@@ -12,7 +12,7 @@
 //             legs, scattered; sized to read at both scales (2-4 px at the end = 5-10 px at the start).
 // Joints are drawn in the paving's own darker tone, never in ink (STYLE: no ink on the ground).
 import React, {useMemo} from 'react';
-import {Batch, Paint, crownD, lineD, polyD, rng, type Pt} from '../kit/dc/core';
+import {Batch, Paint, crownD, lineD, polyD, rng, smoothClosed, type Pt} from '../kit/dc/core';
 import {CAM, dpt, dAt, pxmD, pxmY, RAIL, DT, START_WIN, SPOT} from './V2S5_deck_cam';
 
 /** The floor's extent (END coords): beyond both edges and below the frame at every p. */
@@ -160,92 +160,148 @@ function grates(B: Batch) {
 
 const inWin = (x: number, y: number) => x > START_WIN.x0 - 30 && x < START_WIN.x1 + 20 && y < START_WIN.y1 + 20;
 
-/** One fleck: a lobed spot, wider than deep (the floor is seen at a slant). */
-const fleck = (x: number, y: number, rx: number, seed: string) => crownD(x, y, rx, rx * 0.42, seed, 5, 0.1);
+/** One fleck / spot: lobed, wider than deep (the floor is seen at a slant). */
+const fleck = (x: number, y: number, rx: number, seed: string, k = 0.42) => crownD(x, y, rx, rx * k, seed, 5, 0.1);
 
-/** The sunlit shapes (END coords) as one path: the lit copy of the floor is clipped to it. */
-export function lightShapes(): string {
-  const r = rng('s5deck/light');
-  let d = '';
-  const bandY0 = RAIL.base + 2;
+/** A lobed region bounded by a ragged outline through `pts` (closed, smooth). */
+const lobed = (pts: Pt[]) => smoothClosed(pts);
+
+/** The shade zones' outlines (END coords) and their edges toward the light (with the outward normal): the edges get
+ *  a dappled penumbra (dark spots outside, sun flecks inside), so a shadow's edge breaks up like leaves'. */
+type Zone = {pts: Pt[]; edges: {pts: Pt[]; n: Pt}[]};
+const ZONES: Zone[] = (() => {
+  const r = rng('s5deck/zones');
+  const out: Zone[] = [];
   const bandY1 = dpt(0, COURSES.band1)[1];
-  // 1. the slot's light: broken lit patches on the border band round the news box's feet and beside the bench (the
-  //    box stands in the slot's light; the pair's ground is light at the end), ending in flecks toward us
+  // (a) the canopy's shade round the pair: from the rail (below the lit slot pool under the bench and the news box)
+  //     down to a lobed edge at y ~1470-1545, from beyond the left edge to x ~640-700
   {
-    const patches: [number, number, number][] = [
-      [SPOT.newsBox.x0 + 12, SPOT.newsBox.x0 + 58, 0.9],
-      [SPOT.newsBox.x0 + 70, SPOT.newsBox.x1 + 14, 1],
-      [SPOT.bench.x1 - 30, SPOT.bench.x1 + 6, 0.55],
-      [SPOT.bench.x0 + 4, SPOT.bench.x0 + 34, 0.5],
-    ];
-    patches.forEach(([x0, x1, k], i) => {
-      const pts: Pt[] = [];
-      for (let x = x0; x <= x1; x += 9) pts.push([x, bandY0 + r.range(0, 3)]);
-      for (let x = x1; x >= x0; x -= 8) pts.push([x + r.jitter(3), bandY0 + (bandY1 - bandY0) * k * r.range(0.75, 1) + 5 * Math.sin(x * 0.11 + i)]);
-      d += polyD(pts);
-    });
-    for (let i = 0; i < 14; i++) d += fleck(r.range(SPOT.bench.x0 - 10, SPOT.newsBox.x1 + 30), r.range(bandY1 - 6, bandY1 + 34), r.range(3, 8), `s5deck/sl${i}`);
+    const pts: Pt[] = [];
+    const xL = FX0 - 20;
+    const xR = 670;
+    pts.push([xL, RAIL.base - 1]);
+    for (let x = xL; x <= SPOT.bench.x0 - 30; x += 30) pts.push([x, RAIL.base - 1]);
+    pts.push([SPOT.bench.x0 - 22, bandY1 + 2]);
+    for (let x = SPOT.bench.x0; x <= SPOT.newsBox.x1 + 10; x += 20) pts.push([x, bandY1 + 10 + 8 * Math.sin(x * 0.05) + r.range(0, 10)]);
+    pts.push([SPOT.newsBox.x1 + 24, RAIL.base - 1]);
+    pts.push([xR - 30, RAIL.base - 1]);
+    const right: Pt[] = [];
+    for (let y = RAIL.base + 10; y <= 1500; y += 23) right.push([xR + 30 * Math.sin(y * 0.026 + 0.4) + 12 * Math.sin(y * 0.071) + 7 * Math.sin(y * 0.19) + r.range(-3, 3), y]);
+    const bottom: Pt[] = [];
+    for (let x = xR; x >= xL; x -= 20) bottom.push([x, 1505 + 34 * Math.sin(x * 0.016 + 0.7) + 14 * Math.sin(x * 0.043 + 2) + 6 * Math.sin(x * 0.17) + r.range(-3, 3)]);
+    out.push({pts: [...pts, ...right, ...bottom], edges: [{pts: right, n: [1, 0]}, {pts: bottom, n: [0, 1]}]});
   }
-  // 2. the border band lit on the right (sun over the balustrade between the slope's crowns), broken by the piers'
-  //    shadows (wedges) and ragged toward us
+  // (b) the terrace tree's shade: a strip down the left and the near-left corner
   {
-    const pierXs: number[] = [];
-    for (let X = -1.8 - 3.6 * 30; X < 60; X += 3.6) pierXs.push(CAM.vpx + (CAM.f * X) / RAIL.d);
-    let x = 668;
-    const segs: [number, number][] = [];
-    for (const px of pierXs.filter((p) => p > 668).sort((a, b) => a - b)) {
-      segs.push([x, px - 4]);
-      x = px + 22;
-    }
-    segs.push([x, FX1]);
-    segs.forEach(([a, b], i) => {
-      if (b - a < 8) return;
-      const pts: Pt[] = [[a, bandY0], [b, bandY0]];
-      for (let xx = b; xx >= a; xx -= 18) pts.push([xx - 6, bandY1 + r.range(-3, 8) + (i % 2) * 3]);
-      d += polyD(pts);
-    });
+    const side: Pt[] = [];
+    for (let y = 1480; y <= 1700; y += 22) side.push([200 + 26 * Math.sin(y * 0.045) + 6 * Math.sin(y * 0.2) + r.range(-3, 3), y]);
+    const top: Pt[] = [];
+    for (let x = 220; x <= 480; x += 22) top.push([x, 1735 + 34 * Math.sin(x * 0.028 + 1) + 6 * Math.sin(x * 0.18) + r.range(-3, 3)]);
+    out.push({pts: [[FX0 - 20, 1480], ...side, ...top, [500, FY1 + 10], [FX0 - 20, FY1 + 10]], edges: [{pts: side, n: [1, 0]}, {pts: top, n: [0, -1]}]});
   }
-  // 3. broad lit pools on the right (between the slope crowns' shadows), lobed, with satellite flecks
-  const pools: [number, number, number, number][] = [
-    [770, 1300, 92, 20],
-    [960, 1338, 120, 26],
-    [880, 1420, 70, 18],
-    [1060, 1470, 110, 28],
-    [700, 1478, 60, 15],
-    [560, 1572, 70, 16],
-    [470, 1840, 120, 30],
+  // (c) the corner crown's shade, bottom-right
+  {
+    const side: Pt[] = [];
+    for (let y = 1600; y <= 1780; y += 22) side.push([900 - (y - 1600) * 0.6 + 8 * Math.sin(y * 0.15) + r.range(-4, 4), y]);
+    const top: Pt[] = [];
+    for (let x = 790; x >= 700; x -= 22) top.push([x, 1805 + 10 * Math.sin(x * 0.12) + r.range(0, 12)]);
+    out.push({pts: [[FX1 + 20, 1580], ...side, ...top, [690, FY1 + 10], [FX1 + 20, FY1 + 10]], edges: [{pts: side, n: [-0.8, -0.6]}, {pts: top, n: [-0.3, -0.95]}]});
+  }
+  return out;
+})();
+
+/** Dappled penumbra spots along a zone's edges: outside (dark: to the shade clip) or inside (lit: to the flecks). */
+function penumbra(side: 1 | -1, seed: string): string {
+  const r = rng(seed);
+  let d = '';
+  ZONES.forEach((z, zi) =>
+    z.edges.forEach((e, ei) => {
+      for (let i = 0; i < e.pts.length; i++) {
+        const [x, y] = e.pts[i];
+        const k = pxmY(y);
+        const n = r.int(1, 3);
+        for (let j = 0; j < n; j++) {
+          const u = k * r.range(0.06, 0.55);
+          const px = x + e.n[0] * u * side + r.jitter(k * 0.15);
+          const py = y + e.n[1] * u * side * 0.4 + r.jitter(k * 0.05);
+          const s = k * r.range(0.05, 0.16) * (1 - (u / (k * 0.55)) * 0.55);
+          d += fleck(px, py, Math.max(1.8, s), `${seed}/${zi}/${ei}/${i}/${j}`);
+        }
+      }
+    }),
+  );
+  return d;
+}
+
+/** The SHADE shapes over the sunlit floor (END coords): the canopy's shade round the pair (the start window: the
+ *  start's warm-dark floor) cast by the slope's crowns beyond the rail, the terrace tree's shade down the left and
+ *  in the near-left corner, the corner crown's shade bottom-right, a few long crown shadows across the sunny right,
+ *  leaf-shadow spots (the dapple's dark half) on the lit floor and the zones' dappled penumbra. */
+export function shadeShapes(): string[] {
+  const r = rng('s5deck/shade');
+  const out: string[] = ZONES.map((z) => lobed(z.pts));
+  let d = '';
+  // long crown shadows across the sunny right and the near middle (from beyond, toward us-left)
+  const blobs: [number, number, number, number][] = [
+    [790, 1335, 70, 16],
+    [1010, 1300, 95, 20],
+    [905, 1488, 80, 18],
+    [1090, 1560, 90, 24],
+    [640, 1640, 100, 22],
+    [560, 1760, 80, 20],
   ];
-  pools.forEach(([x, y, rx, ry], i) => {
-    d += crownD(x, y, rx, ry, `s5deck/pool${i}`, 8, 0.1);
-    for (let j = 0; j < 6; j++) d += fleck(x + r.jitter(rx * 1.5), y + r.jitter(ry * 1.4), rx * r.range(0.06, 0.16), `s5deck/pf${i}/${j}`);
-  });
-  // 4. the canopy's dapple: clusters of merging lobed flecks (sizes 0.1-0.45 m), their density by zone: ~30 % lit round
-  //    the pair (the start window: warm-dark, yet a dappled floor), more on the open terrace, none in the near-left
-  //    corner (the terrace tree's shade), little under the corner crown
-  const weight = (x: number, y: number) => {
-    if (x < 300 && y > 1560) return 0;
-    if (x < 150) return 0.1;
-    if (x > 880 && y > 1600) return 0.15;
-    if (inWin(x, y)) return 0.65;
-    return 1;
-  };
+  blobs.forEach(([x, y, rx, ry], i) => (d += crownD(x, y, rx, ry, `s5deck/sb${i}`, 9, 0.1)));
+  // leaf-shadow spots on the lit floor, clustered
+  for (let i = 0; i < 26; i++) {
+    const cx = r.range(640, FX1);
+    const cy = r.range(RAIL.base + 50, 1900);
+    const k = pxmY(cy);
+    const n = 3 + r.int(0, 5);
+    for (let j = 0; j < n; j++) d += fleck(cx + r.jitter(k * 0.9), cy + r.jitter(k * 0.25), Math.max(2, k * r.range(0.08, 0.24)), `s5deck/ls${i}/${j}`);
+  }
+  for (let i = 0; i < 12; i++) {
+    const cx = r.range(300, 640);
+    const cy = r.range(1560, 1900);
+    const k = pxmY(cy);
+    for (let j = 0; j < 4; j++) d += fleck(cx + r.jitter(k * 0.8), cy + r.jitter(k * 0.22), Math.max(2, k * r.range(0.08, 0.22)), `s5deck/ls2${i}/${j}`);
+  }
+  out.push(d);
+  out.push(penumbra(1, 's5deck/penD'));
+  return out;
+}
+
+/** The SUN FLECKS inside the shade (END coords): the dapple's light half in the canopy's shade (round the pair, ~25 %
+ *  lit: sun spots through the blossom at the start), the zones' inner penumbra, a few in the near corners. */
+export function fleckShapes(): string[] {
+  const r = rng('s5deck/flecks');
+  let d = '';
+  // the slot pool's frayed edge: flecks just below the lit band under the bench and the box
+  const bandY1 = dpt(0, COURSES.band1)[1];
+  for (let i = 0; i < 16; i++) d += fleck(r.range(SPOT.bench.x0 - 10, SPOT.newsBox.x1 + 20), r.range(bandY1 + 8, bandY1 + 40), r.range(3, 8), `s5deck/sl${i}`);
+  // clusters in the canopy's shade (merging spots, 0.08-0.3 m)
   let placed = 0;
-  for (let i = 0; i < 400 && placed < 70; i++) {
-    const cx = r.range(FX0 + 30, FX1 - 10);
-    const cy = r.range(RAIL.base + 40, FY1 - 10);
-    if (r.next() > weight(cx, cy)) continue;
+  for (let i = 0; i < 300 && placed < 26; i++) {
+    const cx = r.range(START_WIN.x0 - 60, 660);
+    const cy = r.range(RAIL.base + 50, 1510);
+    if (!inWin(cx, cy) && r.chance(0.6)) continue;
     placed++;
     const k = pxmY(cy);
-    const n = 5 + r.int(0, 9);
-    const sp = k * r.range(0.6, 1.3);
+    const n = 4 + r.int(0, 8);
+    const sp = k * r.range(0.5, 1.1);
     for (let j = 0; j < n; j++) {
       const x = cx + r.jitter(sp);
       const y = cy + r.jitter(sp * 0.28);
       const fall = 1 - Math.min(1, Math.abs(x - cx) / (sp + 1)) * 0.6;
-      d += fleck(x, y, Math.max(2, pxmY(y) * r.range(0.1, 0.36) * fall), `s5deck/fc${i}/${j}`);
+      d += fleck(x, y, Math.max(2, pxmY(y) * r.range(0.08, 0.3) * fall), `s5deck/fc${i}/${j}`);
     }
   }
-  return d;
+  // a few in the near corners' shade
+  for (let i = 0; i < 7; i++) {
+    const x = r.range(180, 480);
+    const y = r.range(1760, 1960);
+    d += fleck(x, y, pxmY(y) * r.range(0.1, 0.22), `s5deck/fn${i}`);
+  }
+  return [d, penumbra(-1, 's5deck/penL')];
 }
 
 /** A petal: a small teardrop at angle a (s = its half-length). */
@@ -307,7 +363,8 @@ function drifts(B: Batch) {
   B.fill(DT.petalLit, c);
 }
 
-/** The deep shade in the near corners (the terrace tree, the corner crown) is simply the shade copy: no light there. */
+/** The floor (END coords): the sunlit paving, the shade copy clipped to the shade shapes, the sunlit copy again
+ *  clipped to the flecks inside the shade (a static 2-value dapple), then grates and petal drifts. */
 export const DeckFloor: React.FC = () => {
   const shade = useMemo(() => {
     const B = new Batch();
@@ -319,7 +376,8 @@ export const DeckFloor: React.FC = () => {
     paving(B, 'lit');
     return B;
   }, []);
-  const light = useMemo(() => lightShapes(), []);
+  const shadeD = useMemo(() => shadeShapes(), []);
+  const fleckD = useMemo(() => fleckShapes(), []);
   const over = useMemo(() => {
     const B = new Batch();
     grates(B);
@@ -329,14 +387,24 @@ export const DeckFloor: React.FC = () => {
   }, []);
   return (
     <>
-      <Paint b={shade} seed="s5deck/floorS" misreg={false} />
+      <Paint b={lit} seed="s5deck/floorL" misreg={false} />
       <defs>
-        <clipPath id="s5deck-light" clipPathUnits="userSpaceOnUse">
-          <path d={light} />
+        <clipPath id="s5deck-shade" clipPathUnits="userSpaceOnUse">
+          {shadeD.map((d, i) => (
+            <path key={i} d={d} />
+          ))}
+        </clipPath>
+        <clipPath id="s5deck-fleck" clipPathUnits="userSpaceOnUse">
+          {fleckD.map((d, i) => (
+            <path key={i} d={d} />
+          ))}
         </clipPath>
       </defs>
-      <g clipPath="url(#s5deck-light)">
-        <Paint b={lit} seed="s5deck/floorL" misreg={false} />
+      <g clipPath="url(#s5deck-shade)">
+        <Paint b={shade} seed="s5deck/floorS" misreg={false} />
+      </g>
+      <g clipPath="url(#s5deck-fleck)">
+        <Paint b={lit} seed="s5deck/floorL2" misreg={false} />
       </g>
       <Paint b={over} seed="s5deck/floorO" misreg={false} />
     </>

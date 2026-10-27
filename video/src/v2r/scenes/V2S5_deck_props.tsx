@@ -43,8 +43,8 @@ export function balustrade(): Batch {
   const pw = 0.42 * k;
   const isPier = (x: number) => pierX.some((p) => Math.abs(x - p) < pw * 0.5 + 0.12 * k);
   // balusters: a vase shape (flat), lit right, shade left
-  const bw = 0.12 * k;
-  const step = 0.3 * k;
+  const bw = 0.13 * k;
+  const step = 0.34 * k;
   let lit = '';
   let shd = '';
   for (let x = x0; x < x1; x += step) {
@@ -105,7 +105,7 @@ export function balustrade(): Batch {
 /** A park bench seen from behind (its back toward us): plum cast-iron ends, a brick top rail, an OPEN back (the
  *  sitters' whole backs show), the seat's back edge, the shadow under it. Screen box x0..x1, the top rail's top at
  *  yRail, the back legs' feet at yFeet. `part` splits it for the stranger's bench. */
-export function benchBack(B: Batch, o: {x0: number; x1: number; yRail: number; yFeet: number; d: number; ink: number; part?: 'all' | 'under' | 'over'; split?: number; shadow?: boolean}) {
+export function benchBack(B: Batch, o: {x0: number; x1: number; yRail: number; yFeet: number; d: number; ink: number; part?: 'all' | 'under' | 'over'; split?: number; shadow?: boolean; yBack?: number}) {
   const {x0, x1, yRail, yFeet, d, ink} = o;
   const part = o.part ?? 'all';
   const k = pxmD(d);
@@ -113,20 +113,26 @@ export function benchBack(B: Batch, o: {x0: number; x1: number; yRail: number; y
   const endW = Math.max(2.2, 0.07 * k);
   const railH = Math.max(2.6, 0.11 * k);
   const seatY = yFeet - 0.45 * k;
-  const seatFrontY = seatY - 0.2 * k;
+  const seatFrontY = seatY - 0.14 * k;
   const split = o.split ?? x1;
   const under = part === 'all' || part === 'under';
   const over = part === 'all' || part === 'over';
   if (under) {
-    // the dark gap under the seat (the floor in the bench's own shade, between the legs) + a contact shadow strip
+    // under the seat: the plinth (or the floor beyond) in the bench's own shade, then the floor under it, the legs
+    // standing on it, a stretcher; the darkest right under the seat's edge (an open space, never a panel)
     if (o.shadow !== false) {
-      // the floor under the seat in the bench's own shade, the darkest right under the seat's edge, a stretcher bar
-      B.fill(DT.deep, polyD([[x0 + endW * 0.5, seatY], [x1 - endW * 0.5, seatY], [x1 - endW * 0.2, yFeet + 0.015 * k], [x0 + endW * 0.2, yFeet + 0.015 * k]]));
-      B.fill(DT.under, polyD([[x0 + endW * 0.5, seatY], [x1 - endW * 0.5, seatY], [x1 - endW * 0.5, seatY + 0.09 * k], [x0 + endW * 0.5, seatY + 0.13 * k]]));
+      const yMid = o.yBack === undefined ? seatY : Math.min(yFeet - 0.1 * k, Math.max(seatY + 0.12 * k, o.yBack));
+      if (o.yBack !== undefined) B.fill(mix(DT.stoneMid, CM.shadeWarm, 0.45), polyD([[x0 + endW * 0.5, seatY], [x1 - endW * 0.5, seatY], [x1 - endW * 0.5, yMid], [x0 + endW * 0.5, yMid]]));
+      B.fill(DT.deep, polyD([[x0 + endW * 0.5, yMid], [x1 - endW * 0.5, yMid], [x1 - endW * 0.2, yFeet + 0.015 * k], [x0 + endW * 0.2, yFeet + 0.015 * k]]));
+      B.fill(DT.under, polyD([[x0 + endW * 0.5, seatY], [x1 - endW * 0.5, seatY], [x1 - endW * 0.5, seatY + 0.05 * k], [x0 + endW * 0.5, seatY + 0.07 * k]]));
       B.fill(DT.deep, polyD([[x0 - 0.03 * k, yFeet], [x1 + 0.06 * k, yFeet], [x1 - 0.02 * k, yFeet + 0.06 * k], [x0 - 0.1 * k, yFeet + 0.07 * k]]));
+      if (o.yBack !== undefined) B.ink(lineD([[x0 + endW, yMid], [x1 - endW, yMid]]), Math.max(0.6, ink * 0.35), DT.under);
       B.rect(DT.iron, x0 + endW * 0.5, yFeet - 0.17 * k, x1 - x0 - endW, Math.max(1, 0.025 * k));
+      // a middle leg
+      const xm = (x0 + x1) / 2;
+      B.rect(DT.iron, xm - Math.max(1, 0.025 * k), seatY, Math.max(2, 0.05 * k), yFeet - seatY);
     }
-    // the seat's top (seen from above-behind, beyond its back edge: lit) and a slat line
+    // the seat's top (seen from above-behind, beyond its back edge: lit, thin) and a slat line
     B.poly(DT.woodLit, [[x0 + endW * 0.6, seatFrontY], [x1 - endW * 0.6, seatFrontY], [x1 - endW * 0.6, seatY], [x0 + endW * 0.6, seatY]]);
     B.ink(lineD([[x0 + endW, (seatFrontY + seatY) / 2], [x1 - endW, (seatFrontY + seatY) / 2]]), Math.max(0.6, ink * 0.3), DT.wood);
     // the top rail's part UNDER the figures (Pip's perch): from the split to the right end
@@ -186,7 +192,7 @@ export function strangerBench(part: 'under' | 'over'): Batch {
     B.ink(`M${tx + 3.6} ${ty - 13.2}q4 -8 8.4 0`, 1.1, DT.ink);
     B.ink(lineD([[tx, ty], [tx + 1.2, ty - 13], [tx + 13.5, ty - 13.5], [tx + 14.5, ty]]), 1.0, DT.ink, 0.2);
   }
-  benchBack(B, {x0: sb.x0, x1: sb.x1, yRail: sb.yRail, yFeet: sb.yFeet, d, ink: 1.9, part, split: sb.split});
+  benchBack(B, {x0: sb.x0, x1: sb.x1, yRail: sb.yRail, yFeet: sb.yFeet, d, ink: 1.9, part, split: sb.split, yBack: RAIL.base});
   return B;
 }
 

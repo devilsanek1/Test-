@@ -31,6 +31,8 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 ## Look (G4)
 - 2026-10-26, G4: "lets go with A": palette 3 Cream & Cobalt (desk_A); then "lets do dusk": the Pentagon scale beat in the
   6 Dusk sister palette. -> `docs/v2/LOOK.md`; rule: Taste signals (palettes).
+  Superseded by the restart (2026-10-27, "full creative freedom"): the dropped pass's Cream & Cobalt + dusk picks no longer
+  bind; the restart's judged direction uses palette "10 Canal Mint" (an October evening, `src/v2r/palette.ts`, STYLE.md).
 
 ## Production (G5 on)
 - 2026-10-26, G5 (while the v2 blocking build ran): "we've updated the repo with a few more ground rules" (every scene must feel
