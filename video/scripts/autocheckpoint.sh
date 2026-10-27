@@ -17,6 +17,8 @@ trailers=${CHECKPOINT_TRAILERS:-}
 
 checkpoint() {
   [ -e .git/index.lock ] && { echo "$(date -u +%H:%M) index locked, skipped"; return; }
+  { [ -e .git/MERGE_HEAD ] || [ -d .git/rebase-merge ] || [ -d .git/rebase-apply ]; } &&
+    { echo "$(date -u +%H:%M) a merge or rebase is in progress, skipped"; return; }
   git add -- "$@" 2>/dev/null
   if git diff --cached --quiet -- "$@"; then
     return

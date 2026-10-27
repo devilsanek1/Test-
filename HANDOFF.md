@@ -125,7 +125,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
 
 - **Video 4 is produced by session https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt since 2026-10-27 ~22:35 UTC**
   (owner: "okay lets continue with the video 4 production"), on branch `claude/busy-lovelace-83r39e` (the earlier v4
-  branch below merged in; not yet in `video-production`). G0.5 is RUNNING there; live state in `video/docs/v4/README.md`.
+  branch below merged in), merged into `video-production` on 2026-10-27 ~23:05 UTC at the owner's yes. G0.5 is RUNNING there; live state in `video/docs/v4/README.md`.
 - Session https://claude.ai/code/session_014PwCXHBSouhcawFp12X9sT, branch `claude/tender-bardeen-j7duak`.
 - Owner: "research another video topic starting with step 1; the topic must not include Anthropic as the key entity."
 - Workflow `context/workflows/v4-g0-topics-wf_4d4df1c1-d0b.js` writes `video/docs/v4/scouting/*.md` and

@@ -7,8 +7,9 @@ and `video/docs/PIPELINE_V2.md`.
 - The owner, 2026-10-27 ~22:35 UTC: "okay lets continue with the video 4 production" (it was paused at ~14:40 UTC so the
   v2 and v3 sessions could finish first; they were still in flight when it resumed, and they share the weekly limit).
 - Session: https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt, git branch **`claude/busy-lovelace-83r39e`** (the
-  earlier v4 branch `claude/tender-bardeen-j7duak` is merged into it, with `video-production` as of 22:30 UTC). Not yet
-  merged into `video-production`: ask the owner before pushing there.
+  earlier v4 branch `claude/tender-bardeen-j7duak` is merged into it, with `video-production` as of 22:30 UTC). Merged into
+  `video-production` on 2026-10-27 ~23:05 UTC (owner: "yes merge it into video-production"): v4 work is committed on the
+  session branch, then pulled and pushed to `video-production` at each step, like the other films.
 - The earlier session (G0, the pause): https://claude.ai/code/session_014PwCXHBSouhcawFp12X9sT.
 - Checkpoints: a commit after every agent, plus `video/scripts/autocheckpoint.sh claude/busy-lovelace-83r39e video/docs/v4`
   in the background (every 10 minutes when v4's files changed; restart it after a session restart, and add v4's

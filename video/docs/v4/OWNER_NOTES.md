@@ -42,3 +42,5 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-27 ~22:55 UTC: "make sure to commit the progress periodically if we get stopped on the usage limits" ->
   `video/scripts/autocheckpoint.sh` runs in the background on v4's paths (a commit and push every 10 minutes when they
   changed), on top of a commit after every agent; agents write their output file early. -> rule: Process (limits).
+- 2026-10-27 ~23:05 UTC: "yes merge it into video-production" -> v4's branch (with the max-effort hook, the
+  auto-checkpoint and the earlier v4 branch's rhythm rule) merged into `video-production`; v4 keeps syncing there.
