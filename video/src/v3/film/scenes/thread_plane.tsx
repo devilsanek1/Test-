@@ -24,7 +24,8 @@
 // 38.12-41.15); the button and the cart badge (left out of the screen's multiply) take a soft blue (C* 18) with no
 // outline and the listing's laptop drops to tier B. The TAG dims to a soft terracotta (C* 38, no outline, the prices
 // in its light tint) everywhere but its own beats (full 0-4.04, 15.30-15.90, 17.24-18.90, 24.44-25.04, 29.90-31.00,
-// 35.95-36.98, 38.12-41.15: TAG_FULL); off-beat its idle sway and the hand's float are halved (eased, never a jump).
+// 35.95-36.98, 38.12-41.15: TAG_FULL); off-beat its idle sway is halved and the hand's float drops to 0.3 (eased,
+// never a jump).
 // Every change is a 2-step change (3 frames at the half step, never a fade); at 4.04 the screen, the button and the tag
 // step down in the same frame as the data center goes dark: one event.
 //
@@ -294,8 +295,10 @@ export function thumbAt(T: number, w: number): Pt {
  *  on film time so both sides of every seam draw it identically. Life on the subject itself, never a camera move. */
 export function handFloat(T: number): {dx: number; dy: number; rot: number} {
   const w = (p: number) => (Math.PI * 2) / p;
-  // off its beat the plane is tier B: half the float (CRAFT §b, support motion x0.5), eased with offbeat()
-  const a = 1 - 0.5 * offbeat(T);
+  // off its beat the plane is tier B, a big near thing that only breathes while the stage acts (CRAFT §b: <= 2 %W/s):
+  // 0.3 of the float (~0.2 %W/s), eased with offbeat(), so the beat's subject owns the motion (the SQA pilot review:
+  // the phone's float was 88 % of the motion over 4.47-5.10 while the data center was the subject)
+  const a = 1 - 0.7 * offbeat(T);
   return {
     dx: a * (1.6 * Math.sin(T * w(4.3) + 0.7) + 0.5 * Math.sin(T * w(1.9) + 2.1)),
     dy: a * (2.6 * Math.sin(T * w(3.1) + 0.2) + 0.7 * Math.sin(T * w(1.7) + 1.3)),

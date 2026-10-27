@@ -61,6 +61,7 @@ import {
   PenCup,
   Plant,
   Show,
+  signFaceShift,
   SkyClouds,
   Smoke,
   Snowfall,
@@ -231,8 +232,11 @@ export const DC_SIGN_AT = 0.25;
 /** The server lights: a soft cold value (a quiet texture under the sign, never a field of bright dashes). */
 export const DC_LED = '#A8B6DE';
 export const DC_DARK_AT = 4.04;
-/** 4.16-4.53: the dark building's server rows light up one by one, after the sign's pop (rows OFF from 4.04). */
-export const DC_ROWS_ON = {at: 4.16, dur: 0.4};
+/** 4.16-4.87: the dark building's server rows light up one by one after the sign's pop (rows OFF from 4.04), one row
+ *  per syllable of "AI data centers" (4.16 / 4.38 / 4.59 / 4.81, each row's three bands a quick sweep), so the beat's
+ *  subject owns the motion through its line (the SQA pilot review measured 8 % for it over 4.47-5.10 when the rows were
+ *  done by 4.56 and the phone's float was all that moved). */
+export const DC_ROWS_ON = {at: 4.16, dur: 0.86};
 const HomeDataCenter: React.FC<{T: number}> = ({T}) => {
   const k = T >= DC_DARK_AT ? Math.sin(Math.PI * prog(T, DC_DARK_AT, 0.2, ease.linear)) : 0;
   const s = 1 + 0.045 * k;
@@ -251,17 +255,19 @@ const HomeDataCenter: React.FC<{T: number}> = ({T}) => {
       ledColor={DC_LED}
       ledStyle="bands"
       rowsOn={DC_ROWS_ON}
+      signOnFace
       tier={T >= DC_DARK_AT ? 'subject' : 'support'}
     />
   );
   return s > 1.0005 ? <XG m={mat.about(mat.scale(s), DC_AT.x, DC_AT.y)}>{body}</XG> : body;
 };
 
-/** The data center's sign plate (H1 px) grown by a margin (its 4.04 pop scales it x1.045): falling snow stays off it. */
+/** The data center's sign plate (H1 px; centred on the lit front face: `signOnFace`) grown by a margin (its 4.04 pop
+ *  scales it x1.045): falling snow stays off it. */
 const SIGN_PLATE = (() => {
   const g = dataCenterGeo(DC_AT.x, DC_AT.y, DC_AT.w).sign;
   const m = 14;
-  return rectD(g.x - m, g.y - m, g.w + m * 2, g.h + m * 2);
+  return rectD(g.x + signFaceShift(DC_AT.w) - m, g.y - m, g.w + m * 2, g.h + m * 2);
 })();
 /** The snow's clip: the sky box minus the sign plate (even-odd). */
 const SNOW_CLIP = rectD(-400, -400, 2000, 2400) + SIGN_PLATE;
@@ -357,10 +363,16 @@ const Biscuits: React.FC<{x: number; y: number; at?: number}> = ({x, y, at}) => 
   </>
 );
 
+/** A rounded rect (corner 8) as one closed path: a desk book's cover. */
+const bookRectD = (x: number, y: number, w: number, h: number) =>
+  `M${x + 8} ${y}H${x + w - 8}Q${x + w} ${y} ${x + w} ${y + 8}V${y + h - 8}Q${x + w} ${y + h} ${x + w - 8} ${y + h}H${x + 8}Q${x} ${y + h} ${x} ${y + h - 8}V${y + 8}Q${x} ${y} ${x + 8} ${y}Z`;
+/** A desk book's whole silhouette in its own (unrotated) frame: the cover and the page block under it. */
+const deskBookD = (bk: {x: number; y: number; w: number; h: number}) => bookRectD(bk.x, bk.y, bk.w, bk.h + 10);
+
 /** A closed book lying flat (rotated about its centre): the cover, the page block's edge, a ribbon. */
 const DeskBook: React.FC<(typeof DESK_BOOKS)[number] & {at?: number}> = ({x, y, w, h, rot, color, at}) => (
   <XG m={mat.about(mat.rotate(rot), x + w / 2, y + h / 2)}>
-    <Fill d={`M${x + 8} ${y}H${x + w - 8}Q${x + w} ${y} ${x + w} ${y + 8}V${y + h - 8}Q${x + w} ${y + h} ${x + w - 8} ${y + h}H${x + 8}Q${x} ${y + h} ${x} ${y + h - 8}V${y + 8}Q${x} ${y} ${x + 8} ${y}Z`} color={color} at={at} offset={false} />
+    <Fill d={bookRectD(x, y, w, h)} color={color} at={at} offset={false} />
     <Fill rect={[x + 10, y + h - 2, w - 20, 12]} color={EMBER.paper} at={at} offset={false} />
     <Fill rect={[x + w * 0.72, y + h - 4, 12, 30]} color={EMBER.mugBand} at={at} offset={false} />
   </XG>
@@ -575,8 +587,13 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
         <ContactShadow x={BOOKS_X.x + BOOKS_X.w / 2} y={BOOKS_X.y} w={BOOKS_X.w} h={10} />
         <ContactShadow x={PENS_X.x} y={PENS_X.y} w={PENS_X.w} h={8} />
         <ContactShadow x={BOOKS_P.x + BOOKS_P.w / 2} y={BOOKS_P.y} w={BOOKS_P.w} h={10} />
+        {/* each closed book's soft contact rim: its own silhouette (cover + page block), turned with the book (an
+            unrotated rect under a book turned 8 deg stuck out at two corners: early SQB-SQF review E13), a few px away
+            from the lamp */}
         {DESK_BOOKS.map((bk, i) => (
-          <Shadow key={i} d={rectD(bk.x, bk.y + 6, bk.w, bk.h + 6)} dx={3} dy={5} soft={3} tint="contact" />
+          <XG key={i} m={mat.about(mat.rotate(bk.rot), bk.x + bk.w / 2, bk.y + bk.h / 2)}>
+            <Shadow d={deskBookD(bk)} dx={3} dy={5} soft={3} tint="contact" />
+          </XG>
         ))}
       </ShadowLayer>
       <Tier tier="environment">
