@@ -179,6 +179,10 @@ Format: **rule** — why / evidence (video, date).
   quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
   reviewing what will still change, early polish). — (2026-10-25; owner, 2026-10-26).
 - **Locked means dropped:** rejected options go to `archive/`, never seen by later prompts; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
+- **New feedback is INTEGRATED, never just appended:** when a note changes the direction, rewrite or retire every rule and
+  doc it contradicts in the same pass, so the next agent never meets conflicting instructions; the current visual direction
+  lives in one place that wins over older docs. — ("evaluate this feedback and compact it with the overall stylistic
+  direction ... the next agent should not be confused with conflicting instructions", 2026-10-27).
 - **Every lesson goes into the generic process, committed** (playbook, a PIPELINE gate, the studio toolkit). — ("we gradually get better", v3, 2026-10-26).
 - **A rejected cut restarts clean.** When the owner says "I don't like it, start from scratch", drop the old visual
   work (archive it), skip the gates the owner names (e.g. no sketch) and make the finished film directly with full
