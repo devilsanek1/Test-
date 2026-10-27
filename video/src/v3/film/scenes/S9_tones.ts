@@ -31,10 +31,11 @@ export const T9 = {
   // the campus and the mountain (far)
   hallB: '#373E5D',
   pylon: '#505A81',
-  pileGold: '#CFA67C',
-  pileDeep: '#BD956D',
-  pilePin: '#DDC29B',
-  pileChip: '#463E46',
+  // the mountain: gold memory, the warmest far shape (G5b review: L 71 / C 36 gold, warm-dark chips, no grey)
+  pileGold: '#D4A46E',
+  pileDeep: '#C69563',
+  pilePin: '#E4C595',
+  pileChip: '#5A4232',
   pileInk: '#826A5A',
   // the mid band (22 %)
   midDark: '#424C71',
