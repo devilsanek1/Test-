@@ -8,12 +8,12 @@
 import React from 'react';
 import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
-import {Batch, Paint, P, ovalPath, domePath, leafPath, lerp, rng, rand, frac, clamp01} from '../kit/canal/core';
+import {Batch, Paint, P, Pt, ovalPath, domePath, leafPath, lerp, rng, rand, frac, clamp01} from '../kit/canal/core';
 import {StringLights, FallingLeaves, Puffs, Pigeons} from '../kit/canal/life';
 import {Person, Seated, NearBack, strideFor} from '../kit/cast';
 import {
-  LANE, walkerH, kAt, kpAt, TREE_L, TREE_R, FESTOON_A, FESTOON_B, JETS, BASIN, basinLeftAt, CAFE, WING, BULB_STEP,
-  runAt, W7, mixHex,
+  LANE, walkerH, kAt, kpAt, seatedH, TREE_L, TREE_R, FESTOON_A, FESTOON_B, JETS, BASIN, basinLeftAt, CAFE, WING, BULB_STEP,
+  NEAR_BACKS, RIM_SITTERS, STANDER, runAt, W7, mixHex,
 } from './V2S7_rig';
 
 // ---------------------------------------------------------------- walkers (profile, sideways)
@@ -224,30 +224,54 @@ export const S7StepSitters: React.FC = () => {
   );
 };
 
-/** T1's two seated backs (in front of the far table, behind their chair hoops): a cup lifts and goes down. */
+/** T1's two seated backs and T0's one (in front of the far tables, behind their chair hoops): a cup lifts and goes
+ *  down, a head turns a little, a page of a paper turns (all ambient, never on Google's key words). */
 export const S7CafeT1People: React.FC = () => {
   const t = useTime();
   const [a, b] = CAFE.s1;
+  const c = CAFE.s0;
   const cupA = clamp01((t - 0.9) / 0.55) * (1 - clamp01((t - 2.95) / 0.55));
+  const turnB = 0.45 * clamp01((t - 3.6) / 0.4) * (1 - clamp01((t - 4.5) / 0.4));
   return (
     <>
+      <Seated x={c.x} y={c.seat} h={c.h} seed={c.seed} read traits={{hair: 'long', acc: 'none', coat: CM.coatOat, hairColor: CM.hair[4], broad: 0.97}} />
       <Seated x={a.x} y={a.seat} h={a.h} seed={a.seed} cup={cupA} side={1} traits={{hair: 'curls', acc: 'scarf', coat: CM.brickLight, broad: 0.98}} />
-      <Seated x={b.x} y={b.seat} h={b.h} seed={b.seed} turn={Math.sin(Math.max(0, t - 3.6) * 1.4) * 0.5 * clamp01((t - 3.6) / 0.4)} traits={{hair: 'short', acc: 'backpack', coat: CM.coatMustard, broad: 0.96}} />
+      <Seated x={b.x} y={b.seat} h={b.h} seed={b.seed} turn={turnB} traits={{hair: 'short', acc: 'backpack', coat: CM.coatMustard, broad: 0.96}} />
     </>
   );
 };
 
-/** T2's near head-backs, cut by the frame bottom (hv <= 150: the widest is <= ~140 px at the shoulders). */
-export const S7CafeNearPeople: React.FC = () => {
+/** The front row: head-backs cut by the frame bottom (hv <= 150: the widest is <= ~140 px at the shoulders). */
+export const S7NearBacks: React.FC = () => {
   const t = useTime();
-  const [a, b] = CAFE.near;
+  const [a, b, c, d] = NEAR_BACKS;
   const turnA = 0.55 * clamp01((t - 2.9) / 0.35) * (1 - clamp01((t - 4.1) / 0.35));
+  const turnD = -0.4 * clamp01((t - 1.2) / 0.4) * (1 - clamp01((t - 2.3) / 0.4));
   return (
     <>
       <NearBack x={a.x} y={1920} hv={a.hv} seed={a.seed} turn={turnA} traits={{hair: 'lowBun', acc: 'scarf', coat: CM.sage, hairColor: CM.hair[1], broad: 0.98}} />
       <NearBack x={b.x} y={1920} hv={b.hv} seed={b.seed} traits={{hair: 'beanie', acc: 'none', coat: CM.coatPlum, hatColor: CM.coatMustard, broad: 0.95}} />
+      <NearBack x={c.x} y={1920} hv={c.hv} seed={c.seed} traits={{hair: 'short', acc: 'backpack', coat: CM.brick, hairColor: CM.hair[3], accColor: CM.coatSlate, broad: 0.97}} />
+      <NearBack x={d.x} y={1920} hv={d.hv} seed={d.seed} turn={turnD} traits={{hair: 'curls', acc: 'tote', coat: CM.coatOat, hairColor: CM.hair[2], broad: 0.94}} />
     </>
   );
+};
+
+/** Two people sitting on the basin's near rim, backs to us, watching the jets (at rest). */
+export const S7RimSitters: React.FC = () => {
+  const [a, b] = RIM_SITTERS;
+  return (
+    <>
+      <Seated x={a.x} y={a.seat} h={seatedH(a.seat)} seed={a.seed} traits={{hair: 'cap', acc: 'backpack', coat: CM.coatSlate, hatColor: CM.leafRust, broad: 0.96}} />
+      <Seated x={b.x} y={b.seat} h={seatedH(b.seat) * 0.96} seed={b.seed} phone side={1} traits={{hair: 'bun', acc: 'scarf', coat: CM.box, hairColor: CM.hair[0], broad: 0.95}} />
+    </>
+  );
+};
+
+/** A person at rest left of the board, on the phone (rear 3/4, never facing us). */
+export const S7Stander: React.FC = () => {
+  const t = useTime();
+  return <Person x={STANDER.x} y={STANDER.feet} h={STANDER.h} seed="s7/stander" pose="phoneEar" view="rear34" gesture={0.3 + 0.3 * Math.sin(t * 1.7)} traits={{hair: 'short', acc: 'tote', coat: CM.coatMustard, hairColor: CM.hair[1]}} exact />;
 };
 
 /** Far tiny walkers beyond the west railing (fill only), in the column left of the board. */
@@ -272,40 +296,69 @@ export const S7FarWalkers: React.FC = () => {
 /** Jet i's height (px) at t: a slow wave travelling right -> left along the row (rhythmic, calm). */
 export const jetH = (i: number, t: number) => {
   const w = 0.5 + 0.5 * Math.sin((2 * Math.PI * t) / 2.6 - i * 0.78 + 0.6);
-  return JETS.hMin + (JETS.hMax - JETS.hMin) * (0.25 + 0.75 * w * w);
+  return JETS.hMin + (JETS.hMax - JETS.hMin) * (0.2 + 0.8 * w * w);
 };
 
-/** The jets: flat columns of water (glass, a paper stripe on the lit side, water on the shade side), breaking at the
- *  top into falling drops; a splash ring at each nozzle. No ink on water. */
+/** The jets: flat columns of water (glass, a paper stripe on the lit side, water on the shade side) that ripple up
+ *  their length, open at the top into a little crown falling outward in two arcs and drops, foam at each nozzle.
+ *  No ink on water; nothing ever crosses the board (x >= 790). */
 export const S7Jets: React.FC = () => {
   const t = useTime();
   const b = new Batch();
   const y0 = JETS.y;
+  const N = 12;
   JETS.xs.forEach((x, i) => {
     const H = jetH(i, t);
-    const top = y0 - H;
-    const lean = -5;
-    const w0 = 7.5;
-    const w1 = 4.2;
-    b.poly(CM.glass, [[x - w0, y0], [x + w0, y0], [x + w1 + lean, top], [x - w1 + lean, top]]);
-    b.poly(CM.paper, [[x - w0, y0], [x - w0 * 0.35, y0], [x - w1 * 0.3 + lean, top], [x - w1 + lean, top]]);
-    b.poly(CM.water, [[x + w0 * 0.45, y0], [x + w0, y0], [x + w1 + lean, top + 6], [x + w1 * 0.4 + lean, top + 8]]);
-    // the break at the top: a rounded cap and drops falling outward (a short loop per drop)
-    b.fill(CM.paper, ovalPath(x + lean, top, w1 * 1.7, w1 * 1.2));
-    for (let k = 0; k < 6; k++) {
-      const per = 0.62 + 0.08 * k;
-      const u = frac(t / per + k * 0.17 + i * 0.31);
-      const side = k % 2 ? 1 : -1;
-      const vx = side * (14 + 6 * (k % 3));
-      const dx = vx * u * 2.2;
-      const dy = -18 * u + 120 * u * u;
-      const r = 3.2 - 1.4 * u;
-      b.fill(k % 3 === 0 ? CM.paper : CM.glass, ovalPath(x + lean + dx, top + dy, r, r * 1.15));
+    const L: Pt[] = [];
+    const R: Pt[] = [];
+    const hi: Pt[] = [];
+    const sh: Pt[] = [];
+    let top: Pt = [x, y0 - H];
+    for (let s = 0; s <= N; s++) {
+      const u = s / N;
+      const y = y0 - H * u;
+      const half = lerp(9, 5.2, u);
+      const wob = 1.5 * Math.sin(2 * Math.PI * (u * 2.4 - t * 2.2) + i * 1.3) * u;
+      const xc = x - 6 * u * u + wob;
+      L.push([xc - half, y]);
+      R.push([xc + half, y]);
+      hi.push([xc - half * 0.3, y]);
+      sh.push([xc + half * 0.45, y]);
+      if (s === N) top = [xc, y];
     }
-    // splash ring at the nozzle: a flat paper ellipse that breathes with the jet
-    const sr = 13 + 6 * ((H - JETS.hMin) / (JETS.hMax - JETS.hMin));
-    b.fill(CM.glass, ovalPath(x, y0 + 1, sr * 1.25, 4.4));
-    b.fill(CM.paper, ovalPath(x - 2, y0, sr * 0.75, 2.6));
+    b.poly(CM.glass, [...L, ...R.slice().reverse()]);
+    b.poly(CM.paper, [...L, ...hi.slice().reverse()]);
+    b.poly(CM.water, [...sh, ...R.slice().reverse()]);
+    // the crown: a rounded cap and two arcs of water falling outward (tapered strips), drops beyond them
+    const [xt, yt] = top;
+    b.fill(CM.paper, ovalPath(xt, yt + 2, 7.5, 6));
+    for (const side of [-1, 1]) {
+      const W = H * 0.15 * (side < 0 ? 1.1 : 0.9);
+      const D = H * 0.3;
+      const pts: Pt[] = [];
+      const pts2: Pt[] = [];
+      for (let s = 0; s <= 8; s++) {
+        const u = s / 8;
+        const px = xt + side * W * u;
+        const py = yt - 12 * u + (12 + D) * u * u;
+        const w = lerp(3.4, 1.2, u);
+        pts.push([px, py - w]);
+        pts2.push([px, py + w]);
+      }
+      b.poly(side < 0 ? CM.paper : CM.glass, [...pts, ...pts2.reverse()]);
+      for (let k = 0; k < 3; k++) {
+        const v = frac(t / 0.55 + k / 3 + i * 0.21 + (side > 0 ? 0.5 : 0));
+        const ex = xt + side * W * (1 + 0.25 * v);
+        const ey = yt + D + 90 * v * v;
+        if (ey < y0 - 4) b.fill(k % 2 ? CM.glass : CM.paper, ovalPath(ex, ey, 2.6, 3.2));
+      }
+    }
+    // foam at the nozzle: a few paper lobes and a glass ring that breathes with the jet
+    const g = (H - JETS.hMin) / (JETS.hMax - JETS.hMin);
+    const sr = 14 + 7 * g;
+    b.fill(CM.glass, ovalPath(x, y0 + 2, sr * 1.35, 5));
+    b.fill(CM.paper, ovalPath(x - 4, y0 - 1, 7 + 2 * g, 4.4));
+    b.fill(CM.paper, ovalPath(x + 6, y0, 5 + 2 * g, 3.4));
   });
   return <Paint b={b} seed="s7/jets" misreg={false} />;
 };

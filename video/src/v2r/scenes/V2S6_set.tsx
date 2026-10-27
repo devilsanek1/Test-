@@ -19,9 +19,9 @@ import {GATE, GT} from '../kit/dc/gate';
 export const LEAF = {
   lit: mix(CM.sage, CM.paper, 0.3),
   body: CM.sage,
-  shade: mix(CM.sage, CM.waterDeep, 0.55),
-  deep: mix(CM.waterDeep, CM.paneUnlit, 0.22),
-  stem: mix(CM.sage, CM.waterDeep, 0.8),
+  shade: mix(CM.sage, CM.waterDeep, 0.4),
+  deep: mix(CM.sage, CM.coatSlate, 0.28),
+  stem: mix(CM.sage, CM.waterDeep, 0.65),
 };
 
 // ---------------------------------------------------------------- the hedge behind the fence (mid plane)

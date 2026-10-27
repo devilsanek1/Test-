@@ -63,33 +63,51 @@ export const FESTOON_B = {from: [1046, 664] as [number, number], to: [1124, 650]
 /** Pip's stone bollard: the cap top is map BOARD_BOLLARD (700, 1205). */
 export const BOLLARD = {x: 700, cap: 1205, base: 1274, w: 60} as const;
 
-/** The fountain basin (near right): far rim front edge, near rim top edge, its left end receding to the VP. */
-export const BASIN = {farY: 1362, nearY: 1626, faceY: 1728, x1: 1140, leftNear: 726} as const;
+/** The fountain basin (right of the board, mid to near): far rim front edge, near rim top edge, the near rim's face
+ *  foot, its left end receding to the VP (the far-left corner sits just below Pip's bollard). */
+export const BASIN = {farY: 1302, nearY: 1540, faceY: 1612, x1: 1140, leftNear: 764} as const;
 export const basinLeftAt = (y: number) => alongVP(BASIN.leftNear, BASIN.nearY, y);
 /** The jets: a row along the basin's middle (nozzle y), rhythmic. */
-export const JETS = {y: 1494, xs: [796, 864, 932, 1000, 1068], hMin: 210, hMax: 360} as const;
+export const JETS = {y: 1422, xs: [806, 872, 938, 1004, 1070], hMin: 168, hMax: 300} as const;
 
 /** People scale (px per metre) in the near band: k under the owner's cap (0.8 k at T1, 0.72 k at the frame bottom). */
 export const kpAt = (y: number) => kAt(y) * (y <= 1100 ? 1 : 1 - Math.min(0.28, ((y - 1100) / 820) * 0.28));
-/** The cafe (bottom left): a far table with two seated backs, a near table with two head-backs cut by the bottom. */
+/** Seated height (seat to head top) of a person at seat line y: the kit's seated proportion (0.95 x kp). */
+export const seatedH = (y: number) => 0.95 * kpAt(y);
+/** The cafe (left): T0 cut by the left edge, T1 with two seated backs, T2 near with two head-backs cut by the bottom. */
 export const CAFE = {
-  t1: {x: 300, top: 1396, rx: 47},
-  t2: {x: 288, top: 1752, rx: 70},
-  /** Seated backs at T1 (seat line y, seated height px: 0.95 x kp, the kit's seated proportion). */
+  t0: {x: 28, top: 1356, rx: 44},
+  t1: {x: 300, top: 1352, rx: 46},
+  t2: {x: 288, top: 1706, rx: 70},
+  /** Seated backs at T1 and T0 (seat line y, seated height px). */
   s1: [
-    {x: 246, seat: 1474, h: 116, seed: 's7/cafe/a'},
-    {x: 358, seat: 1480, h: 110, seed: 's7/cafe/b'},
+    {x: 244, seat: 1430, h: 116, seed: 's7/cafe/a'},
+    {x: 358, seat: 1436, h: 110, seed: 's7/cafe/b'},
   ],
-  /** Near head-backs at T2, cut by the frame bottom (hv <= 150: <= ~140 px wide at the shoulders). */
-  near: [
-    {x: 160, hv: 146, seed: 's7/near/a'},
-    {x: 414, hv: 140, seed: 's7/near/b'},
-  ],
+  s0: {x: 74, seat: 1438, h: 112, seed: 's7/cafe/c'},
 } as const;
 
+/** The front row: head-backs cut by the frame bottom (hv <= 150: <= ~140 px wide at the shoulders), two at the near
+ *  cafe table, two watching the fountain. */
+export const NEAR_BACKS = [
+  {x: 158, hv: 146, seed: 's7/near/a'},
+  {x: 414, hv: 140, seed: 's7/near/b'},
+  {x: 846, hv: 142, seed: 's7/near/c'},
+  {x: 1012, hv: 136, seed: 's7/near/d'},
+] as const;
+
+/** Two people sitting on the basin's near rim, backs to us, watching the jets. */
+export const RIM_SITTERS = [
+  {x: 868, seat: 1546, seed: 's7/rim/a'},
+  {x: 996, seat: 1548, seed: 's7/rim/b'},
+] as const;
+
+/** A person at rest left of the board (on the phone), in front of the left plane's trunk. */
+export const STANDER = {x: 66, feet: 1200, h: 160} as const;
+
 /** The bike rack (Sheffield stands) and the planter of grasses (bottom centre). */
-export const RACK = {base: 1588, xs: [474, 598] as const, w: 108, h: 124, R: 46} as const;
-export const PLANTER = {x0: 492, x1: 706, base: 1904, h: 100} as const;
+export const RACK = {base: 1548, xs: [470, 590] as const, w: 104, h: 120, R: 45} as const;
+export const PLANTER = {x0: 492, x1: 706, base: 1892, h: 100} as const;
 
 // ---------------------------------------------------------------- light and colour helpers
 
