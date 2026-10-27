@@ -80,10 +80,12 @@ const TH_SASH: Box = {x: 1330, y: 666, w: 56, h: 110};
 /** The heritage lamp right of her house (its cap clears W's frame by ~6 px; it stands in the rail as a mass). */
 const HOUSE_LAMP = {x: 992, y: 1078, h: 450};
 /** The canal-side lamps beyond the board (feet behind it): only their heads show over its frame (the StatementBoard's
- *  top rail is at y 680), each with a little post under the lantern; the far one smaller and lower, clear of SUN8. */
+ *  top rail is at y 680), each with a little post under the lantern. They stand in the sky's free gaps at the landing,
+ *  clear of SUN8 and of the set's far-windows ripple (the warehouse's arched windows x 244-312, the terrace's x 548-
+ *  606): one between the sun and the far terrace, one left of the warehouse; the run sweeps right -> left (west). */
 const CANAL_LAMPS = [
-  {id: 'canalLamp1' as const, x: 262, y: 904, h: 290},
-  {id: 'canalLamp2' as const, x: 342, y: 867, h: 240},
+  {id: 'canalLamp1' as const, x: 494, y: 887, h: 270},
+  {id: 'canalLamp2' as const, x: 196, y: 887, h: 270},
 ];
 /** Carriage lamps (lantern top centre): right of her door, right of the neighbour's door. */
 const CARRIAGE_L = {x: 793, y: 868};
@@ -813,6 +815,31 @@ function hallInto(): Batch {
   return b;
 }
 
+/** The leaf's swing (0 shut .. 1 open). Opening: doorOpenK. Closing (doorOpenK's own window 34.66-34.75): a
+ *  door-closer curve, most of the swing in the first frames, so the leaf covers her doorway the frame she is through
+ *  (herIn 34.68: the cast stops drawing her), then it settles onto the latch. */
+const CLOSE_T0 = L(34.66);
+const CLOSE_KEYS: [number, number][] = [
+  [0, 1],
+  [0.07, 0.955],
+  [0.26, 0.33],
+  [0.45, 0.16],
+  [0.63, 0.07],
+  [0.82, 0.02],
+  [1, 0],
+];
+function swingAt(t: number): number {
+  const k = doorOpenK(t);
+  if (t < CLOSE_T0 || k <= 0) return k;
+  const p = clamp((t - CLOSE_T0) / (S8T.doorShuts - CLOSE_T0));
+  for (let i = 0; i < CLOSE_KEYS.length - 1; i++) {
+    const [p0, v0] = CLOSE_KEYS[i];
+    const [p1, v1] = CLOSE_KEYS[i + 1];
+    if (p <= p1) return lerp(v0, v1, (p - p0) / (p1 - p0));
+  }
+  return 0;
+}
+
 /** The leaf as a quad at swing k (0 shut .. 1 open): hinged on the left jamb, swinging IN; its free edge goes deeper
  *  (toward the lane VP), so the quad narrows and the free edge shortens. null once it is edge-on behind the jamb. */
 function leafQuad(k: number): [Pt, Pt, Pt, Pt] | null {
@@ -885,7 +912,7 @@ export const S8House: React.FC = () => {
   const forecourt = useMemo(() => forecourtInto(), []);
   const wins = windowsInto(t, beyond.wins);
   // her door: the hall while it is open; the leaf shut or opening (under her); the closing swing is S8DoorLeaf's
-  const k = doorOpenK(t);
+  const k = swingAt(t);
   const latched = t >= S8T.doorShuts;
   const jolt = latched && t < S8T.doorShuts + 2 / 60 ? 3 : 0;
   const leaf = t < LEAF_SPLIT || latched ? leafInto(latched ? 0 : k, jolt) : null;
@@ -945,7 +972,7 @@ export const S8House: React.FC = () => {
       <Paint b={beyond.b} seed="s8h/beyond" />
       <Lamp x={622} y={943} h={84} seed="s8h/farLamp" lightAt={farLampAt} />
       <EarlyExit>
-        <Puffs x={556} y={737} seed="s8h/frSmoke" kind="smoke" scale={0.62} ceil={TOP + 4} drift={-30} />
+        <Puffs x={632} y={742} seed="s8h/frSmoke" kind="smoke" scale={0.5} ceil={TOP + 4} drift={-24} />
       </EarlyExit>
       {CANAL_LAMPS.map((c) => (
         <Lamp key={c.id} x={c.x} y={c.y} h={c.h} seed={`s8h/${c.id}`} lightAt={lampRunAt(c.id)} />
@@ -1116,7 +1143,7 @@ export const S8Window: React.FC = () => {
 
 export const S8DoorLeaf: React.FC = () => {
   const t = useTime();
-  const k = doorOpenK(t);
+  const k = swingAt(t);
   if (t < LEAF_SPLIT || t >= S8T.doorShuts || k <= 0) return null;
   return (
     <XG m={mat.translate(planeOffset('house', t), 0)}>

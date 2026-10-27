@@ -92,9 +92,9 @@ export const DT = {
   bandShade: mix(sh(CM.limestone, 0.62), CM.brickDeep, 0.08),
   header: CM.brickDeep,
   headerShade: mix(CM.brickDeep, CM.shadeWarm, 0.35),
-  brickSett: CM.brick,
+  brickSett: mix(CM.brick, CM.paving, 0.3),
   brickSettShade: mix(CM.brick, CM.shadeWarm, 0.4),
-  brickSettLight: CM.brickLight,
+  brickSettLight: mix(CM.brick, CM.paving, 0.45),
   // stone (balustrade, planters, the fountain): lit from beyond (the right / the tops), faces toward us in shade
   stone: CM.limestone,
   stoneLit: CM.paper,
