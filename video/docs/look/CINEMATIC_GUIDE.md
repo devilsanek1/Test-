@@ -191,8 +191,10 @@ hero cloud behind it | 3 tiers of life, never 1 s still. Then, at phone size: do
    palette (`PALETTE.md`), ink line, flat fills, people seen from behind and caption style stay exactly as in v1.
 2. **Captions sit on flat sky.** y 317-556 stays plain sky in every frame, from the start to the end of a move: no tower
    top, disc, cloud or roof in it (tops at y >= 600).
-3. **One big move per video (S1 or S5, never both).** Every other wide is locked or breathes: a 1.5-2 % pull-out (or a
-   push of 1 % at most) over 2-3 s, ease-out. No roll, no compound moves, no cut mid-move.
+3. **One big move per video (S1 or S5, never both).** Every other wide is locked, floats or breathes. Cozy wides: locked or
+   the `COZY_AND_SCALE.md` 3b.5 float (8-15 px/s, legs that turn back); never a pull-out or push there (a 2 % pull-out
+   moves the frame edges only ~4-8 px/s and reads frozen). The 1.5-2 % pull-out over 2-3 s, ease-out, is for the S3/S4
+   breathers only (S2: locked, a push of 1 % at most). No roll, no compound moves, no cut mid-move.
 4. **Depth and light in flat steps.** Use 3-4 planes (5 in S1, 6 in S5), each farther plane one value step paler and
    nearer the sky's hue (as in #75 @185.3; scale wides: Scale cues 5). The sun is the only light: one lit side and one
    shade side per building; silhouettes are in the palette's anchor. No bloom, haze, glow or gradients.

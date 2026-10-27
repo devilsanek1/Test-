@@ -182,7 +182,8 @@ Clarity and cinematics are not a trade-off. Each panel names its shot type and f
 writes one row per panel: time, idea, shot type, framing, cozy/scale element, move, readability note, plus the notes-strip
 lines. Then check the whole film:
 - **Moves:** animate at most two, both timing questions: the opening's 5 % pull-out and the one big reveal. Every other
-  panel holds and cuts on its word (G5 adds the 1.5-2 % breathes).
+  panel holds and cuts on its word (G5 adds the hold cameras: cozy wides locked or the `COZY_AND_SCALE.md` 3b.5 float, the
+  1.5-2 % pull-out only on the S3/S4 breathers).
 - **Home base:** it opens the film, returns on the quiet beat (the waiting / thinking line) and hosts the callback; close-ups
   at the viewer's desk keep it with just a lamp-pool ellipse (0.5-0.7 W, wider than the object on it, so it reads as
   light, not a mat). Cozy is at least 50 % of the runtime outside full-frame chart inserts (`COZY_AND_SCALE.md` §1.3:
