@@ -6,25 +6,31 @@
 //   - the framing: one page centre on screen (540, PAGE_CY) for every panel; P7 / P9 / P11 at INSERT_Z (the page reads
 //     ~550 px wide: block 2 of the deal at ~41 px, readable at phone size), P10 = 0.85 x that (the boarded pull-back).
 //     Holds breathe 1.5 % about the page centre (the CAMERA holds; the world keeps living).
-//   - the page words, hand-lettered with the kit's Letter: the signed DEAL page (P7), the deal's words in two quoted
-//     blocks (P9, P10: block 1 never without block 2), GOOGLE SAYS (P11, with its two read-along underlines).
-//   - insert life the kit set does not have at this framing: a water glass whose surface ripples (and jumps on a stamp's
-//     slam), and the official's hand sliding a document onto the left pile where it is SEEN at this zoom (the kit's own
-//     slide happens at x < 100, off screen at 1.2x: kit slide is off here, REQUESTS line in the lane report).
-//   - the near edge of the desk (ours): a keyboard, a pencil, its cable, and the official who sits there TYPING (only
-//     the hands and maroon sleeves, from the frame's bottom edge: people near, never a face), stepped at 10 drawings/s
-//     in bursts, so the bottom of the frame always lives (G6 adds secondary motion).
+//   - the page words, hand-lettered with the kit's Letter, under ONE header style (PageHead: the same size, centring
+//     and y on every page, so the four pages read as one form): the signed DEAL page (P7), the deal's words in two
+//     quoted blocks (P9, P10: block 1 never without block 2), GOOGLE SAYS (P11, with its two read-along underlines).
+//   - the page lies on a DESK PAD, never in a screen: a mid-lavender blotter with leather corner pockets (no dark rim,
+//     no inner gutter lines; a local override of the kit's dark blotter, REQUESTS line in the lane report), no keyboard
+//     anywhere on the page's axis.
+//   - the official who sits at our edge of the desk, TAKING NOTES (only the back of the right hand, a pen and a wine
+//     sleeve, from the frame's lower right: people near, never a face) on a ruled notepad turned 13 degrees, partly
+//     off frame; the writing runs on film time, so the notes go on growing from P7 to P11.
+//   - a colleague's hand (grey suit cuff, a second person: never a third arm of the official) sliding a document onto
+//     the left pile where it is SEEN at this zoom (the kit's own slide happens at x < 100, off screen at 1.2x).
+//   - a water glass whose surface ripples (and jumps on a stamp's slam and on the slid document's landing), the desk
+//     phone's line lights where the frame sees them, a desk lamp that reads as a lamp at this zoom (its angled shade
+//     and lit mouth; the kit's lamp is only a disc here: local redraw, REQUESTS line), a pencil and a stapler.
 //   - the stamp with the board's paper backing (NO VETO lands across the page's top edge, over the DEAL heading).
 // No cat, no Google lettering on P7-P10, no hero cobalt, no pop: stamps and underlines are ink.
-import React from 'react';
+import React, {useId} from 'react';
 import {World} from '../../../lib/World';
 import {InkScale} from '../../../lib/inkComp';
 import {useCaptionFont} from '../../../lib/font';
-import {blob, ellipse, line, rect, roundRect, smooth} from '../../../lib/sketch';
+import {blob, ellipse, line, poly, polyPath, rect, roundRect, smooth, textLines} from '../../../lib/sketch';
 import {rand, rng} from '../../../lib/rng';
 import {ease, prog, useTime} from '../../../lib/time';
-import {mat, XG} from '../../../lib/xf';
-import {CC, COLD, COLD_CENTRE, ColdSet, Fill, INSERT_PAGES, Ink, InsertPage, Letter, Live, loopT, Stamp, stepT, textW, W, type Pt} from '../kit';
+import {mat, type Mat, XG} from '../../../lib/xf';
+import {CC, COLD, COLD_CENTRE, ColdSet, DustMotes, Fill, INSERT_PAGES, Ink, InsertPage, Letter, Live, loopT, Stamp, stepT, textW, W, type Pt} from '../kit';
 
 /** THE page box (set px, before the shot's zoom): the board's P9 box; P7, P9, P10 and P11 all use it. */
 export const PAGE = INSERT_PAGES.P9;
@@ -36,17 +42,29 @@ export const P10_Z = 0.85 * INSERT_Z;
 export const PAGE_CY = 975;
 const SEED = 'cold-insert';
 
+/** Local colours (the cold set's family; L* >= 35 so they stay out of the dark budget). */
+const PAD = COLD.blotterEdge; // the desk pad: one step LIGHTER than the desk (#7C78BA, L* 53): a pad, never a bezel
+const PAD_CORNER = COLD.shade; // its leather corner pockets (#55509A, L* 38)
+const WINE = '#8A4A66'; // the official's sleeve (a mid wine, L* 40)
+const SUIT = '#5E6075'; // the colleague's grey suit (L* 41): a second person, never the official's third arm
+
 /** The shot matrix: the set scaled by z about the page centre, the page centre placed at (540, PAGE_CY). */
 export const insertMat = (z: number) => mat.compose(mat.translate(0, PAGE_CY - COLD_CENTRE[1]), mat.about(mat.scale(z), COLD_CENTRE[0], COLD_CENTRE[1]));
 /** Set px -> screen px for a shot zoom z (for checks and screen-space placement). */
 export const insertPt = (z: number, p: Pt): Pt => [COLD_CENTRE[0] + (p[0] - COLD_CENTRE[0]) * z, PAGE_CY + (p[1] - COLD_CENTRE[1]) * z];
 
+const apply = (m: Mat, p: Pt): Pt => [m[0] * p[0] + m[2] * p[1] + m[4], m[1] * p[0] + m[3] * p[1] + m[5]];
+const clipIdOf = (prefix: string, id: string) => (prefix + id).replace(/[^a-zA-Z0-9-]/g, '');
+
 export type ColdInsertProps = {
   /** The shot zoom (INSERT_Z or P10_Z). */
   z: number;
+  /** The panel's start on the film clock (s): the official's notes run on film time, so they keep growing across the
+   *  four inserts. */
+  from: number;
   /** The panel's length (s): the hold breathes in 1.5 % over it; 0 = no breathing. */
   breathe?: number;
-  /** The official's hand slides a document onto the left pile at this scene time (s); false = not in this shot. */
+  /** A colleague's hand slides a document onto the left pile at this scene time (s); false = not in this shot. */
   slide?: number | false;
   /** Stamp slam times (s): the water glass jumps (a burst of rings) on each. */
   kicks?: number[];
@@ -57,18 +75,23 @@ export type ColdInsertProps = {
 };
 
 /** The cold insert: the kit's cold set, the shared insert life, the page and its words. */
-export const ColdInsert: React.FC<ColdInsertProps> = ({z, breathe = 0, slide = false, kicks = [], children, over}) => {
+export const ColdInsert: React.FC<ColdInsertProps> = ({z, from, breathe = 0, slide = false, kicks = [], children, over}) => {
   const t = useTime();
   const zz = z * (1 + (breathe > 0 ? 0.015 * prog(t, 0, breathe, ease.inOutSine) : 0));
+  // the glass also jumps when the slid document lands on the pile (the same beat on both pages)
+  const allKicks = slide === false ? kicks : [...kicks, slide + 0.41];
   return (
     <World sky={COLD.table}>
       <XG m={insertMat(zz)}>
         <InkScale zoom={zz}>
           <ColdSet zoom={1} slide={false} seed="cold" />
+          <DeskPad />
+          <LampFix />
+          <PhoneLights />
           <DeskFront />
-          <TypingOfficial />
-          <WaterGlass x={182} y={985} r={52} kicks={kicks} />
-          {slide !== false ? <OfficialSlide at={slide} /> : null}
+          <WaterGlass x={182} y={985} r={52} kicks={allKicks} />
+          <NotesOfficial T={from + t} />
+          {slide !== false ? <ColleagueSlide at={slide} /> : null}
           <InsertPage {...PAGE} seed={`${SEED}/page`}>
             {children}
           </InsertPage>
@@ -89,6 +112,16 @@ const INK = CC.ink;
 /** One size for a block of lines: the largest <= size that keeps every line within width w. */
 const blockSize = (lines: string[], size: number, w: number) => Math.min(size, ...lines.map((l) => Math.floor((size * w) / Math.max(1, textW(l, size)))));
 
+/** THE header style of every insert page (DEAL, GOOGLE SAYS): one size (the size GOOGLE SAYS fits the page at), centred,
+ *  on one baseline, one letter spacing. The deal's header never outweighs Google's, nor the other way round. */
+const HEAD = {y: 54, size: 44, spacing: 2, margin: 34} as const;
+const headSize = () => blockSize(['GOOGLE SAYS'], HEAD.size, PAGE.w - 2 * HEAD.margin - 10 * HEAD.spacing);
+export const PageHead: React.FC<{text: string}> = ({text}) => (
+  <Letter x={X(PAGE.w / 2)} y={Y(HEAD.y)} size={headSize()} anchor="middle" fill={INK} spacing={HEAD.spacing}>
+    {text}
+  </Letter>
+);
+
 /** The deal's words, in two quoted blocks (P9, P10): DEAL; block 1 "any lawful government purpose" (big); a rule; block 2,
  *  the oversight clause in full (smaller, never cut). Fairness: block 1 is never drawn without block 2. */
 export const BLOCK1 = ['"any lawful', 'government', 'purpose"'];
@@ -96,7 +129,7 @@ export const BLOCK2 = ['"should not be used', 'for domestic mass', 'surveillance
 const DEAL_M = 28;
 /** Page-local layout (px in the 460 x 620 page): baselines. Block 2 ends at x <= 432 and y <= 592, clear of the lifting
  *  corner (lower right); NO VETO's lower edge stays above block 1's first line. */
-export const DEAL_LAYOUT = {head: 52, b1: [146, 208, 270], rule: 298, b2: 338, b2Lead: 35} as const;
+export const DEAL_LAYOUT = {b1: [146, 208, 270], rule: 298, b2: 338, b2Lead: 35} as const;
 
 export const DealWords: React.FC = () => {
   useCaptionFont();
@@ -106,9 +139,7 @@ export const DealWords: React.FC = () => {
   const L = DEAL_LAYOUT;
   return (
     <>
-      <Letter x={X(PAGE.w / 2)} y={Y(L.head)} size={40} anchor="middle" fill={INK} spacing={3}>
-        DEAL
-      </Letter>
+      <PageHead text="DEAL" />
       {BLOCK1.map((s, i) => (
         <Letter key={`b1${i}`} x={X(DEAL_M)} y={Y(L.b1[i])} size={s1} fill={INK}>
           {s}
@@ -129,7 +160,7 @@ export const DealWords: React.FC = () => {
  *  read along on "principles" (1.84) and "bans" (2.56). */
 export const GOOGLE_ROWS = ['it follows its', 'AI principles', 'staff can safely', 'raise concerns', 'bans retaliation', '"of any kind"'];
 const G_M = 32;
-export const GOOGLE_LAYOUT = {head: 52, rows: [163, 225, 318, 380, 479, 535], under: [238, 492]} as const;
+export const GOOGLE_LAYOUT = {rows: [163, 225, 318, 380, 479, 535], under: [238, 492]} as const;
 
 export const GoogleWords: React.FC<{underlines?: [number, number][]}> = ({underlines = [[1.84, 0.3], [2.56, 0.4]]}) => {
   useCaptionFont();
@@ -142,9 +173,7 @@ export const GoogleWords: React.FC<{underlines?: [number, number][]}> = ({underl
   };
   return (
     <>
-      <Letter x={X(PAGE.w / 2)} y={Y(L.head)} size={44} fit={PAGE.w - 2 * G_M} anchor="middle" fill={INK} spacing={2}>
-        GOOGLE SAYS
-      </Letter>
+      <PageHead text="GOOGLE SAYS" />
       {GOOGLE_ROWS.map((r, i) => (
         <Letter key={`g${i}`} x={X(G_M)} y={Y(L.rows[i])} size={s} fill={INK}>
           {r}
@@ -157,15 +186,16 @@ export const GoogleWords: React.FC<{underlines?: [number, number][]}> = ({underl
   );
 };
 
-/** The signed DEAL page (P7): DEAL, its typed body (word dashes), two signatures side by side. No words but DEAL. */
+/** The signed DEAL page (P7): DEAL (the shared header), its typed body (word dashes), two signatures side by side in
+ *  two clearly different hands (two parties, never one person signing twice). The APRIL 2026 stamp lands at the top
+ *  right, under the header (P7.tsx). No words but DEAL. */
 export const SignedDealWords: React.FC = () => {
   useCaptionFont();
-  const body = wordRows(X(38), Y(132), PAGE.w - 76, 9, 33, `${SEED}/p7body`, [4]);
+  const body = wordRows(X(38), Y(148), PAGE.w - 76, 8, 33, `${SEED}/p7body`, [3]);
+  const sigs = [loopySignature(X(46), Y(522), 156, `${SEED}/sigA`), angularSignature(X(262), Y(514), 118, `${SEED}/sigB`)];
   return (
     <>
-      <Letter x={X(38)} y={Y(72)} size={60} fill={INK} spacing={3}>
-        DEAL
-      </Letter>
+      <PageHead text="DEAL" />
       <Ink d={body} width={3.4} color={INK} taper={false} />
       {[0, 1].map((k) => {
         const x0 = X(38 + k * 214);
@@ -173,7 +203,7 @@ export const SignedDealWords: React.FC = () => {
         return (
           <React.Fragment key={`sig${k}`}>
             <Ink d={line(x0, y0, x0 + 172, y0 + 1, {over: [0, 0], seed: `${SEED}/sl${k}`})} width={W.far} color={INK} />
-            <Ink d={signature(x0 + 8, y0 - 14, 150, `${SEED}/sig${k}`)} width={3.6} color={INK} taper={false} />
+            <Ink d={sigs[k]} width={k ? 3.2 : 3.8} color={INK} taper={false} />
             <Ink d={wordRows(x0, y0 + 26, 110, 1, 0, `${SEED}/sn${k}`, [], 2)} width={2.2} color={INK} taper={false} />
           </React.Fragment>
         );
@@ -204,19 +234,41 @@ const wordRows = (x: number, y: number, w: number, n: number, gap: number, seed:
   return d;
 };
 
-/** A hand signature (loops and a long tail) on a line from (x, y), w wide. */
-const signature = (x: number, y: number, w: number, seed: string): string => {
+/** Signature 1: a wide, loopy, right-slanted hand (a prolate cycloid: tall loops on top) with a big opening loop and
+ *  an underline swept back to the left. (x, y) = the start on the baseline; w = its width. */
+const loopySignature = (x: number, y: number, w: number, seed: string): string => {
   const r = rng(seed);
   const pts: Pt[] = [];
-  const n = 9;
-  for (let i = 0; i <= n; i++) {
-    const u = i / n;
-    const up = i % 2 ? -r.range(18, 34) : r.range(0, 8);
-    pts.push([x + u * w * 0.78 + r.jitter(4), y + up]);
+  const turns = 4.5;
+  const a = w / (turns * 2 * Math.PI);
+  for (let th = 0; th <= turns * 2 * Math.PI; th += 0.32) {
+    const b = a * 2.6 * (1 + 0.25 * Math.sin(th * 0.7 + r.range(0, 3)));
+    const yy = y - b * (1 - Math.cos(th)) * 0.9 - 2;
+    const xx = x + a * th - b * Math.sin(th) * 0.5;
+    pts.push([xx - (yy - y) * 0.38, yy]);
   }
-  pts.push([x + w * 0.86, y - 6], [x + w, y - 12]);
-  const loopX = x + w * r.range(0.15, 0.3);
-  return smooth(pts) + smooth([[loopX, y], [loopX - 12, y - 30], [loopX + 6, y - 44], [loopX + 14, y - 18], [loopX - 4, y + 10]]);
+  const first = smooth([[x - 4, y], [x - 18, y - 30], [x - 2, y - 58], [x + 14, y - 34], [x - 6, y - 4], [x + 6, y + 2]]);
+  const tail = smooth([[x + w * 0.92, y - 6], [x + w * 1.02, y + 8], [x + w * 0.6, y + 14], [x + w * 0.1, y + 10]]);
+  return first + smooth(pts) + tail;
+};
+
+/** Signature 2: a short, angular, back-slanted hand (sharp zigzags, a higher baseline), a crossing bar and a dot. */
+const angularSignature = (x: number, y: number, w: number, seed: string): string => {
+  const r = rng(seed);
+  const pts: Pt[] = [[x, y], [x + 4, y - 40], [x + 12, y]];
+  let cx = x + 12;
+  let up = true;
+  while (cx < x + w - 10) {
+    cx += r.range(9, 15);
+    const h = up ? r.range(10, 24) : r.range(0, 4);
+    pts.push([cx + h * 0.25, y - h]);
+    up = !up;
+  }
+  pts.push([x + w, y - 2]);
+  const d = pts.map(([px, py], i) => `${i ? 'L' : 'M'}${px.toFixed(1)} ${py.toFixed(1)}`).join('');
+  const bar = `M${(x - 6).toFixed(1)} ${(y - 26).toFixed(1)}L${(x + 30).toFixed(1)} ${(y - 30).toFixed(1)}`;
+  const dot = `M${(x + w + 12).toFixed(1)} ${(y - 6).toFixed(1)}L${(x + w + 14).toFixed(1)} ${(y - 7).toFixed(1)}`;
+  return d + bar + dot;
 };
 
 // ---------------------------------------------------------------- stamps (the kit's Stamp, on the board's paper backing)
@@ -230,8 +282,9 @@ const slamScale = (t: number, at: number) => {
 };
 
 /** A stamp (set px centre x, y; width w) slamming at `at` (it LANDS at at + 0.09: put that on the sound). `backing`:
- *  the board's paper fill under it (NO VETO across the page's top edge, over DEAL). Anchor ink, never the pop. */
-export const InsertStamp: React.FC<{x: number; y: number; w: number; text: string; at: number; rot?: number; backing?: boolean}> = ({x, y, w, text, at, rot = -6, backing}) => {
+ *  the board's paper fill under it (true: with its drop shadow, NO VETO across the page's top edge, over DEAL;
+ *  'plain': paper only, for a stamp that lands ON the page and covers the typed rows under it). Anchor ink, never the pop. */
+export const InsertStamp: React.FC<{x: number; y: number; w: number; text: string; at: number; rot?: number; backing?: boolean | 'plain'}> = ({x, y, w, text, at, rot = -6, backing}) => {
   const t = useTime();
   if (t < at) return null;
   const h = w * 0.38;
@@ -239,7 +292,7 @@ export const InsertStamp: React.FC<{x: number; y: number; w: number; text: strin
     <>
       {backing ? (
         <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot), mat.scale(slamScale(t, at)))}>
-          <Fill d={roundRect(-w / 2 + 8, -h / 2 + 10, w, h, h * 0.16)} color={COLD.shade} offset={false} />
+          {backing === true ? <Fill d={roundRect(-w / 2 + 8, -h / 2 + 10, w, h, h * 0.16)} color={COLD.shade} offset={false} /> : null}
           <Fill d={roundRect(-w / 2, -h / 2, w, h, h * 0.16)} color={CC.paper} offset={false} />
         </XG>
       ) : null}
@@ -248,11 +301,172 @@ export const InsertStamp: React.FC<{x: number; y: number; w: number; text: strin
   );
 };
 
+// ---------------------------------------------------------------- the desk pad (a local override of the kit's blotter)
+
+/** The kit blotter's geometry (kit/ColdSet.tsx), redrawn in the pad's colours: the same rect and fill seed, so the
+ *  misregistered fill lands exactly over the kit's. Leather corner pockets; NO side rails and NO inner gutter lines
+ *  (with the dark fill they read as a device bezel). The kit pieces drawn over the blotter's area are redrawn over the
+ *  pad: the fountain pen (all of it) and the lower-left document's corner (clipped to the overlap). */
+const BLOT = {x: PAGE.x - 60, y: PAGE.y - 40, w: PAGE.w + 120, h: PAGE.h + 110};
+const DeskPad: React.FC = () => {
+  const t = useTime();
+  const C = COLD;
+  const cid = clipIdOf('padDoc', useId());
+  const k = 86;
+  const corners: Pt[][] = [
+    [[BLOT.x, BLOT.y], [BLOT.x + k, BLOT.y], [BLOT.x, BLOT.y + k]],
+    [[BLOT.x + BLOT.w, BLOT.y], [BLOT.x + BLOT.w, BLOT.y + k], [BLOT.x + BLOT.w - k, BLOT.y]],
+    [[BLOT.x + BLOT.w, BLOT.y + BLOT.h], [BLOT.x + BLOT.w - k, BLOT.y + BLOT.h], [BLOT.x + BLOT.w, BLOT.y + BLOT.h - k]],
+    [[BLOT.x, BLOT.y + BLOT.h], [BLOT.x, BLOT.y + BLOT.h - k], [BLOT.x + k, BLOT.y + BLOT.h]],
+  ];
+  const cornerD = corners.map((c) => polyPath(c)).join('');
+  const cornerInk = corners.map((c, i) => line(c[1][0], c[1][1], c[2][0], c[2][1], {over: [0, 0], seed: `${SEED}/pc${i}`})).join('');
+  // the kit's fountain pen (it rolls a little), redrawn over the pad
+  const roll = Math.sin(prog(loopT(t, 3.4, 0.6), 0, 0.9, ease.inOutSine) * Math.PI) * 10;
+  return (
+    <>
+      <Fill rect={[BLOT.x, BLOT.y, BLOT.w, BLOT.h]} color={PAD} seed="cold/blot" />
+      <Fill d={cornerD} color={PAD_CORNER} seed={`${SEED}/padc`} />
+      <Ink d={rect(BLOT.x, BLOT.y, BLOT.w, BLOT.h, {seed: 'cold/blotI', over: 'small'})} width={W.mid} color={C.ink} />
+      <Ink d={cornerInk} width={W.far} color={C.ink} />
+      <defs>
+        <clipPath id={cid} clipPathUnits="userSpaceOnUse">
+          <rect x={BLOT.x - 4} y={BLOT.h + BLOT.y - 60} width={44} height={80} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${cid})`}>
+        <KitDocB t={t} />
+      </g>
+      <XG m={mat.compose(mat.translate(842 + roll, 940), mat.rotate(68))}>
+        <Fill d={roundRect(-150, -13, 300, 26, 13)} color={C.pen} offset={false} />
+        <Fill rect={[30, -13, 14, 26]} color={C.penBand} offset={false} />
+        <Fill d={polyPath([[150, -9], [200, 0], [150, 9]])} color={C.metal} offset={false} />
+        <Ink d={roundRect(-150, -13, 300, 26, 13, {seed: 'cold/penI'}) + poly([[150, -9], [200, 0], [150, 9]], {seed: 'cold/nib', over: [0, 0]})} width={W.mid} color={C.ink} />
+      </XG>
+    </>
+  );
+};
+
+/** The kit's lower-left document (ColdSet docPage 'docB', its corner lifting every 3.1 s), copied for the redraw. */
+const KitDocB: React.FC<{t: number}> = ({t}) => {
+  const C = COLD;
+  const [x, y, w, h, rot, k, per] = [-60, 1300, 330, 420, -4, 'docB', 3.1] as const;
+  const seed = 'cold';
+  const u = loopT(t, per, rand(seed, k) * per) / per;
+  const lk = u < 0.3 ? Math.sin((u / 0.3) * Math.PI) : 0;
+  const c = 30 + 22 * lk;
+  const fold: Pt[] = [[x + w - c, y], [x + w, y + c], [x + w - c * 0.92 - 8 * lk, y + c * 0.92 + 8 * lk]];
+  return (
+    <XG m={mat.about(mat.rotate(rot), x + w / 2, y + h / 2)}>
+      <Fill rect={[x + 10, y + 12, w, h]} color={C.shade} offset={false} />
+      <Fill rect={[x, y, w, h]} color={CC.paper} seed={`${seed}/${k}`} />
+      <Ink d={rect(x, y, w, h, {seed: `${seed}/${k}I`, over: 'small'})} width={W.mid} color={C.ink} />
+      <Ink d={textLines(x + w * 0.1, y + h * 0.14, w * 0.7, {n: Math.max(3, Math.floor(h / 46)), gap: 30, seed: `${seed}/${k}t`, heading: true})} width={W.far} color={C.ink} />
+      <Fill d={polyPath([[x + w - c, y - 1], [x + w + 1, y - 1], [x + w + 1, y + c]])} color={C.table} offset={false} />
+      <Fill d={polyPath(fold)} color={CC.paperEdge} offset={false} />
+      <Ink d={poly(fold, {closed: true, seed: `${seed}/${k}f`, over: [0, 0]})} width={W.far} color={C.ink} />
+    </XG>
+  );
+};
+
+// ---------------------------------------------------------------- the desk lamp (a local redraw of the kit's)
+
+/** The kit's grain (kit/ColdSet.tsx grain('cold')), copied so the erased lamp area is the desk again, exactly. */
+const kitGrain = (seed: string): string => {
+  const r = rng(`grain/${seed}`);
+  let d = '';
+  const ys = [40, 130, 210, 660, 740, 830, 930, 1040, 1150, 1260, 1370, 1470, 1580, 1690, 1800, 1890];
+  ys.forEach((y0, i) => {
+    const pts: Pt[] = [];
+    const amp = r.range(4, 12);
+    const ph = r.range(0, 6.28);
+    const x0 = r.range(-200, 300);
+    const x1 = r.range(780, 1300);
+    for (let x = x0; x <= x1; x += 90) pts.push([x, y0 + Math.sin(x / 160 + ph) * amp]);
+    d += smooth(pts);
+    if (r.chance(0.4)) d += smooth([[x0 + 200, y0 + 18], [x0 + 260, y0 + 10], [x0 + 330, y0 + 20]]) + (i % 3 === 0 ? smooth([[x1 - 260, y0 - 16], [x1 - 200, y0 - 26], [x1 - 140, y0 - 14]]) : '');
+  });
+  return d;
+};
+
+/** At the insert zoom the kit's top-down lamp loses its arm off the left edge and reads as a navy disc. Here: the
+ *  kit's lamp area is the desk again (its table, grain, pool and motes, copied exactly, inside a clip), then an
+ *  anglepoise reaching in from the left edge UNDER the caption band (set y > 640): base, two arm bars with a spring, a
+ *  joint, and the shade as a cone tilted down-right into its own pool, its mouth lit. */
+const LampFix: React.FC = () => {
+  const C = COLD;
+  const cid = clipIdOf('lampErase', useId());
+  const base: Pt = [-14, 770];
+  const elbow: Pt = [78, 706];
+  const neck: Pt = [150, 724];
+  const mouth: Pt = [236, 796];
+  const ax: Pt = [(mouth[0] - neck[0]) / Math.hypot(mouth[0] - neck[0], mouth[1] - neck[1]), (mouth[1] - neck[1]) / Math.hypot(mouth[0] - neck[0], mouth[1] - neck[1])];
+  const px: Pt = [-ax[1], ax[0]];
+  const P = (o: Pt, a: number, p: number): Pt => [o[0] + ax[0] * a + px[0] * p, o[1] + ax[1] * a + px[1] * p];
+  const cone = smooth([P(neck, -6, -24), P(neck, -6, 24), P(mouth, 0, 80), P(mouth, 14, 40), P(mouth, 16, 0), P(mouth, 14, -40), P(mouth, 0, -80)], {closed: true, tension: 0.2});
+  const stripe = polyPath([P(neck, 0, -14), P(neck, 0, -4), P(mouth, -6, -44), P(mouth, -8, -66)]);
+  const rot = (Math.atan2(px[1], px[0]) * 180) / Math.PI;
+  const mouthD = (rx: number, ry: number) => {
+    const m = mat.compose(mat.translate(mouth[0], mouth[1]), mat.rotate(rot));
+    const pts: Pt[] = Array.from({length: 24}, (_, i) => apply(m, [Math.cos((i / 24) * 2 * Math.PI) * rx, Math.sin((i / 24) * 2 * Math.PI) * ry]));
+    return smooth(pts, {closed: true});
+  };
+  return (
+    <>
+      <defs>
+        <clipPath id={cid} clipPathUnits="userSpaceOnUse">
+          <rect x={-120} y={456} width={336} height={378} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${cid})`}>
+        <Fill rect={[-130, 440, 360, 400]} color={C.table} offset={false} mode="snap" />
+        <Ink d={kitGrain('cold')} width={W.hair} color={C.seam} />
+        <Fill d={blob(250, 900, 330, 300, {seed: 'cold/pool', wobble: 0.02})} color={C.pool} offset={false} />
+        <Fill d={blob(236, 880, 200, 180, {seed: 'cold/core', wobble: 0.02})} color={C.poolCore} offset={false} />
+        <DustMotes cx={250} cy={900} rx={300} ry={270} n={12} r={5} color={C.metal} rate={1.6} seed="cold/motes" />
+      </g>
+      {/* the base (clamped at the left edge) and the arm, under the caption band */}
+      <Fill d={blob(base[0], base[1], 60, 58, {seed: `${SEED}/lbase`})} color={C.lamp} offset={false} />
+      <Ink d={line(base[0], base[1], elbow[0], elbow[1], {over: [0, 0], seed: `${SEED}/la1`}) + line(elbow[0], elbow[1], neck[0], neck[1], {over: [0, 0], seed: `${SEED}/la2`})} width={15} color={C.lamp} taper={false} />
+      <Ink d={line(base[0] + 10, base[1] - 14, elbow[0] + 4, elbow[1] - 14, {over: [0, 0], seed: `${SEED}/lsp`})} width={3} color={C.metal} taper={false} dash="6 6" />
+      <Fill d={blob(elbow[0], elbow[1], 13, 13, {seed: `${SEED}/ljoint`})} color={C.metal} offset={false} />
+      <Ink d={ellipse(elbow[0], elbow[1], 13, 13, {seed: `${SEED}/ljointI`})} width={W.far} color={C.ink} />
+      {/* the shade: a cone tilted into its pool; its lit mouth and the bulb */}
+      <Fill d={cone} color={C.shade} seed={`${SEED}/lcone`} />
+      <Fill d={stripe} color={C.blotterEdge} offset={false} />
+      <Fill d={mouthD(76, 24)} color={C.lampMouth} offset={false} />
+      <Fill d={mouthD(30, 13)} color={CC.paper} offset={false} />
+      <Ink d={cone + mouthD(76, 24)} width={W.mid} color={C.ink} />
+      <Fill d={blob(neck[0] - ax[0] * 4, neck[1] - ax[1] * 4, 17, 17, {seed: `${SEED}/lcap`})} color={C.lamp} offset={false} />
+    </>
+  );
+};
+
+/** The desk phone's two line lights, where this framing sees the phone (on its body left of the keys, screen x < 990):
+ *  they blink in turn, stepped, never fading (the kit's own lights sit off the right edge at this zoom). */
+const PhoneLights: React.FC = () => {
+  const t = useTime();
+  const lit = Math.floor(t * 1.6) % 2 === 0;
+  const L = [
+    [897, 784, 11],
+    [897, 818, 9],
+  ] as const;
+  return (
+    <>
+      <Live c={[897, 800]}>
+        <circle cx={L[0][0]} cy={L[0][1]} r={L[0][2]} fill={lit ? CC.recLight : COLD.folderTab} />
+        <circle cx={L[1][0]} cy={L[1][1]} r={L[1][2]} fill={!lit ? CC.recLight : COLD.folderTab} />
+      </Live>
+      <Ink d={ellipse(L[0][0], L[0][1], L[0][2], L[0][2], {seed: `${SEED}/pl0`}) + ellipse(L[1][0], L[1][1], L[1][2], L[1][2], {seed: `${SEED}/pl1`})} width={W.far} color={COLD.ink} />
+    </>
+  );
+};
+
 // ---------------------------------------------------------------- insert life
 
 /** A glass of water from above (centre x, y; rim radius r) in the lamp's pool: the surface ripples, rings growing from
- *  the middle every ~1.5 s (filled near-white bands, 5-9 px: they read at phone size), a burst of three on each stamp's
- *  slam. */
+ *  the middle every ~1.5 s (filled near-white bands, 5-9 px: they read at phone size), a burst of three on each kick
+ *  (a stamp's slam, the slid document landing). */
 const WaterGlass: React.FC<{x: number; y: number; r: number; kicks: number[]}> = ({x, y, r, kicks}) => {
   const t = useTime();
   const wr = r * 0.8;
@@ -289,9 +503,11 @@ const WaterGlass: React.FC<{x: number; y: number; r: number; kicks: number[]}> =
   );
 };
 
-/** The official's hand (maroon cuff) slides a document onto the left pile at `at` (0.5 s in, holds 0.35 s, withdraws in
- *  0.4 s; the document stays): the kit's slide, placed where this framing SEES it (hand ~ screen x 50-170, y 1380). */
-const OfficialSlide: React.FC<{at: number}> = ({at}) => {
+/** A colleague's hand (grey suit, white cuff: a second person at the desk's left side, never the official's third
+ *  arm) slides a document onto the left pile at `at` (0.5 s in, holds 0.35 s, withdraws in 0.4 s; the document
+ *  stays): the kit's slide, placed where this framing SEES it (hand ~ screen x 50-170, y 1380). The hand is the BACK
+ *  of a flat hand from above, fingers together, the thumb tucked along the document's edge. */
+const ColleagueSlide: React.FC<{at: number}> = ({at}) => {
   const t = useTime();
   if (t < at) return null;
   const C = COLD;
@@ -304,9 +520,10 @@ const OfficialSlide: React.FC<{at: number}> = ({at}) => {
   const M = mat.about(mat.rotate(-7), doc.x + doc.w / 2, doc.y + doc.h / 2);
   const sleeve = roundRect(hx - 560, hy - 56, 500, 112, 30);
   const cuff = roundRect(hx - 70, hy - 50, 32, 100, 8);
-  const hand = smooth([[hx - 40, hy - 46], [hx + 30, hy - 52], [hx + 70, hy - 30], [hx + 76, hy + 6], [hx + 50, hy + 40], [hx - 40, hy + 46]], {closed: true, tension: 0.35});
-  const thumb = smooth([[hx + 6, hy - 48], [hx + 34, hy - 70], [hx + 56, hy - 62], [hx + 40, hy - 40]], {closed: true, tension: 0.35});
-  const fingers = [-26, -6, 14].map((fy, i) => line(hx + 24, hy + fy, hx + 66, hy + fy + 4, {over: [0, 0], seed: `${SEED}/f${i}`})).join('');
+  const hand = smooth([[hx - 40, hy - 44], [hx + 26, hy - 48], [hx + 72, hy - 34], [hx + 82, hy - 4], [hx + 70, hy + 30], [hx + 30, hy + 42], [hx - 40, hy + 44]], {closed: true, tension: 0.35});
+  const thumb = smooth([[hx - 8, hy + 38], [hx + 28, hy + 50], [hx + 46, hy + 62], [hx + 30, hy + 70], [hx - 4, hy + 58]], {closed: true, tension: 0.35});
+  const splits = [-18, 2, 20].map((fy, i) => line(hx + 44, hy + fy, hx + 78, hy + fy + 1, {over: [0, 0], seed: `${SEED}/f${i}`})).join('');
+  const knuckles = smooth([[hx + 30, hy - 36], [hx + 36, hy - 18], [hx + 34, hy + 2], [hx + 36, hy + 20], [hx + 30, hy + 34]]);
   return (
     <>
       <XG m={M}>
@@ -317,44 +534,26 @@ const OfficialSlide: React.FC<{at: number}> = ({at}) => {
       </XG>
       {out < 1 ? (
         <>
-          <Fill d={sleeve} color={C.cuff} offset={false} />
+          <Fill d={sleeve} color={SUIT} offset={false} />
           <Fill d={cuff} color={C.shirt} offset={false} />
           <Fill d={thumb + hand} color={CC.skin2} offset={false} />
           <Ink d={sleeve + cuff + thumb + hand} width={W.mid} color={C.ink} />
-          <Ink d={fingers} width={W.far} color={C.ink} />
+          <Ink d={splits + knuckles} width={W.far} color={C.ink} />
         </>
       ) : null}
     </>
   );
 };
 
+// ---------------------------------------------------------------- the near edge of the desk (ours)
 
-// ---------------------------------------------------------------- the near edge of the desk (ours): keyboard + typist
-
-const KB = {x: 300, y: 1412, w: 500, h: 160};
-
-/** A keyboard (keys as flat fills: fine detail without ink weight), its cable to the right, a pencil beside the
- *  blotter. Set px, under the blotter's lower edge (1330): at the insert framing it sits at the frame's bottom. */
+/** A pencil and a stapler in the bottom centre, under the pad (set px; at the insert framing they sit at the frame's
+ *  bottom, beside the kit's stamp pad and rubber stamp). Nothing on the page's axis reads as a keyboard. */
 const DeskFront: React.FC = () => {
-  const keys: string[] = [];
-  const pad = 14;
-  const gx = 6;
-  const kw = (KB.w - 2 * pad - 12 * gx) / 13;
-  const kh = (KB.h - 2 * pad - 4 * gx) / 5;
-  for (let j = 0; j < 4; j++)
-    for (let i = 0; i < 13 - (j === 3 ? 1 : 0); i++) keys.push(roundRect(KB.x + pad + i * (kw + gx) + (j % 2) * kw * 0.3, KB.y + pad + j * (kh + gx), kw, kh, 5));
-  keys.push(roundRect(KB.x + pad + 3 * (kw + gx), KB.y + pad + 4 * (kh + gx), 6 * kw + 5 * gx, kh, 5));
-  keys.push(roundRect(KB.x + pad, KB.y + pad + 4 * (kh + gx), 2.6 * kw, kh, 5));
-  keys.push(roundRect(KB.x + KB.w - pad - 2.6 * kw, KB.y + pad + 4 * (kh + gx), 2.6 * kw, kh, 5));
-  const cable = smooth([[KB.x + KB.w - 40, KB.y], [KB.x + KB.w + 10, KB.y - 50], [KB.x + KB.w + 120, KB.y - 40], [KB.x + KB.w + 260, KB.y - 90], [1300, KB.y - 70]]);
-  const pencil = {x: 330, y: 1366, l: 230};
+  const pencil = {x: 290, y: 1372, l: 230};
+  const st = {x: 300, y: 1450, l: 200, w: 46};
   return (
     <>
-      <Ink d={cable} width={7} color={COLD.lamp} taper={false} />
-      <Fill d={roundRect(KB.x + 10, KB.y + 12, KB.w, KB.h, 18)} color={COLD.shade} offset={false} />
-      <Fill d={roundRect(KB.x, KB.y, KB.w, KB.h, 18)} color={COLD.blotterEdge} seed={`${SEED}/kb`} />
-      <Fill d={keys.join('')} color={COLD.metal} offset={false} />
-      <Ink d={roundRect(KB.x, KB.y, KB.w, KB.h, 18, {seed: `${SEED}/kbI`})} width={W.mid} color={COLD.ink} />
       <XG m={mat.about(mat.rotate(-4), pencil.x + pencil.l / 2, pencil.y)}>
         <Fill d={roundRect(pencil.x, pencil.y - 10, pencil.l, 20, 4)} color={COLD.folder} offset={false} />
         <Fill rect={[pencil.x + pencil.l - 26, pencil.y - 10, 26, 20]} color={COLD.folderTab} offset={false} />
@@ -362,74 +561,185 @@ const DeskFront: React.FC = () => {
         <Fill d={`M${pencil.x - 24} ${pencil.y - 3}L${pencil.x - 34} ${pencil.y}L${pencil.x - 24} ${pencil.y + 3}Z`} color={COLD.ink} offset={false} />
         <Ink d={roundRect(pencil.x, pencil.y - 10, pencil.l, 20, 4, {seed: `${SEED}/pcI`}) + `M${pencil.x} ${pencil.y - 10}L${pencil.x - 34} ${pencil.y}L${pencil.x} ${pencil.y + 10}`} width={W.far} color={COLD.ink} />
       </XG>
+      {/* a stapler from above: its base, the top arm, the metal strike plate at the front */}
+      <XG m={mat.about(mat.rotate(9), st.x + st.l / 2, st.y)}>
+        <Fill d={roundRect(st.x + 10, st.y - st.w / 2 + 12, st.l, st.w, st.w / 2)} color={COLD.shade} offset={false} />
+        <Fill d={roundRect(st.x, st.y - st.w / 2, st.l, st.w, st.w / 2)} color={COLD.folderTab} seed={`${SEED}/stb`} />
+        <Fill d={roundRect(st.x + 8, st.y - st.w / 2 + 8, st.l - 50, st.w - 16, (st.w - 16) / 2)} color={COLD.folder} offset={false} />
+        <Fill d={roundRect(st.x + st.l - 40, st.y - st.w / 2 + 6, 32, st.w - 12, 8)} color={COLD.metal} offset={false} />
+        <Ink d={roundRect(st.x, st.y - st.w / 2, st.l, st.w, st.w / 2, {seed: `${SEED}/stI`}) + roundRect(st.x + 8, st.y - st.w / 2 + 8, st.l - 50, st.w - 16, (st.w - 16) / 2, {seed: `${SEED}/stI2`})} width={W.far} color={COLD.ink} />
+      </XG>
     </>
   );
 };
 
-/** One typing hand from above, fingers pointing away from us (set px: the knuckles' centre hx, hy), its sleeve from
- *  (bx, by) below the frame. `press` = the finger pressing a key now (-1 none; it reads shorter from above), `lift` px. */
-const TypingHand: React.FC<{hx: number; hy: number; bx: number; by: number; side: 1 | -1; press: number; lift: number; seed: string}> = ({hx, hy, bx, by, side, press, lift, seed}) => {
+// ---------------------------------------------------------------- the official at our edge, taking notes
+
+/** The memo pad (set px, before its turn): top-bound, ruled, turned 13 degrees (a right-hander's slant), at the
+ *  frame's lower right over the desk pad's corner, so the writing hand stays IN the frame (screen y ~1500-1830). */
+const NOTE = {x: 580, y: 1355, w: 240, h: 250, rot: -13} as const;
+const noteM = mat.about(mat.rotate(NOTE.rot), NOTE.x + NOTE.w / 2, NOTE.y + NOTE.h / 2);
+/** Rows per sheet (then the official flips the sheet over the binding) and the ruled lines. */
+const ROWS = 5;
+const RULES = 6;
+const rowY = (i: number) => NOTE.y + 70 + i * 34;
+const ROW_X = NOTE.x + 26;
+const rowLen = (key: number) => 140 + rand(`${SEED}/rowlen`, key) * 56;
+/** The writing clock (film s): a row every ROW_S; a sheet holds ROWS rows, so a sheet flips every 10 s, at 21.7 (in
+ *  P8, unseen) and at 31.7 (P11 t 3.5: the second half of Google's page gets its beat). */
+const ROW_S = 2.0;
+const W0 = 21.7;
+const WRITE = 0.8; // the share of a row's time spent writing; the rest is the hand's return to the next row
+const FLIP = 0.4; // the sheet's flip over the binding (s), at the start of each sheet's first row
+
+/** A handwritten row (a cursive scribble, words with gaps) from ROW_X to x1, on row i; `key` seeds the words. */
+const scribble = (i: number, key: number, x1: number): string => {
+  const r = rng(`${SEED}/scr${key}`);
+  const y = rowY(i) - 4;
+  let d = '';
+  let x = ROW_X;
+  while (x < x1 - 4) {
+    const wl = r.range(16, 46);
+    const end = Math.min(x + wl, x1);
+    const amp = r.range(3, 6);
+    const ph = r.range(0, 6.28);
+    const pts: string[] = [];
+    for (let xx = x; xx <= end; xx += 3.2) pts.push(`${pts.length ? 'L' : 'M'}${xx.toFixed(1)} ${(y - amp * (0.5 + 0.5 * Math.sin((xx - x) * 0.62 + ph)) - (r.chance(0.08) ? 6 : 0)).toFixed(1)}`);
+    d += pts.join('');
+    x = end + r.range(8, 13);
+  }
+  return d;
+};
+/** A whole sheet's notes up to row `upto` (exclusive), plus row `upto` written to x1 (if given). */
+const sheetNotes = (sheet: number, upto: number, x1?: number) => {
+  let d = '';
+  for (let i = 0; i < upto; i++) d += scribble(i, sheet * 10 + i, ROW_X + rowLen(sheet * 10 + i));
+  if (x1 !== undefined && upto < ROWS) d += scribble(upto, sheet * 10 + upto, x1);
+  return d;
+};
+
+/** The official's notes and right hand: the hand moves along the row as it writes (stepped jitter at 12 drawings/s),
+ *  lifts back to the next row, and after the last row flips the sheet over the binding; the sleeve runs to the lower
+ *  right, off frame (the official sits at our edge). */
+const NotesOfficial: React.FC<{T: number}> = ({T}) => {
   const C = COLD;
-  const y = hy - lift;
-  const wx = hx - side * 6;
-  const wy = y + 58;
-  // the sleeve: a tube from the wrist down to off-frame
-  const ax = bx - wx;
-  const ay = by - wy;
+  const kk = (T - W0) / ROW_S;
+  const n = Math.floor(kk);
+  const u = kk - n;
+  const row = ((n % ROWS) + ROWS) % ROWS;
+  const sheet = Math.floor(n / ROWS);
+  const key = sheet * 10 + row;
+  const len = rowLen(key);
+  const tu = u * ROW_S; // s into this row
+  const flipping = row === 0 && tu < FLIP;
+  const wStart = row === 0 ? FLIP : 0;
+  const writing = !flipping && u < WRITE;
+  const uw = Math.min(1, Math.max(0, (tu - wStart) / (WRITE * ROW_S - wStart)));
+  // the pen tip, notepad-local (unturned set px)
+  const st = Math.round(stepT(T, 12) * 12);
+  const jx = writing ? (rand(`${SEED}/jx`, st) - 0.5) * 4 : 0;
+  const jy = writing ? (rand(`${SEED}/jy`, st) - 0.5) * 6 : 0;
+  let tip: Pt;
+  let lift = 0;
+  if (flipping) {
+    tip = [ROW_X - 6, rowY(0) - 14];
+    lift = 1;
+  } else if (writing) tip = [ROW_X + uw * len + jx, rowY(row) - 6 + jy];
+  else {
+    const v = ease.inOutSine((u - WRITE) / (1 - WRITE));
+    const nr = (row + 1) % ROWS;
+    const to: Pt = nr === 0 ? [ROW_X - 6, rowY(0) - 14] : [ROW_X, rowY(nr) - 6];
+    tip = [ROW_X + len + (to[0] - (ROW_X + len)) * v, rowY(row) - 6 + (to[1] - (rowY(row) - 6)) * v];
+    lift = Math.sin(v * Math.PI * (nr === 0 ? 0.5 : 1));
+  }
+  const P = apply(noteM, tip);
+  // the hand: its forward direction from the (off-frame) shoulder toward the tip, turned 12 degrees to the left
+  const S: Pt = [1060, 2060];
+  const dl = Math.hypot(P[0] - S[0], P[1] - S[1]);
+  const f0: Pt = [(P[0] - S[0]) / dl, (P[1] - S[1]) / dl];
+  const a = (-12 * Math.PI) / 180;
+  const f: Pt = [f0[0] * Math.cos(a) - f0[1] * Math.sin(a), f0[0] * Math.sin(a) + f0[1] * Math.cos(a)];
+  const rr: Pt = [-f[1], f[0]];
+  const bk: Pt = [-f[0], -f[1]];
+  // the knuckle centre K: the pen's tip sits at hand-local (-42, -92)
+  const K: Pt = [P[0] + 42 * rr[0] + 92 * bk[0], P[1] + 42 * rr[1] + 92 * bk[1]];
+  const s = 1 + 0.035 * lift;
+  const handM: Mat = mat.compose([rr[0], rr[1], bk[0], bk[1], K[0], K[1]] as Mat, mat.scale(s));
+  const wrist = apply(handM, [0, 84]);
+  // the sleeve: a tube from the cuff to the shoulder, off frame
+  const ax = S[0] - wrist[0];
+  const ay = S[1] - wrist[1];
   const al = Math.hypot(ax, ay);
   const nx = -ay / al;
   const ny = ax / al;
-  const tube = (w0: number, w1: number, x0: number, y0: number, x1: number, y1: number) =>
-    `M${x0 + nx * w0} ${y0 + ny * w0}L${x1 + nx * w1} ${y1 + ny * w1}L${x1 - nx * w1} ${y1 - ny * w1}L${x0 - nx * w0} ${y0 - ny * w0}Z`;
-  const cuffEnd: Pt = [wx + (ax / al) * 26, wy + (ay / al) * 26];
-  const sleeve = tube(44, 62, cuffEnd[0], cuffEnd[1], bx, by);
-  const cuff = tube(36, 42, wx + (ax / al) * 4, wy + (ay / al) * 4, cuffEnd[0], cuffEnd[1]);
-  const palm = blob(hx, y + 22, 37, 38, {seed: `${seed}/palm`, wobble: 0.02});
-  const fingers = [-25, -8.5, 8.5, 25]
-    .map((dx, i) => {
-      const len = (i === 0 || i === 3 ? 40 : 52) - (i === press ? 16 : 0);
-      const fx = hx + dx * side;
-      return roundRect(fx - 7, y - len, 14, len + 14, 7);
-    })
-    .join('');
-  const thumb = roundRect(hx - side * 50 - 9, y + 4, 18, 40, 9);
-  const thumbM = mat.about(mat.rotate(side * 32), hx - side * 41, y + 24);
+  const sleeve = `M${wrist[0] + nx * 40} ${wrist[1] + ny * 40}L${S[0] + nx * 70} ${S[1] + ny * 70}L${S[0] - nx * 70} ${S[1] - ny * 70}L${wrist[0] - nx * 40} ${wrist[1] - ny * 40}Z`;
+  // the current sheet's notes; while it flips, the old sheet (full) folds over the binding: its front shrinks to the
+  // binding line, then its back rises a little past it and is gone (folded under)
+  const written = flipping ? '' : sheetNotes(sheet, row, writing ? ROW_X + uw * len : ROW_X + len);
+  const fp = flipping ? tu / FLIP : 1;
+  const fs = Math.cos(Math.PI * Math.min(1, fp) * 0.6); // 1 -> -0.31
+  const bindY = NOTE.y + 2;
+  const flipM = mat.about(mat.scale(1, fs), NOTE.x, bindY);
+  let rules = '';
+  for (let i = 0; i < RULES; i++) rules += `M${NOTE.x + 10} ${rowY(i)}L${NOTE.x + NOTE.w - 10} ${rowY(i)}`;
+  const rings: string[] = [];
+  for (let i = 0; i < 8; i++) rings.push(roundRect(NOTE.x + 18 + i * 29, NOTE.y - 12, 10, 30, 5));
+  // hand-local shapes (x to the hand's right, y back toward the wrist; knuckles at y ~ 0)
+  const back = smooth([[-36, -4], [-14, -12], [10, -11], [32, -4], [41, 22], [35, 58], [24, 80], [-22, 80], [-36, 60], [-43, 24]], {closed: true, tension: 0.35});
+  const ridge = smooth([[-30, 6], [-21, 1], [-13, 6], [-4, 1], [5, 6], [14, 2], [24, 7]]);
+  const fingers = [
+    roundRect(-39, -50, 18, 54, 9),
+    roundRect(-19, -34, 18, 38, 9),
+    roundRect(1, -25, 17, 29, 8.5),
+    roundRect(19, -14, 15, 20, 7.5),
+  ].join('');
+  const thumbM: Mat = mat.about(mat.rotate(22), -44, 6);
+  const thumb = roundRect(-54, -30, 19, 46, 9.5);
+  const pen = polyPath([[-46, -80], [-38, -80], [-15, 50], [-25, 52]]);
+  const nib = polyPath([[-46, -80], [-42, -92], [-38, -80]]);
   return (
     <>
-      <Fill d={sleeve} color={C.cuff} offset={false} />
-      <Fill d={cuff} color={C.shirt} offset={false} />
-      <XG m={thumbM}>
-        <Fill d={thumb} color={CC.skin2} offset={false} />
-        <Ink d={thumb} width={W.far} color={C.ink} />
+      {/* the memo pad: its shadow, the sheets under, the top sheet, rules, a margin, the notes, the binding */}
+      <XG m={noteM}>
+        <Fill rect={[NOTE.x + 12, NOTE.y + 14, NOTE.w, NOTE.h]} color={C.shade} offset={false} />
+        <Fill rect={[NOTE.x + 5, NOTE.y + 6, NOTE.w, NOTE.h]} color={CC.paperEdge} offset={false} />
+        <Fill rect={[NOTE.x, NOTE.y, NOTE.w, NOTE.h]} color={CC.paper} seed={`${SEED}/note`} />
+        <Ink d={rules} width={W.hair} color={C.water} taper={false} />
+        <Ink d={`M${NOTE.x + 18} ${NOTE.y + 22}L${NOTE.x + 18} ${NOTE.y + NOTE.h - 8}`} width={W.hair} color={C.folder} taper={false} />
+        {written ? <Ink d={written} width={W.far} color={CC.stamp} taper={false} /> : null}
+        <Ink d={rect(NOTE.x, NOTE.y, NOTE.w, NOTE.h, {seed: `${SEED}/noteI`, over: 'small'})} width={W.mid} color={C.ink} />
+        {flipping ? (
+          <XG m={flipM}>
+            <Fill rect={[NOTE.x, NOTE.y, NOTE.w, NOTE.h]} color={fs >= 0 ? CC.paper : CC.paperEdge} offset={false} />
+            {fs >= 0 ? <Ink d={rules} width={W.hair} color={C.water} taper={false} /> : null}
+            {fs >= 0 ? <Ink d={sheetNotes(sheet - 1, ROWS)} width={W.far} color={CC.stamp} taper={false} /> : null}
+            <Ink d={rect(NOTE.x, NOTE.y, NOTE.w, NOTE.h, {seed: `${SEED}/flipI`, over: [0, 0]})} width={W.mid} color={C.ink} />
+          </XG>
+        ) : null}
+        <Fill rect={[NOTE.x - 4, NOTE.y - 22, NOTE.w + 8, 40]} color={C.folderTab} seed={`${SEED}/noteb`} />
+        <Ink d={rect(NOTE.x - 4, NOTE.y - 22, NOTE.w + 8, 40, {seed: `${SEED}/notebI`, over: [0, 0]})} width={W.mid} color={C.ink} />
+        <Fill d={rings.join('')} color={C.metal} offset={false} />
+        <Ink d={rings.join('')} width={W.hair} color={C.ink} taper={false} />
       </XG>
-      <Fill d={fingers + palm} color={CC.skin2} offset={false} />
-      <Ink d={fingers} width={W.far} color={C.ink} />
-      <Ink d={palm} width={W.mid} color={C.ink} />
-      <Ink d={sleeve + cuff} width={W.mid} color={C.ink} />
-    </>
-  );
-};
-
-/** The official at our edge of the desk, typing: two hands on the keyboard, stepped at 10 drawings / s, in bursts
- *  (typing ~1.8 s, a pause ~0.8 s when the right hand lifts toward the page); always some motion. */
-const TypingOfficial: React.FC = () => {
-  const t = useTime();
-  const s = stepT(t, 10);
-  const k = Math.round(s * 10);
-  const burst = loopT(t, 2.6, 0.4) < 1.8;
-  const hand = (side: 1 | -1, key: string) => {
-    const on = burst && rand(`${SEED}/type/${key}`, k) > 0.25;
-    const press = on ? Math.floor(rand(`${SEED}/press/${key}`, k) * 4) : -1;
-    const lift = on ? (k % 2 === (side === 1 ? 0 : 1) ? 5 : 0) : side === 1 && !burst ? 16 : 2;
-    return press === -1 && !on ? {press: -1, lift} : {press, lift};
-  };
-  const L = hand(-1, 'l');
-  const R = hand(1, 'r');
-  const rx = burst ? 0 : 18;
-  return (
-    <>
-      <TypingHand hx={KB.x + 168} hy={KB.y + 112} bx={KB.x + 70} by={2060} side={-1} press={L.press} lift={L.lift} seed={`${SEED}/hl`} />
-      <TypingHand hx={KB.x + 348 + rx} hy={KB.y + 112} bx={KB.x + 450} by={2060} side={1} press={R.press} lift={R.lift} seed={`${SEED}/hr`} />
+      {/* the sleeve (a mid wine: the official), the cuff, the back of the right hand holding the pen */}
+      <Fill d={sleeve} color={WINE} offset={false} />
+      <Ink d={sleeve} width={W.mid} color={C.ink} />
+      <XG m={handM}>
+        <Fill d={roundRect(-36, 70, 76, 30, 10)} color={C.shirt} offset={false} />
+        <Ink d={roundRect(-36, 70, 76, 30, 10, {seed: `${SEED}/hcuff`})} width={W.far} color={C.ink} />
+        <Fill d={back} color={CC.skin2} offset={false} />
+        <Ink d={back} width={W.mid} color={C.ink} />
+        <Ink d={ridge} width={W.hair} color={C.ink} taper={false} />
+        <Fill d={pen} color={C.pen} offset={false} />
+        <Fill d={nib} color={C.metal} offset={false} />
+        <Ink d={nib} width={W.hair} color={C.ink} taper={false} />
+        <XG m={thumbM}>
+          <Fill d={thumb} color={CC.skin2} offset={false} />
+          <Ink d={thumb} width={W.far} color={C.ink} />
+        </XG>
+        <Fill d={fingers} color={CC.skin2} offset={false} />
+        <Ink d={fingers} width={W.far} color={C.ink} />
+      </XG>
     </>
   );
 };

@@ -3,7 +3,7 @@
 // the insert framing: the deal page, DEAL; block 1 "any lawful government purpose" (big, in quote marks); a rule;
 // block 2 "should not be used for domestic mass surveillance or autonomous weapons (including target selection) without
 // appropriate human oversight and control" (smaller, in quote marks, never cut). HOLD (breathing 1.5 %); the desk keeps
-// living around the page, never on its words; the official's hand slides a document onto the left pile (1.2 s, the same
+// living around the page, never on its words; a colleague's hand slides a document onto the left pile (1.2 s, the same
 // as P11: both pages get the same set and life). No Google lettering. Credit (Film2): "Source: BBC News, 21 Oct 2026".
 import React from 'react';
 import type {ToneKey} from '../../../lib/Film';
@@ -12,7 +12,7 @@ import {ColdInsert, DealWords, INSERT_Z} from './P9_page';
 const DUR = 25.96 - 23.8;
 
 const P9: React.FC = () => (
-  <ColdInsert z={INSERT_Z} breathe={DUR} slide={1.2}>
+  <ColdInsert z={INSERT_Z} from={23.8} breathe={DUR} slide={1.2}>
     <DealWords />
   </ColdInsert>
 );
