@@ -60,7 +60,7 @@ scene needs. Every rule below works inside those tiers.
 | DENSE-CALM | cozy holds (`COZY_AND_SCALE.md` 3b) | flat <= 30 %, detail >= 33 %, obj >= 120, set so both cozy refs pass made flat like for like (C3 at 24 flat colours 18 % / 37 % / 124; C2 flattened: flat 29 %, detail 33 %): flat and obj rise above STORY-LED, detail holds. Plus the hole, field and paused-frame checks above (the reference clip stays out of the repo) | `density.py --cozy` (§9): movers >= 2 (!! < 1), empty <= 5 % (!! > 20 %), cv <= 0.3 for a steady lane or <= 0.75 for one slow swell per 6-7 s (!! > 1.2), the camera locked (float ~0) or floating 8-15 px/s; the motion in one band; one quiet ambient element on (§6) |
 | STORY-LED (was "BUSY") | explainer beats and the opening (a scale hold has its own: `CINEMATIC_GUIDE.md` Scale cues 11) | §1 (flat <= 40 %, obj >= 105, detail >= 34 %) | §6: the story's beat leads (`CRAFT.md` §b), supporting life small, steady and taking turns, never a still frame; ev/s is information |
 
-  v3 G5 was neither: a third of the cozy fullness and half the busy motion (`--cozy`: movers 1.0, empty 56 %, cv 1.13,
+  v3 G5 was neither: a third of the cozy fullness and half the story-led motion (`--cozy`: movers 1.0, empty 56 %, cv 1.13,
   float 2.3 px/s). Events/s and the gap are information, never a target (2026-10-27: the attention tiers keep supporting
   life calm on purpose): a `gate_check.py --density` WARN, FAR or FAIL that comes only from ev/s or the gap is no reason to
   add movers, and any density FAIL counts as a WARN at the gate; judge the paused frame (above) and the eye test
@@ -98,7 +98,7 @@ asked for "less prescriptive on the amount of objects"):
   wall or sky behind the caption band) takes at most one; every other third holds things at several depths (the
   references: 3+ distinct props at 3 depths; an example, never a count to hit). Finer:
   drawn detail in most 240 px bands (§0), and calm sits only at a frame edge, round the subject or behind the captions,
-  never as a slab mid-frame (§0; `COZY_AND_SCALE.md` 3b.3: busy edges and far side, calm centre or floor).
+  never as a slab mid-frame (§0; `COZY_AND_SCALE.md` 3b.3: detailed edges and far side, calm centre or floor).
 - **Hierarchy keeps the read.** The subject keeps the strongest value contrast, the hero colour and a calm ring (30-60 px
   of one value) round its silhouette; dressing sits one value step off its ground, its line and contrast set by its tier,
   never by depth (`CRAFT.md` §b-c: no outlines on dressing, far planes fill only). The sound-off cold read must still pass

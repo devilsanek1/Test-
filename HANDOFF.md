@@ -11,16 +11,25 @@ Everything that agent knew is in this repo. This file is the map; the details li
 
 1. **This file**, fully.
 2. `CLAUDE.md` (root, auto-loaded) and **`video/docs/OWNER_PLAYBOOK.md`**: every piece of owner feedback as a rule.
-   It is the memory across videos. Add to it in the same turn whenever the owner gives feedback.
-3. **`video/docs/PIPELINE_V2.md`**: how we work from video 2 on (gates G0-G8, a playable video at every gate, where to
-   spend tokens and where not to). Background: `video/docs/PIPELINE_RESEARCH.md`.
-4. **`context/summaries/compaction_3.md`**: the most recent detailed state summary (written when the context filled up
+   It is the memory across videos. Capture new feedback in the same turn, split by scope (CLAUDE.md), and integrate it
+   (rewrite or retire whatever it contradicts).
+3. **`video/docs/look/DIRECTION.md`**: the one page of the current look and storytelling direction; read it before
+   any visual work. Its numbers, code and checks: `video/docs/look/CRAFT.md`; why it changed after v3 (owner-approved):
+   `video/docs/retro/2026-10-27_v3_retro.md`. **Which doc wins:** owner's words (playbook; vN/OWNER_NOTES) > DIRECTION >
+   CRAFT > PIPELINE_V2 > G3_ANIMATIC, G5_BLOCKING > look/*.md > the film's STYLE.md (values only) > v1-era docs (API and
+   measurements, never style).
+4. **`video/docs/PIPELINE_V2.md`**: how we work (gates G0-G8, a playable video at every gate from G3, where to spend
+   tokens and where not to). The gate specs: `video/docs/G3_ANIMATIC.md` (the sketch animatic) and
+   `video/docs/G5_BLOCKING.md` (building the film); the look by topic: `video/docs/look/*.md` (section 6). Background:
+   `video/docs/PIPELINE_RESEARCH.md`.
+5. **`context/summaries/compaction_3.md`**: the most recent detailed state summary (written when the context filled up
    for the third time; everything after it is in sections 2-3 below). Then `compaction_2.md` and `compaction_1.md` for history.
-5. **`context/conversation/USER_MESSAGES.md`**: every message the owner sent, verbatim, with timestamps. It's the
+6. **`context/conversation/USER_MESSAGES.md`**: every message the owner sent, verbatim, with timestamps. It's the
    fastest way to learn what they want and how they talk. The full thread with the assistant's replies is
    `context/conversation/CONVERSATION_2026-10-24.md` and `..._2026-10-25.md`; every tool call is in `ACTIONS_LOG.md`.
-6. As needed: the docs index (section 6), `context/agent_reports/` (what each multi-agent run returned) and
-   `context/workflows/` (the workflow scripts with their full agent prompts; reusable).
+7. As needed: the docs index (section 6), `context/agent_reports/` (what each multi-agent run returned) and
+   `context/workflows/` (the workflow scripts with their full agent prompts: copy their structure, never their briefs;
+   PIPELINE_V2 "Studio toolkit").
 
 ## 1. Who and what
 
@@ -34,7 +43,8 @@ Everything that agent knew is in this repo. This file is the map; the details li
   - files sent as downloads (in-app previews may play muted).
 - They opted into **heavy multi-agent work** ("NO LIMITS on tokens and time", ultracode on). Their latest rule is
   quality first: brainstorms, judge panels and design explorations are worth their tokens, while waste (rework, polish
-  before the story is locked, lost work) is not.
+  before the story is locked, lost work) is not. Every agent and helper runs at MAX effort; the weekly limit is the
+  real budget (playbook, Process).
 - **The assistant's role is orchestrator.** It researches, plans and runs Workflow scripts (writers, judges, builders,
   reviewers), builds the film in Remotion, mixes the sound and delivers. It keeps the playbook, pipeline and docs up to date.
 
@@ -165,7 +175,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **In the app:** Instagram → Settings and activity → Data usage and media quality → **"Upload at highest quality" ON**,
   data saver off, upload on strong Wi-Fi.
 - **TikTok:** on the Post screen → More options → **"Allow high-quality uploads"** ON.
-- **The file:** 1080x1920, 30 fps, H.264 High, SDR BT.709, AAC 48 kHz. Ours is about 11.6 Mbps (CRF 14), which is fine;
+- **The file:** 1080x1920, 30 fps (we render 60 fps since v3: `video/docs/POSTING_KIT.md`), H.264 High, SDR BT.709, AAC 48 kHz. Ours is about 11.6 Mbps (CRF 14), which is fine;
   the consensus range is 8-15 Mbps. 4K uploads don't help on Reels (it stores 1080 wide) and add compression risk.
 - **YouTube Shorts is different:** uploads above 1080p get the better VP9/AV1 encodes. Our film is vector (SVG), so a
   1440x2560 render (`--scale=1.3333`) is genuinely sharper. Render one for YouTube.
@@ -182,8 +192,10 @@ Everything that agent knew is in this repo. This file is the map; the details li
 
 - **Git:**
   - Branch **`video-production`** (it is the repo's default branch).
-  - Commit and push after every meaningful step: `git add -A video context` plus root files, then
-    `git push -u origin video-production`.
+  - Commit and push after every meaningful step, only the files you changed: `git add <paths>` (never `-A` or `.`:
+    other sessions edit the repo too), `git pull --no-rebase origin video-production`, then
+    `git push origin HEAD:video-production`. If `.git/index.lock` exists, wait and retry; never discard another
+    session's work.
   - **Every commit message ends with these two lines**:
     ```
     Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
@@ -193,11 +205,14 @@ Everything that agent knew is in this repo. This file is the map; the details li
   - No model identifiers in files, code comments or commit text beyond those lines. No pull requests unless asked.
 - **The repo is PUBLIC** (github.com/devilsanek1/Test-). The owner's email is redacted from every export; never write it
   into a file.
-- **Owner feedback:** record it in `video/docs/OWNER_PLAYBOOK.md` in the same turn, as a rule with the date and reason.
-- **Show playable video at every gate**, and send video files with SendUserFile as downloads. Give the owner the script
-  text with any new voice take.
+- **Owner feedback:** capture it in the same turn, split by scope (CLAUDE.md): approach-level rules in
+  `video/docs/OWNER_PLAYBOOK.md` with the date and reason, integrated (rewrite or retire every rule and doc it
+  contradicts, `video/docs/look/DIRECTION.md` included); notes on one video in `video/docs/vN/OWNER_NOTES.md`.
+- **Show playable video from G3 on** (text and audio before), and send video files with SendUserFile as downloads. Give
+  the owner the script text with any new voice take.
 - **Final means final:** log new ideas for the next video instead of redoing a delivered one.
-- **Progress updates:** short, about every 30 minutes, covering all threads. Between gates, one line.
+- **Progress updates:** the gate deliverable is the update; between gates, a short text status on all active threads
+  (the owner asked for about every 30 minutes in a long build), never a rendered status reel (PIPELINE_V2 rule 8).
 
 ## 5. Environment, setup and gotchas
 
@@ -246,7 +261,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
   - `src/`:
     - `Main.tsx`, `FilmRoot.tsx` and `entry-film.ts` are the film;
     - `scenes/sceneNN/` holds each scene's camera, timing, beats and sets;
-    - `lib/` holds the engine, edges, mascot, captions and theme;
+    - `lib/` holds the engine, edges, mascot, captions, theme and the clean pen with its tiers (`pen.ts`, `tier.tsx`);
     - `data/` holds the captions and timing;
     - `dev/` holds the dev comps, including `ProfilePic.tsx`.
   - `assets/` has the reference videos and frames (`ref/`, `ref2/`, `ref_cinematic/`), the VO takes and the timing JSON.
@@ -256,17 +271,25 @@ Everything that agent knew is in this repo. This file is the map; the details li
   - `review/` holds review and QA artifacts.
   - `scripts/` holds the render, QA, anchor and caption tools.
 - **Docs index (`video/docs/`):**
-  - Process: `OWNER_PLAYBOOK.md` (rules from the owner), `PIPELINE_V2.md` (gates, budgets, anti-waste),
-    `PIPELINE_RESEARCH.md`, `WRAPUP.md` (v1 end state), `POSTING_KIT.md`, `retro/` (spend forensics).
-  - Brief and story (v1): `CREATIVE_BRIEF.md` (the owner's master brief), `BRIEF.md` (the v1 project brief),
+  - Process: `OWNER_PLAYBOOK.md` (rules from the owner), `PIPELINE_V2.md` (gates, budgets, anti-waste, the craft
+    tooling lane), `G3_ANIMATIC.md` (the sketch animatic), `G5_BLOCKING.md` (building the film), `ELEVENLABS.md` +
+    `voice/` (the API voice), `POSTING_KIT.md`, `retro/` (spend forensics; `2026-10-27_v3_retro.md`: the approved
+    pipeline change), `PIPELINE_RESEARCH.md`, `WRAPUP.md` (v1 end state).
+  - **Look (current): `look/DIRECTION.md` (the one page; read it first), `look/CRAFT.md` (numbers, code, checks),
+    `look/STORYBOARD_STYLE.md` (the G3 board), `look/CINEMATIC_GUIDE.md` (shot types, scale cues, the opening),
+    `look/COZY_AND_SCALE.md`, `look/LIFE_AND_DENSITY.md`, `look/PALETTE.md` (+ `palettes.json`), `look/research/`.**
+  - Per video: `vN/` (`OWNER_NOTES.md`, the core line, the script, the style page, plans; rejected options in
+    `vN/archive/`).
+  - Brief and story (v1): `CREATIVE_BRIEF.md` (the owner's master brief), `BRIEF.md` (the v1 project brief; history),
     `script/` (all script versions, critiques, the fact sheet and sources; `final_script.md` is the one used),
-    `timing.md` (word timings), `storyboard_v3.md` / `.json` (the shot plan).
-  - Look and motion (v1): `style_bible.md` (from reference 1), `style_bible_ref2.md` (reference 2: scale and
+    `timing.md` (word timings), `storyboard_v3.md` / `.json` (v1's shot plan).
+  - Look and motion (v1-era, HISTORY: the engine API and the reference measurements, each with a banner; never brief a
+    lane from their look): `style_bible.md` (from reference 1), `style_bible_ref2.md` (reference 2: scale and
     full-bleed), `motion_spec.md` (the reference's animation language, measured; evidence in `motion_evidence/`),
-    `mascot.md`, `CINE.md` (cinematic-scale kit), `EDGES.md` (hand-drawn paper edges), `SHARED_SETS.md` /
-    `SHARED_PROPS.md` (world kit), `ENGINE.md` (scene engine cheat-sheet), `QA.md`.
+    `ENGINE.md` (scene engine cheat-sheet: the API), `CINE.md` (cinematic-scale kit; not clean-pen-aware), `EDGES.md`
+    (paper edges), `mascot.md`, `SHARED_SETS.md` / `SHARED_PROPS.md` (v1's world kit), `QA.md`.
   - Sound: `sound_plan.md`, `sound_credits.md`.
-  - v2: `v2/source_bbc_2026-10-21.md`. Look research: `look/` (the enclosure reference for now).
+  - v2: `v2/` (the v2 session's; `v2/source_bbc_2026-10-21.md` is the source text).
 
 ## 7. The reference material the owner sent
 

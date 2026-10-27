@@ -2,9 +2,12 @@
 
 **New agent picking this up? Read `HANDOFF.md` first**: the full state, the queue, and where all past context lives (`context/`).
 
+**Before any visual work, read `video/docs/look/DIRECTION.md`**: the one page of the current look and storytelling direction; it wins over every older doc.
+
 The video project lives in `video/` (Remotion). Before starting or continuing any video:
 1. Read `video/docs/OWNER_PLAYBOOK.md`: every piece of the owner's feedback, as rules. It is the memory across videos.
 2. Follow `video/docs/PIPELINE_V2.md`: gates G0-G8, with a playable low-res video with voice at every gate.
+3. **Which doc wins:** owner's words (playbook; vN/OWNER_NOTES) > DIRECTION > CRAFT > PIPELINE_V2 > G3_ANIMATIC, G5_BLOCKING > look/*.md > the film's STYLE.md (values only) > v1-era docs (API and measurements, never style). A clash is a bug: fix the lower doc in the same turn.
 
 **Whenever the owner gives feedback, capture it in the same turn and commit it, split by scope:** approach-level lessons go to
 `video/docs/OWNER_PLAYBOOK.md` as general rules; notes on one concrete video (picks, lines, takes, shots) go to
@@ -14,12 +17,18 @@ COHERENT and CLEAR, with no size budget (owner, 2026-10-27): integrate every not
 Top rules (details in the playbook):
 - From the sketch animatic (G3) on, show one playable video per gate, never only stills; before that, text/audio only (no MP4s). Lock the story (sketch animatic) before building; polish last.
 - The G3 animatic is an ANIMATED SKETCHBOOK (stage spec `video/docs/G3_ANIMATIC.md`, drawing spec
-  `video/docs/look/STORYBOARD_STYLE.md`): the film's rough pass at 60 fps — story, cuts, framing, every camera move,
+  `video/docs/look/STORYBOARD_STYLE.md`): the film's rough pass at 60 fps — story, joins, framing, every camera move,
   transition and key action PLAYED with real shape and timing, density and life as grey placeholders (loose never means
-  empty) — monochrome, readable with the sound off; G4+ only ADDS (colour, detail, polish), never changes what G3 locked.
-- Every video gets ONE core line (its own step, G0.5: brainstorm, critique, owner picks) before the script is written.
-- The first 3 s must be a banger: frame 0 is the scene being drawn (lines, then colour), voice from frame 1, the hook made
-  physical (the expected thing, then reality overtaking it), never a still frame; state the payoff in words on frame 0. Target 30-45 s.
+  empty) — monochrome, readable with the sound off. G3 decides flow (carriers, the thread), focus (tiers) and light (rig
+  shapes); G4 is a 6-8 s look clip in the final style, approved before G5; G5 fills G3's plan, never with a new mover,
+  place or tier promotion.
+- The look: one flowing story (every join carries something), one subject at a time, a clean premium line, gentle light
+  and shadow, alive but calm, warm never sickly (`video/docs/look/DIRECTION.md`; numbers in `video/docs/look/CRAFT.md`).
+- Every video gets ONE core line + its through-line card (one thread object, one home place, one "you", a carrier for
+  every join) (its own step, G0.5: brainstorm, critique, owner picks) before the script is written.
+- The first 3 s must be a banger: frame 0 is the scene being drawn in the clean pen (the subject's outline, then colour
+  within ~0.3 s), voice from frame 1, the hook made physical (the expected thing, then reality overtaking it), never a
+  still frame; state the payoff in words on frame 0. Target 30-45 s.
 - A script is one coherent story (spine first; every line follows from the last), never a list of facts. Everyday spoken
   language, no AI-sounding phrasing; detailed emotional cues. The narration is generated with the owner's ElevenLabs voice through the API
   (owner, 2026-10-26): follow `video/docs/voice/API_QUICKSTART.md` (paste format v2, `check_paste.py` OK, `generate_take.py`
@@ -27,7 +36,7 @@ Top rules (details in the playbook):
   without the key does the owner paste it (then always hand over the full paste text).
 - Every lesson goes into the generic process (playbook, pipeline gate, studio toolkit) and is committed, so the next
   video doesn't repeat it.
-- Captions pop in place (no clipped roll-ins). No paper edge at the top of the frame. Production renders at 60 fps.
+- Captions pop in place (no clipped roll-ins). No paper edge at the top of the frame or beside the caption band. Production renders at 60 fps.
 - **NO LIMIT ON TOKENS for creative output** (owner, 2026-10-26): ideas, writing, design, set building, density, life,
   animation and polish get as many agents, rounds and tokens as the quality needs; every subagent runs at MAX effort (owner, 2026-10-27). Never trade quality for savings: brainstorms, competing ideas with judges and design explorations at the early gates are
   worth their tokens. Cut only waste: rework, reviews of things that will still change, polish before the story lock,

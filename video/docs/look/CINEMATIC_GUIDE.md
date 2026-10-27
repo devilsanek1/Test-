@@ -220,7 +220,8 @@ hero cloud behind it | 3 tiers of life, never 1 s still. Then, at phone size: do
    the sun is the key, one lit side and one shade side per building; at night the lamps and lit windows on a light
    night (§d.2); silhouettes in the palette's anchor. No bloom, haze, glow or gradients.
 5. **Dose.** Per video: S1 or S5 once, S2 and S4 at most once each, never two of these back to back. These are the scale
-   and breather beats; the cozy, enclosed streets stay the majority (`COZY_AND_SCALE.md`).
+   and breather beats, framed in the film's own places (the view from the home place, the street outside it), never a
+   new place made for a beat (`CRAFT.md` §a.2); the cozy, enclosed streets stay the majority (`COZY_AND_SCALE.md`).
 
 ## Not for us
 - Faces, close-ups and people as the subject (owner, 2026-10-26): people stay small and seen from behind; in the

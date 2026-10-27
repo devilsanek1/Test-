@@ -142,7 +142,7 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
   one side: we look out from among leaves. Sagging wires stitch the sides (C2 ~6), only in y 0-290 and below y 600.
 - **The caption plane:** across x 95-945, y 290-600 (the caption block y 317-556 with its margin) the lid is ONE flat
   facade fill (L* >= 75, no windows, ink or roof edges), never the canopy (C2's canopy is L* 50, under §5's L* >= 70 for
-  7:1 ink; C2 put its canopy exactly there). The lid's busy detail sits above y 290, below y 600 and in the gutters
+  7:1 ink; C2 put its canopy exactly there). The lid's detail sits above y 290, below y 600 and in the gutters
   (x < 95, x > 945).
 - **C-curve:** one leading curve (kerb, bank, shelf edge) enters one side just under the caption band (y 600-700) and leaves
   the other at y 860-1060, concave to the viewer; its far end dives under a mass through a mouth <= 8 % of that edge
@@ -164,7 +164,7 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
   (amplitude >= 0.12 H, never one straight roofline), kept with its sky in y 0-290 and the gutters: sky ~8-15 %, the
   lightest, calmest field (L* ~90), never an empty slab (LIFE §3: the notches, wires and antennas, an occasional bird or a
   slow cloud). Across x 95-945, y 290-600 the back row is ONE flat facade fill (L* >= 75, no windows, ink or roof edges):
-  the caption plane. The busy facade belt sits in y 600-1000, the value sandwich's dark belt in y 1000-1115.
+  the caption plane. The detailed facade belt sits in y 600-1000, the value sandwich's dark belt in y 1000-1115.
 - **Value sandwich:** the darkest mass (a hedge, trees, a bush, L* 20-38) right behind the seam, so light figures pop; the
   path where people sit is the most neutral ground (C <= 15); the bank and the water below are light again.
 - **The moat:** the lane (seam) at y 1115-1230, above the UI; a stone bank under it (y 1230-1420, dabs, part of the mass), then
@@ -178,11 +178,11 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
   small mover higher up (a stair, an upper walk, ~60 px). Seated ~85 px (0.045 H), standing ~140 px (0.074 H); wall :
   standing figure 6-9:1 (>= 10:1 is scale); a storey ~1 standing figure (compressed depth).
 
-### 3b.3 The detail gradient: busy edges and far side, calm centre or floor
+### 3b.3 The detail gradient: detailed edges and far side (tier C, low contrast), calm centre or floor
 - The far side (lid, far kerb, facade belt) and the frame edges hold 3-6x the detail of the calm field (in our films as
   flat shapes, not lines: `CRAFT.md` §c): C2's top 35 % holds 56 % of all linework (lid cells 3-6x the floor's); C3's
   facade belt has 66 % detail tiles while sky and water stay low in contrast (local colour std 10-22 vs 39-46 in the
-  busy belts).
+  detailed belts).
 - Calm sits only where the eye can rest: one band touching the top or bottom edge (sky, water, floor), the subject's ring,
   the caption plane. Never a slab mid-frame (C3's middle 60 %: 2-3 % flat tiles).
 - Calm is never empty: patterned (<= 6 lane marks as flat bands, two long soft tones), and no hole bigger than the caption
@@ -296,7 +296,7 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
 1. Paused, at phone size beside the cozy reference: full by `LIFE_AND_DENSITY.md` §0 (its DENSE-CALM row and its checks:
    no hole bigger than the caption band, no big field apart from the one calm field at an edge); the numbers live there.
 2. Mass 35-70 % of the frame with the void in its dose; a floor bounded, its far end hidden; >= 40 % of the perimeter closed, open toward us.
-3. Detail gradient: busy far side and edges, calm floor or centre; the captions on one flat plane (a light facade fill or
+3. Detail gradient: detailed far side and edges (tier C), calm floor or centre; the captions on one flat plane (a light facade fill or
    the sky, never the canopy), with no wires, windows or roof edges in y 290-600 inside x 95-945.
 4. Playing: `density.py --cozy` (`LIFE_AND_DENSITY.md` §9): movers >= 2, empty <= 5 %, cv in its dose, the camera locked
    (~0) or floating 8-15 px/s; half the people at rest, nothing coming at us, one quiet ambient element on.
