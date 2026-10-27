@@ -50,3 +50,12 @@ f0 (they should be ink only); the far roofs / bridge in the west gap are bare ve
 work around it in a `V2S1_*.tsx` helper plus a REQUESTS line); then the review loop, the six-viewer cold read and `report_L1.md`.
 Review tooling (scratch only, not committed): a script that renders 20 key-time stills, three full-size frames (0 / 0.6 / 5.3),
 the busy / calm strips, a labelled 216 px sheet beside ref 1 / v1, the 0-6.5 s clip and density. Run density with `python3 -I scripts/qa/density.py <clip>.mp4`.
+
+## 2026-10-27, third helper (MAX + ultracode): parts split, builders running
+- `V2S1.tsx` is now the assembly only (camera, Look cascade at 5800 px/s from SUN0's screen spot, slots); the shared clock and
+  contract is `V2S1_clock.ts` (floodAt, `s1Step`: the stop at 4.54 freezes the row exactly mid-stride (x.5), one step on
+  "life"; `KEEP_CLEAR` zones for the far-towpath life; the lookalike radius). Parts: `V2S1_set` (S1World), `V2S1_row`
+  (her + ghosts), `V2S1_steps` (+ `_public`, our bank), `V2S1_pip` (Pip + bollard; no Pip at t < 0, L6's request).
+- Four builders run in local git worktrees (branches `l1-row`, `l1-set`, `l1-steps`, `l1-pip`, scratch only) with a part
+  critic loop each; their files are merged into video-production when they pass, then the brief's critic loop and the
+  six-viewer cold read. If this session dies: the pushed stubs render; restart the builders from the fix lists above.
