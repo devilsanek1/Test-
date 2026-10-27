@@ -7,7 +7,7 @@
 //              star hung from it, warm string lights swagged across, instant photos pegged on a cord, a pothos in a
 //              hanging pot, a small sea print, plaster ticks.
 //   wall low   (y 615-1250) a wall shelf over the tag (books, a framed photo, a jar, a trailing pothos; its lip at
-//              y 800 leaves the tag a ~150 px calm ring), a leaf print over the lamp's rod, the 2026 calendar, the
+//              y 800 leaves the tag a ~150 px calm ring), a blue-hour print and mittens over the lamp's rod, a night print in the pocket left of the tag, the 2026 calendar, the
 //              wall clock (its second hand ticks), a cork pinboard cut by the right edge, two sticky notes, plaster
 //              ticks. The caption band (y 290-600) stays flat wall.
 // Raw-SVG pieces sit in ExitFade so the loop's un-build (the last 0.3 s) takes them with the fills.

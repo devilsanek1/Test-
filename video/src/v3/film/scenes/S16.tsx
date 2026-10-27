@@ -9,10 +9,11 @@
 // G5b (owner: "way too empty"; the approved pilot's bar): the same desk world as O1 / S7 dressed round the locked frame
 // (S16_wall.tsx: the attic slope with the paper star, string lights, photos on a cord, a hanging pothos, a sea print, the
 // wall shelf over the tag, a leaf print, the calendar, the ticking clock, the pinboard, sticky notes; S16_desk.tsx: the
-// pen cup, the mug, the charger, clementines, glasses, sticky notes, headphones, the spiral notebook, letters, your
-// phone face down, the planner), the lamp's pull chain swinging (the loop), and Pip on the desk right of the tag at
-// 1.8x, watching it: it leans in as the tag turns (39.70), a small trunk-up on the like-pop (39.88), a shrug at us
-// (40.3); it shrinks with the un-build. The tag's flip moves the room's air a beat later (pinboard notes, a sticky
+// pen cup, the mug, the charger, clementines, glasses, sticky notes, headphones, the spiral notebook, letters, a
+// dusk-blue paperback, the planner; the room's cool share >= 10 %: night prints, mittens, a scarf, blue books, a felt
+// pad, the screen's desktop), the lamp's pull chain swinging (the loop), and Pip on the desk right of the tag at 1.8x,
+// watching it: it leans in place as the tag turns (39.70), holds still through the flip, shrugs at us on "tag" (40.3);
+// it shrinks with the un-build. The tag's flip moves the room's air a beat later (pinboard notes, a sticky
 // note, the lights, the pothos settle through 40.1-40.8: no stillness before the un-build).
 // Camera (cozy v2 §3, OVERRIDES g5b: docs/v3/cozy_v2_application.md): the FLOAT replaces the invisible 1.5 % breathe:
 // translation only, 8-12 px/s legs that turn back (eased) within +-12 / +-10 px of home; it starts at home (the cut-in
