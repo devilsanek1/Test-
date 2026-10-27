@@ -54,6 +54,9 @@ export type PhoneProps = {
   /** OPT-IN: the description lines' colour (default: the house ink, the subject's dark line). A light tone (L* >= 64)
    *  draws them as soft hairlines: the listing's text stays quiet next to the tag. */
   descTone?: string;
+  /** Draw the listing title's rule under the photo (default true). false: a tag hanging in that slot covers it (a rule
+   *  peeking out under the tag reads as a stray line). */
+  titleRule?: boolean;
   at?: At;
   seed?: string;
   ink?: number;
@@ -118,6 +121,7 @@ const PhoneBody: React.FC<PhoneProps> = ({
   dim = 0,
   pressDark,
   descTone,
+  titleRule = true,
   at,
   seed = 'phone',
   ink = 4.8,
@@ -166,7 +170,7 @@ const PhoneBody: React.FC<PhoneProps> = ({
       {/* product photo: THE laptop (the 'new' one, lit) on the listing panel */}
       <Fill d={roundRect(S.photo.x, S.photo.y, S.photo.w, S.photo.h, 18 * k)} color={EMBER.paper} at={fillAt(at, 0.04)} offset={false} />
       {photoLaptop ? <Laptop x={S.laptop.x} y={S.laptop.y} w={S.laptop.w} variant="new" at={b(at, 0.06)} seed={`${seed}/lap`} ink={3} tier={dim >= 0.5 ? 'support' : undefined} /> : null}
-      <Ink d={textLines(40 * k, 300 * k, 230 * k, {n: 1, gap: 18 * k, seed: `${seed}/title`, heading: false})} at={b(at, 0.14)} width={thin} />
+      {titleRule ? <Ink d={textLines(40 * k, 300 * k, 230 * k, {n: 1, gap: 18 * k, seed: `${seed}/title`, heading: false})} at={b(at, 0.14)} width={thin} /> : null}
       {/* the listing price (struck when it goes up; the new price pops beside it) */}
       {price ? (
         <Show at={fillAt(at, 0.08)}>
@@ -216,6 +220,10 @@ export type HandProps = {
   /** Draw the small marks (the thumb's knuckle creases, the fingers' nail lines). Default true; the clean B-tier hand
    *  leaves them out (flat: one tone + one shade). */
   details?: boolean;
+  /** OPT-IN (v3 rework): the thumb's line is its FILL's own closed contour, drawn inside the fill (the palm covers its
+   *  base), instead of an open stroke through the same points plus a straight end line (two curves that miss the fill's
+   *  edge by a few px and kink where they meet near the tip). */
+  closedThumb?: boolean;
   at?: At;
   seed?: string;
   ink?: number;
@@ -223,7 +231,7 @@ export type HandProps = {
 
 const addP = (a: Pt, c: Pt, s = 1): Pt => [a[0] + c[0] * s, a[1] + c[1] * s];
 
-const HandBody: React.FC<HandProps> = ({phone, thumbTo, pressAt, skin = EMBER.skin, details = true, at, seed = 'hand', ink = 4.8}) => {
+const HandBody: React.FC<HandProps> = ({phone, thumbTo, pressAt, skin = EMBER.skin, details = true, closedThumb, at, seed = 'hand', ink = 4.8}) => {
   const t = useTime();
   const w = phone.w ?? 400;
   const h = phone.h ?? w * 2.2;
@@ -262,8 +270,14 @@ const HandBody: React.FC<HandProps> = ({phone, thumbTo, pressAt, skin = EMBER.sk
         </XG>
       ))}
       <Fill d={smooth(thumb, {closed: true})} color={skin} at={fillAt(at)} seed={`${seed}/thumb`} />
-      <Ink d={smooth(thumb.slice(0, 6))} at={at} width={ink} />
-      <Ink d={line(...thumb[5], ...addP(thumb[6], u, 40 * k), {over: [0, 0], seed: `${seed}/thE`})} at={b(at, 0.04)} width={ink} />
+      {closedThumb ? (
+        <Ink d={smooth(thumb, {closed: true})} inside={smooth(thumb, {closed: true})} at={at} width={ink} />
+      ) : (
+        <>
+          <Ink d={smooth(thumb.slice(0, 6))} at={at} width={ink} />
+          <Ink d={line(...thumb[5], ...addP(thumb[6], u, 40 * k), {over: [0, 0], seed: `${seed}/thE`})} at={b(at, 0.04)} width={ink} />
+        </>
+      )}
       <XG m={mat.compose(mat.translate(nailC[0], nailC[1]), mat.rotate(ang))}>
         <Fill d={roundRect(-19 * k, -22 * k, 38 * k, 42 * k, 14 * k)} color={EMBER.nail} at={fillAt(at, 0.06)} offset={false} />
         <Ink d={roundRect(-19 * k, -22 * k, 38 * k, 42 * k, 14 * k, {seed: `${seed}/nail`})} at={b(at, 0.08)} width={2.2} />

@@ -760,14 +760,20 @@ const PenCupBody: React.FC<{x: number; y: number; w?: number; seed?: string; at?
 };
 export const PenCup = tiered('environment', {}, PenCupBody);
 
-/** Headphones lying on the desk (band arc and two cups), base on y. */
-const HeadphonesBody: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number; color?: string}> = ({x, y, w = 150, seed = 'hp', at, ink = W.mid, color = EMBER.dcSide}) => {
+/** Headphones lying on the desk (band arc and two cups), base on y. `bandFill` (OPT-IN, v3 rework): the band is a
+ *  filled shape, not a thick stroke, so it takes part in the silhouette the light layers read (a pool's Ambient hole,
+ *  PoolLift, FormShade) and in the tier's fill colour, like the cups. */
+const HeadphonesBody: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number; color?: string; bandFill?: boolean}> = ({x, y, w = 150, seed = 'hp', at, ink = W.mid, color = EMBER.dcSide, bandFill}) => {
   const cw = w * 0.26;
   const ch = w * 0.22;
   const band = `M${x - w * 0.38} ${y - ch * 0.6}C${x - w * 0.4} ${y - w * 0.55} ${x + w * 0.4} ${y - w * 0.55} ${x + w * 0.38} ${y - ch * 0.6}`;
+  // the band as a shape: the arc offset by half its thickness outward and inward (ends hidden under the cups)
+  const th = w * 0.07;
+  const o = th / 2;
+  const bandShape = `M${x - w * 0.38 - o} ${y - ch * 0.6}C${x - w * 0.4 - o} ${y - w * 0.55 - o * 1.5} ${x + w * 0.4 + o} ${y - w * 0.55 - o * 1.5} ${x + w * 0.38 + o} ${y - ch * 0.6}L${x + w * 0.38 - o} ${y - ch * 0.6}C${x + w * 0.4 - o} ${y - w * 0.55 + o * 1.5} ${x - w * 0.4 + o} ${y - w * 0.55 + o * 1.5} ${x - w * 0.38 + o} ${y - ch * 0.6}Z`;
   return (
     <>
-      <Ink thing d={band} at={at} width={w * 0.07} color={color} taper={false} />
+      {bandFill ? <Fill d={bandShape} color={color} at={fillAt(at, 0.02)} offset={false} /> : <Ink thing d={band} at={at} width={w * 0.07} color={color} taper={false} />}
       <Ink d={band} at={at} width={ink * 0.6} />
       {[-1, 1].map((s) => (
         <React.Fragment key={s}>

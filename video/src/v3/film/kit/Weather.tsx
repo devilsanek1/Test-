@@ -318,10 +318,34 @@ export type SkyCloudsProps = {
   speed?: number;
   color?: string;
   seed?: string;
+  /** 'crown' (default: the scalloped crown, closed all round) | 'lobed' (OPT-IN, v3 rework: a flat-bottomed cloud of
+   *  four overlapping round lobes on a flat base; the crown's arcs bulge into half-discs on its long sides, and a
+   *  half-disc behind a building reads as a halo: CRAFT §d.7). */
+  shape?: 'crown' | 'lobed';
 };
 
+/** A flat-bottomed lobed cloud (one closed path per piece, all clockwise: a nonzero union): a base slab from the first
+ *  lobe to the last, four round lobes of varied size resting on the base line `yb` (their bottoms tangent to it). */
+function lobedCloud(cx: number, yb: number, cw: number, H: number, r: () => number): string {
+  const x0 = cx - cw / 2;
+  const lobes: [number, number][] = [
+    [0.12, 0.34],
+    [0.36, 0.5],
+    [0.62, 0.44],
+    [0.86, 0.3],
+  ].map(([u, k]) => [x0 + cw * (u + (r() - 0.5) * 0.04), H * k * (0.92 + r() * 0.16)]);
+  const f = (v: number) => v.toFixed(1);
+  let d = '';
+  for (const [lx, lr] of lobes) d += `M${f(lx - lr)} ${f(yb - lr)}A${f(lr)} ${f(lr)} 0 1 1 ${f(lx + lr)} ${f(yb - lr)}A${f(lr)} ${f(lr)} 0 1 1 ${f(lx - lr)} ${f(yb - lr)}Z`;
+  const a = lobes[0];
+  const z = lobes[lobes.length - 1];
+  const top = yb - H * 0.3;
+  d += `M${f(a[0])} ${f(top)}L${f(z[0])} ${f(top)}L${f(z[0])} ${f(yb)}L${f(a[0])} ${f(yb)}Z`;
+  return d;
+}
+
 /** Big flat cloud masses drifting (a lighter or darker flat step of the sky), wrapping. */
-const SkyCloudsBody: React.FC<SkyCloudsProps> = ({x0 = -200, x1 = 1280, y0 = 40, y1 = 280, n = 4, w = [300, 620], speed = 8, color = '#66759E', seed = 'clouds'}) => {
+const SkyCloudsBody: React.FC<SkyCloudsProps> = ({x0 = -200, x1 = 1280, y0 = 40, y1 = 280, n = 4, w = [300, 620], speed = 8, color = '#66759E', seed = 'clouds', shape = 'crown'}) => {
   const t = useTime();
   const r = rng(`cl/${seed}`);
   const span = x1 - x0;
@@ -333,6 +357,11 @@ const SkyCloudsBody: React.FC<SkyCloudsProps> = ({x0 = -200, x1 = 1280, y0 = 40,
     const sp = speed * r.range(0.8, 1.2);
     const cy = r.range(y0 + ch * 0.6, y1 - ch * 0.5);
     const cx = x0 + ((((base - x0 + sp * t) % (span + cw)) + span + cw) % (span + cw)) - cw / 2;
+    if (shape === 'lobed') {
+      const rr = rng(`cl/${seed}/${i}`);
+      d += lobedCloud(cx, cy + ch * 0.5, cw, ch, () => rr.next());
+      continue;
+    }
     // a flat-bottomed cloud: crown top, straight base
     d += crown(cx, cy, cw / 2, ch, {seed: `${seed}/${i}`, bumps: 5, round: 0.62});
   }
