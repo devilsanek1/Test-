@@ -56,5 +56,18 @@ export const T9 = {
   deckSnowLit: '#CBD5EC',
   footprint: '#8790B4',
   parapet: EMBER.beam,
+  // G5b review: the parapet face in shade (L 24), its coping stones, the plank grain, the hut front one step lighter
+  // than the deck (L 41) with its window's light on the wall, the snowman's dusk-blue scarf, the sparrows
+  parapetShade: '#5A2D20',
+  coping: '#7A4A3A',
+  deckGrain: '#6A3220',
+  hutFront: EMBER.beam,
+  hutSpill: '#B4603C',
+  scarf: EMBER.jeans,
+  sparrow: '#C98A64',
+  // the close back at the start (folds a clear step off the sweater) and the crossing pot's soot
+  sweaterFold: '#7E3220',
+  sweaterLit: '#BC5A3A',
+  potSoot: '#6A3220',
   stackShade: '#6A3220',
 } as const;

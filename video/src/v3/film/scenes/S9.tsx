@@ -36,6 +36,7 @@ import {World, ShotCam, useTime, type ToneKey} from '../../../lib';
 import {Layer} from '../../../lib/cine/camera';
 import {Ink} from '../../../lib/Ink';
 import {rng} from '../../../lib/rng';
+import {blob} from '../../../lib/sketch';
 import {
   EMBER,
   FILM_TOD,
@@ -144,11 +145,33 @@ const SWEATER_FOLDS =
   'M414 1270C380 1300 330 1330 298 1360M528 1266C568 1290 604 1316 628 1340' +
   'M560 1424C590 1396 616 1366 640 1336M520 1508C560 1470 600 1430 632 1396M486 1590C530 1550 580 1500 624 1462' +
   'M322 1452C316 1540 316 1630 310 1720M352 1560C350 1620 352 1680 348 1740M470 1330C472 1450 474 1580 478 1700';
+/** G5b review 6 (the close back read as one flat fill): deeper folds (a shade stroke with a lit edge beside it), the
+ *  raised arm's ribbed cuff and snow settled on the shoulders. */
+const SWEATER_LIT =
+  'M420 1282C386 1312 336 1342 304 1372M534 1278C574 1302 610 1328 634 1352' +
+  'M568 1436C598 1408 624 1378 648 1348M528 1520C568 1482 608 1442 640 1408M330 1464C324 1552 324 1642 318 1732';
+/** The knit's rib on the raised arm's cuff (vertical ticks), start coords. */
+const SWEATER_RIB = (() => {
+  let d = '';
+  for (let x = 724; x <= 774; x += 7) d += `M${x} 1234v19`;
+  return d;
+})();
+const SHOULDER_SNOW = [
+  [600, 1266, 13, 5],
+  [624, 1274, 9, 4],
+  [576, 1263, 7, 3],
+  [300, 1300, 10, 4],
+  [318, 1292, 6, 3],
+  [646, 1288, 6, 3],
+] as const;
 const SweaterFolds: React.FC = () => {
   const t = useTime();
   return (
     <g transform={`translate(0 ${(Math.sin(t * 1.7) * 1.2).toFixed(2)})`}>
-      <Ink d={SWEATER_FOLDS} width={2.6} color={EMBER.sweaterRib} />
+      <Ink d={SWEATER_LIT} width={2.4} color={T9.sweaterLit} />
+      <Ink d={SWEATER_FOLDS} width={4.2} color={T9.sweaterFold} />
+      <path d={SWEATER_RIB} fill="none" stroke={T9.sweaterFold} strokeWidth={2.4} />
+      <path d={SHOULDER_SNOW.map(([x, y, rx, ry], i) => blob(x, y, rx, ry, {seed: `s9/shSn${i}`})).join('')} fill={EMBER.snow} />
     </g>
   );
 };
@@ -164,6 +187,33 @@ const YouClose: React.FC = () => (
 
 // ---- the chimney pot: its own crossing at the move's peak (the board's: 90 px/f, left edge -2010 at 1.00 s)
 const POT = {t0: 1.0, t1: 1.62, x0: -2010, v: 90 * 60, y: 700, w: 1200};
+/** The pot's dressing (G5b review 6: it was one plain rust fill for 11 frames): glaze rings, a soot streak down from the
+ *  rim, a snow cap on the rim. It moves as one piece with the pot (no flicker). Pot-local x (0 = its left edge). */
+const POT_DRESS = (() => {
+  const {y, w} = POT;
+  const rimH = w * 0.07;
+  let rings = '';
+  let ringsLit = '';
+  for (const [yy, hh] of [[y + rimH * 1.6, 22], [y + rimH * 1.6 + 34, 8], [y + 520, 30], [y + 900, 18]] as const) {
+    rings += `M${w * 0.06} ${yy}H${w * 0.94}v${hh}H${w * 0.06}Z`;
+    ringsLit += `M${w * 0.06} ${yy + hh}H${w * 0.94}v5H${w * 0.06}Z`;
+  }
+  // two soot drips from the rim (narrow, one step darker than the clay: a streak, never a dark shape of its own)
+  const drip = (x0: number, x1: number, len: number) => `M${w * x0} ${y + rimH}C${w * x0} ${y + len * 0.4} ${w * (x0 + 0.01)} ${y + len * 0.7} ${w * ((x0 + x1) / 2)} ${y + len}C${w * (x1 - 0.004)} ${y + len * 0.7} ${w * x1} ${y + len * 0.4} ${w * (x1 + 0.006)} ${y + rimH}Z`;
+  const soot = drip(0.32, 0.37, 760) + drip(0.62, 0.65, 420);
+  const cap = `M${w * 0.06} ${y + 6}C${w * 0.2} ${y - 46} ${w * 0.5} ${y - 58} ${w * 0.78} ${y - 40}C${w * 0.88} ${y - 34} ${w * 0.94} ${y - 10} ${w * 0.95} ${y + 8}C${w * 0.7} ${y - 6} ${w * 0.3} ${y - 4} ${w * 0.06} ${y + 6}Z`;
+  const capLit = `M${w * 0.16} ${y - 18}C${w * 0.3} ${y - 44} ${w * 0.52} ${y - 50} ${w * 0.7} ${y - 38}C${w * 0.52} ${y - 34} ${w * 0.32} ${y - 28} ${w * 0.16} ${y - 18}Z`;
+  return {rings, ringsLit, soot, cap, capLit};
+})();
+const PotDress: React.FC<{x: number}> = ({x}) => (
+  <g transform={`translate(${x.toFixed(1)} 0)`}>
+    <path d={POT_DRESS.soot} fill={T9.potSoot} />
+    <path d={POT_DRESS.rings} fill={T9.stackShade} />
+    <path d={POT_DRESS.ringsLit} fill={EMBER.brick} />
+    <path d={POT_DRESS.cap} fill={EMBER.frost} />
+    <path d={POT_DRESS.capLit} fill={EMBER.snow} />
+  </g>
+);
 
 const S9: React.FC = () => {
   const t = useTime();
@@ -220,7 +270,12 @@ const S9: React.FC = () => {
             </PullLayer>
           ) : null}
           <NearFlakes p={p} />
-          {t >= POT.t0 && t < POT.t1 ? <ChimneyPot x={potX} y={POT.y} w={POT.w} seed="s9/pot" /> : null}
+          {t >= POT.t0 && t < POT.t1 ? (
+            <>
+              <ChimneyPot x={potX} y={POT.y} w={POT.w} seed="s9/pot" />
+              <PotDress x={potX} />
+            </>
+          ) : null}
           <S9Birds at={1.85} />
         </Layer>
       </ShotCam>
