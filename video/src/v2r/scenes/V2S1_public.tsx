@@ -53,7 +53,7 @@ export const LowRow: React.FC = () => {
   return (
     <>
       {LOW.map((s, i) => (
-        <Seated key={i} x={s.x} y={LOW_SEAT_Y} h={s.h} seed={`v2s1/low2/${i}`} traits={{...pin(traits[i]), ...s.traits}} turn={keyed(t, s.turns)} lean={s.lean} at={-0.22 + i * 0.02} />
+        <Seated key={i} x={s.x} y={LOW_SEAT_Y} h={s.h} seed={`v2s1/low2/${i}`} traits={{...pin(traits[i]), ...s.traits}} turn={keyed(t, s.turns)} lean={s.lean} ink={0} />
       ))}
     </>
   );
