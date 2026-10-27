@@ -11,9 +11,9 @@
 // A {x 640, y 1780, h 900, facing 'l'} (head r 81), B {x 905, y 1780, h 820, facing 'l'} (head r 74).
 
 import React from 'react';
-import {hline, line, polyPath, rect, roundRect, smooth, textLines} from '../../../lib/sketch';
+import {blob, hline, line, poly, polyPath, rect, roundRect, smooth, textLines} from '../../../lib/sketch';
 import {useTime} from '../../../lib/time';
-import {CC} from '../palette';
+import {CC, STUDIO} from '../palette';
 import {At, b, Fill, fillAt, Ink, inkForHead, Letter, Pt, quadPt, W} from './util';
 import {Badge} from './Props';
 import {Live} from './Ambient';
@@ -102,13 +102,15 @@ export const Staffer: React.FC<StafferProps> = ({x, y, h, facing = 'l', variant 
       ? smooth([[cx - 0.5 * r, S[1] - 0.15 * r], [cx - 0.95 * r, S[1] + 0.7 * r], [cx - 0.12 * r, S[1] + 2.2 * r]]) + smooth([[cx + 0.5 * r, S[1] - 0.15 * r], [cx + 0.95 * r, S[1] + 0.7 * r], [cx + 0.12 * r, S[1] + 2.2 * r]])
       : '';
   // arms: shoulders -> elbows (PLACED: on the table under the shoulders, a clear elbow break) -> hands.
-  // A: both forearms on the table, hands folded together to the right of the page (worried, still).
+  // A: the far forearm across his body at the table's back edge (no table between it and his chest: never a sling),
+  //    its hand by his near elbow; the near forearm forward, its hand resting on the page's right edge (lane L3's P3
+  //    pose, folded back by the assembler; P3 adds a tap fidget with `hands` / `elbows`).
   // B: chin on his near hand (the elbow on the table, the forearm up), the far forearm flat on the table.
   const shB: Pt = [S[0] - s * 0.105 * h, S[1] + 0.035 * h];
   const shF: Pt = [S[0] + s * 0.095 * h, S[1] + 0.035 * h];
   const pose: {hands: [Pt, Pt]; elbows: [Pt, Pt]} =
     variant === 'A'
-      ? {hands: [P(0.0, 0.378), P(-0.04, 0.38)], elbows: [P(-0.105, 0.417), P(0.111, 0.422)]}
+      ? {hands: [P(0.0578, 0.4244), P(0.1978, 0.3244)], elbows: [P(-0.1289, 0.4378), P(0.1489, 0.4289)]}
       : {hands: [P(-0.03, 0.4), [H[0] + s * 0.18 * r, H[1] + 1.22 * r]], elbows: [P(-0.1, 0.45), P(0.12, 0.47)]};
   const handsP0: [Pt, Pt] = hands ?? pose.hands;
   const handsP: [Pt, Pt] = variant === 'A' && !hands ? [handsP0[0], [handsP0[1][0] + fg[0], handsP0[1][1] + fg[1]]] : [[handsP0[0][0] + fg[0], handsP0[0][1] + fg[1]], handsP0[1]];
@@ -154,56 +156,116 @@ export const Staffer: React.FC<StafferProps> = ({x, y, h, facing = 'l', variant 
 // ---------------------------------------------------------------- the set
 
 
-/** The interview table: top surface from `top` to `front`, front face to `bottom` (canvas px; the board's 1362 / 1532 /
- *  1732), broken up like a real one: the front's panel seams, a cable tray under the lip with the mic's cable and a
- *  power strip, the carpet in tiles with flecks, and two empty chair backs on our side (foreground; `chairs` false =
- *  none). */
+/** The interview table (screen px; lane L3's P3Table, folded back by the assembler): the top, the front panel with
+ *  seams and a cable tray (cables, a power strip with its lit switch), the carpet in tiles with flecks, a laptop bag
+ *  leaning on the front, and (`chairs`) two empty chair backs on our side (a mesh, an armrest edge, the post; a camel
+ *  coat over the left one), in STUDIO's value steps. */
 export const InterviewTable: React.FC<{top?: number; front?: number; bottom?: number; x0?: number; x1?: number; chairs?: boolean; at?: At; seed?: string}> = ({top = 1362, front = 1532, bottom = 1732, x0 = -60, x1 = 1140, chairs = true, at, seed = 'itable'}) => {
-  const seams = [300, 640, 980].map((x, i) => vline2(x, front + 22, bottom - 4, `${seed}/sm${i}`)).join('');
+  const seams = [300, 640, 980].map((x, i) => line(x, front + 22, x, bottom - 4, {over: [0, 0], seed: `${seed}/sm${i}`})).join('');
   const tray = front + 22;
-  // carpet tiles in perspective (seams fan from a point above the table) and flecks
   const vp: Pt = [540, 900];
   const tileX = [-300, -60, 180, 420, 660, 900, 1140, 1380];
-  const carpet = tileX.map((bx, i) => {
-    const u = (bottom - vp[1]) / (2000 - vp[1]);
-    return line(vp[0] + (bx - vp[0]) * u, bottom, bx, 2000, {over: [0, 0], seed: `${seed}/ct${i}`});
-  }).join('') + [1800, 1890].map((yy, i) => hline(x0, x1, yy, {over: [0, 0], seed: `${seed}/ch${i}`})).join('');
+  const carpet =
+    tileX
+      .map((bx, i) => {
+        const u = (bottom - vp[1]) / (2000 - vp[1]);
+        return line(vp[0] + (bx - vp[0]) * u, bottom, bx, 2000, {over: [0, 0], seed: `${seed}/ct${i}`});
+      })
+      .join('') + [1800, 1890].map((yy, i) => hline(x0, x1, yy, {over: [0, 0], seed: `${seed}/ch${i}`})).join('');
   const flecks: Pt[] = [];
   for (let i = 0; i < 46; i++) flecks.push([((i * 197) % 1180) - 40, bottom + 18 + ((i * 89) % 170)]);
-  const chairBack = (cx: number, cy: number, w: number, k: string) => {
+  // a chair back: frame, a mesh panel with a centre seam, the armrest's edge on one side, the post
+  const chairBack = (cx: number, cy: number, w: number, arm: 1 | -1, k: string) => {
     const back = roundRect(cx - w / 2, cy, w, w * 0.62, w * 0.16);
-    const inner = roundRect(cx - w * 0.36, cy + w * 0.1, w * 0.72, w * 0.36, w * 0.1);
+    const inner = roundRect(cx - w * 0.38, cy + w * 0.08, w * 0.76, w * 0.42, w * 0.1);
+    let mesh = '';
+    for (let i = 1; i < 7; i++) {
+      const xx = cx - w * 0.38 + (w * 0.76 * i) / 7;
+      mesh += line(xx - w * 0.06, cy + w * 0.1, xx + w * 0.06, cy + w * 0.48, {over: [0, 0], seed: `${seed}/${k}m${i}`});
+    }
+    const armX = cx + arm * w * 0.56;
     return (
       <React.Fragment key={k}>
         <Fill rect={[cx - w * 0.07, cy + w * 0.6, w * 0.14, 2000 - cy]} color={CC.stand} offset={false} at={fillAt(at, 0.02)} />
-        <Fill d={back} color={CC.chairBack} at={fillAt(at, 0.02)} seed={`${seed}/${k}`} />
-        <Fill d={inner} color={CC.micGrille} offset={false} at={fillAt(at, 0.03)} />
-        <Ink d={back} width={W.mid} at={b(at, 0.02)} />
-        <Ink d={inner} width={W.far} at={b(at, 0.04)} />
+        <Fill d={roundRect(armX - w * 0.1, cy + w * 0.36, w * 0.2, w * 0.1, w * 0.04)} color={STUDIO.chair} offset={false} at={fillAt(at, 0.02)} />
+        <Fill rect={[armX - w * 0.02, cy + w * 0.44, w * 0.04, w * 0.4]} color={CC.stand} offset={false} at={fillAt(at, 0.02)} />
+        <Fill d={back} color={STUDIO.chair} at={fillAt(at, 0.02)} seed={`${seed}/${k}`} />
+        <Fill d={inner} color={STUDIO.chairMesh} offset={false} at={fillAt(at, 0.03)} />
+        <Ink d={mesh} width={W.hair} color={STUDIO.chair} at={b(at, 0.05)} />
+        <Ink d={back + roundRect(armX - w * 0.1, cy + w * 0.36, w * 0.2, w * 0.1, w * 0.04, {seed: `${seed}/${k}a`})} width={W.mid} at={b(at, 0.02)} />
+        <Ink d={inner + line(cx, cy + w * 0.08, cx, cy + w * 0.5, {over: [0, 0], seed: `${seed}/${k}s`})} width={W.far} at={b(at, 0.04)} />
       </React.Fragment>
+    );
+  };
+  // a camel coat hung over the left chair's back: its shoulders over the top edge, the collar's V with the lining,
+  // lapels, buttons, one sleeve hanging down the side and the hem below the chair back (fabric, never a bag)
+  const coat = (cx: number, cy: number, w: number) => {
+    const hw = w / 2;
+    const body: Pt[] = [[cx - hw, cy + 10], [cx - hw * 0.92, cy - 8], [cx - hw * 0.5, cy - 14], [cx + hw * 0.5, cy - 14], [cx + hw * 0.92, cy - 8], [cx + hw, cy + 10], [cx + hw * 1.04, cy + 120], [cx + hw * 1.08, cy + 226], [cx - hw * 1.06, cy + 230], [cx - hw * 1.02, cy + 120]];
+    const lining: Pt[] = [[cx - 30, cy - 13], [cx + 30, cy - 13], [cx + 2, cy + 78]];
+    const lapL: Pt[] = [[cx - 56, cy - 11], [cx - 30, cy - 13], [cx + 2, cy + 78], [cx - 22, cy + 62]];
+    const lapR: Pt[] = [[cx + 56, cy - 11], [cx + 30, cy - 13], [cx + 2, cy + 78], [cx + 24, cy + 60]];
+    const sleeve: Pt[] = [[cx + hw * 0.84, cy + 4], [cx + hw * 1.06, cy + 96], [cx + hw * 1.1, cy + 214]];
+    const d = smooth(body, {closed: true, tension: 0.32});
+    const sl = smooth([[sleeve[0][0] - 20, sleeve[0][1]], [sleeve[1][0] - 22, sleeve[1][1]], [sleeve[2][0] - 20, sleeve[2][1]], [sleeve[2][0] + 22, sleeve[2][1] + 4], [sleeve[1][0] + 22, sleeve[1][1]], [sleeve[0][0] + 22, sleeve[0][1] + 6]], {closed: true, tension: 0.32});
+    return (
+      <>
+        <Fill d={d} color={STUDIO.coat} at={fillAt(at, 0.03)} seed={`${seed}/coat`} />
+        <Fill d={polyPath(lining)} color={STUDIO.coatLining} offset={false} at={fillAt(at, 0.04)} />
+        <Fill d={polyPath(lapL) + polyPath(lapR)} color={STUDIO.coatShade} offset={false} at={fillAt(at, 0.04)} />
+        <Fill d={sl} color={STUDIO.coatShade} at={fillAt(at, 0.04)} seed={`${seed}/sleeve`} />
+        <Fill rect={[sleeve[2][0] - 20, sleeve[2][1] - 18, 42, 16]} color={STUDIO.coat} offset={false} at={fillAt(at, 0.05)} />
+        <Ink d={d + poly(lapL, {closed: true, seed: `${seed}/lapL`, over: [0, 0]}) + poly(lapR, {closed: true, seed: `${seed}/lapR`, over: [0, 0]}) + sl + line(cx + 2, cy + 78, cx + 4, cy + 228, {over: [0, 0], seed: `${seed}/coatF`})} width={W.mid} at={b(at, 0.03)} />
+        <Ink d={line(cx - hw * 0.62, cy + 150, cx - hw * 0.2, cy + 156, {over: [0, 0], seed: `${seed}/pk`})} width={W.far} at={b(at, 0.05)} />
+        {[110, 150, 190].map((v, i) => (
+          <Fill key={i} d={blob(cx - 14, cy + v, 6, 6, {seed: `${seed}/btn${i}`})} color={CC.anchor} offset={false} at={fillAt(at, 0.05)} />
+        ))}
+      </>
+    );
+  };
+  // a laptop bag leaning on the table's front panel, standing on the floor
+  const bag = (bx: number, by: number) => {
+    const d = roundRect(bx, by - 96, 150, 96, 12);
+    const flap = roundRect(bx, by - 96, 150, 44, 12);
+    return (
+      <>
+        <Ink d={smooth([[bx + 26, by - 92], [bx + 60, by - 150], [bx + 110, by - 148], [bx + 126, by - 92]])} width={8} color={STUDIO.bag} taper={false} at={b(at, 0.02)} />
+        <Fill d={d} color={STUDIO.bag} at={fillAt(at, 0.02)} seed={`${seed}/bag`} />
+        <Fill d={flap} color={STUDIO.bagFlap} offset={false} at={fillAt(at, 0.03)} />
+        <Fill d={roundRect(bx + 64, by - 58, 22, 14, 3)} color={CC.shelfMetal} offset={false} at={fillAt(at, 0.04)} />
+        <Ink d={d + flap} width={W.mid} at={b(at, 0.02)} />
+      </>
     );
   };
   return (
     <>
-      <Fill rect={[x0, top, x1 - x0, front - top]} color={CC.table} at={fillAt(at)} mode="snap" offset={false} />
-      <Fill rect={[x0, front, x1 - x0, bottom - front]} color={CC.tableFront} at={fillAt(at)} mode="snap" offset={false} />
-      <Fill rect={[x0, bottom, x1 - x0, 2000 - bottom]} color={CC.studioFloor} at={fillAt(at)} mode="snap" offset={false} />
-      <Ink d={carpet} width={W.hair} color={CC.shelfMetal} at={b(at, 0.04)} />
+      <Fill rect={[x0, top, x1 - x0, front - top]} color={STUDIO.table} at={fillAt(at)} mode="snap" offset={false} />
+      <Fill rect={[x0, front, x1 - x0, bottom - front]} color={STUDIO.tableFront} at={fillAt(at)} mode="snap" offset={false} />
+      <Fill rect={[x0, bottom, x1 - x0, 2000 - bottom]} color={STUDIO.floor} at={fillAt(at)} mode="snap" offset={false} />
+      <Ink d={carpet} width={W.hair} color={STUDIO.carpet} at={b(at, 0.04)} />
       <Live at={at} c={[540, bottom + 90]}>
         {flecks.map(([fx, fy], i) => (
-          <rect key={i} x={fx} y={fy} width={7} height={4} fill={CC.carpet} />
+          <rect key={i} x={fx} y={fy} width={7} height={4} fill={STUDIO.carpet} />
         ))}
       </Live>
-      {/* the cable tray under the lip: a darker channel, the mic's cable sagging out of it, a power strip */}
-      <Fill rect={[x0, tray, x1 - x0, 26]} color={CC.studioDeep} offset={false} at={fillAt(at, 0.02)} />
+      {/* the cable tray under the lip: a darker channel, cables sagging out of it, a power strip with its lit switch */}
+      <Fill rect={[x0, tray, x1 - x0, 26]} color={STUDIO.tray} offset={false} at={fillAt(at, 0.02)} />
       <Fill d={roundRect(700, tray + 4, 150, 18, 5)} color={CC.studioPanel} offset={false} at={fillAt(at, 0.03)} />
+      <Live at={at} c={[830, tray + 13]}>
+        <circle cx={830} cy={tray + 13} r={5} fill={STUDIO.lit} />
+        {[724, 752, 780].map((sx) => (
+          <rect key={sx} x={sx} y={tray + 9} width={12} height={8} rx={2} fill={STUDIO.tray} />
+        ))}
+      </Live>
       <Ink d={smooth([[120, tray + 26], [180, tray + 70], [260, tray + 64], [330, tray + 26]]) + smooth([[860, tray + 22], [900, tray + 64], [960, tray + 70]])} width={4} color={CC.cable} taper={false} at={b(at, 0.06)} />
       <Ink d={hline(x0, x1, top, {seed: `${seed}/t`, over: [0, 0]}) + hline(x0, x1, front, {seed: `${seed}/f`, over: [0, 0]}) + hline(x0, x1, bottom, {seed: `${seed}/b`, over: [0, 0]}) + hline(x0, x1, tray + 26, {seed: `${seed}/tr`, over: [0, 0]})} width={W.mid} at={at} />
       <Ink d={hline(x0, x1, front + 16, {seed: `${seed}/e`, over: [0, 0]}) + seams} width={W.hair} at={b(at, 0.05)} />
+      {bag(468, bottom + 4)}
       {chairs ? (
         <>
-          {chairBack(210, 1660, 300, 'chA')}
-          {chairBack(820, 1690, 280, 'chB')}
+          {chairBack(210, 1660, 300, -1, 'chA')}
+          {coat(206, 1654, 210)}
+          {chairBack(820, 1690, 280, 1, 'chB')}
         </>
       ) : null}
     </>

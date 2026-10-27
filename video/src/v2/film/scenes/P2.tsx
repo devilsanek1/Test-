@@ -14,8 +14,7 @@ import {World} from '../../../lib/World';
 import type {ToneKey} from '../../../lib/Film';
 import {ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
-import {CC, CL_X, CONTRACT_PAGE, ContractPage, Fill, FloorRun, HerStanding, Letter, NOOK, NookRoom, lerp, type Pt} from '../kit';
-import {SecondHand} from './P13_nook';
+import {CC, CONTRACT_PAGE, ContractPage, FloorRun, HerStanding, NOOK, NookRoom, lerp, type Pt} from '../kit';
 
 const START = 6.12;
 const DUR = 8.36 - START;
@@ -27,9 +26,6 @@ const RUN_ON = 1612 - (PAGE.y + CONTRACT_PAGE.h * PS);
 const HANDS: [Pt, Pt] = [[648, 1176], [PAGE.x + PAGE.w - 8, 1180]];
 /** The run-on on the floor: from where the hanging strip meets the floor toward us (the board's second page). */
 const RUN = {from: {x0: PAGE.x, x1: PAGE.x + PAGE.w, y: 1612}, to: {x0: 560, x1: 960, y: 1880}};
-/** The lettered title (page-local px): below her hands (they hold the top corners), over the simple face's title bar
- *  and its two text lines (y 56, 110, 156), which a paper patch paints out; the clause bands (y ~230-320) stay. */
-const TITLE = {patch: [30, 170] as [number, number], y: 150, size: 31};
 /** How far the floor run has crept out: it keeps running on through the shot (0.7 at the cut, all out at the end). */
 const runP = (t: number) => lerp(0.7, 1, prog(t, -0.2, DUR + 0.2, ease.inOutSine));
 
@@ -45,14 +41,9 @@ const P2: React.FC = () => {
     <World sky={CC.wall}>
       <XG m={mat.about(mat.scale(z), PAGE.x + 60, 1330)}>
         <NookRoom layout="wide" cat={{pose: 'sit', facing: 'l', size: 120, look: lead, seed: 'p2/cat/366'}}>
-          <SecondHand />
           <HerStanding x={S.x} y={S.y} h={S.h} facing="r" face="calm" hands={HANDS} seed="p2/her">
-            <ContractPage x={PAGE.x} y={PAGE.y} w={PAGE.w} runOn={RUN_ON} seed="p2/page" />
-            {/* CONTRACT, hand-lettered over the simple face's title bar (paper over the bar, then the word) */}
-            <Fill rect={[PAGE.x + 3, PAGE.y + TITLE.patch[0] * PS, PAGE.w - 6, (TITLE.patch[1] - TITLE.patch[0]) * PS]} color={CC.paper} offset={false} />
-            <Letter x={PAGE.x + PAGE.w / 2} y={PAGE.y + TITLE.y * PS} size={TITLE.size} fit={PAGE.w - 2 * CL_X * PS} anchor="middle">
-              CONTRACT
-            </Letter>
+            {/* CONTRACT hand-lettered across the simple face, below her hands (the kit's simple-face title) */}
+            <ContractPage x={PAGE.x} y={PAGE.y} w={PAGE.w} runOn={RUN_ON} title="CONTRACT" titleSize={31} seed="p2/page" />
           </HerStanding>
           <FloorRun from={RUN.from} to={RUN.to} p={p} firstYear={2080} decades={3} seed="p2/run" />
         </NookRoom>

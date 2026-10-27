@@ -16,9 +16,8 @@ import {World} from '../../../lib/World';
 import type {ToneKey} from '../../../lib/Film';
 import {ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
-import {CC, INTERVIEW, Mic, NameTent, P3_STAFF, Staffer, type Pt} from '../kit';
-import {P3Contract, P3GlassNotes, P3Passers, P3TableTop, P3Underline, P3_TENT} from './P3_life';
-import {P3Room, P3Table} from './P3_room';
+import {CC, INTERVIEW, InterviewRoom, InterviewTable, InterviewTableTop, Mic, NameTent, P3_STAFF, Staffer, type Pt} from '../kit';
+import {P3Contract, P3GlassNotes, P3Underline} from './P3_life';
 
 const START = 8.36;
 const DUR = 13.24 - START;
@@ -48,18 +47,17 @@ const P3: React.FC = () => {
   return (
     <World sky={CC.studio}>
       <XG m={mat.about(mat.scale(z), 520, 1300)}>
-        <P3Room />
-        <P3Passers />
+        <InterviewRoom seed="p3room" passer={1.15} flockAt={1.3} />
         <P3GlassNotes />
         <Staffer {...B} variant="B" part="body" seed="p3B" />
         <Staffer {...A} variant="A" part="body" talking={aTalk} seed="p3A" />
-        <P3Table />
+        <InterviewTable seed="p3table" />
         <P3Contract />
         <P3Underline at={LINE_AT} />
-        <P3TableTop />
+        <InterviewTableTop seed="p3top" />
         <Staffer {...B} variant="B" part="arms" seed="p3B" />
         <Staffer {...A} variant="A" part="arms" hands={arms.hands} elbows={arms.elbows} seed="p3A" />
-        <NameTent x={P3_TENT.x} y={P3_TENT.y} w={P3_TENT.w} h={P3_TENT.h} seed="p3tent" />
+        <NameTent {...INTERVIEW.tent} seed="p3tent" />
         <Mic x={INTERVIEW.mic.x} y={INTERVIEW.mic.y} w={INTERVIEW.mic.w} tilt={10} seed="p3mic" />
       </XG>
     </World>

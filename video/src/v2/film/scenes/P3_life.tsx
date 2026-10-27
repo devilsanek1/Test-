@@ -5,24 +5,17 @@
 //                48 px, ruled lines, a signature line with a signature), on the table top's deeper value so it pops.
 //   P3Underline  the ordinary underline under its CONTRACT title, drawn on fast like a pencil stroke on "contracts"
 //                (12.20, the pencil sound): anchor ink, 15 px, with a slight overshoot and a small hook, never the pop.
-//   P3TableTop   the table's dressing, re-laid round the page and the tent: the recorder back-left beside the mic (its
-//                light blinks), the mic's short cable to it, a water glass in front of it (a ripple), a second glass and
-//                the pen on the right by B; nothing touches the page or the tent.
 //   P3GlassNotes the office's things stuck on the frosted partition, clear of both heads: a printed notice taped on the
 //                middle pane, sticky notes on the right pane, a room-booking card by the left mullion.
-//   P3Passers    life that READS at phone size in the room's walker gap (the colleague behind the partition crosses at
-//                t 0-1.3 and 2.7-4.9): a second colleague carrying a stack of archive boxes crosses behind the frosted
-//                glass left to right (1.15-3.25), and a flock of filled birds crosses the dusk in the glass wall (from 1.3).
-import React, {useId} from 'react';
+// (P3TableTop, P3Passers, the room and the table are the kit's now: InterviewTableTop, InterviewRoom `passer` /
+// `flockAt`, InterviewTable, STUDIO; folded back by the assembler.)
+import React from 'react';
 import {hline, line, polyPath, roundRect, smooth, textLines} from '../../../lib/sketch';
-import {useTime} from '../../../lib/time';
-import {b, CC, Fill, Flock, INTERVIEW, Ink, Letter, Live, loopT, onOff, quadPt, W, type Pt} from '../kit';
-import {P3C} from './P3_room';
+import {CC, Fill, INTERVIEW, Ink, Letter, quadPt, W, type Pt} from '../kit';
+import {STUDIO as P3C} from '../palette';
 
 /** The CONTRACT page on the table (screen px): a perspective quad (the far edge inset), front and centre-left. */
 export const P3_PAGE = {x0: 120, x1: 440, top: 1384, bottom: 1526, inset: 18};
-/** NAME WITHHELD's tent in front of A (bottom centre x, y; w, h): its words at 46 px, clear of the page. */
-export const P3_TENT = {x: 664, y: 1520, w: 320, h: 100};
 
 const pageQuad = (): [Pt, Pt, Pt, Pt] => {
   const {x0, x1, top, bottom, inset} = P3_PAGE;
@@ -74,42 +67,6 @@ export const P3Underline: React.FC<{at: number}> = ({at}) => {
   return <Ink d={d} width={15} color={CC.anchor} at={at} dur={0.16} pace="free" taper={false} />;
 };
 
-/** The table's dressing (screen px; draw after the page, before the staffers' arms). */
-export const P3TableTop: React.FC<{seed?: string}> = ({seed = 'p3top'}) => {
-  const t = useTime();
-  const m = INTERVIEW.mic;
-  const rec = {x: 8, y: 1388, w: 110, h: 54};
-  const blink = onOff(t, `${seed}/rec`, 1.1, 0.55);
-  const glass = (x: number, y: number, k: string, ph: number) => {
-    const rp = loopT(t, 2.4, ph) / 2.4;
-    return (
-      <React.Fragment key={k}>
-        <Fill d={roundRect(x - 26, y - 76, 52, 76, 8)} color={CC.glass} seed={`${seed}/${k}`} />
-        <Fill rect={[x - 22, y - 46, 44, 42]} color={CC.studioPanel} offset={false} />
-        <Ink d={roundRect(x - 26, y - 76, 52, 76, 8, {seed: `${seed}/${k}I`}) + hline(x - 22, x + 22, y - 46, {over: [0, 0], seed: `${seed}/${k}w`})} width={W.far} />
-        <Live c={[x, y - 46]}>
-          <path d={`M${x - 18 + rp * 14} ${y - 46}h${8 - rp * 4}`} stroke={CC.white} strokeWidth={3} strokeLinecap="round" />
-        </Live>
-      </React.Fragment>
-    );
-  };
-  return (
-    <>
-      {/* the mic's short cable round to the recorder's back */}
-      <Ink d={smooth([[m.x - 20, m.y - 2], [m.x - 36, m.y + 22], [rec.x + rec.w - 6, rec.y + 14]])} width={4} color={CC.cable} taper={false} />
-      <Fill d={roundRect(rec.x, rec.y, rec.w, rec.h, 10)} color={CC.stand} seed={`${seed}/rec`} />
-      <Fill d={roundRect(rec.x + 12, rec.y + 12, 52, 30, 4)} color={CC.studioDeep} offset={false} />
-      <Ink d={roundRect(rec.x, rec.y, rec.w, rec.h, 10, {seed: `${seed}/recI`})} width={W.mid} />
-      <Live c={[rec.x + 86, rec.y + 27]}>
-        <circle cx={rec.x + 86} cy={rec.y + 27} r={10} fill={blink ? CC.recLight : CC.studioDeep} />
-      </Live>
-      {glass(78, 1512, 'g1', 0)}
-      {glass(1010, 1460, 'g2', 1.1)}
-      <Ink d={line(850, 1508, 950, 1482, {over: [0, 0], seed: `${seed}/pen`})} width={12} color={CC.anchor} taper={false} />
-    </>
-  );
-};
-
 /** Notes and a notice on the frosted partition (screen px; kit INTERVIEW.partition 352..952 x 700..1362, mullions 552
  *  and 752; A's head ~523..685 x 1000..1180, B's ~798..946 x 1020..1180: everything sits above y 960). */
 export const P3GlassNotes: React.FC<{seed?: string}> = ({seed = 'p3notes'}) => {
@@ -134,59 +91,6 @@ export const P3GlassNotes: React.FC<{seed?: string}> = ({seed = 'p3notes'}) => {
       })}
       <Fill d={roundRect(500, 900, 40, 56, 5)} color={CC.paper} offset={false} />
       <Ink d={roundRect(500, 900, 40, 56, 5, {seed: `${seed}/card`}) + hline(508, 532, 916, {over: [0, 0], seed: `${seed}/c1`}) + hline(508, 526, 930, {over: [0, 0], seed: `${seed}/c2`})} width={W.hair} />
-    </>
-  );
-};
-
-/** The second passer behind the frosted partition and a flock in the glass wall (screen px, kit INTERVIEW numbers). */
-export const P3Passers: React.FC<{seed?: string}> = ({seed = 'p3pass'}) => {
-  const t = useTime();
-  const PT = INTERVIEW.partition;
-  const [gx, gy, gw] = INTERVIEW.glass;
-  const id = ('p3pass' + useId()).replace(/[^a-zA-Z0-9-]/g, '');
-  // the passer: a stepped walk (12 drawings / s), 2.1 s across, carrying a stack of two archive boxes at chest height
-  const T0 = 1.15;
-  const DURW = 2.1;
-  const wt = Math.floor(t * 12) / 12;
-  const p = (wt - T0) / DURW;
-  const feet = PT.bottom - 6;
-  const wx = PT.x0 - 90 + (PT.x1 - PT.x0 + 180) * p;
-  const step = Math.floor(t * 6) % 2;
-  const C = CC.officeWalker;
-  const panes: [number, number][] = [[PT.x0, PT.mullions[0] - 6], [PT.mullions[0] + 6, PT.mullions[1] - 6], [PT.mullions[1] + 6, PT.x1]];
-  const sky: [number, number][] = [[gx, gx + gw * 0.5 - 5], [gx + gw * 0.5 + 5, gx + gw]];
-  return (
-    <>
-      <defs>
-        <clipPath id={`${id}p`} clipPathUnits="userSpaceOnUse">
-          {panes.map(([a, z], i) => (
-            <rect key={i} x={a} y={PT.top} width={z - a} height={PT.bottom - PT.top} />
-          ))}
-        </clipPath>
-        <clipPath id={`${id}g`} clipPathUnits="userSpaceOnUse">
-          {sky.map(([a, z], i) => (
-            <rect key={i} x={a} y={gy} width={z - a} height={300} />
-          ))}
-        </clipPath>
-      </defs>
-      {p >= 0 && p <= 1 ? (
-        <g clipPath={`url(#${id}p)`}>
-          <circle cx={wx} cy={feet - 276} r={27} fill={C} />
-          <path d={roundRect(wx - 36, feet - 244, 72, 156, 26)} fill={C} />
-          <path d={`M${wx - 13} ${feet - 96}L${wx - (step ? 30 : 6)} ${feet}M${wx + 13} ${feet - 96}L${wx + (step ? 30 : 6)} ${feet}`} stroke={C} strokeWidth={24} strokeLinecap="round" />
-          {/* the boxes held in front of the chest, both forearms under them */}
-          <rect x={wx + 4} y={feet - 236 + step * 3} width={70} height={52} rx={4} fill={C} />
-          <rect x={wx + 8} y={feet - 284 + step * 3} width={62} height={46} rx={4} fill={C} />
-          <rect x={wx + 20} y={feet - 270 + step * 3} width={36} height={12} rx={3} fill={CC.frost} />
-          <rect x={wx + 20} y={feet - 218 + step * 3} width={40} height={12} rx={3} fill={CC.frost} />
-          <path d={`M${wx - 20} ${feet - 222}L${wx + 46} ${feet - 180 + step * 3}`} stroke={C} strokeWidth={18} strokeLinecap="round" />
-          {/* the frosted band stays in front of him (it is on the glass) */}
-          <rect x={PT.x0} y={960} width={PT.x1 - PT.x0} height={52} fill={CC.frost} />
-        </g>
-      ) : null}
-      <g clipPath={`url(#${id}g)`}>
-        <Flock x={gx} y={gy + 40} w={gw} h={140} n={6} size={15} period={4.6} dur={2.0} offset={1.3} dir={-1} single={false} seed={`${seed}/flock`} />
-      </g>
     </>
   );
 };

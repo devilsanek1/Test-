@@ -15,20 +15,23 @@ export type {CloudsProps, FlockProps, SteamProps, DustMotesProps, WallClockProps
 export {DuskTown} from './Town';
 export type {DuskTownProps} from './Town';
 // her home: the nook (P2 / P4 / P13 layouts, P5 close, P6 angle) and its pieces
-export {NookRoom, NookDeskClose, NookAngle, NOOK_ANGLE, NOOK, NOOK_LAYOUTS, nookMat, nookPt, nookWorld, HighShelf, PotPlant, FramedPicture, Corkboard, CoatOnHook, TableLamp, NookMug, NookMug as Mug, BookPile, PaperStack, FloorPlant} from './Nook';
+export {NookRoom, nookRodCoverRect, NookDeskClose, NookAngle, NOOK_ANGLE, ANGLE_LAMP, CLOSE_MUG, PhoneUp, PHONE_UP, NOOK_DARK, NOOK, NOOK_LAYOUTS, nookMat, nookPt, nookWorld, HighShelf, PotPlant, FramedPicture, Corkboard, CoatOnHook, TableLamp, NookMug, NookMug as Mug, BookPile, PaperStack, FloorPlant} from './Nook';
 export type {NookLayoutName, NookRoomProps} from './Nook';
 // her desk (O1 / P12 / LOOP): the approved style frame, alive
-export {DESK, O1_WAVE, o1Wave, o1Cam, DeskBack, DeskFront, Books, Bookcase, BookStack, TopShelf, DeskWindow, DeskFloor, DeskTop, Basket, Pen, DeskMug, LampHead, leafPath} from './Desk';
+export {DESK, DESK_SHELF_UP, MugWisps, O1_WAVE, o1Wave, o1Cam, DeskBack, DeskFront, Books, Bookcase, BookStack, TopShelf, DeskWindow, DeskFloor, DeskTop, Basket, Pen, DeskMug, LampHead, leafPath} from './Desk';
 // the cast: her, her cat, the staffers
 export {HER, HerStanding, HerSeated, HerBack, HerArm, herMouth, HerHeadParts, hairSway, fidget, tube, elbow} from './Her';
 export type {HerFace, Facing, Talking, HerBase, HerStandingProps, HerSeatedProps, HerBackProps, HerArmProps, HeadSpec} from './Her';
-export {Cat, catHead} from './Cat';
-export type {CatPose, CatProps} from './Cat';
+export {Cat, catHead, catTurnHead} from './Cat';
+export type {CatPose, CatProps, CatTurn} from './Cat';
 export {Staffer, STAFF, P3_STAFF, InterviewTable, TablePage} from './Staffer';
 export type {StafferProps} from './Staffer';
 // her contract and the run-on
 export {ContractPage, FloorRun, CONTRACT_PAGE, O1_PAGE, CL_X, CLAUSE, RUN_YEARS, RUN_STEP, pageMat, pagePoint, clauseWidths, clauseRow, clauseTip, sweepBands, runOnLength, PAPER_HANG} from './Contract';
 export type {PageGeo, ContractPageProps, FloorRunProps} from './Contract';
+// the desk insert's run-on pouring over the desk's front edge (O1 / P12): lip, shadows, the drop, the floor, flutters
+export {O1RunOn, o1RunOn, o1RunSpeed, O1_KICKS, O1_REVEALS, O1_RUN_END, RUN_EDGE, RUN_FLOOR, RUN_FLOOR_Y, YEAR_U, runOnTip, sOfL, lOfS} from './RunOn';
+export type {RunOnMotion, RunOnProps} from './RunOn';
 // props: badge, box, mic, laptop, bubble, stamps
 export {Badge, Lanyard, Box, BOX, BADGE_REST, Mic, micFromBoard, Laptop, Bubble, Stamp} from './Props';
 export type {BadgeProps, BadgeState, BoxProps, MicProps, LaptopProps, BubbleProps, StampProps} from './Props';

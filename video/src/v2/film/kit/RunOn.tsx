@@ -1,4 +1,5 @@
-// O1_runon (lane L1-desk): HER contract's run-on for O1 and P12, the page running on past its own end and pouring off
+// kit/RunOn.tsx (lane L1's O1_runon.tsx, folded back into the kit by the assembler: the kit Contract's run-on is flat
+// on one plane): HER contract's run-on for O1 and P12, the page running on past its own end and pouring off
 // the desk. The roll at its leading edge unrolls: ON THE DESK (page-local, the page's own tilt) to the desk's front
 // edge, over a ROUNDED LIP (a bright curl band, a dark crease under it, its cast shadow on the front face and the
 // drawer on both sides), HANGING down the front of the desk (foreshortened x0.66: a vertical drop seen from the high
@@ -10,15 +11,18 @@
 // down the hanging sheet; the sheet's sway grows with the speed. Everything is a pure function of the paper length L,
 // the slide S (P12: the paper slides 200 px further over the lip; the paper that comes out from under the page carries
 // ruled rows only, so the years keep their order) and the motion inputs (speed, flutter kicks).
-// Local variant of the kit's ContractPage run-on (kit/Contract.tsx RunOnLocal is flat on one plane): see the lane's
-// REQUESTS line. "for life" is never written; the running line only ever runs on HER page.
+// The desk insert's geometry (DESK.front, O1_PAGE, the floor at y 1772) is built in: it is THE desk's run-on.
+// "for life" is never written; the running line only ever runs on HER page.
 import React from 'react';
 import {hline, line, polyPath, roundRect, ellipse} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
 import {ease as E, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {useCaptionFont} from '../../../lib/font';
-import {CC, CL_X, CONTRACT_PAGE, DESK, Fill, Ink, Letter, O1_PAGE, PAPER_HANG, pageMat, type Pt, W, applyM} from '../kit';
+import {CC} from '../palette';
+import {applyM, Fill, Ink, Letter, Pt, W} from './util';
+import {CL_X, CONTRACT_PAGE, O1_PAGE, PAPER_HANG, pageMat} from './Contract';
+import {DESK} from './Desk';
 
 // ---------------------------------------------------------------- geometry (canvas px at camera rest)
 

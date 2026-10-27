@@ -104,8 +104,12 @@ const mixHex = (a: string, c: string, k: number): string => {
 export const PAPER_HANG = mixHex(CC.paper, CC.paperEdge, 0.55);
 
 export type ContractPageProps = PageGeo & {
-  /** The title (style frame: JOB CONTRACT). */
+  /** The title (style frame: JOB CONTRACT). On the SIMPLE face (a held page) the title is a bar unless given: then
+   *  it is hand-lettered across the page below the corners she holds (>= 28 screen px; lane L2's P2 fix, folded back
+   *  by the assembler), in place of the bar and the two lines under it, so the strip reads as a contract. */
   title?: string;
+  /** The simple face's lettered title size (screen px, default 31). */
+  titleSize?: number;
   /** The clause in words (default true). */
   clause?: boolean;
   /** Highlight band progress per clause row (0..1; default done). Or `sweepAt` (the approved sweep timing). */
@@ -127,11 +131,12 @@ export type ContractPageProps = PageGeo & {
 };
 
 export const ContractPage: React.FC<ContractPageProps> = (p) => {
-  const {title = 'JOB CONTRACT', clause = true, sigDur = 0.3, runOn = 0, edgeY, detail = 'auto', shadow = true, at, seed = 'ct'} = p;
+  const {title = 'JOB CONTRACT', titleSize = 31, clause = true, sigDur = 0.3, runOn = 0, edgeY, detail = 'auto', shadow = true, at, seed = 'ct'} = p;
   const t = useTime();
   const ok = useCaptionFont();
   const s = p.w / CONTRACT_PAGE.w;
   const simple = detail === 'simple' || (detail === 'auto' && p.w < 240);
+  const simpleTitle = simple && p.title !== undefined;
   const M = pageMat(p);
   const {w, h} = CONTRACT_PAGE;
   const widths = clauseWidths(ok);
@@ -165,14 +170,18 @@ export const ContractPage: React.FC<ContractPageProps> = (p) => {
         {shadow ? <Fill rect={[5, 7, w, h]} color={CC.paperEdge} offset={false} at={fillAt(at)} /> : null}
         <Fill rect={[0, 0, w, h]} color={CC.paper} offset={false} at={fillAt(at)} />
         <Ink d={rect(0, 0, w, h, {seed: `${seed}/page`, over: 'small'})} width={W.mid} at={at} />
-        {simple ? (
+        {simpleTitle ? (
+          <Letter x={w / 2} y={150} size={titleSize / s} fit={w - 2 * CL_X} anchor="middle" at={b(at, 0.08)}>
+            {title}
+          </Letter>
+        ) : simple ? (
           <Ink d={hline(CL_X, CL_X + 260, 56, {seed: `${seed}/tb`, over: [0, 0]})} width={7} at={b(at, 0.08)} taper={false} />
         ) : ok ? (
           <Letter x={CL_X} y={66} size={46} at={b(at, 0.08)}>
             {title}
           </Letter>
         ) : null}
-        <Ink d={textLines(CL_X, 110, 352, {n: simple ? 2 : 4, gap: simple ? 46 : 26, seed: `${seed}/l1`, heading: false})} width={W.far} at={b(at, 0.1)} />
+        {simpleTitle ? null : <Ink d={textLines(CL_X, 110, 352, {n: simple ? 2 : 4, gap: simple ? 46 : 26, seed: `${seed}/l1`, heading: false})} width={W.far} at={b(at, 0.1)} />}
         {/* the highlighter band (the pop) under the clause's words, then the words */}
         {clause
           ? CLAUSE.rows.map((r, i) =>

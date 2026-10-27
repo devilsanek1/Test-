@@ -18,6 +18,7 @@ import {useTime, prog, ease, clamp} from '../../../lib/time';
 import {depthInk} from '../../../lib/theme';
 import {captionFontStack, measureCaption, useCaptionFont} from '../../../lib/font';
 import {mat, Mat, useXf, XG} from '../../../lib/xf';
+import {ExitFade} from '../../../lib/exit';
 import {CC} from '../palette';
 
 export type At = number | undefined;
@@ -186,20 +187,26 @@ export const Letter: React.FC<LetterProps> = ({x, y, size, fill = CC.ink, anchor
     if (p <= 0) return null;
     if (p < 1) style = {clipPath: `inset(-30% ${((1 - p) * 100).toFixed(1)}% -30% -5%)`};
   }
+  // in an un-build the words shrink about their middle with the fills (lib/exit ExitFade: never a fade, never left
+  // floating on the loop's last frame; lane L2's request, folded back by the assembler)
+  const tw = measureCaption(children, s);
+  const mx = anchor === 'start' ? x + tw / 2 : anchor === 'middle' ? x : x - tw / 2;
   return (
-    <text
-      x={x}
-      y={y}
-      fontFamily={captionFontStack}
-      fontSize={s}
-      fill={fill}
-      textAnchor={anchor}
-      letterSpacing={spacing}
-      transform={rot ? `rotate(${rot} ${x} ${y})` : undefined}
-      style={style}
-    >
-      {children}
-    </text>
+    <ExitFade x={mx} y={y - s * 0.35}>
+      <text
+        x={x}
+        y={y}
+        fontFamily={captionFontStack}
+        fontSize={s}
+        fill={fill}
+        textAnchor={anchor}
+        letterSpacing={spacing}
+        transform={rot ? `rotate(${rot} ${x} ${y})` : undefined}
+        style={style}
+      >
+        {children}
+      </text>
+    </ExitFade>
   );
 };
 

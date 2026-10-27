@@ -1,9 +1,9 @@
 // P6 (lane L3-people): COZY MEDIUM CLOSE, a NEW ANGLE (3/4 front, the window behind her), 16.60-20.52 ("and told the
 // BBC she objected to where its military work was heading.").
 // ONE idea: worried, she tells the BBC she objected. She sits at her desk facing 3/4 front, turned to the mic, her face
-// WORRIED in every frame (P6_face: the brows up in the middle at full ink, a downturned talking mouth, never a round
-// 'o'); behind her the window onto the living dusk town, the bookcase, prints, the clock, the radiator, a candle on the
-// sill (P6_set: the kit's NookAngle with the lamp slid left beside the mic, so a band of lamp-lit wall separates its
+// WORRIED in every frame (the kit's worried face, the lane's P6 fix folded back: the brows up in the middle at full
+// ink, a downturned talking mouth, never a round 'o'); behind her the window onto the living dusk town, the bookcase, prints, the clock, the radiator, a candle on the
+// sill (the kit's NookAngle, the lane's fixes folded back: the lamp beside the mic, so a band of lamp-lit wall separates its
 // shade from her hair; the desk runs the full width in front of her and hides her waist). Her bubble (speech lines only,
 // no words) pops on "told" (16.76, the like-pop). She talks from "told" (a nod, an open hand), clutches her hands at her
 // chest for ONE worried beat on "objected", then talks on. Her cat sits on the desk's right end (the same desk and the
@@ -15,9 +15,7 @@ import {World} from '../../../lib/World';
 import type {ToneKey} from '../../../lib/Film';
 import {ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
-import {Bubble, Cat, CC, HerSeated, Mic, NOOK_ANGLE, herMouth, lerpPt, type Pt} from '../kit';
-import {P6Head, seatedHeadSpec} from './P6_face';
-import {P6Set} from './P6_set';
+import {Bubble, Cat, CC, HerSeated, Mic, NOOK_ANGLE, NookAngle, herMouth, lerpPt, type Pt} from '../kit';
 
 const START = 16.6;
 const DUR = 20.52 - START;
@@ -45,22 +43,16 @@ const P6: React.FC = () => {
   const z = 1 + 0.015 * prog(t, 0, DUR, ease.inOutSine);
   const seed = 'p6/her';
   const her = {x: H.x, y: H.y, h: H.h, facing: 'l' as const, view: 'front34' as const, face: 'worried' as const, talking, clutch, seed};
-  const head = seatedHeadSpec({x: H.x, y: H.y, h: H.h, facing: 'l', talking, seed, t});
   return (
     <World sky={CC.wall}>
       <XG m={mat.about(mat.scale(z), 470, 1050)}>
-        <P6Set
-          behind={
-            <>
-              <HerSeated {...her} part="body" />
-              <P6Head h={head} />
-            </>
-          }
+        <NookAngle
+          behind={<HerSeated {...her} part="body" />}
           cat={<Cat x={CAT.x} y={CAT.y} size={CAT.size} pose="sit" facing="l" look={look} seed="p6/cat" />}
         >
           <Mic x={NOOK_ANGLE.mic.x} y={NOOK_ANGLE.mic.y} w={NOOK_ANGLE.mic.w} tilt={8} seed="p6/mic" />
           <HerSeated {...her} part="arms" />
-        </P6Set>
+        </NookAngle>
         <Bubble x={BUB.x} y={BUB.y} w={BUB.w} h={BUB.h} tail={tail} at={POP} seed="p6/bubble" />
       </XG>
     </World>

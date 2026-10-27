@@ -16,7 +16,7 @@ import {blob, crown, ellipse, glint, hline, line, poly, polyPath, rect, roundRec
 import {ease as E, prog, useTime} from '../../../lib/time';
 import {mat, Mat, XG} from '../../../lib/xf';
 import {useCaptionFont} from '../../../lib/font';
-import {CC} from '../palette';
+import {CC, COLD} from '../palette';
 import {add, applyM, At, b, Fill, fillAt, Ink, Letter, Placed, Pt, W} from './util';
 import {Live} from './Ambient';
 
@@ -108,11 +108,17 @@ export type BoxProps = {
   /** 0..1 squashes the box (the badge landing); `knock` (deg) knocks the photo frame. */
   jolt?: number;
   knock?: number;
+  /** Something dropped IN the box (box-local px, inside the box's squash): drawn between its back and its front wall,
+   *  which is drawn again over it, so only what rises over the rim shows (O1: her badge, its top third and clip over
+   *  the rim; lane L1's BoxFront, folded back by the assembler). */
+  inside?: React.ReactNode;
+  /** Drawn over the front wall (box-local px): a lanyard spilling over the rim. */
+  over?: React.ReactNode;
   at?: At;
   seed?: string;
 };
 
-export const Box: React.FC<BoxProps> = ({x = BOX.bl, y = BOX.back, w = BOX.br - BOX.fl, badge, jolt = 0, knock = 0, at, seed = 'box'}) => {
+export const Box: React.FC<BoxProps> = ({x = BOX.bl, y = BOX.back, w = BOX.br - BOX.fl, badge, jolt = 0, knock = 0, inside, over, at, seed = 'box'}) => {
   const s = w / (BOX.br - BOX.fl);
   const {fl, fr, bl, br, back, rim, bot} = BOX;
   const opening: Pt[] = [[fl, rim], [fr, rim], [br, back], [bl, back]];
@@ -170,6 +176,16 @@ export const Box: React.FC<BoxProps> = ({x = BOX.bl, y = BOX.back, w = BOX.br - 
             </XG>
           </>
         )}
+        {inside !== undefined ? (
+          <>
+            {inside}
+            {/* the front wall again (its own seeds), over what is inside */}
+            <Fill rect={[fl, rim, fr - fl, bot - rim]} color={CC.box} seed={`${seed}/bxF`} at={f(0.01)} />
+            <Ink d={rect(fl, rim, fr - fl, bot - rim, {seed: `${seed}/bxFI`, over: 'small'}) + poly([[fr, bot], [br, back + (bot - rim)], [br, back]], {seed: `${seed}/bxRI`, over: 'small'}) + line(bl, back, br, back, {seed: `${seed}/bxBI`, over: 'small'})} width={W.mid} at={a(0.01)} />
+            <Ink d={hline(fl + 70, fr - 70, rim + 40, {seed: `${seed}/tape`, over: [0, 0]}) + hline(fl + 70, fr - 70, rim + 50, {seed: `${seed}/tape2`, over: [0, 0]})} width={W.hair} at={a(0.06)} />
+            {over}
+          </>
+        ) : null}
       </XG>
     </Placed>
   );
@@ -398,9 +414,12 @@ export type StampProps = {
   rot?: number;
   /** Slam time: it lands from 1.6x in 0.09 s with a small jolt; omit = there. */
   at?: number;
+  /** The board's paper fill under the box at the slam scale (lane L4's InsertStamp, folded back): true = with its flat
+   *  drop shadow (NO VETO across the page's top edge); 'plain' = paper only (a stamp that lands ON the page). */
+  backing?: boolean | 'plain';
 };
 
-export const Stamp: React.FC<StampProps> = ({x, y, w, text, rot = -6, at}) => {
+export const Stamp: React.FC<StampProps> = ({x, y, w, text, rot = -6, at, backing}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const h = w * 0.38;
@@ -412,6 +431,8 @@ export const Stamp: React.FC<StampProps> = ({x, y, w, text, rot = -6, at}) => {
   const inner = roundRect(-w / 2 + 9, -h / 2 + 9, w - 18, h - 18, h * 0.12);
   return (
     <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot), mat.scale(s))}>
+      {backing === true ? <Fill d={roundRect(-w / 2 + 8, -h / 2 + 10, w, h, h * 0.16)} color={COLD.shade} offset={false} /> : null}
+      {backing ? <Fill d={box} color={CC.paper} offset={false} /> : null}
       <Ink d={box} width={w >= 300 ? 7 : 5.5} color={CC.stamp} taper={false} />
       <Ink d={inner} width={2.4} color={CC.stamp} taper={false} />
       <Letter x={0} y={h * 0.2} size={h * 0.52} fit={w - 44} anchor="middle" fill={CC.stamp}>

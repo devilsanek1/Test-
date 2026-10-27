@@ -127,6 +127,8 @@ export const CC = {
   candle: '#FBE6C6',
   flame: '#F7CF9C',
   cable: '#2B2A44',
+  cableWarm: '#8C5A3F', // her home's lamp cables: a warm brown, so the dark anchor stays on her hair, the mic and the shade
+  homeSpines: ['#C8714E', '#E9B47A', '#EBCFB5', '#D98A62'] as string[], // mid-tones a nook book takes instead of navy
   pictures: ['#F6B892', '#E9B47A', '#C8714E', '#5E8C6A', '#9C8CC4', '#F7CF9C'] as string[], // framed prints (no hero blues)
   wallGlow: '#F7DDB8', // the lamp's warm light on the wall (one flat step over the wall)
   // ---- her cat (kit/Cat.tsx): a warm dark tabby; never the hero, never the pop; reads on cream, apricot and dusk blue
@@ -182,6 +184,30 @@ export const CC = {
 };
 
 export type CCRole = keyof typeof CC;
+
+/** P3's interview room: its value steps by depth (lane L3's art-director fix, folded back by the assembler): a lighter
+ *  frosted partition lit from the office beyond, the table top one step deeper so the cream papers pop, a mid table
+ *  front, a deeper floor and the deepest chairs in the foreground (never the anchor), the softbox's mid back, the coat
+ *  over a chair, a laptop bag, the power strip's lit dot. */
+export const STUDIO = {
+  partition: '#CDD0EE', // the frosted glass, lit from the office beyond (lighter than the wall)
+  frost: '#DCDFF4', // the frosted band across it
+  table: '#C3BEE5', // the table top, one value step under the old pale lilac: the cream pages pop on it
+  tableShade: '#ADA8DA', // a page's flat shadow on the top
+  tableFront: '#A49ED2', // the front panel (mid)
+  tray: '#8F96CC', // the cable tray channel
+  floor: '#7C83BF', // the carpet (deeper: the foreground)
+  carpet: '#6A71AE', // its tile seams and flecks
+  chair: '#55537F', // the chair backs (the deepest step, never the anchor)
+  chairMesh: '#6B6996',
+  softBack: '#6F76B4', // = CC.shelfMetal // the softbox's back: a mid periwinkle, not the anchor navy
+  coat: '#C29A6B', // a camel coat over a chair (it echoes the archive boxes: the room's one warm accent)
+  coatShade: '#A67E52',
+  coatLining: '#7E5A44',
+  bag: '#4F4C7A',
+  bagFlap: '#625F90',
+  lit: '#9FE0A0', // the power strip's lit switch (a small green dot)
+} as const;
 
 /** P8's sister palette "6 Dusk" (StylePentagon's DUSK roles, verbatim): saturated blue-violet with peach accents,
  *  never grey mist. Its hero (#3E5BD0) and pop (#FF7A4D) are unused: they belong to her. */
@@ -255,7 +281,8 @@ export const COLD_SETS = {
     stampPad: '#1F1C33',
     ink: '#1C1A26', // DUSK.ink: the cold set's outlines
     shadow: '#1F1C40', // a passer-by's crisp shadow across the window light
-    cuff: '#6B3550', // an official's maroon suit cuff (the hand that slides a document in)
+    cuff: '#6B3550', // an official's maroon suit cuff
+    suit: '#5E6075', // a colleague's grey suit sleeve (the hand that slides a document in: never the official's third arm)
     shirt: '#E6E5F7',
     seal: '#B4AEDF', // an embossed rosette seal on a folder, its ribbons
     sealRib: '#55509A',
@@ -284,6 +311,7 @@ export const COLD_SETS = {
     ink: '#1C1A26',
     shadow: '#4B4688', // a passer-by's crisp shadow across the window light (~28 % darker than the desk)
     cuff: '#6B3550',
+    suit: '#5E6075',
     shirt: '#F3F2FB',
     seal: '#E6E5F7',
     sealRib: '#38357A',

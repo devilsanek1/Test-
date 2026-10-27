@@ -2,10 +2,12 @@
 // set: a cool periwinkle studio corner (CC.studio*). Left, a glass wall onto the city at dusk (kit DuskTown: walkers,
 // cars, windows switching); a softbox light on a stand; behind the staffers a frosted glass partition onto the
 // open-plan office (soft silhouettes at ~35 % contrast: desks, monitors, two seated colleagues, a plant, a coat rack;
-// a colleague walks past every 3.6 s as a clear darker silhouette); a wall clock over it; metal shelving with archive
+// a colleague walks past every 3.6 s as a clear darker silhouette, a second one carries archive boxes across in his gap
+// (`passer`); a flock crosses the glass wall (`flockAt`)); values step by depth (STUDIO; the softbox faces the staffers:
+// lane L3's P3 fixes, folded back by the assembler); a wall clock over it; metal shelving with archive
 // boxes cut by the right edge; ceiling tiles, felt acoustic panels and track lights above the caption band; a tall
-// plant. The table dressing (draw after the table): a recorder with a blinking light, two water glasses (a ripple), a
-// cable to the mic, a pen. The staffers, the mic, the CONTRACT page and the NAME WITHHELD tent are the lane's (kit
+// plant. The table dressing (draw after the table): the recorder back-left by the mic with a blinking light, two water
+// glasses (a ripple), the mic's short cable, a pen; nothing touches the page or the name tent. The staffers, the mic, the CONTRACT page and the NAME WITHHELD tent are the lane's (kit
 // Staffer, Mic, TablePage at INTERVIEW.page, NameTent at INTERVIEW.tent). Screen px, the board's numbers: table top
 // 1362, front 1532 .. 1732; mic (185, 1352, w 150); A (640, 1780, h 900); B (905, 1780, h 820).
 //   <InterviewRoom>       everything behind the staffers (wall, glass wall + town, softbox, partition + office, shelves)
@@ -16,9 +18,9 @@ import React, {useId} from 'react';
 import {blob, ellipse, hline, line, poly, polyPath, rect, roundRect, smooth, vline} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
-import {CC} from '../palette';
-import {At, b, Fill, fillAt, Ink, Letter, W} from './util';
-import {leafD, Live, loopT, onOff, WallClock} from './Ambient';
+import {CC, STUDIO} from '../palette';
+import {At, b, Fill, fillAt, Ink, Letter, Pt, W} from './util';
+import {Flock, leafD, Live, loopT, onOff, WallClock} from './Ambient';
 import {DuskTown} from './Town';
 import {PotPlant} from './Nook';
 
@@ -33,7 +35,7 @@ export const INTERVIEW = {
   /** P3's page and name tent (screen px): CONTRACT at x 220 (A's hands fold to its right: the title stays clear), the
    *  name tent in front of the one who spoke. */
   page: {x: 220, y: 1380, w: 320, h: 140},
-  tent: {x: 650, y: 1520, w: 300, h: 74},
+  tent: {x: 664, y: 1520, w: 320, h: 100},
 };
 
 /** The open-plan office beyond the frosted partition (screen px, ~35 % contrast): desks with monitors (one glows),
@@ -79,22 +81,51 @@ const OfficeBeyond: React.FC<{seed: string}> = ({seed}) => {
   return <>{out}</>;
 };
 
-export const InterviewRoom: React.FC<{at?: At; seed?: string}> = ({at, seed = 'iroom'}) => {
+/** The second colleague behind the frosted glass (screen px, inside the partition's clip): a stepped walk (12 drawings
+ *  / s), 2.1 s across from t0, carrying a stack of two archive boxes at chest height (lane L3's P3Passers, folded back
+ *  by the assembler: now behind the mullions, the softbox and the frosted band, as glass needs). */
+const BoxCarrier: React.FC<{t: number; t0: number}> = ({t, t0}) => {
+  const PT = INTERVIEW.partition;
+  const DURW = 2.1;
+  const wt = Math.floor(t * 12) / 12;
+  const p = (wt - t0) / DURW;
+  if (p < 0 || p > 1) return null;
+  const feet = PT.bottom - 6;
+  const wx = PT.x0 - 90 + (PT.x1 - PT.x0 + 180) * p;
+  const step = Math.floor(t * 6) % 2;
+  const C = CC.officeWalker;
+  return (
+    <g>
+      <circle cx={wx} cy={feet - 276} r={27} fill={C} />
+      <path d={roundRect(wx - 36, feet - 244, 72, 156, 26)} fill={C} />
+      <path d={`M${wx - 13} ${feet - 96}L${wx - (step ? 30 : 6)} ${feet}M${wx + 13} ${feet - 96}L${wx + (step ? 30 : 6)} ${feet}`} stroke={C} strokeWidth={24} strokeLinecap="round" />
+      {/* the boxes held in front of the chest, both forearms under them */}
+      <rect x={wx + 4} y={feet - 236 + step * 3} width={70} height={52} rx={4} fill={C} />
+      <rect x={wx + 8} y={feet - 284 + step * 3} width={62} height={46} rx={4} fill={C} />
+      <rect x={wx + 20} y={feet - 270 + step * 3} width={36} height={12} rx={3} fill={STUDIO.frost} />
+      <rect x={wx + 20} y={feet - 218 + step * 3} width={40} height={12} rx={3} fill={STUDIO.frost} />
+      <path d={`M${wx - 20} ${feet - 222}L${wx + 46} ${feet - 180 + step * 3}`} stroke={C} strokeWidth={18} strokeLinecap="round" />
+    </g>
+  );
+};
+
+/** P3's room behind the staffers (screen px): see the header. `passer` = the scene time (s) the second colleague
+ *  (carrying archive boxes) starts across the frosted glass, in the first walker's gap (default 1.15; false = none);
+ *  `flockAt` = the flock crossing the glass wall's sky (default 1.3; false = none). */
+export const InterviewRoom: React.FC<{at?: At; seed?: string; passer?: number | false; flockAt?: number | false}> = ({at, seed = 'iroom', passer = 1.15, flockAt = 1.3}) => {
   const t = useTime();
   const r = rng(`iroom/${seed}`);
   const [gx, gy, gw, gh] = INTERVIEW.glass;
   const PT = INTERVIEW.partition;
   const clipId = ('iglass' + useId()).replace(/[^a-zA-Z0-9-]/g, '');
   const partId = ('ipart' + useId()).replace(/[^a-zA-Z0-9-]/g, '');
-  // a colleague walks past BEHIND the frosted partition every 3.6 s (a clear darker-periwinkle silhouette ~300 px tall,
-  // crossing in 2.2 s, a stepped walk), right to left, then left to right
+  const skyId = ('isky' + useId()).replace(/[^a-zA-Z0-9-]/g, '');
   const wt = Math.floor(t * 12) / 12;
   const wp = loopT(wt, 3.6, 0.9) / 2.2;
   const wdir = Math.floor((wt + 0.9) / 3.6) % 2 === 0 ? -1 : 1;
   const wx = wdir === 1 ? PT.x0 - 80 + (PT.x1 - PT.x0 + 160) * wp : PT.x1 + 80 - (PT.x1 - PT.x0 + 160) * wp;
   const step = Math.floor(t * 6) % 2;
   const feet = PT.bottom - 6;
-  // archive shelving (right, cut by the edge): boards and boxes
   const shelfX = 960;
   const boards = [700, 880, 1060, 1240];
   const boxes: React.ReactNode[] = [];
@@ -111,13 +142,14 @@ export const InterviewRoom: React.FC<{at?: At; seed?: string}> = ({at, seed = 'i
       x += w + r.range(2, 6);
     }
   });
-  // ceiling tiles and the acoustic panels on the upper wall (all above the caption band, y < 290)
   const tiles = [-60, 150, 360, 570, 780, 990].map((x, i) => vline(x, -40, 120, {over: [0, 0], seed: `${seed}/tile${i}`})).join('') + hline(-60, 1140, 50, {over: [0, 0], seed: `${seed}/tileH`});
   const panels = [70, 260, 450, 640, 830].map((x) => roundRect(x, 150, 150, 112, 14));
+  // the softbox, mirrored: the back (a tapered box) left, the diffuser right, facing the staffers
+  const sbBack: Pt[] = [[394, 700], [290, 760], [290, 940], [394, 1000]];
+  const sbFace: Pt[] = [[380, 690], [440, 660], [440, 1040], [380, 1010]];
   return (
     <>
       <Fill rect={[-200, -200, 1480, 2320]} color={CC.studio} offset={false} mode="snap" at={at} />
-      {/* the ceiling (tiles), the track and its lights; felt acoustic panels on the upper wall (above the band) */}
       <Fill rect={[-200, -200, 1480, 330]} color={CC.studioPanel} offset={false} at={fillAt(at)} />
       <Ink d={tiles} width={W.hair} color={CC.studioDeep} at={at} />
       <Ink d={hline(-60, 1140, 130, {seed: `${seed}/ceil`, over: [0, 0]})} width={W.mid} at={at} />
@@ -132,13 +164,16 @@ export const InterviewRoom: React.FC<{at?: At; seed?: string}> = ({at, seed = 'i
           <Fill d={blob(x, 262, 20, 6, {seed: `${seed}/sp${i}`})} color={CC.core} offset={false} at={fillAt(at, 0.02)} />
         </React.Fragment>
       ))}
-      {/* the frosted partition behind the staffers: the office beyond at ~35 % contrast, a colleague walking past */}
       <defs>
         <clipPath id={partId} clipPathUnits="userSpaceOnUse">
           <rect x={PT.x0} y={PT.top} width={PT.x1 - PT.x0} height={PT.bottom - PT.top} />
         </clipPath>
+        <clipPath id={skyId} clipPathUnits="userSpaceOnUse">
+          <rect x={gx} y={gy} width={gw * 0.5 - 5} height={300} />
+          <rect x={gx + gw * 0.5 + 5} y={gy} width={gw * 0.5 - 5} height={300} />
+        </clipPath>
       </defs>
-      <Fill rect={[PT.x0, PT.top, PT.x1 - PT.x0, PT.bottom - PT.top]} color={CC.studioPanel} offset={false} at={fillAt(at)} />
+      <Fill rect={[PT.x0, PT.top, PT.x1 - PT.x0, PT.bottom - PT.top]} color={STUDIO.partition} offset={false} at={fillAt(at)} />
       <Live at={at} c={[(PT.x0 + PT.x1) / 2, (PT.top + PT.bottom) / 2]}>
         <g clipPath={`url(#${partId})`}>
           <OfficeBeyond seed={seed} />
@@ -150,8 +185,8 @@ export const InterviewRoom: React.FC<{at?: At; seed?: string}> = ({at, seed = 'i
               <path d={`M${wx - 30} ${feet - 220}L${wx - 30 - wdir * (step ? 16 : -10)} ${feet - 120}M${wx + 30} ${feet - 220}L${wx + 30 + wdir * (step ? 16 : -10)} ${feet - 120}`} stroke={CC.officeWalker} strokeWidth={18} strokeLinecap="round" />
             </g>
           ) : null}
-          {/* the frosted band across the glass (eye height) */}
-          <rect x={PT.x0} y={960} width={PT.x1 - PT.x0} height={52} fill={CC.frost} />
+          {passer !== false ? <BoxCarrier t={t} t0={passer} /> : null}
+          <rect x={PT.x0} y={960} width={PT.x1 - PT.x0} height={52} fill={STUDIO.frost} />
         </g>
       </Live>
       <Fill rect={[PT.x0, 600, PT.x1 - PT.x0 + 8, PT.top - 600]} color={CC.studio} offset={false} at={fillAt(at)} />
@@ -159,11 +194,16 @@ export const InterviewRoom: React.FC<{at?: At; seed?: string}> = ({at, seed = 'i
         <Fill key={`mu${i}`} rect={[mx - 6, PT.top, 12, PT.bottom - PT.top]} color={CC.shelfMetal} offset={false} at={fillAt(at, 0.02)} />
       ))}
       <Ink d={rect(PT.x0, PT.top, PT.x1 - PT.x0, PT.bottom - PT.top, {seed: `${seed}/panel`, over: 'small'}) + PT.mullions.map((mx, i) => vline(mx - 6, PT.top, PT.bottom, {over: [0, 0], seed: `${seed}/ps${i}`}) + vline(mx + 6, PT.top, PT.bottom, {over: [0, 0], seed: `${seed}/pt${i}`})).join('')} width={W.far} at={at} />
-      {/* the wall clock above the partition (under the caption band) */}
       <WallClock cx={800} cy={652} r={40} rim={CC.stand} seed={`${seed}/clock`} at={at} />
-      {/* the glass wall onto the city (left): the town with walkers, the mullion grid */}
       <Fill rect={[gx - 14, gy - 14, gw + 28, gh + 14]} color={CC.shelfMetal} offset={false} at={fillAt(at)} />
       <DuskTown x={gx} y={gy} w={gw} h={gh} horizon={gy + gh * 0.4} k={0.85} moon={[gx + gw * 0.7, gy + 70]} stars={5} clouds={2} seed={`${seed}/town`} at={at} />
+      {flockAt !== false ? (
+        <Live at={at} c={[gx + gw / 2, gy + 110]}>
+          <g clipPath={`url(#${skyId})`}>
+            <Flock x={gx} y={gy + 40} w={gw} h={140} n={6} size={15} period={4.6} dur={2.0} offset={flockAt} dir={-1} single={false} seed={`${seed}/flock`} />
+          </g>
+        </Live>
+      ) : null}
       <defs>
         <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
           <rect x={gx} y={gy} width={gw} height={gh} />
@@ -171,12 +211,12 @@ export const InterviewRoom: React.FC<{at?: At; seed?: string}> = ({at, seed = 'i
       </defs>
       <Ink d={vline(gx + gw * 0.5, gy, gy + gh, {over: [0, 0], seed: `${seed}/gm1`}) + hline(gx, gx + gw, gy + gh * 0.55, {over: [0, 0], seed: `${seed}/gm2`})} width={10} color={CC.shelfMetal} taper={false} at={at} />
       <Ink d={rect(gx, gy, gw, gh, {seed: `${seed}/gI`, over: 'small'})} width={W.mid} at={at} />
-      {/* the softbox on its stand (between the glass and the staffers) */}
-      <Ink d={line(380, 860, 384, INTERVIEW.tableTop, {over: [0, 0], seed: `${seed}/stand`}) + line(384, 1180, 330, INTERVIEW.tableTop, {over: [0, 0], seed: `${seed}/leg1`}) + line(384, 1180, 440, INTERVIEW.tableTop, {over: [0, 0], seed: `${seed}/leg2`})} width={7} color={CC.stand} taper={false} at={at} />
-      <Fill d={polyPath([[336, 700], [440, 760], [440, 940], [336, 1000]])} color={CC.stand} at={fillAt(at)} seed={`${seed}/sbBack`} />
-      <Fill d={polyPath([[290, 660], [350, 690], [350, 1010], [290, 1040]])} color={CC.softbox} at={fillAt(at, 0.02)} seed={`${seed}/sb`} />
-      <Ink d={poly([[336, 700], [440, 760], [440, 940], [336, 1000]], {closed: true, seed: `${seed}/sbBI`, over: 'small'}) + poly([[290, 660], [350, 690], [350, 1010], [290, 1040]], {closed: true, seed: `${seed}/sbI`, over: 'small'})} width={W.mid} at={at} />
-      {/* archive shelving, cut by the right edge */}
+      {/* the softbox on its stand, its diffuser turned to the staffers */}
+      <Ink d={line(350, 860, 346, INTERVIEW.tableTop, {over: [0, 0], seed: `${seed}/stand`}) + line(346, 1180, 292, INTERVIEW.tableTop, {over: [0, 0], seed: `${seed}/leg1`}) + line(346, 1180, 400, INTERVIEW.tableTop, {over: [0, 0], seed: `${seed}/leg2`})} width={7} color={CC.stand} taper={false} at={at} />
+      <Fill d={polyPath(sbBack)} color={STUDIO.softBack} at={fillAt(at)} seed={`${seed}/sbBack`} />
+      <Fill d={roundRect(272, 818, 26, 64, 6)} color={STUDIO.softBack} at={fillAt(at)} offset={false} />
+      <Fill d={polyPath(sbFace)} color={CC.softbox} at={fillAt(at, 0.02)} seed={`${seed}/sb`} />
+      <Ink d={poly(sbBack, {closed: true, seed: `${seed}/sbBI`, over: 'small'}) + poly(sbFace, {closed: true, seed: `${seed}/sbI`, over: 'small'}) + roundRect(272, 818, 26, 64, 6, {seed: `${seed}/sbHead`})} width={W.mid} at={at} />
       <Fill rect={[shelfX, 600, 200, 780]} color={CC.studioDeep} offset={false} at={fillAt(at)} />
       {boxes}
       {boards.map((by, i) => (
@@ -184,7 +224,6 @@ export const InterviewRoom: React.FC<{at?: At; seed?: string}> = ({at, seed = 'i
       ))}
       <Ink d={boxInk} width={W.far} at={at} />
       <Ink d={vline(shelfX, 600, 1362, {over: [0, 0], seed: `${seed}/sh1`}) + vline(shelfX + 12, 600, 1362, {over: [0, 0], seed: `${seed}/sh2`}) + boards.map((by, i) => hline(shelfX, 1140, by, {over: [0, 0], seed: `${seed}/sb${i}`})).join('')} width={W.mid} at={at} />
-      {/* a tall plant by the shelving */}
       <PotPlant x={884} y={1200} w={70} h={80} kind="leafy" leaves={9} seed={`${seed}/plant`} at={at} />
     </>
   );
@@ -212,19 +251,20 @@ export const NameTent: React.FC<{x: number; y: number; w?: number; h?: number; t
   );
 };
 
-/** The table's dressing (draw after the table, before the staffers' arms): a recorder with a blinking light, two
- *  water glasses (a ripple), the mic's cable, a pen. */
+/** The table's dressing (screen px; draw after the page, before the staffers' arms): the recorder back-left beside the
+ *  mic (its light blinks), the mic's short cable round to it, a water glass in front of it (a ripple), a second glass
+ *  and the pen on the right by B; nothing touches the page or the name tent (lane L3's P3TableTop, folded back). */
 export const InterviewTableTop: React.FC<{at?: At; seed?: string}> = ({at, seed = 'itop'}) => {
   const t = useTime();
   const m = INTERVIEW.mic;
-  const rec = {x: 680, y: 1420, w: 110, h: 56};
+  const rec = {x: 8, y: 1388, w: 110, h: 54};
   const blink = onOff(t, `${seed}/rec`, 1.1, 0.55);
   const glass = (x: number, y: number, k: string, ph: number) => {
     const rp = loopT(t, 2.4, ph) / 2.4;
     return (
       <React.Fragment key={k}>
-        <Fill d={roundRect(x - 26, y - 76, 52, 76, 8)} color={CC.glass} at={fillAt(at)} seed={`${seed}/${k}`} />
-        <Fill rect={[x - 22, y - 46, 44, 42]} color={CC.studioPanel} offset={false} at={fillAt(at, 0.02)} />
+        <Fill d={roundRect(x - 26, y - 76, 52, 76, 8)} color={CC.glass} seed={`${seed}/${k}`} at={fillAt(at)} />
+        <Fill rect={[x - 22, y - 46, 44, 42]} color={CC.studioPanel} offset={false} at={fillAt(at)} />
         <Ink d={roundRect(x - 26, y - 76, 52, 76, 8, {seed: `${seed}/${k}I`}) + hline(x - 22, x + 22, y - 46, {over: [0, 0], seed: `${seed}/${k}w`})} width={W.far} at={at} />
         <Live at={at} c={[x, y - 46]}>
           <path d={`M${x - 18 + rp * 14} ${y - 46}h${8 - rp * 4}`} stroke={CC.white} strokeWidth={3} strokeLinecap="round" />
@@ -234,16 +274,17 @@ export const InterviewTableTop: React.FC<{at?: At; seed?: string}> = ({at, seed 
   };
   return (
     <>
-      <Ink d={smooth([[m.x + 20, m.y - 4], [m.x + 120, m.y + 30], [rec.x - 60, rec.y + 40], [rec.x, rec.y + 30]])} width={4} color={CC.cable} taper={false} at={b(at, 0.06)} />
-      <Fill d={roundRect(rec.x, rec.y, rec.w, rec.h, 10)} color={CC.stand} at={fillAt(at)} seed={`${seed}/rec`} />
-      <Fill d={roundRect(rec.x + 12, rec.y + 12, 54, 30, 4)} color={CC.studioDeep} offset={false} at={fillAt(at, 0.02)} />
+      {/* the mic's short cable round to the recorder's back */}
+      <Ink d={smooth([[m.x - 20, m.y - 2], [m.x - 36, m.y + 22], [rec.x + rec.w - 6, rec.y + 14]])} width={4} color={CC.cable} taper={false} at={at} />
+      <Fill d={roundRect(rec.x, rec.y, rec.w, rec.h, 10)} color={CC.stand} seed={`${seed}/rec`} at={fillAt(at)} />
+      <Fill d={roundRect(rec.x + 12, rec.y + 12, 52, 30, 4)} color={CC.studioDeep} offset={false} at={fillAt(at)} />
       <Ink d={roundRect(rec.x, rec.y, rec.w, rec.h, 10, {seed: `${seed}/recI`})} width={W.mid} at={at} />
-      <Live at={at} c={[rec.x + 88, rec.y + 26]}>
-        <circle cx={rec.x + 88} cy={rec.y + 26} r={9} fill={blink ? CC.recLight : CC.studioDeep} />
+      <Live at={at} c={[rec.x + 86, rec.y + 27]}>
+        <circle cx={rec.x + 86} cy={rec.y + 27} r={10} fill={blink ? CC.recLight : CC.studioDeep} />
       </Live>
-      {glass(250, 1440, 'g1', 0)}
+      {glass(78, 1512, 'g1', 0)}
       {glass(1010, 1460, 'g2', 1.1)}
-      <Ink d={line(820, 1500, 940, 1470, {over: [0, 0], seed: `${seed}/pen`})} width={12} color={CC.anchor} taper={false} at={at} />
+      <Ink d={line(850, 1508, 950, 1482, {over: [0, 0], seed: `${seed}/pen`})} width={12} color={CC.anchor} taper={false} at={at} />
     </>
   );
 };

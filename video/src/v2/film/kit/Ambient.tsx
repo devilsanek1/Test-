@@ -5,7 +5,7 @@
 //   <Flock>       a loose flock crossing a region every `period` s (stepped wing flaps), plus <Bird> (one glyph)
 //   <Steam>       wisps rising off a mug / a pot (dashes travelling up a wavy path)
 //   <DustMotes>   motes drifting in a lamp's light (an ellipse)
-//   <WallClock>   a wall clock; the second hand ticks every second
+//   <WallClock>   a wall clock; the second hand ticks every second (a 3 screen-px stroke: it reads on a phone)
 //   <Sway>        rotates its children about a pivot by a slow seeded sway (plant leaves, a hanging cord)
 //   <CandleFlame> a stepped flicker
 //   <Live>        gate for raw-SVG life: appears with `at` (or with the BuildWave's colour), shrinks away in an un-build
@@ -311,8 +311,12 @@ export type WallClockProps = {
 
 export const WallClock: React.FC<WallClockProps> = ({cx, cy, r = 40, startMin = 19 * 60 + 42, rim = CC.trim, at, seed = 'clock'}) => {
   const t = useTime();
+  const k = useInkScale();
   const sec = Math.floor(Math.max(0, t) + 1e-6) + 17;
   const min = startMin + sec / 60;
+  // the second hand ticks at 1 Hz and READS at phone size: a straight 3 screen-px stroke with a short tail (lane L2's
+  // SecondHand overlay, folded back by the assembler)
+  const sa = (((sec % 60) * 6 - 90) * Math.PI) / 180;
   const hand = (deg: number, len: number) => {
     const a = ((deg - 90) * Math.PI) / 180;
     return line(cx, cy, cx + Math.cos(a) * len, cy + Math.sin(a) * len, {over: [0, 0], seed: `${seed}/h${len.toFixed(0)}`});
@@ -331,8 +335,8 @@ export const WallClock: React.FC<WallClockProps> = ({cx, cy, r = 40, startMin = 
       <Ink d={hand(((min / 60) % 12) * 30, r * 0.42)} width={ink + 0.6} at={b(at, 0.08)} taper={false} />
       <Ink d={hand((min % 60) * 6, r * 0.62)} width={ink} at={b(at, 0.08)} taper={false} />
       <Live at={at === undefined ? undefined : at + 0.1} c={[cx, cy]}>
-        <path d={hand((sec % 60) * 6, r * 0.7)} stroke={CC.pin} strokeWidth={W.hair} strokeLinecap="round" fill="none" />
-        <circle cx={cx} cy={cy} r={Math.max(2.5, r * 0.07)} fill={CC.anchor} />
+        <path d={`M${cx - Math.cos(sa) * r * 0.16} ${cy - Math.sin(sa) * r * 0.16}L${cx + Math.cos(sa) * r * 0.72} ${cy + Math.sin(sa) * r * 0.72}`} stroke={CC.trim} strokeWidth={3 * k} strokeLinecap="round" fill="none" />
+        <circle cx={cx} cy={cy} r={Math.max(3.4 * k, r * 0.07)} fill={CC.anchor} />
       </Live>
     </>
   );

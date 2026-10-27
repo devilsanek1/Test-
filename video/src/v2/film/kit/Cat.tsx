@@ -39,7 +39,11 @@ export type CatProps = {
   life?: boolean;
   /** Paw-wash windows [t0, t1] (scene s), 'sit' only. */
   wash?: [number, number][];
-  /** Eyes: 'open' (default) | 'half' (drowsy) | 'closed'. 'sleep' is always closed. */
+  /** 'sit' only: a REAL head turn toward what it watches (yaw / pitch / lean / head offset / pupils; its tail tip hangs
+   *  over the edge it sits on): O1 / P12, the cat at the desk's front edge. `look` is ignored when given. */
+  turn?: CatTurn;
+  /** Eyes: 'open' (default; a loaf defaults to 'half', drowsy, and an explicit 'open' wakes it) | 'half' | 'closed'.
+   *  'sleep' is always closed. */
   eyes?: 'open' | 'half' | 'closed';
   at?: At;
   seed?: string;
@@ -162,7 +166,9 @@ const CatHead: React.FC<{h: Head; ink: number; inner: number; detail: boolean; a
   );
 };
 
-export const Cat: React.FC<CatProps> = ({x, y, size = 150, pose = 'sit', facing = 'r', look, life = true, wash, eyes = 'open', at, seed = 'cat'}) => {
+export const Cat: React.FC<CatProps> = ({x, y, size = 150, pose = 'sit', facing = 'r', look, life = true, wash, eyes: eyesProp, turn, at, seed = 'cat'}) => {
+  if (turn && pose === 'sit') return <TurnedCat x={x} y={y} size={size} facing={facing} pose={turn} seed={seed} />;
+  const eyes = eyesProp ?? (pose === 'loaf' ? 'half' : 'open');
   const tReal = useTime();
   const t = life ? tReal : 0;
   const S = size / 100;
@@ -267,7 +273,7 @@ export const Cat: React.FC<CatProps> = ({x, y, size = 150, pose = 'sit', facing 
   } else if (pose === 'loaf') {
     const hc: Pt = [24, -45];
     const lk = lookLocal(hc);
-    const head: Head = {c: hc, rx: 16, ry: 14, front: 0.3, rot: (look ? clamp(lk.ang * 0.5, -25, 20) : 0) + glance * -12, eyeDir: lk.dir, eyes: eyes === 'open' && eyeState !== 'closed' ? 'half' : eyeState, ear};
+    const head: Head = {c: hc, rx: 16, ry: 14, front: 0.3, rot: (look ? clamp(lk.ang * 0.5, -25, 20) : 0) + glance * -12, eyeDir: lk.dir, eyes: eyeState, ear};
     const bodyD = smooth([[-40, 0], [-46, -12], [-44, -28], [-30, -40], [0, -43], [20, -39], [29, -26], [29, -9], [24, 0]], {closed: true, tension: 0.4});
     const tail0: Pt[] = [[-42, -6], [-36, 2], [-14, 4], [6, 3], [18, 1]];
     const tl = [...tail0.slice(0, 3), ...rotPts(tail0.slice(3), tail0[2], -flick * 30)];
@@ -356,4 +362,194 @@ export const catHead = (p: {x: number; y: number; size?: number; pose?: CatPose;
   const pose = p.pose ?? 'sit';
   const hc: Pt = pose === 'sitFront' ? [0, -73] : pose === 'loaf' ? [24, -45] : pose === 'sleep' ? [20, -24] : pose === 'walk' ? [40, -54] : pose === 'peek' ? [0, -27] : [17, -79];
   return [p.x + sx * hc[0] * S, p.y + hc[1] * S];
+};
+
+// ---------------------------------------------------------------- the sitting cat with a REAL head turn (`turn`)
+
+/** A REAL head turn for the sitting cat (lane L1's O1 / P12 cat, folded back by the assembler): the head is a small
+ *  sphere turned in YAW toward the cat's front (features slide over it, the muzzle and nose stick out past the
+ *  outline at 3/4, the far eye hides), PITCH dips the chin, the head moves toward the target and the body LEANS
+ *  forward (a shear about the paws). This sitting cat sits on an EDGE: its tail curls round the front paws and the
+ *  tip hangs over the front edge and swishes (always on); `flick` throws it up on a beat. */
+export type CatTurn = {
+  /** Head yaw toward the cat's front (deg): 20 = mostly to camera, 70 = 3/4 to profile. */
+  yaw: number;
+  /** Chin dip (deg, + = nose down toward the front). */
+  pitch: number;
+  /** Body lean forward (a shear about the paws: 0..0.2). */
+  lean: number;
+  /** Extra head offset toward the target (local units). */
+  head: Pt;
+  /** Pupil direction (local, +x = the cat's front, +y = down). */
+  eye: Pt;
+  /** A big tail flick on a beat (0..1). */
+  flick?: number;
+};
+
+const D2R = Math.PI / 180;
+
+/** The turned head at the origin (local units): ears, head, forehead stripes, eyes + pupils, muzzle, nose, mouth,
+ *  whiskers. `yaw` slides every feature over a sphere toward +x; a feature turned past the silhouette is hidden. */
+const TurnedHead: React.FC<{yaw: number; eye: Pt; eyes: 'open' | 'closed'; ear: boolean; ink: number; inner: number; seed: string}> = ({yaw, eye, eyes, ear, ink, inner, seed}) => {
+  const rx = 17.5;
+  const ry = 15;
+  const th = yaw * D2R;
+  const az = (deg: number) => deg * D2R + th;
+  // ears: on the top, set back (latitude ~55 deg): x = 0.62 rx sin(phi + yaw), width by |cos|
+  const earPts = (phiDeg: number): Pt[] => {
+    const a = az(phiDeg);
+    const cx = 0.66 * rx * Math.sin(a);
+    const w = 0.84 * rx * Math.max(0.42, Math.abs(Math.cos(a)));
+    return [
+      [cx - w / 2, -ry * 0.62],
+      [cx + 0.1 * rx, -ry * 1.6],
+      [cx + w / 2, -ry * 0.5],
+    ];
+  };
+  const innerOf = (e: Pt[]): Pt[] => {
+    const m: Pt = [(e[0][0] + e[1][0] + e[2][0]) / 3, (e[0][1] + e[1][1] + e[2][1]) / 3 + ry * 0.08];
+    return e.map(([x, y]) => [m[0] + (x - m[0]) * 0.55, m[1] + (y - m[1]) * 0.55]);
+  };
+  // the far ear (turned away) first; the near ear twitches
+  const near = earPts(-46);
+  const far = earPts(46);
+  const nearT = ear ? rotPts(near, [near[0][0], near[0][1]], -18) : near;
+  const headD = blob(0, 0, rx * (1 + 0.06 * Math.sin(th)), ry, {seed: `${seed}/head`, wobble: 0.02});
+  // eyes on the face (phi = -/+ 30): the near eye stays, the far eye slides behind the muzzle
+  const er = rx * 0.19;
+  const eyeY = -ry * 0.1;
+  const eyeList = [-30, 30]
+    .map((phi) => ({x: 0.96 * rx * Math.sin(az(phi)), k: Math.cos(az(phi))}))
+    .filter((e) => e.k > 0.3);
+  // muzzle (it stands out past the outline in 3/4), nose, mouth
+  const sm = Math.sin(th);
+  const mx = 1.02 * rx * sm;
+  const my = ry * 0.42;
+  const mw = rx * 0.44 * (0.72 + 0.28 * Math.cos(th));
+  const muzzle = blob(mx, my, mw, ry * 0.3, {seed: `${seed}/mz`, wobble: 0.03});
+  const nx = 1.16 * rx * sm + 0.6;
+  const nose = polyPath([
+    [nx - rx * 0.12, my - ry * 0.26],
+    [nx + rx * 0.08, my - ry * 0.26],
+    [nx - rx * 0.01, my - ry * 0.08],
+  ]);
+  const mouth = smooth([
+    [nx - rx * 0.01, my - ry * 0.06],
+    [nx - rx * 0.06, my + ry * 0.12],
+    [nx - rx * 0.2, my + ry * 0.1],
+  ]);
+  const whisk =
+    [0, 1].map((j) => line(mx + rx * 0.16, my + j * ry * 0.12, mx + rx * (0.78 + 0.08 * j), my - ry * 0.06 + j * ry * 0.24, {over: [0, 0], seed: `${seed}/whF${j}`})).join('') +
+    [0, 1].map((j) => line(mx - mw * 0.7, my + j * ry * 0.12, mx - mw * 0.7 - rx * (0.42 + 0.06 * j), my - ry * 0.04 + j * ry * 0.22, {over: [0, 0], seed: `${seed}/whB${j}`})).join('');
+  const fx = 0.5 * rx * sm;
+  const mStripes = [-0.22, 0, 0.22].map((u, i) => line(fx + u * rx, -ry * 0.92, fx + u * rx * 0.8, -ry * (0.58 - (i === 1 ? 0.06 : 0)), {over: [0, 0], seed: `${seed}/m${i}`})).join('');
+  return (
+    <>
+      {[far, nearT].map((e, i) => (
+        <React.Fragment key={i}>
+          <Fill d={polyPath(e)} color={CC.catBody} offset={false} />
+          <Fill d={polyPath(innerOf(e))} color={CC.catEar} offset={false} />
+          <Ink d={smooth(e)} width={inner} />
+        </React.Fragment>
+      ))}
+      <Fill d={headD} color={CC.catBody} seed={`${seed}/headF`} />
+      <Ink d={mStripes} width={inner * 1.25} color={CC.catStripe} taper={false} />
+      <Ink d={headD} width={ink} open={0.06} />
+      <Fill d={muzzle} color={CC.catLight} offset={false} />
+      <Ink d={muzzle} width={inner} open={0.18} />
+      <Fill d={nose} color={CC.catEar} offset={false} />
+      <Ink d={mouth} width={Math.max(1.2, inner * 0.7)} />
+      {eyeList.map((e, i) => {
+        const w = er * (0.55 + 0.45 * e.k);
+        if (eyes === 'closed') return <Ink key={i} d={smooth([[e.x - w, eyeY - er * 0.05], [e.x, eyeY + er * 0.55], [e.x + w, eyeY - er * 0.05]])} width={inner} />;
+        const hh = er * 0.84;
+        const d = `M${e.x - w} ${eyeY}Q${e.x} ${eyeY - hh * 1.3} ${e.x + w} ${eyeY}Q${e.x} ${eyeY + hh * 1.1} ${e.x - w} ${eyeY}Z`;
+        // pupils pinned toward what it watches (the near side of each eye)
+        const px = e.x + clamp(eye[0], -1, 1) * w * 0.48;
+        const py = eyeY + clamp(eye[1], -1, 1) * er * 0.28 - er * 0.04;
+        return (
+          <React.Fragment key={i}>
+            <Fill d={d} color={CC.catEye} offset={false} />
+            <Fill d={blob(px, py, er * 0.24, er * 0.62, {seed: `${seed}/pu${i}`})} color={CC.ink} offset={false} />
+            <Ink d={d} width={inner * 0.8} />
+          </React.Fragment>
+        );
+      })}
+      <Ink d={whisk} width={Math.max(1.1, inner * 0.55)} />
+    </>
+  );
+};
+
+/** The sitting cat with a turned head (Cat `turn`), on an edge. (x, y) = the ground point under its middle. */
+const TurnedCat: React.FC<{x: number; y: number; size: number; facing: 'l' | 'r'; pose: CatTurn; seed: string}> = ({x, y, size, facing, pose, seed}) => {
+  const t = useTime();
+  const S = size / 100;
+  const M: Mat = mat.compose(mat.translate(x, y), mat.scale((facing === 'r' ? 1 : -1) * S, S));
+  const ink = size >= 260 ? W.mid : size >= 160 ? W.far + 0.6 : W.far;
+  const inner = Math.max(1.4, ink * 0.62);
+  const breathe = 1 + 0.016 * Math.sin((2 * Math.PI * t) / 2.6 + rand(seed, 'br') * 6);
+  const eyes: 'open' | 'closed' = blinkOn(t, seed) ? 'closed' : 'open';
+  const ear = earTwitch(t, seed);
+  const body = (d: string, k: string, color = CC.catBody, open = 0.05) => (
+    <>
+      <Fill d={d} color={color} seed={`${seed}/${k}`} />
+      <Ink d={d} width={ink} open={open} />
+    </>
+  );
+  const stripes = (segs: [Pt, Pt][], w = 4.2) => <Ink d={segs.map(([a, z], i) => line(a[0], a[1], z[0], z[1], {over: [0, 0], seed: `${seed}/st${i}`})).join('')} width={w * S} color={CC.catStripe} taper={false} />;
+  // the tail: round the front paws, then its tip hangs over the desk's front edge (local y > 2.5) and swishes; a flick
+  // (P12, on "can't") throws it up and back. Stepped at 12 drawings / s.
+  const ts = stepT(t, 12);
+  const swish = Math.sin(2 * Math.PI * 0.72 * ts + rand(seed, 'sw') * 6) * 0.8 + Math.sin(2 * Math.PI * 1.9 * ts) * 0.2;
+  const flick = clamp(pose.flick ?? 0, 0, 1);
+  const tail0: Pt[] = [[-36, -5], [-30, 3], [-12, 6], [6, 6], [17, 5]];
+  const hang: Pt[] = [[17, 5], [23, 13], [25, 30], [23, 46]];
+  const pivot: Pt = [20, 8];
+  const hangR = rotPts(hang, pivot, -swish * 22 - flick * 70);
+  const tl = [...tail0, ...hangR.slice(1)];
+  const tailD = tube(tl, tl.map((_, i) => 8.6 + ((6.2 - 8.6) * i) / (tl.length - 1)));
+  const tipA = tl[tl.length - 2];
+  const tipZ = tl[tl.length - 1];
+  const tipD = tube([[tipA[0] + (tipZ[0] - tipA[0]) * 0.4, tipA[1] + (tipZ[1] - tipA[1]) * 0.4], tipZ], [6.6, 6.2]);
+  // the body (kit sit), leaning forward about the paws; the head turned, dipped and moved toward the target
+  const lean = clamp(pose.lean, 0, 0.25);
+  const shear: Mat = [1, 0, -lean, 1, 0, 0];
+  const hc: Pt = [17 + lean * 79 + pose.head[0], -79 + pose.head[1]];
+  const bodyD = smooth([[-34, 0], [-42, -14], [-40, -34], [-28, -50], [-10, -60], [4, -66], [14, -65], [21, -55], [22, -38], [20, -18], [18, 0]], {closed: true, tension: 0.4});
+  return (
+    <XG m={M}>
+      <InkScale value={1 / S}>
+        {body(tailD, 'tail')}
+        <Fill d={tipD} color={CC.catStripe} offset={false} />
+        {stripes([[[-22, 0], [-20, 9]], [[0, 1], [0, 9]], [[24, 22], [27, 26]]], 3.2)}
+        <XG m={mat.about(mat.scale(1, breathe), 0, 0)}>
+          <XG m={shear}>
+            {body(tube([[4, -34], [5, -2]], [8.4, 7.6]), 'legF')}
+            <Fill d={blob(6, -2.5, 6, 3.6, {seed: `${seed}/pwF`})} color={CC.catLight} offset={false} />
+            {body(bodyD, 'body')}
+            <Fill d={blob(-21, -19, 21, 18, {seed: `${seed}/haunch`})} color={CC.catBody} offset={false} />
+            <Ink d={smooth([[-34, -30], [-24, -38], [-6, -30], [-2, -14], [-6, -2]])} width={inner} />
+            {/* the neck: a fill bridge from the chest up to the moved head (shear-frame coords), so it never floats */}
+            <Fill d={tube([[12, -56], [hc[0] - 2 + lean * (hc[1] + 8), hc[1] + 8]], [15, 17])} color={CC.catBody} offset={false} />
+            {stripes([[[-30, -46], [-25, -35]], [[-18, -55], [-14, -43]], [[-6, -61], [-3, -50]], [[-30, -14], [-22, -10]], [[-28, -26], [-20, -24]]])}
+            <Fill d={smooth([[11, -61], [21, -54], [22, -40], [18, -28], [13, -36], [9, -50]], {closed: true})} color={CC.catLight} offset={false} />
+            {body(tube([[12, -38], [13, -36], [14, -2]], [9.2, 8.8, 8]), 'legN')}
+            <Fill d={blob(16, -2.5, 6.8, 4, {seed: `${seed}/pwN`})} color={CC.catLight} offset={false} />
+            <Ink d={ellipse(16, -2.5, 6.8, 4, {seed: `${seed}/pwNI`})} width={inner} />
+          </XG>
+          <XG m={mat.compose(mat.translate(hc[0], hc[1]), mat.about(mat.rotate(pose.pitch), 0, 9))}>
+            <TurnedHead yaw={pose.yaw} eye={pose.eye} eyes={eyes} ear={ear} ink={ink} inner={inner} seed={seed} />
+          </XG>
+        </XG>
+      </InkScale>
+    </XG>
+  );
+};
+
+/** The turned cat's head centre on canvas for a pose (to aim the eye-line and keep things clear of it). */
+export const catTurnHead = (x: number, y: number, size: number, pose: Pick<CatTurn, 'lean' | 'head'>, facing: 'l' | 'r' = 'l'): Pt => {
+  const S = size / 100;
+  const lx = 17 + clamp(pose.lean, 0, 0.25) * 79 + pose.head[0];
+  const ly = -79 + pose.head[1];
+  return [x + (facing === 'r' ? 1 : -1) * lx * S, y + ly * S];
 };

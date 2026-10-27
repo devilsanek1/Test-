@@ -82,7 +82,25 @@ const talkingAt = (t: number, talking?: Talking): boolean => {
 };
 /** Mouth state: 0 closed, 1 half, 2 open (stepped at 10 drawings / s while talking). */
 const MOUTH_STEPS = [2, 1, 2, 0, 1, 2, 1, 0, 2, 1];
-const mouthStep = (t: number, talking?: Talking) => (talkingAt(t, talking) ? MOUTH_STEPS[Math.floor(t * 10) % MOUTH_STEPS.length] : 0);
+/** Her WORRIED talking: the half step most of the time (2 open, 6 half, 2 closed), so she never reads "Oh!". */
+const WORRY_STEPS = [1, 2, 1, 0, 1, 1, 2, 1, 0, 1];
+const mouthStep = (t: number, talking?: Talking, steps = MOUTH_STEPS) => (talkingAt(t, talking) ? steps[Math.floor(t * 10) % steps.length] : 0);
+
+/** A downturned open mouth: a dome (the corners low, the top arched, the bottom nearly straight between the corners),
+ *  so her worried talking reads as a worried "frown, talking", never a round "o". W = half width, H = height. */
+const capMouth = (mx: number, my: number, W: number, H: number): string =>
+  smooth(
+    [
+      [mx - W, my + 0.34 * H],
+      [mx - 0.66 * W, my - 0.36 * H],
+      [mx, my - 0.62 * H],
+      [mx + 0.66 * W, my - 0.36 * H],
+      [mx + W, my + 0.34 * H],
+      [mx + 0.45 * W, my + 0.4 * H],
+      [mx - 0.45 * W, my + 0.4 * H],
+    ],
+    {closed: true, tension: 0.34},
+  );
 /** A blink every ~3.3 s (0.1 s), phase by seed. */
 const blinking = (t: number, seed: string) => (t + rand(seed, 'blink') * 3.3) % 3.3 < 0.1;
 /** Idle life (kit/README.md "Keep a panel alive"): the hair's slow sway (head radii) and a hand fidget (px offset,
@@ -172,10 +190,15 @@ const HairLocks: React.FC<{h: HeadSpec}> = ({h}) => {
   );
 };
 
-/** Head + face + hair cap (the mass and locks are separate layers). */
+/** Head + face + hair cap (the mass and locks are separate layers). HER worried face (long hair, face 'worried': lane
+ *  L3's P6 face, folded back by the assembler): the brows at full ink with a steep inner rise, drawn OVER the hair cap
+ *  (the far one lower and shorter, under the hairline), the talking mouth a downturned dome on the half step most of
+ *  the time, the closed mouth a heavier downturned arc. */
 const Head: React.FC<{h: HeadSpec}> = ({h}) => {
   const t = useTime();
   const {c, r, s, turn, face, ink, at, seed} = h;
+  const style = h.hairStyle ?? 'long';
+  const herWorry = face === 'worried' && style === 'long';
   const headD = blob(c[0], c[1], r * 0.92, r, {seed: `${seed}/head`, wobble: 0.012});
   const inner = Math.max(1.8, ink * 0.62);
   // features: the face's centre line slides toward the facing side as she turns
@@ -194,13 +217,35 @@ const Head: React.FC<{h: HeadSpec}> = ({h}) => {
       ? line(outX, by + 0.04 * r, inX, by - 0.1 * r, {over: [0, 0], seed: `${seed}/bw${i}`})
       : smooth([[outX, by + 0.02 * r], [x, by - 0.05 * r], [inX, by]]);
   };
+  // her worried brows: the inner end 0.16 r above the outer, a slight arch; the far brow (eye 0) lower and shorter
+  const worryBrow = (i: number) => {
+    const [x, y] = eyes[i];
+    const side = i === 0 ? -1 : 1;
+    const far = i === 0;
+    const half = (far ? 0.12 : 0.15) * r;
+    const inX = x + s * -side * half;
+    const outX = x + s * side * half;
+    const by = y - (far ? 0.2 : 0.25) * r;
+    return smooth([[outX, by + 0.05 * r], [(outX + inX) / 2, by - 0.025 * r], [inX, by - 0.11 * r]]);
+  };
   const nose = smooth([[fx + s * 0.07 * r, ey + 0.02 * r], [fx + s * (0.2 + 0.1 * turn) * r, ey + 0.26 * r], [fx + s * 0.04 * r, ey + 0.31 * r]]);
   const mx = fx + s * 0.04 * r;
   const my = c[1] + 0.56 * r;
   const mw = 0.17 * r * (1 - 0.3 * turn);
-  const step = mouthStep(t, h.talking);
+  const step = mouthStep(t, h.talking, herWorry ? WORRY_STEPS : MOUTH_STEPS);
   let mouth: React.ReactNode;
-  if (step > 0) {
+  if (herWorry && step > 0) {
+    const md = capMouth(mx, my + 0.02 * r, step === 2 ? 1.3 * mw : 1.26 * mw, step === 2 ? 0.22 * r : 0.13 * r);
+    mouth = (
+      <>
+        <Fill d={md} color={CC.mouth} offset={false} at={fillAt(at, 0.12)} />
+        <Ink d={md} width={inner * 1.1} at={b(at, 0.12)} />
+      </>
+    );
+  } else if (herWorry) {
+    const md = smooth([[mx - mw * 1.1, my + 0.08 * r], [mx - mw * 0.45, my - 0.02 * r], [mx + mw * 0.4, my - 0.02 * r], [mx + mw * 1.1, my + 0.09 * r]]);
+    mouth = <Ink d={md} width={ink * 0.82} at={b(at, 0.12)} />;
+  } else if (step > 0) {
     const ry = step === 2 ? 0.13 * r : 0.07 * r;
     const md = blob(mx, my + ry * 0.3, mw * 0.85, ry, {seed: `${seed}/m${step}`, wobble: 0.04});
     mouth = (
@@ -216,7 +261,6 @@ const Head: React.FC<{h: HeadSpec}> = ({h}) => {
         : smooth([[mx - mw, my - 0.02 * r], [mx, my + 0.05 * r], [mx + mw, my - 0.02 * r]]);
     mouth = <Ink d={md} width={inner} at={b(at, 0.12)} />;
   }
-  const style = h.hairStyle ?? 'long';
   const hairC = h.hairColor ?? HER.hair;
   const skin = h.skin ?? HER.skin;
   const shift = (pts: Pt[]): Pt[] => pts.map(([u, v]) => [u - turn * 0.22, v]);
@@ -246,11 +290,12 @@ const Head: React.FC<{h: HeadSpec}> = ({h}) => {
           <Fill key={i} d={blob(x, y, 0.072 * r * (i === 1 ? 1 - 0.25 * turn : 1), 0.105 * r, {seed: `${seed}/e${i}`})} color={CC.ink} offset={false} at={fillAt(at, 0.08)} />
         ),
       )}
-      <Ink d={brow(0) + brow(1)} width={inner} at={b(at, 0.1)} />
+      {herWorry ? null : <Ink d={brow(0) + brow(1)} width={inner} at={b(at, 0.1)} />}
       <Ink d={nose} width={Math.max(1.6, inner * 0.85)} at={b(at, 0.1)} />
       {mouth}
       <Fill d={cap} color={hairC} at={fillAt(at, 0.06)} seed={`${seed}/cap`} />
       <Ink d={cap} width={inner} at={b(at, 0.06)} open={0.15} />
+      {herWorry ? <Ink d={worryBrow(0) + worryBrow(1)} width={ink * 1.15} at={b(at, 0.1)} /> : null}
       {ears ? <Fill d={ears} color={skin} at={fillAt(at, 0.07)} offset={false} /> : null}
       {ears ? <Ink d={ears + earIn} width={inner} at={b(at, 0.07)} /> : null}
       {glasses ? <Ink d={glasses} width={inner} at={b(at, 0.12)} /> : null}

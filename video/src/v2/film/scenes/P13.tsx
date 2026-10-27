@@ -18,8 +18,8 @@
 //   f2331-2336  the nook's LINES retract slowly (e 0.55 -> 0.77) while O1's bare lines draw on in place under them (a
 //               line drawing turning into the next, never near-empty frames); from the loop roll (~f2332, the
 //               frame-0 words) the caption band is clipped out of the room, so no nook stroke crosses the words.
-// The World sky and the wall slab drop from the first exit frame; RodCover's rect is clipped out of the room from the
-// first exit frame (the rod never strikes through the caption).
+// The World sky and the wall slab drop from the first exit frame; the rod cover's rect (kit NookRoom rod={false}) is
+// clipped out of the room from the first exit frame (the rod never strikes through the caption).
 import React from 'react';
 import {World} from '../../../lib/World';
 import type {ToneKey} from '../../../lib/Film';
@@ -27,7 +27,7 @@ import {ExitProvider, Look, NoExit, useExit} from '../../../lib/exit';
 import {ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {Bubble, CC, HerSeated, NOOK, NookRoom, herMouth, lerpPt, nookWorld, type Pt} from '../kit';
-import {bubbleTail, Float, RodClip, RodCover, SecondHand} from './P13_nook';
+import {bubbleTail, Float, RodClip} from './P13_nook';
 
 const START = 35.32;
 const DUR = 39.08 - START;
@@ -75,11 +75,10 @@ const P13: React.FC = () => {
               <NookRoom
                 layout="m12"
                 slab={!unbuilding}
+                rod={false}
                 town={{life: 1.3}}
                 cat={{x: CAT[0], y: CAT[1], pose: 'sit', facing: 'l', size: 120, look, seed: 'p13/cat/876'}}
               >
-                <RodCover />
-                <SecondHand />
                 <HerSeated x={H.x} y={H.y} h={H.h} facing="r" view="side" face="calm" talking={[[0.3, POP - 0.25], [POP - 0.1, DUR + 1]]} seed="p13/her" />
               </NookRoom>
             </g>

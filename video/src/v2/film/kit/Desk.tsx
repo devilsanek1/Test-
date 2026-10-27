@@ -12,12 +12,12 @@
 
 import React, {useContext, useId} from 'react';
 import {blob, crown, ellipse, glint, hline, line, poly, polyPath, rect, smooth, vline} from '../../../lib/sketch';
-import {rng} from '../../../lib/rng';
+import {rand, rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {CC} from '../palette';
 import {add, BuildWave, BuildWaveCtx, BuildWaveV, dirDeg, Fill, Ink, Pt, radialWave, useWaveColour, W} from './util';
-import {DustMotes, Steam, Sway} from './Ambient';
+import {DustMotes, Live, Steam, Sway} from './Ambient';
 import {DuskTown} from './Town';
 
 // ---------------------------------------------------------------- layout (the style frame's canvas px)
@@ -72,8 +72,14 @@ function bookRow(x0: number, x1: number, hMin: number, hMax: number, seed: strin
   return out;
 }
 
-/** A row of books standing on a board (base y), x0..x1; ink thin (style frame). Shared with the nook's bookcase. */
-export const Books: React.FC<{x0: number; x1: number; base: number; hMin: number; hMax: number; seed: string; ink?: number; at?: number}> = ({x0, x1, base, hMin, hMax, seed, ink = W.far, at}) => {
+/** A navy spine kept navy with probability `dark`, else a home mid-tone (seeded per book: the row's layout never moves). */
+export const spineColour = (c: string, dark: number, seed: string): string =>
+  c !== CC.anchor || dark >= 1 || rand(seed, 'dark') < dark ? c : CC.homeSpines[Math.floor(rand(seed, 'mid') * CC.homeSpines.length) % CC.homeSpines.length];
+
+/** A row of books standing on a board (base y), x0..x1; ink thin (style frame). Shared with the nook's bookcase.
+ *  `dark` = the share of navy spines that stay navy (default 1: the style frame's desk; the nook passes NOOK_DARK, so
+ *  the dark anchor sits on her hair, the mic and the lamp shade instead of being scattered over the shelves). */
+export const Books: React.FC<{x0: number; x1: number; base: number; hMin: number; hMax: number; seed: string; ink?: number; dark?: number; at?: number}> = ({x0, x1, base, hMin, hMax, seed, ink = W.far, dark = 1, at}) => {
   const row = bookRow(x0, x1, hMin, hMax, seed);
   let d = '';
   const fills = row.map((bk, i) => {
@@ -81,7 +87,7 @@ export const Books: React.FC<{x0: number; x1: number; base: number; hMin: number
     d += rect(bk.x, y, bk.w, bk.h, {seed: `${seed}/r${i}`, over: 'small', edges: 'tlr'});
     d += hline(bk.x + 2, bk.x + bk.w - 2, y + bk.h * bk.band, {seed: `${seed}/b${i}`, over: [1, 1]});
     if (bk.band2) d += hline(bk.x + 2, bk.x + bk.w - 2, y + bk.h * (1 - bk.band * 0.7), {seed: `${seed}/c${i}`, over: [1, 1]});
-    return <Fill key={i} rect={[bk.x, y, bk.w, bk.h]} color={bk.c} seed={`${seed}/${i}`} at={at === undefined ? undefined : at + 0.18} />;
+    return <Fill key={i} rect={[bk.x, y, bk.w, bk.h]} color={spineColour(bk.c, dark, `${seed}/${i}`)} seed={`${seed}/${i}`} at={at === undefined ? undefined : at + 0.18} />;
   });
   return (
     <>
@@ -283,9 +289,11 @@ export const Basket: React.FC = () => {
 
 // ---------------------------------------------------------------- pen, mug, lamp head (in front of the page)
 
-export const Pen: React.FC = () => {
-  const a: Pt = [706, 1182];
-  const z: Pt = [874, 1238];
+/** The pen on the desk (the style frame's place, moved by dx / dy: O1 lays it 600 px left so her cat sits at the
+ *  desk's front-right; lane L1's request, folded back). */
+export const Pen: React.FC<{dx?: number; dy?: number}> = ({dx = 0, dy = 0}) => {
+  const a: Pt = [706 + dx, 1182 + dy];
+  const z: Pt = [874 + dx, 1238 + dy];
   const ang = (Math.atan2(z[1] - a[1], z[0] - a[0]) * 180) / Math.PI;
   const L = Math.hypot(z[0] - a[0], z[1] - a[1]);
   return (
@@ -299,6 +307,45 @@ export const Pen: React.FC = () => {
         <Ink d={line(L - 70, -12, L - 14, -12, {seed: 'penC', over: [0, 0]})} width={W.far} color={CC.paper} />
       </XG>
     </>
+  );
+};
+
+/** Steam off the desk mug (lane L1's, folded back by the assembler: the kit Steam's short dashes read as letters
+ *  beside the contract at phone size): three long, thin, wavy wisps rising from the rim in a lighter warm ink, undulating slowly in
+ *  step (they never cross into letter shapes), thin at the rim, widest low, tapering to nothing at the top. */
+export const MugWisps: React.FC<{x: number; y: number}> = ({x, y}) => {
+  const t = useTime();
+  const wisps: [number, number, number, number][] = [
+    [x - 22, 0, 104, 0.4],
+    [x, 0.5, 142, 1.9],
+    [x + 22, 1.0, 118, 3.3],
+  ];
+  return (
+    <Live c={[x, y - 70]}>
+      {wisps.map(([x0, ph, len0, lp], i) => {
+        const len = len0 + 20 * Math.sin(t * 0.9 + lp);
+        const N = 16;
+        const C: Pt[] = [];
+        for (let j = 0; j <= N; j++) {
+          const s = j / N;
+          C.push([x0 + (2 + 11 * s) * Math.sin(2 * Math.PI * (s * 0.8 - t * 0.3) + ph), y - s * len]);
+        }
+        const Lp: Pt[] = [];
+        const Rp: Pt[] = [];
+        C.forEach((p, j) => {
+          const a = C[Math.max(0, j - 1)];
+          const z = C[Math.min(N, j + 1)];
+          const dx = z[0] - a[0];
+          const dy = z[1] - a[1];
+          const l = Math.hypot(dx, dy) || 1;
+          const s = j / N;
+          const w = 2.4 * Math.pow(Math.sin(Math.PI * Math.min(1, 0.12 + s * 0.88)), 0.8);
+          Lp.push([p[0] - (dy / l) * w, p[1] + (dx / l) * w]);
+          Rp.push([p[0] + (dy / l) * w, p[1] - (dx / l) * w]);
+        });
+        return <path key={i} d={smooth([...Lp, ...Rp.reverse()], {closed: true})} fill={CC.boxIn} />;
+      })}
+    </Live>
   );
 };
 
@@ -318,7 +365,7 @@ export const DeskMug: React.FC = () => {
       <Ink d={line(x0, top, x0, bot - 14, {over: [0, 0], seed: 'mg1'}) + line(x1, top, x1, bot - 14, {over: [0, 0], seed: 'mg2'}) + `M${x0} ${bot - 18}Q${x0} ${bot} ${x0 + 18} ${bot}L${x1 - 18} ${bot}Q${x1} ${bot} ${x1} ${bot - 18}`} width={W.mid} />
       <Fill d={blob((x0 + x1) / 2, top, (x1 - x0) / 2, 13, {seed: 'rim'})} color={CC.anchor} offset={false} />
       <Ink d={ellipse((x0 + x1) / 2, top, (x1 - x0) / 2, 13, {seed: 'rimI'})} width={W.mid} />
-      <Steam x={850} y={top - 8} h={120} amp={9} n={2} seed="deskmug" />
+      <MugWisps x={(x0 + x1) / 2} y={top - 10} />
     </>
   );
 };
@@ -349,11 +396,17 @@ export const LampHead: React.FC = () => {
 // ---------------------------------------------------------------- the two halves
 
 /** Wall .. desk .. the books at the back-left (everything behind the box and the contract). */
+/** How far the top shelf (and its trailing plant) sits above the style frame's place: 50 px, so P12's credit tab sits
+ *  on bare wall (lane L1's fix, folded back by the assembler; dressing hung from the shelf moves with it). */
+export const DESK_SHELF_UP = 50;
+
 export const DeskBack: React.FC<{at?: number; lampOn?: boolean}> = ({at, lampOn = true}) => (
   <AtWave at={at}>
     <Fill rect={[-200, -200, 1480, 2320]} color={CC.wall} offset={false} mode="snap" />
     <Bookcase />
-    <TopShelf />
+    <XG m={mat.translate(0, -DESK_SHELF_UP)}>
+      <TopShelf />
+    </XG>
     <DeskWindow />
     <DeskFloor />
     <Basket />

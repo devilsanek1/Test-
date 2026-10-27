@@ -9,28 +9,27 @@
 //   - the page words, hand-lettered with the kit's Letter, under ONE header style (PageHead: the same size, centring
 //     and y on every page, so the four pages read as one form): the signed DEAL page (P7), the deal's words in two
 //     quoted blocks (P9, P10: block 1 never without block 2), GOOGLE SAYS (P11, with its two read-along underlines).
-//   - the page lies on a DESK PAD, never in a screen: a mid-lavender blotter with leather corner pockets (no dark rim,
-//     no inner gutter lines; a local override of the kit's dark blotter, REQUESTS line in the lane report), no keyboard
-//     anywhere on the page's axis.
+//   - the page lies on a DESK PAD, never in a screen: the kit's mid-lavender pad with leather corner pockets (no dark
+//     rim, no inner gutter lines; the lane's override, folded back into kit/ColdSet.tsx), no keyboard anywhere on the
+//     page's axis.
 //   - the official who sits at our edge of the desk, TAKING NOTES (only the back of the right hand, a pen and a wine
 //     sleeve, from the frame's lower right: people near, never a face) on a ruled notepad turned 13 degrees, partly
 //     off frame; the writing runs on film time, so the notes go on growing from P7 to P11.
 //   - a colleague's hand (grey suit cuff, a second person: never a third arm of the official) sliding a document onto
-//     the left pile where it is SEEN at this zoom (the kit's own slide happens at x < 100, off screen at 1.2x).
-//   - a water glass whose surface ripples (and jumps on a stamp's slam and on the slid document's landing), the desk
-//     phone's line lights where the frame sees them, a desk lamp that reads as a lamp at this zoom (its angled shade
-//     and lit mouth; the kit's lamp is only a disc here: local redraw, REQUESTS line), a pencil and a stapler.
+//     the left pile where it is SEEN at this zoom (the kit ColdSet's `slide`, the lane's version folded back).
+//   - a water glass whose surface ripples (and jumps on a stamp's slam and on the slid document's landing); the kit's
+//     desk phone's line lights and its anglepoise lamp (both folded back from the lane), a pencil and a stapler.
 //   - the stamp with the board's paper backing (NO VETO lands across the page's top edge, over the DEAL heading).
 // No cat, no Google lettering on P7-P10, no hero cobalt, no pop: stamps and underlines are ink.
-import React, {useId} from 'react';
+import React from 'react';
 import {World} from '../../../lib/World';
 import {InkScale} from '../../../lib/inkComp';
 import {useCaptionFont} from '../../../lib/font';
-import {blob, ellipse, line, poly, polyPath, rect, roundRect, smooth, textLines} from '../../../lib/sketch';
+import {blob, ellipse, line, polyPath, rect, roundRect, smooth} from '../../../lib/sketch';
 import {rand, rng} from '../../../lib/rng';
 import {ease, prog, useTime} from '../../../lib/time';
 import {mat, type Mat, XG} from '../../../lib/xf';
-import {CC, COLD, COLD_CENTRE, ColdSet, DustMotes, Fill, INSERT_PAGES, Ink, InsertPage, Letter, Live, loopT, Stamp, stepT, textW, W, type Pt} from '../kit';
+import {CC, COLD, COLD_CENTRE, ColdSet, Fill, INSERT_PAGES, Ink, InsertPage, Letter, Live, loopT, Stamp, stepT, textW, W, type Pt} from '../kit';
 
 /** THE page box (set px, before the shot's zoom): the board's P9 box; P7, P9, P10 and P11 all use it. */
 export const PAGE = INSERT_PAGES.P9;
@@ -43,10 +42,7 @@ export const PAGE_CY = 975;
 const SEED = 'cold-insert';
 
 /** Local colours (the cold set's family; L* >= 35 so they stay out of the dark budget). */
-const PAD = COLD.blotterEdge; // the desk pad: one step LIGHTER than the desk (#7C78BA, L* 53): a pad, never a bezel
-const PAD_CORNER = COLD.shade; // its leather corner pockets (#55509A, L* 38)
 const WINE = '#8A4A66'; // the official's sleeve (a mid wine, L* 40)
-const SUIT = '#5E6075'; // the colleague's grey suit (L* 41): a second person, never the official's third arm
 
 /** The shot matrix: the set scaled by z about the page centre, the page centre placed at (540, PAGE_CY). */
 export const insertMat = (z: number) => mat.compose(mat.translate(0, PAGE_CY - COLD_CENTRE[1]), mat.about(mat.scale(z), COLD_CENTRE[0], COLD_CENTRE[1]));
@@ -54,7 +50,6 @@ export const insertMat = (z: number) => mat.compose(mat.translate(0, PAGE_CY - C
 export const insertPt = (z: number, p: Pt): Pt => [COLD_CENTRE[0] + (p[0] - COLD_CENTRE[0]) * z, PAGE_CY + (p[1] - COLD_CENTRE[1]) * z];
 
 const apply = (m: Mat, p: Pt): Pt => [m[0] * p[0] + m[2] * p[1] + m[4], m[1] * p[0] + m[3] * p[1] + m[5]];
-const clipIdOf = (prefix: string, id: string) => (prefix + id).replace(/[^a-zA-Z0-9-]/g, '');
 
 export type ColdInsertProps = {
   /** The shot zoom (INSERT_Z or P10_Z). */
@@ -84,14 +79,10 @@ export const ColdInsert: React.FC<ColdInsertProps> = ({z, from, breathe = 0, sli
     <World sky={COLD.table}>
       <XG m={insertMat(zz)}>
         <InkScale zoom={zz}>
-          <ColdSet zoom={1} slide={false} seed="cold" />
-          <DeskPad />
-          <LampFix />
-          <PhoneLights />
+          <ColdSet zoom={1} slide={slide} seed="cold" />
           <DeskFront />
           <WaterGlass x={182} y={985} r={52} kicks={allKicks} />
           <NotesOfficial T={from + t} />
-          {slide !== false ? <ColleagueSlide at={slide} /> : null}
           <InsertPage {...PAGE} seed={`${SEED}/page`}>
             {children}
           </InsertPage>
@@ -273,194 +264,9 @@ const angularSignature = (x: number, y: number, w: number, seed: string): string
 
 // ---------------------------------------------------------------- stamps (the kit's Stamp, on the board's paper backing)
 
-/** The kit's slam (Props.tsx Stamp): from 1.6x in 0.09 s, a small jolt after; the backing follows the same scale. */
-const slamScale = (t: number, at: number) => {
-  const p = prog(t, at, 0.09, ease.inQuad);
-  const settle = Math.max(0, t - at - 0.09);
-  const jolt = settle > 0 && settle < 0.12 ? 0.035 * Math.sin((Math.PI * settle) / 0.12) : 0;
-  return (1.6 - 0.6 * p) * (1 - jolt);
-};
-
-/** A stamp (set px centre x, y; width w) slamming at `at` (it LANDS at at + 0.09: put that on the sound). `backing`:
- *  the board's paper fill under it (true: with its drop shadow, NO VETO across the page's top edge, over DEAL;
- *  'plain': paper only, for a stamp that lands ON the page and covers the typed rows under it). Anchor ink, never the pop. */
-export const InsertStamp: React.FC<{x: number; y: number; w: number; text: string; at: number; rot?: number; backing?: boolean | 'plain'}> = ({x, y, w, text, at, rot = -6, backing}) => {
-  const t = useTime();
-  if (t < at) return null;
-  const h = w * 0.38;
-  return (
-    <>
-      {backing ? (
-        <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot), mat.scale(slamScale(t, at)))}>
-          {backing === true ? <Fill d={roundRect(-w / 2 + 8, -h / 2 + 10, w, h, h * 0.16)} color={COLD.shade} offset={false} /> : null}
-          <Fill d={roundRect(-w / 2, -h / 2, w, h, h * 0.16)} color={CC.paper} offset={false} />
-        </XG>
-      ) : null}
-      <Stamp x={x} y={y} w={w} text={text} rot={rot} at={at} />
-    </>
-  );
-};
-
-// ---------------------------------------------------------------- the desk pad (a local override of the kit's blotter)
-
-/** The kit blotter's geometry (kit/ColdSet.tsx), redrawn in the pad's colours: the same rect and fill seed, so the
- *  misregistered fill lands exactly over the kit's. Leather corner pockets; NO side rails and NO inner gutter lines
- *  (with the dark fill they read as a device bezel). The kit pieces drawn over the blotter's area are redrawn over the
- *  pad: the fountain pen (all of it) and the lower-left document's corner (clipped to the overlap). */
-const BLOT = {x: PAGE.x - 60, y: PAGE.y - 40, w: PAGE.w + 120, h: PAGE.h + 110};
-const DeskPad: React.FC = () => {
-  const t = useTime();
-  const C = COLD;
-  const cid = clipIdOf('padDoc', useId());
-  const k = 86;
-  const corners: Pt[][] = [
-    [[BLOT.x, BLOT.y], [BLOT.x + k, BLOT.y], [BLOT.x, BLOT.y + k]],
-    [[BLOT.x + BLOT.w, BLOT.y], [BLOT.x + BLOT.w, BLOT.y + k], [BLOT.x + BLOT.w - k, BLOT.y]],
-    [[BLOT.x + BLOT.w, BLOT.y + BLOT.h], [BLOT.x + BLOT.w - k, BLOT.y + BLOT.h], [BLOT.x + BLOT.w, BLOT.y + BLOT.h - k]],
-    [[BLOT.x, BLOT.y + BLOT.h], [BLOT.x, BLOT.y + BLOT.h - k], [BLOT.x + k, BLOT.y + BLOT.h]],
-  ];
-  const cornerD = corners.map((c) => polyPath(c)).join('');
-  const cornerInk = corners.map((c, i) => line(c[1][0], c[1][1], c[2][0], c[2][1], {over: [0, 0], seed: `${SEED}/pc${i}`})).join('');
-  // the kit's fountain pen (it rolls a little), redrawn over the pad
-  const roll = Math.sin(prog(loopT(t, 3.4, 0.6), 0, 0.9, ease.inOutSine) * Math.PI) * 10;
-  return (
-    <>
-      <Fill rect={[BLOT.x, BLOT.y, BLOT.w, BLOT.h]} color={PAD} seed="cold/blot" />
-      <Fill d={cornerD} color={PAD_CORNER} seed={`${SEED}/padc`} />
-      <Ink d={rect(BLOT.x, BLOT.y, BLOT.w, BLOT.h, {seed: 'cold/blotI', over: 'small'})} width={W.mid} color={C.ink} />
-      <Ink d={cornerInk} width={W.far} color={C.ink} />
-      <defs>
-        <clipPath id={cid} clipPathUnits="userSpaceOnUse">
-          <rect x={BLOT.x - 4} y={BLOT.h + BLOT.y - 60} width={44} height={80} />
-        </clipPath>
-      </defs>
-      <g clipPath={`url(#${cid})`}>
-        <KitDocB t={t} />
-      </g>
-      <XG m={mat.compose(mat.translate(842 + roll, 940), mat.rotate(68))}>
-        <Fill d={roundRect(-150, -13, 300, 26, 13)} color={C.pen} offset={false} />
-        <Fill rect={[30, -13, 14, 26]} color={C.penBand} offset={false} />
-        <Fill d={polyPath([[150, -9], [200, 0], [150, 9]])} color={C.metal} offset={false} />
-        <Ink d={roundRect(-150, -13, 300, 26, 13, {seed: 'cold/penI'}) + poly([[150, -9], [200, 0], [150, 9]], {seed: 'cold/nib', over: [0, 0]})} width={W.mid} color={C.ink} />
-      </XG>
-    </>
-  );
-};
-
-/** The kit's lower-left document (ColdSet docPage 'docB', its corner lifting every 3.1 s), copied for the redraw. */
-const KitDocB: React.FC<{t: number}> = ({t}) => {
-  const C = COLD;
-  const [x, y, w, h, rot, k, per] = [-60, 1300, 330, 420, -4, 'docB', 3.1] as const;
-  const seed = 'cold';
-  const u = loopT(t, per, rand(seed, k) * per) / per;
-  const lk = u < 0.3 ? Math.sin((u / 0.3) * Math.PI) : 0;
-  const c = 30 + 22 * lk;
-  const fold: Pt[] = [[x + w - c, y], [x + w, y + c], [x + w - c * 0.92 - 8 * lk, y + c * 0.92 + 8 * lk]];
-  return (
-    <XG m={mat.about(mat.rotate(rot), x + w / 2, y + h / 2)}>
-      <Fill rect={[x + 10, y + 12, w, h]} color={C.shade} offset={false} />
-      <Fill rect={[x, y, w, h]} color={CC.paper} seed={`${seed}/${k}`} />
-      <Ink d={rect(x, y, w, h, {seed: `${seed}/${k}I`, over: 'small'})} width={W.mid} color={C.ink} />
-      <Ink d={textLines(x + w * 0.1, y + h * 0.14, w * 0.7, {n: Math.max(3, Math.floor(h / 46)), gap: 30, seed: `${seed}/${k}t`, heading: true})} width={W.far} color={C.ink} />
-      <Fill d={polyPath([[x + w - c, y - 1], [x + w + 1, y - 1], [x + w + 1, y + c]])} color={C.table} offset={false} />
-      <Fill d={polyPath(fold)} color={CC.paperEdge} offset={false} />
-      <Ink d={poly(fold, {closed: true, seed: `${seed}/${k}f`, over: [0, 0]})} width={W.far} color={C.ink} />
-    </XG>
-  );
-};
-
-// ---------------------------------------------------------------- the desk lamp (a local redraw of the kit's)
-
-/** The kit's grain (kit/ColdSet.tsx grain('cold')), copied so the erased lamp area is the desk again, exactly. */
-const kitGrain = (seed: string): string => {
-  const r = rng(`grain/${seed}`);
-  let d = '';
-  const ys = [40, 130, 210, 660, 740, 830, 930, 1040, 1150, 1260, 1370, 1470, 1580, 1690, 1800, 1890];
-  ys.forEach((y0, i) => {
-    const pts: Pt[] = [];
-    const amp = r.range(4, 12);
-    const ph = r.range(0, 6.28);
-    const x0 = r.range(-200, 300);
-    const x1 = r.range(780, 1300);
-    for (let x = x0; x <= x1; x += 90) pts.push([x, y0 + Math.sin(x / 160 + ph) * amp]);
-    d += smooth(pts);
-    if (r.chance(0.4)) d += smooth([[x0 + 200, y0 + 18], [x0 + 260, y0 + 10], [x0 + 330, y0 + 20]]) + (i % 3 === 0 ? smooth([[x1 - 260, y0 - 16], [x1 - 200, y0 - 26], [x1 - 140, y0 - 14]]) : '');
-  });
-  return d;
-};
-
-/** At the insert zoom the kit's top-down lamp loses its arm off the left edge and reads as a navy disc. Here: the
- *  kit's lamp area is the desk again (its table, grain, pool and motes, copied exactly, inside a clip), then an
- *  anglepoise reaching in from the left edge UNDER the caption band (set y > 640): base, two arm bars with a spring, a
- *  joint, and the shade as a cone tilted down-right into its own pool, its mouth lit. */
-const LampFix: React.FC = () => {
-  const C = COLD;
-  const cid = clipIdOf('lampErase', useId());
-  const base: Pt = [-14, 770];
-  const elbow: Pt = [78, 706];
-  const neck: Pt = [150, 724];
-  const mouth: Pt = [236, 796];
-  const ax: Pt = [(mouth[0] - neck[0]) / Math.hypot(mouth[0] - neck[0], mouth[1] - neck[1]), (mouth[1] - neck[1]) / Math.hypot(mouth[0] - neck[0], mouth[1] - neck[1])];
-  const px: Pt = [-ax[1], ax[0]];
-  const P = (o: Pt, a: number, p: number): Pt => [o[0] + ax[0] * a + px[0] * p, o[1] + ax[1] * a + px[1] * p];
-  const cone = smooth([P(neck, -6, -24), P(neck, -6, 24), P(mouth, 0, 80), P(mouth, 14, 40), P(mouth, 16, 0), P(mouth, 14, -40), P(mouth, 0, -80)], {closed: true, tension: 0.2});
-  const stripe = polyPath([P(neck, 0, -14), P(neck, 0, -4), P(mouth, -6, -44), P(mouth, -8, -66)]);
-  const rot = (Math.atan2(px[1], px[0]) * 180) / Math.PI;
-  const mouthD = (rx: number, ry: number) => {
-    const m = mat.compose(mat.translate(mouth[0], mouth[1]), mat.rotate(rot));
-    const pts: Pt[] = Array.from({length: 24}, (_, i) => apply(m, [Math.cos((i / 24) * 2 * Math.PI) * rx, Math.sin((i / 24) * 2 * Math.PI) * ry]));
-    return smooth(pts, {closed: true});
-  };
-  return (
-    <>
-      <defs>
-        <clipPath id={cid} clipPathUnits="userSpaceOnUse">
-          <rect x={-120} y={456} width={336} height={378} />
-        </clipPath>
-      </defs>
-      <g clipPath={`url(#${cid})`}>
-        <Fill rect={[-130, 440, 360, 400]} color={C.table} offset={false} mode="snap" />
-        <Ink d={kitGrain('cold')} width={W.hair} color={C.seam} />
-        <Fill d={blob(250, 900, 330, 300, {seed: 'cold/pool', wobble: 0.02})} color={C.pool} offset={false} />
-        <Fill d={blob(236, 880, 200, 180, {seed: 'cold/core', wobble: 0.02})} color={C.poolCore} offset={false} />
-        <DustMotes cx={250} cy={900} rx={300} ry={270} n={12} r={5} color={C.metal} rate={1.6} seed="cold/motes" />
-      </g>
-      {/* the base (clamped at the left edge) and the arm, under the caption band */}
-      <Fill d={blob(base[0], base[1], 60, 58, {seed: `${SEED}/lbase`})} color={C.lamp} offset={false} />
-      <Ink d={line(base[0], base[1], elbow[0], elbow[1], {over: [0, 0], seed: `${SEED}/la1`}) + line(elbow[0], elbow[1], neck[0], neck[1], {over: [0, 0], seed: `${SEED}/la2`})} width={15} color={C.lamp} taper={false} />
-      <Ink d={line(base[0] + 10, base[1] - 14, elbow[0] + 4, elbow[1] - 14, {over: [0, 0], seed: `${SEED}/lsp`})} width={3} color={C.metal} taper={false} dash="6 6" />
-      <Fill d={blob(elbow[0], elbow[1], 13, 13, {seed: `${SEED}/ljoint`})} color={C.metal} offset={false} />
-      <Ink d={ellipse(elbow[0], elbow[1], 13, 13, {seed: `${SEED}/ljointI`})} width={W.far} color={C.ink} />
-      {/* the shade: a cone tilted into its pool; its lit mouth and the bulb */}
-      <Fill d={cone} color={C.shade} seed={`${SEED}/lcone`} />
-      <Fill d={stripe} color={C.blotterEdge} offset={false} />
-      <Fill d={mouthD(76, 24)} color={C.lampMouth} offset={false} />
-      <Fill d={mouthD(30, 13)} color={CC.paper} offset={false} />
-      <Ink d={cone + mouthD(76, 24)} width={W.mid} color={C.ink} />
-      <Fill d={blob(neck[0] - ax[0] * 4, neck[1] - ax[1] * 4, 17, 17, {seed: `${SEED}/lcap`})} color={C.lamp} offset={false} />
-    </>
-  );
-};
-
-/** The desk phone's two line lights, where this framing sees the phone (on its body left of the keys, screen x < 990):
- *  they blink in turn, stepped, never fading (the kit's own lights sit off the right edge at this zoom). */
-const PhoneLights: React.FC = () => {
-  const t = useTime();
-  const lit = Math.floor(t * 1.6) % 2 === 0;
-  const L = [
-    [897, 784, 11],
-    [897, 818, 9],
-  ] as const;
-  return (
-    <>
-      <Live c={[897, 800]}>
-        <circle cx={L[0][0]} cy={L[0][1]} r={L[0][2]} fill={lit ? CC.recLight : COLD.folderTab} />
-        <circle cx={L[1][0]} cy={L[1][1]} r={L[1][2]} fill={!lit ? CC.recLight : COLD.folderTab} />
-      </Live>
-      <Ink d={ellipse(L[0][0], L[0][1], L[0][2], L[0][2], {seed: `${SEED}/pl0`}) + ellipse(L[1][0], L[1][1], L[1][2], L[1][2], {seed: `${SEED}/pl1`})} width={W.far} color={COLD.ink} />
-    </>
-  );
-};
+/** NO VETO / APRIL 2026: the kit Stamp with the board's paper backing (`backing`: lane L4's InsertStamp, folded back into
+ *  kit/Props.tsx Stamp by the assembler). */
+export const InsertStamp = Stamp;
 
 // ---------------------------------------------------------------- insert life
 
@@ -503,47 +309,6 @@ const WaterGlass: React.FC<{x: number; y: number; r: number; kicks: number[]}> =
   );
 };
 
-/** A colleague's hand (grey suit, white cuff: a second person at the desk's left side, never the official's third
- *  arm) slides a document onto the left pile at `at` (0.5 s in, holds 0.35 s, withdraws in 0.4 s; the document
- *  stays): the kit's slide, placed where this framing SEES it (hand ~ screen x 50-170, y 1380). The hand is the BACK
- *  of a flat hand from above, fingers together, the thumb tucked along the document's edge. */
-const ColleagueSlide: React.FC<{at: number}> = ({at}) => {
-  const t = useTime();
-  if (t < at) return null;
-  const C = COLD;
-  const p = prog(t, at, 0.5, ease.outCubic);
-  const out = prog(t, at + 0.85, 0.4, ease.inCubic);
-  const dx = -420 * (1 - p);
-  const doc = {x: -60 + dx, y: 1206, w: 290, h: 350};
-  const hx = doc.x + 196 - 520 * out;
-  const hy = doc.y + 128;
-  const M = mat.about(mat.rotate(-7), doc.x + doc.w / 2, doc.y + doc.h / 2);
-  const sleeve = roundRect(hx - 560, hy - 56, 500, 112, 30);
-  const cuff = roundRect(hx - 70, hy - 50, 32, 100, 8);
-  const hand = smooth([[hx - 40, hy - 44], [hx + 26, hy - 48], [hx + 72, hy - 34], [hx + 82, hy - 4], [hx + 70, hy + 30], [hx + 30, hy + 42], [hx - 40, hy + 44]], {closed: true, tension: 0.35});
-  const thumb = smooth([[hx - 8, hy + 38], [hx + 28, hy + 50], [hx + 46, hy + 62], [hx + 30, hy + 70], [hx - 4, hy + 58]], {closed: true, tension: 0.35});
-  const splits = [-18, 2, 20].map((fy, i) => line(hx + 44, hy + fy, hx + 78, hy + fy + 1, {over: [0, 0], seed: `${SEED}/f${i}`})).join('');
-  const knuckles = smooth([[hx + 30, hy - 36], [hx + 36, hy - 18], [hx + 34, hy + 2], [hx + 36, hy + 20], [hx + 30, hy + 34]]);
-  return (
-    <>
-      <XG m={M}>
-        <Fill rect={[doc.x + 10, doc.y + 12, doc.w, doc.h]} color={C.shade} offset={false} />
-        <Fill rect={[doc.x, doc.y, doc.w, doc.h]} color={CC.paper} offset={false} />
-        <Ink d={rect(doc.x, doc.y, doc.w, doc.h, {seed: `${SEED}/sdI`, over: 'small'})} width={W.mid} color={C.ink} />
-        <Ink d={wordRows(doc.x + 30, doc.y + 52, 220, 7, 32, `${SEED}/sdt`, [2])} width={W.far} color={C.ink} taper={false} />
-      </XG>
-      {out < 1 ? (
-        <>
-          <Fill d={sleeve} color={SUIT} offset={false} />
-          <Fill d={cuff} color={C.shirt} offset={false} />
-          <Fill d={thumb + hand} color={CC.skin2} offset={false} />
-          <Ink d={sleeve + cuff + thumb + hand} width={W.mid} color={C.ink} />
-          <Ink d={splits + knuckles} width={W.far} color={C.ink} />
-        </>
-      ) : null}
-    </>
-  );
-};
 
 // ---------------------------------------------------------------- the near edge of the desk (ours)
 

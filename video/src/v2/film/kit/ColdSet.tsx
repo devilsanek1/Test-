@@ -5,8 +5,9 @@
 // cloud's shadow drifts through it, a branch's leaves sway in it, people passing the window cross it as crisp
 // shadows), other documents and folders (an official rosette seal on one), a fountain pen that rolls a little, a cup
 // of coffee with steam, a desk phone whose line lights blink, a smartphone that lights with notifications, a rubber
-// stamp lying by its pad, paper clips, dust motes in the lamp's light, and once per shot an official's hand (maroon
-// cuff) sliding a document onto the left pile (`slide`). The caption band (y 290-600) holds only the flat desk; the
+// stamp lying by its pad, paper clips, dust motes in the lamp's light, and once per shot a colleague's hand (grey suit
+// cuff) sliding a document onto the left pile (`slide`). The page lies on a desk pad lighter than the desk (leather
+// corner pockets), the lamp is an anglepoise reaching in under the caption band (lane L4's fixes, folded back). The caption band (y 290-600) holds only the flat desk; the
 // window light starts under it. The page is the lane's (kit <InsertPage>, never angled).
 //   <ColdSet zoom variant slide at>  zoom 1 (P7, P9, P11) or 0.85 (P10: the pull-back), about the page centre (540, 950)
 //   <InsertPage x y w h lift>        a warm white page on the cold set: flat drop shadow, paper, outline, a lifting corner
@@ -39,15 +40,24 @@ export type ColdSetProps = {
   variant?: ColdSetName;
   /** Ambient rate multiplier (default 1). */
   life?: number;
-  /** Once per shot an official's hand (maroon suit cuff) slides a document onto the left pile at this scene time (s;
+  /** Once per shot a colleague's hand (grey suit cuff) slides a document onto the left pile at this scene time (s;
    *  default 1.2; false = never): in 0.5 s, holds 0.35 s, withdraws in 0.4 s; the document stays. People near, never
-   *  a face; it never touches the page or the caption band. */
+   *  a face; it never touches the page or the caption band. Keep it the same on P9 and P11 (fairness). */
   slide?: number | false;
   at?: At;
   seed?: string;
 };
 
 const PAGE = INSERT_PAGES.P9;
+/** The desk pad under the page (set px) and its four leather corner pockets. */
+const BLOT = {x: PAGE.x - 60, y: PAGE.y - 40, w: PAGE.w + 120, h: PAGE.h + 110};
+const PAD_K = 86;
+const padCorners: Pt[][] = [
+  [[BLOT.x, BLOT.y], [BLOT.x + PAD_K, BLOT.y], [BLOT.x, BLOT.y + PAD_K]],
+  [[BLOT.x + BLOT.w, BLOT.y], [BLOT.x + BLOT.w, BLOT.y + PAD_K], [BLOT.x + BLOT.w - PAD_K, BLOT.y]],
+  [[BLOT.x + BLOT.w, BLOT.y + BLOT.h], [BLOT.x + BLOT.w - PAD_K, BLOT.y + BLOT.h], [BLOT.x + BLOT.w, BLOT.y + BLOT.h - PAD_K]],
+  [[BLOT.x, BLOT.y + BLOT.h], [BLOT.x, BLOT.y + BLOT.h - PAD_K], [BLOT.x + PAD_K, BLOT.y + BLOT.h]],
+];
 
 export const ColdSet: React.FC<ColdSetProps> = ({zoom = 1, variant, life = 1, slide = 1.2, at, seed = 'cold'}) => {
   const tt = useTime();
@@ -165,22 +175,18 @@ export const ColdSet: React.FC<ColdSetProps> = ({zoom = 1, variant, life = 1, sl
         <Fill d={blob(250, 900, 330, 300, {seed: `${seed}/pool`, wobble: 0.02})} color={C.pool} offset={false} at={fillAt(at)} />
         <Fill d={blob(236, 880, 200, 180, {seed: `${seed}/core`, wobble: 0.02})} color={C.poolCore} offset={false} at={fillAt(at)} />
         <DustMotes cx={250} cy={900} rx={300} ry={270} n={12} r={5} color={C.metal} rate={life * 1.6} seed={`${seed}/motes`} at={at} />
-        {/* the blotter under the page */}
-        <Fill rect={[PAGE.x - 60, PAGE.y - 40, PAGE.w + 120, PAGE.h + 110]} color={C.blotter} at={fillAt(at)} seed={`${seed}/blot`} />
-        <Fill rect={[PAGE.x - 60, PAGE.y - 40, 36, PAGE.h + 110]} color={C.blotterEdge} offset={false} at={fillAt(at, 0.02)} />
-        <Fill rect={[PAGE.x + PAGE.w + 24, PAGE.y - 40, 36, PAGE.h + 110]} color={C.blotterEdge} offset={false} at={fillAt(at, 0.02)} />
-        <Ink d={rect(PAGE.x - 60, PAGE.y - 40, PAGE.w + 120, PAGE.h + 110, {seed: `${seed}/blotI`, over: 'small'}) + vline2(PAGE.x - 24, PAGE.y - 40, PAGE.y + PAGE.h + 70, `${seed}/bl1`) + vline2(PAGE.x + PAGE.w + 24, PAGE.y - 40, PAGE.y + PAGE.h + 70, `${seed}/bl2`)} width={W.mid} color={C.ink} at={at} />
+        {/* the desk pad under the page: one step LIGHTER than the desk (blotterEdge), leather corner pockets (shade), no
+            side rails and no inner gutter lines (dark, with them, it read as a device's bezel: lane L4's fix, folded
+            back by the assembler) */}
+        <Fill rect={[BLOT.x, BLOT.y, BLOT.w, BLOT.h]} color={C.blotterEdge} at={fillAt(at)} seed={`${seed}/blot`} />
+        <Fill d={padCorners.map((c) => polyPath(c)).join('')} color={C.shade} at={fillAt(at, 0.02)} seed={`${seed}/padc`} />
+        <Ink d={rect(BLOT.x, BLOT.y, BLOT.w, BLOT.h, {seed: `${seed}/blotI`, over: 'small'})} width={W.mid} color={C.ink} at={at} />
+        <Ink d={padCorners.map((c, i) => line(c[1][0], c[1][1], c[2][0], c[2][1], {over: [0, 0], seed: `${seed}/pc${i}`})).join('')} width={W.far} color={C.ink} at={b(at, 0.02)} />
         {docs}
-        {/* the desk lamp seen from above (top-left): its base clamped at the left edge, two arm bars with a spring,
-            the round shade over its pool (a dark rim ring, the shade's top, its cap) */}
-        <Fill d={blob(-30, 540, 70, 70, {seed: `${seed}/lbase`})} color={C.lamp} offset={false} at={fillAt(at)} />
-        <Ink d={line(-20, 548, 40, 640, {over: [0, 0], seed: `${seed}/arm1`}) + line(40, 640, 104, 714, {over: [0, 0], seed: `${seed}/arm2`})} width={14} color={C.lamp} taper={false} at={at} />
-        <Ink d={line(-8, 560, 50, 646, {over: [0, 0], seed: `${seed}/spr`})} width={3} color={C.metal} taper={false} dash="6 6" at={b(at, 0.04)} />
-        <Fill d={blob(40, 640, 12, 12, {seed: `${seed}/joint`})} color={C.metal} offset={false} at={fillAt(at, 0.02)} />
-        <Fill d={blob(124, 736, 84, 84, {seed: `${seed}/rim`})} color={C.lamp} at={fillAt(at)} offset={false} />
-        <Fill d={blob(120, 732, 62, 62, {seed: `${seed}/shade`})} color={C.blotterEdge} offset={false} at={fillAt(at, 0.02)} />
-        <Fill d={blob(116, 728, 24, 24, {seed: `${seed}/cap`})} color={C.lamp} offset={false} at={fillAt(at, 0.03)} />
-        <Ink d={ellipse(124, 736, 84, 84, {seed: `${seed}/rimI`}) + ellipse(120, 732, 62, 62, {seed: `${seed}/shI`})} width={W.mid} color={C.ink} at={at} />
+        {/* the desk lamp: an anglepoise reaching in from the left edge UNDER the caption band (set y > 640): its base,
+            two arm bars with a spring, a joint, and the shade as a cone tilted down-right into its own pool, its mouth
+            lit (at the inserts' 1.2x the old top-down shade read as a dark disc: lane L4's fix, folded back) */}
+        <AnglepoiseLamp C={C} at={at} seed={seed} />
         {/* the stamp and its pad (lower left, by the documents) */}
         <Fill d={roundRect(150, 1540, 180, 120, 14)} color={C.stampPad} at={fillAt(at)} seed={`${seed}/pad`} />
         <Fill d={roundRect(166, 1556, 148, 88, 10)} color={C.blotter} offset={false} at={fillAt(at, 0.02)} />
@@ -220,7 +226,6 @@ export const ColdSet: React.FC<ColdSetProps> = ({zoom = 1, variant, life = 1, sl
   );
 };
 
-const vline2 = (x: number, y0: number, y1: number, seed: string) => line(x, y0, x, y1, {over: [0, 0], seed});
 
 /** The desk's grain: wavy hairlines across the top, none in the caption band (y 280-620). */
 const grain = (seed: string): string => {
@@ -241,6 +246,46 @@ const grain = (seed: string): string => {
 };
 
 /** An official desk phone seen from above (centre x, y): body, handset, keys, a coiled cord, a blinking line light. */
+/** The anglepoise (set px): base clamped at the left edge (-14, 770), arm via (78, 706) to the shade's neck (150, 724),
+ *  a cone into its lit mouth at (236, 796) over the pool; everything under set y 640 (the caption band stays desk). */
+const AnglepoiseLamp: React.FC<{C: ColdRoles; at?: At; seed: string}> = ({C, at, seed}) => {
+  const base: Pt = [-14, 770];
+  const elbow: Pt = [78, 706];
+  const neck: Pt = [150, 724];
+  const mouth: Pt = [236, 796];
+  const len = Math.hypot(mouth[0] - neck[0], mouth[1] - neck[1]);
+  const ax: Pt = [(mouth[0] - neck[0]) / len, (mouth[1] - neck[1]) / len];
+  const px: Pt = [-ax[1], ax[0]];
+  const P = (o: Pt, a: number, p: number): Pt => [o[0] + ax[0] * a + px[0] * p, o[1] + ax[1] * a + px[1] * p];
+  const cone = smooth([P(neck, -6, -24), P(neck, -6, 24), P(mouth, 0, 80), P(mouth, 14, 40), P(mouth, 16, 0), P(mouth, 14, -40), P(mouth, 0, -80)], {closed: true, tension: 0.2});
+  const stripe = polyPath([P(neck, 0, -14), P(neck, 0, -4), P(mouth, -6, -44), P(mouth, -8, -66)]);
+  const rot = (Math.atan2(px[1], px[0]) * 180) / Math.PI;
+  const mouthD = (rx: number, ry: number) => {
+    const m = mat.compose(mat.translate(mouth[0], mouth[1]), mat.rotate(rot));
+    const pts: Pt[] = Array.from({length: 24}, (_, i) => {
+      const u = Math.cos((i / 24) * 2 * Math.PI) * rx;
+      const v = Math.sin((i / 24) * 2 * Math.PI) * ry;
+      return [m[0] * u + m[2] * v + m[4], m[1] * u + m[3] * v + m[5]];
+    });
+    return smooth(pts, {closed: true});
+  };
+  return (
+    <>
+      <Fill d={blob(base[0], base[1], 60, 58, {seed: `${seed}/lbase`})} color={C.lamp} offset={false} at={fillAt(at)} />
+      <Ink d={line(base[0], base[1], elbow[0], elbow[1], {over: [0, 0], seed: `${seed}/la1`}) + line(elbow[0], elbow[1], neck[0], neck[1], {over: [0, 0], seed: `${seed}/la2`})} width={15} color={C.lamp} taper={false} at={at} />
+      <Ink d={line(base[0] + 10, base[1] - 14, elbow[0] + 4, elbow[1] - 14, {over: [0, 0], seed: `${seed}/lsp`})} width={3} color={C.metal} taper={false} dash="6 6" at={b(at, 0.04)} />
+      <Fill d={blob(elbow[0], elbow[1], 13, 13, {seed: `${seed}/ljoint`})} color={C.metal} offset={false} at={fillAt(at, 0.02)} />
+      <Ink d={ellipse(elbow[0], elbow[1], 13, 13, {seed: `${seed}/ljointI`})} width={W.far} color={C.ink} at={b(at, 0.02)} />
+      <Fill d={cone} color={C.shade} seed={`${seed}/lcone`} at={fillAt(at)} />
+      <Fill d={stripe} color={C.blotterEdge} offset={false} at={fillAt(at, 0.02)} />
+      <Fill d={mouthD(76, 24)} color={C.lampMouth} offset={false} at={fillAt(at, 0.02)} />
+      <Fill d={mouthD(30, 13)} color={CC.paper} offset={false} at={fillAt(at, 0.03)} />
+      <Ink d={cone + mouthD(76, 24)} width={W.mid} color={C.ink} at={at} />
+      <Fill d={blob(neck[0] - ax[0] * 4, neck[1] - ax[1] * 4, 17, 17, {seed: `${seed}/lcap`})} color={C.lamp} offset={false} at={fillAt(at, 0.03)} />
+    </>
+  );
+};
+
 const DeskPhone: React.FC<{x: number; y: number; C: ColdRoles; t: number; at?: At; seed: string}> = ({x, y, C, t, at, seed}) => {
   const body: Pt[] = [[x - 96, y - 82], [x + 96, y - 82], [x + 112, y + 96], [x - 112, y + 96]];
   const keys: string[] = [];
@@ -255,10 +300,12 @@ const DeskPhone: React.FC<{x: number; y: number; C: ColdRoles; t: number; at?: A
       <Fill d={roundRect(x - 112, y - 120, 224, 64, 30)} color={C.blotter} at={fillAt(at, 0.02)} seed={`${seed}/h`} />
       <Fill d={keys.join('')} color={C.metal} offset={false} at={fillAt(at, 0.04)} />
       <Ink d={poly(body, {closed: true, seed: `${seed}/bI`, over: 'small'}) + roundRect(x - 112, y - 120, 224, 64, 30, {seed: `${seed}/hI`})} width={W.mid} color={C.ink} at={at} />
-      <Live at={at} c={[x + 70, y + 30]}>
-        <circle cx={x + 76} cy={y + 30} r={14} fill={lit ? CC.recLight : C.blotter} />
-        <circle cx={x + 76} cy={y + 64} r={9} fill={!lit ? CC.recLight : C.blotter} />
+      {/* the two line lights on the body LEFT of the keys (x - 78: inside the 1.2x inserts' frame; lane L4's fix) */}
+      <Live at={at} c={[x - 78, y + 40]}>
+        <circle cx={x - 78} cy={y + 24} r={11} fill={lit ? CC.recLight : C.folderTab} />
+        <circle cx={x - 78} cy={y + 58} r={9} fill={!lit ? CC.recLight : C.folderTab} />
       </Live>
+      <Ink d={ellipse(x - 78, y + 24, 11, 11, {seed: `${seed}/pl0`}) + ellipse(x - 78, y + 58, 9, 9, {seed: `${seed}/pl1`})} width={W.far} color={C.ink} at={b(at, 0.04)} />
     </>
   );
 };
@@ -355,31 +402,55 @@ const Rosette: React.FC<{x: number; y: number; r: number; C: ColdRoles; at?: At;
   );
 };
 
-/** The slid-in document and the official's hand (p: slide-in progress 0..1, out: the hand's withdrawal 0..1). */
+/** Words in rows (dashes of word length; a short last row per paragraph): the slid document's text. */
+const wordRows = (x: number, y: number, w: number, n: number, gap: number, seed: string, breaks: number[] = []): string => {
+  const r = rng(seed);
+  let d = '';
+  let yy = y;
+  for (let i = 0; i < n; i++) {
+    const end = breaks.includes(i) || i === n - 1;
+    const span = end ? w * r.range(0.4, 0.62) : w * r.range(0.9, 1);
+    let cx = x;
+    while (cx < x + span - 14) {
+      const len = Math.min(r.range(16, 64), x + span - cx);
+      d += `M${cx.toFixed(1)} ${(yy + r.jitter(0.8)).toFixed(1)}L${(cx + len).toFixed(1)} ${(yy + r.jitter(0.8)).toFixed(1)}`;
+      cx += len + 13;
+    }
+    yy += gap + (breaks.includes(i) ? gap * 0.6 : 0);
+  }
+  return d;
+};
+
+/** The slid document and the hand: a COLLEAGUE's grey suit cuff (never the official's third arm) pushes a document in
+ *  from the left onto the pile at doc x -60 (hand +196 in: seen at the inserts' 1.2x), holds, withdraws; the document
+ *  stays (lane L4's ColleagueSlide, folded back by the assembler). */
 const SlideDoc: React.FC<{p: number; out: number; C: ColdRoles; at?: At; seed: string}> = ({p, out, C, at, seed}) => {
-  const dx = -380 * (1 - p);
-  const doc = {x: -70 + dx, y: 1236, w: 300, h: 370};
-  const hx = doc.x + 96 - 460 * out;
-  const hy = doc.y + 200;
-  const M = mat.about(mat.rotate(-6), doc.x + doc.w / 2, doc.y + doc.h / 2);
-  const sleeve = roundRect(hx - 520, hy - 56, 470, 112, 30);
-  const cuff = roundRect(hx - 66, hy - 50, 30, 100, 8);
-  const hand = smooth([[hx - 40, hy - 46], [hx + 30, hy - 52], [hx + 70, hy - 30], [hx + 76, hy + 6], [hx + 50, hy + 40], [hx - 40, hy + 46]], {closed: true, tension: 0.35});
-  const fingers = [-26, -6, 14].map((fy, i) => line(hx + 24, hy + fy, hx + 66, hy + fy + 4, {over: [0, 0], seed: `${seed}/f${i}`})).join('');
+  const dx = -420 * (1 - p);
+  const doc = {x: -60 + dx, y: 1206, w: 290, h: 350};
+  const hx = doc.x + 196 - 520 * out;
+  const hy = doc.y + 128;
+  const M = mat.about(mat.rotate(-7), doc.x + doc.w / 2, doc.y + doc.h / 2);
+  const sleeve = roundRect(hx - 560, hy - 56, 500, 112, 30);
+  const cuff = roundRect(hx - 70, hy - 50, 32, 100, 8);
+  const hand = smooth([[hx - 40, hy - 44], [hx + 26, hy - 48], [hx + 72, hy - 34], [hx + 82, hy - 4], [hx + 70, hy + 30], [hx + 30, hy + 42], [hx - 40, hy + 44]], {closed: true, tension: 0.35});
+  const thumb = smooth([[hx - 8, hy + 38], [hx + 28, hy + 50], [hx + 46, hy + 62], [hx + 30, hy + 70], [hx - 4, hy + 58]], {closed: true, tension: 0.35});
+  const splits = [-18, 2, 20].map((fy, i) => line(hx + 44, hy + fy, hx + 78, hy + fy + 1, {over: [0, 0], seed: `${seed}/f${i}`})).join('');
+  const knuckles = smooth([[hx + 30, hy - 36], [hx + 36, hy - 18], [hx + 34, hy + 2], [hx + 36, hy + 20], [hx + 30, hy + 34]]);
   return (
     <>
       <XG m={M}>
         <Fill rect={[doc.x + 10, doc.y + 12, doc.w, doc.h]} color={C.shade} offset={false} at={fillAt(at)} />
         <Fill rect={[doc.x, doc.y, doc.w, doc.h]} color={CC.paper} offset={false} at={fillAt(at)} />
-        <Ink d={rect(doc.x, doc.y, doc.w, doc.h, {seed: `${seed}/dI`, over: 'small'}) + textLines(doc.x + 30, doc.y + 50, 220, {n: 7, gap: 34, seed: `${seed}/dt`, heading: true})} width={W.mid} color={C.ink} at={at} />
+        <Ink d={rect(doc.x, doc.y, doc.w, doc.h, {seed: `${seed}/sdI`, over: 'small'})} width={W.mid} color={C.ink} at={at} />
+        <Ink d={wordRows(doc.x + 30, doc.y + 52, 220, 7, 32, `${seed}/sdt`, [2])} width={W.far} color={C.ink} taper={false} at={at} />
       </XG>
       {out < 1 ? (
         <>
-          <Fill d={sleeve} color={C.cuff} offset={false} at={fillAt(at)} />
+          <Fill d={sleeve} color={C.suit} offset={false} at={fillAt(at)} />
           <Fill d={cuff} color={C.shirt} offset={false} at={fillAt(at)} />
-          <Fill d={hand} color={CC.skin2} offset={false} at={fillAt(at)} />
-          <Ink d={sleeve + cuff + hand} width={W.mid} color={C.ink} at={at} />
-          <Ink d={fingers} width={W.far} color={C.ink} at={at} />
+          <Fill d={thumb + hand} color={CC.skin2} offset={false} at={fillAt(at)} />
+          <Ink d={sleeve + cuff + thumb + hand} width={W.mid} color={C.ink} at={at} />
+          <Ink d={splits + knuckles} width={W.far} color={C.ink} at={at} />
         </>
       ) : null}
     </>

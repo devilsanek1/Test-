@@ -5,7 +5,8 @@
 // like-pop): then its eyes open and it looks at the bubble. Her mouth starts moving just before the pop (lead), her
 // head nods and her near hand rises open while she talks. The bubble (speech lines, no words) is the board's 400 x 264
 // box at (250, 650); after its pop it floats (a slow breath about her mouth). The band is plain wall (the board: the
-// glass starts at the band's lower edge; BandCover14 paints out the rod, the recess top and the blind above it).
+// glass starts at the band's lower edge; the kit NookRoom's `bandTop` paints out the rod, the recess top and the blind
+// above it).
 // Camera: HOLD, breathing in 1.5 % on her and the bubble; the room keeps living (the clock's readable second hand).
 import React from 'react';
 import {World} from '../../../lib/World';
@@ -13,7 +14,7 @@ import type {ToneKey} from '../../../lib/Film';
 import {ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {Bubble, CC, HerSeated, NOOK, NookRoom, herMouth, lerpPt, nookWorld, type Pt} from '../kit';
-import {BandCover14, bubbleTail, Float, SecondHand} from './P13_nook';
+import {bubbleTail, Float} from './P13_nook';
 
 const START = 13.24;
 const DUR = 15.0 - START;
@@ -38,9 +39,7 @@ const P4: React.FC = () => {
   return (
     <World sky={CC.wall}>
       <XG m={mat.about(mat.scale(z), 520, 1000)}>
-        <NookRoom layout="m14" cat={{x: CAT[0], y: CAT[1], pose: 'loaf', facing: 'l', size: 120, look, eyes: t < POP + 0.12 ? 'half' : 'open', seed: 'p4/cat/359'}}>
-          <BandCover14 />
-          <SecondHand />
+        <NookRoom layout="m14" bandTop={746} cat={{x: CAT[0], y: CAT[1], pose: 'loaf', facing: 'l', size: 120, look, eyes: t < POP + 0.12 ? 'half' : 'open', seed: 'p4/cat/359'}}>
           <HerSeated x={H.x} y={H.y} h={H.h} facing="r" view="side" face="calm" talking={[[POP - 0.1, DUR + 1]]} seed="p4/her" />
         </NookRoom>
         <Float from={POP + 0.24} tail={tail}>

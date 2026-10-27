@@ -25,6 +25,7 @@ import animatic from '../../../public/v2/animatic.json';
 import scenesJson from './scenes.json';
 import captionsJson from './captions.json';
 import {sceneComponents, sceneTones, sceneWipers} from './scenes';
+import {CC} from './palette';
 
 export const FILM2_FPS = 60;
 export const FILM2_VOICE = 'v2/voice.wav';
@@ -47,8 +48,9 @@ export const film2Frames = (from = 0, to = film2Seconds) => Math.max(1, Math.cei
 
 // ---------------------------------------------------------------- the look of the overlay (LOOK.md, DeskPal A roles)
 
-/** Cream & Cobalt roles the overlay draws with (src/v2/StyleDesk.tsx COBALT: ink, paper, muted credit, the pop). */
-export const OVERLAY_COLORS = {ink: '#2B1B0A', cream: '#FFF8EE', muted: '#7A5038', pop: '#EC6B2E'} as const;
+/** Cream & Cobalt roles the overlay draws with (palette.ts CC = src/v2/StyleDesk.tsx COBALT: ink, paper, muted credit,
+ *  the pop). */
+export const OVERLAY_COLORS = {ink: CC.ink, cream: CC.paper, muted: CC.muted, pop: CC.pop} as const;
 
 /** Frame 0 states the payoff in words (owner playbook; board frame0 "SHE SAYS: NO CRITICIZING GOOGLE. FOR LIFE."),
  *  the fairness rule's SHE SAYS on screen for all of O1. Layout (screen px, all inside the caption band 290-600):

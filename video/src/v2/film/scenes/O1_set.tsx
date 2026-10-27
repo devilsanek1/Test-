@@ -5,7 +5,7 @@
 // head cut by the right edge and its golden pool, the desk's back edge, front face, right end + leg, the floor line
 // past it, the knee space (a tote, slippers, magazines, a power strip). HER CAT sits at the desk's front-right corner
 // and WATCHES every beat: its head turns to 3/4, dips and leans toward the badge, the box going, the highlighter and the
-// run-on pouring off the edge (O1_cat.tsx). Steam (long thin wisps), dust motes, a moth, the clock, the town, the
+// run-on pouring off the edge (the kit Cat's `turn`). Steam (long thin wisps), dust motes, a moth, the clock, the town, the
 // shelf's tendril, the phone and the LED: always on.
 //
 // Locked board (public/v2/animatic.json O1, docs/v2/storyboard_g3.md), O1-local seconds = VO seconds:
@@ -22,7 +22,7 @@
 //   2.60-2.98  on "contract" the pop band sweeps under "no criticizing", hops, "Google" (marker squeak 2.60)
 //   3.06-3.40  the sleeve leaves bottom-left
 //   3.00-3.41  on "bans" the page ratchets out past its own end in five steps (2030; paper unroll 3.00)
-//   3.50-6.04  it pours, faster and faster (O1_runon.tsx): over the lip 3.90, 2040 4.23, 2050 4.88, 2060 5.36, 2070
+//   3.50-6.04  it pours, faster and faster (kit/RunOn.tsx): over the lip 3.90, 2040 4.23, 2050 4.88, 2060 5.36, 2070
 //              5.67, on the floor 5.72, 2080 5.98, out past the bottom edge 6.04; "for life" lands in near silence
 //   camera     PULL OUT 1.05 -> 1.00 about the frame centre, ease-in (inQuad), the whole shot (kit o1Cam); t < 0 holds 1.05
 // P12 (mode "p12", P12-local t): the same set at O1's end (no box, bands done, the run-on at its O1 end, camera 1.00),
@@ -31,25 +31,31 @@
 import React from 'react';
 import {ease as E, prog, useTime} from '../../../lib/time';
 import {mat, Mat, XG} from '../../../lib/xf';
-import {blob, ellipse, hline, line, poly, rect, roundRect, smooth} from '../../../lib/sketch';
+import {hline, line, poly, rect, roundRect, smooth} from '../../../lib/sketch';
 import {useCaptionFont} from '../../../lib/font';
 import {
   add,
   applyM,
   Badge,
-  Basket,
-  BookStack,
-  Bookcase,
   Box,
   BOX,
   BuildWave,
+  Cat,
+  catTurnHead,
+  O1RunOn,
+  o1RunOn,
+  o1RunSpeed,
+  O1_KICKS,
+  O1_RUN_END,
+  runOnTip,
+  type CatTurn,
   type BuildWaveV,
   CC,
   clauseRow,
   ContractPage,
-  DeskFloor,
-  DeskTop,
-  DeskWindow,
+  DeskBack,
+  DESK_SHELF_UP,
+  DeskMug,
   DESK,
   dirDeg,
   DustMotes,
@@ -60,19 +66,15 @@ import {
   Lanyard,
   lerp,
   lerpPt,
-  Live,
   O1_PAGE,
   o1Cam,
   pagePoint,
   Pen,
   type Pt,
   radialWave,
-  TopShelf,
   W,
 } from '../kit';
-import {O1RunOn, o1RunOn, o1RunSpeed, O1_KICKS, O1_RUN_END, runOnTip} from './O1_runon';
 import {DeskBits, FairyLights, Moth, Phone, ShelfTendril, TownLines, UnderBox, UnderDesk, WallDress} from './O1_dress';
-import {DeskCat, deskCatHead, type DeskCatPose} from './O1_cat';
 
 // ---------------------------------------------------------------- timing (O1-local seconds = VO seconds)
 
@@ -88,7 +90,7 @@ const P12_SLIDE = {at: 0.6, dur: 0.72, px: 176};
 /** P12: the phone buzzes on "Google." (film 34.6). O1: between 2040 and 2050. */
 const PHONE_AT = {o1: 4.52, p12: 1.5};
 /** The shelf + garland are raised this far (px) from the style frame so P12's credit tab sits on bare wall. */
-const SHELF_UP = 50;
+const SHELF_UP = DESK_SHELF_UP;
 
 // ---------------------------------------------------------------- her hand, the badge, the box
 
@@ -207,18 +209,6 @@ const drapePath = (d: number) =>
     [224, 920],
   ]);
 
-/** The box's front wall, redrawn over the badge in it (kit/Props Box's own front pieces and seeds), so the badge sits
- *  between its back and front: only its top third shows over the rim. */
-const BoxFront: React.FC<{seed: string}> = ({seed}) => {
-  const {fl, fr, br, bl, back, rim, bot} = BOX;
-  return (
-    <>
-      <Fill rect={[fl, rim, fr - fl, bot - rim]} color={CC.box} seed={`${seed}/bxF`} />
-      <Ink d={rect(fl, rim, fr - fl, bot - rim, {seed: `${seed}/bxFI`, over: 'small'}) + poly([[fr, bot], [br, back + (bot - rim)], [br, back]], {seed: `${seed}/bxRI`, over: 'small'}) + line(bl, back, br, back, {seed: `${seed}/bxBI`, over: 'small'})} width={W.mid} />
-      <Ink d={hline(fl + 70, fr - 70, rim + 40, {seed: `${seed}/tape`, over: [0, 0]}) + hline(fl + 70, fr - 70, rim + 50, {seed: `${seed}/tape2`, over: [0, 0]})} width={W.hair} />
-    </>
-  );
-};
 
 /** Her fingertips curling over the card's top edge (the hand is behind the card): card-local, scaled with it. */
 const Fingertips: React.FC<{k: Card}> = ({k}) => (
@@ -318,9 +308,9 @@ const lookAt = (t: number, cl: Clause): Pt => {
 };
 /** Its pose for a look point: yaw to 3/4-profile toward the target, chin dip by the target's angle below, a forward
  *  lean when it looks down, the head moved a little toward the target. `bow` adds P12's bow over the edge. */
-const catPose = (look: Pt, bow = 0, flick = 0): DeskCatPose => {
+const catPose = (look: Pt, bow = 0, flick = 0): CatTurn => {
   const {x, y, size} = O1_CAT;
-  const h0 = deskCatHead(x, y, size, {lean: 0, head: [0, 0]});
+  const h0 = catTurnHead(x, y, size, {lean: 0, head: [0, 0]});
   const ldx = -(look[0] - h0[0]);
   const ldy = look[1] - h0[1];
   const l = Math.hypot(ldx, ldy) || 1;
@@ -338,83 +328,8 @@ const catPose = (look: Pt, bow = 0, flick = 0): DeskCatPose => {
   };
 };
 
-// ---------------------------------------------------------------- the desk, the mug (local: the shelf raised, steam as wisps)
 
-/** kit DeskBack, with the top shelf (and its trailing plant) raised SHELF_UP px (P12's credit tab sits on bare wall). */
-const O1DeskBack: React.FC = () => (
-  <>
-    <Fill rect={[-200, -200, 1480, 2320]} color={CC.wall} offset={false} mode="snap" />
-    <Bookcase />
-    <XG m={mat.translate(0, -SHELF_UP)}>
-      <TopShelf />
-    </XG>
-    <DeskWindow />
-    <DeskFloor />
-    <Basket />
-    <DeskTop />
-    <BookStack />
-  </>
-);
 
-/** Steam off the mug: three long, thin, wavy wisps rising from the rim in a lighter warm ink, undulating slowly in
- *  step (they never cross into letter shapes), thin at the rim, widest low, tapering to nothing at the top. */
-const MugSteam: React.FC<{x: number; y: number}> = ({x, y}) => {
-  const t = useTime();
-  const wisps: [number, number, number, number][] = [
-    [x - 22, 0, 104, 0.4],
-    [x, 0.5, 142, 1.9],
-    [x + 22, 1.0, 118, 3.3],
-  ];
-  return (
-    <Live c={[x, y - 70]}>
-      {wisps.map(([x0, ph, len0, lp], i) => {
-        const len = len0 + 20 * Math.sin(t * 0.9 + lp);
-        const N = 16;
-        const C: Pt[] = [];
-        for (let j = 0; j <= N; j++) {
-          const s = j / N;
-          C.push([x0 + (2 + 11 * s) * Math.sin(2 * Math.PI * (s * 0.8 - t * 0.3) + ph), y - s * len]);
-        }
-        const Lp: Pt[] = [];
-        const Rp: Pt[] = [];
-        C.forEach((p, j) => {
-          const a = C[Math.max(0, j - 1)];
-          const z = C[Math.min(N, j + 1)];
-          const dx = z[0] - a[0];
-          const dy = z[1] - a[1];
-          const l = Math.hypot(dx, dy) || 1;
-          const s = j / N;
-          const w = 2.4 * Math.pow(Math.sin(Math.PI * Math.min(1, 0.12 + s * 0.88)), 0.8);
-          Lp.push([p[0] - (dy / l) * w, p[1] + (dx / l) * w]);
-          Rp.push([p[0] + (dy / l) * w, p[1] - (dx / l) * w]);
-        });
-        return <path key={i} d={smooth([...Lp, ...Rp.reverse()], {closed: true})} fill={CC.boxIn} />;
-      })}
-    </Live>
-  );
-};
-
-/** kit DeskMug (the style frame's), with the steam as long wisps (the kit's dashes read as letters at phone size). */
-const O1Mug: React.FC = () => {
-  const x0 = 800;
-  const x1 = 898;
-  const top = 950;
-  const bot = 1054;
-  const body = `M${x0} ${top}L${x0} ${bot - 18}Q${x0} ${bot} ${x0 + 18} ${bot}L${x1 - 18} ${bot}Q${x1} ${bot} ${x1} ${bot - 18}L${x1} ${top}Z`;
-  return (
-    <>
-      <Fill d={smooth([[x0 + 10, bot - 6], [x0 - 40, bot + 18], [x0 - 70, bot + 40], [x0 - 30, bot + 46], [x1 - 10, bot + 6]], {closed: true})} color={CC.deskShade} offset={false} />
-      <Ink d={`M${x1 - 2} ${top + 22}C${x1 + 44} ${top + 18} ${x1 + 44} ${top + 80} ${x1 - 2} ${top + 76}`} width={15} color={CC.mug} taper={false} />
-      <Ink d={`M${x1 - 2} ${top + 14}C${x1 + 54} ${top + 10} ${x1 + 54} ${top + 88} ${x1 - 2} ${top + 84}`} width={W.far} />
-      <Fill d={body} color={CC.mug} seed="mug" />
-      <Fill rect={[x0, top + 40, x1 - x0, 18]} color={CC.mugBand} offset={false} />
-      <Ink d={line(x0, top, x0, bot - 14, {over: [0, 0], seed: 'mg1'}) + line(x1, top, x1, bot - 14, {over: [0, 0], seed: 'mg2'}) + `M${x0} ${bot - 18}Q${x0} ${bot} ${x0 + 18} ${bot}L${x1 - 18} ${bot}Q${x1} ${bot} ${x1} ${bot - 18}`} width={W.mid} />
-      <Fill d={blob((x0 + x1) / 2, top, (x1 - x0) / 2, 13, {seed: 'rim'})} color={CC.anchor} offset={false} />
-      <Ink d={ellipse((x0 + x1) / 2, top, (x1 - x0) / 2, 13, {seed: 'rimI'})} width={W.mid} />
-      <MugSteam x={(x0 + x1) / 2} y={top - 10} />
-    </>
-  );
-};
 
 // ---------------------------------------------------------------- the set
 
@@ -449,7 +364,6 @@ export const O1Set: React.FC<O1SetProps> = ({mode = 'o1'}) => {
   const knock = land > 0.02 ? 6 * Math.exp(-(land - 0.02) * 6) * Math.sin((land - 0.02) * 22) : 0;
   const off = boxOff(t);
   const boxGone = t >= CARRY.out[0] + CARRY.out[1];
-  const boxM: Mat = mat.compose(mat.translate(off[0], off[1]), jolt ? mat.about(mat.scale(1 + 0.015 * jolt, 1 - 0.04 * jolt), (BOX.fl + BOX.br) / 2, BOX.bot) : mat.I);
   const landed = t >= CARRY.land;
   const drape = E.outCubic(prog(t, CARRY.land, 0.22));
   // the clause, the signature, the run-on
@@ -468,7 +382,7 @@ export const O1Set: React.FC<O1SetProps> = ({mode = 'o1'}) => {
     <XG m={cam}>
       {built(
         <>
-          <O1DeskBack />
+          <DeskBack />
           <WallDress />
           <XG m={mat.translate(0, -SHELF_UP)}>
             <FairyLights />
@@ -481,15 +395,23 @@ export const O1Set: React.FC<O1SetProps> = ({mode = 'o1'}) => {
           <Phone buzzAt={p12 ? PHONE_AT.p12 : PHONE_AT.o1} />
           {boxGone ? null : (
             <>
-              <Box x={BOX.bl + off[0]} y={BOX.back + off[1]} badge={null} jolt={jolt} knock={knock} seed="o1/box" />
-              {inBox ? (
-                <XG m={boxM}>
-                  {landed ? <Lanyard d={smooth(BOX_LANYARD, {closed: true})} /> : <Lanyard d={fallingLanyard(inBox)} />}
-                  <Badge x={inBox.c[0]} y={inBox.c[1]} w={168} rot={inBox.rot} seed="o1/badgeB" />
-                  <BoxFront seed="o1/box" />
-                  {landed ? <Lanyard d={drapePath(drape)} /> : null}
-                </XG>
-              ) : null}
+              <Box
+                x={BOX.bl + off[0]}
+                y={BOX.back + off[1]}
+                badge={null}
+                jolt={jolt}
+                knock={knock}
+                inside={
+                  inBox ? (
+                    <>
+                      {landed ? <Lanyard d={smooth(BOX_LANYARD, {closed: true})} /> : <Lanyard d={fallingLanyard(inBox)} />}
+                      <Badge x={inBox.c[0]} y={inBox.c[1]} w={168} rot={inBox.rot} seed="o1/badgeB" />
+                    </>
+                  ) : undefined
+                }
+                over={inBox && landed ? <Lanyard d={drapePath(drape)} /> : undefined}
+                seed="o1/box"
+              />
             </>
           )}
           <ContractPage {...O1_PAGE} bands={bands} sigAt={p12 ? undefined : SIG.at} sigDur={SIG.dur} runOn={0} seed="o1/page" />
@@ -499,12 +421,10 @@ export const O1Set: React.FC<O1SetProps> = ({mode = 'o1'}) => {
       {built(
         <>
           <DustMotes cx={DESK.pool.cx + 40} cy={DESK.pool.cy - 60} rx={DESK.pool.rx * 0.9} ry={DESK.pool.ry * 0.8} n={12} r={3.6} seed="o1/motes" />
-          <XG m={mat.translate(-600, 30)}>
-            <Pen />
-          </XG>
-          <O1Mug />
+          <Pen dx={-600} dy={30} />
+          <DeskMug />
           <LampHead />
-          <DeskCat x={O1_CAT.x} y={O1_CAT.y} size={O1_CAT.size} pose={pose} seed="o1/cat" />
+          <Cat x={O1_CAT.x} y={O1_CAT.y} size={O1_CAT.size} pose="sit" facing="l" turn={pose} seed="o1/cat" />
           <Moth />
         </>,
       )}
