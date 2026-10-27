@@ -56,6 +56,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   done-signal), each archived once its work is merged and checked. -> rule: Process (parallelize; archive helpers).
 - 2026-10-27: "They must all use ultracode effort btw - all support sessions you spin up" -> every helper's prompt says
   ultracode and COMMON.md tells it to orchestrate with workflows; the running helpers were told. -> rule: Process (helpers).
+- 2026-10-27: (screenshot of a helper at "Opus 5.5 Medium") "the effort should be either max or ultracode" -> helpers restarted with
+  the first prompt `/effort ultracode on` ("Ultracode on: dynamic workflows on every task"), the task sent as a message;
+  `is_ultracode_active: true` verified. -> rule: Process (helpers).
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
