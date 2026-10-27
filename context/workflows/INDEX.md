@@ -71,4 +71,4 @@
 | 2026-10-27 | `v3-g5b-assemble-wf_180b3ca4-a34.js` | 3 | 0 | `context/agent_reports/2026-10-27_v3-g5b-assemble.md` |
 | 2026-10-27 | `retro-v3-craft-and-process-wf_ae580f04-3cc.js` | 10 | 0 | `context/agent_reports/2026-10-27_retro-v3.md` |
 | 2026-10-27 | `v3-rework-design-and-pilot-wf_b112ce1c-25d.js` (run wf_4299366f-37e, max effort) | 10 | 0 | (running) |
-| 2026-10-27 | `docs-coherence-pass-wf_1c51fee9-71b.js` | 5 | 0 | (running) |
+| 2026-10-27 | `docs-coherence-pass-wf_1c51fee9-71b.js` (run wf_d4e25932-124) | 6 | 0 | `context/agent_reports/2026-10-27_docs-coherence.md` |

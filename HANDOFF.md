@@ -129,6 +129,12 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Video 3 is produced by session https://claude.ai/code/session_01K4EiJphpZBfCkniV3UU3wR.** It is at G0 (topic
   scouting): workflow `context/workflows/v3-g0-topics-wf_b78a4844-2b3.js` writes `video/docs/v3/scouting/*.md` and
   `video/docs/v3/G0_TOPICS.md` (top 3 fresh topics for the owner to pick).
+- **v3 status (2026-10-27 evening): REWORK before publishing** (owner: "apply the feedback ... make it better before we
+  publish"). The G5b cut was NOT posted. Retro: `docs/retro/2026-10-27_v3_retro.md` (pipeline APPROVED), craft spec
+  `docs/look/CRAFT.md`, direction `docs/look/DIRECTION.md`. Rework: new flow `docs/v3/flow_v2.md` (sequences SQA-SQD, the
+  price tag as the thread, carriers at every join), clean pen + tiers + light kit; workflow
+  `context/workflows/v3-rework-design-and-pilot-*.js` builds SQA as the pilot; SQB-SQD then go to helper sessions; then
+  assembly, full-res render, posting master (Film3Final, -14 LUFS, TV range), cover re-check, `docs/v3/POSTING.md`.
 - **v3 status (2026-10-27 ~14:40 UTC): G5b DELIVERED** (`deliverables/v3/v3_g5b.mp4`, 1080x1920, 60 fps, gate PASS,
   film density 6.8 ev/s, flat 19 %, detail 52 %; sheet `review/v3_g5b/sheet.jpg`; render recipe in G5_BLOCKING.md 8b,
   chunked per panel). Waiting for the owner's notes; next G6 polish (easing, secondary motion, subtle edges) + G7 sound.
