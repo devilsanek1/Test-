@@ -20,12 +20,13 @@
 import React, {useId} from 'react';
 import {Fill} from '../../../lib/Fill';
 import {Ink} from '../../../lib/Ink';
-import {blob, circle, ellipse, line, poly, polyPath, roundRect, textLines} from '../../../lib/sketch';
+import {blob, circle, ellipse, line, poly, polyPath, roundRect, smooth, textLines} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {Letters, Mittens, PhotoLine, Planner, Radio, StarLantern} from './O1_life';
 import {
+  Book,
   BookStack,
   Cable,
   Calendar,
@@ -48,6 +49,7 @@ import {
   WallShelf,
   W,
   type LookKey,
+  type PipPoseKey,
   type Pt,
 } from '../kit';
 
@@ -159,7 +161,7 @@ const WallNote: React.FC<{x: number; y: number; s: number; rot: number; color: s
   );
 };
 
-/** A small ceramic dish of paper clips and coins. */
+/** A small ceramic dish of paper clips and coins (dusk-blue glaze, matched S12's: the cool share). */
 const ClipDish: React.FC<{x: number; y: number}> = ({x, y}) => {
   const dish = ellipse(x, y, 52, 18, {seed: 's7/dish'});
   const clip = (cx: number, cy: number, rot: number, col: string, i: number) => (
@@ -167,8 +169,8 @@ const ClipDish: React.FC<{x: number; y: number}> = ({x, y}) => {
   );
   return (
     <>
-      <Fill d={dish} color={EMBER.reveal} seed="s7/dishF" />
-      <Fill d={ellipse(x, y - 3, 38, 11, {seed: 's7/dishIn'})} color={EMBER.wall} offset={false} />
+      <Fill d={dish} color={EMBER.skyLow} seed="s7/dishF" />
+      <Fill d={ellipse(x, y - 3, 38, 11, {seed: 's7/dishIn'})} color={EMBER.snow} offset={false} />
       <Ink d={dish} width={W.far} />
       {clip(x - 14, y - 4, -12, EMBER.dc, 0)}
       {clip(x + 12, y - 2, 20, EMBER.beam, 1)}
@@ -189,6 +191,10 @@ export const S7WallLow: React.FC = () => (
     <WallShelf x={838} y={806} w={290} room={118} seed="s7/shelf" ink={W.far} />
     <Plant x={872} y={806} kind="pothos" size={50} trail={118} amp={3} period={3.4} seed="s7/shelfpothos" ink={W.far} />
     <Calendar x={952} y={866} w={100} from="2026" seed="s7/cal" ink={W.far} />
+    {/* three dusk-toned spines at the shelf's right end, cut by the edge (cozy v2 §4: the cool share) */}
+    <Book x={1032} y={806 - 92} w={20} h={92} color={EMBER.dc} seed="s7/dk1" ink={W.far} />
+    <Book x={1052} y={806 - 80} w={17} h={80} color={EMBER.skyLow} seed="s7/dk2" ink={W.far} />
+    <Book x={1069} y={806 - 98} w={22} h={98} color={EMBER.dcSide} seed="s7/dk3" ink={W.far} />
     <Socket x={268} y={948} />
     {/* left of the pinboard, over the lamp's rod: a small leaf print; right, over the shelf: a taped postcard */}
     <FramedPrint x={30} y={624} w={98} h={110} picture="leaf" seed="s7/print2" ink={W.far} />
@@ -406,8 +412,65 @@ export const PhoneDown: React.FC<{x: number; y: number; w?: number; rot?: number
   );
 };
 
+/** A dusk-blue knitted scarf (S12's, matched) draped across the desk along `pts` (a centre line): snow-white bands,
+ *  knit ribs, a fringe at its free end that stirs in the room's air. The cool share (cozy v2 §4). */
+export const DeskScarf: React.FC<{pts: Pt[]; w?: number; seed: string}> = ({pts, w = 46, seed}) => {
+  const t = useTime();
+  const n = pts.length;
+  const nrm = (i: number): Pt => {
+    const a = pts[Math.max(0, i - 1)];
+    const c = pts[Math.min(n - 1, i + 1)];
+    const dx = c[0] - a[0];
+    const dy = c[1] - a[1];
+    const L = Math.hypot(dx, dy) || 1;
+    return [-dy / L, dx / L];
+  };
+  const L: Pt[] = pts.map((p, i) => [p[0] + nrm(i)[0] * w * 0.5, p[1] + nrm(i)[1] * w * 0.5]);
+  const R: Pt[] = pts.map((p, i) => [p[0] - nrm(i)[0] * w * 0.5, p[1] - nrm(i)[1] * w * 0.5]);
+  const body = polyPath([...L, ...R.slice().reverse()]);
+  // bands across at a few stations, ribs (short ticks) along the length
+  let bands = '';
+  let ribs = '';
+  for (let i = 1; i < n - 1; i++) {
+    const [ax, ay] = L[i];
+    const [cx, cy] = R[i];
+    if (i % 2 === 1) bands += `M${ax.toFixed(1)} ${ay.toFixed(1)}L${cx.toFixed(1)} ${cy.toFixed(1)}`;
+    for (const k of [0.3, 0.7]) {
+      const p0 = pts[i];
+      const p1 = pts[i + 1];
+      const mx = p0[0] + (p1[0] - p0[0]) * k;
+      const my = p0[1] + (p1[1] - p0[1]) * k;
+      const [nx, ny] = nrm(i);
+      ribs += `M${(mx + nx * w * 0.3).toFixed(1)} ${(my + ny * w * 0.3).toFixed(1)}L${(mx - nx * w * 0.3).toFixed(1)} ${(my - ny * w * 0.3).toFixed(1)}`;
+    }
+  }
+  const end = pts[n - 1];
+  const [enx, eny] = nrm(n - 1);
+  const dir = [pts[n - 1][0] - pts[n - 2][0], pts[n - 1][1] - pts[n - 2][1]];
+  const dl = Math.hypot(dir[0], dir[1]) || 1;
+  let fringe = '';
+  for (let k = 0; k < 6; k++) {
+    const u = -0.4 + (k * 0.8) / 5;
+    const fx = end[0] + enx * w * u;
+    const fy = end[1] + eny * w * u;
+    const s = 1 + sway(t, 0.18, 2.6, k * 0.7);
+    fringe += `M${fx.toFixed(1)} ${fy.toFixed(1)}l${((dir[0] / dl) * 20 * s).toFixed(1)} ${((dir[1] / dl) * 20 * s + 2).toFixed(1)}`;
+  }
+  return (
+    <>
+      <Fill d={body} color={EMBER.dc} seed={`${seed}/f`} />
+      <path d={bands} stroke={EMBER.snow} strokeWidth={8} fill="none" />
+      <path d={ribs} stroke={EMBER.dcSide} strokeWidth={2} fill="none" strokeLinecap="round" />
+      <path d={fringe} stroke={EMBER.dc} strokeWidth={4} fill="none" strokeLinecap="round" />
+      <Ink d={smooth(L) + smooth(R)} width={W.far} />
+    </>
+  );
+};
+
 export const S7DeskFront: React.FC = () => (
   <>
+    {/* the dusk-blue scarf off the left edge, draped between the biscuits and the notebook to the letters */}
+    <DeskScarf pts={[[-80, 1430], [40, 1458], [160, 1476], [280, 1474], [380, 1494], [450, 1538], [470, 1600]]} seed="s7/scarf" />
     <SpiralNotebook quad={[[-70, 1500], [326, 1476], [356, 1802], [-60, 1840]]} pen={[[60, 1876], [372, 1640]]} seed="s7/nb" />
     <Letters x={500} y={1466} />
     <Pen from={[598, 1606]} to={[752, 1548]} wPx={14} color={EMBER.dc} seed="s7/pen2" />
@@ -469,14 +532,22 @@ export const ScreenGlint: React.FC<{scr: [Pt, Pt, Pt, Pt]; at: number; dur?: num
 // ---------------------------------------------------------------- Pip
 
 const PIP = {x: 846, y: 1194, scale: 1.4};
-/** Pip watches the laptop (head turned left), turns up to the bubble's spot a few frames before it pops (it points the
- *  eye), rises on its toes on "your" (a small hop), and keeps watching the stick in the bubble to the cut. */
+/** "your" (17.24). */
+const YOUR = 17.24 - 16.6;
+/** Pip watches the laptop from behind the pool's rim (back view), then WHIPS ROUND to face us a few frames before the
+ *  bubble pops (17.07: it points the eye, as O1's turn at 0.92), wide-eyed and looking up-left at the bubble's spot,
+ *  rises on its toes as it pops, and on "your" throws its trunk up toward the bubble (flipped 'trunk-up': up-left),
+ *  holding it to the cut (S8 picks it up facing us). Flipped, so a positive look is screen-left in every pose. */
+const PIP_KEYS: PipPoseKey[] = [
+  {t: -9, pose: 'sit-back'},
+  {t: 17.07 - 16.6, pose: 'sit-front', expression: 'wide'},
+  {t: YOUR, pose: 'trunk-up', expression: 'wide'},
+];
 const PIP_LOOK: LookKey[] = [
-  {t: -9, v: -0.55},
-  {t: S7_LENS_AT - 0.07, v: -0.95},
-  {t: 1.3, v: -0.8},
+  {t: -9, v: 0.55},
+  {t: 17.07 - 16.6, v: 0.85},
 ];
 
 export const S7Pip: React.FC = () => (
-  <Pip3 x={PIP.x} y={PIP.y} scale={PIP.scale} lineWeight={1.12} seed={7} pose="sit-back" look={PIP_LOOK} lookDur={0.18} hops={[{t: S7_LENS_AT + 0.06, height: 14, dur: 0.26}]} />
+  <Pip3 x={PIP.x} y={PIP.y} scale={PIP.scale} lineWeight={1.12} seed={7} flip keys={PIP_KEYS} look={PIP_LOOK} lookDur={0.12} hops={[{t: S7_LENS_AT + 0.06, height: 14, dur: 0.26}]} />
 );
