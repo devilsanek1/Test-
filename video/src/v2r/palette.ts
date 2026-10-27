@@ -19,6 +19,7 @@
 //   sunset   S3 (flash-forward), S7, S8   sunset band (+ dusk mint above it late); lamps coming on
 // No state relights a fill (todSteps are empty): the palette never changes, only what the shot draws.
 
+import './pen'; // the clean pen first (STYLE.md §3), then the palette tokens
 import {captionTones, contrastHex, deltaE, glow, palette, skies, todBulbHalo, todSky, todSteps, todTone, type as typeTok, TodName} from '../lib/theme';
 
 export const PALETTE_NAME = '10 Canal Mint';

@@ -20,6 +20,18 @@ const D2R = Math.PI / 180;
 
 const autoSeed = (...n: number[]) => n.map((v) => Math.round(v)).join(',');
 
+/** Pen mode, set once per film bundle at import time. 'loose' (default) = the house sketch line above, unchanged.
+ *  'clean' = the owner's clean, refined, premium line (2026-10-27, after v3 G5b: "too rough and messy"): every line is ONE
+ *  smooth, confident stroke (no overshoot, breaks, drift or jitter, a hair of bow), loops close cleanly with a low wobble.
+ *  Explicit opts can't undo it. v2r sets it in `src/v2r/pen.ts`. */
+export type PenMode = 'loose' | 'clean';
+let PEN: PenMode = 'loose';
+export const setPenMode = (m: PenMode): void => {
+  PEN = m;
+  PATH_CACHE.clear();
+};
+export const penMode = (): PenMode => PEN;
+
 // ---------------------------------------------------------------- memoisation
 // All path generators are pure, so results are cached by (name, args). Kit components call them on every
 // frame; the cache turns that into a Map lookup.
@@ -92,6 +104,7 @@ const quadAt = (p0: number, c: number, p1: number, t: number) => (1 - t) * (1 - 
 /** A single hand-drawn straight stroke from (x1,y1) to (x2,y2): overshoots, drifts slightly off-axis, bows a
  *  hair, and (if > 400 px) is broken into 2-4 strokes with small gaps. */
 function _line(x1: number, y1: number, x2: number, y2: number, o: LineOpts = {}): string {
+  if (PEN === 'clean') o = {...o, over: 'none', breaks: false, jitter: 0, drift: 0, bow: Math.min(o.bow ?? 0.3, 0.3)};
   const r = rng(o.seed ?? autoSeed(x1, y1, x2, y2));
   const dx = x2 - x1;
   const dy = y2 - y1;
@@ -179,7 +192,7 @@ function _poly(points: Pt[], o: PolyOpts = {}): string {
   const pts = o.closed ? [...points, points[0]] : points;
   if (o.joined) {
     const r = rng(seed);
-    const j = o.jitter ?? 0.8;
+    const j = PEN === 'clean' ? 0 : o.jitter ?? 0.8;
     return pts.map(([x, y], i) => `${i ? 'L' : 'M'}${P(x + r.jitter(j), y + r.jitter(j))}`).join('');
   }
   const out: string[] = [];
@@ -228,9 +241,10 @@ export type CircleOpts = {
 
 function ellipsePts(cx: number, cy: number, rx: number, ry: number, o: CircleOpts, closedLoop: boolean): Pt[] {
   const r = rng(o.seed ?? autoSeed(cx, cy, rx, ry));
-  const wob = o.wobble ?? 0.035;
+  const clean = PEN === 'clean';
+  const wob = clean ? Math.min(o.wobble ?? 0.008, 0.008) : o.wobble ?? 0.035;
   const a0 = (o.start ?? r.range(0, 360)) * D2R;
-  const over = closedLoop ? 0 : (o.overlap ?? r.range(-8, 28)) * D2R;
+  const over = closedLoop ? 0 : clean ? 3 * D2R : (o.overlap ?? r.range(-8, 28)) * D2R;
   const per = Math.PI * (rx + ry);
   const n = Math.max(8, Math.min(28, Math.round(per / 22)));
   const ph1 = r.range(0, 6.28);
