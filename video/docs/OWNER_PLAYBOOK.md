@@ -184,6 +184,8 @@ Format: **rule** — why / evidence (video, date).
   quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
   reviewing what will still change, early polish). — (2026-10-25; owner, 2026-10-26).
 - **Locked means dropped:** rejected options go to `archive/`, never seen by later prompts; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
+- **Every subagent and helper thread runs at MAX effort** (workflow `agent(..., {effort: 'max'})`, the Agent tool's effort
+  setting); helper cloud sessions are started for creative work only when needed and briefed fully. — (owner, 2026-10-27).
 - **New feedback is INTEGRATED, never just appended:** when a note changes the direction, rewrite or retire every rule and
   doc it contradicts in the same pass, so the next agent never meets conflicting instructions; the current visual direction
   lives in one place that wins over older docs. — ("evaluate this feedback and compact it with the overall stylistic
