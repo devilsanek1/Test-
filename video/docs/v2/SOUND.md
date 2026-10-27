@@ -9,7 +9,8 @@ python3 audio/v2r/premix.py` (`python3 audio/v2r/field.py` once fetches the CC0 
 Files: `public/v2r/music_bed.wav` (+ `audio/v2r/music_bed.mid`), `public/v2r/sfx/*.wav` (47 sounds),
 `public/v2r/cue_sheet.json` (the bed at t 0 + 56 cues, `{src, t, gain, note, under_db, set_by}`), `public/v2r/mix.wav`
 (the master: voice + bed + every cue), `public/v2r/cues.json` = `{"audio": "v2r/mix.wav", "sfx": []}`: Film2R now plays
-the master in place of the voice (the browser's own sum of voice + bed + cues peaked at +0.4 dBTP).
+the master in place of the voice (the browser's own sum of voice + bed + cues is unmastered: -15.1 LUFS, peaks near
+0 dBTP).
 
 ## Revision 2 in one paragraph
 DIRECTION.md and THROUGHLINE.md (approved after the draft) changed the joins: every join's sound now rides its CARRIER
@@ -50,8 +51,8 @@ S5's crane, the ONE big move, keeps its swell.
 | S1>S2 6.10 | A push-through into her dark window W | `whoosh_dive:1` 5.95: air rises into the glass, a muffled bump on the plum bridge, settles by 6.27 | +20 ms |
 | S2>S3 12.98 | B match: her dark office window = her lit home window | `lamp_click:2` 12.98: her lamp ON (the thread: OFF 0.40, ON here, ON 34.95) | +14 ms |
 | S3>S4 14.86 | A push-through into her silhouette | `whoosh_dive:2` 14.71 (the callback, 3 dB softer) | +13 ms |
-| S4>S5 20.55 | A push-through into the low October sun | `sun_through:1` 20.40: a glass shimmer swells into the light, a small A6 glass tink on the midpoint, 30 dB down by "In" 20.67 | -1 ms |
-| S5>S6 23.80 | D wipe: a blossom tree crosses right to left | `tree_wipe` 23.62: a soft rush of leaves (CC0 rustle, kept under 2.6 kHz) and air, right to left | +3 ms |
+| S4>S5 20.55 | A push-through into the low October sun | `sun_through:1` 20.40: a glass shimmer swells into the light, a small A6 glass tink on the midpoint, 65 dB down by "In" 20.67 | -4 ms |
+| S5>S6 23.80 | D wipe: a blossom tree crosses right to left | `tree_wipe` 23.62: a soft rush of leaves (CC0 rustle) and air, right to left, all under 2.2 kHz (the /f/ of "for") | +6 ms |
 | S6>S7 28.10 | A push-through into the April sun | `sun_through:2` 27.95 (the callback) | +3 ms |
 | S7>S8 32.93 | D wipe: the narrowboat glides west | `boat_pass` 32.70: its engine (CC0) with a small doppler glide and the bow wash, right to left; nothing before 32.70 | -27 ms |
 | S8>S1 38.95 | B + un-build into frame 0 | `pen_unbuild` 38.82: S8's lines rewind (the pen reversed), turn into frame 0's draw-on at 38.95, crossfade 15 ms into `pen_drawon` at the seam | +29 ms |
@@ -60,7 +61,7 @@ S5's crane, the ONE big move, keeps its swell.
 | shot | t (s) · sound · what |
 |---|---|
 | V2S1 | 0.00 pen_drawon (the clean pen finishes her, the door and W; the colour floods from the sun) · 0.40 lamp_click:1 (W goes dark) · **0.45 exit_ding** (C6 -> F6 struck glass, 58 ms apart; the first-second phone sound) + door_glide · 0.93 step_thup + letter_pops (done by 1.08) · 1.46 wings:1 (the far birds lift at 1.40) · 1.97 / 2.50 / 3.17 / 3.77 / 4.20 / 4.75 ghost_tick (ONE wooden tick, one pitch, per ghost) · 4.95 outline_pops + ear_flap ("life") · 5.95 whoosh_dive:1 |
-| V2S2 | 6.78 window_outline (her window's outline pops on, "one") · 8.40 board_clack:2 (TOLD THE BBC) · 8.93 light_clicks · 9.45 notebook_flap · 10.26 blinds_five · 12.17 blind_thump · 12.70 notebook_clap · 12.98 lamp_click:2 (the match) |
+| V2S2 | 6.78 window_outline (her window's outline pops on, "one") · 8.40 board_clack:2 (TOLD THE BBC) · 8.93 light_clicks (five switches in one step) · 9.45 notebook_flap · 10.26 blinds_five · 12.17 blind_thump · 12.70 notebook_clap · 12.98 lamp_click:2 (the match) |
 | V2S3 | 14.71 whoosh_dive:2 |
 | V2S4 | 15.03 pop_high:1 (name tag) · 16.60 pen_tick · 17.66 steps_stop · 18.88 plate_knock (DEC 2025) · 19.45 pen_short:1 (APR 2026) · 19.77 wings:2 · 20.40 sun_through:1 |
 | V2S5 | 20.73 blossom_pops ("April") · 21.95 wipe_air (the lamppost, centred 22.10) · 22.40 pop_low (plaque, with accent 1) · 23.05 window_warm (ONE step) · 23.62 tree_wipe |
@@ -78,11 +79,13 @@ hers; Google's beat has no sting, no minor turn, no door sounds (its glass doors
 | 0.45 exit_ding, 2nd strike +85 ms, +4 dB | 0.45, 2nd strike +58 ms, +3.2 dB | both mallets land in the /k/ closure of "quit", never on its burst; +3.2 keeps it 8 dB under the voice (TREATMENT §7) and still the first second's loudest |
 | 5.95 whoosh_dive, peak +0.20 | 5.95 whoosh_dive:1, peak +0.15 | on the push-through's midpoint 6.10 |
 | 6.82 pencil_ring (a drawn ring) | 6.78 window_outline (a pop) | the ring is board notation; her window's outline pops on in one frame (conform_L2 §1), 2 frames before "one" |
+| 8.93 light_clicks (five over 0.17 s, 1.5-9 kHz) | 8.93 (five within 40 ms, under 2.6 kHz) | the five windows cool in ONE step (conform_L2 §6); a soft bank of switches leaves the /z s t/ of "Google's staff" free ("staff" 20.5 -> 32.0 dB over everything at 1-4 kHz) |
 | 12.85 notebook_clap | 12.70 | map notebookShutAt 12.70: out of the join window 12.78-13.18 |
 | 12.98 swap_pop | 12.98 lamp_click:2 | the B match is her window, dark -> lit: the thread's own sound (OFF at 0.40, ON at 34.95) |
 | 13.10 pip_land, 14.70 pip_hop, 14.95 pip_land | - (and 14.71 whoosh_dive:2) | Pip keeps its seat across every join; the push-through into her is the new carrier |
-| 20.45 glass_ting | 20.40 sun_through:1 | the push-through into SUN1: the tink on the midpoint 20.55, 30 dB down by "In" |
+| 20.45 glass_ting | 20.40 sun_through:1 | the push-through into SUN1: the tink on the midpoint 20.55, 65 dB down by "In" (no canal slap) |
 | 20.73 calendar_flip | - | the calendar flip is retired (the sun as a character) |
+| 21.95 wipe_air, 23.62 tree_wipe (full band) | the same times, under 2.8 / 2.2 kHz | the /t/ of "letting" and the /f/ of "for" keep their bands |
 | 22.08 wipe_air, peak 22.23 | 21.95, peak 22.10 | the lamppost wipe was widened to 22.02-22.19: the air pass peaks on its middle |
 | 23.05 window_ticks:1 (seven) | 23.05 window_warm (one) | the wing's windows warm in ONE flat step (map windowsWarmAt) |
 | 23.90 pip_hop:2 | 23.62 tree_wipe | S5 -> S6 is the blossom-tree wipe (midpoint 23.80) |
@@ -90,6 +93,7 @@ hers; Google's beat has no sting, no minor turn, no door sounds (its glass doors
 | 27.05 window_ticks:2 (seven in 0.6 s) | 27.10 window_ticks (three) | flash-safe facade (<= 3 switch-ons per second): 27.10 / 27.45 / 27.83, each in a vowel or the pause |
 | 27.95 pip_hop:3, 28.00 glass_ting:2 | 27.95 sun_through:2 | the push-through into SUN2: the tink on the midpoint 28.10 |
 | 30.18 lamp_run (seven tinks) | 30.20 lamp_run (three) | flash-safe run (<= 3 per second): 30.20 / 30.60 / 30.80, in "princ-I-ples", the pause, the end of "and" |
+| pen_long at 19 dB under | 21 dB under, on both boards (A5) | its strokes run over the vowels of "talking": "talking" 6.5 -> 8.5 dB over everything at 4-10 kHz |
 | 32.70 boat_chug (left to right, peak 33.15) | 32.70 boat_pass (right to left, peak 32.90) | the boat travels west (dir 'left'); nearest on the midpoint 32.93, ~16 dB down by "She" |
 | 37.23 lamp_run (seven tinks) | 37.28 lamp_run (three) | 37.28 / 37.68 / 37.88: the vowels of "facts", "is", "not"; never in the /f/ (37.05-37.21), the /k/ (37.38-37.50) or the /ts/ (37.50-37.63) |
 | 38.82 pencil_reverse | 38.82 pen_unbuild | the un-build rewinds the clean pen and turns into frame 0's draw-on at its midpoint 38.95 |
@@ -103,30 +107,30 @@ hers; Google's beat has no sting, no minor turn, no door sounds (its glass doors
 ## The music director's review: what was done
 | item | done | measured now |
 |---|---|---|
-| 1 payoff masked | the long pen ends by 36.95 (both boards); lamp_run 6 dB down, three switch-ons clear of 37.18-37.26 and 37.38-37.50; the same on Google's (A5); premix checks every hit word | "facts" 32.6 / 53.4 dB over everything at 1-4 / 4-10 kHz, "is" 14.0 / 49.0, "not" 32.2 / 43.2, "principles" 23.9 / 31.2; every hit word >= 6 (lowest 7.2 "use", 6.5 "talking") |
-| 2 hook words | letter_pops -6 dB, done by 1.08; outline_pops and ear_flap -5 dB, puffs >= 5 kHz, no sine blip; TONAL replaced by a measured tonality | "Google." 11.8 / 17.9, "life." 16.4 / 17.4 |
+| 1 payoff masked | the long pen ends by 36.95 and sits 2 dB lower (both boards); lamp_run 6 dB down, three switch-ons clear of 37.18-37.26 and 37.38-37.50; the same on Google's (A5); premix checks every hit word | "facts" 33.1 / 55.3 dB over everything at 1-4 / 4-10 kHz, "is" 13.5 / 46.5, "not" 31.9 / 41.9, "principles" 27.4 / 35.1, "talking" 14.8 / 8.5; every hit word >= 6 (lowest 7.2 "use", 6.8 "her") |
+| 2 hook words | letter_pops -6 dB, done by 1.08; outline_pops and ear_flap -5 dB, puffs >= 5 kHz, no sine blip; TONAL replaced by a measured tonality | "Google." 12.0 / 18.6, "life." 17.2 / 17.5 |
 | 3 the ding | a struck glass chime (inharmonic partials, 1 ms mallet, tau 0.2 s); lamp_click -5, door_glide -6 dB. **Adapted:** +3.2 dB, not +4 (at +4 it sat 7.2 dB under the voice, against TREATMENT's >= 8), and its 2nd strike 58 ms after the 1st (both in the /k/ closure) | the first second's loudest SFX, 8.0 dB under the voice; it reads as a rising notification (C6 -> F6) |
-| 4 phone | cello octave on every pulse note, saturated low strings, the C6 un-ducked, the air 7 dB down under music (laps 10), the contrabass 4 dB lighter and the mid voices up, high violins in the crane and on "military" | every arc section over the air on a 350 Hz speaker (+1.2 to +14 dB), 20-33 dB under the voice (was 35-38 and under the air) |
+| 4 phone | cello octave on every pulse note, saturated low strings, the C6 un-ducked, the air 7 dB down under music (laps 10), the contrabass 4 dB lighter and the mid voices up, high violins in the crane and on "military" | every arc section over the air on a 350 Hz speaker (+1.9 to +11 dB), 21-33 dB under the voice (was 35-38 and under the air); the share under 150 Hz 37-62 % (was 85-92) |
 | 5 pumping | an 8 dB duck with a 500 ms hold; the static level keeps the 27 dB median; both pulses 2 velocity steps lighter, accent 1 2.5 dB up | no pause swells (loudest 100 ms in each pause vs the second before: <= +0.3 dB); every pause under both accents (>= 2.2 dB). **Note:** the review's own measure (max in a pause minus the MEDIAN before) still reads +9.1 at 25.60, +5.5 at 34.99, +5.2 at 36.18: those are the score's next notes (a pizz at 25.91, the motif's C5 at 35.17, the pickup at 36.51), not a release |
-| 6 the air | composed from CC0 field-recording grains (14 recordings, below), the life the picture keeps, one at a time | no band cliffs (hook: 0.6-0.8 kHz 0.1 dB, 2.0-3.2 kHz 0.3 dB); events 11.4 dB over the floor (p95 - p10; peaks 15.5), 13.6 on a phone |
+| 6 the air | composed from CC0 field-recording grains (14 recordings, below), the life the picture keeps, one at a time | no band cliffs (hook: 0.63-0.79 kHz +0.3 dB, 2.5-3.2 kHz +0.4 dB); events 12.7 dB over the floor (p95 - p10; peaks 16.0), 14.6 on a phone |
 | 7 comb filter | stereo noise from independent seeds (dsp.decor); no sub-millisecond copies | the master's mono fold-down: worst notch -0.2 dB |
-| 8 glass_tone | struck glass tinks (inharmonic, noise-excited); now the sun push-throughs' tink | 29.5 dB down 0.12 s after the midpoint ("In"), 43.6 dB by "But" |
-| 9 synthetic hits | every impact a struck object with a noise body, the contact of the hit and ONE shared outdoor slap; round-robin variants; one seeded humanize shared by both pulses; the ghost tick woodier | no identical sample repeats; the three "can't" ticks are three variants |
+| 8 glass_tone | struck glass tinks (inharmonic, noise-excited, no canal slap); now the sun push-throughs' tink | 65 dB down 0.12 s after the midpoint ("In"), 78 dB by "But" |
+| 9 synthetic hits | every impact a struck object with a noise body, the contact of the hit and ONE shared outdoor slap; round-robin variants; one seeded humanize shared by both pulses; the ghost tick and the door woodier | energy in the 4 strongest partials (the review's measure): board_clack 65 % (was 99.8), ghost_tick 59-64 % (77 + a sine), plate_knock 53 % (94); no identical sample repeats |
 | 10 seam dropout | cue overflow wraps circularly; the un-build ends exactly 15 ms past the seam and crossfades into the draw-on at a matched level | deepest 5 ms dip at the seam -3.0 dB (was a ~5 ms notch to -47 dBFS); 2-8 kHz step +0.2 dB |
 | 11 consonants | word-synced cues 2 frames before the word; pop_high at 26.47 | no cue starts 0-12 ms after a word onset |
-| 12 checked fine | kept | -14.01 LUFS, -1.25 dBTP; no clicks of ours (the 7 flags are the voice's plosives) |
+| 12 checked fine | kept | -14.01 LUFS, -1.25 dBTP; no clicks of ours (the 7 flags are the voice's own plosives) |
 
 ## Levels and the mix (measured by `premix.py`, `bed.py`; speech = the voiced spans; momentary 400 ms)
 | measure | result |
 |---|---|
 | master `mix.wav` (glue 1.5:1, true-peak limiter) | **-14.01 LUFS, -1.25 dBTP**, 48 kHz |
-| music under the speaking voice | median **26.9 dB**, p5 18.7, min 13.1 (house: ~27, never < 12) |
-| air under the voice / the whole bed | median 31.3 dB / min 12.8 dB |
-| SFX under the voice | every cue >= 8.0 dB under where it lands; the bus median 22.1, min 7.6 (the ding's 400 ms) |
-| 1-4 kHz: voice over everything | median 18.0 dB, min 1.1 (a 400 ms window); every hit word >= 6 dB at 1-4 and 4-10 kHz |
+| music under the speaking voice | median **26.9 dB**, p5 18.8, min 13.7 (house: ~27, never < 12) |
+| air under the voice / the whole bed | median 32.2 dB / min 12.8 dB (the hook's air sits 21 dB under the speech level before its duck) |
+| SFX under the voice | every cue >= 8.0 dB under where it lands; the bus median 22.2, min 7.6 (the ding's 400 ms) |
+| 1-4 kHz: voice over everything | median 18.8 dB, min 1.1 (one 400 ms window); every hit word >= 6 dB at 1-4 and 4-10 kHz |
 | the arc (music, momentary medians) | walk -39.7 · crane -41.4 · **landing -34.2** · clause -39.2 = Google -39.2 · alone -44.4 · **facts -35.5** |
 | joins | every carrier within 30 ms of its midpoint; nothing else starts in a join window (cues, life, birds, notes) |
-| loop seam | sample step 0.45x typical; level +0.8 dB; the bed circular |
+| loop seam | sample step 0.45x typical; level +1.3 dB; deepest 5 ms dip -3.0 dB; 2-8 kHz +0.2 dB; the bed circular |
 
 ## Handover
 - The film plays the master: `public/v2r/cues.json` = `{"audio": "v2r/mix.wav", "sfx": []}` (Film2R's `useCues`); the
