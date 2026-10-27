@@ -101,8 +101,7 @@ Format: **rule** — why / evidence (video, date).
 - **The hook is a concrete, surprising, TRUE claim with stakes**, verified against the primary source before it's
   locked; for a small news item, research the bigger story and lead with its strongest true framing. — (v2, 2026-10-25).
 - **Personal framings must feel natural, not over the top.** Never cast the viewer as a loser in a contest they don't
-  feel; test "you" claims with a viewer panel.
-  — (v3 G2, 2026-10-25).
+  feel; test "you" claims with a viewer panel. — (v3 G2, 2026-10-25).
 - **Target 30-45 s and end close to the payoff** (viewers left once the story felt resolved, ~40 s). — (v1 insights).
 - **Every frame at least 8/10, no dead frames, cuts locked to the beat.** — (v1).
 
@@ -125,7 +124,8 @@ Format: **rule** — why / evidence (video, date).
   `docs/look/STORYBOARD_STYLE.md`. — ("very simple, avoid colours for now", v3 G3, 2026-10-26).
 
 ## Taste signals (general preferences from the owner's picks; the picks themselves are in each video's OWNER_NOTES.md)
-- **Topics: the everyday wallet consequence** wins over a bigger but more distant story. — (v3 G0).
+- **Topics: tech and AI news is the channel's focus** (owner, v4 G0); within it, **the everyday consequence** wins over a
+  bigger but more distant story. — (v3 G0; "lets focus on tech and AI related news", v4 G0, 2026-10-27).
 - **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
   frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
 - **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).

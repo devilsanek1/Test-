@@ -10,3 +10,6 @@ prompts never load it. Re-check freshness and facts before using anything here.
 | "A backup that's a twin isn't a backup": Google Cloud London + Orange outages | judges' favourite mechanism and visual; wait for Google's final incident report | `v3/archive/G0_TOPICS_options.md` (runner-ups), `v3/scouting/tech_internet.md` |
 | "To ban kids, they check everyone": age checks in Türkiye (1 Nov) and Greece (1 Jan 2027) | natural future pegs | same |
 | "The virus that throws decoys": hepatitis B drug lets some people stop treatment | strongest science evidence (2 phase 3 trials, NEJM); needs a bigger hook | same |
+| "Nobody got paid to fill the tanks": EU gas storage lowest since 2011, summer/winter price flip (27 Oct 2026) | v4 round 1 winner (89/110); owner moved v4 to tech/AI; peg fades as winter starts | `v4/archive/G0_TOPICS_round1.md` (A), `v4/scouting/money.md` |
+| "Commute to Zoom": NY Fed SR 1211, half of office days without a face-to-face meeting | v4 round 1 (89/110), top shareability; evergreen-ish | `v4/archive/G0_TOPICS_round1.md` (B), `v4/scouting/jobs_life.md` |
+| "Cocoa crashed, your chocolate didn't" | strong price-lag mechanism; Christmas peg | `v4/archive/G0_TOPICS_round1.md` (runner-ups), `v4/scouting/money.md` |
