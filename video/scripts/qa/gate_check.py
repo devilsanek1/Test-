@@ -4,7 +4,7 @@ before G6, instead of review agents). Generic: any entry / composition + its MP4
 
   python3 -I scripts/qa/gate_check.py --mp4 out/v3_g5.mp4 --scenes src/v3/film/scenes.json \
       --captions src/v3/film/captions.json --voice public/v3/voice.wav \
-      [--entry src/entry-v3-film.tsx --comp Film3] [--fps 60] [--only S9] \
+      [--entry src/entry-v3-film.tsx --comp Film3] [--fps 60] [--only SQD] [--seam-comp Film3Seams] \
       [--frame0 "AI is making your|next laptop pricier." --frame0-until 3.37] [--frame0-geom JSON] [--density] [--json report.json]
 
   v2r (src/v2r/film/Film2R.tsx: FILM2R_FRAME0's numbers):
@@ -36,6 +36,15 @@ Checks (FAIL = exit 1; WARN never fails):
              (v2r's 0.3 s passes; a 1.1 s default dive can FAIL a correct render: check it by eye);
              push-through without a bridge = one cut at c; foreground-wipe = NO hard cut (the element covers the
              change; its window c +- dur / 2 may hold cut-like frames, a cut within 1 frame of c is a WARN).
+  seams      (opt-in by data) a matchcut with `"seam": true` (docs/G5_BLOCKING.md §2b, lib/sequence.tsx) joins two
+             sequence builders that draw the IDENTICAL frame, so NO cut is expected: a detected cut within 1 frame of
+             its frame f = ceil(c * fps) is a FAIL. With --seam-comp (and --entry): the film's seam probe composition
+             (4 frames per seam: each side ALONE at f - 1 and at f) is rendered (scripts/render-frames.mjs,
+             --seam-scale, default 0.25) and each pair compared: more than --seam-max (1 %) of the pixels differing
+             by more than 4 L* is a FAIL (the two builders disagree at the seam). Without --seam-comp: a WARN that
+             the frames were not compared.
+  carriers   (opt-in by data: when any transitionIn names a `carrier`) every join names one, A-F (CRAFT.md §a), and
+             at most 2 are F (plain cuts): else FAIL.
   captions   from the JSON, laid out like SkyCaptions (src/lib/Captions.tsx, tokens read from src/lib/theme.ts,
              glyph extents from the caption font): every page's ink and highlight boxes inside the caption band
              (--band, default 290-600) and inside the caption clip (no clipped letters), lines within the safe width
@@ -364,11 +373,12 @@ def film_const(name: str, default: float) -> float:
     return float(m.group(1)) if m else default
 
 
-def transition_model(scenes: list[dict], fps: float) -> tuple[list, list, list]:
+def transition_model(scenes: list[dict], fps: float) -> tuple[list, list, list, list]:
     """From each scene's transitionIn: the expected hard cuts [(label, frame)], the windows [(label, f0, f1)] whose
-    cut-like frames belong to a transition (not listed as extra), and the frames that must NOT cut [(label, frame)]."""
+    cut-like frames belong to a transition (not listed as extra), the frames that must NOT cut [(label, frame)], and the
+    seams [(label, frame)] (a matchcut with "seam": true: no cut, the two builders' frames equal)."""
     fr = lambda t: math.ceil(t * fps - 1e-6)  # noqa: E731
-    expect, windows, no_cut = [], [], []
+    expect, windows, no_cut, seams = [], [], [], []
     hold = film_const("PT_HOLD", PT_HOLD)
     for s in scenes:
         c, sid = s["start"], s["id"]
@@ -376,7 +386,9 @@ def transition_model(scenes: list[dict], fps: float) -> tuple[list, list, list]:
         typ = tr.get("type", "cut")
         dur = tr.get("dur")
         d = float(dur) if dur is not None else TDUR.get(typ, 0.0)  # Film: t.dur ?? FILM_DEFAULT_DUR[t.type]
-        if typ == "push-through":
+        if typ == "matchcut" and tr.get("seam"):
+            seams.append((f"{sid} (seam {c:.2f} s)", fr(c)))
+        elif typ == "push-through":
             # Film.tsx pushThrough: the zoom-in leg (d - hold) * 0.45 before the bridge, the pull-back 0.55 after it
             h = hold if tr.get("bridge") else 0.0
             if h:
@@ -389,7 +401,92 @@ def transition_model(scenes: list[dict], fps: float) -> tuple[list, list, list]:
             windows.append((sid, fr(c - d / 2) - 1, fr(c + d / 2) + 1))
         else:
             expect.append((sid, fr(c)))
-    return expect, windows, no_cut
+    return expect, windows, no_cut, seams
+
+
+# ---------------------------------------------------------------- seams and carriers (docs/G5_BLOCKING.md §2b)
+
+def lstar(rgb: np.ndarray) -> np.ndarray:
+    """CIE L* (0-100) of an sRGB uint8 image (D65; luminance from the linear channels)."""
+    c = rgb.astype(np.float32) / 255.0
+    lin = np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
+    y = lin[..., 0] * 0.2126 + lin[..., 1] * 0.7152 + lin[..., 2] * 0.0722
+    f = np.where(y > (6 / 29) ** 3, np.cbrt(y), y / (3 * (6 / 29) ** 2) + 4 / 29)
+    return 116 * f - 16
+
+
+def seam_probe(a, scenes: list[dict], fps: float) -> None:
+    """Render the film's seam probe (--seam-comp: 4 frames per seam, lib/sequence.tsx seamProbeFrames) and compare
+    each seam's two builders at f - 1 and at f: share of pixels whose L* differs by more than 4."""
+    import shutil  # noqa: PLC0415
+    import tempfile  # noqa: PLC0415
+    from PIL import Image  # noqa: PLC0415
+    fr = lambda t: math.ceil(t * fps - 1e-6)  # noqa: E731
+    seams = [(scenes[i - 1]["id"], s["id"], s["start"]) for i, s in enumerate(scenes) if i and (s.get("transitionIn") or {}).get("type") == "matchcut" and (s.get("transitionIn") or {}).get("seam")]
+    if not seams:
+        return
+    n = 4 * len(seams)
+    out = Path(a.seam_out) if a.seam_out else Path(tempfile.mkdtemp(prefix="seamprobe-"))
+    out.mkdir(parents=True, exist_ok=True)
+    times = ",".join(f"{k / fps:.6f}" for k in range(n))
+    cmd = ["node", "scripts/render-frames.mjs", a.seam_comp, str(out), times, f"--entry={a.entry}", f"--scale={a.seam_scale}", "--concurrency=2"]
+    try:
+        res = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, timeout=1800)
+    except Exception as e:  # noqa: BLE001
+        report("FAIL", "seams", f"the seam probe {a.seam_comp} did not render: {e}")
+        return
+    got = {}
+    for line in res.stdout.splitlines():
+        parts = line.split()
+        if len(parts) == 3:
+            got[round(float(parts[0]) * fps)] = (int(parts[1]), parts[2])
+    if res.returncode or len(got) < n or any(got[k][0] != k for k in range(n) if k in got):
+        report("FAIL", "seams", f"the seam probe {a.seam_comp} gave {len({v[0] for v in got.values()})} of {n} frames (scenes.json has {len(seams)} seams; "
+               f"is the entry's probe built from the same scenes?): {res.stderr.strip()[-300:]}")
+        return
+    bad = 0
+    lines = []
+    for j, (o, i, c) in enumerate(seams):
+        f = fr(c)
+        shares = []
+        for q, frame in ((0, f - 1), (2, f)):
+            x = np.asarray(Image.open(got[4 * j + q][1]).convert("RGB"))
+            y = np.asarray(Image.open(got[4 * j + q + 1][1]).convert("RGB"))
+            dl = np.abs(lstar(x) - lstar(y))
+            share = float((dl > 4).mean())
+            shares.append((frame, share, dl))
+        worst = max(sh for _, sh, _ in shares)
+        msg = f"{o}|{i} at {c:.2f} s: " + ", ".join(f"frame {fm} {sh:.2%}" for fm, sh, _ in shares) + " of the pixels differ > 4 L* between the two builders"
+        if worst > a.seam_max:
+            fm, sh, dl = max(shares, key=lambda z: z[1])
+            ys, xs = np.nonzero(dl > 4)
+            k = W / dl.shape[1]
+            report("FAIL", "seams", msg + f" (max {a.seam_max:.0%}; frame {fm} differs in x {xs.min() * k:.0f}-{xs.max() * k:.0f}, y {ys.min() * k:.0f}-{ys.max() * k:.0f})")
+            bad += 1
+        else:
+            lines.append(msg)
+    if not bad:
+        report("PASS", "seams", f"{len(seams)} seam(s): the two builders draw the same frames (<= {a.seam_max:.0%} of the pixels > 4 L*): " + "; ".join(lines))
+    if not a.seam_out:
+        shutil.rmtree(out, ignore_errors=True)
+
+
+def check_carriers(scenes: list[dict]) -> None:
+    """CRAFT.md §a: every join names its carrier (A-F) and at most 2 are F. Opt-in by data: only when any scene
+    declares a carrier (v1 / v2 never do)."""
+    joins = scenes[1:]
+    if not any("carrier" in (s.get("transitionIn") or {}) for s in joins):
+        return
+    letters = [(s["id"], (s.get("transitionIn") or {}).get("carrier")) for s in joins]
+    missing = [sid for sid, c in letters if c not in tuple("ABCDEF")]
+    plain = [sid for sid, c in letters if c == "F"]
+    summary = " ".join(f"{sid}:{c}" for sid, c in letters)
+    if missing:
+        report("FAIL", "carriers", f"join(s) without a carrier A-F: {', '.join(missing)} ({summary})")
+    elif len(plain) > 2:
+        report("FAIL", "carriers", f"{len(plain)} plain cuts (F; at most 2, CRAFT.md §a): {', '.join(plain)}")
+    else:
+        report("PASS", "carriers", f"every join names its carrier, {len(plain)} plain cut(s): {summary}")
 
 
 # ---------------------------------------------------------------- main
@@ -403,7 +500,7 @@ def main() -> int:
     ap.add_argument("--fps", type=float, default=60)
     ap.add_argument("--entry", help="the film entry (with --comp: check the composition's fps and length)")
     ap.add_argument("--comp")
-    ap.add_argument("--only", help="the MP4 is one panel alone (Film3Shot / <Film only>): its length, no cuts")
+    ap.add_argument("--only", help="the MP4 is one scene alone (Film3Shot / <Film only>): its length, no cuts")
     ap.add_argument("--band", default="290,600", help="caption band y0,y1 (screen px)")
     ap.add_argument("--safe-x", default="90,950", help="caption x range (right rail beyond)")
     ap.add_argument("--max-chars", type=int, default=20)
@@ -412,6 +509,10 @@ def main() -> int:
     ap.add_argument("--frame0-geom", default="{}", help="JSON: the film's own Frame0Text layout over Film.tsx's F0, e.g. "
                     '\'{"size":72,"baselines":[372,452],"captionBaseline":516,"captionScale":0.531,"spoken":"first"}\'')
     ap.add_argument("--cut-min", type=float, default=2.0, help="minimum mean grey difference of a cut (0-255)")
+    ap.add_argument("--seam-comp", help="the film's seam probe composition (e.g. Film3Seams; needs --entry): compare each seam's two builders")
+    ap.add_argument("--seam-scale", type=float, default=0.25, help="render scale of the seam probe (default 0.25)")
+    ap.add_argument("--seam-max", type=float, default=0.01, help="max share of pixels differing > 4 L* at a seam (default 0.01)")
+    ap.add_argument("--seam-out", help="keep the seam probe's frames here (default: a temp dir, deleted)")
     ap.add_argument("--density", action="store_true", help="also run the density meter (scripts/qa/density.py)")
     ap.add_argument("--json", help="write the results here")
     a = ap.parse_args()
@@ -489,7 +590,7 @@ def main() -> int:
         base = float(np.median(neigh)) if len(neigh) else 0.0
         if d[n] >= a.cut_min and d[n] >= 4 * base + 0.5 and d[n] >= d[max(1, n - 1)] and d[n] >= d[min(len(d) - 1, n + 1)]:
             cuts.append(n)
-    expect, windows, no_cut = transition_model([] if a.only else scenes[1:], fps)
+    expect, windows, no_cut, seams = transition_model([] if a.only else scenes[1:], fps)
     miss = []
     used = set()
     for sid, f in expect:
@@ -505,6 +606,16 @@ def main() -> int:
         hit = [c for c in cuts if abs(c - f) <= 1]
         if hit:
             report("WARN", "cuts", f"{sid}: a hard cut at frame {hit[0]}, but its foreground wipe should cover the change (no cut)")
+    seam_cut = []
+    for sid, f in seams:
+        hit = [c for c in cuts if abs(c - f) <= 1]
+        if hit:
+            used.add(hit[0])
+            seam_cut.append(f"{sid}: a cut at frame {hit[0]} (d={d[hit[0]]:.1f})")
+    if seam_cut:
+        report("FAIL", "seams", f"{len(seam_cut)} of {len(seams)} seam(s) show a cut (a seam joins two identical frames): " + "; ".join(seam_cut))
+    elif seams:
+        report("PASS", "seams", f"no cut at the {len(seams)} seam(s): " + ", ".join(f"{sid} frame {f} d={d[f] if f < len(d) else float('nan'):.1f}" for sid, f in seams))
     in_tr = [c for c in cuts if c not in used and any(lo <= c <= hi for _, lo, hi in windows)]
     extra = [c for c in cuts if c not in used and c not in in_tr]
     trs = f"; {len(no_cut)} foreground wipe(s) without a cut" if no_cut else ""
@@ -517,6 +628,15 @@ def main() -> int:
         report("PASS", "cuts", trs.lstrip("; "))
     if extra:
         report("WARN", "cuts", f"{len(extra)} extra cut-like frame(s) inside shots: " + ", ".join(f"{c} ({c / fps:.2f} s, d={d[c]:.1f})" for c in extra[:12]))
+
+    # ---- seams: the two builders' frames (the probe) and the carriers
+    if seams and not a.only:
+        if a.seam_comp and a.entry:
+            seam_probe(a, scenes, fps)
+        else:
+            report("WARN", "seams", f"{len(seams)} seam(s): the two builders' frames were not compared (pass --entry and --seam-comp, e.g. Film3Seams)")
+    if not a.only:
+        check_carriers(scenes)
 
     # ---- captions
     check_captions(caps, a, voice_s, fps)
