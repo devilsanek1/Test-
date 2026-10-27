@@ -1,0 +1,21 @@
+{
+ "name": "reference 1 @6.0 s (the street with the crowd)",
+ "units": "frac",
+ "ground": [
+  {
+   "name": "the street",
+   "roi": [
+    0.28,
+    0.37,
+    0.75,
+    0.68
+   ],
+   "vps": [
+    [
+     0.625,
+     0.3437
+    ]
+   ]
+  }
+ ]
+}

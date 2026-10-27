@@ -405,6 +405,11 @@ export function skyStops(spec: SkySpec, tol = 0.25): SkyStop[] {
   const ys: number[] = [];
   for (let y = m.top; y < m.bottom; y += step) ys.push(y);
   ys.push(m.bottom);
+  // every key and both band edges are stops (a flat band stays exactly flat; a key is hit exactly)
+  const forced = m.curve.ky.concat(m.band ? [m.band.y0, m.band.y1] : []).filter((y) => y > m.top && y < m.bottom);
+  for (const y of forced) if (ys.indexOf(y) < 0) ys.push(y);
+  ys.sort((a, b) => a - b);
+  const isForced = ys.map((y) => forced.indexOf(y) >= 0);
   const labs = ys.map((y) => curveAt(m.curve, y));
   const rgbs = labs.map((l) => headroom(oklabToRgbInGamut(l), room));
   const out: number[] = [0];
@@ -422,7 +427,7 @@ export function skyStops(spec: SkySpec, tol = 0.25): SkyStop[] {
   };
   while (i < ys.length - 1) {
     let j = i + 1;
-    while (j + 1 < ys.length && fits(i, j + 1)) j++;
+    while (j + 1 < ys.length && !isForced[j] && fits(i, j + 1)) j++;
     out.push(j);
     i = j;
   }

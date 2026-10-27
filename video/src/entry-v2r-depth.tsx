@@ -62,10 +62,11 @@ const FAR_SRC = [CM.brickLight, CM.brick, CM.stucco, CM.limestone];
  *  front row. Same shapes in both modes; only the colours and the detail change. */
 function farRows(): Bld[] {
   const out: Bld[] = [];
+  // the farther rows stand higher (a city rising behind: RIVERSIDE's stacking upward), so each shows above the next
   const rows: {plane: number; w: [number, number]; top: [number, number]; win: number}[] = [
-    {plane: 4, w: [14, 26], top: [908, 930], win: 0},
-    {plane: 3, w: [24, 44], top: [850, 896], win: 5},
-    {plane: 2, w: [44, 82], top: [796, 858], win: 8},
+    {plane: 4, w: [14, 26], top: [796, 836], win: 0},
+    {plane: 3, w: [24, 44], top: [834, 876], win: 5},
+    {plane: 2, w: [44, 82], top: [884, 930], win: 8},
   ];
   for (const row of rows) {
     const r = rng(`demo/far/${row.plane}`);

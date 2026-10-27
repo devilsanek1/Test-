@@ -1,0 +1,162 @@
+{
+ "name": "depth demo canal (DepthDemo2R)",
+ "units": "px",
+ "air_hex": "#F6D9BC",
+ "planes": [
+  {
+   "name": "quay, near",
+   "plane": -1,
+   "role": "ground",
+   "boxes": [
+    [
+     0,
+     1700,
+     1080,
+     1900
+    ]
+   ]
+  },
+  {
+   "name": "quay",
+   "plane": -0.5,
+   "role": "ground",
+   "boxes": [
+    [
+     0,
+     1300,
+     820,
+     1690
+    ]
+   ]
+  },
+  {
+   "name": "water",
+   "plane": -0.3,
+   "role": "ground",
+   "boxes": [
+    [
+     0,
+     1116,
+     1080,
+     1272
+    ]
+   ]
+  },
+  {
+   "name": "the wing (the subject's plane)",
+   "plane": 0,
+   "role": "subject",
+   "boxes": [
+    [
+     372,
+     662,
+     1080,
+     1090
+    ]
+   ]
+  },
+  {
+   "name": "far city, front row",
+   "plane": 2,
+   "boxes": [
+    [
+     0,
+     935,
+     225,
+     1088
+    ]
+   ]
+  },
+  {
+   "name": "far city, back rows",
+   "plane": 3,
+   "boxes": [
+    [
+     0,
+     878,
+     225,
+     900
+    ]
+   ]
+  },
+  {
+   "name": "far city, the farthest strip",
+   "plane": 4,
+   "boxes": [
+    [
+     0,
+     838,
+     140,
+     848
+    ]
+   ]
+  }
+ ],
+ "silhouettes": [
+  {
+   "name": "the wing's west edge (the lit fin)",
+   "tier": "mass",
+   "poly": [
+    [
+     330,
+     610
+    ],
+    [
+     1080,
+     610
+    ],
+    [
+     1080,
+     1092
+    ],
+    [
+     330,
+     1092
+    ]
+   ],
+   "roi": [
+    [
+     290,
+     600,
+     380,
+     1080
+    ]
+   ]
+  },
+  {
+   "name": "her",
+   "tier": "A",
+   "grab": [
+    575,
+    955,
+    625,
+    1108
+   ],
+   "roi": [
+    [
+     555,
+     945,
+     645,
+     1108
+    ]
+   ]
+  }
+ ],
+ "ground": [
+  {
+   "name": "our quay",
+   "roi": [
+    0,
+    1290,
+    1080,
+    1920
+   ],
+   "vps": [
+    [
+     560,
+     980
+    ]
+   ]
+  }
+ ]
+}
