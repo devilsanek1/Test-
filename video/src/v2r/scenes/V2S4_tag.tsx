@@ -1,13 +1,14 @@
 // V2S4_tag.tsx (lane L3, V2S4 STORY part): her name tag (TREATMENT §5 S4 "Texts on objects", §8 A6; plan_L3 §1c;
 // map.ts S4.nameTag). A paper card with a loose ink outline, screen-locked above her (she is screen-fixed while the
 // world trucks), tied to her head by a thin ink leader. Drawn inside the push camera (gone before the push matters).
-//   15.07 "She"  the leader pens up out of her head and the card pops at its top edge (a 4 % spring, its top never
-//                above y 600); "Sofia Liguori" (44 px, faux weight 0.9) and the three role lines pen on fast (by 15.55).
-//   16.60        a flap unfolds: the card extends down to y 870 on a spring (the old bottom stays as a soft crease), the
+//   15.07 "She"  the leader pens up out of her head and the card pops at its top edge (a 4 % spring); the card is the
+//                plan's y 600-764 set 8 px lower (608-772) so its top never lies on the sky / gold-band edge (a tangent);
+//                "Sofia Liguori" (44 px, faux weight 0.9) and the three role lines pen on fast (by 15.55).
+//   16.60        a flap unfolds: the card extends down to y 878 on a spring (the old bottom stays as a soft crease), the
 //                leader shortens; "3 years ·" / "resigned Oct 2026" pen on "and told", the source on "the BBC" (17.08).
 //   18.80        the whole tag pops off (shrinks to its centre in 0.12 s), the leader with it.
 // Text left-aligned at x 612 (card x 594-876). No TEXT in the right rail (x > 780 below y 840): the two credit lines
-// are short. It never covers her (card bottom 870 < her head top 900). Words: K3 `TXT_NAME_TAG` (never retyped).
+// are short. It never covers her (card bottom 878 < her head top 900). Words: K3 `TXT_NAME_TAG` (never retyped).
 import React from 'react';
 import {CM, INK_PX} from '../palette';
 import {Fill} from '../../lib/Fill';
@@ -24,9 +25,11 @@ import {S4_BEATS, S4_HER, S4_HER_HEAD} from './V2S4_rig';
 
 const X0 = 594;
 const X1 = 876;
-const Y0 = MAP.S4.nameTag.y0; // 600
-const Y1A = 764; // build 1 bottom
-const Y1B = 870; // build 2 bottom
+/** The card sits 8 px under the map's y 600 so its top edge never lies ON the sky / gold-band edge (a tangent). */
+const DY = 8;
+const Y0 = MAP.S4.nameTag.y0 + DY; // 608
+const Y1A = 764 + DY; // build 1 bottom
+const Y1B = 870 + DY; // build 2 bottom (her head top is y 900)
 const TX = 612;
 const T1 = S4_BEATS.tagBuild1; // 15.07
 const T2 = S4_BEATS.tagBuild2; // 16.60
@@ -48,14 +51,14 @@ const CARD_END_X = 702;
 
 type Line = {text: string; size: number; y: number; at: number; dur: number; weight?: number};
 const LINES: Line[] = [
-  {text: TXT_NAME_TAG.name, size: 44, y: 644, at: T1 + 0.08, dur: 0.18, weight: 0.9},
-  {text: TXT_NAME_TAG.role[0], size: 30, y: 680, at: T1 + 0.21, dur: 0.13},
-  {text: TXT_NAME_TAG.role[1], size: 30, y: 713, at: T1 + 0.3, dur: 0.11},
-  {text: TXT_NAME_TAG.role[2], size: 30, y: 746, at: T1 + 0.38, dur: 0.1},
-  {text: TXT_NAME_TAG.more[0], size: 30, y: 784, at: T2 + 0.08, dur: 0.1},
-  {text: TXT_NAME_TAG.more[1], size: 30, y: 817, at: T2 + 0.16, dur: 0.16},
-  {text: CREDIT[0], size: 18, y: 842, at: 17.02, dur: 0.12},
-  {text: CREDIT[1], size: 18, y: 861, at: 17.1, dur: 0.1},
+  {text: TXT_NAME_TAG.name, size: 44, y: 644 + DY, at: T1 + 0.08, dur: 0.18, weight: 0.9},
+  {text: TXT_NAME_TAG.role[0], size: 30, y: 680 + DY, at: T1 + 0.21, dur: 0.13},
+  {text: TXT_NAME_TAG.role[1], size: 30, y: 713 + DY, at: T1 + 0.3, dur: 0.11},
+  {text: TXT_NAME_TAG.role[2], size: 30, y: 746 + DY, at: T1 + 0.38, dur: 0.1},
+  {text: TXT_NAME_TAG.more[0], size: 30, y: 784 + DY, at: T2 + 0.08, dur: 0.1},
+  {text: TXT_NAME_TAG.more[1], size: 30, y: 817 + DY, at: T2 + 0.16, dur: 0.16},
+  {text: CREDIT[0], size: 18, y: 842 + DY, at: 17.02, dur: 0.12},
+  {text: CREDIT[1], size: 18, y: 861 + DY, at: 17.1, dur: 0.1},
 ];
 
 export const S4Tag: React.FC = () => {
@@ -73,10 +76,10 @@ export const S4Tag: React.FC = () => {
   const outer = off > 0 ? mat.about(mat.scale(1 - off), cx, cy) : mat.I;
   const pop = mat.about(mat.scale(Math.max(0.05, s1)), cx, Y0);
   const card = `M${P(X0, Y0)}L${P(X1, Y0)}L${P(X1, bottom)}L${P(X0, bottom)}Z`;
-  // a loose outline: corner overshoots everywhere except UP past the card's top (y 600 is the flat sky's edge)
+  // a loose outline: corner overshoots everywhere except UP past the card's top (it stays under the flat sky's y 600)
   const lo = {jitter: 0.5, drift: 0.12, breaks: false};
   const outline = [
-    line(X0, Y0 + 1.5, X1, Y0 + 1.5, {...lo, seed: 's4tagT', over: [5, 3], drift: 0, bow: 0.3}),
+    line(X0, Y0, X1, Y0, {...lo, seed: 's4tagT', over: [5, 3], drift: 0, bow: 0.3}),
     line(X1, Y0, X1, bottom, {...lo, seed: 's4tagR', over: [0, 5]}),
     line(X1, bottom, X0, bottom, {...lo, seed: 's4tagB', over: [4, 6]}),
     line(X0, bottom, X0, Y0, {...lo, seed: 's4tagL', over: [3, 0]}),

@@ -57,9 +57,7 @@ Format: **rule** — why / evidence (video, date).
   (hundreds of buildings shrinking into haze), a landmark that is huge yet far, tiny anchors (figures, birds, airships),
   the drop below the camera, a big sky with huge clouds, many depth layers. Recipe: `docs/look/CINEMATIC_GUIDE.md`
   ("Scale cues"). — ("another point in the Arcane shot is how great the scale feels", v3, 2026-10-26).
-- **Arcane references: ENVIRONMENT ONLY, few and high-confidence** (buildings, cityscapes, interiors as spaces, wides;
-  no faces or people). Build on our own videos incrementally (angles, composition, light, camera), never reinvent.
-  Guide with sketches: `docs/look/CINEMATIC_GUIDE.md`. — ("targeted with high confidence", 2026-10-26).
+- **Arcane references: ENVIRONMENT ONLY** (cities, interiors as spaces, wides; no people), few and high-confidence; build on our own videos. — (2026-10-26).
 - **The owner's favourite Arcane shot: the pull-back crane reveal** (S1E1 rooftop: the camera pulls back and rises until
   the sisters are tiny figures overlooking a vast city; "it has pretty much everything"): the model for a film's big reveal
   (`docs/look/CINEMATIC_GUIDE.md`). — (v3, 2026-10-26).
@@ -158,7 +156,9 @@ Format: **rule** — why / evidence (video, date).
   an initial intermediate step", v3 G5, 2026-10-26).
 - **EFFORT IS ALWAYS MAX:** every workflow agent passes `effort: 'max'`, every helper session runs at /effort max; a lazy
   video from a low effort setting is our failure. — ("the key rule is we need to ensure the effort is MAX!", v2, 2026-10-27).
-- **NO LIMIT ON TOKENS for creative output; never trade quality for savings.** Ideas, scripts, judged competing ideas,
+- **The weekly limit is the real budget: finishing the video comes first** (using up to 100 % of the week is fine if the video
+  is completed). Track the spend hourly (helpers' `cost_usd`, workflow tokens), budget every lane, finish before polishing. — (v2, 2026-10-27).
+- **NO LIMIT ON TOKENS for creative output (inside the weekly limit); never trade quality for savings.** Ideas, scripts, judged competing ideas,
   design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the
   quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
   reviewing what will still change, early polish). — (2026-10-25; owner, 2026-10-26).
