@@ -1,38 +1,128 @@
-// V2S1 helper (lane L1): HER and THE GHOST ROW (TREATMENT section 3-4; map s1RowAt / S1_ROW / GHOST_POP; the shot
+// V2S1 helper (lane L1): HER and THE GHOST ROW (TREATMENT sections 3-4; map s1RowAt / S1_ROW / GHOST_POP; the shot
 // clock V2S1_clock). She walks out of the glass doors at 0.97 and strolls west; on each clause an outline copy of her,
 // greyer each time, pops one step ahead; on "life" the whole row takes ONE step and three bare outlines pop down the bend.
-// STUB: the kit's Her + GhostRow on the shared clock (the exports below are final; the builder replaces the bodies).
-import React from 'react';
+// Every member is the SAME drawing (V2S1_row_fig: her long belted coat, collar, low bun, sleeves, a walking scissor), so
+// the copies read as her, never as gowns: G1 = her now (dark plum head) -> G6 white-silver with a scarf; the coats
+// paper with the film's ONE closed outline (2.2 px); legs and shoes walk below a mid-calf hem in lockstep (s1Step).
+import React, {createContext, useContext} from 'react';
 import {useTime, clamp} from '../../lib/time';
 import * as MAP from '../world/map';
-import {Her, GhostRow, strideFor} from '../kit/cast';
-import {C, s1Step, s1HerXAt, S1_STEP_PX, HER_COAT_AT} from './V2S1_clock';
+import {CM} from '../palette';
+import {HER} from '../kit/cast/Her';
+import {drawn} from '../kit/cast/gait';
+import {C, s1Step, s1HerXAt, HER_COAT_AT} from './V2S1_clock';
+import {FigSpec, RowFigure} from './V2S1_row_fig';
 
-const STRIDE = strideFor(S1_STEP_PX, 170, 'rear34');
+// ---------------------------------------------------------------- the looks (one model sheet)
+
+/** Her (the kit's HER model sheet colours): plum head + low bun, the teal coat (hers only), plum trousers, cream tote,
+ *  the potted desk plant under her left arm. */
+export const herSpec = (coat: string): FigSpec => ({
+  kind: 'her',
+  coat,
+  head: HER.hairColor,
+  legs: HER.trousers,
+  shoes: HER.shoes,
+  skin: HER.skin,
+  tote: HER.tote,
+  plant: {pot: CM.brick, leaf: CM.sage},
+});
+
+/** How the ghosts' legs and shoes are valued (the 216 px read test, scratch b_row/r4/legs_cmp.png): 'clamp' (chosen) = the head value
+ *  down to G3's grey-silver and no paler (G1 dark like her trousers, G2 mid, G3-G6 #A9A5B5), shoes one step darker;
+ *  'head' = the head value all the way (G5-G6 near-white legs); 'mid' = one fixed mid grey for every ghost. */
+export type LegVariant = 'clamp' | 'head' | 'mid';
+export const RowDevCtx = createContext<{legs: LegVariant}>({legs: 'clamp'});
+
+const GH = CM.ghostHead;
+function legValues(age: number, v: LegVariant): {legs: string; shoes: string} {
+  if (v === 'head') return {legs: GH[age - 1], shoes: GH[Math.max(0, age - 2)]};
+  if (v === 'mid') return {legs: GH[1], shoes: GH[0]};
+  const i = Math.min(age - 1, 2);
+  return {legs: GH[i], shoes: GH[Math.max(0, i - 1)]};
+}
+
+/** G1-G6: paper coat, the whole-head value, G4+ a grey-silver scarf and a softer back. */
+export const ghostSpec = (age: number, v: LegVariant = 'clamp'): FigSpec => {
+  const a = Math.max(1, Math.min(6, Math.round(age)));
+  return {
+    kind: 'ghost',
+    coat: CM.ghostPaper,
+    head: GH[a - 1],
+    ...legValues(a, v),
+    // the scarf one fixed grey-silver (G3's head value): one step under G4's silver, and it still reads at 216 px on G5-G6's white
+    scarf: a >= 4 ? GH[2] : undefined,
+    soft: a >= 4 ? (a - 3) / 3 : 0,
+  };
+};
+/** G4 a slightly shorter stride, G5-G6 shorter (same cadence: lockstep). */
+export const ghostStride = (age: number) => (age >= 5 ? 0.78 : age >= 4 ? 0.9 : 1);
+/** O1-O3: ink only, no fill, no age cue. */
+export const OUTLINE_SPEC: FigSpec = {kind: 'outline'};
+
+/** Ink on screen: her 3.4 (130-240 px), the ghosts and outlines 2.2 (K1 ghostInkPx). */
+const HER_INK = 3.4;
+const GHOST_INK = CM.ghostInkPx;
+
+/** Her look back at W over her right shoulder (5.59, 0.22 s). */
+const lookBack = (t: number) => {
+  const u = clamp((drawn(t, 12) - MAP.S1_HER_LOOK_BACK_AT) / 0.22);
+  return u * u * (3 - 2 * u);
+};
+
+// ---------------------------------------------------------------- the slots
 
 /** Her on the far towpath (from the step-out, 0.97) and the ghost row (from 2.00). The `towpath` slot. */
 export const S1Row: React.FC = () => {
   const t = useTime();
+  const {legs} = useContext(RowDevCtx);
   if (t < C.steppingOut) return null;
-  const pose = MAP.s1RowAt(t)[0];
+  const poses = MAP.s1RowAt(t);
   const step = s1Step(t);
-  const x = s1HerXAt(t);
-  const look = t >= MAP.S1_HER_LOOK_BACK_AT ? clamp((t - MAP.S1_HER_LOOK_BACK_AT) / 0.22) : 0;
+  const members = MAP.S1_ROW.map((m, i) => ({m, p: poses[i]})).filter(({m, p}) => m.kind !== 'her' && p.visible);
+  // far members first (the bend's far end is screen-left): they sit behind
+  members.sort((a, b) => a.p.x - b.p.x);
+  const her = poses[0];
   return (
     <>
-      {t >= C.ghostPops[0] ? <GhostRow step={step} stride={STRIDE} /> : null}
-      {look > 0 ? (
-        <Her x={x} y={pose.feetY} h={pose.h} pose="lookBack" look={look} view="rear34" step={step} stride={STRIDE} plant coatAt={HER_COAT_AT} />
-      ) : (
-        <Her x={x} y={pose.feetY} h={pose.h} pose="walk" view="rear34" step={step} stride={STRIDE} plant coatAt={HER_COAT_AT} />
-      )}
+      {members.map(({m, p}) => {
+        const age = m.kind === 'ghost' ? Number(m.id.slice(1)) : 0;
+        return (
+          <RowFigure
+            key={m.id}
+            seed={`s1row/${m.id}`}
+            spec={m.kind === 'ghost' ? ghostSpec(age, legs) : OUTLINE_SPEC}
+            x={p.x}
+            y={p.feetY}
+            h={p.h}
+            step={step}
+            stride={m.kind === 'ghost' ? ghostStride(age) : 1}
+            inkPx={GHOST_INK}
+            at={m.popT ?? undefined}
+            knockout={m.kind === 'outline'}
+            misregX={0.3}
+          />
+        );
+      })}
+      <RowFigure seed="s1row/her" spec={herSpec(CM.hero)} x={s1HerXAt(t)} y={her.feetY} h={her.h} step={step} turn={lookBack(t)} inkPx={HER_INK} />
     </>
   );
 };
 
-/** Her behind the glass doors (t < 0.97; frame 0 and the loop underlay included). The `behindDoor` slot. */
+/** Her behind the glass doors (t < 0.97; frame 0 and the loop underlay included): mid-step at 153 px, her coat paper
+ *  until the flood's last frame (HER_COAT_AT). The `behindDoor` slot. */
 export const S1HerBehindDoor: React.FC = () => {
   const t = useTime();
   if (t >= C.steppingOut) return null;
-  return <Her x={s1HerXAt(t)} y={MAP.S1_HER_STEP_OUT.feetFrom} h={MAP.S1_SHEET.herHAtFacade} pose="walk" view="rear34" step={s1Step(t)} stride={STRIDE} plant coatAt={HER_COAT_AT} />;
+  return (
+    <RowFigure
+      seed="s1row/her"
+      spec={herSpec(t < HER_COAT_AT ? CM.white : CM.hero)}
+      x={s1HerXAt(t)}
+      y={MAP.S1_HER_STEP_OUT.feetFrom}
+      h={MAP.S1_SHEET.herHAtFacade}
+      step={s1Step(t)}
+      inkPx={HER_INK}
+    />
+  );
 };
