@@ -459,7 +459,14 @@ const MugBody: React.FC<{x: number; top: number; t?: number; at?: At; seed?: str
       <Ink d={line(x0, top, x0, bot - 14, {over: [0, 0], seed: `${seed}/mg1`}) + line(x1, top, x1, bot - 14, {over: [0, 0], seed: `${seed}/mg2`}) + `M${x0} ${bot - 18}Q${x0} ${bot} ${x0 + 18} ${bot}L${x1 - 18} ${bot}Q${x1} ${bot} ${x1} ${bot - 18}`} at={at} width={W_MID} />
       <Fill d={blob((x0 + x1) / 2, top, (x1 - x0) / 2, 11, {seed: `${seed}/rim`})} color={EMBER.anchor} at={fillAt(at, 0.04)} offset={false} />
       <Ink d={ellipse((x0 + x1) / 2, top, (x1 - x0) / 2, 11, {seed: `${seed}/rimI`})} at={b(at, 0.04)} width={W_MID} />
-      {steamOn && !isClean() && (at === undefined || tNow >= at + 0.3) ? <Ink d={steam(x0 + w * 0.33, 0) + steam(x0 + w * 0.67, 2.1)} width={W_THIN} /> : null}
+      {steamOn && (at === undefined || tNow >= at + 0.3) ? (
+        isClean() ? (
+          // the clean pen: the steam stays (subtle means lighter, never removed: CRAFT §b), as a light wisp, never a dark squiggle
+          <Ink thing d={steam(x0 + w * 0.33, 0) + steam(x0 + w * 0.67, 2.1)} width={W_THIN} color={EMBER.card} />
+        ) : (
+          <Ink d={steam(x0 + w * 0.33, 0) + steam(x0 + w * 0.67, 2.1)} width={W_THIN} />
+        )
+      ) : null}
     </>
   );
 };

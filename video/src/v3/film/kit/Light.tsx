@@ -223,10 +223,19 @@ export type SunLight = {kind: 'sun'; toward: number; el: number};
 export type SkyLight = {kind: 'sky'; from?: number};
 export type Light = PointLight | SunLight | SkyLight;
 
-/** Multiply tints (light.md C.3): one per job, per set. `ambient` = one step down outside the light (the room's
- *  falloff), `form` = an object's side away from the key, `cast` = a cast shadow, `contact` = the strip where a thing
- *  touches the ground. The half step (penumbra) is `step(tint, 0.5)`. */
+/** Multiply tints (CRAFT §d.3): per set, `form` (an object's side away from the key), `cast` (a cast shadow) and
+ *  `contact` (the strip where a thing touches the ground) are ONE tint family: three strengths of one hue (`tintFamily`).
+ *  `ambient` (one step down outside the light: the room's falloff) is the light's absence, not a shadow: it keeps the
+ *  surface's hue within ~10 deg. The half step (penumbra) is `step(tint, 0.5)`. */
 export type Tints = {ambient: string; form: string; cast: string; contact: string};
+
+/** One shadow family: `base` at three strengths (0 = white = no change, 1 = the base). */
+export const tintFamily = (base: string, k: {form: number; cast: number; contact: number}, ambient: string): Tints => ({
+  ambient,
+  form: mixHex('#FFFFFF', base, k.form),
+  cast: mixHex('#FFFFFF', base, k.cast),
+  contact: mixHex('#FFFFFF', base, k.contact),
+});
 
 export type LightRig = {
   /** 'nook' | 'shop' | 'street' | 'roof' (or a lane's own). */
@@ -261,6 +270,8 @@ export type LightRig = {
   spill: string;
   /** A source's own core (bulb, lantern, lamp mouth: L* 95-98, <= 1 % of the frame). */
   source: string;
+  /** Sky-facing snow caps at dusk (CRAFT §d.2: L* 87-89, thin, never above the pool core: a sky at ~45 lights them). */
+  snowCap: string;
   /** Default form shade: fraction of the object's extent (0.25-0.4) and, for a backlit key, 'down' (tops lit). */
   form: {frac: number; backlit?: boolean};
   /** Penumbra widths (px): contact, cast [base, tip], a hole's soft edge, the lamp wash. */
@@ -269,12 +280,16 @@ export type LightRig = {
   wash?: Ellipse;
 };
 
-/** The warm interior tints (light.md C.3). The ambient turns the wall only 10 deg (peach stays peach: wall 91 -> 82,
- *  desk 68 -> 61); form and cast turn toward rose / plum (the coloured shadows); contact lightened from #C8A3B0 so a
- *  contact strip on the AMBIENT desk stays >= L* 45 (the ladder's floor). */
-export const TINT_ROOM: Tints = {ambient: '#EEDED8', form: '#EEDCDC', cast: '#E3CCD3', contact: '#CEACB8'};
-/** The dusk exterior tints: snow 93 -> 78 violet (form, cast), contact deeper; ambient = the open snow 93 -> 83. */
-export const TINT_DUSK: Tints = {ambient: '#DFE1ED', form: '#D3CFEA', cast: '#D3CFEA', contact: '#B4AED8'};
+/** The warm interior family: rose base #CBA6A6 (h 21) at 0.40 / 0.55 / 0.90 = form #EADBDB, cast #E2CECE, contact
+ *  #D0AFAF. Measured on the room's surfaces (CRAFT §d.3 targets): wall form / cast / contact dL* -10 / -14 / -23, desk
+ *  -7 / -10 / -17, pool -8..-9 / -11..-13 / -19..-21; warm hues turn 4-17 deg toward rose, chroma kept; a contact strip
+ *  on the AMBIENT desk stays at L* 46.6 (the ladder's 45+; the retro's #C8A3B0 at full strength gave 44). The ambient
+ *  #EEDED8 turns the wall only 10 deg (peach stays peach: wall 91 -> 82, desk 68 -> 61). */
+export const TINT_ROOM: Tints = tintFamily('#CBA6A6', {form: 0.4, cast: 0.55, contact: 0.9}, '#EEDED8');
+/** The dusk exterior family: violet base #B4AED8 at 0.50 / 0.58 / 1.0 = form #DAD6EC, cast #D4D0E8 (CRAFT's #D3CFEA),
+ *  contact #B4AED8: on the ambient snow (83) -11 / -13 / -23. The ambient #DFE1ED = the open snow 93 -> 83
+ *  (tintFor(EMBER.snow, '#C9CFE6')). */
+export const TINT_DUSK: Tints = tintFamily('#B4AED8', {form: 0.5, cast: 0.58, contact: 1}, '#DFE1ED');
 
 const BASE = {
   rim: EMBER.core,
@@ -283,6 +298,7 @@ const BASE = {
   window: '#FFD27A',
   spill: '#EBD8C8',
   source: '#FFF4DA',
+  snowCap: '#D9DFF2',
 };
 
 /** Where the kit Lamp's mouth is (the shade's lit ellipse), from its pose (Nook's LampPose: head + rot + scale). */
@@ -305,7 +321,10 @@ export function poolFor(pose: {head: Pt; rot: number; scale?: number}, groundY: 
 
 /** The nook's rig (O1 / S7 / S12 / S13 / S15 / S16): the desk lamp is THE key (a point light on screen-left, its pool
  *  on the desk); the window is a cool fill that only colours (shade tints lean rose / plum; Rim `from="fill"`); its
- *  glass is a source (never darkened). Pass the shot's lamp pose and pool (NOOK_LAYOUT[variant], or a lane's own). */
+ *  glass is a source (never darkened). Pass the shot's lamp pose and pool (NOOK_LAYOUT[variant], or a lane's own).
+ *  NO wall wash by default: v3's anglepoise points down and always stands in front of the window, so a wash's edge
+ *  wraps round the glass and reads as the WINDOW glowing (tried in the demo); the room's falloff is the ambient step,
+ *  the pool and the lit objects. Pass `wash` only for a lamp against an open wall (a table lamp). */
 export function nookRig(L: {lamp: {head: Pt; rot: number; scale?: number; base: Pt}; pool: Ellipse; glass?: {x: number; y: number; w: number; h: number}}, o: {wash?: Ellipse | null} = {}): LightRig {
   const m = lampMouth(L.lamp);
   const foot: Pt = [m.c[0], L.pool.cy];
@@ -323,7 +342,7 @@ export function nookRig(L: {lamp: {head: Pt; rot: number; scale?: number; base: 
     ...BASE,
     form: {frac: 0.34},
     soft: {contact: 3.5, cast: [2, 12], hole: 12, wash: 26},
-    wash: o.wash === null ? undefined : o.wash ?? {cx: m.c[0] + 30, cy: m.c[1] - 60, rx: 380, ry: 300},
+    wash: o.wash ?? undefined,
   };
 }
 
@@ -428,6 +447,8 @@ const LitCtx = createContext<LitV>({rig: RIGS.nook, off: false});
 export const Lit: React.FC<{rig: LightRig; off?: boolean; children?: React.ReactNode}> = ({rig, off = false, children}) => <LitCtx.Provider value={{rig, off}}>{children}</LitCtx.Provider>;
 export const useRig = () => useContext(LitCtx).rig;
 const useOff = () => useContext(LitCtx).off;
+/** True inside `<Lit off>` (the A side of an A/B render): a panel's own light-dependent colours switch back with it. */
+export const useLightOff = useOff;
 
 // ================================================================= light directions
 
@@ -1159,10 +1180,11 @@ export const Rim: React.FC<{d?: string; of?: React.ReactNode; c?: Pt; size?: [nu
 
 // ================================================================= checks (light.md D: what the gate check measures)
 
-/** Value checks of a rig against light.md's ladder, for the surfaces a set uses (empty = OK). Pools must sit >= 4 L*
- *  above their ground in ambient; shadow colours (surface x tint, stacked on the ambient where it applies) keep
- *  C* >= 8 (on surfaces that have it) and L* >= 35 (on surfaces above it); lit windows L* 85-92; sources >= 95;
- *  ellipse holes / the wash keep their edge out of the caption band (y 290-600). */
+/** Value checks of a rig against CRAFT §d's ladder, for the surfaces a set uses (empty = OK). Pools must sit >= 4 L*
+ *  above their ground in ambient; form / cast / contact are one family (hues within 6 deg); shadow colours (surface x
+ *  tint, stacked on the ambient where it applies) keep C* >= 8 (on surfaces that have it) and L* >= 35 (except on an
+ *  anchor-dark surface, L* < 45: its shadows take one step below); lit windows L* 85-92; sources >= 95; snow caps 87-89
+ *  and under the pool's inner step; ellipse holes / the wash keep their edge out of the caption band (y 290-600). */
 export function lightProblems(rig: LightRig, surfaces: Record<string, string>, o: {ground?: string; band?: [number, number]; holes?: Ellipse[]} = {}): string[] {
   const out: string[] = [];
   const L = (h: string) => lch(h).L;
@@ -1173,6 +1195,12 @@ export function lightProblems(rig: LightRig, surfaces: Record<string, string>, o
     if (L(po) < L(amb) + 4) out.push(`pool outer ${po} L${L(po).toFixed(1)} < ground ${amb} L${L(amb).toFixed(1)} + 4`);
     if (L(pi) < L(po) + 3) out.push(`pool inner ${pi} L${L(pi).toFixed(1)} not a step above the outer`);
   }
+  const hues = (['form', 'cast', 'contact'] as (keyof Tints)[]).map((j) => lch(rig.tints[j]).h);
+  const spread = Math.max(...hues.map((a) => Math.max(...hues.map((b) => Math.abs(((a - b + 540) % 360) - 180)))));
+  if (spread > 6) out.push(`form / cast / contact are not one family (hues ${hues.map((h) => h.toFixed(0)).join(' / ')})`);
+  const cap = L(rig.snowCap);
+  if (cap < 87 || cap > 89.5) out.push(`snow cap ${rig.snowCap} L${cap.toFixed(1)} outside 87-89`);
+  if (cap > L(rig.pool[1])) out.push(`snow cap L${cap.toFixed(1)} above the pool core L${L(rig.pool[1]).toFixed(1)}`);
   for (const [name, s] of Object.entries(surfaces)) {
     const base = lch(s);
     const amb = multiply(s, rig.tints.ambient);

@@ -221,16 +221,17 @@ sketch pen (v1, v2 and v2r frames checked pixel-identical before and after).
   light stroke; `hatch`, `scribbleMass`, `wallTicks`, `crownTicks`, `speedLines`, `scribble`, `cross` draw nothing.
 - `<Ink>`: uniform round-capped strokes (no taper, width noise, open contours or loosening on the un-build); width and
   colour from the tier (below). `<Fill>`: registered exactly (authored offsets included); calmer tiers recoloured.
-- Kit texture that is strokes is gone under the clean pen: `DeskGrain`, `WallMarks`, the frost star ticks, the mug's
-  ink steam, the NEW laptop's sparkle crosses, a flying stick's speed ticks, a small stick's pin row; the laptop's key
-  rows are flat tone-on-tone caps (`heroDeep`; the S8 close-up keeps its anchor caps).
+- Kit texture that is strokes is gone under the clean pen: `DeskGrain`, `WallMarks`, the frost star ticks, the NEW
+  laptop's sparkle crosses, a flying stick's speed ticks, a small stick's pin row; the laptop's key rows are flat
+  tone-on-tone caps (`heroDeep`; the S8 close-up keeps its anchor caps). Life stays, lighter (CRAFT: subtle never means
+  removed): the mug's steam is a light wisp (`EMBER.card`), not a dark squiggle.
 
 ## The tiers (by story role, never by depth)
 
 | tier | line (screen px, at camera rest) | fill | idle motion |
 |---|---|---|---|
 | `subject` (A: the beat's 1-3 objects) | the only full outline: authored x0.88, 1.2-3.0 (3.4 -> 3.0, 2.2 -> 1.9, 1.6 -> 1.4) in the object's own shade (tone L* -35, floor 16; no tone: `#4B2A1E`); an outline given `inside` is drawn inside its fill at 2x (the silhouette is the fill's clean edge) | as authored | x1 |
-| `support` (B: supporting life, story objects off-beat) | none, unless the scope says `lines` (close values touch; the mascot): same-hue x0.53, 1.4-2.2 at tone L* -20 (no tone: `#5A2E1E` at 42 %) | value pulled 8 % to the background's, chroma x0.9 (<= 40), hue kept | x0.5 |
+| `support` (B: supporting life, story objects off-beat) | none, unless the scope says `lines` (close values touch; the mascot; a line-drawn figure): same-hue x0.53, 1.6-2.2 at tone L* -20 (no tone: `#5A2E1E` at 42 %) | value pulled 8 % to the background's, chroma x0.9 (<= 40), hue kept | x0.5 |
 | `environment` (C: the room, sets, dressing, street, town, weather) | none; strokes marked `thing` (wires, rails, frames, a bird's V) as hairlines 1.2-1.6 (`#5A2E1E` at 34 %, about dL* 15) | value pulled 16 % to the background's, chroma x0.85 (<= 36), hue kept | x0.4 |
 
 On every tier: a LIGHT line (ink lighter than L* 64: glints, snow edges) stays light and <= 1.8 px; a GRAPHIC stroke

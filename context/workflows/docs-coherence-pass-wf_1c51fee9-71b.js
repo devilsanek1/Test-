@@ -43,7 +43,7 @@ to the detailed doc that holds the numbers, and an explicit "this page wins over
 in finals, misregistered fills, equal-weight clutter, an events-per-second quota, a new place per chart, plain cuts by default). Mark pending items as
 pending (the pipeline proposal awaiting the owner's yes). Do not edit any other file yet. ${GIT}
 REPORT: the path and a 6-line summary.`, { label: 'direction', phase: 'Sweep', effort: 'max' }),
-  agent(`${CTX}
+  () => agent(`${CTX}
 YOU ARE THE CONFLICT SWEEPER. Read every doc listed and find every instruction that conflicts with the newest direction or with another doc (e.g. rough
 or misregistered ink as the house style, "something new every few frames" as a quota, ">= 5 events/s", "always-on idle layer" without tiers, "a cut by
 default", "change size and angle at every cut", "dense set dressing" without the hierarchy, a new place per chart, strangers' backs as the foreground

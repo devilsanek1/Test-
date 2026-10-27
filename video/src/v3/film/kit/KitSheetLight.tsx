@@ -5,9 +5,9 @@
 //                laptop and its tag stand in it (lit: the subject, a warm rim on the key side, the tag's drop shadow on
 //                the lid); books and the pen cup in the pool (form shade on the side away from the lamp, contact, cast
 //                shadows radiating from the lamp's foot, only inside the pool); the mug, the notebook and Pip outside it
-//                (the ambient: one step down, contact shadows only); one lamp wash on the wall (a 2-step edge), the room
-//                one step down elsewhere, the caption band one value; the outside keeps its own light (its ground snow
-//                lowered to the night ambient).
+//                (the ambient: one step down, contact shadows only); the room one step down outside the light (no wall
+//                wash: the anglepoise stands in front of the glass), the caption band one value; the outside keeps its
+//                own light (the clean pen's environment tier already lays its snow at the night ambient).
 //   LightStreet  a blue-hour street corner: the sky is the key (tops lit, no cast direction), one street lamp is a
 //                practical (one small halo step on the sky, its pool on the snow, cast shadows only inside it), lit windows
 //                at L* 88 with their spill on the snow, the open snow at its ambient L* 83, the facade turned away from
@@ -57,9 +57,10 @@ import {
   Shade,
   Shadow,
   ShadowLayer,
+  useLightOff,
+  useRig,
   SourceCore,
   streetLamp,
-  washHole,
   WindowSpill,
   withKey,
 } from './Light';
@@ -75,9 +76,9 @@ const LAMP: LampPose = {base: [150, 1290], elbow: [196, 1020], head: [330, 990],
 const POOL: Ellipse = {cx: 470, cy: 1400, rx: 330, ry: 100};
 /** The kit Nook's own pool, shrunk away when the rig's LightPool replaces it. */
 const NO_POOL: Ellipse = {cx: 470, cy: 1400, rx: 0.5, ry: 0.5};
-/** The rig. The wash is wide enough to hold the whole sill and the frame's foot (its edge crosses only the shelf and the
- *  reveals' sides, never the sill), and its top stays under the caption band. */
-export const RIG_NOOK_DEMO = nookRig({lamp: LAMP, pool: POOL, glass: NOOK.glass}, {wash: {cx: 397, cy: 1023, rx: 600, ry: 300}});
+/** The rig: the lamp is the key; no wall wash (the anglepoise stands in front of the glass: a wash's edge would wrap
+ *  round the window and read as the window glowing). */
+export const RIG_NOOK_DEMO = nookRig({lamp: LAMP, pool: POOL, glass: NOOK.glass});
 
 const LAP = {x: 480, y: 1372, w: 340};
 const LG = laptopGeo(LAP.x, LAP.y, LAP.w);
@@ -128,9 +129,8 @@ export const LightNook: React.FC<{lit?: boolean}> = ({lit = true}) => {
   const drop = dropOffset(rig, tagC, 14);
   const g = NOOK.glass;
   const holes: LightHole[] = [
-    washHole(rig, NOOK.deskY)!,
     {rect: [g.x, g.y, g.w, g.h]}, // the glass: the outside keeps its own light
-    {rect: [NOOK.mullionX - 7, g.y, 14, g.h], kind: 'dark'}, // the mullion is the room's (outside the wash)
+    {rect: [NOOK.mullionX - 7, g.y, 14, g.h], kind: 'dark'}, // the mullion is the room's
     {e: POOL}, // the pool on the desk (hard: its two steps are the gradient)
     {of: laptop},
     {of: tag},
@@ -167,11 +167,11 @@ export const LightNook: React.FC<{lit?: boolean}> = ({lit = true}) => {
       <FormShade of={penCup} c={[PENCUP.x, PENCUP.y - 32]} size={[PENCUP.w, 64]} />
       {/* the tag hangs in front of the lid: its shadow lands on the lid, down and away from the lamp */}
       <Shadow d={TAG_D} dx={drop[0]} dy={drop[1]} clip={LID_D} soft={2} />
-      {/* the room one step down outside the light (falloff); holes: the wash, the glass, the pool, the lit objects */}
+      {/* the room one step down outside the light (falloff); holes: the glass, the pool, the lit objects */}
       <Ambient holes={holes} />
       <PoolLift d={DECK_D} c={LG.keysC} />
-      <Rim d={LID_D} width={5} cover={0.35} />
-      <Rim d={TAG_D} width={4} cover={0.3} />
+      <Rim d={LID_D} width={5} />
+      <Rim d={TAG_D} width={4} />
       <XG m={mat.compose(mat.translate(LAMP.head[0], LAMP.head[1]), mat.rotate(LAMP.rot))}>
         <SourceCore d={ellipseD({cx: 0, cy: 100, rx: 64, ry: 12})} />
       </XG>
@@ -229,18 +229,24 @@ const R_WINDOWS: {r: [number, number, number, number]; lit: boolean}[] = [
 const R_DOOR: [number, number, number, number] = [850, 1290, 90, 188];
 const BENCH = {x0: 262, x1: 418, seat: 1612, top: 1560, base: 1664};
 const PERSON = {x: 760, feet: 1700, h: 270, seed: 'light/p1'};
-const WALK = {from: [-120, 1640] as Pt, to: [1200, 1640] as Pt, h: 210, speed: 90, phase: 0.186, pause: 1.5, seed: 'light/w1'};
+/** Supporting life: a slow walker crossing the lamp's pool behind the bench (x 335 -> 665 over the 6 s clip: it never
+ *  crosses the subject), its shadow swinging round the lamp's foot. */
+const WALK = {from: [-120, 1610] as Pt, to: [1200, 1610] as Pt, h: 205, speed: 55, phase: 0.3245, pause: 1.5, seed: 'light/w1'};
 const CAR = {x: 160, y: 1850, w: 300};
 
-/** Thin sky-facing snow caps at their lit value (L* 93: the only snow that stays that bright), exact: the environment
- *  tier would pull them to ~82, flat with the ground (kit/README "Light and shadow", open items). */
-const SkyCaps: React.FC<{d: string[]}> = ({d}) => (
-  <>
-    {d.map((p, i) => (
-      <Fill key={i} d={p} color={EMBER.snow} mode="snap" offset={false} backdrop />
-    ))}
-  </>
-);
+/** Thin sky-facing snow caps at the rig's cap value (CRAFT §d.2: L* 87-89, under the pool core; the sky at ~45 lights
+ *  them), exact: the environment tier would pull them to ~82, flat with the ground (README "Light and shadow", open). */
+const SkyCaps: React.FC<{d: string[]}> = ({d}) => {
+  const rig = useRig();
+  const off = useLightOff();
+  return (
+    <>
+      {d.map((p, i) => (
+        <Fill key={i} d={p} color={off ? EMBER.snow : rig.snowCap} mode="snap" offset={false} backdrop />
+      ))}
+    </>
+  );
+};
 
 const BuildingL: React.FC = () => (
   <>

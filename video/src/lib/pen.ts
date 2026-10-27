@@ -22,7 +22,7 @@
 //                the silhouette is the clean fill edge. Fills and motion untouched.
 //   support      B: supporting life (Pip, people, an audience, steam) and story objects off-beat (the data center):
 //                NO outline: shapes part by value; a scope with `lines` (close values touch; the mascot) draws
-//                same-hue lines x0.53 (3.4 -> 1.8; 1.4-2.2 px) at the tone's L* -20, or with no tone a deep warm
+//                same-hue lines x0.53 (3.4 -> 1.8; 1.6-2.2 px) at the tone's L* -20, or with no tone a deep warm
 //                brown at 42 % over what is under it; fills' value pulled 8 % toward the background's, chroma x0.9
 //                (<= 40), hue kept; motion x0.5.
 //   environment  C: the room, shelves, desk dressing, the street, the town, weather: NO line. Strokes that ARE the
@@ -67,7 +67,7 @@ export type TierSpec = {
 
 export const CLEAN_TIERS: Record<Tier, TierSpec> = {
   subject: {k: 0.88, min: 1.2, max: 3.0, drop: 35, floor: 16, color: '#4B2A1E', alpha: 1, contours: true, strokes: true, minStroke: 0, pull: 0, chromaK: 1, chromaMax: 200, motion: 1},
-  support: {k: 0.53, min: 1.4, max: 2.2, drop: 20, floor: 20, color: '#5A2E1E', alpha: 0.42, contours: false, strokes: false, minStroke: 8, pull: 0.08, chromaK: 0.9, chromaMax: 40, motion: 0.5},
+  support: {k: 0.53, min: 1.6, max: 2.2, drop: 20, floor: 20, color: '#5A2E1E', alpha: 0.42, contours: false, strokes: false, minStroke: 8, pull: 0.08, chromaK: 0.9, chromaMax: 40, motion: 0.5},
   environment: {k: 0.4, min: 1.2, max: 1.6, drop: 14, floor: 24, color: '#5A2E1E', alpha: 0.34, contours: false, strokes: false, minStroke: 24, pull: 0.16, chromaK: 0.85, chromaMax: 36, motion: 0.4},
 };
 
@@ -240,8 +240,9 @@ export function tierWidth(screenW: number, tier: Tier): number {
   return Math.min(s.max, Math.max(s.min, screenW * s.k));
 }
 
-/** Clean screen width of a LIGHT line (glint, snow edge, rim) on a tier: thin on every tier. */
+/** Clean screen width of a LIGHT line (glint, snow edge, rim, a steam wisp) on a tier: a hairline on every tier
+ *  (CRAFT §c: 1.2-1.8 px). */
 export function tierLightWidth(screenW: number, tier: Tier): number {
   const s = PEN.tiers[tier];
-  return Math.min(1.8, Math.max(0.9, screenW * s.k));
+  return Math.min(1.8, Math.max(1.2, screenW * s.k));
 }
