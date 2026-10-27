@@ -535,7 +535,7 @@ def sun_through(v=1):
     (20.40-20.70), v2 into the April sun and out of the sunset one (27.95-28.25, the callback). A glass shimmer swells
     INTO the light (the reversed ring of the same glass, an air swell rising 0.9 -> 4.2 kHz); on the midpoint (+0.15)
     one small struck glass tink on A6 (the bed's key: inharmonic partials, noise-excited, a soft mallet), its
-    fundamental's tau 24 ms: 30 dB down ~0.1 s later, before 'In' (20.67) / 'But' (28.31). Light, never a sting."""
+    fundamental's tau 21 ms: 30 dB down ~0.1 s later, before 'In' (20.67) / 'But' (28.31). Light, never a sting."""
     d = 0.34; n = n_of(d); t = tt(d); s0 = 330 + 9 * v
     out = buf(d)
     ring = glass(1760.0, [1.0, 2.32, 4.25, 6.63], [0.11, 0.05, 0.025, 0.012], [1.0, 0.4, 0.16, 0.06], SUN_MID, s0,
@@ -545,10 +545,10 @@ def sun_through(v=1):
     c = np.interp(t, [0, SUN_MID, d], [900, 4200, 3000])
     env = np.where(t < SUN_MID, (t / SUN_MID) ** 2.2, np.exp(-(t - SUN_MID) / 0.012))
     out += decor(lambda sd: tv_bandpass(noise(d, sd), c, bw_oct=0.9) * env, s0 + 3, 0.7) * 0.35
-    tink = glass(1760.0, [1.0, 2.32, 4.25, 6.63], [0.024, 0.012, 0.007, 0.004], [1.0, 0.35, 0.14, 0.05], 0.18, s0 + 5,
+    tink = glass(1760.0, [1.0, 2.32, 4.25, 6.63], [0.021, 0.011, 0.006, 0.004], [1.0, 0.35, 0.14, 0.05], 0.18, s0 + 5,
                  mallet=0.3, mallet_band=(2000, 10000), body=0.06, beat_hz=1.3)
     put(out, tink, SUN_MID - 0.0005, 0.8, -0.35)
-    return slap(out, -18.0)
+    return out                     # no canal slap: the light is not in the canal (its reflections held it at -23 dB)
 
 
 # ------------------------------------------------------------------ V2S5 / V2S6 (20.55-28.10)
