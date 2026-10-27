@@ -58,6 +58,9 @@ const common = {
 /** The whole film, end to end (loops to the bare-line frame 0). */
 export const Film3: React.FC = () => <Film scenes={film3Scenes} {...common} />;
 
+/** The posting master (G8): the whole film without the burned-in draft label. */
+export const Film3Final: React.FC = () => <Film scenes={film3Scenes} {...common} draftLabel={undefined} />;
+
 /** One panel alone: its captions, its slice of the voice and sound cues, its own un-build (S16). Composition time =
  *  panel-local time; the label shows film time. */
 export const Film3Shot: React.FC<{id: string}> = ({id}) => {
