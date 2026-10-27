@@ -16,6 +16,10 @@
 // Transition types (transitionIn of the INCOMING scene; c = its start):
 //   cut              hard cut at c.
 //   matchcut         hard cut at c; the two scenes put their shared object (sun, horizon, a door) in the same place.
+//                    `seam: true` (opt-in, no behaviour change): a SEAM, the cut between two sequence builders that
+//                    draw the IDENTICAL picture at c (shared pieces at film time: lib/sequence.tsx), so no cut shows;
+//                    scripts/qa/gate_check.py then expects no cut and compares the two sides (its seam probe).
+//   (any type)       `carrier?: 'A' | ... | 'F'` names the join's carrier (docs/look/CRAFT.md §a), for the checks only.
 //   camera-continuous  the outgoing camera move accelerates into the cut (dur / 2 before it, ease-in cubic) and the
 //                    incoming scene continues it with the SAME velocity and decelerates over dur after it
 //                    (out-cubic, n = 3): one weighty move, no whip-and-stop. {dur = 1.4, dir: 'in' | 'out' | 'up' |
@@ -89,9 +93,20 @@ import {CINE_WIPE_HALF, CINE_WIPERS, wipeEdgeX} from './cine/wipers';
 // ---------------------------------------------------------------- data types
 
 export type CamDir = 'in' | 'out' | 'up' | 'down' | 'left' | 'right';
-export type FilmTransition =
+/** A join's carrier (docs/look/CRAFT.md §a): A push-through, B thread match, C continuous camera, D object carry or
+ *  wipe, E card flip or swipe, F plain cut. Read by the checks (scripts/qa/gate_check.py), never by Film. */
+export type FilmCarrier = 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+type FilmJoin = {/** The join's carrier (checks only; optional, no behaviour). */ carrier?: FilmCarrier};
+export type FilmTransition = FilmJoin & (
   | {type: 'cut'; dur?: number}
-  | {type: 'matchcut'; dur?: number}
+  | {
+      type: 'matchcut';
+      dur?: number;
+      /** Opt-in, no behaviour change: a SEAM between two sequence builders that draw the identical picture at the
+       *  join (lib/sequence.tsx), so the hard cut shows nothing; gate_check expects no cut there and compares both
+       *  sides with the seam probe. */
+      seam?: boolean;
+    }
   | {type: 'camera-continuous'; dur?: number; dir?: CamDir; amount?: number; focus?: Pt; to?: Pt; /** Opt-in ink compensation exponent (0.6 = house): strokes x zoom^-inkComp while the camera zooms (lib/inkComp.tsx). Default off. */ inkComp?: number}
   | {
       type: 'foreground-wipe';
@@ -106,7 +121,8 @@ export type FilmTransition =
       drift?: number;
     }
   | {type: 'push-through'; dur?: number; from?: Pt; to?: Pt; zoom?: number; bridge?: string; /** Opt-in ink compensation exponent (0.6 = house): strokes x zoom^-inkComp on both legs (lib/inkComp.tsx). Default off. */ inkComp?: number}
-  | {type: 'unbuild'; dur?: number};
+  | {type: 'unbuild'; dur?: number}
+);
 /** Caption tone key (scene-local t). `wipe` makes the switch follow a sky wipe edge across the caption band. */
 export type ToneKey = {t: number; tone: CaptionTone; wipe?: 'down' | 'up' | 'snap'; dur?: number};
 export type FilmScene = {
