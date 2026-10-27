@@ -10,6 +10,8 @@ import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
 import {Batch, Paint, P, Pt, ovalPath, domePath, leafPath, lerp, rng, rand, frac, clamp01} from '../kit/canal/core';
 import {StringLights, FallingLeaves, Puffs, Pigeons} from '../kit/canal/life';
+import {twinkle} from '../../v3/film/kit/idle';
+import {TREE_L_SPEC, TREE_R_SPEC} from './V2S7_set';
 import {Person, Seated, NearBack, strideFor} from '../kit/cast';
 import {
   LANE, walkerH, kAt, kpAt, seatedH, TREE_L, TREE_R, FESTOON_A, FESTOON_B, JETS, BASIN, basinLeftAt, CAFE, WING, BULB_STEP,
@@ -329,28 +331,20 @@ export const S7Jets: React.FC = () => {
     b.poly(CM.glass, [...L, ...R.slice().reverse()]);
     b.poly(CM.paper, [...L, ...hi.slice().reverse()]);
     b.poly(CM.water, [...sh, ...R.slice().reverse()]);
-    // the crown: a rounded cap and two arcs of water falling outward (tapered strips), drops beyond them
+    // the crown: the column breaks into a little froth (three paper / glass lobes) and drops fall back on both
+    // sides along short parabolas (cycling), never hooks
     const [xt, yt] = top;
-    b.fill(CM.paper, ovalPath(xt, yt + 2, 7.5, 6));
+    b.fill(CM.glass, ovalPath(xt, yt + 3, 8.5, 7));
+    b.fill(CM.paper, ovalPath(xt - 3, yt + 1, 5.5, 5));
+    b.fill(CM.paper, ovalPath(xt + 4, yt + 5, 3.6, 3.4));
     for (const side of [-1, 1]) {
-      const W = H * 0.15 * (side < 0 ? 1.1 : 0.9);
-      const D = H * 0.3;
-      const pts: Pt[] = [];
-      const pts2: Pt[] = [];
-      for (let s = 0; s <= 8; s++) {
-        const u = s / 8;
-        const px = xt + side * W * u;
-        const py = yt - 12 * u + (12 + D) * u * u;
-        const w = lerp(3.4, 1.2, u);
-        pts.push([px, py - w]);
-        pts2.push([px, py + w]);
-      }
-      b.poly(side < 0 ? CM.paper : CM.glass, [...pts, ...pts2.reverse()]);
-      for (let k = 0; k < 3; k++) {
-        const v = frac(t / 0.55 + k / 3 + i * 0.21 + (side > 0 ? 0.5 : 0));
-        const ex = xt + side * W * (1 + 0.25 * v);
-        const ey = yt + D + 90 * v * v;
-        if (ey < y0 - 4) b.fill(k % 2 ? CM.glass : CM.paper, ovalPath(ex, ey, 2.6, 3.2));
+      for (let k = 0; k < 4; k++) {
+        const v = frac(t / 0.62 + k / 4 + i * 0.19 + (side > 0 ? 0.37 : 0));
+        const spread = H * (0.06 + 0.035 * (k % 2));
+        const ex = xt + side * (4 + spread * v);
+        const ey = yt - 6 * v + (6 + H * 0.42) * v * v;
+        const r = 3.1 - 1.2 * v;
+        if (ey < y0 - 6) b.fill(k % 2 ? CM.paper : CM.glass, ovalPath(ex, ey, r, r * 1.25));
       }
     }
     // foam at the nozzle: a few paper lobes and a glass ring that breathes with the jet
@@ -395,6 +389,42 @@ export const S7Festoons: React.FC = () => (
     <StringLights from={FESTOON_B.from} to={FESTOON_B.to} sag={FESTOON_B.sag} n={FESTOON_B.n} seed="s7/festB" onAt={runAt('festoonB')} step={BULB_STEP} r={5.5} w={INK_PX.hair} />
   </>
 );
+
+/** Fairy lights wound through both plane crowns: off (pale glass beads) until the run, then they come on in a quick
+ *  scatter within 0.3 s of runAt('treeLights'), then one twinkle at a time. Drawn over the crowns. */
+export const S7TreeFairyLights: React.FC = () => {
+  const t = useTime();
+  const t0 = runAt('treeLights');
+  const b = new Batch();
+  let wire = '';
+  [TREE_R_SPEC, TREE_L_SPEC].forEach((spec, ti) => {
+    const r = rng(`s7/fairy/${ti}`);
+    const pts: Pt[] = [];
+    spec.clusters.forEach((c) => {
+      for (let k = 0; k < 3; k++) {
+        const a = r.range(0, Math.PI * 2);
+        const rr = r.range(0.25, 0.8);
+        const y = Math.max(622, c.y + Math.sin(a) * c.ry * rr);
+        pts.push([c.x + Math.cos(a) * c.rx * rr, y]);
+      }
+    });
+    pts.sort((p, q) => p[1] - q[1] || p[0] - q[0]);
+    pts.forEach(([x, y], i) => {
+      wire += `${i ? 'L' : 'M'}${P(x, y)}`;
+      const on = t >= t0 + r.next() * 0.3;
+      const tw = on && twinkle(t, `s7/fairy${ti}`, i, pts.length, 0.5, 0.14);
+      b.fill(!on ? CM.glass : tw ? CM.lamp : i % 3 ? CM.lamp : CM.lampCore, ovalPath(x, y, on ? 4.6 : 3.4, on ? 4.6 : 3.4));
+    });
+  });
+  const w = new Batch();
+  w.ink(wire, 1.1, mixHex(CM.line, CM.sage, 0.3), 0.35);
+  return (
+    <>
+      <Paint b={w} seed="s7/fairyWire" misreg={false} />
+      <Paint b={b} seed="s7/fairy" misreg={false} />
+    </>
+  );
+};
 
 /** The cafe tables' little lanterns (in the run). */
 export const S7CafeLights: React.FC = () => {
@@ -461,7 +491,7 @@ export const S7Pigeons: React.FC = () => (
     <Pigeons ledge={[792, 872, 740]} n={2} size={15} seed="s7/pg/sill" />
   </>
 );
-export const S7GroundPigeons: React.FC = () => <Pigeons ledge={[790, 1010, 1868]} n={3} size={30} seed="s7/pg/ground" shuffleAt={[1.4, 3.6]} />;
+export const S7GroundPigeons: React.FC = () => <Pigeons ledge={[730, 990, 1716]} n={3} size={26} seed="s7/pg/ground" shuffleAt={[1.4, 3.6]} />;
 
 // ---------------------------------------------------------------- the lit flags of the run
 

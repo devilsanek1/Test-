@@ -28,12 +28,12 @@ import {runAt} from './V2S7_rig';
 import {
   S7SkyClipDefs, SkyClip, S7SkyBand, S7Far, S7TreeLTrunk, S7TreeLCrown, S7TreeRTrunk, S7TreeRCrown, S7TreeLights, S7Wing,
   S7Steps, S7Ground, S7Shadows, S7Bollard, S7Basin, S7BasinLights, S7CafeBack, S7CafeT1Chairs, S7CafeNear, S7Rack,
-  S7Planter,
+  S7Planter, S7CanopyFix,
 } from './V2S7_set';
 import {
   S7WalkersA, S7WalkersBC, S7StaffInside, S7StaffOutside, S7StepSitters, S7CafeT1People, S7NearBacks, S7RimSitters,
   S7Stander, S7FarWalkers, S7Jets, S7Water, S7Festoons, S7CafeLights, S7FallingLeaves, S7GroundLeaves, S7Smoke, S7Steam,
-  S7Pigeons, S7GroundPigeons,
+  S7Pigeons, S7GroundPigeons, S7TreeFairyLights,
 } from './V2S7_life';
 import {S7Board} from './V2S7_board';
 import {S7PipHop, S7PipSeat} from './V2S7_pipdraw';
@@ -62,6 +62,7 @@ const V2S7: React.FC = () => {
           <S7FarWalkers />
         </SkyClip>
         <S7Wing behindDoor={<S7StaffInside />} />
+        <S7CanopyFix />
         <S7Pigeons />
         <S7Steps />
         <S7Ground />
@@ -79,6 +80,7 @@ const V2S7: React.FC = () => {
         <SkyClip>
           <S7TreeRCrown />
           <S7TreeLCrown />
+          <S7TreeFairyLights />
         </SkyClip>
         <S7WalkersBC />
         <S7Stander />

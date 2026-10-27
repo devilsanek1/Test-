@@ -10,7 +10,8 @@ short evidence tag (vN, date); a concrete note that teaches something general go
 
 Format: **rule** — why / evidence (video, date).
 
-**Last compacted: 2026-10-27 (fourth pass) · size budget: <= 200 lines** (raised from 150 by the owner, 2026-10-26) (see Maintenance at the end).
+**Last reviewed for coherence: 2026-10-27 (fourth pass) · no size budget: coherent and clear wins over short** (owner,
+2026-10-27; see Maintenance at the end).
 
 ## Audience and goal
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24).
@@ -44,6 +45,17 @@ Format: **rule** — why / evidence (video, date).
 
 ## Visual style
 - **Hand-drawn ink, flat colour, like reference video 1.** — (v1, 2026-10-24).
+- **CLEAN, REFINED, GENTLE, PREMIUM: never rough or messy.** Clean, confident lines (smooth, consistent weights, few of
+  them, no jitter, no sketchy overshoot or double strokes), refined shapes; hand-drawn warmth comes from shape and colour,
+  not from scratchy lines. — ("too rough and messy, a lot of rough lines, not clean at all; cleaner, more refined, gentle,
+  premium", v3 G5b, 2026-10-27).
+- **Light and shadow: gentle, but always there.** One consistent light direction per scene, soft form and cast shadows,
+  gentle light pools that make sense; never absent and never "weirdly put". — (v3 G5b, 2026-10-27).
+- **ATTENTION HIERARCHY: one main arc, one focus at a time.** The story's subject gets the contrast, line weight,
+  saturation and the clear motion; supporting life (a bird, walkers, snow, steam) stays subtle (smaller, lower contrast,
+  thinner or no lines, softer colour, calmer motion): alive, but never competing. Supporting environment may be drawn in
+  a softer, simpler style than the subject; not every moving piece gets the same treatment. Too many equal moving parts
+  = "I don't know what to keep my attention on". — (v3 G5b, 2026-10-27).
 - **Every scene must FEEL ALIVE: that is the key, not an object count.** A dense, detailed world (a city full of
   buildings and windows, a room full of real things), people near and far, layered depth, a recurring living character,
   ambient life that never stops (clouds, birds, steam, lights switching). A dense world makes a frame full even when
@@ -103,6 +115,11 @@ Format: **rule** — why / evidence (video, date).
 - **Every frame at least 8/10, no dead frames, cuts locked to the beat.** — (v1).
 
 ## Storyboard (G3)
+- **One flowing story, never a bunch of shots stitched together.** Every cut carries the eye and the story into the next
+  shot (a shared object, a match, a continuous camera, the subject's motion leading out and in); the main arc is visible
+  across the whole film. Life and detail are DESIGNED into the shot together with its hierarchy from the start, never
+  bolted onto a finished sketch afterwards ("we did the sketch first and then added a whole bunch of details to make it
+  feel alive, which is wrong"). Whether sketch-first helps at all is under review (`docs/retro/`). — (v3 G5b, 2026-10-27).
 - **G3 is the most important gate: an ANIMATED SKETCHBOOK of the final film, optimised for SIGNAL, not quality.** With
   script and voice locked, the animatic gives the director the closest signal to the final story in the least drawing
   and review time: story, transitions, animations and camera moves already very close to final — PLAYED, not only
@@ -163,6 +180,10 @@ Format: **rule** — why / evidence (video, date).
   quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
   reviewing what will still change, early polish). — (2026-10-25; owner, 2026-10-26).
 - **Locked means dropped:** rejected options go to `archive/`, never seen by later prompts; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
+- **New feedback is INTEGRATED, never just appended:** when a note changes the direction, rewrite or retire every rule and
+  doc it contradicts in the same pass, so the next agent never meets conflicting instructions; the current visual direction
+  lives in one place that wins over older docs. — ("evaluate this feedback and compact it with the overall stylistic
+  direction ... the next agent should not be confused with conflicting instructions", 2026-10-27).
 - **Every lesson goes into the generic process, committed** (playbook, a PIPELINE gate, the studio toolkit). — ("we gradually get better", v3, 2026-10-26).
 - **A rejected cut restarts clean.** When the owner says "I don't like it, start from scratch", drop the old visual
   work (archive it), skip the gates the owner names (e.g. no sketch) and make the finished film directly with full
@@ -190,11 +211,13 @@ Format: **rule** — why / evidence (video, date).
 ## Retired rules
 - ~~The owner records the voice in ElevenLabs (we hand over the paste text)~~ → generated through the API with the owner's voice (2026-10-26).
 
-## Maintenance (keep this file short)
-Compact when, at the start of a session, **it has been 7+ days since "Last compacted" and entries were added since**,
-or **the file is over 200 lines**. The orchestrator does it in one pass, with no agents:
-1. Merge duplicate and near-duplicate rules into one; cluster by area; one line per rule, with the evidence shortened to (video, date).
-2. Turn rules that several videos confirmed into short principles; drop wording that only mattered for one video.
-3. Performance log: keep the last ~5 raw lines; fold older ones into a "Trends" paragraph (what the numbers keep saying).
-4. Retired: keep the 10 most recent, one line each; drop older ones (git history keeps them).
-5. Update "Last compacted", then commit "Compact owner playbook".
+## Maintenance (keep this file coherent and clear)
+No size budget (owner, 2026-10-27: "let's not focus on the playbook being a certain size; keep it as coherent and clear as
+we can"). Review it **whenever a note changes the direction** (in the same turn) and at the start of a session if it has
+been 7+ days since "Last reviewed" and entries were added since. The orchestrator:
+1. Integrates: rewrites or retires every rule the new note contradicts, here and in the docs the rules link to, so no two
+   instructions conflict; the newest owner direction wins, and the old rule moves to "Retired" with what replaced it.
+2. Merges duplicate and near-duplicate rules into one, clustered by area, each with its evidence as (video, date).
+3. Turns rules that several videos confirmed into short principles; drops wording that only mattered for one video.
+4. Performance log: keeps the last ~5 raw lines and folds older ones into a "Trends" paragraph.
+5. Updates "Last reviewed", then commits "Review owner playbook".

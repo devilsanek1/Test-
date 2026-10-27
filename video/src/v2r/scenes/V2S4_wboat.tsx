@@ -431,7 +431,7 @@ function herbsInto(b: Batch, t: number) {
 function smokeInto(b: Batch, t: number) {
   const x = 944;
   const y = RF - 116;
-  const ps = puffs(t, {n: 9, life: 3.8, rise: 330, drift: WIND * 150, r0: 6, r1: 17, wobble: 6, seed: 's4boatsmoke', ceil: ROW.ceil}, y);
+  const ps = puffs(t, {n: 9, life: 3.6, rise: 330, drift: WIND * 150, r0: 7, r1: 21, wobble: 7, seed: 's4boatsmoke', ceil: ROW.ceil}, y);
   // each puff a lumpy cluster of three flat ovals (no fade: it shrinks away)
   ps.forEach((p, i) => {
     const c = p.k < 0.25 ? CM.stoneShade : i % 2 ? CM.paving : CM.limestone;
