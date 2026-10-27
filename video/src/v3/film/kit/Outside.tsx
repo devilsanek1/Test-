@@ -25,7 +25,7 @@ const NightSkyBody: React.FC<{x?: number; y?: number; w?: number; h?: number; ba
 export const NightSky = tiered('environment', {bg: EMBER.sky}, NightSkyBody);
 
 /** Steady falling snow inside a rect: seeded flakes that drift down and wrap (deterministic in t). */
-const SnowfallBody: React.FC<{x: number; y: number; w: number; h: number; n?: number; size?: number; speed?: number; seed?: string; at?: At}> = ({x, y, w, h, n = 26, size = 1, speed = 1, seed = 'snow', at}) => {
+const SnowfallBody: React.FC<{x: number; y: number; w: number; h: number; n?: number; size?: number; speed?: number; seed?: string; at?: At; color?: string}> = ({x, y, w, h, n = 26, size = 1, speed = 1, seed = 'snow', at, color = EMBER.snow}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const r = rng(`flakes/${seed}`);
@@ -37,7 +37,7 @@ const SnowfallBody: React.FC<{x: number; y: number; w: number; h: number; n?: nu
     const rad = r.range(2.6, 4.6) * size;
     const fy = y + ((((y0 - y + sp * t) % h) + h) % h);
     const fx = x0 + Math.sin(t * 0.9 + i) * 4;
-    out.push(<TCircle key={i} cx={fx} cy={fy} r={rad} fill={EMBER.snow} />);
+    out.push(<TCircle key={i} cx={fx} cy={fy} r={rad} fill={color} />);
   }
   return <>{out}</>;
 };
@@ -143,6 +143,10 @@ export type DataCenterProps = {
   /** 'ticks' (default: rows of small blinking server lights) | 'bands' (additive, the clean pen's version: each row is
    *  three long lit bands, no dash rows: CRAFT §c "no specks, ticks ... dash rows"). */
   ledStyle?: 'ticks' | 'bands';
+  /** OPT-IN (v3 rework, 'bands' only): once the building goes dark (`darkAt`), its server rows are OFF and light up
+   *  one row at a time from `at` over `dur` s (each row's bands a quick left-to-right sweep, 2 frames apart), in
+   *  `color` (default ledColor): the subject's own motion on its beat ("AI data centers"). */
+  rowsOn?: {at: number; dur: number; color?: string};
 };
 
 export function dataCenterGeo(x: number, y: number, w: number, h?: number, variant: DataCenterVariant = 'normal', signH?: number) {
@@ -154,7 +158,7 @@ export function dataCenterGeo(x: number, y: number, w: number, h?: number, varia
   return {H, top, sign, x0: x - w / 2, x1: x + w / 2};
 }
 
-const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'normal', sign = 'AI DATA CENTER', signAt, darkAt, signLitAt, units = 3, blink = true, at, seed = 'dc', ink = 3.4, signH, ledColor = EMBER.led, ledStyle = 'ticks'}) => {
+const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'normal', sign = 'AI DATA CENTER', signAt, darkAt, signLitAt, units = 3, blink = true, at, seed = 'dc', ink = 3.4, signH, ledColor = EMBER.led, ledStyle = 'ticks', rowsOn}) => {
   const t = useTime();
   const variant: DataCenterVariant = darkAt !== undefined && t >= darkAt ? 'dark' : v0;
   const g = dataCenterGeo(x, y, w, h, v0, signH);
@@ -193,7 +197,12 @@ const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'n
       const span = g.x1 - w * 0.06 - bx0;
       const gap = w * 0.035;
       const bw = (span - gap * 2) / 3;
-      for (let j = 0; j < 3; j++) ticks.push(<TRect key={`t${i}_${j}`} x={bx0 + j * (bw + gap)} y={ry + rowH * 0.3} width={bw} height={Math.max(2.5, rowH * 0.4)} fill={ledColor} />);
+      // rowsOn (opt-in): dark from darkAt, then row by row on (each row a 2-frame-per-band sweep)
+      const powered = rowsOn !== undefined && darkAt !== undefined && t >= darkAt;
+      for (let j = 0; j < 3; j++) {
+        if (powered && t < rowsOn.at + (i * rowsOn.dur) / nRows + j / 30) continue;
+        ticks.push(<TRect key={`t${i}_${j}`} x={bx0 + j * (bw + gap)} y={ry + rowH * 0.3} width={bw} height={Math.max(2.5, rowH * 0.4)} fill={powered ? rowsOn.color ?? ledColor : ledColor} />);
+      }
       continue;
     }
     for (let tx = g.x0 + sideW + w * 0.06, j = 0; tx + tickW < g.x1 - w * 0.05; tx += step, j++) {
