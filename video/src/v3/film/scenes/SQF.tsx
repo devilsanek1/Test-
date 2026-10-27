@@ -34,5 +34,10 @@ const SQF: React.FC = () => {
 };
 export default SQF;
 
-/** White captions on the dusk sky. */
-export const captionTone: ToneKey[] = [{t: 0, tone: 'light'}];
+/** White captions on the dusk sky; ink from the loop's caption roll (41.00, local 4.64: the frame-0 words return on the
+ *  pale un-built page, never white on it; the last page before it is all highlight boxes, readable on both). 4.635 sits
+ *  between frames 2459 and 2460, so float rounding can never move the switch off the roll's frame. */
+export const captionTone: ToneKey[] = [
+  {t: 0, tone: 'light'},
+  {t: 4.635, tone: 'dark'},
+];

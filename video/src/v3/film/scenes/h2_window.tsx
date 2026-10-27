@@ -70,7 +70,9 @@ const DESK = {y: H2_SILL.bottom};
 /** The lamp (off the left edge, over the desk): its mouth lights a pool under the hand and the phone. */
 const H2_LAMP = {base: [-230, 1700] as Pt, head: [-60, 1236] as Pt, rot: 26, scale: 1.4};
 const H2_POOL = {cx: 250, cy: 1560, rx: 360, ry: 112};
-const RIG = nookRig({lamp: H2_LAMP, pool: H2_POOL, glass: {x: -200, y: -200, w: 1480, h: H2_SILL.top + 200}});
+/** H2's nook rig (the lamp off the left edge over the desk): it lights the desk and the front plane in H2 (flow_v2 §5). */
+export const H2_RIG = nookRig({lamp: H2_LAMP, pool: H2_POOL, glass: {x: -200, y: -200, w: 1480, h: H2_SILL.top + 200}});
+const RIG = H2_RIG;
 
 /** The frost on the glass's side edges: flat, soft-edged columns (no ticks, no stars). */
 const FROST = (() => {
