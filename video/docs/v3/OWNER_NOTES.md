@@ -74,3 +74,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   messy, a lot of rough lines; cleaner, more refined, gentle, premium"; "we don't have shadows much and the light is weirdly
   put". -> rules: Visual style (clean premium; light and shadow; attention hierarchy), Storyboard (one flowing story);
   a process retro on sketch-first. v3 ships as is.
+- 2026-10-27: "can you apply the feedback to the video we have here; let's make it better before we publish it; spin up as
+  many parallel work sessions as you need". -> v3 rework: new flow (one home place, carriers at every join, the price tag
+  as the thread; `docs/v3/flow_v2.md`), clean pen + tiers, light and shadow; pilot of the first sequence, then the other
+  sequences in parallel helper sessions. The G5b cut is not posted.
