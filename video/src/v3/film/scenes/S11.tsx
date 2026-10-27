@@ -50,7 +50,7 @@ const CROWD: CrowdLife = {
   row: [
     // the dock hand: hi-vis, hard hat; the phone goes up after "five" to snap the board
     // (a step forward, so the raised phone and its flash stay under the card)
-    {hair: 'short', wear: ['hivis', 'hardhat'], coat: EMBER.dcSide, dy: 56, sMul: 1.04, phoneWin: [FIVE + 0.24, 3.42], moves: [{t: FIVE + 0.08, kind: 'recoil', amp: 1}, {t: 3.42, kind: 'turn', amp: 1.4}]},
+    {hair: 'short', wear: ['hivis', 'hardhat'], coat: EMBER.dcSide, dy: 86, sMul: 1.04, phoneWin: [FIVE + 0.24, 3.42], moves: [{t: FIVE + 0.08, kind: 'recoil', amp: 1}, {t: 3.42, kind: 'turn', amp: 1.4}]},
     // the laptop van's driver: the cap with the badge; a hand to the back of his head on "five", then turns to his
     // neighbour in the settle
     {hair: 'cap', wear: ['badge'], coat: EMBER.dc, hat: EMBER.dcSide, coatDetail: ['quilt', 'yoke'], moves: [{t: 2.92, kind: 'lean', dir: 1, amp: 1.6}, {t: 2.92, kind: 'turn', amp: 1.8}]},

@@ -204,19 +204,20 @@ const PhoneFlash: React.FC<{at?: number[]; row: BackRowProps}> = ({at = [], row}
   if (hit === undefined) return null;
   const phone = backRowPhones(row, t)[0];
   if (!phone) return null;
-  const [cx, cy] = phone.top;
+  // on the phone's body (not its top end), small: the star stays on the board's rail, off the "last year" label
+  const [cx, cy] = phone.mid;
   const big = t - hit < 1 / 60 ? 1 : 0.78;
   let d = '';
   for (let i = 0; i < 8; i++) {
     const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
-    const r1 = (i % 2 ? 40 : 72) * big;
+    const r1 = (i % 2 ? 28 : 48) * big;
     const p = (aa: number, rr: number) => `${(cx + Math.cos(aa) * rr).toFixed(1)} ${(cy + Math.sin(aa) * rr).toFixed(1)}`;
     d += `M${p(a - 0.2, 16 * big)}L${p(a, r1)}L${p(a + 0.2, 16 * big)}Z`;
   }
   return (
     <>
       <path d={d} fill={EMBER.houseLit} />
-      <circle cx={cx} cy={cy} r={18 * big} fill={EMBER.houseLit} />
+      <circle cx={cx} cy={cy} r={14 * big} fill={EMBER.houseLit} />
       <circle cx={cx} cy={cy} r={11 * big} fill={EMBER.white} />
     </>
   );
