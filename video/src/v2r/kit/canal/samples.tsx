@@ -7,7 +7,10 @@ import {World} from '../../../lib/World';
 import {useTime} from '../../../lib/time';
 import {torso} from '../../../lib/sketch';
 import {Batch, Paint, ovalPath, P} from './core';
-import {S1Set, S2Set, S4Set, S8Set, SunDisc} from './sets';
+import {S1Set, S2Set, S4Set, S8Set, SunDisc, S2_BENCH_SEAT} from './sets';
+import {CanalCast} from './slots';
+import {k4Person, k5Pip} from './k4k5';
+import {Her, GhostRow, S1Seated, S8Ghosts, Staffer, Reporter, strideFor} from '../cast';
 import {XG, mat} from '../../../lib/xf';
 import {captionFontStack, useCaptionFont} from '../../../lib/font';
 import {WingS1, WingS7} from './wing';
@@ -65,15 +68,39 @@ export const RowPlaceholders: React.FC<{t?: number}> = ({t: tIn}) => {
 
 // ---------------------------------------------------------------- the samples
 
+/** S1's row with K4's people: her (walking west from 0.97, stopping 4.54, one step on "life") and the ghost row. */
+const S1RowK4: React.FC = () => {
+  const t = useTime();
+  const pose = MAP.s1RowAt(t)[0];
+  const step = 1.5 * Math.max(0, Math.min(t, MAP.S1_ROW_STOP.t0) - 0.97) + (t >= MAP.S1_LIFE_T ? Math.min(1, (t - MAP.S1_LIFE_T) / 0.27) : 0);
+  const stride = strideFor(27, 170, 'rear34');
+  if (t < 0.97) return null;
+  return (
+    <>
+      <GhostRow step={step} stride={stride} />
+      <Her x={pose.x} y={pose.feetY} h={pose.h} pose={t < MAP.S1_ROW_STOP.t0 ? 'walk' : 'stand'} view="rear34" step={step} stride={stride} plant />
+    </>
+  );
+};
+const S1DoorK4: React.FC = () => {
+  const t = useTime();
+  if (t >= 0.97) return null;
+  return <Her x={680} y={1082} h={153} pose="stand" view="back" plant />;
+};
+
 export const CanalSampleS1: React.FC = () => (
   <World sky={GOLDEN} horizon={1000}>
-    <S1Set towpath={<RowPlaceholders />} />
+    <CanalCast person={k4Person} pip={k5Pip}>
+      <S1Set towpath={<S1RowK4 />} behindDoor={<S1DoorK4 />} seated={<S1Seated />} />
+    </CanalCast>
   </World>
 );
 
 export const CanalSampleS2: React.FC = () => (
   <World sky={GOLDEN} horizon={1000}>
-    <S2Set staffCoolAt={2.9} aBoard={<BoardPlaceholder r={MAP.S2.aBoard} />} />
+    <CanalCast person={k4Person} pip={k5Pip}>
+      <S2Set aBoard={<BoardPlaceholder r={MAP.S2.aBoard} />} bench={<><Reporter x={MAP.S2.reporter.x} y={S2_BENCH_SEAT} h={MAP.S2.reporter.h} /><Staffer x={MAP.S2.staffer.x} y={S2_BENCH_SEAT} h={MAP.S2.staffer.h} /></>} />
+    </CanalCast>
   </World>
 );
 
@@ -95,19 +122,23 @@ export const BoardPlaceholder: React.FC<{r: MAP.Rect; legs?: number}> = ({r, leg
 };
 export const CanalSampleS4: React.FC = () => (
   <World sky={GOLDEN} horizon={1000}>
-    <S4Set
-      towpath={
-        <>
-          <FingerpostPlaceholder />
-          <HerWalkPlaceholder x={MAP.S4.her.x} feetY={MAP.S4.her.feetY} h={MAP.S4.her.h} />
-        </>
-      }
-    />
+    <CanalCast person={k4Person} pip={k5Pip}>
+      <S4Set
+        towpath={
+          <>
+            <FingerpostPlaceholder />
+            <Her x={MAP.S4.her.x} y={MAP.S4.her.feetY} h={MAP.S4.her.h} pose="walk" view="profile" walk={{rate: 1.5}} stride={strideFor(34, 170)} />
+          </>
+        }
+      />
+    </CanalCast>
   </World>
 );
 export const CanalSampleS8: React.FC = () => (
   <World sky={[CM.sky, CM.bandSunset]} horizon={1000}>
-    <S8Set wAt={0.5} board={<BoardPlaceholder r={MAP.B} legs={MAP.B_LEGS_Y1} />} lane={<RowS8Placeholders />} />
+    <CanalCast person={k4Person} pip={k5Pip}>
+      <S8Set wAt={0.5} board={<BoardPlaceholder r={MAP.B} legs={MAP.B_LEGS_Y1} />} lane={<S8Ghosts at={0} />} />
+    </CanalCast>
   </World>
 );
 

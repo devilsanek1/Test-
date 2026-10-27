@@ -55,9 +55,11 @@ export type S1SetProps = {
   pip?: React.ReactNode;
   /** Draw the kit's own ambient walkers on the far towpath (cyclist f15, jogger f96, ...). Default true. */
   walkers?: boolean;
+  /** The seated public on the steps (e.g. K4's <S1Seated/>); default: the kit's slots (S1_SEATED). */
+  seated?: React.ReactNode;
 };
 
-export const S1Set: React.FC<S1SetProps> = ({lampOffAt = 0.4, lettersAt = 0.97, birdsBridgeAt = 1.4, birdsRoofsAt = MAP.S1_LIFE_T, busAt = 1.1, duckLandsAt = 2.3, behindDoor, towpath, pip, walkers = true}) => {
+export const S1Set: React.FC<S1SetProps> = ({lampOffAt = 0.4, lettersAt = 0.97, birdsBridgeAt = 1.4, birdsRoofsAt = MAP.S1_LIFE_T, busAt = 1.1, duckLandsAt = 2.3, behindDoor, towpath, pip, walkers = true, seated}) => {
   const S = MAP.S1_SHEET;
   const L = s1Layout();
   const led = wingLedges(L);
@@ -116,7 +118,8 @@ export const S1Set: React.FC<S1SetProps> = ({lampOffAt = 0.4, lettersAt = 0.97, 
       <Ducks ducks={[{x: 470, y: 1180, size: 26, drake: true}, {x: 520, y: 1192, size: 24}, {x: 250, y: 1160, size: 22, vx: -6}]} seed="s1ducks" landAt={duckLandsAt} land={{from: [120, 1080], to: [330, 1196], size: 26}} />
       <FloatingLeaves y0={1150} y1={1210} n={9} size={13} seed="s1fl" current={-8} />
       {/* our bank: the steps and the seated public; Pip on the waterline bollard */}
-      <Steps />
+      <Steps people={!seated} />
+      {seated}
       {pip ?? <PipSlot seat={{id: 'V2S1', x: MAP.S1_BOLLARD.x, y: MAP.S1_BOLLARD.y, size: 100}} />}
       <FallingLeaves box={[0, 640, 260, 1180]} n={4} size={13} seed="s1fall" wind={-26} />
     </>
@@ -255,12 +258,38 @@ export const S2Set: React.FC<S2SetProps> = ({story, staffCoolAt, storyOverlay, a
     }
     b.ink(j, INK_PX.far, CM.line);
     b.layer();
-    for (let i = 0; i < 40; i++) {
+    // a band of granite setts along our coping (small stones, two colours)
+    for (let x = -40; x < 1120; x += 26) {
+      const y = S2_BANK.edge(x) + 16;
+      b.rect(r.chance(0.5) ? CM.stoneShade : CM.limestone, x + 1, y + 1, 24, 14);
+      b.rect(r.chance(0.5) ? CM.limestone : CM.stoneShade, x + 13, y + 17, 24, 14);
+    }
+    // the towpath's painted "share the space" marks: a walker and a bike pictogram (paper paint, no words)
+    const pic = (cx: number, cy: number, k: number) => {
+      b.fill(CM.paper, ovalPath(cx - 60 * k, cy - 52 * k, 9 * k, 9 * k));
+      b.poly(CM.paper, [[cx - 66 * k, cy - 40 * k], [cx - 52 * k, cy - 40 * k], [cx - 48 * k, cy - 6 * k], [cx - 40 * k, cy + 22 * k], [cx - 50 * k, cy + 22 * k], [cx - 58 * k, cy], [cx - 66 * k, cy + 22 * k], [cx - 76 * k, cy + 22 * k], [cx - 68 * k, cy - 6 * k]]);
+      for (const wx of [cx + 10 * k, cx + 64 * k]) {
+        b.fill(CM.paper, ovalPath(wx, cy + 8 * k, 16 * k, 16 * k));
+        b.fill(CM.paving, ovalPath(wx, cy + 8 * k, 11 * k, 11 * k));
+      }
+      b.poly(CM.paper, [[cx + 10 * k, cy + 6 * k], [cx + 36 * k, cy - 20 * k], [cx + 62 * k, cy + 6 * k], [cx + 58 * k, cy + 10 * k], [cx + 36 * k, cy - 12 * k], [cx + 14 * k, cy + 10 * k]]);
+      b.fill(CM.paper, ovalPath(cx + 34 * k, cy - 34 * k, 7 * k, 7 * k));
+    };
+    pic(600, 1560, 1.15);
+    for (let i = 0; i < 60; i++) {
       const y = r.range(1240, 1900);
       const s = lerp(10, 22, (y - 1240) / 660);
       b.fill(r.pick([CM.leafGold, CM.leafRust, CM.coatMustard]), leafPath(r.range(0, 1080), y, s, s * 0.35, r.range(-40, 40)));
     }
     drainInto(b, 470, 1760, 120, 's2drain');
+    // long golden-hour shadows to the right across our towpath (the low sun is west = screen left)
+    const sun: Pt = [-900, 900];
+    for (const [x, y, w, len] of [[600, 1230, 30, 320], [760, 1230, 30, 300], [190, 1252, 40, 360], [530, 1252, 40, 330], [120, 1650, 180, 300], [80, 1292, 120, 260]] as [number, number, number, number][]) shadowInto(b, x, y, w, len, sun, CM.stoneShade, 0.15);
+    // a bike rack with two bikes behind the passers-by, a bin by the bench
+    for (const x of [250, 330, 410]) b.ink(`M${P(x, 1352)}L${P(x, 1300)}Q${P(x + 20, 1278)} ${P(x + 40, 1300)}L${P(x + 40, 1352)}`, INK_PX.mid, CM.anchor);
+    bikeInto(b, 300, 1356, 34, 's2rb1', CM.coatSlate, 1);
+    bikeInto(b, 392, 1360, 34, 's2rb2', CM.brick, -1);
+    binInto(b, 836, 1262, 70, 's2bin');
     // two puddles mirroring the sky (a leaf afloat in one)
     for (const [px, py, pw] of [[300, 1420, 150], [760, 1640, 210]] as [number, number, number][]) {
       b.fill(CM.glass, `M${P(px - pw / 2, py)}Q${P(px - pw * 0.2, py - pw * 0.12)} ${P(px + pw * 0.1, py - pw * 0.08)}Q${P(px + pw / 2, py - pw * 0.06)} ${P(px + pw * 0.45, py + pw * 0.05)}Q${P(px, py + pw * 0.14)} ${P(px - pw / 2, py)}Z`);
@@ -284,9 +313,9 @@ export const S2Set: React.FC<S2SetProps> = ({story, staffCoolAt, storyOverlay, a
       <Movers
         idPrefix="s2far"
         movers={[
-          {pose: 'walk', from: [1100, s2y('base', s2u(1100)) + 12 * s2g(s2u(1100))], to: [-60, s2y('base', s2u(-60)) + 12 * s2g(s2u(-60))], h: [40, 190], speed: 60, phase: 0.2, seed: 's2fw1', acc: 'tote'},
-          {pose: 'walk', from: [-60, 1046], to: [1100, s2y('base', s2u(1100)) + 12 * s2g(s2u(1100))], h: [190, 40], speed: 55, phase: 0.75, seed: 's2fw2', acc: 'scarf'},
-          {pose: 'jog', from: [1100, s2y('base', s2u(1100)) + 12 * s2g(s2u(1100))], to: [-60, 1046], h: [40, 190], speed: 140, phase: 0.45, seed: 's2fj', acc: 'cap'},
+          {pose: 'walk', from: [1100, s2y('base', s2u(1100)) + 12 * s2g(s2u(1100))], to: [560, s2y('base', 3) + 12 * s2g(3)], h: [40, 120], speed: 30, phase: 0.2, seed: 's2fw1', acc: 'tote'},
+          {pose: 'walk', from: [560, s2y('base', 3) + 12 * s2g(3)], to: [1100, s2y('base', s2u(1100)) + 12 * s2g(s2u(1100))], h: [120, 40], speed: 28, phase: 0.75, seed: 's2fw2', acc: 'scarf'},
+          {pose: 'jog', from: [1100, s2y('base', s2u(1100)) + 12 * s2g(s2u(1100))], to: [560, s2y('base', 3) + 12 * s2g(3)], h: [40, 120], speed: 70, phase: 0.45, seed: 's2fj', acc: 'cap'},
         ]}
       />
       <PerspBoat stern={[s2x(mooredA.u1), lane(mooredA.u1, 34)]} bow={[s2x(mooredA.u0), lane(mooredA.u0, 34)]} hStern={150 * s2g(mooredA.u1)} hBow={150 * s2g(mooredA.u0)} seed="s2moored" cabin={CM.sage} />

@@ -7,7 +7,7 @@
 import React, {useMemo} from 'react';
 import {CM, INK_PX} from '../../palette';
 import {line} from '../../../lib/sketch';
-import {Batch, Paint, P, rng, lerp, leafPath, Pt} from './core';
+import {Batch, Paint, P, rng, lerp, leafPath, Pt, ovalPath} from './core';
 import {bollardInto, bikeInto} from './towpath';
 import {copingInto} from './water';
 import {CastSlot, PersonSlot} from './slots';
@@ -125,6 +125,23 @@ export const Steps: React.FC<StepsProps> = ({people = true, acts = [], seed = 's
     // a book lying open
     b.poly(CM.paper, [[248, 1640], [300, 1630], [306, 1648], [252, 1656]]);
     b.poly(CM.box, [[244, 1642], [250, 1658], [256, 1656]]);
+    // more life left on the treads: a striped picnic blanket, a folded coat, a skateboard, a guitar case, a bottle,
+    // a dog bowl, a newspaper (no legible print)
+    const blanket = (x: number, y: number, w: number, h: number) => {
+      b.poly(CM.paper, [[x, y], [x + w, y - 4], [x + w + 10, y + h], [x - 8, y + h + 4]]);
+      for (let k = 0; k < 5; k++) b.poly(k % 2 ? CM.box : CM.sage, [[x + (w * k) / 5, y - (4 * k) / 5], [x + (w * (k + 0.5)) / 5, y - (4 * (k + 0.5)) / 5], [x + ((w + 18) * (k + 0.5)) / 5 - 8, y + h + 4], [x + ((w + 18) * k) / 5 - 8, y + h + 4]]);
+    };
+    blanket(560, 1420, 150, 40);
+    b.poly(CM.coatPlum, [[260, 1468], [330, 1460], [338, 1486], [262, 1492]]);
+    b.poly(CM.coatMustard, [[770, 1652], [890, 1648], [886, 1664], [772, 1668]]);
+    b.fill(CM.anchor, ovalPath(786, 1672, 8, 8));
+    b.fill(CM.anchor, ovalPath(872, 1670, 8, 8));
+    b.poly(CM.anchor, [[1010, 1450], [1070, 1300], [1094, 1306], [1036, 1458]]);
+    b.rect(CM.sage, 470, 1452, 14, 40);
+    b.rect(CM.paper, 472, 1446, 10, 8);
+    b.fill(CM.brickDeep, ovalPath(720, 1600, 22, 8));
+    b.poly(CM.paper, [[60, 1700], [150, 1690], [156, 1720], [64, 1730]]);
+    b.ink(`M${P(70, 1704)}L${P(140, 1696)}M${P(72, 1712)}L${P(128, 1706)}`, INK_PX.hair, CM.paneUnlit);
     // the bike leaning, cut by the bottom-right edge
     bikeInto(b, 1040, 1890, 120, `${seed}/bike`, CM.brickDeep, -1);
     return b;
