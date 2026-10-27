@@ -621,14 +621,15 @@ def door_latch(v=1):
 
 @sound
 def cloth_wipe(v=1):
-    """'her words': the cafe owner wipes the board clean in ONE stroke: cloth on enamel, left to right; the cloth's
-    grain sits low and high, the voice's 1-4 kHz is left free."""
-    d = 0.34; n = n_of(d)
+    """'her words': the cafe owner wipes the board clean in ONE stroke: cloth on enamel, left to right. The stroke
+    starts soft and gathers speed (its body lands on 'words', past the breathy 'her'); the cloth's grain sits low,
+    the voice's 1-4 kHz and its consonants above are left free."""
+    d = 0.36; n = n_of(d)
     g = lp(noise(d, 450), 60)
     grain = np.clip(1.0 + 0.3 * g / (np.std(g) + 1e-12), 0.3, 1.6)
-    y = bp(noise(d, 451), 300, 5500) * env_bell(n, 0.30, 1.3) * grain
-    y = M.notch_band(y, 1000.0, 4000.0, -9.0)
-    return pan_sweep(y, -0.5, 0.2)
+    y = bp(noise(d, 451), 250, 4000) * env_bell(n, 0.62, 1.7) * grain
+    y = M.notch_band(y, 1000.0, 4000.0, -6.0)
+    return pan_sweep(lp(y, 3800, 2), -0.5, 0.2)
 
 
 @sound
@@ -659,8 +660,9 @@ UNTRIMMED = {"pencil_reverse"}                   # exact length: it ends on the 
 
 
 def tonality(y):
-    """the share of a sound's 1-4 kHz energy that sits in its six strongest spectral peaks (+-0.6 %): 1 = bare
-    partials, ~0.1 = noise. Replaces the hand list: anything with a noise puff in the diction band is not tonal."""
+    """the share of a sound's 1-4 kHz energy that sits within +-1.5 % of its six strongest spectral peaks (a struck
+    block's mode and its close neighbours count as one tonal component): 1 = partials, ~0.2 = noise. Replaces the
+    hand list: anything with a noise puff or a noisy body in the diction band is not tonal (review item 2)."""
     m = st(y).mean(axis=1)
     nf = 1 << int(np.ceil(np.log2(max(len(m), 4096)) + 1))
     P = np.abs(np.fft.rfft(m * np.hanning(len(m)), nf)) ** 2
@@ -671,11 +673,10 @@ def tonality(y):
         return 1.0
     pk, _ = ss.find_peaks(Pb, distance=max(1, int(20 / (f[1] - f[0]))))
     top = pk[np.argsort(Pb[pk])[-6:]] if len(pk) else []
-    e = 0.0
+    w = np.zeros(len(fb), bool)
     for i in top:
-        w = (np.abs(fb - fb[i]) <= max(6.0, 0.006 * fb[i]))
-        e += Pb[w].sum()
-    return float(min(1.0, e / Pb.sum()))
+        w |= (np.abs(fb - fb[i]) <= max(6.0, 0.015 * fb[i]))
+    return float(min(1.0, Pb[w].sum() / Pb.sum()))
 
 
 def mono_notch_db(y):
