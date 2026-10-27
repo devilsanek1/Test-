@@ -1,5 +1,12 @@
 # Style bible, reference 2: full-bleed framing, scale and time of day
 
+> **v1 history (banner, 2026-10-27).** Keep it for reference 2's measurements (framing, figure scale, captions in the
+> sky, time of day, the dusk sequence). Its look and motion rules are retired: the per-shot zoom, ink by depth, an
+> audience of backs along the bottom, stepped glow rings and bulbs popping in rows, ref 1's >= 5 events/s as the
+> target, 2-3 scale peaks per film; and "anything not mentioned here stays as in style_bible.md / motion_spec.md" no
+> longer holds. The current look is `docs/look/DIRECTION.md`, its numbers `docs/look/CRAFT.md`. Never brief a lane
+> from this file.
+
 Stream: style and motion analysis (ref 2). This file only **adds to or overrides** `style_bible.md` and `motion_spec.md`
 (reference 1). Anything not mentioned here (ink colour, fill rules, people construction, the 13-colour palette, caption
 font) stays as in those files.

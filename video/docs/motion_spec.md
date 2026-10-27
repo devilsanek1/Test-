@@ -1,5 +1,11 @@
 # Motion spec: the reference's animation language, measured
 
+> **v1 history (banner, 2026-10-27).** Keep it for reference 1's measured timings, the sync grammar and the transition
+> recipes as measurements. Its style rules are retired: misregistered fills, the >= 5 events/s target and the always-on
+> idle layer (§9), the sun as a character that pulses and hops, the cat crossing every transition by jumping. The
+> current direction is `docs/look/DIRECTION.md` (rules 1-3 and 8, "Retired"; numbers in `docs/look/CRAFT.md`).
+> Never brief a lane from this file.
+
 Stream: motion analysis. Source: `assets/ref/reference.mp4` (1080x1350, 30 fps, 946 frames, 31.53 s).
 All 946 frames were extracted and measured with code: frame differencing, colour-mask tracking, connected
 components, ORB/affine camera estimation, ink-pixel growth, card-corner fitting, easing-curve fitting.

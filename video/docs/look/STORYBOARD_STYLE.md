@@ -9,6 +9,8 @@ light): the board plans for it in grey (what carries each join, each beat's one 
 keeps its own sketch pen, never the film's. Owner-approved 2026-10-27 (the designed sketch: `docs/G3_ANIMATIC.md` §1-3):
 a carrier for every join (`CRAFT.md` §a) replaces "cut by default" and §7's "size or angle changes at every cut"; line
 weights follow the attention TIER (story role), never the depth (§2-3); each set's light rig is drawn as shapes (§2).
+The direction the board plans for is `DIRECTION.md`; where this file and `docs/G3_ANIMATIC.md` disagree, G3_ANIMATIC
+wins (the chain in DIRECTION's intro).
 
 ## 0. The principle (owner, 2026-10-26): signal per drawing
 A board exists to give the director (the owner) the most signal about the final film in the least drawing and review
@@ -41,9 +43,9 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
 ## 2. The look
 | Token | Hex | L\* | Use |
 |---|---|---|---|
-| paper | `#F7F5F0` | 97 | The page, sky, far plane and caption band. A neutral off-white: today's cream `#f3ebdd` reads as finished design. |
-| light | `#CDCBC6` | 82 | Tier-C masses with no contour (walls, a table, buildings behind) and the tier-C scribble; sky only when it must separate from the ground. |
-| mid | `#9A9893` | 63 | The light rig's one shadow value (cast and ground shadows, on the side away from the key), tier-B lines, the home base's one flat room tone (§7), slug and notes text. |
+| paper | `#F7F5F0` | 97 | The page, sky, far plane and caption band; the home base's window glass and lamp pool (§7). A neutral off-white: today's cream `#f3ebdd` reads as finished design. |
+| light | `#CDCBC6` | 82 | Tier-C masses with no contour (walls, a table, buildings behind), the home base's one room tone (§7) and the tier-C scribble; sky only when it must separate from the ground. |
+| mid | `#9A9893` | 63 | The light rig's one shadow value (cast and ground shadows, on the side away from the key), tier-B lines, slug and notes text. |
 | dark | `#3A3835` | 24 | The tier-A subject's one mass (a screen, a body, the bar that matters). The only dark area in the panel. |
 | ink | `#1F1E1C` | 11 | All tier-A lines, labels, numbers and captions. |
 | red pencil | `#C23B22` | 45 | **Annotation layer only** (§4): one focus or camera mark. Never a fill, never on an object in the scene; most panels have none. |
@@ -60,7 +62,7 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
 
 ## 3. Drawing rules
 - **One idea per panel.** Write the idea as one sentence first ("a hand taps Add to cart; the price jumps"). Two ideas means two panels,
-  cut on the voice. Exactly one subject; 12-25 elements, and over 30 the panel gets split (`role:'dress'` placeholder elements exempt — `G3_ANIMATIC.md` §3).
+  joined on the voice by a carrier (§4). Exactly one subject; 12-25 elements, and over 30 the panel gets split (`role:'dress'` placeholder elements exempt — `G3_ANIMATIC.md` §3).
 - **Staging:** the subject sits on the centre axis (x 380-700) of the read zone (y 600-1250). It spans 35-60 % of the 760 px stage
   (at least 270 px) with 80 px of clear paper around it, and keeps its screen spot across a cut unless the cut is about movement.
   Before goes on the left, after on the right; more goes up or taller; time runs left to right. A scale panel inverts the
@@ -107,8 +109,10 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
   pass the checklist as panels; the subject is never cut off at an edge for more than 0.3 s. Every move ships its five
   values (move word, duration, start/end offset or scale, anchor, ease) and eases in AND out; speed budget ~15 px/frame
   at the render rate (~900 px/s at 60 fps — a lint WARN resolved by the sound-on check at 1x; derivation in
-  `G3_ANIMATIC.md` §4). **A zoom of more than 2x becomes a cut to a closer panel** (a cut-in reads instantly; the 4.2x
-  zoom in S8 did not). Board-mode parallax only behind `shot.parallax: true` (rise-over planes).
+  `G3_ANIMATIC.md` §4). **A push of more than 2x is a push-through (carrier A):** at most 2x per panel, into a
+  sub-frame that IS the next panel, handed over at matched scale (S8's 4.2x zoom inside one panel cropped its
+  drawing while it moved); a closer view inside one place is a C push; a cut-in is a declared F. Board-mode parallax
+  only behind `shot.parallax: true` (rise-over planes).
 - **Arrows: none over a move we animate.** The move is its own notation, and an arrow would be one more thing to read. Paper boards need
   arrows because they can't move; even Storyboard Pro makes its camera frames optional in PDF exports [18] (REPORTED). A red mark appears
   only when (1) a move is planned but not animated yet (dashed end-frame box, corner arrows and the word, held for the panel); (2) a
@@ -117,9 +121,10 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
   Cases (1) and (3) are legal only in internal interim drafts: on any owner-facing render they are a lint FAIL — a mark
   where a played move belongs is the held-drawing loophole the animated-sketchbook rule retires (owner, 2026-10-26).
 - The slug always names the camera move and the transition with its carrier letter (every G3 transition is labelled).
-  Never a cut by default: every join carries something (at most 2 plain cuts; `G3_ANIMATIC.md` §4); dissolves per
-  `G3_ANIMATIC.md` §4: 0.2-0.4 s to soften, 1-2 s only for time passing. Frame 0 follows the playbook: lines, then
-  tones, voice from frame 1. No other drawing draws itself on except a chart line, in step with the voice.
+  Never a cut by default: every join carries something (at most 2 plain cuts; `G3_ANIMATIC.md` §4); a dissolve is no
+  carrier, only a declared time-passing exception (`G3_ANIMATIC.md` §4). Frame 0 follows the playbook: the scene
+  being drawn (the subject's lines, then the tones), voice from frame 1. No other drawing draws itself on except a
+  chart line, in step with the voice.
 
 ## 5. Speed: how to iterate
 - **Thumbnails first:** for each beat, write the sentence, render 3 variants (a different subject size or angle) as 270 x 480 board stills
@@ -141,7 +146,8 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
   shot type, COZY / SCALE and the move, line 2 the idea, both readable on the sheet; (10) sound on at 1x: every move
   readable, no strobe, every cut lands on its word, cuts judged in pairs, and the reader says where the eye is every 2 s
   and what carried it across each cut; (11) no panel surface both empty and
-  undeclared (`negative: true` or a placeholder), and each set panel answers 'does this place feel inhabited?';
+  undeclared (`negative: true` or a placeholder), and each set panel answers 'does this place feel inhabited?' and
+  'is your eye still on the subject, and what competes with it?';
   (12) the subject stays the same size and on its ground line across a shot's poses unless the change is the idea.
 
 ## 6. Implementation notes for SketchReel (`Animatic.style: 'board' | 'sketch'`, default `board` at G3)
@@ -163,6 +169,9 @@ figure `pose?: 'stand'|'walk'|'point'|'reach'|'hold'|'shrug'|'slump'|'lookup'|'s
 …, word?}` on the red annotation layer (5 px; `frame` = a dashed end-frame box with corner arrows), with `in` and `out` like any other element.
 **To build (tier 1, `G3_ANIMATIC.md` §7; owner-approved 2026-10-27):** `tier?: 'A'|'B'|'C'` on every element (stroke and fill by story
 role, §2: it replaces `role` for the weight), `carrier` on every transition, `rig` per set panel, and the thread object's screen time.
+**Until `tier` lands, set `role` by TIER, never by depth:** A = `role: 'subject'` (9 px ink); B = `role: 'far'` with paper or no
+fill (its 3 px mid-grey line; a filled B shape adds `sw: 3`); C = `role: 'far'` with a light fill (drawn flat, no line). Never
+`'mid'` (a 5 px INK line, darker than B may be) and never the `f` default (it picks the role by depth).
 **`board-lint` runs before every render.** Per shot it checks: at most 25 elements (warn at 30 to split); one subject group; at most 1 label and 1
 mark; text at least 48 px; fills from the palette only; nothing crossing y 290-600 except a `far` flat fill; the subject's box centred
 in x 380-700 and 270-460 px wide (a tall subject such as a standing figure is measured by its height, 300-650 px; a `scale` panel's
@@ -183,22 +192,26 @@ a worked board with every pattern (home base as 1-element window, icon ticker, e
 ## 7. Cinematography belongs in the board (owner, 2026-10-26)
 Clarity and cinematics are not a trade-off. Each panel names its shot type and framing, drawn in monochrome:
 - **Home base = cozy enclosure** (`COZY_AND_SCALE.md` §2-3): walls/shelf as the room-tone mass (next bullet; tier C, no
-  contour) cut by 2 frame edges, ONE opening (the window, 15-30 % of the frame) in light grey; the lamp pool as a
-  light-grey shape. The subject stays the darkest.
+  contour) cut by 2 frame edges, ONE opening (the window, 15-30 % of the frame) in paper; the lamp pool as a
+  paper shape. The subject stays the darkest.
   Reads as a window, not a screen (v3 G3): landscape glass, a sill, the lamp shade over one lower corner, the view in it
   (horizon, landmark) and ONE mullion in clear glass, never across the landmark or its sign (a cross over the subject
-  brought back "screen or blinds?"); the landmark's body in paper so it separates from the light glass. The pool sits
-  on a darker surface (the desk as part of the mid refuge mass) as a paper ellipse; on plain paper it reads as a stain.
-- **The home base is ONE room tone (v3 G3 fix round):** a single far flat mid rect over the whole frame (wall, shelf and desk),
-  so the light glass is the lightest thing around it; a light window on blank paper is darker than its surround and reads as
-  a picture or a screen. Every home-base panel (the POV, the objective return, the close-ups at the desk, the callback)
+  brought back "screen or blinds?"); the glass is paper (the lightest thing in the room) and the landmark's body a light
+  tone with the subject's or B's line, so it separates from the glass. The pool sits on the room tone as a paper ellipse
+  (on plain paper it reads as a stain); the rig's shadows are mid on it.
+- **The home base is ONE room tone (v3 G3 fix round; tone set by tier, 2026-10-27):** a single flat LIGHT rect (tier C)
+  over the whole frame (wall, shelf and desk), so the paper glass is the lightest thing around it; a light window on
+  blank paper is darker than its surround and reads as a picture or a screen. Light, not mid: mid is the rig's shadow
+  value and B's line colour, and both vanish on a mid wall. Every home-base panel (the POV, the objective return, the close-ups at the desk, the callback)
   starts from the same room tone and the same lamp shade or pool, so the place visibly returns; a light desk on paper read
   as another place. In an objective return, reuse the opening's window and its outline of the landmark (scaled), never a
-  new drawing: a tall slab with a cross read as a glass door, a box with notches as a castle. A cut-in keeps the object
-  it cuts into (S15's phone, 1.275x on its axis), not a look-alike.
-- **Scale** (`CINEMATIC_GUIDE.md`): the one big move (S1 rise-over reveal) drawn with its planes; a scale CUT from a close
-  panel to a tiny figure (0.04-0.08 H, so at least ~80 px: a 3 % figure is a 15 px speck on the cold-read thumbnail;
-  fix the plan, not the floor) under something huge; a low or worm's-eye angle for the colossus. Mark a move with the
+  new drawing: a tall slab with a cross read as a glass door, a box with notches as a castle. A closer view keeps the
+  object it moves into (a C push inside the place, or a declared F cut-in: S15's phone, 1.275x on its axis), never a
+  look-alike.
+- **Scale** (`CINEMATIC_GUIDE.md`): the one big move (S1 rise-over or S5 pull-back) drawn with its planes, landing on a
+  tiny figure (0.04-0.08 H, so at least ~80 px: a 3 % figure is a 15 px speck on the cold-read thumbnail; fix the plan,
+  not the floor) under something huge; a scale cut from a close panel is a declared F; a low or worm's-eye angle for
+  the colossus. Mark a move with the
   red `frame` / arrow notation only when it is not animated (§4); an animated move is its own notation.
 - **Scale panels are BIG, never a centred object on paper (fix round):** shot `scale: true`. The reveal lands with the
   colossus cut by BOTH side edges (a wide hall, its sign readable), with a ruler at its foot (a row of houses, drawn paper
@@ -227,16 +240,18 @@ the world bible, before boarding, the cinematographer writes one row per panel: 
 element, move, the join's carrier, the tier map (what is A, B and C), the set's rig (key side, pools), readability note,
 plus the notes-strip lines. Then check the whole film:
 - **Moves:** every cut, camera move, element action and transition the final film will have is PLAYED at sketch
-  fidelity (`G3_ANIMATIC.md` §4-5; speed budget ~15 px/frame at the render rate, a lint WARN). "At most two" is retired;
-  a held panel is a CLAIM that the G5 shot is still: G5 adds only the hold cameras (cozy wides locked or the
-  `COZY_AND_SCALE.md` 3b.5 float, the 1.5-2 % pull-out only on the S3/S4 breathers) and polish, never new motion.
+  fidelity (`G3_ANIMATIC.md` §4-5; the one speed budget, `PIPELINE_V2.md` "Frame rate": ~15 px/frame at the render
+  rate, a lint WARN). "At most two" is retired; a held panel is a CLAIM that the G5 shot is still, and each hold's
+  camera (locked, or the `COZY_AND_SCALE.md` 3b.5 float; never a zoom) is played on the board: G5 adds no camera and
+  no new motion, only polish.
 - **Home base:** it opens the film, returns on the quiet beat (the waiting / thinking line) and hosts the callback; close-ups
-  at the viewer's desk keep it with just a lamp-pool ellipse (0.5-0.7 W, wider than the object on it, so it reads as
-  light, not a mat). Cozy is at least 50 % of the runtime outside full-frame chart inserts (`COZY_AND_SCALE.md` §1.3:
-  an insert is a neutral breath); the nook is breached once.
-- **Scale:** one moment (1.5-4 s) built as a ladder: a close-up of the one thing, the reveal of many, then ONE cut to a
-  tiny figure (change the angle as well as the size, so the second wide steps up instead of repeating).
-- **An S5 pull-back lands on the tiny figure inside the move** instead of a separate scale cut (v3, 2026-10-26).
+  at the viewer's desk keep it with just a lamp-pool ellipse (sized and placed by `CRAFT.md` §d.7, wider than the object
+  on it, so it reads as light, not a mat). Information is paper in the home place (`CRAFT.md` §a.2): a full-frame chart
+  is that paper filling the frame, entered by a push (A) or a card flip (E), and counted neither cozy nor scale; cozy is
+  at least 50 % of the rest of the runtime (`COZY_AND_SCALE.md` §1.3); the nook is breached once.
+- **Scale:** one moment (1.5-4 s) built as a ladder: a close-up of the one thing, the reveal of many, then the one big
+  move lands on a tiny figure (an S5 pull-back lands on it inside the move, v3, 2026-10-26); a separate scale cut is a
+  declared F (change the angle as well as the size, so the second wide steps up instead of repeating).
 - **Every join carries** (`CRAFT.md` §a: a push-through, a match, a continuous camera, an object carry, a card flip),
   taken from the through-line card, its midpoint on the first word of the new sentence and its midpoint frame drawn
   (`G3_ANIMATIC.md` §4); a plain cut (at most 2, on a "But" turn) changes size or angle, except a deliberate match (the
@@ -244,13 +259,15 @@ plus the notes-strip lines. Then check the whole film:
   change is the only difference.
 - **Rise-over in board mode = two layers:** the camera rises a little (the world sinks ~120 px, so nothing enters the
   caption band; ease `unveil`, landing on the key word) while the near ledge drops on its own move with ease `outSine`
-  over the WHOLE panel. Budget the speed on screen: camera + own move at most 15 px per 30 fps frame (a sine ease-out
-  peaks at pi/2 x the average speed; a quad or cubic ease-out landing early peaks at 2-3x and strobes). v3 S9: 120 px
-  of camera + 384 px own move = 520 px on screen in 1.92 s, peak 14.8. Start with the ledge hiding about half the
+  over the WHOLE panel. Budget the speed on screen, camera + own move together, against the one budget (`PIPELINE_V2.md`
+  "Frame rate": ~15 px/frame at the render rate; a sine ease-out peaks at pi/2 x the average speed; a quad or cubic
+  ease-out landing early peaks at 2-3x and strobes). v3 S9 (a 30 fps board): 120 px of camera + 384 px own move = 520
+  px on screen in 1.92 s, peak 14.8 px/frame. Start with the ledge hiding about half the
   landmark, its sign showing; things flying in enter from the side edges when the landmark's top sits near the band.
   Board-mode parallax plays behind `shot.parallax: true` (rise-over planes, `G3_ANIMATIC.md` §4 — tier-2 tooling); other shots stay flat.
-- **Close-ups are redrawn at size, never zoomed** (line weights scale with the camera). **Charts are straight-on, level
-  inserts** (an angle bends the number). **A match is built, not redrawn:** the builder makes the reprise from the first
+- **A close-up's frame is drawn at its size** (line weights scale with the camera): a push into it (A or C, at most 2x
+  per panel) hands over to the close panel drawn at size, never a 4x zoom of the wide drawing. **Charts are
+  straight-on, level paper** (an angle bends the number). **A match is built, not redrawn:** the builder makes the reprise from the first
   panel's element list plus the changes (a redrawn S6 dropped S4's axis word; a redrawn S14 moved S10's ground line).
 - **The low angle goes on the quantity, never on the thing under critique** (no villain): the pile of chips gets the
   worm's-eye; the company's building stays at eye level.

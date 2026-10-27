@@ -8,9 +8,11 @@ measured on v3 G5b against reference 1, v1 and the owner's two cozy references (
 applies now, from the v3 rework on. The gate steps that make the pipeline produce it are owner-approved (2026-10-27) and
 live in `PIPELINE_V2.md`, `G3_ANIMATIC.md` and `G5_BLOCKING.md`; the old rules that contradicted it are rewritten (a
 plain cut as G3's default, G5's draft line, the events-per-second quota). Subtle never means removed and clean never
-means empty: keep the life and the things a scene needs, lower their weight. A film's STYLE.md picks its values inside
-these rules; an older look doc that disagrees loses. Two-film thresholds are warnings with a declared exception, except
-§a's two FAILs. Px at 1080 x 1920, CIE L* and C*, %W/s = % of frame width/s; measures: §e.
+means empty: keep the life and the things a scene needs, lower their weight. The one-page summary of the direction is
+`DIRECTION.md`; a film's STYLE.md picks its values inside these rules. **Which doc wins:** owner's words (playbook;
+vN/OWNER_NOTES) > DIRECTION > CRAFT > PIPELINE_V2 > G3_ANIMATIC, G5_BLOCKING > look/*.md > the film's STYLE.md (values
+only) > v1-era docs (API and measurements, never style). Two-film thresholds are warnings with a declared exception,
+except §a's two FAILs. Px at 1080 x 1920, CIE L* and C*, %W/s = % of frame width/s; measures: §e.
 
 ## a. One flowing story
 **The through-line** (written down beside the core line, before any drawing):
@@ -37,6 +39,9 @@ these rules; an older look doc that disagrees loses. Two-film thresholds are war
 - **D object carry or wipe:** an object leaves one way and enters the next shot from the opposite edge at the same speed.
 - **E card flip or swipe** of the same paper (charts).
 - **F plain cut:** at most 2 per film, only on a "But" turn, with the thread on screen on both sides.
+- **In the engine** (`G5_BLOCKING.md` §2 has the table): A `push-through`, B `matchcut`, C one panel (or
+  `camera-continuous` inside one place), D `foreground-wipe` or a carry across a `cut`, E an in-panel card flip (no Film
+  type yet: the craft tooling lane), F `cut`. A dissolve is no carrier: only a declared time-passing exception.
 - **Timing:** the transition's midpoint lands on the first word of the new sentence, in the voice's pause; during it the
   carrier leads (the mascot may ride with it) and nothing else enters, pops, turns or speeds up, while slow life already
   moving (snow, steam, a far walker) keeps its pace: a freeze reads as a glitch. Shots average >= 3.5 s (ref 1 5.2, v1
@@ -59,7 +64,7 @@ the motion (ref 1 60 %). Every element gets a tier by its STORY ROLE, never by i
 | tier | value | colour | line (§c) | detail | motion |
 |---|---|---|---|---|---|
 | **A subject** (1-3 objects: the beat's one focus) | L* range >= 80; local contrast >= 2x C's | the hero colour only here (>= 50 % of the frame's C* > 35 pixels) | the only full outline | line coverage >= 2.5x C's | >= 60 % of the motion in its beat; a second story action <= 0.3x of it, never at the same moment |
-| **B supporting life** (the mascot, people near the story, an audience; kit tier `support`, which also takes story objects off their beat) | local contrast <= 1.2x C's; no near-black areas | C* <= 25; never the hero or pop hue | tinted, or none | flat: one tone + one shade | each <= 3 % of the frame; constant speed, <= 0.5x the subject's while it moves (a still subject never freezes the world); no pops; together <= 30 % of the motion |
+| **B supporting life** (the mascot, people near the story, an audience in the mid ground; kit tier `support`, which also takes story objects off their beat) | local contrast <= 1.2x C's; no near-black areas | C* <= 25; never the hero or pop hue | tinted, or none | flat: one tone + one shade | each <= 3 % of the frame; constant speed, <= 0.5x the subject's while it moves (a still subject never freezes the world); no pops; together <= 30 % of the motion |
 | **C environment** (room, shelves, desk dressing, street, town, sky, weather and far life: walkers, cars, birds, steam; kit tier `environment`) | local contrast <= 7; L* range <= 60 | C90 <= 25 (ref 1, v1), or saturated at contrast <= 7 (the cozy look) | no outlines; hairlines only | line coverage <= 6 % | the camera's float plus slow life that never stops (cloud drift, smoke, steam, snow, one window or bulb changing at a time, far walkers, cars and birds), together <= 10 % of the motion |
 
 - **Alive but subtle:** supporting life (B and C) never stops (as in the cozy references) but stays small, slow and low in
@@ -73,8 +78,9 @@ the motion (ref 1 60 %). Every element gets a tier by its STORY ROLE, never by i
 - **A softer style for B and C is the method:** a light flat fill with a thin tinted line (ref 1's crowds, drawn with B's
   line, §c), no outlines (the cozy references' walkers), flat tinted silhouettes (v1's far city). Not every moving piece
   is drawn or animated alike.
-- **Big means subject or still:** any moving figure > 5 % of the frame is the subject; foreground backs hold still or
-  breathe (<= 2 %W/s) while the subject acts (v3's audiences, 11-35 % of the frame, took up to 97 % of the motion).
+- **Big means subject or still:** any moving figure > 5 % of the frame is the subject; a big near figure (the "you"; never
+  strangers' backs, §a.3) holds still or breathes (<= 2 %W/s) while the subject acts (v3's audiences, 11-35 % of the
+  frame, took up to 97 % of the motion).
 - **The mascot is tier B** unless the line is about it: C* <= 25, a tinted outline <= 2.2 px, <= 1 % of the frame (close-ups
   too), only blinks and ear moves (<= 10 %W/s) while the subject moves, clear of the subject (v3's Pip, C* 44 with dark
   outlines, beat the subject's salience per pixel in 12 of 13 panels).
@@ -105,7 +111,9 @@ G4 frame had the same pen and passed with a quarter of the strokes: the fix is a
 - **Fills** register exactly (offset 0); a tier-A outline is drawn inside its fill (stroke 2x, clipped to the fill), so the
   silhouette is the clean fill edge.
 - **Texture:** big areas flat; texture only as flat same-hue shapes (a rug pattern, plank seams as 2 long bands at dL* 6-8
-  or less) on 1-2 small surfaces per shot. No specks, ticks, hatching, scribble, dash rows, crumbs or steam squiggles.
+  or less) on 1-2 small surfaces per shot. No specks, ticks, hatching, scribble, dash rows, crumbs or steam squiggles,
+  and no grain overlay. The one optional texture is the owner's halftone (`PALETTE.md` "Texture and lines": at most 6 %,
+  on a few chosen elements, a last step after G6; the film must work flat).
 - **Line motion:** an object draws on as one stroke, never edge by edge; no `exitLoose`, no boil.
 - **Code: the CLEAN pen** (the sketch pen stays for G3 boards), set once in the film's look module: `lib/pen.ts`
   `setPen('clean')` (the full pen with tiers, work in progress; `lib/sketch.ts` `setPenMode('clean')` is v2r's lighter
@@ -118,8 +126,11 @@ G4 frame had the same pen and passed with a quarter of the strokes: the fix is a
 (16 k / 10-26 k / 20-31 k / 21-33 k); dark-line pixels <= 3 % (5.0 / 2.8-6.8 / 7-10 / 5.1-9.4); near-miss ends <= 40 (68 /
 129-413 / 324-691 / 689-1840); colour edges that carry a line <= 40 % (62 / 54-89 / 64-72 / 59-72; the cozy references
 19-22); cleaner than ref 1 and v1 on purpose, never emptier: the props stay, their lines go. Code: `grep -rnE
-"\bover:|misreg|hatch\(|scribble|exitLoose|\bopen=" src/vN/film` finds nothing. Eye check at 1:1: no "+" at a corner, no
-doubled loop, no fill sliding off its line.
+"\bover:|misreg|hatch\(|scribble|exitLoose|\bopen=" src/vN/film` finds nothing, and the film draws no `lib/cine`
+drawing piece (city, street, tower, monument, wall, windows, figures, sky, light, props, wipers, lens: raw paths with
+`misreg` and their own hand jitter, which the clean pen never reaches) until the craft tooling lane ports them; its
+camera, perspective, atmosphere and colour utilities are engine primitives, and `lib/kit` draws through `Ink` / `Fill`
+(clean-pen-aware). Eye check at 1:1: no "+" at a corner, no doubled loop, no fill sliding off its line.
 
 ## d. Light and shadow: gentle, but always there
 v3: light pools darker than the snow they lit, a night room brightest at the top (farthest from a low lamp; already in the

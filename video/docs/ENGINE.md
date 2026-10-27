@@ -1,8 +1,17 @@
-# ENGINE v3: cheat-sheet for scene agents (core lane)
+# ENGINE: cheat-sheet for scene agents (core lane; written for v1, whose shot plan was "storyboard v3")
 
-Full-bleed, cinematic, hand-drawn ink. Read `docs/BRIEF.md` (BALANCE NOTE + CINEMATIC DIRECTION), then this page.
+> **v1-era engine API (banner, 2026-10-27).** Use this page for the API: §1 rules 1-5, 7 and 10, §2, §4-§8, §10-§14.
+> Its look is v1's and retired: rules 6, 8 and 9 (marked below), §3's template look (a per-shot push, a drifting,
+> beating sun, structural overshoot, a crowd inked by depth), §9's sun as a character, the sketch pen as a film's line,
+> glow discs and the full-colour loop seam (a new film un-builds into frame 0: `docs/G5_BLOCKING.md` §1). The current
+> direction is `docs/look/DIRECTION.md` (numbers: `docs/look/CRAFT.md`); in a film the clean pen and tiers draw
+> everything (§7). "v3" on this page means v1's storyboard v3 (`docs/storyboard_v3.md`), never video 3 (except
+> "KitSheet3" in §11). Never brief a lane from its look.
 
-**v3 in one paragraph (storyboard v3, the 55.36 s voice).** Film transitions add NO camera: every `transitionIn` is
+Full-bleed, cinematic, hand-drawn. (v1's lanes read `docs/BRIEF.md` first; a new film's lanes read
+`docs/look/DIRECTION.md` and `docs/look/CRAFT.md`, then this page for the API.)
+
+**v1's storyboard v3 in one paragraph (the 55.36 s voice).** Film transitions add NO camera: every `transitionIn` is
 `cut`, `matchcut` or `foreground-wipe` (element `'scene'`: the outgoing scene's exported `Wiper`), and every camera move
 is a scene key (ShotCam / CineCamera keys or a World `push` with explicit `to` / `at` / `dur`). The loop is a
 FULL-COLOUR seam: the last scene's `transitionOut {type: 'cut', loop: true, captionAt}` plays it to its end untouched
@@ -10,8 +19,8 @@ FULL-COLOUR seam: the last scene's `transitionOut {type: 'cut', loop: true, capt
 `captionAt` and frame 0 finishes that roll (section 5). Labels are scene-owned props; captions never render them
 (section 6). A stepped uniform sky tween is consecutive `snap` keys with explicit colours (section 4).
 Camera / light / skyline / city kit: **`docs/CINE.md`** (`src/lib/cine`). Mascot: **`docs/mascot.md`** (`src/lib/mascot`).
-Look: `docs/style_bible.md` + `docs/style_bible_ref2.md` (full-bleed numbers win). Motion numbers: `docs/motion_spec.md`
-(all of them live in `MOTION`, `src/lib/spec.ts`).
+Look: v1's was `docs/style_bible.md` + `docs/style_bible_ref2.md` (full-bleed numbers win); a new film's is
+`docs/look/DIRECTION.md`. Motion numbers: `docs/motion_spec.md` (all of them live in `MOTION`, `src/lib/spec.ts`).
 
 ```ts
 import {World, ShotCam, Tod, TodAnchor, useTod, Sun, Ink, Fill, Drawn, rect, line, Plane, wallQuad, eyeLevel, Person,
@@ -32,14 +41,16 @@ import {Elephant, ElephantTimeline} from '../lib/mascot';
 4. **Flat.** No CSS/SVG blur, filters, gradients, masks with soft edges. Palette tokens only (`palette.*`, `skies.*`).
 5. **Lead the voice** (motion spec 7): small element `word.s - 0.10`, big build/burst `word.s - 0.25..0.40` so it
    completes on the word, ✓/✗ marks on the word, sun beats on the word (±0.05). Captions apply their own leads.
-6. **≥ 5 visual events per second, no gap > 1.0 s.** Something always moves: sun drift (≥ 10 px/s) / beats, mascot
-   idle, crowd bob, walkers, lights switching on in staggers.
+6. **Retired (v1's "≥ 5 visual events per second, no gap > 1.0 s", 2026-10-27):** never a still frame, but life by
+   tiers (`docs/look/CRAFT.md` §b: one mover leads, supporting life small, slow and taking turns); events/s is
+   information, never a target; the sun is no idle motion.
 7. **People are always seen from behind** (`Person`: ears, neck, back of the head, no faces).
-8. **Ink weight by depth** (`depthInk`), far things get NO ink.
-9. **One colossal element per scene, tiny people / mascot against it**, and an **EYE-LEVEL camera** (section 2b:
-   the lens at ~1.1 x a standing person's height, so every head sits just under the horizon; never 2-4 x head height,
-   which looks DOWN on a diorama and makes the viewer feel big) — with restraint (balance note): mostly gentle pushes
-   (World `push`), 2–3 Arcane-scale peaks in the whole film.
+8. **Retired (v1's "ink weight by depth", 2026-10-27):** ink by TIER, never by depth: `setPen('clean')` in the film's
+   look module, tiers through `tiered()` / `<Tier>` (§7; `docs/look/CRAFT.md` §c). `depthInk` stays for v1 renders.
+9. **Retired (v1's "one colossal element per scene ... gentle pushes, 2-3 Arcane-scale peaks", 2026-10-27):** one big
+   scale reveal per film (`docs/look/DIRECTION.md` rule 7), holds locked or a slow float, never a push per shot
+   (`docs/look/COZY_AND_SCALE.md` 3b.5). The EYE-LEVEL camera of section 2b (the lens at ~1.1 x a standing person's
+   height) stays the default street camera.
 10. **Captions own the sky band** (`skyCaption.clipTop`–`clipBottom`, screen space): keep busy detail, skyline tops and
     sky-band steps out of it (tops below y 600). Dark ink on light skies, white on dark skies (`captionTone`).
     `scripts/sheet.sh` checks it for you (section 11).
@@ -91,7 +102,11 @@ Current values (always reference the TOKEN in code, never the literal):
 | time of day | sky day #ACD1BF, golden #ACD1BF, dusk #6D988B, night #588077, dawn #ACD1BF; caption tone day dark, golden dark, dusk dark, night light, dawn dark (`todSky`, `todTone`) |
 <!-- numbers:end -->
 
-## 3. A complete minimal scene (the template: copy it)
+## 3. A complete minimal scene (v1's template: copy the API, never the look)
+
+> Its look is v1's and retired: the per-shot `push`, the drifting, beating `Sun`, the structural overshoot, `Crowd`'s
+> ink by depth and `rim`. A new film writes the same API in the clean pen and tiers (§7), with its own kit; the craft
+> tooling lane (`docs/PIPELINE_V2.md`) rebuilds this template on it.
 
 `src/scenes/Scene07.tsx` (auto-registered as `S07`; the id must exist in `src/data/scenes.json`):
 
@@ -264,6 +279,9 @@ already on the full form; cast.tsx reads `useInkScale()`.)
 
 ## 5. Transitions (`transitionIn` of the INCOMING scene; c = its `start`)
 
+A new film's joins are carriers A-F (`docs/look/CRAFT.md` §a); their engine types are mapped in
+`docs/G5_BLOCKING.md` §2 (the push-through and camera-continuous below are carriers A and C again).
+
 **v3: transitions add no camera.** `cut`, `matchcut` and `foreground-wipe` never move a scene (Film passes the rest
 camera: `useStageCam()` = rest, `useScene().transitionIn.settle` = 0 for cuts, `zoomDir` = 0, so a World / ShotCam
 `push` starts at its own `at`). Every camera move is a scene key; never rely on the default World push (+6 %).
@@ -314,18 +332,20 @@ Outgoing and incoming scenes keep rendering through overlaps (they hold their en
   `<SkyCaptions split={{x: (T) => edge(T), left: 'light', right: 'dark'}}>` or `regions={(T) => ToneRegion[]}`
   (`{tone, rect: [x0, y0, x1, y1]}` or `{tone, d, transform}`, painted in order). `toneOn(color)` picks the tone that
   reads on a flat colour; `contrast(a, b)` = WCAG ratio.
-- Orchestrator switch: `skyCaption.motion` = `'scroll'` (default: reference 1's measured scroll / rise / wipe) or `'pop'`
-  (reference 2: pages, lines and boxes pop in one frame).
+- Orchestrator switch: `skyCaption.motion` = `'pop'` (the house default for every film, playbook "Captions": pages,
+  lines and boxes pop in one frame; Film `captionMotion: 'pop'`) or `'scroll'` (v1's measured scroll / rise / wipe and
+  still the theme's code value; it clipped letters on the posted reel).
 
 ## 7. Drawing primitives
 
 | API | notes |
 |---|---|
-| `<Ink d at? dur? width? color? order='seq'\|'all' pace='spec'\|'free' open? taper? dash?>` | pen draw-on. **Spec pacing**: every subpath is one stroke of 0.10–0.20 s whatever its length, successive strokes start 1 frame apart (3–6 in flight). `dur` only spreads the stroke starts. Long strokes taper. Un-build: lines loosen, then retract (inside an `<ExitSync>`, e.g. every Person: WITH the group's fills). `inkDrawTime(d, dur?)` = total time. |
-| `<Fill d\|rect color at? mode dir? dur? offset? exitMode? opacity? lookExempt?>` | flat fill, misregistered (`misreg`) by default, relit by the current `<Tod>`. Modes: `pop` (default: 20%→100% about its centre in 0.12 s), `snap` (1 frame), `wipe` (linear, 0.12 s; `dir`), `grow` (from an edge, out-expo 0.2 s), `spring` (7% overshoot), `none`. Exit: shrinks to its centre; fills covering ≥ ~55% of the frame (sky, a bleed ground, a big wall) are the slab: they collapse LAST under the World sky's ONE falling edge (a slab fill is eaten when that edge reaches it; never a second slab with its own top edge). |
+| **the clean pen** (`lib/pen.ts`, `lib/tier.tsx`) | **a new film's default (2026-10-27).** `setPen('clean', {bg, emissive})` once, at module load, in the film's look module (v3: `src/v3/film/look.ts`). Every `Ink` / `Fill` (and every kit piece drawn with them) then draws each shape as ONE closed path, fills registered exactly, no overshoot, drift, breaks, jitter, open contours, taper or loosening, and `hatch`, `scribble`, `wallTicks`, `crownTicks`, `speedLines`, `cross` draw nothing; line and fill come from the TIER: kit pieces declare a default with `tiered('environment', {tone}, Body)`, scenes force one with `<Tier tier="environment" bg={...}>`, raw SVG asks `useTierLine()` / `useTierPaint()`, idle motion scales by `useTierMotion()` (`docs/look/CRAFT.md` §b-§c; header of `lib/pen.ts`). The sketch pen (the rows below as written) stays for v1 / v2 renders and G3 boards. `lib/cine`'s drawing pieces are not clean-pen-aware (`docs/CINE.md`). |
+| `<Ink d at? dur? width? color? order='seq'\|'all' pace='spec'\|'free' open? taper? dash?>` | pen draw-on. **Spec pacing**: every subpath is one stroke of 0.10–0.20 s whatever its length, successive strokes start 1 frame apart (3–6 in flight). `dur` only spreads the stroke starts. Long strokes taper. Un-build: lines loosen, then retract (sketch pen; under the clean pen an object draws on as one stroke, no taper unless asked, no loosening) (inside an `<ExitSync>`, e.g. every Person: WITH the group's fills). `inkDrawTime(d, dur?)` = total time. |
+| `<Fill d\|rect color at? mode dir? dur? offset? exitMode? opacity? lookExempt?>` | flat fill, misregistered (`misreg`) by default under the sketch pen (the clean pen registers it exactly; a subject's outline goes inside its fill with `<Ink inside={fillPath}>`), relit by the current `<Tod>`. Modes: `pop` (default: 20%→100% about its centre in 0.12 s), `snap` (1 frame), `wipe` (linear, 0.12 s; `dir`), `grow` (from an edge, out-expo 0.2 s), `spring` (7% overshoot), `none`. Exit: shrinks to its centre; fills covering ≥ ~55% of the frame (sky, a bleed ground, a big wall) are the slab: they collapse LAST under the World sky's ONE falling edge (a slab fill is eaten when that edge reaches it; never a second slab with its own top edge). |
 | `<Drawn d fill at ...ink>` | ink + its fill landing 0.13–0.27 s after the outline STARTS (seeded). |
 | `<Look fills='paper'\|'none'\|'color' ink? cascade={{at, origin, speed}}>` | render states: paper = ink on white fills (frame 0 / loop frame), `ink={false}` = fills only, `cascade` = paper until a wave from `origin` (the VP) reaches each fill (the opening fill cascade, ~0.3 s; `at` may be negative so the loop seam is mid-motion). The World sky keeps its colour. **Cine pieces are state-aware** (`cine/state.tsx`: Skyline, EndlessCity, Monument, StringLights, ...): they un-build (sink into their base, small first) and take paper / cascade (white fills + hairlines) by themselves. **Never wrap them** in an exit / Look-aware group: the un-build would run twice and the paper hairlines would be hidden. |
-| sketch (`lib/sketch.ts`) | `line hline vline rect poly smooth circle ellipse blob arc wire wirePoint crown crownTicks glint hatch arrow check cross textLines wallTicks speedLines scribble` (ink paths: overshoot, drift, breaks, seeded) + closed fills `rectPath roundRect polyPath torso blob crown`. Memoised: calling them every frame is cheap. |
+| sketch (`lib/sketch.ts`) | `line hline vline rect poly smooth circle ellipse blob arc wire wirePoint crown crownTicks glint hatch arrow check cross textLines wallTicks speedLines scribble` (ink paths: overshoot, drift, breaks, seeded, under the sketch pen; one closed path each under the clean pen) + closed fills `rectPath roundRect polyPath torso blob crown`. Memoised: calling them every frame is cheap. |
 | `<Plane quad w h>` + `wallQuad({vp, x, top, bottom, depth})`, `groundQuad(...)`, `frontQuad(...)`, `rayPoint(vp, p, k)` | **one-point perspective**: draw anything flat in plane-local px, it is projected onto the receding quad; strokes keep screen widths. Only Ink/Fill (and kit built from them) are projected. |
 | `XG`, `mat`, `Place` | affine groups that also work inside a Plane (folded into the projection). |
 
@@ -345,6 +365,9 @@ Outgoing and incoming scenes keep rendering through overlaps (they hold their en
 
 ## 9. The sun (a character)
 
+v1's API. In a new film the sun is light, never a character or idle motion: one light rig per set, and a source never
+moves between cuts (`docs/look/CRAFT.md` §d.1).
+
 `<Sun cx cy r horizon rise beats bounce hops moves drift breathe at>` — in a World it defaults to `sunWorld`.
 - `rise={{at, from: VP}}`: emerges from the vanishing point in 0.37 s (ease-out) then pulses +7% (the opening).
 - `beats={[t, {t, amp}]}`: +4…+13% pulses (attack 0.08 / hold 0.08 / release 0.27), the PEAK lands on t (stressed words).
@@ -357,6 +380,10 @@ Outgoing and incoming scenes keep rendering through overlaps (they hold their en
   everything (card-style anchor). The cine `BigSun` wraps it with time-of-day colours.
 
 ## 10. Kit (`lib/kit`)
+
+v1's kit: references and engine primitives, never a film's assets (playbook: each film draws its own). Its glow discs
+and halos (`Festoon`, `LampPost`: up to 2.2x) and rim slivers predate `docs/look/CRAFT.md` §d (one halo step of at
+most 1.7x or none; a rim only on the subject, inside its silhouette).
 
 - `Person` (back view; `build` draw/pop/rise; `ink` = on-screen weight; `hair` short/long/bun/cap/beanie/bald/curly;
   `acc` backpack/headphones/strap/phone/scarf/sign/collar/hood; `legs`, `legH`; `lod` 0/1/2). **Hero detail**
@@ -460,7 +487,7 @@ card `opacity` animate opacity, are `@deprecated` and must not be used in the fi
 |---|---|---|
 | scene root, sky, time of day | core `<World sky={[{t, tod, wipe}]}>` (one sky, relights every Fill; accepts a cine `TOD.x` as `sky`) | a second sky: a cine `<Sky>` inside a World that already has one |
 | relight cine pieces | omit `tod` (they read the World's `<Tod>`); wrap each piece / row in `<TodAnchor at={[cx, cy]}>` at its centre so it flips when the sky edge reaches it | a fixed `tod` that ignores the World's wipe; `useTod()` in the scene body (returns 'day') |
-| gentle per-shot push | World `push` (flat scenes) / `<ShotCam push>` (layers) | hand-rolled zoom tweens |
+| a story push (holds stay locked or float: `docs/look/COZY_AND_SCALE.md` 3b.5) | World `push` (flat scenes) / `<ShotCam push>` (layers) | hand-rolled zoom tweens; a push in every shot (v1) |
 | multiplane camera moves | `<ShotCam keys>` = cine `CineCamera` + transition camera (`stage`) | CineCamera without `stage` inside `<World stage="context">` (drops the transition move) |
 | camera eases | `MOTION.camera.{ease, slow, reveal, settle, push}` (cine `CAM.*` carry the same values) | ad-hoc beziers, inOutQuart reveals (4 x peak speed: strobes) |
 | placing people / props in depth | `eyeLevel()` camera (2b) + `Crowd eye` | hand-tuned `s` per row (drifts to a high, diorama camera) |

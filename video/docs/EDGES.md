@@ -1,5 +1,12 @@
 # EDGES: hand-made screen edges on a full-bleed world (`src/lib/edges`)
 
+> **v1-era (banner, 2026-10-27).** Keep it for the edge engine's API and measurements. The rule is the playbook's:
+> paper edges ('paint-subtle') are liked, never at the top or beside the caption band. Its "messy" intent, ink running
+> past the colour and the ruled overshoot strokes yield to the clean pen (`docs/look/CRAFT.md` §c): edges are opt-in
+> per film, decided with the G4 look clip and added at G6, 'paint-subtle' at most (never medium or loose), with no
+> ruled overshoot and no ink past the colour. Film's default (`FILM_EDGES` on for a full film) stays for v1; a new film
+> passes `edges={false}` until its G4 clip approves edges. Current direction: `docs/look/DIRECTION.md`.
+
 The user's note: *"I like a bit of hand-drawing messiness that the first video has around the edges of the screen. Maybe
 we can experiment with a few different variations and see what looks cleaner, more polished and premium."*
 
@@ -78,6 +85,11 @@ block outline ruled in. The lab shots:
 | `paint-subtle` | 0.6 | **trim, painted.** Each side one long, slightly tilted edge with one clear step (>= 26 px); ONE bare corner where the scene has drawing (if none can go bare: one bite in the bottom's drawing); the ruled crossing at a painted top corner. The phone's visible zone stays as calm as trim | 4 / 7 / 10 (2 / 5 / 6) | 0 / 25 / 61, 14 / 18 / 20 | 14 / 20 / 25, 0 / 19 / 159 | 0 / 1 / 1 | 18-38 px |
 | `paint-medium` | 1 | **clearly painted, still calm where the phone shows it.** Blocks meet in >= 40 px steps; a bare corner and a partly bare top corner where there is drawing (branches, a crowd), a bleed on the emptiest corner; one left bite (92-124 px from the frame) holding the scene's line art; a bite in the bottom's drawing under the UI | 7 / 10 / 20 (3 / 7 / 8) | 0 / 29 / 109, 10 / 12 / 52 | 0 / 38 / 190, 0 / 27 / 264 | 0 / 1 / 1 | 26-56 px |
 | `paint-loose` | 1.6 | **as messy as reference 1 dares.** Two bare corners (diagonal when both hold drawing), a deep left bite (128-166 px) and a right bite between the caption and the rail, >= 48 px steps, the bottom broken up under the UI, the f_9.0 ruled crossing overshooting 40-60 px | 9 / 13 / 25 (3 / 9 / 11) | 0 / 32 / 142, 10 / 15 / 76 | 0 / 72 / 213, 0 / 0 / 313 | 0 / 1 / 2 | 32-66 px |
+
+**The code since the posted reel (2026-10-25):** `paint-subtle` paints colour past the top edge and beside the caption
+band, so there is no paper at the top or beside the band (`src/lib/edges/paint.ts`, the 0.6 anchor: `top`, `left0`,
+`right0` = -40); the top numbers and the "ruled crossing at a painted top corner" in the table above predate that
+fix. The playbook rule wins: never paper at the top of the frame or beside the caption band.
 
 (Depth 0 = colour at the frame edge: a bleed, a tongue, a keep block.) A seed's random structure is shared across
 looseness (each element draws from its own fork), so `paint-subtle`, `-medium` and `-loose` of one seed are the same

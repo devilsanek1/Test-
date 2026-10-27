@@ -2,8 +2,9 @@
 
 The owner's two visual twists (playbook, 2026-10-25) for G3 (sketch animatic), G4 (look) and G5 (blocking), for v3 (laptop
 prices) and v2 (DeepMind resignations). Evidence: `research/` enclosure [EN], coziness [CO], arcane [AR], vertical [VE], audit
-[AU]. Colour obeys `PALETTE.md`. Tags VERIFIED / REPORTED / UNCERTAIN; untagged numbers are proposals, to test at G4. 1080 x
-1920 (G3 at 30 fps, production at 60), captions 98 px at y 387 / 510 (block y 317-556, x 95-945). Arcane in words only: never
+[AU]. Colour obeys `PALETTE.md`; line, tiers and light obey `CRAFT.md` (it wins where this file differs: the chain in
+`DIRECTION.md`). Tags VERIFIED / REPORTED / UNCERTAIN; untagged numbers are proposals, to test at G4. 1080 x
+1920 at 60 fps throughout (G3 too), captions 98 px at y 387 / 510 (block y 317-556, x 95-945). Arcane in words only: never
 traced, recorded or copied. **Coziness evolves one measured reference at a time** (playbook): the owner's cozy references
 C1-C3 and what each taught are logged in words at the end of section 3b; section 3b (Coziness v2) wins where 2-3 differ.
 
@@ -14,11 +15,13 @@ C1-C3 and what each taught are logged in words at the end of section 3b; section
    tiny, readable person on our side, ratio >= 10:1, **or a world that keeps going** in a long wide, its landmark only 1.1-1.4x
    the figures yet huge and far (#55 measured: `CINEMATIC_GUIDE.md` "Scale cues"; "contrast across a cut" was half true).
 3. **Cozy holds the viewer; scale, only occasionally (playbook), makes them feel the stakes.** Cozy >= 50 % of the runtime
-   outside full-frame chart inserts (frame 0's world, the ending; an insert is a neutral breath, neither cozy nor scale:
-   v3 G3 is 38 % of all 41 s, 55 % of the non-chart time); 1-2 scale moments, never 3 (v2: 1), 1.5-4 s each, <= 20 % of
+   outside full-frame charts (frame 0's world, the ending). A chart is paper in the home place (`CRAFT.md` §a.2), and
+   when it fills the frame (entered by a push, A, or a card flip, E) it counts neither cozy nor scale (v3 G3 was 38 % of
+   all 41 s, 55 % of the non-chart time); 1-2 scale moments, never 3 (v2: 1), 1.5-4 s each, <= 20 % of
    the runtime (VE: 25 %).
-4. **ONE big move per video** (2.5-4 s + 0.8-1.5 s hold), <= 1 mid-size move, other story moves push 3-8 %; cozy holds are
-   locked or float, never an invisible push (3b.5). Never two scale wides in a row; within ~5 s of each small-making beat, a
+4. **ONE big move per video** (2.5-4 s + 0.8-1.5 s hold), <= 1 mid-size move, other story moves push 3-8 %; carrier moves
+   at the joins (`CRAFT.md` §a: push-throughs, a continuous camera) are joins, not story moves, and don't count; cozy
+   holds are locked or float, never an invisible push (3b.5). Never two scale wides in a row; within ~5 s of each small-making beat, a
    beat of agency (a face, a voice, what is being done or can be done)
    [VE §7: our proposal, built on awe (Piff 2015) and threat-needs-efficacy (EPPM), both VERIFIED].
 5. **Coziness belongs to the people affected, never to the threat.** Break it once, at the turn; never twice (the "cosy
@@ -48,7 +51,7 @@ case of an angle-independent measure, the enclosing mass's share of the screen, 
 - **Asymmetry for captions:** one side tall and cut by the top edge, a FLAT field (one light fill, no ink or windows: LIFE §8) across y 317-556;
   the other side tops out below y 600 in x 95-945 (only the gutters rise [AU §3]); a symmetric 1:1 lane can't hold them [EN §3].
 - **Streets:** horizon 0.50-0.60 H, VP at 0.60-0.70 W [EN §3]; kit lane `PerspectiveStreet` camH 160, road 150, walk 150,
-  heights 500-750, vp [650-750, 960-1150], once it has a caption `quietY` (build item 6). **Interiors:** a soffit cuts the
+  heights 500-750, vp [650-750, 960-1150], once it has a caption `quietY`. **Interiors:** a soffit cuts the
   top 8-15 % over <= 70 % of the width; sill at the desk line, wall reveal 32-54 px (Alexander 180 / 222 [EN §8, REPORTED]).
 - **Subject:** head 0.45-0.60 H, back or 3/4 back, back to a wall, facing the opening. POV shots: hands cut by the bottom.
 ```
@@ -66,12 +69,14 @@ case of an angle-independent measure, the enclosing mass's share of the screen, 
 
 ## 3. Cozy rules
 - **Light:** one low lamp + <= 1 secondary (a screen), no ceiling light; warm lamp one side, cool window the other (warm, dim
-  light raised perceived cosiness [CO §3, REPORTED]). Pools: flat, opaque, a cone widening ~3x, an ellipse 0.5-0.7 W, <= 2
-  rings LIGHTER toward the centre (ref 2: peach outer, cream core [AU §1]), darker gaps between pools, no gradient or blur.
-  Sage: ring `#F2D49B` (L* 86, C* 32, <= 5 % of the frame), core `#F0E2BF` (L* 90), on a surface at L* <= 80 (desk tan
-  `#D9BBA1`; on the L* 94 page a pool reads as a stain); corners `#D7E0C8`; it lights the hands and face.
+  light raised perceived cosiness [CO §3, REPORTED]): the set's ONE light rig (`CRAFT.md` §d.1). Pools: flat, opaque, two
+  steps lighter and warmer than their ground, darker gaps between pools, no gradient or blur; where they sit, how big they
+  are and their values are `CRAFT.md` §d.2 and §d.7 (they replace this file's old ring / core / desk numbers: a desk at
+  L* 58-62 under a pool core of 92-94); it lights the hands and face.
 - **Temperature, not darkness:** cold only in the window (Dusk `#BAC3CE` / `#8A9AA8`, frost `#D9DEE5`), glass <= 20 % of the
-  frame; spines, mullions, hair in the anchor `#22332C` (~5 %); page L* >= 75 at night too. Hero (5-15 %) on the story's object,
+  frame; the anchor (Sage `#22332C`, ~5 %) only on dark objects' fills (hair, a spine), thin parts like mullions by tier
+  (`CRAFT.md` §c: in tier C a flat shape or a hairline within dL* 15); page L* >= 75 at night too (the ambient wall 80-84,
+  §d.2). Hero (5-15 %) on the story's object,
   one hue all video, across the Sage -> Dusk shift too; ONE pop (amber `#F2A541` or coral `#FF7A4D`), 1-3 %, look-here only.
 - **Density:** abundance at the edges and the far side, a calm (never empty) centre: props cluster on the shelf, sill and
   desk edge, which hold 3-6x the detail of the centre (3b.3), each >= 60 px, in many soft flat fills (no lines on
@@ -147,7 +152,8 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
 - **FLOOR (y 1250-1920, under the platform UI):** >= 90 % one calm field in <= 2 tones, <= 6 guide marks echoing the curve,
   15-18 L* lighter than the masses; a passing near vehicle may cross it (dressing), key reads never.
 - **People and vehicles:** people 70-190 px (3.5-10 % H) in the life band, about half standing or sitting still;
-  vehicles rounded and toy-like, the largest <= 2/3 W and <= 10 % of the frame (the one "event"); movers enter and leave only
+  vehicles rounded and toy-like: a big one (up to 2/3 W, 10 % of the frame) is that hold's subject (tier A), otherwise
+  each mover stays <= 3 % of the frame (tier B / C, `CRAFT.md` §b); movers enter and leave only
   through the open sides or the mouth, never across the lid.
 
 **RIVERSIDE [C3]: eye level across water (a canal, a river, a pond, a square seen across a fountain).**
@@ -173,18 +179,21 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
   standing figure 6-9:1 (>= 10:1 is scale); a storey ~1 standing figure (compressed depth).
 
 ### 3b.3 The detail gradient: busy edges and far side, calm centre or floor
-- The far side (lid, far kerb, facade belt) and the frame edges hold 3-6x the linework of the calm field: C2's top 35 % holds
-  56 % of all linework (lid cells 3-6x the floor's); C3's facade belt has 66 % detail tiles while sky and water stay low in
-  contrast (local colour std 10-22 vs 39-46 in the busy belts).
+- The far side (lid, far kerb, facade belt) and the frame edges hold 3-6x the detail of the calm field (in our films as
+  flat shapes, not lines: `CRAFT.md` §c): C2's top 35 % holds 56 % of all linework (lid cells 3-6x the floor's); C3's
+  facade belt has 66 % detail tiles while sky and water stay low in contrast (local colour std 10-22 vs 39-46 in the
+  busy belts).
 - Calm sits only where the eye can rest: one band touching the top or bottom edge (sky, water, floor), the subject's ring,
   the caption plane. Never a slab mid-frame (C3's middle 60 %: 2-3 % flat tiles).
-- Calm is never empty: patterned (<= 6 lane marks, ripple dashes, two long soft tones), and no hole bigger than the caption
+- Calm is never empty: patterned (<= 6 lane marks as flat bands, two long soft tones), and no hole bigger than the caption
   band anywhere else (`LIFE_AND_DENSITY.md` §0).
-- Rhythm in tiny things: kerb stripes, rails, wires, windows, blossoms, each 1-6 % W; the frame's strongest contrast goes to
-  one tiny rhythmic element (C2's kerb stripes, 3 % W period), never to a big shape.
-- Lived-in infrastructure is the cheapest fullness (LIFE §0's thin lines): sagging wires, poles with crossarms, antennas,
-  railings, mullions, plus rooftop and street items, balconies, signs, a reflection in one glass face (what C3 held:
-  References). Wires hang only in y 0-290 and below y 600: C3's hang across y 190-670 would cross the captions.
+- Rhythm in tiny things: kerb stripes, rails, wires, windows, blossoms, each 1-6 % W, all tier C (low contrast). The
+  frame's strongest contrast goes to the beat's subject (`CRAFT.md` §b), never to a rhythm or a big shape (C2 gave it to
+  its kerb stripes, 3 % W period: a painting with no story subject).
+- Lived-in infrastructure is the cheapest fullness (LIFE §0): sagging wires, poles with crossarms, antennas, railings,
+  mullions (as hairlines within dL* 15 of their ground: `CRAFT.md` §c), plus rooftop and street items, balconies, signs,
+  a reflection in one glass face (what C3 held: References). Wires hang only in y 0-290 and below y 600: C3's hang
+  across y 190-670 would cross the captions.
 
 ### 3b.4 Life in a cozy beat: it passes through
 - **Sideways, along the place:** movers cross parallel to the picture plane or along the C-curve; they enter from an edge or
@@ -201,8 +210,9 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
   screen ~ arrivals per second x crossing time (0.6/s x ~4.5 s ~ 3): faster arrivals or longer crossings pile up. A crossing
   or an occlusion every 2-3 s.
 - **Steady change, read as `--cozy`'s cv** (LIFE §9): <= 0.3 for a constant lane (C3 0.14) or up to 0.75 for one slow swell
-  per 6-7 s (C2 0.73: one tiny mover, then a peak of 4-5 with the one big vehicle, then release); movers cover 1-15 % of
-  the frame (C2 median ~3 %). No bursts: bursts belong to the hero beats.
+  per 6-7 s (C2 0.73: one tiny mover, then a peak of 4-5 with the one big vehicle, then release); each supporting mover
+  <= 3 % of the frame, and anything moving over 5 % is the subject (`CRAFT.md` §b; C2's movers covered 1-15 %, median
+  ~3 %). No bursts: bursts belong to the hero beats.
 - **Rest next to motion:** about half the people are at rest (sitting on an edge, leaning, chatting, waiting at a kerb)
   right beside the moving ones; stillness among motion reads as leisure. They hold still (at most a 1-2 px breath).
 - **Motion lives in one band:** the lane, kerb or road (C3 ~10 % of the frame; C2 the road, 27 % of pixels ever move); the
@@ -212,8 +222,8 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
   life that never stops; LIFE §6): slow weather or a slow cloud, steam, a window lighting somewhere, an occasional bird, a
   very slow light shift (C2: sun warming a canopy over ~2 s); always lower in contrast and speed than the movers, never in
   the caption plane, and no visible sway, shimmer or boil (neither reference has any).
-- **Cut or loop when the lane is nearly empty** (a mover leaving by an edge), so the jump reads soft; a loop brings every mover
-  off-screen or back to its start state.
+- **Join or loop when the lane is nearly empty** (a mover leaving by an edge), so the change reads soft (the join still
+  carries something: `CRAFT.md` §a); a loop brings every mover off-screen or back to its start state.
 
 ### 3b.5 The camera for cozy holds: locked, or a slow 2D float; never a zoom
 - **Locked** (C2: <= 0.1 px over 7.8 s) when the life crosses a floor: the still observer at a window.
@@ -223,8 +233,8 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
   ±13 px round its middle; one heading at 10 px/s would use up the overscan in ~4 s); the whole set moves as one card (no
   parallax needed, no rotation, no zoom); >= 40 px of overscan on each side; sub-pixel transforms (at 10 px/s a rounded
   one steps 1 px every 6 frames at 60 fps). Captions, the paper edge and the UI stay fixed in screen space: they are the
-  fixed mat the picture slides under. `CINEMATIC_GUIDE.md` rule 3 sends cozy wides here; its 1.5-2 % pull-out is for the
-  S3/S4 breathers only (it moves a frame edge ~4-8 px/s, too slow to read in a hold).
+  fixed mat the picture slides under. `CINEMATIC_GUIDE.md` rule 3 sends every hold here, the S2-S4 breathers too (a
+  1.5-2 % pull-out moves a frame edge ~4-8 px/s, too slow to read in a hold).
 - **Never a zoom in a cozy hold.** v3 G5's centred 1.4 % push-in (10 of 14 shots) moved ~2 px/s at the frame edge, under the
   change threshold: it read as frozen (static runs up to 0.8 s), and a push leans in at the viewer. The float is ~5x faster,
   the same speed everywhere, visible but calm. A zoom stays a story move: visible (>= 3 % in <= 2 s), on a line (K5, K9, the
@@ -246,9 +256,10 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
   other than the hero's and the pop's, so the hero (C >= 30) and the one pop (C >= 50) stay the loudest (colour jobs,
   PALETTE). PALETTE's "background 50-80 %" is met by many light soft fills together (each facade, the sky, the floor its own
   tint), never by one empty slab (LIFE §0's biggest-field check).
-- **Good-weather light, one sun:** lit tones lean yellow-gold; lit : shade on buildings ~3:1 (C3); shadows short (<= 3-4 % W
-  past the object, C2) and soft in value and edge: flat, or a 2-step band with a lighter 15-25 px penumbra (C2's soft edge,
-  25 px at 1080), never a blur or a gradient.
+- **Good-weather light, one sun:** lit tones lean yellow-gold; lit : shade on buildings ~3:1 (C3); shadows gentle in
+  value and edge, flat steps, never a blur or a gradient; their lengths, steps and edges are `CRAFT.md` §d.5-§d.6 (a
+  sun's cast shadow 0.3-0.8 h, sharp at the base with a 10-14 px half-tint step at the far end), which replace C2's
+  measured "<= 3-4 % W" and its 15-25 px penumbra.
 - **Shadows are colour, never grey:** the references measure dL* -25 to -40 at chroma x0.6-0.7, too hard for our pale
   palettes, so depth and chroma come from `CRAFT.md` §d (form dL* -7 to -12, chroma kept >= 0.95x). Their hue turns away
   from yellow: 10-15° toward blue on a cool surface (C2), toward plum on warm walls (C3: orange to plum), a deep red-brown
@@ -260,22 +271,26 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
 - **Value framing by content:** the perimeter 5-8 L* darker than the centre through the masses (C2), or the light-dark-light
   sandwich (C3); never a vignette gradient, never a dark band in front of a cozy backdrop.
 
-### 3b.7 Texture and edges (VERY subtle, playbook)
-- **Texture goes inverse to area.** Large fields stay flat in fill (C2's road: high-pass 1.5-2 L*); their "paint" is a few
-  long tone-on-tone drawn shapes (dL 3-8): lane marks; ripple dashes on water 15-55 px long, 6-8 px thick, ~10-15 per
-  100 x 100 px (C3); a few dry vertical streaks on the biggest wall; stone dabs 25-80 px a value step darker. Small organic
-  things carry the tactile texture at 3-4x the field's (foliage hatching; blossom daubs 23-45 px with a slightly darker rim,
-  no outline; a rug; wood); the optional halftone (<= 6 %, PALETTE) goes only there. Nothing on people, props or captions.
+### 3b.7 Texture and edges (VERY subtle, playbook; the rules are `CRAFT.md` §c)
+- **Texture goes inverse to area, as flat shapes only.** Large fields stay flat in fill (C2's road: high-pass 1.5-2 L*);
+  their "paint" is a few long tone-on-tone flat shapes (dL* 3-8): lane marks as flat bands, two long soft tones on
+  water, stone blocks 25-80 px a value step darker; texture shapes on 1-2 small surfaces per shot (a rug, wood, blossom
+  daubs 23-45 px with no rim line). The references' ripple dashes (C3: ~10-15 per 100 x 100 px), dry wall streaks and
+  foliage hatching are NOT copied: no specks, ticks, hatching, scribble or dash rows (`CRAFT.md` §c). The one optional
+  texture is the owner's halftone (<= 6 %, `PALETTE.md`), a last step on a few chosen elements. Nothing on people,
+  props or captions.
 - **Locked to the world, never boiling** (both references: no boil, no crawl you can see).
 - **Must read full with texture OFF:** C3 flattened to 24 flat colours still reads full and cozy (flat 18 %, detail 37 %);
   texture is worth the last ~5-15 points of flat share, never the fix for an empty set.
-- **Lines:** no outlines; thin warm-dark lines only in key places (poles, wires, tyres, rails, mullions; C2 ~1.6 % of the
-  pixels, C3 3.8 %: examples, never a quota); light lines too (railings, lane marks). Weight and contrast go by attention
-  tier (`CRAFT.md` §c wins over the references' ~2.5-3 px: environment lines are hairlines within dL* 15 of their ground).
-- **Paper edges:** both references edge all four sides; we never put one at the top or beside the caption band. If used:
-  the bottom and the sides from y >= 640 (fading in), inset 12-40 px, ragged (peak-to-peak 20-45 px), a dry-brush zone of
-  10-40 px, the surround a dark warm tint (anchor family, L* 15-35), never grey, white paper or a photo. At the top, the lid
-  or a wall cut by the top edge does the holding job.
+- **Lines by tier** (`CRAFT.md` §c, which wins over the references' ~2.5-3 px warm-dark lines): no outlines on the
+  environment; the things that ARE lines (poles, wires, rails, mullions; C2 ~1.6 % of the pixels, C3 3.8 %: examples,
+  never a quota) as hairlines 1.2-1.6 px within dL* 15 of their ground, light lines as a light tint (railings, lane
+  marks); never warm-dark ink.
+- **Paper edges:** opt-in per film, decided with the G4 look clip (playbook: never at the top or beside the caption
+  band). Both references edge all four sides. If used, it is `EDGES.md`'s 'paint-subtle' (the owner's pick: white
+  paper, the colour painted on top; never medium or loose) on the bottom and the sides from y >= 640, inset 12-40 px,
+  ragged (peak-to-peak 20-45 px); the references' dark warm surround (anchor family, L* 15-35) is an untested variant to
+  show the owner at G4, never a default. At the top, the lid or a wall cut by the top edge does the holding job.
 
 ### 3b.8 Check a cozy shot (phone size, sound off)
 1. Paused, at phone size beside the cozy reference: full by `LIFE_AND_DENSITY.md` §0 (its DENSE-CALM row and its checks:
@@ -318,26 +333,32 @@ big sky with huge slow clouds, life in the hold). Where the planes, haze or life
 
 **Shared rules.** *Haze:* 4-6 flat planes (5-7 on a city vista), a value step darker per plane toward the viewer (one still,
 A7: 12 / 25 / 32 / 36 on a 0-255 scale, ~5 / 10 / 13 / 14 L* [AR §3, our measure]; on a vista the mix toward the sky doubles
-per plane going AWAY, 0 / 12 / 22 / 40 / 65 %, #55 measured: Scale cues 5); far planes fill-only, then key-place ink
-1.5-2 -> 2-3 -> 3-4 px, tapered, no outlines (PALETTE). Dusk ladder: sky `#D9DEE5` (L* 88) -> `#BAC3CE` (78) -> `#8A9AA8` (63)
+per plane going AWAY, 0 / 12 / 22 / 40 / 65 %, #55 measured: Scale cues 5); lines by tier, never by depth (`CRAFT.md`
+§c): the environment draws no line on any plane, hairlines only for things that ARE lines, and only the subject keeps
+its outline. Dusk ladder: sky `#D9DEE5` (L* 88) -> `#BAC3CE` (78) -> `#8A9AA8` (63)
 -> `#545F6D` (40) -> anchor `#1F2433` (14) on the observer; L* <= 40 is anchor-dark, so those two stay ~5 % of a held frame
 and big foregrounds are `#8A9AA8` with a `#545F6D` lip (PALETTE). *Parallax* f = 1 - depth: sky 0, far 0.1, city 0.3, near
-0.55, subject 1, foreground frame 1.3-1.5; neighbours >= 1.8x apart (the frame separates by value). *Speed:* peak <= 15
-px/frame (cap 18; `scripts/camspeed.py`), so with `CAM.reveal` >= 1 s per 315 px of the fastest layer's travel: tilt / crane
-<= 940 px in 3 s, dolly-out <= 2.3x in 3 s centred, <= 1.7x anchored low (at the cap 1,130 px, 2.8x, 1.9x) [AU §4, VERIFIED
-arithmetic]. *Physical camera:* crane, dolly, truck, tilt, no spins; ease in, land over the last 35 %, drift 1-1.5 px, cut
-while it drifts (Fortiche treated the virtual camera as a physical one [REPORTED]).
+0.55, subject 1, foreground frame 1.3-1.5; neighbours >= 1.8x apart (the frame separates by value). *Speed:* the one
+budget, `PIPELINE_V2.md` "Frame rate" (~15 px/frame at the render rate, a WARN; readable at 1x is the test;
+`scripts/camspeed.py`). Worked at 30 fps, with `CAM.reveal` that meant >= 1 s per 315 px of the fastest layer's travel:
+tilt / crane <= 940 px in 3 s, dolly-out <= 2.3x in 3 s centred, <= 1.7x anchored low [AU §4, VERIFIED arithmetic]; at
+60 fps the same px/frame allows twice the speed. *Physical camera:* crane, dolly, truck, tilt, no spins; ease in, land
+over the last 35 %, settle into the hold (locked or the 3b.5 float), and join while it settles (Fortiche treated the
+virtual camera as a physical one [REPORTED]).
+
+The kit column names engine pieces as references only (playbook: no reusable assets, each film draws its own;
+`lib/cine`'s drawing pieces are not clean-pen-aware: `CRAFT.md` §c).
 
 | # | move | emotion | 2D recipe | kit |
 |---|---|---|---|---|
-| K1 | **Close-up -> wide cut** | the jolt of smallness | face / object 0.5-0.7 H, cut on a breath to the observer at 0.04-0.08 H and <= 1/8 of the close-up (0.5 H -> <= 0.06 H); wide 2.5-4 s, line <= 6 words; cut back close; incoming camera already moving (first key 0.5-1.5 s before the cut) | EXISTS: `camSpeedAt` (`cine/camera.tsx`), `WipeCut` (`cine/props.tsx`) |
+| K1 | **Close-up -> wide cut** | the jolt of smallness | a declared F cut (at most 2 per film: `CRAFT.md` §a), or made one move by the S5 pull-back: face / object 0.5-0.7 H, cut on a breath to the observer at 0.04-0.08 H and <= 1/8 of the close-up (0.5 H -> <= 0.06 H); wide 2.5-4 s, line <= 6 words; back by a carrier (a push-through into the home place, A), never a second plain cut; incoming camera already moving (first key 0.5-1.5 s before the cut) | EXISTS: `camSpeedAt` (`cine/camera.tsx`), `WipeCut` (`cine/props.tsx`) |
 | K2 | **Tilt-up reveal** | "it keeps going" | `tilt` 600-900 px in 2.5-3.2 s (900 px needs >= 2.9 s), `CAM.reveal`; horizon 0.40 -> 0.70 H; top lands 0.08-0.15 H or cut; + 3-5 % zoom-out (a tilt has no parallax); flat across y 280-570 | EXISTS: `CineCamera tilt`, CineDemo A, `EndlessCity` colossal `quietAbove` (`cine/city.tsx`), `Tower` (`cine/tower.tsx`) |
 | K3 | **Rise-over (crane)** | the world opens past the wall | crane `y` 400-700 px in 2.5-3.5 s (the ledge moves 1.3x: 700 px needs >= 2.9 s), `CAM.reveal`; a roof / ledge (depth -0.3, `#8A9AA8`, `#545F6D` lip) fills the bottom 30-45 % and slides out the bottom; horizon hidden behind rows; the colossus (depth 0.85) drifts down only 0.15x the crane and "rises" against the falling ledge, so start it cut by the top with that margin | EXISTS: `y` keys, `Ledge` / `Balustrade` (`cine/props.tsx`), `Monument quietY`, CineDemo B |
 | K4 | **Pull-back, intimate -> vast** | our world becomes a dot | dolly from push ~0.8 to 0 anchored on the subject; far x0.95 / mid x0.75 / fore x0.67 (ref-2 shot 16); dolly not zoom, so the room shrinks 5x and a depth-0.85 colossus 1.14x; land at 0.04-0.08 H, hold 0.6-1.0 s. Budget: 5x takes 5.6 s centred (9 s anchored low) at peak 15, so skip ~2x of it in a hidden cut on a dark wiper (S09's door match-cut) or settle for 2.3x in 3 s; never a bare allow-list (S09 hit 80 px/frame) | EXISTS: `push` / `anchor`, CineDemo C, `WindowCloseup` LOD hand-off (`cine/props.tsx`); `revealPlan()` TO BUILD |
 | K5 | **Slow push to the vista** | resolve, looking out | `push` 3-8 % in 2-4 s, `CAM.slow`, anchored on the far VP (`anchorDepth` >= 0.85); back-view figure 0.25-0.35 H cut by the bottom (7 of 12 Arcane stills face a vista) | EXISTS: `ShotCam push` (`src/lib/ShotCam.tsx`) |
-| K6 | **Locked tiny-figure wide** | stillness, being watched | still camera, `handheld` 1-1.5 px; observer 0.04-0.08 H, fill-only, on the axis; colossus cut by the frame >= 10:1; life on 3 speed tiers, never 1 s still, none inside the city mass (Scale cues 11: birds, a pennant, one window on, white steam); 2-3.5 s | EXISTS: `LitWindows` (`cine/windows.tsx`), `WallOfWindows` (`cine/wall.tsx`), `TinyCrowd` (`cine/figures.tsx`), `Birds` (`cine/sky.tsx`) |
+| K6 | **Locked tiny-figure wide** | stillness, being watched | locked camera (no handheld jitter: 3b.5); observer 0.04-0.08 H, fill-only, on the axis; colossus cut by the frame >= 10:1; life on 3 speed tiers, never 1 s still, none inside the city mass (Scale cues 11: birds, a pennant, one window on, white steam); 2-3.5 s | EXISTS: `LitWindows` (`cine/windows.tsx`), `WallOfWindows` (`cine/wall.tsx`), `TinyCrowd` (`cine/figures.tsx`), `Birds` (`cine/sky.tsx`) |
 | K7 | **Worm's-eye on the colossus** | power over you | camera 0.3 m, horizon 0.58-0.64 H (the observer's feet above y 1250); colossus >= 0.7 H cut by the top, flat above y 556; one tiny mover 0.01-0.02 H at 10-20 px/s, clouds 8-15 px/s on depth 1; optional 2-4 % tilt | EXISTS: `Tower vpy`, `Monument` (`cine/monument.tsx`), `LensFigure` (`cine/lens.tsx`); data center TO BUILD |
-| K8 | **Shaft / one lit window** | one person, one light, in a vast structure | shaft core 0.10-0.14 W on the axis, one halo 1.8x a step darker, widening 1.3-1.6x down into a pool 2x the core with the observer in it, top below y 600; or one warm window (the pop) in a cold grid (Hopper) | EXISTS: `LightShaft`, `Glow` (`cine/light.tsx`), `WallOfWindows` events |
+| K8 | **Shaft / one lit window** | one person, one light, in a vast structure | shaft core 0.10-0.14 W on the axis, one halo step of at most 1.7x or none (`CRAFT.md` §d.7), widening 1.3-1.6x down into a pool 2x the core with the observer in it, top below y 600; or one warm window (the pop) in a cold grid (Hopper) | EXISTS: `LightShaft`, `Glow` (`cine/light.tsx`), `WallOfWindows` events |
 | K9 | **Frame push-through** (Cullen here -> there) | leaving the refuge for the stakes | a window / doorway at depth -0.5 [EN §7] holds the opening at 15-25 %; push 0 -> 0.85 anchored on the far subject (depth 0.85) in 1.2-2 s, `CAM.ease`; the opening's edges stay <= 15 px/frame until the mullion wipe, which hides the over-cap pass (allow-list only that window); carry speed into the next shot | TO BUILD: `Portal`, `roomBox` holes; wiper EXISTS (`WipePass`, `cine/props.tsx`) |
 | K10 | **High angle from the institution** | being looked down on by power | horizon 0.15-0.30 H, verticals converging down; calm, linear; once per video, on a crowd or plaza, never on the lone subject | PARTLY: `EndlessCity vp` roof tops (`cine/city.tsx`) |
 
@@ -357,48 +378,14 @@ while it drifts (Fortiche treated the virtual camera as a physical one [REPORTED
 - **Respect:** camera at or below the person's eye level (K10 is a crowd, never one person); no glow, rim or hero colour on
   the thing under critique (low angles flatter [VE §7, REPORTED]); anonymous back-view figures, never real staff's likeness.
 
-## 6. Applying it
-**v3 (laptop prices; Sage Study nook, Dusk exterior).** The data center is a stylised stack; real campuses are wide (Meta's
-Hyperion, Louisiana, ~4x Central Park by 2030; Abilene ~1 Central Park late 2026 [REPORTED, Epoch AI]): the footnote says so.
-1. **Frame 0 (0-2.8 s), cozy 1:1 POV, hook caption on frame 0:** bookshelf x 0-0.22 W cut by the top, flat across the captions;
-   the frosty window (20-25 % with its reveal) holds the data center as a flat `#BAC3CE` grid (>= 60 px, in y 600-1250); lamp
-   pool on the taped hinge; phone cut by the bottom, "Add to cart" and the tag (the pop) in the stage; push 3 % on NEXT.
-2. **Proofs (7-19 s), cozy:** the fogged window is the chart surface (opening <= 25 %); the glide along the line is a truck,
-   `CAM.ease`, <= 15 px/frame. The data center's LEDs are light ticks, no glow; the hero sits on the laptop and the chips.
-3. **Scale (19.9-24.3 s), K9 -> K3, landing in K6 framing:** the push through the window starts ~0.7 s before the cut; the
-   mullion wipe flips Sage -> Dusk; a ~500 px crane in ~2.2 s (peak 15 with the roofs at f 1.3) over snowy roofs (`#8A9AA8`,
-   snow `#D9DEE5`) unveils the data center (depth 0.85, cut by the top); on MOUNTAINS the chip mountain (hero) slides in beside
-   the figure, one group on the axis; land by ~22.8 s: horizon 0.55-0.59 H, door in the stage, ruler = houses with 2-3 windows
-   in the lamp tint (not the pop) + a 60-80 px back-view figure on a roof terrace at camera height (>= 10:1); hold 1.2-1.5 s
-   through "they pay more" (the conveyor clunk = the one secondary motion); the footnote gives the true unit.
-4. **Back home (30.7-37.6 s), cozy:** the K1 cut back from the auction hall to the nook (one floor taller outside). The breach,
-   once: on the ding a single cold LED band crosses the desk for <= 0.5 s, one step, no flicker. Calendar flips at the window.
-5. **Ending (37.9-42.8 s):** the tag close-up (pop), push 3 % (`CAM.slow`), the thumb hovering; hard cut to a matching frame 0.
+## 6. Applying it (archived)
+v3's first plan and the early v2 ideas moved to `docs/v3/archive/cozy_and_scale_s6_s7.md` (2026-10-27; history, never a
+brief). Each film applies this file through its world bible (W1) and camera plan (`PIPELINE_V2.md`, `G3_ANIMATIC.md`).
 
-**v2 (staff resigning, afraid to speak out), angle-agnostic ideas (use at most 1-2 of the scale ones):**
-- **[cozy]** An engineer's table at night, lamp pool on hands and a half-written letter; the HQ's cold grid far off in the window.
-- **[cozy, inverted]** "Afraid to speak": the room as a canyon (>= 2:1), blinds down, pool shrinking; speaking out = the window opens.
-- **[scale]** K6: a lone back-view figure (60-100 px) on a plaza under a glass HQ cut by the top and both sides
-  (`WallOfWindows`, keepDark behind captions), camera at their eye level, the building a flat cool fill: no hero, no rim.
-- **[scale]** K4 + K8 (CineDemo C): from one lit desk window back to an unlit office block (cool mids): one window = one voice.
-- **[cozy -> scale]** Night windows light one by one (`LitWindows`) for others who spoke out: the verified count, a minority.
-- **[scale, once]** K10: the institution's high view over a crowd or campus, calm and symmetric; never down on one person.
-
-## 7. Build list for G3-G5 (S = half a day, M = 1 day, L = 2+ days [AU §5])
-1. **G3:** `revealPlan()` + a 5 s test of v3's K9 -> K3 move under the cap, through the cut (S), so it fits the VO; `roomBox`
-   + openings as evenodd holes (S) + `Portal` at depth -0.5 (S, from the framing pack): every nook shot, K9, v2's room.
-2. **G4:** palette scope (M): Sage Study <-> Dusk in core `<Tod map>` and cine `useTodPal`, TOD / `todSteps` per palette.
-3. **G4:** `LightPool` + `LampCone` + pool anchor (M), replacing four scene one-offs; Tod `interior` role + WindowLight (S).
-4. **G4:** DataCenter colossus (M): louvred faces, LED rows on `LitWindows`, chillers, vapour, `quietAbove`, door, chip mountain.
-5. **G5:** interior props (L: Bookshelf with batched spines and a flat top, Desk, DeskLamp, FrostyWindow, Mug + steam,
-   Calendar, Phone + PriceTag, old Laptop, in core `Ink` / `Fill`); Snow (S); capcheck UI mask (S); HangingLamp (S).
-6. **G5 (cozy v2, before the next cozy hold):** a float mode in the shot camera (`ShotCam` / `CineCamera`: translation legs
-   that turn back within ±12 px of home, eased turns, sub-pixel, overscan) (S); `density.py --cozy` DONE (float, movers,
-   empty, cv: `LIFE_AND_DENSITY.md` §9); still TO BUILD in the meter (S): void (largest empty patch), thing counts, colours
-   per patch, layers, and a profile tag per shot so film averages of ev/s and gap count BUSY shots only; BALCONY and
-   RIVERSIDE set templates (lid, caption-plane facade, C-curve and mouth; backdrop, bank, water) (M).
-7. **Later:** street kit (M: `quietY`, `closer`, ivy, `Flank`) before any lane shot; cine inkComp (M, before any K4 over cine
-   pieces, e.g. v2's office-block pull-back); tilt keystone (M, cut first).
+## 7. Build list (archived)
+The 2026-10-26 build list moved to the same archive file. What is still to build (the float camera mode where it is
+missing, the meter's void, thing counts, colours per patch, layers and per-shot profile tag, once item 7.6) is in the
+craft tooling lane of `docs/PIPELINE_V2.md`; street templates are built when a film's G3 first needs them.
 
 ## 8. Arcane scenes for the owner to measure [AR §7]
 The owner screen-records one longer video of these scenes from their own account and uploads it to the session. It is

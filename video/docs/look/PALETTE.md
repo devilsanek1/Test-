@@ -23,17 +23,22 @@ theme and the proposed direction.
 **Takeaways:**
 
 1. **The same warm off-white background** (`#F3E9E1`) fills 50-80 % of every frame. It's close to our cream (`#F3E0CB`).
-   It's mostly empty: generous negative space around one subject.
+   It's mostly empty: generous negative space around one subject (editorial stills; our films stay full, so our 50-80 %
+   is many soft fills made of things, never one empty slab: `LIFE_AND_DENSITY.md` §0, `COZY_AND_SCALE.md` 3b.6).
 2. **The contrast comes from a few details, not from more colours:**
    - one saturated **hero** colour per image covers 5-15 % of the frame, usually on the subject's clothes. It is often a
      cool cobalt or periwinkle against the warm base (blue against orange: complementary);
    - one **deep dark anchor** covers about 5 %: aubergine/navy (`#34244A`) instead of black, on hair, trousers and shoes;
    - **tiny hot pops** cover 1-3 %: orange `#FA9306`, coral `#FA582F` (a croissant, fairy lights, leaves, confetti).
-3. **Everything else stays soft:** sand, olive, pink, low-saturation mids.
+3. **Everything else stays soft:** sand, olive, pink, low-saturation mids (we keep the softness, never their olive or
+   sand: playbook "Warm, never sickly").
 4. **Texture:** a fine stipple/halftone grain on the fills, which keeps saturated colours soft.
 5. **Lines:** thin, and only for interior details (folds, fingers, faces), not full outlines.
 6. **Secondary elements as line-only drawings:** in ref 1 the house and trees are single-colour olive line art, so the
    subject is the only solid mass.
+
+(5-6 describe the references; our lines are the clean pen by tier, `CRAFT.md` §c: the subject's outline, B's thin
+tinted line or none, no line on the environment.)
 
 ## The house palette family: tools, not a cage (owner, 2026-10-25)
 
@@ -45,14 +50,16 @@ theme and the proposed direction.
   incremental shift and polish, and ultimately have multiple palettes as tools available for various use cases, but
   not get completely stuck in the given set of colours: expand if needed and where relevant."
 
-**The board** is `palette_family.png`: the same small scene drawn in each of the 8 palettes. The data (role → hex) is in
+**The board** is `palette_family.png`: the same small scene drawn in each palette (8 when it was made; #9 Autumn Ember
+was added for v3, so regenerate it). The data (role → hex) is in
 `palettes.json`. Regenerate the board after any change, with
 `python3 scripts/look/palette_board.py && node scripts/look/shoot.cjs` (run from `video/`). The Python step also checks
 every palette against the DNA below.
 
 **The house DNA** keeps the palettes one family. The numbers are CIE L* (lightness) and C (colourfulness):
 - **Background:** soft and light (L* >= 75, C <= 20), never saturated or dark. It fills 50-80 % of the frame.
-- **Mids:** soft, from our clay family (cream, peach, sand, tan, sage) or the palette's own tints. Background props are
+- **Mids:** soft, from our clay family (cream, peach, terracotta, rose, leaf sage) or the palette's own tints; never
+  beige, muddy tan, olive or grey (playbook "Warm, never sickly", v3 G4). Background props are
   flat shapes without lines (`CRAFT.md` §c); a line-drawn figure (reference 1's crowds) takes tier B's thin tinted line.
 - **Ink:** dark and warm (L* <= 25), never pure black, for captions and the darkest lines; drawn lines take their colour by
   attention tier (`CRAFT.md` §c: the subject's in its own shade). At least 7:1 contrast on the background.
@@ -60,9 +67,10 @@ every palette against the DNA below.
   - **one hero** (C >= 30): saturated, on the subject or the story's object, 5-15 % of the frame;
   - **one dark anchor** (L* <= 40): tinted, instead of black, about 5 %;
   - **at most one hot pop** (C >= 50): 1-3 %, only on "look here" (the frame-0 hook detail, a notification, a reveal).
-- **Texture and lines:** see "Texture and lines" below. Lines go only in key places. The halftone is optional, a last-step polish used tactically on a few elements, never everywhere.
+- **Texture and lines:** lines by tier (`CRAFT.md` §c: lines only in key places, the subject's outline first); the
+  halftone ("Texture and lines" below) is optional, a last-step polish used tactically on a few elements, never everywhere.
 
-**The family (v1):**
+**The family:**
 
 | # | Palette | What it is | Use cases |
 |---|---|---|---|
@@ -72,11 +80,13 @@ every palette against the DNA below.
 | 4 | Blush & Pip | blush page, periwinkle hero (Pip's colour), aubergine anchor | human, light, brand moments |
 | 5 | Sage Study | sage and oat, lamp light, forest anchor, amber pop | cozy enclosure: home, desk, quiet interiors |
 | 6 | Dusk | cool mist, low peach sun, indigo hero, coral pop | serious, night, high stakes |
-| 7 | Autumn Ochre | our clay family warmer, burnt-orange hero, a small cool blue pop | money, everyday life |
+| 7 | Autumn Ochre | our clay family warmer, burnt-orange hero, a small cool blue pop | read sick on v3's G4 frame ("we need to have a warm feeling, not sick"): use #9 instead |
 | 8 | Harbour | a cool, fresh page with a warm coral hero and a deep sea anchor | science, health, the outdoors |
+| 9 | Autumn Ember | Autumn Ochre made warm (owner, v3 G4: "much better"): peach-cream page, terracotta-apricot ground, red-brown wood and lines, golden lamp light, burnt-orange hero, blue pop, a saturated dusk blue outside | money, everyday life, cozy interiors at night (v3: `docs/v3/LOOK.md`) |
 
 **How to use it:**
-- **Each video picks one main palette** at G4, by rendering style frames in 2-3 candidates. A sister palette may carry a
+- **Each video picks one main palette** at G4: 2-3 candidates judged internally, the pick shown in the one look clip
+  (`PIPELINE_V2.md` G4). A sister palette may carry a
   deliberate shift inside the story, for example a Sage Study interior followed by a Dusk exterior for the scale
   reveal, because they share the DNA. Never mix many at once.
 - **Within a video, colours keep their jobs:** hero = what the story is about, anchor = weight, pop = "look here".
@@ -96,7 +106,8 @@ The reference is `texture_refs/autumn_walk_detail.png`, a crop of `palette_refs/
 - **Texture: a regular halftone dot grid, not random noise.**
   - The grid is rotated about 45°, with a pitch of about 0.6 % of the image width (about 6-7 px at 1080).
   - It is **tone-on-tone**: the dots are the fill's own hue, about 6-10 % darker in L* on mid and dark fills, and
-    slightly lighter on very light fills. A few paper-white flecks sit on top.
+    slightly lighter on very light fills. A few paper-white flecks sit on top (we keep the dots, never the flecks:
+    `CRAFT.md` §c).
   - It reads as material, not as grain.
 - **Lines:**
   - **Interior and key places only:** a crease on trousers, a leash, a collar, a mouth, the ear's edge.
@@ -104,14 +115,19 @@ The reference is `texture_refs/autumn_walk_detail.png`, a crop of `palette_refs/
   - **The stroke:** dark warm ink, about 2-4 px at 1080 wide, **tapered at both ends** (a brush, not a pen). Our
     `brush()` in `src/lib/mascot/ink.ts` already tapers (`tipIn` / `tipOut`).
 
+**Our lines today: `CRAFT.md` §c** (the clean pen by tier) replaces this reading's line spec. The owner's "black
+outlines, VERY subtle, in key places" is the subject's one outline in its own deep shade plus a few inner details; tier
+B gets a thin tinted line or none, the environment none; taper only where the stroke IS the thing (hair, steam).
+
 **What our kit has:**
-- an optional paper-grain overlay (`public/textures/grain.png`, `Card` `grain`; off by default);
-- tapered brush lines (the mascot ink).
+- an optional paper-grain overlay (`public/textures/grain.png`, `Card` `grain`; off by default): retired, never in a
+  film (`CRAFT.md` §c: no grain);
+- tapered brush lines (the mascot ink; the clean pen keeps taper off unless asked).
 
 **What it lacks:** a halftone fill. Add it as an SVG `<pattern>` (dots in the fill's darker tone), applied per shape
 and locked to the shape, so it moves with the camera.
 
-**The production test (G4 style frames, then one 5 s motion test):**
+**The production test (planned 2026-10-25; history, answered by the preview test below):**
 1. Render a style frame three ways: no texture; the halftone at 6 % and at 10 % tone difference; the same with key
    lines only and with full outlines.
 2. Encode the motion test like Reels does (about 3.5 Mbps H.264) and view it on a phone.
@@ -137,4 +153,4 @@ and locked to the shape, so it moves with the camera.
   - **Where:** only on a few chosen elements per shot, e.g. the hero's clothing in a close-up, one key prop or a cozy
     interior surface. Never the background, never every shape, never small or fast-moving things.
   - **When:** an optional texture pass, as the last step after G6 polish and before the G8 render. The film must be
-    finished and good flat. Key-place lines stay part of the normal drawing.
+    finished and good flat. Key-place lines stay part of the normal drawing (`CRAFT.md` §c).

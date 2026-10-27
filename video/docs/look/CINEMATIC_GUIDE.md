@@ -3,8 +3,9 @@
 ## Why
 The owner (2026-10-26): from Arcane we take only environments, buildings and bigger shots, with no close-ups, people or
 faces. Start simple, with a few high-confidence references that fit our flat ink style naturally.
-v1 (`deliverables/v1/php2shell_final.mp4`) is the baseline and stays the look. Each shot type below is ONE targeted
-upgrade of a v1 shot (a better move, light or composition), and nothing else changes.
+v1 (`deliverables/v1/php2shell_final.mp4`) is the baseline for composition and camera only; the look (the clean pen by
+tier, one light rig per set, warm palettes) is `DIRECTION.md` and `CRAFT.md`, which win where this guide differs. Each
+shot type below is ONE targeted upgrade of a v1 shot (a better move, light or composition).
 
 Notation: frame 1080 x 1920, H = 1920 px, captions at y 317-556. `#94 @238.0` = Arcane shot 94 at 238.0 s into the source
 video; `v1 @25` = 25 s into the v1 film. The sketch animatic (G3) names the S#; blocking (G5) sets the exact numbers.
@@ -23,23 +24,30 @@ measured, not stored):
   that gathers speed, ease-in, over the whole 7.7 s shot).
 - **One continuous shot for the opening, no cut** until the hook's idea has landed.
 - **The loop:** the last frame returns to the bare-line frame 0, so the rewatch starts seamlessly.
-**For our videos:** stage the hook as "the expected thing, then the surprising reality overtaking it", inside one
-opening shot that builds from bare lines; keep our frame-0 claim text and the first-second phone sound. SketchReel
-supports it: `draw` (stroke draw-on) and `fillIn` (colour flood) per element.
+
+**For our videos** (the reference above is in a lined style; our film is drawn in the clean pen, `DIRECTION.md` rule 9):
+stage the hook as "the expected thing, then the surprising reality overtaking it", inside one opening shot that is
+drawn on from frame 0: the subject's outline (with tier B's tinted lines) draws on, tier C lands as flat pale shapes,
+colour floods in within ~0.3 s; the owner approves this build with the G4 look clip. Never still, but the novelty every
+few frames comes from the subject's own build and its mechanism, one mover leading (`CRAFT.md` §b), never from extra
+supporting life. Keep our frame-0 claim text and the first-second phone sound; the film loops back to frame 0's drawing
+state. SketchReel supports it: `draw` (stroke draw-on) and `fillIn` (colour flood) per element.
 **Show the real mechanism (v3 G3, 2026-10-26):** reality overtakes the expectation through the true cause, coupled
 one-to-one to the viewer's stake: each unit of cause is one visible tick of the effect (one memory stick flies to the AI
 data center, the laptop's price ticks up one step). The cause sits outside the home-base window, the effect in the
 viewer's hand, and both change on the payoff word. Never a growth or consumption metaphor (v3's data center swallowing
-the houses: "why is it growing and consuming the buildings?"). Keep the opening's camera to the 5 % pull-out; the big
-scale move belongs to the reveal later in the film (S1 or S5).
+the houses: "why is it growing and consuming the buildings?"). The opening's camera: one visible story move on the hook
+(>= 3 % in <= 2 s, `COZY_AND_SCALE.md` 3b.5) or a locked / floating hold, never the reference's slow invisible
+pull-out; the big scale move belongs to the reveal later in the film (S1 or S5).
 
 ## Shot types
 
 ### S1 Rise-over reveal (move). Confidence: highest, the only shot that passed all 3 reviewers (min 7, avg 7.7)
 - **Idea:** stand behind the rooftop wall, then rise over it: the wall drops out the bottom and the whole city settles in.
-- **Frame:** eye level at rooftop height. Start: the wall and people's backs fill the bottom 25 % (top edge y ~1440),
+- **Frame:** eye level at rooftop height. Start: the wall and the film's "you" from behind (with the mascot; never
+  strangers in front: `CRAFT.md` §a.3) fill the bottom 25 % (top edge y ~1440),
   horizon at 0.37 H. Land: the wall is gone, horizon at 0.40 H (y ~770), city in the lower 60 %, flat sky in the top 40 %.
-- **Planes (5), travel down during the rise:** wall + backs ~520 px (they leave the frame), near
+- **Planes (5), travel down during the rise:** wall + the "you" ~520 px (they leave the frame), near
   towers ~400 px (cut by both side edges, tops kept out of the caption band), mid city ~220 px, horizon ~60 px, sky 0.
 - **Move:** 4-4.5 s, scale 1.00 -> 1.04, ease-out (fast start, lands in the last third), then hold 1 s. Draw the city
   layers ~500 px taller than the start frame shows, so nothing runs out at the bottom.
@@ -56,8 +64,8 @@ scale move belongs to the reveal later in the film (S1 or S5).
   silhouette in our darkest teal runs across the bottom ~22 % (top edge y ~1500), and one dome or roof mass, cut by the
   left edge, rises to y ~880 over the lower left of the disc. The mint sky above the disc holds the captions.
 - **Values (3 only):** disc, sky, silhouette. 2-3 thin flat cloud bars, one value darker than the sky, cross the disc.
-  At most 1-2 flat halo rings, no bloom.
-- **Move:** locked (push of 1 % at most), 2.5-3 s. Only the clouds drift (~6 px/s); one bird may cross the top of the
+  One halo step of at most 1.7x the disc on the sky, or none; no bloom (`CRAFT.md` §d.7).
+- **Move:** locked, 2.5-3 s. Only the clouds drift (~6 px/s); one bird may cross the top of the
   disc (~15 px/s).
 - **Upgrades v1 @31** (the big ringed sun parked behind the glass dome) into a silhouette frame for a "time passes",
   key-line or closing beat. Don't put an info board in this shot.
@@ -69,7 +77,8 @@ scale move belongs to the reveal later in the film (S1 or S5).
   left third (x ~220-420) rises to y >= 600. Sky ~70 %, with 2-3 flat cloud shapes (lit top, underside one value darker)
   kept below the caption band; the sun is half behind a cloud edge at the upper right.
 - **Planes (4):** sky, clouds, far skyline, the landmark with the near roofs.
-- **Move:** pull-out 1.016 -> 1.00 over 3 s, ease-out (most of it early, then it settles); clouds drift 3-6 px/s.
+- **Move:** locked or the `COZY_AND_SCALE.md` 3b.5 float (a 1.6 % pull-out over 3 s reads frozen); clouds drift
+  3-6 px/s.
 - **Upgrades v1 @47** (the FBI dome tower, wide and close, filling the left half). Pull back so the dome stands whole
   against the sky on the left third and the city becomes a low band. The authority beat then reads as one icon, and the
   card stays on the tower.
@@ -79,9 +88,10 @@ scale move belongs to the reveal later in the film (S1 or S5).
 - **Idea:** almost all sky, with a thin strip of ground at the bottom, so the caption owns the frame for one pause.
 - **Frame:** eye level, standing height. Horizon at 0.82 H (y ~1575), with a thin low city strip on it. A promenade or
   wall band runs across the bottom 15-18 %, with 3-5 evenly spaced posts (250-360 px apart). Sky ~80 %: one flat cloud
-  bank cut by the left edge (y ~700-1200) and empty sky to the right. Add 1-2 small backs (~0.08 H) bottom-left, or none.
+  bank cut by the left edge (y ~700-1200) and empty sky to the right. Add the "you" or the mascot small (~0.08 H)
+  bottom-left, or nobody (never strangers in front: `CRAFT.md` §a.3).
 - **Planes (3):** sky with the cloud, city strip, ground band.
-- **Move:** pull-out 1.02 -> 1.00 over 2.5-3 s, ease-out, drift of 24 px at most.
+- **Move:** locked or the `COZY_AND_SCALE.md` 3b.5 float.
 - **Closer variant:** the sun as a half disc on the horizon at centre, right above a wall band with merlons every ~180 px
   (bottom 20 %), and 2-3 flat cloud stripes between y 650 and 1300.
 - **Upgrades v1 @8.5** (the empty plaza with the sun, horizon at ~0.5 H) into a real breath. The horizon drops to 0.82 H
@@ -90,7 +100,8 @@ scale move belongs to the reveal later in the film (S1 or S5).
   #108 @286.3: a crenellated parapet band at the bottom, with the sun on the horizon above it.
 
 ### S5 The pull-back crane reveal (the owner's favourite). Confidence: the owner's pick (2026-10-26), measured per frame
-- **Idea:** the film's ONE big reveal, from the viewer's small world to the vast system. Two backs in rooftop clutter
+- **Idea:** the film's ONE big reveal, from the viewer's small world to the vast system. Two figures from behind (the
+  film's "you" and the mascot; never strangers) in rooftop clutter
   look at something we can't see; the camera pulls back, cranes up and arcs round them until they are tiny at a rail and
   the whole city lands. The move follows their look, then pays it off. Owner: "It has pretty much everything: suspense,
   sense of scale, fantastic environment and composition, and the animation, the actual camera movement."
@@ -112,28 +123,30 @@ scale move belongs to the reveal later in the film (S1 or S5).
   pale far) as the dormer slides on to become the left frame. p 0.77 the spire rises over the right roofline; it lands
   by p 0.96 as the camera slows. Birds (not airships) lead the life in the hold (Scale cues 11).
 - **Start (u = 0):** sky y 0-840; horizon 0.44 H, seen only through a slot at x 240-600, y 780-900 (low skyline, one
-  spire to y 720). Dormer x 600-1080 (finial y 640) down to the bottom edge; boiler x 0-240; parapet top y 1280. Two
-  backs, 3/4, heads turned right (no faces), centre x 470, heads ~180 px from y 1060, cut at the hips; the lead room
-  hits a wall.
+  spire to y 720). Dormer x 600-1080 (finial y 640) down to the bottom edge; boiler x 0-240; parapet top y 1280. The two
+  figures, 3/4 from behind, heads turned right (no faces), centre x 470, heads at most ~140 px (playbook; the source's
+  ~180 px is too big) from y 1060, cut at the hips; the lead room hits a wall.
 - **End (u = 1):** sky y 0-890, horizon 0.46 H. Landmark (a hill city) x 540-1010, spire top at y >= 620, centre (760,
   760) on the right third, ~1.4x the figures' height; sea strip and far roofs (y 900-1150) step up to it. A lit street
   canyon from behind their heads to a vanishing point at (520, 900) and a skylight ridge (600, 1540) -> (700, 1100) aim
   at it. Frames: the dormer, now x 0-260, and a brass cylinder bottom-left; chimney stacks and a glass dome at x
-  780-1080. Two backs at x 420-560 (heads y 1290 on the lower third, feet y 1490: 170-200 px) at a parapet (top y 1400);
+  780-1080. The two figures at x 420-560 (heads y 1290 on the lower third, feet y 1490: 170-200 px) at a parapet (top y 1400);
   a deck below with tile lines converging on them. 6 planes. Their look runs ~65 deg up-right (no 9:16 crop holds
   Arcane's 45).
 - **Light:** one sun high beyond the city (3/4 backlight): tops lit, camera-facing walls and the backs in shade, shadows
   toward us. Each farther plane is a fixed flat mix toward the sky (0 / 12 / 22 / 40 / 65 %, measured: Scale cues 5),
   its shade leaning to the dusk blue (warm near, dusty-cool far, never grey-blue), with fewer value steps (5 / 5 / 4 /
-  3 / 2) and less ink (full, full, hairline, none, none). Eye path: lit deck -> warmest lit facades up the canyon ->
+  3 / 2); lines by tier, never by depth (`CRAFT.md` §c: the subject's outline only; the environment draws no line on
+  any plane, hairlines only for things that ARE lines). Eye path: lit deck -> warmest lit facades up the canyon ->
   pale hill base -> the landmark, the darkest far shape, against the palest cloud (a low flat bank on the horizon, the
   landmark in its gap). Over the move: bright slot in a dark frame -> darkest at the dormer -> light burst BEFORE the
   landmark lands -> settle. Flat mist cuts: ask the owner first.
 - **Retime: the shape, never the speed** (owner: "speed up or slow down where it feels appropriate; in a short reel we
   would usually speed it up"). Source 11.5 s; ours at 60 fps: 2.0 s = 90 f move + 30 f hold, pivot 3.5x, far peak 25
   px/f; **3.3 s (default)** = 156 + 42 f, 5x, 14 px/f (creep/accel/cruise/decel/settle 10/59/25/51/11 f); 5.0 s = 240 +
-  60 f, 6x, 10 px/f. The far slide stays 1.0 W; detailed layers <= ~25 px/f, the zoom at the subject <= ~3 %/f (flat
-  masses may exceed it). Landing hold >= 30 f (0.5 s) below 5 % of peak, drifting the last ~2 % of travel, so the eye
+  60 f, 6x, 10 px/f. The far slide stays 1.0 W; detailed layers inside the one speed budget (`PIPELINE_V2.md` "Frame
+  rate": ~15 px/frame, a WARN; the 2.0 s variant's 25 px/f must pass the readable-at-1x check), the zoom at the subject
+  <= ~3 %/f (flat masses may exceed it). Landing hold >= 30 f (0.5 s) below 5 % of peak, drifting the last ~2 % of travel, so the eye
   finds the tiny figures, then the landmark. At 3.3 s the spire rises at ~1.7 s and lands by ~2.2 s: the payoff word.
 - **Upgrades v1 @25** (rooftop wall, backs, skyline, static) when the reveal must travel from the small world to the
   whole system; S1 when the city only needs to land. **Ref:** #55 @109.46 (11.46 s; S1E1 "Welcome to the Playground",
@@ -148,17 +161,21 @@ quota. Breathers (S3, S4) take theirs from the sky (9-10).
    a tiny second landmark on it (~28 px, one step toward the sky) proves the city runs on to the coast.
 2. **The size gradient:** 5-7 planes, each 2.2-3x smaller than the one in front (never two neighbours within 2x). Building
    widths near : mid : far = 17 : 3 : 1 (near 120-520 px, mid 21-35, far 7-17 x 6-8 tall); windows shrink with them (near
-   7-11 px on a 21-30 px period, near-mid 4-6 on 12, mid 2-3 px dots on 5, far none).
+   7-11 px on a 21-30 px period, near-mid 4-6 on 12, mid 2-3 px tone-on-tone squares on 5 (within dL* 15 of the wall,
+   never dark specks: `CRAFT.md` §c), far none).
 3. **Most of the city is in the thinnest band:** the far field (0-11 % of the horizon-to-feet span) plus the hill town
-   hold ~60 % of Arcane's ~400 roofs: 5-7 rows every 9-10 px, each hiding half the row behind, no sky gaps, a chimney tick
-   per 3-4 roofs. Generate the rows from seeded motifs (+-15 % width, 3-4 roof colours), never a few hand-placed blocks.
-4. **Detail rises toward the horizon:** shapes per building fall (near 30-60, mid 5-8, far 2), so marks per 100 px tile
-   stay level or rise 1.0-1.5x and PEAK just under the horizon (Arcane edge density 23-25 % there, 8-11 % near). Motifs
-   repeat in runs of 4-6 at a fixed period. Calm zones only: the landmark (0.4x the city), the deck (0.65x), the sky.
+   hold ~60 % of Arcane's ~400 roofs: 5-7 rows every 9-10 px, each hiding half the row behind, no sky gaps, a chimney (a
+   flat shape, never a tick) per 3-4 roofs. Generate the rows from seeded motifs (+-15 % width, 3-4 roof colours), never
+   a few hand-placed blocks.
+4. **Detail rises toward the horizon:** shapes per building fall (near 30-60, mid 5-8, far 2), so shapes per 100 px tile
+   (flat shapes, not lines) stay level or rise 1.0-1.5x and PEAK just under the horizon (Arcane edge density 23-25 %
+   there, 8-11 % near). Motifs repeat in runs of 4-6 at a fixed period. Calm zones only: the landmark (0.4x the city),
+   the deck (0.65x), the sky.
 5. **Atmospheric steps, flat (never a haze gradient):** each plane is one fixed mix toward the sky that about doubles per
    plane: near 0 / near-mid 12 / mid 22 / far 40 / infinity strip 65 %, shade leaning 0-50 % to the dusk blue. Autumn
-   Ember darkest swatches `#3A1F16` L15 | `#533D38` 28 | `#695653` 38 | `#8C7D7C` 54 | `#BAACA8` 71; values 5/5/4/3/2; ink
-   full, full, hairline, none, none; warm near, the sky's hue farthest.
+   Ember darkest swatches `#3A1F16` L15 | `#533D38` 28 | `#695653` 38 | `#8C7D7C` 54 | `#BAACA8` 71 (the L* 15 step only
+   as the ~5 % anchor: `PALETTE.md`); values 5/5/4/3/2; lines by tier, never by depth (`CRAFT.md` §c: the environment
+   draws none on any plane); warm near, the sky's hue farthest.
 6. **The drop below the camera:** a low crane, not a drone: feet 2-3 F below the horizon (Arcane 2.0-2.4; the S5 end's 3.0
    is the limit; past 3.5 reads as a map), every city roof under it. Ridges halve per plane (infinity 0-12 px under it,
    far 15-40, mid 60-100, near-mid 140-220), then the rail jumps to 480-560: that gap IS the drop. Never draw a street
@@ -167,8 +184,9 @@ quota. Breathers (S3, S4) take theirs from the sky (9-10).
    top y >= 620) on a hill the town climbs in 5-6 rows. Huge: its units are 2x the mid windows though 2 bands farther
    (lancets 6 x 11 px, one rose or clock 22-28 px). Far: the narrowest value range (0.58x the near), the least detail, ink
    in its shade colour, behind the hill town and the sea strip, birds crossing in front.
-8. **Tiny anchors, lines up:** two backs at 1.0 F, heads on a lighter mid wall; the near anchor 30-35 % of the frame in
-   the darkest swatches, cut by 2 edges. Lines lead UP to the landmark: the canyon VP over their heads, the far skyline
+8. **Tiny anchors, lines up:** the two figures from behind (the "you" and the mascot) at 1.0 F, heads on a lighter mid
+   wall; the near frame mass 30-35 % of the frame, a tier-C mass at L* >= ~30 (the darkest step only on its edge; the
+   anchor colour ~5 %, `PALETTE.md`; `CRAFT.md` §b-§d), cut by 2 edges. Lines lead UP to the landmark: the canyon VP over their heads, the far skyline
    stepping up 40-60 px before the hill, one diagonal (a skylight ridge) at its base; the rail is the one level line.
 9. **A big sky with huge clouds:** sky 30-40 % on a scale end (65-85 % on breathers), clouds 45-55 % of it outside y
    317-556. One hero mass >= 1.0 W (cut by a side), >= 2.5x the landmark's width and BEHIND it (farther, still bigger): on
@@ -181,32 +199,38 @@ quota. Breathers (S3, S4) take theirs from the sky (9-10).
     dead frame), <= 2 % of the frame, never competing with the figures and the landmark. Fast: a flock of 3-6 V's, 24-44
     px (far ones paler), 5-6 wingspans/s, flap 3-4 Hz, one gliding, entering at 70-80 % of the move and crossing toward
     the landmark in 1.5-2.5 s, outside y 317-556. Periodic: a pennant on the near frame, 1-3 Hz. Mid-move: 1-3 white steam
-    wisps; cloth 1-3 px. `Birds` (`cine/sky.tsx`): size 24-44, flap 3-4, dur = path / (5.5 x size).
+    wisps; cloth 1-3 px. All of it at tier B / C weight (`CRAFT.md` §b). The film draws its own birds; `Birds`
+    (`cine/sky.tsx`: size 24-44, flap 3-4, dur = path / (5.5 x size)) is the reference, not clean-pen-aware.
 **Checklist:** nothing ends inside the frame | 5-7 planes 2.2-3x apart | far band packed, detail peaking under the horizon
 | darks climb to the sky | (feet - horizon) / F = 2-3, then the drop | one huge-yet-calm landmark over the horizon | a
 hero cloud behind it | 3 tiers of life, never 1 s still. Then, at phone size: does the world keep going, and is it alive?
 
 ## Rules (all types)
 1. **One change per shot.** Each type changes ONE thing in a v1 shot (the move, the light or the composition). The
-   palette (`PALETTE.md`), ink line, flat fills, people seen from behind and caption style stay exactly as in v1.
+   palette (`PALETTE.md`), flat fills, small people seen from behind and the caption style stay as in v1; the line is
+   the clean pen by tier (`CRAFT.md` §c), never v1's ink line.
 2. **Captions sit on flat sky.** y 317-556 stays plain sky in every frame, from the start to the end of a move: no tower
    top, disc, cloud or roof in it (tops at y >= 600).
-3. **One big move per video (S1 or S5, never both).** Every other wide is locked, floats or breathes. Cozy wides: locked or
-   the `COZY_AND_SCALE.md` 3b.5 float (8-15 px/s, legs that turn back); never a pull-out or push there (a 2 % pull-out
-   moves the frame edges only ~4-8 px/s and reads frozen). The 1.5-2 % pull-out over 2-3 s, ease-out, is for the S3/S4
-   breathers only (S2: locked, a push of 1 % at most). No roll, no compound moves, no cut mid-move.
+3. **One big move per video (S1 or S5, never both).** Every other hold, cozy or breather (S2-S4 too), is locked or the
+   `COZY_AND_SCALE.md` 3b.5 float (8-15 px/s, legs that turn back); never a slow pull-out or push in a hold (a 2 %
+   pull-out moves the frame edges only ~4-8 px/s and reads frozen). A zoom is a visible story move or a carrier
+   (`CRAFT.md` §a). No roll, no compound moves, no cut mid-move.
 4. **Depth and light in flat steps.** Use 3-4 planes (5 in S1, 6 in S5), each farther plane one value step paler and
-   nearer the sky's hue (as in #75 @185.3; scale wides: Scale cues 5). The sun is the only light: one lit side and one
-   shade side per building; silhouettes are in the palette's anchor. No bloom, haze, glow or gradients.
+   nearer the sky's hue (as in #75 @185.3; scale wides: Scale cues 5). One light rig per set (`CRAFT.md` §d.1): by day
+   the sun is the key, one lit side and one shade side per building; at night the lamps and lit windows on a light
+   night (§d.2); silhouettes in the palette's anchor. No bloom, haze, glow or gradients.
 5. **Dose.** Per video: S1 or S5 once, S2 and S4 at most once each, never two of these back to back. These are the scale
    and breather beats; the cozy, enclosed streets stay the majority (`COZY_AND_SCALE.md`).
 
 ## Not for us
-- Faces, close-ups and people as the subject (owner, 2026-10-26): people stay small backs at the bottom.
-- Darkness: night, near-black frames (#81's arch), red and crimson skies, smoke and embers. We stay in daylight colours.
+- Faces, close-ups and people as the subject (owner, 2026-10-26): people stay small and seen from behind; in the
+  foreground only the film's "you" or the mascot (`CRAFT.md` §a.3).
+- Darkness: near-black frames (#81's arch), red and crimson skies, smoke and embers. A night is a light night:
+  temperature, not darkness (`CRAFT.md` §d.2, `COZY_AND_SCALE.md` §3).
 - Painterly texture: haze, bloom, god rays, volumetric light, billowing cumulus. Clouds are 2-3 flat shapes.
 - Arcane's props and VFX: airships (we use birds instead), energy beams, glowing rings, steampunk spires.
-- Hard angles and source-speed moves: worm's-eye 3-point perspective (#3); any long move played at its source speed
+- Hard angles and source-speed moves: 3-point convergence (#3's worm's-eye; a low camera itself is fine:
+  `STORYBOARD_STYLE.md` §7, `COZY_AND_SCALE.md` K7); any long move played at its source speed
   (#55's 11.5 s is S5 only once retimed to 2-5 s); real roll.
 
 ## Source and method

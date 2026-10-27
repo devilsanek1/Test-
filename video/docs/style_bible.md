@@ -1,5 +1,11 @@
 # Style bible: php2shell (owned by the style-bible stream)
 
+> **v1 history (banner, 2026-10-27).** Keep it for reference 1's measurements (geometry, palette, caption type and
+> motion of the card). Its look rules are retired: the loose ink sketch, overshoot, broken and open contours, doubled
+> strokes, offset fills, the ink weight ladder by depth, texture strokes and specks, and a back-view audience along the
+> bottom. The current look is `docs/look/DIRECTION.md` (rules and "Retired"), its numbers `docs/look/CRAFT.md`.
+> Never brief a lane from this file.
+
 Measured from `assets/ref/reference.mp4` (1080x1350) with pixel sampling, k-means on flat-fill pixels,
 distance-transform and cross-section line widths, and font overlays. **All px values are at 1080 px canvas
 width, i.e. the reference card (960 px wide) and our card (960 px wide) are the same scale: every number

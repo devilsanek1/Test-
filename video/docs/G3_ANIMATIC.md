@@ -5,7 +5,8 @@ animations, camera movements ... details ... as placeholders ... like an animate
 the final story in as little time as possible." Reference page: `docs/look/ref_animated_sketchbook.png`.
 This file is the stage spec. The DRAWING spec stays `docs/look/STORYBOARD_STYLE.md` (palette, line weights, panel
 rules); wherever the two conflict — §7's camera-plan rules included — this file wins (edit list: `docs/look/research/g3_spec_edits.md`).
-The film's craft target is `docs/look/CRAFT.md` (2026-10-27). The DESIGNED sketch (owner APPROVED 2026-10-27: "Yes";
+The film's craft target is `docs/look/CRAFT.md` and its direction `docs/look/DIRECTION.md` (2026-10-27; which doc
+wins: the chain in DIRECTION's intro, where this file ranks above the look docs). The DESIGNED sketch (owner APPROVED 2026-10-27: "Yes";
 why: `docs/retro/2026-10-27_v3_retro.md`) is written into this file: G3 starts from the through-line card and the world
 bible (`PIPELINE_V2.md` G1, W1) and decides the flow, the focus and the light (a carrier for every join, the thread,
 tiers as grey weights, the light rig, the mover budget).
@@ -55,7 +56,7 @@ edit, never silently inside a build (`animatic_mograph.md`).
 | Key actions / animations | near-final shape+timing | every move the film will have exists here: 2-4 stepped key poses on beat words, smears for fast transits; stillness is a claim | motion check at 1x; "no G5 move without a G3 placeholder" |
 | Aliveness / density | placeholder (plan FROZEN) | every surface that is dense in the final carries a grey mass at final position, size and tier; `life:` list placed; 2-3 ambient loops per set panel; density planned per sequence against the home set's density key (§3) | emptiness lint; density-promise check; owner question |
 | Scale + cozy moments | near-final composition | home-base room tone, the one big move, the scale ladder, haze-band/shrinking-rows as grey dress | STORYBOARD_STYLE §7 checks |
-| Hook / frame 0 | near-final | frame 0 = lines then tones, payoff in words, voice from frame 1, expectation-then-reality played | first-3s watch; playbook Hook rules |
+| Hook / frame 0 | near-final | frame 0 = the scene being drawn: the subject's lines draw on (B's mid-grey lines with them), then the tones land (C as pale flat tone), payoff in words, voice from frame 1, expectation-then-reality played through the subject's own build | first-3s watch; playbook Hook rules; `DIRECTION.md` rule 9 |
 | Captions / timing | final | locked VO, pop captions, word-anchored cuts; reel at full runtime, 60 fps | gate check; full-reel watch |
 | Colour, texture, final line, easing feel, faces | ABSENT | — | deferred to G4/G5/G6 by design; the hand-off says so |
 
@@ -104,7 +105,10 @@ G5 adds no new motion — only colour, line, easing polish, secondary motion (`a
 - **Camera**: authored as camera transforms (never baked into element moves — a baked move is a picture of a move).
   Each move ships the anime five: move word, duration, start/end offset or scale %, anchor ("fix on sign"), ease. Every
   move eases in AND out; a subject-follow starts 2-4 frames after the subject; pans/rises are ONE oversized drawing
-  (panel drawn 120-140 % of frame) the camera travels across; a push-in > 2x stays a cut-in. Speed budget: ~15 px/frame
+  (panel drawn 120-140 % of frame) the camera travels across. A push of more than 2x is a push-through (carrier A): at
+  most 2x per panel, into a sub-frame that IS the next panel, handed over at matched scale; a closer view inside one
+  place is a C push; a cut-in is a declared F (§4 grammar). Carrier moves are joins, not story moves. Speed budget (the
+  one budget, `PIPELINE_V2.md` "Frame rate"): ~15 px/frame
   at the render rate = ~900 px/s at 60 fps (derivation: v1's ~450 px/s was the same 15 px/frame at 30; strobe scales
   with px/frame, and the playbook Motion rule says 60 fps allows faster moves — readability at 1x is the test, not the
   number). Over budget is a lint WARN, resolved by the sound-on check at 1x; measured only over moves lasting >= 2
@@ -120,12 +124,10 @@ G5 adds no new motion — only colour, line, easing polish, secondary motion (`a
   They are supporting life at their tier and at FINAL size and speed (B near the story, C for weather and far life:
   `CRAFT.md` §b), so the mover budget (§2) shows on the board; they take turns (~0.6 entries/s), and none enters in the
   0.4 s around a cut (what already moves keeps its pace).
-- **Line boil is NOT a G3 requirement** — pure look, zero story signal (the owner approves nothing via boil; aliveness
-  signal is already carried by placeholders + ambient loops, which ARE the contract). Optional after the pipeline is
-  proven: the seeded-variant scheme in `animatic_sketchlook.md`, never on captions/numbers/labels/marks. The next
-  animatic ships boil-off.
-- **Unanimated, on purpose**: overshoot, settle, secondary action, breathes, true morph tweens, easing feel beyond
-  in/out — all G5/G6. Blocking is the kill test: a shot that only reads with polish gets redrawn, never polished.
+- **No line boil** (retired 2026-10-27: `CRAFT.md` §c has no boil, and boil carries no story signal; aliveness is
+  carried by placeholders + ambient loops, which ARE the contract).
+- **Unanimated, on purpose**: overshoot, settle, secondary action, a figure's breath, true morph tweens, easing feel
+  beyond in/out — all G5/G6. Blocking is the kill test: a shot that only reads with polish gets redrawn, never polished.
 - **Drawing budget** for a 40 s / ~15-shot reel: ~60-120 distinct drawings (2-4 poses x shots, + smears),
   spent unevenly — 2-3 poses on held dialogue shots, 6-12 drawings on the 1-3 shots whose meaning IS motion.
 
@@ -136,8 +138,9 @@ flip or swipe, F plain cut (at most 2 per film). The carriers come from the thro
 midpoint lands on the first word of the new sentence, in the voice's pause, and its midpoint frame is drawn (the join
 frame: the carrier mid-way); during it the carrier leads and nothing else enters, pops, turns or speeds up (`CRAFT.md`
 §a timing). Lint ships the `device` and `carrier` fields and the carrier check first (§7 tier 1); each device's
-specific check is built the first time a reel's camera plan uses that device. Dissolves: 0.2-0.4 s to soften, up to
-1-2 s only for time passing.
+specific check is built the first time a reel's camera plan uses that device; the film's engine type per carrier is
+`G5_BLOCKING.md` §2. A dissolve is no carrier, and the film has no opacity fades (`ENGINE.md` rule 3): one appears
+only as a declared exception for time passing (0.2-0.4 s, up to 1-2 s), named in the camera plan and the hand-off.
 
 | Device | Must be decided at G3 (lintable) |
 |---|---|
@@ -148,7 +151,7 @@ specific check is built the first time a reel's camera plan uses that device. Di
 | push-through (scale-through) | panel A contains a 15-30 %-of-frame sub-frame that IS panel B |
 | whip / carry | both shots name the same direction at matched speed; exempt from the speed budget (matched HIGH speed is the device) — lint checks direction + speed match across the cut instead |
 | wipe (object-wipe) | the wiping element already exists in panel A, with its travel direction |
-| dissolve / dip / flash | the relationship named ("time passes"); duration per the rule above |
+| dissolve / dip / flash (a declared exception, never a carrier) | the relationship named ("time passes"); duration per the rule above |
 
 ## 5. Build order and time budget (first full animatic ~3 h, ASSUMING §7 tier-1 tooling is built; rounds 30 min)
 
@@ -189,8 +192,9 @@ contract column (cuts, framing, moves, transitions and carriers, the thread, tie
 
 ## 6. Review and lock
 
-- **Sound-off cold read** (STORYBOARD_STYLE §5 checklist) stays the gate, plus one new question per set panel: "does
-  this place feel inhabited — what's missing from the room?"
+- **Sound-off cold read** (STORYBOARD_STYLE §5 checklist) stays the gate, plus two questions per set panel: "does
+  this place feel inhabited — what's missing from the room?" and "is your eye still on the subject — what competes
+  with it?" (fullness never at the subject's expense: `CRAFT.md` §b).
 - **Motion check, sound on, at 1x**: every move readable (no strobe; this pass resolves the §4 speed WARNs), every cut
   lands on its word, cuts judged in PAIRS with their neighbours, pacing varies. The reader also answers "where is your
   eye, every 2 s?" (it is on that beat's tier-A subject) and "what carried you across each cut?" (the declared carrier;
@@ -242,4 +246,4 @@ reel needs it — never ahead of a reel.** Nobody builds tooling before drawing 
 | Per-device transition checks (§4 table), one device at a time, when a camera plan first uses it (a 15-shot reel uses 2-4 of the 8) | board_lint | S each |
 
 **Dropped**: the volume/contact lint (polices precision the owner waived; the cold read covers it, §4). **Line boil**:
-optional, only after the pipeline is proven (§4) — not scheduled.
+retired (§4; `CRAFT.md` §c).

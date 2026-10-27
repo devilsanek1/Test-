@@ -1,5 +1,11 @@
 # Project brief: "php2shell" short-form explainer
 
+> **v1 history (banner, 2026-10-27): the brief for video 1.** Its look, motion and review notes are retired: the loose
+> architectural ink sketch, overshooting lines, misregistered fills, >= 5 visual events per second, the mascot
+> crossing every transition, the sun as a character, critics on every scene before it ships. The current direction is
+> `docs/look/DIRECTION.md`, the process `docs/PIPELINE_V2.md`, the owner's rules `docs/OWNER_PLAYBOOK.md`. Never brief
+> a lane from this file.
+
 ## Goal
 A 70.7-second vertical video (TikTok / Instagram Reels / YouTube Shorts) built on the supplied voiceover,
 in the visual style, animation language and motion design of the supplied reference video.

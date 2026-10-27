@@ -7,7 +7,9 @@ places, movers or tier promotions (owner-approved 2026-10-27; `docs/retro/2026-1
 staging, readability at phone size and transitions that play. The story, cut points, shot content, transitions and
 their carriers, the thread, the tiers, the light rigs and the mover budget are locked by the G3 board, the look by the
 G4 look clip; G5 translates the monochrome board into real sets, one lane per SEQUENCE, with one agent owning every
-transition (§3). Video 3 is the reference implementation (`src/entry-v3-film.tsx`, `src/v3/film/`).
+transition (§3). The look and storytelling direction is `docs/look/DIRECTION.md` (every lane brief points there and to
+`CRAFT.md`). Video 3 is the reference implementation of the shell (`src/entry-v3-film.tsx`, `src/v3/film/`; its G5b
+sets are not the look model: §8b).
 
 ## 1. The shape: the whole film plays from minute one
 
@@ -37,7 +39,7 @@ Every `transitionIn` carries the board's `transition.type` and its `carrier` (th
 `G3_ANIMATIC.md` §7 tier 1 — until g5_scaffold.py is updated it still flattens to `cut`, so fix scenes.json by hand
 after scaffolding: a transition the board PLAYED never ships flattened); the board's LOOP panel is dropped:
 the last panel ends on the voice's end with the house loop `transitionOut {type: 'unbuild', loop: true, dur: 0.3}`,
-un-building into the FIRST panel's `t < 0` bare-line state, so the film loops to the bare-line frame 0. Then copy
+un-building into the FIRST panel's `t < 0` drawing state, so the film loops back to frame 0 (§2). Then copy
 `BoardPanel.tsx`, `FilmN.tsx` and the entry from v3 and change the imports.
 
 **Film options a G5 shell passes** (all optional props of `<Film>`, off by default so v1 / v2 render as before):
@@ -79,14 +81,33 @@ export const captionTone: ToneKey[] = [{t: 0, tone: 'light'}];   // optional: ov
 
 - **Time**: `useTime()` = panel-local seconds; a voice word at VO time w lands at `t = w - start`. Lead the voice
   (ENGINE §1 rule 5). Everything in seconds, deterministic (`rng`, never `Math.random`), flat (no blur, filters,
-  gradients), **no opacity fades** (pop, grow, wipe, slide, draw on). ENGINE.md §1 (the ten rules), §3 (the template),
-  §7 (primitives), §10 (kit).
+  gradients), **no opacity fades** (pop, grow, wipe, slide, draw on). From `ENGINE.md`: §1 rules 1-5, 7 and 10
+  (rules 6, 8 and 9 are retired: `docs/look/DIRECTION.md`), §4-§6 (stage, transitions, captions) and §7 (primitives,
+  with the clean pen); its §3 template and §10 kit show the API, never the look (v1's sketch pen, drifting sun,
+  per-shot push).
 - **Camera**: cuts add no camera. Every move is the panel's own (World `push` with explicit `to` / `at` / `dur`, or
-  `<ShotCam keys>`), taken from the board's camera and `docs/vN/camera_plan_g3.md`. G5 sets the FINAL camera; peak
-  speed per second (60 fps: ~450 px/s, i.e. ~7.5 px/frame for flat ink).
-- **The first panel at t < 0** is the loop underlay and the frame-0 state: bare ink lines at `t < 0` with the first
-  motions already running (start times slightly negative), colour floods in within ~0.3 s from t 0, voice from frame
-  1, one continuous shot (playbook "The opening"). The last panel un-builds over its last `dur` s on top of it: build
+  `<ShotCam keys>`), taken from the board's camera and `docs/vN/camera_plan_g3.md`: G5 sets the FINAL camera with the
+  shape and timing G3 played (holds locked or the `COZY_AND_SCALE.md` 3b.5 float, never a zoom). The one speed budget
+  is `PIPELINE_V2.md` "Frame rate" (~15 px/frame at the render rate; readable at 1x is the test).
+
+**Joins: each carrier's engine form** (`CRAFT.md` §a; the incoming panel's `transitionIn`, `lib/Film.tsx`). The
+transition agent (§3) owns every row; a dissolve is no carrier (no opacity fades), only a declared time-passing
+exception from the G3 hand-off.
+
+| carrier | Film `transitionIn` / how |
+|---|---|
+| A push-through | `push-through` into the sub-frame the board drew, handed over at matched scale (`bridge` only for a matched flat colour) |
+| B thread match | `matchcut`: the thread in the same screen spot (±8 %) and size (±20 %) on both sides |
+| C continuous camera | one panel (the move inside it), or `camera-continuous` between two panels in one place |
+| D object carry or wipe | `foreground-wipe` (its element already in the outgoing panel), or a carry across a `cut` (same direction and speed on both sides) |
+| E card flip or swipe | an in-panel flip of the same paper (no Film type yet: the craft tooling lane builds one) |
+| F plain cut | `cut` (at most 2 per film, on a "But" turn) |
+
+- **The first panel at t < 0** is the loop underlay and the frame-0 state, the scene being drawn in the clean pen: at
+  `t < 0` the subject's outline (with tier B's tinted lines) draws on and the first motions already run (start times
+  slightly negative), tier C lands as flat pale shapes, and colour floods in within ~0.3 s from t 0; voice from frame
+  1, one continuous shot (`docs/look/DIRECTION.md` rule 9; the owner approves this build with the G4 look clip). The
+  last panel un-builds over its last `dur` s on top of it: build
   with `Ink` / `Fill` / kit (they read the exit value) or read `useExit()` for raw SVG (`<ExitShrink>` for characters).
 - **Caption tone**: `captionTone` keys are scene-local `{t, tone}`: `'dark'` (ink) on light walls and skies, `'light'`
   (white) on dark skies; check the contrast (`contrast(a, b)` in `lib/Captions`: v3's dusk blue #5B6A94 takes white
@@ -103,8 +124,11 @@ export const captionTone: ToneKey[] = [{t: 0, tone: 'light'}];   // optional: ov
   did not show: no new places, movers or tier promotions. `scripts/qa/density.py` is information before the owner sees
   a cut (its events/s and gap are never a reason to add movers).
 - **Look**: the approved G4 look clip and its kit (the clean pen, the set's light rig, the tier palettes), the video's
-  LOOK.md and palette roles (one hero colour, one dark anchor, at most one pop), `docs/look/COZY_AND_SCALE.md`,
-  `docs/look/CINEMATIC_GUIDE.md`.
+  STYLE.md (v3: LOOK.md) and palette roles (one hero colour, one dark anchor, at most one pop), inside
+  `docs/look/DIRECTION.md` and `CRAFT.md`; then `docs/look/COZY_AND_SCALE.md`, `docs/look/CINEMATIC_GUIDE.md`. Every
+  set, person, prop and Pip is the film's own kit (playbook: no reusable assets); `lib/cine`'s drawing pieces are
+  references, never film code, until the craft tooling lane ports them to the clean pen (`CRAFT.md` §c; its camera
+  and utilities are fine).
 
 ## 3. Lane rules
 
@@ -163,7 +187,8 @@ deliverables/vN/vN_g5_blocking.mp4 --scale=0.5`).
 
 - Compositions are 60 fps; frame = `round(t * 60)`; lengths `ceil(seconds * 60 - 1e-6)` (Film's loop seam uses the
   same rounding). Animate in seconds only, so nothing depends on the rate.
-- Speed limits are per second (~450 px/s for long flat-ink moves); drawn character motion may stay stepped (hold each
+- Speed: the one budget in `PIPELINE_V2.md` "Frame rate" (~15 px/frame at the render rate, a WARN; readable at 1x is
+  the test), with the timing G3 played; drawn character motion may stay stepped (hold each
   drawing `round(60 / drawingsPerSecond)` frames) while the camera glides.
 - The board placeholders run at 60 too (SketchReel is time-based).
 
@@ -176,10 +201,14 @@ python3 -I scripts/qa/gate_check.py --mp4 <render.mp4> --scenes src/v3/film/scen
 # one panel: add --only S9 (its length, no cuts) and point --mp4 at the Film3-S9 render
 ```
 
-It checks: fps 60 (the MP4 and the composition), duration = the voice (+-1 frame), an audio stream in sync, every
-scene start has a detected hard cut within 1 frame (caption band and label strip masked), and every caption page (and
-the frame-0 words) inside the caption band and the caption clip, within the safe width. FAIL exits 1; WARN lines (long
-lines, cut-like events inside a shot) are for a human look.
+It checks: fps 60 (the MP4 and the composition), duration = the voice (+-1 frame), an audio stream in sync, the cuts
+each scene's `transitionIn.type` should produce, within 1 frame (caption band and label strip masked): `cut`,
+`matchcut` and `camera-continuous` one hard cut at the start; `push-through` one (two with a `bridge`: into and out of
+it); `foreground-wipe` none (the element covers the change; a hard cut there is a WARN); an `unbuild` transitionIn is
+not modelled yet (expected as a cut); a join that stays inside one panel (carrier C) has no scene start at all. And
+every caption page (and the frame-0 words) inside the caption band and the caption clip, within the safe width. FAIL
+exits 1; WARN lines (long lines, cut-like events inside a shot) are for a human look. It does not read `carrier` yet
+(the craft tooling lane, `PIPELINE_V2.md`).
 
 ## 8. Lessons from v3 (the assembler's round)
 
@@ -215,6 +244,10 @@ rendered the film and fixed what only shows across panels.
   against the house fronts) and the pile for hay (pale stick backs); fixing those in the kit first cost one render, not two.
 
 ## 8b. v3 G5b lessons (the dense rollout: 8 lanes, 3 helper sessions, a chunked full-res render, 2026-10-27)
+
+**Process lessons only:** the owner judged this cut "too busy, too incoherent ... too rough" (2026-10-27), so its
+density bar, its per-panel plan and its sets are not a model (the look: `docs/look/DIRECTION.md`; the bar: the film's
+own G3 density key, `LIFE_AND_DENSITY.md`); its per-panel lanes are replaced by sequence lanes (§3).
 
 - **What made the rollout consistent:** a RENDERED bar (the approved pilot MP4 and its source files named in every
   brief), one per-panel plan (`docs/v3/density_plan_g5b.md`) with an override doc that wins (`cozy_v2_application.md`),
@@ -258,7 +291,8 @@ rendered the film and fixed what only shows across panels.
 ## 9. Lessons from v2 (the assembler's round, 2026-10-27)
 
 Five panel lanes, a kit lane and an engine lane, each with an art-director review and a fix round; the assembler folded
-~20 kit workarounds back in one session.
+~20 kit workarounds back in one session. (v2r was an owner-ordered restart with full creative freedom and no sketch;
+its art-director reviews are not the default: `PIPELINE_V2.md` anti-waste rule 1.)
 
 - **Fold back by pixel diff, never by eye:** render `FilmNBare` stills of every panel (3 per panel + the seam) BEFORE
   the first edit, then after each fold re-render only the touched panels and diff (`changed %` + bbox per frame,

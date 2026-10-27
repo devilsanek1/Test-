@@ -1,5 +1,13 @@
 # CINE: the cinematic-scale kit (cine lane)
 
+> **v1-era kit (banner, 2026-10-27): not clean-pen-aware.** Its drawing pieces (city, street, tower, monument, wall,
+> windows, figures, sky, light, props, wipers, lens) draw raw paths with the theme's `misreg` and their own "hand"
+> jitter, which `setPen('clean')` never reaches: in a new film they are references, never film code, until the craft
+> tooling lane ports them (`docs/PIPELINE_V2.md`); the camera (`CineCamera`, `Layer`), perspective, atmosphere and
+> colour utilities are fine. Retired look: the hand jitter as the intended design, the sun as a character that
+> drifts, beats and hops between shots, glow rings and offset rim slivers (`docs/look/CRAFT.md` §c-§d). Current
+> direction: `docs/look/DIRECTION.md`.
+
 `src/lib/cine/**`: full-bleed pieces that make the viewer feel small (Arcane-scale vistas, worm's-eye monuments,
 pull-backs to a wall of windows) in the reference's flat ink style, plus the reference-2 baseline street. Everything is
 canvas coordinates (1080 x 1920 = the frame at camera rest), time-based in seconds (`useTime()`), deterministic

@@ -45,7 +45,7 @@ literally "turn it off" 😅 Which part surprised you most: the 14 years, or the
   WhatsApp/Messenger, which recompress it.
 - **Upload each platform natively, from the clean file.** Never repost a TikTok download (with the watermark) to Reels or
   Shorts: Instagram says it doesn't recommend Reels that are visibly recycled from other apps.
-- **Our export:** 1080x1920, 30 fps, H.264 High, SDR BT.709 tv-range, AAC 48 kHz, ~10-12 Mbps or CRF 14, +faststart.
+- **Our export:** 1080x1920, 60 fps since v3 (playbook Motion; v1 was 30 fps), H.264 High, SDR BT.709 tv-range, AAC 48 kHz, ~10-12 Mbps or CRF 14, +faststart.
   4K doesn't help on Reels.
 
 ## Linking the accounts
