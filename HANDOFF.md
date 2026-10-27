@@ -135,6 +135,10 @@ Everything that agent knew is in this repo. This file is the map; the details li
   price tag as the thread, carriers at every join), clean pen + tiers + light kit; workflow
   `context/workflows/v3-rework-design-and-pilot-*.js` builds SQA as the pilot; SQB-SQD then go to helper sessions; then
   assembly, full-res render, posting master (Film3Final, -14 LUFS, TV range), cover re-check, `docs/v3/POSTING.md`.
+  Helpers (briefs `video/docs/v3/rework_split/brief_{W,R,H}.md`, done-signal `video/docs/v3/rework_reports/*.md`; archive each
+  when done): W = WINDOW (SQE+SQF, outside, h2_window) session_01VwsUCns4ZcZEphRgqiBXGe; R = REVEAL (SQD)
+  session_01VwsUCpJ3WKXeJ8yoN5qWX8; H = HOME (SQB+SQC) starts once the pilot pushes home_set + thread_plane. Then the
+  transition agent (J1-J5 + loop) and the assembly run in the orchestrator session.
 - **v3 status (2026-10-27 ~14:40 UTC): G5b DELIVERED** (`deliverables/v3/v3_g5b.mp4`, 1080x1920, 60 fps, gate PASS,
   film density 6.8 ev/s, flat 19 %, detail 52 %; sheet `review/v3_g5b/sheet.jpg`; render recipe in G5_BLOCKING.md 8b,
   chunked per panel). Waiting for the owner's notes; next G6 polish (easing, secondary motion, subtle edges) + G7 sound.
