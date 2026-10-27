@@ -8,6 +8,11 @@ from `direction/beat_map.md` §2 ("life" 4.98, "veto" 26.50, "of any kind" 32.08
 NEW (engine primitives only, §9). **Builders read THIS file;** the six treatments and the judges' notes are background, never specs. Every
 shared spot, the map, the S1 scale sheet and the legibility floor live in ONE contract file (K2, §9).
 
+> **Read `STYLE.md` first (2026-10-27): where it settles a conflict with this page, STYLE.md wins.** Above all: every near
+> head-back is <= ~140 px WIDE at the shoulders (head ~55-65), so §5's 200-330 px near heads are overruled; her hero teal is
+> PRESENT on her shots (she is small), not 5-15 % (§9); no low bun + mustard scarf in any crowd (her look-alike). S5's end
+> keeps map.ts's 62 px stranger (L4's spec, approved by the orchestrator).
+
 ## 1. Concept, the understanding shift, why it stops, holds and gets shared
 **One sentence:** a small woman walks out of Google's canal-side building into a golden October evening, and on each clause of her claim an
 outline copy of her, a little greyer each time, pops up ahead of her on the towpath; on "for life" the whole row takes one step and more outlines
