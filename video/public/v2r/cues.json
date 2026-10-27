@@ -128,7 +128,7 @@
  {
   "src": "v2r/sfx/whoosh_dive.wav",
   "t": 5.95,
-  "gain": 0.1676,
+  "gain": 0.2477,
   "note": "push-through dive into the dark window (in the pause 5.59-6.28)",
   "under_db": 12,
   "set_by": "sheet"
@@ -136,10 +136,10 @@
  {
   "src": "v2r/sfx/pencil_ring.wav",
   "t": 6.82,
-  "gain": 0.084,
+  "gain": 0.0871,
   "note": "an ink ring draws round her dark window",
   "under_db": 17,
-  "set_by": "band, words -1.8"
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/board_clack_2.wav",

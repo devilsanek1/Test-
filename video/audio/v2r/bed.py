@@ -10,38 +10,44 @@ film's exit ding at 0.45 s, so the first sound she makes going out is the tune s
 relative D minor for the staff's fear, B-flat lydian for the vast. Real CC0 instruments (VSCO 2 CE, VCSL) played by
 this script: felt piano, string pizzicato, low strings (contrabass + cello), pp violins and bowed vibraphone for air.
 
-THE ARC (TREATMENT s7, on heard times):
+THE ARC (TREATMENT s7, on heard times; the joins are THROUGHLINE s3's, and no music note starts inside a join's
+window, [midpoint - 0.2, midpoint + 0.12): the carrier owns it):
   0.00-6.28   NO music: the canal's air only (water laps, a far city, the life on screen); 4.54-4.79 the air dips
   6.28        two dry violin pizzicato notes, C5 -> F5 (the ding's fourth): false relief on "You'd think..."
   8.44-12.81  "But": the pulse steadies, D minor (A4/D5 ostinato over a moving pizz bass + its cello octave), thins to
-              quarters on "scared", the last note decays out by 12.81 (silence 12.81-13.16)
+              quarters on "scared", the last note decays out by 12.81 (silence 12.81-13.16: the window match)
   13.16       air (pp violins C6 + bowed vibes A5) and ONE high piano C6 on "she" (13.96): the question, un-ducked
   15.07-17.96 her walk: the motif (C6 F6 E6 C6) over a walking pizz bass (F E D C Bb) in tenths; the walk stops
               with her on "objected" (17.96)
   18.92       "military": a low D minor sustain, weight without drama; it lets go on "heading"
-  20.55-21.30 April morning air (bowed vibes, B-flat maj7 colours); 21.30 low strings open with the crane and swell
+  20.70-21.30 April morning air (bowed vibes, B-flat maj7 colours) from "April", after the sun push-through
+  21.30       low strings open with the crane and swell (with divided high violins, so a phone hears it)
   22.43       soft accent 1 on the landing ("Pentagon"): B-flat lydian bloom, lows and highs only, a felt low bloom
   24.00-27.82 the pulse, level and thinned under the clause (C5/F5 fourths, pizz bass Bb A G C + its cello octave)
   28.31-32.70 the SAME pulse, instruments, harmony, humanize and level for Google's side (no minor turn, no sting)
   33.16-36.18 the motif alone, quieter (C5 F5 E5 C5); held breath 36.18-36.54
   37.18       soft accent 2: E5 -> F5, it resolves on "facts" (F add9: piano high, strings low, vibes, low bloom)
   38.82-      a circular tail: the chord thins into the hook's air (gone by ~0.5 s into the loop)
+No swell rides a camera move: the retired moves (S1's pull-out, S2's push, S6's truck, the seam push) never had one;
+the crane (S5, the ONE big move) keeps its swell.
 
 OUT OF THE VOICE'S WAY. The male narrator (f0 ~120 Hz) owns ~120 Hz-4 kHz. Sustained notes live below ~110 Hz or
 above ~800 Hz; the only mid-register notes are short pizzicati and a few soft piano notes; a static carve (-4 dB
 around 2.2 kHz). Then the bed is PRE-DUCKED against the locked voice (public/v2/voice.wav): -8 dB on the music with a
 500 ms hold (a pause under 0.6 s never lets the music swell: no pumping), the music level set so its median sits ~27 dB
-under the speaking voice, a guard on the whole bed so it stays >= 12 dB under every word, and on every hit word
-(sheet.HIT_WORDS) a band carve so the bed sits >= 12 dB under the voice's own 1-4 and 4-10 kHz there.
+under the speaking voice, a guard on the whole bed so it stays >= 12 dB under every word, and a band carve where a word
+needs it (the bed >= 12 dB under the voice's own 1-4 and 4-10 kHz on a hit word, >= 9 dB on any other).
 Play music_bed.wav at gain 1 (cues.json), no further ducking.
 
-ON A PHONE (review item 4): every pizz bass note has its cello octave, the low strings are lightly saturated (their
-harmonics carry the arc through a 350 Hz speaker), and the air sits 4 dB lower wherever music plays.
+ON A PHONE (review item 4): every pizz bass note has its cello octave, the contrabass is 4 dB lighter and the mid
+voices (pizz, cellos, piano, high strings) carry the arc, the low strings are lightly saturated (their harmonics reach
+a 350 Hz speaker), the crane swells in the high violins too, and the air sits 7 dB lower wherever music plays.
 
 THE AIR (review item 6) is composed from CC0 field-recording grains (field.py): hollow laps under a boardwalk and on a
-wooden hull, a far city from a rooftop, a parkway, robins, a wren, a cardinal, spring birds, a gull, rustling leaves, a
-fountain, a narrowboat engine, a bus, a bicycle, ducks, a dog's collar; every grain placed by this script (sheet.LIFE
-sounds the life on screen). The leaves' and grains' spectra overlap: no band crossover cliffs.
+wooden hull, a far city from a rooftop, a parkway, robins, a wren, a cardinal, spring birds, rustling leaves, a
+fountain, a narrowboat engine, a bus; every grain placed by this script. The life it sounds is the life the conformed
+picture keeps (sheet.LIFE, sheet.BIRDS), "alive but calm" (DIRECTION rule 3): small, one at a time, in the voice's
+pauses where it can be, never inside a join's window; the two worlds' air crossfades through the suns (0.30 s).
 """
 from __future__ import annotations
 
@@ -95,8 +101,10 @@ TRACKS = {"pizz": ("vln_pizz", 0.18, "mid"), "inner": ("vla_pizz", -0.2, "mid"),
           "air_vib": ("vibes_bowed", 0.3, "air"), "low_cb": ("cb_sus", 0.0, "low"), "low_vc": ("vc_sus", -0.15, "low")}
 PROGRAMS = {"pizz": 45, "inner": 45, "bass": 45, "bass8": 45, "motif": 0, "air_vln": 48, "air_vib": 11, "low_cb": 43,
             "low_vc": 42, "bloom": 38}
-GAINS = {"pizz": -2.0, "inner": -6.0, "bass": 1.0, "bass8": -6.0, "motif": 10.0, "air_vln": -8.0, "air_vib": -7.0,
-         "low_cb": 0.0, "low_vc": -5.0, "bloom": -40.0}
+# Rebalanced for a phone speaker (review item 4, measured through a 350 Hz high-pass): the contrabass pizz 4 dB down,
+# its cello octave and the mid voices up, so the pulse and the motif carry the arc where the lows vanish.
+GAINS = {"pizz": 0.0, "inner": -4.0, "bass": -3.0, "bass8": -2.5, "motif": 11.0, "air_vln": -6.0, "air_vib": -6.0,
+         "low_cb": -1.0, "low_vc": -3.5, "bloom": -40.0}
 SENDS = {"pizz": 0.30, "inner": 0.30, "bass": 0.15, "bass8": 0.2, "motif": 0.50, "air_vln": 0.8, "air_vib": 0.8,
          "low_cb": 0.2, "low_vc": 0.3, "bloom": 0.1}
 SATURATE = {"bass": 2.6, "low_cb": 3.4, "low_vc": 3.4, "bass8": 1.8}     # review item 4: harmonics a phone can play
@@ -155,11 +163,14 @@ def compose(seed=2610):
     N("low_cb", 18.92, 38, 46, 1.15, False)
     N("low_vc", 18.95, 50, 40, 1.1, False); N("low_vc", 18.97, 53, 38, 1.05, False); N("low_vc", 18.99, 57, 32, 1.0, False)
 
-    # S5: April air from 20.60 (B-flat maj7 colours: D6, A5), 21.30 low strings open (Bb1 + F2) and swell,
+    # S5: April air from 20.70 (B-flat maj7 colours: D6, A5), 21.30 low strings open (Bb1 + F2) and swell,
     # 22.43 accent 1: lydian bloom (vibes C6 + E6, violins D6), the felt low bloom (added in render)
-    N("air_vib", 20.60, 86, 36, 3.6, False); N("air_vib", 20.66, 81, 34, 3.5, False)
+    # (the April air enters on "April" 20.70 / 20.76, after the sun push-through's window 20.35-20.67: nothing but the
+    # carrier starts there)
+    N("air_vib", 20.70, 86, 36, 3.5, False); N("air_vib", 20.76, 81, 34, 3.4, False)
     N("low_cb", 21.30, 34, 44, 3.0, False); N("low_vc", 21.32, 41, 38, 2.9, False)
-    N("air_vln", 21.30, 86, 30, 2.9, False)
+    # the crane's swell is also carried by divided high violins (D6 + F6), so a phone hears it (review item 4)
+    N("air_vln", 21.30, 86, 30, 2.9, False); N("air_vln", 21.34, 89, 26, 2.8, False)
     N("air_vib", 22.43, 84, 42, 1.9, False); N("air_vib", 22.45, 88, 38, 1.8, False)
 
     # 24.00-27.82 and 28.31-32.70: THE SAME level pulse (C5/F5 fourths, pizz bass Bb A G C + its cello octave),
@@ -217,8 +228,9 @@ def write_midi(notes, path=MIDI_OUT, ppq=960):
 
 
 # ---------------------------------------------------------------- the world's air (CC0 grains, circular)
-LONDON = [(0.00, 20.55), (28.06, FILM_DUR)]
-ARL = [(20.55, 28.06)]
+LONDON = sheet.LONDON
+ARL = sheet.ARL
+SUN_XF = 0.30          # through a sun push-through the two worlds' air crossfades over the carrier (0.30 s)
 
 
 def place_c(y, g, t, gain=1.0, p=None):
@@ -240,14 +252,18 @@ def unit_rms(g, win=0.05):
 
 
 def gain_curve(points, n=N_FILM, ramp=0.06):
-    """step levels (dB) per span with short ramps at the edges; circular (the value at the end = at 0)."""
+    """step levels (dB) per span (a, b, dB[, ramp at a, ramp at b]) with linear ramps centred on the edges; circular
+    (the value at the end = at 0)."""
     t = np.arange(n) / SR
     out = np.full(n, -120.0)
-    for (a, b, db) in points:
+    for pt in points:
+        a, b, db = pt[:3]
+        ra = pt[3] if len(pt) > 3 else ramp
+        rb = pt[4] if len(pt) > 4 else ra
         a = -1.0 if a <= 0 else a
         b = n / SR + 1.0 if b >= n / SR - 1e-6 else b
-        m = (t >= a - ramp / 2) & (t < b + ramp / 2)
-        w = np.clip(np.minimum((t - (a - ramp / 2)) / ramp, ((b + ramp / 2) - t) / ramp), 0, 1)
+        m = (t >= a - ra / 2) & (t < b + rb / 2)
+        w = np.clip(np.minimum((t - (a - ra / 2)) / ra, ((b + rb / 2) - t) / rb), 0, 1)
         lin = np.where(m, w * db2a(db), 0)
         out = np.maximum(out, 20 * np.log10(np.maximum(lin, 1e-6)))
     return db2a(out)
@@ -257,27 +273,12 @@ def gain_curve(points, n=N_FILM, ramp=0.06):
 LAP_SOURCES = [(758858, (100, 3000), 8, (0.0, 70.0), 0.62), (480838, (150, 3000), 8, (15.8, 22.3), 0.22),
                (318064, (150, 3000), 8, None, 0.16)]
 # laps per second by scene (the canal under our steps, the wall's towpath, her terrace, our boat, the forecourt, the
-# lane); none in Arlington
-LAP_RATE = [(0.00, 6.10, 2.4), (6.10, 12.98, 1.7), (12.98, 14.86, 1.9), (14.86, 20.55, 2.0), (28.06, 32.93, 1.1),
-            (32.93, FILM_DUR, 1.2)]
-QUIET = [(4.48, 4.86), (36.16, 36.56)]        # the "..." stop and the held breath: the water holds too
-
-# birds: (film t, source, grain a, b, dB, pan, lowpass Hz, why). London robins / a wren / London birds; Arlington
-# cardinal, American robin (one channel: its stereo is phasey), spring birds far, a gull. Mostly in the voice's pauses.
-BIRDS = [
-    (1.50, 409145, 6.92, 7.17, -6, -0.5, 9000, "the bridge birds' calls as they lift (with the wings SFX)"),
-    (1.74, 409145, 7.42, 7.79, -8, -0.35, 9000, ""),
-    (8.10, 418425, 12.59, 12.95, -3, 0.6, 9000, "a robin in the pause before 'But'"),
-    (14.66, 418425, 13.11, 13.50, -4, -0.6, 9000, "her terrace: a robin on the aerials (the pause after 'talking?')"),
-    (15.30, 409145, 14.60, 15.30, -11, 0.7, 7000, "far, under 'worked on'"),
-    (20.12, 418425, 17.12, 17.52, -6, 0.5, 9000, "the last robin before the match-cut (pause 20.10-20.67)"),
-    (20.58, (616969, 0), 0.01, 0.62, -12, -0.4, 8000, "April morning: an American robin under the canopy"),
-    (22.95, 626652, 7.13, 9.15, -6, 0.5, 8000, "spring birds far below the terrace (the view)"),
-    (25.62, 147594, 5.23, 5.77, -3, 0.6, 9000, "a cardinal's 'cheer' in the pause after 'purpose.'"),
-    (26.70, (616969, 0), 4.13, 4.76, -15, -0.6, 7000, "far, by the gate"),
-    (28.90, 409145, 19.04, 19.60, -11, -0.6, 7000, "the forecourt's plane trees, far"),
-    (35.02, 418425, 6.07, 6.48, -4, -0.7, 9000, "a robin on the sunset lane (the pause 34.99-35.45)"),
-]
+# lane); none in Arlington. Calm (DIRECTION rule 3): small events, never a texture.
+LAP_RATE = [(0.00, 6.10, 2.0), (6.10, 12.98, 1.4), (12.98, 14.86, 1.6), (14.86, 20.55, 1.6), (28.10, 32.93, 0.9),
+            (32.93, FILM_DUR, 1.0)]
+# the "..." stop and the held breath: the water holds too; and nothing new starts in a join's window
+QUIET = [(4.48, 4.86), (36.16, 36.56)] + [(lo, hi) for (lo, hi, _) in sheet.join_windows()]
+BIRDS = sheet.BIRDS
 
 
 def bird_grain(src, a, b, lp_hz, ch=None):
@@ -329,26 +330,6 @@ def loop_bed(src, a, lo, hi, n=N_FILM):
     return lp(hp(y, lo, 2), hi, 2)
 
 
-def segment(src, a, b, t, n=N_FILM, fade=0.15):
-    """a stretch of a recording placed at film time t (stereo), with fades."""
-    y = np.zeros((n, 2))
-    g = FLD.cut(FLD.load(src), a, b, fade)
-    return place_c(y, g, t)
-
-
-def paws(t0, n_steps, rate, seed, level=1.0):
-    """a dog's paws on stone: soft padded taps at a trot (a padded body and a claw tick, never a sine)."""
-    r = rng(seed); out = np.zeros(n_of(n_steps / rate + 0.3))
-    for k in range(n_steps):
-        d = 0.06
-        p = 0.8 * body_noise([180 * r.uniform(0.9, 1.1), 420], [0.012, 0.006], [1, .4], d, seed + k, q=4.0)
-        p = p / (np.abs(p).max() + 1e-12)
-        c = contact(0.01, 2500, 9000, 0.0008, seed + 50 + k)
-        p[: len(c)] += 0.25 * c / (np.abs(c).max() + 1e-12)
-        place(out, p, k / rate + r.normal(0, 0.008), r.uniform(0.6, 1.0) * level)
-    return out
-
-
 def train_far(dur=4.2, seed=5150):
     """a train on the far viaduct: a low rumble that swells and fades, the wheel-joint pairs (da-dum) very soft."""
     n = n_of(dur); t = tt(dur); r = rng(seed)
@@ -361,50 +342,43 @@ def train_far(dur=4.2, seed=5150):
     return lp(y, 700, 2)
 
 
+def fade_in(g, dur):
+    k = min(len(g), n_of(dur))
+    w = np.sin(0.5 * np.pi * np.linspace(0, 1, k)) ** 2
+    g = g.copy(); g[:k] *= w if g.ndim == 1 else w[:, None]
+    return g
+
+
 def life_layer(n):
-    """sheet.LIFE: the life already on screen, each from its own grains (levels relative to the water laps)."""
+    """sheet.LIFE: the life the conformed picture keeps, each from its own grains (levels relative to the water laps).
+    A continuous bed that belongs to the new shot (our boat in S4, the fountain in S7) fades in just after the join's
+    window (midpoint + 0.12 s): it never starts inside it."""
     y = np.zeros((n, 2)); rep = []
     for (t, kind, p, note) in sheet.LIFE:
-        if kind == "bike":            # a far cyclist entering from the right: tyre whirr, then a few freewheel ticks
-            g = FLD.cut(FLD.load(276001), 1.0, 4.6, 0.3).mean(axis=1)
-            g = lp(hp(g, 150, 2), 2600, 2)
-            place_c(y, unit_rms(g) * db2a(-14), t, 1.0, p)
-            tk = FLD.cut(FLD.load(156996), 1.94, 2.62, 0.02).mean(axis=1)
-            place_c(y, unit_rms(lp(tk, 7000, 2)) * db2a(-20), 1.52, 1.0, p - 0.3)
-        elif kind == "bus":            # far, on the road bridge in the west gap: a low diesel swell going left
+        if kind == "bus":              # far, on the road bridge in the west gap: a low diesel swell going left
             g = FLD.cut(FLD.load(138247), 7.6, 13.4, 0.6).mean(axis=1)
             g = lp(hp(g, 60, 2), 1300, 2)
-            place_c(y, unit_rms(g) * db2a(-12), t, 1.0, p)
-        elif kind == "duck_land":      # a mallard comes down on the canal: wings and water
-            g = FLD.cut(FLD.load(263104), 60.95, 62.15, 0.04).mean(axis=1)
-            place_c(y, unit_rms(lp(hp(g, 150, 2), 6000, 2)) * db2a(-10), t, 1.0, p)
-        elif kind == "dog":            # trotting: the collar's jingle and the paws on stone
-            j = FLD.cut(FLD.load(611827), 2.08 if t < 5 else 6.10, 2.72 if t < 5 else 6.70, 0.03).mean(axis=1)
-            place_c(y, unit_rms(lp(hp(j, 1800, 2), 7000, 2)) * db2a(-20 if t < 5 else -22), t + 0.05, 1.0, p)
-            place_c(y, unit_rms(paws(t, 6, 4.2, int(t * 100))) * db2a(-13 if t < 5 else -17), t, 1.0, p)
-        elif kind == "boat_pass":      # S2: a narrowboat comes up the canal from the vanishing point
-            d = 5.9; g = FLD.cut(FLD.load(576577), 3.0, 3.0 + d, 0.8).mean(axis=1)
+            place_c(y, unit_rms(g) * db2a(-14), t, 1.0, p)
+        elif kind == "boat_pass":      # S2: a narrowboat comes up the canal from the vanishing point, ends at the cut
+            d = 12.98 - t - 0.05; g = FLD.cut(FLD.load(576577), 3.0, 3.0 + d, 0.6).mean(axis=1)
             k_ = np.linspace(0, 1, len(g))
             g = lp(hp(g, 70, 2), 900, 2) * (0.35 + 0.65 * k_) + lp(hp(g, 900, 2), 1800, 2) * 0.35 * k_ ** 2
-            place_c(y, unit_rms(g) * db2a(-11), t, 1.0, p)
+            place_c(y, unit_rms(g) * db2a(-13), t, 1.0, p)
         elif kind == "boat_ride":      # S4: our narrowboat's engine at idle-ahead beside us, its bow wash
-            d = 20.55 - t + 0.3; g = FLD.cut(FLD.load(576577), 14.0, 14.0 + d, 0.25).mean(axis=1)
+            t0 = t + sheet.JOIN_AFTER; d = 20.55 - t0
+            g = fade_in(FLD.cut(FLD.load(576577), 14.0, 14.0 + d, 0.25).mean(axis=1), 0.4)
             g = lp(hp(g, 75, 2), 1500, 2)
-            place_c(y, unit_rms(g) * db2a(-19), t - 0.15, 1.0, 0.05)
-            w = FLD.cut(FLD.load(318064), 30.0, 30.0 + d, 0.25)
-            place_c(y, unit_rms(lp(hp(w, 200, 2), 3200, 2)) * db2a(-19), t - 0.15)
+            place_c(y, unit_rms(g) * db2a(-20), t0, 1.0, 0.05)
+            w = fade_in(FLD.cut(FLD.load(318064), 30.0, 30.0 + d, 0.25), 0.4)
+            place_c(y, unit_rms(lp(hp(w, 200, 2), 3200, 2)) * db2a(-21), t0)
         elif kind == "train":
-            place_c(y, unit_rms(train_far()) * db2a(-17), t, 1.0, p)
-        elif kind == "gulls":
-            g = FLD.cut(FLD.load(73497), 0.02, 1.38, 0.03).mean(axis=1)
-            g = lp(hp(g, 500, 2), 3200, 2)
-            g = g + 0.25 * np.convolve(g, np.exp(-tt(0.4) / 0.12) * rng(77).standard_normal(n_of(0.4)) * 0.02)[: len(g)]
-            place_c(y, unit_rms(g) * db2a(-16), t, 1.0, p)
+            place_c(y, unit_rms(train_far()) * db2a(-18), t, 1.0, p)
         elif kind == "fountain":      # S7: the forecourt fountain jets, the whole shot
-            d = 32.93 - 28.06 + 0.2; g = FLD.cut(FLD.load(415027), 5.0, 5.0 + d, 0.12)
-            place_c(y, unit_rms(lp(hp(g, 220, 2), 8000, 2)) * db2a(-14), t - 0.1)
-        elif kind == "pigeons":
-            continue                   # the first second belongs to the flood and the ding
+            t0 = t + sheet.JOIN_AFTER; d = 32.93 - t0
+            g = fade_in(FLD.cut(FLD.load(415027), 5.0, 5.0 + d, 0.12), 0.3)
+            place_c(y, unit_rms(lp(hp(g, 220, 2), 8000, 2)) * db2a(-15), t0)
+        else:
+            raise ValueError(kind)
         rep.append((t, kind))
     return y, rep
 
@@ -414,6 +388,7 @@ def life_layer(n):
 # city's floor; the birds and the life are events too; the beds are a floor, never a hiss.
 AIR_LEVEL = {"laps": 0.0, "city": -8.0, "parkway": -5.0, "water_bed": -13.0, "leaves": -14.0, "birds": -1.0,
              "life": -2.0}
+UNDER_MUSIC_DB = -7.0  # the air steps back wherever the music plays (review item 4: the arc over the air on a phone)
 
 
 def level_to(x, curve, target):
@@ -438,14 +413,17 @@ def world_air():
             src, ch = src
         place_c(birds, bird_grain(src, a, bb, lph, ch) * db2a(gdb), t, 1.0, p)
     life, rep = life_layer(n)
+    s4, s7 = 20.55, 28.10                  # the two sun push-throughs: the worlds crossfade over the carrier
+    q, X = 0.06, SUN_XF
     L = {"city": (loop_bed(426894, 46.0, 45, 9000),
-                  [(0.00, 12.98, 0), (12.98, 14.86, -3), (14.86, 20.55, -2), (28.06, 32.93, -1), (32.93, FILM_DUR, -3)]),
-         "parkway": (loop_bed(208502, 34.0, 55, 7000), [(20.55, 28.06, 0)]),
+                  [(0.00, 12.98, 0), (12.98, 14.86, -3), (14.86, s4, -2, q, X), (s7, 32.93, -1, X, q),
+                   (32.93, FILM_DUR, -3)]),
+         "parkway": (loop_bed(208502, 34.0, 55, 7000), [(s4, s7, 0, X, X)]),
          "water_bed": (lp(loop_bed(318064, 18.0, 150, 2600), 2600, 2),
-                       [(0.00, 14.86, 0), (14.86, 20.55, 0), (28.06, 32.93, -6), (32.93, FILM_DUR, -1)]),
+                       [(0.00, s4, 0, q, X), (s7, 32.93, -6, X, q), (32.93, FILM_DUR, -1)]),
          "leaves": (loop_bed(347557, 0.0, 1500, 8000) * gust[:, None] ** 1.5,
-                    [(0.00, 20.55, 0), (20.55, 28.06, 0), (28.06, FILM_DUR, -1)]),
-         "laps": (water_laps(n), [(0.00, 20.55, 0), (28.06, FILM_DUR, 0)]),
+                    [(0.00, s4, 0, q, X), (s4, s7, 0, X, X), (s7, FILM_DUR, -1, X, q)]),
+         "laps": (water_laps(n), [(0.00, s4, 0, q, X), (s7, FILM_DUR, 0, X, q)]),
          "birds": (birds, [(0.00, FILM_DUR, 0)]),
          "life": (life, [(0.00, FILM_DUR, 0)])}
     REF = -30.0
@@ -458,8 +436,8 @@ def world_air():
     # the "..." (4.54-4.79): the air dips 12 dB (down in 40 ms, back over 150 ms); the picture's life goes on
     t = np.arange(n) / SR
     dip = db2a(np.interp(t, [0, 4.50, 4.54, 4.79, 4.94, FILM_DUR], [0, 0, -12, -12, 0, 0]))
-    # wherever music plays the air steps back 4 dB (review item 4); the hook and the seam keep the full air
-    mus = db2a(np.interp(t, [0, 6.05, 6.35, 38.55, 39.0, FILM_DUR], [0, 0, -4, -4, 0, 0]))
+    # wherever music plays the air steps back (review item 4); the hook and the seam keep the full air
+    mus = db2a(np.interp(t, [0, 6.05, 6.35, 38.55, 39.0, FILM_DUR], [0, 0, UNDER_MUSIC_DB, UNDER_MUSIC_DB, 0, 0]))
     y *= (dip * mus)[:, None]
     for k in layers:
         layers[k] = layers[k] * (dip * mus)[:, None]
@@ -728,14 +706,32 @@ def arc_report(vs, music, air):
                         "over_air": round(float(Lm - La), 1)}
         out[lab] = rows
     t1, l1 = short_term_lufs(music, win=0.1, hop=0.01)
-    pumps = {}
+    pumps, pumps_md, vs_acc = {}, {}, {}
+    acc = {"accent1": float(l1[(t1 >= 22.43) & (t1 <= 24.0)].max()), "accent2": float(l1[(t1 >= 37.18) & (t1 <= 38.82)].max())}
     for a, b in GAPS:
         m = (t1 >= a) & (t1 <= b - 0.05); pre = (t1 >= a - 1.0) & (t1 <= a - 0.05)
         pumps[f"{a:.2f}-{b:.2f}"] = round(float(l1[m].max() - l1[pre].max()), 1)
+        pumps_md[f"{a:.2f}-{b:.2f}"] = round(float(l1[m].max() - np.median(l1[(t1 >= a - 1.0) & (t1 <= a - 0.1)])), 1)
+        vs_acc[f"{a:.2f}-{b:.2f}"] = round(float(l1[m].max() - min(acc.values())), 1)
     # the music's loudest 100 ms inside each pause minus its loudest 100 ms in the second of speech before: a swell
-    # the duck lets through shows as > 0 (a note the score places in the pause shows too: 8.08 is the pulse's entry)
+    # the duck lets through shows as > 0 (a note the score places in the pause shows too: 8.08 is the pulse's entry);
+    # the review's own measure (max in the pause minus the MEDIAN of the second before) reads a plucked pulse's next
+    # note as a rise, so it is reported beside it; and every pause stays under both designed accents (vs_accents < 0)
     out["pause_swell_dB"] = pumps
+    out["pause_rise_vs_median_dB (review item 5's measure)"] = pumps_md
+    out["pause_max_vs_quieter_accent_dB"] = vs_acc
+    out["accents_max_100ms_LUFS"] = {k: round(v, 1) for k, v in acc.items()}
     return out
+
+
+def notes_in_join_windows(notes):
+    """music onsets inside a join's window (sheet.join_windows: only the carrier starts there)."""
+    bad = []
+    for (lo, hi, snd) in sheet.join_windows():
+        for (tr, t, d, p, v) in notes:
+            if lo <= t < hi:
+                bad.append((snd, tr, round(t, 3), p))
+    return bad
 
 
 def main():
@@ -754,7 +750,7 @@ def main():
     tt_ = np.arange(N_FILM) / SR
     music = music * db2a(np.interp(tt_, [0, 28.20, 28.30, 32.75, 32.85, FILM_DUR], [0, 0, trim, trim, 0, 0]))[:, None]
     air, air_layers, life_rep = world_air()
-    # the air: ~19 dB under the speaking voice before its own 3 dB duck (with the same hold); 4 dB less under music
+    # the air: ~19 dB under the speaking voice before its own 3 dB duck (with the same hold); 7 dB less under music
     tv, lv = short_term_lufs(vs, win=0.4, hop=0.05)
     vref = float(np.median(lv[speech_frames(tv)]))
     th, la = short_term_lufs(air, win=0.4, hop=0.05)
@@ -805,6 +801,7 @@ def main():
                                             ("clause 24.0-27.8", 24.0, 27.8), ("google 28.3-32.7", 28.3, 32.7),
                                             ("motif alone 33.2-36.2", 33.2, 36.2), ("facts 37.2-38.8", 37.2, 38.8)]},
            "arc": arc_report(vs, music, air),
+           "music_onsets_in_join_windows": notes_in_join_windows(notes),
            "tempo_bpm": [round(60 * n / (b - a), 1) for (a, b, n) in SEG]}
     (SCRATCH / "bed_report.json").write_text(json.dumps(rep, indent=1))
     print(json.dumps(rep, indent=1))
