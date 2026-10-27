@@ -292,9 +292,10 @@ hand-picked fill; shadows inside one layer never double-darken); a light is a fl
 lands on (pools, spills, a rim), never a disc sticker; a soft edge is 2 flat steps (a half-tint band), never blur, a
 gradient or an opacity fade. Opt-in and local to this kit (CRAFT's `lib/light.tsx` is its promotion): nothing in `lib/`
 changes, every light fill is a clean-pen backdrop (never recoloured by a tier), and the module is pen-agnostic (exact
-paths, no `lib/sketch` strokes). Demo: `npx remotion still src/entry-v3-kit.tsx LightDemo out.png --frame=180` (the nook's
-desk props + a blue-hour street corner; `--props='{"lit":false}'` = the same frames before the light system),
-`LightNook`, `LightStreet` (1080 x 1920 each), `LightRigCheck` (`lightProblems()` for every rig: must say 0 problems).
+paths, no `lib/sketch` strokes). Demo: `node scripts/render-frames.mjs LightDemo out 3.0 --entry=src/entry-v3-kit.tsx`
+(the nook's desk props + a blue-hour street corner, 2160 x 1920; `--props='{"lit":false}'` = the same frames before the
+light system), `LightNook`, `LightStreet` (1080 x 1920 each), `LightRigCheck` (`lightProblems()` for every rig: it must
+say 0 problems).
 
 **Layer order** (bottom to top): the set's fills -> ground light (`LightPool`, `WindowSpill`; `Halo` right after the
 sky) -> ground shadows (`ShadowLayer`: `ContactShadow`, `CastShadow`, `Shadow`) -> the objects -> per object `FormShade` /
@@ -302,14 +303,19 @@ sky) -> ground shadows (`ShadowLayer`: `ContactShadow`, `CastShadow`, `Shadow`) 
 are the Film's: never lit. Ink is multiplied like the fill under it (near-black stays near-black: "ink stays unlit").
 Geometry is canvas px at camera rest: put the layers inside the same camera group as the set.
 
+**The gate:** `scripts/qa/check_light.py` on an A/B pair of the same frame. Any composition renders its A side with
+`--props='{"lightOff":true}'` (every light layer off, no panel edited), so the diff finds every light and shadow pixel:
+the brightest 5 % (sky and caption band out) centred within 0.15 H of the subject, no greyed or too-dark shadow pixel,
+one light value across the caption band, every pool and spill >= 4 L* over its ground; the CRAFT §d.10 shares reported.
+
 ## One rig per set (CRAFT §d.1: decided with the story; the key is where the eye goes)
 
-| place | key | shadows | light shapes |
+| place | key | shadows (one family per set) | light shapes |
 |---|---|---|---|
-| **nook** (O1, S7, S8, S12, S13, S15, S16): `nookRig({lamp, pool, glass})` | THE desk lamp, screen-left: a point light (`src` = the shade's mouth from the `LampPose`, `foot` under it, `H` its height over the desk); the window = a cool fill that only colours (`Rim from="fill"`); the glass is a source | room family (rose base `#CBA6A6`): form `#EADBDB`, cast `#E2CECE`, contact `#D0AFAF`; ambient `#EEDED8` (wall 91 -> 82, desk 68 -> 61: peach stays peach) | the pool on the desk `#EBB07F` / `#F6CD98` (two steps, the inner one toward the lamp's foot), the lamp's mouth L* 96 |
-| **shop** (S5): `RIGS.shop` | the ceiling's warm bank high upper-left: a sun (`toward` 35, `el` 64: short shadows falling right and toward us) | room family | none: light on what it hits |
-| **street** at blue hour (S4, S6, S10, S14, the window views): `withKey(RIGS.street, RIGS.street.key, [streetLamp(lantern, base)])` | the open sky (tops lit, no cast direction, contact shadows only; the bright side upper-left for form shades); street lamps are practicals (their own pools; cast shadows only inside them) | dusk family (violet base `#B4AED8`): form `#DAD6EC`, cast `#D4D0E8`, contact `#B4AED8` | pools `#EADBD2` / `#F6E4CA` on the open snow painted at its ambient `#C9CFE6` (L* 83); lit panes `#FFD27A` (L* 86) with their spill `#EBD8C8`; a halo `#8A8FB5` on the sky only (r <= 1.7x the lantern); lanterns L* 96; sky-facing snow caps `#D9DFF2` (L* 89, thin, under the pool core) |
-| **roof** (S9): `RIGS.roof` | the glow beyond the town as a 3/4 BACKLIGHT (a sun `toward` 100, `el` 58): tops and key-side edges lit, the camera-facing sides and backs in shade (`form.backlit`), short shadows toward us | dusk family | `Rim` on You's back and the stick (the darker field behind them) |
+| **nook** (O1, S7, S8, S12, S13, S15, S16): `nookRig({lamp, pool, glass})` | THE desk lamp, screen-left: a point light (`src` = the shade's mouth from the `LampPose`, `foot` under it, `H` its height over the desk); the window = a cool fill that only colours (`Rim from="fill"`); the glass is a source | rose base `#CBA6A6` at 0.40 / 0.55 / 0.90: form `#EADBDB`, cast `#E2CECE`, contact `#D0AFAF`; ambient `#EEDED8` (wall 91 -> 82, desk 68 -> 61: peach stays peach) | the pool `POOL_DESK` on the ladder: ring `#FFD7A4` (L* 88), core `#FFE8C1` (93), the core toward the lamp's foot; the lamp's mouth L* 96 |
+| **shop** (S5): `RIGS.shop` | the ceiling's warm bank high upper-left: a sun (`toward` 35, `el` 64: short shadows falling right and toward us) | the room family | light on what it hits |
+| **street** at blue hour (S4, S6, S10, S14, the window views): `withKey(RIGS.street, RIGS.street.key, [streetLamp(lantern, base)])` | the open sky (tops lit, no cast direction, contact shadows only; its bright side upper-left for form shades); street lamps are practicals (their own pools; cast shadows only inside them) | violet base `#BBA8DA` at 0.50 / 0.58 / 1.0: on the ambient snow form / cast / contact -12 / -13 / -23 | pools `#EADBD2` / `#F6E4CA` on the open snow painted at its ambient `#C9CFE6` (L* 83); lit panes `#FFD27A` (L* 86) with their spill `#EBD8C8`; one halo step on the sky only (r <= 1.7x the lantern; `on` = the sky band behind it); lanterns L* 96; sky-facing snow caps `#D9DFF2` (L* 89, thin, under the pool core) |
+| **roof** (S9): `RIGS.roof` | the glow beyond the town as a 3/4 BACKLIGHT (a sun `toward` 100, `el` 58): tops and key-side edges lit, the camera-facing sides and backs in shade (`form.backlit`), short shadows toward us | the dusk family | `Rim` on You's back and the stick (the darker field behind them) |
 
 `lightAt(rig, p)` picks the light that shapes a spot (the practical whose pool holds it, else the key if it casts);
 `castVector`, `groundDir`, `lightDir` give the screen vectors; `withKey` copies a rig with a shot's own key geometry.
@@ -318,61 +324,68 @@ Geometry is canvas px at camera rest: put the layers inside the same camera grou
 
 | Export | Props / notes |
 |---|---|
-| `Lit` | `rig`, `off` (renders no light layer: the A side of an A/B render; `LitWindow` and a panel's own `useLightOff()` colours switch back with it). `useRig()`, `useLightOff()`. |
+| `Lit` | `rig`, `off` (no light layer: the A side; `LitWindow` and a panel's own `useLightOff()` colours switch back with it; the input prop `{"lightOff": true}` does the same for every composition). `useRig()`, `useLightOff()`. |
 | `ShadowLayer` | one isolated multiply group for a set's ground shadows; `exclude` = paths or the drawn elements (their silhouettes stay clear) when the objects were already drawn (a kit set that draws everything at once). |
-| `ContactShadow` | `x y` (the footprint's centre on the ground) `w`, `h` (6-12; 16 a vehicle), `k` (1.05-1.15; people 1.2-1.3), `d` (a custom footprint: a strip under a laptop's deck, a notebook's cover: then it shows as a sliver on the side away from the key), `away` (3.5 px away from the key), `tint` ('cast' for a building's base: gentler). Self-wrapping: works inside or outside a `ShadowLayer`. |
-| `CastShadow` | the footprint (`x y w` + `depth`, or `pts`) swept along the light, `h` = the object's height; under a lamp h·d / (H - h) capped at `rig.cap` x h and clipped to the lamp's pool (each pool step gets its own tint, `poolCastTints`: never darker than the unlit ground beyond the pool's edge, so a shadow never ends in a lighter dark); under a sun h / tan(el); sky: nothing. `light` forces one light (a walker crossing a pool: no pop at its edge); `soft` [base, tip]. |
+| `ContactShadow` | `x y` (the footprint's centre on the ground) `w`, `h` (6-12; 16 a vehicle), `k` (1.05-1.15; people 1.2-1.3), `d` (a custom footprint: a strip under a laptop's deck, a notebook's cover: then it shows as a sliver on the side away from the key; the desk / wall crease), `away` (3.5 px away from the key), `tint` ('cast' for a building's base: gentler). Self-wrapping: works inside or outside a `ShadowLayer`. |
+| `CastShadow` | the footprint (`x y w` + `depth`, or `pts`) swept along the light, `h` = the object's height; under a lamp h·d / (H - h) capped at `rig.cap` x h and clipped to the lamp's pool, each pool step with its own tint (`poolCastTints`: the cast tint, weakened just enough never to land darker than the unlit ground past the pool's edge: one family, never grey); under a sun h / tan(el); sky: nothing. `light` forces one light (a walker crossing a pool: no pop at its edge); `soft` [base, tip]. |
 | `Shadow` | any shape: a drop shadow on a wall or a lid (`dx dy` = `dropOffset(rig, c, gap)`, `clip` = the surface it lands on), an eave's underside, a desk's front-edge strip; `soft`. |
 | `FormShade` | `of` (the SAME element you drew) or `d`, `c` + `size` (with `of`), `frac` (0.25-0.4), `kind` 'band' (a side terminator: boxes, cylinders, people) or 'crescent' (round things: the object minus a copy moved toward the key), `dir` to force. Give it to every object in a lit zone; supporting things in the ambient get only their contact shadow (calm). |
-| `Shade` | a whole plane one step down (`d` or `of`): a facade turned away from the bright sky, a reveal facing away from the lamp, an underside (`tint="cast"`). |
+| `Shade` | a whole plane one step down (`d` or `of`): the attic slope, a shelf's cubbies (`tint="cast"` strips under its boards), a facade turned away from the bright sky, an underside. |
 | `Ambient` | one multiply of `tints.ambient` over `region` (default the frame) with ordered `holes` (`LightHole`: `e` / `d` / `rect` / `of`, `soft` + `steps` 1-2, `kind` 'lit' or 'dark' to paint the tint back, `clip`): the glass and every source (hard), the pool (hard: its two steps are its gradient), every object standing lit in the pool (`of`), a lamp's wall wash (`washHole(rig, deskY)`: 2-step ~26 px edge, cut at the desk's crease). |
-| `LightPool` | the key's (or `light`'s) pool as two opaque steps (`poolSteps`; `poolFor(pose, groundY)` derives a lamp's pool from its mouth, rx 2.5-3.5x the mouth's half-width). |
+| `LightPool` | the key's (or `light`'s) pool as two opaque steps (`poolSteps`; `poolFor(pose, groundY)` derives a lamp's pool from its mouth). |
 | `WindowSpill`, `LitWindow` | a lit pane's trapezoid on the ground (`win`, `base` = the wall's foot, `widen` 1.3-1.6, `depth` 0.6-1); the pane itself at `rig.window`, exact. |
-| `Halo`, `SourceCore` | one step on the sky behind a lantern (draw it right after the sky; r <= 1.7x `w`); a source's core at L* 96 (a lantern's glass, the lamp's mouth). |
+| `Halo`, `SourceCore` | one step on the sky behind a lantern (draw it right after the sky; r <= 1.7x `w`; `on` = a lighter sky band behind it: the step is taken from that); a source's core at L* 96 (a lantern's glass, the lamp's mouth). |
 | `PoolLift` | screen `rig.lift` (#4A2E10: +6..+11 L*) on a warm object in the pool (`d` or `of`; clipped to the pool, `pool={false}` for a thing standing in it); never on cool or dark parts (lift the deck, not the screen). |
 | `Rim` | the subject's lit edge: 4-6 px inside the silhouette along the key-facing sides (the object minus a copy moved away from the light; a box gets its two key-facing sides whole), `cover` < 0.5 trims a ROUND thing further; `d` or `of` (+ `c`, `size`); `from="fill"` = the window's cool light. Never an offset copy of the outline. |
-| helpers | `lab`, `lch`, `fromLch`, `multiply`, `screen`, `mixHex`, `step`, `tintFor`, `relit` (a lighter warmer variant), `tintFamily`; `ellipseD`, `polyD`, `rectD`, `ellipsePts`, `hull`, `inEllipse`; `lampMouth`, `streetLamp`; `lightProblems(rig, surfaces, {ground})`. |
+| helpers | `lab`, `lch`, `fromLch`, `multiply`, `screen`, `mixHex`, `step`, `tintFor`, `relit` (a lighter warmer variant), `tintFamily`; `ellipseD`, `polyD`, `rectD`, `ellipsePts`, `hull`, `inEllipse`; `lampMouth`, `streetLamp`, `poolSteps`, `poolCastTints`, `groundAmbientOf`; `lightProblems(rig, surfaces, {ground})`. |
 
-A panel (S7's desk, three lines of light):
+A panel (S7's desk; the set as before, the light in a few lines):
 
 ```tsx
-const rig = nookRig({lamp: LAMP, pool: POOL, glass}); const laptop = <Laptop x={540} y={1145} w={420} />;
-<Lit rig={rig}> <Nook ... layout={{lamp: LAMP, pool: NO_POOL}} /> <LightPool /> <ShadowLayer><ContactShadow x={540} y={1240} w={440} d={deckFront} /><CastShadow x={540} y={1145} w={420} pts={hinge} h={269} /></ShadowLayer>
-  {laptop} <FormShade of={mug} c={[860, 1110]} size={[98, 112]} /> <Ambient holes={[{rect: glass}, {e: POOL}, {of: laptop}]} /> <Rim d={polyD(laptopGeo(540, 1145, 420).lid)} /> </Lit>
+const rig = nookRig({lamp: LAMP, pool: POOL, glass}); const laptop = <Laptop x={540} y={1145} w={420} />; const mug = <Mug x={820} top={1040} />;
+<Lit rig={rig}> ...set (its own pool shrunk away)... <LightPool /> <ShadowLayer><ContactShadow x={540} y={1240} w={440} d={deckFront} /><CastShadow x={540} y={1145} w={420} pts={hinge} h={269} /></ShadowLayer>
+  {laptop}{mug} <FormShade of={mug} c={[869, 1100]} size={[98, 112]} /> <Ambient holes={[{rect: glass}, {e: POOL}, {of: laptop}, {of: mug}]} /> <Rim d={polyD(laptopGeo(540, 1145, 420).lid)} /> </Lit>
 ```
 
-## Measured in the demo (`LightDemo`, 3.0 s, clean pen; CIE L*)
+## Measured in the demo (`LightDemo` at 3.0 s, clean pen, CIE L*; the gate: LIGHT OK on both frames)
 
-Night interior: wall (caption band) 91 -> 81.5, one value; desk 68 -> 61; pool 76 / 85 on the ambient desk (+15 / +24);
-the lit laptop keeps its hero (53), its deck lifted to 61; the lamp's mouth 96; form steps -5..-6 on the dark book and
-pen cup, -10 on light surfaces. Night exterior: open snow 83, pools 88 / 91 (+5 / +8), spills 87 (+4), lit panes 86,
-lanterns 96, caps 89, the facade turned from the sky -7; cast shadows inside a pool land at ~78 against the ambient
-snow's 83. `LightRigCheck`: 0 problems (every rig's family, pools, panes, sources, caps; shadow colours on each set's
-surfaces keep C* >= 8 and L* >= 35). Against the cozy references: short, soft (a 12-14 px half step at the far end),
-coloured (violet on snow, rose on the desk) shadows; contact strips under everything that stands.
+**Nook:** the wall (caption band) 91 -> 82, one light value across the band (dL* spread 1.2); the attic slope 66, the
+upper cubbies 73; the desk 68 -> 61; the pool 88 / 93 (+27 / +32 over the ambient desk); the lit laptop keeps its hero
+(53), its deck lifted to 61; the mug in the pool 91 lit / 81 on its shade side; the lamp's mouth 96; the brightest 5 %
+centred on the subject (0.00 H); lit 14 %, ambient 77 %, shadow shapes 10 % of the frame outside the window view (CRAFT
+20-30 / 45-60 / 10-20: this frame is one third caption wall, which must stay one ambient value). **Street:** open snow
+83; pools 88 / 91; spills 87 (+4); lit panes 86 (the old 78 sat under the snow); lanterns 96; caps 89; the halo 65 on
+the sky band's 58; the facade turned from the sky -6; shadows inside the pool 79 (mauve, C* 8.5) against the open
+snow's 83; warm-lit 14 % (CRAFT 8-15); the brightest 5 % 0.06 H from the subject. Against the cozy references: short,
+soft (a 12-14 px half step at the far end), coloured (violet on snow, rose and mauve on the desk and in the pools)
+shadows, and a contact shadow under everything that stands.
 
 **Learned on the way (keep):** (1) under the clean pen the environment tier already pulls far snow toward the sky (the
-window view's snow sits near the night ambient by itself): never stack an `Ambient` on a tiered outside (it went to
-L* 74, grey slush); (2) v3's anglepoise points down and stands in front of the glass: a wall wash's edge wraps round
-the window and reads as the WINDOW glowing, so `nookRig` has no wash (pass one only for a lamp against an open wall);
-(3) a soft band round the pool hole reads as a third ring (a target): the pool hole is hard; (4) a rim limited by a
-half-plane stops abruptly on a box's edge: boxes take the copy's key-facing sides whole; (5) a cast shadow tinted like
-any other came out darker than the unlit snow just past the pool's edge (74 vs 83): pool steps get their own tints;
-(6) the environment tier pulls sky-lit caps down to the ground's value: draw caps exact (`rig.snowCap`, backdrop).
+window view sits near the night ambient by itself): never stack an `Ambient` on a tiered outside (it went to L* 74);
+(2) v3's anglepoise points down and stands in front of the glass: a wall wash's edge wraps round the window and reads
+as the WINDOW glowing, so `nookRig` has no wash (pass one only for a lamp against an open wall); (3) a soft band round
+the pool hole reads as a third ring (a target): the pool hole is hard; (4) a rim limited by a half-plane stops abruptly
+on a box's edge: boxes take the moved copy's key-facing sides whole; (5) CRAFT §d.7's example desk pool (#EBB07F /
+#F6CD98, 76 / 85) sits under the ambient wall's 82, so the brightest 5 % lands on the upper wall: the pool goes on the
+§d.2 ladder (88 / 93), and in a wall-heavy frame it must cover enough desk round the subject (the demo's is 5x the
+mouth's half-width, past §d.7's 2.5-3.5x; S7's tighter frame passes with 3.5x); (6) a violet multiply on a warm light
+(a spill, a pool, a cream shoe) cancels toward grey: the dusk base moved from #B4AED8 to #BBA8DA (a touch of plum); (7)
+inside a pool a shadow must not end darker than the unlit ground past the pool's edge, and a "light removed" tint toward
+the cool ground cannot be reached by a multiply on a warm pool (it lands grey): the cast tint weakened is both; (8) a
+halo on the sky's lighter horizon band needs its step from that band (`on`), or it vanishes (+2 L*); (9) the
+environment tier pulls sky-lit caps down to the ground's value: caps are drawn exact (`rig.snowCap`, backdrop).
 
 ## Open (for the lanes and the kit)
 
 - `Nook`: an option to hand its pool to the rig (`pool: false` or pool colours); the demo shrinks `layout.pool` to
-  nothing and draws `LightPool`. `EMBER.houseLit` (L* 78) -> `rig.window` (L* 86) for every kit house and window, once
-  the panels take the light (the ladder: panes are the brightest warm things outside; the snow must sit under them).
-- Kit silhouettes: `of` renders a piece with `Look fills="paper" ink={false}`; raw SVG that ignores `Look` (Pip's
-  mascot paths) keeps its colours there, so give Pip only contact shadows. Kit pieces with exact outlines exported
-  (`laptopGeo`, `tagShape`) can take `d` instead (cheaper: no second render).
+  nothing and draws `LightPool`. `EMBER.houseLit` (L* 78) -> `rig.window` (L* 86) for every kit house and window once the
+  panels take the light (panes are the brightest warm things outside; the snow must sit under them).
+- Kit silhouettes: `of` renders a piece with `Look fills="paper" ink={false}`; raw SVG that ignores `Look` (Pip's mascot
+  paths) keeps its colours there, so give Pip only contact shadows. Pieces with exact outlines exported (`laptopGeo`,
+  `tagShape`) can take `d` instead (cheaper: no second render).
 - `Pip3`'s `outdoor` rim (an offset copy of its ink) -> `Rim`; `LampPost3` / `WallLamp` halo discs (2.6x and 1.5x the
   lantern; 3.2x the wall lamp) -> `halo={false}` + `Halo`; the street sets' ground snow -> `groundAmbientOf(rig)`.
 - Export from the kit barrel (`index.ts`) once the pen work there settles; promote to `lib/light.tsx` (CRAFT) with the
-  same opt-in; port the gate (pools +4 over their ground, halo <= 1.7x, the brightest 5 % without the sky and the
-  caption band centred within 0.15 H of the subject, no shadow pixel under C* 8 / L* 35 off anchor-dark surfaces, one
-  value in the band) as `scripts/qa/check_light.py` (an A/B diff of `Lit off` vs on finds every light and shadow pixel).
-- Cost: masks and blend groups add ~1-2 s per full-res frame in the demo (two full frames, ~25 light layers); use `d`
-  where a path exists and one `ShadowLayer` per ground.
+  same opt-in.
+- Cost: masks and blend groups took a demo frame (two full frames, ~30 light layers) from 0.8 to 2.7 s; use `d` where a
+  path exists and one `ShadowLayer` per ground.

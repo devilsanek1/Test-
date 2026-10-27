@@ -1,18 +1,20 @@
 // kit/Light.tsx: LIGHT AND SHADOW for the v3 film. Owner (v3 G5b, 2026-10-27): "We don't have the shadows much and the
-// light is weirdly put; lighting and shadows should be gentle but should exist." The system is the retro's light.md
-// sections C-D; the how-to is kit/README.md "Light and shadow". Everything is a FLAT SHAPE:
-//   * a shadow is a flat shape MULTIPLIED with one tint per set (so every surface gets "darker + hue-shifted" for free,
-//     never grey, never a separate fill colour); shadows that overlap inside one layer never double-darken;
+// light is weirdly put; lighting and shadows should be gentle but should exist." The spec is docs/look/CRAFT.md §d (it
+// wins), built from the retro's light lens; the how-to is kit/README.md "Light and shadow"; the gate is
+// scripts/qa/check_light.py. Everything is a FLAT SHAPE:
+//   * a shadow is a flat shape MULTIPLIED with the set's ONE tint family (form / cast / contact = three strengths of one
+//     hue), so every surface gets "darker + hue-shifted" for free, never grey, never a hand-picked fill; shadows that
+//     overlap inside one layer never double-darken;
 //   * a light is a flat step LIGHTER and WARMER than what it lands on (pools, window spill, a rim), never a disc sticker;
 //   * a soft edge is 2 flat steps (a half-tint penumbra band), never blur, a gradient or an opacity fade.
 //
-//   const rig = nookRig(NOOK_LAYOUT.pov);                        // ONE rig per set, locked at G3 with the story
+//   const rig = nookRig({lamp: LAMP, pool: POOL, glass});          // ONE rig per set, decided with the story
 //   <Lit rig={rig}>
 //     ...the set (wall, window, desk)...   <LightPool />          // the pool: two opaque steps on the desk
-//     <ShadowLayer> <ContactShadow x={842} y={1236} w={98} /> <CastShadow x={380} y={1215} w={120} h={60} /> </ShadowLayer>
-//     {mug} <FormShade of={mug} c={[842, 1180]} />                // objects, each with its shade side
-//     <Ambient holes={[{e: rig.wash, soft: 26, steps: 2}, {e: rig.pool, soft: 12}, {of: laptop}]} />  // one step down
-//     <Rim d={lidPath} c={lidCentre} />                            // the subject's lit edge, on top
+//     <ShadowLayer> <ContactShadow x={879} y={1382} w={98} /> <CastShadow x={224} y={1428} w={128} h={62} /> </ShadowLayer>
+//     {mug} <FormShade of={mug} c={[879, 1326]} size={[98, 112]} />   // objects, each with its shade side
+//     <Ambient holes={[{rect: glass}, {e: POOL}, {of: laptop}, {of: mug}]} />   // one step down outside the light
+//     <Rim d={lidPath} />                                          // the subject's lit edge, on top
 //   </Lit>
 //
 // LAYER ORDER (bottom to top): set fills -> ground light (LightPool, WindowSpill, Halo on the sky) -> ground shadows
@@ -27,7 +29,8 @@
 // on a ground plane), 180 = left, 270 = up (away from the viewer).
 //
 // Pen-agnostic: no lib/sketch strokes (exact paths only), so the clean pen and the sketch pen both get the same light.
-// Opt-in and local to v3: nothing in lib/ changes; a panel without these layers renders exactly as before.
+// Opt-in and local to v3: nothing in lib/ changes; a panel without these layers renders exactly as before; the input
+// prop {"lightOff": true} switches every light layer off (the A side of check_light.py's A/B).
 
 import React, {createContext, useContext, useId} from 'react';
 import {getInputProps} from 'remotion';
@@ -209,7 +212,7 @@ function pathBox(d: string): BB {
   return b;
 }
 
-// ================================================================= the rig: ONE per set (light.md C.1)
+// ================================================================= the rig: ONE per set (CRAFT §d.1)
 
 /** A practical: a lamp, a lantern, a bulb. `src` = the light on screen (the shade's mouth, the lantern's centre);
  *  `foot` = the point on the ground right under it (cast shadows radiate from here); `H` = its height above that
@@ -249,7 +252,7 @@ export type LightRig = {
   fill?: {from: number; color: string};
   /** The ground's foreshortening ry / rx (desk 0.3, street 0.2-0.35). */
   ground: number;
-  /** Longest cast shadow, as a multiple of the object's height (light.md: 1.5; the street 1.2). */
+  /** Longest cast shadow, as a multiple of the object's height (CRAFT §d.5: 1.5; the street 1.2). */
   cap: number;
   tints: Tints;
   /** The pool on this set's ground: [outer, inner], both LIGHTER and WARMER than the ground they land on. */
@@ -317,7 +320,7 @@ export function lampMouth(pose: {head: Pt; rot: number; scale?: number}): {c: Pt
   return {c: [pose.head[0] + axis[0] * 100 * s, pose.head[1] + axis[1] * 100 * s], halfW: 72 * s, axis};
 }
 
-/** The pool a lamp throws (light.md C.7): centred on the mouth's foot pushed along the shade's tilt, rx = `k` x the
+/** The pool a lamp throws (CRAFT §d.7): centred on the mouth's foot pushed along the shade's tilt, rx = `k` x the
  *  mouth's half-width (2.5-3.5), ry = rx x the ground's foreshortening. `groundY` = the ground's screen y under it. */
 export function poolFor(pose: {head: Pt; rot: number; scale?: number}, groundY: number, o: {k?: number; ground?: number; push?: number} = {}): Ellipse {
   const m = lampMouth(pose);
@@ -354,7 +357,7 @@ export function nookRig(L: {lamp: {head: Pt; rot: number; scale?: number; base: 
   };
 }
 
-/** The four places of v3 (light.md C.1). Geometry-free presets: a lane copies one and sets the key's screen geometry
+/** The four places of v3 (CRAFT §d.1). Geometry-free presets: a lane copies one and sets the key's screen geometry
  *  for its shot (`withKey`), or uses `nookRig()` for the nook. */
 export const RIGS: Record<'nook' | 'shop' | 'street' | 'roof', LightRig> = {
   /** The nook at blue hour: the O1 pov lamp (point) + the window as the cool fill. */
@@ -416,7 +419,7 @@ export const RIGS: Record<'nook' | 'shop' | 'street' | 'roof', LightRig> = {
 export const withKey = (rig: LightRig, key: Light, lamps: PointLight[] = rig.lamps): LightRig => ({...rig, key, lamps});
 
 /** A street lamp as a practical: lantern at `src`, standing on the ground at `base` (its post's foot), pool rx = k x
- *  the post height (light.md: 0.8-1.0; 0.75 keeps several pools apart), ry = rx x ground. */
+ *  the post height (CRAFT §d.7: 0.8-1.0; 0.75 keeps several pools apart), ry = rx x ground. */
 export function streetLamp(src: Pt, base: Pt, o: {k?: number; ground?: number} = {}): PointLight {
   const H = Math.max(40, base[1] - src[1]);
   const rx = H * (o.k ?? 0.8);
@@ -511,7 +514,7 @@ export function groundDir(rig: LightRig, p: Pt, light: Light | null = lightAt(ri
   return v[0] === 0 && v[1] === 0 ? null : v;
 }
 
-/** The cast shadow's vector on screen for an object of height h standing at ground point `foot` (light.md C.5):
+/** The cast shadow's vector on screen for an object of height h standing at ground point `foot` (CRAFT §d.5):
  *  under a lamp h * d / (H - h), capped at `cap` x h; under a sun h / tan(el); foreshortened by the ground. */
 export function castVector(rig: LightRig, foot: Pt, h: number, light: Light | null = lightAt(rig, foot)): Pt | null {
   if (!light || light.kind === 'sky' || h <= 0) return null;
@@ -664,7 +667,7 @@ export type ContactShadowProps = {
   exit?: boolean;
 };
 
-/** The strip where a thing touches the ground (light.md C.6): an ellipse 1.05-1.15x the footprint, 6-12 px tall,
+/** The strip where a thing touches the ground (CRAFT §d.6): an ellipse 1.05-1.15x the footprint, 6-12 px tall,
  *  pushed 3-4 px away from the key, with a 3-4 px half-step penumbra. The cheapest "premium" tell: give one to
  *  everything that touches a surface. */
 export const ContactShadow: React.FC<ContactShadowProps> = ({x, y, w, h, k = 1.1, d, away = 3.5, soft, tint, at, exit}) => {
@@ -714,7 +717,7 @@ export type CastShadowProps = {
   exit?: boolean;
 };
 
-/** The footprint swept along the light (light.md C.5): radiating from a lamp's foot (h * d / (H - h), capped), or
+/** The footprint swept along the light (CRAFT §d.5): radiating from a lamp's foot (h * d / (H - h), capped), or
  *  parallel under a sun (h / tan(el)), foreshortened by the ground; a penumbra band that widens toward the tip; drawn
  *  only inside the lamp's pool (outside it a thing gets only its contact shadow). Sky light: nothing. */
 export const CastShadow: React.FC<CastShadowProps> = ({x, y, w, depth, pts, h, light, clip = 'pool', soft, tint, at, exit}) => {
@@ -837,7 +840,7 @@ export type FormShadeProps = {
   at?: At;
 };
 
-/** The form shadow (light.md C.4): one flat step (multiply `form`, dL -7..-12) on the side AWAY from the key, 25-40 %
+/** The form shadow (CRAFT §d.4): one flat step (multiply `form`, dL -7..-12) on the side AWAY from the key, 25-40 %
  *  of the object's extent, hard-edged, no ink on the boundary; round things get a crescent. Lit : shade ~3 : 1. Give it
  *  to every object in a lit zone (objects in the ambient get only their contact shadow). */
 export const FormShade: React.FC<FormShadeProps> = ({of, d, c: cIn, size, frac, kind = 'band', dir, tint, at}) => {
@@ -850,7 +853,7 @@ export const FormShade: React.FC<FormShadeProps> = ({of, d, c: cIn, size, frac, 
   const [w, h] = size ?? (bb ? [bb.w, bb.h] : [100, 100]);
   if (off || (!of && !d)) return null;
   if (at !== undefined && t < at) return null;
-  // a band is a SIDE shade (light.md C.4: "on the side away from the key, 25-40 % of the width"): horizontal unless
+  // a band is a SIDE shade (CRAFT §d.4: "on the side away from the key, 25-40 % of the width"): horizontal unless
   // the key is backlit (tops lit: the shade from below) or `dir` says otherwise; a crescent follows the full direction
   const lv = lightDir(rig, c);
   const v: Pt = dir !== undefined ? deg(dir) : rig.form.backlit ? [0, 1] : kind === 'band' ? [lv[0] < 0 ? -1 : 1, 0] : lv;
@@ -955,7 +958,7 @@ export type LightHole = {
   clip?: [number, number, number, number];
 };
 
-/** The ambient step (light.md C.2, C.7 "room falloff"): ONE multiply of the set's `ambient` tint over `region` (default
+/** The ambient step (CRAFT §d.2, C.7 "room falloff"): ONE multiply of the set's `ambient` tint over `region` (default
  *  the whole frame), with HOLES painted back to white in order: the lamp's wall wash (a 2-step ~26 px edge, `washHole`),
  *  the pool (hard: its own two steps are its gradient; a soft band there reads as a third ring, a target), every object
  *  standing lit in the pool, and every source (the window glass, a screen, a lamp's mouth: hard edges).
@@ -1066,7 +1069,7 @@ export const LightPool: React.FC<{pool?: Ellipse; light?: PointLight; colors?: [
   );
 };
 
-/** A lit window pane at dusk (light.md C.2: L* 85-92, the brightest warm things outside; rig.window), exact and never
+/** A lit window pane at dusk (CRAFT §d.2: L* 85-92, the brightest warm things outside; rig.window), exact and never
  *  recoloured by a tier; pair a ground-floor pane with its WindowSpill. With the light off (`<Lit off>`, the A/B
  *  render) it paints the old EMBER.houseLit, so the A side is the kit's look before the light system. */
 export const LitWindow: React.FC<{rect: [number, number, number, number]; color?: string; at?: At}> = ({rect, color, at}) => {
@@ -1075,7 +1078,7 @@ export const LitWindow: React.FC<{rect: [number, number, number, number]; color?
   return <LF rect={rect} color={color ?? rig.window} at={at} />;
 };
 
-/** A lit window's light on the ground in front of it (light.md C.7): a flat trapezoid from the wall's foot under the
+/** A lit window's light on the ground in front of it (CRAFT §d.7): a flat trapezoid from the wall's foot under the
  *  window, widening `widen` x (1.3-1.6) over `depth` x the window's height (0.6-1). +4 L*, warm (rig.spill). */
 export const WindowSpill: React.FC<{win: [number, number, number, number]; base: number; widen?: number; depth?: number; color?: string; at?: At}> = ({win, base, widen = 1.45, depth = 0.7, color, at}) => {
   const rig = useRig();
@@ -1088,7 +1091,7 @@ export const WindowSpill: React.FC<{win: [number, number, number, number]; base:
   return <LF d={polyD(pts)} color={color ?? rig.spill} at={at} />;
 };
 
-/** A lantern's halo (light.md C.7): at most ONE flat step on the SKY only (draw it right after the sky), r <= 1.7x the
+/** A lantern's halo (CRAFT §d.7): at most ONE flat step on the SKY only (draw it right after the sky), r <= 1.7x the
  *  lantern width; or none. Never a disc over the ground or the houses. `on` = the sky colour behind it when that is not
  *  the plain sky (the lighter horizon band `skyLow`): the step is taken from it (+7 L*, warmer), so it still shows. */
 export const Halo: React.FC<{x: number; y: number; w: number; r?: number; color?: string; on?: string; at?: At}> = ({x, y, w, r, color, on, at}) => {
@@ -1107,7 +1110,7 @@ export const SourceCore: React.FC<{d: string; color?: string; at?: At}> = ({d, c
   return <LF d={d} color={color ?? rig.source} at={at} />;
 };
 
-/** Lift an object standing in a pool (light.md C.7): a screen layer of `rig.lift` (#4A2E10: sleeve +11, hero +8, desk
+/** Lift an object standing in a pool (CRAFT §d.7): a screen layer of `rig.lift` (#4A2E10: sleeve +11, hero +8, desk
  *  +6) on the object's silhouette, clipped to the pool. Warm surfaces only (screen greys cool ones). Optional on top of
  *  the Ambient hole: the subject in the pool, one step brighter than its surroundings. `pool={false}` lifts the whole
  *  object (a thing STANDING in the pool: its upright faces are lit too, not only the part over the pool's ellipse). */
@@ -1140,7 +1143,7 @@ export const PoolLift: React.FC<{of?: React.ReactNode; d?: string; pool?: Ellips
   );
 };
 
-/** The subject's lit edge (light.md C.8): 4-6 px INSIDE the silhouette along the key side (the object minus a copy
+/** The subject's lit edge (CRAFT §d.8): 4-6 px INSIDE the silhouette along the key side (the object minus a copy
  *  moved away from the light: thickest where the edge faces the key, nothing where it turns away), limited to `cover`
  *  (0.25-0.5) of the contour (by itself it keeps the key-facing half: a box's two key-facing sides; `cover` trims a round
  *  thing further), in the lit variant (rig.rim, the lamp core). Only on the story subject (You, the hero
@@ -1210,7 +1213,7 @@ export const Rim: React.FC<{d?: string; of?: React.ReactNode; c?: Pt; size?: [nu
   );
 };
 
-// ================================================================= checks (light.md D: what the gate check measures)
+// ================================================================= checks (CRAFT §d "Check": the rig's values; the frame gate is scripts/qa/check_light.py)
 
 /** Value checks of a rig against CRAFT §d's ladder, for the surfaces a set uses (empty = OK). Pools must sit >= 4 L*
  *  above their ground in ambient; form / cast / contact are one family (hues within 6 deg); shadow colours (surface x
