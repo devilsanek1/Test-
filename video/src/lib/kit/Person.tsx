@@ -96,6 +96,10 @@ export type PersonProps = {
   walk?: number;
   /** ON-SCREEN ink weight in px (depthInk: front 4.8, mid 3.4, far 2.2). 0 = no ink. Default ~3.4 * s^0.45. */
   ink?: number;
+  /** Coat detail drawn OVER the torso (fill, outline, seams) and UNDER the hood, back accessories, phone arm and head,
+   *  in the figure's local px (hip line y 0, torso from y -h; clip it to the torso yourself). Raw SVG: shown whole
+   *  (no draw-on); skipped at lod 2. v3's WinterPerson `coatDetail` (quilting, yoke, zip, pockets) uses it. */
+  torsoOver?: React.ReactNode;
 };
 
 type Spec = ReturnType<typeof makeSpec>;
@@ -466,6 +470,8 @@ export const Person: React.FC<PersonProps> = (props) => {
     push(<Ink key="seams" d={P.seams + P.cuffs + P.waist} at={tm(0.12)} width={W * 0.85 * seamA} order="all" seed={k('seams')} />);
     if (tickA > 0.03) push(<Ink key="ticks" d={P.waistTicks} at={tm(0.3)} width={W * 0.55 * tickA} order="all" seed={k('ticks')} />);
   }
+  // the caller's coat detail (over the torso, under the hood and back accessories)
+  if (props.torsoOver && lod < 2) push(<React.Fragment key="torsoOver">{props.torsoOver}</React.Fragment>);
   if (hoodA > 0.02 && P.hoodFill) {
     // the hood sinks into the collar as the figure gets small
     const hood = (

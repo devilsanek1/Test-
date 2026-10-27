@@ -13,7 +13,7 @@ replace it).
 
 Format: **rule** — why / evidence (video, date).
 
-**Last compacted: 2026-10-26 (second pass) · size budget: <= 200 lines** (raised from 150 by the owner, 2026-10-26) (see Maintenance at the end).
+**Last compacted: 2026-10-26 (third pass) · size budget: <= 200 lines** (raised from 150 by the owner, 2026-10-26) (see Maintenance at the end).
 
 ## Audience and goal
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24).
@@ -29,21 +29,15 @@ Format: **rule** — why / evidence (video, date).
   — ("just a collection of sentences", v3 G1, 2026-10-26).
 - **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24).
 - **Scripts come with detailed emotional / delivery cues; the owner always gets the full script text with any take.** — (v1).
-- **We generate the narration with the owner's ElevenLabs voice through the API, for every video** (voice id and model in
-  `docs/voice/VOICE.md`, procedure `docs/voice/API_QUICKSTART.md`): paste format v2 with `check_paste.py` OK;
-  `generate_take.py` (whole script first, auto-checked, auto-regenerated) with `report.json` `all_clean`; `check_take.py`
-  MATCH; send take.wav as an attachment; lock it into `public/vN/`; log it in `ELEVENLABS.md` section 5; commit and push after
-  each step (pull first). The key is the secret `ELEVENLABS_API_KEY`: never print, file, prompt or commit it. Never a voice
-  other than the owner's. — (owner's standing instruction, 2026-10-26).
-
-- **One full paste must narrate cleanly: a voice failure is our process bug, not the owner's problem.** It is fixed in
-  the process (`docs/ELEVENLABS.md`; study in `docs/voice/`):
-  - paste format v2: few short tags, only at the start of a paragraph; that format was clean first time;
-  - `check_paste.py` blocks every pattern that ever broke a take, and only its `--handoff` text reaches the owner;
-  - three takes per paste (free regenerations), with a stated length limit;
-  - `check_take.py` on every take;
-  - the API generator, once the key is in.
-  — (owner, v2 take 1, 2026-10-26).
+- **We generate the narration with the owner's ElevenLabs voice through the API, for every video** (voice id and model
+  in `docs/voice/VOICE.md`, procedure `docs/voice/API_QUICKSTART.md`, details `docs/ELEVENLABS.md`): paste format v2
+  (few short tags, only at a paragraph start) with `check_paste.py` OK (it blocks every pattern that ever broke a take;
+  only its `--handoff` text reaches the owner); `generate_take.py` (whole script first, auto-checked, auto-regenerated)
+  with `report.json` `all_clean`; `check_take.py` MATCH on every take; send take.wav as an attachment; lock it into
+  `public/vN/`; log it in `ELEVENLABS.md` section 5; commit and push after each step (pull first). **One full paste
+  must narrate cleanly: a voice failure is our process bug, never the owner's problem** — fix it in the process. The
+  key is the secret `ELEVENLABS_API_KEY`: never print, file, prompt or commit it. Never a voice other than the
+  owner's. — (owner's standing instruction + v2 take 1, 2026-10-26).
 
 ## Music and sound
 - **Music: cinematic but subtle, especially at the start.** The voice and the hook carry the opening. — (v1).
@@ -56,7 +50,9 @@ Format: **rule** — why / evidence (video, date).
 - **Every scene must FEEL ALIVE: that is the key, not an object count.** Aliveness comes from a dense, detailed world
   (a city full of buildings and windows, a room full of real things), people near and far, layered depth, a recurring
   living character, and ambient life that never stops (clouds drifting, birds, snow, steam, lights switching, small
-  movements). Even Arcane's rooftop shot feels alive from the city's density and detail, the clouds and the birds. The
+  movements). Even Arcane's rooftop shot feels alive from the city's density and detail, the clouds and the birds; and the owner's
+  riverside reference (a few cyclists, people sitting by the water) "doesn't feel empty at all": a dense, detailed world
+  makes a frame full even when little moves. The
   references set the bar (reference 1 France, v1 PHP); numbers from `scripts/qa/density.py` are a warning signal, never
   a quota. Big flat empty fields and an object alone on a blank wall are failures, even in a draft; density belongs to
   the set build (G5), not to polish. — ("way too empty ... those feel a lot more alive", then "less prescriptive on
@@ -77,6 +73,10 @@ Format: **rule** — why / evidence (video, date).
   `docs/look/CINEMATIC_GUIDE.md`. — (v3, 2026-10-26).
 - **Second visual twist: coziness through a sense of enclosure**: framed, street-like spaces that hold the subject (ref
   `docs/look/ref_sense_of_enclosure.jpg`). Rules: `docs/look/COZY_AND_SCALE.md`. — (2026-10-25).
+  **Coziness is a recurring topic we keep evolving, one reference at a time** (enclosure H:W ratios first; then the
+  owner's 2026-10-26 reference: a painterly street seen from above, everyday traffic flowing calmly under flowering trees):
+  each new reference is measured (composition, movement, texture, camera, details) and folded into `COZY_AND_SCALE.md`.
+  — ("really figure out what about the scene brings out this feeling; this is a recurring topic we need to evolve", 2026-10-26).
 - **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
   as a screen recording under the status bar). — (v1 posted reel, 2026-10-25).
 - **Palette: a family of house palettes as tools, not a cage.** A soft, warm, "no screaming colours" base; one sister
@@ -110,10 +110,16 @@ Format: **rule** — why / evidence (video, date).
 - **Every frame at least 8/10, no dead frames, cuts locked to the beat.** — (v1).
 
 ## Storyboard (G3)
-- **Boards optimise for SIGNAL, not quality: the director gets the most information about the final film in the least
-  drawing and the least review time.** Thumbnail-level drawings; the intent made explicit (framing, the one action,
-  the shot type, cozy/scale, the camera move as a red mark, all in a big readable note); animate only where timing is
-  the question; no polish, no extra detail, lean review loops. — (v3 G3, 2026-10-26).
+- **G3 is the most important gate: an ANIMATED SKETCHBOOK of the final film, optimised for SIGNAL, not quality.** With
+  script and voice locked, the animatic gives the director the closest signal to the final story in the least drawing
+  and review time: story, transitions, animations and camera moves already very close to final — PLAYED, not only
+  marked (their shape and timing real, never their polish); detail deliberately loose scribble-mass placeholders
+  (the hand-scribbled texture: owner yes, 2026-10-27), nothing perfectly
+  sharp but the backbone of the future film clearly visible, like an urban sketcher's page (ref
+  `docs/look/ref_animated_sketchbook.png`); thumbnail drawings, the intent explicit (framing, the one action, shot
+  type, cozy/scale) in a big readable note, lean review loops. Spec: `docs/G3_ANIMATIC.md`. — ("frankly the most
+  important stage ... more like an animated sketchbook", 2026-10-26; supersedes "animate only where timing is the
+  question", v3 G3, 2026-10-26).
 - **Every shot reads instantly with the sound off: literal beats clever.** Show recognisable things: a laptop that looks
   like a laptop, a data center like a building of servers, a plain labelled chart. No metaphors that need explaining.
   Test every animatic with a sound-off cold read before the owner sees it. — (v3 G3, 2026-10-26).
@@ -141,7 +147,7 @@ Format: **rule** — why / evidence (video, date).
   readable and strobe-free (60 fps allows faster moves). — ("the speed of transition should not be the reference point
   ... in a short reel we would speed it up", v3, 2026-10-26).
 - **Render at 60 fps from G5 to the final** ("smoother and more crispy"). Animate by time; drawn motion may stay stepped
-  (12-24 drawings/s) while the camera glides; G3 may stay at 30. — (v3, 2026-10-26).
+  (12-24 drawings/s) while the camera glides; the G3 reel also renders at 60 (`G3_ANIMATIC.md`, 2026-10-26). — (v3, 2026-10-26).
 
 ## Captions
 - **Captions pop in place (or rise without clipping);** a slot or scroll reveal that cuts letters looked like a glitch. — (v1 reel, 2026-10-25).

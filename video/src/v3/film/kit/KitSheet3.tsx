@@ -1,6 +1,10 @@
-// KitSheet3: every v3 kit prop and variant on one tall labelled sheet (1080 x 5760, 60 fps), plus the theme check:
+// KitSheet3: every v3 kit prop and variant on one labelled sheet (2160 x 9600: two columns of 1080 x 1920 screens,
+// 60 fps), plus the theme check:
 // the house tokens and the colours some house modules capture at import time must read Autumn Ember inside the v3
-// entries (palette.ts). Render: npx remotion still src/entry-v3-kit.tsx KitSheet3 out.png --frame=90 --scale=0.5
+// entries (palette.ts). Left column, screens 1-3: the G5 sets and props; then the G5b dressing and life kit
+// (KitSheetLife.tsx: two dressed density-test frames, Pip3 + its ΔE table, people, weather and window life, room
+// dressing, street and industrial life, the shop and the dock room, town variety and the deck).
+// Render: npx remotion still src/entry-v3-kit.tsx KitSheet3 out.png --frame=90 --scale=0.5
 import '../palette';
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
@@ -22,8 +26,22 @@ import {MemoryStick, Pile, StickFlight} from './Memory';
 import {YouBack, YouFront, YouSeated, YouTiny} from './You';
 import {BarChart, ChartCard, LineChart, PRICE_HOOK} from './Charts';
 import {Calendar, ChipFactory, ChipMaker, SpeechBubble, ThoughtBubble, Van, WaitingDots, WallClock} from './Props';
+import {KitSheetLifeScreens, LIFE_SHEET} from './KitSheetLife';
 
-export const SHEET = {w: 1080, h: 5760};
+/** Screens 1-3 (the G5 kit) end at y 5760 in the left column; the life kit's 7 screens follow (2 under them, 5 in
+ *  the right column). Keep every sheet under 16384 px tall (Chrome tiles taller pages wrongly). */
+const G5_H = 5760;
+const LIFE_AT: [number, number][] = [
+  [0, G5_H],
+  [0, G5_H + 1920],
+  [1080, 0],
+  [1080, 1920],
+  [1080, 3840],
+  [1080, 5760],
+  [1080, 7680],
+];
+export const SHEET = {w: 2160, h: G5_H + 1920 * 2};
+void LIFE_SHEET;
 
 const Label: React.FC<{x: number; y: number; children: string; light?: boolean}> = ({x, y, children, light}) => (
   <Txt x={x} y={y} size={30} anchor="start" fill={light ? EMBER.white : EMBER.ink}>
@@ -216,6 +234,9 @@ export const KitSheet3: React.FC = () => {
             <Person x={960} y={5750} s={0.35} seed="k/p" />
           </XG>
         </g>
+
+        {/* ---- screens 4-10: the G5b dressing and life kit */}
+        <KitSheetLifeScreens at={LIFE_AT} />
       </svg>
     </AbsoluteFill>
   );

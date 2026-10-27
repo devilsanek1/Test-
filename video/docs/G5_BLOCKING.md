@@ -29,7 +29,9 @@ file that does not exist yet; never overwrites a lane's file):
 python3 -I scripts/g5_scaffold.py --animatic public/vN/animatic.json --film src/vN/film --drop LOOP --end <voice s> --loop-dur 0.3
 ```
 
-Every `transitionIn` becomes a `cut` (the board's transition labels stay in `note`); the board's LOOP panel is dropped:
+Every `transitionIn` carries the board's `transition.type` (the labels also stay in `note`; `G3_ANIMATIC.md` §7 tier 1 —
+until g5_scaffold.py is updated it still flattens to `cut`, so fix scenes.json by hand after scaffolding: a transition
+the board PLAYED never ships flattened); the board's LOOP panel is dropped:
 the last panel ends on the voice's end with the house loop `transitionOut {type: 'unbuild', loop: true, dur: 0.3}`,
 un-building into the FIRST panel's `t < 0` bare-line state, so the film loops to the bare-line frame 0. Then copy
 `BoardPanel.tsx`, `FilmN.tsx` and the entry from v3 and change the imports.
@@ -39,6 +41,13 @@ un-building into the FIRST panel's `t < 0` bare-line state, so the film loops to
 `captionMotion: 'pop'` (owner playbook), `frame0` (the core line in words, section 5), `draftLabel: 'G5'` (burns in
 "G5 · <panel id> · <m:ss.ss>" bottom-left, small, mid grey with a light halo, so the owner can name a shot), and
 `edges={false}` (no edges / paper / texture before G6).
+
+**G5 entry check, before lanes fan out** (`G3_ANIMATIC.md` §2: G4+ may only ADD — these two checks are where that
+promise is enforced): (1) a scripted diff of scenes.json and each built scene against the locked board JSON — every
+camera move, element move, transition device and `life:`/promise item matches, and no motion exists that G3 did not
+play; a mismatch is a FAIL or an explicit, owner-visible G3 reopen. (2) A sound-off cold read of the first fully
+dressed set (the density-key build): map each board `promise` line to what a cold reader names (v3: streams read as
+birds). Lanes start only after both pass.
 
 ## 2. The scene contract (what a lane implements)
 
@@ -75,6 +84,8 @@ export const captionTone: ToneKey[] = [{t: 0, tone: 'light'}];   // optional: ov
   the bottom-left (y > 1850). Key action inside x 90-990, y 600-1480.
 - **Board notation is not film**: the red pencil marks and the notes strip never appear. A red focus circle becomes a
   production emphasis that fits the look (light, the hero colour, a pop), never a drawn circle.
+- **Density and life**: every panel is dressed and alive at G5 (a world around the subject, people, the living character,
+  the idle layer always on): `docs/look/LIFE_AND_DENSITY.md`; check with `scripts/qa/density.py` before the owner sees a cut.
 - **Look**: the video's LOOK.md, its approved style frame and palette roles (one hero colour, one dark anchor, at most
   one pop), `docs/look/COZY_AND_SCALE.md`, `docs/look/CINEMATIC_GUIDE.md`.
 

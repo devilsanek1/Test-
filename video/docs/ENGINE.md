@@ -410,6 +410,8 @@ scripts/still.sh <Comp> <sec> out.png [--scale=0.5]      # one frame (Comp = Mai
 #   generated entry with just its own file, Main / S01.. use src/entry-film.ts (no dev previews), so another lane's
 #   half-written file can't break your previews. --entry=full = src/index.ts (everything, like the Studio).
 scripts/sheet.sh <Comp> <t0> <t1> <n> out.png [--scale=0.35] [--cols=N] [--no-capcheck]   # contact sheet + caption check
+#   any sheet / still composition stays <= 16384 px tall: Chrome tiles a taller page wrongly (the content past
+#   y 16384 is painted over the top of the page), so lay tall kit sheets out in columns (v3 KitSheet3: 2160 x 9600)
 scripts/strip.sh <Comp> <t0> <t1> out.png [--crop=WxH+X+Y] [--scale=0.5] [--step=1]  # EVERY frame: check motion
 node scripts/capcheck.mjs Main                           # caption legibility: 4 frames per scene + every transition window
 node scripts/capcheck.mjs S07 --verbose --viz=/tmp/cc    # one scene; --viz paints failing background pixels magenta

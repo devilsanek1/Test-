@@ -122,6 +122,18 @@ Everything that agent knew is in this repo. This file is the map; the details li
   `scripts/v3/build_radio.py` (stand-in TTS Kokoro: kokoro.onnx + voices.bin from the kokoro-onnx GitHub release
   model-files-v1.0, `pip install kokoro-onnx`).
 - Both push to `video-production`: pull before pushing, and keep each video's files in its own `docs/vN/` folder.
+- **G3 redefined (owner, 2026-10-26 ~22:50 UTC; process session https://claude.ai/code/session_01H2Wuc49J6cRM7XeM5oyjg1):**
+  G3 is "frankly the most important stage": an ANIMATED SKETCHBOOK — close-to-final story, transitions, animations and
+  camera moves, detail as loose-but-never-empty placeholders, "the closest signal to the final story in as little time
+  as possible" (ref image `video/docs/look/ref_animated_sketchbook.png`). New stage spec **`video/docs/G3_ANIMATIC.md`**
+  (signal contract, placeholder vocabulary, motion + transition grammar, build order, review/lock). Research:
+  `video/docs/look/research/animatic_*.md`; edit record `.../g3_spec_edits.md`. STORYBOARD_STYLE §0/§2-§7, PIPELINE_V2
+  (G3 + G5 rows, frame rate, anti-waste 6, toolkit), G5_BLOCKING (entry check), CLAUDE.md and the playbook are aligned.
+  **Before the next video's G3: build the §7 tier-1 tooling** (one checkpointed lane, ~1-2 days: dress layer, ambient
+  kit + `loop`, motion/emptiness lints, transition `device`, 60 fps reel, g5_scaffold transition carry-through); the
+  2 h first-cut budget assumes it exists. Tier 2 is built lazily, never ahead of a reel. Already built (owner yes,
+  2026-10-27): the `{t:'scribble'}` placeholder mass (sketch.ts `scribble`, SketchReel, board_lint; demo
+  `video/public/g3demo/` + `deliverables/tests/g3_sketch_demo.mp4`, entry `src/entry-g3demo.tsx`).
 
 ## 2c. ElevenLabs automation (owner, 2026-10-26)
 
@@ -325,6 +337,7 @@ Never print the key, and never commit it or put it in a file.
 | 10-25 19:55 | `video/docs/look/palette_refs/1-5.webp` (editorial flat illustrations: WSJ giant, croissant + dog, couple with lights, autumn walk, confetti) | "let's play with the colour palettes ... I love our soft, warm, no screaming colours ... the background is very similar to ours, but some details have a bit more contrast" | `video/docs/look/PALETTE.md` + `palette_family.png` (a family of 8 house palettes: v1, v1.1 polish, 6 sisters; DNA rules; pick per video, expand when needed), playbook Visual style |
 | 10-25 ~20:10 | `video/docs/look/texture_refs/autumn_walk_detail.png` (crop of palette ref 4) | "I only really like these very subtle texture pieces and the black outlines, VERY subtle but in key places; test it in production" | `video/docs/look/PALETTE.md` "Texture and lines" (spec and test plan), playbook Visual style; test at G4 |
 | 10-25 17:32 | `context/uploads/inline/2026-10-25_173226_9.jpg` (= `video/docs/look/ref_sense_of_enclosure.jpg`) | "Sense of Enclosure": coziness as a visual twist; keep Arcane-like scale | queue item 2 |
+| 10-26 ~22:50 | `video/docs/look/ref_animated_sketchbook.png` (an urban sketcher's notebook: loose ink street scenes, dense with scribbled suggestion) | "the sketch stage ... frankly the most important stage ... close to final version of the story, transitions, animations, camera movements ... details ... as placeholders ... like an animated sketchbook ... the closest signal to the final story in as little time as possible" | `video/docs/G3_ANIMATIC.md` (the new G3 stage spec), playbook Storyboard rules, STORYBOARD_STYLE / PIPELINE_V2 / G5_BLOCKING / CLAUDE.md updates |
 
 Other screenshots in `context/uploads/` (`*-image.png`) are the same Instagram screens as uploaded files.
 

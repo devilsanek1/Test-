@@ -1,0 +1,119 @@
+{
+  "style": "board",
+  "label": "G3 DEMO · animated sketchbook",
+  "audio": "g3demo/silence.wav",
+  "durationSec": 10.0,
+  "frame0": "The $5 coffee.",
+  "frame0Until": 1.3,
+  "words": [
+    {"w": "Your", "s": 0.3, "e": 0.65},
+    {"w": "coffee.", "s": 0.65, "e": 1.15},
+    {"w": "$3", "s": 3.5, "e": 3.95},
+    {"w": "became", "s": 3.95, "e": 4.5},
+    {"w": "$5.", "s": 4.6, "e": 5.1},
+    {"w": "Look", "s": 6.6, "e": 6.95},
+    {"w": "outside.", "s": 6.95, "e": 7.5}
+  ],
+  "sfx": [
+    {"src": "v3/phone_cart_add.wav", "t": 0.1, "gain": 0.4},
+    {"src": "v3/phone_notify_ding.wav", "t": 4.7, "gain": 0.5},
+    {"src": "v3/phone_like_pop.wav", "t": 8.5, "gain": 0.35}
+  ],
+  "shots": [
+    {
+      "id": "S1",
+      "s": 0,
+      "e": 3.2,
+      "note": "HOME BASE cozy · PULL OUT 5%\nCoffee at your desk; grey masses = shelf clutter (G5: books, plant, radio)",
+      "transition": {"type": "cut"},
+      "camera": {"from": {"x": 540, "y": 960, "z": 1.05}, "to": {"x": 540, "y": 960, "z": 1.0}, "start": 0, "end": 3.0, "ease": "out"},
+      "els": [
+        {"t": "rect", "x": 0, "y": 560, "w": 1080, "h": 1120, "fill": "light", "role": "far"},
+        {"t": "rect", "x": 600, "y": 640, "w": 380, "h": 310, "fill": "paper", "role": "mid"},
+        {"t": "line", "pts": [[790, 640], [790, 950]], "role": "mid"},
+        {"t": "line", "pts": [[584, 956], [996, 956]], "role": "mid"},
+        {"t": "line", "pts": [[604, 860], [976, 860]], "role": "far"},
+        {"t": "rect", "x": 640, "y": 800, "w": 80, "h": 60, "fill": "light", "role": "far"},
+        {"t": "rect", "x": 850, "y": 780, "w": 100, "h": 80, "fill": "light", "role": "far"},
+        {"t": "ellipse", "cx": 680, "cy": 700, "rx": 55, "ry": 18, "fill": "light", "role": "far"},
+        {"t": "rect", "x": 40, "y": 700, "w": 320, "h": 18, "fill": "light", "role": "mid"},
+        {"t": "scribble", "x": 58, "y": 638, "w": 74, "h": 62, "role": "far"},
+        {"t": "scribble", "x": 148, "y": 618, "w": 64, "h": 82, "gap": 12, "role": "far"},
+        {"t": "scribble", "x": 228, "y": 646, "w": 94, "h": 54, "gap": 16, "role": "far"},
+        {"t": "figure", "x": 400, "y": 1470, "h": 580, "pose": "sit", "facing": "r", "role": "subject", "out": 1.9},
+        {"t": "figure", "x": 400, "y": 1470, "h": 580, "pose": "reach", "facing": "r", "role": "subject", "in": 1.9},
+        {"t": "rect", "x": 100, "y": 1150, "w": 880, "h": 36, "fill": "light", "role": "mid"},
+        {"t": "ellipse", "cx": 480, "cy": 1168, "rx": 340, "ry": 46, "fill": "paper", "role": "mid"},
+        {"t": "rect", "x": 600, "y": 1092, "w": 66, "h": 58, "fill": "paper", "role": "mid"},
+        {"t": "line", "pts": [[666, 1104], [690, 1112], [686, 1134], [664, 1140]], "role": "mid"},
+        {"t": "line", "pts": [[628, 1076], [620, 1048], [632, 1024]], "role": "mid", "in": 0.3, "out": 1.7},
+        {"t": "line", "pts": [[644, 1070], [652, 1044], [642, 1016]], "role": "mid", "in": 1.1, "out": 2.5},
+        {"t": "line", "pts": [[630, 1072], [622, 1046], [634, 1020]], "role": "mid", "in": 1.9}
+      ],
+      "moves": [
+        {"el": 7, "dx": 120, "dy": 0, "at": 0, "dur": 3.2, "ease": "linear"},
+        {"el": 18, "dx": 0, "dy": -18, "at": 0.3, "dur": 1.4, "ease": "linear"},
+        {"el": 19, "dx": 0, "dy": -18, "at": 1.1, "dur": 1.4, "ease": "linear"},
+        {"el": 20, "dx": 0, "dy": -16, "at": 1.9, "dur": 1.3, "ease": "linear"}
+      ]
+    },
+    {
+      "id": "S2",
+      "s": 3.2,
+      "e": 6.2,
+      "note": "CLOSE cut-in on the mug · HOLD\n$3 struck, $5 pops on the ding",
+      "transition": {"type": "cut"},
+      "camera": {"from": {"x": 540, "y": 960, "z": 1.0}, "to": {"x": 540, "y": 960, "z": 1.0}},
+      "els": [
+        {"t": "rect", "x": 0, "y": 560, "w": 1080, "h": 1120, "fill": "light", "role": "far"},
+        {"t": "rect", "x": 0, "y": 1180, "w": 1080, "h": 180, "fill": "light", "role": "mid"},
+        {"t": "ellipse", "cx": 540, "cy": 1210, "rx": 430, "ry": 60, "fill": "paper", "role": "mid"},
+        {"t": "line", "pts": [[350, 840], [730, 840], [716, 1180], [364, 1180]], "closed": true, "fill": "dark", "role": "subject"},
+        {"t": "ellipse", "cx": 540, "cy": 840, "rx": 190, "ry": 34, "fill": "dark", "role": "subject"},
+        {"t": "line", "pts": [[730, 900], [800, 920], [810, 1010], [790, 1080], [722, 1100]], "role": "subject"},
+        {"t": "line", "pts": [[500, 790], [488, 742], [504, 700]], "role": "mid", "in": 0.2, "out": 1.8},
+        {"t": "line", "pts": [[570, 784], [582, 738], [566, 696]], "role": "mid", "in": 1.0},
+        {"t": "line", "pts": [[364, 880], [300, 810]], "role": "mid", "in": 0.3},
+        {"t": "rect", "x": 170, "y": 700, "w": 220, "h": 120, "fill": "paper", "role": "mid", "in": 0.3},
+        {"t": "text", "x": 215, "y": 790, "text": "$3", "size": 100, "in": 0.35, "strike": 1.15, "role": "mid"},
+        {"t": "text", "x": 425, "y": 700, "text": "$5", "size": 130, "in": 1.5, "role": "mid"}
+      ],
+      "moves": [
+        {"el": 6, "dx": 0, "dy": -24, "at": 0.2, "dur": 1.5, "ease": "linear"},
+        {"el": 7, "dx": 0, "dy": -22, "at": 1.0, "dur": 1.6, "ease": "linear"}
+      ]
+    },
+    {
+      "id": "S3",
+      "s": 6.2,
+      "e": 10.0,
+      "note": "WIDE the street, queue in depth · RISE\nGrey row = the queue (G5: real people, cafe fronts, signs)",
+      "transition": {"type": "wipe", "label": "street slides in", "dur": 0.3},
+      "camera": {"from": {"x": 540, "y": 1030, "z": 1.05}, "to": {"x": 540, "y": 935, "z": 0.99}, "start": 6.2, "end": 8.6, "ease": "unveil", "word": "RISE"},
+      "els": [
+        {"t": "line", "pts": [[0, 880], [1080, 880]], "role": "far"},
+        {"t": "rect", "x": -40, "y": 700, "w": 300, "h": 180, "fill": "light", "role": "mid"},
+        {"t": "rect", "x": 300, "y": 690, "w": 340, "h": 190, "fill": "light", "role": "mid"},
+        {"t": "rect", "x": 680, "y": 705, "w": 440, "h": 175, "fill": "light", "role": "mid"},
+        {"t": "rect", "x": 380, "y": 760, "w": 90, "h": 120, "fill": "mid", "role": "mid"},
+        {"t": "text", "x": 545, "y": 775, "text": "CAFE", "size": 60, "role": "mid"},
+        {"t": "line", "pts": [[740, 1430], [400, 920], [490, 900], [860, 1410]], "closed": true, "fill": "paper", "role": "far"},
+        {"t": "figure", "x": 585, "y": 1340, "h": 330, "pose": "stand", "facing": "l", "role": "subject"},
+        {"t": "figure", "x": 680, "y": 1200, "h": 240, "pose": "stand", "facing": "l", "role": "far"},
+        {"t": "figure", "x": 615, "y": 1105, "h": 200, "pose": "stand", "facing": "l", "role": "far"},
+        {"t": "figure", "x": 563, "y": 1030, "h": 172, "pose": "walk", "facing": "l", "role": "far"},
+        {"t": "figure", "x": 520, "y": 972, "h": 145, "pose": "stand", "facing": "l", "role": "far"},
+        {"t": "figure", "x": 483, "y": 930, "h": 122, "pose": "stand", "facing": "l", "role": "far"},
+        {"t": "figure", "x": 450, "y": 900, "h": 103, "pose": "reach", "facing": "l", "role": "far"},
+        {"t": "ellipse", "cx": 300, "cy": 420, "rx": 90, "ry": 26, "fill": "light", "role": "far"},
+        {"t": "ellipse", "cx": 820, "cy": 360, "rx": 60, "ry": 18, "fill": "light", "role": "far"},
+        {"t": "scribble", "x": 10, "y": 725, "w": 220, "h": 128, "gap": 18, "role": "far"},
+        {"t": "scribble", "x": 705, "y": 730, "w": 390, "h": 125, "gap": 18, "role": "far"}
+      ],
+      "moves": [
+        {"el": 14, "dx": 90, "dy": 0, "at": 0, "dur": 3.8, "ease": "linear"},
+        {"el": 15, "dx": 60, "dy": 0, "at": 0, "dur": 3.8, "ease": "linear"}
+      ]
+    }
+  ]
+}

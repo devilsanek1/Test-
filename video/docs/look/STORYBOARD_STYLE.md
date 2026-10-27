@@ -6,9 +6,10 @@ sources agree; **REPORTED** = one secondary source or search summary; numbers wi
 
 ## 0. The principle (owner, 2026-10-26): signal per drawing
 A board exists to give the director (the owner) the most signal about the final film in the least drawing and review
-time. Draw at thumbnail level, make the intent explicit (one action, the framing, the shot type, cozy/scale, the camera
-move as a red mark, all stated in the notes strip in big words), animate only where timing is the question, and stop
-the moment the panel says what it must. Quality is not the goal at G3.
+time. Draw at thumbnail level, make the intent explicit (one action, the framing, the shot type, cozy/scale, all stated
+in the notes strip in big words), PLAY every move and transition the film will have at sketch fidelity (shape and
+timing real, polish absent — stage spec: `docs/G3_ANIMATIC.md`), place a grey placeholder wherever the final film is
+dense or alive, and stop the moment the panel says what it must. Quality is not the goal at G3; completeness of signal is.
 
 ## 1. Why
 The v3 animatic (frames at 1, 3.4, 7, 18 and 22 s) gives the eye nothing to follow. Five fills are used as decoration (warm walls, blue
@@ -43,11 +44,12 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
   Nothing in the scene has a hue. Marks are red because a grey arrow reads as an object in the scene; if the owner sees red as colour, marks become dashed ink.
 - **Line weights:** subject outline 9 px ink; the subject's inner details and middle-plane lines 5 px ink; far plane 3 px mid grey, or no
   line (a flat light shape); marks 5 px. Nothing that has to be read is under 3 px. One clean round-capped stroke per edge: at most 8 px of
-  overshoot (none on the subject), no construction tails, no breaks in long lines. **Texture: none** (no hatching, grain, gradients or caption glow).
+  overshoot (none on the subject), no construction tails, no breaks in long lines. **Texture: placeholder tone only** (the `{t:'scribble'}` mass — owner-approved sketchbook texture, 2026-10-27 — and
+  flat mid-grey rects; the remaining `G3_ANIMATIC.md` §3 primitives when built — mid/far/dress roles, placeholder tone, never decoration). Still banned: hatching as rendering, grain, gradients, caption glow.
 
 ## 3. Drawing rules
 - **One idea per panel.** Write the idea as one sentence first ("a hand taps Add to cart; the price jumps"). Two ideas means two panels,
-  cut on the voice. Exactly one subject; 12-25 elements, and over 30 the panel gets split.
+  cut on the voice. Exactly one subject; 12-25 elements, and over 30 the panel gets split (`role:'dress'` placeholder elements exempt — `G3_ANIMATIC.md` §3).
 - **Staging:** the subject sits on the centre axis (x 380-700) of the read zone (y 600-1250). It spans 35-60 % of the 760 px stage
   (at least 270 px) with 80 px of clear paper around it, and keeps its screen spot across a cut unless the cut is about movement.
   Before goes on the left, after on the right; more goes up or taller; time runs left to right. A scale panel inverts the
@@ -68,7 +70,10 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
   number struck through, with the new one beside it. "How many" is a row of equal small icons (Isotype), not one bigger icon.
 - **Labels:** at most one per panel, 56-72 px ink in the caption hand, within 40 px of its object, with no box. Use one only when the
   picture can't say it and the word will be in the final film; it never repeats the caption. No sources or footnotes in the frame.
-- **Space:** at least 40 % of the stage is plain paper. Nothing important sits within 120 px of a side edge or under the UI rail (x > 780,
+- **Space:** at least 40 % of the SUBJECT ZONE is low-detail (plain paper or flat scribble tone), so the subject
+  breathes. Outside the subject zone, bare paper is legal only where the final film stays plain, declared
+  `negative: true`; every surface that will be dense or alive at G5 carries a placeholder mass (`G3_ANIMATIC.md` §3).
+  A set panel over ~55 % bare stage, or a wide with no `role:'dress'` layer, is a lint WARN. Nothing important sits within 120 px of a side edge or under the UI rail (x > 780,
   y > 840). The **caption band** (y 290-600) is plain paper or one flat light sky, and no lines cross it. The captions keep today's
   in-place pop (100 px ink), and the frame-0 payoff line sits above them.
 - **Notes strip (big words, v3 G3 fix round):** one strip at y 1680-1920, paper with a 2 px light rule, written for the director
@@ -79,19 +84,27 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
   read (a grey slab that is OUR ROOF), line 2 says it. Nothing is drawn under the text.
 
 ## 4. Camera and motion notation
-- **By default a panel is a held drawing, cut on the voice.** Motion is used only where the motion is the meaning (the Iron Giant reels
-  tested camera moves early, crude on purpose [17], REPORTED). An element pops in on the word that names it (at most 3 per panel). An
-  element moves only when its movement is the idea (the price tag climbing), in a straight line with easing.
-- **Real camera moves:** a push-in that reveals or isolates (at most 1.6x), or a rise or pan that reveals scale. Both end frames have to
-  pass the checklist as panels; the subject is never cut off at an edge for more than 0.3 s; at most one move per three panels.
-  **A zoom of more than 2x becomes a cut to a closer panel** (a cut-in reads instantly; the 4.2x zoom in S8 did not). No parallax in board mode.
+- **Every cut, camera move, element animation and transition the final film will have is PLAYED in the animatic**
+  with its real path shape and real timing (retimed to the reel: the reference gives the shape, never the speed), at
+  sketch fidelity: drawn actions as 2-4 stepped key poses on their words, fast transits as one smear, ambient life as
+  2-3 looping micro-moves per set panel, rough in/out easing only. A still panel is a claim that the G5 shot is still.
+  Deferred to G5/G6: overshoot, settle, secondary motion, easing feel, morph tweens. Full rules and the transition
+  grammar: `docs/G3_ANIMATIC.md` §4.
+- **Real camera moves:** a push-in that reveals or isolates, or a rise or pan that reveals scale. Both end frames have to
+  pass the checklist as panels; the subject is never cut off at an edge for more than 0.3 s. Every move ships its five
+  values (move word, duration, start/end offset or scale, anchor, ease) and eases in AND out; speed budget ~15 px/frame
+  at the render rate (~900 px/s at 60 fps — a lint WARN resolved by the sound-on check at 1x; derivation in
+  `G3_ANIMATIC.md` §4). **A zoom of more than 2x becomes a cut to a closer panel** (a cut-in reads instantly; the 4.2x
+  zoom in S8 did not). Board-mode parallax only behind `shot.parallax: true` (rise-over planes).
 - **Arrows: none over a move we animate.** The move is its own notation, and an arrow would be one more thing to read. Paper boards need
   arrows because they can't move; even Storyboard Pro makes its camera frames optional in PDF exports [18] (REPORTED). A red mark appears
   only when (1) a move is planned but not animated yet (dashed end-frame box, corner arrows and the word, held for the panel); (2) a
   push-in targets something under 15 % of the frame width (the end-frame box for the first 0.4 s); or (3) the subject's path is the idea but isn't
   animated (one arrow beside the subject). Words: PUSH IN, PULL OUT, PAN L/R, RISE, TILT UP, HOLD (never "truck" or "zoom", which are ambiguous).
-- The slug always names the camera move and the transition (every G3 transition is labelled). Cut by default; a dissolve means time
-  passes. Frame 0 follows the playbook: lines, then tones, voice from frame 1. No other drawing draws itself on except a chart line, in step with the voice.
+  Cases (1) and (3) are legal only in internal interim drafts: on any owner-facing render they are a lint FAIL — a mark
+  where a played move belongs is the held-drawing loophole the animated-sketchbook rule retires (owner, 2026-10-26).
+- The slug always names the camera move and the transition (every G3 transition is labelled). Cut by default; dissolves per `G3_ANIMATIC.md` §4: 0.2-0.4 s to
+  soften, 1-2 s only for time passing. Frame 0 follows the playbook: lines, then tones, voice from frame 1. No other drawing draws itself on except a chart line, in step with the voice.
 
 ## 5. Speed: how to iterate
 - **Thumbnails first:** for each beat, write the sentence, render 3 variants (a different subject size or angle) as 270 x 480 board stills
@@ -101,14 +114,18 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
   or the caption reads as fading text), the animated big move as its start AND landing frames, and every change that is the
   panel's idea already on screen at the sampled frame (put it on the earliest word that names it; hold it >= 1 s).
 - **Re-board only the panel that fails:** each note (from the owner or a cold read) maps to a shot id plus a checklist number. Change that shot's JSON
-  only, re-render its stills, then the 540p 30 fps reel. Panels that passed stay frozen. A fix is usually a swap from the kit (an icon,
-  a pose, a size). Nothing is polished at G3: no parallax, texture, colour or extra draw-on.
+  only, re-render its stills, then the 540p 60 fps reel (smoothness is judged at the film's real rate; `G3_ANIMATIC.md` §5). Panels that passed stay frozen. A fix is usually a swap from the kit (an icon,
+  a pose, a size). Nothing is polished at G3: no colour, no final line, no easing feel, no line boil — but density placeholders,
+  ambient loops and played moves are SIGNAL, not polish, and are required (`G3_ANIMATIC.md` §2).
 - **Sound-off checklist, per panel, at 270 x 480:** (1) one sentence, one subject; (2) filled black, subject and action still named;
   (3) squinting or at 25 %, the eye lands on the subject within ~1 s (heaviest line, darkest against lightest); (4) 3 weights, 4 tones, no hue
   but at most one red mark; (5) subject centred, 35-60 % of the stage (a scale panel: >= 60 % of the frame or cut by both sides), 80 px clear, caption band empty, nothing key at an edge; (6) every object
   named by its shape (no words in boxes), lines that add nothing deleted; (7) at most 1 label (56+ px) and 1 number, no text repeating the
   caption, no sources in frame; (8) a cold reader, sound off, says the sentence from (1); (9) the notes strip's line 1 names the
-  shot type, COZY / SCALE and the move, line 2 the idea, both readable on the sheet.
+  shot type, COZY / SCALE and the move, line 2 the idea, both readable on the sheet; (10) sound on at 1x: every move
+  readable, no strobe, every cut lands on its word, cuts judged in pairs; (11) no panel surface both empty and
+  undeclared (`negative: true` or a placeholder), and each set panel answers 'does this place feel inhabited?';
+  (12) the subject stays the same size and on its ground line across a shot's poses unless the change is the idea.
 
 ## 6. Implementation notes for SketchReel (`Animatic.style: 'board' | 'sketch'`, default `board` at G3)
 | Today | Board mode |
@@ -131,7 +148,12 @@ figure `pose?: 'stand'|'walk'|'point'|'reach'|'hold'|'shrug'|'slump'|'lookup'|'s
 mark; text at least 48 px; fills from the palette only; nothing crossing y 290-600 except a `far` flat fill; the subject's box centred
 in x 380-700 and 270-460 px wide (a tall subject such as a standing figure is measured by its height, 300-650 px; a `scale` panel's
 subject at least 648 px or cut by both side edges); a bare year ("2005") counts as an axis word, not the number; the camera's zoom
-changing by at most 2x within a shot. Boxes are measured on screen (clipped to the frame and the stage above the notes strip); a subject cut by a frame edge
+changing by at most 2x within a shot. Plus the `G3_ANIMATIC.md` §7 tier-1 checks: dress-layer exemption, move
+five-values, speed WARN (~15 px/frame at the render rate, measured only over moves >= 2 frames, whip/carry shots
+exempt), the default-cut check, the camera-plan cross-check (every plan row's move / transition device / `life:` item
+exists in the board JSON), `life:` coverage, unaccounted emptiness (subject breathing ring and edge margins exempt;
+FAIL = >= 4 contiguous undeclared bare cells), zero-ambient FAIL on set panels, red-mark cases (1)/(3) FAIL on
+owner-facing renders. Boxes are measured on screen (clipped to the frame and the stage above the notes strip); a subject cut by a frame edge
 (a waist-up figure) is measured by its visible width. Element moves take `ease` (default `inout`; `outSine` for a
 rise-over's ledge). Implemented: `scripts/v3/board_lint.py` (props and defaults: the header of `src/v3/SketchReel.tsx`);
 a worked board with every pattern (home base as 1-element window, icon ticker, element reuse, two-layer rise-over):
@@ -181,8 +203,10 @@ Clarity and cinematics are not a trade-off. Each panel names its shot type and f
 **Camera plan first (v3 G3, 2026-10-26; example `docs/v3/camera_plan_g3.md`).** Before re-boarding, the cinematographer
 writes one row per panel: time, idea, shot type, framing, cozy/scale element, move, readability note, plus the notes-strip
 lines. Then check the whole film:
-- **Moves:** animate at most two, both timing questions: the opening's 5 % pull-out and the one big reveal. Every other
-  panel holds and cuts on its word (G5 adds the 1.5-2 % breathes).
+- **Moves:** every cut, camera move, element action and transition the final film will have is PLAYED at sketch
+  fidelity (`G3_ANIMATIC.md` §4-5; speed budget ~15 px/frame at the render rate, a lint WARN). "At most two" is retired;
+  a held panel is a CLAIM that the G5 shot is still: G5 adds only the hold cameras (cozy wides locked or the
+  `COZY_AND_SCALE.md` 3b.5 float, the 1.5-2 % pull-out only on the S3/S4 breathers) and polish, never new motion.
 - **Home base:** it opens the film, returns on the quiet beat (the waiting / thinking line) and hosts the callback; close-ups
   at the viewer's desk keep it with just a lamp-pool ellipse (0.5-0.7 W, wider than the object on it, so it reads as
   light, not a mat). Cozy is at least 50 % of the runtime outside full-frame chart inserts (`COZY_AND_SCALE.md` §1.3:
@@ -198,7 +222,7 @@ lines. Then check the whole film:
   peaks at pi/2 x the average speed; a quad or cubic ease-out landing early peaks at 2-3x and strobes). v3 S9: 120 px
   of camera + 384 px own move = 520 px on screen in 1.92 s, peak 14.8. Start with the ledge hiding about half the
   landmark, its sign showing; things flying in enter from the side edges when the landmark's top sits near the band.
-  This is the only parallax a board gets.
+  Board-mode parallax plays behind `shot.parallax: true` (rise-over planes, `G3_ANIMATIC.md` §4 — tier-2 tooling); other shots stay flat.
 - **Close-ups are redrawn at size, never zoomed** (line weights scale with the camera). **Charts are straight-on, level
   inserts** (an angle bends the number). **A match is built, not redrawn:** the builder makes the reprise from the first
   panel's element list plus the changes (a redrawn S6 dropped S4's axis word; a redrawn S14 moved S10's ground line).

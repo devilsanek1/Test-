@@ -99,3 +99,102 @@ theme check, which must say "0 problems").
 4. **One time of day** (blue hour, first snow): no day skies, no sun; outdoor captions white.
 5. **Colour jobs as above**: hero only on laptops and the tag; one blue pop; gold sticks; warm = ours, blue = theirs.
 6. **No board notation in G5**: no red pencil, no notes strip; the red circle is `signLitAt` (or another light / pop).
+
+# Life and density kit (G5b): every frame full and alive
+
+The owner on the G5 cut: "way too empty". The rules: `docs/look/LIFE_AND_DENSITY.md`; the per-panel plan and the kit
+list: `docs/v3/density_plan_g5b.md` (§0 film-wide, §1 per panel, §2 kit list; `docs/v3/s9_scale_plan.md` wins for S9).
+Same conventions as above: canvas px at camera rest, an optional build `at` (ink first, fills `FILL_LAG` later), a
+`seed`; **every idle motion is a pure function of scene seconds** (60 fps moves every frame; only drawn poses step:
+`stepped()`), deterministic, flat fills, **no opacity** (things pop, shrink to nothing, or sweep), ink by depth.
+Dressing never takes the hero orange or the blue pop; it lives in the room (warm) and outside (dusk-blue) families.
+Sheet: KitSheet3 (2160 x 9600, two columns; screens 4-10 are this kit), or alone: `npx remotion still
+src/entry-v3-kit.tsx KitSheetLife out.png --frame=90 --scale=0.5`; two dressed density-test frames at full size:
+compositions `KitLifeO1`, `KitLifeS4` (kit pieces at the plan's places; the lanes own the real sets).
+
+## The idle clocks (`idle.ts`)
+
+| Export | Use |
+|---|---|
+| `sway(t, amp, period, phase)`, `sway2` (two-frequency), `bob(t, amp, hz, phase)` | vines, signs, laundry, breathing |
+| `ring(t, at, amp, hz, decay)`, `rings(t, ats, ...)` | secondary motion: a damped jolt after a cause (things hop, a sign swings, notes flutter) |
+| `hopY(t, at, h, dur)`, `ease01(t, at, dur)`, `stepped(t, fps)` | a hop; an eased 0..1; time quantised to drawn poses |
+| `twinkle(t, seed, i, n, every 0.5)` | is bulb i dimmed (a bulb somewhere every ~0.5 s) |
+| `windowLit(t, seed, i, n, {gap [0.6, 1.5], litFrac, force})` | is window i lit (one switches somewhere every 0.6-1.5 s; `force` = scripted switches) |
+| `events(seed, t0, t1, gap)` | seeded event times (cached) |
+| `loopPos`, `crossing`, `shuttle` (with `holdK`) | a wrapping mover, a one-off crossing, a back-and-forth (forklift, pacing worker) |
+| `puffs(t, opts, originY)` | a puff train that grows, rises, drifts and SHRINKS TO NOTHING (`ceil`: never above the band) |
+| `sweep(t, ats, dur)` | a headlight band's progress |
+| `floatCam(t, {dur, seed, speed [8, 12], box [12, 10], leg [0.6, 1.5], startHome, endHome, turn 0.34})` | the cozy FLOAT (cozy v2 §3): the camera's [dx, dy] from home, straight legs that turn back eased, inside the box; from home at t 0 and back through home on the last frame, still moving. Wrap the set in `mat.translate(dx, dy)` (S15) |
+
+## The living character: Pip in Autumn Ember (`Pip3.tsx`)
+
+| Export | Props / notes |
+|---|---|
+| `PIP_EMBER` | the lib `Colorway`: body lilac `#A983C9`, shade `#8C68AE`, ear inner and cheeks `EMBER.nail`, nails `wall`, ink `EMBER.ink`. Measured ΔE76 (sheet screen 5): wall 56, desk 62, shelf 58, sky 28, skyLow 23, dc 33, snow 49, road 36, brick 66, pop 33, hero 82. Lilac is used for nothing else. |
+| `Pip3` | `x y` (feet) `scale` (1 = ~96 px; close-ups 1.6-1.9 with `lineWeight` 1.25), `pose` or `keys` [{t, pose, look, expression, amount}] (each switch a squash-and-stretch pop), `look` (value or [{t, v}] eased over `lookDur` 0.16 s: the head turn that points the eye), `hops` [{t, to?, dur, height}] (in place, or to a new perch), `jolts` [t] (a startle without a pose change), `at` + `drawDur` (draws on), `exitAt`, `outdoor` (a snow-lit rim along head and back), `snowCap` (0..1 or [t0, t1]: grows), `shakeAt` (flung off), `idle` (1: blink, ears, tail, breath never stop), `flip`, `seed`. Poses: sit-back, sit-front, stand-side, walk-side, peek, trunk-up, hold, ears-cover, shrug, sleep (`src/lib/mascot`). `pipPlace(t, x, y, hops)` = where its feet are (aim things at it). |
+| `PipTiny` | S9's end: a 50-60 px back-view silhouette (pear body, round head, two big ears, the trunk curl past one cheek, a tufted tail), idle ear flicks and tail, `hopAt` (the thoom), `outdoor` rim, `side`. |
+
+## People (`People3.tsx`, on the house `Person`: back view always)
+
+| Export | Props / notes |
+|---|---|
+| `WinterPerson` | Person + `wear`: earmuffs, umbrella, bag, coffee (steam), clipboard, hivis (peach with snow-white bands), hardhat, snow (hat + shoulders, clipped to the coat), badge (the van driver's cap), point (`pointAt`), wave (`waveAt`); `phoneWin` [t0, t1] (the phone goes up and drops), `moves` [{t, kind: lean / recoil / nudge / hop / turn, amp, dir}], `breathe` (2 px, staggered by seed). Colours by seed from `WINTER` (never rust, hero or pop). `x y` = hip line, `s` scale. `personGeo(seed, {torsoH, legs})` = the house figure's w, h, hr, round, head top. `coatDetail` [quilt, yoke, zip, pockets] (tone-on-tone folds + thin ink on the coat, clipped to it, under hair / scarf / hood / pack: no front-row back stays one flat fill; drawn through the house Person's `torsoOver` slot). `winterPhoneAt(props, t)` = where its raised phone is ({top: the camera end, mid}, canvas px; null while down); `winterPersonMat(props, t)` = its local -> canvas matrix. |
+| `BackRow` | tier A: `x0 x1` `top` (the head tops' line) `head` (90-160 px) `n` (3-6), `people` (per-person overrides), `moves` (whole row, staggered 2 frames), `lookX` (all lean toward the subject), `snow`, `riseAt` {i: t} (someone squeezes in from below). Long torsos run past the frame bottom. `backRowPhones(rowProps, t)` = every raised phone [{i, top, mid}] in the row's space (S4's flash follows it); `backRowLayout(rowProps, t)` = each back's WinterPerson props and lean. |
+| `Walker` | tier C (110-260 px): `from to` (feet), `h` (`h1` into depth), `speed` / `phase` / `pause` (wraps) or `window` [t0, t1] (crosses once), `dog`, `wear`, stepping legs. `Dog`. |
+| `TinyWalkers`, `Tiny` | tier D (15-60 px), fill-only: `from to` `n` `h` [near, far] `kinds` (walker, dog, sledge, umbrella, pair) `both` directions. |
+| `WindowSilhouette` | a pane with a neighbour: `who` cross / read / wave / cook / stand / none, `lit` (bool or fn of t), `curtains`, `plant`, `far` (no ink). |
+| `WindowLife` | a block of panes on ONE switching schedule (`gap`, `litFrac`, `force`), some with silhouettes. |
+| `Worker`, `Guard`, `MiniCrate` | hi-vis + hard hat, `carry` (a crate of gold sticks on the shoulder), `walk` {a, b, dur} (paces), `stopAt` (stops and turns); the guard: cap + hi-vis, `stepAt`/`stepTo`, `waveAt`. |
+
+## Weather and window life (`Weather.tsx`)
+
+| Export | Props / notes |
+|---|---|
+| `SnowLayers` | far / mid / near flakes (dia 2-3 / 3-5 / 7-10 px), `x y w h`, `density`, `speed`, `wind`, `offset` per layer (parallax), `band` (default [290, 600]: every other flake shrinks away, none over 6 px; null inside a window under the band). |
+| `SnowSill`, `SnowCap`, `Frost`, `Icicles` | a ridge on a sill / ledge (`drips`); a cap on any box; frost scallops with star ticks in pane corners; icicles that drip every ~1.2 s. |
+| `PuffTrain`, `Smoke`, `Steam`, `CoolingPlume`, `Exhaust` | flat puff trains (`stretch`, `ceil`): chimney smoke (skyLow, drifting right), steam (snow, straight up), the data center's plume (never above y 600), a vehicle's exhaust. |
+| `NearFronts` | the kit list's "NearRoofs" (renamed: the S9 lane owns a rooftop `NearRoofs`): 2-4 house fronts behind a window, snowy roofs, 6-10 warm windows on one schedule (`sil` {index: who}, `force`), chimneys with smoke; fill only. |
+| `SkyClouds`, `LowClouds`, `BirdV` | flat cloud masses drifting 6-10 px/s (keep `y1` <= 290); a low pale bank (S9's lobed `CloudBank` is the S9 lane's); a V of birds flapping. `BAND` = [290, 600]. |
+
+## Room dressing (`Room.tsx`)
+
+| Export | Props / notes |
+|---|---|
+| `ShelfFill` | `planks` [{x0, x1, y, room}] `scale`: upright books (14-40 x 80-150, 5+ colours, bands, labels, a leaner), lying stacks, a framed photo, a jar, a succulent, a trailing pothos at one end. `Book`, `WallShelf` (plank + brackets + contents). |
+| `Plant`, `Leaf`, `LEAF2` | `kind` pothos (vines trail `trail` px and sway +-3 px / 3 s) / succulent / snake / floor / cactus, `size`, `snow`, `shakeAt`. |
+| `StringLights3` | `from to sag` or `points`, `n` `r`, `onAt onDur` (blink on one by one), `every` (a twinkle every ~0.5 s), `halo` steps (default room core / ring; outdoors pass [skyLow, ring]), `sway`, `swingAt`. |
+| `Pinboard`, `PinnedThing` | cork board, 5-7 items (photo, note, postcard, ticket, list), each sways about its pin and flutters on `flutterAt`; `avoid` a rect. |
+| `FramedPrint`, `Poster` | mountain / sea / leaf / sun prints; the lost-cat flyer (tabs flutter) and a concert poster. |
+| `PenCup`, `Headphones`, `BookStack`, `StickyNotes`, `Cable`, `Glasses`, `Speaker` | desk clutter at both depths (`Cable` = a path through `points`: the lane moves it with the phone; `plug`). |
+| `DeskGrain`, `WallMarks`, `PullChain`, `HaloStep`, `CupSteam`, `useJolt` | short organic grain pairs (never a long line), plaster ticks (not in the band), the lamp's swinging pull chain (S7's loop). |
+| `Radiator`, `Rug`, `CoatHook`, `ToteBag`, `Slippers` | S13: a sock that sways on the radiator, a striped rug in perspective (`quad`), a coat and scarf. |
+
+## Street and industrial life (`Street.tsx`)
+
+| Export | Props / notes |
+|---|---|
+| `LampPost3`, `WallLamp` | post with a snow-lit edge, lantern core, flat halo steps (`halo`), snow cap; `arm` top / left / right; 70-300 px. |
+| `SnowTree`, `Bike3` | pine (tiers with snow) or bare (snowy branches), slow sway; an ink-only bike with snow on the saddle. |
+| `Car3`, `PassingCar`, `HeadlightSweep` | `view` side / back / front, `dir`, `lights` (+ a beam step), `snow`, `exhaust`, `rolling`; a one-off crossing; a flat band sweeping a wall (`at` [t], 0.8 s). |
+| `RoadDress`, `roadPt`, `roadScale`, `Footprints`, `Pavement` | a road quad {yB, yT, xBL, xBR, xTL, xTR} dressed in true perspective (kerbs with gaps, snowbanks with ridge ink, two tyre tracks, lane dashes, a steaming manhole, footprints); a straight-on pavement (S4). |
+| `BusStop`, `Fence`, `GateBooth` + `barrierAngle`, `PostSign`, `Floodlight` | shelter with 2-3 waiting people (`turnAt`); a receding fence; the booth with a barrier that lifts in 0.25 s on a stepped pivot (`liftAt` / `lowerAt`, `guardInside`); DELIVERIES (letters >= 22 px); floodlight halo steps on brick. |
+| `Pallet`, `StickCrate`, `Forklift` | gold sticks with chips showing; the forklift's back-and-forth `loop` {a, b, dur, hold} (forks lift at b), a blinking beacon. |
+| `UtilityPole3`, `Wire3` | pole with crossbar and snow; wires with sitting birds (head bobs) that lift off on `birds.liftAt` and wheel away. `lifeBeats`, `useHop` helpers. |
+
+## The places round the information and the shop (`Shop.tsx`)
+
+| Export | Props / notes |
+|---|---|
+| `CardBoard`, `Clipboard` | the board round a card (`card` rect, `margin` 24-30): 'notice' (red-brown frame, cork, glass glints) or 'cork'; `corners` [{corner, kind: flyer / concert / card / slip / note / photo / clipboard}] peek from behind the card (draw the card after it); `flutterAt`. |
+| `Cornice`, `Fascia`, `Drainpipe`, `DisplayWindow`, `LaptopBox`, `ShopDoor` | S4 / S6's street wall: cornice with snow and dripping icicles, the COMPUTERS fascia (warm letters on dusk blue, ~56 px), a pipe with an ice foot, the lit display window (boxes, a monitor's screensaver), the glass door with the swinging OPEN sign (`signX`) and a bell (`bellAt`). |
+| `ShopShelving`, `ShopWindowView`, `CardReader`, `ReceiptPrinter`, `PaperBag`, `UsbJar`, `CounterBell` | S5: shelves round the BETTER `slot`, a screensaver, router LEDs, hooks, talkers, `joltAt` (the pop jolts the shelf 4 px); the window onto the street with `walkers` [{t0, t1, dir, wear, dog}]; the counter (the receipt feeds on `feedAt`, the loop). |
+| `StripLight`, `CableTray`, `DockWindow`, `CoffeeMachine`, `NoSmoking`, `Bench`, `BootMat` | S11's drivers' room: one stepped flicker (`flickerAt`), the dock window with a truck and a forklift passing (`forklift` [[t0, t1]]), the coffee machine's blinking button and steaming cup. |
+
+## Town variety and the deck (`Town.tsx`)
+
+| Export | Props / notes |
+|---|---|
+| `TownHouse`, `TownRow` | five types, never one stamped shape: cottage, terrace (a dormer run), block (balconies, a dish), mansard, shop (awning, lit sign); windows switching, chimneys smoking, antennas; `far` = fill only. A row cycles a seeded shuffle of the types, +-15 % widths, stepped heights. For the S9 lane's MidTown / FarField bands. |
+| `RoofNeighbour`, `Pennant`, `RoofAerials` | a shoveller on a 4-drawing loop (snow puff on the throw) or a balcony light-hanger (30-60 px); a pennant at 1.5-2 Hz. |
+| `FoldingChair`, `SideTable`, `LaundryLine`, `Shovel` | S9's deck: a snow cushion, a steaming mug, laundry that sways, a shovel leaning. (No tram: the S9 scale plan drops it.) |

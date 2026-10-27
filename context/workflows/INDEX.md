@@ -57,3 +57,8 @@
 | 2026-10-26 | `arcane-pullback-distill-wf_74d92f5c-c1b.js` | 9 | 0 | `context/agent_reports/2026-10-26_arcane-pullback-distill.md` |
 | 2026-10-26 | `v3-g5-s9-pullback-wf_045dcc0d-92e.js` | 4 | 0 | `context/agent_reports/2026-10-26_v3-g5-s9-pullback.md` |
 | 2026-10-26 | `v2-g5-blocking-wf_46cfb5eb-fa2.js` | 19 | 0 | (running; re-briefed 2026-10-26 on the owner's aliveness rules: engine cached, kit from its checkpoint, kit critic + fix, 5 lanes x build/critic/fix, assembler, sound-off cold reader, finisher) |
+| 2026-10-26 | `arcane-scale-cues-wf_d9b2c78c-a67.js` | 4 | 0 | `context/agent_reports/2026-10-26_arcane-scale-cues.md` |
+| 2026-10-26 | `v3-density-pilot-wf_675b0cbd-dfa.js` | 8 | 0 | (running) |
+| 2026-10-26 | `cozy-ref-riverside-wf_8b57016c-c16.js` | 4 | 0 | `context/agent_reports/2026-10-26_cozy-ref-riverside.md` |
+| 2026-10-26 | `cozy-v2-synthesis-wf_6ce1fd08-6e1.js` | 5 | 0 | `context/agent_reports/2026-10-26_cozy-v2-synthesis.md` |
+| 2026-10-26 | `g3-animated-sketchbook-wf_6ef4f230-229.js` | 11 | 0 | `context/agent_reports/2026-10-26_g3-animated-sketchbook.md` |
