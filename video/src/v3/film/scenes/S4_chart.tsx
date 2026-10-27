@@ -1,10 +1,11 @@
-// S4_chart (lane L2-inserts): the price chart of S4 and S6, one component so the two panels are the same frame.
+// S4_chart (S4 pilot lane, G5b): the price chart of S4 and S6, one component so the two panels are the same frame.
 // "U.S. computer prices" from 2005, ink L axes, the hero line (kit LineChart, 9 px) drawn downhill with the voice;
-// S6 adds only the hook up and "+9.7%".
+// S6 adds only the hook up and "+9.7%". G5b: the card sits in the shop's noticeboard (S4_street), 6 % smaller about
+// its bottom edge, so every number here comes from S4_street's CARD / PLOT (the words keep their 56-64 px).
 import React from 'react';
-import {LineChart} from '../kit/Charts';
+import {ChartCard, LineChart} from '../kit/Charts';
 import {EMBER, Pop, Txt} from '../kit';
-import {BOARD_HOOK, BOARD_LINE, CARD, PLOT, plotPt} from './S4_wall';
+import {BOARD_HOOK, BOARD_LINE, CARD, CARD_K, PLOT, plotPt} from './S4_street';
 
 export type PriceChartProps = {
   /** The line draws on from drawAt over drawDur (omit = drawn: S6). */
@@ -18,14 +19,15 @@ export type PriceChartProps = {
 
 /** "+9.7%": left of the hook's top, clear of the falling line (board: 120 px, at the hook top's height). */
 const hookTop = plotPt(BOARD_HOOK[BOARD_HOOK.length - 1]);
-const LABEL = {x: hookTop[0] - 126, y: hookTop[1] - 22, size: 118};
+const LABEL = {x: hookTop[0] - 126 * CARD_K, y: hookTop[1] - 22 * CARD_K, size: Math.round(118 * CARD_K)};
 
+/** The card (warm white, ink edge) with the chart on it. */
 export const PriceChart: React.FC<PriceChartProps> = ({drawAt, drawDur = 2.3, hookAt, hookDur = 1.2, labelAt}) => {
   const isS6 = hookAt !== undefined;
   return (
-    <>
-      {/* the title in the caption hand at the board's 60 px (the kit sizes it from the plot width) */}
-      <Txt x={CARD.x + CARD.w / 2} y={CARD.y + 98} size={62} fit={CARD.w * 0.86}>
+    <ChartCard x={CARD.x} y={CARD.y} w={CARD.w} h={CARD.h} seed="s4/card">
+      {/* the title in the caption hand (62 px at G5 size: 58 here, inside the 56-64 band) */}
+      <Txt x={CARD.x + CARD.w / 2} y={CARD.y + 98 * CARD_K} size={58} fit={CARD.w * 0.86}>
         U.S. computer prices
       </Txt>
       <LineChart
@@ -50,6 +52,6 @@ export const PriceChart: React.FC<PriceChartProps> = ({drawAt, drawDur = 2.3, ho
           </Txt>
         </Pop>
       ) : null}
-    </>
+    </ChartCard>
   );
 };

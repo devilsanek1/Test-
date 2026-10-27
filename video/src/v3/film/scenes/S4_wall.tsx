@@ -1,4 +1,6 @@
-// S4_wall (lane L2-inserts): the shared set of the three insert panels S4, S6 and S11. A flat warm-white chart card
+// S4_wall (lane L2-inserts): the G5 insert set, still used by S11 / S12 (breathe, WallCard). Since G5b, S4 and S6 use
+// S4_street.tsx (the chart in the computer shop's noticeboard; it re-exports BOARD_LINE / BOARD_HOOK / breathe from
+// here). The G5 description, for S11: the shared set of the three insert panels S4, S6 and S11. A flat warm-white chart card
 // taped straight-on and level to the nook's peach wall (charts are never angled), the terracotta desk top along the
 // bottom (framing only: platform UI covers it) with a sliver of the lamp's golden pool. Present the chart in the film's
 // world, not as a UI slide. The caption band (y 290-600) stays flat wall: the card starts at y 615.

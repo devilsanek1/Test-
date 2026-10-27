@@ -30,15 +30,16 @@ import {
   MemoryStick,
   NightSky,
   Nook,
+  NOOK_LAYOUT,
   Phone,
   phonePoint,
   phoneSlots,
   PriceTag,
-  Snowfall,
   TownBand,
   Txt,
   type Pt,
 } from '../kit';
+import {O1Desk, O1FarTown, O1Listing, O1Mug, O1NearLife, O1Pip, O1Plume, O1Wall} from './O1_dress';
 
 // ---------------------------------------------------------------- timing (O1-local seconds = VO seconds)
 
@@ -143,9 +144,11 @@ const Outside: React.FC = () => (
   <>
     <NightSky x={GLASS.x - 30} y={GLASS.y - 30} w={GLASS.w + 60} h={GLASS.h + 60} at={0.04} />
     <Fill rect={[GLASS.x - 30, HORIZON, GLASS.w + 60, GLASS.y + GLASS.h - HORIZON + 30]} color={EMBER.snow} at={0.08} offset={false} mode="snap" />
+    <O1FarTown />
     <TownBand y={HORIZON + 2} houses={[{x: 205, w: 70, lit: true}, {x: 762, w: 60, lit: true, chimney: true}]} far at={-0.1} seed="o1/town" />
     <DataCenterBeat />
-    <Snowfall x={GLASS.x} y={GLASS.y} w={GLASS.w} h={GLASS.h} n={22} at={0.12} seed="o1/snow" />
+    <O1Plume />
+    <O1NearLife />
   </>
 );
 
@@ -197,6 +200,11 @@ const Tag: React.FC<{t: number; dy: number}> = ({t, dy}) => {
 
 // ---------------------------------------------------------------- the set
 
+const NOOK_AT = -0.16;
+/** G5b: the notebook on (bottom left), the mug drawn by O1_dress after Pip, the shelf's pot plant moved (a trailing
+ *  pothos takes its board: O1_dress). */
+const NOOK_DRESSED = {mug: null, notebook: true, shelf: {...NOOK_LAYOUT.pov.shelf!, plant: undefined}};
+
 /** O1's whole set (no World: O1 and S15 wrap it). Reads O1 time from useTime(). */
 export const O1Set: React.FC = () => {
   const t = useTime();
@@ -212,12 +220,18 @@ export const O1Set: React.FC = () => {
   return (
     <>
       <XG m={P.room}>
-        <Nook variant="pov" at={-0.16} seed="o1/nook">
+        <Nook variant="pov" at={NOOK_AT} seed="o1/nook" layout={NOOK_DRESSED}>
           {outside}
         </Nook>
+        <O1Wall />
+        <O1Desk />
+        <O1Pip />
+        <O1Mug nookAt={NOOK_AT} />
       </XG>
       <XG m={P.front}>
-        <Phone {...ph} price={null} badge={1} badgeAt={BADGE_AT} pressAt={PRESS_AT} at={-0.12} seed="o1/phone" />
+        <Phone {...ph} price={null} badge={1} badgeAt={BADGE_AT} pressAt={PRESS_AT} at={-0.12} seed="o1/phone">
+          <O1Listing w={PH.w} at={-0.04} />
+        </Phone>
         <Tag t={t} dy={dy} />
         <Hand phone={ph} pressAt={PRESS_AT} at={-0.1} seed="o1/hand" />
       </XG>
