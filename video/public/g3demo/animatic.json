@@ -37,9 +37,9 @@
         {"t": "rect", "x": 850, "y": 780, "w": 100, "h": 80, "fill": "light", "role": "far"},
         {"t": "ellipse", "cx": 680, "cy": 700, "rx": 55, "ry": 18, "fill": "light", "role": "far"},
         {"t": "rect", "x": 40, "y": 700, "w": 320, "h": 18, "fill": "light", "role": "mid"},
-        {"t": "rect", "x": 60, "y": 640, "w": 70, "h": 60, "fill": "light", "role": "far"},
-        {"t": "rect", "x": 150, "y": 620, "w": 60, "h": 80, "fill": "light", "role": "far"},
-        {"t": "rect", "x": 230, "y": 648, "w": 90, "h": 52, "fill": "light", "role": "far"},
+        {"t": "scribble", "x": 58, "y": 638, "w": 74, "h": 62, "role": "far"},
+        {"t": "scribble", "x": 148, "y": 618, "w": 64, "h": 82, "gap": 12, "role": "far"},
+        {"t": "scribble", "x": 228, "y": 646, "w": 94, "h": 54, "gap": 16, "role": "far"},
         {"t": "figure", "x": 400, "y": 1470, "h": 580, "pose": "sit", "facing": "r", "role": "subject", "out": 1.9},
         {"t": "figure", "x": 400, "y": 1470, "h": 580, "pose": "reach", "facing": "r", "role": "subject", "in": 1.9},
         {"t": "rect", "x": 100, "y": 1150, "w": 880, "h": 36, "fill": "light", "role": "mid"},
@@ -106,7 +106,9 @@
         {"t": "figure", "x": 483, "y": 930, "h": 122, "pose": "stand", "facing": "l", "role": "far"},
         {"t": "figure", "x": 450, "y": 900, "h": 103, "pose": "reach", "facing": "l", "role": "far"},
         {"t": "ellipse", "cx": 300, "cy": 420, "rx": 90, "ry": 26, "fill": "light", "role": "far"},
-        {"t": "ellipse", "cx": 820, "cy": 360, "rx": 60, "ry": 18, "fill": "light", "role": "far"}
+        {"t": "ellipse", "cx": 820, "cy": 360, "rx": 60, "ry": 18, "fill": "light", "role": "far"},
+        {"t": "scribble", "x": 10, "y": 725, "w": 220, "h": 128, "gap": 18, "role": "far"},
+        {"t": "scribble", "x": 705, "y": 730, "w": 390, "h": 125, "gap": 18, "role": "far"}
       ],
       "moves": [
         {"el": 14, "dx": 90, "dy": 0, "at": 0, "dur": 3.8, "ease": "linear"},

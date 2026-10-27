@@ -113,7 +113,8 @@ Format: **rule** — why / evidence (video, date).
 - **G3 is the most important gate: an ANIMATED SKETCHBOOK of the final film, optimised for SIGNAL, not quality.** With
   script and voice locked, the animatic gives the director the closest signal to the final story in the least drawing
   and review time: story, transitions, animations and camera moves already very close to final — PLAYED, not only
-  marked (their shape and timing real, never their polish); detail deliberately loose placeholders, nothing perfectly
+  marked (their shape and timing real, never their polish); detail deliberately loose scribble-mass placeholders
+  (the hand-scribbled texture: owner yes, 2026-10-27), nothing perfectly
   sharp but the backbone of the future film clearly visible, like an urban sketcher's page (ref
   `docs/look/ref_animated_sketchbook.png`); thumbnail drawings, the intent explicit (framing, the one action, shot
   type, cozy/scale) in a big readable note, lean review loops. Spec: `docs/G3_ANIMATIC.md`. — ("frankly the most

@@ -48,11 +48,12 @@ hold detail or life at G5 carries a placeholder mass at G3.** Plain paper is leg
 declared with `negative: true`. Palette stays the 4 tones of STORYBOARD_STYLE §2; scribble-mass tone is the ONE legal
 texture (mid/far roles only).
 
-- **Placeholder marks — the first reel uses what board mode already renders**: flat mid-grey rects for masses
-  (STORYBOARD_STYLE §6 maps `hatch` there) and gesture-figure rows for crowds, each tagged with `life:`/`promise`.
-  The five sketch primitives (specs in `animatic_sketchlook.md` §3: `scribble-mass`, `crowd-row`, `facade-row`,
-  `window-ticks`, `foliage-blob`) are the eventual vocabulary: build `scribble-mass` only if the owner asks for the
-  sketchbook texture, the rest the first time a reel's density key demands them (§7 tier 2).
+- **Placeholder marks**: the **scribble mass is the default** — the owner asked for the sketchbook texture (2026-10-27),
+  so it is BUILT: SketchReel `{t: 'scribble', x, y, w, h, gap?, jitter?}`, one wandering 3 px mid-grey stroke that reads
+  as flat tone at 25 % (ONE lint element; demo `public/g3demo/`). Flat mid-grey rects (STORYBOARD_STYLE §6 maps `hatch`
+  there) and gesture-figure rows for crowds remain legal. The other four primitives (specs in `animatic_sketchlook.md`
+  §3: `crowd-row`, `facade-row`, `window-ticks`, `foliage-blob`) land the first time a reel's density key demands them
+  (§7 tier 2).
 - **Dress layer** (`animatic_audit.md` #2): elements with `role:'dress'` — 3 px light-grey loose masses sketching the
   FULL set (shelf clutter, wall fill, street fill) — exempt from the 25-element cap and subject lint. Required on every
   home-base and wide panel.
@@ -165,8 +166,8 @@ contract column (cuts, framing, moves, transitions, density placeholders).
 ## 7. Tooling deltas (from `animatic_audit.md` §2/§5; S ~ <=2 h, M ~ half a day)
 
 **Already exists**: 7 transition types played; element moves + eases; one camera segment; 9 poses; draw-on/fillIn; notes
-strip; red marks; box/band/count/zoom lint; contact sheets; g5 scaffold. Flat mid-grey rects + figure rows already cover
-the first reel's placeholders (§3). **Tier 1 is a ONE-TIME checkpointed tooling lane, landed before the next video's G3
+strip; red marks; box/band/count/zoom lint; contact sheets; g5 scaffold; **`{t:'scribble'}` masses (built 2026-10-27,
+owner-approved texture)**. Scribble masses, flat mid-grey rects + figure rows cover the first reel's placeholders (§3). **Tier 1 is a ONE-TIME checkpointed tooling lane, landed before the next video's G3
 and outside the gate budget; the §5 2 h first cut assumes only tier 1 exists. Tier 2 is built lazily, the first time a
 reel needs it — never ahead of a reel.** Nobody builds tooling before drawing panels the existing kit can draw.
 
@@ -186,7 +187,7 @@ reel needs it — never ahead of a reel.** Nobody builds tooling before drawing 
 
 | Tier 2 — build when a reel first needs it | Where | Effort |
 |---|---|---|
-| `scribble-mass` (only if the owner asks for the sketchbook texture); `crowd-row` / `facade-row` / `window-ticks` / `foliage-blob` when a reel's density key demands them | SketchReel | M |
+| `crowd-row` / `facade-row` / `window-ticks` / `foliage-blob` when a reel's density key demands them (`scribble-mass`: BUILT 2026-10-27, owner yes) | SketchReel | M |
 | `camera.keys?: Cam[]` (multi-key camera) + board-mode parallax behind `shot.parallax: true` | SketchReel | M |
 | Per-device transition checks (§4 table), one device at a time, when a camera plan first uses it (a 15-shot reel uses 2-4 of the 8) | board_lint | S each |
 
