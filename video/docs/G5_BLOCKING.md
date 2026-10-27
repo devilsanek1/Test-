@@ -99,7 +99,7 @@ exception from the G3 hand-off.
 |---|---|
 | A push-through | `push-through` into the sub-frame the board drew, handed over at matched scale (`bridge` only for a matched flat colour) |
 | B thread match | `matchcut`: the thread in the same screen spot (±8 %) and size (±20 %) on both sides |
-| C continuous camera | one panel (the move inside it), or `camera-continuous` between two panels in one place |
+| C continuous camera | one panel (the move inside it), a seam between two sequences (§2b), or `camera-continuous` between two panels in one place |
 | D object carry or wipe | `foreground-wipe` (its element already in the outgoing panel), or a carry across a `cut` (same direction and speed on both sides) |
 | E card flip or swipe | an in-panel flip of the same paper (no Film type yet: the craft tooling lane builds one) |
 | F plain cut | `cut` (at most 2 per film, on a "But" turn) |
@@ -137,6 +137,40 @@ exception from the G3 hand-off.
   (`CRAFT.md` §c; its camera and utilities are fine). The light and shadow layers come from `lib/light.tsx`; a film
   never imports another film's folder (`src/vN/`).
 
+## 2b. The sequence contract (one scenes.json row = one SEQUENCE; the v3 rework on)
+
+A sequence spans several script lines in ONE place and owns its camera end to end; scenes.json then holds sequences,
+not board panels (v3: `docs/v3/flow_v2.md` §2, SQA-SQF). §2 holds for it, plus:
+- **One file per sequence** (`scenes/<SQ>.tsx` + helpers `<SQ>_*.tsx`), one lane each. It starts as a PLACEHOLDER that
+  plays the old panels it replaces, each in its own window of film time with its own time base and caption tone, as
+  before (`lib/sequence.tsx` `PanelWindows` + `panelTones`; v3: `scenes/g5b_panels.tsx`), so the film plays end to end
+  from the first commit (v3: pixel-identical to G5b except J3's new push-through). The lane replaces the file whole;
+  the old panel files stay as set libraries, no longer scenes.
+- **The camera is the sequence's own:** every move inside it is a function of FILM time on its place's shared camera
+  (v3: `homeCam(T)`, `entryCam(T)`), so the framing never jumps where one builder hands over to the next; the engine
+  moves a camera only in its own transitions (`push-through`, `camera-continuous`).
+- **Film time:** `useTime()` is sequence-local; `useFilmTime()` (`lib/sequence.tsx`) is film seconds, bit-exact in a
+  normal layer and negative in the loop underlay (the first sequence's t < 0 drawing state). Whatever is drawn on both
+  sides of a join (a set, its camera, the thread plane, a held prop) keys on film time.
+- **Shared pieces have ONE owner each** (a file per piece; v3, flow_v2 §3: `home_set` + `homeCam` the SQA pilot,
+  `thread_plane` and `h2_window` + `entryCam` the transition agent, `outside` the SQE lane). Every other builder
+  imports it read-only, never a copy or a hand-drawn twin; a change goes to its owner under `REQUESTS:`.
+- **Joins** (the incoming row's `transitionIn`, always with its `carrier`):
+  - a **seam**, `{"type": "matchcut", "seam": true, "carrier": "C"}` ("A" for a pull-back through a window both
+    builders draw): the carrier's motion runs ACROSS the boundary and both builders draw the IDENTICAL picture there,
+    so Film's hard cut at frame f = ceil(c x 60) shows nothing. Put c mid-move or on a held frame, never on an event;
+    each builder must also render correctly just past its window (the outgoing at f, the incoming at f - 1).
+  - an **engine transition** (A `push-through`, D `foreground-wipe`, `camera-continuous`): the engine moves or clips
+    both sides; each builder draws its side to the join's numbers (v3 J3: the same stick at (540, 870), w 700, rot -4
+    on both sides, so at x7 only the bands around it change).
+  - the **loop**: the last sequence's `transitionOut` un-build onto the first one's t < 0 state (§2).
+- **How two builders meet:** the transition agent writes each join's frame-exact state at c (positions, camera, light,
+  who moves) into the shared pieces and both builders import it. Checks: `gate_check.py --seam-comp FilmNSeams` (§7:
+  a cut at a seam is a FAIL; the seam probe, `FilmSeamProbe` registered as `FilmNSeams`, renders each side ALONE at
+  f - 1 and f, and over 1 % of the pixels differing by > 4 L* is a FAIL) and a 60 fps strip of c ± 0.4 s.
+- **Chunks** for the full-size render: `python3 -I scripts/film_chunks.py src/vN/film/scenes.json --max 360` (one per
+  sequence on Film's own ceil boundaries, the long ones split; §8b).
+
 ## 3. Lane rules
 
 - **One lane per SEQUENCE** (owner-approved 2026-10-27): a lane owns the consecutive panels in one place (with their
@@ -152,22 +186,23 @@ exception from the G3 hand-off.
 - Commit only your own paths (`git add <paths>`, never `-A` or `.`); never pull, merge, rebase, reset, stash or checkout.
 - Keep a session small (one panel), check stills at 0.5 scale plus one 0.25 phone-size look, at most ~10 images.
 
-## 4. Fastest previews of one panel (composition time = panel-local seconds; the label shows film time)
+## 4. Fastest previews of one scene (a sequence; composition time = scene-local seconds; the label shows film time)
 
 ```bash
 E=--entry=src/entry-v3-film.tsx
 # one or more stills (one bundle, one browser); frame = round(t * 60)
-node scripts/render-frames.mjs Film3-S9 /tmp/s9 0.2,1.0,1.8 $E --scale=0.5
+node scripts/render-frames.mjs Film3-SQD /tmp/sqd 0.2,1.0,1.8 $E --scale=0.5
 # contact sheet + the caption legibility check (scripts/capcheck.py) on the same frames
-scripts/sheet.sh Film3-S9 0 1.9 8 /tmp/s9_sheet.png $E --scale=0.35
+scripts/sheet.sh Film3-SQD 0 1.9 8 /tmp/sqd_sheet.png $E --scale=0.35
 # the props form (Film3Shot {id}); sheet.sh's caption check passes its own --props, so add --no-capcheck here
-node scripts/render-frames.mjs Film3Shot /tmp/s9 0.5 $E --props='{"id":"S9"}' --scale=0.25
+node scripts/render-frames.mjs Film3Shot /tmp/sqd 0.5 $E --props='{"id":"SQD"}' --scale=0.25
 # every frame of a motion at 60 fps (scripts/strip.sh samples at 30 fps and bundles src/index.ts: use this instead)
-node scripts/render-frames.mjs Film3-S9 /tmp/s9f $(python3 -c "print(','.join(f'{f/60:.4f}' for f in range(30, 60)))") $E --scale=0.33
-# the cut in context (the film around a scene start: VO seconds)
+node scripts/render-frames.mjs Film3-SQD /tmp/sqdf $(python3 -c "print(','.join(f'{f/60:.4f}' for f in range(30, 60)))") $E --scale=0.33
+# a join in context (the film around a scene start: VO seconds), and a seam's two builders alone (§2b)
 node scripts/render-frames.mjs Film3 /tmp/cut 19.383,19.4,19.417 $E --scale=0.5
-# a playable panel with its voice
-npx remotion render src/entry-v3-film.tsx Film3-S9 /tmp/s9.mp4 --scale=0.5
+node scripts/render-frames.mjs Film3Seams /tmp/seams $(python3 -c "print(','.join(f'{k/60:.4f}' for k in range(16)))") $E --scale=0.25
+# a playable sequence with its voice
+npx remotion render src/entry-v3-film.tsx Film3-SQD /tmp/sqd.mp4 --scale=0.5
 ```
 
 Tile stills with `montage` (scripts/sheet.sh does it for you). Never render the whole film at full size in a lane
@@ -205,19 +240,22 @@ film (§8b's recipe).
 
 ```bash
 python3 -I scripts/qa/gate_check.py --mp4 <render.mp4> --scenes src/v3/film/scenes.json --captions src/v3/film/captions.json \
-  --voice public/v3/voice.wav --entry src/entry-v3-film.tsx --comp Film3 \
+  --voice public/v3/voice.wav --entry src/entry-v3-film.tsx --comp Film3 --seam-comp Film3Seams \
   --frame0 "AI is making your|next laptop pricier." --frame0-until 3.37
-# one panel: add --only S9 (its length, no cuts) and point --mp4 at the Film3-S9 render
+# one sequence: add --only SQD (its length, no cuts) and point --mp4 at the Film3-SQD render
 ```
 
 It checks: fps 60 (the MP4 and the composition), duration = the voice (+-1 frame), an audio stream in sync, the cuts
 each scene's `transitionIn.type` should produce, within 1 frame (caption band and label strip masked): `cut`,
 `matchcut` and `camera-continuous` one hard cut at the start; `push-through` one (two with a `bridge`: into and out of
-it); `foreground-wipe` none (the element covers the change; a hard cut there is a WARN); an `unbuild` transitionIn is
-not modelled yet (expected as a cut); a join that stays inside one panel (carrier C) has no scene start at all. And
-every caption page (and the frame-0 words) inside the caption band and the caption clip, within the safe width. FAIL
-exits 1; WARN lines (long lines, cut-like events inside a shot) are for a human look. It does not read `carrier` yet
-(the craft tooling lane, `PIPELINE_V2.md`).
+it); `foreground-wipe` none (the element covers the change; a hard cut there is a WARN); a seam (`matchcut` +
+`seam: true`, §2b) none (a cut there is a FAIL), and with `--seam-comp` the seam probe compares its two builders'
+frames (over 1 % of the pixels differing by > 4 L* is a FAIL; without it, a WARN); an `unbuild` transitionIn is not
+modelled yet (expected as a cut); a join that stays inside one scene (carrier C) has no scene start at all. And every
+caption page (and the frame-0 words) inside the caption band and the caption clip, within the safe width. With
+`carrier`s in scenes.json it also checks CRAFT §a's first FAIL: every join names one (A-F), at most 2 are F. FAIL
+exits 1; WARN lines (long lines, cut-like events inside a shot) are for a human look. The thread's coverage is not
+scripted yet (the craft tooling lane, `PIPELINE_V2.md`).
 
 ## 8. Lessons from v3 (the assembler's round)
 
@@ -286,7 +324,8 @@ own G3 density key, `LIFE_AND_DENSITY.md`); its per-panel lanes are replaced by 
   duration n/60, audio from ONE direct audio-only render (a chunk starting inside a sound cue ticks), every seam frame
   checked against a direct still. v3: 14 chunks 63.5 min + 26 min audio; this fixer round re-rendered only the 9
   touched chunks (34.5 min) and reused the audio. Trap: Film cuts at ceil(start * 60), chunks cut at round() start one
-  frame early, so a fix to a panel re-renders the next chunk too (or build the list with ceil).
+  frame early, so a fix to a panel re-renders the next chunk too (fixed: `scripts/film_chunks.py` builds the list with
+  ceil, §2b).
 - **Meter floating holds at full res:** S7 / S8 / S12 read 5.3 / 7.8 / 15.5 ev/s in the lanes but 1.8 / 3.6 / 3.1 in
   the film. A `--scale=0.5` render rasterises the float camera's sub-pixel drift as 1-3 % of a static wall flipping
   every frame (0-0.8 % at full res), and the density pass counts it as motion (static 0 %; `--cozy` removes the shift,
