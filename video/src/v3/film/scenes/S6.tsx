@@ -59,7 +59,8 @@ const S6_LIFE: StreetLife = {
     keys: [
       {t: 0, pose: 'sit-back'},
       {t: UP + 0.08, pose: 'trunk-up'},
-      {t: SETTLE + 0.25, pose: 'sit-front', expression: 'worried'},
+      // 'wide' (the anxious face), never the shared 'worried' brow: it reads as a cross V at this size (G5b review)
+      {t: SETTLE + 0.25, pose: 'sit-front', expression: 'wide'},
     ],
   },
 };
