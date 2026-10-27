@@ -65,9 +65,10 @@ export const S8T = {
 /** The truck's own progress 0..1 (map s8TruckU, in scene seconds). */
 export const truckU = (t: number) => MAP.s8TruckU(t + S8_START);
 
-/** Float + truck progress c(t): 0 at the wipe start (the map's pre-truck pose), 1 at the landing (35.60) with zero
- *  speed; a 10 % linear float before, multiplied into the in-out truck (continuous speed at 34.99). */
-export const FLOAT_K = 0.1;
+/** Truck progress c(t): 0 before 34.99 (the map's pre-truck pose), 1 at the landing (35.60) with zero speed. The old
+ *  parallax float (a % of each plane's dx) is OFF: STYLE.md's float law forbids parallax and a heading held for seconds;
+ *  the float is now `floatXY` (one 2D translation of the whole picture). */
+export const FLOAT_K = 0;
 export const camC = (t: number) => {
   const u = truckU(t);
   const f = FLOAT_K * clamp((t - S8T.wipeT0) / (S8T.truckT1 - S8T.wipeT0));
@@ -92,6 +93,30 @@ export type PlaneId = keyof typeof PLANE_DX;
 /** A plane's screen offset at scene time t (px; negative before the landing). */
 export const planeDx = (dx: number, t: number) => -dx * (1 - camC(t));
 export const planeOffset = (p: PlaneId, t: number) => planeDx(PLANE_DX[p], t);
+
+/** THE FLOAT (STYLE.md section 6, the float law): translation only, the whole picture together (no parallax), eased straight
+ *  legs turning every 0.6-1.5 s, 8-15 px/s (peak <= 25), net within +-12 px of home, and back home (0) when a move starts
+ *  (the truck 34.99, the seam push 37.70) so every K2 spot is exact. Two runs: the wipe -> the truck; the landing -> the push.
+ *  Keys: [scene t, dx, dy]. */
+export const FLOAT_KEYS: [number, number, number][][] = [
+  [[L(32.7), 0, 0], [L(33.55), 9, -4], [L(34.3), 2, 5], [L(34.99), 0, 0]],
+  [[L(35.6), 0, 0], [L(36.4), -8, -3], [L(37.1), -1, 5], [L(37.7), 0, 0]],
+];
+export const floatXY = (t: number): [number, number] => {
+  for (const run of FLOAT_KEYS) {
+    if (t < run[0][0] || t > run[run.length - 1][0]) continue;
+    for (let i = 0; i < run.length - 1; i++) {
+      const [t0, x0, y0] = run[i];
+      const [t1, x1, y1] = run[i + 1];
+      if (t <= t1) {
+        const u = (t - t0) / (t1 - t0);
+        const e = u * u * (3 - 2 * u);
+        return [x0 + (x1 - x0) * e, y0 + (y1 - y0) * e];
+      }
+    }
+  }
+  return [0, 0];
+};
 
 // ---------------------------------------------------------------- the lane (landing-pose geometry)
 
