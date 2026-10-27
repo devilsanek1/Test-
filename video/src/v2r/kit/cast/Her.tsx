@@ -68,7 +68,7 @@ export type HerProps = BuildProps & {
   tote?: boolean;
   /** lookBack: how far round (0..1, default 1). */
   look?: number;
-  /** goIn: the hand target relative to her feet (default up-right, a door handle). */
+  /** goIn: the hand target relative to her feet (default a door handle at her right, forearm in, one foot on the step). */
   reach?: [number, number];
   /** Her coat stays paper until this time (S1: the flood reaches her coat LAST, f18 = 0.30 s). */
   coatAt?: number;
@@ -90,7 +90,7 @@ export const Her: React.FC<HerProps> = ({x, y, h = 170, pose = 'walk', view, fli
     case 'lookBack':
       return <Person {...common} pose={step !== undefined || walk ? 'walk' : 'stand'} step={step} walk={walk} view={view ?? 'rear34'} turn={look} />;
     case 'goIn':
-      return <Person {...common} pose="reach" view="back" reach={reach ?? [h * 0.3, -h * 0.66]} />;
+      return <Person {...common} pose="reach" view="back" reach={reach ?? [h * 0.2, -h * 0.56]} elbow={[h * 0.27, -h * 0.62]} stepUp={1} />;
     case 'walk':
     default:
       return <Person {...common} pose="walk" step={step} walk={walk ?? (step === undefined ? {rate: 1.6} : undefined)} view={view ?? 'rear34'} />;

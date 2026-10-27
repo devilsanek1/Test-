@@ -54,6 +54,10 @@ export type PersonProps = BuildProps & {
   exact?: boolean;
   /** pose 'reach': hand target relative to the feet (px, in the drawn left-facing frame). */
   reach?: [number, number];
+  /** pose 'reach': the elbow relative to the feet (default: bent outward). */
+  elbow?: [number, number];
+  /** 0..1: one foot up a step (back view; S8 at her door). */
+  stepUp?: number;
   /** pose 'phoneEar': free-hand gesture 0..1. */
   gesture?: number;
   /** pose 'cycle': pedal turns per second (default 1.1). */
@@ -88,9 +92,9 @@ export const Person: React.FC<PersonProps> = (p) => {
   const moving = pose === 'walk' || pose === 'jog' || ((pose === 'phoneEar' || pose === 'reach') && (p.step !== undefined || !!p.walk));
   const st = moving ? q100(step) : 0;
   const crank = pose === 'cycle' ? Math.round(drawn(t, 12) * (p.pedal ?? 1.1) * 12) * ((Math.PI * 2) / 12) : 0;
-  const key = JSON.stringify([p.seed, p.traits ?? 0, p.model ?? 0, H, pose, view, lod, moving, st, p.stride ?? 1, q100(p.turn ?? 0), p.tilt ?? 0, p.reach ?? 0, q100(p.gesture ?? 0), q100(crank)]);
+  const key = JSON.stringify([p.seed, p.traits ?? 0, p.model ?? 0, H, pose, view, lod, moving, st, p.stride ?? 1, q100(p.turn ?? 0), p.tilt ?? 0, p.reach ?? 0, p.elbow ?? 0, q100(p.stepUp ?? 0), q100(p.gesture ?? 0), q100(crank)]);
   const parts = cached(key, () =>
-    standParts(m, {view, pose, H, moving, gait: moving ? gaitOf(st) : STILL, stride: p.stride, turn: p.turn, tilt: p.tilt, lod, seed: p.seed, reach: p.reach, gesture: p.gesture, crank}),
+    standParts(m, {view, pose, H, moving, gait: moving ? gaitOf(st) : STILL, stride: p.stride, turn: p.turn, tilt: p.tilt, lod, seed: p.seed, reach: p.reach, elbow: p.elbow, stepUp: p.stepUp, gesture: p.gesture, crank}),
   );
   const inkPx = p.ink ?? (lod >= 2 ? 0 : inkFor(H));
   return (

@@ -88,6 +88,8 @@ export function traitsFor(seed: Seed, o: TraitOverrides = {}): Traits {
   let acc = o.acc ?? r.weighted(ACC_W);
   // a hood up already reads as headwear; headphones over a hood / cap / beanie hide in it: give a bag instead
   if (!o.acc && acc === 'headphones' && (hair === 'hood' || hair === 'cap' || hair === 'beanie')) acc = 'tote';
+  // a scarf under a hood is hidden but its tail still shows (an odd stripe): give a backpack instead
+  if (!o.acc && acc === 'scarf' && hair === 'hood') acc = 'backpack';
   const accColor = o.accColor ?? pickNot(r, ACC_COLOR, [coat]);
   const t: Traits = {
     hair,
