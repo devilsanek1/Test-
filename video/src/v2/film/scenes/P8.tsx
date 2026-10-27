@@ -5,14 +5,15 @@
 // 21.32-23.40, landing on "AI", then a 0.4 s hold) while the wall drops away on its own (fastest plane, cut in moving,
 // decelerating over the whole panel) with real multiplane parallax: the wall, the treetops on the slope below us, the
 // verge and the service road, the highway, the lawn, the parked cars, the building, the near woods, the far highway,
-// the suburbs, the river, the far towers, the farthest skyline, the sun's bands, the huge clouds. As it rises the
-// world beyond the roof's back edges opens up (river, suburbs, highway, skyline) and the whole five-ring building lands
-// wider than the frame with two rows of identical parked cars at its foot as the ruler.
+// the suburbs, the river, the mid-rise bank, the far towers, the farthest skylines, the sun's bands, the big clouds. As it
+// rises the world beyond the roof's back edges opens up (river, suburbs, highway, six haze steps of skyline) and the
+// whole five-ring building lands too big for the frame (apex y 712, facade bottom y 1348, its outer corners off both
+// edges) with two tight rows of ~46 identical small parked cars at its foot as the ruler.
 // Look: the sister palette "6 Dusk" (LOOK.md; review/look/v2_g4/pentagon_dusk.png, StylePentagon's code and DUSK roles)
 // plus P8_pal's extra steps of the same family; flat fills, ink on the building and the wall only, no gradients.
-// Life (always on, draft motion): the huge clouds drift, bars cross the sun, a flock passes it, far windows twinkle,
+// Life (always on, draft motion): the big clouds drift, bars cross the sun, a flock passes it, far windows twinkle,
 // glints on the river, tiny cars on the bridge and the far highway, office windows switch on, highway traffic with
-// headlight beams (cars keep entering through the hold), street lamps come on one by one, trees and ivy sway, two
+// headlight beams (cars keep entering through the hold), street and lot lamps come on one by one, trees and ivy sway, two
 // pigeons take off from the wall as we rise, a low flock crosses BELOW us and birds burst up out of the treetops below
 // (the drop), a near bird glides in over the skyline. Fairness: no figures, aircraft, weapons, flags, lettering or "Google";
 // her cat and her cobalt never appear here.
@@ -32,9 +33,9 @@ export const P8_MOVE = 23.4 - START;
 const PANEL = 23.8 - START;
 /** The board's "unveil" ease (SketchReel trapezoid(0.1, 0.6): accelerate over 10 %, cruise, decelerate over 60 %). */
 const UNVEIL = cruiseEase(0.1, 0.6);
-/** The wall's own drop: cut in MOVING at its cruise speed, cruise to mid-panel, then a sine landing at the panel's end
- *  (outSine-like, but its peak stays under the 60 fps flat-ink limit: ~400 px/s for an 800 px drop). */
-const CRUISE_OUT_C = 0.5;
+/** The wall's own drop: cut in MOVING at its cruise speed, cruise to 60 % of the panel, then a sine landing at the
+ *  panel's end (outSine-like, but its peak stays under the 60 fps flat-ink limit: ~407 px/s for its 862 px drop). */
+const CRUISE_OUT_C = 0.6;
 const cruiseOut = (u: number) => {
   const x = clamp(u, 0, 1);
   const c = CRUISE_OUT_C;
@@ -59,7 +60,8 @@ export const P8_TRAVEL = {
   highway: 165,
   verge: 185,
   slope: 470,
-  wall: 800,
+  // the cut: the coping at y ~910 hides the building below mid-roof (about half of it); the landing: y 1770
+  wall: 862,
 };
 
 /** Camera state at scene time t (exported for the lane's speed check). */

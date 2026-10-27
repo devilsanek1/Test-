@@ -1,12 +1,17 @@
 // P8_site.tsx (lane L5-scale): the Pentagon and everything in front of it, for P8 (the scale beat). The building, its
 // projection and the parked-car ruler are StylePentagon's (src/v2/StylePentagon.tsx, the approved style frame
-// review/look/v2_g4/pentagon_dusk.png), copied, not imported. Added for the great-scale cues (owner, 2026-10-26): a few
-// office windows switching on, roof units, two rows of identical parked cars at its foot (the ruler, as the board), a
-// tree lawn, a four-lane highway with moving cars (warm headlight beams) and street lamps coming on one by one, a verge
-// and a service road, then THE DROP: treetops on the slope below us, seen from above, and the stone wall we rise over
-// (coping, courses of stones, ivy, moss, two pigeons that take off as the camera rises).
+// review/look/v2_g4/pentagon_dusk.png), copied, not imported, re-solved for the board's "too big for the frame" landing
+// (art director, fix round): apex y 712, roof front y 1195, facade bottom y 1348, the outer corners ~140 px off both
+// side edges, a big courtyard. Added for the great-scale cues (owner, 2026-10-26): a few office windows switching on,
+// roof units, two tight rows of ~46 identical small parked cars at its foot (the ruler at near true size: a car is
+// ~1/45 of the front face), bay ticks and tall lot lamps in the one-point perspective of the ground, a drive that
+// sweeps from the highway on the left across the lawn and recedes to the building (the one receding element), a
+// violet-green tree lawn (cast shadows; clumps overlapping the lot), a four-lane highway with moving cars (warm headlight
+// beams) and street lamps coming on one by one, a verge with trees over the near lane, a fence at the top of the
+// embankment, then THE DROP: treetops on the slope below us, seen from above, and the stone wall we rise over (coping,
+// courses of stones, uneven ivy, a moss cushion, a missing stone, staggered weep holes, two pigeons that take off).
 // Fairness (CORE_LINE 2): a plain building; no flags, figures, aircraft, weapons, text or "Google"; no glow, rim or hero
-// colour on it. All moving cars are the one plain sedan of the ruler.
+// colour on it. All cars are the one plain sedan of the ruler.
 // Coordinates: canvas px of the LANDING frame (camera at rest = the rise's end); P8.tsx moves each plane.
 import React, {useId} from 'react';
 import {Fill} from '../../../lib/Fill';
@@ -21,8 +26,9 @@ import {P8X} from './P8_pal';
 const P = DUSK;
 
 // ---------------------------------------------------------------- the camera: one perspective for building + ground
-// (StylePentagon, verbatim.) Plan in metres: X right, Z away from us (the front facade at Z = 0), Y up. The numbers solve
-// for the landing frame: front corners at x 40 / 1040, roof front edge y 1000, apex y 710.
+// (StylePentagon's model.) Plan in metres: X right, Z away from us (the front facade at Z = 0), Y up. The numbers solve
+// for the landing frame: front corners at x 50 / 1030, roof front edge y 1195, apex y 712; a farther, higher camera than
+// the style frame (DC 1600 m, ~25 deg down), so the five-ring roof opens up and its outer corners run off both edges.
 const D36 = Math.PI / 5;
 const EDGE = 281;
 const R_OUT = EDGE / (2 * Math.sin(D36));
@@ -35,10 +41,10 @@ const WELLS: [number, number][] = [
   [94, 100],
 ];
 const HB = 44;
-const DC = 900;
-const HALF = 500;
-const ROOF_FRONT_Y = 1000;
-const APEX_Y = 710;
+const DC = 1600;
+const HALF = 490;
+const ROOF_FRONT_Y = 1195;
+const APEX_Y = 712;
 const F = (HALF * DC) / (EDGE / 2);
 const A_ = ((ROOF_FRONT_Y - APEX_Y) * DC * (DC + R_OUT + RI_OUT)) / (R_OUT + RI_OUT);
 const HY = ROOF_FRONT_Y - A_ / DC;
@@ -63,8 +69,8 @@ export const roofBackY = (x: number) => {
   return a[1] + ((b[1] - a[1]) * (x - a[0])) / (b[0] - a[0]);
 };
 
-/** The wall's coping top edge at the landing. */
-export const WALL_Y_LAND = 1640;
+/** The wall's coping top edge at the landing (low in the frame: the drop below us shows above it). */
+export const WALL_Y_LAND = 1770;
 
 const W_FRONT = stroke.inkBold;
 const W_MID = stroke.ink;
@@ -205,7 +211,7 @@ export const P8Pentagon: React.FC = () => {
       <g clipPath={`url(#${clipId})`}>
         <Fill d={polyPath(g.hole)} color={P.facade} offset={false} />
         <Fill d={g.winCourt} color={P.win} offset={false} />
-        <Fill d={polyPath(g.floor)} color={P.lawn} offset={false} />
+        <Fill d={polyPath(g.floor)} color={P8X.lawn} offset={false} />
         {g.trees.map((d, i) => (
           <Fill key={i} d={d} color={P.courtTree} offset={false} />
         ))}
@@ -219,7 +225,11 @@ export const P8Pentagon: React.FC = () => {
 
 // ---------------------------------------------------------------- the car (the ruler's one model)
 
-const CAR_M = 9.5; // car length in plan metres (drawn ~2x so it reads; StylePentagon used 8.2)
+/** The ruler: a parked car's length in plan metres (~1.3x a real 4.6 m sedan so its roof and windows still read at
+ *  ~21 px; ~46 per row, ~45 to the front face). */
+const LOT_CAR_M = 6;
+/** The moving cars on the nearer highway: a little larger (nearer, and they carry the life). */
+const HW_CAR_M = 8;
 
 /** One car, side view, facing right, length L, wheels on (x, y). [body, glass, wheels]. */
 function carPaths(x: number, y: number, L: number): [string, string, string] {
@@ -231,69 +241,135 @@ function carPaths(x: number, y: number, L: number): [string, string, string] {
   return [body, glass, wheel(0.21) + wheel(0.79)];
 }
 
+// ---------------------------------------------------------------- ground bands in plan (they recede in perspective)
+
+type P2 = [number, number];
+/** A band of half-width hw (plan m) along a plan polyline, projected to the ground: one closed polygon. */
+const planBand = (pts: P2[], hw: number): string => {
+  const left: Pt[] = [];
+  const right: Pt[] = [];
+  pts.forEach((p, i) => {
+    const a = pts[Math.max(0, i - 1)];
+    const b = pts[Math.min(pts.length - 1, i + 1)];
+    const dx = b[0] - a[0];
+    const dz = b[1] - a[1];
+    const l = Math.hypot(dx, dz) || 1;
+    const nx = -dz / l;
+    const nz = dx / l;
+    left.push(proj(p[0] + nx * hw, p[1] + nz * hw));
+    right.push(proj(p[0] - nx * hw, p[1] - nz * hw));
+  });
+  return polyPath([...left, ...right.reverse()]);
+};
+const cubic = (a: P2, b: P2, c: P2, d: P2, n: number): P2[] =>
+  Array.from({length: n + 1}, (_, i) => {
+    const u = i / n;
+    const v = 1 - u;
+    return [v * v * v * a[0] + 3 * v * v * u * b[0] + 3 * v * u * u * c[0] + u * u * u * d[0], v * v * v * a[1] + 3 * v * v * u * b[1] + 3 * v * u * u * c[1] + u * u * u * d[1]] as P2;
+  });
+
 // ---------------------------------------------------------------- the lot at its foot: two rows of identical parked cars
 
-const ROWS = [-18, -42];
-const LOT_END = -54;
-const LAWN_END = -100;
+const ROWS = [-12, -32];
+const LOT_END = -42;
+/** The drive's centre line (plan X) where it recedes to the building, and its half-width (m). */
+const DRIVE_X = -53;
+const DRIVE_HW = 4.6;
 
-/** The lot's surface: drawn UNDER the building (its top edge hides behind the facade during the rise). */
+/** The ground around and in front of the building: drawn UNDER it (its top edge hides behind the facade and, beside
+ *  the building, runs back to the depth of its outer corners). */
 export const P8LotGround: React.FC = () => {
-  const top = groundY(0);
-  return <Fill rect={[-300, top - 60, 1680, groundY(LOT_END) - top + 260]} color={P.lot} offset={false} />;
+  const top = groundY(300);
+  return <Fill rect={[-300, top, 1680, groundY(LOT_END) - top + 260]} color={P.lot} offset={false} />;
 };
 
 const LOT = (() => {
+  const pitch = LOT_CAR_M * 1.12;
   const rows = ROWS.map((Z, ri) => {
     const r = rng(`p8/row${ri}`);
     const k = kAt(Z);
-    const L = CAR_M * k;
+    const L = LOT_CAR_M * k;
     const y = groundY(Z);
     let body = '';
     let glass = '';
     let wheels = '';
     let bays = '';
-    for (let x = -L * r.range(0.2, 0.9); x < 1080 + L; x += L * 1.3) {
-      bays += polyPath([
-        [x - 0.12 * L, y + 0.02 * L],
-        [x - 0.12 * L + 2, y + 0.02 * L],
-        [x - 0.16 * L + 2, y + 0.16 * L],
-        [x - 0.16 * L, y + 0.16 * L],
-      ]);
-      if (r.chance(0.12)) continue; // an empty bay
-      const [b, g, w] = carPaths(x, y, L);
+    for (let X = -172 + r.range(0, pitch); X < 172; X += pitch) {
+      // the bay tick at the bay's left edge, a ground line receding toward the vanishing point
+      const xb = X - pitch / 2;
+      if (Math.abs(xb - DRIVE_X) > DRIVE_HW + 1.5) bays += polyPath([proj(xb - 0.22, Z + 1.6), proj(xb + 0.22, Z + 1.6), proj(xb + 0.22, Z - 3.6), proj(xb - 0.22, Z - 3.6)]);
+      if (Math.abs(X - DRIVE_X) < DRIVE_HW + LOT_CAR_M * 0.6) continue; // the drive runs through the rows
+      if (r.chance(0.08)) continue; // an empty bay
+      const [b, g, w] = carPaths(proj(X - LOT_CAR_M / 2, Z)[0], y, L);
       body += b;
       glass += g;
       wheels += w;
     }
     return {body, glass, wheels, bays};
   });
-  // hairline lamp posts between the rows (a second ruler, ~10 m), sparse and staggered
-  const Z = -30;
-  const k = kAt(Z);
-  const y = groundY(Z);
-  const pr = rng('p8/posts');
-  let pole = '';
-  let head = '';
-  for (let x = 120 + pr.range(-30, 30); x < 1060; x += pr.range(250, 320)) {
-    pole += vline(x, y - 10 * k, y, {over: [0, 0], seed: `pp${Math.round(x)}`, breaks: false});
-    head += line(x - 1.4 * k, y - 10 * k, x + 1.4 * k, y - 10 * k, {over: [0, 0], seed: `ph${Math.round(x)}`, breaks: false});
-  }
-  return {rows, pole, head};
+  // tall lot lamps between the rows (a second ruler, ~14 m), staggered; they come on one by one
+  const Z = -22;
+  const posts = [-131, -92, -18, 37, 94, 139].map((X, i) => {
+    const [x, y] = proj(X, Z);
+    const k = kAt(Z);
+    const h = 14 * k;
+    return {
+      x,
+      pole: vline(x, y - h, y, {over: [0, 0], seed: `lp8p${i}`, breaks: false}),
+      head: roundRect(x - 1.6 * k, y - h - 0.5 * k, 3.2 * k, 0.9 * k, 0.4 * k),
+      pool: `M${(x - 5.5 * k).toFixed(1)} ${(y + 0.5).toFixed(1)}a${(5.5 * k).toFixed(1)} ${(1.3 * k).toFixed(1)} 0 1 0 ${(11 * k).toFixed(1)} 0a${(5.5 * k).toFixed(1)} ${(1.3 * k).toFixed(1)} 0 1 0 ${(-11 * k).toFixed(1)} 0Z`,
+      on: 1.3 + 0.17 * ((i * 4) % 6),
+    };
+  });
+  // the drive through the lot (to the walk at the facade's foot), its curbs and centre dashes
+  const drive = [
+    [DRIVE_X, -4],
+    [DRIVE_X, LOT_END - 1],
+  ] as P2[];
+  return {rows, posts, drive: planBand(drive, DRIVE_HW + 0.5), driveIn: planBand(drive, DRIVE_HW)};
 })();
 
+const dashes = (pts: P2[], every: number, len: number, hw: number) => {
+  // dashes along a plan polyline (sampled densely): a short band every `every` metres
+  let d = '';
+  let acc = 0;
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1];
+    const b = pts[i];
+    const l = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    for (let s = 0; s < l; s += 0.5) {
+      const u = s / l;
+      const m = acc + s;
+      if (m % every < 0.5) {
+        const p0: P2 = [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u];
+        const u1 = Math.min(1, (s + len) / l);
+        const p1: P2 = [a[0] + (b[0] - a[0]) * u1, a[1] + (b[1] - a[1]) * u1];
+        d += planBand([p0, p1], hw);
+      }
+    }
+    acc += l;
+  }
+  return d;
+};
+
 export const P8Lot: React.FC = () => {
+  const t = useTime();
   const top = groundY(0);
   const [a, b] = LOT.rows;
   return (
     <>
-      <Fill rect={[-300, top, 1680, groundY(-6) - top]} color={P.walk} offset={false} />
+      <Fill rect={[-300, top, 1680, groundY(-5) - top]} color={P.walk} offset={false} />
+      <path d={LOT.drive} fill={P8X.curb} />
+      <path d={LOT.driveIn} fill={P.road} />
+      {LOT.posts.map((l, i) => (t >= l.on ? <path key={i} d={l.pool} fill={P8X.pool} /> : null))}
       <path d={a.bays + b.bays} fill={P8X.bay} />
       <Fill d={a.wheels} color={P.wheel} offset={false} />
       <Fill d={a.body} color={P.car} offset={false} />
       <Fill d={a.glass} color={P.carGlass} offset={false} />
-      <Ink d={LOT.pole} width={W_HAIR} color={P.post} taper={false} />
-      <Ink d={LOT.head} width={W_THIN} color={P.post} taper={false} />
+      <Ink d={LOT.posts.map((l) => l.pole).join('')} width={W_THIN} color={P.post} taper={false} />
+      {LOT.posts.map((l, i) => (
+        <path key={`h${i}`} d={l.head} fill={t >= l.on ? P8X.lampOn : P8X.lampOff} />
+      ))}
       <Fill d={b.wheels} color={P.wheel} offset={false} />
       <Fill d={b.body} color={P.car} offset={false} />
       <Fill d={b.glass} color={P.carGlass} offset={false} />
@@ -301,39 +377,61 @@ export const P8Lot: React.FC = () => {
   );
 };
 
-// ---------------------------------------------------------------- the lawn with its trees
+// ---------------------------------------------------------------- the lawn: the drive sweeping across it, its trees
+
+const LAWN_END = -76;
+/** The drive from the highway: it leaves the far carriageway on the left and sweeps across the lawn, then recedes
+ *  straight to the lot (plan m). */
+const DRIVE_PATH: P2[] = [...cubic([-196, -78.5], [-112, -78.5], [DRIVE_X, -73], [DRIVE_X, -50], 28), [DRIVE_X, LOT_END + 1]];
 
 const LAWN = (() => {
   const y0 = groundY(LOT_END);
   const r = rng('p8/lawntrees');
-  const trees: {x: number; y: number; trunk: string; crown: string; lit: string; seed: string}[] = [];
-  for (let x = -30; x < 1120; ) {
-    const Z = -78 + r.range(-6, 6);
+  const trees: {trunk: string; crown: string; lit: string; shadow: string; seed: string}[] = [];
+  const tree = (X: number, Z: number, s: number) => {
     const k = kAt(Z);
-    const y = groundY(Z);
-    const rx = r.range(3.2, 4.4) * k;
-    const ry = r.range(2.8, 3.6) * k;
-    const h = r.range(5.5, 7) * k;
+    const [x, y] = proj(X, Z);
+    const rx = r.range(4.2, 5.6) * s * k;
+    const ry = r.range(3.6, 4.6) * s * k;
+    const h = r.range(6.5, 8.5) * s * k;
     const cy = y - h;
+    const seed = `lt${Math.round(X * 10)}_${Math.round(Z)}`;
     trees.push({
-      x,
-      y,
-      trunk: roundRect(x - 0.35 * k, cy, 0.7 * k, h, 0.3 * k),
-      crown: crown(x, cy, rx, ry, {seed: `lt${Math.round(x)}`, bumps: 7, round: 0.72}),
-      lit: crown(x + rx * 0.22, cy - ry * 0.25, rx * 0.62, ry * 0.55, {seed: `ltl${Math.round(x)}`, bumps: 5, round: 0.75}),
-      seed: `lt${Math.round(x)}`,
+      trunk: roundRect(x - 0.4 * k, cy, 0.8 * k, h, 0.3 * k),
+      crown: crown(x, cy, rx, ry, {seed, bumps: 7, round: 0.72}),
+      lit: crown(x + rx * 0.22, cy - ry * 0.25, rx * 0.62, ry * 0.55, {seed: `${seed}l`, bumps: 5, round: 0.75}),
+      // the cast shadow falls left (the sun is low on the right): a long flat ellipse on the grass
+      shadow: `M${(x - rx * 2.6).toFixed(1)} ${(y + 0.5).toFixed(1)}a${(rx * 1.5).toFixed(1)} ${(1.1 * k).toFixed(1)} 0 1 0 ${(rx * 3).toFixed(1)} 0a${(rx * 1.5).toFixed(1)} ${(1.1 * k).toFixed(1)} 0 1 0 ${(-rx * 3).toFixed(1)} 0Z`,
+      seed,
     });
-    x += r.chance(0.22) ? r.range(110, 170) : r.range(42, 70);
+  };
+  // clumps of 1-3 trees at uneven spacing and depth; some stand at the lot's edge (their crowns over the far row)
+  for (let X = -160; X < 170; ) {
+    if (Math.abs(X - DRIVE_X) < 12) {
+      X += 14;
+      continue;
+    }
+    const n = r.chance(0.35) ? 1 : r.chance(0.6) ? 2 : 3;
+    const Z0 = r.chance(0.3) ? -45 - r.range(0, 3) : -52 - r.range(0, 16);
+    for (let i = 0; i < n; i++) tree(X + i * r.range(4.5, 7), Z0 - r.range(0, 5), r.chance(0.2) ? 1.25 : 1);
+    X += n * 6 + (r.chance(0.3) ? r.range(26, 44) : r.range(8, 18));
   }
-  return {y0, trees};
+  // draw far -> near
+  return {y0, trees: trees.reverse()};
 })();
 
 export const P8Lawn: React.FC = () => {
   const t = useTime();
   return (
     <>
-      <Fill rect={[-300, LAWN.y0 - 2, 1680, 600]} color={P.lawn} offset={false} />
+      <Fill rect={[-300, LAWN.y0 - 2, 1680, 600]} color={P8X.lawn} offset={false} />
       <Fill rect={[-300, LAWN.y0 - 2, 1680, 3]} color={P8X.curb} offset={false} />
+      <path d={planBand(DRIVE_PATH, DRIVE_HW + 0.5)} fill={P8X.curb} />
+      <path d={planBand(DRIVE_PATH, DRIVE_HW)} fill={P.road} />
+      <path d={dashes(DRIVE_PATH, 6, 2.6, 0.22)} fill={P.roadLine} />
+      {LAWN.trees.map((q) => (
+        <path key={`s${q.seed}`} d={q.shadow} fill={P8X.lawnShade} />
+      ))}
       {LAWN.trees.map((q) => {
         const dx = Math.sin(2 * Math.PI * 0.45 * t + rand(q.seed, 'ph') * 6.28) * 1.6;
         return (
@@ -355,14 +453,14 @@ export const P8Lawn: React.FC = () => {
 /** A lane: depth Z, direction, speed (px/s at its depth), cars on its loop, and `late` = scene times at which one more
  *  car ENTERS the frame (new life during the landing and the hold; nudged later if it would overlap a looping car). */
 type Lane = {Z: number; dir: 1 | -1; v: number; n: number; seed: string; late?: number[]};
-const HW_TOP = LAWN_END; // -100
-const HW_MEDIAN: [number, number] = [-128, -136];
-const HW_END = -164;
+const HW_TOP = LAWN_END; // -76
+const HW_MEDIAN: [number, number] = [-102, -109];
+const HW_END = -136;
 const LANES: Lane[] = [
-  {Z: -107, dir: 1, v: 92, n: 3, seed: 'l1', late: [1.3]},
-  {Z: -121, dir: 1, v: 124, n: 3, seed: 'l2', late: [2.02]},
-  {Z: -143, dir: -1, v: 112, n: 3, seed: 'l3', late: [1.62]},
-  {Z: -157, dir: -1, v: 86, n: 4, seed: 'l4', late: [1.12, 2.28]},
+  {Z: -83, dir: 1, v: 92, n: 3, seed: 'l1', late: [1.3]},
+  {Z: -96, dir: 1, v: 124, n: 3, seed: 'l2', late: [2.02]},
+  {Z: -118, dir: -1, v: 112, n: 3, seed: 'l3', late: [1.62]},
+  {Z: -131, dir: -1, v: 86, n: 4, seed: 'l4', late: [1.12, 2.28]},
 ];
 /** Street lamps on the highway's far edge; they come on one by one, left to right, as the lawn rises into view. */
 export const LAMP_ON0 = 0.98;
@@ -370,7 +468,7 @@ export const LAMP_STEP = 0.11;
 const LAMP_XS = Array.from({length: 9}, (_, i) => 62 + 120 * i);
 
 const laneCars = (lane: Lane) => {
-  const L = CAR_M * kAt(lane.Z);
+  const L = HW_CAR_M * kAt(lane.Z);
   const [body, glass, wheels] = carPaths(0, 0, L);
   const beam = polyPath([
     [L * 0.98, -0.2 * L],
@@ -430,7 +528,7 @@ const HW = (() => {
   const y1 = groundY(HW_END);
   const ym0 = groundY(HW_MEDIAN[0]);
   const ym1 = groundY(HW_MEDIAN[1]);
-  const dashes = (Z: number) => {
+  const dash = (Z: number) => {
     const k = kAt(Z);
     const y = groundY(Z);
     let d = '';
@@ -458,7 +556,7 @@ const HW = (() => {
       pool: `M${x - 30} ${y + 8}a34 7 0 1 0 68 0a34 7 0 1 0 -68 0Z`,
     };
   });
-  return {y0, y1, ym0, ym1, dash: dashes(-114) + dashes(-150), edges: edge(-101.5) + edge(-126.5) + edge(-137.5) + edge(-162.5), posts, lamps, railY: ym0 - 1.1 * k};
+  return {y0, y1, ym0, ym1, dash: dash(-89.5) + dash(-124.5), edges: edge(-77.4) + edge(-101.3) + edge(-109.8) + edge(-134.6), posts, lamps, railY: ym0 - 1.1 * k};
 })();
 
 export const P8Highway: React.FC = () => {
@@ -485,17 +583,14 @@ export const P8Highway: React.FC = () => {
   );
 };
 
-// ---------------------------------------------------------------- the verge, the service road, the embankment
+// ---------------------------------------------------------------- the verge, its trees, the fence at the embankment's top
 
-const VERGE_END = -196;
-const SVC_END = -212;
-const SVC_LANE: Lane = {Z: -205, dir: -1, v: 70, n: 2, seed: 'svc', late: [0.95, 1.86]};
-const SVC_CARS = laneCars(SVC_LANE);
+const VERGE_END = -156;
 const VERGE = (() => {
   const r = rng('p8/verge');
   const bushes: {d: string; lit: string}[] = [];
   for (let x = -40; x < 1120; ) {
-    const Z = -180 + r.range(-8, 8);
+    const Z = -146 + r.range(-6, 6);
     const k = kAt(Z);
     const y = groundY(Z);
     const rx = r.range(2.4, 4.2) * k;
@@ -506,33 +601,66 @@ const VERGE = (() => {
     });
     x += r.chance(0.3) ? r.range(90, 160) : r.range(30, 60);
   }
+  // a few verge trees: nearer than the highway, their crowns stand over its near lane (they break the band edge)
+  const trees: {trunk: string; d: string; lit: string; seed: string}[] = [];
+  for (const [X, s] of [
+    [-128, 1.1],
+    [-121, 0.9],
+    [-12, 1.0],
+    [104, 1.15],
+    [112, 0.95],
+    [119, 1.05],
+  ] as [number, number][]) {
+    const Z = -140 - r.range(0, 4);
+    const k = kAt(Z);
+    const [x, y] = proj(X, Z);
+    const h = 8.5 * s * k;
+    const rx = 5 * s * k;
+    const ry = 4.3 * s * k;
+    const seed = `vt${X}`;
+    trees.push({
+      trunk: roundRect(x - 0.45 * k, y - h, 0.9 * k, h, 0.3 * k),
+      d: crown(x, y - h, rx, ry, {seed, bumps: 7, round: 0.72}),
+      lit: crown(x + rx * 0.22, y - h - ry * 0.25, rx * 0.6, ry * 0.55, {seed: `${seed}l`, bumps: 5, round: 0.75}),
+      seed,
+    });
+  }
   // the fence at the embankment's top (posts + two wires): the edge of the drop
-  const y = groundY(SVC_END) + 4;
-  const k = kAt(SVC_END);
+  const y = groundY(VERGE_END) + 3;
+  const k = kAt(VERGE_END);
   let fence = '';
   for (let x = -30; x < 1120; x += 3.2 * k) fence += `M${x.toFixed(1)} ${y.toFixed(1)}V${(y - 1.2 * k).toFixed(1)}`;
   fence += `M-300 ${(y - 1.05 * k).toFixed(1)}H1380M-300 ${(y - 0.55 * k).toFixed(1)}H1380`;
-  return {bushes, fence};
+  return {bushes, trees, fence};
 })();
 
 export const P8Verge: React.FC = () => {
   const t = useTime();
   const y0 = groundY(HW_END);
   const y1 = groundY(VERGE_END);
-  const y2 = groundY(SVC_END);
   return (
     <>
       <Fill rect={[-300, y0, 1680, y1 - y0 + 1]} color={P.verge} offset={false} />
+      {/* the embankment falling away below the fence (the treetops of the slope stand in front of it) */}
+      <Fill rect={[-300, y1, 1680, 700]} color={P8X.canopyDark} offset={false} />
       {VERGE.bushes.map((b, i) => (
         <React.Fragment key={i}>
           <path d={b.d} fill={P8X.bush} />
           <path d={b.lit} fill={P8X.bushLit} />
         </React.Fragment>
       ))}
-      <Fill rect={[-300, y1, 1680, y2 - y1 + 1]} color={P.road} offset={false} />
-      <Cars lane={SVC_LANE} c={SVC_CARS} t={t} />
-      {/* the embankment falling away below the fence (the treetops of the slope stand in front of it) */}
-      <Fill rect={[-300, y2, 1680, 700]} color={P8X.canopyDark} offset={false} />
+      {VERGE.trees.map((q) => {
+        const dx = Math.sin(2 * Math.PI * 0.4 * t + rand(q.seed, 'ph') * 6.28) * 2;
+        return (
+          <g key={q.seed}>
+            <path d={q.trunk} fill={P8X.trunk} />
+            <g transform={`translate(${dx.toFixed(2)} 0)`}>
+              <path d={q.d} fill={P8X.bush} />
+              <path d={q.lit} fill={P8X.bushLit} />
+            </g>
+          </g>
+        );
+      })}
       <path d={VERGE.fence} stroke={P8X.rail} strokeWidth={2.2} fill="none" />
     </>
   );
@@ -546,7 +674,7 @@ const TREETOPS = (() => {
   for (let x = -60; x < 1160; ) {
     const rx = r.range(52, 92);
     const ry = r.range(38, 54);
-    const cy = WALL_Y_LAND - r.range(28, 70);
+    const cy = WALL_Y_LAND - r.range(40, 92);
     const s = `tt${Math.round(x)}`;
     out.push({
       dark: crown(x + rx, cy + 10, rx * 1.08, ry * 1.05, {seed: `${s}d`, bumps: 8, round: 0.7}),
@@ -591,26 +719,59 @@ const WALL = (() => {
   for (let x = r.range(60, 180); x < 1080; x += r.range(230, 290)) joints += line(x, top + 3, x + 6, lipY - 2, {over: [0, 0], seed: `cj${Math.round(x)}`});
   const courses = Array.from({length: N_COURSES}, (_, i) => faceY + COURSE * (i + 1));
   courses.forEach((y, i) => (joints += hline(-40, 1120, y, {seed: `wc${i}`, over: [0, 0]})));
-  // stones: staggered blocks, three flat tones (no texture)
+  // stones: staggered blocks, three flat tones (no texture); one stone is missing (a dark recess with a lit sill) and
+  // one is split by a crack, so the big field never reads mechanical
   const tones: string[][] = [[], [], []];
+  let missing = '';
+  let sill = '';
   [faceY, ...courses].forEach((y0, i) => {
     let x = -60 + (i % 2) * 90 - r.range(0, 60);
+    let j = 0;
     while (x < 1140) {
       const w = r.range(140, 220);
       const tone = r.chance(0.5) ? 0 : r.chance(0.5) ? 1 : 2;
       tones[tone].push(`M${x.toFixed(1)} ${y0.toFixed(1)}h${w.toFixed(1)}v${COURSE}h${(-w).toFixed(1)}Z`);
+      if (i === 2 && j === 4) {
+        // a corner broken off this stone: a jagged dark recess, its broken floor catching the light
+        const bx = x + w * 0.38;
+        missing += polyPath([[bx, y0 + 4], [bx + w * 0.2, y0 + 12], [bx + w * 0.34, y0 + 5], [x + w - 4, y0 + 9], [x + w - 4, y0 + COURSE - 5], [bx + w * 0.08, y0 + COURSE - 5], [bx - 8, y0 + COURSE * 0.55], [bx + 6, y0 + 26]]);
+        sill += polyPath([[bx + w * 0.08, y0 + COURSE - 13], [x + w - 4, y0 + COURSE - 15], [x + w - 4, y0 + COURSE - 5], [bx + w * 0.08, y0 + COURSE - 5]]);
+      }
       x += w;
+      j++;
       if (x < 1080) joints += vline(x, y0 + 4, y0 + COURSE - 4, {over: [0, 0], seed: `wv${i}-${Math.round(x)}`});
     }
   });
-  // moss on the coping, weep holes on the face
+  // moss: small patches along the coping, and one tuft of grass growing out of the coping's joint (left of centre)
   let moss = '';
-  for (let i = 0; i < 9; i++) {
+  for (let i = 0; i < 7; i++) {
     const x = r.range(20, 1060);
     moss += roundRect(x, top + r.range(4, 26), r.range(18, 46), r.range(5, 9), 4);
   }
+  let cushion = '';
+  let cushionLit = '';
+  const gr = rng('p8/tuft');
+  for (let i = 0; i < 26; i++) {
+    const x = 470 + gr.range(0, 120) + (i % 2) * 6;
+    const h = gr.range(14, 34) * (1 - Math.abs(x - 530) / 110);
+    const lean = gr.range(-9, 9);
+    const blade = polyPath([[x - 3, top + 6], [x + lean, top + 6 - h], [x + 3, top + 6]]);
+    if (gr.chance(0.4)) cushionLit += blade;
+    else cushion += blade;
+  }
+  cushion += roundRect(468, top - 2, 128, 12, 6);
+  // weep holes, staggered across three courses, each with a stain run below it
   let weep = '';
-  for (const x of [210, 590, 930]) weep += roundRect(x, faceY + COURSE * 1.35, 26, 16, 6);
+  let stain = '';
+  for (const [x, c] of [
+    [214, 1.3],
+    [612, 2.45],
+    [915, 0.55],
+  ]) {
+    const y = faceY + COURSE * c;
+    weep += roundRect(x, y, 26, 16, 7);
+    stain += roundRect(x - 4, y + 13, 34, 9, 4.5);
+  }
   // lichen patches down the face (flat blobs) and two old cracks across a few stones
   for (let i = 0; i < 7; i++) {
     const x = r.range(40, 1040);
@@ -627,12 +788,14 @@ const WALL = (() => {
     }
     return d;
   };
-  joints += crack(470, faceY + 4, 7, 'p8crack1') + crack(840, faceY + COURSE * 3 + 4, 5, 'p8crack2');
-  // ivy clumps hanging over the coping: leaf blobs on a stem, each clump sways about its root
+  joints += crack(338, faceY + 4, 3, 'p8crack1') + crack(840, faceY + COURSE * 3 + 4, 5, 'p8crack2');
+  // ivy clumps hanging over the coping, unevenly: two close together on the left, one long far to the right, one short
+  // stub at the right edge; leaf blobs on a stem, each clump sways about its root
   const ivy = [
-    {x: 118, n: 13, len: 190},
-    {x: 655, n: 9, len: 120},
-    {x: 1000, n: 12, len: 170},
+    {x: 92, n: 13, len: 200},
+    {x: 166, n: 7, len: 100},
+    {x: 748, n: 14, len: 230},
+    {x: 1018, n: 4, len: 52},
   ].map((c, ci) => {
     let dark = '';
     let lit = '';
@@ -663,7 +826,7 @@ const WALL = (() => {
     }
     return {x: c.x, y: top, dark, lit, stem, seed: `ivy${ci}`};
   });
-  return {top, lipY, faceY, joints, tones, moss, weep, ivy};
+  return {top, lipY, faceY, joints, tones, moss, cushion, cushionLit, weep, stain, missing, sill, ivy};
 })();
 
 /** The two pigeons on the coping (wall-layer px): they take off as the camera starts to rise. */
@@ -704,12 +867,17 @@ export const P8Wall: React.FC = () => {
       <Fill rect={[-300, w.faceY, 1680, COURSE * (N_COURSES + 2)]} color={P.wall} offset={false} />
       <path d={w.tones[1].join('')} fill={P8X.stone2} />
       <path d={w.tones[2].join('')} fill={P8X.stone3} />
+      <path d={w.missing} fill={P.lip} />
+      <path d={w.sill} fill={P8X.stone2} />
+      <path d={w.stain} fill={P8X.moss} />
       <path d={w.weep} fill={P8X.weep} />
       <Fill rect={[-300, w.top, 1680, w.lipY - w.top]} color={P.coping} seed="p8coping" />
       <path d={w.moss} fill={P8X.moss} />
       <Fill rect={[-300, w.lipY, 1680, w.faceY - w.lipY]} color={P.lip} offset={false} />
       <Ink d={w.joints} width={W_MID} color={P.joint} />
       <Ink d={hline(-60, 1140, w.top, {seed: 'p8cope', over: 'structural'}) + hline(-60, 1140, w.lipY, {seed: 'p8lip', over: 'medium'})} width={W_FRONT} color={P.ink} />
+      <path d={w.cushion} fill={P8X.ivy} />
+      <path d={w.cushionLit} fill={P8X.ivyLit} />
       {w.ivy.map((c) => {
         const a = Math.sin(2 * Math.PI * 0.6 * t + rand(c.seed, 'ph') * 6.28) * 2.4;
         return (

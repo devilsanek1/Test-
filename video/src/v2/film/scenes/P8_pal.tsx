@@ -7,21 +7,25 @@ import {DUSK} from '../palette';
 export const P8X = {
   // ---- the big sky
   cloud: '#C2BCEE', // the huge clouds: one step lighter and pinker than the sky #A9B5EC
-  cloudLit: '#F3C7B8', // their undersides, lit by the low sun
-  cloudFar: '#B7B3EA', // a farther cloud layer behind them
+  cloudLit: '#F3C7B8', // a thin rim on their sun-side (lower-right) bumps, lit by the low sun
+  cloudFar: '#B7B3EA', // a farther, smaller cloud behind them
   cloudFarLit: '#E9C0C2',
   cloudBar: '#EDB7A6', // thin bars across the sun (one step darker than the glow)
   // ---- the world beyond the building (haze steps, far -> near)
+  haze0: '#E0C5DC', // the palest row of tiny blocks on the horizon (in front of the glow and the sun)
   haze1: '#CEC1EA', // the farthest skyline, nearly the dusk band
   haze2: DUSK.far, // #B4AEDF the far towers
   towerLit: '#F1D2B4', // far windows (tiny, twinkling)
-  bank: '#AAA4DC', // the far river bank
+  mid: '#A7A1DB', // the mid-rise row on the far bank (window dots)
+  bank: '#A09AD6', // the far river bank
   river: '#D2CEF1', // the river, catching the sky
   glint: '#F7D2BB', // the sun's glints on the water
   bridge: '#918BC9',
+  bridgeDeck: '#7F79BE',
   sub: '#A39DD9', // far suburbs
   subRoof: '#9690D1',
-  subRoofLit: '#BEB0E1',
+  subRoofLit: '#BEB0E1', // the sun-side roof slope (peach-lilac)
+  subWall: '#B2ABE0', // the houses' gable walls
   farRoad: '#C0BCE8',
   farCar: '#56509A',
   farLight: '#F6D7B0',
@@ -31,6 +35,8 @@ export const P8X = {
   unitTop: '#D3D2F1',
   unitSide: '#9E9CD8',
   // ---- the ground in front of it
+  lawn: '#8A8FBE', // a violet-green grass step (between the lot and the bushes; never steel-blue water)
+  lawnShade: '#7579AE', // the trees' cast shadows on it (to the left: the sun is low on the right)
   curb: '#B9B6E6',
   bay: '#B6B3E4', // parking bay ticks
   tree: DUSK.courtTree, // #5D7BA6
