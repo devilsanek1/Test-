@@ -135,7 +135,7 @@ type HeadOut = {behind: Part[]; front: Part[]};
 function head(
   m: Model,
   col: Col,
-  o: {cx: number; cy: number; r: number; view: View; lod: Lod; seed: string; shoulderY: number; hairEnd: number; turn?: number; tilt?: number},
+  o: {cx: number; cy: number; r: number; view: View; lod: Lod; seed: string; shoulderY: number; hairEnd: number; turn?: number; tilt?: number; noCheek?: boolean},
 ): HeadOut {
   const {cx, cy, r, view, lod, seed, shoulderY, hairEnd} = o;
   const turn = o.turn ?? 0;
@@ -220,7 +220,7 @@ function head(
   }
 
   // ---- a cheek crescent (profile always unless cheek false; back views when the head turns): skin, no features
-  const cheekOn = view === 'profile' ? m.cheek !== false && kind !== 'hood' : Math.abs(turn) > 0.15 && kind !== 'hood' && kind !== 'long';
+  const cheekOn = !o.noCheek && (view === 'profile' ? m.cheek !== false && kind !== 'hood' : Math.abs(turn) > 0.15 && kind !== 'hood' && kind !== 'long' && kind !== 'curls');
   if (cheekOn && skinC && lod <= 1 && !m.mono && !m.bare && !m.paper) {
     if (view === 'profile') {
       const a0 = 118 + (o.tilt ?? 0);
@@ -483,17 +483,17 @@ export function standParts(m: Model, o: StandOpts): Part[] {
       [1, moving ? g.liftFar : 0],
     ] as [number, number][]) {
       const lift = s > 0 ? Math.max(lift0, up * 1.3) : lift0;
-      const lx = cx * 0.4 + s * H * 0.068 * br;
+      const lx = cx * 0.4 + s * H * 0.06 * br;
       const fy = -lift * H * 0.06 * (s > 0 && up > 0 ? 1 : amp);
       const legTop = hemY - H * 0.04;
       if (lod <= 2) {
-        const d = capsule([lx, legTop], [lx, fy - H * 0.018], H * 0.04 * br, H * 0.035 * br);
+        const d = capsule([lx, legTop], [lx, fy - H * 0.018], H * 0.047 * br, H * 0.042 * br);
         out.push({k: `leg${s}`, d, fill: legC, ink: inkOn ? d : undefined});
         // shoe: a heel from behind; a lifted foot shows its sole
-        const sd = ellipsePath(lx, fy - H * 0.014, H * 0.045 * br, H * 0.022);
+        const sd = ellipsePath(lx, fy - H * 0.014, H * 0.05 * br, H * 0.024);
         out.push({k: `shoe${s}`, d: sd, fill: lift > 0.35 && !m.paper && !m.mono ? CM.paper : shoeC, ink: lod === 0 ? sd : undefined, w: 0.75});
       } else {
-        out.push({k: `leg${s}`, d: capsule([lx, legTop], [lx, fy - H * 0.01], H * 0.045, H * 0.04), fill: legC});
+        out.push({k: `leg${s}`, d: capsule([lx, legTop], [lx, fy - H * 0.01], H * 0.05, H * 0.045), fill: legC});
       }
     }
     // neck
@@ -517,8 +517,10 @@ export function standParts(m: Model, o: StandOpts): Part[] {
       // arm seams (the arms live inside the coat from behind), swinging a hair on a walk
       const sw = moving ? H * 0.008 * g.s : 0;
       const armEnd = -H * 0.45 + bobY;
-      const reachR = pose === 'reach';
-      out.push({k: 'seams', ink: `M${P(cx - W / 2 + H * 0.06)} ${P(shoulderY + H * 0.1)}Q${P(cx - W / 2 + H * 0.05 - sw)} ${P((shoulderY + armEnd) / 2)} ${P(cx - W / 2 + H * 0.055 - sw)} ${P(armEnd)}` + (reachR ? '' : `M${P(cx + W / 2 - H * 0.06)} ${P(shoulderY + H * 0.1)}Q${P(cx + W / 2 - H * 0.05 + sw)} ${P((shoulderY + armEnd) / 2)} ${P(cx + W / 2 - H * 0.055 + sw)} ${P(armEnd)}`), w: 0.6});
+      const reachSide = pose === 'reach' && o.reach ? (o.reach[0] >= cx ? 1 : -1) : 0;
+      const seamL = `M${P(cx - W / 2 + H * 0.06)} ${P(shoulderY + H * 0.1)}Q${P(cx - W / 2 + H * 0.05 - sw)} ${P((shoulderY + armEnd) / 2)} ${P(cx - W / 2 + H * 0.055 - sw)} ${P(armEnd)}`;
+      const seamR = `M${P(cx + W / 2 - H * 0.06)} ${P(shoulderY + H * 0.1)}Q${P(cx + W / 2 - H * 0.05 + sw)} ${P((shoulderY + armEnd) / 2)} ${P(cx + W / 2 - H * 0.055 + sw)} ${P(armEnd)}`;
+      out.push({k: 'seams', ink: (reachSide < 0 ? '' : seamL) + (reachSide > 0 ? '' : seamR), w: 0.6});
       if (m.vent) out.push({k: 'vent', ink: `M${P(cx)} ${P(hemY - H * 0.005)}L${P(cx + H * 0.002)} ${P(hemY - H * 0.1)}`, w: 0.7});
       if (m.apron) {
         // apron: a strap round the nape and the waist ties with a bow at the small of the back
@@ -534,8 +536,10 @@ export function standParts(m: Model, o: StandOpts): Part[] {
     out.push(...acc.over);
     if (m.scarf || m.acc === 'scarf') out.push(...scarfParts(col(m.scarf ?? m.accColor), {cx: headCx * 0.5 + cx * 0.5, y: shoulderY, w: r * 1.9, H, view, lod, k: 'scarf'}));
     if (pose === 'reach' && o.reach) {
-      const from: Pt = [cx + W * 0.34, shoulderY + H * 0.06];
-      const el: Pt = o.elbow ?? [Math.max(from[0], o.reach[0]) + H * 0.04, (from[1] + o.reach[1]) / 2 + H * 0.05];
+      // the arm on the target's side (a wipe to the left uses the left arm)
+      const sd = o.reach[0] >= cx ? 1 : -1;
+      const from: Pt = [cx + sd * W * 0.34, shoulderY + H * 0.06];
+      const el: Pt = o.elbow ?? [sd > 0 ? Math.max(from[0], o.reach[0]) + H * 0.04 : Math.min(from[0], o.reach[0]) - H * 0.04, (from[1] + o.reach[1]) / 2 + H * 0.05];
       out.push(...armParts(col, m, {from, to: o.reach, H, lod, k: 'reachArm', elbow: el}));
     }
     const hd = head(m, col, {cx: headCx, cy: headCy, r, view, lod, seed, shoulderY, hairEnd: shoulderY + H * 0.17, turn: o.turn, tilt: o.tilt});
@@ -557,8 +561,8 @@ export function standParts(m: Model, o: StandOpts): Part[] {
     const fy = -lift;
     if (lod <= 2) {
       const knee: Pt = [hx - Math.sin(th) * L * 0.5 - (lift > 0 ? H * 0.025 * (lift / (H * 0.05)) : 0), hipY + (fy - hipY) * 0.5];
-      const d1 = capsule([hx, hipY], knee, H * 0.042, H * 0.037);
-      const d2 = capsule(knee, [fx, fy - H * 0.02], H * 0.037, H * 0.031);
+      const d1 = capsule([hx, hipY], knee, H * 0.047, H * 0.042);
+      const d2 = capsule(knee, [fx, fy - H * 0.02], H * 0.042, H * 0.035);
       out.push({k: `thigh${which}`, d: d1, fill: legC});
       out.push({k: `shin${which}`, d: d2, fill: legC, ink: inkOn ? d2 : undefined});
       // a shoe pointing forward (left), toe down a hair on a swing
@@ -930,7 +934,7 @@ export function nearParts(m: Model, o: NearOpts): Part[] {
   const bleed = o.bleed ?? 40;
   const r = hv * 0.205;
   const H = r / 0.112; // the standing height this head belongs to (accessory sizes)
-  const headCx = (o.turn ?? 0) * r * 0.1;
+  const headCx = (o.turn ?? 0) * r * 0.16;
   const headCy = -hv + r;
   const shoulderY = -hv + 2 * r + hv * 0.06;
   const W = hv * 0.84 * m.broad;
@@ -958,7 +962,7 @@ export function nearParts(m: Model, o: NearOpts): Part[] {
     const d = curve([[-r * 1.2, shoulderY + hv * 0.03], ...arcPts(0, shoulderY + hv * 0.02, r * 1.2, r * 0.6, 190, 350, 10), [r * 1.2, shoulderY + hv * 0.03], [0, shoulderY + hv * 0.09]], true, 0.4);
     out.push({k: 'hoodDown', d, fill: col(m.coat), ink: d});
   }
-  const hd = head(m, col, {cx: headCx, cy: headCy, r, view: 'back', lod: 0, seed, shoulderY, hairEnd: shoulderY + hv * 0.2, turn: o.turn});
+  const hd = head(m, col, {cx: headCx, cy: headCy, r, view: 'back', lod: 0, seed, shoulderY, hairEnd: shoulderY + hv * 0.2, turn: o.turn, noCheek: true});
   out.push(...hd.behind, ...hd.front);
   return out;
 }

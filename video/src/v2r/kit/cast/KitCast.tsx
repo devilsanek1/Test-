@@ -13,6 +13,7 @@ import {TimeShift, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {Fill} from '../../../lib/Fill';
 import {Ink} from '../../../lib/Ink';
+import {ExitProvider, Look} from '../../../lib/exit';
 import {CM, problems} from '../../palette';
 import {s1RowAt, S2, W2_CUT, S1_HER_LOOK_BACK_AT} from '../../world/map';
 import {traitProblems, HairKind, AccKind} from './traits';
@@ -451,8 +452,24 @@ const WindowsScreen: React.FC = () => {
       <Ghost x={340} y={1500} h={135} age={6} />
       <Staffer x={520} y={1500} h={180} />
       <Label x={24} y={1580}>
-        shot-size row (px): S1 her 170 . S4 170 . S8 150 . S2 staffer 190 seated . S2 reporter 150 . S5 stranger 150 / end 36
+        engine states: Look paper (f0 bare line) / Look cascade / un-build e 0.25 / 0.5 / 0.75 (figures leave whole)
       </Label>
+      <Ground y={1860} />
+      <Look fills="paper">
+        <Her x={80} y={1860} plant step={0.3} />
+        <Ghost x={170} y={1860} h={160} age={3} />
+        <Seated x={260} y={1860} h={110} seed="paperSeat" cup={0.3} />
+      </Look>
+      <Look cascade={{at: -0.05, origin: [380, 1700], speed: 900}}>
+        <Person x={380} y={1860} h={160} seed="casc1" traits={{acc: 'backpack'}} />
+        <Person x={460} y={1860} h={160} seed="casc2" traits={{hair: 'long'}} />
+      </Look>
+      {[0.25, 0.5, 0.75].map((e, i) => (
+        <ExitProvider key={e} value={e}>
+          <Her x={580 + i * 170} y={1860} plant step={0.3} />
+          <Ghost x={650 + i * 170} y={1860} h={150} age={5} />
+        </ExitProvider>
+      ))}
     </>
   );
 };
@@ -591,7 +608,7 @@ export const KitCast: React.FC = () => {
           <CrowdScreen />
         </Cell>
         <XG m={mat.translate(0, 3840)}>
-          <Label x={24} y={1880} size={22}>
+          <Label x={24} y={1912} size={22}>
             {issues.length ? `CHECKS: ${issues.slice(0, 3).join(' | ')}` : 'CHECKS: palette problems() and trait tables OK (nothing near teal)'}
           </Label>
         </XG>

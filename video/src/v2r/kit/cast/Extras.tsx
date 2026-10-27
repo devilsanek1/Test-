@@ -32,14 +32,15 @@ export type StrangerProps = BuildProps & {
   h?: number;
   /** A page turn (the paper lifts a hair) at these times. */
   turnPageAt?: number[];
+  seed?: string;
 };
 
 /** The stranger on the S5 bench, reading an open newspaper (no masthead, no legible words). */
-export const Stranger: React.FC<StrangerProps> = ({x, y, h = 150, turnPageAt = [], at, fillLag}) => {
+export const Stranger: React.FC<StrangerProps> = ({x, y, h = 150, turnPageAt = [], at, fillLag, seed = 'stranger'}) => {
   const t = useTime();
   let lift = 0;
   for (const a of turnPageAt) if (t >= a && t < a + 0.4) lift = Math.sin(((t - a) / 0.4) * Math.PI) * h * 0.02;
-  return <Seated x={x} y={y - lift} h={h} seed="stranger" traits={STRANGER} model={STRANGER} read at={at} fillLag={fillLag} />;
+  return <Seated x={x} y={y - lift} h={h} seed={seed} traits={STRANGER} model={STRANGER} read at={at} fillLag={fillLag} />;
 };
 
 export const CAFE_OWNER: Partial<Traits> & Partial<Model> = {
@@ -68,10 +69,11 @@ export type CafeOwnerProps = BuildProps & {
   reachTo?: Pt;
   /** Mirror (wiping toward screen right). */
   flip?: boolean;
+  seed?: string;
 };
 
 /** The café owner: a small back in an apron with a cloth; one wiping stroke across the board. */
-export const CafeOwner: React.FC<CafeOwnerProps> = ({x, y, h = 170, wipeAt, wipeDur = 0.45, reachFrom, reachTo, flip, at, fillLag}) => {
+export const CafeOwner: React.FC<CafeOwnerProps> = ({x, y, h = 170, wipeAt, wipeDur = 0.45, reachFrom, reachTo, flip, at, fillLag, seed = 'cafeOwner'}) => {
   const t = useTime();
   const from: Pt = reachFrom ?? [-h * 0.12, -h * 0.68];
   const to: Pt = reachTo ?? [-h * 0.5, -h * 0.6];
@@ -80,8 +82,8 @@ export const CafeOwner: React.FC<CafeOwnerProps> = ({x, y, h = 170, wipeAt, wipe
   const rag = clothParts(hand, h);
   return (
     <>
-      <Person x={x} y={y} h={h} exact seed="cafeOwner" traits={CAFE_OWNER} model={CAFE_OWNER} pose="reach" view="back" reach={hand} flip={flip} at={at} fillLag={fillLag} />
-      <FigureG x={x} y={y} flip={flip} seed="cafeOwner/cloth">
+      <Person x={x} y={y} h={h} exact seed={seed} traits={CAFE_OWNER} model={CAFE_OWNER} pose="reach" view="back" reach={hand} flip={flip} at={at} fillLag={fillLag} />
+      <FigureG x={x} y={y} flip={flip} seed={`${seed}/cloth`}>
         <Parts parts={rag} inkPx={h >= 130 ? 2.2 : 1.6} offset={[1.5, 1]} seed="cafeCloth" at={at} fillLag={fillLag} />
       </FigureG>
     </>

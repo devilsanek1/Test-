@@ -185,13 +185,14 @@ export type StafferProps = {
   /** The hood goes up (default 10.36) over 0.2 s. */
   hoodAt?: number;
   at?: number;
+  seed?: string;
 };
 
-export const Staffer: React.FC<StafferProps> = ({x, y, h = 190, turnAt = S2.notebookOpenAt, toward = -1, hoodAt = S2.hoodAt, at}) => {
+export const Staffer: React.FC<StafferProps> = ({x, y, h = 190, turnAt = S2.notebookOpenAt, toward = -1, hoodAt = S2.hoodAt, at, seed = 'staffer'}) => {
   const t = useTime();
   const turn = toward * 0.7 * ease.inOutCubic(clamp((t - turnAt) / 0.25));
   const hood = clamp((t - hoodAt) / 0.2);
-  return <Seated x={x} y={y} h={h} seed="staffer" traits={STAFFER} model={{...STAFFER, hoodUp: hood > 0 ? ease.outCubic(hood) : undefined}} turn={turn} at={at} />;
+  return <Seated x={x} y={y} h={h} seed={seed} traits={STAFFER} model={{...STAFFER, hoodUp: hood > 0 ? ease.outCubic(hood) : undefined}} turn={turn} at={at} />;
 };
 
 export const REPORTER: Partial<Traits> & Partial<Model> = {
@@ -216,13 +217,14 @@ export type ReporterProps = {
   /** Which side the notebook is held on (+1 = toward the staffer on the right). */
   side?: 1 | -1;
   at?: number;
+  seed?: string;
 };
 
-export const Reporter: React.FC<ReporterProps> = ({x, y, h = 168, openAt = S2.notebookOpenAt, shutAt = S2.notebookShutAt, side = 1, at}) => {
+export const Reporter: React.FC<ReporterProps> = ({x, y, h = 168, openAt = S2.notebookOpenAt, shutAt = S2.notebookShutAt, side = 1, at, seed = 'reporter'}) => {
   const t = useTime();
   let k = ease.outCubic(clamp((t - openAt) / 0.18));
   if (t >= shutAt) k = 1 - ease.inCubic(clamp((t - shutAt) / 0.08));
-  return <Seated x={x} y={y} h={h} seed="reporter" traits={REPORTER} model={REPORTER} notebook={k} side={side} at={at} />;
+  return <Seated x={x} y={y} h={h} seed={seed} traits={REPORTER} model={REPORTER} notebook={k} side={side} at={at} />;
 };
 
 export {STAFF_SIL as STAFF_SILHOUETTE};
