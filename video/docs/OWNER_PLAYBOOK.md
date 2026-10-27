@@ -143,8 +143,8 @@ Format: **rule** — why / evidence (video, date).
   (12-24 drawings/s) while the camera glides; the G3 reel also renders at 60 (`G3_ANIMATIC.md`, 2026-10-26). — (v3, 2026-10-26).
 
 ## Captions
-- **Captions pop in place (or rise without clipping);** a slot or scroll reveal that cuts letters looked like a glitch. — (v1 reel, 2026-10-25).
-- **Captions are burned in;** platform auto-captions stay off. — (v1).
+- **Captions are burned in and pop in place (or rise without clipping);** a reveal that cuts letters looks like a glitch;
+  platform auto-captions stay off. — (v1 reel, 2026-10-25).
 
 ## Process and communication
 - **Playable video starts at the sketch animatic (G3); from then on every gate is a video, never only stills.** Before
