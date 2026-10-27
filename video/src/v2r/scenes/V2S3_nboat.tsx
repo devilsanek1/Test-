@@ -1,14 +1,16 @@
 // V2S3_nboat.tsx (lane L3, V2S3 NEAR helper; WORLD px at the 12.98 match, inside V2S3's camera): OUR moored
-// narrowboat, the bottom third's main mass, cut by both edges. The SAME boat as V2S4's foreground boat (TREATMENT §5
-// S3 / S4; plan_L3 §1-2): a SAGE cabin side lined out in cream (panels, beading, fancy corners), ONE plum gunwale
-// stripe, cream portholes warmly lit inside at sunset with curtains (a pot plant behind one, someone passing behind
-// another), slate side doors with brass ports, a painted flower panel in the roses-and-castles spirit (NO lettering),
-// a slate hull with its rubbing strake, rope fenders; the roof seen from a little above (the towpath is higher than
-// the water) and dressed: a boat pole and a plank, herb pots, the pigeon box, a coiled rope, a folded bike, the stove
-// chimney (smoke, clamped under the band), a watering can, a painted Buckby can, a lifebuoy, mushroom vents and a
-// geranium trough cut by the right edge. Life: smoke, curtains, herbs, the passer-by inside, a slow moored bob.
+// narrowboat, the bottom third's main mass, cut by both edges. The SAME boat as V2S4's foreground boat
+// (V2S4_wboat.tsx: its livery is mapped onto this view, see the cabin section): a SAGE cabin side under a brick
+// cantrail painted with diamonds, cream coach-line frames, ONE plum gunwale stripe with a mustard edge, cream
+// portholes with brass rings, lamp-lit inside at sunset with curtains (a pot plant behind one, a window box under
+// another, someone passing behind a third), the side doors painted with roses (no lettering), the castle medallion,
+// T-studs, rope fenders hanging from the roof rail, a slate hull with its rubbing strake; the roof seen from a little
+// above (the towpath is higher than the water) with grab rails, dressed: a boat pole and a plank, herb pots, the
+// pigeon box, a coiled rope, a folded bike, the stove chimney (smoke, clamped under the band), a watering can, a
+// painted Buckby can, a lifebuoy, mushroom vents and a geranium trough cut by the right edge. Life: smoke, curtains,
+// herbs, the passer-by inside, the fenders, a slow moored bob.
 //
-// Layout (world y): roof far edge 1262 · roof 1262-1326 · cant 1326-1340 · cabin side 1340-1570 · plum stripe
+// Layout (world y): roof far edge 1262 · roof 1262-1326 · cantrail 1326-1346 · cabin side 1346-1570 · plum stripe
 // 1570-1584 · hull 1584-1616 (waterline). x from -70 to 1170 (S3_BLEED). Low sun at left: cast shadows on the roof
 // run right, as colour (stone shade), never grey.
 //
@@ -35,10 +37,10 @@ export const NB = {
   water: 1616,
   /** Stove chimney: centre x, base on the roof, pipe top (smoke leaves under the cap). */
   chimney: {x: 706, base: 1306, top: 1206},
-  /** The mooring dolly on the gunwale (the rope to our coping's ring starts here). */
-  dolly: [118, 1572] as Pt,
-  /** Fenders hang from the gunwale at these x. */
-  fenders: [474, 1046],
+  /** The mooring T-stud on the gunwale (the rope to our coping's ring starts here; S4's left T-stud, mapped). */
+  dolly: [22, 1561] as Pt,
+  /** Rope fenders hang from the roof's near rail down the cabin side at these x (S4's three, mapped, + one more). */
+  fenders: [144, 350, 625, 1062],
 } as const;
 
 // ---------------------------------------------------------------- levels + small path helpers
@@ -61,9 +63,6 @@ const rr = (x: number, y: number, w: number, h: number, r: number) => {
   const k = Math.min(r, w / 2, h / 2);
   return `M${P(x + k, y)}L${P(x + w - k, y)}Q${P(x + w, y)} ${P(x + w, y + k)}L${P(x + w, y + h - k)}Q${P(x + w, y + h)} ${P(x + w - k, y + h)}L${P(x + k, y + h)}Q${P(x, y + h)} ${P(x, y + h - k)}L${P(x, y + k)}Q${P(x, y)} ${P(x + k, y)}Z`;
 };
-/** Lining-out with "fancy corners": a rectangle whose corners are notched by small quarter circles (concave). */
-const fancy = (x: number, y: number, w: number, h: number, k: number) =>
-  `M${P(x + k, y)}L${P(x + w - k, y)}Q${P(x + w - k, y + k)} ${P(x + w, y + k)}L${P(x + w, y + h - k)}Q${P(x + w - k, y + h - k)} ${P(x + w - k, y + h)}L${P(x + k, y + h)}Q${P(x + k, y + h - k)} ${P(x, y + h - k)}L${P(x, y + k)}Q${P(x + k, y + k)} ${P(x + k, y)}Z`;
 /** An oval wound the other way (a HOLE when appended to an ovalPath under the nonzero rule). */
 export const holePath = (cx: number, cy: number, rx: number, ry: number) =>
   `M${P(cx - rx, cy)}A${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 1 ${P(cx + rx, cy)}A${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 1 ${P(cx - rx, cy)}Z`;
@@ -82,126 +81,186 @@ const roofShadow = (b: Batch, x: number, y: number, w: number, len: number) => {
 const longLine = (x0: number, y0: number, x1: number, y1: number, seed: string, over: 'small' | 'medium' = 'small') => line(x0, y0, x1, y1, {seed, over, drift: 0.06, bow: 1.2});
 
 // ---------------------------------------------------------------- the cabin side, hull and roof surface (static)
+// The livery follows V2S4_wboat.tsx (the same boat, seen bigger in V2S4): S4's cabin section is mapped onto this one at
+// S3's scale (S4 x -> 166 + (x - 270) * 0.66; S4's 350 px cabin side = S3's 230 px), so the brick cantrail painted with
+// diamonds, the cream coach-line frames, the rose-painted side doors, the castle medallion, the brass-ringed portholes
+// (a pot plant behind one, a window box under another) and the T-studs sit where S4 shows them; S3 sees more of the
+// boat to the right (two more portholes, the saloon window cut by the edge). At sunset the glass is lamp-lit.
+const SK = 0.66;
+const s4x = (x4: number) => 166 + (x4 - 270) * SK;
+const CANT1 = NB.roofNear + 20; // the cantrail band (S4's 30 px)
 
-type Porthole = {x: number; y: number; r: number; curtain: string; inside: 'plant' | 'walker' | 'shelf' | 'kettle'};
+type Porthole = {x: number; y: number; r: number; curtain: string; inside: 'plant' | 'walker' | 'shelf' | 'kettle' | 'lamp'; box?: boolean};
 export const PORTHOLES: Porthole[] = [
-  {x: 34, y: 1440, r: 26, curtain: CM.box, inside: 'plant'},
-  {x: 394, y: 1440, r: 26, curtain: CM.blossom, inside: 'walker'},
-  {x: 776, y: 1440, r: 26, curtain: CM.coatMustard, inside: 'shelf'},
-  {x: 1012, y: 1440, r: 26, curtain: CM.leafRust, inside: 'kettle'},
+  {x: s4x(128), y: 1442, r: 26, curtain: CM.box, inside: 'lamp'},
+  {x: s4x(612), y: 1442, r: 26, curtain: CM.leafRust, inside: 'plant'},
+  {x: s4x(740), y: 1442, r: 26, curtain: CM.blossom, inside: 'shelf', box: true},
+  {x: s4x(1022), y: 1442, r: 26, curtain: CM.coatMustard, inside: 'kettle'},
+  {x: 812, y: 1442, r: 26, curtain: CM.box, inside: 'walker'},
+  {x: 1012, y: 1442, r: 26, curtain: CM.leafRust, inside: 'shelf'},
 ];
-/** The rectangular saloon window cut by the right edge; the painted flower panel; the side doors. */
-const SALOON = {x0: 1092, x1: 1214, y0: 1386, y1: 1490};
-/** The flower panel: a cream-grounded oval (a calm read beside her window, which stays the strongest), scale PK of
- *  the original 188 x 124 design. */
-const PK = 0.8;
-const PANEL = {x: 566, y: 1452, rx: 94 * PK, ry: 62 * PK};
-const DOORS = {x0: 166, x1: 306, y0: 1362, y1: 1556};
-const DW = (DOORS.x1 - DOORS.x0 - 4) / 2;
+/** The porthole someone passes behind (13.42-14.12). */
+const WALKER_PORT = 4;
+/** The rectangular saloon window cut by the right edge; the castle medallion; the side doors (S4's, mapped). */
+const SALOON = {x0: 1092, x1: 1214, y0: 1388, y1: 1492};
+const CASTLE = {x: s4x(890), y: 1444, rx: 66 * SK, ry: 62 * SK};
+const DOORS = {x0: s4x(270), x1: s4x(514), y0: 1370, y1: 1558};
+const DMID = (DOORS.x0 + DOORS.x1) / 2;
+const LEAVES: [number, number][] = [[DOORS.x0, DMID - 1.5], [DMID + 1.5, DOORS.x1]];
+
+/** A rounded-rect RING (outer clockwise, inner counter-clockwise: a hole under the nonzero rule). */
+function ringRR(x0: number, y0: number, x1: number, y1: number, r: number, w: number): string {
+  const one = (a: number, b: number, c: number, d: number, k: number, ccw: boolean) => {
+    if (!ccw) return `M${P(a + k, b)}L${P(c - k, b)}Q${P(c, b)} ${P(c, b + k)}L${P(c, d - k)}Q${P(c, d)} ${P(c - k, d)}L${P(a + k, d)}Q${P(a, d)} ${P(a, d - k)}L${P(a, b + k)}Q${P(a, b)} ${P(a + k, b)}Z`;
+    return `M${P(a + k, b)}Q${P(a, b)} ${P(a, b + k)}L${P(a, d - k)}Q${P(a, d)} ${P(a + k, d)}L${P(c - k, d)}Q${P(c, d)} ${P(c, d - k)}L${P(c, b + k)}Q${P(c, b)} ${P(c - k, b)}Z`;
+  };
+  return one(x0, y0, x1, y1, r, false) + one(x0 + w, y0 + w, x1 - w, y1 - w, Math.max(1, r - w), true);
+}
+
+/** A painted rose (S4's recipe): a disc, three swirl strokes into `swirl`. */
+function roseInto(b: Batch, x: number, y: number, R: number, c: string, seed: string, swirl: string[]) {
+  const r = rng(seed);
+  b.fill(c, ovalPath(x, y, R, R * 0.86));
+  let d = '';
+  for (let k = 0; k < 3; k++) {
+    const a = r.range(0, 6.28);
+    d += `M${P(x + Math.cos(a) * R * 0.2, y + Math.sin(a) * R * 0.18)}A${(R * 0.62).toFixed(1)} ${(R * 0.5).toFixed(1)} 0 0 1 ${P(x + Math.cos(a + 2.2) * R * 0.72, y + Math.sin(a + 2.2) * R * 0.6)}`;
+  }
+  swirl.push(d);
+}
 
 function cabinInto(L: Levels) {
   const {x0, x1} = NB;
   const W = x1 - x0;
-  // ---- level 0: the bands, top to bottom (adjacent, no overlap but the backing water under the roof's far edge)
+  // ---- level 0: the bands (backing water under the roof's far edge, roof, cantrail, cabin side, stripe, hull)
   const b0 = L.at(0);
   b0.rect(CM.water, x0, NB.roofFar - 8, W, 30);
-  b0.rect(CM.coatOat, x0, NB.roofFar, W, NB.roofNear - NB.roofFar);
-  b0.rect(CM.brickDeep, x0, NB.roofNear, W, NB.cant - NB.roofNear);
-  b0.rect(CM.sage, x0, NB.cant, W, NB.cabin1 - NB.cant);
+  b0.rect(CM.stucco, x0, NB.roofFar, W, NB.roofNear - NB.roofFar);
+  b0.rect(CM.brickDeep, x0, NB.roofNear, W, CANT1 - NB.roofNear);
+  b0.rect(CM.sage, x0, CANT1, W, NB.cabin1 - CANT1);
   b0.rect(CM.anchor, x0, NB.cabin1, W, NB.gun1 - NB.cabin1);
   b0.rect(CM.paneUnlit, x0, NB.gun1, W, NB.water - NB.gun1 + 2);
-  // ---- level 1: on the bands (rails, camber, the tumblehome catching the sky, the cant's shadow, the strake)
+  // ---- level 1: on the bands: the roof's far shade and rolled near edge, the camber catching the low sun, the cream
+  // coach line under the cantrail, the cabin's foot shade, the stripe's mustard edge, the strake
   const b1 = L.at(1);
-  b1.rect(CM.line, x0, NB.roofFar + 2, W, 4);
-  b1.rect(CM.limestone, x0, NB.roofNear - 9, W, 5);
-  b1.rect(CM.paper, x0, NB.roofFar + 22, W, 5);
-  b1.rect(CM.glass, x0, NB.cant + 4, W, 12);
-  b1.rect(CM.shadeCool, x0, NB.cant, W, 4);
-  b1.rect(CM.shadeCool, x0, NB.gun1 + 13, W, 4);
-  b1.rect(CM.brick, x0, NB.roofNear + 2, W, 3);
-  // ---- level 2: beading, lining-out panels (ink), the door leaves, the panel's border, the saloon frame
+  b1.rect(CM.stoneShade, x0, NB.roofFar, W, 5);
+  b1.rect(CM.limestone, x0, NB.roofNear - 6, W, 6);
+  b1.rect(CM.paper, x0, NB.roofFar + 24, W, 4);
+  b1.rect(CM.coatOat, x0, CANT1, W, 2.4);
+  b1.rect(CM.stoneShade, x0, NB.cabin1 - 5, W, 5);
+  b1.rect(CM.coatMustard, x0, NB.gun1 - 2, W, 1.8);
+  b1.rect(CM.shadeCool, x0, NB.gun1 + 12, W, 3.4);
+  // cream coach-line frames round the sage panels (S4's, mapped), and one more panel past S4's view
+  for (const [a, c] of [[s4x(-30), s4x(238)], [s4x(532), s4x(828)], [s4x(956), s4x(1160)], [s4x(1190), x1 + 40]] as [number, number][]) {
+    b1.fill(CM.coatOat, ringRR(a, CANT1 + 13, c, NB.cabin1 - 16, 12, 2.6));
+  }
+  // diamonds painted along the cantrail (mustard and paper), brass vents on it
+  for (let x = s4x(20); x < x1; x += 58 * SK) {
+    const c = Math.round((x - s4x(20)) / (58 * SK)) % 2 ? CM.coatMustard : CM.paper;
+    const cy = NB.roofNear + 10;
+    b1.poly(c, [[x, cy - 5.3], [x + 6, cy], [x, cy + 5.3], [x - 6, cy]]);
+  }
+  // the grab rails (wood) on stanchions, far and near
+  for (const [y, h] of [[NB.roofFar + 2, 7], [NB.roofNear - 4, 8]] as [number, number][]) {
+    b1.rect(CM.line, x0, y - h, W, 3);
+    for (let x = x0 + 30; x < x1; x += 80) b1.rect(CM.line, x, y - h, 3, h);
+  }
+  // T-studs on the gunwale
+  for (const x of [s4x(52), s4x(588), s4x(1066), 990]) {
+    b1.rect(CM.anchor, x - 3.3, NB.cabin1 - 9, 6.6, 9);
+    b1.rect(CM.anchor, x - 6.6, NB.cabin1 - 12, 13.2, 3.4);
+  }
+  // ---- level 2: porthole rims (cream: per frame, with the curtains), the door frame, the castle's cream ring, the saloon frame
   const b2 = L.at(2);
-  b2.rect(CM.paper, x0, NB.cant + 16, W, 2.4);
-  b2.rect(CM.paper, x0, NB.cabin1 - 12, W, 2.4);
-  b2.rect(CM.shadeCool, x0, NB.cabin1 - 9.6, W, 1.6);
-  const panels: [number, number][] = [
-    [x0 - 30, DOORS.x0 - 16],
-    [DOORS.x1 + 16, 694],
-    [710, x1 + 40],
-  ];
-  for (const [a, c] of panels) {
-    b2.ink(fancy(a, 1362, c - a, 180, 12), 3, CM.coatOat);
-    b2.ink(fancy(a + 8, 1370, c - a - 16, 164, 9), 1.4, CM.coatMustard);
+  b2.rect(CM.line, DOORS.x0 - 6, DOORS.y0 - 6, DOORS.x1 - DOORS.x0 + 12, DOORS.y1 - DOORS.y0 + 8);
+  b2.fill(CM.coatOat, ovalPath(CASTLE.x, CASTLE.y, CASTLE.rx + 4, CASTLE.ry + 4));
+  b2.fill(CM.coatOat, ringRR(SALOON.x0 - 9, SALOON.y0 - 9, SALOON.x1 + 9, SALOON.y1 + 9, 14, 9));
+  for (const x of [s4x(196), s4x(566), s4x(956), 930]) {
+    b2.rect(CM.coatMustard, x - 8, NB.roofNear + 4, 16, 10);
+    b2.rect(CM.line, x - 5.3, NB.roofNear + 6.6, 10.6, 1.5);
+    b2.rect(CM.line, x - 5.3, NB.roofNear + 9.2, 10.6, 1.5);
   }
-  for (let k = 0; k < 2; k++) b2.fill(CM.paneUnlit, rr(DOORS.x0 + k * (DW + 4), DOORS.y0, DW, DOORS.y1 - DOORS.y0, 6));
-  b2.fill(CM.coatMustard, ovalPath(PANEL.x, PANEL.y, PANEL.rx + 7, PANEL.ry + 7));
-  b2.fill(CM.coatOat, rr(SALOON.x0 - 9, SALOON.y0 - 9, SALOON.x1 - SALOON.x0 + 18, SALOON.y1 - SALOON.y0 + 18, 16));
-  b2.rect(CM.coatMustard, DOORS.x0 - 6, DOORS.y1 - 3, DOORS.x1 - DOORS.x0 + 12, 6);
-  // ---- level 3: door lining + diamonds + handles, the panel's slate ground, the saloon's lamp-lit glass
+  // ---- level 3: the door leaves (brick), the castle's paper ground, the saloon's lamp-lit glass
   const b3 = L.at(3);
-  for (let k = 0; k < 2; k++) {
-    const dx = DOORS.x0 + k * (DW + 4);
-    b3.ink(fancy(dx + 8, DOORS.y0 + 62, DW - 16, DOORS.y1 - DOORS.y0 - 74, 6), 2, CM.coatOat);
-    const cx = dx + DW / 2;
-    const cy = DOORS.y0 + 128;
-    b3.poly(CM.coatMustard, [[cx, cy - 26], [cx + 15, cy], [cx, cy + 26], [cx - 15, cy]]);
-    b3.fill(CM.coatMustard, ovalPath(k === 0 ? dx + DW - 10 : dx + 10, DOORS.y0 + 100, 4.2, 4.2));
-  }
-  b3.fill(CM.coatOat, ovalPath(PANEL.x, PANEL.y, PANEL.rx, PANEL.ry));
-  b3.fill(CM.lamp, rr(SALOON.x0, SALOON.y0, SALOON.x1 - SALOON.x0, SALOON.y1 - SALOON.y0, 10));
-  // ---- level 4: diamond hearts, the panel's leaves, the saloon's interior (light, shelf, jars, lamp shade)
+  for (const [a, c] of LEAVES) b3.rect(CM.brickDeep, a, DOORS.y0, c - a, DOORS.y1 - DOORS.y0);
+  b3.fill(CM.paper, ovalPath(CASTLE.x, CASTLE.y, CASTLE.rx, CASTLE.ry));
+  b3.fill(CM.lamp, `M${P(SALOON.x0, SALOON.y0)}L${P(SALOON.x1, SALOON.y0)}L${P(SALOON.x1, SALOON.y1)}L${P(SALOON.x0, SALOON.y1)}Z`);
+  // ---- level 4: the door panels (cream border, paper ground), the castle's lake and hills, the saloon's interior
   const b4 = L.at(4);
-  for (let k = 0; k < 2; k++) {
-    const cx = DOORS.x0 + k * (DW + 4) + DW / 2;
-    const cy = DOORS.y0 + 128;
-    b4.poly(CM.box, [[cx, cy - 13], [cx + 7.5, cy], [cx, cy + 13], [cx - 7.5, cy]]);
+  for (const [a, c] of LEAVES) {
+    b4.fill(CM.coatOat, ringRR(a + 6.6, DOORS.y0 + 8, c - 6.6, DOORS.y1 - 8, 6.6, 3.3));
+    b4.rect(CM.paper, a + 10, DOORS.y0 + 11.3, c - a - 20, DOORS.y1 - DOORS.y0 - 22.6);
   }
-  for (const [dx, dy, Lf, a] of PANEL_LEAVES) b4.fill(CM.sage, leafPath(PANEL.x + dx, PANEL.y + dy, Lf, Lf * 0.32, a));
-  b4.ink(PANEL_LEAVES.map(([dx, dy, Lf, a]) => {
-    const ar = (a * Math.PI) / 180;
-    return `M${P(PANEL.x + dx - Math.cos(ar) * Lf * 0.42, PANEL.y + dy - Math.sin(ar) * Lf * 0.42)}L${P(PANEL.x + dx + Math.cos(ar) * Lf * 0.42, PANEL.y + dy + Math.sin(ar) * Lf * 0.42)}`;
-  }).join(''), 1.2, CM.coatMustard);
-  b4.ink(ellipseInk(PANEL.x, PANEL.y, PANEL.rx - 7, PANEL.ry - 7, {seed: 's3nb/pl2', wobble: 0.01, overlap: 4}), 1.6, CM.leafRust);
+  const cs = CASTLE.rx / 50;
+  const CX = CASTLE.x;
+  const CY = CASTLE.y;
+  b4.fill(CM.water, `M${P(CX - 46 * cs, CY + 26 * cs)}Q${P(CX, CY + 18 * cs)} ${P(CX + 46 * cs, CY + 26 * cs)}Q${P(CX, CY + 44 * cs)} ${P(CX - 46 * cs, CY + 26 * cs)}Z`);
+  b4.fill(CM.sage, lobes(CX - 50 * cs, CX - 8 * cs, CY + 24 * cs, 18 * cs, 'castleHillA', 2));
+  b4.fill(CM.sage, lobes(CX + 10 * cs, CX + 50 * cs, CY + 24 * cs, 15 * cs, 'castleHillB', 2));
   b4.rect(CM.lampCore, SALOON.x0 + 10, SALOON.y0 + 26, 34, 50);
   b4.rect(CM.line, SALOON.x0 + 4, SALOON.y0 + 44, 110, 4);
   for (const [jx, jh, jc] of [[SALOON.x0 + 52, 16, CM.brick], [SALOON.x0 + 66, 11, CM.coatSlate], [SALOON.x0 + 80, 19, CM.sage]] as [number, number, string][]) b4.rect(jc, jx, SALOON.y0 + 44 - jh, 10, jh);
   b4.fill(CM.box, `M${P(SALOON.x0 + 18, SALOON.y0 + 12)}L${P(SALOON.x0 + 36, SALOON.y0 + 12)}L${P(SALOON.x0 + 42, SALOON.y0 + 26)}L${P(SALOON.x0 + 12, SALOON.y0 + 26)}Z`);
-  // ---- level 5: roses (outer), the valance, the sill pots
+  // ---- level 5: leaves on the door panels, the castle (towers, walls), the valance and the sill pots
   const b5 = L.at(5);
-  for (const [dx, dy, R, c0] of PANEL_ROSES) b5.fill(c0, ovalPath(PANEL.x + dx, PANEL.y + dy, R, R * 0.84));
+  for (const [a, c] of LEAVES) {
+    const cx = (a + c) / 2;
+    const cy = (DOORS.y0 + DOORS.y1) / 2 - 14.5;
+    const w = c - a - 26.4;
+    for (let k = 0; k < 8; k++) {
+      const an = (k / 8) * Math.PI * 2 + 0.3;
+      b5.fill(CM.sage, leafPath(cx + Math.cos(an) * w * 0.32, cy + Math.sin(an) * w * 0.36, w * 0.32, w * 0.1, (an * 180) / Math.PI));
+    }
+    b5.fill(CM.sage, leafPath(cx - 4, DOORS.y1 - 30, 17, 4.6, 14));
+    b5.fill(CM.sage, leafPath(cx + 9, DOORS.y1 - 34, 14.5, 4, -30));
+  }
+  b5.rect(CM.brickLight, CX - 22 * cs, CY - 8 * cs, 44 * cs, 30 * cs);
+  b5.rect(CM.brickLight, CX - 27 * cs, CY - 24 * cs, 12 * cs, 46 * cs);
+  b5.rect(CM.brickLight, CX + 15 * cs, CY - 20 * cs, 12 * cs, 42 * cs);
+  b5.poly(CM.brick, [[CX - 29 * cs, CY - 24 * cs], [CX - 21 * cs, CY - 37 * cs], [CX - 13 * cs, CY - 24 * cs]]);
+  b5.poly(CM.brick, [[CX + 13 * cs, CY - 20 * cs], [CX + 21 * cs, CY - 33 * cs], [CX + 29 * cs, CY - 20 * cs]]);
   b5.fill(CM.box, `M${P(SALOON.x0, SALOON.y0)}L${P(SALOON.x1, SALOON.y0)}L${P(SALOON.x1, SALOON.y0 + 16)}Q${P(SALOON.x0 + 60, SALOON.y0 + 26)} ${P(SALOON.x0, SALOON.y0 + 16)}Z`);
   b5.fill(CM.brick, potPath(SALOON.x0 + 30, SALOON.y1 - 2, 26, 18));
   b5.fill(CM.coatOat, potPath(SALOON.x0 + 82, SALOON.y1 - 2, 20, 14));
-  // ---- level 6: roses (inner), daisies, the sill plants
+  // ---- level 6: roses over the leaves, the castle's door and lit windows, the sill plants, brass on the doors
   const b6 = L.at(6);
-  for (const [dx, dy, R, , c1] of PANEL_ROSES) b6.fill(c1, ovalPath(PANEL.x + dx + R * 0.08, PANEL.y + dy + R * 0.06, R * 0.55, R * 0.46));
-  for (const [dx, dy] of PANEL_DAISIES) {
-    for (let k = 0; k < 6; k++) {
-      const a = (k / 6) * Math.PI * 2;
-      b6.fill(CM.coatMustard, ovalPath(PANEL.x + dx + Math.cos(a) * 4.6, PANEL.y + dy + Math.sin(a) * 4.2, 2.9, 2.9));
-    }
+  const sw: string[] = [];
+  for (const [a, c] of LEAVES) {
+    const cx = (a + c) / 2;
+    const cy = (DOORS.y0 + DOORS.y1) / 2 - 14.5;
+    const w = c - a - 26.4;
+    roseInto(b6, cx, cy, w * 0.18, CM.brick, `s3rose${a}a`, sw);
+    roseInto(b6, cx - w * 0.24, cy + w * 0.2, w * 0.12, CM.box, `s3rose${a}b`, sw);
+    roseInto(b6, cx + w * 0.24, cy + w * 0.16, w * 0.12, CM.blossom, `s3rose${a}c`, sw);
+    roseInto(b6, cx + w * 0.05, cy - w * 0.28, w * 0.1, CM.coatMustard, `s3rose${a}d`, sw);
+    roseInto(b6, cx - 10.5, DOORS.y1 - 37, 6.6, CM.box, `s3posy${a}`, sw);
+    roseInto(b6, cx + 10.5, DOORS.y1 - 39.6, 6, CM.coatMustard, `s3posy2${a}`, sw);
   }
-  for (const [dx, dy] of [[-76, 6], [78, -22], [-36, -48], [34, 50], [-70, 38], [74, 34]] as [number, number][]) b6.fill(CM.brick, ovalPath(PANEL.x + dx * PK, PANEL.y + dy * PK, 2, 2));
+  b6.ink(sw.join(''), 1.1, CM.ink);
+  b6.rect(CM.anchor, CX - 4 * cs, CY + 8 * cs, 8 * cs, 14 * cs);
+  b6.rect(CM.lamp, CX - 23 * cs, CY - 16 * cs, 4 * cs, 5 * cs);
+  b6.rect(CM.lamp, CX + 19 * cs, CY - 12 * cs, 4 * cs, 5 * cs);
   b6.fill(CM.sage, lobes(SALOON.x0 + 10, SALOON.x0 + 52, SALOON.y1 - 18, 30, 's3nb/sal1', 3));
   b6.fill(CM.sage, lobes(SALOON.x0 + 68, SALOON.x0 + 98, SALOON.y1 - 14, 22, 's3nb/sal2', 3));
-  // ---- level 7: rose hearts + highlight strokes, daisy hearts
-  const b7 = L.at(7);
-  for (const [dx, dy, R, c0] of PANEL_ROSES) b7.fill(c0, ovalPath(PANEL.x + dx + R * 0.12, PANEL.y + dy + R * 0.1, R * 0.24, R * 0.2));
-  for (const [dx, dy] of PANEL_DAISIES) b7.fill(CM.leafRust, ovalPath(PANEL.x + dx, PANEL.y + dy, 2.6, 2.6));
-  let hl = '';
-  for (const [dx, dy, R] of PANEL_ROSES) hl += arcInk(PANEL.x + dx, PANEL.y + dy, R * 0.78, R * 0.66, 200, 300, {seed: `s3nb/rh${dx}`}) + arcInk(PANEL.x + dx, PANEL.y + dy, R * 0.5, R * 0.42, 20, 120, {seed: `s3nb/rh2${dx}`});
-  b7.ink(hl, 1.8, CM.paper);
+  for (const hy of [DOORS.y0 + 24, DOORS.y1 - 24]) {
+    b6.rect(CM.coatMustard, DOORS.x0 - 4.6, hy - 2.6, 10.6, 5.3);
+    b6.rect(CM.coatMustard, DOORS.x1 - 6, hy - 2.6, 10.6, 5.3);
+  }
+  b6.fill(CM.coatMustard, ovalPath(DMID - 8, (DOORS.y0 + DOORS.y1) / 2 + 22, 4, 4));
+  b6.fill(CM.coatMustard, ovalPath(DMID + 8, (DOORS.y0 + DOORS.y1) / 2 + 22, 4, 4));
+  // daisies on the door panels (mustard, on the paper ground)
+  for (const [a, c] of LEAVES) {
+    const cx = (a + c) / 2;
+    const cy = (DOORS.y0 + DOORS.y1) / 2 - 14.5;
+    const w = c - a - 26.4;
+    const rr = rng(`s3daisy${a}`);
+    for (let k = 0; k < 4; k++) {
+      const dx = cx + rr.range(-w * 0.38, w * 0.38);
+      const dy = cy + rr.range(-w * 0.1, w * 0.5);
+      for (let q = 0; q < 5; q++) b6.fill(CM.coatMustard, ovalPath(dx + Math.cos((q * 6.28) / 5) * 2.6, dy + Math.sin((q * 6.28) / 5) * 2.6, 1.8, 1.8));
+    }
+  }
 }
-
-const PANEL_LEAVES: [number, number, number, number][] = ([
-  [-58, -6, 34, -150], [-50, 22, 32, 160], [-6, -36, 30, -100], [30, 30, 32, 60], [62, -14, 34, -20], [58, 20, 30, 25], [-28, 40, 28, 120], [16, -40, 26, -70],
-] as [number, number, number, number][]).map(([x, y, l, a]) => [x * PK, y * PK, l * PK, a] as [number, number, number, number]);
-const PANEL_ROSES: [number, number, number, string, string][] = ([
-  [-24, 2, 26, CM.box, CM.leafRust],
-  [24, -8, 22, CM.blossom, CM.brick],
-  [6, 26, 17, CM.leafRust, CM.brickDeep],
-] as [number, number, number, string, string][]).map(([x, y, r, a, b]) => [x * PK, y * PK, r * PK, a, b] as [number, number, number, string, string]);
-const PANEL_DAISIES: [number, number][] = ([[-62, -24], [66, 2], [-46, 30], [44, 34], [-6, -44]] as [number, number][]).map(([x, y]) => [x * PK, y * PK] as [number, number]);
 
 // ---------------------------------------------------------------- the roof dressing (static)
 
@@ -271,7 +330,7 @@ function roofInto(L: Levels) {
   }
   a.ink(spokes, 1, CM.stoneShade);
   for (const [wx, wy] of [wA, wB]) c.fill(CM.coatMustard, ovalPath(wx, wy, 3.2, 3.2));
-  c.ink(`M${P(wA[0], wA[1])}L${P(g[0] + 2, g[1] - 44)}L${P(wB[0], wB[1])}M${P(g[0] + 2, g[1] - 44)}L${P(g[0] - 2, g[1] - 86)}M${P(g[0] + 2, g[1] - 44)}L${P(g[0] + 22, g[1] - 70)}L${P(g[0] + 34, g[1] - 72)}`, 5, CM.coatMustard);
+  c.ink(`M${P(wA[0], wA[1])}L${P(g[0] + 2, g[1] - 44)}L${P(wB[0], wB[1])}M${P(g[0] + 2, g[1] - 44)}L${P(g[0] - 2, g[1] - 86)}M${P(g[0] + 2, g[1] - 44)}L${P(g[0] + 22, g[1] - 70)}L${P(g[0] + 34, g[1] - 72)}`, 5, CM.brickDeep);
   d.fill(CM.anchor, `M${P(g[0] - 16, g[1] - 88)}Q${P(g[0] - 2, g[1] - 96)} ${P(g[0] + 12, g[1] - 89)}L${P(g[0] + 10, g[1] - 84)}L${P(g[0] - 14, g[1] - 84)}Z`);
   d.fill(CM.anchor, ovalPath(g[0] + 36, g[1] - 72, 5, 3));
   d.ink(circleInk(wA[0], wA[1], R, {seed: 's3nb/bwA', wobble: 0.02}) + circleInk(wB[0], wB[1], R, {seed: 's3nb/bwB', wobble: 0.02}), hair, CM.ink, 0.3);
@@ -341,16 +400,13 @@ function contoursInto(b: Batch) {
   b.ink(longLine(x0, NB.cabin1, x1, NB.cabin1, 's3nb/cabBase', 'medium'), INK_PX.front, CM.ink, 0.25);
   b.ink(longLine(x0, NB.roofFar, x1, NB.roofFar, 's3nb/roofFar'), INK_PX.mid, CM.ink, 0.35);
   b.ink(longLine(x0, NB.water, x1, NB.water, 's3nb/water'), INK_PX.far, CM.ink, 0.5);
-  // the doors' edges and the panel's oval
-  let dd = '';
-  for (let k = 0; k < 2; k++) {
-    const dx = DOORS.x0 + k * (DW + 4);
-    dd += line(dx, DOORS.y0, dx, DOORS.y1, {seed: `s3nb/dl${k}`, over: 'small', drift: 0.1}) + line(dx + DW, DOORS.y0, dx + DW, DOORS.y1, {seed: `s3nb/dr${k}`, over: 'small', drift: 0.1});
-  }
-  dd += line(DOORS.x0, DOORS.y0, DOORS.x1, DOORS.y0, {seed: 's3nb/dt', over: 'small', drift: 0.1});
-  b.ink(dd, INK_PX.mid, CM.ink, 0.2);
-  b.ink(ellipseInk(PANEL.x, PANEL.y, PANEL.rx + 7, PANEL.ry + 7, {seed: 's3nb/panelInk', wobble: 0.015}), INK_PX.far, CM.ink, 0.25);
-  b.ink(line(SALOON.x0 - 9, SALOON.y0 - 9, SALOON.x0 - 9, SALOON.y1 + 9, {seed: 's3nb/salL', over: 'small', drift: 0.1}) + line(SALOON.x0 - 9, SALOON.y1 + 9, SALOON.x1 + 20, SALOON.y1 + 9, {seed: 's3nb/salB', over: 'small', drift: 0.1}), INK_PX.far, CM.ink, 0.2);
+  // the door frame and its middle, the castle's ring, the saloon frame (S4's strokes, mapped)
+  let m = '';
+  m += line(DOORS.x0 - 6, DOORS.y0 - 6, DOORS.x1 + 6, DOORS.y0 - 6, {seed: 's3door/t', over: 'small', drift: 0.1}) + line(DOORS.x0 - 6, DOORS.y0 - 6, DOORS.x0 - 6, DOORS.y1 + 2, {seed: 's3door/l', over: 'small', drift: 0.1}) + line(DOORS.x1 + 6, DOORS.y0 - 6, DOORS.x1 + 6, DOORS.y1 + 2, {seed: 's3door/r', over: 'small', drift: 0.1});
+  m += line(DMID, DOORS.y0, DMID, DOORS.y1, {seed: 's3door/m', over: 'none', drift: 0.05});
+  m += `M${P(CASTLE.x - CASTLE.rx - 4, CASTLE.y)}A${(CASTLE.rx + 4).toFixed(1)} ${(CASTLE.ry + 4).toFixed(1)} 0 0 1 ${P(CASTLE.x + CASTLE.rx + 4, CASTLE.y)}`;
+  m += line(SALOON.x0 - 9, SALOON.y0 - 9, SALOON.x0 - 9, SALOON.y1 + 9, {seed: 's3nb/salL', over: 'small', drift: 0.1}) + line(SALOON.x0 - 9, SALOON.y1 + 9, SALOON.x1 + 20, SALOON.y1 + 9, {seed: 's3nb/salB', over: 'small', drift: 0.1});
+  b.ink(m, INK_PX.mid, CM.ink, 0.3);
 }
 
 // ---------------------------------------------------------------- life (per frame, few nodes)
@@ -422,7 +478,7 @@ function herbsInto(L: Levels, t: number) {
   a.ink(outline, INK_PX.hair, CM.ink, 0.4);
 }
 
-/** The porthole interiors (warm lamp-lit glass + what is inside), drawn per frame under the curtains. */
+/** The porthole interiors (warm lamp-lit glass + what is inside), static, under the curtains. */
 function portholesBack(L: Levels) {
   const g0 = L.at(0);
   const g1 = L.at(1);
@@ -435,6 +491,7 @@ function portholesBack(L: Levels) {
       g1.rect(CM.line, x - r, y + r * 0.62, r * 2, 3);
       g1.fill(CM.brick, potPath(x + 6, y + r * 0.62, 16, 12));
       g2.fill(CM.sage, lobes(x - 8, x + 20, y + r * 0.62 - 10, 24, 's3nb/pp', 3));
+      g2.fill(CM.leafGold, leafPath(x + 9, y - 6, 12, 4, -40));
     } else if (h.inside === 'shelf') {
       g1.rect(CM.line, x - r, y + 7, r * 2, 3);
       g2.rect(CM.coatSlate, x - 12, y - 5, 7, 12);
@@ -451,39 +508,48 @@ function portholesBack(L: Levels) {
   }
 }
 
-/** Curtains (their inner edges sway a little: a draught through the hatch), the rods, then the cream rims with brass
- *  dogs and the door ports. Drawn per frame over the interiors. */
-function portholesFront(L: Levels, t: number) {
-  const cu = L.at(0);
-  const rod = L.at(1);
-  const rim = L.at(2);
-  const dog = L.at(3);
+/** Curtains, tied back; their inner edges sway a little (a draught through the hatch). Per frame. */
+function curtainsInto(b: Batch, t: number) {
   for (const [i, h] of PORTHOLES.entries()) {
     const {x, y, r} = h;
     const sw = 1.6 * Math.sin(t * 1.7 + i * 1.9) + 0.8 * Math.sin(t * 3.9 + i);
-    cu.fill(h.curtain, `M${P(x - r - 1, y - r * 0.85)}Q${P(x - r * 0.15 + sw, y - r * 0.9)} ${P(x - r * 0.38 + sw * 0.6, y + r * 0.1)}Q${P(x - r * 0.6, y + r * 0.5)} ${P(x - r - 1, y + r * 0.62)}Z`);
-    cu.fill(h.curtain, `M${P(x + r + 1, y - r * 0.85)}Q${P(x + r * 0.15 + sw * 0.7, y - r * 0.9)} ${P(x + r * 0.38 + sw * 0.4, y + r * 0.1)}Q${P(x + r * 0.6, y + r * 0.5)} ${P(x + r + 1, y + r * 0.62)}Z`);
-    rod.rect(CM.line, x - r, y - r * 0.92, r * 2, 2.6);
-    const R = r + 9;
-    rim.fill(CM.coatOat, ringPath(x, y, R, R, r, r));
-    for (const a of [-0.6, 1.2, 2.9]) dog.fill(CM.coatMustard, ovalPath(x + Math.cos(a + i) * (R - 4.5), y + Math.sin(a + i) * (R - 4.5), 2.6, 2.6));
-    dog.ink(circleInk(x, y, R, {seed: `s3nb/ph${i}`, wobble: 0.02}), INK_PX.far, CM.ink, 0.2);
-  }
-  for (let k = 0; k < 2; k++) {
-    const cx = DOORS.x0 + k * (DW + 4) + DW / 2;
-    const cy = DOORS.y0 + 34;
-    const sw = 1.2 * Math.sin(t * 1.9 + k * 2.4);
-    rim.fill(CM.coatMustard, ringPath(cx, cy, 17, 17, 12, 12));
-    cu.fill(CM.lamp, ovalPath(cx, cy, 12.5, 12.5));
-    rod.fill(k ? CM.box : CM.blossom, `M${P(cx - 12, cy - 8)}Q${P(cx - 4 + sw, cy - 10)} ${P(cx - 5 + sw, cy + 4)}L${P(cx - 12, cy + 6)}Z`);
-    dog.ink(circleInk(cx, cy, 17, {seed: `s3nb/dp${k}`, wobble: 0.02}), INK_PX.hair, CM.ink, 0.3);
+    b.fill(h.curtain, `M${P(x - r - 1, y - r * 0.85)}Q${P(x - r * 0.15 + sw, y - r * 0.9)} ${P(x - r * 0.38 + sw * 0.6, y + r * 0.1)}Q${P(x - r * 0.6, y + r * 0.5)} ${P(x - r - 1, y + r * 0.62)}Z`);
+    if (h.inside !== 'plant') b.fill(h.curtain, `M${P(x + r + 1, y - r * 0.85)}Q${P(x + r * 0.15 + sw * 0.7, y - r * 0.9)} ${P(x + r * 0.38 + sw * 0.4, y + r * 0.1)}Q${P(x + r * 0.6, y + r * 0.5)} ${P(x + r + 1, y + r * 0.62)}Z`);
   }
 }
 
-/** Someone crossing the saloon behind porthole 2 (13.42-14.12): a plum head-and-shoulders, clipped to the glass. */
+/** Static, over the curtains: the curtain rods, the cream rims, the brass rings and their dogs (S4's porthole). */
+function portholesFront(L: Levels) {
+  const rod = L.at(0);
+  const rim = L.at(1);
+  const dog = L.at(2);
+  for (const [i, h] of PORTHOLES.entries()) {
+    const {x, y, r} = h;
+    rod.rect(CM.coatMustard, x - r * 0.9, y - r * 0.68, r * 1.8, 2.4);
+    rim.fill(CM.coatOat, ringPath(x, y, r + 8, r + 8, r + 2.6, r + 2.6));
+    rim.fill(CM.coatMustard, ringPath(x, y, r + 2.6, r + 2.6, r, r));
+    for (let k = 0; k < 4; k++) {
+      const a = (k / 4) * Math.PI * 2 + 0.4;
+      dog.fill(CM.coatMustard, ovalPath(x + Math.cos(a) * (r + 5.3), y + Math.sin(a) * (r + 5.3), 2.3, 2.3));
+    }
+    dog.ink(circleInk(x, y, r + 8, {seed: `s3nb/ph${i}`, wobble: 0.02}), INK_PX.far, CM.ink, 0.2);
+  }
+  // the window box under the boxed porthole: a wooden trough of flowers trailing (S4's, mapped)
+  const wb = PORTHOLES.find((p) => p.box)!;
+  const by = wb.y + 42;
+  rod.rect(CM.line, wb.x - 33, by, 66, 14.5);
+  rod.rect(CM.brickDeep, wb.x - 34.3, by - 1.3, 68.6, 3.3);
+  rim.fill(CM.leafGold, lobes(wb.x - 35.6, wb.x + 35.6, by, 20, 's3wbox', 5));
+  rim.fill(CM.leafRust, leafPath(wb.x - 30, by + 18, 14.5, 4, 70));
+  rim.fill(CM.leafGold, leafPath(wb.x + 28, by + 21, 17, 4, 100));
+  for (let k = 0; k < 7; k++) dog.fill([CM.box, CM.blossom, CM.paper, CM.coatMustard][k % 4], ovalPath(wb.x - 28 + k * 9.2, by - 12 + (k % 3) * 4, 3.4, 3.1));
+  dog.ink(lobes(wb.x - 35.6, wb.x + 35.6, by, 20, 's3wbox', 5).replace(/Z$/, ''), 1.2, CM.ink, 0.35);
+}
+
+/** Someone crossing the saloon behind a porthole (13.42-14.12): a plum head-and-shoulders, clipped to the glass. */
 const WALKER = {t0: 13.42, dur: 0.7};
 function walkerInto(b: Batch, t: number) {
-  const h = PORTHOLES[1];
+  const h = PORTHOLES[WALKER_PORT];
   const k = (t - WALKER.t0) / WALKER.dur;
   if (k < -0.05 || k > 1.05) return;
   const px = lerp(h.x - h.r * 2.2, h.x + h.r * 2.2, k);
@@ -493,24 +559,24 @@ function walkerInto(b: Batch, t: number) {
   b.fill(CM.anchor, `M${P(px - 24, h.y + h.r + 4)}L${P(px - 22, h.y + 10 - by)}Q${P(px, h.y - 2 - by)} ${P(px + 22, h.y + 10 - by)}L${P(px + 24, h.y + h.r + 4)}Z`);
 }
 
-/** Rope fenders hanging from the gunwale over the hull (they swing a hair as the boat rocks). */
+/** Rope fenders hanging from the roof's near rail down the cabin side (S4's, mapped); they swing with the boat. */
 function fendersInto(L: Levels, t: number) {
   const a = L.at(0);
   const c = L.at(1);
-  for (const [i, fx] of NB.fenders.entries()) {
-    const sw = 1.4 * Math.sin(t * 1.3 + i * 2.1);
-    const topY = NB.cabin1 + 6;
-    const fy0 = NB.gun1 + 4;
-    const fy1 = NB.water + 10;
-    const cx = fx + sw;
-    a.ink(`M${P(fx, topY)}L${P(cx, fy0)}`, 2.6, CM.line);
-    a.fill(CM.coatOat, rr(cx - 17, fy0, 34, fy1 - fy0, 14));
-    c.fill(CM.leafGold, rr(cx + 5, fy0 + 3, 9, fy1 - fy0 - 6, 5));
-    let tw = '';
-    for (let y = fy0 + 6; y < fy1 - 3; y += 6) tw += `M${P(cx - 14, y)}Q${P(cx, y + 3.5)} ${P(cx + 14, y)}`;
-    c.ink(tw, 1.2, CM.line);
-    c.ink(rr(cx - 17, fy0, 34, fy1 - fy0, 14), INK_PX.far, CM.ink, 0.3);
+  const top = NB.roofNear - 4;
+  const fy = NB.cabin1 - 7;
+  const rope: string[] = [];
+  for (const [i, x] of NB.fenders.entries()) {
+    const sw = Math.sin(t * 1.1 + i * 1.9) * 1.2;
+    a.ink(`M${P(x, top)}Q${P(x + 2 + sw * 0.4, (top + fy) / 2)} ${P(x + sw, fy)}`, 2.4, CM.coatOat);
+    const fx = x + sw;
+    c.fill(CM.coatOat, `M${P(fx - 10, fy)}L${P(fx + 10, fy)}Q${P(fx + 12, fy + 21)} ${P(fx + 9, fy + 42)}L${P(fx - 9, fy + 42)}Q${P(fx - 12, fy + 21)} ${P(fx - 10, fy)}Z`);
+    let rp = '';
+    for (let k = 1; k < 7; k++) rp += `M${P(fx - 10.5, fy + k * 6)}Q${P(fx, fy + k * 6 + 2.6)} ${P(fx + 10.5, fy + k * 6)}`;
+    rope.push(rp);
+    c.ink(`M${P(fx - 10, fy)}Q${P(fx - 12, fy + 21)} ${P(fx - 9, fy + 42)}`, INK_PX.far, CM.ink, 0.3);
   }
+  c.ink(rope.join(''), 1.1, CM.line);
 }
 
 /** The moored bob: a slow ~1.3 px rise and fall (the boat is alive; the coping is not). */
@@ -518,7 +584,7 @@ export const boatBob = (t: number) => 1.3 * Math.sin(t * 2.1 + 0.4) + 0.4 * Math
 
 const CLIP_ID = 's3nbWalkerClip';
 
-/** Our narrowboat (static batch + per-frame life). WORLD px at the match. */
+/** Our narrowboat (static batches + per-frame life). WORLD px at the match. */
 export const S3Boat: React.FC = () => {
   const t = useTime();
   const stat = useMemo(() => {
@@ -534,17 +600,22 @@ export const S3Boat: React.FC = () => {
     portholesBack(L);
     return L.merge();
   }, []);
+  const rims = useMemo(() => {
+    const L = new Levels();
+    portholesFront(L);
+    return L.merge();
+  }, []);
   const walker = new Batch();
   walkerInto(walker, t);
-  const front = new Levels();
-  portholesFront(front, t);
+  const curtains = new Batch();
+  curtainsInto(curtains, t);
   const herbs = new Levels();
   herbsInto(herbs, t);
   const fend = new Levels();
   fendersInto(fend, t);
   const dy = boatBob(t);
   const ch = NB.chimney;
-  const ph = PORTHOLES[1];
+  const ph = PORTHOLES[WALKER_PORT];
   return (
     <XG m={mat.translate(0, dy)}>
       <Paint b={stat} seed="s3nboat" />
@@ -557,7 +628,8 @@ export const S3Boat: React.FC = () => {
       <g clipPath={`url(#${CLIP_ID})`}>
         <Paint b={walker} seed="s3nbWalker" misreg={false} />
       </g>
-      <Paint b={front.merge()} seed="s3nbFront" />
+      <Paint b={curtains} seed="s3nbCurtains" misreg={false} />
+      <Paint b={rims} seed="s3nbRims" />
       <Paint b={herbs.merge()} seed="s3nbHerbs" />
       <Paint b={fend.merge()} seed="s3nbFend" />
       <Puffs x={ch.x} y={ch.top - 10} seed="s3nb/smoke" kind="smoke" scale={1.25} drift={26} bursts={[13.62]} />
