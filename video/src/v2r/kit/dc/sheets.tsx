@@ -13,12 +13,12 @@ import {useTime, TimeShift} from '../../../lib/time';
 import {S5, S6} from '../../world/map';
 import {Seated, Person, NearBack} from '../cast';
 import {Pip} from '../pip/Pip';
-import {CraneSet} from './Crane';
+import {CraneSet} from './CraneSet';
 import {CRANE_T, craneP, craneSpeeds, sunAtStart, swapAt, DECK, planeMat, applyMat} from './crane';
 import {FarPlane, RiverPlane, VISTA, HighBars} from './vista';
 import {Pentagon} from './pentagon';
 import {MidGround, NearMid} from './valley';
-import {Terrace, StrangerBench, TerraceTree, LampPost, TERRACE, deckPt, deckPxPerM} from './terrace';
+import {Terrace, StrangerBench, TerraceTree, LampPost, TERRACE, TT, deckPt, deckPxPerM, castShadowD} from './terrace';
 import {GateSet, GateFacade, GateFence, GateNear, GateLawnTrees, GATE, S6_T0} from './gate';
 import {PENT_BOX} from './lens';
 import {WIPE} from './crane';
@@ -81,19 +81,35 @@ const NewsBoxStandIn: React.FC = () => {
   );
 };
 
-/** The terrace public at the end (K4 backs: a parent at the stroller, two at the balustrade, one on the far bench). */
+/** The terrace public at the end (K4 backs: a parent at the stroller, three at the balustrade, one on the far bench,
+ *  a jogger), each with its flat shadow toward us-left. */
 const TerracePeople: React.FC = () => {
   const t = useTime();
-  const st = deckPt(-1.4, 12.4);
-  const rail = (x: number) => deckPt(x, 21.0);
+  const at = (lx: number, d: number, hM: number) => {
+    const [x, y] = deckPt(lx, d);
+    return {x, y, h: hM * deckPxPerM(y)};
+  };
+  const ppl = [
+    {...at(4.8, 21.0, 1.72), seed: 's5/rail1', coat: CM.coatMustard},
+    {...at(5.6, 21.0, 1.6), seed: 's5/rail2', coat: CM.coatOat},
+    {...at(11.4, 21.0, 1.75), seed: 's5/rail3', coat: CM.brick},
+    {...at(8.4, 13.4, 1.7), seed: 's5/parent', coat: CM.coatPlum},
+    {...at(4.4, 17.6, 1.68), seed: 's5/pair1', coat: CM.sage},
+    {...at(4.95, 17.8, 1.6), seed: 's5/pair2', coat: CM.brickLight},
+    {...at(8.6, 20.6, 1.7), seed: 's5/rail4', coat: CM.coatSlate},
+    {...at(9.2, 13.8, 1.2), seed: 's5/child', coat: CM.coatMustard},
+  ];
+  const jog = at(12.5 - ((t * 2.6) % 9), 18.0, 1.7);
+  const sh = ppl.map((q) => castShadowD(q.x, q.y, q.h * 0.42)).join('') + castShadowD(jog.x, jog.y, jog.h * 0.42);
+  const b2 = at(3.8, 14.6, 0.85);
   return (
     <>
-      <Person x={rail(2.6)[0]} y={rail(2.6)[1]} h={1.72 * deckPxPerM(rail(2.6)[1])} seed="s5/rail1" traits={{coat: CM.coatMustard}} />
-      <Person x={rail(3.3)[0]} y={rail(3.3)[1]} h={1.6 * deckPxPerM(rail(3.3)[1])} seed="s5/rail2" traits={{coat: CM.coatOat}} />
-      <Person x={rail(7.4)[0]} y={rail(7.4)[1]} h={1.75 * deckPxPerM(rail(7.4)[1])} seed="s5/rail3" />
-      <Person x={st[0] + 0.85 * deckPxPerM(st[1])} y={st[1] + 4} h={1.7 * deckPxPerM(st[1])} seed="s5/parent" traits={{coat: CM.coatPlum}} />
-      <Person x={deckPt(-6 + ((t * 2.6) % 16), 16)[0]} y={deckPt(0, 16)[1]} h={1.7 * deckPxPerM(deckPt(0, 16)[1])} seed="s5/jog" pose="jog" view="profile" flip walk={{rate: 2.8}} />
-      <Seated x={deckPt(1.9, 14.6)[0]} y={deckPt(1.9, 14.6, 0.45)[1]} h={0.85 * deckPxPerM(deckPt(0, 14.6)[1])} seed="s5/bench2" phone />
+      <path d={sh} fill={TT.shadowFloor} />
+      {ppl.map((q) => (
+        <Person key={q.seed} x={q.x} y={q.y} h={q.h} seed={q.seed} traits={{coat: q.coat}} />
+      ))}
+      <Person x={jog.x} y={jog.y} h={jog.h} seed="s5/jog" pose="jog" view="profile" walk={{rate: 2.8}} />
+      <Seated x={b2.x} y={deckPt(3.8, 14.6, 0.45)[1]} h={b2.h} seed="s5/bench2" phone />
     </>
   );
 };
@@ -156,9 +172,9 @@ const GatePeople: React.FC<{which: 'mid' | 'near' | 'door'}> = ({which}) => {
     );
   }
   if (which === 'mid') {
-    // a jogger crossing the footpath right -> left (in the board's plane, behind the board's legs)
-    const x = 1240 - ((t * 190) % 1700);
-    return <Person x={x} y={GATE.kerbY - 2} h={300} seed="s6/jog" pose="jog" view="profile" walk={{rate: 2.9}} />;
+    // a jogger on the lawn path beyond the fence (small: people stay small), right -> left, seen between the pickets
+    const x = 1200 - ((t * 120) % 1500);
+    return <Person x={x} y={884} h={104} seed="s6/jog" pose="jog" view="profile" walk={{rate: 2.9}} />;
   }
   // staff backs at the service door (far plane): one walks in before 25.0, one comes out ~26.3 and goes in again
   const D = GATE.door;
@@ -184,7 +200,7 @@ export const GateDC: React.FC = () => {
         <GateSet
           bars={<HighBars seed="s6bars" drift={5} />}
           doorPeople={<GatePeople which="door" />}
-          mid={<GatePeople which="mid" />}
+          lawn={<GatePeople which="mid" />}
           board={<BoardStandIn />}
           pip={<Pip x={GATE.post.x} y={GATE.post.cap} size={98} pose="sit" seed="s6pip" target={[960, 790]} targetWeight={1} />}
           near={<GatePeople which="near" />}
@@ -236,12 +252,12 @@ export const KitDC: React.FC = () => {
         </Tile>
         {/* row 2: the near-mid before / after the burst (start coords), the terrace tree, the lampposts */}
         <Tile x={30} y={800} w={680} h={720} vb={[0, 560, 1080, 1144]} label="NEAR-MID at 20.70 (buds)">
-          <TimeShift by={-0.15}>
+          <TimeShift by={0.35}>
             <NearMid burstAt={0.21} />
           </TimeShift>
         </Tile>
         <Tile x={740} y={800} w={680} h={720} vb={[0, 560, 1080, 1144]} label="NEAR-MID at 20.85 (4-frame burst done)">
-          <TimeShift by={-0.3}>
+          <TimeShift by={0.2}>
             <NearMid burstAt={0.21} />
           </TimeShift>
         </Tile>
