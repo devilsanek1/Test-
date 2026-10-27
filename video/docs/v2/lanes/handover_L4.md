@@ -47,3 +47,17 @@ figure/Pip polish. Then critics (art director, sound-off, SCALE, SPEED per frame
 - Tool: `$SCRATCH/tools/bandcheck.py` (not committed; copy below) needs `pip install opencv-python-headless numpy`
   (cv2 missing in this container). It counts non-sky (#BCDCCF, tol 28) pixels in y 317-556 per frame of a Film2RBare
   render of `--frames=1233-1439`.
+
+## 2026-10-27 ~14:30 UTC, third helper (MAX effort + ultracode, session_014PwCXHEmk7T2Y5xLmUSX6h): in progress
+- Switched to video-production; read COMMON, brief, TREATMENT, STYLE.md, CINEMATIC_GUIDE S5 + Scale cues, the kits.
+- Decisions (in `L4_spec.md`, the lane's build spec every builder reads): end horizon ~750; the camera stays ~8 seated heights
+  (the contract's 62 px stranger at feet 1238 + the Pentagon box fix it; the terrace becomes a near world with its own size
+  gradient so it never reads as a map); the plaque = a viewpoint plaque on a pedestal in front of the rail (x ~450-760, y
+  ~1140-1246, "The Pentagon" 56 px); Pip arrives mid-air at L3's (292, 721) and drops onto the backrest seat (415, 1120).
+- Restructured: the rig reads each slot file's camera numbers (no import cycles); `V2S5_nearmid.tsx` slot; `V2S5_set.tsx`
+  `only` layer groups; dev entry `V2S5_entry.tsx` (S5Shot, S5At {p, t, only}); node camera check `V2S5_qa.ts`.
+- Scratch tools (not committed; recreate from this note if lost): bandcheck.py (Film2RBare f1233-1439, non-sky px in y
+  317-556 and in the margin 290-600 minus the sun disc / the calendar page), make_review.sh (keys at 216 px beside refs,
+  full-size start/end, motion strips, 0.5 clip + density + camera check).
+- Running: workflow `v2r-l4-crane-build` (sky&far -> valley, terrace -> figures&text, then start). Next: critic panel (art
+  director, sound-off, SCALE, speed/motion, fairness, completeness), fix rounds until pass, report_L4.md.
