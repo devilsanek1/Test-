@@ -46,9 +46,9 @@ export const WINDOWS: WinSpec[] = [
   // her house: two dormers (one lit), the ground-floor tripartite window behind lace nets
   {id: 'h1d1', x: 228, y: 622, w: 40, h: 34, bars: 'dormer', surround: 'plain', wall: CM.shadeCool, lit: false, unlit: 'blind', blind: 0.4, sill: false},
   {id: 'h1d2', x: 402, y: 622, w: 40, h: 34, bars: 'dormer', surround: 'plain', wall: CM.shadeCool, lit: true, inner: 'pendant', sill: false},
-  {id: 'h1g', x: 330, y: 922, w: 104, h: 112, bars: '2/2', surround: 'stone', wall: CM.brick, lit: false, unlit: 'nets'},
-  {id: 'h1gl', x: 300, y: 922, w: 22, h: 112, bars: '1/1', surround: 'plain', wall: CM.brick, lit: false, unlit: 'nets', sill: false},
-  {id: 'h1gr', x: 442, y: 922, w: 22, h: 112, bars: '1/1', surround: 'plain', wall: CM.brick, lit: false, unlit: 'nets', sill: false},
+  {id: 'h1g', x: 330, y: 922, w: 104, h: 112, bars: '2/2', surround: 'stone', wall: CM.brick, lit: false, unlit: 'plant', blind: 0.2},
+  {id: 'h1gl', x: 300, y: 922, w: 22, h: 112, bars: '1/1', surround: 'plain', wall: CM.brick, lit: false, unlit: 'sky', sill: false},
+  {id: 'h1gr', x: 442, y: 922, w: 22, h: 112, bars: '1/1', surround: 'plain', wall: CM.brick, lit: false, unlit: 'sky', sill: false},
   // the stock-brick house: the WATERING neighbour's window (lit, lower sash up), a blind, the lit front room
   {id: 'h2a', x: 566, y: 708, w: 66, h: 136, bars: '2/2', surround: 'hood', wall: CM.brickLight, lit: true, inner: 'frame', open: 30, box: true, curtain: CM.blossom},
   {id: 'h2b', x: 668, y: 708, w: 66, h: 136, bars: '2/2', surround: 'hood', wall: CM.brickLight, lit: false, unlit: 'blind', blind: 0.36},

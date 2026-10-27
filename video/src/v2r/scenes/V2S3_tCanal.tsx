@@ -7,8 +7,8 @@ import React, {useMemo} from 'react';
 import {CM} from '../palette';
 import {useTime} from '../../lib/time';
 import {Paint, frac} from '../kit/canal/core';
-import {Ducks, FloatingLeaves, Heron} from '../kit/canal/life';
-import {Batch, TK, line, ovalPath, rng, P} from './V2S3_tParts';
+import {Ducks, FloatingLeaves} from '../kit/canal/life';
+import {Batch, TK, line, ovalPath, rng, P, leafPath} from './V2S3_tParts';
 
 export const CANAL = {top: 1130, bottom: 1420, x0: -80, x1: 1180} as const;
 
@@ -116,11 +116,49 @@ const PostAndRings: React.FC = () => {
   return <Paint b={b} seed="s3c/post" />;
 };
 
+
+/** A grey heron standing on the post, in profile facing west (left): long legs, a hunched body with folded wings, the
+ *  S-neck tucked, a black crest stripe and a dagger bill. One slow head turn (it looks back east, then west again). */
+const HeronS3: React.FC<{x: number; y: number; h: number; turnAt: number}> = ({x, y, h, turnAt}) => {
+  const t = useTime();
+  const b = new Batch();
+  // the head turn: 0 = looking west (left), 1 = looking back east (right); out and back over 1.1 s
+  const u = t < turnAt ? 0 : t < turnAt + 0.3 ? (t - turnAt) / 0.3 : t < turnAt + 0.8 ? 1 : t < turnAt + 1.1 ? 1 - (t - turnAt - 0.8) / 0.3 : 0;
+  const look = u * u * (3 - 2 * u);
+  const dir = look > 0.5 ? 1 : -1;
+  const legH = h * 0.34;
+  const k = h / 84;
+  // legs (thin, a knee bend) and toes on the post top
+  b.ink(`M${P(x - 3 * k, y)}L${P(x - 2 * k, y - legH * 0.5)}L${P(x - 4 * k, y - legH)}M${P(x + 4 * k, y)}L${P(x + 3 * k, y - legH * 0.55)}L${P(x + 1 * k, y - legH)}`, 1.8, CM.shadeCool);
+  b.ink(`M${P(x - 9 * k, y)}L${P(x + 8 * k, y)}`, 1.4, CM.shadeCool);
+  // the body: a hunched teardrop, back in stone grey, wing in cool shade, a pale breast
+  const by = y - legH;
+  const body = `M${P(x - 16 * k, by - 18 * k)}Q${P(x - 4 * k, by - 30 * k)} ${P(x + 14 * k, by - 22 * k)}Q${P(x + 30 * k, by - 12 * k)} ${P(x + 34 * k, by + 2 * k)}Q${P(x + 14 * k, by + 4 * k)} ${P(x - 2 * k, by + 2 * k)}Q${P(x - 16 * k, by - 4 * k)} ${P(x - 16 * k, by - 18 * k)}Z`;
+  b.fill(CM.stoneShade, body);
+  b.fill(CM.shadeCool, `M${P(x - 6 * k, by - 20 * k)}Q${P(x + 14 * k, by - 22 * k)} ${P(x + 34 * k, by + 1 * k)}Q${P(x + 12 * k, by - 4 * k)} ${P(x - 4 * k, by - 8 * k)}Z`);
+  b.fill(CM.paper, `M${P(x - 16 * k, by - 18 * k)}Q${P(x - 18 * k, by - 6 * k)} ${P(x - 6 * k, by + 1 * k)}Q${P(x - 10 * k, by - 10 * k)} ${P(x - 10 * k, by - 20 * k)}Z`);
+  // the neck: an S tucked into the shoulders, pale with a plum streak; the head with its crest
+  const nx = x - 12 * k;
+  const ny = by - 20 * k;
+  const hx = nx - 6 * k + look * 10 * k;
+  const hy = ny - 22 * k;
+  b.ink(`M${P(nx, ny)}C${P(nx - 10 * k, ny - 8 * k)} ${P(hx + 8 * k, hy + 10 * k)} ${P(hx, hy)}`, 7 * k, CM.paper);
+  b.ink(`M${P(nx - 2 * k, ny - 4 * k)}C${P(nx - 9 * k, ny - 10 * k)} ${P(hx + 5 * k, hy + 10 * k)} ${P(hx - 1 * k, hy + 3 * k)}`, 1.2, CM.anchor);
+  b.fill(CM.paper, ovalPath(hx, hy, 5.4 * k, 4.6 * k));
+  b.fill(CM.anchor, `M${P(hx - dir * 1 * k, hy - 3.4 * k)}L${P(hx - dir * 14 * k, hy - 2 * k)}L${P(hx - dir * 2 * k, hy - 1 * k)}Z`);
+  b.fill(CM.coatMustard, `M${P(hx + dir * 3 * k, hy - 1.6 * k)}L${P(hx + dir * 19 * k, hy + 0.6 * k)}L${P(hx + dir * 3 * k, hy + 1.8 * k)}Z`);
+  b.fill(CM.anchor, ovalPath(hx + dir * 1.6 * k, hy - 0.8 * k, 1, 1));
+  b.ink(body, 1.4, CM.ink, 0.35);
+  // tail feathers and a few shoulder plumes
+  for (let i = 0; i < 3; i++) b.fill(CM.shadeCool, leafPath(x + (30 + i * 2) * k, by + (2 - i * 2) * k, 10 * k, 2.2 * k, 12 + i * 8));
+  return <Paint b={b} seed="s3heronP" misreg={false} />;
+};
+
 export const S3CanalLife: React.FC = () => (
   <>
     <FloatingLeaves y0={1150} y1={1290} n={9} size={11} seed="s3fl" current={-9} />
     <PostAndRings />
-    <Heron x={POST.x} y={POST.top + 1} h={78} face={-1} turnAt={13.85} seed="s3heron" />
+    <HeronS3 x={POST.x} y={POST.top + 1} h={84} turnAt={13.78} />
     <Ducks ducks={[{x: 528, y: 1214, size: 26, drake: true}, {x: 578, y: 1222, size: 24}]} seed="s3ducks" />
   </>
 );

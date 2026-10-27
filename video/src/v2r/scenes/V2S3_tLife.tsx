@@ -53,35 +53,44 @@ const Cyclist: React.FC = () => {
   return <Person x={x} y={CYCLIST.y} h={CYCLIST.h} exact seed={CYCLIST.seed} traits={{coat: CM.brick, hair: 'cap', hatColor: CM.coatSlate, acc: 'backpack', accColor: CM.coatOat}} pose="cycle" view="profile" pedal={1.3} />;
 };
 
-/** The dog ahead of the dog walker: a small trotting dog on a lead (legs step at 12 drawings/s). */
+/** The dog ahead of the dog walker: a small terrier trotting on a lead (legs step at 12 drawings/s, the body bobs,
+ *  the tail wags every frame). Profile facing east (right), like its walker. */
 const Dog: React.FC<{w: WalkerSpec}> = ({w}) => {
   const t = useTime();
-  const x = walkerX(w, t) + 64;
+  const x = walkerX(w, t) + 62;
   const y = w.y + 1;
   const tq = drawn(t, 12);
-  const g = Math.sin(tq * 13);
+  const ph = tq * 12.5;
   const b = new Batch();
   const col = CM.coatOat;
-  const H = 22;
-  const L = 34;
-  const bob = Math.abs(Math.sin(tq * 13)) * 1.2;
-  const by = y - H * 0.62 - bob;
-  // legs (two pairs, scissoring)
-  for (const [lx, s] of [[x - L * 0.3, 1], [x + L * 0.28, -1]] as const) {
-    b.poly(CM.line, [[lx - 2, by + 3], [lx + 2, by + 3], [lx + 2 + g * s * 4, y], [lx - 2 + g * s * 4, y]]);
-    b.poly(col, [[lx - 2.2, by + 2], [lx + 2.2, by + 2], [lx + 2.2 - g * s * 4, y], [lx - 2.2 - g * s * 4, y]]);
+  const dark = CM.line;
+  const bob = Math.abs(Math.sin(ph)) * 1.4;
+  const sh = 27; // shoulder height
+  const by = y - sh * 0.62 - bob;
+  // legs: a trot (diagonal pairs move together), far legs in the darker coat
+  const legs: [number, number, string][] = [[-15, 1, dark], [12, -1, dark], [-11, -1, col], [16, 1, col]];
+  for (const [lx, s, c] of legs) {
+    const sw = Math.sin(ph) * s * 5;
+    b.poly(c, [[x + lx - 2.2, by + 2], [x + lx + 2.4, by + 2], [x + lx + 2 + sw, y - 1], [x + lx - 2 + sw, y - 1]]);
+    b.rect(c, x + lx - 2.4 + sw, y - 2.4, 5.4, 2.4);
   }
-  b.fill(col, ovalPath(x, by, L * 0.48, H * 0.3));
-  b.fill(col, ovalPath(x + L * 0.5, by - H * 0.3, H * 0.27, H * 0.24));
-  b.fill(CM.line, ovalPath(x + L * 0.44, by - H * 0.42, 3.4, 5.2));
-  b.fill(col, `M${P(x + L * 0.62, by - H * 0.3)}L${P(x + L * 0.82, by - H * 0.24)}L${P(x + L * 0.64, by - H * 0.16)}Z`);
-  b.ink(`M${P(x - L * 0.46, by - 2)}Q${P(x - L * 0.62, by - H * 0.5 + Math.sin(t * 14) * 3)} ${P(x - L * 0.54, by - H * 0.72)}`, 2.2, col);
-  b.rect(CM.coatMustard, x + L * 0.36, by - H * 0.18, 3, 5);
+  // body, chest, the head with a snout and a dark ear, the tail up
+  b.fill(col, `M${P(x - 19, by - 3)}Q${P(x - 4, by - 11)} ${P(x + 16, by - 8)}Q${P(x + 23, by - 2)} ${P(x + 18, by + 7)}Q${P(x, by + 10)} ${P(x - 18, by + 6)}Z`);
+  const hx = x + 22;
+  const hy = by - 13 - bob * 0.3;
+  b.fill(col, ovalPath(hx, hy, 7.5, 6.8));
+  b.fill(col, `M${P(hx + 3, hy - 2)}L${P(hx + 13, hy + 1)}L${P(hx + 12, hy + 5)}L${P(hx + 2, hy + 5)}Z`);
+  b.fill(CM.anchor, ovalPath(hx + 12.6, hy + 1.6, 1.8, 1.6));
+  b.fill(dark, `M${P(hx - 4, hy - 5)}Q${P(hx - 7, hy + 2)} ${P(hx - 2, hy + 6)}L${P(hx + 1, hy - 4)}Z`);
+  b.fill(col, `M${P(x + 14, by - 6)}L${P(hx - 2, hy + 2)}L${P(hx + 3, hy + 6)}L${P(x + 21, by + 2)}Z`);
+  const wag = Math.sin(t * 15) * 4;
+  b.ink(`M${P(x - 18, by - 2)}Q${P(x - 25, by - 10)} ${P(x - 22 + wag, by - 19)}`, 3, col);
+  b.rect(CM.coatMustard, hx - 7, hy + 4, 4, 6);
+  b.ink(`M${P(x - 19, by - 3)}Q${P(x - 4, by - 11)} ${P(x + 16, by - 8)}`, TK.detail, CM.ink, 0.2);
   // the lead from the walker's hand to the collar
-  const hx = walkerX(w, t) + 14;
-  const hy = w.y - w.h * 0.46;
-  b.ink(`M${P(hx, hy)}Q${P((hx + x + L * 0.4) / 2, hy + 18)} ${P(x + L * 0.4, by - H * 0.14)}`, 1.2, CM.anchor);
-  b.ink(`M${P(x - L * 0.46, by)}Q${P(x, by - H * 0.36)} ${P(x + L * 0.62, by - H * 0.42)}`, TK.detail, CM.ink, 0.3);
+  const hX = walkerX(w, t) + 16;
+  const hY = w.y - w.h * 0.47;
+  b.ink(`M${P(hX, hY)}Q${P((hX + hx - 5) / 2, hY + 14)} ${P(hx - 5, hy + 7)}`, 1.3, CM.anchor);
   return <Paint b={b} seed="s3dog" misreg={false} />;
 };
 
@@ -149,7 +158,7 @@ export const S3Inside: React.FC = () => {
     const lean = tipAt(t) * 4;
     const hx = WATER.x - lean;
     const hy = 770 + lean * 0.6;
-    b.poly(CM.coatPlum, [[hx - 26, WATER.sill], [hx - 22, hy + 22], [hx - 8, hy + 14], [hx + 10, hy + 14], [hx + 22, hy + 22], [hx + 26, WATER.sill]]);
+    b.poly(CM.box, [[hx - 26, WATER.sill], [hx - 22, hy + 22], [hx - 8, hy + 14], [hx + 10, hy + 14], [hx + 22, hy + 22], [hx + 26, WATER.sill]]);
     b.fill(CM.hair[2], ovalPath(hx, hy, 11, 12));
     b.fill(CM.hair[2], ovalPath(hx + 6, hy - 9, 5, 4.6));
     b.fill(CM.brickLight, ovalPath(hx - 2, hy + 12, 3.4, 3));
@@ -159,8 +168,8 @@ export const S3Inside: React.FC = () => {
     const sw = Math.sin(t * 2.1) * 1.2;
     const hx = KETTLE.x + sw;
     const hy = 778;
-    b.poly(CM.coatSlate, [[hx - 24, KETTLE.sill], [hx - 20, hy + 20], [hx - 6, hy + 13], [hx + 8, hy + 13], [hx + 21, hy + 20], [hx + 24, KETTLE.sill]]);
-    b.fill(CM.hair[0], ovalPath(hx, hy, 10.5, 11.5));
+    b.poly(CM.coatMustard, [[hx - 24, KETTLE.sill], [hx - 20, hy + 20], [hx - 6, hy + 13], [hx + 8, hy + 13], [hx + 21, hy + 20], [hx + 24, KETTLE.sill]]);
+    b.fill(CM.hair[4], ovalPath(hx, hy, 10.5, 11.5));
     b.fill(CM.paper, ovalPath(hx - 18, KETTLE.sill - 9, 7, 6));
     b.rect(CM.anchor, hx - 21, KETTLE.sill - 16, 6, 3);
   }
@@ -176,7 +185,7 @@ export const S3Outside: React.FC = () => {
   {
     const sh: [number, number] = [WATER.x - 10, 826];
     const hand: [number, number] = [WATER.x - 24 - tip * 4, 834 - tip * 2];
-    b.ink(`M${P(sh[0], sh[1])}L${P(hand[0], hand[1])}`, 6, CM.coatPlum);
+    b.ink(`M${P(sh[0], sh[1])}L${P(hand[0], hand[1])}`, 6, CM.box);
     const a = (-8 - 38 * tip) * (Math.PI / 180);
     const ca = Math.cos(a);
     const sa = Math.sin(a);

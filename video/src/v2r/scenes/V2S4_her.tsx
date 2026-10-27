@@ -74,20 +74,38 @@ const HerShadow: React.FC = () => {
   return <Paint b={b} seed="s4herShadow" misreg={false} />;
 };
 
+/** The stop: she arrives at step 5.0, the passing position (both legs plumb under the hip, the far foot lifted). The
+ *  walk pose is HELD there and its stride eases to 0 over three drawings, so the lifted foot comes down and the knee
+ *  straightens with no slide (at step 5.0 the leg angles are 0 whatever the stride): no switch, no pop. */
+export function herStrideAt(t: number): number {
+  if (t < S4_BEATS.stop) return HER_STRIDE;
+  const tq = Math.floor(t * 12 + 1e-6) / 12;
+  const u = Math.max(0, Math.min(1, (tq - S4_BEATS.stop + 1 / 12) / 0.25));
+  return HER_STRIDE * (1 - u * u * (3 - 2 * u));
+}
+
 export const S4Her: React.FC = () => {
   const t = useTime();
   const {x, feetY: y, h} = S4_HER;
-  const common = {x, y, h, seed: 's4her', exact: true, stride: HER_STRIDE, ink: 3.4, model: MODEL, traits: HER} as const;
-  const fig =
-    t < S4_BEATS.stop ? (
-      <Person {...common} pose="walk" view="profile" step={herStepAt(t)} />
-    ) : (
-      <Person {...common} pose="stand" view="profile" tilt={herTilt(t)} />
-    );
+  const stopped = t >= S4_BEATS.stop;
   return (
     <>
       <HerShadow />
-      {fig}
+      <Person
+        x={x}
+        y={y}
+        h={h}
+        seed="s4her"
+        exact
+        ink={3.4}
+        model={MODEL}
+        traits={HER}
+        pose="walk"
+        view="profile"
+        step={stopped ? S4_TRUCK.steps : herStepAt(t)}
+        stride={herStrideAt(t)}
+        tilt={stopped ? herTilt(t) : 0}
+      />
     </>
   );
 };

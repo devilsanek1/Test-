@@ -81,11 +81,11 @@ const HerSilhouette: React.FC = () => {
 function roomBatch(): Batch {
   const b = new Batch();
   const w = X1 - X0;
-  // the lamp-lit walls: warm, the brightest field in the frame round the standard lamp
-  b.rect(CM.lamp, X0, Y0, w, Y1 - Y0);
+  // the lamp-lit walls: the brightest field in the frame; the ceiling and the far corners a step warmer
+  b.rect(CM.lampCore, X0, Y0, w, Y1 - Y0);
   b.layer();
-  b.fill(CM.lampCore, ovalPath(352, 772, 70, 62));
-  b.rect(CM.lampCore, X0, Y0, w, 44);
+  b.rect(CM.lamp, X0, Y0, w, 10);
+  b.poly(CM.lamp, [[X0, Y0], [X0 + 30, Y0 + 10], [X0 + 30, 840], [X0, 846]]);
   b.layer();
   // a dado rail, the floor and a rug
   b.rect(CM.box, X0, 840, w, 3);
@@ -101,7 +101,7 @@ function roomBatch(): Batch {
   b.rect(CM.line, 368, 760, 2.2, 96);
   b.fill(CM.line, ovalPath(369, 857, 9, 2.6));
   b.poly(CM.box, [[357, 760], [381, 760], [376, 742], [362, 742]]);
-  b.rect(CM.lampCore, 362, 760, 14, 3);
+  b.rect(CM.paper, 360, 760, 18, 3);
   // a low shelf with books at the left, a trailing plant on it
   b.rect(CM.line, X0 + 2, 790, 40, 3);
   let bx = X0 + 4;
@@ -200,15 +200,53 @@ function blindInto(b: Batch, t: number) {
 
 function herBoxInto(b: Batch, t: number) {
   const box = MAP.S3.windowBox;
+  const seat = MAP.S3.pipSeat.x;
+  const r = rng('herBoxPlants');
   // the plants flinch when Pip lands on the box's right end (13.10): a damped shake, strongest near the seat
   const d = t - S3_BEATS.pipLand;
-  const fl = d > 0 && d < 0.7 ? 5 * Math.sin(d * 34) * Math.exp(-d * 7) : 0;
-  boxInto(b, box.x0, box.x1, box.y0, box.y1 - box.y0 - 2, 'herBox', {trough: CM.line, low: [MAP.S3.pipSeat.x - 42, MAP.S3.pipSeat.x + 48], flinch: fl});
-  // two brackets under the trough and its plank lines
+  const shake = (x: number) => (d > 0 && d < 0.8 ? 6 * Math.sin(d * 30) * Math.exp(-d * 6) * Math.max(0.15, 1 - Math.abs(x - seat) / 160) : 0);
+  const sway = (x: number) => Math.sin(t * 1.7 + x * 0.05) * 0.8 + shake(x);
+  const top = box.y0 + 1;
+  // geraniums at the west end: stems, rounded leaves, rust-red and pink flower heads
+  for (let i = 0; i < 6; i++) {
+    const x = box.x0 + 12 + i * 12 + r.jitter(3);
+    const hh = r.range(22, 36);
+    const sx = sway(x);
+    b.ink(`M${P(x, top)}Q${P(x + 2 + sx * 0.5, top - hh * 0.5)} ${P(x + sx, top - hh)}`, 1.6, CM.sage);
+    b.fill(CM.sage, ovalPath(x - 5 + sx * 0.4, top - hh * 0.4, 6.5, 5.2));
+    b.fill(r.pick([CM.leafRust, CM.blossom, CM.leafRust, CM.box]), ovalPath(x + sx, top - hh - 2, 6.2, 5.4));
+    b.fill(CM.paper, ovalPath(x + sx - 1.6, top - hh - 3.4, 1.4, 1.2));
+  }
+  // lavender, rosemary and white daisies in the middle
+  for (let i = 0; i < 10; i++) {
+    const x = box.x0 + 88 + i * 8.5 + r.jitter(2);
+    const hh = r.range(16, 30);
+    const sx = sway(x);
+    b.ink(`M${P(x, top)}L${P(x + sx, top - hh)}`, 1.2, CM.sage);
+    if (i % 2 === 0) for (let k = 0; k < 4; k++) b.fill(CM.coatPlum, ovalPath(x + sx * (1 - k * 0.15), top - hh + k * 3.2, 1.8, 1.6));
+    else b.fill(CM.paper, ovalPath(x + sx, top - hh, 3.2, 2.8));
+  }
+  b.fill(CM.sage, lobes(box.x0 + 82, box.x0 + 172, top + 1, 14, 'herBoxMid', 5));
+  // low thyme and sedum mounds round Pip's seat (it sits among them)
+  b.fill(CM.sage, lobes(box.x0 + 168, box.x1 - 4, top + 1, 9, 'herBoxLow', 6));
+  b.fill(CM.leafGold, lobes(seat - 30 + shake(seat) * 0.6, seat - 6 + shake(seat) * 0.6, top + 1, 7, 'herBoxLowB', 2));
+  b.fill(CM.leafGold, lobes(seat + 20 + shake(seat) * 0.6, seat + 46 + shake(seat) * 0.6, top + 1, 6, 'herBoxLowC', 2));
+  for (let i = 0; i < 6; i++) b.fill(CM.blossom, ovalPath(box.x0 + 186 + i * 13 + shake(box.x0 + 186 + i * 13), top - 5 - (i % 2) * 2, 2, 1.8));
   b.layer();
+  // the trough: painted planks, a front band, two iron brackets, its shade on the string course
+  const hh = box.y1 - box.y0 - 2;
+  b.rect(CM.line, box.x0, box.y0, box.x1 - box.x0, hh);
+  b.rect(CM.brickDeep, box.x0, box.y0, box.x1 - box.x0, 4);
+  b.rect(CM.shadeWarm, box.x0 + 2, box.y0 + hh, box.x1 - box.x0 - 4, 4);
   b.rect(CM.anchor, box.x0 + 16, box.y1 - 2, 5, 12);
   b.rect(CM.anchor, box.x1 - 22, box.y1 - 2, 5, 12);
-  b.ink(line(box.x0, box.y0 + 1, box.x1, box.y0 + 1.5, {seed: 'boxTop', over: 'small'}) + line(box.x0 + 2, box.y0 + 14, box.x1 - 2, box.y0 + 14, {seed: 'boxMid', over: 'none'}), TK.detail);
+  // ivy trailing over the lip
+  for (let i = 0; i < 9; i++) {
+    const tx = box.x0 + 14 + i * 29 + r.jitter(6);
+    const L = r.range(12, 30);
+    for (let k = 0; k < 4; k++) b.fill(k === 3 && i % 3 === 0 ? CM.leafGold : CM.sage, leafPath(tx + Math.sin(k * 1.3) * 3 + shake(tx) * 0.5, box.y0 + 6 + (L * (k + 1)) / 4, 6.4, 2.8, 90 + r.jitter(35)));
+  }
+  b.ink(line(box.x0, box.y0 + 1, box.x1, box.y0 + 1.5, {seed: 'boxTop', over: 'small'}) + line(box.x0 + 2, box.y0 + 16, box.x1 - 2, box.y0 + 16.4, {seed: 'boxMid', over: 'none'}) + line(box.x0, box.y0, box.x0, box.y1 - 2, {seed: 'boxL', over: 'small'}), TK.detail);
   void S3_PIP;
 }
 
