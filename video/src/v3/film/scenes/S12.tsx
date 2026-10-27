@@ -35,7 +35,7 @@ import {mat, XG} from '../../../lib/xf';
 import {EMBER, floatCam, Lamp, Laptop, laptopGeo, PriceTag, PullChain, quadPt, ring, StickFlight, tagHole, textW, type Pt} from '../kit';
 import {S7DeskBack, S7Mug, S7WallTop} from './S7_desk';
 import {S12WallLow} from './S12_wall';
-import {S12DeskFront, S12DeskMid, S12Grain, S12Pip} from './S12_desk';
+import {S12DeskFront, S12DeskMid, S12Grain, S12Pip, S12Thermos} from './S12_desk';
 
 const START = 29.4;
 const DUR = 31.32 - START;
@@ -110,6 +110,7 @@ const S12: React.FC = () => {
         <Desk />
         <S12Grain />
         <S7DeskBack />
+        <S12Thermos x={818} y={1104} />
         <Lamp pose={LAMP_POSE} seed="s12/lamp" />
         <PullChain x={156} y={904} len={92} amp={6} jolt={[NEW_AT + 0.05]} />
         <S7Mug />

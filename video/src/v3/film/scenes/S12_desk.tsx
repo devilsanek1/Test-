@@ -6,7 +6,8 @@
 //                right port, sticky notes (they flutter on the ding), glasses, two clementines.
 //   desk front   the spiral notebook and its pen cut by the left edge, a plate of biscuits with crumbs, letters, a clip
 //                dish, your phone face down cut by the bottom edge, O1's open planner and the radio bottom right, grain.
-//   Pip          (1.4x, S7's size) follows the stick in from the upper left, leans in to read the tag as $999 is struck;
+//   Pip          (1.55x: S7's 1.4 a step up for the reaction beat; front view, so its eyes point) follows the stick in
+//                from the upper left, then reads the tag, leaning in with wide eyes as $999 is struck;
 //                on "pass" (the ding) it recoils with a hop back and its ears drop over its eyes; on "on" it turns to
 //                us, worried (S11 handed it over worried; S13 lets it sleep).
 // Cool share (cozy v2 §4): the headphones, the notebook's dusk-blue cover, the cable, the pen cup, Pip's lilac.
@@ -19,7 +20,7 @@ import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {Letters, Mittens, Planner, Radio} from './O1_life';
 import {Clementines, Pen, PhoneDown, SpiralNotebook} from './S7_desk';
-import {Cable, DeskGrain, EMBER, ease01, Glasses, Headphones, Pip3, pipPlace, StickyNotes, W, type LookKey, type PipHop, type PipPoseKey, type Pt} from '../kit';
+import {Cable, DeskGrain, EMBER, ease01, sway, Glasses, Headphones, Pip3, pipPlace, StickyNotes, W, type LookKey, type PipHop, type PipPoseKey, type Pt} from '../kit';
 
 // ---------------------------------------------------------------- small desk things (S7's drawings, S12 seeds)
 
@@ -57,14 +58,60 @@ const ClipDish: React.FC<{x: number; y: number}> = ({x, y}) => {
   );
   return (
     <>
-      <Fill d={dish} color={EMBER.reveal} seed="s12/dishF" />
-      <Fill d={ellipse(x, y - 3, 38, 11, {seed: 's12/dishIn'})} color={EMBER.wall} offset={false} />
+      <Fill d={dish} color={EMBER.skyLow} seed="s12/dishF" />
+      <Fill d={ellipse(x, y - 3, 38, 11, {seed: 's12/dishIn'})} color={EMBER.snow} offset={false} />
       <Ink d={dish} width={W.far} />
       {clip(x - 14, y - 4, -12, EMBER.dc, 0)}
       {clip(x + 12, y - 2, 20, EMBER.beam, 1)}
       <Fill d={ellipse(x + 2, y - 6, 9, 4, {seed: 's12/coin1'})} color={EMBER.books[0]} offset={false} />
       <Fill d={ellipse(x - 34, y + 24, 10, 5, {seed: 's12/coin2'})} color={EMBER.ring} seed="s12/coin2F" />
       <Ink d={ellipse(x - 34, y + 24, 10, 5, {seed: 's12/coin2I'})} width={W.hair} />
+    </>
+  );
+};
+
+/** A dusk-blue knitted scarf folded into a loose nest on the desk (Pip sits on it), snow-white bands, its tail running
+ *  off the left edge with a fringe: the close's cool patch (cozy v2 §4) and a contrasting ground for Pip's lilac. */
+const ScarfNest: React.FC = () => {
+  const t = useTime();
+  const nest = blob(206, 1446, 128, 40, {seed: 's12/scarfA', wobble: 0.05});
+  const fold = blob(196, 1430, 98, 26, {seed: 's12/scarfB', wobble: 0.06});
+  const tail = 'M96 1438C40 1446 0 1470 -70 1478L-70 1530C2 1520 52 1494 112 1470Z';
+  // knit bands across the tail and the front of the nest (snow, two thin rows each)
+  const band = (x0: number, y0: number, x1: number, y1: number, k: number) => (
+    <path key={k} d={`M${x0} ${y0}L${x1} ${y1}`} stroke={EMBER.snow} strokeWidth={7} strokeLinecap="butt" />
+  );
+  // the fringe at the tail's end, off the edge, and a short loose end by the nest that stirs in the room's air
+  const loose = sway(t, 3, 2.6, 0.7);
+  return (
+    <>
+      <Fill d={tail} color={EMBER.dc} seed="s12/scarfT" />
+      {band(36, 1452, 56, 1500, 0)}
+      {band(-10, 1466, 4, 1514, 1)}
+      <Ink d={'M96 1438C40 1446 0 1470 -70 1478M112 1470C52 1494 2 1520 -70 1530'} width={W.far} />
+      <Fill d={nest} color={EMBER.dc} seed="s12/scarfN" />
+      <Fill d={blob(214, 1458, 112, 22, {seed: 's12/scarfS', wobble: 0.05})} color={EMBER.dcSide} offset={false} />
+      <Fill d={fold} color={EMBER.dc} seed="s12/scarfF" />
+      {band(150, 1412, 156, 1452, 2)}
+      {band(244, 1410, 240, 1452, 3)}
+      <Ink d={nest} width={W.far} />
+      <Ink d={fold} width={W.hair} />
+      <path d={`M316 1450q16 6 ${24 + loose} ${18}M322 1446q20 2 ${32 + loose} 10`} fill="none" stroke={EMBER.dc} strokeWidth={4} strokeLinecap="round" />
+    </>
+  );
+};
+
+/** A dusk-blue thermos flask on the back row, right of the laptop (its cup-lid and a snow-white band). */
+export const S12Thermos: React.FC<{x: number; y: number; w?: number; h?: number}> = ({x, y, w = 50, h = 128}) => {
+  const body = `M${x - w / 2} ${y - h + 22}L${x - w / 2} ${y - 8}Q${x - w / 2} ${y} ${x - w / 2 + 8} ${y}L${x + w / 2 - 8} ${y}Q${x + w / 2} ${y} ${x + w / 2} ${y - 8}L${x + w / 2} ${y - h + 22}Z`;
+  const cap = `M${x - w / 2 + 3} ${y - h + 24}L${x - w / 2 + 6} ${y - h + 4}Q${x} ${y - h - 4} ${x + w / 2 - 6} ${y - h + 4}L${x + w / 2 - 3} ${y - h + 24}Z`;
+  return (
+    <>
+      <Fill d={body} color={EMBER.dc} seed="s12/thermB" />
+      <Fill rect={[x - w / 2, y - h * 0.46, w, 12]} color={EMBER.snow} offset={false} />
+      <Fill d={cap} color={EMBER.dcSide} seed="s12/thermC" />
+      <Ink d={body + cap} width={W.far} />
+      <Ink d={`M${x - w * 0.26} ${y - h + 34}L${x - w * 0.26} ${y - h * 0.56}`} width={W.hair} color={EMBER.skyLow} />
     </>
   );
 };
@@ -77,7 +124,8 @@ const crumbs = (pts: [number, number, number][]) =>
 export const S12DeskMid: React.FC<{port: Pt; ding: number}> = ({port, ding}) => (
   <>
     <Headphones x={112} y={1214} w={168} seed="s12/hp" ink={W.far} />
-    <Mittens x={-6} y={1350} />
+    <Mittens x={-34} y={1352} />
+    <ScarfNest />
     {/* the charger: from the right edge across the desk into the laptop's right port (it leads the eye in) */}
     <Cable points={[port, [812, port[1] + 30], [900, port[1] + 62], [1004, port[1] + 50], [1130, port[1] + 96]]} plug width={7} color={EMBER.dcSide} />
     <StickyNotes x={806} y={1318} n={2} size={64} flutterAt={[ding + 0.06]} seed="s12/sticky" />
@@ -115,7 +163,7 @@ export const S12Grain: React.FC = () => (
 
 // ---------------------------------------------------------------- Pip
 
-const PIP = {x: 192, y: 1440, scale: 1.4};
+const PIP = {x: 206, y: 1442, scale: 1.55};
 
 export type S12PipBeats = {
   /** The stick's flight (it pops in upper left at t0 and is in the keyboard by t1). */
@@ -135,13 +183,14 @@ export const S12Pip: React.FC<{beats: S12PipBeats}> = ({beats}) => {
   const t = useTime();
   const {stick, strike, ding, on} = beats;
   const keys: PipPoseKey[] = [
-    {t: -9, pose: 'sit-back'},
+    {t: -9, pose: 'sit-front', expression: 'neutral'},
+    {t: strike - 0.08, pose: 'sit-front', expression: 'wide'},
     {t: ding + 0.02, pose: 'ears-cover'},
     {t: on - 0.04, pose: 'sit-front', expression: 'worried'},
   ];
   const look: LookKey[] = [
     {t: -9, v: -0.6},
-    {t: stick[0] + 0.12, v: 0.55},
+    {t: stick[0] + 0.14, v: 0.75},
     {t: on - 0.04, v: 0.1},
   ];
   const hops: PipHop[] = [{t: ding + 0.02, to: [PIP.x - 18, PIP.y], height: 12, dur: 0.22}];
@@ -150,7 +199,7 @@ export const S12Pip: React.FC<{beats: S12PipBeats}> = ({beats}) => {
   const {x: fx, y: fy} = pipPlace(t, PIP.x, PIP.y, hops);
   return (
     <XG m={mat.about(mat.rotate(lean), fx, fy)}>
-      <Pip3 x={PIP.x} y={PIP.y} scale={PIP.scale} lineWeight={1.12} seed={7} keys={keys} look={look} lookDur={0.2} hops={hops} />
+      <Pip3 x={PIP.x} y={PIP.y} scale={PIP.scale} lineWeight={1.18} seed={7} keys={keys} look={look} lookDur={0.2} hops={hops} />
     </XG>
   );
 };

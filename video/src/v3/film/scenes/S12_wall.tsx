@@ -134,7 +134,7 @@ export const S12WallLow: React.FC<{ding: number}> = ({ding}) => (
     <TapedCard x={958} y={618} w={94} h={62} jolt={ding + 0.1} />
     <Socket x={268} y={948} />
     {/* two sticky reminders by the lid's top-right corner */}
-    <WallNote x={784} y={890} s={56} rot={-7} color={EMBER.core} jolt={ding + 0.05} seed="s12/wn1" />
-    <WallNote x={812} y={942} s={52} rot={6} color={EMBER.hl} jolt={ding + 0.08} seed="s12/wn2" />
+    <WallNote x={782} y={846} s={54} rot={-7} color={EMBER.core} jolt={ding + 0.05} seed="s12/wn1" />
+    <WallNote x={812} y={896} s={50} rot={6} color={EMBER.hl} jolt={ding + 0.08} seed="s12/wn2" />
   </>
 );
