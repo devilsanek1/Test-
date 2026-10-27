@@ -200,11 +200,11 @@ export const S13Outside: React.FC = () => {
       <TownHouse x={466} y={HOR + 4} w={56} kind="terrace" color={FAR_ROW} far seed="s13/fl1" litFrac={0.6} />
       <TownHouse x={516} y={HOR + 6} w={50} kind="cottage" color={EMBER.roofs} far seed="s13/fl2" litFrac={0.7} />
       <SnowTree x={572} y={HOR + 8} h={88} kind="pine" far seed="s13/pine" />
+      <DataCenter x={DC_X} y={HOR + 2} w={371} variant="far" sign={null} seed="dc/objective" />
       {/* the cooling plume slides off the 3 roof units and drifts right along the glass top (the quiet ambient loop) */}
       {[692, 776, 860].map((x, i) => (
-        <PuffTrain key={i} x={x} y={652} n={6} life={3.4} rise={14} drift={140} r0={6} r1={18} wobble={3} stretch={1.7} color={EMBER.skyLow} seed={`s13/plume${i}`} at={-3 - i * 1.1} />
+        <PuffTrain key={i} x={x} y={650} n={6} life={3.4} rise={14} drift={140} r0={6} r1={18} wobble={3} stretch={1.7} color={EMBER.skyLow} seed={`s13/plume${i}`} at={-3 - i * 1.1} />
       ))}
-      <DataCenter x={DC_X} y={HOR + 2} w={371} variant="far" sign={null} seed="dc/objective" />
       <TownHouse x={960} y={HOR + 6} w={62} h={128} kind="block" color={FAR_ROW} far dish seed="s13/fr1" litFrac={0.7} />
       <WindowSilhouette x={970} y={806} w={16} h={20} who="cook" lit far seed="s13/blockwin" dark={EMBER.dcDark} />
       <WindowSilhouette x={994} y={850} w={15} h={19} who="read" lit far seed="s13/blockwin2" dark={EMBER.dcDark} />

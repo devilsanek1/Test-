@@ -29,10 +29,12 @@ import {
   CoatHook,
   EMBER,
   FramedPrint,
+  Glasses,
   Headphones,
   PenCup,
   Pip3,
   Plant,
+  quadPt,
   Radiator,
   Rug,
   ShelfFill,
@@ -74,7 +76,7 @@ export const S13WallTop: React.FC = () => (
     <PhotoLine x0={150} y0={196} x1={318} y1={204} sag={14} />
     {/* warm string lights under the attic beam (above the band) and the lit paper star hung from it */}
     <StringLights3 points={[[586, 16], [752, 102], [912, 184], [1062, 258]]} sag={16} n={10} r={8} seed="s13/beamlights" />
-    <StarLantern x={724} hookY={86} cy={150} r={30} />
+    <StarLantern x={724} hookY={86} cy={150} r={30} litAt={-1} />
   </>
 );
 
@@ -217,6 +219,31 @@ const YarnBasket: React.FC<{x: number; y: number; w?: number}> = ({x, y, w = 230
   );
 };
 
+/** The rug's woven pattern: a zigzag along the blue and the gold stripes, a dotted line along the peach ones
+ *  (tone-on-tone, hair weight: texture on a small thing, never a flat slab). */
+const RugPattern: React.FC<{quad: [Pt, Pt, Pt, Pt]}> = ({quad}) => {
+  const zig = (v: number, amp: number, n: number) => {
+    let d = '';
+    for (let i = 0; i <= n; i++) {
+      const p = quadPt(quad, 0.03 + (0.94 * i) / n, v + (i % 2 ? amp : -amp));
+      d += `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
+    }
+    return d;
+  };
+  const dots = (v: number, n: number) =>
+    Array.from({length: n}, (_, i) => {
+      const p = quadPt(quad, 0.05 + (0.9 * i) / (n - 1), v);
+      return circle(p[0], p[1], 3);
+    }).join('');
+  return (
+    <>
+      <Ink d={zig(2.45 / 7, 0.022, 34)} width={W.hair} color={EMBER.card} order="all" />
+      <Ink d={zig(4.45 / 7, 0.022, 34)} width={W.hair} color={EMBER.beam} order="all" />
+      <Fill d={dots(0.45 / 7, 24) + dots(6.45 / 7, 26)} color={EMBER.books[4]} offset={false} />
+    </>
+  );
+};
+
 /** Behind you: the floorboards, the rug, the slippers, the floor plant, the open book. */
 export const S13FloorBack: React.FC = () => {
   const rug: [Pt, Pt, Pt, Pt] = [[168, 1412], [962, 1412], [1076, 1694], [56, 1694]];
@@ -226,6 +253,7 @@ export const S13FloorBack: React.FC = () => {
       {/* a short colour shadow under the desk and the radiator (wall reveal penumbra, cozy v2 §4) */}
       <Fill rect={[500, 1384, 520, 14]} color="#E3B092" offset={false} />
       <Rug quad={rug} stripes={7} colors={[EMBER.hl, EMBER.wall, EMBER.skyLow, EMBER.wall, EMBER.books[0], EMBER.wall]} seed="s13/rug" ink={W.mid} />
+      <RugPattern quad={rug} />
       <Slippers x={196} y={1508} w={150} seed="s13/slip" ink={W.far} color={EMBER.books[4]} />
       <OpenBook x={470} y={1606} />
       <Plant x={1046} y={1470} kind="floor" size={230} seed="s13/floorplant" ink={W.far} />
@@ -237,6 +265,9 @@ export const S13FloorBack: React.FC = () => {
 export const S13FloorFront: React.FC = () => (
   <>
     <Pouf x={96} y={1800} rx={150} ry={46} />
+    {/* a stack of books on the floorboards (cut by the bottom edge) with your glasses on it */}
+    <BookStack x={470} y={1880} w={170} n={4} seed="s13/floorstack" ink={W.far} scale={1.3} />
+    <Glasses x={560} y={1762} w={100} rot={-8} seed="s13/glasses" ink={W.far} />
     <YarnBasket x={846} y={1830} />
   </>
 );
@@ -259,9 +290,9 @@ export const S13Pip: React.FC<{x: number; y: number}> = ({x, y}) => {
     const shrink = u > 0.72 ? 1 - (u - 0.72) / 0.28 : 1;
     const s = (0.4 + 0.6 * grow) * shrink;
     if (s < 0.05) continue;
-    const zx = x + 44 + 40 * u + 7 * Math.sin(u * 5 + k);
-    const zy = y - 112 - 84 * u;
-    const size = 34 + (k % 3) * 6;
+    const zx = x + 50 + 46 * u + 8 * Math.sin(u * 5 + k);
+    const zy = y - 118 - 96 * u;
+    const size = 50 + (k % 3) * 8;
     zs.push(
       <XG key={k} m={mat.about(mat.scale(s), zx, zy)}>
         <Txt x={zx} y={zy} size={size} fill={EMBER.beam} rot={-12 + (k % 2) * 8}>
@@ -273,8 +304,8 @@ export const S13Pip: React.FC<{x: number; y: number}> = ({x, y}) => {
   return (
     <>
       {/* a short colour shadow under Pip on the rug */}
-      <Fill d={blob(x + 10, y + 3, 84, 11, {seed: 's13/pipsh'})} color="#D9A58A" offset={false} />
-      <Pip3 x={x} y={y} scale={1.45} pose="sleep" seed={13} />
+      <Fill d={blob(x + 10, y + 3, 90, 12, {seed: 's13/pipsh'})} color="#D9A58A" offset={false} />
+      <Pip3 x={x} y={y} scale={1.55} pose="sleep" seed={13} />
       {zs}
     </>
   );
