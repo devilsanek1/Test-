@@ -20,10 +20,10 @@ const SOURCES: Src[] = [
   {x0: -70, x1: 150, color: CM.sage, depth: 64, dens: 0.42},
   {x0: -40, x1: 90, color: CM.leafGold, depth: 40, dens: 0.3, y: 18},
   // the terrace walls (broken brick strips)
-  {x0: 170, x1: 520, color: CM.brick, depth: 80, dens: 0.34},
-  {x0: 530, x1: 770, color: CM.stucco, depth: 70, dens: 0.4},
-  {x0: 780, x1: 1005, color: CM.brickDeep, depth: 78, dens: 0.34},
-  {x0: 1012, x1: 1180, color: CM.sage, depth: 70, dens: 0.38},
+  {x0: 170, x1: 520, color: CM.brick, depth: 80, dens: 0.24},
+  {x0: 530, x1: 770, color: CM.stucco, depth: 70, dens: 0.3},
+  {x0: 780, x1: 1005, color: CM.brickDeep, depth: 78, dens: 0.24},
+  {x0: 1012, x1: 1180, color: CM.sage, depth: 70, dens: 0.28},
   // her lit window above the box: the brightest column (warm), and the lit ground-floor rooms
   {x0: 288, x1: 384, color: CM.lampCore, depth: 118, dens: 0.72},
   {x0: 300, x1: 372, color: CM.lamp, depth: 96, dens: 0.5, y: 8},
