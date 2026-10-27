@@ -98,7 +98,7 @@ export const TICKER: TickerStep[] = [
 export const OLD_AT = 1.88;
 export const STRIKE_AT = 1.92;
 export const TURN_AT = 39.7;
-export const REACT = {tap: 0.0, jolt: [15.3, 35.95], tug: 18.3, sway: 24.44};
+export const REACT = {tap: 0.0, settle: 2.72, lower: 3.82, jolt: [15.3, 35.95], tug: 18.3, sway: 24.44};
 /** The warm rim on the tag's lamp side while it ticks (CRAFT §d.8: the subject only). */
 export const RIM_WINDOW: [number, number] = [1.86, 3.3];
 
@@ -110,6 +110,16 @@ export function tagReaction(T: number): number {
   if (T >= REACT.tap) {
     const d = T - REACT.tap;
     a += 4.2 * Math.exp(-d * 1.5) * Math.sin(d * Math.PI * 2 * 1.3);
+  }
+  // after the last tick the tag keeps settling (~1 s), and when the phone lowers (3.64-4.00) it swings from inertia
+  // and settles through "data centers are." (physical secondary motion on the subject; small next to the beat)
+  if (T >= REACT.settle) {
+    const d = T - REACT.settle;
+    a += 3.2 * Math.exp(-d * 2.0) * Math.sin(d * Math.PI * 2 * 1.5);
+  }
+  if (T >= REACT.lower) {
+    const d = T - REACT.lower;
+    a += -3.4 * Math.exp(-d * 1.5) * Math.sin(d * Math.PI * 2 * 1.2);
   }
   for (const j of REACT.jolt) if (T >= j) a += 7 * Math.exp(-(T - j) * 9) * Math.sin((T - j) * 34);
   if (T >= REACT.tug) {
@@ -136,9 +146,9 @@ export function screenDim(T: number): number {
   const b = litAt(T - 0.05);
   return a && b ? 0 : !a && !b ? 1 : 0.5;
 }
-/** The dim step: a warm multiply (screen white -> L* ~90), never grey. */
-export const DIM_TINT = '#EEE3DA';
-const DIM_HALF = '#F7F1EC';
+/** The dim step: a warm multiply (screen white -> L* ~89), never grey. */
+export const DIM_TINT = '#EBDFD5';
+const DIM_HALF = '#F5EFEA';
 
 // ================================================================= Pip
 
