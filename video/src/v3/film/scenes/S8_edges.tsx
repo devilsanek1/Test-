@@ -16,8 +16,9 @@ import {blob, circle, line, polyPath, smooth} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
-import {Cable, DeskGrain, EMBER, Leaf, Pip3, quadPt, ring, StringLights3, sway, Txt, WallMarks, W, type LookKey, type PipPoseKey, type Pt} from '../kit';
-import {PhoneDown, SpiralNotebook} from './S7_desk';
+import {Cable, DeskGrain, EMBER, FramedPrint, Glasses, Leaf, Pip3, quadPt, ring, StringLights3, sway, Txt, WallMarks, W, type LookKey, type PipPoseKey, type Pt} from '../kit';
+import {PhotoLine} from './O1_life';
+import {Clementines, PhoneDown, SpiralNotebook} from './S7_desk';
 
 type Quad = [Pt, Pt, Pt, Pt];
 
@@ -56,9 +57,15 @@ const Vines: React.FC = () => {
 export const S8WallTop: React.FC = () => (
   <>
     <WallMarks x={60} y={30} w={500} h={160} n={4} seed="s8/wm1" />
-    <WallMarks x={620} y={210} w={260} h={50} n={2} seed="s8/wm2" />
+    <WallMarks x={330} y={206} w={560} h={60} n={4} seed="s8/wm2" />
+    {/* S7's sea print, at close size, between the bulbs */}
+    <FramedPrint x={640} y={128} w={136} h={146} picture="sea" seed="s8/print" ink={W.far} />
+    {/* S7's instant photos on their cord, at close size (top left, bottoms ~214) */}
+    <XG m={mat.scale(2)}>
+      <PhotoLine x0={-30} y0={30} x1={150} y1={24} sag={10} />
+    </XG>
     {/* the lowest bulbs of S7's strand, at close size (bulbs ~y 120-225, halos clear of the band) */}
-    <StringLights3 points={[[-80, -30], [360, 118], [820, 92], [1160, -40]]} sag={22} n={4} r={20} sway={2.4} ink={W.far} seed="s8/lights" />
+    <StringLights3 points={[[260, -40], [560, 116], [900, 100], [1160, -40]]} sag={20} n={3} r={20} sway={2.4} ink={W.far} seed="s8/lights" />
     <Vines />
   </>
 );
@@ -104,24 +111,41 @@ const capQuad = (deck: Quad, i: number, j: number): Pt[] => {
   return [quadPt(deck, a, v - hv), quadPt(deck, c, v - hv), quadPt(deck, c, v + hv), quadPt(deck, a, v + hv)];
 };
 
-/** Hairline legends on the caps the stick leaves visible (rows 1-3 left of x 170 and right of x 910). */
-export const KeyLegends: React.FC<{deck: Quad}> = ({deck}) => {
-  const keys: [number, number, string][] = [
-    [0, 0, 'Q'], [0, 1, 'W'], [0, 10, 'O'], [0, 11, 'P'],
-    [1, 0, 'A'], [1, 1, 'S'], [1, 11, 'L'],
-    [2, 0, 'Z'], [2, 11, '?'],
-  ];
+/** Hairline legends on every cap (the stick covers the middle ones once it stands), the speaker grilles either side of
+ *  the trackpad and the webcam dot on the top bezel: the close-up's fine detail on the subject, all one step off its
+ *  ground (light legends on the dark caps, heroDeep dots on the hero deck). */
+export const KeyLegends: React.FC<{deck: Quad; lid: Quad}> = ({deck, lid}) => {
+  const rows = ['QWERTYUIOP[]', "ASDFGHJKL;'#", 'ZXCVBNM,./?^'];
+  const out: React.ReactNode[] = [];
+  rows.forEach((row, i) => {
+    for (let j = 0; j < 12; j++) {
+      const [cx, cy] = capCentre(deck, i, j);
+      if (cx < -30 || cx > 1110) continue;
+      out.push(
+        <Txt key={`${i}_${j}`} x={cx - 4} y={cy + 8} size={26} fill={EMBER.reveal}>
+          {row[j]}
+        </Txt>,
+      );
+    }
+  });
+  // speaker grilles: dots in two blocks beside the trackpad
+  let dots = '';
+  for (const [u0, u1] of [[0.13, 0.31], [0.69, 0.87]] as const) {
+    for (let r = 0; r < 4; r++) {
+      for (let k = 0; k < 9; k++) {
+        const [x, y] = quadPt(deck, u0 + ((u1 - u0) * (k + 0.5)) / 9, 0.72 + r * 0.055);
+        if (x < -10 || x > 1090) continue;
+        dots += `M${(x - 3.2).toFixed(1)} ${y.toFixed(1)}a3.2 2.6 0 1 0 6.4 0a3.2 2.6 0 1 0 -6.4 0`;
+      }
+    }
+  }
+  const cam = quadPt(lid, 0.5, 0.09);
   return (
     <>
-      {keys.map(([i, j, ch]) => {
-        const [cx, cy] = capCentre(deck, i, j);
-        if (cx < -30 || cx > 1110) return null;
-        return (
-          <Txt key={`${i}${j}`} x={cx - 4} y={cy + 6} size={22} fill={EMBER.reveal}>
-            {ch}
-          </Txt>
-        );
-      })}
+      {out}
+      <path d={dots} fill={EMBER.anchor} />
+      <circle cx={cam[0]} cy={cam[1]} r={9} fill={EMBER.anchor} stroke={EMBER.ink} strokeWidth={1.6} />
+      <circle cx={cam[0] + 2.5} cy={cam[1] - 2.5} r={2.6} fill={EMBER.skyLow} />
     </>
   );
 };
@@ -186,6 +210,11 @@ export const S8DeskFront: React.FC = () => (
     {/* the spiral notebook and its pen, cut by the left edge (S7's notebook at close size) */}
     <SpiralNotebook quad={[[-330, 1508], [150, 1494], [190, 1900], [-300, 1930]]} rings={8} ringR={1.7} pen={[[-40, 1780], [236, 1590]]} penW={26} ink={W.front} seed="s8/nb" />
     <Biscuit x={378} y={1660} seed="s8/biscuit" />
+    <Clementines x={236} y={1548} k={1.9} seed="s8/clem" />
+    <Glasses x={598} y={1612} w={230} rot={9} seed="s8/glasses" ink={W.mid} />
+    {[[488, 1560, 4], [520, 1590, 3], [460, 1600, 3.4], [640, 1700, 4]].map(([cx, cy, cr], i) => (
+      <Fill key={i} d={circle(cx, cy, cr)} color={EMBER.books[6]} offset={false} />
+    ))}
     {/* your phone's corner and a sticky note cut by the bottom edge */}
     <PhoneDown x={520} y={1772} w={330} rot={-6} seed="s8/phone" />
     <DeskNote x={286} y={1790} s={128} rot={-12} color={EMBER.ring} seed="s8/note2" />

@@ -24,7 +24,7 @@ import {blob, circle, ellipse, line, poly, polyPath, roundRect, textLines} from 
 import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
-import {Letters, Mittens, PhotoLine, Planner} from './O1_life';
+import {Letters, Mittens, PhotoLine, Planner, Radio, StarLantern} from './O1_life';
 import {
   BookStack,
   Cable,
@@ -82,7 +82,7 @@ const Slope: React.FC = () => {
   const yAt = (x: number) => -50 + (x - x0) * k;
   const slope: Pt[] = [[x0, -80], [1170, -80], [1170, yAt(1170)]];
   const beam: Pt[] = [[x0, -50], [1170, yAt(1170)], [1170, yAt(1170) + 26], [x0 - 42, -50]];
-  const planks = [60, 120].map((d) => line(x0 + d / k, -50, 1170, yAt(1170) - d, {over: [0, 0], seed: `s7/pl${d}`})).join('');
+  const planks = [50, 100, 150].map((d) => line(x0 + d / k, -50, 1170, yAt(1170) - d, {over: [0, 0], seed: `s7/pl${d}`})).join('');
   return (
     <>
       <Fill d={polyPath(slope)} color={EMBER.slope} offset={false} />
@@ -104,6 +104,8 @@ export const S7WallTop: React.FC = () => (
     <PhotoLine x0={44} y0={182} x1={298} y1={172} sag={12} />
     <HangingPlant x={452} y={150} seed="s7/hang" />
     <FramedPrint x={612} y={146} w={104} h={118} picture="sea" seed="s7/print" ink={W.far} />
+    {/* O1's paper star, hung from the beam (lit, swaying and turning slowly) */}
+    <StarLantern x={1004} hookY={128} cy={204} r={30} litAt={-1} />
   </>
 );
 
@@ -128,6 +130,55 @@ const Socket: React.FC<{x: number; y: number}> = ({x, y}) => {
   );
 };
 
+/** A postcard taped to the wall (a snowy hill under a dusk sky), its free corner lifting a hair in the room's air. */
+const TapedCard: React.FC<{x: number; y: number; w: number; h: number}> = ({x, y, w, h}) => {
+  const t = useTime();
+  const a = 5 + sway(t, 0.8, 4.6, 0.9);
+  return (
+    <XG m={mat.about(mat.rotate(a), x + w / 2, y + 4)}>
+      <Fill rect={[x, y, w, h]} color={EMBER.card} seed="s7/tc" />
+      <Fill rect={[x + 5, y + 5, w - 10, h * 0.6]} color={EMBER.sky} offset={false} />
+      <Fill d={`M${x + 5} ${y + h - 5}L${x + 5} ${y + h * 0.56}Q${x + w * 0.45} ${y + h * 0.3} ${x + w - 5} ${y + h * 0.58}L${x + w - 5} ${y + h - 5}Z`} color={EMBER.snow} offset={false} />
+      <Fill d={circle(x + w * 0.72, y + h * 0.26, 6)} color={EMBER.houseLit} offset={false} />
+      <Fill rect={[x + w * 0.36, y - 7, 26, 12]} color={EMBER.frost} offset={false} />
+      <Ink d={`M${x} ${y}h${w}v${h}h${-w}Z`} width={W.hair} />
+    </XG>
+  );
+};
+
+/** A sticky note stuck on the wall, a line of writing, its bottom edge lifting a hair. */
+const WallNote: React.FC<{x: number; y: number; s: number; rot: number; color: string; seed: string}> = ({x, y, s, rot, color, seed}) => {
+  const t = useTime();
+  const a = rot + sway(t, 0.7, 3.7, x * 0.01);
+  return (
+    <XG m={mat.about(mat.rotate(a), x + s / 2, y)}>
+      <Fill rect={[x, y, s, s]} color={color} seed={`${seed}/f`} />
+      <Ink d={`M${x} ${y}h${s}v${s}h${-s}Z`} width={W.hair} />
+      <Ink d={line(x + s * 0.15, y + s * 0.4, x + s * 0.8, y + s * 0.38, {over: [0, 0], seed: `${seed}/l1`}) + line(x + s * 0.15, y + s * 0.62, x + s * 0.6, y + s * 0.62, {over: [0, 0], seed: `${seed}/l2`})} width={W.hair} />
+    </XG>
+  );
+};
+
+/** A small ceramic dish of paper clips and coins. */
+const ClipDish: React.FC<{x: number; y: number}> = ({x, y}) => {
+  const dish = ellipse(x, y, 52, 18, {seed: 's7/dish'});
+  const clip = (cx: number, cy: number, rot: number, col: string, i: number) => (
+    <path key={i} d={`M${cx - 14} ${cy}a5 5 0 0 1 5 -5h18a5 5 0 0 1 0 10h-16a3.5 3.5 0 0 1 0 -7h14`} transform={`rotate(${rot} ${cx} ${cy})`} fill="none" stroke={col} strokeWidth={2.2} strokeLinecap="round" />
+  );
+  return (
+    <>
+      <Fill d={dish} color={EMBER.reveal} seed="s7/dishF" />
+      <Fill d={ellipse(x, y - 3, 38, 11, {seed: 's7/dishIn'})} color={EMBER.wall} offset={false} />
+      <Ink d={dish} width={W.far} />
+      {clip(x - 14, y - 4, -12, EMBER.dc, 0)}
+      {clip(x + 12, y - 2, 20, EMBER.beam, 1)}
+      <Fill d={ellipse(x + 2, y - 6, 9, 4, {seed: 's7/coin1'})} color={EMBER.books[0]} offset={false} />
+      <Fill d={ellipse(x - 30, y + 26, 10, 5, {seed: 's7/coin2'})} color={EMBER.ring} seed="s7/coin2F" />
+      <Ink d={ellipse(x - 30, y + 26, 10, 5, {seed: 's7/coin2I'})} width={W.hair} />
+    </>
+  );
+};
+
 export const S7WallLow: React.FC = () => (
   <>
     <WallMarks x={196} y={880} w={110} h={70} n={2} seed="s7/wm3" />
@@ -139,6 +190,12 @@ export const S7WallLow: React.FC = () => (
     <Plant x={872} y={806} kind="pothos" size={50} trail={118} amp={3} period={3.4} seed="s7/shelfpothos" ink={W.far} />
     <Calendar x={952} y={866} w={100} from="2026" seed="s7/cal" ink={W.far} />
     <Socket x={268} y={948} />
+    {/* left of the pinboard, over the lamp's rod: a small leaf print; right, over the shelf: a taped postcard */}
+    <FramedPrint x={30} y={624} w={98} h={110} picture="leaf" seed="s7/print2" ink={W.far} />
+    <TapedCard x={958} y={618} w={94} h={62} />
+    {/* two sticky notes on the wall by the laptop's top-right corner (reminders) */}
+    <WallNote x={776} y={896} s={56} rot={-7} color={EMBER.core} seed="s7/wn1" />
+    <WallNote x={808} y={946} s={52} rot={6} color={EMBER.hl} seed="s7/wn2" />
   </>
 );
 
@@ -223,7 +280,7 @@ const Biscuits: React.FC<{x: number; y: number; k?: number; seed: string}> = ({x
 export const S7_PORT: Pt = [768, 1198];
 
 /** Two clementines on the desk, one half peeled (a winter desk; warm confetti, never the hero orange). */
-const Clementines: React.FC<{x: number; y: number; seed: string}> = ({x, y, seed}) => {
+export const Clementines: React.FC<{x: number; y: number; k?: number; seed: string}> = ({x, y, k = 1, seed}) => {
   const fruit = (cx: number, cy: number, r: number, i: number, peeled: boolean) => (
     <React.Fragment key={i}>
       <Fill d={blob(cx, cy, r, r * 0.86, {seed: `${seed}/f${i}`})} color={peeled ? EMBER.books[0] : EMBER.pot} seed={`${seed}/fF${i}`} />
@@ -236,13 +293,14 @@ const Clementines: React.FC<{x: number; y: number; seed: string}> = ({x, y, seed
       )}
     </React.Fragment>
   );
+  const peel = `M${x + 50 * k} ${y + 22 * k}q${16 * k} ${-10 * k} ${30 * k} ${2 * k}q${10 * k} ${10 * k} ${-4 * k} ${18 * k}q${-14 * k} ${4 * k} ${-26 * k} ${-6 * k}z`;
   return (
     <>
       {/* a curl of peel */}
-      <Fill d={`M${x + 50} ${y + 22}q16 -10 30 2q10 10 -4 18q-14 4 -26 -6z`} color={EMBER.pot} seed={`${seed}/peel`} />
-      <Ink d={`M${x + 50} ${y + 22}q16 -10 30 2q10 10 -4 18q-14 4 -26 -6z`} width={W.hair} />
-      {fruit(x, y, 30, 0, false)}
-      {fruit(x + 46, y - 16, 27, 1, true)}
+      <Fill d={peel} color={EMBER.pot} seed={`${seed}/peel`} />
+      <Ink d={peel} width={W.hair} />
+      {fruit(x, y, 30 * k, 0, false)}
+      {fruit(x + 46 * k, y - 16 * k, 27 * k, 1, true)}
     </>
   );
 };
@@ -253,7 +311,8 @@ export const S7DeskMid: React.FC = () => (
     <Mittens x={8} y={1352} />
     <Biscuits x={170} y={1404} seed="s7/biscuits" />
     <Clementines x={352} y={1424} seed="s7/clem" />
-    <Plant x={1030} y={1584} kind="cactus" size={74} seed="s7/cactus" ink={W.far} />
+    <Radio x={944} y={1596} w={116} />
+    <ClipDish x={708} y={1470} />
     {/* the charger: from the right edge across the desk, under Pip, into the laptop's right port */}
     <Cable points={[S7_PORT, [812, 1226], [900, 1258], [1004, 1246], [1130, 1292]]} plug width={7} color={EMBER.dcSide} />
     <Glasses x={962} y={1352} w={122} rot={-14} seed="s7/glasses" ink={W.far} />

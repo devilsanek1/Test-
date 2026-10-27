@@ -72,7 +72,7 @@ const S8: React.FC = () => {
         <S8DeskFront />
         <Laptop x={LAP.x} y={LAP.y} w={LAP.w} lidH={LAP.lidH} variant="old" screen={EMBER.dcSide} ink={4.8} seed="s8/lap" />
         <BezelNote x={22} y={598} />
-        <KeyLegends deck={g.deck} />
+        <KeyLegends deck={g.deck} lid={g.lid} />
         <KeySprings deck={g.deck} />
         <defs>
           <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
