@@ -1,48 +1,84 @@
 // P3 helpers (lane L3-people):
-//   P3Underline  the ordinary underline under the page's CONTRACT title, drawn on like a pencil stroke on "contracts"
-//                (12.20, the pencil sound): anchor ink, a hand-drawn line with a small hook, never the pop.
-//   P3TableTop   the table's dressing, re-laid for this panel (a local copy of kit InterviewTableTop, same pieces and
-//                life): the kit's mic cable runs diagonally across the CONTRACT page (it read as a slash through the
-//                page, right where the underline lands) and its recorder sits behind the NAME WITHHELD tent (its
-//                blinking light never shows). Here the recorder sits in front of the mic, left of the page, on a short
-//                cable that never touches the page; the glasses and the pen stay where the kit put them.
+//   P3Contract   the CONTRACT on the table, front and centre-left under A's hand with its own space (the art director:
+//                it was pushed left and half-tucked beside a NAME WITHHELD tent of the same cream and lettering size, so
+//                the table read as two equal labels): a real contract (a second sheet under it, a staple, the title at
+//                48 px, ruled lines, a signature line with a signature), on the table top's deeper value so it pops.
+//   P3Underline  the ordinary underline under its CONTRACT title, drawn on fast like a pencil stroke on "contracts"
+//                (12.20, the pencil sound): anchor ink, 15 px, with a slight overshoot and a small hook, never the pop.
+//   P3TableTop   the table's dressing, re-laid round the page and the tent: the recorder back-left beside the mic (its
+//                light blinks), the mic's short cable to it, a water glass in front of it (a ripple), a second glass and
+//                the pen on the right by B; nothing touches the page or the tent.
 //   P3GlassNotes the office's things stuck on the frosted partition, clear of both heads: a printed notice taped on the
-//                middle pane, sticky notes on the right pane, a room-booking card by the left mullion (it breaks the
-//                flat glass behind them; all static, the walker and the office beyond carry the life).
-//   P3Passers    life that READS at phone size in the kit walker's gap (it crosses the partition at t 0-1.3 and
-//                2.7-4.9, so 1.3-2.7 had only faces moving): a second colleague carrying a stack of archive boxes
-//                crosses behind the frosted glass left to right (1.15-3.25, the kit walker's silhouette and colour,
-//                behind the mullions and the frosted band), and a flock of filled birds crosses the dusk sky in the glass
-//                wall right to left (from 1.3).
+//                middle pane, sticky notes on the right pane, a room-booking card by the left mullion.
+//   P3Passers    life that READS at phone size in the room's walker gap (the colleague behind the partition crosses at
+//                t 0-1.3 and 2.7-4.9): a second colleague carrying a stack of archive boxes crosses behind the frosted
+//                glass left to right (1.15-3.25), and a flock of filled birds crosses the dusk in the glass wall (from 1.3).
 import React, {useId} from 'react';
 import {hline, line, polyPath, roundRect, smooth, textLines} from '../../../lib/sketch';
 import {useTime} from '../../../lib/time';
-import {CC, Fill, Flock, INTERVIEW, Ink, Live, loopT, onOff, quadPt, W, type Pt} from '../kit';
+import {b, CC, Fill, Flock, INTERVIEW, Ink, Letter, Live, loopT, onOff, quadPt, W, type Pt} from '../kit';
+import {P3C} from './P3_room';
 
-/** The page quad (the kit TablePage's numbers). */
+/** The CONTRACT page on the table (screen px): a perspective quad (the far edge inset), front and centre-left. */
+export const P3_PAGE = {x0: 120, x1: 440, top: 1384, bottom: 1526, inset: 18};
+/** NAME WITHHELD's tent in front of A (bottom centre x, y; w, h): its words at 46 px, clear of the page. */
+export const P3_TENT = {x: 664, y: 1520, w: 320, h: 100};
+
 const pageQuad = (): [Pt, Pt, Pt, Pt] => {
-  const {x, y, w, h} = INTERVIEW.page;
-  const inset = w * 0.06;
-  return [[x + inset, y], [x + w - inset, y], [x + w, y + h], [x, y + h]];
+  const {x0, x1, top, bottom, inset} = P3_PAGE;
+  return [[x0 + inset, top], [x1 - inset, top], [x1, bottom], [x0, bottom]];
+};
+/** The title's baseline centre and size. */
+const TITLE = (() => {
+  const c = quadPt(pageQuad(), 0.5, 0.36);
+  return {x: c[0], y: c[1] + 4, size: 48};
+})();
+
+export const P3Contract: React.FC<{seed?: string}> = ({seed = 'p3page'}) => {
+  const q = pageQuad();
+  const under: Pt[] = q.map(([x, y], i): Pt => [x + (i === 0 || i === 3 ? 12 : 16), y + (i < 2 ? -6 : 6)]);
+  const shadow: Pt[] = under.map(([x, y]): Pt => [x + 6, y + 8]);
+  const rows = [0.6, 0.7, 0.8].map((v, i) => {
+    const a = quadPt(q, 0.1, v);
+    const z = quadPt(q, 0.9 - (i % 2) * 0.16, v);
+    return line(a[0], a[1], z[0], z[1], {over: [0, 0], seed: `${seed}/r${i}`});
+  });
+  const s0 = quadPt(q, 0.52, 0.92);
+  const s1 = quadPt(q, 0.92, 0.92);
+  const sig = smooth([[s0[0] + 10, s0[1] - 6], [s0[0] + 28, s0[1] - 22], [s0[0] + 40, s0[1] - 4], [s0[0] + 58, s0[1] - 20], [s0[0] + 80, s0[1] - 8], [s0[0] + 104, s0[1] - 14]]);
+  const st = quadPt(q, 0.06, 0.08);
+  return (
+    <>
+      <Fill d={polyPath(shadow)} color={P3C.tableShade} offset={false} />
+      <Fill d={polyPath(under)} color={CC.paperEdge} offset={false} />
+      <Ink d={polyPath(under)} width={W.far} />
+      <Fill d={polyPath(q)} color={CC.paper} seed={`${seed}/p`} />
+      <Ink d={polyPath(q)} width={W.mid} />
+      <Ink d={line(st[0], st[1] + 6, st[0] + 20, st[1] - 4, {over: [0, 0], seed: `${seed}/staple`})} width={4} color={CC.shelfMetal} taper={false} />
+      <Letter x={TITLE.x} y={TITLE.y} size={TITLE.size} fit={(P3_PAGE.x1 - P3_PAGE.x0) * 0.74} anchor="middle">
+        CONTRACT
+      </Letter>
+      <Ink d={rows.join('')} width={W.far} />
+      <Ink d={line(s0[0], s0[1], s1[0], s1[1], {over: [0, 0], seed: `${seed}/sl`}) + sig} width={W.hair + 0.4} />
+      <Ink d={line(s0[0] - 22, s0[1] - 16, s0[0] - 8, s0[1] - 4, {over: [0, 0], seed: `${seed}/x1`}) + line(s0[0] - 22, s0[1] - 4, s0[0] - 8, s0[1] - 16, {over: [0, 0], seed: `${seed}/x2`})} width={W.hair} />
+    </>
+  );
 };
 
-/** The CONTRACT title's underline (screen px): the title is centred at the page's (0.5, 0.3) point, baseline + 0.1 h,
- *  fitted to 0.7 w. */
+/** The underline under CONTRACT (screen px), drawn on fast from `at`: 15 px, a slight overshoot, a small hook. */
 export const P3Underline: React.FC<{at: number}> = ({at}) => {
-  const {w, h} = INTERVIEW.page;
-  const c = quadPt(pageQuad(), 0.5, 0.3);
-  const yl = c[1] + h * 0.1 + 12;
-  const half = w * 0.33;
-  const d = smooth([[c[0] - half, yl + 2], [c[0] - half * 0.3, yl - 1], [c[0] + half * 0.4, yl + 1], [c[0] + half, yl - 3], [c[0] + half - 14, yl + 7]]);
-  return <Ink d={d} width={9} color={CC.anchor} at={at} dur={0.26} pace="free" taper={false} />;
+  const half = 112;
+  const yl = TITLE.y + 16;
+  const x = TITLE.x;
+  const d = smooth([[x - half, yl + 2], [x - half * 0.3, yl - 1], [x + half * 0.4, yl + 1], [x + half + 12, yl - 4], [x + half - 4, yl + 8]]);
+  return <Ink d={d} width={15} color={CC.anchor} at={at} dur={0.16} pace="free" taper={false} />;
 };
 
-/** The recorder (left of the page, in front of the mic: its light blinks), two water glasses (a ripple), the mic's
- *  short cable, a pen. Draw after the table and the page, before the staffers' arms. */
+/** The table's dressing (screen px; draw after the page, before the staffers' arms). */
 export const P3TableTop: React.FC<{seed?: string}> = ({seed = 'p3top'}) => {
   const t = useTime();
   const m = INTERVIEW.mic;
-  const rec = {x: 34, y: 1436, w: 118, h: 58};
+  const rec = {x: 8, y: 1388, w: 110, h: 54};
   const blink = onOff(t, `${seed}/rec`, 1.1, 0.55);
   const glass = (x: number, y: number, k: string, ph: number) => {
     const rp = loopT(t, 2.4, ph) / 2.4;
@@ -59,17 +95,17 @@ export const P3TableTop: React.FC<{seed?: string}> = ({seed = 'p3top'}) => {
   };
   return (
     <>
-      {/* the mic's cable: down from its base, round to the recorder's back (left of the page) */}
-      <Ink d={smooth([[m.x + 14, m.y - 2], [m.x + 10, m.y + 40], [m.x - 20, m.y + 76], [rec.x + rec.w - 10, rec.y + 6]])} width={4} color={CC.cable} taper={false} />
+      {/* the mic's short cable round to the recorder's back */}
+      <Ink d={smooth([[m.x - 20, m.y - 2], [m.x - 36, m.y + 22], [rec.x + rec.w - 6, rec.y + 14]])} width={4} color={CC.cable} taper={false} />
       <Fill d={roundRect(rec.x, rec.y, rec.w, rec.h, 10)} color={CC.stand} seed={`${seed}/rec`} />
-      <Fill d={roundRect(rec.x + 12, rec.y + 12, 56, 32, 4)} color={CC.studioDeep} offset={false} />
+      <Fill d={roundRect(rec.x + 12, rec.y + 12, 52, 30, 4)} color={CC.studioDeep} offset={false} />
       <Ink d={roundRect(rec.x, rec.y, rec.w, rec.h, 10, {seed: `${seed}/recI`})} width={W.mid} />
-      <Live c={[rec.x + 94, rec.y + 28]}>
-        <circle cx={rec.x + 94} cy={rec.y + 28} r={10} fill={blink ? CC.recLight : CC.studioDeep} />
+      <Live c={[rec.x + 86, rec.y + 27]}>
+        <circle cx={rec.x + 86} cy={rec.y + 27} r={10} fill={blink ? CC.recLight : CC.studioDeep} />
       </Live>
-      {glass(250, 1440, 'g1', 0)}
+      {glass(78, 1512, 'g1', 0)}
       {glass(1010, 1460, 'g2', 1.1)}
-      <Ink d={line(820, 1500, 940, 1470, {over: [0, 0], seed: `${seed}/pen`})} width={12} color={CC.anchor} taper={false} />
+      <Ink d={line(850, 1508, 950, 1482, {over: [0, 0], seed: `${seed}/pen`})} width={12} color={CC.anchor} taper={false} />
     </>
   );
 };
