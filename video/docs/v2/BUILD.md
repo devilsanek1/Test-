@@ -68,7 +68,7 @@ Palette check: `problems()` in `src/v2r/palette.ts` (pass measured coverage for 
 ```bash
 python3 -I scripts/qa/gate_check.py --mp4 <render.mp4> --scenes src/v2r/film/scenes.json --captions src/v2r/film/captions.json \
   --voice public/v2/voice.wav --entry src/entry-v2r-film.tsx --comp Film2R \
-  --frame0 "SHE SAYS: NO CRITICIZING|GOOGLE. FOR LIFE." --frame0-until 5.95      # one shot: --only V2S4 on a Film2R-V2S4 render
+  --frame0 "SHE SAYS: NO CRITICIZING|GOOGLE. FOR LIFE." --frame0-until 5.95 --frame0-geom '{"size":72,"baselines":[372,452],"captionBaseline":516,"captionScale":0.5306,"spoken":"first","keys":["SAYS:","NO","NO CRITICIZING","FOR LIFE."],"source":"Source: BBC News, 21 Oct 2026","sourceSize":20,"sourceBaseline":550}'   # = FILM2R_FRAME0; cuts follow transitionIn (push-through bridge: cuts at c +- 0.05; foreground-wipe: no cut); one shot: --only V2S4 on a Film2R-V2S4 render
 ```
 Known by design (2026-10-27 smoke): `FAIL cuts` for V2S2 (the push-through's bridge cuts at f363 / f369, around 366) and V2S8 (a
 foreground wipe has no hard cut); WARN cut-like frames at the flood, the dive, the bridge and the un-build. gate_check models the
