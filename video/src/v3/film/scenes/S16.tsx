@@ -53,6 +53,7 @@ const PIP_KEYS: PipPoseKey[] = [
   {t: -9, pose: 'sit-back'},
   {t: POP_AT - 0.02, pose: 'trunk-up'},
   {t: SHRUG_AT, pose: 'shrug'},
+  {t: SHRUG_AT + 0.44, pose: 'sit-back'},
 ];
 
 const S16Pip: React.FC = () => (
@@ -81,7 +82,7 @@ const S16: React.FC = () => {
         <S16Grain />
         <Lamp pose={{base: [-170, 1250], elbow: [-60, 650], head: [92, 790], rot: 32, scale: 1.25}} seed="s16/lamp" />
         <ExitFade x={96} y={940}>
-          <PullChain x={96} y={938} len={44} amp={6} jolt={[TURN_AT + 0.14]} />
+          <PullChain x={96} y={938} len={44} amp={8} jolt={[TURN_AT + 0.14]} />
         </ExitFade>
         <S16DeskBack />
         <Laptop x={LAP.x} y={LAP.y} w={LAP.w} variant="new" seed="s16/lap" />

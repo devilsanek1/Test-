@@ -68,7 +68,9 @@ export const S16WallTop: React.FC = () => (
     <WallMarks x={500} y={214} w={240} h={50} n={2} seed="s16/wm2" />
     <Slope />
     {/* the paper star hung from the beam (lit, swaying and turning slowly) */}
-    <StarLantern x={1004} hookY={96} cy={190} r={32} litAt={-1} />
+    <ExitFade x={1004} y={190}>
+      <StarLantern x={1004} hookY={96} cy={190} r={32} litAt={-1} />
+    </ExitFade>
     {/* warm string lights swagged from the left edge to the beam (bulbs y 50-200; a bulb twinkles every ~0.5 s); they
         swing when the tag's flip moves the air */}
     <ExitFade x={500} y={120}>
@@ -76,7 +78,9 @@ export const S16WallTop: React.FC = () => (
     </ExitFade>
     {/* instant photos pegged on a cord, top left (bottoms ~262: clear of the band) */}
     <PhotoLine x0={46} y0={186} x1={334} y1={174} sag={13} />
-    <HangingPlant x={482} y={156} seed="s16/hang" />
+    <ExitFade x={482} y={150}>
+      <HangingPlant x={482} y={156} seed="s16/hang" />
+    </ExitFade>
     <FramedPrint x={612} y={150} w={108} h={118} picture="sea" seed="s16/print" ink={W.far} />
   </>
 );
@@ -147,7 +151,9 @@ const Shelf: React.FC = () => (
     <WallShelf x={236} y={800} w={492} room={128} seed="s16/shelf" ink={W.far} />
     <StandingPhoto x={604} y={800} w={70} seed="s16/sphoto" />
     <Jar x={676} y={800} w={44} seed="s16/jar" />
-    <Plant x={282} y={800} kind="pothos" size={54} trail={104} amp={3} period={3.3} shakeAt={[AIR + 0.2]} seed="s16/shelfpothos" ink={W.far} />
+    <ExitFade x={282} y={820}>
+      <Plant x={282} y={800} kind="pothos" size={54} trail={104} amp={3} period={3.3} shakeAt={[AIR + 0.2]} seed="s16/shelfpothos" ink={W.far} />
+    </ExitFade>
   </>
 );
 
@@ -160,13 +166,17 @@ export const S16WallLow: React.FC = () => (
     <FramedPrint x={24} y={622} w={100} h={112} picture="leaf" seed="s16/print2" ink={W.far} />
     <Shelf />
     {/* right column: the 2026 calendar, the clock (its second hand ticks), the pinboard cut by the right edge */}
-    <Calendar x={792} y={624} w={104} from="2026" seed="s16/cal" ink={W.far} />
-    <WallClock cx={1006} cy={676} r={50} seed="s16/clock" ink={W.far} startMin={12} />
+    <ExitFade x={844} y={672}>
+      <Calendar x={792} y={624} w={104} from="2026" seed="s16/cal" ink={W.far} />
+    </ExitFade>
+    <ExitFade x={1006} y={676}>
+      <WallClock cx={1006} cy={676} r={50} seed="s16/clock" ink={W.far} startMin={12} />
+    </ExitFade>
     <ExitFade x={960} y={860}>
-      <Pinboard x={806} y={772} w={330} h={196} items={['photo', 'note', 'postcard', 'ticket', 'note', 'photo']} flutterAt={[AIR]} seed="s16/pin" ink={W.far} />
+      <Pinboard x={806} y={772} w={330} h={196} items={['photo', 'note', 'postcard', 'ticket', 'note', 'photo']} flutterAt={[0.14, AIR, 1.62]} seed="s16/pin" ink={W.far} />
     </ExitFade>
     {/* two sticky notes on the wall over Pip (reminders) */}
     <WallNote x={848} y={1010} s={54} rot={-6} color={EMBER.core} seed="s16/wn1" flutterAt={AIR + 0.08} />
-    <WallNote x={912} y={1034} s={50} rot={7} color={EMBER.hl} seed="s16/wn2" />
+    <WallNote x={912} y={1034} s={50} rot={7} color={EMBER.hl} seed="s16/wn2" flutterAt={1.54} />
   </>
 );

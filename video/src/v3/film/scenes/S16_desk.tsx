@@ -17,8 +17,8 @@ import {ExitFade} from '../../../lib/exit';
 import {blob, circle, ellipse, hline} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
 import {Letters, Planner} from './O1_life';
-import {Clementines, PhoneDown, SpiralNotebook} from './S7_desk';
-import {Cable, DeskGrain, EMBER, Glasses, Headphones, Mug, PenCup, StickyNotes, W, type Pt} from '../kit';
+import {Clementines, Pen, PhoneDown, SpiralNotebook} from './S7_desk';
+import {Cable, DeskGrain, EMBER, Glasses, Headphones, Mug, PenCup, Steam, StickyNotes, W, type Pt} from '../kit';
 import {S16_TURN} from './S16_wall';
 
 /** The desk's back edge (the wall above it). */
@@ -51,6 +51,10 @@ export const S16Grain: React.FC = () => (
 export const S16DeskBack: React.FC = () => (
   <>
     <PenCup x={1074} y={1278} w={58} seed="s16/pens" ink={W.far} />
+    {/* the tea's steam: warm-white puffs that rise and shrink to nothing over the mug (the steady back-row loop) */}
+    <ExitFade x={1015} y={1250}>
+      <Steam x={1015} y={1272} n={5} life={2.1} rise={120} drift={-10} r0={4} r1={13} wobble={6} seed="s16/steam" color={EMBER.card} />
+    </ExitFade>
     <Mug x={968} top={1286} w={94} seed="s16/mug" />
   </>
 );
@@ -96,15 +100,51 @@ export const S16DeskMid: React.FC = () => (
     <Clementines x={444} y={1522} k={1.3} seed="s16/clem" />
     {/* reading glasses on the pool's front rim (the lenses catch the lamp) */}
     <Glasses x={690} y={1438} w={150} rot={-8} seed="s16/glasses" ink={W.far} />
-    <StickyNotes x={760} y={1510} n={2} size={78} flutterAt={[S16_TURN + 0.18]} seed="s16/sticky" />
+    <StickyNotes x={760} y={1510} n={2} size={78} flutterAt={[S16_TURN + 0.18, 1.72]} seed="s16/sticky" />
     <Headphones x={980} y={1478} w={224} seed="s16/hp" ink={W.far} />
     <Biscuits x={930} y={1652} k={1.15} seed="s16/biscuits" />
   </>
 );
 
+/** Biro doodles on the notebook's page (over the kit's three lines): a little price tag with a question mark, a star,
+ *  and a two-line list with ticks. Thin blue-biro ink (the dusk family, never the pop). */
+const PageDoodle: React.FC = () => {
+  const c = EMBER.dc;
+  const tag = 'M118 1716L176 1708L196 1726L180 1746L122 1752Z';
+  const q = 'M146 1722Q150 1714 158 1716Q166 1720 160 1728Q154 1732 155 1738';
+  const star = 'M244 1704L250 1718L264 1718L253 1727L258 1741L244 1732L231 1740L236 1727L225 1718L239 1717Z';
+  const ticks = 'M112 1782l6 6l10 -12M112 1812l6 6l10 -12';
+  const list = 'M138 1784Q170 1781 214 1780M138 1814Q160 1812 190 1811';
+  return (
+    <>
+      <Ink d={tag + `M130 1730a4 4 0 1 0 0.1 0`} width={1.9} color={c} />
+      <Ink d={q} width={1.9} color={c} />
+      <Fill d={circle(155, 1744, 1.8)} color={c} offset={false} />
+      <Ink d={star} width={1.7} color={c} />
+      <Ink d={ticks + list} width={1.7} color={c} />
+    </>
+  );
+};
+
+/** Two coins on the desk. */
+const Coins: React.FC<{x: number; y: number}> = ({x, y}) => (
+  <>
+    <Fill d={ellipse(x, y, 17, 9, {seed: 's16/coin1'})} color={EMBER.ring} seed="s16/coin1F" />
+    <Ink d={ellipse(x, y, 17, 9, {seed: 's16/coin1I'})} width={W.hair} />
+    <Fill d={ellipse(x + 28, y + 12, 14, 7.5, {seed: 's16/coin2'})} color={EMBER.books[0]} seed="s16/coin2F" />
+    <Ink d={ellipse(x + 28, y + 12, 14, 7.5, {seed: 's16/coin2I'})} width={W.hair} />
+  </>
+);
+
 export const S16DeskFront: React.FC = () => (
   <>
-    <SpiralNotebook quad={[[-80, 1566], [318, 1538], [350, 1890], [-70, 1934]]} pen={[[40, 1900], [356, 1682]]} seed="s16/nb" />
+    <ExitFade x={140} y={1730}>
+      <SpiralNotebook quad={[[-80, 1566], [318, 1538], [350, 1890], [-70, 1934]]} seed="s16/nb" />
+    </ExitFade>
+    <PageDoodle />
+    <Pen from={[40, 1900]} to={[356, 1682]} wPx={16} seed="s16/nb/pen" />
+    <Pen from={[616, 1628]} to={[772, 1596]} wPx={13} color={EMBER.books[4]} seed="s16/pencil" />
+    <Coins x={668} y={1772} />
     <Letters x={548} y={1690} />
     <PhoneDown x={404} y={1790} w={220} rot={6} seed="s16/phone" />
     <Planner x={784} y={1712} />
