@@ -65,17 +65,33 @@ const WOOD_LIGHT = '#DDB06F'; // their lighter slat (L* ~74)
 const RATTAN = '#C9876A'; // the bistro chairs (L* ~62)
 const IRON = CM.coatSlate;
 const LEAF_SHADE = '#86A07E'; // the bay's inner lobes, a full step under the sage (L* ~63)
-const FERN = '#7E9C74'; // the near fern (L* ~61)
+const FERN = '#7E9C74'; // the near fern and the ivy (L* ~61)
+const TERRACOTTA_DEEP = '#BC7D60'; // the planter's second board (L* ~58)
+const SOIL = '#8C6A55'; // the soil inside the planter (L* ~47)
+const ASHLAR = '#C4A68E'; // the pier's second stone (L* ~70)
 const CANVAS = '#F1E3CB'; // the tote's canvas
 
 // ---------------------------------------------------------------- near: the pier (cut by the right edge)
 
 const Pier: React.FC = () => {
   const {x0, cap, base, xc} = FORE.pier;
+  // ashlar: three courses of blocks in two near stones, staggered by half a block (joints as value steps, no line)
+  const courses: [number, number][] = [
+    [cap + 36, cap + 118],
+    [cap + 118, cap + 210],
+    [cap + 210, base],
+  ];
+  const blocks = courses.map(([a, c], j) => {
+    const xs = j % 2 ? [x0, 964, 1060, 1100] : [x0, 920, 1012, 1100];
+    return xs.slice(0, -1).map((xa, i) => <F key={`${j}/${i}`} d={slab(xa, xs[i + 1], xc, a, c)} c={(i + j) % 2 ? STONE_MID : ASHLAR} s={`pierB${j}${i}`} />);
+  });
   return (
     <>
       <F d={slab(x0, 1100, xc, cap + 26, base)} c={STONE_MID} s="pierBody" />
-      <F d={slab(x0 - 14, 1100, xc, cap, cap + 28)} c={STONE_LIT} s="pierCap" />
+      {blocks}
+      {/* the coping stone: proud of the face, a lit top and its front, one shade step under it (NearForm) */}
+      <F d={slab(x0 - 16, 1100, xc, cap + 10, cap + 36)} c={STONE} s="pierCapF" />
+      <F d={slab(x0 - 16, 1100, xc, cap, cap + 12)} c={STONE_LIT} s="pierCap" />
       {/* a terracotta pot of thyme on the pier cap */}
       <F d={poly([[930, cap - 44], [990, cap - 44], [982, cap], [938, cap]])} c={TERRACOTTA} s="pierPot" />
       <F d={`M926 ${cap - 44}C930 ${cap - 74} 950 ${cap - 88} 962 ${cap - 84}C976 ${cap - 92} 996 ${cap - 72} 994 ${cap - 44}Z`} c={CM.sage} s="pierThyme" />
@@ -100,9 +116,14 @@ const Planter: React.FC = () => {
       <F d={poly([[118, rim + 2], [134, rim + 2], [138, 1420], [124, 1420]])} c={CM.brickDeep} s="bayTrunk" />
       <F d={crown} c={CM.sage} s="bayCrown" />
       <F d={ell(150, 1414, 52, 30) + ell(70, 1440, 40, 22)} c={LEAF_SHADE} s="bayInner" />
-      {/* the terracotta box: a lit stone rim, the body below it, both edges to the vanishing point */}
-      <F d={slab(x0, x1, xc, rim + 14, base)} c={TERRACOTTA} s="plBody" />
+      {/* the planter box: vertical boards in two terracotta woods, a stone coping on top with the soil showing inside
+          it (we look down into the box), ivy trailing over its front; every long edge to the vanishing point */}
+      {[x0, 58, 164, x1].slice(0, -1).map((xa, i, arr) => (
+        <F key={i} d={slab(xa, [58, 164, x1][i], xc, rim + 14, base)} c={i % 2 ? TERRACOTTA_DEEP : TERRACOTTA} s={`plBoard${i}`} />
+      ))}
+      <F d={slab(x0 - 8, x1 + 10, xc, rim - 12, rim + 2)} c={SOIL} s="plSoil" />
       <F d={slab(x0 - 8, x1 + 10, xc, rim, rim + 16)} c={STONE_LIT} s="plRim" />
+      <F d={`M8 ${rim + 12}C10 ${rim + 40} 26 ${rim + 66} 20 ${rim + 92}C34 ${rim + 70} 40 ${rim + 44} 46 ${rim + 14}ZM92 ${rim + 14}C96 ${rim + 46} 112 ${rim + 58} 106 ${rim + 84}C122 ${rim + 62} 126 ${rim + 40} 130 ${rim + 16}ZM176 ${rim + 18}C178 ${rim + 36} 190 ${rim + 50} 186 ${rim + 66}C200 ${rim + 50} 204 ${rim + 34} 206 ${rim + 18}Z`} c={FERN} s="plIvy" />
       {/* a few grasses at the rim's right corner */}
       <F d={`M228 ${rim}C226 ${rim - 40} 214 ${rim - 70} 206 ${rim - 82}C222 ${rim - 66} 236 ${rim - 40} 240 ${rim}ZM244 ${rim}C246 ${rim - 46} 256 ${rim - 72} 268 ${rim - 86}C262 ${rim - 60} 256 ${rim - 32} 256 ${rim}Z`} c={CM.leafGold} s="plGrass" />
     </>
@@ -273,7 +294,9 @@ const NearForm: React.FC = () => (
     <FormShade d={slab(FORE.crates.x0, FORE.crates.x1, FORE.crates.xc, 1666, FORE.crates.base)} at={floodAt(460, 1700)} />
     <FormShade d={slab(FORE.crates.x0 + 14, FORE.crates.x1 - 10, FORE.crates.xc, 1590, 1666)} at={floodAt(460, 1620)} />
     <FormShade d={poly([[FORE.table.x - 7, FORE.table.top + 10], [FORE.table.x + 7, FORE.table.top + 10], [FORE.table.x + 7, FORE.table.foot], [FORE.table.x - 7, FORE.table.foot]])} at={floodAt(742, 1640)} />
-    <Shade d={slab(FORE.pier.x0, 1100, FORE.pier.xc, FORE.pier.cap + 26, FORE.pier.base)} at={floodAt(980, 1700)} />
+    <Shade d={slab(FORE.pier.x0, 1100, FORE.pier.xc, FORE.pier.cap + 36, FORE.pier.base)} at={floodAt(980, 1700)} />
+    <Shade d={slab(FORE.pier.x0, 1100, FORE.pier.xc, FORE.pier.cap + 36, FORE.pier.cap + 50)} at={floodAt(980, 1640)} />
+    <Shade d={slab(FORE.planter.x0, FORE.planter.x1, FORE.planter.xc, FORE.planter.rim + 16, FORE.planter.rim + 30)} at={floodAt(120, 1560)} />
   </>
 );
 
