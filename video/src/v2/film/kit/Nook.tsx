@@ -1,7 +1,9 @@
 // kit/Nook.tsx: HER HOME BASE, the nook (P2, P4, P13; P5 and P6 are the same home from closer / another angle). One
 // dense, lived-in room (owner, 2026-10-26: a room full of real things, layered depth, ambient life that never stops):
-// a soffit with a hanging plant, a full bookcase cut by the left edge, a wall clock, her coat and scarf on a hook, a
-// framed print, the landscape window (660 x 470, ONE mullion, sill, a roller blind) onto the living dusk town (kit/Town),
+// a wall cabinet and a high shelf at the top (inset from the frame's edge: never a slab), a full bookcase cut by the
+// left edge with an upper cabinet to the high shelf, a wall clock, her coat and scarf on a hook, a
+// framed print, the landscape window (660 x 470, ONE mullion, sill, a Roman blind in folds, the curtain rod across it)
+// onto the living dusk town (kit/Town),
 // a candle and a succulent on the sill, a honey curtain right, her desk with the table lamp and its golden light (on the
 // wall and the desk), a corkboard leaning on the wall, papers on her closed laptop, the mug with steam, the interview
 // mic and its cable, a pen cup, books; under the desk the radiator, a basket and cables; her chair; the floor with a
@@ -13,9 +15,10 @@
 // tail point; ink stays at screen weight). nookPt(layout, p) maps a world point to the screen. The board's figures in
 // world px: P2 her standing (540, 1600, h 640); P4 / P13 her seated (420, 1600, h 600) on the chair; the mic (577, 1298,
 // w 75). In the zoomed layouts the window's top is cut by the caption band's lower edge: the blind is drawn down to
-// world y 760 (P4) / 690 (P2, P13), so only flat wall and blind fabric reach into the band.
+// world y 736 (P4) / 690 (P2, P13), so mostly wall and blind fabric reach into the band (P4 shows a strip of sky).
 //   <NookDeskClose>  P5: over her shoulder at the desk (laptop on the desk, the window right, the lamp, the pool)
-//   <NookAngle>      P6: the new angle, 3/4 front: the window behind her (cut right), the bookcase left, the desk left
+//   <NookAngle>      P6: the new angle, 3/4 front: the window behind her (cut right), the bookcase left, the radiator
+//                    right, her body in `behind`, then the desk across the full width in front of her, the floor plant
 
 import React, {useId} from 'react';
 import {blob, crown, ellipse, hline, line, poly, polyPath, rect, roundRect, smooth, textLines, vline} from '../../../lib/sketch';
@@ -37,7 +40,7 @@ export type NookLayoutName = 'wide' | 'm12' | 'm14';
 export const NOOK_LAYOUTS: Record<NookLayoutName, {s: number; fx: number; fy: number; blindY: number; panel: string}> = {
   wide: {s: 1, fx: 540, fy: 960, blindY: 690, panel: 'P2'},
   m12: {s: 1.2, fx: 164, fy: 957, blindY: 690, panel: 'P13'},
-  m14: {s: 1.4, fx: 254, fy: 1139.5, blindY: 760, panel: 'P4'},
+  m14: {s: 1.4, fx: 254, fy: 1139.5, blindY: 736, panel: 'P4'},
 };
 export const nookMat = (layout: NookLayoutName): Mat => {
   const L = NOOK_LAYOUTS[layout];
@@ -52,11 +55,18 @@ export const nookWorld = (layout: NookLayoutName, p: Pt): Pt => applyM(mat.inv(n
 export const NOOK = {
   floorY: 1540,
   soffit: {x1: 770, y: 110},
+  /** The wall cabinet at the top left (inset 44 px from the frame's top edge in P2). */
+  cabinet: {x0: 24, x1: 640, y0: 44, y1: 140},
   highShelf: {x1: 770, y: 250},
+  /** The upper cabinet over the bookcase (to the high shelf: in P4 the left column runs to the frame's top edge), with
+   *  an open niche under it where a book pile and a succulent stand on the bookcase. */
+  upper: {x0: -170, x1: 174, y0: 266, y1: 516},
   bookcase: {x0: -170, x1: 152, side: 22, top: 600, boards: [600, 790, 980, 1170, 1360], bottom: 1540},
   strip: {x: 218}, // the wall strip between the bookcase and the window (clock, coat hook)
   window: {x0: 265, x1: 975, top: 600, glass: [290, 620, 660, 470] as [number, number, number, number], mullion: 740, sillY: 1090, sillH: 28},
   curtain: {x0: 990, x1: 1110, top: 600, bottom: 1546},
+  /** The curtain rod over the window, its whole width (finial left; in P4 it frames the top right). */
+  rod: {x0: 246, x1: 1140, y: 586},
   desk: {x0: 248, x1: 1110, top: 1294, apron: [1312, 1348] as [number, number], legs: [256, 1050]},
   lamp: {x: 845, y: 1296},
   chair: {x0: 330, x1: 450, backTop: 1270, seat: 1426, floor: 1600},
@@ -287,7 +297,7 @@ export const NookMug: React.FC<{x: number; top: number; w?: number; at?: At; see
       <Fill rect={[x, top + hgt * 0.38, w, hgt * 0.17]} color={CC.mugBand} offset={false} at={fillAt(at, 0.02)} />
       <Ink d={body} width={w >= 80 ? W.mid : W.far} at={at} />
       <Fill d={blob(x + w / 2, top, w / 2, Math.max(4, w * 0.12), {seed: `${seed}/rim`})} color={CC.anchor} offset={false} at={fillAt(at, 0.03)} />
-      <Steam x={x + w / 2} y={top - 4} h={w * 1.7} amp={w * 0.12} seed={`${seed}/st`} at={at} />
+      <Steam x={x + w / 2} y={top - 4} h={Math.max(64, w * 2.1)} amp={Math.max(6, w * 0.14)} seed={`${seed}/st`} at={at} />
     </>
   );
 };
@@ -375,15 +385,26 @@ export const HighShelf: React.FC<{x0: number; x1: number; y: number; at?: At; se
   );
 };
 
+/** The top of the wall (world px): a wall cabinet (three doors, knobs, a shadow under it) inset from the frame's top
+ *  edge (never a slab flush with the edge: it would read as paper), and the long high shelf full of things under it. */
 const Soffit: React.FC<{at?: At}> = ({at}) => {
-  const {x1, y} = NOOK.soffit;
   const sh = NOOK.highShelf;
+  const C = NOOK.cabinet;
+  const dw = (C.x1 - C.x0 - 16) / 3;
+  const doors = [0, 1, 2].map((i) => rect(C.x0 + 8 + i * dw + 4, C.y0 + 8, dw - 8, C.y1 - C.y0 - 16, {seed: `cabd${i}`, over: [0, 0]})).join('');
   return (
     <>
-      <Fill rect={[-200, -200, x1 + 200, y + 200]} color={CC.wallShade} offset={false} at={fillAt(at)} />
-      <Fill rect={[-200, y, x1 + 200, 10]} color={CC.wallDeep} offset={false} at={fillAt(at)} />
-      <Ink d={hline(-60, x1, y, {seed: 'sof1', over: [0, 8]}) + vline(x1, -60, y, {seed: 'sof2', over: [0, 4]})} width={W.mid} at={at} />
-      {/* a long high shelf under the soffit, full of things (above the caption band: y < 290) */}
+      <Fill rect={[C.x0 + 6, C.y1, C.x1 - C.x0, 10]} color={CC.wallDeep} offset={false} at={fillAt(at)} />
+      <Fill rect={[C.x0, C.y0, C.x1 - C.x0, C.y1 - C.y0]} color={CC.shelf} at={fillAt(at)} seed="cab" />
+      {[0, 1, 2].map((i) => (
+        <Fill key={i} rect={[C.x0 + 8 + i * dw + 4, C.y0 + 8, dw - 8, C.y1 - C.y0 - 16]} color={CC.wallShade} offset={false} at={fillAt(at, 0.02)} />
+      ))}
+      <Ink d={rect(C.x0, C.y0, C.x1 - C.x0, C.y1 - C.y0, {seed: 'cabI', over: 'small'})} width={W.mid} at={at} />
+      <Ink d={doors} width={W.far} at={b(at, 0.03)} />
+      {[0, 1, 2].map((i) => (
+        <Fill key={`k${i}`} d={blob(C.x0 + 8 + i * dw + (i === 2 ? 22 : dw - 22), (C.y0 + C.y1) / 2 + 12, 6, 6, {seed: `cabk${i}`})} color={CC.anchor} offset={false} at={fillAt(at, 0.04)} />
+      ))}
+      {/* a long high shelf under it, full of things (above the caption band: y < 290) */}
       <HighShelf x0={-60} x1={sh.x1} y={sh.y} seed="hs" at={at} />
     </>
   );
@@ -417,10 +438,30 @@ const Bookcase: React.FC<{at?: At}> = ({at}) => {
       <Fill rect={[B.x1, B.top - 4, B.side, B.bottom - B.top + 4]} color={CC.shelf} offset={false} at={fillAt(at)} />
       <Ink d={boards} width={W.mid} at={at} />
       <Ink d={vline(B.x1, B.top - 4, B.bottom, {over: [0, 0], seed: 'nku1'}) + vline(B.x1 + B.side, B.top - 4, B.bottom, {over: [0, 0], seed: 'nku2'}) + hline(B.x0 - 40, B.x1 + B.side, B.top - 4, {seed: 'nkt', over: [0, 0]})} width={W.mid} at={at} />
-      {/* on top (only small things: the caption band ends at 600) */}
+      {/* the upper cabinet over it (two tall flat doors: calm in P2's band; P4's left column runs to the top edge) */}
+      <UpperCabinet at={at} />
+      {/* in the niche on top (only small things) */}
       <BookPile x={-20} y={B.top - 4} w={110} n={2} seed="nktop" at={at} />
       <PotPlant x={100} y={B.top - 34} w={40} h={30} kind="succulent" seed="nktopplant" at={at} />
       {void r}
+    </>
+  );
+};
+
+const UpperCabinet: React.FC<{at?: At}> = ({at}) => {
+  const U = NOOK.upper;
+  const B = NOOK.bookcase;
+  const mid = (U.x0 + U.x1) / 2 + 30;
+  return (
+    <>
+      <Fill rect={[B.x0 - 40, U.y1, B.x1 - B.x0 + 40, B.top - U.y1]} color={CC.caseBack} offset={false} at={fillAt(at)} />
+      <Fill rect={[B.x1, U.y1, B.side, B.top - U.y1]} color={CC.shelf} offset={false} at={fillAt(at)} />
+      <Fill rect={[U.x0, U.y0, U.x1 - U.x0, U.y1 - U.y0]} color={CC.shelf} at={fillAt(at)} seed="upcab" />
+      <Fill rect={[U.x0 + 10, U.y0 + 12, mid - U.x0 - 16, U.y1 - U.y0 - 24]} color={CC.wallShade} offset={false} at={fillAt(at, 0.02)} />
+      <Fill rect={[mid + 6, U.y0 + 12, U.x1 - mid - 18, U.y1 - U.y0 - 24]} color={CC.wallShade} offset={false} at={fillAt(at, 0.02)} />
+      <Ink d={rect(U.x0, U.y0, U.x1 - U.x0, U.y1 - U.y0, {seed: 'upcabI', over: 'small'}) + vline(mid, U.y0 + 12, U.y1 - 12, {over: [0, 0], seed: 'upcabM'}) + vline(B.x1, U.y1, B.top, {over: [0, 0], seed: 'upcabS1'}) + vline(B.x1 + B.side, U.y1, B.top, {over: [0, 0], seed: 'upcabS2'})} width={W.mid} at={at} />
+      <Fill d={blob(mid - 16, (U.y0 + U.y1) / 2 + 40, 6, 6, {seed: 'upk1'})} color={CC.anchor} offset={false} at={fillAt(at, 0.04)} />
+      <Fill d={blob(mid + 22, (U.y0 + U.y1) / 2 + 40, 6, 6, {seed: 'upk2'})} color={CC.anchor} offset={false} at={fillAt(at, 0.04)} />
     </>
   );
 };
@@ -429,14 +470,20 @@ const NookWindow: React.FC<{blindY: number; town?: Partial<DuskTownProps>; at?: 
   const t = useTime();
   const N = NOOK.window;
   const [gx, gy, gw, gh] = N.glass;
-  const cordSw = swayAt(t, 'cord', 2.4, 0.4);
+  const cordSw = swayAt(t, 'cord', 4, 0.4);
+  const nf = Math.max(2, Math.round((blindY - gy) / 34));
+  const folds: [number, number][] = Array.from({length: nf}, (_, i) => [gy - 8 + ((blindY - gy + 8) * i) / nf, gy - 8 + ((blindY - gy + 8) * (i + 1)) / nf]);
   return (
     <>
       <Fill rect={[N.x0, N.top, N.x1 - N.x0, N.sillY - N.top]} color={CC.wallShade} offset={false} at={fillAt(at)} />
       <Fill rect={[gx - 10, gy - 10, gw + 20, gh + 10]} color={CC.trim} offset={false} at={fillAt(at)} />
       <DuskTown x={gx} y={gy} w={gw} h={gh} horizon={gy + gh * 0.55} moon={[gx + gw * 0.8, blindY + 46]} {...town} seed={town?.seed ?? 'nooktown'} at={at} />
-      {/* the roller blind (fabric down to blindY, its bar, the cord) */}
+      {/* the blind (a Roman blind: fabric down to blindY in soft folds, alternate folds one step down; its bar, the
+          fold shadow it casts on the glass, the pull cord with its toggle) */}
+      <Fill rect={[gx - 6, blindY + 10, gw + 12, 9]} color={CC.winDark} offset={false} at={fillAt(at, 0.03)} />
       <Fill rect={[gx - 6, gy - 8, gw + 12, blindY - gy + 8]} color={CC.blind} offset={false} at={fillAt(at, 0.02)} />
+      {folds.map(([y0, y1], i) => (i % 2 ? <Fill key={`bf${i}`} rect={[gx - 6, y0, gw + 12, y1 - y0]} color={CC.blindShade} offset={false} at={fillAt(at, 0.03)} /> : null))}
+      <Ink d={folds.map(([y0], i) => (i ? hline(gx - 6, gx + gw + 6, y0, {seed: `blf${i}`, over: [0, 0]}) : '')).join('')} width={W.hair} color={CC.curtainShade} at={b(at, 0.03)} />
       <Fill rect={[gx - 8, blindY, gw + 16, 10]} color={CC.trim} offset={false} at={fillAt(at, 0.03)} />
       <Ink d={hline(gx - 8, gx + gw + 8, blindY + 10, {seed: 'blb', over: [0, 0]}) + hline(gx - 8, gx + gw + 8, blindY, {seed: 'blt', over: [0, 0]})} width={W.far} at={b(at, 0.03)} />
       <Ink d={line(gx + gw - 60, blindY + 10, gx + gw - 60 + cordSw, blindY + 74, {over: [0, 0], seed: 'cord'})} width={W.hair} at={b(at, 0.04)} />
@@ -461,17 +508,23 @@ const NookWindow: React.FC<{blindY: number; town?: Partial<DuskTownProps>; at?: 
 const Curtain: React.FC<{at?: At}> = ({at}) => {
   const t = useTime();
   const C = NOOK.curtain;
-  const s1 = swayAt(t, 'cur1', 5, 0.19);
-  const s2 = swayAt(t, 'cur2', 3, 0.27);
+  const s1 = swayAt(t, 'cur1', 12, 0.19);
+  const s2 = swayAt(t, 'cur2', 7, 0.27);
   const d = smooth([[C.x0 + 6, C.top], [C.x0 - 4, C.top + 300], [C.x0 + 4 + s2 * 0.4, C.top + 640], [C.x0 - 6 + s1, C.bottom], [C.x1 + 40, C.bottom + 4], [C.x1 + 40, C.top]], {closed: true, tension: 0.35});
   const folds = [28, 58, 90].map((dx, i) => smooth([[C.x0 + dx, C.top + 10], [C.x0 + dx + (i % 2 ? 4 : -4), C.top + 400], [C.x0 + dx + s1 * 0.8 + (i - 1) * 4, C.bottom - 6]])).join('');
+  // the rod runs the window's whole width (finials at both ends), rings gathered over the curtain
+  const R = NOOK.rod;
   return (
     <>
-      <Ink d={hline(952, 1130, C.top - 4, {over: [0, 0], seed: 'rod'})} width={7} color={CC.anchor} taper={false} at={at} />
-      <Fill d={blob(950, C.top - 4, 9, 9, {seed: 'finial'})} color={CC.anchor} offset={false} at={fillAt(at)} />
+      <Ink d={hline(R.x0, R.x1, R.y, {over: [0, 0], seed: 'rod'})} width={7} color={CC.anchor} taper={false} at={at} />
+      <Fill d={blob(R.x0 - 6, R.y, 11, 11, {seed: 'finial'})} color={CC.anchor} offset={false} at={fillAt(at)} />
+      {[R.x0 + 30, R.x0 + 300].map((bx, i) => (
+        <Ink key={i} d={line(bx, R.y, bx, R.y + 16, {over: [0, 0], seed: `rodb${i}`})} width={5} color={CC.anchor} taper={false} at={at} />
+      ))}
       <Fill d={d} color={CC.curtain} at={fillAt(at)} seed="curtain" />
       <Ink d={folds} width={W.far} color={CC.curtainShade} at={b(at, 0.04)} />
       <Ink d={d} width={W.mid} at={at} open={0.08} />
+      <Ink d={[0, 1, 2, 3].map((i) => ellipse(C.x0 + 12 + i * 26, R.y + 2, 8, 9, {seed: `ring${i}`})).join('')} width={W.far} at={b(at, 0.04)} />
     </>
   );
 };
@@ -661,7 +714,8 @@ export const NookRoom: React.FC<NookRoomProps> = ({layout = 'wide', town, cat, l
 /** P5's set (screen px, no figure): the wall, the window right (cut) onto the town, a framed print over the laptop,
  *  the corkboard left (behind her head), the desk top seen from behind her (back edge y 980), the lamp right, the
  *  golden pool (560, 1190), papers, a pen, the mug with steam. Her laptop is the lane's (kit Laptop at the board's
- *  x 530 hinge y 953 w 460); her back view and the cat (loaf / tail in the pool) go on top. */
+ *  x 530 hinge y 953 w 460); her back view (kit HerBack at x 60: the board's 110 moved left for the hero budget; its
+ *  chair back crosses her waist) and the cat (loaf / tail in the pool) go on top. */
 export const NookDeskClose: React.FC<{town?: Partial<DuskTownProps>; slab?: boolean; at?: At; children?: React.ReactNode}> = ({town, slab = true, at, children}) => (
   <>
     {slab ? <Fill rect={[-200, -200, 1480, 2320]} color={CC.wall} offset={false} mode="snap" at={at} /> : null}
@@ -716,66 +770,118 @@ export const NookDeskClose: React.FC<{town?: Partial<DuskTownProps>; slab?: bool
 
 // ---------------------------------------------------------------- P6: the new angle, 3/4 front, the window behind her
 
-/** P6's set (screen px, no figure): the wall; the bookcase cut by the left edge (-150..140, 640..1540); the window
- *  behind her (glass 560..1080, 640..1130, cut by the right edge; mullion 900; sill 535..1105 x 1130..1156) onto the
- *  living town; two framed prints and the clock on the wall between (clear of the bubble at 120..520 x 650..914); the
- *  desk in front left (top edge y 1450, -20..620) with the lamp, its pool (260, 1540) and a mug. Her (kit HerSeated
- *  front34 at the board's 640, 1960, h 1100, facing l), the mic (200, 1452, w 120) and the cat go on top. */
-export const NookAngle: React.FC<{town?: Partial<DuskTownProps>; slab?: boolean; at?: At; children?: React.ReactNode}> = ({town, slab = true, at, children}) => (
-  <>
-    {slab ? <Fill rect={[-200, -200, 1480, 2320]} color={CC.wall} offset={false} mode="snap" at={at} /> : null}
-    {/* window */}
-    <Fill rect={[535, 618, 600, 512]} color={CC.wallShade} offset={false} at={fillAt(at)} />
-    <Fill rect={[552, 632, 600, 498]} color={CC.trim} offset={false} at={fillAt(at)} />
-    <DuskTown x={560} y={640} w={560} h={490} horizon={905} k={1.12} moon={[860, 740]} seed="p6town" {...town} at={at} />
-    <Fill rect={[556, 636, 560, 54]} color={CC.blind} offset={false} at={fillAt(at, 0.02)} />
-    <Fill rect={[554, 688, 560, 10]} color={CC.trim} offset={false} at={fillAt(at, 0.03)} />
-    <Fill rect={[893, 698, 14, 432]} color={CC.trim} offset={false} at={fillAt(at, 0.02)} />
-    <Ink d={vline(535, 618, 1130, {over: [0, 0], seed: 'p6r'}) + vline(560, 640, 1130, {over: [0, 0], seed: 'p6g'}) + vline(893, 698, 1130, {over: [0, 0], seed: 'p6m1'}) + vline(907, 698, 1130, {over: [0, 0], seed: 'p6m2'}) + hline(535, 1140, 618, {over: [0, 0], seed: 'p6t'}) + hline(554, 1140, 698, {over: [0, 0], seed: 'p6b'})} width={W.mid} at={at} />
-    <Fill rect={[523, 1130, 600, 12]} color={CC.sill} offset={false} at={fillAt(at)} />
-    <Fill rect={[523, 1142, 600, 14]} color={CC.wallShade} offset={false} at={fillAt(at)} />
-    <Ink d={hline(523, 1140, 1130, {over: [4, 0], seed: 'p6s1'}) + hline(523, 1140, 1156, {over: [0, 0], seed: 'p6s2'})} width={W.mid} at={at} />
-    <Fill d={roundRect(1010, 1090, 36, 40, 6)} color={CC.candle} at={fillAt(at)} seed="p6candle" />
-    <Ink d={roundRect(1010, 1090, 36, 40, 6, {seed: 'p6candleI'})} width={W.far} at={at} />
-    <CandleFlame x={1028} y={1088} h={22} seed="p6flame" at={at} />
-    {/* bookcase */}
-    <Fill rect={[-200, 640, 340, 900]} color={CC.caseBack} offset={false} at={fillAt(at)} />
-    <Books x0={-190} x1={118} base={826} hMin={120} hMax={170} seed="p6b1" at={at} />
-    <Books x0={-190} x1={60} base={1016} hMin={110} hMax={160} seed="p6b2" at={at} />
-    <Books x0={-190} x1={118} base={1206} hMin={120} hMax={160} seed="p6b3" at={at} />
-    <Books x0={-190} x1={118} base={1396} hMin={110} hMax={150} seed="p6b4" at={at} />
-    <PotPlant x={70} y={970} w={46} h={44} kind="leafy" seed="p6caseplant" at={at} />
-    {[640, 826, 1016, 1206, 1396].map((y, i) => (
-      <Fill key={i} rect={[-200, y, 340, 16]} color={CC.shelf} seed={`p6bb${i}`} at={fillAt(at)} />
-    ))}
-    <Fill rect={[118, 636, 22, 904]} color={CC.shelf} offset={false} at={fillAt(at)} />
-    <Ink d={[640, 826, 1016, 1206, 1396].map((y, i) => hline(-60, 118, y, {seed: `p6bl${i}`, over: [0, 0]}) + hline(-60, 118, y + 16, {seed: `p6bm${i}`, over: [0, 0]})).join('') + vline(118, 636, 1540, {over: [0, 0], seed: 'p6u1'}) + vline(140, 636, 1540, {over: [0, 0], seed: 'p6u2'})} width={W.mid} at={at} />
-    {/* the top edge: the home's high shelf, a print over the window (cut right), a trailing plant hanging */}
-    <HighShelf x0={-40} x1={520} y={250} seed="p6hs" at={at} />
-    <FramedPicture x={720} y={96} w={260} h={170} kind="hills" seed="p6toppic" at={at} />
-    <Sway x={620} y={-20} amp={1.6} hz={0.17} seed="p6hang">
-      <Ink d={line(620, -20, 604, 196, {over: [0, 0], seed: 'p6h1'}) + line(620, -20, 636, 196, {over: [0, 0], seed: 'p6h2'})} width={W.hair} at={at} />
-      <PotPlant x={594} y={196} w={54} h={36} kind="trailing" seed="p6hangpot" at={at} />
-    </Sway>
-    {/* the wall between: prints and the clock, under the bubble's place */}
-    <FramedPicture x={190} y={968} w={128} h={160} kind="hills" seed="p6pic1" at={at} />
-    <FramedPicture x={346} y={1002} w={110} h={90} kind="portrait" seed="p6pic2" at={at} />
-    <WallClock cx={398} cy={1180} r={40} seed="p6clock" at={at} />
-    {/* the desk in front left, the lamp and its pool */}
-    <TableLamp x={424} y={1452} h={150} glow={{rx: 210, ry: 130, dy: -20}} glowClip={[1160, 1452]} pool={0} seed="p6lamp" at={at} />
-    <Fill rect={[-200, 1450, 840, 600]} color={CC.desk} offset={false} at={fillAt(at)} />
-    <Fill d={blob(260, 1540, 300, 60, {seed: 'p6pool1', wobble: 0.02})} color={CC.ring} offset={false} at={fillAt(at)} />
-    <Fill d={blob(256, 1536, 190, 36, {seed: 'p6pool2', wobble: 0.02})} color={CC.core} offset={false} at={fillAt(at)} />
-    <Ink d={hline(-60, 640, 1450, {seed: 'p6dk', over: [0, 8]})} width={W.mid} at={at} />
-    <NookMug x={36} top={1420} w={70} seed="p6mug" at={at} />
-    <BookPile x={-20} y={1700} w={210} n={3} seed="p6deskbooks" at={at} />
-    <PotPlant x={170} y={1452} w={64} h={52} kind="succulent" seed="p6deskplant" at={at} />
-    <Fill d={polyPath([[60, 1760], [300, 1744], [316, 1900], [70, 1916]])} color={CC.paper} at={fillAt(at)} seed="p6note" />
-    <Fill d={polyPath([[300, 1744], [520, 1736], [530, 1890], [316, 1900]])} color={CC.paper} at={fillAt(at)} seed="p6note2" />
-    <Ink d={poly([[60, 1760], [300, 1744], [316, 1900], [70, 1916]], {closed: true, seed: 'p6noteI', over: 'small'}) + poly([[300, 1744], [520, 1736], [530, 1890], [316, 1900]], {closed: true, seed: 'p6note2I', over: 'small'}) + textLines(86, 1784, 190, {n: 4, gap: 26, seed: 'p6nl1', heading: false}) + textLines(330, 1772, 170, {n: 4, gap: 26, seed: 'p6nl2', heading: false})} width={W.far} at={at} />
-    <Ink d={line(240, 1700, 420, 1676, {over: [0, 0], seed: 'p6pen'})} width={12} color={CC.anchor} taper={false} at={at} />
-    <Fill d={polyPath([[300, 1560], [520, 1550], [530, 1640], [306, 1652]])} color={CC.paper} at={fillAt(at)} seed="p6paper" />
-    <Ink d={poly([[300, 1560], [520, 1550], [530, 1640], [306, 1652]], {closed: true, seed: 'p6paperI', over: 'small'}) + textLines(322, 1578, 170, {n: 3, gap: 20, seed: 'p6pl', heading: false})} width={W.far} at={at} />
-    {children}
-  </>
-);
+/** P6's set (screen px): the back wall (the bookcase cut by the left edge, the window behind her: glass 560..1080 x
+ *  640..1130, cut right, mullion 900, a candle on the sill; two prints and the clock between, clear of the bubble at
+ *  120..520 x 650..914; the radiator under the window right of her, her chair's back behind her shoulder), the floor
+ *  under the desk (boards, the rug's edge, a wicker bin), then `behind` (HER BODY: <HerSeated part="body" legs/>: the
+ *  desk hides her waist, her shins show under it), then the desk running the FULL width in front of her (back edge
+ *  y 1440, front edge 1640, apron and drawers to 1688, legs to the floor) with the lamp and its pool (260, 1540), a mug,
+ *  books, a succulent, papers, a phone, a standing photo, and the big floor plant in the right foreground; `children`
+ *  last (screen px: the mic (260, 1452, w 120), her arms <HerSeated part="arms"/> resting on the desk, the cat on the
+ *  sill ~120, the bubble). */
+export const NOOK_ANGLE = {deskBack: 1440, deskFront: 1640, apron: 1688, floor: 1688, her: {x: 640, y: 1960, h: 1100}, mic: {x: 260, y: 1452, w: 120}, sill: 1130};
+
+export const NookAngle: React.FC<{town?: Partial<DuskTownProps>; slab?: boolean; at?: At; behind?: React.ReactNode; children?: React.ReactNode}> = ({town, slab = true, at, behind, children}) => {
+  const A = NOOK_ANGLE;
+  const vp: Pt = [520, 1300];
+  const boards = [-400, -160, 80, 320, 560, 800, 1040, 1280, 1520].map((bx, i) => {
+    const u = (A.floor - vp[1]) / (2000 - vp[1]);
+    return line(vp[0] + (bx - vp[0]) * u, A.floor, bx, 2000, {over: [0, 0], seed: `p6fb${i}`});
+  });
+  const rug: Pt[] = [[-60, 1800], [900, 1786], [1000, 2000], [-60, 2000]];
+  const lampX = 424;
+  return (
+    <>
+      {slab ? <Fill rect={[-200, -200, 1480, 2320]} color={CC.wall} offset={false} mode="snap" at={at} /> : null}
+      {/* window */}
+      <Fill rect={[535, 618, 600, 512]} color={CC.wallShade} offset={false} at={fillAt(at)} />
+      <Fill rect={[552, 632, 600, 498]} color={CC.trim} offset={false} at={fillAt(at)} />
+      <DuskTown x={560} y={640} w={560} h={490} horizon={905} k={1.12} moon={[860, 740]} seed="p6town" {...town} at={at} />
+      <Fill rect={[556, 636, 560, 54]} color={CC.blind} offset={false} at={fillAt(at, 0.02)} />
+      <Fill rect={[556, 690, 560, 8]} color={CC.winDark} offset={false} at={fillAt(at, 0.03)} />
+      <Fill rect={[554, 684, 560, 10]} color={CC.trim} offset={false} at={fillAt(at, 0.03)} />
+      <Fill rect={[893, 698, 14, 432]} color={CC.trim} offset={false} at={fillAt(at, 0.02)} />
+      <Ink d={vline(535, 618, 1130, {over: [0, 0], seed: 'p6r'}) + vline(560, 640, 1130, {over: [0, 0], seed: 'p6g'}) + vline(893, 698, 1130, {over: [0, 0], seed: 'p6m1'}) + vline(907, 698, 1130, {over: [0, 0], seed: 'p6m2'}) + hline(535, 1140, 618, {over: [0, 0], seed: 'p6t'}) + hline(554, 1140, 694, {over: [0, 0], seed: 'p6b'})} width={W.mid} at={at} />
+      <Fill rect={[523, 1130, 600, 12]} color={CC.sill} offset={false} at={fillAt(at)} />
+      <Fill rect={[523, 1142, 600, 14]} color={CC.wallShade} offset={false} at={fillAt(at)} />
+      <Ink d={hline(523, 1140, 1130, {over: [4, 0], seed: 'p6s1'}) + hline(523, 1140, 1156, {over: [0, 0], seed: 'p6s2'})} width={W.mid} at={at} />
+      <Fill d={roundRect(1010, 1090, 36, 40, 6)} color={CC.candle} at={fillAt(at)} seed="p6candle" />
+      <Ink d={roundRect(1010, 1090, 36, 40, 6, {seed: 'p6candleI'})} width={W.far} at={at} />
+      <CandleFlame x={1028} y={1088} h={22} seed="p6flame" at={at} />
+      {/* the radiator under the window (right of her), its pipe; a wall socket with the lamp's cable */}
+      <Fill rect={[770, 1196, 300, 232]} color={CC.radiator} at={fillAt(at)} seed="p6rad" />
+      <Ink d={rect(770, 1196, 300, 232, {seed: 'p6radI', over: 'small'}) + Array.from({length: 11}, (_, i) => vline(770 + 27 * (i + 0.6), 1210, 1414, {over: [0, 0], seed: `p6rf${i}`})).join('')} width={W.far} at={at} />
+      <Ink d={vline(1050, 1428, 1446, {over: [0, 0], seed: 'p6pipe'})} width={8} color={CC.radiator} taper={false} at={at} />
+      {/* bookcase */}
+      <Fill rect={[-200, 640, 340, 900]} color={CC.caseBack} offset={false} at={fillAt(at)} />
+      <Books x0={-190} x1={118} base={826} hMin={120} hMax={170} seed="p6b1" at={at} />
+      <Books x0={-190} x1={60} base={1016} hMin={110} hMax={160} seed="p6b2" at={at} />
+      <Books x0={-190} x1={118} base={1206} hMin={120} hMax={160} seed="p6b3" at={at} />
+      <Books x0={-190} x1={118} base={1396} hMin={110} hMax={150} seed="p6b4" at={at} />
+      <PotPlant x={70} y={970} w={46} h={44} kind="leafy" seed="p6caseplant" at={at} />
+      {[640, 826, 1016, 1206, 1396].map((y, i) => (
+        <Fill key={i} rect={[-200, y, 340, 16]} color={CC.shelf} seed={`p6bb${i}`} at={fillAt(at)} />
+      ))}
+      <Fill rect={[118, 636, 22, 904]} color={CC.shelf} offset={false} at={fillAt(at)} />
+      <Ink d={[640, 826, 1016, 1206, 1396].map((y, i) => hline(-60, 118, y, {seed: `p6bl${i}`, over: [0, 0]}) + hline(-60, 118, y + 16, {seed: `p6bm${i}`, over: [0, 0]})).join('') + vline(118, 636, 1540, {over: [0, 0], seed: 'p6u1'}) + vline(140, 636, 1540, {over: [0, 0], seed: 'p6u2'})} width={W.mid} at={at} />
+      {/* the top edge: the home's high shelf, a print over the window (cut right), a trailing plant hanging */}
+      <HighShelf x0={-40} x1={520} y={250} seed="p6hs" at={at} />
+      <FramedPicture x={720} y={96} w={260} h={170} kind="hills" seed="p6toppic" at={at} />
+      <Sway x={620} y={-20} amp={2.4} hz={0.17} seed="p6hang">
+        <Ink d={line(620, -20, 604, 196, {over: [0, 0], seed: 'p6h1'}) + line(620, -20, 636, 196, {over: [0, 0], seed: 'p6h2'})} width={W.hair} at={at} />
+        <PotPlant x={594} y={196} w={54} h={36} kind="trailing" seed="p6hangpot" at={at} />
+      </Sway>
+      {/* the wall between: prints and the clock, under the bubble's place */}
+      <FramedPicture x={190} y={968} w={128} h={160} kind="hills" seed="p6pic1" at={at} />
+      <FramedPicture x={346} y={1002} w={110} h={90} kind="portrait" seed="p6pic2" at={at} />
+      <WallClock cx={398} cy={1180} r={40} seed="p6clock" at={at} />
+      {/* the lamp's warm light on the wall (the lamp itself stands on the desk, in front of her) */}
+      <TableLamp x={lampX} y={A.deskBack + 12} h={150} glow={{rx: 210, ry: 130, dy: -20}} glowClip={[1160, A.deskBack]} pool={0} motes seed="p6lampglow" at={at} />
+      {/* her chair's back behind her shoulder (her body covers most of it) */}
+      <Fill d={roundRect(690, 1306, 120, 34, 14)} color={CC.chair} at={fillAt(at)} seed="p6chairT" />
+      <Fill rect={[776, 1336, 24, 110]} color={CC.chairShade} offset={false} at={fillAt(at)} />
+      <Ink d={roundRect(690, 1306, 120, 34, 14, {seed: 'p6chairTI'}) + vline(776, 1340, 1440, {over: [0, 0], seed: 'p6chp1'}) + vline(800, 1340, 1440, {over: [0, 0], seed: 'p6chp2'})} width={W.mid} at={at} />
+      {/* the floor under the desk: boards, the rug's edge, a wicker bin */}
+      <Fill rect={[-200, A.floor, 1480, 400]} color={CC.floor} offset={false} at={fillAt(at)} />
+      <Ink d={boards.join('')} width={W.hair} at={b(at, 0.04)} />
+      <Fill d={polyPath(rug)} color={CC.rug} at={fillAt(at)} seed="p6rug" />
+      <Ink d={hline(-60, 900, 1830, {over: [0, 0], seed: 'p6rugb'})} width={8} color={CC.rugBand} taper={false} at={b(at, 0.04)} />
+      <Ink d={poly(rug, {closed: false, seed: 'p6rugI', over: [0, 0]})} width={W.mid} at={at} />
+      <Fill rect={[-200, A.floor, 1480, 40]} color={CC.under} offset={false} at={fillAt(at)} />
+      <Fill d={polyPath([[760, 1740], [880, 1740], [866, 1900], [774, 1900]])} color={CC.boxSide} at={fillAt(at)} seed="p6bin" />
+      <Ink d={poly([[760, 1740], [880, 1740], [866, 1900], [774, 1900]], {closed: true, seed: 'p6binI', over: 'small'}) + line(800, 1750, 804, 1890, {over: [0, 0], seed: 'p6bw1'}) + line(840, 1750, 836, 1890, {over: [0, 0], seed: 'p6bw2'}) + hline(764, 876, 1790, {over: [0, 0], seed: 'p6bw3'})} width={W.far} at={at} />
+      <Fill d={crown(820, 1736, 40, 18, {seed: 'p6ball', bumps: 8, round: 0.55})} color={CC.paperEdge} offset={false} at={fillAt(at)} />
+      {/* HER body (behind the desk: it hides her waist; her shins show under it) */}
+      {behind}
+      {/* the desk, full width, in front of her: top, apron with drawers, legs */}
+      <Fill rect={[-200, A.deskBack, 1480, A.deskFront - A.deskBack]} color={CC.desk} offset={false} at={fillAt(at)} />
+      <Fill d={blob(260, 1540, 300, 60, {seed: 'p6pool1', wobble: 0.02})} color={CC.ring} offset={false} at={fillAt(at)} />
+      <Fill d={blob(256, 1536, 190, 36, {seed: 'p6pool2', wobble: 0.02})} color={CC.core} offset={false} at={fillAt(at)} />
+      <Ink d={[1490, 1560, 1610].map((y, i) => smooth([[-40, y], [300, y + 4], [700, y - 3], [1120, y + 4]])).join('')} width={W.hair} color={CC.deskShade} at={at} />
+      <Fill rect={[-200, A.deskFront, 1480, A.apron - A.deskFront]} color={CC.deskFront} offset={false} at={fillAt(at)} />
+      {[[10, 36], [1004, 1030]].map(([l0, l1], i) => (
+        <Fill key={`lg${i}`} rect={[l0, A.apron, l1 - l0, 300]} color={CC.deskFront} seed={`p6leg${i}`} at={fillAt(at)} />
+      ))}
+      <Ink d={hline(-60, 1140, A.deskBack, {seed: 'p6dk', over: [0, 0]}) + hline(-60, 1140, A.deskFront, {seed: 'p6dkf', over: [0, 0]}) + hline(-60, 1140, A.apron, {seed: 'p6dka', over: [0, 0]}) + rect(200, A.deskFront + 8, 280, 32, {seed: 'p6drw1', over: 'small'}) + rect(620, A.deskFront + 8, 280, 32, {seed: 'p6drw2', over: 'small'}) + [10, 36, 1004, 1030].map((lx, i) => vline(lx, A.apron, 1960, {over: [0, 0], seed: `p6lgI${i}`})).join('')} width={W.mid} at={at} />
+      <Fill d={blob(340, A.deskFront + 24, 10, 6, {seed: 'p6knob1'})} color={CC.anchor} offset={false} at={fillAt(at)} />
+      <Fill d={blob(760, A.deskFront + 24, 10, 6, {seed: 'p6knob2'})} color={CC.anchor} offset={false} at={fillAt(at)} />
+      {/* on the desk: the lamp, a mug, books, a succulent, papers, a pen, her phone, a standing photo, a paper stack */}
+      <TableLamp x={lampX} y={A.deskBack + 12} h={150} glow={false} pool={0} motes={false} seed="p6lamp" at={at} />
+      <NookMug x={30} top={1468} w={70} seed="p6mug" at={at} />
+      <BookPile x={-20} y={1636} w={200} n={3} seed="p6deskbooks" at={at} />
+      <PotPlant x={150} y={1462} w={60} h={50} kind="succulent" seed="p6deskplant" at={at} />
+      <Fill d={polyPath([[300, 1552], [520, 1542], [530, 1630], [306, 1640]])} color={CC.paper} at={fillAt(at)} seed="p6paper" />
+      <Ink d={poly([[300, 1552], [520, 1542], [530, 1630], [306, 1640]], {closed: true, seed: 'p6paperI', over: 'small'}) + textLines(322, 1570, 170, {n: 3, gap: 20, seed: 'p6pl', heading: false})} width={W.far} at={at} />
+      <Fill d={polyPath([[600, 1560], [770, 1552], [778, 1626], [606, 1634]])} color={CC.note2} at={fillAt(at)} seed="p6note" />
+      <Ink d={poly([[600, 1560], [770, 1552], [778, 1626], [606, 1634]], {closed: true, seed: 'p6noteI', over: 'small'}) + textLines(620, 1578, 120, {n: 2, gap: 20, seed: 'p6nl', heading: false})} width={W.far} at={at} />
+      <Ink d={line(220, 1612, 380, 1596, {over: [0, 0], seed: 'p6pen'})} width={12} color={CC.anchor} taper={false} at={at} />
+      <Fill d={roundRect(850, 1520, 92, 150, 16)} color={CC.anchor} at={fillAt(at)} seed="p6phone" />
+      <Ink d={roundRect(850, 1520, 92, 150, 16, {seed: 'p6phoneI'})} width={W.mid} at={at} />
+      <FramedPicture x={930} y={1330} w={104} h={118} kind="sea" seed="p6deskphoto" at={at} />
+      <PaperStack x={960} y={1610} w={150} seed="p6stack" at={at} />
+      {/* the big floor plant in the right foreground (in front of the desk's end: the right rail is UI anyway) */}
+      <FloorPlant x={1150} y={1960} h={560} seed="p6floorplant" at={at} />
+      {children}
+    </>
+  );
+};

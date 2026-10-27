@@ -70,13 +70,14 @@ const rotPts = (pts: Pt[], about: Pt, deg: number): Pt[] => {
   return pts.map(([x, y]) => [about[0] + (x - about[0]) * c - (y - about[1]) * s, about[1] + (x - about[0]) * s + (y - about[1]) * c]);
 };
 
-/** Seeded idle clocks. */
-const blinkOn = (t: number, seed: string) => loopT(t, 3.9 + rand(seed, 'bp') * 1.4, rand(seed, 'bo') * 4) < 0.22;
-const earTwitch = (t: number, seed: string) => loopT(t, 3.3 + rand(seed, 'ep') * 1.3, rand(seed, 'eo') * 4) < 0.14;
+/** Seeded idle clocks (the AD: a cat event every ~1.5 s that READS at phone size): a slow blink every ~3 s (0.3 s), an
+ *  ear twitch every ~2.6 s, a big tail flick every ~2 s (0.6 s, stepped at 12 drawings / s); their phases interleave. */
+const blinkOn = (t: number, seed: string) => loopT(t, 2.9 + rand(seed, 'bp') * 0.6, rand(seed, 'bo') * 4) < 0.3;
+const earTwitch = (t: number, seed: string) => loopT(t, 2.4 + rand(seed, 'ep') * 0.5, rand(seed, 'eo') * 4 + 0.9) < 0.18;
 const tailFlick = (t: number, seed: string) => {
-  const per = 2.6 + rand(seed, 'tp') * 1.0;
-  const u = loopT(stepT(t, 12), per, rand(seed, 'to') * per);
-  return u < 0.42 ? Math.sin((u / 0.42) * Math.PI) : 0;
+  const per = 1.8 + rand(seed, 'tp') * 0.5;
+  const u = loopT(stepT(t, 12), per, rand(seed, 'to') * per + 0.5);
+  return u < 0.6 ? Math.sin((u / 0.6) * Math.PI) : 0;
 };
 
 type Head = {c: Pt; rx: number; ry: number; front: number; rot: number; eyeDir: Pt; eyes: 'open' | 'half' | 'closed'; ear: boolean};
@@ -97,7 +98,7 @@ const CatHead: React.FC<{h: Head; ink: number; inner: number; detail: boolean; a
     const tip: Pt = [fx + side * rx * 0.78 * k, cy - ry * 1.62];
     return [[bx0, cy - ry * 0.78], tip, [bx1, cy - ry * 0.42]];
   };
-  const twitch = h.ear ? 14 : 0;
+  const twitch = h.ear ? 22 : 0;
   const earL = rotPts(earPts(-1), [fx - rx * 0.6, cy - ry * 0.6], -twitch * 0.2);
   const earR = rotPts(earPts(1), [fx + rx * 0.6, cy - ry * 0.6], twitch);
   const innerOf = (e: Pt[]): Pt[] => {
@@ -174,6 +175,8 @@ export const Cat: React.FC<CatProps> = ({x, y, size = 150, pose = 'sit', facing 
   const blink = life && blinkOn(t, seed);
   const ear = life && earTwitch(t, seed);
   const flick = life ? tailFlick(t, seed) : 0;
+  // a head tilt every ~4.4 s (1.1 s, a held drawing): curious, then back
+  const glance = life && loopT(stepT(t, 12), 4.2 + rand(seed, 'gp') * 0.6, rand(seed, 'go') * 4 + 2.1) < 1.1 ? 1 : 0;
   const washing = pose === 'sit' && !!wash && wash.some(([a, z]) => tReal >= a && tReal < z);
   const eyeState: Head['eyes'] = pose === 'sleep' || eyes === 'closed' ? 'closed' : blink ? 'closed' : washing ? 'half' : eyes;
   // the look target in local units
@@ -204,13 +207,13 @@ export const Cat: React.FC<CatProps> = ({x, y, size = 150, pose = 'sit', facing 
     const front = pose === 'sitFront';
     const hc: Pt = front ? [0, -73] : [17, -79];
     const lk = lookLocal(hc);
-    const rot = look ? clamp(lk.ang * (front ? 0.25 : 0.55), -32, 26) : 0;
+    const rot = (look ? clamp(lk.ang * (front ? 0.25 : 0.55), -32, 26) : 0) + glance * (look ? -8 : -14);
     const head: Head = {c: hc, rx: front ? 19 : 17, ry: front ? 16 : 15, front: front ? 1 : 0, rot, eyeDir: lk.dir, eyes: eyeState, ear};
     if (front) {
       const bodyD = smooth([[-26, 0], [-31, -14], [-23, -34], [-14, -51], [0, -57], [14, -51], [23, -34], [31, -14], [26, 0]], {closed: true, tension: 0.4});
       let tail: Pt[] = [[22, -6], [33, 2], [18, 6], [-4, 6], [-18, 2]];
       tail = [...tail.slice(0, 3), ...rotPts(tail.slice(3), tail[2], 0), ...[]];
-      const tailF = rotPts(tail.slice(3), tail[2], -flick * 22);
+      const tailF = rotPts(tail.slice(3), tail[2], -flick * 34);
       const tl = [...tail.slice(0, 3), ...tailF];
       content = (
         <XG m={mat.about(mat.scale(1, breathe), 0, 0)}>
@@ -238,7 +241,7 @@ export const Cat: React.FC<CatProps> = ({x, y, size = 150, pose = 'sit', facing 
     } else {
       const bodyD = smooth([[-34, 0], [-42, -14], [-40, -34], [-28, -50], [-10, -60], [4, -66], [14, -65], [21, -55], [22, -38], [20, -18], [18, 0]], {closed: true, tension: 0.4});
       const tail0: Pt[] = [[-36, -5], [-30, 3], [-10, 5], [10, 4], [26, 1], [33, -6]];
-      const tl = [...tail0.slice(0, 4), ...rotPts(tail0.slice(4), tail0[3], -flick * 30)];
+      const tl = [...tail0.slice(0, 4), ...rotPts(tail0.slice(4), tail0[3], -flick * 48)];
       const pawUp = washing ? Math.sin(((tReal * 6) % 1) * Math.PI) : 0;
       const nearPaw: Pt = washing ? [24, -66 + pawUp * 3] : [14, -2];
       const nearKnee: Pt = washing ? [22, -46] : [13, -36];
@@ -264,10 +267,10 @@ export const Cat: React.FC<CatProps> = ({x, y, size = 150, pose = 'sit', facing 
   } else if (pose === 'loaf') {
     const hc: Pt = [24, -45];
     const lk = lookLocal(hc);
-    const head: Head = {c: hc, rx: 16, ry: 14, front: 0.3, rot: look ? clamp(lk.ang * 0.5, -25, 20) : 0, eyeDir: lk.dir, eyes: eyes === 'open' && eyeState !== 'closed' ? 'half' : eyeState, ear};
+    const head: Head = {c: hc, rx: 16, ry: 14, front: 0.3, rot: (look ? clamp(lk.ang * 0.5, -25, 20) : 0) + glance * -12, eyeDir: lk.dir, eyes: eyes === 'open' && eyeState !== 'closed' ? 'half' : eyeState, ear};
     const bodyD = smooth([[-40, 0], [-46, -12], [-44, -28], [-30, -40], [0, -43], [20, -39], [29, -26], [29, -9], [24, 0]], {closed: true, tension: 0.4});
     const tail0: Pt[] = [[-42, -6], [-36, 2], [-14, 4], [6, 3], [18, 1]];
-    const tl = [...tail0.slice(0, 3), ...rotPts(tail0.slice(3), tail0[2], -flick * 16)];
+    const tl = [...tail0.slice(0, 3), ...rotPts(tail0.slice(3), tail0[2], -flick * 30)];
     content = (
       <XG m={mat.about(mat.scale(1, breathe), 0, 0)}>
         {body(bodyD, 'body')}
@@ -282,7 +285,7 @@ export const Cat: React.FC<CatProps> = ({x, y, size = 150, pose = 'sit', facing 
   } else if (pose === 'sleep') {
     const bodyD = smooth([[-40, -2], [-44, -20], [-32, -40], [-6, -46], [20, -40], [36, -24], [38, -6], [30, 0]], {closed: true, tension: 0.42});
     const tail0: Pt[] = [[-38, -6], [-28, 3], [0, 5], [22, 2], [34, -6], [38, -14]];
-    const tl = [...tail0.slice(0, 4), ...rotPts(tail0.slice(4), tail0[3], -flick * 10)];
+    const tl = [...tail0.slice(0, 4), ...rotPts(tail0.slice(4), tail0[3], -flick * 22)];
     const head: Head = {c: [20, -24], rx: 15, ry: 12.5, front: 0.6, rot: 12, eyeDir: [0, 0], eyes: 'closed', ear};
     content = (
       <XG m={mat.about(mat.scale(1, breathe), 0, 0)}>

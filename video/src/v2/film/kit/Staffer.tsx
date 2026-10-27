@@ -11,11 +11,12 @@
 // A {x 640, y 1780, h 900, facing 'l'} (head r 81), B {x 905, y 1780, h 820, facing 'l'} (head r 74).
 
 import React from 'react';
-import {hline, line, polyPath, rect, smooth, textLines} from '../../../lib/sketch';
+import {hline, line, polyPath, rect, roundRect, smooth, textLines} from '../../../lib/sketch';
 import {useTime} from '../../../lib/time';
 import {CC} from '../palette';
 import {At, b, Fill, fillAt, Ink, inkForHead, Letter, Pt, quadPt, W} from './util';
 import {Badge} from './Props';
+import {Live} from './Ambient';
 import {elbow, Facing, fidget, HerFace, HerHeadParts, HeadSpec, Talking, tube} from './Her';
 import {rand} from '../../../lib/rng';
 
@@ -43,8 +44,11 @@ export type StafferProps = {
   /** 'all' | 'body' (head, torso, badge) | 'arms' (forearms + hands on the table: draw after the table). */
   part?: 'all' | 'body' | 'arms';
   badge?: boolean;
-  /** Override hand positions (canvas px). */
+  /** Override hand positions (canvas px; [back, front]). Default: A folds his hands on the table to the RIGHT of the
+   *  CONTRACT page (x 220-540: its title stays clear); B rests his chin on his near hand, the other forearm on the table. */
   hands?: [Pt, Pt];
+  /** Override the elbows (canvas px; default: placed under the shoulders on the table: an elbow break, never a Z). */
+  elbows?: [Pt, Pt];
   /** Idle life (default true): breath, blink, a glance, a hand fidget, a swallow. */
   life?: boolean;
   at?: At;
@@ -52,7 +56,7 @@ export type StafferProps = {
   ink?: number;
 };
 
-export const Staffer: React.FC<StafferProps> = ({x, y, h, facing = 'l', variant = 'A', face = 'worried', talking, part = 'all', badge = true, hands, at, seed, ink: inkP, life = true}) => {
+export const Staffer: React.FC<StafferProps> = ({x, y, h, facing = 'l', variant = 'A', face = 'worried', talking, part = 'all', badge = true, hands, elbows, at, seed, ink: inkP, life = true}) => {
   const t = useTime();
   const V = STAFF[variant];
   const sd = seed ?? `staff${variant}`;
@@ -97,14 +101,19 @@ export const Staffer: React.FC<StafferProps> = ({x, y, h, facing = 'l', variant 
     variant === 'B'
       ? smooth([[cx - 0.5 * r, S[1] - 0.15 * r], [cx - 0.95 * r, S[1] + 0.7 * r], [cx - 0.12 * r, S[1] + 2.2 * r]]) + smooth([[cx + 0.5 * r, S[1] - 0.15 * r], [cx + 0.95 * r, S[1] + 0.7 * r], [cx + 0.12 * r, S[1] + 2.2 * r]])
       : '';
-  // arms: shoulders -> elbows -> hands on the table (toward the mic)
-  // default: the forearms on the table, the hands clasped in front of the body (a worried interview pose)
-  const handsP0: [Pt, Pt] = hands ?? [P(0.0, 0.4), P(-0.05, 0.392)];
-  const handsP: [Pt, Pt] = [[handsP0[0][0] + fg[0], handsP0[0][1] + fg[1]], handsP0[1]];
+  // arms: shoulders -> elbows (PLACED: on the table under the shoulders, a clear elbow break) -> hands.
+  // A: both forearms on the table, hands folded together to the right of the page (worried, still).
+  // B: chin on his near hand (the elbow on the table, the forearm up), the far forearm flat on the table.
   const shB: Pt = [S[0] - s * 0.105 * h, S[1] + 0.035 * h];
   const shF: Pt = [S[0] + s * 0.095 * h, S[1] + 0.035 * h];
-  const E0 = elbow(shB, handsP[0], 0.16 * h, 0.16 * h, -s);
-  const E1 = elbow(shF, handsP[1], 0.16 * h, 0.16 * h, -s);
+  const pose: {hands: [Pt, Pt]; elbows: [Pt, Pt]} =
+    variant === 'A'
+      ? {hands: [P(0.0, 0.378), P(-0.04, 0.38)], elbows: [P(-0.105, 0.417), P(0.111, 0.422)]}
+      : {hands: [P(-0.03, 0.4), [H[0] + s * 0.18 * r, H[1] + 1.22 * r]], elbows: [P(-0.1, 0.45), P(0.12, 0.47)]};
+  const handsP0: [Pt, Pt] = hands ?? pose.hands;
+  const handsP: [Pt, Pt] = variant === 'A' && !hands ? [handsP0[0], [handsP0[1][0] + fg[0], handsP0[1][1] + fg[1]]] : [[handsP0[0][0] + fg[0], handsP0[0][1] + fg[1]], handsP0[1]];
+  const E0: Pt = elbows ? elbows[0] : hands ? elbow(shB, handsP[0], 0.16 * h, 0.16 * h, -s) : pose.elbows[0];
+  const E1: Pt = elbows ? elbows[1] : hands ? elbow(shF, handsP[1], 0.16 * h, 0.16 * h, -s) : pose.elbows[1];
   const aw = 0.06 * h;
   const arm = (A: Pt, E: Pt, Z: Pt, k: string) => {
     const d = tube([A, E, Z], [aw * 1.05, aw, aw * 0.88]);
@@ -145,16 +154,63 @@ export const Staffer: React.FC<StafferProps> = ({x, y, h, facing = 'l', variant 
 // ---------------------------------------------------------------- the set
 
 
-/** The interview table: top surface from `top` to `front`, front face to `bottom` (canvas px; the board's 1362 / 1532 / 1732). */
-export const InterviewTable: React.FC<{top?: number; front?: number; bottom?: number; x0?: number; x1?: number; at?: At; seed?: string}> = ({top = 1362, front = 1532, bottom = 1732, x0 = -60, x1 = 1140, at, seed = 'itable'}) => (
-  <>
-    <Fill rect={[x0, top, x1 - x0, front - top]} color={CC.table} at={fillAt(at)} mode="snap" offset={false} />
-    <Fill rect={[x0, front, x1 - x0, bottom - front]} color={CC.tableFront} at={fillAt(at)} mode="snap" offset={false} />
-    <Fill rect={[x0, bottom, x1 - x0, 2000 - bottom]} color={CC.studioFloor} at={fillAt(at)} mode="snap" offset={false} />
-    <Ink d={hline(x0, x1, top, {seed: `${seed}/t`, over: [0, 0]}) + hline(x0, x1, front, {seed: `${seed}/f`, over: [0, 0]}) + hline(x0, x1, bottom, {seed: `${seed}/b`, over: [0, 0]})} width={W.mid} at={at} />
-    <Ink d={hline(x0, x1, front + 16, {seed: `${seed}/e`, over: [0, 0]})} width={W.hair} at={b(at, 0.05)} />
-  </>
-);
+/** The interview table: top surface from `top` to `front`, front face to `bottom` (canvas px; the board's 1362 / 1532 /
+ *  1732), broken up like a real one: the front's panel seams, a cable tray under the lip with the mic's cable and a
+ *  power strip, the carpet in tiles with flecks, and two empty chair backs on our side (foreground; `chairs` false =
+ *  none). */
+export const InterviewTable: React.FC<{top?: number; front?: number; bottom?: number; x0?: number; x1?: number; chairs?: boolean; at?: At; seed?: string}> = ({top = 1362, front = 1532, bottom = 1732, x0 = -60, x1 = 1140, chairs = true, at, seed = 'itable'}) => {
+  const seams = [300, 640, 980].map((x, i) => vline2(x, front + 22, bottom - 4, `${seed}/sm${i}`)).join('');
+  const tray = front + 22;
+  // carpet tiles in perspective (seams fan from a point above the table) and flecks
+  const vp: Pt = [540, 900];
+  const tileX = [-300, -60, 180, 420, 660, 900, 1140, 1380];
+  const carpet = tileX.map((bx, i) => {
+    const u = (bottom - vp[1]) / (2000 - vp[1]);
+    return line(vp[0] + (bx - vp[0]) * u, bottom, bx, 2000, {over: [0, 0], seed: `${seed}/ct${i}`});
+  }).join('') + [1800, 1890].map((yy, i) => hline(x0, x1, yy, {over: [0, 0], seed: `${seed}/ch${i}`})).join('');
+  const flecks: Pt[] = [];
+  for (let i = 0; i < 46; i++) flecks.push([((i * 197) % 1180) - 40, bottom + 18 + ((i * 89) % 170)]);
+  const chairBack = (cx: number, cy: number, w: number, k: string) => {
+    const back = roundRect(cx - w / 2, cy, w, w * 0.62, w * 0.16);
+    const inner = roundRect(cx - w * 0.36, cy + w * 0.1, w * 0.72, w * 0.36, w * 0.1);
+    return (
+      <React.Fragment key={k}>
+        <Fill rect={[cx - w * 0.07, cy + w * 0.6, w * 0.14, 2000 - cy]} color={CC.stand} offset={false} at={fillAt(at, 0.02)} />
+        <Fill d={back} color={CC.chairBack} at={fillAt(at, 0.02)} seed={`${seed}/${k}`} />
+        <Fill d={inner} color={CC.micGrille} offset={false} at={fillAt(at, 0.03)} />
+        <Ink d={back} width={W.mid} at={b(at, 0.02)} />
+        <Ink d={inner} width={W.far} at={b(at, 0.04)} />
+      </React.Fragment>
+    );
+  };
+  return (
+    <>
+      <Fill rect={[x0, top, x1 - x0, front - top]} color={CC.table} at={fillAt(at)} mode="snap" offset={false} />
+      <Fill rect={[x0, front, x1 - x0, bottom - front]} color={CC.tableFront} at={fillAt(at)} mode="snap" offset={false} />
+      <Fill rect={[x0, bottom, x1 - x0, 2000 - bottom]} color={CC.studioFloor} at={fillAt(at)} mode="snap" offset={false} />
+      <Ink d={carpet} width={W.hair} color={CC.shelfMetal} at={b(at, 0.04)} />
+      <Live at={at} c={[540, bottom + 90]}>
+        {flecks.map(([fx, fy], i) => (
+          <rect key={i} x={fx} y={fy} width={7} height={4} fill={CC.carpet} />
+        ))}
+      </Live>
+      {/* the cable tray under the lip: a darker channel, the mic's cable sagging out of it, a power strip */}
+      <Fill rect={[x0, tray, x1 - x0, 26]} color={CC.studioDeep} offset={false} at={fillAt(at, 0.02)} />
+      <Fill d={roundRect(700, tray + 4, 150, 18, 5)} color={CC.studioPanel} offset={false} at={fillAt(at, 0.03)} />
+      <Ink d={smooth([[120, tray + 26], [180, tray + 70], [260, tray + 64], [330, tray + 26]]) + smooth([[860, tray + 22], [900, tray + 64], [960, tray + 70]])} width={4} color={CC.cable} taper={false} at={b(at, 0.06)} />
+      <Ink d={hline(x0, x1, top, {seed: `${seed}/t`, over: [0, 0]}) + hline(x0, x1, front, {seed: `${seed}/f`, over: [0, 0]}) + hline(x0, x1, bottom, {seed: `${seed}/b`, over: [0, 0]}) + hline(x0, x1, tray + 26, {seed: `${seed}/tr`, over: [0, 0]})} width={W.mid} at={at} />
+      <Ink d={hline(x0, x1, front + 16, {seed: `${seed}/e`, over: [0, 0]}) + seams} width={W.hair} at={b(at, 0.05)} />
+      {chairs ? (
+        <>
+          {chairBack(210, 1660, 300, 'chA')}
+          {chairBack(820, 1690, 280, 'chB')}
+        </>
+      ) : null}
+    </>
+  );
+};
+
+const vline2 = (x: number, y0: number, y1: number, seed: string) => line(x, y0, x, y1, {over: [0, 0], seed});
 
 /** A page lying flat on the table (a perspective trapezoid: the far edge narrower), with a hand-lettered title and
  *  ruled lines (P3: CONTRACT at x 300, y 1380, 320 x 140). */

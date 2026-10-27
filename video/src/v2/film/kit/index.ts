@@ -9,13 +9,13 @@ export type {CCRole, DuskRole, ColdRoles, ColdSetName} from '../palette';
 export {b, fillAt, FILL_LAG, W, inkForHead, lerp, lerpPt, add, dirDeg, applyM, quadPt, BuildWave, BuildWaveCtx, radialWave, Ink, Fill, useWaveColour, Show, Pop, Rot, Placed, textW, Letter, Txt} from './util';
 export type {At, Pt, BuildWaveV, LetterProps} from './util';
 // ambient life (every panel lives the same way)
-export {loopT, stepT, swayAt, onOff, Live, Clouds, cloudPath, Bird, birdPath, Flock, Steam, DustMotes, WallClock, Sway, CandleFlame, leafD} from './Ambient';
+export {loopT, stepT, swayAt, onOff, Live, Clouds, cloudPath, Bird, birdPath, birdShape, Flock, Steam, DustMotes, WallClock, Sway, CandleFlame, leafD} from './Ambient';
 export type {CloudsProps, FlockProps, SteamProps, DustMotesProps, WallClockProps} from './Ambient';
 // the town outside her window
 export {DuskTown} from './Town';
 export type {DuskTownProps} from './Town';
 // her home: the nook (P2 / P4 / P13 layouts, P5 close, P6 angle) and its pieces
-export {NookRoom, NookDeskClose, NookAngle, NOOK, NOOK_LAYOUTS, nookMat, nookPt, nookWorld, HighShelf, PotPlant, FramedPicture, Corkboard, CoatOnHook, TableLamp, NookMug, NookMug as Mug, BookPile, PaperStack, FloorPlant} from './Nook';
+export {NookRoom, NookDeskClose, NookAngle, NOOK_ANGLE, NOOK, NOOK_LAYOUTS, nookMat, nookPt, nookWorld, HighShelf, PotPlant, FramedPicture, Corkboard, CoatOnHook, TableLamp, NookMug, NookMug as Mug, BookPile, PaperStack, FloorPlant} from './Nook';
 export type {NookLayoutName, NookRoomProps} from './Nook';
 // her desk (O1 / P12 / LOOP): the approved style frame, alive
 export {DESK, O1_WAVE, o1Wave, o1Cam, DeskBack, DeskFront, Books, Bookcase, BookStack, TopShelf, DeskWindow, DeskFloor, DeskTop, Basket, Pen, DeskMug, LampHead, leafPath} from './Desk';
@@ -35,4 +35,4 @@ export type {BadgeProps, BadgeState, BoxProps, MicProps, LaptopProps, BubbleProp
 // the cold set (P7, P9, P10, P11) and P3's interview room
 export {ColdSet, InsertPage, ColdGround, INSERT_PAGES, COLD_CENTRE} from './ColdSet';
 export type {ColdSetProps, InsertPageProps} from './ColdSet';
-export {InterviewRoom, InterviewTableTop, INTERVIEW} from './Interview';
+export {InterviewRoom, InterviewTableTop, INTERVIEW, NameTent} from './Interview';

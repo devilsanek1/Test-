@@ -5,8 +5,7 @@ import '../palette';
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
 import {CC} from '../palette';
-import {Letter} from './util';
-import {NOOK, NookAngle, NookDeskClose, NookRoom} from './Nook';
+import {NOOK, NOOK_ANGLE, NookAngle, NookDeskClose, NookRoom} from './Nook';
 import {Cat} from './Cat';
 import {HerArm, HerBack, HerSeated, HerStanding} from './Her';
 import {ContractPage, FloorRun, O1_PAGE, clauseTip} from './Contract';
@@ -14,7 +13,7 @@ import {Bubble, Laptop, Mic, Box} from './Props';
 import {DeskBack, DeskFront, DESK} from './Desk';
 import {DuskTown} from './Town';
 import {ColdSet, InsertPage, INSERT_PAGES} from './ColdSet';
-import {InterviewRoom, InterviewTableTop, INTERVIEW} from './Interview';
+import {InterviewRoom, InterviewTableTop, INTERVIEW, NameTent} from './Interview';
 import {InterviewTable, Staffer, P3_STAFF, TablePage} from './Staffer';
 
 export const KIT_SETS = ['nookWide', 'nook12', 'nook14', 'desk', 'p5', 'p6', 'town', 'cold', 'coldDusk', 'interview'] as const;
@@ -27,8 +26,8 @@ export const KIT_SET_LABELS: Record<KitSetName, string> = {
   p5: 'P5 over the shoulder',
   p6: 'P6 new angle',
   town: 'the town (window view)',
-  cold: 'COLD SET night (pick)',
-  coldDusk: 'cold set dusk (alt)',
+  cold: 'cold set night (rejected)',
+  coldDusk: 'COLD SET dusk (the pick)',
   interview: 'P3 interview room',
 };
 
@@ -49,7 +48,7 @@ const NookSeated: React.FC<{layout: 'm12' | 'm14'}> = ({layout}) => {
   return (
     <>
       <NookRoom layout={layout} cat={layout === 'm14' ? {pose: 'loaf', facing: 'l', size: 120, x: 680} : {pose: 'sit', facing: 'l', size: 120, x: 690, look: [470, 760]}}>
-        <HerSeated x={H.x} y={H.y} h={H.h} facing="r" view="side" face="calm" talking={[[0, 8]]} hands={[[520, 1298], [552, 1292]]} seed="ks/herS" />
+        <HerSeated x={H.x} y={H.y} h={H.h} facing="r" view="side" face="calm" talking={[[0, 8]]} seed="ks/herS" />
       </NookRoom>
       {layout === 'm14' ? <Bubble x={250} y={650} w={400} h={264} tail={[490, 1078]} seed="ks/b4" /> : <Bubble x={270} y={640} w={400} h={264} tail={[482, 1102]} text="FACTS" seed="ks/b13" />}
     </>
@@ -74,20 +73,23 @@ const P5: React.FC = () => (
   <NookDeskClose>
     <Laptop x={530} y={953} w={460} screen="ai" seed="ks/p5lap" />
     <Cat x={1010} y={1330} size={300} pose="loaf" facing="l" seed="ks/p5cat" />
-    <HerBack x={110} y={1600} h={1100} facing="r" seed="ks/p5her" />
+    <HerBack x={60} y={1600} h={1100} facing="r" seed="ks/p5her" />
   </NookDeskClose>
 );
 
-const P6: React.FC = () => (
-  <>
-    <NookAngle>
-      <Cat x={990} y={1130} size={120} pose="sit" facing="l" look={[620, 1130]} seed="ks/p6cat" />
-      <Mic x={260} y={1452} w={120} tilt={8} seed="ks/p6mic" />
-      <HerSeated x={640} y={1960} h={1100} facing="l" view="front34" face="worried" talking={[[0, 8]]} legs={false} seed="ks/p6her" />
-    </NookAngle>
-    <Bubble x={120} y={650} w={400} h={264} tail={[500, 1104]} seed="ks/b6" />
-  </>
-);
+const P6: React.FC = () => {
+  const H = NOOK_ANGLE.her;
+  return (
+    <>
+      <NookAngle behind={<HerSeated x={H.x} y={H.y} h={H.h} facing="l" view="front34" face="worried" talking={[[0, 8]]} part="body" seed="ks/p6her" />}>
+        <Cat x={990} y={NOOK_ANGLE.sill} size={120} pose="sit" facing="l" look={[620, 1130]} seed="ks/p6cat" />
+        <Mic x={NOOK_ANGLE.mic.x} y={NOOK_ANGLE.mic.y} w={NOOK_ANGLE.mic.w} tilt={8} seed="ks/p6mic" />
+        <HerSeated x={H.x} y={H.y} h={H.h} facing="l" view="front34" face="worried" talking={[[0, 8]]} part="arms" seed="ks/p6her" />
+      </NookAngle>
+      <Bubble x={120} y={650} w={400} h={264} tail={[500, 1104]} seed="ks/b6" />
+    </>
+  );
+};
 
 const Town: React.FC = () => (
   <>
@@ -115,14 +117,12 @@ const Interview: React.FC = () => {
       <Staffer {...B} variant="B" part="body" />
       <Staffer {...A} variant="A" part="body" talking={[[0, 8]]} />
       <InterviewTable />
-      <TablePage x={300} y={1380} w={320} h={140} />
+      <TablePage {...INTERVIEW.page} />
       <InterviewTableTop />
       <Staffer {...B} variant="B" part="arms" />
       <Staffer {...A} variant="A" part="arms" />
+      <NameTent {...INTERVIEW.tent} />
       <Mic x={INTERVIEW.mic.x} y={INTERVIEW.mic.y} w={INTERVIEW.mic.w} tilt={10} />
-      <Letter x={604} y={990} size={56} anchor="middle">
-        NAME WITHHELD
-      </Letter>
     </>
   );
 };

@@ -63,7 +63,7 @@ export type CloudsProps = {
   h: number;
   /** How many clouds (default 3). */
   n?: number;
-  /** Drift speed px/s (default 9; + = to the right). Far skies 4-8, a big sky 10-16. */
+  /** Drift speed px/s (default 22; + = to the right): >= 20 so the drift reads by eye between two glances. */
   speed?: number;
   /** Cloud size factor (1 = ~150 px long). */
   size?: number;
@@ -89,7 +89,7 @@ export const cloudPath = (cx: number, cy: number, L: number, seed: string): {bod
   return {body, under};
 };
 
-export const Clouds: React.FC<CloudsProps> = ({x, y, w, h, n = 3, speed = 9, size = 1, color = CC.cloud, lit = CC.cloudLit, seed = 'clouds', at}) => {
+export const Clouds: React.FC<CloudsProps> = ({x, y, w, h, n = 3, speed = 22, size = 1, color = CC.cloud, lit = CC.cloudLit, seed = 'clouds', at}) => {
   const t = useTime();
   const r = rng(`clouds/${seed}`);
   const out: React.ReactNode[] = [];
@@ -117,17 +117,30 @@ export const Clouds: React.FC<CloudsProps> = ({x, y, w, h, n = 3, speed = 9, siz
 
 // ---------------------------------------------------------------- birds
 
-/** One bird glyph (a far plane: a dark stroke, no outline): wings up (flap 1) or down (flap 0), span 2 s px. */
+/** One bird glyph (a far plane: no outline), wings up (flap 1) or down (flap 0), span 2 s px: the centre line of the
+ *  wings (birdShape fills it out). */
 export const birdPath = (x: number, y: number, s: number, flap: number): string => {
   const up = flap > 0.5;
   const tipY = up ? -0.75 * s : 0.15 * s;
   const midY = up ? -0.42 * s : -0.38 * s;
   return `M${x - s} ${y + tipY}Q${x - 0.45 * s} ${y + midY} ${x} ${y}Q${x + 0.45 * s} ${y + midY} ${x + s} ${y + tipY}`;
 };
+/** The FILLED bird (thin moving lines vanish at phone size; filled shapes read): the wing line thickened toward the
+ *  body (0.26 s at the middle), tips sharp, a small body under the joint. */
+export const birdShape = (x: number, y: number, s: number, flap: number): string => {
+  const up = flap > 0.5;
+  const tipY = up ? -0.75 * s : 0.15 * s;
+  const midY = up ? -0.42 * s : -0.38 * s;
+  const th = 0.26 * s;
+  return (
+    `M${x - s} ${y + tipY}Q${x - 0.45 * s} ${y + midY} ${x} ${y}Q${x + 0.45 * s} ${y + midY} ${x + s} ${y + tipY}` +
+    `Q${x + 0.42 * s} ${y + midY + th} ${x + 0.1 * s} ${y + th}L${x} ${y + th * 1.35}L${x - 0.1 * s} ${y + th}Q${x - 0.42 * s} ${y + midY + th} ${x - s} ${y + tipY}Z`
+  );
+};
 
 export const Bird: React.FC<{x: number; y: number; s?: number; flap?: number; color?: string; width?: number}> = ({x, y, s = 10, flap = 0, color = CC.anchor, width}) => {
   const k = useInkScale();
-  return <path d={birdPath(x, y, s, flap)} fill="none" stroke={color} strokeWidth={(width ?? Math.max(1.6, s * 0.28)) * k} strokeLinecap="round" strokeLinejoin="round" />;
+  return <path d={birdShape(x, y, s, flap)} fill={color} stroke={color} strokeWidth={(width ?? Math.max(1.2, s * 0.12)) * k} strokeLinejoin="round" />;
 };
 
 export type FlockProps = {
@@ -136,16 +149,16 @@ export type FlockProps = {
   y: number;
   w: number;
   h: number;
-  /** Birds per pass (default 6). */
+  /** Birds per pass (default 7). */
   n?: number;
-  /** A pass starts every `period` s (default 6.5) and takes `dur` s (default 4.2) to cross. */
+  /** A pass starts every `period` s (default 4.2) and takes `dur` s (default 2.4) to cross (the AD: ~2 s, readable). */
   period?: number;
   dur?: number;
   /** First pass start (scene s; default -1.5: already crossing on the cut). */
   offset?: number;
   /** +1 left to right (default), -1 right to left. */
   dir?: 1 | -1;
-  /** Half wing span px (default 9; far 5-7, a near flock 14-20). */
+  /** Half wing span px (default 14: it reads at phone size; a near flock 18-24). */
   size?: number;
   color?: string;
   /** One extra single bird on its own slower cycle (default true). */
@@ -154,7 +167,7 @@ export type FlockProps = {
   at?: At;
 };
 
-export const Flock: React.FC<FlockProps> = ({x, y, w, h, n = 6, period = 6.5, dur = 4.2, offset = -1.5, dir = 1, size = 9, color = CC.anchor, single = true, seed = 'flock', at}) => {
+export const Flock: React.FC<FlockProps> = ({x, y, w, h, n = 7, period = 4.2, dur = 2.4, offset = -1.5, dir = 1, size = 14, color = CC.anchor, single = true, seed = 'flock', at}) => {
   const t = useTime();
   const out: React.ReactNode[] = [];
   const pass = Math.floor((t - offset) / period);
@@ -205,7 +218,7 @@ export type SteamProps = {
   /** Rise (px, default 70) and half width of the wave (default 7). */
   h?: number;
   amp?: number;
-  /** Wisps (default 2), stroke width (default far ink), colour (default ink). */
+  /** Wisps (default 2), stroke width (default max(3.2, h / 22): it reads at phone size), colour (default ink). */
   n?: number;
   width?: number;
   color?: string;
@@ -219,7 +232,7 @@ export type SteamProps = {
 export const Steam: React.FC<SteamProps> = ({x, y, h = 70, amp = 7, n = 2, width, color = CC.ink, rate = 1, seed = 'steam', at}) => {
   const t = useTime();
   const k = useInkScale();
-  const sw = (width ?? W.far) * k;
+  const sw = (width ?? Math.max(3.2, h / 22)) * k;
   const out: React.ReactNode[] = [];
   for (let i = 0; i < n; i++) {
     const sx = x + (i - (n - 1) / 2) * amp * 2.6;
@@ -247,7 +260,7 @@ export type DustMotesProps = {
   rx: number;
   ry: number;
   n?: number;
-  /** Mote radius px (default 2.6) and colour (default the lamp core, a step lighter than the pool). */
+  /** Mote radius px (default 3.6) and colour (default the paper white, a step lighter than the pool). */
   r?: number;
   color?: string;
   /** Drift speed factor (default 1). */
@@ -256,7 +269,7 @@ export type DustMotesProps = {
   at?: At;
 };
 
-export const DustMotes: React.FC<DustMotesProps> = ({cx, cy, rx, ry, n = 9, r = 2.6, color = CC.paper, rate = 1, seed = 'motes', at}) => {
+export const DustMotes: React.FC<DustMotesProps> = ({cx, cy, rx, ry, n = 10, r = 3.6, color = CC.paper, rate = 1, seed = 'motes', at}) => {
   const t = useTime() * rate;
   const g = rng(`motes/${seed}`);
   const k = useInkScale();

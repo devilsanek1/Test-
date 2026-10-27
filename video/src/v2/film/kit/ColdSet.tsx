@@ -1,23 +1,26 @@
 // kit/ColdSet.tsx: THE COLD SET (P7, P9, P10, P11; lane L4). ONE cold, official setting for the deal page AND Google's
-// page (fairness: equal size, ground, tone and dressing): an official desk at night seen straight down from above, edge
-// to edge, in DUSK's blue-violet family (never the hero cobalt, never grey): a dark violet lacquered top (COLD.table), a
-// blotter under the page, a cool desk lamp's pool (top-left), the window's light falling across the desk in two panes
-// (and a cloud's shadow drifting through it), other documents and folders, a fountain pen that rolls a little, a glass
-// of water with a ripple, a stamp and its pad, paper clips, dust motes in the lamp's light. The caption band (y 290-600)
-// holds only the flat desk and the flat window light. The page is the lane's (kit <InsertPage>, never angled).
-//   <ColdSet zoom variant at>   zoom 1 (P7, P9, P11) or 0.85 (P10: the pull-back), about the page centre (540, 950)
-//   <InsertPage x y w h lift>    a warm white page on the cold set: flat drop shadow, paper, outline, a lifting corner
-//   INSERT_PAGES                 the board's page boxes (P9 = P11: Google's page at the deal page's size and place)
+// page (fairness: equal size, ground, tone and dressing): an official desk at dusk seen straight down from above, edge
+// to edge, in DUSK's blue-violet family (never the hero cobalt, never grey): a mid-violet top (COLD.table), a blotter
+// under the page, a cool desk lamp's pool (top-left), the window's light falling across the desk in two panes (a
+// cloud's shadow drifts through it, a branch's leaves sway in it, people passing the window cross it as crisp
+// shadows), other documents and folders (an official rosette seal on one), a fountain pen that rolls a little, a cup
+// of coffee with steam, a desk phone whose line lights blink, a smartphone that lights with notifications, a rubber
+// stamp lying by its pad, paper clips, dust motes in the lamp's light, and once per shot an official's hand (maroon
+// cuff) sliding a document onto the left pile (`slide`). The caption band (y 290-600) holds only the flat desk; the
+// window light starts under it. The page is the lane's (kit <InsertPage>, never angled).
+//   <ColdSet zoom variant slide at>  zoom 1 (P7, P9, P11) or 0.85 (P10: the pull-back), about the page centre (540, 950)
+//   <InsertPage x y w h lift>        a warm white page on the cold set: flat drop shadow, paper, outline, a lifting corner
+//   INSERT_PAGES                     the board's page boxes (P9 = P11: Google's page at the deal page's size and place)
 
 import React, {useId} from 'react';
-import {blob, ellipse, hline, line, poly, polyPath, rect, roundRect, smooth, textLines} from '../../../lib/sketch';
+import {blob, crown, ellipse, hline, line, poly, polyPath, rect, roundRect, smooth, textLines} from '../../../lib/sketch';
 import {rand, rng} from '../../../lib/rng';
 import {ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {InkScale} from '../../../lib/inkComp';
 import {CC, COLD, COLD_SETS, ColdRoles, ColdSetName} from '../palette';
 import {At, b, Fill, fillAt, Ink, Pt, W} from './util';
-import {DustMotes, Live, loopT} from './Ambient';
+import {DustMotes, Live, loopT, Steam} from './Ambient';
 
 /** The board's page boxes: P9 and P11 share one box (Google's page at the deal page's size, position, ground, tone). */
 export const INSERT_PAGES = {
@@ -32,17 +35,21 @@ export const COLD_CENTRE: Pt = [540, 950];
 export type ColdSetProps = {
   /** 1 (P7, P9, P11) or 0.85 (P10's pull-back): the whole set scales about COLD_CENTRE. */
   zoom?: number;
-  /** 'night' (THE pick) | 'dusk' (the comparison candidate). */
+  /** 'dusk' (THE pick, COLD_PICK: the default) | 'night' (the rejected comparison candidate). */
   variant?: ColdSetName;
   /** Ambient rate multiplier (default 1). */
   life?: number;
+  /** Once per shot an official's hand (maroon suit cuff) slides a document onto the left pile at this scene time (s;
+   *  default 1.2; false = never): in 0.5 s, holds 0.35 s, withdraws in 0.4 s; the document stays. People near, never
+   *  a face; it never touches the page or the caption band. */
+  slide?: number | false;
   at?: At;
   seed?: string;
 };
 
 const PAGE = INSERT_PAGES.P9;
 
-export const ColdSet: React.FC<ColdSetProps> = ({zoom = 1, variant, life = 1, at, seed = 'cold'}) => {
+export const ColdSet: React.FC<ColdSetProps> = ({zoom = 1, variant, life = 1, slide = 1.2, at, seed = 'cold'}) => {
   const tt = useTime();
   const t = tt * life;
   const C: ColdRoles = variant ? COLD_SETS[variant] : COLD;
@@ -57,7 +64,7 @@ export const ColdSet: React.FC<ColdSetProps> = ({zoom = 1, variant, life = 1, at
   const paneB = pane(1240);
   // a cloud's shadow sliding through the light every 4.2 s; someone passing the window every 5.6 s (a head-and-
   // shoulders shadow crossing the light panes: people near, never seen)
-  const cp = loopT(t, 4.2, 2) / 4.2;
+  const cp = loopT(t, 3.0, 2) / 3.0;
   const pp = loopT(t, 3.2, 0.7) / 1.8;
   const pasDir = Math.floor((t + 0.7) / 3.2) % 2 === 0 ? 1 : -1;
   const pasX = pasDir === 1 ? 1300 - pp * 1300 : pp * 1300;
@@ -66,9 +73,9 @@ export const ColdSet: React.FC<ColdSetProps> = ({zoom = 1, variant, life = 1, at
   const cloud: Pt[] = [[cloudX, top], [cloudX + 220, top], [cloudX + 100, 2300], [cloudX - 120, 2300]];
   // the pen rolls a little (a nudge every 3.4 s)
   const roll = Math.sin(prog(loopT(t, 3.4, 0.6), 0, 0.9, ease.inOutSine) * Math.PI) * 10;
-  // the glass's ripple: a ring growing from the centre every 2.2 s
-  const rp = loopT(t, 2.2) / 2.2;
-  const glass: Pt = [930, 1640];
+  // the slide: a document pushed in from the left edge by a hand in a maroon cuff (then the hand withdraws)
+  const slideIn = slide === false ? -1 : prog(tt, slide, 0.5, ease.outCubic);
+  const slideOut = slide === false ? 0 : prog(tt, slide + 0.85, 0.4, ease.inCubic);
   const ink = (w: number) => w;
   const docs: React.ReactNode[] = [];
   // other documents: a page lower-left, a folder stack lower-right, a closed folder top-right
@@ -144,15 +151,20 @@ export const ColdSet: React.FC<ColdSetProps> = ({zoom = 1, variant, life = 1, at
           <path d={polyPath(cloud)} fill={C.table} />
           {pp <= 1 ? (
             <g clipPath={`url(#${clipId})`}>
-              <circle cx={pasX} cy={860} r={70} fill={C.table} />
-              <path d={roundRect(pasX - 150, 930, 300, 900, 120)} fill={C.table} />
+              <path d={passerD(pasX)} fill={C.shadow} />
             </g>
           ) : null}
+          {/* a branch outside the window: its leaves' shadow sways in the light, always (crisp, flat) */}
+          <g clipPath={`url(#${clipId})`}>
+            <XG m={mat.about(mat.rotate(branchSway(t)), 1260, 420)}>
+              <path d={branchD} fill={C.shadow} />
+            </XG>
+          </g>
         </Live>
         {/* the desk lamp from above (top-left) and its cool pool */}
         <Fill d={blob(250, 900, 330, 300, {seed: `${seed}/pool`, wobble: 0.02})} color={C.pool} offset={false} at={fillAt(at)} />
         <Fill d={blob(236, 880, 200, 180, {seed: `${seed}/core`, wobble: 0.02})} color={C.poolCore} offset={false} at={fillAt(at)} />
-        <DustMotes cx={250} cy={900} rx={300} ry={270} n={9} r={3} color={C.metal} rate={life} seed={`${seed}/motes`} at={at} />
+        <DustMotes cx={250} cy={900} rx={300} ry={270} n={12} r={5} color={C.metal} rate={life * 1.6} seed={`${seed}/motes`} at={at} />
         {/* the blotter under the page */}
         <Fill rect={[PAGE.x - 60, PAGE.y - 40, PAGE.w + 120, PAGE.h + 110]} color={C.blotter} at={fillAt(at)} seed={`${seed}/blot`} />
         <Fill rect={[PAGE.x - 60, PAGE.y - 40, 36, PAGE.h + 110]} color={C.blotterEdge} offset={false} at={fillAt(at, 0.02)} />
@@ -173,9 +185,7 @@ export const ColdSet: React.FC<ColdSetProps> = ({zoom = 1, variant, life = 1, at
         <Fill d={roundRect(150, 1540, 180, 120, 14)} color={C.stampPad} at={fillAt(at)} seed={`${seed}/pad`} />
         <Fill d={roundRect(166, 1556, 148, 88, 10)} color={C.blotter} offset={false} at={fillAt(at, 0.02)} />
         <Ink d={roundRect(150, 1540, 180, 120, 14, {seed: `${seed}/padI`})} width={W.mid} color={C.ink} at={at} />
-        <Fill d={blob(410, 1630, 46, 46, {seed: `${seed}/stamp`})} color={CC.trim} at={fillAt(at)} offset={false} />
-        <Fill d={blob(410, 1630, 26, 26, {seed: `${seed}/stampK`})} color={CC.chairShade} offset={false} at={fillAt(at, 0.02)} />
-        <Ink d={ellipse(410, 1630, 46, 46, {seed: `${seed}/stampI`})} width={W.mid} color={C.ink} at={at} />
+        <RubberStamp x={356} y={1630} C={C} at={at} seed={`${seed}/rstamp`} />
         {clips}
         {/* the desk phone (right margin): body, handset, keys, a coiled cord, a line light that blinks */}
         <DeskPhone x={975} y={760} C={C} t={t} at={at} seed={`${seed}/phone`} />
@@ -184,6 +194,9 @@ export const ColdSet: React.FC<ColdSetProps> = ({zoom = 1, variant, life = 1, at
         <Fill d={blob(962, 1206, 58, 56, {seed: `${seed}/cup`})} color={CC.paper} at={fillAt(at, 0.02)} offset={false} />
         <Fill d={blob(962, 1206, 44, 42, {seed: `${seed}/coffee`})} color={CC.under} offset={false} at={fillAt(at, 0.03)} />
         <Ink d={ellipse(968, 1212, 92, 88, {seed: `${seed}/saucerI`}) + ellipse(962, 1206, 58, 56, {seed: `${seed}/cupI`}) + roundRect(1012, 1196, 34, 20, 9, {seed: `${seed}/hdl`, closed: false}) + line(890, 1270, 860, 1330, {over: [0, 0], seed: `${seed}/spoon`})} width={W.mid} color={C.ink} at={at} />
+        <Steam x={962} y={1176} h={130} amp={12} n={3} width={8} color={C.metal} seed={`${seed}/cupsteam`} at={at} />
+        {/* a smartphone face up: its screen lights with a notification every ~2.6 s */}
+        <Smartphone x={846} y={1316} C={C} t={t} at={at} seed={`${seed}/mobile`} />
         {/* reading glasses (left margin) */}
         <XG m={mat.about(mat.rotate(-18), 130, 1110)}>
           <Fill d={blob(90, 1110, 36, 30, {seed: `${seed}/g1`})} color={C.glass} offset={false} at={fillAt(at)} />
@@ -197,15 +210,10 @@ export const ColdSet: React.FC<ColdSetProps> = ({zoom = 1, variant, life = 1, at
           <Fill d={polyPath([[150, -9], [200, 0], [150, 9]])} color={C.metal} offset={false} at={fillAt(at, 0.02)} />
           <Ink d={roundRect(-150, -13, 300, 26, 13, {seed: `${seed}/penI`}) + poly([[150, -9], [200, 0], [150, 9]], {seed: `${seed}/nib`, over: [0, 0]})} width={W.mid} color={C.ink} at={at} />
         </XG>
-        {/* the glass of water (lower right) with its ripple */}
-        <Fill d={blob(glass[0] + 10, glass[1] + 14, 78, 78, {seed: `${seed}/gsh`})} color={C.shade} offset={false} at={fillAt(at)} />
-        <Fill d={blob(glass[0], glass[1], 78, 78, {seed: `${seed}/g`})} color={C.glass} offset={false} at={fillAt(at)} />
-        <Fill d={blob(glass[0], glass[1], 60, 60, {seed: `${seed}/w`})} color={C.water} offset={false} at={fillAt(at, 0.02)} />
-        <Ink d={ellipse(glass[0], glass[1], 78, 78, {seed: `${seed}/gI`}) + ellipse(glass[0], glass[1], 60, 60, {seed: `${seed}/wI`})} width={W.mid} color={C.ink} at={at} />
-        <Live at={at} c={glass}>
-          <circle cx={glass[0]} cy={glass[1]} r={8 + rp * 46} fill="none" stroke={C.glass} strokeWidth={3} />
-          <path d={`M${glass[0] - 40} ${glass[1] - 40}Q${glass[0] - 50} ${glass[1] - 10} ${glass[0] - 44} ${glass[1] + 14}`} fill="none" stroke={CC.white} strokeWidth={5} strokeLinecap="round" />
-        </Live>
+        {/* an official rosette seal on the lower folder (ribbon tails: it reads as a seal, never a disc) */}
+        <Rosette x={1036} y={1600} r={48} C={C} at={at} seed={`${seed}/seal`} />
+        {/* the document the official's hand slides onto the left pile (it stays) and the hand itself */}
+        {slideIn >= 0 && tt >= (slide as number) ? <SlideDoc p={slideIn} out={slideOut} C={C} at={at} seed={`${seed}/slide`} /> : null}
         {void r}
       </InkScale>
     </XG>
@@ -248,8 +256,132 @@ const DeskPhone: React.FC<{x: number; y: number; C: ColdRoles; t: number; at?: A
       <Fill d={keys.join('')} color={C.metal} offset={false} at={fillAt(at, 0.04)} />
       <Ink d={poly(body, {closed: true, seed: `${seed}/bI`, over: 'small'}) + roundRect(x - 112, y - 120, 224, 64, 30, {seed: `${seed}/hI`})} width={W.mid} color={C.ink} at={at} />
       <Live at={at} c={[x + 70, y + 30]}>
-        <circle cx={x + 76} cy={y + 30} r={9} fill={lit ? CC.recLight : C.blotter} />
+        <circle cx={x + 76} cy={y + 30} r={14} fill={lit ? CC.recLight : C.blotter} />
+        <circle cx={x + 76} cy={y + 64} r={9} fill={!lit ? CC.recLight : C.blotter} />
       </Live>
+    </>
+  );
+};
+
+/** A smartphone lying face up (top-left x, y): dark glass; every ~2.6 s the screen lights for ~1.1 s with a
+ *  notification (two lines and a dot), stepped on / off. */
+const Smartphone: React.FC<{x: number; y: number; C: ColdRoles; t: number; at?: At; seed: string}> = ({x, y, C, t, at, seed}) => {
+  const on = loopT(Math.floor(t * 12) / 12, 2.6, 0.4) < 1.1;
+  return (
+    <>
+      <Fill d={roundRect(x + 8, y + 10, 96, 184, 18)} color={C.shade} offset={false} at={fillAt(at)} />
+      <Fill d={roundRect(x, y, 96, 184, 18)} color={C.pen} at={fillAt(at)} seed={`${seed}/b`} />
+      <Ink d={roundRect(x, y, 96, 184, 18, {seed: `${seed}/bI`})} width={W.mid} color={C.ink} at={at} />
+      <Live at={at} c={[x + 48, y + 92]}>
+        <rect x={x + 9} y={y + 14} width={78} height={156} rx={8} fill={on ? C.poolCore : C.blotter} />
+        {on ? (
+          <>
+            <rect x={x + 16} y={y + 40} width={64} height={34} rx={6} fill={CC.paper} />
+            <rect x={x + 22} y={y + 48} width={40} height={6} fill={C.ink} />
+            <rect x={x + 22} y={y + 60} width={28} height={6} fill={C.ink} />
+            <circle cx={x + 70} cy={y + 52} r={5} fill={CC.recLight} />
+          </>
+        ) : null}
+      </Live>
+    </>
+  );
+};
+
+/** The branch's sway (deg): three incommensurate sines, so it never rests. */
+const branchSway = (t: number) => Math.sin(t * 2.1) * 5.5 + Math.sin(t * 5.3) * 2.2 + Math.sin(t * 8.9) * 1;
+
+/** A leafy branch's shadow (in the window light, upper right): a stem from off-frame and seven leaves. */
+const branchD = (() => {
+  const stem: Pt[] = [[1260, 420], [1130, 640], [1020, 860], [930, 1100]];
+  let d = smooth(stem.map(([x, y]) => [x - 7, y] as Pt).concat([...stem].reverse().map(([x, y]) => [x + 7, y] as Pt)), {closed: true});
+  const leaves: [number, number, number, number][] = [[1150, 610, 90, 200], [1095, 700, 80, -30], [1060, 790, 96, 160], [1010, 880, 84, -20], [985, 960, 92, 190], [950, 1040, 80, -40], [925, 1120, 76, 110]];
+  const leaf = (x: number, y: number, len: number, deg: number) => {
+    const a = (deg * Math.PI) / 180;
+    const u: Pt = [Math.cos(a), Math.sin(a)];
+    const n: Pt = [-u[1], u[0]];
+    const w = len * 0.42;
+    return `M${x} ${y}Q${x + u[0] * len * 0.5 + n[0] * w} ${y + u[1] * len * 0.5 + n[1] * w} ${x + u[0] * len} ${y + u[1] * len}Q${x + u[0] * len * 0.5 - n[0] * w} ${y + u[1] * len * 0.5 - n[1] * w} ${x} ${y}Z`;
+  };
+  for (const [x, y, l, deg] of leaves) d += leaf(x, y, l, deg);
+  return d;
+})();
+
+/** A passer-by's shadow across the window light: head, neck, shoulders and arms (crisp, flat). */
+const passerD = (x: number): string =>
+  blob(x, 830, 74, 82, {seed: 'passerH', wobble: 0.01}) +
+  polyPath([[x - 30, 890], [x + 30, 890], [x + 34, 940], [x - 34, 940]]) +
+  smooth([[x - 40, 930], [x - 150, 960], [x - 205, 1040], [x - 220, 1400], [x - 200, 2300], [x + 200, 2300], [x + 220, 1400], [x + 205, 1040], [x + 150, 960], [x + 40, 930]], {closed: true, tension: 0.3});
+
+/** A rubber stamp lying on its side (x = the knob's centre, y = its axis): knob, neck, wooden block, the rubber face. */
+const RubberStamp: React.FC<{x: number; y: number; C: ColdRoles; at?: At; seed: string}> = ({x, y, C, at, seed}) => {
+  const knob = blob(x, y, 32, 30, {seed: `${seed}/k`});
+  const neck = roundRect(x + 26, y - 13, 52, 26, 6);
+  const block = roundRect(x + 74, y - 38, 80, 76, 8);
+  const rubber = roundRect(x + 152, y - 34, 14, 68, 4);
+  return (
+    <>
+      <Fill d={roundRect(x - 20, y + 26, 190, 18, 8)} color={C.shade} offset={false} at={fillAt(at)} />
+      <Fill d={neck} color={C.stampWood} at={fillAt(at)} seed={`${seed}/n`} />
+      <Fill d={block} color={C.stampWood} at={fillAt(at)} seed={`${seed}/b`} />
+      <Fill d={rubber} color={C.stampPad} at={fillAt(at, 0.02)} offset={false} />
+      <Fill d={knob} color={C.lamp} at={fillAt(at)} seed={`${seed}/kf`} />
+      <Ink d={knob + neck + block + rubber + line(x + 84, y - 30, x + 84, y + 30, {over: [0, 0], seed: `${seed}/g`})} width={W.mid} color={C.ink} at={at} />
+    </>
+  );
+};
+
+/** An official rosette seal (scalloped disc, inner ring, a star) with two V-notched ribbon tails. */
+const Rosette: React.FC<{x: number; y: number; r: number; C: ColdRoles; at?: At; seed: string}> = ({x, y, r, C, at, seed}) => {
+  const tail = (dx: number, rot: number) => {
+    const a = (rot * Math.PI) / 180;
+    const P = (u: number, v: number): Pt => [x + dx + u * Math.cos(a) - v * Math.sin(a), y + u * Math.sin(a) + v * Math.cos(a)];
+    return polyPath([P(-16, 0), P(16, 0), P(16, r * 2.2), P(0, r * 1.9), P(-16, r * 2.2)]);
+  };
+  const tails = tail(-14, 16) + tail(14, -16);
+  const star = polyPath(Array.from({length: 10}, (_, i): Pt => {
+    const rr = i % 2 ? r * 0.2 : r * 0.42;
+    const a = -Math.PI / 2 + (i * Math.PI) / 5;
+    return [x + Math.cos(a) * rr, y + Math.sin(a) * rr];
+  }));
+  return (
+    <>
+      <Fill d={tails} color={C.sealRib} at={fillAt(at)} seed={`${seed}/t`} />
+      <Ink d={tails} width={W.far} color={C.ink} at={at} />
+      <Fill d={crown(x, y + r, r, r * 2, {seed: `${seed}/c`, bumps: 16, round: 0.7})} color={C.seal} at={fillAt(at)} offset={false} />
+      <Fill d={blob(x, y, r, r, {seed: `${seed}/d`, wobble: 0.01})} color={C.seal} at={fillAt(at)} seed={`${seed}/df`} />
+      <Ink d={ellipse(x, y, r, r, {seed: `${seed}/dI`}) + ellipse(x, y, r * 0.66, r * 0.66, {seed: `${seed}/iI`})} width={W.mid} color={C.ink} at={at} />
+      <Fill d={star} color={C.sealRib} offset={false} at={fillAt(at, 0.03)} />
+    </>
+  );
+};
+
+/** The slid-in document and the official's hand (p: slide-in progress 0..1, out: the hand's withdrawal 0..1). */
+const SlideDoc: React.FC<{p: number; out: number; C: ColdRoles; at?: At; seed: string}> = ({p, out, C, at, seed}) => {
+  const dx = -380 * (1 - p);
+  const doc = {x: -70 + dx, y: 1236, w: 300, h: 370};
+  const hx = doc.x + 96 - 460 * out;
+  const hy = doc.y + 200;
+  const M = mat.about(mat.rotate(-6), doc.x + doc.w / 2, doc.y + doc.h / 2);
+  const sleeve = roundRect(hx - 520, hy - 56, 470, 112, 30);
+  const cuff = roundRect(hx - 66, hy - 50, 30, 100, 8);
+  const hand = smooth([[hx - 40, hy - 46], [hx + 30, hy - 52], [hx + 70, hy - 30], [hx + 76, hy + 6], [hx + 50, hy + 40], [hx - 40, hy + 46]], {closed: true, tension: 0.35});
+  const fingers = [-26, -6, 14].map((fy, i) => line(hx + 24, hy + fy, hx + 66, hy + fy + 4, {over: [0, 0], seed: `${seed}/f${i}`})).join('');
+  return (
+    <>
+      <XG m={M}>
+        <Fill rect={[doc.x + 10, doc.y + 12, doc.w, doc.h]} color={C.shade} offset={false} at={fillAt(at)} />
+        <Fill rect={[doc.x, doc.y, doc.w, doc.h]} color={CC.paper} offset={false} at={fillAt(at)} />
+        <Ink d={rect(doc.x, doc.y, doc.w, doc.h, {seed: `${seed}/dI`, over: 'small'}) + textLines(doc.x + 30, doc.y + 50, 220, {n: 7, gap: 34, seed: `${seed}/dt`, heading: true})} width={W.mid} color={C.ink} at={at} />
+      </XG>
+      {out < 1 ? (
+        <>
+          <Fill d={sleeve} color={C.cuff} offset={false} at={fillAt(at)} />
+          <Fill d={cuff} color={C.shirt} offset={false} at={fillAt(at)} />
+          <Fill d={hand} color={CC.skin2} offset={false} at={fillAt(at)} />
+          <Ink d={sleeve + cuff + hand} width={W.mid} color={C.ink} at={at} />
+          <Ink d={fingers} width={W.far} color={C.ink} at={at} />
+        </>
+      ) : null}
     </>
   );
 };

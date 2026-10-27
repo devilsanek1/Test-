@@ -10,11 +10,12 @@ import {mat, XG} from '../../../lib/xf';
 import {palette, relightProblems} from '../../../lib/theme';
 import {PERSON_BODIES} from '../../../lib/kit/Person';
 import {TOD} from '../../../lib/cine/atmosphere';
-import {CC, COLD, DUSK, ccProblems} from '../palette';
+import {CC, COLD, COLD_PICK, DUSK, ccProblems} from '../palette';
 import {Letter, Txt} from './util';
 import {Cat} from './Cat';
 import {HerArm, HerBack, HerSeated, HerStanding} from './Her';
 import {Staffer, P3_STAFF, InterviewTable, TablePage} from './Staffer';
+import {INTERVIEW, NameTent} from './Interview';
 import {ContractPage, FloorRun, O1_PAGE, clauseTip} from './Contract';
 import {Badge, Box, Bubble, Laptop, Mic, micFromBoard, Stamp} from './Props';
 import {Clouds, CandleFlame, DustMotes, Flock, Steam, WallClock} from './Ambient';
@@ -72,13 +73,11 @@ const A_P3: React.FC = () => {
       <Staffer {...B} variant="B" part="body" seed="sh/sB" />
       <Staffer {...A} variant="A" part="body" talking={[[0, 9]]} seed="sh/sA" />
       <InterviewTable />
-      <TablePage x={300} y={1380} w={320} h={140} />
+      <TablePage {...INTERVIEW.page} />
       <Staffer {...B} variant="B" part="arms" seed="sh/sB" />
       <Staffer {...A} variant="A" part="arms" seed="sh/sA" />
+      <NameTent {...INTERVIEW.tent} />
       <Mic {...micFromBoard(110, 1100, 150)} tilt={10} seed="sh/p3mic" />
-      <Letter x={604} y={990} size={56} anchor="middle">
-        NAME WITHHELD
-      </Letter>
     </>
   );
 };
@@ -88,7 +87,7 @@ const A_P4: React.FC = () => (
     <rect x={248} y={1378} width={1000} height={50} fill={CC.desk} />
     <Floor y={1700} />
     <Mic {...micFromBoard(654.4, 1196.2, 105)} seed="sh/p4mic" />
-    <HerSeated x={486.4} y={1784.2} h={840} facing="r" view="side" talking={[[0, 9]]} hands={[[630, 1380], [672, 1372]]} seed="sh/p4her" />
+    <HerSeated x={486.4} y={1784.2} h={840} facing="r" view="side" talking={[[0, 9]]} seed="sh/p4her" />
     <Cat x={930} y={1378} size={168} pose="loaf" facing="l" seed="sh/p4cat" />
     <Bubble x={250} y={650} w={400} h={264} tail={[490, 1078]} seed="sh/b4" />
   </>
@@ -99,7 +98,7 @@ const A_P13: React.FC = () => (
     <rect x={267} y={1380} width={1000} height={42} fill={CC.desk} />
     <Floor y={1656} />
     <Mic {...micFromBoard(615.2, 1224.6, 90)} seed="sh/p13mic" />
-    <HerSeated x={471.2} y={1728.6} h={720} facing="r" view="side" talking={[[0, 9]]} hands={[[594, 1382], [628, 1376]]} seed="sh/p13her" />
+    <HerSeated x={471.2} y={1728.6} h={720} facing="r" view="side" talking={[[0, 9]]} clutch={[[0, 9]]} seed="sh/p13her" />
     <Cat x={860} y={1380} size={140} pose="sitFront" look={[470, 760]} seed="sh/p13cat" />
     <Bubble x={270} y={640} w={400} h={264} tail={[482, 1102]} text="FACTS" seed="sh/b13" />
   </>
@@ -110,15 +109,17 @@ const A_P5: React.FC = () => (
     <rect x={-100} y={980} width={1300} height={1000} fill={CC.desk} />
     <Laptop x={530} y={953} w={460} screen="ai" seed="sh/p5lap" />
     <Cat x={1010} y={1330} size={300} pose="loaf" facing="l" seed="sh/p5cat" />
-    <HerBack x={110} y={1600} h={1100} facing="r" seed="sh/p5her" />
+    <HerBack x={60} y={1600} h={1100} facing="r" seed="sh/p5her" />
   </>
 );
 
 const A_P6: React.FC = () => (
   <>
-    <rect x={-100} y={1450} width={740} height={600} fill={CC.desk} />
+    <HerSeated x={640} y={1960} h={1100} facing="l" view="front34" face="worried" talking={[[0, 9]]} part="body" seed="sh/p6her" />
+    <rect x={-100} y={1440} width={1300} height={200} fill={CC.desk} />
+    <rect x={-100} y={1640} width={1300} height={48} fill={CC.deskFront} />
     <Mic x={260} y={1452} w={120} tilt={8} seed="sh/p6mic" />
-    <HerSeated x={640} y={1960} h={1100} facing="l" view="front34" face="worried" talking={[[0, 9]]} legs={false} seed="sh/p6her" />
+    <HerSeated x={640} y={1960} h={1100} facing="l" view="front34" face="worried" talking={[[0, 9]]} part="arms" seed="sh/p6her" />
     <Bubble x={120} y={650} w={400} h={264} tail={[500, 1104]} seed="sh/b6" />
   </>
 );
@@ -139,7 +140,7 @@ const A_O1: React.FC = () => {
 
 const A_Small: React.FC = () => (
   <>
-    <Label x={40} y={90} size={40}>Badge 168 / 90 / 62 (staffer, worn)</Label>
+    <Label x={40} y={112} size={36}>Badge 168 / 90 / worn 62: staffer (navy) / hers (cobalt)</Label>
     <Badge x={150} y={240} w={168} seed="sh/bd1" />
     <Badge x={360} y={240} w={90} seed="sh/bd2" />
     <Badge x={520} y={250} w={62} strap={[[500, 150], [540, 150]]} lanyard={CC.lanyardA} seed="sh/bd3" />
@@ -174,11 +175,11 @@ export const KitSheet2: React.FC = () => {
   const swatch = (o: Record<string, unknown>) => Object.entries(o).filter(([, v]) => typeof v === 'string' && (v as string).startsWith('#')) as [string, string][];
   const A = [
     {c: <A_P2 />, l: 'P2: her standing h 640 + contract w 120 + floor run; cat 116 sill, 150 sleep'},
-    {c: <A_P3 />, l: 'P3: staffers h 900 / 820 (head r 81 / 74), mic 150, page, NAME WITHHELD'},
+    {c: <A_P3 />, l: 'P3: staffers h 900 / 820, mic 150, CONTRACT x 220, NAME WITHHELD tent'},
     {c: <A_P4 />, l: 'P4: her seated h 840, mic 105, bubble 400, cat loaf 168'},
-    {c: <A_P13 />, l: 'P13: her seated h 720, mic 90, FACTS bubble 400, cat 140'},
+    {c: <A_P13 />, l: 'P13: seated h 720 (the clutch beat), mic 90, FACTS 400, cat 140'},
     {c: <A_P5 />, l: 'P5: back view h 1100 (hair), laptop 460 AI, cat loaf 300'},
-    {c: <A_P6 />, l: 'P6: medium close 3/4, worried + talking, h 1100, mic 120'},
+    {c: <A_P6 />, l: 'P6: 3/4 h 1100 body behind the desk, arms on it, mic 120'},
     {c: <A_O1 />, l: 'O1: arm + highlighter, box + badge, page 420 + run-on, cat peek 360'},
     {c: <A_Small />, l: 'small extremes at phone size'},
   ];
@@ -269,7 +270,7 @@ export const KitSheet2: React.FC = () => {
             GOOGLE SAYS
           </Letter>
           <Label x={20} y={5720} size={26}>
-            {problems.length ? `PALETTE CHECK: ${problems.length} problems` : 'Palette check: house tokens = Cream & Cobalt, COLD = night, DUSK roles: 0 problems'}
+            {problems.length ? `PALETTE CHECK: ${problems.length} problems` : `Palette check: house tokens = Cream & Cobalt, COLD = ${COLD_PICK}, DUSK roles: 0 problems`}
           </Label>
           {problems.slice(0, 3).map((p, i) => (
             <Txt key={i} x={20} y={5748 + i * 24} size={20} anchor="start" fill={CC.pop}>

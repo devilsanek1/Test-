@@ -20,6 +20,7 @@ import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {CC} from '../palette';
 import {add, At, b, dirDeg, Fill, fillAt, Ink, inkForHead, lerp, Pt, W} from './util';
+import {loopT} from './Ambient';
 import {Badge} from './Props';
 
 export const HER = {hair: CC.hair, hairShade: CC.hairShade, skin: CC.skin, sweater: CC.sweater, rib: CC.sweaterRib, trousers: CC.trousers, shoe: CC.shoe} as const;
@@ -121,7 +122,9 @@ type HeadSpec = {
 
 // short / bald caps (staffers), front view, in head radii
 const CAP_SHORT: Pt[] = [[-0.95, -0.05], [-1.0, -0.55], [-0.62, -1.02], [0, -1.13], [0.62, -1.02], [1.0, -0.55], [0.95, -0.05], [0.84, -0.42], [0.42, -0.6], [-0.18, -0.64], [-0.78, -0.44]];
-const TUFT: Pt[] = [[-0.98, -0.25], [-1.06, 0.1], [-0.9, 0.42], [-0.74, 0.3], [-0.8, -0.05]];
+// staffer B: a grey-white fringe round the back of the head from the temple to the nape, ABOVE and behind the ear (the
+// ear is drawn over it, so it never reads as headphones)
+const TUFT: Pt[] = [[-0.6, -0.66], [-0.9, -0.46], [-1.05, -0.1], [-1.02, 0.3], [-0.88, 0.52], [-0.8, 0.34], [-0.86, -0.04], [-0.76, -0.38], [-0.52, -0.56]];
 
 // hair cap outlines in head radii (u toward the facing side, v down), front (turn 0) and side (turn 1)
 const CAP_FRONT: Pt[] = [[-0.9, 0.12], [-1.05, -0.3], [-0.86, -0.86], [-0.3, -1.1], [0.35, -1.08], [0.88, -0.8], [1.05, -0.3], [0.9, 0.12], [0.7, -0.28], [0.36, -0.52], [-0.18, -0.5], [-0.68, -0.25]];
@@ -227,11 +230,13 @@ const Head: React.FC<{h: HeadSpec}> = ({h}) => {
     style === 'long'
       ? ''
       : ellipse(...ptsAt(h, [[-0.92 - turn * 0.1, 0.12]])[0], 0.13 * r, 0.2 * r, {seed: `${seed}/earA`}) + (turn < 0.5 ? ellipse(...ptsAt(h, [[0.92 - turn * 0.3, 0.12]])[0], 0.12 * r, 0.2 * r, {seed: `${seed}/earB`}) : '');
+  const earIn =
+    style === 'long'
+      ? ''
+      : smooth(ptsAt(h, [[-0.95 - turn * 0.1, 0.02], [-0.88 - turn * 0.1, 0.12], [-0.93 - turn * 0.1, 0.22]])) + (turn < 0.5 ? smooth(ptsAt(h, [[0.95 - turn * 0.3, 0.02], [0.88 - turn * 0.3, 0.12], [0.93 - turn * 0.3, 0.22]])) : '');
   const glasses = h.glasses ? eyes.map(([x, yy], i) => ellipse(x, yy, 0.2 * r, 0.17 * r, {seed: `${seed}/gl${i}`})).join('') + line(eyes[0][0] + (eyes[1][0] > eyes[0][0] ? 0.2 : -0.2) * r, ey, eyes[1][0] - (eyes[1][0] > eyes[0][0] ? 0.2 : -0.2) * r, ey, {over: [0, 0], seed: `${seed}/br`}) : '';
   return (
     <>
-      {ears ? <Fill d={ears} color={skin} at={fillAt(at, 0.02)} offset={false} /> : null}
-      {ears ? <Ink d={ears} width={inner} at={b(at, 0.02)} /> : null}
       <Fill d={headD} color={skin} at={fillAt(at, 0.02)} seed={`${seed}/headF`} />
       <Ink d={headD} width={ink} at={b(at, 0.02)} open={0.08} />
       {eyes.map(([x, y], i) =>
@@ -246,6 +251,8 @@ const Head: React.FC<{h: HeadSpec}> = ({h}) => {
       {mouth}
       <Fill d={cap} color={hairC} at={fillAt(at, 0.06)} seed={`${seed}/cap`} />
       <Ink d={cap} width={inner} at={b(at, 0.06)} open={0.15} />
+      {ears ? <Fill d={ears} color={skin} at={fillAt(at, 0.07)} offset={false} /> : null}
+      {ears ? <Ink d={ears + earIn} width={inner} at={b(at, 0.07)} /> : null}
       {glasses ? <Ink d={glasses} width={inner} at={b(at, 0.12)} /> : null}
     </>
   );
@@ -257,14 +264,27 @@ const collarD = (cx: number, y: number, w: number, s: number, turn: number) => {
   return smooth([[cx - w + o, y - w * 0.12], [cx + o, y + w * 0.32], [cx + w + o, y - w * 0.12], [cx + w * 0.8 + o, y - w * 0.3], [cx + o, y + w * 0.08], [cx - w * 0.8 + o, y - w * 0.3]], {closed: true});
 };
 
-/** A hand: palm blob with a thumb; `grip` curls the fingers over an edge (holding a page). */
-const HandShape: React.FC<{p: Pt; r: number; dir: Pt; ink: number; at: At; seed: string; grip?: boolean}> = ({p, r, dir, ink, at, seed, grip}) => {
+/** A hand: palm blob with a thumb; `grip` curls the fingers over an edge (holding a page); `open` spreads four fingers
+ *  toward `dir` (a talking gesture: an open palm reads at phone size, a blob reads as a fist). */
+const HandShape: React.FC<{p: Pt; r: number; dir: Pt; ink: number; at: At; seed: string; grip?: boolean; open?: boolean}> = ({p, r, dir, ink, at, seed, grip, open}) => {
   const d = blob(p[0], p[1], r * 1.05, r * 0.92, {seed: `${seed}/palm`, wobble: 0.05});
   const n: Pt = [-dir[1], dir[0]];
   const thumb = smooth([add(p, n, r * 0.7), add(add(p, n, r * 1.15), dir, r * 0.4), add(add(p, n, r * 0.8), dir, r * 0.95)]);
   const knuckles = grip ? smooth([add(add(p, n, -r * 0.6), dir, r * 0.5), add(p, dir, r * 0.75), add(add(p, n, r * 0.4), dir, r * 0.62)]) : '';
+  const fingers = open
+    ? [-0.55, -0.18, 0.18, 0.52]
+        .map((k, i) => {
+          const a = Math.atan2(dir[1], dir[0]) + k * 0.75;
+          const u: Pt = [Math.cos(a), Math.sin(a)];
+          const base = add(p, u, r * 0.7);
+          return tube([base, add(base, u, r * (i === 0 ? 0.75 : 1.0))], [r * 0.42, r * 0.36]);
+        })
+        .join('')
+    : '';
   return (
     <>
+      {open ? <Fill d={fingers} color={HER.skin} at={fillAt(at, 0.1)} offset={false} /> : null}
+      {open ? <Ink d={fingers} width={ink * 0.6} at={b(at, 0.1)} /> : null}
       <Fill d={d} color={HER.skin} at={fillAt(at, 0.1)} seed={`${seed}/palmF`} />
       <Ink d={d} width={ink * 0.75} at={b(at, 0.1)} open={0.15} />
       <Ink d={thumb + knuckles} width={Math.max(1.6, ink * 0.55)} at={b(at, 0.12)} />
@@ -402,16 +422,39 @@ export type HerSeatedProps = HerBase & {
   talking?: Talking;
   /** Override the turn (side 0.72, front34 0.32). */
   turn?: number;
-  /** Hands (canvas px). Default: the board's sit pose (forearms forward on the desk). */
+  /** Hands (canvas px). Default: the REST pose: forearms resting on the desk, elbows down, hands open near the mic. */
   hands?: [Pt, Pt];
+  /** Elbows (canvas px; default: under the shoulders, at / below the desk top: an elbow break, never an IK loop). */
+  elbows?: [Pt, Pt];
+  /** Time windows (scene s) of the worried fist clutch (both hands together at the chest): keep it for ONE beat. */
+  clutch?: [number, number][];
+  /** While talking, the near hand rises open to gesture (every ~2.4 s for ~0.9 s; default true). */
+  gesture?: boolean;
   lanyard?: boolean;
-  /** Draw the legs (default true; P6 cuts them with the frame anyway). */
+  /** Draw the legs (default true; P6 shows only the shins under the desk). */
   legs?: boolean;
-  /** Idle life (default true): breath, blink, hair sway, a hand fidget, a nod while talking. */
+  /** 'all' (default) | 'body' (hair, legs, torso, head: draw it BEHIND the desk) | 'arms' (the sleeves and hands that
+   *  rest ON the desk: draw them after it). P6: <NookAngle behind={<HerSeated part="body"/>}> <HerSeated part="arms"/>. */
+  part?: 'all' | 'body' | 'arms';
+  /** Idle life (default true): breath, blink, hair sway, a hand fidget, a nod and a gesture while talking. */
   life?: boolean;
 };
 
-export const HerSeated: React.FC<HerSeatedProps> = ({x, y, h, facing = 'r', view = 'side', face = 'calm', talking, turn: turnP, hands, lanyard = false, legs = true, at, seed = 'herSeat', ink: inkP, life = true}) => {
+/** Her seated hands / elbows in figure units (u toward `facing`, v up from the ground, x h): rest, gesture, clutch. */
+const SEAT_POSE = {
+  side: {
+    rest: {hands: [[0.17, 0.52], [0.2, 0.515]], elbows: [[0.03, 0.455], [0.05, 0.45]]},
+    gesture: [0.15, 0.62],
+    clutch: {hands: [[0.12, 0.53], [0.14, 0.545]], elbows: [[0.02, 0.44], [0.06, 0.445]]},
+  },
+  front34: {
+    rest: {hands: [[0.02, 0.405], [0.2, 0.42]], elbows: [[-0.085, 0.455], [0.115, 0.455]]},
+    gesture: [0.19, 0.53],
+    clutch: {hands: [[0.05, 0.47], [0.1, 0.46]], elbows: [[-0.08, 0.43], [0.12, 0.43]]},
+  },
+} as const;
+
+export const HerSeated: React.FC<HerSeatedProps> = ({x, y, h, facing = 'r', view = 'side', face = 'calm', talking, turn: turnP, hands, elbows, clutch, gesture = true, lanyard = false, legs = true, part = 'all', at, seed = 'herSeat', ink: inkP, life = true}) => {
   const t = useTime();
   const s = facing === 'r' ? 1 : -1;
   const r = 0.09 * h;
@@ -470,16 +513,24 @@ export const HerSeated: React.FC<HerSeatedProps> = ({x, y, h, facing = 'r', view
     return {d: tube([hip, knee, foot], [0.1 * h, 0.075 * h, 0.06 * h]), foot};
   };
   const shoeD = (f: Pt) => roundRect(Math.min(f[0] - 0.03 * h, f[0] + s * 0.09 * h), f[1] - 0.012 * h, 0.12 * h, 0.042 * h, 0.02 * h);
-  // arms: shoulder -> elbow -> hand on the desk
-  const handsP0: [Pt, Pt] = hands ?? (front ? [P(0.07, 0.44), P(0.13, 0.425)] : [P(0.17, 0.46), P(0.22, 0.48)]);
-  const handsP: [Pt, Pt] = [handsP0[0], add(handsP0[1], fg)];
+  // arms: shoulder -> elbow (down, at or below the desk top) -> hand (open, resting on the desk near the mic). The
+  // elbows are PLACED (an elbow break), never solved, so an arm can't loop. While talking the near hand rises open to
+  // gesture; in a `clutch` window both fists come together at the chest (the one worried beat).
+  const SP = SEAT_POSE[front ? 'front34' : 'side'];
+  const clutching = !!clutch && clutch.some(([a, z]) => t >= a && t < z);
+  const gper = 2.4 + rand(seed, 'gper') * 0.5;
+  const gu = loopT(Math.floor(t * 12) / 12, gper, rand(seed, 'gph') * gper);
+  const gk = life && gesture && !clutching && !hands && talkingAt(t, talking) && gu < 0.9 ? Math.sin((Math.min(gu, 0.9) / 0.9) * Math.PI) : 0;
+  const pose = clutching ? SP.clutch : SP.rest;
+  const PU = (q: readonly [number, number]): Pt => P(q[0], q[1]);
+  const restNear = PU(pose.hands[1]);
+  const gestNear = PU(SP.gesture);
+  const handsP0: [Pt, Pt] = hands ?? [PU(pose.hands[0]), [lerp(restNear[0], gestNear[0], gk), lerp(restNear[1], gestNear[1], gk)]];
+  const handsP: [Pt, Pt] = [handsP0[0], add(handsP0[1], fg, gk > 0 ? 0 : 1)];
   const shBack: Pt = front ? [S[0] - s * 0.09 * h, S[1] + 0.03 * h] : [S[0] - s * 0.01 * h, S[1] + 0.025 * h];
   const shFront: Pt = front ? [S[0] + s * 0.085 * h, S[1] + 0.03 * h] : [S[0] + s * 0.035 * h, S[1] + 0.03 * h];
-  const l1 = 0.16 * h;
-  const l2 = 0.15 * h;
-  // elbows bend down (toward the seat) whichever way she faces
-  const E0 = elbow(shBack, handsP[0], l1, l2, -s);
-  const E1 = elbow(shFront, handsP[1], l1, l2, -s);
+  const E0: Pt = elbows ? elbows[0] : hands ? elbow(shBack, handsP[0], 0.16 * h, 0.15 * h, -s) : PU(pose.elbows[0]);
+  const E1: Pt = elbows ? elbows[1] : hands ? elbow(shFront, handsP[1], 0.16 * h, 0.15 * h, -s) : PU(pose.elbows[1]);
   const aw = 0.056 * h;
   const neckD = polyPath([[H[0] - 0.32 * r, H[1] + 0.7 * r], [H[0] + 0.32 * r, H[1] + 0.7 * r], [H[0] + 0.36 * r + s * 0.01 * h, S[1] + 0.01 * h], [H[0] - 0.36 * r + s * 0.01 * h, S[1] + 0.01 * h]]);
   const dirOf = (E: Pt, Z: Pt): Pt => {
@@ -489,10 +540,12 @@ export const HerSeated: React.FC<HerSeatedProps> = ({x, y, h, facing = 'r', view
   const massOver = turn >= 0.5;
   const L0 = legD(0);
   const L1 = legD(1);
+  const B = part !== 'arms';
+  const A = part !== 'body';
   return (
     <>
-      {!massOver ? <HairMass h={head} /> : null}
-      {legs ? (
+      {B && !massOver ? <HairMass h={head} /> : null}
+      {B && legs ? (
         <>
           {[L0, L1].map((L, i) => (
             <React.Fragment key={i}>
@@ -504,20 +557,28 @@ export const HerSeated: React.FC<HerSeatedProps> = ({x, y, h, facing = 'r', view
         </>
       ) : null}
       {/* the arm on the far side goes behind the torso in the side view */}
-      {!front ? <Sleeve A={shBack} E={E0} Z={handsP[0]} w={aw} ink={ink} at={at} seed={`${seed}/a0`} color={HER.rib} /> : null}
-      <Fill d={torso} color={HER.sweater} at={fillAt(at)} seed={`${seed}/torso`} />
-      <Fill d={hem} color={HER.rib} at={fillAt(at, 0.02)} offset={false} />
-      <Ink d={torso} width={ink} at={at} open={0.05} />
-      <Fill d={neckD} color={HER.skin} at={fillAt(at, 0.02)} offset={false} />
-      <Fill d={collarD(H[0] + s * 0.008 * h, S[1], 0.36 * r * 1.55, s, turn)} color={HER.rib} at={fillAt(at, 0.03)} offset={false} />
-      {lanyard ? <Badge x={S[0] + s * 0.03 * h} y={S[1] + 0.12 * h} w={Math.max(40, 0.075 * h)} strap={[[H[0] - 0.35 * r, S[1] + 0.004 * h], [H[0] + 0.35 * r, S[1] + 0.004 * h]]} at={b(at, 0.1)} seed={`${seed}/badge`} /> : null}
-      {massOver ? <HairMass h={head} /> : null}
-      <Head h={head} />
-      <HairLocks h={head} />
-      {front ? <Sleeve A={shBack} E={E0} Z={handsP[0]} w={aw} ink={ink} at={at} seed={`${seed}/a0`} /> : null}
-      <HandShape p={handsP[0]} r={0.032 * h} dir={dirOf(E0, handsP[0])} ink={ink} at={at} seed={`${seed}/h0`} />
-      <Sleeve A={shFront} E={E1} Z={handsP[1]} w={aw} ink={ink} at={at} seed={`${seed}/a1`} />
-      <HandShape p={handsP[1]} r={0.032 * h} dir={dirOf(E1, handsP[1])} ink={ink} at={at} seed={`${seed}/h1`} />
+      {B && !front ? <Sleeve A={shBack} E={E0} Z={handsP[0]} w={aw} ink={ink} at={at} seed={`${seed}/a0`} color={HER.rib} /> : null}
+      {B ? (
+        <>
+          <Fill d={torso} color={HER.sweater} at={fillAt(at)} seed={`${seed}/torso`} />
+          <Fill d={hem} color={HER.rib} at={fillAt(at, 0.02)} offset={false} />
+          <Ink d={torso} width={ink} at={at} open={0.05} />
+          <Fill d={neckD} color={HER.skin} at={fillAt(at, 0.02)} offset={false} />
+          <Fill d={collarD(H[0] + s * 0.008 * h, S[1], 0.36 * r * 1.55, s, turn)} color={HER.rib} at={fillAt(at, 0.03)} offset={false} />
+          {lanyard ? <Badge x={S[0] + s * 0.03 * h} y={S[1] + 0.12 * h} w={Math.max(40, 0.075 * h)} strap={[[H[0] - 0.35 * r, S[1] + 0.004 * h], [H[0] + 0.35 * r, S[1] + 0.004 * h]]} at={b(at, 0.1)} seed={`${seed}/badge`} /> : null}
+          {massOver ? <HairMass h={head} /> : null}
+          <Head h={head} />
+          <HairLocks h={head} />
+        </>
+      ) : null}
+      {A ? (
+        <>
+          {front ? <Sleeve A={shBack} E={E0} Z={handsP[0]} w={aw} ink={ink} at={at} seed={`${seed}/a0`} /> : null}
+          <HandShape p={handsP[0]} r={0.032 * h} dir={dirOf(E0, handsP[0])} ink={ink} at={at} seed={`${seed}/h0`} grip={clutching} />
+          <Sleeve A={shFront} E={E1} Z={handsP[1]} w={aw} ink={ink} at={at} seed={`${seed}/a1`} />
+          <HandShape p={handsP[1]} r={0.032 * h} dir={gk > 0.3 ? [s * 0.35, -0.94] : dirOf(E1, handsP[1])} ink={ink} at={at} seed={`${seed}/h1`} grip={clutching} open={gk > 0.3} />
+        </>
+      ) : null}
     </>
   );
 };
@@ -537,11 +598,13 @@ export const herMouth = (p: {x: number; y: number; h: number; facing?: Facing; v
 export type HerBackProps = HerBase & {
   /** The hand on the laptop (canvas px). Default: the board's sit-pose hand. */
   hand?: Pt;
+  /** Her chair's back across her waist (default true): a wooden top rail, a lower rail, the posts and a centre slat. */
+  chair?: boolean;
   /** Idle life (default true): breath, the hair's sway, the hand's fidget (typing). */
   life?: boolean;
 };
 
-export const HerBack: React.FC<HerBackProps> = ({x, y, h, facing = 'r', hand, at, seed = 'herBack', ink: inkP, life = true}) => {
+export const HerBack: React.FC<HerBackProps> = ({x, y, h, facing = 'r', hand, chair = true, at, seed = 'herBack', ink: inkP, life = true}) => {
   const t = useTime();
   const swh = life ? hairSway(t, seed) * 1.4 : 0;
   const fgb0 = life ? fidget(t, seed, 0.008 * h) : ([0, 0] as Pt);
@@ -604,11 +667,49 @@ export const HerBack: React.FC<HerBackProps> = ({x, y, h, facing = 'r', hand, at
     {closed: true, tension: 0.42},
   );
   const strands = [0.1, -0.35, -0.75].map((u, i) => smooth(([[u + 0.1, -0.7], [u - 0.05, 0.6], [u - 0.02, 2.0], [u + 0.08, 3.0 - i * 0.2]] as Pt[]).map(([uu, v]): Pt => [H[0] + s * uu * r, H[1] + v * r]))).join('');
+  // a group of lit strands on the lamp side (the lamp is ahead of her, toward `facing`), swaying with the mass
+  const hiStrands = [0.42, 0.55, 0.66, 0.3]
+    .map((u, i) => smooth(([[u - 0.05, -0.62 + i * 0.05], [u + 0.04, 0.2], [u - 0.02 + swh * 0.4, 1.4], [u - 0.12 + swh * 0.8, 2.3 - i * 0.25]] as Pt[]).map(([uu, v]): Pt => [H[0] + s * uu * r, H[1] + v * r])))
+    .join('');
+  // the sweater's shadow side (away from the lamp) and its folds: shoulder blade, the armpit crease, the sleeve's
+  // crease at the elbow, a drag line down the back
+  const shadowSide = smooth(
+    [
+      [S[0] - s * 0.1 * h, S[1] - 0.004 * h],
+      [S[0] - s * 0.136 * h, S[1] + 0.04 * h],
+      [S[0] - s * 0.152 * h, S[1] + 0.25 * h],
+      [S[0] - s * 0.152 * h, bottom],
+      [S[0] - s * 0.07 * h, bottom],
+      [S[0] - s * 0.075 * h, S[1] + 0.3 * h],
+      [S[0] - s * 0.095 * h, S[1] + 0.1 * h],
+      [S[0] - s * 0.08 * h, S[1] + 0.02 * h],
+    ],
+    {closed: true, tension: 0.35},
+  );
+  const folds = [
+    smooth([[S[0] - s * 0.06 * h, S[1] + 0.07 * h], [S[0] - s * 0.025 * h, S[1] + 0.15 * h], [S[0] + s * 0.005 * h, S[1] + 0.24 * h]]),
+    smooth([[S[0] + s * 0.105 * h, S[1] + 0.12 * h], [S[0] + s * 0.07 * h, S[1] + 0.2 * h], [S[0] + s * 0.06 * h, S[1] + 0.3 * h]]),
+    smooth([[S[0] - s * 0.01 * h, S[1] + 0.34 * h], [S[0] + s * 0.02 * h, S[1] + 0.45 * h], [S[0] + s * 0.01 * h, S[1] + 0.56 * h]]),
+    smooth([[E[0] - s * 0.025 * h, E[1] - 0.02 * h], [E[0] + s * 0.005 * h, E[1] + 0.01 * h], [E[0] + s * 0.035 * h, E[1] - 0.005 * h]]),
+  ].join('');
   const dz: Pt = [Z[0] - E[0], Z[1] - E[1]];
   const dl = Math.hypot(dz[0], dz[1]) || 1;
+  // her chair's back, across her waist (between the camera and her): top rail, lower rail, two posts, a centre slat
+  const cTop = S[1] + 0.5 * h;
+  const cx0 = S[0] - s * 0.2 * h;
+  const cx1 = S[0] + s * 0.17 * h;
+  const cl = Math.min(cx0, cx1);
+  const cr = Math.max(cx0, cx1);
+  const cw = cr - cl;
+  const rail = (y0: number, hh: number) => roundRect(cl, y0, cw, hh, hh * 0.4);
+  const post = (px: number) => roundRect(px - 0.016 * h, cTop + 0.02 * h, 0.032 * h, 2200 - cTop, 0.012 * h);
+  const chairD = rail(cTop, 0.055 * h) + rail(cTop + 0.17 * h, 0.04 * h);
+  const postsD = post(cl + cw * 0.06) + post(cl + cw * 0.94) + roundRect(cl + cw * 0.46, cTop + 0.05 * h, cw * 0.1, 0.13 * h, 0.01 * h);
   return (
     <>
       <Fill d={torso} color={HER.sweater} at={fillAt(at)} seed={`${seed}/torso`} />
+      <Fill d={shadowSide} color={HER.rib} at={fillAt(at, 0.02)} offset={false} />
+      <Ink d={folds} width={Math.max(2.2, ink * 0.55)} color={HER.rib} at={b(at, 0.06)} />
       <Ink d={torso} width={ink} at={at} open={0.05} />
       <Sleeve A={A} E={E} Z={Z} w={aw} ink={ink} at={at} seed={`${seed}/arm`} />
       <HandShape p={Z} r={0.034 * h} dir={[dz[0] / dl, dz[1] / dl]} ink={ink} at={at} seed={`${seed}/hand`} />
@@ -617,9 +718,21 @@ export const HerBack: React.FC<HerBackProps> = ({x, y, h, facing = 'r', hand, at
       <Fill d={hair} color={HER.hair} at={fillAt(at, 0.04)} seed={`${seed}/hair`} />
       <Ink d={hair} width={ink * 0.8} at={b(at, 0.04)} open={0.1} />
       <Ink d={strands} width={Math.max(1.6, ink * 0.4)} color={HER.hairShade} at={b(at, 0.08)} />
+      <Ink d={hiStrands} width={Math.max(2.4, ink * 0.75)} color={CC.hairHi} at={b(at, 0.08)} />
+      {chair ? (
+        <>
+          <Fill d={postsD} color={CC.chairShade} at={fillAt(at, 0.04)} seed={`${seed}/posts`} />
+          <Ink d={postsD} width={ink * 0.8} at={b(at, 0.04)} />
+          <Fill d={chairD} color={CC.chair} at={fillAt(at, 0.04)} seed={`${seed}/chair`} />
+          <Ink d={chairD} width={ink * 0.85} at={b(at, 0.04)} />
+          <Ink d={hline2(cl + 12, cr - 12, cTop + 0.016 * h)} width={Math.max(1.6, ink * 0.35)} color={CC.chairShade} at={b(at, 0.08)} />
+        </>
+      ) : null}
     </>
   );
 };
+
+const hline2 = (x0: number, x1: number, y: number) => line(x0, y, x1, y, {over: [0, 0], seed: `hl${x0.toFixed(0)}`});
 
 // ---------------------------------------------------------------- her sleeve + hand (O1, P12: the style frame's Arm)
 

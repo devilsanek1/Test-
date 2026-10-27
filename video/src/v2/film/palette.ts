@@ -80,6 +80,7 @@ export const CC = {
   // ---- HER (the protagonist: one model, kit/Her.tsx). Generic figure, never a likeness.
   hair: '#2B2A44', // long dark hair mass = the anchor
   hairShade: '#1F1E33', // one flat step darker (the underside of the mass)
+  hairHi: '#4A4868', // a group of lit strands (one flat step lighter: the lamp catches her hair)
   sweater: '#3F7FE0', // = hero cobalt (her sweater: sleeve, torso)
   sweaterRib: '#2F66BF', // the hero's own flat shade step (cuffs, collar, hem): on her only
   trousers: '#5B4B66', // muted plum (dark-mid, warm)
@@ -93,10 +94,10 @@ export const CC = {
   staffB: '#C48B5C', // camel jacket
   staffBShade: '#A9744A',
   staffBShirt: '#F3E6D6',
-  staffBHair: '#8A6A58', // a little side hair (bald on top)
+  staffBHair: '#E6DED6', // a grey-white fringe round the back of his head (bald on top; the ear shows)
   skin2: '#D9A07C', // staffer B's skin (a second warm skin)
-  lanyardA: '#2B2A44', // non-hero lanyards
-  lanyardB: '#9A5236',
+  lanyardA: '#2B2A44', // non-hero lanyards: navy only (cobalt is HER lanyard alone)
+  lanyardB: '#3A3360',
   // ---- P3's interview table (kit/Interview.tsx; the room's roles are `studio*` below)
   table: '#E1DDF3', // a pale lilac laminate top
   tableFront: '#B7B2DE',
@@ -121,7 +122,8 @@ export const CC = {
   scarf: '#E9B47A',
   leafDark: '#467A5A', // a plant's back leaves (one step under `leaf`)
   leafLight: '#7FA884',
-  blind: '#F2D3AE', // the roller blind (honey cream)
+  blind: '#F2D3AE', // the roller blind (honey cream) ...
+  blindShade: '#E6C096', // ... its folds (a Roman blind: alternate folds one flat step down) and the shadow under it
   candle: '#FBE6C6',
   flame: '#F7CF9C',
   cable: '#2B2A44',
@@ -161,6 +163,14 @@ export const CC = {
   stand: '#2B2A44',
   glass: '#DCE0F5', // a water glass
   recLight: '#F7C98B', // the recorder's small blinking light (never the pop)
+  // the open-plan office seen through the frosted glass behind the staffers: soft silhouettes, ~35 % contrast
+  officeFar: '#A3A9DA', // desks, a coat rack, seated colleagues (one step under the panel)
+  officeGlow: '#D3D6F1', // a monitor's glow
+  officeWalker: '#7C83C2', // the colleague walking past the glass (a clear, darker periwinkle)
+  frost: '#C9CDEE', // the frosted band across the glass
+  acoustic: '#A9AEDD', // felt acoustic panels on the upper wall
+  carpet: '#858CC6', // the carpet's flecks on the studio floor
+  chairBack: '#6A6896', // the empty chairs on our side of the table (foreground: one step darker than the room)
   // ---- the colour jobs
   hero: '#3F7FE0', // cobalt: HER ONLY (sweater, sleeve, her badge lanyard). Never Google, the deal or the Pentagon.
   heroDeep: '#2F66BF',
@@ -244,6 +254,12 @@ export const COLD_SETS = {
     metal: '#C3C1EC', // clips, the lamp's arm highlight
     stampPad: '#1F1C33',
     ink: '#1C1A26', // DUSK.ink: the cold set's outlines
+    shadow: '#1F1C40', // a passer-by's crisp shadow across the window light
+    cuff: '#6B3550', // an official's maroon suit cuff (the hand that slides a document in)
+    shirt: '#E6E5F7',
+    seal: '#B4AEDF', // an embossed rosette seal on a folder, its ribbons
+    sealRib: '#55509A',
+    stampWood: '#9D9AD3', // the rubber stamp's handle and block
   },
   dusk: {
     table: '#716DB0',
@@ -266,6 +282,12 @@ export const COLD_SETS = {
     metal: '#E6E5F7',
     stampPad: '#1F1C33',
     ink: '#1C1A26',
+    shadow: '#4B4688', // a passer-by's crisp shadow across the window light (~28 % darker than the desk)
+    cuff: '#6B3550',
+    shirt: '#F3F2FB',
+    seal: '#E6E5F7',
+    sealRib: '#38357A',
+    stampWood: '#B4AEDF',
   },
 };
 export type ColdSetName = keyof typeof COLD_SETS;
