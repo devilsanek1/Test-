@@ -3,18 +3,19 @@
 // broken reflection, glints that switch), OUR coping (limestone blocks with joints, a lip, two iron mooring rings: the
 // boat's rope tied through one, its tail coiled on the stones), OUR towpath y 1652-2016 (slabs in a gentle perspective,
 // running bond, several stone tones, cracks, grit, a drift of October leaves along the kerb, a drain grate, leaves that
-// skitter in the breeze), and the near heritage lamp-post cut by the bottom-right: its fluted plinth, the column and
-// the swan-neck arm leaving the frame on the right (masses only in the rail; lamps are ON but the lantern is out of
-// frame). Line only where it carries form: the coping lip, the lamp, the rope; the paving joints are thin warm lines.
+// skitter in the breeze), and the near lamp-post cut by the bottom-right: S2's near lamp held across the match-cut
+// (its column and swan-neck arm leaving the frame on the right; masses only in the rail; the lantern is out of frame).
+// Line only where it carries form: the coping lip, the lamp, the rope; the paving joints are thin warm lines.
 // Overlapping shapes sit on separate Levels (a Batch draws one fill per colour per layer).
 import React, {useMemo} from 'react';
 import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
 import {line, ellipse as ellipseInk} from '../../lib/sketch';
 import {Batch, Paint, P, rng, frac, ovalPath, leafPath, lerp} from '../kit/canal/core';
-import {groundShadow} from './V2S3_ndress';
 import type {Pt} from '../kit/canal/core';
 import {NB, boatBob, ringPath, Levels} from './V2S3_nboat';
+import {Lamp} from '../kit/canal/towpath';
+import * as MAP from '../world/map';
 
 /** Ground lines (world px). */
 export const NG = {
@@ -28,7 +29,6 @@ export const NG = {
   vp: [540, 1150] as Pt,
   ringRope: [112, 1641] as Pt,
   ringSpare: [858, 1641] as Pt,
-  lampX: 912,
 } as const;
 
 const LEAF = [CM.leafGold, CM.leafRust, CM.coatMustard, CM.leafGold, CM.brick];
@@ -190,39 +190,20 @@ function pavingInto(L: Levels) {
   lv.ink(stems, 1.2, CM.line);
 }
 
-/** The near heritage lamp-post: fluted plinth cut by the bottom, the column, a brass band, the swan-neck arm
- *  leaving the frame on the right (the lantern hangs out of frame). */
-function lampInto(L: Levels) {
-  const x = NG.lampX;
-  const top = 1240;
-  const col = CM.anchor;
-  // its long shadow on the paving (to the right, away from the low sun)
-  groundShadow(L.at(0), x - 30, x + 30, 1930, 190, 30);
-  const b = L.at(1);
-  // plinth: base block, a moulding, the fluted drum, a collar
-  b.poly(col, [[x - 44, 2030], [x + 44, 2030], [x + 40, 1952], [x - 40, 1952]]);
-  b.poly(col, [[x - 37, 1952], [x + 37, 1952], [x + 31, 1926], [x - 31, 1926]]);
-  b.rect(col, x - 26, 1872, 52, 56);
-  b.poly(col, [[x - 31, 1880], [x + 31, 1880], [x + 27, 1866], [x - 27, 1866]]);
-  // the column (tapering) up to the collar and the swan neck
-  b.poly(col, [[x - 13, 1868], [x + 13, 1868], [x + 10.5, top], [x - 10.5, top]]);
-  b.poly(col, [[x - 17, top + 16], [x + 17, top + 16], [x + 14, top - 8], [x - 14, top - 8]]);
-  // the swan-neck arm: it leaves the frame over the canal (y ~1140), clear of her towpath and its cyclist
-  b.fill(col, `M${P(x - 9, top - 6)}Q${P(x - 12, top - 58)} ${P(x + 58, top - 76)}Q${P(x + 150, top - 92)} ${P(1200, top - 104)}L${P(1200, top - 87)}Q${P(x + 150, top - 75)} ${P(x + 60, top - 59)}Q${P(x + 8, top - 46)} ${P(x + 9, top - 6)}Z`);
-  b.fill(col, `M${P(x + 8, top - 26)}Q${P(x + 38, top - 30)} ${P(x + 50, top - 52)}L${P(x + 44, top - 54)}Q${P(x + 34, top - 36)} ${P(x + 8, top - 35)}Z`);
-  // brass bands, flutes, the shade side (warm), the lit edge (the low sun from the left)
-  const c = L.at(2);
-  c.rect(CM.coatMustard, x - 12.5, 1592, 25, 8);
-  c.rect(CM.coatMustard, x - 16, top + 4, 32, 5);
-  c.rect(CM.shadeWarm, x + 4, top + 18, 7, 1866 - top - 18);
-  c.rect(CM.shadeWarm, x + 10, 1878, 12, 46);
-  c.rect(CM.shadeWarm, x + 20, 1956, 20, 70);
-  for (const fx of [-14, -4, 6]) c.rect(CM.coatPlum, x + fx, 1882, 3.2, 40);
-  c.rect(CM.coatPlum, x - 9, top + 20, 3, 1866 - top - 24);
-  // ink: the column's lit edge and the plinth's top edges (front weight, loose), the arm's upper edge
-  c.ink(line(x - 13, 1868, x - 10.5, top, {seed: 's3ng/lampL', over: 'small', drift: 0.05, bow: 0.8}) + line(x - 44, 1952, x + 44, 1952, {seed: 's3ng/plinthT', over: 'small', drift: 0.1}) + line(x - 31, 1880, x + 31, 1880, {seed: 's3ng/plinth2', over: 'small', drift: 0.1}), INK_PX.front, CM.ink, 0.2);
-  c.ink(`M${P(x - 9, top - 6)}Q${P(x - 12, top - 58)} ${P(x + 58, top - 76)}Q${P(x + 150, top - 92)} ${P(1200, top - 104)}`, INK_PX.mid, CM.ink, 0.25);
-}
+/** The near lamp-post is S2's near lamp HELD across the window match-cut: lane L2 draws it (V2S2_Set.tsx) with the
+ *  kit's near Lamp at world x 930, foot 1990, 1290 tall, 30 wide, under S2's 1.06 push about W2. Mapped to the screen
+ *  at the cut (= S3's world at the match) it stands here, so the foreground column stays put while the world swaps
+ *  behind it (same kit piece, same seed: the same misregistration and pen line). Its foot is below the frame, so the
+ *  bottom-right edge cuts the post (TREATMENT: "a lamp-post foot cut by the bottom-right"); its swan-neck arm leaves
+ *  the frame right above y 600 at the cut (606) and the 5 % ease-back lowers it. */
+const S2_NEAR_LAMP = {x: 930, y: 1990, h: 1290, w: 30};
+const PUSH = MAP.S2.camera.push;
+export const NEAR_LAMP = {
+  x: PUSH.anchor.x + (S2_NEAR_LAMP.x - PUSH.anchor.x) * PUSH.to,
+  y: PUSH.anchor.y + (S2_NEAR_LAMP.y - PUSH.anchor.y) * PUSH.to,
+  h: S2_NEAR_LAMP.h * PUSH.to,
+  w: S2_NEAR_LAMP.w * PUSH.to,
+} as const;
 
 // ---------------------------------------------------------------- life
 
@@ -363,12 +344,5 @@ export const S3Ground: React.FC = () => {
   );
 };
 
-/** The near lamp-post (nearest of all, after the head-backs). */
-export const S3LampFoot: React.FC = () => {
-  const stat = useMemo(() => {
-    const L = new Levels();
-    lampInto(L);
-    return L.merge();
-  }, []);
-  return <Paint b={stat} seed="s3ngLamp" />;
-};
+/** The near lamp-post (nearest of all, after the head-backs): S2's, held across the cut. */
+export const S3LampFoot: React.FC = () => <Lamp x={NEAR_LAMP.x} y={NEAR_LAMP.y} h={NEAR_LAMP.h} w={NEAR_LAMP.w} variant="near" seed="s2nearlamp" />;
