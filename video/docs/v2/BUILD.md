@@ -16,10 +16,16 @@ The direction is `TREATMENT.md` (read it in full); this page is only the plumbin
 | `src/v2r/world/map.ts` K2 · `kit/cast` K4 · `kit/pip` K5 · `kit/canal` K6 · `kit/dc` K7 · `kit/boards` K3 (L5) | kit agents | shared spots / scale sheet and the film's own kit (each with its `src/entry-v2r-<kit>.tsx`). |
 | `audio/v2r/**`, `public/v2r/**` (not the heard words) | sound K9 / L7 | `public/v2r/cues.json`: `[{src, t, gain}]` or `{"sfx": [...], "audio": "v2r/mix.wav"}` (`audio` replaces the voice: the final mix; cues whose file is not in public/ yet are skipped). |
 
-Transitions (scenes.json): S1 cut (film start) · S2 `push-through` from W (860,700) into her dark window (200,795), zoom 12, plum
-bridge, `inkComp` 0.6, dur 0.30 (out-leg 5.96-6.05, bridge 6.05-6.15, in-leg 6.15-6.26) · S3 `matchcut` (W2) · S4 cut (Pip's leap) · S5
-`matchcut` (SUN1) · S6 cut (Pip's leap) · S7 `matchcut` (SUN2) · S8 `foreground-wipe` element `scene` = V2S7's `Wiper`, dir `left`, 0.46 s
-(32.70-33.16) · V2S8 `transitionOut` un-build 0.26 s (38.82-39.08), loop, captions back at `captionAt` 39.04.
+Transitions (scenes.json = `docs/v2/THROUGHLINE.md` §3; every `transitionIn` names its `carrier`, so `gate_check.py` runs
+CRAFT §a's carrier check): S1 cut (film start) · S2 A `push-through` from W (860,700) into her dark office window at M
+(335,785), zoom 12, plum bridge, `inkComp` 0.6, dur 0.30 (out-leg 5.96-6.05, bridge 6.05-6.15, in-leg 6.15-6.26) · S3 B
+`matchcut` at M · S4 A `push-through` from her silhouette's head (330,742) to her head (720,912), zoom 12, plum bridge, 0.30
+(14.71-15.01) · S5 A `push-through` into SUN1 (250,650), zoom 7, no bridge, 0.30 (20.40-20.70) · S6 (start 23.80) D
+`foreground-wipe` element `scene` = V2S5's `Wiper` (one blossom tree), dir `left`, 0.36 s (23.62-23.98) · S7 (start 28.10) A
+`push-through` into SUN2 (260,620), zoom 7, no bridge, 0.30 (27.95-28.25) · S8 D `foreground-wipe` element `scene` = V2S7's
+`Wiper`, dir `left`, 0.46 s (32.70-33.16) · V2S8 `transitionOut` un-build 0.26 s (38.82-39.08), the loop's B, captions back at
+`captionAt` 39.04. No plain cut; Pip never hops across a join. Until V2S5 exports its `Wiper`, lib/Film falls back to its
+figure wiper there (a stand-in only).
 
 ## 2. The scene contract (what a lane implements)
 - `export default` a `React.FC` with no props, returning one `<World>` (`lib/World`). `useTime()` = SHOT-local seconds (0 = the
@@ -30,15 +36,18 @@ bridge, `inkComp` 0.6, dur 0.30 (out-leg 5.96-6.05, bridge 6.05-6.15, in-leg 6.1
   Never the barrel `lib/index` (it pulls `lib/kit` and the cine kit), never v1 / v3 / v2 sets (TREATMENT §9), never `Film2R.tsx`
   (circular: it imports the registry).
 - Optional exports: `captionTone: ToneKey[]` (always `[{t: 0, tone: 'dark'}]` here: ink on the mint); `Wiper: WiperComponent`
-  (V2S7 only: the narrowboat for the wipe into S8; screen px centred on x, opaque over x +- 90 full height, static `half` = real
-  half-width, static `captionRegions`). The current V2S7 placeholder exports a stand-in Wiper; L5 replaces it.
-- **V2S1 at t < 0** is frame 0 AND the loop underlay: during the un-build it renders at t = T - 39.083 (-0.26 ... 0). Bare warm ink
-  on paper (`<Look fills="paper">` or a `Look cascade` with `at: 0` from SUN0), the sun half-coloured and Pip in colour, first
-  motions starting 3-4 frames before t 0. **V2S8's un-build**: `Ink` / `Fill` read the exit; raw SVG reads `useExit()`; drop the
+  (V2S5: one blossom tree for the wipe into S6, clipped at y >= 560; V2S7: the narrowboat for the wipe into S8; screen px
+  centred on x, opaque over its body full height, static `half` = real half-width, static `captionRegions`).
+- **V2S1 at t < 0** is frame 0 AND the loop underlay: during the un-build it renders at t = T - 39.083 (-0.26 ... 0). Frame 0
+  in the clean pen (DIRECTION rule 9, THROUGHLINE §4.1): paper; the C world as flat PALE shapes; the A subjects' outlines (her,
+  the door, W) drawing on with Pip's tinted line; the sun half-coloured; no colour before the flood from SUN0 (a `Look
+  cascade` with `at: 0`; the pale pre-state is the opt-in `cascade.pale`); first motions starting 3-4 frames before t 0. **V2S8's un-build**: `Ink` / `Fill` read the exit; raw SVG reads `useExit()`; drop the
   sky slab with `useExit() > 0 ? 'transparent' : sky`, her window and the ghosts last.
-- **Cut hooks** (spots in K2 `map.ts`): both lanes of a cut put the shared object on the same screen spot on the cut frame: W at
-  (860,700) for the push-through and the loop; W2 (335,785) 133 x 164 at 12.98; SUN1 (250,650) r 65 at 20.55; SUN2 (260,620) r 45 at
-  28.06. S2 owns its 12 % ease-out 6.10-6.70 (its own camera, under the transition's in-leg).
+- **Join hooks** (spots in K2 `map.ts` `MATCHES`): both lanes of a join put the shared object on the same screen spot: W at
+  (860,700) for the push-through and the loop (zoom 1.00 on both sides); M (335,785) 132.5 x 164.3 at 12.98; her head at
+  (330,742) / (720,912) at 14.86; SUN1 (250,650) r 65 at 20.55; SUN2 (260,620) r 45 at 28.10; Pip on both sides of every
+  join (swept, riding the carrier, or in the same spot). S2 owns its 12 % ease-out 6.10-6.70 (its own camera, under the
+  transition's in-leg).
 - Screen: nothing drawn in y 317-556 (the caption block; the band margin y 290-600 stays flat sky), key reads in x 120-880, nothing
   in the right rail (x > 780 below y 840 for boards and Pip), the draft label lives bottom-left (y > 1850).
 

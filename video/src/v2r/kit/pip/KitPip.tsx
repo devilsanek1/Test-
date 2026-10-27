@@ -132,7 +132,7 @@ export const KitPip: React.FC = () => {
           </g>
         ))}
         {/* 4 */}
-        <Band y={Y4} h={1100} fill={CM.paper} title="4 · against every ground of 10 Canal Mint (body #9497D8, dE76 >= 20 from all)" />
+        <Band y={Y4} h={1100} fill={CM.paper} title={`4 · against every ground of 10 Canal Mint (body ${CM.pipBody}, dE76 >= 20 from all)`} />
         {GROUNDS.map((g, i) => {
           const col = i % 6;
           const row = Math.floor(i / 6);
@@ -178,7 +178,7 @@ export const KitPip: React.FC = () => {
           'teddy-bear soles (one pad, three beans) · two haunch arcs from behind',
           'a short knitted mustard scarf, its two tails lifting in the canal wind',
           'contour: ONE loose continuous stroke, 2-3 gaps (head top, base, an ear root)',
-          'body #9497D8 · shade #7579C0 (far ear, far legs) · inner ear #F2C3CC · scarf #D4A960',
+          `body ${CM.pipBody} · shade ${CM.pipShade} (far ear, far legs) · inner ear ${CM.pipEar} · scarf ${CM.pipScarf} (all C* <= 25: tier B)`,
           'idle always: blink, ear fold-and-flick, breathing, scarf flutter, tuft, tail',
         ].map((s, i) => (
           <Label key={i} x={1000} y={Y6 + 180 + i * 50} size={30} anchor="start">

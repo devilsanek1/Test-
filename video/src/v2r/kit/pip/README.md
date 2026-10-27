@@ -6,7 +6,9 @@ kit, v1 sets or the dropped `src/v2/**`: only the engine tools (`lib/time`, `lib
 
 ## Who it is
 A pebble-round baby elephant with no neck, the channel's witness (docs/mascot.md, house_digest §6): it sits in every
-shot, watches what the voice is about, reacts once per shot at most, and hops across the cuts.
+shot, watches what the voice is about, reacts once per shot at most, and crosses every join on its carrier (swept by
+a push-through, riding a wipe's object, or in the same screen spot: it never hops across a join, `docs/v2/THROUGHLINE.md`
+§3; hops stay available inside a shot).
 - **Body** a pebble (wider and flatter below its middle), **head** round, straight on it.
 - **Ears** two big LEAF ears: each is two half-blades on a curved midrib, so an ear can **fold** along its midrib and
   **flick** (the idle "fold-and-flick" every 4-8 s). Pink inner face, a midrib vein and one pair of side veins.
@@ -15,8 +17,9 @@ shot, watches what the voice is about, reacts once per shot at most, and hops ac
 - **Scarf** short, knitted, mustard: a ribbed band round the no-neck, a knot at its side, two fringed tails that lift and
   flutter in the canal wind (the `wind` param sets their direction).
 - **Tail** hangs over its seat's edge (like reference 1's cat), a little brush at the tip; two haunch arcs from behind.
-- **Colours** (CM.pip*): body `#9497D8`, shade `#7579C0` (only the far ear / far legs: depth is colour), inner ear,
-  cheeks and soles `#F2C3CC`, scarf `#D4A960`, ink `#2B1B0A`.
+- **Colours** (CM.pip*; tier B since 2026-10-27, every one at C* <= 25): body `#9495C1` (L* 63 / C* 25), shade
+  `#73739D` (only the far ear / far legs: depth is colour), inner ear, cheeks and soles `#F2C3CC`, scarf `#D8C599`; the
+  clean pen draws its line in the body's own shade (1.6-2.2 px), never the ink `#2B1B0A`.
 
 ## The line
 The silhouette (body, head, ears, trunk, legs, scarf band) is traced every frame as the union of the part shapes

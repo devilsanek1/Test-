@@ -148,11 +148,12 @@ const GroundS6: React.FC = () => (
     <R x={-300} y={1248} w={1680} h={7} c={CM.limestone} />
   </>
 );
-/** The fence's tall corner post (Pip's seat at its cap: S6.pipSeat0), on the board's (mid) plane. */
+/** The fence's tall corner post (its cap: map S6.cornerPost; Pip sits at the board's foot since the conform), on the
+ *  board's (mid) plane. */
 const CornerPost: React.FC = () => (
   <>
-    <R x={S6.pipSeat0.x - 27} y={S6.pipSeat0.y + 10} w={54} h={1250 - S6.pipSeat0.y - 10} c={CM.limestone} />
-    <R x={S6.pipSeat0.x - 33} y={S6.pipSeat0.y} w={66} h={11} c={CM.stoneShade} />
+    <R x={S6.cornerPost.x - 27} y={S6.cornerPost.y + 10} w={54} h={1250 - S6.cornerPost.y - 10} c={CM.limestone} />
+    <R x={S6.cornerPost.x - 33} y={S6.cornerPost.y} w={66} h={11} c={CM.stoneShade} />
   </>
 );
 
