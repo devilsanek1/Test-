@@ -128,7 +128,7 @@ const FloodMast: React.FC<{x: number; y: number; h: number; seed: string}> = ({x
   }
   return (
     <>
-      <circle cx={x} cy={top + 6 * s} r={30 * s} fill={mixHex(EMBER.sky, EMBER.ring, 0.3)} />
+      <circle cx={x} cy={top + 6 * s} r={30 * s} fill={mixHex(EMBER.ring, EMBER.skyLow, 0.18)} />
       <circle cx={x} cy={top + 6 * s} r={17 * s} fill={mixHex(EMBER.ring, EMBER.core, 0.3)} />
       <path d={`M${x - 4 * s} ${y}L${x - 2 * s} ${top}M${x + 4 * s} ${y}L${x + 2 * s} ${top}`} stroke={EMBER.dcSide} strokeWidth={2} />
       <path d={lat} stroke={EMBER.dcSide} strokeWidth={1.2} />

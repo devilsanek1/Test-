@@ -10,7 +10,9 @@
 // G5b (owner: "way too empty"; the approved pilot's bar): the desk world dressed to O1's level around the locked board
 // (S7_desk.tsx: string lights, photos, a hanging pothos, a print, the pinboard, a wall shelf, the calendar, books, a
 // candle, the mug, a speaker, headphones, biscuits, glasses, sticky notes, the charger into the laptop, a spiral
-// notebook, letters, your phone face down, the planner; Pip on the desk watching, then up at the bubble on "your").
+// notebook, letters, your phone face down, the planner; Pip on the desk watching, then whipping round to face us and
+// up at the bubble, trunk up on "your"). Fix pass: S12's dusk-blue thermos, a dusk scarf across the front desk, the
+// dusk clip dish and three dusk spines on the shelf (cozy v2 §4 cool share; the same desk as S12).
 // cozy v2 (docs/v3/cozy_v2_application.md, OVERRIDES the g5b plan): the laptop's off screen in dcSide (plain dark,
 // matched S7 / S8 / S12; the cool share); its glint slides across once (17.6).
 // Camera: the FLOAT (cozy v2 §3, replaces the invisible 1.5 % breathe): translation only, 8-12 px/s legs that turn back
@@ -26,6 +28,7 @@ import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER, floatCam, Lamp, Laptop, laptopGeo, MemoryStick, quadPt} from '../kit';
 import {S7Lens} from './S7_lens';
+import {S12Thermos} from './S12_desk';
 import {S7_LENS_AT, S7DeskBack, S7DeskFront, S7DeskMid, S7Grain, S7Mug, S7Pip, S7PullChain, S7WallLow, S7WallTop, ScreenGlint} from './S7_desk';
 
 const START = 16.6;
@@ -76,6 +79,8 @@ const S7: React.FC = () => {
         <S7DeskBack />
         <Lamp pose={{base: [-300, 1090], elbow: [-90, 640], head: [8, 792], rot: -24, scale: 1.55}} seed="s7/lamp" />
         <S7PullChain />
+        {/* S12's dusk-blue thermos on the back row behind Pip (the same desk; the cool share) */}
+        <S12Thermos x={818} y={1104} />
         <S7Mug />
         <Laptop x={S7_LAP.x} y={S7_LAP.y} w={S7_LAP.w} variant="old" screen={EMBER.dcSide} seed="s7/lap" />
         <ScreenGlint scr={g.scr} at={GLINT_AT} />

@@ -27,18 +27,20 @@ const CHANGES: QueueS14 = {
   pushDur: 0.3,
 };
 
-/** G5b life beats: on "chip" (0.16) the workers at the door stop and turn to the chip maker; as the second data center
- *  lands (1.28-1.4) the sparrows lift off the wire, the bus stop turns, the kid points at it, the guard steps out and
- *  the barrier lifts for it; Pip slides and clings on the shove (VanLife) and shakes the snow off (1.9). */
+/** G5b life beats: on "chip" (0.16) the workers at the door stop and turn to the chip maker; the second data center
+ *  lands ALONE (1.28-1.4), then the world answers it, staggered 0.1-0.3 s after (fix round): the sparrows lift off the
+ *  wire (1.42), the guard steps out (1.45), the bus stop turns (1.48), the kid points at it (1.52), the barrier lifts
+ *  (1.7) and the guard waves (1.75); Pip slides and clings on the shove (VanLife) and shakes the snow off (1.9). */
 const BEATS: QueueBeats = {
   workersStopAt: 0.16,
-  birdsLiftAt: 1.3,
-  busTurnAt: 1.34,
-  kidPointAt: 1.36,
-  guardStepAt: 1.3,
-  guardWaveAt: 1.68,
-  barrierLiftAt: [1.64],
+  birdsLiftAt: 1.42,
+  busTurnAt: 1.48,
+  kidPointAt: 1.52,
+  guardStepAt: 1.45,
+  guardWaveAt: 1.75,
+  barrierLiftAt: [1.7],
   pipShakeAt: 1.9,
+  rowLeanAt: 1.85,
 };
 
 const S14: React.FC = () => <QueueSet id="S14" dur={DUR} s14={CHANGES} beats={BEATS} />;

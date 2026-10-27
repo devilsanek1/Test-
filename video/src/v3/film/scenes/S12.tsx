@@ -21,7 +21,9 @@
 // down, the planner, the radio). Pip on the desk left of the tag: follows the stick in, leans in to read the tag as
 // $999 is struck, recoils with its ears down on "pass", turns to us worried on "on". The world answers the beats: the
 // laptop dips a hair as the stick goes in; on the ding the pinned notes, the sticky notes, the hoop, the postcard and
-// the pull chain all jolt.
+// the pull chain all jolt, the mug puffs steam; at 30.70 a wall note drops to hang from one corner and swings.
+// Fix pass: the stick flies bigger (190 -> 120 px, front ink) over a dusk night print; cool dressing (a closed
+// dusk planner, a dusk radio, airmail letters, a frost plate); the phone pushed down; Pip ends wide-eyed at us.
 // Camera: the FLOAT (cozy v2 §3, OVERRIDES the 1.5 % breathe): translation only, 8-12 px/s legs that turn back within
 // +-12 / +-10 px of home; the captions and the UI stay fixed. Every set reaches >= 40 px past each frame edge.
 import React from 'react';
@@ -35,7 +37,7 @@ import {mat, XG} from '../../../lib/xf';
 import {EMBER, floatCam, Lamp, Laptop, laptopGeo, PriceTag, PullChain, quadPt, ring, StickFlight, tagHole, textW, type Pt} from '../kit';
 import {S7DeskBack, S7Mug, S7WallTop} from './S7_desk';
 import {S12WallLow} from './S12_wall';
-import {S12DeskFront, S12DeskMid, S12Grain, S12Pip, S12Thermos} from './S12_desk';
+import {S12DeskFront, S12DeskMid, S12Grain, S12Pip, S12Thermos, SteamPuff} from './S12_desk';
 
 const START = 29.4;
 const DUR = 31.32 - START;
@@ -45,6 +47,8 @@ const STRIKE_AT = 29.96 - START - 0.06;
 const NEW_AT = 30.28 - START - 0.02;
 /** "on" (30.84): Pip turns to us. */
 const ON_AT = 30.84 - START;
+/** "on" + ~0.45 s: one settle beat after the ding (a wall note drops to hang from one corner and swings). */
+const SETTLE_AT = 30.7 - START;
 /** The stick's flight (board move: 0.05 -> 0.50, gone by 0.55). */
 const STICK_T: [number, number] = [0.05, 0.5];
 
@@ -106,13 +110,14 @@ const S12: React.FC = () => {
     <World sky={EMBER.wall}>
       <XG m={mat.translate(dx, dy)}>
         <S7WallTop />
-        <S12WallLow ding={NEW_AT} />
+        <S12WallLow ding={NEW_AT} settle={SETTLE_AT} />
         <Desk />
         <S12Grain />
         <S7DeskBack />
         <S12Thermos x={818} y={1104} />
         <Lamp pose={LAMP_POSE} seed="s12/lamp" />
         <PullChain x={156} y={904} len={92} amp={6} jolt={[NEW_AT + 0.05]} />
+        <SteamPuff x={912} y={1046} at={NEW_AT + 0.1} />
         <S7Mug />
         <XG m={mat.translate(0, dip)}>
           <Laptop x={LAP.x} y={LAP.y} w={LAP.w} variant="new" seed="s12/lap" />
@@ -130,7 +135,7 @@ const S12: React.FC = () => {
           </>
         )}
         {/* the 5x stick from S11 slides into the laptop's keyboard (board move: 0.05 -> 0.50, gone by 0.55) */}
-        <StickFlight from={[240, 704]} to={[g.keysC[0], g.keysC[1] + dip]} t0={STICK_T[0]} t1={STICK_T[1]} arc={40} w0={150} w1={84} rot0={-8} rot1={0} end="shrink" seed="s12/stick" />
+        <StickFlight from={[240, 704]} to={[g.keysC[0], g.keysC[1] + dip]} t0={STICK_T[0]} t1={STICK_T[1]} arc={40} w0={190} w1={120} rot0={-8} rot1={0} end="shrink" ink={4.8} seed="s12/stick" />
       </XG>
     </World>
   );

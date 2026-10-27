@@ -67,6 +67,8 @@ export type QueueBeats = {
   birdsLiftAt?: number;
   busTurnAt?: number;
   kidPointAt?: number;
+  /** The shopper on the front row's left wing leans to see up the queue. */
+  rowLeanAt?: number;
   /** A phone goes up in the front row. */
   phoneWin?: [number, number];
   /** S14: the van is shoved (Pip slides and clings, snow falls off the roof), Pip shakes the snow off. */
