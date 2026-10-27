@@ -168,8 +168,7 @@ Format: **rule** — why / evidence (video, date).
   work (archive it), skip the gates the owner names (e.g. no sketch) and make the finished film directly with full
   creative freedom inside these principles; never patch the rejected cut. — ("No I don't like it, let's start from
   scratch ... let's not do the sketch. Do the video right away, full creative freedom", v2 G5, 2026-10-27).
-- **Once the owner says "final", don't redo it;** log ideas for the next video. — (v1, 2026-10-25).
-- **Deliver videos as a download as well;** in-app previews may play muted. — (v1, 2026-10-25).
+- **Once the owner says "final", don't redo it (log ideas for the next video); deliver videos as a download too** (in-app previews may play muted). — (v1, 2026-10-25).
 
 ## Platforms and posting
 - **Accounts: Instagram `what.the.fuss.is.about`** (Creator, Education); TikTok and YouTube Shorts under the same name,
