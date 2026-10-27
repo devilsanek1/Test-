@@ -78,6 +78,8 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   session limit we are not losing any progress" -> controlled pause of every lane and local workflow (all pushed, handovers, resume scheduled 18:33 UTC).
   Then: "before you restart the work read the updated overall stylistic instructions and the guideline from the repo" -> the playbook's new
   clean / light / hierarchy / flowing-story rules integrated into STYLE.md + a clean pen for v2r (15:40 UTC).
+- 2026-10-27 18:38 UTC, after the reset: "Okay the limits seem to reset" (taken as the go for the proposed plan: conform v2 to
+  DIRECTION.md / CRAFT.md, a look clip of the S1 opening first, the lanes conform after their briefs land).
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in

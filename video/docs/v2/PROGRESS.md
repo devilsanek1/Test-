@@ -2,6 +2,17 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-27 18:45 UTC: RESUMED, conforming to DIRECTION
+
+The session limit reset at 18:30 (owner: "Okay the limits seem to reset"). While paused, the video 3 session landed the owner-approved
+direction: `docs/look/DIRECTION.md` (one page, it wins) + `docs/look/CRAFT.md` + the approved pipeline (look clip before the lanes). v2 was
+built before it (dark ink everywhere, strangers' backs in the foreground, Pip-hop cuts, no light rig, no thread object), so the plan the owner
+okayed: (1) groundwork workflow `wf_fbca738e-09e` (local, MAX): `THROUGHLINE.md` (thread, places, carriers per join, tiers per beat, light rig
+per set) + `lanes/conform_L1..L6.md`, adversarially checked, then STYLE.md / map.ts / TREATMENT / COMMON integrated; in parallel the engine:
+`lib/light.tsx` (port of v3's Light kit), the tiered clean pen for v2r (`lib/pen.ts` setPen('clean') + kit tier defaults); (2) a 6-8 s look
+clip of the S1 opening for the owner; (3) the six lanes conform their shots (one agent each, one critic round); (4) assembly, review, mix, final.
+Lanes stay idle until their conform brief lands. Hourly report re-enabled; branch sync re-armed.
+
 ## Snapshot 2026-10-27 15:10 UTC: CONTROLLED PAUSE (session limit)
 
 **Why:** the owner's plan usage at ~15:02 UTC: the 5-hour **session limit 89 %** (resets 18:30 UTC; shared by every session on the
