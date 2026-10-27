@@ -49,7 +49,8 @@ const bez = (a: Pt, b: Pt, c: Pt, d: Pt, u: number): Pt => {
 };
 
 /** One stick: it lifts off the listing's laptop, arcs up and a little left over the glass, and shrinks into the data
- *  center's roof. Small (96 -> 34 px), no speed ticks, one smooth ease: supporting motion, the tag's tick is the beat. */
+ *  center's roof. 124 -> 44 px (readable at phone size, still smaller than the tag), no speed ticks, one smooth ease:
+ *  supporting motion; the tag's tick is the beat. */
 const Stick: React.FC<{T: number; i: number}> = ({T, i}) => {
   const t0 = LAUNCHES[i];
   if (T < t0 || T >= t0 + FLIGHT) return null;
@@ -62,7 +63,7 @@ const Stick: React.FC<{T: number; i: number}> = ({T, i}) => {
   const [x, y] = bez(a, b, c, d, p);
   const grow = 0.6 + 0.4 * ease.outCubic(clamp(u / 0.12));
   const sink = 1 - ease.inCubic(clamp((u - 0.86) / 0.14));
-  const w = (96 + (34 - 96) * p) * grow * sink;
+  const w = (124 + (44 - 124) * p) * grow * sink;
   if (w < 4) return null;
   return <MemoryStick x={x} y={y} w={w} rot={-18 + 22 * p} seed={`sqa/stick${i}`} />;
 };

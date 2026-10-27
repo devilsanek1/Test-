@@ -230,6 +230,15 @@ const RoomRight: React.FC = () => (
   </>
 );
 
+/** A closed book lying flat (rotated about its centre): the cover, the page block's edge, a ribbon. */
+const DeskBook: React.FC<(typeof DESK_BOOKS)[number] & {at?: number}> = ({x, y, w, h, rot, color, at}) => (
+  <XG m={mat.about(mat.rotate(rot), x + w / 2, y + h / 2)}>
+    <Fill d={`M${x + 8} ${y}H${x + w - 8}Q${x + w} ${y} ${x + w} ${y + 8}V${y + h - 8}Q${x + w} ${y + h} ${x + w - 8} ${y + h}H${x + 8}Q${x} ${y + h} ${x} ${y + h - 8}V${y + 8}Q${x} ${y} ${x + 8} ${y}Z`} color={color} at={at} offset={false} />
+    <Fill rect={[x + 10, y + h - 2, w - 20, 12]} color={EMBER.paper} at={at} offset={false} />
+    <Fill rect={[x + w * 0.72, y + h - 4, 12, 30]} color={EMBER.mugBand} at={at} offset={false} />
+  </XG>
+);
+
 /** A roof window in the slope over the card wall (H1 px; seen in SQB's framing): the night sky in it, a snow edge. */
 const SKY_PANE: Pt[] = [[1318, 52], [1502, 52], [1522, 214], [1298, 214]];
 const SKY_FRAME: Pt[] = [[1296, 30], [1524, 30], [1548, 236], [1272, 236]];
@@ -300,8 +309,14 @@ const MUG = {x: 872, top: 1130, w: 92};
 const BOOKS_R = {x: 968, y: 1206, w: 128};
 const PENS = {x: 1052, y: 1150, w: 50};
 const GLASSES = {x: 902, y: 1444, w: 110};
-const SNAKE = {x: 1590, y: 1212, size: 236};
-const BOOKS_X = {x: 1690, y: 1210, w: 150};
+const SNAKE = {x: 1806, y: 1214, size: 214};
+const BOOKS_X = {x: 1560, y: 1212, w: 146};
+/** Two closed books lying on the desk's front (flat: a cover, the page block, a ribbon): one right of the phone in
+ *  H1 (under the thumb's reach), one on the extension (SQB's right). */
+const DESK_BOOKS: {x: number; y: number; w: number; h: number; rot: number; color: string}[] = [
+  {x: 820, y: 1596, w: 250, h: 180, rot: -8, color: EMBER.books[4]},
+  {x: 1590, y: 1420, w: 220, h: 160, rot: 6, color: EMBER.books[1]},
+];
 const PENS_X = {x: 1214, y: 1206, w: 54};
 const BOOKS_P = {x: 1300, y: 1208, w: 132};
 
@@ -379,6 +394,9 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
         <ContactShadow x={BOOKS_X.x + BOOKS_X.w / 2} y={BOOKS_X.y} w={BOOKS_X.w} h={10} />
         <ContactShadow x={PENS_X.x} y={PENS_X.y} w={PENS_X.w} h={8} />
         <ContactShadow x={BOOKS_P.x + BOOKS_P.w / 2} y={BOOKS_P.y} w={BOOKS_P.w} h={10} />
+        {DESK_BOOKS.map((bk, i) => (
+          <Shadow key={i} d={rectD(bk.x, bk.y + 6, bk.w, bk.h + 6)} dx={3} dy={5} soft={3} tint="contact" />
+        ))}
       </ShadowLayer>
       <Tier tier="environment">
         {headphones}
@@ -393,6 +411,9 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
         <BookStack x={BOOKS_X.x} y={BOOKS_X.y} w={BOOKS_X.w} n={3} seed="home/booksX" at={-0.36} />
         <PenCup x={PENS_X.x} y={PENS_X.y} w={PENS_X.w} seed="home/pensX" at={-0.36} />
         <BookStack x={BOOKS_P.x} y={BOOKS_P.y} w={BOOKS_P.w} n={2} seed="home/booksP" at={-0.36} />
+        {DESK_BOOKS.map((bk, i) => (
+          <DeskBook key={i} {...bk} at={-0.34} />
+        ))}
         <Lamp pose={LAMP} lit at={NOOK_AT + 0.08} seed="home/nook" />
       </Tier>
       {room}
