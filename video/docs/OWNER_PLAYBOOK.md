@@ -75,6 +75,12 @@ Maintenance at the end).
   separate one from the other, no distance effect, no perspective; the bottom part: little to no perspective or depth
   ... research some libraries on GitHub ... add a bit of particles here and there to make things more natural", v2 G4,
   2026-10-27).
+- **ONE CONTINUOUS SKY, no abrupt colour seams.** The sky is one sky from the top of the frame to the horizon: its colour
+  changes gradually (a few flat steps, each a small change in value and hue), warmest around the sun and toward the
+  horizon, so the caption field is part of that sky, never a separate slab of another colour; the sun sits in sky that
+  agrees with it, and the far city takes the lowest sky step as its haze. Generally: two big fields of unrelated colour never
+  meet in a hard seam unless an object edge explains it. — ("what bothered me is different color of the space and sun,
+  like why is it blue sky and then suddenly abruptly orange, weird", v2 G4, 2026-10-27).
 - **ATTENTION HIERARCHY: one main arc, one focus at a time.** The story's subject gets the contrast, line weight,
   saturation and the clear motion; supporting life (a bird, walkers, snow, steam) stays subtle (smaller, lower contrast,
   thinner or no lines, softer colour, calmer motion): alive, but never competing. Supporting environment may be drawn in

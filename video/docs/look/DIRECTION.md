@@ -70,7 +70,10 @@ A clash is a bug: fix the lower doc in the same turn.
   default), one hero on the story's object, one tinted dark anchor (~5 %), at most one pop ("look here"). Peach
   creams, terracotta, rose, leaf sage, golden light, plum and red-brown shadows; never beige, muddy tan, olive or
   grey; a warm world held by one cool field; saturation as confetti, never fields. Money and everyday life: #9 Autumn
-  Ember (#7 Autumn Ochre read sick). -> `PALETTE.md`; `COZY_AND_SCALE.md` 3b.6.
+  Ember (#7 Autumn Ochre read sick). **One continuous sky** (owner, v2 G4): from the frame top to the horizon the sky
+  changes in a few small flat steps (value and hue), warmest at the sun and the horizon; the caption field is part of it
+  (never a slab of another colour above an abrupt band); the far haze takes the lowest sky step; no two big fields of
+  unrelated colour meet in a seam no object explains. -> `PALETTE.md`; `COZY_AND_SCALE.md` 3b.6; `CRAFT.md` §f.
 - **7. Cozy, with occasional great scale.** Cozy is the home feeling (>= 50 % of the runtime outside full-frame charts):
   a place that holds you without shutting you in (masses on 2-3 sides, one opening the subject faces), life passing
   through sideways, broken once at most, at the turn; it evolves one measured owner reference at a time. Scale: 1-2

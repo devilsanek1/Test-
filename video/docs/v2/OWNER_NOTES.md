@@ -92,6 +92,10 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   shadows added are better; research some libraries on github that would help you achieve better, more natural effects and add perhaps a
   bit of particles here and there". -> playbook rule DEPTH AND SEPARATION (+ DIRECTION rule 2); S1 v2: the far city recedes (atmospheric
   perspective), the Google wing separates, the steps recede in perspective; a researched particles + depth toolkit for every lane.
+- 2026-10-27 ~22:50 UTC (screenshot: the mint caption sky above, a peach band with the big orange sun below it): "what bothered me
+  is different color of the space and sun, like why is it blue sky and then suddenly abruptly orange, weird" -> playbook ONE CONTINUOUS
+  SKY + DIRECTION rule 6; S1: the sky steps from the caption field to a warm horizon, the sun smaller/lower in agreeing sky, the far
+  haze = the lowest sky step; every lane's brief gets it.
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
