@@ -3,8 +3,7 @@
 //      the last one in by 22.2 (nothing moves in or out across J4's no-new-mover window 22.28-23.08)
 //   B  two DC trucks driving up outside's road from our street into the DC's gate (20.80-22.20), small, one steady
 //      speed (they come out from behind our street's far side, between the town's two rows: OutsideTown's onRoad slot)
-//   C  a V of four birds crossing the sky below the caption band in the hold (they keep flying across J4: RevealBirds
-//      is exported for `outside.tsx` to draw on the same clock), the thoom's snow puffs off the front roofs (21.72)
+//   C  a V of four birds crossing the upper right of the sky in the hold, out past the right edge by ~22.15
 // Tier B life is soft (no outline, C* <= 25 by its fills), slow, and never in the caption band. H2 px.
 import React from 'react';
 import {rng} from '../../../lib/rng';
@@ -104,15 +103,16 @@ const BIRDS: Bird[] = [
   {dx: -28, dy: 15, size: 14, hz: 3.0, ph: 2.3},
   {dx: -54, dy: -26, size: 12, hz: 3.8, ph: 0.6},
 ];
-/** From 21.30 a V of four birds crosses from the left edge at ~95 px/s along y ~700 (below the caption band, above the
- *  DC): a hairline-weight V in the sky's own darker tone (tier C: within ~15 L* of the sky), gone off the right edge
- *  by ~33 s. H2 px, film time. */
+/** The hold's life: from 21.30 a V of four birds crosses the upper right of the sky, below the caption band, over the
+ *  mountain's flank (~220 px/s, a gentle climb), and leaves past the right edge by ~22.15: in the hold, gone before
+ *  J4's no-new-mover window (22.28-23.08), so the seam stays one drawing. A hairline-weight V in the sky's own darker
+ *  tone (tier C). H2 px (far plane), film time. */
 export const BIRDS_FROM = 21.3;
 export const RevealBirds: React.FC<{T: number}> = ({T}) => {
   if (T < BIRDS_FROM) return null;
   const k = T - BIRDS_FROM;
-  const lead: [number, number] = [-30 + 95 * k, 712 - 9 * k + Math.sin(k * 1.9) * 3];
-  if (lead[0] > 1200) return null;
+  const lead: [number, number] = [880 + 220 * k, 716 - 22 * k + Math.sin(k * 1.9) * 3];
+  if (lead[0] - 70 > 1110) return null;
   let d = '';
   for (const b of BIRDS) {
     const x = lead[0] + b.dx + Math.sin(k * 1.7 + b.ph) * 1.5;
