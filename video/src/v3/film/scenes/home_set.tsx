@@ -8,11 +8,11 @@
 //                                  the room's ambient light like the card; CARD / PLOT / plotPt below)
 //   homeCam(T)                     the shared camera: {x, y, z, zFar, room, far} (H1 px -> screen)
 //
-// THE CAMERA (flow_v2 §3): O1's pull-out 1.05 -> 1.00 about (540, 960) eases OUT over 0-5.00 (the far plane moves half
-// as much: real parallax); J1 pans x 0 -> -775 over 5.15-6.45, J2 back over 15.95-17.25 (smoothstep: peak 14.9 px/f at
-// 60 fps; room and outside together, a head turn has no parallax); the SQB hold between them floats (the cozy float,
-// +-10 x 8 px, 8-12 px/s, from and back to home); everything else is locked. The thread plane (thread_plane.tsx) is
-// screen-fixed in front of all of it.
+// THE CAMERA (flow_v2 §3): LOCKED through the hook (0-5.15; the first pilot's 1.05 -> 1.00 pull-out was a zoom in a
+// hold, DIRECTION rule 8: every edge of the room crawled while the hook played); J1 pans x 0 -> -775 over 5.15-6.45, J2
+// back over 15.95-17.25 (smoothstep: peak 14.9 px/f at 60 fps; room and outside together, a head turn has no
+// parallax); the SQB hold between them floats (the cozy float, +-10 x 8 px, 8-12 px/s, from and back to home);
+// everything else is locked. The thread plane (thread_plane.tsx) is screen-fixed in front of all of it.
 // THE ROOM (H1 px = O1's framing at camera rest): the kit Nook ('pov': shelf cut by the left edge, the attic slope top
 // right, ONE window glass 180-900 x 630-1060 with the mullion at 830, the desk from 1086, the anglepoise on the left);
 // extended right: the wall, the slope above a horizontal tie beam (its bottom at y 285: the caption band below stays one
@@ -21,12 +21,19 @@
 // low contrast; G5b's crumbs, mittens, candle, radio, planner, photos, star lantern, wall marks and desk grain dropped).
 // THE OUTSIDE (far plane, clipped to the glass): the dusk sky, one far ridge, the town (flat houses with lit panes at
 // the rig's window value), our neighbours' snowy roofs, THE AI DATA CENTER (tier B: tinted lines; the sign at 0.25; at
-// 4.04 it goes dark, its sign lights cold white with a small pop and it is the subject), falling snow, one chimney's
-// smoke. Life is C: slow, small, low contrast (snow, smoke, the string lights' rare twinkle, the pothos, the steam).
-// THE LIGHT (kit/Light.tsx, CRAFT §d): HOME_RIG = the nook rig (the lamp is the key, screen-left: its pool on the desk,
-// contact shadows under everything that touches the desk, cast shadows only inside the pool, form shades on the lit
-// objects, the room one ambient step down outside the light, the slope / shelf cubbies / undersides a plane step down,
-// the card's and the notes' soft drop shadows on the wall, the lamp's mouth the brightest warm value). The outside keeps
+// 4.04 it goes dark, its sign lights cold white with a small pop and it is the subject; 4.16-4.53 its server rows light
+// up one by one: the subject's own motion on "AI data centers"), falling snow (kept off the lit sign plate: a flake
+// crossing the letters reads as a smudge), one chimney's smoke, lobed clouds drifting behind the data center (never a
+// disc: a half-disc behind a building reads as a halo). Life is C: slow, small, low contrast (snow, smoke, the string
+// lights' rare twinkle, the pothos, the steam).
+// THE LIGHT (kit/Light.tsx, CRAFT §d): HOME_RIG = the nook rig (the lamp is the key, screen-left: its pool on the desk
+// is LIT TERRACOTTA, keeping the desk's colour (ring L* 79 C* 42, core L* 84 C* 38, never a pale cream disc), contact
+// shadows under everything that touches the desk, cast shadows only inside the pool, the headphones warm and lifted in
+// the pool, a form shade on the side away from the lamp on every object (mug, pen cups, book stacks, the lamp's base,
+// the headphones; the hand's is the thread plane's), ONE lamp wash on the shelf and the window's left reveal behind the
+// lamp (a 2-step edge, below the caption band, cut at the desk's crease), the room one ambient step down outside the
+// light, the slope / shelf cubbies / undersides a plane step down, the card's, the notes' and the pins' soft drop
+// shadows falling AWAY from the lamp (right, a hair up), the lamp's mouth the brightest warm value). The outside keeps
 // its own light (no Ambient stacked on it).
 // FRAME 0 (T < 0.3, SQA wraps it in the pale colour cascade): every piece here lands as a flat shape before T 0 (the
 // loop underlay: T -0.3 .. 0), the data center's tinted lines draw on from -0.15, the raw details (snow, server lights,
@@ -40,6 +47,7 @@ import {mat, type Mat, XG} from '../../../lib/xf';
 import {
   BookStack,
   DataCenter,
+  dataCenterGeo,
   EMBER,
   floatCam,
   FramedPrint,
@@ -66,12 +74,14 @@ import {
   Ambient,
   CastShadow,
   ContactShadow,
+  dropOffset,
   ellipseD,
   FormShade,
   LightPool,
   Lit,
   LitWindow,
   nookRig,
+  PoolLift,
   polyD,
   rectD,
   Shade,
@@ -79,7 +89,9 @@ import {
   ShadowLayer,
   SourceCore,
   step,
+  washHole,
   type Ellipse,
+  type LightHole,
   type LightRig,
 } from '../kit/Light';
 import {Letters} from './O1_life';
@@ -101,12 +113,20 @@ export const DC_AT = {x: 540, y: 952, w: 436};
 export const LAMP: LampPose = NOOK.lamp;
 export const POOL: Ellipse = NOOK.pool;
 /** THE nook rig (CRAFT §d.1): every shot of the home reads it (the thread plane too). Its ambient step sits at the
- *  bright end of CRAFT §d.2's ladder (the wall 91 -> 84, the desk 68 -> 64, hue kept peach): the owner's "warm, never
- *  sickly" room stays warm while the lamp's pool (88 / 93) still leads by +24 L*. */
+ *  bright end of CRAFT §d.2's ladder (the wall 91 -> 84, the desk 68 -> 63, hue kept peach): the owner's "warm, never
+ *  sickly" room stays warm. */
 export const HOME_AMBIENT = '#F5E5DA';
+/** The desk pool as LIT TERRACOTTA (SQA pilot review; CRAFT §d.7: "L* 82-85 at C* >= 36"): ring L* 79 C* 42 h 62, core
+ *  L* 84 C* 38 h 70, both lighter (+16 / +21 over the ambient desk) and warmer than the desk (h 55), keeping its colour.
+ *  The old ring #FFD7A4 / core #FFE8C1 (L* 88 / 93, C* 31 / 22) turned the terracotta into a pale cream disc that read as
+ *  a placemat. The brightest 5 % of H1 is the phone's screen (and the card's paper in SQB), so the pool need not be. */
+export const HOME_POOL: [string, string] = ['#FBB580', '#FFC78F'];
+/** The lamp's ONE wash (CRAFT §d.7 room falloff): on the shelf and the window's left reveal behind the lamp, cut at the
+ *  desk's crease (washHole), its top at y 838 (the caption band ends at 600). */
+export const HOME_WASH: Ellipse = {cx: 190, cy: 1000, rx: 236, ry: 162};
 export const HOME_RIG: LightRig = (() => {
-  const r = nookRig({lamp: LAMP, pool: POOL, glass: GLASS});
-  return {...r, tints: {...r.tints, ambient: HOME_AMBIENT}};
+  const r = nookRig({lamp: LAMP, pool: POOL, glass: GLASS}, {wash: HOME_WASH});
+  return {...r, tints: {...r.tints, ambient: HOME_AMBIENT}, pool: HOME_POOL};
 })();
 /** The chart card on the wall right of the window (flow_v2 §3) and its plot box (SQB draws the line in it). */
 export const CARD = {x: 975, y: 612, w: 740, h: 416};
@@ -128,7 +148,8 @@ const BEAM_BOT = -4 + 560 * SLOPE_K;
 // ================================================================= the camera
 
 export const HOME_CENTER: Pt = [540, 960];
-export const PULL = {t1: 5.0, z0: 1.05};
+/** The hook's camera: LOCKED (z0 1.0; the first pilot's 1.05 -> 1.00 pull-out over 0-5.00 was a zoom in a hold). */
+export const PULL = {t1: 5.0, z0: 1.0};
 export const J1_PAN = {t0: 5.15, t1: 6.45, dx: -775};
 export const J2_PAN = {t0: 15.95, t1: 17.25};
 const FLOAT_SQB = {t0: J1_PAN.t1, t1: J2_PAN.t0};
@@ -210,6 +231,8 @@ export const DC_SIGN_AT = 0.25;
 /** The server lights: a soft cold value (a quiet texture under the sign, never a field of bright dashes). */
 export const DC_LED = '#A8B6DE';
 export const DC_DARK_AT = 4.04;
+/** 4.16-4.53: the dark building's server rows light up one by one, after the sign's pop (rows OFF from 4.04). */
+export const DC_ROWS_ON = {at: 4.16, dur: 0.4};
 const HomeDataCenter: React.FC<{T: number}> = ({T}) => {
   const k = T >= DC_DARK_AT ? Math.sin(Math.PI * prog(T, DC_DARK_AT, 0.2, ease.linear)) : 0;
   const s = 1 + 0.045 * k;
@@ -227,10 +250,39 @@ const HomeDataCenter: React.FC<{T: number}> = ({T}) => {
       seed="home/dc"
       ledColor={DC_LED}
       ledStyle="bands"
+      rowsOn={DC_ROWS_ON}
       tier={T >= DC_DARK_AT ? 'subject' : 'support'}
     />
   );
   return s > 1.0005 ? <XG m={mat.about(mat.scale(s), DC_AT.x, DC_AT.y)}>{body}</XG> : body;
+};
+
+/** The data center's sign plate (H1 px) grown by a margin (its 4.04 pop scales it x1.045): falling snow stays off it. */
+const SIGN_PLATE = (() => {
+  const g = dataCenterGeo(DC_AT.x, DC_AT.y, DC_AT.w).sign;
+  const m = 14;
+  return rectD(g.x - m, g.y - m, g.w + m * 2, g.h + m * 2);
+})();
+/** The snow's clip: the sky box minus the sign plate (even-odd). */
+const SNOW_CLIP = rectD(-400, -400, 2000, 2400) + SIGN_PLATE;
+
+/** Falling snow in the glass, kept off the lit sign plate (a grey flake crossing the letters reads as a smudge). */
+const HomeSnow: React.FC = () => {
+  const id = 'homesnow' + React.useId().replace(/[^a-zA-Z0-9]/g, '');
+  return (
+    <>
+      <defs>
+        <clipPath id={id} clipPathUnits="userSpaceOnUse">
+          <path d={SNOW_CLIP} clipRule="evenodd" />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id})`}>
+        <Snowfall x={GLASS.x} y={GLASS.y} w={GLASS.w} h={GLASS.h} n={18} size={0.75} speed={0.6} seed="home/snow" at={0.18} />
+        {/* a nearer, slower-looking layer of bigger flakes (still small, low contrast on the sky) */}
+        <Snowfall x={GLASS.x} y={GLASS.y} w={GLASS.w} h={GLASS.h} n={8} size={1.6} speed={0.85} seed="home/snowNear" at={0.22} />
+      </g>
+    </>
+  );
 };
 
 /** The view through the window (far plane, H1 px): exported for any shot that hangs the same window. */
@@ -253,7 +305,7 @@ export const HomeOutside: React.FC<{T: number}> = ({T}) => (
     <SnowTree x={758} y={HORIZON + 4} h={70} kind="pine" far seed="home/pine2" at={-0.4} />
     {/* a slow cloud band behind the data center (visible either side of it), a lighter flat step of the sky */}
     <Show at={0.15}>
-      <SkyClouds x0={GLASS.x - 260} x1={GLASS.x + GLASS.w + 260} y0={640} y1={790} n={3} w={[240, 420]} speed={7} color="#67769F" seed="home/clouds" />
+      <SkyClouds x0={GLASS.x - 260} x1={GLASS.x + GLASS.w + 260} y0={640} y1={790} n={3} w={[240, 420]} speed={7} color="#67769F" seed="home/clouds" shape="lobed" />
     </Show>
     <HomeDataCenter T={T} />
     {/* one window lights up (a neighbour home: 1.05, in the hook's quiet stretch) */}
@@ -264,9 +316,7 @@ export const HomeOutside: React.FC<{T: number}> = ({T}) => (
     <FarHouse x={848} w={64} y={1056} h={44} pitch={0.34} color={NEAR_HOUSE} lit={[[0.56, 0.32]]} chimney at={-0.38} />
     {/* one chimney's smoke drifting right (slow, low contrast) */}
     <Smoke x={250 + 64 * 0.725} y={HORIZON + 2 - 56 - 64 * 0.4 - 4} seed="home/smoke" at={0.2} ceil={640} r1={15} rise={120} drift={-70} />
-    <Snowfall x={GLASS.x} y={GLASS.y} w={GLASS.w} h={GLASS.h} n={18} size={0.75} speed={0.6} seed="home/snow" at={0.18} />
-    {/* a nearer, slower-looking layer of bigger flakes (still small, low contrast on the sky) */}
-    <Snowfall x={GLASS.x} y={GLASS.y} w={GLASS.w} h={GLASS.h} n={8} size={1.6} speed={0.85} seed="home/snowNear" at={0.22} />
+    <HomeSnow />
   </Tier>
 );
 
@@ -399,8 +449,33 @@ const DESK_BOOKS: {x: number; y: number; w: number; h: number; rot: number; colo
 const PENS_X = {x: 1214, y: 1206, w: 54};
 const BOOKS_P = {x: 1300, y: 1208, w: 132};
 
-/** The piece that lies LIT in the pool (its silhouette is an Ambient hole; it gets form + cast shadows). */
-const headphones = <Headphones x={HEAD.x} y={HEAD.y} w={HEAD.w} seed="home/hp" at={0.02} />;
+/** The headphones' warm red-brown (a cool navy band was the pool's darkest thing, L* 25, and greyed in the light):
+ *  after the environment tier's pull ~L* 54 C* 28, lifted +6..11 in the pool. */
+const HEAD_COLOR = '#A85A4E';
+/** The piece that lies LIT in the pool (its silhouette, band included, is an Ambient hole; it gets form + cast shadows
+ *  and the pool's lift). */
+const headphones = <Headphones x={HEAD.x} y={HEAD.y} w={HEAD.w} seed="home/hp" at={0.02} color={HEAD_COLOR} bandFill />;
+/** The desk things with a form shade on the side away from the lamp (CRAFT §d.4; the lamp is screen-left, so the
+ *  shade is their right side): elements shared by the drawing and its FormShade. */
+const pens = <PenCup x={PENS.x} y={PENS.y + 10} w={PENS.w} seed="home/pens" at={-0.36} />;
+const pensX = <PenCup x={PENS_X.x} y={PENS_X.y} w={PENS_X.w} seed="home/pensX" at={-0.36} />;
+const booksR = <BookStack x={BOOKS_R.x} y={BOOKS_R.y} w={BOOKS_R.w} n={2} seed="home/booksR" at={-0.37} />;
+const booksX = <BookStack x={BOOKS_X.x} y={BOOKS_X.y} w={BOOKS_X.w} n={3} seed="home/booksX" at={-0.36} />;
+const booksP = <BookStack x={BOOKS_P.x} y={BOOKS_P.y} w={BOOKS_P.w} n={2} seed="home/booksP" at={-0.36} />;
+const cactus = <Plant x={CACTUS.x} y={CACTUS.y} kind="cactus" size={70} seed="home/cactus" at={-0.36} />;
+const snake = <Plant x={SNAKE.x} y={SNAKE.y} kind="snake" size={SNAKE.size} seed="home/snake" at={-0.36} />;
+/** [element, centre, size] of each shaded desk thing (a pen cup's centre and height include its body only). */
+const FORMS: [React.ReactNode, Pt, [number, number]][] = [
+  [pens, [PENS.x, PENS.y + 10 - PENS.w * 0.575], [PENS.w, PENS.w * 1.15]],
+  [pensX, [PENS_X.x, PENS_X.y - PENS_X.w * 0.575], [PENS_X.w, PENS_X.w * 1.15]],
+  [booksR, [BOOKS_R.x + BOOKS_R.w / 2, BOOKS_R.y - 21], [BOOKS_R.w, 42]],
+  [booksX, [BOOKS_X.x + BOOKS_X.w / 2, BOOKS_X.y - 32], [BOOKS_X.w, 63]],
+  [booksP, [BOOKS_P.x + BOOKS_P.w / 2, BOOKS_P.y - 21], [BOOKS_P.w, 42]],
+  [cactus, [CACTUS.x, CACTUS.y - 40], [30, 80]],
+  [snake, [SNAKE.x, SNAKE.y - SNAKE.size * 0.4], [SNAKE.size * 0.4, SNAKE.size * 0.8]],
+];
+/** The lamp's base on the desk (inside the pool, right of the mouth): its shade side is its right. */
+const LAMP_BASE_D = ellipseD({cx: LAMP.base[0], cy: LAMP.base[1], rx: 56, ry: 15});
 
 const NOOK_AT = -0.5;
 const NO_POOL: Ellipse = {cx: POOL.cx, cy: POOL.cy, rx: 0.5, ry: 0.5};
@@ -412,6 +487,19 @@ const SHELF_X1 = 116;
 const CUBBIES = [[-30, -30, SHELF_X1 + 30, 298], [-30, 284, SHELF_X1 + 30, 300], [-30, 600, SHELF_X1 + 30, 256]].map((r) => rectD(r[0], r[1], r[2], r[3])).join('');
 const UNDERSIDES = [284, 600, 872].map((y) => rectD(-30, y, SHELF_X1 + 30, 9)).join('');
 const AMBIENT_REGION: [number, number, number, number] = [-600, -600, ROOM_X1 + 1000, 3200];
+/** The card's drop shadow: 7 px away from the lamp (dropOffset: right, a hair up). */
+const CARD_DROP = dropOffset(HOME_RIG, [CARD.x + CARD.w / 2, CARD.y + CARD.h / 2], 7);
+/** The Ambient's holes, in order: the lamp's wash (a 2-step edge, cut at the desk's crease), the glass (the mullion
+ *  painted back), the skylight, the card, the pool, the headphones lying lit in it. */
+const AMBIENT_HOLES: LightHole[] = [
+  ...[washHole(HOME_RIG, DESK_Y)].filter((h): h is LightHole => h !== null),
+  {rect: [GLASS.x, GLASS.y, GLASS.w, GLASS.h]},
+  {rect: [NOOK.mullionX - 7, GLASS.y, 14, GLASS.h], kind: 'dark'},
+  {d: polyD(SKY_PANE)},
+  {rect: [CARD.x, CARD.y, CARD.w, CARD.h]},
+  {e: POOL},
+  {of: headphones},
+];
 /** A clip path that keeps everything OUTSIDE a closed polygon path (a drop shadow falls on the wall, never on the
  *  card or note that casts it): the region's rect, then the shape reversed (a hole under the nonzero rule). */
 function outside(d: string): string {
@@ -490,44 +578,52 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
       </ShadowLayer>
       <Tier tier="environment">
         {headphones}
-        <Plant x={CACTUS.x} y={CACTUS.y} kind="cactus" size={70} seed="home/cactus" at={-0.36} />
+        {cactus}
         <Biscuits x={PLATE.x} y={PLATE.y} at={-0.36} />
         <Plant x={SILL_PLANT.x} y={SILL_PLANT.y} kind="succulent" size={42} seed="home/sillsu" at={-0.36} />
         <Letters x={LETTERS.x} y={LETTERS.y} at={-0.36} />
         <Notebook seed="home/nb" at={-0.4} />
         {mug}
-        <BookStack x={BOOKS_R.x} y={BOOKS_R.y} w={BOOKS_R.w} n={2} seed="home/booksR" at={-0.37} />
-        <PenCup x={PENS.x} y={PENS.y + 10} w={PENS.w} seed="home/pens" at={-0.36} />
+        {booksR}
+        {pens}
         <WarmGlasses x={GLASSES.x} y={GLASSES.y} w={GLASSES.w} rot={-10} at={-0.36} />
-        <Plant x={SNAKE.x} y={SNAKE.y} kind="snake" size={SNAKE.size} seed="home/snake" at={-0.36} />
-        <BookStack x={BOOKS_X.x} y={BOOKS_X.y} w={BOOKS_X.w} n={3} seed="home/booksX" at={-0.36} />
-        <PenCup x={PENS_X.x} y={PENS_X.y} w={PENS_X.w} seed="home/pensX" at={-0.36} />
-        <BookStack x={BOOKS_P.x} y={BOOKS_P.y} w={BOOKS_P.w} n={2} seed="home/booksP" at={-0.36} />
+        {snake}
+        {booksX}
+        {pensX}
+        {booksP}
         {DESK_BOOKS.map((bk, i) => (
           <DeskBook key={i} {...bk} at={-0.34} />
         ))}
         <Lamp pose={LAMP} lit at={NOOK_AT + 0.08} seed="home/nook" />
       </Tier>
       {room}
-      {/* form: the lit things in the pool, one step on the side away from the lamp; the planes turned from it */}
+      {/* form: one step on the side away from the lamp, on the lit things in the pool and every desk thing; the planes
+          turned from the lamp */}
       <FormShade of={headphones} c={[HEAD.x, HEAD.y - HEAD.w * 0.25]} size={[HEAD.w, HEAD.w * 0.5]} />
+      <FormShade d={LAMP_BASE_D} />
+      <FormShade of={mug} c={[MUG.x + MUG.w / 2, MUG.top + MUG.w * 0.57]} size={[MUG.w, MUG.w * 1.14]} />
+      {FORMS.map(([el, c, size], i) => (
+        <FormShade key={i} of={el} c={c} size={size} />
+      ))}
       <Shade d={SLOPE_SHADE} />
       <Shade d={CUBBIES} />
       <Shade d={UNDERSIDES} tint="cast" />
-      {/* the card and the notes stand a hair off the wall: soft drop shadows down-right; the pins cast too */}
-      <Shadow d={rectD(CARD.x, CARD.y, CARD.w, CARD.h)} dx={6} dy={8} soft={4} tint="form" clip={outside(rectD(CARD.x, CARD.y, CARD.w, CARD.h))} />
-      {NOTES.map((n, i) => (
-        <Shadow key={i} d={noteD(n)} dx={4} dy={6} soft={3} tint="form" clip={outside(noteD(n))} />
-      ))}
-      {PINS.map(([x, y], i) => (
-        <Shadow key={i} d={ellipseD({cx: x, cy: y, rx: 9, ry: 9})} dx={4} dy={6} soft={2} />
-      ))}
-      {/* the room one step down outside the light: the glass, the pool and what stands lit in it keep their light */}
-      <Ambient
-        tint={ambientTint(T)}
-        region={AMBIENT_REGION}
-        holes={[{rect: [GLASS.x, GLASS.y, GLASS.w, GLASS.h]}, {rect: [NOOK.mullionX - 7, GLASS.y, 14, GLASS.h], kind: 'dark'}, {d: polyD(SKY_PANE)}, {rect: [CARD.x, CARD.y, CARD.w, CARD.h]}, {e: POOL}, {of: headphones}]}
-      />
+      {/* the card and the notes stand a hair off the wall: soft drop shadows falling AWAY from the lamp (it is low on
+          the left: right and a hair up), the pins' too */}
+      <Shadow d={rectD(CARD.x, CARD.y, CARD.w, CARD.h)} dx={CARD_DROP[0]} dy={CARD_DROP[1]} soft={4} tint="form" clip={outside(rectD(CARD.x, CARD.y, CARD.w, CARD.h))} />
+      {NOTES.map((n, i) => {
+        const o = dropOffset(HOME_RIG, [n.x + n.w / 2, n.y + n.h / 2], 5);
+        return <Shadow key={i} d={noteD(n)} dx={o[0]} dy={o[1]} soft={3} tint="form" clip={outside(noteD(n))} />;
+      })}
+      {PINS.map(([x, y], i) => {
+        const o = dropOffset(HOME_RIG, [x, y], 5);
+        return <Shadow key={i} d={ellipseD({cx: x, cy: y, rx: 9, ry: 9})} dx={o[0]} dy={o[1]} soft={2} />;
+      })}
+      {/* the room one step down outside the light: the lamp's wash on the shelf behind it, the glass, the pool and
+          what stands lit in it keep their light */}
+      <Ambient tint={ambientTint(T)} region={AMBIENT_REGION} holes={AMBIENT_HOLES} />
+      {/* the headphones lie IN the pool: lifted +6..11 L* (a screen of the rig's lift, clipped to the pool) */}
+      <PoolLift of={headphones} c={[HEAD.x, HEAD.y - HEAD.w * 0.25]} />
       <XG m={mat.compose(mat.translate(LAMP.head[0], LAMP.head[1]), mat.rotate(LAMP.rot))}>
         <SourceCore d={ellipseD({cx: 0, cy: 100, rx: 64, ry: 12})} />
       </XG>

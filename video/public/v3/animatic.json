@@ -570,7 +570,7 @@
  "sfx": [
   {
    "src": "v3/phone_cart_add.wav",
-   "t": 0.0,
+   "t": 0.5,
    "gain": 0.5
   },
   {

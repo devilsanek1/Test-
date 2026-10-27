@@ -93,7 +93,15 @@ const SQA: React.FC = () => {
       <Flights T={T} />
     </World>
   );
-  return T < 0.6 ? <Look cascade={SQA_CASCADE}>{scene}</Look> : scene;
+  // frame 0's colour flood, each fill landing in ONE step inside its own outline (snapPops: never a fill growing from
+  // its centre inside a line that is already drawn)
+  return T < 0.6 ? (
+    <Look cascade={SQA_CASCADE} snapPops>
+      {scene}
+    </Look>
+  ) : (
+    scene
+  );
 };
 export default SQA;
 
