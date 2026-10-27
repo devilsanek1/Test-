@@ -20,10 +20,11 @@ import React, {useMemo} from 'react';
 import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
 import {XG, mat} from '../../lib/xf';
-import {line, circle as circleInk, ellipse as ellipseInk, arc as arcInk} from '../../lib/sketch';
+import {line, circle as circleInk, arc as arcInk} from '../../lib/sketch';
 import {Batch, Paint, P, rng, ovalPath, domePath, lobes, leafPath, lerp} from '../kit/canal/core';
 import type {Pt} from '../kit/canal/core';
 import {Puffs} from '../kit/canal/life';
+import {bikeInto} from '../kit/canal/towpath';
 
 /** The boat's lines (world px at the match). */
 export const NB = {
@@ -36,7 +37,7 @@ export const NB = {
   gun1: 1584,
   water: 1616,
   /** Stove chimney: centre x, base on the roof, pipe top (smoke leaves under the cap). */
-  chimney: {x: 706, base: 1306, top: 1206},
+  chimney: {x: 610.8, base: 1318, top: 1196},
   /** The mooring T-stud on the gunwale (the rope to our coping's ring starts here; S4's left T-stud, mapped). */
   dolly: [22, 1561] as Pt,
   /** Rope fenders hang from the roof's near rail down the cabin side at these x (S4's three, mapped, + one more). */
@@ -70,13 +71,6 @@ export const holePath = (cx: number, cy: number, rx: number, ry: number) =>
 export const ringPath = (cx: number, cy: number, rx: number, ry: number, ix: number, iy: number) => `${ovalPath(cx, cy, rx, ry)}${holePath(cx, cy, ix, iy)}`;
 /** A tapered pot (terracotta), base centre (x, y), top width w, height h. */
 const potPath = (x: number, y: number, w: number, h: number) => `M${P(x - w / 2, y - h)}L${P(x + w / 2, y - h)}L${P(x + w * 0.37, y)}L${P(x - w * 0.37, y)}Z`;
-/** A shadow lying on the roof (a horizontal surface seen at a grazing angle): it runs RIGHT from an item's foot,
- *  away from the low sun at left, dipping only a few px toward us, never past the roof's near edge. */
-const roofShadow = (b: Batch, x: number, y: number, w: number, len: number) => {
-  const y0 = Math.min(y, NB.roofNear - 10);
-  const dip = Math.min(5, NB.roofNear - 8 - y0);
-  b.poly(CM.stoneShade, [[x - w * 0.15, y0 - 3], [x + len, y0 - 3 + dip * 0.6], [x + len - 4, y0 + dip], [x - w * 0.1, y0 + 2]]);
-};
 /** A long hand-drawn line that stays parallel to its edge (low drift): the boat's long contours. */
 const longLine = (x0: number, y0: number, x1: number, y1: number, seed: string, over: 'small' | 'medium' = 'small') => line(x0, y0, x1, y1, {seed, over, drift: 0.06, bow: 1.2});
 
@@ -263,20 +257,29 @@ function cabinInto(L: Levels) {
 }
 
 // ---------------------------------------------------------------- the roof dressing (static)
-
-type HerbPot = {x: number; y: number; w: number; h: number; kind: 'rosemary' | 'basil' | 'thyme' | 'chilli'};
+// S4's roof, mapped like the cabin (x -> s4x, heights x SK, the roof's depth kept): the boat pole, plank and mop on
+// the far rail, brass vents and the water filler, a coiled rope, a bucket and a watering can, five herb pots round an
+// empty spot (where Pip rides in S4), a solar panel, the bike, the lifebuoy leaning on the stove chimney, the log pile.
+// Past S4's view (x > 783): a painted Buckby can, a mop bucket and a geranium trough cut by the right edge.
+type HerbPot = {x: number; base: number; w: number; kind: 'rosemary' | 'basil' | 'chives' | 'thyme' | 'geranium'};
+const rn = (k4: number) => NB.roofNear - k4; // S4's "RN - k" on S3's roof
 export const HERB_POTS: HerbPot[] = [
-  {x: 52, y: 1318, w: 30, h: 28, kind: 'rosemary'},
-  {x: 104, y: 1313, w: 38, h: 32, kind: 'basil'},
-  {x: 158, y: 1320, w: 26, h: 22, kind: 'thyme'},
-  {x: 210, y: 1315, w: 34, h: 30, kind: 'chilli'},
+  {x: s4x(296), base: rn(20), w: 40 * SK, kind: 'rosemary'},
+  {x: s4x(346), base: rn(30), w: 34 * SK, kind: 'geranium'},
+  {x: s4x(390), base: rn(12), w: 34 * SK, kind: 'chives'},
+  {x: s4x(552), base: rn(26), w: 34 * SK, kind: 'thyme'},
+  {x: s4x(598), base: rn(12), w: 40 * SK, kind: 'basil'},
+  {x: 1000, base: rn(16), w: 36 * SK, kind: 'rosemary'},
+  {x: 1030, base: rn(26), w: 30 * SK, kind: 'thyme'},
 ];
-const PIGEON = {x0: 300, x1: 372, y: 1312, h: 26};
-const COIL: Pt = [446, 1300];
-const BIKE: Pt = [566, 1318];
-const WCAN: Pt = [800, 1316];
-const BUCKBY: Pt = [872, 1312];
-const BUOY = {x: 996, y: 1294, rx: 52, ry: 16};
+const COIL = {x: s4x(78), y: rn(22), rx: 56 * SK, ry: 12};
+const WCAN = {x: s4x(214), y: rn(14)};
+const BUCKET = {x0: s4x(134), x1: s4x(166), y: rn(4)};
+const SOLAR: Pt[] = [[s4x(604), NB.roofFar + 18], [s4x(712), NB.roofFar + 18], [s4x(717), NB.roofFar + 40], [s4x(598), NB.roofFar + 40]];
+const BIKE = {x: s4x(740), y: rn(10), R: 34 * SK};
+const BUOY = {x: s4x(860), y: rn(44), R: 36 * SK, ri: 19 * SK};
+const LOGS = {x: s4x(992), y: rn(12)};
+const BUCKBY: Pt = [846, rn(14)];
 
 function roofInto(L: Levels) {
   const w2 = INK_PX.far;
@@ -284,113 +287,114 @@ function roofInto(L: Levels) {
   const s1 = L.at(1); // shadows on the roof
   const a = L.at(2); // item bodies
   const c = L.at(3); // details on the bodies
-  const d = L.at(4); // small details
-  // ---- the boat pole and the plank along the far side of the roof (cut by the left edge)
-  a.poly(CM.line, [[-90, 1271], [262, 1265], [263, 1271], [-90, 1278]]);
-  a.fill(CM.anchor, `M${P(262, 1263)}L${P(282, 1262)}Q${P(292, 1267)} ${P(282, 1273)}L${P(262, 1272)}Z`);
-  a.poly(CM.leafGold, [[-90, 1290], [150, 1286], [154, 1298], [-90, 1303]]);
-  c.poly(CM.line, [[-90, 1303], [154, 1298], [154, 1301], [-90, 1306]]);
-  c.ink(longLine(-90, 1290, 152, 1286, 's3nb/plank') + longLine(-90, 1271, 262, 1265, 's3nb/pole'), hair);
-  // ---- herb pots (terracotta, rims, a shade side, their shadows) - the herbs themselves sway: herbsInto()
-  for (const p of HERB_POTS) {
-    roofShadow(s1, p.x + p.w * 0.3, p.y, p.w * 0.8, p.w * 1.9);
-    a.fill(CM.brick, potPath(p.x, p.y, p.w, p.h));
-    c.fill(CM.brickDeep, `M${P(p.x - p.w / 2 - 2, p.y - p.h)}L${P(p.x + p.w / 2 + 2, p.y - p.h)}L${P(p.x + p.w / 2 + 1, p.y - p.h + 7)}L${P(p.x - p.w / 2 - 1, p.y - p.h + 7)}Z`);
-    c.fill(CM.shadeWarm, `M${P(p.x + p.w * 0.18, p.y - p.h + 7)}L${P(p.x + p.w / 2 - 1, p.y - p.h + 7)}L${P(p.x + p.w * 0.37, p.y)}L${P(p.x + p.w * 0.12, p.y)}Z`);
-    d.ink(`M${P(p.x - p.w / 2, p.y - p.h)}L${P(p.x - p.w * 0.37, p.y)}L${P(p.x + p.w * 0.37, p.y)}`, w2, CM.ink, 0.2);
+  const d = L.at(4); // small details, ink
+  const inks: string[] = [];
+  // ---- on the far rail: the boat pole, the plank, the mop with its head; vents and the water filler
+  a.rect(CM.coatOat, s4x(-40), NB.roofFar - 13, 440 * SK, 3.4);
+  a.rect(CM.line, s4x(-40), NB.roofFar - 8, 300 * SK, 4.6);
+  a.rect(CM.brickDeep, s4x(160), NB.roofFar - 18.5, 170 * SK, 2.6);
+  c.rect(CM.coatMustard, s4x(394), NB.roofFar - 14, 6, 4.6);
+  c.fill(CM.paper, `M${P(s4x(328), NB.roofFar - 22)}Q${P(s4x(356), NB.roofFar - 25)} ${P(s4x(368), NB.roofFar - 16)}Q${P(s4x(352), NB.roofFar - 11)} ${P(s4x(328), NB.roofFar - 15)}Z`);
+  for (const x of [s4x(176), s4x(646), s4x(872), 900]) {
+    a.rect(CM.coatMustard, x - 2.6, NB.roofFar + 24, 5.3, 6.6);
+    a.fill(CM.coatMustard, domePath(x, NB.roofFar + 26, 10, 6.6));
+    c.fill(CM.leafGold, domePath(x - 3, NB.roofFar + 24.5, 3.4, 2.4));
   }
-  // ---- the pigeon box: a raised sage box with a cream lid and two little lit ports
-  const pb = PIGEON;
-  roofShadow(s1, pb.x1 - 4, pb.y, 30, 58);
-  a.rect(CM.sage, pb.x0, pb.y - pb.h, pb.x1 - pb.x0, pb.h);
-  c.poly(CM.coatOat, [[pb.x0 - 4, pb.y - pb.h], [pb.x1 + 4, pb.y - pb.h], [pb.x1 - 2, pb.y - pb.h - 14], [pb.x0 + 2, pb.y - pb.h - 14]]);
-  for (const px of [pb.x0 + 20, pb.x1 - 20]) {
-    c.fill(CM.coatMustard, ovalPath(px, pb.y - pb.h / 2, 8, 8));
-    d.fill(CM.lamp, ovalPath(px, pb.y - pb.h / 2, 5.4, 5.4));
-  }
-  d.ink(`M${P(pb.x0, pb.y - pb.h - 1)}L${P(pb.x0, pb.y)}L${P(pb.x1, pb.y)}L${P(pb.x1, pb.y - pb.h)}`, w2, CM.ink, 0.25);
-  // ---- the coiled rope (cream, a spiral of twists)
-  roofShadow(s1, COIL[0] + 30, COIL[1] + 10, 30, 30);
-  a.fill(CM.coatOat, ovalPath(COIL[0], COIL[1], 44, 14));
-  c.fill(CM.line, ovalPath(COIL[0] + 2, COIL[1] - 1, 12, 4));
+  a.fill(CM.coatMustard, ovalPath(s4x(1040), rn(14), 6.6, 2.4));
+  // ---- short east shadows on the roof top (the low sun is west)
+  const sh = (x0: number, x1: number, y: number, len: number, dd = 4) => s1.poly(CM.stoneShade, [[x0, y - 2], [x1, y - 2], [x1 + len, y + dd], [x0 + len * 0.7, y + dd]]);
+  sh(COIL.x - COIL.rx * 0.8, COIL.x + COIL.rx, COIL.y + 8, 14, 5);
+  sh(BUCKET.x0, BUCKET.x1, BUCKET.y, 12);
+  sh(WCAN.x - 16, WCAN.x + 16, WCAN.y, 16);
+  for (const h of HERB_POTS) sh(h.x - h.w * 0.38, h.x + h.w * 0.38, h.base, 12, 3);
+  sh(BIKE.x - 30, BIKE.x + 30, BIKE.y, 14);
+  sh(BUOY.x - 20, BUOY.x + 22, rn(8), 16);
+  sh(NB.chimney.x - 7, NB.chimney.x + 7, NB.chimney.base - 2, 28, 5);
+  sh(LOGS.x - 10, LOGS.x + 72, rn(6), 10);
+  sh(BUCKBY[0] - 11, BUCKBY[0] + 11, BUCKBY[1], 22);
+  // ---- the coiled rope (left)
+  a.fill(CM.coatOat, ovalPath(COIL.x, COIL.y, COIL.rx, COIL.ry));
+  c.fill(CM.line, ovalPath(COIL.x, COIL.y - 1, 16, 5));
   let coil = '';
-  for (let k = 0; k < 4; k++) coil += ellipseInk(COIL[0] + k * 0.6, COIL[1] - k * 0.2, 44 - k * 9, 14 - k * 2.6, {seed: `s3nb/coil${k}`, wobble: 0.03, overlap: 30});
-  c.ink(coil, hair, CM.line);
-  // ---- the folded bike (mustard frame, two small wheels side by side, saddle on top)
-  const g = BIKE;
-  roofShadow(s1, g[0] + 30, g[1], 60, 84);
-  const R = 23;
-  const wA: Pt = [g[0] - 14, g[1] - R];
-  const wB: Pt = [g[0] + 16, g[1] - R + 1];
-  for (const [wx, wy] of [wA, wB]) a.fill(CM.coatSlate, ringPath(wx, wy, R, R, R - 4.5, R - 4.5));
-  let spokes = '';
-  for (const [wx, wy] of [wA, wB]) for (let k = 0; k < 4; k++) {
-    const ang = (k / 4) * Math.PI + 0.3;
-    spokes += `M${P(wx - Math.cos(ang) * (R - 5), wy - Math.sin(ang) * (R - 5))}L${P(wx + Math.cos(ang) * (R - 5), wy + Math.sin(ang) * (R - 5))}`;
+  for (let k = 0; k < 4; k++) coil += `M${P(COIL.x - COIL.rx + 2 + k * 5, COIL.y)}A${(COIL.rx - 2 - k * 5).toFixed(1)} ${(COIL.ry - 1 - k * 1.7).toFixed(1)} 0 0 0 ${P(COIL.x + COIL.rx - 2 - k * 5, COIL.y)}`;
+  c.ink(coil, 1.2, CM.line);
+  inks.push(`M${P(COIL.x - COIL.rx, COIL.y)}A${COIL.rx.toFixed(1)} ${COIL.ry} 0 0 0 ${P(COIL.x + COIL.rx, COIL.y)}`);
+  // ---- a bucket and the watering can (slate)
+  a.poly(CM.stoneShade, [[BUCKET.x0, BUCKET.y], [BUCKET.x0 - 2.6, BUCKET.y - 24], [BUCKET.x1 + 2.6, BUCKET.y - 24], [BUCKET.x1, BUCKET.y]]);
+  c.fill(CM.limestone, ovalPath((BUCKET.x0 + BUCKET.x1) / 2, BUCKET.y - 24, 13, 3.4));
+  d.ink(`M${P(BUCKET.x0 - 1.4, BUCKET.y - 23)}Q${P((BUCKET.x0 + BUCKET.x1) / 2, BUCKET.y - 39)} ${P(BUCKET.x1 + 1.4, BUCKET.y - 23)}`, 1.2, CM.ink);
+  const cx = WCAN.x;
+  const cy = WCAN.y;
+  a.poly(CM.coatSlate, [[cx - 17, cy], [cx - 16, cy - 30], [cx + 14.5, cy - 30], [cx + 16, cy]]);
+  a.poly(CM.coatSlate, [[cx + 13, cy - 20], [cx + 42, cy - 42], [cx + 43.5, cy - 37.6], [cx + 13, cy - 10.6]]);
+  a.fill(CM.coatSlate, ovalPath(cx + 44, cy - 40, 5.3, 3));
+  c.rect(CM.shadeCool, cx - 17, cy - 22.4, 33, 2.6);
+  d.ink(`M${P(cx - 12, cy - 30)}Q${P(cx, cy - 47.5)} ${P(cx + 10.6, cy - 30)}`, 2, CM.coatSlate);
+  inks.push(`M${P(cx - 17, cy)}L${P(cx - 16, cy - 30)}L${P(cx + 14.5, cy - 30)}`);
+  // ---- herb pots (terracotta with a rolled rim; the herbs sway: herbsInto)
+  for (const h of HERB_POTS) {
+    const ph = h.w * 0.9;
+    a.poly(CM.brick, [[h.x - h.w / 2, h.base - ph], [h.x + h.w / 2, h.base - ph], [h.x + h.w * 0.38, h.base], [h.x - h.w * 0.38, h.base]]);
+    c.rect(CM.brickDeep, h.x - h.w / 2 - 1.3, h.base - ph - 2, h.w + 2.6, 4.6);
+    c.poly(CM.shadeWarm, [[h.x + h.w * 0.16, h.base - ph + 2.6], [h.x + h.w / 2 - 1, h.base - ph + 2.6], [h.x + h.w * 0.38, h.base], [h.x + h.w * 0.12, h.base]]);
+    inks.push(`M${P(h.x - h.w / 2 - 1.3, h.base - ph - 1.3)}L${P(h.x - h.w * 0.38, h.base)}L${P(h.x + h.w * 0.38, h.base)}`);
   }
-  a.ink(spokes, 1, CM.stoneShade);
-  for (const [wx, wy] of [wA, wB]) c.fill(CM.coatMustard, ovalPath(wx, wy, 3.2, 3.2));
-  c.ink(`M${P(wA[0], wA[1])}L${P(g[0] + 2, g[1] - 44)}L${P(wB[0], wB[1])}M${P(g[0] + 2, g[1] - 44)}L${P(g[0] - 2, g[1] - 86)}M${P(g[0] + 2, g[1] - 44)}L${P(g[0] + 22, g[1] - 70)}L${P(g[0] + 34, g[1] - 72)}`, 5, CM.brickDeep);
-  d.fill(CM.anchor, `M${P(g[0] - 16, g[1] - 88)}Q${P(g[0] - 2, g[1] - 96)} ${P(g[0] + 12, g[1] - 89)}L${P(g[0] + 10, g[1] - 84)}L${P(g[0] - 14, g[1] - 84)}Z`);
-  d.fill(CM.anchor, ovalPath(g[0] + 36, g[1] - 72, 5, 3));
-  d.ink(circleInk(wA[0], wA[1], R, {seed: 's3nb/bwA', wobble: 0.02}) + circleInk(wB[0], wB[1], R, {seed: 's3nb/bwB', wobble: 0.02}), hair, CM.ink, 0.3);
-  // ---- the stove chimney (plum pipe, two brass bands, a hat) - smoke: <Puffs> in S3Boat
+  // ---- the solar panel lying flat (low), its cells
+  a.poly(CM.paneUnlit, SOLAR);
+  let sp = '';
+  for (let k = 1; k < 6; k++) sp += `M${P(SOLAR[0][0] + k * 12, SOLAR[0][1])}L${P(SOLAR[3][0] + k * 12.8, SOLAR[3][1])}`;
+  sp += `M${P(SOLAR[3][0] + 2, (SOLAR[0][1] + SOLAR[3][1]) / 2)}L${P(SOLAR[2][0] - 2, (SOLAR[0][1] + SOLAR[3][1]) / 2)}`;
+  c.ink(sp, 0.8, CM.glass);
+  // ---- the bike (S4's, brick-deep) and its saddle-bag
+  bikeInto(c, BIKE.x, BIKE.y, BIKE.R, 's3fold', CM.brickDeep, -1);
+  d.rect(CM.anchor, s4x(700), rn(84), 30 * SK, 4);
+  // ---- the lifebuoy leaning on the chimney (four quadrants, paper and peach)
+  for (let q = 0; q < 4; q++) {
+    const a0 = (q * Math.PI) / 2 + 0.3;
+    const a1 = a0 + Math.PI / 2;
+    const R = BUOY.R;
+    const ri = BUOY.ri;
+    c.fill(q % 2 ? CM.paper : CM.box, `M${P(BUOY.x + Math.cos(a0) * R, BUOY.y + Math.sin(a0) * R)}A${R.toFixed(1)} ${R.toFixed(1)} 0 0 1 ${P(BUOY.x + Math.cos(a1) * R, BUOY.y + Math.sin(a1) * R)}L${P(BUOY.x + Math.cos(a1) * ri, BUOY.y + Math.sin(a1) * ri)}A${ri.toFixed(1)} ${ri.toFixed(1)} 0 0 0 ${P(BUOY.x + Math.cos(a0) * ri, BUOY.y + Math.sin(a0) * ri)}Z`);
+  }
+  inks.push(circleInk(BUOY.x, BUOY.y, BUOY.R, {seed: 's3roofbuoy'}));
+  // ---- the stove chimney: a plum pipe, brass bands, its coolie hat (smoke: <Puffs> in S3Boat)
   const ch = NB.chimney;
-  roofShadow(s1, ch.x + 10, ch.base, 26, 96);
-  a.fill(CM.anchor, `M${P(ch.x - 15, ch.base)}L${P(ch.x - 12, ch.base - 12)}L${P(ch.x + 12, ch.base - 12)}L${P(ch.x + 15, ch.base)}Z`);
-  a.rect(CM.anchor, ch.x - 9, ch.top, 18, ch.base - 12 - ch.top);
-  a.fill(CM.anchor, `M${P(ch.x - 21, ch.top - 8)}Q${P(ch.x, ch.top - 26)} ${P(ch.x + 21, ch.top - 8)}L${P(ch.x + 16, ch.top - 4)}L${P(ch.x - 16, ch.top - 4)}Z`);
-  a.rect(CM.anchor, ch.x - 2, ch.top - 6, 4, 6);
-  c.rect(CM.coatMustard, ch.x - 10, ch.top + 22, 20, 6);
-  c.rect(CM.coatMustard, ch.x - 10, ch.base - 34, 20, 5);
-  c.rect(CM.coatPlum, ch.x + 3, ch.top + 30, 4, ch.base - 46 - ch.top - 30);
-  d.ink(line(ch.x - 9, ch.top, ch.x - 9, ch.base - 12, {seed: 's3nb/chim', over: 'small', drift: 0.1}), w2, CM.ink);
-  // ---- the watering can (slate)
-  roofShadow(s1, WCAN[0] + 16, WCAN[1], 34, 52);
-  a.fill(CM.coatSlate, rr(WCAN[0] - 22, WCAN[1] - 30, 40, 30, 7));
-  a.poly(CM.coatSlate, [[WCAN[0] + 14, WCAN[1] - 14], [WCAN[0] + 40, WCAN[1] - 38], [WCAN[0] + 44, WCAN[1] - 34], [WCAN[0] + 18, WCAN[1] - 8]]);
-  a.fill(CM.coatSlate, ovalPath(WCAN[0] + 44, WCAN[1] - 38, 6, 4));
-  c.rect(CM.shadeCool, WCAN[0] + 6, WCAN[1] - 28, 10, 27);
-  d.ink(arcInk(WCAN[0] - 2, WCAN[1] - 30, 18, 14, 180, 360, {seed: 's3nb/wch'}) + `M${P(WCAN[0] - 22, WCAN[1] - 26)}L${P(WCAN[0] - 22, WCAN[1])}`, w2, CM.ink);
-  // ---- the painted Buckby can (plum-mauve, a brass band, a rose)
+  a.rect(CM.anchor, ch.x - 7.3, ch.top, 14.6, ch.base - ch.top);
+  a.poly(CM.anchor, [[ch.x - 17, ch.top], [ch.x, ch.top - 10.6], [ch.x + 17, ch.top]]);
+  a.rect(CM.anchor, ch.x - 1.3, ch.top - 13.3, 2.6, 4);
+  c.rect(CM.coatMustard, ch.x - 8, ch.top + 21, 16, 4.6);
+  c.rect(CM.coatMustard, ch.x - 9.3, ch.base - 8, 18.6, 5.3);
+  inks.push(line(ch.x - 7.3, ch.base - 4, ch.x - 7.3, ch.top, {seed: 's3chim', over: 'small', drift: 0.1}));
+  // ---- the log pile (bark, cut ends: the middle row golden), the rings
+  for (let k = 0; k < 12; k++) {
+    const col = k % 4;
+    const row = Math.floor(k / 4);
+    a.fill(CM.line, ovalPath(LOGS.x + col * 26 * SK + (row % 2) * 13 * SK, LOGS.y - row * 14.5, 8.6, 7.3));
+  }
+  let logInk = '';
+  for (let k = 0; k < 12; k++) {
+    const col = k % 4;
+    const row = Math.floor(k / 4);
+    const x = LOGS.x + col * 26 * SK + (row % 2) * 13 * SK;
+    const y = LOGS.y - row * 14.5;
+    c.fill(row === 1 ? CM.leafGold : CM.coatOat, ovalPath(x, y, 5.9, 5));
+    logInk += circleInk(x, y, 2.6, {seed: `s3log${k}`});
+  }
+  c.ink(logInk, 0.8, CM.line);
+  // ---- past S4's view: the painted Buckby can (plum-mauve, a brass band, a rose)
   const bc = BUCKBY;
-  roofShadow(s1, bc[0] + 14, bc[1], 30, 62);
-  a.fill(CM.coatPlum, rr(bc[0] - 16, bc[1] - 50, 32, 50, 5));
-  a.fill(CM.coatPlum, `M${P(bc[0] - 12, bc[1] - 50)}L${P(bc[0] - 8, bc[1] - 60)}L${P(bc[0] + 8, bc[1] - 60)}L${P(bc[0] + 12, bc[1] - 50)}Z`);
-  c.rect(CM.coatMustard, bc[0] - 16, bc[1] - 42, 32, 4);
-  c.fill(CM.box, ovalPath(bc[0] - 4, bc[1] - 24, 7, 6.4));
-  d.fill(CM.brick, ovalPath(bc[0] - 3, bc[1] - 23, 3.2, 2.8));
-  d.fill(CM.paper, ovalPath(bc[0] + 8, bc[1] - 20, 3.2, 3.2));
-  d.fill(CM.sage, leafPath(bc[0] + 4, bc[1] - 32, 10, 3, -30));
-  d.ink(arcInk(bc[0], bc[1] - 60, 12, 12, 180, 360, {seed: 's3nb/bch'}) + `M${P(bc[0] + 16, bc[1] - 48)}L${P(bc[0] + 16, bc[1])}`, w2, CM.ink);
-  // ---- the lifebuoy lying flat (a paper ring with four rust bands; the roof shows through its hole)
-  const lb = BUOY;
-  roofShadow(s1, lb.x + 44, lb.y + 14, 40, 26);
-  a.fill(CM.paper, ringPath(lb.x, lb.y, lb.rx, lb.ry, lb.rx * 0.6, lb.ry * 0.5));
-  for (const a0 of [20, 110, 200, 290]) {
-    const pts: Pt[] = [];
-    for (let k = 0; k <= 6; k++) {
-      const ang = ((a0 + (k / 6) * 34) * Math.PI) / 180;
-      pts.push([lb.x + Math.cos(ang) * lb.rx, lb.y + Math.sin(ang) * lb.ry]);
-    }
-    for (let k = 6; k >= 0; k--) {
-      const ang = ((a0 + (k / 6) * 34) * Math.PI) / 180;
-      pts.push([lb.x + Math.cos(ang) * lb.rx * 0.6, lb.y + Math.sin(ang) * lb.ry * 0.5]);
-    }
-    c.poly(CM.leafRust, pts);
-  }
-  d.ink(ellipseInk(lb.x, lb.y, lb.rx, lb.ry, {seed: 's3nb/lb', wobble: 0.02}), w2, CM.ink, 0.25);
-  // ---- the geranium trough cut by the right edge (flowers sway with the herbs)
-  a.poly(CM.brickDeep, [[1066, 1296], [1200, 1296], [1200, 1318], [1070, 1318]]);
-  c.rect(CM.brick, 1066, 1296, 134, 6);
-  d.ink(`M${P(1066, 1296)}L${P(1070, 1318)}L${P(1200, 1318)}`, w2, CM.ink, 0.2);
-  // ---- brass mushroom vents along the roof's near edge
-  for (const vx of [256, 652, 936]) {
-    roofShadow(s1, vx + 6, NB.roofNear - 12, 18, 26);
-    a.fill(CM.coatMustard, domePath(vx, NB.roofNear - 12, 11, 8));
-    a.rect(CM.line, vx - 7, NB.roofNear - 12, 14, 3);
-    c.fill(CM.leafGold, domePath(vx - 3, NB.roofNear - 14, 4, 3));
-  }
+  a.fill(CM.coatPlum, rr(bc[0] - 11, bc[1] - 33, 22, 33, 4));
+  a.fill(CM.coatPlum, `M${P(bc[0] - 8, bc[1] - 33)}L${P(bc[0] - 5.3, bc[1] - 40)}L${P(bc[0] + 5.3, bc[1] - 40)}L${P(bc[0] + 8, bc[1] - 33)}Z`);
+  c.rect(CM.coatMustard, bc[0] - 11, bc[1] - 28, 22, 2.6);
+  c.fill(CM.box, ovalPath(bc[0] - 2.6, bc[1] - 16, 4.6, 4.2));
+  d.fill(CM.brick, ovalPath(bc[0] - 2, bc[1] - 15.4, 2.1, 1.9));
+  d.fill(CM.paper, ovalPath(bc[0] + 5.3, bc[1] - 13, 2.1, 2.1));
+  d.ink(arcInk(bc[0], bc[1] - 40, 8, 8, 180, 360, {seed: 's3nb/bch'}) + `M${P(bc[0] + 11, bc[1] - 32)}L${P(bc[0] + 11, bc[1])}`, hair, CM.ink);
+  // ---- the geranium trough cut by the right edge (the flowers sway with the herbs)
+  a.poly(CM.brickDeep, [[1066, rn(30)], [1200, rn(30)], [1200, rn(8)], [1070, rn(8)]]);
+  c.rect(CM.brick, 1066, rn(30), 134, 5);
+  inks.push(`M${P(1066, rn(30))}L${P(1070, rn(8))}L${P(1200, rn(8))}`);
+  d.ink(inks.join(''), w2, CM.ink, 0.3);
 }
 
 /** The boat's long contours, last (front weight where the form turns; open, overshooting, parallel). */
@@ -411,71 +415,53 @@ function contoursInto(b: Batch) {
 
 // ---------------------------------------------------------------- life (per frame, few nodes)
 
-/** Herbs and geraniums: foliage that sways in the canal breeze (tips move every frame; leaves flick). */
+/** Herbs (S4's kinds and recipe, at S3's scale): the leafy ones as a pointed bunch with leaves, the bladed ones as
+ *  stems; all lean east in the evening breeze and sway every frame. The geraniums in the trough sway with them. */
 function herbsInto(L: Levels, t: number) {
-  const breeze = (ph: number, amp: number) => amp * (0.7 * Math.sin(t * 2.3 + ph) + 0.3 * Math.sin(t * 5.1 + ph * 1.7));
   const a = L.at(0);
   const c = L.at(1);
-  let stems = '';
-  let outline = '';
-  for (const [i, p] of HERB_POTS.entries()) {
-    const top = p.y - p.h;
-    const r = rng(`s3nb/herb${i}`);
-    if (p.kind === 'rosemary') {
-      for (let k = 0; k < 7; k++) {
-        const bx = p.x - p.w * 0.32 + (p.w * 0.64 * k) / 6;
-        const Lh = r.range(26, 40);
-        const sw = breeze(i + k, 3.2);
-        stems += `M${P(bx, top + 2)}Q${P(bx + sw * 0.4, top - Lh * 0.5)} ${P(bx + sw, top - Lh)}`;
-        for (let n = 1; n < 4; n++) {
-          const yy = top - (Lh * n) / 4;
-          const xx = bx + (sw * n) / 4;
-          c.fill(CM.sage, leafPath(xx + 4, yy, 9, 2.2, -30 + sw));
-          c.fill(CM.sage, leafPath(xx - 4, yy - 2, 9, 2.2, 210 + sw));
-        }
-      }
-    } else if (p.kind === 'basil') {
-      const lb = lobes(p.x - p.w * 0.62 + breeze(i, 1.2), p.x + p.w * 0.62 + breeze(i + 1, 1.2), top + 4, p.h * 1.25, `s3nb/basil${i}`, 4);
-      a.fill(CM.sage, lb);
-      outline += lb;
-      for (let k = 0; k < 6; k++) {
-        const ang = -150 + k * 24 + breeze(i + k, 8);
-        c.fill(k % 2 ? CM.glass : CM.sage, leafPath(p.x + (k - 2.5) * 7 + breeze(i + k, 1.6), top - p.h * 0.55 + Math.abs(k - 2.5) * 4, 13, 4.4, ang));
-      }
-    } else if (p.kind === 'thyme') {
-      const lb = lobes(p.x - p.w * 0.7 + breeze(i, 0.8), p.x + p.w * 0.7 + breeze(i + 2, 0.8), top + 3, p.h * 0.9, `s3nb/thyme${i}`, 5);
-      a.fill(CM.sage, lb);
-      outline += lb;
-      for (let k = 0; k < 5; k++) c.fill(CM.blossom, ovalPath(p.x - 12 + k * 6 + breeze(i + k, 1), top - 10 - (k % 2) * 5, 2.2, 2.2));
+  const blades: string[] = [];
+  const thyme: string[] = [];
+  HERB_POTS.forEach((h, i) => {
+    const {x, w} = h;
+    const sway = 1.6 + Math.sin(t * 3.1 + i * 1.7) * 1.5 + Math.sin(t * 7.3 + i) * 0.6;
+    const top = h.base - w * 0.9 - 2;
+    if (h.kind === 'basil' || h.kind === 'geranium') {
+      a.fill(CM.sage, `M${P(x - w * 0.62, top)}Q${P(x - w * 0.72 + sway * 0.6, top - w * 0.95)} ${P(x + sway, top - w * 1.25)}Q${P(x + w * 0.72 + sway * 0.6, top - w * 0.95)} ${P(x + w * 0.62, top)}Z`);
+      for (let k = 0; k < 5; k++) c.fill(k % 2 ? CM.sage : CM.leafGold, leafPath(x - w * 0.3 + k * w * 0.15 + sway * 0.8, top - w * (0.5 + (k % 3) * 0.2), w * 0.36, w * 0.14, -30 + k * 20 + sway * 4));
+      if (h.kind === 'geranium') for (let k = 0; k < 4; k++) c.fill(k % 2 ? CM.box : CM.blossom, ovalPath(x - w * 0.3 + k * w * 0.2 + sway * 0.9, top - w * (1.05 + (k % 2) * 0.18), 3.6, 3.3));
     } else {
-      const lb = lobes(p.x - p.w * 0.66 + breeze(i, 1), p.x + p.w * 0.66 + breeze(i + 3, 1), top + 3, p.h * 1.15, `s3nb/chil${i}`, 4);
-      a.fill(CM.sage, lb);
-      outline += lb;
-      for (let k = 0; k < 4; k++) {
-        const px = p.x - 12 + k * 8 + breeze(i + k, 1.6);
-        const py = top - 12 - (k % 2) * 9;
-        c.fill(CM.leafRust, leafPath(px, py + 6, 13, 3.4, 80 + breeze(k, 10)));
+      let dd = '';
+      const n = h.kind === 'chives' ? 12 : 9;
+      for (let k = 0; k < n; k++) {
+        const bx = x - w * 0.36 + (w * 0.72 * k) / (n - 1);
+        const Lb = w * (h.kind === 'rosemary' ? 1.45 : h.kind === 'chives' ? 1.3 : 0.85) * (0.75 + ((k * 37) % 10) / 30);
+        const tip = sway * (0.6 + (k % 3) * 0.25);
+        dd += `M${P(bx, top)}Q${P(bx + tip * 0.4, top - Lb * 0.5)} ${P(bx + tip, top - Lb)}`;
       }
+      (h.kind === 'thyme' ? thyme : blades).push(dd);
+      if (h.kind === 'chives') for (let k = 0; k < 3; k++) c.fill(CM.blossom, ovalPath(x - w * 0.3 + k * w * 0.3 + sway * 0.9, top - w * 1.2 - (k % 2) * 4, 3, 3));
+      if (h.kind === 'rosemary') for (let k = 0; k < 7; k++) c.fill(CM.sage, leafPath(x - w * 0.32 + k * w * 0.11 + sway * 0.5, top - w * (0.4 + (k % 3) * 0.32), 6, 1.8, -70 + sway * 6));
     }
-  }
-  c.ink(stems, 1.6, CM.line);
+  });
+  a.ink(blades.join(''), 1.7, CM.sage);
+  a.ink(thyme.join(''), 2, CM.leafGold);
   // geraniums in the trough (cut by the right edge)
-  const ger = lobes(1066 + breeze(7, 1.2), 1210, 1298, 34, 's3nb/ger', 6);
+  const breeze = (ph: number, amp: number) => amp * (0.7 * Math.sin(t * 2.3 + ph) + 0.3 * Math.sin(t * 5.1 + ph * 1.7));
+  const ger = lobes(1066 + breeze(7, 1.2), 1210, rn(28), 30, 's3nb/ger', 6);
   a.fill(CM.sage, ger);
-  outline += ger;
+  a.ink(ger, INK_PX.hair, CM.ink, 0.4);
   for (let k = 0; k < 6; k++) {
     const gx = 1076 + k * 22 + breeze(k * 1.3, 2);
-    const gy = 1268 - (k % 3) * 6 + breeze(k, 1);
-    c.fill(k % 2 ? CM.blossom : CM.box, ovalPath(gx, gy, 8, 7));
+    const gy = rn(52) - (k % 3) * 6 + breeze(k, 1);
+    c.fill(k % 2 ? CM.blossom : CM.box, ovalPath(gx, gy, 7, 6));
   }
   const dlev = L.at(2);
   for (let k = 0; k < 6; k++) {
     const gx = 1076 + k * 22 + breeze(k * 1.3, 2);
-    const gy = 1268 - (k % 3) * 6 + breeze(k, 1);
-    dlev.fill(k % 2 ? CM.box : CM.brick, ovalPath(gx + 2, gy + 1, 3.4, 3));
+    const gy = rn(52) - (k % 3) * 6 + breeze(k, 1);
+    dlev.fill(k % 2 ? CM.box : CM.brick, ovalPath(gx + 2, gy + 1, 3, 2.6));
   }
-  // ink on the foliage masses: their own lobed outline, left open in places (it carries the form against the water)
-  a.ink(outline, INK_PX.hair, CM.ink, 0.4);
 }
 
 /** The porthole interiors (warm lamp-lit glass + what is inside), static, under the curtains. */
