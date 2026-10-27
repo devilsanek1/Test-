@@ -24,10 +24,12 @@ export type CloudSpec = {
   /** The flat base (y). */
   base: number;
   lobes: Lobe[];
-  /** Crown (the lit caps): size of each crown ellipse vs its lobe, and its shift toward the sun (+ = right). */
-  crown?: {k: number; dx: number; dy?: number};
-  /** Belly: a flat band along the base, its scalloped top `h` px above the base, scallops every `period` px. */
-  belly?: {h: number; period: number};
+  /** Crown (the lit caps): each lobe's cap is an ellipse kx x ky of the lobe, shifted toward the sun (dx of rx, + =
+   *  right) and down from the lobe top (dy of its height); its round bottom shows inside the body. */
+  crown?: {kx: number; ky: number; dx: number; dy?: number};
+  /** Belly: the shaded band along the base; its top edge is a row of puff bottoms hanging over it (arcs bulging DOWN,
+   *  cusps between them) `h` px above the base at the cusps, `dip` px lower in each arc's middle; one per `period`. */
+  belly?: {h: number; period: number; dip?: number};
   /** Sampling step (px). */
   step?: number;
 };
@@ -71,34 +73,34 @@ export function cloudPaths(c: CloudSpec): {body: string; crown: string; belly: s
   for (let x = xa; x < xb; x += step) top.push([x, cloudTop(c, x)]);
   top.push([xb, c.base]);
   const body = polyPath([[xa, c.base], ...top, [xb, c.base]]);
-  // belly: max(envelope, the scalloped band top)
+  // belly: the band under the puffs' round bottoms (arcs bulging down, cusps between), never above the envelope
   let belly = '';
   if (c.belly) {
-    const {h, period} = c.belly;
+    const {h, period, dip = h * 0.45} = c.belly;
     const pts: Pt[] = [];
     for (let x = xa; x <= xb; x += step) {
       const ph = ((x - xa) / period) % 1;
-      const sc = Math.sin(ph * Math.PI); // one shallow arch per scallop
-      const yb = c.base - h * (0.62 + 0.38 * sc);
+      const arc = Math.sqrt(Math.max(0, 1 - (2 * ph - 1) ** 2)); // 0 at the cusps, 1 mid-arc
+      const yb = c.base - h + dip * arc;
       pts.push([x, Math.max(cloudTop(c, x), yb)]);
     }
     belly = polyPath([[xa, c.base], ...pts, [xb, c.base]]);
   }
-  // crowns: per lobe, an ellipse pushed toward the sun, clamped inside the body and above the belly band
+  // crowns: per lobe, an ellipse pushed toward the sun, clamped inside the body (its round bottom stays visible; the
+  // belly, drawn over it, cuts any cap that reaches the base)
   let crown = '';
   if (c.crown) {
-    const {k, dx, dy = 0.04} = c.crown;
+    const {kx, ky, dx, dy = 0.03} = c.crown;
     for (const l of c.lobes) {
       const rx = l[1] / 2;
       const ry = c.base - l[2];
-      const rxc = rx * k;
-      const ryc = ry * k * 0.82;
+      const rxc = rx * kx;
+      const ryc = ry * ky;
       const cx = l[0] + rx * dx;
       const cy = l[2] + ry * dy + ryc;
-      const floorY = c.base - (c.belly ? c.belly.h * 1.05 : ry * 0.25);
-      const pts = ellPts(cx, cy, rxc, ryc, 44).map(([x, y]): Pt => {
+      const pts = ellPts(cx, cy, rxc, ryc, 48).map(([x, y]): Pt => {
         const xx = Math.min(xb - 1, Math.max(xa + 1, x));
-        return [xx, Math.min(floorY, Math.max(y, cloudTop(c, xx)))];
+        return [xx, Math.min(c.base, Math.max(y, cloudTop(c, xx)))];
       });
       crown += polyPath(pts);
     }
@@ -108,49 +110,58 @@ export function cloudPaths(c: CloudSpec): {body: string; crown: string; belly: s
 
 // ---------------------------------------------------------------- the top-gutter clouds
 
-/** END coords. Base <= 272 and every lobe top >= 0 (the top edge may cut a lobe): at the start the far plane scales
- *  1.08x about the horizon, so these points move UP there (never down into the band margin 290-317). */
+/** END coords. Every base <= 270 and the lobes reach up to (and past) the top edge: at the start the far plane scales
+ *  1.08x about the horizon, so these points move UP there (never down into the band margin 290-317). At the end A is
+ *  cut by the left edge and B by the right; at the start B fills the left and C enters at the right. */
+const TOP_CROWN = {kx: 0.7, ky: 0.33, dx: 0.2, dy: -0.02};
 export const TOP_CLOUDS: CloudSpec[] = [
-  // A: cut by the LEFT edge at the end (x -470..560)
+  // A: cut by the LEFT edge at the end (x -440..490)
   {
-    base: 268,
+    base: 264,
     lobes: [
-      [-360, 260, 168],
-      [-200, 330, 110],
-      [-20, 300, 92],
-      [150, 340, 64],
-      [330, 300, 112],
-      [470, 200, 170],
+      [-340, 200, 190],
+      [-210, 300, 134],
+      [-50, 330, 74],
+      [60, 150, 30],
+      [140, 300, 42],
+      [270, 240, 98],
+      [372, 200, 150],
+      [446, 90, 206],
     ],
-    crown: {k: 0.7, dx: 0.2},
-    belly: {h: 34, period: 120},
+    crown: TOP_CROWN,
+    belly: {h: 30, period: 112, dip: 13},
   },
-  // B: cut by the RIGHT edge at the end, the left one at the start (x 610..1560)
+  // B: cut by the RIGHT edge at the end, the left one at the start (x 670..1630)
   {
-    base: 258,
+    base: 246,
     lobes: [
-      [690, 170, 176],
-      [820, 300, 104],
-      [990, 360, 30],
-      [1170, 300, 78],
-      [1330, 330, 52],
-      [1490, 170, 150],
+      [730, 120, 196],
+      [830, 240, 128],
+      [966, 290, 54],
+      [1050, 150, 4],
+      [1126, 250, 18],
+      [1250, 300, 66],
+      [1400, 280, 104],
+      [1520, 200, 150],
+      [1590, 80, 200],
     ],
-    crown: {k: 0.7, dx: 0.2},
-    belly: {h: 36, period: 130},
+    crown: TOP_CROWN,
+    belly: {h: 30, period: 120, dip: 13},
   },
-  // C: cut by the right edge at the start (x 1640..2520)
+  // C: cut by the right edge at the start (x 1700..2600)
   {
     base: 270,
     lobes: [
-      [1720, 200, 170],
-      [1860, 320, 92],
-      [2040, 360, 46],
-      [2230, 330, 100],
-      [2420, 240, 150],
+      [1770, 140, 204],
+      [1880, 260, 124],
+      [2026, 320, 54],
+      [2120, 140, 26],
+      [2210, 300, 70],
+      [2370, 280, 122],
+      [2520, 180, 190],
     ],
-    crown: {k: 0.7, dx: 0.2},
-    belly: {h: 34, period: 120},
+    crown: TOP_CROWN,
+    belly: {h: 30, period: 112, dip: 13},
   },
 ];
 
@@ -164,9 +175,9 @@ export const TopClouds: React.FC<{seed?: string}> = ({seed = 's5top'}) => {
     const parts = TOP_CLOUDS.map(cloudPaths);
     for (const p of parts) B.fill(SKY.cloudBody, p.body);
     B.layer();
-    for (const p of parts) B.fill(SKY.cloudBelly, p.belly);
-    B.layer();
     for (const p of parts) B.fill(SKY.cloudCrown, p.crown);
+    B.layer();
+    for (const p of parts) B.fill(SKY.cloudBelly, p.belly);
     return B;
   }, []);
   return (
@@ -208,8 +219,8 @@ export const BANK: CloudSpec = {
     [2290, 300, 660],
     [2440, 260, 700],
   ],
-  crown: {k: 0.68, dx: 0.22},
-  belly: {h: 30, period: 150},
+  crown: {kx: 0.68, ky: 0.34, dx: 0.2, dy: -0.02},
+  belly: {h: 24, period: 132, dip: 11},
   step: 3,
 };
 export const BANK_DRIFT = 1.2;
@@ -221,9 +232,9 @@ export const HeroBank: React.FC<{seed?: string}> = ({seed = 's5bank'}) => {
     const p = cloudPaths(BANK);
     B.fill(SKY.bankBody, p.body);
     B.layer();
-    B.fill(SKY.bankBelly, p.belly);
-    B.layer();
     B.fill(SKY.bankCrown, p.crown);
+    B.layer();
+    B.fill(SKY.bankBelly, p.belly);
     return B;
   }, []);
   return (

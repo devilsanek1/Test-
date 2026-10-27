@@ -13,9 +13,9 @@
 //
 // G5b (owner: "way too empty"; the approved pilot's bar, docs/look/LIFE_AND_DENSITY.md): the same desk world as S7
 // round the locked board. Above the band S7's wall top as built (string lights, photos on a cord, the hanging pothos,
-// the sea print, O1's paper star, the attic slope); below it S12_wall.tsx (the leaf print, an embroidery hoop and a
-// taped list, the pinboard in S7's bubble spot, the shelf with books and a trailing pothos, the postcard, the calendar,
-// the socket, sticky reminders); O1's lamp with its shade cut by the left edge and its pull chain (the loop); S7's back
+// the sea print, O1's paper star, the attic slope); below it S12_wall.tsx (fixer pass: S7's wall, its leaf print and
+// pinboard at S7's positions, the socket, O1's window behind the laptop with a list taped to the glass and two sticky
+// reminders; the laptop shows S16's desktop); O1's lamp with its shade cut by the left edge and its pull chain (the loop); S7's back
 // row (books, pen cup, succulent, the candle, the speaker, the mug); S12_desk.tsx (headphones, mittens, the charger
 // into the laptop, sticky notes, glasses, clementines; the notebook, biscuits, letters, a clip dish, your phone face
 // down, the planner, the radio). Pip on the desk left of the tag: follows the stick in, leans in to read the tag as
@@ -34,7 +34,7 @@ import {Ink} from '../../../lib/Ink';
 import {blob, hline, line, smooth} from '../../../lib/sketch';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
-import {EMBER, floatCam, Lamp, Laptop, laptopGeo, PriceTag, PullChain, quadPt, ring, StickFlight, tagHole, textW, type Pt} from '../kit';
+import {EMBER, floatCam, Lamp, Laptop, laptopGeo, PriceTag, PullChain, quadPt, ring, ScreenDesktop, StickFlight, tagHole, textW, type Pt} from '../kit';
 import {S7DeskBack, S7Mug, S7WallTop} from './S7_desk';
 import {S12WallLow} from './S12_wall';
 import {S12DeskFront, S12DeskMid, S12Grain, S12Pip, S12Thermos, SteamPuff} from './S12_desk';
@@ -120,7 +120,10 @@ const S12: React.FC = () => {
         <SteamPuff x={912} y={1046} at={NEW_AT + 0.1} />
         <S7Mug />
         <XG m={mat.translate(0, dip)}>
-          <Laptop x={LAP.x} y={LAP.y} w={LAP.w} variant="new" seed="s12/lap" />
+          {/* THE laptop shows S16's desktop (the same laptop the tag hangs from there; fixer pass, G5b review) */}
+          <Laptop x={LAP.x} y={LAP.y} w={LAP.w} variant="new" seed="s12/lap">
+            <ScreenDesktop scr={g.scr} />
+          </Laptop>
         </XG>
         <S12DeskMid port={[PORT[0], PORT[1] + dip]} ding={NEW_AT} />
         <S12Pip beats={{stick: STICK_T, strike: STRIKE_AT, ding: NEW_AT, on: ON_AT}} />

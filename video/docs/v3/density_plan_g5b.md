@@ -128,6 +128,9 @@ at full size (1080 x 1920): the 540 x 960 G5 render blurred every fine line.
 ### S7 (16.60-18.28) CLOSE at your desk, home base (meter: 0.6 ev/s, 88 % static, 71 % flat, 11 % detail)
 - **Locked:** the laptop (420 px) in the lamp pool, the lamp shade cut by the left edge, the see-inside bubble upper right
   (x ~560-780, y ~615-800) on "your" (17.14). No window: it is saved for O1, S13 and S15.
+  **Overridden (G5b fixer, review of the full cut):** "no window" gave the one desk two back walls (O1 / S13 / S15 face the
+  window; S7, S8, S12 and S16 faced a pinboard wall). S7 / S8 / S12 / S16 now show O1's window behind the laptop / tag
+  (`scenes/desk_window.tsx`), the pinboard a side piece; framing and camera unchanged.
 - **DESK_set:** on the wall (y 600-1000) a pinboard between the lamp and the bubble (x 180-470, y 620-840: photos,
   sticky notes, a sea postcard, a ticket) and a small shelf on the right (x 820-1080, y 640-800: a plant, 3 books); 6-8
   string-light bulbs hanging from the top edge (y < 280). Desk back row (y 1000-1100): a book stack, a pen cup, a small
