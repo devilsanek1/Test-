@@ -25,16 +25,18 @@ function sizes(): string[] {
       const a = scr(p, [b.x0, b.y0]);
       const c = scr(p, [b.x1, b.y1]);
       const on = c[0] > 0 && a[0] < 1080 && c[1] > 0 && a[1] < 1920;
+      // the share of the figure in frame (a sliver at an edge during the move does not count as a big figure)
+      const vis = on ? ((Math.min(1080, c[0]) - Math.max(0, a[0])) * (Math.min(1920, c[1]) - Math.max(0, a[1]))) / Math.max(1, (c[0] - a[0]) * (c[1] - a[1])) : 0;
       const cur = best.get(b.key) ?? {h: 0, t: 0, startOn: false};
-      if (on && b.h * k > cur.h) {
+      if (vis >= 0.4 && b.h * k > cur.h) {
         cur.h = b.h * k;
         cur.t = t;
       }
-      if (on && t < 0.75) cur.startOn = true;
+      if (vis > 0.02 && t < 0.75) cur.startOn = true;
       best.set(b.key, cur);
     }
   }
-  const out = ['1. cast size on screen (max over the shot; END height in brackets):'];
+  const out = ['1. cast size on screen (max over the shot while >= 40 % of the figure is in frame; the end size after):'];
   const end = castBoxes(3.2);
   best.forEach((v, key) => {
     const e = end.find((x) => x.key === key);

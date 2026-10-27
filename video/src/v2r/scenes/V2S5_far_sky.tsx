@@ -73,30 +73,39 @@ export function cloudPaths(c: CloudSpec): {body: string; crown: string; belly: s
   for (let x = xa; x < xb; x += step) top.push([x, cloudTop(c, x)]);
   top.push([xb, c.base]);
   const body = polyPath([[xa, c.base], ...top, [xb, c.base]]);
-  // belly: the band under the puffs' round bottoms (arcs bulging down, cusps between), never above the envelope
+  // belly: the band under the puffs' round bottoms (arcs bulging down, cusps between), never above the envelope; the
+  // scallops vary in width (seeded) so the base never reads as a machine-made edge
+  const g = rng(`cloud/${xa.toFixed(0)}/${c.base}`);
   let belly = '';
   if (c.belly) {
     const {h, period, dip = h * 0.45} = c.belly;
+    const cuts: number[] = [xa];
+    while (cuts[cuts.length - 1] < xb) cuts.push(cuts[cuts.length - 1] + period * g.range(0.6, 1.4));
     const pts: Pt[] = [];
+    let k = 0;
     for (let x = xa; x <= xb; x += step) {
-      const ph = ((x - xa) / period) % 1;
+      while (k < cuts.length - 2 && x > cuts[k + 1]) k++;
+      const ph = (x - cuts[k]) / (cuts[k + 1] - cuts[k]);
       const arc = Math.sqrt(Math.max(0, 1 - (2 * ph - 1) ** 2)); // 0 at the cusps, 1 mid-arc
       const yb = c.base - h + dip * arc;
       pts.push([x, Math.max(cloudTop(c, x), yb)]);
     }
     belly = polyPath([[xa, c.base], ...pts, [xb, c.base]]);
   }
-  // crowns: per lobe, an ellipse pushed toward the sun, clamped inside the body (its round bottom stays visible; the
-  // belly, drawn over it, cuts any cap that reaches the base)
+  // crowns: per lobe (lobes taller than 60 px only), an ellipse pushed toward the sun, its size and shift varied a
+  // little (seeded), clamped inside the body (its round bottom stays visible; the belly, drawn over it, cuts any cap
+  // that reaches the base)
   let crown = '';
   if (c.crown) {
     const {kx, ky, dx, dy = 0.03} = c.crown;
     for (const l of c.lobes) {
       const rx = l[1] / 2;
       const ry = c.base - l[2];
-      const rxc = rx * kx;
-      const ryc = ry * ky;
-      const cx = l[0] + rx * dx;
+      const v = [g.range(0.85, 1.12), g.range(0.82, 1.15), g.range(0.7, 1.3)];
+      if (ry < 60 || rx < 55) continue;
+      const rxc = rx * kx * v[0];
+      const ryc = ry * ky * v[1];
+      const cx = l[0] + rx * dx * v[2];
       const cy = l[2] + ry * dy + ryc;
       const pts = ellPts(cx, cy, rxc, ryc, 48).map(([x, y]): Pt => {
         const xx = Math.min(xb - 1, Math.max(xa + 1, x));
@@ -310,4 +319,3 @@ export const SunS5: React.FC<SunProps> = ({x = SUN_END.x, y = SUN_END.y, r = SUN
   );
 };
 
-void rng;

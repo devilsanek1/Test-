@@ -5,7 +5,7 @@
 import './v2r/palette';
 import React from 'react';
 import {Composition, registerRoot} from 'remotion';
-import {CastCrowd, CastS1, KitCast, SHEET, WalkTest} from './v2r/kit/cast/KitCast';
+import {CastCrowd, CastS1, KitCast, SeatTest, SHEET, WalkTest} from './v2r/kit/cast/KitCast';
 
 const CastRoot: React.FC = () => (
   <>
@@ -13,6 +13,7 @@ const CastRoot: React.FC = () => (
     <Composition id="CastS1" component={CastS1} fps={60} width={1080} height={1920} durationInFrames={120} />
     <Composition id="CastCrowd" component={CastCrowd} fps={60} width={1080} height={1920} durationInFrames={120} />
     <Composition id="CastWalk" component={WalkTest} fps={60} width={1080} height={300} durationInFrames={120} />
+    <Composition id="CastSeats" component={SeatTest} fps={60} width={1080} height={1920} durationInFrames={120} />
   </>
 );
 

@@ -1072,8 +1072,8 @@ function seatSideParts(m: Model, o: SeatOpts, view: 'rear34' | 'profile'): Part[
   const hug = arms === 'hug';
   const off = r34 ? 0.035 * h : 0;
   const hip: Pt = [r34 ? -0.06 * h : -0.03 * h, -0.085 * h];
-  const knee: Pt = hug ? [-0.3 * h, -0.37 * h] : [-0.46 * h, -0.15 * h];
-  const ankle: Pt = hug ? [-0.37 * h, 0.015 * h] : [-0.52 * h, 0.03 * h];
+  const knee: Pt = hug ? [-0.3 * h, -0.37 * h] : [-0.43 * h, -0.17 * h];
+  const ankle: Pt = hug ? [-0.37 * h, 0.015 * h] : [-0.5 * h, 0.03 * h];
   const lw = (child ? 0.072 : 0.08) * h;
   const leg = (k: string, dx: number, dy: number) => {
     if (lod > 2) return;
@@ -1215,8 +1215,9 @@ function seatSideParts(m: Model, o: SeatOpts, view: 'rear34' | 'profile'): Part[
     el = [knee[0] + 0.05 * h, knee[1] - 0.06 * h];
     hand = [hcx - r * 0.85, hcy + r * 0.8];
   } else if (arms === 'back') {
-    hand = [r34 ? off + ws * 1.4 : sh[0] + 0.3 * h, 0.025 * h];
-    el = [(sh[0] + hand[0]) / 2 + 0.01 * h, (sh[1] + hand[1]) / 2];
+    // rear 3/4: the near hand planted behind the near hip; profile: straight back behind the seat
+    hand = r34 ? [off - ws * 1.3, 0.03 * h] : [sh[0] + 0.3 * h, 0.025 * h];
+    el = [(sh[0] + hand[0]) / 2 + (r34 ? -0.012 * h : 0.01 * h), (sh[1] + hand[1]) / 2];
   } else if (arms === 'hug') {
     el = [knee[0] + 0.13 * h, -0.27 * h];
     hand = [ankle[0] + 0.08 * h, -0.2 * h];
