@@ -1,22 +1,21 @@
-# Video 4: state and pick-up notes (PAUSED 2026-10-27)
+# Video 4: state and pick-up notes (RESUMED 2026-10-27 ~22:35 UTC)
 
 For the agent who picks this up later. Read this file first, then `HANDOFF.md` (root), `video/docs/OWNER_PLAYBOOK.md`
 and `video/docs/PIPELINE_V2.md`.
 
-## Why it is paused
-The owner, 2026-10-27 ~14:40 UTC: "lets pause for now. lets make sure the other session finishes its work. only then we
-can proceed with this one". **Don't resume until the owner says go** (the other sessions are v2 and v3; see `HANDOFF.md` 2b).
-
-## Where the work lives
-- Git branch: **`claude/tender-bardeen-j7duak`** (pushed). Not yet merged into `video-production`; merge it when the owner
-  resumes v4 (or ask first).
-- Session that did this: https://claude.ai/code/session_014PwCXHBSouhcawFp12X9sT
+## Who runs it now
+- The owner, 2026-10-27 ~22:35 UTC: "okay lets continue with the video 4 production" (it was paused at ~14:40 UTC so the
+  v2 and v3 sessions could finish first; they were still in flight when it resumed, and they share the weekly limit).
+- Session: https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt, git branch **`claude/busy-lovelace-83r39e`** (the
+  earlier v4 branch `claude/tender-bardeen-j7duak` is merged into it, with `video-production` as of 22:30 UTC). Not yet
+  merged into `video-production`: ask the owner before pushing there.
+- The earlier session (G0, the pause): https://claude.ai/code/session_014PwCXHBSouhcawFp12X9sT.
 
 ## Status by gate
 | Gate | Status | File |
 |---|---|---|
 | G0 topic | **LOCKED**: AI songs and the shared royalty pot | `G0_TOPICS.md` |
-| G0.5 core line | **NOT STARTED** (the run was stopped before any agent finished; nothing produced) | to write: `research/*.md`, `research/factlock.md`, `CORE_LINE.md` |
+| G0.5 core line | **RUNNING** (resumed 2026-10-27 ~22:40 UTC; stages run as max-effort subagents, see "Next step") | `research/*.md`, `research/factlock.md`, `CORE_LINE.md` |
 | G1+ | not started | |
 
 ## The locked topic in one paragraph
@@ -35,14 +34,21 @@ of Beatdapp (NBC, quote partly verbatim, finish it). Full beat outline, sources,
   the core line may ride the wider fuss, not only the royalty mechanism, as long as the video pays it off.
 
 ## Next step: G0.5 (facts + core line)
-Relaunch **unchanged** with the Workflow tool:
-`scriptPath: <repo>/context/workflows/v4-g05-facts-and-core-line-wf_cd902428-060.js`
-(paths inside are absolute `/home/user/Test-/video/...`; adjust if the repo lives elsewhere). It runs:
-3 research lanes (mechanism, the fuss, voices + guardrails) -> `research/factlock.md` -> 6 lever writers -> 4 judges ->
-4 viewer personas + 2 sceptics per finalist -> `CORE_LINE.md` (top 3) -> truth check. About 35 agents.
-Then: show the owner the top 3 lines on one screen; after the pick, archive the rest and go to G1 (story-first script,
-template `context/workflows/v3-g1-story-*.js`, which now enforces the rhythm rule: short sentences of 5 words or
-fewer between the long ones, `video/scripts/voice/check_rhythm.py` OK), then G2 voice via the ElevenLabs API (`video/docs/voice/API_QUICKSTART.md`).
+The workflow `context/workflows/v4-g05-facts-and-core-line-wf_cd902428-060.js` holds the stages and the briefs. The
+resuming session has no Workflow tool, so it runs the same stages as subagents (Agent tool, `effort: max`), stage by
+stage, committing after each: 3 research lanes (mechanism, the fuss, voices + guardrails) -> `research/factlock.md` ->
+6 lever writers -> 4 judges -> 4 viewer personas + 2 sceptics (each sceptic covers every finalist, one verdict per
+line) -> `CORE_LINE.md` (top 3, with a thread idea per pick for the through-line card) -> truth check.
+Then: show the owner the top 3 lines on one screen; after the pick, archive the rest, draft the through-line card
+from the pick (playbook "Hook and pacing"; `docs/look/CRAFT.md` §a) and go to G1 (story-first script, template
+`context/workflows/v3-g1-story-*.js`, which now enforces the rhythm rule: short sentences of 5 words or fewer between
+the long ones, `video/scripts/voice/check_rhythm.py` OK), then G2 voice via the ElevenLabs API
+(`video/docs/voice/API_QUICKSTART.md`). **The key `ELEVENLABS_API_KEY` is not set in the resuming session** (the owner
+was told on 2026-10-27): once the owner adds it as an environment secret, a new session (or a helper session in the
+same environment) sees it; without it, the owner makes the take from our full paste text.
+**Craft tooling lane** (`docs/PIPELINE_V2.md`, "Craft tooling lane" + tooling item 6): the session running v4 owns it
+and it must land before v4's G3; G0-G2 never wait for it. Schedule it against the weekly limit (v2 and the v3 rework
+share it).
 
 ## Files in this folder
 - `G0_TOPICS.md`: the locked topic (only the pick).

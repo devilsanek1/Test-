@@ -13,3 +13,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   "i like B actually - i think there is good amount of fuss about AI songs". -> rule: Taste signals (topics).
 - 2026-10-27, G0.5: "lets pause for now. lets make sure the other session finishes its work" -> the G0.5 run (facts +
   core line) stopped before any agent finished; relaunch it unchanged when the owner says go.
+- 2026-10-27 ~22:35 UTC, G0.5: "okay lets continue with the video 4 production" -> resumed in session
+  https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt (branch `claude/busy-lovelace-83r39e`, the v4 branch merged
+  into it); G0.5 relaunched with the same stages and briefs, run as max-effort subagents (that session has no Workflow
+  tool). The voice key `ELEVENLABS_API_KEY` is not set in that session: the owner was told before G2.
