@@ -14,14 +14,18 @@ import {Batch, P, Pt, rng, ovalPath, lobes, lerp, domePath, r1} from '../kit/can
 import {litAt} from '../kit/canal/life';
 import {Person} from '../kit/cast';
 import * as MAP from '../world/map';
-import {CellPaint, Under, barPath, ringPath, S1_IRON} from './V2S1_set_core';
+import {CellPaint, Under, barPath, ringPath, S1_IRON, hazeBatch} from './V2S1_set_core';
 import {floodAt} from './V2S1_clock';
 
 const S = MAP.S1_SHEET;
 /** The bridge (screen px at zoom 1.00). */
 export const BRIDGE = {x0: -60, x1: 350, railTop: 934, deck: 958, course: 972, base: 1056, arch: {cx: 110, half: 148, spring: 1030, crown: 984}} as const;
+/** The far block behind the wing's west edge (before the haze: ~L* 72 after it, cool, no detail). */
+const CALM_FIELD = '#8F93AE';
 /** Every far building's hidden foot (behind the bridge railing). */
 const FOOT = 944;
+/** How far each far plane mixes toward S1_HAZE (V2S1_set_core): each a clear step, the bridge the nearest. */
+export const HAZE_K = {far: 0.8, mid: 0.62, near: 0.46, bridge: 0.3, rail: 0.36} as const;
 
 // ---------------------------------------------------------------- the far roofs
 
@@ -52,17 +56,19 @@ const FAR: Bld[] = [
 ];
 const MID: Bld[] = [
   {x0: -30, x1: 46, top: 790, wall: CM.stucco, roof: 'mansard', stacks: [[30, 20]], win: {w: 7, h: 10, gx: 16, gy: 20}},
-  {x0: 46, x1: 118, top: 798, wall: CM.brickLight, roof: 'pitch', roofCol: CM.shadeWarm, stacks: [[62, 22], [104, 18]], aerial: [104], win: {w: 7, h: 10, gx: 16, gy: 20}},
+  {x0: 46, x1: 118, top: 798, wall: CM.brickLight, roof: 'pitch', roofCol: CM.shadeWarm, stacks: [[62, 22], [104, 18]], win: {w: 7, h: 10, gx: 16, gy: 20}},
   {x0: 118, x1: 186, top: 786, wall: CM.limestone, roof: 'flat', stacks: [[132, 16], [170, 20]], win: {w: 7, h: 10, gx: 15, gy: 19}},
   {x0: 186, x1: 260, top: 782, wall: CM.brickLight, roof: 'gable', roofCol: CM.shadeWarm, win: {w: 7, h: 10, gx: 16, gy: 20}},
-  {x0: 260, x1: 352, top: 794, wall: CM.stucco, roof: 'pitch', roofCol: CM.shadeCool, stacks: [[280, 24], [330, 20]], aerial: [280], win: {w: 7, h: 10, gx: 16, gy: 20}},
+  {x0: 260, x1: 352, top: 794, wall: CM.stucco, roof: 'pitch', roofCol: CM.shadeCool, stacks: [[280, 24], [330, 20]], win: {w: 7, h: 10, gx: 16, gy: 20}},
 ];
 const NEAR: Bld[] = [
-  {x0: -30, x1: 62, top: 814, wall: CM.brick, roof: 'pitch', roofCol: CM.brickDeep, stacks: [[40, 26]], aerial: [40], win: {w: 11, h: 17, gx: 24, gy: 30}},
+  {x0: -30, x1: 62, top: 814, wall: CM.brick, roof: 'pitch', roofCol: CM.brickDeep, stacks: [[40, 26]], win: {w: 11, h: 17, gx: 24, gy: 30}},
   {x0: 62, x1: 152, top: 808, wall: CM.stucco, roof: 'mansard', stacks: [[84, 24], [138, 22]], win: {w: 11, h: 17, gx: 25, gy: 30}},
   {x0: 152, x1: 222, top: 826, wall: CM.brick, roof: 'flat', tank: true, win: {w: 12, h: 18, gx: 23, gy: 30, arch: true}},
-  {x0: 222, x1: 292, top: 818, wall: CM.brickLight, roof: 'pitch', roofCol: CM.brick, stacks: [[248, 26]], aerial: [248], win: {w: 11, h: 17, gx: 24, gy: 30}},
-  {x0: 292, x1: 356, top: 830, wall: CM.brick, roof: 'flat', garden: true, win: {w: 11, h: 17, gx: 22, gy: 30}},
+  {x0: 222, x1: 292, top: 818, wall: CM.brickLight, roof: 'pitch', roofCol: CM.brick, stacks: [[248, 26]], win: {w: 11, h: 17, gx: 24, gy: 30}},
+  // right behind the wing's west edge: a calm cool block (no windows, no garden), so the wing's pale pier reads
+  // against a clear, darker field (the owner's separation note)
+  {x0: 292, x1: 356, top: 786, wall: CALM_FIELD, roof: 'flat'},
 ];
 /** The far window that lights on 1.80 (TREATMENT f108): the near stucco terrace, top row, second window. */
 const FAR_LIGHT = {row: 'near', bld: 1, k: 1, at: 1.8};
@@ -163,9 +169,12 @@ const FarRoofs: React.FC = () => {
     FAR.forEach((o, i) => bldInto(stat, under, o, `F${i}`, INK_PX.hair));
     stat.layer();
     const wins: {w: WinRef; row: string; bld: number; k: number}[] = [];
-    MID.forEach((o, i) => bldInto(stat, under, o, `M${i}`, INK_PX.hair).forEach((w, k) => wins.push({w, row: 'mid', bld: i, k})));
+    // the two far planes are simpler: no windows (only the near row keeps its sash windows)
+    MID.forEach((o, i) => bldInto(stat, under, o, `M${i}`, INK_PX.hair));
     stat.layer();
     NEAR.forEach((o, i) => bldInto(stat, under, o, `N${i}`, INK_PX.far).forEach((w, k) => wins.push({w, row: 'near', bld: i, k})));
+    // atmospheric perspective: three clear steps toward the haze (the farthest plane nearly the air itself)
+    hazeBatch(stat, [HAZE_K.far, HAZE_K.mid, HAZE_K.near]);
     // window outlines in the underdrawing (near row only: the bare-line state reads as a street of sash windows)
     for (const {w, row, bld} of wins) {
       if (row !== 'near') continue;
@@ -183,11 +192,12 @@ const FarRoofs: React.FC = () => {
     // every other far window holds its frame-0 state
     const on = forced ? t >= FAR_LIGHT.at : litAt(0, 's1farwin', i, n, {litFrac: 0.2, gap: [0.7, 1.6]});
     const v = rng(`s1farwc/${w.key}`).next();
-    const col = on ? CM.lamp : v < 0.5 ? S1_IRON : v < 0.82 ? CM.glass : CM.stoneShade;
+    const col = on ? CM.lamp : v < 0.5 ? CM.stoneShade : CM.glass;
     if (w.arch) wb.fill(col, `M${P(w.x, w.y + w.h)}L${P(w.x, w.y + w.w / 2)}A${r1(w.w / 2)} ${r1(w.w / 2)} 0 0 1 ${P(w.x + w.w, w.y + w.w / 2)}L${P(w.x + w.w, w.y + w.h)}Z`);
     else wb.rect(col, w.x, w.y, w.w, w.h);
     if (row === 'near') wb.rect(CM.limestone, w.x - 1.5, w.y + w.h, w.w + 3, 2.5);
   });
+  hazeBatch(wb, [HAZE_K.near]);
   return (
     <>
       <CellPaint b={stat} seed="s1far/stat" cell={70} misreg={0.6} />
@@ -356,6 +366,7 @@ const Bus: React.FC = () => {
   b.rect(CM.box, xl + L - 24, y0 + 5, 18, 8);
   b.rect(CM.brickDeep, xl, y1 - 10, L, 3);
   for (const wx of [xl + 30, xl + L - 40]) b.fill(CM.coatSlate, ovalPath(wx, y1 - 4, 9, 9));
+  hazeBatch(b, [HAZE_K.bridge]);
   return <CellPaint b={b} seed="s1bus" cell={1000} misreg={0} live />;
 };
 
@@ -428,8 +439,16 @@ const RailBirds: React.FC = () => {
 // ---------------------------------------------------------------- the west gap
 
 export const S1WestGap: React.FC = () => {
-  const body = useMemo(() => bridgeBody(), []);
-  const rail = useMemo(() => bridgeRail(), []);
+  const body = useMemo(() => {
+    const g = bridgeBody();
+    hazeBatch(g.b, [HAZE_K.bridge]);
+    return g;
+  }, []);
+  const rail = useMemo(() => {
+    const g = bridgeRail();
+    hazeBatch(g.b, [HAZE_K.rail]);
+    return g;
+  }, []);
   return (
     <>
       <FarRoofs />

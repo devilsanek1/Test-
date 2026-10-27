@@ -14,6 +14,7 @@ import {Ink} from '../../lib/Ink';
 import {rng} from '../../lib/rng';
 import {CM} from '../palette';
 import {Batch, P, Pt} from '../kit/canal/core';
+import {mixHex} from '../../lib/light';
 
 export type {Pt};
 
@@ -28,6 +29,29 @@ export function offsetFor(seed: string, k = 1): [number, number] {
 /** Tier C's iron and frames (window frames, railings, lamp posts, bollards, aerials, far panes): a MID slate, half way
  *  from the slate to the stone shade (L* ~63), so thin dark bars never read as lines in the calm world (CRAFT §b-§c). */
 export const S1_IRON = '#939AAD';
+
+/** THE HAZE (atmospheric perspective in flat colour; the owner's depth note, 2026-10-27): what the air between us and
+ *  the far city mixes every far plane toward: lighter, cooler and lower in chroma than the warm near world (pale
+ *  rose-lilac, L* ~89, C* ~5), so the warm wing stands clearly in front of the city. */
+export const S1_HAZE = '#EADCD8';
+
+/** Mix a batch's fills toward the haze, layer by layer (`ks[i]` for layer i; the last k for any further layer), and
+ *  drop its ink: a far plane is simpler and carries no lines. */
+export function hazeBatch(b: Batch, ks: number[], haze = S1_HAZE): Batch {
+  b.layers.forEach((l, i) => {
+    const k = ks[Math.min(i, ks.length - 1)];
+    const fills = new Map<string, string[]>();
+    l.fills.forEach((ds, c) => {
+      const m = mixHex(c, haze, k);
+      const a = fills.get(m);
+      if (a) a.push(...ds);
+      else fills.set(m, [...ds]);
+    });
+    l.fills = fills;
+    l.inks = new Map();
+  });
+  return b;
+}
 
 // ---------------------------------------------------------------- CellPaint
 

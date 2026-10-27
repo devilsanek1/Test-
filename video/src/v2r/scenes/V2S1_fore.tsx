@@ -16,6 +16,7 @@ import {Tier} from '../../lib/tier';
 import {CastShadow, ContactShadow, FormShade, Shade, ShadowLayer} from '../../lib/light';
 import {CM} from '../palette';
 import {floodAt} from './V2S1_clock';
+import {BANK_LIT} from './V2S1_steps_stone';
 
 type Pt = [number, number];
 const r1 = (n: number) => Math.round(n * 10) / 10;
@@ -35,7 +36,7 @@ export const FORE = {
 };
 
 // warm values only (a shadow multiplied onto a low-chroma stone reads grey: check_light)
-const STONE_LIT = CM.stucco;
+const STONE_LIT = BANK_LIT;
 const STONE = CM.paving;
 const STONE_MID = CM.coatOat;
 const WOOD = CM.leafGold;
@@ -217,8 +218,8 @@ const CapCluster: React.FC = () => {
     <>
       <F d={rect(424, y - 12, 488, y)} c={RATTAN} s="book" />
       <F d={rect(428, y - 15, 484, y - 12)} c={CM.paper} s="bookP" />
-      {/* a scarf left on the wall, one end hanging down its face */}
-      <F d={`M548 ${y}C566 ${y - 10} 600 ${y - 8} 626 ${y}L634 ${y + 70}C628 ${y + 76} 616 ${y + 76} 610 ${y + 70}L606 ${y + 14}C590 ${y + 10} 566 ${y + 10} 548 ${y + 12}Z`} c={CM.coatMustard} s="scarf" />
+      {/* a scarf left folded on the wall */}
+      <F d={`M548 ${y}C570 ${y - 14} 610 ${y - 12} 640 ${y - 2}L642 ${y + 1}C612 ${y - 3} 574 ${y - 3} 548 ${y + 3}Z`} c={CM.coatMustard} s="scarf" />
       {/* fallen leaves: two on the cap, two on the tread by the planter */}
       <F d={leaf(372, y + 4, 14, 20) + leaf(700, y + 6, 13, -30)} c={CM.leafGold} s="lvG" />
       <F d={leaf(330, 1676, 15, 60) + leaf(566, 1734, 13, -10)} c={RATTAN} s="lvR" />

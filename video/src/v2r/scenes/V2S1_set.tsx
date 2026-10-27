@@ -25,7 +25,7 @@ import * as MAP from '../world/map';
 import {S1WestGap} from './V2S1_set_far';
 import {S1Wing, S1DoorLeaves, S1WingLife} from './V2S1_set_wing';
 import {S1Water, S1FarTowpath, S1PathFurniture, S1Boats, S1FarLife, S1PlaneBranch} from './V2S1_set_life';
-import {S1BankShade, S1BoatStrips, S1TowpathShadows, S1WingShades} from './V2S1_light';
+import {S1BoatStrips, S1TowpathShadows, S1WingShades} from './V2S1_light';
 
 export type S1WorldProps = {
   /** Her figure behind the glass doors (between the lobby and the door glass). */
@@ -81,7 +81,7 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
       <Ducks ducks={[{x: 470, y: 1182, size: 26, drake: true}, {x: 522, y: 1194, size: 24}, {x: 250, y: 1166, size: 22}]} seed="s1ducks" />
     </Env>
     {seated}
-    <S1BankShade />
+    {/* (S1BankShade retired: the near foreground's big things carry their own form and front shades now) */}
     {pip}
   </CanalCast>
 );

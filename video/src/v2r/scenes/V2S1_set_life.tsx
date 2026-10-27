@@ -20,7 +20,8 @@ import {bollardInto} from '../kit/canal/towpath';
 import {Puffs} from '../kit/canal/life';
 import {Person, Seated} from '../kit/cast';
 import * as MAP from '../world/map';
-import {CellPaint, Under, barPath, planeLeaf, S1_IRON} from './V2S1_set_core';
+import {CellPaint, Under, barPath, planeLeaf, S1_IRON, S1_HAZE} from './V2S1_set_core';
+import {mixHex} from '../../lib/light';
 import {s1ArchOpening} from './V2S1_set_far';
 import {floodAt} from './V2S1_clock';
 
@@ -33,6 +34,9 @@ const frac = (x: number) => x - Math.floor(x);
 export const s1Bend = (x: number) => MAP.s1TowpathFeetY(x) - S.herLineFeetY;
 /** The far towpath on the straight: back edge (the wing's foot / the bridge abutment), the coping, the water. */
 export const S1_PATH = {top: 1068, edge: 1111, coping: 15, x0: -40, x1: 1120} as const;
+/** The ONE vanishing point of the ground (our steps' BANK.vp, V2S1_steps_stone): every receding edge runs to it. */
+const VP_X = 540;
+const VP_Y = 965;
 
 function band(x0: number, x1: number, a: number, c: number, off: (x: number) => number): Pt[] {
   const pts: Pt[] = [];
@@ -53,6 +57,15 @@ export const S1FarTowpath: React.FC = () => {
     const off = s1Bend;
     // the paving, in 120 px strips (the bend's far end floods first)
     for (let x = x0; x < x1; x += 120) b.poly(CM.paving, band(x - 1, Math.min(x1, x + 121), top, edge + 1, off));
+    // its slabs: every other one in the second stone, their sides running to the vanishing point (VP_X, VP_Y), finer
+    // and closer in value than our own treads' (the far bank recedes: the owner's depth note)
+    b.layer();
+    const vb = (xe: number) => VP_X + ((xe - VP_X) * (top - VP_Y)) / (edge - VP_Y);
+    for (let xe = x0, i = 0; xe < x1; i++) {
+      const w = 64 * r.range(0.85, 1.15);
+      if (i % 2) b.poly(CM.stucco, [[vb(xe), top + off(vb(xe))], [vb(xe + w), top + off(vb(xe + w))], [xe + w, edge + off(xe + w)], [xe, edge + off(xe)]]);
+      xe += w;
+    }
     // the wall's foot: a darker strip along the back
     for (let x = x0; x < x1; x += 120) b.poly(CM.stucco, band(x - 1, Math.min(x1, x + 121), top, top + 6, off));
     b.layer();
@@ -139,6 +152,8 @@ const REFL: Refl[] = [
   {x0: 120, x1: 280, color: CM.sun, depth: 0},
 ];
 const WATER = {y0: S.water.y0 - 2, y1: S.water.y1 + 2, x0: -40, x1: 1120} as const;
+const WATER_FAR = mixHex(CM.water, S1_HAZE, 0.3);
+const WATER_NEAR = mixHex(CM.water, CM.waterDeep, 0.3);
 
 /** The canal between the far coping and our bank: base colour in regions, the wing's broken reflection and the sun's
  *  (orange only on the sun disc: its reflection is gold), swaying slowly. No ripple dashes, no glints (CRAFT §c). */
@@ -150,6 +165,9 @@ export const S1Water: React.FC = () => {
     const b = new Batch();
     for (let x = x0; x < x1; x += 140) {
       b.rect(CM.water, x - 0.5, y0, 141, H);
+      // depth in three flat steps: the far water toward the haze, the near water a step deeper
+      b.rect(WATER_FAR, x - 0.5, y0 + 9, 141, H * 0.3);
+      b.rect(WATER_NEAR, x - 0.5, y1 - H * 0.3, 141, H * 0.3);
       b.rect(CM.waterDeep, x - 0.5, y0, 141, 9);
     }
     return b;
@@ -164,9 +182,10 @@ export const S1Water: React.FC = () => {
       const depth = ref.depth || 60;
       const W = ref.x1 - ref.x0;
       const rr = rng(`s1refl/${i}`);
-      // band 1: most of the width, band 2 under it: shorter, inset, a calm gap between
-      const h1 = Math.max(4, depth * 0.34);
-      const h2 = Math.max(3, depth * 0.22);
+      // band 1 (far, near the far coping): most of the width, thin; band 2 under it (nearer): shorter, inset and
+      // thicker, a calm gap between (bands thicken toward us: the water recedes)
+      const h1 = Math.max(3, depth * 0.2);
+      const h2 = Math.max(4, depth * 0.32);
       const g1 = W > 300 ? rr.range(0.38, 0.5) : -1;
       if (g1 > 0) {
         b.rect(color, ref.x0 + W * 0.02, rt + 2, W * (g1 - 0.04), h1);

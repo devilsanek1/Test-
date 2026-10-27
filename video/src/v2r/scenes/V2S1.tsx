@@ -33,6 +33,12 @@ import type {ToneKey} from '../../lib/Film';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
+/** PARTICLES SLOT (the owner's note, 2026-10-27: "a bit of particles here and there ... to make things a bit more
+ *  natural"; CRAFT §f): motes drifting in the low sun's light (around SUN0 and over the west gap), a drifting leaf or
+ *  two (from the plane branch, top-left), a few glints on the water (y 1130-1215). Filled from the shared, deterministic
+ *  src/lib/particles.tsx when it lands (the orchestrator's call): never a hand-rolled particle system here. Empty now. */
+const S1Particles: React.FC = () => null;
+
 const V2S1: React.FC = () => (
   <World sky={CM.white} horizon={1000}>
     <Lit rig={RIG_CANAL}>
@@ -40,6 +46,7 @@ const V2S1: React.FC = () => (
       <Look cascade={{at: FLOOD.t0, origin: FLOOD_ORIGIN, speed: FLOOD.speed, pale: S1_PALE, paper: CM.white}}>
         <S1World behindDoor={<S1HerBehindDoor />} towpath={<S1Row />} seated={<S1Steps />} pip={<S1Pip />} />
       </Look>
+      <S1Particles />
       <SunHalf />
     </Lit>
   </World>
