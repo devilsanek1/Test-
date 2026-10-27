@@ -27,9 +27,10 @@ export const PEAK_TONES = {
   deep: T9.pileDeep,
   lit: '#E0B680',
   pin: '#DDBB8C',
-  /** The neighbours' chips: a calm warm brown (L* ~46), never the hero stick's near-black: the pile reads as sticks at
-   *  every zoom without a field of dark rectangles (the owner: "too busy"). */
-  chip: '#96694A',
+  /** The neighbours' chips: a calm warm brown (L* 60, 11 under the gold: CRAFT §c's tier C, <= 15 inside a plane), never
+   *  the summit stick's near-black: the pile reads as sticks at every zoom without a field of dark rectangles (the
+   *  owner: "too busy"), and the subject stick keeps the contrast. */
+  chip: '#B3865F',
   mound: '#B98757',
 } as const;
 
