@@ -23,7 +23,9 @@ its signal, and they keep their FAIL. Px at 1080 x 1920, CIE L* and C*, %W/s = %
    never gone more than 3 s; when the shot is elsewhere it keeps a home spot (a corner, the window, the phone). One
    exception: the film's scale reveal (the pull-back, playbook) runs its full length without it when the move leaves from
    the thread and the next join returns to it (v3: the crane follows the stick that left your laptop); never a tag pinned
-   over the reveal. Every cause beat ends with it reacting (the tag ticks): each shot answers "what did this do to it?"
+   over the reveal. A second, owner-approved exception: a declared FAIRNESS stretch (the other side's equal-weight reply,
+   or a place the subject must never be), which runs without the thread and returns to it at its next join (v2: S5-S7,
+   12.4 s, owner yes 2026-10-27). Every cause beat ends with it reacting (the tag ticks): each shot answers "what did this do to it?"
    (v3: 35 %, gone 17.9 s mid-cause.)
 2. **One home place.** Other places are entered through something in it (window, phone, screen, a paper chart) and left
    the same way; at most 3 places and 1 big scale reveal in 45 s. Information (a chart, a number) is paper in the place the
@@ -53,7 +55,7 @@ its signal, and they keep their FAIL. Px at 1080 x 1920, CIE L* and C*, %W/s = %
 
 **Check** (every join; in brackets ref 1 / v1 / v3 G5b):
 - Shot list (scenes.json `carrier` once the field lands): every join has a carrier letter, at most 2 are F; the thread's
-  screen time summed from it is >= 80 % with no gap over 3 s (the declared scale reveal aside). These two are the FAILs.
+  screen time summed from it is >= 80 % with no gap over 3 s (the declared scale reveal and an owner-approved fairness stretch aside: the 80 % is counted outside them). These two are the FAILs.
 - carry >= 0.25 unless B or D is declared (0.53 / 0.19 / 0.085); eye jump <= 0.10 (0.05 / 0.12 / 0.17); colour shift
   <= 15 unless a light change is declared (10.7 / 11.8 / 24.1); <= 4 movers within 0.4 s of the join, falling weather
   declared aside (2 / 4 / 20). Eye jump and colour shift already flag jumps on a G3 board (v3's board: 0.21 and 35, over

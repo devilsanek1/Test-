@@ -33,6 +33,7 @@
 // string-light bulbs) appear from 0.08-0.3, as the colour floods in.
 import React from 'react';
 import {Fill} from '../../../lib/Fill';
+import {Ink} from '../../../lib/Ink';
 import {Tier} from '../../../lib/tier';
 import {ease, prog, TimeProvider} from '../../../lib/time';
 import {mat, type Mat, XG} from '../../../lib/xf';
@@ -42,7 +43,6 @@ import {
   EMBER,
   floatCam,
   FramedPrint,
-  Glasses,
   Headphones,
   Lamp,
   NightSky,
@@ -53,6 +53,7 @@ import {
   PenCup,
   Plant,
   Show,
+  SkyClouds,
   Smoke,
   Snowfall,
   SnowTree,
@@ -79,6 +80,7 @@ import {
   SourceCore,
   step,
   type Ellipse,
+  type LightRig,
 } from '../kit/Light';
 import {Letters} from './O1_life';
 
@@ -98,8 +100,14 @@ export const DC_AT = {x: 540, y: 952, w: 436};
 /** The lamp (the key) and its pool on the desk: the Nook's own pose, the pool on CRAFT §d's ladder. */
 export const LAMP: LampPose = NOOK.lamp;
 export const POOL: Ellipse = NOOK.pool;
-/** THE nook rig (CRAFT §d.1): every shot of the home reads it (the thread plane too). */
-export const HOME_RIG = nookRig({lamp: LAMP, pool: POOL, glass: GLASS});
+/** THE nook rig (CRAFT §d.1): every shot of the home reads it (the thread plane too). Its ambient step sits at the
+ *  bright end of CRAFT §d.2's ladder (the wall 91 -> 84, the desk 68 -> 64, hue kept peach): the owner's "warm, never
+ *  sickly" room stays warm while the lamp's pool (88 / 93) still leads by +24 L*. */
+export const HOME_AMBIENT = '#F5E5DA';
+export const HOME_RIG: LightRig = (() => {
+  const r = nookRig({lamp: LAMP, pool: POOL, glass: GLASS});
+  return {...r, tints: {...r.tints, ambient: HOME_AMBIENT}};
+})();
 /** The chart card on the wall right of the window (flow_v2 §3) and its plot box (SQB draws the line in it). */
 export const CARD = {x: 975, y: 612, w: 740, h: 416};
 export const PLOT = {x: CARD.x + 137, y: CARD.y + 150, w: CARD.w - 197, h: CARD.h - 232};
@@ -147,7 +155,31 @@ export function homeCam(T: number): HomeCam {
 
 const SKY_BOX: [number, number, number, number] = [GLASS.x - 40, GLASS.y - 40, GLASS.w + 80, GLASS.h + 80];
 const RIDGE = '#4E5B88';
+const RIDGE_HOUSE = '#46527E';
+/** The ridge's top line (x -> y) and the tiny houses standing on it: [x, w, lit]. */
+const RIDGE_PTS: Pt[] = [[140, 918], [230, 906], [330, 922], [430, 900], [520, 914], [640, 896], [760, 912], [860, 902], [940, 914]];
+const RIDGE_Y = (x: number) => {
+  for (let i = 1; i < RIDGE_PTS.length; i++) {
+    const [x0, y0] = RIDGE_PTS[i - 1];
+    const [x1, y1] = RIDGE_PTS[i];
+    if (x <= x1) return y0 + ((y1 - y0) * (x - x0)) / (x1 - x0) + 3;
+  }
+  return RIDGE_PTS[RIDGE_PTS.length - 1][1] + 3;
+};
+const FAR_ROW: [number, number, boolean][] = [
+  [178, 26, true],
+  [206, 22, false],
+  [232, 28, true],
+  [262, 24, false],
+  [292, 26, true],
+  [764, 24, true],
+  [790, 28, false],
+  [820, 24, true],
+  [848, 26, false],
+  [876, 22, true],
+];
 const ROOF = EMBER.roofs;
+const NEAR_HOUSE = '#3E4870';
 
 /** A far house: a flat body and roof, a snow cap, lit panes at the rig's window value (exact, never recoloured). */
 const FarHouse: React.FC<{x: number; w: number; y: number; h?: number; pitch?: number; lit?: [number, number][]; at?: number; color?: string; chimney?: boolean}> = ({x, w, y, h = w * 0.62, pitch = 0.4, lit = [], at, color = ROOF, chimney}) => {
@@ -191,6 +223,7 @@ const HomeDataCenter: React.FC<{T: number}> = ({T}) => {
       at={-0.15}
       seed="home/dc"
       ledColor={DC_LED}
+      ledStyle="bands"
       tier={T >= DC_DARK_AT ? 'subject' : 'support'}
     />
   );
@@ -204,6 +237,10 @@ export const HomeOutside: React.FC<{T: number}> = ({T}) => (
     {/* one far ridge along the horizon (a flat step under the sky) */}
     <Fill d={polyD([[GLASS.x - 40, HORIZON + 4], [GLASS.x - 40, 918], [230, 906], [330, 922], [430, 900], [520, 914], [640, 896], [760, 912], [860, 902], [GLASS.x + GLASS.w + 40, 914], [GLASS.x + GLASS.w + 40, HORIZON + 4]])} color={RIDGE} at={-0.46} offset={false} />
     <Fill rect={[GLASS.x - 40, HORIZON, GLASS.w + 80, GLASS.y + GLASS.h - HORIZON + 40]} color={EMBER.snow} at={-0.44} offset={false} mode="snap" />
+    {/* the far town along the ridge: a row of tiny houses with a few lit panes (flat, far, calm) */}
+    {FAR_ROW.map(([x, w, lit], i) => (
+      <FarHouse key={i} x={x} w={w} y={RIDGE_Y(x + w / 2)} h={w * 0.6} pitch={0.36} color={RIDGE_HOUSE} lit={lit ? [[0.42, 0.34]] : []} at={-0.43} />
+    ))}
     {/* the town on the horizon: left of the data center, then right of it */}
     <FarHouse x={190} w={58} y={HORIZON + 2} lit={[[0.22, 0.3]]} at={-0.42} />
     <FarHouse x={250} w={64} y={HORIZON + 2} h={56} lit={[[0.56, 0.36]]} chimney at={-0.41} />
@@ -211,10 +248,22 @@ export const HomeOutside: React.FC<{T: number}> = ({T}) => (
     <FarHouse x={772} w={56} y={HORIZON + 2} h={82} pitch={0.2} lit={[[0.18, 0.2], [0.6, 0.55]]} at={-0.42} />
     <FarHouse x={836} w={62} y={HORIZON + 2} lit={[[0.4, 0.34]]} chimney at={-0.41} />
     <SnowTree x={758} y={HORIZON + 4} h={70} kind="pine" far seed="home/pine2" at={-0.4} />
+    {/* a slow cloud band behind the data center (visible either side of it), a lighter flat step of the sky */}
+    <Show at={0.15}>
+      <SkyClouds x0={GLASS.x - 260} x1={GLASS.x + GLASS.w + 260} y0={640} y1={790} n={3} w={[240, 420]} speed={7} color="#67769F" seed="home/clouds" />
+    </Show>
     <HomeDataCenter T={T} />
+    {/* one window lights up (a neighbour home: 1.05, in the hook's quiet stretch) */}
+    <LitWindow rect={[836 + 62 * 0.66, HORIZON + 2 - 62 * 0.62 + 62 * 0.62 * 0.36, 62 * 0.16, 62 * 0.62 * 0.26]} at={1.05} />
+    {/* the nearest houses down our street (in front of the horizon, behind the sill): small, a lit pane each */}
+    <FarHouse x={186} w={76} y={1054} h={46} pitch={0.32} color={NEAR_HOUSE} lit={[[0.58, 0.3]]} at={-0.38} />
+    <FarHouse x={772} w={70} y={1050} h={46} pitch={0.32} color={NEAR_HOUSE} lit={[[0.24, 0.3]]} at={-0.38} />
+    <FarHouse x={848} w={64} y={1056} h={44} pitch={0.34} color={NEAR_HOUSE} lit={[[0.56, 0.32]]} chimney at={-0.38} />
     {/* one chimney's smoke drifting right (slow, low contrast) */}
-    <Smoke x={250 + 64 * 0.725} y={HORIZON + 2 - 56 - 64 * 0.4 - 4} seed="home/smoke" at={0.2} ceil={640} />
+    <Smoke x={250 + 64 * 0.725} y={HORIZON + 2 - 56 - 64 * 0.4 - 4} seed="home/smoke" at={0.2} ceil={640} r1={15} rise={120} drift={-70} />
     <Snowfall x={GLASS.x} y={GLASS.y} w={GLASS.w} h={GLASS.h} n={18} size={0.75} speed={0.6} seed="home/snow" at={0.18} />
+    {/* a nearer, slower-looking layer of bigger flakes (still small, low contrast on the sky) */}
+    <Snowfall x={GLASS.x} y={GLASS.y} w={GLASS.w} h={GLASS.h} n={8} size={1.6} speed={0.85} seed="home/snowNear" at={0.22} />
   </Tier>
 );
 
@@ -227,6 +276,31 @@ const RoomRight: React.FC = () => (
     <Fill d={polyD([[1100, -60], [ROOM_X1 + 200, -60], [ROOM_X1 + 200, BEAM_TOP], [1100, BEAM_TOP]])} color={EMBER.slope} at={-0.48} offset={false} />
     <Fill d={polyD([[1112, BEAM_TOP], [ROOM_X1 + 200, BEAM_TOP], [ROOM_X1 + 200, BEAM_BOT], [1120, BEAM_BOT]])} color={EMBER.beam} at={-0.46} offset={false} />
     <Fill rect={[1100, DESK_Y, ROOM_X1 - 1100 + 200, 1000]} color={EMBER.desk} at={-0.47} offset={false} />
+  </>
+);
+
+/** Reading glasses lying on the desk: warm amber lenses (a cool lens would turn grey under the room's warm ambient
+ *  step: CRAFT §d.3), the frame as one hairline thing. */
+const WarmGlasses: React.FC<{x: number; y: number; w: number; rot: number; at?: number}> = ({x, y, w, rot, at}) => {
+  const r = w * 0.22;
+  const lens = (cx: number) => ellipseD({cx, cy: y, rx: r, ry: r * 0.8});
+  const frame = lens(x - w * 0.27) + lens(x + w * 0.27) + `M${x - w * 0.06} ${y - r * 0.2}Q${x} ${y - r * 0.5} ${x + w * 0.06} ${y - r * 0.2}M${x - w * 0.48} ${y - r * 0.3}L${x - w * 0.3} ${y - r * 1.1}M${x + w * 0.48} ${y - r * 0.3}L${x + w * 0.3} ${y - r * 1.1}`;
+  return (
+    <XG m={mat.about(mat.rotate(rot), x, y)}>
+      <Fill d={lens(x - w * 0.27) + lens(x + w * 0.27)} color="#F3D9BC" at={at} offset={false} />
+      <Ink thing d={frame} at={at} width={1.6} color="#8A5A44" />
+    </XG>
+  );
+};
+
+/** A plate with three biscuits (flat, no line, no crumbs). */
+const Biscuits: React.FC<{x: number; y: number; at?: number}> = ({x, y, at}) => (
+  <>
+    <Fill d={ellipseD({cx: x, cy: y, rx: 72, ry: 22})} color={EMBER.card} at={at} offset={false} />
+    <Fill d={ellipseD({cx: x, cy: y - 2, rx: 52, ry: 14})} color={EMBER.paper} at={at} offset={false} />
+    {([[-24, -6, 20], [18, -2, 19], [-2, -16, 18]] as [number, number, number][]).map(([dx, dy, r], i) => (
+      <Fill key={i} d={ellipseD({cx: x + dx, cy: y + dy, rx: r, ry: r * 0.6})} color={EMBER.books[6]} at={at} offset={false} />
+    ))}
   </>
 );
 
@@ -287,7 +361,7 @@ const PINS: Pt[] = [
 /** Two flat notes on the wall right of the card (tier C: flat, no line). */
 const NOTES: {x: number; y: number; w: number; h: number; rot: number; color: string; inner?: string}[] = [
   {x: 1748, y: 640, w: 86, h: 86, rot: 5, color: '#F3C98F'},
-  {x: 1742, y: 770, w: 124, h: 84, rot: -4, color: EMBER.card, inner: '#C7CEE6'},
+  {x: 1742, y: 770, w: 124, h: 84, rot: -4, color: EMBER.card, inner: '#EDC4A6'},
 ];
 const noteD = (n: (typeof NOTES)[number]) => {
   const c: Pt = [n.x + n.w / 2, n.y + n.h / 2];
@@ -309,12 +383,14 @@ const MUG = {x: 872, top: 1130, w: 92};
 const BOOKS_R = {x: 968, y: 1206, w: 128};
 const PENS = {x: 1052, y: 1150, w: 50};
 const GLASSES = {x: 902, y: 1444, w: 110};
+const PLATE = {x: 112, y: 1352};
+const SILL_PLANT = {x: 912, y: 1062};
 const SNAKE = {x: 1806, y: 1214, size: 214};
 const BOOKS_X = {x: 1560, y: 1212, w: 146};
 /** Two closed books lying on the desk's front (flat: a cover, the page block, a ribbon): one right of the phone in
  *  H1 (under the thumb's reach), one on the extension (SQB's right). */
 const DESK_BOOKS: {x: number; y: number; w: number; h: number; rot: number; color: string}[] = [
-  {x: 820, y: 1596, w: 250, h: 180, rot: -8, color: EMBER.books[4]},
+  {x: 820, y: 1596, w: 250, h: 180, rot: -8, color: EMBER.books[2]},
   {x: 1590, y: 1420, w: 220, h: 160, rot: 6, color: EMBER.books[1]},
 ];
 const PENS_X = {x: 1214, y: 1206, w: 54};
@@ -333,6 +409,14 @@ const SHELF_X1 = 116;
 const CUBBIES = [[-30, -30, SHELF_X1 + 30, 298], [-30, 284, SHELF_X1 + 30, 300], [-30, 600, SHELF_X1 + 30, 256]].map((r) => rectD(r[0], r[1], r[2], r[3])).join('');
 const UNDERSIDES = [284, 600, 872].map((y) => rectD(-30, y, SHELF_X1 + 30, 9)).join('');
 const AMBIENT_REGION: [number, number, number, number] = [-600, -600, ROOM_X1 + 1000, 3200];
+/** A clip path that keeps everything OUTSIDE a closed polygon path (a drop shadow falls on the wall, never on the
+ *  card or note that casts it): the region's rect, then the shape reversed (a hole under the nonzero rule). */
+function outside(d: string): string {
+  const pts = d.replace(/Z$/, '').slice(1).split('L').map((p) => p.trim().split(/\s+/).map(Number) as Pt);
+  const rev = pts.slice().reverse();
+  const [x, y, w, h] = AMBIENT_REGION;
+  return rectD(x, y, w, h) + polyD(rev);
+}
 
 export type HomeRoomProps = {
   T: number;
@@ -358,6 +442,7 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
         <Skylight />
         {/* the top band: one print, the string lights along the slope (no glow discs) */}
         <FramedPrint x={430} y={40} w={84} h={100} picture="sun" seed="home/print" at={-0.4} />
+        <FramedPrint x={330} y={84} w={66} h={82} picture="leaf" seed="home/print2" at={-0.4} />
         <StringLights3 points={[[574, 8], [744, 96], [904, 180], [1090, 262]]} sag={18} n={10} r={7} every={1.6} halo={false} seed="home/lights" at={0.18} />
       </Tier>
       {/* the card (paper, exact) and the notes on the wall */}
@@ -390,6 +475,8 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
         <ContactShadow x={MUG.x + MUG.w / 2} y={MUG.top + MUG.w * 1.14} w={MUG.w} />
         <ContactShadow x={BOOKS_R.x + BOOKS_R.w / 2} y={BOOKS_R.y} w={BOOKS_R.w} h={10} />
         <ContactShadow x={GLASSES.x} y={GLASSES.y + 6} w={GLASSES.w} h={7} />
+        <ContactShadow x={PLATE.x} y={PLATE.y + 8} w={150} h={10} />
+        <ContactShadow x={SILL_PLANT.x} y={SILL_PLANT.y} w={30} h={6} />
         <ContactShadow x={SNAKE.x} y={SNAKE.y} w={SNAKE.size * 0.38} h={10} />
         <ContactShadow x={BOOKS_X.x + BOOKS_X.w / 2} y={BOOKS_X.y} w={BOOKS_X.w} h={10} />
         <ContactShadow x={PENS_X.x} y={PENS_X.y} w={PENS_X.w} h={8} />
@@ -401,12 +488,14 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
       <Tier tier="environment">
         {headphones}
         <Plant x={CACTUS.x} y={CACTUS.y} kind="cactus" size={70} seed="home/cactus" at={-0.36} />
+        <Biscuits x={PLATE.x} y={PLATE.y} at={-0.36} />
+        <Plant x={SILL_PLANT.x} y={SILL_PLANT.y} kind="succulent" size={42} seed="home/sillsu" at={-0.36} />
         <Letters x={LETTERS.x} y={LETTERS.y} at={-0.36} />
         <Notebook seed="home/nb" at={-0.4} />
         {mug}
         <BookStack x={BOOKS_R.x} y={BOOKS_R.y} w={BOOKS_R.w} n={2} seed="home/booksR" at={-0.37} />
         <PenCup x={PENS.x} y={PENS.y + 10} w={PENS.w} seed="home/pens" at={-0.36} />
-        <Glasses x={GLASSES.x} y={GLASSES.y} w={GLASSES.w} rot={-10} seed="home/glasses" at={-0.36} />
+        <WarmGlasses x={GLASSES.x} y={GLASSES.y} w={GLASSES.w} rot={-10} at={-0.36} />
         <Plant x={SNAKE.x} y={SNAKE.y} kind="snake" size={SNAKE.size} seed="home/snake" at={-0.36} />
         <BookStack x={BOOKS_X.x} y={BOOKS_X.y} w={BOOKS_X.w} n={3} seed="home/booksX" at={-0.36} />
         <PenCup x={PENS_X.x} y={PENS_X.y} w={PENS_X.w} seed="home/pensX" at={-0.36} />
@@ -423,9 +512,9 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
       <Shade d={CUBBIES} />
       <Shade d={UNDERSIDES} tint="cast" />
       {/* the card and the notes stand a hair off the wall: soft drop shadows down-right; the pins cast too */}
-      <Shadow d={rectD(CARD.x, CARD.y, CARD.w, CARD.h)} dx={6} dy={8} soft={4} tint="form" />
+      <Shadow d={rectD(CARD.x, CARD.y, CARD.w, CARD.h)} dx={6} dy={8} soft={4} tint="form" clip={outside(rectD(CARD.x, CARD.y, CARD.w, CARD.h))} />
       {NOTES.map((n, i) => (
-        <Shadow key={i} d={noteD(n)} dx={4} dy={6} soft={3} tint="form" />
+        <Shadow key={i} d={noteD(n)} dx={4} dy={6} soft={3} tint="form" clip={outside(noteD(n))} />
       ))}
       {PINS.map(([x, y], i) => (
         <Shadow key={i} d={ellipseD({cx: x, cy: y, rx: 9, ry: 9})} dx={4} dy={6} soft={2} />
@@ -434,7 +523,7 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
       <Ambient
         tint={ambientTint(T)}
         region={AMBIENT_REGION}
-        holes={[{rect: [GLASS.x, GLASS.y, GLASS.w, GLASS.h]}, {rect: [NOOK.mullionX - 7, GLASS.y, 14, GLASS.h], kind: 'dark'}, {d: polyD(SKY_PANE)}, {e: POOL}, {of: headphones}]}
+        holes={[{rect: [GLASS.x, GLASS.y, GLASS.w, GLASS.h]}, {rect: [NOOK.mullionX - 7, GLASS.y, 14, GLASS.h], kind: 'dark'}, {d: polyD(SKY_PANE)}, {rect: [CARD.x, CARD.y, CARD.w, CARD.h]}, {e: POOL}, {of: headphones}]}
       />
       <XG m={mat.compose(mat.translate(LAMP.head[0], LAMP.head[1]), mat.rotate(LAMP.rot))}>
         <SourceCore d={ellipseD({cx: 0, cy: 100, rx: 64, ry: 12})} />

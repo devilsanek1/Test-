@@ -2,6 +2,18 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-27 20:19 UTC (hourly)
+
+| part | owner | status |
+|---|---|---|
+| THROUGHLINE.md + conform_L1..L6 | groundwork workflow | director DONE; critic DONE (verdict "fixed", 193cb35): thread = her window, 98 % outside the owner-approved fairness stretch S5-S7; 0 plain cuts; Pip carried across every join; shots avg 4.89 s, 2 places, 1 scale reveal |
+| STYLE / map / scenes.json carriers / rigs.ts / TREATMENT / COMMON | groundwork workflow (integrator) | running |
+| lib/light.tsx + tiered clean pen + kit tiers | engine | DONE (dc9c1bc, 7b400c4); v3 byte-identical |
+| Lanes L1-L6 | cloud helpers | idle; resume when the integrator lands (L1 also builds the look clip) |
+| Sound revision | local, paused | resumes with the new scenes.json carriers |
+
+**Spend:** orchestrator $3,581.50 (+$31 in the last hour); helpers idle. Projection unchanged (~$650-800 to the finished film, ~81-87 % of the week).
+
 ## Snapshot 2026-10-27 19:19 UTC (hourly)
 
 | part | owner | status |

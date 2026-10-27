@@ -7,13 +7,15 @@ your shot, 0.4 scale (`--gl=angle --concurrency=2`). This shot is the owner's ne
 s.
 
 ## 1. Frame 0 drawn in the clean pen (DIRECTION rule 9; replaces the bare-ink f0)
-- t < 0 (the loop underlay) and f0: paper; tier C lands as flat PALE shapes (each fill a pale step toward the paper, no
-  lines); the subject's outline draws on, one stroke per object (her behind the glass door, the door, W), from t ~-0.26
-  so f0 shows it mid-draw; Pip in colour with its tinted line; the sun half-coloured as now. Then the flood from SUN0 by
-  0.30 s, her teal coat last (keep `FLOOD`, `HER_COAT_AT`).
-- `Look cascade` floods from white only (`lib/Fill.tsx` ~l.213-217). Add an opt-in pale pre-state (`cascade.pale`: before
-  the wave a fill is `mix(colour, paper, pale)`; unset = today's paper, so v1 / v3 render the same) and list it as a
-  REQUEST line in the report (an engine edit). Export the t < 0 state for L6 (S8 un-builds onto it) and tell L6.
+- t < 0 (the loop underlay) and f0: paper; everything but the subject lands as flat PALE shapes (each fill a pale step
+  toward the paper, no lines); the subject's outline draws on, one stroke per object (her behind the glass door, the door,
+  W), from t ~-0.26 so f0 shows it mid-draw, with Pip's tinted line (B's lines draw on with the subject; no colour before
+  the flood, so a full-colour Pip at f0 is out: DIRECTION rule 9); the sun half-coloured as now (the flood starts from
+  it). Then the flood from SUN0 by 0.30 s, Pip with it, her teal coat last (keep `FLOOD`, `HER_COAT_AT`).
+- `Look cascade` floods from white only (`lib/Fill.tsx` ~l.213-217). The opt-in pale pre-state (`cascade.pale`: before
+  the wave a fill is `mix(colour, paper, pale)`; unset = today's paper) is the integrator's engine edit (THROUGHLINE §7);
+  if it has not landed when you reach frame 0, add exactly that, check one v3 frame is pixel-identical, and list it under
+  REQUESTS. Export the t < 0 state for L6 (S8 un-builds onto it) and tell L6.
 
 ## 2. Join out, A push-through into W (THROUGHLINE §3)
 5.95-6.25 as built; its `to` becomes [335, 785] (the integrator's scenes.json; L2 moves her window there). Retire the 5 %
@@ -25,22 +27,24 @@ nothing enters, pops or turns but the dive.
 A `LitWindow` (L* 85-92, no glow) to 0.40, then the plum anchor (the lamp click). A at 0-0.40 and 5.59-6.25.
 
 ## 4. Foreground: no stranger's back (DIRECTION rule 3)
-Delete the 6 near head-backs and every seated figure whose head is cut by the bottom edge or whose body is over ~110 px.
-The near steps (y ~1500-1920) hold things only: step edges as flat 2-tone bands, a tote, two takeaway cups, a folded
-newspaper, a scarf left on a step, a bike cut by the bottom-right, a planter of grasses, a few leaves as flat shapes. The
-bottom third stays the densest band. The seated public stays on the lower steps by the water (mid ground), 60-110 px, half
-at rest, no two alike, no dark bun or long dark coat within 300 px of her (look-alike rule).
+Every seated row nearer than the step by the water goes (the near head-backs at y ~1800, the rows at ~1600 and ~1450:
+rows of seated backs in front read as "you"). Those steps (y ~1350-1920) hold things only: step edges as flat 2-tone
+bands, a tote, two takeaway cups, a folded newspaper, a scarf left on a step, a bike cut by the bottom-right, a planter of
+grasses, a few leaves as flat shapes; the bottom third stays the densest band. The seated public stays only on the step
+by the water (feet y ~1280, the mid ground, ~60 px), half at rest, no two alike, no dark bun or long dark coat within
+300 px of her (look-alike rule).
 
 ## 5. Tiers (CRAFT §b)
-A: her + the ghost row (+ the three outlines on 4.98) · W (0-0.40, 5.59-6.25) · the glass door (0.45-1.40). B: Pip, the
-canopy letters (pop 0.97), one far jogger, the seated public. C: everything else. Only A has a full outline; C draws none
-(hairlines for wires and rails). Kit defaults hold; promote with `WingFront wTier` / `tier` / `<Tier>`.
+A: her + the ghost row (+ the three outlines on 4.98) · W (0-0.40, 5.59-6.25) · the glass door with its canopy letters
+(0.45-1.40; the letters pop on "Google" 0.97: a pop is A's, never B's). B: Pip, the seated public by the water. C:
+everything else (the far jogger too). Only A has a full outline; C draws none (hairlines for wires and rails). Kit
+defaults hold; promote with `WingFront wTier` / `tier` / `<Tier>`.
 
 ## 6. Life (<= 3 noticeable supporting movers at once; the hook's novelty is her build only)
-Keep: the hero cloud (2 px/s) + one thin bar (y < 290), the bus once on the far bridge, ONE jogger (passing ~3.85, never
-over her or G1 at 1.8-2.4; x 0-220 clear 4.5-6.1), birds lifting at 1.40 and 4.98 (small, far), one window switch at a time
->= 2 s apart, one slow chimney puff, pigeons at rest. Cut: the bridge cyclist, the duck, the dog trotting down our steps,
-water glints, the near steps' cup and head moves.
+Keep: the hero cloud (2 px/s) + one thin bar (y < 290), the bus once on the far bridge, ONE far jogger, small (C, <= ~60
+px) on the far bend, never crossing her or the row, birds lifting at 1.40 (small, far: her step out), one window switch
+at a time >= 2 s apart, one slow chimney puff, pigeons at rest. Cut: the birds at 4.98 (the hit is the row's), the
+bridge cyclist, the duck, the dog trotting down our steps, water glints, every near-step move.
 
 ## 7. Light: RIG_CANAL (`src/v2r/world/rigs.ts`; if the integrator has not pushed it, create it FIRST from
 `src/entry-v2r-light.tsx`'s `TINT_CANAL` + `CANAL_EVENING`, add RIG_APRIL per THROUGHLINE §5, push before anything else)
@@ -51,10 +55,9 @@ water glints, the near steps' cup and head moves.
   the canopy underside and the step risers one `Shade` step. Rim on her coat's left edge only.
 
 ## 8. Line
-The tiered clean pen is global: in `V2S1*` delete `INK_PX.*` per-element weights and every `over` / `breaks` / `jitter:` /
-`drift` / `misreg` / `open` / `exitLoose` option, hatching, ripple dashes, brick and stone dabs, leaf specks (`grep -nE
-"INK_PX|over:|breaks|jitter:|drift|misreg|hatch\(|scribble|exitLoose|open=" src/v2r/scenes/V2S1*`); keep rng placement
-jitter. The ghosts keep their one closed outline (A on their beat).
+THROUGHLINE §6 "Line": the global pen already cleans every stroke, so don't strip `INK_PX` or sketch options by hand;
+tier your pieces, author A outlines at `INK_PX.mid` or wider, and delete the hand-drawn marks in `V2S1*` (ripple dashes,
+brick and stone dabs, leaf specks). The ghosts keep their one closed outline (A on their beat).
 
 ## 9. Keep exactly
 Frame-0 words, source line, box keys; the exit ding (0.45); her figure, walk, look back; the ghost row (figures, timing,
@@ -63,7 +66,8 @@ ears-cover on "life" (its one reaction).
 
 ## 10. Report (<= 12 lines, `docs/v2/lanes/report_L1.md`, pushed last)
 - The look clip: Film2R frames 0-450 (0-7.5 s, S2's opening from L2) at 0.4 scale with voice; its path.
-- `check_light.py` A/B (`--props='{"lightOff":true}'`) at 0.5, 3.0, 5.3 (`--subject` her + the row): PASS.
+- `check_light.py` A/B (`--props='{"lightOff":true}'`, the sky flags of THROUGHLINE §5) at 0.5, 3.0, 5.3 (`--subject`
+  her + the row): PASS.
 - `scripts/qa/retro_tools/line/measure.py` at 3.0 and 5.3: strokes <= 80 / Mpx, near-miss ends <= 40, dark-line <= 3 %.
-- Eye check at phone size every 1 s (her / W / the row); movers at 2.0-3.0 <= 3; stills at f0, f9 and 5.3 (no
-  stranger's back; y 317-556 pure sky); `npx tsc --noEmit -p .` clean; REQUEST lines (the `pale` edit, map.ts).
+- Eye check at phone size every 1 s (her / W / the row); movers at 2.0-3.0 <= 3; stills at f0 (lines and pale shapes
+  only, the sun aside), f9 and 5.3 (no stranger's back; y 317-556 pure sky); `npx tsc --noEmit -p .` clean; REQUEST lines.

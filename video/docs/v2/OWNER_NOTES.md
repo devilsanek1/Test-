@@ -80,6 +80,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   clean / light / hierarchy / flowing-story rules integrated into STYLE.md + a clean pen for v2r (15:40 UTC).
 - 2026-10-27 18:38 UTC, after the reset: "Okay the limits seem to reset" (taken as the go for the proposed plan: conform v2 to
   DIRECTION.md / CRAFT.md, a look clip of the S1 opening first, the lanes conform after their briefs land).
+- 2026-10-27 ~20:10 UTC: "Yes": S5-S7 (12.4 s: the Arlington crane reveal, the deal board, Google's reply) run without her window
+  (the thread) as a declared fairness exception; the window holds 67 % of the film (98 % outside S5-S7). Rejected: restaging the
+  boards on the canal beside her window (~2 lane-days, weakens equal weight). General rule added (playbook core-line rule, CRAFT §a.1, DIRECTION 1).
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
