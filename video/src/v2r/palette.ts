@@ -51,7 +51,7 @@ export const CM = {
   waterDeep: '#7DAEA8',
   paneUnlit: '#5E6F86',
   // ---- the colour jobs
-  hero: '#0B8577', // canal teal: HER ONLY (coat, door, window frame); 5-15 % on her shots
+  hero: '#0B8577', // canal teal: HER ONLY (coat, door, window frame); present on her shots (she is small, ~0.3 %)
   anchor: '#36223A', // plum: her dark office window, hair, gunwale stripes, board frames, near silhouettes (~5 %)
   pop: '#EE6A2E', // sun orange: the sun disc only (1-3 %)
   sun: '#EE6A2E',
@@ -243,7 +243,7 @@ export type Coverage = {page?: number; hero?: number; pop?: number; anchor?: num
  *  - Pip's body dE76 >= 20 from every ground;
  *  - the hero is unique: no other role and no coat / hair / confetti within dE 20 of the canal teal;
  *  - confetti C* <= 45; nothing grey in the page (C* >= 5);
- *  - with `coverage`: page >= 50 %, hero 5-15 % on her shots (0 % elsewhere is fine), pop <= 3 %, anchor <= ~8 %.
+ *  - with `coverage`: page >= 50 %, hero present (<= 15 %) on her shots (0 % elsewhere is fine), pop <= 3 %, anchor <= ~8 %.
  *  `captured` = colours some module copied at ITS import time: [label, got, want]. */
 export function problems(coverage?: Coverage, captured: [string, string, string][] = []): string[] {
   const out: string[] = [];
@@ -294,7 +294,8 @@ export function problems(coverage?: Coverage, captured: [string, string, string]
     const pct = (x: number) => `${(x * 100).toFixed(1)} %`;
     if (coverage.page !== undefined && coverage.page < 0.5) out.push(`page ${pct(coverage.page)} (< 50 %)`);
     if (coverage.hero !== undefined) {
-      if (coverage.herShot && (coverage.hero < 0.05 || coverage.hero > 0.15)) out.push(`hero ${pct(coverage.hero)} on her shot (want 5-15 %)`);
+      // she is small (people rule): her coat is ~0.3 % of a frame, so her shots need the teal PRESENT, not 5-15 % (STYLE.md)
+      if (coverage.herShot && (coverage.hero <= 0 || coverage.hero > 0.15)) out.push(`hero ${pct(coverage.hero)} on her shot (want > 0, <= 15 %)`);
       if (!coverage.herShot && coverage.hero > 0.15) out.push(`hero ${pct(coverage.hero)} (> 15 %)`);
     }
     if (coverage.pop !== undefined && coverage.pop > 0.03) out.push(`pop ${pct(coverage.pop)} (> 3 %)`);

@@ -15,7 +15,7 @@ import {line, circle as circleInk} from '../../lib/sketch';
 import {Batch, Paint, P, rng, ovalPath, domePath, lobes, leafPath, lerp, frac} from '../kit/canal/core';
 import {Lamp, bikeInto, bollardInto, binInto, planterInto} from '../kit/canal/towpath';
 import {Heron} from '../kit/canal/life';
-import {ROW, PLANE_X, SHADOW, WIND} from './V2S4_wcore';
+import {ROW, PLANE_X, SHADOW, WIND, CLEAN, WINK} from './V2S4_wcore';
 import {benchReaderInto, anglerInto} from './V2S4_wcast';
 
 const [X0, X1] = PLANE_X(1);
@@ -44,7 +44,6 @@ const SEGS: Seg[] = [
 function wallsInto(b: Batch) {
   const r = rng('s4walls');
   const ink: string[] = [];
-  const ticks: string[] = [];
   const pw = 14;
   const gates = SEGS.filter((s) => s.kind === 'gate');
   const walls = SEGS.filter((s) => s.kind !== 'gate');
@@ -56,7 +55,7 @@ function wallsInto(b: Batch) {
     const gx1 = s.x1 - pw;
     b.rect(s.gate as string, gx0, TOP - 4, gx1 - gx0, FOOT - TOP + 4);
     b.fill(s.gate as string, `M${P(gx0, TOP - 4)}Q${P((gx0 + gx1) / 2, TOP - 14)} ${P(gx1, TOP - 4)}Z`);
-    ink.push(line(s.x0, TOP - 12, s.x0, FOOT, {seed: `s4gp${s.x0}`, over: 'small'}) + line(s.x1, TOP - 12, s.x1, FOOT, {seed: `s4gq${s.x0}`, over: 'small'}));
+    ink.push(line(s.x0, TOP - 12, s.x0, FOOT, {...CLEAN, seed: `s4gp${s.x0}`}) + line(s.x1, TOP - 12, s.x1, FOOT, {...CLEAN, seed: `s4gq${s.x0}`}));
   }
   b.layer();
   // P1: copings and pier caps, the coping's shade line, render patches, brick ticks
@@ -67,12 +66,13 @@ function wallsInto(b: Batch) {
       b.rect(CM.stoneShade, s.x0, FOOT - 16, w, 16);
       for (let k = 0; k < 3; k++) b.rect(CM.stoneShade, s.x0 + r.range(10, w - 40), r.range(TOP + 20, FOOT - 40), r.range(14, 30), 2);
     } else {
-      for (let k = 0; k < Math.round(w / 22); k++) ticks.push(`M${P(r.range(s.x0 + 4, s.x1 - 12), r.range(TOP + 10, FOOT - 8))}h${r.range(6, 11).toFixed(1)}`);
       for (let k = 0; k < Math.round(w / 40); k++) b.rect(s.c === CM.brickDeep ? CM.brick : CM.brickDeep, r.range(s.x0 + 4, s.x1 - 16), r.range(TOP + 12, FOOT - 10), r.range(8, 14), 3);
     }
-    ink.push(line(s.x0 - 2, TOP - 7, s.x1 + 2, TOP - 7, {seed: `s4wc${s.x0}`, over: 'small'}));
+    ink.push(line(s.x0 - 2, TOP - 7, s.x1 + 2, TOP - 7, {...CLEAN, seed: `s4wc${s.x0}`}));
   }
   for (const s of gates) for (const px of [s.x0, s.x1 - pw]) b.rect(CM.limestone, px - 3, TOP - 18, pw + 6, 7);
+  // the right-hand pier of each gate casts a short shade east onto the wall beside it (one light: the low sun, west)
+  for (const s of gates) b.poly(CM.shadeWarm, [[s.x1, TOP - 4], [s.x1 + 12, TOP + 2], [s.x1 + 12, FOOT], [s.x1, FOOT]]);
   b.layer();
   // P2: under-coping shade, pier domes, gate planks, straps and knob, railings, the trellis, the wall lamp
   for (const s of walls) b.rect(CM.stoneShade, s.x0 - 2, TOP + 1, s.x1 - s.x0 + 4, 3);
@@ -144,8 +144,7 @@ function wallsInto(b: Batch) {
       for (const [dx, dy] of [[-6, -32], [3, -36], [8, -28]]) b.fill(CM.box, ovalPath(px + dx, TOP + dy, 3.2, 3));
     }
   }
-  b.ink(ticks.join(''), 1.1, CM.brickDeep);
-  b.ink(ink.join(''), INK_PX.far, CM.ink, 0.25);
+  b.ink(ink.join(''), WINK.props, CM.ink, 0.12);
 }
 
 // ---------------------------------------------------------------- paving + coping
@@ -164,20 +163,22 @@ function pavingInto(b: Batch) {
     const h = lerp(10, 18, (y - FOOT) / (COP - FOOT));
     b.poly(r.pick([CM.limestone, CM.stucco, CM.limestone, CM.stoneShade]), [[x, y], [x + w, y + r.jitter(1)], [x + w + 3, y + h], [x + 2, y + h]]);
   }
-  // joints: rows widening toward us, broken runs + cross ticks, never a grid
-  let d = '';
+  b.layer();
+  // slab joints: soft thin shade strips (no lines on the ground), rows widening toward us, broken, never a grid
   const rows = [FOOT + 16, FOOT + 34, FOOT + 54, COP - 3];
   rows.forEach((yy, i) => {
     let x = X0 + r.range(0, 50);
     while (x < X1) {
-      const L = r.range(50, 140);
-      if (r.chance(0.7)) d += `M${P(x, yy + r.jitter(0.8))}L${P(x + L, yy + r.jitter(1))}`;
-      const prev = i === 0 ? FOOT + 4 : rows[i - 1];
-      if (r.chance(0.55)) d += `M${P(x + L * 0.5, prev + 2)}L${P(x + L * 0.5 + r.jitter(2) - (i * 1.5), yy - 1)}`;
-      x += L + r.range(16, 60);
+      const L = r.range(60, 150);
+      if (r.chance(0.6)) b.poly(CM.stoneShade, [[x, yy], [x + L, yy + r.jitter(0.8)], [x + L, yy + 1.6 + i * 0.3], [x, yy + 1.6 + i * 0.3]]);
+      const prev = i === 0 ? FOOT + 6 : rows[i - 1] + 2;
+      if (r.chance(0.45)) {
+        const cx = x + L * 0.5;
+        b.poly(CM.stoneShade, [[cx, prev], [cx + 1.6, prev], [cx + 1.6 - i * 1.4, yy], [cx - i * 1.4, yy]]);
+      }
+      x += L + r.range(24, 70);
     }
   });
-  b.ink(d, 1.2, CM.line);
   // drain grate and a manhole cover
   b.poly(CM.stoneShade, [[456, 1050], [496, 1050], [494, 1060], [458, 1060]]);
   let gr = '';
@@ -203,10 +204,8 @@ function copingInto(b: Batch) {
   const r = rng('s4cop');
   b.rect(CM.limestone, X0, COP, X1 - X0, EDGE - COP);
   b.rect(CM.stoneShade, X0, EDGE - 4, X1 - X0, 4);
-  let j = '';
-  for (let x = X0 + r.range(20, 60); x < X1; x += r.range(60, 110)) j += `M${P(x, COP + 1)}L${P(x + r.jitter(1), EDGE - 3)}`;
-  b.ink(j, 1, CM.shadeCool);
-  b.ink(line(X0, COP, X1, COP + r.jitter(1), {seed: 's4coplip', over: 'small'}), INK_PX.far, CM.ink, 0.2);
+  for (let x = X0 + r.range(20, 60); x < X1; x += r.range(60, 110)) b.rect(CM.stoneShade, x, COP + 1, 1.6, EDGE - COP - 4);
+  b.ink(line(X0, COP, X1, COP, {...CLEAN, seed: 's4coplip'}), WINK.props, CM.ink, 0.1);
   // mooring rings on the coping face, cast-iron bollards on top
   let rings = '';
   for (const x of [262, 520, 868, 1236]) rings += circleInk(x, COP + 6, 4.6, {seed: `s4ring${x}`});
@@ -249,7 +248,7 @@ function furnitureInto(b: Batch) {
     const ri = 9;
     b.fill(q % 2 ? CM.paper : CM.box, `M${P(lx + Math.cos(a0) * R, cy + Math.sin(a0) * R)}A${R} ${R} 0 0 1 ${P(lx + Math.cos(a1) * R, cy + Math.sin(a1) * R)}L${P(lx + Math.cos(a1) * ri, cy + Math.sin(a1) * ri)}A${ri} ${ri} 0 0 0 ${P(lx + Math.cos(a0) * ri, cy + Math.sin(a0) * ri)}Z`);
   }
-  b.ink(circleInk(lx, cy, 17, {seed: 's4buoy'}), 1.4, CM.ink);
+  b.ink(circleInk(lx, cy, 17, {seed: 's4buoy', wobble: 0.004}), WINK.props * 0.8, CM.ink);
 }
 
 /** Leaves skittering east along the paving in the wind (life on the ground), and a few falling from the gardens. */

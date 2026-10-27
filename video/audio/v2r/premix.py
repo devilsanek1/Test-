@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 """Video 2 premix: voice (public/v2/voice.wav) + the bed (public/v2r/music_bed.wav) + every cue in
-public/v2r/cues.json, summed exactly as Film plays them (cue at round(t * 60) frames, linear gain, cut at the film's
-end), then measured and mastered to -14 LUFS / -1 dBTP.
+public/v2r/cues.json, summed exactly as Film plays them (cue at round(t * 60) frames, linear gain; a cue that runs
+past the film's end wraps onto its start, as the loop plays it), then measured and mastered to -14 LUFS / -1 dBTP.
 
     python3 audio/v2r/premix.py          # -> scratchpad v2r/sound/premix.wav + premix_report.json + premix.png
                                          #    and public/v2r/mix.wav (the mastered draft: Film audioSrc, sfx dropped)
 
 Measured (speech = the voiced spans in sheet.py, momentary 400 ms K-weighted loudness unless noted):
   integrated loudness + true peak of the master; the voice over the bed / the music / the air / the SFX bus while it
-  speaks (median, p5, min); every cue's own gap to the voice at its moment (house: >= 8 dB); the 1-4 kHz balance
-  (voice vs everything else, band-limited 400 ms RMS, while it speaks); the loop seam; clicks; and the peak of the
-  raw sum the browser would play (voice + cues at their gains, no master).
+  speaks (median, p5, min); every cue's own gap to the voice at its moment (house: >= 8 dB); the 1-4 kHz balance;
+  THE HIT WORDS (review item 1): the voice >= 6 dB over everything else at 1-4 and 4-10 kHz on every word of
+  sheet.HIT_WORDS (raw energy; the two opening words count a measured-tonal masker 10 dB less, raw reported); every
+  other word reported; the cue onsets against the word onsets (review item 11); the mono fold-down (review item 7);
+  the arc on full range and through a phone-speaker model, and the music's swell in each pause (items 4, 5); the loop
+  seam: sample step, level, and the 2-8 kHz level and the deepest 5 ms dip across it (item 10); clicks; the raw sum.
 """
 from __future__ import annotations
 
@@ -19,13 +22,14 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from dsp import (SR, PUBLIC, VOICE, SCRATCH, N_FILM, FILM_DUR, FPS, np, bp, db2a, a2db, save, load, lufs,  # noqa
-                 true_peak_db, short_term_lufs, click_report, frame_t, n_of)
+from dsp import (SR, PUBLIC, VOICE, SCRATCH, N_FILM, FILM_DUR, FPS, np, ss, bp, db2a, a2db, save, load, lufs,  # noqa
+                 true_peak_db, short_term_lufs, click_report, frame_t, n_of, st)
 import sheet  # noqa: E402
 import measure as M  # noqa: E402
 import mix as HM  # noqa: E402  (audio/mix.py: circular glue + the true-peak limiter)
 
 MIX_OUT = PUBLIC / "mix.wav"
+WORD_MIN = 6.0
 
 
 def speech_mask(t):
@@ -75,9 +79,8 @@ def build_sfx(cues):
         if p not in cache:
             cache[p] = load(p)
         x = cache[p] * c["gain"]
-        i = int(round(frame_t(c["t"]) * SR))
-        n = min(len(x), N_FILM - i)
-        one = np.zeros((N_FILM, 2)); one[i:i + n] = x[:n]
+        one = np.zeros((N_FILM, 2))
+        M.place_wrapped(one, x, frame_t(c["t"]))           # the loop: what runs past the end plays from frame 0
         bus += one
         per.append((c, one))
     return bus, per
@@ -102,6 +105,124 @@ def tpdf16(y, seed=7):
     r = np.random.default_rng(seed)
     q = 1.0 / 32768
     return y + (r.random(y.shape) - r.random(y.shape)) * q
+
+
+# ---------------------------------------------------------------- the review's checks
+BANDS = {"1-4k": (1000.0, 4000.0), "4-10k": (4000.0, 10000.0)}
+
+
+def band_frames(x, band, win=0.03, hop=0.01):
+    m = st(x).mean(axis=1)
+    b = ss.sosfiltfilt(ss.butter(4, band, "bandpass", fs=SR, output="sos"), m)
+    w, h = n_of(win), n_of(hop)
+    c = np.concatenate([[0.0], np.cumsum(b ** 2)])
+    idx = np.arange(0, max(1, len(b) - w), h)
+    return (idx + w / 2) / SR, (c[idx + w] - c[idx]) / w
+
+
+def tonality(y):
+    import sfx
+    return sfx.tonality(y)
+
+
+def word_check(v, bed, per, words):
+    """every word: the voice over (bed + SFX) at 1-4 and 4-10 kHz over its active frames (energy) and its worst
+    30 ms frame; hit words flagged. For sheet.TONAL_RELAXED words the measured-tonal SFX count 10 dB less."""
+    Ev, Er, Ert = {}, {}, {}
+    tonal_bus = np.zeros((N_FILM, 2)); other_bus = np.zeros((N_FILM, 2))
+    cache = {}
+    for c, one in per:
+        src = c["src"]
+        if src not in cache:
+            cache[src] = tonality(load(PUBLIC.parent / src)) >= 0.85
+        if cache[src]:
+            tonal_bus += one
+        else:
+            other_bus += one
+    for bn, band in BANDS.items():
+        tv, Ev[bn] = band_frames(v, band)
+        _, eb = band_frames(bed + other_bus, band)
+        _, et = band_frames(tonal_bus, band)
+        Er[bn] = eb + et
+        Ert[bn] = eb + et * db2a(-sheet.TONAL_MASKING_DB) ** 2
+    hits = {(w, s) for (w, s) in sheet.HIT_WORDS}
+    rows = []
+    for x in words:
+        w, s = x["w"], x["s"]
+        span = (s - sheet.WORD_PAD, x["e"] + sheet.WORD_PAD)
+        row = {"word": w, "t": s, "hit": (w, s) in hits}
+        relaxed = (w, s) in sheet.TONAL_RELAXED
+        for bn in BANDS:
+            m = (tv >= span[0]) & (tv <= span[1])
+            lv = 10 * np.log10(Ev[bn] + 1e-30)
+            act = m & (lv >= lv[m].max() - 12.0) & (lv > -75.0) if m.any() else m
+            if not act.any():
+                row[bn] = None; continue
+            R = Ert[bn] if relaxed else Er[bn]
+            row[bn] = round(float(10 * np.log10(Ev[bn][act].sum() / (R[act].sum() + 1e-30))), 1)
+            row[bn + "_min"] = round(float(np.min(10 * np.log10(Ev[bn][act] / (R[act] + 1e-30)))), 1)
+            if relaxed:
+                row[bn + "_raw"] = round(float(10 * np.log10(Ev[bn][act].sum() / (Er[bn][act].sum() + 1e-30))), 1)
+        rows.append(row)
+    return rows
+
+
+def onsets_vs_words(cues, words):
+    """each cue's first audible sample (-30 dB of its peak envelope) against the nearest heard word onset (json and
+    the voiced-span starts): the review's item 11 (no SFX landing 0-12 ms after a word onset)."""
+    ons = sorted({w["s"] for w in words} | {a for (a, b) in sheet.VOICED})
+    rows = []
+    for c in cues:
+        if c["src"].endswith("music_bed.wav"):
+            continue
+        x = load(PUBLIC.parent / c["src"]).mean(axis=1)
+        e = np.sqrt(np.convolve(x ** 2, np.ones(240) / 240, "same"))
+        on = int(np.argmax(e > e.max() * db2a(-30)))
+        t_on = frame_t(c["t"]) + on / SR
+        near = min(ons, key=lambda o: abs(o - t_on))
+        rows.append({"t": c["t"], "src": c["src"].split("/")[-1][:-4], "onset": round(t_on, 3),
+                     "vs_word_ms": round(1000 * (t_on - near))})
+    after = [r for r in rows if 0 <= r["vs_word_ms"] <= 12]
+    within = [r for r in rows if abs(r["vs_word_ms"]) <= 20]
+    return rows, after, within
+
+
+def mono_fold(x):
+    """the mix's mono fold-down against a coherent reference, 1/6 octave, 200 Hz-12 kHz: the deepest notch (dB)."""
+    nf = 1 << 20
+    seg = x[: min(len(x), nf)]
+    Lm = np.abs(np.fft.rfft(seg[:, 0], nf)) ** 2; Rm = np.abs(np.fft.rfft(seg[:, 1], nf)) ** 2
+    Mm = np.abs(np.fft.rfft(seg.mean(axis=1), nf)) ** 2
+    f = np.fft.rfftfreq(nf, 1 / SR)
+    worst = (0.0, 0.0)
+    for fc in np.geomspace(200, 12000, 80):
+        w = (f >= fc / 2 ** (1 / 12)) & (f < fc * 2 ** (1 / 12))
+        ref = 0.25 * (Lm[w].sum() + Rm[w].sum()) + 0.5 * np.sqrt(Lm[w].sum() * Rm[w].sum())
+        d = 10 * np.log10((Mm[w].sum() + 1e-30) / (ref + 1e-30))
+        if d < worst[0]:
+            worst = (round(float(d), 1), round(float(fc)))
+    return worst
+
+
+def seam_check(x):
+    """across the loop seam: the 2-8 kHz level in the 60 ms before vs after, and the deepest 5 ms RMS within +-40 ms
+    of it against the median 5 ms RMS of the 0.4 s around it (a dropout shows as a deep dip)."""
+    H = n_of(0.4)
+    z = np.concatenate([x[-H:], x[:H]]).mean(axis=1)
+    b = ss.sosfiltfilt(ss.butter(4, [2000, 8000], "bandpass", fs=SR, output="sos"), z)
+    w = n_of(0.06)
+    before = 10 * np.log10(np.mean(b[H - w:H] ** 2) + 1e-20); after = 10 * np.log10(np.mean(b[H:H + w] ** 2) + 1e-20)
+    k = n_of(0.005)
+    e = 10 * np.log10(np.convolve(z ** 2, np.ones(k) / k, "same") + 1e-20)
+    near = e[H - n_of(0.04): H + n_of(0.04)]
+    return {"band_2_8k_before_dB": round(float(before), 1), "band_2_8k_after_dB": round(float(after), 1),
+            "band_2_8k_step_dB": round(float(after - before), 1),
+            "deepest_5ms_dip_vs_median_dB": round(float(near.min() - np.median(e)), 1)}
+
+
+def phone(x):
+    y = ss.sosfilt(ss.butter(4, 350, "highpass", fs=SR, output="sos"), x, axis=0)
+    return ss.sosfilt(ss.butter(2, 12000, "lowpass", fs=SR, output="sos"), y, axis=0)
 
 
 def plot(vs, bed, sfx, mixed, out):
@@ -131,6 +252,7 @@ def plot(vs, bed, sfx, mixed, out):
 def main():
     SCRATCH.mkdir(parents=True, exist_ok=True)
     cues = json.loads((PUBLIC / "cues.json").read_text())
+    words = json.loads((PUBLIC / "voice_words_heard.json").read_text())["words"]
     v = load(VOICE, mono=True); v = np.pad(v, (0, max(0, N_FILM - len(v))))[:N_FILM]
     vs = np.stack([v, v], 1)
     bed = load(PUBLIC / "music_bed.wav")[:N_FILM]
@@ -174,15 +296,38 @@ def main():
                      "band_under_voice_here": (round(here[1] - eb, 1) if here else "pause")})
     rep["cues"] = rows
     rep["cues_closer_than_8dB"] = [r for r in rows if isinstance(r["under_voice_here"], float) and r["under_voice_here"] < 8]
+    # review item 1: the hit words (and every other word, reported)
+    wc = word_check(v, bed, per, words)
+    rep["hit_words"] = [r for r in wc if r["hit"]]
+    rep["hit_words_failing"] = [r for r in wc if r["hit"] and any(r[b] is not None and r[b] < WORD_MIN for b in BANDS)]
+    rep["other_words_under_6dB"] = [r for r in wc if not r["hit"] and any(r[b] is not None and r[b] < WORD_MIN for b in BANDS)]
+    # review item 11: the cues against the word onsets
+    on, after, within = onsets_vs_words(cues, words)
+    rep["cue_onsets"] = on
+    rep["cues_0_12ms_after_a_word"] = after
+    rep["cues_within_20ms_of_a_word"] = len(within)
+    # review item 7: the mono fold-down
+    rep["mono_fold_worst_notch_dB_at_Hz"] = mono_fold(mixed)
+    # review items 4-5: the arc full range / phone, the music in each pause (from bed.py's own report)
+    bedrep = SCRATCH / "bed_report.json"
+    if bedrep.exists():
+        br = json.loads(bedrep.read_text())
+        rep["arc"] = br.get("arc")
+    # review item 10: the seam
     rep["clicks_master"] = click_report(mixed)[0]
     import qc as QC
     rep["loop_seam"] = QC.seam(mixed)
+    rep["loop_seam"].update(seam_check(mixed))
     t1, l1 = short_term_lufs(mixed, win=1.0, hop=0.25)
     rep["section_LUFS_1s"] = {sid: round(float(np.mean(l1[(t1 >= a) & (t1 < b)])), 1) for (sid, a, b) in sheet.SHOTS}
     (SCRATCH / "premix_report.json").write_text(json.dumps(rep, indent=1))
     plot(vs, bed, sfx, mixed, SCRATCH / "premix.png")
-    short = {k: v for k, v in rep.items() if k != "cues"}
+    short = {k: v_ for k, v_ in rep.items() if k not in ("cues", "cue_onsets", "hit_words", "arc")}
     print(json.dumps(short, indent=1))
+    print("hit words: voice over bed + SFX (dB) 1-4 kHz [worst 30 ms], 4-10 kHz [worst 30 ms]:")
+    for r in rep["hit_words"]:
+        raw = f"  (raw {r.get('1-4k_raw')} / {r.get('4-10k_raw')})" if "1-4k_raw" in r else ""
+        print(f"  {r['t']:6.2f} {r['word']:13s} {r['1-4k']} [{r.get('1-4k_min')}]  {r['4-10k']} [{r.get('4-10k_min')}]{raw}")
     print("cues (t, file, gain, dB under the speech level, dB under the voice where it lands, the same in 1-4 kHz):")
     for r in rows:
         print(f"  {r['t']:6.2f} {r['src']:15s} {r['gain']:.4f} {r['under_speech_level']:6.1f} {r['under_voice_here']}"

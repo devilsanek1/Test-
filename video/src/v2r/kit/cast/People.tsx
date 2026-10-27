@@ -6,15 +6,19 @@
 //   <Person x={420} y={1095} h={150} seed="s1/jog" pose="jog" view="profile" walk={{rate: 3}} flip />
 //   <Person x={300} y={980} h={90} seed="s2/w3" pose="walk" view="back" step={stepsAt(t, plan)} />
 //   <Seated x={360} y={1510} h={110} seed="s1/mid/2" cup={k} />
-//   <NearBack x={200} y={1920} hv={300} seed="s1/near/0" traits={{hair: 'hood'}} />
+//   <Seated x={420} y={1510} h={100} seed="s1/mid/3" arms="knees" lean={-4} />          // knees / back / hug / lap
+//   <Seated x={480} y={1510} h={100} seed="s1/mid/4" view="rear34" flip arms="hug" />   // turned: lap, knees, shins
+//   <NearBack x={200} y={1920} hv={150} seed="s1/near/0" traits={{hair: 'hood'}} />   // <= 140 px wide (owner rule)
 //   <WindowPerson x={610} y={540} hb={34} seed="s3/n1" act="water" />
-// Sizes: standing h 16-400 px (LOD: >= 105 full detail, 42-105 simplified, 16-42 fill only, < 16 use FarCrowd);
-// seated h 30-260; near backs hv 200-360; window figures hb 12-60.
+// Sizes (the owner's people rule, 2026-10-27: small and simple like reference 1; no figure wider than ~1/6 of the
+// frame = 180 px; near head-backs <= 140 px wide): standing h 16-220 px (LOD: >= 105 full detail, 42-105 simplified,
+// 16-42 fill only, < 16 use FarCrowd); cyclists <= 172 px (CYCLIST_MAX_H); seated h 30-200; near backs hv 100-170
+// (width capped at 140); window figures hb 12-60.
 
 import React from 'react';
 import {useTime} from '../../../lib/time';
 import {castRow, TraitOverrides, Traits, traitsFor} from './traits';
-import {bustParts, BustOpts, Model, nearParts, seatParts, SeatOpts, StandPose, standParts, View} from './body';
+import {bustParts, BustOpts, Model, nearParts, SeatArms, seatParts, SeatOpts, SeatView, StandPose, standParts, View} from './body';
 import {drawn, gaitOf, selfSteps, STILL} from './gait';
 import {cached, FigureG, inkFor, Lod, lodFor, misregFor, Parts, q100, q2} from './parts';
 
@@ -76,15 +80,22 @@ export type PersonProps = BuildProps & {
   knockout?: boolean;
   /** Inside a parent's ExitSync (a group that leaves as one). */
   noSync?: boolean;
+  /** A child: a bigger head on a narrower body (pass the child's own height in `h`). */
+  child?: boolean;
 };
+
+/** A cyclist is ~1.0 H wide (two wheels and the frame): the owner's people rule (no figure wider than ~1/6 of the
+ *  frame, 180 px) caps a cyclist's height at this. */
+export const CYCLIST_MAX_H = 172;
 
 /** A standing / walking / jogging / cycling member of the public, or (via `model`) any named standing figure. */
 export const Person: React.FC<PersonProps> = (p) => {
   const t = useTime();
   const tr = traitsFor(p.seed, p.traits);
-  const m: Model = {...tr, ...(p.model ?? {})};
-  const H = q2(p.exact ? p.h : p.h * tr.tall);
+  const m: Model = {...tr, ...(p.model ?? {}), ...(p.child ? {child: true} : {})};
   const pose: StandPose = p.pose ?? (p.step !== undefined || p.walk ? 'walk' : 'stand');
+  const H0 = p.exact ? p.h : p.h * tr.tall;
+  const H = q2(pose === 'cycle' ? Math.min(H0, CYCLIST_MAX_H) : H0);
   const view: View = p.view ?? 'back';
   const lod: Lod = p.lod ?? lodFor(H);
   let step = p.step ?? 0;
@@ -120,25 +131,54 @@ export type SeatedProps = BuildProps & {
   side?: 1 | -1;
   /** Head turn -1..1 (a head turns: S1 life, the S2 staffer turning to the reporter). */
   turn?: number;
+  /** The arms' pose: lap (default) | knees (leaning forward, elbows on the knees) | back (leaning back on both hands)
+   *  | hug (hugging the knees). A cup / phone / notebook takes its own arm, a newspaper both. */
+  arms?: SeatArms;
+  /** Lean (deg, + = the head toward screen right): a shear about the seat (pairs lean together; idle sway). */
+  lean?: number;
+  /** back (default) | rear34 | profile (turned to a neighbour: the lap, knees and shins show). Side views face left. */
+  view?: SeatView;
+  /** Face right (side views; a back view mirrors its bag side). */
+  flip?: boolean;
+  /** A child (a bigger head on a narrower body; pass the child's own seated height in `h`). */
+  child?: boolean;
+  /** An arm over a partner's shoulders: the hand at this point relative to the seat point (draw this figure after
+   *  the partner). In the drawn (unflipped) frame. */
+  armAround?: [number, number];
   ink?: number;
   lod?: Lod;
   model?: Partial<Model>;
   noSync?: boolean;
 };
 
-/** A seated back (steps, benches, café chairs). */
+/** A seated figure (steps, benches, café chairs): a back by default, or a rear 3/4 / profile with the lap and knees. */
 export const Seated: React.FC<SeatedProps> = (p) => {
   const tr = traitsFor(p.seed, p.traits);
-  const m: Model = {...tr, ...(p.model ?? {})};
+  const m: Model = {...tr, ...(p.model ?? {}), ...(p.child ? {child: true} : {})};
   const h = q2(p.h * (0.96 + (tr.tall - 0.93) * 0.6));
   const Heq = h / 0.56;
   const lod: Lod = p.lod ?? lodFor(Heq);
-  const o: SeatOpts = {h, lod, seed: p.seed, turn: p.turn === undefined ? undefined : q100(p.turn), cup: p.cup === undefined ? undefined : q100(p.cup), read: p.read, phone: p.phone, notebook: p.notebook === undefined ? undefined : q100(p.notebook), side: p.side};
+  const o: SeatOpts = {
+    h,
+    lod,
+    seed: p.seed,
+    turn: p.turn === undefined ? undefined : q100(p.turn),
+    cup: p.cup === undefined ? undefined : q100(p.cup),
+    read: p.read,
+    phone: p.phone,
+    notebook: p.notebook === undefined ? undefined : q100(p.notebook),
+    side: p.side,
+    arms: p.arms,
+    lean: p.lean === undefined ? undefined : Math.round(p.lean * 10) / 10,
+    view: p.view,
+    child: p.child,
+    armAround: p.armAround ? [q2(p.armAround[0]), q2(p.armAround[1])] : undefined,
+  };
   const key = JSON.stringify(['seat', p.seed, p.traits ?? 0, p.model ?? 0, o]);
   const parts = cached(key, () => seatParts(m, o));
   const inkPx = p.ink ?? (lod >= 2 ? 0 : inkFor(Heq));
   return (
-    <FigureG x={p.x} y={p.y} seed={p.seed} noSync={p.noSync}>
+    <FigureG x={p.x} y={p.y} flip={p.flip} seed={p.seed} noSync={p.noSync}>
       <Parts parts={parts} at={p.at} fillLag={p.fillLag} inkPx={inkPx} offset={lod >= 2 ? false : misregFor(Heq, p.seed)} seed={p.seed} />
     </FigureG>
   );
@@ -148,12 +188,15 @@ export type NearBackProps = BuildProps & {
   /** Centre of the shoulders at the CUT line (canvas px; usually y = 1920). */
   x: number;
   y: number;
-  /** Visible height: head top to the cut (250-330 px on S1's steps). */
+  /** Visible height: head top to the cut. The drawn width is 0.84 hv x broad, held to NEAR_MAX_W (140 px, the
+   *  owner's people rule): past it the head and shoulders stay at the capped size and a longer back shows. */
   hv: number;
   seed: string;
   traits?: TraitOverrides;
   turn?: number;
-  /** Ink px (default 4.8: the front of the depth ladder). */
+  /** Lean (deg, + = the head toward screen right): a shear about the cut. */
+  lean?: number;
+  /** Ink px (default 4.8: the front of the depth ladder; the S1 near row uses 3.4 at <= 140 px). */
   ink?: number;
   model?: Partial<Model>;
 };
@@ -163,11 +206,12 @@ export const NearBack: React.FC<NearBackProps> = (p) => {
   const tr = traitsFor(p.seed, p.traits);
   const m: Model = {...tr, ...(p.model ?? {})};
   const hv = q2(p.hv);
-  const key = JSON.stringify(['near', p.seed, p.traits ?? 0, p.model ?? 0, hv, q100(p.turn ?? 0)]);
-  const parts = cached(key, () => nearParts(m, {hv, seed: p.seed, turn: p.turn === undefined ? undefined : q100(p.turn)}));
+  const lean = p.lean === undefined ? undefined : Math.round(p.lean * 10) / 10;
+  const key = JSON.stringify(['near', p.seed, p.traits ?? 0, p.model ?? 0, hv, q100(p.turn ?? 0), lean ?? 0]);
+  const parts = cached(key, () => nearParts(m, {hv, seed: p.seed, turn: p.turn === undefined ? undefined : q100(p.turn), lean}));
   return (
     <FigureG x={p.x} y={p.y} seed={p.seed}>
-      <Parts parts={parts} at={p.at} fillLag={p.fillLag} inkPx={p.ink ?? 4.8} offset={misregFor(hv * 1.6, p.seed)} seed={p.seed} />
+      <Parts parts={parts} at={p.at} fillLag={p.fillLag} inkPx={p.ink ?? 4.8} offset={misregFor(Math.min(hv, 166) * 1.6, p.seed)} seed={p.seed} />
     </FigureG>
   );
 };
@@ -212,7 +256,7 @@ export const WindowPerson: React.FC<WindowPersonProps> = (p) => {
 
 // ---------------------------------------------------------------- rows
 
-export type SeatedRowSpot = {x: number; y: number; h: number; turn?: number; cup?: number; read?: boolean; phone?: boolean; side?: 1 | -1; traits?: TraitOverrides};
+export type SeatedRowSpot = {x: number; y: number; h: number; turn?: number; cup?: number; read?: boolean; phone?: boolean; side?: 1 | -1; traits?: TraitOverrides; arms?: SeatArms; lean?: number; view?: SeatView; flip?: boolean; child?: boolean};
 
 /** A row of seated backs with no two neighbours alike (castRow). `spots` left to right. */
 export const SeatedRow: React.FC<BuildProps & {seed: string; spots: SeatedRowSpot[]; stagger?: number; ink?: number}> = ({seed, spots, at, stagger = 0.05, ink}) => {
@@ -220,7 +264,7 @@ export const SeatedRow: React.FC<BuildProps & {seed: string; spots: SeatedRowSpo
   return (
     <>
       {spots.map((s, i) => (
-        <Seated key={i} x={s.x} y={s.y} h={s.h} seed={`${seed}/${i}`} traits={pin(row[i])} turn={s.turn} cup={s.cup} read={s.read} phone={s.phone} side={s.side} at={at === undefined ? undefined : at + i * stagger} ink={ink} />
+        <Seated key={i} x={s.x} y={s.y} h={s.h} seed={`${seed}/${i}`} traits={pin(row[i])} turn={s.turn} cup={s.cup} read={s.read} phone={s.phone} side={s.side} arms={s.arms} lean={s.lean} view={s.view} flip={s.flip} child={s.child} at={at === undefined ? undefined : at + i * stagger} ink={ink} />
       ))}
     </>
   );
