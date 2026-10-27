@@ -12,7 +12,7 @@
 import React from 'react';
 import {useTime} from '../../lib/time';
 import {XG} from '../../lib/xf';
-import {PullLayer} from '../../v3/film/kit/Pullback';
+import {PullLayer} from '../../lib/pullback';
 import {craneP, planeMat, startMat, boxMat, wipeMat, swapAt, SWAP_P, T5, PLANES} from './V2S5_rig';
 import {S5StartBack, S5StartFore} from './V2S5_start';
 import {S5Far, S5FarLife} from './V2S5_far';

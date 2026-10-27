@@ -177,7 +177,7 @@ export const KitPip: React.FC = () => {
           'a short trunk with one curl · a three-hair tuft through the head-top gap',
           'teddy-bear soles (one pad, three beans) · two haunch arcs from behind',
           'a short knitted mustard scarf, its two tails lifting in the canal wind',
-          'contour: ONE loose continuous stroke, 2-3 gaps (head top, base, an ear root)',
+          'contour: ONE closed same-hue line (the clean pen, tier B: 1.6-2.2 px; no gaps)',
           `body ${CM.pipBody} · shade ${CM.pipShade} (far ear, far legs) · inner ear ${CM.pipEar} · scarf ${CM.pipScarf} (all C* <= 25: tier B)`,
           'idle always: blink, ear fold-and-flick, breathing, scarf flutter, tuft, tail',
         ].map((s, i) => (

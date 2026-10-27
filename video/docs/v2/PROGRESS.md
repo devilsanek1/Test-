@@ -2,6 +2,17 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-27 21:19 UTC (hourly)
+
+| part | owner | status |
+|---|---|---|
+| Groundwork integrator (STYLE values-only, TREATMENT banner, COMMON, THROUGHLINE §7) | local workflow (resumed after a container restart at ~20:45) | finishing: docs done, final typecheck + push |
+| G4 look clip (S1, 0-~6.3 s) | L1 helper (resumed 20:57) | building: clean-pen frame 0 (pale cascade, subject draw-on), camera locked, tiers, light rig RIG_CANAL, life cut to budget (0e97dec); due ~22:30 |
+| L2-L6 conform | helpers, idle | wait for the owner's approval of the look clip (approved pipeline: G4 before the lanes) |
+
+**Spend:** orchestrator $3,607.51 (+$26 in the last hour); L1 +$28.5 since 20:57. Owner 20:59: session 13 % (resets ~23:30), weekly 62 %.
+Projection: video 2 needs ~22-28 % more of the week -> ~85-90 % with the v3 rework sharing the week.
+
 ## Snapshot 2026-10-27 20:19 UTC (hourly)
 
 | part | owner | status |

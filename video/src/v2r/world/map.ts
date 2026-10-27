@@ -93,7 +93,7 @@ export type EaseName = keyof typeof EASE;
 /** A zoom key: from -> to over t0..t1 about an anchor. */
 export type ZoomKey = {from: number; to: number; t0: number; t1: number; anchor: XY; ease: EaseName};
 export const zoomAt = (k: ZoomKey, t: number): number => k.from + (k.to - k.from) * EASE[k.ease](prog(t, k.t0, k.t1));
-/** The house cubic bezier (same maths as src/v3/film/kit/Pullback.tsx `cubicBezier`), for S5's progress. */
+/** The house cubic bezier (same maths as src/lib/pullback.tsx `cubicBezier`), for S5's progress. */
 export const cubicBezier = (x1: number, y1: number, x2: number, y2: number) => (u: number): number => {
   if (u <= 0) return 0;
   if (u >= 1) return 1;
@@ -139,6 +139,9 @@ export const SKYLINE_EXCEPTIONS = {
   sunTopMinY: 575,
   /** S5: the cloud bank and the obelisk tops stay at y >= 610. */
   s5CloudObeliskTopMinY: 610,
+  /** The two foreground wipers (S5's blossom tree into S6, S7's narrowboat into S8) are clipped at y >= 560: they may
+   *  cross y 560-600 (covering the suns' tops), never the band. */
+  wiperClipMinY: 560,
   /** S1 sky life above the band: the hero cloud (y 120-280) and a plane branch in the top-left gutter (y 0-240). */
   s1SkyLife: 'hero cloud y 120-280 upper right, drifting 2 px/s; plane branch x 0-220, y 0-240',
 } as const;
@@ -752,13 +755,15 @@ export const S4 = {
   /** The A push-through from S3 pulls back out of her head here (14.86-15.01); the name tag pops on "She" 15.07. */
   pullFrom: {x: 720, y: 912} as XY,
   /** THE THREAD in S4 (THROUGHLINE §1.2, §2): her house's first-floor French window ahead at the far left, in the backs
-   *  plane (0.6x the path's 310 px truck): half in from the left edge by ~15.4, whole by ~16.1-16.3; teal frame, Juliet
-   *  rail, blind UP, a DARK pane (she is not home yet); tier B (the thread's home spot), >= 90 px wide; at the stop she
-   *  looks west along the plates toward it, and the push-through into SUN1 leaves from the sun right beside it.
-   *  THROUGHLINE's "~(150, 790)" sits behind the DEC plate (x 110-560, y 755-855, the nearer path plane, up from 18.92),
-   *  which would hide most of it to the join; this spot keeps its x and lifts it clear: 10 px above the plate's top and
-   *  10 px left of SUN1's disc (x >= 185), at its pose (17.96). Never over the plates, the tag or the band. */
-  herWindow: {x: 135, y: 690, w: 90, h: 111} as Spot,
+   *  plane (0.6x the path's 310 px truck: it starts to enter at ~14.95, half in by ~15.6, whole by ~16.3); teal frame,
+   *  Juliet rail, blind UP, a DARK pane (she is not home yet); tier B (the thread's home spot), >= 90 px wide (90 x 102:
+   *  S8's W proportion); at the stop she looks west along the plates toward it, and the push-through into SUN1 leaves
+   *  from the sun right beside it. At its pose (17.96) it sits left of SUN1's disc (x <= 180; the disc reaches x 185) and
+   *  6 px above the DEC plate (x 110-560, y 755-855, on the nearer path plane, up from 18.92): an earlier draft's
+   *  ~(150, 790) sat behind that plate (hidden from 18.92 to the join) and crossed the disc. 47 px stay above it for the
+   *  house's eave, mansard and low chimney pots, all at y >= 600 (the backs' ridges sit at y ~615-620). Never over the
+   *  plates, the tag or the band. */
+  herWindow: {x: 135, y: 698, w: 90, h: 102} as Spot,
   backsPlaneK: 0.6,
   towpathY: [860, 1080] as const,
   /** The fingerpost at the stop (17.96): ONE post at x ~575, two arrow plates pointing WEST, time order top-to-bottom,
@@ -931,7 +936,6 @@ export const S8 = {
   /** Her teal door at the bend (house plane): x 520-610 -> 680-770, y 880-1060. */
   doorPre: {x0: 520, y0: 880, x1: 610, y1: 1060} as Rect,
   door: {x0: 680, y0: 880, x1: 770, y1: 1060} as Rect,
-  /** W above-right of the door (house plane): (700, 700) -> (860, 700) = W, the loop seam. */
   /** W (THE THREAD) above-right of the door (house plane): (700, 700) -> (860, 700) = W, the loop seam. Uncovered by
    *  the boat's stern ~33.0; lights 34.95 (LitWindow + a WindowSpill: the thread's answer). */
   wPre: {x: 700, y: 700, w: 150, h: 170} as Spot,
@@ -1239,7 +1243,7 @@ const s2Shapes = (t: number): Shape[] => {
     ...(t >= S2.aBoardOutAt ? [R('text', 'A-board TOLD THE BBC (8.44)', S2.aBoard)] : []),
     R('mass', 'bench', S2.bench),
     F('figure', 'reporter (seated back)', S2.reporter, SEATED_ASPECT_OVERLAY),
-    F('figure', 'staffer >= 180 px seated (hood 10.36)', S2.staffer, SEATED_ASPECT_OVERLAY),
+    F('figure', 'staffer >= 180 px seated (hood ~10.85)', S2.staffer, SEATED_ASPECT_OVERLAY),
     P('Pip: railing post (590, 1050)', S2.pipSeat),
     R('mass', 'planter of grasses', {x0: 0, y0: 1290, x1: 230, y1: 1650}),
     R('mass', 'paving bands, drain cover, leaves, bundles + crate, the dog at rest (things only)', {x0: 230, y0: 1290, x1: 940, y1: FRAME_H}),
@@ -1345,7 +1349,7 @@ const s8Shapes = (t: number): Shape[] => {
   const dxG = -tr.ghostPlaneDx * (1 - u);
   const dxH = -tr.housePlaneDx * (1 - u);
   const out: Shape[] = [
-    D('sun', 'S8 low sun (420, 640) r 40', SUN8),
+    D('sun', 'SUN8: S8 low sun (420, 625) r 40', SUN8),
     R('mass', 'her terrace at the bend (house plane)', shiftRect({x0: 640, y0: 600, x1: FRAME_W + 160, y1: 1060}, dxH)),
     R('key', 'W: her home window (lights 34.95)', shiftRect(spotRect(W), dxH)),
     R('key', 'her teal door (shuts 34.75)', shiftRect(S8.door, dxH)),
@@ -1392,7 +1396,7 @@ export type ContractIssue = {shot: ShotId | 'ALL'; t: number; what: string; seve
 /** The moments each shot is checked at (its pose + its key beats). */
 export const CHECK_T: Record<ShotId, number[]> = {
   V2S1: [0, 2.0, 4.98, 5.3],
-  V2S2: [6.7, 8.96, 10.36, 12.98],
+  V2S2: [6.7, 8.96, 10.85, 12.98],
   V2S3: [12.98, 13.6, 14.28],
   V2S4: [16.6, 17.96, 19.8, 20.55],
   V2S5: [21.0, 23.62],
@@ -1446,7 +1450,7 @@ export const contractProblems = (): ContractIssue[] => {
     if (d.y - d.r < band.y1) out.push({shot: id, t: 0, what: `sun (${d.x}, ${d.y}) r ${d.r} enters the band`, severity: 'error'});
   });
   [S6.board0, B].forEach((r) => {
-    if (r.y0 - (SUN2.y + SUN2.r) < 15) out.push({shot: 'V2S7', t: 28.06, what: 'SUN2 is < 15 px above a board top', severity: 'error'});
+    if (r.y0 - (SUN2.y + SUN2.r) < 15) out.push({shot: 'V2S7', t: 28.1, what: 'SUN2 is < 15 px above a board top', severity: 'error'});
   });
   if (B.y0 - (SUN8.y + SUN8.r) < 15) out.push({shot: 'V2S8', t: 35.6, what: 'the S8 sun touches her board', severity: 'error'});
   // Staff windows >= 90 x 90; S3 silhouette >= 130 after the ease-back.

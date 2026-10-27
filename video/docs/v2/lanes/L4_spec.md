@@ -38,7 +38,7 @@ Words heard: In 0.12 · April 0.21-0.69 · that 0.82 · meant 0.93 · a 1.17 · 
 ## 2. Space: the planes, the coordinates, the hard screen rules
 - **END coords** = the screen at p 1 (1080 x 1920). **START coords** = the screen at p 0. Each plane is authored in END
   coords (the near-mid and the start figures / news box in START coords) and drawn through its map (`V2S5_rig.ts`
-  `PLANES`; `src/v3/film/kit/Pullback.tsx` `planeMat`, `startMat`, `boxMat`, `PullLayer` = ink-compensated).
+  `PLANES`; `src/lib/pullback.tsx` `planeMat`, `startMat`, `boxMat`, `PullLayer` = ink-compensated).
   | plane | owner file | map at p 0 (start) | seen at the start (END coords) |
   |---|---|---|---|
   | far (sky, clouds, bank, sun, city, obelisk) | V2S5_far | k 1.08 about (540, horizon), slid so the END sun lands on SUN1: ~ -850 px | x ~ 830-1830 |
@@ -170,7 +170,7 @@ never 1 s still. Then, at phone size: does the world keep going, and is it alive
 
 ## 7. The rules every builder keeps (from TREATMENT / COMMON; a break is a must-fix)
 - **No reusable assets:** engine primitives (`lib/Ink`, `Fill`, `sketch`, `persp`, `xf`, `time`, `rng`, `inkComp`, `font`),
-  the v2r kits (`src/v2r/kit/**`), `src/v3/film/kit/Pullback.tsx` and `idle.ts` only. Forking kit code into your own
+  the v2r kits (`src/v2r/kit/**`), `src/lib/pullback.tsx` and `src/lib/idle.ts` (ported from v3's kit, 2026-10-27) only. Forking kit code into your own
   `V2S5_*` file is fine (it is this film's kit); never import v1 sets, the v3 kit, `lib/kit`, the cine generators,
   `lib/mascot` or anything under `src/v2/**`.
 - **Palette "10 Canal Mint" roles only** (`src/v2r/palette.ts` `CM`, steps via kit/dc/core `atm` / `atmShade` / `mix`):

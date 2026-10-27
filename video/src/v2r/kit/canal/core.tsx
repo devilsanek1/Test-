@@ -4,7 +4,7 @@
 //   ink()           the line weight for a thing of a given on-screen size (LOD: far things are fill-only).
 //   H / proj        a plane's homography (a facade drawn flat in metres, mapped onto its screen quad): CanalWing,
 //                   Terrace and the lane use it so a slight 3/4 or a receding wall stays true.
-//   T               the scene clock, plus the shared idle clocks from src/v3/film/kit/idle.ts (a palette-free TOOL).
+//   T               the scene clock, plus the shared idle clocks from src/lib/idle.ts (an engine TOOL).
 // Colours come only from the palette's role tokens (CM). Nothing fades: shapes pop, grow, slide or switch.
 // Clean pen + tiers (src/v2r/pen.ts, README "Tiers"): Paint has NO tier of its own: it draws in the scope it sits in
 // (a kit set's default, a scene's <Tier>, or untagged = support with thin tinted lines). Ink that IS the thing goes in
