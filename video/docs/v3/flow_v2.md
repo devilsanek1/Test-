@@ -9,8 +9,10 @@ cuts in 6 places -> 0 in 2 + 1 reveal; tag gone 17.9 s -> on 91 %; "you" five wa
 - **THREAD = your next laptop's paper tag** on the phone's listing laptop (the FRONT PLANE: screen-fixed, never moved by the world
   camera). On 0-19.2 and 22.45-41.15 (91 %); off only in the declared scale reveal (it leaves from the stick that rose out of the
   tag's laptop; J4 brings it back). $999 -> $1,015 / $1,031 / $1,047 / $1,063 / **$1,079** on O1's launches 1.88 / 2.18 / 2.40 /
-  2.60 / 2.72 ("$999" struck from 1.92) -> **$1,099 on "pass" 30.28** (ding). Reactions: jolt 15.30, tug 18.30, sway 24.44, tick
-  30.28, jolt 35.95, turn 39.70; "$999" again in the loop.
+  2.60 / 2.72 ("$999" struck from 1.92) -> **$1,099 on "pass" 30.28** (ding). Reactions: the tap 0.50, jolt 15.30, tug 18.30,
+  sway 24.44, tick 30.28, jolt 35.95, turn 39.70; "$999" again in the loop. OFF ITS BEATS the tag is tier B (SQA pilot review: a
+  soft terracotta, no outline, the prices in its light tint; full only 0-4.04, 15.30-15.90, 17.24-18.90, 24.44-25.04,
+  29.90-31.00, 35.95-36.98, 38.12-41.15, each switch a 2-step change; `thread_plane.tsx` TAG_FULL).
 - **HOME = the nook, POV:** H1 = O1's framing (glass 180-900 x 630-1060, DC x 322-758) and a chart card pinned right of the window;
   H2 = standing at the glass (the reveal lands there; its far field is wider, so never a direct H1 <-> H2 move: a dolly-zoom).
   **OUTSIDE = one geography:** the DC, the mountain of sticks behind its right side, the town, OUR street with the chip factory's
@@ -36,10 +38,12 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
 
 ## 3. Shared pieces (one owner each; every other builder draws them read-only)
 - **`scenes/home_set.tsx` + `homeCam(T)`** (the SQA pilot): O1's nook extended right, the card (H1 px x 975-1715, y 612-1028) and
-  2-3 flat notes on the wall right of the window (O1's calendar leaves it). O1's pull-out 1.05 -> 1.00 eases out over 0-5.00; J1
-  pans x 0 -> -775 over 5.15-6.45, J2 back over 15.95-17.25 (inOutCubic, peak 14.9 px/f; room and outside together); else float.
+  2-3 flat notes on the wall right of the window (O1's calendar leaves it). The camera is LOCKED through the hook (SQA pilot
+  review: O1's 1.05 -> 1.00 pull-out was a zoom in a hold, DIRECTION rule 8); J1 pans x 0 -> -775 over 5.15-6.45, J2 back over
+  15.95-17.25 (inOutCubic, peak 14.9 px/f; room and outside together); the SQB hold floats.
 - **`scenes/thread_plane.tsx`** (transition agent; from O1's front plane): hand, phone, listing, tag, Pip, ticker; the screen dims a
-  step when the stage leads (lit 0-4.40, 17.24-19.40, 29.90-31.00, 38.12-41.15); price glyphs above y 1480, all left of x 950:
+  step toward peach when the stage leads (lit 0-4.04, 17.24-19.40, 29.90-31.00, 38.12-41.15), the button and badge then a soft
+  blue; the tag's own off-beat schedule is §1's; price glyphs above y 1480, all left of x 950:
 
   | spot | phone (top-left, w; rot -3) | tag box (top-left, w; rot -6) | when (move) |
   |---|---|---|---|
@@ -57,9 +61,12 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
   agent): the window from inside at H2 size, and J4's move.
 
 ## 4. The beats (visuals lead their word by ~0.1 s)
-- **SQA HOOK.** O1 as built (frame-0 lines, cart pop 0.00, sign 0.25, five launches each ticking the tag under the listing laptop,
-  the phone lowers 3.64-4.00, the DC dark with its sign lit 4.04), in the clean pen, with the new ticker, LOW-C, the eased
-  pull-out and Pip on the phone (calm keys).
+- **SQA HOOK.** O1 as built (frame-0 lines, sign 0.25, five launches each ticking the tag under the listing laptop, the phone
+  lowers 3.64-4.00, the DC dark with its sign lit 4.04), in the clean pen, with the new ticker, LOW-C and Pip on the phone (calm
+  keys). After the SQA pilot review: the colour floods out from the tag (the bezel last, every fill one step inside its line);
+  the tap acted after the colour lands (the thumb lifts 0.30-0.40, presses 0.50 on "laptop", the cart pop sound 0.50, the badge
+  0 -> 1 at 0.52); the camera locked; at 4.04 ONE event (the DC dark + sign lit, the thread plane off-beat in the same frame),
+  4.16-4.53 the DC's server rows light one by one.
 - **SQB OLD DEAL.** The card (paper, unlit) at screen x 200-940, y 612-1028, ~150 px of night window at the left edge: "US computer
   prices" 58 px, "same computing power" 34 px, axes, 2005, 2025. 6.98-9.28 the line draws downhill (2021 bump); 10.50 a doodle
   laptop with "$999" lands on it (~2017); 10.82 a shinier BETTER one, same "$999", pops right after; 13.85-14.45 the line hooks

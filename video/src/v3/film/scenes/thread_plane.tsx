@@ -23,7 +23,8 @@
 // state. The screen dims one value step toward peach while the stage leads (lit 0-4.04, 17.24-19.40, 29.90-31.00,
 // 38.12-41.15); the button and the cart badge (left out of the screen's multiply) take a soft blue (C* 18) with no
 // outline and the listing's laptop drops to tier B. The TAG dims to a soft terracotta (C* 38, no outline, the prices
-// in its light tint) everywhere but its own beats (full 0-4.04, 15.30-19.40, 29.90-31.00, 35.95-36.98, 38.12-41.15).
+// in its light tint) everywhere but its own beats (full 0-4.04, 15.30-15.90, 17.24-18.90, 24.44-25.04, 29.90-31.00,
+// 35.95-36.98, 38.12-41.15: TAG_FULL); off-beat its idle sway and the hand's float are halved (eased, never a jump).
 // Every change is a 2-step change (3 frames at the half step, never a fade); at 4.04 the screen, the button and the tag
 // step down in the same frame as the data center goes dark: one event.
 //
@@ -161,12 +162,15 @@ export const SCREEN_LIT: [number, number][] = [
   [38.12, 99],
 ];
 /** The TAG's own beats (film seconds): full strength (A) inside, the off-beat tier B outside. 0-4.04 the hook's ticks;
- *  15.30 its jolt on "almost 10%", carried home through J2's pan into "your laptop runs on memory" (SQC) until the
- *  reveal; 29.90-31.00 the crate and $1,099 on "pass"; 35.95 the jolt as the trucks overtake, until the data center's
- *  sign steps up at 36.98; 38.12 the payoff. */
+ *  15.30 its jolt on "almost 10%" (0.6 s); 17.24 "your laptop" through the tug as THE stick leaves it (18.30 + 0.6: THE
+ *  stick is the subject at 18.86, early SQB-SQF review E2); 24.44 its sway (0.6 s); 29.90-31.00 the crate and $1,099 on
+ *  "pass"; 35.95 the jolt as the trucks overtake, until the data center's sign steps up at 36.98 (a step 0.6 s after J5,
+ *  never inside a join's 0.4 s); 38.12 the payoff. */
 export const TAG_FULL: [number, number][] = [
   [-99, 4.04],
-  [15.3, 19.4],
+  [15.3, 15.9],
+  [17.24, 18.9],
+  [24.44, 25.04],
   [29.9, 31.0],
   [35.95, 36.98],
   [38.12, 99],
