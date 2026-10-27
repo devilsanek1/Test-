@@ -54,6 +54,7 @@ function ringRR(x0: number, y0: number, x1: number, y1: number, r: number, w: nu
 const PORT_Y = 1446;
 const PORT_R = 40;
 const PORTS = [
+  {x: -14, curtain: CM.coatMustard},
   {x: 128, curtain: CM.box},
   {x: 612, curtain: CM.leafRust, plant: true},
   {x: 740, curtain: CM.blossom, box: true},
@@ -98,6 +99,15 @@ function cabinInto(b: Batch) {
     b.rect(CM.anchor, x - 5, GW - 14, 10, 14);
     b.rect(CM.anchor, x - 10, GW - 18, 20, 5);
   }
+  // the beading moulding above the gunwale, rivets along the hull
+  b.rect(CM.limestone, XL, GW - 20, XR - XL, 3);
+  b.rect(CM.shadeCool, XL, GW - 17, XR - XL, 2);
+  for (let x = XL + 8; x < XR; x += 22) b.fill(CM.shadeCool, ovalPath(x, GW + 27, 2.2, 2.2));
+  // a boat hook clipped along the cabin side under the cantrail (brass clips, the hook at its end)
+  b.rect(CM.line, XL, CT + 38, 290, 6);
+  b.layer();
+  for (const x of [26, 190]) b.rect(CM.coatMustard, x - 4, CT + 36, 8, 10);
+  b.ink(`M${P(250, CT + 41)}L${P(262, CT + 41)}Q${P(272, CT + 41)} ${P(272, CT + 49)}Q${P(272, CT + 56)} ${P(264, CT + 55)}`, 2.6, CM.coatMustard);
   b.layer();
   // L2: porthole rims, the door frame, the castle oval, the window box
   for (const p of PORTS) b.fill(CM.coatOat, ovalPath(p.x, PORT_Y, PORT_R + 12, PORT_R + 12));
@@ -469,8 +479,9 @@ function nearLayout() {
   });
   const foam = Array.from({length: 30}, () => ({px: r.range(NX0, NX1), len: r.range(24, 70), dy: r.range(-2, 5)}));
   const glints = Array.from({length: 18}, () => ({x: r.range(XL, XR), y: NY0 + 26 + r.next() * (NY1 - NY0 - 36), per: r.range(1.2, 2.6), ph: r.next()}));
-  const leaves = Array.from({length: 11}, (_, i) => ({px: r.range(NX0, NX1), y: r.range(NY0 + 44, NY1 - 24), rot: r.range(-30, 30), i}));
-  return {refl, rip, foam, glints, leaves};
+  const leaves = Array.from({length: 13}, (_, i) => ({px: r.range(NX0, NX1), y: r.range(NY0 + 44, NY1 - 24), rot: r.range(-30, 30), i}));
+  const twigs = Array.from({length: 2}, (_, i) => ({px: r.range(NX0, NX1), y: r.range(NY0 + 70, NY1 - 40), i}));
+  return {refl, rip, foam, glints, leaves, twigs};
 }
 
 /** The diverging wake lines: fixed to the boat (screen), dashes flowing along them; they fold away after the stop. */
@@ -537,15 +548,22 @@ export const NearWater: React.FC<{lay: ReturnType<typeof nearLayout>}> = ({lay})
   // glints
   for (const g of lay.glints) {
     if (frac(t / g.per + g.ph) >= 0.4) continue;
-    const s = lerp(1.2, 2.0, (g.y - NY0) / (NY1 - NY0));
+    const s = lerp(0.8, 1.4, (g.y - NY0) / (NY1 - NY0));
     const x = g.x + Math.sin(t * 0.9 + g.per) * 8;
     b.fill(CM.paper, `M${P(x - 10 * s, g.y)}L${P(x + 10 * s, g.y - 1)}L${P(x + 8 * s, g.y + 2.4 * s)}L${P(x - 8 * s, g.y + 2.4 * s)}Z`);
   }
   b.layer();
   // floating leaves riding the near water, bobbing
+  for (const tw of lay.twigs) {
+    const sx = wrapX(tw.px, dx + drift * 1.2);
+    const y = tw.y + Math.sin(t * 1.2 + tw.i) * 1.4;
+    b.poly(CM.line, [[sx - 34, y - 2], [sx + 34, y + 2], [sx + 34, y + 5], [sx - 34, y + 1]]);
+    b.poly(CM.line, [[sx + 6, y + 1], [sx + 26, y - 12], [sx + 28, y - 10], [sx + 9, y + 3]]);
+    b.fill(CM.leafRust, leafPath(sx + 28, y - 13, 16, 5, -30));
+  }
   for (const l of lay.leaves) {
     const sx = wrapX(l.px, dx + drift * 1.4);
-    const s = lerp(14, 22, (l.y - NY0) / (NY1 - NY0));
+    const s = lerp(16, 26, (l.y - NY0) / (NY1 - NY0));
     b.fill([CM.leafGold, CM.leafRust, CM.coatMustard][l.i % 3], leafPath(sx, l.y + Math.sin(t * 1.4 + l.i) * 1.6, s, s * 0.26, l.rot + Math.sin(t + l.i) * 8));
   }
   return <Paint b={b} seed="s4nearWater" misreg={false} />;

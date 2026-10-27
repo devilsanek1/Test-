@@ -150,7 +150,7 @@ export const BACK_WINS: BackWin[] = (() => {
   return out;
 })();
 /** House 2's kitchen comes on mid-truck; house 4's left sash is lit (the neighbour reading there). */
-export const BACK_WIN_FORCE = [{i: 5, t: 16.2, on: true}, {i: 9, t: 0, on: true}];
+export const BACK_WIN_FORCE = [{i: 5, t: 16.2, on: true}, {i: 9, t: 0, on: true}, {i: 14, t: 18.45, on: true}, {i: 12, t: 19.3, on: false}];
 
 function housesInto(b: Batch) {
   const stacksInk: string[] = [];
@@ -388,6 +388,30 @@ function pigeonsInto(b: Batch, t: number) {
   }
 }
 
+
+/** A gull gliding west over the backs after the stop (a flap now and then); it stays east of the plates. */
+export const GULL = {t0: 18.25, x0: 1112, y0: 704, speed: 108};
+function gullInto(b: Batch, t: number) {
+  const u = t - GULL.t0;
+  if (u < 0) return;
+  const x = GULL.x0 - GULL.speed * u;
+  if (x < 600) return;
+  const y = GULL.y0 - 10 * Math.sin(u * 1.3) - u * 4;
+  const flapping = frac(u / 1.6) < 0.38;
+  const f = flapping ? Math.sin(u * 15) : 0.25;
+  const s = 15;
+  const wy = s * 0.55 * f;
+  // wings (stone, dark tips), body and head (paper), a yellow beak, facing west
+  b.fill(CM.stoneShade, `M${P(x - s * 1.25, y - wy - 2)}Q${P(x - s * 0.55, y - wy * 0.4 - s * 0.22)} ${P(x, y)}Q${P(x + s * 0.55, y - wy * 0.4 - s * 0.22)} ${P(x + s * 1.25, y - wy - 2)}L${P(x + s * 0.6, y - wy * 0.3 + 2)}L${P(x, y + 3)}L${P(x - s * 0.6, y - wy * 0.3 + 2)}Z`);
+  b.layer();
+  b.fill(CM.anchor, ovalPath(x - s * 1.18, y - wy - 1.5, s * 0.16, s * 0.08));
+  b.fill(CM.anchor, ovalPath(x + s * 1.18, y - wy - 1.5, s * 0.16, s * 0.08));
+  b.fill(CM.paper, ovalPath(x, y + 1, s * 0.62, s * 0.2));
+  b.fill(CM.paper, ovalPath(x - s * 0.62, y - 1, s * 0.17, s * 0.15));
+  b.layer();
+  b.fill(CM.coatMustard, `M${P(x - s * 0.76, y - 1)}L${P(x - s * 0.98, y)}L${P(x - s * 0.76, y + 1)}Z`);
+}
+
 // ---------------------------------------------------------------- the plane
 
 export const BacksPlane: React.FC = () => {
@@ -413,6 +437,8 @@ export const BacksPlane: React.FC = () => {
   pigeonsInto(dyn, t);
   dyn.layer();
   treeLeavesInto(dyn, t);
+  dyn.layer();
+  gullInto(dyn, t);
   const nb = BACK_WINS[9];
   return (
     <>

@@ -26,7 +26,7 @@ export const NG = {
   bottom: 2016,
   /** Vanishing point of the paving's side joints (the eye's horizon above the boat). */
   vp: [540, 1150] as Pt,
-  ringRope: [252, 1641] as Pt,
+  ringRope: [112, 1641] as Pt,
   ringSpare: [858, 1641] as Pt,
   lampX: 912,
 } as const;

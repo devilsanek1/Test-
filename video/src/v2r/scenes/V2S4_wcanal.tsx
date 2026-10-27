@@ -138,7 +138,7 @@ export const CanalPlane: React.FC = () => {
     <>
       <Paint b={base} seed="s4canalBase" misreg={false} />
       <Paint b={b} seed="s4canalLife" misreg={false} />
-      <Ducks ducks={[{x: 684, y: 1166, size: 28, vx: -15, drake: true}, {x: 730, y: 1180, size: 25, vx: -15}]} seed="s4ducks" x0={X0} x1={X1} />
+      <Ducks ducks={[{x: 1040, y: 1166, size: 28, vx: -22, drake: true}, {x: 1092, y: 1180, size: 25, vx: -22}]} seed="s4ducks" x0={X0} x1={X1} />
     </>
   );
 };
