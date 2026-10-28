@@ -146,7 +146,9 @@ export function makeAtmosphere(o: {name: string; air: string | readonly string[]
   };
 }
 
-/** The sky's lowest step (the air behind the farthest plane) from a list of sky colours, top -> horizon. */
+/** The sky's lowest step (the air behind the farthest plane) from a list of sky colours, top -> horizon. A film drawn
+ *  with lib/sky's ONE continuous sky takes its air from `horizonColor(spec, x)` instead (CRAFT §g.3: the sky's lowest
+ *  colour, warmed under the sun; v2 S1: skies.ts `S1_AIR`), and a per-plane air from `skyColorAt(spec, y, x)`. */
 export const hazeFromSky = (skyTopToHorizon: readonly string[]): string => skyTopToHorizon[skyTopToHorizon.length - 1];
 
 /** k of plane p (0 for the subject's plane and nearer). The SUBJECT (tier A) takes at most half its plane's step: it
@@ -562,7 +564,7 @@ export const DEPTH_TARGETS = {
   farAirDE: 10,
   /** ΔE to the air falls at least this much per plane going away. */
   ladderDE: 3,
-  /** The subject's plane against the plane right behind it, ΔE76 between their means (references 11-22.6; G4 5.6). */
+  /** The subject's plane against the plane right behind it, ΔE76 between their means (references 11-22.6; G4 5.7). */
   subjectStepDE: 12,
   /** The farthest plane's darks (L* p5) within this of its air's L* (v1 2-13; G4 24-35). */
   farDarksL: 20,
@@ -600,12 +602,16 @@ export function depthProblems(atm: Atmosphere, planes: {plane: number; colors: s
     const m = meanLab(p.colors);
     return {plane: p.plane, m, air: dLab(m, lab(atm.air(p.plane))), colors: p.colors.filter(isHex)};
   });
+  // the ladder: from the second plane behind the subject on, each >= 3 closer to its air than the one before it (the
+  // first one is the subject step below), as check_depth.py measures it
   for (let i = 1; i < rows.length; i++) {
-    if (rows[i].air > rows[i - 1].air - DEPTH_TARGETS.ladderDE)
+    if (rows[i - 1].plane > 0 && rows[i].air > rows[i - 1].air - DEPTH_TARGETS.ladderDE)
       out.push(`plane +${rows[i].plane} is ${rows[i].air.toFixed(1)} from its air, not >= ${DEPTH_TARGETS.ladderDE} closer than plane +${rows[i - 1].plane} (${rows[i - 1].air.toFixed(1)}): the ladder must fall toward the air`);
   }
   const far = rows[rows.length - 1];
-  if (far.air > DEPTH_TARGETS.farAirDE) out.push(`farthest plane +${far.plane}: ΔE ${far.air.toFixed(1)} from its air (target <= ${DEPTH_TARGETS.farAirDE})`);
+  const sub0 = rows.find((r) => r.plane === 0);
+  if (sub0 && far.plane > 0 && far.air >= sub0.air) out.push(`no air: the farthest plane +${far.plane} is ΔE ${far.air.toFixed(1)} from its air, the subject's plane ${sub0.air.toFixed(1)}: the farthest must be the closest to the air (check_depth's FAIL)`);
+  if (Math.round(far.air) > DEPTH_TARGETS.farAirDE) out.push(`farthest plane +${far.plane}: ΔE ${far.air.toFixed(1)} from its air (target <= ${DEPTH_TARGETS.farAirDE})`);
   const sub = rows.find((r) => r.plane === 0);
   const behind = rows.find((r) => r.plane > 0);
   if (sub && behind && dLab(sub.m, behind.m) < DEPTH_TARGETS.subjectStepDE) out.push(`the subject's plane and plane +${behind.plane} are ΔE ${dLab(sub.m, behind.m).toFixed(1)} apart (target >= ${DEPTH_TARGETS.subjectStepDE}): one clear step`);
@@ -616,20 +622,26 @@ export function depthProblems(atm: Atmosphere, planes: {plane: number; colors: s
     if (r.plane >= 2)
       for (const c of r.colors) {
         const q = lch(c);
-        if (q.C < 6 && q.L < 92) out.push(`plane +${r.plane}: ${c} is grey (C* ${q.C.toFixed(1)}): never grey far away`);
+        if (q.C < 8 && q.L < 92) out.push(`plane +${r.plane}: ${c} is grey (C* ${q.C.toFixed(1)} < 8): never grey far away`);
       }
   return out;
 }
 
 /** Things of known size in one shot (`y` = the screen y of their BASE, `px` their height on screen, `m` their real
  *  height in metres, `level` metres above level 0): the size inversions (a nearer thing drawn SMALLER per metre than a
- *  farther one: the strongest depth warning, CRAFT §f.5) and k's spread on one level (one camera: +-15 %). */
+ *  farther one: the strongest depth warning, CRAFT §f.5) and k's spread on one level (one camera: +-15 %). Nearer =
+ *  a lower base on the same level; across levels only with the camera's `height` (metres over level 0): depth ~
+ *  (height - level) / (base y - horizon), as in check_depth.py. */
 export function sizeProblems(things: {name: string; y: number; px: number; m: number; level?: number}[], o: {horizon: number; height?: number; tol?: number}): string[] {
   const out: string[] = [];
-  const rows = things.map((t) => ({...t, ppm: t.px / t.m, level: t.level ?? 0}));
+  const rows = things.map((t) => {
+    const level = t.level ?? 0;
+    return {...t, ppm: t.px / t.m, level, z: o.height !== undefined ? (o.height - level) / Math.max(1e-6, t.y - o.horizon) : null};
+  });
+  const nearer = (a: (typeof rows)[number], b: (typeof rows)[number]) => (a.level === b.level ? a.y > b.y + 4 : a.z !== null && b.z !== null && a.z < b.z * 0.97);
   for (const a of rows)
     for (const b of rows)
-      if (a.y > b.y + 4 && a.ppm < b.ppm * 0.97) out.push(`size inversion: ${a.name} (base y ${a.y.toFixed(0)}, ${a.ppm.toFixed(0)} px/m) is nearer than ${b.name} (base y ${b.y.toFixed(0)}, ${b.ppm.toFixed(0)} px/m) but smaller per metre`);
+      if (nearer(a, b) && a.ppm < b.ppm * 0.97) out.push(`size inversion: ${a.name} (base y ${a.y.toFixed(0)}, ${a.ppm.toFixed(0)} px/m) is nearer than ${b.name} (base y ${b.y.toFixed(0)}, ${b.ppm.toFixed(0)} px/m) but smaller per metre`);
   const tol = o.tol ?? DEPTH_TARGETS.cameraTol;
   const levels = Array.from(new Set(rows.map((r) => r.level)));
   for (const lv of levels) {
