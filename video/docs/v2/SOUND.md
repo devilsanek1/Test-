@@ -48,9 +48,9 @@ S5's crane, the ONE big move, keeps its swell.
 ## The joins (THROUGHLINE §3): the sound on each carrier, peaking on its midpoint (measured in the master)
 | join | carrier | sound (cue) | peak vs midpoint |
 |---|---|---|---|
-| S1>S2 6.10 | A push-through into her dark window W | `whoosh_dive:1` 5.95: air rises into the glass, a muffled bump on the plum bridge, settles by 6.27 | +20 ms |
+| S1>S2 6.10 | A push-through into her dark window W (0.45 s since REVIEW_1 MUST 5: 5.875-6.325, the zoom seen from ~5.95) | `whoosh_dive:1` 5.95: air rises into the glass, a muffled bump on the plum bridge, settles by 6.27 | +20 ms |
 | S2>S3 12.98 | B match: her dark office window = her lit home window | `lamp_click:2` 12.98: her lamp ON (the thread: OFF 0.40, ON here, ON 34.95) | +14 ms |
-| S3>S4 14.86 | A push-through into her silhouette | `whoosh_dive:2` 14.71 (the callback, 3 dB softer) | +13 ms |
+| S3>S4 14.86 | A push-through into her silhouette (0.45 s: 14.635-15.085) | `whoosh_dive:2` 14.71 (the callback, 3 dB softer) | +13 ms |
 | S4>S5 20.55 | A push-through into the low October sun | `sun_through:1` 20.40: a glass shimmer swells into the light, a small A6 glass tink on the midpoint, 65 dB down by "In" 20.67 | -4 ms |
 | S5>S6 23.80 | D wipe: a blossom tree crosses right to left | `tree_wipe` 23.62: a soft rush of leaves (CC0 rustle) and air, right to left, all under 2.2 kHz (the /f/ of "for") | +6 ms |
 | S6>S7 28.10 | A push-through into the April sun | `sun_through:2` 27.95 (the callback) | +3 ms |
@@ -60,7 +60,7 @@ S5's crane, the ONE big move, keeps its swell.
 ## Every cue (on the picture's onset; word-synced cues 2 frames before the heard word; same idea = same file)
 | shot | t (s) · sound · what |
 |---|---|
-| V2S1 | 0.00 pen_drawon (the clean pen finishes her, the door and W; the colour floods from the sun) · 0.40 lamp_click:1 (W goes dark) · **0.45 exit_ding** (C6 -> F6 struck glass, 58 ms apart; the first-second phone sound) + door_glide · 0.93 step_thup + letter_pops (done by 1.08) · 1.46 wings:1 (the far birds lift at 1.40) · 1.97 / 2.50 / 3.17 / 3.77 / 4.20 / 4.75 ghost_tick (ONE wooden tick, one pitch, per ghost) · 4.95 outline_pops + ear_flap ("life") · 5.95 whoosh_dive:1 |
+| V2S1 | 0.00 pen_drawon (the clean pen draws her, the door, then W from frame 0, 0.00-0.39; the colour floods from the sun 0.44-0.80) · 0.40 lamp_click:1 (W goes dark) · **0.45 exit_ding** (C6 -> F6 struck glass, 58 ms apart; the first-second phone sound) + door_glide · 0.93 step_thup + letter_pops (done by 1.08) · 1.46 wings:1 (the far birds lift at 1.40) · 1.97 / 2.50 / 3.17 / 3.77 / 4.20 / 4.75 ghost_tick (ONE wooden tick, one pitch, per ghost) · 4.95 outline_pops + ear_flap ("life") · 5.95 whoosh_dive:1 |
 | V2S2 | 6.78 window_outline (her window's outline pops on, "one") · 8.40 board_clack:2 (TOLD THE BBC) · 8.93 light_clicks (five switches in one step) · 9.45 notebook_flap · 10.26 blinds_five · 12.17 blind_thump · 12.70 notebook_clap · 12.98 lamp_click:2 (the match) |
 | V2S3 | 14.71 whoosh_dive:2 |
 | V2S4 | 15.03 pop_high:1 (name tag) · 16.60 pen_tick · 17.66 steps_stop · 18.88 plate_knock (DEC 2025) · 19.45 pen_short:1 (APR 2026) · 19.77 wings:2 · 20.40 sun_through:1 |
@@ -75,7 +75,7 @@ hers; Google's beat has no sting, no minor turn, no door sounds (its glass doors
 ## Cues that moved, and why (against the paused draft)
 | was | now | why |
 |---|---|---|
-| 0.00 pencil_flood (scratchy hatching) | 0.00 pen_drawon | DIRECTION rules 4 + 9: frame 0 is the clean pen drawing the subject on (S1_DRAW -0.26..0.26), then the flood |
+| 0.00 pencil_flood (scratchy hatching) | 0.00 pen_drawon | DIRECTION rules 4 + 9: frame 0 is the clean pen drawing the subject on, then the flood. REVIEW_1 MUST 2 (fix pass A): the strokes start AT f0 and run 0.00-0.39 (re-touches at 0.12, 0.18, 0.27), the flood wash 0.44-0.80; the file is 0.86 s; gain 0.059 (set 20 dB under the voice); hit words pass (She 14.7, quit 10.2, Google 12.0 dB at 1-4 kHz); the seam crossfade still matched (rms step -0.63 dB, 2-8 kHz step 0.2 dB) |
 | 0.45 exit_ding, 2nd strike +85 ms, +4 dB | 0.45, 2nd strike +58 ms, +3.2 dB | both mallets land in the /k/ closure of "quit", never on its burst; +3.2 keeps it 8 dB under the voice (TREATMENT §7) and still the first second's loudest |
 | 5.95 whoosh_dive, peak +0.20 | 5.95 whoosh_dive:1, peak +0.15 | on the push-through's midpoint 6.10 |
 | 6.82 pencil_ring (a drawn ring) | 6.78 window_outline (a pop) | the ring is board notation; her window's outline pops on in one frame (conform_L2 §1), 2 frames before "one" |
