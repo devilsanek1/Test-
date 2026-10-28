@@ -116,4 +116,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-28 ~00:35 UTC, asked about the scout's parallax-float proposal: "switch it on if you think it will make the videos better and
   improve engagement" -> ON (orchestrator's call: depth in motion without more movers): playbook rule, DIRECTION rule 8,
   COZY_AND_SCALE 3b.5; a parallax helper in lib/depth.ts (L1 builds it with S1, the lanes reuse it).
+- 2026-10-28, on the G4 look clip v4 (`deliverables/v2/v2r_G4_look_v4.mp4`: depth, one gentle sky, particles, the parallax float, the art
+  director's fixes): "Okay I think this is better now the hook video" -> v4 APPROVED as the look; L2-L6 resume from
+  `lanes/RESUME_2026-10-28.md`.
 
