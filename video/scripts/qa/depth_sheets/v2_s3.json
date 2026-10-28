@@ -1,0 +1,367 @@
+{
+ "name": "v2 S3 'Her window' @13.5 s (Film2R; lane L3's art conform): her terrace across the canal at sunset",
+ "units": "px",
+ "air_hex": "#FCBF9B",
+ "air_note": "S3_AIR = horizonColor(S3_SUNSET, SUN3.x) (world/skies.ts): the sky's lowest colour warmed under the sun, the far planes' air (V2S3_depth S3_ATM)",
+ "planes": [
+  {
+   "name": "our towpath and its things (bench, bag, bollard, leaves)",
+   "plane": -2,
+   "boxes": [
+    [
+     0,
+     1662,
+     990,
+     1920
+    ]
+   ]
+  },
+  {
+   "name": "our moored boat (cabin side and roof)",
+   "plane": -1,
+   "boxes": [
+    [
+     0,
+     1262,
+     990,
+     1610
+    ]
+   ]
+  },
+  {
+   "name": "the canal",
+   "plane": -0.6,
+   "role": "ground",
+   "boxes": [
+    [
+     0,
+     1142,
+     990,
+     1250
+    ]
+   ],
+   "exclude": [
+    [
+     1034,
+     1140,
+     1060,
+     1250
+    ]
+   ]
+  },
+  {
+   "name": "her terrace (the subject's plane: her window M, the facades, Pip's railing)",
+   "plane": 0,
+   "role": "subject",
+   "boxes": [
+    [
+     170,
+     680,
+     990,
+     1098
+    ]
+   ]
+  },
+  {
+   "name": "her towpath and the garden wall past her end wall",
+   "plane": 0,
+   "boxes": [
+    [
+     0,
+     1004,
+     165,
+     1098
+    ],
+    [
+     170,
+     1100,
+     990,
+     1128
+    ]
+   ]
+  },
+  {
+   "name": "the roofs and chimneys in the west gap (+1)",
+   "plane": 1,
+   "boxes": [
+    [
+     0,
+     714,
+     156,
+     776
+    ]
+   ]
+  },
+  {
+   "name": "the far city on the sunset band (+2: the far rows under the sun, the gasholder drum)",
+   "plane": 2,
+   "boxes": [
+    [
+     2,
+     650,
+     26,
+     694
+    ],
+    [
+     58,
+     678,
+     160,
+     690
+    ]
+   ]
+  }
+ ],
+ "silhouettes": [
+  {
+   "name": "her lit pane in the darker wall (inside its teal frame band, the window's one outline)",
+   "tier": "A",
+   "poly": [
+    [
+     268.75,
+     702.85
+    ],
+    [
+     401.25,
+     702.85
+    ],
+    [
+     401.25,
+     867.15
+    ],
+    [
+     268.75,
+     867.15
+    ]
+   ],
+   "roi": [
+    [
+     240,
+     680,
+     430,
+     858
+    ]
+   ],
+   "note": "the pane is the lit glass (M = W2_CUT, 132.5 x 164.3); its frame band (S8's teal, 9.3 px) and the tier-A outline read as the window's line; the sill's edge (the window box) is outside the roi"
+  },
+  {
+   "name": "her silhouette (head and body to the rail) in the lit room",
+   "tier": "A",
+   "poly": [
+    [
+     347,
+     720
+    ],
+    [
+     341,
+     725
+    ],
+    [
+     339,
+     729
+    ],
+    [
+     338,
+     739
+    ],
+    [
+     341,
+     745
+    ],
+    [
+     333,
+     768
+    ],
+    [
+     333,
+     772
+    ],
+    [
+     335,
+     775
+    ],
+    [
+     345,
+     775
+    ],
+    [
+     344,
+     784
+    ],
+    [
+     337,
+     794
+    ],
+    [
+     337,
+     800
+    ],
+    [
+     340,
+     804
+    ],
+    [
+     368,
+     804
+    ],
+    [
+     371,
+     802
+    ],
+    [
+     369,
+     762
+    ],
+    [
+     363,
+     754
+    ],
+    [
+     351,
+     755
+    ],
+    [
+     349,
+     753
+    ],
+    [
+     356,
+     752
+    ],
+    [
+     359,
+     750
+    ],
+    [
+     369,
+     751
+    ],
+    [
+     374,
+     747
+    ],
+    [
+     375,
+     743
+    ],
+    [
+     370,
+     737
+    ],
+    [
+     369,
+     727
+    ],
+    [
+     363,
+     721
+    ],
+    [
+     358,
+     719
+    ]
+   ],
+   "roi": [
+    [
+     300,
+     700,
+     410,
+     806
+    ]
+   ],
+   "note": "polygon from the 13.5 render's plum fill inside the pane (morphological opening drops the Juliet rail's bars)"
+  },
+  {
+   "name": "her house's west end wall against the west gap (the terrace's front off the roofs behind it)",
+   "tier": "mass",
+   "poly": [
+    [
+     165,
+     640
+    ],
+    [
+     525,
+     640
+    ],
+    [
+     525,
+     1100
+    ],
+    [
+     165,
+     1100
+    ]
+   ],
+   "roi": [
+    [
+     140,
+     676,
+     190,
+     1000
+    ]
+   ]
+  },
+  {
+   "name": "our boat's roof edge against the canal",
+   "tier": "mass",
+   "poly": [
+    [
+     -70,
+     1262
+    ],
+    [
+     1170,
+     1262
+    ],
+    [
+     1170,
+     1616
+    ],
+    [
+     -70,
+     1616
+    ]
+   ],
+   "roi": [
+    [
+     0,
+     1240,
+     990,
+     1280
+    ]
+   ]
+  }
+ ],
+ "ground": [
+  {
+   "name": "our towpath (slab joints laid out from S3_CAM, to the towpath's vanishing point)",
+   "roi": [
+    0,
+    1662,
+    990,
+    1920
+   ],
+   "vps": [
+    [
+     540,
+     1150
+    ]
+   ]
+  }
+ ],
+ "horizon": 1150,
+ "things": [
+  {
+   "name": "the bench on our towpath (its back, 0.86 m)",
+   "y": 1850,
+   "px": 194,
+   "m": 0.86
+  },
+  {
+   "name": "the mooring bollard on our coping (0.55 m)",
+   "y": 1644,
+   "px": 88,
+   "m": 0.55
+  }
+ ],
+ "note": "The ground's box and the lower planes stop at x 990: L2's near lamp (held across the cut, x 1011-1049) is no plane of S3's set. The far planes are thin in this narrow west gap (x < 165): the far city shows as a 12 px band under the sun and the gasholder drum at the left edge."
+}

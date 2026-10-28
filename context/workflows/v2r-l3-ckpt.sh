@@ -12,8 +12,11 @@ mkdir -p $S/wip
 ok=$(nice -n 10 env GL=angle node scripts/render-frames.mjs Film2R $S/wip 13.5,17.0 --entry=src/entry-v2r-film.tsx --scale=0.25 2>&1 | grep -c "render-frames\]")
 if [ "$ok" = "0" ]; then echo "RENDER FAILED (not committing)"; exit 1; fi
 cd /home/user/Test- || exit 1
-git add video/src/v2r/scenes/V2S3* video/src/v2r/scenes/V2S4* video/src/v2r/world/skies.ts video/docs/v2/lanes/*_L3.md context/workflows/v2r-l3-* 2>/dev/null
-git add video/scripts/qa/depth_sheets/v2_s3*.json video/scripts/qa/depth_sheets/v2_s4*.json 2>/dev/null
+# add only paths that exist (one unmatched pathspec makes git add add nothing)
+for p in video/src/v2r/scenes/V2S3* video/src/v2r/scenes/V2S4* video/src/v2r/world/skies.ts video/docs/v2/lanes/*_L3.md video/docs/v2/lanes/img/L3_* context/workflows/v2r-l3-* video/scripts/qa/depth_sheets/v2_s3*.json video/scripts/qa/depth_sheets/v2_s4*.json; do
+  [ -e "$p" ] && git add -- "$p"
+done
+for p in $(git ls-files --deleted -- 'video/src/v2r/scenes/V2S3*' 'video/src/v2r/scenes/V2S4*'); do git rm -q --cached -- "$p"; done  # L3 files deleted
 if git diff --cached --quiet; then echo "nothing to checkpoint"; else
   for i in 1 2 3 4 5; do git commit -q -m "$msg" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" -m "Claude-Session: https://claude.ai/code/session_014PwCXJs9nWENkpKqVhHWMP" && break; sleep 3; done
 fi

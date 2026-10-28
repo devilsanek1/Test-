@@ -50,6 +50,7 @@ export {
   S2_LEGS_Y1,
   BBC_FRAME,
   BOARD_COLORS,
+  BBC_CALM,
   KEY_WEIGHT,
   CREDIT_WEIGHT,
   weightFor,
