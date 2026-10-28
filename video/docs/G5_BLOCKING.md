@@ -55,12 +55,14 @@ these checks are where that promise is enforced; owner-approved 2026-10-27):
   motion exists that G3 did not play; a mismatch is a FAIL or an explicit, owner-visible G3 reopen. (2) A sound-off
   cold read of the first fully dressed set (the home set, the density key, as built for the G4 look clip): map each
   board `promise` line to what a cold reader names (v3: streams read as birds). (3) CRAFT's measures (`CRAFT.md` §e:
-  carry, eye jump and colour shift per join; tiers and salience; line; light with `scripts/qa/check_light.py`) run on
+  carry, eye jump and colour shift per join; tiers and salience; line; light with `scripts/qa/check_light.py`; depth with
+  `scripts/qa/check_depth.py` and the set's sheet) run on
   the G3 reel and on the approved G4 look clip: the baseline the exit is compared with. Lanes start only after (1) and
   (2) pass and the baseline is recorded.
 - **Exit, before the owner sees the cut** (with the gate check, §7): the same diff and measures rerun on the G5 render
   and compared with the baseline and CRAFT's numbers (warnings with a declared exception; `CRAFT.md` §a's two FAILs, a
-  carrier per join with at most 2 plain cuts and the thread >= 80 % with no gap over 3 s, stay FAILs): every join keeps
+  carrier per join with at most 2 plain cuts and the thread >= 80 % with no gap over 3 s, and §f's three depth FAILs stay
+  FAILs): every join keeps
   its carrier, nothing rises above its G3 tier, no mover or place appears that G3 did not show. Until the craft tooling
   lane ports the measures into `scripts/qa` (`PIPELINE_V2.md`), the raw versions are in `scripts/qa/retro_tools/`.
 
@@ -127,15 +129,17 @@ exception from the G3 hand-off.
 - **Density and life: fill what G3 decided.** Every G3 placeholder and `life:` item becomes its real dressing and life
   at its G3 tier, so every panel is full and alive, calm and tiered (a world around the subject, people, the living
   character, slow life that never stops): `docs/look/CRAFT.md` §b, `docs/look/LIFE_AND_DENSITY.md`. Nothing the board
-  did not show: no new places, movers or tier promotions. `scripts/qa/density.py` is information before the owner sees
+  did not show: no new places, movers or tier promotions (a particle field is a mover: only the fields G3 named, from
+  `lib/particles.tsx`, inside the mover budget). `scripts/qa/density.py` is information before the owner sees
   a cut (its events/s and gap are never a reason to add movers).
 - **Look**: the approved G4 look clip and its kit (the clean pen, the set's light rig, the tier palettes), the video's
   STYLE.md (v3: LOOK.md) and palette roles (one hero colour, one dark anchor, at most one pop), inside
   `docs/look/DIRECTION.md` and `CRAFT.md`; then `docs/look/COZY_AND_SCALE.md`, `docs/look/CINEMATIC_GUIDE.md`. Every
   set, person, prop and Pip is the film's own kit (playbook: no reusable assets; people have no faces); `lib/cine`'s
   drawing pieces are references, never film code, until the craft tooling lane ports them to the clean pen
-  (`CRAFT.md` §c; its camera and utilities are fine). The light and shadow layers come from `lib/light.tsx`; a film
-  never imports another film's folder (`src/vN/`).
+  (`CRAFT.md` §c; its camera and utilities are fine). The light and shadow layers come from `lib/light.tsx`, depth from
+  `lib/depth.ts` (the set's atmosphere, planes and ONE camera from W1: `CRAFT.md` §f; how-to `lib/DEPTH.md`), particles
+  from `lib/particles.tsx`; a film never imports another film's folder (`src/vN/`).
 
 ## 2b. The sequence contract (one scenes.json row = one SEQUENCE; the v3 rework on)
 

@@ -59,12 +59,13 @@
    "plane": 3,
    "boxes": [
     [
-     0.6,
-     0.505,
-     0.74,
-     0.57
+     0.61,
+     0.51,
+     0.715,
+     0.595
     ]
-   ]
+   ],
+   "note": "the far city in front of the sun (masked by colour); the power symbol above it left out"
   }
  ],
  "silhouettes": [

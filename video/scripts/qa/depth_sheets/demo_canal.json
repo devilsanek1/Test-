@@ -57,7 +57,7 @@
   },
   {
    "name": "far city, front row",
-   "plane": 2,
+   "plane": 3,
    "boxes": [
     [
      0,
@@ -69,13 +69,13 @@
   },
   {
    "name": "far city, back rows",
-   "plane": 3,
+   "plane": 4,
    "boxes": [
     [
      0,
-     878,
+     850,
      225,
-     900
+     880
     ]
    ]
   },
@@ -85,9 +85,9 @@
    "boxes": [
     [
      0,
-     838,
-     140,
-     848
+     806,
+     225,
+     828
     ]
    ]
   }

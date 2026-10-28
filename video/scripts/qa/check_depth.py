@@ -19,8 +19,8 @@ air each, the farthest over dE 10 from it, the subject's plane < dE 12 from the 
 darks > 20 under the air, its range > 15 or values > 4, its contrast > 0.5x the subject plane's (or > 4) or its visible
 edges > 0.5x, its C* < 8 (grey), an environment plane over CRAFT §b's tier-C contrast 7 on its own.
 SEPARATION (fill 2-8 px inside against fill 2-10 px outside along the silhouette, sampled every 4 px at 540) WARN: a
-tier-A subject under median |dL*| 15, over 20 % at one value (|dL*| < 5) or an unlined one-value run over 60 px; a mass
-under 12 / 25 % / 100 px. GROUND (Canny + Hough on L* at 1080, segments >= 36 px; walls' verticals left out; "visible" =
+tier-A subject under median |dL*| 15, over 20 % at one value (|dL*| < 5) or an unlined one-value run over 60 px (12 / 25 %
+when an outline runs along >= 80 % of it: the line helps, it never replaces the fill step); a mass under 12 / 25 % / 100 px. GROUND (Canny + Hough on L* at 1080, segments >= 36 px; walls' verticals left out; "visible" =
 |dL*| >= 6 across the line) WARN: over 60 % level, under 20 % to the vanishing point(s), receding lines that exist but
 under |dL*| 6 ("invisible perspective"), row spacing growing < 2x from far to near, a texture no finer far than near.
 SIZE (things of known size, `y` = their base) WARN: a size inversion, k's spread over +-15 % on one level.
@@ -42,9 +42,9 @@ cv2.setNumThreads(1)
 W540 = 540
 T = dict(  # = lib/depth.ts DEPTH_TARGETS (CRAFT §f)
     ladder=3.0, far_air=10.0, subject_step=12.0, far_darks=20.0, far_range=15.0, far_values=4, far_lc_k=0.5, far_lc=4.0,
-    far_edges_k=0.5, far_chroma=8.0, env_lc=7.0,
-    sep_a=(15.0, 0.20, 60), sep_mass=(12.0, 0.25, 100), melt_median=6.0, melt_same=0.50, melt_run=100,
-    ground_level=0.60, ground_recede=0.20, elev_level=0.70, elev_recede=0.10, visible=6.0, spacing=2.0, cam_tol=0.15,
+    far_edges_k=0.5, far_chroma=8.0, behind_k=1.1,
+    sep_a=(15.0, 0.20, 60), sep_a_lined=12.0, sep_mass=(12.0, 0.25, 100), melt_median=6.0, melt_same=0.50, melt_run=100,
+    ground_level=0.65, ground_recede=0.20, elev_level=0.70, elev_recede=0.10, visible=6.0, spacing=2.0, cam_tol=0.15,
 )
 
 
@@ -131,7 +131,7 @@ def hue_diff(h1, h2):
 
 # ---------------------------------------------------------------- planes
 
-def plane_stats(im: Img, m, air, lc_map, grad):
+def plane_stats(im: Img, m, air, lc_map, grad, lc_fill):
     """A plane's numbers over all its pixels (drawn lines included, as the research measured them: a lined far plane
     is a busier far plane; our clean pen draws no line on tier C)."""
     if m.sum() < 30:
@@ -143,7 +143,8 @@ def plane_stats(im: Img, m, air, lc_map, grad):
     hist, _ = np.histogram(L, bins=np.arange(0, 102, 6))
     out = dict(L=float(L.mean()), C=float(C.mean()), C90=float(np.percentile(C, 90)), h=hue_deg(a.mean(), b.mean()),
                Lp5=float(np.percentile(L, 5)), Lp95=float(np.percentile(L, 95)), LC=float(lc_map[m].mean()),
-               edges=float((grad[m] > 6).mean()), values=int((hist >= 0.03 * m.sum()).sum()), n=int(m.sum()))
+               edges=float((grad[m] > 6).mean()), values=int((hist >= 0.03 * m.sum()).sum()), n=int(m.sum()),
+               LCfill=float(lc_fill[m].mean()))
     out['range'] = out['Lp95'] - out['Lp5']
     out['dEair'] = float(np.linalg.norm(mean - air))
     out['air_L'] = float(air[0])
@@ -164,7 +165,14 @@ def check_planes(im: Img, sheet, u: Units, res, report):
     else:
         return 0
     L = lab[..., 0]
-    lc_map = np.abs(L - cv2.GaussianBlur(L, (0, 0), 8 * im.W / W540))
+    sig = 8 * im.W / W540
+    lc_map = np.abs(L - cv2.GaussianBlur(L, (0, 0), sig))
+    # the same with drawn dark lines filled by their neighbourhood: a plane's FILL contrast, like for like with our
+    # environment (the clean pen draws no line on tier C), for the budget of the planes behind the subject
+    lines = linemask(lab)
+    Lf = L.copy()
+    Lf[lines] = cv2.medianBlur(L.astype(np.float32), 5)[lines]
+    lc_fill = np.abs(Lf - cv2.GaussianBlur(Lf, (0, 0), sig))
     grad = grad_de(lab)
     rows = []
     for p in sheet.get('planes', []):
@@ -176,7 +184,7 @@ def check_planes(im: Img, sheet, u: Units, res, report):
             pm = boxmask(lab.shape, p['air'], u) & ~sunm
             if pm.sum() > 20:
                 pa = lab[pm].mean(0)
-        st = plane_stats(im, m, pa, lc_map, grad)
+        st = plane_stats(im, m, pa, lc_map, grad, lc_fill)
         if st is None:
             report.append(('WARN', f"plane '{p['name']}': too few pixels to measure"))
             continue
@@ -189,7 +197,7 @@ def check_planes(im: Img, sheet, u: Units, res, report):
     behind = sorted([r for r in rows if r['plane'] > 0 and r['ladder']], key=lambda r: r['plane'])
     for r in rows:
         report.append(('INFO', f"  plane {r['plane']:+.1f} {r['name'][:34]:34s} L* {r['L']:5.1f} C* {r['C']:4.1f} C90 {r['C90']:4.1f} h {r['h']:3.0f}  "
-                               f"darks {r['Lp5']:4.1f} range {r['range']:4.1f} values {r['values']}  contrast {r['LC']:4.1f} edges {r['edges']:.2f}  dE air {r['dEair']:4.1f}"))
+                               f"darks {r['Lp5']:4.1f} range {r['range']:4.1f} values {r['values']}  contrast {r['LC']:4.1f} (fill {r['LCfill']:4.1f}) edges {r['edges']:.2f}  dE air {r['dEair']:4.1f}"))
     s = subj[0] if subj else None
     if not (s and behind):
         return 0
@@ -213,13 +221,11 @@ def check_planes(im: Img, sheet, u: Units, res, report):
         report.append(('WARN', f"subject's plane -> plane {behind[0]['plane']:+.0f}: dE {step:.1f} between their means (>= {T['subject_step']:.0f}; references 11-22.6): one clear step"))
     else:
         report.append(('OK', f"subject's plane -> plane {behind[0]['plane']:+.0f}: dE {step:.1f}" + (" (a vista: its ladder falls toward the air plane by plane)" if step < T['subject_step'] else '')))
-    # every plane behind the subject: calmer than the subject's plane, inside the tier-C budget on its own
+    # no plane behind the subject is busier than the subject's plane (its fill contrast: our environment draws no line)
     for r in behind:
-        k = r['LC'] / max(1e-6, s['LC'])
-        if r is not far and k > 0.6:
-            report.append(('WARN', f"plane {r['plane']:+.0f} '{r['name']}': contrast {r['LC']:.1f} is {k:.2f}x the subject plane's (<= 0.6x behind the subject)"))
-        if r['LC'] > T['env_lc']:
-            report.append(('WARN', f"plane {r['plane']:+.0f} '{r['name']}': local contrast {r['LC']:.1f} > {T['env_lc']:.0f}, CRAFT §b's tier-C budget, on its own plane"))
+        k = r['LCfill'] / max(1e-6, s['LCfill'])
+        if k > T['behind_k']:
+            report.append(('WARN', f"plane {r['plane']:+.0f} '{r['name']}' is busier than the subject's plane: fill contrast {r['LCfill']:.1f}, {k:.2f}x (<= {T['behind_k']}x; the far must calm down)"))
     # the farthest plane: simpler, calmer, its darks lifted toward the air (a far plane, +3 and beyond, in full)
     k = far['LC'] / max(1e-6, s['LC'])
     ke = far['edges'] / max(1e-6, s['edges'])
@@ -247,6 +253,7 @@ def grabcut(bgr, box):
     x0, y0, x1, y1 = box
     mask = np.zeros((H, W), np.uint8)
     bg, fg = np.zeros((1, 65), np.float64), np.zeros((1, 65), np.float64)
+    cv2.setRNGSeed(0)  # GrabCut's k-means start: fixed, so a sheet gives the same mask every run (still prefer a `poly`)
     cv2.grabCut(bgr, mask, (x0, y0, max(2, x1 - x0), max(2, y1 - y0)), bg, fg, 6, cv2.GC_INIT_WITH_RECT)
     m = (mask == cv2.GC_FGD) | (mask == cv2.GC_PR_FGD)
     n, lab_, st, _ = cv2.connectedComponentsWithStats(m.astype(np.uint8))
@@ -316,6 +323,8 @@ def check_separation(im: Img, sheet, u: Units, res, lines, report):
         r.update(name=s['name'], tier=s.get('tier', 'A'), run=int(r['run'] * k), run_unlined=int(r['run_unlined'] * k))
         out.append(r)
         med, same, run = T['sep_a'] if r['tier'] == 'A' else T['sep_mass']
+        if r['tier'] == 'A' and r['line_share'] >= 0.8:  # an outline along >= 80 % of it helps; it never replaces the fill step
+            med, same = T['sep_a_lined'], T['sep_mass'][1]
         line = f"silhouette '{r['name']}' ({'tier A' if r['tier'] == 'A' else 'a mass'}): median |dL*| {r['median']:.1f}, one value {r['same'] * 100:.0f} %, unlined one-value run {r['run_unlined']} px (lined {r['line_share'] * 100:.0f} %)"
         if r['median'] < T['melt_median'] or (r['same'] >= T['melt_same'] and r['run_unlined'] > T['melt_run']):
             fails += 1

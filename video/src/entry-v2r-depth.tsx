@@ -26,7 +26,7 @@ import {tierFill} from './lib/pen';
 import {ellipseD, Lit, polyD, rectD} from './lib/light';
 import {RIG_CANAL} from './v2r/world/rigs';
 import {rng} from './lib/rng';
-import {backing, band, depthProblems, flight, flightCheek, groundCam, groundPoly, makeAtmosphere, nearStep, planeLod, recede, rowsZ, seamTone, sizeProblems, toneOnTone, type GroundCam} from './lib/depth';
+import {backing, band, depthProblems, flight, flightCheek, groundCam, groundPoly, makeAtmosphere, nearStep, planeLod, planePalette, recede, rowsZ, seamTone, sizeProblems, toneOnTone, type GroundCam} from './lib/depth';
 import {glitterPath, particleProblems, particlesAt, Particles, type ParticlesProps} from './lib/particles';
 import type {Pt} from './lib/sketch';
 
@@ -57,32 +57,38 @@ const HER = {x: 600, feet: CAM.y(Z_HER), h: 1.7 * CAM.pxPerM(CAM.y(Z_HER))};
 // ---------------------------------------------------------------- the far city (planes +2, +3, +4)
 
 type Bld = {x: number; w: number; top: number; c: string; plane: number; win: Pt[]};
-const FAR_SRC = [CM.brickLight, CM.brick, CM.stucco, CM.limestone];
-/** Seeded rows, the farther the smaller and the higher (Scale cues 2-3): +4 an infinity strip, +3 the back rows, +2 the
- *  front row. Same shapes in both modes; only the colours and the detail change. */
+/** A brick city: every row the same mix of materials (so a plane's mean is its material at its air step). */
+const FAR_SRC = [CM.brick, CM.brickLight, CM.brick, CM.stucco];
+/** Seeded rows, the farther the smaller and the higher (Scale cues 2-3): +3 the front row, +4 the back rows and the
+ *  farthest strip. Behind a PALE subject plane (this wing, L* ~76) the city starts at +3: a +2 brick row would sit as
+ *  close to the wing's colour as to the air. Same shapes in both modes; only the colours and the detail change. */
 function farRows(): Bld[] {
   const out: Bld[] = [];
   // the farther rows stand higher (a city rising behind: RIVERSIDE's stacking upward), so each shows above the next
-  const rows: {plane: number; w: [number, number]; top: [number, number]; win: number}[] = [
-    {plane: 4, w: [14, 26], top: [796, 836], win: 0},
-    {plane: 3, w: [24, 44], top: [834, 876], win: 5},
-    {plane: 2, w: [44, 82], top: [884, 930], win: 8},
+  const rows: {plane: number; w: [number, number]; top: [number, number]; win: number; seed: string}[] = [
+    {plane: 4, w: [14, 26], top: [788, 800], win: 0, seed: 'strip'},
+    {plane: 4, w: [24, 44], top: [832, 846], win: 5, seed: 'back'},
+    {plane: 3, w: [44, 82], top: [884, 930], win: 8, seed: 'front'},
   ];
   for (const row of rows) {
-    const r = rng(`demo/far/${row.plane}`);
+    const r = rng(`demo/far/${row.seed}`);
+    let k = 0;
     let x = -20;
     while (x < 372) {
       const w = r.range(row.w[0], row.w[1]);
       const top = r.range(row.top[0], row.top[1]);
       const win: Pt[] = [];
       if (row.win) for (let wy = top + row.win * 1.6; wy < 1080 - row.win * 2; wy += row.win * 2.6) for (let wx = x + row.win; wx < x + w - row.win * 1.4; wx += row.win * 2.2) win.push([wx, wy]);
-      out.push({x, w, top, c: r.pick(FAR_SRC), plane: row.plane, win});
+      out.push({x, w, top, c: FAR_SRC[k++ % FAR_SRC.length], plane: row.plane, win});
       x += w * r.range(0.82, 1.0);
     }
   }
   return out;
 }
 const FAR = farRows();
+
+/** Each far plane's palette: the four materials receded to the plane and merged into its value count (planePalette). */
+const FAR_PAL: Record<number, Record<string, string>> = {3: planePalette(FAR_SRC, 3, ATM), 4: planePalette(FAR_SRC, 4, ATM)};
 
 const FarCity: React.FC<{mode: Mode}> = ({mode}) => {
   const flat = mode === 'flat';
@@ -91,9 +97,9 @@ const FarCity: React.FC<{mode: Mode}> = ({mode}) => {
       {FAR.map((b, i) => {
         const lod = planeLod(b.plane);
         // flat: the near role colours everywhere, lamp-yellow and iron windows (the G4 clip's far city)
-        const wall = flat ? b.c : recede(b.c, b.plane, ATM);
+        const wall = flat ? b.c : FAR_PAL[b.plane][b.c];
         const wins = flat ? b.win : lod.windows === 'none' ? [] : b.win.filter(() => true);
-        const ws = b.plane === 2 ? 8 : 5;
+        const ws = b.plane === 3 ? 8 : 5;
         const keep = flat || ws >= lod.minFeature;
         return (
           <React.Fragment key={i}>
@@ -113,6 +119,8 @@ const FarCity: React.FC<{mode: Mode}> = ({mode}) => {
 // ---------------------------------------------------------------- the subject's plane: the wing, the towpath, her
 
 const WIN1 = Array.from({length: 6}, (_, i) => [420 + i * 112, 690] as Pt);
+/** The wing's ground storey: glazing bays of small panes on a stucco grid (a facade has its own detail). */
+const PANES = Array.from({length: 4}, (_, i) => i).flatMap((i) => Array.from({length: 6}, (_, j) => [400 + i * 170 + (j % 2) * 66, 900 + Math.floor(j / 2) * 62] as Pt));
 const Wing: React.FC<{mode: Mode}> = ({mode}) => {
   const flat = mode === 'flat';
   // the calm backing field behind the lit fin (CRAFT §f.3): a far gasholder rising behind the wing's west corner, its
@@ -135,8 +143,8 @@ const Wing: React.FC<{mode: Mode}> = ({mode}) => {
       {WIN1.map((p, i) => (
         <Fill key={i} d={rectD(p[0], p[1], 84, 128)} color={i === 4 ? CM.anchor : i % 2 ? CM.lamp : CM.glass} offset={false} />
       ))}
-      {[0, 1, 2, 3].map((i) => (
-        <Fill key={i} d={rectD(400 + i * 170, WING.storey + 40, 130, WING.base - WING.storey - 40)} color={i === 1 ? CM.glass : CM.paneUnlit} offset={false} />
+      {PANES.map((p, i) => (
+        <Fill key={i} d={rectD(p[0], p[1], 58, 54)} color={Math.floor(i / 6) === 1 ? CM.glass : CM.paneUnlit} offset={false} />
       ))}
       {/* the cream fin at the west corner: the lit edge the owner saw melt into the sky */}
       <Fill d={rectD(FIN.x0, FIN.top, FIN.x1 - FIN.x0, WING.base - FIN.top)} color={CM.stucco} offset={false} />
@@ -339,7 +347,7 @@ const DepthDemo2R: React.FC<{mode?: Mode}> = ({mode = 'depth'}) => (
     </Lit>
     <svg style={{position: 'absolute', left: 0, top: 0}} width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
       <text x={40} y={1880} fontSize={30} fontFamily="'DejaVu Sans', sans-serif" fill={CM.ink}>
-        {mode === 'flat' ? 'FLAT (the G4 faults)' : mode === 'trails' ? 'DEPTH + particle trails (1 s)' : 'DEPTH (lib/depth + lib/particles)'}
+        {mode === 'flat' ? 'FLAT (the G4 faults)' : mode === 'trails' ? 'DEPTH + particle trails (3 s, debug)' : 'DEPTH (lib/depth + lib/particles)'}
       </text>
     </svg>
   </World>
@@ -348,7 +356,7 @@ const DepthDemo2R: React.FC<{mode?: Mode}> = ({mode = 'depth'}) => (
 // ---------------------------------------------------------------- the lint, as text
 
 const DepthLint2R: React.FC = () => {
-  const far = (mode: Mode, plane: number) => FAR.filter((b) => b.plane === plane).map((b) => (mode === 'flat' ? b.c : recede(b.c, b.plane, ATM)));
+  const far = (mode: Mode, plane: number) => FAR.filter((b) => b.plane === plane).map((b) => (mode === 'flat' ? b.c : FAR_PAL[b.plane][b.c]));
   const subject = [CM.brickLight, CM.stucco, CM.limestone];
   const things = [
     {name: 'her (far towpath)', y: HER.feet, px: HER.h, m: 1.7},
@@ -359,7 +367,6 @@ const DepthLint2R: React.FC = () => {
   for (const mode of ['flat', 'depth'] as Mode[]) {
     const p = depthProblems(ATM, [
       {plane: 0, colors: subject},
-      {plane: 2, colors: far(mode, 2)},
       {plane: 3, colors: far(mode, 3)},
       {plane: 4, colors: far(mode, 4)},
     ]);
