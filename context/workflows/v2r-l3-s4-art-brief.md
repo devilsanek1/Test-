@@ -78,7 +78,9 @@ V2S3 (the shot before) was conformed just before you: read its "S3 art conform" 
    `V2S4_post` first, then in every `V2S4_*` (`V2S4_wpath`'s brick ticks, `V2S4_wcanal`'s ripple dashes, ...); author A
    outlines at `INK_PX.mid` or wider; do not strip `INK_PX` or sketch options by hand otherwise; tier every piece.
 8. **Particles, SEEN at phone size** (the owner on v4, 2026-10-28: "I don't see any changes in the particles anywhere";
-   CRAFT §f.6; `lib/particles` PRESETS may still hold the old sizes, so pass `size` / `count` yourself): `motes` near SUN1
+   CRAFT §f.6; L1 raised `lib/particles`' PRESETS to these numbers: merge origin first, then use the presets and never
+   pass a smaller size; pass `size` only if the presets still hold the old ones; check at 360 px wide that a viewer can
+   point at them): `motes` near SUN1
    (6-10 px, against shade where they can read), a `leaves` field across the towpath (26-40 px, a visible flutter and
    turn, 2-3 across the hold, crossing the mid ground, their fall clear of the band and of her), `glints` under SUN1 on the
    bottom water (20-36 px, L* +15..+25, 4-6 twinkling at once, 0.3-0.8 s). Particles read `useTime()`, which inside S4's
@@ -114,6 +116,8 @@ Renders (from `video/`): stills `env GL=angle node scripts/render-frames.mjs Fil
 - Public repo: never write an email address or a secret into a file; never commit reference frames.
 - Work in small, checkpointed steps (sky, then planes and air, then the thread and the gasholders, then light, then
   tiers/life, then line marks, then particles), rendering a still after each to see it.
-- Your final message (it is read by the lane, not shown to the owner): what changed per step, every check's numbers,
-  the still paths (under `/tmp/claude-0/-home-user-Test-/6f98c33a-2c7f-5355-893a-0f8c4c5abcb3/scratchpad/s4art/`),
-  open issues, and REQUEST lines.
+- Write all the details (what changed per step, every check's numbers, the still paths under
+  `/tmp/claude-0/-home-user-Test-/6f98c33a-2c7f-5355-893a-0f8c4c5abcb3/scratchpad/s4art/`, open issues, REQUEST lines)
+  into the "S4 art conform" section of `handover_L3.md` and commit it. Your final message (read by the lane, whose
+  context is expensive) is at most 10 lines: each check's verdict with its key number, the commit hash, any must-fix
+  left open. No logs or long tables in it.

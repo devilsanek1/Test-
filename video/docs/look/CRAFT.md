@@ -259,7 +259,8 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
 6. **A few particles make it natural, and they are SEEN** (owner: "a bit of particles here and there"; then, on v4: "I don't
    see any changes in the particles anywhere": the test is that a viewer can point at them at phone size without
    searching): tier-C life, calm and slow, declared at G3 as `life:` items: motes only inside light and against shade
-   (6-10 px, L* +12 to +20 over what is behind them, 6-10 in the sunlit air), dust or pollen in the sun-side air (both
+   (sized by distance: 6-10 px in the mid and far air, 6-10 of them, and 2-4 near-plane motes at 12-16 px drifting past
+   the nearest shade, which are the ones a phone sees; L* +12 to +20 over what is behind them), dust or pollen in the sun-side air (both
    3-12 px/s), leaves (26-40 px, a visible flutter and turn, 2-3 in view across a hold, crossing the mid ground where the
    eye can catch them, their fall clear of the caption band and the subject: a leaf that would reach them shrinks out
    before, never to come back), glints only in the sun's glitter path (20-36 px sparkles or level dashes, L* +15 to +25,
@@ -289,7 +290,7 @@ stands off what is behind it, the far reads far, the ground runs into the pictur
 - A separation backing that is a blank slab: the field behind a subject is a real thing of the set (a building with tone-on-tone windows,
   a stepped top, a lit sliver on its sun side), never a placeholder rectangle.
 - Particles nobody can see: at phone size the viewer must spot them without searching: leaves 26-40 px crossing the mid ground,
-  glints 20-36 px (4-6 at once), motes 6-10 px against shade (v4 had 13 px leaves, 14-24 px glints, 3-4 px motes: invisible to the owner).
+  glints 20-36 px (4-6 at once), motes 6-10 px in the far air plus 2-4 near-plane motes at 12-16 px against the nearest shade (v5: 8-10 px motes alone read as specks; v4 had 13 px leaves, 14-24 px glints, 3-4 px motes: invisible to the owner).
 - Two cameras: a perspective ground under level, frontal buildings reads as a backdrop on a floor; facades, bridge and far rows share the
   ground's horizon and vanishing point (a narrow side wall in shade shows a building's depth).
 - The heaviest area at a squint must be the subject's, never the near dressing: near planes get value range, not prop count.
