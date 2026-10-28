@@ -150,7 +150,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
     - `shared_layer.md`: thread_plane, home_set, PriceTag, captions;
     - `cross_prepass.md`: what crossed the lane borders;
     - `OPEN.md`: the work list, E1-E15 and items 1-12.
-  - The final assembly is workflow `context/workflows/v3-assembly.js` (run wf_abe46864-482; resume with `resumeFromRunId`). Its steps:
+  - The final assembly is workflow `context/workflows/v3-assembly.js` (the 5-hour limit stopped run wf_abe46864-482 at 02:49 UTC; its integrator was resumed from its transcript and finished: `rework_reports/assembly_integrate.md`; the rest runs as wf_c4276cf6-c2a with `args.integReport`; resume with `resumeFromRunId`; each agent writes `rework_reports/assembly_*.md` as it goes). Its steps:
     1. integrate (the lanes' open REQUESTS, every join and the loop seam);
     2. full-size render;
     3. three independent reviews (story/attention, look/light, a cold owner's eye at phone size);
