@@ -81,7 +81,9 @@ python3 -I scripts/qa/gate_check.py --mp4 <render.mp4> --scenes src/v2r/film/sce
   --voice public/v2/voice.wav --entry src/entry-v2r-film.tsx --comp Film2R \
   --frame0 "SHE SAYS: NO CRITICIZING|GOOGLE. FOR LIFE." --frame0-until 5.95 --frame0-geom '{"size":72,"baselines":[372,452],"captionBaseline":516,"captionScale":0.5306,"spoken":"first","keys":["SAYS:","NO","NO CRITICIZING","FOR LIFE."],"source":"Source: BBC News, 21 Oct 2026","sourceSize":20,"sourceBaseline":550}'   # = FILM2R_FRAME0; cuts follow transitionIn (push-through bridge: cuts at c +- 0.05; foreground-wipe: no cut); one shot: --only V2S4 on a Film2R-V2S4 render
 ```
-Expected (2026-10-27, quarter scale): PASS, 2 WARN (V2S2's out-of-bridge cut at f370, not f369: the dark window matches the
-plum bridge; cut-like frames at the draw-on 9 / 14 / 24, f1248 and the un-build 2330 / 2336); frame 0 is checked with
-FILM2R_FRAME0 via --frame0-geom (box x pad not modelled: eye-check the key boxes at full size).
+Expected (the G5 assembly master, 2026-10-28, full size: `docs/v2/ASSEMBLY.md`): PASS, 4 WARN (V2S2's out-of-bridge cut at
+f370, not f369: the dark window matches the plum bridge; V2S7's cut at f1685, not f1686; a cut-like f1429 inside the S5 -> S6
+wipe, the wiper's own motion, no pop; extra cut-like f24 (the draw-on) and f2336 (the un-build)); frame 0 is checked with
+FILM2R_FRAME0 via --frame0-geom (box x pad not modelled: eye-check the key boxes at full size). The master's other checks
+(av_lag, the lints, light, depth, banding and their regions): ASSEMBLY.md.
 Engine note: lib/Film never draws a push-through `bridge` (it culls the outgoing scene first); Film2R draws it itself.

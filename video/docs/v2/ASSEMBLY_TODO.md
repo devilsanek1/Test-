@@ -51,3 +51,7 @@
 - ALL LANES DONE 11:52. Review notes across shots: the sun as a whole orange ball floating above boards/sets in S4-S7 (a motif or a tell?).
 - THE WATER SWAPS DONE (2026-10-28, docs/v2/water/SWAPS.md): lib/water in S2, S3, S4, S5 (S1 already); S8's seam fixed (S8Canal exits early);
   waterProblems clean on all eight specs (src/v2r/scenes/water_swaps_qa.ts); open: the master colour check on S2-S5, S2's three gold columns at phone size.
+- THE G5 ASSEMBLY v1 (2026-10-28, docs/v2/ASSEMBLY.md): deliverables/v2/v2r_G5_assembly_v1.mp4 (the master, the mix, 39.083 s);
+  gate_check PASS (4 WARN); open: check_light FAIL 23.40 (f1404, the paving outshines the Pentagon since the dark plaque) and
+  34.00 (f2040, the board in her walk, known); eye: S5's heavy tree shadows 20.7-22.0, the sun on the boards' corner S6/S7
+  (+ the black rail at the f1686 push), the blank boards (S7 28.2-29.9, S8 33.2-36.5).
