@@ -8,7 +8,7 @@
 // Kit defects worked around here: towpath.tsx Towpath draws its joints in CM.line (a coloured stroke): copied and
 // adapted (joints = thin stone fills + an f0 ink underdrawing); boat.tsx boatInto draws the fender ropes in CM.line:
 // painted with CellPaint (every stroke CM.ink); life.tsx Branch reads as noise at f0 / 216 px: redrawn.
-import React, {useMemo} from 'react';
+import React, {createContext, useContext, useMemo} from 'react';
 import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
 import {line} from '../../lib/sketch';
@@ -164,9 +164,23 @@ const WATER_H0 = S.water.y1 - S.water.y0 + 4;
 const WATER_FAR = atmos(CM.water, 0.3, S1_HAZE, {chromaFloor: 12});
 const WATER_NEAR = mixHex(CM.water, CM.waterDeep, 0.3);
 
+/** THE WATER STUDY SEAM (owner on v5's water, 2026-10-28: "way too cheap ... lazy and cheap"; docs/v2/water/DIAGNOSIS.md):
+ *  a component set here is drawn INSTEAD of S1Water's own body, in the same place (inside the water's parallax plane
+ *  group, the environment tier, the flood's Look and RIG_CANAL), with the scene time `t`. Unset (null, the default) =
+ *  S1 exactly as before, byte for byte. Only src/entry-v2r-waterstudy.tsx sets it (src/v2r/water_study/cand*.tsx). */
+export const S1WaterSlot = createContext<React.FC<{t: number}> | null>(null);
+/** The same seam for the duck on the water (S1World draws it in the moored boats' plane, after the boats): a component
+ *  set here replaces the kit duck (its body, its bob and its paper V wake), so a candidate water can give it its own
+ *  ripples and reflection. Unset = the kit duck exactly as before. */
+export const S1DuckSlot = createContext<React.FC<{t: number}> | null>(null);
+/** The duck as S1World places it: one mallard at its water's scale (~127 px/m: ~0.5 m long), by the bend, its
+ *  waterline y 1136 (the kit's Ducks: body x +-34, head toward +x, a +-6 px sway). */
+export const S1_DUCK = {x: 396, y: 1136, size: 62} as const;
+
 /** The canal between the far coping and our bank: base colour in regions, the wing's broken reflection and the sun's
  *  (orange only on the sun disc: its reflection is gold), swaying slowly. No ripple dashes, no glints (CRAFT §c). */
 export const S1Water: React.FC = () => {
+  const Slot = useContext(S1WaterSlot);
   const t = useTime();
   const {y0, y1, x0, x1} = WATER;
   const H = y1 - y0;
@@ -207,6 +221,8 @@ export const S1Water: React.FC = () => {
     });
     return b;
   }, []);
+  // the study seam (after every hook, so the hook order never changes): a candidate water replaces this body
+  if (Slot) return <Slot t={t} />;
   return (
     <>
       <CellPaint b={base} seed="s1water/base" cell={140} misreg={0} />

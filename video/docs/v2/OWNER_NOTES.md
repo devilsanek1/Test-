@@ -128,6 +128,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   two competing treatments judged on S1, the winner built into the library), shown to the owner on S1 as the G4 look clip v6 before the
   lanes swap it in; the lanes keep going meanwhile (their water isolated in one component, no water polish); the final review round
   shrinks to pay for it inside 100 % of the week.
+- 2026-10-28 ~09:29 UTC, budget: a screenshot (this 5-hour window 36 %, resets in 3 h 23 min; weekly 81 %, resets Mon 09:59) and
+  "Let's push the ..." -> lanes resumed from their hold with the lean scope (one critic round, must-fixes only, one 0.4 clip + report); the
+  water workflow continues; recalibrated: ~$38 per weekly %, ~$10 per window % (the 23:22 -> 09:29 readings); finish projected ~93-98 %.
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
