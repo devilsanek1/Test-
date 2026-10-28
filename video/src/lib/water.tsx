@@ -529,8 +529,13 @@ export type WaterSpec = {
   tone?: Partial<ToneOpts>;
   /** The Fresnel ladder: k far -> near over the water's y, in flat steps (default 0.40 -> 0.72 in steps of 0.05). */
   ladder?: {k: [number, number]; y?: [number, number]; step?: number};
-  /** The grid (default dz 0.45 m, pitch >= 3 px, gap 16 -> 26 % of the pitch). */
-  grid?: {dz?: number; minPitch?: number; gap?: [number, number]};
+  /** The grid (default dz 0.45 m, pitch >= 3 px, gap 16 -> 26 % of the pitch). Bars start only where a band is at
+   *  least `barPitch` px (default 7: the far water is a near-perfect mirror, R2, so a far reflection stays whole); a gap
+   *  inside a reflection is a TROUGH, tone-on-tone: the bar's own tone mixed `gapMix` (default 0.4) toward the open
+   *  water there (a light line across a reflection is a ripple line's job, few and placed: R9). */
+  grid?: {dz?: number; minPitch?: number; gap?: [number, number]; barPitch?: number; gapMix?: number};
+  /** Reflection layers from this one on (the quay, the boats) draw over the glitter (default 30). */
+  quayLayer?: number;
   sway?: Sway;
   sources: WaterSource[];
   /** Reflections of things that move (people walking, a door sliding, a bus): rebuilt every frame. */
@@ -574,6 +579,9 @@ type Static = {
   byId: Map<string, Resolved>;
   ladder: {k: [number, number]; y: [number, number]; step: number};
   sway: Sway;
+  /** Bars start at or below this y (the first band of barPitch px). */
+  yBarMin: number;
+  gapMix: number;
   bed: GlitterLens[];
   sunPlane: number;
   floodEnd: number;
@@ -596,7 +604,7 @@ export function regionPoly(r: WaterSpec['region']): Poly {
   return [...top, ...bot.reverse()];
 }
 
-function resolveSource(s: WaterSource, cam: WaterCam, grid: Grid, region: WaterSpec['region'], moving: boolean): Resolved {
+function resolveSource(s: WaterSource, cam: WaterCam, grid: Grid, region: WaterSpec['region'], moving: boolean, yBarMin: number): Resolved {
   const p = s.refl ?? (s.thing && s.axis !== undefined ? mirrorPoly(s.thing, s.axis, cam) : []);
   const box = boxOf(p);
   // the visible length: from its top (or the water's far edge) to the near edge under its middle (or its own end)
@@ -604,7 +612,7 @@ function resolveSource(s: WaterSource, cam: WaterCam, grid: Grid, region: WaterS
   const top = Math.max(box.y0, region.top(xc));
   const yEnd = Math.min(box.y1, region.bottom(xc) + 4);
   const k = Math.max(0.55, s.solid ?? 0.6);
-  const raw = top + Math.max(0, yEnd - top) * k;
+  const raw = Math.max(top + Math.max(0, yEnd - top) * k, yBarMin);
   const ySolid = moving ? raw : snapRow(grid, raw);
   return {...s, p, box, ySolid, yEnd: Math.max(yEnd, ySolid + 1), sd: seedOf(s.id)};
 }
@@ -620,11 +628,18 @@ export function waterStatic(spec: WaterSpec): Static {
   const g = spec.grid ?? {};
   const grid = makeGrid(spec.cam, {yTop: box.top, yBot: box.bottom + 40, dz: g.dz ?? 0.45, minPitch: g.minPitch ?? 3, gap: g.gap ?? [0.16, 0.26], yFar: spec.ramp.yFar, yNear: spec.ramp.yNear});
   const ramp = waterRamp(spec.cam, spec.sky, spec.body, spec.ramp, box);
-  const srcs = spec.sources.map((s) => resolveSource(s, spec.cam, grid, spec.region, false));
+  const barPitch = g.barPitch ?? 7;
+  let yBarMin = grid.rows[grid.rows.length - 1];
+  for (let i = 0; i + 1 < grid.rows.length; i++)
+    if (grid.rows[i + 1] - grid.rows[i] >= barPitch - 1e-9) {
+      yBarMin = grid.rows[i];
+      break;
+    }
+  const srcs = spec.sources.map((s) => resolveSource(s, spec.cam, grid, spec.region, false, yBarMin));
   const byId = new Map(srcs.map((s) => [s.id, s] as [string, Resolved]));
   const ladder = {k: spec.ladder?.k ?? ([0.4, 0.72] as [number, number]), y: spec.ladder?.y ?? ([spec.ramp.yFar, spec.ramp.yNear] as [number, number]), step: spec.ladder?.step ?? 0.05};
   const sway = spec.sway ?? SWAY_DEFAULT;
-  const st: Static = {spec, seed, tone, grid, ramp, regionD: polyD(rp), regionPoly: rp, box, srcs, byId, ladder, sway, bed: [], sunPlane: spec.sun?.plane ?? 0, floodEnd: 0, pale: [], paleBase: ''};
+  const st: Static = {spec, seed, tone, grid, ramp, regionD: polyD(rp), regionPoly: rp, box, srcs, byId, ladder, sway, yBarMin, gapMix: g.gapMix ?? 0.4, bed: [], sunPlane: spec.sun?.plane ?? 0, floodEnd: 0, pale: [], paleBase: ''};
   st.bed = spec.sun && spec.lod !== 'far' ? glitterBed(st) : [];
   if (spec.flood) {
     const f = spec.flood;
@@ -951,7 +966,7 @@ export function waterFrame(spec: WaterSpec, t: number): WaterFrame {
   const swayFn = far ? () => 0 : (y: number) => swayAt(spec.cam, st.sway, yFar, yNear, st.seed, y, t);
   const ctx: FrameCtx = {st, t, sway: swayFn, shift};
   const out: Runs = new Map();
-  const moving = spec.moving ? spec.moving(t).map((s) => resolveSource(s, spec.cam, st.grid, spec.region, true)) : [];
+  const moving = spec.moving ? spec.moving(t).map((s) => resolveSource(s, spec.cam, st.grid, spec.region, true, st.yBarMin)) : [];
   const all = [...st.srcs.map((s) => ({s, m: false})), ...moving.map((s) => ({s, m: true}))].sort((a, b) => a.s.layer - b.s.layer);
   for (const {s, m} of all) {
     if (far) buildFlat(s, ctx, out);
