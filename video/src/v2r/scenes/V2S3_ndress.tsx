@@ -35,6 +35,25 @@ const pt = (x: number, z: number, level = 0): Pt => cam.pt(x, z, level);
 
 /** The bench seen from behind: the iron end frames (rear legs, arms), the three back slats, the seat's front edge seen
  *  through the slats' gaps, the bag on the seat. */
+/** A polygon with its corners rounded (each cut back `d` px along both edges, at most a third of the edge): cast iron
+ *  is cast round, and a sharp dark corner reads as a tick. */
+function roundPoly(pts: Pt[], d = 6): string {
+  const n = pts.length;
+  const cut = (a: Pt, b: Pt): Pt => {
+    const l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+    const k = Math.min(d, l / 3) / l;
+    return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k];
+  };
+  let s = '';
+  for (let i = 0; i < n; i++) {
+    const v = pts[i];
+    const a = cut(v, pts[(i + n - 1) % n]);
+    const c = cut(v, pts[(i + 1) % n]);
+    s += `${i ? 'L' : 'M'}${P(a[0], a[1])}Q${P(v[0], v[1])} ${P(c[0], c[1])}`;
+  }
+  return s + 'Z';
+}
+
 function benchBatch(): Batch {
   const b = new Batch();
   const {x0, x1, zBack, zFront, seat, back0, back1} = BENCH;
@@ -51,7 +70,7 @@ function benchBatch(): Batch {
   b.poly(CM.coatMustard, [[bx - bw * 0.5, by], [bx + bw * 0.5, by], [bx + bw * 0.44, by - bh * 0.72], [bx - bw * 0.44, by - bh * 0.72]]);
   b.rect(seamTone(CM.coatMustard, 10), bx - bw * 0.47, by - bh * 0.28, bw * 0.94, bh * 0.08);
   const hy = by - bh * 0.72;
-  b.fill(seamTone(CM.coatMustard, 14), `M${P(bx - bw * 0.3, hy)}Q${P(bx - bw * 0.26, hy - bh * 0.34)} ${P(bx, hy - bh * 0.34)}Q${P(bx + bw * 0.26, hy - bh * 0.34)} ${P(bx + bw * 0.3, hy)}L${P(bx + bw * 0.2, hy)}Q${P(bx + bw * 0.18, hy - bh * 0.24)} ${P(bx, hy - bh * 0.24)}Q${P(bx - bw * 0.18, hy - bh * 0.24)} ${P(bx - bw * 0.2, hy)}Z`);
+  b.fill(seamTone(CM.coatMustard, 7), `M${P(bx - bw * 0.3, hy)}Q${P(bx - bw * 0.26, hy - bh * 0.34)} ${P(bx, hy - bh * 0.34)}Q${P(bx + bw * 0.26, hy - bh * 0.34)} ${P(bx + bw * 0.3, hy)}L${P(bx + bw * 0.2, hy)}Q${P(bx + bw * 0.18, hy - bh * 0.24)} ${P(bx, hy - bh * 0.24)}Q${P(bx - bw * 0.18, hy - bh * 0.24)} ${P(bx - bw * 0.2, hy)}Z`);
   b.layer();
   // the back slats (three planks across, a gap between each), on the rear frame
   for (let k = 0; k < 3; k++) {
@@ -62,9 +81,9 @@ function benchBatch(): Batch {
   // the iron end frames: a rear leg up to the back's top, an arm forward at seat height, a front leg
   for (const ex of [x0 + 0.03, x1 - 0.03]) {
     const w = 0.05;
-    b.poly(IRON, [pt(ex - w, zBack, back1 + 0.02), pt(ex + w, zBack, back1 + 0.02), pt(ex + w, zBack, 0), pt(ex - w, zBack, 0)]);
-    b.poly(IRON, [pt(ex - w, zBack, seat + 0.2), pt(ex - w, zFront, seat + 0.2), pt(ex - w, zFront, seat + 0.15), pt(ex - w, zBack, seat + 0.15)]);
-    b.poly(IRON, [pt(ex - w * 0.8, zFront, seat + 0.18), pt(ex + w * 0.8, zFront, seat + 0.18), pt(ex + w * 0.8, zFront, 0), pt(ex - w * 0.8, zFront, 0)]);
+    b.fill(IRON, roundPoly([pt(ex - w, zBack, back1 + 0.02), pt(ex + w, zBack, back1 + 0.02), pt(ex + w, zBack, 0), pt(ex - w, zBack, 0)]));
+    b.fill(IRON, roundPoly([pt(ex - w, zBack, seat + 0.2), pt(ex - w, zFront, seat + 0.2), pt(ex - w, zFront, seat + 0.15), pt(ex - w, zBack, seat + 0.15)]));
+    b.fill(IRON, roundPoly([pt(ex - w * 0.8, zFront, seat + 0.18), pt(ex + w * 0.8, zFront, seat + 0.18), pt(ex + w * 0.8, zFront, 0), pt(ex - w * 0.8, zFront, 0)]));
   }
   return planeBatch(b, PLANE);
 }

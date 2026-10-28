@@ -73,7 +73,7 @@ export const WINDOWS: WinSpec[] = [
 export const DOORS: DoorSpec[] = [
   {id: 'herDoor', x: 184, y: 940, w: 62, h: 126, color: CM.hero, fan: 'arch', fanLit: true, caseStucco: true, ground: TL.ground},
   {id: 'h2door', x: 690, y: 940, w: 62, h: 126, color: CM.coatMustard, fan: 'rect', fanLit: false, caseStucco: true, ground: TL.ground},
-  {id: 'h3door', x: 792, y: 942, w: 60, h: 124, color: CM.anchor, fan: 'arch', fanLit: true, caseStucco: false, ground: TL.ground},
+  {id: 'h3door', x: 792, y: 942, w: 60, h: 124, color: CM.sage, fan: 'arch', fanLit: true, caseStucco: false, ground: TL.ground},
 ];
 
 /** The stacks on the party walls and her end wall (x, w, top, colour, pots): their bodies take a FormShade. */
@@ -125,7 +125,7 @@ function backBatch(sh: ShadeSink, stacks: string[]): Batch {
     sh.cast.push(rectP(h.x0, TL.cornice + 14, h.x1 - h.x0, 3));
     b.rect(h.wall === CM.sage ? CM.stucco : CM.limestone, h.x0 - 1, TL.string, h.x1 - h.x0 + 2, 10);
     sh.cast.push(rectP(h.x0, TL.string + 10, h.x1 - h.x0, 2.5));
-    b.rect(seamTone(h.wall === CM.sage || h.roof === 'parapet' ? CM.stucco : h.wall, 9), h.x0, G - 22, h.x1 - h.x0, 22);
+    b.rect(seamTone(CM.stucco, 9), h.x0, G - 22, h.x1 - h.x0, 22);
   }
   b.layer();
   // ---- chimney stacks on the party walls (pots >= 600) + the end stack on her west wall
@@ -196,7 +196,8 @@ function streetBatch(): Batch {
   const b = new Batch();
   const G = TL.ground;
   const rail: [number, number][] = [[258, 525], [525, 676], [766, 776], [868, 1010], [1010, 1180]];
-  rail.forEach(([a, c], i) => areaRailInto(b, a, c, G, 62, `rail${i}`));
+  // (the rail before the stucco house's ground-floor window rises to its sill: no thin brick gap between them)
+  rail.forEach(([a, c], i) => areaRailInto(b, a, c, G, a === 868 ? 66 : 62, `rail${i}`));
   areaRailInto(b, 160, 168, G, 62, 'railW');
   binInto(b, 742 + 120, G, 46, CM.coatSlate);
   binInto(b, 742 + 152, G, 46, CM.sage);

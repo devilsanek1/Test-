@@ -47,7 +47,7 @@ const Walker: React.FC<{w: WalkerSpec}> = ({w}) => {
   const step = (w.phase ?? 0) + (Math.abs(w.v) * (tq - S3_START)) / w.stepPx;
   return (
     <Tier tier="environment">
-      <Person x={walkerX(w, t)} y={w.y} h={w.h} exact seed={w.seed} traits={w.traits} pose="walk" view="profile" flip={w.v > 0} step={step} stride={strideFor(w.stepPx, w.h, 'profile')} />
+      <Person x={walkerX(w, t)} y={w.y} h={w.h} ink={0} exact seed={w.seed} traits={w.traits} pose="walk" view="profile" flip={w.v > 0} step={step} stride={strideFor(w.stepPx, w.h, 'profile')} />
     </Tier>
   );
 };
@@ -258,6 +258,6 @@ export const S3RoofLife: React.FC = () => {
       b.fill(dim ? CM.coatMustard : CM.lamp, ovalPath(x, y + 2.9, 2.6, 3.2));
     }
   });
-  b.ink(wires, 1.2, CM.ink, 0, {thing: true});
+  b.ink(wires, 1.2, S3_IRON, 0, {thing: true});
   return <Paint b={b} seed="s3festoons" misreg={false} />;
 };

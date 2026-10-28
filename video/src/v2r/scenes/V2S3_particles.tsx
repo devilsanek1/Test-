@@ -9,8 +9,8 @@
 //   leaves  two 34-40 px palmate leaves blown across her towpath and over the canal on a light westerly (115 px/s across,
 //           45-70 px/s down) from the tree past her end wall: one already in flight at the cut (born 12.20, its grow-in
 //           long before the join), one born at 13.30; they settle on the water (floor 1176), never reaching the boat
-//   motes   FAR: four 8-10 px motes, L* +18, in the evening light beside her window, against the shaded brick east of
-//           its architrave (the wall's shade); NEAR: three 12-16 px motes (lib's `nearSize`, plane -2) drifting in the
+//   motes   FAR: four 8-10 px motes, L* +18, in the evening light beside her window, against the brick east of its
+//           frame band; NEAR: three 12-16 px motes (lib's `nearSize`, plane -2) drifting in the
 //           low sun's light in front of our hull's shade
 // At most 15 alive across the fields (<= 16: CRAFT §f.6): 6 glints, 2 leaves, 4 far motes, 3 near motes.
 import React from 'react';
@@ -39,7 +39,7 @@ export const S3_PARTICLE_FIELDS: {plane: number; f: ParticlesProps}[] = [
     plane: S3_PLANE.terrace,
     f: {kind: 'leaves', seed: 's3leaves', region: {rect: [-24, 1004, 44, 40]}, on: '#D2BAAB', colors: [CM.leafRust, CM.leafGold], leaf: 'palmate', births: [12.2, 13.3], size: [34, 40], speed: [45, 70], drift: [115, 0], floor: 1176, margin: 12, ...common},
   },
-  // the far motes: beside her window, against the shaded brick east of the architrave
+  // the far motes: beside her window, against the brick east of its frame band
   {plane: S3_PLANE.terrace, f: {kind: 'motes', seed: 's3motes', region: {rect: [430, 726, 66, 126]}, on: '#B57562', count: 4, size: [8, 10], lift: 18, margin: 10, ...common}},
   // the near motes (nearest: last): in front of our hull's shade (its slate, rendered ~#616F82)
   {plane: S3_PLANE.towpath, f: {kind: 'motes', seed: 's3motesNear', plane: -2, region: {rect: [340, 1572, 420, 40]}, on: '#616F82', count: 3, lift: 17, margin: 10, ...common}},
