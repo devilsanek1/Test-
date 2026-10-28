@@ -1,7 +1,9 @@
 # Video 3 posting kit: "AI is making your next laptop pricier"
 
 Video: `deliverables/v3/v3_final.mp4`, the rework cut (1080x1920, 60 fps, 41.15 s = 2469 frames, loops to frame 0; H.264
-High from the master encode, BT.709 tagged, TV range, faststart; AAC 48 kHz at -13.9 LUFS / -1.9 dBTP; 18.0 MB).
+High from the master encode, BT.709 tagged, TV range, faststart; AAC 48 kHz at -13.9 LUFS / -1.9 dBTP; 17.9 MB). Re-mastered 2026-10-28 after the owner's notes on the posted reel: no repeated
+text at the hook (the core line is its spoken line's caption), the street notice shows only "~5x" / "2027", no small source lines
+in the picture (sources: the pinned comment).
 Cover: `deliverables/v3/cover.png` (Cover3 frame 192 = 3.2 s of the reworked hook: the phone's listing with its tag, $999
 struck and $1,079, under the window's lit AI DATA CENTER sign; the core line as the title on the wall above the window,
 clear of the subject; the title, the sign and the tag sit inside the 3:4 profile-grid crop). Facts: `research/factlock.md` (the BLS
