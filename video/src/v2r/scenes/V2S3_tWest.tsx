@@ -115,8 +115,8 @@ function westNearBatch(): Batch {
   b.rect(CM.brickLight, XL, g0 + 6, XE - XL, 1100 - g0 - 6);
   b.rect(CM.limestone, XL, g0, XE - XL + 2, 8);
   b.layer();
-  b.rect(CM.line, 44, g0 + 10, 46, 90);
-  b.rect(CM.brickDeep, 66, g0 + 12, 22, 86);
+  b.rect(CM.leafRust, 44, g0 + 10, 46, 90);
+  b.rect(CM.brick, 66, g0 + 12, 22, 86);
   b.layer();
   for (const [c0, c1, drop] of [[XL + 6, 30, 30], [96, 160, 24]] as const) {
     b.fill(CM.sage, lobes(c0, c1, g0 + 4, drop * 0.7, `s3ivy${c0}`, 4));

@@ -173,7 +173,7 @@ function cabinInto(L: Levels) {
   }
   // ---- level 2: porthole rims (cream: per frame, with the curtains), the door frame, the castle's cream ring, the saloon frame
   const b2 = L.at(2);
-  b2.rect(BOAT_WOOD, DOORS.x0 - 6, DOORS.y0 - 6, DOORS.x1 - DOORS.x0 + 12, DOORS.y1 - DOORS.y0 + 8);
+  b2.fill(BOAT_WOOD, rr(DOORS.x0 - 6, DOORS.y0 - 6, DOORS.x1 - DOORS.x0 + 12, DOORS.y1 - DOORS.y0 + 8, 7));
   b2.fill(CM.coatOat, ovalPath(CASTLE.x, CASTLE.y, CASTLE.rx + 4, CASTLE.ry + 4));
   b2.fill(CM.coatOat, ringRR(SALOON.x0 - 9, SALOON.y0 - 9, SALOON.x1 + 9, SALOON.y1 + 9, 14, 9));
   for (const x of [s4x(196), s4x(566), s4x(956), 930]) {
@@ -299,7 +299,7 @@ function roofInto(L: Levels) {
   // ---- on the far rail: the boat pole, the plank, the mop with its head; vents and the water filler
   a.rect(CM.coatOat, s4x(-40), NB.roofFar - 13, 440 * SK, 3.4);
   a.rect(BOAT_WOOD, s4x(-40), NB.roofFar - 8, 300 * SK, 4.6);
-  a.rect(CM.brickDeep, s4x(160), NB.roofFar - 18.5, 170 * SK, 2.6);
+  a.rect('#C09474', s4x(160), NB.roofFar - 18.5, 170 * SK, 2.6);
   c.rect(CM.coatMustard, s4x(394), NB.roofFar - 14, 6, 4.6);
   c.fill(CM.stucco, `M${P(s4x(328), NB.roofFar - 22)}Q${P(s4x(356), NB.roofFar - 25)} ${P(s4x(368), NB.roofFar - 16)}Q${P(s4x(352), NB.roofFar - 11)} ${P(s4x(328), NB.roofFar - 15)}Z`);
   for (const x of [s4x(176), s4x(646), s4x(872), 900]) {
@@ -381,13 +381,13 @@ function roofInto(L: Levels) {
   c.ink(logInk, 0.8, BOAT_WOOD);
   // ---- past S4's view: the painted Buckby can (plum-mauve, a brass band, a rose)
   const bc = BUCKBY;
-  a.fill(CM.coatPlum, rr(bc[0] - 11, bc[1] - 33, 22, 33, 4));
-  a.fill(CM.coatPlum, `M${P(bc[0] - 8, bc[1] - 33)}L${P(bc[0] - 5.3, bc[1] - 40)}L${P(bc[0] + 5.3, bc[1] - 40)}L${P(bc[0] + 8, bc[1] - 33)}Z`);
+  a.fill(FITTING, rr(bc[0] - 11, bc[1] - 33, 22, 33, 4));
+  a.fill(FITTING, `M${P(bc[0] - 8, bc[1] - 33)}L${P(bc[0] - 5.3, bc[1] - 40)}L${P(bc[0] + 5.3, bc[1] - 40)}L${P(bc[0] + 8, bc[1] - 33)}Z`);
   c.rect(CM.coatMustard, bc[0] - 11, bc[1] - 28, 22, 2.6);
   c.fill(CM.box, ovalPath(bc[0] - 2.6, bc[1] - 16, 4.6, 4.2));
   d.fill(CM.brick, ovalPath(bc[0] - 2, bc[1] - 15.4, 2.1, 1.9));
   d.fill(CM.stucco, ovalPath(bc[0] + 5.3, bc[1] - 13, 2.1, 2.1));
-  d.ink(arcInk(bc[0], bc[1] - 40, 8, 8, 180, 360, {seed: 's3nb/bch'}) + `M${P(bc[0] + 11, bc[1] - 32)}L${P(bc[0] + 11, bc[1])}`, hair, CM.ink);
+  d.ink(arcInk(bc[0], bc[1] - 40, 8, 8, 180, 360, {seed: 's3nb/bch'}) + `M${P(bc[0] + 11, bc[1] - 32)}L${P(bc[0] + 11, bc[1])}`, hair, CM.shadeCool);
   // ---- the geranium trough cut by the right edge (the flowers sway with the herbs)
   a.poly(CM.brickDeep, [[1066, rn(30)], [1200, rn(30)], [1200, rn(8)], [1070, rn(8)]]);
   c.rect(CM.brick, 1066, rn(30), 134, 5);
@@ -573,10 +573,19 @@ const CLIP_ID = 's3nbWalkerClip';
  *  us), the cabin side's foot one Shade step (CRAFT §d: the tint family, never a hand-picked
  *  fill). Drawn after the boat's static batch (the cabin, the roof, its things), so the things they lie under must not
  *  be covered: the contacts sit at the feet, the casts run along the roof to the right. */
+/** The roof's near grab rail and its stanchions (cabinInto's): kept out of the roof things' shadows (a 3 px rail under a
+ *  shadow reads as a row of dark ticks). */
+function nearRailD(): string {
+  const y = NB.roofNear - 12;
+  let d = `M${NB.x0} ${y}H${NB.x1}V${y + 3}H${NB.x0}Z`;
+  for (let x = NB.x0 + 30; x < NB.x1; x += 80) d += `M${x} ${y}H${x + 3}V${y + 8}H${x}Z`;
+  return d;
+}
+
 const BoatShadows: React.FC = () => (
   <>
     <Shade d={`M${NB.x0} ${NB.cabin1 - 5}H${NB.x1}V${NB.cabin1}H${NB.x0}Z`} />
-    <ShadowLayer>
+    <ShadowLayer exclude={[nearRailD()]}>
       <ContactShadow x={COIL.x} y={COIL.y + 8} w={COIL.rx * 2} h={7} />
       <ContactShadow x={(BUCKET.x0 + BUCKET.x1) / 2} y={BUCKET.y} w={BUCKET.x1 - BUCKET.x0} h={6} />
       <CastShadow x={(BUCKET.x0 + BUCKET.x1) / 2} y={BUCKET.y} w={BUCKET.x1 - BUCKET.x0} depth={4} h={24} />

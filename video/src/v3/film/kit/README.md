@@ -135,7 +135,7 @@ compositions `KitLifeO1`, `KitLifeS4` (kit pieces at the plan's places; the lane
 | Export | Props / notes |
 |---|---|
 | `PIP_EMBER` | the lib `Colorway`: body lilac `#A983C9`, shade `#8C68AE`, ear inner and cheeks `EMBER.nail`, nails `wall`, ink `EMBER.ink`. Measured ΔE76 (sheet screen 5): wall 56, desk 62, shelf 58, sky 28, skyLow 23, dc 33, snow 49, road 36, brick 66, pop 33, hero 82. Lilac is used for nothing else. |
-| `Pip3` | `x y` (feet) `scale` (1 = ~96 px; close-ups 1.6-1.9 with `lineWeight` 1.25), `pose` or `keys` [{t, pose, look, expression, amount}] (each switch a squash-and-stretch pop), `look` (value or [{t, v}] eased over `lookDur` 0.16 s: the head turn that points the eye), `hops` [{t, to?, dur, height}] (in place, or to a new perch), `jolts` [t] (a startle without a pose change), `at` + `drawDur` (draws on), `exitAt`, `outdoor` (a snow-lit rim along head and back), `snowCap` (0..1 or [t0, t1]: grows), `shakeAt` (flung off), `idle` (1: blink, ears, tail, breath never stop), `flip`, `seed`. Poses: sit-back, sit-front, stand-side, walk-side, peek, trunk-up, hold, ears-cover, shrug, sleep (`src/lib/mascot`). `pipPlace(t, x, y, hops)` = where its feet are (aim things at it). |
+| `Pip3` | `x y` (feet) `scale` (1 = ~96 px; close-ups 1.6-1.9 with `lineWeight` 1.25), `pose` or `keys` [{t, pose, look, expression, amount}] (each switch a squash-and-stretch pop), `look` (value or [{t, v}] eased over `lookDur` 0.16 s: the head turn that points the eye), `hops` [{t, to?, dur, height}] (in place, or to a new perch), `jolts` [t] (a startle without a pose change), `shrugs` [{t, dur 0.15, face 'meh', hold}] (a shrug IN the current pose: the head rises and leans out a hair with the heavy-lidded face, no key switch so no squash pop; the payoff's side shrug, never the frontal 'shrug' pose over a subject), `at` + `drawDur` (draws on), `exitAt`, `outdoor` (a snow-lit rim along head and back), `snowCap` (0..1 or [t0, t1]: grows), `shakeAt` (flung off), `idle` (1: blink, ears, tail, breath never stop), `flip`, `seed`. Poses: sit-back, sit-front, stand-side, walk-side, peek, trunk-up, hold, ears-cover, shrug, sleep (`src/lib/mascot`). `pipPlace(t, x, y, hops)` = where its feet are (aim things at it). |
 | `PipTiny` | S9's end: a 50-60 px back-view silhouette (pear body, round head, two big ears, the trunk curl past one cheek, a tufted tail), idle ear flicks and tail, `hopAt` (the thoom), `outdoor` rim, `side`. |
 
 ## People (`People3.tsx`, on the house `Person`: back view always)
@@ -352,7 +352,10 @@ const rig = nookRig({lamp: LAMP, pool: POOL, glass}); const laptop = <Laptop x={
 air (sRGB colour matrix: no blur, no fade; dusk-blue pieces only: a warm hue across from the air would cross grey, so recolour
 those with `lib/depth.ts` `recede`); `twoStepIn` / `stepAt` = the house 2-step switch (3 frames at the half step). H2's data
 center is `<Haze k={0.35 * s}>` round the kit `DataCenter` off its beats. `kit/Fleet.tsx` (`FleetVan` van / dc / better,
-`NoticeFlip`, `CrateFlight` / `CrateBox`): `NoticeFlip` takes `binding` / `rings` (a calm header off the board's beats); its
+`NoticeFlip`, `CrateFlight` / `CrateBox`): 'better' is the van's chassis and length with a bigger box (`BETTER_VAN`: a Luton
+box, 0.74 of the length, 1.2x tall) carrying the chart's BETTER laptop, a warm-white pill with ink letters at ~h x 0.4 over
+the NEW laptop, so it reads at phone size; the pill calms with the van's `line` (or `labelK` 0 / 0.5 / 1 for a 2-step;
+`fleetVanGeo` returns `top` = the box's top and `cabTop` = the cab's); `NoticeFlip` takes `binding` / `rings` (a calm header off the board's beats); its
 snow (the vans' roofs, the notice's cap) is the street rig's sky-facing cap (`RIGS.street.snowCap`, L* 89, CRAFT §d.2), never
 the palette's lit `EMBER.snow` (L* 93): the brightest thing outside is a light, never the snow. A whole plane that must sit back
 for a beat (H2's street through the reveal) takes `outside.tsx`'s `CalmPlane` (its value contrast toward its own ground and its

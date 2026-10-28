@@ -13,14 +13,16 @@ import {S3_WATER} from './V2S3_water';
 
 /** The heron's mooring post: a timber post standing in the water off the far coping. */
 const POST = S3_WATER.standing[0];
+/** Its weathered grey timber (a mid value: a dark post in the water reads as a line). */
+const POST_WOOD = '#9C8676';
 
 function postBatch(): Batch {
   const b = new Batch();
-  b.rect(CM.line, POST.x - POST.w / 2, POST.top, POST.w, POST.bottom - POST.top);
-  b.fill(CM.line, ovalPath(POST.x, POST.top, POST.w / 2 + 1, 3));
+  b.rect(POST_WOOD, POST.x - POST.w / 2, POST.top, POST.w, POST.bottom - POST.top);
+  b.fill(POST_WOOD, ovalPath(POST.x, POST.top, POST.w / 2 + 1, 3));
   // its waterline: the water's own deeper step (never a contact strip on water), and one soft reflection band
   b.rect(CM.waterDeep, POST.x - POST.w, POST.bottom - 4, POST.w * 2, 4);
-  b.rect(mixHex(CM.water, CM.line, 0.35), POST.x - 4, POST.bottom, 8, 14);
+  b.rect(mixHex(CM.water, POST_WOOD, 0.35), POST.x - 4, POST.bottom, 8, 14);
   return b;
 }
 

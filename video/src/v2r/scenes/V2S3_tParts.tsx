@@ -330,7 +330,7 @@ export function doorInto(b: Batch, d: DoorSpec, sh: ShadeSink) {
     b.rect(CM.stucco, x - 13, top - 4, 11, h + fanH + 8);
     b.rect(CM.stucco, x + w + 2, top - 4, 11, h + fanH + 8);
     b.rect(CM.stucco, x - 18, top - 14, w + 36, 11);
-    sh.cast.push(rectP(x - 18, top - 3, w + 36, 2.6));
+    sh.cast.push(rectP(x - 18, top - 3, w + 36, 10));
     sh.cast.push(quadP([[x + w + 13, top], [x + w + 20, top + 6], [x + w + 20, y + h], [x + w + 13, y + h]]));
   } else {
     sh.cast.push(quadP([[x + w + 3, top + 4], [x + w + 9, top + 9], [x + w + 9, y + h], [x + w + 3, y + h]]));

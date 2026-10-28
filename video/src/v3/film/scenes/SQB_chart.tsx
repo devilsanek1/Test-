@@ -10,7 +10,9 @@
 //   10.32-10.50 a doodle laptop drops onto the line (~2010) and lands on "buy" (10.60): its screen says "$999"
 //   10.82       a shinier, bigger BETTER one pops onto the line right after it (~2015), the SAME "$999" ("one." 10.92):
 //               same money, better laptop = lower on the line (the index is quality-adjusted, FL 1.8/1.9)
-//   11.80       "this past year": the dot at the line's end pops once (the eye waits where the hook will turn)
+//   11.80       "this past year": the dot at the line's end pops once and, in the same frame, a soft band in a pale
+//               hero tint pops in over the past year (YEAR_BAND, final round R3-3: the turn's own picture; the hook
+//               rises inside it at 13.85 and "+9.7%" lands over it)
 //   13.85-14.45 the line hooks UP (Sept 2025 -> Sept 2026, the hero colour), ending just before "up" (14.52)
 //   14.74       "+9.7%" pops alone, above the hook ("almost10%" 14.84), and in the same frame the old deal's doodles
 //               step back, ONE event (final pass, the owner's "not sure what to keep my attention on"): both go to tier
@@ -356,6 +358,42 @@ function dotPulse(T: number): number {
   return u <= 0 || u >= 1 ? 1 : 1 + 0.5 * Math.sin(Math.PI * u) ** 2;
 }
 
+// ================================================================= "this past year" (the turn's stage)
+
+/** "But this past year, in the US," (11.48-13.56) had no picture of its own (final round, R3-3: the dot's x1.5 swell,
+ *  ~9 pt on a phone, on a framing unchanged since 6.45, was the only event; the cold watch's first swipe point). At
+ *  CHART_BEATS.pulse the plot's last year gets ONE visible event on the card: a soft band in a pale tint of the hero
+ *  (tier-B value: C* ~21, no outline, flat, soft top corners) pops in over the past year (Sept 2025 -> Sept 2026, the
+ *  hook's span), the plot's full height, with the dot's swell in the same frame; the end dot sits inside it and it
+ *  stays as the stage where the line hooks up (13.85) and "+9.7%" lands (14.74). It starts at 2025 (over the "2025"
+ *  label, the dot inside with room for its swell: ~51 px wide), its foot stops just above the x axis (the axis stays
+ *  one crisp line) and its right edge covers the hook's round end cap. */
+export const YEAR_BAND = (() => {
+  const x0 = P(2025, 0)[0];
+  const x1 = P(HOOK.end[0], 0)[0] + LINE_W * 0.5 + 2;
+  const [, top] = plotPt([0, 1]);
+  const [, axis] = plotPt([0, 0]);
+  return {x: x0, y: top - 12, w: x1 - x0, h: axis - 2 - (top - 12), r: 5};
+})();
+/** The band's fill: the hero 72 % of the way to the card's paper (L* ~83, C* ~21 on the paper's 95: seen at phone
+ *  size, never loud; the line, the dot and the hook keep the hero itself). */
+export const YEAR_BAND_FILL = mixRgb(EMBER.hero, CARD_PAPER, 0.72);
+const YEAR_BAND_D = (() => {
+  const {x, y, w, h, r} = YEAR_BAND;
+  return `M${x} ${y + h}V${y + r}Q${x} ${y} ${x + r} ${y}H${x + w - r}Q${x + w} ${y} ${x + w} ${y + r}V${y + h}Z`;
+})();
+
+/** The band pops in about its centre (0.3 -> 1 with a small overshoot, 0.18 s: the house pop) and stays. */
+const YearBand: React.FC<{T: number}> = ({T}) => {
+  if (T < CHART_BEATS.pulse) return null;
+  const p = prog(T, CHART_BEATS.pulse, 0.18, ease.outBack(1.4));
+  const s = 0.3 + 0.7 * p;
+  const band = <TPath d={YEAR_BAND_D} fill={YEAR_BAND_FILL} />;
+  if (p >= 1) return band;
+  const {x, y, w, h} = YEAR_BAND;
+  return <XG m={mat.about(mat.scale(s), x + w / 2, y + h / 2)}>{band}</XG>;
+};
+
 /** THE CHART at film time T (H1 px; draw it as HomeSet's `card`). Nothing before 6.98 (the J1 seam sees the bare
  *  face only). */
 export const OldDealChart: React.FC<{T?: number}> = ({T: Tin}) => {
@@ -368,6 +406,7 @@ export const OldDealChart: React.FC<{T?: number}> = ({T: Tin}) => {
   const head = pts[pts.length - 1];
   return (
     <Tier tier="subject">
+      <YearBand T={T} />
       <TPath d={pathOf(pts)} stroke={EMBER.hero} strokeWidth={LINE_W} strokeLinecap="round" strokeLinejoin="round" fill="none" graphic />
       {pen ? <TCircle cx={head[0]} cy={head[1]} r={LINE_W * 0.95 * dotPulse(T)} fill={EMBER.hero} /> : null}
       <MineDoodle T={T} k={off} />
