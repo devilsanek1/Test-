@@ -64,9 +64,10 @@ export const SWAY: Sway = {
   jitter: 0.12,
   seed: 4101,
 };
-/** The ragged edges: the ends of every mirrored piece recede by up to 2.5 px along the far quay, 24 px at our edge,
- *  each breathing on its own 3-6 s cycle: the sides waver, the near end breaks into fragments (R6). */
-export const RAGGED: Ragged = {max: [2.5, 24], period: [3, 6], seed: 4105};
+/** The ragged edges: every mirrored piece's ends recede 1.5 px (far) -> 3.5 px (near) in a square, irregular zigzag
+ *  on top of the sway; from nearness 0.45 (y ~1192) on up to 18 px more at our edge, rounded (the near end breaking into
+ *  fragments); each end breathes on its own 3-6 s cycle; a narrow thing loses at most a fifth of its width per side. */
+export const RAGGED: Ragged = {small: [1.5, 3.5], big: 18, from: 0.45, round: 4.5, period: [3, 6], seed: 4105};
 /** The ripple gaps (R6, R9, R2 by coverage): ~1.1 thin light cut lines per 1000 px per far row (0.22 of the row tall,
  *  50-230 px long), up to 7 row-tall gaps per 1000 px near (60-240 px): the reflection intact along the far quay,
  *  breaking into fragments toward us, where the water's own teal shows. Each lens lives 3.2-6.8 s (grows along its
@@ -84,18 +85,20 @@ export const GAPS: Gaps = {
   seed: 4102,
 };
 /** The sun's glitter column (R8): straight under SUN0 (x 196), densest at its still-water mirror point (y 1158),
- *  half-width 3.4 deg slopes: ~20 px at the far edge, ~24 near (a narrow column, ~6x taller than wide here); 14 slots,
- *  each sliver lives 0.42-0.9 s (grows in and out along its length), 11 px far -> 34 px near, 8.5:1; born from 0.30 s
- *  (CRAFT §f.6: after the frame-0 flood). */
+ *  half-width from 3.4 deg slopes: ~20 px at the far edge, ~24 near (a narrow column, ~3.5x taller than wide here,
+ *  where the bridge's reflection fills the water); a still gold bed of level lenses (CandWater) and 6 sliver slots,
+ *  each sliver living 0.42-0.9 s (it grows in and out along its length, never a fade): ~4 alive, at most 6, 18 -> 34 px
+ *  long at 8.5:1, warm white L* 97 (CRAFT §f.6: glints 20-36 px, 4-6 at once, L* +15..+25; S1 keeps <= 16 particles
+ *  alive with the motes and the leaves). Born from 0.30 s (after the frame-0 flood). */
 export const GLITTER: Glitter = {
   x: MAP.SUN0.x,
   mirrorY: G.SUN.mirror.y,
   sigma: 22,
   slope: 0.06,
   elev: (G.SUN.elevationDeg * Math.PI) / 180,
-  slots: 14,
+  slots: 6,
   life: [0.42, 0.9],
-  len: [11, 34],
+  len: [18, 34],
   aspect: 8.5,
   t0: 0.3,
   seed: 4103,
@@ -125,23 +128,21 @@ function rampAt(y: number): string {
   const n = (y - 1111) / (1290 - 1111);
   const sky = toOklab({l: s.l - 0.02 - 0.015 * clamp01(n), c: s.c * (0.95 - 0.1 * clamp01(n)), h: s.h});
   // the body's light veil: the water's own teal at the light band's value, then the body itself (R2)
-  const veil = toOklab({l: oklch(BODY).l + 0.06, c: 0.022, h: oklch(BODY).h});
+  const veil = toOklab({l: oklch(BODY).l + 0.085, c: 0.018, h: oklch(BODY).h});
   const body = toOklab(BODY);
-  const a = smooth(0.22, 0.58, n);
-  const b = smooth(0.5, 0.95, n);
+  const a = smooth(0.1, 0.4, n);
+  const b = smooth(0.32, 0.86, n);
   return oklabToHex(mixOklab(mixOklab(sky, veil, a), body, b * 0.92));
 }
 /** THE ONE ALLOWED GRADIENT (the brief): the shot's own sky seen in the water, as a lib/sky spec over the water's box
- *  (keys every 16 px; the eased OKLab curve; lib/sky's blue-noise dither). The sun's warmth mirrored round its still
- *  mirror point (196, 1158), kept low (ry 60, 0.75): Fresnel weakens it toward us, and a full-height one laid over the
- *  near teal crossed yellow-green at C* 7.3 (skyCheck); this one crosses at C* 4.5, the light band at L* 84-87. */
+ *  (keys every 16 px; the eased OKLab curve; lib/sky's blue-noise dither). The far water mirrors the warm horizon
+ *  (L* 86.5), crosses to the water's own pale veil at L* ~86 by y ~1165 (light, never beige, khaki or grey) and settles
+ *  on the teal body (L* 76) from y ~1250: the near water shows its body (R2). No mirrored sun warmth: its ellipse sat
+ *  right on the crossing and turned it khaki (skyCheck C* 7.6); the glitter column carries the sun. */
 export function waterRamp(): SkySpec {
   const keys: {y: number; color: string}[] = [];
   for (let y = 1046; y <= 1338; y += 16) keys.push({y, color: rampAt(y)});
-  const warm = S1_EVENING.sun!;
-  const wc = oklch(typeof warm.color === 'string' ? warm.color : fromOklch(warm.color));
-  const sunCol = fromOklch({l: wc.l - 0.03, c: wc.c * 0.93, h: wc.h});
-  return {keys, band: null, x: -60, width: 1200, top: 1040, bottom: 1340, sun: {x: warm.x, y: 2 * CAM.horizon - warm.y, rx: 300, ry: 60, color: sunCol, strength: 0.75}};
+  return {keys, band: null, x: -60, width: 1200, top: 1040, bottom: 1340, sun: null};
 }
 
 // on-screen colours (what the clean pen shows: the environment tier's calm pull, the far planes' haze, the ground

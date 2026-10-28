@@ -68,8 +68,10 @@ handle slot and legs, plus Pip.
 
 ## REQUESTS
 1. **map.ts (integrator):** L2's optional "the board ~40 px lower" needs `S2.aBoard` moved; K3's `S2_LEGS_Y1` follows it.
-2. **K3 face (orchestrator's call; A5 / "keep K3's face"):** close the inner border's corner notches and drop the screw
-   and handle-slot lines. That would cut ~15 / Mpx of near-miss ends on every board.
+2. **K3 face: LANDED** (the orchestrator's call, 10:38). Every board now has a closed keyline, screw heads without
+   slots, and no handle slot; everything else is identical. Stills: S2 11.0, S6 25.0, S7 31.0, S8 36.0, all OK. Line
+   delta (lettering blanked) S6 / S7: strokes 41 -> 40 / 35 -> 33, near-miss ends 26 -> 24 / 44 -> 43, dark-line
+   1.0 -> 0.96 % / 0.42 -> 0.39 %. So the gain is ~1-2 / Mpx, not the ~15 estimated, and S7 stays over 40.
 3. **Tools:**
    - check_light: take a gradient sky (today only `--exclude` rectangles).
    - lib/particles: lint a leaf's on-screen entrance against the joins.

@@ -246,26 +246,64 @@ export function withBox(s: Src): Src {
 }
 
 /** The ragged edges (R6: a rippled reflection's sides waver and its far end breaks up): in every row each piece's two
- *  ends recede by up to `max` px (far -> near, x nearness^1.4), seeded per row and thing, breathing on its own 3-6 s
- *  cycle; a piece that would be shorter than 2 px drops out (the fragments of R6's last 25-35 %). */
-export type Ragged = {max: [number, number]; period: [number, number]; seed: number};
-function erode(p: Poly, row: Row, id: number, t: number, rg: Ragged): Poly | null {
+ *  ends recede a little (`small`, far -> near: an irregular zigzag on top of the sway), and from nearness `from` on a
+ *  lot more (`big` at our edge: the near end breaking into fragments, R6's last 25-35 %), seeded per row and thing,
+ *  breathing on its own `period` cycle; a narrow thing (a figure, a post) loses at most a fifth of its width per side,
+ *  and a piece shorter than 2 px drops out. Only the deep breaks are rounded (`round` px or more). */
+export type Ragged = {small: [number, number]; big: number; from: number; round: number; period: [number, number]; seed: number};
+function erode(p: Poly, row: Row, id: number, t: number, rg: Ragged): {p: Poly; a: number; b: number} | null {
   let x0 = Infinity;
   let x1 = -Infinity;
   for (const q of p) {
     if (q[0] < x0) x0 = q[0];
     if (q[0] > x1) x1 = q[0];
   }
-  const E = lerp(rg.max[0], rg.max[1], Math.pow(row.n, 1.4));
+  const w = x1 - x0;
+  const small = lerp(rg.small[0], rg.small[1], row.n);
+  const big = rg.big * Math.pow(clamp01((row.n - rg.from) / (1 - rg.from)), 1.2);
+  const cap = w < 80 ? 0.2 * w : Infinity;
   const side = (j: number) => {
     const P = lerp(rg.period[0], rg.period[1], hash01(rg.seed, row.i, id, j, 1));
     const breath = 0.62 + 0.38 * Math.sin((2 * Math.PI * t) / P + 2 * Math.PI * hash01(rg.seed, row.i, id, j, 2));
-    return E * hash01(rg.seed, row.i, id, j) * breath;
+    return Math.min(cap, (small * hash01(rg.seed, row.i, id, j, 3) + big * hash01(rg.seed, row.i, id, j)) * breath);
   };
-  const a = x0 + side(0);
-  const b = x1 - side(1);
+  const ea = side(0);
+  const eb = side(1);
+  const a = x0 + ea;
+  const b = x1 - eb;
   if (b - a < 2) return null;
-  return a > x0 + 0.05 || b < x1 - 0.05 ? clipX(p, a, b) : p;
+  const q = ea > 0.05 || eb > 0.05 ? clipX(p, a, b) : p;
+  const rh = row.h >= 5;
+  return q ? {p: q, a: rh && ea >= rg.round ? a : NaN, b: rh && eb >= rg.round ? b : NaN} : null;
+}
+/** A piece's path with its ERODED ends rounded (R6: a slice ends round, never square): a vertical segment lying on a
+ *  cut becomes a half-lens bulging outward by 0.4 of its height (at most 5 px). */
+export function polyDRound(p: Poly, dx: number, a: number, b: number): string {
+  let d = '';
+  const n = p.length;
+  const on = (x: number, c: number) => Number.isFinite(c) && Math.abs(x - c) < 0.02;
+  for (let i = 0; i < n; i++) {
+    const q = p[i];
+    if (i === 0) {
+      d += `M${r2(q[0] + dx)} ${r2(q[1])}`;
+      continue;
+    }
+    const prev = p[i - 1];
+    const cut = on(prev[0], a) && on(q[0], a) ? -1 : on(prev[0], b) && on(q[0], b) ? 1 : 0;
+    if (cut) {
+      const bulge = Math.min(5, Math.abs(q[1] - prev[1]) * 0.4) * cut;
+      d += `Q${r2(q[0] + bulge + dx)} ${r2((q[1] + prev[1]) / 2)} ${r2(q[0] + dx)} ${r2(q[1])}`;
+    } else d += `L${r2(q[0] + dx)} ${r2(q[1])}`;
+  }
+  // the closing segment (last -> first)
+  const L = p[n - 1];
+  const F = p[0];
+  const cut = on(L[0], a) && on(F[0], a) ? -1 : on(L[0], b) && on(F[0], b) ? 1 : 0;
+  if (cut) {
+    const bulge = Math.min(5, Math.abs(F[1] - L[1]) * 0.4) * cut;
+    d += `Q${r2(F[0] + bulge + dx)} ${r2((F[1] + L[1]) / 2)} ${r2(F[0] + dx)} ${r2(F[1])}`;
+  }
+  return d + 'Z';
 }
 
 /** The reflections cut into rows: per layer, per toned colour, ONE path (every row's pieces with that row's sway). */
@@ -281,14 +319,15 @@ export function slice(srcs: Src[], rows: Row[], offs: number[], shift: (plane: n
     for (let r = 0; r < rows.length; r++) {
       const row = rows[r];
       if (row.y1 <= ymin || row.y0 >= ymax) continue;
-      let piece = clipBand(moved, row.y0, row.y1);
-      if (piece && rag && !s.crisp) piece = erode(piece, row, s.id ?? 0, rag.t, rag.r);
+      const piece = clipBand(moved, row.y0, row.y1);
       if (!piece) continue;
+      const er = rag && !s.crisp ? erode(piece, row, s.id ?? 0, rag.t, rag.r) : {p: piece, a: NaN, b: NaN};
+      if (!er) continue;
       const color = tone(s, row);
       const key = `${s.layer}|${color}`;
       let a = acc.get(key);
       if (!a) acc.set(key, (a = {layer: s.layer, color, parts: []}));
-      a.parts.push(polyD(piece, offs[r], 0));
+      a.parts.push(Number.isFinite(er.a) || Number.isFinite(er.b) ? polyDRound(er.p, offs[r], er.a, er.b) : polyD(er.p, offs[r], 0));
     }
   }
   return Array.from(acc.values())
