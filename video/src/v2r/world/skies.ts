@@ -93,7 +93,7 @@ export const S5_AIR = horizonColor(S5_SKY);
 //             stays V2S8_set's flat S8Sky disc, drawn on top; no halo.
 // S8_AIR      the far haze of the lane (the sky's lowest colour warmed under SUN8): lib/depth's air for S8's far planes.
 // Wired (L6, V2S8_set S8Sky): <Sky spec={S8_EVENING} /> under the set; it contracts into SUN0 at the un-build (the
-// loop's mirror of S1's flood), V2S8_set S8SkyExit.
+// loop's mirror of S1's flood).
 export const S8_EVENING = eveningSky({band: CM.sky, horizon: SUNSET_HORIZON, horizonY: 680, sun: {x: SUN8.x, y: SUN8.y + 35, rx: 200, ry: 60}, bottom: 800});
 
 /** The far haze of S8's lane (the sky's lowest colour under SUN8): lib/depth's air for the far rows and the far bank. */

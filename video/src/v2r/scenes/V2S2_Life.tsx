@@ -1,48 +1,57 @@
-// V2S2_Life (lane L2): the shot's own life on top of the set's (TREATMENT §5 S2 "always": walkers on both towpaths, a
-// jogger, a boat, window switches, pigeons, urn steam; the bottom third's head-backs and dog). FILM seconds.
-//   S2FarLife   the far towpath, behind our railing: a cyclist and a walker with a dog (the set has two walkers + a jogger)
-//   S2NearLife  our towpath, nearest: a passer-by's head-back gliding left -> right along the bottom edge, a second one
-//               standing (head turns), a dog on a lead nosing a leaf, two pigeons pecking. People small (owner rule:
-//               near head-backs <= ~140 px wide); nothing crosses the A-board's lettering or the story windows.
+// V2S2_Life (lane L2): the shot's own life on top of the set's (conform_L2 §5: <= 3 noticeable supporting movers at
+// once, taking turns; every mover enters at an edge or from behind a mass, already moving; nothing pops or stops in open
+// view). The set already holds the parapet pigeons (they lift once, 7.85), the urn's steam (the kit Newsstand), the
+// passing narrowboat (from the right edge at 7.60) and the ducks at rest. No stranger's back, no dog's trot, no paving
+// pigeons (conform_L2 §3, §5). FILM seconds.
+//   S2FarLife   ONE far walker on the far towpath: already walking when it comes in at the right edge (6.90), left-bound
+//               at a stroll (~27 px/s), sized by the wall's scale (~64 px a person at s2g 1), so it stays tiny and
+//               slow by the VP; never reaches the story windows' columns (x >= 940 by 12.98)
+//   S2Motes     a few motes in the low light at the left edge (the sun side, CRAFT §f.6; conform_L2 §10): over the
+//               kiosk's painted body, clear of its lit opening, steady through the joins (6.10, 12.98)
 import React from 'react';
 import {CM} from '../palette';
-import {useTime, clamp, ease} from '../../lib/time';
-import {Movers, Pigeons} from '../kit/canal/life';
+import {useTime} from '../../lib/time';
+import {Tier} from '../../lib/tier';
+import {Particles, CAPTION_BAND} from '../../lib/particles';
 import {CastSlot} from '../kit/canal/slots';
-import {s2x, s2y, s2g, s2u} from '../kit/canal/wall';
-import {NearBack} from '../kit/cast';
+import {s2g, s2u} from '../kit/canal/wall';
+import {farPath} from './V2S2_Water';
+import {S2_ATM} from './V2S2_Wall';
 
-/** A point on the far towpath (the wing's base + 12 g) at screen x. */
-const farPath = (x: number): [number, number] => {
-  const u = s2u(x);
-  return [x, s2y('base', u) + 12 * s2g(u)];
-};
+/** The far walker: comes in at the right edge (x 1110, off frame) at 6.90, walking left at 27 px/s. */
+export const S2_WALKER = {enter: 6.9, x0: 1110, speed: 27, hPerG: 64};
 
-export const S2FarLife: React.FC = () => (
-  <Movers
-    idPrefix="s2farX"
-    movers={[
-      {pose: 'cycle', from: farPath(1100), to: farPath(560), h: [36, 104], speed: 120, phase: 0.1, pause: 2.2, seed: 's2cyc', acc: 'backpack'},
-      {pose: 'walk', from: farPath(600), to: farPath(1100), h: [104, 36], speed: 24, phase: 0.35, seed: 's2fw3', acc: 'dogLead'},
-    ]}
-  />
-);
-
-export const S2NearLife: React.FC = () => {
+export const S2FarLife: React.FC = () => {
   const t = useTime();
-  // passer-by A glides left -> right along the bottom (a slow stroll, a small bob): x 240 -> 760 over the shot
-  const ax = 230 + 75 * (t - 6.1);
-  const bob = Math.abs(Math.sin((t - 6.1) * Math.PI * 1.7)) * 6;
-  // passer-by B stands (waiting), the head turns toward the water at 7.6 and back at 11.2
-  const turnB = 0.5 * ease.inOutCubic(clamp((t - 7.6) / 0.3)) - 0.5 * ease.inOutCubic(clamp((t - 11.2) / 0.3));
-  // the dog: noses along a leaf 6.1-9.0, sits 9.0-10.4, trots on 10.4 -> off right
-  const dogX = t < 10.4 ? 600 - 8 * (t - 6.1) : 566 + 90 * (t - 10.4);
+  if (t < S2_WALKER.enter) return null;
+  const x = S2_WALKER.x0 - (t - S2_WALKER.enter) * S2_WALKER.speed;
+  const [, y] = farPath(x);
+  const h = S2_WALKER.hPerG * s2g(s2u(x));
   return (
-    <>
-      <Pigeons ledge={[300, 470, 1520]} n={2} size={26} seed="s2pave" />
-      <CastSlot s={{id: 'dog', x: dogX, y: 1450, h: 66, pose: 'dog', seed: 's2dog', dir: t < 10.4 ? -1 : 1, gait: t < 9.0 || t >= 10.4 ? t : 9.0}} />
-      <NearBack x={ax} y={1920 + bob} hv={196} seed="s2passA" traits={{hair: 'beanie', hatColor: CM.coatMustard, coat: CM.brick}} />
-      <NearBack x={800} y={1920} hv={210} seed="s2passB" turn={turnB} traits={{hair: 'cap', hatColor: CM.coatSlate, coat: CM.coatOat}} />
-    </>
+    <Tier tier="environment">
+      <CastSlot s={{id: 's2far0', x, y, h, pose: 'walk', dir: -1, seed: 's2fw', coat: CM.coatSlate, gait: t}} />
+    </Tier>
   );
 };
+
+/** The motes' field (shot-local joins [0, 6.88] = film 6.10, 12.98): below the kiosk's counter and the papers' clips,
+ *  over its painted sage body and the air in front of its corner. */
+export const S2_MOTES = {
+  region: [6, 1158, 128, 96] as [number, number, number, number],
+  joins: [6.1, 12.98],
+  sun: [-260, 700] as [number, number],
+};
+export const S2Motes: React.FC = () => (
+  <Particles
+    kind="motes"
+    seed="S2/motes"
+    region={{rect: S2_MOTES.region}}
+    on={CM.sage}
+    count={4}
+    atm={S2_ATM}
+    t0={6.1}
+    joins={S2_MOTES.joins}
+    avoid={[CAPTION_BAND]}
+    sun={S2_MOTES.sun}
+  />
+);
