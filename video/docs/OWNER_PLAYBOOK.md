@@ -238,13 +238,16 @@ Maintenance at the end).
   AI adjacent news", v4, 2026-10-28); the existing fuss (people already arguing about it) weighs as much as
   a direct wallet hit,** and an everyday consequence beats a bigger, distant story. — (v3 G0; v4 G0: "focus on tech and AI",
   picked AI songs over the wallet pick: "good amount of fuss about AI songs", 2026-10-27).
-- **Topics are picked in the owner's order: relevant (with buzz and surprise) first, then true and solid, then fresh,
-  then visually appealing in our look, then the mood the slate needs, then shareable** (weights 6-5-4-3-2-1; a story
+- **Topics are picked in the owner's order: relevant (with buzz and surprise) first, then true and solid, then
+  visually appealing in our look, then the mood the slate needs, then fresh (news from about the last month), then
+  shareable** (weights 6-5-4-3-2-1; a story
   that isn't true is out whatever it scores). The list the editor scores on, and the owner sees:
   `docs/TOPIC_CRITERIA.md`. — ("one important condition for the story pick is we should find a story that is going to
   be possible to make visually appealing ... give me the list of criteria"; then "lets make it relevant first but
   include buzz here too and surprise, then true and solid, then fresh, then visually appealing, then mood. Then
-  shareabliity potential", v4, 2026-10-28).
+  shareabliity potential"; "lets move the freshness lower and make it last month or so", v4, 2026-10-28). The
+  shortlist always comes with its chart: each story's score on each criterion (`video/scripts/topic_chart.py`; "can
+  you show me the visual next time we do research ... some bar chart", v4, 2026-10-28).
 - **Topics: alternate the mood: a positive story after a negative one.** v2 (Google staff resigning), v3 (laptop
   prices) and v4's first pick (AI songs and fake plays) were all bad news, so the next is a very recent, highly
   relevant, genuinely POSITIVE AI story (e.g. AI helping find a medicine or beat a disease) with a hopeful outlook.

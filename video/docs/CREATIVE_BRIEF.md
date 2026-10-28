@@ -12,6 +12,8 @@
 >   §1, paste format v2). The "DELIVERY CUES" section's paste format (a bracketed cue on its own line before each
 >   beat) is retired for the paste: it broke takes.
 > - **Visuals:** the current look is `docs/look/DIRECTION.md`.
+> - **Freshness:** news from about the last month, weighed below relevance, truth, visual appeal and mood (owner,
+>   2026-10-28), not "ideally the past 24-72 h" (§4-8); the full topic criteria: `docs/TOPIC_CRITERIA.md`.
 > - The notes on "THIS script" and the PHP lines below are video 1's (history).
 
 Channel identity, editorial strategy and storytelling for "What's All the Fuss About?", a short-form channel

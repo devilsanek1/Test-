@@ -200,3 +200,34 @@ surprise), 2 = true (evidence), 3 = fresh, 4 = visual (the dedicated visual chec
 | 21 | OpenAI's math and physics "discoveries" | 5.7 | 3 | 9 | 4 | 4 | 5 | **5.24** |
 | 22 | McMaster's free antibiotic-finder AI | 5.7 | 6 | 2 | 6 | 7 | 5 | **5.19** |
 | 23 | UCLA MAESTRO prostate-cancer drug pair | 5.2 | 3 | 8 | 5 | 5 | 4 | **5.10** |
+
+## All 23 re-ranked again: freshness lower, a month window (2026-10-28, "lets move the freshness lower and make it last month or so")
+
+Order and weights: relevant 6, true 5, visual 4, mood 3, fresh 2, shareable 1 (`docs/TOPIC_CRITERIA.md`). Freshness was scored on a
+two-week window, so it is rescaled to the month (9-8 -> 10, 7 -> 9, 6 -> 8, 5 -> 7, 4 -> 6, 3 -> 4). Data: `topic_scores.json`; chart: `topic_chart.png`.
+
+| Rank | Story | Relevant | True | Visual | Mood | Fresh | Share | Score /10 |
+|---|---|---|---|---|---|---|---|---|
+| 1 | "Pervert glasses" that read a blind man's menu | 8.2 | 8 | 9 | 8 | 9 | 8 | **8.34** |
+| 2 | Personal mRNA melanoma vaccine, Phase 3 | 8.3 | 9 | 6 | 9 | 10 | 9 | **8.32** |
+| 3 | Android quake alerts reach 200+ countries | 7.5 | 7 | 9 | 8 | 8 | 8 | **7.81** |
+| 4 | Hurricane Isaias: the AI called the landfall | 8.0 | 7 | 8 | 8 | 8 | 8 | **7.76** |
+| 5 | "Could they hear you?": a bedside EEG reads 1 in 3 "unresponsive" ICU patients | 8.2 | 7 | 7 | 7 | 10 | 8 | **7.68** |
+| 6 | First patient given AI-designed phages | 8.2 | 4 | 9 | 6 | 10 | 9 | **7.25** |
+| 7 | Pancreatic cancer in "normal" CT scans | 8.0 | 7 | 6 | 8 | 6 | 8 | **7.19** |
+| 8 | A bionic arm that feels goes home | 6.8 | 6 | 9 | 8 | 6 | 8 | **7.18** |
+| 9 | Microsoft's diagnosis AI, in Science | 6.8 | 7 | 7 | 6 | 9 | 7 | **6.99** |
+| 10 | AI hears a weak heart: stethoscope + chest X-ray | 6.0 | 7 | 7 | 7 | 10 | 5 | **6.90** |
+| 11 | Deer alarm calls warn villagers of tigers, Nepal | 6.7 | 5 | 9 | 4 | 10 | 6 | **6.63** |
+| 12 | Kids' rare diseases diagnosed with o3 Deep Research | 7.3 | 6 | 7 | 8 | 2 | 7 | **6.51** |
+| 13 | A hobbyist, his AI helpers and a possible planet | 6.0 | 5 | 8 | 7 | 8 | 6 | **6.48** |
+| 14 | ALS voice rebuilt from a 16 s TV clip | 7.0 | 5 | 8 | 6 | 4 | 8 | **6.33** |
+| 15 | AI-designed gene editor, blight-proof rice | 6.2 | 6 | 6 | 7 | 7 | 5 | **6.25** |
+| 16 | Virtual Biotech: 37,000 agents read 56,000 trials | 5.7 | 6 | 6 | 6 | 10 | 4 | **6.20** |
+| 17 | Breast-cancer AI: who can skip chemo | 6.7 | 4 | 5 | 7 | 10 | 6 | **6.06** |
+| 18 | Rentosertib, AI-found drug in Phase III | 6.3 | 6 | 5 | 7 | 6 | 5 | **5.99** |
+| 19 | Penn's epilepsy AI on patients' phones | 5.5 | 5 | 6 | 6 | 8 | 4 | **5.71** |
+| 20 | McMaster's free antibiotic-finder AI | 5.7 | 6 | 6 | 7 | 2 | 5 | **5.63** |
+| 21 | Florida's AI mosquito trap | 5.5 | 3 | 7 | 6 | 10 | 4 | **5.62** |
+| 22 | UCLA MAESTRO prostate-cancer drug pair | 5.2 | 3 | 5 | 5 | 10 | 4 | **5.01** |
+| 23 | OpenAI's math and physics "discoveries" | 5.7 | 3 | 4 | 4 | 10 | 5 | **4.87** |

@@ -85,3 +85,10 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   -> rule: Taste signals (the owner's order).
 - 2026-10-28 ~16:35 UTC: "reevaluate the stories based on that - all N stories you researched" -> all 23 candidates of
   rounds 3-4 re-ranked from the editors' scores in the owner's order (`G0_TOPICS_r4.md`, last table).
+- 2026-10-28 ~16:45 UTC: "can you show me the visual next time we do research - like the story and some bar chart or
+  something showing the score on each category" -> `video/scripts/topic_chart.py` (one block per story, a bar per
+  criterion, the weighted total); a sample from this round: `topic_chart.png` (data `topic_scores.json`). -> rule:
+  Taste signals (the shortlist comes with its chart); PIPELINE_V2 G0.
+- 2026-10-28 ~16:50 UTC: "lets move the freshness lower and make it last month or so" -> order now relevant, true,
+  visual, mood, fresh (about the last month), shareable; re-ranked: the glasses 8.34, the vaccine 8.32 (tied), quake
+  alerts 7.81, the hurricane 7.76, "could they hear you?" 7.68. -> rule: Taste signals; CREATIVE_BRIEF banner.
