@@ -39,6 +39,7 @@ import {railingInto, bikeInto, treeInto, Lamp} from '../kit/canal/towpath';
 import {Person, HER, WindowPerson, drawn} from '../kit/cast';
 import {S8T, L, planeOffset, lampRunAt, doorOpenK, LANE, SKYLINE_MIN_Y} from './V2S8_clock';
 import {LateExit, EarlyExit} from './V2S8_exit';
+import {S8Plane} from './V2S8_depth';
 
 // ---------------------------------------------------------------- geometry (landing pose, house plane)
 
@@ -904,7 +905,6 @@ const FLUTTER = {t0: L(36.0), dur: 0.42, to: [HOUSE_LAMP.x + 22, HOUSE_LAMP.y - 
 
 export const S8House: React.FC = () => {
   const t = useTime();
-  const dx = planeOffset('house', t);
   const hallClip = 'hc' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const beyond = useMemo(() => beyondInto(), []);
   const facade = useMemo(() => facadeInto(), []);
@@ -962,7 +962,7 @@ export const S8House: React.FC = () => {
   // the far street lamp beyond the bend lights after the canal lamps, the run's next step west
   const farLampAt = lampRunAt('canalLamp2') + 0.04;
   return (
-    <XG m={mat.translate(dx, 0)}>
+    <S8Plane p="house">
       <defs>
         <clipPath id={hallClip} clipPathUnits="userSpaceOnUse">
           <rect x={D.x0} y={D.y0} width={DW} height={DH} />
@@ -1008,7 +1008,7 @@ export const S8House: React.FC = () => {
       <EarlyExit>
         <Paint b={pg} seed="s8h/pigeons" misreg={false} />
       </EarlyExit>
-    </XG>
+    </S8Plane>
   );
 };
 
@@ -1093,7 +1093,6 @@ function herWalk(t: number): {x: number; dir: 1 | -1; moving: boolean} | null {
 
 export const S8Window: React.FC = () => {
   const t = useTime();
-  const dx = planeOffset('house', t);
   const clip = 'wc' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const lit = flickOn(t, S8T.wLights);
   const room = useMemo(() => roomInto(lit), [lit]);
@@ -1102,7 +1101,7 @@ export const S8Window: React.FC = () => {
   const g = bump(t, L(36.9) + 0.22, 0.45);
   return (
     <LateExit>
-      <XG m={mat.translate(dx, 0)}>
+      <S8Plane p="house">
         <defs>
           <clipPath id={clip} clipPathUnits="userSpaceOnUse">
             <rect x={WX0} y={WY0} width={W8.w} height={W8.h} />
@@ -1134,7 +1133,7 @@ export const S8Window: React.FC = () => {
           </g>
         ) : null}
         <Paint b={front} seed="s8w/front" />
-      </XG>
+      </S8Plane>
     </LateExit>
   );
 };
@@ -1146,8 +1145,8 @@ export const S8DoorLeaf: React.FC = () => {
   const k = swingAt(t);
   if (t < LEAF_SPLIT || t >= S8T.doorShuts || k <= 0) return null;
   return (
-    <XG m={mat.translate(planeOffset('house', t), 0)}>
+    <S8Plane p="house">
       <Paint b={leafInto(k, 0)} seed="s8h/leaf" />
-    </XG>
+    </S8Plane>
   );
 };

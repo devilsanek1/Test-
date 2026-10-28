@@ -16,7 +16,7 @@
 // band); 0,0,330,712 holds the pale cloud strip and the far tower, which read as steps.
 import {CM} from '../palette';
 import {eveningSky, horizonColor} from '../../lib/sky';
-import {SUN0} from './map';
+import {SUN0, SUN8} from './map';
 
 /** S1's warm horizon = V2S1_set_core S1_SKY[5] (#FBD9BB), the far city's haze since L1's continuous-sky pass. */
 export const S1_HORIZON = '#FBD9BB';
@@ -26,3 +26,18 @@ export const S1_EVENING = eveningSky({band: CM.sky, horizon: S1_HORIZON, horizon
 
 /** The far haze of S1's west gap (the sky's lowest colour under the sun): lib/depth's air for the far city. */
 export const S1_AIR = horizonColor(S1_EVENING, SUN0.x);
+
+// ---------------------------------------------------------------- S8 (lane L6): her lane at sunset, looking west
+// S8_EVENING  the same evening as S1, later (the sunset state S7 shares, A5): the caption field's mint flat through the
+//             band, a pale warm light band at y ~624 over the far rows, the sunset band CM.bandSunset (#F3C6A6) as the
+//             horizon at y 680 (behind the far rows: it shows in the gaps between the gasholders, the viaduct and the
+//             far roofs), the low sun's warmth 200 x 60 centred 35 px under SUN8 (420, 625), low and wide, hugging the
+//             skyline (its top stays under the mint: skyProblems [] with the yellow-green crossing at C* 5.7). The disc
+//             stays V2S8_set's flat S8Sky disc, drawn on top; no halo.
+// S8_AIR      the far haze of the lane (the sky's lowest colour warmed under SUN8): lib/depth's air for S8's far planes.
+// Wired (L6, V2S8_set S8Sky): <Sky spec={S8_EVENING} /> under the set; it contracts into SUN0 at the un-build (the
+// loop's mirror of S1's flood), V2S8_set S8SkyExit.
+export const S8_EVENING = eveningSky({band: CM.sky, horizon: CM.bandSunset, horizonY: 680, sun: {x: SUN8.x, y: SUN8.y + 35, rx: 200, ry: 60}, bottom: 800});
+
+/** The far haze of S8's lane (the sky's lowest colour under SUN8): lib/depth's air for the far rows and the far bank. */
+export const S8_AIR = horizonColor(S8_EVENING, SUN8.x);

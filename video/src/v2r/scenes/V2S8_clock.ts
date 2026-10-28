@@ -2,15 +2,15 @@
 // Scene-local seconds: t = film - 32.93 (BUILD.md scene contract). Film times from TREATMENT.md section 5 (row S8),
 // map.ts S8, the heard word onsets (public/v2r/voice_words_heard.json).
 //
-// CAMERA (decided by L6):
-//   - pre-truck float: every plane drifts right by 10 % of its truck dx, linear from the wipe start (the board plane at
-//     ~8.6 px/s, the near plane ~11 px/s: the 8-12 px/s float), multiplied into the truck so the speed is continuous;
-//   - ONE plain truck 34.99-35.60 (ease in-out, inside the speech pause): planes shift right by their dx
+// CAMERA (decided by L6; conform_L6 §1, DIRECTION rule 8, lib/depth's parallax float):
+//   - LOCKED from the wipe through her walk home (the wipe in 32.70-33.16, the ghosts' pop, the door: the action is the
+//     life), then ONE plain truck 34.99-35.60 (ease in-out, inside the speech pause): planes shift right by their dx
 //     (map S8.truck: board 250, ghosts 240, house 160, sky 0) and land EXACTLY on the landing pose (board at B, W at
-//     (860, 700)) with zero speed; locked 35.60-37.70 (the quote reads on a still board);
-//   - the seam push: 1.00 -> 1.05 about W (860, 700), 37.70 -> 38.82, ease in-out (zero speed both ends), then held
-//     through the un-build 38.82-39.08, so W is 157.5 x 178.5 at (860, 700) = S1's frame 0 (zoom 1.05 about W), and
-//     S1's ease-in pull-out starts from rest: the seam has no speed step.
+//     (860, 700)) with zero speed;
+//   - the landing hold floats: a gentle PARALLAX float (S8_FLOAT_LEGS: three straight legs 35.75-38.60, each plane its
+//     share by depth, S8_DEPTH: the near band 0.85, her plane 0.6, the far bank 0.45, the far rows 0.35, the sky and
+//     the captions 0), home by 38.60, so nothing moves in 38.72-39.08 but the un-build;
+//   - the seam push is RETIRED (S1 opens at zoom 1.00: W (860, 700) 150 x 170 IS S1's frame-0 window).
 //   - MULTIPLANE: every part draws at the LANDING pose (screen px = map px at 35.60) and shifts by its plane's
 //     offset. The lane's ground is THREE RIGID BANDS split by horizontal edges (a horizontal edge sliding along itself
 //     is invisible): the house band (forecourt setts, y < KERB_Y) rides the house plane, the towpath flagstones
@@ -21,6 +21,8 @@
 //     240 px plane), and the truck slides them in front of her SHUT door (x 658-734): the claim still stands at her
 //     door. They glide 80 px relative to the house during the truck (the map's plane, kept on purpose).
 import {clamp, prog} from '../../lib/time';
+import {floatAt, parallaxOffset, PARALLAX_SKY} from '../../lib/depth';
+import type {FloatLeg} from '../../lib/depth';
 import * as MAP from '../world/map';
 
 export const S8_START = 32.93;
@@ -51,12 +53,10 @@ export const S8T = {
   herInWindow: L(35.85), // her silhouette comes to W, phone at her ear (S3's picture, caught up with)
   quotePen: L(36.54), // the quote pen-draws on (line 1), the credit pops on the board
   quoteLine1End: L(37.1), // line 1 complete just before "facts"
-  facts: L(37.18), // the lamps light in a run west down the lane; two neighbours stop to read
+  facts: L(37.18), // the lamps light in a run west down the lane (three switch-ons, LAMP_RUN_FRAMES)
   quoteLine2: L(37.2),
   quoteLine2End: L(37.7), // line 2 complete on "not"
-  not: L(37.7), // Pip looks up at W; the seam push starts
-  pushT0: L(37.7),
-  pushT1: L(38.82),
+  not: L(37.7), // Pip looks up at W (a lead: W is the film's last picture)
   unbuildT0: L(38.82), // the engine's un-build (exit 0 -> 1) over 0.26 s onto S1's t < 0 state
   unbuildT1: L(39.08),
   end: L(39.08),
@@ -65,15 +65,8 @@ export const S8T = {
 /** The truck's own progress 0..1 (map s8TruckU, in scene seconds). */
 export const truckU = (t: number) => MAP.s8TruckU(t + S8_START);
 
-/** Truck progress c(t): 0 before 34.99 (the map's pre-truck pose), 1 at the landing (35.60) with zero speed. The old
- *  parallax float (a % of each plane's dx) is OFF: STYLE.md's float law forbids parallax and a heading held for seconds;
- *  the float is now `floatXY` (one 2D translation of the whole picture). */
-export const FLOAT_K = 0;
-export const camC = (t: number) => {
-  const u = truckU(t);
-  const f = FLOAT_K * clamp((t - S8T.wipeT0) / (S8T.truckT1 - S8T.wipeT0));
-  return 1 - (1 - u) * (1 - f);
-};
+/** Truck progress c(t): 0 before 34.99 (the map's pre-truck pose), 1 at the landing (35.60) with zero speed. */
+export const camC = (t: number) => truckU(t);
 
 /** The planes' truck dx (px, screen-rightward, landing pose = 0 offset). Map S8.truck + L6's extra planes. */
 export const PLANE_DX = {
@@ -94,28 +87,30 @@ export type PlaneId = keyof typeof PLANE_DX;
 export const planeDx = (dx: number, t: number) => -dx * (1 - camC(t));
 export const planeOffset = (p: PlaneId, t: number) => planeDx(PLANE_DX[p], t);
 
-/** THE FLOAT (STYLE.md section 6, the float law): translation only, the whole picture together (no parallax), eased straight
- *  legs turning every 0.6-1.5 s, 8-15 px/s (peak <= 25), net within +-12 px of home, and back home (0) when a move starts
- *  (the truck 34.99, the un-build 38.82) so every K2 spot is exact. Two runs: the wipe -> the truck; the landing -> the un-build.
- *  Keys: [scene t, dx, dy]. */
-export const FLOAT_KEYS: [number, number, number][][] = [
-  [[L(32.7), 0, 0], [L(33.55), 9, -4], [L(34.3), 2, 5], [L(34.99), 0, 0]],
-  [[L(35.6), 0, 0], [L(36.4), -8, -3], [L(37.15), -1, 5], [L(38.0), 7, 1], [L(38.82), 0, 0]],
+/** Each truck plane's DEPTH plane (lib/depth, CRAFT §f.1, conform_L6 §10, THROUGHLINE §5b): -1 the near band (the cafe
+ *  boat's stern deck and its things, the planter, the near lamp-post), 0 her, the board and the lane (her house, W, the
+ *  ghosts, the towpath band, the cafe boat at our coping), +0.5 the canal, +1 the far bank across the basin, +2 the far
+ *  rows on the sunset band; the sky (and the sun) never float. Sets the parallax float's share (parallaxK) and, in the
+ *  sets, each plane's air step (S8_ATM). */
+export const S8_DEPTH: Record<PlaneId, number> = {sky: PARALLAX_SKY, far: 2, south: 1, water: 0.5, lampsFar: 0.5, house: 0, ghosts: 0, board: 0, boat: 0, near: -1};
+
+/** THE PARALLAX FLOAT (DIRECTION rule 8, owner 2026-10-28; lib/depth floatAt, V2S1_float's model): the landing hold
+ *  floats in three straight legs (near-ground px from home; <= 10 px/s at the near ground, the net offset within 12 px),
+ *  home by 38.60. Before it the camera is locked (the wipe in, her walk, the truck: the action carries the life). */
+export const S8_FLOAT_LEGS: FloatLeg[] = [
+  {t0: L(35.75), t1: L(36.75), to: [-6, -3]},
+  {t0: L(36.75), t1: L(37.7), to: [-2, -6]},
+  {t0: L(37.7), t1: L(38.6), to: [0, 0]},
 ];
-export const floatXY = (t: number): [number, number] => {
-  for (const run of FLOAT_KEYS) {
-    if (t < run[0][0] || t > run[run.length - 1][0]) continue;
-    for (let i = 0; i < run.length - 1; i++) {
-      const [t0, x0, y0] = run[i];
-      const [t1, x1, y1] = run[i + 1];
-      if (t <= t1) {
-        const u = (t - t0) / (t1 - t0);
-        const e = u * u * (3 - 2 * u);
-        return [x0 + (x1 - x0) * e, y0 + (y1 - y0) * e];
-      }
-    }
-  }
-  return [0, 0];
+/** Home at these times (floatProblems): the wipe in, her door, the truck's start and landing, from 38.60 through the
+ *  un-build (nothing moves in 38.72-39.08 but the un-build) and the seam. */
+export const S8_FLOAT_REST = [S8T.wipeT0, S8T.wipeT1, S8T.doorShuts, S8T.truckT0, S8T.truckT1, L(38.6), S8T.unbuildT0, S8T.end];
+/** The near-ground float at scene t. */
+export const s8Float = (t: number): [number, number] => floatAt(t, S8_FLOAT_LEGS) as [number, number];
+/** A truck plane's full screen shift at t: its truck offset plus its depth share of the float (sub-pixel). */
+export const planeShift = (p: PlaneId, t: number): [number, number] => {
+  const [fx, fy] = parallaxOffset(s8Float(t), S8_DEPTH[p]);
+  return [planeOffset(p, t) + fx, fy];
 };
 
 // ---------------------------------------------------------------- the lane (landing-pose geometry)
@@ -208,30 +203,28 @@ export const PIP_SEAT = {x: MAP.BOARD_BOLLARD.x, y: MAP.BOARD_BOLLARD.y} as cons
 /** Pip's size at the board bollard: S7's PIP_SIZE_S7 (A5: the same Pip pose at both boards). */
 export const PIP_SIZE = 100;
 /** Pip's seam SETTLE (conform_L6 §1, THROUGHLINE §3: a 30 px step down, no hop): 38.82 -> 38.98 from the board
- *  bollard (700, 1205) onto S1's f0 bollard (700, 1235), zoom 1.00; it un-builds with the shot (late), so the loop lands
- *  on S1's frame 0, where S1's own Pip draws on from t 0 (V2S1_clock S1_F0: absent at t < 0). */
-export const PIP_SEAM = {t0: S8T.unbuildT0, land: L(38.98), to: {x: MAP.S1_BOLLARD.x, y: MAP.S1_BOLLARD.y}, height: 0} as const;
-/** S1's clock relative to S8's: S1 time = S8 time - S1_SHIFT (the loop underlay runs at film T - 2345 / 60). */
-export const S1_SHIFT = 2345 / 60 - S8_START;
-/** S1's frame-0 Pip, mirrored from V2S1_pip.tsx `S1Pip` (L1; it draws nothing at t < 0): from PIP_SEAM.land on, S8 draws THIS Pip on S1's clock
- *  (TimeShift by S1_SHIFT) inside the 1.05 push, so the last S8 frame and S1's frame 0 hold the identical Pip. */
-export const S1_PIP = {x: MAP.S1_BOLLARD.x, y: MAP.S1_BOLLARD.y, size: 100, facing: 'back' as const, seed: 'pipS1'};
+ *  bollard (700, 1205) onto S1's frame-0 bollard (700, 1235) (map S1_BOLLARD = V2S1_clock S1_PIP.seat; zoom 1.00 in
+ *  both shots), then it un-builds with the shot (late): S1's own Pip is absent at t < 0 and draws on from t 0 there
+ *  (V2S1_clock S1_F0), so the loop lands on S1's frame 0 with one Pip. */
+export const PIP_SEAM = {t0: S8T.unbuildT0, land: L(38.98), to: {x: MAP.S1_BOLLARD.x, y: MAP.S1_BOLLARD.y}} as const;
 
 /** Pip's seat on screen (pre-truck = map (450, 1205); landing = BOARD_BOLLARD) at t. */
 export const pipSeatAt = (t: number) => ({x: PIP_SEAT.x + planeOffset('board', t), y: PIP_SEAT.y});
 
 // ---------------------------------------------------------------- the lamp run on "facts" (37.18)
 
-/** ONE run, near -> far ("west down the lane"), everything alike (Q9 c: no item singled out; the board never lights),
- *  FLASH-SAFE (STYLE / THROUGHLINE: <= 3 switch-ons in any 1 s): four lamps, 0.34 s apart, each switching on ONCE and
- *  laying its pool (two flat steps). Every other light (the carriage lamps, the festoons, the cafe boat's lights, the
- *  far windows) is already on at sunset: `lampRunAt` gives them -10 (on from the start). */
-export const LAMP_RUN_STEP = 0.34;
+/** ONE run, near -> far ("west down the lane"), everything alike (Q9 c: no item singled out; the board never lights), in
+ *  THREE switch-ons on the sound lane's film frames f2237 / 2261 / 2273 (RESUME_2026-10-28; the S7 festoon's spacing, A5):
+ *  the near lamp with its pool, the heritage lamp by her house with its pool, the two canal lamps over the board together.
+ *  FLASH-SAFE (THROUGHLINE §4: <= 3 switch-ons in any 1 s): three in 0.6 s, each lamp switching on ONCE. Every other
+ *  light (the carriage lamps, the festoons, the cafe boat's lights, the far windows) is already on at sunset: `lampRunAt`
+ *  gives them -10 (on from the start). */
+export const LAMP_RUN_FRAMES = {nearPool: 2237, houseLamp: 2261, canalLamp1: 2273, canalLamp2: 2273} as const;
 export const LAMP_RUN_ORDER = ['nearPool', 'houseLamp', 'canalLamp1', 'canalLamp2'] as const;
 export type LampRunId = (typeof LAMP_RUN_ORDER)[number] | 'carriageR' | 'festoon' | 'carriageL' | 'boatLights' | 'farWindows';
 export const lampRunAt = (id: LampRunId): number => {
-  const i = (LAMP_RUN_ORDER as readonly string[]).indexOf(id);
-  return i < 0 ? -10 : S8T.facts + LAMP_RUN_STEP * i;
+  const f = (LAMP_RUN_FRAMES as Record<string, number>)[id];
+  return f === undefined ? -10 : L(f / 60);
 };
 
 // ---------------------------------------------------------------- ground (the paving profile, for the sets)
@@ -239,23 +232,7 @@ export const lampRunAt = (id: LampRunId): number => {
 /** Ground plane shear (kept for old callers): use groundOffset(y, t) for the rigid bands. */
 export const groundDxAtY = (y: number, t: number) => groundOffset(y, t);
 
-/** The seam push is RETIRED (conform_L6 §1: S1 opens at zoom 1.00, so W (860, 700) 150 x 170 already IS S1's frame-0
- *  window). Kept as a constant 1.00 so old callers stay exact. */
-export const SEAM_ZOOM = 1.0;
-export const seamZoom = (t: number) => {
-  const p = prog(t, S8T.pushT0, S8T.pushT1 - S8T.pushT0);
-  return 1 + (SEAM_ZOOM - 1) * p * p * (3 - 2 * p);
-};
-/** Landing-pose screen point -> on-screen point under the seam push. */
-export const pushPt = (x: number, y: number, t: number): [number, number] => {
-  const z = seamZoom(t);
-  return [MAP.W.x + (x - MAP.W.x) * z, MAP.W.y + (y - MAP.W.y) * z];
-};
-
-/** Pip's seam target: S1's f0 bollard on screen (zoom 1.00: (700, 1235)). */
-export const S1_F0_PIP = {x: MAP.W.x + (MAP.S1_BOLLARD.x - MAP.W.x) * SEAM_ZOOM, y: MAP.W.y + (MAP.S1_BOLLARD.y - MAP.W.y) * SEAM_ZOOM};
-
-/** Nothing drawn above this landing-pose y (so the 1.05 push about W keeps every built top at screen y >= 600). */
+/** Nothing built above this landing-pose y (the caption band's margin: every top stays at screen y >= 600). */
 export const SKYLINE_MIN_Y = 606;
 /** Smoke, steam and flyers stay below this screen y (the band margin y 290-600 stays flat sky). */
 export const LIFE_CEIL = 602;
