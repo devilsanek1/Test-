@@ -9,10 +9,14 @@ and `docs/look/CRAFT.md` §f.7 (the rules) outrank it. Optics and sources: `docs
 (R1-R14). Why this design: `docs/v2/water/JUDGE.md` (candidate A's engine and cool colour, candidate B's drawing).
 
 ## What it draws (bottom to top; raw SVG with computed colours: the pen's tier pull never re-tints it)
-1. **The ramp:** the shot's own `lib/sky` preset mirrored about the horizon (water y shows the sky at 2 hz - y), toned
-   toward the water's body: the far water keeps the warm horizon (value toned only), a light veil of the body's hue
-   crosses, the teal body shows near us (R2). It is a `lib/sky` spec over the water's box (eased OKLab curve, blue-noise
-   dither), held still on screen while the water plane floats. It is the ONE gradient in the water.
+1. **The ramp:** the shot's own `lib/sky` preset mirrored about the horizon (water y shows the sky at 2 hz - y), a
+   FRESNEL STEP under it (OKLab L - 0.05 at the far edge: ~5 L*, so the far water is >= 4 L* under the air and never the
+   lit ground's colour), toned toward the water's body: a light veil of the body's hue crosses, the teal body shows near
+   us (R2). Through the whole warm-to-cool crossing (CIE h 30-168) the chroma is held in the CLEAN GAP, C* 4.7-5.5
+   (`rampGap`: the beige and olive bands start at 6, grey under 4): the far water is a pale warm pearl (S1: #D7CDC5, L*
+   83, C* 5.6), as the sky's own light band crosses at C* <= 6, never peach paving, beige or olive. It is a `lib/sky` spec
+   over the water's box (keys every 8 px, or every 1/20 of a short strip; eased OKLab curve, blue-noise dither), held
+   still on screen while the water plane floats. It is the ONE gradient in the water.
 2. **Reflections:** every thing over the water, as a screen polygon with its own waterline (`axis`), mirrored (R1) and
    toned by a flat Fresnel ladder in CIE LCh (`reflectTone`: hue from the water, value from the world, a light keeps
    its colour; R3-R4). Each is ONE solid block, its sides sampled every 4 px and bent by the sway (never a stair-step),
@@ -20,13 +24,24 @@ and `docs/look/CRAFT.md` §f.7 (the rules) outrank it. Optics and sources: `docs
    perspective grid. Bars start only where a band is >= `barPitch` px (7): the far water is a near-perfect mirror, so a
    far reflection stays whole. Each band's gap is a tone-on-tone trough (the bar's hue, <= 3.5 L* toward the open water;
    a light's slivers part on the open water instead, R7). The envelope narrows smoothly toward the end; a band breaks
-   once at most, only in its last half, static and seeded; the very last may drop.
+   once at most, only in its last half, static and seeded; the very last may drop. `solid: 1` is WHOLE (one shape to
+   its end: a far thing in the far water, a near mirror); `maxBars` caps a thin thing's bars (S1's pier and lamps: 2).
+   - **A light** (`kind: 'light'`, `LightOpts`) is LIGHT ON WATER: a short solid block (<= 35 % of its visible length,
+     its bottom a gentle static ripple of 2.2 px, so no row carries the whole gold-to-water edge), then <= 3 LEAF slivers
+     on the open water (pointed at both ends, flanks 1 - |u|^1.5), each 0.62 as long (the first: 0.62 x the block's
+     width) and 0.85 as thick as the one above, seeded a little off the middle, each swaying with its row; the water
+     between them >= 4.5 px (the encode's 4:2:0 keeps 2 rows of every gap teal); its tone a step (6 L*) under its source,
+     falling 1.3 L* a sliver.
 3. **Quay pieces:** `draw: 'crisp'` (a contact band: the quay's face mirrored, one flat still shape) and `draw: 'stub'`
    (a bollard's reflection: a short vertical ending in its dome).
 4. **The glitter** (R8) under `sun`, between the reflections and the quay layer (`quayLayer`, default 30): a STILL bed,
-   one gold lens per band of the column (its half-width a (y - hz) + f a sin e; longest at the sun's mirror point
-   2 hz - y_sun), swaying with its band; in its longer lenses up to 6 warm-white slivers (each slot owns its own lenses),
-   growing in along their length, holding, shrinking out, then resting >= 0.12 s. These are CRAFT §f.6's glints.
+   one amber lens per band of the column where the band is >= 5 px (`lensPitch`: the far rows are a near mirror), 0.8
+   of its band thick and 0.85 of the envelope long (`lensLen`; its half-width a (y - hz) + f a sin e; longest at the
+   sun's mirror point 2 hz - y_sun), swaying with its band; in its lenses >= 4.5 px tall up to 6 gold-white slivers (each
+   slot owns its own lenses), >= 3.5 px tall at their middle at full length (`SLIVER_H`), growing in along their length,
+   holding, shrinking out, then resting >= 0.12 s. These are CRAFT §f.6's glints. Colours: the bed L* 81 C* 42 h 71
+   (#F9BE7F), the slivers L* 94.7 C* 16 h 87 (#FEEED1): every sRGB mix of a sliver and its lens stays >= 6 dE76 from a
+   peach paving, and fewer of the bed's rims fall in the house bands in the encode.
 5. **Shades** (optional): closed paths multiplied by the rig's water tint (`tint`, `shades`: a bank's shade, R10).
 6. **Ripple lines** (R9): `slots` long tapered lenses drifting with the breeze; a crest across a reflection (its own
    tone +8 L*), a trough across the open water (-0.04 OKLab L); the tone is decided once per life, never flips.
@@ -41,12 +56,13 @@ and `docs/look/CRAFT.md` §f.7 (the rules) outrank it. Optics and sources: `docs
 | | what |
 |---|---|
 | `<Water spec t />` | the whole water, in the shot's water slot (inside the water plane's parallax group, before everything that stands in or over it) |
-| `WaterSpec` | `id`, `seed`; `cam` {horizon, f, eye over the WATER (m)}; `region` {top(x), bottom(x), x0, x1, tucks}; `sky` (the shot's preset), `air`; `body` (the near water's colour); `tint`, `shades`; `tier`; `ramp` {yFar, yNear, toning}; `tone` (TONE_DEFAULT, `warmMemory` 0); `ladder` {k: [0.40, 0.72], y, step 0.05}; `grid` {dz 0.45, minPitch 3, gap [0.16, 0.26], barPitch 7, gapMix 0.4}; `sway`; `sources`; `moving(t)`; `sun`; `ripples`; `float(plane, t)` + `skyPlane`; `flood`; `joins`; `lod`, `farLod` |
-| `WaterSource` | `id`; `thing` + `axis` (number = a level waterline, `'horizon'`, `{a0, s}` = R1's affine sloped quay, `{line: (x) => y}`) or `refl` (already mirrored); `color` (on screen); `kind` body / light / figure; `layer`, `plane`; `draw` mass / crisp / stub; `solid` (>= 0.55), `breakup`, `narrow`, `taper`, `sway`; `sep` {from, dL} (a value step kept from another source at every step), `dL` |
+| `WaterSpec` | `id`, `seed`; `cam` {horizon, f, eye over the WATER (m)}; `region` {top(x), bottom(x), x0, x1, tucks}; `sky` (the shot's preset), `air`; `body` (the near water's colour); `tint`, `shades`; `tier`; `ramp` {yFar, yNear, toning, `cap` 5.5}; `tone` (TONE_DEFAULT: waterC 13.5, cMin 9; `warmMemory` 0); `ladder` {k: [0.40, 0.72], y, step 0.05}; `grid` {dz 0.45, minPitch 3, gap [0.16, 0.26], barPitch 7, gapMix 0.4}; `sway`; `sources`; `moving(t)`; `sun` (+ `lensPitch` 5, `lensLen` 0.85); `ripples`; `float(plane, t)` + `skyPlane`; `flood`; `joins`; `notLike` [{name, hex, dE 6}] (the lit ground beside the water: never its colour); `lod`, `farLod` |
+| `WaterSource` | `id`; `thing` + `axis` (number = a level waterline, `'horizon'`, `{a0, s}` = R1's affine sloped quay, `{line: (x) => y}`) or `refl` (already mirrored); `color` (on screen); `kind` body / light / figure; `layer`, `plane`; `draw` mass / crisp / stub; `solid` (>= 0.55; 1 = whole), `maxBars`, `breakup`, `narrow`, `taper`, `sway`; `light` (LightOpts: solid 0.33, slivers 3, ratio 0.62, thinning 0.85, thick, gap 4.5, step 6, fall 1.3, wave [2.2, 56], leaf 1.5); `kMin` (a figure's k floor, default 0.6); `sep` {from, dL} (a value step kept from another source at every step), `dL` |
 | `waterFrame(spec, t)` | the pure per-frame build (runs, ripple lines, bed, slivers): node QA reads what the picture draws |
-| `waterProblems(spec, {t1, otherAlive})` | the lint: no tone in the beige / olive / grey bands, a cool body, every thing above its waterline and inside the water's span, solid >= 0.55 and tapered ends, a far strip on `lod 'far'`, calm sway (<= 3 / 7 px, waves 0.2-0.6 m/s, slices <= 15 px/s), 6-14 ripple slots of >= 40 px drifting <= 25 px/s, the glitter under the sun and inside R8's column, slivers 20-36 px, lit 0.25-0.8 s, <= 6 alive and nested in the bed, <= 16 with the shot's other particles, a flood declared, no field born in a join's window |
-| `waterPalette(spec)` | every colour with L* / C* / h and its band (the palette QA hook) |
-| helpers | `mirrorPoly`, `affineMirror` (an SVG matrix), `axisY`, `reflectTone`, `neverBand`, `cleanColour`, `waterStep`, `crestOf`, `waterRamp`, `rampColour`, `floaterWater`, `waterColourAt`, `waterKAt`, `waterSwayAt`, `camZ` / `camY` / `camFresnel` / `pxPerMDeep`, `WATER_LIMITS` |
+| `waterPieces(spec, t)` | per source: its blocks, bars (a broken band counts twice) and a light's slivers, with its middle x (the comb count) |
+| `waterProblems(spec, {t1, otherAlive})` | the lint: no tone in the beige / olive / grey bands, and the ramp AS DRAWN walked ROW BY ROW (its curve between two clean keys can cross a band), none within dE76 6 of a `notLike` colour, the far water >= 4 L* under the `air`, a cool body, every thing above its waterline and inside the water's span, solid >= 0.55 and tapered ends, a light's block <= 35 % with <= 3 slivers each >= 15 % shorter and thinner, gaps >= 4 px and a step >= 4 L* under its source, a far strip on `lod 'far'`, calm sway (<= 3 / 7 px, waves 0.2-0.6 m/s, slices <= 15 px/s), 6-14 ripple slots of >= 40 px drifting <= 25 px/s, the glitter under the sun and inside R8's column, slivers 20-36 px, lit 0.25-0.8 s, <= 6 alive and nested in the bed, <= 16 with the shot's other particles, a flood declared, no field born in a join's window |
+| `waterPalette(spec)` | every colour with L* / C* / h and its band (the palette QA hook; a light's block and slivers) |
+| helpers | `mirrorPoly`, `affineMirror` (an SVG matrix), `axisY`, `reflectTone`, `neverBand`, `cleanColour`, `rampGap`, `dE76`, `waterStep`, `crestOf`, `waterRamp`, `rampColour`, `floaterWater`, `leafD`, `lensD`, `barD`, `waterColourAt`, `waterKAt`, `waterSwayAt`, `camZ` / `camY` / `camFresnel` / `pxPerMDeep`, `LIGHT_DEFAULT`, `SLIVER_H`, `WATER_LIMITS` |
 
 Demo: `src/entry-v2r-water.tsx` (`WaterFarSample`, `WaterAffineSample`; their specs in `src/lib/water_samples.ts`).
 
