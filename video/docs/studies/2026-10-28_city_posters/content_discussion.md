@@ -1,10 +1,11 @@
 # Content discussion: which stories fit the city-poster style
 
-**State (2026-10-28 ~22:40 UTC): OPEN.** The owner has steered twice: not content ABOUT real cities (exchange 2), and
-not made-up content either (exchange 3's myths, fables and metaphor worlds: "completely made up content like", a
-message cut off there). Exchange 4 sent: the middle, true stories whose action happens in a big world we can show, in
-seven kinds with a real example each; strongest for us: nature hits a town, one person crosses a big world, a crowd
-does one thing at once. Asked the owner to confirm the middle and finish the cut-off thought. No picks yet.
+**State (2026-10-28 ~22:50 UTC): DIRECTION FIRMING UP.** Tech told through these views, researched as a general
+direction: one possible umbrella is **tech in the cities** (WOW cases where a city solves a problem with new tech or
+AI); data centres and driverless taxis are kinds inside it; every pick needs a WOW; the owner liked the weird-place
+data centres (a Cold War bunker, a chapel, a public pool). Three scouts (max effort) are hunting:
+`discussion_scouts/wow_datacentres.md`, `wow_tech_world.md`, `tech_in_cities.md`. Next: edit their finds into the
+umbrella's kinds and a shortlist with the column chart. No pick yet; who produces the video stays the owner's call.
 
 Notes: `content_market.md` and `content_fit.md` (the orchestrator's content track, scoped to tech and AI) are folded in
 below; their final versions (pulled ~22:20 UTC) changed nothing here. `content_fit.md`'s best kinds already include two
@@ -44,6 +45,22 @@ pick); this thread never edits `video/docs/v4/`. If the discussion lands on a to
   completely made up content like" (the message ends there)
   -> captured: playbook, Taste signals, "Places on screen": neither extreme; the middle is true stories whose action
   happens in a big world we can show; a metaphor world only when a true story needs it and the facts map (v1).
+- 2026-10-28 ~22:38 UTC (in this thread, on exchange 4): "okay so i kind of like the direction of tech related topics
+  here / like datacenters do fit pretty nice in here - like we have perhaps some wow stories here like i've heard
+  someone plans a datacenter in new your or like a datacenter in some weird places or datacenters kind of fit
+  interestingly here / the topic about waymos or driverless taxis in London would be good too, but perhaps not as WOW,
+  we need some WOW stories here"
+  -> captured: playbook, Taste signals ("Places on screen": the owner leans to tech told this way, data centres
+  especially; every pick needs a WOW; the "Topics" bullet notes the return to tech).
+- 2026-10-28 ~22:43 UTC (in this thread, on exchange 5): "no i mean research more - this is a general direction,
+  datacenter is one, having waymo or driverless taxis in citis is a good topic too btw but we need to find a way to
+  generalize it like one POSSIBLE direction is lets say generalizing it to tech in the cities. like some interesting,
+  weird, wow like cases where cities come up with the new solutions to problems, deploy some wow tech / ai / etc"
+- 2026-10-28 ~22:44 UTC (in this thread, quoting exchange 5's leads): "those are interesting ones: Weird places, older
+  but WOW: one sits in a Cold War bunker under Stockholm, a supercomputer was built inside a Barcelona chapel, and a
+  small one heats a public pool in England."
+  -> captured: playbook, Taste signals ("Places on screen": research the general direction; tech in the cities as one
+  umbrella; driverless taxis "a good topic too"; tech in a weird place is a WOW; an older story can carry it with a peg).
 
 ## How an idea is judged here
 - **The look** (the seven posters, `video/docs/look/poster_refs/`): one real place, one hero landmark, layered depth
@@ -165,6 +182,36 @@ mean? Your message cut off after 'like', so tell me if I misread."
 this weekend). Sources seen for 6 (search results, 2026-10-28):
 https://www.arabnews.com/node/2629661/world ; https://www.khaosodenglish.com/news/crimecourtscalamity/2026/01/06/global-fraud-hub-exposed-new-scam-compound-50km-from-poipet/ ;
 https://www.nationthailand.com/news/asean/40060787
+
+**The owner's reaction:** ~22:38 UTC: tech topics here, data centres especially; WOW stories; London's driverless taxis
+"not as WOW" (verbatim above). -> exchange 5.
+
+### 5. ~22:45 UTC: two scouts on WOW stories (sent)
+Launched (max effort, lean: two scouts, this thread as editor): WOW data-centre stories (the New York one the owner
+heard about; weird places: orbit, the sea floor, bunkers, chapels, mines; heat for pools and homes; district-sized
+campuses; the 3 Nov votes) and WOW tech set in a big world (rocket-catching towers, fusion machines, giant
+telescopes, record builds; no robotaxi launches, no product launches). Each story: the WOW, why now, the big view and
+frame 0, the so-what, ad or news, sources, mood, scores on TOPIC_CRITERIA plus WOW. Quick leads sent to the owner
+meanwhile (search results, to check): data centres in orbit (Starcloud flew an Nvidia H100 in Nov 2025; SpaceX filed
+for up to a million satellites, 30 Jan 2026; Starcloud-2 reportedly due ~Oct 2026, unconfirmed); New York State's
+one-year pause on big new data centres (Ars Technica, July 2026:
+https://arstechnica.com/tech-policy/2026/07/new-york-is-the-first-state-to-impose-a-data-center-moratorium/); the
+3 Nov votes (Boulder City); old but WOW: a data centre in a Cold War bunker under Stockholm (Pionen), a supercomputer
+in a Barcelona chapel (MareNostrum), a small data centre heating a public pool in Devon (2023).
+Orbit sources seen: https://www.fierce-network.com/cloud/space-data-centers-starcloud-spacex-and-project-suncatcher-explained ;
+https://www.geekwire.com/2026/orbital-ai-seattle-area-startup-starcloud-hits-1-1b-valuation-to-build-space-based-data-centers/
+
+**The owner's reaction:** ~22:43-22:44 UTC: "research more - this is a general direction"; tech in the cities as one
+possible umbrella; the weird-place data centres are "interesting ones" (verbatim above). -> exchange 6.
+
+### 6. ~22:50 UTC: the general direction, a third scout (sent)
+Launched a third scout (max effort): **tech in the cities**, 10-14 WOW cases where a city solves a problem with new tech,
+AI or engineering (moving people, incl. driverless taxis with a WOW angle; fighting nature; city services; food, water
+and energy; tech in surprising places) -> `discussion_scouts/tech_in_cities.md`. Messages to the running scouts: the
+data-centre scout verifies the three weird places and digs for more with a fresh peg; the city scout adds city tech in
+surprising places (e.g. a power plant with a ski slope on its roof). The umbrella's kinds as we framed them for the
+owner: moving people, the hidden machines, fighting nature, city services. The lean shape grew to three scouts at the
+owner's "research more"; this thread edits.
 
 **The owner's reaction:** (waiting)
 

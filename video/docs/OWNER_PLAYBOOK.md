@@ -300,8 +300,8 @@ Maintenance at the end).
 - **Topics: tech and AI news, and AI-ADJACENT news (science, health tech, space, robots, computers, energy: where AI is
   part of the story or right next to it), is the channel's focus** ("no too narrow, lets research some more - expand it to
   AI adjacent news", v4, 2026-10-28); the existing fuss (people already arguing about it) weighs as much as
-  a direct wallet hit,** and an everyday consequence beats a bigger, distant story. The city-poster brainstorm is the
-  one open exception: any subject (Places on screen, below). — (v3 G0; v4 G0: "focus on tech and AI",
+  a direct wallet hit,** and an everyday consequence beats a bigger, distant story. The city-poster brainstorm opened
+  this to any subject, and the owner came back to tech told through its views (Places on screen, below). — (v3 G0; v4 G0: "focus on tech and AI",
   picked AI songs over the wallet pick: "good amount of fuss about AI songs", 2026-10-27).
 - **Topics are picked in the owner's order: relevant (with buzz and surprise) first, then true and solid, then
   visually appealing in our look, then the mood the slate needs, then fresh (news from about the last month), then
@@ -331,7 +331,14 @@ Maintenance at the end).
   `docs/studies/2026-10-28_city_posters/` (the content track; the live discussion is its `content_discussion.md`) before
   it changes `docs/TOPIC_CRITERIA.md`. **The search is open to any subject, not only tech and AI: what people would
   love to hear about** (the owner's seeds: history, news from cities, stories); **news from a real city is positive.**
-  Until the owner picks a direction, picks keep the tech/AI focus above. — ("I want us to see which type of content would be best fit into videos where we have more of cities /
+  **The owner then leaned back to tech topics told this way, researched as a general direction, not one topic:** one
+  possible umbrella is **tech in the cities** (interesting, weird, WOW cases where a city solves a problem with new
+  tech or AI); data centres (one building at a scale you can only show from far away, in surprising places) and
+  driverless taxis ("a good topic too") are kinds inside it. **Every pick needs a WOW**, a "wait, seriously?" fact or
+  picture (London's driverless taxis alone: "perhaps not as WOW"); **tech in a weird place is one** (a data centre in a
+  Cold War bunker, a supercomputer in a chapel, one heating a public pool: "those are interesting ones"), and an older
+  story can carry it if the WOW is strong and it gets a peg. Until the owner picks a direction, picks keep the tech/AI
+  focus above. — ("I want us to see which type of content would be best fit into videos where we have more of cities /
   architectures / buildings / etc - so for example our very first video was the most successful so far and i
   personally like the last video about google i think the story wasn't quite good, but visually it was nice to be
   honest. Obviously still far away from what we could do to be very successful studio, but initial steps", 2026-10-28;
@@ -342,7 +349,15 @@ Maintenance at the end).
   content would contain storytelling that is around these views. Like previously we discusesd arcane shots - they fit
   within the same kind of category, its content and storytelling that is around these views but has nothing to do
   wiht the actual cities", 2026-10-28; then, on the story shapes (myths, fables, metaphor worlds): "now i feel like you
-  went the other direction, like completely made up content like", 2026-10-28).
+  went the other direction, like completely made up content like", 2026-10-28; then "okay so i kind of like the
+  direction of tech related topics here ... datacenters do fit pretty nice in here - like we have perhaps some wow
+  stories here like i've heard someone plans a datacenter in new your or like a datacenter in some weird places ...
+  the topic about waymos or driverless taxis in London would be good too, but perhaps not as WOW, we need some WOW
+  stories here"; then "no i mean research more - this is a general direction, datacenter is one, having waymo or
+  driverless taxis in citis is a good topic too btw but we need to find a way to generalize it like one POSSIBLE
+  direction is lets say generalizing it to tech in the cities. like some interesting, weird, wow like cases where
+  cities come up with the new solutions to problems, deploy some wow tech / ai / etc"; and on the weird-place data
+  centres: "those are interesting ones", 2026-10-28).
 - **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
   frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
 - **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).
