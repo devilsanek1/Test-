@@ -1,5 +1,9 @@
 # Water study, candidate B: "designed editorial" (2026-10-28)
 
+**Built (2026-10-28):** the study is closed. The shipped water is `src/lib/water.tsx` (how-to `src/lib/WATER.md`, rules
+`docs/look/CRAFT.md` §f.7), fed S1's spec in `src/v2r/scenes/V2S1_water.tsx`; the study seam, `src/entry-v2r-waterstudy.tsx`
+and `src/v2r/water_study/` are removed (their code is in git history up to 5506f34). The paths below are historical.
+
 **The brief** is the owner on the G4 look clip v5's water (`docs/v2/OWNER_NOTES.md`): "I don't like the water too much,
 leafs are great" ... "It's just looking way too cheap, not clean or premium quality or refined. Just lazy and cheap. I
 mean that about the water."

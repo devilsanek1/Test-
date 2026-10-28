@@ -2,8 +2,10 @@
 """judge_metrics.py: the water judge's measurements (docs/v2/water/JUDGE.md), so a fix pass can re-measure its
 must-fixes the same way. S1 only (the water region is S1's, from geometry.ts / DIAGNOSIS §2.2).
 
-Render the same frames of WaterStudyBase (v5) and each candidate with scripts/render-frames.mjs (one folder each,
-f00060.png ...), then:
+Render the same frames of the baseline and of the new water with scripts/render-frames.mjs (one folder each,
+f00060.png ...). The study entry is gone (2026-10-28: the water is src/lib/water.tsx): the v5 baseline is Film2R at a
+commit before the build (e.g. 5506f34; its f150 / f300 sha256 are DIAGNOSIS §4's), the new water is Film2R now
+(--entry=src/entry-v2r-film.tsx --props='{"draftLabel":false}'). Then:
 
   python3 -I docs/v2/water/judge_metrics.py --dirs v5=/tmp/wsBase,A=/tmp/wsA,B=/tmp/wsB --frames 60,150,228,300
   # motion (60 consecutive frames in every folder, e.g. 150-209 = 2.50-3.48 s):
