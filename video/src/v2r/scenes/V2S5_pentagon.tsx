@@ -21,10 +21,12 @@ export const PT5 = {
   facadeShade: atmShade(mix(CM.stoneShade, CM.shadeCool, 0.22), 2),
   facadeShadeDeep: atmShade(CM.stoneShade, 2),
   cornice: atm(CM.paper, 2),
-  roofLit: atm(mix(CM.limestone, CM.stoneShade, 0.3), 2),
-  roofShade: atmShade(mix(CM.stoneShade, CM.limestone, 0.2), 2),
-  well: atmShade(mix(CM.shadeCool, CM.paneUnlit, 0.4), 2),
-  wellDeep: atmShade(CM.shadeCool, 2),
+  // the roof: grey (the real building's limestone walls under a darker grey roof), one value under the hazy
+  // parkland behind it, so its far edges hold a fill step (check_depth "melts": a cream roof was 4-5 off it)
+  roofLit: atm(mix(CM.stoneShade, CM.shadeCool, 0.45), 2),
+  roofShade: atmShade(mix(CM.stoneShade, CM.shadeCool, 0.62), 2),
+  well: atmShade(mix(CM.shadeCool, CM.anchor, 0.25), 2),
+  wellDeep: atmShade(mix(CM.shadeCool, CM.anchor, 0.35), 2),
   paneShade: atmShade(mix(CM.paneUnlit, CM.anchor, 0.15), 2),
   paneLit: atm(mix(CM.paneUnlit, CM.limestone, 0.45), 2),
   paneWarm: atm(CM.lamp, 2),
@@ -35,7 +37,8 @@ export const PT5 = {
   courtBlossom: atm(CM.blossom, 2),
   pavilion: atm(CM.paper, 2),
   pavilionRoof: atm(CM.brick, 2),
-  shadow: atm(mix(CM.sage, CM.anchor, 0.3), 2),
+  // its cast shadow on the lawn toward us: deep enough that the shaded front facade keeps a fill step off it (L* ~55)
+  shadow: atm(mix(CM.sage, CM.anchor, 0.46), 2),
   ink: inkCol(2),
 };
 

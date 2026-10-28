@@ -34,7 +34,6 @@ import {S2FarLife, S2Motes} from './V2S2_Life';
 import {staffOverlay} from './V2S2_Staff';
 import {S2BenchPeople} from './V2S2_Bench';
 import {PipS2} from './V2S2_Pip';
-import {S2Plane, S2_PLANE} from './V2S2_Float';
 import {Tier} from '../../lib/tier';
 import {Lit} from '../../lib/light';
 import {RIG_CANAL} from '../world/rigs';
@@ -159,12 +158,13 @@ const Shot: React.FC = () => {
                   agent={<S2Newsagent />}
                   bench={<S2BenchPeople />}
                   pip={<PipS2 />}
-                  farLife={<S2FarLife />}
-                  extra={
-                    <S2Plane plane={S2_PLANE.subject}>
-                      <S2Motes />
-                    </S2Plane>
+                  farLife={
+                    <>
+                      <S2FarLife />
+                      <S2Motes layer="far" />
+                    </>
                   }
+                  extra={<S2Motes layer="near" />}
                 />
               </CanalCast>
             </Lit>

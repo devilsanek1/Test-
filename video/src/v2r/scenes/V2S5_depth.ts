@@ -3,14 +3,18 @@
 // their steps 0 / 12 / 22 / 40 / 65 % through `recede` (L* toward the air, hue converging on it or kept at a lower
 // chroma: never grey, tan or olive, unlike the old sRGB mix toward the mint):
 //   0 the deck (terrace, the pair)  +1 the slope's crowns  +2 the valley + the Pentagon (A from 22.43: half a step)
-//   +3 the river plane and the far city's front rows  +4 the far city's back rows, the hills, the infinity strip.
+//   +2.6 the river plane  +3 the far city's front rows  +4 the far city's back rows, the hills, the infinity strip.
 import {makeAtmosphere, recede, planePalette} from '../../lib/depth';
 import {CM} from '../palette';
 import {mix} from '../kit/dc/core';
 import type {Tier} from '../../lib/tier';
 import {S5_AIR} from '../world/skies';
 
-export const S5_ATM = makeAtmosphere({name: 'v2 S5 Arlington April morning', air: S5_AIR});
+/** S5's ONE atmosphere: the air = the sky's lowest step (S5_AIR); S1's far ladder (0 / 12 / 22 / 66 / 90 %, a far
+ *  colour across from the warm air turning up to 30 deg toward it): with the gentle 40 / 65 % steps the far city stayed
+ *  dE 16.3 from the gold air, no closer than the terrace (check_depth "no air", 2026-10-28); the near planes (+1, +2)
+ *  keep 12 / 22 %. */
+export const S5_ATM = makeAtmosphere({name: 'v2 S5 Arlington April morning', air: S5_AIR, steps: [0, 0.12, 0.22, 0.66, 0.9], hueTurn: 30});
 
 export const S5_PLANE = {deck: 0, nearmid: 1, mid: 2, river: 3, cityFront: 3, far: 4} as const;
 
