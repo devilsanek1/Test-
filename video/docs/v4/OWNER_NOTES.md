@@ -106,3 +106,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   scored (`G0_TOPICS_r4.md`, "Two owner-suggested candidates"): SynthID 7.48 (anyone can check a picture; very
   drawable; but it finds only Google's own marks, the peg is an award, the counts are Google's); Gemini 4 Carbon 5.90
   (not for people yet: cyber defenders first; Google's own benchmarks; a launch reads as an ad).
+- 2026-10-28 ~21:25 UTC (the topic question unanswered): "i want you to do something else - i want you to focus on the optimizing the codebase and streamlining the process. So each video does take a while to create and takes a lot of tokens. ... we MUST not sacrifice the quality of the video, we MUST not sacrifice the details and overall look and feel, but we need to brainstorm and find a way to streamline the process IF THERE is obvious ways" -> v4 paused at the topic pick (the shortlist, its
+  column chart and the reworded lines wait in `G0_TOPICS_r4.md`); this session runs the streamlining review
+  (`docs/retro/2026-10-28_streamline/`: three reviewers, tokens / render / codebase, then one plan for the owner). ->
+  rule: playbook Process ("Spend on the film, never on overhead": streamline the process, never the film).

@@ -340,7 +340,10 @@ Maintenance at the end).
   and search only for a missing fact), a writer and a critic for the script; agents write files and return at most 3
   lines; the orchestrator stays small (a fresh session per gate, batched steps, no big skill or doc loads for small
   questions); check the session's rate limit before a fan-out. A session's budget may be its own: v4's session spends
-  only on v4 ("these tokens we have here are not shared with other videos").
+  only on v4 ("these tokens we have here are not shared with other videos"). Streamlining the production never costs the
+  film (owner, 2026-10-28: "we MUST not sacrifice the quality of the video, we MUST not sacrifice the details and overall
+  look and feel, but we need to brainstorm and find a way to streamline the process IF THERE is obvious ways"): cut the
+  process's rework, reading and re-rendering, never the look, the detail or a review (`docs/retro/2026-10-28_streamline/`).
 - **NO LIMIT ON TOKENS for creative output (inside the weekly limit); never trade quality for savings.** Ideas, scripts, judged competing ideas,
   design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the quality needs (workflows larger than the default size guideline too), and the early selection stages (topic, core line, script) need few: a few strong agents with files and one fact check (the rule above); only true waste is cut (rework, lost work,
   reviewing what will still change, early polish, a review loop that has stopped improving the shot: `docs/PIPELINE_V2.md`

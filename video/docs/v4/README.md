@@ -17,6 +17,10 @@ and `video/docs/PIPELINE_V2.md`.
   were resumed from their transcripts; three finished writers' lines were saved from their transcripts.
 
 ## Status by gate
+**PAUSED at the topic pick (2026-10-28 ~21:25 UTC):** the owner switched this session to the streamlining review ("i want
+you to do something else"; `docs/retro/2026-10-28_streamline/`). The pick waits: `G0_TOPICS_r4.md` (the glasses and the
+vaccine tied at 8.3; the glasses' line reworded as news; SynthID 7.5 and Gemini 4 Carbon 5.9 added), `topic_chart.png`.
+
 | Gate | Status | File |
 |---|---|---|
 | G0 topic + core line | **Shortlist and chart sent; waiting on the owner's pick** (2026-10-28 ~17:00 UTC). Rounds 3 (positive AI) and 4 (AI-adjacent, owner: "expand it to AI adjacent news") ran lean (2 scouts + 1 editor each). All 23 stories re-ranked in the owner's order (`docs/TOPIC_CRITERIA.md`: relevant with buzz and surprise, true, visual, mood, fresh = about the last month, shareable). Top: the glasses 8.34 and the vaccine 8.32 (tied; the tie-break, a real person in his own words, favours the glasses), quake alerts 7.81, the hurricane 7.76, "could they hear you?" 7.68 | `G0_TOPICS_r4.md` (top 3 with core lines, every table), `topic_scores.json`, `topic_chart.png` |

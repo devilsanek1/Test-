@@ -119,6 +119,8 @@ Everything that agent knew is in this repo. This file is the map; the details li
   paper with big captions) with 3 hook variants.
 
 ## 2c. Video 4 (2026-10-27): G0 topic scouting started
+- **2026-10-28 ~21:25 UTC: paused at the topic pick** (shortlist and column chart sent; `video/docs/v4/README.md`); the
+  session runs the owner's streamlining review: `video/docs/retro/2026-10-28_streamline/`.
 
 - **Video 4 is produced by session https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt since 2026-10-27 ~22:35 UTC**
   (owner: "okay lets continue with the video 4 production"), on branch `claude/busy-lovelace-83r39e` (the earlier v4
