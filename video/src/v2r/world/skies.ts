@@ -16,7 +16,7 @@
 // band); 0,0,330,712 holds the pale cloud strip and the far tower, which read as steps.
 import {CM} from '../palette';
 import {eveningSky, horizonColor, oklabToLch, toOklab} from '../../lib/sky';
-import {SUN0} from './map';
+import {SUN0, SUN2} from './map';
 
 /** S1's warm horizon = V2S1_set_core S1_SKY[5] (#FBD9BB), the far city's haze since L1's continuous-sky pass. */
 export const S1_HORIZON = '#FBD9BB';
@@ -43,3 +43,28 @@ export const S2_EVENING = eveningSky({band: CM.sky, horizon: S1_HORIZON, horizon
 /** S2's air for lib/depth's makeAtmosphere: the sky's lowest colour behind the far end of the canal (the VP side, away
  *  from the sun). */
 export const S2_AIR = horizonColor(S2_EVENING, 1000);
+
+// ---------------------------------------------------------------- L5: S6 (Arlington, April morning) and S7 (the forecourt at sunset)
+// Both suns sit at SUN2 (260, 620) r 45 (the S6 -> S7 push-through keeps its screen spot): high in the ramp, 64 px under
+// the caption band and 216 / 277 px over the horizon. A sun warmth there (any rx, strength 0.35-1, centre 620-660)
+// composites the peach over the mint and crosses yellow-green at C* 10-13 (skyProblems: khaki; measured 2026-10-28), so
+// these two skies carry NO sun warmth: the ramp's light band and warm horizon are the sky's warmth (khaki C* 5.8-5.9),
+// and the disc stays the scene's own flat shape on top, no halo.
+
+/** S6's April morning horizon (LIGHT.april's gold band): behind the gate's facade band at the eye-level horizon y 836. */
+export const S6_HORIZON = CM.bandGold;
+/** S6's April morning sky: the caption field's mint flat through the band, a pale light band, the gold horizon at y 836
+ *  (hidden by the facade band from y 705: the visible sky above it carries the light band); SUN2 (the east = screen
+ *  left: the gate looks south) sits on the ramp. */
+export const S6_MORNING = eveningSky({band: CM.sky, horizon: S6_HORIZON, horizonY: 836, sun: null});
+/** The far air of S6 (the lawn's cherries and the promenade beyond the fence): lib/depth's air. */
+export const S6_AIR = horizonColor(S6_MORNING, SUN2.x);
+
+/** The London sunset horizon S7 and S8 share (one light: TREATMENT section 8 A5; LIGHT.sunset's band). */
+export const SUNSET_HORIZON = CM.bandSunset;
+/** S7's sunset: the eye-level horizon of the forecourt's camera at y 897 (1.6 m eye height at the wing's 72 px/m, base
+ *  y 1012), hidden by the wing and the far roofs; the west gap past the wing's corner shows the light band and the warm
+ *  ramp under SUN2 (screen left = west). */
+export const S7_SUNSET = eveningSky({band: CM.sky, horizon: SUNSET_HORIZON, horizonY: 897, sun: null});
+/** The far air of S7's west gap (the far roofs): lib/depth's air. */
+export const S7_AIR = horizonColor(S7_SUNSET, SUN2.x);
