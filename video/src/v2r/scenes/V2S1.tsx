@@ -42,7 +42,8 @@ export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
  *  caption band and her path:
  *    motes   a few in the sun-side air over the west gap, against the far rows (a step lighter toward SUN0)
  *    glints  in the sun's glitter path on the canal under SUN0 (short level dashes that shorten toward the horizon)
- *    a leaf  from the plane branch, down the left gutter (x < 95: never through the caption band) */
+ *    a leaf  from the plane branch, straight down the left gutter (x < 95: never through the caption band; no drift,
+ *            a 10 px margin: conform_L1 §11, the toolkit critic's note) */
 export const S1_PARTICLES = {t0: 0.3, t1: 5.75, joins: [6.1], her: [380, 900, 320, 220] as [number, number, number, number]};
 const S1Particles: React.FC = () => {
   const sun: [number, number] = [MAP.SUN0.x, MAP.SUN0.y];
@@ -56,7 +57,7 @@ const S1Particles: React.FC = () => {
         <Particles kind="glints" seed="s1glints" region={{poly: glitterPath({x: MAP.SUN0.x, yFar: 1104, yNear: 1166})}} on="#E9C98E" horizon={965} {...common} />
       </S1Plane>
       <S1Plane plane={S1_PLANE.near}>
-        <Particles kind="leaves" seed="s1leaf" region={{rect: [20, 110, 34, 70]}} on="#DACCBE" colors={[CM.leafGold, CM.leafRust]} floor={1910} count={1} gap={[0.3, 0.9]} {...common} />
+        <Particles kind="leaves" seed="s1leaf" region={{rect: [20, 110, 34, 70]}} on="#DACCBE" colors={[CM.leafGold, CM.leafRust]} floor={1910} count={1} gap={[0.3, 0.9]} drift={[0, 0]} margin={10} {...common} />
       </S1Plane>
     </>
   );

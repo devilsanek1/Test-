@@ -1,5 +1,5 @@
 {
- "name": "v2 S1 (lane L1, current build: two-point bank, the far city in haze steps, the stepped sky)",
+ "name": "v2 S1 (lane L1, current build: two-point bank, the far city in haze steps, the lib/sky evening sky)",
  "units": "frac",
  "planes": [
   {
@@ -682,6 +682,6 @@
    "level": 4
   }
  ],
- "air_hex": "#FBD9BB",
- "note": "L1, 2026-10-28: copied from v2_g4_look_s1 with the two-point VPs (V2S1_steps_stone GROUND_VP / GROUND_VP2), the far rows at +3 / +4, air_hex = S1_HAZE (the lowest sky step), the sun + halo masked out of the far planes. The calm far tower behind the wing (V2S1_set_far CalmTower, x 258-346) is the corner's backing field, excluded from the far rows' boxes. 2026-10-28: the seated public left our bank (the orchestrator's size decision); two people on the bridge (level 4 m) and one through the arch (beyond the bend: off the y-camera, not listed); the ducks at their water's scale."
+ "air_hex": "#FDD5B8",
+ "note": "L1, 2026-10-28: copied from v2_g4_look_s1 with the two-point VPs (V2S1_steps_stone GROUND_VP / GROUND_VP2), the far rows at +3 / +4, air_hex = S1_HAZE (the lowest sky step), the sun + halo masked out of the far planes. The calm far tower behind the wing (V2S1_set_far CalmTower, x 258-346) is the corner's backing field, excluded from the far rows' boxes. 2026-10-28: the seated public left our bank (the orchestrator's size decision); two people on the bridge (level 4 m) and one through the arch (beyond the bend: off the y-camera, not listed); the ducks at their water's scale. 2026-10-28: air_hex = S1_AIR (lib/sky horizonColor(S1_EVENING, SUN0.x))."
 }
