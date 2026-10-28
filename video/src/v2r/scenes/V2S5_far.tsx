@@ -10,7 +10,7 @@
 // S5FarLife (screen space, given p) draws the sky's movers THROUGH the far plane's own map (farMat below = the rig's
 // FAR_S5 exactly), so they ride the camera like the world they fly in: gulls wheeling over the far city (one flock in
 // the start's slot, one over the end's city), and two pale V's of birds that the crane's pan brings in from the left
-// edge (~22.0) and that cross the open middle sky to the hold, always RIGHT of the obelisk (never across it); y >= 590.
+// edge (~22.0) and that cross the open middle sky to the hold, always RIGHT of the obelisk (never across it); y >= 610.
 // Import rule: never import V2S5_rig / V2S5_set / V2S5_figs (the rig imports this file).
 import React from 'react';
 import {useTime} from '../../lib/time';
@@ -119,8 +119,8 @@ const GULLS: {c: Pt; r: Pt; n: number; span: number; seed: number}[] = [
  *  strokes (CRAFT §c: things that ARE lines within dL* 15 of what is behind them; §f.6: far birds pale and small):
  *  L* 75 / 78 over the bank (L* 90) and the mint (85), ~2 px; at 360 px wide the near V is still a 15 px mark. */
 export const VS: {t0: number; from: Pt; v: number; rise: number; span: number; n: number; glider: number; color: string; w: number}[] = [
-  {t0: 1.4, from: [590, 692], v: 116, rise: -6, span: 44, n: 7, glider: 3, color: fromLch(75, 10, 22), w: 2.2},
-  {t0: 1.4, from: [492, 640], v: 98, rise: -4, span: 32, n: 5, glider: -1, color: fromLch(78, 8, 30), w: 2.0},
+  {t0: 1.25, from: [620, 700], v: 100, rise: -5, span: 44, n: 7, glider: 3, color: fromLch(75, 10, 22), w: 2.2},
+  {t0: 1.25, from: [500, 652], v: 82, rise: -4, span: 32, n: 5, glider: -1, color: fromLch(78, 8, 30), w: 2.0},
 ];
 /** The V's vertical spread per rank (x span): a shallow V (the far birds read as a line of marks, never a tall cross). */
 const V_SPREAD = 0.4;
