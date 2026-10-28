@@ -1,12 +1,15 @@
-// V2S4_wfar.tsx (lane L3, V2S4 WORLD helpers): the FAR plane (+2, 0.3x the truck) drawn at the 17.96 pose in plane px.
-// TIER C, one flat step toward the air (planeBatch(+2): four values within dE 24, no lines), the far town past the
+// V2S4_wfar.tsx (lane L3, V2S4 WORLD helpers): the FAR plane (0.3x the truck; the atmosphere's +3.5 step) at the 17.96
+// pose in plane px.
+// TIER C, one flat step toward the air (planeBatch(+3.5): three values within dE 12, no lines), the far town past the
 // atmosphere steps (unlit: CRAFT §d.9).
 //   gasholders   two cast-iron guide frames, pale with distance: the LEFT one holds a drum of flats (cx 90: it slides in
 //                behind her end house as the backs overtake it, hidden from ~17.06), the RIGHT one (G1, cx 520) stands
 //                in the gap right of the sun. NO LINE CROSSES SUN1's DISC (x 185-315, y 585-715) at any frame: the far
 //                plane moves 0.3 x 310 = 93 px, so everything above y 716 keeps plane-x < 175 or > 422 (G1: 430-610)
-//   far roofs    two rows in flat depth steps: pitched, mansard, flat and gable roofs, plain stacks; no windows (at +2 a
-//                window is tone on tone at most: CRAFT §f.2), no aerials, no pots; the sun's column stays below y 736
+//   far roofs    two rows in flat depth steps, warm stones and bricks (under the golden air the far city takes its
+//                warmth: CRAFT §f.2; cool slates and glass greyed toward C* 7 there): pitched, mansard, flat and gable
+//                roofs, plain stacks; no windows (far: tone on tone at most), no aerials, no pots; the sun's column stays
+//                below y 736
 //   viaduct      a brick viaduct, arches, a parapet; no masts or wire (no hairline past the subject's planes), no train
 //   birds        a small flock perched on G1's top ring lifts on "heading" (19.78) and flies WEST into the sun's band,
 //                pale and small (the brief's "birds west")
@@ -52,10 +55,10 @@ function gasFrameInto(b: Batch, g: Gas) {
     b.rect(CM.limestone, cx - dr, dt, dr * 2, base - dt);
     b.fill(CM.limestone, `M${P(cx - dr, dt)}Q${P(cx, dt - 9)} ${P(cx + dr, dt)}Z`);
     b.layer();
-    b.rect(CM.stoneShade, cx + dr * 0.55, dt, dr * 0.45, base - dt);
+    b.rect(CM.brickLight, cx + dr * 0.55, dt, dr * 0.45, base - dt);
   }
   b.layer();
-  const col = CM.shadeCool;
+  const col = CM.shadeWarm;
   // ring girders: an upper and a lower chord per ring as thin ribbons (front arcs)
   for (let i = 0; i <= tiers; i++) {
     const y = ringY(i);
@@ -104,7 +107,7 @@ function farRowInto(b: Batch, o: RowOpts) {
     b.rect(wall, x, wallTop, w + 0.8, o.base - wallTop);
     if (kind === 'pitch') b.poly(roof, [[x - 2, wallTop], [x + w * 0.14, wallTop - rh * 0.75], [x + w * 0.86, wallTop - rh * 0.75], [x + w + 2, wallTop]]);
     if (kind === 'mansard') b.poly(roof, [[x - 1, wallTop], [x + w * 0.07, wallTop - rh], [x + w * 0.93, wallTop - rh], [x + w + 1, wallTop]]);
-    if (kind === 'flat') b.rect(CM.stoneShade, x - 1, wallTop - 4, w + 2, 4);
+    if (kind === 'flat') b.rect(CM.brickLight, x - 1, wallTop - 4, w + 2, 4);
     if (kind === 'gable') b.poly(roof, [[x - 2, wallTop], [x + w / 2, wallTop - rh * 1.05], [x + w + 2, wallTop]]);
     if (kind === 'shed') {
       const n = Math.max(2, Math.round(w / 24));
@@ -193,9 +196,9 @@ export function farStatic(): Batch {
   const b = new Batch();
   for (const g of GAS) gasFrameInto(b, g);
   b.layer();
-  farRowInto(b, {x0: X0, x1: X1, base: ROW.wallTop, top: 728, spread: 10, seed: 's4farA', walls: [CM.limestone, CM.stoneShade, CM.glass, CM.limestone], roofs: [CM.stoneShade, CM.shadeCool, CM.stoneShade], w: [44, 96]});
+  farRowInto(b, {x0: X0, x1: X1, base: ROW.wallTop, top: 728, spread: 10, seed: 's4farA', walls: [CM.limestone, CM.stucco, CM.brickLight, CM.limestone], roofs: [CM.brickLight, CM.shadeWarm, CM.brick], w: [44, 96]});
   b.layer();
-  farRowInto(b, {x0: X0, x1: X1, base: ROW.wallTop, top: 752, spread: 8, seed: 's4farB', walls: [CM.brickLight, CM.stucco, CM.limestone, CM.brickLight, CM.stoneShade], roofs: [CM.shadeCool, CM.shadeWarm, CM.paneUnlit], w: [52, 120]});
+  farRowInto(b, {x0: X0, x1: X1, base: ROW.wallTop, top: 752, spread: 8, seed: 's4farB', walls: [CM.brickLight, CM.stucco, CM.limestone, CM.brickLight, CM.box], roofs: [CM.brick, CM.shadeWarm, CM.brickDeep], w: [52, 120]});
   b.layer();
   viaductInto(b);
   return planeBatch(b, S4_PLANE.far);
