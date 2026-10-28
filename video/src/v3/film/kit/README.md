@@ -347,6 +347,13 @@ const rig = nookRig({lamp: LAMP, pool: POOL, glass}); const laptop = <Laptop x={
   {laptop}{mug} <FormShade of={mug} c={[869, 1100]} size={[98, 112]} /> <Ambient holes={[{rect: glass}, {e: POOL}, {of: laptop}, {of: mug}]} /> <Rim d={polyD(laptopGeo(540, 1145, 420).lid)} /> </Lit>
 ```
 
+**The air and the street's kit (the WINDOW lane, v3 rework):** `kit/Haze.tsx` `Haze` (`k`, `color`) = ONE flat plane step
+(CRAFT §f.2) for a whole kit piece whose inner colours a scene cannot pass: every colour in the group mixed `k` toward the
+air (sRGB colour matrix: no blur, no fade; dusk-blue pieces only: a warm hue across from the air would cross grey, so recolour
+those with `lib/depth.ts` `recede`); `twoStepIn` / `stepAt` = the house 2-step switch (3 frames at the half step). H2's data
+center is `<Haze k={0.35 * s}>` round the kit `DataCenter` off its beats. `kit/Fleet.tsx` (`FleetVan` van / dc / better,
+`NoticeFlip`, `CrateFlight` / `CrateBox`): `NoticeFlip` takes `binding` / `rings` (a calm header off the board's beats).
+
 ## Measured in the demo (`LightDemo` at 3.0 s, clean pen, CIE L*; the gate: LIGHT OK on both frames)
 
 **Nook:** the wall (caption band) 91 -> 82, one light value across the band (dL* spread 1.2); the attic slope 66, the
