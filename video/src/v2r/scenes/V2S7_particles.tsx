@@ -4,8 +4,10 @@
 // (28.10 = local 0, the wipe 32.70 = local 4.60) and of 32.50-33.10 (nothing new but the wiper), clear of the caption
 // band and of Google's board.
 //   leaves       three plane leaves (palmate, the preset's 26-40 px) blown in from off the right edge, one per birth
-//                across the hold (0.75 / 2.15 / 3.25 s: each in view by ~1.0 / 2.4 / 3.5 s), west across the open mid
-//                ground in front of the doors (82 px/s across, ~58 down), landing behind Pip (plane 0)
+//                across the hold (0.25 / 2.0 / 2.95 s, born out of frame: each crosses the edge in 0.2-0.3 s at 1.6 /
+//                2.7 / 3.6 s, clear of both joins and of 32.50-33.10), west across the open mid ground in front of the
+//                doors (82 px/s across, ~58 down), still in the air over the forecourt at the wipe (plane 0's sizes; drawn
+//                in the young plane's float group, the depth they cross)
 //   motes        7 small motes (6-9 px) in the low sun's light against the wing's shaded brick right of the doors and
 //                under the plane's crown (plane +0.6); with the 3 near ones, 10 in all (the owner's note on v5)
 //   near motes   3 near motes (12-16 px, lib/particles nearSize) drifting past the nearest shade: the coat over the
@@ -37,11 +39,11 @@ const common = {joins: S7_JOINS, t0: 0.25, t1: 4.35, atm: S7_ATM, sun: [SUN2.x, 
 export const S7_PARTICLE_FIELDS: ParticlesProps[] = [
   {
     // plane leaves blown in from off the right edge (the young plane's crown overhangs it) on the canal breeze, WEST
-    // across the open mid ground in front of the doors, landing on the forecourt behind Pip: the proven particle (the
-    // owner on v5: "leafs are great"), the lib preset sizes on the subject's plane (26-40 px), never smaller
+    // across the open mid ground in front of the doors, drifting down toward the forecourt behind Pip: the proven
+    // particle (the owner on v5: "leafs are great"), the lib preset sizes on the subject's plane (26-40 px), never smaller
     kind: 'leaves',
     seed: 's7/leaves',
-    region: {rect: [1092, 760, 70, 110]},
+    region: {rect: [1110, 770, 50, 100]},
     on: BRICK_SHADED,
     plane: 0,
     leaf: 'palmate',
@@ -49,7 +51,7 @@ export const S7_PARTICLE_FIELDS: ParticlesProps[] = [
     speed: [52, 64],
     drift: [-82, 0],
     floor: 1066,
-    births: [0.75, 2.15, 3.25],
+    births: [0.25, 2.0, 2.95],
     margin: 12,
     avoid: [CAPTION_BAND, S7_BOARD_BOX, PIP_BOX],
     ...common,

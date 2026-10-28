@@ -76,7 +76,8 @@ function groundBatch(): Batch {
   for (let z = zFar - SLAB_D; z > zNear; z -= SLAB_D) L.at(2).poly(soft, band(cam, [-X_SPAN - 1, z], [X_SPAN + 1, z], 0.018));
   // ---- a few fallen leaves as flat shapes, bigger toward us (~12 cm leaves at the ground's own scale)
   const lv = rng('s3ng/leaves');
-  const LEAF = [CM.leafGold, CM.leafRust, CM.coatMustard, CM.leafRust];
+  // gold, mustard and a light rust (a dark rust leaf on the near paving reads as a speck: CRAFT §c)
+  const LEAF = [CM.leafGold, '#C98B6B', CM.coatMustard, '#C98B6B'];
   const spots: [number, number][] = [[-2.2, 7.4], [-0.9, 6.3], [0.6, 7.9], [1.7, 6.8], [2.6, 5.9], [-1.6, 5.4], [0.2, 5.6], [-2.9, 6.6]];
   spots.forEach(([lx, lz], i) => {
     const [sx, sy] = cam.pt(lx, lz);

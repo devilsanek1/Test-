@@ -1,11 +1,12 @@
 // V2S3_tWest.tsx (lane L3, V2S3 FAR helper): the WEST GAP beyond her end-of-terrace house (x < 165), WORLD px at the
 // 12.98 match, in three depth planes (V2S3_depth; CRAFT §f, THROUGHLINE §5b), back to front:
-//   S3FarCity   +2  the far city on the sunset band: a gasholder drum left of the sun, the far rows the low sun sets
+//   S3FarCity   +2  the far city on the sunset band: a plain gasholder drum left of the sun, the far rows the low sun sets
 //                   behind, ONE level roof edge across the disc (y 676: no notch or tooth; CRAFT §f "Failures"), their
 //                   windows tone-on-tone; warm peach materials one flat step toward S3_AIR (planePalette: four values)
 //   S3Roofs     +1  the roofs and chimneys in front of it: three gable-fronted houses (slate roofs, lavender stone
-//                   walls, rendered stacks with pots), all below the disc and its stacks clear of it; tone-on-tone
-//                   windows; stone values that part from her brick end wall (CRAFT §f.3)
+//                   walls, a slate-rendered ground floor, a rendered stack with pots), all below the disc and its stack
+//                   clear of it; tone-on-tone windows; values that part from her brick end wall and her door case
+//                   (CRAFT §f.3)
 //   S3WestNear   0  at the terrace's depth: an autumn tree (flat clumps, the side away from the sun in shade) and the
 //                   garden wall with its gate and ivy
 // The sun itself is S3Sun (V2S3_terrace), drawn first in the sky plane. Every part is flat colour (no hand marks: no
@@ -32,16 +33,15 @@ const FAR = planePalette([CM.brickLight, CM.box, CM.bandSunset, CM.blossom], 2, 
 
 function farCityBatch(): Batch {
   const b = new Batch();
-  // a gasholder drum, cut by the left edge, 22 px clear of the disc: its guide columns as broad tone-on-tone bands
+  // a gasholder drum, cut by the left edge, 22 px clear of the disc: a plain far silhouette (its frame is too fine to
+  // read on +2)
   const drum = {x0: XL, x1: 28, top: 646};
   b.rect(FAR[CM.brickLight], drum.x0, drum.top, drum.x1 - drum.x0, 800 - drum.top);
-  b.rect(FAR[CM.box], drum.x0, drum.top - 4, drum.x1 - drum.x0, 6);
   // the far rows: one level roof edge under the sun, from the drum to behind her end wall
   b.rect(FAR[CM.bandSunset], drum.x1 - 8, FAR_TOP, XE + 20 - (drum.x1 - 8), 800 - FAR_TOP);
   b.layer();
-  for (let x = drum.x0 + 14; x < drum.x1 - 4; x += 26) b.rect(toneOnTone(FAR[CM.brickLight], {dE: 4}), x, drum.top + 6, 6, 800 - drum.top - 6);
   // the far rows' windows: tone-on-tone (CRAFT §f.2: never a dark speck or the lamp colour on +2)
-  const win = toneOnTone(FAR[CM.bandSunset], {dE: 4});
+  const win = toneOnTone(FAR[CM.bandSunset], {dE: 3});
   for (let y = FAR_TOP + 10; y < 790; y += 18) for (let x = drum.x1 + 4; x < XE + 14; x += 16) b.rect(win, x, y, 6, 8);
   return b;
 }
@@ -52,11 +52,12 @@ function farCityBatch(): Batch {
 const ROOF = planePalette([CM.shadeCool, CM.stoneShade, CM.limestone, CM.brickLight], 1, S3_ATM);
 
 /** Three gable-fronted houses (x0, x1, eaves y, apex y): every gable below the disc (its lowest point at x is 652 +
- *  sqrt(46^2 - (x - 96)^2)), the far city's level edge the only line across it. */
+ *  sqrt(46^2 - (x - 96)^2)), the far city's level edge the only line across it; the last one stops short of her end
+ *  wall (x 165), so its slate verge never sits right behind her brick (CRAFT §f.3). */
 const GABLES: [number, number, number, number][] = [
   [XL, 6, 712, 690],
   [6, 86, 714, 694],
-  [86, XE + 20, 716, 700],
+  [86, 163, 716, 700],
 ];
 
 function roofsBatch(): Batch {
@@ -68,8 +69,12 @@ function roofsBatch(): Batch {
     b.poly(ROOF[CM.stoneShade], [[x0, eaves + 8], [mx, apex + 7], [x1, eaves + 8], [x1, 1010], [x0, 1010]]);
   }
   b.layer();
-  // rendered stacks with brick pots, clear of the disc (x < 46 or x > 146)
-  for (const [x, top, w] of [[-6, 682, 16], [146, 690, 12]] as [number, number, number][]) {
+  // their ground floors: a darker shopfront band (slate render) from y 896, mostly behind the tree and the garden wall;
+  // where it shows, beside her end wall, it parts her pale door case from the pale stone above it (CRAFT §f.3)
+  for (const [x0, x1] of GABLES) b.rect(ROOF[CM.shadeCool], x0, 896, x1 - x0, 1010 - 896);
+  b.layer();
+  // a rendered stack with brick pots by her end wall, clear of the disc (x > 146)
+  for (const [x, top, w] of [[146, 690, 12]] as [number, number, number][]) {
     b.rect(ROOF[CM.limestone], x, top, w, 724 - top);
     for (let k = 0; k < Math.max(1, Math.round(w / 8)); k++) b.rect(ROOF[CM.brickLight], x + 2 + k * 7, top - 6, 5, 6);
   }
@@ -83,7 +88,7 @@ function roofsBatch(): Batch {
 
 // ---------------------------------------------------------------- 0: the tree and the garden wall (the terrace's depth)
 
-const TREE = {x: 52, base: 1004, cx: 46, cy: 872, rx: 106, ry: 92} as const;
+const TREE = {x: 36, base: 1004, cx: 30, cy: 872, rx: 106, ry: 92} as const;
 
 function westNearBatch(): Batch {
   const b = new Batch();

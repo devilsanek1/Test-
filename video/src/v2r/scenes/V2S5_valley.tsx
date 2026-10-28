@@ -328,6 +328,7 @@ export type NearMid5Props = {
 /** The near-mid slope in START coords: the slope's crowns (dark masses, limbs, then blossom that bursts in 4 frames on
  *  "April"), lit on the side facing the sun in the slot; the big tree's trunk. */
 const NearMidBody: React.FC<NearMid5Props> = ({burstAt, seed = 'nm'}) => {
+  const t = useTime();
   const crowns = useMemo(() => nearCrowns(seed), [seed]);
   const specs = useMemo<CrownSpec[]>(
     () =>
@@ -339,6 +340,12 @@ const NearMidBody: React.FC<NearMid5Props> = ({burstAt, seed = 'nm'}) => {
       }),
     [crowns],
   );
+  // In blossom, the small crowns (the slot trees, the back row: rx < 90, their limbs 2.2 px and twigs 1.2 px) drop
+  // their limbs: tier C draws no hairline twigs (CRAFT §c; QA 2026-10-28: ~90 of the 21.0 frame's 286 strokes); the
+  // bare trees keep them until the burst is done (the kit's bloomed, +0.12 s), and the big crowns that frame the slot
+  // keep their limbs (3-5 px structure).
+  const specsBloomed = useMemo<CrownSpec[]>(() => specs.map((c) => (c.rx < 90 ? {...c, limbs: false} : c)), [specs]);
+  const bloomed = burstAt === undefined || t >= burstAt + 0.12;
   const trunk = useMemo(() => {
     const B = new Batch();
     const bt = NEAR_MID5.bigTree;
@@ -358,7 +365,7 @@ const NearMidBody: React.FC<NearMid5Props> = ({burstAt, seed = 'nm'}) => {
   return (
     <>
       <Paint b={trunk} seed={`${seed}/trunk`} misreg={3} />
-      <BloomCrowns crowns={specs} burstAt={burstAt} seed={`${seed}/bl`} tones={BLOOM_S5} />
+      <BloomCrowns crowns={bloomed ? specsBloomed : specs} burstAt={burstAt} seed={`${seed}/bl`} tones={BLOOM_S5} />
     </>
   );
 };

@@ -6,6 +6,7 @@ import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
 import {Batch, Paint, mix, inkCol, lineD, polyD, quadD, crownD, circleD, rng, type Pt} from '../kit/dc/core';
 import {rcAtm, rcShade} from './V2S5_depth';
+import {toneOnTone} from '../../lib/depth';
 import {MID, PENT, PENT_ROT, circ, facesLens, halfSide, pentagon, sideFrame, sidePt, shadowOffset, wallLight, vert} from '../kit/dc/lens';
 import {tiered} from '../kit/tiers';
 
@@ -16,10 +17,14 @@ const atmShade = (c: string, d: number) => rcShade(c, d, 'subject');
 
 // ---------------------------------------------------------------- tones (plane 2: 22 % toward the sky)
 
+const FACADE_LIT = atm(CM.limestone, 2);
+const FACADE_SHADE = atmShade(mix(CM.stoneShade, CM.shadeCool, 0.22), 2);
+const FACADE_SHADE_DEEP = atmShade(CM.stoneShade, 2);
+
 export const PT5 = {
-  facadeLit: atm(CM.limestone, 2),
-  facadeShade: atmShade(mix(CM.stoneShade, CM.shadeCool, 0.22), 2),
-  facadeShadeDeep: atmShade(CM.stoneShade, 2),
+  facadeLit: FACADE_LIT,
+  facadeShade: FACADE_SHADE,
+  facadeShadeDeep: FACADE_SHADE_DEEP,
   cornice: atm(CM.paper, 2),
   // the roof: grey (the real building's limestone walls under a darker grey roof), one value under the hazy
   // parkland behind it, so its far edges hold a fill step (check_depth "melts": a cream roof was 4-5 off it)
@@ -27,8 +32,12 @@ export const PT5 = {
   roofShade: atmShade(mix(CM.stoneShade, CM.shadeCool, 0.62), 2),
   well: atmShade(mix(CM.shadeCool, CM.anchor, 0.25), 2),
   wellDeep: atmShade(mix(CM.shadeCool, CM.anchor, 0.35), 2),
-  paneShade: atmShade(mix(CM.paneUnlit, CM.anchor, 0.15), 2),
-  paneLit: atm(mix(CM.paneUnlit, CM.limestone, 0.45), 2),
+  // its windows TONE-ON-TONE (CRAFT §f.2: windows dE <= 6 from their wall from +2, never a dark speck; §c: no specks):
+  // the rows still read as the facade's grain, without ~700 dark specks (QA 2026-10-28: 74 % of the end frame's
+  // strokes, line measure 457 strokes / Mpx at 23.4); the warm run (paneWarm, 23.08) is the one window beat
+  paneShade: toneOnTone(FACADE_SHADE, {dE: 6}),
+  paneCourt: toneOnTone(FACADE_SHADE_DEEP, {dE: 6}),
+  paneLit: toneOnTone(FACADE_LIT, {dE: 6}),
   paneWarm: atm(CM.lamp, 2),
   courtLawn: atmShade(mix(CM.sage, CM.shadeCool, 0.18), 2),
   courtLawnLit: atm(CM.sage, 2),
@@ -169,7 +178,7 @@ const PentagonBody: React.FC<Pentagon5Props> = ({warmAt, warmDur = 0.7, seed = '
         for (let s = -hs + 2; s < hs - 2; s += PENT.windowPitch) {
           const a2 = sidePt(i, PENT.courtApothem - 0.06, s);
           const b2 = sidePt(i, PENT.courtApothem - 0.06, s + 1.4);
-          b.poly(PT5.paneShade, [P3(a2, z1), P3(b2, z1), P3(b2, z0), P3(a2, z0)]);
+          b.poly(PT5.paneCourt, [P3(a2, z1), P3(b2, z1), P3(b2, z0), P3(a2, z0)]);
         }
       }
     }
