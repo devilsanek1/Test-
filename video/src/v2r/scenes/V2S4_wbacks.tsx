@@ -17,6 +17,7 @@ import {Batch, Paint, P, rng, ovalPath, lobes, leafPath, lerp, frac, r1} from '.
 import {litAt, Puffs} from '../kit/canal/life';
 import {WindowPerson} from '../kit/cast';
 import {ROW, PLANE_X, sunClear, WIND, CLEAN, WINK} from './V2S4_wcore';
+import {S4_PLANE, planeBatch} from './V2S4_depth';
 
 const K = 0.6;
 const [X0, X1] = PLANE_X(K);
@@ -453,7 +454,7 @@ export const BacksPlane: React.FC = () => {
     warehouseInto(b);
     b.layer();
     housesInto(b);
-    return b;
+    return planeBatch(b, S4_PLANE.backs, {keep: [CM.lamp, CM.lampCore]});
   }, []);
   const n = BACK_WINS.length;
   const lit = (w: BackWin) => litAt(t, 's4backs', w.i, n, {litFrac: 0.28, gap: [0.9, 2.2], force: BACK_WIN_FORCE});
@@ -473,6 +474,7 @@ export const BacksPlane: React.FC = () => {
   treeLeavesInto(dyn, t);
   dyn.layer();
   gullInto(dyn, t);
+  planeBatch(dyn, S4_PLANE.backs, {keep: [CM.lamp, CM.lampCore]});
   const nb = BACK_WINS[9];
   return (
     <>

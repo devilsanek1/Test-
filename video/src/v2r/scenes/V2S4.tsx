@@ -17,12 +17,18 @@
 import React from 'react';
 import {World} from '../../lib/World';
 import {TimeShift} from '../../lib/time';
+import {Sky} from '../../lib/sky';
+import {S4_SKY} from '../world/skies';
 import {CM} from '../palette';
 import * as MAP from '../world/map';
 import {CanalCast} from '../kit/canal/slots';
 import {k4Person} from '../kit/canal/k4k5';
 import {SunDisc} from '../kit/canal/sets';
 import type {ToneKey} from '../../lib/Film';
+import {Lit} from '../../lib/light';
+import {Tier} from '../../lib/tier';
+import {RIG_CANAL} from '../world/rigs';
+import {S4_AIR} from '../world/skies';
 import {S4_START} from './V2S4_rig';
 import {S4Far, S4Backs} from './V2S4_far';
 import {S4Path, S4Canal} from './V2S4_path';
@@ -36,23 +42,38 @@ export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
 const Shot: React.FC = () => (
   <CanalCast person={k4Person}>
-    <SunDisc x={MAP.S4.sunAtPose.x} y={MAP.S4.sunAtPose.y} r={MAP.S4.sunAtPose.r} />
-    <S4Far />
-    <S4Backs />
-    <S4Path>
-      <S4Post />
-    </S4Path>
-    <S4Her />
-    <S4Canal />
-    <S4Boat />
-    <S4Pip />
-    <S4Plates />
-    <S4Tag />
+    <Lit rig={RIG_CANAL}>
+      {/* the sky (no truck: it is at infinity): ONE continuous, gentle, dithered sky (lib/sky; world/skies S4_SKY)
+          carrying SUN1's warmth low and wide; then the flat disc, no halo */}
+      <Sky spec={S4_SKY} />
+      <SunDisc x={MAP.S4.sunAtPose.x} y={MAP.S4.sunAtPose.y} r={MAP.S4.sunAtPose.r} />
+      {/* TIERS (CRAFT §b): the world is tier C (flat, no line; the far planes calmed toward the air, the rest toward the
+          paving); A = her, the name tag, the fingerpost and its plates; B = Pip, her far window, the walkers she passes */}
+      <Tier tier="environment" bg={S4_AIR}>
+        <S4Far />
+      </Tier>
+      <Tier tier="environment" bg={S4_AIR}>
+        <S4Backs />
+      </Tier>
+      <S4Path>
+        <S4Post />
+      </S4Path>
+      <S4Her />
+      <Tier tier="environment" bg={CM.paving}>
+        <S4Canal />
+      </Tier>
+      <Tier tier="environment" bg={CM.paving}>
+        <S4Boat />
+      </Tier>
+      <S4Pip />
+      <S4Plates />
+      <S4Tag />
+    </Lit>
   </CanalCast>
 );
 
 const V2S4: React.FC = () => (
-  <World sky={[CM.sky, CM.bandGold]} horizon={1000}>
+  <World sky={CM.sky} horizon={1000}>
     <TimeShift by={-S4_START}>
       <Shot />
     </TimeShift>

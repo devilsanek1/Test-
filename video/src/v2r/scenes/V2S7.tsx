@@ -107,7 +107,7 @@ const V2S7: React.FC = () => {
             <S7TrunkForm />
             <S7TreeCrown />
             <S7CrownForm />
-            <S7Field seed="s7/leaves" />
+            <S7Field seed="s7/gust" />
           </S7Plane>
           <S7Plane plane={P.motes}>
             <S7Field seed="s7/motes" />

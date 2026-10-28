@@ -28,41 +28,53 @@ import {S7_DOOR_BOX} from './V2S7_wing';
 
 export type FolkPose = {x: number; y: number; h: number; inside: boolean; view: 'back' | 'profile'; flip: boolean; z: number};
 
-/** The staffer going IN: already walking toward the doors (a back) when the shot opens, through them at ~0.95 s (the
- *  doors open 0.58-1.58), then left inside the lobby, gone behind the side light by ~1.8 s. */
+/** The door line (the facade, z 25): a figure switches between the outside layer and the lobby slot exactly there,
+ *  in the open doorway (x 2.5 m: clear of the west side light's frame), so the switch is seamless (same place, size
+ *  and pose on both sides). */
+const DOOR_Z = 25.0;
+/** The staffer going IN: already walking toward the doors (a back) when the shot opens, up the steps and through the
+ *  door line at 0.95 s (the doors open 0.58-1.58), on into the lobby (to z 25.4), then left, gone behind the side
+ *  light by ~1.8 s. One continuous path: no jump at the door. */
 export function staffIn(t: number): FolkPose | null {
   const {x: [xa, xb], z: [za, zb]} = S7_LANES.staffIn;
-  const T0 = -1.2;
+  const T0 = -1.5;
   const T1 = 0.95;
   if (t < T0 || t > 1.8) return null;
   if (t < T1) {
     const u = (t - T0) / (T1 - T0);
     const x = lerp(xa, xb, u);
     const z = lerp(za, zb, u);
-    // up the two low steps over the last 0.3 m
+    // up the two low steps over the last 0.7 m
     const lev = clamp01((z - S7_STEPS.z[0] + 0.05) / (S7_STEPS.z[2] - S7_STEPS.z[0])) * 2 * S7_STEPS.rise;
     const [sx, sy] = pt(x, z, lev);
     return {x: sx, y: sy, h: heightAt(z, 1.7), inside: false, view: 'back', flip: false, z};
   }
+  // inside: straight on to z 25.4 (0.95-1.16 s, a back), then left along the lobby (a profile)
   const u = (t - T1) / (1.8 - T1);
-  const [sx, sy] = pt(xb - 0.15 - 1.7 * u, 25.4, 0.3);
-  return {x: sx, y: sy, h: heightAt(25.4, 1.7), inside: true, view: u < 0.25 ? 'back' : 'profile', flip: false, z: 25.4};
+  const a = clamp01(u / 0.25);
+  const z = lerp(DOOR_Z, 25.4, a);
+  const x = xb - 1.7 * clamp01((u - 0.25) / 0.75);
+  const [sx, sy] = pt(x, z, 2 * S7_STEPS.rise);
+  return {x: sx, y: sy, h: heightAt(z, 1.7), inside: true, view: u < 0.25 ? 'back' : 'profile', flip: false, z};
 }
 
-/** The staffer coming OUT: inside (profile, walking right) from 2.55 s, through the doors at ~3.05 (open 2.82-3.80),
- *  down the steps and away right along the frontage (z 23.7), behind the bikes and the plane. */
+/** The staffer coming OUT: inside (profile, walking right) from 2.55 s, bearing toward the doors and over the door
+ *  line at 3.05 (open 2.82-3.80), down the steps and away right along the frontage (z 23.7), behind the bikes and the
+ *  plane. One continuous path: no jump at the door. */
 export function staffOut(t: number): FolkPose | null {
   const T0 = 2.55;
   const T1 = 3.05;
   if (t < T0) return null;
   if (t < T1) {
     const u = (t - T0) / (T1 - T0);
-    const [sx, sy] = pt(lerp(1.05, 2.25, u), 25.4, 0.3);
-    return {x: sx, y: sy, h: heightAt(25.4, 1.7), inside: true, view: 'profile', flip: true, z: 25.4};
+    // along the lobby at z 25.4, the last fifth bearing out to the door line
+    const z = lerp(25.4, DOOR_Z, clamp01((u - 0.8) / 0.2));
+    const [sx, sy] = pt(lerp(1.05, S7_LANES.staffOut.x[0], u), z, 2 * S7_STEPS.rise);
+    return {x: sx, y: sy, h: heightAt(z, 1.7), inside: true, view: 'profile', flip: true, z};
   }
   const s = t - T1;
-  const z = lerp(24.9, S7_LANES.staffOut.z, clamp01(s / 0.45));
-  const x = 2.25 + 1.3 * s;
+  const z = lerp(DOOR_Z, S7_LANES.staffOut.z, clamp01(s / 1.0));
+  const x = S7_LANES.staffOut.x[0] + 1.3 * s;
   const lev = clamp01((z - S7_STEPS.z[0] + 0.05) / (S7_STEPS.z[2] - S7_STEPS.z[0])) * 2 * S7_STEPS.rise;
   const [sx, sy] = pt(x, z, lev);
   if (sx > 1160) return null;
