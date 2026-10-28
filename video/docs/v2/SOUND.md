@@ -57,17 +57,17 @@ S5's crane, the ONE big move, keeps its swell.
 | S7>S8 32.93 | D wipe: the narrowboat glides west | `boat_pass` 32.70: its engine (CC0) with a small doppler glide and the bow wash, right to left; nothing before 32.70 | -27 ms |
 | S8>S1 38.95 | B + un-build into frame 0 | `pen_unbuild` 38.82: S8's lines rewind (the pen reversed), turn into frame 0's draw-on at 38.95, crossfade 15 ms into `pen_drawon` at the seam | +29 ms |
 
-## Every cue (on the picture's onset; word-synced cues 2 frames before the heard word; same idea = same file)
+## Every cue (on the picture's onset; word-synced cues 2 frames before the frame the picture shows the word's event on; same idea = same file)
 | shot | t (s) · sound · what |
 |---|---|
-| V2S1 | 0.00 pen_drawon (the clean pen draws her, the door, then W from frame 0, 0.00-0.39; the colour floods from the sun 0.44-0.80) · 0.40 lamp_click:1 (W goes dark) · **0.45 exit_ding** (C6 -> F6 struck glass, 58 ms apart; the first-second phone sound) + door_glide · 0.93 step_thup + letter_pops (done by 1.08) · 1.46 wings:1 (the far birds lift at 1.40) · 1.97 / 2.50 / 3.17 / 3.77 / 4.20 / 4.75 ghost_tick (ONE wooden tick, one pitch, per ghost) · 4.95 outline_pops + ear_flap ("life") · 5.95 whoosh_dive:1 |
-| V2S2 | 6.78 window_outline (her window's outline pops on, "one") · 8.40 board_clack:2 (TOLD THE BBC) · 8.93 light_clicks (five switches in one step) · 9.45 notebook_flap · 10.26 blinds_five · 12.17 blind_thump · 12.70 notebook_clap · 12.98 lamp_click:2 (the match) |
+| V2S1 | 0.00 pen_drawon (the clean pen draws her, the door, then W from frame 0, 0.00-0.39; the colour floods from the sun 0.44-0.80) · 0.40 lamp_click:1 (W goes dark) · **0.45 exit_ding** (C6 -> F6 struck glass, 58 ms apart; the first-second phone sound) + door_glide · 0.95 letter_pops (six, 0.06 s apart, as the letters pop) · 0.97 step_thup (her heel on the f60 drawing) · 1.97 / 2.50 / 3.17 / 3.77 / 4.20 / 4.77 ghost_tick (ONE wooden tick, one pitch, per ghost) · 2.45 wings:1 + the two calls 2.49 / 2.78 in the air (the rail birds lift at 2.45) · 4.95 outline_pops (0.03 s apart) + ear_flap ("life") · 5.95 whoosh_dive:1 |
+| V2S2 | 6.80 window_outline (her window's outline pops on, f410) · 8.42 board_clack:2 (TOLD THE BBC) · 8.93 light_clicks (five, 0.04 s apart, as the windows cool) · 9.45 notebook_flap · 10.26 blinds_five · 12.17 blind_thump · 12.70 notebook_clap · 12.98 lamp_click:2 (the match) |
 | V2S3 | 14.71 whoosh_dive:2 |
-| V2S4 | 15.03 pop_high:1 (name tag) · 16.60 pen_tick · 17.66 steps_stop · 18.88 plate_knock (DEC 2025) · 19.45 pen_short:1 (APR 2026) · 19.77 wings:2 · 20.40 sun_through:1 |
+| V2S4 | 15.05 pop_high:1 (name tag) · 16.60 pen_tick · 17.33 steps_stop (the drawn contact f1040, the stand f1076) · 18.90 plate_knock (DEC 2025) · 19.45 pen_short:1 (APR 2026) · 19.77 wings:2 (seven, slow) · 20.40 sun_through:1 |
 | V2S5 | 20.73 blossom_pops ("April") · 21.95 wipe_air (the lamppost, centred 22.10) · 22.40 pop_low (plaque, with accent 1) · 23.05 window_warm (ONE step) · 23.62 tree_wipe |
 | V2S6 | 24.00 pop (the purpose line on "any") · 26.47 pop_high:2 (the F12 line on "veto") · 27.10 window_ticks (3 switch-ons) · 27.95 sun_through:2 |
-| V2S7 | 28.33 board_clack:1 (GOOGLE SAYS) · 29.60 pen_short:2 · 30.20 lamp_run (3 switch-ons) · 30.74 pen_long · 32.70 boat_pass |
-| V2S8 | 33.13 board_clack:1 (SHE SAYS) · 33.75 / 33.83 / 33.90 ghost_tick (-3 dB) · 34.75 door_latch · 34.95 lamp_click:2 (W lights) · 35.68 cloth_wipe · 36.50 pen_long · 37.28 lamp_run (= Google's) · 38.82 pen_unbuild |
+| V2S7 | 28.33 board_clack:1 (GOOGLE SAYS) · 29.62 pen_short:2 · 30.20 lamp_run (3 switch-ons) · 30.74 pen_long · 32.70 boat_pass |
+| V2S8 | 33.13 board_clack:1 (SHE SAYS) · 33.75 / 33.80 / 33.83 ghost_tick (-3 dB, on the 0.04 s stagger) · 34.75 door_latch · 34.95 lamp_click:2 (W lights) · 35.68 cloth_wipe · 36.52 pen_long · 37.28 lamp_run (= Google's) · 38.82 pen_unbuild |
 
 Fairness (A5, Q9, V14): the board clack, the long pen and the lamp run are ONE file each at ONE gain on Google's board and
 hers; Google's beat has no sting, no minor turn, no door sounds (its glass doors stay silent: they would echo her exit).
@@ -104,7 +104,7 @@ hers; Google's beat has no sting, no minor turn, no door sounds (its glass doors
 | air: birds 14.66, 15.30, 20.12, 20.58, 26.70, 28.90 | 20.58 -> 21.25; the rest gone | in a join window (14.66, 20.12, 20.58), or under the voice beside another life sound or on Google's beat: one at a time, in pauses |
 | air: S4 boat 14.86, S7 fountain 28.06 | 14.98, 28.22 (fading in) | a new shot's continuous life starts after its join's window |
 
-## The music director's review: what was done
+## The music director's review: what was done (measured at revision 2; the final numbers: "Sound sync (final)")
 | item | done | measured now |
 |---|---|---|
 | 1 payoff masked | the long pen ends by 36.95 and sits 2 dB lower (both boards); lamp_run 6 dB down, three switch-ons clear of 37.18-37.26 and 37.38-37.50; the same on Google's (A5); premix checks every hit word | "facts" 33.1 / 55.3 dB over everything at 1-4 / 4-10 kHz, "is" 13.5 / 46.5, "not" 31.9 / 41.9, "principles" 27.4 / 35.1, "talking" 14.8 / 8.5; every hit word >= 6 (lowest 7.2 "use", 6.8 "her") |
@@ -125,20 +125,60 @@ hers; Google's beat has no sting, no minor turn, no door sounds (its glass doors
 |---|---|
 | master `mix.wav` (glue 1.5:1, true-peak limiter) | **-14.01 LUFS, -1.25 dBTP**, 48 kHz |
 | music under the speaking voice | median **26.9 dB**, p5 18.8, min 13.7 (house: ~27, never < 12) |
-| air under the voice / the whole bed | median 32.2 dB / min 12.8 dB (the hook's air sits 21 dB under the speech level before its duck) |
-| SFX under the voice | every cue >= 8.0 dB under where it lands; the bus median 22.2, min 7.6 (the ding's 400 ms) |
-| 1-4 kHz: voice over everything | median 18.8 dB, min 1.1 (one 400 ms window); every hit word >= 6 dB at 1-4 and 4-10 kHz |
+| air under the voice / the whole bed | median 32.5 dB / min 12.8 dB (the hook's air sits 21 dB under the speech level before its duck) |
+| SFX under the voice | every cue >= 8.0 dB under where it lands; the bus median 22.4, min 6.7 (the ding's 400 ms: the ding, the glide, the lamp click and pen_drawon's flood wash 0.44-0.80, since fix pass A) |
+| 1-4 kHz: voice over everything | median 18.5 dB, min 1.1 (one 400 ms window); every hit word >= 6 dB at 1-4 and 4-10 kHz |
 | the arc (music, momentary medians) | walk -39.7 · crane -41.4 · **landing -34.2** · clause -39.2 = Google -39.2 · alone -44.4 · **facts -35.5** |
 | joins | every carrier within 30 ms of its midpoint; nothing else starts in a join window (cues, life, birds, notes) |
 | loop seam | sample step 0.45x typical; level +1.3 dB; deepest 5 ms dip -3.0 dB; 2-8 kHz +0.2 dB; the bed circular |
 
+## Sound sync (final) (2026-10-28, against the final picture: map.ts, the scenes' clocks, scenes.json)
+Every cue was checked against the frame on which the picture shows its event (the scenes test `t >= at`, so an event
+between two frames shows on the later one). In sync = on that frame, or 1-2 frames ahead for a word-synced cue; never
+after it. What moved (from -> to, why):
+
+| cue | from -> to | why |
+|---|---|---|
+| wings:1 + the two rail-bird calls (bed) | 1.46 / 1.50 / 1.74 -> **2.45** / 2.49 / 2.78; 16 -> 20 dB under, calls -6 / -8 -> -9 / -12 | W4: the five on the bridge rail lift at 2.45 (S1_CLOCK.birdsLiftBridge), not 1.40; the sounds came a second early, in the pause. Now under "her contract", so softer; the second call ends 3.15, before G3's tick |
+| wings (the file) | one design, 8.5-11 flaps/s -> per flock (sfx WINGS) | S1: five, lift delays 0-0.20 s, 6.5 flaps/s; S4: seven, 0-0.16 s, 3.8 flaps/s, gone before 20.40 (as drawn) |
+| `lead()` (9 cues) | round(onset x 60) - 2 -> the picture's frame - 2 | an event at 8.44 shows on f507, not f506: the A-board clack, the name tag, the DEC plate, G6's tick, the outline, "AI principles", her quote's pen were 3 frames (50 ms) ahead; each now leads by 2: 8.40 -> 8.42, 15.03 -> 15.05, 18.88 -> 18.90, 4.75 -> 4.77, 6.78 -> 6.80, 29.60 -> 29.62, 36.50 -> 36.52 |
+| step_thup | 0.93 -> 0.97 (f58) | her heel lands on the f60 drawing (12 a second) |
+| letter_pops | 0.93, 25 ms apart (done 1.08) -> 0.95, **0.06 s apart** (to 1.25) | the six letters pop 0.97 + 0.06 k (to 1.27); "Google." holds 11.7 / 16.3 dB |
+| light_clicks | five within 40 ms -> five **0.04 s apart** | the five windows cool 0.04 s apart (S2.staffOnStagger), each click toward its window; "staff" 26.6 / 44.1 dB |
+| outline_pops | puffs 0.06 s apart -> 0.03 s | O1-O3 pop 4.97 / 5.00 / 5.03; the third puff trailed by 2 frames |
+| ghost_tick (S8) | 33.75 / 33.83 / 33.90 -> 33.75 / 33.80 / 33.83 | the three ghosts pop 0.04 s apart (f2027 / 2030 / 2032): the third tick trailed by 2 frames |
+| steps_stop | 17.66 + 0.30 -> **17.33** + 0.60 | the drawn contact of her step 4.5 is f1040; the stand (step 5.0) f1075, its plant at f1076, 2 frames before "objected" (17.66 was mid-swing) |
+| S4 train (bed) | 15.25 -> cut | the final viaduct has no train (V2S4_wfar) |
+| life / bird layers (bed) | AIR_LEVEL life -2.0 -> -2.58, birds -1.0 -> -1.77 | a layer is normalised as a whole: without the train and with the softer calls every other life sound / bird would have risen 0.58 / 0.77 dB; now each one is unchanged (measured 0.00 dB) |
+
+Confirmed on the picture, unmoved: the pen draw-on f0; W dark 0.40 (f24) and the doors 0.45-0.52 with the ding 0.45
+(f27); the bus 1.10; Pip's ears-cover 4.98-5.08 (ear_flap 4.95); the S2 boat (heard from 7.00, its 0.6 s fade-in
+complete as its bow enters at 7.60); the blinds 10.26 + 0.085 k (each 0.16 s drop, its tap at +0.105); W2's blind
+12.20-12.36 (thump 12.32); the notebook 9.48 / 12.70; the B match 12.98 (f779); the S5 blossom 20.76, the lamppost wipe
+22.02-22.19, the plaque 22.43, the warm step 23.08; S6's purpose line 24.03 (f1442); GOOGLE SAYS 28.33 (f1700); the
+pens' first strokes; her door 34.75 and W 34.95; the cloth wipe (heard from 35.711: 22 ms ahead of f2144, 9 ms before
+"her"); the three lanes' requests (Handover). Pip's other actions (head turns, S6's ear flick on the F12 pop, S8's
+ears down on the ghost ticks, its S8 step-off in the join window and landing 33.20 beside the SHE SAYS clack) stay
+silent: one sound at a time. The S2 parapet pigeons' lift (7.85) stays unsounded (the robin at 8.09 answers it).
+Every join's carrier on its midpoint, unmoved: +20 / +14 / +13 / -4 / +6 / +3 / -27 / +29 ms (nothing else starts in
+any join window: cues, life, birds, notes).
+
+**The checks** (bed.py, sfx.py, premix.py, 2026-10-28): the master **-14.01 LUFS, -1.25 dBTP**; every hit word >= 6 dB
+over everything at 1-4 and 4-10 kHz (lowest: "use" 7.2 and "can't" 7.3 at 1-4 kHz, "her" 6.8 at 4-10; "She" 14.7 /
+11.6, "quit" 10.4 / 16.1, "Google." 11.7 / 16.3, "contract" 13.1 / 19.0, "life." 16.4 / 17.5, "facts" 33.0 / 54.9);
+no cue 0-12 ms after a word; joins: none failing; pumps: no pause swells (<= +0.3 dB), every pause >= 2.2 dB under both
+accents; phone: every arc section over the air (+1.5 "military" to +10.7 "facts"); music under the voice median 26.9,
+min 13.8; air 32.5; the seam: rms step -0.62 dB, 2-8 kHz step +0.2 dB, deepest 5 ms dip -2.6 dB, sample step 0.5x
+typical; mono fold-down worst notch -0.3 dB; no clicks of ours; no music note in a join window.
+
 ## Handover
 - The film plays the master: `public/v2r/cues.json` = `{"audio": "v2r/mix.wav", "sfx": []}` (Film2R's `useCues`); the
   cue list itself is `cue_sheet.json`. No K8 change is needed.
-- W4: re-spot `sheet.CUES` (and LIFE / BIRDS) from the FINAL picture (±1 frame) and rerun the three commands; the gains,
-  the word guard and the join checks re-derive themselves.
-- The picture should light on the sound's frames (REQUESTS in the report): S7's run 1812 / 1836 / 1848, S8's run 2237 /
-  2261 / 2273 (A5: the same offsets), S6's facade 1626 / 1647 / 1670, S6's F12 line 1588.
+- W4 is done ("Sound sync (final)"): every cue sits on the final picture's frames. A later picture change re-spots
+  `sheet.CUES` / LIFE / BIRDS (`lead()` takes the picture's event time) and reruns the three commands.
+- The lanes' requests are in the picture: S7's festoons f1812 / 1836 / 1848, S8's lamp run f2237 / 2261 / 2273, S6's
+  facade f1626 / 1647 / 1670 exactly; S6's F12 line shows on f1589 (`f12LineAt` 26.467 > 1588 / 60), one frame after its
+  pop_high:2 at f1588, which leads "veto" (f1590) by 2: in sync either way.
 - Not yet heard by a human: check once on phone speakers and once on earbuds (the ding, the ticks, the sun tinks, the
   boat, the crane swell).
 
