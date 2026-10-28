@@ -232,7 +232,9 @@ Maintenance at the end).
   `docs/look/STORYBOARD_STYLE.md`. — ("very simple, avoid colours for now", v3 G3, 2026-10-26).
 
 ## Taste signals (general preferences from the owner's picks; the picks themselves are in each video's OWNER_NOTES.md)
-- **Topics: tech and AI news is the channel's focus; the existing fuss (people already arguing about it) weighs as much as
+- **Topics: tech and AI news, and AI-ADJACENT news (science, health tech, space, robots, computers, energy: where AI is
+  part of the story or right next to it), is the channel's focus** ("no too narrow, lets research some more - expand it to
+  AI adjacent news", v4, 2026-10-28); the existing fuss (people already arguing about it) weighs as much as
   a direct wallet hit,** and an everyday consequence beats a bigger, distant story. — (v3 G0; v4 G0: "focus on tech and AI",
   picked AI songs over the wallet pick: "good amount of fuss about AI songs", 2026-10-27).
 - **Topics: alternate the mood: a positive story after a negative one.** v2 (Google staff resigning), v3 (laptop

@@ -70,3 +70,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   the process / clean up - so that the next videos are not encountering the same issues" -> applied: PIPELINE_V2 (lean
   G0-G1 defaults, agents report in files, one fact file), playbook, CLAUDE.md, HANDOFF, heavy templates marked; list in
   the review's "Applied" section. -> rule: Process (spend on the film, never on overhead).
+- 2026-10-28 ~15:00 UTC, on round 3's top 3 (the AI hurricane forecast, the AI-designed phage, cancer in "normal"
+  scans): "no too narrow, lets research some more - expand it to AI adjacent news" -> round 4 (lean): two scouts on
+  positive AI-adjacent news (science, health and space; machines and everyday tech), round 3's candidates kept in the
+  pool, one editor over both rounds -> `G0_TOPICS_r4.md`. -> rule: Taste signals (topics: AI-adjacent counts).
