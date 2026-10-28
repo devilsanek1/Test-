@@ -9,17 +9,14 @@
 //   frame 0        NO title over the captions (REVIEW_1 MUST 1; playbook "Hook and pacing": no `frame0` block, as
 //                  Film3): frame 0 shows the first spoken page, "She [quit] Google.", at the house size; the core line
 //                  is the cover's text and the source goes to the post (docs/v2/POSTING_KIT.md)
-//   credits        TREATMENT section 8: the engine draws only the S8 caption-band source line (33.16-36.54); every
-//                  other credit lives on an object in its shot (boards, tag, plates, news box: the lanes')
+//   credits        none in the picture (REVIEW_1 MUST 3; playbook: no small source lines in the picture): every source
+//                  and cut detail is in the post caption and the pinned comment (docs/v2/POSTING_KIT.md)
 //   draftLabel     ON for review renders ("V2R · <shot> · <m:ss.ss>"), OFF for the final (--props='{"draftLabel":false}')
 // Compositions: src/entry-v2r-film.tsx (Film2R, Film2RShot {id}, Film2R-<ID>, Film2RBare).
 import React, {useEffect, useState} from 'react';
 import {AbsoluteFill, cancelRender, continueRender, delayRender, getStaticFiles, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {Film, filmDuration, pushThroughHold, type FilmScene, type FilmSfx} from '../../lib/Film';
-import {CAPCHECK_COLORS, capcheckMode, type CaptionBeat} from '../../lib/Captions';
-import {captionFontStack, useCaptionFont} from '../../lib/font';
-import {skyCaption, world} from '../../lib/theme';
-import {CM} from '../palette';
+import {type CaptionBeat} from '../../lib/Captions';
 import scenesJson from './scenes.json';
 import captionsJson from './captions.json';
 import {sceneComponents, sceneTones, sceneWipers} from '../scenes';
@@ -29,7 +26,6 @@ export const FILM2R_VOICE = 'v2/voice.wav';
 export const FILM2R_CUES = 'v2r/cues.json';
 /** The label burned into every review render. */
 export const FILM2R_LABEL = 'V2R';
-export const SOURCE_BBC = 'Source: BBC News, 21 Oct 2026';
 
 /** The shots, with each lane's own captionTone (exported by its shot module) over the scenes.json default. */
 export type Film2RScene = FilmScene & {light?: string; lane?: string};
@@ -45,12 +41,6 @@ export const film2rFrames = (from = 0, to = film2rSeconds) => Math.max(1, Math.c
  *  size; "And she says her contract / bans her from criticizing it…" pops at 2.00 and "for life." at 4.79 (it leaves
  *  the band at 5.88, as the dive into W starts: captions_pages.txt `@out`). At the loop roll (captionAt 39.04) page 1
  *  pops back, as at frame 0. The core line is the cover's text; the S1 source line went to the post (POSTING_KIT.md). */
-
-/** Engine-drawn credits (film seconds), small ink lines under the captions. TREATMENT section 8: S1's source line is
- *  gone from the band (REVIEW_1 MUST 1: the post caption and the pinned comment carry it); S8's sits under the caption
- *  33.16-36.54, then moves onto her board (L6). */
-export type Film2RCredit = {from: number; to: number; text: string; baseline?: number; size?: number};
-export const FILM2R_CREDITS: Film2RCredit[] = [{from: 33.16, to: 36.54, text: SOURCE_BBC, baseline: 552, size: 20}];
 
 /** The sound lane's cue file (optional): a bare [{src, t, gain}] array or {sfx, audio}. */
 type CueFile = FilmSfx[] | {sfx?: FilmSfx[]; audio?: string};
@@ -86,28 +76,6 @@ function useCues(): {sfx: FilmSfx[]; audio?: string} {
   }, [handle, names]);
   return cues;
 }
-
-/** The engine credits overlay (caption font, ink, pops in and out; never in capcheck's background pass). */
-const Credits: React.FC<{offset: number}> = ({offset}) => {
-  const frame = useCurrentFrame();
-  const {fps} = useVideoConfig();
-  const ok = useCaptionFont();
-  const mode = capcheckMode();
-  if (mode === 'bg') return null;
-  const T = frame / fps + offset;
-  const on = FILM2R_CREDITS.filter((c) => T >= c.from - 1e-6 && T < c.to - 1e-6);
-  if (!on.length) return null;
-  const fill = mode === 'mask' ? CAPCHECK_COLORS.dark : CM.ink;
-  return (
-    <svg width={world.w} height={world.h} viewBox={`0 0 ${world.w} ${world.h}`} style={{position: 'absolute', left: 0, top: 0, visibility: ok ? undefined : 'hidden'}}>
-      {on.map((c, i) => (
-        <text key={i} x={skyCaption.cx} y={c.baseline ?? 552} textAnchor="middle" fontFamily={captionFontStack} fontSize={c.size ?? 20} fill={fill}>
-          {c.text}
-        </text>
-      ))}
-    </svg>
-  );
-};
 
 /** The push-through's flat bridge colour (V2S1 -> V2S2 and V2S3 -> V2S4: plum, 3 frames). lib/Film computes the hold
  *  (the join's own `hold`, 0.05 s here since REVIEW_1 MUST 5, else its PT_HOLD 0.1: pushThroughHold) but culls the
@@ -152,7 +120,6 @@ export const Film2R: React.FC<Film2RProps> = ({draftLabel = true}) => {
     <AbsoluteFill>
       <Film scenes={film2rScenes} {...common} />
       <Bridges />
-      <Credits offset={0} />
     </AbsoluteFill>
   );
 };
@@ -166,7 +133,6 @@ export const Film2RShot: React.FC<{id: string; draftLabel?: boolean}> = ({id, dr
   return (
     <AbsoluteFill>
       <Film scenes={film2rScenes} {...common} only={id} offset={s.start} />
-      <Credits offset={s.start} />
     </AbsoluteFill>
   );
 };

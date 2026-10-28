@@ -55,6 +55,7 @@ Checks (FAIL = exit 1; WARN never fails):
              glyph extents from the caption font): every page's ink and highlight boxes inside the caption band
              (--band, default 290-600) and inside the caption clip (no clipped letters), lines within the safe width
              (x 90-950: the right rail), 1-2 lines per page, ~20 characters per line (WARN), pages in time order.
+             A page with "hide" (film_captions `@hide`: a board carries its words) is never drawn, so it is skipped.
              --frame0: the frame-0 words (Film `frame0`, lines split by '|') and the spoken pages lowered under them,
              with Film.tsx's F0 layout. --frame0-geom (JSON) overrides that layout with a film's own Frame0Text
              numbers: size, baselines, captionBaseline, captionScale (as in F0), plus the optional v2r fields:
@@ -257,7 +258,7 @@ def check_captions(caps: list[dict], a, voice_s: float, fps: float) -> None:
             report("FAIL", "captions", f"{tag} starts before the page before it")
             bad += 1
         prev_s = b["s"]
-        if i in hidden:
+        if i in hidden or b.get("hide"):
             continue
         if not 1 <= len(b["lines"]) <= 2:
             report("WARN", "captions", f"{tag}: {len(b['lines'])} lines (pages are 1-2 lines)")
@@ -341,7 +342,8 @@ def check_captions(caps: list[dict], a, voice_s: float, fps: float) -> None:
         report("FAIL", "captions", f"the last page ends at {end:.3f} s, the voice at {voice_s:.3f} s")
         bad += 1
     if not bad:
-        report("PASS", "captions", f"{len(caps)} pages inside the band {band[0]:.0f}-{band[1]:.0f} and the clip {clip[0]:.0f}-{clip[1]:.0f}, x {x_lo}-{x_hi}" + (f"; frame-0 words + {len(low)} lowered pages" + (f" ({len(hidden)} hidden under the block)" if hidden else "") + (" + source line" if f0.get("source") else "") if f0_lines else ""))
+        boards = sum(1 for b in caps if b.get("hide"))
+        report("PASS", "captions", f"{len(caps)} pages" + (f" ({boards} @hide: a board carries the words)" if boards else "") + f" inside the band {band[0]:.0f}-{band[1]:.0f} and the clip {clip[0]:.0f}-{clip[1]:.0f}, x {x_lo}-{x_hi}" + (f"; frame-0 words + {len(low)} lowered pages" + (f" ({len(hidden)} hidden under the block)" if hidden else "") + (" + source line" if f0.get("source") else "") if f0_lines else ""))
 
 
 # ---------------------------------------------------------------- density (scripts/qa/density.py)

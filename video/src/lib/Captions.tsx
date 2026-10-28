@@ -23,7 +23,11 @@ export type CaptionHighlight = {text: string; s: number};
 /** `out` (SkyCaptions): the page scrolls up and away at this time with no page replacing it, so the caption band is
  *  empty until the next page rolls in (e.g. across a camera dive or a match cut); with pop captions it pops away in one
  *  frame. scripts/film_captions.py writes it from a pages file's `@out <seconds>` line. */
-export type CaptionBeat = {s: number; e?: number; out?: number; lines: CaptionLine[]; highlights?: CaptionHighlight[]; style?: 'normal' | 'punch' | 'hook'};
+/** `hide` (SkyCaptions): the page is never drawn (the band is empty for its time) because a board in the shot writes the
+ *  same words in step with the voice (owner playbook: never the same words twice on screen at once); its words stay in
+ *  the file, so the paging still covers the voice. A page after a hidden one lands on its first word, as after `out`.
+ *  scripts/film_captions.py writes it from a pages file's `@hide` line. */
+export type CaptionBeat = {s: number; e?: number; out?: number; hide?: boolean; lines: CaptionLine[]; highlights?: CaptionHighlight[]; style?: 'normal' | 'punch' | 'hook'};
 
 export type CaptionsProps = {
   beats: CaptionBeat[];
@@ -441,7 +445,7 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', s
   // page lead before it (v3's J3: "And so do" pops on the cut frame instead of 2 frames into the push's last frames)
   if (pop) {
     for (let i = 1; i < pages.length; i++) {
-      if (list[i - 1].out === undefined || list[i] === loopBeat) continue;
+      if ((list[i - 1].out === undefined && !list[i - 1].hide) || list[i] === loopBeat) continue;
       const s0 = list[i].s;
       const pg = pages[i];
       if (!(s0 > pg.start)) continue;
@@ -457,8 +461,10 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', s
     k = 0;
     settledAll = true;
   }
+  // a hidden page (`hide`): the band stays empty for its time (a board carries its words)
+  if (list[k].hide) return null;
   const cur = pages[k];
-  const prev = k > 0 ? pages[k - 1] : null;
+  const prev = k > 0 && !list[k - 1].hide ? pages[k - 1] : null;
   // the first page never scrolls in when it is the hook (it is already on screen at frame 0)
   const instant = pop || settledAll || cur.start <= instantUntil || (hookAtStart && k === 0);
   const u = clamp((T - cur.start) / (cur.scrollDur ?? MOTION.captionScroll.dur));
@@ -469,7 +475,7 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', s
   if (loopBeat && loopEnd !== undefined && hookAtStart && !pop && k === 0 && T >= 0) {
     const lp = pages[pages.length - 1];
     const lu = (T + loopEnd - lp.start) / (lp.scrollDur ?? MOTION.captionScroll.dur);
-    if (loopEnd > lp.start && T < lp.start && lu < 1) tail = {q: MOTION.captionScroll.ease(clamp(lu)), prev: pages.length > 1 ? pages[pages.length - 2] : null};
+    if (loopEnd > lp.start && T < lp.start && lu < 1) tail = {q: MOTION.captionScroll.ease(clamp(lu)), prev: pages.length > 1 && !list[pages.length - 2].hide ? pages[pages.length - 2] : null};
   }
   // a page with `out` scrolls up and away on its own; the next page then rolls into an empty band (no prev to push).
   // Pop captions (`motion` 'pop') pop it away in one frame instead: a roll-out would clip its letters at the band's top
