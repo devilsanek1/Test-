@@ -1,6 +1,6 @@
 // V2S4_wcanal.tsx (lane L3, V2S4 WORLD helpers): THE CANAL STRIP between her coping and our boat (the 1.0x canal plane,
-// plane px at the 17.96 pose; y 1082 -> under our boat's roof at ~1222). TIER C. The water itself is the isolated flat
-// placeholder (V2S4_water S4Water 'canal': no motion of its own, no styling spent until lib/water lands); on it two
+// plane px at the 17.96 pose; y 1082 -> under our boat's roof at ~1222). TIER C. The water itself is lib/water's (V2S4_water
+// S4Water 'canal': its reflections, ripple lines and SUN1's glitter); on it two
 // ducks paddling west (the shot's one small water life, conform_L3 §2) and the angler's line and float, still (no
 // nibble, no ring: the life budget). No reflection of her (no teal off her, no dark water behind her).
 import React from 'react';

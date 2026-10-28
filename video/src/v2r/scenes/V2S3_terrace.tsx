@@ -5,7 +5,7 @@
 //              terrace (V2S3_tHouses), HER French window at M with her silhouette on the phone, blind up (V2S3_tHer),
 //              the two lit neighbours (watering, kettle steam) and the balcony's festoons, her towpath with its bench,
 //              bollards, bin, lit lamp and the one far walker (V2S3_tLife)
-//   S3Canal    the canal (V2S3_water's one isolated water component, a flat placeholder until lib/water) and the heron
+//   S3Canal    the canal (V2S3_water: lib/water's spec, its reflections, ripples and SUN3's glitter) and the heron
 //              standing still on its post (V2S3_tCanal)
 // The far city (+2) and the roofs and chimneys (+1) of the west gap are V2S3.tsx's own plane groups. The shot's ONE
 // read: her lit window with her silhouette is the brightest, clearest thing in the frame; the rest is a calm, alive

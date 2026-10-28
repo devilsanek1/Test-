@@ -153,11 +153,11 @@ function canalSources(): WaterSource[] {
 const X_BACKS = PLANE_X(S4_K.backs);
 
 /** The boat's side as drawn (V2S4_wboat, the boat's plane: measured on the 17.97 still): the sage cabin side
- *  (1290-1638), the plum gunwale stripe (1640-1654), the slate hull (1656-1700). */
+ *  (1290-1638), and the hull (slate, 1656-1700) with the plum gunwale stripe over it (1640-1654) as ONE dark band in
+ *  the hull's slate (R5: "a boat as one dark band"; the stripe's 14 px would mirror as a second hard stripe). */
 const BOAT_BANDS: [string, number, number, string][] = [
   ['boat/cabin', ROW.cabinTop, 1638, '#ABBCA5'],
-  ['boat/stripe', ROW.gunwale, 1654, '#453348'],
-  ['boat/hull', 1656, ROW.waterline, '#677588'],
+  ['boat/hull', ROW.gunwale, ROW.waterline, '#677588'],
 ];
 /** Our boat mirrored WHOLE in the near water about its waterline (a near mirror), each band its own mass; its sides are
  *  past the frame. Screen-fixed (the boat glides with the camera). */

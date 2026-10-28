@@ -8,6 +8,8 @@ import {s1WaterSpec} from './V2S1_water';
 import {S1_PARTICLES_ALIVE as S1_OTHER_ALIVE} from './V2S1_particles';
 import {s3WaterSpecs} from './V2S3_water';
 import {S3_OTHER_ALIVE} from './V2S3_particles';
+import {s4WaterSpecs} from './V2S4_water';
+import {S4_OTHER_ALIVE} from './V2S4_particles';
 
 type Row = {spec: WaterSpec; t0: number; t1: number; other: number};
 const rows: Row[] = [];
@@ -18,6 +20,11 @@ add(s1WaterSpec(), 0, 6.13, S1_OTHER_ALIVE);
   const s = s3WaterSpecs();
   add(s.canal, 12.98, 14.86, S3_OTHER_ALIVE);
   add(s.sliver, 12.98, 14.86, S3_OTHER_ALIVE);
+}
+{
+  const s = s4WaterSpecs();
+  add(s.canal, 14.86, 20.55, S4_OTHER_ALIVE);
+  add(s.near, 14.86, 20.55, S4_OTHER_ALIVE);
 }
 
 const fmt = (hex: string) => {
