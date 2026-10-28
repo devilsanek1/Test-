@@ -18,22 +18,22 @@
 // Tiers: A the deal board; B Pip, the door staff; C everything else.
 // Parts: V2S6_rig (clock, camera, float), V2S6_board, V2S6_pip, V2S6_near (footpath, near plane, ground shadows),
 // V2S6_life (lawn trees, jogger, staff, petals), V2S6_set (the hedge's colour fix). The set's far pieces are the dc
-// kit's gate (GateFacade, GateLawnTrees, GateFence), placed here plane by plane.
+// kit's gate (GateFacade, GateFence), placed here plane by plane; the lawn's cherries are S6's own (air-stepped).
 import React from 'react';
 import {World} from '../../lib/World';
 import {TimeShift} from '../../lib/time';
 import {Lit} from '../../lib/light';
 import {Sky} from '../../lib/sky';
 import {CM, TOD} from '../palette';
-import {GateFacade, GateFence, GateLawnTrees} from '../kit/dc/gate';
+import {GateFacade, GateFence} from '../kit/dc/gate';
 import {S6} from '../world/map';
 import {RIG_APRIL} from '../world/rigs';
-import {S6_MORNING} from '../world/skies';
+import {S6_AIR, S6_MORNING} from '../world/skies';
 import type {ToneKey} from '../../lib/Film';
 import {HORIZON, S6Plane, S6_PLANE, S6_START, SUN, T0} from './V2S6_rig';
 import {S6Board} from './V2S6_board';
 import {S6PipSeat} from './V2S6_pip';
-import {S6LawnTrees, S6Promenade, S6Staff, S6Petals} from './V2S6_life';
+import {S6LawnTrees, S6Promenade, S6Staff, S6Petals, S6_AIR_K} from './V2S6_life';
 import {S6Paving, S6GroundShadows, S6NearBed, S6NearBench, S6NearShadows, S6KerbShade} from './V2S6_near';
 import {S6HedgeFix} from './V2S6_set';
 
@@ -48,7 +48,11 @@ const WIN_GROUPS: {x0: number; x1: number; at: number}[] = [
 ];
 
 /** The facade band (the dc kit's GateFacade), drawn once per window group under that group's clip: the same seed, so
- *  the copies are identical but for their windows' switch-on; the doorway (and its staff) lives in the last one. */
+ *  the copies are identical but for their windows' switch-on; the doorway (and its staff) lives in the last one. Then
+ *  the far plane's ONE flat step toward the April air (lib/depth CRAFT §f.2; the kit's colours are fixed, so the step is
+ *  a flat air-coloured layer over the band, the mix every colour of it would take): the farthest plane is the closest
+ *  to the air (check_depth). It stops at the lawn strip (y 831: a sage under a gold air would turn olive). */
+const F = {y0: S6.facadeBandY[0], y1: S6.facadeBandY[1]};
 const S6Facade: React.FC = () => (
   <>
     <defs>
@@ -63,6 +67,7 @@ const S6Facade: React.FC = () => (
         <GateFacade lightAt={[g.at, g.at]} doorPeople={i === WIN_GROUPS.length - 1 ? <S6Staff /> : undefined} />
       </g>
     ))}
+    <rect x={-300} y={F.y0 - 3} width={1800} height={F.y1 - 4 - (F.y0 - 3)} fill={S6_AIR} opacity={S6_AIR_K.facade} />
   </>
 );
 
@@ -76,13 +81,14 @@ const V2S6: React.FC = () => (
           <S6Facade />
         </S6Plane>
         <S6Plane plane={S6_PLANE.lawn}>
-          <GateLawnTrees />
           <S6LawnTrees />
           <S6Promenade />
         </S6Plane>
         <S6Plane plane={S6_PLANE.fence}>
           <GateFence />
           <S6HedgeFix />
+          {/* the fence + lawn's flat step toward the air (as the facade's: a sage under a gold air at 0.15 keeps h ~128) */}
+          <rect x={-300} y={F.y1 + 45} width={1800} height={1252 - 4 - (F.y1 + 45)} fill={S6_AIR} opacity={S6_AIR_K.fence} />
         </S6Plane>
         <S6Plane plane={S6_PLANE.subject}>
           <S6Paving />
