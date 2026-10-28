@@ -11,8 +11,6 @@
 // exactly (its approved sway, no V), its contact lens and its mirrored underside.
 import React, {useMemo} from 'react';
 import {useTime} from '../../lib/time';
-import {getInputProps} from 'remotion';
-const DIAG: string = String((getInputProps() as {waterDiag?: string}).waterDiag ?? '');
 import {Fill} from '../../lib/Fill';
 import {Water, floaterWater, waterColourAt, waterKAt, waterSwayAt, ellipsePoly, quadPts, lerp, type Axis, type Poly, type Pt, type WaterSource, type WaterSpec} from '../../lib/water';
 import {atmos, backing, parallaxK} from '../../lib/depth';
@@ -113,24 +111,24 @@ const DU0 = PM.uAt(MAP.S1_SHEET.door.x0, HM * 0.6);
 const DU1 = PM.uAt(MAP.S1_SHEET.door.x1, HM * 0.6);
 const DV0 = PM.vAt(MAP.S1_SHEET.door.y0, (DU0 + DU1) / 2);
 const V_LO = HM - 2.1;
+/** The door's frame (m a side): the lit glass inside it is the light. */
+const DOOR_FRAME = 0.09;
 
-/** A moored boat: hull + gunwale as ONE dark mass (R5: the plum stripe is too thin to survive a rippled mirror), the
- *  cabin the second value, the cratch; portholes and the roof's edge dropped. Each about its own waterline. */
-function boatThings(o: BoatOpts, cabin: string, id: string): WaterSource[] {
+/** A moored boat: its hull + gunwale as ONE dark mass with the raked bow's sweep (R5: the plum stripe is too thin to
+ *  survive a rippled mirror); the pale cabin and the cratch are left to the water (a pale thing reflects weakly in the
+ *  near water, R2, and their slices and the cratch's long diagonal only fragmented the boat): every boat is doubled by
+ *  one dark band. About its own waterline. */
+function boatThings(o: BoatOpts, id: string): WaterSource[] {
   const g = boatGeom(o);
   const {X} = g;
   const bowLift = o.h * 0.42;
   const hullTop = g.gunTop + g.gunH;
   const hull: Poly = [[X(0), o.water], [X(0), g.gunTop], [X(0.86), g.gunTop], ...quadPts([X(0.86), g.gunTop], [X(0.95), g.gunTop - bowLift * 0.3], [X(1) + o.dir * 3, g.gunTop - bowLift], 8), [X(1), hullTop - bowLift + g.gunH * 0.4], [X(0.985), o.water]];
-  const cab: Poly = [[X(g.c0), g.roofY], [X(g.c1), g.roofY], [X(g.c1), g.gunTop + 0.5], [X(g.c0), g.gunTop + 0.5]];
-  const cratch: Poly = [[X(g.c1), g.roofY + (g.gunTop - g.roofY) * 0.25], [X(0.94), g.gunTop - bowLift * 0.2], [X(g.c1), g.gunTop]];
   const dark = env(CM.paneUnlit);
   // each about its own waterline: the reflection starts right under the hull (S1BoatStrips covers the seam)
   const axis = o.water;
   return [
-    {id: `${id}/hull`, thing: hull, axis, color: dark, layer: LAYER.boats, plane: S1_PLANE.boats, breakup: 0.15, narrow: 0.05, solid: 0.6},
-    {id: `${id}/cabin`, thing: cab, axis, color: env(cabin), layer: LAYER.boats, plane: S1_PLANE.boats, breakup: 0.5, narrow: 0.1, solid: 0.6},
-    {id: `${id}/cratch`, thing: cratch, axis, color: dark, layer: LAYER.boatsFront, plane: S1_PLANE.boats, breakup: 0, narrow: 0.15, solid: 0.6},
+    {id: `${id}/hull`, thing: hull, axis, color: dark, layer: LAYER.boats, plane: S1_PLANE.boats, breakup: 0, narrow: 0.04, solid: 0.75},
   ];
 }
 /** A heritage lamp post's plinth and column (the lantern sits far below our edge in the water). */
@@ -175,8 +173,9 @@ function s1Sources(): WaterSource[] {
   out.push({id: 'wing/pier', thing: [[xs - 16, s1WingBaseY(xs) - 3], [xs + pier, s1WingBaseY(xs)], [xs + pier, PM.p(0, V_LO)[1]], [xs - 16, PM.p(0, V_LO)[1]]], axis: WING_AXIS, color: shaded(CM.limestone), layer: LAYER.wing, plane: P0, breakup: 0, narrow: 0});
   // the corner slit bay (unlit: one value)
   out.push({id: 'wing/slit', thing: PM.q(0.74, V_LO, 0.56, V_PLINTH - V_LO), axis: WING_AXIS, color: shaded(S1_IRON), layer: LAYER.wing, plane: P0, breakup: 0, narrow: 0.08});
-  // the door bay, kept lit: the lobby's gold, THE light in the water (R7): a column as wide as the door
-  out.push({id: 'wing/lobby', thing: PM.q(DU0, Math.max(DV0, V_LO), DU1 - DU0, HM - Math.max(DV0, V_LO)), axis: WING_AXIS, color: CM.lamp, kind: 'light', layer: LAYER.wing, plane: P0, breakup: 0.3, narrow: 0.12, taper: 5, solid: 0.6});
+  // the door bay, kept lit: the lobby's gold, THE light in the water (R7): a column as wide as the lit glass (the
+  // door's frame, ~0.09 m a side, stays with the wall)
+  out.push({id: 'wing/lobby', thing: PM.q(DU0 + DOOR_FRAME, Math.max(DV0, V_LO), DU1 - DU0 - 2 * DOOR_FRAME, HM - Math.max(DV0, V_LO)), axis: WING_AXIS, color: CM.lamp, kind: 'light', layer: LAYER.wing, plane: P0, breakup: 0.3, narrow: 0.16, taper: 5, solid: 0.55});
   // ---- the lamp posts at the path's back (off, slate iron): long thin verticals, whole for 70 %, then a few dashes
   for (const L of S1_FAR_LAMPS) {
     if (L.x > 900) continue; // behind boat A
@@ -202,7 +201,7 @@ function s1Sources(): WaterSource[] {
   }
   out.push({id: 'coping', refl: [...top, ...bot.reverse()], color: multiply(env(CM.stoneShade), TINT_CANAL.form), layer: LAYER.coping, plane: P0, draw: 'crisp'});
   // ---- the two moored boats (their own waterlines 1140 / 1196): boat B (nearer) after boat A
-  out.push(...boatThings(BOAT_A, CM.sage, 'boatA'), ...boatThings(BOAT_B, CM.coatOat, 'boatB'));
+  out.push(...boatThings(BOAT_A, 'boatA'), ...boatThings(BOAT_B, 'boatB'));
   return out;
 }
 
@@ -210,13 +209,14 @@ function s1Sources(): WaterSource[] {
 
 const POP_FILL = MAP.GHOST_POP.outlineS + MAP.GHOST_POP.fillDelayF / 60;
 /** A walking figure, simplified (R5): what the water shows of it is its LEGS under the mid-calf hem (V2S1_row_fig:
- *  the hem at 0.25 h): one slim vertical in the legs' value, hanging from its own mirror line, ending in a few tapered
- *  bars (the coat beyond is left to Fresnel: a flat coat block read as a box). The row reads as a rhythm of slim
- *  verticals under the row; her reflection is environment, never a second her (R5). */
+ *  the hem at 0.25 h), their lower 0.19 h: ONE slim wavering vertical in the legs' value hanging from its own mirror
+ *  line, its end rounded (a walking reflection in bars flickered as its slices passed; the coat beyond is left to
+ *  Fresnel: a flat coat block read as a box). The row reads as a rhythm of slim verticals under the row; her
+ *  reflection is environment, never a second her (R5). */
 function figureThing(id: string, x: number, feetY: number, h: number, legs: string): WaterSource {
   const s = h / 170;
   const f = (dx: number, dy: number): Pt => [x + dx * s, feetY + dy * s];
-  return {id, thing: [f(-8.5, 0), f(8.5, 0), f(9.5, -46), f(-9.5, -46)], axis: s1MirrorLine(x, feetY), color: legs, kind: 'figure', layer: LAYER.people, plane: S1_PLANE.subject, breakup: 0, narrow: 0.18, taper: 1.6, solid: 0.6};
+  return {id, thing: [f(-8.5, 0), f(8.5, 0), f(9.3, -32), f(-9.3, -32)], axis: s1MirrorLine(x, feetY), color: legs, kind: 'figure', layer: LAYER.people, plane: S1_PLANE.subject, breakup: 0, narrow: 0, taper: 1.6, solid: 1};
 }
 
 /** Every reflection that moves at t: her (behind the glass, then on the towpath), the ghosts from their fill, the bus
@@ -273,7 +273,7 @@ const S1_WATER: WaterSpec = {
   grid: {dz: 0.45, minPitch: 3, gap: [0.16, 0.26]},
   sources: [],
   moving: s1Moving,
-  sun: {x: MAP.SUN0.x, y: MAP.SUN0.y, slope: 0.06, rows: SUN_ROWS, t0: 0.3, slots: 6, life: [0.42, 0.9], len: [20, 34], sigma: 22, plane: S1_PLANE.farRoofs},
+  sun: {x: MAP.SUN0.x, y: MAP.SUN0.y, slope: 0.06, rows: SUN_ROWS, t0: 0.3, slots: 6, life: [0.5, 0.8], len: [20, 34], sigma: 22, plane: S1_PLANE.farRoofs},
   // ripple lines: 6-11 alive, mostly in the near water, clear of the glitter column and Pip's seat (S1_PIP)
   ripples: {
     slots: 11,
@@ -287,7 +287,8 @@ const S1_WATER: WaterSpec = {
     thick: [1.5, 3],
     drift: [6, 16],
     life: [2.6, 4.6],
-    t0: 0.24,
+    // a steady field from frame 0, revealed by the flood with the rest of the water's colour (f5-f12): never a pop
+    t0: 0,
   },
   float: s1WaterFloat,
   skyPlane: S1_PLANE.sky,
@@ -298,18 +299,7 @@ const S1_WATER: WaterSpec = {
 let built = false;
 const ensure = () => {
   if (!built) {
-    let src = s1Sources();
-    if (DIAG.includes('nolamps')) src = src.filter((x) => !x.id.startsWith('lamp'));
-    if (DIAG.includes('notower')) src = src.filter((x) => x.id !== 'tower' && x.id !== 'roofs');
-    if (DIAG.includes('nobridge')) src = src.filter((x) => !x.id.startsWith('br/'));
-    if (DIAG.includes('nowing')) src = src.filter((x) => !x.id.startsWith('wing/'));
-    if (DIAG.includes('noboats')) src = src.filter((x) => !x.id.startsWith('boat'));
-    if (DIAG.includes('nostubs')) src = src.filter((x) => !x.id.startsWith('bollard'));
-    if (DIAG.includes('nocoping')) src = src.filter((x) => x.id !== 'coping');
-    S1_WATER.sources = src;
-    if (DIAG.includes('nofig')) S1_WATER.moving = (t) => s1Moving(t).filter((x) => !x.id.startsWith('fig'));
-    if (DIAG.includes('nosun')) S1_WATER.sun = undefined;
-    if (DIAG.includes('norip')) S1_WATER.ripples = undefined;
+    S1_WATER.sources = s1Sources();
     built = true;
   }
   return S1_WATER;
@@ -328,8 +318,9 @@ export const S1Water: React.FC = () => {
 
 /** The duck's ring (R11: a duck at rest paddles rings, never a V): one at a time, 2.4 s every 3.4 s, growing ~28 px/s
  *  from 22 px, flattened by the water's foreshortening (ry/rx 0.12), a hairline that thins from 1.3 to 0.45 px (it grows
- *  in from nothing: never a fade), in the far water's light colour. */
-export const S1_DUCK_RING = {on: true, t0: 0.45, period: 3.4, life: 2.4, r0: 22, grow: 28, w0: 1.3, w1: 0.45} as const;
+ *  in from nothing: never a fade), in the far water's light colour. OFF: the contact lens and the mirrored underside
+ *  seat the duck, and the ring was one more mover and one more line on a calm water (the judge's "may stay"). */
+export const S1_DUCK_RING = {on: false, t0: 0.45, period: 3.4, life: 2.4, r0: 22, grow: 28, w0: 1.3, w1: 0.45} as const;
 
 /** The kit's mallard (V2S1_set_life S1_DUCK: x 396 +- 6 px on its 21 s sway, the kit's bob), its body and head. */
 export function s1DuckPose(t: number) {
@@ -353,7 +344,7 @@ export const S1Duck: React.FC = () => {
   const w = floaterWater({x, y, len: s, color: env(CM.line), k: fw.k, tone: spec.tone, sway: sw});
   const rings: React.ReactNode[] = [];
   const R = S1_DUCK_RING;
-  if (R.on && !DIAG.includes('noring')) {
+  if (R.on) {
     const fs = (y - S1W_CAM.horizon) / S1W_CAM.f;
     const u = (t - R.t0) / R.period;
     if (u >= 0) {

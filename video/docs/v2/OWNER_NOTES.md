@@ -138,6 +138,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   ~$290-385 left; the finish projects ~96-102 %, so more cuts that don't show: the water swap only where water shows at size (S2, S3/S4,
   S5), one fresh agent for the cold watch + the art/flow review, one fix pass (<= 6 musts), sound re-time + mix only, the cover and
   posting kit from the existing drafts.
+- 2026-10-28 ~12:51 UTC, budget: a screenshot (window 73 %, resetting in 1 min; weekly 91 %, the bar red) -> ~$29 per weekly %
+  (09:29 -> 12:51), ~$225-300 left; the lean plan projects ~97.5-100.5 %: the film (water, assembly, review, fixes, sound, master) first;
+  the cover, the posting kit and any extra polish are the first to wait for Monday's reset if the week runs out.
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in

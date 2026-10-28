@@ -1,7 +1,7 @@
 // V2S5_pentagon.tsx (lane L4): THE PENTAGON for S5, FORKED from the Arlington kit (kit/dc/pentagon.tsx, 2026-10-27) so
 // it takes S5's ONE atmosphere (conform_L4 §10): its tones recede toward the April gold at HALF the mid plane's step
 // (the subject from 22.43, CRAFT §f), instead of the kit's sRGB mix toward the mint. The body is the kit's.
-import React, {useMemo} from 'react';
+import React, {useId, useMemo} from 'react';
 import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
 import {Batch, Paint, mix, inkCol, lineD, polyD, quadD, crownD, circleD, rng, type Pt} from '../kit/dc/core';
@@ -10,6 +10,7 @@ import {toneOnTone} from '../../lib/depth';
 import {MID, PENT, PENT_ROT, circ, facesLens, halfSide, pentagon, sideFrame, sidePt, shadowOffset, wallLight, vert} from '../kit/dc/lens';
 import {tiered} from '../kit/tiers';
 import {Shadow, ShadowLayer} from '../../lib/light';
+import {pavingD5} from './V2S5_valley';
 
 /** The kit's atm / atmShade through S5's air at HALF the step (the Pentagon is the shot's subject from 22.43: CRAFT §f
  *  "the subject takes at most half its plane's step"; one value all through, no colour pop on its word). */
@@ -64,12 +65,46 @@ export const PT5 = {
  *  2026-10-28: the old flat L* 55 C* 4 fill read grey-olive): the ground under it times the rig's ONE family at its
  *  CAST strength (`tint="cast"`, the rig from context; CRAFT §d.3's cast dL* -10..-15). It falls mostly on the warm
  *  boulevard and ring paving (~80 % of what shows: L* 88 -> 75, C* 16, h 53, the terrace's own rose-tan shade) and on
- *  the lawn's edge (L* 80 -> 68, C* 12). The shaded front facades (L* 60) stand a step under it: a shaded edge on a
- *  lighter field (§f.3). Its screen path: the footprint swept along the end light (the kit lens' 3D shadow offset). */
+ *  the lawn's edge, where it takes RIG_APRIL's `lawn` tint (the integrator, 2026-10-28, L4's request: the rose family
+ *  read L* 80 -> 67, C* 11.5, h 105 there, olive; now the lawn's own deeper step, h ~125, C* ~17, the same value):
+ *  `CastOnGround` splits it on the valley's paving (V2S5_valley pavingD5). The shaded front facades (L* 60) stand a step
+ *  under it: a shaded edge on a lighter field (§f.3). Its screen path: the footprint swept along the end light (the kit
+ *  lens' 3D shadow offset). */
 
 const castD = (): string => {
   const outer = pentagon(PENT.apothem);
   return polyD(hull([...outer, ...shifted(outer, shadowOffset(H))].map((q) => P3(q, 0))));
+};
+
+/** A ground shadow split by surface: RIG_APRIL's `cast` tint where it falls on the paving, its `lawn` tint on the lawn
+ *  (two complementary masks of the same paved shapes: no double darkening, no gap). Inside a ShadowLayer. */
+const CastOnGround: React.FC<{d: string; soft?: number}> = ({d, soft = 3}) => {
+  const id = 'p5g' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const pav = useMemo(pavingD5, []);
+  const box = {x: -4000, y: -4000, width: 10000, height: 10000};
+  return (
+    <>
+      <defs>
+        <mask id={`${id}p`} maskUnits="userSpaceOnUse" {...box}>
+          {pav.map((p, i) => (
+            <path key={i} d={p} fill="#FFFFFF" />
+          ))}
+        </mask>
+        <mask id={`${id}l`} maskUnits="userSpaceOnUse" {...box}>
+          <rect {...box} fill="#FFFFFF" />
+          {pav.map((p, i) => (
+            <path key={i} d={p} fill="#000000" />
+          ))}
+        </mask>
+      </defs>
+      <g mask={`url(#${id}p)`}>
+        <Shadow d={d} tint="cast" soft={soft} />
+      </g>
+      <g mask={`url(#${id}l)`}>
+        <Shadow d={d} tint="lawn" soft={soft} />
+      </g>
+    </>
+  );
 };
 
 const H = PENT.height;
@@ -282,7 +317,7 @@ const PentagonBody: React.FC<Pentagon5Props> = ({warmAt, warmDur = 0.7, seed = '
   return (
     <>
       <ShadowLayer>
-        <Shadow d={cast} tint="cast" soft={3} />
+        <CastOnGround d={cast} soft={3} />
       </ShadowLayer>
       <Paint b={parts} seed={`${seed}/p`} misreg={false} />
       {wd ? <path d={wd} fill={PT5.paneWarm} /> : null}

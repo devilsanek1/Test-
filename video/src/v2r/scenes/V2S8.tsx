@@ -100,21 +100,63 @@ const S8Particles: React.FC = () => {
   );
 };
 
-/** The sky's foot at the un-build: the gradient runs to y 800 behind the set; as the set un-builds its foot rises to
- *  the caption band's (560) over exit e 0 -> 0.35, so the peach horizon behind the far rows never shows as a band over
- *  S1's frame 0 (what the set uncovers is S1's pale drawing); the rest contracts into SUN0 (S8Sky). */
-const SKY_FOOT = {from: 800, to: 560, e1: 0.35} as const;
+/** S1's frame-0 SKYLINE as the loop's underlay shows it (lib/Film draws S1 at t < 0 under the un-build): the first
+ *  non-paper row of each column in S1's frame-0 render (2026-10-28, 1080 wide; t < 0 and frame 0 are the same pale C
+ *  world): the west gap's far roofs y ~757-791 with SUN0's half-disc (top 720) among them, the wing's corner, parapet and
+ *  roof planting y ~589-655; +3 px so the sky overlaps the pale tops (no paper line between them), simplified to 1 px.
+ *  [x, y] pairs, x 0 -> 1080. Re-trace it if S1's frame-0 skyline changes (the seam would show a sliver). */
+const S1_F0_SKYLINE: [number, number][] = [
+  [0, 768], [19, 768], [20, 761], [21, 760], [38, 760], [39, 761], [40, 771], [41, 775], [42, 771], [45, 771],
+  [46, 776], [48, 776], [49, 794], [54, 787], [55, 767], [68, 767], [69, 782], [75, 782], [76, 772], [77, 772],
+  [78, 767], [80, 767], [81, 772], [82, 767], [84, 767], [85, 772], [86, 767], [88, 768], [89, 772], [91, 772],
+  [92, 782], [94, 782], [95, 771], [112, 771], [113, 782], [116, 782], [117, 757], [146, 757], [153, 744],
+  [165, 732], [178, 725], [187, 723], [204, 723], [213, 725], [226, 732], [232, 737], [238, 744], [244, 755],
+  [257, 755], [258, 627], [271, 627], [272, 601], [279, 601], [280, 593], [309, 593], [310, 601], [345, 601],
+  [346, 654], [350, 653], [359, 655], [362, 655], [363, 648], [368, 643], [371, 643], [376, 647], [379, 641],
+  [382, 639], [385, 639], [390, 645], [395, 641], [399, 641], [403, 645], [405, 652], [417, 651], [418, 633],
+  [424, 630], [431, 633], [435, 629], [438, 628], [446, 632], [450, 629], [454, 629], [459, 632], [460, 637],
+  [464, 635], [472, 635], [478, 638], [481, 642], [492, 638], [496, 638], [502, 641], [506, 639], [519, 639],
+  [526, 641], [532, 638], [543, 638], [548, 640], [549, 636], [555, 633], [567, 632], [578, 635], [605, 626],
+  [620, 626], [633, 630], [639, 627], [640, 615], [641, 614], [642, 616], [643, 622], [645, 625], [650, 625],
+  [651, 621], [653, 625], [659, 625], [660, 616], [662, 614], [663, 626], [670, 629], [671, 622], [672, 619],
+  [673, 632], [676, 632], [677, 631], [678, 603], [681, 600], [690, 597], [700, 597], [711, 601], [715, 597],
+  [726, 593], [732, 593], [742, 597], [744, 599], [745, 604], [750, 601], [760, 599], [776, 603], [778, 605],
+  [779, 621], [783, 621], [788, 611], [789, 620], [795, 620], [796, 605], [797, 605], [798, 611], [800, 615],
+  [801, 619], [808, 619], [809, 609], [811, 619], [813, 619], [815, 618], [816, 608], [818, 605], [819, 613],
+  [820, 618], [825, 618], [829, 617], [831, 612], [832, 615], [834, 613], [840, 612], [843, 607], [844, 611],
+  [852, 612], [854, 609], [855, 612], [860, 615], [868, 612], [891, 613], [892, 612], [893, 607], [896, 604],
+  [907, 600], [913, 601], [920, 606], [926, 601], [938, 600], [944, 603], [947, 606], [948, 611], [949, 611],
+  [950, 601], [954, 596], [958, 594], [964, 594], [972, 600], [978, 595], [985, 595], [988, 597], [991, 596],
+  [1000, 599], [1005, 599], [1010, 594], [1014, 592], [1024, 592], [1032, 597], [1047, 592], [1061, 593],
+  [1069, 597], [1080, 593],
+];
+
+/** The sky's foot at the un-build: the gradient runs to y 800 behind the set; as the set un-builds its foot rises onto
+ *  S1's frame-0 skyline over exit e 0 -> 0.35, so the peach horizon behind the far rows never shows as a band over S1's
+ *  frame 0 (what the set uncovers is S1's pale drawing) and the sky that is left stands BEHIND S1's pale roofs (the mirror
+ *  of S1's flood, which grows from SUN0 behind them); the rest contracts into SUN0 (S8Sky), the last of it over SUN0's
+ *  half-disc. The foot used to rise to a flat y 560 and wait there for the contraction: a hard mint edge beside the
+ *  caption band over S1's paper for ~7 frames (critic_L6 SHOULD 5, 2337-2341; CLAUDE.md: no paper / colour edge beside
+ *  the band), an edge no object explained; now S1's own roofs explain every edge but the contracting circle's. */
+const SKY_FOOT = {from: 800, e1: 0.35} as const;
+const footD = (k: number): string => {
+  const y = (sy: number) => (SKY_FOOT.from - (SKY_FOOT.from - sy) * k).toFixed(1);
+  const n = S1_F0_SKYLINE.length;
+  let d = `M-200 -200H1280V${y(S1_F0_SKYLINE[n - 1][1])}`;
+  for (let i = n - 1; i >= 0; i--) d += `L${S1_F0_SKYLINE[i][0]} ${y(S1_F0_SKYLINE[i][1])}`;
+  return `${d}L-200 ${y(S1_F0_SKYLINE[0][1])}Z`;
+};
 const S8SkyAtExit: React.FC = () => {
   const e = useExit();
   const id = 's8sf' + useId().replace(/[^a-zA-Z0-9]/g, '');
   if (e <= 0) return <S8Sky />;
   const u = Math.min(1, e / SKY_FOOT.e1);
-  const foot = SKY_FOOT.from - (SKY_FOOT.from - SKY_FOOT.to) * u * u * (3 - 2 * u);
+  const k = u * u * (3 - 2 * u);
   return (
     <>
       <defs>
         <clipPath id={id} clipPathUnits="userSpaceOnUse">
-          <rect x={-200} y={-200} width={1480} height={foot + 200} />
+          <path d={footD(k)} />
         </clipPath>
       </defs>
       <g clipPath={`url(#${id})`}>

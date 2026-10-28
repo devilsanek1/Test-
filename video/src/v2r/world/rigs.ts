@@ -3,18 +3,19 @@
 // lens turns the key takes its per-shot copy below (`withKey`: the same family and pools, its own screen angle).
 //
 //   RIG_CANAL  the canal on one October evening (S1, S2, S3, S4, S7, S8): the low western sun
-//   RIG_APRIL  Arlington on an April morning (S5, S6): the morning sun, no pools
+//   RIG_APRIL  Arlington on an April morning (S5, S6): the morning sun, no pools; its tints add `lawn`
 //
 // One shadow family for both sets (TINT_CANAL). The sun never moves between cuts (it keeps its screen spot through
 // both sun push-throughs) and two suns never share a frame. Every shot: contact shadows under everything that touches a
 // surface; casts for people, posts, boards and trees along the key; FormShade on the side away from it; `Shade` one
 // step on planes turned from the sun; Rim only on her (S1, S4, S8); lit panes are `LitWindow` (L* 85-92, no glow).
 // On WATER (the canal in S1, S2, S3, S4, S8) a light-layer shade takes `tint="water"` (TINT_CANAL.water, the water's
-// own deeper step), never the rose family; a shade drawn as a flat fill of the water's own steps needs none.
+// own deeper step), never the rose family; a shade drawn as a flat fill of the water's own steps needs none. On LAWN
+// (Arlington, S5) the same: `tint="lawn"` (TINT_APRIL.lawn, the lawn's own deeper step).
 // Check: scripts/qa/check_light.py on an A/B (`--props='{"lightOff":true}'`) with --sky '#BCDCCF' and
 // --exclude 0,0,1080,<the shot's sky bottom y> (its default sky is v3's dusk blue).
 import {CM} from '../palette';
-import {makeRig, sunLight, tintFamily, tintFor, withKey, type LightRig, type Tints} from '../../lib/light';
+import {fromLch, lch, makeRig, sunLight, tintFamily, tintFor, withKey, type LightRig, type Tints} from '../../lib/light';
 
 /** The film's ONE shadow family: CM.shadeWarm at 0.20 / 0.28 / 0.48 (= the light demo's TINT_CANAL): on the paving
  *  form / cast / contact dL* -9 / -13 / -22, chroma kept, toward rose. Day and evening: no ambient step (#FFFFFF).
@@ -52,6 +53,17 @@ export const RIG_CANAL: LightRig = makeRig({
  *  camera-facing sides one step down); her rim along her top and left edge only. */
 export const RIG_CANAL_S8: LightRig = {...withKey(RIG_CANAL, sunLight({toward: 85, el: 36})), form: {frac: 0.3, backlit: true}};
 
+/** The LAWN's own deeper step: CM.sage one cast step down (dL* -12, the CRAFT §d.3 cast depth), its hue kept, chroma
+ *  x 1.05. The rose family turned S5's lawn edge olive under the Pentagon's cast (L4, 2026-10-28: L* 79 -> 67, C* 16 ->
+ *  11.5, h 123 -> 105); this tint keeps it the lawn's green (h ~125, C* ~17) at the same value. */
+const SAGE = lch(CM.sage);
+export const LAWN_SHADE = fromLch(SAGE.L - 12, SAGE.C * 1.05, SAGE.h);
+
+/** RIG_APRIL's tints: the film's ONE family (TINT_CANAL) + `lawn` (multiply: CM.sage -> LAWN_SHADE). Lanes write
+ *  `tint="lawn"` on a light-layer shade that falls on lawn (S5: the Pentagon's cast on the lawns round it), the family's
+ *  `cast` on the paving beside it. */
+export const TINT_APRIL: Tints & {water: string; lawn: string} = {...TINT_CANAL, lawn: tintFor(CM.sage, LAWN_SHADE)};
+
 /** RIG_APRIL: the same family; the April morning sun, el 40, no pools (no lamps by day). S5's start: the sun in the slot
  *  at the left, shadows right and toward us (toward 15); S6 looks south (a > 90 deg turn from S5's end, so the key may
  *  change side at the wipe): the sun at the left (SUN2), shadows right and toward us (toward 15). */
@@ -60,7 +72,7 @@ export const RIG_APRIL: LightRig = makeRig({
   key: sunLight({toward: 15, el: 40}),
   ground: 0.28,
   cap: 0.8,
-  tints: TINT_CANAL,
+  tints: TINT_APRIL,
   pool: CANAL_POOL,
   surface: CM.paving,
   rim: CANAL_RIM,

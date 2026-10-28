@@ -7,8 +7,10 @@
 //
 //   <NameTag />        S4 (lane L3): screen-locked over her; builds 0.21 / 1.74, pops off 3.94 (scene s)
 //   <Fingerpost />     S4 (lane L3): on the path plane; DEC plate pops 4.06, APR plate fill 4.59, pen done 4.94
-//   <NewsBox />        S5 (lane L4): START coords (face x 470-780, y 880-1230); already there (`at` optional)
-//   <Plaque />         S5 (lane L4): END coords; pops at 1.88 (22.43, ON "Pentagon"); auto-sized to `keySize`
+//   <NewsBox />        S5 (lane L4): START coords (face x 470-780, y 880-1230); already there (`at` optional); headline
+//                      body 34 (`headlineSize`); its A outline in the slate box's own shade (the declared tone)
+//   <Plaque />         S5 (lane L4): END coords; pops at 1.88 (22.43, ON "Pentagon"); auto-sized to `keySize`;
+//                      `panel="dark"`: a bronze-dark plate with light letters (for light paving behind it)
 //   <DoorSign x y />   any door: 1-3 lines (default CLASSIFIED / AUTHORIZED / PERSONNEL ONLY), sized by `size`
 //
 // CLOCK: every time is SCENE-LOCAL seconds (useTime() inside the shot = film time - the shot's start); the presets'
@@ -29,7 +31,7 @@ import {rand} from '../../../lib/rng';
 import {S4, S5, shotById, type Rect, type XY} from '../../world/map';
 import {TYPE, WorldText, textW} from './WorldText';
 import {TXT_NAME_TAG, TXT_NEWS_BOX, TXT_PLAQUE, TXT_PLATES, TXT_SERVICE_DOOR} from './texts';
-import {BOARD_COLORS, KEY_WEIGHT, mixHex} from './StatementBoard';
+import {BOARD_COLORS, KEY_WEIGHT, mixHex, weightFor} from './StatementBoard';
 import {tiered} from '../tiers';
 
 // ---------------------------------------------------------------- colour (CM tokens and flat mixes of them)
@@ -65,6 +67,10 @@ export const SMALL_COLORS = {
   bronze: CM.coatMustard,
   bronzeDeep: CM.line,
   plaqueFace: CM.limestone,
+  // the plaque's dark panel (`panel="dark"`): a bronze-dark plate (L* 36, h 37: the line colour a step toward the plum
+  // anchor) with limestone letters
+  plaqueDark: tone(CM.line, CM.anchor, 0.3),
+  plaqueLetter: CM.limestone,
 } as const;
 
 /** The fills' misregistration from their line (px, ~2.7: inside the house 2-5 px, the boards' direction: right and
@@ -661,17 +667,28 @@ export const Fingerpost = tiered('support', {}, FingerpostBody);
 // =================================================================================================================
 
 /** The box is drawn in its own 310 x 350 units (coin housing top -> feet), then fitted to `rect`. The window is the
- *  front page behind glass (276 x 200, 17 px in from each side): the 40 px headline (247 px) keeps 14 px a side. */
+ *  front page behind glass (276 x 200, 17 px in from each side): the headline keeps >= 14 px a side. */
 export const NEWS_BOX = {
   w: 310,
   h: 350,
   window: {x0: 17, y0: 58, x1: 293, y1: 258},
-  /** Page rows (box units): two plain head rules, the headline's three baselines, a short rule, the credit's two. */
+  /** Page rows (box units): two plain head rules, the headline's three baselines, a short rule, the credit's two. The
+   *  headline is BODY size 34 (the director, 2026-10-27: 40 was off the type scale, nothing between 34 and 56; L4's
+   *  rows from S5's re-lettered page); `headline40` / `midRule40` are the earlier 40 px rows (`headlineSize={40}`). */
   rules: [64, 67.5],
-  headline: [102, 147, 192],
-  midRule: 200,
+  headline: [104, 142, 180],
+  midRule: 195,
+  headline40: [102, 147, 192],
+  midRule40: 200,
   credit: [218, 239],
 } as const;
+
+/** The headline rows for a headline size: exact at 34 and 40, interpolated between (clamped). */
+export const newsBoxRows = (size: number): {headline: number[]; midRule: number} => {
+  const k = Math.min(1, Math.max(0, (size - TYPE.body) / (40 - TYPE.body)));
+  const N = NEWS_BOX;
+  return {headline: N.headline.map((y, i) => y + (N.headline40[i] - y) * k), midRule: N.midRule + (N.midRule40 - N.midRule) * k};
+};
 
 export type NewsBoxProps = {
   /** The box's contract rect, coin housing top -> feet (default S5.start.newsBox, START coords: x 470-780, y 880-1230).
@@ -679,6 +696,8 @@ export type NewsBoxProps = {
   rect?: Rect;
   /** Optional build (scene s): the box pops up from its feet, inks, the headline pens on. Omit = already there. */
   at?: number;
+  /** The headline's size (default TYPE.body 34; 40 = the earlier exception, weight 0.5). */
+  headlineSize?: number;
   /** The flat ground shadow (toward us and east: the sun is beyond, in the slot to the west). */
   shadow?: boolean;
   ink?: number;
@@ -687,10 +706,11 @@ export type NewsBoxProps = {
 };
 
 /** S5's newspaper box (lane L4): a slate honour box lit on its west side, the chrome coin housing on the lid (coin
- *  slot, a blank price window, the return knob), a hinged door whose window shows the front page (headline 40 px x 3
+ *  slot, a blank price window, the return knob), a hinged door whose window shows the front page (headline body 34 x 3
  *  + the 18 px credit; two plain rules at its head, no masthead), the pull handle, a blank coin-return plate, short
- *  legs on feet, a ground shadow. No masthead, no brand, no logo. */
-const NewsBoxBody: React.FC<NewsBoxProps> = ({rect = S5.start.newsBox, at, shadow = true, ink = INK_PX.far, seed = 'newsBox', exit = true}) => {
+ *  legs on feet, a ground shadow. No masthead, no brand, no logo. Its tone is the slate box (declared at the export),
+ *  so as a subject (tier A) its one closed outline is the box's own deep shade, never the pen's default ink. */
+const NewsBoxBody: React.FC<NewsBoxProps> = ({rect = S5.start.newsBox, at, headlineSize = TYPE.body, shadow = true, ink = INK_PX.far, seed = 'newsBox', exit = true}) => {
   useCaptionFont();
   const t = useTime();
   if (at !== undefined && t < at) return null;
@@ -701,6 +721,8 @@ const NewsBoxBody: React.FC<NewsBoxProps> = ({rect = S5.start.newsBox, at, shado
   const inkAt = at === undefined ? undefined : at + 0.07;
   const hAt = at === undefined ? undefined : at + 0.16;
   const W = N.window;
+  const rows = newsBoxRows(headlineSize);
+  const hWeight = headlineSize >= 40 ? 0.5 : weightFor(headlineSize);
   const cx = N.w / 2;
   const off = MISREG;
   const bodyY0 = 42;
@@ -736,9 +758,9 @@ const NewsBoxBody: React.FC<NewsBoxProps> = ({rect = S5.start.newsBox, at, shado
         exit={exit}
         graphic
       />
-      <Ink d={line(cx - 72, N.midRule, cx + 72, N.midRule, {over: [0, 0], drift: 0, jitter: 0.3, seed: `${seed}/rule3`})} width={1.2} color={C.pageRule} taper={false} vary={0} at={inkAt} seed={`${seed}/rule3I`} exit={exit} graphic />
+      <Ink d={line(cx - 72, rows.midRule, cx + 72, rows.midRule, {over: [0, 0], drift: 0, jitter: 0.3, seed: `${seed}/rule3`})} width={1.2} color={C.pageRule} taper={false} vary={0} at={inkAt} seed={`${seed}/rule3I`} exit={exit} graphic />
       {TXT_NEWS_BOX.headline.map((s, i) => (
-        <WorldText key={`h${i}`} x={cx} y={N.headline[i]} size={40} text={s} anchor="middle" weight={0.5} at={hAt === undefined ? undefined : hAt + i * 0.12} dur={0.16} maxW={W.x1 - W.x0 - 16} seed={`${seed}/h${i}`} exit={exit} />
+        <WorldText key={`h${i}`} x={cx} y={rows.headline[i]} size={headlineSize} text={s} anchor="middle" weight={hWeight} at={hAt === undefined ? undefined : hAt + i * 0.12} dur={0.16} maxW={W.x1 - W.x0 - 16} seed={`${seed}/h${i}`} exit={exit} />
       ))}
       {TXT_NEWS_BOX.credit.map((s, i) => (
         <WorldText key={`c${i}`} x={cx} y={N.credit[i]} size={TYPE.credit} text={s} anchor="middle" at={hAt === undefined ? undefined : hAt + 0.4 + i * 0.08} dur={0.14} maxW={W.x1 - W.x0 - 16} seed={`${seed}/c${i}`} exit={exit} />
@@ -782,7 +804,8 @@ const NewsBoxBody: React.FC<NewsBoxProps> = ({rect = S5.start.newsBox, at, shado
     </XG>
   );
 };
-export const NewsBox = tiered('support', {}, NewsBoxBody);
+/** Tone = the slate box (L5's K3 note from L4, 2026-10-28: the A outline in its own shade, not the pen's #4B2A1E). */
+export const NewsBox = tiered('support', {tone: SMALL_COLORS.box}, NewsBoxBody);
 
 // =================================================================================================================
 // 4. Plaque (S5, lane L4): a viewpoint orientation plaque, bronze frame, limestone face; no seal, flag or insignia
@@ -794,6 +817,12 @@ export const PLAQUE_MOUNT: Rect = {x0: 560, y0: 1120, x1: 760, y1: 1226};
 export const PLAQUE_COPING_Y = 1180;
 
 export type PlaqueLayout = {w: number; h: number; frame: number; keyBase: number; bodyBase: number; stand: {w: number; h: number}; total: number};
+
+/** The plaque's panel (its face): 'light' (limestone, ink letters: the default) or 'dark' (a bronze-dark plate with
+ *  limestone letters, in the same bronze frame) for a plaque standing on LIGHT paving: there the bronze frame (L* 72)
+ *  and the limestone face sat within a few L* of the field round them (S5 @23.4: separation median |dL*| 6.9-8.3, 34 % at
+ *  one value; L4's report); the dark plate (L* 36) steps ~30-40 L* from the paving along its whole contour (CRAFT §f.3). */
+export type PlaquePanel = 'light' | 'dark';
 
 /** The plaque's body size for a key size: 30 with the 56 px key (the type scale's body); 24 with a smaller key (the
  *  small-mount variant: 'US Department of Defense' 231 px). */
@@ -828,6 +857,8 @@ export type PlaqueProps = {
   stand?: boolean;
   /** A small bronze pointer tab toward the building (default 'up': it stands in front of and below it). */
   pointer?: 'up' | 'left' | 'right' | 'none';
+  /** The panel: 'light' (default) or 'dark' (bronze-dark plate, light letters: on light paving). */
+  panel?: PlaquePanel;
   ink?: number;
   seed?: string;
   exit?: boolean;
@@ -836,7 +867,7 @@ export type PlaqueProps = {
 /** S5's viewpoint plaque (lane L4): "The Pentagon" (key) + "US Department of Defense" (body) on a limestone face in a
  *  bronze frame, two brass screws, a small pointer tab toward the building, on a short bronze post; it pops up from its
  *  foot with the text on it (no pen: it reads ON the word). */
-const PlaqueBody: React.FC<PlaqueProps> = ({x = 612, y = PLAQUE_COPING_Y + 2, keySize = TYPE.key, bodySize, at = SMALL_CLOCK.plaque.at, stand = true, pointer = 'up', ink = INK_PX.far, seed = 'plaque', exit = true}) => {
+const PlaqueBody: React.FC<PlaqueProps> = ({x = 612, y = PLAQUE_COPING_Y + 2, keySize = TYPE.key, bodySize, at = SMALL_CLOCK.plaque.at, stand = true, pointer = 'up', panel = 'light', ink = INK_PX.far, seed = 'plaque', exit = true}) => {
   useCaptionFont();
   const t = useTime();
   const bs = bodySize ?? plaqueBodySize(keySize);
@@ -853,6 +884,7 @@ const PlaqueBody: React.FC<PlaqueProps> = ({x = 612, y = PLAQUE_COPING_Y + 2, ke
   const f = Lp.frame;
   const off = MISREG;
   const pt = 13;
+  const dark = panel === 'dark';
   const tab: Pt[] | null =
     pointer === 'up'
       ? [[x - pt, y0 + 1], [x, y0 - pt], [x + pt, y0 + 1]]
@@ -881,12 +913,12 @@ const PlaqueBody: React.FC<PlaqueProps> = ({x = 612, y = PLAQUE_COPING_Y + 2, ke
       {/* the plate's thickness (right and below), the bronze frame, its bevel line, the limestone face */}
       <Fill d={rectD(x0 + 3, y0 + 3.5, x1 + 3, y1 + 3.5)} color={C.bronzeDeep} offset={false} seed={`${seed}/edge`} exit={exit} />
       <Fill d={rectD(x0, y0, x1, y1)} color={C.bronze} offset={off} seed={`${seed}/frame`} exit={exit} />
-      <Fill d={rectD(x0 + f, y0 + f, x1 - f, y1 - f)} color={C.plaqueFace} offset={false} seed={`${seed}/face`} exit={exit} />
+      <Fill d={rectD(x0 + f, y0 + f, x1 - f, y1 - f)} color={dark ? C.plaqueDark : C.plaqueFace} offset={false} seed={`${seed}/face`} exit={exit} />
       <Ink d={poly([[x0 + f, y1 - f], [x0 + f, y0 + f], [x1 - f, y0 + f]], {joined: true, jitter: 0.2, seed: `${seed}/bevel`})} width={INK_PX.hair} color={C.bronzeDeep} taper={false} vary={0} seed={`${seed}/bevelI`} exit={exit} />
       <Screws pts={[{x: x0 + f / 2 + 0.5, y: (y0 + y1) / 2}, {x: x1 - f / 2 - 0.5, y: (y0 + y1) / 2}]} r={screwR} seed={seed} exit={exit} />
       <Ink d={outInk} width={ink} open={0.1} seed={`${seed}/ink`} exit={exit} />
-      <WorldText x={x} y={y0 + Lp.keyBase} size={keySize} text={TXT_PLAQUE.key} anchor="middle" weight={keySize >= 56 ? KEY_WEIGHT : 0.7} seed={`${seed}/k`} exit={exit} />
-      <WorldText x={x} y={y0 + Lp.bodyBase} size={bs} text={TXT_PLAQUE.body} anchor="middle" seed={`${seed}/b`} exit={exit} />
+      <WorldText x={x} y={y0 + Lp.keyBase} size={keySize} text={TXT_PLAQUE.key} anchor="middle" weight={keySize >= 56 ? KEY_WEIGHT : 0.7} color={dark ? C.plaqueLetter : undefined} seed={`${seed}/k`} exit={exit} />
+      <WorldText x={x} y={y0 + Lp.bodyBase} size={bs} text={TXT_PLAQUE.body} anchor="middle" color={dark ? C.plaqueLetter : undefined} seed={`${seed}/b`} exit={exit} />
     </XG>
   );
 };
