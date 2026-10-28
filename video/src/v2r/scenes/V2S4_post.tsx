@@ -2,23 +2,28 @@
 // objects", §8 V16; plan_L3 §1b; map.ts S4.post / plateDec2025 / plateApr2026). Drawn in PLANE coordinates at the
 // 17.96 pose (the post lands at x 575).
 //   S4Post    (inside S4Path, slides with the towpath plane): a slim heritage post in plum with a gilt ball finial,
-//             a moulded cast-iron foot on a stone plinth, two empty sockets that hint where the arms go, and its short
-//             colour shadow east on the paving (STYLE §2). Bare until "military".
+//             a moulded cast-iron foot on a stone plinth, two empty sockets that hint where the arms go. Bare until
+//             "military". TIER A from its beat: its ONE closed outline (INK_PX.mid, the post's own deep shade: the pen
+//             draws it 3.0 px) pops on with the DEC plate (18.92: a promotion pops the outline, never the fill, THROUGHLINE
+//             §4); its contact and cast shadows are the towpath's ShadowLayer (V2S4_wpath, from POST_STANDERS), its form
+//             step the light layer's FormShade on its right side (the low sun is west).
 //   S4Plates  (V2S4.tsx draws it ABOVE Pip and the boat): the two arrow plates pointing WEST, top-to-bottom = time
 //             order. 18.92 "military": the DEC 2025 plate knocks onto the post (its paper face grows out of its socket
-//             to the tip in ~0.1 s with a small overshoot), its edge and plum keyline ink, then "DEC 2025" /
-//             "unclassified work" / the credit pen on. 19.43-19.80: the APR 2026 plate, complete ON "heading". They are
-//             the top layer so nothing ever moves over the lettering (Pip's leap into the sun passes BEHIND them).
+//             to the tip in ~0.1 s with a small overshoot), its ONE closed edge (tier A) and its closed plum keyline,
+//             then "DEC 2025" / "unclassified work" / the credit pen on. 19.43-19.80: the APR 2026 plate, complete ON
+//             "heading". They are the top layer so nothing ever moves over the lettering.
 // Lettering: K3 `WorldText` + `TXT_PLATES` (never retyped): keys 56 px with faux weight 0.9, body 31 px, credits 18 px.
 import React, {useMemo} from 'react';
 import {CM, INK_PX} from '../palette';
 import {Fill} from '../../lib/Fill';
 import {Ink} from '../../lib/Ink';
-import {line, circle} from '../../lib/sketch';
 import {springAt, useTime} from '../../lib/time';
 import {XG, mat} from '../../lib/xf';
 import {useCaptionFont} from '../../lib/font';
 import {Batch, Paint, ovalPath, P, Pt} from '../kit/canal/core';
+import {Tier} from '../../lib/tier';
+import {FormShade} from '../../lib/light';
+import type {Stander} from './V2S4_light';
 import {WorldText, textW} from '../kit/boards/WorldText';
 import {TXT_PLATES} from '../kit/boards/texts';
 import * as MAP from '../world/map';
@@ -39,14 +44,6 @@ const SOCK_H = 26;
 function postBatch(): Batch {
   const b = new Batch();
   const x = POST.x;
-  // its shadow on the paving: colour, flat, SHORT and east (STYLE §2; the world's own quad, V2S4_wcore SHADOW)
-  b.poly(CM.stoneShade, [
-    [x - 18, POST.footY - 1],
-    [x + 18, POST.footY - 2],
-    [x + 18 + 34, POST.footY + 4],
-    [x - 11 + 34 * 0.9, POST.footY + 6],
-  ]);
-  b.layer();
   // stone plinth: lit face, a shade side to the east
   b.rect(CM.limestone, x - 18, PLINTH_TOP, 36, POST.footY - PLINTH_TOP);
   b.rect(CM.stoneShade, x + 9, PLINTH_TOP, 9, POST.footY - PLINTH_TOP);
@@ -82,33 +79,47 @@ function postBatch(): Batch {
     b.rect(CM.anchor, x - 10, cy - SOCK_H / 2 - 3, 20, SOCK_H + 6);
     b.fill(CM.leafGold, ovalPath(x + 5, cy, 2, 2));
   }
-  b.layer();
-  // ink: loose, open, only where it carries form (shaft edges with a break, the foot, the finial, the sockets)
-  const w = INK_PX.far;
-  b.ink(line(x - HW, SHAFT_TOP + 2, x - HW, 880, {seed: 'pL1', over: [2, 0]}), w);
-  b.ink(line(x - HW, 896, x - HW, BASE_TOP - 4, {seed: 'pL2', over: [0, 2]}), w);
-  b.ink(line(x + HW, SHAFT_TOP + 2, x + HW, 812, {seed: 'pR1', over: [2, 0]}), w);
-  b.ink(line(x + HW, 828, x + HW, BASE_TOP - 6, {seed: 'pR2', over: 'none'}), w);
-  b.ink(
-    `M${P(x - HW - 2, BASE_TOP + 16)}L${P(x - 13, PLINTH_TOP - 4)}L${P(x - 14, PLINTH_TOP)}M${P(x + HW + 2, BASE_TOP + 16)}L${P(x + 13, PLINTH_TOP - 4)}L${P(x + 15, PLINTH_TOP)}`,
-    w,
-  );
-  b.ink(line(x - 20, PLINTH_TOP, x + 21, PLINTH_TOP, {seed: 'pPl', over: 'small'}), w);
-  b.ink(line(x - 18, PLINTH_TOP + 2, x - 18, POST.footY, {seed: 'pPlL', over: 'none'}), INK_PX.hair);
-  b.ink(line(x - 12, BASE_TOP - 6, x + 12, BASE_TOP - 6, {seed: 'pRing', over: 'small'}), INK_PX.hair);
-  b.ink(line(x - 12, POST.topY, x + 12, POST.topY, {seed: 'pCap', over: 'small'}), INK_PX.hair);
-  b.ink(circle(x, POST.topY - 14, 8, {seed: 'pBall', overlap: -40}), INK_PX.hair);
-  for (const [i, cy] of SOCKETS.entries()) {
-    b.ink(line(x - 12, cy - SOCK_H / 2, x + 12, cy - SOCK_H / 2, {seed: `pSo${i}`, over: [1, 2]}), INK_PX.hair);
-    b.ink(line(x + 12, cy - SOCK_H / 2 + 2, x + 12, cy + SOCK_H / 2, {seed: `pSr${i}`, over: 'none'}), INK_PX.hair);
-  }
   return b;
 }
 
-/** The bare post on the towpath plane (rendered inside S4Path: already slid with the plane). */
+/** The post's iron silhouette (foot, shaft, collar, ball and spike) as ONE closed path: its tier-A outline and its form
+ *  step's shape. */
+const POST_D = (() => {
+  const x = POST.x;
+  const top = POST.topY;
+  // the left half, bottom -> top, as (dx, y); the right half mirrors it
+  const left: [number, number][] = [
+    [-14, PLINTH_TOP],
+    [-13, PLINTH_TOP - 4],
+    [-11, BASE_TOP + 16],
+    [-11, BASE_TOP - 6],
+    [-HW, BASE_TOP - 6],
+  ];
+  for (const cy of [...SOCKETS].sort((a, c) => c - a)) left.push([-HW, cy + 13], [-12, cy + 13], [-12, cy - 13], [-HW, cy - 13]);
+  left.push([-HW, top + 9], [-11, top + 9], [-11, top], [-6, top], [-6, top - 6], [-4.5, top - 7.5]);
+  const right = left.map(([dx, y]) => [-dx, y] as [number, number]).reverse();
+  return (
+    `M${left.map(([dx, y]) => P(x + dx, y)).join('L')}` +
+    `A8 8 0 1 1 ${right.map(([dx, y]) => P(x + dx, y)).join('L')}Z`
+  );
+})();
+
+/** The post's ground shadows (plane px; drawn by the towpath's one ShadowLayer, V2S4_wpath): contact under the plinth,
+ *  the cast of the whole post along the light. */
+export const POST_STANDERS: Stander[] = [{x: POST.x, y: POST.footY, w: 38, h: POST.footY - POST.topY + 33, w2: 16}];
+
+/** The bare post on the towpath plane (rendered inside S4Path: already slid with the plane): fills at tier A always
+ *  (no value pop), its one closed outline from the DEC plate's knock-on, the form step on its right side. */
 export const S4Post: React.FC = () => {
+  const t = useTime();
   const b = useMemo(postBatch, []);
-  return <Paint b={b} seed="s4post" />;
+  return (
+    <Tier tier="subject" tone={CM.anchor}>
+      <Paint b={b} seed="s4post" misreg={false} />
+      <FormShade d={POST_D} />
+      {t >= MAP.S4.decPlateAt ? <Ink d={POST_D} width={INK_PX.mid} order="all" seed="s4postEdge" /> : null}
+    </Tier>
+  );
 };
 
 // ---------------------------------------------------------------- the plates (top layer)
@@ -171,22 +182,12 @@ function platePts(r: MAP.Rect): Pt[] {
 const PlateFace: React.FC<{p: PlateSpec}> = ({p}) => {
   const t = useTime();
   const {r} = p;
-  const ink = useMemo(() => {
-    const [a, b2, c, d, e] = platePts(r);
-    const o = {over: [3, 7] as [number, number], jitter: 0.5, drift: 0.15, breaks: false};
-    return [
-      line(e[0], e[1], a[0], a[1], {...o, seed: `${p.seed}e1`, over: [1, 4]}),
-      line(a[0], a[1], b2[0] + 2, b2[1], {...o, seed: `${p.seed}e2`}),
-      line(b2[0], b2[1] - 2, c[0], c[1] + 3, {...o, seed: `${p.seed}e3`, over: [2, 3]}),
-      line(c[0] + 2, c[1], d[0], d[1], {...o, seed: `${p.seed}e4`}),
-      line(d[0], d[1], e[0], e[1], {...o, seed: `${p.seed}e5`, over: [4, 1]}),
-    ].join('');
-  }, [r, p.seed]);
   const key = useMemo(() => {
-    // the plum keyline: inset 6 px along the top, the post end and the bottom; open at the point (the key starts there)
+    // the plum keyline: the arrow inset 6 px, ONE closed path (no stroke ends near the lettering)
     const k = 6;
-    const xa = r.x0 + 30 + 22;
-    return `M${P(xa, r.y0 + k)}L${P(r.x1 - k, r.y0 + k)}L${P(r.x1 - k, r.y1 - k)}L${P(xa + 6, r.y1 - k)}`;
+    const ym = (r.y0 + r.y1) / 2;
+    const xb = r.x0 + 30;
+    return `M${P(xb + k * 0.4, r.y0 + k)}L${P(r.x1 - k, r.y0 + k)}L${P(r.x1 - k, r.y1 - k)}L${P(xb + k * 0.4, r.y1 - k)}L${P(r.x0 + k * 1.8, ym)}Z`;
   }, [r]);
   if (t < p.at) return null;
   // the face grows out of its socket (scale x about the post end) with a small overshoot
@@ -198,10 +199,10 @@ const PlateFace: React.FC<{p: PlateSpec}> = ({p}) => {
   const under = `M${P(r.x0 + 33, r.y1 - 1)}L${P(r.x1, r.y1 - 1)}L${P(r.x1, r.y1 + 5)}L${P(r.x0 + 31, r.y1 + 5)}L${P(r.x0 + 4, ym + 3)}Z`;
   return (
     <XG m={mat.about(mat.scale(sx, 1), r.x1, ym)}>
-      {/* the arm's underside in shade (its thickness), then the paper face */}
+      {/* the arm's underside in shade (its thickness), then the paper face, its one closed edge, the closed keyline */}
       <Fill d={under} color={CM.shadeWarm} offset={false} seed={`${p.seed}under`} />
-      <Fill d={face} color={CM.paper} seed={`${p.seed}face`} offset={[3, 2]} />
-      <Ink d={ink} at={p.at + 0.04} width={INK_PX.far} order="all" seed={`${p.seed}edge`} />
+      <Fill d={face} color={CM.paper} offset={false} seed={`${p.seed}face`} />
+      <Ink d={face} at={p.at + 0.04} width={INK_PX.mid} order="all" seed={`${p.seed}edge`} />
       <Ink d={key} at={p.at + 0.07} width={INK_PX.hair} color={CM.anchor} order="all" seed={`${p.seed}key`} />
     </XG>
   );
@@ -219,10 +220,6 @@ const Clamps: React.FC<{p: PlateSpec}> = ({p}) => {
     s.fill(CM.leafGold, ovalPath(x - 18, cy - 6, 2.2, 2.2));
     s.fill(CM.leafGold, ovalPath(x - 18, cy + 6, 2.2, 2.2));
     s.fill(CM.leafGold, ovalPath(x + 5, cy, 2, 2));
-    s.layer();
-    s.ink(line(x - 26, cy - SOCK_H / 2, x + 12, cy - SOCK_H / 2, {seed: `${p.seed}clT`, over: [1, 2]}), INK_PX.hair);
-    s.ink(line(x - 26, cy + SOCK_H / 2, x - 8, cy + SOCK_H / 2, {seed: `${p.seed}clB`, over: [1, 1]}), INK_PX.hair);
-    s.ink(line(x - 26, cy - SOCK_H / 2 + 1, x - 26, cy + SOCK_H / 2, {seed: `${p.seed}clL`, over: 'none'}), INK_PX.hair);
     return s;
   }, [p]);
   if (t < p.at) return null;
@@ -250,6 +247,7 @@ export const S4Plates: React.FC = () => {
   const t = useTime();
   return (
     <XG m={mat.translate(s4PlaneDx(S4_K.path, t), 0)}>
+      <Tier tier="subject" tone={CM.paper}>
       {PLATES.map((p) => (
         <React.Fragment key={p.seed}>
           <PlateFace p={p} />
@@ -257,6 +255,7 @@ export const S4Plates: React.FC = () => {
           <PlateText p={p} />
         </React.Fragment>
       ))}
+      </Tier>
     </XG>
   );
 };

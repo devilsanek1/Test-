@@ -1,22 +1,34 @@
-// V2S4_wpath.tsx (lane L3, V2S4 WORLD helpers): HER TOWPATH, the 1.0x path plane at the 17.96 pose (plane px).
-//   garden walls   y 862-992 at the back: each garden its own (stock brick in three tones, a rendered one, piers
-//                  with stone caps), three wooden gates, iron railings, a trellis with roses, ivy spilling over, a
-//                  pot on the coping, a wall lamp (off), a few brick ticks
-//   paving         y 992-1070: broken slab joints in rows that widen toward us, repaired patches, a drain, a manhole,
-//                  moss in the joints, fallen leaves (and a few skittering east in the wind)
-//   coping         y 1070-1082: stone blocks, a lip, mooring rings, cast-iron bollards
-//   furniture      heritage lamp posts (off: low sun), planters of grasses, a litter bin, a bike against a wall, a
-//                  lifebuoy on its post; short colour shadows to the EAST (STYLE.md: <= ~40 px past the object)
-// Nothing post-like stands under the plates (x 110-560 at the pose) beside the fingerpost (x 575).
+// V2S4_wpath.tsx (lane L3, V2S4 WORLD helpers): HER TOWPATH, the 1.0x path plane at the 17.96 pose (plane px). TIER C
+// (flat, no line; the people on it in V2S4_wcast, the post in V2S4_post).
+//   garden walls   y 862-992 at the back: each garden its own (stock brick in three tones, a rendered one, piers with
+//                  stone caps), three wooden gates, iron railings (a calm mid slate, never plum), roses on a trellis,
+//                  ivy spilling over, a pot on the coping
+//   paving         y 992-1070: flagstones laid out from S4_CAM (V2S4_depth): level joints every 0.6 m (rows that
+//                  foreshorten, 12.7 px near -> 6.5 px far) and receding joints every 0.75 m that converge on the shot's
+//                  vanishing point (540, 760) at EVERY frame of the truck (re-projected per frame: their near ends ride the
+//                  plane, their far ends move 0.75x, as the ground does); a manhole, a drain, a few fallen leaves
+//   coping         y 1070-1082: one stone band and its lip; three bollards
+//   furniture      heritage lamp posts (off: low sun), a planter of grasses, a litter bin, a lifebuoy on its post, the
+//                  reader's bench, the angler, the heron (still)
+// The hand-drawn marks are gone (brick ticks, render patches, gate planks and straps, moss dabs, blooms dots, the drain
+// and manhole hatching, the mooring rings, 46 leaf specks, the coping's ticks), and so are the movers the life budget
+// cuts (the wall pigeons, the skittering leaves; conform_L3 §2). LIGHT (RIG_CANAL, V2S4_light): ONE ShadowLayer for
+// the whole towpath (contact + cast under every standing thing, the walkers, the post and HER: hers is screen-fixed, so
+// it is placed at her screen x minus the plane's offset), the gate piers' casts on the walls, the walls' band at their
+// foot; FormShade on the bollards, the bin and the planter.
 import React, {useMemo} from 'react';
-import {CM, INK_PX} from '../palette';
+import {CM} from '../palette';
 import {useTime} from '../../lib/time';
-import {line, circle as circleInk} from '../../lib/sketch';
-import {Batch, Paint, P, rng, ovalPath, domePath, lobes, leafPath, lerp, frac} from '../kit/canal/core';
-import {Lamp, bikeInto, bollardInto, binInto, planterInto} from '../kit/canal/towpath';
+import {seamTone} from '../../lib/depth';
+import {Shadow, ShadowLayer, ContactShadow, CastShadow} from '../../lib/light';
+import {Batch, Paint, P, rng, ovalPath, domePath, lobes, leafPath} from '../kit/canal/core';
 import {Heron} from '../kit/canal/life';
-import {ROW, PLANE_X, SHADOW, WIND, CLEAN, WINK} from './V2S4_wcore';
-import {benchReaderInto, anglerInto} from './V2S4_wcast';
+import {ROW, PLANE_X} from './V2S4_wcore';
+import {S4_K, S4_HER, s4PlaneDx} from './V2S4_rig';
+import {S4_CAM} from './V2S4_depth';
+import {benchReaderInto, anglerInto, walkerStanders, Walkers, READER_STANDERS, ANGLER_STANDERS, S4_IRON, S4_WOOD} from './V2S4_wcast';
+import {S4FormShades, type Stander} from './V2S4_light';
+import {POST_STANDERS} from './V2S4_post';
 
 const [X0, X1] = PLANE_X(1);
 const TOP = ROW.wallTop;
@@ -40,78 +52,41 @@ const SEGS: Seg[] = [
   {x0: 1250, x1: 1300, kind: 'gate', c: CM.brickLight, gate: CM.brickDeep},
   {x0: 1300, x1: X1, kind: 'railing', c: CM.brick},
 ];
+const PIER_W = 14;
 
 function wallsInto(b: Batch) {
   const r = rng('s4walls');
-  const ink: string[] = [];
-  const pw = 14;
   const gates = SEGS.filter((s) => s.kind === 'gate');
   const walls = SEGS.filter((s) => s.kind !== 'gate');
-  // P0: wall bodies, gate piers, gate leaves
+  // P0: wall bodies, gate piers, gate leaves (flat: one calm leaf each)
   for (const s of walls) b.rect(s.c, s.x0, TOP, s.x1 - s.x0, FOOT - TOP);
   for (const s of gates) {
-    for (const px of [s.x0, s.x1 - pw]) b.rect(s.c, px, TOP - 12, pw, FOOT - TOP + 12);
-    const gx0 = s.x0 + pw;
-    const gx1 = s.x1 - pw;
+    for (const px of [s.x0, s.x1 - PIER_W]) b.rect(s.c, px, TOP - 12, PIER_W, FOOT - TOP + 12);
+    const gx0 = s.x0 + PIER_W;
+    const gx1 = s.x1 - PIER_W;
     b.rect(s.gate as string, gx0, TOP - 4, gx1 - gx0, FOOT - TOP + 4);
     b.fill(s.gate as string, `M${P(gx0, TOP - 4)}Q${P((gx0 + gx1) / 2, TOP - 14)} ${P(gx1, TOP - 4)}Z`);
-    ink.push(line(s.x0, TOP - 12, s.x0, FOOT, {...CLEAN, seed: `s4gp${s.x0}`}) + line(s.x1, TOP - 12, s.x1, FOOT, {...CLEAN, seed: `s4gq${s.x0}`}));
   }
   b.layer();
-  // P1: copings and pier caps, the coping's shade line, render patches, brick ticks
-  for (const s of walls) {
-    const w = s.x1 - s.x0;
-    b.rect(CM.limestone, s.x0 - 2, TOP - 7, w + 4, 8);
-    if (s.kind === 'render') {
-      b.rect(CM.stoneShade, s.x0, FOOT - 16, w, 16);
-      for (let k = 0; k < 3; k++) b.rect(CM.stoneShade, s.x0 + r.range(10, w - 40), r.range(TOP + 20, FOOT - 40), r.range(14, 30), 2);
-    } else {
-      for (let k = 0; k < Math.round(w / 40); k++) b.rect(s.c === CM.brickDeep ? CM.brick : CM.brickDeep, r.range(s.x0 + 4, s.x1 - 16), r.range(TOP + 12, FOOT - 10), r.range(8, 14), 3);
-    }
-    ink.push(line(s.x0 - 2, TOP - 7, s.x1 + 2, TOP - 7, {...CLEAN, seed: `s4wc${s.x0}`}));
-  }
-  for (const s of gates) for (const px of [s.x0, s.x1 - pw]) b.rect(CM.limestone, px - 3, TOP - 18, pw + 6, 7);
-  // the right-hand pier of each gate casts a short shade east onto the wall beside it (one light: the low sun, west)
-  for (const s of gates) b.poly(CM.shadeWarm, [[s.x1, TOP - 4], [s.x1 + 12, TOP + 2], [s.x1 + 12, FOOT], [s.x1, FOOT]]);
+  // P1: copings and pier caps
+  for (const s of walls) b.rect(CM.limestone, s.x0 - 2, TOP - 7, s.x1 - s.x0 + 4, 8);
+  for (const s of gates) for (const px of [s.x0, s.x1 - PIER_W]) b.rect(CM.limestone, px - 3, TOP - 18, PIER_W + 6, 7);
   b.layer();
-  // P2: under-coping shade, pier domes, gate planks, straps and knob, railings, the trellis, the wall lamp
-  for (const s of walls) b.rect(CM.stoneShade, s.x0 - 2, TOP + 1, s.x1 - s.x0 + 4, 3);
-  for (const s of gates) {
-    for (const px of [s.x0, s.x1 - pw]) b.fill(CM.limestone, domePath(px + pw / 2, TOP - 18, pw / 2 + 1, 6));
-    const gx0 = s.x0 + pw;
-    const gx1 = s.x1 - pw;
-    for (let x = gx0 + 6; x < gx1 - 2; x += 6) b.rect(CM.shadeWarm, x, TOP, 1, FOOT - TOP - 4);
-    b.rect(CM.anchor, gx0 + 2, TOP + 18, gx1 - gx0 - 4, 3);
-    b.rect(CM.anchor, gx0 + 2, FOOT - 30, gx1 - gx0 - 4, 3);
-    b.fill(CM.coatMustard, ovalPath(gx1 - 7, (TOP + FOOT) / 2, 3, 3));
-  }
-  const trellis: string[] = [];
+  // P2: pier domes, the railings (one calm mid slate: rails, bars and spikes, never a dark line), the trellis roses
+  for (const s of gates) for (const px of [s.x0, s.x1 - PIER_W]) b.fill(CM.limestone, domePath(px + PIER_W / 2, TOP - 18, PIER_W / 2 + 1, 6));
   for (const s of walls) {
     if (s.kind === 'railing') {
       const ry = TOP - 62;
-      b.rect(CM.anchor, s.x0, ry + 6, s.x1 - s.x0, 3);
-      b.rect(CM.anchor, s.x0, TOP - 16, s.x1 - s.x0, 2.4);
+      b.rect(S4_IRON, s.x0, ry + 6, s.x1 - s.x0, 3);
+      b.rect(S4_IRON, s.x0, TOP - 16, s.x1 - s.x0, 2.4);
       for (let x = s.x0 + 7; x < s.x1 - 2; x += 15) {
-        b.rect(CM.anchor, x - 0.9, ry + 2, 1.8, TOP - 8 - ry);
-        b.poly(CM.anchor, [[x - 2.2, ry + 4], [x, ry - 3], [x + 2.2, ry + 4]]);
+        b.rect(S4_IRON, x - 0.9, ry + 2, 1.8, TOP - 8 - ry);
+        b.poly(S4_IRON, [[x - 2.2, ry + 4], [x, ry - 3], [x + 2.2, ry + 4]]);
       }
     }
-    if (s.kind === 'trellis') {
-      const ty = TOP - 66;
-      let tr = '';
-      for (let x = s.x0 + 8; x < s.x1 - 4; x += 16) tr += `M${P(x, TOP - 6)}L${P(x + 16, ty)}M${P(x + 16, TOP - 6)}L${P(x, ty)}`;
-      tr += `M${P(s.x0 + 4, ty)}L${P(s.x1 - 4, ty)}`;
-      trellis.push(tr);
-    }
-    if (s.pot) {
-      const lx = s.x1 - 18;
-      b.rect(CM.anchor, lx - 2, TOP + 26, 4, 10);
-      b.poly(CM.anchor, [[lx - 9, TOP + 30], [lx, TOP + 23], [lx + 9, TOP + 30]]);
-    }
   }
-  b.ink(trellis.join(''), 1.3, CM.line);
   b.layer();
-  // P3: plants (trellis roses, ivy), the pot on the coping, the lamp's glass
+  // P3: plants (the trellis roses as one climbing mass, ivy), the pot on the coping
   for (const s of walls) {
     const w = s.x1 - s.x0;
     if (s.kind === 'trellis') {
@@ -129,203 +104,225 @@ function wallsInto(b: Batch) {
     if (s.pot) {
       const px = s.x0 + w * 0.3;
       b.fill(CM.sage, lobes(px - 13, px + 13, TOP - 21, 18, 's4wpot', 3));
-      const lx = s.x1 - 18;
-      b.poly(CM.glass, [[lx - 7, TOP + 30], [lx + 7, TOP + 30], [lx + 5, TOP + 44], [lx - 5, TOP + 44]]);
     }
   }
   b.layer();
-  // P4: blooms, the pot itself (over the plant's base)
   for (const s of walls) {
-    const w = s.x1 - s.x0;
-    if (s.kind === 'trellis') for (let k = 0; k < Math.round(w / 26); k++) b.fill(r.pick([CM.blossom, CM.box, CM.paper]), ovalPath(r.range(s.x0 + 10, s.x1 - 10), r.range(TOP - 50, TOP - 10), 3.6, 3.3));
-    if (s.pot) {
-      const px = s.x0 + w * 0.3;
-      b.poly(CM.brickDeep, [[px - 9, TOP - 22], [px + 9, TOP - 22], [px + 7, TOP - 7], [px - 7, TOP - 7]]);
-      for (const [dx, dy] of [[-6, -32], [3, -36], [8, -28]]) b.fill(CM.box, ovalPath(px + dx, TOP + dy, 3.2, 3));
-    }
+    if (!s.pot) continue;
+    const px = s.x0 + (s.x1 - s.x0) * 0.3;
+    b.poly(CM.brickDeep, [[px - 9, TOP - 22], [px + 9, TOP - 22], [px + 7, TOP - 7], [px - 7, TOP - 7]]);
   }
-  b.ink(ink.join(''), WINK.props, CM.ink, 0.12);
 }
 
 // ---------------------------------------------------------------- paving + coping
 
-function pavingInto(b: Batch) {
-  const r = rng('s4pave');
+/** The towpath's depth from S4_CAM: the coping (y 1070) is 14.0 m away, the wall foot (y 992) 18.7 m. */
+const Z_NEAR = S4_CAM.z(COP);
+const Z_FAR = S4_CAM.z(FOOT);
+/** Level joints every 0.6 m (y of each row, near -> far, inside the towpath). */
+const ROWS_Y: number[] = (() => {
+  const out: number[] = [];
+  for (let z = Z_NEAR + 0.6; z < Z_FAR - 0.15; z += 0.6) out.push(S4_CAM.y(z));
+  return out;
+})();
+/** Receding joints every 0.75 m along the towpath (their near ends, plane x at the pose: 75 px at 100 px/m). */
+const JOINTS_X: number[] = (() => {
+  const out: number[] = [];
+  for (let x = X0 - 400; x < X1 + 120; x += 75) out.push(x);
+  return out;
+})();
+/** The joints' tones: the receding ones a visible joint (dL* 9, CRAFT §f.4: >= 6 reads), the level ones a soft one (dL* 5)
+ *  so the rows foreshorten without stacking the ground into level bands. */
+const JOINT_DEEP = seamTone(CM.paving, 9);
+const JOINT_SOFT = seamTone(CM.paving, 5);
+
+function groundInto(b: Batch) {
   b.rect(CM.paving, X0, FOOT, X1 - X0, COP - FOOT + 1);
-  // the walls' short shadow along their foot, moss in the angle
-  b.rect(CM.stoneShade, X0, FOOT, X1 - X0, 7);
-  for (let x = X0 + r.range(0, 40); x < X1; x += r.range(40, 110)) b.fill(CM.sage, lobes(x, x + r.range(10, 24), FOOT + 3, r.range(5, 9), `s4moss${x.toFixed(0)}`, 2));
-  // repaired patches and odd slabs
-  for (let k = 0; k < 16; k++) {
-    const x = r.range(X0, X1 - 80);
-    const y = r.range(FOOT + 10, COP - 22);
-    const w = r.range(30, 76);
-    const h = lerp(10, 18, (y - FOOT) / (COP - FOOT));
-    b.poly(r.pick([CM.limestone, CM.stucco, CM.limestone, CM.stoneShade]), [[x, y], [x + w, y + r.jitter(1)], [x + w + 3, y + h], [x + 2, y + h]]);
-  }
   b.layer();
-  // slab joints: soft thin shade strips (no lines on the ground), rows widening toward us, broken, never a grid
-  const rows = [FOOT + 16, FOOT + 34, FOOT + 54, COP - 3];
-  rows.forEach((yy, i) => {
-    let x = X0 + r.range(0, 50);
-    while (x < X1) {
-      const L = r.range(60, 150);
-      if (r.chance(0.6)) b.poly(CM.stoneShade, [[x, yy], [x + L, yy + r.jitter(0.8)], [x + L, yy + 1.6 + i * 0.3], [x, yy + 1.6 + i * 0.3]]);
-      const prev = i === 0 ? FOOT + 6 : rows[i - 1] + 2;
-      if (r.chance(0.45)) {
-        const cx = x + L * 0.5;
-        b.poly(CM.stoneShade, [[cx, prev], [cx + 1.6, prev], [cx + 1.6 - i * 1.4, yy], [cx - i * 1.4, yy]]);
-      }
-      x += L + r.range(24, 70);
-    }
-  });
-  // drain grate and a manhole cover
-  b.poly(CM.stoneShade, [[456, 1050], [496, 1050], [494, 1060], [458, 1060]]);
-  let gr = '';
-  for (let k = 1; k < 7; k++) gr += `M${P(456 + k * 5.7, 1051)}L${P(457 + k * 5.6, 1059)}`;
-  b.ink(gr, 1, CM.shadeCool);
+  // the level joints: thin soft bands, narrowing with distance
+  for (const y of ROWS_Y) {
+    const w = 1.2 + 1.1 * ((y - FOOT) / (COP - FOOT));
+    b.rect(JOINT_SOFT, X0, y - w / 2, X1 - X0, w);
+  }
+  // a manhole cover and a drain grate: flat foreshortened shapes on the flags (no hatching)
   b.poly(CM.stoneShade, [[920, 1026], [978, 1026], [982, 1044], [916, 1044]]);
   b.poly(CM.limestone, [[925, 1029], [973, 1029], [976, 1041], [922, 1041]]);
-  let mh = '';
-  for (let k = 0; k < 6; k++) mh += `M${P(927 + k * 8.5, 1030)}L${P(925 + k * 8.5, 1040)}`;
-  b.ink(mh, 0.9, CM.shadeCool);
-}
-
-function leavesInto(b: Batch) {
+  b.poly(CM.stoneShade, [[456, 1050], [496, 1050], [494, 1060], [458, 1060]]);
+  b.layer();
+  // a few fallen leaves lying flat (sized by distance: 13 px far, 19 px near)
   const r = rng('s4pleaves');
-  for (let i = 0; i < 46; i++) {
-    const y = r.range(FOOT + 6, COP - 4);
-    const s = lerp(7, 12, (y - FOOT) / (COP - FOOT));
-    b.fill(r.pick([CM.leafGold, CM.leafRust, CM.coatMustard, CM.leafGold]), leafPath(r.range(X0, X1), y, s, s * 0.36, r.range(-40, 40)));
+  for (let i = 0; i < 7; i++) {
+    const y = r.range(FOOT + 10, COP - 6);
+    const s = 13 + 6 * ((y - FOOT) / (COP - FOOT));
+    b.fill(i % 2 ? CM.leafGold : CM.leafRust, leafPath(r.range(X0 + 60, X1 - 60), y, s, s * 0.34, r.range(-30, 30)));
   }
-}
-
-function copingInto(b: Batch) {
-  const r = rng('s4cop');
+  b.layer();
+  // the coping: one stone band, its lip in shade toward the water
   b.rect(CM.limestone, X0, COP, X1 - X0, EDGE - COP);
   b.rect(CM.stoneShade, X0, EDGE - 4, X1 - X0, 4);
-  for (let x = X0 + r.range(20, 60); x < X1; x += r.range(60, 110)) b.rect(CM.stoneShade, x, COP + 1, 1.6, EDGE - COP - 4);
-  b.ink(line(X0, COP, X1, COP, {...CLEAN, seed: 's4coplip'}), WINK.props, CM.ink, 0.1);
-  // mooring rings on the coping face, cast-iron bollards on top
-  let rings = '';
-  for (const x of [262, 520, 868, 1236]) rings += circleInk(x, COP + 6, 4.6, {seed: `s4ring${x}`});
-  b.ink(rings, 1.5, CM.anchor);
-  for (const x of [150, 792, 1122]) {
-    b.poly(CM.stoneShade, [[x - 9, COP + 1], [x + 9, COP], [x + 9 + SHADOW.len * 0.7, COP + 5], [x - 4 + SHADOW.len * 0.6, COP + 7]]);
-    bollardInto(b, x, COP + 2, 26, `s4bol${x}`);
-  }
 }
 
-// ---------------------------------------------------------------- furniture
+/** The receding joints at film t: each joint's near end rides the plane (1.0x), its far end the wall foot's depth
+ *  (0.75x), so every joint runs to the fixed vanishing point (540, 760) on screen. Plane px (drawn inside the plane's
+ *  slide `dx`). */
+function jointsBatch(dx: number): Batch {
+  const b = new Batch();
+  const k = Z_NEAR / Z_FAR;
+  const [vx] = S4_CAM.vp;
+  for (const xn of JOINTS_X) {
+    const sn = xn + dx;
+    const sf = vx + (sn - vx) * k;
+    if (Math.max(sn, sf) < -20 || Math.min(sn, sf) > 1100) continue;
+    const xf = sf - dx;
+    const wn = 2.6;
+    const wf = wn * k;
+    b.poly(JOINT_DEEP, [[xn - wn / 2, COP], [xn + wn / 2, COP], [xf + wf / 2, FOOT], [xf - wf / 2, FOOT]]);
+  }
+  return b;
+}
+
+// ---------------------------------------------------------------- furniture (flat, mid tones, no ink)
 
 const LAMPS = [{x: 40, h: 290}, {x: 905, h: 290}, {x: 1392, h: 290}];
+const LAMP_FOOT = 1064;
+const BOLLARDS = [150, 792, 1122];
+const PLANTER = {x0: 146, x1: 236, y: 1006, h: 40};
+const BIN = {x: 482, y: 1012, h: 48};
+const BUOY = {x: 1086, y: 1068, cy: 1030};
 
-function furnitureInto(b: Batch) {
-  const sh = (x: number, y: number, w: number, len: number = SHADOW.len) => b.poly(CM.stoneShade, [[x - w / 2, y - 1], [x + w / 2, y - 2], [x + w / 2 + len, y + 4], [x - w / 2 + len * 0.85, y + 6]]);
-  for (const l of LAMPS) sh(l.x, 1062, 16, 30);
-  // planters of grasses at the wall foot (one under the plates, one by the far gate)
-  sh(190, 1006, 90);
-  // the litter bin (short: it never reaches the plates)
-  sh(482, 1012, 26);
-  // the lifebuoy post near the coping
-  sh(1086, 1068, 10, 22);
+/** A heritage lamp post (off: the low sun): plinth, column, ladder bar, lantern glass, cap and finial; one calm mid
+ *  slate, no ink (a thin dark lamp post reads as a line: CRAFT §c). */
+function lampInto(b: Batch, x: number, y: number, h: number) {
+  const cw = Math.max(2.5, h * 0.034);
+  b.fill(S4_IRON, `M${P(x - cw * 1.6, y)}L${P(x - cw * 1.2, y - h * 0.08)}L${P(x + cw * 1.2, y - h * 0.08)}L${P(x + cw * 1.6, y)}Z`);
+  b.fill(S4_IRON, `M${P(x - cw * 0.7, y - h * 0.08)}L${P(x - cw * 0.45, y - h * 0.8)}L${P(x + cw * 0.45, y - h * 0.8)}L${P(x + cw * 0.7, y - h * 0.08)}Z`);
+  b.rect(S4_IRON, x - cw, y - h * 0.36, cw * 2, Math.max(2.4, h * 0.018));
+  b.rect(S4_IRON, x - cw * 2.6, y - h * 0.79, cw * 5.2, Math.max(2.4, h * 0.012));
+  const lb = y - h * 0.82;
+  const lt = y - h * 0.94;
+  b.fill(CM.glass, `M${P(x - cw * 1.5, lb)}L${P(x - cw * 2.4, lt)}L${P(x + cw * 2.4, lt)}L${P(x + cw * 1.5, lb)}Z`);
+  b.fill(S4_IRON, `M${P(x - cw * 2.8, lt)}L${P(x, lt - h * 0.045)}L${P(x + cw * 2.8, lt)}Z`);
+  b.fill(S4_IRON, ovalPath(x, lt - h * 0.055, cw * 0.6, cw * 0.7));
+}
+
+/** A cast-iron mooring bollard on the coping (a calm slate, its form step from the light layer). */
+const bollardD = (x: number, y: number, h: number) => {
+  const w = h * 0.9;
+  return `M${P(x - w * 0.42, y)}L${P(x - w * 0.3, y - h * 0.55)}L${P(x - w * 0.42, y - h * 0.78)}Q${P(x, y - h * 1.08)} ${P(x + w * 0.42, y - h * 0.78)}L${P(x + w * 0.3, y - h * 0.55)}L${P(x + w * 0.42, y)}Z`;
+};
+const binD = () => {
+  const {x, y, h} = BIN;
+  const w = h * 0.62;
+  return `M${P(x - w / 2, y - h * 0.86)}Q${P(x, y - h * 1.02)} ${P(x + w / 2, y - h * 0.86)}L${P(x + w * 0.44, y)}L${P(x - w * 0.44, y)}Z`;
+};
+const planterD = () => `M${P(PLANTER.x0, PLANTER.y - PLANTER.h)}L${P(PLANTER.x1, PLANTER.y - PLANTER.h)}L${P(PLANTER.x1, PLANTER.y)}L${P(PLANTER.x0, PLANTER.y)}Z`;
+
+/** The far furniture (the wall side: drawn before the walkers pass in front of it). */
+function farThingsInto(b: Batch) {
+  b.fill(S4_WOOD, planterD());
+  b.fill(S4_IRON, binD());
   b.layer();
-  planterInto(b, 146, 236, 1006, 40, 's4pl1');
+  b.fill(CM.sage, lobes(PLANTER.x0 + 4, PLANTER.x1 - 4, PLANTER.y - PLANTER.h + 2, PLANTER.h * 1.4, 's4pl1/g'));
+  b.rect(CM.coatMustard, BIN.x - BIN.h * 0.22, BIN.y - BIN.h * 0.62, BIN.h * 0.44, BIN.h * 0.08);
+}
 
-  binInto(b, 482, 1012, 48, 's4bin');
-  // a bike leaning on the rendered wall, another locked to the railings by the far gate
-  bikeInto(b, 1342, 1004, 22, 's4bk1', CM.coatMustard, -1);
-  bikeInto(b, 1440, 1000, 21, 's4bk2', CM.brick, 1);
+/** The near furniture (lamps, the lifebuoy post, the bollards, the angler): over the walkers. */
+function nearThingsInto(b: Batch) {
+  for (const l of LAMPS) lampInto(b, l.x, LAMP_FOOT, l.h);
   // the lifebuoy: a short post with a ring (peach and paper quarters, never the sun's orange)
-  const lx = 1086;
-  b.rect(CM.line, lx - 3, 1000, 6, 68);
-  b.rect(CM.line, lx - 10, 1000, 20, 4);
-  const cy = 1030;
+  b.rect(S4_WOOD, BUOY.x - 3, 1000, 6, BUOY.y - 1000);
+  b.rect(S4_WOOD, BUOY.x - 10, 1000, 20, 4);
+  for (const x of BOLLARDS) b.fill(S4_IRON, bollardD(x, COP + 2, 26));
+  b.layer();
   for (let q = 0; q < 4; q++) {
     const a0 = (q * Math.PI) / 2;
     const a1 = a0 + Math.PI / 2;
     const R = 17;
     const ri = 9;
-    b.fill(q % 2 ? CM.paper : CM.box, `M${P(lx + Math.cos(a0) * R, cy + Math.sin(a0) * R)}A${R} ${R} 0 0 1 ${P(lx + Math.cos(a1) * R, cy + Math.sin(a1) * R)}L${P(lx + Math.cos(a1) * ri, cy + Math.sin(a1) * ri)}A${ri} ${ri} 0 0 0 ${P(lx + Math.cos(a0) * ri, cy + Math.sin(a0) * ri)}Z`);
+    b.fill(q % 2 ? CM.paper : CM.box, `M${P(BUOY.x + Math.cos(a0) * R, BUOY.cy + Math.sin(a0) * R)}A${R} ${R} 0 0 1 ${P(BUOY.x + Math.cos(a1) * R, BUOY.cy + Math.sin(a1) * R)}L${P(BUOY.x + Math.cos(a1) * ri, BUOY.cy + Math.sin(a1) * ri)}A${ri} ${ri} 0 0 0 ${P(BUOY.x + Math.cos(a0) * ri, BUOY.cy + Math.sin(a0) * ri)}Z`);
   }
-  b.ink(circleInk(lx, cy, 17, {seed: 's4buoy', wobble: 0.004}), WINK.props * 0.8, CM.ink);
-}
-
-/** Leaves skittering east along the paving in the wind (life on the ground), and a few falling from the gardens. */
-function blowingInto(b: Batch, t: number) {
-  const r = rng('s4blow');
-  for (let i = 0; i < 6; i++) {
-    const per = r.range(3.2, 5.0);
-    const u = frac(t / per + r.next());
-    const y = r.range(FOOT + 12, COP - 6);
-    const x = lerp(r.range(X0, X1 - 300), r.range(X0, X1 - 300) + 260, u);
-    const hop = Math.abs(Math.sin(u * 14 + i)) * 4;
-    b.fill(i % 2 ? CM.leafRust : CM.leafGold, leafPath(x + 300 * WIND * u * 0.2, y - hop, 9, 3.4 * Math.abs(Math.cos(t * 6 + i)) + 0.8, t * 160 + i * 40));
-  }
-  for (let i = 0; i < 7; i++) {
-    const per = r.range(3.6, 5.6);
-    const u = frac(t / per + r.next());
-    const sx = r.pick([920, 960, 1010, 1240, 1280, 760, 1180]);
-    const x = sx + WIND * u * 70 + Math.sin(u * 8 + i) * 12;
-    const y = lerp(TOP - 70, COP - 6, u);
-    b.fill(i % 2 ? CM.leafGold : CM.coatMustard, leafPath(x, y, 9, 3.2 * Math.abs(Math.cos(t * 5 + i)) + 0.8, t * 120 + i * 50));
-  }
-}
-
-
-/** Pigeons on the garden wall's coping (east of her at the pose): bob, peck, shuffle a step now and then. */
-function wallPigeonsInto(b: Batch, t: number) {
-  const s = 18;
-  const birds = [1002, 1030, 1064].map((x0, i) => {
-    const r = rng(`s4wpig/${i}`);
-    const face = r.chance(0.5) ? 1 : -1;
-    const x = x0 + face * 6 * Math.floor(frac(t / (2.6 + i * 0.7) + r.next()) * 2);
-    const peck = Math.max(0, Math.sin(t * 1.9 + i * 2.1) - 0.55) * 7;
-    return {x, face, peck, by: TOP - 8 - s * 0.34};
-  });
-  for (const p of birds) b.fill(CM.stoneShade, ovalPath(p.x, p.by, s * 0.46, s * 0.3));
   b.layer();
-  for (const p of birds) {
-    b.fill(CM.shadeCool, ovalPath(p.x - p.face * s * 0.08, p.by - s * 0.05, s * 0.28, s * 0.14));
-    b.fill(CM.shadeCool, ovalPath(p.x + p.face * s * 0.38, p.by - s * 0.27 + p.peck, s * 0.15, s * 0.15));
-    b.fill(CM.shadeCool, `M${P(p.x - p.face * s * 0.36, p.by)}L${P(p.x - p.face * s * 0.72, p.by + s * 0.08)}L${P(p.x - p.face * s * 0.34, p.by + s * 0.16)}Z`);
-    b.rect(CM.box, p.x - s * 0.08, TOP - 9, s * 0.06, 2.4);
-    b.rect(CM.box, p.x + s * 0.06, TOP - 9, s * 0.06, 2.4);
-  }
+  anglerInto(b);
 }
+
+/** Everything standing on the towpath that casts (plane px at the pose; the walkers and her are added per frame). */
+const STATIC_STANDERS: Stander[] = [
+  ...LAMPS.map((l) => ({x: l.x, y: LAMP_FOOT, w: 26, h: l.h, w2: 8})),
+  ...BOLLARDS.map((x) => ({x, y: COP + 2, w: 24, h: 24, w2: 18})),
+  {x: (PLANTER.x0 + PLANTER.x1) / 2, y: PLANTER.y, w: PLANTER.x1 - PLANTER.x0, h: PLANTER.h + 20},
+  {x: BIN.x, y: BIN.y, w: BIN.h * 0.6, h: BIN.h},
+  {x: BUOY.x, y: BUOY.y, w: 12, h: 68, w2: 6},
+  {x: 236, y: COP + 4, w: 22, h: 60, w2: 8},
+  ...READER_STANDERS,
+  ...ANGLER_STANDERS,
+  ...POST_STANDERS,
+];
+
+/** The gate piers' casts on the wall face east of them, and the walls' shade band at their foot (the low sun throws
+ *  the wall's shadow a little toward us: ~6 px on the flags at that depth). */
+const WALL_SHADES: string[] = [
+  ...SEGS.filter((s) => s.kind === 'gate').map((s) => `M${P(s.x1, TOP - 4)}L${P(s.x1 + 12, TOP + 2)}L${P(s.x1 + 12, FOOT)}L${P(s.x1, FOOT)}Z`),
+  `M${P(X0, FOOT)}L${P(X1, FOOT)}L${P(X1, FOOT + 6)}L${P(X0, FOOT + 6)}Z`,
+];
+
+/** The towpath's ground shadows at film t: one isolated multiply layer (no double darkening where casts cross). */
+const TowpathShadows: React.FC<{t: number; dx: number}> = ({t, dx}) => {
+  const her: Stander = {x: S4_HER.x - dx, y: S4_HER.feetY, w: S4_HER.h * 0.26, h: S4_HER.h, w2: S4_HER.h * 0.2, person: true};
+  const things = [...STATIC_STANDERS, ...walkerStanders(t), her];
+  return (
+    <ShadowLayer>
+      {WALL_SHADES.map((d, i) => (
+        <Shadow key={`w${i}`} d={d} tint="cast" />
+      ))}
+      {things.map((s, i) => (
+        <React.Fragment key={i}>
+          <ContactShadow x={s.x} y={s.y} w={s.w} k={s.k ?? (s.person ? 1.2 : 1.1)} />
+          {s.h > 0 ? <CastShadow x={s.x} y={s.y} w={s.w2 ?? s.w * 0.8} h={s.h} /> : null}
+        </React.Fragment>
+      ))}
+    </ShadowLayer>
+  );
+};
 
 // ---------------------------------------------------------------- the plane
 
 export const PathPlane: React.FC = () => {
   const t = useTime();
-  const stat = useMemo(() => {
+  const dx = s4PlaneDx(S4_K.path, t);
+  const ground = useMemo(() => {
     const b = new Batch();
     wallsInto(b);
     b.layer();
-    pavingInto(b);
-    b.layer();
-    leavesInto(b);
-    copingInto(b);
-    b.layer();
-    furnitureInto(b);
+    groundInto(b);
     return b;
   }, []);
-  const dyn = new Batch();
-  benchReaderInto(dyn, t);
-  dyn.layer();
-  anglerInto(dyn, t);
-  dyn.layer();
-  blowingInto(dyn, t);
-  dyn.layer();
-  wallPigeonsInto(dyn, t);
+  const far = useMemo(() => {
+    const b = new Batch();
+    farThingsInto(b);
+    return b;
+  }, []);
+  const bench = useMemo(() => {
+    const b = new Batch();
+    benchReaderInto(b);
+    return b;
+  }, []);
+  const near = useMemo(() => {
+    const b = new Batch();
+    nearThingsInto(b);
+    return b;
+  }, []);
   return (
     <>
-      <Paint b={stat} seed="s4pathSt" />
-      {LAMPS.map((l) => (
-        <Lamp key={l.x} x={l.x} y={1064} h={l.h} seed={`s4lamp${l.x}`} />
-      ))}
-      <Paint b={dyn} seed="s4pathDyn" />
-      <Heron x={236} y={COP + 4} h={96} face={1} turnAt={18.5} seed="s4heron" />
+      <Paint b={ground} seed="s4pathGround" misreg={false} />
+      <Paint b={jointsBatch(dx)} seed="s4pathJoints" misreg={false} />
+      <TowpathShadows t={t} dx={dx} />
+      <Paint b={far} seed="s4pathFar" misreg={false} />
+      <S4FormShades ds={[planterD(), binD()]} />
+      <Walkers />
+      <Paint b={bench} seed="s4pathBench" misreg={false} />
+      <Paint b={near} seed="s4pathNear" misreg={false} />
+      <S4FormShades ds={BOLLARDS.map((x) => bollardD(x, COP + 2, 26))} />
+      <Heron x={236} y={COP + 4} h={96} face={1} turnAt={999} seed="s4heron" />
     </>
   );
 };
