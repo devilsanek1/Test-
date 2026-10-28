@@ -49,8 +49,8 @@ export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
  *            easterly (born 35.70, 36.35, 37.00: the landing hold), fluttering and turning leftward across the lane's open mid ground,
  *            the towpath in front of her house, below the ghosts' feet and Pip's bollard, settling on the near paving
  *    motes   S8 is the mote shot (the sun ahead), sized by distance: FAR 6-10 px backlit in SUN8's light against her
- *            house's shaded facade right of her door, under W; NEAR 12-16 px (lib plane -2, the preset's nearSize)
- *            drifting slowly in front of the cafe boat's shaded cabin side at the left edge, above the owner
+ *            house's shaded facade right of her door, under W (L* ~68); NEAR 12-16 px (lib plane -2, the preset's
+ *            nearSize), 2-3 from the landing, drifting slowly in front of the facade's shaded right end, right of W
  *  No glints: no open water under SUN8 in frame at any pose (the basin is behind the board and the cafe boat).
  *  Nothing is born after 38.60 (nothing enters in the seam's 38.72-39.08); at the un-build they go with the sky, swept
  *  by its contraction into SUN0 (S1's frame 0 has none). Joins: the wipe in (scene 0) and the seam (6.15). */
@@ -62,9 +62,11 @@ const GHOSTS_BOX: [number, number, number, number] = [610, 900, 170, 200];
 const BOARD_BOX: [number, number, number, number] = [100, 670, 590, 600];
 const PIP_BOX: [number, number, number, number] = [640, 1100, 120, 215];
 const SUN8_AT: [number, number] = [MAP.SUN8.x, MAP.SUN8.y];
+/** The near lamp's lantern at the landing (V2S8_set NLAMP): the far motes keep off it. */
+const LANTERN_BOX: [number, number, number, number] = [1024, 800, 48, 90];
 export const S8_PARTICLE_FIELDS: {p: PlaneId; f: ParticlesProps}[] = [
-  {p: 'house', f: {kind: 'motes', seed: 's8motes', region: {rect: [866, 810, 180, 190]}, on: '#C99484', count: 5, atm: S8_ATM, plane: 0, t0: -3, t1: L(38.6), joins: S8_PARTICLE_JOINS, avoid: [CAPTION_BAND, W_BOX, HER_PATH, GHOSTS_BOX], sun: SUN8_AT}},
-  {p: 'board', f: {kind: 'motes', seed: 's8motesNear', plane: -2, region: {ellipse: {cx: 52, cy: 880, rx: 46, ry: 90}}, on: '#9C7E78', count: 3, lift: 18, margin: 12, t0: -3, t1: L(38.6), joins: S8_PARTICLE_JOINS, avoid: [CAPTION_BAND], sun: SUN8_AT}},
+  {p: 'house', f: {kind: 'motes', seed: 's8motes', region: {rect: [866, 810, 150, 190]}, on: '#CD9985', count: 5, atm: S8_ATM, plane: 0, t0: -3, t1: L(38.6), joins: S8_PARTICLE_JOINS, avoid: [CAPTION_BAND, W_BOX, HER_PATH, GHOSTS_BOX, LANTERN_BOX], sun: SUN8_AT}},
+  {p: 'near', f: {kind: 'motes', seed: 's8motesNear', plane: -2, region: {ellipse: {cx: 1005, cy: 745, rx: 38, ry: 45}}, on: '#CD9985', count: 3, lift: 18, margin: 12, t0: S8T.truckT1, t1: L(38.6), joins: S8_PARTICLE_JOINS, avoid: [CAPTION_BAND, W_BOX], sun: SUN8_AT}},
   {p: 'board', f: {kind: 'leaves', seed: 's8leaves', leaf: 'palmate', region: {rect: [1110, 1150, 40, 70]}, on: '#E8D2BF', colors: [CM.leafRust, CM.leafGold, CM.leafRust], births: [L(35.7), L(36.35), L(37.0)], size: [34, 40], speed: [45, 70], drift: [-115, 0], floor: 1430, margin: 12, t0: S8T.wipeT1, t1: L(38.6), joins: S8_PARTICLE_JOINS, avoid: [CAPTION_BAND, BOARD_BOX, PIP_BOX, GHOSTS_BOX], sun: SUN8_AT}},
 ];
 /** The sky's un-build circle (S8Sky's numbers: exit e 0.30 -> 0.92, r 1400 -> 0 easing in, about SUN0). */
