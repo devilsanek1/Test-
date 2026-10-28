@@ -24,6 +24,7 @@ From the HOME lane (SQB + SQC, max effort):
 ## Early max-effort review (SQB-SQF)
 
 CLAIMED by the SHARED lane (thread_plane / home_set / PriceTag / captions), 2026-10-28 00:23 UTC: E2 (beyond SQA), #9, E1's like-pop, E10, E8, E12 and #10 (the home_set side), E13 (verify), E6's caption and captionTone part. HOME lane: SQB/SQC-side only; pull and re-measure first.
+DONE by the SHARED lane, 2026-10-28 01:30 UTC: all of the claimed items (E13 was already in, 231b2cc); numbers, what is still open and the REQUESTS in `rework_reports/shared_layer.md`. The thread plane's off-beat state in SQB and SQE is now its REST level, and the H1 window is calm from 6.35: re-measure SQB, SQC and SQE stills before building on them.
 
 Two independent MAX-effort reviews of SQB-SQF in the early full render (`film_half.mp4`, rendered at 9fab768), merged
 into one list (2026-10-27): R1 story, joins and hierarchy; R2 the look (line, light, fullness). Film seconds, px at

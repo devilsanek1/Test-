@@ -437,6 +437,17 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', s
     const lines = pg.lines.map((ln) => ({...ln, boxes: ln.boxes.map((bx) => (preDrawn.has(bx.hl) ? {...bx, start: -Infinity} : bx))}));
     return {...pg, lines, scrollDur: loopEnd !== undefined ? loopRollDur(loopEnd - pg.start) : undefined};
   });
+  // pop captions: a page after an empty band (the page before it left with `out`) lands ON its first word, never the
+  // page lead before it (v3's J3: "And so do" pops on the cut frame instead of 2 frames into the push's last frames)
+  if (pop) {
+    for (let i = 1; i < pages.length; i++) {
+      if (list[i - 1].out === undefined || list[i] === loopBeat) continue;
+      const s0 = list[i].s;
+      const pg = pages[i];
+      if (!(s0 > pg.start)) continue;
+      pages[i] = {...pg, start: s0, lines: pg.lines.map((ln) => ({...ln, start: Math.max(ln.start, s0), boxes: ln.boxes.map((bx) => ({...bx, start: Math.max(bx.start, s0)}))}))};
+    }
+  }
   const instantUntil = range && isFinite(range[0]) ? range[0] + instantWithin : -Infinity;
   let k = -1;
   for (let i = 0; i < pages.length; i++) if (pages[i].start <= T) k = i;
