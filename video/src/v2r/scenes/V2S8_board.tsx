@@ -1,10 +1,13 @@
 // V2S8 board (lane L6; conform_L6 §3, §4, §8). Everything here rides the BOARD plane (V2S8_depth S8Plane 'board').
 // HER BOARD: lane L5's ONE StatementBoard face at B (the same face, type, light, pen and clack as Google's board in
-// S7, A5), filled with K3's herContent (TXT_HER: SHE SAYS / "talking about facts / is not criticising" / the credit).
-//   33.16 SHE SAYS pops with the clack · a HALF-WIPED menu (a band of smudges left only across the face's lower-left,
-//   where the cafe owner's squeegee rides) · 35.72 the ONE stroke (L5's ragged wipe edge; the squeegee's blade rides it
-//   across the smudges) · 36.54 the credit pops and the quote pens on (36.54-37.10 / 37.20-37.70). Tier: support until
-//   the wipe, then the SUBJECT (its A outline pops on with the stroke, 35.72: THROUGHLINE §4 S8).
+// S7, A5), filled with K3's herContent (TXT_HER: SHE SAYS / "talking about facts / is not criticising" at 60 px, the
+// board's width: the payoff; no credit since REVIEW_1 MUST 3, the post carries it; the caption's page 24 is `@hide`).
+//   33.16 SHE SAYS pops with the clack · a DULL, HALF-WIPED face: the whole face one value step down (L* ~88 vs 96;
+//   REVIEW_1 SHOULD 2 / check_light 34.0: the blank cream face outshone her walk home) with a band of flat pale smears
+//   across its lower-left, where the cafe owner's squeegee rides (no scribbles: they read as a stray squiggle) · 35.72
+//   the ONE stroke (L5's ragged wipe edge; the squeegee's blade rides it across the smudges) wipes the face clean ·
+//   36.54 the quote pens on (36.54-37.10 / 37.20-37.70). Tier: support until the wipe, then the SUBJECT (its A outline
+//   pops on with the stroke, 35.72: THROUGHLINE §4 S8).
 // THE CAFE OWNER (tier B: a small figure in an apron, rear 3/4, no face): stands just LEFT of the board at its depth,
 // between the board and the cafe boat (feet (66, 1258), 210 px: never in front of the face), a long-handled squeegee in
 // both hands; it slides in with the truck (the board plane), rests the blade on the face's lower-left, wipes the ONE
@@ -40,7 +43,7 @@ export const boardIsSubject = (t: number) => t >= S8T.herWords;
 
 const HerBoardS8: React.FC<{t: number}> = ({t}) => (
   <Tier tier={boardIsSubject(t) ? 'subject' : 'support'}>
-    <StatementBoard face={MAP.B} legsTo={MAP.B_LEGS_Y1} clackAt={S8T.she} lines={CONTENT.lines} rules={CONTENT.rules} smudges={SMUDGES} wipe={WIPE} shadow={false} seed="her" />
+    <StatementBoard face={MAP.B} legsTo={MAP.B_LEGS_Y1} clackAt={S8T.she} lines={CONTENT.lines} rules={CONTENT.rules} smudges={SMUDGES} wipe={WIPE} dim={{}} shadow={false} seed="her" />
   </Tier>
 );
 

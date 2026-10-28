@@ -11,13 +11,14 @@
 // Her form shade and rim are V2S8_cast's (they need her drawing); Pip's bollard's form shade is V2S8_board's.
 import React from 'react';
 import {CastShadow, ContactShadow, LightPool, ShadowLayer, WindowSpill, poolUnder, relit} from '../../lib/light';
+import {POP as ROW_POP} from './V2S1_row_fig';
 import {useTime} from '../../lib/time';
 import * as MAP from '../world/map';
 import {B_GEOM} from '../kit/boards';
 import {herAt, lampRunAt, S8T} from './V2S8_clock';
 import {S8Plane} from './V2S8_depth';
 import {OWNER, S8_BOLLARD} from './V2S8_board';
-import {WALKERS, walkerAt} from './V2S8_cast';
+import {WALKERS, s8CopyAt, walkerAt} from './V2S8_cast';
 import {HOUSE_LAMP} from './V2S8_house';
 import {NLAMP} from './V2S8_set';
 
@@ -76,12 +77,13 @@ const HerShadow: React.FC<{t: number}> = ({t}) => {
   return <Stand x={p.x} y={p.y} h={p.h} />;
 };
 
-/** The ghosts: their shadows land with their fill (the pop + 0.06 s, staggered as the kit's S8Ghosts). */
+/** The copies (S1's far-copy figure since REVIEW_1 MUST 6): their shadows land with their fill (RowFigure's pop: the
+ *  outline 0.10 s, the fill 2 frames later), staggered as their pops (V2S8_cast s8CopyAt). */
 const GhostShadows: React.FC = () => (
   <>
     {[...MAP.S8.ghosts].reverse().map((g, j) => {
       const i = MAP.S8.ghosts.length - 1 - j;
-      return <Stand key={g.id} x={g.x} y={g.feetY} h={g.h} at={S8T.cant + i * 0.04 + 0.06} />;
+      return <Stand key={g.id} x={g.x} y={g.feetY} h={g.h} at={s8CopyAt(i) + ROW_POP.outlineS + ROW_POP.fillDelayS} />;
     })}
   </>
 );

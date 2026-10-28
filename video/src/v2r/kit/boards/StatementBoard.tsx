@@ -766,6 +766,8 @@ type PresetBase = {
   /** The face rect (default: the shot's contract face). */
   face?: Rect;
   legsTo?: number;
+  /** The blank face one value step down (StatementBoard `dim`). */
+  dim?: StatementBoardProps['dim'];
   shadow?: string | false;
   /** The shot's start on the caller's clock: every DEFAULT time is t0 + its scene-local default (explicit times are
    *  taken as given). Default 0 (scene-local). */

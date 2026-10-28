@@ -3,9 +3,11 @@
 // (goIn), through the doorway by 34.68 (the closing door leaf, V2S8_house, covers her). Tier A (the subject): the only
 // full outline, her form shade on the side away from the low sun ahead and the RIM along her top and left edge (backlit:
 // CRAFT §d.8, conform_L6 §6). Her contact and cast shadows are V2S8_light's.
-// THE GHOSTS (three, G4-G6's cues) pop on "can't" ahead of her, left of her door, and the truck slides them in front of
-// her shut door (map S8.ghosts, the 240 plane): with her they are the subject while she walks (A, 33.78-34.75), then B
-// with their one closed tinted line (line-drawn figures); they un-build LAST (LateExit).
+// THE COPIES (three) pop on "can't" ahead of her, left of her door, and the truck slides them in front of her shut door
+// (map S8.ghosts, the 240 plane). Since REVIEW_1 MUST 6 they are S1's FAR-COPY FIGURE (V2S1_row_fig RowFigure with
+// ghostSpec(6), the three white-haired copies that pop on "life"): oat coat, white hair, the grey scarf and legs, solid
+// fills, standing; tier B (support, its tinted closed line) beside her A; contact + cast shadows (V2S8_light) land with
+// their fill. Same spots, same pops (0.04 s apart) and ticks. They un-build LAST (LateExit).
 // THE PUBLIC (tier C: no lines, calm): life on the lane at its own planes, crossing SIDEWAYS or walking away (nothing
 // comes at the lens), never teal, never over her, the board text, Pip or the ghosts' heads; <= 3 noticeable supporting
 // movers at once, taking turns; nothing enters in 38.72-39.08 (the seam). The payoff is hers (critic_L6 MUST 2): no
@@ -19,7 +21,11 @@ import {FormShade, Rim} from '../../lib/light';
 import {Tier} from '../../lib/tier';
 import {useTime, clamp} from '../../lib/time';
 import {CM} from '../palette';
-import {Her, Person, S8Ghosts, strideFor, FarCrowd, type FarSpot, type TraitOverrides} from '../kit/cast';
+import {Her, Person, strideFor, FarCrowd, type FarSpot, type TraitOverrides} from '../kit/cast';
+import * as MAP from '../world/map';
+import {INK_PX} from '../palette';
+import {RowFigure} from './V2S1_row_fig';
+import {ghostSpec} from './V2S1_row';
 import {herAt, herStep, S8T, S8_START, L} from './V2S8_clock';
 import type {PlaneId} from './V2S8_clock';
 import {S8Plane} from './V2S8_depth';
@@ -53,21 +59,26 @@ export const S8Her: React.FC = () => {
 
 // ---------------------------------------------------------------- the ghosts
 
-/** With her, the ghosts are the subject while she walks home (their pop on "can't" to her door shutting). */
+/** S1's far-copy figure (G6: white hair, the oat coat, the grey scarf and legs). */
+const COPY_SPEC = ghostSpec(6);
+/** The three pops on "can't", 0.04 s apart from the far one (as the kit's S8Ghosts staggered them). */
+export const S8_COPY_STAGGER = 0.04;
+export const s8CopyAt = (i: number) => S8T.cant + i * S8_COPY_STAGGER;
+/** RETIRED (REVIEW_1 MUST 6: the copies are tier B throughout, beside her A): kept for old readers. */
 export const GHOSTS_A: [number, number] = [S8T.cant, S8T.doorShuts];
-export const S8GhostsLayer: React.FC = () => {
-  const t = useTime();
-  const a = t >= GHOSTS_A[0] && t < GHOSTS_A[1];
-  return (
-    <LateExit>
-      <S8Plane p="ghosts">
-        <Tier tier={a ? 'subject' : 'support'} lines>
-          <S8Ghosts at={S8T.cant} dx={0} view="back" stagger={0.04} />
-        </Tier>
-      </S8Plane>
-    </LateExit>
-  );
-};
+export const S8GhostsLayer: React.FC = () => (
+  <LateExit>
+    <S8Plane p="ghosts">
+      <Tier tier="support" lines>
+        {[...MAP.S8.ghosts].reverse().map((g, j) => {
+          const i = MAP.S8.ghosts.length - 1 - j;
+          // standing: stride 0 at a whole step (the feet together under the hips, no lift, no roll)
+          return <RowFigure key={g.id} seed={`s8copy/${g.id}`} spec={COPY_SPEC} x={g.x} y={g.feetY} h={g.h} step={1} stride={0} inkPx={INK_PX.mid} at={s8CopyAt(i)} knockout={false} misregX={0.3} />;
+        })}
+      </Tier>
+    </S8Plane>
+  </LateExit>
+);
 
 // ---------------------------------------------------------------- the public
 

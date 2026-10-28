@@ -308,6 +308,27 @@ export const DECK_SHADE: string[] = (() => {
   return [smoothClosed(outerA) + holes, smoothClosed([...B, [1200, 2030]])];
 })();
 
+/** The near paving's lit zone ONE value step down (REVIEW_1 SHOULD 3 / check_light FAIL f1404: at the landing the lit
+ *  terrace below the subject outshone the Pentagon): the floor nearer than a soft lobed edge across the deck (END y
+ *  ~1395, under the header course and the plaque), drawn as the rig's AMBIENT tint in its own ShadowLayer BEFORE the
+ *  deck's shade (the shade multiplies over it: the dapple keeps its contrast, a step deeper). It reads as the shade of
+ *  the terrace's near trees behind the lens; far below the frame at the start (2.42x about the slot). Static. */
+export const NEAR_AMBIENT: string = (() => {
+  const edge = lobedEdge(
+    [
+      [-140, 1412],
+      [240, 1402],
+      [620, 1394],
+      [900, 1388],
+      [1200, 1382],
+    ],
+    9,
+    110,
+    's5deck/nearAmb',
+  );
+  return smoothClosed([...edge, [1200, 2030], [-140, 2030]]);
+})();
+
 /** Renders a list of [colour, path] as exact backdrop fills (no misregistration; the colours are already calm). */
 const FlatFills: React.FC<{fills: Layer; seed: string}> = ({fills, seed}) => (
   <>
