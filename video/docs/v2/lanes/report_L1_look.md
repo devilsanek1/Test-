@@ -10,10 +10,11 @@ after the critic and after the cold viewer, then this clip).
 
 ## v4: the art director's list on v3, in one pass (2026-10-28)
 **The clip:** `video/deliverables/v2/v2r_G4_look_v4.mp4`, the master encode (PNG frames, BT.709, x264 CRF 14 slow
-aq-mode 3, yuv420p). Frames 0-367 (0.00-6.13 s), 1080x1920, 60 fps, with the current mix, 3.9 MB.
+aq-mode 3, yuv420p). Frames 0-367 (0.00-6.13 s), 1080x1920, 60 fps, with the current mix, 3.8 MB. It is rendered on
+top of the sky critic's b6861a5 (S1_EVENING's sun warmth lower and wider, 340x153), so it shows S1's current sky.
 **The sheet:** `video/deliverables/v2/v2r_G4_look_v4_sheet.jpg` (0.4 scale, every 0.25 s).
 Commits: 02e0c9c (the far city, the wing, the canal), f48a342 (the terrace, the particles), a50f725 (the depth sheets),
-bc9d11f and ab8f872 (two fixes the first v4 render's checks found, below).
+bc9d11f and ab8f872 (two fixes the first v4 render's checks found, below), then this clip.
 
 **MUST**
 1. **The sun's tooth is gone.** One level roof edge runs under the sun: the near far-roof is a flat roof at y 758 from
@@ -84,43 +85,48 @@ bc9d11f and ab8f872 (two fixes the first v4 render's checks found, below).
   value step with its hue turned 50° the warm way round (lavender → rose → peach), C* >= 10.
 
 **Checks (on the master)**
-- **check_banding** on the open sky (x 0-160 y 262-700, x 1005-1080 y 0-590) at 0.5, 3.0 and 5.3 s: **PASS** every time.
+- **check_banding** at 0.5, 3.0 and 5.3 s, on my two open-sky regions and the sky critic's three (`skies.ts`):
 
-  | | value |
-  |---|---|
-  | staircase | 0.02-0.13 |
-  | max step dE00 | 0.36-0.72 |
-  | grain | 0.21-0.23 L* |
-  | caption band dL* | 0.01-0.02 (L* 84.8) |
+  | region | verdict | max step dE00 | staircase | grain L* |
+  |---|---|---|---|---|
+  | x 0-160 y 262-700 | PASS x3 | 0.42-0.72 | 0.03-0.05 | 0.20 |
+  | x 1005-1080 y 0-590 | PASS x3 | 0.36-0.53 | 0.05-0.13 | 0.22-0.23 |
+  | the west gap, 0,560,250,712 | PASS x3 | 0.12-0.29 | 0.00 | 0.31 |
+  | the zenith, 400,0,1080,170 | PASS x3 | 0.25-0.26 | 0.05-0.08 | 0.29 |
+  | the band, 0,270,1080,560 | PASS at 3.0 and 5.3, WARN at 0.5 | 1.15-1.40 | 0.02-0.05 | 0.15-0.16 |
 
+  The caption band stays flat: dL* 0.01-0.02 at L* 84.8. The one step at 0.5 s (x 512-576, y 467) is the caption
+  line "She quit Google." (its "quit" highlight), not the sky; that line is gone by 3.0 s.
+- **skyProblems(S1_EVENING, {ink}):** [] on the merged sky.
 - **check_depth: 0 FAIL, 5 WARN** at 5.4 s and at 3.0 s. The sheets' wing outline now follows the end wall's edge
-  (x 314) and the sloped top; the old outline FAILs on v4, the new one on v3.
+  (x 314) and the sloped top; the old outline FAILs on v4, the new one on v3. Their air is S1_AIR's new #FDD6B8.
 
   | at 5.4 s | v4 | v3 |
   |---|---|---|
-  | the wing's west edge, median \|ΔL*\| (OK) | 13.8 | 14.9 |
-  | her (OK) | 22.1 | 25.4 |
+  | the wing's west edge, median \|ΔL*\| (OK) | 13.9 | 14.9 |
+  | her (OK) | 22.2 | 25.4 |
   | subject's plane → +3 (WARN, needs 12) | **9.4** | 7.7 |
-  | the copies' row (WARN, needs 15) | 8.5 | 10.4 |
+  | the copies' row (WARN, needs 15) | 8.3 | 10.4 |
   | front row (+3) dE from the air | 12.4 | 12.3 |
-  | farthest plane (+4) dE from the air | 10.3 | 10.2 |
+  | farthest plane (+4) dE from the air | 10.4 | 10.2 |
 
-  At 3.0 s the wing is 13.7, her 22.1, and G1-G2 **9.1** (6.4 on v3's frame; WARN, needs 12).
+  At 3.0 s the wing is 13.8, her 22.4, and G1-G2 **10.2** (6.4 on v3's frame; WARN, needs 12; a GrabCut box, which
+  moves by a point or two with small changes behind the copies).
 - **check_light A/B** at 0.5, 3.0 and 5.3 s: **OK** every time.
-  - The brightest 5 % sits 0.042-0.053 H from the subject.
+  - The brightest 5 % sits 0.045-0.058 H from the subject.
   - Greyed: 39 / 123 / 80 px (v3: 123 / 220 / 158).
   - The caption band stays flat (spread 0.0).
 - **particleProblems** and **floatProblems**: clean. Typecheck clean.
 
 **WARNs left**
-- **The copies' row (8.5).** The coats now step off the glazed ground storey behind them by ~7 L*: oat L* 84-85
+- **The copies' row (8.3).** The coats now step off the glazed ground storey behind them by ~7 L*: oat L* 84-85
   against the unlit glass, which went from L* 86.7 to 77.7 in the shade (v3: ~2). But the row's whole outline also has
   dark heads and legs, and those now sit on a darker wall, so the median fell.
   - **A next step if you want the row to read by value:** the ground storey's unlit panes one step deeper (glass in
     shade reads dark). At L* ~70 the coats step ~14. It changes the window life, so it is not in this pass.
-- **Her (22.1, OK, down from 25.4):** the same shade sits behind her dark coat.
-- **The ladder:** +4 is not 3 closer to the air than +3 (10.3 against 12.4).
-- **The far plane's edges:** 0.88x the subject plane's.
+- **Her (22.2, OK, down from 25.4):** the same shade sits behind her dark coat.
+- **The ladder:** +4 is not 3 closer to the air than +3 (10.4 against 12.4).
+- **The far plane's edges:** 0.87x the subject plane's.
 - **The bank's texture gradient:** the near half's big things add crossings.
 
 **REQUESTS**
@@ -136,8 +142,8 @@ bc9d11f and ab8f872 (two fixes the first v4 render's checks found, below).
       `birdsLiftBridge` to ~1.50.
 - **`src/v2r/world/rigs.ts`:** a `water` tint in TINT_CANAL (`tintFor(CM.water, CM.waterDeep)`), so every lane's
   waterline strips stay teal. The rig's rose family greys teal water. V2S1_light holds it locally for now.
-- **`src/v2r/world/skies.ts`:** the banding note's region (0,0,330,712) takes in the plane branch, the cloud bar, the
-  tower and the sun, and FAILs on their edges. The open-sky regions above are the ones to measure.
+- (The skies.ts banding region I meant to flag, 0,0,330,712, is already replaced by the sky critic's open-sky regions
+  in b6861a5.)
 
 ---
 
