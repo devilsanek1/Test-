@@ -1,25 +1,31 @@
 // V2S5_deck_props.tsx (lane L4, TERRACE): the terrace's built things in END coords (deck plane), each a static Batch
-// with the screen y of its foot (for depth sorting with the people):
+// with the screen y of its foot (for depth sorting with the people) and its LIGHT (lib/light, drawn by S5Deck in the
+// deck's ONE ShadowLayer: contact strips, casts along the rig's sun, the shade under a seat; never a hand-picked dark fill):
 //   the BALUSTRADE (the one level line, authored x -1100..2200: past both edges at every p), the STRANGER'S BENCH in
-//   two parts (UNDER the figures: the top rail's right half, Pip's perch, and the shadow; OVER the figures: the top
-//   rail's left half across the stranger's back, the iron ends, the seat's back edge), park benches (one family: plum
-//   cast-iron ends, a brick top rail, an OPEN back), a bin, a drinking fountain, raised tulip beds, a crabapple planter,
-//   a bike leaning on the balustrade, a viewpoint lectern (a panorama relief, no words), the stranger's tote.
-// Light: the low morning sun is beyond the view (right): tops and right sides lit, faces toward us in shade, cast
-// shadows toward us. Ink by depth on the deck (front 3.4 at the near things, 2.2-1.6 at the rail).
-import React from 'react';
+//   two parts (UNDER the figures: the top rail's right half, Pip's perch; OVER the figures: the top rail's left half
+//   across the stranger's back, the iron ends, the seat's back edge), park benches (one family: plum cast-iron ends, a
+//   brick top rail, an OPEN back), a bin, a drinking fountain, raised tulip beds (calm colour drifts), a crabapple
+//   planter, a bike leaning on the balustrade (its frame and wheels ARE lines: `thing`), a viewpoint lectern (no words),
+//   the stranger's tote. Tier C (V2S5_set wraps the deck in the environment tier): no outlines; lines that are the
+//   thing stay as hairlines.
 import {CM} from '../palette';
-import {Batch, mix, crownD, ellD, lineD, polyD, rng, smoothClosed, circleD, blossomD, type Pt} from '../kit/dc/core';
+import {Batch, mix, crownD, ellD, lineD, polyD, rng, smoothClosed, blossomD, type Pt} from '../kit/dc/core';
 import {CAM, dpt, pxmD, RAIL, DT, SPOT} from './V2S5_deck_cam';
 
-export type Prop = {y: number; b: Batch; key: string};
-
-const P2 = (a: Pt, b: Pt): Pt => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+/** A prop's light (END coords): contact strips (an ellipse footprint, or a path), casts (a footprint swept along the
+ *  rig's sun, `h` px tall), extra flat shade shapes (the floor under a seat). */
+export type PropLight = {
+  contact?: {x: number; y: number; w: number; h?: number; k?: number; d?: string}[];
+  cast?: {x: number; y: number; w: number; h: number; depth?: number; pts?: Pt[]}[];
+  shade?: {d: string; tint?: 'cast' | 'contact' | 'form'; soft?: number}[];
+};
+export type Prop = {y: number; b: Batch; key: string; light?: PropLight};
 
 // ---------------------------------------------------------------- the balustrade
 
 /** The balustrade: plinth, vase balusters every 0.3 m, piers every 3.6 m (one behind the news box, one behind the
- *  plaque), a coping with a lit top. Authored x -1100..2200 at the rail depth. */
+ *  plaque), a coping with a lit top. Authored x -1100..2200 at the rail depth. Part of the set: drawn before the
+ *  deck's shadows (they fall on its plinth too). */
 export function balustrade(): Batch {
   const B = new Batch();
   const d = RAIL.d;
@@ -53,7 +59,7 @@ export function balustrade(): Batch {
     const yb = yCopB + 0.02 * k;
     const ye = yPl - 0.01 * k;
     const h = ye - yb;
-    const body = smoothClosed([
+    lit += smoothClosed([
       [cx - bw * 0.3, yb],
       [cx + bw * 0.3, yb],
       [cx + bw * 0.22, yb + h * 0.22],
@@ -63,7 +69,6 @@ export function balustrade(): Batch {
       [cx - bw * 0.55, yb + h * 0.62],
       [cx - bw * 0.22, yb + h * 0.22],
     ]);
-    lit += body;
     shd += polyD([
       [cx - bw * 0.55, yb + h * 0.5],
       [cx - bw * 0.05, yb + h * 0.42],
@@ -78,38 +83,32 @@ export function balustrade(): Batch {
   let pl = '';
   let ps = '';
   let pc = '';
-  let pInk = '';
   for (const px of pierX) {
     pl += polyD([[px - pw / 2, yTop], [px + pw / 2, yTop], [px + pw / 2, yBase], [px - pw / 2, yBase]]);
     ps += polyD([[px - pw / 2, yTop], [px - pw * 0.12, yTop], [px - pw * 0.12, yBase], [px - pw / 2, yBase]]);
     pc += polyD([[px - pw * 0.62, yTop - 0.09 * k], [px + pw * 0.62, yTop - 0.09 * k], [px + pw * 0.62, yTop + 0.02 * k], [px - pw * 0.62, yTop + 0.02 * k]]);
-    pInk += lineD([[px - pw / 2, yTop + 0.04 * k], [px - pw / 2, yBase]]) + lineD([[px + pw / 2, yTop + 0.04 * k], [px + pw / 2, yPl]]);
   }
   B.fill(DT.stone, pl);
   B.fill(DT.stoneMid, ps);
-  // the coping: front face, lit top, a shadow line under it
+  // the coping: front face, lit top, a shade strip under it
   B.rect(DT.stone, x0, yTop, x1 - x0, yCopB - yTop);
   B.rect(DT.stoneLit, x0, yTop - 1.4, x1 - x0, 2.6);
   B.rect(DT.stoneShade, x0, yCopB, x1 - x0, Math.max(1.2, 0.03 * k));
   B.fill(DT.stoneLit, pc);
-  B.layer();
-  B.ink(lineD([[x0, yCopB], [x1, yCopB]]), 1.8, DT.ink, 0.12);
-  B.ink(lineD([[x0, yTop - 0.4], [x1, yTop - 0.4]]), 1.5, DT.ink, 0.3);
-  B.ink(lineD([[x0, yPl], [x1, yPl]]), 1.4, DT.ink, 0.35);
-  B.ink(pInk, 1.4, DT.ink, 0.2);
   return B;
 }
 
 // ---------------------------------------------------------------- benches (one family)
 
+type BenchO = {x0: number; x1: number; yRail: number; yFeet: number; d: number; part?: 'all' | 'under' | 'over'; split?: number; yBack?: number};
+
 /** A park bench seen from behind (its back toward us): plum cast-iron ends, a brick top rail, an OPEN back (the
- *  sitters' whole backs show), the seat's back edge, the shadow under it. Screen box x0..x1, the top rail's top at
- *  yRail, the back legs' feet at yFeet. `part` splits it for the stranger's bench. */
-export function benchBack(B: Batch, o: {x0: number; x1: number; yRail: number; yFeet: number; d: number; ink: number; part?: 'all' | 'under' | 'over'; split?: number; shadow?: boolean; yBack?: number}) {
-  const {x0, x1, yRail, yFeet, d, ink} = o;
+ *  sitters' whole backs show), the seat's back edge. Screen box x0..x1, the top rail's top at yRail, the back legs'
+ *  feet at yFeet. `part` splits it for the stranger's bench. Its light: `benchLight`. */
+export function benchBack(B: Batch, o: BenchO) {
+  const {x0, x1, yRail, yFeet, d} = o;
   const part = o.part ?? 'all';
   const k = pxmD(d);
-  const H = yFeet - yRail;
   const endW = Math.max(2.2, 0.07 * k);
   const railH = Math.max(2.6, 0.11 * k);
   const seatY = yFeet - 0.45 * k;
@@ -118,42 +117,26 @@ export function benchBack(B: Batch, o: {x0: number; x1: number; yRail: number; y
   const under = part === 'all' || part === 'under';
   const over = part === 'all' || part === 'over';
   if (under) {
-    // under the seat: the plinth (or the floor beyond) in the bench's own shade, then the floor under it, the legs
-    // standing on it, a stretcher; the darkest right under the seat's edge (an open space, never a panel)
-    if (o.shadow !== false) {
-      const yMid = o.yBack === undefined ? seatY : Math.min(yFeet - 0.1 * k, Math.max(seatY + 0.12 * k, o.yBack));
-      if (o.yBack !== undefined) B.fill(mix(DT.stoneMid, CM.shadeWarm, 0.45), polyD([[x0 + endW * 0.5, seatY], [x1 - endW * 0.5, seatY], [x1 - endW * 0.5, yMid], [x0 + endW * 0.5, yMid]]));
-      B.fill(DT.deep, polyD([[x0 + endW * 0.5, yMid], [x1 - endW * 0.5, yMid], [x1 - endW * 0.2, yFeet + 0.015 * k], [x0 + endW * 0.2, yFeet + 0.015 * k]]));
-      B.fill(DT.under, polyD([[x0 + endW * 0.5, seatY], [x1 - endW * 0.5, seatY], [x1 - endW * 0.5, seatY + 0.05 * k], [x0 + endW * 0.5, seatY + 0.07 * k]]));
-      B.fill(DT.deep, polyD([[x0 - 0.03 * k, yFeet], [x1 + 0.06 * k, yFeet], [x1 - 0.02 * k, yFeet + 0.06 * k], [x0 - 0.1 * k, yFeet + 0.07 * k]]));
-      if (o.yBack !== undefined) B.ink(lineD([[x0 + endW, yMid], [x1 - endW, yMid]]), Math.max(0.6, ink * 0.35), DT.under);
-      B.rect(DT.iron, x0 + endW * 0.5, yFeet - 0.17 * k, x1 - x0 - endW, Math.max(1, 0.025 * k));
-      // a middle leg
-      const xm = (x0 + x1) / 2;
-      B.rect(DT.iron, xm - Math.max(1, 0.025 * k), seatY, Math.max(2, 0.05 * k), yFeet - seatY);
-    }
-    // the seat's top (seen from above-behind, beyond its back edge: lit, thin) and a slat line
+    // under the seat: a stretcher and a middle leg (the floor's shade there is the light layer's: benchLight)
+    B.rect(DT.iron, x0 + endW * 0.5, yFeet - 0.17 * k, x1 - x0 - endW, Math.max(1, 0.025 * k));
+    const xm = (x0 + x1) / 2;
+    B.rect(DT.iron, xm - Math.max(1, 0.025 * k), seatY, Math.max(2, 0.05 * k), yFeet - seatY);
+    // the seat's top (seen from above-behind, beyond its back edge: lit, thin)
     B.poly(DT.woodLit, [[x0 + endW * 0.6, seatFrontY], [x1 - endW * 0.6, seatFrontY], [x1 - endW * 0.6, seatY], [x0 + endW * 0.6, seatY]]);
-    B.ink(lineD([[x0 + endW, (seatFrontY + seatY) / 2], [x1 - endW, (seatFrontY + seatY) / 2]]), Math.max(0.6, ink * 0.3), DT.wood);
     // the top rail's part UNDER the figures (Pip's perch): from the split to the right end
     if (split < x1) {
       B.rect(DT.wood, split, yRail, x1 - endW * 0.5 - split, railH);
       B.rect(DT.woodLit, split, yRail - 0.4, x1 - endW * 0.5 - split, Math.max(1, railH * 0.3));
-      B.ink(lineD([[split, yRail], [x1 - endW * 0.4, yRail]]), ink, DT.ink);
-      B.ink(lineD([[split, yRail + railH], [x1 - endW * 0.4, yRail + railH]]), ink * 0.7, DT.ink);
     }
   }
   if (over) {
     B.layer();
     // the seat's back edge (the plank nearest us, at the sitters' hips)
     B.rect(DT.wood, x0 + endW * 0.6, seatY - Math.max(1.4, 0.06 * k), x1 - x0 - endW * 1.2, Math.max(2.2, 0.085 * k));
-    B.ink(lineD([[x0 + endW, seatY + Math.max(0.8, 0.025 * k)], [x1 - endW, seatY + Math.max(0.8, 0.025 * k)]]), ink * 0.6, DT.ink);
     // the top rail's part over the figures (across the stranger's back)
     const xr = Math.min(split, x1 - endW * 0.5);
     B.rect(DT.wood, x0 + endW * 0.5, yRail, xr - x0 - endW * 0.5, railH);
     B.rect(DT.woodLit, x0 + endW * 0.5, yRail - 0.4, xr - x0 - endW * 0.5, Math.max(1, railH * 0.3));
-    B.ink(lineD([[x0 + endW * 0.4, yRail], [xr, yRail]]), ink, DT.ink);
-    B.ink(lineD([[x0 + endW * 0.4, yRail + railH], [xr, yRail + railH]]), ink * 0.7, DT.ink);
     // the cast-iron ends: leg + armrest + the back upright (seen from behind: a slim S), lit edge right
     for (const ex of [x0, x1 - endW]) {
       const arm = seatY - 0.24 * k;
@@ -169,31 +152,55 @@ export function benchBack(B: Batch, o: {x0: number; x1: number; yRail: number; y
       ]);
       B.rect(DT.ironLit, ex + endW * 0.62, yRail + railH, endW * 0.3, yFeet - yRail - railH);
     }
-    B.ink(lineD([[x0, yFeet], [x0 + endW * 0.1, seatY], [x0 - endW * 0.15, seatY - 0.24 * k], [x0, yRail]]), ink * 0.8, DT.ink);
-    B.ink(lineD([[x1, yFeet], [x1 - endW * 0.1, seatY], [x1 + endW * 0.15, seatY - 0.24 * k], [x1, yRail]]), ink * 0.8, DT.ink);
   }
-  void H;
+}
+
+/** A bench's light: the floor (and the plinth behind, for a bench at the rail) under its seat one cast step down, a
+ *  contact strip along its feet, its cast (the seat-and-back block swept along the sun). */
+export function benchLight(o: BenchO): PropLight {
+  const {x0, x1, yFeet, d} = o;
+  const k = pxmD(d);
+  const endW = Math.max(2.2, 0.07 * k);
+  const seatY = yFeet - 0.45 * k;
+  const yTop = o.yBack !== undefined ? seatY : seatY + 0.04 * k;
+  const under = polyD([[x0 + endW * 0.5, yTop], [x1 - endW * 0.5, yTop], [x1 - endW * 0.3, yFeet + 0.01 * k], [x0 + endW * 0.3, yFeet + 0.01 * k]]);
+  // the footprint: the back feet's line (nearest us) to the front feet 0.45 m deeper (higher on screen)
+  const yFront = CAM.hz + (CAM.f * CAM.h) / ((CAM.f * CAM.h) / Math.max(1, yFeet - CAM.hz) + 0.45);
+  const pts: Pt[] = [[x0, yFeet], [x1, yFeet], [x1 - 0.02 * k, yFront], [x0 + 0.02 * k, yFront]];
+  return {
+    shade: [{d: under, tint: 'cast'}],
+    contact: [{x: (x0 + x1) / 2, y: yFeet - 0.5, w: x1 - x0, h: Math.max(5, Math.min(12, 0.16 * k))}],
+    cast: [{x: (x0 + x1) / 2, y: (yFeet + yFront) / 2, w: x1 - x0, h: 0.86 * k, pts}],
+  };
 }
 
 /** The stranger's bench at the rail: top rail's top = Pip's seat, feet at y 1240 (contract). The split sits between
  *  the stranger's paper (START x <= 350) and Pip's left ear (START x >= 360): START x 354 = END 340.5. */
 export const STRANGER_BENCH = {x0: SPOT.bench.x0, x1: SPOT.bench.x1, yRail: SPOT.pipSeat[1], yFeet: SPOT.bench.y1, split: 340.5};
-export function strangerBench(part: 'under' | 'over'): Batch {
-  const B = new Batch();
+const strangerO = (part: 'under' | 'over'): BenchO => {
   const sb = STRANGER_BENCH;
   const d = (CAM.f * CAM.h) / (sb.yFeet - CAM.hz);
+  return {x0: sb.x0, x1: sb.x1, yRail: sb.yRail, yFeet: sb.yFeet, d, part, split: sb.split, yBack: RAIL.base};
+};
+/** The stranger's tote leaning on the bench's left iron end (on the floor). */
+const TOTE = {x: STRANGER_BENCH.x0 - 15, y: STRANGER_BENCH.yFeet - 1};
+export function strangerBench(part: 'under' | 'over'): Batch {
+  const B = new Batch();
   if (part === 'under') {
-    // the stranger's tote leaning on the left iron end (on the floor), its strap
-    const tx = sb.x0 - 15;
-    const ty = sb.yFeet - 1;
+    const {x: tx, y: ty} = TOTE;
     B.poly(CM.coatOat, [[tx, ty], [tx + 1.2, ty - 13], [tx + 13.5, ty - 13.5], [tx + 14.5, ty]]);
     B.poly(mix(CM.coatOat, CM.shadeWarm, 0.3), [[tx, ty], [tx + 1.2, ty - 13], [tx + 4, ty - 13.2], [tx + 3.6, ty]]);
-    B.fill(DT.deep, ellD(tx + 6, ty + 1.2, 10, 2));
-    B.ink(`M${tx + 3.6} ${ty - 13.2}q4 -8 8.4 0`, 1.1, DT.ink);
-    B.ink(lineD([[tx, ty], [tx + 1.2, ty - 13], [tx + 13.5, ty - 13.5], [tx + 14.5, ty]]), 1.0, DT.ink, 0.2);
+    // its strap IS a line (a hairline on the environment tier)
+    B.ink(`M${tx + 3.6} ${ty - 13.2}q4 -8 8.4 0`, 1.1, mix(CM.coatOat, CM.shadeWarm, 0.45), 0, {thing: true});
   }
-  benchBack(B, {x0: sb.x0, x1: sb.x1, yRail: sb.yRail, yFeet: sb.yFeet, d, ink: 1.9, part, split: sb.split, yBack: RAIL.base});
+  benchBack(B, strangerO(part));
   return B;
+}
+/** The stranger's bench's light (and the tote's contact strip). */
+export function strangerBenchLight(): PropLight {
+  const L = benchLight(strangerO('under'));
+  L.contact = [...(L.contact ?? []), {x: TOTE.x + 7, y: TOTE.y + 0.5, w: 14.5, h: 4}];
+  return L;
 }
 
 // ---------------------------------------------------------------- small things on the terrace
@@ -205,12 +212,13 @@ export function parkBench(X0: number, X1: number, d: number, extra?: (B: Batch, 
   const a = dpt(X0, d);
   const b = dpt(X1, d);
   const yRail = dpt(X0, d, 0.92)[1];
-  benchBack(B, {x0: a[0], x1: b[0], yRail, yFeet: a[1], d, ink: k > 75 ? 2.6 : 2.2, part: 'all'});
+  const o: BenchO = {x0: a[0], x1: b[0], yRail, yFeet: a[1], d, part: 'all'};
+  benchBack(B, o);
   if (extra) {
     B.layer();
     extra(B, a, b, k);
   }
-  return {y: a[1], b: B, key: `bench${X0}`};
+  return {y: a[1], b: B, key: `bench${X0}`, light: benchLight(o)};
 }
 
 /** An iron litter bin with a domed lid at (X, d). */
@@ -220,8 +228,6 @@ export function bin(X: number, d: number): Prop {
   const [x, y] = dpt(X, d);
   const w = 0.5 * k;
   const h = 0.95 * k;
-  B.fill(DT.deep, ellD(x - 0.1 * k, y + 0.06 * k, w * 0.75, 0.12 * k));
-  B.layer();
   B.rect(DT.iron, x - w / 2, y - h, w, h);
   B.rect(DT.ironLit, x + w * 0.18, y - h + 2, w * 0.22, h - 2);
   B.fill(DT.iron, `M${x - w * 0.56} ${y - h}Q${x} ${y - h - 0.22 * k} ${x + w * 0.56} ${y - h}Z`);
@@ -229,11 +235,7 @@ export function bin(X: number, d: number): Prop {
   // bands
   B.rect(DT.ironLit, x - w / 2, y - h * 0.82, w, Math.max(1.2, 0.03 * k));
   B.rect(DT.ironLit, x - w / 2, y - h * 0.18, w, Math.max(1.2, 0.03 * k));
-  const ink = k > 75 ? 2.6 : 2.2;
-  B.ink(lineD([[x - w / 2, y], [x - w / 2, y - h], [x + w / 2, y - h], [x + w / 2, y]]), ink, DT.ink, 0.2);
-  // a paper cup on the lid's edge... no: a petal or two on the lid
-  B.fill(DT.petal, ellD(x - w * 0.1, y - h - 0.05 * k, 0.04 * k, 0.02 * k));
-  return {y, b: B, key: `bin${X}`};
+  return {y, b: B, key: `bin${X}`, light: {contact: [{x, y, w}], cast: [{x, y: y - 0.12 * k, w, depth: 0.12 * k, h: h + 0.1 * k}]}};
 }
 
 /** A stone drinking fountain (a fluted column, a round bowl, a step) at (X, d). */
@@ -241,8 +243,6 @@ export function fountain(X: number, d: number): Prop {
   const B = new Batch();
   const k = pxmD(d);
   const [x, y] = dpt(X, d);
-  B.fill(DT.deep, ellD(x - 0.15 * k, y + 0.08 * k, 0.55 * k, 0.14 * k));
-  B.layer();
   // the step
   B.rect(DT.stoneMid, x - 0.38 * k, y - 0.12 * k, 0.76 * k, 0.12 * k);
   B.rect(DT.stone, x - 0.38 * k, y - 0.14 * k, 0.76 * k, 0.04 * k);
@@ -256,16 +256,14 @@ export function fountain(X: number, d: number): Prop {
   B.fill(DT.stone, `M${x - bw / 2} ${y - 0.9 * k}Q${x} ${y - 0.72 * k} ${x + bw / 2} ${y - 0.9 * k}Z`);
   B.fill(DT.stoneLit, ellD(x, y - 0.92 * k, bw / 2, 0.08 * k));
   B.fill(CM.water, ellD(x + 0.02 * k, y - 0.925 * k, bw * 0.36, 0.05 * k));
-  // the spout (iron) and a thin arc of water
+  // the spout (iron)
   B.rect(DT.iron, x - 0.025 * k, y - 1.02 * k, 0.05 * k, 0.1 * k);
-  const ink = k > 75 ? 2.6 : 2.2;
-  B.ink(lineD([[x - cw / 2, y - 0.12 * k], [x - cw / 2, y - 0.86 * k]]) + lineD([[x + cw / 2, y - 0.12 * k], [x + cw / 2, y - 0.86 * k]]), ink, DT.ink, 0.15);
-  B.ink(`M${x - bw / 2} ${y - 0.9 * k}Q${x} ${y - 0.72 * k} ${x + bw / 2} ${y - 0.9 * k}`, ink, DT.ink);
-  return {y, b: B, key: `fountain${X}`};
+  return {y, b: B, key: `fountain${X}`, light: {contact: [{x, y, w: 0.76 * k}], cast: [{x, y: y - 0.1 * k, w: 0.76 * k, depth: 0.14 * k, h: 1.0 * k}]}};
 }
 
-/** A tulip bed at ground level: a low stone edging, soil, broad leaves and tulips planted in colour DRIFTS (a few
- *  strays), heights varying, inside a low iron HOOP fence (ink-only hoops: thin lines); (X0..X1) x (dNear..dFar). */
+/** A tulip bed at ground level: a low stone edging, soil, and the tulips as calm colour DRIFTS (CRAFT §c: big areas
+ *  flat): each drift a lobed leaf mass with a few larger heads in ONE hue at close values, no white sparks; (X0..X1) x
+ *  (dNear..dFar). Its light: a contact strip along the near edging. */
 export function tulipBed(X0: number, X1: number, dNear: number, dFar: number, seed: string): Prop {
   const B = new Batch();
   const kz = 0.08;
@@ -275,80 +273,55 @@ export function tulipBed(X0: number, X1: number, dNear: number, dFar: number, se
   const bt1 = pt(X1, dFar, kz);
   const ft0 = pt(X0, dNear, kz);
   const ft1 = pt(X1, dNear, kz);
+  const fb0 = pt(X0, dNear);
+  const fb1 = pt(X1, dNear);
   const bb0 = pt(X0, dFar);
-  // the edging and the soil
-  B.poly(DT.stoneMid, [ft0, ft1, bt1, bt0]);
+  // the edging (its near face toward us, a lit top) and the soil
+  B.poly(DT.stoneMid, [fb0, fb1, ft1, ft0]);
+  B.poly(DT.stone, [ft0, ft1, bt1, bt0]);
   B.poly(DT.soil, [pt(X0 + kw, dNear - kw, kz), pt(X1 - kw, dNear - kw, kz), pt(X1 - kw, dFar + kw, kz), pt(X0 + kw, dFar + kw, kz)]);
-  B.rect(DT.stone, bt0[0], bt0[1] - 1.2, bt1[0] - bt0[0], 2.2);
   B.layer();
   const r = rng(`s5deck/tul/${seed}`);
-  // the hoop fence along the far edge and both sides (behind the tulips), as ink hoops
-  const hoops = (Xa: number, da: number, Xb: number, db: number) => {
-    let h = '';
-    const n = Math.max(2, Math.round(Math.hypot(Xb - Xa, db - da) / 0.42));
-    for (let i = 0; i < n; i++) {
-      const u0 = i / n;
-      const u1 = (i + 1) / n;
-      const A = pt(Xa + (Xb - Xa) * u0, da + (db - da) * u0);
-      const Bp = pt(Xa + (Xb - Xa) * u1, da + (db - da) * u1);
-      const k = pxmD(da + (db - da) * (u0 + u1) / 2);
-      h += `M${A[0].toFixed(1)} ${A[1].toFixed(1)}Q${((A[0] + Bp[0]) / 2).toFixed(1)} ${((A[1] + Bp[1]) / 2 - 0.62 * k).toFixed(1)} ${Bp[0].toFixed(1)} ${Bp[1].toFixed(1)}`;
-    }
-    return h;
-  };
-  const kInk = pxmD(dNear) > 75 ? 1.8 : 1.5;
-  B.ink(hoops(X0 - 0.06, dFar + 0.06, X1 + 0.06, dFar + 0.06), kInk, DT.iron);
-  // colour drifts along the bed
-  const drifts: {X: number; d: number; col: string}[] = [];
-  for (let i = 0; i < Math.max(3, Math.round((X1 - X0) / 0.5)); i++) drifts.push({X: r.range(X0, X1), d: r.range(dNear, dFar), col: DT.tulips[(i * 3 + r.int(0, 2)) % DT.tulips.length]});
-  const colAt = (X: number, d: number) => {
-    let best = drifts[0];
-    let bd = 1e9;
-    for (const q of drifts) {
-      const dd = (q.X - X) ** 2 + ((q.d - d) * 1.6) ** 2;
-      if (dd < bd) {
-        bd = dd;
-        best = q;
-      }
-    }
-    return r.chance(0.08) ? r.pick(DT.tulips) : best.col;
-  };
+  // drifts: 3-4 along the bed, each a hue
+  const nD = Math.max(3, Math.round((X1 - X0) / 0.75));
+  const hues = [DT.tulipRose, DT.tulipCream, DT.tulipGold, DT.tulipCoral];
   const leafA: string[] = [];
   const leafB: string[] = [];
-  const stems: string[] = [];
   const heads = new Map<string, string>();
   const headsLit = new Map<string, string>();
-  const plants: {x: number; y: number; k: number; hgt: number; col: string}[] = [];
-  for (let d = dFar + kw - 0.06; d > dNear - kw + 0.05; d -= r.range(0.1, 0.16)) {
-    const k = pxmD(d);
-    for (let X = X0 + kw + r.range(0, 0.12); X < X1 - kw - 0.03; X += r.range(0.11, 0.2)) {
-      const [x, y] = pt(X + r.jitter(0.04), d, kz);
-      plants.push({x, y, k, hgt: r.range(0.3, 0.5) * k, col: colAt(X, d)});
+  for (let i = 0; i < nD; i++) {
+    const xa = X0 + kw + ((X1 - X0 - 2 * kw) * i) / nD;
+    const xb = X0 + kw + ((X1 - X0 - 2 * kw) * (i + 1)) / nD;
+    const col = hues[(i + (seed === 'nearR' ? 1 : 0)) % hues.length];
+    // the leaf mass of the drift: one lobed shape from the far edge to the near edge
+    const pts: Pt[] = [];
+    const n = 9;
+    for (let j = 0; j <= n; j++) pts.push(pt(xa + ((xb - xa) * j) / n, dFar + kw, kz + 0.2 + r.range(0, 0.12)));
+    for (let j = n; j >= 0; j--) pts.push(pt(xa + ((xb - xa) * j) / n, dNear - kw, kz + 0.06 + r.range(0, 0.06)));
+    (i % 2 ? leafA : leafB).push(smoothClosed(pts));
+    // the heads: a loose grid, 0.2-0.26 m apart, larger than life (they read at the end)
+    for (let d = dFar + kw - 0.08; d > dNear - kw + 0.1; d -= r.range(0.2, 0.26)) {
+      const k = pxmD(d);
+      for (let X = xa + r.range(0.04, 0.14); X < xb - 0.06; X += r.range(0.2, 0.26)) {
+        const [x, y] = pt(X + r.jitter(0.03), d, kz);
+        const hgt = r.range(0.32, 0.46) * k;
+        const hw = 0.06 * k;
+        const hx = x;
+        const hy = y - hgt;
+        const hd = `M${hx - hw} ${hy}Q${hx - hw} ${hy - hw * 2.1} ${hx - hw * 0.3} ${hy - hw * 2.3}L${hx} ${hy - hw * 1.7}L${hx + hw * 0.3} ${hy - hw * 2.3}Q${hx + hw} ${hy - hw * 2.1} ${hx + hw} ${hy}Q${hx} ${hy + hw * 0.8} ${hx - hw} ${hy}Z`;
+        heads.set(col, (heads.get(col) ?? '') + hd);
+        if (k > 70) headsLit.set(col, (headsLit.get(col) ?? '') + ellD(hx + hw * 0.36, hy - hw * 1.2, hw * 0.3, hw * 0.62));
+      }
     }
-  }
-  for (const p of plants) {
-    const {x, y, k, hgt} = p;
-    const lean = r.jitter(0.04) * k;
-    (r.chance(0.5) ? leafA : leafB).push(polyD([[x - 0.05 * k, y], [x - 0.12 * k + lean, y - hgt * 0.45], [x - 0.01 * k, y - hgt * 0.18]]));
-    (r.chance(0.5) ? leafA : leafB).push(polyD([[x + 0.04 * k, y], [x + 0.11 * k + lean, y - hgt * 0.52], [x + 0.01 * k, y - hgt * 0.22]]));
-    stems.push(lineD([[x, y - hgt * 0.15], [x + lean * 0.5, y - hgt]]));
-    const hw = 0.048 * k;
-    const hx = x + lean * 0.5;
-    const hy = y - hgt;
-    const hd = `M${hx - hw} ${hy}Q${hx - hw} ${hy - hw * 2.2} ${hx - hw * 0.3} ${hy - hw * 2.4}L${hx} ${hy - hw * 1.7}L${hx + hw * 0.3} ${hy - hw * 2.4}Q${hx + hw} ${hy - hw * 2.2} ${hx + hw} ${hy}Q${hx} ${hy + hw * 0.8} ${hx - hw} ${hy}Z`;
-    heads.set(p.col, (heads.get(p.col) ?? '') + hd);
-    if (k > 60) headsLit.set(p.col, (headsLit.get(p.col) ?? '') + ellD(hx + hw * 0.38, hy - hw * 1.25, hw * 0.28, hw * 0.62));
   }
   B.fill(DT.leafShade, leafB.join(''));
   B.fill(DT.leaf, leafA.join(''));
-  B.ink(stems.join(''), Math.max(0.8, pxmD(dNear) * 0.012), DT.leafShade);
   B.layer();
   heads.forEach((d, col) => B.fill(col, d));
-  headsLit.forEach((d, col) => B.fill(mix(col, CM.paper, 0.45), d));
-  B.layer();
-  // the side hoops (in front of the side tulips)
-  B.ink(hoops(X0 - 0.06, dFar + 0.06, X0 - 0.06, dNear - 0.3) + hoops(X1 + 0.06, dFar + 0.06, X1 + 0.06, dNear - 0.3), kInk, DT.iron);
-  return {y: bb0[1], b: B, key: `bed${seed}`};
+  headsLit.forEach((d, col) => B.fill(mix(col, CM.paper, 0.2), d));
+  // the contact strip along the near edging (where the bed meets the paving)
+  const strip = polyD([[fb0[0] - 2, fb0[1] - 1], [fb1[0] + 2, fb1[1] - 1], [fb1[0] + 1, fb1[1] + 5], [fb0[0] - 1, fb0[1] + 5]]);
+  return {y: bb0[1], b: B, key: `bed${seed}`, light: {shade: [{d: strip, tint: 'contact', soft: 2.5}]}};
 }
 
 /** A square stone planter with a small blossoming crabapple (the crown stays under the crane: low). */
@@ -363,49 +336,41 @@ export function crabPlanter(X: number, d: number, seed: string): Prop {
   const bt = dpt(X + w / 2, d, hz);
   const ct = dpt(X - w / 2, d + w, hz);
   const dt = dpt(X + w / 2, d + w, hz);
-  B.fill(DT.deep, polyD([a, b, [b[0] - 0.2 * k, b[1] + 0.4 * k], [a[0] - 0.3 * k, a[1] + 0.4 * k]]));
-  B.layer();
   B.poly(DT.stoneShade, [a, b, bt, at]);
   B.poly(DT.stoneDeep, [a, [a[0] + (b[0] - a[0]) * 0.3, a[1]], [at[0] + (bt[0] - at[0]) * 0.3, at[1]], at]);
   B.poly(X > 0 ? DT.stoneDeep : DT.stoneMid, X > 0 ? [a, dpt(X - w / 2, d + w), ct, at] : [b, dpt(X + w / 2, d + w), dt, bt]);
   B.poly(DT.stone, [at, bt, dt, ct]);
   B.poly(DT.soil, [dpt(X - w / 2 + 0.1, d + 0.1, hz), dpt(X + w / 2 - 0.1, d + 0.1, hz), dpt(X + w / 2 - 0.1, d + w - 0.1, hz), dpt(X - w / 2 + 0.1, d + w - 0.1, hz)]);
-  // trunk + crown (2.0-3.4 m up)
+  // trunk + crown (2.0-3.4 m up): calm (a mid mauve mass, blossom close in value)
   const [tx, ty] = dpt(X, d + w / 2, hz);
   const top = dpt(X, d + w / 2, 3.3);
   const crR = 0.95 * k;
   B.layer();
   B.rect(DT.iron, tx - 0.05 * k, top[1] + crR * 0.6, 0.1 * k, ty - top[1] - crR * 0.6);
-  B.rect(mix(DT.iron, CM.brickDeep, 0.4), tx + 0.01 * k, top[1] + crR * 0.6, 0.03 * k, ty - top[1] - crR * 0.6);
   const cy = top[1] + crR * 0.55;
-  B.fill(mix(CM.shadeWarm, CM.anchor, 0.42), crownD(tx, cy, crR, crR * 0.8, `s5deck/cr${seed}0`, 11, 0.2));
-  B.fill(mix(CM.shadeWarm, CM.blossom, 0.35), crownD(tx + crR * 0.12, cy - crR * 0.08, crR * 0.78, crR * 0.62, `s5deck/cr${seed}1`, 9, 0.2));
-  B.fill(mix(CM.blossom, CM.brickLight, 0.15), crownD(tx + crR * 0.36, cy - crR * 0.28, crR * 0.42, crR * 0.32, `s5deck/cr${seed}2`, 7, 0.2));
+  B.fill(DT.crown, crownD(tx, cy, crR, crR * 0.8, `s5deck/cr${seed}0`, 11, 0.2));
+  B.fill(DT.crownMid, crownD(tx + crR * 0.12, cy - crR * 0.08, crR * 0.78, crR * 0.62, `s5deck/cr${seed}1`, 9, 0.2));
+  B.fill(DT.crownLit, crownD(tx + crR * 0.36, cy - crR * 0.28, crR * 0.42, crR * 0.32, `s5deck/cr${seed}2`, 7, 0.2));
   let fl = '';
   let fs = '';
-  let fw = '';
   const pr = rng(`s5deck/crf${seed}`);
-  for (let i = 0; i < 46; i++) {
+  for (let i = 0; i < 22; i++) {
     const ang = pr.range(0, Math.PI * 2);
-    const dd = Math.sqrt(pr.next()) * 0.92;
+    const dd = Math.sqrt(pr.next()) * 0.86;
     const fx = tx + Math.cos(ang) * crR * dd;
     const fy = cy + Math.sin(ang) * crR * 0.78 * dd;
-    const s = blossomD(fx, fy, crR * pr.range(0.07, 0.12), `s5deck/crb${seed}${i}`, 3);
-    const lit = Math.cos(ang) * 0.6 - Math.sin(ang) * 0.8;
-    if (lit > 0.5 && pr.chance(0.4)) fw += s;
-    else if (lit > -0.1) fl += s;
+    const s = blossomD(fx, fy, crR * pr.range(0.1, 0.15), `s5deck/crb${seed}${i}`, 3);
+    if (Math.cos(ang) * 0.6 - Math.sin(ang) * 0.8 > -0.1) fl += s;
     else fs += s;
   }
-  B.fill(mix(CM.blossom, CM.shadeWarm, 0.32), fs);
-  B.fill(CM.blossom, fl);
-  B.fill(CM.paper, fw);
-  const ink = k > 75 ? 2.6 : 2.2;
-  B.ink(crownD(tx, cy, crR, crR * 0.8, `s5deck/cr${seed}0`, 11, 0.2), ink, DT.ink, 0.45);
-  B.ink(lineD([a, at, bt, b]), ink, DT.ink, 0.2);
-  return {y: a[1], b: B, key: `planter${seed}`};
+  B.fill(DT.crownMid, fs);
+  B.fill(DT.crownFlower, fl);
+  const pts: Pt[] = [a, b, dpt(X + w / 2, d + w), dpt(X - w / 2, d + w)];
+  return {y: a[1], b: B, key: `planter${seed}`, light: {contact: [{x: (a[0] + b[0]) / 2, y: a[1], w: b[0] - a[0]}], cast: [{x: (a[0] + b[0]) / 2, y: a[1], w: b[0] - a[0], h: (hz + 0.6) * k, pts}]}};
 }
 
-/** A bike leaning on the balustrade (profile, facing right), wheels 0.68 m. Ink-only frame, flat tyres. */
+/** A bike leaning on the balustrade (profile, facing right), wheels 0.68 m. Its frame and tyres ARE lines (`thing`:
+ *  hairlines on the environment tier), its basket a flat fill. */
 export function bikeAtRail(X: number): Prop {
   const B = new Batch();
   const d = RAIL.d - 0.35;
@@ -414,31 +379,25 @@ export function bikeAtRail(X: number): Prop {
   const r = 0.34 * k;
   const w0: Pt = [x - 0.52 * k, y - r];
   const w1: Pt = [x + 0.52 * k, y - r];
-  B.fill(DT.deep, ellD(x - 0.1 * k, y + 0.05 * k, 0.7 * k, 0.08 * k));
-  B.layer();
-  // tyres (flat rings: fill a ring as two circles, even-odd not available: draw thick ink)
   const ring = (c: Pt) => `M${c[0] - r} ${c[1]}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`;
-  B.ink(ring(w0) + ring(w1), Math.max(1.4, 0.05 * k), DT.iron);
+  const iron = mix(CM.coatSlate, CM.anchor, 0.25);
+  B.ink(ring(w0) + ring(w1), Math.max(1.4, 0.05 * k), DT.iron, 0, {thing: true});
   const seat: Pt = [x - 0.22 * k, y - 0.98 * k];
   const bar: Pt = [x + 0.38 * k, y - 1.04 * k];
   const crank: Pt = [x - 0.05 * k, y - r * 0.95];
   const frame = lineD([w0, crank, w1]) + lineD([w0, seat, crank]) + lineD([seat, [bar[0] - 0.08 * k, bar[1] + 0.12 * k], w1]) + lineD([[bar[0] - 0.08 * k, bar[1] + 0.12 * k], bar]) + lineD([[seat[0] - 0.08 * k, seat[1] - 0.02 * k], [seat[0] + 0.08 * k, seat[1] - 0.02 * k]]);
-  B.ink(frame, Math.max(1.1, 0.035 * k), mix(CM.coatSlate, CM.anchor, 0.25));
-  B.ink(lineD([[bar[0] - 0.06 * k, bar[1]], [bar[0] + 0.08 * k, bar[1] - 0.02 * k]]), Math.max(1.1, 0.035 * k), DT.ink);
+  B.ink(frame, Math.max(1.1, 0.035 * k), iron, 0, {thing: true});
   // a basket on the front (a sign of care: a few tulips in it)
   B.rect(CM.coatOat, bar[0] - 0.02 * k, bar[1] + 0.06 * k, 0.24 * k, 0.16 * k);
-  B.fill(CM.blossom, ellD(bar[0] + 0.07 * k, bar[1] + 0.05 * k, 0.05 * k, 0.03 * k) + ellD(bar[0] + 0.15 * k, bar[1] + 0.04 * k, 0.04 * k, 0.03 * k));
-  return {y, b: B, key: `bike${X}`};
+  B.fill(DT.tulipRose, ellD(bar[0] + 0.07 * k, bar[1] + 0.05 * k, 0.05 * k, 0.03 * k) + ellD(bar[0] + 0.15 * k, bar[1] + 0.04 * k, 0.04 * k, 0.03 * k));
+  return {y, b: B, key: `bike${X}`, light: {contact: [{x: w0[0], y, w: 0.16 * k, h: 4}, {x: w1[0], y, w: 0.16 * k, h: 4}]}};
 }
 
-/** A viewpoint lectern: an iron post and a slanted panel facing up toward the visitor (us) with a panorama relief
- *  (the skyline's line: an obelisk spike, a dome, low roofs). NO words. */
+/** A viewpoint lectern: an iron post and a slanted panel facing up toward the visitor (us), a bronze-pale face. NO words. */
 export function lectern(X: number, d: number): Prop {
   const B = new Batch();
   const k = pxmD(d);
   const [x, y] = dpt(X, d);
-  B.fill(DT.deep, ellD(x - 0.1 * k, y + 0.05 * k, 0.4 * k, 0.09 * k));
-  B.layer();
   B.rect(DT.iron, x - 0.05 * k, y - 0.82 * k, 0.1 * k, 0.82 * k);
   B.rect(DT.ironLit, x + 0.01 * k, y - 0.82 * k, 0.03 * k, 0.82 * k);
   B.rect(DT.iron, x - 0.16 * k, y - 0.04 * k, 0.32 * k, 0.04 * k);
@@ -450,23 +409,5 @@ export function lectern(X: number, d: number): Prop {
   B.poly(DT.iron, pts);
   const fi = 0.035 * k;
   B.poly(mix(CM.limestone, CM.coatMustard, 0.25), [[x - pw / 2 + fi, top + fi], [x + pw / 2 - fi, top + fi], [x + pw / 2 - fi, top + ph - fi], [x - pw / 2 + fi, top + ph - fi]]);
-  // the relief: a skyline line (no words)
-  const ly = top + ph * 0.62;
-  const L = x - pw / 2 + fi * 1.6;
-  const R = x + pw / 2 - fi * 1.6;
-  const sk: Pt[] = [[L, ly]];
-  const r = rng('s5deck/lect');
-  for (let u = 0.05; u < 0.98; u += 0.07) sk.push([L + (R - L) * u, ly - r.range(0, 0.05) * k]);
-  sk.push([R, ly]);
-  B.ink(lineD(sk), Math.max(0.7, 0.015 * k), mix(CM.line, CM.anchor, 0.3));
-  // the obelisk spike and the dome (tiny relief marks)
-  const ox = L + (R - L) * 0.32;
-  B.ink(lineD([[ox - 0.01 * k, ly], [ox, ly - 0.16 * k], [ox + 0.01 * k, ly]]), Math.max(0.7, 0.015 * k), mix(CM.line, CM.anchor, 0.3));
-  B.ink(`M${L + (R - L) * 0.7 - 0.04 * k} ${ly}Q${L + (R - L) * 0.7} ${ly - 0.09 * k} ${L + (R - L) * 0.7 + 0.04 * k} ${ly}`, Math.max(0.7, 0.015 * k), mix(CM.line, CM.anchor, 0.3));
-  const ink = k > 75 ? 2.6 : 2.2;
-  B.ink(lineD([...pts, pts[0]]), ink, DT.ink, 0.15);
-  return {y, b: B, key: `lectern${X}`};
+  return {y, b: B, key: `lectern${X}`, light: {contact: [{x, y, w: 0.32 * k}], cast: [{x, y: y - 0.02 * k, w: 0.12 * k, depth: 0.08 * k, h: 1.08 * k}]}};
 }
-
-void circleD;
-void P2;
