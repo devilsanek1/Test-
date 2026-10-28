@@ -70,6 +70,11 @@ Demo: `src/entry-v2r-water.tsx` (`WaterFarSample`, `WaterAffineSample`; their sp
   (A was 81-111, B 58-84); marks 12-16 (A 27-32); glitter gold 974-1030 px (A 128-354); Pip dE 28; motion over
   2.50-3.48 s: 0.47 % px changing per frame, 0.69 % quick toggles (v5 0.33 / 0.60); +8 to +32 ms per frame; f150 and
   f300 byte-identical in three processes.
+- **On the master** (deliverables/v2/v2r_G4_look_v6.mp4, 368 frames in 3 min 21 s at concurrency 2): the v5 -> v6 pixel
+  diff lies inside the water only (0 px outside at 1.0 / 2.5 / 5.0 s); check_banding PASS on the ramp's widest open
+  stretch (950,1249,1057,1265) and the open sky (one isolated step in 0,270,1080,560 at 0.5 s, as in v5); check_depth
+  0 FAIL with v5's same 5 WARN (3.0 / 5.4 s); check_light as v5 (its one FAIL, the bank's brightest 5 % 0.156 / 0.174 H
+  from her at 2.5 / 5.0 s, v5 0.155 / 0.172).
 
 ## Recipes (each lane builds its own spec; never hand-roll a water)
 - **Every canal shot at evening (S2, S3, S4, S8):** copy S1's spec shape: your `groundCam`'s horizon and focal, the eye
