@@ -31,8 +31,8 @@ function heronBatch(x: number, y: number, h: number): Batch {
   const dir = -1;
   const legH = h * 0.34;
   const k = h / 84;
-  b.poly(CM.shadeCool, [[x - 4 * k, y], [x - 2.5 * k, y - legH * 0.5], [x - 4.5 * k, y - legH], [x - 2.5 * k, y - legH], [x - 0.5 * k, y - legH * 0.5], [x - 2 * k, y]]);
-  b.poly(CM.shadeCool, [[x + 3 * k, y], [x + 4 * k, y - legH * 0.55], [x + 1.5 * k, y - legH], [x + 3.5 * k, y - legH], [x + 5.5 * k, y - legH * 0.55], [x + 5 * k, y]]);
+  b.poly(CM.stoneShade, [[x - 4 * k, y], [x - 2.5 * k, y - legH * 0.5], [x - 4.5 * k, y - legH], [x - 2.5 * k, y - legH], [x - 0.5 * k, y - legH * 0.5], [x - 2 * k, y]]);
+  b.poly(CM.stoneShade, [[x + 3 * k, y], [x + 4 * k, y - legH * 0.55], [x + 1.5 * k, y - legH], [x + 3.5 * k, y - legH], [x + 5.5 * k, y - legH * 0.55], [x + 5 * k, y]]);
   const by = y - legH;
   const body = `M${P(x - 16 * k, by - 18 * k)}Q${P(x - 4 * k, by - 30 * k)} ${P(x + 14 * k, by - 22 * k)}Q${P(x + 30 * k, by - 12 * k)} ${P(x + 34 * k, by + 2 * k)}Q${P(x + 14 * k, by + 4 * k)} ${P(x - 2 * k, by + 2 * k)}Q${P(x - 16 * k, by - 4 * k)} ${P(x - 16 * k, by - 18 * k)}Z`;
   b.fill(CM.stoneShade, body);
