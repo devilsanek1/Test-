@@ -242,9 +242,11 @@ const NEAR_HOUSE = '#3E4870';
  *  plane (walls half way into the far snow, the near row a little less: the WINDOW lane's town), so SQB's window strip
  *  and SQC's window behind THE stick stop competing with the chart and the stick. A SETTLE, not a switch: one smooth
  *  0.6 s step (6.35-6.95, done before the chart's line starts at 6.98) while the strip slides with the pan's last
- *  metres; the thread plane's REST level and the desk's mug and pen cup take the same one (the assembly: a 2-step
- *  switch here moved the whole phone, ~20 % of the frame, by ~2.4 L* twice in 3 frames, and read as a pop mid-pan;
- *  a tier change ON a beat stays a 2-step switch). SQA (0-5.80, the approved pilot) is untouched. */
+ *  metres; the thread plane's REST level takes the same one (the assembly: a 2-step switch here moved the whole phone,
+ *  ~20 % of the frame, by ~2.4 L* twice in 3 frames, and read as a pop mid-pan; a tier change ON a beat stays a
+ *  2-step switch). The houses, the window's woodwork, the beams and the desk's two darks settle a little earlier, as
+ *  the pan lands (STRIP_CALM 6.20-6.65, the final round: they are in SQB's strip). SQA (0-5.80, the approved pilot)
+ *  is untouched. */
 export const HOOK_CALM_AT = 6.35;
 export const HOOK_CALM_DUR = 0.6;
 /** 0 = the hook's window (SQA), 1 = calm (smoothstep over HOOK_CALM_DUR from HOOK_CALM_AT). */
@@ -258,14 +260,27 @@ const CALM_STEP = {far: 0.5, town: 0.5, near: 0.38};
 /** Then one light haze step over the houses toward the far snow (kit Haze: far = lighter, lower contrast; the lit panes
  *  turn a pale cream on the calm walls instead of yellow specks: a mix toward the blue sky would grey them). */
 const TOWN_HAZE = 0.3;
-/** THE WINDOW'S WOODWORK SITS BACK IN THE SAME SETTLE (final round, R1-2 / R3-2): in SQB's framing the window is a strip
- *  at the left edge, and its terracotta frame and mullion (L* 45, C* 40) on the dusk-blue glass (L* 45, C* 22: a
- *  complementary colour edge) with the near-black latch held 24-49 % of the frame's top-3 % salience while the chart's
- *  line drew (the card 5-37 %). From HOOK_CALM_AT the frame, the mullion and the latch take one step toward the
- *  glass's dusk (kit Haze toward the sky: a calm plum-brown, C* ~12, hue kept warm of grey), the latch one soft value
- *  under the mullion, never near-black; one piece of wood, so the frame takes the mullion's step (it is the same colour
- *  in SQA). SQA keeps the pilot's woodwork; SQC (H1) keeps the calm one behind THE stick, like the rest of the window. */
+/** THE WINDOW'S WOODWORK AND THE ATTIC'S BEAMS SIT BACK TOO (final round, R1-2 / R3-2): in SQB's framing the window is
+ *  a strip at the left edge, and its terracotta frame and mullion (L* 45, C* 40) on the dusk-blue glass (L* 45, C* 22:
+ *  a complementary colour edge) with the near-black latch held 24-49 % of the frame's top-3 % salience while the
+ *  chart's line drew (the card 5-37 %). The frame, the mullion and the latch take one step toward the glass's dusk
+ *  (kit Haze toward the sky: a calm plum-brown, C* ~12, hue kept warm of grey), the latch one soft value under the
+ *  mullion, never near-black; one piece of wood, so the frame takes the mullion's step (it is the same colour in SQA).
+ *  With the strip calm, the same terracotta in the attic's beams (the slope's diagonal beam and the tie beam over the
+ *  card wall, `EMBER.beam` = the trim) held 31-36 % of the top 3 % over the line's draw: they take one step toward the
+ *  slope they lie on (a softer warm brown), so no single line of the room competes with the chart. Both settle with
+ *  the strip (STRIP_CALM below). SQA keeps the pilot's woodwork and beams; SQC (H1) keeps the calm ones behind THE
+ *  stick, like the rest of the window. */
 const WOOD_CALM_K = 0.5;
+const BEAM_CALM_K = 0.4;
+/** THE STRIP'S SETTLE (final round): everything SQB's framing shows of the hook's window and room sits back in one smooth
+ *  0.45 s step as J1's pan lands, right after the join's 0.4 s (6.20-6.65), so the strip is calm by SQB's first beat
+ *  (at 6.5 / 6.6 the strip still held 27 / 19 % of the top 3 % on windowCalm's 6.35-6.95): the woodwork and the beams
+ *  above, the houses' steps and caps (they are in the strip), the desk's two darks (the mug, the pen cup). The data
+ *  center, still in frame until ~6.33, keeps windowCalm (6.35-6.95, with the thread plane's REST). */
+export const STRIP_CALM = {at: 6.2, dur: 0.45};
+/** 0 = the hook's strip (SQA), 1 = calm. */
+export const stripCalm = (T: number): number => smooth((T - STRIP_CALM.at) / STRIP_CALM.dur);
 /** The far roofs' snow caps one pale step toward the air (the sky's lowest colour, DIRECTION rule 6) when calm: the
  *  caps were the strip's brightest marks on the dark glass (L* 85 on 45); the lit panes keep the far-snow haze (a mix
  *  toward the blue would grey them). */
@@ -382,9 +397,9 @@ const HomeSnow: React.FC = () => {
 };
 
 /** The view through the window (far plane, H1 px): exported for any shot that hangs the same window. After the hook
- *  (windowCalm) the houses and the data center sit back (E8). */
+ *  the houses (stripCalm) and the data center (windowCalm) sit back (E8). */
 export const HomeOutside: React.FC<{T: number}> = ({T}) => {
-  const c = windowCalm(T);
+  const c = stripCalm(T);
   const far = c * CALM_STEP.far;
   const town = c * CALM_STEP.town;
   const near = c * CALM_STEP.near;
@@ -430,12 +445,13 @@ export const HomeOutside: React.FC<{T: number}> = ({T}) => {
 
 // ================================================================= the room
 
-/** The room's right extension (drawn after the Nook): the wall, the slope above the tie beam, the desk. */
-const RoomRight: React.FC = () => (
+/** The room's right extension (drawn after the Nook): the wall, the slope above the tie beam, the desk. `beam`: the tie
+ *  beam's colour (calm after the hook: stripCalm). */
+const RoomRight: React.FC<{beam?: string}> = ({beam = EMBER.beam}) => (
   <>
     <Fill rect={[1270, -200, ROOM_X1 - 1270 + 200, DESK_Y + 200]} color={EMBER.wall} at={-0.5} mode="snap" offset={false} />
     <Fill d={polyD([[1100, -60], [ROOM_X1 + 200, -60], [ROOM_X1 + 200, BEAM_TOP], [1100, BEAM_TOP]])} color={EMBER.slope} at={-0.48} offset={false} />
-    <Fill d={polyD([[1112, BEAM_TOP], [ROOM_X1 + 200, BEAM_TOP], [ROOM_X1 + 200, BEAM_BOT], [1120, BEAM_BOT]])} color={EMBER.beam} at={-0.46} offset={false} />
+    <Fill d={polyD([[1112, BEAM_TOP], [ROOM_X1 + 200, BEAM_TOP], [ROOM_X1 + 200, BEAM_BOT], [1120, BEAM_BOT]])} color={beam} at={-0.46} offset={false} />
     <Fill rect={[1100, DESK_Y, ROOM_X1 - 1100 + 200, 1000]} color={EMBER.desk} at={-0.47} offset={false} />
   </>
 );
@@ -486,22 +502,23 @@ const DeskBook: React.FC<(typeof DESK_BOOKS)[number] & {at?: number}> = ({x, y, 
  *  no mover a viewer could point at; CRAFT §f.6): five flakes at the window's near-layer size (diameter 10-14 px, the
  *  near layer of HomeSnow, the same snow colour on the tier), 23-32 px/s with a slow +-5 px sway, so 3-5 drift through
  *  the pane from ~9.8 s to J2's pan. Each slides in from under the pane's top edge (the wrap starts above the clip)
- *  and out behind the snow strip at its foot, never popping inside the pane. SCHEDULED, not random: the first shows
- *  at the pane's top at 8.9 and the second at the line's end (9.28), so "Laptops get better for the same money" has the
- *  chart's line alone (R1-2: the line's draw leads the motion), then 1 -> 3 by 9.8, 4-5 through the quiet stretch
- *  (10.9-13.85) and 3-4 to J2; no flake slides in during J2's 0.4 s (16.2-17.0; falling weather keeps its pace).
- *  SQA (and J1's seam) never sees one (the first enters at 8.38, far from the pilot's frames). */
+ *  and out behind the snow strip at its foot, never popping inside the pane. SCHEDULED, not random: none until the
+ *  chart's line has drawn (R1-2: "Laptops get better for the same money" is the line's alone; the room's float rests
+ *  then too), the first shows at the pane's top at 9.6, the next at 10.2 and 10.7 (3 from 10.8 through the quiet
+ *  stretch), 12.8 and 13.2 (4-5 from 13.0 to 16.0), 4 to J2 and 3 as the pane leaves the frame; no flake slides in on
+ *  the band's pop (11.6-12.1) or inside J2's 0.4 s (16.2-17.0; falling weather keeps its pace). SQA and J1's seam
+ *  never see one (the first enters at 9.0). */
 const SKY_PANE: Pt[] = [[1318, 52], [1502, 52], [1522, 214], [1298, 214]];
 const SKY_FRAME: Pt[] = [[1296, 30], [1524, 30], [1548, 236], [1272, 236]];
 /** The flakes' wrap (H1 px): from above the pane's top edge to below its snow strip (a flake wraps out of sight). */
 const SKY_WRAP = {y: 30, h: 206};
 /** [x (H1 px), radius, fall speed px/s, first entry at the wrap's top (film s)]. */
 export const SKY_FLAKES: [number, number, number, number][] = [
-  [1372, 6.8, 30.5, 8.38],
-  [1452, 5.2, 23.0, 8.55],
-  [1336, 7.2, 31.9, 9.16],
-  [1418, 4.8, 29.6, 10.3],
-  [1484, 6.0, 23.3, 10.71],
+  [1402, 6.8, 25.5, 9.0],
+  [1350, 5.2, 23.0, 9.51],
+  [1462, 7.2, 23.2, 10.04],
+  [1376, 4.8, 26.7, 12.18],
+  [1436, 6.0, 28.3, 12.67],
 ];
 const SkylightSnow: React.FC = () => {
   const id = 'skysnow' + React.useId().replace(/[^a-zA-Z0-9]/g, '');
@@ -732,8 +749,8 @@ export type HomeRoomProps = {
 
 /** AFTER THE HOOK THE DESK'S DARKS SIT BACK TOO (the HOME lane, final pass): the mug (its coffee near-black, L* ~27)
  *  and the pen cup (navy, a near-black pen) sit in SQA's frame and keep the pilot's values there, but in SQB they held
- *  15-20 % of the frame's most salient pixels beside the card (12.5, 14.95): from HOOK_CALM_AT they take one light haze
- *  step toward the wall (kit Haze, the same settle as the window), tier C next to the chart. */
+ *  15-20 % of the frame's most salient pixels beside the card (12.5, 14.95): after the hook they take one light haze
+ *  step toward the wall (kit Haze, in the strip's settle STRIP_CALM), tier C next to the chart. */
 const DESK_CALM_K = 0.25;
 
 /** The window's woodwork as the Nook draws it (H1 px): the frame's bars (its trim rect minus the glass), the mullion
@@ -750,24 +767,34 @@ const WOOD = (() => {
 })();
 /** The latch, one soft value under the mullion (a darker step of the trim, never the near-black anchor). */
 const LATCH_CALM = mixHex(EMBER.trim, EMBER.anchor, 0.4);
-/** After the hook (windowCalm k > 0): the woodwork redrawn over the Nook's in the trim colour (the same environment
- *  tier, so k 0 is the Nook's exact colour), then one Haze step toward the glass's dusk; the room's ambient step falls
- *  on it as on the Nook's (the mullion is the Ambient's 'dark' hole). */
+/** The Nook's diagonal beam along the slope's foot (kit Nook `Slope`'s beam polygon, H1 px). */
+const SLOPE_BEAM_D = polyD([[560, -30], [1120, -30 + 560 * SLOPE_K], [1120, -4 + 560 * SLOPE_K], [510, -30]]);
+/** The beams' calm colour at k (0..1): one step toward the slope they lie on. */
+const beamCalm = (k: number) => (k > 0 ? mixHex(EMBER.beam, EMBER.slope, BEAM_CALM_K * k) : EMBER.beam);
+/** After the hook (stripCalm k > 0): the woodwork redrawn over the Nook's in the trim colour (the same environment
+ *  tier, so k 0 is the Nook's exact colour) under one Haze step toward the glass's dusk, and the slope's beam redrawn
+ *  one step toward the slope; the room's ambient step falls on them as on the Nook's (the mullion is the Ambient's
+ *  'dark' hole). */
 const CalmWoodwork: React.FC<{k: number}> = ({k}) => (
-  <Haze k={WOOD_CALM_K * k} color={EMBER.sky}>
+  <>
+    <Haze k={WOOD_CALM_K * k} color={EMBER.sky}>
+      <Tier tier="environment">
+        <Fill d={WOOD.frame} rule="evenodd" color={EMBER.trim} offset={false} />
+        <Fill d={WOOD.mullion} color={EMBER.trim} offset={false} />
+        <Fill d={WOOD.latch} color={mixHex(EMBER.anchor, LATCH_CALM, k)} offset={false} />
+      </Tier>
+    </Haze>
     <Tier tier="environment">
-      <Fill d={WOOD.frame} rule="evenodd" color={EMBER.trim} offset={false} />
-      <Fill d={WOOD.mullion} color={EMBER.trim} offset={false} />
-      <Fill d={WOOD.latch} color={mixHex(EMBER.anchor, LATCH_CALM, k)} offset={false} />
+      <Fill d={SLOPE_BEAM_D} color={beamCalm(k)} offset={false} />
     </Tier>
-  </Haze>
+  </>
 );
 
 /** The room plane (H1 px, inside the room camera): the set, then its light. */
 export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
   const mug = <Mug x={MUG.x} top={MUG.top} w={MUG.w} seed="home/mug" at={-0.38} />;
-  const calm = windowCalm(T);
-  const deskCalm = DESK_CALM_K * calm;
+  const wood = stripCalm(T);
+  const deskCalm = DESK_CALM_K * wood;
   return (
     <>
       <Nook variant="pov" at={NOOK_AT} seed="home/nook" layout={NOOK_LAYOUT_HOME}>
@@ -775,9 +802,9 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
           <HomeOutside T={T} />
         </XG>
       </Nook>
-      {calm > 0 ? <CalmWoodwork k={calm} /> : null}
+      {wood > 0 ? <CalmWoodwork k={wood} /> : null}
       <Tier tier="environment">
-        <RoomRight />
+        <RoomRight beam={beamCalm(wood)} />
         <Skylight />
         {/* the top band: one print, the string lights along the slope (no glow discs) */}
         <FramedPrint x={430} y={40} w={84} h={100} picture="sun" seed="home/print" at={-0.4} />
