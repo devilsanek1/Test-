@@ -53,6 +53,12 @@ const WIN_GROUPS: {x0: number; x1: number; at: number}[] = [
  *  a flat air-coloured layer over the band, the mix every colour of it would take): the farthest plane is the closest
  *  to the air (check_depth). It stops at the lawn strip (y 831: a sage under a gold air would turn olive). */
 const F = {y0: S6.facadeBandY[0], y1: S6.facadeBandY[1]};
+/** The tall corner post above the fence's air step (GateFence: a 54 px shaft under a 68 px cap at map S6.cornerPost). */
+const POST_TOP = (() => {
+  const {x, y} = S6.cornerPost;
+  const yb = F.y1 + 45;
+  return `M${x - 34} ${y}H${x + 34}V${y + 16}H${x + 27}V${yb}H${x - 27}V${y + 16}H${x - 34}Z`;
+})();
 const S6Facade: React.FC = () => (
   <>
     <defs>
@@ -89,6 +95,8 @@ const V2S6: React.FC = () => (
           <S6HedgeFix />
           {/* the fence + lawn's flat step toward the air (as the facade's: a sage under a gold air at 0.15 keeps h ~128) */}
           <rect x={-300} y={F.y1 + 45} width={1800} height={1252 - 4 - (F.y1 + 45)} fill={S6_AIR} opacity={S6_AIR_K.fence} />
+          {/* the tall corner post's top (it rises over the band's top edge): the same step, so it never outshines the board */}
+          <path d={POST_TOP} fill={S6_AIR} opacity={S6_AIR_K.fence} />
         </S6Plane>
         <S6Plane plane={S6_PLANE.subject}>
           <S6Paving />
