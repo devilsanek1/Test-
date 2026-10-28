@@ -72,11 +72,13 @@ building, and it decides the outcome:
   sentence. Brainstorm: 5-6 writers, each pulling a different emotional lever (loss, unfairness, reversal, personal,
   curiosity, headline punch), 6-8 lines each, plus the owner's own suggestion. Critique: judges score every line for gut
   reaction, truth, read-at-a-glance clarity and whether the video can pay it off; a viewer-persona panel gives gut
-  rankings; sceptics try to refute the finalists as misleading. Pick: the owner picks from the top 3, and the
+  rankings; sceptics try to refute the finalists as misleading, and an ad-or-news panel rejects any line that sounds like
+  a commercial or bait (playbook, Audience and goal: never baity). Pick: the owner picks from the top 3, and the
   through-line card is drafted from the pick (G1 completes it). Workflow: `context/workflows/v3-g05-core-line*.js`.
 - **G1 script = story first (owner, 2026-10-26):** (1) 3-4 competing **story spines** (the throughline question, the
   viewer's situation, beats joined by but/so, the turn, the payoff that lands the core line), judged; (2) 2-3 writers
-  draft the winning spine; (3) a cold-read panel retells each draft (a list-like retelling fails) plus a flow critic
+  draft the winning spine; (3) a cold-read panel retells each draft (a list-like retelling fails) and hears the
+  first line cold: "ad or news?" (an ad-like or baity opening fails: playbook, never baity) plus a flow critic
   (every line follows from the previous) and a fact check; (4) one merged script, then the through-line card's carriers
   from its joins (G1 row). Never structure a script as a list of facts to prove. **Rhythm (owner, 2026-10-27):** short
   sentences (<= 5 words) break up the long ones, at least one after every 1-2 long sentences; the merged script must pass
