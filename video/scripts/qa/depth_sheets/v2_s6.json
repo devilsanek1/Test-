@@ -6,20 +6,20 @@
   {"name": "the near tulip bed + shrub (left)", "plane": -1, "boxes": [[0, 1490, 205, 1920], [0, 1150, 70, 1440]]},
   {"name": "the near bench (right)", "plane": -1, "boxes": [[880, 1210, 1080, 1460]]},
   {"name": "the footpath (ground)", "plane": 0, "role": "ground", "boxes": [[330, 1460, 790, 1920]]},
-  {"name": "the deal board (the subject's plane)", "plane": 0, "role": "subject", "boxes": [[124, 682, 682, 1250]]},
+  {"name": "the deal board (the subject's plane)", "plane": 0, "role": "subject", "boxes": [[124, 782, 682, 1250]]},
   {"name": "the fence + lawn", "plane": 1, "boxes": [[690, 900, 795, 1230], [0, 905, 112, 1110]]},
   {"name": "the lawn's cherries over the board", "plane": 2, "boxes": [[350, 632, 650, 676]]},
   {"name": "the facade band + door (right of the board)", "plane": 3, "boxes": [[800, 708, 1080, 828]]}
  ],
  "silhouettes": [
-  {"name": "the deal board's left edge (lawn, fence, shrub)", "tier": "A", "rect": [123, 679, 683, 1252], "roi": [[96, 700, 150, 1250]]},
-  {"name": "the deal board's top edge (sky, crowns)", "tier": "A", "rect": [123, 679, 683, 1252], "roi": [[140, 655, 670, 705]]},
+  {"name": "the deal board's left edge (lawn, fence, shrub)", "tier": "A", "rect": [123, 779, 683, 1252], "roi": [[96, 800, 150, 1250]]},
+  {"name": "the deal board's top edge (sky, crowns)", "tier": "A", "rect": [123, 779, 683, 1252], "roi": [[140, 755, 670, 805]]},
   {"name": "Pip on the paving", "tier": "mass", "rect": [318, 1312, 410, 1412], "roi": [[300, 1295, 430, 1430]]}
  ],
  "ground": [{"name": "the footpath (one-point)", "roi": [210, 1300, 800, 1920], "vps": [[540, 771]]}],
  "horizon": 771,
  "things": [
-  {"name": "the deal board (frame top to its feet)", "y": 1252, "px": 572, "m": 1.9},
+  {"name": "the deal board (frame top to its feet; frame top 780 since REVIEW_1 MUST 4)", "y": 1252, "px": 472, "m": 1.57},
   {"name": "the jogger on the far promenade", "y": 874, "px": 109, "m": 1.7},
   {"name": "the service door", "y": 835, "px": 100, "m": 2.5},
   {"name": "the park fence", "y": 1236, "px": 226, "m": 0.78},

@@ -58,7 +58,7 @@
    "boxes": [
     [
      115.2,
-     680.6,
+     780.6,
      671.2,
      1236.6
     ]
@@ -110,15 +110,15 @@
    "poly": [
     [
      113.2,
-     678.6
+     778.6
     ],
     [
      673.2,
-     678.6
+     778.6
     ],
     [
      674.7,
-     684.6
+     784.6
     ],
     [
      687.2,
@@ -152,19 +152,19 @@
    "roi": [
     [
      93.2,
-     653.6,
+     753.6,
      708.2,
-     703.6
+     803.6
     ],
     [
      648.2,
-     678.6,
+     778.6,
      713.2,
      1233.6
     ],
     [
      91.2,
-     678.6,
+     778.6,
      138.2,
      1233.6
     ]
@@ -385,10 +385,10 @@
  "horizon": 895.6,
  "things": [
   {
-   "name": "Google's board (2.58 m: a big freestanding A-board)",
+   "name": "Google's board (2.13 m since REVIEW_1 MUST 4: frame top 780, feet 1250; a freestanding A-board)",
    "y": 1248.6,
-   "px": 570,
-   "m": 2.58
+   "px": 470,
+   "m": 2.13
   },
   {
    "name": "Pip's stone bollard (0.29 m)",
@@ -427,5 +427,5 @@
    "m": 1.72
   }
  ],
- "note": "L5, 2026-10-28: generated from the code's geometry (V2S7_plan S7_CAM, the board B, BOARD_BOLLARD, the push s7PushAt and the per-plane float s7PlaneOffset at 31 s). Every visible plane boxed, the farthest (+3, the far roofs) included, no box over sky; the air = S7_AIR (horizonColor(S7_SUNSET, SUN2.x))."
+ "note": "L5, 2026-10-28: generated from the code's geometry (V2S7_plan S7_CAM, the board B, BOARD_BOLLARD, the push s7PushAt and the per-plane float s7PlaneOffset at 31 s). Every visible plane boxed, the farthest (+3, the far roofs) included, no box over sky; the air = S7_AIR (horizonColor(S7_SUNSET, SUN2.x)). Updated for REVIEW_1 fix pass B (MUST 4): the board's frame top 780 (was 680), feet unchanged; its top vertices, the subject plane box, the edge ROIs and its size moved with it (G7 master check)."
 }
