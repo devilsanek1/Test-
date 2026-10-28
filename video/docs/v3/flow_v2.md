@@ -73,8 +73,12 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
   snow, caps one pale step) with a road from our street (x ~300) up to the DC; street 1040-1250: factory wall x 330-950 (y
   1000-1090; a soft warm brick), lit gate opening x 480-640 spilling down to the floodlight pool (560, 1200) rx 230 ry 55, booth on
   its left, notice board x 680-880 (y 1010-1150), waiting lane x 720-940 (y 1140-1240), the road-mouth lamp (232) with its own
-  pool; sill 1250-1292; flat frost on the glass's side edges below y 620. **`scenes/h2_window.tsx` + `entryCam(T)`**: the window
-  from inside at H2 size, J4's move and SQE's push (`pushCam`: x1.35 about (680, 1120), in 24.90-25.70, held, out 36.36-36.98).
+  pool; sill 1250-1292; flat frost on the glass's side edges below y 620. The snow is the street rig's sky-facing cap (`H2_SNOW`,
+  L* 89: caps, lids, flakes, the vans' roofs; never the palette's lit 93), the booth's cream in the dusk ambient, our pavement and
+  the outer sill one near step darker (CRAFT §f.2), so the brightest thing outside is a light, never the snow (cross pre-pass).
+  **`scenes/h2_window.tsx` + `entryCam(T)`**: the window from inside at H2 size (`H2_RIG` = the home's nook rig: the
+  lit-terracotta pool, the sill in the room's ambient; kit `POOL_NOOK`, `AMBIENT_NOOK`), J4's move and SQE's push (`pushCam`:
+  x1.35 about (680, 1120), in 24.90-25.70, held, out 36.36-36.98).
 
 ## 4. The beats (visuals lead their word by ~0.1 s)
 - **SQA HOOK.** O1 as built (frame-0 lines, sign 0.25, five launches each ticking the tag under the listing laptop, the phone
@@ -92,17 +96,21 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
   "chips"); the tag tugs 18.30; hold to 18.905.
 - **SQD THEIR MOUNTAIN.** 19.40: the same stick on the pile's summit, sky above, lying on a BED of two sticks at its own angle
   (their tops tucked behind its bottom edge: gold under it at every zoom, never a strip of sky); its neighbours are kit-shaped
-  MemorySticks at H2 size (~26 px), so x27 shows real chips (never hay). The pile reads as memory while it is big on screen and
+  MemorySticks at H2 size (~26 px); THE stick is 30 px at H2 rest (`SQD_peak` `SUMMIT_W`: >= ~30 so it reads on the summit at
+  phone size), so x23 shows real chips (never hay). The pile reads as memory while it is big on screen and
   calms as it shrinks (final pass, E5): the crest's sticks in THE stick's own gold one value under it, pins, four warm dark
   chips 20 L* under the board while a crest stick is >= 120 px on screen (**the reveal's declared exception** to CRAFT §c's
   dL* 15), pale to tier C (11 L*) by 50 px (~20.8-21.2, inside the move's fastest stretch), chips pale further out, the lower
   pile flat boards with a soft lit top; so the hold, SQE and SQF see the calm pile. ONE pull-back on the S5 ease (155 f,
-  19.40-21.98) to just outside our window: the far plane starts x27 (`planeMat` {o: the summit in H2 px, off: (540, 870) - o,
-  k: 27}), town planes rise from the bottom, our street last; the DC's lit sign in frame by ~21.0 (whole DC by ~21.35;
-  orchestrator, 2026-10-27: the x27 S5 move cannot bring it in earlier), the whole mountain by 21.32, thoom 21.72 (p 0.985);
+  19.40-21.98) to just outside our window: the far plane starts x23.3 (`planeMat` {o: the summit in H2 px, off: (540, 870) - o,
+  k: K0 = 700 / SUMMIT_W}), town planes rise from the bottom, our street last; the DC's lit sign in frame by ~21.0 (whole DC by
+  ~21.35; orchestrator, 2026-10-27: the S5 move cannot bring it in earlier), the whole mountain by 21.32, thoom 21.72 (p 0.985);
   hold 21.98-22.35 (the birds: OutsideFar's one flock, rising from behind the mountain's flank); then J4. S9's streams from
-  21.0 only, <= 1 per 0.25 s, no trails. While the far field leads, the street's loud pieces are calm until the load beat
-  (`outside.tsx`, film time, both builders: one step at 23.10, none in the hold). Its peak plane speeds (OPEN 5, checked at
+  21.0 only, <= 1 per 0.25 s, no trails. While the far field leads, the WHOLE street plane is one calm step (`outside.tsx`
+  `STREET_CALM`, film time, both builders: its value contrast x0.6 toward its own ambient snow, its chroma x0.9, hue kept: one
+  colour matrix; at 21.9 the DC and the mountain hold 60 % of the frame's top-3 % salience, the street 27 %, was 89 %), stepping
+  back up smoothly across J4 (22.25-23.05: a whole-street switch read as a cut); the gate's pool and lit opening, the DC trucks
+  and the notice keep their own one step at the load beat (23.10). Its peak plane speeds (OPEN 5, checked at
   full size): the far plane 42 px/f as the DC's right edge enters (20.92), the town 22, the street 30 (mostly under the frame):
   clean spacing, no repeating high-contrast pattern near the step (the lower pile is flat): not softened.
 - **SQE FIRST DIBS.** 23.10 the gate comes up (one step: the pool warms, the truck takes its outline); 23.10-24.20 crates of gold
@@ -134,7 +142,7 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
 | SQA | tag (each tick) -> DC 4.04 | sticks (small), hand, Pip | room, town, snow | nook; tag rim (left) while it ticks | "its price goes up each time a stick flies to the AI data center" |
 | SQB | line -> doodles -> hook, +9.7% | tag, Pip, dim phone | wall, notes, window strip | nook, lamp off left; card unlit; pins cast down-right | "the same money bought more for 20 years; now +9.7%" |
 | SQC | listing laptop -> stick | tag, Pip, hand | room, DC calm | nook; the stick's warm rim (on its lamp side, left; CRAFT §d.8) | "your laptop runs on that stick" |
-| SQD | stick -> DC -> mountain | streams, 2 trucks on the road | town, clouds, birds, snow; the street calm to 23.10 | street; pile tops a step lighter, brightest on the crest THE stick lies on (the frame's brightest 5 % on the stick); its flank turned from the sky in form shade; cold rim on the summit stick (inside its outline, over it); the pile's rim on its silhouette while it is the subject (21.32-23.10) | "one of a mountain of sticks by the data center" |
+| SQD | stick -> DC -> mountain | streams, 2 trucks on the road | town, clouds, birds, snow; the street plane calm (lifting across J4) | street; pile tops a step lighter, brightest on the crest THE stick lies on (the frame's brightest 5 % on the stick); its flank turned from the sky in form shade; cold rim on the summit stick (inside its outline, over it); the pile's rim on its silhouette while it is the subject (21.32-23.10) | "one of a mountain of sticks by the data center" |
 | SQE | truck; van + crate; 5x; hop + tag; BETTER van; flip + trucks | waiting vans and trucks (one haze step), workers, guard, Pip, tag | street (a soft brick wall, pale caps), lamps, walker + dog, steam, town, DC (hazed, calm sign) | street + the gate's pool as THE light (two warm steps, its lit yard spilling down to it), the road-mouth lamp's small pool; van unlit until 25.72 | "their trucks first; one crate, 5x; your price up; the better one stuck; 2027 tighter" |
 | SQF | DC sign (lit, its rows one per syllable) -> tag | Pip | window view (the street calm) | nook on the tag: rim left, form shade right third | "the data center ends up on the price tag" |
 
@@ -159,7 +167,8 @@ upper-left, tops lit, contact only; the DC sign the brightest cold light; 16 px 
   before it, lib/Captions.tsx), dark on the stick's gold edge.
 - **J4 22.68** SQD -> SQE, seam mid-entry (frame 1361): `entryCam` 22.35-22.95 (inOutCubic): window x3.0 -> H2 size about (540,
   1100), street x1.12 -> 1, far field x1.03 -> 1; the front plane rises into LEFT 22.45-22.95; the trucks already stand in the
-  pool; no new mover 22.28-23.08; a declared light change (into the warm room).
+  pool; no new mover 22.28-23.08; the street plane's calm lifts smoothly over 22.25-23.05 (under the entry's pull: no switch);
+  a declared light change (into the warm room).
 - **J5 36.36** SQE -> SQF, seam at frame 2182 as SQE's held push starts its release (36.36-36.98: the continuous camera
   carries "So ..."; both builders draw H2Scene at film time). **Loop:** SQF `transitionOut` `{"type": "unbuild", "loop": true,
   "dur": 0.3}` onto SQA's t < 0 bare lines, the thread plane carried back to frame 0's spot first (40.55-40.85).
