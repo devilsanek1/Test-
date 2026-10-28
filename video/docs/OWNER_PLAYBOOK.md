@@ -175,11 +175,13 @@ Maintenance at the end).
   - the film loops back to frame 0.
   Details: `docs/look/CINEMATIC_GUIDE.md`, "The opening"; `docs/look/DIRECTION.md` rule 9. — (owner's reference, v3,
   2026-10-26; the clean pen and one focus, v3 G5b, 2026-10-27).
-- **State the payoff in words on frame 0; polish the first 2 s and 5 s most, then the first 10 s.** A calm, pretty
-  opening lost ~80 % of viewers by 3 s; late quirks are acceptable. The frame-0 words ARE the caption for the spoken line
-  that says the same thing: while they show, no caption page repeats them (in Remotion: `Frame0Text.spoken: 'first'`, or
-  hide that page). — (v1 IG insights, 2026-10-25; v3, 2026-10-28: "why do we have the text repeat itself?", the core
-  line over its own spoken caption "AI's making it pricier.").
+- **State the payoff in words within the first ~2 s, in the voice's order; polish the first 2 s and 5 s most, then the
+  first 10 s.** A calm, pretty opening lost ~80 % of viewers by 3 s; late quirks are acceptable. The captions ARE the
+  words on screen: frame 0 shows the first spoken line, and when the voice opens with a question the payoff is the next
+  caption (by ~2 s). Never a title over the captions (no `frame0` block): it answers before the question is asked and
+  repeats the spoken line; the core line as a title belongs on the cover. — (v1 IG insights, 2026-10-25; v3,
+  2026-10-28: "why do we have the text repeat itself?", then "Why are we having this out of order weirdly? Should we
+  just show buying ..?").
 - **The hook is a concrete, surprising, TRUE claim with stakes**, verified against the primary source before it's
   locked; for a small news item, research the bigger story and lead with its strongest true framing. — (v2, 2026-10-25).
 - **Personal framings must feel natural, not over the top.** Never cast the viewer as a loser in a contest they don't
@@ -347,6 +349,8 @@ Maintenance at the end).
 - ~~G3: animate only where timing is the question~~ → the animated sketchbook plays every move and transition (2026-10-26).
 - ~~v1's ink line as the film's line (overshoot, open contours, offset fills, weight by depth)~~ → the clean pen, lines
   by story role (v3 G5b, 2026-10-27).
+- ~~The core line as a title over the captions from frame 0 (`frame0`)~~ → the captions in the voice's order, the
+  payoff by ~2 s; the core line as a title only on the cover (v3, 2026-10-28).
 - ~~Frame 0 as the whole scene in bare ink lines~~ → frame 0 drawn on in the clean pen, shown to the owner at the next
   G4 look clip (2026-10-27).
 - ~~Something new every few frames from any element~~ → from the story's own build, one focus at a time (v3 G5b, 2026-10-27).

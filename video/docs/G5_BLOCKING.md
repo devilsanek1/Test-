@@ -44,7 +44,7 @@ un-building into the FIRST panel's `t < 0` drawing state, so the film loops back
 
 **Film options a G5 shell passes** (all optional props of `<Film>`, off by default so v1 / v2 render as before):
 `audioSrc` (the voice, e.g. `vN/voice.wav`), `sfx` (the board's cues `[{src, t, gain}]`, played like SketchReel's),
-`captionMotion: 'pop'` (owner playbook), `frame0` (the core line in words, section 5), `draftLabel: 'G5'` (burns in
+`captionMotion: 'pop'` (owner playbook), `frame0` (retired for new films: no title over the captions, section 5), `draftLabel: 'G5'` (burns in
 "G5 · <panel id> · <m:ss.ss>" bottom-left, small, mid grey with a light halo, so the owner can name a shot), and
 `edges={false}` (no edges / paper / texture before G6).
 
@@ -223,11 +223,9 @@ film (§8b's recipe).
   sentence boundaries (never the board's fixed-width fragments), `[brackets]` = the highlight box on the key words.
   The script aligns it to the transcript by characters and fails if a word is missing or out of order.
 - Pop captions (`captionMotion: 'pop'`): pages, lines and highlight boxes pop in place (owner playbook).
-- **Frame 0 states the payoff in words** (`frame0`): the core line in the caption band from frame 0 until the board's
-  `frame0Until`, in the G4 look's caption style (caption tone colours, the highlight box), with the spoken captions
-  lowered and scaled under it (one line, inside the band); they move back up on the first page change after `until`.
-  From the loop roll (the last page rolls back to page 1 at `captionAt`, default end - 0.22 s) the words return, so
-  the last frame lands on frame 0.
+- **The payoff in words by ~2 s, in the voice's order:** frame 0 shows the first spoken line as a normal caption; no
+  `frame0` title block over the captions (owner, v3, 2026-10-28: it answered before the question and repeated the spoken
+  line). The core line as a title belongs on the cover. (`frame0` stays in `Film.tsx` for the films that used it.)
 - (v2) Pages before `until` AND the page starting ON `until` stay lowered: make them one line. Credits = FilmN's own overlay keyed by the panel on screen (scenes.json `credit`), one ink-on-cream tab at y ~185-288 (under the top UI, above the band), hidden while the frame-0 words show (seam = frame 0).
 - (v2) A frame-0 credit needs a custom `Frame0Text` layout (words 70 on 340 / 424, credit 34 on 472, captions 556 at 0.68); gate_check reads Film.tsx's default F0, so re-check custom numbers. `FilmNBare` = `<Film showCaptions={false}>`, no frame0 / label / overlay: sound-off cold reads.
 

@@ -16,7 +16,7 @@
 // Compositions: src/entry-v3-film.tsx (Film3, Film3Shot {id}, Film3-<ID>, Film3Seams). How-to: docs/G5_BLOCKING.md
 // (§2b: the sequence contract).
 import React from 'react';
-import {Film, filmDuration, type FilmScene, type FilmSfx, type Frame0Text} from '../../lib/Film';
+import {Film, filmDuration, type FilmScene, type FilmSfx} from '../../lib/Film';
 import {FilmSeamProbe, seamProbeFrames} from '../../lib/sequence';
 import type {CaptionBeat} from '../../lib/Captions';
 import animatic from '../../../public/v3/animatic.json';
@@ -51,16 +51,10 @@ export const film3Seconds = filmDuration(film3Scenes);
 /** Frames at 60 fps: ceil(seconds * fps), the same rounding as Film's loop seam. */
 export const film3Frames = (from = 0, to = film3Seconds) => Math.max(1, Math.ceil((to - from) * FILM3_FPS - 1e-6));
 
-/** Frame 0 states the payoff in words (owner playbook), in the style frame's caption look (ink, the highlight box). */
-export const FILM3_FRAME0: Frame0Text = {
-  lines: ['AI is making your', 'next laptop pricier.'],
-  highlight: 'pricier.',
-  until: (animatic as {frame0Until: number}).frame0Until,
-  // only "Buying a laptop soon?" sits under the core line: the voice's "AI's making it pricier." (1.64) is the core line
-  // itself, so its page stays hidden while the words show (owner, 2026-10-28: "why do we have the text repeat itself?")
-  spoken: 'first',
-};
-
+/** No frame-0 title over the captions: the words follow the voice's order (owner, 2026-10-28: "Why are we having this
+ *  out of order weirdly? Should we just show buying ..?"). Frame 0 shows the first spoken line, "Buying a laptop soon?",
+ *  and the payoff, "AI's making it pricier.", pops at 1.64 as its own caption. The core line stays on the cover
+ *  (Cover3.tsx). */
 const common = {
   components: sceneComponents,
   wipers: sceneWipers,
@@ -68,7 +62,6 @@ const common = {
   audioSrc: FILM3_VOICE,
   sfx: film3Sfx,
   captionMotion: 'pop' as const,
-  frame0: FILM3_FRAME0,
   draftLabel: FILM3_GATE,
   edges: false,
 };
