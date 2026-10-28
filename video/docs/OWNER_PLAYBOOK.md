@@ -77,6 +77,10 @@ Maintenance at the end).
   separate one from the other, no distance effect, no perspective; the bottom part: little to no perspective or depth
   ... research some libraries on GitHub ... add a bit of particles here and there to make things more natural", v2 G4,
   2026-10-27).
+- **A gentle PARALLAX float, never a flat card.** When a held shot floats, its planes move by depth (Disney's multiplane
+  idea): the near ground most, far planes little, the sky and the caption band not at all; slow, small, back at rest
+  by every join; it adds depth in motion without adding movers. — ("switch it on if you think it will make the videos
+  better and improve engagement", v2 G4, 2026-10-28).
 - **ONE CONTINUOUS SKY, a gentle gradient, no abrupt colour seams.** The sky is one sky from the top of the frame to
   the horizon: ONE gentle, smooth gradient (the sky is the one place a gradient is welcome), warmest around the sun and
   toward the horizon, dithered so it never bands on a phone, nearly flat inside the caption band so captions keep their

@@ -88,7 +88,9 @@ A clash is a bug: fix the lower doc in the same turn.
   pop, grow, wipe or slide in; a draw-on is frame 0's, and after it only where the drawing is the beat (a chart line
   in step with the voice); no opacity fades (a dissolve only as a declared time-passing exception). A reference gives
   a move's SHAPE, never its speed (retime it, usually faster; one speed budget, readable at 1x). Every hold is locked
-  or a slow 2D float, never a zoom; a zoom is a visible story move or a carrier; no roll, no compound moves; visuals
+  or a slow float, never a zoom; a float is a gentle PARALLAX float (owner, 2026-10-28: planes move by depth, the
+  near ground most, far planes little, the sky and the caption band not at all; back at rest by every join and on
+  every map-critical frame; `lib/depth.ts` parallax helper); a zoom is a visible story move or a carrier; no roll, no compound moves; visuals
   lead their word by ~0.1 s. -> `G3_ANIMATIC.md` §4; `PIPELINE_V2.md` "Frame rate"; `COZY_AND_SCALE.md` 3b.5.
 - **9. The opening is a banger.** Frame 0 is the scene being drawn, in the clean pen: the subject's outline (with B's
   tinted lines) draws on, C lands as flat pale shapes and colour floods in within ~0.3 s, with the core line in words,

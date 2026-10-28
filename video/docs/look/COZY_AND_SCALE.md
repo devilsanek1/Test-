@@ -235,8 +235,9 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
 - **2D float** (C3) when the life is one lane: translation only, 8-15 px/s PATH speed at 1080 (0.7-1.4 % W/s; `--cozy`'s
   float, C3 10.1), peak <= 25 px/s, in straight legs with a steady heading, turning (eased) every 0.6-1.5 s and turning
   back, so the net offset stays within ±12 px of home (C3 drifted a net 16 x 21 px along a ~45 px path in 4.1 s, about
-  ±13 px round its middle; one heading at 10 px/s would use up the overscan in ~4 s); the whole set moves as one card (no
-  parallax needed, no rotation, no zoom); >= 40 px of overscan on each side; sub-pixel transforms (at 10 px/s a rounded
+  ±13 px round its middle; one heading at 10 px/s would use up the overscan in ~4 s); the planes move by depth (a gentle
+  PARALLAX float, owner 2026-10-28: the near ground at the full float, far planes at a small fraction, the sky and the
+  caption band fixed; `lib/depth.ts`), no rotation, no zoom; >= 40 px of overscan on each side; sub-pixel transforms (at 10 px/s a rounded
   one steps 1 px every 6 frames at 60 fps). Captions, the paper edge and the UI stay fixed in screen space: they are the
   fixed mat the picture slides under. `CINEMATIC_GUIDE.md` rule 3 sends every hold here, the S2-S4 breathers too (a
   1.5-2 % pull-out moves a frame edge ~4-8 px/s, too slow to read in a hold).
