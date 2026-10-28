@@ -79,3 +79,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   of criteria you are choosing the story based on" -> `docs/TOPIC_CRITERIA.md` (visual appeal and truth are musts);
   visual scores in `G0_TOPICS_r4.md`: glasses 9, hurricane 8, vaccine 6; recommendation moved to the glasses.
   -> rule: Taste signals (visual appeal is a pick condition).
+- 2026-10-28 ~16:25 UTC: "lets make it relevant first but include buzz here too and surprise, then true and solid, then
+  fresh, then visually appealing, then mood. Then shareabliity potential" -> `docs/TOPIC_CRITERIA.md` rewritten in that
+  order (weights 6-5-4-3-2-1); re-ranked: vaccine 8.2, glasses 7.7, hurricane 7.2 (`G0_TOPICS_r4.md`).
+  -> rule: Taste signals (the owner's order).

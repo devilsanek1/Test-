@@ -156,3 +156,15 @@ bill's status; Chris Edwards's name and title (ABC's; one syndicated piece seen 
 **With visual appeal as a must, the recommendation moves to the glasses** (AI front and centre, a real person, a real
 fuss, all of it drawable in our look); the hurricane is the scale-led alternative; the vaccine is the biggest news but
 the hardest to make beautiful.
+
+## Ranked in the owner's order (2026-10-28; `docs/TOPIC_CRITERIA.md`, weights 6-5-4-3-2-1)
+
+| Topic | 1 Relevant + buzz + surprise | 2 True | 3 Fresh | 4 Visual | 5 Mood | 6 Share | Weighted /10 |
+|---|---|---|---|---|---|---|---|
+| A vaccine made from your own cancer | 9 (cancer touches everyone; covered worldwide; "made from YOUR cancer") | 7.5 (big randomized trial; not peer-reviewed yet; the AI step on Moderna's word) | 9 (24 Oct) | 6 | 9 | 8 | **8.2** |
+| The glasses some want banned | 7.5 (smart glasses are spreading; a live ban fight; mostly Australian) | 8 | 6.5 (13-22 Oct) | 9 | 8 | 7 | **7.7** |
+| The AI that called the hurricane | 7 (forecasts touch millions; a niche buzz) | 8 | 7 (event 9 Oct, NPR 26 Oct) | 8 | 6 (nine deaths) | 6 | **7.2** |
+
+**In the owner's order the vaccine leads again**: relevance and freshness carry the most weight, and its visual risk
+(microscopic) has a plan: the body as a city (immune cells handed a "wanted poster" of the cancer's marks), the result
+as 100 small people (82 lit against 70), a cozy home place in the patient's kitchen.
