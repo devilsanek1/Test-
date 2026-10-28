@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """The journal-corpus study's tools (video/docs/studies/2026-10-28_city_posters/journals/README.md has the method).
 
-  python3 video/scripts/look/posters/journals.py merge      # parts/corpus_C*.csv -> corpus.csv (validated, deduped, J ids)
-  python3 video/scripts/look/posters/journals.py sample     # a seeded 20 % sample, stratified by collector -> blind_sample_ids.txt
+  python3 video/scripts/look/posters/journals.py merge      # parts/corpus_feeds.csv + corpus_C*.csv -> corpus.csv (validated, deduped)
+  python3 video/scripts/look/posters/journals.py select [N] # stage 2: triage top N + a random 10 % control -> stage2_ids.txt
+  python3 video/scripts/look/posters/journals.py sample     # a seeded 20 % of stage 2, stratified by source -> blind_sample_ids.txt
   python3 video/scripts/look/posters/journals.py check scores.csv [--fix]   # ranges, tags, the sums (--fix recomputes them)
   python3 video/scripts/look/posters/journals.py agreement  # scores.csv vs scores_blind.csv on the sample (markdown)
   python3 video/scripts/look/posters/journals.py stats      # per cluster and the base rates (needs clusters.csv; markdown)
@@ -32,9 +33,12 @@ OUTLETS = {
     'technologyreview.com': 'MIT Technology Review', 'scientificamerican.com': 'Scientific American',
     'nationalgeographic.com': 'National Geographic', 'smithsonianmag.com': 'Smithsonian',
     'washingtonpost.com': 'The Washington Post', 'cnn.com': 'CNN', 'npr.org': 'NPR',
+    # from the outlets' RSS feeds (fetched by the orchestrating session: feeds_raw.csv)
+    'economist.com': 'The Economist', 'nytimes.com': 'The New York Times', 'theguardian.com': 'The Guardian',
+    'newyorker.com': 'The New Yorker', 'wired.com': 'Wired', 'theatlantic.com': 'The Atlantic', 'ft.com': 'Financial Times',
 }
 CORPUS_COLS = ['id', 'outlet', 'date', 'date_source', 'headline', 'url', 'section', 'type', 'stratum', 'query',
-               'summary', 'collector']
+               'summary', 'collector', 'source', 'feed_tags']
 SCORE_COLS = ['id', 'W', 'H', 'D', 'N', 'M', 'fit', 'gate', 'gate_reason', 'R', 'T', 'Mo', 'F', 'S', 'value', 'owner',
               'wow', 'world', 'real_place', 'happens_to', 'conflict', 'everyday', 'mood', 'ad_risk', 'past_topic', 'tech_ai',
               'news_shape', 'telling_shape', 'view', 'dup_of', 'confidence', 'note']
@@ -89,7 +93,10 @@ def url_key(url):
 # ---------------------------------------------------------------- merge and sample
 
 def cmd_merge(args):
+    # the feeds first: a story found both ways keeps its feed row (complete, dated lists)
     parts = sorted(f for f in os.listdir(path(args, 'parts')) if re.fullmatch(r'corpus_C\d+\.csv', f))
+    if os.path.exists(path(args, os.path.join('parts', 'corpus_feeds.csv'))):
+        parts = ['corpus_feeds.csv'] + parts
     kept, dropped, seen = [], [], {}
     for f in parts:
         for r in read_csv(path(args, os.path.join('parts', f))):
@@ -99,16 +106,17 @@ def cmd_merge(args):
             if not r.get('url', '').startswith('http'):
                 why.append('no url')
             elif outlet is None:
-                why.append('url not one of the 11 outlets')
+                why.append('url not one of the outlets')
             if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', r.get('date', '')):
                 why.append('no date')
             elif not (WINDOW[0] <= r['date'] <= WINDOW[1]):
                 why.append('date outside the window')
-            for k in ('headline', 'summary'):
+            feed = r.get('stratum') == 'F'
+            for k in ('headline',) if feed else ('headline', 'summary'):
                 if not r.get(k):
                     why.append('no ' + k)
-            if r.get('stratum') not in ('A', 'B'):
-                why.append('stratum not A/B')
+            if r.get('stratum') not in ('A', 'B', 'F'):
+                why.append('stratum not A/B/F')
             key = url_key(r.get('url', ''))
             if not why and key in seen:
                 why.append('duplicate of ' + seen[key])
@@ -118,43 +126,71 @@ def cmd_merge(args):
             seen[key] = r.get('id', '?')
             r['outlet'] = outlet
             r['collector'] = r.get('collector') or f[len('corpus_'):-len('.csv')]
+            r['source'] = 'rss' if feed else 'search'
             kept.append(r)
-    for i, r in enumerate(kept, 1):
-        r['source_id'] = r.get('id', '')
-        r['id'] = 'J%03d' % i
-    cols = CORPUS_COLS + ['source_id']
-    write_csv(path(args, 'corpus.csv'), kept, cols)
+    write_csv(path(args, 'corpus.csv'), kept, CORPUS_COLS)
     log = ['# merge log', f'kept {len(kept)}, dropped {len(dropped)}']
     log += [f'- {sid} ({f}): {why}' for sid, f, why in dropped]
     with open(path(args, os.path.join('parts', 'merge_log.txt')), 'w', encoding='utf-8') as fh:
         fh.write('\n'.join(log) + '\n')
     print('\n'.join(log[:2]))
     by = Counter((r['outlet'], r['stratum']) for r in kept)
-    print('\n| outlet | A | B | all |\n|---|---|---|---|')
+    print('\n| outlet | search A | search B | feeds | all |\n|---|---|---|---|---|')
     for o in sorted({o for o, _ in by}):
-        print(f'| {o} | {by[(o, "A")]} | {by[(o, "B")]} | {by[(o, "A")] + by[(o, "B")]} |')
+        a, b, f_ = by[(o, 'A')], by[(o, 'B')], by[(o, 'F')]
+        print(f'| {o} | {a} | {b} | {f_} | {a + b + f_} |')
     print('\ntypes:', dict(Counter(r.get('type', '') for r in kept)))
     weeks = Counter('09-28..10-06' if r['date'] <= '2026-10-06' else '10-07..10-20' if r['date'] <= '2026-10-20'
                     else '10-21..10-28' for r in kept)
     print('dates:', dict(sorted(weeks.items())))
-    short = [r['id'] for r in kept if len(r['summary'].split()) < 10]
+    short = [r['id'] for r in kept if r['source'] == 'search' and len(r['summary'].split()) < 10]
     if short:
         print('thin summaries (< 10 words):', ' '.join(short))
 
 
+def cmd_select(args):
+    """Stage 2: the top N by the triage (t_fit, then t_wow) plus a seeded random 10 % of the rest as a control."""
+    corpus = {r['id']: r for r in read_csv(path(args, 'corpus.csv'))}
+    tri = {}
+    for f in sorted(os.listdir(path(args, 'parts'))):
+        if re.fullmatch(r'triage_\w+\.csv', f):
+            for r in read_csv(path(args, os.path.join('parts', f))):
+                if r['id'] in corpus:
+                    tri[r['id']] = r
+    missing = sorted(set(corpus) - set(tri))
+    if missing:
+        print(f'not triaged ({len(missing)}): ' + ' '.join(missing[:40]))
+    rank = sorted(tri, key=lambda i: (-(num(tri[i]['t_fit']) or 0), -(num(tri[i]['t_wow']) or 0), i))
+    top = rank[:args.n]
+    rest = rank[args.n:]
+    rng = random.Random(SEED)
+    control = sorted(rng.sample(rest, math.ceil(0.1 * len(rest)))) if rest else []
+    write_csv(path(args, 'triage.csv'), [dict(tri[i], stage2='top' if i in top else 'control' if i in control else '')
+                                         for i in sorted(tri)], ['id', 't_fit', 't_wow', 't_conf', 'stage2'])
+    with open(path(args, 'stage2_ids.txt'), 'w', encoding='utf-8') as f:
+        f.write('\n'.join(sorted(top + control)) + '\n')
+    cut = num(tri[top[-1]]['t_fit']) if top else None
+    print(f'{len(tri)} triaged; stage 2 = top {len(top)} (t_fit >= {cut}) + control {len(control)} = '
+          f'{len(top) + len(control)} -> stage2_ids.txt, triage.csv')
+
+
 def cmd_sample(args):
     rows = read_csv(path(args, 'corpus.csv'))
+    if os.path.exists(path(args, 'stage2_ids.txt')):
+        with open(path(args, 'stage2_ids.txt'), encoding='utf-8') as f:
+            keep = {x.strip() for x in f if x.strip()}
+        rows = [r for r in rows if r['id'] in keep]
     rng = random.Random(SEED)
     by = defaultdict(list)
     for r in rows:
-        by[r['collector']].append(r['id'])
+        by[r['source']].append(r['id'])
     ids = []
     for c in sorted(by):
         ids += rng.sample(by[c], math.ceil(0.2 * len(by[c])))
     ids.sort()
     with open(path(args, 'blind_sample_ids.txt'), 'w', encoding='utf-8') as f:
         f.write('\n'.join(ids) + '\n')
-    print(f'{len(ids)} of {len(rows)} ids (seed {SEED}, stratified by collector) -> blind_sample_ids.txt')
+    print(f'{len(ids)} of {len(rows)} ids (seed {SEED}, stratified by source) -> blind_sample_ids.txt')
 
 
 # ---------------------------------------------------------------- scores
@@ -193,6 +229,9 @@ def cmd_check(args):
     corpus = {r['id'] for r in read_csv(path(args, 'corpus.csv'))}
     if os.path.basename(p) == 'scores_blind.csv':
         with open(path(args, 'blind_sample_ids.txt'), encoding='utf-8') as f:
+            want = {x.strip() for x in f if x.strip()}
+    elif os.path.exists(path(args, 'stage2_ids.txt')):
+        with open(path(args, 'stage2_ids.txt'), encoding='utf-8') as f:
             want = {x.strip() for x in f if x.strip()}
     else:
         want = corpus
@@ -583,6 +622,8 @@ def main():
     sub = ap.add_subparsers(dest='cmd', required=True)
     sub.add_parser('merge')
     sub.add_parser('sample')
+    se = sub.add_parser('select')
+    se.add_argument('n', nargs='?', type=int, default=250)
     c = sub.add_parser('check')
     c.add_argument('file')
     c.add_argument('--fix', action='store_true')
@@ -595,7 +636,7 @@ def main():
     ch = sub.add_parser('chart')
     ch.add_argument('--title', default='')
     args = ap.parse_args()
-    fn = {'merge': cmd_merge, 'sample': cmd_sample, 'check': cmd_check, 'agreement': cmd_agreement,
+    fn = {'merge': cmd_merge, 'select': cmd_select, 'sample': cmd_sample, 'check': cmd_check, 'agreement': cmd_agreement,
           'stats': cmd_stats, 'slices': cmd_slices, 'top': cmd_top, 'chart': cmd_chart}[args.cmd]
     sys.exit(fn(args) or 0)
 
