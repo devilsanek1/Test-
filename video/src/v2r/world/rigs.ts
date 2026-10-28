@@ -9,15 +9,23 @@
 // both sun push-throughs) and two suns never share a frame. Every shot: contact shadows under everything that touches a
 // surface; casts for people, posts, boards and trees along the key; FormShade on the side away from it; `Shade` one
 // step on planes turned from the sun; Rim only on her (S1, S4, S8); lit panes are `LitWindow` (L* 85-92, no glow).
+// On WATER (the canal in S1, S2, S3, S4, S8) a light-layer shade takes `tint="water"` (TINT_CANAL.water, the water's
+// own deeper step), never the rose family; a shade drawn as a flat fill of the water's own steps needs none.
 // Check: scripts/qa/check_light.py on an A/B (`--props='{"lightOff":true}'`) with --sky '#BCDCCF' and
 // --exclude 0,0,1080,<the shot's sky bottom y> (its default sky is v3's dusk blue).
 import {CM} from '../palette';
-import {makeRig, sunLight, tintFamily, withKey, type LightRig} from '../../lib/light';
+import {makeRig, sunLight, tintFamily, tintFor, withKey, type LightRig, type Tints} from '../../lib/light';
 
 /** The film's ONE shadow family: CM.shadeWarm at 0.20 / 0.28 / 0.48 (= the light demo's TINT_CANAL): on the paving
- *  form / cast / contact dL* -9 / -13 / -22, chroma kept, toward rose. Never a contact strip on water (it greys): a
- *  cast-strength strip at a waterline at most. Day and evening: no ambient step (#FFFFFF). */
-export const TINT_CANAL = tintFamily(CM.shadeWarm, {form: 0.2, cast: 0.28, contact: 0.48}, '#FFFFFF');
+ *  form / cast / contact dL* -9 / -13 / -22, chroma kept, toward rose. Day and evening: no ambient step (#FFFFFF).
+ *  ON WATER: `water`, the water's own deeper step (CM.water x it = CM.waterDeep: dL* -9, C* 15 -> 18, the hue kept).
+ *  The rose family greys teal water: its cast took S1's far water to C* 4.7 (check_light "greyed", L1 v4). Lanes
+ *  write `tint="water"` (lib/light's tintOf finds the key) on every light-layer shade on the canal: a cast-strength
+ *  strip at a waterline at most, never a contact strip. */
+export const TINT_CANAL: Tints & {water: string} = {
+  ...tintFamily(CM.shadeWarm, {form: 0.2, cast: 0.28, contact: 0.48}, '#FFFFFF'),
+  water: tintFor(CM.water, CM.waterDeep),
+};
 
 /** The lamp pools (two flat steps, both lighter and warmer than the paving: +4 L* at least) and the rim colour. */
 export const CANAL_POOL: [string, string] = ['#FBE6C2', '#FFF2D9'];

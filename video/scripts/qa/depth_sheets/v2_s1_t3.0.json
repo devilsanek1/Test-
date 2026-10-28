@@ -252,6 +252,6 @@
    "level": 4
   }
  ],
- "air_hex": "#FDD5B8",
+ "air_hex": "#FDD6B8",
  "note": "L1: the 3.0 s variant of v2_s1 (her and the first two copies as GrabCut boxes at 3.0 s, fixed seed). 2026-10-28: the seated public left our bank (the orchestrator's size decision); two people on the bridge (level 4 m) and one through the arch (beyond the bend: off the y-camera, not listed); the ducks at their water's scale. 2026-10-28: air_hex = S1_AIR (lib/sky horizonColor(S1_EVENING, SUN0.x))."
 }

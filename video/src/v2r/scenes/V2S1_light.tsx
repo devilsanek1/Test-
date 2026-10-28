@@ -11,8 +11,7 @@
 // Every shape lands with the flood at its spot (`at` = floodAt): frame 0 is pale shapes only, no shadow smudges.
 // Her form shade and rim (her left edge, the key side) are in V2S1_row (they need her drawing).
 import React from 'react';
-import {CastShadow, ContactShadow, Shade, Shadow, ShadowLayer, tintFor} from '../../lib/light';
-import {CM} from '../palette';
+import {CastShadow, ContactShadow, Shade, Shadow, ShadowLayer} from '../../lib/light';
 import {useTime} from '../../lib/time';
 import * as MAP from '../world/map';
 import {boatGeom} from '../kit/canal/boat';
@@ -83,12 +82,8 @@ export const S1LobbyContact: React.FC<{x: number; y: number; h: number}> = ({x, 
   </ShadowLayer>
 );
 
-/** A shade on the canal: the water's own deeper step (water x this = CM.waterDeep, dL* -9, chroma kept). The rig's rose
- *  family greys teal water (rigs.ts: the cast step took the far water to C* 4.7, check_light's "greyed"), so the
- *  waterline strips take this tint instead. */
-const WATER_SHADE = tintFor(CM.water, CM.waterDeep);
-
-/** The moored boats: a cast-strength strip along each waterline (the hull's shade on the water; never a contact strip). */
+/** The moored boats: a cast-strength strip along each waterline (the hull's shade on the water; never a contact strip),
+ *  in the rig's `water` tint (rigs.ts TINT_CANAL.water: the water's own deeper step; the rose family greys teal). */
 export const S1BoatStrips: React.FC<{which: 'A' | 'B'}> = ({which}) => {
   const o = which === 'A' ? BOAT_A : BOAT_B;
   const g = boatGeom(o);
@@ -98,7 +93,7 @@ export const S1BoatStrips: React.FC<{which: 'A' | 'B'}> = ({which}) => {
   const d = `M${xa} ${y - 1}L${xb} ${y - 1}L${xb} ${y + 6}L${xa + 6} ${y + 6}Z`;
   return (
     <ShadowLayer>
-      <Shadow d={d} tint={WATER_SHADE} at={floodAt((xa + xb) / 2, y)} />
+      <Shadow d={d} tint="water" at={floodAt((xa + xb) / 2, y)} />
     </ShadowLayer>
   );
 };
