@@ -19,9 +19,10 @@ and `video/docs/PIPELINE_V2.md`.
 ## Status by gate
 | Gate | Status | File |
 |---|---|---|
-| G0 topic | **ROUND 3, a very recent POSITIVE AI story** (owner, 2026-10-28: "alternate between positive and more negative topics ... something very recent, extremely relevant yet very positive around AI. like AI is helping to find medication or solve some disease"; asked to switch video 4: "Switch video 4 (Recommended)"). The first five scouts died at the usage limit before writing anything (11:10-13:30 UTC); the weekly limit is at its warning level (resets ~4 Nov 03:00 UTC), so the owner is asked before the relaunch | `scouting_r3/`, then `G0_TOPICS_r3.md` (top 3) |
-| G0.5 core line | not started for the new topic | |
-| G1+ | not started | |
+| G0 topic + core line | **Shortlist and chart sent; waiting on the owner's pick** (2026-10-28 ~17:00 UTC). Rounds 3 (positive AI) and 4 (AI-adjacent, owner: "expand it to AI adjacent news") ran lean (2 scouts + 1 editor each). All 23 stories re-ranked in the owner's order (`docs/TOPIC_CRITERIA.md`: relevant with buzz and surprise, true, visual, mood, fresh = about the last month, shareable). Top: the glasses 8.34 and the vaccine 8.32 (tied; the tie-break, a real person in his own words, favours the glasses), quake alerts 7.81, the hurricane 7.76, "could they hear you?" 7.68 | `G0_TOPICS_r4.md` (top 3 with core lines, every table), `topic_scores.json`, `topic_chart.png` |
+| Fact lock | after the pick: one agent, the only web check | `research/factlock.md` |
+| G1 script | after the fact lock: writer + critic + one fix pass | |
+| G2 voice | after the owner approves the script: the API (`docs/voice/API_QUICKSTART.md`) | `public/v4/` |
 
 **Parked, not rejected: AI songs and the shared royalty pot** (G0 + G0.5 complete, top 3 core lines truth-checked, no
 pick made): `archive/ai_songs/` (its README says how to resume), listed in `docs/IDEAS_BANK.md`.
@@ -31,23 +32,28 @@ pick made): `archive/ai_songs/` (its README says how to resume), listed in `docs
 - Focus on tech and AI news; this round a genuinely POSITIVE AI story (a medicine, a disease, earlier diagnosis, a
   public good), with a hopeful outlook and the same standards as any story: what AI did and didn't do, trial stage,
   peer review, who benefits and when (playbook "Taste signals": alternate the mood).
+- AI-adjacent news is in scope (2026-10-28); stories are picked in the owner's order (`docs/TOPIC_CRITERIA.md`).
 
-## Next step: G0 round 3, then G0.5 for the pick
-Round 3 runs as subagents (Agent tool, `effort: max`), each writing its results into `scouting_r3/` as it goes: five
-scouts (medicine, diagnosis, science, everyday good, viral good news; briefs in this session's history, the round-2
-template `context/workflows/v4-g0-topics-tech-*.js` for the structure), three judges (growth, standards, creative; an
-"uplift" score added), a synthesis into `G0_TOPICS_r3.md` (top 3 on one screen) and an adversarial fact-check. After
-the owner's pick: lock it as `G0_TOPICS.md`, then G0.5 the same way as the parked AI-songs run (research -> fact lock ->
-lever writers -> judges -> viewer panel + sceptics -> editor -> truth check; bookkeeping `video/scripts/coreline.py`),
-then G1 (story-first script, template `context/workflows/v3-g1-story-*.js`, rhythm rule `check_rhythm.py` OK), then
-G2 voice. **The voice key:** this session has no `ELEVENLABS_API_KEY`; the owner is making a new restricted key (the
-pasted string was the key's ID, not the key) to store as the environment's network secret; a helper session in the
-same environment then runs G2. **Craft tooling lane** (`docs/PIPELINE_V2.md`): owned by the session running v4, must
-land before v4's G3; G0-G2 never wait for it; schedule it against the weekly limit.
+## Next step: the owner's pick, then the lean G0-G2 (`docs/PIPELINE_V2.md`)
+The owner's goal for this session: "lets scout for the most relevant story, then write a script and generate the sound."
+1. Lock the pick as `G0_TOPICS.md` (the topic, its core line, a through-line card draft); update this file.
+2. Fact lock: one agent (Agent tool, `effort: max`), from the editor's sources in `G0_TOPICS_r4.md` and the scouting
+   files, into `research/factlock.md`. Every later check reads it and searches only for a fact it lacks.
+3. G1: one writer (two spines, picks one, the script with cues; `check_rhythm.py` and `check_paste.py` OK), one critic
+   (a cold retell, flow, facts against the fact file, at most 6 findings), one fix pass. The owner approves the script
+   and the through-line card.
+4. G2: the voice through the API. **The key:** this container has no `ELEVENLABS_API_KEY`. The owner stores the real
+   secret (it starts with `sk_`; the 64-hex string pasted on 2026-10-27 was the key's ID) as the environment's secret; a
+   new session in the same environment sees it (a helper session's first prompt is exactly `/effort max`). Lock the take
+   into `public/v4/` and log it in `ELEVENLABS.md` section 5.
+
+**Craft tooling lane** (`docs/PIPELINE_V2.md`): owned by the session running v4, must land before v4's G3; G0-G2 never
+wait for it; schedule it against the weekly limit.
 
 ## Files in this folder
 - `archive/ai_songs/`: the parked first topic, complete through G0.5.
-- `scouting_r3/` (round 3, positive AI) and `G0_TOPICS_r3.md` once written.
+- `scouting_r3/` + `G0_TOPICS_r3.md` (round 3, positive AI) and `scouting_r4/` + `G0_TOPICS_r4.md` (round 4,
+  AI-adjacent; the full re-rank). `topic_scores.json` and `topic_chart.png` (drawn by `video/scripts/topic_chart.py`).
 - `OWNER_NOTES.md`: every owner note on v4, verbatim, with what we did.
 - `archive/G0_TOPICS_round1.md` (gas tanks, commute to Zoom, padlock key 4) and `archive/G0_TOPICS_round2_options.md`
   (the tech/AI top 3 with score table and runner-ups). No prompt reads the archive.
