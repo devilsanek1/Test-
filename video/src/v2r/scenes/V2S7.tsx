@@ -18,7 +18,8 @@
 // screen-fixed (the S6 -> S7 push-through lands on it at 28.10: what shows in its 7x window is the sun, the sky and
 // the board's top rail only). Light: <Lit rig={RIG_CANAL}> (V2S7_light: the sun low at the left).
 // Parts: V2S7_plan (the camera and the plan), V2S7_rig (the clock), V2S7_far (sky, sun, the west strip), V2S7_wing,
-// V2S7_ground (paving, the plane tree, the bollard), V2S7_near (cafe, planter, basin), V2S7_folk (people, bikes,
+// V2S7_ground (paving, the plane tree, the bollard), V2S7_near (cafe, planter, basin rims), V2S7_water (the basin's
+// water and jets: one component for the coming lib/water swap), V2S7_folk (people, bikes,
 // festoon, smoke), V2S7_particles, V2S7_light, V2S7_board, V2S7_pipdraw, V2S7_wiper (the wipe into S8: `Wiper`).
 import React from 'react';
 import {World} from '../../lib/World';
@@ -34,7 +35,8 @@ import {S7Plane} from './V2S7_float';
 import {S7Sky, S7Sun, S7FarRoofs, S7FarTrees, S7WestEdge} from './V2S7_far';
 import {S7WingFront} from './V2S7_wing';
 import {S7Ground, S7TreeGrate, S7NearLeaves, S7TreeTrunk, S7TreeCrown, S7Bollard} from './V2S7_ground';
-import {S7Cafe, S7Planter, S7BasinWater, S7BasinRims, S7Jets} from './V2S7_near';
+import {S7Cafe, S7Planter, S7BasinFarRim, S7BasinRims} from './V2S7_near';
+import {S7BasinWater} from './V2S7_water';
 import {S7StaffInside, S7StaffOutside, S7Cyclist, S7CafePair, S7FarWalker, S7Bikes, S7Festoon, S7BoatSmoke} from './V2S7_folk';
 import {S7Field} from './V2S7_particles';
 import {
@@ -122,11 +124,11 @@ const V2S7: React.FC = () => {
           {/* the near things: the basin, then the cafe and the planter */}
           <S7Plane plane={P.basin}>
             <S7BasinContact />
+            <S7BasinFarRim />
             <S7BasinWater />
             <S7BasinWaterShade />
             <S7BasinRims />
             <S7BasinFaceShade />
-            <S7Jets />
           </S7Plane>
           <S7Plane plane={P.cafe}>
             <S7CafeShadows />

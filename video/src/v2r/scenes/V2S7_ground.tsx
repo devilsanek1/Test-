@@ -1,9 +1,10 @@
 // V2S7_ground.tsx (lane L5): the FORECOURT of V2S7 on ONE camera (V2S7_plan S7_CAM: eye 1.6 m, horizon 897, VP
 // (540, 897)) and its young London plane, plane +0.5.
 //   S7Ground band    the granite paving laid out flat in metres and projected (CRAFT §f.4): long slabs 0.6 m wide
-//                    running north, so their joints run INTO the picture to the VP (|dL*| 7, a band that narrows with
-//                    distance), staggered cross joints that foreshorten toward the wing (only nearer than 14 m: the far
-//                    paving calms to its long joints). Drawn in three bands, one per float plane (near z < 4.6: -1;
+//                    running north, so their joints run INTO the picture to the VP (|dL*| 8, a band that narrows with
+//                    distance), darker granite strips (0.12 m) every 2.4 m running north too (they keep the far
+//                    forecourt's perspective readable where the joints thin to a hairline), staggered cross joints that
+//                    foreshorten toward the wing (only nearer than 14 m: the far paving calms to its long lines). Drawn in three bands, one per float plane (near z < 4.6: -1;
 //                    mid 4.6-11.8: 0; far 11.8 to the steps: +0.5); each seam lies on a cross joint.
 //   S7TreeGrate      the plane's iron grate (seen in perspective) and the fallen leaves round it
 //   S7NearLeaves     three big fallen leaves on the near paving (sized by the camera: ~0.17 m)
@@ -33,6 +34,12 @@ const SLAB_L = 1.2;
 const JOINT_W = 0.014;
 /** x of the long joints (m): 0.3 + 0.6 j, none exactly on the lens axis. */
 const JOINT_XS = Array.from({length: 61}, (_, j) => 0.3 + SLAB_W * (j - 30)).filter((x) => Math.abs(x) < 18);
+/** The forecourt's granite strips: a darker stone 0.12 m wide every 2.4 m, running north into the picture (as the
+ *  paving's long joints do: the far forecourt's thin joints narrow to a hairline, these strips keep its perspective
+ *  readable to the wing). Off the lens axis: none crosses the bottom centre. */
+const STRIP = seamTone(CM.paving, 9);
+const STRIP_W = 0.12;
+const STRIP_XS = [-6.3, -3.9, -1.5, 1.5, 3.9, 6.3, 8.7];
 
 /** A joint as a band in the plane (its width in metres, held >= 1.4 px on screen so the far joints still read). */
 function jointQuad(x: number, z0: number, z1: number): P2[] {
@@ -66,6 +73,8 @@ export const S7Ground: React.FC<{band: GroundBand}> = ({band}) => {
       if (x < Math.min(XSPAN(za)[0], lo) - 1 || x > Math.max(XSPAN(za)[1], hi) + 1) continue;
       k.poly(JOINT, jointQuad(x, za, z1));
     }
+    // the granite strips (over the joints they lie on)
+    for (const x of STRIP_XS) k.poly(STRIP, [pt(x - STRIP_W / 2, za), pt(x + STRIP_W / 2, za), pt(x + STRIP_W / 2, z1), pt(x - STRIP_W / 2, z1)]);
     // staggered cross joints (running bond), only nearer than 14 m
     for (let j = 0; j < JOINT_XS.length - 1; j++) {
       const xa = JOINT_XS[j];

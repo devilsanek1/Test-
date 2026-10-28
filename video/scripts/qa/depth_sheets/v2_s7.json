@@ -1,0 +1,431 @@
+{
+ "name": "v2 S7 \"Google says\" at 31.00 s (lane L5: one eye-level camera, horizon 897, VP (540, 897); the push z 1.0000 about (390, 960) and the float applied per plane)",
+ "units": "px",
+ "air_hex": "#F3C6A6",
+ "planes": [
+  {
+   "name": "far roofs on the sunset band (west strip)",
+   "plane": 3,
+   "boxes": [
+    [
+     4.8,
+     728.7,
+     100.8,
+     744.7
+    ]
+   ]
+  },
+  {
+   "name": "the far street's plane trees (west strip)",
+   "plane": 2,
+   "boxes": [
+    [
+     5.9,
+     775.2,
+     93.9,
+     857.2
+    ]
+   ]
+  },
+  {
+   "name": "the wing's facade above the canopy (shaded brick, tone-on-tone lit panes)",
+   "plane": 1,
+   "boxes": [
+    [
+     702.4,
+     621,
+     942.4,
+     693
+    ]
+   ]
+  },
+  {
+   "name": "the young plane (its crown)",
+   "plane": 0.5,
+   "boxes": [
+    [
+     966.8,
+     662.8,
+     1072.8,
+     834.8
+    ]
+   ]
+  },
+  {
+   "name": "Google's board (the subject's plane)",
+   "plane": 0,
+   "role": "subject",
+   "boxes": [
+    [
+     115.2,
+     680.6,
+     671.2,
+     1236.6
+    ]
+   ],
+   "exclude": [
+    [
+     643.2,
+     1090.6,
+     773.2,
+     1280.6
+    ]
+   ]
+  },
+  {
+   "name": "the fountain basin (rims, water, jets)",
+   "plane": -0.5,
+   "boxes": [
+    [
+     818.9,
+     1250.3,
+     1081.9,
+     1393.3
+    ]
+   ]
+  },
+  {
+   "name": "the cafe and the planter (near things)",
+   "plane": -1,
+   "boxes": [
+    [
+     4.5,
+     1294.1,
+     399.5,
+     1758.1
+    ],
+    [
+     922.5,
+     1448.1,
+     1082.5,
+     1913.1
+    ]
+   ]
+  }
+ ],
+ "silhouettes": [
+  {
+   "name": "Google's board (tier A: its frame against the sky, the wing, the west strip, the paving)",
+   "tier": "A",
+   "poly": [
+    [
+     113.2,
+     678.6
+    ],
+    [
+     673.2,
+     678.6
+    ],
+    [
+     674.7,
+     684.6
+    ],
+    [
+     687.2,
+     1245.6
+    ],
+    [
+     673.2,
+     1248.6
+    ],
+    [
+     633.2,
+     1248.6
+    ],
+    [
+     633.2,
+     1238.6
+    ],
+    [
+     153.2,
+     1238.6
+    ],
+    [
+     153.2,
+     1248.6
+    ],
+    [
+     113.2,
+     1248.6
+    ]
+   ],
+   "roi": [
+    [
+     93.2,
+     653.6,
+     708.2,
+     703.6
+    ],
+    [
+     648.2,
+     678.6,
+     713.2,
+     1233.6
+    ],
+    [
+     91.2,
+     678.6,
+     138.2,
+     1233.6
+    ]
+   ]
+  },
+  {
+   "name": "Pip on the bollard",
+   "tier": "mass",
+   "poly": [
+    [
+     712,
+     1095
+    ],
+    [
+     706,
+     1100
+    ],
+    [
+     705,
+     1095
+    ],
+    [
+     703,
+     1101
+    ],
+    [
+     695,
+     1097
+    ],
+    [
+     702,
+     1102
+    ],
+    [
+     690,
+     1104
+    ],
+    [
+     680,
+     1109
+    ],
+    [
+     671,
+     1119
+    ],
+    [
+     669,
+     1127
+    ],
+    [
+     659,
+     1131
+    ],
+    [
+     656,
+     1136
+    ],
+    [
+     656,
+     1142
+    ],
+    [
+     660,
+     1148
+    ],
+    [
+     665,
+     1150
+    ],
+    [
+     675,
+     1148
+    ],
+    [
+     681,
+     1153
+    ],
+    [
+     681,
+     1157
+    ],
+    [
+     671,
+     1172
+    ],
+    [
+     670,
+     1183
+    ],
+    [
+     665,
+     1189
+    ],
+    [
+     665,
+     1197
+    ],
+    [
+     673,
+     1206
+    ],
+    [
+     680,
+     1206
+    ],
+    [
+     685,
+     1202
+    ],
+    [
+     695,
+     1205
+    ],
+    [
+     710,
+     1205
+    ],
+    [
+     720,
+     1202
+    ],
+    [
+     726,
+     1207
+    ],
+    [
+     726,
+     1200
+    ],
+    [
+     731,
+     1195
+    ],
+    [
+     731,
+     1200
+    ],
+    [
+     733,
+     1198
+    ],
+    [
+     735,
+     1174
+    ],
+    [
+     729,
+     1162
+    ],
+    [
+     746,
+     1161
+    ],
+    [
+     745,
+     1135
+    ],
+    [
+     737,
+     1121
+    ],
+    [
+     730,
+     1120
+    ],
+    [
+     719,
+     1108
+    ],
+    [
+     706,
+     1103
+    ]
+   ],
+   "roi": [
+    [
+     643.2,
+     1088.6,
+     773.2,
+     1210.6
+    ]
+   ],
+   "note": "polygon baked from a GrabCut of the box [640, 1095, 765, 1208] at 31 s (fixed seed), carried to this time by the code's push and float"
+  }
+ ],
+ "ground": [
+  {
+   "name": "the forecourt in front of the board (joints to the VP)",
+   "roi": [
+    3.2,
+    1260.6,
+    1083.2,
+    1918.6
+   ],
+   "vps": [
+    [
+     543.2,
+     895.6
+    ]
+   ]
+  },
+  {
+   "name": "the forecourt right of the board, to the wing",
+   "roi": [
+    702.8,
+    1016.8,
+    1082.8,
+    1248.8
+   ],
+   "vps": [
+    [
+     543.2,
+     895.6
+    ]
+   ]
+  }
+ ],
+ "horizon": 895.6,
+ "things": [
+  {
+   "name": "Google's board (2.58 m: a big freestanding A-board)",
+   "y": 1248.6,
+   "px": 570,
+   "m": 2.58
+  },
+  {
+   "name": "Pip's stone bollard (0.29 m)",
+   "y": 1272.6,
+   "px": 69,
+   "m": 0.29
+  },
+  {
+   "name": "the cafe table (0.75 m)",
+   "y": 1717.9,
+   "px": 385.7,
+   "m": 0.75
+  },
+  {
+   "name": "chair B (its back 0.88 m)",
+   "y": 1781.2,
+   "px": 484.9,
+   "m": 0.88
+  },
+  {
+   "name": "the young plane (to its crown top, 4.17 m)",
+   "y": 1069.3,
+   "px": 452.5,
+   "m": 4.17
+  },
+  {
+   "name": "a Sheffield stand on the frontage (0.8 m)",
+   "y": 1020.1,
+   "px": 62.1,
+   "m": 0.8
+  },
+  {
+   "name": "the cyclist (1.72 m)",
+   "y": 1032.9,
+   "px": 147.4,
+   "m": 1.72
+  }
+ ],
+ "note": "L5, 2026-10-28: generated from the code's geometry (V2S7_plan S7_CAM, the board B, BOARD_BOLLARD, the push s7PushAt and the per-plane float s7PlaneOffset at 31 s). Every visible plane boxed, the farthest (+3, the far roofs) included, no box over sky; the air = S7_AIR (horizonColor(S7_SUNSET, SUN2.x))."
+}

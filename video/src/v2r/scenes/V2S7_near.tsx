@@ -6,18 +6,16 @@
 //               draped over it, cut by the left edge; chair B to the right
 //   S7Planter   plane -1: a corten planter of grasses in the bottom-right corner, cut by both edges, its west side lit
 //   S7Basin*    plane -0.5: the fountain basin at the right: a low limestone rim (its west end toward the low sun, its
-//               near face south: V2S7_light's shade step), plain flat water (the owner on v5: "I don't like the water
-//               too much": no glints, no water styling), three STEADY jets in a row running into the picture
+//               near face south: V2S7_light's shade step); its water and jets are V2S7_water's (one component)
 // Near planes get value range, not prop count (CRAFT §f): their plane-0 colours one near step darker (lib/depth recede
 // -1 / -0.5); tier C (environment: flat fills, no outline). Nothing here rises over the board's bottom rail where it
 // stands in front of it (h <= 1.6 - 0.196 z m), nor near Pip (x 645-755, y >= 1100).
 import React, {useMemo} from 'react';
 import {CM} from '../palette';
-import {useTime} from '../../lib/time';
 import {Tier} from '../../lib/tier';
 import {recede} from '../../lib/depth';
-import {Batch, Paint, lobes, ovalPath, rng} from '../kit/canal/core';
-import {kz, pt, S7_ATM, S7_BASIN, S7_CAFE, type P2} from './V2S7_plan';
+import {Batch, Paint, lobes, rng} from '../kit/canal/core';
+import {pt, S7_ATM, S7_BASIN, S7_CAFE, type P2} from './V2S7_plan';
 
 const near = (c: string, plane = -1) => recede(c, plane, S7_ATM);
 
@@ -218,101 +216,54 @@ export const S7Planter: React.FC = () => {
 // ---------------------------------------------------------------- the fountain basin (-0.5)
 
 const BS = S7_BASIN;
-/** The basin's faces (screen polygons) for the light layer. */
+/** The basin's faces (screen polygons) for the light layer (its water is V2S7_water's S7_WATER). */
 export function s7BasinFaces() {
-  const {x0, x1, zN, zF, rim, coping, water} = BS;
+  const {x0, x1, zN, zF, rim} = BS;
   return {
     nearFace: front(x0, x1, zN, 0, rim),
     westFace: side(x0, zN, zF, 0, rim),
-    water: flat(x0 + coping, x1, zN + coping, zF - coping, water),
-    /** The west wall's shadow on the water (the low western sun over the coping): a thin strip along its inner edge. */
-    waterShade: flat(x0 + coping, x0 + coping + 0.14, zN + coping, zF - coping, water),
     foot: [pt(x0, zF, 0), pt(x0, zN, 0), pt(x1, zN, 0)] as P2[],
   };
 }
 
-/** The water: plain and flat (one colour and the far rim's reflection as one deeper step: S1's treatment). */
-export const S7BasinWater: React.FC = () => {
+const STONE = {
+  stone: recede(CM.limestone, -0.5, S7_ATM),
+  lit: recede(CM.paper, -0.5, S7_ATM),
+  edge: recede(CM.stucco, -0.5, S7_ATM),
+};
+
+/** The far rim (its inner face over the water and its coping): drawn before the water. */
+export const S7BasinFarRim: React.FC = () => {
   const b = useMemo(() => {
     const k = new Batch();
-    const {x0, x1, zN, zF, coping, water} = BS;
-    k.poly(recede(CM.water, -0.5, S7_ATM), flat(x0 + coping, x1, zN + coping, zF - coping, water));
-    k.poly(recede(CM.waterDeep, -0.5, S7_ATM), flat(x0 + coping, x1, zF - coping - 0.24, zF - coping, water));
+    const {x0, x1, zF, rim, coping, water} = BS;
+    k.poly(STONE.edge, front(x0 + coping, x1, zF - coping, water, rim));
+    k.poly(STONE.stone, flat(x0, x1, zF - coping, zF, rim));
     return k;
   }, []);
   return (
     <Tier tier="environment">
-      <Paint b={b} seed="s7/basinWater" misreg={false} />
+      <Paint b={b} seed="s7/basinFar" misreg={false} />
     </Tier>
   );
 };
 
-/** The rims: the far coping and its inner face, the west end (toward the low western sun: lit), the near rim. */
+/** The west end (toward the low western sun: lit) and the near rim (its south face: V2S7_light's Shade step), after the
+ *  water. */
 export const S7BasinRims: React.FC = () => {
   const b = useMemo(() => {
     const k = new Batch();
-    const {x0, x1, zN, zF, rim, coping, water} = BS;
-    const stone = recede(CM.limestone, -0.5, S7_ATM);
-    const stoneLit = recede(CM.paper, -0.5, S7_ATM);
-    const stoneEdge = recede(CM.stucco, -0.5, S7_ATM);
-    k.poly(stoneEdge, front(x0 + coping, x1, zF - coping, water, rim));
-    k.poly(stone, flat(x0, x1, zF - coping, zF, rim));
+    const {x0, x1, zN, zF, rim, coping} = BS;
+    k.poly(STONE.lit, side(x0, zN, zF, 0, rim));
+    k.poly(STONE.stone, flat(x0, x0 + coping, zN, zF, rim));
     k.layer();
-    k.poly(stoneLit, side(x0, zN, zF, 0, rim));
-    k.poly(stone, flat(x0, x0 + coping, zN, zF, rim));
-    k.layer();
-    k.poly(stone, front(x0, x1, zN, 0, rim));
-    k.poly(stoneLit, flat(x0, x1, zN, zN + coping, rim));
+    k.poly(STONE.stone, front(x0, x1, zN, 0, rim));
+    k.poly(STONE.lit, flat(x0, x1, zN, zN + coping, rim));
     return k;
   }, []);
   return (
     <Tier tier="environment">
       <Paint b={b} seed="s7/basinRims" misreg={false} />
-    </Tier>
-  );
-};
-
-/** The three steady jets: a column of glass with a paper stripe on the sun side and the water's tone on the far side,
- *  a slow ripple up its length, a small crown of falling water, a foam ring at the foot (constant height). */
-export const S7Jets: React.FC = () => {
-  const t = useTime();
-  const jets = new Batch();
-  const glass = recede(CM.glass, -0.5, S7_ATM);
-  const foam = recede(CM.paper, -0.5, S7_ATM);
-  const deep = recede(CM.water, -0.5, S7_ATM);
-  BS.jets.z.forEach((z, i) => {
-    const {x, h, r} = BS.jets;
-    const k = kz(z);
-    const [bx, by] = pt(x, z, BS.water);
-    const [, ty] = pt(x, z, BS.water + h);
-    const H = by - ty;
-    const half = r * k;
-    const L: P2[] = [];
-    const R: P2[] = [];
-    const S: P2[] = [];
-    const N = 10;
-    for (let s = 0; s <= N; s++) {
-      const u = s / N;
-      const y = by - H * u;
-      const w = half * (1 - 0.35 * u);
-      const wob = 1.2 * Math.sin(2 * Math.PI * (u * 2 - t * 1.6) + i * 1.7) * u;
-      L.push([bx - w + wob, y]);
-      R.push([bx + w + wob, y]);
-      S.push([bx - w * 0.35 + wob, y]);
-    }
-    jets.poly(foam, ring(x, z, r * 2.2, BS.water + 0.002, 20));
-    jets.layer();
-    jets.poly(glass, [...L, ...R.slice().reverse()]);
-    jets.poly(foam, [...L, ...S.slice().reverse()]);
-    jets.poly(deep, [...S.map(([sx, sy]) => [sx + half * 0.9, sy] as P2), ...R.slice().reverse()]);
-    const cx = (L[N][0] + R[N][0]) / 2;
-    jets.fill(glass, `M${(cx - half * 2.4).toFixed(1)} ${(ty + 5).toFixed(1)}Q${cx.toFixed(1)} ${(ty - half * 1.6).toFixed(1)} ${(cx + half * 2.4).toFixed(1)} ${(ty + 5).toFixed(1)}Z`);
-    jets.fill(foam, ovalPath(cx - half * 0.3, ty + 1, half * 1.2, half * 0.7));
-    jets.layer();
-  });
-  return (
-    <Tier tier="environment">
-      <Paint b={jets} seed="s7/jets" misreg={false} />
     </Tier>
   );
 };
