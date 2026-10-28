@@ -1,0 +1,337 @@
+{
+ "title": "Video 4: the story shortlist",
+ "subtitle": "Scored in the owner's order of importance (2026-10-28)",
+ "criteria": [
+  {
+   "key": "relevant",
+   "label": "Relevant (+ buzz, surprise)",
+   "weight": 6
+  },
+  {
+   "key": "true",
+   "label": "True and solid",
+   "weight": 5
+  },
+  {
+   "key": "visual",
+   "label": "Visually appealing",
+   "weight": 4
+  },
+  {
+   "key": "mood",
+   "label": "Mood (hopeful)",
+   "weight": 3
+  },
+  {
+   "key": "fresh",
+   "label": "Fresh (last month)",
+   "weight": 2
+  },
+  {
+   "key": "share",
+   "label": "Shareable",
+   "weight": 1
+  }
+ ],
+ "stories": [
+  {
+   "rank": 1,
+   "name": "\"Pervert glasses\" that read a blind man's menu",
+   "scores": {
+    "relevant": 8.2,
+    "true": 8.0,
+    "visual": 9,
+    "mood": 8.0,
+    "fresh": 9,
+    "share": 8.0
+   },
+   "total": 8.34
+  },
+  {
+   "rank": 2,
+   "name": "Personal mRNA melanoma vaccine, Phase 3",
+   "scores": {
+    "relevant": 8.3,
+    "true": 9.0,
+    "visual": 6,
+    "mood": 9.0,
+    "fresh": 10,
+    "share": 9.0
+   },
+   "total": 8.32
+  },
+  {
+   "rank": 3,
+   "name": "Android quake alerts reach 200+ countries",
+   "scores": {
+    "relevant": 7.5,
+    "true": 7.0,
+    "visual": 9.0,
+    "mood": 8.0,
+    "fresh": 8,
+    "share": 8.0
+   },
+   "total": 7.81
+  },
+  {
+   "rank": 4,
+   "name": "Hurricane Isaias: the AI called the landfall",
+   "scores": {
+    "relevant": 8.0,
+    "true": 7.0,
+    "visual": 8,
+    "mood": 8.0,
+    "fresh": 8,
+    "share": 8.0
+   },
+   "total": 7.76
+  },
+  {
+   "rank": 5,
+   "name": "\"Could they hear you?\": a bedside EEG reads 1 in 3 \"unresponsive\" ICU patients",
+   "scores": {
+    "relevant": 8.2,
+    "true": 7.0,
+    "visual": 7.0,
+    "mood": 7.0,
+    "fresh": 10,
+    "share": 8.0
+   },
+   "total": 7.68
+  },
+  {
+   "rank": 6,
+   "name": "First patient given AI-designed phages",
+   "scores": {
+    "relevant": 8.2,
+    "true": 4.0,
+    "visual": 9.0,
+    "mood": 6.0,
+    "fresh": 10,
+    "share": 9.0
+   },
+   "total": 7.25
+  },
+  {
+   "rank": 7,
+   "name": "Pancreatic cancer in \"normal\" CT scans",
+   "scores": {
+    "relevant": 8.0,
+    "true": 7.0,
+    "visual": 6.0,
+    "mood": 8.0,
+    "fresh": 6,
+    "share": 8.0
+   },
+   "total": 7.19
+  },
+  {
+   "rank": 8,
+   "name": "A bionic arm that feels goes home",
+   "scores": {
+    "relevant": 6.8,
+    "true": 6.0,
+    "visual": 9.0,
+    "mood": 8.0,
+    "fresh": 6,
+    "share": 8.0
+   },
+   "total": 7.18
+  },
+  {
+   "rank": 9,
+   "name": "Microsoft's diagnosis AI, in Science",
+   "scores": {
+    "relevant": 6.8,
+    "true": 7.0,
+    "visual": 7.0,
+    "mood": 6.0,
+    "fresh": 9,
+    "share": 7.0
+   },
+   "total": 6.99
+  },
+  {
+   "rank": 10,
+   "name": "AI hears a weak heart: stethoscope + chest X-ray",
+   "scores": {
+    "relevant": 6.0,
+    "true": 7.0,
+    "visual": 7.0,
+    "mood": 7.0,
+    "fresh": 10,
+    "share": 5.0
+   },
+   "total": 6.9
+  },
+  {
+   "rank": 11,
+   "name": "Deer alarm calls warn villagers of tigers, Nepal",
+   "scores": {
+    "relevant": 6.7,
+    "true": 5.0,
+    "visual": 9.0,
+    "mood": 4.0,
+    "fresh": 10,
+    "share": 6.0
+   },
+   "total": 6.63
+  },
+  {
+   "rank": 12,
+   "name": "Kids' rare diseases diagnosed with o3 Deep Research",
+   "scores": {
+    "relevant": 7.3,
+    "true": 6.0,
+    "visual": 7.0,
+    "mood": 8.0,
+    "fresh": 2,
+    "share": 7.0
+   },
+   "total": 6.51
+  },
+  {
+   "rank": 13,
+   "name": "A hobbyist, his AI helpers and a possible planet",
+   "scores": {
+    "relevant": 6.0,
+    "true": 5.0,
+    "visual": 8.0,
+    "mood": 7.0,
+    "fresh": 8,
+    "share": 6.0
+   },
+   "total": 6.48
+  },
+  {
+   "rank": 14,
+   "name": "ALS voice rebuilt from a 16 s TV clip",
+   "scores": {
+    "relevant": 7.0,
+    "true": 5.0,
+    "visual": 8.0,
+    "mood": 6.0,
+    "fresh": 4,
+    "share": 8.0
+   },
+   "total": 6.33
+  },
+  {
+   "rank": 15,
+   "name": "AI-designed gene editor, blight-proof rice",
+   "scores": {
+    "relevant": 6.2,
+    "true": 6.0,
+    "visual": 6.0,
+    "mood": 7.0,
+    "fresh": 7,
+    "share": 5.0
+   },
+   "total": 6.25
+  },
+  {
+   "rank": 16,
+   "name": "Virtual Biotech: 37,000 agents read 56,000 trials",
+   "scores": {
+    "relevant": 5.7,
+    "true": 6.0,
+    "visual": 6.0,
+    "mood": 6.0,
+    "fresh": 10,
+    "share": 4.0
+   },
+   "total": 6.2
+  },
+  {
+   "rank": 17,
+   "name": "Breast-cancer AI: who can skip chemo",
+   "scores": {
+    "relevant": 6.7,
+    "true": 4.0,
+    "visual": 5.0,
+    "mood": 7.0,
+    "fresh": 10,
+    "share": 6.0
+   },
+   "total": 6.06
+  },
+  {
+   "rank": 18,
+   "name": "Rentosertib, AI-found drug in Phase III",
+   "scores": {
+    "relevant": 6.3,
+    "true": 6.0,
+    "visual": 5.0,
+    "mood": 7.0,
+    "fresh": 6,
+    "share": 5.0
+   },
+   "total": 5.99
+  },
+  {
+   "rank": 19,
+   "name": "Penn's epilepsy AI on patients' phones",
+   "scores": {
+    "relevant": 5.5,
+    "true": 5.0,
+    "visual": 6.0,
+    "mood": 6.0,
+    "fresh": 8,
+    "share": 4.0
+   },
+   "total": 5.71
+  },
+  {
+   "rank": 20,
+   "name": "McMaster's free antibiotic-finder AI",
+   "scores": {
+    "relevant": 5.7,
+    "true": 6.0,
+    "visual": 6.0,
+    "mood": 7.0,
+    "fresh": 2,
+    "share": 5.0
+   },
+   "total": 5.63
+  },
+  {
+   "rank": 21,
+   "name": "Florida's AI mosquito trap",
+   "scores": {
+    "relevant": 5.5,
+    "true": 3.0,
+    "visual": 7.0,
+    "mood": 6.0,
+    "fresh": 10,
+    "share": 4.0
+   },
+   "total": 5.62
+  },
+  {
+   "rank": 22,
+   "name": "UCLA MAESTRO prostate-cancer drug pair",
+   "scores": {
+    "relevant": 5.2,
+    "true": 3.0,
+    "visual": 5.0,
+    "mood": 5.0,
+    "fresh": 10,
+    "share": 4.0
+   },
+   "total": 5.01
+  },
+  {
+   "rank": 23,
+   "name": "OpenAI's math and physics \"discoveries\"",
+   "scores": {
+    "relevant": 5.7,
+    "true": 3.0,
+    "visual": 4.0,
+    "mood": 4.0,
+    "fresh": 10,
+    "share": 5.0
+   },
+   "total": 4.87
+  }
+ ]
+}

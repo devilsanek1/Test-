@@ -65,8 +65,9 @@ Quality and output value come first, spent where it reaches the film. Ideas are 
 - **G0 topic (lean since 2026-10-28):** the brief names the mood the next video needs (alternate positive and negative
   stories: playbook "Taste signals", owner 2026-10-28). When the owner names no topic, two scouts (about 15 searches
   each, each writing its file from its first step) cover the beats the brief asks for, and one editor judges them
-  (growth, standards and creative lenses; scores in its file), fact-checks the top 3 against their sources and drafts
-  each one's core line (G0.5 bullet), so the owner picks the topic and its line on one screen. When the owner names
+  on `docs/TOPIC_CRITERIA.md` (the owner's order: relevance with buzz and surprise first; an untrue story is out; scores in its file), fact-checks the top 3 against their sources and drafts
+  each one's core line (G0.5 bullet), so the owner picks the topic and its line on one screen, with the chart
+  of every story's score on each criterion (`video/scripts/topic_chart.py`, owner 2026-10-28). When the owner names
   the topic, one agent researches its biggest true framing (playbook: the hook). Then one research-and-fact-lock agent
   (about 20 searches) writes `docs/vN/research/factlock.md`: the only web check of the facts; every later check reads
   it and searches only for a fact it lacks (v4 checked the same facts on the web five times). The heavy version (5-6

@@ -70,3 +70,25 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   the process / clean up - so that the next videos are not encountering the same issues" -> applied: PIPELINE_V2 (lean
   G0-G1 defaults, agents report in files, one fact file), playbook, CLAUDE.md, HANDOFF, heavy templates marked; list in
   the review's "Applied" section. -> rule: Process (spend on the film, never on overhead).
+- 2026-10-28 ~15:00 UTC, on round 3's top 3 (the AI hurricane forecast, the AI-designed phage, cancer in "normal"
+  scans): "no too narrow, lets research some more - expand it to AI adjacent news" -> round 4 (lean): two scouts on
+  positive AI-adjacent news (science, health and space; machines and everyday tech), round 3's candidates kept in the
+  pool, one editor over both rounds -> `G0_TOPICS_r4.md`. -> rule: Taste signals (topics: AI-adjacent counts).
+- 2026-10-28 ~16:10 UTC, on round 4's top 3: "one important condition for the story pick is we should find a story that
+  is going to be possible to make visually appealing. Like evaluate each one from that point on. And give me the list
+  of criteria you are choosing the story based on" -> `docs/TOPIC_CRITERIA.md` (visual appeal and truth are musts);
+  visual scores in `G0_TOPICS_r4.md`: glasses 9, hurricane 8, vaccine 6; recommendation moved to the glasses.
+  -> rule: Taste signals (visual appeal is a pick condition).
+- 2026-10-28 ~16:25 UTC: "lets make it relevant first but include buzz here too and surprise, then true and solid, then
+  fresh, then visually appealing, then mood. Then shareabliity potential" -> `docs/TOPIC_CRITERIA.md` rewritten in that
+  order (weights 6-5-4-3-2-1); re-ranked: vaccine 8.2, glasses 7.7, hurricane 7.2 (`G0_TOPICS_r4.md`).
+  -> rule: Taste signals (the owner's order).
+- 2026-10-28 ~16:35 UTC: "reevaluate the stories based on that - all N stories you researched" -> all 23 candidates of
+  rounds 3-4 re-ranked from the editors' scores in the owner's order (`G0_TOPICS_r4.md`, last table).
+- 2026-10-28 ~16:45 UTC: "can you show me the visual next time we do research - like the story and some bar chart or
+  something showing the score on each category" -> `video/scripts/topic_chart.py` (one block per story, a bar per
+  criterion, the weighted total); a sample from this round: `topic_chart.png` (data `topic_scores.json`). -> rule:
+  Taste signals (the shortlist comes with its chart); PIPELINE_V2 G0.
+- 2026-10-28 ~16:50 UTC: "lets move the freshness lower and make it last month or so" -> order now relevant, true,
+  visual, mood, fresh (about the last month), shareable; re-ranked: the glasses 8.34, the vaccine 8.32 (tied), quake
+  alerts 7.81, the hurricane 7.76, "could they hear you?" 7.68. -> rule: Taste signals; CREATIVE_BRIEF banner.
