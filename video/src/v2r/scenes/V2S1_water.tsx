@@ -12,7 +12,7 @@
 import React, {useMemo} from 'react';
 import {useTime} from '../../lib/time';
 import {Fill} from '../../lib/Fill';
-import {Water, floaterWater, waterColourAt, waterKAt, waterSwayAt, ellipsePoly, quadPts, lerp, type Axis, type Poly, type Pt, type WaterSource, type WaterSpec} from '../../lib/water';
+import {Water, floaterWater, waterColourAt, waterKAt, waterSwayAt, ellipsePoly, quadPts, lerp, smooth, type Axis, type Poly, type Pt, type WaterSource, type WaterSpec} from '../../lib/water';
 import {atmos, backing, parallaxK} from '../../lib/depth';
 import {tierFill} from '../../lib/pen';
 import {multiply} from '../../lib/light';
@@ -21,6 +21,7 @@ import {rand} from '../../lib/rng';
 import {CM} from '../palette';
 import * as MAP from '../world/map';
 import {S1_EVENING, S1_AIR} from '../world/skies';
+import {mixSky} from '../../lib/sky';
 import {TINT_CANAL} from '../world/rigs';
 import {P, ovalPath} from '../kit/canal/core';
 import {boatGeom, type BoatOpts} from '../kit/canal/boat';
@@ -146,22 +147,29 @@ function bollardPoly(x: number, y: number, h: number): Poly {
 function s1Sources(): WaterSource[] {
   const out: WaterSource[] = [];
   const P0 = S1_PLANE.subject;
-  // ---- the far roofs (+4) through and under the bridge's railing: one hazy band under the deck, its lower edge the
-  // roofline turned upside down (about the horizon)
-  const roofline: Pt[] = [[-70, 772], [40, 770], [46, 798], [56, 782], [108, 782], [118, 798], [118, 754], [210, 754], [222, 751], [286, 751], [300, 752], [372, 752]];
-  out.push({id: 'roofs', thing: [[-70, 793], [372, 793], ...roofline.slice().reverse()], axis: 'horizon', color: hazed(CM.stucco, 0.7), layer: LAYER.roofs, plane: S1_PLANE.farRoofs, breakup: 0.3, narrow: 0.05});
-  // ---- the far tower (+3), behind the bridge
-  out.push({id: 'tower', thing: rect(258, 598, 346, 944), axis: 'horizon', color: towerField(), layer: LAYER.bridge, plane: S1_PLANE.farTower, breakup: 0.2, narrow: 0.1});
+  // ---- THE FAR CITY (+3 / +4: the far roofs through and under the bridge's railing, and the far tower behind the
+  // bridge) as ONE pale far mass, WHOLE (the critic on v6's first master, CRITIC.md must-fix 2c: the roofs' 4 bars, the
+  // tower's 4 and their troughs made a comb of pale pill-ended bars beside the glitter; the far water is a near mirror,
+  // R2, R5): one hazy shape about the horizon, its lower edge the skyline turned upside down and smoothed (the
+  // chimneys' notches let the far ramp through as a peach "crown" with two spikes at the near-left), the tower's
+  // column in it; one tone between the roofs' haze and the tower's field
+  const skyline = (x: number) => 772 - 21 * smooth(-70, 372, x);
+  const edge: Pt[] = [];
+  for (let x = 372; x >= -70; x -= 17) edge.push([x, skyline(x)]);
+  const cut = (pts: Pt[], keep: (x: number) => boolean) => pts.filter(([x]) => keep(x));
+  const farCity: Poly = [[-70, 793], [258, 793], [258, 944], [346, 944], [346, 793], [372, 793], ...cut(edge, (x) => x > 346), [346, skyline(346)], [346, 598], [258, 598], [258, skyline(258)], ...cut(edge, (x) => x < 258), [-70, skyline(-70)]];
+  out.push({id: 'farCity', thing: farCity, axis: 'horizon', color: mixSky(hazed(CM.stucco, 0.7), towerField(), 0.35), layer: LAYER.roofs, plane: S1_PLANE.farRoofs, solid: 1});
   // ---- the road bridge (+2): the brick spandrels, the limestone deck, the pilaster, the voussoir ring and inside it the
   // arch's soffit in shade seen from below: the arch and its reflection close into one ellipse across the far towpath;
-  // the soffit's bowl keeps a clear value step under the ring (G7: >= 6 L*)
+  // the soffit's bowl keeps a clear value step under the ring (G7; >= 8 L*: at 6.5 the mirrored ellipse read as a pale
+  // "smile" at phone size, the critic)
   // (the bridge's foot below its waterline is under water: each thing stops at the axis)
   const {x0, x1, deck, course} = BRIDGE;
   out.push({id: 'br/brick', thing: rect(x0, course, x1, BRIDGE_AXIS), axis: BRIDGE_AXIS, color: hazed(CM.brick, HAZE_K.bridge), layer: LAYER.bridge, plane: S1_PLANE.bridge, breakup: 0.35, narrow: 0.06});
   out.push({id: 'br/deck', thing: rect(x0, deck, x1, course), axis: BRIDGE_AXIS, color: hazed(CM.limestone, HAZE_K.bridge), layer: LAYER.bridge, plane: S1_PLANE.bridge, breakup: 0.35, narrow: 0.06});
   out.push({id: 'br/pilaster', thing: rect(268, course, 284, BRIDGE_AXIS), axis: BRIDGE_AXIS, color: hazed(CM.limestone, HAZE_K.bridge), layer: LAYER.ring, plane: S1_PLANE.bridge, breakup: 0, narrow: 0});
   out.push({id: 'br/ring', thing: archPoly(11, BRIDGE_AXIS), axis: BRIDGE_AXIS, color: hazed(CM.limestone, HAZE_K.bridge), layer: LAYER.ring, plane: S1_PLANE.bridge, breakup: 0, narrow: 0.04});
-  out.push({id: 'br/soffit', thing: archPoly(0, BRIDGE_AXIS), axis: BRIDGE_AXIS, color: hazed(CM.stoneShade, HAZE_K.bridge), layer: LAYER.opening, plane: S1_PLANE.bridge, breakup: 0, narrow: 0.04, sep: {from: 'br/ring', dL: -6.5}});
+  out.push({id: 'br/soffit', thing: archPoly(0, BRIDGE_AXIS), axis: BRIDGE_AXIS, color: hazed(CM.stoneShade, HAZE_K.bridge), layer: LAYER.opening, plane: S1_PLANE.bridge, breakup: 0, narrow: 0.04, sep: {from: 'br/ring', dL: -8.5}});
   // (the railing, its 4.4 px posts and 1.6 px bars, is dropped: one plane simpler than the bridge, R5; at the far
   // bend its posts read as a comb, not as water)
   // ---- Google's wing (the subject's plane): its ground storey in the shade of the far city (V2S1_light's ground
@@ -170,19 +178,23 @@ function s1Sources(): WaterSource[] {
   // the west end wall (lit stone) and the corner pier
   const [xs] = PM.p(0, HM);
   const pier = PM.pxPerM(0.25) * 0.5;
-  out.push({id: 'wing/pier', thing: [[xs - 16, s1WingBaseY(xs) - 3], [xs + pier, s1WingBaseY(xs)], [xs + pier, PM.p(0, V_LO)[1]], [xs - 16, PM.p(0, V_LO)[1]]], axis: WING_AXIS, color: shaded(CM.limestone), layer: LAYER.wing, plane: P0, breakup: 0, narrow: 0});
+  out.push({id: 'wing/pier', thing: [[xs - 16, s1WingBaseY(xs) - 3], [xs + pier, s1WingBaseY(xs)], [xs + pier, PM.p(0, V_LO)[1]], [xs - 16, PM.p(0, V_LO)[1]]], axis: WING_AXIS, color: shaded(CM.limestone), layer: LAYER.wing, plane: P0, breakup: 0, narrow: 0, solid: 0.7, maxBars: 2});
   // the corner slit bay (unlit: one value)
   out.push({id: 'wing/slit', thing: PM.q(0.74, V_LO, 0.56, V_PLINTH - V_LO), axis: WING_AXIS, color: shaded(S1_IRON), layer: LAYER.wing, plane: P0, breakup: 0, narrow: 0.08});
-  // the door bay, kept lit: the lobby's gold, THE light in the water (R7): a column as wide as the lit glass (the
-  // door's frame, ~0.09 m a side, stays with the wall)
-  out.push({id: 'wing/lobby', thing: PM.q(DU0 + DOOR_FRAME, Math.max(DV0, V_LO), DU1 - DU0 - 2 * DOOR_FRAME, HM - Math.max(DV0, V_LO)), axis: WING_AXIS, color: CM.lamp, kind: 'light', layer: LAYER.wing, plane: P0, breakup: 0.3, narrow: 0.16, taper: 5, solid: 0.55});
+  // the door bay, kept lit: the lobby's gold, THE light in the water (R7), as LIGHT ON WATER (lib/water LightOpts; the
+  // critic on v6's first master, CRITIC.md must-fix 1: "a solid slab with five equal round-capped bars ... a stack of
+  // pancakes", its 2 px gaps khaki in the encode): the lit glass's mirror, solid for a third of its length (its bottom
+  // a gentle ripple), then three leaf slivers on the water, each a third shorter and 15 % thinner, the water between
+  // them >= 7 px; a step (6 L*) under the lit glass (#F7CF86, L* 85.1), falling 1.3 L* a sliver. As wide as the lit
+  // glass (the door's frame, ~0.09 m a side, stays with the wall)
+  out.push({id: 'wing/lobby', thing: PM.q(DU0 + DOOR_FRAME, Math.max(DV0, V_LO), DU1 - DU0 - 2 * DOOR_FRAME, HM - Math.max(DV0, V_LO)), axis: WING_AXIS, color: CM.lamp, kind: 'light', layer: LAYER.wing, plane: P0, light: {solid: 0.33, slivers: 3, step: 6, fall: 1.3}});
   // ---- the lamp posts at the path's back (off, slate iron): long thin verticals, whole for 70 %, then a few dashes
   for (const L of S1_FAR_LAMPS) {
     if (L.x > 900) continue; // behind boat A
     const k = MAP.s1FigureHAt(L.x) / MAP.S1_SHEET.herH;
     const h = L.h || 350 * k;
     const y = S1_PATH.top + 6 + s1Bend(L.x);
-    out.push({id: `lamp${L.x}`, thing: lampPoly(L.x, y, h), axis: s1MirrorLine(L.x, y), color: env(S1_IRON), layer: LAYER.lamps, plane: P0, breakup: 0, narrow: 0.2, taper: 1.2, solid: 0.7});
+    out.push({id: `lamp${L.x}`, thing: lampPoly(L.x, y, h), axis: s1MirrorLine(L.x, y), color: env(S1_IRON), layer: LAYER.lamps, plane: P0, breakup: 0, narrow: 0.2, taper: 1.2, solid: 0.7, maxBars: 2});
   }
   // ---- the bollards on the coping: dome-capped stubs hanging from the coping's reflection (G6)
   for (const x of S1_BOLLARDS) {
@@ -209,14 +221,16 @@ function s1Sources(): WaterSource[] {
 
 const POP_FILL = MAP.GHOST_POP.outlineS + MAP.GHOST_POP.fillDelayF / 60;
 /** A walking figure, simplified (R5): what the water shows of it is its LEGS under the mid-calf hem (V2S1_row_fig:
- *  the hem at 0.25 h), their lower 0.19 h: ONE slim wavering vertical in the legs' value hanging from its own mirror
- *  line, its end rounded (a walking reflection in bars flickered as its slices passed; the coat beyond is left to
- *  Fresnel: a flat coat block read as a box). The row reads as a rhythm of slim verticals under the row; her
- *  reflection is environment, never a second her (R5). */
+ *  the hem at 0.25 h), their lowest 0.12 h: ONE slim wavering wedge hanging from its own mirror line, 8 px wide at
+ *  the waterline (her 1.70 m; <= 10 px), tapering to a point (a walking reflection in bars flickered as its slices
+ *  passed; the coat beyond is left to Fresnel: a flat coat block read as a box). Its tone sits near the water's own
+ *  (kMin 0.85: her legs L* ~70, the ghosts' 67-72), so it stays <= 12 L* under every field it crosses, the lit door's
+ *  gold column included (the critic on v6's first master, CRITIC.md must-fix 2a: 14-19 px slabs at L* 60 notched the
+ *  gold and stippled the water under the subject). Her reflection is environment, never a second her (R5). */
 function figureThing(id: string, x: number, feetY: number, h: number, legs: string): WaterSource {
   const s = h / 170;
   const f = (dx: number, dy: number): Pt => [x + dx * s, feetY + dy * s];
-  return {id, thing: [f(-8.5, 0), f(8.5, 0), f(9.3, -32), f(-9.3, -32)], axis: s1MirrorLine(x, feetY), color: legs, kind: 'figure', layer: LAYER.people, plane: S1_PLANE.subject, breakup: 0, narrow: 0, taper: 1.6, solid: 1};
+  return {id, thing: [f(-4, 0), f(4, 0), f(3.4, -6), f(2.3, -12), f(1, -17), f(0, -20), f(-1, -17), f(-2.3, -12), f(-3.4, -6)], axis: s1MirrorLine(x, feetY), color: legs, kind: 'figure', kMin: 0.85, layer: LAYER.people, plane: S1_PLANE.subject, breakup: 0, narrow: 0, taper: 1.6, solid: 1};
 }
 
 /** Every reflection that moves at t: her (behind the glass, then on the towpath), the ghosts from their fill, the bus
@@ -245,8 +259,9 @@ function s1Moving(t: number): WaterSource[] {
   const xa = Math.max(-70, bx - L / 2);
   const xb = Math.min(330, bx + L / 2);
   if (xb - xa > 2) {
-    out.push({id: 'bus', thing: rect(xa, y0, xb, y1), axis: BRIDGE_AXIS, color: hazed(CM.brick, HAZE_K.bus), layer: LAYER.bus, plane: S1_PLANE.bridge, breakup: 0, narrow: 0.05});
-    if (xb - xa > 20) out.push({id: 'bus/glass', thing: rect(xa + 8, y0 + S1_BUS.h * 0.56, xb - 8, y0 + S1_BUS.h * 0.8), axis: BRIDGE_AXIS, color: hazed(CM.glass, HAZE_K.bus), layer: LAYER.bus, plane: S1_PLANE.bridge, breakup: 0, narrow: 0.05});
+    // whole (a far thing in the far water: a near mirror, R2, R5): its bars made the left third's comb as it crossed
+    out.push({id: 'bus', thing: rect(xa, y0, xb, y1), axis: BRIDGE_AXIS, color: hazed(CM.brick, HAZE_K.bus), layer: LAYER.bus, plane: S1_PLANE.bridge, solid: 1});
+    if (xb - xa > 20) out.push({id: 'bus/glass', thing: rect(xa + 8, y0 + S1_BUS.h * 0.56, xb - 8, y0 + S1_BUS.h * 0.8), axis: BRIDGE_AXIS, color: hazed(CM.glass, HAZE_K.bus), layer: LAYER.bus, plane: S1_PLANE.bridge, solid: 1});
   }
   return out;
 }
@@ -264,6 +279,9 @@ const S1_WATER: WaterSpec = {
   region: {top: s1WaterTop, bottom: s1WaterBottom, x0: -40, x1: 1120, tuckTop: 4, tuckBottom: 24, step: 10},
   sky: S1_EVENING,
   air: S1_AIR,
+  // our bank's paving as the pen draws it in the evening light (the critic's sample at 3.0 s): the far water never
+  // takes its colour (it read as paving at the near-left, dE76 ~1)
+  notLike: [{name: 'the paving', hex: '#F1D2B3'}],
   // the water's own colour (the near water's body, R2): CM.water as the clean pen shows it, a step deeper
   body: '#9CC3BC',
   tint: TINT_CANAL.water,

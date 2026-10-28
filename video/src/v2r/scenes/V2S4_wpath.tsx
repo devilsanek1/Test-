@@ -39,14 +39,15 @@ const EDGE = ROW.edge;
 // ---------------------------------------------------------------- garden walls
 
 /** The slate gate lifted to a mid tone (a narrow dark leaf reads as a line mark: CRAFT §c). */
-const GATE_SLATE = '#8794A8';
+export const GATE_SLATE = '#8794A8';
 /** The rendered garden walls: a warm mid render one step under the old stucco, with ONE recessed panel a step deeper
  *  (fills only), so the field beside her is a real wall, not a blank near-white slab, and the tag and plates stay the
  *  lightest things in her band (critic_L3 MUST 2; CRAFT §f.2). */
 const RENDER = '#EDD3BF';
 const RENDER_PANEL = '#E6C6AF';
-type Seg = {x0: number; x1: number; kind: 'brick' | 'render' | 'gate' | 'railing' | 'trellis'; c: string; ivy?: boolean; pot?: boolean; gate?: string};
-const SEGS: Seg[] = [
+export type Seg = {x0: number; x1: number; kind: 'brick' | 'render' | 'gate' | 'railing' | 'trellis'; c: string; ivy?: boolean; pot?: boolean; gate?: string};
+/** (exported for the canal's reflections: V2S4_water S4's lib/water spec) */
+export const SEGS: Seg[] = [
   {x0: X0, x1: 128, kind: 'brick', c: CM.brick, ivy: true},
   {x0: 128, x1: 300, kind: 'trellis', c: CM.stucco},
   {x0: 300, x1: 352, kind: 'gate', c: CM.brickDeep, gate: GATE_SLATE},
@@ -183,9 +184,10 @@ function coursesBatch(dx: number): Batch {
 
 // ---------------------------------------------------------------- furniture (flat, mid tones, no ink)
 
-const LAMPS = [{x: 40, h: 290}, {x: 905, h: 290}, {x: 1392, h: 290}];
-const LAMP_FOOT = 1064;
-const BOLLARDS = [150, 792, 1122];
+// (exported for the canal's reflections: V2S4_water)
+export const LAMPS = [{x: 40, h: 290}, {x: 905, h: 290}, {x: 1392, h: 290}];
+export const LAMP_FOOT = 1064;
+export const BOLLARDS = [150, 792, 1122];
 const PLANTER = {x0: 146, x1: 236, y: 1006, h: 40};
 const BIN = {x: 482, y: 1012, h: 48};
 const BUOY = {x: 1086, y: 1068, cy: 1030};

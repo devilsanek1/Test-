@@ -272,25 +272,32 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
 7. **Water is drawn like a building, never a fill** (owner on v2's G4 v5: "way too cheap, not clean or premium quality or
    refined ... lazy and cheap"; `research/2026-10-28_water.md` R1-R14, `docs/v2/water/JUDGE.md`): it is the MIRROR of
    its own shot under the shot's one camera, through `lib/water.tsx` (how-to `src/lib/WATER.md`), never hand-rolled.
-   (a) The open water is the shot's own sky mirrored about the horizon and toned toward the water's body (warm far, a
-   light veil, the teal body near): the one gradient in the water (DIRECTION rule 6), lib/sky's curve and dither. (b)
+   (a) The open water is the shot's own sky mirrored about the horizon, a Fresnel step under it (the far water >= 4 L*
+   under the air, never the lit ground's colour: dE76 >= 6), toned toward the water's body (a pale warm pearl far, a
+   light veil, the teal body near), its warm-to-cool crossing held in the clean gap C* 4.7-5.5 (the bands start at 6):
+   the one gradient in the water (DIRECTION rule 6), lib/sky's curve and dither. (b)
    Every thing over it mirrors about its OWN waterline (a sloped quay by R1's affine map), toned in CIE LCh by a flat
    Fresnel ladder (k 0.40 far -> 0.72 near, steps of 0.05): hue from the water, value from the world, a light keeps its
-   colour; the water stays the frame's one cool field (>= 83 % cool, <= 15 % warm) and no tone falls in the beige, olive
-   or grey bands. (c) Each reflection is ONE smooth solid block (sides bent by the sway, no stair-step, corners rounded)
+   colour; the water stays the frame's one cool field (>= 83 % cool, <= 15 % warm, <= 1.5 % in the beige and olive
+   bands, ON THE MASTER: its 4:2:0 chroma turns thin gaps and gold-on-teal rims khaki) and no tone falls in the beige,
+   olive or grey bands, the ramp walked row by row. (c) Each reflection is ONE smooth solid block (sides bent by the sway, no stair-step, corners rounded)
    down to >= 55 % of its visible length, then level bars with tapered ends on ONE perspective grid (0.45 m bands), bars
-   only where a band is >= 7 px; gaps tone-on-tone (<= 3.5 L*); at most one static break per band, in its last half.
+   only where a band is >= 7 px; gaps tone-on-tone (<= 3.5 L*); at most one static break per band, in its last half;
+   a far thing in the far water is whole, a thin vertical breaks twice at most. A LIGHT (a lit door, a lamp) is light
+   on water, never a slab: a block <= 35 % of its visible length, then <= 3 pointed leaf slivers, each >= 15 % shorter
+   and thinner than the one above, the water between them >= 4 px, a step >= 4 L* under its source.
    (d) One plane simpler than the thing (R5): masses, verticals >= 3 px, lights; people as their legs, a boat as one dark
-   band, no stiles, rails or cabins. (e) The sun: one column straight under it, a still bed of one gold lens per band
-   (21-56 x 3-6.5 px) and 4-6 nested warm-white slivers (§6's glints: 20-36 px, +15 L* over the bed, lit 0.3-0.8 s,
-   resting >= 0.12 s); never stars. (f) The open water carries only 6-14 ripple lines (40-150 px, tapered, drifting <= 25
+   band, no stiles, rails or cabins; a far skyline as one mass. (e) The sun: one column straight under it, a still bed
+   of one amber lens per band of >= 5 px (28-48 x 4-6.6 px) and 4-6 nested gold-white slivers (§6's glints: 20-36 px,
+   >= 3.5 px tall, +13 L* over the bed, lit 0.3-0.8 s, resting >= 0.12 s); never stars. (f) The open water carries only 6-14 ripple lines (40-150 px, tapered, drifting <= 25
    px/s; +6-10 L* across a reflection, a step darker across the open water, the tone fixed for its life). (g) Calm: only
    the sway (+-1.5-3 px far, +-4-7 near, its phase travelling toward the viewer at 0.2-0.6 m/s), the ripple drift and the
    slivers move; nothing boils, flickers or regrows elsewhere. (h) A floater sits on a thin dark contact lens and its
    mirrored underside (2-3 bars), never a V unless it moves. (i) A strip whose rows are under 2 px is `lod: 'far'` (R14:
    flat bands, flecks, current lines). **Check:** `waterProblems(spec)` is empty, and
    `docs/v2/water/judge_metrics.py` against the last approved water (cool %, piece-end edges, thin light marks, glitter
-   gold, quick toggles); eye check at phone size: a calm, glassy canal with its reflections, never boxes, dashes or stars.
+   gold, quick toggles), and `docs/v2/water/master_check.py` on the master (the colour numbers above); eye check at
+   phone size: a calm, glassy canal with its reflections, never boxes, dashes, stars or a stack of pancakes.
 - **Code:** `lib/water.tsx` (§7: `<Water>`, `waterProblems`, `waterPalette`; how-to `lib/WATER.md`, demo
   `src/entry-v2r-water.tsx`), `lib/depth.ts` (`makeAtmosphere`, `recede`, `planePalette`, `toneOnTone`, `backing`, `groundCam`, `flight`,
   `band`, `quadForPlane`, `poissonDisk`, `depthProblems`, `sizeProblems`; the parallax float `parallaxOffset`,

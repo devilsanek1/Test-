@@ -49,3 +49,46 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   from their transcripts and committed; the three stopped writers resumed from their transcripts (SendMessage), each now
   writing its result into `core_line/writers/`; the auto-checkpoint loop had ended at its 2-hour cap, so the rule now
   leans on agents writing files plus a commit at every step. -> rule: Process (limits).
+- 2026-10-28 ~11:05 UTC, after the G0.5 top 3 (AI songs): "thinking more about the topics we research and pick. I think
+  we should alternate between positive and more negative topics. I think so far we mainly had negative topics like
+  prices of laptops going up, google scandal. I am thinking if we should focus on something very recent, extremely
+  relevant yet very positive around AI. like AI is helping to find medication or solve some disease, i think having a
+  nice positive outlook would be the right direction for a story" -> rule: Taste signals (alternate the mood); G0
+  round 3 scouts very recent POSITIVE AI stories (`scouting_r3/`, top 3 in `G0_TOPICS_r3.md`); asked whether it
+  replaces AI songs as video 4 (AI songs parked with its research and core line) or becomes video 5.
+- 2026-10-28 ~13:25 UTC: asked whether the positive AI story replaces AI songs as video 4 or becomes video 5; owner:
+  "Switch video 4 (Recommended)" -> AI songs parked whole in `archive/ai_songs/` (README says how to resume; listed in
+  `docs/IDEAS_BANK.md`); video 4 restarts at G0 round 3 (positive AI), whose five scouts had died at the usage limit
+  before writing anything.
+- 2026-10-28 ~14:25 UTC: "no we only use the budget in this session for the video 4 ... so lets do a few stages only -
+  lets scout for the most relevant story, then write a script and generate the sound. That is our goal here"; "no i mean
+  we are spending all tokens here only on the video 4. these tokens we have here are not shared with other videos";
+  and asked to find the waste in the early stages ("30% of the weekly budget" spent) -> cost review
+  `docs/retro/2026-10-28_v4_early_stage_cost.md`; v4 now runs the lean G0-G2: 2 scouts + 1 editor (topic and core line
+  picked together), one fact lock, writer + critic for the script, the voice through the API. -> rule: Process (lean).
+- 2026-10-28 ~14:40 UTC: "i mean if you identify any real inefficincies and redundancies and waste on tokens - update
+  the process / clean up - so that the next videos are not encountering the same issues" -> applied: PIPELINE_V2 (lean
+  G0-G1 defaults, agents report in files, one fact file), playbook, CLAUDE.md, HANDOFF, heavy templates marked; list in
+  the review's "Applied" section. -> rule: Process (spend on the film, never on overhead).
+- 2026-10-28 ~15:00 UTC, on round 3's top 3 (the AI hurricane forecast, the AI-designed phage, cancer in "normal"
+  scans): "no too narrow, lets research some more - expand it to AI adjacent news" -> round 4 (lean): two scouts on
+  positive AI-adjacent news (science, health and space; machines and everyday tech), round 3's candidates kept in the
+  pool, one editor over both rounds -> `G0_TOPICS_r4.md`. -> rule: Taste signals (topics: AI-adjacent counts).
+- 2026-10-28 ~16:10 UTC, on round 4's top 3: "one important condition for the story pick is we should find a story that
+  is going to be possible to make visually appealing. Like evaluate each one from that point on. And give me the list
+  of criteria you are choosing the story based on" -> `docs/TOPIC_CRITERIA.md` (visual appeal and truth are musts);
+  visual scores in `G0_TOPICS_r4.md`: glasses 9, hurricane 8, vaccine 6; recommendation moved to the glasses.
+  -> rule: Taste signals (visual appeal is a pick condition).
+- 2026-10-28 ~16:25 UTC: "lets make it relevant first but include buzz here too and surprise, then true and solid, then
+  fresh, then visually appealing, then mood. Then shareabliity potential" -> `docs/TOPIC_CRITERIA.md` rewritten in that
+  order (weights 6-5-4-3-2-1); re-ranked: vaccine 8.2, glasses 7.7, hurricane 7.2 (`G0_TOPICS_r4.md`).
+  -> rule: Taste signals (the owner's order).
+- 2026-10-28 ~16:35 UTC: "reevaluate the stories based on that - all N stories you researched" -> all 23 candidates of
+  rounds 3-4 re-ranked from the editors' scores in the owner's order (`G0_TOPICS_r4.md`, last table).
+- 2026-10-28 ~16:45 UTC: "can you show me the visual next time we do research - like the story and some bar chart or
+  something showing the score on each category" -> `video/scripts/topic_chart.py` (one block per story, a bar per
+  criterion, the weighted total); a sample from this round: `topic_chart.png` (data `topic_scores.json`). -> rule:
+  Taste signals (the shortlist comes with its chart); PIPELINE_V2 G0.
+- 2026-10-28 ~16:50 UTC: "lets move the freshness lower and make it last month or so" -> order now relevant, true,
+  visual, mood, fresh (about the last month), shareable; re-ranked: the glasses 8.34, the vaccine 8.32 (tied), quake
+  alerts 7.81, the hurricane 7.76, "could they hear you?" 7.68. -> rule: Taste signals; CREATIVE_BRIEF banner.

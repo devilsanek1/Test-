@@ -1,3 +1,5 @@
+// HEAVY version (owner, 2026-10-28): the default early pipeline is lean (docs/PIPELINE_V2.md, the G0-G1 bullets; review
+// docs/retro/2026-10-28_v4_early_stage_cost.md). Run this only when the owner asks for a wider search.
 export const meta = {
   name: 'v4-g05-facts-and-core-line',
   description: 'v4 G0.5 (AI songs): 3 research lanes, fact lock, then the core line: 6 lever writers, 4 judges, viewer panel + sceptics, top 3, truth check',

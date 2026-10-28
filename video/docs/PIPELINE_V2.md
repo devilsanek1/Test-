@@ -40,9 +40,9 @@ one is approved; the one exception is W1, internal text written beside G1-G2.
 
 | Gate | Owner plays / sees | Owner approves | Frozen after | Budget |
 |---|---|---|---|---|
-| G0 Topic | the top 3 topics on one screen of text (from the scouting workflow: Creative exploration below), or the owner's own topic | topic, audience, takeaway, length band | topic, length band; then the **fact lock** (`docs/vN/research/factlock.md`: every fact, number and quote the film may use, each checked against its primary source; v2 and v3 have one) before G0.5 | one scouting run, skipped when the owner names the topic (a divergent stage: Creative exploration); then the fact lock |
-| **G0.5 Core line** (owner, 2026-10-25) | the top 3 candidate lines on one screen of text | **the one sentence** the whole video exists to land, the one that gets the biggest emotional reaction (v3 example: "AI is making your PC more expensive") | the core line: it becomes the frame-0 text, the hook's seed, the cover and title text and the payoff's callback, and every script line must serve it; from the pick we draft its **THROUGH-LINE CARD** (thread object and home spot, home place, one "you": internal; G1 completes it and the owner approves it there) | 1 h, after the fact lock |
-| G1 Script | **the ElevenLabs-ready script** (a short emotional cue per line, v1 format), with up to **3 hook-line alternatives** as text inside it (the owner picks one; G2 voices only the pick), plus the completed **THROUGH-LINE CARD** (one screen of text, `docs/look/CRAFT.md` §a; owner-approved 2026-10-27): the thread object and its home spot, the one home place (at most 3 places and 1 scale reveal), the one "you", the mascot rule, and a carrier (A-F) for every join between the script's lines, taken from the script's own joins (the carriers follow the script, never the other way round); the voice comes at G2 | every word, the hook line, the card | meaning and order of lines; the hook line; the card | 1 h, then 15 min per round |
+| G0 Topic | the top 3 topics on one screen of text, **each with its proposed core line** (lean scouting: Creative exploration below), or the owner's own topic | topic **and its core line** (a separate G0.5 only on request), audience, takeaway, length band | topic, core line, length band; then the **fact lock** (built ONCE, by one agent; every later check reads it) (`docs/vN/research/factlock.md`: every fact, number and quote the film may use, each checked against its primary source; v2 and v3 have one) before G0.5 | 2 scouts + 1 editor, skipped when the owner names the topic; then one fact-lock agent |
+| **G0.5 Core line** (owner, 2026-10-25; folded into G0 by default since 2026-10-28) | by default nothing extra: the core line comes with the topic on G0's screen; a separate round (the top 3 lines on one screen) only when the owner asks for more options | **the one sentence** the whole video exists to land, the one that gets the biggest emotional reaction (v3 example: "AI is making your PC more expensive") | the core line: it becomes the frame-0 text, the hook's seed, the cover and title text and the payoff's callback, and every script line must serve it; from the pick we draft its **THROUGH-LINE CARD** (thread object and home spot, home place, one "you": internal; G1 completes it and the owner approves it there) | by default none (G0's editor drafts the line); on request one writer + one critic |
+| G1 Script | **the ElevenLabs-ready script** (a short emotional cue per line, v1 format), with up to **3 hook-line alternatives** as text inside it (the owner picks one; G2 voices only the pick), plus the completed **THROUGH-LINE CARD** (one screen of text, `docs/look/CRAFT.md` §a; owner-approved 2026-10-27): the thread object and its home spot, the one home place (at most 3 places and 1 scale reveal), the one "you", the mascot rule, and a carrier (A-F) for every join between the script's lines, taken from the script's own joins (the carriers follow the script, never the other way round); the voice comes at G2 | every word, the hook line, the card | meaning and order of lines; the hook line; the card | one writer + one critic + one fix pass; 1 h, then 15 min per round |
 | G2 Voice lock | **the take, generated with the owner's voice through the API** (owner, 2026-10-26; `docs/voice/API_QUICKSTART.md`: paste format v2, `check_paste.py` OK, `generate_take.py` `all_clean`, `check_take.py` MATCH), sent as take.wav with the full script text, locked into `public/vN/`, logged in `ELEVENLABS.md` section 5; word timings taken from it. Only without the key does the owner paste it (always the full `--handoff` text); we check that take the same way. No video (owner, 2026-10-25) | voice, pace | the clock (word timings) | 30 min |
 | **W1 World bible** (text, beside G1-G2; owner-approved 2026-10-27) | no owner step (internal text): the set list (the home place first); the PROPOSED palette (one sister palette from `look/PALETTE.md` by the story's use case; 2-3 candidates judged internally when the topic needs a new look) and, in its terms, one light rig per set (the key and its side, the shadow tint family, the pool colours: `CRAFT.md` §d.1), its depth (the planes, 0 = the subject's, the air behind them = the sky's lowest step, the camera's horizon and vanishing point(s): `CRAFT.md` §f.1) and one colour-script line per beat; tiers A/B/C per shot (`CRAFT.md` §b); the recurring living character (Pip by default, `LIFE_AND_DENSITY.md` §5); its choices reach the owner as G3's grey and the G4 look clip | — (judged at G3 and G4) | — (G3 freezes the tiers and the rig's shapes; G4 approves the palette and freezes the pen, the rigs and the tier palettes; a change at G4 is written back into W1) | in parallel with G1-G2 |
 | **G3 Sketch animatic** | ONE video at 60 fps: the whole film as an ANIMATED SKETCHBOOK (spec: `docs/G3_ANIMATIC.md`) — every cut, camera move, transition and key action PLAYED at sketch fidelity, every join with its carrier, the tiers at their final weights in grey, each set's light rig as shapes and its planes as grey steps (paler with distance, the horizon and the ground's lines to the VP drawn), density and life as grey placeholders (particle fields among the `life:` items), timed to the locked voice (visual concepts judged internally; owner rule: one version) — tool: `SketchReel` board mode + `board_lint` | **the film's rough pass**: story in pictures, cuts, transitions, camera moves, key actions, the density/life plan, and **where the eye goes and what carries each join** (2026-10-27; the hand-off states the fidelity ladder) | the signal contract (`G3_ANIMATIC.md` §2): scene list, cut points, shot content, framing, transition devices and carriers, camera moves, motion plan, density promises, thread coverage, tiers, the light rig, the mover budget | first cut ~3 h (was 2; the hour goes to tiers, carriers and the light marks; assumes `G3_ANIMATIC.md` §7 tier-1 tooling, built once beforehand: not built yet on 2026-10-27, tooling item 6); rounds 30 min |
@@ -61,33 +61,42 @@ lock), then the G5 lanes and G6 (video 1: the first playable film at hour 18.7).
 life, animation, polish) gets as many agents, rounds and tokens as the quality needs, including workflows larger than the
 default size guideline. The anti-waste rules below only cut true waste (rework, lost work, reviews of things that will change).
 
-Quality and output value come first. Spend generously where ideas are decided, because that is cheap compared to
-building, and it decides the outcome:
-- **G0 topic:** when the owner names no topic, 5 beat scouts search the last 72 h, 3 judges (growth, standards,
-  creative) score the candidates, one synthesis writes the top 3 and an adversarial fact-check tests them (toolkit row
-  "G0 topic"); the owner picks. When the owner names the topic, research it instead and look for its biggest true
-  framing (playbook: the hook). Either way the fact lock follows (G0 row). The angle and the hook are no longer G0's:
-  they are folded into G0.5 (the core line) and G1 (the hook line).
-- **G0.5 core line (its own step, owner rule):** once the topic is picked and the fact lock is written, distil the single key
-  sentence. Brainstorm: 5-6 writers, each pulling a different emotional lever (loss, unfairness, reversal, personal,
-  curiosity, headline punch), 6-8 lines each, plus the owner's own suggestion. Critique: judges score every line for gut
-  reaction, truth, read-at-a-glance clarity and whether the video can pay it off; a viewer-persona panel gives gut
-  rankings; sceptics try to refute the finalists as misleading, and an ad-or-news panel rejects any line that sounds like
-  a commercial or bait (playbook, Audience and goal: never baity). Pick: the owner picks from the top 3, and the
-  through-line card is drafted from the pick (G1 completes it). Workflow: `context/workflows/v3-g05-core-line*.js`.
-- **G1 script = story first (owner, 2026-10-26):** (1) 3-4 competing **story spines** (the throughline question, the
-  viewer's situation, beats joined by but/so, the turn, the payoff that lands the core line), judged; (2) 2-3 writers
-  draft the winning spine; (3) a cold-read panel retells each draft (a list-like retelling fails) and hears the
-  first line cold: "ad or news?" (an ad-like or baity opening fails: playbook, never baity) plus a flow critic
-  (every line follows from the previous) and a fact check; (4) one merged script, then the through-line card's carriers
-  from its joins (G1 row). Never structure a script as a list of facts to prove. **Rhythm (owner, 2026-10-27):** short
-  sentences (<= 5 words) break up the long ones, at least one after every 1-2 long sentences; the merged script must pass
-  `scripts/voice/check_rhythm.py` before it goes to the owner.
+Quality and output value come first, spent where it reaches the film. Ideas are decided early, where a wrong turn is cheapest to fix, but run as big panels the early stages cost as much as a build (v4: about $280 for a topic and a line, much of it waste: `docs/retro/2026-10-28_v4_early_stage_cost.md`), so they run lean by default: a few strong agents that write files, one fact check, and the owner's picks (owner, 2026-10-28):
+- **G0 topic (lean since 2026-10-28):** the brief names the mood the next video needs (alternate positive and negative
+  stories: playbook "Taste signals", owner 2026-10-28). When the owner names no topic, two scouts (about 15 searches
+  each, each writing its file from its first step) cover the beats the brief asks for, and one editor judges them
+  on `docs/TOPIC_CRITERIA.md` (the owner's order: relevance with buzz and surprise first; an untrue story is out; scores in its file), fact-checks the top 3 against their sources and drafts
+  each one's core line (G0.5 bullet), so the owner picks the topic and its line on one screen, with the chart
+  of every story's score on each criterion (`video/scripts/topic_chart.py`, owner 2026-10-28). When the owner names
+  the topic, one agent researches its biggest true framing (playbook: the hook). Then one research-and-fact-lock agent
+  (about 20 searches) writes `docs/vN/research/factlock.md`: the only web check of the facts; every later check reads
+  it and searches only for a fact it lacks (v4 checked the same facts on the web five times). The heavy version (5-6
+  scouts, 3 judges, a synthesis, a fact-check: `v3-g0-topics-*.js`) runs only when the owner asks for a wider search.
+- **G0.5 core line (owner rule; folded into G0 by default since 2026-10-28):** the one key sentence is still picked
+  before the script. G0's editor drafts it per topic with what the v3-v4 core-line runs taught: one real person in
+  their own words, or a direct question, beats a plural headline; plain beats clever; a line whose honest payoff walks
+  back its own claim fails; a line that sounds like a commercial or bait fails (playbook, Audience and goal: never
+  baity; v3's "Buying a laptop soon?" opening was skipped by 64.5 %); numbers are checked against the fact file (v4's truth check caught a 2024 figure in a 2026
+  hook). A separate round runs only when the owner asks for more options: one writer (12-15 lines across the levers:
+  loss, unfairness, reversal, personal, curiosity, headline, one real voice) and one critic (the judges' lenses, a
+  four-persona gut panel and a truth check in one pass), the top 3 on one screen; bookkeeping
+  `video/scripts/coreline.py`. The heavy version (22 agents: `v3-g05-core-line*.js`, `v4-g05-facts-and-core-line-*.js`)
+  cost about $150 on v4 and its four judges barely separated the top lines: never by default.
+- **G1 script = story first (owner, 2026-10-26; lean since 2026-10-28):** one writer (1) drafts 2-3 competing story
+  spines (the throughline question, the viewer's situation, beats joined by but/so, the turn, the payoff that lands the
+  core line) and picks one, with its reason; (2) writes the script with cues; (3) runs `check_rhythm.py` and
+  `check_paste.py` until both pass. Then one critic: a cold retell (a list-like retelling fails), the first line heard cold: "ad or news?" (an ad-like or
+  baity opening fails: playbook, never baity), the flow (every line
+  follows from the previous) and the facts against the fact file, at most 6 findings; then one fix pass by the same
+  writer (resumed, not restarted). The through-line card's carriers come from the script's joins (G1 row). Never
+  structure a script as a list of facts to prove. **Rhythm (owner, 2026-10-27):** short sentences (<= 5 words) break up
+  the long ones, at least one after every 1-2 long sentences; the script must pass `scripts/voice/check_rhythm.py`
+  before it goes to the owner. The heavy version (~12 agents: `v3-g1-story-*.js`) runs only on request.
 - **G3 animatic:** 2-3 visual concepts for the whole film, judged internally; the owner sees one animatic (one-version rule).
 - **G4 look:** 2-4 style-frame directions when the topic needs a new look, judged internally; the pick becomes the one
   look clip the owner plays.
 
-These are divergent stages: many agents, short outputs, judged together. The rules below target the convergent
+G3 and G4 are divergent stages (a few concepts, judged together); G0-G1 run lean (above). The rules below target the convergent
 stages (building, fixing, polishing), where the measured waste happened.
 
 ## Anti-waste rules (each one fixes a measured waste)
@@ -141,6 +150,14 @@ stages (building, fixing, polishing), where the measured waste happened.
    what it pays at ~150k). So an orchestrator or lane session delegates reading, rendering and critique to fresh agents
    that write their results into files and return a few lines, never pulls whole reports, diffs or logs into its own
    context, and starts a new phase (a resume, the next shot) from a short handover in a fresh session or after a compact.
+   **Agents report in files, not in the chat (v4, 2026-10-28):** every agent writes its result into a repo file from its
+   first step (a usage limit can stop it at any time) and returns at most 3 lines; the orchestrator reads only what it
+   needs from the file (v4's writers and judges pasted their full JSON into the chat: about 50k tokens re-read on every
+   later step). A stage's shared brief lives in one file (`docs/vN/briefs/<stage>.md`) that each agent reads, so each
+   prompt is a few lines. No big skill or doc load for a small question (one settings-schema load added ~70k tokens to
+   every later step). Batch the steps (a commit rides in the same call as the next action). Before a fan-out, check the
+   session's rate limit (get_session `rate_limit_info`): agents launched near the limit die with nothing saved (v4: five
+   scouts, 2026-10-28).
 
 10. **Locked means dropped (owner, 2026-10-25).** When a gate locks, move the rejected options to `docs/vN/archive/`
     (no prompt reads it), trim the gate doc to the locked choice, and point later prompts only at locked docs and
@@ -176,7 +193,7 @@ Every lesson lands here, in the playbook or in a gate, in the same turn (owner, 
 in `context/workflows/`. **Copy their structure, never their briefs:** v3's G3 board brief (`v3-g3-board-cine-*.js`)
 still asks for scale cuts and "size and angle at every cut", and `v3-g5b-rollout-*.js` builds per-panel lanes to the
 retired G5b bar (retired as a template). Rebuild the G3 and G5 templates on `docs/look/DIRECTION.md` and `CRAFT.md`
-before the next video's G3. The G0-G1 templates' STRUCTURE stands, but every copied brief needs four updates: today's
+before the next video's G3. The G0-G1 templates are the HEAVY versions, run only when the owner asks for a wider search (the default is the lean flow in the G0-G1 bullets above); when one runs, every copied brief needs four updates: today's
 date and search window (`v3-g0-topics-*.js` hard-codes 2026-10-25), the current look words from DIRECTION (its judges
 still say "hand-drawn ink"), `effort: 'max'` on every `agent()` call (every script in `context/workflows/` sets it since 2026-10-27; a copied or new
 one must pass `python3 .claude/hooks/max_effort.py --lint`, and the repo's hook denies a run that doesn't), and
@@ -184,9 +201,9 @@ the through-line card (G0.5 drafts it from the pick, G1 completes it from the sc
 
 | Gate | Tool / template | What it does |
 |---|---|---|
-| G0 topic | `v3-g0-topics-*.js`; `docs/IDEAS_BANK.md` | 5 beat scouts (last 72 h), 3 judges, synthesis, fact-check: top 3 topics |
-| G0.5 core line | `v3-g05-core-line-*.js` | 6 emotional-lever writers, 4 judges, viewer personas + sceptics on finalists, top 3 |
-| G1 script | `v3-g1-story-*.js` | story spines first, judges, 3 writers, cold-read retell panel, flow critic, merge, fact-check |
+| G0 topic | lean by default (2 scouts + 1 editor: the G0 bullet); heavy on request: `v3-g0-topics-*.js`; `docs/IDEAS_BANK.md` | the top 3 topics, each with its proposed core line |
+| G0.5 core line | by default inside G0; on request one writer + one critic (`video/scripts/coreline.py` for the bookkeeping); heavy, never by default: `v3-g05-core-line-*.js` | the top 3 lines |
+| G1 script | lean by default (one writer + one critic + one fix pass: the G1 bullet); heavy on request: `v3-g1-story-*.js` | spines, the script with cues, rhythm and paste checks, critique, fix |
 | any line | `v3-line2-fix-*.js` | replacement lines tested in context by viewer personas + a standards/flow judge |
 | G1/G2 voice | `docs/ELEVENLABS.md`; `video/scripts/voice/` | paste-file rules + `check_paste.py`; `check_rhythm.py` (long sentences broken by short ones); `check_take.py` (transcribe + diff), `clean_take.py`, `transcribe.py` |
 | G2 voice (API) | `video/scripts/voice/generate_take.py` | per-line generation with the owner's voice, ASR check (Parakeet + Whisper), auto-regenerate, stitch; needs `ELEVENLABS_API_KEY` |
@@ -210,7 +227,9 @@ the through-line card (G0.5 drafts it from the pick, G1 completes it from the sc
   that anything its agent starts runs at max too. The hook in `.claude/settings.json` enforces it;
   `python3 .claude/hooks/max_effort.py --lint|--fix <workflow.js>` checks or repairs a script.
 - Context: the gate's brief plus the scene's own data. **Point to sections, never "read all docs fully".**
-- A report is at most 12 lines. Cross-lane requests go in one block, in an exact format.
+- An agent writes its result into a file and its chat report is at most 3 lines (rule 9). Cross-lane requests go in one
+  block, in an exact format.
+- **One fact file:** after G0, agents read `docs/vN/research/factlock.md` and search the web only for a fact it lacks.
 - Lanes: one scene per agent session (G5: a lane owns a SEQUENCE and builds it panel by panel; one agent owns every
   transition); shared kit / engine changes go only through the orchestrator.
 - Renders: 0.33-0.5 scale strips; full res only for a 1-2 frame measurement (an agent's working renders; the owner's

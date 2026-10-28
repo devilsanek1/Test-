@@ -11,6 +11,9 @@ commit before the build (e.g. 5506f34; its f150 / f300 sha256 are DIAGNOSIS §4'
   # motion (60 consecutive frames in every folder, e.g. 150-209 = 2.50-3.48 s):
   python3 -I docs/v2/water/judge_metrics.py --dirs v5=/tmp/mBase,A=/tmp/mA --motion 150-209
 
+The colour numbers on the delivered MASTER (khaki rows at the lit door, cool / warm / house-band shares, median C*,
+paving-like px: the critic's must-fix 4, docs/v2/water/CRITIC.md) are master_check.py's (this folder).
+
 The first folder is the baseline. The water mask is S1's water polygon minus every pixel that is identical in ALL the
 given folders at that frame (what is drawn over the water the same way: Pip, the boats, the leaves), so pass at least
 the baseline and one candidate. Numbers (per 1000 water px where it says so):

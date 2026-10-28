@@ -4,7 +4,7 @@
 //            its bollards; heritage lamps (off), a planter, a bin, a lifebuoy, a bench with a reader, an angler, the
 //            heron (all still); the parent and toddler she passes (tier B) BEHIND her; the towpath's one ShadowLayer;
 //            then `children` = the fingerpost (V2S4_post, tier A), inside the plane
-//   S4Canal  the canal strip between her coping and our boat: the isolated water placeholder (V2S4_water), two ducks,
+//   S4Canal  the canal strip between her coping and our boat: lib/water's canal (V2S4_water: reflections, ripples, SUN1's glitter), two ducks,
 //            the angler's line and float (still)
 // Drawing: V2S4_wpath.tsx, V2S4_wcast.tsx, V2S4_wcanal.tsx; shared numbers: V2S4_wcore.ts.
 import React from 'react';

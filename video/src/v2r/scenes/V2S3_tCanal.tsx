@@ -1,13 +1,12 @@
 // V2S3_tCanal.tsx (lane L3, V2S3 FAR helper): what stands in the canal, WORLD px at the 12.98 match: a heron standing
-// still on a mooring post off her coping (the water itself is V2S3_water's one isolated component; its geometry, this
-// post included, is S3_WATER). The post's waterline is a flat step of the water's own deeper colour (never a contact
-// strip on water). Flat shapes, tier C; no head turn (the life budget).
+// still on a mooring post off her coping (the water itself is V2S3_water's lib/water spec; its geometry, this post
+// included, is S3_WATER; the post's reflection is the water's). The post's waterline is a thin lens a step under the
+// water's own colour there (never a contact strip on water). Flat shapes, tier C; no head turn (the life budget).
 import React, {useMemo} from 'react';
 import {CM} from '../palette';
-import {mixHex} from '../../lib/light';
 import {Paint} from '../kit/canal/core';
 import {Batch, ovalPath, P, leafPath} from './V2S3_tParts';
-import {S3_WATER} from './V2S3_water';
+import {S3_WATER, s3PostContact} from './V2S3_water';
 
 // ---------------------------------------------------------------- the heron on its post (still)
 
@@ -20,9 +19,10 @@ function postBatch(): Batch {
   const b = new Batch();
   b.rect(POST_WOOD, POST.x - POST.w / 2, POST.top, POST.w, POST.bottom - POST.top);
   b.fill(POST_WOOD, ovalPath(POST.x, POST.top, POST.w / 2 + 1, 3));
-  // its waterline: the water's own deeper step (never a contact strip on water), and one soft reflection band
-  b.rect(CM.waterDeep, POST.x - POST.w, POST.bottom - 4, POST.w * 2, 4);
-  b.rect(mixHex(CM.water, POST_WOOD, 0.35), POST.x - 4, POST.bottom, 8, 14);
+  // its waterline: a thin lens a step under the water as drawn there (never a contact strip on water); its reflection
+  // is the water's own (V2S3_water: the post is one of the canal's sources)
+  const c = s3PostContact();
+  b.fill(c.color, c.d);
   return b;
 }
 

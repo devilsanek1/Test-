@@ -1,3 +1,5 @@
+// HEAVY version (owner, 2026-10-28): the default early pipeline is lean (docs/PIPELINE_V2.md, the G0-G1 bullets; review
+// docs/retro/2026-10-28_v4_early_stage_cost.md). Run this only when the owner asks for a wider search.
 export const meta = {
   name: 'v3-g0-topics',
   description: 'v3 G0: 5 scouts find fresh (last 72 h) story candidates by beat, 3 judges score, synthesis writes the top 3 topics, adversarial fact-check',

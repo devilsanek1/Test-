@@ -88,7 +88,8 @@ Maintenance at the end).
   separate one from the other, no distance effect, no perspective; the bottom part: little to no perspective or depth
   ... research some libraries on GitHub ... add a bit of particles here and there to make things more natural"; on v4: "I don't see any changes in the particles
   anywhere"; on v5: "I don't like the water too much, leafs are great"; "it's just looking way too cheap, not clean or premium
-  quality or refined, just lazy and cheap", v2 G4,
+  quality or refined, just lazy and cheap"; on v6, the researched shared water (true reflections, a gold light
+  column, still glitter, calm ripple lines): "Yeah this is better", v2 G4,
   2026-10-27/28).
 - **A gentle PARALLAX float, never a flat card.** When a held shot floats, its planes move by depth (Disney's multiplane
   idea): the near ground most, far planes little, the sky and the caption band not at all; slow, small, back at rest
@@ -163,13 +164,13 @@ Maintenance at the end).
 - **Profile identity: mascot Pip (the purple PHP elephant), drawn in each film's style;** avatar `deliverables/profile/pip_power_button.png`. — (2026-10-25).
 
 ## Hook and pacing
-- **Every video has ONE core line, picked in its own step (G0.5) before the script:** the single sentence at the core
+- **Every video has ONE core line, picked before the script (by default on the topic screen: each topic comes with its proposed core line, so the owner picks both at once; a separate core-line round only on request):** the single sentence at the core
   of the message with the biggest emotional reaction. It drives frame 0, the hook, the cover and the payoff; every line
   serves it. From the pick we draft its THROUGH-LINE CARD (one thread object, one home place, one "you":
   `docs/look/CRAFT.md` §a); the script (G1) completes it with a carrier for every join, taken from the script's own
   joins, and the owner approves the card with the script. The thread may also leave for a FAIRNESS beat the owner approves
   (the other side's equal-weight reply, a place the subject must never be): declare it on the card. — (v3, 2026-10-25; card:
-  v3 retro, owner yes, 2026-10-27; fairness exception: v2, owner yes, 2026-10-27).
+  v3 retro, owner yes, 2026-10-27; fairness exception: v2, owner yes, 2026-10-27; picked with the topic by default: lean early stages, v4, 2026-10-28).
 - **The first 3 s / first scene must be a banger ("something is about to happen"), and every opening effect must be
   BIG enough to stop a thumb:** judged as a viewer scrolling a feed on a phone, each effect (the draw-on, the hook's
   mechanism, the ticks) is unmistakable on first watch: bold, large on screen, long enough to register, with its own
@@ -239,9 +240,28 @@ Maintenance at the end).
   `docs/look/STORYBOARD_STYLE.md`. — ("very simple, avoid colours for now", v3 G3, 2026-10-26).
 
 ## Taste signals (general preferences from the owner's picks; the picks themselves are in each video's OWNER_NOTES.md)
-- **Topics: tech and AI news is the channel's focus; the existing fuss (people already arguing about it) weighs as much as
+- **Topics: tech and AI news, and AI-ADJACENT news (science, health tech, space, robots, computers, energy: where AI is
+  part of the story or right next to it), is the channel's focus** ("no too narrow, lets research some more - expand it to
+  AI adjacent news", v4, 2026-10-28); the existing fuss (people already arguing about it) weighs as much as
   a direct wallet hit,** and an everyday consequence beats a bigger, distant story. — (v3 G0; v4 G0: "focus on tech and AI",
   picked AI songs over the wallet pick: "good amount of fuss about AI songs", 2026-10-27).
+- **Topics are picked in the owner's order: relevant (with buzz and surprise) first, then true and solid, then
+  visually appealing in our look, then the mood the slate needs, then fresh (news from about the last month), then
+  shareable** (weights 6-5-4-3-2-1; a story
+  that isn't true is out whatever it scores). The list the editor scores on, and the owner sees:
+  `docs/TOPIC_CRITERIA.md`. — ("one important condition for the story pick is we should find a story that is going to
+  be possible to make visually appealing ... give me the list of criteria"; then "lets make it relevant first but
+  include buzz here too and surprise, then true and solid, then fresh, then visually appealing, then mood. Then
+  shareabliity potential"; "lets move the freshness lower and make it last month or so", v4, 2026-10-28). The
+  shortlist always comes with its chart: each story's score on each criterion (`video/scripts/topic_chart.py`; "can
+  you show me the visual next time we do research ... some bar chart", v4, 2026-10-28).
+- **Topics: alternate the mood: a positive story after a negative one.** v2 (Google staff resigning), v3 (laptop
+  prices) and v4's first pick (AI songs and fake plays) were all bad news, so the next is a very recent, highly
+  relevant, genuinely POSITIVE AI story (e.g. AI helping find a medicine or beat a disease) with a hopeful outlook.
+  Positive never means hype: the same standards check applies (trial phase, peer review, "helped" vs "did", who
+  benefits and when). Every topic scout names the mood the next video needs. — ("we should alternate between positive
+  and more negative topics ... something very recent, extremely relevant yet very positive around AI ... a nice
+  positive outlook would be the right direction for a story", v4, 2026-10-28).
 - **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
   frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
 - **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).
@@ -313,9 +333,15 @@ Maintenance at the end).
   starting over (owner, v4, 2026-10-27: "make sure to commit the progress periodically if we get stopped on the usage
   limits"). Before any restart, re-read the current direction (`docs/look/DIRECTION.md`, the playbook and the docs they
   link: other sessions change them) and integrate it into the film's one style page first. — (v2, 2026-10-27).
+- **Spend on the film, never on overhead (owner, 2026-10-28: "evaluate if there is anything in the early stages ... that is
+  complete waste"; review `docs/retro/2026-10-28_v4_early_stage_cost.md`).** The early stages run lean: two scouts and one
+  editor for the topic (the owner picks the topic and its core line on one screen), one fact lock (later checks read it
+  and search only for a missing fact), a writer and a critic for the script; agents write files and return at most 3
+  lines; the orchestrator stays small (a fresh session per gate, batched steps, no big skill or doc loads for small
+  questions); check the session's rate limit before a fan-out. A session's budget may be its own: v4's session spends
+  only on v4 ("these tokens we have here are not shared with other videos").
 - **NO LIMIT ON TOKENS for creative output (inside the weekly limit); never trade quality for savings.** Ideas, scripts, judged competing ideas,
-  design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the
-  quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
+  design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the quality needs (workflows larger than the default size guideline too), and the early selection stages (topic, core line, script) need few: a few strong agents with files and one fact check (the rule above); only true waste is cut (rework, lost work,
   reviewing what will still change, early polish, a review loop that has stopped improving the shot: `docs/PIPELINE_V2.md`
   rule 2, and checks that repeat another check). — (2026-10-25; owner, 2026-10-26; 2026-10-28).
 - **Locked means dropped:** rejected options go to `archive/`, never seen by later prompts; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
