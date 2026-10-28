@@ -126,23 +126,21 @@ function rampAt(y: number): string {
   const n = (y - 1111) / (1290 - 1111);
   const sky = toOklab({l: s.l - 0.02 - 0.015 * clamp01(n), c: s.c * (0.95 - 0.1 * clamp01(n)), h: s.h});
   // the body's light veil: the water's own teal at the light band's value, then the body itself (R2)
-  const veil = toOklab({l: oklch(BODY).l + 0.06, c: 0.022, h: oklch(BODY).h});
+  const veil = toOklab({l: oklch(BODY).l + 0.085, c: 0.018, h: oklch(BODY).h});
   const body = toOklab(BODY);
-  const a = smooth(0.22, 0.58, n);
-  const b = smooth(0.5, 0.95, n);
+  const a = smooth(0.1, 0.4, n);
+  const b = smooth(0.32, 0.86, n);
   return oklabToHex(mixOklab(mixOklab(sky, veil, a), body, b * 0.92));
 }
 /** THE ONE ALLOWED GRADIENT (the brief): the shot's own sky seen in the water, as a lib/sky spec over the water's box
- *  (keys every 16 px; the eased OKLab curve; lib/sky's blue-noise dither). The sun's warmth mirrored round its still
- *  mirror point (196, 1158), kept low (ry 60, 0.75): Fresnel weakens it toward us, and a full-height one laid over the
- *  near teal crossed yellow-green at C* 7.3 (skyCheck); this one crosses at C* 4.5, the light band at L* 84-87. */
+ *  (keys every 16 px; the eased OKLab curve; lib/sky's blue-noise dither). The far water mirrors the warm horizon
+ *  (L* 86.5), crosses to the water's own pale veil at L* ~86 by y ~1165 (light, never beige, khaki or grey) and settles
+ *  on the teal body (L* 76) from y ~1250: the near water shows its body (R2). No mirrored sun warmth: its ellipse sat
+ *  right on the crossing and turned it khaki (skyCheck C* 7.6); the glitter column carries the sun. */
 export function waterRamp(): SkySpec {
   const keys: {y: number; color: string}[] = [];
   for (let y = 1046; y <= 1338; y += 16) keys.push({y, color: rampAt(y)});
-  const warm = S1_EVENING.sun!;
-  const wc = oklch(typeof warm.color === 'string' ? warm.color : fromOklch(warm.color));
-  const sunCol = fromOklch({l: wc.l - 0.03, c: wc.c * 0.93, h: wc.h});
-  return {keys, band: null, x: -60, width: 1200, top: 1040, bottom: 1340, sun: {x: warm.x, y: 2 * CAM.horizon - warm.y, rx: 300, ry: 60, color: sunCol, strength: 0.75}};
+  return {keys, band: null, x: -60, width: 1200, top: 1040, bottom: 1340, sun: null};
 }
 
 // on-screen colours (what the clean pen shows: the environment tier's calm pull, the far planes' haze, the ground
