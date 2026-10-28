@@ -176,43 +176,30 @@ export function rowOffset(row: Row, t: number, s: Sway): number {
 
 // ================================================================= colour: the Fresnel ladder in CIE LCh (R2-R4)
 
-/** How a reflection is toned. `body`: an opaque thing (L* toward the water's by k, hue kept, chroma eased; warm
- *  low-chroma colours never land in the beige / tan band: light ones stay cream, darker ones take the water's own
- *  hue); `light`: an emissive source (lobby gold: stays light and rich, R7); `figure`: a person (her teal or an oat
- *  coat: at least k 0.6, C* <= 24: environment, never a second subject, R5). */
+/** How a reflection is toned: HUE FROM THE WATER, VALUE FROM THE WORLD, LIGHT KEEPS ITS COLOUR. `body`: an opaque
+ *  thing: its L* moves toward the water's by k (R3: lights a little darker, darks lighter), and it takes the water's own
+ *  hue family at that value (deeper = a touch bluer and richer, lighter = a touch greener and paler): the physical mix
+ *  of a warm reflection into the teal body is khaki in RGB (research R4), so the flat-colour answer keeps the water one
+ *  colour family and lets the VALUES carry every mirrored shape; `light`: an emissive source (the lobby's gold: stays
+ *  light and rich, R7); `figure`: a person (k >= 0.6: environment, never a second subject, R5). */
 export type ToneKind = 'body' | 'light' | 'figure';
-export type ToneOpts = {waterL: number; waterH: number; waterC: number; cMax: number; creamL: number};
+export type ToneOpts = {waterL: number; waterH: number; waterC: number; hueSlope: number; chromaSlope: number; cMin: number; cMax: number};
 const TONES = new Map<string, string>();
 export function reflectTone(src: string, k: number, o: ToneOpts, kind: ToneKind = 'body'): string {
-  const key = `${src}|${k.toFixed(3)}|${kind}|${o.waterL}|${o.waterH}`;
+  const key = `${src}|${k.toFixed(3)}|${kind}|${o.waterL}|${o.waterH}|${o.waterC}`;
   const hit = TONES.get(key);
   if (hit) return hit;
   const c = lch(src);
   const kk = kind === 'figure' ? Math.max(0.6, k) : k;
   const L = c.L + (o.waterL - c.L) * kk;
-  const warm = c.h >= 25 && c.h <= 115;
-  let C = c.C;
-  let h = c.h;
-  let Lo = L;
+  let out: string;
   if (kind === 'light') {
     // R7: the lobby's gold stays the brightest, richest field in the water (L* 79-83, C* >= 35), a touch toward rose
-    C = Math.max(35, c.C * 0.92);
-    h = c.h - 4 * kk;
-  } else if (warm && c.L >= 84 && c.C < 22) {
-    // a light warm stone or coat: cream, never beige (CRAFT's NEVER list; research R4): lighter than 86, low chroma
-    Lo = Math.max(o.creamL, Math.min(c.L - 2, L));
-    C = Math.min(c.C, 14);
-  } else if (c.C < 9 || (warm && c.C < 18)) {
-    // near-neutral, or a warm colour too dull to stay warm below L* 86 (it would read beige / tan): the water's own hue
-    h = o.waterH;
-    C = o.waterC;
+    out = fromLch(L, Math.max(35, c.C * 0.92), c.h - 4 * kk);
   } else {
-    // chromatic: the hue kept (warm ones turn up to 6 deg toward rose, the shade family), chroma eased, capped
-    C = Math.min(kind === 'figure' ? 24 : o.cMax, c.C * (0.94 - 0.12 * kk));
-    if (warm) h = c.h - 6 * kk;
-    if (warm && Lo < 86) C = Math.max(Math.min(c.C, 18), C);
+    const d = o.waterL - L;
+    out = fromLch(L, Math.max(o.cMin, Math.min(o.cMax, o.waterC + d * o.chromaSlope)), o.waterH + d * o.hueSlope);
   }
-  const out = fromLch(Lo, C, ((h % 360) + 360) % 360);
   if (TONES.size > 6000) TONES.clear();
   TONES.set(key, out);
   return out;
@@ -229,7 +216,21 @@ export function paleOf(hex: string, k: number, paper: string): string {
 /** One thing over the water, as its REFLECTION: a polygon already mirrored about its own waterline (screen px at the
  *  camera's rest), its on-screen colour (the reflection is toned from it), its z-layer among the reflections (higher
  *  = nearer, drawn later) and the parallax plane whose float it rides. */
-export type Src = {p: Poly; col: string; layer: number; plane: number; kind?: ToneKind; ymin?: number; ymax?: number; xmin?: number; xmax?: number};
+export type Src = {
+  p: Poly;
+  col: string;
+  layer: number;
+  plane: number;
+  kind?: ToneKind;
+  /** A stable id (the ragged edges' seed). */
+  id?: number;
+  /** No ragged edges (a contact band: the quay's own face stays crisp, R10). */
+  crisp?: boolean;
+  ymin?: number;
+  ymax?: number;
+  xmin?: number;
+  xmax?: number;
+};
 export function withBox(s: Src): Src {
   let ymin = Infinity;
   let ymax = -Infinity;
@@ -244,9 +245,70 @@ export function withBox(s: Src): Src {
   return {...s, ymin, ymax, xmin, xmax};
 }
 
+/** The ragged edges (R6: a rippled reflection's sides waver and its far end breaks up): in every row each piece's two
+ *  ends recede a little (`small`, far -> near: an irregular zigzag on top of the sway), and from nearness `from` on a
+ *  lot more (`big` at our edge: the near end breaking into fragments, R6's last 25-35 %), seeded per row and thing,
+ *  breathing on its own `period` cycle; a narrow thing (a figure, a post) loses at most a fifth of its width per side,
+ *  and a piece shorter than 2 px drops out. Only the deep breaks are rounded (`round` px or more). */
+export type Ragged = {small: [number, number]; big: number; from: number; round: number; period: [number, number]; seed: number};
+function erode(p: Poly, row: Row, id: number, t: number, rg: Ragged): {p: Poly; a: number; b: number} | null {
+  let x0 = Infinity;
+  let x1 = -Infinity;
+  for (const q of p) {
+    if (q[0] < x0) x0 = q[0];
+    if (q[0] > x1) x1 = q[0];
+  }
+  const w = x1 - x0;
+  const small = lerp(rg.small[0], rg.small[1], row.n);
+  const big = rg.big * Math.pow(clamp01((row.n - rg.from) / (1 - rg.from)), 1.2);
+  const cap = w < 80 ? 0.2 * w : Infinity;
+  const side = (j: number) => {
+    const P = lerp(rg.period[0], rg.period[1], hash01(rg.seed, row.i, id, j, 1));
+    const breath = 0.62 + 0.38 * Math.sin((2 * Math.PI * t) / P + 2 * Math.PI * hash01(rg.seed, row.i, id, j, 2));
+    return Math.min(cap, (small * hash01(rg.seed, row.i, id, j, 3) + big * hash01(rg.seed, row.i, id, j)) * breath);
+  };
+  const ea = side(0);
+  const eb = side(1);
+  const a = x0 + ea;
+  const b = x1 - eb;
+  if (b - a < 2) return null;
+  const q = ea > 0.05 || eb > 0.05 ? clipX(p, a, b) : p;
+  const rh = row.h >= 5;
+  return q ? {p: q, a: rh && ea >= rg.round ? a : NaN, b: rh && eb >= rg.round ? b : NaN} : null;
+}
+/** A piece's path with its ERODED ends rounded (R6: a slice ends round, never square): a vertical segment lying on a
+ *  cut becomes a half-lens bulging outward by 0.4 of its height (at most 5 px). */
+export function polyDRound(p: Poly, dx: number, a: number, b: number): string {
+  let d = '';
+  const n = p.length;
+  const on = (x: number, c: number) => Number.isFinite(c) && Math.abs(x - c) < 0.02;
+  for (let i = 0; i < n; i++) {
+    const q = p[i];
+    if (i === 0) {
+      d += `M${r2(q[0] + dx)} ${r2(q[1])}`;
+      continue;
+    }
+    const prev = p[i - 1];
+    const cut = on(prev[0], a) && on(q[0], a) ? -1 : on(prev[0], b) && on(q[0], b) ? 1 : 0;
+    if (cut) {
+      const bulge = Math.min(5, Math.abs(q[1] - prev[1]) * 0.4) * cut;
+      d += `Q${r2(q[0] + bulge + dx)} ${r2((q[1] + prev[1]) / 2)} ${r2(q[0] + dx)} ${r2(q[1])}`;
+    } else d += `L${r2(q[0] + dx)} ${r2(q[1])}`;
+  }
+  // the closing segment (last -> first)
+  const L = p[n - 1];
+  const F = p[0];
+  const cut = on(L[0], a) && on(F[0], a) ? -1 : on(L[0], b) && on(F[0], b) ? 1 : 0;
+  if (cut) {
+    const bulge = Math.min(5, Math.abs(F[1] - L[1]) * 0.4) * cut;
+    d += `Q${r2(F[0] + bulge + dx)} ${r2((F[1] + L[1]) / 2)} ${r2(F[0] + dx)} ${r2(F[1])}`;
+  }
+  return d + 'Z';
+}
+
 /** The reflections cut into rows: per layer, per toned colour, ONE path (every row's pieces with that row's sway). */
 export type Sliced = {layer: number; color: string; d: string}[];
-export function slice(srcs: Src[], rows: Row[], offs: number[], shift: (plane: number) => Pt, tone: (src: Src, row: Row) => string): Sliced {
+export function slice(srcs: Src[], rows: Row[], offs: number[], shift: (plane: number) => Pt, tone: (src: Src, row: Row) => string, rag?: {t: number; r: Ragged}): Sliced {
   const acc = new Map<string, {layer: number; color: string; parts: string[]}>();
   const byLayer = srcs.slice().sort((a, b) => a.layer - b.layer);
   for (const s of byLayer) {
@@ -259,11 +321,13 @@ export function slice(srcs: Src[], rows: Row[], offs: number[], shift: (plane: n
       if (row.y1 <= ymin || row.y0 >= ymax) continue;
       const piece = clipBand(moved, row.y0, row.y1);
       if (!piece) continue;
+      const er = rag && !s.crisp ? erode(piece, row, s.id ?? 0, rag.t, rag.r) : {p: piece, a: NaN, b: NaN};
+      if (!er) continue;
       const color = tone(s, row);
       const key = `${s.layer}|${color}`;
       let a = acc.get(key);
       if (!a) acc.set(key, (a = {layer: s.layer, color, parts: []}));
-      a.parts.push(polyD(piece, offs[r], 0));
+      a.parts.push(Number.isFinite(er.a) || Number.isFinite(er.b) ? polyDRound(er.p, offs[r], er.a, er.b) : polyD(er.p, offs[r], 0));
     }
   }
   return Array.from(acc.values())
@@ -296,9 +360,12 @@ export type Gaps = {
   thick: [number, number];
   minH: number;
   period: [number, number];
+  /** From this nearness on, a gap is a level PILL (rounded ends: the reflection breaking into fragments) rather than a
+   *  pointed lens (a thin light ripple line). */
+  pillFrom: number;
   seed: number;
 };
-export type Lens = {x: number; y: number; len: number; h: number; row: number};
+export type Lens = {x: number; y: number; len: number; h: number; row: number; pill: boolean};
 export function gapsAt(rows: Row[], t: number, g: Gaps, xRange: (row: Row) => [number, number] | null): Lens[] {
   const out: Lens[] = [];
   for (const row of rows) {
@@ -322,7 +389,7 @@ export function gapsAt(rows: Row[], t: number, g: Gaps, xRange: (row: Row) => [n
       const len = lerp(L0, L1, hash01(g.seed, row.i, j, 3, cyc)) * env;
       if (len < 3) continue;
       const x = xr[0] + width * hash01(g.seed, row.i, j, 4, cyc);
-      out.push({x, y, len, h: Math.min(h, len * 0.45), row: row.i});
+      out.push({x, y, len, h: Math.min(h, len * 0.45), row: row.i, pill: row.n >= g.pillFrom});
     }
   }
   return out;

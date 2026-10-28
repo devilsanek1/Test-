@@ -183,9 +183,13 @@ export const FAR_AIR = EMBER.skyLow;
  *  cap, lid, bank and flake of the outside takes it (h2_window's outer sill and kit Fleet's roofs too); SQA's H1 window
  *  keeps its own (home_set: the approved pilot). */
 export const H2_SNOW = RIGS.street.snowCap;
-/** The data center's calm haze step off its beats (kit Haze k; home_set's H1 window takes the same: one building). */
-export const HALL_K = 0.35;
-const HALLB_K = 0.5;
+/** The data center's calm haze step off its beats (kit Haze k; home_set's H1 window takes the same: one building). One
+ *  far plane's step (CRAFT §f.2, +2): the calm body L* 18 -> ~41, its rows ~48, so the calm data center sits closer to
+ *  the air than the town in front of it and is no longer the heaviest dark at a squint while the beat plays in the street
+ *  (assembly review R2-5: at k 0.35 the calm body, L* ~33, was the frame's darkest mass through SQE and dE 19.5 from the
+ *  air against the town's 18.3: the depth ladder inverted). Hall B stays one step farther. */
+export const HALL_K = 0.55;
+const HALLB_K = 0.65;
 
 // ---------------------------------------------------------------- film clock
 
@@ -400,10 +404,27 @@ const rd = (x: number, y: number, w: number, h: number) => `M${f1(x)} ${f1(y)}h$
  *  facade, letters a calm step over it: it still reads at full size, never the frame's brightest cold light). */
 /** Lit: the frame's brightest cold light (a light box, L* ~92: CRAFT §d.2's 85-92 for lit panes and bulbs). */
 const SIGN_LIT = {panel: '#E2EAFF', text: EMBER.ink};
-export const SIGN_CALM = {panel: '#5F6782', text: '#8D95AE'};
-/** SQF's beat rhymes with the hook's (4.04): as the sign lights at 36.98 the rows go dark, then light one at a time on
- *  "an AI data center" (37.00-37.80: the subject owns its line's motion; kit DataCenter `rowsOn`). */
-const HALL_ROWS = {at: H2_BEATS.sign + 0.02, dur: 0.8};
+/** Calm: the panel L* ~51 (~10 over the hazed facade's ~41, within E3's dL* 15), the letters L* ~67 (a calm step over the
+ *  panel), the sign's own cool hue (C* ~15). */
+export const SIGN_CALM = {panel: '#717994', text: '#9AA3BC'};
+/** SQF's beat rhymes with the hook's (4.04: the building dark and its sign lit on "AI", then its rows one per syllable):
+ *  the sign lights at 36.98 (on "AI", 37.08) and the rows go dark, then light one at a time on the syllables of "AI data
+ *  center": I ~37.28, da 37.48, ta ~37.64, cen 37.80, each ~0.1 s ahead of its syllable (37.18 / 37.36 / 37.54 / 37.72;
+ *  kit DataCenter `rowsOn`, under the lit rows drawn on top: HallRowsLit). */
+const HALL_ROWS = {at: 37.18, dur: 0.72};
+/** The hall's four server-row slots (S9 px): the kit DataCenter's own row geometry for HALL ('dark', 4 rows, kit
+ *  Outside.tsx DataCenterBody), so the lit rows sit exactly in its strips. */
+const HALL_ROW_SLOTS = (() => {
+  const g = HALL_GEO;
+  const w = HALL.w;
+  const sideW = w * 0.06;
+  const rowsTop = g.sign.y + g.sign.h + g.H * 0.08;
+  const rowGap = (HALL.y - g.H * 0.08 - rowsTop) / 4;
+  const rowH = Math.max(3, rowGap * 0.42);
+  const x0 = g.x0 + sideW + w * 0.04;
+  const sw = w - sideW - w * 0.08;
+  return [0, 1, 2, 3].map((i) => ({x: x0, y: rowsTop + i * rowGap, w: sw, h: rowH}));
+})();
 /** The server rows' bands: the clean pen's soft rows on the beat; one value over the body when calm (before the haze). */
 const DC_LED = '#A8B6DE';
 const DC_LED_CALM = EMBER.dc;
@@ -431,14 +452,27 @@ const HallBCalm: React.FC = () => {
   );
 };
 
-/** The hall's roof: S9's run of 7 fan units, still (no spinning blade ticks, no dark fan discs): boxes in the hall's
- *  own dark value under their snow lids, so the roof reads as one silhouette with snow caps (S9 px). */
-const HallFansCalm: React.FC = () => {
+/** The hall's roof (S9 px). On its beats S9's run of 7 fan units, still (no spinning blade ticks, no dark fan discs):
+ *  boxes in the hall's own dark value under their snow lids. Calm (`plant`), ONE continuous plant enclosure over the same
+ *  run, in the hall's own value under one snow lid: one silhouette with the hall, no sky between the units (assembly
+ *  review R2-5: under the calm haze the 7 boxes, L* 32-33 with 14-19 px of sky between them, made 14 short dark marks
+ *  per frame on the sky, a row of dark dashes). */
+const HallFansCalm: React.FC<{plant?: boolean}> = ({plant}) => {
+  const y = HALL_ROOF;
+  if (plant) {
+    const x0 = HALL.x - 132 - 15;
+    const w = 6 * 44 + 30;
+    return (
+      <>
+        <path d={rrect(x0, y - 15, w, 16, 3)} fill={EMBER.dcDark} />
+        <path d={rrect(x0 - 1.5, y - 17.5, w + 3, 3.5, 1.75)} fill={H2_SNOW} />
+      </>
+    );
+  }
   let box = '';
   let lid = '';
   for (let i = 0; i < 7; i++) {
     const cx = HALL.x - 132 + i * 44;
-    const y = HALL_ROOF;
     box += rd(cx - 15, y - 15, 30, 16);
     lid += rd(cx - 16.5, y - 17.5, 33, 3.5);
   }
@@ -450,10 +484,28 @@ const HallFansCalm: React.FC = () => {
   );
 };
 
+/** THE ROWS ON THE PAYOFF'S BEAT (assembly review R1-4: the kit's three short bands per row stepped only ~400-500 px
+ *  each, so 37.05-38.12 read as the film's longest still run, 1.08 s, under "an AI data center"; the hook's twin rows
+ *  step ~1,100-1,300 px). Each row lights as ONE band across the facade's row slot (S9 px: ~277 x 5.6 H2 px, ~1,500 px)
+ *  at the sign's lit value, popping whole in one frame on its syllable (HALL_ROWS), drawn over the kit's rows (which
+ *  light under it at the same moments); `s` = the hall's step: lit on the beat (0), half way to the calm rows' value at
+ *  the half step, gone when calm (the kit's calm bands show). The building is dark from the sign's step, so between
+ *  36.98 and the first row its rows are all off. */
+const HallRowsLit: React.FC<{T: number; s: number}> = ({T, s}) => {
+  if (s >= 1 || T < H2_BEATS.sign) return null;
+  const color = s > 0 ? mixHex(SIGN_LIT.panel, DC_LED_CALM, 0.5) : SIGN_LIT.panel;
+  const bh = 6.4;
+  const d = HALL_ROW_SLOTS.filter((_, i) => T >= HALL_ROWS.at + (i * HALL_ROWS.dur) / 4)
+    .map((r) => rrect(r.x + 4, r.y + r.h / 2 - bh / 2, r.w - 8, bh, bh / 2))
+    .join('');
+  return d ? <path d={d} fill={color} /> : null;
+};
+
 /** THE AI data center at H2 (S9 px; through S9_TO_H2): the kit DataCenter (dark, 'bands' rows, no blink, no sign of its
  *  own) under one haze step when calm, its roof fans, then the sign drawn on top in its state. `s` = 0 on its beat (A),
  *  1 calm (C), 0.5 the 3-frame half step. */
 const H2Hall: React.FC<{s: number}> = ({s}) => {
+  const T = useFilmT();
   const g = HALL_GEO;
   const sideW = HALL.w * 0.06;
   const tier = s >= 1 ? 'environment' : s > 0 ? 'support' : 'subject';
@@ -461,11 +513,12 @@ const H2Hall: React.FC<{s: number}> = ({s}) => {
   return (
     <>
       <Haze k={HALL_K * s} color={FAR_AIR}>
-        <HallFansCalm />
+        <HallFansCalm plant={s >= 0.5} />
         {/* on FILM time (OutsideFar runs S9's clock for S9's pieces): the rows' darkAt / rowsOn are film seconds */}
         <FilmClock>
         <DataCenter x={HALL.x} y={HALL.y} w={HALL.w} h={HALL.h} variant="dark" units={0} sign={null} signH={52} ink={2.6} ledStyle="bands" ledColor={mixHex(DC_LED, DC_LED_CALM, s)} blink={false} darkAt={H2_BEATS.sign} rowsOn={HALL_ROWS} snow={H2_SNOW} tier={tier} seed="s9/dc" />
         </FilmClock>
+        <HallRowsLit T={T} s={s} />
       </Haze>
       <path d={rrect(g.sign.x, g.sign.y, g.sign.w, g.sign.h, 3)} fill={mixHex(SIGN_LIT.panel, SIGN_CALM.panel, s)} />
       <Txt x={HALL.x + sideW / 2} y={g.sign.y + g.sign.h * 0.74} size={signSize} fill={mixHex(SIGN_LIT.text, SIGN_CALM.text, s)} fit={g.sign.w * 0.92}>
@@ -601,7 +654,8 @@ const HouseRow: React.FC<{hs: House[]; seed: string; T: number}> = ({hs, seed, T
  *  the caption band. The steam lies over the mountain's flank: a light step of the pile's own lit gold, small (r <= 7),
  *  so it reads as steam in front of the gold, never as holes in it (E14). */
 const FAB = {x0: 600, x1: 944, base: 1004, h: 34, teeth: 4, tooth: 30, chim: {x: 896, w: 18, top: 900}};
-/** Its roof one plane step behind the street's calm wall (toward the far snow), the chimney a step under it, the north
+/** Its roof one plane behind the street's calm wall, at the town plane's air value (L* 58 against FAR_AIR's 57, warm:
+ *  CRAFT §f.2, the farther plane closer to its air; the wall in front is L* 65), the chimney a step under it, the north
  *  glazing a warm glow one step over the roof (not a window-bright stripe: the sawtooth held the frame's top salience). */
 const FAB_BRICK = '#AE8078';
 const FAB_SHADE = '#A16E63';
@@ -687,36 +741,43 @@ const Worker: React.FC<{x: number; y: number; h: number; walk: number; carry: bo
   );
 };
 
-/** The two workers' loading loop: from the gate's mouth to a truck's back and back (film time). */
+/** Where a DC truck stands to load at the gate (A from the start to 24.30, B 25.20-33.50, C from 36.25): the back of
+ *  its box, where the workers hand the crates in (street-plane px). */
+const GATE_TRUCK: Pt = [455, Y_POOL];
+const GATE_TRUCK_BACK: Pt = [GATE_TRUCK[0] + (VAN_W * 1.4) / 2 + 6, GATE_TRUCK[1] - 6];
+/** One worker's trip (film seconds): from its spot at the gate's mouth out to the truck's back carrying a crate (`out`
+ *  s), a hold there while the crate goes in (`hold`), back empty (`back`); `dx` = its own place at the truck's back. */
+type Trip = {t0: number; out: number; hold: number; back: number; dx: number};
+const trip = (t0: number, out: number, hold: number, back: number, dx: number): Trip => ({t0, out, hold, back, dx});
+/** THE WORKERS TAKE TURNS WITH THE BEATS (assembly review R1-5; CRAFT §b: one mover leads, supporting movers take
+ *  turns): every trip is placed between the street's beats, never through them, and starts and ends at the worker's own
+ *  spot (no jump: the old loop ran B's loading on a 2.6 s cycle straight through five beats, 25.60-32.90, took 13-27 % of
+ *  the motion against the BETTER van's 33 %, and snapped each worker to its spot where a phase began or ended). A (the
+ *  load beat, the subject's own action, 23.10-24.22): two quick trips side by side. B (after our van's crate, 26.22-28.46):
+ *  one trip each, out while "costs about" is said, both still at the truck's back while the 5x face swings on (27.08-
+ *  27.32), back before the van behind shuffles up (28.62); then they wait at the gate's mouth through the van's pull-up,
+ *  the hop and the tick (29.20-30.30), the BETTER van (31.40-32.84) and B's departure (33.50). C (behind the payoff's
+ *  phone): from 38.75, after the data center's beat, nothing walks while its sign and rows light. */
+const WORKER_TRIPS: [Trip[], Trip[]] = [
+  [trip(23.1, 0.48, 0.1, 0.48, -8), trip(26.22, 0.84, 0.56, 0.84, -8), trip(38.75, 1.17, 0.13, 1.17, -8)],
+  [trip(23.2, 0.46, 0.1, 0.46, 10), trip(26.3, 0.78, 0.54, 0.8, 10), trip(40.05, 1.17, 0.13, 1.17, 10)],
+];
+
+/** The two workers at film time T (street-plane px). */
 function workersAt(T: number): {x: number; y: number; h: number; walk: number; carry: boolean; face: 1 | -1}[] {
-  const B = H2_BEATS;
   const G: Pt = [548, 1104];
-  const vs = vehiclesAt(T);
-  const backOf = (id: string): Pt | null => {
-    const v = vs.find((q) => q.id === id);
-    if (!v || v.y < 1200) return null;
-    return [v.x + (VAN_W * 1.4 * v.k) / 2 + 6, v.y - 6];
-  };
-  // which truck they load, and how fast (the subject's beat 23.10-24.20 fast; B and later C at a calm pace)
-  const target = T < B.aGo ? 'A' : T < B.bGo ? 'B' : 'C';
-  const back = backOf(target);
-  const fast = T >= B.load && T < B.aGo;
-  const period = fast ? 1.1 : 2.6;
-  // C is loaded only after the data center's beat (38.75): nothing walks while the payoff's sign lights
-  const start = fast ? B.load : target === 'B' ? B.aGo + 1.3 : 38.75;
-  return [0, 0.5].map((ph, i) => {
+  return WORKER_TRIPS.map((trips, i) => {
     const idle: Pt = [G[0] + (i ? 30 : -14), G[1] + 6];
-    if (!back || T < start || (target === 'B' && T > B.bGo - 0.6) || (target === 'C' && T < 38.75)) {
-      return {x: idle[0], y: idle[1], h: 40, walk: 0, carry: false, face: 1 as const};
-    }
-    const c = (((T - start) / period + ph) % 1 + 1) % 1;
-    // out carrying (0-0.45), in empty (0.5-0.95), short holds at each end
-    const out = c < 0.5;
-    const s = out ? ease.inOutSine(clamp(c / 0.45)) : 1 - ease.inOutSine(clamp((c - 0.5) / 0.45));
+    const q = trips.find((r) => T >= r.t0 && T < r.t0 + r.out + r.hold + r.back);
+    if (!q) return {x: idle[0], y: idle[1], h: 40, walk: 0, carry: false, face: 1 as const};
+    const u = T - q.t0;
+    const back: Pt = [GATE_TRUCK_BACK[0] + q.dx, GATE_TRUCK_BACK[1]];
+    const out = u < q.out + q.hold;
+    const s = u < q.out ? ease.inOutSine(u / q.out) : out ? 1 : 1 - ease.inOutSine((u - q.out - q.hold) / q.back);
+    const moving = u < q.out || u >= q.out + q.hold;
     const x = idle[0] + (back[0] - idle[0]) * s;
     const y = idle[1] + (back[1] - idle[1]) * s;
-    const moving = out ? c < 0.45 : c < 0.95;
-    return {x, y, h: 40 + 6 * s, walk: moving ? (T - start) * 1.7 : 0, carry: out, face: (out ? 1 : -1) as 1 | -1};
+    return {x, y, h: 40 + 6 * s, walk: moving ? u * 1.7 : 0, carry: out, face: (out ? 1 : -1) as 1 | -1};
   });
 }
 
@@ -821,9 +882,14 @@ const STREET_AMBIENT = '#C9CFE6';
 /** The waiting vans' exhaust: a light vapour step over the road (L* 88, under the snow caps' 89: not snow, so it keeps
  *  its own value; at the caps' value it fell under the change a phone shows and the queue's slow life went still). */
 const EXHAUST = mixHex(EMBER.snow, EMBER.road, 0.35);
-/** The street's stage (tier C): the factory's wall a soft warm brick, sky-lit snow caps one pale step (L* 86, under the
- *  pool's core: CRAFT §d.2), so the wall's top edge and the roofline never hold the frame's top salience. */
-const WALL_BRICK = '#A66B5C';
+/** The street's stage (tier C): the factory's wall a soft warm brick in the street's dusk ambient, L* 65 C* 28 (hue and
+ *  chroma of the old #A66B5C, one value lighter), so its sky-lit snow cap (L* 86, one pale step, under the pool's core:
+ *  CRAFT §d.2) and the gate's lit yard (L* 84) sit ~20 L* over it (CRAFT §c, tier C) and the wall's top edge never holds
+ *  the frame's top salience. (Assembly review R1-1: at L* 51 the cap's edge, dL* ~35 along ~840 px of the pushed frame,
+ *  held 17-29 % of the top-3 % salience at every queue beat, against 9-32 % for the beat's own subject.) The factory's
+ *  roof behind it (FAB_BRICK, L* 58) sits at the town plane's air value (FAR_AIR, L* 57): the farther plane, closer to its
+ *  air (CRAFT §f.2). */
+const WALL_BRICK = fromLch(65, 28.3, 40);
 const STREET_CAP = '#D0D6E7';
 /** The guard booth's cream body in the street's ambient light (CRAFT §d.2-3: a wall facing us under the open sky sits
  *  one step down, L* 91 -> 81, its chroma kept, turned toward rose): the room's wall cream (EMBER.wall, lit by the nook's
@@ -883,8 +949,9 @@ export const OutsideStreet: React.FC = () => {
           <path d={rrect(-40, 990, 228, 104, 3)} fill={'#A6776E'} />
           <path d={roundPoly([[-50, 994], [70, 952], [200, 994], [194, 1002], [-44, 1002]], 3)} fill={STREET_CAP} />
           <path d={rrect(40, 1020, 34, 40, 2) + rrect(118, 1020, 34, 40, 2)} fill={off ? EMBER.houseLit : '#FFD27A'} />
-          {/* the factory's wall (tier C: a soft warm brick, L* 51 C* 28, never the saturated dark field that held the
-              frame's top salience behind every beat) with its snow cap one pale step; the gate's lit yard: crates inside */}
+          {/* the factory's wall (tier C: a soft warm brick, L* 65 C* 28, never a dark field whose snow-capped top edge
+              holds the frame's top salience behind every beat) with its snow cap one pale step; the gate's lit yard:
+              crates inside */}
           <path d={rrect(W.x0, W.y0, W.x1 - W.x0, W.y1 - W.y0 + 4, 3)} fill={WALL_BRICK} />
           <path d={rrect(W.x0 - 4, W.y0 - 6, W.x1 - W.x0 + 8, 9, 4)} fill={STREET_CAP} />
           {/* two string courses: long same-hue bands a calm step under the brick (CRAFT §c: dL* <= ~6), never dark lines */}

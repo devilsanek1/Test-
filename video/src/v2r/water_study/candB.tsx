@@ -41,8 +41,10 @@ import {
   buildMass,
   cie,
   depthAt,
+  fresnelSteps,
   fromOk,
-  glitterAt,
+  glitterBed,
+  glitterCores,
   lensPath,
   okLch,
   paleOf,
@@ -114,7 +116,7 @@ const ROWS = (() => {
   }
   return out;
 })();
-const GRID = sliceGrid(ROWS, [0.2, 0.32], 1110, 1290);
+const GRID = sliceGrid(ROWS, [0.16, 0.26], 1110, 1290);
 
 /** THE SWAY (R6, R12): +-1.3 px at the far bank -> +-4.2 px at our feet; 4.6 s and 2.9 s, wavelengths 1.5 m and 0.8 m,
  *  the phase travelling toward us (~0.3 m/s). */
@@ -125,14 +127,13 @@ const SWAY: Sway = {amp: [1.3, 4.2], yFar: 1090, yNear: 1290, T: [4.6, 2.9], lam
 /** Fresnel in three flat steps (R2): a reflection at full design strength under the far bank (k 0.3 toward the water's
  *  body), a step weaker from y 1150, the near third from y 1195 (k 0.6). */
 const STEPS = [1150, 1195];
-const tone3 = (src: string, k: [number, number, number] = [0.3, 0.45, 0.6]) => k.map((v) => reflectTone(src, v, CM.water));
+const tone3 = (src: string, k: [number, number, number] = [0.3, 0.45, 0.6], o: {turn?: number; fade?: [number, number]} = {}) => fresnelSteps(src, k, CM.water, o);
 /** On-screen source colours (sampled at 1.0 s, after the clean pen; DIAGNOSIS §2.4). */
 const SRC = {
   bridgeBrick: '#DAA28E',
   bridgeSoffit: '#D0CCD8',
   bridgeStone: '#EEDCCB',
-  farCity: '#D0C0C8',
-  farTower: '#B4B4C4',
+  farCity: '#D8BEC4',
   wingBrick: '#CD9985',
   wingStone: '#D5C5BB',
   wingGlass: '#93949F',
@@ -145,21 +146,22 @@ const SRC = {
   herCoat: CM.hero,
 } as const;
 const COL = {
-  bridgeBrick: tone3(SRC.bridgeBrick, [0.32, 0.45, 0.6]),
+  // the reflection a touch darker than the lit brick (R3: a mid holds; under the light quay it reads as water)
+  bridgeBrick: tone3(SRC.bridgeBrick, [-0.08, 0.3, 0.55]),
   bridgeSoffit: tone3(SRC.bridgeSoffit, [0.25, 0.4, 0.55]),
-  bridgeStone: tone3(SRC.bridgeStone, [0.25, 0.4, 0.55]),
-  farCity: tone3(SRC.farCity, [0.3, 0.42, 0.55]),
-  farTower: tone3(SRC.farTower, [0.3, 0.42, 0.55]),
-  wingBrick: tone3(SRC.wingBrick),
-  wingStone: tone3(SRC.wingStone, [0.25, 0.4, 0.55]),
+  // lights stay light (L* >= 86: a low chroma reads cream there, never beige)
+  bridgeStone: tone3(SRC.bridgeStone, [0.1, 0.16, 0.22]),
+  farCity: tone3(SRC.farCity, [0.34, 0.46, 0.58]),
+  wingBrick: tone3(SRC.wingBrick, [-0.1, 0.3, 0.55]),
+  wingStone: tone3(SRC.wingStone, [0.1, 0.16, 0.22]),
   wingGlass: tone3(SRC.wingGlass),
   // a light keeps its gold (R7: L* 80-83 at C* >= 35): lights tone less
-  lobby: [0, 1, 2].map((i) => reflectTone(SRC.lobby, [0.16, 0.26, 0.36][i], CM.water, {rose: 2, chroma: 0.98})),
+  lobby: [0, 1, 2].map((i) => reflectTone(SRC.lobby, [0.24, 0.32, 0.4][i], CM.water, {rose: 2, chroma: 0.78})),
   iron: tone3(SRC.iron, [0.3, 0.42, 0.55]),
   hull: tone3(SRC.hull, [0.3, 0.42, 0.55]),
   sage: [0.35, 0.5, 0.62].map((k) => reflectTone(SRC.sage, k, CM.water, {toWater: 0.45})),
   oat: [0.4, 0.55, 0.65].map((k) => reflectTone(SRC.oat, k, CM.water, {toWater: 0.75})),
-  herLegs: tone3(SRC.herLegs, [0.5, 0.6, 0.68]),
+  herLegs: tone3(SRC.herLegs, [0.6, 0.66, 0.72]),
   // the hero colour is hers only: her reflection calmed to tier C (C* <= 25)
   herCoat: tone3(SRC.herCoat, [0.55, 0.62, 0.7]).map((c) => {
     const o = okLch(c);
@@ -167,15 +169,15 @@ const COL = {
   }),
 };
 /** A ghost's whole-figure value (its head colour, MAP.S1_ROW: they age by value G1 -> G6) toned. */
-const ghostCol = (hex: string) => tone3(hex, [0.5, 0.6, 0.68]);
+const ghostCol = (hex: string) => tone3(hex, [0.68, 0.74, 0.8]);
 
 /** The quay band (the far coping's face mirrored, in shade): one cool step of the water, between the far towpath's dark
  *  waterline strip and the reflections. */
 const QUAY = waterStep(CM.water, 0.0, 0.85);
 /** Ripple tones (R9): a crest catching the sky (lighter), a trough showing the body (darker). */
-const rippleCol = (y: number, tone: number) => waterStep(waterAt(y), tone > 0 ? 0.035 : -0.045, tone > 0 ? 0.8 : 1.1);
-/** The glitter: the bed (the sun's reflected gold, flat), the slivers' gold and their warm-white cores (never #FFFFFF). */
-const GLIT = {bed: fromOk(0.88, 0.075, 74), gold: fromOk(0.92, 0.09, 80), core: fromOk(0.978, 0.022, 88)};
+const rippleCol = (y: number, tone: number) => waterStep(waterAt(y), tone > 0 ? 0.045 : -0.05, tone > 0 ? 0.75 : 1.1);
+/** The glitter: the bed (the sun's reflected gold, flat lenses) and the warm-white cores nested in them (never #FFFFFF). */
+const GLIT = {bed: fromOk(0.875, 0.085, 72), core: fromOk(0.978, 0.022, 88)};
 
 // ================================================================= S1's sources (what stands over the water), at rest
 
@@ -200,33 +202,30 @@ const bowlSpan = (grow: number) => (y: number): [number, number] | null => {
   return hw > 0.5 ? [BR.arch.cx - hw, BR.arch.cx + hw] : null;
 };
 const bridgeMasses = (): Mass[] => [
-  // the spandrels' brick (one value) down to the string course mirrored (972 -> 1128): the far water is a near-perfect
-  // mirror (R2: Fresnel 0.6), so the bridge stays whole
-  {id: 'br/brick', span: rect(BR.x0, BR.x1), y0: 1058, solid: 2 * BRW - BR.course, y1: 2 * BRW - BR.course, colors: COL.bridgeBrick, steps: STEPS},
+  // the spandrels' brick, the string course and the deck as ONE value (R5: one value per reflected object), down to the
+  // deck mirrored (958 -> 1142): the far water is a near-perfect mirror (Fresnel 0.6), so the bridge stays whole
+  {id: 'br/brick', span: rect(BR.x0, BR.x1), y0: 1058, solid: 2 * BRW - BR.deck, y1: 2 * BRW - BR.deck, colors: COL.bridgeBrick, steps: STEPS},
   // the voussoir ring (limestone, 11 px) round the arch's bowl (the soffit in shade, seen from below): the arch and its
   // reflection close into the classic ellipse (the far towpath crosses its middle)
   {id: 'br/ring', span: bowlSpan(11), y0: 1058, solid: 2 * BRW - (BR.arch.crown - 11), y1: 2 * BRW - (BR.arch.crown - 11), colors: COL.bridgeStone, steps: STEPS},
   {id: 'br/bowl', span: bowlSpan(0), y0: 1058, solid: 2 * BRW - BR.arch.crown, y1: 2 * BRW - BR.arch.crown, colors: COL.bridgeSoffit, steps: STEPS},
   // the abutment pilaster (a vertical survives)
   {id: 'br/pil', span: rect(268, 282), y0: 1058, solid: 2 * BRW - BR.course, y1: 2 * BRW - BR.course, colors: COL.bridgeStone, steps: STEPS},
-  // the deck and string course (limestone) 958-972 -> 1128-1142: one light line
-  {id: 'br/deck', span: rect(BR.x0, BR.x1), y0: 2 * BRW - BR.course - 0.5, solid: 2 * BRW - BR.deck, y1: 2 * BRW - BR.deck, colors: COL.bridgeStone, steps: STEPS},
-  // over the railing: the far city's haze and the calm far tower (x 258-346), breaking up toward our feet
-  {id: 'br/far', span: rect(BR.x0, BR.x1 + 4), y0: 2 * BRW - BR.deck - 0.5, solid: 1152, y1: 1182, colors: COL.farCity, steps: STEPS, breakup: 0.3, narrow: 0.06},
-  {id: 'br/tower', span: rect(258, 346), y0: 2 * BRW - BR.deck - 0.5, solid: 1160, y1: 1190, colors: COL.farTower, steps: STEPS, breakup: 0, narrow: 0.1},
+  // over the railing: the far city's haze, breaking up toward our feet (the glitter's ground)
+  {id: 'br/far', span: rect(BR.x0, BR.x1 + 4), y0: 2 * BRW - BR.deck - 0.5, solid: 1156, y1: 1186, colors: COL.farCity, steps: STEPS, breakup: 0.3, narrow: 0.06},
 ];
 
 // ---- Google's wing: its ground storey's lowest ~1.2 m (the facade above y ~1056 mirrored about ~1091), simplified to
 // one brick mass with the light corner pier and the glass slit; the lit lobby is a LIGHT (its column, below)
 const WING_TOP = 1096;
 const wingMasses = (): Mass[] => [
-  {id: 'wing/brick', span: rect(326, 796), y0: WING_TOP, solid: 1166, y1: 1222, colors: COL.wingBrick, steps: STEPS, breakup: 0.55, narrow: 0.12},
-  {id: 'wing/pier', span: rect(330, 351), y0: WING_TOP, solid: 1166, y1: 1200, colors: COL.wingStone, steps: STEPS, breakup: 0, narrow: 0},
-  {id: 'wing/glass', span: rect(392, 428), y0: WING_TOP, solid: 1166, y1: 1204, colors: COL.wingGlass, steps: STEPS, breakup: 0, narrow: 0.08},
+  {id: 'wing/brick', span: rect(326, 796), y0: WING_TOP, solid: 1160, y1: 1212, colors: COL.wingBrick, steps: STEPS, breakup: 0.5, narrow: 0.14},
+  {id: 'wing/pier', span: rect(330, 351), y0: WING_TOP, solid: 1160, y1: 1196, colors: COL.wingStone, steps: STEPS, breakup: 0, narrow: 0},
+  {id: 'wing/glass', span: rect(392, 428), y0: WING_TOP, solid: 1160, y1: 1200, colors: COL.wingGlass, steps: STEPS, breakup: 0, narrow: 0.08},
 ];
 /** The lit lobby through the glass doors (x 540-720, the lobby's gold; R7): a column as wide as the door, through the
  *  whole strip (its mirror spans the water), solid under the far bank, then slices, thinning toward our feet. */
-const LOBBY: Mass = {id: 'lobby', span: rect(544, 716), y0: WING_TOP, solid: 1172, y1: 1254, colors: COL.lobby, steps: STEPS, breakup: 0.3, narrow: 0.12, taper: 5};
+const LOBBY: Mass = {id: 'lobby', span: rect(544, 716), y0: WING_TOP, solid: 1180, y1: 1254, colors: COL.lobby, steps: STEPS, breakup: 0.3, narrow: 0.12, taper: 5};
 
 // ---- verticals: the lamp posts (off, slate iron) and the bollards on the coping (R5: verticals survive)
 const lampMasses = (): Mass[] =>
@@ -236,7 +235,10 @@ const lampMasses = (): Mass[] =>
     .filter((L) => L.x < 780)
     .map((L) => {
       const cw = Math.max(2.2, L.h * 0.034) * 0.62;
-      return {id: `lamp/${L.x}`, span: rect(L.x - cw, L.x + cw), y0: 1058, solid: Math.min(waterBottom(L.x) - 34, 1160), y1: waterBottom(L.x) + 4, colors: COL.iron, steps: STEPS, breakup: 0, narrow: 0, taper: 1.2};
+      // a post's reflection: one wavering vertical, whole for its first 70 %, then a few short dashes (never a ladder)
+      const top = reflTop(L.x);
+      const end = waterBottom(L.x) + 4;
+      return {id: `lamp/${L.x}`, span: rect(L.x - cw, L.x + cw), y0: 1058, solid: top + (end - top) * 0.7, y1: end, colors: COL.iron, steps: STEPS, breakup: 0, narrow: 0.2, taper: 1.2};
     });
 
 // ---- the moored boats (each about its own waterline)
@@ -311,7 +313,7 @@ const figureMasses = (t: number): Mass[] => {
     const grow = m.popT === null ? 1 : sstep(0, 0.12, t - m.popT);
     if (grow <= 0) return;
     const top = 2 * waterTop(p.x) - p.feetY - 1;
-    const legW = p.h * 0.05;
+    const legW = p.h * 0.046;
     const legs = p.h * 0.36 * grow;
     const col = m.kind === 'her' ? COL.herLegs : ghostCol(m.headHex ?? '#A9A5B5');
     out.push({id: `fig/${m.id}`, span: rect(p.x - legW, p.x + legW), y0: top - 30, solid: top + legs * 0.62, y1: top + legs, colors: col, steps: STEPS, breakup: 0, narrow: 0.25, taper: 2});
@@ -331,8 +333,11 @@ const bollardStubs = (): {x: number; y0: number; y1: number; w: number}[] =>
   });
 
 // ---- the sun's glitter column (R8): straight under SUN0 (x 196), over the whole water there (y 1100 -> 1172), densest
-// at its still-water mirror point (y 1158), 14 -> 30 px half-width (the low sun at 7.8 deg: a narrow column)
-const GLITTER: Glitter = {x: SUN.x, yTop: reflTop(SUN.x) + 1, yBot: waterBottom(SUN.x) + 2, w: [13, 30], peak: SUN.mirror.y, slots: 16, bed: GLIT.bed, gold: GLIT.gold, core: GLIT.core, seed: 's1sun', t0: 0.24};
+// at its still-water mirror point (y 1158); half-width 15 px at the far edge -> 32 px at our edge (the low sun at 7.8 deg:
+// a narrow column, ~1.2x taller than wide in this strip, the start of a path ~7x longer than wide)
+const GLITTER: Glitter = {x: SUN.x, yTop: reflTop(SUN.x) - 1, yBot: waterBottom(SUN.x) + 2, w: [17, 36], peak: SUN.mirror.y, seed: 's1sun', t0: 0.24};
+
+const GLITTER_BED = glitterBed(GLITTER, GRID);
 
 // ---- ripple lines (R9): 11 alive, mostly in the open near water, clear of the glitter column and Pip's seat
 const RIPPLES: Ripples = {
@@ -344,8 +349,8 @@ const RIPPLES: Ripples = {
     [140, 1080, 252, 1190],
     [636, 1110, 764, 1300],
   ],
-  len: [34, 120],
-  thick: [1.3, 2.6],
+  len: [40, 150],
+  thick: [1.5, 3],
   drift: [6, 16],
   life: [2.6, 4.6],
   t0: 0.24,
@@ -403,27 +408,13 @@ const WaterBody: React.FC<{t: number}> = ({t}) => {
   // ripple lines
   const rip: Runs = new Map();
   for (const l of ripplesAt(RIPPLES, t, (x) => [reflTop(x) + 4, waterBottom(x)])) pushRun(rip, rippleCol(l.y, l.tone), lensPath(l.x, l.y, l.len, l.h));
-  // the glitter: its bed (short gold slices on the rows, static, swaying) and the live slivers
+  // the glitter: the still bed of gold lenses (they sway with their rows) and the warm-white cores living in them
   const bed: string[] = [];
-  for (let i = 0; i + 1 < ROWS.length; i++) {
-    const ya = ROWS[i];
-    const yb = ROWS[i + 1];
-    if (ya < GLITTER.yTop + 6 || yb > GLITTER.yBot + 6) continue;
-    const u = (ya - GLITTER.yTop) / (GLITTER.yBot - GLITTER.yTop);
-    const rr = rng(`s1sunbed/${i}`);
-    const r = rr.next();
-    if (r < 0.28) continue;
-    const hw = (GLITTER.w[0] + (GLITTER.w[1] - GLITTER.w[0]) * u) * (0.45 + 0.4 * rr.next());
-    const cx = GLITTER.x + (rr.next() - 0.5) * 8 + sway((ya + yb) / 2) * 0.8;
-    const g = GRID.gap(ya, yb);
-    bed.push(barPath(cx - hw, cx + hw, ya + g, yb, 3 + u * 6));
-  }
-  const gold: string[] = [];
   const core: string[] = [];
-  for (const s of glitterAt(GLITTER, CAM, t)) {
-    if (s.k <= 0.02) continue;
-    gold.push(lensPath(s.x, s.y, s.len * s.k, s.h, -1));
-    core.push(lensPath(s.x + s.len * 0.06, s.y + s.h * 0.08, s.len * s.k * 0.46, s.h * 0.55, -1));
+  for (const b of GLITTER_BED) bed.push(lensPath(b.cx + sway(b.cy) * 0.7, b.cy, b.len, b.h));
+  for (const c of glitterCores(GLITTER, GLITTER_BED, t)) {
+    if (c.k <= 0.02) continue;
+    core.push(lensPath(c.cx + sway(c.cy) * 0.7, c.cy, c.len * c.k, c.h * (0.6 + 0.4 * c.k)));
   }
   return (
     <>
@@ -451,7 +442,6 @@ const WaterBody: React.FC<{t: number}> = ({t}) => {
       <RunPaths runs={rip} k="rip" />
       <g transform={tr(floatOf(S1_PLANE.farRoofs, t))}>
         <path d={bed.join('')} fill={GLIT.bed} />
-        <path d={gold.join('')} fill={GLIT.gold} />
         <path d={core.join('')} fill={GLIT.core} />
       </g>
     </>
@@ -556,7 +546,8 @@ const DuckWater: React.FC<{t: number}> = ({t}) => {
   const y = DUCK.y;
   const base = waterAt(y);
   const refl = reflectTone('#A66952', 0.45, CM.water);
-  const light = waterStep(base, 0.05, 0.7);
+  // the crests catch the sky: the water's own colour a step lighter (on the wing's rose reflection they part clearly)
+  const light = waterStep(base, 0.03, 0.6);
   const dark = waterStep(base, -0.07, 1.1);
   const sw = swayAt(SWAY, CAM, y + 6, t);
   // the reflection: the body's underside mirrored (a shallow lens hanging from the waterline), in two slices
@@ -569,15 +560,15 @@ const DuckWater: React.FC<{t: number}> = ({t}) => {
   // the V: from the chest (x + 0.34 s), back (toward -x); arms at +-2.5 deg in screen (foreshortened Kelvin)
   const kk = (y - CAM.hz) / CAM.f;
   const tanA = kk * Math.tan((19.47 * Math.PI) / 180);
-  const L = s * 3.3;
+  const L = s * 2.7;
   const x0 = x + s * 0.3;
   const arms: string[] = [];
   for (const side of [-1, 1]) {
     // each arm: three tapered pieces along its length, thinning, with growing gaps (it ages into dashes)
     const pieces = [
-      [0.12, 0.46, 2.2],
-      [0.52, 0.74, 1.6],
-      [0.8, 0.93, 1.1],
+      [0.1, 0.46, 3],
+      [0.52, 0.75, 2.2],
+      [0.81, 0.94, 1.5],
     ];
     for (const [a, b, h] of pieces) {
       const xa = x0 - L * a;
@@ -619,7 +610,6 @@ export const CAND_B_PALETTE = (): {name: string; hex: string; L: number; C: numb
   (Object.keys(COL) as (keyof typeof COL)[]).forEach((k) => COL[k].forEach((c, i) => add(`${k}[${i}]`, c)));
   add('quay', QUAY);
   add('glitter bed', GLIT.bed);
-  add('glitter gold', GLIT.gold);
   add('glitter core', GLIT.core);
   return out;
 };
