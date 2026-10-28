@@ -108,6 +108,13 @@ this is better"). I read the written rules as the owner's words on the opening. 
 stale: THROUGHLINE §1.1 and §6 (S1 "keep: frame-0 words, source, box keys"), and Film2R's frame-0 and credits blocks.
 Fix them in the same pass.
 
+**The newest rule, "never baity"** (owner on v3's insights, 2026-10-28; merged while this review was being written) does
+not add a MUST here:
+- v2r opens like news ("She quit Google."), with the world's own picture first and no sales question, so it passes.
+- MUST 1's fix keeps it that way.
+- MUST 2's draw-on must stay the scene being drawn, never a title effect.
+- v3's curve (~40 % left at 2 s) is one more reason to fix the first 2 s first.
+
 ## MUST-FIX (6, most severe first)
 
 **1. The frame-0 title shows words the voice does not say, out of order.**
