@@ -51,15 +51,16 @@ export const CAM: WaterCam = {horizon: G.S1W_CAM.horizon, f: G.S1W_CAM.f, eye: G
  *  far (y 1111) -> 7.7 px at y 1215 -> 15 px at y 1290 (research R6: ~5x thicker near). Nearness 0 at the far edge
  *  (y 1111), 1 at our edge on the right (y 1290). */
 export const ROWS = makeRows(CAM, {yTop: 1054, yBot: 1336, dz: 0.33, jitter: 0.3, seed: 41, nearFrom: 1111, nearTo: 1290});
-/** The sway (R6, R12): +-1.3 px far -> +-5 px near; two waves travelling toward us (2.4 m / 4.6 s and 1.3 m / 3.1 s:
- *  0.52 and 0.42 m/s, i.e. 5.5 px/s at the far edge, 16 px/s at y 1215, 27 px/s near on screen); a slice's peak sideways
- *  speed ~2.4 px/s far, ~9 px/s near. Neighbouring rows differ by 49 deg of the long wave: a gentle zigzag. */
+/** The sway (R6, R12): +-1.6 px far -> +-5.5 px near; two waves travelling toward us (2.2 m / 5.0 s and 1.4 m / 3.6 s:
+ *  0.44 and 0.39 m/s, i.e. ~4.5 px/s along the far quay, ~13 px/s at y 1215, ~22 px/s at our edge on screen); a
+ *  slice's peak sideways speed ~2 px/s far, ~7 px/s near. Neighbouring rows differ by 54 deg of the long wave: a gentle
+ *  zigzag that ripples toward us, never a sawtooth. */
 export const SWAY: Sway = {
   ampFar: 1.6,
   ampNear: 5.5,
   waves: [
-    {lambda: 3.4, period: 5.2, w: 0.7},
-    {lambda: 1.9, period: 3.6, w: 0.3},
+    {lambda: 2.2, period: 5.0, w: 0.7},
+    {lambda: 1.4, period: 3.6, w: 0.3},
   ],
   jitter: 0.12,
   seed: 4101,
@@ -111,7 +112,7 @@ export const BODY = '#9CC3BC';
 /** The reflections' toning (R3-R4): L* toward 76 by k; the water's hue family at that value: h 182 at L* 76, 0.9 deg
  *  bluer per L* deeper (L* 62: h 195, C* 14.5; the deep water), greener and paler when lighter (L* 84: h 175, C* 7.4). */
 export const TONE: ToneOpts = {waterL: 76, waterH: 182, waterC: 10, hueSlope: 0.9, chromaSlope: 0.32, cMin: 6.5, cMax: 16};
-/** The Fresnel ladder: k 0.30 along the far quay (R 0.53) -> 0.65 at our edge (R 0.26), in 8 flat steps of 0.05, one per
+/** The Fresnel ladder: k 0.40 along the far quay (R 0.53) -> 0.70 at our edge (R 0.26), in 7 flat steps of 0.05, one per
  *  row: a reflection keeps about half its strength toward us. */
 export const kOf = (row: Row) => Math.round(lerp(0.4, 0.72, row.n) * 20) / 20;
 /** The glitter's still gold bed (the sun's reflected light, R8) and its warm-white slivers (L* ~97, never #FFFFFF). */
