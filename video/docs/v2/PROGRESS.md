@@ -2,6 +2,15 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 10:19 UTC (hourly)
+
+The owner's readings at 09:29 (window 36 %, week 81 %) lifted the hold; lanes resumed lean (one critic pass, must-fixes, one 0.4 clip).
+DONE + archived: L6 (S8 + the seam: report_L6.md; the sun sets behind one level roofline; SUN8 moved in map.ts) and L2 (S2: report_L2.md;
+depth / light 0 FAIL). Running: L3 (S3 conformed and checked; S4 in build, then the critic + fix), L4 (S5's fixer on 6 critic fixes),
+L5 (S7 critic MUSTs; K3's calm BBC board for S2 landed). Water workflow: research (14 rules) + diagnosis + the study seam done; the two
+candidates (true reflection / designed editorial) drawing. Open list for assembly: `scratchpad` to-do (the lanes' water swaps, map requests,
+SHOULDs). Spend: the hour ~$146; estimated week ~84 %, window ~48 % (guard ~12:50, reset ~12:52); finish projected ~94-99 %.
+
 ## Snapshot 2026-10-28 09:18 UTC (hourly): budget alarm, lanes hold at a checkpoint
 
 Done: the owner took look clip v5 ("leafs are great") but called the water "way too cheap ... lazy and cheap": a workflow redesigns it as
