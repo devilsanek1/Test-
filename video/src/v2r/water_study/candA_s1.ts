@@ -51,15 +51,16 @@ export const CAM: WaterCam = {horizon: G.S1W_CAM.horizon, f: G.S1W_CAM.f, eye: G
  *  far (y 1111) -> 7.7 px at y 1215 -> 15 px at y 1290 (research R6: ~5x thicker near). Nearness 0 at the far edge
  *  (y 1111), 1 at our edge on the right (y 1290). */
 export const ROWS = makeRows(CAM, {yTop: 1054, yBot: 1336, dz: 0.33, jitter: 0.3, seed: 41, nearFrom: 1111, nearTo: 1290});
-/** The sway (R6, R12): +-1.3 px far -> +-5 px near; two waves travelling toward us (2.4 m / 4.6 s and 1.3 m / 3.1 s:
- *  0.52 and 0.42 m/s, i.e. 5.5 px/s at the far edge, 16 px/s at y 1215, 27 px/s near on screen); a slice's peak sideways
- *  speed ~2.4 px/s far, ~9 px/s near. Neighbouring rows differ by 49 deg of the long wave: a gentle zigzag. */
+/** The sway (R6, R12): +-1.6 px far -> +-5.5 px near; two waves travelling toward us (2.2 m / 5.0 s and 1.4 m / 3.6 s:
+ *  0.44 and 0.39 m/s, i.e. ~4.5 px/s along the far quay, ~13 px/s at y 1215, ~22 px/s at our edge on screen); a
+ *  slice's peak sideways speed ~2 px/s far, ~7 px/s near. Neighbouring rows differ by 54 deg of the long wave: a gentle
+ *  zigzag that ripples toward us, never a sawtooth. */
 export const SWAY: Sway = {
   ampFar: 1.6,
   ampNear: 5.5,
   waves: [
-    {lambda: 3.4, period: 5.2, w: 0.7},
-    {lambda: 1.9, period: 3.6, w: 0.3},
+    {lambda: 2.2, period: 5.0, w: 0.7},
+    {lambda: 1.4, period: 3.6, w: 0.3},
   ],
   jitter: 0.12,
   seed: 4101,
