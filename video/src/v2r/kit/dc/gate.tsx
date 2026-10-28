@@ -199,21 +199,14 @@ const GateFacadeBody: React.FC<GateFacadeProps> = ({lightAt = [S6.facadeWindowsL
 };
 export const GateFacade = tiered('environment', {}, GateFacadeBody);
 
-/** The door plate: CLASSIFIED / AUTHORIZED PERSONNEL ONLY (US spelling; "classified", never "secret"). Centre x, top y. */
+/** The door plate: a plain plate, NO letters (REVIEW_1 MUST 3: its CLASSIFIED / AUTHORIZED PERSONNEL ONLY lines were
+ *  20 / 11 px, fine print at phone size; owner playbook: words in the world are few and big or not drawn). Centre x,
+ *  top y. */
 const ServicePlateBody: React.FC<{x: number; y: number; w?: number}> = ({x, y, w = 108}) => {
   const h = w * 0.5;
   return (
     <g>
       <rect x={x - w / 2} y={y} width={w} height={h} rx={3} fill={GT.plate} stroke={GT.ink} strokeWidth={1.8} />
-      <text x={x} y={y + h * 0.42} textAnchor="middle" fontFamily="CaptionHand, 'Patrick Hand', cursive" fontSize={w * 0.185} letterSpacing={0.6} fill={GT.ink}>
-        CLASSIFIED
-      </text>
-      <text x={x} y={y + h * 0.66} textAnchor="middle" fontFamily="CaptionHand, 'Patrick Hand', cursive" fontSize={w * 0.1} fill={GT.ink}>
-        AUTHORIZED
-      </text>
-      <text x={x} y={y + h * 0.86} textAnchor="middle" fontFamily="CaptionHand, 'Patrick Hand', cursive" fontSize={w * 0.1} fill={GT.ink}>
-        PERSONNEL ONLY
-      </text>
     </g>
   );
 };

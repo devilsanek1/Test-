@@ -3,12 +3,13 @@
 // while the world trucks), tied to her head by a thin ink leader. Tier A with her (the beat's subject while it shows);
 // screen-locked paper: unlit, no shadow.
 //   15.07 "She"  the leader pens up out of her head and the card pops at its top edge (a 4 % spring); "Sofia Liguori"
-//                (44 px, faux weight 0.9), "research engineer," and "Google DeepMind (Google's AI lab)" (30 px) pen on
-//                fast (by 15.55).
+//                (48 px, faux weight 0.9) pens on fast (by 15.33).
 //   16.60        a flap unfolds: the card extends down to y 800 on a spring (the old bottom stays as a soft crease), the
-//                leader shortens; "3 years · resigned Oct 2026" pens on "and told", the source (18 px) on "the BBC".
+//                leader shortens; "Google DeepMind" (44 px) pens on.
 //   18.80        the whole tag pops off (shrinks to its centre in 0.12 s), the leader with it.
-// Text left-aligned at x 608 (card x 590-1000; the widest line 365 px of the 378 the card holds: no line is squeezed).
+// FEW AND BIG (REVIEW_1 MUST 3): only her name and her lab are drawn; her role, "3 years · resigned Oct 2026" and the
+// source are in the post caption and the pinned comment (docs/v2/POSTING_KIT.md).
+// Text left-aligned at x 608 (card x 590-1000; the widest line 263 px of the 378 the card holds).
 // It stays above y 840 (no text in the right rail below it) and never covers her (her head top is y 900) or the post
 // (x 575). Words: K3 `TXT_NAME_TAG` (never retyped; build 1's last two role parts share one line, build 2's two parts
 // share one line, the credit is one line).
@@ -44,12 +45,10 @@ const HEAD_END = {x: S4_HER_HEAD.x - 1, y: S4_HER.feetY - S4_HER.h - 9};
 const CARD_END_X = 702;
 
 type Line = {text: string; size: number; y: number; at: number; dur: number; weight?: number};
+/** Build 1 (600-736): the name centred on the card; build 2 (736-798): the lab under the crease. */
 const LINES: Line[] = [
-  {text: TXT_NAME_TAG.name, size: 44, y: 646, at: T1 + 0.08, dur: 0.18, weight: 0.9},
-  {text: TXT_NAME_TAG.role[0], size: 30, y: 684, at: T1 + 0.21, dur: 0.13},
-  {text: `${TXT_NAME_TAG.role[1]} ${TXT_NAME_TAG.role[2]}`, size: 30, y: 719, at: T1 + 0.3, dur: 0.2},
-  {text: TXT_NAME_TAG.more.join(' '), size: 30, y: 757, at: T2 + 0.08, dur: 0.24},
-  {text: TXT_NAME_TAG.credit, size: 18, y: 784, at: 17.02, dur: 0.2},
+  {text: TXT_NAME_TAG.name, size: 48, y: 684, at: T1 + 0.08, dur: 0.18, weight: 0.9},
+  {text: TXT_NAME_TAG.lab, size: 44, y: 776, at: T2 + 0.08, dur: 0.22, weight: 0.9},
 ];
 
 export const S4Tag: React.FC = () => {

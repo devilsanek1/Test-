@@ -830,14 +830,14 @@ export const plaqueBodySize = (keySize: number) => (keySize >= TYPE.key ? TYPE.b
 
 /** The plaque's size for its key / body sizes (measured text + a 7 px bronze frame + 13 px pads), on a 26 px bronze
  *  post: 56 / 30 = 329 x 127; 40 / 30 = 329 x 110 (the body line sets the width); 40 / 24 = 271 x 104. */
-export function plaqueLayout(keySize: number = TYPE.key, bodySize: number = plaqueBodySize(keySize), stand = true): PlaqueLayout {
+export function plaqueLayout(keySize: number = TYPE.key, bodySize: number = plaqueBodySize(keySize), stand = true, body = true): PlaqueLayout {
   const frame = 7;
   const pad = 13;
-  const tw = Math.max(textW(TXT_PLAQUE.key, keySize), textW(TXT_PLAQUE.body, bodySize));
+  const tw = Math.max(textW(TXT_PLAQUE.key, keySize), body ? textW(TXT_PLAQUE.body, bodySize) : 0);
   const w = Math.ceil(tw + 2 * (frame + pad));
   const keyBase = frame + 9 + inkTop(TXT_PLAQUE.key, keySize);
-  const bodyBase = keyBase + inkBottom(TXT_PLAQUE.key, keySize) + 6 + inkTop(TXT_PLAQUE.body, bodySize);
-  const h = Math.ceil(bodyBase + inkBottom(TXT_PLAQUE.body, bodySize) + 9 + frame);
+  const bodyBase = body ? keyBase + inkBottom(TXT_PLAQUE.key, keySize) + 6 + inkTop(TXT_PLAQUE.body, bodySize) : keyBase;
+  const h = Math.ceil((body ? bodyBase + inkBottom(TXT_PLAQUE.body, bodySize) : keyBase + inkBottom(TXT_PLAQUE.key, keySize)) + 9 + frame);
   const st = stand ? {w: 24, h: 26} : {w: 0, h: 0};
   return {w, h, frame, keyBase, bodyBase, stand: st, total: h + st.h};
 }
@@ -859,6 +859,9 @@ export type PlaqueProps = {
   pointer?: 'up' | 'left' | 'right' | 'none';
   /** The panel: 'light' (default) or 'dark' (bronze-dark plate, light letters: on light paving). */
   panel?: PlaquePanel;
+  /** Draw the body line ("US Department of Defense", 30 / 24 px). false: the key alone on a plate sized to it (REVIEW_1
+   *  MUST 3: no line under ~40 px in the picture; the film's S5 plaque). Default true. */
+  body?: boolean;
   ink?: number;
   seed?: string;
   exit?: boolean;
@@ -867,7 +870,7 @@ export type PlaqueProps = {
 /** S5's viewpoint plaque (lane L4): "The Pentagon" (key) + "US Department of Defense" (body) on a limestone face in a
  *  bronze frame, two brass screws, a small pointer tab toward the building, on a short bronze post; it pops up from its
  *  foot with the text on it (no pen: it reads ON the word). */
-const PlaqueBody: React.FC<PlaqueProps> = ({x = 612, y = PLAQUE_COPING_Y + 2, keySize = TYPE.key, bodySize, at = SMALL_CLOCK.plaque.at, stand = true, pointer = 'up', panel = 'light', ink = INK_PX.far, seed = 'plaque', exit = true}) => {
+const PlaqueBody: React.FC<PlaqueProps> = ({x = 612, y = PLAQUE_COPING_Y + 2, keySize = TYPE.key, bodySize, at = SMALL_CLOCK.plaque.at, stand = true, pointer = 'up', panel = 'light', body = true, ink = INK_PX.far, seed = 'plaque', exit = true}) => {
   useCaptionFont();
   const t = useTime();
   const bs = bodySize ?? plaqueBodySize(keySize);
@@ -876,7 +879,7 @@ const PlaqueBody: React.FC<PlaqueProps> = ({x = 612, y = PLAQUE_COPING_Y + 2, ke
   const k = popK(t, pAt, 0.25);
   if (k <= 0.001) return null;
   const C = SMALL_COLORS;
-  const Lp = plaqueLayout(keySize, bs, stand);
+  const Lp = plaqueLayout(keySize, bs, stand, body);
   const x0 = x - Lp.w / 2;
   const x1 = x + Lp.w / 2;
   const y1 = y - Lp.stand.h;
@@ -918,7 +921,7 @@ const PlaqueBody: React.FC<PlaqueProps> = ({x = 612, y = PLAQUE_COPING_Y + 2, ke
       <Screws pts={[{x: x0 + f / 2 + 0.5, y: (y0 + y1) / 2}, {x: x1 - f / 2 - 0.5, y: (y0 + y1) / 2}]} r={screwR} seed={seed} exit={exit} />
       <Ink d={outInk} width={ink} open={0.1} seed={`${seed}/ink`} exit={exit} />
       <WorldText x={x} y={y0 + Lp.keyBase} size={keySize} text={TXT_PLAQUE.key} anchor="middle" weight={keySize >= 56 ? KEY_WEIGHT : 0.7} color={dark ? C.plaqueLetter : undefined} seed={`${seed}/k`} exit={exit} />
-      <WorldText x={x} y={y0 + Lp.bodyBase} size={bs} text={TXT_PLAQUE.body} anchor="middle" color={dark ? C.plaqueLetter : undefined} seed={`${seed}/b`} exit={exit} />
+      {body ? <WorldText x={x} y={y0 + Lp.bodyBase} size={bs} text={TXT_PLAQUE.body} anchor="middle" color={dark ? C.plaqueLetter : undefined} seed={`${seed}/b`} exit={exit} /> : null}
     </XG>
   );
 };

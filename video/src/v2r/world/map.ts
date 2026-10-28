@@ -166,8 +166,11 @@ export const LEGIBILITY = {
   pipMinH: 86,
   pipMaxH: 120,
   pipS5EndMinH: 44,
-  /** Pip keeps >= 200 px (box to box) from every line of the F11 clause (S6). */
+  /** RETIRED with the F11 clause (REVIEW_1 MUST 3: the clause is not drawn; kept for the dev sheets). */
   pipClauseClearPx: 200,
+  /** SUN2 floats at least ONE DIAMETER clear of every board's frame top (REVIEW_1 MUST 4: it read as a ball sitting on
+   *  the board); the same for SUN8 over her board. */
+  sunBoardClearDiam: 1,
   /** The phone checks: a whole frame 216 px wide (the cold read) and ~390 px (full-screen phone width). */
   phoneCheckPx: 216,
   phoneFullPx: 390,
@@ -266,11 +269,14 @@ export const W2_CUT: Spot = M;
 export const SUN0: Disc = {x: 196, y: 772, r: 52};
 export const SUN1: Disc = {x: 250, y: 650, r: 65};
 export const SUN2: Disc = {x: 260, y: 620, r: 45};
-/** S8's low sun ahead, over the canal past her board (THROUGHLINE §7: top 585, 35 px clear of B's top). Fixed through S8's
+/** S8's low sun ahead, over the canal past her board (top 600; since REVIEW_1 MUST 4 its bottom 680 is 100 px over her
+ *  board's frame top 780, more than one diameter). Fixed through S8's
  *  truck; it un-builds before S1's SUN0 shows through at the seam (two suns never share a frame). */
 export const SUN8: Disc = {x: 420, y: 640, r: 40};
-/** B: the A-board FACE (Google's in S7 at its push landing 30.04; hers in S8 from the truck landing 35.60). */
-export const B: Rect = {x0: 150, y0: 700, x1: 630, y1: 1220};
+/** B: the A-board FACE (Google's in S7 at its push landing 30.04; hers in S8 from the truck landing 35.60). 480 x 420
+ *  since REVIEW_1 MUST 3 + 4 (2026-10-28): the few big lines need less height, so the top came down 100 px (frame top
+ *  780) and SUN2 floats > 1 diameter clear; the feet stay on 1250. */
+export const B: Rect = {x0: 150, y0: 800, x1: 630, y1: 1220};
 export const B_LEGS_Y1 = 1250;
 /** Pip's board bollard beside B (S7, S8): base-centre. Clears B's face and the rail. */
 export const BOARD_BOLLARD: Seat = {x: 700, y: 1205};
@@ -859,14 +865,15 @@ export const S5 = {
 } as const;
 
 export const S6 = {
-  /** The deal board 560 x 560 (mid plane), HELD at its 24.00 pose for the whole shot, 23.80-28.10 (THROUGHLINE §4.6:
-   *  the 4 s parallax truck is RETIRED, DIRECTION rule 8: a hold is locked or a slow 2D float). board1 = board0. */
-  board0: {x0: 120, y0: 680, x1: 680, y1: 1240} as Rect,
-  board1: {x0: 120, y0: 680, x1: 680, y1: 1240} as Rect,
+  /** The deal board 560 x 460 (mid plane), HELD at its 24.00 pose for the whole shot, 23.80-28.10 (THROUGHLINE §4.6:
+   *  the 4 s parallax truck is RETIRED, DIRECTION rule 8: a hold is locked or a slow 2D float). board1 = board0. Its
+   *  top came down 100 px (680 -> 780; REVIEW_1 MUST 4) with Google's (B): SUN2 floats > 1 diameter clear. */
+  board0: {x0: 120, y0: 780, x1: 680, y1: 1240} as Rect,
+  board1: {x0: 120, y0: 780, x1: 680, y1: 1240} as Rect,
   /** RETIRED drift (the truck): 0. The dc gate kit's GATE_DRIFT reads it (and facadeDriftPxS, nearCrossPxS). */
   boardDriftPxS: 0,
-  /** The F11 clause block: its ink top at y >= 920, its last line's ink bottom at y <= 1108 (K3 DEAL_LAYOUT: the 5th
-   *  line's baseline 1099). Up when the wipe uncovers the board. */
+  /** RETIRED (REVIEW_1 MUST 3): the F11 clause is not drawn (its point is in the post: POSTING_KIT.md). Kept for the
+   *  dev sheets only. */
   clauseTopMinY: 920,
   clauseBottomMaxY: 1108,
   /** The purpose line pops ON "any" 24.03, after the wipe; the F12 line on "veto" 26.40 (V9). */
@@ -936,7 +943,7 @@ export const S7 = {
 
 export const S8 = {
   /** Her board (the cafe boat's quote-of-the-day A-board): x -100-380 before the truck, B after. */
-  boardPre: {x0: -100, y0: 700, x1: 380, y1: 1220} as Rect,
+  boardPre: {x0: -100, y0: 800, x1: 380, y1: 1220} as Rect,
   board: B,
   /** The ONE plain truck left 34.99-35.60 (ease in-out, inside the pause). Screen shift per plane (px, rightward). */
   truck: {t0: 34.99, t1: 35.6, boardPlaneDx: 250, ghostPlaneDx: 240, housePlaneDx: 160, skyDx: 0},
@@ -1132,7 +1139,7 @@ export const MATCHES: MatchPoint[] = [
       {label: "S6: Pip at the board's foot, swept", side: 'out', seat: S6.pipSeat0},
       {label: 'S7: Pip seated on the board bollard from the first frame', side: 'in', seat: BOARD_BOLLARD},
     ],
-    rule: 'SUN2 (260, 620) r 45 in both (19 px clear of the band, >= 15 px above every board top); midpoint 28.10, 0.21 s before "But" 28.31; the deal board holds still and readable to >= 27.95; nothing enters, pops or turns in 27.90-28.30 (the GOOGLE SAYS header lands 28.32-28.34); a declared light change (April -> sunset).',
+    rule: 'SUN2 (260, 620) r 45 in both (19 px clear of the band, >= one diameter above every board frame top: 780); the 7x zoom window (x 183-337, y 483-757) holds no board; midpoint 28.10, 0.21 s before "But" 28.31; the deal board holds still and readable to >= 27.95; nothing enters, pops or turns in 27.90-28.30 (the GOOGLE SAYS header lands 28.32-28.34); a declared light change (April -> sunset).',
   },
   {
     cut: 'S7 -> S8 foreground wipe', t: 32.93, f: frameOf(32.93), out: 'V2S7', in: 'V2S8', carrier: 'D', kind: "foreground-wipe 32.70-33.16, S7's Wiper (a narrowboat travelling west, dir left)",
@@ -1247,7 +1254,7 @@ const s2Shapes = (t: number): Shape[] => {
     L('line', 'ground row y 900-1010 at the left', [{x: 0, y: 1010}, {x: 900, y: 940}]),
     R('key', 'her dark window at M (A outline 6.82)', spotRect(S2.herDarkWindow)),
     ...S2.staffWindows.map((w) => R('key', `${w.id} ${w.w} x ${w.h}`, spotRect(w))),
-    ...(t >= S2.aBoardOutAt ? [R('text', 'A-board TOLD THE BBC (8.44)', S2.aBoard)] : []),
+    ...(t >= S2.aBoardOutAt ? [R('text', 'A-board “for fear of retaliation” (8.44)', S2.aBoard)] : []),
     R('mass', 'bench', S2.bench),
     F('figure', 'reporter (seated back)', S2.reporter, SEATED_ASPECT_OVERLAY),
     F('figure', 'staffer >= 180 px seated (hood ~10.85)', S2.staffer, SEATED_ASPECT_OVERLAY),
@@ -1280,7 +1287,7 @@ const s4Shapes = (t: number): Shape[] => {
     R('mass', 'THE THREAD: her far window (B, dark pane)', spotRect(S4.herWindow)),
     R('mass', 'her towpath y 860-1080', {x0: 0, y0: 860, x1: FRAME_W, y1: 1080}),
     L('line', 'the post (x ~575)', [{x: S4.post.x, y: S4.post.topY}, {x: S4.post.x, y: S4.post.footY}]),
-    ...(t >= S4.decPlateAt ? [R('text', 'plate DEC 2025 (56 px) / unclassified', S4.plateDec2025)] : []),
+    ...(t >= S4.decPlateAt ? [R('text', 'plate DEC 2025 · unclassified (52 / 44 px)', S4.plateDec2025)] : []),
     ...(t >= S4.aprPlatePen[0] ? [R('text', 'plate APR 2026 / classified', S4.plateApr2026)] : []),
     ...(t >= S4.nameTagBuilds[0] && t < S4.nameTagOffAt ? [R('text', 'name tag (15.07 / 16.60, off 18.80)', S4.nameTag)] : []),
     F('her', 'her 170 px, profile, walking left', S4.her),
@@ -1302,7 +1309,7 @@ const s5Shapes = (t: number): Shape[] => {
       R('mass', 'bench', s.bench),
       F('figure', 'the stranger (back, newspaper)', s.stranger, SEATED_ASPECT_OVERLAY),
       P('Pip: beside the stranger', s.pipSeat),
-      R('text', 'news box (headline 34 px x 3 + credit)', s.newsBox),
+      R('text', 'news box (headline 44 px x 4)', s.newsBox),
       R('mass', 'bench front, paving, root', {x0: 0, y0: 1250, x1: FRAME_W, y1: FRAME_H}),
     ];
   }
@@ -1327,8 +1334,7 @@ const s6Shapes = (t: number): Shape[] => {
     D('sun', 'SUN2 (lands at the cut)', SUN2),
     R('mass', 'limestone facade band (y 705-835)', {x0: 0, y0: 705, x1: FRAME_W, y1: 835}),
     R('mass', 'service door (shuts 25.0, 27.4)', s6ServiceDoorAt(t)),
-    R('text', 'the deal board 560 x 560 (clause first; purpose on "any")', b),
-    R('text', 'the F11 clause block (ink 920-1108)', {x0: b.x0 + 20, y0: S6.clauseTopMinY, x1: b.x1 - 20, y1: S6.clauseBottomMaxY}),
+    R('text', 'the deal board 560 x 460 (tag; purpose on "any"; F12 on "veto")', b),
     R('mass', 'the corner post (cap 770, 720)', {x0: S6.cornerPost.x - 27, y0: S6.cornerPost.y, x1: S6.cornerPost.x + 27, y1: 1250}),
     P("Pip: the board's foot (360, 1410), still (ear flick 26.50)", s6PipSeatAt(t), S6.pipH),
     R('mass', 'near plane: kerb, tulip beds, bench, bike rack, posts + blossom (things only)', {x0: 0, y0: 1240, x1: FRAME_W, y1: FRAME_H}),
@@ -1445,21 +1451,22 @@ export const contractProblems = (): ContractIssue[] => {
       });
     });
   });
-  // S6: Pip >= 200 px from the clause block (its ink 920-1108; Pip at its S6 size).
-  [23.8, 26.5, 28.1].forEach((t) => {
-    const b = s6BoardAt(t);
-    const clause: Rect = {x0: b.x0 + 20, y0: S6.clauseTopMinY, x1: b.x1 - 20, y1: S6.clauseBottomMaxY};
-    const g = rectGap(pipBox(s6PipSeatAt(t), S6.pipH), clause);
-    if (g < LEGIBILITY.pipClauseClearPx) out.push({shot: 'V2S6', t, what: `Pip is ${g.toFixed(0)} px from the clause`, severity: 'error'});
-  });
-  // Suns: clear of the band; SUN2 >= 15 px above every board top; the S8 sun never touches her board.
+  // S6: the Pip-vs-clause check is RETIRED with the clause (REVIEW_1 MUST 3: nothing small is drawn on the board).
+  // Suns: clear of the band; SUN2 >= one diameter above every board's frame top, and the S6 -> S7 push's 7x window
+  // round it holds no board (REVIEW_1 MUST 4); the S8 sun >= one diameter over her board's frame.
   ([['V2S1', SUN0], ['V2S4', SUN1], ['V2S6', SUN2], ['V2S8', SUN8]] as [ShotId, Disc][]).forEach(([id, d]) => {
     if (d.y - d.r < band.y1) out.push({shot: id, t: 0, what: `sun (${d.x}, ${d.y}) r ${d.r} enters the band`, severity: 'error'});
   });
-  [S6.board0, B].forEach((r) => {
-    if (r.y0 - (SUN2.y + SUN2.r) < 15) out.push({shot: 'V2S7', t: 28.1, what: 'SUN2 is < 15 px above a board top', severity: 'error'});
+  const frameTops: [ShotId, Rect, number][] = [['V2S6', S6.board0, S6.board0.y0], ['V2S7', B, B.y0 - 20]];
+  const s2 = shotById('V2S7').transitionIn;
+  const zoom = s2.type === 'push-through' ? s2.zoom ?? 7 : 7;
+  const win: Rect = {x0: SUN2.x - FRAME_W / 2 / zoom, y0: SUN2.y - FRAME_H / 2 / zoom, x1: SUN2.x + FRAME_W / 2 / zoom, y1: SUN2.y + FRAME_H / 2 / zoom};
+  frameTops.forEach(([id, r, top]) => {
+    const gap = top - (SUN2.y + SUN2.r);
+    if (gap < LEGIBILITY.sunBoardClearDiam * 2 * SUN2.r) out.push({shot: id, t: 28.1, what: `SUN2 is ${gap.toFixed(0)} px above a board's frame top (< one diameter)`, severity: 'error'});
+    if (overlaps({x0: r.x0 - 40, y0: top, x1: r.x1 + 40, y1: r.y1}, win)) out.push({shot: id, t: 28.1, what: 'a board enters the S6 -> S7 push window round SUN2', severity: 'error'});
   });
-  if (B.y0 - (SUN8.y + SUN8.r) < 15) out.push({shot: 'V2S8', t: 35.6, what: 'the S8 sun touches her board', severity: 'error'});
+  if (B.y0 - 20 - (SUN8.y + SUN8.r) < LEGIBILITY.sunBoardClearDiam * 2 * SUN8.r) out.push({shot: 'V2S8', t: 35.6, what: 'the S8 sun is < one diameter over her board', severity: 'error'});
   // Staff windows >= 90 x 90; S3 silhouette >= 130 after the ease-back.
   S2.staffWindows.forEach((w) => {
     if (Math.min(w.w, w.h) < LEGIBILITY.staffWindowMinPx) out.push({shot: 'V2S2', t: 8.96, what: `staff window ${w.id} < 90 px`, severity: 'error'});

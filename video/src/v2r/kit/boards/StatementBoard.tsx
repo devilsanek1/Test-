@@ -64,7 +64,11 @@ export const BOARD_COLORS = {
   contour: CM.ink,
   /** The ground shadow: a warm shade of the paving (colour, never grey). */
   shadow: mixHex(CM.paving, CM.shadeWarm, 0.45),
-  /** The half-wiped menu (HerBoard): pale smears and faded scribbles, no legible words. */
+  /** The blank face ONE value step down (L* ~88 vs the face's 96; warm, never greyed): `dim` (REVIEW_1 SHOULD 2 /
+   *  check_light 34.0: a blank cream face outshone the beat's subject). `dim.k` scales the step (1 = the whole step). */
+  faceDim: mixHex(CM.paper, CM.shadeWarm, 0.15),
+  /** The half-wiped menu (HerBoard): pale flat smears, no legible words (its scribbles are not drawn since REVIEW_1:
+   *  they read as a stray grey squiggle). */
   smear: mixHex(CM.paper, CM.coatPlum, 0.09),
   smearDeep: mixHex(CM.paper, CM.coatPlum, 0.16),
   scribble: mixHex(CM.coatPlum, CM.paper, 0.42),
@@ -93,8 +97,12 @@ export const KEY_WEIGHT = 1.2;
 export const FRAME_SEED = 'statement-board';
 /** The shared faux weight of credits and small rows (<= 20 px) so they hold at full-screen phone width (~390 px). */
 export const CREDIT_WEIGHT = 0.45;
-/** The faux weight of a line by its size (the same on every board): keys KEY_WEIGHT, credits CREDIT_WEIGHT, body 0. */
-export const weightFor = (size: number) => (size >= TYPE.key ? KEY_WEIGHT : size <= TYPE.creditLarge ? CREDIT_WEIGHT : 0);
+/** The shared faux weight of the 40-55 px lines (REVIEW_1 MUST 3: every drawn line >= 44 px; ~KEY_WEIGHT x 44 / 56) so
+ *  they hold at 0.25 scale like the keys. ONE value for every board. */
+export const MID_WEIGHT = 0.9;
+/** The faux weight of a line by its size (the same on every board): keys KEY_WEIGHT, 40-55 px MID_WEIGHT, credits
+ *  CREDIT_WEIGHT, body 0. */
+export const weightFor = (size: number) => (size >= TYPE.key ? KEY_WEIGHT : size >= 40 ? MID_WEIGHT : size <= TYPE.creditLarge ? CREDIT_WEIGHT : 0);
 
 // ---------------------------------------------------------------- geometry
 
@@ -515,6 +523,10 @@ export type StatementBoardProps = {
   smudgeTop?: number;
   /** The ONE cloth stroke that erases the smudges (they are gone after it). */
   wipe?: Wipe;
+  /** The blank face one value step down (C.faceDim, scaled by k <= 1). With `wipe` and no `until`: the face is dull
+   *  until the stroke, which wipes it clean (the dull film goes with the smudges, behind the ragged edge). With `until`:
+   *  the face eases back to full over `dur` s (in-out sine) from `until` (a board whose words come on, no cloth). */
+  dim?: {k?: number; until?: number; dur?: number};
   /** Frame options (keyline inset, the back frame's wedge, the handle slot, the text margin). */
   frame?: BoardFrameOpts;
   /** Contour ink weight (outer edges); inner edges get INK_PX.far. Default INK_PX.mid. */
@@ -560,6 +572,7 @@ const StatementBoardBody: React.FC<StatementBoardProps> = ({
   smudges,
   smudgeTop,
   wipe,
+  dim,
   frame,
   inkWidth = INK_PX.mid,
   seed = 'board',
@@ -630,10 +643,9 @@ const StatementBoardBody: React.FC<StatementBoardProps> = ({
     const wdur = wipe ? wipe.dur ?? WIPE_DUR : 0;
     const u = wipe ? prog(t, wipe.at, wdur, ease.inOutSine) : 0;
     if (!wipe || t < wipe.at + wdur) {
+      // flat smears only (the scribbles and dot leaders read as a stray grey squiggle: REVIEW_1 SHOULD 2)
       const body = (
         <>
-          <Ink d={smudge.scribbles} width={2.4} color={C.scribble} taper={false} vary={0.04} seed={`${seed}/scrib`} thing />
-          <Fill d={smudge.dots} color={C.scribble} offset={false} seed={`${seed}/dots`} />
           <Fill d={smudge.smearsDeep} color={C.smearDeep} offset={false} seed={`${seed}/smD`} />
           <Fill d={smudge.smears} color={C.smear} offset={false} seed={`${seed}/sm`} />
         </>
@@ -657,6 +669,34 @@ const StatementBoardBody: React.FC<StatementBoardProps> = ({
       );
     }
   }
+  // the dull face: with a wipe (and no `until`) a film the stroke wipes away with the smudges; else a timed ease back
+  let dull: React.ReactNode = null;
+  if (dim) {
+    const k = Math.min(1, dim.k ?? 1);
+    if (wipe && dim.until === undefined) {
+      const wdur = wipe.dur ?? WIPE_DUR;
+      if (t < wipe.at + wdur) {
+        const film = <Fill d={P2.plate} color={mixHex(C.face, C.faceDim, k)} offset={false} seed={`${frameSeed}/dull`} />;
+        dull =
+          t >= wipe.at ? (
+            <>
+              <defs>
+                <clipPath id={`dull${uid}`}>
+                  <path d={dirtyD(face, wipe, prog(t, wipe.at, wdur, ease.inOutSine))} />
+                </clipPath>
+              </defs>
+              <g clipPath={`url(#dull${uid})`}>{film}</g>
+            </>
+          ) : (
+            film
+          );
+      }
+    } else {
+      const u = dim.until === undefined ? 0 : prog(t, dim.until, dim.dur ?? 0.3, ease.inOutSine);
+      const kk = k * (1 - u);
+      if (kk > 0.004) dull = <Fill d={P2.plate} color={mixHex(C.face, C.faceDim, kk)} offset={false} seed={`${frameSeed}/dull`} />;
+    }
+  }
   return (
     <>
       {shadow !== false && landed ? <BoardShadow g={g} color={shadow || BOARD_COLORS.shadow} seed={frameSeed} /> : null}
@@ -670,6 +710,7 @@ const StatementBoardBody: React.FC<StatementBoardProps> = ({
         {/* the enamel plate: its thickness in shade, the face, the keyline, four brass screws */}
         <Fill d={P2.plateEdge} color={C.faceEdge} offset={false} seed={`${frameSeed}/edge`} />
         <Fill d={P2.plate} color={C.face} offset={false} seed={`${frameSeed}/face`} />
+        {dull}
         <Ink d={P2.keyD} width={Math.max(1.6, Math.min(2.2, g.keyInset * 0.2))} color={C.keyline} taper={false} vary={0} seed={`${frameSeed}/key`} graphic />
         <Fill d={P2.screwD} color={C.screw} offset={false} seed={`${frameSeed}/screw`} />
         {menu}
@@ -692,15 +733,21 @@ export const StatementBoard = tiered('support', {tone: (p: StatementBoardProps) 
 
 // ---------------------------------------------------------------- presets: layouts (baselines = dy from the face top)
 
-/** S6 deal board layout (480 x 520 face): px below the face's top edge. The clause starts at y >= 920 at the cut
- *  (S6.clauseTopMinY: Pip on the corner post keeps >= 200 px away). */
-export const DEAL_LAYOUT = {tag: 46, purpose: 120, purposeLead: 60, clause: 247, clauseLead: 38, rule: 420, f12: 455, credit: 494} as const;
-/** S7 Google's board layout (480 x 520 face). */
-export const GOOGLE_LAYOUT = {header: 70, rule: 92, follows: 162, principles: 222, small: 268, bans: 352, anyKind: 412, credit: 494} as const;
-/** S8 her board layout (480 x 520 face): the quote centred between the header rule and the credit. */
-export const HER_LAYOUT = {header: 70, rule: 92, quote: 262, quoteLead: 64, credit: 494} as const;
-/** S2 newsstand board layout (400 x 200 face). */
-export const BBC_LAYOUT = {header: 53, body: 92, bodyLead: 30, credit: 183} as const;
+// FEW AND BIG (REVIEW_1 MUST 3 + 4, 2026-10-28): every drawn line >= 44 px, no source, clause or small row on a face
+// (the post carries them: docs/v2/POSTING_KIT.md), and the big faces 100 px shorter (480 x 420: their tops at y 800, so
+// SUN2 floats > 1 diameter clear of the frame's top rail at 780).
+
+/** S6 deal board layout (480 x 420 face): px below the face's top edge. The tag (44), the purpose line (56, two rows),
+ *  the divider and the F12 line (44, two rows) on "veto". */
+export const DEAL_LAYOUT = {tag: 62, purpose: 150, purposeLead: 60, rule: 262, f12: 322, f12Lead: 52} as const;
+/** S7 Google's board layout (480 x 420 face): the header, then Google's words as heard (44 / 56 / 44 / 56). */
+export const GOOGLE_LAYOUT = {header: 70, rule: 92, follows: 158, principles: 222, bans: 300, anyKind: 364} as const;
+/** S8 her board layout (480 x 420 face): her quote at 60 px (the column's width: the payoff), centred under the rule. */
+export const HER_LAYOUT = {header: 70, rule: 92, quote: 222, quoteLead: 72} as const;
+/** The size of her quote: the widest row at the text column's width (436 px). */
+export const HER_QUOTE_SIZE = 60;
+/** S2 newsstand board layout (400 x 200 face): the BBC's quote alone, two rows at 56, centred on the face. */
+export const BBC_LAYOUT = {quote: 88, quoteLead: 62} as const;
 
 /** Scene-local default times (s from each shot's start; TREATMENT section 5 + the heard word times). */
 export const DEAL_T = {clack: 0, purpose: 0.03, f12: 2.4} as const;
@@ -745,27 +792,26 @@ export function dealContent(g: BoardGeom, purposeAt?: number, f12At?: number): {
   const y0 = g.face.y0;
   const x = g.column.x0;
   const tagLS = 1.5;
+  const tagSize = 44;
   // the tag is a ruled caps line: the caps, then a hairline to the column's right edge at the caps' middle
-  const tagEnd = x + textW(TXT_DEAL.tag, TYPE.body, tagLS);
-  const capMid = y0 + L.tag - TYPE.body * 0.661 * 0.5;
+  const tagEnd = x + textW(TXT_DEAL.tag, tagSize, tagLS);
+  const capMid = y0 + L.tag - tagSize * 0.661 * 0.5;
   return {
     lines: [
-      {text: TXT_DEAL.tag, size: TYPE.body, x, y: y0 + L.tag, letterSpacing: tagLS},
+      {text: TXT_DEAL.tag, size: tagSize, x, y: y0 + L.tag, letterSpacing: tagLS},
       {text: TXT_DEAL.purpose, size: TYPE.key, x, y: y0 + L.purpose, lead: L.purposeLead, at: purposeAt, mode: 'pop'},
-      {text: TXT_DEAL.clause, size: TYPE.body, x, y: y0 + L.clause, lead: L.clauseLead},
-      {text: TXT_DEAL.f12, size: TYPE.body, x, y: y0 + L.f12, at: f12At, mode: 'pop'},
-      {text: TXT_DEAL.credit, size: TYPE.credit, x, y: y0 + L.credit},
+      {text: TXT_DEAL.f12Rows, size: 44, x, y: y0 + L.f12, lead: L.f12Lead, at: f12At, mode: 'pop'},
     ],
     rules: [
       {x0: tagEnd + 14, x1: g.column.x1, y: capMid, width: 2.2},
-      // the divider under the clause draws on with the F12 line (never an empty slot at the cut)
+      // the divider over the F12 line draws on with it (never an empty slot at the cut)
       {x0: x, x1: g.column.x1, y: y0 + L.rule, width: 2.2, at: f12At === undefined ? undefined : f12At - 0.04, dur: 0.14},
     ],
   };
 }
 
-/** S6's deal board (the record): at the cut the frame, the tag, the FULL clause and the credit are up; the purpose
- *  line pops ON "any"; the F12 line pops on "veto"; the board clacks on the cut. No party named, no "Google" (V2). */
+/** S6's deal board (the record): at the cut the frame and the tag are up; the purpose line pops ON "any"; the F12 line
+ *  pops on "veto"; the board clacks on the cut. No party named, no "Google" (V2). */
 const DealBoardBody: React.FC<DealBoardProps> = ({face = S6_FACE, legsTo = S6_LEGS_Y1, t0 = 0, purposeAt, f12At, clackAt, seed = 'deal', ...rest}) => {
   useCaptionFont();
   const g = useMemo(() => boardFrame(face, 40, 20, legsTo), [face.x0, face.y0, face.x1, face.y1, legsTo]);
@@ -792,20 +838,20 @@ export type GoogleBoardProps = PresetBase & {
 };
 
 export function googleContent(g: BoardGeom, T: {header?: number; credit?: number; follows?: Span; principles?: Span; small?: number; bans?: Span; anyKind?: Span}): {lines: BoardLine[]; rules: BoardRule[]} {
+  // `credit` and `small` are kept in the signature for old callers: neither is drawn (REVIEW_1 MUST 3)
   const L = GOOGLE_LAYOUT;
   const y0 = g.face.y0;
-  const widest = Math.max(...[TXT_GOOGLE.principles, TXT_GOOGLE.anyKind].map((s) => textW(s, TYPE.key)), ...[TXT_GOOGLE.small].map((s) => textW(s, TYPE.creditLarge)), textW(TXT_GOOGLE.credit, TYPE.credit));
+  const mid = 44;
+  const widest = Math.max(...[TXT_GOOGLE.principles, TXT_GOOGLE.anyKind].map((s) => textW(s, TYPE.key)), ...[TXT_GOOGLE.follows, TXT_GOOGLE.bans].map((s) => textW(s, mid)));
   const x = blockX(g, widest);
   const pen = (s?: Span) => (s ? penOf(s) : {});
   return {
     lines: [
       {text: TXT_GOOGLE.header, size: TYPE.header, anchor: 'middle', y: y0 + L.header, at: T.header, mode: 'pop'},
-      {text: TXT_GOOGLE.follows, size: TYPE.body, x, y: y0 + L.follows, ...pen(T.follows), mode: 'pen'},
+      {text: TXT_GOOGLE.follows, size: mid, x, y: y0 + L.follows, ...pen(T.follows), mode: 'pen'},
       {text: TXT_GOOGLE.principles, size: TYPE.key, x, y: y0 + L.principles, ...pen(T.principles), mode: 'pen'},
-      {text: TXT_GOOGLE.small, size: TYPE.creditLarge, x, y: y0 + L.small, at: T.small, mode: 'pop'},
-      {text: TXT_GOOGLE.bans, size: TYPE.body, x, y: y0 + L.bans, ...pen(T.bans), mode: 'pen'},
+      {text: TXT_GOOGLE.bans, size: mid, x, y: y0 + L.bans, ...pen(T.bans), mode: 'pen'},
       {text: TXT_GOOGLE.anyKind, size: TYPE.key, x, y: y0 + L.anyKind, ...pen(T.anyKind), mode: 'pen'},
-      {text: TXT_GOOGLE.credit, size: TYPE.credit, x, y: y0 + L.credit, at: T.credit, mode: 'pop'},
     ],
     rules: [headerRule(g, y0 + L.rule, 112, T.header === undefined ? undefined : T.header + 0.05)],
   };
@@ -848,20 +894,19 @@ export type HerBoardProps = PresetBase & {
   creditLines?: 1 | 2;
 };
 
-export function herContent(g: BoardGeom, T: {header?: number; quote1?: Span; quote2?: Span; credit?: number}, creditLines: 1 | 2 = 1): {lines: BoardLine[]; rules: BoardRule[]} {
+export function herContent(g: BoardGeom, T: {header?: number; quote1?: Span; quote2?: Span; credit?: number}, _creditLines: 1 | 2 = 1): {lines: BoardLine[]; rules: BoardRule[]} {
+  // `credit` / `creditLines` are kept in the signature for old callers: the credit is not drawn (REVIEW_1 MUST 3)
   const L = HER_LAYOUT;
   const y0 = g.face.y0;
-  const credit = creditLines === 1 ? [TXT_HER.credit.join(' · ')] : TXT_HER.credit;
-  const widest = Math.max(...TXT_HER.quote.map((s) => textW(s, TYPE.key)), ...credit.map((s) => textW(s, TYPE.credit)));
+  const size = HER_QUOTE_SIZE;
+  const widest = Math.max(...TXT_HER.quote.map((s) => textW(s, size)));
   const x = blockX(g, widest);
   const pen = (s?: Span) => (s ? penOf(s) : {});
-  const creditY = y0 + L.credit - (credit.length - 1) * 22;
   return {
     lines: [
       {text: TXT_HER.header, size: TYPE.header, anchor: 'middle', y: y0 + L.header, at: T.header, mode: 'pop'},
-      {text: TXT_HER.quote[0], size: TYPE.key, x, y: y0 + L.quote, ...pen(T.quote1), mode: 'pen'},
-      {text: TXT_HER.quote[1], size: TYPE.key, x, y: y0 + L.quote + L.quoteLead, ...pen(T.quote2), mode: 'pen'},
-      {text: credit, size: TYPE.credit, x, y: creditY, lead: 22, at: T.credit, mode: 'pop'},
+      {text: TXT_HER.quote[0], size, x, y: y0 + L.quote, ...pen(T.quote1), mode: 'pen'},
+      {text: TXT_HER.quote[1], size, x, y: y0 + L.quote + L.quoteLead, ...pen(T.quote2), mode: 'pen'},
     ],
     rules: [headerRule(g, y0 + L.rule, 112, T.header === undefined ? undefined : T.header + 0.05)],
   };
@@ -937,22 +982,17 @@ export const bbcBody = (): string[] => {
 export function bbcContent(g: BoardGeom): {lines: BoardLine[]; rules: BoardRule[]} {
   const L = BBC_LAYOUT;
   const y0 = g.face.y0;
-  const body = bbcBody();
-  const widest = Math.max(...body.map((s) => textW(s, TYPE.bodySmall)), textW(TXT_TOLD_THE_BBC.credit, TYPE.creditLarge));
+  const widest = Math.max(...TXT_TOLD_THE_BBC.quote.map((s) => textW(s, TYPE.key)));
   const x = blockX(g, widest);
   return {
-    lines: [
-      {text: TXT_TOLD_THE_BBC.header, size: TYPE.key, anchor: 'middle', y: y0 + L.header},
-      {text: body, size: TYPE.bodySmall, x, y: y0 + L.body, lead: L.bodyLead},
-      {text: TXT_TOLD_THE_BBC.credit, size: TYPE.creditLarge, x, y: y0 + L.credit},
-    ],
-    // no rule under the header: the 200 px face has no room for one (it would underline THE)
+    // the BBC's quote alone (REVIEW_1 MUST 3: the caption says "told the BBC"; the body and the credit were fine print)
+    lines: [{text: TXT_TOLD_THE_BBC.quote, size: TYPE.key, x, y: y0 + L.quote, lead: L.quoteLead}],
     rules: [],
   };
 }
 
-/** S2's newsstand A-board TOLD THE BBC (face S2.aBoard 400 x 200; the same face and type, smaller frame); already
- *  there: L2 slides it out with its own transform at 8.44. */
+/** S2's newsstand A-board (face S2.aBoard 400 x 200; the same face and type, smaller frame) with the BBC's quote
+ *  "for fear of retaliation"; already there: L2 slides it out with its own transform at 8.44. */
 const ToldTheBBCBoardBody: React.FC<ToldTheBBCBoardProps> = ({face = S2.aBoard, legsTo = S2_LEGS_Y1, stile = 26, rail = 16, seed = 'bbc', colors = BBC_CALM, t0: _t0, ...rest}) => {
   useCaptionFont();
   const g = useMemo(() => boardFrame(face, stile, rail, legsTo, BBC_FRAME), [face.x0, face.y0, face.x1, face.y1, legsTo, stile, rail]);
