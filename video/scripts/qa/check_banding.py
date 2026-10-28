@@ -48,7 +48,8 @@ JND_DE = 1.5  # a chroma step (CAMBI reads luma only; dE00 1.0 is the side-by-si
 WEAK_C = 0.010
 WEAK_DE = 0.8
 STRONG = 2.0  # x the JND: one such step fails alone
-STAIR = 3  # visible steps in one strip = a staircase
+STAIR = 3  # visible steps in one strip (or stair steps in one wide strip) = a staircase
+STAIR_C = 0.013  # a stair step's luminance bar: just over one 8-bit luma code at sky lightness (L* 73-92)
 MIN_PLATEAU = 8
 WEAK_PLATEAU = 16
 GRAIN_MAX = 0.6
@@ -232,9 +233,8 @@ def steps_in(prof: np.ndarray, yp: np.ndarray, y0: int):
         dL = float(b[0] - a[0])
         dE = float(de2000(a, b))
         cc = float(abs(yb - ya) / max(min(ya, yb), 1e-6))
-        # ALIGNED: the jump goes the way the sky itself is going there (the profile smoothed over ~50 rows, across the
-        # step, moves within 60 deg of the jump's direction): a band of a quantised ramp. An encoder's block wobble
-        # or a blotch jumps either way: half of them against the sky's own direction.
+        # aligned (information): the jump goes the way the sky itself goes there (the profile smoothed over ~50 rows
+        # moves within 60 deg of it): a band of a quantised ramp, where a blotch or an encoder's wobble goes either way
         J = b - a
         d = Pw[min(n - 1, c + 12)] - Pw[max(0, c - 13)]
         nj, nd = float(np.linalg.norm(J)), float(np.linalg.norm(d))
@@ -281,9 +281,11 @@ def strip_steps(lab: np.ndarray, Y: np.ndarray, sw: int, k: float, along0: int, 
         vis = [s for s in st if (s[3] >= JND_C or s[2] >= JND_DE) and min(s[4], s[5]) >= MIN_PLATEAU * k]
         strong = [s for s in vis if s[3] >= STRONG * JND_C or s[2] >= STRONG * JND_DE]
         weak = [s for s in st if (s[3] >= WEAK_C or s[2] >= WEAK_DE) and min(s[4], s[5]) >= WEAK_PLATEAU * k and s not in vis]
-        # a STAIRCASE of near-JND steps: each alone at the edge of seeing, but repeated down the sky the eye reads the
-        # pattern (a phone in a dim room: the plain gradient through x264 CRF 14 is 1.2-1.6 % steps every ~13 px)
-        stair = [s for s in st if s[6] and (s[3] >= WEAK_C or s[2] >= WEAK_DE) and min(s[4], s[5]) >= MIN_PLATEAU * k]
+        # STAIR steps (counted in the wide strips): near-JND steps, each alone at the edge of seeing, that repeated across
+        # the sky the eye reads as stripes (the plain mint -> peach gradient through x264 CRF 14: dE00 0.9-1.2 hue steps
+        # every 8-18 px). One 8-bit luma code (c ~0.010-0.012 at sky lightness, under CAMBI's threshold) is the floor of
+        # any re-encode that drops the dither, so the luminance bar sits just above it.
+        stair = [s for s in st if (s[3] >= STAIR_C or s[2] >= WEAK_DE) and min(s[4], s[5]) >= MIN_PLATEAU * k]
         plateaus = [s[4] for s in st]
         strips.append({
             'axis': axis,
@@ -365,7 +367,7 @@ def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float, axes: str 
         why.append(f'a staircase: {vis_worst} visible steps in one strip' if vis_worst >= STAIR else f'{strong} strong step(s)')
     if stair_worst >= STAIR:
         verdict = 'FAIL'
-        why.append(f'a staircase across the sky: {stair_worst} near-JND steps the way the sky goes, in one wide strip')
+        why.append(f'a staircase across the sky: {stair_worst} near-JND steps in one wide strip')
     if 'band' in res and res['band']['dL'] > max_dl + 1e-9:
         verdict = 'FAIL'
         why.append(f"caption band dL* {res['band']['dL']:.2f} > {max_dl}")
