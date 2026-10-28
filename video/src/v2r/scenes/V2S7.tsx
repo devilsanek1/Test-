@@ -1,109 +1,142 @@
-// V2S7 "Google says" (lane L5). Film 28.06-32.93 s (visible under the wipe to 33.16); TREATMENT.md section 5 row S7,
-// section 8 (V3, V12, V14, V15, A5), section 9; STYLE.md (the definitive look); map.ts S7, B, BOARD_BOLLARD, SUN2.
-// Words: "But Google says it follows its AI principles and bans retaliation "of any kind"." (28.31-32.70)
+// V2S7 "Google says" (lane L5), the conform to the approved look (G4 v4; RESUME_2026-10-28; DIRECTION, CRAFT §a-§g).
+// Film 28.10-32.93 s (visible under the narrowboat wipe to 33.16); TREATMENT section 5 row S7, section 8 (V3, V12, V14,
+// V15, A5); THROUGHLINE §4-§6; conform_L5 §3, §7. Words: "But Google says it follows its AI principles and bans
+// retaliation "of any kind"." (28.31-32.70)
 //
-// Google's canal wing at human size from its west-end forecourt, looking north at sunset (the same light as S8, A5):
-// Google's A-board GOOGLE SAYS at B, Pip sitting on the board bollard watching it (no reaction), the "Google" canopy
-// right of the board, plain lit windows, two young planes with festoons, a fountain basin, a cafe, bikes; the west
-// gap past the wing's corner with far London roofs and SUN2 setting behind them (the match from S6's morning sun).
-// DENSE-CALM and uninterrupted 28.31-32.70: people cross sideways behind the board, the jets rise and fall, leaves
-// drop, and ON "principles" (30.04) the forecourt lights up in one run (A5: her lamps run on "facts" in S8).
+// Google's canal wing from its west-end forecourt at a standing eye level (ONE camera, V2S7_plan S7_CAM: eye 1.6 m,
+// horizon 897, VP (540, 897)), looking north at sunset: Google's board GOOGLE SAYS at B is the subject (tier A, the
+// whole shot); Pip sits on the board bollard and watches it (no reaction: V14); the wing behind is a calm field (its
+// shaded brick, tone-on-tone lit windows, the lit lobby, the canopy "Google"); the west strip left of the board shows
+// two people at rest, the far street's plane trees and roofs on the sunset band; the bottom third is things, few and
+// big, cut by the edges (the cafe table and chairs with a coat over one, a planter of grasses, the fountain basin).
+// Life takes turns (<= 3 noticeable at once): a staffer going in, the cyclist, a staffer coming out; the festoon lights
+// in three switch-ons (film frames 1812 / 1836 / 1848); leaves and motes SEEN at phone size; steady jets.
 //
-// Camera (V2S7_pip s7CamAt): the ONE 4 % story push about B's centre 28.40-30.04 (landing on "principles", B exact)
-// + a 2D float within +-12 px of home, zero at 30.04. Every WORLD layer sits in that camera; the sky (World, = S8's)
-// and SUN2 (260, 620) r 45 are screen-fixed (the sun sets behind the far roofs; it never rims the building).
-// Pip: 28.06-28.22 the second half of the hop across the cut in SCREEN space (pipHopAt), then seated in the camera.
-// The wipe into S8 (32.70-33.16) is V2S7_wiper's band-safe narrowboat: `export const Wiper`.
-// Parts: V2S7_rig (numbers), V2S7_set (the set), V2S7_life (life), V2S7_board (the board), V2S7_pipdraw (Pip),
-// V2S7_wiper (the wipe), V2S7_pip (the camera and the hop, shared with V2S6).
+// Camera: the ONE 4 % story push about B's centre 28.40-30.04 (landing on "principles", B exact), identical on every
+// plane (one XG); then a gentle PARALLAX float 30.20-32.50, each plane its own share (V2S7_float S7Plane; home at
+// 30.04 and from 32.50: the wipe starts at rest). The sky rides the push but never floats; SUN2 (260, 620) r 45 is
+// screen-fixed (the S6 -> S7 push-through lands on it at 28.10: what shows in its 7x window is the sun, the sky and
+// the board's top rail only). Light: <Lit rig={RIG_CANAL}> (V2S7_light: the sun low at the left).
+// Parts: V2S7_plan (the camera and the plan), V2S7_rig (the clock), V2S7_far (sky, sun, the west strip), V2S7_wing,
+// V2S7_ground (paving, the plane tree, the bollard), V2S7_near (cafe, planter, basin), V2S7_folk (people, bikes,
+// festoon, smoke), V2S7_particles, V2S7_light, V2S7_board, V2S7_pipdraw, V2S7_wiper (the wipe into S8: `Wiper`).
 import React from 'react';
 import {World} from '../../lib/World';
 import {useTime} from '../../lib/time';
 import {XG, mat} from '../../lib/xf';
-import {CM, skyBands} from '../palette';
-import {SUN2} from '../world/map';
+import {Lit} from '../../lib/light';
+import {CM} from '../palette';
+import {RIG_CANAL} from '../world/rigs';
 import type {ToneKey, WiperComponent} from '../../lib/Film';
-import {s7CamAt, S7_T0} from './V2S7_pip';
-import {runAt} from './V2S7_rig';
+import {s7PushAt, S7_PLANE, S7_T0} from './V2S7_pip';
+import {S7_HORIZON} from './V2S7_plan';
+import {S7Plane} from './V2S7_float';
+import {S7Sky, S7Sun, S7FarRoofs, S7FarTrees, S7WestEdge} from './V2S7_far';
+import {S7WingFront} from './V2S7_wing';
+import {S7Ground, S7TreeGrate, S7NearLeaves, S7TreeTrunk, S7TreeCrown, S7Bollard} from './V2S7_ground';
+import {S7Cafe, S7Planter, S7BasinWater, S7BasinRims, S7Jets} from './V2S7_near';
+import {S7StaffInside, S7StaffOutside, S7Cyclist, S7CafePair, S7FarWalker, S7Bikes, S7Festoon, S7BoatSmoke} from './V2S7_folk';
+import {S7Field} from './V2S7_particles';
 import {
-  S7SkyClipDefs, SkyClip, S7SkyBand, S7Far, S7TreeLTrunk, S7TreeLCrown, S7TreeRTrunk, S7TreeRCrown, S7TreeLights, S7Wing,
-  S7Steps, S7Ground, S7Shadows, S7Bollard, S7Basin, S7BasinLights, S7CafeBack, S7CafeT1Chairs, S7CafeNear, S7Rack,
-  S7Planter, S7CanopyFix,
-} from './V2S7_set';
-import {
-  S7WalkersA, S7WalkersBC, S7StaffInside, S7StaffOutside, S7StepSitters, S7CafeT1People, S7NearBacks, S7RimSitters,
-  S7Stander, S7FarWalkers, S7Jets, S7Water, S7Festoons, S7CafeLights, S7FallingLeaves, S7GroundLeaves, S7Smoke, S7Steam,
-  S7Pigeons, S7GroundPigeons, S7TreeFairyLights,
-} from './V2S7_life';
+  S7WingShade, S7WestWallShade, S7BoardShadows, S7BollardForm, S7TreeShadows, S7TrunkForm, S7CrownForm, S7FolkShadows,
+  S7CyclistShadow, S7CafeShadows, S7CafeForm, S7BasinContact, S7BasinWaterShade, S7BasinFaceShade,
+} from './V2S7_light';
 import {S7Board} from './V2S7_board';
 import {S7PipSeat} from './V2S7_pipdraw';
 import {S7Wiper} from './V2S7_wiper';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
-/** SUN2: screen-fixed, the one orange (a plain flat disc, as S6 draws it: the match-cut at 28.06). */
-const Sun2: React.FC = () => <circle cx={SUN2.x} cy={SUN2.y} r={SUN2.r} fill={CM.sun} />;
+const P = S7_PLANE;
 
 const V2S7: React.FC = () => {
   const t = useTime();
-  const c = s7CamAt(S7_T0 + t);
-  const cam = mat.compose(mat.translate(c.dx, c.dy), mat.about(mat.scale(c.z), c.ax, c.ay));
-  const litTrees = t >= runAt('treeLights');
-  const litBasin = t >= runAt('basinLights');
+  const push = s7PushAt(S7_T0 + t);
+  const cam = mat.about(mat.scale(push.z), push.ax, push.ay);
   return (
-    <World sky={skyBands('sunset', true)} horizon={900}>
-      <S7SkyBand />
-      <Sun2 />
-      <XG m={cam}>
-        <S7SkyClipDefs />
-        <SkyClip>
-          <S7Far t={t} />
-          <S7Smoke />
-          <S7FarWalkers />
-        </SkyClip>
-        <S7Wing behindDoor={<S7StaffInside />} />
-        <S7CanopyFix />
-        <S7Pigeons />
-        <S7Steps />
-        <S7Ground />
-        <S7Shadows />
-        <SkyClip>
-          <S7Festoons />
-        </SkyClip>
-        <S7StaffOutside />
-        <S7StepSitters />
-        <S7WalkersA />
-        <S7TreeRTrunk />
-        <S7TreeLTrunk />
-        <S7TreeLights lit={litTrees} />
-        <S7FallingLeaves />
-        <SkyClip>
-          <S7TreeRCrown />
-          <S7TreeLCrown />
-          <S7TreeFairyLights />
-        </SkyClip>
-        <S7WalkersBC />
-        <S7Stander />
-        <S7Board />
-        <S7Bollard />
-        <S7PipSeat />
-        <S7Basin />
-        <S7Water />
-        <S7BasinLights lit={litBasin} />
-        <S7Jets />
-        <S7RimSitters />
-        <S7CafeBack />
-        <S7CafeT1People />
-        <S7CafeT1Chairs />
-        <S7Rack />
-        <S7GroundPigeons />
-        <S7GroundLeaves />
-        <S7CafeNear />
-        <S7CafeLights />
-        <S7Steam />
-        <S7NearBacks />
-        <S7Planter />
-      </XG>
+    <World sky={CM.sky} horizon={S7_HORIZON}>
+      <Lit rig={RIG_CANAL}>
+        {/* the one continuous sky rides the push (never the float); SUN2 is screen-fixed, flat, on it */}
+        <XG m={cam}>
+          <S7Sky />
+        </XG>
+        <S7Sun />
+        <XG m={cam}>
+          {/* the far street on the sunset band, beyond the west hedge */}
+          <S7Plane plane={P.farRoofs}>
+            <S7FarRoofs />
+          </S7Plane>
+          <S7Plane plane={P.trees}>
+            <S7FarTrees />
+            <S7BoatSmoke />
+            <S7FarWalker />
+          </S7Plane>
+          {/* the forecourt's paving first, each band in its plane (seams on cross joints) */}
+          <S7Plane plane={P.plane}>
+            <S7Ground band="far" />
+            <S7TreeGrate />
+          </S7Plane>
+          <S7Plane plane={P.subject}>
+            <S7Ground band="mid" />
+          </S7Plane>
+          <S7Plane plane={P.cafe}>
+            <S7Ground band="near" />
+            <S7NearLeaves />
+          </S7Plane>
+          {/* +1: the west hedge, the wing (its shade step), what stands along it */}
+          <S7Plane plane={P.wing}>
+            <S7WestEdge />
+            <S7WestWallShade />
+            <S7WingFront behindDoor={<S7StaffInside />} />
+            <S7WingShade />
+            <S7FolkShadows />
+            <S7CafePair />
+            <S7Bikes />
+            <S7StaffOutside />
+          </S7Plane>
+          <S7Plane plane={P.festoon}>
+            <S7Festoon />
+          </S7Plane>
+          {/* +0.5: the cyclist behind the young plane, the plane, its leaves */}
+          <S7Plane plane={P.plane}>
+            <S7CyclistShadow />
+            <S7Cyclist />
+            <S7TreeShadows />
+            <S7TreeTrunk />
+            <S7TrunkForm />
+            <S7TreeCrown />
+            <S7CrownForm />
+            <S7Field seed="s7/leaves" />
+          </S7Plane>
+          <S7Plane plane={P.motes}>
+            <S7Field seed="s7/motes" />
+          </S7Plane>
+          {/* 0: Google's board (tier A, its shadows the rig's), Pip on the bollard */}
+          <S7Plane plane={P.subject}>
+            <S7BoardShadows />
+            <S7Board shadow={false} />
+            <S7Bollard />
+            <S7BollardForm />
+            <S7PipSeat />
+          </S7Plane>
+          {/* the near things: the basin, then the cafe and the planter */}
+          <S7Plane plane={P.basin}>
+            <S7BasinContact />
+            <S7BasinWater />
+            <S7BasinWaterShade />
+            <S7BasinRims />
+            <S7BasinFaceShade />
+            <S7Jets />
+          </S7Plane>
+          <S7Plane plane={P.cafe}>
+            <S7CafeShadows />
+            <S7Cafe />
+            <S7Planter />
+            <S7CafeForm />
+            <S7Field seed="s7/nearMotes" />
+          </S7Plane>
+        </XG>
+      </Lit>
     </World>
   );
 };

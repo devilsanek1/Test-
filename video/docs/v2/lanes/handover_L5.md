@@ -1,3 +1,20 @@
+## RESUMED 2026-10-28 07:54 UTC on the G4 v4 model (L5, session `session_014PwCXJBpuhBWJAJtA6vrSe`); state at 09:00
+- Done, pushed: K3's tier-A look checked on S6 at 25.0 (one closed ~3 px outline in the frame's deep plum, keys full;
+  no kit change) + README "Light": the legs' contact and cast shadows come from the scene's rig (`shadow={false}`).
+- V2S6 conformed (commits 46eaf56 ... the petals commit): ONE eye-level camera (V2S6_rig `CAM`: eye 1.6 m, horizon 771,
+  VP (540, 771): the gate's far field implies it; the kit's 836 is the facade's foot), the near plane rebuilt at that
+  scale (V2S6_near: raised tulip bed + flowering shrub left, a park bench right, footpath joints to the VP), S6_MORNING
+  sky (skies.ts, horizonY 771), RIG_APRIL contact / cast / Shade, the deal board tier A (`shadow={false}`), the clock via
+  `<TimeShift by={T0 - S6_START}>` (inner = film - 24.00), the parallax float 24.30-26.40 (planes -1 .. +3), window groups
+  f1626 / 1647 / 1670 (three clipped GateFacade copies), one jogger, the staff by the camera, petals S6's own weather
+  (<= 7, 24-34 px, over the paving), far planes stepped toward the air (facade 0.72, cherries 0.62, fence 0.15).
+  Checks at 25.0: check_depth 0 FAIL (2 WARN), check_light OK (25.0, 27.5), banding PASS x3, line 41 strokes / Mpx,
+  26 near-miss ends, 1.0 % dark (lettering blanked), particles_phone 6 / 5 / 7 seen, floatProblems [], skyProblems [].
+- V2S7: ONE builder agent (MAX) conforming it (camera horizon 897 / VP (540, 897), S7_SUNSET, RIG_CANAL, deletions, cafe
+  things, festoons f1812 / 1836 / 1848, particles, float, depth sheet v2_s7.json); its step 1 (the clock) is pushed.
+- Next: the ONE combined critic (brief in the scratchpad `critic_brief.md`), up to two fix rounds, then report_L5.md
+  (0.4 clip of Film2R 23.32-33.46 with the voice, every check's number) and one line to the orchestrator.
+
 ## PAUSED 22:40 UTC for the depth pass (L5, session `session_014PwCXJBpuhBWJAJtA6vrSe`)
 State: resumed 22:16 on the new direction (DIRECTION.md, CRAFT §a-§d, THROUGHLINE.md, conform_L5.md); read them all, rendered the
 current S6 / S7 at 0.4 (Film2R 23.9-31.5) beside the approved G4 look clip. NO code changed since the 15:06 checkpoint (tree
