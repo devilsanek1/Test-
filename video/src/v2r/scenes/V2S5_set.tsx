@@ -5,7 +5,8 @@
 //   V2S5_far       S5Far (far plane) + S5FarLife (sky life, screen)
 //   V2S5_river     S5River          V2S5_mid  S5Mid          V2S5_nearmid  S5NearMid (start coords)
 //   V2S5_deck      S5Deck / S5DeckOver (deck plane), S5TreeLeft / S5RightFrame (their boxes), S5WipeProp
-//   V2S5_particles S5Particles (the 'near' slot: petals and glints, each field in its plane's map)
+//   V2S5_particles S5Particles (the 'near' slot: petals and motes, each field in its plane's map); S5NearMidParticles
+//                  (the start's petals, drawn in the near-mid layer: they sink with the slope's crowns)
 //   V2S5_figs      FiguresStart (start coords until the swap) / FiguresEnd (deck plane from the swap)
 //   V2S5_text      NewsBox (start coords, rides the deck) / Plaque (end coords, pops on "Pentagon")
 // Tiers (conform_L4 §5): every plane is C (environment: no outline, calm) but the figures (B, their kits' default) and
@@ -17,14 +18,14 @@ import {useTime} from '../../lib/time';
 import {XG} from '../../lib/xf';
 import {PullLayer} from '../../lib/pullback';
 import {Tier} from '../../lib/tier';
-import {craneP, planeMat, startMat, boxMat, wipeMat, swapAt, SWAP_P, T5, PLANES} from './V2S5_rig';
+import {craneP, planeMat, startMat, boxMat, wipeMat, deckMat, deckStartMat, swapAt, SWAP_P, T5, PLANES} from './V2S5_rig';
 import {S5StartBack, S5StartFore} from './V2S5_start';
 import {S5Far, S5FarLife} from './V2S5_far';
 import {S5River} from './V2S5_river';
 import {S5Mid} from './V2S5_mid';
 import {S5NearMid} from './V2S5_nearmid';
 import {S5Deck, S5DeckOver, S5TreeLeft, S5RightFrame, S5WipeProp} from './V2S5_deck';
-import {S5Particles} from './V2S5_particles';
+import {S5Particles, S5NearMidParticles} from './V2S5_particles';
 import {FiguresStart, FiguresEnd} from './V2S5_figs';
 import {NewsBox, Plaque} from './V2S5_text';
 
@@ -38,8 +39,9 @@ export const S5Set: React.FC<{p?: number; only?: S5Layer[]}> = ({p: pIn, only}) 
   const t = useTime();
   const p = pIn ?? craneP(t);
   const swapped = pIn !== undefined ? pIn >= SWAP_P : t >= swapAt;
-  const deck = planeMat(PLANES.deck, p);
-  const deckStart = startMat(PLANES.deck, p);
+  // the deck on its own pace (V2S5_rig deckP: calmer at the lamppost's edges, the same start, end and beats)
+  const deck = deckMat(p);
+  const deckStart = deckStartMat(p);
   const on = (l: S5Layer) => !only || only.includes(l);
   return (
     <>
@@ -68,9 +70,15 @@ export const S5Set: React.FC<{p?: number; only?: S5Layer[]}> = ({p: pIn, only}) 
           <S5Mid />
         </PullLayer>
       ) : null}
-      {on('nearmid') ? (
+      {on('nearmid') || on('near') ? (
         <PullLayer m={startMat(PLANES.nearmid, p)}>
-          <S5NearMid />
+          {on('nearmid') ? <S5NearMid /> : null}
+          {/* the start's petals belong to the slope's crowns: they sink with them behind the balustrade */}
+          {on('near') ? (
+            <Tier tier="environment">
+              <S5NearMidParticles />
+            </Tier>
+          ) : null}
         </PullLayer>
       ) : null}
       <PullLayer m={deck}>

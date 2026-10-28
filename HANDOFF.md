@@ -91,7 +91,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
   - Voice: `video/audio/vo_clean.wav`, the treated ElevenLabs take `video/assets/vo_v3_final.wav`.
   - Sound: synthesized SFX (`video/audio/sfx`), cues in `video/audio/cues.json`, and a cinematic bed.
 - **Posted to Instagram on 2026-10-25.** After 45 minutes: 155 views, 70 viewers, average watch 21 s of 55 s, and
-  about 80 % of viewers gone by 3 s. The lesson is now a rule: put the payoff in words on frame 0, keep it 30-45 s, and
+  about 80 % of viewers gone by 3 s. The lesson is now a rule: put the payoff in words in the first ~2 s (in the voice's order, since 2026-10-28), keep it 30-45 s, and
   polish the hook most. The numbers are in the playbook's Performance log.
 - **Owner feedback after posting** (all in the playbook):
   - The paper edge at the top looked like a screen recording, so it was removed in the final.
@@ -143,7 +143,11 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Video 3 is produced by session https://claude.ai/code/session_01K4EiJphpZBfCkniV3UU3wR.** It is at G0 (topic
   scouting): workflow `context/workflows/v3-g0-topics-wf_b78a4844-2b3.js` writes `video/docs/v3/scouting/*.md` and
   `video/docs/v3/G0_TOPICS.md` (top 3 fresh topics for the owner to pick).
-- **v3 status (2026-10-28 ~02:30 UTC): REWORK, FINAL ASSEMBLY RUNNING.**
+- **v3 status (2026-10-28): DONE.** The owner posted the reworked reel and closed it ("It's done"). Their notes on the
+  posted reel are rules for the next videos (playbook): words follow the voice (no title over the captions), words in
+  the picture few and big, every opening effect big enough to stop a thumb. `deliverables/v3/v3_final.mp4` is the
+  latest master, with the text fixes. Earlier status: rework master delivered, awaiting the owner's review. The
+  final step's report (master facts, checks, cover frame 192, what is deferred): `video/docs/v3/rework_reports/assembly_final.md`.
   - The hook pilot (SQA 0-5.80) was sent to the owner: `deliverables/v3/v3_rework_pilot.mp4`.
   - Five max-effort fix lanes are done and pushed. Their reports are in `video/docs/v3/rework_reports/`:
     - `final_lanes.md`: WINDOW, REVEAL, HOME;

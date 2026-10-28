@@ -1,6 +1,46 @@
 # L2 handover (V2S2 "The wall")
 
-## PAUSED 22:40 UTC for the depth pass (orchestrator; resume with the depth section added to conform_L2.md)
+## PAUSED 2026-10-28 ~09:25 UTC (budget hold, orchestrator). Resume scope: the critic's MUST-FIXes only, no second critic round, then report_L2.md
+**Done + pushed (V2S2*.tsx, V2S2_Ground/_Near/_Water/_Light/_Wall/_Float/_Layout, depth sheets v2_s2.json + v2_s2_t7.0.json):**
+conform_L2 §1-§10 + RESUME: Pip seated from frame 1, her A outline pop 6.82, the push retired, float legs home at 12.98;
+lib/sky S2_EVENING + S2_AIR; ONE camera on the VP (1400, 700) (our edge + towpath joints to it), planes -1/0/+1/+2/+3/+4
+via S2_ATM (air S2_AIR, steps [0, .12, .15, .6, .9]); no head-backs: kiosk foot, dog at rest, planter, bollards (no
+railing), lamp + bike; K3 ToldTheBBCBoard (A from 8.44, shadow from the shove, BOARD_SHIFT -50); RIG_CANAL light layers;
+one far walker, the boat entering 7.60, pigeons on the far bays out by ~9.8; motes far 4 x 9-10 px + near 3 x 13-16 px.
+**Checks run:** depth 7.0 / 11.0: 0 FAIL (3 / 3 WARN: +2/+3 air ladder flat 7.5 -> 7.2, SW4 29 % one value, towpath
+texture); light A/B OK (7.0: brightest 5 % 0.039 H from her window, greyed 8 px; 11.0: 0.077 H, 18 px; band 0.0); banding
+open sky PASS (the flat cloud's edge reads dL* 4.1 if included); skyProblems note only; particleProblems [];
+floatProblems []; tsc 0 errors; lines @10.0: dark px 1.38 %, strokes 130 / Mpx, near-miss 258 / Mpx (87 / ~150 without
+the board's lettering); match 12.95 / 12.967 / 12.983 / 13.00: M = plum pane x 269-400 y 703-866 (S2) and S3's lit opening
+on the same rect, Pip bottom 1051 x 544-633 (S2) / 543-633 (S3); movers @10.3: no noticeable supporting mover (boat
+~0.15 % of the frame); 11.0: no stranger's back. The 0.4 clip (5.9-13.2) exists in scratch only: re-render after the fixes.
+**Critic (one pass, 09:20): 7 MUST / 3 NICE. Open MUST-FIXes:**
+1. Bottom 40 % a flat empty beige floor: V2S2_Near PAVE.far = un-stepped stone toward S1's ground #EED8C9, PAVE.near a
+   step darker (~-5 L*) split on the NEAR_ROW joint, STONE_B a real 2nd tone (dL* 6-8); leaf specks -> 5-6 leaves 30-45 px
+   at the planter / lamp feet / kerb (optional: one long 2-step cast across the near paving from the sun side).
+2. Particles unseen, no leaves: V2S2_Life: a leaves field (S1 v5 preset 34-40 px), 2 leaves from the left edge across the
+   open towpath / canal (x 200-1000, y 1100-1700, plane towpath), ~7.0-8.2 and ~11.0-12.1, none entering near the joins or
+   8.30-8.50, 8.94-9.12, 9.48, 10.26-10.60, ~10.85, 12.20; drop the planter motes; far motes to x >= 560 or drop.
+3. Near dressing outweighs the subject: PLANTER_WOOD -> mid wood L* 60-64; the drain a warm iron 1-2 steps under the
+   paving; tyres a step lighter warm slate (the lamp's colour stays: S3 holds it).
+4. The board owns the eye 8.94-12.98: tier subject 8.42-~9.6 only, then support; BOARD_DX0 further left (no plum stile by
+   the newsagent before 8.42); REQUEST K3/L5 a calm colour override for this board (frame L* 40-45, face ~L* 91).
+5. (L3's file) S3 still draws the old near lamp at x 930: REQUEST L3 to take S2_NEAR_LAMP (V2S2_Near).
+6. Blinds striped: V2S2_Staff S2Blind: no slat <Ink> (or 2-3 Fill bands seamTone(shadeWarm, 6)); rail + cord as Fills.
+7. The 6.82 outline invisible + grey: V2S2 HerOutline tone CM.brickLight (~L* 39 warm), with a limestone casing (reveal +
+   sill 8-10 px) popping with it.
+NICE (only if cheap): his turn before "But" (~7.70-7.92); SW1's mug away from her pane ({side: 1, hand: -1}); the board ~40 px
+lower (map + K3 REQUEST). Full critic text: scratchpad crit/findings.md (this session only).
+**Also (parent 09:12):** isolate the water: S2Water -> the water alone (poly + reflections + waterline strip) in ONE
+component with its geometry exported (top = farCoping - 2, bottom = OUR_EDGE + 30; above it: the far towpath + coping, the
+far lamp, the boat, ducks, our bank, Pip), the far bank its own component; no water styling (lib/water swaps in later).
+**Next step on resume:** one MAX builder agent: MUST 1, 2, 3, 6, 7 + 4 (my part) + the water split; re-run depth 7.0 / 11.0,
+light, particleProblems + particles_phone at 360, line @10.0, the match; render the 0.4 clip (Film2R frames 354-792) to
+video/deliverables/v2/lanes/v2r_L2_S2_0.4.mp4; commit + push; then report_L2.md (<= 12 lines) + one line to the parent.
+REQUESTS for the report: L3 lamp (MUST 5); K3/L5 board colours (MUST 4); map.ts S2 bench / figure boxes per V2S2_Layout
+and aBoard x -50.
+
+## Superseded: PAUSED 22:40 UTC for the depth pass (orchestrator; resume with the depth section added to conform_L2.md)
 **State (pushed):** the conform has only just started. Read DIRECTION, CRAFT §a-§d, THROUGHLINE, conform_L2, LIGHT.md, the
 tier header and the kit Tiers notes; studied the G4 look clip. The integrator's map.ts / scenes.json already carry S2's
 conform numbers (her window at M (335, 785), SW1 at (200, 795), 'W2' (465, 776) full blind 12.20, push retired, pull-back

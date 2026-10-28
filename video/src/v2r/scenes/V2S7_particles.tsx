@@ -3,9 +3,14 @@
 // noticeable mover), each a pure function of the shot's time, every entrance clear of the 0.4 s round both joins
 // (28.10 = local 0, the wipe 32.70 = local 4.60) and of 32.50-33.10 (nothing new but the wiper), clear of the caption
 // band and of Google's board.
-//   leaves       three plane leaves (palmate, the preset's 26-40 px) blown in from off the right edge, one per birth
-//                across the hold (0.75 / 2.15 / 3.25 s: each in view by ~1.0 / 2.4 / 3.5 s), west across the open mid
-//                ground in front of the doors (82 px/s across, ~58 down), landing behind Pip (plane 0)
+//   leaves       three RUST plane leaves (palmate, the preset's 26-40 px; S1 v5's approved colour: on the gold crown and
+//                the tan wing gold leaves were lost, dL* 2) blown in from off the right edge, one per birth (0.25 / 2.0 /
+//                2.95 s, born out of frame: each in view from 0.9 / 2.2 / 3.3 s, clear of both joins and of 32.50-33.10),
+//                west on a gust low across the PALE PAVING in front of the frontage (x 780-1080, y 1035-1100: 110 px/s
+//                across, ~30 down, dL* ~30 on the paving), above the jets and right of Pip; the first lands at (809, 1100)
+//                at ~3.2 s and goes by 4.0 s, the other two are still in the air at the wipe (plane 0's sizes; drawn in the
+//                young plane's float group, the depth they cross). Seed "s7/gust": broad side on (turn |sx| >= 0.3) at the
+//                phone checks 30.7 / 31.5 / 32.3
 //   motes        7 small motes (6-9 px) in the low sun's light against the wing's shaded brick right of the doors and
 //                under the plane's crown (plane +0.6); with the 3 near ones, 10 in all (the owner's note on v5)
 //   near motes   3 near motes (12-16 px, lib/particles nearSize) drifting past the nearest shade: the coat over the
@@ -37,19 +42,21 @@ const common = {joins: S7_JOINS, t0: 0.25, t1: 4.35, atm: S7_ATM, sun: [SUN2.x, 
 export const S7_PARTICLE_FIELDS: ParticlesProps[] = [
   {
     // plane leaves blown in from off the right edge (the young plane's crown overhangs it) on the canal breeze, WEST
-    // across the open mid ground in front of the doors, landing on the forecourt behind Pip: the proven particle (the
-    // owner on v5: "leafs are great"), the lib preset sizes on the subject's plane (26-40 px), never smaller
+    // low across the open paving in front of the frontage: the proven particle (the owner on v5: "leafs are great"),
+    // rust as S1's (seen at phone size on the pale paving), the lib preset sizes on the subject's plane (26-40 px), never
+    // smaller; a gust (110 px/s across, a slow 28-34 px/s fall) carries them over the paving, above the jets' tops (y
+    // 1136) and right of Pip's box
     kind: 'leaves',
-    seed: 's7/leaves',
-    region: {rect: [1092, 760, 70, 110]},
-    on: BRICK_SHADED,
+    seed: 's7/gust',
+    region: {rect: [1105, 1010, 40, 30]},
+    on: CM.paving,
     plane: 0,
     leaf: 'palmate',
-    colors: [CM.leafGold, CM.leafRust, CM.coatMustard],
-    speed: [52, 64],
-    drift: [-82, 0],
-    floor: 1066,
-    births: [0.75, 2.15, 3.25],
+    colors: [CM.leafRust],
+    speed: [28, 34],
+    drift: [-110, 0],
+    floor: 1100,
+    births: [0.25, 2.0, 2.95],
     margin: 12,
     avoid: [CAPTION_BAND, S7_BOARD_BOX, PIP_BOX],
     ...common,

@@ -5,8 +5,8 @@
 // Composed from the lane's own parts (each its own file):
 //   V2S1_set_far    the west gap: far roofs, SUN0, the bridge, the bus (once, 1.10), the five birds (1.40)
 //   V2S1_set_wing   the wing: facade, panes (one switch, 3.90), W, the lobby (+ behindDoor), the sliding leaves, pigeons
-//   V2S1_set_life   the water, the far towpath and its bend, lamps and bollards, the boats, the one far jogger, the
-//                   plane branch
+//   V2S1_set_life   the far towpath and its bend, lamps and bollards, the boats, the one far jogger, the plane branch
+//   V2S1_water      the canal (the film's one shared water, src/lib/water.tsx: S1's spec) and the duck on it
 //   V2S1_set_core   CellPaint (fills split by region, so the flood ripples shape by shape)
 //   V2S1_light      the light layers (RIG_CANAL): the fins' shades, the soffit, the towpath's contact and cast shadows,
 //                   the boats' waterline strips
@@ -18,13 +18,14 @@
 import React from 'react';
 import {Tier} from '../../lib/tier';
 import {CM} from '../palette';
-import {Cloud, Ducks} from '../kit/canal/life';
+import {Cloud} from '../kit/canal/life';
 import {CanalCast} from '../kit/canal/slots';
 import {k4Person} from '../kit/canal/k4k5';
 import * as MAP from '../world/map';
 import {S1WestGap} from './V2S1_set_far';
 import {S1Wing, S1DoorLeaves, S1WingLife} from './V2S1_set_wing';
-import {S1Water, S1FarTowpath, S1PathFurniture, S1Boats, S1FarLife, S1PlaneBranch} from './V2S1_set_life';
+import {S1FarTowpath, S1PathFurniture, S1Boats, S1FarLife, S1PlaneBranch} from './V2S1_set_life';
+import {S1Water, S1Duck} from './V2S1_water';
 import {S1BoatStrips, S1TowpathShadows, S1WingShades} from './V2S1_light';
 import {S1Plane, S1_PLANE} from './V2S1_float';
 
@@ -92,8 +93,9 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
         <S1BoatStrips which="B" />
         <S1Boats />
         {/* one duck at its water's scale (one camera: ~127 px/m there, a mallard ~0.58 m: ~70 px), by the bend, clear
-            of Pip's zone and the sun's glitter path (the pale drake read as a ghost: the art director on v3) */}
-        <Ducks ducks={[{x: 396, y: 1136, size: 62}]} seed="s1ducks" />
+            of Pip's zone and the sun's glitter path (the pale drake read as a ghost: the art director on v3); its contact
+            lens and mirrored underside are the water's (V2S1_water), its paper V wake is gone */}
+        <S1Duck />
       </Env>
     </S1Plane>
     {/* our bank and its near things split their own planes (V2S1_steps) */}

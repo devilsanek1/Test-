@@ -11,7 +11,7 @@
 // right stile (a slim wedge on the shade side) and its back leg under the bottom rail | the plum-painted wooden frame:
 // two stiles that run down to the ground as the front legs, a top rail with a handle slot, a bottom rail; a lit strip
 // on the sun side (screen left) | the cream enamel plate with slightly rounded corners, its thickness showing as a
-// shade edge right and below | a plum keyline inset ~10 px, notched round four brass screw heads | the lettering
+// shade edge right and below | a plum keyline inset ~10 px, closed, with four brass screw heads on its corners (the clean face, 2026-10-28: no notches, no slots, no handle slot) | the lettering
 // (WorldText, one type scale, flat ink) and thin painted rules | loose ink on the frame's outer contour only (open,
 // small overshoots): never on the face, never round the letters.
 // Motion (nothing fades, ever): `at` the board lands (a short drop, then the clack); `clackAt` a 3 px wooden jolt
@@ -69,6 +69,22 @@ export const BOARD_COLORS = {
   smearDeep: mixHex(CM.paper, CM.coatPlum, 0.16),
   scribble: mixHex(CM.coatPlum, CM.paper, 0.42),
 } as const;
+export type BoardColors = {[K in keyof typeof BOARD_COLORS]: string};
+
+/** S2's TOLD THE BBC A-board, calm (L2's request, 2026-10-28: there it SUPPORTS the wall of windows): the frame L* ~42 in
+ *  the coatPlum / line family (lit / shade one step either side), the face limestone L* 91, a step under the staff
+ *  panes; the lettering stays ink (it must read). The deal, Google and her boards keep BOARD_COLORS (A5). */
+const BBC_FRAME_C = mixHex(mixHex(CM.coatPlum, CM.line, 0.3), CM.paper, 0.08);
+export const BBC_CALM: Partial<BoardColors> = {
+  frame: BBC_FRAME_C,
+  frameLit: mixHex(BBC_FRAME_C, CM.paper, 0.2),
+  frameShade: mixHex(BBC_FRAME_C, CM.anchor, 0.35),
+  face: CM.limestone,
+  faceEdge: mixHex(CM.limestone, CM.stoneShade, 0.62),
+  keyline: BBC_FRAME_C,
+  rule: BBC_FRAME_C,
+  contour: mixHex(BBC_FRAME_C, CM.anchor, 0.5),
+};
 
 /** The shared faux weight of every key line (>= 56 px: headers and keys) so it holds at 216 px wide. ONE value for
  *  every board (fairness: no board gets extra weight). */
@@ -141,7 +157,8 @@ export function boardFrame(face: Rect, stile = 40, rail = 20, legsTo: number = B
   const side: Pt[] | null = sideW > 0 ? [[X1 - 2, hinge], [X1 + 1.5, hinge], [X1 + sideW, footY], [X1 - 2, footY]] : null;
   const backLeg: Pt[] | null =
     sideW > 0 && legsTo - legsTop > 2 ? [[face.x0 - 2, legsTop - 2], [face.x0 + wAt(legsTop), legsTop - 2], [face.x0 + sideW, footY], [face.x0 - 2, footY]] : null;
-  const hasHandle = o.handle ?? rail >= 18;
+  // the clean face (2026-10-28, the orchestrator on L5's request): no handle slot unless a board asks for one
+  const hasHandle = o.handle ?? false;
   const hw = Math.min(62, (face.x1 - face.x0) * 0.13);
   const hh = Math.max(4.5, rail * 0.3);
   const cx = (face.x0 + face.x1) / 2;
@@ -198,10 +215,6 @@ const rectD = (r: Rect) => `M${P(r.x0, r.y0)}H${r1(r.x1)}V${r1(r.y1)}H${r1(r.x0)
 const roundD = (r: Rect, rad: number) =>
   `M${P(r.x0 + rad, r.y0)}H${r1(r.x1 - rad)}A${rad} ${rad} 0 0 1 ${P(r.x1, r.y0 + rad)}V${r1(r.y1 - rad)}A${rad} ${rad} 0 0 1 ${P(r.x1 - rad, r.y1)}` +
   `H${r1(r.x0 + rad)}A${rad} ${rad} 0 0 1 ${P(r.x0, r.y1 - rad)}V${r1(r.y0 + rad)}A${rad} ${rad} 0 0 1 ${P(r.x0 + rad, r.y0)}Z`;
-/** The keyline's centreline: a rect whose corners are notched (concave quarter circles round the screws). */
-const notchedD = (k: Rect, rc: number) =>
-  `M${P(k.x0 + rc, k.y0)}H${r1(k.x1 - rc)}A${rc} ${rc} 0 0 0 ${P(k.x1, k.y0 + rc)}V${r1(k.y1 - rc)}A${rc} ${rc} 0 0 0 ${P(k.x1 - rc, k.y1)}` +
-  `H${r1(k.x0 + rc)}A${rc} ${rc} 0 0 0 ${P(k.x0, k.y1 - rc)}V${r1(k.y0 + rc)}A${rc} ${rc} 0 0 0 ${P(k.x0 + rc, k.y0)}Z`;
 const circD = (x: number, y: number, rr: number) => `M${P(x - rr, y)}a${rr} ${rr} 0 1 0 ${r1(rr * 2)} 0a${rr} ${rr} 0 1 0 ${r1(-rr * 2)} 0Z`;
 
 // ---------------------------------------------------------------- motion helpers (pure)
@@ -512,6 +525,8 @@ export type StatementBoardProps = {
   frameSeed?: string;
   /** Extra face content (drawn over the face and under the lettering; moves with the jolt). */
   children?: React.ReactNode;
+  /** A colour override (keys of BOARD_COLORS; a stable object, e.g. BBC_CALM). Default: BOARD_COLORS. */
+  colors?: Partial<BoardColors>;
 };
 
 /** The ground shadow of a board (flat, cast right and a little toward us; colour, never grey). */
@@ -550,11 +565,12 @@ const StatementBoardBody: React.FC<StatementBoardProps> = ({
   seed = 'board',
   frameSeed = FRAME_SEED,
   children,
+  colors,
 }) => {
   const t = useTime();
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
   const g = useMemo(() => boardFrame(face, stile, rail, legsTo, frame), [face.x0, face.y0, face.x1, face.y1, stile, rail, legsTo, frame?.keyInset, frame?.side, frame?.handle, frame?.margin]);
-  const C = BOARD_COLORS;
+  const C = useMemo(() => (colors ? {...BOARD_COLORS, ...colors} : BOARD_COLORS), [colors]);
   // ---- static paths (frame, face, keyline, contour ink)
   const P2 = useMemo(() => {
     const {outer: O, face: F, railB} = g;
@@ -578,17 +594,10 @@ const StatementBoardBody: React.FC<StatementBoardProps> = ({
     const fr = Math.max(4, Math.min(8, (F.x1 - F.x0) * 0.016));
     const plate = roundD(F, fr);
     const plateEdge = roundD({x0: F.x0 + 2.5, y0: F.y0 + 3, x1: F.x1 + 2.5, y1: F.y1 + 3}, fr);
-    const keyD = notchedD(g.keyline, g.notch);
+    // the keyline: ONE closed border (its corners no longer notched round the screws: the clean premium line)
+    const keyD = roundD(g.keyline, 2.5);
     const sr = Math.max(2.6, g.keyInset * 0.36);
     const screwD = g.screws.map((s) => circD(s.x, s.y, sr)).join('');
-    const r = rng(`${frameSeed}/screws`);
-    const slotD = g.screws
-      .map((s) => {
-        const a = r.range(0, Math.PI);
-        const l = sr * 0.75;
-        return `M${P(s.x - Math.cos(a) * l, s.y - Math.sin(a) * l)}L${P(s.x + Math.cos(a) * l, s.y + Math.sin(a) * l)}`;
-      })
-      .join('');
     // contour ink: the outer silhouette only (left edge, top edge, the right stile's edge), one pen stroke per edge
     // with a small overshoot; the A's back edge thinner (it recedes). Open: Ink leaves a seeded gap in each stroke.
     const o = {over: 'small' as const, jitter: 0.5, drift: 0.25, breaks: false};
@@ -602,7 +611,7 @@ const StatementBoardBody: React.FC<StatementBoardProps> = ({
       (O.y1 - railB.y1 > 6
         ? skLine(F.x0, railB.y1 + 2, F.x0, O.y1, {over: [0, 0], breaks: false, seed: `${frameSeed}/cl`}) + skLine(F.x1, railB.y1 + 2, F.x1, O.y1, {over: [0, 0], breaks: false, seed: `${frameSeed}/cr`})
         : '');
-    return {frameD, litD, plate, plateEdge, keyD, screwD, slotD, outerInk, backInk, innerInk, sr};
+    return {frameD, litD, plate, plateEdge, keyD, screwD, outerInk, backInk, innerInk, sr};
   }, [g, stile, rail, frameSeed]);
   const smudge = useMemo(() => {
     if (!smudges) return null;
@@ -663,7 +672,6 @@ const StatementBoardBody: React.FC<StatementBoardProps> = ({
         <Fill d={P2.plate} color={C.face} offset={false} seed={`${frameSeed}/face`} />
         <Ink d={P2.keyD} width={Math.max(1.6, Math.min(2.2, g.keyInset * 0.2))} color={C.keyline} taper={false} vary={0} seed={`${frameSeed}/key`} graphic />
         <Fill d={P2.screwD} color={C.screw} offset={false} seed={`${frameSeed}/screw`} />
-        <Ink d={P2.slotD} width={Math.max(0.9, P2.sr * 0.34)} color={C.screwSlot} taper={false} vary={0} seed={`${frameSeed}/slot`} />
         {menu}
         {children}
         {rules.map((r, i) => (
@@ -680,7 +688,7 @@ const StatementBoardBody: React.FC<StatementBoardProps> = ({
     </>
   );
 };
-export const StatementBoard = tiered('support', {tone: BOARD_COLORS.frame}, StatementBoardBody);
+export const StatementBoard = tiered('support', {tone: (p: StatementBoardProps) => p.colors?.frame ?? BOARD_COLORS.frame}, StatementBoardBody);
 
 // ---------------------------------------------------------------- presets: layouts (baselines = dy from the face top)
 
@@ -912,6 +920,8 @@ export function herWipe(o: {t0?: number; wipeAt?: number; wipeDur?: number; wipe
 // ---- 4. the newsstand board (S2)
 
 export type ToldTheBBCBoardProps = PresetBase & {
+  /** Default BBC_CALM (S2's calm A-board); pass BOARD_COLORS for the full-contrast face. */
+  colors?: Partial<BoardColors>;
   /** Frame sizes for the smaller board (defaults 26 / 16). */
   stile?: number;
   rail?: number;
@@ -943,11 +953,11 @@ export function bbcContent(g: BoardGeom): {lines: BoardLine[]; rules: BoardRule[
 
 /** S2's newsstand A-board TOLD THE BBC (face S2.aBoard 400 x 200; the same face and type, smaller frame); already
  *  there: L2 slides it out with its own transform at 8.44. */
-const ToldTheBBCBoardBody: React.FC<ToldTheBBCBoardProps> = ({face = S2.aBoard, legsTo = S2_LEGS_Y1, stile = 26, rail = 16, seed = 'bbc', t0: _t0, ...rest}) => {
+const ToldTheBBCBoardBody: React.FC<ToldTheBBCBoardProps> = ({face = S2.aBoard, legsTo = S2_LEGS_Y1, stile = 26, rail = 16, seed = 'bbc', colors = BBC_CALM, t0: _t0, ...rest}) => {
   useCaptionFont();
   const g = useMemo(() => boardFrame(face, stile, rail, legsTo, BBC_FRAME), [face.x0, face.y0, face.x1, face.y1, legsTo, stile, rail]);
   const c = bbcContent(g);
-  return <StatementBoard face={face} legsTo={legsTo} stile={stile} rail={rail} frame={BBC_FRAME} lines={c.lines} rules={c.rules} seed={seed} {...rest} />;
+  return <StatementBoard face={face} legsTo={legsTo} stile={stile} rail={rail} frame={BBC_FRAME} lines={c.lines} rules={c.rules} seed={seed} colors={colors} {...rest} />;
 };
 export const ToldTheBBCBoard = tiered('support', {}, ToldTheBBCBoardBody);
 

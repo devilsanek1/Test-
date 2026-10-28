@@ -7,7 +7,8 @@
 //   captions.json  pop captions from public/v3/voice_words.json (scripts/film_captions.py + captions_pages.txt)
 //   scenes/        one file per sequence (each starts as a placeholder playing the G5b panels it replaces:
 //                  scenes/g5b_panels.tsx; lanes replace them; scenes/index.ts registers them)
-//   voice          public/v3/voice.wav; sound cues = the locked board's (public/v3/animatic.json "sfx")
+//   voice          public/v3/voice.wav; sound cues = the locked board's (public/v3/animatic.json "sfx") plus the
+//                  payoff's thoom at 36.98 (PAYOFF_THOOM: the hook's 4.04 beat rhymed in sound too)
 //   frame 0        the core line in words until 3.37 s (and from the loop roll on), spoken captions under it
 //   draft          G5: no edges / paper / texture; a burned-in "G5 · <sequence> · <timecode>" label
 //   seam probe     Film3Seams: each seam's two builders alone at its frames f - 1 and f (lib/sequence.tsx), for
@@ -15,7 +16,7 @@
 // Compositions: src/entry-v3-film.tsx (Film3, Film3Shot {id}, Film3-<ID>, Film3Seams). How-to: docs/G5_BLOCKING.md
 // (§2b: the sequence contract).
 import React from 'react';
-import {Film, filmDuration, type FilmScene, type FilmSfx, type Frame0Text} from '../../lib/Film';
+import {Film, filmDuration, type FilmScene, type FilmSfx} from '../../lib/Film';
 import {FilmSeamProbe, seamProbeFrames} from '../../lib/sequence';
 import type {CaptionBeat} from '../../lib/Captions';
 import animatic from '../../../public/v3/animatic.json';
@@ -39,19 +40,21 @@ export const film3Scenes: FilmScene[] = (scenesJson as FilmScene[])
   .map((s) => (sceneTones[s.id] ? {...s, captionTone: sceneTones[s.id]} : s))
   .map((s) => (s.transitionOut?.type === 'unbuild' ? {...s, transitionOut: {...s.transitionOut, captionAt: FILM3_LOOP_CAPTION_AT}} : s));
 export const film3Captions = captionsJson as CaptionBeat[];
-export const film3Sfx = (animatic as {sfx: FilmSfx[]}).sfx;
+/** The payoff's rhyme lands in sound as the hook's did (assembly review R1-7): at 36.98 the data center's sign lights
+ *  and its rows light one per syllable of "an AI data center" (outside.tsx HALL_ROWS), the hook's 4.04 beat rhymed, so it
+ *  takes the hook's thoom (its 21.72 level: the voice stays on top). The locked board's list (public/v3/animatic.json)
+ *  stays as it was. */
+export const PAYOFF_THOOM: FilmSfx = {src: 'v3/v3_thoom.wav', t: 36.98, gain: 0.5};
+export const film3Sfx: FilmSfx[] = [...(animatic as {sfx: FilmSfx[]}).sfx, PAYOFF_THOOM];
 /** Film seconds (the voice: 41.15 s). */
 export const film3Seconds = filmDuration(film3Scenes);
 /** Frames at 60 fps: ceil(seconds * fps), the same rounding as Film's loop seam. */
 export const film3Frames = (from = 0, to = film3Seconds) => Math.max(1, Math.ceil((to - from) * FILM3_FPS - 1e-6));
 
-/** Frame 0 states the payoff in words (owner playbook), in the style frame's caption look (ink, the highlight box). */
-export const FILM3_FRAME0: Frame0Text = {
-  lines: ['AI is making your', 'next laptop pricier.'],
-  highlight: 'pricier.',
-  until: (animatic as {frame0Until: number}).frame0Until,
-};
-
+/** No frame-0 title over the captions: the words follow the voice's order (owner, 2026-10-28: "Why are we having this
+ *  out of order weirdly? Should we just show buying ..?"). Frame 0 shows the first spoken line, "Buying a laptop soon?",
+ *  and the payoff, "AI's making it pricier.", pops at 1.64 as its own caption. The core line stays on the cover
+ *  (Cover3.tsx). */
 const common = {
   components: sceneComponents,
   wipers: sceneWipers,
@@ -59,7 +62,6 @@ const common = {
   audioSrc: FILM3_VOICE,
   sfx: film3Sfx,
   captionMotion: 'pop' as const,
-  frame0: FILM3_FRAME0,
   draftLabel: FILM3_GATE,
   edges: false,
 };

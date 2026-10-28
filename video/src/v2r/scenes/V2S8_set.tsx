@@ -10,7 +10,7 @@
 //            values near the air (lib/depth planePalette), windows tone-on-tone, nothing under 4 px      far 24
 //   S8South  the far bank across the basin, depth +1 (one step toward the air): warehouses, terrace backs, blocks,
 //            autumn trees, static windows, the far towpath with tiny walkers, benches and lamps         south 60
-//   S8Water  the canal (+0.5: the water and the far wall) AND THE HOUSE BAND (the towpath beyond the bend, her
+//   S8Water  the canal (+0.5: S8Canal, the water field, then the far wall) AND THE HOUSE BAND (the towpath beyond the bend, her
 //            forecourt, the coping to the VP), drawn here, UNDER S8House                          water 110 / house 160
 //   S8Boat   the cafe boat moored along our coping (its x 0-150 strip shows at the landing: the serving hatch, a
 //            menu card, herb pots, the lit pigeon box, the stove chimney, bunting, the roof lights)          250
@@ -163,8 +163,12 @@ const copeInAt = (y: number) => cam(COPE_IN, 0, zAt(y))[0];
 
 // ================================================================= S8Sky (one continuous sky + the sun, the ONE orange)
 
-/** The low sun ahead: map SUN8 (420, 625) r 40 (top 585, 95 px over her board's frame top 680; never touches it). */
-export const S8_SUN = {x: MAP.SUN8.x, y: MAP.SUN8.y, r: MAP.SUN8.r} as const;
+/** The low sun ahead, SETTING (critic_L6 MUST 1; S1's model, CRAFT §f "Failures"): (420, 640) r 40, its top at y 600
+ *  (out of the caption band), its lower part behind ONE level far roofline at y 646-650 (S8Far's MILL), so a half-disc
+ *  sets behind the far rows, its visible base ~30 px over her board's frame top (676-680). A local value until the
+ *  integrator moves map SUN8 (REQUEST map.ts: SUN8 -> (420, 640) r 40); the sky's warmth (world/skies S8_EVENING) is
+ *  centred under it. */
+export const S8_SUN = {x: MAP.SUN8.x, y: 640, r: MAP.SUN8.r} as const;
 /** The sky's un-build: it contracts into SUN0 (S1's sun spot, where S1's flood will grow it back out from: the loop's
  *  mirror) over exit e 0.30 -> 0.92, easing in, from a radius that covers every sky corner (and the float's margin). */
 const SKY_EXIT = {e0: 0.3, e1: 0.92, r0: 1400} as const;
@@ -204,9 +208,16 @@ export const S8Sky: React.FC = () => {
 
 /** S8Far's depth plane (CRAFT §f.2: +2 on the sunset band, k .22 toward the air, <= 4 values, nothing under 4 px). */
 const FAR_PLANE = 2;
-/** The calm zone round the sun (far-plane x at the landing AND before the truck, -24): only the low far skyline, whose
- *  ONE near-level roof edge (y 700) stays under the disc (bottom 665): the disc is whole (CRAFT §f "Failures"). */
+/** The calm zone round the sun (far-plane x at the landing AND before the truck, -24): no mid row there; the low far
+ *  skyline (y ~700) behind THE MILL, whose one level roofline cuts the disc. */
 const CALM: [number, number] = [346, 532];
+/** THE MILL (the sun's roofline; CRAFT §f "Failures": one near-level edge cuts the disc, or it is whole): a long flat-
+ *  roofed canal mill on the far rows, its stone coping LEVEL at y 646 across far x 343-538, i.e. across the whole disc
+ *  (S8_SUN x 380-460) at the landing AND before the truck (the far plane's -24, plus its float share, 2.4 px). Nothing
+ *  stands on it in front of the disc (no stack, pot, gable or notch); its left end abuts the works chimney (x 333-343),
+ *  the right terrace (FN, from x ~505) overlaps its right end. Tone-on-tone windows (a real building, never a slab);
+ *  the far plane's palette like the rest of S8Far. */
+const MILL = {x0: 343, x1: 538, top: 650, cope: 4, win: {w: 6, h: 9, gx: 15, gy: 22, y0: 660}} as const;
 
 /** One row of far buildings: walls, roofs (pitched, mansard, gable, flat with a coping), chimney stacks with pots,
  *  and (o.win >= 4) its window grid as `win:<wall>` fills (tone-on-tone on the wall, set after the plane's palette).
@@ -356,6 +367,13 @@ function farLayout(): FarLayout {
     stack: 7,
     skip: CALM,
   });
+  front.layer();
+  // THE MILL: the sun's one level roofline (a flat roof, a stone coping), tone-on-tone windows below it
+  front.rect(CM.brickLight, MILL.x0, MILL.top, MILL.x1 - MILL.x0, 962 - MILL.top);
+  front.rect(CM.bandSunset, MILL.x0, MILL.top - MILL.cope, MILL.x1 - MILL.x0, MILL.cope + 1);
+  for (let wy = MILL.win.y0; wy + MILL.win.h < 800; wy += MILL.win.gy) {
+    for (let wx = MILL.x0 + 8; wx + MILL.win.w < MILL.x1 - 6; wx += MILL.win.gx) front.rect(`win:${CM.brickLight}`, wx, wy, MILL.win.w, MILL.win.h);
+  }
   front.layer();
   // the canal warehouse + the works chimney
   front.rect(CM.brickLight, WARE.x0, WARE.top, WARE.x1 - WARE.x0, 962 - WARE.top);
@@ -590,13 +608,26 @@ const farWall = (x: number) => {
   const b = sbBase(x);
   return {top: b + 2.5 * k, cope: b + 6.5 * k, foot: b + 18 * k};
 };
+/** The canal's water field (water plane, landing coords): from the horizon (HY - 6) down to y1, x0..x1. */
 const WATER = {x0: -320, x1: 840, y1: 1450};
+
+/** THE CANAL'S WATER, its own piece (the coming lib/water swap replaces this one component): ONE flat field (no
+ *  reflections, ripple dashes or glints drawn by hand), geometry WATER. Drawn first by S8Water, inside its tier-C water
+ *  plane. Hidden behind the board and the cafe boat at every pose (S1's water changes => re-check the seam). */
+export const S8Canal: React.FC = () => {
+  const el = useMemo(() => {
+    const b = new Batch();
+    b.rect(recede(CM.water, 0.5, S8_ATM), WATER.x0, HY - 6, WATER.x1 - WATER.x0, WATER.y1 - HY + 6);
+    // seed 's8water' layer 0: the un-build's seeded jitter stays what it was when the field shared S8Water's batch
+    return <Paint b={b} seed="s8water" misreg={false} />;
+  }, []);
+  return el;
+};
 
 export const S8Water: React.FC = () => {
   const stat = useMemo(() => {
     const b = new Batch();
-    // the water: ONE flat field (no reflections, ripple dashes or glints drawn by hand: the lead's particles glint)
-    b.rect(recede(CM.water, 0.5, S8_ATM), WATER.x0, HY - 6, WATER.x1 - WATER.x0, WATER.y1 - HY + 6);
+    // layer 0 is S8Canal's (the water field); the far wall stays on layer 1 (its seeds unchanged)
     b.layer();
     const xs: number[] = [];
     for (let x = WATER.x0; x <= VX; x += 30) xs.push(x);
@@ -612,6 +643,7 @@ export const S8Water: React.FC = () => {
   return (
     <Tier tier="environment">
       <OnPlane p="water">
+        <S8Canal />
         {statEl}
         <EarlyExit>
           <Ducks ducks={[{x: 112, y: 985, size: 19, vx: -2.6, drake: true}, {x: 138, y: 991, size: 17, vx: -2.4}]} seed="s8ducks" x0={-60} x1={220} />

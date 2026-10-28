@@ -1,13 +1,16 @@
 // V2S5_pentagon.tsx (lane L4): THE PENTAGON for S5, FORKED from the Arlington kit (kit/dc/pentagon.tsx, 2026-10-27) so
 // it takes S5's ONE atmosphere (conform_L4 §10): its tones recede toward the April gold at HALF the mid plane's step
 // (the subject from 22.43, CRAFT §f), instead of the kit's sRGB mix toward the mint. The body is the kit's.
-import React, {useMemo} from 'react';
+import React, {useId, useMemo} from 'react';
 import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
 import {Batch, Paint, mix, inkCol, lineD, polyD, quadD, crownD, circleD, rng, type Pt} from '../kit/dc/core';
 import {rcAtm, rcShade} from './V2S5_depth';
+import {toneOnTone} from '../../lib/depth';
 import {MID, PENT, PENT_ROT, circ, facesLens, halfSide, pentagon, sideFrame, sidePt, shadowOffset, wallLight, vert} from '../kit/dc/lens';
 import {tiered} from '../kit/tiers';
+import {Shadow, ShadowLayer} from '../../lib/light';
+import {pavingD5} from './V2S5_valley';
 
 /** The kit's atm / atmShade through S5's air at HALF the step (the Pentagon is the shot's subject from 22.43: CRAFT §f
  *  "the subject takes at most half its plane's step"; one value all through, no colour pop on its word). */
@@ -16,19 +19,37 @@ const atmShade = (c: string, d: number) => rcShade(c, d, 'subject');
 
 // ---------------------------------------------------------------- tones (plane 2: 22 % toward the sky)
 
+const FACADE_LIT = atm(CM.limestone, 2);
+/** The front facades turned from the sun (3/4 backlight): a step under the cast shadow in front of them (L* 59 on the
+ *  cast's ~75 paving / ~68 lawn: a shaded edge on a lighter field, CRAFT §f.3 counterchange; the old L* 72 stood on a
+ *  hand-picked L* 55 fill), their foot a step deeper (L* 55). */
+const FACADE_SHADE = atmShade(mix(CM.stoneShade, CM.shadeCool, 0.9), 2);
+const FACADE_FOOT = atmShade(mix(CM.shadeCool, CM.anchor, 0.1), 2);
+/** The facades' former mid shade (L* 72): the lit facade's plinth and the tone its A outline is drawn from (the clean
+ *  pen's subject drop: L* ~37, its own deep shade, never near-black). */
+const FACADE_MID = atmShade(mix(CM.stoneShade, CM.shadeCool, 0.22), 2);
+const FACADE_SHADE_DEEP = atmShade(CM.stoneShade, 2);
+
 export const PT5 = {
-  facadeLit: atm(CM.limestone, 2),
-  facadeShade: atmShade(mix(CM.stoneShade, CM.shadeCool, 0.22), 2),
-  facadeShadeDeep: atmShade(CM.stoneShade, 2),
+  facadeLit: FACADE_LIT,
+  facadeShade: FACADE_SHADE,
+  facadeFoot: FACADE_FOOT,
+  facadeMid: FACADE_MID,
+  facadeShadeDeep: FACADE_SHADE_DEEP,
   cornice: atm(CM.paper, 2),
   // the roof: grey (the real building's limestone walls under a darker grey roof), one value under the hazy
   // parkland behind it, so its far edges hold a fill step (check_depth "melts": a cream roof was 4-5 off it)
   roofLit: atm(mix(CM.stoneShade, CM.shadeCool, 0.45), 2),
   roofShade: atmShade(mix(CM.stoneShade, CM.shadeCool, 0.62), 2),
-  well: atmShade(mix(CM.shadeCool, CM.anchor, 0.25), 2),
-  wellDeep: atmShade(mix(CM.shadeCool, CM.anchor, 0.35), 2),
-  paneShade: atmShade(mix(CM.paneUnlit, CM.anchor, 0.15), 2),
-  paneLit: atm(mix(CM.paneUnlit, CM.limestone, 0.45), 2),
+  // the four light wells TONE-ON-TONE with the roof (L* 61 on its 70: the critic's single scale change, 2026-10-28): the
+  // rings read as a huge complex's roof grain far away, never as dark grooves on a model past the railing
+  well: atmShade(mix(CM.stoneShade, CM.shadeCool, 0.8), 2),
+  // its windows TONE-ON-TONE (CRAFT §f.2: windows dE <= 6 from their wall from +2, never a dark speck; §c: no specks):
+  // the rows still read as the facade's grain, without ~700 dark specks (QA 2026-10-28: 74 % of the end frame's
+  // strokes, line measure 457 strokes / Mpx at 23.4); the warm run (paneWarm, 23.08) is the one window beat
+  paneShade: toneOnTone(FACADE_SHADE, {dE: 6}),
+  paneCourt: toneOnTone(FACADE_SHADE_DEEP, {dE: 6}),
+  paneLit: toneOnTone(FACADE_LIT, {dE: 6}),
   paneWarm: atm(CM.lamp, 2),
   courtLawn: atmShade(mix(CM.sage, CM.shadeCool, 0.18), 2),
   courtLawnLit: atm(CM.sage, 2),
@@ -37,9 +58,53 @@ export const PT5 = {
   courtBlossom: atm(CM.blossom, 2),
   pavilion: atm(CM.paper, 2),
   pavilionRoof: atm(CM.brick, 2),
-  // its cast shadow on the lawn toward us: deep enough that the shaded front facade keeps a fill step off it (L* ~55)
-  shadow: atm(mix(CM.sage, CM.anchor, 0.46), 2),
   ink: inkCol(2),
+};
+
+/** The building's cast (left and toward us) is a LIGHT-LAYER shadow, never a hand-picked fill (CRAFT §d.3: the critic,
+ *  2026-10-28: the old flat L* 55 C* 4 fill read grey-olive): the ground under it times the rig's ONE family at its
+ *  CAST strength (`tint="cast"`, the rig from context; CRAFT §d.3's cast dL* -10..-15). It falls mostly on the warm
+ *  boulevard and ring paving (~80 % of what shows: L* 88 -> 75, C* 16, h 53, the terrace's own rose-tan shade) and on
+ *  the lawn's edge, where it takes RIG_APRIL's `lawn` tint (the integrator, 2026-10-28, L4's request: the rose family
+ *  read L* 80 -> 67, C* 11.5, h 105 there, olive; now the lawn's own deeper step, h ~125, C* ~17, the same value):
+ *  `CastOnGround` splits it on the valley's paving (V2S5_valley pavingD5). The shaded front facades (L* 60) stand a step
+ *  under it: a shaded edge on a lighter field (§f.3). Its screen path: the footprint swept along the end light (the kit
+ *  lens' 3D shadow offset). */
+
+const castD = (): string => {
+  const outer = pentagon(PENT.apothem);
+  return polyD(hull([...outer, ...shifted(outer, shadowOffset(H))].map((q) => P3(q, 0))));
+};
+
+/** A ground shadow split by surface: RIG_APRIL's `cast` tint where it falls on the paving, its `lawn` tint on the lawn
+ *  (two complementary masks of the same paved shapes: no double darkening, no gap). Inside a ShadowLayer. */
+const CastOnGround: React.FC<{d: string; soft?: number}> = ({d, soft = 3}) => {
+  const id = 'p5g' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const pav = useMemo(pavingD5, []);
+  const box = {x: -4000, y: -4000, width: 10000, height: 10000};
+  return (
+    <>
+      <defs>
+        <mask id={`${id}p`} maskUnits="userSpaceOnUse" {...box}>
+          {pav.map((p, i) => (
+            <path key={i} d={p} fill="#FFFFFF" />
+          ))}
+        </mask>
+        <mask id={`${id}l`} maskUnits="userSpaceOnUse" {...box}>
+          <rect {...box} fill="#FFFFFF" />
+          {pav.map((p, i) => (
+            <path key={i} d={p} fill="#000000" />
+          ))}
+        </mask>
+      </defs>
+      <g mask={`url(#${id}p)`}>
+        <Shadow d={d} tint="cast" soft={soft} />
+      </g>
+      <g mask={`url(#${id}l)`}>
+        <Shadow d={d} tint="lawn" soft={soft} />
+      </g>
+    </>
+  );
 };
 
 const H = PENT.height;
@@ -116,9 +181,7 @@ const PentagonBody: React.FC<Pentagon5Props> = ({warmAt, warmDur = 0.7, seed = '
     const outer = pentagon(PENT.apothem);
     const b = new Batch();
 
-    // ---- 1. the shadow on the lawn (toward the lens and left), under everything
-    const sh = shadowOffset(H);
-    b.poly(PT5.shadow, hull([...outer, ...shifted(outer, sh)].map((q) => P3(q, 0))));
+    // ---- 1. the shadow on the lawn (toward the lens and left): the light layer below (PentagonBody's ShadowLayer)
 
     // ---- 2. the courtyard: floor (its far part in the far ring's shadow), paths, trees, the small pavilion
     b.layer();
@@ -169,7 +232,7 @@ const PentagonBody: React.FC<Pentagon5Props> = ({warmAt, warmDur = 0.7, seed = '
         for (let s = -hs + 2; s < hs - 2; s += PENT.windowPitch) {
           const a2 = sidePt(i, PENT.courtApothem - 0.06, s);
           const b2 = sidePt(i, PENT.courtApothem - 0.06, s + 1.4);
-          b.poly(PT5.paneShade, [P3(a2, z1), P3(b2, z1), P3(b2, z0), P3(a2, z0)]);
+          b.poly(PT5.paneCourt, [P3(a2, z1), P3(b2, z1), P3(b2, z0), P3(a2, z0)]);
         }
       }
     }
@@ -204,9 +267,9 @@ const PentagonBody: React.FC<Pentagon5Props> = ({warmAt, warmDur = 0.7, seed = '
       const B = vert(PENT.apothem, (sd.i + 1) % 5);
       const lit = sd.light > -0.05;
       b.poly(lit ? PT5.facadeLit : PT5.facadeShade, [P3(A, 0), P3(B, 0), P3(B, H), P3(A, H)]);
-      // cornice band and plinth (flat steps)
+      // cornice band and plinth (flat steps): the shaded facade's foot a step deeper (its base edge on the lighter cast)
       b.poly(PT5.cornice, [P3(A, H - 1.1), P3(B, H - 1.1), P3(B, H), P3(A, H)]);
-      b.poly(lit ? PT5.facadeShade : PT5.facadeShadeDeep, [P3(A, 0), P3(B, 0), P3(B, 0.9), P3(A, 0.9)]);
+      b.poly(lit ? PT5.facadeMid : PT5.facadeFoot, [P3(A, 0), P3(B, 0), P3(B, 0.9), P3(A, 0.9)]);
       for (const w of facadeWindows(sd.i)) (lit ? winBatch.lit : winBatch.shade).push(polyD(w.q));
     }
     b.layer();
@@ -225,7 +288,7 @@ const PentagonBody: React.FC<Pentagon5Props> = ({warmAt, warmDur = 0.7, seed = '
       bases.push(P3(vert(PENT.apothem, sd.i), 0), P3(vert(PENT.apothem, (sd.i + 1) % 5), 0));
     }
     const sil = hull([...roofOut, ...bases]);
-    b.ink(lineD([...sil, sil[0]]), INK_PX.mid, CM.ink, 0, {tone: PT5.facadeShade});
+    b.ink(lineD([...sil, sil[0]]), INK_PX.mid, CM.ink, 0, {tone: PT5.facadeMid});
     return b;
   }, [seed]);
 
@@ -250,8 +313,12 @@ const PentagonBody: React.FC<Pentagon5Props> = ({warmAt, warmDur = 0.7, seed = '
     };
   }, [warmAt, warmDur, warm, seed]);
   const wd = warmD ? warmD(t) : '';
+  const cast = useMemo(castD, []);
   return (
     <>
+      <ShadowLayer>
+        <CastOnGround d={cast} soft={3} />
+      </ShadowLayer>
       <Paint b={parts} seed={`${seed}/p`} misreg={false} />
       {wd ? <path d={wd} fill={PT5.paneWarm} /> : null}
     </>

@@ -15,11 +15,15 @@ import {CastShadow, ContactShadow, FormShade, ShadowLayer} from '../../lib/light
 import {Batch, Paint, P, ovalPath} from '../kit/canal/core';
 import type {Pt} from '../kit/canal/core';
 import {S3_CAM, onPlane, planeBatch} from './V2S3_depth';
+import {PLANTER_WOOD} from './V2S2_Near';
 
 const cam = S3_CAM;
-/** The near iron (the bench's end frames, the bollard): a mid plum, dark but never near-black (her plum silhouette is
- *  the darkest, clearest shape in the frame). */
-const IRON = CM.coatPlum;
+/** The near iron (bench ends, bollard): a warm slate (L2's near tyres), never plum: her plum silhouette stays the frame's
+ *  darkest, and the near things never its darkest mass. */
+const IRON = '#7E7387';
+/** The mooring bollard: the same slate, deep (a cast-iron post reads dark; its dome stands in front of the boat's plum
+ *  stripe, which it meets at one value, never as a light notch). */
+const BOLLARD_IRON = '#4A4656';
 const PLANE = -2;
 
 /** The bench (metres): its long axis along the canal, its back toward us; x from -2.0 to -0.2 m, the back legs at
@@ -35,11 +39,31 @@ const pt = (x: number, z: number, level = 0): Pt => cam.pt(x, z, level);
 
 /** The bench seen from behind: the iron end frames (rear legs, arms), the three back slats, the seat's front edge seen
  *  through the slats' gaps, the bag on the seat. */
+/** A polygon with its corners rounded (each cut back `d` px along both edges, at most a third of the edge): cast iron
+ *  is cast round, and a sharp dark corner reads as a tick. */
+function roundPoly(pts: Pt[], d = 6): string {
+  const n = pts.length;
+  const cut = (a: Pt, b: Pt): Pt => {
+    const l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+    const k = Math.min(d, l / 3) / l;
+    return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k];
+  };
+  let s = '';
+  for (let i = 0; i < n; i++) {
+    const v = pts[i];
+    const a = cut(v, pts[(i + n - 1) % n]);
+    const c = cut(v, pts[(i + 1) % n]);
+    s += `${i ? 'L' : 'M'}${P(a[0], a[1])}Q${P(v[0], v[1])} ${P(c[0], c[1])}`;
+  }
+  return s + 'Z';
+}
+
 function benchBatch(): Batch {
   const b = new Batch();
   const {x0, x1, zBack, zFront, seat, back0, back1} = BENCH;
-  const wood = CM.line;
-  const woodLit = seamTone(CM.line, -8);
+  // the slats: L2's mid wood (S2's planter on the same towpath), never the darkest mass
+  const wood = PLANTER_WOOD;
+  const woodLit = seamTone(PLANTER_WOOD, -8);
   // the seat (its planks, seen in the gaps between the back slats: the far edge one step lighter, it faces the sky)
   b.poly(woodLit, [pt(x0 + 0.04, zFront, seat), pt(x1 - 0.04, zFront, seat), pt(x1 - 0.04, zBack, seat), pt(x0 + 0.04, zBack, seat)]);
   b.layer();
@@ -51,7 +75,7 @@ function benchBatch(): Batch {
   b.poly(CM.coatMustard, [[bx - bw * 0.5, by], [bx + bw * 0.5, by], [bx + bw * 0.44, by - bh * 0.72], [bx - bw * 0.44, by - bh * 0.72]]);
   b.rect(seamTone(CM.coatMustard, 10), bx - bw * 0.47, by - bh * 0.28, bw * 0.94, bh * 0.08);
   const hy = by - bh * 0.72;
-  b.fill(seamTone(CM.coatMustard, 14), `M${P(bx - bw * 0.3, hy)}Q${P(bx - bw * 0.26, hy - bh * 0.34)} ${P(bx, hy - bh * 0.34)}Q${P(bx + bw * 0.26, hy - bh * 0.34)} ${P(bx + bw * 0.3, hy)}L${P(bx + bw * 0.2, hy)}Q${P(bx + bw * 0.18, hy - bh * 0.24)} ${P(bx, hy - bh * 0.24)}Q${P(bx - bw * 0.18, hy - bh * 0.24)} ${P(bx - bw * 0.2, hy)}Z`);
+  b.fill(seamTone(CM.coatMustard, 7), `M${P(bx - bw * 0.3, hy)}Q${P(bx - bw * 0.26, hy - bh * 0.34)} ${P(bx, hy - bh * 0.34)}Q${P(bx + bw * 0.26, hy - bh * 0.34)} ${P(bx + bw * 0.3, hy)}L${P(bx + bw * 0.2, hy)}Q${P(bx + bw * 0.18, hy - bh * 0.24)} ${P(bx, hy - bh * 0.24)}Q${P(bx - bw * 0.18, hy - bh * 0.24)} ${P(bx - bw * 0.2, hy)}Z`);
   b.layer();
   // the back slats (three planks across, a gap between each), on the rear frame
   for (let k = 0; k < 3; k++) {
@@ -62,9 +86,9 @@ function benchBatch(): Batch {
   // the iron end frames: a rear leg up to the back's top, an arm forward at seat height, a front leg
   for (const ex of [x0 + 0.03, x1 - 0.03]) {
     const w = 0.05;
-    b.poly(IRON, [pt(ex - w, zBack, back1 + 0.02), pt(ex + w, zBack, back1 + 0.02), pt(ex + w, zBack, 0), pt(ex - w, zBack, 0)]);
-    b.poly(IRON, [pt(ex - w, zBack, seat + 0.2), pt(ex - w, zFront, seat + 0.2), pt(ex - w, zFront, seat + 0.15), pt(ex - w, zBack, seat + 0.15)]);
-    b.poly(IRON, [pt(ex - w * 0.8, zFront, seat + 0.18), pt(ex + w * 0.8, zFront, seat + 0.18), pt(ex + w * 0.8, zFront, 0), pt(ex - w * 0.8, zFront, 0)]);
+    b.fill(IRON, roundPoly([pt(ex - w, zBack, back1 + 0.02), pt(ex + w, zBack, back1 + 0.02), pt(ex + w, zBack, 0), pt(ex - w, zBack, 0)]));
+    b.fill(IRON, roundPoly([pt(ex - w, zBack, seat + 0.2), pt(ex - w, zFront, seat + 0.2), pt(ex - w, zFront, seat + 0.15), pt(ex - w, zBack, seat + 0.15)]));
+    b.fill(IRON, roundPoly([pt(ex - w * 0.8, zFront, seat + 0.18), pt(ex + w * 0.8, zFront, seat + 0.18), pt(ex + w * 0.8, zFront, 0), pt(ex - w * 0.8, zFront, 0)]));
   }
   return planeBatch(b, PLANE);
 }
@@ -86,7 +110,7 @@ export const bollardNeck = (): Pt => {
 
 function bollardBatch(): Batch {
   const b = new Batch();
-  b.fill(IRON, bollardD());
+  b.fill(BOLLARD_IRON, bollardD());
   return planeBatch(b, PLANE);
 }
 

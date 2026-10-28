@@ -49,16 +49,20 @@ rf "$OUT/full" 13.5,17.0,19.9 --scale=1
 rf "$OUT/off" 13.5,17.0,19.9 --scale=1 --props='{"lightOff":true}'
 f() { python3 -c "import sys; print('%s/f%05d.png' % (sys.argv[2], round(float(sys.argv[1]) * 60)))" "$1" "$2"; }
 echo "== check_light"
-python3 scripts/qa/check_light.py "$(f 13.5 $OUT/off)" "$(f 13.5 $OUT/full)" --subject 255,700,410,870 --sky '#BCDCCF' --exclude 0,0,1080,600 2>&1 | tail -6
-python3 scripts/qa/check_light.py "$(f 17.0 $OUT/off)" "$(f 17.0 $OUT/full)" --subject 660,880,790,1080 --sky '#BCDCCF' --exclude 0,0,1080,600 2>&1 | tail -6
-python3 scripts/qa/check_light.py "$(f 19.9 $OUT/off)" "$(f 19.9 $OUT/full)" --subject 660,880,790,1080 --sky '#BCDCCF' --exclude 0,0,1080,600 2>&1 | tail -6
+echo '-- 13.5 S3 her window'; python3 scripts/qa/check_light.py "$(f 13.5 $OUT/off)" "$(f 13.5 $OUT/full)" --subject 259,693,411,874 --sky '#BCDCCF' --exclude 0,0,1080,700 2>&1 | tail -6
+echo '-- 17.0 S4 her'; python3 scripts/qa/check_light.py "$(f 17.0 $OUT/off)" "$(f 17.0 $OUT/full)" --subject 684,896,758,1072 --sky '#BCDCCF' --exclude 0,0,1080,745 2>&1 | tail -6
+echo '-- 19.9 S4 her box'; python3 scripts/qa/check_light.py "$(f 19.9 $OUT/off)" "$(f 19.9 $OUT/full)" --subject 684,896,758,1072 --sky '#BCDCCF' --exclude 0,0,1080,745 2>&1 | tail -6
+echo '-- 19.9 S4 her + the plates (tier A at the hold)'; python3 scripts/qa/check_light.py "$(f 19.9 $OUT/off)" "$(f 19.9 $OUT/full)" --subject 100,750,758,1072 --sky '#BCDCCF' --exclude 0,0,1080,745 2>&1 | tail -6
 echo "== check_depth"
 for t in 13.5; do python3 scripts/qa/check_depth.py "$(f $t $OUT/full)" --sheet scripts/qa/depth_sheets/v2_s3.json --quiet 2>&1 | tail -4; done
-for t in 17.0 19.9; do python3 scripts/qa/check_depth.py "$(f $t $OUT/full)" --sheet scripts/qa/depth_sheets/v2_s4.json --quiet 2>&1 | tail -4; done
+echo '-- 17.0 v2_s4.json'; python3 scripts/qa/check_depth.py "$(f 17.0 $OUT/full)" --sheet scripts/qa/depth_sheets/v2_s4.json --quiet 2>&1 | tail -4
+echo '-- 19.9 v2_s4_hold.json'; python3 scripts/qa/check_depth.py "$(f 19.9 $OUT/full)" --sheet scripts/qa/depth_sheets/v2_s4_hold.json --quiet 2>&1 | tail -4
 echo "== line metrics (full size, caption zone masked)"
 python3 -I scripts/qa/retro_tools/line/measure.py "$OUT/measure.json" "s3_13.5=$(f 13.5 $OUT/full)#290-600" "s4_17.0=$(f 17.0 $OUT/full)#290-600" 2>&1 | tail -2
 (cd scripts/qa/retro_tools/line && python3 ends.py "s3_13.5=$(f 13.5 $OUT/full)#290-600" "s4_17.0=$(f 17.0 $OUT/full)#290-600" 2>&1 | tail -4)
 echo "== banding (open sky)"
-python3 -I scripts/qa/check_banding.py "$(f 13.5 $OUT/full)" --region ${S3_SKY_REGION:-400,0,1080,280} --quiet 2>&1 | tail -2
-python3 -I scripts/qa/check_banding.py "$(f 17.0 $OUT/full)" --region ${S4_SKY_REGION:-400,0,1080,280} --quiet 2>&1 | tail -2
+python3 -I scripts/qa/check_banding.py "$(f 13.5 $OUT/full)" --region 0,0,1080,595 2>&1 | grep -E 'PASS|FAIL|WARN' | tail -1
+python3 -I scripts/qa/check_banding.py "$(f 17.0 $OUT/full)" --region 0,0,1080,280 2>&1 | grep -E 'PASS|FAIL|WARN' | tail -1
+python3 -I scripts/qa/check_banding.py "$(f 19.9 $OUT/full)" --region 0,0,1080,280 2>&1 | grep -E 'PASS|FAIL|WARN' | tail -1
+python3 -I scripts/qa/check_banding.py "$(f 19.9 $OUT/full)" --region 322,604,424,730 2>&1 | grep -E 'PASS|FAIL|WARN' | tail -1
 echo "== done: $OUT"

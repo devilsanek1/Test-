@@ -108,6 +108,32 @@ function dense(pts: Pt[], step = 25): Pt[] {
   return out;
 }
 
+/** The mid ground's PAVED shapes (MID plane screen px, nonzero, exactly as MidGround5 fills them): the ring road round
+ *  the building, its link to the boulevard, Washington Boulevard (its kerbed width, the road inside it) and the lawn
+ *  paths. Everything else of the ground is lawn. */
+type Paving5 = {ring: string; link: string; kerb: string; road: string; paths: string[]};
+let PAVING5: Paving5 | null = null;
+const paving5 = (): Paving5 => {
+  if (PAVING5) return PAVING5;
+  const ringO = pentagon(PENT.apothem + 42).map(G);
+  const ringI = pentagon(PENT.apothem + 34).map(G);
+  PAVING5 = {
+    ring: polyD(ringO) + polyD(ringI),
+    link: groundRibbon(dense([[-260, -150], [-400, -120]]), 9),
+    kerb: groundRibbon(dense(WASH_BLVD5), 22),
+    road: groundRibbon(dense(WASH_BLVD5), 18),
+    paths: JOG_PATHS.map((p) => groundRibbon(dense(p, 20), 3.2)),
+  };
+  return PAVING5;
+};
+/** The paved ground as path strings (each nonzero; their union is the paving, the rest of the ground the lawn): a
+ *  light-layer shade that falls on both splits on it (V2S5_pentagon's cast: RIG_APRIL's `cast` tint on the paving, its
+ *  `lawn` tint on the lawn). */
+export const pavingD5 = (): string[] => {
+  const pv = paving5();
+  return [pv.ring, pv.link, pv.kerb, ...pv.paths];
+};
+
 /** A tree at a ground point: a flat shadow toward the lens-left, a crown sized in metres. */
 function tree(B: {shadow: string[]; crowns: Map<string, string[]>}, x: number, y: number, rM: number, col: string, seed: string) {
   const s = MID.pxPerM(x, y, 6);
@@ -139,15 +165,14 @@ const MidGroundBody: React.FC<{seed?: string}> = ({seed = 'midg'}) => {
     }
     // the ring road round the building (no traffic: part of the reservation) and its link to the boulevard
     B.layer();
-    const ringO = pentagon(PENT.apothem + 42).map(G);
-    const ringI = pentagon(PENT.apothem + 34).map(G);
-    B.fill(MT5.road, polyD(ringO) + polyD(ringI));
-    B.fill(MT5.road, groundRibbon(dense([[-260, -150], [-400, -120]]), 9));
+    const pv = paving5();
+    B.fill(MT5.road, pv.ring);
+    B.fill(MT5.road, pv.link);
     // Washington Boulevard (4 lanes), with its kerb edges a step darker
-    B.fill(MT5.roadEdge, groundRibbon(dense(WASH_BLVD5), 22));
-    B.fill(MT5.road, groundRibbon(dense(WASH_BLVD5), 18));
+    B.fill(MT5.roadEdge, pv.kerb);
+    B.fill(MT5.road, pv.road);
     // the lawn paths (joggers)
-    for (const p of JOG_PATHS) B.fill(MT5.path, groundRibbon(dense(p, 20), 3.2));
+    for (const d of pv.paths) B.fill(MT5.path, d);
 
     // groves and street trees (never on the building, its ring or the roads)
     B.layer();
@@ -258,7 +283,9 @@ export const MidGround5 = tiered('environment', {}, MidGroundBody);
  *  near-black plum), the clumps and flowers closer together, all receded one step toward the April air. */
 export const BLOOM_S5: BloomTones = {
   base: atm(mix(CM.shadeWarm, CM.blossom, 0.12), 1),
-  limb: atm(mix(CM.anchor, CM.shadeWarm, 0.45), 1),
+  // limbs TONE-ON-TONE with the mass (L* 48 on its 55: the critic, 2026-10-28: at phone size the old plum limbs, L* 37,
+  // read as scratches across the crowns); the shapes are the kit's
+  limb: atm(mix(CM.shadeWarm, CM.anchor, 0.1), 1),
   shade: atm(mix(CM.shadeWarm, CM.blossom, 0.42), 1),
   mid: atm(mix(CM.shadeWarm, CM.blossom, 0.64), 1),
   lit: atm(mix(CM.blossom, CM.brickLight, 0.12), 1),
@@ -328,6 +355,7 @@ export type NearMid5Props = {
 /** The near-mid slope in START coords: the slope's crowns (dark masses, limbs, then blossom that bursts in 4 frames on
  *  "April"), lit on the side facing the sun in the slot; the big tree's trunk. */
 const NearMidBody: React.FC<NearMid5Props> = ({burstAt, seed = 'nm'}) => {
+  const t = useTime();
   const crowns = useMemo(() => nearCrowns(seed), [seed]);
   const specs = useMemo<CrownSpec[]>(
     () =>
@@ -339,6 +367,12 @@ const NearMidBody: React.FC<NearMid5Props> = ({burstAt, seed = 'nm'}) => {
       }),
     [crowns],
   );
+  // In blossom, the small crowns (the slot trees, the back row: rx < 90, their limbs 2.2 px and twigs 1.2 px) drop
+  // their limbs: tier C draws no hairline twigs (CRAFT §c; QA 2026-10-28: ~90 of the 21.0 frame's 286 strokes); the
+  // bare trees keep them until the burst is done (the kit's bloomed, +0.12 s), and the big crowns that frame the slot
+  // keep their limbs (3-5 px structure).
+  const specsBloomed = useMemo<CrownSpec[]>(() => specs.map((c) => (c.rx < 90 ? {...c, limbs: false} : c)), [specs]);
+  const bloomed = burstAt === undefined || t >= burstAt + 0.12;
   const trunk = useMemo(() => {
     const B = new Batch();
     const bt = NEAR_MID5.bigTree;
@@ -358,7 +392,7 @@ const NearMidBody: React.FC<NearMid5Props> = ({burstAt, seed = 'nm'}) => {
   return (
     <>
       <Paint b={trunk} seed={`${seed}/trunk`} misreg={3} />
-      <BloomCrowns crowns={specs} burstAt={burstAt} seed={`${seed}/bl`} tones={BLOOM_S5} />
+      <BloomCrowns crowns={bloomed ? specsBloomed : specs} burstAt={burstAt} seed={`${seed}/bl`} tones={BLOOM_S5} />
     </>
   );
 };

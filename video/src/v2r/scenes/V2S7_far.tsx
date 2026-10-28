@@ -6,7 +6,7 @@
 //                board's top-left (nothing crosses the 7x window of the push-through, V2S7_plan S7_SUN_WINDOW)
 //   S7FarRoofs   +3: a far London row on the sunset band (three houses, chimneys, tone-on-tone windows), every fill
 //                its step toward the air (planePalette at 4.3: nearly the air itself, pre-compensated for the pen)
-//   S7FarTrees   +2: the far street's plane trees in autumn haze, gold crowns lit on the sun side (each value its own
+//   S7FarTrees   +2: the far street's plane trees in autumn haze, rose-peach crowns, gold where the sun catches them (each value its own
 //                step toward the air: the ladder falls >= 3 per plane from the wing, CRAFT §f.2)
 //   S7WestEdge   +1: the forecourt's west edge, flush with the wing: a clipped hedge on a low limestone wall (z 25)
 // Tier C throughout (<Tier tier="environment" bg={S7_AIR}>): flat fills, no line; the far tops stay at y >= 690 where
@@ -90,16 +90,16 @@ export const S7FarTrees: React.FC = () => {
     // three values per crown on +2, each its own step toward the air (the main gold one plane step, the lit and the
     // far side a little more: the plane's mean sits >= 3 closer to the air than the wing's, and >= 3 farther than
     // the roofs': the ladder of CRAFT §f.2)
-    const main = onPlane(CM.leafGold, 1);
-    const lit = onPlane(CM.stucco, 1.8);
-    const far = onPlane(CM.brickLight, 1.8);
+    const main = onPlane(CM.brickLight, 2.1);
+    const lit = onPlane('#E6C084', 2.6);
+    const far = onPlane(CM.leafGold, 2.6);
     const trunk = onPlane(CM.stoneShade, 2.4);
     for (const t of FAR_TREES) k.rect(trunk, t.x - 4, t.cy + t.ry * 0.6, 8, t.base - (t.cy + t.ry * 0.6));
     k.layer();
     for (const t of FAR_TREES) {
       k.fill(main, crownD(t.x, t.cy, t.rx, t.ry, {seed: t.seed, round: 0.75}));
-      k.fill(lit, crownD(t.x - t.rx * 0.3, t.cy - t.ry * 0.22, t.rx * 0.48, t.ry * 0.46, {seed: `${t.seed}/lit`, round: 0.75}));
-      k.fill(far, crownD(t.x + t.rx * 0.34, t.cy + t.ry * 0.3, t.rx * 0.42, t.ry * 0.36, {seed: `${t.seed}/sh`, round: 0.75}));
+      k.fill(lit, crownD(t.x - t.rx * 0.32, t.cy - t.ry * 0.26, t.rx * 0.4, t.ry * 0.36, {seed: `${t.seed}/lit`, round: 0.75}));
+      k.fill(far, crownD(t.x + t.rx * 0.36, t.cy + t.ry * 0.32, t.rx * 0.36, t.ry * 0.3, {seed: `${t.seed}/sh`, round: 0.75}));
     }
     return k;
   }, []);
@@ -142,3 +142,28 @@ export const S7WestEdge: React.FC = () => {
 export const s7WestWallFace = () => `M${P(-70, S7_WEST_Y.wall + 1.5)}L${P(360, S7_WEST_Y.wall + 1.5)}L${P(360, S7_WEST_Y.base)}L${P(-70, S7_WEST_Y.base)}Z`;
 
 export {ovalPath};
+
+// ---------------------------------------------------------------- +2 smoke from a moored boat's stove beyond the hedge
+
+/** Smoke from a narrowboat's stove on the canal beyond the west hedge (its roof hidden by the hedge): four warm-grey
+ *  puffs rising slowly and drifting west on the breeze, each growing in and shrinking out (never a fade), staying
+ *  below y 860; a pure function of the time. On +2 (the far street's air step). */
+export const S7BoatSmoke: React.FC<{t: number}> = ({t}) => {
+  const b = new Batch();
+  const cols = [onPlane('#D8C4BA', 1.6), onPlane('#E2D2C8', 1.6)];
+  const x0 = 78;
+  const y0 = 930;
+  for (let i = 0; i < 4; i++) {
+    const u = (((t + 10) / 3.2 + i / 4) % 1 + 1) % 1;
+    const r = 4 + 11 * Math.sin(Math.PI * Math.min(1, u * 1.15)) * (u < 0.87 ? 1 : (1 - u) / 0.13);
+    if (r < 1) continue;
+    const x = x0 - 34 * u - 6 * Math.sin(u * 5 + i);
+    const y = y0 - 72 * u;
+    b.fill(cols[i % 2], ovalPath(x, y, r, r * 0.86));
+  }
+  return (
+    <Tier tier="environment" bg={S7_AIR}>
+      <Paint b={b} seed="s7/boatSmoke" misreg={false} />
+    </Tier>
+  );
+};

@@ -163,10 +163,15 @@ Maintenance at the end).
   joins, and the owner approves the card with the script. The thread may also leave for a FAIRNESS beat the owner approves
   (the other side's equal-weight reply, a place the subject must never be): declare it on the card. — (v3, 2026-10-25; card:
   v3 retro, owner yes, 2026-10-27; fairness exception: v2, owner yes, 2026-10-27).
-- **The first 3 s / first scene must be a banger ("something is about to happen"):**
+- **The first 3 s / first scene must be a banger ("something is about to happen"), and every opening effect must be
+  BIG enough to stop a thumb:** judged as a viewer scrolling a feed on a phone, each effect (the draw-on, the hook's
+  mechanism, the ticks) is unmistakable on first watch: bold, large on screen, long enough to register, with its own
+  sound; a subtle effect counts as none. — (owner, v3, 2026-10-28: "initial animation effects like visual aspect should
+  be better and more effective at capturing people attention ... the initial drawing effect is barely visible or
+  noticeable and really don't impact or amazes me", of a 0.3 s pale draw-on and 30 px memory sticks.)
   - frame 0 is the scene being made, drawn on in the clean pen: the subject's outline (with the supporting lines)
-    first, then colour floods in within ~0.3 s (the lined films drew every line first; the owner sees the clean-pen
-    version in the next G4 look clip);
+    first, then colour floods in, as a visible event (bold line at full contrast, a moving pen tip, long enough to
+    read: ~0.3 s was invisible), never a pale wash (the lined films drew every line first);
   - voice from the first frames (the first word at ~0.12 s, the locked voice file's lead; never a silent lead);
   - the hook's claim made physical and escalating: the expected thing shown, then reality overtaking it at ~2 s,
     through the real mechanism;
@@ -175,8 +180,13 @@ Maintenance at the end).
   - the film loops back to frame 0.
   Details: `docs/look/CINEMATIC_GUIDE.md`, "The opening"; `docs/look/DIRECTION.md` rule 9. — (owner's reference, v3,
   2026-10-26; the clean pen and one focus, v3 G5b, 2026-10-27).
-- **State the payoff in words on frame 0; polish the first 2 s and 5 s most, then the first 10 s.** A calm, pretty
-  opening lost ~80 % of viewers by 3 s; late quirks are acceptable. — (v1 IG insights, 2026-10-25).
+- **State the payoff in words within the first ~2 s, in the voice's order; polish the first 2 s and 5 s most, then the
+  first 10 s.** A calm, pretty opening lost ~80 % of viewers by 3 s; late quirks are acceptable. The captions ARE the
+  words on screen: frame 0 shows the first spoken line, and when the voice opens with a question the payoff is the next
+  caption (by ~2 s). Never a title over the captions (no `frame0` block): it answers before the question is asked and
+  repeats the spoken line; the core line as a title belongs on the cover. — (v1 IG insights, 2026-10-25; v3,
+  2026-10-28: "why do we have the text repeat itself?", then "Why are we having this out of order weirdly? Should we
+  just show buying ..?").
 - **The hook is a concrete, surprising, TRUE claim with stakes**, verified against the primary source before it's
   locked; for a small news item, research the bigger story and lead with its strongest true framing. — (v2, 2026-10-25).
 - **Personal framings must feel natural, not over the top.** Never cast the viewer as a loser in a contest they don't
@@ -211,7 +221,12 @@ Maintenance at the end).
   important stage ... more like an animated sketchbook", 2026-10-26).
 - **Every shot reads instantly with the sound off: literal beats clever.** Recognisable things (a laptop that looks like a
   laptop, a plain labelled chart), the real mechanism, never a metaphor the facts don't support or that needs explaining;
-  a sound-off cold read before the owner sees any cut. — (v3 G3, 2026-10-26).
+  a sound-off cold read before the owner sees any cut. **Words in the world (signs, notices, cards, screens) are few and
+  big: each one reads at phone size at a glance, or it is not drawn.** No small source lines, quotes or fine print in
+  the picture (sources go in the caption and the pinned comment), never the same words twice on screen at once, and
+  nothing passes in front of words while they are the beat. Before any cut goes out, check every on-screen word at 0.25
+  scale. — (v3 G3, 2026-10-26; v3, 2026-10-28: "this text is weird", the notice's 11-13 px source and Micron lines, a
+  one-bar chart and a crate crossing its labels).
 - **Drawn like a professional storyboard: monochrome, clarity first, and cinematic** (framing, angle, scale, coziness
   decided in the board; clarity from composition, never icons on blank paper; every panel names its shot type). Spec:
   `docs/look/STORYBOARD_STYLE.md`. — ("very simple, avoid colours for now", v3 G3, 2026-10-26).
@@ -281,7 +296,12 @@ Maintenance at the end).
   initial intermediate step", v3 G5, 2026-10-26).
 - **The weekly limit is the real budget: finishing the video comes first** (using up to 100 % of the week is fine if the
   video is completed; with several films in flight they share it, and finishing them comes before starting a new one).
-  Track the spend hourly (helpers' `cost_usd`, workflow tokens), budget every lane, finish before polishing. The
+  Track the spend hourly (helpers' `cost_usd`, workflow tokens), budget every lane, finish before polishing. **Close to
+  a limit, drop the low-signal stages first and keep what changes the film** (owner, v3, 2026-10-28: "we are getting
+  close to our token limits can we drop some stages some redundant low signal work"): keep the fixes for problems already
+  found and the master; drop a separate verifier when the final assembler re-checks every fix at its time, extra
+  reviewers on a lens another already covers, full-film re-renders inside fix lanes (stills at the finding's time do),
+  and the minors (listed as deferred, never silently). Resume stopped lanes scoped to their blockers and majors. The
   **5-hour session limit** is a hard wall shared by every session: watch both; before it hits, PAUSE in a controlled way
   (every lane stops its agents, commits + pushes, writes its handover; schedule the resume after the reset), so nothing
   is lost. **Commit progress periodically, so a limit that hits without warning costs minutes, not work:** every agent
@@ -297,7 +317,7 @@ Maintenance at the end).
   design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the
   quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
   reviewing what will still change, early polish, a review loop that has stopped improving the shot: `docs/PIPELINE_V2.md`
-  rule 2). — (2026-10-25; owner, 2026-10-26).
+  rule 2, and checks that repeat another check). — (2026-10-25; owner, 2026-10-26; 2026-10-28).
 - **Locked means dropped:** rejected options go to `archive/`, never seen by later prompts; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
 - **New feedback is INTEGRATED, never just appended:** when a note changes the direction, rewrite or retire every rule and
   doc it contradicts in the same pass, so the next agent never meets conflicting instructions. The current visual and
@@ -341,6 +361,8 @@ Maintenance at the end).
 - ~~G3: animate only where timing is the question~~ → the animated sketchbook plays every move and transition (2026-10-26).
 - ~~v1's ink line as the film's line (overshoot, open contours, offset fills, weight by depth)~~ → the clean pen, lines
   by story role (v3 G5b, 2026-10-27).
+- ~~The core line as a title over the captions from frame 0 (`frame0`)~~ → the captions in the voice's order, the
+  payoff by ~2 s; the core line as a title only on the cover (v3, 2026-10-28).
 - ~~Frame 0 as the whole scene in bare ink lines~~ → frame 0 drawn on in the clean pen, shown to the owner at the next
   G4 look clip (2026-10-27).
 - ~~Something new every few frames from any element~~ → from the story's own build, one focus at a time (v3 G5b, 2026-10-27).

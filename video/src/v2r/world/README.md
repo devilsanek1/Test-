@@ -47,9 +47,14 @@ move maps them about its anchor (`scaleAbout`); match points are screen px AT th
 - S1 and S8 both show W at zoom 1.00 (150 x 170): the loop seam matches with no pull-out and no seam push.
 - S1 feet follow the one lens: G6 feet 1068, O3 1057 (sizes exactly 170 -> 135, outlines 130 -> 120).
 - Her window takes M in S2 (the staff window there moved to her old spot): the S2 -> S3 match is the thread itself.
-- S4's far window sits at (135, 698), 90 x 102 (S8's W proportion): the draft's ~(150, 790) lay behind the DEC plate
+- S4's far window sits at (125, 698), 90 x 102 (S8's W proportion): the draft's ~(150, 790) lay behind the DEC plate
   (x 110-560, y 755-855 from 18.92) and crossed SUN1's disc, so the spot rises clear of both (6 px above the plate, left
-  of the disc) and leaves y 600-647 for her house's eave, mansard and pots.
+  of the disc) and leaves y 600-647 for her house's eave, mansard and pots; at (135, 698) its frame and cornice sat 3-5 px
+  from the disc's limb (a tangent at phone size), so it moved 10 px left (2026-10-28; SUN1 keeps r 65: S5's far plane
+  is pinned to it).
+- S2's board face and bench are where S2 draws them (2026-10-28, L2's request): the A-board x 110-510 (50 px left of the
+  treatment's 160-560, clear of Pip's seat), the bench x 600-800, y 1110-1290 on the board's ground line, the reporter
+  and the staffer seated on it (x 640 / 718, heads at y 1120 / 1104).
 - S5's lamppost wipe runs 22.02-22.19 (p 0.37-0.51): p 0.40-0.50 is only 7 frames, the treatment asks >= 10.
 - S6 is held (drift 0): Pip sits at the board's foot (360, 1410) at 98 px, its head 204 px under the clause's last
   line; the corner post keeps its own spot (`S6.cornerPost`).

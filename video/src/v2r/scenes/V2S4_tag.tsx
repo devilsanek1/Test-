@@ -18,6 +18,7 @@ import {Fill} from '../../lib/Fill';
 import {Ink} from '../../lib/Ink';
 import {clamp, ease, springAt, useTime} from '../../lib/time';
 import {XG, mat} from '../../lib/xf';
+import {Tier} from '../../lib/tier';
 import {useCaptionFont} from '../../lib/font';
 import {P, ovalPath} from '../kit/canal/core';
 import {WorldText} from '../kit/boards/WorldText';
@@ -72,8 +73,9 @@ export const S4Tag: React.FC = () => {
   const ly1 = bottom - 1;
   const leader = `M${P(lx0, ly0)}Q${P((lx0 + CARD_END_X) / 2 + 6, (ly0 + ly1) / 2)} ${P(CARD_END_X, ly1)}`;
   return (
+    <Tier tier="subject" tone={CM.paper}>
     <XG m={outer}>
-      {ly0 - ly1 > 4 ? <Ink d={leader} at={T1} dur={0.08} width={INK_PX.hair} seed="s4tagLeader" exit={false} /> : null}
+      {ly0 - ly1 > 4 ? <Ink d={leader} at={T1} dur={0.08} width={INK_PX.hair} color={CM.line} seed="s4tagLeader" exit={false} /> : null}
       <XG m={pop}>
         <Fill d={card} color={CM.paper} offset={false} seed="s4tagCard" />
         {ext > 0.02 ? <Ink d={`M${P(X0 + 10, Y1A - 4)}L${P(X1 - 12, Y1A - 4)}`} width={INK_PX.hair} color={CM.stoneShade} seed="s4tagCrease" /> : null}
@@ -85,5 +87,6 @@ export const S4Tag: React.FC = () => {
         ))}
       </XG>
     </XG>
+    </Tier>
   );
 };

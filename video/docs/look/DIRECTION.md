@@ -73,7 +73,8 @@ A clash is a bug: fix the lower doc in the same turn.
   grey; a warm world held by one cool field; saturation as confetti, never fields. Money and everyday life: #9 Autumn
   Ember (#7 Autumn Ochre read sick). **One continuous sky** (owner, v2 G4): from the frame top to the horizon the sky
   is ONE gentle, smooth gradient (the owner's opt-in: the sky is the one place a gradient is welcome; "find a beautiful
-  way to do a gentle gradient"), warmest at the sun and the horizon, dithered so it never bands on a phone, nearly
+  way to do a gentle gradient"; water may mirror that same sky, toned toward it: the sky's own gradient seen in it,
+  `CRAFT.md` §f.7), warmest at the sun and the horizon, dithered so it never bands on a phone, nearly
   flat inside the caption band (captions keep their contrast); the far haze takes the sky's lowest colour; no two big
   fields of unrelated colour meet in a seam no object explains. -> `PALETTE.md`; `COZY_AND_SCALE.md` 3b.6; `CRAFT.md` §f;
   the sky: `CRAFT.md` §g (`lib/sky.tsx`, `check_banding.py`, the master encode).
@@ -94,7 +95,9 @@ A clash is a bug: fix the lower doc in the same turn.
   every map-critical frame; `lib/depth.ts` parallax helper); a zoom is a visible story move or a carrier; no roll, no compound moves; visuals
   lead their word by ~0.1 s. -> `G3_ANIMATIC.md` §4; `PIPELINE_V2.md` "Frame rate"; `COZY_AND_SCALE.md` 3b.5.
 - **9. The opening is a banger.** Frame 0 is the scene being drawn, in the clean pen: the subject's outline (with B's
-  tinted lines) draws on, C lands as flat pale shapes and colour floods in within ~0.3 s, with the core line in words,
+  tinted lines) draws on, C lands as flat pale shapes and colour floods in, as a bold event a scrolling viewer can't miss (~0.3 s was
+  invisible: owner, 2026-10-28; every opening effect large, long enough to register, with its own sound), with the captions in the voice's order (frame 0 shows the first spoken line, the
+  payoff in words by ~2 s; no title over them: playbook Hook and pacing),
   the voice from the first frames (the first word at ~0.12 s, the locked voice file's lead) and a positive phone sound
   in the first second; the hook made physical in ONE continuous shot (the expected thing, then reality overtaking it
   at ~2 s through the real mechanism), something new every few frames from the subject's own build, never from extra

@@ -4,14 +4,15 @@
 // tier C everywhere but the story pieces (they come in through the slots with their own tiers).
 // Back to front:
 //   plane +1   the wall (V2S2_Wall: the wing + its stepped tiers, the story windows, the overlay), the parapet pigeons
-//              on the far bays (they lift once, 7.85, and fly out right), the water + the far towpath + the far lamps (V2S2_Water), the far life (slot),
+//              on the far bays (they lift once, 7.85, and fly out right), the water alone (V2S2_Water S2WaterSurface), the
+//              far towpath + its coping + the far lamp (S2FarBank), the far life (slot),
 //              the passing boat (from 7.55), the ducks
 //   plane -0.5 our towpath's far rows (V2S2_Near S2Towpath part 'far': the ground under the bank's things)
 //   plane 0    our coping + railing (V2S2_Near S2Bank), Pip (slot) on the coping, the A-board (slot: drawn BEFORE the
 //              kiosk so it slides out from behind it), the kiosk (its awning clear of SW5), the newsagent (slot), the
 //              bench (its iron ends CM.line, never plum) with its people (slot drawn before the backrest)
-//   plane -1   our towpath's near rows (part 'near'), the light on our towpath (V2S2_Light), the kiosk's foot (bundles,
-//              crate), the dog lying at rest, the planter of grasses, the slim near lamp + the bike locked to it
+//   plane -1   our towpath's near rows (part 'near'), the light on our towpath (V2S2_Light), the leaves blown across it
+//              (slot, each in its own plane group), the planter of grasses, the slim near lamp + the bike locked to it
 import React, {useMemo} from 'react';
 import {CM} from '../palette';
 import {Tier} from '../../lib/tier';
@@ -21,7 +22,7 @@ import {Batch, Paint} from '../kit/canal/core';
 import {seamTone} from '../../lib/depth';
 import {S2Wall} from './V2S2_Wall';
 import type {S2WallProps} from './V2S2_Wall';
-import {S2Water, S2PassingBoat, S2Ducks} from './V2S2_Water';
+import {S2WaterSurface, S2FarBank, S2PassingBoat, S2Ducks} from './V2S2_Water';
 import {S2Bank, S2Towpath, S2NearThings, S2KioskFoot} from './V2S2_Near';
 import {S2TowpathLight, S2BankLight, S2PlanterForm} from './V2S2_Light';
 import {S2Plane, S2_PLANE} from './V2S2_Float';
@@ -61,18 +62,22 @@ export type V2S2SetProps = Pick<S2WallProps, 'staffCoolAt' | 'storyOverlay' | 's
   pip?: React.ReactNode;
   /** The far towpath's life (plane +1). */
   farLife?: React.ReactNode;
+  /** The leaves blown across our towpath (in its plane group, after its light, BEFORE the near things: the planter's
+   *  grass, the bike and the lamp post pass in front of them). */
+  leaves?: React.ReactNode;
   /** Particles and other light life (drawn last, each in its own plane group). */
   extra?: React.ReactNode;
 };
 
-export const V2S2Set: React.FC<V2S2SetProps> = ({staffCoolAt, storyOverlay, storyTier, aBoard, agent, bench, pip, farLife, extra}) => (
+export const V2S2Set: React.FC<V2S2SetProps> = ({staffCoolAt, storyOverlay, storyTier, aBoard, agent, bench, pip, farLife, leaves, extra}) => (
   <>
     <S2Plane plane={S2_PLANE.wall}>
       <S2Wall staffCoolAt={staffCoolAt} storyOverlay={storyOverlay} storyTier={storyTier} />
       {/* the parapet pigeons on the far bays (sized to them), clear of the story windows: they lift once at 7.85 and
           fly right, out of the frame by ~10.3 (the kit keeps them under y 600: they never cruise a ceiling in view) */}
       <Pigeons ledge={[800, 950, 680]} n={4} size={14} seed="s2parapet" liftAt={7.85} dir={1} ceil={600} />
-      <S2Water />
+      <S2WaterSurface />
+      <S2FarBank />
       {farLife}
       <S2PassingBoat />
       <S2Ducks />
@@ -98,6 +103,9 @@ export const V2S2Set: React.FC<V2S2SetProps> = ({staffCoolAt, storyOverlay, stor
     <S2Plane plane={S2_PLANE.towpath}>
       <S2Towpath part="near" />
       <S2TowpathLight />
+    </S2Plane>
+    {leaves}
+    <S2Plane plane={S2_PLANE.towpath}>
       <S2NearThings />
       <S2PlanterForm />
     </S2Plane>

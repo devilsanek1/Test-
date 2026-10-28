@@ -11,11 +11,7 @@
 //          turns side-on, so nothing snaps); it stays seated: the A push-through into SUN1 (20.40-20.70) sweeps it.
 // Its idle (blink, ears, breathing, tuft, tail, scarf) never stops.
 import React from 'react';
-import {CM} from '../palette';
-import {Fill} from '../../lib/Fill';
-import {useTime} from '../../lib/time';
-import {PipTrack, PipTrackProps, trackAt} from '../kit/pip';
-import {ovalPath} from '../kit/canal/core';
+import {PipTrack, PipTrackProps} from '../kit/pip';
 import {S4_BEATS, S4_HER_HEAD, S4_PIP, S4_START} from './V2S4_rig';
 
 type XY = [number, number];
@@ -71,22 +67,6 @@ export const S4_PIP_TRACK: PipTrackProps = {
   ],
 };
 
-/** Its contact shadow on the roof (colour, never grey): a flat oval a little east of its seat (the low sun is west),
- *  scaled by how high Pip is above the roof (it rides seated: always ~1). */
-const RoofShadow: React.FC = () => {
-  const t = useTime();
-  const st = trackAt(S4_PIP_TRACK, t);
-  const [sx, sy] = S4_PIP.seat;
-  const lift = Math.max(0, sy - st.y);
-  const k = Math.max(0, 1 - lift / 90);
-  if (k <= 0.05) return null;
-  const cx = sx + 14 + (st.x - sx) * 0.6;
-  return <Fill d={ovalPath(cx, sy + 1, 44 * k, 6.5 * k)} color={CM.stoneShade} offset={false} seed="s4pipShadow" />;
-};
-
-export const S4Pip: React.FC = () => (
-  <>
-    <RoofShadow />
-    <PipTrack {...S4_PIP_TRACK} />
-  </>
-);
+/** Pip (tier B: the kit's support scope with its tinted line); its contact shadow on the roof is the light layer's
+ *  (V2S4_wboat RoofShadows, riding the boat's bob). */
+export const S4Pip: React.FC = () => <PipTrack {...S4_PIP_TRACK} />;

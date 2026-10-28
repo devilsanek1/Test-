@@ -128,6 +128,19 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   two competing treatments judged on S1, the winner built into the library), shown to the owner on S1 as the G4 look clip v6 before the
   lanes swap it in; the lanes keep going meanwhile (their water isolated in one component, no water polish); the final review round
   shrinks to pay for it inside 100 % of the week.
+- 2026-10-28 ~09:29 UTC, budget: a screenshot (this 5-hour window 36 %, resets in 3 h 23 min; weekly 81 %, resets Mon 09:59) and
+  "Let's push the ..." -> lanes resumed from their hold with the lean scope (one critic round, must-fixes only, one 0.4 clip + report); the
+  water workflow continues; recalibrated: ~$38 per weekly %, ~$10 per window % (the 23:22 -> 09:29 readings); finish projected ~93-98 %.
+- 2026-10-28 ~10:52 UTC, budget: "Updated %" (window 59 %, resets in 2 h; weekly 87 %) -> recalibrated ~$33.5 per weekly %, ~$8.7 per
+  window %; ~$435 left in the week; the lean plan (water swaps by one fresh agent, one combined review + a cold viewer, one fix pass, sound
+  re-time + mix, master) projects ~95-99 %; no new scope.
+- 2026-10-28 ~11:29 UTC, budget: a screenshot (window 64 %, resets in 1 h 23 min; weekly 89 %) -> ~$30 per weekly % (09:29 -> 11:29),
+  ~$290-385 left; the finish projects ~96-102 %, so more cuts that don't show: the water swap only where water shows at size (S2, S3/S4,
+  S5), one fresh agent for the cold watch + the art/flow review, one fix pass (<= 6 musts), sound re-time + mix only, the cover and
+  posting kit from the existing drafts.
+- 2026-10-28 ~12:51 UTC, budget: a screenshot (window 73 %, resetting in 1 min; weekly 91 %, the bar red) -> ~$29 per weekly %
+  (09:29 -> 12:51), ~$225-300 left; the lean plan projects ~97.5-100.5 %: the film (water, assembly, review, fixes, sound, master) first;
+  the cover, the posting kit and any extra polish are the first to wait for Monday's reset if the week runs out.
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in

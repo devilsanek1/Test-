@@ -15,7 +15,8 @@
 //   PAYOFF (310, 950) w 460   38.62-41.15 (38.12-38.62; HIGH-C x1.15 about (540, 1180))
 // The ticker: $999 -> $1,015 / $1,031 / $1,047 / $1,063 / $1,079 on the launches 1.88 / 2.18 / 2.40 / 2.60 / 2.72 (the
 // old $999 shown struck from 1.88, struck at 1.92) -> $1,099 on "pass" 30.28. Reactions: the tap 0.50, jolt 15.30, tug
-// 18.30, sway 24.44, jolt 35.95, the turn 39.70 (the mini data center "AI" on its back).
+// 18.30, sway 24.95 (after the DC truck's drive up the road, 24.30-24.95: assembly review R3-6), jolt 35.95, the turn
+// 39.70 (the mini data center "AI" on its back).
 // THE TAP (the hook's expected thing, acted after the colour lands; SQA pilot review): the thumb rests on "Add to cart"
 // in the frame-0 drawing, lifts 0.30-0.40, comes down 0.44-0.50 and presses on "laptop" (0.50: the button squashes a
 // value darker, the cart badge pops 0 -> 1 at 0.52 with the cart-pop sound at 0.50, the tag swings from the press).
@@ -25,7 +26,7 @@
 // outline and the listing's laptop drops to tier B. From 6.35 (home_set's HOOK_CALM_AT: the window sits back in the same
 // settle, 6.35-6.95, under the pan's last metres) every off-beat stretch is the deeper REST level (early review E2: the bezel L* 48, the screen L* 84,
 // the button and badge a screen tint, the tag C* 24: PHONE_REST, TAG_REST); SQA's 4.04-5.80 keeps the pilot's state. The TAG dims to a soft terracotta (C* 38, no outline, the prices
-// in its light tint) everywhere but its own beats (full 0-4.04, 15.30-15.90, 17.24-18.60, 24.44-25.04, 29.90-31.00,
+// in its light tint) everywhere but its own beats (full 0-4.04, 15.30-15.90, 17.24-18.60, 24.95-25.25, 29.90-31.00,
 // 35.95-36.98, 38.12-41.15: TAG_FULL); off-beat its idle sway is halved and the hand's float drops to 0.3 (eased,
 // never a jump).
 // Every change is a 2-step change (3 frames at the half step, never a fade); at 4.04 the screen, the button and the tag
@@ -52,7 +53,7 @@ import {useFilmTime} from '../../../lib/sequence';
 import {Look} from '../../../lib/exit';
 import {Tier} from '../../../lib/tier';
 import {mat, type Mat, XG} from '../../../lib/xf';
-import {EMBER, Hand, laptopGeo, Phone, phonePoint, phoneSlots, Pip3, PriceTag, Show, Txt, type LookKey, type PipPoseKey, type Pt, type TickerStep} from '../kit';
+import {EMBER, Hand, laptopGeo, Phone, phonePoint, phoneSlots, Pip3, PriceTag, Show, Txt, type LookKey, type PipPoseKey, type PipShrug, type Pt, type TickerStep} from '../kit';
 import {FormShade, Lit, mixHex, Rim, type LightRig} from '../kit/Light';
 import {PHONE_DIM_BODY, PHONE_DIM_POP} from '../kit/Phone';
 import {TAG_DIM} from '../kit/PriceTag';
@@ -126,7 +127,12 @@ export const TURN_AT = 39.7;
 /** THE TAP (film seconds): the thumb lifts off "Add to cart" 0.30-0.40, comes down 0.44-0.50 and presses at 0.50 (on
  *  "laptop", 0.52); the badge pops at 0.52; the cart-pop sound is public/v3/animatic.json's phone_cart_add at 0.50. */
 export const TAP = {lift: [0.3, 0.4] as [number, number], down: [0.44, 0.5] as [number, number], press: 0.5, badge: 0.52, liftPx: 44};
-export const REACT = {tap: TAP.press, settle: 2.72, lower: 3.66, jolt: [15.3, 35.95], tug: 18.3, sway: 24.44};
+/** The tag's reactions (film seconds). The sway answers "first dibs" AFTER its picture: the DC truck drives up the road
+ *  24.30-24.95 (outside.tsx `aGo` + 0.65), so the tag swings at 24.95, in the voice's pause ("dibs." ends ~24.88, "Which"
+ *  starts ~25.30), never while the truck goes first (assembly review R3-6: at 24.6 the tag's flash held 71 % of the
+ *  frame's top-3 % salience and the gate and trucks 12 %; CRAFT §b, a second story action never at the same moment; CRAFT
+ *  §a, every cause beat ENDS with the tag reacting). */
+export const REACT = {tap: TAP.press, settle: 2.72, lower: 3.66, jolt: [15.3, 35.95], tug: 18.3, sway: 24.95};
 /** The warm rim on the tag's lamp side while it is the lit subject (CRAFT §d.8: the subject only): while it ticks, and
  *  through the payoff from PAYOFF on (early review E10: the light layer changed the payoff tag by dL* 0.0; flow_v2 §5
  *  SQF "rim left, form shade right third"), 4-6 px inside its silhouette. */
@@ -186,14 +192,16 @@ export const SCREEN_LIT: [number, number][] = [
  *  15.30 its jolt on "almost 10%" (0.6 s); 17.24 "your laptop" through the tug's first swing as THE stick leaves it
  *  (18.30 + 0.3: the assembly; the step hides in the stick's fast growth toward the lens, so THE stick alone is A on
  *  "chips" and J3's push starts on an unchanging frame: ending at 18.90 put the step on the push's first frames and
- *  left the tag 31 % of the frame's top-3 % salience beside the landed stick, early review E2's "by ~18.9"); 24.44 its
- *  sway (0.6 s); 29.90-31.00 the crate and $1,099 on "pass"; 35.95 the jolt as the trucks overtake, until the data
+ *  left the tag 31 % of the frame's top-3 % salience beside the landed stick, early review E2's "by ~18.9"); 24.95 its
+ *  sway, after the DC truck's drive (24.30-24.95), for the voice's pause only (to 25.25: "Which" ~25.30; the step down
+ *  lands under SQE's read push, 24.90-25.70, and the swing's tail plays at tier B; assembly review R3-6); 29.90-31.00 the
+ *  crate and $1,099 on "pass"; 35.95 the jolt as the trucks overtake, until the data
  *  center's sign steps up at 36.98 (a step 0.6 s after J5, never inside a join's 0.4 s); 38.12 the payoff. */
 export const TAG_FULL: [number, number][] = [
   [-99, 4.04],
   [15.3, 15.9],
   [17.24, 18.6],
-  [24.44, 25.04],
+  [24.95, 25.25],
   [29.9, 31.0],
   [35.95, 36.98],
   [38.12, 99],
@@ -272,19 +280,22 @@ export const PIP_LOOK: LookKey[] = [
   {t: 33.11, v: 0.55},
   {t: 33.49, v: 0.35},
   {t: 38.2, v: -0.6}, // PAYOFF: down at the tag
-  {t: 40.24, v: 0.05},
+  {t: 40.38, v: 0.05}, // the shrug: up at you, as "tag" ends (the voice's last sound ~40.42)
 ];
-/** Pose / expression keys: the ears-droop beat on "buy one." (10.92) as the 'meh' face, back on "But"; the shrug on
- *  40.30 (the WINDOW lane's 40.24-40.70). */
+/** Pose / expression keys: the ears-droop beat on "buy one." (10.92) as the 'meh' face, back on "But". */
 export const PIP_KEYS: PipPoseKey[] = [
   {t: -99, pose: 'peek', amount: 0.86},
   {t: 1.2, pose: 'peek', amount: 1}, // "soon?": it leans out from behind the phone ...
   {t: 1.6, pose: 'peek', amount: 0.86}, // ... and tucks back before the first launch
   {t: 10.92, pose: 'peek', amount: 0.86, expression: 'meh'},
   {t: 11.48, pose: 'peek', amount: 0.86},
-  {t: 40.24, pose: 'shrug'},
-  {t: 40.7, pose: 'peek', amount: 0.86},
 ];
+/** THE SHRUG (flow_v2 §1 "shrug 40.30"; assembly review R3-7): in its SIDE pose, never the frontal arms-up 'shrug' pose
+ *  (that swap was a ~160 x 170 px pop over the phone's screen, 1.3 % of the frame, on "tag", overlapping the plane's
+ *  travel). After "tag" ends (its last sound ~40.42) and done before the loop's travel (SQF LOOP_BACK, 40.55): the head
+ *  rises and leans out a hair from behind the phone's edge with the heavy-lidded "oh well" face, kept through the loop
+ *  (a held face, no motion). */
+export const PIP_SHRUGS: PipShrug[] = [{t: 40.4, dur: 0.15, face: 'meh', hold: true}];
 /** Pip's grip point on the phone's right edge (phone-local px at w 400) and its scale per phone k. */
 export const PIP_GRIP: Pt = [400, 240];
 export const PIP_SCALE = 1.35;
@@ -541,7 +552,7 @@ export const ThreadPlane: React.FC<ThreadPlaneProps> = ({T: Tin, rig = HOME_RIG,
         </Phone>
         {pip ? (
           <XG m={S.m}>
-            <Pip3 x={S.pip.x} y={S.pip.y} scale={S.pip.scale} keys={PIP_KEYS} look={PIP_LOOK} lookDur={0.2} at={AT.pip} drawDur={0.5} seed={7} />
+            <Pip3 x={S.pip.x} y={S.pip.y} scale={S.pip.scale} keys={PIP_KEYS} look={PIP_LOOK} lookDur={0.2} shrugs={PIP_SHRUGS} at={AT.pip} drawDur={0.5} seed={7} />
           </XG>
         ) : null}
         {tag ? (

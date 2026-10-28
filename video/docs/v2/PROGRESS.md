@@ -2,6 +2,40 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 13:22 UTC (hourly)
+
+The integrator finished the cross-shot items (ASSEMBLY_TODO 1-4 DONE, 5 was a bird already fixed). The water: `src/lib/water.tsx` (A's
+true reflection + B's drawing language + the judge's must-fixes), `src/lib/WATER.md` (a recipe per scene), S1 through it, and the G4
+look clip v6 master (`deliverables/v2/v2r_G4_look_v6.mp4`, its sheet, phone sheet and the v5-vs-v6 water sheet; diff inside the water
+only, banding PASS). The fresh-eyes critic is reviewing v6 now; then one fix pass if it finds must-fixes; then v6 goes to the owner.
+Spend: ~$27 since 12:37; estimated week ~92 % (owner 91 % at 12:51).
+
+## Snapshot 2026-10-28 12:37 UTC (hourly)
+
+ALL LANES DONE (L3 S3+S4 11:46, L4 S5 11:49) and every helper session archived; their open items are in `docs/v2/ASSEMBLY_TODO.md`.
+Running locally: the water builder (`src/lib/water.tsx`: A's true reflection with B's drawing language and the judge's six must-fixes;
+then S1 through the lib, look clip v6, a fresh critic) and the integrator (map fixes for S2 / S4, S8's window stile + the seam's mint edge
+DONE, S4's brace off SUN1 DONE, K3 NewsBox / Plaque and the April lawn tint in progress). Spend: ~$48 since 11:19 (no helpers); the
+owner's last reading 11:29 (week 89 %); estimated week ~90-91 %; finish ~97-100 % on the lean plan.
+
+## Snapshot 2026-10-28 11:19 UTC (hourly)
+
+DONE + archived: L2 (S2), L5 (boards, S6, S7; K3's clean face on every board), L6 (S8 + the seam). Running: L3 (S4's art conform:
+sky, planes + air, light, her end house's dark French window, particles; then its one critic pass), L4 (S5's six critic fixes; the
+birds' V's now enter off-screen). Water: both candidates drawn; the judge picked A (true reflection, every reflection derived from the
+set) as the base, not shippable as is (1-3 px stair-steps, scattered dashes, a faint glitter), with B's drawing language grafted in
+(`docs/v2/water/JUDGE.md`); the builder now makes `src/lib/water.tsx` + look clip v6, then a fresh critic. The owner's readings at
+10:52: window 59 %, week 87 %. Spend: the hour ~$94; estimated week ~88 %, window ~63 % (reset ~12:52); finish ~95-99 %.
+
+## Snapshot 2026-10-28 10:19 UTC (hourly)
+
+The owner's readings at 09:29 (window 36 %, week 81 %) lifted the hold; lanes resumed lean (one critic pass, must-fixes, one 0.4 clip).
+DONE + archived: L6 (S8 + the seam: report_L6.md; the sun sets behind one level roofline; SUN8 moved in map.ts) and L2 (S2: report_L2.md;
+depth / light 0 FAIL). Running: L3 (S3 conformed and checked; S4 in build, then the critic + fix), L4 (S5's fixer on 6 critic fixes),
+L5 (S7 critic MUSTs; K3's calm BBC board for S2 landed). Water workflow: research (14 rules) + diagnosis + the study seam done; the two
+candidates (true reflection / designed editorial) drawing. Open list for assembly: `scratchpad` to-do (the lanes' water swaps, map requests,
+SHOULDs). Spend: the hour ~$146; estimated week ~84 %, window ~48 % (guard ~12:50, reset ~12:52); finish projected ~94-99 %.
+
 ## Snapshot 2026-10-28 09:18 UTC (hourly): budget alarm, lanes hold at a checkpoint
 
 Done: the owner took look clip v5 ("leafs are great") but called the water "way too cheap ... lazy and cheap": a workflow redesigns it as

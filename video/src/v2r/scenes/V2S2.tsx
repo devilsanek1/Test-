@@ -35,6 +35,7 @@ import {staffOverlay} from './V2S2_Staff';
 import {S2BenchPeople} from './V2S2_Bench';
 import {PipS2} from './V2S2_Pip';
 import {Tier} from '../../lib/tier';
+import {toneOnTone} from '../../lib/depth';
 import {Lit} from '../../lib/light';
 import {RIG_CANAL} from '../world/rigs';
 import {Sky} from '../../lib/sky';
@@ -59,21 +60,47 @@ export const s2Cam = (t: number) => mat.about(mat.scale(pullZ(t)), S2.camera.pul
 
 // ---------------------------------------------------------------- the story windows
 
-/** Her dark window's A outline (6.82 "one"): pops on in ONE frame (DIRECTION rule 8 keeps draw-ons for frame 0), one
- *  closed line round the pane at M in its stone frame's own deep warm shade (tier subject, tone = the limestone frame:
- *  the clean pen draws it 3.0 px at the tone's L* -35, the only full outline in the frame). The pane stays the plum
- *  anchor all shot. */
-const M_RECT = (() => {
+/** Her dark window's A outline (6.82 "one"; the critic, 2026-10-28: the old 3 px limestone line, L* 56 C* 8, was
+ *  invisible and grey): in ONE frame (DIRECTION rule 8 keeps draw-ons for frame 0) her window becomes a framed object:
+ *  a limestone casing pops round the plum pane (a 9 px reveal on three sides, the lit head a step lighter; a 10 px sill
+ *  projecting 5 px each side, its lit top a step lighter), and ONE closed 3.0 px line runs round the casing's outer
+ *  edge in the brick wall's own deep warm shade (tier subject, tone CM.brickLight: the clean pen draws it at L* -35,
+ *  ~L* 39 warm brick), the only full outline in the frame. The pane itself is untouched: exactly M (335, 785) 133 x
+ *  164, the plum anchor all shot (the S3 match). */
+const HER_CASE = (() => {
   const {x, y, w, h} = S2.herDarkWindow;
-  const o = 2; // the line sits on the stone frame round the pane, just outside the plum
-  return {x0: x - w / 2 - o, y0: y - h / 2 - o, x1: x + w / 2 + o, y1: y + h / 2 + o};
+  const x0 = x - w / 2;
+  const y0 = y - h / 2;
+  const x1 = x + w / 2;
+  const y1 = y + h / 2;
+  const c = 9; // the reveal
+  const sill = 10;
+  const proj = 5; // the sill's projection past the casing
+  return {x0, y0, x1, y1, c, sill, proj, X0: x0 - c, Y0: y0 - c, X1: x1 + c, S0: x0 - c - proj, S1: x1 + c + proj, SY: y1 + sill};
 })();
-const HER_OUTLINE_D = `M${M_RECT.x0.toFixed(1)} ${M_RECT.y0.toFixed(1)}H${M_RECT.x1.toFixed(1)}V${M_RECT.y1.toFixed(1)}H${M_RECT.x0.toFixed(1)}Z`;
+const r1 = (v: number) => v.toFixed(1);
+const rectD = (x0: number, y0: number, x1: number, y1: number) => `M${r1(x0)} ${r1(y0)}H${r1(x1)}V${r1(y1)}H${r1(x0)}Z`;
+/** The casing's stone (three sides: head, left and right reveals), its lit head, the sill and its lit top. */
+const CASE_D = (() => {
+  const k = HER_CASE;
+  return rectD(k.X0, k.Y0 + 3, k.x0, k.y1) + rectD(k.x1, k.Y0 + 3, k.X1, k.y1);
+})();
+const CASE_LIT_D = rectD(HER_CASE.X0, HER_CASE.Y0, HER_CASE.X1, HER_CASE.y0);
+const SILL_D = rectD(HER_CASE.S0, HER_CASE.y1 + 3, HER_CASE.S1, HER_CASE.SY);
+const SILL_LIT_D = rectD(HER_CASE.S0, HER_CASE.y1, HER_CASE.S1, HER_CASE.y1 + 3);
+/** The outline: ONE closed path round the casing and its projecting sill (no corner crossings). */
+const HER_OUTLINE_D = (() => {
+  const k = HER_CASE;
+  return `M${r1(k.X0)} ${r1(k.Y0)}H${r1(k.X1)}V${r1(k.y1)}H${r1(k.S1)}V${r1(k.SY)}H${r1(k.S0)}V${r1(k.y1)}H${r1(k.X0)}Z`;
+})();
+const CASE_LIT = toneOnTone(CM.limestone, {lit: true, dE: 5});
 const HerOutline: React.FC = () => {
   const t = useTime();
   if (t < S2.outlineAt) return null;
   return (
-    <Tier tier="subject" tone={CM.limestone}>
+    <Tier tier="subject" tone={CM.brickLight}>
+      <Fill d={CASE_D + SILL_D} color={CM.limestone} offset={false} seed="s2herCase" />
+      <Fill d={CASE_LIT_D + SILL_LIT_D} color={CASE_LIT} offset={false} seed="s2herCaseLit" />
       <Ink d={HER_OUTLINE_D} width={INK_PX.mid} seed="s2herOutline" />
     </Tier>
   );
@@ -164,6 +191,7 @@ const Shot: React.FC = () => {
                       <S2Motes layer="far" />
                     </>
                   }
+                  leaves={<S2Motes layer="leaves" />}
                   extra={<S2Motes layer="near" />}
                 />
               </CanalCast>

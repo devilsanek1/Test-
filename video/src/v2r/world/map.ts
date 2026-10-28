@@ -135,7 +135,7 @@ export const UI = {
 export const SKYLINE_EXCEPTIONS = {
   /** S1: the roof-terrace planting may reach up to y 575 (never higher). */
   s1RoofPlantingTopMinY: 575,
-  /** Sun discs: SUN2 top = 575 (19 px clear of the band); SUN1 top 585; SUN0 top 720 (behind the far roofs from y ~752); SUN8 top 585; S5's end sun 586. */
+  /** Sun discs: SUN2 top = 575 (19 px clear of the band); SUN1 top 585; SUN0 top 720 (behind the far roofs from y ~752); SUN8 top 600 (sets behind S8's level far coping, y 646); S5's end sun 586. */
   sunTopMinY: 575,
   /** S5: the cloud bank and the obelisk tops stay at y >= 610. */
   s5CloudObeliskTopMinY: 610,
@@ -268,7 +268,7 @@ export const SUN1: Disc = {x: 250, y: 650, r: 65};
 export const SUN2: Disc = {x: 260, y: 620, r: 45};
 /** S8's low sun ahead, over the canal past her board (THROUGHLINE §7: top 585, 35 px clear of B's top). Fixed through S8's
  *  truck; it un-builds before S1's SUN0 shows through at the seam (two suns never share a frame). */
-export const SUN8: Disc = {x: 420, y: 625, r: 40};
+export const SUN8: Disc = {x: 420, y: 640, r: 40};
 /** B: the A-board FACE (Google's in S7 at its push landing 30.04; hers in S8 from the truck landing 35.60). */
 export const B: Rect = {x0: 150, y0: 700, x1: 630, y1: 1220};
 export const B_LEGS_Y1 = 1250;
@@ -694,14 +694,19 @@ export const S2 = {
   /** The wing, cut by the left edge, receding right: rows at the left edge; ~400 windows (one batched path, LOD);
    *  the stepped tiers small behind it, all at y >= 600; pigeons on the parapet. */
   wing: {parapetMinY: 600, firstStoreyY: [700, 880] as const, groundRowY: [900, 1010] as const, windowWLeft: 150, windowWFar: 8, windowsTotal: 400},
-  /** The newsstand A-board TOLD THE BBC (slid out by the newsagent at 8.44). */
-  aBoard: {x0: 160, y0: 1050, x1: 560, y1: 1250} as Rect,
+  /** The newsstand A-board TOLD THE BBC (slid out by the newsagent at 8.44). Its face as S2 draws it (L2's request,
+   *  2026-10-28): 50 px left of the treatment's x 160-560 (V2S2_Board's former BOARD_SHIFT), so K3's frame (26 px
+   *  stiles) ends at x 536, a clear gap left of Pip's seat (590, 1050). */
+  aBoard: {x0: 110, y0: 1050, x1: 510, y1: 1250} as Rect,
   aBoardOutAt: 8.44,
   /** The bench: the reporter (left: satchel, notebook, no BBC marks) and the staffer (right: slate coat, auburn hair,
-   *  plain lanyard; seated >= 180 px, seated from the start). Seated figure boxes (centre x, feet, height). */
-  bench: {x0: 560, y0: 1040, x1: 780, y1: 1230} as Rect,
-  reporter: {x: 612, feetY: 1230, h: 165} as Fig,
-  staffer: {x: 714, feetY: 1230, h: 180} as Fig,
+   *  plain lanyard; seated >= 180 px, seated from the start). Seated figure boxes (centre x, feet, height). As S2 draws
+   *  them (V2S2_Layout, L2's request 2026-10-28): the bench on the A-board's ground line, x 600-800, y 1110-1290 (the
+   *  earlier x 560-780, y 1040-1230 put the reporter's head 15 px under Pip's seat); the pair on its seat line y 1244
+   *  (seat to head 124 / 140: heads at y 1120 / 1104). */
+  bench: {x0: 600, y0: 1110, x1: 800, y1: 1290} as Rect,
+  reporter: {x: 640, feetY: 1290, h: 170} as Fig,
+  staffer: {x: 718, feetY: 1290, h: 186} as Fig,
   /** 9.48 "BBC": the notebook opens, the staffer turns to the reporter; the notebook claps shut by 12.70 (was 12.85):
    *  nothing enters, pops or turns in 12.78-13.18 (the match). */
   notebookOpenAt: 9.48,
@@ -760,12 +765,14 @@ export const S4 = {
    *  plane (0.6x the path's 310 px truck: it starts to enter at ~14.95, half in by ~15.6, whole by ~16.3); teal frame,
    *  Juliet rail, blind UP, a DARK pane (she is not home yet); tier B (the thread's home spot), >= 90 px wide (90 x 102:
    *  S8's W proportion); at the stop she looks west along the plates toward it, and the push-through into SUN1 leaves
-   *  from the sun right beside it. At its pose (17.96) it sits left of SUN1's disc (x <= 180; the disc reaches x 185) and
-   *  6 px above the DEC plate (x 110-560, y 755-855, on the nearer path plane, up from 18.92): an earlier draft's
-   *  ~(150, 790) sat behind that plate (hidden from 18.92 to the join) and crossed the disc. 47 px stay above it for the
-   *  house's eave, mansard and low chimney pots, all at y >= 600 (the backs' ridges sit at y ~615-620). Never over the
-   *  plates, the tag or the band. */
-  herWindow: {x: 135, y: 698, w: 90, h: 102} as Spot,
+   *  from the sun right beside it. At its pose (17.96) it sits left of SUN1's disc (x <= 170, its house's cornice <= 172;
+   *  the disc reaches x 185: a 13-15 px gap, never a tangent; at x 135 (until 2026-10-28) its frame and cornice sat
+   *  3-5 px from the limb, so the integrator moved it 10 px left rather than shrink SUN1, which S5's far plane is
+   *  pinned to) and 6 px above the DEC plate (x 110-560, y 755-855, on the nearer path plane, up from 18.92): an earlier
+   *  draft's ~(150, 790) sat behind that plate (hidden from 18.92 to the join) and crossed the disc. 47 px stay above it
+   *  for the house's eave, mansard and low chimney pots, all at y >= 600 (the backs' ridges sit at y ~615-620). Never
+   *  over the plates, the tag or the band. */
+  herWindow: {x: 125, y: 698, w: 90, h: 102} as Spot,
   backsPlaneK: 0.6,
   towpathY: [860, 1080] as const,
   /** The fingerpost at the stop (17.96): ONE post at x ~575, two arrow plates pointing WEST, time order top-to-bottom,
@@ -808,7 +815,8 @@ export const S5 = {
     bench: {x0: 230, y0: 1060, x1: 460, y1: 1230} as Rect,
     stranger: {x: 300, feetY: 1225, h: 150} as Fig,
     pipSeat: {x: 415, y: 1120} as Seat,
-    /** The US newspaper box, no masthead: face 310 px wide; headline 40 px x 3 lines + an 18 px credit. */
+    /** The US newspaper box, no masthead: face 310 px wide; headline body 34 px x 3 lines + an 18 px credit (K3 NewsBox's
+     *  default since 2026-10-28: 40 was off the type scale). */
     newsBox: {x0: 470, y0: 880, x1: 780, y1: 1230} as Rect,
     /** 20.76 "April": the slot's trees burst into blossom in 4 frames (the beat's A); Pip looks up at the blossom (its
      *  one reaction). The disc stays a disc. */
@@ -1302,7 +1310,7 @@ const s5Shapes = (t: number): Shape[] => {
       R('mass', 'bench', s.bench),
       F('figure', 'the stranger (back, newspaper)', s.stranger, SEATED_ASPECT_OVERLAY),
       P('Pip: beside the stranger', s.pipSeat),
-      R('text', 'news box (headline 40 px x 3 + credit)', s.newsBox),
+      R('text', 'news box (headline 34 px x 3 + credit)', s.newsBox),
       R('mass', 'bench front, paving, root', {x0: 0, y0: 1250, x1: FRAME_W, y1: FRAME_H}),
     ];
   }
@@ -1356,7 +1364,7 @@ const s8Shapes = (t: number): Shape[] => {
   const dxG = -tr.ghostPlaneDx * (1 - u);
   const dxH = -tr.housePlaneDx * (1 - u);
   const out: Shape[] = [
-    D('sun', 'SUN8: S8 low sun (420, 625) r 40', SUN8),
+    D('sun', 'SUN8: S8 low sun (420, 640) r 40, setting behind one level far coping at y 646', SUN8),
     R('mass', 'her terrace at the bend (house plane)', shiftRect({x0: 640, y0: 600, x1: FRAME_W + 160, y1: 1060}, dxH)),
     R('key', 'W: her home window (lights 34.95)', shiftRect(spotRect(W), dxH)),
     R('key', 'her teal door (shuts 34.75)', shiftRect(S8.door, dxH)),

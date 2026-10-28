@@ -1,8 +1,8 @@
 // V2S2_Layout (lane L2): the shot's own shared numbers, used by V2S2.tsx (the story, the bench people, Pip) and
 // V2S2_Set.tsx (the bench furniture, its shadow, the life around it). FILM seconds, screen px at the 6.70 pose.
-// Deviation from map.ts S2 (a REQUEST line in report_L2.md): the bench sits 50-60 px lower and 40 px right
-// (map bench x 560-780, y 1040-1230 -> x 600-800, y 1110-1290, on the A-board's ground line), because the map's own
-// figure boxes put the reporter's head 15 px under Pip's seat (590, 1050): Pip read as sitting on her head.
+// map.ts S2 holds these numbers since 2026-10-28 (L2's REQUEST, report_L2.md): the bench sits 50-60 px lower and 40 px
+// right of the first map (x 560-780, y 1040-1230 -> x 600-800, y 1110-1290, on the A-board's ground line), because the
+// first map's figure boxes put the reporter's head 15 px under Pip's seat (590, 1050): Pip read as sitting on her head.
 
 /** The bench (kit `Bench` back view on this rect: feet line y1, backrest top y1 - 0.42 w). */
 export const S2_BENCH = {x0: 600, y0: 1110, x1: 800, y1: 1290};

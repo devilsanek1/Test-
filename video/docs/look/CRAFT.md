@@ -269,7 +269,30 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
    shrinks out (never fades), a step lighter on the sun side, no entrance (a leaf growing in, a flock flying in)
    touching the 0.4 s around a join (a steady field keeps its pace), a pure function of the frame. They are movers, not
    texture (§c).
-- **Code:** `lib/depth.ts` (`makeAtmosphere`, `recede`, `planePalette`, `toneOnTone`, `backing`, `groundCam`, `flight`,
+7. **Water is drawn like a building, never a fill** (owner on v2's G4 v5: "way too cheap, not clean or premium quality or
+   refined ... lazy and cheap"; `research/2026-10-28_water.md` R1-R14, `docs/v2/water/JUDGE.md`): it is the MIRROR of
+   its own shot under the shot's one camera, through `lib/water.tsx` (how-to `src/lib/WATER.md`), never hand-rolled.
+   (a) The open water is the shot's own sky mirrored about the horizon and toned toward the water's body (warm far, a
+   light veil, the teal body near): the one gradient in the water (DIRECTION rule 6), lib/sky's curve and dither. (b)
+   Every thing over it mirrors about its OWN waterline (a sloped quay by R1's affine map), toned in CIE LCh by a flat
+   Fresnel ladder (k 0.40 far -> 0.72 near, steps of 0.05): hue from the water, value from the world, a light keeps its
+   colour; the water stays the frame's one cool field (>= 83 % cool, <= 15 % warm) and no tone falls in the beige, olive
+   or grey bands. (c) Each reflection is ONE smooth solid block (sides bent by the sway, no stair-step, corners rounded)
+   down to >= 55 % of its visible length, then level bars with tapered ends on ONE perspective grid (0.45 m bands), bars
+   only where a band is >= 7 px; gaps tone-on-tone (<= 3.5 L*); at most one static break per band, in its last half.
+   (d) One plane simpler than the thing (R5): masses, verticals >= 3 px, lights; people as their legs, a boat as one dark
+   band, no stiles, rails or cabins. (e) The sun: one column straight under it, a still bed of one gold lens per band
+   (21-56 x 3-6.5 px) and 4-6 nested warm-white slivers (§6's glints: 20-36 px, +15 L* over the bed, lit 0.3-0.8 s,
+   resting >= 0.12 s); never stars. (f) The open water carries only 6-14 ripple lines (40-150 px, tapered, drifting <= 25
+   px/s; +6-10 L* across a reflection, a step darker across the open water, the tone fixed for its life). (g) Calm: only
+   the sway (+-1.5-3 px far, +-4-7 near, its phase travelling toward the viewer at 0.2-0.6 m/s), the ripple drift and the
+   slivers move; nothing boils, flickers or regrows elsewhere. (h) A floater sits on a thin dark contact lens and its
+   mirrored underside (2-3 bars), never a V unless it moves. (i) A strip whose rows are under 2 px is `lod: 'far'` (R14:
+   flat bands, flecks, current lines). **Check:** `waterProblems(spec)` is empty, and
+   `docs/v2/water/judge_metrics.py` against the last approved water (cool %, piece-end edges, thin light marks, glitter
+   gold, quick toggles); eye check at phone size: a calm, glassy canal with its reflections, never boxes, dashes or stars.
+- **Code:** `lib/water.tsx` (§7: `<Water>`, `waterProblems`, `waterPalette`; how-to `lib/WATER.md`, demo
+  `src/entry-v2r-water.tsx`), `lib/depth.ts` (`makeAtmosphere`, `recede`, `planePalette`, `toneOnTone`, `backing`, `groundCam`, `flight`,
   `band`, `quadForPlane`, `poissonDisk`, `depthProblems`, `sizeProblems`; the parallax float `parallaxOffset`,
   `floatAt`, `floatProblems`) and `lib/particles.tsx` (`<Particles kind>`, `particleProblems`); how-to and numbers
   `lib/DEPTH.md`; demo `src/entry-v2r-depth.tsx`. Flat everywhere; the parallax float is approved (owner, 2026-10-28:
@@ -293,7 +316,7 @@ stands off what is behind it, the far reads far, the ground runs into the pictur
 - Particles nobody can see: at phone size the viewer must spot them without searching: leaves 26-40 px crossing the mid ground,
   glints 20-36 px (4-6 at once), motes 6-10 px in the far air plus 2-4 near-plane motes at 12-16 px against the nearest shade (v5: 8-10 px motes alone read as specks; v4 had 13 px leaves, 14-24 px glints, 3-4 px motes: invisible to the owner).
 - Cheap water (owner on v2's v5: "way too cheap ... lazy and cheap"): a flat band with box-shaped reflection patches, scattered dashes
-  and star sparkles. Water is drawn with the care of a building: one shared component, its reflections, ripples and glitter designed.
+  and star sparkles. Water is drawn with the care of a building: `lib/water.tsx` (§7), its reflections, ripples and glitter designed.
 - Two cameras: a perspective ground under level, frontal buildings reads as a backdrop on a floor; facades, bridge and far rows share the
   ground's horizon and vanishing point (a narrow side wall in shade shows a building's depth).
 - The heaviest area at a squint must be the subject's, never the near dressing: near planes get value range, not prop count.

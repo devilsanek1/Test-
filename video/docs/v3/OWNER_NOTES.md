@@ -80,3 +80,32 @@ Only the owner's quoted words carry owner rank; the "->" half is our log, and a 
   many parallel work sessions as you need". -> v3 rework: new flow (one home place, carriers at every join, the price tag
   as the thread; `docs/v3/flow_v2.md`), clean pen + tiers, light and shadow; pilot of the first sequence, then the other
   sequences in parallel helper sessions. The G5b cut is not posted.
+- 2026-10-28: "Continue / We hit the [limit] previously" (after the 5-hour limit stopped the assembly) -> the integrator
+  resumed from its transcript and finished (`rework_reports/assembly_integrate.md`); the full film rendered; three
+  reviews written (`assembly_review_R{1,2,3}.md`: the summit pile reads as pallets/bricks is the one blocker).
+- 2026-10-28: "we are getting close to our token limits can we drop some stages some redundant low signal work" -> the
+  separate verifier and the second fix round dropped; the REVEAL lane (the blocker) and the WINDOW lane (its two majors
+  only; minors deferred) resumed lean; then one final agent: master, cover, POSTING. -> rule: playbook, Process (the
+  weekly limit: close to a limit, drop the low-signal stages first).
+  - Final round (G8): fixed the summit pile, SQB's strip and turn, the BETTER van, the overtake before the jolt, the
+    payoff's rows and the loop's $1,099; deferred for the token budget: R3-4 (the queue's vans stay small), the
+    mountain's air step, Pip's look-up timing. Master `deliverables/v3/v3_final.mp4` + cover delivered for review.
+- 2026-10-28 (on the posted reel, screenshots): "Wait why do we have the text repeat itself?" -> the frame-0 core line
+  ("AI is making your next laptop pricier.") sat over its own spoken caption "AI's making it pricier." (1.64-3.37):
+  `Film3.tsx` FILM3_FRAME0 `spoken: 'first'`, only "Buying a laptop soon?" under the core line. "Also this text is weird"
+  (the street notice's faces) -> the 5x face is "~5x" alone (bars, "last year / now", the 11 px Gartner line gone), the
+  2027 face "2027" alone (Micron's 13 px quote gone), and the chart card's 24 px BLS source line gone; the sources stay
+  in the pinned comment. -> rules: playbook (frame-0 words are the caption; words in the world are few and big).
+- 2026-10-28 (on the fixed master, frame 0 in the phone's file viewer): "What's this tho?" (the pale frame-0 drawing
+  state) and "Why are we having this out of order weirdly? Should we just show buying ..?" -> the core-line title is gone
+  from the film (`Film3.tsx`: no `frame0`): frame 0 shows "Buying a laptop soon?", "AI's making it pricier." pops at
+  1.64, the loop lands on the question; the core line stays on the cover. The pale frame is the 0.3 s draw-in (frame 0
+  being drawn, then colour) that the loop also un-builds into: explained, the owner's call whether to start on the
+  finished colour frame. -> rule: playbook Hook and pacing (the payoff in words by ~2 s, in the voice's order).
+- 2026-10-28 (screen recording of the posted reel's opening): "one first piece of feedback I think initial animation
+  effects like visual aspect should be better and more effective at capturing people attention. Like take a look the
+  initial drawing effect is barely visible or noticeable and really don't impact or amazes me" -> a rule for the next
+  videos (playbook Hook and pacing: every opening effect big enough to stop a thumb). Then: "I mean let's not change the
+  video" -> v3 stays as posted (the opening rebuild was stopped before it changed anything).
+- 2026-10-28: "It's done. It's the feedback for the next" -> v3 closed; the opening-effects note is a rule for the next
+  videos (playbook Hook and pacing).

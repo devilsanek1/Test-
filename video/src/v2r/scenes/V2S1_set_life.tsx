@@ -1,5 +1,5 @@
-// V2S1 world (lane L1): THE NEAR HALF OF THE SET and its life: the water (y 1110-1215: reflections, ripples, glints,
-// split by region so the flood ripples across it, with an f0 ripple underdrawing in ink), the far towpath that BENDS
+// V2S1 world (lane L1): THE NEAR HALF OF THE SET and its life (the water itself is V2S1_water.tsx: the film's one shared
+// water, src/lib/water.tsx, fed S1's spec; this file keeps S1_DUCK, the duck's place), the far towpath that BENDS
 // AWAY at the left (map S1_TOWPATH_FEET: its paving, joints as thin fills, the coping, the water's far edge, receding
 // bollards and lamps that follow the curve), the two moored boats in the right rail (the kit's boatInto painted ink-only),
 // the far-towpath life (K4 Person directly, explicit traits; every V2S1_clock KEEP_CLEAR zone respected, no lookalike of
@@ -20,12 +20,9 @@ import {bollardInto} from '../kit/canal/towpath';
 import {Puffs} from '../kit/canal/life';
 import {Person, Seated} from '../kit/cast';
 import * as MAP from '../world/map';
-import {CellPaint, Under, barPath, planeLeaf, S1_IRON, S1_HAZE} from './V2S1_set_core';
-import {mixHex} from '../../lib/light';
-import {atmos} from '../../lib/depth';
+import {CellPaint, Under, barPath, planeLeaf, S1_IRON} from './V2S1_set_core';
 import {s1ArchOpening} from './V2S1_set_far';
 import {floodAt} from './V2S1_clock';
-import {edgeY} from './V2S1_steps_stone';
 
 const S = MAP.S1_SHEET;
 const frac = (x: number) => x - Math.floor(x);
@@ -146,74 +143,10 @@ function lampInto(b: Batch, x: number, y: number, h: number, seed: string) {
 
 // ---------------------------------------------------------------- the water
 
-type Refl = {x0: number; x1: number; color: string; depth: number};
-// two reflections only (the art director, v3: the canal read as a barcode of peach / yellow / terracotta bars): the
-// wing's, and the sun's gold column where the glints live; each eased into the water (REFL_SOFT) so they sit on its
-// own value steps, through `atmos` (hue kept, chroma eased, never under C* 12): a straight sRGB mix of a warm colour
-// into the teal crosses grey (the wing's turned khaki #C0B7A6, the sun's olive #CACBA3: DIRECTION rule 6)
-const REFL: Refl[] = [
-  {x0: 330, x1: 1080, color: CM.brickLight, depth: 46},
-  {x0: 120, x1: 280, color: CM.sun, depth: 0},
-];
-const REFL_SOFT = 0.5;
-// the water runs on under our bank's slanted coping (it reaches y ~1300 at the right edge; the bank covers the rest)
-const WATER = {y0: S.water.y0 - 2, y1: S.water.y1 + 96, x0: -40, x1: 1120} as const;
-const WATER_H0 = S.water.y1 - S.water.y0 + 4;
-// the far water toward the haze, through `atmos` too (the sRGB mix read grey-green, C* 9.8 h 149, and any shade on it
-// greyed): a pale teal, C* 12
-const WATER_FAR = atmos(CM.water, 0.3, S1_HAZE, {chromaFloor: 12});
-const WATER_NEAR = mixHex(CM.water, CM.waterDeep, 0.3);
-
-/** The canal between the far coping and our bank: base colour in regions, the wing's broken reflection and the sun's
- *  (orange only on the sun disc: its reflection is gold), swaying slowly. No ripple dashes, no glints (CRAFT §c). */
-export const S1Water: React.FC = () => {
-  const t = useTime();
-  const {y0, y1, x0, x1} = WATER;
-  const H = y1 - y0;
-  const base = useMemo(() => {
-    const b = new Batch();
-    for (let x = x0; x < x1; x += 140) {
-      b.rect(CM.water, x - 0.5, y0, 141, H);
-      // depth in three flat steps: the far water toward the haze, the near water a step deeper along our coping (it
-      // runs to the ground's vanishing point, like the coping)
-      b.rect(WATER_FAR, x - 0.5, y0 + 9, 141, WATER_H0 * 0.3);
-      const xa = x - 0.5;
-      const xb = x + 140.5;
-      b.poly(WATER_NEAR, [[xa, edgeY(1184, xa)], [xb, edgeY(1184, xb)], [xb, edgeY(1222, xb)], [xa, edgeY(1222, xa)]]);
-      b.rect(CM.waterDeep, x - 0.5, y0, 141, 9);
-    }
-    return b;
-  }, []);
-  // the reflections as a few LONG flat bands (no dash rows, CRAFT §c), static: the wing's broken in two by a calm
-  // gap, the sun's gold column under the disc, the lit lobby's gold under the doors
-  const b = useMemo(() => {
-    const b = new Batch();
-    const rt = y0 + 10;
-    REFL.forEach((ref, i) => {
-      const color = atmos(ref.color === CM.sun ? CM.lamp : ref.color, REFL_SOFT, CM.water, {chromaFloor: 12});
-      const depth = ref.depth || 60;
-      const W = ref.x1 - ref.x0;
-      const rr = rng(`s1refl/${i}`);
-      // band 1 (far, near the far coping): most of the width, thin; band 2 under it (nearer): shorter, inset and
-      // thicker, a calm gap between (bands thicken toward us: the water recedes)
-      const h1 = Math.max(3, depth * 0.2);
-      const h2 = Math.max(4, depth * 0.32);
-      const g1 = W > 300 ? rr.range(0.38, 0.5) : -1;
-      if (g1 > 0) {
-        b.rect(color, ref.x0 + W * 0.02, rt + 2, W * (g1 - 0.04), h1);
-        b.rect(color, ref.x0 + W * (g1 + 0.03), rt + 2, W * (0.95 - g1), h1);
-      } else b.rect(color, ref.x0 + W * 0.04, rt + 2, W * 0.92, h1);
-      if (ref.color === CM.sun) b.rect(color, ref.x0 + W * 0.16, rt + 2 + h1 + depth * 0.18, W * 0.62, h2);
-    });
-    return b;
-  }, []);
-  return (
-    <>
-      <CellPaint b={base} seed="s1water/base" cell={140} misreg={0} />
-      <CellPaint b={b} seed="s1water/refl" cell={140} misreg={0} />
-    </>
-  );
-};
+/** The duck as S1World places it: one mallard at its water's scale (~127 px/m: ~0.5 m long), by the bend, its
+ *  waterline y 1136 (the kit's mallard: body x +-34, head toward +x, a +-6 px sway). Drawn with its water in
+ *  V2S1_water (S1Duck); the canal itself is V2S1_water's S1Water (the film's one shared water, src/lib/water.tsx). */
+export const S1_DUCK = {x: 396, y: 1136, size: 62} as const;
 
 // ---------------------------------------------------------------- the two moored boats (the right rail)
 

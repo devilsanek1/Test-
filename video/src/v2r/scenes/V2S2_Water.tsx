@@ -1,10 +1,12 @@
 // V2S2_Water (lane L2): the canal and the far towpath in S2, on ONE camera (V2S2_Ground): the far towpath and its
 // coping follow the wing's base to the VP (kit/canal/wall s2y), our water edge runs to the same VP, so the water narrows
-// toward it. Flat colour (CRAFT §c, §f): the water one fill, a few long calm reflection bands tone-on-tone with it (the
-// wing's lit band and its brick), the far coping's strip at the waterline in the rig's WATER tint (never a contact strip
-// on water), the far towpath stepped to its plane by distance (`recede` toward S2's air). One far lamp in CM.line
-// (STYLE §2: never plum), stepped to its plane. FILM seconds.
-//   S2Water          the water + its reflections + the far towpath and coping, one far lamp (u 5.5)
+// toward it. Flat colour (CRAFT §c, §f). FILM seconds.
+//   S2WaterSurface   THE WATER ALONE, in one component, its geometry in one place (S2_WATER: the shared lib/water
+//                    swaps in here): the water fill, its long calm reflection bands tone-on-tone with it (the wing's
+//                    lit band and its brick), the far coping's waterline strip in the rig's WATER tint (never a
+//                    contact strip on water)
+//   S2FarBank        the far towpath and its coping, stepped to their planes by distance (`recede` toward S2's air),
+//                    and ONE far lamp in CM.line (STYLE §2: never plum), stepped to its plane (u 5.5)
 //   S2PassingBoat    a narrowboat far down the canal: its bow comes in at the right edge at 7.60, small and slow (it
 //                    nears us at walking pace), chimney puffs every ~0.5 s; it never reaches the story windows' columns
 //                    or Pip (its bow at x ~742 by 12.98)
@@ -37,28 +39,49 @@ export const waterMid = (x: number): number => (farCoping(s2u(x)) + OUR_EDGE(x))
 
 const col = (c: string, p: number) => (p > 0 ? recede(c, p, S2_ATM) : c);
 
-export const S2Water: React.FC = () => {
-  const uEnd = s2u(1140);
+/** THE WATER's geometry, in one place (the shared lib/water swaps in against it; no other S2 code draws water):
+ *    top     the far coping's foot, 2 px up under its lip: farCoping(u) - 2, from u -3 (off the left edge) to the
+ *            right edge (u at x 1140)
+ *    bottom  our water edge, 30 px down: OUR_EDGE(x) + 30, from x 1160 back to -60 (our coping covers the 30 px)
+ *  What stands ABOVE it (drawn after it, so the water may run under all of it): the far towpath + its coping and the
+ *  far lamp (S2FarBank), the far walker, the far motes, the passing boat and its smoke, the ducks (all in the wall's
+ *  plane group), our bank (the coping and the bollards: V2S2_Near S2Bank), the A-board, Pip on its bollard. */
+export const S2_WATER = {
+  u0: -3,
+  /** The column position at the right edge (x 1140, with the float's overscan). */
+  uEnd: () => s2u(1140),
+  top: (u: number) => farCoping(u) - 2,
+  bottom: (x: number) => OUR_EDGE(x) + 30,
+  /** The outline: the top edge left to right (every 0.25 u), then the bottom right to left (every 30 px). */
+  poly: (): Pt[] => {
+    const top: Pt[] = [];
+    for (let u = S2_WATER.u0; u <= S2_WATER.uEnd(); u += 0.25) top.push([s2x(u), S2_WATER.top(u)]);
+    const bot: Pt[] = [];
+    for (let x = 1160; x >= -60; x -= 30) bot.push([x, S2_WATER.bottom(x)]);
+    return [...top, ...bot];
+  },
+  /** The reflection bands under the far bank: [offset under the far coping, thickness, lit] (x s2g at each u). */
+  bands: [
+    [10, 7, false],
+    [26, 5, true],
+    [40, 4, false],
+  ] as [number, number, boolean][],
+};
+
+/** THE WATER ALONE: the water fill, its reflection bands, the far coping's waterline strip. */
+export const S2WaterSurface: React.FC = () => {
+  const uEnd = S2_WATER.uEnd();
   const b = useMemo(() => {
     const b = new Batch();
     // ---- the water: from the far coping down to our edge (and on under our coping; our bank covers it)
-    const top: Pt[] = [];
-    for (let u = -3; u <= uEnd; u += 0.25) top.push([s2x(u), farCoping(u) - 2]);
-    const bot: Pt[] = [];
-    for (let x = 1160; x >= -60; x -= 30) bot.push([x, OUR_EDGE(x) + 30]);
-    b.poly(CM.water, [...top, ...bot] as KPt[]);
+    b.poly(CM.water, S2_WATER.poly() as KPt[]);
     b.layer();
     // ---- long calm reflection bands under the far bank: the wing's brick and its lit first storey, tone-on-tone with
     // the water (never dashes); each band runs along the bank (to the VP) and narrows with distance
-    const bands: [number, number, boolean][] = [
-      [10, 7, false],
-      [26, 5, true],
-      [40, 4, false],
-    ];
-    for (const [off, th, lit] of bands) {
+    for (const [off, th, lit] of S2_WATER.bands) {
       const pts: Pt[] = [];
       const pts2: Pt[] = [];
-      for (let u = -3; u <= uEnd; u += 0.5) {
+      for (let u = S2_WATER.u0; u <= uEnd; u += 0.5) {
         const g = s2g(u);
         const y = farCoping(u) + off * g;
         if (y > OUR_EDGE(s2x(u)) - 4) continue;
@@ -67,8 +90,37 @@ export const S2Water: React.FC = () => {
       }
       if (pts.length > 2) b.poly(toneOnTone(CM.water, {lit, dE: lit ? 6 : 4}), [...pts, ...pts2.reverse()] as KPt[]);
     }
-    b.layer();
-    // ---- the far towpath (paving) and its coping, per plane segment (stepped toward the air with distance)
+    return b;
+  }, [uEnd]);
+  // the far coping's strip on the water (a cast-strength strip in the water tint: never a contact strip on water)
+  const strip = useMemo(() => {
+    const pts: Pt[] = [];
+    const pts2: Pt[] = [];
+    for (let u = S2_WATER.u0; u <= uEnd; u += 0.5) {
+      pts.push([s2x(u), farCoping(u)]);
+      pts2.push([s2x(u), farCoping(u) + Math.max(2, 7 * s2g(u))]);
+    }
+    return 'M' + [...pts, ...pts2.reverse()].map(([x, y]) => P(x, y)).join('L') + 'Z';
+  }, [uEnd]);
+  return (
+    <>
+      <Tier tier="environment">
+        <Paint b={b} seed="s2water" misreg={false} />
+      </Tier>
+      <ShadowLayer>
+        <Shadow d={strip} tint="water" />
+      </ShadowLayer>
+    </>
+  );
+};
+
+/** The far bank: the far towpath (paving) and its coping per plane segment (stepped toward the air with distance), then
+ *  ONE far lamp on the far towpath (u 5.5, plane +1, CM.line stepped to it), clear of the story windows; none farther
+ *  (the far planes stay calm: no dark specks by the VP, CRAFT §f). Drawn right after the water. */
+export const S2FarBank: React.FC = () => {
+  const uEnd = S2_WATER.uEnd();
+  const b = useMemo(() => {
+    const b = new Batch();
     const seg: [number, number, number][] = [
       [-3, 2.5, 0],
       [2.5, 6.5, 1],
@@ -90,26 +142,11 @@ export const S2Water: React.FC = () => {
     }
     return b;
   }, [uEnd]);
-  // the far coping's strip on the water (a cast-strength strip in the water tint: never a contact strip on water)
-  const strip = useMemo(() => {
-    const pts: Pt[] = [];
-    const pts2: Pt[] = [];
-    for (let u = -3; u <= uEnd; u += 0.5) {
-      pts.push([s2x(u), farCoping(u)]);
-      pts2.push([s2x(u), farCoping(u) + Math.max(2, 7 * s2g(u))]);
-    }
-    return 'M' + [...pts, ...pts2.reverse()].map(([x, y]) => P(x, y)).join('L') + 'Z';
-  }, [uEnd]);
   return (
     <>
       <Tier tier="environment">
-        <Paint b={b} seed="s2water" misreg={false} />
+        <Paint b={b} seed="s2farbank" misreg={false} />
       </Tier>
-      <ShadowLayer>
-        <Shadow d={strip} tint="water" />
-      </ShadowLayer>
-      {/* ONE far lamp on the far towpath (u 5.5, plane +1, CM.line stepped to it), clear of the story windows; none
-          farther (the far planes stay calm: no dark specks by the VP, CRAFT §f) */}
       <Tier tier="environment">
         {[5.5].map((u, i) => (
           <Lamp key={i} x={s2x(u)} y={s2y('base', u) + 12 * s2g(u)} h={290 * s2g(u)} color={col(CM.line, wallPlane(u))} seed={`s2lamp${i}`} />

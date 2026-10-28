@@ -64,8 +64,8 @@ full contrast; nothing in the kit changed.
 | `creditLarge` / `credit` | 20 / 18 | `CREDIT_WEIGHT` 0.45 | sources, the small row | ~390 px (at the floor: ~6.5 px tall) |
 
 `weightFor(size)` gives the weight; one value per size on every piece, so no board is ever heavier than another.
-Exceptions (measured, in the treatment): the name 44 px on the tag (weight 0.7), the news-box headline 40 px (0.5), the
-tag rows 30. `WorldText` modes: `pen` (written left -> right behind a slanted nib edge; the face is there first), `pop`
+Exceptions (measured, in the treatment): the name 44 px on the tag (weight 0.7), the tag rows 30. The news-box headline
+is body 34 since 2026-10-28 (the director: 40 was off the scale); `headlineSize={40}` keeps the old 40 px rows (weight 0.5). `WorldText` modes: `pen` (written left -> right behind a slanted nib edge; the face is there first), `pop`
 (springs 0.55 -> 1 about its centre, 7 %), `none` (there / snaps on), `off` (shrinks away in 0.12 s), exit (shrinks with
 the fills). `maxW` is only a guard: every preset is measured to fit.
 
@@ -78,11 +78,11 @@ start on the caller's clock: every default becomes `t0 + default`; explicit time
 
 | shot · lane | piece | spot | default times: scene s (film s) | clock |
 |---|---|---|---|---|
-| S2 · L2 | `ToldTheBBCBoard` | face `S2.aBoard` 160-560 x 1050-1250; frame 134-586 x 1034-1298 (stile 26, rail 16, legs `S2_LEGS_Y1` 1298, back wedge to 595, shadow to ~661); `BBC_GEOM` | none: already there; optional `at` (lands), `clackAt` | FILM s (e.g. `clackAt={8.74}`, the slide's end) |
+| S2 · L2 | `ToldTheBBCBoard` | face `S2.aBoard` 110-510 x 1050-1250 (since 2026-10-28: where S2 draws it, 50 px left of the treatment's 160-560); frame 84-536 x 1034-1298 (stile 26, rail 16, legs `S2_LEGS_Y1` 1298, back wedge to 545, shadow to ~611); `BBC_GEOM` | none: already there; optional `at` (lands), `clackAt` | FILM s (e.g. `clackAt={8.74}`, the slide's end) |
 | S4 · L3 | `NameTag` | x 600-869, y 605-875 (screen-locked over her, tilt -1.2 deg), leader to (720, 892) | build 1 0.21 (15.07), build 2 1.74 (16.60), off 3.94 (18.80) | FILM s: `at={15.07} growAt={16.6} off={18.8}` |
 | S4 · L3 | `Fingerpost` (or `SignPost` + 2 `ArrowPlate`) | post x 575, shaft 735-1060 (finial above); plates x 110-560 (tip at x0) y 755-855 / 865-965, path plane; body 31 px | DEC pops 4.06 (18.92), pen to 4.52; APR fill 4.59 (19.45), pen to 4.94 (19.80, "heading") | FILM s: `decAt={18.92} aprAt={19.45} aprEnd={19.8}` |
 | S5 · L4 | `NewsBox` | START coords `S5.start.newsBox` 470-780 x 880-1230 (drawn in 310 x 350 units, fitted to `rect`) | already there (`at` optional) | scene s |
-| S5 · L4 | `Plaque` | END coords x 612, post foot 1182: plate 447-777 x 1029-1156 at key 56 / body 30 (329 x 127); key 40 / body 24: 271 x 104 | pops 1.88 (22.43, "Pentagon") | scene s |
+| S5 · L4 | `Plaque` | END coords x 612, post foot 1182: plate 447-777 x 1029-1156 at key 56 / body 30 (329 x 127); key 40 / body 24: 271 x 104; `panel="dark"` (on light paving): a bronze-dark plate with limestone letters, same size; S5 uses it at x 605, foot 1237 (441-769 x 1110-1237) | pops 1.88 (22.43, "Pentagon") | scene s |
 | S6 · L5 | `DealBoard` | `S6_FACE` 160-640 x 700-1220 = `S6.board0` inset 40 / 20 (frame 120-680 x 680-1250); the scene moves it with the mid plane (`s6BoardAt`); `DEAL_GEOM` | clack 0 (24.00), purpose pops 0.03 (24.03, "any"), F12 + divider 2.40 (26.40, "veto") | scene s |
 | S7 · L5 | `GoogleBoard` | face B 150-630 x 700-1220 (frame 110-670 x 680-1250, wedge to 684); `B_GEOM` | header + credit + clack 0.30 (28.36); follows its 1.59-1.72; "AI principles" 1.72-1.98 (complete 30.04); small row 2.24 (30.30); bans retaliation 2.68-3.22; "of any kind" 3.27-4.02 (complete 32.08) | scene s |
 | S8 · L6 | `HerBoard` | B on the board plane (x -100-380 before the truck) | header already there unless `headerAt` (L6: 0.23 = 33.16, with the clack); wipe 2.79 (35.72) for 0.35 s; quote 3.61-4.17 / 4.27-4.77 (36.54-37.70); credit 3.61 | scene s |
@@ -133,10 +133,15 @@ loose ink on the outer contour only (never on the face, never round the letters)
   postAt?, bodySize (auto: 31), shadow = true, ink, seed, exit}`; parts `SignPost {x, top, foot, w, at?, collars?}` and
   `ArrowPlate {rect, rootX, text: {key, body, credit}, bodySize = 31, at?, penAt?, penEnd?}` (a plate swings out on the
   rise spring, fill first, then ONE pen sweep at one speed over every row). `plateBodySize(plates, postX)`.
-- `NewsBox {rect = S5.start.newsBox, at?, shadow = true, ink = 2.2, seed, exit}`: a slate honour box lit on its west side,
-  no masthead or brand; keep the 310 : 350 aspect.
+- `NewsBox {rect = S5.start.newsBox, at?, headlineSize = 34, shadow = true, ink = 2.2, seed, exit}`: a slate honour box lit
+  on its west side, no masthead or brand; keep the 310 : 350 aspect. Its tone is the slate box (declared at the export), so
+  promoted to subject its one closed outline is the box's own deep shade, never the pen's default #4B2A1E;
+  `newsBoxRows(size)` gives the headline rows (34: 104 / 142 / 180, rule 195; 40: 102 / 147 / 192, rule 200).
 - `Plaque {x = 612, y = 1182 (post foot), keySize = 56, bodySize = plaqueBodySize(keySize), at = 1.88, stand = true,
-  pointer: 'up' | 'left' | 'right' | 'none', ink, seed, exit}`; `plaqueLayout(keySize, bodySize, stand)` gives its size.
+  pointer: 'up' | 'left' | 'right' | 'none', panel: 'light' | 'dark' = 'light', ink, seed, exit}`; `plaqueLayout(keySize,
+  bodySize, stand)` gives its size. `panel="dark"` is for a plaque on light paving: the light panel's bronze frame (L* 72)
+  and limestone face sit within a few L* of it (S5: separation 6.9-8.3); the dark panel (`SMALL_COLORS.plaqueDark`, L* 36,
+  limestone letters) steps ~30-40 L* along the whole contour (CRAFT §f.3).
 - `DoorSign {x (centre), y (top), size = 30, lines = TXT_SERVICE_DOOR, at?, ink, seed, exit}`; `doorSignLayout`.
 - Shared: `SMALL_CLOCK`, `SMALL_COLORS` (= the boards' `BOARD_COLORS` family + the box / bronze tones), `MISREG`,
   `popK`, `offK`, `edgeInk`, `insetPoly`, `inkTop` / `inkBottom` / `EM` (glyph extents), `tone` (= `mixHex`).
