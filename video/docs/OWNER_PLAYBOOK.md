@@ -313,6 +313,13 @@ Maintenance at the end).
   starting over (owner, v4, 2026-10-27: "make sure to commit the progress periodically if we get stopped on the usage
   limits"). Before any restart, re-read the current direction (`docs/look/DIRECTION.md`, the playbook and the docs they
   link: other sessions change them) and integrate it into the film's one style page first. — (v2, 2026-10-27).
+- **Spend on the film, never on overhead (owner, 2026-10-28: "evaluate if there is anything in the early stages ... that is
+  complete waste"; review `docs/retro/2026-10-28_v4_early_stage_cost.md`).** The early stages run lean: two scouts and one
+  editor for the topic (the owner picks the topic and its core line on one screen), one fact lock (later checks read it
+  and search only for a missing fact), a writer and a critic for the script; agents write files and return at most 3
+  lines; the orchestrator stays small (a fresh session per gate, batched steps, no big skill or doc loads for small
+  questions); check the session's rate limit before a fan-out. A session's budget may be its own: v4's session spends
+  only on v4 ("these tokens we have here are not shared with other videos").
 - **NO LIMIT ON TOKENS for creative output (inside the weekly limit); never trade quality for savings.** Ideas, scripts, judged competing ideas,
   design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the
   quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
