@@ -1,10 +1,10 @@
 # Content discussion: which stories fit the city-poster style
 
-**State (2026-10-28 ~22:35 UTC): OPEN.** The owner reframed the question (~22:20 UTC): not content ABOUT real cities,
-but stories TOLD through these views, the way Arcane's shots carry stories that have "nothing to do wiht the actual
-cities". Exchange 3 sent: seven story shapes that live in these views, each with an example; a top 3 (the system as a
-world; small you, vast thing; above and below); and a proposal: each story on the next shortlist comes with its world
-(its shape and its big view). Waiting on the owner. Exchange 2's real-city list stays as one option, not the frame.
+**State (2026-10-28 ~22:40 UTC): OPEN.** The owner has steered twice: not content ABOUT real cities (exchange 2), and
+not made-up content either (exchange 3's myths, fables and metaphor worlds: "completely made up content like", a
+message cut off there). Exchange 4 sent: the middle, true stories whose action happens in a big world we can show, in
+seven kinds with a real example each; strongest for us: nature hits a town, one person crosses a big world, a crowd
+does one thing at once. Asked the owner to confirm the middle and finish the cut-off thought. No picks yet.
 
 Notes: `content_market.md` and `content_fit.md` (the orchestrator's content track, scoped to tech and AI) are folded in
 below; their final versions (pulled ~22:20 UTC) changed nothing here. `content_fit.md`'s best kinds already include two
@@ -40,6 +40,10 @@ pick); this thread never edits `video/docs/v4/`. If the discussion lands on a to
   subject; the world can be invented or a metaphor; a real city is one option). The Arcane reference is the owner's
   2026-10-24 note: "some videos make it feel big and some make it feel small ... this video makes me feel small. My
   reference is Arcane: cinematic shots always made me feel scale" (HANDOFF section 7).
+- 2026-10-28 ~22:28 UTC (in this thread, on exchange 3): "now i feel like you went the other direction, like
+  completely made up content like" (the message ends there)
+  -> captured: playbook, Taste signals, "Places on screen": neither extreme; the middle is true stories whose action
+  happens in a big world we can show; a metaphor world only when a true story needs it and the facts map (v1).
 
 ## How an idea is judged here
 - **The look** (the seven posters, `video/docs/look/poster_refs/`): one real place, one hero landmark, layered depth
@@ -137,6 +141,30 @@ shortlist, each story comes with its world: its shape and its big view.
   Europe with pamphlets, and what it teaches about the AI flood. Risk: a forced parallel.
 - **Two worlds, side by side.** The same street in two versions (before and after, here and there, with and without):
   the split view as the argument (`content_fit.md`'s "two places, two choices"). Risk: halves the coziness.
+
+**The owner's reaction:** ~22:28 UTC, "now i feel like you went the other direction, like completely made up
+content like" (verbatim above). -> exchange 4.
+
+### 4. ~22:40 UTC: the middle, true stories set in a big world (sent)
+What we said, in short: "You're right, I swung from real cities to made-up stories. The middle: true stories where the
+action happens in a big world we can show. Not about a city, not invented." A rule of thumb: if a film crew could have
+shot it, we can draw it as one of these views. Then seven kinds, our strongest three, and: "Is this the middle you
+mean? Your message cut off after 'like', so tell me if I misread."
+
+| # | Kind | The example we gave (status) |
+|---|---|---|
+| 1 | **Nature hits a town** (storms, quakes, fires, and what warned people) | every forecast sent Hurricane Isaias to Louisiana; Google DeepMind's AI said Florida, and it was right about the path (9 Oct; NPR 26 Oct; v4's shortlist) |
+| 2 | **Something huge gets built** | on 3 Nov about 35 US towns vote on giant data centres; one, Boulder City, was built for the Hoover Dam workers (Ballotpedia, Newsweek, S&P Global; search results) |
+| 3 | **One person crosses a big world** | a blind man walks his city while his glasses read him the signs and menus (Chris Edwards, ABC 13 Oct; v4's shortlist) |
+| 4 | **A crowd does one thing at once** | this weekend huge crowds fill Mexico City for a Day of the Dead parade that only exists because of a James Bond film (first parade 29 Oct 2016) |
+| 5 | **New machines on real streets** | driverless taxis are due in London by the end of the year (Waymo's Q4 2026 target), the city where cabbies learn 25,000 streets by heart |
+| 6 | **Real capers** (heists, scams, spies in real buildings) | the walled "scam cities" on Myanmar's and Cambodia's borders, where people are held to run online scams (latest big reports: Jan-Jun 2026, not this month); the Louvre jewels, still not found (no fresh peg found) |
+| 7 | **Finds at the edge** (the field, the deep sea, the sky) | a hobbyist and his AI helpers may have found a planet NASA's filter set aside; NASA checks in November (Scientific American, 14 Oct; v4's r4 list) |
+
+**Strongest for us:** 1 (the scale: a storm over one town), 3 (a real person: the tie-breaker), 4 (positive, colour,
+this weekend). Sources seen for 6 (search results, 2026-10-28):
+https://www.arabnews.com/node/2629661/world ; https://www.khaosodenglish.com/news/crimecourtscalamity/2026/01/06/global-fraud-hub-exposed-new-scam-compound-50km-from-poipet/ ;
+https://www.nationthailand.com/news/asean/40060787
 
 **The owner's reaction:** (waiting)
 

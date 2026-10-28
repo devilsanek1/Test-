@@ -323,8 +323,10 @@ Maintenance at the end).
   positive outlook would be the right direction for a story", v4, 2026-10-28).
 - **Places on screen: the posters' views are a way of telling a story, not its subject.** Find the stories that can
   be TOLD through such views (a layered world, one hero, something WAY far out for scale), the way Arcane's shots carry
-  stories that have nothing to do with a real city: the world can be invented or a metaphor (v1's town of websites, the
-  best performer so far), and a real city is one option, never the requirement. The owner's examples are v1 and v2
+  stories that have nothing to do with a real city. **Neither extreme: not content ABOUT real cities, and not made-up
+  content (myths, fables, what-ifs as the story). The middle: true stories (real events, people, things) whose action
+  happens in a big world we can show** (streets, buildings, landscapes, the sky); a metaphor world only when a true
+  story needs it and the facts map one-to-one (v1's town of websites, the best performer so far). The owner's examples are v1 and v2
   (the look they like; its story was the weak part). Which stories fit is studied in
   `docs/studies/2026-10-28_city_posters/` (the content track; the live discussion is its `content_discussion.md`) before
   it changes `docs/TOPIC_CRITERIA.md`. **The search is open to any subject, not only tech and AI: what people would
@@ -339,7 +341,8 @@ Maintenance at the end).
   in your content you are overfixating on the content around real cities, but im thinking more about what kind of
   content would contain storytelling that is around these views. Like previously we discusesd arcane shots - they fit
   within the same kind of category, its content and storytelling that is around these views but has nothing to do
-  wiht the actual cities", 2026-10-28).
+  wiht the actual cities", 2026-10-28; then, on the story shapes (myths, fables, metaphor worlds): "now i feel like you
+  went the other direction, like completely made up content like", 2026-10-28).
 - **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
   frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
 - **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).
