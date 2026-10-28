@@ -85,8 +85,13 @@ export const H2_RIG: LightRig = (() => {
 })();
 const RIG = H2_RIG;
 
-/** The desk planner's cover: a muted plum-brown (L* 48, C* 22), a calm step on the terracotta desk. */
-const PLANNER = '#97646C';
+/** The desk planner's cover: a muted warm rose-brown one value under the terracotta desk (tier C, CRAFT §c: within dL*
+ *  ~10 of the desk it lies on; L* 58 C* 27 before the room's ambient step, ~53.5 rendered on the desk's ~63). Its band
+ *  and its spine step with it. (Assembly review R2-4: the old plum-brown #97646C rendered L* 44, dL* 17-19 under the
+ *  desk, and at a squint it was the frame's second-heaviest dark at 23.5 and 38.0, after the data center and ahead of
+ *  every street subject but the DC truck: near dressing outweighing the beat, CRAFT §f.) */
+const PLANNER = mixHex('#97646C', EMBER.desk, 0.5);
+const PLANNER_SPINE = mixHex(EMBER.beam, EMBER.desk, 0.5);
 
 /** The frost on the glass's side edges: flat, soft-edged columns (no ticks, no stars). */
 const FROST = (() => {
@@ -139,11 +144,11 @@ export const H2Window: React.FC = () => {
           <ContactShadow x={970} y={1600} w={70} h={10} />
         </ShadowLayer>
         <Tier tier="environment" bg={EMBER.wall}>
-          {/* a closed planner and a pencil (flat, soft corners); the planner a muted plum-brown on the terracotta desk (tier
-              C: a calm step, never the navy block that out-contrasted the desk's subject) */}
+          {/* a closed planner and a pencil (flat, soft corners); the planner a warm rose-brown one value under the
+              terracotta desk (tier C: a calm step, never a dark block that outweighs the street's beat at a squint) */}
           <path d={planner} fill={PLANNER} />
           <path d={rrect(470, 1580, 300, 14, 7)} fill={mixHex(PLANNER, EMBER.desk, 0.35)} />
-          <path d={rrect(735, 1580, 18, 190, 4)} fill={EMBER.beam} />
+          <path d={rrect(735, 1580, 18, 190, 4)} fill={PLANNER_SPINE} />
           <path d={roundPoly([[820, 1700], [990, 1640], [996, 1652], [826, 1712]], 3)} fill={EMBER.board} />
           <path d={ellD(906, 1667, 3, 3)} fill={EMBER.ink} />
           {mug}
