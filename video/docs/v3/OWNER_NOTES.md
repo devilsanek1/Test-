@@ -107,3 +107,5 @@ Only the owner's quoted words carry owner rank; the "->" half is our log, and a 
   initial drawing effect is barely visible or noticeable and really don't impact or amazes me" -> a rule for the next
   videos (playbook Hook and pacing: every opening effect big enough to stop a thumb). Then: "I mean let's not change the
   video" -> v3 stays as posted (the opening rebuild was stopped before it changed anything).
+- 2026-10-28: "It's done. It's the feedback for the next" -> v3 closed; the opening-effects note is a rule for the next
+  videos (playbook Hook and pacing).
