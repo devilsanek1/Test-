@@ -565,6 +565,13 @@ export type WaterSun = {
   sigma?: number;
   /** The plane it rides (the sun's). */
   plane?: number;
+  /** THE SUN'S PATH under the bed (the sun's light on the water, the sky's sun warmth seen in it: DIRECTION rule 6;
+   *  the critic on v6's first master: the glitter "sits on cool teal" and its gold lenses' edges mix to khaki in the
+   *  encode): one flat pale-cream leaf along the column, `k` x R8's half-width, a step LIGHTER than the water it lies
+   *  on (light is lighter than what it lights), its chroma low (default C* 7.5 at the air's hue, L* air - 1.2: cream at
+   *  L* >= 86, never beige), so the gold lenses sit on warm light and its own edge mixes with the teal at C* < 6.
+   *  false = none. */
+  path?: false | {color?: string; k?: number};
 };
 /** Ripple lines (R9). */
 export type WaterRipples = {
@@ -1077,6 +1084,35 @@ function glitterBed(st: Static): GlitterLens[] {
   }
   return out;
 }
+/** THE SUN'S PATH (WaterSun.path): one flat leaf along the column, pointed at its far end, widening toward us to `k`
+ *  x R8's half-width (the near bank crops it), its sides swaying with their rows like the bed. */
+export function sunPathD(st: Static, sway: (y: number) => number): string {
+  const s = st.spec.sun;
+  if (!s || s.path === false || st.spec.lod === 'far') return '';
+  const k = s.path?.k ?? 1.3;
+  const [y0, y1] = sunRows(st);
+  const n = 30;
+  const L: Pt[] = [];
+  const R: Pt[] = [];
+  for (let i = 0; i <= n; i++) {
+    const u = i / n;
+    const y = lerp(y0, y1, u);
+    const taper = Math.pow(smooth(0, 0.42, u), 0.6);
+    const hw = Math.max(0.3, k * glitterHalfW(st.spec.cam, s, y) * taper);
+    const dx = sway(y) * 0.7;
+    L.push([s.x - hw + dx, y]);
+    R.push([s.x + hw + dx, y]);
+  }
+  return polyD([...L, ...R.reverse()]);
+}
+/** The sun's path colour: the shot's air (the sky's lowest colour, under the sun) a touch under, its chroma low. */
+export function sunPathColour(spec: WaterSpec): string {
+  const s = spec.sun;
+  if (!s || s.path === false) return '';
+  if (s.path?.color) return s.path.color;
+  const a = lch(spec.air ?? spec.body);
+  return cleanColour(fromLch(Math.min(95, a.L - 1.2), 7.5, a.h), spec.tone?.waterH ?? TONE_DEFAULT.waterH);
+}
 export type Sliver = {x: number; y: number; len: number; h: number; lens: number};
 /** A sliver's dark rest between two lives (s): longer than 0.1 s, so no pixel flickers on and off. */
 export const SLIVER_REST = 0.12;
@@ -1233,6 +1269,9 @@ export type WaterFrame = {
   ripples: {color: string; d: string}[];
   quayLayer: number;
   bed: string;
+  /** The sun's path under the bed (WaterSun.path). */
+  pathD: string;
+  pathColor: string;
   slivers: Sliver[];
   sliverD: string;
   bedColor: string;
@@ -1294,8 +1333,10 @@ export function waterFrame(spec: WaterSpec, t: number): WaterFrame {
   const sunShift: Pt = sun ? [shift(st.sunPlane)[0], 0] : [0, 0];
   let bed = '';
   let sliverD = '';
+  let pathD = '';
   let slivers: Sliver[] = [];
   if (sun && !far) {
+    pathD = sunPathD(st, swayFn);
     for (const b of st.bed) bed += lensD(b.cx + swayFn(b.cy) * 0.7, b.cy, b.len, b.h);
     slivers = glitterSlivers(st, t);
     for (const s of slivers) sliverD += lensD(s.x + swayFn(s.y) * 0.7, s.y, s.len, s.h);
@@ -1309,6 +1350,8 @@ export function waterFrame(spec: WaterSpec, t: number): WaterFrame {
     runs,
     ripples: Array.from(rip.entries()).map(([color, ds]) => ({color, d: ds.join('')})),
     bed,
+    pathD,
+    pathColor: sun ? sunPathColour(spec) : '',
     slivers,
     sliverD,
     bedColor: sun?.bed ?? SUN_DEFAULT.bed,
@@ -1400,6 +1443,7 @@ export const Water: React.FC<{spec: WaterSpec; t: number}> = ({spec, t}) => {
             <path key={`r${i}`} d={p.d} fill={p.color} />
           ))}
         <g transform={tr(fr.sunShift)}>
+          {fr.pathD ? <path d={fr.pathD} fill={fr.pathColor} /> : null}
           {fr.bed ? <path d={fr.bed} fill={fr.bedColor} /> : null}
           {fr.sliverD ? <path d={fr.sliverD} fill={fr.coreColor} /> : null}
         </g>
@@ -1476,6 +1520,7 @@ export function waterPalette(spec: WaterSpec): {name: string; hex: string; L: nu
     } else for (const k of ks) add(`${s.id} k${k.toFixed(2)}`, toneOf(st, s, k));
   }
   if (spec.sun) {
+    if (spec.sun.path !== false) add('sun path', sunPathColour(spec));
     add('glitter bed', spec.sun.bed ?? SUN_DEFAULT.bed);
     add('glitter sliver', spec.sun.core ?? SUN_DEFAULT.core);
   }
