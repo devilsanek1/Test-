@@ -1,10 +1,11 @@
 # Content discussion: which stories fit the city-poster style
 
-**State (2026-10-28 ~22:45 UTC): DIRECTION FIRMING UP.** The owner likes tech topics told through these views, data
-centres especially, and wants WOW stories (driverless taxis in London: "good too, but perhaps not as WOW"). Two scouts
-(max effort) are hunting: WOW data-centre stories (`discussion_scouts/wow_datacentres.md`) and other WOW tech set in a
-big world (`discussion_scouts/wow_tech_world.md`). Next: edit their finds into a shortlist with the column chart for
-the owner. No pick yet; who produces the video stays the owner's call.
+**State (2026-10-28 ~22:50 UTC): DIRECTION FIRMING UP.** Tech told through these views, researched as a general
+direction: one possible umbrella is **tech in the cities** (WOW cases where a city solves a problem with new tech or
+AI); data centres and driverless taxis are kinds inside it; every pick needs a WOW; the owner liked the weird-place
+data centres (a Cold War bunker, a chapel, a public pool). Three scouts (max effort) are hunting:
+`discussion_scouts/wow_datacentres.md`, `wow_tech_world.md`, `tech_in_cities.md`. Next: edit their finds into the
+umbrella's kinds and a shortlist with the column chart. No pick yet; who produces the video stays the owner's call.
 
 Notes: `content_market.md` and `content_fit.md` (the orchestrator's content track, scoped to tech and AI) are folded in
 below; their final versions (pulled ~22:20 UTC) changed nothing here. `content_fit.md`'s best kinds already include two
@@ -51,6 +52,15 @@ pick); this thread never edits `video/docs/v4/`. If the discussion lands on a to
   we need some WOW stories here"
   -> captured: playbook, Taste signals ("Places on screen": the owner leans to tech told this way, data centres
   especially; every pick needs a WOW; the "Topics" bullet notes the return to tech).
+- 2026-10-28 ~22:43 UTC (in this thread, on exchange 5): "no i mean research more - this is a general direction,
+  datacenter is one, having waymo or driverless taxis in citis is a good topic too btw but we need to find a way to
+  generalize it like one POSSIBLE direction is lets say generalizing it to tech in the cities. like some interesting,
+  weird, wow like cases where cities come up with the new solutions to problems, deploy some wow tech / ai / etc"
+- 2026-10-28 ~22:44 UTC (in this thread, quoting exchange 5's leads): "those are interesting ones: Weird places, older
+  but WOW: one sits in a Cold War bunker under Stockholm, a supercomputer was built inside a Barcelona chapel, and a
+  small one heats a public pool in England."
+  -> captured: playbook, Taste signals ("Places on screen": research the general direction; tech in the cities as one
+  umbrella; driverless taxis "a good topic too"; tech in a weird place is a WOW; an older story can carry it with a peg).
 
 ## How an idea is judged here
 - **The look** (the seven posters, `video/docs/look/poster_refs/`): one real place, one hero landmark, layered depth
@@ -190,6 +200,18 @@ https://arstechnica.com/tech-policy/2026/07/new-york-is-the-first-state-to-impos
 in a Barcelona chapel (MareNostrum), a small data centre heating a public pool in Devon (2023).
 Orbit sources seen: https://www.fierce-network.com/cloud/space-data-centers-starcloud-spacex-and-project-suncatcher-explained ;
 https://www.geekwire.com/2026/orbital-ai-seattle-area-startup-starcloud-hits-1-1b-valuation-to-build-space-based-data-centers/
+
+**The owner's reaction:** ~22:43-22:44 UTC: "research more - this is a general direction"; tech in the cities as one
+possible umbrella; the weird-place data centres are "interesting ones" (verbatim above). -> exchange 6.
+
+### 6. ~22:50 UTC: the general direction, a third scout (sent)
+Launched a third scout (max effort): **tech in the cities**, 10-14 WOW cases where a city solves a problem with new tech,
+AI or engineering (moving people, incl. driverless taxis with a WOW angle; fighting nature; city services; food, water
+and energy; tech in surprising places) -> `discussion_scouts/tech_in_cities.md`. Messages to the running scouts: the
+data-centre scout verifies the three weird places and digs for more with a fresh peg; the city scout adds city tech in
+surprising places (e.g. a power plant with a ski slope on its roof). The umbrella's kinds as we framed them for the
+owner: moving people, the hidden machines, fighting nature, city services. The lean shape grew to three scouts at the
+owner's "research more"; this thread edits.
 
 **The owner's reaction:** (waiting)
 
