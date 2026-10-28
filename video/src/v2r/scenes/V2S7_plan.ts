@@ -134,7 +134,7 @@ export const S7_FAR = {treeZ: 55, roofZ: [95, 130] as P2} as const;
 /** Two Sheffield stands with two bikes along the frontage right of the doors (z 23.2). */
 export const S7_BIKES = {z: 23.2, stands: [4.75, 5.75], bikes: [{x: 5.05, dir: 1 as 1 | -1}, {x: 6.0, dir: -1 as 1 | -1}]} as const;
 /** The cyclist's lane (z 15.5: behind the board, in front of the plane tree) and the staff's door path. */
-export const S7_LANES = {cyclist: 15.5, staffIn: {x: [2.7, 2.25] as P2, z: [21.8, 24.55] as P2}, staffOut: {z: 23.7, x: [2.25, 7.6] as P2}} as const;
+export const S7_LANES = {cyclist: 15.5, staffIn: {x: [2.75, 2.5] as P2, z: [21.8, 25.0] as P2}, staffOut: {z: 23.7, x: [2.5, 7.6] as P2}} as const;
 
 /** A person of real height `m` whose feet stand at depth z: on-screen height (px). */
 export const heightAt = (z: number, m: number) => m * kz(z);
