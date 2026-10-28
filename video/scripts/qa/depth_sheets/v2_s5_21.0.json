@@ -4,6 +4,18 @@
  "air_hex": "#F6D9BC",
  "planes": [
   {
+   "name": "the canopy tree's root foot (the start's near corner, plane -2: V2S5_start)",
+   "plane": -2,
+   "boxes": [
+    [
+     0,
+     1790,
+     230,
+     1920
+    ]
+   ]
+  },
+  {
    "name": "terrace: bench, pair, news box, balustrade",
    "plane": 0,
    "role": "subject",
@@ -37,6 +49,14 @@
      0,
      1250,
      1080,
+     1920
+    ]
+   ],
+   "exclude": [
+    [
+     0,
+     1580,
+     560,
      1920
     ]
    ]
@@ -98,7 +118,7 @@
  ],
  "silhouettes": [
   {
-   "name": "the news box's body (A, 20.90-21.75)",
+   "name": "the news box's body (A, 20.90-22.03)",
    "tier": "A",
    "poly": [
     [
