@@ -10,17 +10,20 @@
 //   10.32-10.50 a doodle laptop drops onto the line (~2010) and lands on "buy" (10.60): its screen says "$999"
 //   10.82       a shinier, bigger BETTER one pops onto the line right after it (~2015), the SAME "$999" ("one." 10.92):
 //               same money, better laptop = lower on the line (the index is quality-adjusted, FL 1.8/1.9)
-//   11.80       "But this past year": the old deal steps back in ONE event with the dot's pop (final pass, the owner's
-//               "not sure what to keep my attention on"): the falling line and both doodles go to tier B (a soft
-//               terracotta, no outline, pale screens, the prices and the badge in a soft ink), a 2-step change, so the
-//               dot at "now" is the card's one hero thing until the hook turns up from it
+//   11.80       "this past year": the dot at the line's end pops once (the eye waits where the hook will turn)
 //   13.85-14.45 the line hooks UP (Sept 2025 -> Sept 2026, the hero colour), ending just before "up" (14.52)
-//   14.74       "+9.7%" pops alone, above the hook ("almost10%" 14.84)
+//   14.74       "+9.7%" pops alone, above the hook ("almost10%" 14.84), and in the same frame the old deal's doodles
+//               step back, ONE event (final pass, the owner's "not sure what to keep my attention on"): both go to tier
+//               B (a soft terracotta, no outline, pale screens, the prices and the badge in a soft ink), a 2-step
+//               change, so the number and the hook own the card's hero; the falling line stays the hero, the eye's
+//               path to the turn. Measured (the frame's top-3 % salience on the card): 76 % at 12.5 and 13.5, 58 % at
+//               14.95. Stepping them (and the line) back earlier, at "But" (11.80), left the card 10 % at 12.5 and gave
+//               the window strip and the mug 65 %; at the hook's start, 33 % while it drew.
 //   15.05       the source, small, at the card's foot: "US computers · Sept 2026 vs a year earlier (BLS)"
 // The shape is the BLS index's (CUUR0000SEEE01, FL 1.6-1.8): falling fast early and slower later, the 2021 bump, the
 // turn up at the end; no y numbers (the label carries the one number). Hierarchy (CRAFT §b): the line, then the
-// doodles, then the dot, then the hook and "+9.7%" are the subject in turn (the hero colour, the laptops' full outline;
-// the line is a graphic stroke); nothing else on the card moves. Layout: the old deal reads left to right (the falling
+// doodles, then the line's end (the dot's pop), then the hook and "+9.7%" are the subject in turn (the hero colour, the
+// laptops' full outline on their beat only; the line is a graphic stroke); nothing else on the card moves. Layout: the old deal reads left to right (the falling
 // line, the doodles in the middle, the turn and its number on the right), each clear of the static face.
 // READ AT PHONE SIZE (final pass, OPEN 12: "$999" / "BETTER" were ~25 / 23 px, ~6 px on a phone): the doodles are the
 // laptop's own shapes (laptopGeo) drawn plain for the chart (lid, screen, deck, a keyboard plate; no trackpad, no
@@ -148,25 +151,23 @@ export const CHART_BEATS = {
   source: 15.05,
   /** "this past year" (11.88): the pen's dot at the line's end pops once (the eye waits where the hook will turn). */
   pulse: 11.8,
-  /** ...and in the same frame the old deal (the falling line, both doodles) steps back to tier B: one event. */
-  step: 11.8,
+  /** The doodles step back to tier B as "+9.7%" pops: one event. */
+  step: 14.74,
 };
 export const LINE_W = 9;
 
-/** The old deal OFF its beat (tier B, from CHART_BEATS.step; CRAFT §b: soft, no outline, no near-black): the hero
- *  60 % toward the paper for the doodles' lids (L* 77, C* 27; the B tier's pull takes it to ~C* 24), their deck edge and
- *  keys one step deeper (L* 69), the screens a pale peach 13 L* over the lid, the prices and BETTER in a soft ink (L* 49
- *  on L* 90), the badge's pill one pale step; the falling line half way to the paper (L* 73: still the chart's line at
- *  phone size, no longer competing with the dot, the hook and "+9.7%", which keep the hero). */
+/** The doodles OFF their beat (tier B, from CHART_BEATS.step; CRAFT §b: soft, no outline, no near-black): the hero
+ *  60 % toward the paper for the lids (L* 77, C* 27; the B tier's pull takes it to ~C* 24), their deck edge and keys one
+ *  step deeper (L* 69), the screens a pale peach 13 L* over the lid, the prices and BETTER in a soft ink (L* 49 on
+ *  L* 90), the badge's pill one pale step. */
 export const OLD_DEAL_OFF = {
   lid: mixRgb(EMBER.hero, CARD_PAPER, 0.6),
   deep: mixRgb(EMBER.heroDeep, CARD_PAPER, 0.5),
   screen: mixRgb('#F6D2C0', CARD_PAPER, 0.4),
   ink: '#9A6A55',
   badge: mixRgb('#F6D2C0', CARD_PAPER, 0.7),
-  line: mixRgb(EMBER.hero, CARD_PAPER, 0.5),
 };
-/** 0 = the old deal on its beats, 0.5 = the 3-frame half step, 1 = off-beat (tier B). */
+/** 0 = the doodles on their beat, 0.5 = the 3-frame half step, 1 = off-beat (tier B). */
 export const oldDealOff = (T: number): number => stepAt(T, CHART_BEATS.step);
 
 // ================================================================= the doodles (the laptop, drawn plain, standing ON the line)
@@ -356,23 +357,18 @@ function dotPulse(T: number): number {
 }
 
 /** THE CHART at film time T (H1 px; draw it as HomeSet's `card`). Nothing before 6.98 (the J1 seam sees the bare
- *  face only). The falling line and the hook are two strokes meeting at "now" (the dot): from CHART_BEATS.step the
- *  falling one is the old deal's soft terracotta, the hook always the hero. */
+ *  face only). */
 export const OldDealChart: React.FC<{T?: number}> = ({T: Tin}) => {
   const t = useTime();
   const T = Tin ?? t;
   const {s, pen} = strokeAt(T);
   if (s <= 0) return null;
   const off = oldDealOff(T);
-  const line = upTo(Math.min(s, L_LINE));
-  const hook = s > L_LINE ? upTo(s).slice(LINE_XY.length - 1) : null;
-  const tip = hook ?? line;
-  const head = tip[tip.length - 1];
-  const stroke = {strokeWidth: LINE_W, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, fill: 'none'};
+  const pts = upTo(s);
+  const head = pts[pts.length - 1];
   return (
     <Tier tier="subject">
-      <TPath d={pathOf(line)} stroke={mixRgb(EMBER.hero, OLD_DEAL_OFF.line, off)} {...stroke} graphic />
-      {hook ? <TPath d={pathOf(hook)} stroke={EMBER.hero} {...stroke} graphic /> : null}
+      <TPath d={pathOf(pts)} stroke={EMBER.hero} strokeWidth={LINE_W} strokeLinecap="round" strokeLinejoin="round" fill="none" graphic />
       {pen ? <TCircle cx={head[0]} cy={head[1]} r={LINE_W * 0.95 * dotPulse(T)} fill={EMBER.hero} /> : null}
       <MineDoodle T={T} k={off} />
       <BetterDoodle T={T} k={off} />
