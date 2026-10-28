@@ -12,6 +12,8 @@ import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
 import {At, b, fillAt, mixRgb, Pt, Show, Txt} from './util';
 import {DataCenter} from './Outside';
+import {useLightOff, useRig} from './Light';
+import {useLook} from '../../../lib/exit';
 import {tiered} from '../../../lib/tier';
 
 export type TickerStep = {t: number; v: string};
@@ -51,6 +53,11 @@ export type PriceTagProps = {
    *  (like-pop)"): from this time the back's drawing pops (x0.6 -> 1.1 -> 1 over 0.24 s, about its centre) as the back
    *  opens, in step with the like-pop sound. Pass the turn's midpoint (turnAt + 0.18), when the back appears. */
   backPopAt?: number;
+  /** OPT-IN (v3 rework, CRAFT §d.4; flow_v2 §5 SQF "form shade right third"): the paper's form shade on the side away
+   *  from a screen-left key: this fraction of its width (<= 0.6), one flat multiply step in the rig's form tint, drawn
+   *  between the paper and its print (the price and the back's drawing stay crisp: a band over the glyphs dimmed the
+   *  payoff's last digit); off with the light layers (`lightOff`) and in silhouette renders. */
+  formShade?: number;
   /** 'hero' (burnt orange, default) | 'pop' (the style frame's blue tag). */
   tone?: 'hero' | 'pop';
   /** OPT-IN (v3 rework, CRAFT §b: a story object off its beat is tier B): 0 = full strength (default); 1 = off-beat:
@@ -110,12 +117,18 @@ function backPopScale(d: number): number {
   return 1.1 - 0.1 * ease.inOutSine(clamp((d - 0.12) / 0.12));
 }
 
-const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, oldSize: oldK = 0.16, oldTone = 'white', oldAt, strikeAt, stringFrom, rot = 0, sway = 0, turnAt, turn, backSign = 'AI', backPopAt, tone = 'hero', dim = 0, dimColors, stringThrough, at, seed = 'tag', ink = 3.4}) => {
+const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, oldSize: oldK = 0.16, oldTone = 'white', oldAt, strikeAt, stringFrom, rot = 0, sway = 0, turnAt, turn, backSign = 'AI', backPopAt, formShade, tone = 'hero', dim = 0, dimColors, stringThrough, at, seed = 'tag', ink = 3.4}) => {
   const t = useTime();
   const h = w * 0.5;
   const shape = tagShape(w);
   const [hx, hy] = tagHole(w);
   const DIM = {...TAG_DIM, ...dimColors};
+  const rig = useRig();
+  const lightOff = useLightOff();
+  const look = useLook();
+  const sf = formShade ? Math.min(0.6, formShade) : 0;
+  const cR = w * 0.025;
+  const shadeD = sf > 0 && !lightOff && look.fills === 'color' ? polyPath([[w * (1 - sf), 0], [w - cR, 0], [w, cR], [w, h - cR], [w - cR, h], [w * (1 - sf), h]]) : '';
   const body = mixRgb(tone === 'pop' ? EMBER.pop : EMBER.hero, DIM.body, dim);
   const white = mixRgb(EMBER.white, DIM.text, dim);
   const ringC = mixRgb(tone === 'pop' ? EMBER.card : EMBER.pop, DIM.ring, dim);
@@ -167,6 +180,11 @@ const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, old
       {stringThrough ? null : stringInk}
       <XG m={m}>
         <Fill d={polyPath(shape)} color={back ? EMBER.heroDeep : body} at={fillAt(at)} seed={`${seed}/body`} />
+        {shadeD ? (
+          <g style={{mixBlendMode: 'multiply'}}>
+            <path d={shadeD} fill={rig.tints.form} />
+          </g>
+        ) : null}
         {back || dim < 0.5 ? <Ink d={poly(shape, {closed: true, seed: `${seed}/o`, over: w < 240 ? [0, 3] : [2, 7]})} inside={polyPath(shape)} at={at} width={ink} /> : null}
       </XG>
       {/* tied through the hole: the string runs over the paper and into the eyelet (the ring is drawn over its end) */}

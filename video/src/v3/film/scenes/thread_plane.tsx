@@ -135,7 +135,8 @@ export const RIM_WINDOWS: [number, number][] = [
   [1.86, 3.3],
   [38.62, 41.15],
 ];
-/** The payoff's form shade on the tag's right third (away from the lamp, screen-left), with the rim (E10). */
+/** The payoff's form shade on the tag's right third (away from the lamp, screen-left), with the rim (E10): the tag's own
+ *  `formShade`, between its paper and its print, so the price stays crisp. */
 export const FORM_WINDOW: [number, number] = [38.62, 41.15];
 /** The like-pop (flow_v2 §4, 39.88 "price": the sound public/v3/animatic.json phone_like_pop): the back's drawing pops
  *  as the back lands, at the turn's midpoint (the G3 board: "on 'price' its back lands: a tiny AI data center"). */
@@ -501,6 +502,7 @@ export const ThreadPlane: React.FC<ThreadPlaneProps> = ({T: Tin, rig = HOME_RIG,
       strikeAt={STRIKE_AT}
       turnAt={TURN_AT}
       backPopAt={LIKE_POP_AT}
+      formShade={T >= FORM_WINDOW[0] && T < FORM_WINDOW[1] ? 0.33 : undefined}
       dim={S.tagDim}
       dimColors={tagDimColors}
       at={AT.tag}
@@ -544,7 +546,6 @@ export const ThreadPlane: React.FC<ThreadPlaneProps> = ({T: Tin, rig = HOME_RIG,
           <>
             {tagEl}
             <TagFrame0 S={S} tagAt={AT.tag} />
-            {T >= FORM_WINDOW[0] && T < FORM_WINDOW[1] ? <FormShade of={tagEl} c={[S.tag.x + S.tag.w * 0.55, S.tag.y + S.tag.w * 0.25]} size={[S.tag.w, S.tag.w * 0.5]} frac={0.33} /> : null}
             {RIM_WINDOWS.some(([a, b]) => T >= a && T < b) ? <Rim of={tagEl} c={[S.tag.x + S.tag.w * 0.55, S.tag.y + S.tag.w * 0.25]} size={[S.tag.w, S.tag.w * 0.5]} width={5 * k} /> : null}
           </>
         ) : null}
