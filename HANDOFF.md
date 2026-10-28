@@ -235,7 +235,8 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **The file:** 1080x1920, 30 fps (we render 60 fps since v3: `video/docs/POSTING_KIT.md`), H.264 High, SDR BT.709, AAC 48 kHz. Ours is about 11.6 Mbps (CRF 14), which is fine;
   the consensus range is 8-15 Mbps. 4K uploads don't help on Reels (it stores 1080 wide) and add compression risk.
 - **YouTube Shorts is different:** uploads above 1080p get the better VP9/AV1 encodes. Our film is vector (SVG), so a
-  1440x2560 render (`--scale=1.3333`) is genuinely sharper. Render one for YouTube.
+  1440x2560 render (`scripts/render-media.mjs ... --master --scale=4/3`; a plain 1.3333 misses whole pixels and
+  Remotion refuses it) is genuinely sharper. Render one for YouTube.
 - **Getting the file to the phone:** download the original (AirDrop, Files, Drive). Not via WhatsApp/Messenger, which
   recompress it.
 - **In Instagram's editor:** don't apply filters or edits.

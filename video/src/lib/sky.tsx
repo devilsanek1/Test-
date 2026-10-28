@@ -164,8 +164,10 @@ export const contrastRgb = (a: Rgb, b: Rgb) => {
 export type SkyKey = {y: number; color: SkyColor};
 /** The caption band: inside it the sky stays nearly flat (max dL*, CIE). */
 export type SkyBand = {y0: number; y1: number; maxDL?: number};
-/** A low sun's warmth: an ellipse (rx wide, ry tall) of `color` around the disc centre, strongest at the centre
- *  (`strength`, 0..1, default 1) and gone at the rim with a smootherstep. Part of the sky, below everything. */
+/** A low sun's warmth: an ellipse (rx wide, ry tall; default ry 0.45 rx) of `color` around the disc centre, strongest
+ *  at the centre (`strength`, 0..1, default 1) and gone at the rim with a smootherstep. Part of the sky, below
+ *  everything. Low and wide hugs the horizon (a painter's sunset glow); a taller one (0.6 rx) rose into the mint as a
+ *  round blob (a glow disc, DIRECTION rule 5) and crossed yellow-green at C* 8.1 there (sky critic, 2026-10-28). */
 export type SkySun = {x: number; y: number; color: SkyColor; rx: number; ry?: number; strength?: number};
 /** The blue-noise dither: +-amp code values per channel (TPDF-shaped integers, default 2), at `grain` px per texel
  *  (default 2: measured, a 1 px texture is the first thing x264 throws away; CRAFT §g), the tile shifted by `offset`
@@ -191,6 +193,8 @@ export type SkySpec = {
 /** The house caption band (the 317-556 block, DIRECTION rule 10) and its flatness budget (CRAFT §g). */
 export const CAPTION_BAND: SkyBand = {y0: 317, y1: 556, maxDL: 1.5};
 export const DEFAULT_DITHER: Required<SkyDither> = {amp: 2, grain: 2, offset: [0, 0]};
+/** The sun's warmth: its default height as a share of its width (SkySun). */
+export const SUN_RY = 0.45;
 
 // ================================================================= the curve: a monotone cubic through the keys
 
@@ -322,7 +326,7 @@ export function skyModel(spec: SkySpec): SkyModel {
   let sun: SkyModel['sun'] = null;
   if (spec.sun) {
     const s = spec.sun;
-    let ry = s.ry ?? s.rx * 0.6;
+    let ry = s.ry ?? s.rx * SUN_RY;
     if (band) {
       const room = s.y >= band.y1 ? s.y - band.y1 - 2 : s.y <= band.y0 ? band.y0 - s.y - 2 : 0;
       if (room < ry) {
@@ -373,7 +377,10 @@ const roomOf = (m: SkyModel) => (m.dither ? Math.ceil(m.dither.amp) : 0);
  *  255 by the dither's amplitude), then the sun's warmth composited over it the way the browser does (sRGB alpha, the
  *  warm colour at the smootherstep weight). Without x, the vertical gradient alone. */
 export function skyRgbAt(spec: SkySpec, y: number, x?: number): Rgb {
-  const m = skyModel(spec);
+  return modelRgbAt(skyModel(spec), y, x);
+}
+/** skyRgbAt on a resolved model (no spec lookup: for loops over many points). */
+function modelRgbAt(m: SkyModel, y: number, x?: number): Rgb {
   const room = roomOf(m);
   const base = headroom(oklabToRgbInGamut(curveAt(m.curve, y)), room);
   if (x === undefined || !m.sun) return base;
@@ -777,7 +784,8 @@ export type SkyCheck = {
   bandDE: number;
   /** Lowest WCAG contrast of `ink` on the band (when an ink is given). */
   inkContrast: number | null;
-  /** The khaki / olive zone: the largest CIE C* on the vertical ramp where the hue is 95-140 deg (yellow-green). */
+  /** The khaki / olive zone: the largest CIE C* where the hue is 95-140 deg (yellow-green), on the vertical ramp and
+   *  where the sun's warmth crosses it. */
   khakiC: number;
   /** The longest run (px) of the vertical ramp under C* 2.5 (a grey band). */
   greyRun: number;
@@ -795,7 +803,7 @@ export function skyCheck(spec: SkySpec, o: {ink?: string} = {}): SkyCheck {
     const xs: number[] = [];
     for (let x = Math.max(0, m.x); x <= Math.min(1080, m.x + m.width); x += 24) xs.push(x);
     const pts: Oklab[] = [];
-    for (let y = m.band.y0; y <= m.band.y1; y += 3) for (const x of xs) pts.push(skyLabAt(spec, y, x));
+    for (let y = m.band.y0; y <= m.band.y1; y += 3) for (const x of xs) pts.push(rgbToOklab(modelRgbAt(m, y, x)));
     const Ls = pts.map(cieLAt);
     bandDL = Math.max(...Ls) - Math.min(...Ls);
     const mean = pts.reduce((s, l) => [s[0] + l[0] / pts.length, s[1] + l[1] / pts.length, s[2] + l[2] / pts.length] as Oklab, [0, 0, 0] as Oklab);
@@ -809,6 +817,11 @@ export function skyCheck(spec: SkySpec, o: {ink?: string} = {}): SkyCheck {
   let greyRun = 0;
   let run = 0;
   const yEnd = m.curve.ky[m.curve.ky.length - 1];
+  const yellowGreen = (rgb: Rgb) => {
+    const [, a, b] = rgbToCieLab(rgb);
+    const h = ((Math.atan2(b, a) * 180) / Math.PI + 360) % 360;
+    return h >= 95 && h <= 140 ? Math.hypot(a, b) : 0;
+  };
   for (let y = m.curve.ky[0]; y <= yEnd; y += 1) {
     const [, a, b] = rgbToCieLab(oklabToRgbInGamut(curveAt(m.curve, y)));
     const C = Math.hypot(a, b);
@@ -817,18 +830,27 @@ export function skyCheck(spec: SkySpec, o: {ink?: string} = {}): SkyCheck {
     run = C < 2.5 ? run + 1 : 0;
     greyRun = Math.max(greyRun, run);
   }
+  // ... and where the sun's warmth crosses the ramp (composited in sRGB, as drawn): a warm colour laid over the mint
+  // finds its own way through yellow-green, which the ramp alone never shows
+  if (m.sun) {
+    const s = m.sun;
+    for (let y = Math.max(m.curve.ky[0], s.y - s.ry); y <= Math.min(yEnd, s.y + s.ry); y += 4) {
+      for (let x = Math.max(m.x, s.x - s.rx); x <= Math.min(m.x + m.width, s.x + s.rx); x += 12) khakiC = Math.max(khakiC, yellowGreen(modelRgbAt(m, y, x)));
+    }
+  }
   return {bandDL, bandDE, inkContrast, khakiC, greyRun, stops: skyStops(spec).length, notes: m.notes};
 }
 
 /** CRAFT §g's budgets, empty = OK: band dL* <= maxDL (default 1.5); ink >= 7:1 on the band; the yellow-green zone of the
- *  ramp at C* <= 7 (pale light, never khaki or olive); no grey run over 60 px. The guard's own actions come as notes. */
+ *  sky (the ramp and where the sun's warmth crosses it) at C* <= 7 (pale light, never khaki or olive); no grey run over
+ *  60 px. The guard's own actions come as notes. */
 export function skyProblems(spec: SkySpec, o: {ink?: string} = {}): string[] {
   const m = skyModel(spec);
   const c = skyCheck(spec, o);
   const out: string[] = [];
   if (m.band && c.bandDL > m.band.maxDL + 1e-6) out.push(`caption band y ${m.band.y0}-${m.band.y1}: dL* ${c.bandDL.toFixed(2)} (> ${m.band.maxDL})`);
   if (c.inkContrast !== null && c.inkContrast < 7) out.push(`ink ${o.ink} on the caption band: ${c.inkContrast.toFixed(2)}:1 (< 7:1)`);
-  if (c.khakiC > 7) out.push(`the ramp crosses yellow-green at C* ${c.khakiC.toFixed(1)} (> 7: reads khaki / olive); lower the light key's chroma`);
+  if (c.khakiC > 7) out.push(`the sky crosses yellow-green at C* ${c.khakiC.toFixed(1)} (> 7: reads khaki / olive); lower the light key's chroma, or keep the sun's warmth lower (ry)`);
   if (c.greyRun > 60) out.push(`a grey run of ${c.greyRun} px (C* < 2.5): give the light band some warmth`);
   return out.concat(c.notes.map((n) => `note: ${n}`));
 }

@@ -28,7 +28,7 @@ const FPS = 60;
 
 /** S1's warm horizon and evening sky (src/v2r/world/skies.ts: the film's one sky per set): the mint flat through the
  *  caption band, a gentle zenith, a pale warm light band, the peach horizon at y 800 (behind the far roofs), the low
- *  sun's warmth 340 x 204 around SUN0. */
+ *  sun's warmth 340 x 153 around SUN0 (low and wide). */
 const HORIZON = S1_HORIZON;
 
 /** A zenith `drop` OKLCH L under the band colour, a touch richer and cooler (eveningSky's recipe). */
