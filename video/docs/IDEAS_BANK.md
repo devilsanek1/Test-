@@ -18,3 +18,6 @@ prompts never load it. Re-check freshness and facts before using anything here.
 | "The icing, not the cake": Barclays 5,000 jobs "because of AI" | test for any "AI took the jobs" headline; verify the CEO quote | `v4/archive/G0_TOPICS_round2_options.md` (runner-ups) |
 | "700 supermarket freezers turned into ovens" (France, Oct 2026) | most drawable; needs a fresh peg | same; `v4/scouting/tech_internet.md` |
 | "You told an AI your secrets, now a bankruptcy judge decides" (Character.AI Chapter 11) | pegs: ~23 Nov auction; clear viewer action | same; `v4/scouting_r2/ai_everyday.md` |
+- **AI songs and the shared royalty pot** (parked from v4, 2026-10-28; a negative story, so it fits after a positive one):
+  G0 and G0.5 are complete (fact file, top 3 core lines, truth-checked); `video/docs/v4/archive/ai_songs/README.md` says how
+  to resume. Re-check freshness first.
