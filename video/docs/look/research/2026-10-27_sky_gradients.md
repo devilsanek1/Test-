@@ -97,8 +97,9 @@ tile), `scripts/render-media.mjs --master`, the demo `src/entry-v2r-sky.tsx`, S1
   (= the far haze) -> the warmth gathered round the low sun. Value control: the band stays one value (dL* <= 1.5) so the
   ink keeps its contrast.
 - **How deep a zenith (measured, §5 table E):** a deeper zenith is richer, but a slow ramp over a big area is exactly
-  where a platform's re-encode leaves soft contours: dL* 0.6 and 1.1 passed the 3.5 Mbps simulation, dL* 2 left 3 weak
-  contours in every rung. Default: OKLCH L -0.012 (dL* ~1.1).
+  where a platform's re-encode leaves soft contours: zeniths up to dL* 1.3 passed the master and every simulated rung,
+  dL* 2.4 left 3 weak contours at the 2 Mbps rung. Default: OKLCH L -0.012 (dL* 1.3 at the key above the frame, ~1.0 at
+  the frame's top edge).
 
 ## 3. Banding: why it happens, what Chrome does, the fixes
 
@@ -221,9 +222,9 @@ band 1.7 L* dark; `--master` PASS 0, 0.02, grain 0.28, dE76 to the lossless stil
 (The steps' own top rows PASS after a re-encode only because the platform smooths them into its own blocks; their
 west gap keeps the flat steps by design.)
 
-**E. The zenith, pure sky, region 0,0,1080,317, after the master and three rungs:** zenith dL* 0 (flat): PASS / FAIL 1
-chroma blotch / FAIL / PASS; dL* 0.6: PASS everywhere; **dL* 1.1 (default): PASS / PASS / WARN 3 weak / WARN 3 weak**;
-dL* 2: PASS / WARN / WARN / WARN.
+**E. The zenith, pure sky, region 0,0,1080,317 (master CRF 14 slow aq-mode 3, then P35 / P20 / H25):** zenith dL* 0
+(flat), 0.7 and **1.3 (default)**: PASS in the master and every rung (at most 1 weak step); dL* 2.4: PASS / PASS / WARN
+(3 weak) / PASS.
 
 **F. Raw renders (no encode), west gap:** six flat steps FAIL (27 strong, dE00 5.7, staircase 0.97); plain 2-stop PASS
 (0.00); lib/sky PASS (0.01, grain 0.27, band dL* 0.11). Cost: the dither adds ~80-95 ms per full-size frame in Chrome

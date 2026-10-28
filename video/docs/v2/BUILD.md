@@ -70,7 +70,7 @@ GL=angle node scripts/render-frames.mjs Film2R-V2S4 <dir> 0.2,1.0,2.5 $E --scale
 GL=angle node scripts/render-frames.mjs Film2R <dir> 12.95,12.98,13.0 $E --scale=0.4           # a join in context (film s)
 npx remotion render src/entry-v2r-film.tsx Film2R-V2S4 <out>.mp4 --gl=angle --concurrency=2 --scale=0.4
 npx remotion render src/entry-v2r-film.tsx Film2R <out>.mp4 --gl=angle --concurrency=2 --scale=0.4     # the assembly's review cut (label on)
-npx remotion render src/entry-v2r-film.tsx Film2R out/v2r_final.mp4 --gl=angle --concurrency=2 --crf 14 --props='{"draftLabel":false}'
+GL=angle node scripts/render-media.mjs Film2R out/v2r_final.mp4 --entry=src/entry-v2r-film.tsx --master --concurrency=2 --props='{"draftLabel":false}'   # the master (PIPELINE_V2 "Master encode")
 npx remotion render src/entry-v2r-film.tsx Film2RBare <out>.mp4 --gl=angle --concurrency=2 --scale=0.25 # sound-off cold read
 ```
 Palette check: `problems()` in `src/v2r/palette.ts` (pass measured coverage for the budgets). Typecheck: `npx tsc --noEmit`.

@@ -668,9 +668,9 @@ export type EveningSkyOpts = {
   horizon: SkyColor;
   /** Where the horizon colour is reached (behind the far skyline). */
   horizonY: number;
-  /** The top of the sky: the band colour a touch deeper and cooler (default OKLCH L -0.012, C +0.004, h +6: dL* ~1.1;
-   *  a deeper zenith reads richer but a slow ramp over a big area is where a platform's re-encode leaves soft blotches,
-   *  measured: CRAFT §g). */
+  /** The top of the sky: the band colour a touch deeper and cooler (default OKLCH L -0.012, C +0.004, h +6: dL* 1.3 at
+   *  the key, ~1.0 at the frame top; a deeper zenith reads richer, but a slow ramp over a big area is where a platform's
+   *  re-encode leaves soft contours: dL* 2.4 warned at the 2 Mbps rung, measured: CRAFT §g). */
   zenith?: SkyColor;
   /** The light band just above the warm horizon: lighter than both, low chroma, the horizon's hue turned warm-cream
    *  (default L max + 0.022, C 0.014, h horizon + 8); false = none. The mint crosses to the peach through light, never

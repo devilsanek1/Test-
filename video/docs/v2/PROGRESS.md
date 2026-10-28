@@ -2,6 +2,17 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 00:18 UTC (hourly)
+
+| part | owner | status |
+|---|---|---|
+| Depth + particles toolkit | local `wf_5d776523-d28` | builder finishing (lib/depth.ts, lib/particles.tsx, check_depth.py, DEPTH.md, CRAFT §f, PIPELINE gates, v2 brief sections all pushed); critic next |
+| Pro sky | local `wf_951757bf-213` | sky engineer building (lib/sky.tsx, check_banding.py, v2r/world/skies.ts, encode settings in render-media.mjs); critic next |
+| S1 look clip v3 | L1 | wiring lib/depth + lib/particles into S1, measuring with check_depth; then the sky lib; then v3 render |
+| L2-L6 | paused | resume after the owner sees v3 |
+
+**Spend:** orchestrator $3,728.60 (+$44 in the last hour). The owner dedicated the full remaining week to video 2 (finish inside 100 %).
+
 ## Snapshot 2026-10-27 23:18 UTC (hourly)
 
 | part | owner | status |
