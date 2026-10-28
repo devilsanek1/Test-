@@ -1,3 +1,15 @@
+> **Resumed 2026-10-28 ~08:00 UTC (RESUME_2026-10-28.md; the G4 look v4 approved).** Pushed: the S5 -> S6 Wiper (V2S5_wiper:
+> one calm blossom tree, right to left, clipped y >= 560); S5's sky = world/skies `S5_SKY` (screen space, no sun warmth: any
+> warmth at y ~650 reads khaki, as L5 found for S6), the flat April bands gone; one atmosphere `S5_ATM` (V2S5_depth: the air
+> = the gold horizon, S1's far ladder 0/12/22/66/90 %, hue turn 30); far/river tones receded per role (V2S5_far_tones); the
+> dc kit's valley and Pentagon FORKED onto that air (V2S5_valley, V2S5_pentagon; calmer slot crowns BLOOM_S5; the Pentagon a
+> grey roof + ONE closed outline in its own shade, A from 22.43); the light rig `s5Rig(p)` (V2S5_light: the sun's shadows
+> swing 15 -> 165 deg with its screen spot); every plane tier C; the news box A 20.90-21.75 with contact + cast shadows; the
+> stranger's contacts; particles SEEN (V2S5_particles: 30-36 px petals, 2 at the start, 2 in the landing hold); World stage
+> flat (the push-through out of the April sun now plays). Depth sheets `scripts/qa/depth_sheets/v2_s5_{21.0,23.4}.json`.
+> In flight: ONE deck agent on V2S5_deck_* (calm floor with visible receding joints: check_depth "elevation" FAILs on the
+> old floor; contact/cast shadows; frames' crowns calmed; life: nothing enters 23.55-24.00). Then: checks, ONE critic, report.
+
 > **Paused 22:40 UTC for the depth pass (orchestrator; resume when it adds a depth section to conform_L4.md).** Conform state
 > (typecheck clean, committed, NOT yet rendered): DONE `V2S5_figs.tsx` (Pip seated at (415, 1120) from frame 0, no arrival
 > hop, no 23.90 leap, its one reaction = lookUp at the slot's blossom (330, 885) on "April" 0.21; the stranger turns a page
