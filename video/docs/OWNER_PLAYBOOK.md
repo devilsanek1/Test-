@@ -267,7 +267,8 @@ Maintenance at the end).
 - **Topics: tech and AI news, and AI-ADJACENT news (science, health tech, space, robots, computers, energy: where AI is
   part of the story or right next to it), is the channel's focus** ("no too narrow, lets research some more - expand it to
   AI adjacent news", v4, 2026-10-28); the existing fuss (people already arguing about it) weighs as much as
-  a direct wallet hit,** and an everyday consequence beats a bigger, distant story. — (v3 G0; v4 G0: "focus on tech and AI",
+  a direct wallet hit,** and an everyday consequence beats a bigger, distant story. The city-poster brainstorm is the
+  one open exception: any subject (Places on screen, below). — (v3 G0; v4 G0: "focus on tech and AI",
   picked AI songs over the wallet pick: "good amount of fuss about AI songs", 2026-10-27).
 - **Topics are picked in the owner's order: relevant (with buzz and surprise) first, then true and solid, then
   visually appealing in our look, then the mood the slate needs, then fresh (news from about the last month), then
@@ -290,10 +291,16 @@ Maintenance at the end).
 - **Places on screen: find the content that fits a world of cities, architecture and buildings.** The owner's examples
   are v1 (the best performer so far) and v2 (the look they like; its story was the weak part). Which stories fit is
   studied in `docs/studies/2026-10-28_city_posters/` (the content track) before it changes `docs/TOPIC_CRITERIA.md`.
-  — ("I want us to see which type of content would be best fit into videos where we have more of cities /
+  **That brainstorm is open to any subject, not only tech and AI: the content that fits the look best and that people
+  would love to hear about** (the owner's own seeds: history, news from cities, stories); **news from cities is
+  positive.** Until the owner picks a direction from it (`content_discussion.md` in the study), picks keep the tech/AI
+  focus above. — ("I want us to see which type of content would be best fit into videos where we have more of cities /
   architectures / buildings / etc - so for example our very first video was the most successful so far and i
   personally like the last video about google i think the story wasn't quite good, but visually it was nice to be
-  honest. Obviously still far away from what we could do to be very successful studio, but initial steps", 2026-10-28).
+  honest. Obviously still far away from what we could do to be very successful studio, but initial steps", 2026-10-28;
+  then "Don't be fixated on tech or AI, all goes, the best kind of content that fits into this and people would love
+  to hear about. Some of the ideas off the top of my head - some history videos? Some news that are happening in the
+  cities, but i want them to be possitive? Some stories? waht else ? Do proper brainstorm", 2026-10-28).
 - **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
   frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
 - **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).
