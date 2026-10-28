@@ -123,6 +123,11 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   keep going" -> v5 is the look; the leaves are the proven particle (playbook: the depth rule's evidence); the water stays as it is for this
   film (every lane keeps S1's water, no new water styling) and is a known weak spot: playbook "water gets its own study in the next film's
   G4"; if the budget allows at G6 polish, one water pass across all shots, shown to the owner first.
+- 2026-10-28 ~09:05 UTC, asked what bothers them about the water: "It's just looking way too cheap, not clean or premium quality or
+  refined. Just lazy and cheap. I mean that about the water" -> the water is redesigned NOW as one shared premium component (researched,
+  two competing treatments judged on S1, the winner built into the library), shown to the owner on S1 as the G4 look clip v6 before the
+  lanes swap it in; the lanes keep going meanwhile (their water isolated in one component, no water polish); the final review round
+  shrinks to pay for it inside 100 % of the week.
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
