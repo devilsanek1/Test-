@@ -35,7 +35,8 @@
 //                    under it (no transition camera); `drift: 50` (px) restores the v2 parallax drift.
 //   push-through     zoom into a point of the outgoing scene until it fills the frame, (optional flat `bridge` colour
 //                    for 3 frames), then the incoming scene pulls back out of its own point:
-//                    {dur = 1.1, from: [x, y], to?: [x, y] (default centre), zoom = 7, bridge?: colour}.
+//                    {dur = 1.1, from: [x, y], to?: [x, y] (default centre), zoom = 7, bridge?: colour, hold?: s}
+//                    (`hold`: the bridge's length, centred on the cut; default PT_HOLD 0.1).
 //                    Match the colours: zoom into a window whose glass is the incoming scene's sky.
 //   unbuild          the outgoing scene un-builds (MOTION.unbuild recipe) over [c - dur, c] on top of the incoming
 //                    scene, which is already rendered underneath (its local time is negative: show its line-art
@@ -120,7 +121,7 @@ export type FilmTransition = FilmJoin & (
        *  camera (v3). 50 = the v2 drift. */
       drift?: number;
     }
-  | {type: 'push-through'; dur?: number; from?: Pt; to?: Pt; zoom?: number; bridge?: string; /** Opt-in ink compensation exponent (0.6 = house): strokes x zoom^-inkComp on both legs (lib/inkComp.tsx). Default off. */ inkComp?: number}
+  | {type: 'push-through'; dur?: number; from?: Pt; to?: Pt; zoom?: number; bridge?: string; /** With `bridge`: the flat bridge's hold (s), centred on the cut. Default PT_HOLD (0.1). */ hold?: number; /** Opt-in ink compensation exponent (0.6 = house): strokes x zoom^-inkComp on both legs (lib/inkComp.tsx). Default off. */ inkComp?: number}
   | {type: 'unbuild'; dur?: number}
 );
 /** Caption tone key (scene-local t). `wipe` makes the switch follow a sky wipe edge across the caption band. */
@@ -212,9 +213,12 @@ function camCont(tr: Extract<FilmTransition, {type: 'camera-continuous'}>): {dOu
   };
 }
 
+/** A push-through's flat-bridge hold (s): its own `hold`, else PT_HOLD; 0 without a bridge. */
+export const pushThroughHold = (tr: Extract<FilmTransition, {type: 'push-through'}>): number => (tr.bridge ? tr.hold ?? PT_HOLD : 0);
+
 function pushThrough(tr: Extract<FilmTransition, {type: 'push-through'}>) {
   const d = tdur(tr);
-  const hold = tr.bridge ? PT_HOLD : 0;
+  const hold = pushThroughHold(tr);
   const dOut = (d - hold) * 0.45;
   const dIn = (d - hold) * 0.55;
   const Z = tr.zoom ?? 7;
