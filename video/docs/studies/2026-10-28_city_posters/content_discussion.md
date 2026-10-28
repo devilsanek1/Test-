@@ -3,8 +3,12 @@
 **State (2026-10-28 ~22:30 UTC): OPEN.** The owner widened the brief to any subject ("Don't be fixated on tech or AI,
 all goes"). Exchange 2 sent: ten content directions with one example each, a top 3 (festivals and seasons explained;
 cities that fixed what yours didn't; good news from a city, with the why), and a series format (one city per video).
-Waiting on the owner's pick. `content_market.md` and `content_fit.md` (the orchestrator's content track, still WIP when
-read at ~22:15 UTC) are folded in below; both were scoped to tech and AI before the owner widened it.
+Waiting on the owner's pick. `content_market.md` and `content_fit.md` (the orchestrator's content track) are folded in
+below; both were scoped to tech and AI before the owner widened it. Their final versions (pulled ~22:20 UTC) change
+nothing here: `content_fit.md`'s tech-led ranking (nature against the city with tech on its side 8.12; the system drawn
+as a city and the hidden machine under it 7.76; the street that works differently now 7.40) is the pool's tech row
+(19). The owner's ONE LOOK, ONE BRAND answer (`video/docs/look/poster_refs/README.md`; the playbook) backs the series
+format: every cover in one look, read as one set of posters.
 
 Run by the parallel thread (helper session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt), started by the
 study's orchestrator (https://claude.ai/code/session_01YGLGMqbgdpycjemYZL3aoL), on branch
