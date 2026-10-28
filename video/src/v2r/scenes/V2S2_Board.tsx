@@ -1,15 +1,20 @@
 // V2S2_Board (lane L2): the newsstand's A-board TOLD THE BBC (TREATMENT §5 S2 "Texts on objects"; map S2.aBoard face
 // x 160-560, y 1050-1250, here 8 px left) and the newsagent who shoves it out from behind the kiosk (the wood clack
 // 8.44). The board is K3's `ToldTheBBCBoard` (L5): its frame, face, lettering and ground shadow; tier B while it rests
-// behind the kiosk, A from 8.44 (conform_L2 §4); its shadow only once it moves (before, it would show beyond the kiosk).
+// behind the kiosk, A on its beat only, 8.42-9.60 (the shove, "But Google's", until the BBC beat has played: the critic
+// 2026-10-28, it owned the eye to the match as the biggest, brightest A), then B again; its shadow only once it moves.
 // Times are FILM seconds (the scene wraps it in <TimeShift by={-6.1}>).
+//   at rest it is wholly hidden behind the kiosk (its back wedge's foot at x 95 < the kiosk's 104: no plum stile beside
+//   the newsagent before the shove).
 //   the move: the shove starts it at 8.42; a sine push-and-slide (quarter-sine in over 0.11 s while the hand is on the
-//   stile, quarter-cosine out over 0.41 s) lands 3 px past its spot at 8.94 and rocks back by 8.985 (peak 19.1 px/f),
-//   as the five light clicks start (8.96-9.12).
-//   the newsagent: back -> 3/4 -> profile in 3 drawings at 12/s (8.12-8.28), a 3-drawing shove with a lean
-//   (8.34 wind-up / 8.42 push / 8.50 follow-through) with the hand ON the right stile while it is in reach, recovers
-//   (8.62 / 8.74), then steps back and turns back in 3 drawings (9.05 / 9.15 / 9.25); idle = 3 drawn re-stacking
-//   poses at 7/s in bursts (no sine-driven arm).
+//   stile, quarter-cosine out over 0.41 s) lands 3 px past its spot at 8.94 and rocks back by 8.985 (the same timing;
+//   453 px now: peak 22.8 px/f at 8.53, while only its stile and blank margin are out; the lettering clears the
+//   newsagent at ~22 px/f and is under 15 px/f from 8.75), as the five light clicks start (8.96-9.12).
+//   the newsagent: back -> 3/4 -> profile in 3 drawings at 12/s (7.70-7.92, on "contract", well before Pip's "But"
+//   swivel 8.28-8.44: never two turns at once), holds in profile with his hand on the board's edge at the kiosk's
+//   corner (no wind-up), then a 2-drawing shove with a lean (8.42 push / 8.50 follow-through) with the hand ON the
+//   right stile while it is in reach, recovers (8.62 / 8.74), then steps back and turns back in 3 drawings (9.05 /
+//   9.15 / 9.25); idle = 3 drawn re-stacking poses at 7/s in bursts (no sine-driven arm).
 import React from 'react';
 import {CM} from '../palette';
 import {useTime, clamp} from '../../lib/time';
@@ -21,15 +26,18 @@ import * as MAP from '../world/map';
 
 /** The board face shifted this far left of the map rect: K3's frame (26 px stiles) then ends at x 536, a clear gap
  *  left of Pip's seat (Pip's lower body starts at x ~560: no tangent, Pip never reads as perched on the board). Its
- *  left stile hides behind the kiosk; at rest its lettering hides behind the kiosk and the newsagent (BOARD_DX0). */
+ *  left stile hides behind the kiosk; at rest the whole board hides behind the kiosk (BOARD_DX0). */
 export const BOARD_SHIFT = -50;
 const F = {x0: MAP.S2.aBoard.x0 + BOARD_SHIFT, y0: MAP.S2.aBoard.y0, x1: MAP.S2.aBoard.x1 + BOARD_SHIFT, y1: MAP.S2.aBoard.y1};
 /** K3's small frame (ToldTheBBCBoard's defaults). */
 const STILE = 26;
 /** Ground line under the board (the legs' feet: K3's S2_LEGS_Y1). */
 export const BOARD_GROUND = S2_LEGS_Y1;
-/** The board's resting offset behind the kiosk (its lettering hidden) and its move. */
-export const BOARD_DX0 = -376;
+/** The board's resting offset: wholly behind the kiosk (x <= 104): the frame's right stile ends at x 536 and its back
+ *  wedge's foot at 545 (K3 boardFrame: side 0.36 x the 26 px stile), so at -450 its rightmost pixel is x 95. */
+export const BOARD_DX0 = -450;
+/** The board is the beat's subject (tier A) from the shove to here, then support (B). */
+export const BOARD_SUBJECT = {t0: 8.42, t1: 9.6};
 const SHOVE_T0 = 8.42;
 const RISE = 0.11;
 const FALL = 0.41;
@@ -55,6 +63,8 @@ export const boardRightStileX = (t: number) => F.x1 + STILE + boardDx(t);
 // ---------------------------------------------------------------- the newsagent
 
 const AGENT_X = 112;
+/** The hand's leftmost spot: the board's edge at the kiosk's corner (x 104). */
+const HAND_MIN_X = 100;
 const AGENT_Y = 1296;
 const AGENT_H = 250;
 const AGENT_TRAITS = {coat: CM.coatPlum, acc: 'none' as const};
@@ -79,13 +89,14 @@ export function agentAt(t: number): AgentDrawing {
     const f = Math.floor(u * 7);
     return back([0, 1, 2, 1, 0, 2][f % 6]);
   };
-  if (t < 8.12) return idle(6.1);
-  // the turn: back (head turned) -> 3/4 -> profile, 3 drawings at 12/s
-  if (t < 8.2) return {view: 'back', flip: false, pose: 'stand', dx: 0, lean: 0, turn: 0.6};
-  if (t < 8.28) return {view: 'rear34', flip: true, pose: 'stand', dx: 2, lean: 0};
-  if (t < 8.34) return {view: 'profile', flip: true, pose: 'stand', dx: 4, lean: 0};
-  // the shove: wind-up (hand on the stile, a lean back), push, follow-through
-  if (t < 8.42) return {view: 'profile', flip: true, pose: 'reach', dx: 6, lean: -2.5, reach: 'stile', elbow: [-22, -132]};
+  if (t < 7.7) return idle(6.1);
+  // the turn (on "contract", before Pip's "But" swivel): back (head turned) -> 3/4 -> profile, 3 drawings at 12/s
+  if (t < 7.78) return {view: 'back', flip: false, pose: 'stand', dx: 0, lean: 0, turn: 0.6};
+  if (t < 7.86) return {view: 'rear34', flip: true, pose: 'stand', dx: 2, lean: 0};
+  if (t < 7.92) return {view: 'profile', flip: true, pose: 'stand', dx: 4, lean: 0};
+  // the hold: in profile, his hand on the board's edge at the kiosk's corner, upright (no wind-up)
+  if (t < 8.42) return {view: 'profile', flip: true, pose: 'reach', dx: 6, lean: 0, reach: 'stile', elbow: [-22, -132]};
+  // the shove: push, follow-through
   if (t < 8.5) return {view: 'profile', flip: true, pose: 'reach', dx: 12, lean: 5, reach: 'stile'};
   if (t < 8.62) return {view: 'profile', flip: true, pose: 'reach', dx: 16, lean: 9, reach: 'stile'};
   // recover (watching it land), upright
@@ -107,8 +118,9 @@ const Newsagent: React.FC = () => {
   if (d.pose === 'reach') {
     if (d.reach === 'stile') {
       // the hand on the right stile's face (screen), mapped into the leaning, flipped figure's local frame; at full
-      // stretch it lets go (the board slides on)
-      const sx = Math.min(boardRightStileX(t) - 10, fx + 118);
+      // stretch it lets go (the board slides on). While the stile is still behind the kiosk the hand grips the board's
+      // edge at the kiosk's corner (never reaching back into the kiosk)
+      const sx = Math.min(Math.max(boardRightStileX(t) - 10, HAND_MIN_X), fx + 118);
       const sy = 1150 + boardDy(t, undefined, MAP.S2.aBoardOutAt);
       const th = (-d.lean * Math.PI) / 180;
       const vx = sx - fx;
@@ -136,7 +148,7 @@ export const S2Board: React.FC = () => {
         legsTo={BOARD_GROUND}
         clackAt={MAP.S2.aBoardOutAt}
         shadow={t < SHOVE_T0 ? false : undefined}
-        tier={t >= MAP.S2.aBoardOutAt ? 'subject' : 'support'}
+        tier={t >= BOARD_SUBJECT.t0 && t < BOARD_SUBJECT.t1 ? 'subject' : 'support'}
         seed="s2bbc"
       />
     </XG>

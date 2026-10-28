@@ -46,14 +46,15 @@ export const S2FarLife: React.FC = () => {
  *            10.85, a quicker gust: out before the match's quiet 12.78). None enters within 0.2 s of a join or a beat
  *            (8.44, 8.96, 9.48, 10.26-10.60, 10.85, 12.20). Drawn on our towpath's plane BEHIND the near things (the
  *            planter's grass, the bike, the lamp post pass in front of them: depth).
- *    far     four 9-10 px motes in the far air RIGHT of Pip, in front of the near bays' ground floor (x 652-800,
- *            y 822-922: its slate shade panes and brick piers), L* +20 over the bays' brick (over a limestone fin or
- *            a lit pane they melt, never a dark speck); nothing stands in front of them all shot (the board's
- *            footprint is left of Pip)
+ *    far     three 9-10 px motes in the far air RIGHT of Pip, in front of the near bays' ground floor (x 650-762,
+ *            y 866-928: two unlit panes' slate shade and the brick between, left of the lit pane), L* +20 over the
+ *            bays' brick (+26 over the slate; over a limestone fin they melt, never a dark speck); nothing stands in
+ *            front of them all shot (the board's footprint is left of Pip); seeded to keep apart (>= 24 px)
  *    near    three 12-16 px motes drifting slowly through the bench's cast shade on our bank, right of the bench
  *            (the nearest real shade in the read zone that stays all shot; L* ~68): L* +18 over it, pale specks in
- *            the low sun (on the dark near lamp post the +20 cap left them mid-brown dots that read as bolts)
- *  9 alive at most (CRAFT §f.6: <= ~10 motes, <= ~16 in all). */
+ *            the low sun (on the dark near lamp post the +20 cap left them mid-brown dots that read as bolts);
+ *            seeded to keep apart (>= 17 px gap)
+ *  8 alive at most (CRAFT §f.6: <= ~10 motes, <= ~16 in all). */
 export const S2_PARTICLES = {t0: 4.0, joins: [6.1, 12.98], sun: [-260, 700] as [number, number]};
 const common = {t0: S2_PARTICLES.t0, joins: S2_PARTICLES.joins, sun: S2_PARTICLES.sun, avoid: [CAPTION_BAND]};
 /** What the leaves keep clear of (screen px at the pose): Pip on its bollard, the TOLD THE BBC board at rest (its
@@ -65,25 +66,21 @@ const LEAF_AVOID = [CAPTION_BAND, S2_PIP_ZONE, S2_BOARD_ZONE, S2_BENCH_ZONE];
 /** The leaves' common look: S1's preset (palmate, 34-40 px on screen at plane 0's scale, rust and gold), on the far
  *  rows' stone (their contrast is held against it), a light fall (50-65 px/s) on a westerly. */
 const leafLook = {kind: 'leaves' as const, leaf: 'palmate' as const, on: PAVE.far.a, colors: [CM.leafRust, CM.leafGold], size: [34, 40] as [number, number], speed: [50, 65] as [number, number], margin: 12, ...common, avoid: LEAF_AVOID};
-/** The far motes' air: in front of the near bays' ground floor right of Pip (the wall's plane +1 group). */
-const FAR_AIR: [number, number][] = [
-  [652, 840],
-  [800, 822],
-  [800, 890],
-  [652, 922],
-];
+/** The far motes' air: in front of the near bays' ground floor right of Pip, left of their lit pane (the wall's plane
+ *  +1 group): two unlit panes' slate shade (L* 62) and the brick between. */
+const FAR_AIR: [number, number, number, number] = [650, 866, 112, 62];
 /** The bays' brick right of Pip, as drawn (plane +1): what the far motes are lifted over. */
 const BAY_BRICK = '#CF9A83';
 /** The bench's cast shade on our bank's paving, as drawn (its core): what the near motes are lifted over. */
 const BENCH_SHADE = '#C1A096';
 export const S2_PARTICLE_FIELDS: {plane: number; layer: 'far' | 'leaves' | 'near'; f: ParticlesProps}[] = [
-  {plane: S2_PLANE.wall, layer: 'far', f: {kind: 'motes', seed: 's2motesFarR', region: {poly: FAR_AIR}, on: BAY_BRICK, count: 4, size: [9, 10], lift: 20, margin: 8, ...common, avoid: [CAPTION_BAND, S2_PIP_ZONE]}},
+  {plane: S2_PLANE.wall, layer: 'far', f: {kind: 'motes', seed: 's2motesFar3', region: {rect: FAR_AIR}, on: BAY_BRICK, count: 3, size: [9, 10], lift: 20, margin: 8, ...common, avoid: [CAPTION_BAND, S2_PIP_ZONE]}},
   // leaf 1: born off the left edge at 6.80 (its grow-in hidden), in view 7.08 -> 9.93, out by the right edge
   {plane: S2_PLANE.towpath, layer: 'leaves', f: {...leafLook, seed: 's2leafA', region: {rect: [-175, 1356, 30, 16]}, births: [6.8], drift: [400, 0], life: [4.5, 4.5]}},
   // leaf 2: born off the left edge at 10.80, in view 11.07 -> 12.67 (a quicker gust), out by the right edge
   {plane: S2_PLANE.towpath, layer: 'leaves', f: {...leafLook, seed: 's2leaf2D', region: {rect: [-200, 1356, 30, 16]}, colors: [CM.leafGold, CM.leafRust], births: [10.8], drift: [690, 0], life: [3.5, 3.5]}},
   // the near motes, last (nearest): through the bench's cast shade right of the bench (V2S2_Light: on screen #C1A096)
-  {plane: S2_PLANE.towpath, layer: 'near', f: {kind: 'motes', seed: 's2motesShade', plane: -2, region: {ellipse: {cx: 872, cy: 1296, rx: 64, ry: 27}}, on: BENCH_SHADE, count: 3, lift: 18, margin: 10, ...common}},
+  {plane: S2_PLANE.towpath, layer: 'near', f: {kind: 'motes', seed: 's2motesShade1', plane: -2, region: {ellipse: {cx: 872, cy: 1296, rx: 64, ry: 27}}, on: BENCH_SHADE, count: 3, lift: 18, margin: 10, ...common}},
 ];
 
 /** One layer of the fields, each in its plane group (far: the set's farLife slot, in the wall's plane group already;
