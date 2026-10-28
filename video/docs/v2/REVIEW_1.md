@@ -275,3 +275,80 @@ not add a MUST here:
   - Re-run check_light at 34.0.
   - Do a 0.25-scale pass over every on-screen word, and one 1x watch of 0-15 s on a phone.
 - **If the week forces a cut:** drop MUSTs from the bottom (6, then 5), and ask the owner before dropping 2.
+
+## Fix pass A (MUSTs 1, 2 and 5, 2026-10-28)
+
+Done by one agent from this review, the playbook's opening rules ("every opening effect must be BIG enough to stop a
+thumb"; "State the payoff in words ... Never a title over the captions"), DIRECTION rule 9 and CINEMATIC_GUIDE "The
+opening". Nothing else in the approved look changed (palette, light, depth, sky, particles, the water).
+
+**MUST 1, the frame-0 title: done.**
+- `Film2R.tsx`: `FILM2R_FRAME0` and `frame0` in `useCommon` are gone, as in Film3. The contract sheet's mirror of the block
+  (`entry-v2r-contract.tsx`) is gone too, and `map.ts FRAME0_TEXT` now lists the S1 pages. Page 1, "She [quit] Google.",
+  shows from f0 at the house size (98 px, the one-line slot).
+- The paging follows the heard words (`voice_words_heard.json`): "And she says her contract / bans her from [criticizing]
+  it…" (2.00-4.79, line 2 on "bans" at 3.20, its box on "criticizing" at 3.80), then "[for life]." (4.79).
+  - The long lines set that page at ~81 px (its line 2 is 1025 px wide at 98 px, against the 850 px band).
+    `film_captions.py` WARNs on the 25 / 29 characters.
+  - The boxes are my addition: every other hook page has one, and the old block's emphasis was these two words.
+- **One deviation from the brief:** "for life." leaves the band at 5.88 (`@out`), as the dive into W starts, and does not
+  run to 6.28. Without it, an ink caption sits on W's dark pane and the plum bridge for ~5 frames, so the band stays
+  empty through the dive as before. The same `@out` (14.64, as "talking?" ends) clears "So why is she talking?" before
+  the dive into her.
+- The pages go from 27 to 24. MUST 3's numbers move by -3: hide 16 (was 19), 19-21 (was 22-24) and 24 (was 27).
+- The S1 source line left the band (S8's, 33.16-36.54, is MUST 3's). `docs/v2/POSTING_KIT.md` is new: the core line as
+  the cover's text, and the source in the caption and the pinned comment.
+- The loop: page 1 pops back at captionAt 39.04 (f2343), at the f0 size and place: f2343, f2344 and f0 read the same.
+- Stale docs fixed: THROUGHLINE §1.1 and §6 S1, BUILD §1 / §3 / §5, Film2R's header, gate_check's v2r example, and
+  CINEMATIC_GUIDE's "Keep our frame-0 claim text", which clashed with the playbook.
+
+**MUST 2, the frame-0 draw-on: done.** Frame 0 is paper and the flat pale shapes (S1_PALE 0.7, unchanged), with no line
+at t < 0. The strokes start AT f0 and are the event (`V2S1_clock.ts` S1_DRAW, S1_BOLD):
+- **The order:** her (-0.017 to 0.20, one pen through her parts), then the door frame (0.12-0.21), the two leaves
+  (0.18-0.32, one pen per leaf), then W (0.27-0.39). W's frame closes on the lamp click (0.40).
+- **Bold:** an InkScale (lib/inkComp) of x1.8 on the clean pen's A line, 3.0 -> **5.4 px at 1080** (1.8 px at 360). It
+  eases back to 3.0 px over the flood (0.44-0.80, in-out sine), so the rest of the shot is the approved line.
+- **Full contrast:** each line is its object's own deep shade, and her coat's line is the teal's while the coat is still
+  paper (FigDraw `lineTone`).
+- **The pen tip:** a solid disc in the line's colour rides each stroke's head, radius 1.25 x the line (13.5 px across at
+  1080, ~4.5 px at 360). It is an opt-in `tip` on lib/Ink, off by default, so other films are untouched. No blur, glow
+  or gradient.
+- **W goes dark at 0.40** with its plum pane in full colour at once (CellPaint `full`), before the flood reaches the wing,
+  so the click reads on the pale page: it is the first colour after the sun.
+- **The doors and the ding** keep 0.45-0.52. Pip's tinted line now draws with the flood (from 0.44), not under the pen.
+- **The flood** runs from SUN0 at 0.44: the sky flood by f30, 5200 px/s to the far corner at ~0.74, and her coat last at
+  0.78 (f47). The colour is done by ~0.8 s: the mean L* under the sky is 91.7 at f0, 90.1 at f24 and 77.9 at f48.
+- **The sound:** `pen_drawon` was redesigned in `audio/v2r/sfx.py`.
+  - The glide runs 0.00-0.39, with a light lift and re-touch at 0.12, 0.18 and 0.27. The flood wash runs 0.44-0.80 (the
+    file is 0.86 s, gain 0.059, 20 dB under the voice).
+  - The mix was rebuilt with `sfx.py` + `premix.py`. The bed is unchanged (its join windows come from the midpoints), and
+    the mix differs from the old one only in 0-1 s.
+  - premix: no hit word failing (She 14.7, quit 10.2, Google 12.0 dB over everything at 1-4 kHz) and no join failing.
+    The master stays at -14.01 LUFS / -1.25 dBTP.
+  - The loop seam's crossfade still matches: an RMS step of -0.63 dB, a 2-8 kHz step of 0.2 dB, and a deepest 5 ms dip of
+    -2.6 dB.
+- **The loop:** S8's un-build (38.82-39.08) now lands on paper and pale shapes, and the pen starts at f0. The seam frames
+  (see the checks below) show no pop.
+
+**MUST 5, the two dark push-throughs: done.**
+- `lib/Film.tsx` takes a per-join `hold` on a push-through with a bridge (`pushThroughHold`; the default is still
+  PT_HOLD 0.1). Film2R's Bridges and gate_check's cut model read the same value.
+- V2S2 and V2S4 now run `dur` 0.45 with `hold` 0.05, and the midpoints stay at 6.10 and 14.86.
+- **S1 -> S2:** the zoom into W grows for 11 frames (f354-f364, 0.18 s), then 3 plum frames (f365-f367), then 14
+  pull-out frames (f368-f381).
+- **S3 -> S4:** the same shape: f880-f890, then plum f891-f893, then f894-f906.
+- **Nothing enters early:**
+  - S4's tag pops at 15.07, when the pull-out is at v 0.84 (zoom 1.010).
+  - S2's first page pops at 6.28 (zoom 1.07, settling).
+  - The band is empty through both dives (MUST 1's `@out`).
+- **The whooshes** keep their cues (5.95, 14.71: the zoom is only seen from ~0.15 s before the midpoint, an in-cubic), and
+  they still peak on the midpoints: +20 ms / -1.3 dB and +13 ms / -0.9 dB, as before.
+
+**Checks.**
+- `npx tsc --noEmit -p .`: clean.
+- v1 (`Main` f6, f135) and v3 (`Film3` f6, f1158, which includes its push-through) render byte-identical before and
+  after the lib changes (md5 e19dbe70, 435ec8e6, 66852623, 0fc79e2b).
+- Stills of f0, f6, f12, f18, f27, f36 and f48, at 0.5 and at 360 px wide. At 360 px the bold door frame (from f12), W's
+  plum (f24) and the flood from the sun (f27-f48) are unmistakable. Her own strokes (f1-f12) are small: she is ~51 px
+  tall at 360.
+- The pushes as 12-frame strips, the seam strip (f2330-f2344, f0-f3) and gate_check on a full-size render: below.
