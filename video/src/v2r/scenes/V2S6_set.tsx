@@ -71,20 +71,21 @@ const fenceOverlay = (): Batch => {
   B.ink(lineD([[P.x - P.w / 2, base], [P.x - P.w / 2, P.cap + 16]]), 3.4, GT.ink);
   B.ink(lineD([[P.x + P.w / 2, base], [P.x + P.w / 2, P.cap + 16]]), 3.4, GT.ink);
   B.ink(lineD([[P.x - P.w / 2 - 7, P.cap], [P.x + P.w / 2 + 7, P.cap]]), 3.4, GT.ink);
-  // layer 5: the fence-foot tulips, replayed with the kit's own rng sequence (rng('fence'): the heights are its first draws)
+  // layer 5: the fence-foot tulips, replayed with the kit's own rng sequence (rng('fence'): the heights are its first
+  // draws) over ONE calm foliage band: the kit's leaf triangles on its dark soil strip read as a comb of short dark
+  // strokes (the line measure's near-miss ends), so the leaves are a continuous sage band with a lit top edge
   B.layer();
   B.rect(GT.kerb, x0, base - 6, x1 - x0, 8);
+  B.rect(LEAF.body, x0, base - 16, x1 - x0, 26);
+  B.rect(LEAF.lit, x0, base - 16, x1 - x0, 3);
   const rk = rng('fence');
-  let leaves = '';
   const heads = new Map<string, string>();
   for (let x = x0 + 4; x < x1; x += 11) {
     if (Math.abs(x - P.x) < P.w * 0.7) continue;
     const hgt = rk.range(26, 40);
-    leaves += `M${x - 3} ${base + 8}L${x} ${base + 8 - hgt * 0.7}L${x + 3} ${base + 8}Z`;
     const col = GT.tulip[Math.floor(frac(Math.sin(x * 0.07) * 43758.5) * GT.tulip.length)];
     heads.set(col, (heads.get(col) ?? '') + ellD(x, base + 8 - hgt, 4.2, 5.6));
   }
-  B.fill(GT.leaf, leaves);
   heads.forEach((d, col) => B.fill(col, d));
   return B;
 };
