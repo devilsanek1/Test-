@@ -183,11 +183,11 @@ function s1Sources(): WaterSource[] {
   out.push({id: 'wing/slit', thing: PM.q(0.74, V_LO, 0.56, V_PLINTH - V_LO), axis: WING_AXIS, color: shaded(S1_IRON), layer: LAYER.wing, plane: P0, breakup: 0, narrow: 0.08});
   // the door bay, kept lit: the lobby's gold, THE light in the water (R7), as LIGHT ON WATER (lib/water LightOpts; the
   // critic on v6's first master, CRITIC.md must-fix 1: "a solid slab with five equal round-capped bars ... a stack of
-  // pancakes", its 2 px gaps khaki in the encode): the lit glass's mirror, solid for a third of its length, then three
-  // lens slivers on the water, each a fifth shorter and thinner, the water between them >= 4.5 px; a step (6 L*) under
-  // the lit glass (#F7CF86, L* 85.1), falling 1.3 L* a sliver. As wide as the lit glass (the door's frame, ~0.09 m a
-  // side, stays with the wall)
-  out.push({id: 'wing/lobby', thing: PM.q(DU0 + DOOR_FRAME, Math.max(DV0, V_LO), DU1 - DU0 - 2 * DOOR_FRAME, HM - Math.max(DV0, V_LO)), axis: WING_AXIS, color: CM.lamp, kind: 'light', layer: LAYER.wing, plane: P0, light: {solid: 0.33, slivers: 3, ratio: 0.8, gap: 4.5, step: 6, fall: 1.3}});
+  // pancakes", its 2 px gaps khaki in the encode): the lit glass's mirror, solid for a third of its length (its bottom
+  // a gentle ripple), then three leaf slivers on the water, each a third shorter and 15 % thinner, the water between
+  // them >= 7 px; a step (6 L*) under the lit glass (#F7CF86, L* 85.1), falling 1.3 L* a sliver. As wide as the lit
+  // glass (the door's frame, ~0.09 m a side, stays with the wall)
+  out.push({id: 'wing/lobby', thing: PM.q(DU0 + DOOR_FRAME, Math.max(DV0, V_LO), DU1 - DU0 - 2 * DOOR_FRAME, HM - Math.max(DV0, V_LO)), axis: WING_AXIS, color: CM.lamp, kind: 'light', layer: LAYER.wing, plane: P0, light: {solid: 0.33, slivers: 3, step: 6, fall: 1.3}});
   // ---- the lamp posts at the path's back (off, slate iron): long thin verticals, whole for 70 %, then a few dashes
   for (const L of S1_FAR_LAMPS) {
     if (L.x > 900) continue; // behind boat A
@@ -221,7 +221,7 @@ function s1Sources(): WaterSource[] {
 
 const POP_FILL = MAP.GHOST_POP.outlineS + MAP.GHOST_POP.fillDelayF / 60;
 /** A walking figure, simplified (R5): what the water shows of it is its LEGS under the mid-calf hem (V2S1_row_fig:
- *  the hem at 0.25 h), their lower 0.19 h: ONE slim wavering wedge hanging from its own mirror line, 9.2 px wide at
+ *  the hem at 0.25 h), their lowest 0.12 h: ONE slim wavering wedge hanging from its own mirror line, 8 px wide at
  *  the waterline (her 1.70 m; <= 10 px), tapering to a point (a walking reflection in bars flickered as its slices
  *  passed; the coat beyond is left to Fresnel: a flat coat block read as a box). Its tone sits near the water's own
  *  (kMin 0.85: her legs L* ~70, the ghosts' 67-72), so it stays <= 12 L* under every field it crosses, the lit door's
@@ -230,7 +230,7 @@ const POP_FILL = MAP.GHOST_POP.outlineS + MAP.GHOST_POP.fillDelayF / 60;
 function figureThing(id: string, x: number, feetY: number, h: number, legs: string): WaterSource {
   const s = h / 170;
   const f = (dx: number, dy: number): Pt => [x + dx * s, feetY + dy * s];
-  return {id, thing: [f(-4.6, 0), f(4.6, 0), f(4.1, -9), f(2.9, -18), f(1.4, -26), f(0, -32), f(-1.4, -26), f(-2.9, -18), f(-4.1, -9)], axis: s1MirrorLine(x, feetY), color: legs, kind: 'figure', kMin: 0.85, layer: LAYER.people, plane: S1_PLANE.subject, breakup: 0, narrow: 0, taper: 1.6, solid: 1};
+  return {id, thing: [f(-4, 0), f(4, 0), f(3.4, -6), f(2.3, -12), f(1, -17), f(0, -20), f(-1, -17), f(-2.3, -12), f(-3.4, -6)], axis: s1MirrorLine(x, feetY), color: legs, kind: 'figure', kMin: 0.85, layer: LAYER.people, plane: S1_PLANE.subject, breakup: 0, narrow: 0, taper: 1.6, solid: 1};
 }
 
 /** Every reflection that moves at t: her (behind the glass, then on the towpath), the ghosts from their fill, the bus

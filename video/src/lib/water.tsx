@@ -507,17 +507,22 @@ export type WaterSource = {
   far?: boolean;
 };
 /** LIGHT ON WATER (a lit door, a lamp: R7; the critic on v6's first master, CRITIC.md must-fix 1: "a solid slab with
- *  five equal round-capped bars ... a stack of pancakes", its 2 px gaps turned khaki in the encode's 4:2:0 chroma). The
- *  column is the light's mirror: a SHORT SOLID BLOCK (<= 35 % of its visible length, its sides bent by the sway, its
- *  bottom corners rounded), then at most 3 LENS SLIVERS on the open water, each `ratio` (<= 0.85) as long and as thick
- *  as the one above (the first: `ratio` x the block's width), pointed at both ends (never a pill cap), seeded a little
- *  off the column's middle, each swaying with its own row; the water between them is >= `gap` px (>= 4: the encode's
- *  4:2:0 keeps at least 2 rows of every gap the water's own colour, wherever the float puts it). Its value is a step
- *  under its source (>= 4 L*: a reflection never outshines its light) and falls with each sliver. */
+ *  five equal round-capped bars ... a stack of pancakes", its 2 px gaps khaki in the encode's 4:2:0 chroma). The
+ *  column is the light's mirror: a SHORT SOLID BLOCK (<= 35 % of its visible length; its sides bent by the sway; its
+ *  bottom a gentle static ripple, `wave` px, so no single row carries the whole gold-to-water edge), then at most 3
+ *  LEAF SLIVERS on the open water (pointed at both ends, never a pill cap; flanks a touch straighter than a lens, `leaf`
+ *  1.5), each `ratio` (<= 0.85) as long and `thinning` (<= 0.85) as thick as the one above (the first: `ratio` x the
+ *  block's width), seeded a little off the column's middle, each swaying with its own row; the water between them is
+ *  >= `gap` px (>= 4: the encode's 4:2:0 keeps at least 2 rows of every gap the water's own colour, wherever the float
+ *  puts it). Its value is a step under its source (>= 4 L*: a reflection never outshines its light) and falls with
+ *  each sliver. */
 export type LightOpts = {
   solid?: number;
   slivers?: number;
+  /** Each sliver's length over the one above (the first's over the block's width) ... */
   ratio?: number;
+  /** ... and its thickness over the one above. */
+  thinning?: number;
   /** The first sliver's thickness: this share of its band's pitch, clamped to `thickPx`. */
   thick?: number;
   thickPx?: [number, number];
@@ -530,8 +535,12 @@ export type LightOpts = {
   fall?: number;
   /** Each sliver's seeded shift across, as a share of the block's width. */
   wander?: number;
+  /** The block's bottom ripple: amplitude (px) and wavelength (px). */
+  wave?: [number, number];
+  /** The sliver's profile: 2 = a lens (parabolic flanks), 1 = a diamond; 1.5 a willow leaf. */
+  leaf?: number;
 };
-export const LIGHT_DEFAULT: Required<LightOpts> = {solid: 0.33, slivers: 3, ratio: 0.8, thick: 0.8, thickPx: [5, 8], gap: 4.5, gapK: 0.95, gapGrow: 0.2, step: 6, fall: 1.3, wander: 0.05};
+export const LIGHT_DEFAULT: Required<LightOpts> = {solid: 0.33, slivers: 3, ratio: 0.68, thinning: 0.85, thick: 1.05, thickPx: [6, 9], gap: 4.5, gapK: 0.95, gapGrow: 0.2, step: 6, fall: 1.3, wander: 0.05, wave: [2.2, 56], leaf: 1.5};
 /** The sun's glitter column (R8; CRAFT §f.6's glints are its slivers). */
 export type WaterSun = {
   /** The sun on screen (its disc's centre). */
@@ -921,7 +930,20 @@ export function lightGeom(st: Static, s: Resolved): {top: number; yEnd: number; 
   const yEnd = Math.min(s.box.y1, st.spec.region.bottom(xc) + 4);
   return {top, yEnd, yBlock: top + Math.max(1, yEnd - top) * Math.min(0.35, lo.solid)};
 }
-/** LIGHT ON WATER (LightOpts): the short block, then the lens slivers on the open water. */
+/** A level LEAF (a light's sliver): pointed at both ends, `h` thick at its middle; its flanks follow 1 - |u|^p (p 2: a
+ *  lens; p 1: a diamond), sampled densely (smooth at any size). */
+export function leafD(cx: number, cy: number, len: number, h: number, p = 1.5): string {
+  if (len < 0.6 || h < 0.15) return '';
+  const n = 14;
+  const top: Pt[] = [];
+  for (let i = 0; i <= 2 * n; i++) {
+    const u = i / n - 1;
+    top.push([cx + (u * len) / 2, cy - (h / 2) * (1 - Math.pow(Math.abs(u), p))]);
+  }
+  const bot = top.slice(1, -1).map(([x, y]) => [x, 2 * cy - y] as Pt).reverse();
+  return polyD([...top, ...bot]);
+}
+/** LIGHT ON WATER (LightOpts): the short block, then the leaf slivers on the open water. */
 function buildLight(s: Resolved, ctx: FrameCtx, out: Runs): void {
   const {st} = ctx;
   const lo = {...LIGHT_DEFAULT, ...(s.light ?? {})};
@@ -933,30 +955,37 @@ function buildLight(s: Resolved, ctx: FrameCtx, out: Runs): void {
   const yEnd = g.yEnd + sy;
   const yB = g.yBlock + sy;
   const tones = lightTones(st, s, lerp(top, yB, 0.5));
-  // ---- the block: the light's own mirror, its sides bent by the sway, its bottom corners rounded
-  const block = clipBand(p, -1e9, yB);
-  if (block) {
-    const dense = roundBottom(densify(block, 4), yB, 3.5);
-    pushRun(out, s.layer, tones[0], polyD(dense.map(([x, y]) => [x + ctx.sway(y) * k, y] as Pt)));
-    counted(ctx, s, 'blocks');
-  }
-  // ---- the slivers: lenses on the open water, each `ratio` as long and as thick as the one above
   const iv = intervalsAt(p, yB - 0.5);
   if (!iv.length) return;
   const x0 = iv[0][0];
   const x1 = iv[iv.length - 1][1];
   const W = x1 - x0;
+  // ---- the block: the light's own mirror, its sides bent by the sway, its bottom corners rounded and its bottom a
+  // gentle static ripple (eased to nothing at the corners; its phase seeded, its crests on the light's own x)
+  const block = clipBand(p, -1e9, yB);
+  if (block) {
+    const [amp, lam] = lo.wave;
+    const ph = 2 * Math.PI * hash01(st.seed, s.sd, 31);
+    const dense = roundBottom(densify(block, 4, 3), yB, 3.5).map(([x, y]) => {
+      if (Math.abs(y - yB) > 0.01 || amp <= 0) return [x, y] as Pt;
+      const e = smooth(0, 10, Math.min(x - x0, x1 - x));
+      return [x, y + amp * e * Math.sin((2 * Math.PI * (x - sx)) / lam + ph)] as Pt;
+    });
+    pushRun(out, s.layer, tones[0], polyD(dense.map(([x, y]) => [x + ctx.sway(y) * k, y] as Pt)));
+    counted(ctx, s, 'blocks');
+  }
+  // ---- the slivers: leaves on the open water, each `ratio` as long and `thinning` as thick as the one above
   let len = W;
   let T = Math.min(lo.thickPx[1], Math.max(lo.thickPx[0], pitchAt(st, yB) * lo.thick));
-  let y = yB;
+  let y = yB + lo.wave[0];
   for (let i = 0; i < Math.min(3, lo.slivers); i++) {
     len *= lo.ratio;
-    if (i > 0) T *= lo.ratio;
+    if (i > 0) T *= lo.thinning;
     const gap = Math.max(lo.gap, pitchAt(st, y) * lo.gapK * (1 + lo.gapGrow * i));
     const yc = y + gap + T / 2;
     if (yc + T / 2 > yEnd || len < 8) break;
     const cx = (x0 + x1) / 2 + (2 * hash01(st.seed, s.sd, 40 + i) - 1) * lo.wander * W + ctx.sway(yc) * k;
-    pushRun(out, s.layer, tones[i + 1], lensD(cx, yc, len, T));
+    pushRun(out, s.layer, tones[i + 1], leafD(cx, yc, len, T, lo.leaf));
     counted(ctx, s, 'slivers');
     y = yc + T / 2;
   }
@@ -1516,7 +1545,7 @@ export function waterProblems(spec: WaterSpec, o: {t1?: number; otherAlive?: num
     const lo = {...LIGHT_DEFAULT, ...(s.light ?? {})};
     if (lo.solid > 0.35) out.push(`${name}: ${s.id}: a light's solid block ${Math.round(lo.solid * 100)} % of its length (<= 35 %: a longer one reads as a slab)`);
     if (lo.slivers > 3) out.push(`${name}: ${s.id}: ${lo.slivers} slivers (<= 3: more read as a stack)`);
-    if (lo.ratio > 0.85) out.push(`${name}: ${s.id}: sliver ratio ${lo.ratio} (each >= 15 % shorter and thinner than the one above)`);
+    if (lo.ratio > 0.85 || lo.thinning > 0.85) out.push(`${name}: ${s.id}: sliver ratio ${lo.ratio} / thinning ${lo.thinning} (each >= 15 % shorter and thinner than the one above)`);
     if (lo.gap < 4) out.push(`${name}: ${s.id}: sliver gaps ${lo.gap} px (>= 4: the encode's 4:2:0 chroma turns a thinner gap khaki)`);
     if (lo.step < 4) out.push(`${name}: ${s.id}: the column ${lo.step} L* under its light (>= 4: a reflection never outshines its source)`);
   }
