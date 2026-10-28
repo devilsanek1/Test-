@@ -31,7 +31,7 @@ stage the hook as "the expected thing, then the surprising reality overtaking it
 drawn on from frame 0: the subject's outline (with tier B's tinted lines) draws on, tier C lands as flat pale shapes,
 colour floods in, as a bold visible event (not ~0.3 s: owner, 2026-10-28); the owner approves this build with the G4 look clip. Never still, but the novelty every
 few frames comes from the subject's own build and its mechanism, one mover leading (`CRAFT.md` §b), never from extra
-supporting life. Keep our frame-0 claim text and the first-second phone sound; the film loops back to frame 0's drawing
+supporting life. Keep the first spoken line as frame 0's caption (never a title over it: playbook "Hook and pacing") and the first-second phone sound; the film loops back to frame 0's drawing
 state. SketchReel supports it: `draw` (stroke draw-on) and `fillIn` (colour flood) per element.
 **Show the real mechanism (v3 G3, 2026-10-26):** reality overtakes the expectation through the true cause, coupled
 one-to-one to the viewer's stake: each unit of cause is one visible tick of the effect (one memory stick flies to the AI

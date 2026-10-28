@@ -7,8 +7,10 @@ Lanes build from `lanes/conform_Ln.md`. Times: film seconds on the heard clock (
 px at 1080 x 1920.
 
 ## 1. The card
-1. **Core line (locked):** "She quit Google, and says her contract bans criticizing it, for life." Frame 0: SHE SAYS: NO
-   CRITICIZING GOOGLE. FOR LIFE. + "Source: BBC News, 21 Oct 2026". Payoff: "talking about facts is not criticising".
+1. **Core line (locked):** "She quit Google, and says her contract bans criticizing it, for life." Frame 0: the first
+   spoken line "She quit Google." as the caption (no title over the captions: REVIEW_1 MUST 1, playbook "Hook and
+   pacing"); the core line SHE SAYS: NO CRITICIZING GOOGLE. FOR LIFE. is the cover's text, and "Source: BBC News, 21 Oct
+   2026" is the post's (`POSTING_KIT.md`). Payoff: "talking about facts is not criticising".
 2. **Thread: her window, the one small window.** Lamp-lit at Google, it goes dark when she quits (0.40); it is the one
    dark pane while the staff's blinds come down (S2); lit and open at home while she talks (S3: the question); it waits
    ahead of her on the walk home (S4); it lights when she gets home (34.95) and the film loops on it. Home spots: **W**
@@ -170,7 +172,7 @@ perspective, the bottom flat; "a bit of particles here and there". Every shot, w
 ## 6. What stays, what changes
 | shot | keep exactly as built | change |
 |---|---|---|
-| S1 | frame-0 words, source, box keys; exit ding; her figure, walk, the ghost row (figures, timing, stop, step, outlines); wing, door, canopy, W; the far towpath bend; KEEP_CLEAR | frame 0 drawn in the clean pen (pale shapes, A outlines and Pip's tinted line drawing on, then the flood); the 5 % pull-out retired (zoom 1.00); every seated row nearer than the step by the water out, things in; life cut to budget; Pip's 5.90 hop out; tiers, light |
+| S1 | the first spoken page from frame 0 (no frame-0 block, no source line: REVIEW_1 MUST 1); exit ding; her figure, walk, the ghost row (figures, timing, stop, step, outlines); wing, door, canopy, W; the far towpath bend; KEEP_CLEAR | frame 0 drawn in the clean pen (pale shapes; from f0 the bold A outlines draw on with a moving pen tip, her, the door, then W, then the flood 0.44-0.78 with Pip's tinted line: REVIEW_1 MUST 2); the 5 % pull-out retired (zoom 1.00); every seated row nearer than the step by the water out, things in; life cut to budget; Pip's 5.90 hop out; tiers, light |
 | S2 | the wall; the staff windows' story; bench figures; the board slide; Pip's head turn; the near lamp | her dark window to M (the staff window there moves to (200, 795)); the ring -> her window's A outline; the 6 % push retired; head-backs out, things in; hood after the blinds; Pip's hops out; tiers, light |
 | S3 | terrace; her window (= S8's); the boat | ease-back retired; Pip to (590, 1050), no landing or leap; head-backs out; exit = push-through into her; tiers, light |
 | S4 | the walk, stride, truck, tag builds, post + plates, the boat foreground | opens out of her head; her house + window at the far left; gasholder off the sun; the 6 % push retired; exit = push-through into SUN1; Pip seated, no hops; tiers, light |
