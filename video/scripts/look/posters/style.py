@@ -68,7 +68,7 @@ STUDY = VIDEO / 'docs/studies/2026-10-28_city_posters'
 # translucent planes; 'water' = {'box', 'src'} pairs; 'flat' = extra flat patches for the grain.
 POSTERS: dict[str, dict] = {
     '01_singapore.jpg': {
-        'light': {'tower side vs front': [[400, 800, 460, 900], [348, 800, 358, 900]]},
+        'light': {'tower front vs left side': [[400, 800, 460, 900], [359, 810, 368, 900]]},
         'planes': [['x', 450, 0, 330], ['y', 60, 250, 1000]],
         'water': {'far shore mirror': {'box': [190, 1150, 700, 1240], 'src': [190, 1060, 700, 1145]},
                   'boat': {'box': [275, 1286, 465, 1310], 'src': [275, 1245, 465, 1282]}},
@@ -79,11 +79,11 @@ POSTERS: dict[str, dict] = {
                     'near houses': [500, 1300, 1080, 1625]},
     },
     '02_reykjavik.jpg': {
-        'light': {'spire left vs right': [[243, 520, 265, 590], [275, 520, 297, 590]]},
+        'light': {'spire right vs left': [[275, 520, 297, 590], [243, 520, 265, 590]]},
         'planes': [['y', 90, 380, 900]],
         'water': {'harbour': {'box': [640, 1300, 1000, 1390]},
                   'ship': {'box': [1010, 1300, 1206, 1340], 'src': [1010, 1250, 1206, 1298]}},
-        'city': 'Reykjavik', 'sky': [400, 210, 1000, 540], 'sky_col': [450, 950], 'skyline': 880,
+        'city': 'Reykjavik', 'sky': [400, 210, 1000, 540], 'sky_col': [400, 520], 'skyline': 680,
         'title': [430, 145, 790, 195], 'hero': [180, 395, 420, 1115], 'ground': [0, 1400, 1206, 1605],
         'regions': {'sky planes': [0, 380, 640, 900], 'far mountains': [400, 890, 1206, 1000],
                     'mid patchwork': [0, 1110, 640, 1290], 'water': [640, 1290, 1206, 1420],
@@ -110,7 +110,7 @@ POSTERS: dict[str, dict] = {
     },
     '05_cape_town.jpg': {
         'light': {'house front vs side': [[975, 1095, 1130, 1150], [942, 1100, 964, 1290]],
-                  'lighthouse left vs right': [[228, 1030, 238, 1080], [244, 1030, 254, 1080]]},
+                  'lighthouse left vs right': [[228, 1030, 240, 1080], [245, 1030, 254, 1080]]},
         'planes': [],
         'water': {'bay': {'box': [0, 1110, 400, 1200], 'src': [0, 1020, 400, 1105]}},
         'city': 'Cape Town', 'sky': [100, 270, 1000, 500], 'sky_col': [100, 900], 'skyline': 600,
@@ -119,8 +119,8 @@ POSTERS: dict[str, dict] = {
                     'mid patchwork': [0, 1180, 560, 1330], 'near houses': [760, 830, 1206, 1550]},
     },
     '06_copenhagen.jpg': {
-        'light': {'round tower left vs right': [[622, 950, 655, 1060], [700, 950, 730, 1060]],
-                  'dome left vs right': [[875, 995, 905, 1030], [965, 995, 995, 1030]]},
+        'light': {'round tower right vs left': [[700, 950, 728, 990], [608, 950, 650, 990]],
+                  'dome right vs left': [[945, 1005, 990, 1025], [867, 1005, 909, 1025]]},
         'planes': [['y', 560, 780, 1010], ['x', 975, 420, 700]],
         'water': {'canal patchwork': {'box': [660, 1270, 800, 1345], 'src': [660, 1150, 800, 1265]},
                   'canal wide': {'box': [0, 1300, 1206, 1530]}},
@@ -130,8 +130,7 @@ POSTERS: dict[str, dict] = {
                     'water': [0, 1250, 1206, 1530], 'ground': [0, 1500, 1206, 1625]},
     },
     '07_kyoto.jpg': {
-        'light': {'pavilion front vs side': [[880, 945, 1080, 990], [700, 950, 760, 990]],
-                  'rock top vs base': [[630, 1112, 680, 1125], [630, 1138, 680, 1150]]},
+        'light': {'pavilion gold lit vs shade': [[870, 960, 950, 990], [775, 960, 845, 990]]},
         'planes': [['x', 725, 600, 1206], ['x', 690, 600, 1206]],
         'water': {'pond mirror': {'box': [650, 1130, 1180, 1300], 'src': [650, 950, 1180, 1120]}},
         'city': 'Kyoto', 'sky': [330, 260, 1150, 600], 'sky_col': [450, 1150], 'skyline': 640,
@@ -310,6 +309,9 @@ def colour(rgb: np.ndarray, valid: np.ndarray, reg: dict | None, k: int = 12, se
            'warm_vs_cool': round(fam['warm'] / max(0.1, fam['warm'] + fam['cool']), 2)}
     # chroma strategy
     Cv = C4[v4]
+    Lv = L4[v4]
+    out['lightness'] = {'p5': round(float(np.percentile(Lv, 5)), 1), 'p50': round(float(np.percentile(Lv, 50)), 1),
+                        'p95': round(float(np.percentile(Lv, 95)), 1)}
     out['chroma'] = {'p50': round(float(np.percentile(Cv, 50)), 1), 'p90': round(float(np.percentile(Cv, 90)), 1),
                      'p99': round(float(np.percentile(Cv, 99)), 1),
                      'ge30': round(100 * float((Cv >= 30).mean()), 1), 'ge40': round(100 * float((Cv >= 40).mean()), 1),
@@ -916,17 +918,17 @@ def shade_steps(rgb: np.ndarray, valid: np.ndarray, k: int = 18, seed: int = 0) 
 # Full-size frames pulled from the masters (README "Inputs"): ffmpeg -ss <t> -i <master> -frames:v 1 <out>.png.
 # Canvas px (1080 x 1920). The caption band (y 290-600) is the sky's quiet field: sky boxes sit under the caption line.
 OURS: dict[str, dict] = {
-    'v2_t1.0.png': {'film': 'v2 S1', 'sky': [40, 380, 1040, 445], 'sky_col': [300, 1000], 'skyline': 600,
+    'v2_t1.0.png': {'film': 'v2 S1', 'sky': [250, 20, 850, 200], 'sky_col': [300, 1000], 'skyline': 600,
                     'title': [0, 230, 1080, 375], 'ground': [0, 1300, 1080, 1900],
                     'regions': {'ground': [0, 1300, 1080, 1900], 'far city': [0, 600, 330, 900]},
                     'water': {'canal (lib/water)': {'box': [300, 1110, 900, 1200], 'src': [300, 1000, 900, 1100]}}},
-    'v2_t9.0.png': {'film': 'v2 S2', 'sky': [40, 380, 1040, 445], 'title': [0, 230, 1080, 375],
+    'v2_t9.0.png': {'film': 'v2 S2', 'sky': [250, 20, 850, 200], 'title': [0, 230, 1080, 375],
                     'regions': {'ground': [0, 1300, 1080, 1900]}},
-    'v2_t17.5.png': {'film': 'v2 S4', 'sky': [40, 380, 1040, 445], 'title': [0, 230, 1080, 375],
+    'v2_t17.5.png': {'film': 'v2 S4', 'sky': [250, 20, 850, 200], 'title': [0, 230, 1080, 375],
                      'regions': {'ground': [0, 1300, 1080, 1900]}},
-    'v2_t22.0.png': {'film': 'v2 S5', 'sky': [40, 380, 1040, 445], 'sky_col': [100, 980], 'skyline': 600,
+    'v2_t22.0.png': {'film': 'v2 S5', 'sky': [250, 20, 850, 200], 'sky_col': [100, 980], 'skyline': 600,
                      'title': [0, 230, 1080, 375], 'regions': {'ground': [0, 1300, 1080, 1900]}},
-    'v2_t36.0.png': {'film': 'v2 S8', 'sky': [40, 380, 1040, 445], 'title': [0, 230, 1080, 375],
+    'v2_t36.0.png': {'film': 'v2 S8', 'sky': [250, 20, 850, 200], 'title': [0, 230, 1080, 375],
                      'regions': {'ground': [0, 1300, 1080, 1900]}},
     'v1_t20.5.png': {'film': 'v1 @20.5', 'regions': {}},
     'v1_t38.5.png': {'film': 'v1 @38.5', 'regions': {}},
@@ -1016,6 +1018,143 @@ def cmd_measure(a) -> None:
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     Path(a.out).write_text(json.dumps(out, indent=1, default=float))
     print('wrote', a.out)
+
+
+# ------------------------------------------------------------------------------------------------- encode test
+def _noise(shape, sigma: float, seed: int) -> np.ndarray:
+    """Zero-mean, unit-std mono noise, Gaussian-filtered (sigma px); deterministic."""
+    rng = np.random.default_rng(seed)
+    n = rng.standard_normal(shape).astype(np.float32)
+    n = cv2.GaussianBlur(n, (0, 0), sigma) if sigma > 0 else n
+    n -= n.mean()
+    return n / max(1e-6, n.std())
+
+
+def _shift(img: np.ndarray, dx: float) -> np.ndarray:
+    M = np.float32([[1, 0, dx], [0, 1, 0]])
+    return cv2.warpAffine(img, M, (img.shape[1], img.shape[0]), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+
+
+def _ffmpeg_encode(frames, out: Path, fps: int, args: list[str], size=(1080, 1920)) -> None:
+    W, H = size
+    cmd = ['ffmpeg', '-v', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{W}x{H}', '-r', str(fps), '-i', '-',
+           '-vf', 'scale=out_color_matrix=bt709:out_range=tv,format=yuv420p', *args,
+           '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv', str(out)]
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+    for f in frames:
+        p.stdin.write(np.ascontiguousarray(f).tobytes())
+    p.stdin.close()
+    if p.wait():
+        raise SystemExit(f'ffmpeg failed: {out}')
+
+
+def _reencode(src: Path, out: Path, args: list[str], scale: str | None = None) -> None:
+    vf = (f'scale={scale}:flags=bicubic,' if scale else '') + 'format=yuv420p'
+    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', str(src), '-vf', vf, *args, '-colorspace', 'bt709',
+                    '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv', str(out)], check=True)
+
+
+def _decode(path: Path, n: int | None = None, size=(1080, 1920)) -> list[np.ndarray]:
+    W, H = size
+    cmd = ['ffmpeg', '-v', 'error', '-i', str(path), '-vf', f'scale={W}:{H}:flags=bicubic:in_color_matrix=bt709:in_range=tv,format=rgb24',
+           *(['-frames:v', str(n)] if n else []), '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-']
+    raw = subprocess.run(cmd, check=True, capture_output=True).stdout
+    fr = np.frombuffer(raw, np.uint8).reshape(-1, H, W, 3)
+    return [fr[i] for i in range(len(fr) if n is None else min(n, len(fr)))]
+
+
+def _bitrate_kbps(path: Path) -> float:
+    r = subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'format=duration,size',
+                        '-of', 'json', str(path)], capture_output=True, text=True, check=True)
+    f = json.loads(r.stdout)['format']
+    return round(8 * int(f['size']) / float(f['duration']) / 1000, 0)
+
+
+def cmd_encode(a) -> None:
+    """A texture overlay through the master and a platform-like re-encode: cost (bitrate), survival, shimmer."""
+    out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
+    rgb = np.asarray(Image.open(a.frame).convert('RGB'))
+    H, W = rgb.shape[:2]
+    lab = srgb_to_lab(rgb.astype(np.float64))
+    lab1 = lab.copy(); lab1[..., 0] += 1.0
+    J = (lab_to_srgb(lab1) - lab_to_srgb(lab)).astype(np.float32)  # sRGB codes per +1 L*, per pixel
+    base = rgb.astype(np.float32)
+    fps, n = 60, int(round(a.seconds * 60))
+    v = 0.5  # px per frame: a 30 px/s parallax float
+    pad = 64
+    grain = _noise((H + pad, W + pad), a.grain_px, 1) * a.grain
+    mottle = _noise((H + pad, W + pad), a.mottle_px, 2) * a.mottle
+    conds = {
+        'A_flat': None,
+        'B_world_grain_mottle': 'world',
+        'C_screen_grain_mottle': 'screen',
+        'E_boiling_grain': 'boil',
+        'F_world_mottle_only': 'mottle',
+    }
+    flat = flat_map(lab, np.ones((H, W), bool))
+    res = {'frame': str(a.frame), 'grain_L': a.grain, 'grain_sigma_px': a.grain_px, 'mottle_L': a.mottle,
+           'mottle_sigma_px': a.mottle_px, 'pan_px_per_frame': v, 'conditions': {}}
+    for name, mode in conds.items():
+        keep = {}
+        def gen():
+          for i in range(n):
+              dx = -v * i
+              img = _shift(base, dx)
+              Jt = _shift(J, dx)
+              if mode == 'world':
+                  T = _shift((grain + mottle)[:H, :W], dx)
+              elif mode == 'screen':
+                  T = (grain + mottle)[:H, :W]
+              elif mode == 'boil':
+                  T = _noise((H, W), a.grain_px, 100 + i) * a.grain
+              elif mode == 'mottle':
+                  T = _shift(mottle[:H, :W], dx)
+              else:
+                  T = None
+              f = np.clip(np.round(img if T is None else img + Jt * T[..., None]), 0, 255).astype(np.uint8)
+              if i == n // 2:
+                  keep['mid'] = f
+              yield f
+        master = out / f'{name}_master.mp4'
+        _ffmpeg_encode(gen(), master, fps, ['-c:v', 'libx264', '-preset', 'slow', '-crf', '14', '-x264-params', 'aq-mode=3'], (W, H))
+        p1080 = out / f'{name}_p1080_3500k.mp4'
+        _reencode(master, p1080, ['-c:v', 'libx264', '-preset', 'medium', '-b:v', '3500k', '-maxrate', '3500k', '-bufsize', '7000k'])
+        p720 = out / f'{name}_p720_1500k.mp4'
+        _reencode(master, p720, ['-c:v', 'libx264', '-preset', 'medium', '-b:v', '1500k', '-maxrate', '1500k', '-bufsize', '3000k'], scale='720:1280')
+        c = {'master_kbps': _bitrate_kbps(master)}
+        src_mid = keep['mid']
+        for tag, path in (('master', master), ('p1080', p1080), ('p720', p720)):
+            dec = _decode(path, n // 2 + 12)
+            mid = dec[n // 2]
+            Ld = srgb_to_lab(mid.astype(np.float64))[..., 0].astype(np.float32)
+            hp = Ld - cv2.GaussianBlur(Ld, (0, 0), 4)
+            m = ndi.binary_erosion(flat, iterations=8)
+            m[:, :pad] = False; m[:, -pad:] = False
+            c[f'{tag}_hp_std'] = round(float(hp[m].std()), 3)
+            # mottling: detrended low-pass std in the sky's top box
+            lp = cv2.GaussianBlur(Ld, (0, 0), 4) - cv2.GaussianBlur(Ld, (0, 0), 40)
+            c[f'{tag}_lp_std'] = round(float(lp[m].std()), 3)
+            # temporal: align frame i+1 onto frame i by the known pan, mean |dL*| in flat areas
+            diffs = []
+            for i in range(n // 2 - 10, n // 2 + 10):
+                a0 = srgb_to_lab(dec[i].astype(np.float64))[..., 0].astype(np.float32)
+                a1 = srgb_to_lab(dec[i + 1].astype(np.float64))[..., 0].astype(np.float32)
+                a1s = _shift(a1, v)
+                diffs.append(float(np.abs(a1s - a0)[m].mean()))
+            c[f'{tag}_temporal_dL'] = round(float(np.mean(diffs)), 3)
+            if tag != 'master':
+                c[f'{tag}_kbps'] = _bitrate_kbps(path)
+        Ls = srgb_to_lab(src_mid.astype(np.float64))[..., 0].astype(np.float32)
+        hp = Ls - cv2.GaussianBlur(Ls, (0, 0), 4)
+        m = ndi.binary_erosion(flat, iterations=8); m[:, :pad] = False; m[:, -pad:] = False
+        c['source_hp_std'] = round(float(hp[m].std()), 3)
+        lp = cv2.GaussianBlur(Ls, (0, 0), 4) - cv2.GaussianBlur(Ls, (0, 0), 40)
+        c['source_lp_std'] = round(float(lp[m].std()), 3)
+        Image.fromarray(src_mid).save(out / f'{name}_mid.png')
+        res['conditions'][name] = c
+        print(name, json.dumps(c), file=sys.stderr)
+    (out / 'encode_test.json').write_text(json.dumps(res, indent=1))
+    print('wrote', out / 'encode_test.json')
 
 
 # -------------------------------------------------------------------------------------------------------- dna
