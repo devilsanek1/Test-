@@ -166,7 +166,7 @@ compositions `KitLifeO1`, `KitLifeS4` (kit pieces at the plan's places; the lane
 |---|---|
 | `ShelfFill` | `planks` [{x0, x1, y, room}] `scale`: upright books (14-40 x 80-150, 5+ colours, bands, labels, a leaner), lying stacks, a framed photo, a jar, a succulent, a trailing pothos at one end. `Book`, `WallShelf` (plank + brackets + contents). |
 | `Plant`, `Leaf`, `LEAF2` | `kind` pothos (vines trail `trail` px and sway +-3 px / 3 s) / succulent / snake / floor / cactus, `size`, `snow`, `shakeAt`. |
-| `StringLights3` | `from to sag` or `points`, `n` `r`, `onAt onDur` (blink on one by one), `every` (a twinkle every ~0.5 s), `halo` steps (default room core / ring; outdoors pass [skyLow, ring]), `sway`, `swingAt`. |
+| `StringLights3` | `from to sag` or `points`, `n` `r`, `onAt onDur` (blink on one by one), `every` (a twinkle every ~0.5 s), `twinkleDur` (opt-in: how long the bulb stays dim, default 0.14 s; the home's slope string: 0.6 s with `every` 1.5, one bulb stepping at a time), `halo` steps (default room core / ring; outdoors pass [skyLow, ring]), `sway`, `swingAt`. |
 | `Pinboard`, `PinnedThing` | cork board, 5-7 items (photo, note, postcard, ticket, list), each sways about its pin and flutters on `flutterAt`; `avoid` a rect. |
 | `FramedPrint`, `Poster` | mountain / sea / leaf / sun prints; the lost-cat flyer (tabs flutter) and a concert poster. |
 | `PenCup`, `Headphones`, `BookStack`, `StickyNotes`, `Cable`, `Glasses`, `Speaker` | desk clutter at both depths (`Cable` = a path through `points`: the lane moves it with the phone; `plug`; `Headphones bandFill`, opt-in: the band a filled shape, so the light layers' silhouettes include it). |

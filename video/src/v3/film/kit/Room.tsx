@@ -392,6 +392,9 @@ export type StringLights3Props = {
   onDur?: number;
   /** A bulb somewhere twinkles every `every` s (default 0.5; 0 = never). */
   every?: number;
+  /** OPT-IN (v3 rework): how long a twinkling bulb stays dim (default 0.14 s, a blink; ~0.6 s with `every` ~1.5: one bulb
+   *  stepping down and back at a time, the set's calm slow life). */
+  twinkleDur?: number;
   /** Flat halo steps round the lit bulbs: the outer and inner colours, or false (default the room's lamp core). */
   halo?: [string, string] | false;
   /** Wind / breath sway at the middle (px). */
@@ -410,7 +413,7 @@ const BULB_DIM = EMBER.pot;
 
 /** Warm string lights: a sagging wire with round bulbs (four warm colours) on short stems, flat halo steps, blinking on
  *  one by one, one bulb twinkling about every 0.5 s; the string sways. */
-const StringLights3Body: React.FC<StringLights3Props> = ({from, to, points, sag = 40, n = 10, r = 9, onAt, onDur = 0.7, every = 0.5, halo = [EMBER.core, EMBER.ring], sway: sw = 2, swingAt, seed = 'lights', ink = W.hair, at}) => {
+const StringLights3Body: React.FC<StringLights3Props> = ({from, to, points, sag = 40, n = 10, r = 9, onAt, onDur = 0.7, every = 0.5, twinkleDur = 0.14, halo = [EMBER.core, EMBER.ring], sway: sw = 2, swingAt, seed = 'lights', ink = W.hair, at}) => {
   const t = useTime();
   const km = useTierMotion(); // idle motion on its tier (clean pen: support x0.5, environment x0.4; sketch pen 1)
   if (at !== undefined && t < at) return null;
@@ -451,7 +454,7 @@ const StringLights3Body: React.FC<StringLights3Props> = ({from, to, points, sag 
     stems += `M${bx.toFixed(1)} ${by.toFixed(1)}L${sx.toFixed(1)} ${syy.toFixed(1)}`;
     const cy = syy + r;
     const lit = onAt === undefined ? true : t >= onAt + (k / Math.max(1, n - 1)) * onDur;
-    const dim = every > 0 && twinkle(t, seed, k, n, every);
+    const dim = every > 0 && twinkle(t, seed, k, n, every, twinkleDur);
     const color = !lit ? EMBER.card : dim ? BULB_DIM : BULBS[k % BULBS.length];
     if (lit && !dim && halo) {
       halos.push(<TCircle key={`h2${k}`} cx={sx} cy={cy} r={r * 2.6} fill={halo[0]} />);

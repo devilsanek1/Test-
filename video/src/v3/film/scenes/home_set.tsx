@@ -682,7 +682,7 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
         <FramedPrint x={330} y={84} w={66} h={82} picture="leaf" seed="home/print2" at={-0.4} />
         <StringLights3 points={[[574, 8], [744, 96], [904, 180], [1090, 262]]} sag={18} n={10} r={7} every={1.6} halo={false} seed="home/lights" at={0.18} />
         {/* SQB's corner (E12): the slope right of the skylight; one bulb steps about every 1.5 s */}
-        <StringLights3 points={SLOPE_LIGHTS} sag={14} n={6} r={7} every={1.5} halo={false} seed="home/lights2" at={0.18} />
+        <StringLights3 points={SLOPE_LIGHTS} sag={14} n={6} r={7} every={1.5} twinkleDur={0.6} halo={false} seed="home/lights2" at={0.18} />
       </Tier>
       {/* the card (paper, exact) and the notes on the wall */}
       {/* the card's paper and pins keep their exact colours (the subject tier recolours nothing) */}
