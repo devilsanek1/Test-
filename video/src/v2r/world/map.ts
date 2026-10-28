@@ -871,7 +871,8 @@ export const S6 = {
   clauseBottomMaxY: 1108,
   /** The purpose line pops ON "any" 24.03, after the wipe; the F12 line on "veto" 26.40 (V9). */
   purposeLineAt: 24.03,
-  f12LineAt: 26.4,
+  /** On "veto": 26.467 = f1588 (the sound lane's request, 2026-10-28: on its SFX frame). */
+  f12LineAt: 26.467,
   /** The low limestone facade band (cut by both edges) + its service door (held: no drift). */
   facadeBandY: [705, 835] as const,
   serviceDoor0: {x0: 900, y0: 735, x1: 1020, y1: 835} as Rect,
@@ -879,6 +880,8 @@ export const S6 = {
   doorShutsAt: [25.0, 27.4] as const,
   /** The facade windows light 27.08-27.80, at most 3 switch-ons per second (flash-safe). */
   facadeWindowsLight: [27.08, 27.8] as const,
+  /** ...in three grouped switch-ons on these film frames (the sound lane's request, 2026-10-28): 27.100 / 27.450 / 27.833. */
+  facadeWindowsF: [1626, 1647, 1670] as const,
   nearCrossPxS: 0,
   /** The staff walk-in to the service door starts >= 24.40 (outside the join window 23.60-24.00), or is already under way. */
   staffWalkInMinT: 24.4,
@@ -921,6 +924,7 @@ export const S7 = {
     {t: 28.33, what: 'GOOGLE SAYS header + board clack (28.32-28.34: after the join window, leading "Google" 28.36)'},
     {t: 29.65, what: 'follows its "AI principles" pen-draws (56 px), complete on 30.04'},
     {t: 30.1, what: 'the festoons light in a run 30.10-30.60 (<= 3 switch-ons per second), just after the pen completes'},
+    {t: 30.2, what: 'the festoon switch-ons on film frames 1812 / 1836 / 1848 (30.200 / 30.600 / 30.800: the sound lane, 2026-10-28)'},
     {t: 30.3, what: 'small row: Google\'s AI Principles: "human oversight" (20 px, F16)'},
     {t: 30.74, what: 'bans retaliation "of any kind" pen-draws (56 px), complete on 32.08'},
   ],
