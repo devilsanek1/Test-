@@ -560,6 +560,8 @@ export type WaterSun = {
   slots?: number;
   life?: [number, number];
   len?: [number, number];
+  /** The bed's lenses only on bands at least this many px (default 5): the far rows are a near mirror. */
+  lensPitch?: number;
   /** Where it is densest (default the sun's still-water mirror point, 2 hz - y) and the spread (px). */
   mirrorY?: number;
   sigma?: number;
@@ -1044,7 +1046,7 @@ function buildFlat(s: Resolved, ctx: FrameCtx, out: Runs): void {
 // the bed a richer amber gold and the slivers a warm gold-white (the critic on v6's first master: the encode's 4:2:0
 // chroma mixed the C* 34 bed's edges with the teal into olive, and the near-white slivers' rims into the paving's own
 // peach, dE76 < 5): at C* 40 / 16 the edge mixes stay out of the house bands and >= 6 from the paving
-const SUN_DEFAULT = {slope: 0.06, bed: fromLch(82, 40, 72), core: fromLch(97.5, 16, 84), t0: 0.3, slots: 6, life: [0.5, 0.8] as [number, number], len: [20, 34] as [number, number], sigma: 22};
+const SUN_DEFAULT = {slope: 0.06, bed: fromLch(82, 40, 72), core: fromLch(97.5, 16, 84), lensPitch: 5, t0: 0.3, slots: 6, life: [0.5, 0.8] as [number, number], len: [20, 34] as [number, number], sigma: 22};
 /** The column's half-width at screen y (R8, DERIVED for a level camera): a (y - hz) + f a sin(e), e the sun's elevation. */
 export function glitterHalfW(cam: WaterCam, sun: WaterSun, y: number): number {
   const a = sun.slope ?? SUN_DEFAULT.slope;
@@ -1067,6 +1069,9 @@ function glitterBed(st: Static): GlitterLens[] {
     const ya = rows[i];
     const yb = rows[i + 1];
     if (ya < y0 || yb > y1 + 2) continue;
+    // the far rows thinner than `lensPitch` are left to the mirror: a 3-4 px gold lens there is mostly edge, too thin
+    // to read on a phone, and the encode's 4:2:0 chroma turns its rims olive (the critic on v6's first master)
+    if (yb - ya < (s.lensPitch ?? SUN_DEFAULT.lensPitch)) continue;
     const len = hash01(st.seed, 7001, i, 2);
     const off = hash01(st.seed, 7001, i, 3);
     const u = clamp01((ya - y0) / Math.max(1, y1 - y0));
