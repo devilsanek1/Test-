@@ -146,14 +146,18 @@ export function waterStep(water: string, dl: number, ck = 1): string {
  *  water's teal through violet to mauve (never through khaki); use it only while the water stays >= 80 % cool. */
 export type ToneKind = 'body' | 'light' | 'figure';
 export type ToneOpts = {waterL: number; waterH: number; waterC: number; hueSlope: number; chromaSlope: number; cMin: number; cMax: number; warmMemory: number};
-export const TONE_DEFAULT: ToneOpts = {waterL: 76, waterH: 182, waterC: 10, hueSlope: 0.9, chromaSlope: 0.32, cMin: 6.5, cMax: 16, warmMemory: 0};
+/** The body's tone family: the approved Canal Mint (the open body #A0C5BE, C* 13.7; v5's flat #A6C9C1, C* 13.2). A
+ *  reflection keeps the water's chroma round C* 13.5 (deeper = a touch richer), never under 9: the critic on v6's
+ *  first master (2026-10-28, docs/v2/water/CRITIC.md must-fix 3): waterC 10 / cMin 6.5 turned the wing's reflection a
+ *  grey-teal (C* 10.5) and the water's median C* 11.2. */
+export const TONE_DEFAULT: ToneOpts = {waterL: 76, waterH: 182, waterC: 13.5, hueSlope: 0.9, chromaSlope: 0.32, cMin: 9, cMax: 16, warmMemory: 0};
 const TONES = new Map<string, string>();
-export function reflectTone(src: string, k: number, o: ToneOpts, kind: ToneKind = 'body', dL = 0): string {
-  const key = `${src}|${k.toFixed(3)}|${kind}|${dL}|${o.waterL}|${o.waterH}|${o.waterC}|${o.hueSlope}|${o.chromaSlope}|${o.cMin}|${o.cMax}|${o.warmMemory}`;
+export function reflectTone(src: string, k: number, o: ToneOpts, kind: ToneKind = 'body', dL = 0, kMin = 0.6): string {
+  const key = `${src}|${k.toFixed(3)}|${kind}|${dL}|${kMin}|${o.waterL}|${o.waterH}|${o.waterC}|${o.hueSlope}|${o.chromaSlope}|${o.cMin}|${o.cMax}|${o.warmMemory}`;
   const hit = TONES.get(key);
   if (hit) return hit;
   const c = lch(src);
-  const kk = kind === 'figure' ? Math.max(0.6, k) : k;
+  const kk = kind === 'figure' ? Math.max(kMin, k) : k;
   const L = c.L + (o.waterL - c.L) * kk + dL;
   let out: string;
   if (kind === 'light') {
@@ -380,10 +384,15 @@ export function swayAt(cam: WaterCam, s: Sway, yFar: number, yNear: number, seed
 // ================================================================= the open water: the shot's sky, mirrored and toned
 
 /** THE ONE ALLOWED GRADIENT (DIRECTION rule 6's water exception): the shot's own sky seen in the water. The water at
- *  screen y mirrors the sky at 2 hz - y (R1), its value toned a little darker toward the viewer (R3); from the middle
- *  water on it is pulled toward the water's own teal (R2: the near water shows its body) in OKLab, through a light veil
- *  of the body's hue, where the sky is already light: the crossing stays light, never khaki or grey (R4). Defaults are
- *  S1's (the judged candidate A); n runs 0 at `yFar` (the far edge) -> 1 at `yNear` (our edge). */
+ *  screen y mirrors the sky at 2 hz - y (R1), a FRESNEL STEP under it (OKLab L - dl: ~5 L* at the far edge, so the far
+ *  water is >= 4 L* under the air and never the lit ground's own colour); from the middle water on it is pulled toward
+ *  the water's own teal (R2: the near water shows its body) in OKLab, through a light veil of the body's hue. The warm
+ *  sky's chroma is cancelled by the teal body where they cross (the physical mix is low in chroma): through the whole
+ *  warm-to-cool crossing (CIE h 30-150) the chroma is held in the CLEAN GAP, C* 4.3-`cap` (5.6: the beige and olive
+ *  bands start at 6, grey under 4), as the sky's own light band crosses at C* <= 6 (CRAFT §g.1): so the far water is a
+ *  pale warm pearl, never peach paving, beige, olive or grey (R4; the critic on v6's first master, CRITIC.md must-fix
+ *  2b: its far end was the paving's colour, dE76 ~1, and its crossing ran through the house beige band). Defaults are
+ *  S1's; n runs 0 at `yFar` (the far edge) -> 1 at `yNear` (our edge). */
 export type RampOpts = {
   /** The far edge and the near edge of the water (screen y) for the toning's n. */
   yFar: number;
@@ -401,8 +410,23 @@ export type RampOpts = {
   bodyAt?: [number, number, number];
   /** Keys every `step` px over the water's box. */
   step?: number;
+  /** The clean gap's chroma ceiling (CIE C*) through the warm-to-cool crossing (default 5.6; the bands start at 6). */
+  cap?: number;
 };
-export const RAMP_DEFAULT = {dl: [0.02, 0.015] as [number, number], ck: [0.95, 0.1] as [number, number], veil: {l: 0.085, c: 0.018}, veilAt: [0.1, 0.4] as [number, number], bodyAt: [0.32, 0.86, 0.92] as [number, number, number], step: 16};
+export const RAMP_DEFAULT = {dl: [0.05, -0.03] as [number, number], ck: [0.95, 0.1] as [number, number], veil: {l: 0.085, c: 0.018}, veilAt: [0.1, 0.4] as [number, number], bodyAt: [0.32, 0.86, 0.92] as [number, number, number], step: 16, cap: 5.6};
+/** The CLEAN GAP (rampColour): through the warm-to-cool crossing (CIE h 55-150, eased off over h 30-55 on the rose side
+ *  and 150-168 on the cool side) a colour's chroma is held under `cap` (beige and olive start at C* 6) and, under
+ *  L* 85, over 4.3 (grey is C* < 4); its L* and hue are kept. */
+export function rampGap(hex: string, cap: number = RAMP_DEFAULT.cap): string {
+  const c = lch(hex);
+  let lim = Infinity;
+  if (c.h >= 55 && c.h <= 150) lim = cap;
+  else if (c.h >= 30 && c.h < 55) lim = cap + ((55 - c.h) / 25) * 30;
+  else if (c.h > 150 && c.h < 168) lim = cap + ((c.h - 150) / 18) * 30;
+  let C = Math.min(c.C, lim);
+  if (c.L < 85 && C < 4.3 && lim < Infinity) C = 4.3;
+  return C === c.C ? hex : fromLch(c.L, C, c.h);
+}
 export function rampColour(cam: WaterCam, sky: SkySpec, body: string, o: RampOpts, y: number): string {
   const dl = o.dl ?? RAMP_DEFAULT.dl;
   const ck = o.ck ?? RAMP_DEFAULT.ck;
@@ -417,7 +441,7 @@ export function rampColour(cam: WaterCam, sky: SkySpec, body: string, o: RampOpt
   const veil = toOklab({l: b.l + veilO.l, c: veilO.c, h: b.h});
   const a = smooth(va[0], va[1], n);
   const bb = smooth(ba[0], ba[1], n);
-  return cleanColour(oklabToHex(mixOklab(mixOklab(skyL, veil, a), toOklab(body), bb * ba[2])), b.h);
+  return rampGap(cleanColour(oklabToHex(mixOklab(mixOklab(skyL, veil, a), toOklab(body), bb * ba[2])), b.h), o.cap ?? RAMP_DEFAULT.cap);
 }
 /** The ramp as a lib/sky spec over the water's box (its eased curve and blue-noise dither). */
 export function waterRamp(cam: WaterCam, sky: SkySpec, body: string, o: RampOpts, box: {x0: number; x1: number; top: number; bottom: number}): SkySpec {
@@ -446,10 +470,20 @@ export type WaterSource = {
   /** The parallax plane whose float it rides (the shot's `float`). */
   plane: number;
   /** 'mass' (a solid block, then bars: the default), 'crisp' (one flat band: a contact band; no bars, no sway),
-   *  'stub' (a dome-ended vertical from the waterline: a bollard's reflection). */
+   *  'stub' (a dome-ended vertical from the waterline: a bollard's reflection). A `kind: 'light'` mass is drawn as
+   *  LIGHT ON WATER (`light`): a short solid block, then a few lens slivers on the open water. */
   draw?: 'mass' | 'crisp' | 'stub';
-  /** The share of its VISIBLE length drawn as the solid block (>= 0.55, default 0.6): the rest is bars. */
+  /** The share of its VISIBLE length drawn as the solid block (>= 0.55, default 0.6): the rest is bars. 1 = WHOLE: one
+   *  smooth shape to its end, no bars (a far thing in the far water, a near mirror: R2, R5). */
   solid?: number;
+  /** At most this many bars under the block (default: as many as the envelope gives): a thin thing breaks once or
+   *  twice, never into a comb (CRITIC.md must-fix 2c). */
+  maxBars?: number;
+  /** A light's column (kind 'light'; LIGHT_DEFAULT). */
+  light?: LightOpts;
+  /** A figure's Fresnel k floor (kind 'figure'; default 0.6): higher = nearer the water's own value, so a person's
+   *  reflection stays a soft, slim step on its field (environment, never a second subject: R5). */
+  kMin?: number;
   /** 0..1: how readily a bar breaks (once at most, static, only in the last half; a post 0, a facade ~0.5). */
   breakup?: number;
   /** 0..0.4: how far the bars pull in toward its end (a smooth envelope). */
@@ -466,6 +500,32 @@ export type WaterSource = {
   /** Far LOD only: draw it, or leave it to the ramp. */
   far?: boolean;
 };
+/** LIGHT ON WATER (a lit door, a lamp: R7; the critic on v6's first master, CRITIC.md must-fix 1: "a solid slab with
+ *  five equal round-capped bars ... a stack of pancakes", its 2 px gaps turned khaki in the encode's 4:2:0 chroma). The
+ *  column is the light's mirror: a SHORT SOLID BLOCK (<= 35 % of its visible length, its sides bent by the sway, its
+ *  bottom corners rounded), then at most 3 LENS SLIVERS on the open water, each `ratio` (<= 0.85) as long and as thick
+ *  as the one above (the first: `ratio` x the block's width), pointed at both ends (never a pill cap), seeded a little
+ *  off the column's middle, each swaying with its own row; the water between them is >= `gap` px (>= 4: the encode's
+ *  4:2:0 keeps at least 2 rows of every gap the water's own colour, wherever the float puts it). Its value is a step
+ *  under its source (>= 4 L*: a reflection never outshines its light) and falls with each sliver. */
+export type LightOpts = {
+  solid?: number;
+  slivers?: number;
+  ratio?: number;
+  /** The first sliver's thickness: this share of its band's pitch, clamped to `thickPx`. */
+  thick?: number;
+  thickPx?: [number, number];
+  /** The water gap above each sliver: max(`gap`, `gapK` x the pitch there), growing by `gapGrow` per sliver. */
+  gap?: number;
+  gapK?: number;
+  gapGrow?: number;
+  /** CIE L*: the block's step under its source, and each sliver's further fall. */
+  step?: number;
+  fall?: number;
+  /** Each sliver's seeded shift across, as a share of the block's width. */
+  wander?: number;
+};
+export const LIGHT_DEFAULT: Required<LightOpts> = {solid: 0.33, slivers: 3, ratio: 0.8, thick: 0.8, thickPx: [5, 8], gap: 4.5, gapK: 0.95, gapGrow: 0.2, step: 6, fall: 1.3, wander: 0.05};
 /** The sun's glitter column (R8; CRAFT §f.6's glints are its slivers). */
 export type WaterSun = {
   /** The sun on screen (its disc's centre). */
@@ -553,6 +613,10 @@ export type WaterSpec = {
   flood?: {origin: Pt; t0: number; speed: number; pale: number; paper: string};
   /** The shot's joins (scene s): nothing new is born in the 0.4 s around one (steady fields keep their pace). */
   joins?: number[];
+  /** Colours the water must never be mistaken for (the lit ground beside it, as drawn on screen): the lint walks the
+   *  ramp row by row and every reflection tone, and flags any within dE76 `dE` (default 6) of one (the critic on v6's
+   *  first master: the far water was the paving's own colour, dE76 ~1, so at the near-left it read as paving). */
+  notLike?: {name: string; hex: string; dE?: number}[];
   /** 'far' (R14): a far strip under ~2 px rows: flat bands, flecks, current lines, no slices. */
   lod?: 'near' | 'far';
   /** Far LOD: flecks (count, length px) and current lines (count). */
@@ -614,6 +678,8 @@ function resolveSource(s: WaterSource, cam: WaterCam, grid: Grid, region: WaterS
   const xc = Math.max(region.x0, Math.min(region.x1, (box.x0 + box.x1) / 2));
   const top = Math.max(box.y0, region.top(xc));
   const yEnd = Math.min(box.y1, region.bottom(xc) + 4);
+  // WHOLE (solid 1): one smooth shape to its own end (the region clips it at our edge), no bars
+  if ((s.solid ?? 0.6) >= 1 && s.kind !== 'light') return {...s, p, box, ySolid: box.y1 + 1, yEnd: box.y1 + 1, sd: seedOf(s.id)};
   const k = Math.min(1, Math.max(0.55, s.solid ?? 0.6));
   const raw = Math.max(top + Math.max(0, yEnd - top) * k, yBarMin);
   const ySolid = moving ? raw : snapRow(grid, raw);
