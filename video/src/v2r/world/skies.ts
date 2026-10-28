@@ -46,17 +46,18 @@ export const S2_AIR = horizonColor(S2_EVENING, 1000);
 
 // ---------------------------------------------------------------- L5: S6 (Arlington, April morning) and S7 (the forecourt at sunset)
 // Both suns sit at SUN2 (260, 620) r 45 (the S6 -> S7 push-through keeps its screen spot): high in the ramp, 64 px under
-// the caption band and 216 / 277 px over the horizon. A sun warmth there (any rx, strength 0.35-1, centre 620-660)
+// the caption band and 151 / 277 px over the horizon. A sun warmth there (any rx, strength 0.35-1, centre 620-660)
 // composites the peach over the mint and crosses yellow-green at C* 10-13 (skyProblems: khaki; measured 2026-10-28), so
 // these two skies carry NO sun warmth: the ramp's light band and warm horizon are the sky's warmth (khaki C* 5.8-5.9),
 // and the disc stays the scene's own flat shape on top, no halo.
 
-/** S6's April morning horizon (LIGHT.april's gold band): behind the gate's facade band at the eye-level horizon y 836. */
+/** S6's April morning horizon (LIGHT.april's gold band): behind the gate's facade band at the eye-level horizon y 771
+ *  (V2S6_rig's camera: eye 1.6 m; the kit's 836 is the facade's foot). */
 export const S6_HORIZON = CM.bandGold;
-/** S6's April morning sky: the caption field's mint flat through the band, a pale light band, the gold horizon at y 836
+/** S6's April morning sky: the caption field's mint flat through the band, a pale light band, the gold horizon at y 771
  *  (hidden by the facade band from y 705: the visible sky above it carries the light band); SUN2 (the east = screen
  *  left: the gate looks south) sits on the ramp. */
-export const S6_MORNING = eveningSky({band: CM.sky, horizon: S6_HORIZON, horizonY: 836, sun: null});
+export const S6_MORNING = eveningSky({band: CM.sky, horizon: S6_HORIZON, horizonY: 771, sun: null});
 /** The far air of S6 (the lawn's cherries and the promenade beyond the fence): lib/depth's air. */
 export const S6_AIR = horizonColor(S6_MORNING, SUN2.x);
 
@@ -98,3 +99,18 @@ export const S8_EVENING = eveningSky({band: CM.sky, horizon: SUNSET_HORIZON, hor
 
 /** The far haze of S8's lane (the sky's lowest colour under SUN8): lib/depth's air for the far rows and the far bank. */
 export const S8_AIR = horizonColor(S8_EVENING, SUN8.x);
+
+// ---------------------------------------------------------------- L3: S3 (her window, a flash-forward in S8's sunset light)
+// S3_SUNSET  her terrace across the water at sunset (looking north): the caption field's mint flat through the band, a
+//            pale warm light band at y ~635 over her roofline, SUNSET_HORIZON (#F3C6A6, S7's and S8's) as the horizon at
+//            y 700, the bottom of the sky seen in the west gap past her end wall (the far roofs, the gasholder and the
+//            viaduct hide the rest), and S8's low, wide warmth (200 x 60) centred 35 px under SUN3 (96, 652) r 46
+//            (V2S3_tWest SUN3), hugging the west gap's skyline: the sun sets in sky that agrees with it. skyProblems [] with
+//            the yellow-green crossing at C* 5.75 (a warmth centred on the disc this high in the ramp turns khaki: L5's
+//            note above). The disc stays V2S3's flat S3Sun shape on top, no halo.
+// S3_AIR     the far haze of the west gap (the sky's lowest colour warmed under SUN3): lib/depth's air for S3's far planes.
+// Wired (L3, V2S3.tsx): <Sky spec={S3_SUNSET} /> first in the sky plane (no float), the World's flat steps gone.
+export const S3_SUNSET = eveningSky({band: CM.sky, horizon: SUNSET_HORIZON, horizonY: 700, sun: {x: 96, y: 687, rx: 200, ry: 60}});
+
+/** The far haze of S3's west gap (the sky's lowest colour under SUN3): lib/depth's air for the far city and the roofs. */
+export const S3_AIR = horizonColor(S3_SUNSET, 96);

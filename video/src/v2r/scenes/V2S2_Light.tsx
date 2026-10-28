@@ -4,14 +4,14 @@
 // tint family (rigs.ts TINT_CANAL); nothing draws outside V2S2.tsx's <Lit rig={RIG_CANAL}>, and `{"lightOff": true}`
 // turns it all off (the A side of check_light.py). Screen px at the pose, FILM seconds; each layer rides the plane
 // group of the things it belongs to (the set draws it right after the ground it falls on, before the things).
-//   S2BankLight      plane 0: contact + cast under the kiosk, the newsagent, the bench's iron ends, the reporter and the
-//                    staffer, the kiosk's foot (crate, bundles), the dog, and Pip on the coping (contact only: its raw
-//                    SVG gives no silhouette); the A-board's own shadow is K3's (it slides with the board)
+//   S2BankLight      plane 0: contact + cast under the kiosk, the newsagent, the bench (one cast for it and the pair on
+//                    it), the kiosk's foot (crate, bundles), the dog, the bollards, and Pip on its bollard (contact only:
+//                    its raw SVG gives no silhouette); the A-board's own shadow is K3's (it slides with the board)
 //   S2TowpathLight   plane -1: the planter (contact, cast, its right end in form shade), the bike's wheels (contact)
 import React from 'react';
 import {CastShadow, ContactShadow, FormShade, ShadowLayer} from '../../lib/light';
 import {S2_BENCH} from './V2S2_Layout';
-import {NEAR} from './V2S2_Near';
+import {BOLLARDS, NEAR} from './V2S2_Near';
 import * as MAP from '../world/map';
 
 /** The kiosk (kit Newsstand box) and the newsagent's spot (V2S2_Board AGENT_X / AGENT_Y / AGENT_H). */
@@ -35,14 +35,11 @@ export const S2BankLight: React.FC = () => {
       {/* the newsagent */}
       <ContactShadow x={AGENT.x} y={AGENT.y} w={AGENT.h * 0.24} k={1.2} />
       <CastShadow x={AGENT.x} y={AGENT.y} w={AGENT.h * 0.2} h={AGENT.h} />
-      {/* the bench's iron ends and the pair on it */}
+      {/* the bench's iron ends; ONE cast for the bench and the pair on it (the tallest head sets its length) */}
       {[-0.42, 0.42].map((k) => (
         <ContactShadow key={k} x={cx + k * bw} y={y1} w={bw * 0.1} h={7} />
       ))}
-      <CastShadow x={cx} y={y1} w={bw} h={bw * 0.42} />
-      {PAIR.map((p, i) => (
-        <CastShadow key={i} x={p.x} y={y1} w={p.h * 0.36} h={p.h} />
-      ))}
+      <CastShadow x={cx} y={y1} w={bw} h={Math.max(...PAIR.map((p) => p.h))} />
       {/* the kiosk's foot: the crate, the bundles; the dog lying at rest */}
       <ContactShadow x={NEAR.crate.x + NEAR.crate.w / 2} y={NEAR.crate.y} w={NEAR.crate.w} h={8} />
       {NEAR.bundles.map((b, i) => (
@@ -50,8 +47,14 @@ export const S2BankLight: React.FC = () => {
       ))}
       <ContactShadow x={NEAR.dog.x + NEAR.dog.len * 0.3} y={NEAR.dog.y} w={NEAR.dog.len * 1.1} h={10} />
       <CastShadow x={NEAR.dog.x + NEAR.dog.len * 0.3} y={NEAR.dog.y} w={NEAR.dog.len} h={NEAR.dog.len * 0.36} />
-      {/* Pip on the coping: contact only */}
-      <ContactShadow x={MAP.S2.pipSeat.x} y={MAP.S2.pipSeat.y} w={62} h={6} />
+      {/* the mooring bollards (Pip's carries Pip: its contact on the bollard's cap) */}
+      {BOLLARDS.map((o, i) => (
+        <React.Fragment key={i}>
+          <ContactShadow x={o.x} y={o.foot} w={o.w * 1.3} h={Math.max(3, o.w * 0.2)} />
+          <CastShadow x={o.x} y={o.foot} w={o.w} h={o.h} />
+        </React.Fragment>
+      ))}
+      <ContactShadow x={MAP.S2.pipSeat.x} y={MAP.S2.pipSeat.y} w={BOLLARDS[0].w * 1.1} h={5} />
     </ShadowLayer>
   );
 };
@@ -62,7 +65,7 @@ export const S2TowpathLight: React.FC = () => {
     <>
       <ShadowLayer>
         <ContactShadow x={(x0 + x1) / 2} y={base} w={x1 - x0} h={12} k={1.05} />
-        <CastShadow x={(x0 + x1) / 2} y={base} w={x1 - x0} h={(base - rim) * 1.6} />
+        <CastShadow x={(x0 + x1) / 2} y={base} w={x1 - x0} h={base - rim} />
         <ContactShadow x={NEAR.bike.x - NEAR.bike.r * 1.2} y={NEAR.bike.y + NEAR.bike.r} w={NEAR.bike.r * 0.5} h={8} />
         <ContactShadow x={NEAR.bike.x + NEAR.bike.r * 1.25} y={NEAR.bike.y + NEAR.bike.r} w={NEAR.bike.r * 0.5} h={8} />
       </ShadowLayer>
