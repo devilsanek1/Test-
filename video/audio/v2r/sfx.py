@@ -169,27 +169,32 @@ def pen_glide(d, seed, speed=None):
 
 # ------------------------------------------------------------------ V2S1 (0.00-6.10)
 SEAM_XF = 0.015        # the un-build's crossfade into frame 0's draw-on (s)
-DRAW_END = 0.26        # S1_DRAW: the subject's outline draws on -0.26 .. +0.26 (f0 = mid-draw)
+DRAW_END = 0.39        # S1_DRAW (REVIEW_1 MUST 2): the pen draws her, the door, then W from f0; W's frame closes at 0.39
+DRAW_TOUCH = (0.12, 0.18, 0.27)   # the pen moves on: the door frame, the leaves, W (a light lift and re-touch each)
+FLOOD_T0, FLOOD_D = 0.44, 0.36    # the colour flood from SUN0 0.44-0.78 (her coat last), after the lamp click
 
 
 @sound
 def pen_drawon(v=1):
-    """f0 (DIRECTION rule 9): the clean pen's ONE stroke per subject (her, the door, W) is half drawn at frame 0 and
-    finishes at 0.26: a steady felt-tip glide already in motion (it began at -0.26, under the un-build), easing off as
-    the pen lifts; the colour floods out from the sun 0.02-0.30: a soft rising wash that peaks at ~0.12 and is 15 dB
-    down by 0.24, before the /sh/ of "She" (0.25). It opens with the 15 ms crossfade from the un-build (no notch at the
-    loop seam; sfx.match_seam sets the level)."""
-    out = buf(0.50)
+    """f0 (DIRECTION rule 9; REVIEW_1 MUST 2: the draw-on is a bold event that starts AT frame 0): the clean pen draws
+    the subject from the first frame, one steady felt-tip glide 0.00-0.39 (her, the door, then W), lifting a hair and
+    touching down again where it moves on (0.12 the door frame, 0.18 the leaves, 0.27 W), easing off as it lifts just
+    before the lamp click (0.40); then the colour floods out from the sun 0.44-0.80: a soft rising wash (peak ~0.56)
+    under "quit", after the ding's strike. It opens with the 15 ms crossfade from the un-build (no notch at the loop
+    seam; sfx.match_seam sets the level)."""
+    out = buf(0.86)
     n = n_of(DRAW_END + 0.03); t = np.arange(n) / SR
     sp = np.where(t < DRAW_END - 0.07, 1.0, np.clip(1.0 - (t - (DRAW_END - 0.07)) / 0.10, 0.12, 1.0))   # eases as it lifts
+    for tt in DRAW_TOUCH:
+        sp = sp * (1.0 - 0.4 * np.exp(-0.5 * ((t - tt) / 0.012) ** 2))
     st_ = pen_glide(DRAW_END + 0.03, 101, sp)
     st_[: n_of(SEAM_XF)] *= np.sin(0.5 * np.pi * np.linspace(0, 1, n_of(SEAM_XF))) ** 2
     st_[-n_of(0.012):] *= np.cos(0.5 * np.pi * np.linspace(0, 1, n_of(0.012))) ** 2
     put(out, st_, 0.0, 0.62, 0.1)
-    d = 0.30; nw = n_of(d)                                 # the flood: 0.02-0.32, peak ~0.12
-    wash = decor(lambda sd: tv_bandpass(noise(d, sd), np.geomspace(520, 2400, nw), bw_oct=1.0) * env_bell(nw, 0.33, 1.7),
+    nw = n_of(FLOOD_D)                                     # the flood: 0.44-0.80, peak ~0.56
+    wash = decor(lambda sd: tv_bandpass(noise(FLOOD_D, sd), np.geomspace(520, 2400, nw), bw_oct=1.0) * env_bell(nw, 0.33, 1.7),
                  7, 0.65)
-    out[n_of(0.02): n_of(0.02) + nw] += wash * 0.42
+    out[n_of(FLOOD_T0): n_of(FLOOD_T0) + nw] += wash * 0.42
     return out
 
 
@@ -316,13 +321,14 @@ def ear_flap(v=1):
     return out
 
 
-DIVE_MID = 0.15        # whoosh_dive: the carrier's midpoint, s after the cue (the push-throughs run 0.30 s)
+DIVE_MID = 0.15        # whoosh_dive: the carrier's midpoint, s after the cue (the push-throughs run 0.45 s since REVIEW_1
+                       # MUST 5; their zoom is seen from ~0.15 s before the midpoint, so the cue stays put)
 
 
 @sound
 def whoosh_dive(v=1):
-    """the A push-throughs with the plum bridge: v1 into her dark window W (5.95-6.25), v2 into her silhouette in her
-    lit window (14.71-15.01). The air rises INTO the glass, a muffled 'through the glass' bump lands ON the midpoint
+    """the A push-throughs with the plum bridge: v1 into her dark window W (5.875-6.325), v2 into her silhouette in her
+    lit window (14.635-15.085). The air rises INTO the glass, a muffled 'through the glass' bump lands ON the midpoint
     (+0.15 s: the plum bridge frame), then the air settles as the new shot opens (decorrelated L/R: no comb); gone by
     +0.32, before the next word (0.18-0.21 s after the midpoint)."""
     d = 0.32; n = n_of(d); k = DIVE_MID / d

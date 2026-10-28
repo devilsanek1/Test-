@@ -57,9 +57,9 @@ CUTS = [s for (_, s, _) in SHOTS[1:]]
 # THROUGHLINE s3: every join, its midpoint, its carrier (DIRECTION rule 1: A push-through, B thread match, D wipe), the
 # carrier's span on screen, and THE sound that rides it (peaking on the midpoint).
 JOINS = [
-    ("S1>S2", 6.10, "A push-through into her dark office window W (plum bridge 6.05-6.15)", (5.95, 6.25), "whoosh_dive:1"),
+    ("S1>S2", 6.10, "A push-through into her dark office window W (plum bridge 6.075-6.125)", (5.875, 6.325), "whoosh_dive:1"),
     ("S2>S3", 12.98, "B match: her dark office window at M = her lit home window at M", (12.98, 12.98), "lamp_click:2"),
-    ("S3>S4", 14.86, "A push-through into her silhouette, out of her walking (plum bridge)", (14.71, 15.01), "whoosh_dive:2"),
+    ("S3>S4", 14.86, "A push-through into her silhouette, out of her walking (plum bridge 14.835-14.885)", (14.635, 15.085), "whoosh_dive:2"),
     ("S4>S5", 20.55, "A push-through into the low October sun SUN1, out of the April sun", (20.40, 20.70), "sun_through:1"),
     ("S5>S6", 23.80, "D wipe: one blossom tree crosses the lens right to left", (23.62, 23.98), "tree_wipe"),
     ("S6>S7", 28.10, "A push-through into the April sun SUN2, out of the sunset sun", (27.95, 28.25), "sun_through:2"),
@@ -155,8 +155,9 @@ WINDOW_TICK_FRAMES = [0, 21, 44]
 # when one of them has to come down for the voice, they all come down together.
 CUES = [
     # V2S1 Walking out (0.00-6.10): no music; air + canal (in the bed) + these
-    (0.00, "pen_drawon", 20, "f0: the clean pen finishes drawing her, the door and W on (one stroke each, begun at -0.26 "
-                             "under the un-build), the colour floods from the sun outward (f1-f18), her coat last"),
+    (0.00, "pen_drawon", 20, "f0: the clean pen draws her, the door, then W from the first frame (bold, one moving pen "
+                             "each, 0.00-0.39: REVIEW_1 MUST 2), then the colour floods from the sun outward 0.44-0.78 "
+                             "(f27-f47), her coat last"),
     (0.40, "lamp_click:1", 20, "her lamp at W clicks OFF: the biggest window goes dark (the first picture of 'quit')"),
     (0.45, "exit_ding", 9, "OUR exit ding, two struck glass-chime notes rising a fourth (C6 -> F6): the glass doors start "
                            "to slide (the first-second phone sound, DIRECTION rule 9)"),
@@ -173,7 +174,7 @@ CUES = [
     (lead(4.79), "ghost_tick:2", 14, "G6 pops ('for'); the ambience dip 4.54-4.79 is in the bed"),
     (lead(4.98), "outline_pops", 15, "'life': three bare outlines pop in down the towpath (air puffs above 5 kHz; then air, no note)"),
     (lead(4.98), "ear_flap", 23, "Pip's leaf ears cover on 'life' (its one reaction)"),
-    (5.95, "whoosh_dive:1", 12, "JOIN S1>S2, the A push-through into her dark window W 5.95-6.25: the air rises into it, "
+    (5.95, "whoosh_dive:1", 12, "JOIN S1>S2, the A push-through into her dark window W 5.875-6.325 (seen from ~5.95): the air rises into it, "
                                 "'through the glass' on the midpoint 6.10 (the plum bridge), settles, gone by 6.27"),
     # V2S2 The wall (6.10-12.98)
     (at_frame(407), "window_outline", 17, "'one': her dark window's A outline pops on (one frame), in the gap before 'one'"),
@@ -186,7 +187,7 @@ CUES = [
     (12.98, "lamp_click:2", 20, "JOIN S2>S3, the B match: her dark office window becomes her lit home window at M: her "
                                 "lamp clicks ON (the thread's own sound: OFF at 0.40, ON here, ON again at 34.95)"),
     # V2S3 Her window (12.98-14.86)
-    (14.71, "whoosh_dive:2", 15, "JOIN S3>S4, the A push-through into her silhouette 14.71-15.01, 'through the glass' "
+    (14.71, "whoosh_dive:2", 15, "JOIN S3>S4, the A push-through into her silhouette 14.635-15.085 (seen from ~14.71), 'through the glass' "
                                  "on 14.86 (the callback, 3 dB softer)"),
     # V2S4 The walk home (14.86-20.55)
     (lead(15.07), "pop_high:1", 16, "her name tag pops (first build) ('She')"),
