@@ -21,7 +21,8 @@
 //               path to the turn. Measured (the frame's top-3 % salience on the card): 76 % at 12.5 and 13.5, 58 % at
 //               14.95. Stepping them (and the line) back earlier, at "But" (11.80), left the card 10 % at 12.5 and gave
 //               the window strip and the mug 65 %; at the hook's start, 33 % while it drew.
-//   15.05       the source, small, at the card's foot: "US computers · Sept 2026 vs a year earlier (BLS)"
+//   (no source line on the card: on-screen words read at phone size or are not drawn, owner 2026-10-28; the BLS source
+//   sits in the pinned comment, POSTING.md)
 // The shape is the BLS index's (CUUR0000SEEE01, FL 1.6-1.8): falling fast early and slower later, the 2021 bump, the
 // turn up at the end; no y numbers (the label carries the one number). Hierarchy (CRAFT §b): the line, then the
 // doodles, then the line's end (the dot's pop), then the hook and "+9.7%" are the subject in turn (the hero colour, the
@@ -309,7 +310,6 @@ export const LABEL = (() => {
   const top = P(HOOK.end[0], HOOK.end[1]);
   return {x: CARD.x + CARD.w - 26, y: top[1] - 30, size: 110};
 })();
-const SOURCE = {x: CARD.x + CARD.w / 2, y: CARD.y + CARD.h - 12, size: 24};
 
 const Label: React.FC<{T: number}> = ({T}) => {
   if (T < CHART_BEATS.label) return null;
@@ -326,17 +326,6 @@ const Label: React.FC<{T: number}> = ({T}) => {
   return s >= 0.999 && p >= 1 ? txt : <XG m={mat.about(mat.scale(s), cx, cy)}>{txt}</XG>;
 };
 
-const Source: React.FC<{T: number}> = ({T}) => {
-  if (T < CHART_BEATS.source) return null;
-  const p = prog(T, CHART_BEATS.source, 0.1, ease.outCubic);
-  const s = 0.7 + 0.3 * p;
-  const txt = (
-    <Txt x={SOURCE.x} y={SOURCE.y} size={SOURCE.size} fill="#6E4A3A" fit={CARD.w * 0.9}>
-      US computers · Sept 2026 vs a year earlier (BLS)
-    </Txt>
-  );
-  return s >= 0.999 ? txt : <XG m={mat.about(mat.scale(s), SOURCE.x, SOURCE.y - SOURCE.size * 0.3)}>{txt}</XG>;
-};
 
 // ================================================================= the chart
 
@@ -412,7 +401,6 @@ export const OldDealChart: React.FC<{T?: number}> = ({T: Tin}) => {
       <MineDoodle T={T} k={off} />
       <BetterDoodle T={T} k={off} />
       <Label T={T} />
-      <Source T={T} />
     </Tier>
   );
 };

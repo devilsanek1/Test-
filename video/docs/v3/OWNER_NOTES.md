@@ -90,3 +90,9 @@ Only the owner's quoted words carry owner rank; the "->" half is our log, and a 
   - Final round (G8): fixed the summit pile, SQB's strip and turn, the BETTER van, the overtake before the jolt, the
     payoff's rows and the loop's $1,099; deferred for the token budget: R3-4 (the queue's vans stay small), the
     mountain's air step, Pip's look-up timing. Master `deliverables/v3/v3_final.mp4` + cover delivered for review.
+- 2026-10-28 (on the posted reel, screenshots): "Wait why do we have the text repeat itself?" -> the frame-0 core line
+  ("AI is making your next laptop pricier.") sat over its own spoken caption "AI's making it pricier." (1.64-3.37):
+  `Film3.tsx` FILM3_FRAME0 `spoken: 'first'`, only "Buying a laptop soon?" under the core line. "Also this text is weird"
+  (the street notice's faces) -> the 5x face is "~5x" alone (bars, "last year / now", the 11 px Gartner line gone), the
+  2027 face "2027" alone (Micron's 13 px quote gone), and the chart card's 24 px BLS source line gone; the sources stay
+  in the pinned comment. -> rules: playbook (frame-0 words are the caption; words in the world are few and big).

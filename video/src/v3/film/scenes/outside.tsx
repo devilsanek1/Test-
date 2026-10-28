@@ -810,63 +810,27 @@ const NOTICE_CALM = {paper: '#E9DACF', ink: '#C9A08F', now: '#A69389', last: '#E
 // pushed frame's wall band, y 944-972, at the queue's beats: assembly review R1-1)
 const mixK = (full: string, calm: string, k: number) => (k <= 0 ? full : k >= 1 ? calm : mixHex(full, calm, k));
 
-/** The 5x face: last year | now bars (S11's), "~5x", the source. */
-const FaceFiveX: React.FC<{k: number}> = ({k}) => {
-  const small = k < 0.5;
-  return (
-    <>
-      <path d={rrect(16, 76, 26, 18, 2)} fill={mixK(EMBER.boardDeep, NOTICE_CALM.last, k)} />
-      <path d={rrect(52, 14, 26, 80, 2)} fill={mixK(EMBER.anchor, NOTICE_CALM.now, k)} />
-      {small ? (
-        <>
-          <path d={`M10 95H86`} stroke={EMBER.beam} strokeWidth={2} />
-          <Txt x={29} y={110} size={13} fill={EMBER.ink}>
-            last year
-          </Txt>
-          <Txt x={65} y={110} size={13} fill={EMBER.ink}>
-            now
-          </Txt>
-          <Txt x={144} y={104} size={22} fill={EMBER.beam} fit={110}>
-            RAM chips
-          </Txt>
-          <Txt x={100} y={121} size={11} fill={EMBER.beam} fit={190}>
-            RAM chips · Gartner, Q2 2026
-          </Txt>
-        </>
-      ) : null}
-      <Txt x={144} y={78} size={72} fill={mixK(EMBER.ink, NOTICE_CALM.ink, k)} fit={108}>
-        ~5x
-      </Txt>
-    </>
-  );
-};
-/** The 2027 face: "2027" big, Micron's line small; nothing once blank. */
+/** The 5x face: "~5x", big, alone. On-screen words read at phone size or are not drawn (owner, 2026-10-28: "this text
+ *  is weird"): the bars, their "last year / now" labels and the 11 px source line are gone; the caption says "about five
+ *  times last year's price" and the source sits in the pinned comment (POSTING.md). */
+const FaceFiveX: React.FC<{k: number}> = ({k}) => (
+  <Txt x={100} y={84} size={88} fill={mixK(EMBER.ink, NOTICE_CALM.ink, k)} fit={176}>
+    ~5x
+  </Txt>
+);
+/** The 2027 face: "2027", big, alone (Micron's 13 px quote is gone, as the 5x face's lines); nothing once blank. */
 const Face2027: React.FC<{k: number; blank: boolean}> = ({k, blank}) =>
   blank ? null : (
-    <>
-      <Txt x={100} y={78} size={84} fill={mixK(EMBER.ink, NOTICE_CALM.ink, k)} fit={184}>
-        2027
-      </Txt>
-      {k < 0.5 ? (
-        <>
-          <Txt x={100} y={100} size={13} fill={EMBER.beam} fit={190}>
-            Micron: supply 'much tighter'
-          </Txt>
-          <Txt x={100} y={116} size={13} fill={EMBER.beam} fit={190}>
-            in 2027 and 2028 than in 2026
-          </Txt>
-        </>
-      ) : null}
-    </>
+    <Txt x={100} y={84} size={88} fill={mixK(EMBER.ink, NOTICE_CALM.ink, k)} fit={184}>
+      2027
+    </Txt>
   );
-/** The notice's first face: the gate's queue rule, always calm (a faint "CHIP PICKUP", a van icon and an arrow), shown
+/** The notice's first face: the gate's queue rule, always calm (a van icon and an arrow: its faint "CHIP PICKUP" went
+ *  with the other small words, owner 2026-10-28), shown
  *  from the load beat (blank through SQD's reveal and J4: E5). */
 const FaceQueue: React.FC<{on: boolean}> = ({on}) =>
   on ? (
     <>
-      <Txt x={100} y={50} size={30} fill={NOTICE_CALM.faint} fit={170}>
-        CHIP PICKUP
-      </Txt>
       <path d={rrect(60, 70, 52, 30, 4) + rrect(112, 80, 22, 20, 4)} fill={mixHex(EMBER.reveal, NOTICE_CALM.paper, 0.5)} />
       <path d={ellD(74, 102, 6, 6) + ellD(124, 102, 6, 6)} fill={NOTICE_CALM.faint} />
       <path d={`M44 85L30 85M36 79L30 85L36 91`} stroke={NOTICE_CALM.faint} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" fill="none" />

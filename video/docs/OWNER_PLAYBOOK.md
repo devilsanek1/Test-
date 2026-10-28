@@ -176,7 +176,10 @@ Maintenance at the end).
   Details: `docs/look/CINEMATIC_GUIDE.md`, "The opening"; `docs/look/DIRECTION.md` rule 9. — (owner's reference, v3,
   2026-10-26; the clean pen and one focus, v3 G5b, 2026-10-27).
 - **State the payoff in words on frame 0; polish the first 2 s and 5 s most, then the first 10 s.** A calm, pretty
-  opening lost ~80 % of viewers by 3 s; late quirks are acceptable. — (v1 IG insights, 2026-10-25).
+  opening lost ~80 % of viewers by 3 s; late quirks are acceptable. The frame-0 words ARE the caption for the spoken line
+  that says the same thing: while they show, no caption page repeats them (in Remotion: `Frame0Text.spoken: 'first'`, or
+  hide that page). — (v1 IG insights, 2026-10-25; v3, 2026-10-28: "why do we have the text repeat itself?", the core
+  line over its own spoken caption "AI's making it pricier.").
 - **The hook is a concrete, surprising, TRUE claim with stakes**, verified against the primary source before it's
   locked; for a small news item, research the bigger story and lead with its strongest true framing. — (v2, 2026-10-25).
 - **Personal framings must feel natural, not over the top.** Never cast the viewer as a loser in a contest they don't
@@ -211,7 +214,12 @@ Maintenance at the end).
   important stage ... more like an animated sketchbook", 2026-10-26).
 - **Every shot reads instantly with the sound off: literal beats clever.** Recognisable things (a laptop that looks like a
   laptop, a plain labelled chart), the real mechanism, never a metaphor the facts don't support or that needs explaining;
-  a sound-off cold read before the owner sees any cut. — (v3 G3, 2026-10-26).
+  a sound-off cold read before the owner sees any cut. **Words in the world (signs, notices, cards, screens) are few and
+  big: each one reads at phone size at a glance, or it is not drawn.** No small source lines, quotes or fine print in
+  the picture (sources go in the caption and the pinned comment), never the same words twice on screen at once, and
+  nothing passes in front of words while they are the beat. Before any cut goes out, check every on-screen word at 0.25
+  scale. — (v3 G3, 2026-10-26; v3, 2026-10-28: "this text is weird", the notice's 11-13 px source and Micron lines, a
+  one-bar chart and a crate crossing its labels).
 - **Drawn like a professional storyboard: monochrome, clarity first, and cinematic** (framing, angle, scale, coziness
   decided in the board; clarity from composition, never icons on blank paper; every panel names its shot type). Spec:
   `docs/look/STORYBOARD_STYLE.md`. — ("very simple, avoid colours for now", v3 G3, 2026-10-26).

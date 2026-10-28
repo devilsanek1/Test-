@@ -56,6 +56,9 @@ export const FILM3_FRAME0: Frame0Text = {
   lines: ['AI is making your', 'next laptop pricier.'],
   highlight: 'pricier.',
   until: (animatic as {frame0Until: number}).frame0Until,
+  // only "Buying a laptop soon?" sits under the core line: the voice's "AI's making it pricier." (1.64) is the core line
+  // itself, so its page stays hidden while the words show (owner, 2026-10-28: "why do we have the text repeat itself?")
+  spoken: 'first',
 };
 
 const common = {
