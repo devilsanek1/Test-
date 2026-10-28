@@ -9,9 +9,13 @@
 //                x1.12 -> 1, the town x1.07 -> 1, the far field x1.03 -> 1 (we pull back in through our own glass; a
 //                declared light change: into the warm room). Before 22.35 it holds the start state (SQD's last frames
 //                draw H2View there), after 22.95 identity.
-//   pushCam(T)   SQE's one push: x1.35 about (600, 1120) (flow_v2 §7's read fallback over its x1.25) for the street and the window over 24.90-25.70 (inOutSine),
-//                released over 28.93-29.60; with depth: the town x1.2, the far field x1.08 (the mountain's summit stays
-//                under the caption band).
+//   pushCam(T)   SQE's ONE push: x1.35 about (680, 1120) (flow_v2 §7's read fallback over its x1.25) for the street and
+//                the window over 24.90-25.70 (inOutSine), HELD through the queue (the van's crate, the hop into the
+//                phone, the BETTER van, the 2027 flip and the overtake all play at the pushed size: early review E4,
+//                OPEN 6) and released in SQF's "nothing new" stretch 36.36-36.98 (J5's continuous camera: the pull-out
+//                lands as the data center's sign lights at 36.98); with depth: the town x1.2, the far field x1.08 (the
+//                mountain's summit stays under the caption band). The centre x 680 keeps the notice and the lane's head
+//                left of the platform's right rail (x 950) and the gate right of the phone.
 //   h2Cams(T)    push x entry: what SQE and SQF draw through.
 // <H2View> draws the three outside planes and this window through h2Cams at film time; the sky is the World's.
 import React from 'react';
@@ -21,7 +25,7 @@ import {Tier} from '../../../lib/tier';
 import {EMBER, Mug, type Pt} from '../kit';
 import {Ambient, ContactShadow, FormShade, LightPool, Lit, nookRig, Shadow, ShadowLayer, mixHex} from '../kit/Light';
 import {ellD, roundPoly, rrect} from '../kit/Fleet';
-import {FilmClock, OutsideFar, OutsideStreet, OutsideTown, useFilmT} from './outside';
+import {FilmClock, OutsideFar, OutsideStreet, OutsideTown, PlaneCamsProvider, useFilmT} from './outside';
 
 // ---------------------------------------------------------------- geometry (H2 canvas px at rest)
 
@@ -36,7 +40,7 @@ const I = mat.I;
 const zoomAbout = (s: number, c: Pt): Mat => mat.about(mat.scale(s), c[0], c[1]);
 
 export const ENTRY = {t0: 22.35, t1: 22.95, c: [540, 1100] as Pt, win: 3.0, street: 1.12, town: 1.07, far: 1.03};
-export const PUSH = {in0: 24.9, in1: 25.7, out0: 28.93, out1: 29.6, c: [600, 1120] as Pt, street: 1.35, town: 1.2, far: 1.08};
+export const PUSH = {in0: 24.9, in1: 25.7, out0: 36.36, out1: 36.98, c: [680, 1120] as Pt, street: 1.35, town: 1.2, far: 1.08};
 
 /** J4's move (see the header): one progress, each plane its own start scale, log-linear. */
 export function entryCam(T: number): H2Cams {
@@ -141,8 +145,10 @@ export const H2Window: React.FC = () => {
 export const H2View: React.FC<{cams?: H2Cams}> = ({cams}) => {
   const T = useFilmT();
   const c = cams ?? h2Cams(T);
+  // the planes know their cameras: the street keeps its snow under the caption band in screen px and drives the trucks
+  // up the town plane's road while the push scales the two planes apart
   return (
-    <>
+    <PlaneCamsProvider value={{far: c.far, town: c.town, street: c.street}}>
       <XG m={c.far}>
         <OutsideFar />
       </XG>
@@ -155,6 +161,6 @@ export const H2View: React.FC<{cams?: H2Cams}> = ({cams}) => {
       <XG m={c.win}>
         <H2Window />
       </XG>
-    </>
+    </PlaneCamsProvider>
   );
 };

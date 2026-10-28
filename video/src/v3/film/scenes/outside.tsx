@@ -4,36 +4,59 @@
 // inside another FilmClock, and gives its kit pieces film time), so the frames match bit for bit across J4 and J5.
 //
 // H2 at rest (canvas px): flat sky behind the caption band (white captions); horizon y 930: THE DATA CENTER (S9's hall,
-// dark, its sign lit) w 330 at x 230-560, THE MOUNTAIN (S9's PeakPile re-laid: summit (800, 640), crest sticks ~26 px,
-// the summit stick a kit MemoryStick for SQD's x27 start) behind its right side and past the right edge; the town
-// 930-1040 with the road from our street (x ~300) up to the data center; OUR STREET 1040-1250: the chip factory's wall
-// x 330-950 (y 1000-1090) with its lit gate x 480-640, the booth on its left, the floodlight's pool (560, 1200) rx 230
-// ry 55, the notice x 680-880 (y 1010-1150), the waiting lane x 720-940 (y 1140-1240); the sill is h2_window's.
-// Planes (each a camera plane of its own: entryCam / pushCam scale them differently): OutsideFar (sky, clouds,
-// mountain, data center), OutsideTown (the town, the road up, the factory behind its wall), OutsideStreet (the street
-// and everything on it).
+// dark) w 330 at x 230-560, THE MOUNTAIN (the REVEAL lane's pile: summit (800, 640), the summit stick a kit MemoryStick
+// for SQD's x27 start) behind its right side and past the right edge; the town 930-1040 with the road from our street
+// (x ~300) up to the data center; OUR STREET 1040-1250: the chip factory's wall x 330-950 (y 1000-1090) with its lit
+// gate x 480-640, the booth on its left, the floodlight's pool (560, 1200) rx 230 ry 55, the notice x 680-880 (y
+// 1010-1150), the waiting lane x 720-940 (y 1140-1240), the road-mouth lamp (232) with its own small pool; the sill is
+// h2_window's. Planes (each a camera plane of its own: entryCam / pushCam scale them differently): OutsideFar (sky,
+// clouds, mountain, data center), OutsideTown (the town, the road up, the factory behind its wall), OutsideStreet (the
+// street and everything on it). H2View hands the planes their cameras (PlaneCams): the street keeps the snow under the
+// caption band in SCREEN px and drives the trucks up the town plane's road while the planes are scaled apart.
 //
-// The street's timeline (film seconds; flow_v2 §4 SQE / SQF): the two DC trucks A and B stand in the pool from the
-// start (J4: nothing new moves 22.28-23.08); 23.10-24.20 two workers carry crates into A; 24.20 the barrier lifts, A
-// drives up the road (24.30-25.45, shrinking into the data center's gate) as B rolls up to the gate (24.30-25.20); OUR
-// VAN waits unlit at the head of the lane, rolls into the pool 25.72-26.20 (lit at last), ONE small crate lands on its
-// roof on "left" 26.04; the van behind shuffles up 26.25-26.75; 27.08 the notice's 5x face swings on; 29.20-29.85 our
-// van drives along the near kerb to x ~420; 29.90-30.25 its crate hops over the sill into the listing laptop (the
-// thread plane's ~(171, 1236)); 30.40-31.20 it leaves left; 31.40-32.84 the BETTER van joins the back of the queue;
-// 33.50-34.40 B leaves up the road; 34.60 the notice flips to 2027; 35.22-36.25 two DC trucks overtake the BETTER van
-// (nudged back 35.62) and take the pool; 36.98 the data center's sign steps up one value (SQF), then the street holds,
-// alive and calm. Tiers follow the beat (flow_v2 §5): the beat's subject gets the one outline and the motion.
+// THE FAR FIELD SITS BACK (early review E3; CRAFT §b tier C, §f one flat step per plane toward the air): off its two
+// beats the data center is tier C: one haze step toward the sky's lowest colour (kit Haze, k 0.35: its body L* 18 -> 33),
+// its server rows the clean pen's three long soft bands (no dash rows, no blink), its sign panel and letters within a
+// calm step of the facade, no outline; hall B one more step back (k 0.5), the roof fans without their spinning ticks.
+// Its beats (HALL_A): 19.40-21.60 (the reveal's "AI data centers.", the sign lit, its one outline) and 36.98-38.70 (SQF:
+// the sign LIGHTS on "AI", drawn on top of the hall: the payoff's one event on the horizon); every switch is a 2-step
+// change. The town's houses are calm too: walls half way into the far snow, caps one pale step, every raw fill through
+// the tier's paint (useTierPaint); the factory's steam a light step of the pile's own gold (E14: pale puffs read as holes
+// in the mountain).
+//
+// The street's timeline (film seconds; flow_v2 §4 SQE / SQF; the push x1.35 is held 25.70-36.36, so the queue is laid
+// out inside the pushed frame: right of the phone and Pip, left of the platform's right rail): the two DC trucks A and
+// B stand in the pool from the start; THE STREET IS CALM until the load beat (E5): the gate's pool and its lit opening one
+// value calmer, the trucks one haze step back, the notice blank, so SQD's "By the mountain" and J4's entry keep the eye;
+// 23.10 the gate comes up with the load (one event: the pool warms, truck A takes its outline, the workers start);
+// 23.10-24.20 two workers carry crates into A; 24.20 the barrier lifts, A drives up the road (24.30-25.45, shrinking
+// into the data center's gate) as B rolls up to the gate (24.30-25.20); OUR VAN waits unlit at the head of the lane,
+// rolls into the pool 25.72-26.20 (lit at last), ONE small crate lands on its roof on "left" 26.04; the van behind
+// shuffles up 26.25-26.75; 27.08 the notice's 5x face swings on (full for 1.5 s, then one value down, its small lines
+// hidden: E9); 29.20-29.85 our van pulls up at the near kerb (x 550: clear of Pip); 29.85-30.29 its crate hops over the
+// sill into the listing laptop, growing to ~120 px as it comes toward the glass and shrinking into the screen (E4: the
+// carry reads), the tag ticks to $1,099 on "pass" (30.28); 30.40 our van leaves left as the van behind moves up into the
+// pool (30.55-31.15); 31.40-32.84 the BETTER van joins the queue at the lane's head; 33.50-34.65 B leaves up the road;
+// 34.60 the notice flips to 2027 (full until 35.85, then one value down); 35.22-36.25 two DC trucks overtake along the
+// near kerb (BETTER nudged back 35.62): C takes the gate, D stops in front of the pool; 36.98 the notice goes blank as
+// the data center's sign lights (SQF), then the street holds, alive and calm. Tiers follow the beat (flow_v2 §5): the
+// beat's subject gets the one outline and the motion.
+// Light (CRAFT §d; the street rig: the open sky the key): the gate's floodlight pool is THE light (two warm steps: L* 87
+// C* 13 / L* 91 C* 16, lighter AND warmer than the road: E11), the gate's lit yard spills onto the pavement down to it,
+// the road-mouth lamp lights its own small pool, contact shadows under everything that stands.
 import React, {createContext, useContext, useId} from 'react';
 import {TimeProvider, clamp, ease, prog, useTime} from '../../../lib/time';
 import {mat, XG, type Mat} from '../../../lib/xf';
 import {rng} from '../../../lib/rng';
-import {Tier} from '../../../lib/tier';
+import {Tier, useTierPaint} from '../../../lib/tier';
 import {useFilmTime} from '../../../lib/sequence';
-import {EMBER, BirdV, SnowLayers, windowLit, puffs, Txt, type Pt} from '../kit';
-import {ContactShadow, LightPool, Lit, RIGS, ShadowLayer, mixHex, useLightOff, withKey, streetLamp} from '../kit/Light';
-import {CrateBox, CrateFlight, crateFlightPose, ellD, FleetVan, fleetVanGeo, NoticeFlip, rrect, roundPoly, type FleetVariant} from '../kit/Fleet';
-import {CornerCloud, HighClouds, CloudBank, FarGround, InfinityLine, FarField, HallB, HallPlume, HallFans, Hall, HALL, HALL_GEO, HORIZON as S9_HORIZON} from './S9_far';
-import {RevealPeak, J3Stick, J3StickLight} from './SQD_peak';
+import {EMBER, BirdV, DataCenter, SnowLayers, windowLit, puffs, Txt, type Pt} from '../kit';
+import {ContactShadow, LightPool, Lit, RIGS, ShadowLayer, WindowSpill, mixHex, useLightOff, withKey, streetLamp} from '../kit/Light';
+import {CrateBox, CrateFlight, ellD, FleetVan, fleetVanGeo, NoticeFlip, rrect, roundPoly, type FleetVariant} from '../kit/Fleet';
+import {Haze, stepAt, twoStepIn} from '../kit/Haze';
+import {CornerCloud, HighClouds, CloudBank, FarGround, InfinityLine, HallPlume, HALL, HALL_GEO, HALL_ROOF, HALLB, HORIZON as S9_HORIZON, roofRows, RoofRowsView, type RoofRowSpec} from './S9_far';
+import {T9} from './S9_tones';
+import {RevealPeak, J3Stick, J3StickLight, PEAK_TONES} from './SQD_peak';
 import {RevealBirds} from './SQD_life';
 
 const f1 = (v: number) => (Math.round(v * 10) / 10).toString();
@@ -55,11 +78,16 @@ export const H2_FLOOD = {x: 560, y: 1006};
 export const H2_POOL = {cx: 560, cy: 1200, rx: 230, ry: 55};
 export const H2_NOTICE = {x: 680, y: 1010, w: 200, h: 140, ground: 1104};
 export const H2_LANE = {x0: 720, x1: 940, y0: 1140, y1: 1240};
-/** Where the van's crate lands in the thread plane's listing laptop (screen px at H2 rest; LEFT spot). */
+/** Where the van's crate lands in the thread plane's listing laptop (screen px at H2 rest; LEFT spot): the default
+ *  only, SQE passes the plane's own listing screen at film time. */
 export const H2_CRATE_TO: Pt = [171, 1236];
+/** The road-mouth lamp (a practical: lantern, post foot on the far pavement) and its small pool (E11). */
+export const H2_ROAD_LAMP = streetLamp([232, 962], [232, 1094]);
 
 /** Film-time beats of the street (flow_v2 §4). */
 export const H2_BEATS = {
+  /** The street's calm ends (E5): the gate comes up with the load beat. */
+  calmEnd: 23.1,
   load: 23.1,
   barrier: 24.2,
   aGo: 24.3,
@@ -67,21 +95,38 @@ export const H2_BEATS = {
   vanInEnd: 26.2,
   crate: 26.04,
   fiveX: 27.08,
+  /** The 5x face steps one value down (E9: ~1.5 s at full contrast from its swing). */
+  fiveXCalm: 28.58,
   vanGo: 29.2,
   vanKerb: 29.85,
-  hop: 29.9,
-  hopEnd: 30.25,
+  hop: 29.85,
+  hopEnd: 30.29,
   ding: 30.28,
   vanLeave: 30.4,
+  /** The van behind ours moves up into the pool (the lane's head frees for the BETTER van). */
+  van2In: 30.55,
+  van2InEnd: 31.15,
   better: 31.4,
   betterEnd: 32.84,
   bGo: 33.5,
   flip: 34.6,
+  /** The 2027 face steps one value down (before J5's 0.4 s: nothing changes in 35.96-36.76). */
+  flipCalm: 35.85,
   trucks: 35.22,
   trucksEnd: 36.25,
   nudge: 35.62,
+  /** The data center's sign lights (SQF, on "AI"); the notice goes blank in the same frame (one event). */
   sign: 36.98,
 };
+/** The data center's beats (E3): A (the subject) inside, C (calm, hazed) outside; each switch a 2-step change. */
+export const HALL_A: [number, number][] = [
+  [-99, 21.6],
+  [36.98, 38.7],
+];
+/** The far field's haze (CRAFT §f: one flat step per plane toward the air, the sky's lowest colour). */
+export const FAR_AIR = EMBER.skyLow;
+const HALL_K = 0.35;
+const HALLB_K = 0.5;
 
 // ---------------------------------------------------------------- film clock
 
@@ -106,6 +151,19 @@ export const FilmClock: React.FC<{children?: React.ReactNode}> = ({children}) =>
     </FilmTCtx.Provider>
   );
 };
+
+// ---------------------------------------------------------------- the planes' cameras (from H2View)
+
+/** The cameras the planes are drawn through right now (h2_window's h2Cams; absent = identity: SQD's own pull-back). */
+export type PlaneCams = {far: Mat; town: Mat; street: Mat};
+const PlaneCamsCtx = createContext<PlaneCams | null>(null);
+export const PlaneCamsProvider = PlaneCamsCtx.Provider;
+/** The street plane -> the town plane's road (inv(street) x town): the trucks climbing the road follow the road the
+ *  town plane draws, whatever the push does to the two planes. */
+function roadMapOf(c: PlaneCams | null): Mat {
+  return c ? mat.mul(mat.inv(c.street), c.town) : mat.I;
+}
+const ap = (m: Mat, p: Pt): Pt => [m[0] * p[0] + m[2] * p[1] + m[4], m[1] * p[0] + m[3] * p[1] + m[5]];
 
 // ---------------------------------------------------------------- tracks
 
@@ -166,7 +224,12 @@ const VAN_W = 140;
 const Y_POOL = 1218;
 const Y_LANE = 1236;
 const Y_KERB = 1250;
-/** The road's mouth on our street and its top at the data center's gate. */
+/** Our van's stop at the near kerb (clear of Pip and the phone in the held push). */
+const KERB_X = 565;
+/** The lane's head (where the next van waits). */
+const LANE_HEAD = 805;
+/** The road's mouth on our street and its top at the data center's gate (keys from index 2 lie on the town plane's
+ *  road: they follow it through roadMapOf). */
 const ROAD_UP: Key[] = [
   {t: 0, p: [455, Y_POOL], k: 1},
   {t: 0, p: [398, 1124], k: 0.8},
@@ -174,51 +237,63 @@ const ROAD_UP: Key[] = [
   {t: 0, p: [352, 990], k: 0.32},
   {t: 0, p: [388, 936], k: 0},
 ];
+const roadUp = (m: Mat): Key[] => {
+  if (mat.isIdentity(m)) return ROAD_UP;
+  const s = Math.hypot(m[0], m[1]);
+  return ROAD_UP.map((q, i) => (i < 2 ? q : {t: 0, p: ap(m, q.p), k: (q.k ?? 1) * s}));
+};
 
 export type Vehicle = {id: string; variant: FleetVariant; x: number; y: number; k: number; dir: 1 | -1; line: boolean; roll: number; crate?: boolean};
 
-/** Every vehicle on the street at film time T (back to front by ground y). */
-export function vehiclesAt(T: number): Vehicle[] {
+/** Every vehicle on the street at film time T (back to front by ground y). `road` = the street -> town-road map. */
+export function vehiclesAt(T: number, road: Mat = mat.I): Vehicle[] {
   const B = H2_BEATS;
   const out: Vehicle[] = [];
   const roll = (x: number, k = 1) => (-x / (VAN_W * 0.085 * k)) % (Math.PI * 2);
-  // A: loads at the gate, leaves up the road on "first dibs"
-  if (T < B.aGo + 1.2) {
-    const a = drive(T, B.aGo, B.aGo + 1.15, ROAD_UP, ease.inOutSine);
+  const up = roadUp(road);
+  // A: loads at the gate, leaves up the road on "first dibs" (at the gate's speed, gone into the data center's gate by
+  // 24.95: the push only starts at 24.90, so the road and the street never part under it)
+  if (T < B.aGo + 0.7) {
+    const a = drive(T, B.aGo, B.aGo + 0.65, up, ease.inOutSine);
     if (a.k > 0.04) out.push({id: 'A', variant: 'dc', x: a.p[0], y: a.p[1], k: a.k, dir: -1, line: T >= B.load - 0.1 && T < B.vanIn - 0.4, roll: roll(a.p[0], a.k)});
   }
-  // B: behind A in the pool, rolls up to the gate, loads, leaves up the road while chip makers speak (33.50)
-  if (T < B.bGo + 1.2) {
+  // B: behind A in the pool, rolls up to the gate, loads, leaves while chip makers speak (33.50): left along the street
+  // toward the road's mouth, out of view behind the phone (in the held push the town plane's road lies apart from the
+  // street's wall: a truck climbing it would cross the wall's corner)
+  if (T < B.bGo + 1.6) {
     const b1 = drive(T, B.aGo, B.aGo + 0.9, [{t: 0, p: [675, Y_POOL]}, {t: 0, p: [455, Y_POOL]}], ease.inOutCubic);
-    const b2 = drive(T, B.bGo, B.bGo + 1.15, ROAD_UP, ease.inOutSine);
+    const b2 = drive(T, B.bGo, B.bGo + 1.5, [{t: 0, p: [455, Y_POOL]}, {t: 0, p: [330, 1214]}, {t: 0, p: [-240, 1214]}], ease.inQuad);
     const q = T < B.bGo ? b1 : b2;
     if (q.k > 0.04) out.push({id: 'B', variant: 'dc', x: q.p[0], y: q.p[1], k: q.k, dir: -1, line: false, roll: roll(q.p[0], q.k)});
   }
-  // OUR VAN: waits unlit at the head of the lane; into the pool; the kerb; the hop; away left
+  // OUR VAN: waits unlit at the head of the lane; into the pool; the kerb; the hop; away left (slow while it is in
+  // view, faster once the phone hides it)
   {
     let q: {p: Pt; k: number};
-    if (T < B.vanGo) q = drive(T, B.vanIn, B.vanInEnd, [{t: 0, p: [805, Y_LANE]}, {t: 0, p: [740, 1226]}, {t: 0, p: [680, Y_POOL]}], ease.inOutCubic);
-    else if (T < B.vanLeave) q = drive(T, B.vanGo, B.vanKerb, [{t: 0, p: [680, Y_POOL]}, {t: 0, p: [592, 1244]}, {t: 0, p: [420, Y_KERB]}], ease.inOutCubic);
-    else q = drive(T, B.vanLeave, B.vanLeave + 0.8, [{t: 0, p: [420, Y_KERB]}, {t: 0, p: [-170, Y_KERB]}], ease.inCubic);
+    if (T < B.vanGo) q = drive(T, B.vanIn, B.vanInEnd, [{t: 0, p: [LANE_HEAD, Y_LANE]}, {t: 0, p: [740, 1226]}, {t: 0, p: [680, Y_POOL]}], ease.inOutCubic);
+    else if (T < B.vanLeave) q = drive(T, B.vanGo, B.vanKerb, [{t: 0, p: [680, Y_POOL]}, {t: 0, p: [618, 1242]}, {t: 0, p: [KERB_X, Y_KERB]}], ease.inOutCubic);
+    else q = drive(T, B.vanLeave, B.vanLeave + 1.4, [{t: 0, p: [KERB_X, Y_KERB]}, {t: 0, p: [-170, Y_KERB]}], ease.inQuad);
     const on = (T >= B.vanIn - 0.1 && T < B.vanInEnd + 0.5) || (T >= B.vanGo - 0.1 && T < B.ding + 0.1);
     if (q.p[0] > -160) out.push({id: 'van', variant: 'van', x: q.p[0], y: q.p[1], k: 1, dir: -1, line: on, roll: roll(q.p[0]), crate: T >= B.crate && T < B.hop});
   }
-  // the van behind ours shuffles up to the head of the lane
+  // the van behind ours: shuffles up to the head of the lane, then moves up into the pool when ours has gone
   {
-    const q = drive(T, 26.25, 26.75, [{t: 0, p: [950, Y_LANE]}, {t: 0, p: [805, Y_LANE]}], ease.inOutCubic);
+    const q =
+      T < B.van2In
+        ? drive(T, 26.25, 26.75, [{t: 0, p: [950, Y_LANE]}, {t: 0, p: [LANE_HEAD, Y_LANE]}], ease.inOutCubic)
+        : drive(T, B.van2In, B.van2InEnd, [{t: 0, p: [LANE_HEAD, Y_LANE]}, {t: 0, p: [740, 1226]}, {t: 0, p: [680, Y_POOL]}], ease.inOutCubic);
     out.push({id: 'van2', variant: 'van', x: q.p[0], y: q.p[1], k: 1, dir: -1, line: false, roll: roll(q.p[0])});
   }
-  // the BETTER van joins the back of the queue; the trucks nudge it back
+  // the BETTER van joins the queue at the lane's head; the trucks nudge it back
   if (T >= B.better - 0.05) {
-    const q = drive(T, B.better, B.betterEnd, [{t: 0, p: [1190, 1244]}, {t: 0, p: [885, 1244]}], ease.outCubic);
+    const q = drive(T, B.better, B.betterEnd, [{t: 0, p: [1190, Y_LANE]}, {t: 0, p: [LANE_HEAD, Y_LANE]}], ease.outCubic);
     const nudge = 26 * ease.outBack(1.6)(prog(T, B.nudge, 0.22));
-    out.push({id: 'better', variant: 'better', x: q.p[0] + nudge, y: q.p[1], k: 1, dir: -1, line: (T < B.betterEnd + 0.3) || (T >= B.trucks && T < B.trucksEnd), roll: roll(q.p[0] + nudge)});
+    out.push({id: 'better', variant: 'better', x: q.p[0] + nudge, y: q.p[1], k: 1, dir: -1, line: T < B.betterEnd + 0.3 || (T >= B.trucks && T < B.trucksEnd), roll: roll(q.p[0] + nudge)});
   }
-  // two DC trucks overtake the queue along the near kerb and take the pool
+  // two DC trucks overtake the queue along the near kerb: C takes the gate, D stops in front of the pool
   if (T >= B.trucks - 0.05) {
-    const lane = (x0: number, x1: number): Key[] => [{t: 0, p: [x0, 1252]}, {t: 0, p: [980, 1252]}, {t: 0, p: [x1 + 120, 1236]}, {t: 0, p: [x1, Y_POOL]}];
-    const c = drive(T, B.trucks, B.trucksEnd, lane(1200, 455), ease.inOutSine);
-    const d = drive(T, B.trucks + 0.1, B.trucksEnd + 0.08, lane(1420, 675), ease.inOutSine);
+    const c = drive(T, B.trucks, B.trucksEnd, [{t: 0, p: [1200, 1252]}, {t: 0, p: [980, 1252]}, {t: 0, p: [575, 1240]}, {t: 0, p: [455, Y_POOL]}], ease.inOutSine);
+    const d = drive(T, B.trucks + 0.1, B.trucksEnd + 0.08, [{t: 0, p: [1420, 1252]}, {t: 0, p: [980, 1252]}, {t: 0, p: [720, 1252]}], ease.inOutSine);
     const lit = T >= B.flip && T < B.trucksEnd + 0.1;
     out.push({id: 'C', variant: 'dc', x: c.p[0], y: c.p[1], k: 1, dir: -1, line: lit, roll: roll(c.p[0])});
     out.push({id: 'D', variant: 'dc', x: d.p[0], y: d.p[1], k: 1, dir: -1, line: lit, roll: roll(d.p[0])});
@@ -226,7 +301,7 @@ export function vehiclesAt(T: number): Vehicle[] {
   return out.sort((p, q) => p.y - q.y);
 }
 
-/** Where the van's crate sits on its roof (canvas px), at film time T. */
+/** Where the van's crate sits on its roof (street-plane px), at film time T. */
 export function vanCrateAt(T: number): {x: number; y: number; w: number} | null {
   const v = vehiclesAt(T).find((q) => q.id === 'van');
   if (!v) return null;
@@ -239,8 +314,7 @@ export function vanCrateAt(T: number): {x: number; y: number; w: number} | null 
 /** S9 px -> H2 px: S9's far field re-laid by ONE map (S9's 380 px hall becomes the 330 px data center at x 230-560,
  *  S9's horizon 960 -> 930), the same map the REVEAL lane's pull-back was built on. */
 export const S9_TO_H2: Mat = mat.compose(mat.translate(H2_DC.x, H2_HORIZON), mat.scale(H2_DC.w / HALL.w), mat.translate(-HALL.x, -S9_HORIZON));
-const ap = (m: Mat, p: Pt): Pt => [m[0] * p[0] + m[2] * p[1] + m[4], m[1] * p[0] + m[3] * p[1] + m[5]];
-/** The data center's lit sign in H2 px (the sign step at 36.98 frames it). */
+/** The data center's sign in H2 px. */
 export const H2_SIGN = (() => {
   const s = HALL_GEO.sign;
   const a = ap(S9_TO_H2, [s.x, s.y]);
@@ -257,16 +331,105 @@ const S9Clock: React.FC<{children?: React.ReactNode}> = ({children}) => {
   );
 };
 
-/** The far plane, back to front: the clouds, the far ground, THE MOUNTAIN (the REVEAL lane's kit-shaped pile, summit
- *  (800, 640)) with the summit stick, hall B and its plume, `streams` (SQD's stick streams: a slot), the hall's fans and
- *  THE DATA CENTER (dark, its sign lit: the brightest cold light), the infinity line, the far field's roofs (the town
- *  covers their foot). From 36.98 the sign steps up one value (one lighter frame round the panel: no glow disc).
- *  `summit` = draw the summit stick (SQD draws its own J3 stick in screen px); `birds` = the reveal's V of birds
- *  (SQD_life's RevealBirds, from 21.30). */
+const rd = (x: number, y: number, w: number, h: number) => `M${f1(x)} ${f1(y)}h${f1(w)}v${f1(h)}h${f1(-w)}Z`;
+
+/** The data center's sign: lit (its beats: the cold light panel, ink letters) or calm (a panel one step over the hazed
+ *  facade, letters a calm step over it: it still reads at full size, never the frame's brightest cold light). */
+const SIGN_LIT = {panel: EMBER.led, text: EMBER.ink};
+const SIGN_CALM = {panel: '#5F6782', text: '#8D95AE'};
+/** The server rows' bands: the clean pen's soft rows on the beat; one value over the body when calm (before the haze). */
+const DC_LED = '#A8B6DE';
+const DC_LED_CALM = EMBER.dc;
+
+/** Hall B (no sign) beside and behind the hall: S9's shape, its rows as three long soft bands (no dash rows, no blink),
+ *  always calm, one haze step farther than the hall (S9 px). */
+const HallBCalm: React.FC = () => {
+  const {x0, x1, top, base} = HALLB;
+  const units = [688, 742, 796, 850];
+  const bw = (x1 - x0 - 26 - 2 * 8) / 3;
+  const bands = [930, 948]
+    .map((y) => [0, 1, 2].map((j) => rrect(x0 + 16 + j * (bw + 8), y + 4, bw, 5, 2.5)).join(''))
+    .join('');
+  return (
+    <Haze k={HALLB_K} color={FAR_AIR}>
+      {units.map((ux, i) => (
+        <React.Fragment key={i}>
+          <path d={rd(ux, top - 11, 26, 12)} fill={EMBER.dcSide} />
+          <path d={rd(ux - 1.5, top - 13, 29, 3)} fill={T9.infLight} />
+        </React.Fragment>
+      ))}
+      <path d={rd(x0, top, x1 - x0, base - top)} fill={T9.hallB} />
+      <path d={rd(x0, top, 14, base - top)} fill={mixHex(T9.hallB, '#1C2036', 0.5)} />
+      <path d={rd(x0 - 2, top - 3, x1 - x0 + 4, 4)} fill={T9.infLight} />
+      <path d={rd(x0 + 16, 930, x1 - x0 - 26, 13) + rd(x0 + 16, 948, x1 - x0 - 26, 13)} fill={EMBER.dcSide} />
+      <path d={bands} fill={mixHex(DC_LED_CALM, T9.hallB, 0.2)} />
+    </Haze>
+  );
+};
+
+/** The hall's roof: S9's run of 7 fan units (18 px fans on 44), still: no spinning blade ticks (S9 px). */
+const HallFansCalm: React.FC = () => {
+  let box = '';
+  let lid = '';
+  let disc = '';
+  for (let i = 0; i < 7; i++) {
+    const cx = HALL.x - 132 + i * 44;
+    const y = HALL_ROOF;
+    box += rd(cx - 15, y - 15, 30, 16);
+    lid += rd(cx - 16.5, y - 17.5, 33, 3.5);
+    disc += ellD(cx, y - 8, 9, 4.2);
+  }
+  return (
+    <>
+      <path d={box} fill={EMBER.dcSide} />
+      <path d={lid} fill={EMBER.snow} />
+      <path d={disc} fill={EMBER.dcDark} />
+    </>
+  );
+};
+
+/** THE AI data center at H2 (S9 px; through S9_TO_H2): the kit DataCenter (dark, 'bands' rows, no blink, no sign of its
+ *  own) under one haze step when calm, its roof fans, then the sign drawn on top in its state. `s` = 0 on its beat (A),
+ *  1 calm (C), 0.5 the 3-frame half step. */
+const H2Hall: React.FC<{s: number}> = ({s}) => {
+  const g = HALL_GEO;
+  const sideW = HALL.w * 0.06;
+  const tier = s >= 1 ? 'environment' : s > 0 ? 'support' : 'subject';
+  const signSize = Math.min(g.sign.h * 0.78, HALL.w * 0.16);
+  return (
+    <>
+      <Haze k={HALL_K * s} color={FAR_AIR}>
+        <HallFansCalm />
+        <DataCenter x={HALL.x} y={HALL.y} w={HALL.w} h={HALL.h} variant="dark" units={0} sign={null} signH={52} ink={2.6} ledStyle="bands" ledColor={mixHex(DC_LED, DC_LED_CALM, s)} blink={false} tier={tier} seed="s9/dc" />
+      </Haze>
+      <path d={rrect(g.sign.x, g.sign.y, g.sign.w, g.sign.h, 3)} fill={mixHex(SIGN_LIT.panel, SIGN_CALM.panel, s)} />
+      <Txt x={HALL.x + sideW / 2} y={g.sign.y + g.sign.h * 0.74} size={signSize} fill={mixHex(SIGN_LIT.text, SIGN_CALM.text, s)} fit={g.sign.w * 0.92}>
+        AI DATA CENTER
+      </Txt>
+    </>
+  );
+};
+
+/** S9's far field (seven rows of tiny roofs, S9 y 972-1040: the same seeded shapes as S9_far's FarField) one plane step
+ *  calmer (CRAFT §f, +3: walls and roofs close to the air, the lit dots tone-on-tone). Only seen in SQD's pull-back (the
+ *  town's far snow covers it at H2). */
+const FF_CALM: RoofRowSpec[] = Array.from({length: 7}, (_, i) => {
+  const haze = ((6 - i) / 6) * 0.18;
+  const dark = mixHex('#7E89AD', T9.glow, haze);
+  const light = mixHex('#B1BBD8', T9.glow, haze * 0.6);
+  return {y: 980 + i * 9.6, w: 9 + i * 1.25, dark, light, dot: mixHex(dark, light, 0.25), dotEvery: 3, chimEvery: 3.5, x0: -150, x1: 1500, tall: 0.14};
+});
+const FF_CALM_PATHS = roofRows(FF_CALM, 'farfield');
+const FarFieldCalm: React.FC = () => <RoofRowsView rows={FF_CALM} paths={FF_CALM_PATHS} />;
+
+/** The far plane, back to front: the clouds, the far ground, THE MOUNTAIN (the REVEAL lane's pile, summit (800, 640))
+ *  with the summit stick, hall B and its plume, `streams` (SQD's stick streams: a slot), THE DATA CENTER (the header:
+ *  calm off its beats, its sign lit on them, drawn on top of the hall), the infinity line, the far field's roofs (the
+ *  town covers their foot). `summit` = draw the summit stick (SQD draws its own J3 stick in screen px); `birds` = the
+ *  reveal's V of birds (SQD_life's RevealBirds, from 21.30: the film's one flock there, SQD draws none of its own). */
 export const OutsideFar: React.FC<{streams?: React.ReactNode; summit?: boolean; birds?: boolean}> = ({streams, summit = true, birds = true}) => {
   const T = useFilmT();
-  const signUp = T >= H2_BEATS.sign;
-  const s = H2_SIGN;
+  const s = twoStepIn(T, HALL_A);
   return (
     <S9Clock>
       <Tier tier="environment" bg={EMBER.sky}>
@@ -281,24 +444,14 @@ export const OutsideFar: React.FC<{streams?: React.ReactNode; summit?: boolean; 
         <RevealPeak />
         {summit ? <SummitStick /> : null}
         <XG m={S9_TO_H2}>
-          <HallB />
+          <HallBCalm />
           <HallPlume />
         </XG>
         {streams}
         <XG m={S9_TO_H2}>
-          <HallFans />
-        </XG>
-      </Tier>
-      {signUp ? <path d={rrect(s.x - 7, s.y - 7, s.w + 14, s.h + 14, 5)} fill={mixHex(EMBER.led, EMBER.sky, 0.45)} /> : null}
-      <Tier tier={T >= H2_BEATS.sign - 0.1 && T < 38.7 ? 'subject' : 'support'} bg={EMBER.sky}>
-        <XG m={S9_TO_H2}>
-          <Hall />
-        </XG>
-      </Tier>
-      <Tier tier="environment" bg={EMBER.sky}>
-        <XG m={S9_TO_H2}>
+          <H2Hall s={s} />
           <InfinityLine />
-          <FarField />
+          <FarFieldCalm />
         </XG>
       </Tier>
     </S9Clock>
@@ -318,6 +471,8 @@ const SummitStick: React.FC = () => (
 
 type House = {x: number; w: number; base: number; h: number; roof: number; color: string; wins: [number, number, number, number][]};
 const TOWN_COLORS = ['#3B4570', EMBER.roofs, '#46527C', '#404A74'];
+/** The town's far snow (what the houses stand on and the walls are hazed half way into). */
+const FAR_SNOW = '#CDD3E8';
 /** Two rows of small houses on the horizon (the back one over the far snow, the front one standing on our street's far
  *  side), with a gap where the road climbs to the data center. */
 const TOWN: {back: House[]; front: House[]} = (() => {
@@ -342,8 +497,13 @@ const TOWN: {back: House[]; front: House[]} = (() => {
   return {back: row(964, -40, 1120, [38, 60], [22, 34], [372, 418]), front: row(1036, -50, 1130, [52, 82], [34, 52], [262, 344])};
 })();
 
+/** A row of the town's houses, calm (E3; tier C): walls half way into the far snow (L* ~56-61 before the tier's pull),
+ *  caps one pale step (the tier's EMBER.snow, L* ~85, never the frame's white), unlit panes a step under the wall; lit
+ *  panes stay emissive (one switching at a time). Every raw fill through the tier's paint. */
 const HouseRow: React.FC<{hs: House[]; seed: string; T: number}> = ({hs, seed, T}) => {
+  const paint = useTierPaint();
   const lit = useLightOff() ? EMBER.houseLit : '#FFD27A';
+  const cap = paint(EMBER.snow);
   let n = 0;
   hs.forEach((h) => (n += h.wins.length));
   let k = 0;
@@ -351,16 +511,17 @@ const HouseRow: React.FC<{hs: House[]; seed: string; T: number}> = ({hs, seed, T
     <>
       {hs.map((h, i) => {
         const peak = h.base - h.h - h.roof;
+        const wall = mixHex(h.color, FAR_SNOW, 0.5);
         const body = roundPoly([[h.x, h.base], [h.x, h.base - h.h], [h.x + h.w / 2, peak], [h.x + h.w, h.base - h.h], [h.x + h.w, h.base]], [0, 2, 2, 2, 0]);
-        const cap = roundPoly([[h.x - 3, h.base - h.h + 3], [h.x + h.w / 2, peak - 3], [h.x + h.w + 3, h.base - h.h + 3], [h.x + h.w + 1, h.base - h.h + 8], [h.x + h.w / 2, peak + 5], [h.x - 1, h.base - h.h + 8]], 2);
+        const capD = roundPoly([[h.x - 3, h.base - h.h + 3], [h.x + h.w / 2, peak - 3], [h.x + h.w + 3, h.base - h.h + 3], [h.x + h.w + 1, h.base - h.h + 8], [h.x + h.w / 2, peak + 5], [h.x - 1, h.base - h.h + 8]], 2);
         return (
           <g key={i}>
-            <path d={body} fill={h.color} />
-            <path d={cap} fill={EMBER.snow} />
+            <path d={body} fill={paint(wall)} />
+            <path d={capD} fill={cap} />
             {h.wins.map((w, j) => {
               const on = windowLit(T, seed, k, n, {gap: [0.9, 2.2], litFrac: 0.7});
               k++;
-              return <path key={j} d={rrect(w[0], w[1], w[2], w[3], 1.5)} fill={on ? lit : mixHex(h.color, EMBER.sky, 0.4)} />;
+              return <path key={j} d={rrect(w[0], w[1], w[2], w[3], 1.5)} fill={on ? lit : paint(mixHex(wall, EMBER.sky, 0.3))} />;
             })}
           </g>
         );
@@ -371,11 +532,14 @@ const HouseRow: React.FC<{hs: House[]; seed: string; T: number}> = ({hs, seed, T
 
 /** The chip factory behind its wall (calm C: a step toward the sky, no line): a low sawtooth roof whose north
  *  glazing glows warm, snow on the long slopes, one chimney whose steam rises slowly and shrinks to nothing well under
- *  the caption band. */
+ *  the caption band. The steam lies over the mountain's flank: a light step of the pile's own lit gold, small (r <= 7),
+ *  so it reads as steam in front of the gold, never as holes in it (E14). */
 const FAB = {x0: 600, x1: 944, base: 1004, h: 34, teeth: 4, tooth: 30, chim: {x: 896, w: 18, top: 900}};
 const FAB_BRICK = mixHex(EMBER.brick, EMBER.sky, 0.3);
 const FAB_SHADE = mixHex(EMBER.brickShade, EMBER.sky, 0.3);
+const STEAM = mixHex(PEAK_TONES.lit, '#FFFFFF', 0.35);
 const FactoryRoof: React.FC<{T: number}> = ({T}) => {
+  const paint = useTierPaint();
   const {x0, x1, base, h, teeth, tooth, chim} = FAB;
   const top = base - h;
   const tw = (x1 - x0) / teeth;
@@ -389,17 +553,17 @@ const FactoryRoof: React.FC<{T: number}> = ({T}) => {
     snow += `M${f1(a - 1)} ${top + 1}L${f1(a + tw * 0.78)} ${top - tooth - 2}L${f1(a + tw * 0.78)} ${top - tooth + 5}L${f1(a + 6)} ${top + 3}Z`;
   }
   roof += `V${base}Z`;
-  const ps = puffs(T, {n: 4, life: 3.4, rise: 120, drift: 26, r0: 4, r1: 11, wobble: 3, seed: 'h2/fab', ceil: 700}, chim.top - 6);
+  const ps = puffs(T, {n: 4, life: 3.4, rise: 100, drift: 22, r0: 3, r1: 7, wobble: 2.5, seed: 'h2/fab', ceil: 700}, chim.top - 6);
   return (
     <>
       {ps.map((q, i) => (
-        <path key={i} d={ellD(chim.x + chim.w / 2 + q.x, chim.top - 6 + q.y, q.r * 1.25, q.r)} fill={mixHex(EMBER.snow, EMBER.sky, 0.3)} />
+        <path key={i} d={ellD(chim.x + chim.w / 2 + q.x, chim.top - 6 + q.y, q.r * 1.25, q.r)} fill={paint(STEAM)} />
       ))}
-      <path d={rrect(chim.x, chim.top, chim.w, base - chim.top, 2)} fill={FAB_SHADE} />
-      <path d={rrect(chim.x - 3, chim.top - 4, chim.w + 6, 6, 2)} fill={EMBER.snow} />
-      <path d={roof} fill={FAB_BRICK} />
+      <path d={rrect(chim.x, chim.top, chim.w, base - chim.top, 2)} fill={paint(FAB_SHADE)} />
+      <path d={rrect(chim.x - 3, chim.top - 4, chim.w + 6, 6, 2)} fill={paint(EMBER.snow)} />
+      <path d={roof} fill={paint(FAB_BRICK)} />
       <path d={glaze} fill={useLightOff() ? EMBER.houseLit : '#F2C98E'} />
-      <path d={snow} fill={EMBER.snow} />
+      <path d={snow} fill={paint(EMBER.snow)} />
     </>
   );
 };
@@ -411,18 +575,26 @@ export const OutsideTown: React.FC<{onRoad?: React.ReactNode}> = ({onRoad}) => {
   return (
     <FilmClock>
       <Tier tier="environment" bg={EMBER.sky}>
-        {/* the far snow under the town */}
-        <path d={`M-400 ${H2_HORIZON}H1480V1100H-400Z`} fill={'#CDD3E8'} />
-        <HouseRow hs={TOWN.back} seed="h2/townB" T={T} />
-        {/* the road from our street up to the data center's gate: one trodden band, tiny lamps along it */}
-        <path d={`M250 1092C262 1050 300 1010 342 978C368 958 384 944 392 932L404 932C400 946 392 962 378 984C352 1022 334 1058 338 1092Z`} fill={EMBER.road} />
-        <path d={[[318, 1046], [346, 1000], [372, 962]].map(([x, y]) => ellD(x, y, 2.6, 2.6)).join('')} fill={'#FFE2B0'} />
-        {onRoad}
-        <HouseRow hs={TOWN.front} seed="h2/townF" T={T} />
-        {/* the chip factory, behind its wall: a low sawtooth roof, its glazing lit, a chimney with slow soft steam */}
-        <FactoryRoof T={T} />
+        <TownBody T={T} onRoad={onRoad} />
       </Tier>
     </FilmClock>
+  );
+};
+const TownBody: React.FC<{T: number; onRoad?: React.ReactNode}> = ({T, onRoad}) => {
+  const paint = useTierPaint();
+  return (
+    <>
+      {/* the far snow under the town */}
+      <path d={`M-400 ${H2_HORIZON}H1480V1100H-400Z`} fill={paint(FAR_SNOW)} />
+      <HouseRow hs={TOWN.back} seed="h2/townB" T={T} />
+      {/* the road from our street up to the data center's gate: one trodden band, tiny lamps along it */}
+      <path d={`M250 1092C262 1050 300 1010 342 978C368 958 384 944 392 932L404 932C400 946 392 962 378 984C352 1022 334 1058 338 1092Z`} fill={paint(EMBER.road)} />
+      <path d={[[318, 1046], [346, 1000], [372, 962]].map(([x, y]) => ellD(x, y, 2.6, 2.6)).join('')} fill={'#FFE2B0'} />
+      {onRoad}
+      <HouseRow hs={TOWN.front} seed="h2/townF" T={T} />
+      {/* the chip factory, behind its wall: a low sawtooth roof, its glazing lit, a chimney with slow soft steam */}
+      <FactoryRoof T={T} />
+    </>
   );
 };
 
@@ -456,7 +628,7 @@ function workersAt(T: number): {x: number; y: number; h: number; walk: number; c
     if (!v || v.y < 1200) return null;
     return [v.x + (VAN_W * 1.4 * v.k) / 2 + 6, v.y - 6];
   };
-  // which truck they load, and how fast (the subject's beat 23.10-24.20 fast; B and later C/D at a calm pace)
+  // which truck they load, and how fast (the subject's beat 23.10-24.20 fast; B and later C at a calm pace)
   const target = T < B.aGo ? 'A' : T < B.bGo ? 'B' : 'C';
   const back = backOf(target);
   const fast = T >= B.load && T < B.aGo;
@@ -473,64 +645,79 @@ function workersAt(T: number): {x: number; y: number; h: number; walk: number; c
     const s = out ? ease.inOutSine(clamp(c / 0.45)) : 1 - ease.inOutSine(clamp((c - 0.5) / 0.45));
     const x = idle[0] + (back[0] - idle[0]) * s;
     const y = idle[1] + (back[1] - idle[1]) * s;
-    const moving = (out ? c < 0.45 : c < 0.95);
+    const moving = out ? c < 0.45 : c < 0.95;
     return {x, y, h: 40 + 6 * s, walk: moving ? (T - start) * 1.7 : 0, carry: out, face: (out ? 1 : -1) as 1 | -1};
   });
 }
 
-/** The 5x face: last year | now bars (S11's), "~5x", the source. Face-local px (200 x ~122). */
-const FaceFiveX: React.FC = () => (
-  <>
-    <path d={rrect(16, 76, 26, 18, 2)} fill={EMBER.boardDeep} />
-    <path d={rrect(52, 14, 26, 80, 2)} fill={EMBER.anchor} />
-    <path d={`M10 95H86`} stroke={EMBER.beam} strokeWidth={2} />
-    <Txt x={29} y={110} size={13} fill={EMBER.ink}>
-      last year
-    </Txt>
-    <Txt x={65} y={110} size={13} fill={EMBER.ink}>
-      now
-    </Txt>
-    <Txt x={144} y={78} size={72} fill={EMBER.ink} fit={108}>
-      ~5x
-    </Txt>
-    <Txt x={144} y={104} size={22} fill={EMBER.beam} fit={110}>
-      RAM chips
-    </Txt>
-    <Txt x={100} y={-4} size={1} fill={EMBER.card}>
-      {' '}
-    </Txt>
-  </>
-);
-const FaceFiveXSource: React.FC = () => (
-  <Txt x={100} y={121} size={11} fill={EMBER.beam} fit={190}>
-    RAM chips · Gartner, Q2 2026
-  </Txt>
-);
-/** The 2027 face: "2027" big, Micron's line small. */
-const Face2027: React.FC = () => (
-  <>
-    <Txt x={100} y={78} size={84} fill={EMBER.ink} fit={184}>
-      2027
-    </Txt>
-    <Txt x={100} y={100} size={13} fill={EMBER.beam} fit={190}>
-      Micron: supply 'much tighter'
-    </Txt>
-    <Txt x={100} y={116} size={13} fill={EMBER.beam} fit={190}>
-      in 2027 and 2028 than in 2026
-    </Txt>
-  </>
-);
-/** The notice's first face: the gate's queue rule, quiet (a van icon and an arrow). */
-const FaceQueue: React.FC = () => (
-  <>
-    <Txt x={100} y={50} size={30} fill={EMBER.beam} fit={170}>
-      CHIP PICKUP
-    </Txt>
-    <path d={rrect(60, 70, 52, 30, 4) + rrect(112, 80, 22, 20, 4)} fill={EMBER.reveal} />
-    <path d={ellD(74, 102, 6, 6) + ellD(124, 102, 6, 6)} fill={EMBER.beam} />
-    <path d={`M44 85L30 85M36 79L30 85L36 91`} stroke={EMBER.beam} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" fill="none" />
-  </>
-);
+// ---- the notice's faces (face-local px, 200 x ~122). E9: each face at full contrast ~1.5 s from its swing, then one
+// value down with its small lines hidden; blank from the sign step (36.98). `k` 0 = full, 0.5 the half step, 1 calm.
+/** The calm notice (tier C): a soft warm paper (L* 88), its big glyph a calm warm mid value, its bars pale. */
+const NOTICE_CALM = {paper: '#E9DACF', ink: '#BB8672', now: '#897369', last: '#E0B788', faint: '#D1AF9F'};
+const mixK = (full: string, calm: string, k: number) => (k <= 0 ? full : k >= 1 ? calm : mixHex(full, calm, k));
+
+/** The 5x face: last year | now bars (S11's), "~5x", the source. */
+const FaceFiveX: React.FC<{k: number}> = ({k}) => {
+  const small = k < 0.5;
+  return (
+    <>
+      <path d={rrect(16, 76, 26, 18, 2)} fill={mixK(EMBER.boardDeep, NOTICE_CALM.last, k)} />
+      <path d={rrect(52, 14, 26, 80, 2)} fill={mixK(EMBER.anchor, NOTICE_CALM.now, k)} />
+      {small ? (
+        <>
+          <path d={`M10 95H86`} stroke={EMBER.beam} strokeWidth={2} />
+          <Txt x={29} y={110} size={13} fill={EMBER.ink}>
+            last year
+          </Txt>
+          <Txt x={65} y={110} size={13} fill={EMBER.ink}>
+            now
+          </Txt>
+          <Txt x={144} y={104} size={22} fill={EMBER.beam} fit={110}>
+            RAM chips
+          </Txt>
+          <Txt x={100} y={121} size={11} fill={EMBER.beam} fit={190}>
+            RAM chips · Gartner, Q2 2026
+          </Txt>
+        </>
+      ) : null}
+      <Txt x={144} y={78} size={72} fill={mixK(EMBER.ink, NOTICE_CALM.ink, k)} fit={108}>
+        ~5x
+      </Txt>
+    </>
+  );
+};
+/** The 2027 face: "2027" big, Micron's line small; nothing once blank. */
+const Face2027: React.FC<{k: number; blank: boolean}> = ({k, blank}) =>
+  blank ? null : (
+    <>
+      <Txt x={100} y={78} size={84} fill={mixK(EMBER.ink, NOTICE_CALM.ink, k)} fit={184}>
+        2027
+      </Txt>
+      {k < 0.5 ? (
+        <>
+          <Txt x={100} y={100} size={13} fill={EMBER.beam} fit={190}>
+            Micron: supply 'much tighter'
+          </Txt>
+          <Txt x={100} y={116} size={13} fill={EMBER.beam} fit={190}>
+            in 2027 and 2028 than in 2026
+          </Txt>
+        </>
+      ) : null}
+    </>
+  );
+/** The notice's first face: the gate's queue rule, always calm (a faint "CHIP PICKUP", a van icon and an arrow), shown
+ *  from the load beat (blank through SQD's reveal and J4: E5). */
+const FaceQueue: React.FC<{on: boolean}> = ({on}) =>
+  on ? (
+    <>
+      <Txt x={100} y={50} size={30} fill={NOTICE_CALM.faint} fit={170}>
+        CHIP PICKUP
+      </Txt>
+      <path d={rrect(60, 70, 52, 30, 4) + rrect(112, 80, 22, 20, 4)} fill={mixHex(EMBER.reveal, NOTICE_CALM.paper, 0.5)} />
+      <path d={ellD(74, 102, 6, 6) + ellD(124, 102, 6, 6)} fill={NOTICE_CALM.faint} />
+      <path d={`M44 85L30 85M36 79L30 85L36 91`} stroke={NOTICE_CALM.faint} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </>
+  ) : null;
 
 /** The barrier's angle (deg; 0 = across the lane, 85 = up) at T: a stepped pivot, 4 drawings over 0.25 s. */
 function barrier(T: number): number {
@@ -549,29 +736,49 @@ function barrier(T: number): number {
   return a;
 }
 
+/** The gate's floodlight pool: two warm steps, both lighter and warmer than the road and the snow (CRAFT §d.7; E11),
+ *  and its calm step (until the load beat: E5). */
+const POOL_FULL: [string, string] = ['#ECD6C3', '#F8E2C8'];
+const POOL_CALM: [string, string] = ['#E1D1C7', '#EBDAC9'];
+/** The gate's lit yard: full, and one value calmer until the load beat. */
+const GATE_LIT = '#F7CB8E';
+const GATE_CALM = '#E9B881';
+/** The DC trucks' calm (until the load beat): one haze step toward the street's ambient snow. */
+const TRUCK_CALM_K = 0.2;
+const STREET_AMBIENT = '#C9CFE6';
+
 /** Our street: ground, the factory's wall and gate, the booth and barrier, the floodlight and its pool, the notice,
  *  the queue, the workers, the walkers, the snow. */
 export const OutsideStreet: React.FC = () => {
   const T = useFilmT();
   const B = H2_BEATS;
   const off = useLightOff();
+  const cams = useContext(PlaneCamsCtx);
   const id = 'h2s' + useId().replace(/[^a-zA-Z0-9]/g, '');
-  const vs = vehiclesAt(T);
+  const vs = vehiclesAt(T, roadMapOf(cams));
   const ws = workersAt(T);
-  const rig = withKey(RIGS.street, RIGS.street.key, [streetLamp([H2_FLOOD.x + 20, H2_FLOOD.y + 12], [H2_POOL.cx, H2_POOL.cy])]);
+  const rig = withKey(RIGS.street, RIGS.street.key, [streetLamp([H2_FLOOD.x + 20, H2_FLOOD.y + 12], [H2_POOL.cx, H2_POOL.cy]), H2_ROAD_LAMP]);
   const G = H2_GATE;
   const W = H2_WALL;
   const crate = vanCrateAt(T);
-  // faces of the notice: the queue rule, the 5x (27.08), 2027 (34.60)
+  // the street's calm until the load beat (E5): 1 calm, 0.5 the half step, 0 full
+  const calm = 1 - stepAt(T, B.calmEnd);
+  const poolCols: [string, string] = [mixK(POOL_FULL[0], POOL_CALM[0], calm), mixK(POOL_FULL[1], POOL_CALM[1], calm)];
+  // the notice's faces (E9): the queue rule (calm, from the load beat), the 5x (27.08), 2027 (34.60), blank at 36.98
+  const k5 = stepAt(T, B.fiveXCalm);
+  const k27 = stepAt(T, B.flipCalm);
   const faces = [
-    {t: -99, node: <FaceQueue />},
-    {t: B.fiveX, node: <><FaceFiveX /><FaceFiveXSource /></>},
-    {t: B.flip, node: <Face2027 />},
+    {t: -99, paper: NOTICE_CALM.paper, node: <FaceQueue on={T >= B.calmEnd} />},
+    {t: B.fiveX, paper: mixK(EMBER.card, NOTICE_CALM.paper, k5), node: <FaceFiveX k={k5} />},
+    {t: B.flip, paper: mixK(EMBER.card, NOTICE_CALM.paper, k27), node: <Face2027 k={k27} blank={T >= B.sign} />},
   ];
-  const noticeOn = (T >= B.fiveX - 0.1 && T < B.vanGo) || (T >= B.flip - 0.1 && T < B.trucks + 0.2);
+  const noticeOn = (T >= B.fiveX - 0.1 && T < B.fiveXCalm) || (T >= B.flip - 0.1 && T < B.flipCalm);
   // the far pavement's walker and dog (left of the factory, slow), then a second walker the other way
   const walkerX = T < 31 ? 30 + (T - 22) * 30 : 300 - (T - 31) * 26;
   const walkerOn = (T > 22 && T < 31.2) || (T > 31.6 && T < 42);
+  // the snow stays under the caption band in SCREEN px (y 612), whatever the camera does to this plane
+  const sm = cams?.street ?? mat.I;
+  const snowTop = (612 - sm[5]) / (sm[3] || 1);
   return (
     <FilmClock>
       <Lit rig={rig}>
@@ -580,6 +787,10 @@ export const OutsideStreet: React.FC = () => {
           <path d={`M-400 ${H2_STREET.top}H1480V1500H-400Z`} fill={'#C9CFE6'} />
           <path d={`M-400 1104H1480V1500H-400Z`} fill={EMBER.road} />
           <path d={`M-400 1146H1480V1150H-400ZM-400 1196H1480V1200H-400Z`} fill={mixHex(EMBER.road, '#C9CFE6', 0.5)} />
+        </Tier>
+        {/* the road-mouth lamp's own small pool (E11; behind the corner house, which stands in front of its far half) */}
+        <LightPool light={H2_ROAD_LAMP} colors={POOL_FULL} />
+        <Tier tier="environment" bg={EMBER.sky}>
           {/* the corner house on our side, left of the road's mouth (warm: ours), one lit window */}
           <path d={rrect(-40, 990, 228, 104, 3)} fill={'#9A5A46'} />
           <path d={roundPoly([[-50, 994], [70, 952], [200, 994], [194, 1002], [-44, 1002]], 3)} fill={EMBER.snow} />
@@ -588,7 +799,7 @@ export const OutsideStreet: React.FC = () => {
           <path d={rrect(W.x0, W.y0, W.x1 - W.x0, W.y1 - W.y0 + 4, 3)} fill={EMBER.brick} />
           <path d={rrect(W.x0 - 4, W.y0 - 6, W.x1 - W.x0 + 8, 9, 4)} fill={EMBER.snow} />
           <path d={`M${W.x0} ${W.y0 + 34}H${W.x1}V${W.y0 + 37}H${W.x0}ZM${W.x0} ${W.y0 + 64}H${W.x1}V${W.y0 + 67}H${W.x0}Z`} fill={EMBER.brickShade} />
-          <path d={rrect(G.x0, G.y0, G.x1 - G.x0, G.y1 - G.y0 + 2, 4)} fill={off ? EMBER.houseLit : '#F7CB8E'} />
+          <path d={rrect(G.x0, G.y0, G.x1 - G.x0, G.y1 - G.y0 + 2, 4)} fill={off ? EMBER.houseLit : mixK(GATE_LIT, GATE_CALM, calm)} />
           <path d={rrect(G.x0 + 16, G.y0 + 34, 40, 38, 2) + rrect(G.x0 + 60, G.y0 + 44, 36, 28, 2)} fill={'#C98A64'} />
           <path d={rrect(G.x0 + 22, G.y0 + 28, 30, 8, 2) + rrect(G.x0 + 64, G.y0 + 38, 28, 8, 2)} fill={EMBER.board} />
           {/* the booth on the gate's left: a lit window, the guard's silhouette inside */}
@@ -598,23 +809,26 @@ export const OutsideStreet: React.FC = () => {
           <path d={rrect(H2_BOOTH.x0 + 8, H2_BOOTH.y0 + 10, 30, 24, 2)} fill={off ? EMBER.houseLit : '#FFD27A'} />
           <path d={ellD(H2_BOOTH.x0 + 22, H2_BOOTH.y0 + 22, 5, 5.5) + rrect(H2_BOOTH.x0 + 14, H2_BOOTH.y0 + 27, 16, 8, 3)} fill={'#C98A64'} />
         </Tier>
-        {/* the floodlight's pool on the street: THE light outside (two flat steps, lighter and warmer than the snow) */}
-        <LightPool pool={H2_POOL} colors={['#E2D6D6', '#F2E2CF']} />
+        {/* the floodlight's pool on the street: THE light outside (two flat warm steps), and the gate's lit yard spilling
+            onto the pavement down to it (one lit zone: the yard, the spill, the pool) */}
+        <WindowSpill win={[G.x0, G.y0, G.x1 - G.x0, G.y1 - G.y0]} base={G.y1 + 4} widen={1.45} depth={0.75} color={poolCols[0]} />
+        <LightPool pool={H2_POOL} colors={poolCols} />
         <Tier tier="environment" bg={EMBER.sky}>
           {/* the floodlight on the wall over the gate (its lit face the source core) */}
           <path d={rrect(H2_FLOOD.x - 3, H2_FLOOD.y - 8, 6, 14, 2)} fill={EMBER.anchor} />
           <path d={roundPoly([[H2_FLOOD.x - 18, H2_FLOOD.y + 2], [H2_FLOOD.x + 18, H2_FLOOD.y + 2], [H2_FLOOD.x + 13, H2_FLOOD.y + 16], [H2_FLOOD.x - 13, H2_FLOOD.y + 16]], 3)} fill={EMBER.dcSide} />
           <path d={rrect(H2_FLOOD.x - 12, H2_FLOOD.y + 12, 24, 5, 2)} fill={EMBER.core} />
-          {/* the street lamp at the road's mouth (a practical: its lantern, one halo step on the wall/sky) */}
+          {/* the street lamp at the road's mouth (a practical: its lantern lights the small pool at its foot) */}
           <path d={rrect(229, 966, 6, 128, 3)} fill={EMBER.dcSide} />
           <path d={rrect(222, 956, 20, 14, 4)} fill={EMBER.core} />
           <path d={rrect(220, 951, 24, 6, 3)} fill={EMBER.snow} />
         </Tier>
         <ShadowLayer>
-          {/* contact shadows: the booth, the notice's posts, every vehicle (16 px), the workers */}
+          {/* contact shadows: the booth, the notice's posts, the lamp post, every vehicle (16 px), the workers */}
           <ContactShadow x={(H2_BOOTH.x0 + H2_BOOTH.x1) / 2} y={H2_BOOTH.y1} w={H2_BOOTH.x1 - H2_BOOTH.x0} h={8} />
           <ContactShadow x={H2_NOTICE.x + H2_NOTICE.w * 0.15} y={H2_NOTICE.ground} w={14} h={6} />
           <ContactShadow x={H2_NOTICE.x + H2_NOTICE.w * 0.85} y={H2_NOTICE.ground} w={14} h={6} />
+          <ContactShadow x={232} y={1094} w={10} h={5} />
           {vs.map((v) => {
             const g = fleetVanGeo({x: v.x, y: v.y, w: VAN_W * v.k, variant: v.variant, dir: v.dir});
             return v.y > 1080 ? <ContactShadow key={v.id} x={v.x} y={v.y} w={g.w * 0.94} h={16 * v.k} /> : null;
@@ -630,19 +844,30 @@ export const OutsideStreet: React.FC = () => {
         {walkerOn ? <Walker x={walkerX} y={1098} dir={T < 31 ? 1 : -1} T={T} /> : null}
         {/* the workers, the vehicles, the barrier: back to front */}
         {ws.map((w, i) => (w.y < 1150 ? <Worker key={`wb${i}`} {...w} /> : null))}
-        {vs.map((v) => (
-          <React.Fragment key={v.id}>
-            <FleetVan x={v.x} y={v.y} w={VAN_W * v.k} variant={v.variant} dir={v.dir} line={v.line} roll={v.roll} lift={off || v.variant === 'dc' ? 0 : poolLift(v.x, v.y, VAN_W * v.k)} />
-            {v.crate && crate ? <CrateBox x={crate.x} y={crate.y} w={crate.w} line={T >= B.vanGo - 0.1} /> : null}
-          </React.Fragment>
-        ))}
+        {vs.map((v) => {
+          const van = <FleetVan x={v.x} y={v.y} w={VAN_W * v.k} variant={v.variant} dir={v.dir} line={v.line} roll={v.roll} lift={off || v.variant === 'dc' ? 0 : poolLift(v.x, v.y, VAN_W * v.k)} />;
+          return (
+            <React.Fragment key={v.id}>
+              {v.variant === 'dc' ? (
+                <Haze k={TRUCK_CALM_K * calm} color={STREET_AMBIENT}>
+                  {van}
+                </Haze>
+              ) : (
+                van
+              )}
+              {v.crate && crate ? <CrateBox x={crate.x} y={crate.y} w={crate.w} line={T >= B.vanGo - 0.1} /> : null}
+            </React.Fragment>
+          );
+        })}
         {ws.map((w, i) => (w.y >= 1150 ? <Worker key={`wf${i}`} {...w} /> : null))}
         {/* slow life in the queue: soft exhaust puffs at the waiting vans' tails (C: small, slow, shrink to nothing) */}
-        {vs.filter((v) => v.id === 'van2' || v.id === 'better').map((v) =>
-          puffs(T, {n: 3, life: 2.4, rise: 26, drift: 22, r0: 2, r1: 6, wobble: 2, seed: `h2/ex/${v.id}`}).map((q, i) => (
-            <path key={`${v.id}${i}`} d={ellD(v.x + VAN_W / 2 + 6 + q.x, v.y - 8 + q.y, q.r * 1.3, q.r)} fill={mixHex(EMBER.snow, EMBER.road, 0.35)} />
-          )),
-        )}
+        {vs
+          .filter((v) => v.id === 'van2' || v.id === 'better')
+          .map((v) =>
+            puffs(T, {n: 3, life: 2.4, rise: 26, drift: 22, r0: 2, r1: 6, wobble: 2, seed: `h2/ex/${v.id}`}).map((q, i) => (
+              <path key={`${v.id}${i}`} d={ellD(v.x + VAN_W / 2 + 6 + q.x, v.y - 8 + q.y, q.r * 1.3, q.r)} fill={mixHex(EMBER.snow, EMBER.road, 0.35)} />
+            )),
+          )}
         {/* a small car crosses the street's far side while the payoff holds (C: flat, slow) */}
         <FarCar T={T} />
         {/* ONE small crate onto our van's roof on "left" (26.04) */}
@@ -657,15 +882,15 @@ export const OutsideStreet: React.FC = () => {
           <path d={[0, 2, 4].map((i) => rrect(334 + 10 + i * 20, 1155, 18, 10, 1)).join('')} fill={EMBER.beam} />
         </XG>
         <path d={rrect(328, 1150, 12, 52, 3)} fill={EMBER.dcSide} />
-        {/* falling snow (far + mid), kept under the caption band */}
+        {/* falling snow (far + mid), kept under the caption band (screen y 612) */}
         <clipPath id={id}>
-          <rect x={-200} y={612} width={1480} height={1400} />
+          <rect x={-200} y={snowTop} width={1480} height={Math.max(0, 2012 - snowTop)} />
         </clipPath>
         <g clipPath={`url(#${id})`}>
           <SnowLayers x={-60} y={560} w={1200} h={760} layers={['far', 'mid']} density={0.5} band={null} seed="h2/snow" />
         </g>
-        {/* birds: one small V crossing high and slow while the chip makers speak (C) */}
-        <BirdV at={32.9} from={[-40, 700]} to={[460, 668]} dur={3.2} />
+        {/* birds: one small V crossing slow while the chip makers speak (C), under the caption band in the held push */}
+        <BirdV at={32.9} from={[-40, 790]} to={[460, 760]} dur={3.2} />
       </Lit>
     </FilmClock>
   );
@@ -681,19 +906,40 @@ const CRATE_ON = (() => {
   return {from: [590, 1128] as Pt, to, t0: H2_BEATS.crate - 0.24, t1: H2_BEATS.crate + 0.02, arc: 40, w0: 22, w1: 34, rot0: -12, rot1: 0};
 })();
 
-/** The hop: from the van's roof over the sill into the listing laptop (29.90-30.25, shrinking into the screen), in
- *  SCREEN px (the push has released by 29.60: the street plane is at rest). `to` = the thread plane's listing laptop
- *  screen (default H2_CRATE_TO). Drawn ABOVE the front plane (it lands in the phone): <CrateHop> in the sequence. */
-export function crateHop(T: number, to: Pt = H2_CRATE_TO) {
-  const c = vanCrateAt(H2_BEATS.hop - 1 / 60);
+/** THE HOP (E4: the carry must read): the van's crate leaves its roof at 29.85 and arcs over the sill into the thread
+ *  plane's listing laptop, GROWING as it comes toward the glass (from the pushed crate's own screen size to ~120 px at
+ *  mid-arc, "at the sill") and shrinking into the screen (~40 px at 84 %, then to nothing by 30.29: the tag ticks to
+ *  $1,099 at 30.28 as it disappears, with the screen lit). In SCREEN px, drawn ABOVE the front plane. `to` = the
+ *  listing's screen centre at film time; `street` = the street plane's camera (the start is its crate on screen). */
+export const HOP = {t0: H2_BEATS.hop, t1: H2_BEATS.hopEnd, arc: 110, peak: 120, peakU: 0.5, land: 40, landU: 0.84};
+const smooth01 = (u: number) => {
+  const v = clamp(u);
+  return v * v * (3 - 2 * v);
+};
+export function crateHop(T: number, to: Pt = H2_CRATE_TO, street: Mat = mat.I): {x: number; y: number; w: number; rot: number} | null {
+  if (T < HOP.t0 || T >= HOP.t1) return null;
+  const c = vanCrateAt(HOP.t0 - 1 / 60);
   if (!c) return null;
-  return crateFlightPose(T, {from: [c.x, c.y - 10], to, t0: H2_BEATS.hop, t1: H2_BEATS.hopEnd, arc: 90, w0: 34, w1: 16, rot0: 0, rot1: -14});
+  const s = Math.hypot(street[0], street[1]);
+  const from = ap(street, [c.x, c.y - (c.w * 0.62) / 2]);
+  const w0 = c.w * s;
+  const u = (T - HOP.t0) / (HOP.t1 - HOP.t0);
+  const p = ease.inOutSine(u);
+  const x = from[0] + (to[0] - from[0]) * p;
+  const y = from[1] + (to[1] - from[1]) * p - HOP.arc * 4 * p * (1 - p);
+  const w =
+    u < HOP.peakU
+      ? w0 + (HOP.peak - w0) * smooth01(u / HOP.peakU)
+      : u < HOP.landU
+        ? HOP.peak + (HOP.land - HOP.peak) * smooth01((u - HOP.peakU) / (HOP.landU - HOP.peakU))
+        : HOP.land * (1 - ease.inCubic(clamp((u - HOP.landU) / (1 - HOP.landU))));
+  return w < 2 ? null : {x, y, w, rot: -14 * p};
 }
 
 /** The crate's hop drawn in screen px over the front plane (the subject's outline). */
-export const CrateHop: React.FC<{to?: Pt}> = ({to}) => {
+export const CrateHop: React.FC<{to?: Pt; street?: Mat}> = ({to, street}) => {
   const T = useFilmT();
-  const q = crateHop(T, to);
+  const q = crateHop(T, to, street);
   return q ? <CrateBox x={q.x} y={q.y + (q.w * 0.62) / 2} w={q.w} rot={q.rot} line /> : null;
 };
 
@@ -780,7 +1026,7 @@ const Walker: React.FC<{x: number; y: number; dir: 1 | -1; T: number}> = ({x, y,
 /** The whole outside through three plane matrices (a camera hands them; identity = H2 at rest). The sky is NOT here:
  *  it is the World's flat background. */
 export const OutsidePlanes: React.FC<{far?: Mat; town?: Mat; street?: Mat}> = ({far = mat.I, town = mat.I, street = mat.I}) => (
-  <>
+  <PlaneCamsProvider value={{far, town, street}}>
     <XG m={far}>
       <OutsideFar />
     </XG>
@@ -790,5 +1036,6 @@ export const OutsidePlanes: React.FC<{far?: Mat; town?: Mat; street?: Mat}> = ({
     <XG m={street}>
       <OutsideStreet />
     </XG>
-  </>
+  </PlaneCamsProvider>
 );
+void useTime;

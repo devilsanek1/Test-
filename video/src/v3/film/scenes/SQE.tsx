@@ -25,7 +25,7 @@ import React from 'react';
 import {World} from '../../../lib/World';
 import type {ToneKey} from '../../../lib/Film';
 import {EMBER, FILM_TOD} from '../kit';
-import {H2View, H2_RIG} from './h2_window';
+import {H2View, H2_RIG, h2Cams} from './h2_window';
 import {CrateHop, FilmClock, useFilmT} from './outside';
 import {ThreadPlane, threadAt, type ThreadPlaneProps} from './thread_plane';
 
@@ -38,7 +38,7 @@ export const H2Scene: React.FC<{tagProps?: ThreadPlaneProps['tagProps']; wrap?: 
     <>
       <ThreadPlane T={T} rig={H2_RIG} tagProps={tagProps} />
       <FilmClock>
-        <CrateHop to={threadAt(T).listingScreen} />
+        <CrateHop to={threadAt(T).listingScreen} street={h2Cams(T).street} />
       </FilmClock>
     </>
   );
