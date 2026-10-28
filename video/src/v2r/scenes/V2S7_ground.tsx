@@ -91,18 +91,29 @@ export const S7Ground: React.FC<{band: GroundBand}> = ({band}) => {
 
 const LEAF_COLS = [CM.leafGold, CM.leafRust, CM.coatMustard, CM.leafGold];
 
-/** A fallen plane leaf lying flat at (x, z): a palmate silhouette foreshortened by the ground (one closed shape). */
+/** A fallen plane leaf lying flat at (x, z), `m` metres long: the palmate outline lib/particles draws in the air (five
+ *  pointed lobes round a centre a third up from the stem, and the stem), laid out in the ground plane and projected,
+ *  so the camera foreshortens it. One closed shape. */
+const PALM: [number, number][] = [
+  [-1.75, 0.42],
+  [-0.95, 0.82],
+  [0, 1],
+  [0.95, 0.82],
+  [1.75, 0.42],
+];
 function flatLeafInto(k: Batch, x: number, z: number, m: number, rot: number, col: string) {
-  const [sx, sy] = pt(x, z);
-  const s = m * kz(z);
-  const fl = 1.6 / z; // the ground's ry / rx at this depth
-  const pts: P2[] = [];
-  const lobesN = 5;
-  for (let i = 0; i < lobesN * 2; i++) {
-    const a = (i / (lobesN * 2)) * Math.PI * 2 + rot;
-    const r = (i % 2 ? 0.28 : 0.5) * s * (i === 0 ? 1.1 : 1);
-    pts.push([sx + Math.cos(a) * r, sy + Math.sin(a) * r * Math.max(0.28, fl * 2.2)]);
-  }
+  const R = m / 1.32;
+  const x0 = -m / 2;
+  const cx = x0 + 0.32 * R;
+  const c = Math.cos(rot);
+  const s = Math.sin(rot);
+  const P = (u: number, v: number): P2 => pt(x + u * c - v * s, z + u * s + v * c);
+  const at = (a: number, L: number): P2 => P(cx + Math.cos(a) * R * L, Math.sin(a) * R * L);
+  const pts: P2[] = [P(x0 - m * 0.16, -m * 0.02), P(x0 - m * 0.16, m * 0.02), P(x0, 0)];
+  PALM.forEach(([a, L], i) => {
+    if (i > 0) pts.push(at((PALM[i - 1][0] + a) / 2, 0.44));
+    pts.push(at(a - 0.2, L * 0.72), at(a, L), at(a + 0.2, L * 0.72));
+  });
   k.poly(col, pts);
 }
 
@@ -156,20 +167,16 @@ const LIMBS: Limb[] = [
   {a: [T.sx - 62, 742], c: [T.sx - 76, 690], w0: 8, w1: 5},
 ];
 const CLUSTERS: Cluster[] = [
-  {x: 978, y: 688, rx: 44, ry: 46},
-  {x: 1032, y: 664, rx: 54, ry: 44},
-  {x: 1092, y: 690, rx: 58, ry: 50},
-  {x: 964, y: 770, rx: 40, ry: 40},
-  {x: 1014, y: 752, rx: 50, ry: 46},
-  {x: 1080, y: 788, rx: 56, ry: 50},
-  {x: 1002, y: 826, rx: 34, ry: 28},
-  {x: 1052, y: 840, rx: 38, ry: 28},
+  {x: 1000, y: 712, rx: 72, ry: 70},
+  {x: 1076, y: 690, rx: 76, ry: 66},
+  {x: 1034, y: 790, rx: 84, ry: 64},
+  {x: 970, y: 790, rx: 44, ry: 40},
 ];
 
 /** The tree's colours on +0.5. */
 const TC = {
   bark: onPlane(CM.limestone, 0.5),
-  barkPatch: [onPlane(CM.sage, 0.5), onPlane(CM.stoneShade, 0.5), onPlane(CM.coatOat, 0.5)],
+  barkPatch: [onPlane('#DCDCC6', 0.5), onPlane('#E6DCCB', 0.5), onPlane('#E8DFC9', 0.5)],
   knuckle: onPlane(CM.paving, 0.5),
   leaf: [onPlane(CM.leafGold, 0.5), onPlane(CM.sage, 0.5), onPlane(CM.coatMustard, 0.5), onPlane(CM.leafRust, 0.5)],
   leafLit: onPlane('#E9C27E', 0.5),
@@ -193,15 +200,10 @@ export const S7TreeTrunk: React.FC = () => {
       k.fill(TC.knuckle, ovalPath(L.c[0], L.c[1], L.w1 * 0.7, L.w1 * 0.55));
     }
     k.layer();
-    // the plane's camouflage plates: a few big flat patches (never specks)
-    const r = rng('s7/treeBark');
+    // the plane's bark: two long soft plates a close tone off the trunk (never spots)
     const h = T.base - T.trunkTop;
-    for (let i = 0; i < 5; i++) {
-      const v = (i + 0.3 + r.next() * 0.4) / 5;
-      const y = T.trunkTop + h * v;
-      const half = lerp(wt, wb, v) / 2;
-      k.fill(TC.barkPatch[i % 3], blob(T.sx + r.range(-half * 0.45, half * 0.2), y, Math.min(half * 0.5, 7), r.range(10, 16), {seed: `s7/bark${i}`, wobble: 0.1}));
-    }
+    k.fill(TC.barkPatch[0], `M${T.sx - wt * 0.34} ${T.trunkTop + h * 0.12}Q${T.sx - wt * 0.05} ${T.trunkTop + h * 0.2} ${T.sx - wt * 0.12} ${T.trunkTop + h * 0.46}Q${T.sx - wt * 0.3} ${T.trunkTop + h * 0.4} ${T.sx - wt * 0.34} ${T.trunkTop + h * 0.12}Z`);
+    k.fill(TC.barkPatch[2], `M${T.sx - wb * 0.4} ${T.trunkTop + h * 0.58}Q${T.sx + wb * 0.05} ${T.trunkTop + h * 0.64} ${T.sx - wb * 0.02} ${T.trunkTop + h * 0.9}Q${T.sx - wb * 0.32} ${T.trunkTop + h * 0.86} ${T.sx - wb * 0.4} ${T.trunkTop + h * 0.58}Z`);
     return k;
   }, []);
   return (
@@ -215,9 +217,11 @@ export const S7TreeTrunk: React.FC = () => {
 export const S7TreeCrown: React.FC = () => {
   const b = useMemo(() => {
     const k = new Batch();
-    CLUSTERS.forEach((c, i) => k.fill(TC.leaf[i % 4], crownD(c.x, c.y, c.rx, c.ry, {seed: `s7/crown${i}`, round: 0.72})));
+    CLUSTERS.forEach((c, i) => k.fill(TC.leaf[0], crownD(c.x, c.y, c.rx, c.ry, {seed: `s7/crown${i}`, round: 0.8})));
     k.layer();
-    CLUSTERS.forEach((c, i) => k.fill(i % 2 ? TC.leafLit : TC.leaf[0], crownD(c.x - c.rx * 0.3, c.y - c.ry * 0.2, c.rx * 0.44, c.ry * 0.4, {seed: `s7/crownLit${i}`, round: 0.74})));
+    // the sun side (west, upper left of each mass) one step lighter; a few rust masses in the depth of the crown
+    CLUSTERS.slice(0, 3).forEach((c, i) => k.fill(TC.leafLit, crownD(c.x - c.rx * 0.3, c.y - c.ry * 0.24, c.rx * 0.52, c.ry * 0.46, {seed: `s7/crownLit${i}`, round: 0.82})));
+    k.fill(TC.leaf[3], crownD(1058, 812, 40, 26, {seed: 's7/crownRust', round: 0.8}));
     return k;
   }, []);
   return (

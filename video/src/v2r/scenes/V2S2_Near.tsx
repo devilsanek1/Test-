@@ -207,6 +207,12 @@ export const PLANTER_WOOD = nearStep(CM.line, -2);
 
 /** The lamp's swan-neck: from the post's top it curves right out of the frame (below y 600). */
 const LAMP_TOP = 700;
+/** The near lamp as it stands at the match (12.98: every float leg at rest), for L3, who holds it across the cut.
+ *  Measured on the 12.95 frame: the post x 1014-1045 at y 1400 (1012-1047 at y 1900; centre 1030, w 30, half-width
+ *  0.62 w at the foot y 1990, 0.5 w from y 790 up), the swan-neck curving right from y 790 into an arm that leaves
+ *  the frame (x 1079) at y 657-678; a collar y 1640-1670 (48 wide); the bike's lock ring r 26 round it at y 1600.
+ *  One flat colour: authored nearStep(CM.line, -2) = #7E3E26, drawn in tier C (environment) = #8F553F on screen. */
+export const S2_NEAR_LAMP = {x: 1030, w: 30, foot: 1990, neckY: LAMP_TOP + 90, armExitY: [657, 678], collar: {y: 1640, h: 30, w: 48}, authored: '#7E3E26', onScreen: '#8F553F', lockY: 1600};
 
 const PlanterGrass: React.FC = () => {
   const {x0, x1, rim} = NEAR.planter;
@@ -306,20 +312,12 @@ export const S2NearThings: React.FC = () => {
     }
     return b;
   }, []);
-  const lampBike = useMemo(() => {
+  const bike = useMemo(() => {
     const b = new Batch();
-    // ---- the slim near lamp (CM.line, a step darker: plane -2): the post from below the frame up to the swan-neck,
-    // which curves right and leaves the frame at y ~640-680 (never near the band)
-    const {x, w} = NEAR.lamp;
-    const c = nearStep(IRON, -2);
-    b.fill(c, `M${P(x - w * 0.62, 1990)}L${P(x - w * 0.5, LAMP_TOP + 90)}C${P(x - w * 0.5, LAMP_TOP + 20)} ${P(x + 10, LAMP_TOP - 40)} ${P(x + 60, LAMP_TOP - 46)}L${P(1140, LAMP_TOP - 56)}L${P(1140, LAMP_TOP - 56 + w * 0.7)}L${P(x + 62, LAMP_TOP - 46 + w * 0.72)}C${P(x + 24, LAMP_TOP - 38 + w * 0.7)} ${P(x + w * 0.5, LAMP_TOP + 30)} ${P(x + w * 0.5, LAMP_TOP + 90)}L${P(x + w * 0.62, 1990)}Z`);
-    b.rect(nearStep(CM.coatMustard, -2), x - w * 0.56, 1220, w * 1.12, 10); // a painted band
-    b.rect(c, x - w * 0.8, 1640, w * 1.6, 30); // a collar
-    b.layer();
     // ---- the bike locked to the lamp's foot (cut by the bottom-right): wheels and frame are things that ARE lines
     const {x: bx, y: by, r} = NEAR.bike;
-    const tyre = nearStep(CM.coatSlate, -2);
-    const frame = nearStep(CM.coatMustard, -2);
+    const tyre = nearStep(CM.coatSlate, -1);
+    const frame = nearStep(CM.coatMustard, -1);
     const ring = (cx: number, cy: number, rr: number, t: number) =>
       `M${P(cx - rr, cy)}a${rr} ${rr} 0 1 1 ${2 * rr} 0a${rr} ${rr} 0 1 1 ${-2 * rr} 0ZM${P(cx - rr + t, cy)}a${rr - t} ${rr - t} 0 1 0 ${2 * (rr - t)} 0a${rr - t} ${rr - t} 0 1 0 ${-2 * (rr - t)} 0Z`;
     b.fill(tyre, ring(bx - r * 1.2, by, r, 10));
@@ -345,15 +343,27 @@ export const S2NearThings: React.FC = () => {
     bar(head, hub2, 9);
     b.fill(nearStep(CM.anchor, -1), `M${P(seat[0] - 26, seat[1] - 10)}L${P(seat[0] + 22, seat[1] - 12)}L${P(seat[0] + 18, seat[1] - 2)}L${P(seat[0] - 22, seat[1])}Z`); // saddle
     b.fill(frame, poly([[head[0] - 6, head[1] - 22], [head[0] + 40, head[1] - 30], [head[0] + 42, head[1] - 22], [head[0] - 4, head[1] - 14]])); // bars
-    // the lock: a short D round the post
-    b.fill(nearStep(CM.coatSlate, -2), ring(NEAR.lamp.x, 1600, 26, 6));
+    // the lock: a short D round the post (a thing that IS a line: one tone, never a dark hairline)
+    b.fill(CM.coatSlate, ring(NEAR.lamp.x, 1600, 26, 9));
+    return b;
+  }, []);
+  // the post AFTER the bike: the bike's head tube and bars pass behind it (no slivers of the dark post between bars)
+  const post = useMemo(() => {
+    const b = new Batch();
+    // ---- the slim near lamp (CM.line, a step darker: plane -2): the post from below the frame up to the swan-neck,
+    // which curves right and leaves the frame at y ~640-680 (never near the band)
+    const {x, w} = NEAR.lamp;
+    const c = nearStep(IRON, -2);
+    b.fill(c, `M${P(x - w * 0.62, 1990)}L${P(x - w * 0.5, LAMP_TOP + 90)}C${P(x - w * 0.5, LAMP_TOP + 20)} ${P(x + 10, LAMP_TOP - 40)} ${P(x + 60, LAMP_TOP - 46)}L${P(1140, LAMP_TOP - 56)}L${P(1140, LAMP_TOP - 56 + w * 0.7)}L${P(x + 62, LAMP_TOP - 46 + w * 0.72)}C${P(x + 24, LAMP_TOP - 38 + w * 0.7)} ${P(x + w * 0.5, LAMP_TOP + 30)} ${P(x + w * 0.5, LAMP_TOP + 90)}L${P(x + w * 0.62, 1990)}Z`);
+    b.rect(c, x - w * 0.8, 1640, w * 1.6, 30); // a collar
     return b;
   }, []);
   return (
     <Tier tier="environment">
       <Paint b={box} seed="s2nearthings" misreg={false} />
       <PlanterGrass />
-      <Paint b={lampBike} seed="s2lampbike" misreg={false} />
+      <Paint b={bike} seed="s2lampbike" misreg={false} />
+      <Paint b={post} seed="s2lamppost" misreg={false} />
     </Tier>
   );
 };
