@@ -8,19 +8,21 @@ Nothing is committed.
 
 **A (recommended). "A man got 18 months for having bots play his AI songs."** One real person, curiosity. 12 words.
 - Cover, ALL CAPS, 7 words: **BOTS PLAYED HIS AI SONGS. 18 MONTHS.** Small type under it: "Michael Smith, wire fraud conspiracy, sentenced Oct 2026".
-- Hook, 0-3 s: "A man got 18 months for having bots play his AI songs." [deadpan, a bit amused; lean on BOTS]. The jolt: "Prosecutors say those fake plays paid him over $10 million."
+- Hook, 0-3 s: "A man got 18 months for having bots play his AI songs." [deadpan, a bit amused; lean on BOTS]. The jolt: "Prosecutors say those fake plays paid him over $8 million."
 - Angle: whose money that was: a shared pot every real artist is paid from, which fake plays that slip past the filters still dip into. Emotion: "Prison, for that? Who did he even hurt?"
 - Why: 70.2/90 (#2), truth 9.2 (best of the top 10), in all 4 judges' top 5. The viewers' #1 (Rob, Dev, Lena): the only line all 4 would stop on and none called bait. Lena: "this is going straight to the band chat."
-- Sceptics: minor x2: the crime was pocketing the royalties, not the bots as such. Line kept (FL 1.8's safe wording, trimmed; already 12 words); "wire fraud" on the cover and the $10 million in line 2 name the money by ~5 s.
+- Sceptics: minor x2: the crime was pocketing the royalties, not the bots as such. Line kept (FL 1.8's safe wording, trimmed; already 12 words); "wire fraud" on the cover and the $8 million in line 2 name the money by ~5 s.
 - Risk: his harm is contested (his lawyers: no "appreciable loss"; Spotify says it held his Spotify take to ~$60,000). So the "oh" is the pot (no one lost much, every slice got a little thinner), never "he robbed artists" as fact.
+- Truth status: TRUE after one fix (checked 2026-10-28: fact file, MBW, WUNC, NPR). Holds: 18 months on 6 Oct 2026, after a guilty plea to conspiracy to commit wire fraud; billions of bot plays, prosecutors say. Changed: line 2's "$10 million" was the 2024 charge; prosecutors now say more than $8 million, and he forfeits the $8.09M loss both sides agreed. His bots were software, so section 2 now draws screens, not a phone farm. The script must still: keep "prosecutors say" on their figures; give his lawyers' "no ... appreciable loss" and Spotify's ~$60,000 equal weight; never say, in our voice, that he stole from artists.
 
 **B. "Could you even tell if a song was AI?"** The fuss, as a question to you. 9 words.
-- Cover, ALL CAPS, 7 words: **BLIND TEST: 97% COULDN'T TELL. COULD YOU?** Small type: "one test of 9,000 people, Deezer/Ipsos, Oct 2025".
+- Cover, ALL CAPS, 7 words: **BLIND TEST: 97% COULDN'T TELL. COULD YOU?** Small type: "one test of 3 songs, 9,000 people, Deezer/Ipsos, Oct 2025".
 - Hook, 0-3 s: "Could you even tell if a song was AI?" [playful dare; lean on YOU]. The jolt, by ~4 s: "Okay, harder one: which of these fans is a bot?"
 - Angle: everyone worries about the songs; the fake that drains the shared pot is a "fan" who's really a bot. Liking an AI song is your call, and once a bot slips past the filters, the pot can't tell. Emotion: pride, poked ("I'd hear it"), then "wait, fans can be bots?"
 - Why: 71.5/90 (#1), gut 8, clarity 9: the hottest public question, the fuss you picked the topic for. All 4 viewers would stop and 3 share, but all 4 called it bait (Maya: "there better be an actual test though"). Payoff 4.5: every judge's worry.
 - Sceptics: minor x2: one Deezer-commissioned test of 3 songs, not a law of hearing; "could you?" promises a test we can't play. Fixes: the scope in small type; the video answers in words, and its real test is the bot one.
 - Risk: a bait-and-switch. We may play no AI audio and the pot doesn't answer "could you tell?", so the bot twist must land by ~4 s and the last line must close both questions.
+- Truth status: TRUE as a question, and the cover holds with its scope (checked 2026-10-28 against Deezer's release). Holds: one online test, 9,000 adults in 8 countries, 3 tracks (2 fully AI, 1 human): "97% of the respondents failed". Changed: the small type now says "3 songs". The script must still say "in one blind test" aloud (never "97% of people can't tell") and answer "could you?" in words, since we play no AI audio.
 
 **C. "Some bots are skimming your favorite artist's pay."** Unfairness, for someone you love. 8 words.
 - Cover, ALL CAPS, 7 words: **SOME BOTS SKIM YOUR FAVORITE ARTIST'S PAY**. Small type: "only fake plays that slip past the filters; nobody knows how many".
@@ -28,11 +30,10 @@ Nothing is committed.
 - Angle: the shared pot itself. Every counted play shrinks every other slice, so fake plays that slip through thin a real artist's pay without touching her songs. Emotion: protective anger ("hey, that's hers"), then "how?"
 - Why: 67.5/90 (#4), gut 7.2, payoff 8: the payoff in words on frame 0, in the plain "your" shape of your v3 pick. Viewers: 3 of 4 stop, none called it bait. Maya: "that actually makes me mad". Its "can shrink" twin (L5) lost all 4.
 - Sceptics: minor x2: "are skimming" states an unmeasured loss as certain. Fix applied: "Some bots" (the fact lock's own "some fake plays slip through", FL 8.2) instead of "can", plus the small type.
-- Risk: no "AI" in the words (the fuss you picked the topic for), so the frame-0 drawing and line 3 must bring it. Rob shrugs: "Spotify already pays these guys peanuts."
+- Risk: no "AI" in the words (the fuss you picked the topic for), so the frame-0 drawing and line 3 must bring it. Rob shrugs: "Spotify already pays these guys peanuts, so yeah, figures."
+- Truth status: HOLDS as the fact file's inference, not a measured loss (checked 2026-10-28). Each country's monthly pot is split by share of plays (Spotify's FAQ), so every fake play that gets counted thins every real slice, and some still get counted (FL 8.2). "Some bots" is looser than both sceptics' "that slip past the filters" but true, and "can" fell flat with viewers (L5); the small type and the callback carry the filter. The panel scored it without "Some". Changed: nothing (Rob's quote is now verbatim). The script must still say caught fakes earn nothing and nobody's measured it, and never that bots play her songs.
 
 **Recommendation: A.** The viewers' clear #1 and the truest line: one real person, AI and bots in one breath, and its itch ("who did he even hurt?") leads straight to the pot. C is the plain fallback; B rides the fuss hardest but only works if the bot twist lands by ~4 s.
-
-**The G0 seeds came last:** L1 (#47, 41.5) and L2 (#43, 45.2), MAJOR for both sceptics: L1 blames AI songs instead of fake plays; L2's cover drops "one app" and reads as half of all new music. L1's instinct (nobody listens, yet money moves) lives on as the turn.
 
 ## 2. Per pick: what it takes to land
 
@@ -53,11 +54,12 @@ Nothing is committed.
 **A. "A man got 18 months for having bots play his AI songs."**
 - Callback (last line): "He got 18 months. The fake plays nobody catches still take a slice, and nobody knows how
   big." It answers "who did he hurt?" with the pot, and turns one caught man into the open question. Then loop to frame
-  0's single phone.
+  0's single bot screen.
 - Must prove, in this order:
   1. It happened: sentenced 6 Oct 2026, 18 months, forfeits $8.09M, the first US criminal case of its kind (FL 1.8,
      4.9). Prosecutors say: hundreds of thousands of AI songs, billions of bot plays, up to 10,000 bot accounts at
-     once, four services, 2017-2024, $14M+ collected (4.10, 4.12). His plan, as a quote card: "a TON of content with
+     once, four services, 2017-2024, more than $8M in royalties (4.10, 4.12; MBW, 7 Oct 2026; FL 4.10's $14M+ is all
+     royalty payers sent him, real plays included, never his take). His plan, as a quote card: "a TON of content with
      small amounts of Streams" (4.11). AI made the TON cheap (2.8-2.9); name no tool (7.10).
   2. So whose money was it? Streaming doesn't pay per play (3.1). Each month, in each country, the money sits in a
      shared pot, split by each track's share of the plays (3.2-3.3). So his fake plays took a share of the pot real
@@ -72,16 +74,17 @@ Nothing is committed.
 - The platforms' side, ~20-26 s, right after "did he hurt anyone?": caught fakes earn nothing and come out of the pot
   (4.1-4.2, 3.13); Apple wiped up to 2 billion fake plays from 2025's payouts (4.4); most AI uploads take nothing from
   Spotify's pot (its 1,000-play line, 3.9-3.10). They fight it; the open question is what slips through. Don't say they caught him.
-- First second: our own cheerful notification ding ("new listener!") on one phone as frame 0 draws it; the camera
-  pulls back and the ding multiplies into a rattling roar across thousands of phones, the play counter spinning to
-  "billions", then cut dead to one low thunk on "18 months". The happy sound becomes the crime.
+- First second: our own cheerful notification ding ("new listener!") on one bot account's screen as frame 0 draws it;
+  the camera pulls back and the ding multiplies into a rattling roar across thousands of screens in server racks (his
+  bots were software on rented cloud accounts, not a phone farm), the play counter spinning to "billions", then cut
+  dead to one low thunk on "18 months". The happy sound becomes the crime.
 - Palette: **#3 Cream & Cobalt**, the "news" palette you picked for v2's serious story: cream page #F3E6D6, cobalt
-  hero #3F7FE0 on the thread (the bot phone's screen), anchor #2B2A44, orange pop #EC6B2E only on "18 MONTHS" and the
-  play counter. A sister shift to **#6 Dusk** (mist #D9DEE5, indigo #3E5BD0) for the one scale beat: the dark farm of
-  glowing phones.
-- Through-line seed: thread, one bot phone, its play counter spinning (one of his thousands, then in an evidence bag,
-  last one still playing that nobody caught); home, the shared pot, a big tip jar on a lamp-lit table, with the farm
-  and the courtroom opening through a phone screen; you, POV, your thumb on play.
+  hero #3F7FE0 on the thread (the bot account's screen), anchor #2B2A44, orange pop #EC6B2E only on "18 MONTHS" and the
+  play counter. A sister shift to **#6 Dusk** (mist #D9DEE5, indigo #3E5BD0) for the one scale beat: the dark server
+  room of glowing bot screens.
+- Through-line seed: thread, one bot account's screen, its play counter spinning (one of his thousands, then stamped
+  EVIDENCE, last one still playing that nobody caught); home, the shared pot, a big tip jar on a lamp-lit table, with
+  the server room and the courtroom opening through a phone screen; you, POV, your thumb on play.
 
 **B. "Could you even tell if a song was AI?"**
 - Callback (last line): "So, could you tell if a song was AI? Maybe not. Your favorite artist needs the app to tell
@@ -96,11 +99,11 @@ Nothing is committed.
   3. So why fake fans? Streaming doesn't pay per play: each month the money sits in a shared pot, split by share of
      plays (3.1-3.3), so a fake play that gets counted takes a share just like yours (3.7, 7.4).
   4. The platforms' side (below).
-  5. Payoff: some fakes still pass the app's test (one man's did for 7 years, 4.10, 8.5), and nobody knows how many
-     (8.2) or how much they take (8.1). Then the callback.
+  5. Payoff: some fakes still pass the app's test (one man's did for 7 years, on four apps, 4.10, 8.5), and nobody
+     knows how many (8.2) or how much they take (8.1). Then the callback.
 - The platforms' side, ~22-28 s, right after the pot: the apps take that test every day; caught fakes earn nothing and
   come out of the pot (4.1-4.2, 3.13, 4.4), and most AI uploads take nothing from Spotify's pot (its 1,000-play line,
-  3.9-3.10). But Spotify itself says "all streaming services face ever-changing stream manipulation" (7.1). Keep spotting bots apart from spotting AI songs (two
+  3.9-3.10). But Spotify itself says: "All streaming services face ever-changing stream manipulation." (7.1). Keep spotting bots apart from spotting AI songs (two
   different filters): never use "detection will only get harder" (7.3, about AI) for bots.
 - First second: our own two-note "new release" ping as two song cards drop onto your phone side by side, one marked
   "AI?", while frame 0 draws them; the 97% stamps down at ~1.5 s.
@@ -120,7 +123,8 @@ Nothing is committed.
      pool", 7.4; Apple: "a zero-sum game", 6.4).
   4. And fake plays are cheap now: fake accounts play their own songs on repeat (4.10-4.12; his "TON" email, 4.11),
      and AI makes those songs almost free (2.1, 2.8-2.9); on one app, up to 85% of AI-song plays were fake in 2025
-     (2.4). But bots go wherever the money is: they even pushed a human song to No. 1 (4.5, 4.3).
+     (2.4). But bots go wherever the money is: they even pushed a human song to No. 1 on Spotify's US chart, with no
+     sign its artist knew (4.5, 4.3).
   5. The platforms' side (below), which is what "some" means: one man's fakes slipped through for 7 years and got him
      18 months (4.9-4.10). Nobody knows how many slip through now (8.2), and nobody has measured the loss (8.1). Then
      the callback.
@@ -139,7 +143,8 @@ Nothing is committed.
 ## 3. The evidence
 
 **Score table**, all 47 (score out of 90 = gut x3 + truth x2 + clarity x2 + payoff + share, averaged over the 4
-judges). A, B, C = the picks (C is L34 with the sceptics' fix: "Some bots"); F = finalist the panel and sceptics saw.
+judges). A, B, C = the picks (C is L34 with the editor's fix for the sceptics' note, "Some bots"; it was scored
+without "Some"); F = finalist the panel and sceptics saw.
 
 | # | ID | Line | Lever | Gut | Truth | Clarity | Payoff | Share | Score |
 |---|---|---|---|---|---|---|---|---|---|
@@ -216,6 +221,10 @@ true everywhere.
 **Sceptics** (both read every finalist): nothing to fix on L35 and L5 (and L24, for the lawyer); minor on L18, L3, L34
 and L28 (and L24, for the fact-checker); major on L1 and L2, the G0 seeds. Their fixes are applied or weighed in
 section 1.
+
+**The G0 seeds came last:** L1 (#47, 41.5) and L2 (#43, 45.2), MAJOR for both sceptics: L1 blames AI songs instead of
+fake plays; L2's cover drops "one app" and reads as half of all new music. L1's instinct (nobody listens, yet money
+moves) lives on as the turn.
 
 **5 runner-ups worth keeping:**
 1. **L35 "Who pays when bots play AI songs?"** The turn line inside any of the three scripts, or a caption. Neither
