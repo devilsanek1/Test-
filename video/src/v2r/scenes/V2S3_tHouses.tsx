@@ -140,12 +140,10 @@ function backBatch(sh: ShadeSink, stacks: string[]): Batch {
   }
   // ---- window and door surrounds, frames
   for (const w of WINDOWS) winBack(b, w, sh);
-  // her French window's stone architrave + hood (the frame itself is V2S3_tHer's); their casts
-  const {x0, y0, x1, y1} = HER_OPENING;
-  b.rect(CM.limestone, x0 - 18, y0 - 18, x1 - x0 + 36, y1 - y0 + 18);
-  b.rect(CM.limestone, x0 - 26, y0 - 32, x1 - x0 + 52, 12);
-  sh.cast.push(rectP(x0 - 26, y0 - 20, x1 - x0 + 52, 3));
-  sh.cast.push(quadP([[x1 + 18, y0 - 16], [x1 + 27, y0 - 10], [x1 + 27, y1 + 2], [x1 + 18, y1 + 2]]));
+  // her French window (V2S3_tHer) sits straight in the brick, as S8's does: no light stone surround round it, so her
+  // lit pane reads in the darker wall (CRAFT §f.3, the brief's separation); its frame band's cast to the east
+  const {x1, y0, y1} = HER_OPENING;
+  sh.cast.push(quadP([[x1 + 9, y0 - 6], [x1 + 16, y0], [x1 + 16, y1 + 4], [x1 + 9, y1 + 4]]));
   // the stucco house's bay: a projection on the ground floor, its cornice and the stucco apron
   b.rect(CM.stucco, BAY.x0 + 2, BAY.y0, BAY.x1 - BAY.x0 - 4, BAY.y1 - BAY.y0);
   b.rect(CM.limestone, BAY.x0, 900, BAY.x1 - BAY.x0, 10);

@@ -563,13 +563,12 @@ export const boatBob = (t: number) => 1.3 * Math.sin(t * 2.1 + 0.4) + 0.4 * Math
 const CLIP_ID = 's3nbWalkerClip';
 
 /** The roof things' contact and cast shadows on the roof (one multiply layer; RIG_CANAL: right and a little toward
- *  us), the cabin side's foot and the roof's far edge one Shade step (CRAFT §d: the tint family, never a hand-picked
+ *  us), the cabin side's foot one Shade step (CRAFT §d: the tint family, never a hand-picked
  *  fill). Drawn after the boat's static batch (the cabin, the roof, its things), so the things they lie under must not
  *  be covered: the contacts sit at the feet, the casts run along the roof to the right. */
 const BoatShadows: React.FC = () => (
   <>
     <Shade d={`M${NB.x0} ${NB.cabin1 - 5}H${NB.x1}V${NB.cabin1}H${NB.x0}Z`} />
-    <Shade d={`M${NB.x0} ${NB.roofFar}H${NB.x1}V${NB.roofFar + 5}H${NB.x0}Z`} />
     <ShadowLayer>
       <ContactShadow x={COIL.x} y={COIL.y + 8} w={COIL.rx * 2} h={7} />
       <ContactShadow x={(BUCKET.x0 + BUCKET.x1) / 2} y={BUCKET.y} w={BUCKET.x1 - BUCKET.x0} h={6} />
