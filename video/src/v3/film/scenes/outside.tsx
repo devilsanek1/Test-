@@ -37,8 +37,9 @@
 // sill into the listing laptop, growing to ~120 px as it comes toward the glass and shrinking into the screen (E4: the
 // carry reads), the tag ticks to $1,099 on "pass" (30.28); 30.40 our van leaves left as the van behind moves up into the
 // pool (30.55-31.15); 31.40-32.84 the BETTER van joins the queue at the lane's head; 33.50-34.65 B leaves up the road;
-// 34.60 the notice flips to 2027 (full until 35.85, then one value down); 35.22-36.25 two DC trucks overtake along the
-// near kerb (BETTER nudged back 35.62): C takes the gate, D stops in front of the pool; 36.98 the notice goes blank as
+// 34.60 the notice flips to 2027 (full until 35.85, then one value down); 34.95-35.93 two DC trucks overtake along the
+// near kerb (BETTER nudged back 35.38), ending before the tag's jolt (35.95): C takes the gate, D stops in front of the
+// pool; 36.98 the notice goes blank as
 // the data center's sign lights and its rows go dark, then light one at a time on "an AI data center" (37.00-37.80, the
 // hook's 4.04 beat rhymed; the trucks sit back in the same frame), then the street holds, alive and calm (the workers
 // load C from 38.75, a small far car crosses slowly from 37.3: nothing near the gate walks while the sign lights). Tiers follow the beat (flow_v2 §5): the
@@ -118,9 +119,14 @@ export const H2_BEATS = {
   flip: 34.6,
   /** The 2027 face steps one value down (before J5's 0.4 s: nothing changes in 35.96-36.76). */
   flipCalm: 35.85,
-  trucks: 35.22,
-  trucksEnd: 36.25,
-  nudge: 35.62,
+  /** The overtake plays alone and ENDS before the tag's jolt (35.95): C 34.95-35.85, D to 35.93, the BETTER van nudged
+   *  35.38, every outline off by 35.95 (THREAD lane REQUEST 1, after assembly review R3-6: the trucks drove until 36.33,
+   *  their motion peaked on the jolt and inside J5's 0.4 s). */
+  trucks: 34.95,
+  trucksEnd: 35.85,
+  nudge: 35.38,
+  /** The BETTER van's beat ends at the end of "one." (33.40, the pause before "But"), its pill stepping down 2-step. */
+  betterLineEnd: 33.4,
   /** The data center's sign lights (SQF, on "AI"); the notice goes blank in the same frame (one event). */
   sign: 36.98,
 };
@@ -308,7 +314,7 @@ const roadUp = (m: Mat): Key[] => {
 
 /** `calm` (DC trucks): 0 on the truck's own beat, 1 off it (tier B: one haze step toward the street's ambient snow, so a
  *  dark truck waiting in the bright pool never out-shouts the beat's subject), 0.5 the 3-frame half step. */
-export type Vehicle = {id: string; variant: FleetVariant; x: number; y: number; k: number; dir: 1 | -1; line: boolean; roll: number; crate?: boolean; calm?: number};
+export type Vehicle = {id: string; variant: FleetVariant; x: number; y: number; k: number; dir: 1 | -1; line: boolean; roll: number; crate?: boolean; calm?: number; labelK?: number};
 
 /** Every vehicle on the street at film time T (back to front by ground y). `road` = the street -> town-road map. */
 export function vehiclesAt(T: number, road: Mat = mat.I): Vehicle[] {
@@ -353,7 +359,8 @@ export function vehiclesAt(T: number, road: Mat = mat.I): Vehicle[] {
   if (T >= B.better - 0.05) {
     const q = drive(T, B.better, B.betterEnd, [{t: 0, p: [1190, Y_LANE]}, {t: 0, p: [LANE_HEAD, Y_LANE]}], ease.outCubic);
     const nudge = 26 * ease.outBack(1.6)(prog(T, B.nudge, 0.22));
-    out.push({id: 'better', variant: 'better', x: q.p[0] + nudge, y: q.p[1], k: 1, dir: -1, line: T < B.betterEnd + 0.3 || (T >= B.trucks && T < B.trucksEnd), roll: roll(q.p[0] + nudge)});
+    const on: [number, number][] = [[-99, B.betterLineEnd], [B.trucks, B.trucksEnd]];
+    out.push({id: 'better', variant: 'better', x: q.p[0] + nudge, y: q.p[1], k: 1, dir: -1, line: on.some(([a, b]) => T >= a && T < b), roll: roll(q.p[0] + nudge), labelK: twoStepIn(T, on)});
   }
   // two DC trucks overtake the queue along the near kerb: C takes the gate, D stops in front of the pool
   if (T >= B.trucks - 0.05) {
@@ -798,7 +805,9 @@ function workersAt(T: number): {x: number; y: number; h: number; walk: number; c
 // value down with its small lines hidden; blank from the sign step (36.98). `k` 0 = full, 0.5 the half step, 1 calm.
 /** The calm notice (tier C): a soft warm paper (L* 88), its big glyph a calm step under it (L* 69: it still reads at
  *  full size, never as loud as the beat's subject), its bars pale. */
-const NOTICE_CALM = {paper: '#E9DACF', ink: '#C9A08F', now: '#A69389', last: '#E3C09B', faint: '#D8BAAC', binding: '#8E6A62'};
+const NOTICE_CALM = {paper: '#E9DACF', ink: '#C9A08F', now: '#A69389', last: '#E3C09B', faint: '#D8BAAC', binding: mixHex('#8E6A62', '#E9DACF', 0.4)};
+// (the calm binding L* ~64, one step toward its paper: at L* 48 on the L* 88 paper the calm header held most of the
+// pushed frame's wall band, y 944-972, at the queue's beats: assembly review R1-1)
 const mixK = (full: string, calm: string, k: number) => (k <= 0 ? full : k >= 1 ? calm : mixHex(full, calm, k));
 
 /** The 5x face: last year | now bars (S11's), "~5x", the source. */
@@ -966,7 +975,9 @@ export const OutsideStreet: React.FC = () => {
               holds the frame's top salience behind every beat) with its snow cap one pale step; the gate's lit yard:
               crates inside */}
           <path d={rrect(W.x0, W.y0, W.x1 - W.x0, W.y1 - W.y0 + 4, 3)} fill={WALL_BRICK} />
-          <path d={rrect(W.x0 - 4, W.y0 - 6, W.x1 - W.x0 + 8, 9, 4)} fill={STREET_CAP} />
+          {/* its snow cap a thin lid (6 px, 3 above the wall's top) one small step toward the street's ambient snow (L* ~84.5,
+              still over the ground snow's 83: CRAFT §d.2), so the wall's top edge stays a calm line (R1-1) */}
+          <path d={rrect(W.x0 - 3, W.y0 - 3, W.x1 - W.x0 + 6, 6, 3)} fill={mixHex(STREET_CAP, STREET_AMBIENT, 0.5)} />
           {/* two string courses: long same-hue bands a calm step under the brick (CRAFT §c: dL* <= ~6), never dark lines */}
           <path d={`M${W.x0} ${W.y0 + 34}H${W.x1}V${W.y0 + 37}H${W.x0}ZM${W.x0} ${W.y0 + 64}H${W.x1}V${W.y0 + 67}H${W.x0}Z`} fill={mixHex(WALL_BRICK, EMBER.brickShade, 0.3)} />
           <path d={rrect(G.x0, G.y0, G.x1 - G.x0, G.y1 - G.y0 + 2, 4)} fill={off ? EMBER.houseLit : mixK(GATE_LIT, GATE_CALM, calm)} />
@@ -1015,7 +1026,7 @@ export const OutsideStreet: React.FC = () => {
         {/* the workers, the vehicles, the barrier: back to front */}
         {ws.map((w, i) => (w.y < 1150 ? <Worker key={`wb${i}`} {...w} /> : null))}
         {vs.map((v) => {
-          const van = <FleetVan x={v.x} y={v.y} w={VAN_W * v.k} variant={v.variant} dir={v.dir} line={v.line} roll={v.roll} lift={off || v.variant === 'dc' ? 0 : poolLift(v.x, v.y, VAN_W * v.k)} />;
+          const van = <FleetVan x={v.x} y={v.y} w={VAN_W * v.k} variant={v.variant} dir={v.dir} line={v.line} roll={v.roll} labelK={v.labelK} lift={off || v.variant === 'dc' ? 0 : poolLift(v.x, v.y, VAN_W * v.k)} />;
           return (
             <React.Fragment key={v.id}>
               {v.variant === 'dc' ? (
