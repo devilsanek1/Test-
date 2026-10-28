@@ -87,3 +87,6 @@ Only the owner's quoted words carry owner rank; the "->" half is our log, and a 
   separate verifier and the second fix round dropped; the REVEAL lane (the blocker) and the WINDOW lane (its two majors
   only; minors deferred) resumed lean; then one final agent: master, cover, POSTING. -> rule: playbook, Process (the
   weekly limit: close to a limit, drop the low-signal stages first).
+  - Final round (G8): fixed the summit pile, SQB's strip and turn, the BETTER van, the overtake before the jolt, the
+    payoff's rows and the loop's $1,099; deferred for the token budget: R3-4 (the queue's vans stay small), the
+    mountain's air step, Pip's look-up timing. Master `deliverables/v3/v3_final.mp4` + cover delivered for review.
