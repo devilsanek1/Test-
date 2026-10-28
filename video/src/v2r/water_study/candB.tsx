@@ -161,7 +161,7 @@ const COL = {
   hull: tone3(SRC.hull, [0.3, 0.42, 0.55]),
   sage: [0.35, 0.5, 0.62].map((k) => reflectTone(SRC.sage, k, CM.water, {toWater: 0.45})),
   oat: [0.4, 0.55, 0.65].map((k) => reflectTone(SRC.oat, k, CM.water, {toWater: 0.75})),
-  herLegs: tone3(SRC.herLegs, [0.56, 0.64, 0.72]),
+  herLegs: tone3(SRC.herLegs, [0.6, 0.66, 0.72]),
   // the hero colour is hers only: her reflection calmed to tier C (C* <= 25)
   herCoat: tone3(SRC.herCoat, [0.55, 0.62, 0.7]).map((c) => {
     const o = okLch(c);
@@ -169,7 +169,7 @@ const COL = {
   }),
 };
 /** A ghost's whole-figure value (its head colour, MAP.S1_ROW: they age by value G1 -> G6) toned. */
-const ghostCol = (hex: string) => tone3(hex, [0.6, 0.68, 0.75]);
+const ghostCol = (hex: string) => tone3(hex, [0.68, 0.74, 0.8]);
 
 /** The quay band (the far coping's face mirrored, in shade): one cool step of the water, between the far towpath's dark
  *  waterline strip and the reflections. */
@@ -313,7 +313,7 @@ const figureMasses = (t: number): Mass[] => {
     const grow = m.popT === null ? 1 : sstep(0, 0.12, t - m.popT);
     if (grow <= 0) return;
     const top = 2 * waterTop(p.x) - p.feetY - 1;
-    const legW = p.h * 0.05;
+    const legW = p.h * 0.046;
     const legs = p.h * 0.36 * grow;
     const col = m.kind === 'her' ? COL.herLegs : ghostCol(m.headHex ?? '#A9A5B5');
     out.push({id: `fig/${m.id}`, span: rect(p.x - legW, p.x + legW), y0: top - 30, solid: top + legs * 0.62, y1: top + legs, colors: col, steps: STEPS, breakup: 0, narrow: 0.25, taper: 2});

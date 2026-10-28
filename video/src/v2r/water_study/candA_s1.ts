@@ -64,9 +64,10 @@ export const SWAY: Sway = {
   jitter: 0.12,
   seed: 4101,
 };
-/** The ragged edges: the ends of every mirrored piece recede by up to 2.5 px along the far quay, 24 px at our edge,
- *  each breathing on its own 3-6 s cycle: the sides waver, the near end breaks into fragments (R6). */
-export const RAGGED: Ragged = {max: [2.5, 24], period: [3, 6], seed: 4105};
+/** The ragged edges: every mirrored piece's ends recede 1.5 px (far) -> 3.5 px (near) in a square, irregular zigzag
+ *  on top of the sway; from nearness 0.45 (y ~1192) on up to 18 px more at our edge, rounded (the near end breaking into
+ *  fragments); each end breathes on its own 3-6 s cycle; a narrow thing loses at most a fifth of its width per side. */
+export const RAGGED: Ragged = {small: [1.5, 3.5], big: 18, from: 0.45, round: 4.5, period: [3, 6], seed: 4105};
 /** The ripple gaps (R6, R9, R2 by coverage): ~1.1 thin light cut lines per 1000 px per far row (0.22 of the row tall,
  *  50-230 px long), up to 7 row-tall gaps per 1000 px near (60-240 px): the reflection intact along the far quay,
  *  breaking into fragments toward us, where the water's own teal shows. Each lens lives 3.2-6.8 s (grows along its
