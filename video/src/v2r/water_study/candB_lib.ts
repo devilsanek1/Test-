@@ -65,7 +65,7 @@ export function cleanColour(hex: string, hueIfGrey = 190): string {
  *  the far bank, 0.6 near: Fresnel), its hue kept (warm hues turned up to `rose` deg toward rose, cool ones toward
  *  violet: the rig's shade family), warm chroma held (>= 0.9x), cool chroma eased; a near-neutral source (glass, stone,
  *  a pale band) takes the water's hue at a soft chroma. Never an RGB or `atmos` mix (khaki, beige). */
-export function reflectTone(src: string, k: number, water: string, o: {rose?: number; chroma?: number} = {}): string {
+export function reflectTone(src: string, k: number, water: string, o: {rose?: number; chroma?: number; toWater?: number} = {}): string {
   const s = okLch(src);
   const w = okLch(water);
   const l = lerp(s.l, w.l, k);
@@ -79,6 +79,11 @@ export function reflectTone(src: string, k: number, water: string, o: {rose?: nu
     const warm = s.h >= 15 && s.h <= 110;
     h = warm ? s.h - (o.rose ?? 4) * k : s.h + 6 * k;
     c = (warm ? s.c * (1 - 0.1 * k) : s.c * (1 - 0.3 * k)) * (o.chroma ?? 1);
+  }
+  if (o.toWater) {
+    // a weak reflection of a pale thing (near water): the water's own hue at a soft chroma, its value lifted
+    h = hueLerp(h, w.h, o.toWater);
+    c = lerp(c, Math.min(w.c, 0.03), o.toWater);
   }
   return cleanColour(fromOk(l, c, h), w.h);
 }
@@ -317,18 +322,18 @@ export const pushRun = (out: Runs, c: string, d: string) => {
   else out.set(c, [d]);
 };
 
-/** Build a mass: the SOLID block (one smooth closed shape whose sides wave with the rows' sway: the mirror is intact
- *  at its base), then the SLICES (one tapered bar per row segment, on the shared grid; toward y1 the rows thin out,
- *  break along their length and pull in, the last ones short dashes). Breaks are static per row (seeded): only the sway
- *  moves them, so the reflection never boils. */
+/** Build a mass: the SOLID block (one smooth closed shape whose sides wave with the sway: the mirror is intact at its
+ *  base), then the SLICES (one tapered bar per band of the shared grid; toward y1 the bands thin out, break along their
+ *  length and pull in, the last ones short dashes). Breaks are static per band (seeded): only the sway moves them, so
+ *  the reflection never boils. */
 export function buildMass(m: Mass, grid: SliceGrid, sway: (y: number) => number, out: Runs): void {
   const k = m.sway ?? 1;
   const solid = snapRow(grid, m.solid);
-  // ---- the solid block: its edges sampled at every row boundary in [y0, solid]
+  // ---- the solid block: its edges sampled every 4 px in [y0, solid] (a smooth wave, independent of the bands)
   if (solid > m.y0 + 0.5) {
-    const ys: number[] = [m.y0];
-    for (const y of grid.rows) if (y > m.y0 + 0.5 && y < solid - 0.5) ys.push(y);
-    ys.push(solid);
+    const ys: number[] = [];
+    const n = Math.max(2, Math.ceil((solid - m.y0) / 4));
+    for (let i = 0; i <= n; i++) ys.push(m.y0 + ((solid - m.y0) * i) / n);
     const left: Pt[] = [];
     const right: Pt[] = [];
     for (const y of ys) {
@@ -354,7 +359,7 @@ export function buildMass(m: Mass, grid: SliceGrid, sway: (y: number) => number,
     const ya = rows[i];
     const yb = rows[i + 1];
     if (yb <= solid + 0.01 || ya >= m.y1) continue;
-    // every row draws its numbers whether or not it is used (one row's pattern never depends on another's)
+    // every band draws its numbers whether or not it is used (one band's pattern never depends on another's)
     const rr = rng(`mass/${m.id}/${i}`);
     const drop = rr.next();
     const nbr = rr.next();
@@ -364,31 +369,31 @@ export function buildMass(m: Mass, grid: SliceGrid, sway: (y: number) => number,
     const lb = rr.next();
     const a = Math.max(ya, solid);
     const top = a + grid.gap(ya, yb);
-    const bot = yb;
-    if (bot - top < 0.6) continue;
+    const bot = Math.min(yb, m.y1 + (yb - ya) * 0.5);
+    if (bot - top < 0.8) continue;
     const ym = (top + bot) / 2;
     const s = m.span(ym);
     if (!s) continue;
     const u = smooth01(solid, m.y1, ym); // 0 at the block, 1 at the reflection's end
-    if (drop < 0.72 * u * u) continue; // the end thins out
+    if (drop < 0.55 * u * u * u) continue; // the very end thins out
     const pitch = yb - ya;
     const w = s[1] - s[0];
-    const x0 = s[0] + w * u * narrow * la;
-    const x1 = s[1] - w * u * narrow * lb;
+    const x0 = s[0] + w * u * narrow * (0.4 + 0.6 * la);
+    const x1 = s[1] - w * u * narrow * (0.4 + 0.6 * lb);
     if (x1 - x0 < 2) continue;
-    const taper = Math.min((m.taper ?? 3) * (0.5 + pitch / 8), (x1 - x0) * 0.4);
-    // breaks along the row (0-2), more toward the end: a short gap of the water
+    const taper = Math.min((m.taper ?? 3) * (0.6 + pitch / 10), (x1 - x0) * 0.4);
+    // breaks along the band (0-2), only past the middle of the slicing: a short gap of the water
     let nb = 0;
-    if (brk > 0 && x1 - x0 > 30) nb = Math.min(2, Math.floor(brk * (0.25 + 2.2 * u) + nbr));
+    if (brk > 0 && x1 - x0 > 36 && u > 0.3) nb = Math.min(2, Math.floor(brk * 2.4 * (u - 0.3) + nbr * 0.9));
     const cuts: [number, number][] = [];
-    const g0 = Math.max(4, pitch * (1.4 + 2.4 * u));
+    const g0 = Math.max(5, pitch * (0.9 + 1.6 * u));
     if (nb >= 1) {
-      const xb = x0 + (x1 - x0) * (0.2 + 0.6 * pa);
+      const xb = x0 + (x1 - x0) * (0.22 + 0.56 * pa);
       cuts.push([xb - g0 / 2, xb + g0 / 2]);
     }
     if (nb >= 2) {
-      const xb = x0 + (x1 - x0) * (pb < 0.5 ? 0.08 + 0.14 * pb : 0.78 + 0.14 * pb);
-      cuts.push([xb - g0 * 0.35, xb + g0 * 0.35]);
+      const xb = x0 + (x1 - x0) * (pb < 0.5 ? 0.1 + 0.12 * pb : 0.78 + 0.12 * pb);
+      cuts.push([xb - g0 * 0.4, xb + g0 * 0.4]);
     }
     cuts.sort((p, q) => p[0] - q[0]);
     const segs: [number, number][] = [];
@@ -401,7 +406,7 @@ export function buildMass(m: Mass, grid: SliceGrid, sway: (y: number) => number,
     const dx = sway(ym) * k;
     const col = colourAt(m, ym);
     for (const [s0, s1] of segs) {
-      if (s1 - s0 < 2.5) continue;
+      if (s1 - s0 < 3) continue;
       pushRun(out, col, barPath(s0 + dx, s1 + dx, top, bot, taper, taper));
     }
   }
