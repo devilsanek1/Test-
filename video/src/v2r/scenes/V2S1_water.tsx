@@ -259,8 +259,9 @@ function s1Moving(t: number): WaterSource[] {
   const xa = Math.max(-70, bx - L / 2);
   const xb = Math.min(330, bx + L / 2);
   if (xb - xa > 2) {
-    out.push({id: 'bus', thing: rect(xa, y0, xb, y1), axis: BRIDGE_AXIS, color: hazed(CM.brick, HAZE_K.bus), layer: LAYER.bus, plane: S1_PLANE.bridge, breakup: 0, narrow: 0.05});
-    if (xb - xa > 20) out.push({id: 'bus/glass', thing: rect(xa + 8, y0 + S1_BUS.h * 0.56, xb - 8, y0 + S1_BUS.h * 0.8), axis: BRIDGE_AXIS, color: hazed(CM.glass, HAZE_K.bus), layer: LAYER.bus, plane: S1_PLANE.bridge, breakup: 0, narrow: 0.05});
+    // whole (a far thing in the far water: a near mirror, R2, R5): its bars made the left third's comb as it crossed
+    out.push({id: 'bus', thing: rect(xa, y0, xb, y1), axis: BRIDGE_AXIS, color: hazed(CM.brick, HAZE_K.bus), layer: LAYER.bus, plane: S1_PLANE.bridge, solid: 1});
+    if (xb - xa > 20) out.push({id: 'bus/glass', thing: rect(xa + 8, y0 + S1_BUS.h * 0.56, xb - 8, y0 + S1_BUS.h * 0.8), axis: BRIDGE_AXIS, color: hazed(CM.glass, HAZE_K.bus), layer: LAYER.bus, plane: S1_PLANE.bridge, solid: 1});
   }
   return out;
 }
