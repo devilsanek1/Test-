@@ -278,6 +278,9 @@ def main():
         if name not in cache:
             rgb = load(name, a.v2dir)
             cache[name] = (rgb, skcolor.rgb2lab(rgb).astype(np.float32), ui_mask(name, rgb.shape))
+            # CRAFT §e local contrast: mean |L* - Gaussian(L*, sigma 16)| at 1080 wide (sigma scaled to this width)
+            Lf = cache[name][1][..., 0]
+            cache[name + '#lc'] = np.abs(Lf - cv2.GaussianBlur(Lf, (0, 0), 16.0 * rgb.shape[1] / 1080.0))
         rgb, lab, ui = cache[name]
         scale = 1080.0 / rgb.shape[1]
         x0, y0, x1, y1 = box
@@ -289,6 +292,7 @@ def main():
             continue
         r = {'image': name, 'label': label, 'band': band, 'kind': kind, 'box': box, 'cover': round(float(m.mean()), 2)}
         r.update(sample_metrics(lab[sub][..., 0], m, y0, scale))
+        r['lc'] = round(float(cache[name + '#lc'][sub][m].mean()), 2) if (name + '#lc') in cache else None
         cm = contour_metrics(m, scale)
         if cm:
             r.update({k: round(v, 2) for k, v in cm.items()})
@@ -306,11 +310,11 @@ def main():
         w, n = edge_width(ch, axis, scale)
         edges.append({'image': name, 'label': label, 'kind': kind, 'width_px': w, 'profiles': n})
     json.dump({'samples': res, 'edges': edges}, open(os.path.join(a.out, 'pro_3_nature.json'), 'w'), indent=1, default=float)
-    hdr = f"{'sample':28s} {'band':4s} {'cov':>4s} {'vals':>4s} {'L mean':>6s} {'range':>5s} {'steps':24s} {'top r':>5s} {'rim':>5s} {'rough':>5s} {'strt':>5s} {'e/c':>5s} {'fine':>5s} {'mott':>5s} {'flat':>5s} {'lt deg':>6s} {'lt k':>5s}"
+    hdr = f"{'sample':28s} {'band':4s} {'cov':>4s} {'vals':>4s} {'L mean':>6s} {'range':>5s} {'steps':24s} {'top r':>5s} {'rim':>5s} {'rough':>5s} {'strt':>5s} {'e/c':>5s} {'fine':>5s} {'mott':>5s} {'flat':>5s} {'lt deg':>6s} {'lt k':>5s} {'lc':>5s}"
     print(hdr)
     for r in res:
         print(f"{r['label'][:28]:28s} {r['band'][:4]:4s} {r['cover']:4.2f} {len(r['values']):4d} {r['L_mean']:6.1f} {r['range']:5.1f} {str(r['steps'])[:24]:24s} "
-              f"{r['top_r']:5.2f} {str(r.get('rim_dL')):>5s} {r.get('rough', 0):5.2f} {r.get('straight', 0):5.2f} {str(r.get('edge_core')):>5s} {r['fine']:5.2f} {r['mottle']:5.2f} {r.get('flat', 0):5.2f} {r['light_deg']:6.0f} {r['light_k']:5.2f}")
+              f"{r['top_r']:5.2f} {str(r.get('rim_dL')):>5s} {r.get('rough', 0):5.2f} {r.get('straight', 0):5.2f} {str(r.get('edge_core')):>5s} {r['fine']:5.2f} {r['mottle']:5.2f} {r.get('flat', 0):5.2f} {r['light_deg']:6.0f} {r['light_k']:5.2f} {r['lc']:5.2f}")
     print()
     for e in edges:
         print(f"{e['label']:40s} {e['kind']:5s} width {e['width_px']} px at 1080 ({e['profiles']} profiles)")

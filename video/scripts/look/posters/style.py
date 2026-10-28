@@ -1084,6 +1084,8 @@ def cmd_encode(a) -> None:
     }
     res = {'frame': str(a.frame), 'grain_L': a.grain, 'grain_sigma_px': a.grain_px, 'mottle_L': a.mottle,
            'mottle_sigma_px': a.mottle_px, 'pan_px_per_frame': v, 'conditions': {}}
+    if getattr(a, 'only', ''):
+        conds = {k: v for k, v in conds.items() if k in a.only.split(',')}
     for name, mode in conds.items():
         keep = {}
         def gen():
@@ -1444,13 +1446,13 @@ def sheet_planes_light(J, out: Path):
     save_sheet(im.crop((0, 0, W, y + 470)), out)
 
 
-def sheet_texture(J, out: Path, frames: Path, enc: Path | None):
+def sheet_texture(J, out: Path, frames: Path, enc):
     ms = load_mask_spec()
     items = [(POSTERS[n]['city'], REFS / n, POSTERS[n]['sky'], J['posters'][n]) for n in POSTERS]
     items.append(('v2 S1 sky', frames / 'v2_t1.0.png', [250, 20, 850, 200], J['ours'].get('v2_t1.0.png', {})))
     cw = 280
     W = 24 + cw * len(items) + 24
-    H = 980 if enc else 820
+    H = 1200
     im = Image.new('RGB', (W, H), PAPER)
     d = ImageDraw.Draw(im)
     label(d, (24, 14), 'Texture: 1:1 crops of open sky (top), the same stretched x8 around its mean (middle), numbers (bottom).', 24, bold=True)
@@ -1478,13 +1480,19 @@ def sheet_texture(J, out: Path, frames: Path, enc: Path | None):
             label(d, (x, ty + 64), f"mottle {mo.get('L_std')} L* (p1-99 {mo.get('L_p2p_p1_p99')})", 15)
             label(d, (x, ty + 84), f"scale {mo.get('scale_px_1e')} px; col/row {mo['row_vs_col_std'][1]}/{mo['row_vs_col_std'][0]}", 15)
         label(d, (x, ty + 104), f"(crop {2 * s} px{' , v2 at 1080' if 'v2' in tag else ''})", 13, MUTED)
-    if enc and (enc / 'encode_test.json').exists():
-        E = json.loads((enc / 'encode_test.json').read_text())
-        ty = H - 160
-        label(d, (24, ty), f"Through H.264 (v2 S1 frame panning 30 px/s, 60 fps; texture grain {E['grain_L']} L* sigma {E['grain_sigma_px']} px + mottle "
-              f"{E['mottle_L']} L* sigma {E['mottle_sigma_px']} px): master CRF 14 kbps; texture left after a 3.5 Mbps / 720p 1.5 Mbps re-encode; frame-to-frame |dL*|", 16, bold=True)
+    runs = [e for e in (enc if isinstance(enc, (list, tuple)) else [enc]) if e and (e / 'encode_test.json').exists()]
+    ty = 830
+    if runs:
+        label(d, (24, ty), 'Through H.264 (a v2 S1 frame panning 30 px/s at 60 fps; master x264 CRF 14 slow aq 3, then 3.5 Mbps 1080p and '
+              '1.5 Mbps 720p): master bitrate; texture kept after the re-encodes; frame-to-frame |dL*|; check_banding', 16, bold=True)
+        ty += 28
+    for e in runs:
+        E = json.loads((e / 'encode_test.json').read_text())
+        label(d, (24, ty), f"texture: grain {E['grain_L']} L* (sigma {E['grain_sigma_px']} px), mottle {E['mottle_L']} L* (sigma {E['mottle_sigma_px']} px)",
+              15, MUTED)
+        ty += 22
         A0 = E['conditions'].get('A_flat', {})
-        for j, (k, c) in enumerate(E['conditions'].items()):
+        for k, c in E['conditions'].items():
             def ret(tag, kind):
                 src = math.sqrt(max(0, c[f'source_{kind}_std'] ** 2 - A0.get(f'source_{kind}_std', 0) ** 2))
                 got = math.sqrt(max(0, c[f'{tag}_{kind}_std'] ** 2 - A0.get(f'{tag}_{kind}_std', 0) ** 2))
@@ -1493,7 +1501,10 @@ def sheet_texture(J, out: Path, frames: Path, enc: Path | None):
                    f"grain kept {ret('p1080', 'hp')} at 1080 / {ret('p720', 'hp')} at 720; mottle kept {ret('p1080', 'lp')} / {ret('p720', 'lp')}; "
                    f"frame-to-frame |dL*| {c['master_temporal_dL']} / {c['p1080_temporal_dL']} / {c['p720_temporal_dL']} (master / 1080 / 720); "
                    f"banding {c.get('p1080_banding', '-')} / {c.get('p720_banding', '-')}")
-            label(d, (24, ty + 28 + 22 * j), txt, 15)
+            label(d, (24, ty), txt, 15)
+            ty += 22
+        ty += 6
+    im = im.crop((0, 0, W, max(ty + 10, 830)))
     save_sheet(im, out)
 
 
@@ -1601,8 +1612,8 @@ def cmd_sheets(a) -> None:
     sheet_maps(J, items, img / 'style_saturation_darks.jpg')
     sheet_patchwork(J, img / 'style_patchwork.jpg', frames)
     sheet_planes_light(J, img / 'style_planes_light.jpg')
-    enc = Path(a.json).parent / 'enc'
-    sheet_texture(J, img / 'style_texture.jpg', frames, enc if enc.exists() else None)
+    encs = [Path(a.json).parent / n for n in ('enc', 'enc_subtle')]
+    sheet_texture(J, img / 'style_texture.jpg', frames, [e for e in encs if e.exists()])
     sheet_sky_water(J, img / 'style_sky_water.jpg', frames)
     sheet_type(J, img / 'style_type.jpg')
 
@@ -1666,6 +1677,7 @@ def main() -> None:
     e.add_argument('--mottle', type=float, default=1.5, help='mottling std (L*) to add')
     e.add_argument('--mottle-px', type=float, default=18, help='mottling scale (sigma, px)')
     e.add_argument('--seconds', type=float, default=2.0)
+    e.add_argument('--only', default='', help='comma list of conditions (A_flat, B_world_grain_mottle, C_screen_grain_mottle, E_boiling_grain, F_world_mottle_only)')
     d = sub.add_parser('dna', help="check palettes (palettes.json format) against the house DNA and never bands")
     d.add_argument('--palettes', required=True)
     a = ap.parse_args()
