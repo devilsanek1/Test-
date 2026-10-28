@@ -117,6 +117,30 @@ const S8Particles: React.FC = () => {
   );
 };
 
+/** The sky's foot at the un-build: the gradient runs to y 800 behind the set; as the set un-builds its foot rises to
+ *  the caption band's (560) over exit e 0 -> 0.35, so the peach horizon behind the far rows never shows as a band over
+ *  S1's frame 0 (what the set uncovers is S1's pale drawing); the rest contracts into SUN0 (S8Sky). */
+const SKY_FOOT = {from: 800, to: 560, e1: 0.35} as const;
+const S8SkyAtExit: React.FC = () => {
+  const e = useExit();
+  const id = 's8sf' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  if (e <= 0) return <S8Sky />;
+  const u = Math.min(1, e / SKY_FOOT.e1);
+  const foot = SKY_FOOT.from - (SKY_FOOT.from - SKY_FOOT.to) * u * u * (3 - 2 * u);
+  return (
+    <>
+      <defs>
+        <clipPath id={id} clipPathUnits="userSpaceOnUse">
+          <rect x={-200} y={-200} width={1480} height={foot + 200} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id})`}>
+        <S8Sky />
+      </g>
+    </>
+  );
+};
+
 const V2S8: React.FC = () => {
   const e = useExit();
   // the World sky is only a backstop under the set (S8Sky draws the sky); at the un-build it goes at once, so S1's
@@ -125,7 +149,7 @@ const V2S8: React.FC = () => {
     <World sky={e > 0 ? 'transparent' : CM.sky} horizon={900}>
       <Lit rig={RIG_CANAL_S8}>
         <CanalCast person={k4Person}>
-          <S8Sky />
+          <S8SkyAtExit />
           <S8Far />
           <S8South />
           <S8Water />
