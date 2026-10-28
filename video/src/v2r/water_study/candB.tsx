@@ -102,18 +102,19 @@ const RAMP_PALE: SkySpec = {...RAMP_SKY, keys: RAMP_SKY.keys.map((k) => ({y: k.y
 /** The water's own colour at a row (what a slice gap shows; a ripple line's base). */
 const waterAt = (y: number) => rampColour(RAMP, y);
 
-/** THE SLICE GRID (R6): rows at 0.32 m of water, projected: 3.4 px at the far edge, 8.7 at y 1200, 16.6 at our feet;
- *  every row's gap (its trough, the ramp showing through) 16 % of its pitch far -> 34 % near. */
+/** THE SLICE GRID (R6): bands at 0.45 m of water, projected (4.7 px at the far edge, 7.6 at y 1150, 12.2 at y 1200,
+ *  18 at y 1250, 23 at our feet): every band's gap (its trough, the ramp showing through) 20 % of its pitch far ->
+ *  32 % near. Few, calm bands: an editorial slice, never a barcode. */
 const ROWS = (() => {
   const out: number[] = [];
   let y = 1056;
-  while (y < 1330) {
+  while (y < 1340) {
     out.push(y);
-    y += Math.max(2.6, pxPerMDeep(CAM, y) * 0.32);
+    y += Math.max(3, pxPerMDeep(CAM, y) * 0.45);
   }
   return out;
 })();
-const GRID = sliceGrid(ROWS, [0.16, 0.34], 1100, 1290);
+const GRID = sliceGrid(ROWS, [0.2, 0.32], 1110, 1290);
 
 /** THE SWAY (R6, R12): +-1.3 px at the far bank -> +-4.2 px at our feet; 4.6 s and 2.9 s, wavelengths 1.5 m and 0.8 m,
  *  the phase travelling toward us (~0.3 m/s). */
@@ -130,6 +131,8 @@ const SRC = {
   bridgeBrick: '#DAA28E',
   bridgeSoffit: '#D0CCD8',
   bridgeStone: '#EEDCCB',
+  farCity: '#D0C0C8',
+  farTower: '#B4B4C4',
   wingBrick: '#CD9985',
   wingStone: '#D5C5BB',
   wingGlass: '#93949F',
@@ -145,6 +148,8 @@ const COL = {
   bridgeBrick: tone3(SRC.bridgeBrick, [0.32, 0.45, 0.6]),
   bridgeSoffit: tone3(SRC.bridgeSoffit, [0.25, 0.4, 0.55]),
   bridgeStone: tone3(SRC.bridgeStone, [0.25, 0.4, 0.55]),
+  farCity: tone3(SRC.farCity, [0.3, 0.42, 0.55]),
+  farTower: tone3(SRC.farTower, [0.3, 0.42, 0.55]),
   wingBrick: tone3(SRC.wingBrick),
   wingStone: tone3(SRC.wingStone, [0.25, 0.4, 0.55]),
   wingGlass: tone3(SRC.wingGlass),
@@ -152,9 +157,9 @@ const COL = {
   lobby: [0, 1, 2].map((i) => reflectTone(SRC.lobby, [0.16, 0.26, 0.36][i], CM.water, {rose: 2, chroma: 0.98})),
   iron: tone3(SRC.iron, [0.3, 0.42, 0.55]),
   hull: tone3(SRC.hull, [0.3, 0.42, 0.55]),
-  sage: tone3(SRC.sage, [0.35, 0.5, 0.62]),
-  oat: tone3(SRC.oat, [0.4, 0.55, 0.65]),
-  herLegs: tone3(SRC.herLegs, [0.45, 0.55, 0.65]),
+  sage: [0.35, 0.5, 0.62].map((k) => reflectTone(SRC.sage, k, CM.water, {toWater: 0.45})),
+  oat: [0.4, 0.55, 0.65].map((k) => reflectTone(SRC.oat, k, CM.water, {toWater: 0.75})),
+  herLegs: tone3(SRC.herLegs, [0.5, 0.6, 0.68]),
   // the hero colour is hers only: her reflection calmed to tier C (C* <= 25)
   herCoat: tone3(SRC.herCoat, [0.55, 0.62, 0.7]).map((c) => {
     const o = okLch(c);
@@ -162,7 +167,7 @@ const COL = {
   }),
 };
 /** A ghost's whole-figure value (its head colour, MAP.S1_ROW: they age by value G1 -> G6) toned. */
-const ghostCol = (hex: string) => tone3(hex, [0.4, 0.5, 0.6]);
+const ghostCol = (hex: string) => tone3(hex, [0.5, 0.6, 0.68]);
 
 /** The quay band (the far coping's face mirrored, in shade): one cool step of the water, between the far towpath's dark
  *  waterline strip and the reflections. */
@@ -170,7 +175,7 @@ const QUAY = waterStep(CM.water, 0.0, 0.85);
 /** Ripple tones (R9): a crest catching the sky (lighter), a trough showing the body (darker). */
 const rippleCol = (y: number, tone: number) => waterStep(waterAt(y), tone > 0 ? 0.035 : -0.045, tone > 0 ? 0.8 : 1.1);
 /** The glitter: the bed (the sun's reflected gold, flat), the slivers' gold and their warm-white cores (never #FFFFFF). */
-const GLIT = {bed: fromOk(0.905, 0.058, 76), gold: fromOk(0.935, 0.07, 82), core: fromOk(0.975, 0.025, 85)};
+const GLIT = {bed: fromOk(0.88, 0.075, 74), gold: fromOk(0.92, 0.09, 80), core: fromOk(0.978, 0.022, 88)};
 
 // ================================================================= S1's sources (what stands over the water), at rest
 
@@ -195,28 +200,33 @@ const bowlSpan = (grow: number) => (y: number): [number, number] | null => {
   return hw > 0.5 ? [BR.arch.cx - hw, BR.arch.cx + hw] : null;
 };
 const bridgeMasses = (): Mass[] => [
-  // the spandrels' brick (one value) down to the string course mirrored (972 -> 1128)
-  {id: 'br/brick', span: rect(BR.x0, BR.x1), y0: 1058, solid: 1112, y1: 2 * BRW - BR.course, colors: COL.bridgeBrick, steps: STEPS, breakup: 0.25, narrow: 0.05},
-  // the voussoir ring (limestone, 11 px) and the arch's bowl (the soffit in shade, seen from below)
-  {id: 'br/ring', span: bowlSpan(11), y0: 1058, solid: 1106, y1: 2 * BRW - (BR.arch.crown - 11), colors: COL.bridgeStone, steps: STEPS, breakup: 0, narrow: 0.05},
-  {id: 'br/bowl', span: bowlSpan(0), y0: 1058, solid: 1104, y1: 2 * BRW - BR.arch.crown, colors: COL.bridgeSoffit, steps: STEPS, breakup: 0, narrow: 0.05},
+  // the spandrels' brick (one value) down to the string course mirrored (972 -> 1128): the far water is a near-perfect
+  // mirror (R2: Fresnel 0.6), so the bridge stays whole
+  {id: 'br/brick', span: rect(BR.x0, BR.x1), y0: 1058, solid: 2 * BRW - BR.course, y1: 2 * BRW - BR.course, colors: COL.bridgeBrick, steps: STEPS},
+  // the voussoir ring (limestone, 11 px) round the arch's bowl (the soffit in shade, seen from below): the arch and its
+  // reflection close into the classic ellipse (the far towpath crosses its middle)
+  {id: 'br/ring', span: bowlSpan(11), y0: 1058, solid: 2 * BRW - (BR.arch.crown - 11), y1: 2 * BRW - (BR.arch.crown - 11), colors: COL.bridgeStone, steps: STEPS},
+  {id: 'br/bowl', span: bowlSpan(0), y0: 1058, solid: 2 * BRW - BR.arch.crown, y1: 2 * BRW - BR.arch.crown, colors: COL.bridgeSoffit, steps: STEPS},
   // the abutment pilaster (a vertical survives)
-  {id: 'br/pil', span: rect(268, 282), y0: 1058, solid: 1110, y1: 2 * BRW - BR.course, colors: COL.bridgeStone, steps: STEPS, breakup: 0, narrow: 0},
-  // the deck and string course (limestone) 958-972 -> 1128-1142: a light band of slices
-  {id: 'br/deck', span: rect(BR.x0, BR.x1), y0: 2 * BRW - BR.course, solid: 2 * BRW - BR.course, y1: 2 * BRW - BR.deck, colors: COL.bridgeStone, steps: STEPS, breakup: 0.3, narrow: 0.04},
+  {id: 'br/pil', span: rect(268, 282), y0: 1058, solid: 2 * BRW - BR.course, y1: 2 * BRW - BR.course, colors: COL.bridgeStone, steps: STEPS},
+  // the deck and string course (limestone) 958-972 -> 1128-1142: one light line
+  {id: 'br/deck', span: rect(BR.x0, BR.x1), y0: 2 * BRW - BR.course - 0.5, solid: 2 * BRW - BR.deck, y1: 2 * BRW - BR.deck, colors: COL.bridgeStone, steps: STEPS},
+  // over the railing: the far city's haze and the calm far tower (x 258-346), breaking up toward our feet
+  {id: 'br/far', span: rect(BR.x0, BR.x1 + 4), y0: 2 * BRW - BR.deck - 0.5, solid: 1152, y1: 1182, colors: COL.farCity, steps: STEPS, breakup: 0.3, narrow: 0.06},
+  {id: 'br/tower', span: rect(258, 346), y0: 2 * BRW - BR.deck - 0.5, solid: 1160, y1: 1190, colors: COL.farTower, steps: STEPS, breakup: 0, narrow: 0.1},
 ];
 
 // ---- Google's wing: its ground storey's lowest ~1.2 m (the facade above y ~1056 mirrored about ~1091), simplified to
 // one brick mass with the light corner pier and the glass slit; the lit lobby is a LIGHT (its column, below)
 const WING_TOP = 1096;
 const wingMasses = (): Mass[] => [
-  {id: 'wing/brick', span: rect(326, 796), y0: WING_TOP, solid: 1150, y1: 1218, colors: COL.wingBrick, steps: STEPS, breakup: 0.6, narrow: 0.14},
-  {id: 'wing/pier', span: rect(330, 351), y0: WING_TOP, solid: 1150, y1: 1206, colors: COL.wingStone, steps: STEPS, breakup: 0, narrow: 0},
-  {id: 'wing/glass', span: rect(392, 428), y0: WING_TOP, solid: 1150, y1: 1206, colors: COL.wingGlass, steps: STEPS, breakup: 0, narrow: 0.08},
+  {id: 'wing/brick', span: rect(326, 796), y0: WING_TOP, solid: 1166, y1: 1222, colors: COL.wingBrick, steps: STEPS, breakup: 0.55, narrow: 0.12},
+  {id: 'wing/pier', span: rect(330, 351), y0: WING_TOP, solid: 1166, y1: 1200, colors: COL.wingStone, steps: STEPS, breakup: 0, narrow: 0},
+  {id: 'wing/glass', span: rect(392, 428), y0: WING_TOP, solid: 1166, y1: 1204, colors: COL.wingGlass, steps: STEPS, breakup: 0, narrow: 0.08},
 ];
 /** The lit lobby through the glass doors (x 540-720, the lobby's gold; R7): a column as wide as the door, through the
  *  whole strip (its mirror spans the water), solid under the far bank, then slices, thinning toward our feet. */
-const LOBBY: Mass = {id: 'lobby', span: rect(544, 716), y0: WING_TOP, solid: 1160, y1: 1252, colors: COL.lobby, steps: STEPS, breakup: 0.32, narrow: 0.12, taper: 4};
+const LOBBY: Mass = {id: 'lobby', span: rect(544, 716), y0: WING_TOP, solid: 1172, y1: 1254, colors: COL.lobby, steps: STEPS, breakup: 0.3, narrow: 0.12, taper: 5};
 
 // ---- verticals: the lamp posts (off, slate iron) and the bollards on the coping (R5: verticals survive)
 const lampMasses = (): Mass[] =>
@@ -302,12 +312,12 @@ const figureMasses = (t: number): Mass[] => {
     if (grow <= 0) return;
     const top = 2 * waterTop(p.x) - p.feetY - 1;
     const legW = p.h * 0.05;
-    const legs = p.h * 0.46 * grow;
+    const legs = p.h * 0.36 * grow;
     const col = m.kind === 'her' ? COL.herLegs : ghostCol(m.headHex ?? '#A9A5B5');
-    out.push({id: `fig/${m.id}`, span: rect(p.x - legW, p.x + legW), y0: top - 30, solid: top + legs * 0.55, y1: top + legs, colors: col, steps: STEPS, breakup: 0, narrow: 0.1, taper: 1.5});
+    out.push({id: `fig/${m.id}`, span: rect(p.x - legW, p.x + legW), y0: top - 30, solid: top + legs * 0.62, y1: top + legs, colors: col, steps: STEPS, breakup: 0, narrow: 0.25, taper: 2});
     if (m.kind === 'her') {
       const cw = p.h * 0.12;
-      out.push({id: `fig/${m.id}/coat`, span: rect(p.x - cw, p.x + cw), y0: top + legs + 1, solid: top + legs + 4, y1: top + legs + p.h * 0.3 * grow, colors: COL.herCoat, steps: STEPS, breakup: 0.2, narrow: 0.2, taper: 3});
+      out.push({id: `fig/${m.id}/coat`, span: rect(p.x - cw, p.x + cw), y0: top + legs, solid: top + legs + 6, y1: top + legs + p.h * 0.26 * grow, colors: COL.herCoat, steps: STEPS, breakup: 0.2, narrow: 0.25, taper: 3});
     }
   });
   return out;
