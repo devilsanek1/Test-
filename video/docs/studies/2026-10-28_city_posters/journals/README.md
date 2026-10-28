@@ -140,6 +140,11 @@ scores but never reaches the candidates.
 - `happens_to`: to (the story changes the place or world) / in (the place is the stage) / none.
 - `conflict` Y/N (two sides, a threat, a dilemma); `everyday` Y/N (a consequence an ordinary person feels: money, home,
   health, commute, safety, weather); `mood`: pos / neg / mixed.
+- `wow`, 0-2 (owner, 2026-10-28: "we need some WOW stories here"; playbook: every pick needs a WOW, a "wait,
+  seriously?" fact or picture): 2: a fact AND a picture that would stop a thumb (something enormous, strange or
+  seemingly impossible happening in a place: tech in a weird place, such as a data centre in a Cold War bunker or a
+  supercomputer in a chapel; a city sinking; a storm turning at the last minute); 1: one surprising fact or picture,
+  not both; 0: expected news (a rate decision, an election result, a quarterly report).
 - `ad_risk` Y/N (a launch, a product or a company's own claim leads); `past_topic` Y/N (a past video's topic: the PHP
   flaw and government sites, the DeepMind contract, laptop and memory-chip prices, AI songs and fake plays);
   `tech_ai` Y/N (tech, AI or AI-adjacent: science, health tech, space, robots, computers, energy).
@@ -170,7 +175,8 @@ scores but never reaches the candidates.
 | A new museum by a famous architect opens | 3 | 2 | 1 | 0 | 1 | **7** | the building is the hero; little changes but the skyline |
 
 ### 4.6 The candidates (top 10)
-Gate pass, fit >= 6, not a past topic, ranked by the owner's own topic order with our fit as "visually appealing":
+Gate pass, fit >= 6, WOW >= 1 (every pick needs a WOW), not a past topic, ranked by the owner's own topic order with
+our fit as "visually appealing" (ties: the higher WOW):
 **owner score = (6 R + 5 T + 4 fit + 3 Mo + 2 F + 1 S) / 21.** Each candidate gets its home place, hero, the far-out
 thing, its telling shape, and the "ad or news?" check (`TOPIC_CRITERIA.md`: heard cold over its first frame, would its
 line sound like a commercial?). A candidate is an idea, not a fact lock.
@@ -186,8 +192,10 @@ line sound like a commercial?). A candidate is an idea, not a fact lock.
   that cannot be re-found is dropped and counted.
 - **Clustering:** the open `news_shape` codes are consolidated into about 8-15 clusters (each with a one-line
   definition; every row in exactly one). Per cluster: size (rows and distinct events), mean fit, mean value, share
-  positive, share with a real place, the top telling shapes, the best examples; and where high-fit stories come from
-  (outlet, section, stratum). One chart: clusters by mean story value (x) against mean visual fit (y), bubble size =
+  positive, share with a real place, the share with WOW 2, the top telling shapes, the best examples; and where
+  high-fit stories come from (outlet, section, stratum). Two slices the owner named, reported whatever the clusters
+  are: **tech in the cities** (tech or AI happening in a real place: `tech_ai` Y and W >= 2; the owner's possible
+  umbrella) and **data centres** (every data-centre story, with its place and WOW). One chart: clusters by mean story value (x) against mean visual fit (y), bubble size =
   rows, readable on a phone.
 - **Files (this folder):** `README.md` (this), `corpus.csv`, `scores.csv` (the first scorer, every row),
   `scores_blind.csv` (the second scorer, the sample), `blind_sample_ids.txt`, `clusters.csv` (id -> cluster),
@@ -195,4 +203,14 @@ line sound like a commercial?). A candidate is an idea, not a fact lock.
   for the owner). Tools: `video/scripts/look/posters/journals.py` (merge, sample, agreement, stats).
 
 ## 6. Reliability result and changes after collection
-(Appended after the blind check.)
+- **2026-10-28 ~22:55 UTC, collecting, before any scoring:** the `wow` tag (4.4) and the WOW >= 1 condition for the
+  candidates (4.6), and the two slices (section 5), from the owner's notes in the content thread (~22:38-22:50 UTC:
+  "we need some WOW stories here"; tech in the cities as one possible direction; data centres in weird places: "those
+  are interesting ones"; the playbook, "Places on screen"). The scoring formulas are unchanged.
+- **The feeds:** the orchestrator reported (~22:30 UTC) that the owner opened the network and that the outlets' RSS
+  feeds (The Economist, TIME, Forbes, The Atlantic, The Guardian, the NYT, the WSJ, Wired, The New Yorker, the FT) and
+  Google News answer in its environment. From this session they do not: the fetch tool cannot reach economist.com, and
+  news.google.com does not resolve (the session's network settings), and a curl check of the feeds was refused by this
+  session's permission check. So the corpus stays search-based from the 11 reachable outlets; a session that can read
+  the feeds can add the blocked outlets later with this same rubric (rows marked by source).
+- (The blind check's result is appended here.)
