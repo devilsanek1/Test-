@@ -1,10 +1,7 @@
 [
   {"s":0.12,"e":2.0,"lines":[{"text":"She quit Google.","s":0.12}],"highlights":[{"text":"quit","s":0.52}]},
-  {"s":2.0,"e":2.36,"lines":[{"text":"And she says","s":2.0}],"highlights":[]},
-  {"s":2.36,"e":3.2,"lines":[{"text":"her contract","s":2.36}],"highlights":[]},
-  {"s":3.2,"e":3.8,"lines":[{"text":"bans her from","s":3.2}],"highlights":[]},
-  {"s":3.8,"e":4.79,"lines":[{"text":"criticizing it…","s":3.8}],"highlights":[]},
-  {"s":4.79,"e":6.28,"lines":[{"text":"for life.","s":4.79}],"highlights":[]},
+  {"s":2.0,"e":4.79,"lines":[{"text":"And she says her contract","s":2.0},{"text":"bans her from criticizing it…","s":3.2}],"highlights":[{"text":"criticizing","s":3.8}]},
+  {"s":4.79,"e":5.88,"lines":[{"text":"for life.","s":4.79}],"highlights":[{"text":"for life","s":4.79}],"out":5.88},
   {"s":6.28,"e":8.44,"lines":[{"text":"You'd think that's","s":6.28},{"text":"one odd contract.","s":6.92}],"highlights":[{"text":"odd","s":7.18}]},
   {"s":8.44,"e":10.1,"lines":[{"text":"But Google's staff","s":8.44},{"text":"told the BBC","s":9.24}],"highlights":[{"text":"staff","s":8.96}]},
   {"s":10.1,"e":11.57,"lines":[{"text":"they're scared","s":10.1},{"text":"to speak out,","s":10.68}],"highlights":[{"text":"scared","s":10.36}]},

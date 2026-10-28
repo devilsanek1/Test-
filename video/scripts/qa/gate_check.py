@@ -7,13 +7,10 @@ before G6, instead of review agents). Generic: any entry / composition + its MP4
       [--entry src/entry-v3-film.tsx --comp Film3] [--fps 60] [--only SQD] [--seam-comp Film3Seams] \
       [--frame0 "AI is making your|next laptop pricier." --frame0-until 3.37] [--frame0-geom JSON] [--density] [--json report.json]
 
-  v2r (src/v2r/film/Film2R.tsx: FILM2R_FRAME0's numbers):
+  v2r (no frame-0 block since REVIEW_1 MUST 1, as v3: frame 0 shows the first spoken page):
   python3 -I scripts/qa/gate_check.py --mp4 out/v2r.mp4 --scenes src/v2r/film/scenes.json \
-      --captions src/v2r/film/captions.json --voice public/v2/voice.wav \
-      --frame0 "SHE SAYS: NO CRITICIZING|GOOGLE. FOR LIFE." --frame0-until 5.95 \
-      --frame0-geom '{"size":72,"baselines":[372,452],"captionBaseline":516,"captionScale":0.5306,"spoken":"first",
-                      "keys":["SAYS:","NO","NO CRITICIZING","FOR LIFE."],"source":"Source: BBC News, 21 Oct 2026",
-                      "sourceSize":20,"sourceBaseline":550}'
+      --captions src/v2r/film/captions.json --voice public/v2/voice.wav --entry src/entry-v2r-film.tsx --comp Film2R
+  (--frame0 / --frame0-geom stay for a film that still draws a frame0 block.)
 
 Checks (FAIL = exit 1; WARN never fails):
   fps        the video stream is --fps (default 60); with --entry/--comp also the composition's own fps and length
@@ -28,8 +25,8 @@ Checks (FAIL = exit 1; WARN never fails):
              (lib/Film.tsx), always on (v1's wipes S07 / S10 get the new verdicts too): cut / matchcut /
              camera-continuous / none = one hard cut at the start c (an `unbuild` transitionIn is not modelled: it is
              expected as a cut, though Film's un-build ends on the incoming scene with none);
-             push-through WITH a `bridge` colour = two cuts, into the flat bridge at c - 0.05 and out of it at
-             c + 0.05 (Film's PT_HOLD 0.1 s; the bridge itself is drawn by the film, e.g. Film2R's Bridges: lib/Film
+             push-through WITH a `bridge` colour = two cuts, into the flat bridge at c - hold/2 and out of it at
+             c + hold/2 (the join's own `hold`, else Film's PT_HOLD 0.1 s; the bridge itself is drawn by the film, e.g. Film2R's Bridges: lib/Film
              culls it), cut-like frames on its zoom legs (c - hold/2 - (dur - hold) * 0.45 ..
              c + hold/2 + (dur - hold) * 0.55, +-1 frame) are expected (not listed as extra); a window colour-matched
              to the bridge moves the visible out-cut one frame later (a WARN); the generic peak rule needs short legs
@@ -402,7 +399,7 @@ def transition_model(scenes: list[dict], fps: float) -> tuple[list, list, list, 
             seams.append((f"{sid} (seam {c:.2f} s)", fr(c)))
         elif typ == "push-through":
             # Film.tsx pushThrough: the zoom-in leg (d - hold) * 0.45 before the bridge, the pull-back 0.55 after it
-            h = hold if tr.get("bridge") else 0.0
+            h = float(tr.get("hold", hold)) if tr.get("bridge") else 0.0  # Film.tsx pushThroughHold
             if h:
                 expect += [(f"{sid} (into the push-through bridge)", fr(c - h / 2), "bridge"), (f"{sid} (out of the push-through bridge)", fr(c + h / 2), "bridge")]
             else:

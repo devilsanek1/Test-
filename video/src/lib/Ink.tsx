@@ -168,6 +168,9 @@ export type InkProps = {
   /** Clean pen: the closed fill this outline bounds (same coordinates). The outline is drawn INSIDE it at 2x width
    *  (clipped to it), so the silhouette is the fill's own clean edge and no line overhangs (CRAFT §c, the subject). */
   inside?: string;
+  /** OPT-IN pen tip (v2r's frame-0 draw-on, REVIEW_1 MUST 2): while a stroke draws on, a solid disc in the line's own
+   *  colour rides its head, radius = `tip` x the drawn width (no glow, no blur). Default off: nothing changes. */
+  tip?: number;
 };
 
 type Seg = {i: number; a: number; b: number; w: number};
@@ -195,6 +198,7 @@ export const Ink: React.FC<InkProps> = ({
   graphic,
   tone,
   inside,
+  tip,
 }) => {
   const t = useTime();
   const e = useExit();
@@ -246,7 +250,7 @@ export const Ink: React.FC<InkProps> = ({
     }
   }
   if (clipTo) {
-    const body = <InkStrokes {...{d, at, t, dur, ease, width, ks, jit, vary, color, order, pace, opacity, seed, dIn, exit, e, sync, taper, open, dash, cap, join, style, clean}} />;
+    const body = <InkStrokes {...{d, at, t, dur, ease, width, ks, jit, vary, color, order, pace, opacity, seed, dIn, exit, e, sync, taper, open, dash, cap, join, style, clean, tip}} />;
     return (
       <>
         <defs>
@@ -258,7 +262,7 @@ export const Ink: React.FC<InkProps> = ({
       </>
     );
   }
-  return <InkStrokes {...{d, at, t, dur, ease, width, ks, jit, vary, color, order, pace, opacity, seed, dIn, exit, e, sync, taper, open, dash, cap, join, style, clean}} />;
+  return <InkStrokes {...{d, at, t, dur, ease, width, ks, jit, vary, color, order, pace, opacity, seed, dIn, exit, e, sync, taper, open, dash, cap, join, style, clean, tip}} />;
 };
 
 type InkStrokesProps = {
@@ -287,10 +291,11 @@ type InkStrokesProps = {
   join: 'round' | 'miter' | 'bevel';
   style?: React.CSSProperties;
   clean: boolean;
+  tip?: number;
 };
 
 /** The strokes of one <Ink> (draw-on, taper tiers, open contours, un-build), after the pen has set its look. */
-const InkStrokes: React.FC<InkStrokesProps> = ({d, dIn, at, t, dur, ease, width, ks, jit, vary, color, order, pace, opacity, seed, exit, e, sync, taper, open, dash, cap, join, style, clean}) => {
+const InkStrokes: React.FC<InkStrokesProps> = ({d, dIn, at, t, dur, ease, width, ks, jit, vary, color, order, pace, opacity, seed, exit, e, sync, taper, open, dash, cap, join, style, clean, tip}) => {
   // un-build: retract after the fills (recipe), or WITH its group's fills inside an <ExitSync> (a figure in a crowd)
   const retract = sync ? exitInkSyncProgress(e, sync.jitter) : exitInkProgress(e, jit);
   const w = width * ks * (1 + (jit * 2 - 1) * vary);
@@ -381,6 +386,19 @@ const InkStrokes: React.FC<InkStrokesProps> = ({d, dIn, at, t, dur, ease, width,
         {...common}
       />,
     );
+  }
+  // the opt-in pen tip: a disc on the head of every stroke still drawing on (never during the un-build)
+  if (tip && at !== undefined && r <= 0) {
+    for (let i = 0; i < n; i++) {
+      const L = P.lens[i];
+      if (drawn[i] <= 0 || drawn[i] >= 1 || L <= 0.5) continue;
+      try {
+        const h = getPointAtLength(P.subs[i], drawn[i] * L);
+        out.push(<circle key={`tip${i}`} cx={h.x} cy={h.y} r={w * tip} fill={color} opacity={opacity} style={style} />);
+      } catch {
+        // an unmeasurable piece draws no tip
+      }
+    }
   }
   return <>{out}</>;
 };

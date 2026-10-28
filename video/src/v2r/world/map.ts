@@ -544,27 +544,18 @@ export const S1_CLOCK = {
   dive: {t0: 5.95, t1: 6.25}, // the A push-through into W; in 5.80-6.40 nothing enters, pops or turns but the dive
 } as const;
 
-/** S1 frame-0 words (mirror of TREATMENT section 4; K8's Frame0Text renders them). All inside y 317-556. */
+/** S1 frame-0 words. REVIEW_1 MUST 1 (playbook "Hook and pacing": no title over the captions): the frame-0 block is
+ *  RETIRED. Frame 0 shows the first spoken page at the house size; the core line is the cover's text and the source
+ *  line is the post's (docs/v2/POSTING_KIT.md). The S1 pages (captions_pages.txt): */
 export const FRAME0_TEXT = {
-  lines: ['SHE SAYS: NO CRITICIZING', 'GOOGLE. FOR LIFE.'],
-  linePx: 72,
-  baselines: [372, 452],
-  source: 'Source: BBC News, 21 Oct 2026',
-  sourcePx: 20,
-  sourceBaseline: 550,
-  /** The ONLY spoken page under the block, 0.12-1.88: "She [quit] Google." */
-  spokenPage: {text: 'She [quit] Google.', s: 0.12, e: 1.88, px: 52, baseline: 516},
-  /** The peach box walks the block's own words, one at a time, ~0.06 s before each audible onset. */
-  keys: [
-    {t: 2.06, text: 'SAYS'},
-    {t: 3.14, text: 'NO'},
-    {t: 3.74, text: 'NO CRITICIZING'},
-    {t: 4.77, text: 'FOR LIFE'},
-  ],
-  until: 5.95,
+  /** 0.12-2.00, at the house size from frame 0. */
+  spokenPage: {text: 'She [quit] Google.', s: 0.12, e: 2.0},
+  /** 2.00-4.79 (line 2 on "bans" 3.20) and 4.79-5.88 ("for life." leaves the band as the dive into W starts). */
+  pages: ['And she says her contract / bans her from [criticizing] it…', '[for life].'],
+  out: 5.88,
   /** S2's first page pops at 6.28 (the band stays empty through the dive). */
   nextPageAt: 6.28,
-  /** The loop: the frame-0 words (no box) pop back at captionAt. */
+  /** The loop: page 1 pops back at captionAt, as at frame 0. */
   loopCaptionAt: 39.04,
 } as const;
 

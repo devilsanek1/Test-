@@ -6,15 +6,16 @@
 //   scenes/        one file per shot, src/v2r/scenes/V2S<n>.tsx (lanes replace the placeholders; index.ts registers them)
 //   audio          the voice public/v2/voice.wav; sound cues from public/v2r/cues.json once the sound lane writes it
 //                  ({"sfx": [{src, t, gain}], "audio"?: "v2r/mix.wav"}: `audio` replaces the voice, e.g. the final mix)
-//   frame 0        TREATMENT section 4: the block SHE SAYS: NO CRITICIZING / GOOGLE. FOR LIFE. + its source line, the
-//                  box walking the block's own words on timed keys, only the first spoken page under it, until 5.95
+//   frame 0        NO title over the captions (REVIEW_1 MUST 1; playbook "Hook and pacing": no `frame0` block, as
+//                  Film3): frame 0 shows the first spoken page, "She [quit] Google.", at the house size; the core line
+//                  is the cover's text and the source goes to the post (docs/v2/POSTING_KIT.md)
 //   credits        TREATMENT section 8: the engine draws only the S8 caption-band source line (33.16-36.54); every
 //                  other credit lives on an object in its shot (boards, tag, plates, news box: the lanes')
 //   draftLabel     ON for review renders ("V2R · <shot> · <m:ss.ss>"), OFF for the final (--props='{"draftLabel":false}')
 // Compositions: src/entry-v2r-film.tsx (Film2R, Film2RShot {id}, Film2R-<ID>, Film2RBare).
 import React, {useEffect, useState} from 'react';
 import {AbsoluteFill, cancelRender, continueRender, delayRender, getStaticFiles, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
-import {Film, filmDuration, type FilmScene, type FilmSfx, type Frame0Text} from '../../lib/Film';
+import {Film, filmDuration, pushThroughHold, type FilmScene, type FilmSfx} from '../../lib/Film';
 import {CAPCHECK_COLORS, capcheckMode, type CaptionBeat} from '../../lib/Captions';
 import {captionFontStack, useCaptionFont} from '../../lib/font';
 import {skyCaption, world} from '../../lib/theme';
@@ -39,31 +40,15 @@ export const film2rSeconds = filmDuration(film2rScenes);
 /** Frames at 60 fps: ceil(seconds * fps), the same rounding as Film's loop seam (2345). */
 export const film2rFrames = (from = 0, to = film2rSeconds) => Math.max(1, Math.ceil((to - from) * FILM2R_FPS - 1e-6));
 
-/** Frame 0 (TREATMENT section 4): ONE tier of words in the caption band on the flat mint, the source line under it.
- *  The only spoken page under the block is "She [quit] Google." (52 px, baseline 516); from ~1.9 s the box walks the
- *  block's own words (landing ~0.06 s before each audible onset) and holds FOR LIFE through the cover to 5.95, when
- *  block and source pop out together as the dive starts. At the loop roll (captionAt 39.04) the words pop back, no box. */
-export const FILM2R_FRAME0: Frame0Text = {
-  lines: ['SHE SAYS: NO CRITICIZING', 'GOOGLE. FOR LIFE.'],
-  size: 72,
-  baselines: [372, 452],
-  until: 5.95,
-  source: SOURCE_BBC,
-  sourceSize: 20,
-  sourceBaseline: 550,
-  keys: [
-    {t: 2.06, text: 'SAYS:'},
-    {t: 3.14, text: 'NO'},
-    {t: 3.74, text: 'NO CRITICIZING'},
-    {t: 4.77, text: 'FOR LIFE.'},
-  ],
-  spoken: 'first',
-  captionBaseline: 516,
-  captionScale: 52 / skyCaption.size,
-};
+/** No frame-0 title over the captions (REVIEW_1 MUST 1; owner, 2026-10-28: "Why are we having this out of order
+ *  weirdly?"): the words follow the voice. Frame 0 shows the first spoken page, "She [quit] Google.", at the house
+ *  size; "And she says her contract / bans her from criticizing it…" pops at 2.00 and "for life." at 4.79 (it leaves
+ *  the band at 5.88, as the dive into W starts: captions_pages.txt `@out`). At the loop roll (captionAt 39.04) page 1
+ *  pops back, as at frame 0. The core line is the cover's text; the S1 source line went to the post (POSTING_KIT.md). */
 
-/** Engine-drawn credits (film seconds), small ink lines under the captions. TREATMENT section 8: S1's source rides
- *  the frame-0 block (FILM2R_FRAME0.source); S8's sits under the caption 33.16-36.54, then moves onto her board (L6). */
+/** Engine-drawn credits (film seconds), small ink lines under the captions. TREATMENT section 8: S1's source line is
+ *  gone from the band (REVIEW_1 MUST 1: the post caption and the pinned comment carry it); S8's sits under the caption
+ *  33.16-36.54, then moves onto her board (L6). */
 export type Film2RCredit = {from: number; to: number; text: string; baseline?: number; size?: number};
 export const FILM2R_CREDITS: Film2RCredit[] = [{from: 33.16, to: 36.54, text: SOURCE_BBC, baseline: 552, size: 20}];
 
@@ -124,19 +109,21 @@ const Credits: React.FC<{offset: number}> = ({offset}) => {
   );
 };
 
-/** The push-through's flat bridge colour (V2S1 -> V2S2: plum, 6.05-6.15). lib/Film computes the hold (0.1 s, its
- *  PT_HOLD) but culls the outgoing scene at c - hold / 2 before it pushes the bridge overlay, so the bridge never
- *  draws (no other film uses a bridge yet); Film2R draws it here, above everything, for the hold's frames. Full film
- *  only (a one-shot preview has no outgoing scene). The bridge ends exactly where Film shows the incoming scene
- *  (c + hold / 2, same expression, no epsilon), so no frame draws neither. */
-const PT_HOLD = 0.1;
+/** The push-through's flat bridge colour (V2S1 -> V2S2 and V2S3 -> V2S4: plum, 3 frames). lib/Film computes the hold
+ *  (the join's own `hold`, 0.05 s here since REVIEW_1 MUST 5, else its PT_HOLD 0.1: pushThroughHold) but culls the
+ *  outgoing scene at c - hold / 2 before it pushes the bridge overlay, so the bridge never draws (no other film uses a
+ *  bridge yet); Film2R draws it here, above everything, for the hold's frames. Full film only (a one-shot preview has
+ *  no outgoing scene). The bridge ends exactly where Film shows the incoming scene (c + hold / 2, same expression, no
+ *  epsilon), so no frame draws neither. */
 const Bridges: React.FC = () => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const T = frame / fps;
   for (const s of film2rScenes) {
     const tin = s.transitionIn;
-    if (tin?.type === 'push-through' && tin.bridge && T >= s.start - PT_HOLD / 2 - 1e-6 && T < s.start + PT_HOLD / 2) return <AbsoluteFill style={{background: tin.bridge}} />;
+    if (tin?.type !== 'push-through' || !tin.bridge) continue;
+    const hold = pushThroughHold(tin);
+    if (T >= s.start - hold / 2 - 1e-6 && T < s.start + hold / 2) return <AbsoluteFill style={{background: tin.bridge}} />;
   }
   return null;
 };
@@ -151,7 +138,6 @@ const useCommon = (draftLabel: boolean): Common => {
     audioSrc: cues.audio ?? FILM2R_VOICE,
     sfx: cues.sfx,
     captionMotion: 'pop',
-    frame0: FILM2R_FRAME0,
     draftLabel: draftLabel ? FILM2R_LABEL : undefined,
     edges: false,
   };
@@ -185,7 +171,7 @@ export const Film2RShot: React.FC<{id: string; draftLabel?: boolean}> = ({id, dr
   );
 };
 
-/** Sound-off cold reads: the picture and the voice only (no captions, frame-0 words, credits or label). */
+/** Sound-off cold reads: the picture and the voice only (no captions, credits or label). */
 export const Film2RBare: React.FC = () => {
   const cues = useCues();
   return (
