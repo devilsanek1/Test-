@@ -109,11 +109,27 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   before the owner sees it; lanes may take a second critic round when a must-fix remains; a full whole-film review panel (cold viewer, art,
   flow/motion, fairness, sound) and a G6 polish pass on the hook and the key beats before the master.
 
+- 2026-10-28 ~00:35 UTC, asked about the scout's parallax-float proposal: "switch it on if you think it will make the videos better and
+  improve engagement" -> ON (orchestrator's call: depth in motion without more movers): playbook rule, DIRECTION rule 8,
+  COZY_AND_SCALE 3b.5; a parallax helper in lib/depth.ts (L1 builds it with S1, the lanes reuse it).
+- 2026-10-28, on the G4 look clip v4 (`deliverables/v2/v2r_G4_look_v4.mp4`: depth, one gentle sky, particles, the parallax float, the art
+  director's fixes): "Okay I think this is better now the hook video" -> v4 APPROVED as the look; L2-L6 resume from
+  `lanes/RESUME_2026-10-28.md`.
+- 2026-10-28 ~08:00 UTC: "Continue. Tho I don't see any changes in the particles anywhere, you mentioned some leaves previously no?"
+  -> verified: at phone size v4's particles are invisible (13 px leaf, 14-24 px glints, 3-4 px motes); new numbers in CRAFT §f.6 (leaves
+  26-40 px, glints 20-36 px x 4-6, motes 6-10 px) + lib/particles presets; S1 gets a particles pass (look clip v5); lanes inherit.
+- 2026-10-28 ~08:55 UTC, on the G4 look clip v5 (`deliverables/v2/v2r_G4_look_v5.mp4`: leaves 34-40 px blown across the water and the
+  quay, 4-6 glints in the sun's path, near motes on the bay tree): "I don't like the water too much, leafs are great, but let's keep it and
+  keep going" -> v5 is the look; the leaves are the proven particle (playbook: the depth rule's evidence); the water stays as it is for this
+  film (every lane keeps S1's water, no new water styling) and is a known weak spot: playbook "water gets its own study in the next film's
+  G4"; if the budget allows at G6 polish, one water pass across all shots, shown to the owner first.
+- 2026-10-28 ~09:05 UTC, asked what bothers them about the water: "It's just looking way too cheap, not clean or premium quality or
+  refined. Just lazy and cheap. I mean that about the water" -> the water is redesigned NOW as one shared premium component (researched,
+  two competing treatments judged on S1, the winner built into the library), shown to the owner on S1 as the G4 look clip v6 before the
+  lanes swap it in; the lanes keep going meanwhile (their water isolated in one component, no water polish); the final review round
+  shrinks to pay for it inside 100 % of the week.
+
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
   the caption and the pinned comment as text plus a URL people can copy; links in captions aren't clickable; a
   link-in-bio sources page later. Waiting for the owner's yes to make it a default.
-- 2026-10-28 ~00:35 UTC, asked about the scout's parallax-float proposal: "switch it on if you think it will make the videos better and
-  improve engagement" -> ON (orchestrator's call: depth in motion without more movers): playbook rule, DIRECTION rule 8,
-  COZY_AND_SCALE 3b.5; a parallax helper in lib/depth.ts (L1 builds it with S1, the lanes reuse it).
-

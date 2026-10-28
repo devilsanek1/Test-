@@ -4,7 +4,8 @@
 //   Horizon y 750 (sky 39 % of the frame). The END sun (1058.5, 646) r 60.2, cut by the right edge, top 585.8 (>= 575):
 //   with it the far plane sits 12 px LOWER at the start than at the end, so the binding limit for the bank and obelisk
 //   tops is the END frame itself (610); an END y of 610 lands at 611 at the start (V2S5_qa prints the mapping).
-//   Pieces: V2S5_far_sky (TopClouds, HeroBank, AprilBands, SunS5), V2S5_far_city (FarHills, FarCityS5, ObeliskS5),
+//   The sky itself is V2S5's screen-space <Sky spec={S5_SKY}> (world/skies; no flat bands). Pieces: V2S5_far_sky
+//   (HeroBank, SunS5), V2S5_far_city (FarHills, FarCityS5, ObeliskS5),
 //   tones in V2S5_far_tones.
 // S5FarLife (screen space, given p) draws the sky's movers THROUGH the far plane's own map (farMat below = the rig's
 // FAR_S5 exactly), so they ride the camera like the world they fly in: gulls wheeling over the far city (one flock in
@@ -19,7 +20,7 @@ import {CRANE_T, planeMat, type PullPlane} from '../kit/dc/crane';
 import {mix} from '../kit/dc/core';
 import {CM} from '../palette';
 import type {Pt} from '../../lib/sketch';
-import {HeroBank, AprilBands, SunS5, SUN_END} from './V2S5_far_sky';
+import {HeroBank, SunS5, SUN_END} from './V2S5_far_sky';
 import {TimeShift} from '../../lib/time';
 import {cloudD} from '../kit/dc/core';
 import {S6Clouds} from './V2S6_life';
@@ -86,7 +87,6 @@ const S5TopGutter: React.FC = () => {
 
 export const S5Far: React.FC = () => (
   <>
-    <AprilBands x0={CITY.x0} x1={CITY.x1} horizon={FAR_END.horizon} />
     <S5TopGutter />
     <SunS5 />
     <HeroBank />
@@ -114,8 +114,9 @@ const GULLS: {c: Pt; r: Pt; n: number; span: number; seed: number}[] = [
 
 /** The two V's of the hold (END coords): enter left of the frame at ~75 % of the move (t0), fly right and a little up. */
 const VS: {t0: number; from: Pt; v: number; rise: number; span: number; n: number; ink: number; glider: number}[] = [
-  {t0: 1.9, from: [150, 694], v: 242, rise: -9, span: 38, n: 7, ink: 0.18, glider: 3},
-  {t0: 2.08, from: [80, 652], v: 205, rise: -6, span: 27, n: 5, ink: 0.42, glider: -1},
+  // SEEN at phone size (the owner on v4; CRAFT §f.6): at 360 px wide the near V is a 15 px mark, a mid tone over the sky
+  {t0: 1.9, from: [150, 694], v: 242, rise: -9, span: 46, n: 7, ink: 0.3, glider: 3},
+  {t0: 2.08, from: [80, 652], v: 205, rise: -6, span: 34, n: 5, ink: 0.46, glider: -1},
 ];
 
 /** A far flock low over the city (the smallest step of the birds' size ladder: V 38 / far V 27 / gulls 13 / this 8 px),
@@ -155,7 +156,7 @@ export const S5FarLife: React.FC<{p: number}> = ({p}) => {
       const w = V.span * (1 - rank * 0.07);
       d += birdD(x, y, w, (t * 3.6 + i * 0.19) % 1, i === V.glider);
     }
-    vs.push({d, ink: V.ink, w: V.span > 34 ? 2.6 : 2.1});
+    vs.push({d, ink: V.ink, w: V.span > 40 ? 3.4 : 2.8});
   }
   return (
     <XG m={farMat(p)}>

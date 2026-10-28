@@ -69,51 +69,41 @@ export const RAIL = (() => {
   return {d, top, base, coping: dpt(0, d, 0.88)[1], plinth: dpt(0, d, 0.16)[1], pxm: pxmD(d)};
 })();
 
-// ---------------------------------------------------------------- tones (plane 0: full ink; shadows are colour)
+// ---------------------------------------------------------------- tones (tier C: calm; shadows are the light layers')
 
-const sh = (c: string, k: number) => mix(c, CM.shadeWarm, k);
 export const DT = {
   ink: CM.ink,
-  // the floor: sun and the canopy's shade (2 values, the shade warm-dark, hue turned to plum) + the deepest shade
+  // the border band's stone and the paving (the floor's own calm colours: V2S5_deck_floor FLOOR)
   lit: CM.paving,
-  litHi: mix(CM.paving, CM.paper, 0.32),
-  litWarm: mix(CM.paving, CM.brickLight, 0.16),
-  litCool: mix(CM.paving, CM.limestone, 0.6),
-  shade: mix(sh(CM.paving, 0.68), CM.brickDeep, 0.25),
-  shadeHi: mix(sh(CM.paving, 0.58), CM.brickDeep, 0.16),
-  shadeLo: mix(sh(CM.paving, 0.8), CM.brickDeep, 0.2),
-  shadeCool: mix(sh(CM.paving, 0.7), CM.stoneShade, 0.22),
-  deep: mix(sh(CM.paving, 0.9), CM.anchor, 0.15),
-  under: mix(CM.shadeWarm, CM.anchor, 0.35),
-  jointLit: mix(CM.paving, CM.line, 0.5),
-  jointShade: mix(sh(CM.paving, 0.96), CM.anchor, 0.12),
-  // the border band (limestone slabs along the balustrade) and the brick header course
-  band: CM.limestone,
-  bandShade: mix(sh(CM.limestone, 0.62), CM.brickDeep, 0.08),
-  header: CM.brickDeep,
-  headerShade: mix(CM.brickDeep, CM.shadeWarm, 0.35),
-  brickSett: mix(CM.brick, CM.paving, 0.3),
-  brickSettShade: mix(CM.brick, CM.shadeWarm, 0.4),
-  brickSettLight: mix(CM.brick, CM.paving, 0.45),
-  // stone (balustrade, planters, the fountain): lit from beyond (the right / the tops), faces toward us in shade
+  // stone (balustrade, planters, the fountain): lit from beyond (the tops), faces toward us a warm step down
   stone: CM.limestone,
   stoneLit: CM.paper,
-  stoneMid: mix(CM.limestone, CM.stoneShade, 0.45),
+  stoneMid: mix(CM.limestone, CM.shadeWarm, 0.16),
   stoneShade: CM.stoneShade,
   stoneDeep: mix(CM.stoneShade, CM.shadeWarm, 0.32),
-  // wood, iron
+  // wood, iron (painted iron in a calm mid plum, L* 52: the approved look's furniture legs are light, never a row of
+  // near-black strokes; tier C)
   wood: CM.brick,
   woodLit: mix(CM.brick, CM.brickLight, 0.55),
   woodShade: CM.brickDeep,
-  iron: CM.anchor,
-  ironLit: mix(CM.anchor, CM.coatPlum, 0.55),
-  // planting
-  soil: mix(CM.brickDeep, CM.anchor, 0.42),
+  iron: mix(CM.shadeWarm, CM.stoneShade, 0.2),
+  ironLit: mix(CM.shadeWarm, CM.stoneShade, 0.5),
+  // planting (the soil a mid earth: it never shows as a dark sliver)
+  soil: mix(CM.brickDeep, CM.sage, 0.5),
   leaf: CM.sage,
   leafWarm: mix(CM.sage, CM.shadeWarm, 0.18),
   leafShade: mix(CM.sage, CM.anchor, 0.18),
   leafDeep: mix(CM.sage, CM.anchor, 0.3),
-  tulips: [CM.brick, CM.blossom, CM.coatMustard, CM.paper, CM.coatPlum, mix(CM.blossom, CM.brick, 0.45)] as string[],
+  // tulips in calm drifts (close to the leaves' values: no white sparks)
+  tulipRose: mix(CM.blossom, CM.brickLight, 0.35),
+  tulipCream: mix(CM.coatOat, CM.blossom, 0.25),
+  tulipGold: mix(CM.coatMustard, CM.paper, 0.35),
+  tulipCoral: mix(CM.brickLight, CM.blossom, 0.35),
+  // the planter crabapple's crown (a mid mauve mass, blossom close in value)
+  crown: mix(CM.shadeWarm, CM.blossom, 0.12),
+  crownMid: mix(CM.shadeWarm, CM.blossom, 0.5),
+  crownLit: mix(CM.blossom, CM.brickLight, 0.12),
+  crownFlower: mix(CM.blossom, CM.shadeWarm, 0.1),
   petal: CM.blossom,
   petalShade: mix(CM.blossom, CM.shadeWarm, 0.3),
   petalLit: mix(CM.blossom, CM.paper, 0.4),

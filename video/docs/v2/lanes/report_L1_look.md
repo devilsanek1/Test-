@@ -8,6 +8,76 @@ and the plum.
 Commits: 14ac5f5 ... 0b7f2a3 (the conform and the pre-critic clip); c8a9aed, 66aa2af and the last L1 commit (the fixes
 after the critic and after the cold viewer, then this clip).
 
+## v5: particles SEEN at phone size (the owner on v4, 2026-10-28)
+**The clip:** `video/deliverables/v2/v2r_G4_look_v5.mp4`, the master encode (as v4), 3.9 MB. Re-rendered in place with
+the near motes (CRAFT §f.6, 3ee6853: motes sized by distance); the owner had not seen the first v5.
+**The sheet:** `video/deliverables/v2/v2r_G4_look_v5_sheet.jpg` (0.4 scale, every 0.25 s).
+**The phone test:** `video/deliverables/v2/v2r_G4_look_v5_phone.jpg` (`scripts/qa/particles_phone.py`):
+- three of the master's frames (2.5, 3.8 and 5.0 s) at 360 px wide, as a phone shows them;
+- under them, the same three with every particle ringed, from `particlesAt` plus the float.
+
+**What the owner said:** "I don't see any changes in the particles anywhere, you mentioned some leaves previously no?"
+At phone size, v4's 13 px leaf, 14-24 px glints and 3-4 px motes were invisible.
+
+**lib/particles: shared, so every lane inherits it (CRAFT §f.6).** Commit 797568a; the near motes in this build.
+- **The presets:**
+
+  | kind | size | contrast | count | how they move |
+  |---|---|---|---|---|
+  | motes | sized by distance: 6-10 px far; 12-16 px on screen in front of the subject plane (`nearSize`) | +15 L* | 8 (cap 10) | slow drift, 3-8 px/s plus a 2.5 px/s rise (near ones too) |
+  | dust | 5-8 px | +12 L* | | |
+  | leaves | 26-40 px | | 2 (cap 3) | a 24-44 px flutter; half tumble, the rest turn visibly |
+  | glints | 20-36 px four-point sparkles | +20 L* | 6 at once | twinkle 0.3-0.8 s; flattened toward the horizon, shortened only x0.78-1.15 |
+
+- **Motes sized by distance:** a motes field nearer than the subject plane (`plane < 0`) takes the preset's
+  `nearSize` (12-16 px on screen) instead of the 1.5x-per-plane scale, and keeps unit speed. Its `size` override is
+  then on-screen px too.
+- **Contrast limits per kind** (`LIFT_MAX`): motes 20, glints 25, leaves 30, dust and birds 15; tier B adds 5. The old
+  flat limit of 15 would have washed the leaves' rust toward the paving.
+- **New options:**
+  - `births` places leaves on a hold;
+  - `leaf: 'palmate'` gives the plane leaf's five lobes (at 360 px an almond reads as a seed);
+  - `nearSize` (a preset field: motes have it).
+- **New lint checks in `particleProblems`:**
+  - a phone-size floor on screen, by plane: motes 6 px, or 12 px in front of the subject plane (`SEEN_MIN.near`,
+    `seenSizeMin`); dust 5, leaves 26 and glints 20 px; motes +12, glints +15 L*. The lint sizes each field the way the
+    drawing does (`resolve`), and checks the top speed the same way;
+  - a birth outside [t0, t1] or inside a join's window;
+  - at most 16 alive.
+- **`src/lib/DEPTH.md`:** the new numbers, plus the lessons (near motes read where far ones are specks; keep their
+  region on the shade only; pick the seed by tracing it).
+
+**S1** (`V2S1_particles.tsx`: one exported field list that the scene, the lint and the phone test all read):
+
+| field | what | where and when |
+|---|---|---|
+| leaves | three palmate plane leaves, 34-40 px, rust and gold, fluttering and turning | blown in from the plane tree off-frame left (born 1.2, 2.5, 3.8 s; enter ~2.0, 2.8, 4.1 s), ~115 px/s across and ~40 px/s down: across the water and our landing toward the middle (x 0 → 460, y 1150-1340), below the row, clear of Pip; 1 in view from 2.0 s, 2 from 2.8, 3 from 4.1 |
+| glints | six sparkles, 26-36 px, +20 to +24 L* (L* ~99 on the gold water) | the glitter path under the sun (x 116-276, y 1110-1166): 4-6 at once, 5.0 on average |
+| motes, far | four motes, 8-10 px, +16 to +20 L* | two against the far tower's shaded column, two in front of the backlit far fronts under the roofline (the sun is behind them); from 0.3 s |
+| motes, near | three motes, 12-16 px, +17 L* over the crown's shade (L* ~70: the motes are ~87) | in front of the bay tree's crown, lower left: its shaded right lobe (x 174-282, y 1384-1460), on the near ground's float; 2-3 in view from 1.8 s, drifting 3-8 px/s. The crown's lit lobe (+9) and the stone round it (0) would hide them, so they stay off both |
+
+At most 16 alive (the cap): 4 far motes, 3 near, 6 glints, 3 leaves. Nothing is born before 0.3 s or enters in
+5.80-6.40, and nothing crosses the caption band, her, the row or Pip.
+
+**The phone test, read honestly**
+- **Leaves:** they read at 360 px as small rust and gold leaves crossing the landing, the only things moving there.
+- **Glints:** they read as white sparkles under the sun.
+- **Near motes:** yes, I can point at them in the top row without hunting. They are clean pale dots, 4-5 px at 360 px,
+  on the dark side of the bay tree: two clear ones at 2.5 and 3.8 s, one at 5.0 s (the other two are growing in or
+  shrinking out). They sit in the corner, so the eye finds them after her and the leaves, not first. In a still they
+  could pass for blossom; in the clip they grow in, drift and shrink out, so they read as motes.
+- **Far motes:** still specks. I cannot find them in the top row without the rings. There are four now (seven before).
+
+**Checks on the master**
+- `particleProblems` and `floatProblems`: clean (16 alive at most). Typecheck clean.
+- **check_depth:** 0 FAIL, 5 WARN at 5.4 s and at 3.0 s, as before. The wing's west edge is 13.9 / 13.7, her
+  21.9 / 20.8, the copies' row 8.2, G1-G2 9.9.
+- **check_banding at 3.0 s:** PASS on all five open-sky regions.
+- **check_light A/B:** OK at all three times. The brightest 5 % sits 0.045-0.058 H from the subject, greyed is 39 / 123
+  / 80 px (budget 259), and the caption band stays flat.
+
+---
+
 ## v4: the art director's list on v3, in one pass (2026-10-28)
 **The clip:** `video/deliverables/v2/v2r_G4_look_v4.mp4`, the master encode (PNG frames, BT.709, x264 CRF 14 slow
 aq-mode 3, yuv420p). Frames 0-367 (0.00-6.13 s), 1080x1920, 60 fps, with the current mix, 3.8 MB. It is rendered on

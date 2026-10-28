@@ -1,35 +1,53 @@
-// V2S3_tHer.tsx (lane L3, V2S3 FAR helper): HER French window at MAP.W2_CUT (the window match with S2's W2: same spot,
-// same size on the cut frame), WORLD px at the 12.98 match. The story point of the shot: S2's blinds came down, hers
-// goes UP. Inside: the lamp-lit room (a standard lamp, a shelf, a picture, a rug) and HER full-figure silhouette (plum,
-// phone at her ear) pacing between the two French leaves, which stand OPEN inward (her window is open); the Juliet
-// rail in front; her long window box below (Pip's seat at its right end, the plants flinch when it lands at 13.10).
-//   12.98  the blind is 35 % down and rolling up; fully up by ~13.08 (a small spring, settled by ~13.16)
-//   13.12-14.56  she walks LEFT across the room (feet honest: steps = distance / step length), then stands at the left
-//          end x 292 through 14.86, so Pip's exit leap (14.70, up-left) passes her for as few frames as possible
-//   14.28  her free hand moves (talking)
-import React, {useMemo} from 'react';
-import {CM} from '../palette';
+// V2S3_tHer.tsx (lane L3, V2S3 STORY part): HER French window at MAP.W2_CUT = M (the B match with S2's dark office
+// window: same spot, same size), WORLD px at the 12.98 match: the thread, TIER A with her silhouette.
+// The window is S8's design (L6's S8Window in V2S8_house.tsx, roomInto / wFrontInto, scaled to M's 132.5 x 164.3; conform
+// §4): the teal frame band, the closed leaves meeting on a teal stile, the transom at 62 %, the lamp-lit room (a
+// LitWindow pane, the lamp's wash on the back wall, the blind rolled UP from the first frame: "lit, blind up", nothing
+// moves at the cut), the standard lamp's gold shade, two shelves of books, a plant, the Juliet rail. ONE deliberate
+// change: in S8 the meeting stile runs the full height and would cross her head at the push-through point (330, 742),
+// so here it runs from the transom to the bottom only and the glazing above the transom is one undivided fanlight,
+// where her head sits (the lane asks L6 to make S8's window the same).
+// Her silhouette (plum, phone at her ear, 140 px, feet on the room's floor y 862) stands between the room and the
+// front (the transom, the stile and the Juliet rail in front of her body), clipped to the pane:
+//   13.12-14.56  she walks LEFT across the room (feet honest: steps = distance / step length on the 12/s clock), then
+//                stands still at x 331.5 (her head centred on x 330: the push-through's point (330, 742) is inside it)
+//   14.28        her free hand moves (talking)
+// Tier A: the frame and her silhouette carry the shot's only full outline (INK_PX.mid, in their own deep shade: the
+// clean pen draws it 3.0 px); the brightest 5 % of the frame is her pane; her plum silhouette is the darkest, clearest
+// shape. Light: her room's light spills out over the Juliet rail, the window box and the wall below (+4 L*, warm:
+// a flat screen lift that keeps what it lands on, two steps for its soft edge).
+import React, {useId, useMemo} from 'react';
+import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
 import {ExitSync} from '../../lib/exit';
+import {Tier} from '../../lib/tier';
+import {LitWindow, PoolLift, mixHex} from '../../lib/light';
 import {Paint} from '../kit/canal/core';
 import {HER, Person, strideFor, drawn} from '../kit/cast';
 import * as MAP from '../world/map';
-import {S3_BEATS, S3_HER, S3_PIP} from './V2S3_rig';
-import {Batch, TK, boxInto, line, rectInk, ovalPath, domePath, lobes, leafPath, rng, P, r1} from './V2S3_tParts';
+import {S3_BEATS, S3_HER} from './V2S3_rig';
+import {Batch, line, ovalPath, domePath, lobes, leafPath, rng, P} from './V2S3_tParts';
 
 const F = MAP.W2_CUT;
 const X0 = F.x - F.w / 2; // 268.75
 const X1 = F.x + F.w / 2; // 401.25
 const Y0 = F.y - F.h / 2; // 702.85
 const Y1 = F.y + F.h / 2; // 867.15
-/** The open leaves' free edges (an inward-open leaf seen from outside: a narrow strip at each jamb). */
-const LEAF_L = X0 + 13;
-const LEAF_R = X1 - 13;
-const FRAME = 7;
+/** S8's frame band (TerraceRow's 7 % of the width). */
+const WFR = F.w * 0.07;
+/** The transom, 62 % down (S8): above it the undivided fanlight, below it the closed leaves on their meeting stile. */
+const TRANSOM = Y0 + F.h * 0.62;
+/** The pane as a rect [x, y, w, h] (the LitWindow; check_light's --subject box adds the frame band). */
+export const HER_PANE: [number, number, number, number] = [X0, Y0, F.w, F.h];
+/** Her lit pane: a lamp gold half way to the lamp's core (L* ~89, inside LitWindow's 85-92): the brightest field in
+ *  the frame (the neighbours' lit panes are the plain lamp gold, L* 85), the lamp's wash (the core, L* 92) on it. */
+const PANE_LIT = mixHex(CM.lamp, CM.lampCore, 0.5);
+/** Her window box under the sill (map S3.windowBox). */
+const BOX = MAP.S3.windowBox;
 
 // ---------------------------------------------------------------- her pacing (film seconds)
 
-const WALK = {t0: 13.12, t1: 14.56, from: 362, to: 302} as const;
+const WALK = {t0: 13.12, t1: 14.56, from: 362, to: S3_HER.stillX} as const;
 const STEP_PX = 30;
 const STRIDE = strideFor(STEP_PX, S3_HER.h, 'profile');
 const smooth = (k: number) => {
@@ -55,224 +73,155 @@ const HerSilhouette: React.FC = () => {
   const x = herX(t);
   return (
     <ExitSync seed="fig/s3her">
-      <Person
-        x={x}
-        y={S3_HER.y}
-        h={S3_HER.h}
-        exact
-        seed="s3herWin"
-        traits={HER}
-        model={{...HER, coat: CM.anchor, mono: CM.anchor, tote: undefined, vent: false}}
-        pose="phoneEar"
-        gesture={gestureAt(t)}
-        view="profile"
-        step={moving ? step : undefined}
-        stride={STRIDE}
-        ink={0}
-        exactFill
-        noSync
-      />
+      <Tier tier="subject" tone={CM.anchor}>
+        <Person
+          x={x}
+          y={S3_HER.y}
+          h={S3_HER.h}
+          exact
+          seed="s3herWin"
+          traits={HER}
+          model={{...HER, coat: CM.anchor, mono: CM.anchor, tote: undefined, vent: false}}
+          pose="phoneEar"
+          gesture={gestureAt(t)}
+          view="profile"
+          step={moving ? step : undefined}
+          stride={STRIDE}
+          ink={INK_PX.mid}
+          exactFill
+          noSync
+        />
+      </Tier>
     </ExitSync>
   );
 };
 
-// ---------------------------------------------------------------- the room behind her (static)
+// ---------------------------------------------------------------- the room behind her (S8's roomInto, lit, at M)
 
 function roomBatch(): Batch {
   const b = new Batch();
-  const w = X1 - X0;
-  // the lamp-lit walls: the brightest field in the frame; the ceiling and the far corners a step warmer
-  b.rect(CM.lampCore, X0, Y0, w, Y1 - Y0);
-  b.layer();
-  b.rect(CM.lamp, X0, Y0, w, 10);
-  b.poly(CM.lamp, [[X0, Y0], [X0 + 30, Y0 + 10], [X0 + 30, 840], [X0, 846]]);
-  b.layer();
-  // a dado rail, the floor and a rug
-  b.rect(CM.box, X0, 840, w, 3);
-  b.rect(CM.lamp, X0, 843, w, Y1 - 843);
-  b.rect(CM.box, 300, 852, 78, 9);
-  b.rect(CM.blossom, 306, 854, 66, 3);
-  // a picture high on the back wall (above her head) and a small mirror
-  b.rect(CM.line, 300, 707, 30, 12);
-  b.rect(CM.sage, 302.5, 709.5, 25, 7);
-  b.rect(CM.line, 344, 709, 14, 10);
-  b.rect(CM.paper, 346, 711, 10, 6);
-  // the standard lamp at the right (she passes in front of it)
-  b.rect(CM.line, 368, 760, 2.2, 96);
-  b.fill(CM.line, ovalPath(369, 857, 9, 2.6));
-  b.poly(CM.box, [[357, 760], [381, 760], [376, 742], [362, 742]]);
-  b.rect(CM.paper, 360, 760, 18, 3);
-  // a tall plant in a pot on the floor at the right (partly behind the open leaf)
-  b.poly(CM.leafRust, [[380, 846], [396, 846], [393, 860], [383, 860]]);
-  for (let k = 0; k < 9; k++) b.fill(CM.sage, leafPath(388 + Math.sin(k * 2.1) * 7, 842 - k * 7, 12, 4.4, k % 2 ? 30 : 150));
-  // a low shelf with books at the left, a trailing plant on it
-  b.rect(CM.line, X0 + 2, 790, 40, 3);
-  let bx = X0 + 4;
-  const r = rng('herBooks');
-  while (bx < X0 + 40) {
-    const bw = r.range(3, 5.5);
-    const bh = r.range(9, 15);
-    b.rect(r.pick([CM.brick, CM.coatMustard, CM.sage, CM.paneUnlit, CM.blossom, CM.coatPlum]), bx, 790 - bh, bw, bh);
-    bx += bw + r.range(0.5, 1.6);
+  const fx = X0;
+  const fy = Y0;
+  // the lamp's wash on the back wall (the pane itself is the LitWindow under this batch)
+  b.rect(CM.lampCore, fx + F.w * 0.18, fy + F.h * 0.12, F.w * 0.64, F.h * 0.46);
+  // the blind rolled UP at the head of the opening
+  b.rect(CM.coatOat, fx, fy, F.w, F.h * 0.06);
+  // two shelves of books (right), the standard lamp's gold shade on its stand (left), a plant on the floor (left)
+  for (let s2 = 0; s2 < 2; s2++) {
+    const sy = fy + F.h * (0.3 + s2 * 0.18);
+    b.rect(CM.line, fx + F.w * 0.55, sy, F.w * 0.4, F.h * 0.02);
+    for (let bk = 0; bk < 5; bk++) b.rect([CM.brick, CM.coatMustard, CM.sage, CM.paneUnlit, CM.box][(bk + s2) % 5], fx + F.w * (0.57 + bk * 0.075), sy - F.h * 0.08, F.w * 0.055, F.h * 0.08);
   }
-  for (let k = 0; k < 6; k++) b.fill(CM.sage, leafPath(X0 + 30 + k * 1.5, 796 + k * 6, 7, 3, 80 + k * 6));
+  b.fill(CM.coatMustard, domePath(fx + F.w * 0.2, fy + F.h * 0.32, F.w * 0.09, F.h * 0.06));
+  b.rect(CM.anchor, fx + F.w * 0.195, fy + F.h * 0.32, Math.max(1.5, F.w * 0.015), F.h * 0.6);
+  b.fill(CM.sage, lobes(fx + F.w * 0.02, fx + F.w * 0.3, fy + F.h, F.h * 0.3, 's8w/herplant', 3));
   return b;
 }
 
-// ---------------------------------------------------------------- the frame, the open leaves, the Juliet rail (static)
-
-function frameBatch(): Batch {
+/** The frame band round the opening (S8's, TerraceRow's teal), behind the room's glass. */
+function frameBandBatch(): Batch {
   const b = new Batch();
-  const hero = CM.hero;
-  // the open leaves: a narrow trapezoid at each jamb (the far edge a little shorter: it recedes into the room)
-  const leaf = (xh: number, xf: number, seed: string) => {
-    const dy = 6;
-    b.poly(hero, [[xh, Y0], [xf, Y0 + dy], [xf, Y1 - dy], [xh, Y1]]);
-    const inset = (k: number) => [xh + (xf - xh) * k, Y0 + dy * k] as [number, number];
-    // three glass panes per leaf: the glass catches the sky (mint) and a pale streak
-    const panes = [[0.06, 0.3], [0.36, 0.62], [0.68, 0.94]];
-    for (const [a, c] of panes) {
-      const ya = Y0 + (Y1 - Y0) * a;
-      const yc = Y0 + (Y1 - Y0) * c;
-      const k0 = 0.2;
-      const k1 = 0.82;
-      const p0 = inset(k0)[0];
-      const p1 = inset(k1)[0];
-      const sl = (x: number) => ((x - xh) / (xf - xh)) * dy;
-      b.poly(CM.glass, [[p0, ya + sl(p0)], [p1, ya + sl(p1)], [p1, yc - sl(p1)], [p0, yc - sl(p0)]]);
-      b.poly(CM.sky, [[p0, ya + sl(p0) + 4], [p1, ya + sl(p1) + 14], [p1, ya + sl(p1) + 20], [p0, ya + sl(p0) + 10]]);
-    }
-    void seed;
-  };
-  leaf(X0, LEAF_L, 'L');
-  leaf(X1, LEAF_R, 'R');
-  // the outer frame (teal: hers), its threshold
-  b.rect(hero, X0 - FRAME, Y0 - FRAME, F.w + FRAME * 2, FRAME);
-  b.rect(hero, X0 - FRAME, Y0 - FRAME, FRAME, F.h + FRAME);
-  b.rect(hero, X1, Y0 - FRAME, FRAME, F.h + FRAME);
-  b.rect(hero, X0 - FRAME, Y1 - 3, F.w + FRAME * 2, 5);
-  b.layer();
-  // the Juliet rail (plum iron): top rail, bottom rail, balusters, a band of rings
-  const top = 806;
-  const bot = Y1 + 1;
-  b.rect(CM.anchor, X0 - 12, top - 2, F.w + 24, 4);
-  b.rect(CM.anchor, X0 - 10, bot - 3, F.w + 20, 3);
-  b.rect(CM.anchor, X0 - 10, top + 14, F.w + 20, 2);
-  for (let x = X0 - 8; x <= X1 + 8; x += 10.6) b.rect(CM.anchor, x - 0.8, top, 1.6, bot - top);
-  b.fill(CM.anchor, ovalPath(X0 - 12, top - 1, 3.6, 3.6));
-  b.fill(CM.anchor, ovalPath(X1 + 12, top - 1, 3.6, 3.6));
-  let rings = '';
-  for (let x = X0 - 3; x < X1 + 4; x += 10.6) rings += `M${P(x + 5.3, top + 3)}A${r1(4.2)} ${r1(4.6)} 0 1 0 ${P(x + 5.31, top + 3)}`;
-  b.ink(rings, 1.1, CM.anchor);
-  b.layer();
-  // ink: the frame (her line is the strongest on the terrace), the leaves' edges, the rail
-  b.ink(rectInk(X0 - FRAME, Y0 - FRAME, F.w + FRAME * 2, F.h + FRAME, {seed: 'herFrame', over: 'small', open: 0.15}), TK.her);
-  b.ink(line(LEAF_L, Y0 + 6, LEAF_L, Y1 - 6, {seed: 'leafL', over: 'none'}) + line(LEAF_R, Y0 + 6, LEAF_R, Y1 - 6, {seed: 'leafR', over: 'none'}), TK.detail);
-  b.ink(line(X0 - 14, top - 1, X1 + 14, top - 1, {seed: 'jrail', over: 'small'}), TK.detail);
+  b.rect(CM.hero, X0 - WFR, Y0 - WFR, F.w + 2 * WFR, F.h + WFR);
   return b;
 }
 
-// ---------------------------------------------------------------- the blind (rolling UP) and the box
-
-/** The blind's bottom edge at film t: 35 % down at the match, up by ~13.08 with a small spring. */
-export const blindBottom = (t: number): number => {
-  const up = Y0 + 9;
-  const start = Y0 + F.h * 0.35;
-  const t0 = 12.98;
-  const dur = 0.1;
-  if (t <= t0) return start;
-  const k = (t - t0) / dur;
-  if (k < 1) return start + (up - 4 - start) * (1 - Math.pow(1 - k, 1.8));
-  // overshoot 4 px past the roller, then settle (a damped spring, still by ~13.16)
-  const d = t - (t0 + dur);
-  return up - 4 * Math.exp(-d * 18) * Math.cos(d * 32);
-};
-
-function blindInto(b: Batch, t: number) {
-  const yb = blindBottom(t);
-  // the roller box over the head of the opening, then the fabric and its bottom bar with a pull ring
-  if (yb > Y0 + 6) {
-    b.rect(CM.coatOat, X0, Y0, F.w, yb - Y0);
-    b.rect(CM.stoneShade, X0, yb - 3, F.w, 3);
-    b.rect(CM.line, X0 + 2, yb, F.w - 4, 3.4);
-    b.rect(CM.line, F.x - 0.7, yb + 3, 1.4, 9);
-    b.fill(CM.line, ovalPath(F.x, yb + 13.5, 2.6, 2.6));
-  }
-  b.rect(CM.coatOat, X0 - 2, Y0 - 1, F.w + 4, 9);
-  b.rect(CM.stoneShade, X0 - 2, Y0 + 6, F.w + 4, 2);
+/** The front (S8's wFrontInto at M): the transom, the meeting stile FROM THE TRANSOM DOWN (the fanlight above is one
+ *  undivided pane: the dive into her head never lands on a bar), the bottom rail, the Juliet rail over her; the frame's
+ *  outline at INK_PX.mid (tier A: one closed line in the frame's own deep shade). */
+function frontBatch(): Batch {
+  const b = new Batch();
+  const fx = X0;
+  const fy = Y0;
+  b.rect(CM.hero, fx + F.w * 0.48, TRANSOM, F.w * 0.04, fy + F.h - TRANSOM);
+  b.rect(CM.hero, fx, TRANSOM, F.w, F.w * 0.035);
+  b.rect(CM.hero, fx - WFR, fy + F.h - F.w * 0.02, F.w + 2 * WFR, F.w * 0.07);
+  const ry = fy + F.h * 0.6;
+  b.rect(CM.anchor, fx - F.w * 0.1, ry, F.w * 1.2, Math.max(2, F.w * 0.025));
+  for (let bx = fx - F.w * 0.08; bx <= fx + F.w * 1.08; bx += F.w * 0.09) b.rect(CM.anchor, bx, ry, Math.max(1.2, F.w * 0.012), fy + F.h - ry);
+  const x0 = fx - WFR;
+  const x1 = fx + F.w + WFR;
+  const y0 = fy - WFR;
+  const y1 = fy + F.h + F.w * 0.05;
+  b.ink(`M${P(x0, y0)}L${P(x1, y0)}L${P(x1, y1)}L${P(x0, y1)}Z`, INK_PX.mid);
+  void line;
+  return b;
 }
 
-function herBoxInto(b: Batch, t: number) {
-  const box = MAP.S3.windowBox;
-  const seat = MAP.S3.pipSeat.x;
+// ---------------------------------------------------------------- her window box (the terrace's, under the sill)
+
+/** The window box under her window: a painted trough with two calm masses of planting and a few flower clusters (no
+ *  stems, dots or specks next to the subject: CRAFT §c), trailing ivy as a few hanging leaves. */
+function herBoxBatch(): Batch {
+  const b = new Batch();
+  const top = BOX.y0 + 1;
   const r = rng('herBoxPlants');
-  // the plants flinch when Pip lands on the box's right end (13.10): a damped shake, strongest near the seat
-  const d = t - S3_BEATS.pipLand;
-  const shake = (x: number) => (d > 0 && d < 0.8 ? 6 * Math.sin(d * 30) * Math.exp(-d * 6) * Math.max(0.15, 1 - Math.abs(x - seat) / 160) : 0);
-  const sway = (x: number) => Math.sin(t * 1.7 + x * 0.05) * 0.8 + shake(x);
-  const top = box.y0 + 1;
-  // geraniums at the west end: stems, rounded leaves, rust-red and pink flower heads
-  for (let i = 0; i < 6; i++) {
-    const x = box.x0 + 12 + i * 12 + r.jitter(3);
-    const hh = r.range(22, 36);
-    const sx = sway(x);
-    b.ink(`M${P(x, top)}Q${P(x + 2 + sx * 0.5, top - hh * 0.5)} ${P(x + sx, top - hh)}`, 1.6, CM.sage);
-    b.fill(CM.sage, ovalPath(x - 5 + sx * 0.4, top - hh * 0.4, 6.5, 5.2));
-    b.fill(r.pick([CM.leafRust, CM.blossom, CM.leafRust, CM.box]), ovalPath(x + sx, top - hh - 2, 6.2, 5.4));
-    b.fill(CM.paper, ovalPath(x + sx - 1.6, top - hh - 3.4, 1.4, 1.2));
-  }
-  // lavender, rosemary and white daisies in the middle
-  for (let i = 0; i < 10; i++) {
-    const x = box.x0 + 88 + i * 8.5 + r.jitter(2);
-    const hh = r.range(16, 30);
-    const sx = sway(x);
-    b.ink(`M${P(x, top)}L${P(x + sx, top - hh)}`, 1.2, CM.sage);
-    if (i % 2 === 0) for (let k = 0; k < 4; k++) b.fill(CM.coatPlum, ovalPath(x + sx * (1 - k * 0.15), top - hh + k * 3.2, 1.8, 1.6));
-    else b.fill(CM.paper, ovalPath(x + sx, top - hh, 3.2, 2.8));
-  }
-  b.fill(CM.sage, lobes(box.x0 + 82, box.x0 + 172, top + 1, 14, 'herBoxMid', 5));
-  // low thyme and sedum mounds round Pip's seat (it sits among them)
-  b.fill(CM.sage, lobes(box.x0 + 168, box.x1 - 4, top + 1, 9, 'herBoxLow', 6));
-  b.fill(CM.leafGold, lobes(seat - 30 + shake(seat) * 0.6, seat - 6 + shake(seat) * 0.6, top + 1, 7, 'herBoxLowB', 2));
-  b.fill(CM.leafGold, lobes(seat + 20 + shake(seat) * 0.6, seat + 46 + shake(seat) * 0.6, top + 1, 6, 'herBoxLowC', 2));
-  for (let i = 0; i < 6; i++) b.fill(CM.blossom, ovalPath(box.x0 + 186 + i * 13 + shake(box.x0 + 186 + i * 13), top - 5 - (i % 2) * 2, 2, 1.8));
+  b.fill(CM.sage, lobes(BOX.x0 + 6, BOX.x0 + 110, top + 1, 26, 'herBoxW', 4));
+  b.fill(CM.sage, lobes(BOX.x0 + 100, BOX.x1 - 6, top + 1, 16, 'herBoxE', 6));
   b.layer();
-  // the trough: painted planks, a front band, two iron brackets, its shade on the string course
-  const hh = box.y1 - box.y0 - 2;
-  b.rect(CM.line, box.x0, box.y0, box.x1 - box.x0, hh);
-  b.rect(CM.brickDeep, box.x0, box.y0, box.x1 - box.x0, 4);
-  b.rect(CM.shadeWarm, box.x0 + 2, box.y0 + hh, box.x1 - box.x0 - 4, 4);
-  b.rect(CM.anchor, box.x0 + 16, box.y1 - 2, 5, 12);
-  b.rect(CM.anchor, box.x1 - 22, box.y1 - 2, 5, 12);
-  // ivy trailing over the lip
-  for (let i = 0; i < 9; i++) {
-    const tx = box.x0 + 14 + i * 29 + r.jitter(6);
-    const L = r.range(12, 30);
-    for (let k = 0; k < 4; k++) b.fill(k === 3 && i % 3 === 0 ? CM.leafGold : CM.sage, leafPath(tx + Math.sin(k * 1.3) * 3 + shake(tx) * 0.5, box.y0 + 6 + (L * (k + 1)) / 4, 6.4, 2.8, 90 + r.jitter(35)));
+  for (const [x, y, c] of [[BOX.x0 + 22, top - 18, CM.leafRust], [BOX.x0 + 52, top - 22, CM.blossom], [BOX.x0 + 84, top - 16, CM.leafRust], [BOX.x0 + 150, top - 10, CM.blossom], [BOX.x0 + 214, top - 9, CM.box]] as [number, number, string][]) {
+    b.fill(c, ovalPath(x, y, 7, 6));
   }
-  b.ink(line(box.x0, box.y0 + 1, box.x1, box.y0 + 1.5, {seed: 'boxTop', over: 'small'}) + line(box.x0 + 2, box.y0 + 16, box.x1 - 2, box.y0 + 16.4, {seed: 'boxMid', over: 'none'}) + line(box.x0, box.y0, box.x0, box.y1 - 2, {seed: 'boxL', over: 'small'}), TK.detail);
-  void S3_PIP;
+  b.layer();
+  const hh = BOX.y1 - BOX.y0 - 2;
+  b.rect(CM.line, BOX.x0, BOX.y0, BOX.x1 - BOX.x0, hh);
+  b.rect(CM.anchor, BOX.x0 + 16, BOX.y1 - 2, 5, 12);
+  b.rect(CM.anchor, BOX.x1 - 22, BOX.y1 - 2, 5, 12);
+  for (let i = 0; i < 5; i++) {
+    const tx = BOX.x0 + 24 + i * 52 + r.jitter(6);
+    b.fill(CM.sage, leafPath(tx, BOX.y0 + 14 + r.range(4, 10), r.range(14, 22), 5, 90 + r.jitter(20)));
+  }
+  return b;
 }
+
+// ---------------------------------------------------------------- the spill (her room's light, outside)
+
+/** Her room's light spilling out from the sill onto the Juliet rail's foot and the window box's planting under it
+ *  (CRAFT §d.7: a trapezoid widening ~1.25x, +4 L*, warm): a flat SCREEN lift (it keeps the plants and the trough it
+ *  lands on; an opaque spill would paint them out). It stops at the box's front: the wall below is vertical and the
+ *  room's light does not fall on it. Never over the lit pane or her (lit panes stay unlit: CRAFT §d.9). */
+const SPILL = {top: Y1 - 1, bottom: Y1 + 19, w0: F.w + 2 * WFR, widen: 1.25} as const;
+const spillD = () => {
+  const cx = F.x;
+  const w1 = SPILL.w0 * SPILL.widen;
+  return `M${P(cx - SPILL.w0 / 2, SPILL.top)}L${P(cx + SPILL.w0 / 2, SPILL.top)}L${P(cx + w1 / 2, SPILL.bottom)}L${P(cx - w1 / 2, SPILL.bottom)}Z`;
+};
+/** The screen colour of the step (~+4 L* on the box's sage and trough, warm). */
+const SPILL_LIFT = '#33200C';
+
+const HerSpill: React.FC = () => <PoolLift d={spillD()} pool={false} color={SPILL_LIFT} c={[F.x, Y1 + 12]} />;
 
 // ---------------------------------------------------------------- the component
 
 export const S3Her: React.FC = () => {
-  const t = useTime();
   const room = useMemo(roomBatch, []);
-  const frame = useMemo(frameBatch, []);
-  const blind = new Batch();
-  blindInto(blind, t);
-  const box = new Batch();
-  herBoxInto(box, t);
+  const band = useMemo(frameBandBatch, []);
+  const front = useMemo(frontBatch, []);
+  const box = useMemo(herBoxBatch, []);
+  const clip = 's3pane' + useId().replace(/[^a-zA-Z0-9]/g, '');
   return (
     <>
-      <Paint b={room} seed="s3her/room" misreg={false} />
-      <HerSilhouette />
-      <Paint b={blind} seed="s3her/blind" misreg={false} />
-      <Paint b={frame} seed="s3her/frame" />
-      <Paint b={box} seed="s3her/box" />
+      <Tier tier="subject" tone={CM.hero}>
+        <Paint b={band} seed="s3her/band" misreg={false} />
+        <LitWindow rect={HER_PANE} color={PANE_LIT} offColor={PANE_LIT} />
+        <Paint b={room} seed="s3her/room" misreg={false} />
+      </Tier>
+      <defs>
+        <clipPath id={clip} clipPathUnits="userSpaceOnUse">
+          <rect x={X0} y={Y0} width={F.w} height={F.h} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${clip})`}>
+        <HerSilhouette />
+      </g>
+      <Tier tier="subject" tone={CM.hero}>
+        <Paint b={front} seed="s3her/front" misreg={false} />
+      </Tier>
+      <Tier tier="environment">
+        <Paint b={box} seed="s3her/box" misreg={false} />
+      </Tier>
+      <HerSpill />
     </>
   );
 };
 
-export {X0 as HER_X0, X1 as HER_X1, Y0 as HER_Y0, Y1 as HER_Y1, domePath, lobes};
+export {X0 as HER_X0, X1 as HER_X1, Y0 as HER_Y0, Y1 as HER_Y1, TRANSOM as HER_TRANSOM};

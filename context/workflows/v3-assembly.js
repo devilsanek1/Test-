@@ -13,6 +13,7 @@ export const meta = {
 
 const V = '/home/user/Test-/video'
 const SCR = '/tmp/claude-0/-home-user-Test-/e0b06496-a313-5ced-bf0f-bc634eb12744/scratchpad/rework/assembly'
+const REP = '/home/user/Test-/video/docs/v3/rework_reports'
 const LANE_REPORTS = (args && args.laneReports) || '(no lane reports passed: read video/docs/v3/rework_reports/*.md)'
 
 const GIT = `GIT: commit after every meaningful step (containers restart; uncommitted work is lost), only your own paths (git add <paths>), message
@@ -39,7 +40,8 @@ ${V}/src/v3/film/kit/. The work list so far: ${V}/docs/v3/rework_reports/OPEN.md
 RENDER: ${V}/scripts/render-media.mjs (read its header: one bundle, --frames=a-b, --scale, --codec=wav, --master). The box has 4 cores and other agents
 render too: --concurrency=2 for full films. QA: ${V}/scripts/qa/gate_check.py (--seam-comp Film3Seams, --density), ${V}/scripts/qa/density.py
 (--cozy), ${V}/scripts/qa/check_light.py, ${V}/scripts/qa/retro_tools/ (story carry/jumps, hierarchy tiers, line/measure.py, light).
-Work under ${SCR}/<your label>/. Look at no more than ~20 images per pass (contact sheets help). If you spawn any subagent, give it effort "max".`
+Work under ${SCR}/<your label>/. HOUSE RULE (limits): write your result into your report file in the repo AS YOU GO (named below) and commit it at
+every step; never only as your final message; your final message repeats the file's text. Look at no more than ~20 images per pass (contact sheets help). If you spawn any subagent, give it effort "max".`
 
 const FINDING = {
   type: 'object',
@@ -67,7 +69,7 @@ const REVIEW = {
 
 // ---------- 1. Integrate ----------
 phase('Integrate')
-const integ = await agent(`${CTX}
+const integ = (args && args.integReport) ? args.integReport : await agent(`${CTX}
 YOU ARE THE INTEGRATOR (the transition agent, G5_BLOCKING §3). Four fix lanes just finished, each on its own files (WINDOW: SQE/SQF/outside/h2_window;
 REVEAL: SQD; HOME: SQB/SQC; SHARED: thread_plane/home_set/PriceTag/captions). Their reports:
 ${LANE_REPORTS}
@@ -83,7 +85,9 @@ ${GIT}
 RETURN (at most 18 lines): the requests applied, the join numbers (carry / eye jump / colour shift per join), the render path and its length in
 frames, the 3 worst spots you saw, and anything still broken.`, { label: 'integrate', phase: 'Integrate', effort: 'max' })
 
-// ---------- 2. Review (two independent reviewers) ----------
+if (!integ) return 'STOPPED: the integrator returned nothing (session limit or error); resume this run once it can work again.'
+
+// ---------- 2. Review (independent reviewers) ----------
 phase('Review')
 const REVIEWERS = [
   { key: 'R1', lens: `STORY, JOINS AND ATTENTION. Watch the film as the owner will, at phone size, with the sound on, then with the sound off. Is it ONE
@@ -108,8 +112,9 @@ The film: ${SCR}/film_full.mp4 (full size, 60 fps, with the voice); sheets ${SCR
 stills or clips from the code where you need them (render-media.mjs --frames, --scale=0.5). Your lens: ${r.lens}
 Judge ONLY against the owner's words and the rules; do not invent new taste. Every finding: the time, the area, the owner words it answers, what you
 measured, and ONE concrete fix with its file and component (and its lane). Rank blockers first, then what the owner sees longest. At most 12 findings;
-only real ones (a perfect sequence gets none). Do NOT edit any repo file.`, { label: `review:${r.key}`, phase: 'Review', effort: 'max', schema: REVIEW })))
+only real ones (a perfect sequence gets none). Edit NO repo file except your report: ${REP}/assembly_review_${r.key}.md (verdict, scores, findings; commit it as you go).`, { label: `review:${r.key}`, phase: 'Review', effort: 'max', schema: REVIEW })))
 
+if (!reviews.some(Boolean)) return `STOPPED after the integrator: every reviewer failed.\n## Integrate\n${integ}`
 const all = reviews.filter(Boolean).flatMap((r) => r.findings || [])
 const LANES = ['home', 'thread', 'window', 'reveal']
 const OWN = {
@@ -134,6 +139,7 @@ ${fmt(g.items)}
 Fix every real one (skip one only if it is wrong: say why, with the evidence), at the approved pilot's bar. Keep what already works: change only what a
 finding names. Re-check each fix with stills at its time (0.5 scale and a 0.25 phone look) and the measure the finding used; npx tsc --noEmit -p video.
 Re-run the seam probe if you touched a join's frames. ${GIT}
+REPORT FILE: ${REP}/assembly_fix_${g.lane}.md.
 RETURN (at most 14 lines): each finding id -> fixed (the number before -> after) / skipped (why); REQUESTS (one exact line each).`, { label: `fix:${g.lane}`, phase: 'Fix', effort: 'max' })))
 let fixReport = groups.map((g, i) => `### ${g.lane}\n${fixes[i] || 'FAILED'}`).join('\n\n')
 
@@ -148,8 +154,9 @@ Do not trust the fix reports: git pull, then render the film again at full size 
 --entry=src/entry-v3-film.tsx --concurrency=2 --crf=18) and check EVERY finding at its time with the measure it used (fixed / not fixed / made worse).
 Then watch the whole film at phone size, sound on, for anything the fixes broke (joins, the loop seam, captions, the thread, a pop, a regression against
 the approved pilot SQA) and for any blocker the reviewers missed. Do NOT edit any repo file. In findings, list ONLY what is still open or newly broken
-(re-use the reviewer's id for a finding that is still open; V-n for new ones), with its lane and one concrete fix; an empty list means the film is clean.`,
+(re-use the reviewer's id for a finding that is still open; V-n for new ones), with its lane and one concrete fix; an empty list means the film is clean. Edit NO repo file except your report: ${REP}/assembly_verify.md (commit it as you go).`,
   { label: 'verify', phase: 'Verify', effort: 'max', schema: REVIEW })
+if (!ver) return `STOPPED before the master: the verifier failed (resume this run).\n## Integrate\n${integ}\n## Fix\n${fixReport}`
 const still = ((ver && ver.findings) || [])
 const open2 = still.filter((f) => f.severity !== 'minor')
 log(`verify: ${still.length} open (${open2.length} blocker/major)`)
@@ -166,6 +173,7 @@ The first round's reports (what was tried):
 ${fixReport}
 Fix each one at its root (a repeat means the first fix missed the cause), at the approved pilot's bar; change only what a finding names. Re-check each
 with stills at its time (0.5 scale and a 0.25 phone look) and its measure; npx tsc --noEmit -p video; the seam probe if you touched a join. ${GIT}
+REPORT FILE: ${REP}/assembly_fix2_${g.lane}.md.
 RETURN (at most 12 lines): each id -> fixed (before -> after) / skipped (why); REQUESTS.`, { label: `fix2:${g.lane}`, phase: 'Fix 2', effort: 'max' })))
   fixReport += '\n\n## Second round (after the verifier)\n' + groups2.map((g, i) => `### ${g.lane}\n${fixes2[i] || 'FAILED'}`).join('\n\n')
 }
@@ -194,6 +202,7 @@ ${verReport}
    duration). ${V}/docs/v3/OWNER_NOTES.md: one line under the rework entry (what the final round fixed; owner's words stay as quoted). HANDOFF.md's v3
    status line: the rework master delivered, awaiting the owner's review. Commit the master, the cover and the docs (git add those paths).
 ${GIT}
+REPORT FILE: ${REP}/assembly_final.md.
 RETURN (at most 16 lines): the master's path, ffprobe facts, LUFS / dBTP, the banding and gate results, the cover frame, each finding fixed or not,
 anything you would still change (ranked).`, { label: 'final', phase: 'Final', effort: 'max' })
 

@@ -30,10 +30,15 @@ import {CanalCast} from '../kit/canal/slots';
 import {k4Person} from '../kit/canal/k4k5';
 import {V2S2Set} from './V2S2_Set';
 import {S2Board, S2Newsagent} from './V2S2_Board';
-import {S2FarLife, S2NearLife} from './V2S2_Life';
+import {S2FarLife, S2Motes} from './V2S2_Life';
 import {staffOverlay} from './V2S2_Staff';
 import {S2BenchPeople} from './V2S2_Bench';
 import {PipS2} from './V2S2_Pip';
+import {Tier} from '../../lib/tier';
+import {Lit} from '../../lib/light';
+import {RIG_CANAL} from '../world/rigs';
+import {Sky} from '../../lib/sky';
+import {S2_EVENING} from '../world/skies';
 import type {ToneKey} from '../../lib/Film';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
@@ -43,56 +48,48 @@ const START = 6.1;
 
 // ---------------------------------------------------------------- the camera (film seconds)
 
-/** The float's far point (px): the world slides left a little while the eye travels down the wall (within +-9 px, so
- *  her window and SW5 stay in the key-read box x >= 120), back to 0 by the end of the push. */
-export const FLOAT_PX = -8;
-/** Float: 0 -> FLOAT_PX over 6.70-8.50 (in-out sine, peak ~7 px/s), then back to 0 by 12.80 (in-out cubic). */
-export const floatDx = (t: number): number => {
-  const a = S2.camera.pullBack.t1;
-  const b = S2.camera.push.t0;
-  if (t <= a) return 0;
-  if (t <= b) return FLOAT_PX * ease.inOutSine(clamp((t - a) / (b - a)));
-  return FLOAT_PX * (1 - ease.inOutCubic(clamp((t - b) / (S2.camera.push.t1 - b))));
-};
-/** The pull out of the push-through: 1.12 -> 1.00 on an out-sine (still settling after the whip, lands at 6.70). */
+/** The pull out of the push-through: 1.12 -> 1.00 about her window M on an out-sine (still settling after the
+ *  transition's whip, lands at 6.70). The 6 % story push is retired (DIRECTION rule 8: no zoom in a hold). */
 export const pullZ = (t: number) => {
   const k = S2.camera.pullBack;
   return k.from + (k.to - k.from) * ease.outSine(clamp((t - k.t0) / (k.t1 - k.t0)));
 };
-export const pushZ = (t: number) => {
-  const k = S2.camera.push;
-  return k.from + (k.to - k.from) * ease.inOutCubic(clamp((t - k.t0) / (k.t1 - k.t0)));
-};
-/** World -> screen at film time t: the push about W2 (outermost), the float, the pull about her window. */
-export const s2Cam = (t: number) =>
-  mat.compose(
-    mat.about(mat.scale(pushZ(t)), S2.camera.push.anchor.x, S2.camera.push.anchor.y),
-    mat.translate(floatDx(t), 0),
-    mat.about(mat.scale(pullZ(t)), S2.camera.pullBack.anchor.x, S2.camera.pullBack.anchor.y),
-  );
+/** World -> screen at film time t: the pull about M. The float is per plane (V2S2_Float S2Plane). */
+export const s2Cam = (t: number) => mat.about(mat.scale(pullZ(t)), S2.camera.pullBack.anchor.x, S2.camera.pullBack.anchor.y);
 
 // ---------------------------------------------------------------- the story windows
 
-/** The pencil ring round her dark window ("one", 6.82): one loose stroke, drawn on in 0.32 s, a 10 % overshoot. */
-const RING_D = (() => {
-  const {x, y} = S2.herDarkWindow;
-  const rx = 79;
-  const ry = 103;
-  const pts: string[] = [];
-  const a0 = -2.2;
-  const span = Math.PI * 2 * 1.1;
-  const n = 64;
-  for (let i = 0; i <= n; i++) {
-    const a = a0 + (span * i) / n;
-    const wob = 1 + 0.025 * Math.sin(a * 3 + 1.3) + 0.03 * (i / n);
-    pts.push(`${(x + Math.cos(a) * rx * wob).toFixed(1)},${(y + Math.sin(a) * ry * wob).toFixed(1)}`);
-  }
-  return `M${pts.join('L')}`;
+/** Her dark window's A outline (6.82 "one"): pops on in ONE frame (DIRECTION rule 8 keeps draw-ons for frame 0), one
+ *  closed line round the pane at M in its stone frame's own deep warm shade (tier subject, tone = the limestone frame:
+ *  the clean pen draws it 3.0 px at the tone's L* -35, the only full outline in the frame). The pane stays the plum
+ *  anchor all shot. */
+const M_RECT = (() => {
+  const {x, y, w, h} = S2.herDarkWindow;
+  const o = 2; // the line sits on the stone frame round the pane, just outside the plum
+  return {x0: x - w / 2 - o, y0: y - h / 2 - o, x1: x + w / 2 + o, y1: y + h / 2 + o};
 })();
+const HER_OUTLINE_D = `M${M_RECT.x0.toFixed(1)} ${M_RECT.y0.toFixed(1)}H${M_RECT.x1.toFixed(1)}V${M_RECT.y1.toFixed(1)}H${M_RECT.x0.toFixed(1)}Z`;
+const HerOutline: React.FC = () => {
+  const t = useTime();
+  if (t < S2.outlineAt) return null;
+  return (
+    <Tier tier="subject" tone={CM.limestone}>
+      <Ink d={HER_OUTLINE_D} width={INK_PX.mid} seed="s2herOutline" />
+    </Tier>
+  );
+};
 
 const storyOverlay = (w: MAP.Spot & {id: string}): React.ReactNode => {
-  if (w.id === 'HER') return <Ink d={RING_D} at={S2.ringAt} dur={0.32} pace="free" width={INK_PX.front} seed="s2ring" />;
+  if (w.id === 'HER') return <HerOutline />;
   return staffOverlay(w);
+};
+
+/** The story panes' tiers (conform_L2 §4): her window is the subject from "one" (6.82); each staff window is promoted
+ *  on its own click of "staff" (8.96 + i 0.04) and stays A through the blinds and "contracts"; before that, support. */
+const storyTierAt = (t: number) => (id: string): 'subject' | 'support' => {
+  if (id === 'HER') return t >= S2.outlineAt ? 'subject' : 'support';
+  const i = S2.staffWindows.findIndex((w) => w.id === id);
+  return i >= 0 && t >= S2.staffOnAt + i * S2.staffOnStagger ? 'subject' : 'support';
 };
 
 // ---------------------------------------------------------------- screen space: the sky and its one cloud
@@ -122,43 +119,64 @@ const S2Cloud: React.FC = () => {
   return <Fill d={d} color={CM.skyHigh} offset={false} seed="s2cloud" />;
 };
 
+/** The sky (lib/sky, world/skies S2_EVENING: one continuous gentle gradient, flat through the caption band, warm toward
+ *  the horizon behind the tiers) in SCREEN space: it never floats or zooms (DIRECTION rules 6, 8). Then the cloud. */
 const ScreenSky: React.FC = () => (
   <>
-    <Fill rect={[-10, -10, 1100, 610]} color={CM.sky} offset={false} seed="s2skyslab" />
+    <Sky spec={S2_EVENING} />
     <S2Cloud />
   </>
 );
+
+/** The world is clipped to y >= 600 on screen: no built top ever shows in the band margin, even while the pull-back's
+ *  1.12 lifts the tiers (K2 UI.skylineMinY). */
+const WORLD_CLIP_ID = 's2worldclip';
 
 // ---------------------------------------------------------------- the shot
 
 const Shot: React.FC = () => {
   const t = useTime(); // film seconds
-  const z = pullZ(t) * pushZ(t);
+  const z = pullZ(t);
   return (
     <>
-      <XG m={s2Cam(t)}>
-        <InkScale zoom={z} k={0.6}>
-          <CanalCast person={k4Person}>
-            <V2S2Set
-              staffCoolAt={S2.staffOnAt}
-              storyOverlay={storyOverlay}
-              aBoard={<S2Board />}
-              agent={<S2Newsagent />}
-              bench={<S2BenchPeople />}
-              pip={<PipS2 />}
-              farLife={<S2FarLife />}
-              near={<S2NearLife />}
-            />
-          </CanalCast>
-        </InkScale>
-      </XG>
       <ScreenSky />
+      <defs>
+        <clipPath id={WORLD_CLIP_ID}>
+          <rect x={-60} y={600} width={1200} height={1400} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${WORLD_CLIP_ID})`}>
+        <XG m={s2Cam(t)}>
+          <InkScale zoom={z} k={0.6}>
+            <Lit rig={RIG_CANAL}>
+              <CanalCast person={k4Person}>
+                <V2S2Set
+                  staffCoolAt={S2.staffOnAt}
+                  storyOverlay={storyOverlay}
+                  storyTier={storyTierAt(t)}
+                  aBoard={<S2Board />}
+                  agent={<S2Newsagent />}
+                  bench={<S2BenchPeople />}
+                  pip={<PipS2 />}
+                  farLife={
+                    <>
+                      <S2FarLife />
+                      <S2Motes layer="far" />
+                    </>
+                  }
+                  extra={<S2Motes layer="near" />}
+                />
+              </CanalCast>
+            </Lit>
+          </InkScale>
+        </XG>
+      </g>
     </>
   );
 };
 
 const V2S2: React.FC = () => (
-  <World sky={[CM.sky, CM.bandGold]} horizon={1000}>
+  <World sky={CM.sky} horizon={1000}>
     <TimeShift by={-START}>
       <Shot />
     </TimeShift>

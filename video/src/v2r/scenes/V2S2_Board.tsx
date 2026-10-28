@@ -1,8 +1,8 @@
 // V2S2_Board (lane L2): the newsstand's A-board TOLD THE BBC (TREATMENT §5 S2 "Texts on objects"; map S2.aBoard face
-// x 160-560, y 1050-1250) and the newsagent who shoves it out from behind the kiosk (the wood clack 8.44). A stand-in
-// for K3's StatementBoard with the same anatomy: plum stiles and rails round a paper face with a plum keyline, brick
-// legs to the paving, a ground shadow; lettering from K3 (`WorldText`, `TXT_TOLD_THE_BBC`), words unchanged, the body
-// on exactly three lines (the quote whole). Times are FILM seconds (the scene wraps it in <TimeShift by={-6.1}>).
+// x 160-560, y 1050-1250, here 8 px left) and the newsagent who shoves it out from behind the kiosk (the wood clack
+// 8.44). The board is K3's `ToldTheBBCBoard` (L5): its frame, face, lettering and ground shadow; tier B while it rests
+// behind the kiosk, A from 8.44 (conform_L2 §4); its shadow only once it moves (before, it would show beyond the kiosk).
+// Times are FILM seconds (the scene wraps it in <TimeShift by={-6.1}>).
 //   the move: the shove starts it at 8.42; a sine push-and-slide (quarter-sine in over 0.11 s while the hand is on the
 //   stile, quarter-cosine out over 0.41 s) lands 3 px past its spot at 8.94 and rocks back by 8.985 (peak 19.1 px/f),
 //   as the five light clicks start (8.96-9.12).
@@ -10,29 +10,24 @@
 //   (8.34 wind-up / 8.42 push / 8.50 follow-through) with the hand ON the right stile while it is in reach, recovers
 //   (8.62 / 8.74), then steps back and turns back in 3 drawings (9.05 / 9.15 / 9.25); idle = 3 drawn re-stacking
 //   poses at 7/s in bursts (no sine-driven arm).
-// REQUEST (report): swap to L5's ToldTheBBCBoard when it lands.
-import React, {useMemo} from 'react';
-import {CM, INK_PX} from '../palette';
-import {Fill} from '../../lib/Fill';
-import {Ink} from '../../lib/Ink';
-import {line} from '../../lib/sketch';
+import React from 'react';
+import {CM} from '../palette';
 import {useTime, clamp} from '../../lib/time';
 import {XG, mat} from '../../lib/xf';
-import {WorldText, TYPE} from '../kit/boards/WorldText';
-import {TXT_TOLD_THE_BBC} from '../kit/boards/texts';
+import {ToldTheBBCBoard, S2_LEGS_Y1, boardDy} from '../kit/boards/StatementBoard';
 import {Person} from '../kit/cast';
 import type {View} from '../kit/cast';
-import {useCaptionFont} from '../../lib/font';
 import * as MAP from '../world/map';
 
-/** The board face shifted this far left of the map rect (Pip's seat clearance; the left stile stays at x >= 126).
- *  Its lettering hides behind the kiosk (x <= 124) and the newsagent at rest (BOARD_DX0). */
-export const BOARD_SHIFT = -8;
+/** The board face shifted this far left of the map rect: K3's frame (26 px stiles) then ends at x 536, a clear gap
+ *  left of Pip's seat (Pip's lower body starts at x ~560: no tangent, Pip never reads as perched on the board). Its
+ *  left stile hides behind the kiosk; at rest its lettering hides behind the kiosk and the newsagent (BOARD_DX0). */
+export const BOARD_SHIFT = -50;
 const F = {x0: MAP.S2.aBoard.x0 + BOARD_SHIFT, y0: MAP.S2.aBoard.y0, x1: MAP.S2.aBoard.x1 + BOARD_SHIFT, y1: MAP.S2.aBoard.y1};
-const STILE = 22;
-const RAIL = 16;
-/** Ground line under the board (the legs' feet). */
-export const BOARD_GROUND = 1298;
+/** K3's small frame (ToldTheBBCBoard's defaults). */
+const STILE = 26;
+/** Ground line under the board (the legs' feet: K3's S2_LEGS_Y1). */
+export const BOARD_GROUND = S2_LEGS_Y1;
 /** The board's resting offset behind the kiosk (its lettering hidden) and its move. */
 export const BOARD_DX0 = -376;
 const SHOVE_T0 = 8.42;
@@ -56,67 +51,6 @@ export const boardDx = (t: number): number => {
 
 /** The right stile's outer edge x at time t (the newsagent's hand). */
 export const boardRightStileX = (t: number) => F.x1 + STILE + boardDx(t);
-
-/** The body on exactly three lines: the words of texts.ts, the quote whole. */
-const BODY_LINES: string[] = (() => {
-  const w = TXT_TOLD_THE_BBC.body[0].split(' ');
-  return [w.slice(0, 3).join(' '), w.slice(3).join(' '), TXT_TOLD_THE_BBC.body[1]];
-})();
-/** Baselines (the 1.06 push about W2 keeps the credit at y <= 1250 at the cut: 1220 -> 1248). */
-const Y_HEADER = 1099;
-const Y_RULE = 1111;
-const Y_BODY = [1141, 1170, 1199];
-const Y_CREDIT = 1222;
-
-const BoardFace: React.FC = () => {
-  useCaptionFont();
-  const {x0, x1, y0, y1} = F;
-  const cx = (x0 + x1) / 2;
-  const ink = useMemo(
-    () =>
-      [
-        line(x0 - STILE, y0 - RAIL, x0 - STILE + 2, y1 + RAIL + 2, {seed: 'abL', over: 'small'}),
-        line(x1 + STILE, y0 - RAIL, x1 + STILE - 2, y1 + RAIL + 2, {seed: 'abR', over: 'small'}),
-        line(x0 - STILE - 6, y0 - RAIL, x1 + STILE + 8, y0 - RAIL + 1, {seed: 'abT', over: 'small'}),
-        line(x0 - 4, y1 + RAIL, x1 + 10, y1 + RAIL, {seed: 'abB', over: 'small'}),
-        // the front legs (brick, below the face's bottom rail): one line each, open at the foot
-        line(x0 - STILE + 3, y1 + RAIL + 2, x0 - STILE + 6, BOARD_GROUND - 2, {seed: 'abLL', over: 'small'}),
-        line(x1 + STILE - 3, y1 + RAIL + 2, x1 + STILE - 6, BOARD_GROUND - 2, {seed: 'abRL', over: 'small'}),
-      ].join(''),
-    [x0, x1, y0, y1],
-  );
-  const legTop = y1 + RAIL;
-  return (
-    <>
-      {/* the ground shadow (colour, never grey), cast right by the low west sun */}
-      <Fill d={`M${x0 - STILE},${BOARD_GROUND}L${x1 + STILE},${BOARD_GROUND}L${x1 + STILE + 150},${BOARD_GROUND + 26}L${x0 - STILE + 110},${BOARD_GROUND + 30}Z`} color={CM.stoneShade} offset={false} seed="abShadow" />
-      {/* the back leg pair peeking under the face (an A-frame) */}
-      <Fill d={`M${x0 - STILE + 30},${legTop}L${x0 - STILE + 44},${legTop}L${x0 - STILE + 60},${BOARD_GROUND - 10}L${x0 - STILE + 46},${BOARD_GROUND - 10}Z`} color={CM.brickDeep} seed="abBackL" />
-      <Fill d={`M${x1 + STILE - 44},${legTop}L${x1 + STILE - 30},${legTop}L${x1 + STILE - 46},${BOARD_GROUND - 10}L${x1 + STILE - 60},${BOARD_GROUND - 10}Z`} color={CM.brickDeep} seed="abBackR" />
-      {/* the front legs below the bottom rail: brick (the plum stays on the face's frame: dark budget) */}
-      <Fill rect={[x0 - STILE + 1, legTop, STILE - 4, BOARD_GROUND - legTop]} color={CM.brickDeep} seed="abLegL" />
-      <Fill rect={[x1 + 3, legTop, STILE - 4, BOARD_GROUND - legTop]} color={CM.brickDeep} seed="abLegR" />
-      {/* the frame: plum stiles and rails round the face only */}
-      <Fill rect={[x0 - STILE, y0 - RAIL, STILE, y1 + RAIL - (y0 - RAIL)]} color={CM.anchor} seed="abStL" />
-      <Fill rect={[x1, y0 - RAIL, STILE, y1 + RAIL - (y0 - RAIL)]} color={CM.anchor} seed="abStR" />
-      <Fill rect={[x0, y0 - RAIL, x1 - x0, RAIL]} color={CM.anchor} seed="abRailT" />
-      <Fill rect={[x0, y1, x1 - x0, RAIL]} color={CM.anchor} seed="abRailB" />
-      <Fill rect={[x0, y0, x1 - x0, y1 - y0]} color={CM.paper} offset={false} seed="abFace" />
-      <Ink d={`M${x0 + 8},${y0 + 8}H${x1 - 8}V${y1 - 8}H${x0 + 8}Z`} width={INK_PX.hair} color={CM.anchor} seed="abKey" />
-      {/* two brass screws on the top rail */}
-      <Fill d={`M${x0 + 18},${y0 - RAIL / 2}m-4,0a4,4 0 1,0 8,0a4,4 0 1,0 -8,0`} color={CM.coatMustard} offset={false} seed="abS1" />
-      <Fill d={`M${x1 - 18},${y0 - RAIL / 2}m-4,0a4,4 0 1,0 8,0a4,4 0 1,0 -8,0`} color={CM.coatMustard} offset={false} seed="abS2" />
-      <Ink d={ink} width={INK_PX.mid} seed="abInk" />
-      {/* lettering (K3): header 56 (read at 216 px), a rule, body 30 on three lines, credit 21 in ink */}
-      <WorldText x={cx} y={Y_HEADER} size={TYPE.key} text={TXT_TOLD_THE_BBC.header} anchor="middle" weight={0.9} seed="abH" />
-      <Ink d={line(cx - 136, Y_RULE, cx + 138, Y_RULE - 1, {seed: 'abRule', over: 'small'})} width={INK_PX.far} color={CM.anchor} seed="abRuleI" />
-      {BODY_LINES.map((l, i) => (
-        <WorldText key={i} x={cx} y={Y_BODY[i]} size={TYPE.bodySmall} text={l} anchor="middle" seed={`abB${i}`} />
-      ))}
-      <WorldText x={cx} y={Y_CREDIT} size={21} text={TXT_TOLD_THE_BBC.credit} anchor="middle" color={CM.ink} seed="abC" />
-    </>
-  );
-};
 
 // ---------------------------------------------------------------- the newsagent
 
@@ -175,7 +109,7 @@ const Newsagent: React.FC = () => {
       // the hand on the right stile's face (screen), mapped into the leaning, flipped figure's local frame; at full
       // stretch it lets go (the board slides on)
       const sx = Math.min(boardRightStileX(t) - 10, fx + 118);
-      const sy = 1150;
+      const sy = 1150 + boardDy(t, undefined, MAP.S2.aBoardOutAt);
       const th = (-d.lean * Math.PI) / 180;
       const vx = sx - fx;
       const vy = sy - fy;
@@ -197,7 +131,14 @@ export const S2Board: React.FC = () => {
   const dx = boardDx(t);
   return (
     <XG m={mat.translate(dx, 0)}>
-      <BoardFace />
+      <ToldTheBBCBoard
+        face={F}
+        legsTo={BOARD_GROUND}
+        clackAt={MAP.S2.aBoardOutAt}
+        shadow={t < SHOVE_T0 ? false : undefined}
+        tier={t >= MAP.S2.aBoardOutAt ? 'subject' : 'support'}
+        seed="s2bbc"
+      />
     </XG>
   );
 };

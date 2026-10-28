@@ -1,26 +1,47 @@
-// V2S5 "The far side" (lane L4): the ONE big move and the only scale moment. Film 20.55-24.00 s (scene t = film -
-// 20.55); TREATMENT.md sections 5-6 (row S5), map.ts S5, the Arlington kit (kit/dc) on the crane rig.
-//   0.00       the sun match-cut: SUN1 (250, 650) r 65 in the bright slot under the blossoming canopy; Pip comes down
-//              out of the sun onto the bench beside the stranger reading an open newspaper; the US news box beside them.
-//   0.21       "April": the disc flips into a calendar page APRIL 2026 (back by 0.65); the slot's trees burst into
-//              blossom in 4 frames; Pip looks up at it.
-//   0.75-2.85  ONE ease: dolly back + crane up + ~75 deg arc round the two backs (the far slides right, the slope sinks,
-//              the valley rises); a big tree where the Pentagon will land; the lamppost wipes the backs at the peak
-//              (the tiny drawings swap behind it); a light burst; 1.88 "Pentagon": it clears the tree, the plaque
-//              pops; the obelisk rises; 2.53 windows warm on along one wing.
-//   2.85-3.45  the hold: a V of birds; 3.35 Pip leaps up-right (the cut on action into S6).
-// Helpers: V2S5_rig (planes), V2S5_set (the layered set), V2S5_far, V2S5_figs, V2S5_text.
+// V2S5 "The far side" (lane L4): the ONE big move and the only scale moment. Film 20.55-23.80 s (scene t = film -
+// 20.55); conform_L4.md (wins over TREATMENT), THROUGHLINE §3-§5b, map.ts S5, the Arlington kit (kit/dc) on the crane rig.
+//   in         a push-through out of S4's sun (20.40-20.70, carrier A): S5 opens inside SUN1 (250, 650) in the bright
+//              slot under the canopy, Pip SEATED on the bench back beside the stranger reading an open newspaper.
+//   0.21       "April": the slot's trees burst into blossom (a few petals drift); Pip looks up at it (its one reaction).
+//   0.15-1.20  the news box is the subject (its headline at body size); 0.75-2.85 ONE ease: dolly back + crane up + an
+//              arc round the two backs (the far slides right, the slope sinks, the valley rises); the lamppost wipes the
+//              backs at the peak (the tiny drawings swap behind it); 1.88 "Pentagon": it clears the tree, its outline
+//              returns (tier A), the plaque pops; the obelisk rises; 2.53 its lit wing's windows warm in one step.
+//   2.85-3.25  the hold (a V of birds), then out by a FOREGROUND WIPE (carrier D, 23.62-23.98): one blossom tree passes
+//              close to the lens right to left (`Wiper`, V2S5_wiper) and S6 is behind it. Pip stays put (no leap).
+// Helpers: V2S5_rig (planes), V2S5_set (the layered set), V2S5_far*, V2S5_river, V2S5_mid, V2S5_deck*, V2S5_figs,
+// V2S5_text, V2S5_depth (the atmosphere), V2S5_wiper.
 import React from 'react';
 import {World} from '../../lib/World';
 import {CM} from '../palette';
 import {S5Set} from './V2S5_set';
-import type {ToneKey} from '../../lib/Film';
+import type {ToneKey, WiperComponent} from '../../lib/Film';
+import {S5Wiper} from './V2S5_wiper';
+import {Sky} from '../../lib/sky';
+import {S5_SKY} from '../world/skies';
+import {Lit} from '../../lib/light';
+import {useTime} from '../../lib/time';
+import {craneP} from './V2S5_rig';
+import {s5Rig} from './V2S5_light';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
-const V2S5: React.FC = () => (
-  <World sky={CM.sky} stage="context">
-    <S5Set />
-  </World>
-);
+/** The S5 -> S6 foreground wipe's element (scenes.json V2S6 transitionIn {kind 'foreground-wipe', element 'scene'}). */
+export const Wiper: WiperComponent = S5Wiper;
+
+const V2S5: React.FC = () => {
+  const t = useTime();
+  return (
+    // stage "flat": the push-through's incoming leg (out of the April sun, 20.55-20.72, zoom 7 -> 1 about SUN1) moves the
+    // whole set as one plane (the crane rig's own planes never fold the stage camera in)
+    <World sky={CM.sky}>
+      {/* the sky (CRAFT §g): ONE screen-space gradient behind the whole crane, unlit, the bottom layer */}
+      <Sky spec={S5_SKY} />
+      {/* the light (V2S5_light): RIG_APRIL's family, the sun's shadows swinging with its screen spot through the arc */}
+      <Lit rig={s5Rig(craneP(t))}>
+        <S5Set />
+      </Lit>
+    </World>
+  );
+};
 export default V2S5;
