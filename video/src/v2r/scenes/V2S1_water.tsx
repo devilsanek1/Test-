@@ -11,6 +11,8 @@
 // exactly (its approved sway, no V), its contact lens and its mirrored underside.
 import React, {useMemo} from 'react';
 import {useTime} from '../../lib/time';
+import {getInputProps} from 'remotion';
+const DIAG: string = String((getInputProps() as {waterDiag?: string}).waterDiag ?? '');
 import {Fill} from '../../lib/Fill';
 import {Water, floaterWater, waterColourAt, waterKAt, waterSwayAt, ellipsePoly, quadPts, lerp, type Axis, type Poly, type Pt, type WaterSource, type WaterSpec} from '../../lib/water';
 import {atmos, backing, parallaxK} from '../../lib/depth';
@@ -27,10 +29,11 @@ import {boatGeom, type BoatOpts} from '../kit/canal/boat';
 import {BOAT_A, BOAT_B, S1_BOLLARDS, S1_DUCK, S1_FAR_LAMPS, S1_PATH, s1Bend} from './V2S1_set_life';
 import {BANK, edgeY} from './V2S1_steps_stone';
 import {S1_PLANE, s1Float} from './V2S1_float';
-import {FLOOD, FLOOD_ORIGIN, HER_COAT_AT, S1_PALE, s1HerXAt} from './V2S1_clock';
+import {FLOOD, FLOOD_ORIGIN, S1_PALE, s1HerXAt} from './V2S1_clock';
 import {BRIDGE, HAZE_K, S1_BUS, s1BusX} from './V2S1_set_far';
 import {S1_HAZE, S1_IRON} from './V2S1_set_core';
-import {S1_WING_PLANE as PM, S1_WING_V_PLINTH as V_PLINTH, S1_WING_HM as HM, s1WingBaseY, s1DoorOpen} from './V2S1_set_wing';
+import {herSpec, ghostSpec} from './V2S1_row';
+import {S1_WING_PLANE as PM, S1_WING_V_PLINTH as V_PLINTH, S1_WING_HM as HM, s1WingBaseY} from './V2S1_set_wing';
 
 // ================================================================= S1's water geometry (DIAGNOSIS §2)
 
@@ -161,8 +164,8 @@ function s1Sources(): WaterSource[] {
   out.push({id: 'br/pilaster', thing: rect(268, course, 284, BRIDGE_AXIS), axis: BRIDGE_AXIS, color: hazed(CM.limestone, HAZE_K.bridge), layer: LAYER.ring, plane: S1_PLANE.bridge, breakup: 0, narrow: 0});
   out.push({id: 'br/ring', thing: archPoly(11, BRIDGE_AXIS), axis: BRIDGE_AXIS, color: hazed(CM.limestone, HAZE_K.bridge), layer: LAYER.ring, plane: S1_PLANE.bridge, breakup: 0, narrow: 0.04});
   out.push({id: 'br/soffit', thing: archPoly(0, BRIDGE_AXIS), axis: BRIDGE_AXIS, color: hazed(CM.stoneShade, HAZE_K.bridge), layer: LAYER.opening, plane: S1_PLANE.bridge, breakup: 0, narrow: 0.04, sep: {from: 'br/ring', dL: -6.5}});
-  // the railing's posts (4.4 px verticals survive; the 1.6 px bars and the rails do not: R5)
-  for (let x = x0 + 30; x < x1; x += 62) out.push({id: `br/post${x}`, thing: rect(x - 2.2, BRIDGE.railTop - 5, x + 2.2, deck + 1), axis: BRIDGE_AXIS, color: hazed(S1_IRON, HAZE_K.rail), layer: LAYER.posts, plane: S1_PLANE.bridge, breakup: 0, narrow: 0.1, taper: 1.2});
+  // (the railing, its 4.4 px posts and 1.6 px bars, is dropped: one plane simpler than the bridge, R5; at the far
+  // bend its posts read as a comb, not as water)
   // ---- Google's wing (the subject's plane): its ground storey in the shade of the far city (V2S1_light's ground
   // Shade), from the plinth up ~2 m; one plane simpler than the facade (R5): the fins and the plinth merge into the wall
   out.push({id: 'wing/wall', thing: PM.q(-0.05, V_LO, PM.wM + 0.4, HM - V_LO), axis: WING_AXIS, color: shaded(CM.brickLight), layer: LAYER.wall, plane: P0, breakup: 0.5, narrow: 0.14});
@@ -194,7 +197,8 @@ function s1Sources(): WaterSource[] {
   const bot: Pt[] = [];
   for (let x = -70; x <= 1150; x += 10) {
     top.push([x, s1WaterTop(x) - 2]);
-    bot.push([x, s1ReflTop(x)]);
+    // 2 px over the reflections' start: the feet of the row stand 1 px above the coping's top (no seam of light)
+    bot.push([x, s1ReflTop(x) + 2]);
   }
   out.push({id: 'coping', refl: [...top, ...bot.reverse()], color: multiply(env(CM.stoneShade), TINT_CANAL.form), layer: LAYER.coping, plane: P0, draw: 'crisp'});
   // ---- the two moored boats (their own waterlines 1140 / 1196): boat B (nearer) after boat A
@@ -205,42 +209,34 @@ function s1Sources(): WaterSource[] {
 // ================================================================= the reflections that move
 
 const POP_FILL = MAP.GHOST_POP.outlineS + MAP.GHOST_POP.fillDelayF / 60;
-/** A walking figure, simplified (R5): the legs under the hem, the hem, the coat to the shoulders as ONE silhouette in
- *  the coat's value; about its own mirror line. */
-function figureThing(id: string, x: number, feetY: number, h: number, coat: string): WaterSource {
+/** A walking figure, simplified (R5): what the water shows of it is its LEGS under the mid-calf hem (V2S1_row_fig:
+ *  the hem at 0.25 h): one slim vertical in the legs' value, hanging from its own mirror line, ending in a few tapered
+ *  bars (the coat beyond is left to Fresnel: a flat coat block read as a box). The row reads as a rhythm of slim
+ *  verticals under the row; her reflection is environment, never a second her (R5). */
+function figureThing(id: string, x: number, feetY: number, h: number, legs: string): WaterSource {
   const s = h / 170;
   const f = (dx: number, dy: number): Pt => [x + dx * s, feetY + dy * s];
-  const sil = [f(-9, 0), f(9, 0), f(9, -40), f(22, -42), f(19.5, -104), f(18.5, -128), f(-18.5, -128), f(-19.5, -104), f(-22, -42), f(-9, -40)];
-  return {id, thing: sil, axis: s1MirrorLine(x, feetY), color: coat, kind: 'figure', layer: LAYER.people, plane: S1_PLANE.subject, breakup: 0, narrow: 0.22, taper: 2, solid: 0.6};
+  return {id, thing: [f(-8.5, 0), f(8.5, 0), f(9.5, -46), f(-9.5, -46)], axis: s1MirrorLine(x, feetY), color: legs, kind: 'figure', layer: LAYER.people, plane: S1_PLANE.subject, breakup: 0, narrow: 0.18, taper: 1.6, solid: 0.6};
 }
-/** Every reflection that moves at t: her (behind the glass, then on the towpath), the ghosts from their fill, the
- *  door's sliding leaves, the bus on the bridge. */
+
+/** Every reflection that moves at t: her (behind the glass, then on the towpath), the ghosts from their fill, the bus
+ *  on the bridge. */
 function s1Moving(t: number): WaterSource[] {
   const out: WaterSource[] = [];
   const poses = MAP.s1RowAt(Math.max(0, t));
   MAP.S1_ROW.forEach((mem, i) => {
     const p = poses[i];
     if (mem.kind === 'her') {
-      out.push(figureThing('fig/her', s1HerXAt(t), p.feetY, p.h, t < HER_COAT_AT ? CM.white : CM.hero));
+      out.push(figureThing('fig/her', s1HerXAt(t), p.feetY, p.h, herSpec(CM.hero).legs ?? CM.hero));
       return;
     }
-    if (mem.popT === null || t < mem.popT + POP_FILL) return;
-    out.push(figureThing(`fig/${mem.id}`, p.x, p.feetY, p.h, CM.coatOat));
+    // the bare outlines (O1-O3: no fill) reflect nothing: lines do not survive a rippled mirror (R5)
+    if (mem.popT === null || mem.kind === 'outline' || t < mem.popT + POP_FILL) return;
+    const age = Number(mem.id.slice(1));
+    out.push(figureThing(`fig/${mem.id}`, p.x, p.feetY, p.h, ghostSpec(age).legs ?? CM.coatOat));
   });
-  // the door's two glass leaves (slate stiles, 0.085 m: verticals that survive), sliding with s1DoorOpen, clipped to the
-  // opening (they park in pockets)
-  const open = s1DoorOpen(t);
-  const leafW = (DU1 - DU0) / 2;
-  const st = 0.085;
-  for (const side of [0, 1]) {
-    const a = DU0 + side * leafW + open * leafW * (side ? 1 : -1);
-    for (const [j, u0] of [a, a + leafW - st].entries()) {
-      const lo = Math.max(DU0, u0);
-      const hi = Math.min(DU1, u0 + st);
-      if (hi - lo < 0.01) continue;
-      out.push({id: `leaf${side}${j}`, thing: PM.q(lo, DV0 + 0.07, hi - lo, HM - 0.05 - DV0 - 0.07), axis: WING_AXIS, color: env(CM.paneUnlit), layer: LAYER.leaves, plane: S1_PLANE.subject, breakup: 0, narrow: 0.1, taper: 1.2});
-    }
-  }
+  // (the door's glass leaves and their slate stiles are left to the set: in the water the lit door is ONE gold column,
+  // one plane simpler than the facade, R5, R7)
   // the double-decker on the bridge (behind the railing, in front of the far roofs; hidden by the wing past x 330)
   const bx = s1BusX(t);
   const L = S1_BUS.len;
@@ -258,7 +254,7 @@ function s1Moving(t: number): WaterSource[] {
 // ================================================================= the spec
 
 /** The sun's glitter column: straight under SUN0 (x 196), densest at its still-water mirror point (y 1158). */
-const SUN_ROWS: [number, number] = [s1ReflTop(MAP.SUN0.x) + 1, s1WaterBottom(MAP.SUN0.x) + 2];
+const SUN_ROWS: [number, number] = [s1ReflTop(MAP.SUN0.x) - 3, s1WaterBottom(MAP.SUN0.x) + 3];
 
 /** S1's WATER (lib/water's WaterSpec). Screen px at the float's rest; scene seconds = film seconds. */
 const S1_WATER: WaterSpec = {
@@ -302,7 +298,18 @@ const S1_WATER: WaterSpec = {
 let built = false;
 const ensure = () => {
   if (!built) {
-    S1_WATER.sources = s1Sources();
+    let src = s1Sources();
+    if (DIAG.includes('nolamps')) src = src.filter((x) => !x.id.startsWith('lamp'));
+    if (DIAG.includes('notower')) src = src.filter((x) => x.id !== 'tower' && x.id !== 'roofs');
+    if (DIAG.includes('nobridge')) src = src.filter((x) => !x.id.startsWith('br/'));
+    if (DIAG.includes('nowing')) src = src.filter((x) => !x.id.startsWith('wing/'));
+    if (DIAG.includes('noboats')) src = src.filter((x) => !x.id.startsWith('boat'));
+    if (DIAG.includes('nostubs')) src = src.filter((x) => !x.id.startsWith('bollard'));
+    if (DIAG.includes('nocoping')) src = src.filter((x) => x.id !== 'coping');
+    S1_WATER.sources = src;
+    if (DIAG.includes('nofig')) S1_WATER.moving = (t) => s1Moving(t).filter((x) => !x.id.startsWith('fig'));
+    if (DIAG.includes('nosun')) S1_WATER.sun = undefined;
+    if (DIAG.includes('norip')) S1_WATER.ripples = undefined;
     built = true;
   }
   return S1_WATER;
@@ -346,7 +353,7 @@ export const S1Duck: React.FC = () => {
   const w = floaterWater({x, y, len: s, color: env(CM.line), k: fw.k, tone: spec.tone, sway: sw});
   const rings: React.ReactNode[] = [];
   const R = S1_DUCK_RING;
-  if (R.on) {
+  if (R.on && !DIAG.includes('noring')) {
     const fs = (y - S1W_CAM.horizon) / S1W_CAM.f;
     const u = (t - R.t0) / R.period;
     if (u >= 0) {

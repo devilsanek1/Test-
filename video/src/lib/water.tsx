@@ -359,10 +359,10 @@ export function snapRow(g: Grid, y: number): number {
  *  amp[1] at the near edge). Continuous in y: a block's side bends as one smooth curve, a bar slides with its band. */
 export type Sway = {amp: [number, number]; waves: {lambda: number; period: number; w: number}[]};
 export const SWAY_DEFAULT: Sway = {
-  amp: [1.5, 4.4],
+  amp: [1.4, 4.4],
   waves: [
-    {lambda: 2.2, period: 5.0, w: 0.7},
-    {lambda: 1.4, period: 3.6, w: 0.3},
+    {lambda: 3.2, period: 7.0, w: 0.72},
+    {lambda: 1.6, period: 4.2, w: 0.28},
   ],
 };
 export function swayAt(cam: WaterCam, s: Sway, yFar: number, yNear: number, seed: number, y: number, t: number): number {
@@ -688,6 +688,23 @@ function toneOf(st: Static, s: WaterSource, k: number): string {
   return c;
 }
 
+const TROUGHS = new Map<string, string>();
+/** A band's trough colour, tone-on-tone: the bar's own hue and chroma, its L* moved `gapMix` of the way toward the open
+ *  water's there, by 3.5 L* at most (a light line across a reflection is a ripple line's job, few and placed: R9). */
+export const TROUGH_MAX_DL = 3.5;
+function troughOf(st: Static, col: string, y: number): string {
+  const key = `${col}|${Math.round(y)}|${st.gapMix}|${st.seed}`;
+  const hit = TROUGHS.get(key);
+  if (hit) return hit;
+  const b = lch(col);
+  const w = lch(skyColorAt(st.ramp, y));
+  const dl = Math.max(-TROUGH_MAX_DL, Math.min(TROUGH_MAX_DL, st.gapMix * (w.L - b.L)));
+  const c = cleanColour(fromLch(b.L + dl, b.C, b.h), st.tone.waterH);
+  if (TROUGHS.size > 8000) TROUGHS.clear();
+  TROUGHS.set(key, c);
+  return c;
+}
+
 // ================================================================= the mass builder (G1: a solid block, then bars)
 
 type Runs = Map<string, {layer: number; color: string; parts: string[]}>;
@@ -722,10 +739,11 @@ function buildMass(s: Resolved, ctx: FrameCtx, out: Runs, moving: boolean): void
     return;
   }
   const p = sx || sy ? s.p.map(([x, y]) => [x + sx, y + sy] as Pt) : s.p;
-  // ---- the solid block: the reflection itself down to ySolid, its sides bent by the sway (one smooth closed shape)
+  // ---- the solid block: the reflection itself down to ySolid, its sides bent by the sway (one smooth closed shape);
+  // its bottom corners rounded (never a square cut)
   const block = clipBand(p, -1e9, s.ySolid);
   if (block) {
-    const dense = densify(block, 4);
+    const dense = roundBottom(densify(block, 4), s.ySolid, 3.5);
     const top = Math.max(s.box.y0 + sy, st.spec.region.top((s.box.x0 + s.box.x1) / 2));
     const kb = kAt(st, lerp(top, s.ySolid, 0.3));
     pushRun(out, s.layer, toneOf(st, s, kb), polyD(dense.map(([x, y]) => [x + ctx.sway(y) * k, y] as Pt)));
@@ -739,11 +757,12 @@ function buildMass(s: Resolved, ctx: FrameCtx, out: Runs, moving: boolean): void
   const span = Math.max(1, s.yEnd - s.ySolid);
   const yMax = s.box.y1 + sy;
   for (let i = 0; i + 1 < rows.length; i++) {
-    const ya = rows[i];
     const yb = rows[i + 1];
-    if (ya < s.ySolid - 0.01) continue;
+    if (yb <= s.ySolid + 0.01) continue;
+    // the band under the block starts at the block (a moving source's block ends between two boundaries)
+    const ya = Math.max(rows[i], s.ySolid);
     if (ya >= yMax || ya > s.yEnd + 2) break;
-    const topY = ya + gapOf(st.grid, ya, yb);
+    const topY = ya + gapOf(st.grid, rows[i], yb);
     const bot = Math.min(yb, yMax);
     if (bot - topY < 0.8) continue;
     const ym = (topY + bot) / 2;
@@ -755,10 +774,17 @@ function buildMass(s: Resolved, ctx: FrameCtx, out: Runs, moving: boolean): void
     const at = hash01(st.seed, sd, i, 4);
     const drop = hash01(st.seed, sd, i, 5);
     if (!moving && u > 0.82 && drop < 0.35) continue;
-    const pitch = yb - ya;
+    const pitch = yb - rows[i];
     const kk = kAt(st, ym);
     const col = toneOf(st, s, kk);
+    // the band's trough (its gap): tone-on-tone, the bar's own tone a step toward the open water there; a LIGHT's
+    // slivers part on the open water instead (R7: a column of slivers, the water between)
+    const trough = s.kind === 'light' ? '' : troughOf(st, col, ya);
     const dx = ctx.sway(ym) * k;
+    const seg = (a: number, b: number, tl: number, tr: number) => {
+      if (trough) pushRun(out, s.layer, trough, barD(a + dx, b + dx, ya, topY, tl, tr));
+      pushRun(out, s.layer, col, barD(a + dx, b + dx, topY, bot, tl, tr));
+    };
     for (const [x0r, x1r] of intervalsAt(p, ym)) {
       const w = x1r - x0r;
       const inset = narrow * w * Math.pow(u, 1.5) * (0.85 + 0.3 * jit);
@@ -769,11 +795,44 @@ function buildMass(s: Resolved, ctx: FrameCtx, out: Runs, moving: boolean): void
       if (brk > 0.001 && u > 0.45 && x1 - x0 > 60 && pbreak < brk * (u - 0.3) * 1.6) {
         const g0 = Math.max(6, pitch * (1 + 1.4 * u));
         const xb = x0 + (x1 - x0) * (0.25 + 0.5 * at);
-        if (xb - g0 / 2 - x0 >= 3) pushRun(out, s.layer, col, barD(x0 + dx, xb - g0 / 2 + dx, topY, bot, taper, Math.min(taper, (xb - g0 / 2 - x0) * 0.4)));
-        if (x1 - xb - g0 / 2 >= 3) pushRun(out, s.layer, col, barD(xb + g0 / 2 + dx, x1 + dx, topY, bot, Math.min(taper, (x1 - xb - g0 / 2) * 0.4), taper));
-      } else pushRun(out, s.layer, col, barD(x0 + dx, x1 + dx, topY, bot, taper, taper));
+        if (xb - g0 / 2 - x0 >= 3) seg(x0, xb - g0 / 2, taper, Math.min(taper, (xb - g0 / 2 - x0) * 0.4));
+        if (x1 - xb - g0 / 2 >= 3) seg(xb + g0 / 2, x1, Math.min(taper, (x1 - xb - g0 / 2) * 0.4), taper);
+      } else seg(x0, x1, taper, taper);
     }
   }
+}
+
+/** Round a clipped shape's bottom corners (the vertices on the cut line y = yb whose other edge rises): each corner
+ *  becomes a quarter curve of radius <= r (and <= a third of each edge), so a block never ends in a square cut. */
+export function roundBottom(p: Poly, yb: number, r: number): Poly {
+  const n = p.length;
+  if (n < 3) return p;
+  const on = (q: Pt) => Math.abs(q[1] - yb) < 0.01;
+  const out: Poly = [];
+  for (let i = 0; i < n; i++) {
+    const c = p[i];
+    const a = p[(i - 1 + n) % n];
+    const b = p[(i + 1) % n];
+    if (!on(c) || (on(a) && on(b)) || (!on(a) && !on(b))) {
+      out.push(c);
+      continue;
+    }
+    // one neighbour along the cut, the other up a side
+    const along = on(a) ? a : b;
+    const up = on(a) ? b : a;
+    const la = Math.hypot(along[0] - c[0], along[1] - c[1]);
+    const lu = Math.hypot(up[0] - c[0], up[1] - c[1]);
+    const rr = Math.min(r, la / 3, lu / 1.01);
+    if (rr < 0.4) {
+      out.push(c);
+      continue;
+    }
+    const pa: Pt = [c[0] + ((along[0] - c[0]) * rr) / la, c[1] + ((along[1] - c[1]) * rr) / la];
+    const pu: Pt = [c[0] + ((up[0] - c[0]) * rr) / lu, c[1] + ((up[1] - c[1]) * rr) / lu];
+    const [first, last] = on(a) ? [pa, pu] : [pu, pa];
+    out.push(first, ...quadPts(first, c, last, 4));
+  }
+  return out;
 }
 
 /** Far LOD (R14): a reflection as one flat shape at its far tone (no bars, no sway). */
@@ -797,7 +856,7 @@ function sunRows(st: Static): [number, number] {
   return s.rows ?? [st.spec.region.top(s.x) + 4, st.spec.region.bottom(s.x) + 2];
 }
 /** THE BED: one still gold lens per band of the grid inside the column (its length follows the column's envelope,
- *  longest round the sun's mirror point); a few bands left out (static: the column reads broken, never a ladder). */
+ *  longest round the sun's mirror point; seeded lengths and offsets break it: never a ladder). */
 function glitterBed(st: Static): GlitterLens[] {
   const s = st.spec.sun!;
   const [y0, y1] = sunRows(st);
@@ -808,12 +867,10 @@ function glitterBed(st: Static): GlitterLens[] {
     const ya = rows[i];
     const yb = rows[i + 1];
     if (ya < y0 || yb > y1 + 2) continue;
-    const keep = hash01(st.seed, 7001, i, 1);
     const len = hash01(st.seed, 7001, i, 2);
     const off = hash01(st.seed, 7001, i, 3);
     const u = clamp01((ya - y0) / Math.max(1, y1 - y0));
     const nearPeak = clamp01(1 - Math.abs((ya + yb) / 2 - peak) / ((y1 - y0) * 0.6));
-    if (keep < 0.16 - 0.12 * nearPeak) continue;
     const top = ya + gapOf(st.grid, ya, yb);
     const hw = glitterHalfW(st.spec.cam, s, (top + yb) / 2) * (0.52 + 0.4 * len + 0.26 * nearPeak);
     out.push({cx: s.x + (off - 0.5) * lerp(5, 12, u), cy: (top + yb) / 2, len: hw * 2, h: (yb - top) * 0.92, band: i});
@@ -946,8 +1003,9 @@ export function floaterWater(o: {x: number; y: number; len: number; color: strin
 export type WaterFrame = {
   ramp: SkySpec;
   skyShift: Pt;
-  runs: {color: string; d: string}[];
+  runs: {layer: number; color: string; d: string}[];
   ripples: {color: string; d: string}[];
+  quayLayer: number;
   bed: string;
   slivers: Sliver[];
   sliverD: string;
@@ -974,7 +1032,7 @@ export function waterFrame(spec: WaterSpec, t: number): WaterFrame {
   }
   const runs = Array.from(out.values())
     .sort((a, b) => a.layer - b.layer)
-    .map((a) => ({color: a.color, d: a.parts.join('')}));
+    .map((a) => ({layer: a.layer, color: a.color, d: a.parts.join('')}));
   // ripple lines: light across a reflection, darker across the open water
   const polys = all.filter(({s}) => s.draw !== 'crisp' && s.p.length >= 3).map(({s}) => {
     const [sx, sy] = shift(s.plane);
@@ -994,7 +1052,8 @@ export function waterFrame(spec: WaterSpec, t: number): WaterFrame {
   }
   // the glitter: the still bed (swaying with its bands) and the slivers nested in it
   const sun = spec.sun;
-  const sunShift = sun ? shift(st.sunPlane) : ([0, 0] as Pt);
+  // the column lies on the water's bands (no shift in y) and follows the sun's plane across (x)
+  const sunShift: Pt = sun ? [shift(st.sunPlane)[0], 0] : [0, 0];
   let bed = '';
   let sliverD = '';
   let slivers: Sliver[] = [];
@@ -1018,6 +1077,7 @@ export function waterFrame(spec: WaterSpec, t: number): WaterFrame {
     coreColor: sun?.core ?? SUN_DEFAULT.core,
     sunShift,
     lines,
+    quayLayer: spec.quayLayer ?? 30,
   };
 }
 
@@ -1081,9 +1141,20 @@ export const Water: React.FC<{spec: WaterSpec; t: number}> = ({spec, t}) => {
         <g transform={tr(fr.skyShift)}>
           <Sky spec={fr.ramp} />
         </g>
-        {fr.runs.map((p, i) => (
-          <path key={`r${i}`} d={p.d} fill={p.color} />
-        ))}
+        {fr.runs
+          .filter((p) => p.layer < fr.quayLayer)
+          .map((p, i) => (
+            <path key={`r${i}`} d={p.d} fill={p.color} />
+          ))}
+        <g transform={tr(fr.sunShift)}>
+          {fr.bed ? <path d={fr.bed} fill={fr.bedColor} /> : null}
+          {fr.sliverD ? <path d={fr.sliverD} fill={fr.coreColor} /> : null}
+        </g>
+        {fr.runs
+          .filter((p) => p.layer >= fr.quayLayer)
+          .map((p, i) => (
+            <path key={`q${i}`} d={p.d} fill={p.color} />
+          ))}
         {spec.shades && spec.tint ? (
           <g style={{mixBlendMode: 'multiply'}}>
             <path d={spec.shades.join('')} fill={spec.tint} />
@@ -1092,10 +1163,6 @@ export const Water: React.FC<{spec: WaterSpec; t: number}> = ({spec, t}) => {
         {fr.ripples.map((p, i) => (
           <path key={`l${i}`} d={p.d} fill={p.color} />
         ))}
-        <g transform={tr(fr.sunShift)}>
-          {fr.bed ? <path d={fr.bed} fill={fr.bedColor} /> : null}
-          {fr.sliverD ? <path d={fr.sliverD} fill={fr.coreColor} /> : null}
-        </g>
       </>
     );
   }

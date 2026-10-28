@@ -1,11 +1,12 @@
 // V2S4_wbacks.tsx (lane L3, V2S4 WORLD helpers): the BACKS plane (+1, 0.6x the truck) at the 17.96 pose, in plane px.
 //   left      HER END HOUSE (the thread: conform_L3 §2; map S4.herWindow): the terrace's end house, red stock brick
 //             (S3's her house), a stone cornice, a slate mansard with a dormer, a chimney stack with two pots, her teal
-//             front door; her first-floor French window, 90 x 102 at (135, 698) (S4HerWindow below, tier B): teal frame,
+//             front door; her first-floor French window, 90 x 102 at (125, 698) (S4HerWindow below, tier B): teal frame,
 //             blind UP, a DARK pane (she is not home yet), the fanlight undivided above the transom, the stile from the
 //             transom down, a Juliet rail drawn as ONE closed comb (no stroke ends 3-18 px apart: S3's lesson). It enters
 //             from the left edge with the plane (starts ~14.95, half in by ~15.6, whole by ~16.3) and sits at the pose
-//             left of SUN1's disc (x <= 180; the disc reaches x 185) and 6 px above the DEC plate (y 755).
+//             left of SUN1's disc (x <= 170, the house's cornice <= 172; the disc reaches x 185: a 13-15 px gap, never a
+//             tangent) and 6 px above the DEC plate (y 755).
 //   the gap   the sun's column stays low: an allotment yard (a greenhouse, a shed, a water butt, bean leaves,
 //             sunflowers gone to seed, an apple tree), so the sun, the gasholder and the far roofs read over it
 //   terrace   five house backs: slate roofs (two with box dormers), party-wall stacks with pots, rear sashes (a few
@@ -33,13 +34,14 @@ const GROUND = ROW.wallTop + 2; // everything below is behind the garden walls
 
 // ---------------------------------------------------------------- her end house (the thread)
 
-/** Her end house (plane px at the pose): its front from off the left edge to x 180 (her window's frame), the stone
- *  cornice at 634-642 under the slate mansard (top 614, a dormer over the door), the chimney stack on the ridge at
- *  x 96-122 (pots to y 601), a narrow first-floor sash beside her window, her teal front door and a ground-floor sash. */
-export const HER_HOUSE = {x0: X0 - 10, x1: 180, cornice: 634, mansardTop: 614, stack: {x0: 96, x1: 122, top: 606}} as const;
-/** Her window's OUTER box (frame band included): map S4.herWindow, 90 x 102 centred (135, 698). */
+/** Her window's OUTER box (frame band included): map S4.herWindow, 90 x 102 centred (125, 698). */
 const HW = MAP.S4.herWindow;
 export const HER_WIN = {x0: HW.x - HW.w / 2, x1: HW.x + HW.w / 2, y0: HW.y - HW.h / 2, y1: HW.y + HW.h / 2} as const;
+/** Her end house (plane px at the pose): its front from off the left edge to her window's frame (x 170; its cornice
+ *  overhangs 2 px), the stone cornice at 634-642 under the slate mansard (top 614, a dormer over the door), the chimney
+ *  stack on the ridge at x 96-122 (pots to y 601), a narrow first-floor sash beside her window, her teal front door and
+ *  a ground-floor sash. */
+export const HER_HOUSE = {x0: X0 - 10, x1: HER_WIN.x1, cornice: 634, mansardTop: 614, stack: {x0: 96, x1: 122, top: 606}} as const;
 
 function herHouseInto(b: Batch) {
   const h = HER_HOUSE;
