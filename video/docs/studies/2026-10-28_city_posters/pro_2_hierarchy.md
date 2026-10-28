@@ -20,7 +20,7 @@ features taken out. A glance reads the big shapes and colours, which match; only
 
 **Measured** (37 boxes on the 7 posters at 1080 px wide, UI masked; median [range]; v2 = the S1 cover frame, t 5.20 s):
 
-| per box | A hero (15) | B near life (8) | C near: patchwork (7) | C far (7) | v2 S1: A / C near / C far |
+| per box | A hero (15) | B support (8) | C near: patchwork (7) | C far (7) | v2 S1: A / C near / C far |
 |---|---|---|---|---|---|
 | small features: thin < 9 px at >= 10 L*, % of area | **6.9** [0.5-14.2] | 8.4 | **1.8** [0.6-4.5] | **0.7** [0-4.0] | 11.2 / **0.2** / 0.9 |
 | shapes (faces) per 10,000 px | 15.3 | 16.8 | **14.5** [11-25] | 7.1 | 20.5 / **3.2** / 8.0 |
@@ -32,15 +32,13 @@ features taken out. A glance reads the big shapes and colours, which match; only
 | strong-edge width 10-90 %, px | 2.7 | 2.7 | 2.3 | 2.3 | 2.1 / 2.3 / 2.2 |
 | CIEDE2000 to the A+B palette | 4.5 | 5.5 | 6.3 [5.1-7.9] | 4.4 | 1.8 / 5.4 / 5.2 |
 
-**Where it lives (boxes in each screenshot's pixels):** Singapore: the MBS towers `[232,661,877,1054]` (a 2-3 px mullion
-grid, lit and shaded faces, the skypark's tiny trees) against the far blocks `[0,739,345,994]` (pale flat rectangles,
-0-3 window stripes) and the patchwork `[135,1339,495,1609]` (stairs, arches and walls as flat blocks of the shophouses'
-terracotta, sage and teal). Reykjavik: Hallgrimskirkja `[45,398,532,1118]` (each stepped column a lit/shade pair, clock,
-windows) against the faceted roofs `[0,1118,630,1260]` (big triangles in the house colours, 1.3 % small features beside
-the houses' 5.7 %). Buenos Aires: Casa Rosada `[660,960,1206,1395]` (the most ornate, 11.7 %) against the patchwork
-`[520,1430,780,1575]` (3.2 %). Kyoto: Kinkaku-ji `[638,739,1170,1129]` (10.4 %) against the patchwork `[560,1180,720,1300]`
-(0.6 %) and the far mountains `[660,634,1206,799]` (0.1 %, L* range 30). Hanoi's far city `[360,574,1200,829]` shows the
-other far option: a miniature with real windows (4.0 %) rather than blocks.
+**Where it lives** (boxes in each screenshot's pixels; all 37 in the script): Singapore's MBS towers `[232,661,877,1054]`
+(a 2-3 px mullion grid, lit and shade faces, the skypark's tiny trees) against the far blocks `[0,739,345,994]` and the
+patchwork `[135,1339,495,1609]` (stairs, arches, walls as flat blocks of the shophouses' terracotta, sage and teal);
+Hallgrimskirkja `[45,398,532,1118]` (each stepped column a lit/shade pair) against the faceted roofs `[0,1118,630,1260]`
+(1.3 % beside the houses' 5.7 %); Casa Rosada `[660,960,1206,1395]` (11.7 %) against the patchwork `[520,1430,780,1575]`
+(3.2 %); Kinkaku-ji `[638,739,1170,1129]` (10.4 %) against the patchwork `[560,1180,720,1300]` (0.6 %) and the far
+mountains `[660,634,1206,799]` (0.1 %). Hanoi's far city `[360,574,1200,829]` is the other far option: a miniature (4.0 %).
 
 **What creates the feeling, three findings:**
 1. **The tiers change resolution, never style.** What stays: the face size (A 49 px, C near 49 px), the palette (C sits
@@ -64,7 +62,7 @@ between. For this feeling, that is what reads "cheap and lazy": big areas with n
 in kind than a crate.
 
 ## 2. How the professionals do it
-Sources were read through search summaries this session: the steamstatic CDN (Valve's PDFs) was not reachable from it.
+Read through search summaries (Valve's PDFs on the steamstatic CDN were not reachable from this session).
 1. **Valve, Team Fortress 2** (Mitchell, Francke, Eng, "Illustrative Rendering in Team Fortress 2", NPAR 2007; Mitchell,
    "Stylization with a Purpose", GDC 2008: https://cdn.steamstatic.com/apps/valve/2008/GDC2008_StylizationWithAPurpose_TF2.pdf):
    a "read hierarchy" (team, then class, then weapon); environments of simple forms, minimised visual noise in texture
@@ -103,17 +101,14 @@ Sources were read through search summaries this session: the steamstatic CDN (Va
    https://www.audubon.org/magazine/january-february-2008/counting-wings): the subject reduced to its simplest visual
    terms without losing its identity (his line, in several wordings: he counts the wings, not the feathers). **Teaches:** what C keeps
    (silhouette, proportions, colour, the count of big parts) and what it drops (the small features).
-9. **Lost and found edges** (Matt Kohr, Ctrl+Paint, "Lost Edges": https://www.ctrlpaint.com/videos/lost-edges; Utrecht
-   University, "Macchie, Passages and 'Edges Lost & Found'": https://research-portal.uu.nl/en/publications/macchie-passages-and-edges-lost-amp-found/):
-   an edge is lost where neighbouring shapes are close in value and hue, found where they differ; the sharpest edges sit
-   near the focal point. **Teaches:** in flat colour, edge emphasis is the value and hue step between two fills.
-10. **Game LOD practice** ("Level of detail (computer graphics)", Wikipedia: LOD falls with distance "or according to
-   other metrics such as object importance"; texel density: one detail density per scene, heroes allowed more, e.g.
-   https://www.vertexschool.com/texel-density-guide): **Teaches:** pick each object's level from its role and its
-   on-screen size; keep one density per plane so nothing looks sharper or blurrier than its neighbours.
-11. **Shedworks, Sable** (GDC 2022, "The Art of Sable": https://gdcvault.com/play/1027721/The-Art-of-Sable-Imperfection;
-   Game Developer's report): a flat-shaded, line-drawn world got its readability from lighting first and a distant fog
-   its director called key. **Teaches:** one light and one air are what make simple and detailed objects one world.
+9. **Lost and found edges** (Matt Kohr, Ctrl+Paint, https://www.ctrlpaint.com/videos/lost-edges; Utrecht University,
+   https://research-portal.uu.nl/en/publications/macchie-passages-and-edges-lost-amp-found/): an edge is lost where two
+   shapes are close in value and hue, found where they differ. **Teaches:** in flat colour, emphasis is the fills' step.
+10. **Game LOD practice** (Wikipedia, "Level of detail (computer graphics)": by distance "or according to other metrics
+   such as object importance"; texel density, one per scene: https://www.vertexschool.com/texel-density-guide).
+   **Teaches:** each object's level from its role and on-screen size; one detail density per plane.
+11. **Shedworks, Sable** (GDC 2022, https://gdcvault.com/play/1027721/The-Art-of-Sable-Imperfection): a flat-shaded,
+   lined world read through lighting first and a distant fog. **Teaches:** one light and one air make it one world.
 Dropped after search: Kurzgesagt (no first-party writing on detail hierarchy found), Marco Bucci, Sinix and Feng Zhu (no
 checkable source found in this pass), Breath of the Wild's painterly far LOD (not confirmed).
 
@@ -150,8 +145,8 @@ kept, covers every tier, weaker with distance; another line -> no tier invents a
 **3.3 The "can't spot it at a glance" test.** **Owner** (each G4 look clip and G6 cut, on the phone): flick the frame
 past as a scroll (~2 s): does anything look off, is it one picture? Then look 10 s: name the crispest thing. Pass: nothing
 off at 2 s, the beat's A named at 10 s (the UX five-second test, Perfetti, UIE 2005, is the same idea). **The check**
-(`scripts/qa/check_finish.py`, new; prototype: `video/scripts/look/posters/pro_2_hierarchy.py`), on the tier map (a debug
-render with each tier scope in one flat ID colour, as the depth sheets render planes) and the frame: (1) finish: A's
+(`scripts/qa/check_finish.py`, new; prototype: `video/scripts/look/posters/pro_2_hierarchy.py`), on a finish sheet (JSON
+boxes or polygons per tier from the code's geometry, like `scripts/qa/depth_sheets/`) and the frame: (1) finish: A's
 small features >= 3x C near's and >= 5x C far's (posters 3.8x, 10x), A's tones >= C's; (2) glance: after a Gaussian
 blur of sigma 3 px (the < 9 px features gone), each C plane is within CIEDE2000 8 of the A/B palette, edge width within
 1.3x, face side within 2x of A's, local contrast >= 0.4x A's (C must not be a hole); (3) emptiness: no C region over 5 %
@@ -171,8 +166,8 @@ fill colour, tone count, texture or edge width falls outside its tier's band. Pl
   Building still calls the v1 sketch helpers (`hatch`, `wallTicks`): the LOD pass moves it onto the clean pen for good.
 - **`src/lib/patchwork.ts`** (new, M-L): fills a C mass (its layout polygon) with flat facets: a recursive guillotine
   (BSP) split snapped to the scene's grid (verticals, horizontals, `lib/persp.tsx`'s vanishing lines, 45-degree cuts),
-  facet sides from the plane's distribution (near ~50 px, far ~75 px), clipped to the mass with polygon-clipping (mfogel,
-  MIT); natural masses (hills, crowns) as Delaunay facets (delaunator, Mapbox, ISC: https://github.com/mapbox/delaunator);
+  facet sides from the plane's distribution (near ~50 px, far ~75 px), clipped to the mass with polygon-clipping (npm,
+  mfogel); natural masses (hills, crowns) as Delaunay facets (delaunator, Mapbox, ISC: https://github.com/mapbox/delaunator);
   fills from the plane's 4-7 palette fills, tone by orientation to the key, neighbours dL* 4-10, identity marks seeded
   every 3-6 facets; facets belong to their plane (they parallax with it) and never move or boil.
 - **Texture** (rule 4's test): a plane factor 1.0 / 0.7 / 0.4 in its shader.
@@ -210,8 +205,8 @@ Tiers from `docs/v2/THROUGHLINE.md` §4; "before" from `baseline_v2_sheet.jpg` a
 - **Everywhere:** if the texture test keeps it, its plane factors; one ladder in every shot, so the brand reads.
 
 ## 5. What the owner didn't name that matters for this feeling
-1. **The hero's size.** Finish needs room: the posters' heroes fill 4-20 % of the frame (their boxes); v2's S1 subject
-   is ~0.3 %. Below ~3 px a feature vanishes on a phone, so the crisp object must be big where its finish is the point
+1. **The hero's size.** Finish needs room: each poster's main hero box covers 4-20 % of the frame (median 14 %); v2's S1
+   subject is ~0.3 %. Below ~3 px a feature vanishes on a phone, so the crisp object is big where its finish is the point
    (or the camera pushes in): in a city film the landmark is the natural A.
 2. **Fullness is shape count, not small features.** The patchwork has the hero's density of shapes; v2's flats have a
    quarter of it. "Low poly" removes features, never shapes.
@@ -226,11 +221,11 @@ Tiers from `docs/v2/THROUGHLINE.md` §4; "before" from `baseline_v2_sheet.jpg` a
 ## 6. Clashes with the owner's earlier words, and open questions
 **Clashes (flagged, not overruled):**
 1. **The near world's contrast.** CRAFT §b (C local contrast <= 7, A >= 2x C) and DIRECTION rule 2 ("C, the
-   environment: no outlines, low contrast") against the posters' near patchwork (9.7 [5.0-17.8]; A / C 1.1x). The
-   owner's words: "supporting life (a bird, walkers, snow, steam) stays subtle (smaller, lower contrast, thinner or no
-   lines, softer colour, calmer motion)" and "Supporting environment may be drawn in a softer, simpler style than the
-   subject" (playbook, ATTENTION HIERARCHY). The posters' C is simpler but not softer: its calm comes from no small
-   features and no motion. The CRAFT cap stands until the owner says otherwise (question 2).
+   environment: no outlines, low contrast"; `check_depth.py` WARNs over 7) against the posters' near patchwork (9.7
+   [5.0-17.8]; A / C 1.1x). The playbook (owner rank): "supporting life (a bird, walkers, snow, steam) stays subtle
+   (smaller, lower contrast, thinner or no lines, softer colour, calmer motion)"; "Supporting environment may be drawn in
+   a softer, simpler style than the subject". The posters' C is simpler but not softer: its calm comes from having no
+   small features and no motion. The cap stands until the owner says otherwise (question 2).
 2. **Big flat areas.** CRAFT §c: "big areas flat ... texture only as flat same-hue shapes ... on 1-2 small surfaces per
    shot"; the patchwork cuts big areas into many flat facets (each flat, dL* 4-10). It is shape, not texture, but it
    changes what "big areas flat" means: the owner's call with question 1.

@@ -60,7 +60,7 @@ W540 = 540  # the house depth check's working width (scripts/qa/check_depth.py)
 # height, est.).
 POSTERS = {
     '01_singapore.jpg': dict(
-        city='Singapore', hero='Marina Bay Sands',
+        city='Singapore', hero='Marina Bay Sands', tallest_top=665,
         sky=[[150, 260, 1000, 560]], air=[[420, 580, 820, 650]], title=[400, 175, 800, 230],
         planes=[
             dict(name='frame: leaves', rank=1, poly=[[0, 1290], [90, 1290], [180, 1330], [260, 1420], [300, 1625], [0, 1625]]),
@@ -74,7 +74,7 @@ POSTERS = {
         structures=[
             dict(name='shophouses (roofs, fronts)', box=[480, 1160, 1206, 1625]),
             dict(name='stairs and arch', box=[120, 1380, 600, 1625]),
-            dict(name='Marina Bay Sands', box=[230, 660, 870, 1045]),
+            dict(name='Marina Bay Sands', box=[230, 660, 870, 1045], draw=False),
             dict(name='far shore', box=[0, 1080, 850, 1160]),
         ],
         views=[dict(zone='one camera (raised over the near roofs)', y=1140, cue="the bay's far edge (x 0-830); the near roofs are seen from above")],
@@ -90,7 +90,7 @@ POSTERS = {
         ],
     ),
     '02_reykjavik.jpg': dict(
-        city='Reykjavik', hero='Hallgrimskirkja',
+        city='Reykjavik', hero='Hallgrimskirkja', tallest_top=395,
         sky=[[400, 200, 1000, 520]], air=[[400, 840, 560, 885]], title=[300, 145, 900, 195],
         planes=[
             dict(name='frame: the nearest houses', rank=1, poly=[[0, 1440], [560, 1430], [560, 1500], [900, 1500], [900, 1608], [0, 1608]]),
@@ -104,7 +104,7 @@ POSTERS = {
         structures=[
             dict(name='Harpa', box=[585, 990, 1150, 1240]),
             dict(name='house rows', box=[0, 1100, 1000, 1608]),
-            dict(name='Hallgrimskirkja', box=[30, 390, 540, 1120]),
+            dict(name='Hallgrimskirkja', box=[30, 390, 540, 1120], draw=False),
         ],
         views=[dict(zone='one camera (raised over the roofs)', y=990, cue="the sea's far edge (x 330-1206); Harpa's edges meet on it")],
         things=[
@@ -122,7 +122,7 @@ POSTERS = {
         ],
     ),
     '03_hanoi.jpg': dict(
-        city='Hanoi', hero='One Pillar Pagoda',
+        city='Hanoi', hero='One Pillar Pagoda', tallest_top=430,
         sky=[[500, 290, 1000, 520]], air=[[620, 560, 780, 600]], title=[480, 215, 740, 270],
         planes=[
             dict(name='frame: cyclo, woman, flowers', rank=1, boxes=[[60, 1295, 370, 1610], [990, 1350, 1206, 1610], [740, 1430, 990, 1610]]),
@@ -139,7 +139,7 @@ POSTERS = {
             dict(name='Huc bridge', box=[140, 1040, 650, 1250]),
             dict(name='pagoda balustrade', box=[690, 1255, 1206, 1365]),
             dict(name='left street (shophouses, road)', box=[0, 760, 320, 1610]),
-            dict(name='One Pillar Pagoda', box=[680, 840, 1190, 1390]),
+            dict(name='One Pillar Pagoda', box=[680, 840, 1190, 1390], draw=False),
         ],
         views=[dict(zone='near/mid eye level', from_=['Huc bridge', 'pagoda balustrade']),
                dict(zone='far horizon (lifted)', y=925, cue="the lake's far edge at the Turtle Tower (x 300-860)")],
@@ -157,7 +157,7 @@ POSTERS = {
         ],
     ),
     '04_buenos_aires.jpg': dict(
-        city='Buenos Aires', hero='the Obelisco',
+        city='Buenos Aires', hero='the Obelisco', tallest_top=400,
         sky=[[100, 200, 540, 600], [700, 200, 1150, 600]], air=[[700, 770, 940, 830]], title=[350, 125, 870, 175],
         planes=[
             dict(name='frame: La Boca houses, cafe', rank=1, poly=[[0, 930], [180, 960], [420, 1120], [560, 1170], [560, 1579], [0, 1579]]),
@@ -194,7 +194,7 @@ POSTERS = {
         ],
     ),
     '05_cape_town.jpg': dict(
-        city='Cape Town', hero='Table Mountain',
+        city='Cape Town', hero='Table Mountain', tallest_top=600,
         sky=[[100, 260, 1000, 480]], air=[[0, 600, 80, 700]], title=[420, 200, 790, 250],
         planes=[
             dict(name='frame: proteas, stairs', rank=1, poly=[[0, 1260], [200, 1240], [420, 1300], [480, 1460], [480, 1605], [0, 1605]], extra_boxes=[[1100, 1385, 1206, 1605]]),
@@ -227,7 +227,7 @@ POSTERS = {
         ],
     ),
     '06_copenhagen.jpg': dict(
-        city='Copenhagen', hero='Nyhavn',
+        city='Copenhagen', hero='Nyhavn', tallest_top=355,
         sky=[[350, 300, 1000, 650]], air=[[745, 960, 840, 1040]], title=[280, 190, 940, 245],
         planes=[
             dict(name='frame: the mermaid on her rock', rank=1, poly=[[840, 1625], [860, 1330], [900, 1120], [1000, 1100], [1100, 1300], [1170, 1340], [1206, 1450], [1206, 1625]]),
@@ -260,7 +260,7 @@ POSTERS = {
         ],
     ),
     '07_kyoto.jpg': dict(
-        city='Kyoto', hero='Kinkaku-ji',
+        city='Kyoto', hero='Kinkaku-ji', tallest_top=465,
         sky=[[300, 250, 1000, 600]], air=[[380, 640, 560, 690]], title=[460, 190, 760, 240],
         planes=[
             dict(name='frame: maple, veranda, bamboo', rank=1, boxes=[[0, 880, 170, 1240], [0, 1215, 330, 1618], [965, 1275, 1206, 1618]]),
@@ -274,8 +274,8 @@ POSTERS = {
         structures=[
             dict(name='Kinkaku-ji', box=[640, 740, 1175, 1140]),
             dict(name='veranda', box=[0, 1150, 340, 1618]),
-            dict(name='torii tunnel', box=[80, 1040, 440, 1320]),
-            dict(name='pagoda', box=[100, 450, 420, 920]),
+            dict(name='torii tunnel', box=[80, 1040, 440, 1320], draw=False),
+            dict(name='pagoda', box=[100, 450, 420, 920], draw=False),
         ],
         views=[dict(zone='mid eye level (Kinkaku-ji, gentle two-point)', from_=['Kinkaku-ji']),
                dict(zone='near eye level (torii tunnel, by eye)', y=1236, cue="the tunnel's beams meet at its far end (x ~300-320), by eye on a 1.3x crop"),
@@ -540,8 +540,21 @@ def structure_vps(bgr, valid, box, seed=11):
 
 # ================================================================= views: eye levels and camera heights
 
-def resolve_views(cfg, structs):
-    """Each view's eye-level y: a cue's y, or the mean y of the first finite VP of each named structure."""
+def pick_vp(struct, W):
+    """A structure's VP that fixes an eye level: the strongest finite one, skipping a near-parallel family far out
+    (angle spread < 2 deg and > 3 widths from the centre: its height is ill-defined, e.g. a paving's level joints)."""
+    for p in struct.get('vps', []):
+        if p['kind'] != 'finite':
+            continue
+        spread = p['angle_p10_p90'][1] - p['angle_p10_p90'][0]
+        if spread < 2.0 and abs(p['x'] - W / 2) > 3 * W:
+            continue
+        return p
+    return None
+
+
+def resolve_views(cfg, structs, W):
+    """Each view's eye-level y: a cue's y, or the mean y of each named structure's picked VP (`pick_vp`)."""
     out = []
     for v in cfg.get('views', []):
         d = dict(zone=v['zone'])
@@ -550,10 +563,10 @@ def resolve_views(cfg, structs):
         else:
             ys, src = [], []
             for name in v['from_']:
-                fin = [p for p in structs.get(name, {}).get('vps', []) if p['kind'] == 'finite']
-                if fin:
-                    ys.append(fin[0]['y'])
-                    src.append(f"{name}: VP ({fin[0]['x']:.0f}, {fin[0]['y']:.0f})")
+                p = pick_vp(structs.get(name, {}), W)
+                if p:
+                    ys.append(p['y'])
+                    src.append(f"{name}: VP ({p['x']:.0f}, {p['y']:.0f})")
             if not ys:
                 continue
             d.update(y=float(np.mean(ys)), source='; '.join(src), spread=float(max(ys) - min(ys)))
@@ -565,6 +578,45 @@ def camera_height(thing, horizon):
     """Camera height (m) a thing implies under a horizon: m x (base - horizon) / (base - top); negative = its base
     stands above the eye level."""
     return thing['m'] * (thing['base'] - horizon) / max(1e-6, thing['base'] - thing['top'])
+
+
+def frame_cover(frame_masks, near_masks, valid):
+    """How the bottom and the sides are filled: `band_top` = the y (fraction) above which the nearest plane covers less
+    than 40 % of a row (scanning up from the bottom edge); `bottom` = the share of the bottom tenth covered by the
+    nearest plane; `sides` = the share of the outer 15 % columns, lower half, covered by the nearest two (non-ground)
+    planes."""
+    H, W = valid.shape
+    fm = np.zeros((H, W), bool)
+    for m in frame_masks:
+        fm |= m
+    nm = np.zeros((H, W), bool)
+    for m in near_masks:
+        nm |= m
+    rows = np.nonzero(valid.any(1))[0]
+    y0, y1 = rows[0], rows[-1] + 1
+    cov = fm[y0:y1].mean(1)
+    band = y1
+    for y in range(y1 - 1, y0, -1):
+        if cov[y - y0] < 0.4:
+            band = y + 1
+            break
+    bottom = fm[int(y1 - 0.1 * (y1 - y0)):y1].mean()
+    side_cols = np.r_[0:int(0.15 * W), int(0.85 * W):W]
+    lower = slice(int(y0 + 0.5 * (y1 - y0)), y1)
+    sides = nm[lower][:, side_cols].mean()
+    return dict(band_top=round(band / H, 3), bottom=round(float(bottom), 3), sides=round(float(sides), 3))
+
+
+def poster_bands(cfg, views, res, H):
+    """One value per poster for the 9:16 mapping: the tallest element's top, the hero's top, the far horizon (a far
+    view, else the one camera), the near eye level (the median of the near/mid views, else the one camera; the veranda's
+    view from above left out), the near frame band's top."""
+    far = [v['y'] for v in views if 'far' in v['zone']] or [v['y'] for v in views if 'one camera' in v['zone']]
+    near = [v['y'] for v in views if ('near' in v['zone'] or 'mid' in v['zone']) and 'veranda' not in v['zone']] or [v['y'] for v in views if 'one camera' in v['zone']]
+    hb = cfg.get('hero_box') or {}
+    return dict(tallest_top=round(cfg['tallest_top'] / H, 3), hero_top=round(hb['top'] / H, 3) if hb else None,
+                far=round(min(far) / H, 3) if far else None, near=round(float(np.median(near)) / H, 3) if near else None,
+                frame_top=res['frame']['band_top'])
 
 
 def unit_ladder(cfg):
@@ -723,7 +775,7 @@ def analyse_poster(name, cfg, model=None):
     else:
         valid_lines = valid
     structs = {st['name']: structure_vps(bgr, valid_lines, st['box']) for st in cfg['structures']}
-    views = resolve_views(cfg, structs)
+    views = resolve_views(cfg, structs, W)
     seg = segments(bgr, valid_lines)
     res = dict(file=name, city=cfg['city'], hero=cfg['hero'], size=[W, H], structures=structs, views=views,
                lines=line_stats(seg, H), planes=measure_planes(bgr, valid, cfg), rows=row_profile(bgr, valid, cfg.get('title')),
@@ -734,6 +786,9 @@ def analyse_poster(name, cfg, model=None):
     if hb:
         res['hero_frac'] = dict(top=round(hb['top'] / H, 3), base=round(hb['base'] / H, 3), height=round((hb['base'] - hb['top']) / H, 3))
     res['ground_share'] = round(sum(p['share'] for p in res['planes']['planes'] if p['role'] == 'ground'), 4)
+    res['frame'] = frame_cover([plane_mask(bgr.shape, p) for p in cfg['planes'] if p['rank'] == 1],
+                               [plane_mask(bgr.shape, p) for p in cfg['planes'] if p['rank'] <= 2 and p.get('role') != 'ground'], valid)
+    res['bands'] = poster_bands(cfg, views, res, H)
     if model:
         d = depth_net(bgr, model)
         res['depth'] = depth_layering(d, valid)
@@ -847,6 +902,8 @@ def vp_panel(bgr, cfg, structs, views, width=420, margin=0.36, title=''):
     Y = lambda y: int(round(head + y * s))
     k = 0
     for st in cfg['structures']:
+        if not st.get('draw', True):
+            continue
         for v in structs.get(st['name'], {}).get('vps', []):
             col = bgr_hex(CAT[k % len(CAT)])
             k += 1
@@ -865,7 +922,8 @@ def vp_panel(bgr, cfg, structs, views, width=420, margin=0.36, title=''):
         col = view_col(v['zone'])
         y = Y(v['y'])
         dashed(canvas, (0, y), (canvas.shape[1], y), col, 2)
-        put(canvas, f"{v['y'] / H:.2f} H", (canvas.shape[1] - 70, y - 6), 0.5, col, 1, bg=(255, 255, 255))
+        word = 'far' if 'far' in v['zone'] else 'one camera' if 'one camera' in v['zone'] else 'near'
+        put(canvas, f"{word} {v['y'] / H:.2f} H", (canvas.shape[1] - (150 if word == 'one camera' else 102), y - 6), 0.5, col, 1, bg=(255, 255, 255))
     put(canvas, title, (8, 24), 0.62, INK, 1)
     return canvas
 

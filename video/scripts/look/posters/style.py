@@ -1282,7 +1282,7 @@ def sheet_colour(J, items, out: Path):
         im.paste(bm, (24 + thw + 20, y))
         x0 = 24 + 2 * thw + 50
         label(d, (x0, y), tag, 22, bold=True)
-        bw = 1180
+        bw = 1040
         xx = x0
         for cl in c.get('clusters', []):
             w = max(2, int(round(bw * cl['share'] / 100)))
@@ -1300,10 +1300,10 @@ def sheet_colour(J, items, out: Path):
         lines = [f"warm {f.get('warm', 0):.0f} %  cool {f.get('cool', 0):.0f} %  green-olive {f.get('green-olive', 0):.0f} %  neutral (C*<6) {f.get('neutral', 0):.0f} %",
                  f"C* median {ch.get('p50', 0):.1f}, p90 {ch.get('p90', 0):.1f};  C*>=30 {ch.get('ge30', 0):.1f} %;  pop C*>=50 {ch.get('ge50_pop', 0):.2f} %",
                  f"L* p5 / p50 / p95 {li.get('p5', 0):.0f} / {li.get('p50', 0):.0f} / {li.get('p95', 0):.0f};  dark L*<40 {dk.get('lt40_pct', 0):.1f} %  (<30 {dk.get('lt30_pct', 0):.1f} %)",
-                 f"never bands: beige {b.get('beige', 0):.1f}  olive {b.get('olive', 0):.1f}  grey {b.get('grey', 0):.1f}  (+ yellow-green {b.get('yellow-green', 0):.1f}) %" +
-                 (f";  below the skyline {land:.0f} %" if land is not None else '')]
+                 f"never bands: beige {b.get('beige', 0):.1f}  olive {b.get('olive', 0):.1f}  grey {b.get('grey', 0):.1f} (+ y-green {b.get('yellow-green', 0):.1f}) %" +
+                 (f"; land {land:.0f} %" if land is not None else '')]
         for i, t in enumerate(lines):
-            label(d, (x0 + bw + 24, y + 34 + 26 * i), t, 18)
+            label(d, (x0 + bw + 20, y + 34 + 26 * i), t, 17)
         y += rowh
     save_sheet(im, out)
 
@@ -1506,7 +1506,7 @@ def sheet_texture(J, out: Path, frames: Path, enc: Path | None):
             def ret(tag, kind):
                 src = math.sqrt(max(0, c[f'source_{kind}_std'] ** 2 - A0.get(f'source_{kind}_std', 0) ** 2))
                 got = math.sqrt(max(0, c[f'{tag}_{kind}_std'] ** 2 - A0.get(f'{tag}_{kind}_std', 0) ** 2))
-                return f"{100 * got / src:.0f}%" if src > 0.08 else '-'
+                return f"{100 * got / src:.0f}%" if src > 0.15 else "-"
             txt = (f"{k}: master {c['master_kbps']:.0f} kbps ({100 * c['master_kbps'] / A0.get('master_kbps', 1) - 100:+.0f} %); "
                    f"grain kept {ret('p1080', 'hp')} at 1080 / {ret('p720', 'hp')} at 720; mottle kept {ret('p1080', 'lp')} / {ret('p720', 'lp')}; "
                    f"frame-to-frame |dL*| {c['master_temporal_dL']} / {c['p1080_temporal_dL']} / {c['p720_temporal_dL']} (master / 1080 / 720); "

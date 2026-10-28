@@ -165,8 +165,11 @@ Everything that agent knew is in this repo. This file is the map; the details li
   branch; output `journals/` in the study folder (the rubric, about 200-300 stories from the last 30 days, scores, a
   blind second scorer on a sample, clusters, a chart, a summary). The environment's network policy denies the news
   hosts and feeds (checked 2026-10-28 22:20 UTC: economist.com, time.com, forbes.com, nytimes, theguardian.com,
-  reuters.com, apnews.com, GDELT, Google News, wikipedia.org), so the corpus comes from web search results; the owner
-  can allow the hosts under the environment's Network access settings.
+  reuters.com, apnews.com, GDELT, Google News, wikipedia.org), so the corpus came from web search results; then the
+  owner changed the network policy (~22:28 UTC) and the feeds load (economist.com, time.com, forbes.com, theatlantic.com,
+  theguardian.com, rss.nytimes.com, feeds.a.dj.com, wired.com, newyorker.com, ft.com via a redirect, news.google.com
+  RSS; reuters.com and apnews.com answer 401/403 from their own bot walls; GDELT doesn't answer): the corpus is built
+  from the feeds.
 - **The owner's answers (2026-10-28 ~22:10 UTC)** to our nine first observations are rules now where decided (one look,
   one brand; a VERY subtle texture to try; lit and shade faces; a full value range: DIRECTION intro and rules 3-6,
   CRAFT §c, PALETTE, the playbook) and open where not (outline-free edges: an A vs B picture; one consolidated layout
