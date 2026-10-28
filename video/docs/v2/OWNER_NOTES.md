@@ -150,6 +150,8 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   B (fine print + no repeated words, S6 / S7 boards lowered, S8's solid copies) go ahead as listed, then the sound re-time + mix and the master.
 - 2026-10-28 ~17:15 UTC, budget: "95%" -> ~$25.5 per weekly %, ~$128 left; fix pass B is the MUSTs only (+ the 34.0 light FAIL),
   run beside the sound re-time + mix, then the master; the cover + posting kit after Monday's reset unless margin remains.
+- 2026-10-28 ~18:25 UTC, budget: "96%" (the estimate was 96.4 %) -> ~4 % left; the film (fix B, sound sync, master) ~$35-50, the cover +
+  posting kit ~$10-20: both fit inside 100 %.
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
