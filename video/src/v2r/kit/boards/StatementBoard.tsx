@@ -69,6 +69,22 @@ export const BOARD_COLORS = {
   smearDeep: mixHex(CM.paper, CM.coatPlum, 0.16),
   scribble: mixHex(CM.coatPlum, CM.paper, 0.42),
 } as const;
+export type BoardColors = {[K in keyof typeof BOARD_COLORS]: string};
+
+/** S2's TOLD THE BBC A-board, calm (L2's request, 2026-10-28: there it SUPPORTS the wall of windows): the frame L* ~42 in
+ *  the coatPlum / line family (lit / shade one step either side), the face limestone L* 91, a step under the staff
+ *  panes; the lettering stays ink (it must read). The deal, Google and her boards keep BOARD_COLORS (A5). */
+const BBC_FRAME_C = mixHex(mixHex(CM.coatPlum, CM.line, 0.3), CM.paper, 0.08);
+export const BBC_CALM: Partial<BoardColors> = {
+  frame: BBC_FRAME_C,
+  frameLit: mixHex(BBC_FRAME_C, CM.paper, 0.2),
+  frameShade: mixHex(BBC_FRAME_C, CM.anchor, 0.35),
+  face: CM.limestone,
+  faceEdge: mixHex(CM.limestone, CM.stoneShade, 0.62),
+  keyline: BBC_FRAME_C,
+  rule: BBC_FRAME_C,
+  contour: mixHex(BBC_FRAME_C, CM.anchor, 0.5),
+};
 
 /** The shared faux weight of every key line (>= 56 px: headers and keys) so it holds at 216 px wide. ONE value for
  *  every board (fairness: no board gets extra weight). */
@@ -512,6 +528,8 @@ export type StatementBoardProps = {
   frameSeed?: string;
   /** Extra face content (drawn over the face and under the lettering; moves with the jolt). */
   children?: React.ReactNode;
+  /** A colour override (keys of BOARD_COLORS; a stable object, e.g. BBC_CALM). Default: BOARD_COLORS. */
+  colors?: Partial<BoardColors>;
 };
 
 /** The ground shadow of a board (flat, cast right and a little toward us; colour, never grey). */
@@ -550,11 +568,12 @@ const StatementBoardBody: React.FC<StatementBoardProps> = ({
   seed = 'board',
   frameSeed = FRAME_SEED,
   children,
+  colors,
 }) => {
   const t = useTime();
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
   const g = useMemo(() => boardFrame(face, stile, rail, legsTo, frame), [face.x0, face.y0, face.x1, face.y1, stile, rail, legsTo, frame?.keyInset, frame?.side, frame?.handle, frame?.margin]);
-  const C = BOARD_COLORS;
+  const C = useMemo(() => (colors ? {...BOARD_COLORS, ...colors} : BOARD_COLORS), [colors]);
   // ---- static paths (frame, face, keyline, contour ink)
   const P2 = useMemo(() => {
     const {outer: O, face: F, railB} = g;
@@ -680,7 +699,7 @@ const StatementBoardBody: React.FC<StatementBoardProps> = ({
     </>
   );
 };
-export const StatementBoard = tiered('support', {tone: BOARD_COLORS.frame}, StatementBoardBody);
+export const StatementBoard = tiered('support', {tone: (p: StatementBoardProps) => p.colors?.frame ?? BOARD_COLORS.frame}, StatementBoardBody);
 
 // ---------------------------------------------------------------- presets: layouts (baselines = dy from the face top)
 
@@ -912,6 +931,8 @@ export function herWipe(o: {t0?: number; wipeAt?: number; wipeDur?: number; wipe
 // ---- 4. the newsstand board (S2)
 
 export type ToldTheBBCBoardProps = PresetBase & {
+  /** Default BBC_CALM (S2's calm A-board); pass BOARD_COLORS for the full-contrast face. */
+  colors?: Partial<BoardColors>;
   /** Frame sizes for the smaller board (defaults 26 / 16). */
   stile?: number;
   rail?: number;
@@ -943,11 +964,11 @@ export function bbcContent(g: BoardGeom): {lines: BoardLine[]; rules: BoardRule[
 
 /** S2's newsstand A-board TOLD THE BBC (face S2.aBoard 400 x 200; the same face and type, smaller frame); already
  *  there: L2 slides it out with its own transform at 8.44. */
-const ToldTheBBCBoardBody: React.FC<ToldTheBBCBoardProps> = ({face = S2.aBoard, legsTo = S2_LEGS_Y1, stile = 26, rail = 16, seed = 'bbc', t0: _t0, ...rest}) => {
+const ToldTheBBCBoardBody: React.FC<ToldTheBBCBoardProps> = ({face = S2.aBoard, legsTo = S2_LEGS_Y1, stile = 26, rail = 16, seed = 'bbc', colors = BBC_CALM, t0: _t0, ...rest}) => {
   useCaptionFont();
   const g = useMemo(() => boardFrame(face, stile, rail, legsTo, BBC_FRAME), [face.x0, face.y0, face.x1, face.y1, legsTo, stile, rail]);
   const c = bbcContent(g);
-  return <StatementBoard face={face} legsTo={legsTo} stile={stile} rail={rail} frame={BBC_FRAME} lines={c.lines} rules={c.rules} seed={seed} {...rest} />;
+  return <StatementBoard face={face} legsTo={legsTo} stile={stile} rail={rail} frame={BBC_FRAME} lines={c.lines} rules={c.rules} seed={seed} colors={colors} {...rest} />;
 };
 export const ToldTheBBCBoard = tiered('support', {}, ToldTheBBCBoardBody);
 
