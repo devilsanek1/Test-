@@ -69,28 +69,50 @@ Demo: `src/entry-v2r-water.tsx` (`WaterFarSample`, `WaterAffineSample`; their sp
 ## S1's numbers (`src/v2r/scenes/V2S1_water.tsx`; DIAGNOSIS §2 has the geometry)
 - **Camera:** horizon 965, f 1400, eye 1.45 m over the water. **Grid:** 0.45 m bands: 4.7 px at the far edge (y 1111),
   12 px at 1200, 23 px at our edge; gaps 16 -> 26 % of the pitch; bars from y ~1143 (the first 7 px band).
-- **Tone:** k 0.40 (far) -> 0.72 (near) in steps of 0.05; TONE {waterL 76, waterH 182, waterC 10, hueSlope 0.9,
-  chromaSlope 0.32, C* 6.5-16}: the wing's brick #95B4B0 (L* 71) far -> #9EBBB6 (73.7) near; the lit lobby #ECC583 (L*
-  81.5, C* 39); the arch's ring L* 84.1 over its soffit 77.6 (`sep` -6.5: the ellipse closes with a clear step).
+- **Tone:** k 0.40 (far) -> 0.72 (near) in steps of 0.05; TONE {waterL 76, waterH 182, waterC 13.5, hueSlope 0.9,
+  chromaSlope 0.32, C* 9-16} (the approved Canal Mint: v6's first master had waterC 10 / cMin 6.5 and read a step greyer,
+  median C* 11.2): the wing's brick #8DB6B0 (L* 71, C* 15) far -> #96BCB6 (73.4, C* 14) near; the arch's ring L* 84.1
+  over its soffit 75.7 (`sep` -8.5: the mirrored ellipse closes at phone size).
+- **The ramp:** the far water #D7CDC5 (L* 83.0, C* 5.6: 5.2 under the air #FDD6B8, dE76 15 from the paving), the
+  crossing at C* 4.7-5.5 (y 1160-1176), the body #A0C5BE from y ~1260; `notLike` our paving as drawn (#F1D2B3).
+- **The lit door** (`wing/lobby`, `kind: 'light'`): the lit glass #F7CF86 (L* 85.1) -> the block #E6BE7D (L* 79.1, C*
+  39) from under the coping band to y ~1151 (33 % of 120 px), its bottom a 2.2 px ripple; three leaves 102 / 63 / 39 px
+  long, 8 / 6.8 / 5.8 px thick, L* 77.7 / 76.5 / 75.1, the water between them 7-14 px; the column ends at y ~1205.
 - **Sway:** +-1.4 px far -> +-4.4 px near; waves 3.2 m / 7.0 s and 1.6 m / 4.2 s (0.46 / 0.38 m/s toward us).
-- **Glitter:** x 196, rows reflTop - 3 .. our edge + 3, slope 0.06 rad; 12 bed lenses 21-56 x 3-6.2 px (L* 82, C* 34,
-  h 74); 6 sliver slots: ~4 alive (max 6), 20-34 px, L* 97.5, lit 0.46-0.78 s, from 0.30 s.
+- **Glitter:** x 196, rows reflTop - 3 .. our edge + 3, slope 0.06 rad; 7 bed lenses 28-48 x 4.2-6.6 px on the bands
+  >= 5 px (y 1123-1163; #F9BE7F, L* 81 C* 42 h 71); 6 sliver slots in the 6 lenses >= 4.5 px: ~4 alive (max 6), 20-34
+  px long, 3.5-4.8 px tall at full length, #FEEED1 (L* 94.7, C* 16), lit 0.46-0.78 s, from 0.30 s.
 - **Ripples:** 11 slots (6-11 alive on every frame), 40-150 px, 1.5-3 px, drift 6-16 px/s east, lives 2.6-4.6 s, rests
   0.2-0.7 s; clear of the glitter column and Pip's seat; a steady field from frame 0, revealed by the flood.
 - **Simplified (R5), and why:** the door's stiles and the bridge's railing are left to the set (they split the gold
-  column and combed the bend); the row reflects as its LEGS (0.19 h: a flat coat block read as a box), the outlines
-  O1-O3 reflect nothing; each boat is ONE dark band (hull + gunwale with the bow's sweep; the cabin and cratch only
-  fragmented it); the duck's ring is off (one more mover and line).
-- **Measured** (docs/v2/water/judge_metrics.py against v5, at 1.0 / 2.5 / 3.8 / 5.0 s): cool 85.9 / 85.0 / 83.5 /
-  83.4 % (v5 85-88), warm 12.3-13.8 %, under the sky 8.2-8.5 % cool; dx edges 50.5 / 60.3 / 65.4 / 67.1 per 1000
-  (A was 81-111, B 58-84); marks 12-16 (A 27-32); glitter gold 974-1030 px (A 128-354); Pip dE 28; motion over
-  2.50-3.48 s: 0.47 % px changing per frame, 0.69 % quick toggles (v5 0.33 / 0.60); +8 to +32 ms per frame; f150 and
-  f300 byte-identical in three processes.
-- **On the master** (deliverables/v2/v2r_G4_look_v6.mp4, 368 frames in 3 min 21 s at concurrency 2): the v5 -> v6 pixel
-  diff lies inside the water only (0 px outside at 1.0 / 2.5 / 5.0 s); check_banding PASS on the ramp's widest open
-  stretch (950,1249,1057,1265) and the open sky (one isolated step in 0,270,1080,560 at 0.5 s, as in v5); check_depth
-  0 FAIL with v5's same 5 WARN (3.0 / 5.4 s); check_light as v5 (its one FAIL, the bank's brightest 5 % 0.156 / 0.174 H
-  from her at 2.5 / 5.0 s, v5 0.155 / 0.172).
+  column and combed the bend); the far roofs and the far tower are ONE pale far mass, whole (`farCity`: their 8 bars
+  and troughs combed the left third beside the glitter; its lower edge the skyline smoothed, so no chimney notch lets
+  the far water through as a "crown"); the pier and the lamps break twice at most (`maxBars: 2`); the bus on the bridge
+  is whole; the row reflects as a slim wedge of its lowest 0.12 h (8 px wide at the waterline, `kMin` 0.85: L* 67-72,
+  <= 12 under every field, the gold included; a 14-19 px slab at L* 60 notched the gold), the outlines O1-O3 reflect
+  nothing; each boat is ONE dark band (hull + gunwale with the bow's sweep; the cabin and cratch only fragmented it); the
+  duck's ring is off (one more mover and line).
+- **Measured on lossless frames** (docs/v2/water/judge_metrics.py against v5, at 1.0 / 2.5 / 3.8 / 5.0 s): cool 93.6 /
+  93.0 / 92.7 / 92.6 % (v5 85-88), warm 5.4-5.8 %; dx edges 46.5 / 54.8 / 57.3 / 58.7 per 1000 (v6's first build
+  50.5-67.1); marks 15-17; glitter gold 676-743 px; Pip dE 29-31; `waterPieces`: 5 bars outside the glitter in x 0-360
+  at 1-5 s (the critic counted ~15); f180 / f300 byte-identical in two processes (sha256 7bce4572... / d435b704...).
+- **On the master** (deliverables/v2/v2r_G4_look_v6.mp4, re-rendered in place after the critic's fix pass: 368 frames
+  in 3 min 3 s at concurrency 2; `docs/v2/water/master_check.py` at 1 / 2 / 3 / 4 / 5 s, the critic's mask):
+
+  | at 1-5 s | khaki rows (door) | cool | warm | house bands | median C* | paving px |
+  |---|---|---|---|---|---|---|
+  | v6's first master | 13-15 | 79.3-82.2 % | 15.1-16.2 % | 2.80-3.35 % | 11.1-11.2 | 59-411 |
+  | this master | **0** | **90.5-91.6 %** | **6.6-7.1 %** | **1.18-1.35 %** | **14.8** | 8-11 |
+
+  The 8-11 paving-like px (dE76 2.9-5.0) are single 4:2:0 chroma specks at the glitter's sliver tips (x 188-215); the
+  ramp, the reflections and the near-left show none (0 in the lossless frames). Motion (2.50-3.48 s): 0.55 % px
+  changing per frame, 1.29 % quick toggles (v6's first 0.73 / 1.36, v5 0.71 / 1.55); horizontal edge onsets 66-72 per
+  1000 water px (v6's first 78-88, v5 45-48). Outside the water nothing changed: 0 px in the lossless 3.0 s frame
+  against v6's first code; the masters differ there by encode noise only (v5 -> this: 4,472 px over 30 codes in 358
+  frames; v6's first -> this, the same content outside: 3,906). check_banding PASS on the ramp's widest open stretch
+  (950,1249,1057,1265), the west gap and the zenith; the band 0,270,1080,560 WARN at 0.5 and 3.0 s (its caption lines;
+  v5 WARN at 0.5 s). check_depth 0 FAIL with v5's same 5 WARN (3.0 / 5.4 s). check_light as v5 (its one FAIL, the bank's
+  brightest 5 % 0.156 / 0.173 H from her at 2.5 / 5.0 s; greyed 196 / 185 px, OK).
 
 ## Recipes (each lane builds its own spec; never hand-roll a water)
 - **Every canal shot at evening (S2, S3, S4, S8):** copy S1's spec shape: your `groundCam`'s horizon and focal, the eye
@@ -98,7 +120,11 @@ Demo: `src/entry-v2r-water.tsx` (`WaterFarSample`, `WaterAffineSample`; their sp
   `#9CC3BC`, `tint` TINT_CANAL.water; one `WaterSource` per mass, vertical and light over the water, its `thing` the
   polygon you draw and its `axis` its own waterline; `sun` only where the sun is in frame; `ripples` 6-14 slots clear of
   your mascot's seat; `float` your shot's per-plane counter-shift inside the water's group; `flood` your frame-0 front if
-  the shot opens; run `waterProblems(spec, {t1, otherAlive})` and the judge's measures before you report.
+  the shot opens; run `waterProblems(spec, {t1, otherAlive})` and the judge's measures before you report, and the
+  colour numbers on the MASTER, not only on PNG frames (`docs/v2/water/master_check.py <master> <baseline>`: the 4:2:0
+  chroma of every delivered clip turns thin gaps and gold-on-teal rims khaki; S1's mask; copy it with your shot's water
+  edges and boxes). A lit window or lamp is `kind: 'light'` (LightOpts); a far skyline is one whole mass; a thin
+  vertical takes `maxBars: 2`; `notLike` the lit ground beside your water.
   - **S2** (the receding canal): the far quay's waterline is a sloped line: `axis: {a0, s}` (R1's affine map; mirrored
     edges follow the slope exactly; `affineMirror(a0, s)` mirrors a whole group the same way); the passing boat is a
     `moving` source; the two ducks take `floaterWater`. Not built yet: a moving boat's wake (a wide Kelvin V, R11).
@@ -126,3 +152,17 @@ Demo: `src/entry-v2r-water.tsx` (`WaterFarSample`, `WaterAffineSample`; their sp
   the band runs 2 px over the reflections' start.
 - Rendering on a full disk: Chrome falls back to shared memory files on the temp disk and the page crashes; render with
   `TMPDIR` on `/dev/shm` when the disk is tight.
+- (The critic on v6's first master, 2026-10-28, `docs/v2/water/CRITIC.md`.) A light drawn like a mass (a slab, then
+  equal round-capped bars on the grid) reads as a stack of pancakes, and its 2 px gaps turn khaki in the encode: a
+  light is a short block and a few shrinking leaves with real water between them.
+- Judge colour on the MASTER: yuv420p averages the chroma of every 2 x 2 block, so a gold-to-teal edge mixes to olive
+  on 1-2 rows whatever the PNG shows; khaki scales with the length of warm-on-cool edges: fewer, shorter gold shapes;
+  edges that wander across rows (a rippled block bottom, leaf flanks) never stack into one khaki row.
+- The mirrored sky darkened by a Fresnel step crosses the house beige band wherever it desaturates under L* 86:
+  hold the crossing in the clean gap (C* 4.7-5.5) and walk the ramp ROW BY ROW in the lint (the keys alone were clean).
+- The lit ground is the sky's own peach: a far water left at the sky's value reads as paving. Keep it a step under
+  the air and say which ground it must never equal (`notLike`).
+- A pale "sun path" under the glitter read as a pasted panel (and its rims with the gold mixed into the paving's
+  peach); a richer amber bed with gold-white slivers on the reflections reads as sun and stays out of the bands.
+- A sliver's sRGB edge with its lens is a third colour: at L* 97.5 C* 7 (near-white) on L* 82 gold it is the paving's
+  peach; at L* 94.7 C* 16 on C* 42 amber it stays >= 6 dE76 away (L* 97.5 can hold only C* ~7 in sRGB).
