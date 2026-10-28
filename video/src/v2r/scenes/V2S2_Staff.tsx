@@ -7,7 +7,8 @@
 //   idle: a 2-drawing weight shift or head turn (<= 5 px) every 0.62-0.88 s, staggered across the five.
 //   10.26 + i x 0.085 "scared": each figure starts stepping back 0.11 s before its blind (4 drawings at 12/s): it
 //     scales to 0.75 and sinks until its head top sits just under the half blind's bottom rail (further back in the
-//     room); the blind (CM.shadeWarm, CM.stoneShade slat hairlines, an ink bottom rail and cord) drops to half.
+//     room); the blind (one flat CM.shadeWarm shape, two soft fold bands, a rail and cord in its own deep shade: no
+//     ink) drops to half.
 //   12.20 "contracts": W2's blind drops fully (a full mauve block, the darkest pane after hers); its figure is gone.
 // The window's own mullion and transom (the set's, same fill and seed) are redrawn over the figure and the blind: the
 // person stands behind the glass. Everything is clipped to the pane, 2 px inside the set's frame line.
@@ -15,6 +16,7 @@ import React, {useId} from 'react';
 import {CM} from '../palette';
 import {Fill} from '../../lib/Fill';
 import {Ink} from '../../lib/Ink';
+import {seamTone} from '../../lib/depth';
 import {useTime} from '../../lib/time';
 import {ExitSync} from '../../lib/exit';
 import * as MAP from '../world/map';
@@ -43,7 +45,8 @@ type StaffLook = {
 /** No two neighbours alike (W2-SW2, W2-SW4, SW2-SW3, SW3-SW4, SW4-SW5 touch). */
 export const STAFF_LOOK: Record<string, StaffLook> = {
   // keyed by map S2.staffWindows ids since the conform: SW1 (200, 795) at her old spot, W2 (465, 776) beside hers
-  SW1: {hair: 'short', acc: 'mug', side: -1, broad: 1.95, idle: 'turn', period: 0.74, phase: 0.12, hand: 1},
+  // SW1's mug in its left hand, away from her pane (the critic, 2026-10-28: a forearm pointing at her window read as blame)
+  SW1: {hair: 'short', acc: 'mug', side: 1, broad: 1.95, idle: 'turn', period: 0.74, phase: 0.12, hand: -1},
   W2: {hair: 'crop', acc: 'headphones', side: 1, broad: 2.05, idle: 'shift', period: 0.86, phase: 0.47, hand: -1},
   SW3: {hair: 'short', acc: 'mug', side: -1, broad: 1.9, idle: 'turn', period: 0.66, phase: 0.29, hand: -1},
   SW4: {hair: 'crop', acc: 'headphones', side: 1, broad: 1.95, idle: 'shift', period: 0.8, phase: 0.05, hand: 1},
@@ -122,23 +125,36 @@ function staffFigure(o: {cx: number; top: number; r: number; sill: number; look:
   return {fill: d, cord};
 }
 
-/** The blind rig (this shot's colours): a CM.shadeWarm drop, CM.stoneShade slat hairlines, an ink rail and cord. */
+/** The blind's two deeper tones: its fold bands (one soft step under the blind, seamTone 6) and its bottom rail and
+ *  cord (the blind's own deep shade, seamTone 12). */
+const BLIND_BAND = seamTone(CM.shadeWarm, 6);
+const BLIND_DEEP = seamTone(CM.shadeWarm, 12);
+
+/** The blind (the critic, 2026-10-28: the slat hairlines striped the beat's subject): ONE flat warm-shade shape
+ *  (CM.shadeWarm), two soft fold bands across it a step deeper (flat fills at 0.36 and 0.7 of its drop, so a pleated
+ *  blind opens as it comes down), its bottom rail a flat bar in its own deep shade, and a short cord under the rail:
+ *  no ink anywhere. */
 const S2Blind: React.FC<{x: number; y: number; w: number; h: number; keys: BlindKey[]; seed: string}> = ({x, y, w, h, keys, seed}) => {
   const t = useTime();
   const k = blindAt(t, keys);
   if (k <= 0.005) return null;
   const bh = h * k;
   const rail = y + bh;
-  const gap = Math.max(7, Math.min(12, h / 13));
-  let slats = '';
-  for (let yy = y + gap; yy < rail - 3; yy += gap) slats += `M${P(x + 2)} ${P(yy)}L${P(x + w - 2)} ${P(yy + 0.6)}`;
+  const railH = Math.max(2.5, Math.min(4, h * 0.026));
+  const bandH = Math.max(2.5, Math.min(6, bh * 0.05));
+  let bands = '';
+  for (const f of [0.36, 0.7]) {
+    const yb = y + bh * f - bandH / 2;
+    if (yb + bandH < rail - railH - 2) bands += `M${P(x)} ${P(yb)}h${P(w)}v${P(bandH)}h${P(-w)}Z`;
+  }
   const cx = x + w * 0.8;
+  const cordL = Math.min(22, h * 0.16);
   return (
     <>
       <Fill rect={[x, y, w, bh]} color={CM.shadeWarm} offset={false} seed={`${seed}/f`} />
-      {slats ? <Ink d={slats} width={1.1} color={CM.stoneShade} taper={false} seed={`${seed}/s`} /> : null}
-      <Ink d={`M${P(x - 2)} ${P(rail)}L${P(x + w + 2)} ${P(rail + 0.5)}`} width={2.6} taper={false} seed={`${seed}/r`} />
-      <Ink d={`M${P(cx)} ${P(rail)}L${P(cx)} ${P(rail + Math.min(22, h * 0.16))}`} width={1.1} taper={false} seed={`${seed}/c`} />
+      {bands ? <Fill d={bands} color={BLIND_BAND} offset={false} seed={`${seed}/b`} /> : null}
+      <Fill d={`M${P(x - 2)} ${P(rail - railH)}h${P(w + 4)}v${P(railH)}h${P(-w - 4)}Z`} color={BLIND_DEEP} offset={false} seed={`${seed}/r`} />
+      <Fill d={`M${P(cx - 0.9)} ${P(rail)}h1.8v${P(cordL)}h-1.8Z`} color={BLIND_DEEP} offset={false} seed={`${seed}/c`} />
     </>
   );
 };

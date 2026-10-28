@@ -312,7 +312,9 @@ export const S2Wall: React.FC<S2WallProps> = ({staffCoolAt = MAP.S2.staffOnAt, s
           <Paint b={sb} seed={`s2wall/story/${w.id}`} misreg={false} />
         </Tier>
       ))}
-      {storyOverlay ? S2_STORY.map((w) => <React.Fragment key={`o${w.id}`}>{storyOverlay(w)}</React.Fragment>) : null}
+      {/* the overlays: the staff windows' first, HER window's last (its casing and outline, from 6.82, sit over SW1's
+          right edge, figure and blind included: SW1's opening ends at her stone casing) */}
+      {storyOverlay ? [...S2_STORY.filter((w) => w.id !== 'HER'), ...S2_STORY.filter((w) => w.id === 'HER')].map((w) => <React.Fragment key={`o${w.id}`}>{storyOverlay(w)}</React.Fragment>) : null}
     </>
   );
 };
