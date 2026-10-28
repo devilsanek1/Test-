@@ -124,8 +124,8 @@ export const pxPerMDeep = (cam: WaterCam, y: number) => ((y - cam.hz) * (y - cam
 /** Screen px per metre ACROSS at screen y. */
 export const pxPerM = (cam: WaterCam, y: number) => (y - cam.hz) / cam.eye;
 
-/** R6: ROWS at equal real spacing (dz metres) projected: the slice rows of every reflection and the ripple rows, thin
- *  far, thick near (S1, dz 0.32: 3.4 px at the far edge, 8.7 at y 1200, 16.6 near). Cached by value. */
+/** R6: ROWS at equal real spacing (dz metres) projected: the slice rows of every reflection and the glitter's bed, thin
+ *  far, thick near (S1, dz 0.45: 4.7 px at the far edge, 12.2 at y 1200, 23 near). Cached by value. */
 const ROWS = new Map<string, number[]>();
 export function perspectiveRows(cam: WaterCam, y0: number, y1: number, dz: number, minPitch = 2.5): number[] {
   const key = `${cam.hz}|${cam.f}|${cam.eye}|${y0}|${y1}|${dz}|${minPitch}`;
@@ -160,13 +160,12 @@ export function swayAt(s: Sway, cam: WaterCam, y: number, t: number): number {
 // ================================================================= shapes (one closed path each; the clean pen's rules)
 
 const n1 = (v: number) => (Math.round(v * 10) / 10).toString();
-/** A level LENS (a sliver, a ripple, a glint): pointed ends, the fullest at its middle. `bias` < 0 flattens the top
- *  (a sliver lying on the water). */
-export function lensPath(cx: number, cy: number, len: number, h: number, bias = 0): string {
+/** A level LENS (a sliver, a ripple, a glint): pointed ends, the fullest at its middle. */
+export function lensPath(cx: number, cy: number, len: number, h: number): string {
   if (len < 0.6 || h < 0.2) return '';
   const x0 = cx - len / 2;
   const x1 = cx + len / 2;
-  const top = cy - h / 2 + Math.max(0, -bias) * h * 0.25;
+  const top = cy - h / 2;
   const bot = cy + h / 2;
   // two quadratic arcs: control points at 2x the half-height make the apex exactly h tall
   const kt = cy - (cy - top) * 2;
@@ -187,22 +186,6 @@ export function barPath(x0: number, x1: number, y0: number, y1: number, taperL: 
   d += tr > 0.3 ? `Q${n1(x1 - tr * 0.2)} ${n1(y0)} ${n1(x1)} ${n1(ym)}Q${n1(x1 - tr * 0.2)} ${n1(y1)} ${n1(x1 - tr)} ${n1(y1)}` : `L${n1(x1)} ${n1(y1)}`;
   d += `L${n1(x0 + tl)} ${n1(y1)}`;
   d += tl > 0.3 ? `Q${n1(x0 + tl * 0.2)} ${n1(y1)} ${n1(x0)} ${n1(ym)}Q${n1(x0 + tl * 0.2)} ${n1(y0)} ${n1(x0 + tl)} ${n1(y0)}` : `L${n1(x0)} ${n1(y0)}`;
-  return d + 'Z';
-}
-
-/** A smooth closed outline through points (Catmull-Rom -> cubic Beziers): the clean pen's curves. */
-export function smoothClosed(pts: Pt[], tension = 0.5): string {
-  const n = pts.length;
-  if (n < 3) return '';
-  let d = `M${n1(pts[0][0])} ${n1(pts[0][1])}`;
-  for (let i = 0; i < n; i++) {
-    const p0 = pts[(i - 1 + n) % n];
-    const p1 = pts[i];
-    const p2 = pts[(i + 1) % n];
-    const p3 = pts[(i + 2) % n];
-    const k = tension / 3;
-    d += `C${n1(p1[0] + (p2[0] - p0[0]) * k)} ${n1(p1[1] + (p2[1] - p0[1]) * k)} ${n1(p2[0] - (p3[0] - p1[0]) * k)} ${n1(p2[1] - (p3[1] - p1[1]) * k)} ${n1(p2[0])} ${n1(p2[1])}`;
-  }
   return d + 'Z';
 }
 
@@ -314,8 +297,6 @@ export type Mass = {
   narrow?: number;
   /** Sway multiplier (0 = still). */
   sway?: number;
-  /** Hide everything above this y at x (the quay band covers it; for the block's top edge). */
-  topAt?: (x: number) => number;
 };
 
 /** The fill colour for a row of a mass. */
@@ -325,7 +306,6 @@ const colourAt = (m: Mass, y: number): string => {
   while (i < s.length && y >= s[i]) i++;
   return m.colors[Math.min(i, m.colors.length - 1)];
 };
-
 
 /** Colour runs (colour -> path data), drawn in insertion order, one <path> per colour. */
 export type Runs = Map<string, string[]>;

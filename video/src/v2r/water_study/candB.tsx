@@ -36,7 +36,7 @@ import {CM} from '../palette';
 import * as MAP from '../world/map';
 import {S1_EVENING} from '../world/skies';
 import {S1_PLANE} from '../scenes/V2S1_float';
-import {Batch, P, Paint, ovalPath, rand, rng} from '../kit/canal/core';
+import {Batch, P, Paint, ovalPath, rand} from '../kit/canal/core';
 import {tiered} from '../kit/tiers';
 import {BOATS, DUCK, FLOOD_ORIGIN, PAPER, REFLECTORS, S1_PALE, S1W_CAM, SUN, floatOf, floodRadius, reflTop, rowAt, waterBottom, waterPolygon, waterTop} from './geometry';
 import {
@@ -51,6 +51,7 @@ import {
   lensPath,
   okLch,
   paleOf,
+  perspectiveRows,
   pxPerMDeep,
   rampColour,
   rampKeys,
@@ -108,27 +109,21 @@ const RAMP_PALE: SkySpec = {...RAMP_SKY, keys: RAMP_SKY.keys.map((k) => ({y: k.y
 const waterAt = (y: number) => rampColour(RAMP, y);
 
 /** THE SLICE GRID (R6): bands at 0.45 m of water, projected (4.7 px at the far edge, 7.6 at y 1150, 12.2 at y 1200,
- *  18 at y 1250, 23 at our feet): every band's gap (its trough, the ramp showing through) 20 % of its pitch far ->
- *  32 % near. Few, calm bands: an editorial slice, never a barcode. */
-const ROWS = (() => {
-  const out: number[] = [];
-  let y = 1056;
-  while (y < 1340) {
-    out.push(y);
-    y += Math.max(3, pxPerMDeep(CAM, y) * 0.45);
-  }
-  return out;
-})();
+ *  18 at y 1250, 23 at our feet): every band's gap (its trough, the ramp showing through) 16 % of its pitch far ->
+ *  26 % near. Few, calm bands, shared by every reflection: an editorial slice, never a barcode. */
+const ROWS = perspectiveRows(CAM, 1056, 1340, 0.45, 3);
 const GRID = sliceGrid(ROWS, [0.16, 0.26], 1110, 1290);
 
-/** THE SWAY (R6, R12): +-1.3 px at the far bank -> +-4.2 px at our feet; 4.6 s and 2.9 s, wavelengths 1.5 m and 0.8 m,
- *  the phase travelling toward us (~0.3 m/s). */
+/** THE SWAY (R6, R12): amplitude 1.3 px at y 1090 -> 4.2 px at y 1290 (measured: +-1.5 px at the far bank, +-3.9 at our
+ *  feet; at most 2.3 -> 6.5 px/s); 4.6 s and 2.9 s, wavelengths 1.5 m and 0.8 m, the phase travelling toward us
+ *  (~0.3 m/s). */
 const SWAY: Sway = {amp: [1.3, 4.2], yFar: 1090, yNear: 1290, T: [4.6, 2.9], lambda: [1.5, 0.8], seed: 's1b'};
 
 // ================================================================= colours (R3-R4: toned in OKLCH, never mixed in RGB)
 
-/** Fresnel in three flat steps (R2): a reflection at full design strength under the far bank (k 0.3 toward the water's
- *  body), a step weaker from y 1150, the near third from y 1195 (k 0.6). */
+/** Fresnel in three flat steps (R2): every reflection takes three tones (fresnelSteps: k toward the water's body per
+ *  step, and from the second step less chroma, a warm hue turning through mauve, a cool one through slate): the far
+ *  bank's until y 1150, the middle's until y 1195, then the near third's. */
 const STEPS = [1150, 1195];
 const tone3 = (src: string, k: [number, number, number] = [0.3, 0.45, 0.6], o: {turn?: number; fade?: [number, number]} = {}) => fresnelSteps(src, k, CM.water, o);
 /** On-screen source colours (sampled at 1.0 s, after the clean pen; DIAGNOSIS §2.4). */
@@ -335,14 +330,14 @@ const bollardStubs = (): {x: number; y0: number; y1: number; w: number}[] =>
     return {x: b.x, y0: line - 4, y1: 2 * line - (b.foot - b.h), w: b.h * 0.9 * 0.84};
   });
 
-// ---- the sun's glitter column (R8): straight under SUN0 (x 196), over the whole water there (y 1100 -> 1172), densest
-// at its still-water mirror point (y 1158); half-width 15 px at the far edge -> 32 px at our edge (the low sun at 7.8 deg:
-// a narrow column, ~1.2x taller than wide in this strip, the start of a path ~7x longer than wide)
+// ---- the sun's glitter column (R8): straight under SUN0 (x 196), over the whole water there (y 1099 -> 1172), densest
+// at its still-water mirror point (y 1158); half-width 17 px at the far edge -> 36 px at our edge (the low sun at 7.8 deg:
+// a narrow column, the start of a path ~7x longer than wide); a bed of 12 lenses, 2-12 cores alive (mean 8)
 const GLITTER: Glitter = {x: SUN.x, yTop: reflTop(SUN.x) - 1, yBot: waterBottom(SUN.x) + 2, w: [17, 36], peak: SUN.mirror.y, seed: 's1sun', t0: 0.24};
 
 const GLITTER_BED = glitterBed(GLITTER, GRID);
 
-// ---- ripple lines (R9): 11 alive, mostly in the open near water, clear of the glitter column and Pip's seat
+// ---- ripple lines (R9): 6-11 alive (11 slots), mostly in the open near water, clear of the glitter column and Pip's seat
 const RIPPLES: Ripples = {
   slots: 11,
   seed: 's1rip',
@@ -546,8 +541,9 @@ const DuckBodyRaw: React.FC<{t: number}> = ({t}) => {
 const DuckBody = tiered('environment', {}, DuckBodyRaw);
 
 /** The duck's water: its reflection (the body mirrored about its waterline, toned), a thin contact line, and the
- *  Kelvin V (R11): two tapered light lines from its chest back, 2.5 deg per arm at its row (k = (y - hz) / f), 3.3 body
- *  lengths, each breaking into dashes toward its tail; one short transverse arc inside the V near the bird. */
+ *  Kelvin V (R11): two tapered light lines from its chest back, 2.5 deg per arm at its row (k = (y - hz) / f), 2.7 body
+ *  lengths (it ends short of the sun's glitter), each breaking into dashes toward its tail; one short transverse arc
+ *  inside the V near the bird. */
 const DuckWater: React.FC<{t: number}> = ({t}) => {
   const s = DUCK.size;
   const x = duckX(t);
