@@ -308,8 +308,11 @@ Everything that agent knew is in this repo. This file is the map; the details li
   - Workflow agents ran about 2 at a time on this 4-CPU container (render-heavy work is CPU-bound); more parallel work
     goes to helper cloud sessions, each its own machine (PIPELINE_V2 anti-waste rule 5; playbook Process).
   - **Usage limits (weekly/monthly) kill agents mid-task** (66 agents were lost on v1). Keep agent tasks small and
-    commit after each one; run `video/scripts/autocheckpoint.sh <branch> <your film's paths>` in the background (it
-    commits and pushes only those paths every 10 minutes when they changed; `--once` for a single checkpoint). The main loop kept working when agents could not.
+    commit after each one and at every turn's end; agents write their results into repo files, never only as messages
+    (a 5-hour limit on 2026-10-28 stopped three writers, and three finished ones existed only as messages); a long
+    unattended build runs `video/scripts/autocheckpoint.sh <branch> <your film's paths>` (every 10 minutes when those
+    paths changed, at most 2 hours per background job; `--once` for a single checkpoint); after the reset, resume a
+    stopped agent with SendMessage instead of starting a new one. The main loop kept working when agents could not.
   - ImageMagick circle avatar mask:
     `-alpha set ( +clone -alpha transparent -fill white -draw "circle ..." ) -compose DstIn -composite -background white -alpha remove`.
   - The scratchpad and `video/out/` are not in git (`video/out` is gitignored); deliverables go to `video/deliverables/`.

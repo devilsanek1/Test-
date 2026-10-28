@@ -267,12 +267,15 @@ Maintenance at the end).
   Track the spend hourly (helpers' `cost_usd`, workflow tokens), budget every lane, finish before polishing. The
   **5-hour session limit** is a hard wall shared by every session: watch both; before it hits, PAUSE in a controlled way
   (every lane stops its agents, commits + pushes, writes its handover; schedule the resume after the reset), so nothing
-  is lost. **Commit progress periodically, so a limit that hits without warning costs minutes, not work:** every session
-  runs `video/scripts/autocheckpoint.sh` in the background on its own film paths (a commit and push every 10 minutes
-  whenever they changed), commits after every agent, and briefs each agent to write its output file early and keep it
-  updated as it goes (owner, v4, 2026-10-27: "make sure to commit the progress periodically if we get stopped on the
-  usage limits"). Before any restart, re-read the current direction (`docs/look/DIRECTION.md`, the playbook and the docs
-  they link: other sessions change them) and integrate it into the film's one style page first. — (v2, 2026-10-27).
+  is lost. **Commit progress periodically, so a limit that hits without warning costs minutes, not work:** every agent
+  writes its result into a file in the repo as it goes (never only as its final message: on 2026-10-28 a 5-hour limit
+  hit while three finished writers' lines existed only as messages), the orchestrator commits after every agent and at
+  the end of every turn, and a long unattended build runs `video/scripts/autocheckpoint.sh` on its own paths (a commit
+  and push every 10 minutes when they changed; a background job lives at most 2 hours, so it covers one build, not a
+  whole day). An agent stopped by a limit resumes from its transcript (SendMessage) once the limit resets, rather than
+  starting over (owner, v4, 2026-10-27: "make sure to commit the progress periodically if we get stopped on the usage
+  limits"). Before any restart, re-read the current direction (`docs/look/DIRECTION.md`, the playbook and the docs they
+  link: other sessions change them) and integrate it into the film's one style page first. — (v2, 2026-10-27).
 - **NO LIMIT ON TOKENS for creative output (inside the weekly limit); never trade quality for savings.** Ideas, scripts, judged competing ideas,
   design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the
   quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
