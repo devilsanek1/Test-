@@ -84,11 +84,12 @@ const bollardD = (x: number, y: number, h: number) => {
   return `M${P(x - w * 0.42, y)}L${P(x - w * 0.3, y - h * 0.55)}L${P(x - w * 0.42, y - h * 0.78)}L${P(x + w * 0.42, y - h * 0.78)}L${P(x + w * 0.3, y - h * 0.55)}L${P(x + w * 0.42, y)}Z`;
 };
 
-const BENCH = {x: 112, y: PATH.edge - 8, w: 104} as const;
-const BOLLARDS = [262, 652, 1118] as const;
-const BOLLARD_H = 17;
-const BIN = {x: 948, y: PATH.edge - 9, h: 32} as const;
-const LAMP = {x: 986, y: PATH.edge - 6, h: 252} as const;
+// (exported for the canal's reflections: V2S3_water S3's lib/water spec)
+export const BENCH = {x: 112, y: PATH.edge - 8, w: 104} as const;
+export const BOLLARDS = [262, 652, 1118] as const;
+export const BOLLARD_H = 17;
+export const BIN = {x: 948, y: PATH.edge - 9, h: 32} as const;
+export const LAMP = {x: 986, y: PATH.edge - 6, h: 252} as const;
 
 function pathBatch(): Batch {
   const b = new Batch();

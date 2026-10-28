@@ -215,3 +215,79 @@ x 196 and is densest at its mirror point, y 1158. Two things miss:
   - warm: h under 110 or over 300 at C* over 8.
 - **A khaki row:** a row of the box with more than 50 % of its px khaki.
 - **Pip** (h 250-320) is left out of the box counts.
+
+## The fix pass (the fixer, 2026-10-28): one "fixed" line per item, measured on the re-rendered master
+The master is `deliverables/v2/v2r_G4_look_v6.mp4`, re-rendered in place (with its sheet, phone view and water v5 vs
+v6 sheet). The numbers are `docs/v2/water/master_check.py` at 1 / 2 / 3 / 4 / 5 s, with the critic's mask and
+classes; it reproduces this verdict's numbers on v6's first master exactly. The engine is in `src/lib/water.tsx`, S1's
+spec in `src/v2r/scenes/V2S1_water.tsx`, and the how-to in `src/lib/WATER.md`.
+
+| at 1-5 s, master | khaki rows (door) | cool | warm | house bands | median C* | paving px |
+|---|---|---|---|---|---|---|
+| target | <= 2 | >= 83 % | <= 15 % | <= 1.5 % | >= 12.5 | 0 |
+| v6's first master | 13-15 | 79.3-82.2 % | 15.1-16.2 % | 2.80-3.35 % | 11.1-11.2 | 59-411 |
+| re-rendered master | **0** | **90.5-91.6 %** | **6.6-7.1 %** | **1.18-1.35 %** | **14.8** | **8-11** |
+
+- **1. Fixed: the lit door is light on water.** It is `kind: 'light'`, drawn by `LightOpts`.
+  - A solid block of 33 % of the visible length: from under the coping band to y ~1151. Its bottom is a gentle static
+    2.2 px ripple, so no row carries the whole gold-to-water edge.
+  - Then 3 leaf slivers, pointed at both ends, flanks 1 - |u|^1.5. They are 102 / 63 / 39 px long (each 0.62 of the
+    one above; the first 0.62 x the block's width) and 8 / 6.8 / 5.8 px thick (0.85).
+  - The water between them is 7-14 px (>= 4.5).
+  - The tone: the lit glass is L* 85.1; the block L* 79.1 (6 under it), the slivers L* 77.7 / 76.5 / 75.1.
+  - Khaki rows in x 556-640, y 1150-1232: 0 at every second (13-15 before). The box's khaki px: 609-855 (1,703-2,077).
+  - At 720 px wide: the door's mirror breaking into three shrinking glints.
+- **2a. Fixed: the row's legs.** Each figure reflects as one slim wedge of its lowest 0.12 h: 8 px wide at the
+  waterline, tapering to a point. `kMin` 0.85 puts the tones at L* 67-72, <= 11.5 under the gold block and 1-6 under
+  the wall. Over the gold they are small dents, not slabs.
+- **2b. Fixed: the far water is never the paving.**
+  - The mirrored sky is a Fresnel step under the sky (OKLab L - 0.05). The far end is #D7CDC5 (L* 83.0): 5.2 L* under
+    the air #FDD6B8, and dE76 15 from the paving.
+  - Through the whole warm-to-cool crossing the chroma is held in the clean gap, C* 4.7-5.5 (`rampGap`).
+  - `waterProblems` now walks the ramp as drawn, row by row. It also flags any row within dE76 6 of a `notLike` colour
+    (S1: the paving #F1D2B3) and a far water under 4 L* below the `air`.
+  - Ramp rows in a house band: 0 (8 before).
+  - Paving-like px: 0 in the lossless frames (396 before). In the master, 8-11 (59-411 before): single 4:2:0 chroma
+    specks at the glitter's sliver tips (x 188-215, dE76 2.9-5.0). None in the ramp, the reflections or the near-left.
+    The target of 0 is not met, by those specks only.
+- **2c. Fixed: the left third's comb.**
+  - The far roofs and the far tower are ONE pale far mass, whole: `farCity`, its lower edge the skyline smoothed, so no
+    chimney notch lets the far water through. The crown is gone (crown box khaki px 0-2, 61-339 before).
+  - The pier and the lamps break twice at most (`maxBars: 2`). The bus on the bridge is whole.
+  - Bars outside the glitter in x 0-360 (`waterPieces`): 5 at every second from 1 to 5 s (~15 before).
+- **3. Fixed: Canal Mint.** `TONE_DEFAULT` is waterC 13.5, cMin 9 (was 10 / 6.5).
+  - The wing's reflection is C* 14.0-15.0 (#8DB6B0-#96BCB6); at (560, 1205) C* 13.9-14.8.
+  - The water's median C* is 14.8 (11.2 before; v5 13.2).
+  - 90.5-91.6 % cool, and no tone in a house band (the lint).
+- **4. Fixed: CRAFT §f.7's numbers pass on the master.**
+  - 90.5-91.6 % cool, 6.6-7.1 % warm, 1.18-1.35 % in the house bands (olive 0.88-1.12, beige 0.17-0.30).
+  - The check is now in the recipe: `docs/v2/water/master_check.py <master> <baseline>`, in `WATER.md`'s recipe and
+    `judge_metrics.py`'s header.
+  - The glitter's share fell with three changes: a richer amber bed (#F9BE7F, C* 42: its encode rims mix out of the
+    bands), no lenses on the far bands under 5 px (7 lenses, not 12), and lenses 0.85 as long.
+- **Nice-to-have, the sun's warmth in the water: tried, then declined.** A pale cream path under the glitter (the
+  sun's light on the water) read as a pasted grey-beige panel at 2x. Its edges with the gold also mixed into the
+  paving's peach (664-766 px in the master). Instead, the amber bed sits on the reflections, as above: glitter box khaki
+  px 596-682 in the master (1,257-1,393 before).
+- **Nice-to-have, the slivers taller: done.** Slivers are >= 3.5 px tall at their middle at full length (`SLIVER_H`):
+  3.5-4.8 px. They live only in lenses >= 4.5 px, so they stay nested, and the lenses fill 0.8 of their band. Their
+  gold-white #FEEED1 (L* 94.7, C* 16) keeps every sRGB rim with its lens >= 6 dE76 from the paving. L* 97.5 can hold only
+  C* ~7 in sRGB, and its rims were the paving's peach.
+- **Nice-to-have, a break phase per reflection: moot for the door.** The door's slivers are no longer on the shared
+  grid, so the boats' bars no longer cut on its rows. The rest keep the one grid.
+- **Nice-to-have, the arch: done.** The soffit bowl is 8.4-8.6 L* under its ring (`sep` -8.5).
+- **Nice-to-have, the hull seam: checked, left.** The 3-4 px light line is the kit's "waterline lip"
+  (`kit/canal/boat.tsx`: a CM.waterDeep strip the boat draws over its own water). It is the boat's, outside the water,
+  and in a shared kit, so it is not changed here. A proposal for the kit's owner: draw the lip in the hull's shade, a
+  darker contact.
+- **Checked, unchanged outside the water:**
+  - The lossless 3.0 s frame against v6's first code: 0 px differ outside the water region.
+  - The masters there differ by encode noise only. v5 -> this: 4,472 px over 30 codes in frames 0-357. v6's first ->
+    this, with the same content outside: 3,906.
+  - check_depth: 0 FAIL, the same 5 WARN as v5, at 3.0 / 5.4 s.
+  - check_banding: PASS on the ramp's open stretch, the west gap and the zenith. The band 0,270,1080,560 WARNs at 0.5 /
+    3.0 s on its caption lines (v5 at 0.5 s).
+  - check_light: as v5. Its one FAIL is the bank's brightest 5 %, 0.156 / 0.173 H from her; greyed 196 / 185 px (OK).
+  - Motion over 2.50-3.48 s: 0.55 % px changing per frame, 1.29 % quick toggles (0.73 / 1.36 before). Horizontal edge
+    onsets: 66-72 per 1000 water px (78-88).
+  - Determinism: f180 / f300 are byte-identical in two processes. `waterProblems` and `particleProblems` are [].

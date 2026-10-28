@@ -23,6 +23,9 @@ export const SUN3 = {x: 96, y: 652, r: 46} as const;
 /** The overscan's left edge and her end wall. */
 const XL = -80;
 const XE = 165;
+/** The garden wall past her end wall (westNearBatch: brick under a stone coping, top y 1004, foot on her towpath's back
+ *  line 1100): exported for the canal's reflections (V2S3_water). */
+export const S3_GARDEN = {x0: XL, x1: XE, top: 1004, foot: 1100} as const;
 /** The far city's level roof edge across the disc. */
 const FAR_TOP = 676;
 
@@ -111,7 +114,7 @@ function westNearBatch(): Batch {
   b.layer();
   // the garden wall: brick under a stone coping, a timber gate (its boards as two flat tones), ivy over the coping as
   // three lobed masses
-  const g0 = 1004;
+  const g0 = S3_GARDEN.top;
   b.rect(CM.brickLight, XL, g0 + 6, XE - XL, 1100 - g0 - 6);
   b.rect(CM.limestone, XL, g0, XE - XL + 2, 8);
   b.layer();

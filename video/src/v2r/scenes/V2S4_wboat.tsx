@@ -12,7 +12,7 @@
 //        cantrail, ending ABOVE the gunwale (so the cantrail and the plum stripe stay unbroken bands: S3's lesson, no
 //        dark-fill corners for the line count)
 //   hull: the ONE plum gunwale stripe, a slate strip with a rubbing strake down to the waterline ~1700
-//   near water (2.0x): the isolated flat placeholder (V2S4_water S4Water 'near'; the glints are V2S4_particles')
+//   near water (2.0x): lib/water's (V2S4_water S4Water 'near': our boat mirrored whole, ripple lines streaming)
 // TIER C (environment: flat, no line), plane -1 (one near value step: planeBatch(-1)). The boat's wood (rails,
 // stanchions, the door frame, the plank, the logs, the hook) is lifted to a mid oak and its small dark fittings to a mid
 // slate (on the near plane a thin dark fitting reads as a line: CRAFT §c; S3's boat did the same); the plum stays on the

@@ -394,7 +394,7 @@ export function swayAt(cam: WaterCam, s: Sway, yFar: number, yNear: number, seed
  *  water is >= 4 L* under the air and never the lit ground's own colour); from the middle water on it is pulled toward
  *  the water's own teal (R2: the near water shows its body) in OKLab, through a light veil of the body's hue. The warm
  *  sky's chroma is cancelled by the teal body where they cross (the physical mix is low in chroma): through the whole
- *  warm-to-cool crossing (CIE h 30-150) the chroma is held in the CLEAN GAP, C* 4.3-`cap` (5.6: the beige and olive
+ *  warm-to-cool crossing (CIE h 30-150) the chroma is held in the CLEAN GAP, C* 4.7-`cap` (5.5: the beige and olive
  *  bands start at 6, grey under 4), as the sky's own light band crosses at C* <= 6 (CRAFT §g.1): so the far water is a
  *  pale warm pearl, never peach paving, beige, olive or grey (R4; the critic on v6's first master, CRITIC.md must-fix
  *  2b: its far end was the paving's colour, dE76 ~1, and its crossing ran through the house beige band). Defaults are
@@ -414,15 +414,15 @@ export type RampOpts = {
   veilAt?: [number, number];
   /** The body mixed in over n bodyAt[0] -> bodyAt[1], up to bodyAt[2]. */
   bodyAt?: [number, number, number];
-  /** Keys every `step` px over the water's box. */
+  /** Keys every `step` px over the water's box (default 8: the curve between two keys follows the clean gap). */
   step?: number;
-  /** The clean gap's chroma ceiling (CIE C*) through the warm-to-cool crossing (default 5.6; the bands start at 6). */
+  /** The clean gap's chroma ceiling (CIE C*) through the warm-to-cool crossing (default 5.5; the bands start at 6). */
   cap?: number;
 };
-export const RAMP_DEFAULT = {dl: [0.05, -0.03] as [number, number], ck: [0.95, 0.1] as [number, number], veil: {l: 0.085, c: 0.018}, veilAt: [0.1, 0.4] as [number, number], bodyAt: [0.32, 0.86, 0.92] as [number, number, number], step: 16, cap: 5.6};
+export const RAMP_DEFAULT = {dl: [0.05, -0.03] as [number, number], ck: [0.95, 0.1] as [number, number], veil: {l: 0.085, c: 0.018}, veilAt: [0.1, 0.4] as [number, number], bodyAt: [0.32, 0.86, 0.92] as [number, number, number], step: 8, cap: 5.5};
 /** The CLEAN GAP (rampColour): through the warm-to-cool crossing (CIE h 55-150, eased off over h 30-55 on the rose side
  *  and 150-168 on the cool side) a colour's chroma is held under `cap` (beige and olive start at C* 6) and, under
- *  L* 85, over 4.3 (grey is C* < 4); its L* and hue are kept. */
+ *  L* 85, over 4.7 (grey is C* < 4); its L* and hue are kept. */
 export function rampGap(hex: string, cap: number = RAMP_DEFAULT.cap): string {
   const c = lch(hex);
   let lim = Infinity;
@@ -430,7 +430,8 @@ export function rampGap(hex: string, cap: number = RAMP_DEFAULT.cap): string {
   else if (c.h >= 30 && c.h < 55) lim = cap + ((55 - c.h) / 25) * 30;
   else if (c.h > 150 && c.h < 168) lim = cap + ((c.h - 150) / 18) * 30;
   let C = Math.min(c.C, lim);
-  if (c.L < 85 && C < 4.3 && lim < Infinity) C = 4.3;
+  // the floor a touch over grey's 4: the sky curve's chords between two keys run a little inside them
+  if (c.L < 85 && C < 4.7 && lim < Infinity) C = 4.7;
   return C === c.C ? hex : fromLch(c.L, C, c.h);
 }
 export function rampColour(cam: WaterCam, sky: SkySpec, body: string, o: RampOpts, y: number): string {
@@ -451,7 +452,9 @@ export function rampColour(cam: WaterCam, sky: SkySpec, body: string, o: RampOpt
 }
 /** The ramp as a lib/sky spec over the water's box (its eased curve and blue-noise dither). */
 export function waterRamp(cam: WaterCam, sky: SkySpec, body: string, o: RampOpts, box: {x0: number; x1: number; top: number; bottom: number}): SkySpec {
-  const step = o.step ?? RAMP_DEFAULT.step;
+  // a short strip crosses from warm to the body in a few rows: keys at least every 1/20 of the toning's span, so the
+  // curve between two keys never cuts through the neutral axis (grey) or back into a band
+  const step = o.step ?? Math.max(2, Math.min(RAMP_DEFAULT.step, Math.round(Math.abs(o.yNear - o.yFar) / 20)));
   const keys: {y: number; color: string}[] = [];
   for (let y = box.top; y <= box.bottom + step - 1e-6; y += step) keys.push({y, color: rampColour(cam, sky, body, o, y)});
   return {keys, band: null, x: box.x0, width: box.x1 - box.x0, top: box.top, bottom: box.bottom, sun: null};
@@ -540,7 +543,7 @@ export type LightOpts = {
   /** The sliver's profile: 2 = a lens (parabolic flanks), 1 = a diamond; 1.5 a willow leaf. */
   leaf?: number;
 };
-export const LIGHT_DEFAULT: Required<LightOpts> = {solid: 0.33, slivers: 3, ratio: 0.68, thinning: 0.85, thick: 1.05, thickPx: [6, 9], gap: 4.5, gapK: 0.95, gapGrow: 0.2, step: 6, fall: 1.3, wander: 0.05, wave: [2.2, 56], leaf: 1.5};
+export const LIGHT_DEFAULT: Required<LightOpts> = {solid: 0.33, slivers: 3, ratio: 0.62, thinning: 0.85, thick: 1.05, thickPx: [6, 9], gap: 4.5, gapK: 0.95, gapGrow: 0.2, step: 6, fall: 1.3, wander: 0.05, wave: [2.2, 56], leaf: 1.5};
 /** The sun's glitter column (R8; CRAFT §f.6's glints are its slivers). */
 export type WaterSun = {
   /** The sun on screen (its disc's centre). */
@@ -550,8 +553,8 @@ export type WaterSun = {
   slope?: number;
   /** The column's y range (default the water's at the sun's x). */
   rows?: [number, number];
-  /** The bed's gold and the slivers' warm white (default L* 82 C* 34 h 74 / L* 97.5 C* 7 h 85: the slivers +15 over the
-   *  bed, CRAFT §f.6). */
+  /** The bed's gold and the slivers' warm white (default L* 81 C* 42 h 71 / L* 94.5 C* 16 h 87: the slivers +13.5 over
+   *  the bed, CRAFT §f.6). */
   bed?: string;
   core?: string;
   /** Slivers are born from t0 (after the frame-0 flood). */
@@ -560,18 +563,16 @@ export type WaterSun = {
   slots?: number;
   life?: [number, number];
   len?: [number, number];
+  /** The bed's lenses only on bands at least this many px (default 5): the far rows are a near mirror; and their
+   *  length as a share of the envelope's (default 0.85: every px of gold edge on the teal is an olive fringe in the
+   *  encode). */
+  lensPitch?: number;
+  lensLen?: number;
   /** Where it is densest (default the sun's still-water mirror point, 2 hz - y) and the spread (px). */
   mirrorY?: number;
   sigma?: number;
   /** The plane it rides (the sun's). */
   plane?: number;
-  /** THE SUN'S PATH under the bed (the sun's light on the water, the sky's sun warmth seen in it: DIRECTION rule 6;
-   *  the critic on v6's first master: the glitter "sits on cool teal" and its gold lenses' edges mix to khaki in the
-   *  encode): one flat pale-cream leaf along the column, `k` x R8's half-width, a step LIGHTER than the water it lies
-   *  on (light is lighter than what it lights), its chroma low (default C* 7.5 at the air's hue, L* air - 1.2: cream at
-   *  L* >= 86, never beige), so the gold lenses sit on warm light and its own edge mixes with the teal at C* < 6.
-   *  false = none. */
-  path?: false | {color?: string; k?: number};
 };
 /** Ripple lines (R9). */
 export type WaterRipples = {
@@ -1048,7 +1049,14 @@ function buildFlat(s: Resolved, ctx: FrameCtx, out: Runs): void {
 
 // ================================================================= the sun's glitter (G2: a still bed, nested slivers)
 
-const SUN_DEFAULT = {slope: 0.06, bed: fromLch(82, 34, 74), core: fromLch(97.5, 7, 85), t0: 0.3, slots: 6, life: [0.5, 0.8] as [number, number], len: [20, 34] as [number, number], sigma: 22};
+// the bed a richer amber gold and the slivers a warm gold-white (the critic on v6's first master: the encode's 4:2:0
+// chroma mixed the C* 34 bed's edges with the teal into olive, and the near-white slivers' rims with the bed into the
+// paving's own peach, dE76 < 5): at C* 42 / 16 (L* 94.5 is the lightest a C* 16 gold-white can be in sRGB) every sRGB
+// mix of a sliver and its lens stays >= 6 from the paving, and fewer of the bed's rims fall in the house bands
+/** A bed lens's most height (px; CRAFT §f.7e: 28-48 x 4-6.6 px): on a steep water (bands of 10-20 px) a lens is a
+ *  slim gold streak in its band, never a blob that fills it (S1's tallest is 6.59999: unchanged). */
+export const BED_H_MAX = 6.6;
+const SUN_DEFAULT = {slope: 0.06, bed: fromLch(81, 42, 71), core: fromLch(94.5, 16, 87), lensPitch: 5, lensLen: 0.85, t0: 0.3, slots: 6, life: [0.5, 0.8] as [number, number], len: [20, 34] as [number, number], sigma: 22};
 /** The column's half-width at screen y (R8, DERIVED for a level camera): a (y - hz) + f a sin(e), e the sun's elevation. */
 export function glitterHalfW(cam: WaterCam, sun: WaterSun, y: number): number {
   const a = sun.slope ?? SUN_DEFAULT.slope;
@@ -1071,6 +1079,9 @@ function glitterBed(st: Static): GlitterLens[] {
     const ya = rows[i];
     const yb = rows[i + 1];
     if (ya < y0 || yb > y1 + 2) continue;
+    // the far rows thinner than `lensPitch` are left to the mirror: a 3-4 px gold lens there is mostly edge, too thin
+    // to read on a phone, and the encode's 4:2:0 chroma turns its rims olive (the critic on v6's first master)
+    if (yb - ya < (s.lensPitch ?? SUN_DEFAULT.lensPitch)) continue;
     const len = hash01(st.seed, 7001, i, 2);
     const off = hash01(st.seed, 7001, i, 3);
     const u = clamp01((ya - y0) / Math.max(1, y1 - y0));
@@ -1080,42 +1091,17 @@ function glitterBed(st: Static): GlitterLens[] {
     const hw = Math.min(28, col * (0.45 + 0.62 * len + 0.25 * nearPeak));
     // its centre wanders inside the column (never past its edge): seeded per band, still
     const room = Math.max(0, col - hw * 0.55);
-    out.push({cx: s.x + (2 * off - 1) * Math.min(room, lerp(8, 16, u)), cy: (top + yb) / 2, len: Math.max(21, hw * 2), h: (yb - top) * 0.92, band: i});
+    // a lens fills most of its band (0.8 of the pitch): the slivers it holds can stand >= 3.5 px tall; never thicker
+    // than BED_H_MAX (CRAFT §f.7e: 4-6.6 px; a steeper water's 10-20 px bands made 8-17 px gold blobs: S3 / S4)
+    out.push({cx: s.x + (2 * off - 1) * Math.min(room, lerp(8, 16, u)), cy: (top + yb) / 2, len: Math.max(21, hw * 2 * (s.lensLen ?? SUN_DEFAULT.lensLen)), h: Math.min(BED_H_MAX, Math.max((yb - top) * 0.92, (yb - ya) * 0.8)), band: i});
   }
   return out;
-}
-/** THE SUN'S PATH (WaterSun.path): one flat leaf along the column, pointed at its far end, widening toward us to `k`
- *  x R8's half-width (the near bank crops it), its sides swaying with their rows like the bed. */
-export function sunPathD(st: Static, sway: (y: number) => number): string {
-  const s = st.spec.sun;
-  if (!s || s.path === false || st.spec.lod === 'far') return '';
-  const k = s.path?.k ?? 1.3;
-  const [y0, y1] = sunRows(st);
-  const n = 30;
-  const L: Pt[] = [];
-  const R: Pt[] = [];
-  for (let i = 0; i <= n; i++) {
-    const u = i / n;
-    const y = lerp(y0, y1, u);
-    const taper = Math.pow(smooth(0, 0.42, u), 0.6);
-    const hw = Math.max(0.3, k * glitterHalfW(st.spec.cam, s, y) * taper);
-    const dx = sway(y) * 0.7;
-    L.push([s.x - hw + dx, y]);
-    R.push([s.x + hw + dx, y]);
-  }
-  return polyD([...L, ...R.reverse()]);
-}
-/** The sun's path colour: the shot's air (the sky's lowest colour, under the sun) a touch under, its chroma low. */
-export function sunPathColour(spec: WaterSpec): string {
-  const s = spec.sun;
-  if (!s || s.path === false) return '';
-  if (s.path?.color) return s.path.color;
-  const a = lch(spec.air ?? spec.body);
-  return cleanColour(fromLch(Math.min(95, a.L - 1.2), 7.5, a.h), spec.tone?.waterH ?? TONE_DEFAULT.waterH);
 }
 export type Sliver = {x: number; y: number; len: number; h: number; lens: number};
 /** A sliver's dark rest between two lives (s): longer than 0.1 s, so no pixel flickers on and off. */
 export const SLIVER_REST = 0.12;
+/** A sliver's least height at its middle at full length (px): the critic's 2.4-4 px read ~1 px on a phone. */
+export const SLIVER_H = 3.5;
 /** THE SLIVERS at t: `slots` warm-white lenses nested in the bed's longer lenses (each slot owns its own lenses, so two
  *  never share one), each living `life` s (lit 62-86 % of it), growing in and shrinking out along its length (never a
  *  fade), densest round the sun's mirror point. Born from t0. */
@@ -1132,7 +1118,7 @@ export function glitterSlivers(st: Static, t: number): Sliver[] {
   // the lenses long enough to hold a sliver, by nearness to the mirror point; slot j owns ranks j, j + slots, ...
   const long = st.bed
     .map((b, i) => ({b, i}))
-    .filter((o) => o.b.len >= len[0] / 0.8)
+    .filter((o) => o.b.len >= len[0] / 0.8 && o.b.h >= SLIVER_H / 0.78)
     .sort((a, c) => Math.abs(a.b.cy - peak) - Math.abs(c.b.cy - peak));
   const out: Sliver[] = [];
   for (let j = 0; j < slots; j++) {
@@ -1163,7 +1149,9 @@ export function glitterSlivers(st: Static, t: number): Sliver[] {
     if (L < 2) continue;
     const room = Math.max(0, b.len - Math.max(len[0], L0)) / 2;
     const x = b.cx + room * (2 * hash01(st.seed, 7100, j, 7, cyc) - 1) * 0.8;
-    out.push({x, y: b.cy, len: L, h: Math.min(b.h * 0.62, Math.max(1.6, L / 8.5)), lens: pick.i});
+    // >= 3.5 px tall at its middle at full length (a phone sees ~1.2 px), thinner while it grows in; inside its lens
+    const hFull = Math.min(b.h * 0.78, Math.max(SLIVER_H, Math.max(len[0], L0) / 7));
+    out.push({x, y: b.cy, len: L, h: hFull * (0.6 + 0.4 * env), lens: pick.i});
   }
   return out;
 }
@@ -1269,9 +1257,6 @@ export type WaterFrame = {
   ripples: {color: string; d: string}[];
   quayLayer: number;
   bed: string;
-  /** The sun's path under the bed (WaterSun.path). */
-  pathD: string;
-  pathColor: string;
   slivers: Sliver[];
   sliverD: string;
   bedColor: string;
@@ -1333,10 +1318,8 @@ export function waterFrame(spec: WaterSpec, t: number): WaterFrame {
   const sunShift: Pt = sun ? [shift(st.sunPlane)[0], 0] : [0, 0];
   let bed = '';
   let sliverD = '';
-  let pathD = '';
   let slivers: Sliver[] = [];
   if (sun && !far) {
-    pathD = sunPathD(st, swayFn);
     for (const b of st.bed) bed += lensD(b.cx + swayFn(b.cy) * 0.7, b.cy, b.len, b.h);
     slivers = glitterSlivers(st, t);
     for (const s of slivers) sliverD += lensD(s.x + swayFn(s.y) * 0.7, s.y, s.len, s.h);
@@ -1350,8 +1333,6 @@ export function waterFrame(spec: WaterSpec, t: number): WaterFrame {
     runs,
     ripples: Array.from(rip.entries()).map(([color, ds]) => ({color, d: ds.join('')})),
     bed,
-    pathD,
-    pathColor: sun ? sunPathColour(spec) : '',
     slivers,
     sliverD,
     bedColor: sun?.bed ?? SUN_DEFAULT.bed,
@@ -1443,7 +1424,6 @@ export const Water: React.FC<{spec: WaterSpec; t: number}> = ({spec, t}) => {
             <path key={`r${i}`} d={p.d} fill={p.color} />
           ))}
         <g transform={tr(fr.sunShift)}>
-          {fr.pathD ? <path d={fr.pathD} fill={fr.pathColor} /> : null}
           {fr.bed ? <path d={fr.bed} fill={fr.bedColor} /> : null}
           {fr.sliverD ? <path d={fr.sliverD} fill={fr.coreColor} /> : null}
         </g>
@@ -1520,7 +1500,6 @@ export function waterPalette(spec: WaterSpec): {name: string; hex: string; L: nu
     } else for (const k of ks) add(`${s.id} k${k.toFixed(2)}`, toneOf(st, s, k));
   }
   if (spec.sun) {
-    if (spec.sun.path !== false) add('sun path', sunPathColour(spec));
     add('glitter bed', spec.sun.bed ?? SUN_DEFAULT.bed);
     add('glitter sliver', spec.sun.core ?? SUN_DEFAULT.core);
   }

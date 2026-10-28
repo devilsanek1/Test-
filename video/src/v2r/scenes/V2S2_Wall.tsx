@@ -134,7 +134,8 @@ const litBase = (c: number, row: 'first' | 'ground') => {
   const r = rng(`s2pane/${c}/${row}`);
   return r.chance(0.58);
 };
-const litAt = (t: number, c: number, row: 'first' | 'ground') => {
+/** (exported for the water's reflections: V2S2_Water S2's lib/water spec) */
+export const litAt = (t: number, c: number, row: 'first' | 'ground') => {
   let lit = litBase(c, row);
   for (const [sc, sr, at, after] of SWITCHES) if (sc === c && sr === row && t >= at) lit = after;
   return lit;
