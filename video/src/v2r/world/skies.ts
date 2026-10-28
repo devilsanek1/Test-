@@ -26,3 +26,15 @@ export const S1_EVENING = eveningSky({band: CM.sky, horizon: S1_HORIZON, horizon
 
 /** The far haze of S1's west gap (the sky's lowest colour under the sun): lib/depth's air for the far city. */
 export const S1_AIR = horizonColor(S1_EVENING, SUN0.x);
+
+/** S5's April morning over Arlington (lane L4; S6 may share it: the set's sky): the caption mint flat through the band,
+ *  the gentle zenith and pale light band of `eveningSky`, the April gold (CM.bandGold) at the horizon y 750 behind the
+ *  cloud bank and the far city, the morning sun's warmth low and wide round the sun. The crane moves the sun across the
+ *  sky (SUN1 (250, 650) in the slot at the start -> (1058.5, 646) cut by the right edge at the end): pass its screen spot
+ *  each frame (`s5Sky`; animating the sun, never the keys, costs nothing). */
+export const S5_HORIZON = CM.bandGold;
+export const s5Sky = (sun: {x: number; y: number}) => eveningSky({band: CM.sky, horizon: S5_HORIZON, horizonY: 750, sun: {x: sun.x, y: sun.y, rx: 230}});
+/** S5's sky at the end of the crane (the landing hold): the reference for the checks. */
+export const S5_SKY = s5Sky({x: 1058.5, y: 646});
+/** The air of S5's planes (lib/depth makeAtmosphere): the sky's lowest colour across the view (the April gold). */
+export const S5_AIR = horizonColor(S5_SKY, 540);
