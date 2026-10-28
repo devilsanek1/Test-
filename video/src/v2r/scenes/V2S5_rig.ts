@@ -33,6 +33,69 @@ export const FAR_S5: PullPlane = (() => {
 /** Every camera plane of the shot (the QA reads these). */
 export const PLANES = {far: FAR_S5, river: RIVER_PL, mid: MID_PLANE, nearmid: NEARMID_PLANE, deck: DECK, tree: TREE_BOX, right: RIGHT_BOX};
 
+// ---------------------------------------------------------------- the deck's own pace (camspeed, 2026-10-28)
+// The deck (k 2.42: the shot's biggest zoom) is what a real-render camera estimate locks onto from 21.8 to 22.4, and its
+// zoom-out about the stranger's feet carried 16.5-17.1 px/f at the frame's far corner just outside the lamppost
+// allowance (22.02-22.19). So the DECK alone runs on its own progress g(p): the same start and end, a hair ahead early
+// (p < 0.17, where every plane is slow), ~15 % calmer at both edges of the lamppost wipe (p 0.30-0.37 and 0.50-0.57),
+// back at its pace behind the lamppost, and catching up in the landing's ease (p 0.72-0.98). |g - p| <= 0.03 (the deck
+// <= ~2.5 % off its scale at any p); the beats are the other planes' and the pivot's (the stranger's feet, unchanged by
+// the scale): the swap behind the lamppost, "Pentagon" clearing the tree at 22.43 and the landing stay where they were.
+const DECK_DIP: [number, number][] = [
+  [0.15, 0],
+  [0.3, 0.155],
+  [0.37, 0.155],
+  [0.435, 0.075],
+  [0.5, 0.145],
+  [0.57, 0.145],
+  [0.7, 0],
+];
+const sstep = (a: number, b: number, x: number) => {
+  const u = Math.max(0, Math.min(1, (x - a) / (b - a)));
+  return u * u * (3 - 2 * u);
+};
+const dipAt = (p: number) => {
+  for (let i = 0; i < DECK_DIP.length - 1; i++) {
+    const [a, da] = DECK_DIP[i];
+    const [b, db] = DECK_DIP[i + 1];
+    if (p >= a && p <= b) return da + (db - da) * sstep(a, b, p);
+  }
+  return 0;
+};
+const hump = (p: number, a: number, b: number) => (p > a && p < b ? Math.sin((Math.PI * (p - a)) / (b - a)) ** 2 : 0);
+/** g(p) on a 2000-step table: the early hump (0.28 at its peak) and a late one sized so g(1) = 1 exactly. */
+const DECK_G: Float64Array = (() => {
+  const N = 2000;
+  const integ = (f: (p: number) => number) => {
+    const out = new Float64Array(N + 1);
+    for (let i = 1; i <= N; i++) {
+      const a = (i - 1) / N;
+      const b = i / N;
+      out[i] = out[i - 1] + ((f(a) + f(b)) / 2) * (b - a);
+    }
+    return out;
+  };
+  const base = integ((p) => 1 - dipAt(p) + 0.28 * hump(p, 0, 0.17));
+  const late = integ((p) => hump(p, 0.72, 0.98));
+  const L = (1 - base[N]) / late[N];
+  const g = new Float64Array(N + 1);
+  for (let i = 0; i <= N; i++) g[i] = base[i] + L * late[i];
+  return g;
+})();
+/** The deck's progress at crane progress p (0 -> 0, 1 -> 1, monotone). */
+export const deckP = (p: number): number => {
+  if (p <= 0) return 0;
+  if (p >= 1) return 1;
+  const N = DECK_G.length - 1;
+  const x = p * N;
+  const i = Math.min(N - 1, Math.floor(x));
+  return DECK_G[i] + (DECK_G[i + 1] - DECK_G[i]) * (x - i);
+};
+/** The deck plane's map at crane progress p (END coords) and its start map (START coords: the close figures, the news
+ *  box, the start's petals). */
+export const deckMat = (p: number) => planeMat(DECK, deckP(p));
+export const deckStartMat = (p: number) => startMat(DECK, deckP(p));
+
 /** End coords of a START-coords point riding the deck (the inverse of the deck's p 0 map). */
 export const deckEndOf = (q: Pt): Pt => {
   const off = DECK.off ?? [0, 0];
@@ -62,6 +125,5 @@ export const swappedAt = (t: number) => t >= swapAt;
 /** The progress at which the swap happens (for stills driven by p). */
 export const SWAP_P = craneP(swapAt);
 
-void startMat;
 void boxMat;
 void matScale;

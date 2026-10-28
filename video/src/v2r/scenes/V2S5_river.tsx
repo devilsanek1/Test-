@@ -16,6 +16,11 @@
 // >>> it and the rising mid plane is never empty at any p (in END coords it is visible down to y ~1130 at p 0, ~990 at
 // >>> p 0.55, ~945 at p 0.7, ~900 at p 0.85).
 // Life (pure functions of scene time): glints, rowers, sails, parkway, bridge and highway cars. Nothing fades.
+// THE WATER is ONE component, `S5Water` (its geometry in ONE const, `S5_WATER`): the Potomac band + its streaks, the boat
+// basin, the Boundary Channel / lagoon band and the glints on the water. S5River draws the ground the water lies in, then
+// <S5Water> with the land over the water as its children (the banks' lines, docks, bridges, the far shore, the parkland),
+// then what floats on it (hulls, rowers, sails) and the near trees. A shared premium water (src/lib/water.tsx, later)
+// replaces S5Water in ONE line (S5River's <S5Water>); it never needs the land's code.
 // Import rule: never import V2S5_rig / V2S5_set / V2S5_figs (the rig imports this file).
 import React, {useMemo} from 'react';
 import {useTime} from '../../lib/time';
@@ -71,6 +76,97 @@ function bandD(x0: number, x1: number, f: (x: number) => number, w: (x: number) 
   return polyD([...top, ...bot]);
 }
 
+// ---------------------------------------------------------------- THE WATER (one component, one geometry)
+
+/** Every water region of the river plane (END coords) and the banks' lines the land draws over it. S5Water draws these;
+ *  the land (S5River) never draws water. */
+export const S5_WATER = {
+  x0: RIVER.x0,
+  x1: RIVER.x1,
+  /** The banks' lines (the land's, drawn over the water): the far shore's embankment, the near bank's edge. */
+  banks: {farShore: RIVER.shore, nearBank: RIVER.nearBank[0]},
+  /** The Potomac: a band from the far shore's foot to the near bank's edge; a darker strip under the far shore (its
+   *  reflection) `deep` px tall; current streaks in `streaks.y` (count, lengths, two heights; seeded). */
+  potomac: {top: RIVER.water[0] - 1, bottom: RIVER.nearBank[0], deep: 3, streaks: {n: 80, y: [RIVER.water[0] + 5, RIVER.water[1] - 3] as [number, number], len: [30, 120] as [number, number]}},
+  /** The boat basin: a trapezoid let into the near bank (its docks and boats are the land's). */
+  basin: ((): Pt[] => {
+    const {x0, x1, y} = RIVER.basin;
+    return [
+      [x0, y - 1],
+      [x1, y - 1],
+      [x1 - 8, y + 9],
+      [x0 + 12, y + 9],
+    ];
+  })(),
+  /** The Boundary Channel and the lagoon: a band right under the near bank (centre, width), wider at the lagoon, with a
+   *  thin deep line along its far edge. */
+  channel: {
+    centre: (x: number) => 866 + 4 * Math.sin(x * 0.006 + 1.2),
+    width: (x: number) => 9 + 8 * Math.max(0, Math.sin((x - 250) * 0.0045)) + 2 * Math.sin(x * 0.02),
+    deepLine: (x: number) => 862 + 4 * Math.sin(x * 0.006 + 1.2),
+    deepW: 1.6,
+  },
+  /** Glints on the Potomac: `n` short dashes in `y`, never within 26 px of a bridge's line; each pops on / off on its
+   *  own period and drifts with the current (`drift` px/s). */
+  glints: {n: 70, y: [RIVER.water[0] + 4, RIVER.water[1] - 2.5] as [number, number], w: [3, 9] as [number, number], drift: 2, bridges: [RIVER.memorial, ...RIVER.fourteenth]},
+};
+
+/** The water's flat fills (static): the channel (deep parkland), the Potomac, the basin; one layer each (drawn apart
+ *  before the split: the same colours, the same order). */
+function waterBatch(seed: string): Batch {
+  const B = new Batch();
+  const {x0, x1} = S5_WATER;
+  const C = S5_WATER.channel;
+  B.fill(RIV.water, bandD(x0, x1, C.centre, C.width));
+  B.fill(RIV.waterDeep, bandD(x0, x1, C.deepLine, () => C.deepW));
+  B.layer();
+  const P = S5_WATER.potomac;
+  B.rect(RIV.water, x0, P.top, x1 - x0, P.bottom - P.top);
+  B.rect(RIV.waterDeep, x0, P.top + 1, x1 - x0, P.deep);
+  {
+    const s = rng(`${seed}/streak`);
+    for (let i = 0; i < P.streaks.n; i++) {
+      const x = s.range(x0, x1);
+      const y = s.range(P.streaks.y[0], P.streaks.y[1]);
+      B.rect(s.chance(0.6) ? RIV.waterLit : RIV.waterDeep, x, y, s.range(P.streaks.len[0], P.streaks.len[1]), s.chance(0.7) ? 1.1 : 1.6);
+    }
+  }
+  B.layer();
+  B.poly(RIV.water, S5_WATER.basin);
+  return B;
+}
+
+/** THE WATER: its fills, then `children` (the land over it: banks, docks, bridges, the far shore, the parkland), then
+ *  the glints on its surface. Replace this component to restyle every water in the shot. */
+export const S5Water: React.FC<{seed?: string; children?: React.ReactNode}> = ({seed = 's5river', children}) => {
+  const t = useTime();
+  const fills = useMemo(() => waterBatch(seed), [seed]);
+  const glints = useMemo(() => {
+    const G = S5_WATER.glints;
+    const g = rng(`${seed}/gl`);
+    const out: {x: number; y: number; w: number; ph: number; per: number; duty: number}[] = [];
+    while (out.length < G.n) {
+      const x = g.range(S5_WATER.x0, S5_WATER.x1);
+      const y = g.range(G.y[0], G.y[1]);
+      const onBridge = G.bridges.some(({far, near: nr}) => {
+        const k = (y - far[1]) / (nr[1] - far[1]);
+        return k > -0.1 && k < 1.1 && Math.abs(x - (far[0] + (nr[0] - far[0]) * k)) < 26;
+      });
+      if (!onBridge) out.push({x, y, w: g.range(G.w[0], G.w[1]), ph: g.range(0, 1), per: g.range(2.2, 4.2), duty: g.range(0.5, 0.8)});
+    }
+    return out;
+  }, [seed]);
+  let gd = '';
+  for (const q of glints) if (frac(t / q.per + q.ph) < q.duty) gd += `M${(q.x + S5_WATER.glints.drift * t).toFixed(1)} ${q.y.toFixed(1)}h${q.w.toFixed(1)}`;
+  return (
+    <>
+      <Paint b={fills} seed={`${seed}/w`} misreg={false} />
+      {children}
+      <path d={gd} stroke={RIV.glint} strokeWidth={1.4} strokeLinecap="round" fill="none" />
+    </>
+  );
+};
+
 type Crown = {x: number; y: number; r: number; col: string; seed: string};
 
 /** Draw crowns back to front in y bands (a layer per band keeps the overlap order by depth), each with its flat
@@ -88,10 +184,9 @@ function drawCrowns(B: Batch, crowns: Crown[], shadow: string, band = 9) {
   }
 }
 
-/** The deep parkland (behind everything else on this plane). */
-function deepPark(seed: string): Batch {
+/** The ground the water lies in (drawn under S5Water): the deep parkland's base and mown bands, the near bank's lawn. */
+function riverGround(): Batch {
   const B = new Batch();
-  const r = rng(`${seed}/deep`);
   const {x0, x1} = RIVER;
   const y0 = RIVER.nearBank[1] - 2;
   B.rect(RIV.parkDeep, x0, y0, x1 - x0, RIVER.deep - y0);
@@ -102,9 +197,17 @@ function deepPark(seed: string): Batch {
     y += h * 1.15;
   }
   B.layer();
-  // the Boundary Channel and the lagoon: a cool band right under the near bank, wider at the lagoon
-  B.fill(RIV.water, bandD(x0, x1, (x) => 866 + 4 * Math.sin(x * 0.006 + 1.2), (x) => 9 + 8 * Math.max(0, Math.sin((x - 250) * 0.0045)) + 2 * Math.sin(x * 0.02)));
-  B.fill(RIV.waterDeep, bandD(x0, x1, (x) => 862 + 4 * Math.sin(x * 0.006 + 1.2), () => 1.6));
+  // the near bank's lawn strip (the shore edge, the parkway and the basin's docks are the land's, over the water)
+  const [ny0, ny1] = RIVER.nearBank;
+  B.rect(RIV.park, x0, ny0, x1 - x0, ny1 - ny0 + 1);
+  return B;
+}
+
+/** The deep parkland over its water (the channel and the lagoon are S5Water's). */
+function deepPark(seed: string): Batch {
+  const B = new Batch();
+  const r = rng(`${seed}/deep`);
+  const {x0, x1} = RIVER;
   // moored boats in the lagoon below the basin
   for (let x = 1004; x < 1140; x += r.range(7, 11)) B.rect(RIV.hull, x, 866 + r.range(-2, 3), r.range(3.5, 5.5), 1.6);
   B.layer();
@@ -162,37 +265,25 @@ function deepPark(seed: string): Batch {
   return B;
 }
 
-/** The water, the bridges, the far shore and the near bank behind the parkway's cars. */
+/** The land over the water: the near bank's edge and parkway, the basin's docks, the bridges, the far shore. */
 function riverBack(seed: string): Batch {
   const B = new Batch();
   const {x0, x1} = RIVER;
-  // ---- the water
-  const [wy0, wy1] = RIVER.water;
-  B.rect(RIV.water, x0, wy0 - 1, x1 - x0, wy1 - wy0 + 2);
-  B.rect(RIV.waterDeep, x0, wy0, x1 - x0, 3);
+  // ---- the near bank: the shore edge (the bank's line, over the water), the parkway, the boat basin's docks
+  const [ny0] = RIVER.nearBank;
   {
-    const s = rng(`${seed}/streak`);
-    for (let i = 0; i < 80; i++) {
-      const x = s.range(x0, x1);
-      const y = s.range(wy0 + 5, wy1 - 3);
-      B.rect(s.chance(0.6) ? RIV.waterLit : RIV.waterDeep, x, y, s.range(30, 120), s.chance(0.7) ? 1.1 : 1.6);
-    }
+    // the bank's line, 2 px from 0.6 above the water's edge; its last 0.4 px stops at the basin's mouth (the basin is
+    // let into the bank: its water meets the line, never under it)
+    const nb = S5_WATER.banks.nearBank;
+    const [bx0, bx1] = [S5_WATER.basin[0][0], S5_WATER.basin[1][0]];
+    B.rect(RIV.wall, x0, nb - 0.6, x1 - x0, 1.6);
+    B.rect(RIV.wall, x0, nb + 1, bx0 - x0, 0.4);
+    B.rect(RIV.wall, bx1, nb + 1, x1 - bx1, 0.4);
   }
-  B.layer();
-  // ---- the near bank: the shore edge, the lawn strip, the parkway, the boat basin
-  const [ny0, ny1] = RIVER.nearBank;
-  B.rect(RIV.park, x0, ny0, x1 - x0, ny1 - ny0 + 1);
-  B.rect(RIV.wall, x0, ny0 - 0.6, x1 - x0, 2);
   B.rect(RIV.road, x0, RIVER.parkway - 2.6, x1 - x0, 5.2);
   B.rect(RIV.roadEdge, x0, RIVER.parkway - 0.3, x1 - x0, 0.7);
   {
     const {x0: bx0, x1: bx1, y} = RIVER.basin;
-    B.poly(RIV.water, [
-      [bx0, y - 1],
-      [bx1, y - 1],
-      [bx1 - 8, y + 9],
-      [bx0 + 12, y + 9],
-    ]);
     const d = rng(`${seed}/basin`);
     for (let x = bx0 + 18; x < bx1 - 14; x += 20) {
       B.rect(RIV.dock, x, y + 0.5, 1.1, 7);
@@ -271,9 +362,9 @@ function riverBack(seed: string): Batch {
     });
   }
   B.layer();
-  // ---- the far shore: the embankment, the monuments, the cherry fringe over the city's lowest row
-  B.rect(RIV.wall, x0, RIVER.shore - 2, x1 - x0, 2.4);
-  B.rect(RIV.wallShade, x0, RIVER.shore + 0.2, x1 - x0, 0.9);
+  // ---- the far shore: the embankment (the far bank's line, over the water), the monuments, the cherry fringe
+  B.rect(RIV.wall, x0, S5_WATER.banks.farShore - 2, x1 - x0, 2.4);
+  B.rect(RIV.wallShade, x0, S5_WATER.banks.farShore + 0.2, x1 - x0, 0.9);
   {
     const {x, base} = RIVER.lincoln;
     B.rect(RIV.temple, x - 17, base - 11, 34, 11);
@@ -328,27 +419,10 @@ function riverFront(seed: string): Batch {
 
 export const S5River: React.FC<{seed?: string}> = ({seed = 's5river'}) => {
   const t = useTime();
+  const ground = useMemo(() => riverGround(), []);
   const deep = useMemo(() => deepPark(seed), [seed]);
   const back = useMemo(() => riverBack(seed), [seed]);
   const front = useMemo(() => riverFront(seed), [seed]);
-  // glints: short paper dashes on the water; each pops on / off on its own slow period (never a fade), drifting with
-  // the current (+2 px/s); none on the bridges
-  const glints = useMemo(() => {
-    const g = rng(`${seed}/gl`);
-    const out: {x: number; y: number; w: number; ph: number; per: number; duty: number}[] = [];
-    while (out.length < 70) {
-      const x = g.range(RIVER.x0, RIVER.x1);
-      const y = g.range(RIVER.water[0] + 4, RIVER.water[1] - 2.5);
-      const onBridge = [RIVER.memorial, ...RIVER.fourteenth].some(({far, near: nr}) => {
-        const k = (y - far[1]) / (nr[1] - far[1]);
-        return k > -0.1 && k < 1.1 && Math.abs(x - (far[0] + (nr[0] - far[0]) * k)) < 26;
-      });
-      if (!onBridge) out.push({x, y, w: g.range(3, 9), ph: g.range(0, 1), per: g.range(2.2, 4.2), duty: g.range(0.5, 0.8)});
-    }
-    return out;
-  }, [seed]);
-  let gd = '';
-  for (const q of glints) if (frac(t / q.per + q.ph) < q.duty) gd += `M${(q.x + 2 * t).toFixed(1)} ${q.y.toFixed(1)}h${q.w.toFixed(1)}`;
   // rowers (sculls: a hull and two oars that stroke ~1 Hz), slow
   const rowers = [
     {x0: 470, v: 7, y: 814},
@@ -401,9 +475,11 @@ export const S5River: React.FC<{seed?: string}> = ({seed = 's5river'}) => {
   }
   return (
     <>
-      <Paint b={deep} seed={`${seed}/d`} misreg={false} />
-      <Paint b={back} seed={`${seed}/b`} misreg={false} />
-      <path d={gd} stroke={RIV.glint} strokeWidth={1.4} strokeLinecap="round" fill="none" />
+      <Paint b={ground} seed={`${seed}/g`} misreg={false} />
+      <S5Water seed={seed}>
+        <Paint b={deep} seed={`${seed}/d`} misreg={false} />
+        <Paint b={back} seed={`${seed}/b`} misreg={false} />
+      </S5Water>
       <path d={hulls} fill={RIV.hull} />
       <path d={rw} stroke={RIV.rower} strokeWidth={0.9} strokeLinecap="round" fill="none" />
       <path d={sd} fill={RIV.sail} />

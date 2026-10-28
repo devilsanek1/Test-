@@ -169,6 +169,15 @@ function petals(): Layer {
     [980, 1060, 1640, 7.0],
   ];
   kerbs.forEach(([x0, x1, y, th], i) => (i % 2 ? (a += driftD(x0, x1, y, th, `s5deck/dk${i}`)) : (b += driftD(x0, x1, y, th, `s5deck/dk${i}`))));
+  // drifts the START sees (the held start frame shows the deck's x 194-640, y 732-1525 at 2.42x: its floor would be
+  // bare flags): a few flat petal drifts gathered along the flags' cross joints under the canopy, 80-120 px at the start
+  const startDrifts: [number, number, number, number][] = [
+    [262, 300, 1338, 3.4],
+    [470, 520, 1372, 3.6],
+    [318, 366, 1446, 4.0],
+    [522, 580, 1492, 4.2],
+  ];
+  startDrifts.forEach(([x0, x1, y, th], i) => (i % 2 ? (b += driftD(x0, x1, y, th, `s5deck/ds${i}`)) : (a += driftD(x0, x1, y, th, `s5deck/ds${i}`))));
   // single petals: a dozen and a half, more toward the trees (left, bottom-right) and a few round the pair
   const spots: [number, number][] = [
     [230, 1262], [405, 1258], [470, 1290], [262, 1318], [560, 1352], [330, 1395], [610, 1300],
@@ -214,9 +223,45 @@ function lobedEdge(ctrl: Pt[], amp: number, per: number, seed: string): Pt[] {
   return out;
 }
 
+/** Sun flecks in the canopy's shade (END coords: centre, half-width; flattened by the floor's slant): the shade is a
+ *  canopy's DAPPLE, never one soft stain (the critic, 2026-10-28). Four in the START window (2.42x there: ~130-180 px
+ *  flecks on the start's floor), four round the end's near bench and bin (the terrace tree's shade). */
+export const SHADE_HOLES: [number, number, number][] = [
+  [300, 1362, 30],
+  [478, 1420, 26],
+  [372, 1488, 34],
+  [540, 1462, 22],
+  [118, 1612, 40],
+  [280, 1742, 36],
+  [52, 1830, 46],
+  [214, 1900, 42],
+];
+
+/** Signed area of a closed polygon (screen coords). */
+const area2 = (pts: Pt[]) => pts.reduce((s, p, i) => {
+  const q = pts[(i + 1) % pts.length];
+  return s + p[0] * q[1] - q[0] * p[1];
+}, 0);
+
+/** A rounded fleck on the floor at (x, y), half-width rx, wound against `outer` (a hole under nonzero). */
+function fleckPts(x: number, y: number, rx: number, seed: string, cw: boolean): Pt[] {
+  const r = rng(seed);
+  const k = Math.max(0.5, Math.min(0.8, 0.5 + (0.3 * (y - 1300)) / 600));
+  const n = 14;
+  const out: Pt[] = [];
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2 * (cw ? 1 : -1);
+    const w = 1 + r.range(-0.07, 0.07);
+    out.push([x + Math.cos(a) * rx * w, y + Math.sin(a) * rx * k * w]);
+  }
+  return out;
+}
+
 /** The deck's large soft shade shapes (END coords), static:
  *  A  the canopy's shade over the start's floor below the slot's lit strip (the pair and the news box stand in the
- *     light), which at the end is the terrace tree's shade over the floor's left third down to the bottom-left corner;
+ *     light), which at the end is the terrace tree's shade over the floor's left third down to the bottom-left corner,
+ *     dappled: SHADE_HOLES are its sun flecks (subpaths wound against it: holes under nonzero; the Shadow's half-tone
+ *     band rings each one, the soft edge of a fleck);
  *  B  the corner crown's shade, bottom-right (toward us and left of it). */
 export const DECK_SHADE: string[] = (() => {
   const A = lobedEdge(
@@ -256,7 +301,11 @@ export const DECK_SHADE: string[] = (() => {
     96,
     's5deck/shadeB',
   );
-  return [smoothClosed([...A, [-140, 2030]]), smoothClosed([...B, [1200, 2030]])];
+  const outerA: Pt[] = [...A, [-140, 2030]];
+  // a fleck winds against A: the opposite sign of A's signed area (in the y-down frame: angle sign flips the turn)
+  const cw = area2(outerA) < 0;
+  const holes = SHADE_HOLES.map(([x, y, rx], i) => smoothClosed(fleckPts(x, y, rx, `s5deck/fleck${i}`, cw))).join('');
+  return [smoothClosed(outerA) + holes, smoothClosed([...B, [1200, 2030]])];
 })();
 
 /** Renders a list of [colour, path] as exact backdrop fills (no misregistration; the colours are already calm). */

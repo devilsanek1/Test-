@@ -17,7 +17,9 @@
 import React from 'react';
 import {Fill} from '../../lib/Fill';
 import {useTime} from '../../lib/time';
-import {CastShadow, ContactShadow, ShadowLayer} from '../../lib/light';
+import {CastShadow, ContactShadow, ShadowLayer, fromLch} from '../../lib/light';
+import {Tier} from '../../lib/tier';
+import {CM} from '../palette';
 import {XG, mat} from '../../lib/xf';
 import {polyPath} from '../../lib/sketch';
 import {S5} from '../world/map';
@@ -29,23 +31,33 @@ export const PLAQUE_SPOT = {x: 605, y: 1237, stand: false};
 
 const rectD = (x0: number, y0: number, x1: number, y1: number) => polyPath([[x0, y0], [x1, y0], [x1, y1], [x0, y1]]);
 
-/** The news box is the SUBJECT (tier A: one closed outline in its own shade) from just after the slot's burst to the
- *  move (film 20.90-21.75; conform_L4 §5), the environment before and after (scene s). */
-export const NEWS_A: [number, number] = [20.9 - 20.55, 21.75 - 20.55];
+/** The news box is the SUBJECT (tier A: one closed outline in its own shade) from just after the slot's burst into the
+ *  move (film 20.90-22.033; conform_L4 §5), the environment before and after (scene s). It steps down BEHIND the
+ *  lamppost wipe (f1322: the two baskets centred on the box hide its body and most of the page; only the page's top
+ *  line shows above them), never in plain view mid-move (it was 21.75). */
+export const NEWS_A: [number, number] = [20.9 - 20.55, 1322 / 60 - 20.55];
+
+/** The re-lettered front page, tied to the box's tier: on its beat (A) K3's page and ink; off it (C) ONE calm step,
+ *  page and letters closer in value (dL* ~84 -> ~36), so from the step on the Pentagon owns the contrast (22.43; CRAFT
+ *  §b: the environment's local contrast <= 7, never a subject's). Shown exactly (backdrops: the tier never shifts them). */
+const PAGE_TONES = {
+  subject: {page: SMALL_COLORS.face, rule: SMALL_COLORS.pageRule, text: CM.ink},
+  environment: {page: fromLch(88, 8, 78), rule: fromLch(73, 9, 62), text: fromLch(52, 12, 48)},
+} as const;
 
 /** The front page at body size (box units, the K3 box's own 310 x 350 frame): page, head rules, the 3-line headline at
- *  34, a short rule, the 18 px credit. Drawn over K3's page (same window, same colours). */
+ *  34, a short rule, the 18 px credit. Drawn over K3's page (same window; its colours follow the box's tier). */
 const PAGE34 = {headline: [104, 142, 180], midRule: 195, credit: [218, 239]};
 
 export const NewsBox: React.FC = () => {
   const r = S5.start.newsBox;
   const N = NEWS_BOX;
   const W = N.window;
-  const C = SMALL_COLORS;
   const cx = N.w / 2;
   const m = mat.compose(mat.translate(r.x0, r.y0), mat.scale((r.x1 - r.x0) / N.w, (r.y1 - r.y0) / N.h));
   const t = useTime();
   const tier = t >= NEWS_A[0] && t < NEWS_A[1] ? 'subject' : 'environment';
+  const P = PAGE_TONES[tier];
   const bw = r.x1 - r.x0;
   return (
     <>
@@ -56,17 +68,19 @@ export const NewsBox: React.FC = () => {
         <ContactShadow x={(r.x0 + r.x1) / 2} y={r.y1} w={bw * 0.86} h={12} />
       </ShadowLayer>
       <K3NewsBox tier={tier} shadow={false} />
-      <XG m={m}>
-        <Fill d={rectD(W.x0 + 4, W.y0 + 3.5, W.x1, W.y1)} color={C.face} offset={false} seed="s5nb/page" />
-        <Fill d={rectD(W.x0 + 14, N.rules[0] - 0.55, W.x1 - 12, N.rules[0] + 0.55) + rectD(W.x0 + 14, N.rules[1] - 0.55, W.x1 - 12, N.rules[1] + 0.55)} color={C.pageRule} offset={false} seed="s5nb/rules" />
-        <Fill d={rectD(cx - 72, PAGE34.midRule - 0.6, cx + 72, PAGE34.midRule + 0.6)} color={C.pageRule} offset={false} seed="s5nb/mid" />
-        {TXT_NEWS_BOX.headline.map((s, i) => (
-          <WorldText key={`h${i}`} x={cx} y={PAGE34.headline[i]} size={TYPE.body} text={s} anchor="middle" weight={0} maxW={W.x1 - W.x0 - 16} seed={`s5nb/h${i}`} />
-        ))}
-        {TXT_NEWS_BOX.credit.map((s, i) => (
-          <WorldText key={`c${i}`} x={cx} y={PAGE34.credit[i]} size={TYPE.credit} text={s} anchor="middle" maxW={W.x1 - W.x0 - 16} seed={`s5nb/c${i}`} />
-        ))}
-      </XG>
+      <Tier tier={tier}>
+        <XG m={m}>
+          <Fill d={rectD(W.x0 + 4, W.y0 + 3.5, W.x1, W.y1)} color={P.page} offset={false} backdrop seed="s5nb/page" />
+          <Fill d={rectD(W.x0 + 14, N.rules[0] - 0.55, W.x1 - 12, N.rules[0] + 0.55) + rectD(W.x0 + 14, N.rules[1] - 0.55, W.x1 - 12, N.rules[1] + 0.55)} color={P.rule} offset={false} backdrop seed="s5nb/rules" />
+          <Fill d={rectD(cx - 72, PAGE34.midRule - 0.6, cx + 72, PAGE34.midRule + 0.6)} color={P.rule} offset={false} backdrop seed="s5nb/mid" />
+          {TXT_NEWS_BOX.headline.map((s, i) => (
+            <WorldText key={`h${i}`} x={cx} y={PAGE34.headline[i]} size={TYPE.body} text={s} anchor="middle" weight={0} color={P.text} maxW={W.x1 - W.x0 - 16} seed={`s5nb/h${i}`} />
+          ))}
+          {TXT_NEWS_BOX.credit.map((s, i) => (
+            <WorldText key={`c${i}`} x={cx} y={PAGE34.credit[i]} size={TYPE.credit} text={s} anchor="middle" color={P.text} maxW={W.x1 - W.x0 - 16} seed={`s5nb/c${i}`} />
+          ))}
+        </XG>
+      </Tier>
     </>
   );
 };
