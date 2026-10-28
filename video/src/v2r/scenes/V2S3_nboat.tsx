@@ -25,6 +25,7 @@ import {Batch, Paint, P, rng, ovalPath, domePath, lobes, leafPath, lerp} from '.
 import type {Pt} from '../kit/canal/core';
 import {Puffs} from '../kit/canal/life';
 import {bikeInto} from '../kit/canal/towpath';
+import {planeBatch} from './V2S3_depth';
 
 /** The boat's lines (world px at the match). */
 export const NB = {
@@ -573,33 +574,37 @@ const CLIP_ID = 's3nbWalkerClip';
 /** Our narrowboat (static batches + per-frame life). WORLD px at the match. */
 export const S3Boat: React.FC = () => {
   const t = useTime();
+  // every fill one near value step darker (the boat's plane, -1: V2S3_depth planeBatch)
   const stat = useMemo(() => {
     const L = new Levels();
     cabinInto(L);
     roofInto(L);
     const b = L.merge();
     contoursInto(b);
-    return b;
+    return planeBatch(b, -1);
   }, []);
   const back = useMemo(() => {
     const L = new Levels();
     portholesBack(L);
-    return L.merge();
+    return planeBatch(L.merge(), -1);
   }, []);
   const rims = useMemo(() => {
     const L = new Levels();
     portholesFront(L);
-    return L.merge();
+    return planeBatch(L.merge(), -1);
   }, []);
   const walker = new Batch();
   walkerInto(walker, t);
+  planeBatch(walker, -1);
   const curtains = new Batch();
   curtainsInto(curtains, t);
+  planeBatch(curtains, -1);
   const herbs = new Levels();
   herbsInto(herbs, t);
   const fend = new Levels();
   fendersInto(fend, t);
-  const dy = boatBob(t);
+  // moored and still (the float is the shot's only camera motion)
+  const dy = 0;
   const ch = NB.chimney;
   const ph = PORTHOLES[WALKER_PORT];
   return (
@@ -616,8 +621,8 @@ export const S3Boat: React.FC = () => {
       </g>
       <Paint b={curtains} seed="s3nbCurtains" misreg={false} />
       <Paint b={rims} seed="s3nbRims" />
-      <Paint b={herbs.merge()} seed="s3nbHerbs" />
-      <Paint b={fend.merge()} seed="s3nbFend" />
+      <Paint b={planeBatch(herbs.merge(), -1)} seed="s3nbHerbs" />
+      <Paint b={planeBatch(fend.merge(), -1)} seed="s3nbFend" />
       <Puffs x={ch.x} y={ch.top - 10} seed="s3nb/smoke" kind="smoke" scale={1.25} drift={26} bursts={[13.62]} />
     </XG>
   );

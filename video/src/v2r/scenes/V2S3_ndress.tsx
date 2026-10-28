@@ -12,6 +12,7 @@ import {Batch, Paint, P, rng, ovalPath, leafPath} from '../kit/canal/core';
 import type {Pt} from '../kit/canal/core';
 import {Levels} from './V2S3_nboat';
 import {Pigeons} from '../kit/canal/life';
+import {planeBatch} from './V2S3_depth';
 
 /** A long low-sun shadow lying on the towpath: from an object's foot (x0..x1 at y) it runs RIGHT and a little toward
  *  us (the sun is low at left), as a flat stone-shade shape attached to the foot. */
@@ -160,7 +161,7 @@ export const S3Dress: React.FC = () => {
     logsInto(L);
     sackInto(L);
     bayInto(L);
-    return L.merge();
+    return planeBatch(L.merge(), -2);
   }, []);
   const life = new Batch();
   robinInto(life, t);
