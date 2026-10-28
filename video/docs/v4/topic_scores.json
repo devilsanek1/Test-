@@ -5,32 +5,38 @@
   {
    "key": "relevant",
    "label": "Relevant (+ buzz, surprise)",
-   "weight": 6
+   "weight": 6,
+   "short": "Relevant"
   },
   {
    "key": "true",
    "label": "True and solid",
-   "weight": 5
+   "weight": 5,
+   "short": "True"
   },
   {
    "key": "visual",
    "label": "Visually appealing",
-   "weight": 4
+   "weight": 4,
+   "short": "Visual"
   },
   {
    "key": "mood",
    "label": "Mood (hopeful)",
-   "weight": 3
+   "weight": 3,
+   "short": "Mood"
   },
   {
    "key": "fresh",
    "label": "Fresh (last month)",
-   "weight": 2
+   "weight": 2,
+   "short": "Fresh"
   },
   {
    "key": "share",
    "label": "Shareable",
-   "weight": 1
+   "weight": 1,
+   "short": "Share"
   }
  ],
  "stories": [
@@ -101,6 +107,19 @@
   },
   {
    "rank": 6,
+   "name": "SynthID: a hidden mark in 180 billion AI pictures",
+   "scores": {
+    "relevant": 7,
+    "true": 7,
+    "visual": 8,
+    "mood": 8,
+    "fresh": 8,
+    "share": 8
+   },
+   "total": 7.48
+  },
+  {
+   "rank": 7,
    "name": "First patient given AI-designed phages",
    "scores": {
     "relevant": 8.2,
@@ -113,7 +132,7 @@
    "total": 7.25
   },
   {
-   "rank": 7,
+   "rank": 8,
    "name": "Pancreatic cancer in \"normal\" CT scans",
    "scores": {
     "relevant": 8.0,
@@ -126,7 +145,7 @@
    "total": 7.19
   },
   {
-   "rank": 8,
+   "rank": 9,
    "name": "A bionic arm that feels goes home",
    "scores": {
     "relevant": 6.8,
@@ -139,7 +158,7 @@
    "total": 7.18
   },
   {
-   "rank": 9,
+   "rank": 10,
    "name": "Microsoft's diagnosis AI, in Science",
    "scores": {
     "relevant": 6.8,
@@ -152,7 +171,7 @@
    "total": 6.99
   },
   {
-   "rank": 10,
+   "rank": 11,
    "name": "AI hears a weak heart: stethoscope + chest X-ray",
    "scores": {
     "relevant": 6.0,
@@ -165,7 +184,7 @@
    "total": 6.9
   },
   {
-   "rank": 11,
+   "rank": 12,
    "name": "Deer alarm calls warn villagers of tigers, Nepal",
    "scores": {
     "relevant": 6.7,
@@ -178,7 +197,7 @@
    "total": 6.63
   },
   {
-   "rank": 12,
+   "rank": 13,
    "name": "Kids' rare diseases diagnosed with o3 Deep Research",
    "scores": {
     "relevant": 7.3,
@@ -191,7 +210,7 @@
    "total": 6.51
   },
   {
-   "rank": 13,
+   "rank": 14,
    "name": "A hobbyist, his AI helpers and a possible planet",
    "scores": {
     "relevant": 6.0,
@@ -204,7 +223,7 @@
    "total": 6.48
   },
   {
-   "rank": 14,
+   "rank": 15,
    "name": "ALS voice rebuilt from a 16 s TV clip",
    "scores": {
     "relevant": 7.0,
@@ -217,7 +236,7 @@
    "total": 6.33
   },
   {
-   "rank": 15,
+   "rank": 16,
    "name": "AI-designed gene editor, blight-proof rice",
    "scores": {
     "relevant": 6.2,
@@ -230,7 +249,7 @@
    "total": 6.25
   },
   {
-   "rank": 16,
+   "rank": 17,
    "name": "Virtual Biotech: 37,000 agents read 56,000 trials",
    "scores": {
     "relevant": 5.7,
@@ -243,7 +262,7 @@
    "total": 6.2
   },
   {
-   "rank": 17,
+   "rank": 18,
    "name": "Breast-cancer AI: who can skip chemo",
    "scores": {
     "relevant": 6.7,
@@ -256,7 +275,7 @@
    "total": 6.06
   },
   {
-   "rank": 18,
+   "rank": 19,
    "name": "Rentosertib, AI-found drug in Phase III",
    "scores": {
     "relevant": 6.3,
@@ -269,7 +288,20 @@
    "total": 5.99
   },
   {
-   "rank": 19,
+   "rank": 20,
+   "name": "Gemini 4 Carbon, Google's new model",
+   "scores": {
+    "relevant": 6,
+    "true": 6,
+    "visual": 4,
+    "mood": 6,
+    "fresh": 10,
+    "share": 4
+   },
+   "total": 5.9
+  },
+  {
+   "rank": 21,
    "name": "Penn's epilepsy AI on patients' phones",
    "scores": {
     "relevant": 5.5,
@@ -282,7 +314,7 @@
    "total": 5.71
   },
   {
-   "rank": 20,
+   "rank": 22,
    "name": "McMaster's free antibiotic-finder AI",
    "scores": {
     "relevant": 5.7,
@@ -295,7 +327,7 @@
    "total": 5.63
   },
   {
-   "rank": 21,
+   "rank": 23,
    "name": "Florida's AI mosquito trap",
    "scores": {
     "relevant": 5.5,
@@ -308,7 +340,7 @@
    "total": 5.62
   },
   {
-   "rank": 22,
+   "rank": 24,
    "name": "UCLA MAESTRO prostate-cancer drug pair",
    "scores": {
     "relevant": 5.2,
@@ -321,7 +353,7 @@
    "total": 5.01
   },
   {
-   "rank": 23,
+   "rank": 25,
    "name": "OpenAI's math and physics \"discoveries\"",
    "scores": {
     "relevant": 5.7,

@@ -85,10 +85,24 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   -> rule: Taste signals (the owner's order).
 - 2026-10-28 ~16:35 UTC: "reevaluate the stories based on that - all N stories you researched" -> all 23 candidates of
   rounds 3-4 re-ranked from the editors' scores in the owner's order (`G0_TOPICS_r4.md`, last table).
-- 2026-10-28 ~16:45 UTC: "can you show me the visual next time we do research - like the story and some bar chart or
+- 2026-10-28 ~15:50 UTC: "can you show me the visual next time we do research - like the story and some bar chart or
   something showing the score on each category" -> `video/scripts/topic_chart.py` (one block per story, a bar per
   criterion, the weighted total); a sample from this round: `topic_chart.png` (data `topic_scores.json`). -> rule:
   Taste signals (the shortlist comes with its chart); PIPELINE_V2 G0.
-- 2026-10-28 ~16:50 UTC: "lets move the freshness lower and make it last month or so" -> order now relevant, true,
+- 2026-10-28 ~15:51 UTC: "lets move the freshness lower and make it last month or so" -> order now relevant, true,
   visual, mood, fresh (about the last month), shareable; re-ranked: the glasses 8.34, the vaccine 8.32 (tied), quake
   alerts 7.81, the hurricane 7.76, "could they hear you?" 7.68. -> rule: Taste signals; CREATIVE_BRIEF banner.
+- 2026-10-28 ~16:52 UTC (with the two notes above re-sent): "make the visual into column chart and read the latest
+  update in our repo - we committed an updated learnings from the video 3" -> `topic_chart.py` draws one column per
+  criterion (the most important on the left, the value above, the short label below); v3's lesson read (playbook,
+  Audience and goal: never baity; v3's ad-like opening, 64.5 % skipped) and applied to the shortlist (`G0_TOPICS_r4.md`,
+  "Ad or news?"): the glasses' line read like an ad (a testimonial plus a feature demo) and is reworded as news; the
+  vaccine, hurricane and ICU lines pass; quake alerts are a phone-feature launch. -> rule: playbook Taste signals (the
+  column chart); TOPIC_CRITERIA (the ad-or-news check).
+- 2026-10-28 ~17:21 UTC: "maybe one thing we can do is something about the new model released?
+  [blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/] like if there is
+  something geniunely interesting and easy to get for people? also what about this news?
+  [blog.google/innovation-and-ai/models-and-research/google-deepmind/synthid-time-best-inventions/]" -> both read and
+  scored (`G0_TOPICS_r4.md`, "Two owner-suggested candidates"): SynthID 7.48 (anyone can check a picture; very
+  drawable; but it finds only Google's own marks, the peg is an award, the counts are Google's); Gemini 4 Carbon 5.90
+  (not for people yet: cyber defenders first; Google's own benchmarks; a launch reads as an ad).
