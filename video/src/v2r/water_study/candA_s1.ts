@@ -112,7 +112,7 @@ export const BODY = '#9CC3BC';
 /** The reflections' toning (R3-R4): L* toward 76 by k; the water's hue family at that value: h 182 at L* 76, 0.9 deg
  *  bluer per L* deeper (L* 62: h 195, C* 14.5; the deep water), greener and paler when lighter (L* 84: h 175, C* 7.4). */
 export const TONE: ToneOpts = {waterL: 76, waterH: 182, waterC: 10, hueSlope: 0.9, chromaSlope: 0.32, cMin: 6.5, cMax: 16};
-/** The Fresnel ladder: k 0.30 along the far quay (R 0.53) -> 0.65 at our edge (R 0.26), in 8 flat steps of 0.05, one per
+/** The Fresnel ladder: k 0.40 along the far quay (R 0.53) -> 0.70 at our edge (R 0.26), in 7 flat steps of 0.05, one per
  *  row: a reflection keeps about half its strength toward us. */
 export const kOf = (row: Row) => Math.round(lerp(0.4, 0.72, row.n) * 20) / 20;
 /** The glitter's still gold bed (the sun's reflected light, R8) and its warm-white slivers (L* ~97, never #FFFFFF). */

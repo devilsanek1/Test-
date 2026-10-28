@@ -108,8 +108,8 @@ the coping's own face.
 | the coping's face in shade #B8ADBA (72.0) | #9EBBB6 (L* 73.7) | (far only) |
 | boats' hulls #707E92 (52.3) | #749D9B (L* 61.8, C* 14.7, h 194) | #8DAFAB (L* 68.9) |
 | boat A's sage cabin #B5C7AF (78.3) / B's oat #E4D3BA (85.3) | #ABC5BF (77.5) / #BACFCA (81.5) | #A9C3BD / #B0C8C3 |
-| her teal coat CM.hero (k >= 0.6) | #8BADA9 (L* 68.2, C* 12.5) | #8BADA9 |
-| the ghosts' oat coats (k >= 0.6) | #B0C8C3 (L* 78.7) | #B0C8C3 |
+| her teal coat CM.hero (k >= 0.6) | #81A6A3 (L* 65.4, C* 13.5, h 191) | #8BADA9 (L* 68.2) |
+| the ghosts' oat coats (k >= 0.6) | #B4CBC5 (L* 79.9) | #B0C8C3 (L* 78.7) |
 | the duck #A66952 (50.5) | #709A99 (L* 60.7, C* 15.0, h 196) | #8BADAA (L* 68.2) |
 | the bridge's brick #DAA28E / deck #EEDECD / soffit #D0CCD8 | #9DBAB5 (73.3) / #C3D6D0 (84.1) / #B5CBC6 (80.0) | #A2BDB8 / #B5CBC6 / #AEC6C1 |
 | the far roofs (hazed stucco #F5D9C3) / tower #B5B7C6 | #C1D4CF (83.4) / #A4BFBA (75.3) | #B4CBC5 / #A5C0BB |
@@ -132,9 +132,9 @@ y 1136), a hairline thinning 1.3 -> 0.45 px (grows in over 0.25 s: never a fade)
 
 ## 4. Render cost
 
-Bench (`out/water_study/candA/render.mjs --bench`: one bundle, frames 180-195 = 3.00-3.25 s, concurrency 1, JPEG, the two
-compositions alternated twice on the shared 4-CPU machine): **WaterStudyBase median 558 / 584 ms per frame, A 561 / 579
-ms** (means 608 / 668 vs 615 / 621): **A costs the same as v5's water within the bench's noise (+-25 ms).** The JS per
+Bench (`out/water_study/candA/render.mjs --bench`: one bundle, frames 180-195 = 3.00-3.25 s, concurrency 1, JPEG, Base and
+A alternated, two sessions on the shared 4-CPU machine): **WaterStudyBase median 558 / 584 / 559 / 547 ms per frame, A
+561 / 579 / 559 / 610 ms**: **A costs about what v5's water cost (+~15 ms, inside the bench's +-25 ms noise).** The JS per
 frame (node): 6.8 ms (slicing ~35 sources into 53 rows, the gaps, the glitter); ~82 reflection paths (~51 KB of path
 data), ~20 gap paths, 2 glitter paths, the ramp (lib/sky: one gradient and its dither over the water's box). The 2 s
 master clip: 120 frames in 66 s at concurrency 2.
@@ -151,6 +151,10 @@ master clip: 120 frames in 66 s at concurrency 2.
   lib/sky's own curve and dither.
 - **The 5.80-6.40 join:** nothing new enters or pops in the water (the gaps, the bed and the slivers are steady
   fields; the duck's 3.85 s ring thins out by 6.25; the ghosts' reflections pop with the ghosts, last at 5.16).
+- **Light** (`check_light.py` A/B at 2.5 s, `--sky '#BCDCCF' --exclude 0,0,1080,950 --subject 500,920,680,1100`): A
+  and v5 read the same: the brightest 5 % centred at (498, 1398) vs (496, 1396), 0.155 vs 0.154 H from that box (the
+  same verdict with these flags: the pale near steps hold it; L1's v5 runs used their own subject box), greyed shadow
+  pixels 209 vs 230, the caption band untouched. A adds no light layer and moves nothing.
 - **The seam:** only `candA*.ts(x)` changed; WaterStudyBase still renders v5 (the comparison crops).
 
 ## 6. API sketch: one shared `lib/water.tsx` for S1, S2, S3, S4, S8 and S5
@@ -208,5 +212,4 @@ How each water feeds it (read-only today: other lanes own these files):
 - **Kept from S1, drawn over the slot:** the far towpath's own 8 px waterDeep strip and S1BoatStrips read as the
   contact bands; no change needed.
 - **The duck's ring** is a hairline (CRAFT §c: things that ARE lines); without it the duck still sits on its reflection.
-- **Not run:** `check_light.py` (A adds no light layer; the boat strips multiply a teal hull reflection, which stays
-  teal) and `check_banding.py` (§5).
+- **`check_banding.py` not run** (§5).
