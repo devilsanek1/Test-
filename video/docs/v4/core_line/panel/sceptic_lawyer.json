@@ -1,0 +1,11 @@
+{"verdicts":[
+{"id":"L18","severity":"minor","problem":"PRELIMINARY (checks in progress): one 3-track blind test commissioned by Deezer; '97% couldn't tell' is the all-three-right score.","safer_wording":""},
+{"id":"L3","severity":"minor","problem":"PRELIMINARY (checks in progress): the crime is wire-fraud conspiracy (royalties collected through fake plays), not merely having bots play songs.","safer_wording":""},
+{"id":"L35","severity":"none","problem":"PRELIMINARY (checks in progress).","safer_wording":""},
+{"id":"L34","severity":"minor","problem":"PRELIMINARY (checks in progress): states as present fact an effect that exists only for fakes that slip past the filters and has never been measured.","safer_wording":""},
+{"id":"L5","severity":"none","problem":"PRELIMINARY (checks in progress).","safer_wording":""},
+{"id":"L24","severity":"none","problem":"PRELIMINARY (checks in progress).","safer_wording":""},
+{"id":"L28","severity":"minor","problem":"PRELIMINARY (checks in progress): 'nobody hears' can be read as zero plays.","safer_wording":""},
+{"id":"L1","severity":"major","problem":"PRELIMINARY (checks in progress): says AI songs as a class take money from artists (a 'Never say' row); frame 0 drops 'almost'.","safer_wording":""},
+{"id":"L2","severity":"major","problem":"PRELIMINARY (checks in progress): frame 0 drops 'one app' and 'on peak days', so it reads as half of all new music.","safer_wording":""}
+]}
