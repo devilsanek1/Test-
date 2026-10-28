@@ -49,8 +49,11 @@ import {Look} from '../../../lib/exit';
 import {Tier} from '../../../lib/tier';
 import {mat, type Mat, XG} from '../../../lib/xf';
 import {EMBER, Hand, laptopGeo, Phone, phonePoint, phoneSlots, Pip3, PriceTag, Show, Txt, type LookKey, type PipPoseKey, type Pt, type TickerStep} from '../kit';
-import {FormShade, Lit, Rim, type LightRig} from '../kit/Light';
-import {FilmClock, HOME_RIG, LIGHT_ON} from './home_set';
+import {stepAt} from '../kit/Haze';
+import {FormShade, Lit, mixHex, Rim, type LightRig} from '../kit/Light';
+import {PHONE_DIM_BODY, PHONE_DIM_POP} from '../kit/Phone';
+import {TAG_DIM} from '../kit/PriceTag';
+import {FilmClock, HOME_RIG, HOOK_CALM_AT, LIGHT_ON} from './home_set';
 
 // ================================================================= the spots and the moves (film seconds)
 
@@ -121,8 +124,18 @@ export const TURN_AT = 39.7;
  *  "laptop", 0.52); the badge pops at 0.52; the cart-pop sound is public/v3/animatic.json's phone_cart_add at 0.50. */
 export const TAP = {lift: [0.3, 0.4] as [number, number], down: [0.44, 0.5] as [number, number], press: 0.5, badge: 0.52, liftPx: 44};
 export const REACT = {tap: TAP.press, settle: 2.72, lower: 3.66, jolt: [15.3, 35.95], tug: 18.3, sway: 24.44};
-/** The warm rim on the tag's lamp side while it ticks (CRAFT §d.8: the subject only). */
-export const RIM_WINDOW: [number, number] = [1.86, 3.3];
+/** The warm rim on the tag's lamp side while it is the lit subject (CRAFT §d.8: the subject only): while it ticks, and
+ *  through the payoff from PAYOFF on (early review E10: the light layer changed the payoff tag by dL* 0.0; flow_v2 §5
+ *  SQF "rim left, form shade right third"), 4-6 px inside its silhouette. */
+export const RIM_WINDOWS: [number, number][] = [
+  [1.86, 3.3],
+  [38.62, 41.15],
+];
+/** The payoff's form shade on the tag's right third (away from the lamp, screen-left), with the rim (E10). */
+export const FORM_WINDOW: [number, number] = [38.62, 41.15];
+/** The like-pop (flow_v2 §4, 39.88 "price": the sound public/v3/animatic.json phone_like_pop): the back's drawing pops
+ *  as the back lands, at the turn's midpoint (the G3 board: "on 'price' its back lands: a tiny AI data center"). */
+export const LIKE_POP_AT = 39.88;
 
 /** Extra hang angle (deg) from the tag's reactions at film time T (the ticker's own jolts are PriceTag's). */
 export function tagReaction(T: number): number {
@@ -214,6 +227,20 @@ export const tagSway = (T: number): number => 1.2 - 0.65 * offbeat(T);
 /** The dim step: a warm multiply toward peach (screen white -> #F2D9C8, L* 88, C* 13), never greige or grey. */
 export const DIM_TINT = '#F2D9C8';
 const DIM_HALF = '#F9ECE4';
+
+/** REST (early review E2: SQB's 9 s chart hold is the film's longest shot, and the dimmed plane still held more of the
+ *  frame's salience than the chart): from HOOK_CALM_AT (6.35, the same step as the window sitting back; SQA's 4.04-5.80
+ *  off-beat state, the approved pilot, is untouched) every off-beat stretch takes a deeper tier B (CRAFT §b: C* <= 25,
+ *  contrast near the stage's, no near-black): the bezel a soft warm brown (L* 48) instead of L* 32 (its edge against the
+ *  dimmed screen and the desk was the plane's strongest local contrast), the screen one more peach step (L* 84), the
+ *  button and the badge a screen tint (no pop hue), the tag a soft terracotta (C* 24, its prices L* 82, a warm eyelet).
+ *  On every beat the plane is full as before; each switch stays a 2-step change. */
+export const PHONE_REST = {body: '#8D6A5F', pop: '#DEC1B1'};
+export const TAG_REST = {body: '#C38F7F', text: '#E0C7BD', ring: '#D0B6AA', line: '#AB7465'};
+const DIM_REST = '#E9CCB9';
+const DIM_HALF_REST = '#F5E5DC';
+/** 0 = the pilot's off-beat colours (before 6.35), 0.5 = the half step, 1 = rest. */
+export const restK = (T: number): number => stepAt(T, HOOK_CALM_AT);
 
 /** The POV hand's skin (B, CRAFT §c: its own value against the desk it lies over: L* ~76 after the support tier's
  *  pull, the desk 63 in the room's ambient; C* ~23). */
@@ -371,15 +398,17 @@ const circD = (cx: number, cy: number, r: number) => `M${cx - r} ${cy}A${r} ${r}
 /** The screen's dim step (a multiply over the screen's rounded rect, phone-local), with the button and the cart badge
  *  left out (even-odd holes): they take their own soft off-beat blue (Phone `dim`), which a peach multiply would turn
  *  grey (#9AACCB x #F2D9C8 = C* 7). */
-const ScreenDim: React.FC<{w: number; h: number; dim: number}> = ({w, h, dim}) => {
+const ScreenDim: React.FC<{w: number; h: number; dim: number; rest?: number}> = ({w, h, dim, rest = 0}) => {
   if (dim <= 0) return null;
   const k = w / 400;
   const S = phoneSlots(w, 372, BUTTON_Y);
   const bt = S.button;
   const d = rrD(16 * k, 16 * k, w - 32 * k, h - 32 * k, 42 * k) + rrD(bt.x, bt.y, bt.w, bt.h, 20 * k) + circD(S.badge.x, S.badge.y, S.badge.r);
+  const full = rest > 0 ? mixHex(DIM_TINT, DIM_REST, rest) : DIM_TINT;
+  const half = rest > 0 ? mixHex(DIM_HALF, DIM_HALF_REST, rest) : DIM_HALF;
   return (
     <g style={{mixBlendMode: 'multiply'}}>
-      <path d={d} fillRule="evenodd" fill={dim >= 1 ? DIM_TINT : DIM_HALF} />
+      <path d={d} fillRule="evenodd" fill={dim >= 1 ? full : half} />
     </g>
   );
 };
@@ -449,6 +478,10 @@ export const ThreadPlane: React.FC<ThreadPlaneProps> = ({T: Tin, rig = HOME_RIG,
   // inside its outline (SQA's <Look snapPops>), so the colour floods OUT FROM THE TAG: the tag 0.033, the screen 0.05,
   // the photo and the listing's laptop 0.06-0.1, the hand 0.08-0.16, the button 0.12, the dark bezel last (0.15)
   const AT = {phone: -0.16, listing: -0.04, tag: -0.147, hand: -0.1, pip: -0.1, bezel: 0.15};
+  // REST (E2): from 6.35 the off-beat colours are the calmer rest ones (the beats are unchanged: dim 0 ignores them)
+  const r = restK(T);
+  const tagDimColors = r > 0 ? {body: mixHex(TAG_DIM.body, TAG_REST.body, r), text: mixHex(TAG_DIM.text, TAG_REST.text, r), ring: mixHex(TAG_DIM.ring, TAG_REST.ring, r), line: mixHex(TAG_DIM.line, TAG_REST.line, r)} : undefined;
+  const phoneDimColors = r > 0 ? {body: mixHex(PHONE_DIM_BODY, PHONE_REST.body, r), pop: mixHex(PHONE_DIM_POP, PHONE_REST.pop, r)} : undefined;
   const tagEl = (
     <PriceTag
       x={S.tag.x}
@@ -463,7 +496,9 @@ export const ThreadPlane: React.FC<ThreadPlaneProps> = ({T: Tin, rig = HOME_RIG,
       oldAt={OLD_AT}
       strikeAt={STRIKE_AT}
       turnAt={TURN_AT}
+      backPopAt={LIKE_POP_AT}
       dim={S.tagDim}
+      dimColors={tagDimColors}
       at={AT.tag}
       seed="thread/tag"
       {...tagProps}
@@ -486,6 +521,7 @@ export const ThreadPlane: React.FC<ThreadPlaneProps> = ({T: Tin, rig = HOME_RIG,
           pressAt={TAP.press}
           pressDark
           dim={S.dim}
+          dimColors={phoneDimColors}
           bodyFillAt={AT.bezel}
           descTone={DESC_TONE}
           at={AT.phone}
@@ -493,7 +529,7 @@ export const ThreadPlane: React.FC<ThreadPlaneProps> = ({T: Tin, rig = HOME_RIG,
         >
           <ListingRest w={phone.w} at={AT.listing + 0.2} T={T} />
           {children}
-          <ScreenDim w={phone.w} h={phone.h} dim={S.dim} />
+          <ScreenDim w={phone.w} h={phone.h} dim={S.dim} rest={r} />
         </Phone>
         {pip ? (
           <XG m={S.m}>
@@ -504,7 +540,8 @@ export const ThreadPlane: React.FC<ThreadPlaneProps> = ({T: Tin, rig = HOME_RIG,
           <>
             {tagEl}
             <TagFrame0 S={S} tagAt={AT.tag} />
-            {T >= RIM_WINDOW[0] && T < RIM_WINDOW[1] ? <Rim of={tagEl} c={[S.tag.x + S.tag.w * 0.55, S.tag.y + S.tag.w * 0.25]} size={[S.tag.w, S.tag.w * 0.5]} width={5 * k} /> : null}
+            {T >= FORM_WINDOW[0] && T < FORM_WINDOW[1] ? <FormShade of={tagEl} c={[S.tag.x + S.tag.w * 0.55, S.tag.y + S.tag.w * 0.25]} size={[S.tag.w, S.tag.w * 0.5]} frac={0.33} /> : null}
+            {RIM_WINDOWS.some(([a, b]) => T >= a && T < b) ? <Rim of={tagEl} c={[S.tag.x + S.tag.w * 0.55, S.tag.y + S.tag.w * 0.25]} size={[S.tag.w, S.tag.w * 0.5]} width={5 * k} /> : null}
           </>
         ) : null}
         <Tier tier="support" lines>

@@ -226,6 +226,9 @@ const SIGN_CALM = {panel: '#5F6782', text: '#8D95AE'};
 const FAR_SNOW = '#CDD3E8';
 /** How far each row of houses steps toward FAR_SNOW when calm (the farther, the more). */
 const CALM_STEP = {far: 0.5, town: 0.5, near: 0.38};
+/** Then one light haze step over the houses toward the far snow (kit Haze: far = lighter, lower contrast; the lit panes
+ *  turn a pale cream on the calm walls instead of yellow specks: a mix toward the blue sky would grey them). */
+const TOWN_HAZE = 0.3;
 
 /** A far house: a flat body and roof, a snow cap, lit panes at the rig's window value (exact, never recoloured).
  *  `calm` (0..1, x its row's step): the walls step toward the far snow (after the hook, E8). */
@@ -349,28 +352,32 @@ export const HomeOutside: React.FC<{T: number}> = ({T}) => {
     {/* one far ridge along the horizon (a flat step under the sky) */}
     <Fill d={polyD([[GLASS.x - 40, HORIZON + 4], [GLASS.x - 40, 918], [230, 906], [330, 922], [430, 900], [520, 914], [640, 896], [760, 912], [860, 902], [GLASS.x + GLASS.w + 40, 914], [GLASS.x + GLASS.w + 40, HORIZON + 4]])} color={RIDGE} at={-0.46} offset={false} />
     <Fill rect={[GLASS.x - 40, HORIZON, GLASS.w + 80, GLASS.y + GLASS.h - HORIZON + 40]} color={EMBER.snow} at={-0.44} offset={false} mode="snap" />
-    {/* the far town along the ridge: a row of tiny houses with a few lit panes (flat, far, calm) */}
-    {FAR_ROW.map(([x, w, lit], i) => (
-      <FarHouse key={i} x={x} w={w} y={RIDGE_Y(x + w / 2)} h={w * 0.6} pitch={0.36} color={RIDGE_HOUSE} lit={lit ? [[0.42, 0.34]] : []} at={-0.43} calm={far} />
-    ))}
-    {/* the town on the horizon: left of the data center, then right of it */}
-    <FarHouse x={190} w={58} y={HORIZON + 2} lit={[[0.22, 0.3]]} at={-0.42} calm={town} />
-    <FarHouse x={250} w={64} y={HORIZON + 2} h={56} lit={[[0.56, 0.36]]} chimney at={-0.41} calm={town} />
-    <SnowTree x={326} y={HORIZON + 4} h={92} kind="pine" far seed="home/pine1" at={-0.4} />
-    <FarHouse x={772} w={56} y={HORIZON + 2} h={82} pitch={0.2} lit={[[0.18, 0.2], [0.6, 0.55]]} at={-0.42} calm={town} />
-    <FarHouse x={836} w={62} y={HORIZON + 2} lit={[[0.4, 0.34]]} chimney at={-0.41} calm={town} />
-    <SnowTree x={758} y={HORIZON + 4} h={70} kind="pine" far seed="home/pine2" at={-0.4} />
+    <Haze k={TOWN_HAZE * c} color={FAR_SNOW}>
+      {/* the far town along the ridge: a row of tiny houses with a few lit panes (flat, far, calm) */}
+      {FAR_ROW.map(([x, w, lit], i) => (
+        <FarHouse key={i} x={x} w={w} y={RIDGE_Y(x + w / 2)} h={w * 0.6} pitch={0.36} color={RIDGE_HOUSE} lit={lit ? [[0.42, 0.34]] : []} at={-0.43} calm={far} />
+      ))}
+      {/* the town on the horizon: left of the data center, then right of it */}
+      <FarHouse x={190} w={58} y={HORIZON + 2} lit={[[0.22, 0.3]]} at={-0.42} calm={town} />
+      <FarHouse x={250} w={64} y={HORIZON + 2} h={56} lit={[[0.56, 0.36]]} chimney at={-0.41} calm={town} />
+      <SnowTree x={326} y={HORIZON + 4} h={92} kind="pine" far seed="home/pine1" at={-0.4} />
+      <FarHouse x={772} w={56} y={HORIZON + 2} h={82} pitch={0.2} lit={[[0.18, 0.2], [0.6, 0.55]]} at={-0.42} calm={town} />
+      <FarHouse x={836} w={62} y={HORIZON + 2} lit={[[0.4, 0.34]]} chimney at={-0.41} calm={town} />
+      <SnowTree x={758} y={HORIZON + 4} h={70} kind="pine" far seed="home/pine2" at={-0.4} />
+    </Haze>
     {/* a slow cloud band behind the data center (visible either side of it), a lighter flat step of the sky */}
     <Show at={0.15}>
       <SkyClouds x0={GLASS.x - 260} x1={GLASS.x + GLASS.w + 260} y0={640} y1={790} n={3} w={[240, 420]} speed={7} color="#67769F" seed="home/clouds" shape="lobed" />
     </Show>
     <HomeDataCenter T={T} />
-    {/* one window lights up (a neighbour home: 1.05, in the hook's quiet stretch) */}
-    <LitWindow rect={[836 + 62 * 0.66, HORIZON + 2 - 62 * 0.62 + 62 * 0.62 * 0.36, 62 * 0.16, 62 * 0.62 * 0.26]} at={1.05} />
-    {/* the nearest houses down our street (in front of the horizon, behind the sill): small, a lit pane each */}
-    <FarHouse x={186} w={76} y={1054} h={46} pitch={0.32} color={NEAR_HOUSE} lit={[[0.58, 0.3]]} at={-0.38} calm={near} />
-    <FarHouse x={772} w={70} y={1050} h={46} pitch={0.32} color={NEAR_HOUSE} lit={[[0.24, 0.3]]} at={-0.38} calm={near} />
-    <FarHouse x={848} w={64} y={1056} h={44} pitch={0.34} color={NEAR_HOUSE} lit={[[0.56, 0.32]]} chimney at={-0.38} calm={near} />
+    <Haze k={TOWN_HAZE * c} color={FAR_SNOW}>
+      {/* one window lights up (a neighbour home: 1.05, in the hook's quiet stretch) */}
+      <LitWindow rect={[836 + 62 * 0.66, HORIZON + 2 - 62 * 0.62 + 62 * 0.62 * 0.36, 62 * 0.16, 62 * 0.62 * 0.26]} at={1.05} />
+      {/* the nearest houses down our street (in front of the horizon, behind the sill): small, a lit pane each */}
+      <FarHouse x={186} w={76} y={1054} h={46} pitch={0.32} color={NEAR_HOUSE} lit={[[0.58, 0.3]]} at={-0.38} calm={near} />
+      <FarHouse x={772} w={70} y={1050} h={46} pitch={0.32} color={NEAR_HOUSE} lit={[[0.24, 0.3]]} at={-0.38} calm={near} />
+      <FarHouse x={848} w={64} y={1056} h={44} pitch={0.34} color={NEAR_HOUSE} lit={[[0.56, 0.32]]} chimney at={-0.38} calm={near} />
+    </Haze>
     {/* one chimney's smoke drifting right (slow, low contrast) */}
     <Smoke x={250 + 64 * 0.725} y={HORIZON + 2 - 56 - 64 * 0.4 - 4} seed="home/smoke" at={0.2} ceil={640} r1={15} rise={120} drift={-70} />
     <HomeSnow />
