@@ -5,7 +5,7 @@
 // `float`):
 //   SkyDemo2R    props {variant: 'after' (lib/sky, default) | 'before' (a plain 2-stop SVG gradient, mint at the band's
 //                foot -> peach at the horizon, hex stops, no dither but Chrome's own) | 'steps' (S1's six flat steps and
-//                its 1.6x halo, as on 2026-10-27), amp (dither codes, default 2), grain (px, 1), dither (true), warmth
+//                its 1.6x halo, as on 2026-10-27), amp (dither codes, default 2), grain (px, default 2), dither (true), warmth
 //                (true), scene (true: the skyline, the sun, the wing), caption (true), float (px: a slow 2D drift of the
 //                whole set, 0 = locked)}
 //   SkyBefore2R / SkySteps2R   the same with variant 'before' / 'steps'.
@@ -18,19 +18,24 @@ import React from 'react';
 import {AbsoluteFill, Composition, registerRoot, useCurrentFrame, useVideoConfig} from 'remotion';
 import {CM} from './v2r/palette';
 import {SUN0} from './v2r/world/map';
-import {eveningSky, horizonColor, mixSky, Sky, skyProblems} from './lib/sky';
+import {S1_EVENING, S1_HORIZON} from './v2r/world/skies';
+import {eveningSky, horizonColor, mixSky, oklch, Sky, skyProblems} from './lib/sky';
 import {captionFontStack, useCaptionFont} from './lib/font';
 
 const W = 1080;
 const H = 1920;
 const FPS = 60;
 
-/** S1's warm horizon (the lowest of L1's six steps, V2S1_set_core S1_SKY[5]); the demo's far haze. */
-const HORIZON = '#FBD9BB';
+/** S1's warm horizon and evening sky (src/v2r/world/skies.ts: the film's one sky per set): the mint flat through the
+ *  caption band, a gentle zenith, a pale warm light band, the peach horizon at y 800 (behind the far roofs), the low
+ *  sun's warmth 340 x 204 around SUN0. */
+const HORIZON = S1_HORIZON;
 
-/** The S1 evening, lib/sky's way: the mint flat through the caption band, a slightly deeper cooler zenith, a pale warm
- *  light band, the peach horizon at y 800 (behind the far roofs), the low sun's warmth 340 x 204 around SUN0. */
-export const S1_EVENING = eveningSky({band: CM.sky, horizon: HORIZON, horizonY: 800, sun: {x: SUN0.x, y: SUN0.y, rx: 340}});
+/** A zenith `drop` OKLCH L under the band colour, a touch richer and cooler (eveningSky's recipe). */
+const zenithOf = (drop: number) => {
+  const b = oklch(CM.sky);
+  return {l: b.l - drop, c: b.c + drop / 3, h: b.h + (drop > 0 ? 6 : 0)};
+};
 
 /** S1's sky on 2026-10-27 (L1, V2S1_set_core): the mint flat to y 572, then five flat steps. */
 const STEPS = ['#BCDCCF', '#CEDECD', '#DFE1CB', '#EDE3C9', '#F8E0C3', '#FBD9BB'];
@@ -45,6 +50,8 @@ export type SkyDemoProps = {
   scene?: boolean;
   caption?: boolean;
   float?: number;
+  /** The zenith's OKLCH L drop from the band colour (eveningSky's default 0.012 when unset). */
+  zenithDrop?: number;
 };
 
 const Before: React.FC = () => (
@@ -115,11 +122,12 @@ const Caption: React.FC = () => {
   );
 };
 
-export const SkyDemo2R: React.FC<SkyDemoProps> = ({variant = 'after', amp = 2, grain = 1, dither = true, warmth = true, scene = true, caption = true, float = 0}) => {
+export const SkyDemo2R: React.FC<SkyDemoProps> = ({variant = 'after', amp = 2, grain = 2, dither = true, warmth = true, scene = true, caption = true, float = 0, zenithDrop}) => {
   const f = useCurrentFrame();
   const {fps} = useVideoConfig();
   const t = f / fps;
-  const spec = {...S1_EVENING, sun: warmth ? S1_EVENING.sun : null, dither: dither ? {amp, grain} : (false as const)};
+  const base = zenithDrop === undefined ? S1_EVENING : eveningSky({band: CM.sky, horizon: HORIZON, horizonY: 800, sun: {x: SUN0.x, y: SUN0.y, rx: 340}, zenith: zenithOf(zenithDrop)});
+  const spec = {...base, sun: warmth ? base.sun : null, dither: dither ? {amp, grain} : (false as const)};
   const dx = float ? float * Math.sin(t * 0.9) : 0;
   const dy = float ? float * 0.5 * Math.sin(t * 0.63) : 0;
   return (
