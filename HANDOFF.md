@@ -143,7 +143,8 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Video 3 is produced by session https://claude.ai/code/session_01K4EiJphpZBfCkniV3UU3wR.** It is at G0 (topic
   scouting): workflow `context/workflows/v3-g0-topics-wf_b78a4844-2b3.js` writes `video/docs/v3/scouting/*.md` and
   `video/docs/v3/G0_TOPICS.md` (top 3 fresh topics for the owner to pick).
-- **v3 status (2026-10-28 ~02:30 UTC): REWORK, FINAL ASSEMBLY RUNNING.**
+- **v3 status (2026-10-28): rework master delivered (`deliverables/v3/v3_final.mp4`), awaiting the owner's review.** The
+  final step's report (master facts, checks, cover frame 192, what is deferred): `video/docs/v3/rework_reports/assembly_final.md`.
   - The hook pilot (SQA 0-5.80) was sent to the owner: `deliverables/v3/v3_rework_pilot.mp4`.
   - Five max-effort fix lanes are done and pushed. Their reports are in `video/docs/v3/rework_reports/`:
     - `final_lanes.md`: WINDOW, REVEAL, HOME;
