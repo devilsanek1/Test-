@@ -11,8 +11,9 @@
 // THE CAMERA (flow_v2 §3): LOCKED through the hook (0-5.15; the first pilot's 1.05 -> 1.00 pull-out was a zoom in a
 // hold, DIRECTION rule 8: every edge of the room crawled while the hook played); J1 pans x 0 -> -775 over 5.15-6.45, J2
 // back over 15.95-17.25 (smoothstep: peak 14.9 px/f at 60 fps; room and outside together, a head turn has no
-// parallax); the SQB hold between them floats (the cozy float, +-10 x 8 px, 8-12 px/s, from and back to home);
-// everything else is locked. The thread plane (thread_plane.tsx) is screen-fixed in front of all of it.
+// parallax); the SQB hold between them floats as a PARALLAX float (DIRECTION rule 8: the room +-10 x 8 px, 8-12 px/s,
+// the window view a quarter of it, FAR_FLOAT_K; from and back to home); everything else is locked. The thread plane
+// (thread_plane.tsx) is screen-fixed in front of all of it.
 // THE ROOM (H1 px = O1's framing at camera rest): the kit Nook ('pov': shelf cut by the left edge, the attic slope top
 // right, ONE window glass 180-900 x 630-1060 with the mullion at 830, the desk from 1086, the anglepoise on the left);
 // extended right: the wall, the slope above a horizontal tie beam (its bottom at y 285: the caption band below stays one
@@ -97,7 +98,7 @@ import {
   type LightHole,
   type LightRig,
 } from '../kit/Light';
-import {Haze, stepAt} from '../kit/Haze';
+import {Haze} from '../kit/Haze';
 import {mixHex} from '../kit/Light';
 import {Letters} from './O1_life';
 import {FAR_SNOW, HALL_K, SIGN_CALM} from './outside';
@@ -159,11 +160,16 @@ export const PULL = {t1: 5.0, z0: 1.0};
 export const J1_PAN = {t0: 5.15, t1: 6.45, dx: -775};
 export const J2_PAN = {t0: 15.95, t1: 17.25};
 const FLOAT_SQB = {t0: J1_PAN.t1, t1: J2_PAN.t0};
+/** THE PARALLAX FLOAT (DIRECTION rule 8, owner 2026-10-28: planes move by depth, never one flat card): over SQB's hold
+ *  the room (the wall, the card, the desk: one near plane) takes the whole float, the window view (sky, town, the data
+ *  center, its snow) a quarter of it (lib/depth's PARALLAX_K ratio of a far plane to the subject's, 0.15 / 0.6); the
+ *  thread plane and the captions stay screen-fixed. Both are home (0, 0) at 6.45 and back home by 15.95, J2's start. */
+export const FAR_FLOAT_K = 0.25;
 const smooth = (u: number) => (u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u));
 
 export type HomeCam = {x: number; y: number; z: number; zFar: number; room: Mat; far: Mat};
 
-/** The home camera at film time T (H1 px -> screen): pull-out, the J1 / J2 pans, the SQB float. */
+/** The home camera at film time T (H1 px -> screen): pull-out, the J1 / J2 pans, the SQB parallax float. */
 export function homeCam(T: number): HomeCam {
   const z = T <= 0 ? PULL.z0 : T >= PULL.t1 ? 1 : PULL.z0 - (PULL.z0 - 1) * ease.outCubic(T / PULL.t1);
   let x = 0;
@@ -178,7 +184,8 @@ export function homeCam(T: number): HomeCam {
   const zFar = 1 + (z - 1) * 0.5;
   const about = (s: number) => mat.about(mat.scale(s), HOME_CENTER[0], HOME_CENTER[1]);
   const pan = mat.translate(x + fx, fy);
-  return {x: x + fx, y: fy, z, zFar, room: mat.mul(pan, about(z)), far: mat.mul(pan, about(zFar))};
+  const panFar = mat.translate(x + FAR_FLOAT_K * fx, FAR_FLOAT_K * fy);
+  return {x: x + fx, y: fy, z, zFar, room: mat.mul(pan, about(z)), far: mat.mul(panFar, about(zFar))};
 }
 
 // ================================================================= the outside (far plane, H1 px)
@@ -217,11 +224,15 @@ const NEAR_HOUSE = '#3E4870';
  *  toward the sky's lowest colour, its lit sign to a calm panel one step over the hazed facade (the WINDOW lane's H2
  *  values: one data center seen from both windows), its rows one value over the body; the town's houses step back one
  *  plane (walls half way into the far snow, the near row a little less: the WINDOW lane's town), so SQB's window strip
- *  and SQC's window behind THE stick stop competing with the chart and the stick. A 2-step change (half for 3 frames)
- *  while the strip slides with the pan's last metres. SQA (0-5.80, the approved pilot) is untouched. */
+ *  and SQC's window behind THE stick stop competing with the chart and the stick. A SETTLE, not a switch: one smooth
+ *  0.6 s step (6.35-6.95, done before the chart's line starts at 6.98) while the strip slides with the pan's last
+ *  metres; the thread plane's REST level and the desk's mug and pen cup take the same one (the assembly: a 2-step
+ *  switch here moved the whole phone, ~20 % of the frame, by ~2.4 L* twice in 3 frames, and read as a pop mid-pan;
+ *  a tier change ON a beat stays a 2-step switch). SQA (0-5.80, the approved pilot) is untouched. */
 export const HOOK_CALM_AT = 6.35;
-/** 0 = the hook's window (SQA), 0.5 = the 3-frame half step, 1 = calm. */
-export const windowCalm = (T: number): number => stepAt(T, HOOK_CALM_AT);
+export const HOOK_CALM_DUR = 0.6;
+/** 0 = the hook's window (SQA), 1 = calm (smoothstep over HOOK_CALM_DUR from HOOK_CALM_AT). */
+export const windowCalm = (T: number): number => smooth((T - HOOK_CALM_AT) / HOOK_CALM_DUR);
 /** outside.tsx's calm data center (its haze step, its calm sign) and its town's far snow: one data center and one town
  *  seen from both windows, the values imported from their owner, never copied. */
 const DC_CALM_HAZE = HALL_K;
@@ -441,9 +452,13 @@ const DeskBook: React.FC<(typeof DESK_BOOKS)[number] & {at?: number}> = ({x, y, 
 
 /** A roof window in the slope over the card wall (H1 px; seen in SQB's framing): the night sky in it, a snow edge, and
  *  the set's own slow life where SQB looks (E12): snow drifting down past the glass (small, slow, a few flakes at a
- *  time; the pane clips them, so they never pop in or out inside it). */
+ *  time; the pane clips them, so they never pop in or out inside it). J1's pan brings the pane into SQA's last 0.15 s,
+ *  so the flakes start at J1's seam (`enterAt` 5.80: SQA keeps the approved pilot's frames) and each slides in from
+ *  the pane's top edge on its next fall (the first from ~6.5 s, clear of J1's 0.4 s; every one within its first
+ *  8-13 s cycle; nine flakes, a touch quicker than before, so SQB's second half holds the old few at a time). */
 const SKY_PANE: Pt[] = [[1318, 52], [1502, 52], [1522, 214], [1298, 214]];
 const SKY_FRAME: Pt[] = [[1296, 30], [1524, 30], [1548, 236], [1272, 236]];
+const SKY_SNOW_FROM = 5.8;
 const SkylightSnow: React.FC = () => {
   const id = 'skysnow' + React.useId().replace(/[^a-zA-Z0-9]/g, '');
   return (
@@ -455,7 +470,7 @@ const SkylightSnow: React.FC = () => {
       </defs>
       <g clipPath={`url(#${id})`}>
         {/* the wrap rect runs past the pane top and bottom, so a flake wraps out of sight */}
-        <Snowfall x={1298} y={30} w={224} h={206} n={7} size={0.75} speed={0.55} seed="home/skysnow" at={0.3} />
+        <Snowfall x={1298} y={30} w={224} h={206} n={9} size={0.75} speed={0.6} seed="home/skysnow" at={0.3} enterAt={SKY_SNOW_FROM} />
       </g>
     </>
   );
@@ -482,7 +497,8 @@ const Skylight: React.FC = () => (
  *  set's own slow life in SQB's framing, a 7 px bulb, never a noticeable mover), a teacup on its saucer and a pencil on
  *  the desk's lower right. */
 const SLOPE_LIGHTS: Pt[] = [[1566, 48], [1732, 116], [1910, 162]];
-const TEACUP = {x: 1736, y: 1772, w: 96};
+/** The teacup (H1 px: its centre x, its saucer's y, its width; the tea's surface at y - 0.4 w): SQB's steam reads it. */
+export const TEACUP = {x: 1736, y: 1772, w: 96};
 /** The pencil lies past the right edge in SQB's framing (cut by it: the world goes on), clear of the hand. */
 const PENCIL = {x: 1832, y: 1652, len: 176, rot: -22};
 /** A teacup on its saucer (flat: the saucer, the cup's body with a soft band, the tea's surface a light amber: a dark
@@ -666,9 +682,16 @@ export type HomeRoomProps = {
   room?: React.ReactNode;
 };
 
+/** AFTER THE HOOK THE DESK'S DARKS SIT BACK TOO (the HOME lane, final pass): the mug (its coffee near-black, L* ~27)
+ *  and the pen cup (navy, a near-black pen) sit in SQA's frame and keep the pilot's values there, but in SQB they held
+ *  15-20 % of the frame's most salient pixels beside the card (12.5, 14.95): from HOOK_CALM_AT they take one light haze
+ *  step toward the wall (kit Haze, the same settle as the window), tier C next to the chart. */
+const DESK_CALM_K = 0.25;
+
 /** The room plane (H1 px, inside the room camera): the set, then its light. */
 export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
   const mug = <Mug x={MUG.x} top={MUG.top} w={MUG.w} seed="home/mug" at={-0.38} />;
+  const deskCalm = DESK_CALM_K * windowCalm(T);
   return (
     <>
       <Nook variant="pov" at={NOOK_AT} seed="home/nook" layout={NOOK_LAYOUT_HOME}>
@@ -743,9 +766,13 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
         <Plant x={SILL_PLANT.x} y={SILL_PLANT.y} kind="succulent" size={42} seed="home/sillsu" at={-0.36} />
         <Letters x={LETTERS.x} y={LETTERS.y} at={-0.36} />
         <Notebook seed="home/nb" at={-0.4} />
-        {mug}
+        <Haze k={deskCalm} color={EMBER.wall}>
+          {mug}
+        </Haze>
         {booksR}
-        {pens}
+        <Haze k={deskCalm} color={EMBER.wall}>
+          {pens}
+        </Haze>
         <WarmGlasses x={GLASSES.x} y={GLASSES.y} w={GLASSES.w} rot={-10} at={-0.36} />
         {snake}
         {booksX}

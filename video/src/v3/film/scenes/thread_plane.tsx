@@ -23,9 +23,9 @@
 // state. The screen dims one value step toward peach while the stage leads (lit 0-4.04, 17.24-18.30, 29.90-31.00,
 // 38.12-41.15); the button and the cart badge (left out of the screen's multiply) take a soft blue (C* 18) with no
 // outline and the listing's laptop drops to tier B. From 6.35 (home_set's HOOK_CALM_AT: the window sits back in the same
-// step, mid-pan) every off-beat stretch is the deeper REST level (early review E2: the bezel L* 48, the screen L* 84,
+// settle, 6.35-6.95, under the pan's last metres) every off-beat stretch is the deeper REST level (early review E2: the bezel L* 48, the screen L* 84,
 // the button and badge a screen tint, the tag C* 24: PHONE_REST, TAG_REST); SQA's 4.04-5.80 keeps the pilot's state. The TAG dims to a soft terracotta (C* 38, no outline, the prices
-// in its light tint) everywhere but its own beats (full 0-4.04, 15.30-15.90, 17.24-18.90, 24.44-25.04, 29.90-31.00,
+// in its light tint) everywhere but its own beats (full 0-4.04, 15.30-15.90, 17.24-18.60, 24.44-25.04, 29.90-31.00,
 // 35.95-36.98, 38.12-41.15: TAG_FULL); off-beat its idle sway is halved and the hand's float drops to 0.3 (eased,
 // never a jump).
 // Every change is a 2-step change (3 frames at the half step, never a fade); at 4.04 the screen, the button and the tag
@@ -53,11 +53,10 @@ import {Look} from '../../../lib/exit';
 import {Tier} from '../../../lib/tier';
 import {mat, type Mat, XG} from '../../../lib/xf';
 import {EMBER, Hand, laptopGeo, Phone, phonePoint, phoneSlots, Pip3, PriceTag, Show, Txt, type LookKey, type PipPoseKey, type Pt, type TickerStep} from '../kit';
-import {stepAt} from '../kit/Haze';
 import {FormShade, Lit, mixHex, Rim, type LightRig} from '../kit/Light';
 import {PHONE_DIM_BODY, PHONE_DIM_POP} from '../kit/Phone';
 import {TAG_DIM} from '../kit/PriceTag';
-import {FilmClock, HOME_RIG, HOOK_CALM_AT, LIGHT_ON} from './home_set';
+import {FilmClock, HOME_RIG, LIGHT_ON, windowCalm} from './home_set';
 
 // ================================================================= the spots and the moves (film seconds)
 
@@ -184,14 +183,16 @@ export const SCREEN_LIT: [number, number][] = [
   [38.12, 99],
 ];
 /** The TAG's own beats (film seconds): full strength (A) inside, the off-beat tier B outside. 0-4.04 the hook's ticks;
- *  15.30 its jolt on "almost 10%" (0.6 s); 17.24 "your laptop" through the tug as THE stick leaves it (18.30 + 0.6: THE
- *  stick is the subject at 18.86, early SQB-SQF review E2); 24.44 its sway (0.6 s); 29.90-31.00 the crate and $1,099 on
- *  "pass"; 35.95 the jolt as the trucks overtake, until the data center's sign steps up at 36.98 (a step 0.6 s after J5,
- *  never inside a join's 0.4 s); 38.12 the payoff. */
+ *  15.30 its jolt on "almost 10%" (0.6 s); 17.24 "your laptop" through the tug's first swing as THE stick leaves it
+ *  (18.30 + 0.3: the assembly; the step hides in the stick's fast growth toward the lens, so THE stick alone is A on
+ *  "chips" and J3's push starts on an unchanging frame: ending at 18.90 put the step on the push's first frames and
+ *  left the tag 31 % of the frame's top-3 % salience beside the landed stick, early review E2's "by ~18.9"); 24.44 its
+ *  sway (0.6 s); 29.90-31.00 the crate and $1,099 on "pass"; 35.95 the jolt as the trucks overtake, until the data
+ *  center's sign steps up at 36.98 (a step 0.6 s after J5, never inside a join's 0.4 s); 38.12 the payoff. */
 export const TAG_FULL: [number, number][] = [
   [-99, 4.04],
   [15.3, 15.9],
-  [17.24, 18.9],
+  [17.24, 18.6],
   [24.44, 25.04],
   [29.9, 31.0],
   [35.95, 36.98],
@@ -234,18 +235,19 @@ export const DIM_TINT = '#F2D9C8';
 const DIM_HALF = '#F9ECE4';
 
 /** REST (early review E2: SQB's 9 s chart hold is the film's longest shot, and the dimmed plane still held more of the
- *  frame's salience than the chart): from HOOK_CALM_AT (6.35, the same step as the window sitting back; SQA's 4.04-5.80
+ *  frame's salience than the chart): from HOOK_CALM_AT (6.35, the same settle as the window sitting back; SQA's 4.04-5.80
  *  off-beat state, the approved pilot, is untouched) every off-beat stretch takes a deeper tier B (CRAFT §b: C* <= 25,
  *  contrast near the stage's, no near-black): the bezel a soft warm brown (L* 48) instead of L* 32 (its edge against the
  *  dimmed screen and the desk was the plane's strongest local contrast), the screen one more peach step (L* 84), the
  *  button and the badge a screen tint (no pop hue), the tag a soft terracotta (C* 24, its prices L* 82, a warm eyelet).
- *  On every beat the plane is full as before; each switch stays a 2-step change. */
+ *  On every beat the plane is full as before; each beat switch stays a 2-step change (the REST onset itself settles, restK). */
 export const PHONE_REST = {body: '#8D6A5F', pop: '#DEC1B1'};
 export const TAG_REST = {body: '#C38F7F', text: '#E0C7BD', ring: '#D0B6AA', line: '#AB7465'};
 const DIM_REST = '#E9CCB9';
 const DIM_HALF_REST = '#F5E5DC';
-/** 0 = the pilot's off-beat colours (before 6.35), 0.5 = the half step, 1 = rest. */
-export const restK = (T: number): number => stepAt(T, HOOK_CALM_AT);
+/** 0 = the pilot's off-beat colours (before 6.35), 1 = rest: home_set's settle (6.35-6.95, smooth), never a switch (a
+ *  2-step change here moved the whole phone mid-pan and read as a pop; the beats' own changes stay 2-step). */
+export const restK = (T: number): number => windowCalm(T);
 
 /** The POV hand's skin (B, CRAFT §c: its own value against the desk it lies over: L* ~76 after the support tier's
  *  pull, the desk 63 in the room's ambient; C* ~23). */

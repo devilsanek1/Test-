@@ -30,14 +30,13 @@ import {Tier} from '../../../lib/tier';
 import {World} from '../../../lib/World';
 import type {ToneKey} from '../../../lib/Film';
 import {EMBER, type Pt} from '../kit';
-import {HomeSet} from './home_set';
+import {HomeSet, TEACUP} from './home_set';
 import {ThreadPlane} from './thread_plane';
 import {OldDealChart} from './SQB_chart';
 
-/** The teacup on the desk's lower right (home_set.tsx TEACUP, H1 px: x 1736, y 1772, w 96; its tea's surface at
- *  y - 0.4 w), seen only in SQB's framing (off screen at both seams: x 1341 on screen at J1 and J2). Keep in step with
- *  home_set if the cup ever moves. */
-const TEA = {x: 1736, surface: 1772 - 0.4 * 96};
+/** The teacup on the desk's lower right (home_set.tsx TEACUP, H1 px; its tea's surface at y - 0.4 w), seen only in
+ *  SQB's framing (off screen at both seams: x 1341 on screen at J1 and J2): the steam reads its position, never a copy. */
+const TEA = {x: TEACUP.x, surface: TEACUP.y - 0.4 * TEACUP.w};
 /** The steam's colour: a light warm step of the desk (L* 82, ~75 under the room's ambient step, the desk ~64 there:
  *  within CRAFT §c's dL* 15 for tier C), so it is felt at the frame's edge, never seen before the chart. */
 const STEAM = '#EEC2A6';

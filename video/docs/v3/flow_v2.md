@@ -11,11 +11,14 @@ cuts in 6 places -> 0 in 2 + 1 reveal; tag gone 17.9 s -> on 91 %; "you" five wa
   tag's laptop; J4 brings it back). $999 -> $1,015 / $1,031 / $1,047 / $1,063 / **$1,079** on O1's launches 1.88 / 2.18 / 2.40 /
   2.60 / 2.72 ("$999" struck from 1.92) -> **$1,099 on "pass" 30.28** (ding). Reactions: the tap 0.50, jolt 15.30, tug 18.30,
   sway 24.44, tick 30.28, jolt 35.95, turn 39.70; "$999" again in the loop. OFF ITS BEATS the tag is tier B (SQA pilot review: a
-  soft terracotta, no outline, the prices in its light tint; full only 0-4.04, 15.30-15.90, 17.24-18.90, 24.44-25.04,
+  soft terracotta, no outline, the prices in its light tint; full only 0-4.04, 15.30-15.90, 17.24-18.60, 24.44-25.04,
   29.90-31.00, 35.95-36.98, 38.12-41.15, each switch a 2-step change; `thread_plane.tsx` TAG_FULL). Each window opens ON its
   reaction, never 0.6 s before it: earlier it would put the tag at full strength on the stage's own beats ("+9.7%" 14.74, the
-  barrier 24.20) and inside J5's 0.4 s. From 6.35 (the window's calm step, E8) every off-beat stretch is the plane's REST level
-  (early review E2: C* 24, prices L* 82, a warm eyelet; `TAG_REST`, `PHONE_REST`).
+  barrier 24.20) and inside J5's 0.4 s. The tug's window ends at 18.60 (the tug's first swing; the step hides in the stick's fast
+  growth, so THE stick alone is A on "chips" and J3's push starts on an unchanging frame; the assembly). From 6.35 (the window's
+  calm settle, E8) every off-beat stretch is the plane's REST level (early review E2: C* 24, prices L* 82, a warm eyelet;
+  `TAG_REST`, `PHONE_REST`), reached in ONE smooth 0.6 s settle (6.35-6.95, `restK` = home_set's `windowCalm`): a 2-step switch
+  there moved the whole phone mid-pan and read as a pop; the beats' own switches stay 2-step.
 - **HOME = the nook, POV:** H1 = O1's framing (glass 180-900 x 630-1060, DC x 322-758) and a chart card pinned right of the window;
   H2 = standing at the glass (the reveal lands there; its far field is wider, so never a direct H1 <-> H2 move: a dolly-zoom).
   **OUTSIDE = one geography:** the DC, the mountain of sticks behind its right side, the town, OUR street with the chip factory's
@@ -43,17 +46,22 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
 - **`scenes/home_set.tsx` + `homeCam(T)`** (the SQA pilot): O1's nook extended right, the card (H1 px x 975-1715, y 612-1028) and
   2-3 flat notes on the wall right of the window (O1's calendar leaves it). The camera is LOCKED through the hook (SQA pilot
   review: O1's 1.05 -> 1.00 pull-out was a zoom in a hold, DIRECTION rule 8); J1 pans x 0 -> -775 over 5.15-6.45, J2 back over
-  15.95-17.25 (inOutCubic, peak 14.9 px/f; room and outside together); the SQB hold floats. After the hook the window view
-  sits back (early review E8; `HOOK_CALM_AT` 6.35, when J1's pan has carried the data center out of frame, so SQA stays the
-  pilot): the data center tier C (one haze step, its sign a calm panel in outside.tsx's values: one data center from both
-  windows), the houses one plane step toward the far snow plus one light haze step. SQB's own corner (E12; only its framing sees
+  15.95-17.25 (inOutCubic, peak 14.9 px/f; room and outside together); the SQB hold floats as a PARALLAX float (DIRECTION rule
+  8: the room +-10 x 8 px, the window view `FAR_FLOAT_K` 0.25 of it; home at 6.45 and back home by 15.95). After the hook the
+  window view sits back (early review E8; `HOOK_CALM_AT` 6.35, when J1's pan has carried the data center out of frame, so SQA
+  stays the pilot; one smooth 0.6 s settle to 6.95, never a switch): the data center tier C (one haze step, its sign a calm
+  panel in outside.tsx's values: one data center from both windows), the houses one plane step toward the far snow plus one
+  light haze step; in the same settle the desk's two darks beside the card, the mug (its coffee L* ~27) and the pen cup, take
+  one light haze step toward the wall (k 0.25: in SQB they held 15-20 % of the frame's top salience). SQB's own corner (E12; only its framing sees
   H1 x > ~1480): a short run of string lights on the slope right of the skylight (one bulb steps ~every 1.5 s), snow drifting
-  past the skylight, a teacup and a pencil on the desk's lower right.
+  past the skylight (from J1's seam on, each flake sliding in from the pane's top: J1's pan shows the pane in SQA's last
+  0.15 s, which keeps the pilot's frames; kit `Snowfall` `enterAt`), a teacup (`TEACUP`, SQB's steam reads it) and a pencil on
+  the desk's lower right.
 - **`scenes/thread_plane.tsx`** (transition agent; from O1's front plane): hand, phone, listing, tag, Pip, ticker; the screen dims a
   step toward peach when the stage leads (lit 0-4.04, 17.24-18.30: it dims as THE stick leaves it, #9; 29.90-31.00,
   38.12-41.15), the button and badge then a soft blue, the body a soft warm dark (L* 32, no outline) and the listing's laptop a
-  soft terracotta (SQA pilot review: off-beat the plane is tier B, no near-black, never out-colouring the stage); from 6.35 the
-  REST level (E2: the bezel L* 48, the screen one more peach step, L* 84, the button and badge a screen tint, no pop hue; at
+  soft terracotta (SQA pilot review: off-beat the plane is tier B, no near-black, never out-colouring the stage); from 6.35 (a
+  0.6 s settle) the REST level (E2: the bezel L* 48, the screen one more peach step, L* 84, the button and badge a screen tint, no pop hue; at
   9.0 the plane holds 9 % of the top-3 % salience, the chart 36 %); the tag's own off-beat schedule is §1's; the payoff tag lit
   (E10: a rim 38.62-41.15 on its lamp side, a form shade on its right third); the like-pop (39.88): the back's data center pops
   x0.6 -> 1.1 -> 1 as the back lands (kit PriceTag `backPopAt`); price glyphs above y 1480, all left of x 950:
@@ -88,9 +96,12 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
   0 -> 1 at 0.52); the camera locked; at 4.04 ONE event (the DC dark + sign lit + the thoom, the thread plane off-beat in the
   same frame), 4.16-4.87 the DC's server rows light one per syllable of "AI data centers" (the subject owns its line's motion).
 - **SQB OLD DEAL.** The card (paper, unlit) at screen x 200-940, y 612-1028, ~150 px of night window at the left edge: "US computer
-  prices" 58 px, "same computing power" 34 px, axes, 2005, 2025. 6.98-9.28 the line draws downhill (2021 bump); 10.50 a doodle
-  laptop with "$999" lands on it (~2017); 10.82 a shinier BETTER one, same "$999", pops right after; 13.85-14.45 the line hooks
-  UP (hero); 14.74 "+9.7%" (~110 px) pops alone; 15.05 "US computers · Sept 2026 vs a year earlier (BLS)" (24 px); 15.30 tag jolt.
+  prices" 58 px, "same computing power" 34 px, axes, 2005, 2025. 6.98-9.28 the line draws downhill (2021 bump); 10.32-10.50 a
+  doodle laptop with "$999" drops onto it (~2010), landing on "buy"; 10.82 a shinier, bigger BETTER one, the same "$999", pops
+  right after (~2015); 11.80 the line's end dot pops once ("this past year"); 13.85-14.45 the line hooks UP (hero); 14.74
+  "+9.7%" (~110 px) pops alone and, in the same frame, the doodles step back to tier B (one event: a soft terracotta, no
+  outline, pale screens; the falling line stays the hero); 15.05 "US computers · Sept 2026 vs a year earlier (BLS)" (24 px);
+  15.30 tag jolt.
 - **SQC YOUR STICK.** 17.24-17.64 the phone rises to HIGH2, its screen lit. 18.28 one MemoryStick (130 px at the listing screen
   ~(529, 1070)) lifts toward the lens, outCubic, no overshoot, to centre (540, 870), w 700, rot -4 by 18.86 (chips clear on
   "chips"); the tag tugs 18.30; hold to 18.905.

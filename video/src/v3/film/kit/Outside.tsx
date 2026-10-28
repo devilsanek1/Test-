@@ -24,10 +24,13 @@ const NightSkyBody: React.FC<{x?: number; y?: number; w?: number; h?: number; ba
 );
 export const NightSky = tiered('environment', {bg: EMBER.sky}, NightSkyBody);
 
-/** Steady falling snow inside a rect: seeded flakes that drift down and wrap (deterministic in t). */
-const SnowfallBody: React.FC<{x: number; y: number; w: number; h: number; n?: number; size?: number; speed?: number; seed?: string; at?: At; color?: string}> = ({x, y, w, h, n = 26, size = 1, speed = 1, seed = 'snow', at, color = EMBER.snow}) => {
+/** Steady falling snow inside a rect: seeded flakes that drift down and wrap (deterministic in t). OPT-IN `enterAt`
+ *  (v3 rework: the skylight that pans into SQA's last frames): no flake before it, then each flake only from its first
+ *  wrap after it, sliding in from the rect's top edge (put the rect's top above a clip, so nothing pops in). */
+const SnowfallBody: React.FC<{x: number; y: number; w: number; h: number; n?: number; size?: number; speed?: number; seed?: string; at?: At; color?: string; enterAt?: number}> = ({x, y, w, h, n = 26, size = 1, speed = 1, seed = 'snow', at, color = EMBER.snow, enterAt}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
+  if (enterAt !== undefined && t < enterAt) return null;
   const r = rng(`flakes/${seed}`);
   const out: React.ReactNode[] = [];
   for (let i = 0; i < n; i++) {
@@ -35,7 +38,10 @@ const SnowfallBody: React.FC<{x: number; y: number; w: number; h: number; n?: nu
     const y0 = r.range(y, y + h);
     const sp = r.range(26, 44) * speed;
     const rad = r.range(2.6, 4.6) * size;
-    const fy = y + ((((y0 - y + sp * t) % h) + h) % h);
+    const ph = (((y0 - y + sp * t) % h) + h) % h;
+    // this fall began ph / sp s ago at the rect's top edge: before enterAt, the flake waits for its next wrap
+    if (enterAt !== undefined && t - ph / sp < enterAt) continue;
+    const fy = y + ph;
     const fx = x0 + Math.sin(t * 0.9 + i) * 4;
     out.push(<TCircle key={i} cx={fx} cy={fy} r={rad} fill={color} />);
   }
