@@ -16,14 +16,19 @@
 // >>> it and the rising mid plane is never empty at any p (in END coords it is visible down to y ~1130 at p 0, ~990 at
 // >>> p 0.55, ~945 at p 0.7, ~900 at p 0.85).
 // Life (pure functions of scene time): glints, rowers, sails, parkway, bridge and highway cars. Nothing fades.
-// THE WATER is ONE component, `S5Water` (its geometry in ONE const, `S5_WATER`): the Potomac band + its streaks, the boat
-// basin, the Boundary Channel / lagoon band and the glints on the water. S5River draws the ground the water lies in, then
-// <S5Water> with the land over the water as its children (the banks' lines, docks, bridges, the far shore, the parkland),
-// then what floats on it (hulls, rowers, sails) and the near trees. A shared premium water (src/lib/water.tsx, later)
-// replaces S5Water in ONE line (S5River's <S5Water>); it never needs the land's code.
+// THE WATER is ONE component, `S5Water` (its geometry in ONE const, `S5_WATER`), drawn by the film's ONE shared water
+// (src/lib/water.tsx, its far LOD, R14; how-to src/lib/WATER.md, S5's recipe; the water swap, 2026-10-28): the Potomac
+// band with the boat basin let into its near bank, and the Boundary Channel / lagoon band, each a far strip: S5_SKY (the
+// April morning's own keys) mirrored, a Fresnel step under the air, the far shore, the Lincoln Memorial and the bridges'
+// faces mirrored flat, 2-4 still current lines and <= 6 flecks of 2-6 px under the END sun (the old seeded streaks and
+// on/off glint dashes are gone: "scattered white dashes" read cheap on S1's v5). S5River draws the ground the water lies
+// in, then <S5Water> with the land over the water as its children (the banks' lines, docks, bridges, the far shore, the
+// parkland), then what floats on it (hulls, rowers, sails) and the near trees.
 // Import rule: never import V2S5_rig / V2S5_set / V2S5_figs (the rig imports this file).
 import React, {useMemo} from 'react';
 import {useTime} from '../../lib/time';
+import {Water, cie, type WaterSource, type WaterSpec} from '../../lib/water';
+import {S5_AIR, S5_SKY} from '../world/skies';
 import {Batch, Paint, crownD, frac, rand, rng, type Pt} from '../kit/dc/core';
 import {RIVER as KIT_RIVER, type PullPlane} from '../kit/dc/crane';
 import {FAR_END} from './V2S5_far';
@@ -111,58 +116,120 @@ export const S5_WATER = {
   glints: {n: 70, y: [RIVER.water[0] + 4, RIVER.water[1] - 2.5] as [number, number], w: [3, 9] as [number, number], drift: 2, bridges: [RIVER.memorial, ...RIVER.fourteenth]},
 };
 
-/** The water's flat fills (static): the channel (deep parkland), the Potomac, the basin; one layer each (drawn apart
- *  before the split: the same colours, the same order). */
-function waterBatch(seed: string): Batch {
-  const B = new Batch();
-  const {x0, x1} = S5_WATER;
-  const C = S5_WATER.channel;
-  B.fill(RIV.water, bandD(x0, x1, C.centre, C.width));
-  B.fill(RIV.waterDeep, bandD(x0, x1, C.deepLine, () => C.deepW));
-  B.layer();
-  const P = S5_WATER.potomac;
-  B.rect(RIV.water, x0, P.top, x1 - x0, P.bottom - P.top);
-  B.rect(RIV.waterDeep, x0, P.top + 1, x1 - x0, P.deep);
-  {
-    const s = rng(`${seed}/streak`);
-    for (let i = 0; i < P.streaks.n; i++) {
-      const x = s.range(x0, x1);
-      const y = s.range(P.streaks.y[0], P.streaks.y[1]);
-      B.rect(s.chance(0.6) ? RIV.waterLit : RIV.waterDeep, x, y, s.range(P.streaks.len[0], P.streaks.len[1]), s.chance(0.7) ? 1.1 : 1.6);
-    }
-  }
-  B.layer();
-  B.poly(RIV.water, S5_WATER.basin);
-  return B;
-}
+// ---------------------------------------------------------------- the water's specs (lib/water, far LOD)
 
-/** THE WATER: its fills, then `children` (the land over it: banks, docks, bridges, the far shore, the parkland), then
- *  the glints on its surface. Replace this component to restyle every water in the shot. */
-export const S5Water: React.FC<{seed?: string; children?: React.ReactNode}> = ({seed = 's5river', children}) => {
+/** S5's water camera (END coords): the end horizon y 750, focal 1400; the eye ~87 m over the river (the crane over the
+ *  Arlington bank: the far shore, ~2.4 km off, lies 51 px under the horizon at y 801). Its rows are ~0.04-0.08 px: a
+ *  far strip (R14). */
+export const S5W_CAM = {horizon: FAR_END.horizon, f: 1400, eye: 87} as const;
+const PAPER = '#FBF3E6';
+/** The far water's tone family: the river plane's hazed water (RIV.water) as the ladder's water end. */
+const FAR_TONE = (() => {
+  const c = cie(RIV.water);
+  return {waterL: c.L - 2, waterH: c.h, waterC: Math.max(6, c.C), cMin: 5, cMax: 11};
+})();
+/** A sloped edge's affine axis through two points (R1's map: y = a0 + s x). */
+const axisThrough = (a: Pt, b: Pt) => {
+  const s = (b[1] - a[1]) / (b[0] - a[0]);
+  return {a0: a[1] - s * a[0], s};
+};
+/** The things over the Potomac, mirrored FLAT at their far tones (one shape each, no bars, no sway: lod 'far'): the far
+ *  shore's fringe (one mass about its embankment), the Lincoln Memorial's temple, Memorial Bridge's face and the three
+ *  14th Street faces (each about its own sloped foot line). Colours as the plane draws them (RIV). */
+function potomacSources(): WaterSource[] {
+  const out: WaterSource[] = [];
+  const {x0, x1} = S5_WATER;
+  const fs = RIVER.shore;
+  out.push({id: 'shore', thing: [[x0, fs], [x0, fs - 9], [x1, fs - 9], [x1, fs]], axis: fs, color: RIV.shoreTree, layer: 0, plane: 4});
+  const L = RIVER.lincoln;
+  out.push({id: 'lincoln', thing: [[L.x - 17, fs], [L.x - 17, L.base - 11], [L.x + 17, L.base - 11], [L.x + 17, fs]], axis: fs, color: RIV.temple, layer: 1, plane: 4});
+  {
+    const {far, near: nr} = RIVER.memorial;
+    const top = (k: number): Pt => [far[0] + (nr[0] - far[0]) * k, far[1] - 1.4 + (nr[1] - far[1] - 0.4) * k];
+    const foot = (k: number): Pt => [far[0] + (nr[0] - far[0]) * k, far[1] - 1.4 + 4.6 + (nr[1] - far[1] - 0.4 + 4.4) * k];
+    out.push({id: 'memorial', thing: [top(0), top(1), foot(1), foot(0)], axis: axisThrough(foot(0), foot(1)), color: RIV.bridge, layer: 2, plane: 4});
+  }
+  RIVER.fourteenth.forEach(({far: f, near: nn}, i) => {
+    const thF = i === 2 ? 1.6 : 2.2;
+    const thN = i === 2 ? 2.6 : 3.6;
+    const a: Pt = [f[0], f[1] - 0.6 + thF];
+    const b: Pt = [nn[0], nn[1] - 0.8 + thN];
+    out.push({id: `fourteenth${i}`, thing: [[f[0], f[1] - 1.5], [nn[0], nn[1] - 2], b, a], axis: axisThrough(a, b), color: i === 2 ? RIV.bridgeShade : RIV.bridge, layer: 3 + i, plane: 4});
+  });
+  return out;
+}
+/** The boat basin let into the near bank (x 990-1150, y 825-835): the Potomac's near edge drops there. */
+const basinBottom = (x: number): number => {
+  const {x0, x1, y} = RIVER.basin;
+  return x > x0 + 12 && x < x1 - 8 ? y + 9 : S5_WATER.potomac.bottom;
+};
+const S5_POTOMAC: WaterSpec = {
+  id: 'S5 Potomac',
+  seed: 's5potomac',
+  cam: {...S5W_CAM},
+  region: {top: () => S5_WATER.potomac.top, bottom: basinBottom, x0: S5_WATER.x0, x1: S5_WATER.x1, tuckTop: 1, tuckBottom: 1, step: 4},
+  sky: S5_SKY,
+  air: S5_AIR,
+  // the far water's own body: the river plane's hazed water (V2S5_far_tones RIV.water: CM.water toward the glass and
+  // the plane's air), never the canal's near body
+  body: RIV.water,
+  // the far river's own tone family (its reflections converge on the plane's hazed water, as every far plane converges
+  // on the air: CRAFT §f.1), not the near canal's Canal Mint
+  tone: FAR_TONE,
+  tier: 'environment',
+  // a far strip: the veil at the body's own value (the default + 0.085 OKLab L lifted the strip's middle to L* 91, over
+  // the air), a Fresnel step of 0.06 under the mirrored gold band
+  ramp: {yFar: S5_WATER.potomac.top, yNear: RIVER.basin.y + 9, dl: [0.06, -0.02], veil: {l: 0, c: 0.016}},
+  sources: [],
+  // the END sun (cut by the right edge): a higher April-morning sun (R13), its few flecks in a wider, shorter column
+  sun: {x: FAR_END.sun.x, y: FAR_END.sun.y, slope: 0.08, t0: -1},
+  lod: 'far',
+  farLod: {flecks: 5, fleckLen: [2, 6], lines: 3},
+  // the shot never opens the film: its water is whole from its first frame (a front at scene 0, long crossed)
+  flood: {origin: [FAR_END.sun.x, FAR_END.sun.y], t0: -2, speed: 6000, pale: 0.7, paper: PAPER},
+  joins: [0, 23.8 - 20.55],
+};
+/** The Boundary Channel and the lagoon (seen while the mid plane rises): a far strip along its own band. */
+const S5_CHANNEL: WaterSpec = {
+  id: 'S5 channel',
+  seed: 's5channel',
+  cam: {...S5W_CAM},
+  region: {top: (x: number) => S5_WATER.channel.centre(x) - S5_WATER.channel.width(x) / 2, bottom: (x: number) => S5_WATER.channel.centre(x) + S5_WATER.channel.width(x) / 2, x0: S5_WATER.x0, x1: S5_WATER.x1, tuckTop: 0, tuckBottom: 0, step: 12},
+  sky: S5_SKY,
+  air: S5_AIR,
+  body: RIV.water,
+  tone: FAR_TONE,
+  tier: 'environment',
+  ramp: {yFar: 852, yNear: 884, dl: [0.08, -0.03], veil: {l: 0, c: 0.016}},
+  sources: [],
+  lod: 'far',
+  farLod: {lines: 2},
+  flood: {origin: [FAR_END.sun.x, FAR_END.sun.y], t0: -1, speed: 6000, pale: 0.7, paper: PAPER},
+  joins: [0, 23.8 - 20.55],
+};
+let built = false;
+const ensure = () => {
+  if (!built) {
+    S5_POTOMAC.sources = potomacSources();
+    built = true;
+  }
+};
+/** S5's water specs with their sources built (node QA, the lint). */
+export const s5WaterSpecs = (): {potomac: WaterSpec; channel: WaterSpec} => {
+  ensure();
+  return {potomac: S5_POTOMAC, channel: S5_CHANNEL};
+};
+
+/** THE WATER: the channel and the Potomac (lib/water far strips), then `children` (the land over it: banks, docks,
+ *  bridges, the far shore, the parkland). Replace this component to restyle every water in the shot. */
+export const S5Water: React.FC<{seed?: string; children?: React.ReactNode}> = ({children}) => {
   const t = useTime();
-  const fills = useMemo(() => waterBatch(seed), [seed]);
-  const glints = useMemo(() => {
-    const G = S5_WATER.glints;
-    const g = rng(`${seed}/gl`);
-    const out: {x: number; y: number; w: number; ph: number; per: number; duty: number}[] = [];
-    while (out.length < G.n) {
-      const x = g.range(S5_WATER.x0, S5_WATER.x1);
-      const y = g.range(G.y[0], G.y[1]);
-      const onBridge = G.bridges.some(({far, near: nr}) => {
-        const k = (y - far[1]) / (nr[1] - far[1]);
-        return k > -0.1 && k < 1.1 && Math.abs(x - (far[0] + (nr[0] - far[0]) * k)) < 26;
-      });
-      if (!onBridge) out.push({x, y, w: g.range(G.w[0], G.w[1]), ph: g.range(0, 1), per: g.range(2.2, 4.2), duty: g.range(0.5, 0.8)});
-    }
-    return out;
-  }, [seed]);
-  let gd = '';
-  for (const q of glints) if (frac(t / q.per + q.ph) < q.duty) gd += `M${(q.x + S5_WATER.glints.drift * t).toFixed(1)} ${q.y.toFixed(1)}h${q.w.toFixed(1)}`;
+  ensure();
   return (
     <>
-      <Paint b={fills} seed={`${seed}/w`} misreg={false} />
+      <Water spec={S5_CHANNEL} t={t} />
+      <Water spec={S5_POTOMAC} t={t} />
       {children}
-      <path d={gd} stroke={RIV.glint} strokeWidth={1.4} strokeLinecap="round" fill="none" />
     </>
   );
 };
