@@ -15,8 +15,9 @@
 // z-order (the slot contract): sky things, west gap, water, far towpath (+ the far jogger), the wing (behindDoor inside,
 // between the lobby and the door glass), the door leaves, the wing's shades, pigeons, the towpath's shadows, lamps and
 // bollards, {towpath} (her + the row), the moored boats, ducks, {seated}, {pip}.
-import React from 'react';
+import React, {useContext} from 'react';
 import {Tier} from '../../lib/tier';
+import {useTime} from '../../lib/time';
 import {CM} from '../palette';
 import {Cloud, Ducks} from '../kit/canal/life';
 import {CanalCast} from '../kit/canal/slots';
@@ -24,7 +25,7 @@ import {k4Person} from '../kit/canal/k4k5';
 import * as MAP from '../world/map';
 import {S1WestGap} from './V2S1_set_far';
 import {S1Wing, S1DoorLeaves, S1WingLife} from './V2S1_set_wing';
-import {S1Water, S1FarTowpath, S1PathFurniture, S1Boats, S1FarLife, S1PlaneBranch} from './V2S1_set_life';
+import {S1Water, S1FarTowpath, S1PathFurniture, S1Boats, S1FarLife, S1PlaneBranch, S1DuckSlot, S1_DUCK} from './V2S1_set_life';
 import {S1BoatStrips, S1TowpathShadows, S1WingShades} from './V2S1_light';
 import {S1Plane, S1_PLANE} from './V2S1_float';
 
@@ -46,6 +47,13 @@ const CLOUD_BAR = {x: 40, y: 236, w: 300, h: 20, speed: 9} as const;
 /** Tier C: the environment (no outlines, hairlines only for the things that ARE lines). The slots keep their own
  *  tiers: {towpath} her + the row (A, V2S1_row), {seated} the lead's bank, {pip} Pip (B) and its bollard (C). */
 const Env: React.FC<{children?: React.ReactNode}> = ({children}) => <Tier tier="environment">{children}</Tier>;
+
+/** The duck on the water: the kit's mallard (S1_DUCK), or the water study's own (V2S1_set_life S1DuckSlot). */
+const S1Duck: React.FC = () => {
+  const Slot = useContext(S1DuckSlot);
+  const t = useTime();
+  return Slot ? <Slot t={t} /> : <Ducks ducks={[{...S1_DUCK}]} seed="s1ducks" />;
+};
 
 export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pip}) => (
   <CanalCast person={k4Person}>
@@ -93,7 +101,7 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
         <S1Boats />
         {/* one duck at its water's scale (one camera: ~127 px/m there, a mallard ~0.58 m: ~70 px), by the bend, clear
             of Pip's zone and the sun's glitter path (the pale drake read as a ghost: the art director on v3) */}
-        <Ducks ducks={[{x: 396, y: 1136, size: 62}]} seed="s1ducks" />
+        <S1Duck />
       </Env>
     </S1Plane>
     {/* our bank and its near things split their own planes (V2S1_steps) */}

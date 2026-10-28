@@ -1,7 +1,7 @@
 // V2S1 helper (lane L1): the shot's PARTICLES (lib/particles; CRAFT §f.6; the owner on v4: they must be SEEN at phone
 // size). One exported list of fields, each on its parallax plane: S1Particles draws it (after the world, inside the
 // set's <Lit>), and the lint and the phone-size test read the same list.
-import React from 'react';
+import React, {createContext, useContext} from 'react';
 import {CAPTION_BAND, Particles, glitterPath, type ParticlesProps} from '../../lib/particles';
 import {CM} from '../palette';
 import * as MAP from '../world/map';
@@ -45,12 +45,22 @@ export const S1_PARTICLE_FIELDS: {plane: number; f: ParticlesProps}[] = [
   {plane: S1_PLANE.near, f: {kind: 'motes', seed: 's1motesNear101', plane: -2, region: {ellipse: {cx: 228, cy: 1422, rx: 54, ry: 38}}, on: '#A5AD9A', count: 3, lift: 19, margin: 12, ...common, avoid: [CAPTION_BAND, S1_PARTICLES.her, S1_PIP_BOX]}},
 ];
 
-export const S1Particles: React.FC = () => (
-  <>
-    {S1_PARTICLE_FIELDS.map(({plane, f}) => (
-      <S1Plane key={f.seed} plane={plane}>
-        <Particles {...f} />
-      </S1Plane>
-    ))}
-  </>
-);
+/** THE WATER STUDY SEAM (docs/v2/water/DIAGNOSIS.md): true hides ONLY the glint field (the sun-path sparkles belong
+ *  to the water's design now: a candidate water draws its own glitter); the motes and the leaves stay. Default false =
+ *  S1 exactly as before. Only src/entry-v2r-waterstudy.tsx sets it. */
+export const S1GlintsOff = createContext<boolean>(false);
+
+export const S1Particles: React.FC = () => {
+  const glintsOff = useContext(S1GlintsOff);
+  return (
+    <>
+      {S1_PARTICLE_FIELDS.map(({plane, f}) =>
+        glintsOff && f.kind === 'glints' ? null : (
+          <S1Plane key={f.seed} plane={plane}>
+            <Particles {...f} />
+          </S1Plane>
+        ),
+      )}
+    </>
+  );
+};
