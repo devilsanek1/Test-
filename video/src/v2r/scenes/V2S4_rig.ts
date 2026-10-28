@@ -36,21 +36,18 @@ export const S4_WORDS = {
 
 /** Every story beat of the shot (film s). */
 export const S4_BEATS = {
-  pipLand: 14.95,
   tagBuild1: MAP.S4.nameTagBuilds[0], // 15.07
   tagBuild2: MAP.S4.nameTagBuilds[1], // 16.60
   stopT0: MAP.S4.camera.stop.t0, // 17.36: the truck starts to slow
   stop: MAP.S4.stopAt, // 17.96: she stops ("objected")
   lookUp: 18.06, // her head lifts to the post's plates (stopLook)
-  pushT0: MAP.S4.camera.push.t0, // 18.40
-  pushT1: MAP.S4.camera.push.t1, // 20.10
   tagOff: MAP.S4.nameTagOffAt, // 18.80
   decPlate: MAP.S4.decPlateAt, // 18.92 ("military")
   aprPenT0: MAP.S4.aprPlatePen[0], // 19.45
   aprPenT1: MAP.S4.aprPlatePen[1], // 19.80 (complete on "heading")
   pipTurnWest: 19.55,
   birdsWest: MAP.S4.birdsWestAt, // 19.80
-  pipLeap: 20.25,
+  homeBy: MAP.S4.camera.homeBy, // 20.40: the hold is home (the A push-through into SUN1 20.40-20.70 is the join's)
 } as const;
 
 // ---------------------------------------------------------------- the truck (the camera trucks WEST with her)
@@ -97,18 +94,14 @@ export const s4HerSteps = (t: number): number => {
   return Math.min(S4_TRUCK.steps, s4Travel(tq) / HER_STEP_PX);
 };
 
-// ---------------------------------------------------------------- the push (6 % about SUN1, soft landing at 20.10)
+// ---------------------------------------------------------------- the camera (conform_L3 §2, DIRECTION rule 8)
 
-/** The push curve between the contract's endpoints (18.40 -> 20.10): it gathers like an ease-in and lands softly
- *  (no dead stop), then the camera is locked through the 20.10-20.67 pause to the sun match-cut. */
-export const S4_PUSH_EASE = MAP.cubicBezier(0.55, 0.0, 0.35, 1.0);
-export const s4Zoom = (t: number): number => {
-  const k = MAP.S4.camera.push;
-  const u = Math.min(1, Math.max(0, (t - k.t0) / (k.t1 - k.t0)));
-  return k.from + (k.to - k.from) * S4_PUSH_EASE(u);
-};
-/** World (the 17.96 pose, screen px at zoom 1) -> screen at film t: the push about SUN1 (its centre stays put). */
-export const s4Screen = (p: MAP.XY, t: number): MAP.XY => MAP.scaleAbout(p, MAP.S4.camera.push.anchor, s4Zoom(t));
+/** The 6 % push is RETIRED (no zoom in a hold): map S4.camera.push is 1.00 -> 1.00. After the stop (17.96) the camera
+ *  holds LOCKED (the plates must read) and is home by 20.40, so SUN1 sits at (250, 650) r 65 at zoom 1 for the A
+ *  push-through into it (20.40-20.70, the join's). Kept as functions for built code. */
+export const s4Zoom = (_t: number): number => 1;
+/** World (the 17.96 pose) -> screen at film t: the identity (no camera move but the planes' own truck). */
+export const s4Screen = (p: MAP.XY, _t: number): MAP.XY => p;
 
 // ---------------------------------------------------------------- her, the tag, the post, Pip
 
@@ -117,14 +110,10 @@ export const S4_HER = {...MAP.S4.her, stepPx: HER_STEP_PX} as const;
 /** Her head (for Pip's gaze and the tag's leader), world px at the pose. */
 export const S4_HER_HEAD: MAP.XY = {x: S4_HER.x - 6, y: S4_HER.feetY - S4_HER.h + 18};
 
-/** Pip's S4 track in WORLD px (inside the push camera; the push is 1.00 until 18.40).
- *  In: a leap from the upper right that is mid-air at the cut at ~(580, 1000), descending down-left LEFT of her (map
- *  MATCHES rect x 520-640, y 940-1060), landing on the boat roof (470, 1218) at 14.95.
- *  Out: a leap toward the sun from 20.25 (0.45 s), mid-air at the cut at ~(293, 721) on screen, over the sun's lower
- *  right; the arc never rises above y 600 and Pip's ears stay below the band (y > 556). */
+/** Pip (conform_L3 §2): SEATED on our boat's roof at (470, 1218) from the first frame (the boat glides with us, so Pip
+ *  rides it screen-fixed); no in-leap, no out-leap: it turns WEST on "heading" (19.55), its one reaction, and the A
+ *  push-through into SUN1 sweeps it. */
 export const S4_PIP = {
   size: 100,
-  inLeap: {from: [1020, 820] as [number, number], t0: S4_BEATS.pipLand - 0.45, dur: 0.45, height: 216},
   seat: [MAP.S4.pipSeat.x, MAP.S4.pipSeat.y] as [number, number],
-  outLeap: {t0: S4_BEATS.pipLeap, to: [200, 600] as [number, number], dur: 0.45, height: 100},
 } as const;
