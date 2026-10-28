@@ -351,4 +351,30 @@ at t < 0. The strokes start AT f0 and are the event (`V2S1_clock.ts` S1_DRAW, S1
 - Stills of f0, f6, f12, f18, f27, f36 and f48, at 0.5 and at 360 px wide. At 360 px the bold door frame (from f12), W's
   plum (f24) and the flood from the sun (f27-f48) are unmistakable. Her own strokes (f1-f12) are small: she is ~51 px
   tall at 360.
-- The pushes as 12-frame strips, the seam strip (f2330-f2344, f0-f3) and gate_check on a full-size render: below.
+- **The pushes** (12-frame strips from a full-size master render, 710 s): at S1 -> S2, W grows from f354 (visibly from
+  f357) to f364, then plum f365-f367, then the pull out of M. At S3 -> S4, her silhouette grows f880-f890, then plum
+  f891-f893, then the pull out of her walking. No caption sits on either plum bridge.
+- **The seam** (f2333-f2344, f0-f3): S8 un-builds onto paper and pale shapes, and page 1 pops back at f2343. f2343, f2344
+  and f0 read the same (mean |grey| change f2344 -> f0 0.06/255), then the pen starts on her at f1. No pop.
+- **gate_check (BUILD §5 without --frame0): PASS, 0 FAIL, 6 WARN.**
+  - The 7 cuts are at their scene starts. V2S2's cut into the bridge, f365, is found at the flat bridge's edge. W's pane
+    at 8.7x is the bridge's own plum (CM.anchor #36223A), so the change into the bridge is no peak.
+  - gate_check now has that rule (a big change into or out of a still frame is a bridged push's cut) and the join's own
+    `hold`.
+  - WARN: V2S2's out-cut at f369, not f368: M's pane also matches the plum, as before.
+  - WARN: V2S7 at f1685, and the S5 -> S6 wipe's f1429: both as before.
+  - WARN: the frame-0 beats inside S1. They are f24 (W goes dark) and f29, f33 and f38 (the flood's steps). Before, only
+    f24 showed.
+  - WARN: f2336 (the un-build).
+  - WARN: page 2's 25 / 29 characters.
+  - The captions pass: 24 pages inside the band 290-600, the clip 280-570 and x 90-950.
+- **Lints** (`assembly_lints.ts`): 1 problem, S8's leaves (s8leaves). It is not in this pass's code.
+- **Files:** the render and the strips are in the session's scratchpad, not deliverables. The master for the owner
+  comes after pass B (OWNER_NOTES, 17:15).
+
+**Left open.**
+- Her own strokes are small at 360 px: she is ~51 px tall, and the review gave no brief to frame her bigger. The door,
+  W and the flood carry the event at phone size.
+- `@out 5.88` departs from the brief's "for life." to 6.28.
+- Page 2 sits at ~81 px.
+- MUST 3's page numbers have moved (see MUST 1).

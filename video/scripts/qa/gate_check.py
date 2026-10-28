@@ -649,6 +649,15 @@ def main() -> int:
                 n = max(sp, key=lambda k: d[k])
                 hit = [n]
                 spikes.append(f"{sid} frame {n} (d={d[n]:.1f}, x{d[n] / max(d[n - 1], d[n + 1], 1e-6):.1f} its neighbours)")
+        if not hit and mode == "bridge":
+            # the flat bridge's own edge: a big change INTO a still frame (or OUT of one) is the bridge's cut, even when
+            # the zoom's last step before it is as big (v2r's 0.45 s dive into W: its plum pane at 8.7x already matches
+            # the plum bridge, so the change into the bridge is no peak)
+            fl = [n for n in (f - 1, f, f + 1) if 1 <= n < len(d) - 1 and d[n] >= a.cut_min and min(d[n - 1], d[n + 1]) < 0.5]
+            if fl:
+                n = max(fl, key=lambda k: d[k])
+                hit = [n]
+                spikes.append(f"{sid} frame {n} (d={d[n]:.1f}, at the flat bridge's edge)")
         if not hit and zs:
             report("WARN", "cuts", f"{sid}: no push-through turn at its declared frame {f} (zoom per frame over {f - PT_TURN - 1}-{f + PT_TURN + 1}: " + " ".join(f"{z:.2f}" for z in zs) + ")")
         if hit:
