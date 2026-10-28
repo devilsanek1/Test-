@@ -504,7 +504,8 @@ export type WaterRipples = {
   drift: [number, number];
   life: [number, number];
   t0: number;
-  /** Tone steps (OKLab L) on the water's own colour: a crest (light) and a trough (dark). */
+  /** A crest across a reflection: the reflection's own tone this many CIE L* lighter (default 8: R9's +6-10); a trough
+   *  across the open water: the water's own colour this many OKLab L darker (default -0.04). */
   crest?: number;
   trough?: number;
 };
@@ -611,7 +612,7 @@ function resolveSource(s: WaterSource, cam: WaterCam, grid: Grid, region: WaterS
   const xc = Math.max(region.x0, Math.min(region.x1, (box.x0 + box.x1) / 2));
   const top = Math.max(box.y0, region.top(xc));
   const yEnd = Math.min(box.y1, region.bottom(xc) + 4);
-  const k = Math.max(0.55, s.solid ?? 0.6);
+  const k = Math.min(1, Math.max(0.55, s.solid ?? 0.6));
   const raw = Math.max(top + Math.max(0, yEnd - top) * k, yBarMin);
   const ySolid = moving ? raw : snapRow(grid, raw);
   return {...s, p, box, ySolid, yEnd: Math.max(yEnd, ySolid + 1), sd: seedOf(s.id)};
@@ -900,18 +901,24 @@ export function glitterSlivers(st: Static, t: number): Sliver[] {
   for (let j = 0; j < slots; j++) {
     const own = long.filter((_, r) => r % slots === j);
     if (!own.length) continue;
-    const P = lerp(life[0], life[1], hash01(st.seed, 7100, j, 1));
+    // a cycle = a life (lit 60-80 % of it) then a rest of at least 0.16 s (a sliver never re-lights at once)
+    const P = lerp(life[0], life[1], hash01(st.seed, 7100, j, 1)) + 0.16;
     const u = (t - t0) / P - hash01(st.seed, 7100, j, 2);
     if (u < 0) continue;
     const cyc = Math.floor(u);
-    const tau = u - cyc;
-    const lifeK = lerp(0.62, 0.86, hash01(st.seed, 7100, j, 3, cyc));
-    if (tau > lifeK) continue;
-    const env = Math.pow(Math.sin((Math.PI * tau) / lifeK), 0.6);
-    // which of its lenses this cycle: weighted toward the mirror point (a normal draw in y, the nearest lens)
+    const tau = (u - cyc) * P;
+    const lit = (P - 0.16) * lerp(0.6, 0.8, hash01(st.seed, 7100, j, 3, cyc));
+    if (tau > lit) continue;
+    // it grows in along its length (40 %), holds (20 %), shrinks out (40 %): eased, never a fade
+    const q = tau / lit;
+    const e0 = q < 0.4 ? q / 0.4 : q > 0.6 ? (1 - q) / 0.4 : 1;
+    const env = e0 * e0 * (3 - 2 * e0);
+    // which of its lenses this cycle: weighted toward the mirror point (a normal draw in y, the nearest lens); with two
+    // lenses a slot takes them in turn
     const yv = peak + sigma * gauss(hash01(st.seed, 7100, j, 4, cyc), hash01(st.seed, 7100, j, 5, cyc));
     let pick = own[0];
-    for (const o of own) if (Math.abs(o.b.cy - yv) < Math.abs(pick.b.cy - yv)) pick = o;
+    if (own.length > 1) pick = own[cyc % own.length];
+    else for (const o of own) if (Math.abs(o.b.cy - yv) < Math.abs(pick.b.cy - yv)) pick = o;
     const b = pick.b;
     const L0 = Math.min(len[1], b.len * 0.8) * lerp(0.82, 1, hash01(st.seed, 7100, j, 6, cyc));
     const L = Math.max(len[0], L0) * env;
@@ -925,12 +932,12 @@ export function glitterSlivers(st: Static, t: number): Sliver[] {
 
 // ================================================================= ripple lines (G3)
 
-export type RippleLine = {x: number; y: number; len: number; h: number; tone: 1 | -1};
+export type RippleLine = {x: number; y: number; len: number; h: number; tone: 1 | -1; /** The reflection colour it crosses (a crest). */ over?: string};
 /** Ripple lines at t: `slots` lenses, each living `life` s (growing in along its length, holding, shrinking out: never a
  *  fade) at a new spot each cycle, drifting with the breeze; every spot keeps clear of the avoid boxes over its whole
  *  drift, and of the water's edges. The tone is decided by what lies under its middle: a light crest across a
  *  reflection, a darker trough across the open water (R9). */
-export function ripplesAt(st: Static, t: number, under: (x: number, y: number) => boolean): RippleLine[] {
+export function ripplesAt(st: Static, t: number, under: (x: number, y: number) => string | null): RippleLine[] {
   const rp = st.spec.ripples;
   const out: RippleLine[] = [];
   if (!rp || st.spec.lod === 'far' || t < rp.t0) return out;
@@ -966,12 +973,29 @@ export function ripplesAt(st: Static, t: number, under: (x: number, y: number) =
         const len = L * g;
         const h = lerp(rp.thick[0], rp.thick[1], near) * lerp(0.85, 1.1, hash01(st.seed, 7300, s, n, 5)) * (0.55 + 0.45 * g);
         const xc = x + v * (t - tb);
-        if (len >= 2) out.push({x: xc, y, len, h, tone: under(xc, y) ? 1 : -1});
+        // its tone is decided once for its life, by what lies under its mid-life spot (a line never flips colour)
+        const tone = under(x + v * life * 0.5, y);
+        if (len >= 2) out.push({x: xc, y, len, h, tone: tone ? 1 : -1, over: tone || undefined});
         break;
       }
       tb += life + lerp(0.2, 1.2, hash01(st.seed, 7300, s, n, 6));
     }
   }
+  return out;
+}
+
+/** A crest across a reflection (R9): the reflection's own hue a light step up (CIE L*), its chroma eased: tone-on-tone,
+ *  never a white line. */
+export const CREST_DL = 8;
+const CRESTS = new Map<string, string>();
+export function crestOf(under: string, dl: number): string {
+  const key = `${under}|${dl}`;
+  const hit = CRESTS.get(key);
+  if (hit) return hit;
+  const c = lch(under);
+  const out = cleanColour(fromLch(Math.min(95, c.L + dl), c.C * 0.8, c.h));
+  if (CRESTS.size > 4000) CRESTS.clear();
+  CRESTS.set(key, out);
   return out;
 }
 
@@ -1036,15 +1060,22 @@ export function waterFrame(spec: WaterSpec, t: number): WaterFrame {
   // ripple lines: light across a reflection, darker across the open water
   const polys = all.filter(({s}) => s.draw !== 'crisp' && s.p.length >= 3).map(({s}) => {
     const [sx, sy] = shift(s.plane);
-    return {p: s.p, sx, sy, box: s.box};
+    return {s, p: s.p, sx, sy, box: s.box};
   });
-  const under = (x: number, y: number) => polys.some((q) => x >= q.box.x0 + q.sx && x <= q.box.x1 + q.sx && y >= q.box.y0 + q.sy && y <= q.box.y1 + q.sy && inPoly(q.p, x - q.sx, y - q.sy));
+  // the topmost reflection under a point (its tone there), or null for the open water
+  const under = (x: number, y: number): string | null => {
+    for (let i = polys.length - 1; i >= 0; i--) {
+      const q = polys[i];
+      if (x >= q.box.x0 + q.sx && x <= q.box.x1 + q.sx && y >= q.box.y0 + q.sy && y <= q.box.y1 + q.sy && inPoly(q.p, x - q.sx, y - q.sy)) return toneOf(st, q.s, kAt(st, y));
+    }
+    return null;
+  };
   const lines = far ? farLines(st) : ripplesAt(st, t, under);
   const rip = new Map<string, string[]>();
   const rp = spec.ripples;
   for (const l of lines) {
     const base = skyColorAt(st.ramp, l.y);
-    const c = far ? waterStep(base, l.tone * 0.02, 1) : waterStep(base, l.tone > 0 ? rp?.crest ?? 0.045 : rp?.trough ?? -0.05, l.tone > 0 ? 0.75 : 1.1);
+    const c = far ? waterStep(base, l.tone * 0.02, 1) : l.over ? crestOf(l.over, rp?.crest ?? CREST_DL) : waterStep(base, rp?.trough ?? -0.04, 1.1);
     const d = lensD(l.x, l.y, l.len, l.h);
     const a = rip.get(c);
     if (a) a.push(d);
@@ -1222,11 +1253,8 @@ export function waterPalette(spec: WaterSpec): {name: string; hex: string; L: nu
     add('glitter sliver', spec.sun.core ?? SUN_DEFAULT.core);
   }
   if (spec.ripples) {
-    for (let y = st.box.top; y <= st.box.bottom; y += 24) {
-      const base = skyColorAt(st.ramp, y);
-      add(`ripple crest y${y}`, waterStep(base, spec.ripples.crest ?? 0.045, 0.75));
-      add(`ripple trough y${y}`, waterStep(base, spec.ripples.trough ?? -0.05, 1.1));
-    }
+    for (let y = st.box.top; y <= st.box.bottom; y += 24) add(`ripple trough y${y}`, waterStep(skyColorAt(st.ramp, y), spec.ripples.trough ?? -0.04, 1.1));
+    for (const s of st.srcs) for (const k of [ks[0], ks[ks.length - 1]]) add(`ripple crest over ${s.id} k${k.toFixed(2)}`, crestOf(toneOf(st, s, k), spec.ripples.crest ?? CREST_DL));
   }
   return out;
 }
