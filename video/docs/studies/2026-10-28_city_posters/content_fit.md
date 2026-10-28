@@ -70,12 +70,210 @@ perform better for us.* Split it so it can fail:
 
 ## 2. Archetypes ranked
 
-_(pending)_
+Nine kinds of story where a place can carry the film, inside the brief (tech and AI first, AI-adjacent in scope). Each
+is scored 1-10 for a TYPICAL good story of its kind (est.) on `docs/TOPIC_CRITERIA.md`'s six criteria (R relevant +
+buzz + surprise 6, T true 5, V visual 4, M mood 3, F fresh 2, S shareable 1; **Owner** = their weighted score /10). M is
+scored for the slate's need NOW (a positive story: playbook Taste signals); for the slot after v4 it flips, lifting #2
+and #3. **Place fit** (P): 10 = the place is the mechanism (what happens, happens to a place) with a natural home place,
+one hero landmark and a thread that moves through them (CRAFT §a); 5 = a real place as a stage, the mechanism elsewhere;
+1 = only screens, papers or molecules. **Rank** = (6R + 5T + 4V + 3M + 2F + 1S + 4P) / 25: place fit enters at the
+weight of visual appeal, so the owner's order stays on top (our rule, est.; the owner may weigh it differently).
+
+| # | Archetype | Home place / hero landmark / thread (example) | R | T | V | M | F | S | Owner | P | **Rank** |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | Nature against the city, tech on its side | a coastal town / its skyline under the storm / the forecast line or the alert wave | 8 | 7 | 9 | 8 | 8 | 8 | 7.95 | 9 | **8.12** |
+| 2= | The system drawn as a city (v1's form) | a town where each building is one website / the building the news hits / the blueprint, the light | 8 | 8 | 9 | 4 | 8 | 6 | 7.52 | 9 | **7.76** |
+| 2= | The hidden machine under the city | your street / the data centre, cable station or substation revealed / your message, a watt, a drop | 8 | 8 | 8 | 5 | 8 | 7 | 7.52 | 9 | **7.76** |
+| 4 | The street that works differently now | one crossing / the crossing itself / the robotaxi, the drone, the shuttle | 7 | 6 | 9 | 6 | 8 | 7 | 7.10 | 9 | **7.40** |
+| 5 | Two places, two choices | one street with two sides / the pool gate with a ban sign / the object both decide about | 8 | 7 | 7 | 5 | 7 | 8 | 7.05 | 7 | **7.04** |
+| 6= | The place where it happened | the real office, lab or court / its facade / a person's thing (v2: her window) | 7 | 8 | 7 | 7 | 9 | 6 | 7.38 | 5 | **7.00** |
+| 6= | A building as the protagonist | its street / the building / what flows out of it (heat, power) | 5 | 6 | 9 | 8 | 4 | 7 | 6.43 | 10 | **7.00** |
+| 8 | Your city from above | one roof / the city from orbit / the satellite's square of view | 6 | 7 | 6 | 7 | 4 | 6 | 6.19 | 6 | **6.16** |
+| 9 | The map story | none (many places) / a globe / the event's spread | 7 | 7 | 5 | 6 | 6 | 6 | 6.33 | 4 | **5.96** |
+
+**1. Nature against the city, with tech on the city's side** (quake alerts, storm and flood forecasts, fire cameras).
+The force is the film's one scale moment (the storm over the Gulf, the ring of shaking) and the town under it is the cozy
+home place; the hero is its skyline or one building on the shore; the thread is the warning itself (the forecast line,
+the alert racing ahead of the shaking, a wisp of smoke), easy to keep on screen 80 % of the time. The hook is physical by
+nature: the expected thing (every model says Louisiana; the street is quiet), then reality overtaking it (the storm
+turns; the phones light up before the cups rattle). It is news by nature (an event, not a product), so it passes "ad or
+news?" as long as the event leads and the feature follows. Mood: hopeful when the warning worked, grave around deaths
+(gentle, never disaster spectacle). Supply: high this month (Isaias 9 Oct, Panama's M7.7 9 Oct, Japan's false 9.9 alarm
+16 Oct, California's fire cameras 14-15 Oct: section 3); est. 2-4 usable pegs a month in season. Risks: one storm proves
+little (say so); vendor-on-vendor sourcing (Google's AI, Google's alerts); maps and arrows (r4's visual check: keep it a
+drawn world, not a weather graphic). It is also the posters' own grammar: one hero under a big, lit sky.
+
+**2=. The system drawn as a city** (v1's form: an invisible system, such as the web, a network, your phone's apps or
+even the body, drawn as a town where each building is one part). The only archetype our numbers support (v1: 82 %
+place-led frames, skip rate 32.2 %). The town is the home place, the hero is the one building the news hits, and every
+"so what" happens to a building, so it reads with the sound off. Hook: the building does what the news says (it goes
+dark; it opens its door to a stranger). Mood: mostly bad news (outages, flaws, hacks), so it suits the slot after v4's
+positive story. Supply: weekly (est.; the ideas bank's "a backup that's a twin" is one). Risks: the metaphor must map
+one-to-one and read cold (playbook, Storyboard: "never a metaphor the facts don't support or that needs explaining"); a
+made-up town loses the posters' real-city charm unless it borrows one city's flavour; PHP again is out (not a past topic).
+
+**2=. The hidden machine under the city** (data centres, subsea cables, chip fabs, substations, cooling water, masts).
+The posters' patchwork city with one giant hidden among ordinary roofs: the hero is the hidden building, shown by a
+cutaway or the one pull-back; the thread is what travels (your message as light, a watt, a drop of cooling water). Hook:
+the everyday act (you hit send), then reality (it crosses an ocean in a cable about as thick as a garden hose: verify
+before use); as news it needs an event at the machine (a cut cable, a town's vote, a heat deal). AI's build-out is the
+fuss of 2026 (bills, water, noise), so relevance is high, but most stories are costs. Supply: weekly (est.). Risks: v3
+was data centres and your wallet (TOPIC_CRITERIA 1: never a past video's topic; a new angle only, and never through a
+shopping screen); logos (draw it unbranded); a grey box is dull unless the reveal is the event.
+
+**4. The street that works differently now** (robotaxis, delivery and defibrillator drones, driverless shuttles, AI
+traffic lights). One crossing the viewer knows is the home place; the new machine is the thread moving through it; life
+is built in (cafés, bikes, crowds: the posters' density). Hook: the expected street (a red light, a driver), then the
+change (nobody in the driver's seat; a box lands before the ambulance). Mood: mixed (safety and convenience vs jobs and
+trust). Supply: weekly (Waymo's Toronto, Madrid and Las Vegas news, 16-27 Oct, `v4/scouting_r4/tech.md`; the drone-AED
+study, 25 Sep). Risks: a branded robotaxi in frame 0 is an ad; pilots and company claims (T 6); a weak "so what" for
+viewers outside that city.
+
+**5. Two places, two choices** (one city bans, another adopts: smart glasses at pools, phones in schools, age checks).
+The fuss is built in and fairness gets its own place, but two places halve the coziness and strain "one home place"
+unless drawn as one street with two sides (CRAFT §a allows at most 3 places). Hook: "here it's banned; across the river
+it's handed out", news if both decisions are real. Supply: est. 2-4 a month. Risks: a listicle feel; politics. v4's
+glasses are this shape (place fit 7: the pool gate, the café).
+
+**6=. The place where it happened** (a real city or building anchors a story about something else). A real place
+charms (v2's canal is the look the owner likes) but the mechanism lives elsewhere (a contract, a fear), so the place
+turns into a stage and boards carry the argument (v2: 6 of 20 frames). Supply: every story. Risks: generic travel
+content, the company's logo on its HQ, a real person's likeness. Use it as the default setting, never as the reason to
+pick a story.
+
+**6=. A building as the protagonist** (a data centre heating a town, a 3D-printed block, a fusion hall). The purest
+poster match (the hero landmark IS the subject), but tech news rarely makes a building the news: no in-window example
+found (the 3D-printing record was May 2026; October's fusion news was lab results; section 3, search notes), stories
+tend to be curiosities without a "so what", and close to the builder's press release (ad risk). Best as the hero inside
+#2 or #3.
+
+**8. Your city from above** (satellites and AI map every roof, tree, heat island or lost city). The orbit-to-roof zoom is
+a superb scale move, but a top-down map is the opposite of the posters' raised three-quarter view and flattens depth
+(CRAFT §f), surveillance worries come with it, and nothing fresh turned up (Google's heat tool dates from 2024). Keep it
+as the one scale shot inside another archetype.
+
+**9. The map story** (one event across many places). The weakest fit: many places and no home break the through-line
+card, and maps drift into infographics. Only as one home place plus one pull-back to the globe; otherwise drop.
 
 ## 3. Candidates now
 
-_(pending)_
+**A. The paused v4 shortlist with place fit added** (`docs/v4/G0_TOPICS_r4.md`; **Owner** = its month-window table,
+unchanged; P and Rank as in section 2).
+
+| Story | Archetype | Home place / hero (the best we could draw) | Owner | P | **Rank** | Place note |
+|---|---|---|---|---|---|---|
+| The glasses some want banned | 5 two places | an Australian street / the pool gate's ban sign, the café | 8.34 | 7 | **8.13** | the fight lives in places (pools, schools, gyms); the help lives in the glasses |
+| Android quake alerts, 200+ countries | 1 nature vs city | a city block / its skyline swaying / the alert over the roofs | 7.81 | 9 | **8.00** | r4: news only with a real quake; Panama gives one (F1) |
+| The AI that called the hurricane | 1 nature vs city | a Panhandle street boarding up / the coast under the storm / the path line | 7.76 | 9 | **7.96** | the most place-led checked story; fresh: NPR 19 + 26 Oct, CNN 8 Oct (below) |
+| A vaccine made from your own cancer | 2 the body as a city | a patient's kitchen / a city of cells / the "wanted poster" | 8.32 | 5 | **7.79** | the city is a metaphor (r4's plan); the real places (the congress, the clinic) are stages |
+| "Could they hear you?" | 6 where it happened | an ICU room | 7.68 | 3 | 6.93 | an interior, no city |
+| SynthID | none | a wall of pictures | 7.48 | 2 | 6.60 | pictures and screens |
+| Gemini 4 Carbon | none | none | 5.90 | 1 | 5.12 | code |
+
+Hurricane coverage since r3: NPR, "AI models are changing how forecasters predict the paths of hurricanes" (2026-10-19)
+https://www.npr.org/2026/10/19/nx-s1-5996666/ai-models-are-changing-how-forecasters-predict-the-paths-of-hurricanes ; NPR
+(2026-10-26) https://www.npr.org/2026/10/26/nx-s1-6012820/ai-hurricane-forecast-google-deepmind-isaias ; CNN, "The National
+Hurricane Center's big bet on AI" (2026-10-08) https://www.cnn.com/2026/10/08/weather/hurricane-isaias-ai-models-google ;
+weather.com (2026-10-13) https://weather.com/2026/10/13/storms/hurricane/hurricane-isaias-google-deepmind-ai-forecasts. All
+agree: right on the track from the start, weaker on strength; the NHC blends it in.
+
+**B. The ideas bank on place fit only** (`docs/IDEAS_BANK.md`; its other scores are on older scales and need a
+freshness re-check). P 9: "a backup that's a twin" (two server halls side by side in one district: archetype 2;
+negative). P 7: EU gas storage (the tanks and caverns: archetype 3; energy, no AI); "Commute to Zoom" (office towers
+half empty: archetype 4; AI-adjacent at most); the 700 supermarket freezers turned into ovens (the supermarket as the
+building). P 6: Spotify's family check (the family home and grandma's house across town: the rule IS an address). P 5:
+the box in your hallway; Barclays' 5,000 jobs (the Canary Wharf towers). P 4: Meta's New Mexico verdict (a state as a
+map); age checks in Türkiye and Greece (two countries, but the mechanism is an ID check on a phone). P 2: dostarlimab,
+the hepatitis B decoys, cocoa, Character.AI's bankruptcy, AI songs.
+
+**C. Fresh scouting** (news since ~28 Sep 2026; tech or AI-adjacent; positive unless marked; 26 searches on 2026-10-28).
+WebFetch could not reach news hosts from this container (DNS blocked), so each fact is from search-engine summaries of
+the named outlets, not full reads: the fact lock re-reads them.
+
+| # | Story: the one-line angle | Arch. | Home place / hero landmark | R | T | V | M | F | S | Owner | P | **Rank** |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| F1 | **A 7.7 shook Panama; six days later its phones joined a quake-warning network** (the quake 9 Oct; Google's 15 Oct expansion names Panama) | 1 | a Panama City flat / the bay's skyline | 7.5 | 7 | 9 | 8 | 9 | 8 | 7.90 | 9 | **8.08** |
+| F2 | **The camera on the ridge calls in the fire before anyone dials 911**: AI on ~1,000 mountaintop cameras now spots more than half of California's wildfires first | 1 | a hillside street / the camera mast above the city at dusk | 7 | 7 | 9 | 8 | 8 | 7 | 7.62 | 8 | **7.68** |
+| F3 | **Japan's phones shouted "magnitude 9.9"; eight minutes later the alert was withdrawn** (MIXED: why warnings are built to shout early) | 1 | a Tokyo flat / the skyline as every window lights at once | 7 | 8 | 9 | 4 | 9 | 8 | 7.43 | 9 | **7.68** |
+| F4 | **A drone brought the defibrillator before the ambulance**: drones plus road reach 95 %+ of cardiac arrests within 5 min vs 30-40 % by road (a model), and a real case in Borås | 4 | a Swedish town's street / its church tower, the drone over the roofs | 7 | 6 | 9 | 9 | 6 | 8 | 7.38 | 8 | **7.48** |
+| F5 | **Madrid's first cars with nobody at the wheel** (MIXED: testing from 20 Oct, riders in 2027) | 4 | a Madrid street / the Metropolis building on Gran Vía | 6 | 7 | 8 | 5 | 9 | 5 | 6.71 | 8 | **6.92** |
+
+Sources and the "ad or news?" check:
+- **F1:** NBC News (2026-10-09) https://www.nbcnews.com/world/panama/magnitude-77-earthquake-rocks-panama-rcna602557 ; Al
+  Jazeera (2026-10-09) https://www.aljazeera.com/news/2026/10/9/tsunami-warnings-across-latin-america-after-7-7-magnitude-earthquake-hits ;
+  CBS News https://www.cbsnews.com/news/panama-earthquake-tsunami-threat/ (people left buildings in Panama City; a historic
+  cathedral partly fell in Coclé; the Canal kept working); Google's blog (2026-10-15, read by the r4 scout: Panama named)
+  https://blog.google/products-and-platforms/platforms/android/android-earthquake-alerts-expansion-2026/. News if the quake
+  leads; an ad if the phone leads (Google's feature, Google's source). Never imply the quake caused the expansion or that
+  phones warned on 9 Oct (no source says so); not AI on Google's own pages (r4).
+- **F2:** Seoul Economic Daily (2026-10-14) https://en.sedaily.com/international/2026/10/14/ai-spots-more-than-half-of-california-wildfires-first ;
+  The Philadelphia Inquirer (2026-10-15) https://www.inquirer.com/news/nation-world/remote-cameras-ai-spot-wildfires-crew-satellite-wifi-california-20261015.html ;
+  PBS NewsHour (CAL FIRE's chief: about half spotted before a 911 call; date not seen) https://www.pbs.org/newshour/show/how-satellites-and-ai-cameras-are-detecting-wildfires-before-they-get-out-of-control ;
+  DroneXL (2026-07-25: 1,260 cameras, 915 with AI, 900+ fires before a 911 call) https://dronexl.co/2026/07/25/california-ai-cameras-firesat-drones-wildfire/.
+  Counts differ by period: lock one. News (a public network, ALERTCalifornia with CAL FIRE); a feature peg, not an event.
+- **F3:** The Japan Times (2026-10-16) https://www.japantimes.co.jp/news/2026/10/16/japan/jma-earthquake-warning/ ; Malay Mail
+  (2026-10-16) https://www.malaymail.com/amp/news/life/2026/10/16/when-japans-earthquake-warning-system-cried-wolf-magnitude-99-alert-withdrawn-in-eight-minutes/239333
+  (the alert at 12:40 for northern, eastern and central Japan; the real quake M6.9 off Kamchatka). News. Not AI: a slot
+  after a positive film.
+- **F4:** EUSEM press release (Sept 2026) https://www.eusem.org/news/1165-press-release-drones-could-speed-up-delivery-of-automated-external-defibrillators-to-patients-suffering-cardiac-arrest ;
+  News-Medical (2026-09-25) https://www.news-medical.net/news/20260925/Drone-delivered-AEDs-could-reduce-defibrillation-delays-after-cardiac-arrest.aspx ;
+  HospiMedica https://www.hospimedica.com/critical-care/articles/294813397/drone-aed-delivery-could-shorten-time-to-out-of-hospital-cardiac-arrest-defibrillation.html ;
+  the Borås case (19 Jul 2026, the patient regained a pulse) has one outlet: https://www.comparethecloud.net/news/everdrones-drone-delivered-a-defibrillator-before-the-ambulance-arrived-in-a-swedish-cardiac-arrest-.
+  A model plus one case; robots, no AI named. News if the rescue leads; the operator's brand stays out.
+- **F5:** The Olive Press (2026-10-22) https://www.theolivepress.es/spain-news/2026/10/22/spain-waymo-robotaxis-driverless-cars-madrid/ ;
+  Just Auto https://www.just-auto.com/news/waymo-driverless-service-launch-spain-2027/ (Oct 2026); r4's scout (Electrek,
+  TechCrunch). High ad risk: a brand's launch, nothing for people until 2027.
+
+**Watch list** (place fit 8-9, peg too weak now): W1, a data centre's heat for a town near Frankfurt (Goodman's planned
+FRA02, up to 50 MW for Neu-Isenburg's network; a letter of intent, date unconfirmed:
+https://datacenterdynamics.com/en/news/waste-heat-from-goodman-data-center-in-frankfurt-germany-to-power-district-heating-system ,
+https://cio.de/article/3700643/rechenzentrum-heizt-gebaeude-in-neu-isenburg.html). W2, AI read a whole scroll buried by
+Vesuvius (Naples, June 2026: https://www.scientificamerican.com/article/ai-reads-ancient-scroll-charred-by-mount-vesuvius-in-tech-first):
+Herculaneum under the volcano is a ready-made hero landmark, AI is the hero, positive; peg: the next scroll ($1M
+prize); an ideas-bank line. W3, the East Micronesia Cable (1 Sep 2026): every Pacific Islands Forum member now on a
+subsea cable (search summary of Australia's announcement); low relevance. **Searched, nothing in the window:** AI
+traffic lights, AI flood warnings, AI leak detection (NTT's Fukuoka trial only), 3D-printed buildings (record May 2026),
+fusion first plasma, satellite heat maps (Google's tool dates from 2024), Waymo London, lidar "lost cities".
 
 ## 4. Recommendation and open questions
 
-_(pending)_
+**The lesson under all of it:** our best film did not show a pretty city, it made the story happen TO buildings (v1);
+the look the owner likes put a lovely place behind a story whose mechanism lived on boards (v2). So pick stories whose
+mechanism can happen to a place, then draw that place the way the posters do (one hero landmark, one home, one sky).
+Place fit is a test of the story, not of the set.
+
+**Directions for the channel, in order:**
+1. **Nature against the city, tech on the city's side** (rank 8.12): the best place fit that also supplies positive,
+   AI-led news now; one town under one sky is both the posters' composition and our through-line card (one home place,
+   one scale reveal, the warning as the thread). Start v4 here.
+2. **The system drawn as a city, and the hidden machine under it** (7.76 each): the place IS the mechanism (v1's way,
+   our best numbers); the home for the channel's core tech stories (outages, flaws, AI's power and water), mostly bad
+   news, so the slot after v4. Prefer a real place (a real cable station, a real data-centre town) where the facts allow;
+   never through a shopping screen (v3).
+3. **The street that works differently now** (7.40): robots, drones and driverless cars in one real street; the best
+   life and density, but weaker truth and real ad risk: only when a public result or a person leads, never a launch.
+
+Not directions: "the place where it happened" as a stage (v2), the map story, the view from above (single shots at
+most); "a building as the protagonist" lives inside #2 as its hero.
+
+**Candidates now (v4 needs a positive story):**
+- **The AI that called the hurricane** (rank 7.96, place fit 9): the most place-led checked story on the shortlist, AI
+  as the hero, kept fresh by NPR (19 and 26 Oct). Frame 0: every forecast line points west, then the storm bends toward
+  one Panhandle town.
+- **Panama's quake, then its phones** (F1, 8.08): the quake-alert story with the real-quake peg r4 asked for. Needs the
+  fact lock (Panama in Google's 15 Oct list; no phone-warning claim for 9 Oct; "not AI" on Google's pages, so it is
+  AI-adjacent at most).
+- **The glasses** stay first in the owner's order even with place fit (8.13); if picked, stage them place-first (frame
+  0: the ban sign on a pool gate, then the café street), never the product. The study does not overturn r4's pick; it
+  adds the place-led alternative.
+
+**The experiment** (section 1): make v4 place-led with a place event at frame 0; log it the section-1 way at exactly
+24 h; if the account qualifies for Trial Reels, post two openings (the place event vs the thread in close-up) to
+non-followers first. Over v5-v6, one film where the place is the mechanism and one where it is only a stage, to test
+H2. The decision rule is set before the numbers come in.
+
+**Open questions for the owner:**
+1. Should "place fit" join the topic screen (a 7th column, or inside "visually appealing", weight 4)? Changing
+   `docs/TOPIC_CRITERIA.md` is your call.
+2. For v4: the hurricane (most places, AI as the hero), Panama's quake and phones, or the glasses staged place-first?
+3. May v4 carry a second opening (one extra shot, cost S) for a two-opening Trial Reels test, if the account qualifies?
