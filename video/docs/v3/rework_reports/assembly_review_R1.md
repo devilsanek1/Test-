@@ -6,10 +6,15 @@ every join carrying something, one subject at a time, the support subtle but ali
 Measured per CRAFT §e with the captions masked. Evidence (frames, scripts, numbers):
 `/tmp/claude-0/-home-user-Test-/e0b06496-a313-5ced-bf0f-bc634eb12744/scratchpad/rework/assembly/R1/`.
 
-Status: IN PROGRESS (written as I go; measures so far below).
+Status: DONE (2026-10-28). Images looked at: 9 sheets / crops.
 
 ## Verdict
-(pending)
+Yes on the story and the joins: one home and one view out, five carried joins (C C A A C, 0 plain cuts) inside CRAFT's
+limits, the tag on screen 92 % and reacting on every cause beat, every picture on its word; it reads as one flowing
+story and the hook holds the pilot's bar. Not yet on "what to keep my attention on" in the two longest stretches: SQE's
+queue (the subject 9-32 % of the top salience, the factory wall's snow cap 17-29 %) and SQB's first 3.5 s (the chart
+9-38 %, the window strip 24-34 %). What an owner sees first: a calm, coherent hook and chart, then a summit of "pallets",
+a long street where the small vans don't stand out, and a quiet payoff beat on the data center. No blockers.
 
 ## Scores
 **Joins** (CRAFT §e on `film_full.mp4`, 108 px wide; first with the integrator's mask, y < 0.32 H out; then CRAFT's literal
@@ -20,8 +25,12 @@ Carriers C C A A C + loop, 0 plain cuts; 6 shots, 6.9 s average. Every join carr
 **Thread:** on screen 0-19.2 and 22.45-41.15 (92 %), one gap of 3.25 s = the declared reveal. It reacts on every beat
 (share of the tag box changing): jolt 15.30 61 %, tug 18.30 62 %, sway 24.44 59 %, tick 30.28 26 %, jolt 35.95 59 %, turn
 39.70 24 %; off its beats it is still (only its 2-step tier switches show).
-**SQA vs the approved pilot:** <= 0.5 % of pixels differ by > 8 levels at 10 sampled frames (renderer noise); frame 0
-shows the first caption page from frame 0 (the loop's roll; the pilot from 0.10 s): fine.
+**SQA vs the approved pilot:** <= 0.5 % of pixels differ by > 8 levels at 10 frames 0.10-5.75 s (renderer noise);
+frame 0 differs only by the first caption page, shown from frame 0 (the loop's roll; the pilot's from 0.10 s): fine.
+**Hook / payoff / loop:** frame 0 drawn in the clean pen with the core line, the voice at 0.12, the cart pop at 0.50, the
+ticks from 1.88, never still (3 % of 0-3 s frames still, longest 0.03 s); visuals on their words (0-0.1 s lead) at
+every beat checked; the payoff tag 74 % of the salience on "next laptop's", the turn 90 % of the motion; the loop
+un-builds onto frame 0's lines (carry 0.76-0.80).
 **Per beat** (CRAFT §e at 540 wide, captions and label masked; subject = the beat's A box; salience = its share of the
 top-3 %; motion = its share of a 0.5 s burst at 30 fps, ECC-registered; boxes checked on overlays):
 - SQA (approved pilot): tap 98 / 85 %, launches 79-82 / 86-89 %, DC 4.04 54 % (window 91 %) / 43-50 %.
@@ -34,7 +43,7 @@ top-3 %; motion = its share of a 0.5 s burst at 30 fps, ECC-registered; boxes ch
 - SQE: gate 27 % / 49 % at 23.2; tag sway 72 %; van into the pool 31 / 63 %; the crate 26 / 67 %; notice 5x 44 / 45 %;
   van to the kerb 32 / 61 %; hop 76 / 72 %; tick 83 / 52 %; BETTER van 9 / 49 % (31.45) and 30 / 33 % (32.3); notice 2027
   51 / 51 %; overtake 24 % (the 2027 notice 50 %) / 86 %; jolt 69 %. Competitors at every queue beat: the factory wall's
-  snow cap (25-27 % of the top-3 % within 7 px of it), the gate's lit yard 11-25 %, the mountain 10-15 %; the workers'
+  snow cap band y 940-976 (17-29 % of the top-3 %), the gate's lit yard 3-11 %, the far field 3-16 %; the workers'
   loading loop 13-27 % of the motion.
 - SQF: DC sign 48-52 % / 9-33 % (the tag's same-frame step-down 39 % of 36.95-37.45); payoff hold 74 / 46 %; turn 38 /
   90 %.
@@ -59,9 +68,9 @@ top-3 %; motion = its share of a 0.5 s burst at 30 fps, ECC-registered; boxes ch
   yet alive". Measured: until the doodles land (10.1) the card holds 9-38 % of the top-3 % salience: the night-window
   strip (screen x 0-125) 24-34 %, the skylight and slope string 10-35 %, Pip 10-13 %, the dim phone 12-22 %; the line's
   draw holds 33-52 % of the motion (target >= 60 %) with 2-7 noticeable supporting movers; at 8.0 the card's local
-  contrast is 4.6 against the strip's 4.8 (subject / environment 1.6, target >= 2). 60-70 % of the strip's share sits on
-  the Nook's mullion column (screen x 40-80: the trim bar and its near-black latch, `EMBER.anchor`) and the horizon row
-  (y 900-1000). From 10.1 the card holds 57-78 %. **Fix:** `home_set.tsx` (the home set's owner), inside the 6.35
+  contrast is 4.6 against the strip's 4.8 (subject / environment 1.6, target >= 2). 17-19 of the strip's 24-28 points
+  sit on the Nook's mullion column (screen x 40-80: the trim bar and its near-black latch, `EMBER.anchor`), most of the
+  rest on the horizon row (y 900-1000). From 10.1 the card holds 57-78 %. **Fix:** `home_set.tsx` (the home set's owner), inside the 6.35
   window calm (`windowCalm`, so SQA stays the pilot): the mullion and latch (`NOOK.mullionX` +-7 over the glass) and the
   strip's horizon houses one more calm step (the kit `Haze` toward the glass's dusk, no near-black latch), so the strip
   holds <= 10 % of the top-3 % and the line's draw >= 60 % of the motion from 7.08 ("Laptops").
@@ -80,9 +89,10 @@ top-3 %; motion = its share of a 0.5 s burst at 30 fps, ECC-registered; boxes ch
   the frame changes > 12 levels per frame); the per-syllable rows step 370-515 px each (the hook's twin rows at
   4.38-4.88: 1,100-1,300 px); the DC holds 48-52 % of the top-3 % salience (the trucks' white "AI" panels 16-17 %, the
   corner house 8 %) and 9-33 % of the motion (the tag's same-frame step-down takes 39 % of 36.95-37.45; then the far
-  walker and the steam lead). **Fix:** `outside.tsx` the hall's `rowsOn` (`HALL_ROWS`, SQF's beat): each syllable's row
-  lights as a band at least the hook's size (the soft bands 2-3x taller, lit to the sign's value: >= ~1,200 px per step),
-  so on "an AI data center" the DC alone moves and holds >= 60 % of the salience and the motion.
+  walker and the steam lead). **Fix:** `outside.tsx`, SQF's beat (`HALL_A` 36.98-38.70): draw the four per-syllable rows
+  on top of the hall as the sign already is (after `<Hall />`, like the sign's step), each a band across the facade at
+  the sign's lit value, >= ~1,200 px per step like the hook's, so on "an AI data center" the DC alone moves and holds
+  >= 60 % of the salience and the motion (the kit `rowsOn` bands stay for the calm frames).
 - **R1-5 minor (window). SQE 25.60-32.90, the gate's mouth.** Owner: "too many moving parts". Measured: the two workers
   load truck B on a 2.6 s loop (`workersAt`: aGo + 1.3 -> bGo - 0.6) straight through five beats; at 32.30 ("for the
   better one") they take 27 % of the motion against the BETTER van's 33 %, 18 % at 31.45, 13 % at 28.62; CRAFT §b: one
