@@ -108,6 +108,32 @@ function dense(pts: Pt[], step = 25): Pt[] {
   return out;
 }
 
+/** The mid ground's PAVED shapes (MID plane screen px, nonzero, exactly as MidGround5 fills them): the ring road round
+ *  the building, its link to the boulevard, Washington Boulevard (its kerbed width, the road inside it) and the lawn
+ *  paths. Everything else of the ground is lawn. */
+type Paving5 = {ring: string; link: string; kerb: string; road: string; paths: string[]};
+let PAVING5: Paving5 | null = null;
+const paving5 = (): Paving5 => {
+  if (PAVING5) return PAVING5;
+  const ringO = pentagon(PENT.apothem + 42).map(G);
+  const ringI = pentagon(PENT.apothem + 34).map(G);
+  PAVING5 = {
+    ring: polyD(ringO) + polyD(ringI),
+    link: groundRibbon(dense([[-260, -150], [-400, -120]]), 9),
+    kerb: groundRibbon(dense(WASH_BLVD5), 22),
+    road: groundRibbon(dense(WASH_BLVD5), 18),
+    paths: JOG_PATHS.map((p) => groundRibbon(dense(p, 20), 3.2)),
+  };
+  return PAVING5;
+};
+/** The paved ground as path strings (each nonzero; their union is the paving, the rest of the ground the lawn): a
+ *  light-layer shade that falls on both splits on it (V2S5_pentagon's cast: RIG_APRIL's `cast` tint on the paving, its
+ *  `lawn` tint on the lawn). */
+export const pavingD5 = (): string[] => {
+  const pv = paving5();
+  return [pv.ring, pv.link, pv.kerb, ...pv.paths];
+};
+
 /** A tree at a ground point: a flat shadow toward the lens-left, a crown sized in metres. */
 function tree(B: {shadow: string[]; crowns: Map<string, string[]>}, x: number, y: number, rM: number, col: string, seed: string) {
   const s = MID.pxPerM(x, y, 6);
@@ -139,15 +165,14 @@ const MidGroundBody: React.FC<{seed?: string}> = ({seed = 'midg'}) => {
     }
     // the ring road round the building (no traffic: part of the reservation) and its link to the boulevard
     B.layer();
-    const ringO = pentagon(PENT.apothem + 42).map(G);
-    const ringI = pentagon(PENT.apothem + 34).map(G);
-    B.fill(MT5.road, polyD(ringO) + polyD(ringI));
-    B.fill(MT5.road, groundRibbon(dense([[-260, -150], [-400, -120]]), 9));
+    const pv = paving5();
+    B.fill(MT5.road, pv.ring);
+    B.fill(MT5.road, pv.link);
     // Washington Boulevard (4 lanes), with its kerb edges a step darker
-    B.fill(MT5.roadEdge, groundRibbon(dense(WASH_BLVD5), 22));
-    B.fill(MT5.road, groundRibbon(dense(WASH_BLVD5), 18));
+    B.fill(MT5.roadEdge, pv.kerb);
+    B.fill(MT5.road, pv.road);
     // the lawn paths (joggers)
-    for (const p of JOG_PATHS) B.fill(MT5.path, groundRibbon(dense(p, 20), 3.2));
+    for (const d of pv.paths) B.fill(MT5.path, d);
 
     // groves and street trees (never on the building, its ring or the roads)
     B.layer();

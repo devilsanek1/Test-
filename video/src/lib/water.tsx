@@ -1296,17 +1296,16 @@ export function waterProblems(spec: WaterSpec, o: {t1?: number; otherAlive?: num
     if (!s.p.length) continue;
     if (s.box.x1 < spec.region.x0 - 60 || s.box.x0 > spec.region.x1 + 60) out.push(`${name}: ${s.id}: its reflection lies outside the water's x range`);
   }
-  // ---- the grid: no slice row under 2 px where bars are drawn (far LOD draws none)
+  // ---- the grid: no slice row under 2 px. Bars start only where a band is barPitch px or more (the blocks above are
+  // whole), so a near water's slices are >= 2 px by construction; a water whose NEAR rows are already under 2 px is a
+  // far strip and is drawn with lod 'far' (R14: flat bands, flecks, current lines)
   if (spec.lod !== 'far') {
-    const rows = st.grid.rows;
-    for (let i = 0; i + 1 < rows.length; i++) {
-      const pitch = rows[i + 1] - rows[i];
-      const gap = gapOf(st.grid, rows[i], rows[i + 1]);
-      if (pitch - gap < L.minPitch && rows[i] < st.box.bottom) {
-        out.push(`${name}: the band at y ${rows[i].toFixed(0)} draws a ${(pitch - gap).toFixed(1)} px slice (< ${L.minPitch}): use lod 'far' (R14) or a coarser grid`);
-        break;
-      }
-    }
+    let yNear = -Infinity;
+    for (let x = spec.region.x0; x <= spec.region.x1; x += 20) yNear = Math.max(yNear, spec.region.bottom(x));
+    const real = pxPerMDeep(spec.cam, yNear) * (spec.grid?.dz ?? 0.45);
+    if (real < L.minPitch) out.push(`${name}: the water's nearest rows are ${real.toFixed(2)} px (< ${L.minPitch}): a far strip, draw it with lod 'far' (R14)`);
+    const barPitch = spec.grid?.barPitch ?? 7;
+    if (barPitch - Math.max(st.grid.minGap, barPitch * st.grid.gapK[1]) < L.minPitch) out.push(`${name}: barPitch ${barPitch} px leaves slices under ${L.minPitch} px`);
   }
   // ---- calm motion (R12): the sway, its wave speed, the ripple drift
   const sw = st.sway;
