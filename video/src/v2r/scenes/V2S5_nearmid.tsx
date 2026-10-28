@@ -4,9 +4,9 @@
 // NEARMID_PLANE (the rig reads it; drawn through startMat).
 // Import rule: never import V2S5_rig / V2S5_set / V2S5_figs (the rig imports this file).
 import React from 'react';
-import {NearMid} from '../kit/dc/valley';
+import {NearMid5} from './V2S5_valley';
 import {CRANE_T, NEAR_MID_PL, type PullPlane} from '../kit/dc/crane';
 
 export const NEARMID_PLANE: PullPlane = NEAR_MID_PL;
 
-export const S5NearMid: React.FC = () => <NearMid burstAt={CRANE_T.april} />;
+export const S5NearMid: React.FC = () => <NearMid5 burstAt={CRANE_T.april} />;
