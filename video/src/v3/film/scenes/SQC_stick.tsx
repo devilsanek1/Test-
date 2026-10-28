@@ -8,12 +8,15 @@
 // request: J3 matches on both sides).
 // Light (the nook rig, CRAFT §d.8): the stick is the subject, so it alone gets a rim: the lamp's warm light (its key,
 // screen-left and below the stick: the lamp is in frame) 4-6 px inside its silhouette on the key-facing sides, growing
-// with the stick. No contact or cast shadow: it touches nothing once it leaves the phone.
+// with the stick. The rim's shape is THE stick's own outline (its key notch and side notches) moved in by the
+// subject's 3 px line (final pass, as SQD_peak's J3StickRim, early review E7): on a plain rectangle the band ran
+// straight across the left side notch, outside the silhouette, and painted over the outline on the lamp side. No
+// contact or cast shadow: it touches nothing once it leaves the phone.
 import React from 'react';
 import {clamp, ease} from '../../../lib/time';
 import {STICK_RATIO, type Pt} from '../kit';
 import {Rim, polyD} from '../kit/Light';
-import {J3Stick} from './SQD_peak';
+import {J3Stick, stickParts} from './SQD_peak';
 import {threadAt} from './thread_plane';
 
 /** The lift (film seconds): from "memory" to just after "chips", then the hold J3 starts from. */
@@ -41,12 +44,39 @@ export function liftPose(T: number): StickPose | null {
   };
 }
 
-/** The stick's board silhouette (screen px), for its rim. */
-function boardD(p: StickPose): string {
-  const h = p.w * STICK_RATIO;
+/** The subject's outline on the stick (screen px: the kit MemoryStick under the clean pen draws it 3 px, inside its
+ *  fill, from ~100 px up). */
+const LINE = 3;
+
+/** A closed polygon (clockwise on screen) moved `d` px inward: each edge along its inward normal, each vertex where its
+ *  two offset edges meet (SQD_peak's own helper for J3StickRim; the stick's outline has no edge shorter than ~4 % of its
+ *  width, so a few px keep it a simple polygon). */
+function insetPoly(pts: Pt[], d: number): Pt[] {
+  const n = pts.length;
+  const edge = (i: number) => {
+    const a = pts[i];
+    const b = pts[(i + 1) % n];
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const l = Math.hypot(dx, dy) || 1;
+    return {p: [a[0] - (dy / l) * d, a[1] + (dx / l) * d] as Pt, v: [dx, dy] as Pt};
+  };
+  return pts.map((_, i) => {
+    const A = edge((i - 1 + n) % n);
+    const B = edge(i);
+    const den = A.v[0] * B.v[1] - A.v[1] * B.v[0];
+    if (Math.abs(den) < 1e-9) return B.p;
+    const t = ((B.p[0] - A.p[0]) * B.v[1] - (B.p[1] - A.p[1]) * B.v[0]) / den;
+    return [A.p[0] + A.v[0] * t, A.p[1] + A.v[1] * t] as Pt;
+  });
+}
+
+/** THE stick's silhouette (its notches included) just inside its outline, at a pose (screen px): the rim's shape. */
+function rimShapeD(p: StickPose): string {
   const a = (p.rot * Math.PI) / 180;
-  const P = (lx: number, ly: number): Pt => [p.x + lx * Math.cos(a) - ly * Math.sin(a), p.y + lx * Math.sin(a) + ly * Math.cos(a)];
-  return polyD([P(-p.w / 2, -h / 2), P(p.w / 2, -h / 2), P(p.w / 2, h / 2), P(-p.w / 2, h / 2)]);
+  const ca = Math.cos(a);
+  const sa = Math.sin(a);
+  return polyD(insetPoly(stickParts(p.w).outline, LINE).map(([lx, ly]): Pt => [p.x + lx * ca - ly * sa, p.y + lx * sa + ly * ca]));
 }
 
 /** THE stick at film time T (screen space, after the thread plane; inside the nook rig's <Lit>). */
@@ -57,7 +87,7 @@ export const LiftStick: React.FC<{T: number}> = ({T}) => {
   return (
     <>
       <J3Stick x={p.x} y={p.y} w={p.w} rot={p.rot} />
-      {rimW >= 1 ? <Rim d={boardD(p)} c={[p.x, p.y]} size={[p.w, p.w * STICK_RATIO]} width={rimW} /> : null}
+      {rimW >= 1 ? <Rim d={rimShapeD(p)} c={[p.x, p.y]} size={[p.w - 2 * LINE, p.w * STICK_RATIO - 2 * LINE]} width={rimW} /> : null}
     </>
   );
 };
