@@ -818,6 +818,9 @@ const GATE_CALM = '#E9B881';
  *  step toward the street's ambient snow. */
 const TRUCK_CALM_K = 0.18;
 const STREET_AMBIENT = '#C9CFE6';
+/** The waiting vans' exhaust: a light vapour step over the road (L* 88, under the snow caps' 89: not snow, so it keeps
+ *  its own value; at the caps' value it fell under the change a phone shows and the queue's slow life went still). */
+const EXHAUST = mixHex(EMBER.snow, EMBER.road, 0.35);
 /** The street's stage (tier C): the factory's wall a soft warm brick, sky-lit snow caps one pale step (L* 86, under the
  *  pool's core: CRAFT §d.2), so the wall's top edge and the roofline never hold the frame's top salience. */
 const WALL_BRICK = '#A66B5C';
@@ -952,7 +955,7 @@ export const OutsideStreet: React.FC = () => {
           .filter((v) => v.id === 'van2' || v.id === 'better')
           .map((v) =>
             puffs(T, {n: 3, life: 2.4, rise: 26, drift: 22, r0: 2, r1: 6, wobble: 2, seed: `h2/ex/${v.id}`}).map((q, i) => (
-              <path key={`${v.id}${i}`} d={ellD(v.x + VAN_W / 2 + 6 + q.x, v.y - 8 + q.y, q.r * 1.3, q.r)} fill={mixHex(H2_SNOW, EMBER.road, 0.35)} />
+              <path key={`${v.id}${i}`} d={ellD(v.x + VAN_W / 2 + 6 + q.x, v.y - 8 + q.y, q.r * 1.3, q.r)} fill={EXHAUST} />
             )),
           )}
         {/* a small car crosses the street's far side while the payoff holds (C: flat, slow) */}
