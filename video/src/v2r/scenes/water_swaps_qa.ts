@@ -11,6 +11,7 @@ import {s3WaterSpecs} from './V2S3_water';
 import {S3_OTHER_ALIVE} from './V2S3_particles';
 import {s4WaterSpecs} from './V2S4_water';
 import {S4_OTHER_ALIVE} from './V2S4_particles';
+import {s5WaterSpecs} from './V2S5_river';
 
 type Row = {spec: WaterSpec; t0: number; t1: number; other: number};
 const rows: Row[] = [];
@@ -28,6 +29,12 @@ add(s2WaterSpec(), 6.1, 12.98, 8);
   const s = s4WaterSpecs();
   add(s.canal, 14.86, 20.55, S4_OTHER_ALIVE);
   add(s.near, 14.86, 20.55, S4_OTHER_ALIVE);
+}
+{
+  // S5 runs on scene seconds (0 at 20.55); its other particles: <= 9 alive (V2S5_particles: 4 + 2 motes, 3 leaves)
+  const s = s5WaterSpecs();
+  add(s.potomac, 0, 3.25, 9);
+  add(s.channel, 0, 3.25, 9);
 }
 
 const fmt = (hex: string) => {

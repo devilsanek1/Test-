@@ -611,9 +611,11 @@ const farWall = (x: number) => {
 /** The canal's water field (water plane, landing coords): from the horizon (HY - 6) down to y1, x0..x1. */
 const WATER = {x0: -320, x1: 840, y1: 1450};
 
-/** THE CANAL'S WATER, its own piece (the coming lib/water swap replaces this one component): ONE flat field (no
- *  reflections, ripple dashes or glints drawn by hand), geometry WATER. Drawn first by S8Water, inside its tier-C water
- *  plane. Hidden behind the board and the cafe boat at every pose (S1's water changes => re-check the seam). */
+/** THE CANAL'S WATER, its own piece: ONE flat field (no reflections, ripple dashes or glints drawn by hand), geometry
+ *  WATER. Drawn first by S8Water, inside its tier-C water plane. Hidden behind the board and the cafe boat at every
+ *  pose but a ~40 x 70 px patch right of the board, so it stays this flat field, not lib/water (the water swap,
+ *  2026-10-28, docs/v2/water/SWAPS.md: the seam check found the pop was the un-build order, fixed in S8Water with an
+ *  early exit; a lib/water field would not take part in the un-build). */
 export const S8Canal: React.FC = () => {
   const el = useMemo(() => {
     const b = new Batch();
@@ -643,7 +645,12 @@ export const S8Water: React.FC = () => {
   return (
     <Tier tier="environment">
       <OnPlane p="water">
-        <S8Canal />
+        {/* the water field leaves EARLY in the un-build (gone by e 0.3, while the board still covers it): it exited
+            with the rest, so the board's exit bared it as a flat teal band for 2-3 frames (2335-2337) over S1's pale
+            frame 0 (the water swap's seam check, docs/v2/water/SWAPS.md) */}
+        <EarlyExit to={0.3}>
+          <S8Canal />
+        </EarlyExit>
         {statEl}
         <EarlyExit>
           <Ducks ducks={[{x: 112, y: 985, size: 19, vx: -2.6, drake: true}, {x: 138, y: 991, size: 17, vx: -2.4}]} seed="s8ducks" x0={-60} x1={220} />

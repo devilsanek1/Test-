@@ -62,7 +62,7 @@ and `docs/look/CRAFT.md` §f.7 (the rules) outrank it. Optics and sources: `docs
 | `waterPieces(spec, t)` | per source: its blocks, bars (a broken band counts twice) and a light's slivers, with its middle x (the comb count) |
 | `waterProblems(spec, {t1, otherAlive})` | the lint: no tone in the beige / olive / grey bands, and the ramp AS DRAWN walked ROW BY ROW (its curve between two clean keys can cross a band), none within dE76 6 of a `notLike` colour, the far water >= 4 L* under the `air`, a cool body, every thing above its waterline and inside the water's span, solid >= 0.55 and tapered ends, a light's block <= 35 % with <= 3 slivers each >= 15 % shorter and thinner, gaps >= 4 px and a step >= 4 L* under its source, a far strip on `lod 'far'`, calm sway (<= 3 / 7 px, waves 0.2-0.6 m/s, slices <= 15 px/s), 6-14 ripple slots of >= 40 px drifting <= 25 px/s, the glitter under the sun and inside R8's column, slivers 20-36 px, lit 0.25-0.8 s, <= 6 alive and nested in the bed, <= 16 with the shot's other particles, a flood declared, no field born in a join's window |
 | `waterPalette(spec)` | every colour with L* / C* / h and its band (the palette QA hook; a light's block and slivers) |
-| helpers | `mirrorPoly`, `affineMirror` (an SVG matrix), `axisY`, `reflectTone`, `neverBand`, `cleanColour`, `rampGap`, `dE76`, `waterStep`, `crestOf`, `waterRamp`, `rampColour`, `floaterWater`, `leafD`, `lensD`, `barD`, `waterColourAt`, `waterKAt`, `waterSwayAt`, `camZ` / `camY` / `camFresnel` / `pxPerMDeep`, `LIGHT_DEFAULT`, `SLIVER_H`, `WATER_LIMITS` |
+| helpers | `mirrorPoly`, `affineMirror` (an SVG matrix), `axisY`, `reflectTone`, `neverBand`, `cleanColour`, `rampGap`, `dE76`, `waterStep`, `crestOf`, `waterRamp`, `rampColour`, `floaterWater`, `leafD`, `lensD`, `barD`, `waterColourAt`, `waterKAt`, `waterSwayAt`, `camZ` / `camY` / `camFresnel` / `pxPerMDeep`, `LIGHT_DEFAULT`, `SLIVER_H`, `BED_H_MAX`, `WATER_LIMITS` |
 
 Demo: `src/entry-v2r-water.tsx` (`WaterFarSample`, `WaterAffineSample`; their specs in `src/lib/water_samples.ts`).
 
@@ -135,6 +135,22 @@ Demo: `src/entry-v2r-water.tsx` (`WaterFarSample`, `WaterAffineSample`; their sp
 - **S5, the Potomac on an April morning** (a 23 px far strip): `lod: 'far'`, `sky: S5_SKY` (the morning's own keys), the
   far shore and the bridges' arches as `sources` mirrored flat, `sun` for 2-6 px flecks, `farLod.lines` 2-4; the sample
   `WATER_FAR_SAMPLE` (lib/water_samples.ts) is the recipe. A morning sun is higher: a wider, shorter column (R13).
+- **Built (the water swaps, 2026-10-28; every number in `docs/v2/water/SWAPS.md`):** S2 `V2S2_Water.tsx`, S3
+  `V2S3_water.tsx` (canal + sliver), S4 `V2S4_water.tsx` (canal + near water), S5 `V2S5_river.tsx` (Potomac + channel,
+  far LOD); `src/v2r/scenes/water_swaps_qa.ts` lints all of them. What they taught the next water:
+  - a set may have no single level camera (S3's towpath VP sat below the canal's far edge): take the eye level the WATER
+    can live under (the shot's World horizon) and the eye height from the coping's drawn face (t / e = face / (waterline -
+    horizon)); the lens factor e / (e - t) maps a towpath base onto its mirror line;
+  - steep water (S3, S4: 10-21 px bands) keeps the bed's lenses CRAFT-sized through `BED_H_MAX` (6.6 px); on near water
+    seen at 50-60 deg (S4's, 88-140 px bands) the sun's column goes on the strip nearest its mirror point instead;
+  - near water under a hull is a near MIRROR: the boat whole (`solid 1`), ladder k 0.70-0.80; a water drawn in screen
+    space while its surface trucks takes its own group (S4: 2.0x) and counter-shifts what is screen-fixed via `float`;
+  - a far strip takes its own plane's hazed water as `body`, a tone family from it (S5 FAR_TONE), the veil at the body's
+    value (the default + 0.085 lifted a 23 px strip over the air);
+  - a shot that does not open the film declares a flood at 0 that has long crossed; its fields start before its cut;
+  - lit windows reflect as LIGHT ON WATER with 2 slivers when several share the water; once a pane cools to white it is
+    a pale mass (`kind 'light'` keeps C* >= 35: a white light would turn green);
+  - the water's own glitter replaces lib/particles' 4-point star glints on water (CRAFT §f.7e).
 - **The colour identity** stays the owner's knob: `tone.warmMemory` (0..1, off) lets a warm mass keep its hue family in
   the far steps at C* <= 12 through violet to mauve; use it only if the owner asks for a warmer canal, and only while the
   water stays >= 80 % cool (research §5.6, JUDGE G8).
