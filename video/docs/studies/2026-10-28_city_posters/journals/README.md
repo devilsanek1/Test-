@@ -9,8 +9,9 @@ Run by helper session https://claude.ai/code/session_01YGLGMqT2EoqkuUBVwxxRZE (t
 the study's orchestrator (https://claude.ai/code/session_01YGLGMqbgdpycjemYZL3aoL), on branch
 `claude/compassionate-hopper-5iqguj`. Part of the city-poster study (`../README.md`). Nothing here is a rule: it feeds the
 content discussion (`../content_discussion.md`, the parallel thread) and the next topic pick. **This rubric was written
-before any story was collected** (2026-10-28 22:35 UTC); the reliability result and any sharpening are appended in
-section 6, never edited into the rubric silently.
+before any story was collected** (2026-10-28 22:35 UTC; the telling shapes updated at 22:45, still before collecting,
+for the owner's second steer); the reliability result and any sharpening are appended in section 6, never edited into
+the rubric silently.
 
 ## 1. The question, made testable
 Of the stories big journals published in the last 30 days (2026-09-28 to 2026-10-28), **which could be TOLD through the
@@ -24,6 +25,11 @@ good fits fall into?** The output is content directions with real examples, not 
   discusesd arcane shots ... has nothing to do wiht the actual cities"; playbook, Taste signals, "Places on screen"):
   the world can be a real place or a faithful metaphor (v1's town of websites, our best performer). So the rubric scores
   the WORLD a story can be told in; a real named place is recorded as a tag, never required.
+- Neither extreme (owner, ~22:28 UTC, on the content thread's myths, fables and metaphor worlds: "now i feel like you
+  went the other direction, like completely made up content like"; playbook, "Places on screen"): not content ABOUT
+  real cities, and not made-up content; **the middle is true stories whose action happens in a big world we can show**,
+  with a metaphor world only when a true story needs it and the facts map one-to-one (v1). Every row in this corpus is
+  a true story by construction; the telling shapes (4.4) are the content thread's "middle" kinds (its exchange 4).
 - Any subject, not only tech and AI ("Don't be fixated on tech or AI, all goes, the best kind of content that fits into
   this and people would love to hear about"); news from a real city is positive (playbook). Tech/AI is a tag, because
   picks keep the tech/AI focus until the owner picks a direction.
@@ -51,8 +57,8 @@ good fits fall into?** The output is content directions with real examples, not 
    our one-line summary), so their agreement measures the rubric, not research effort. A separate auditor re-finds
    about 10 % of the rows by fresh searches (no invented story, URL or date).
 5. **Two shapes per story.** The NEWS shape (open-coded: what kind of event it is) and the TELLING shape (how it would
-   be told in these views: the content thread's exchange 3 list, section 4.4), so the clusters say both which news fits
-   and how we would tell it.
+   be told in these views: the content thread's "middle" kinds, section 4.4), so the clusters say both which news fits
+   and how we would tell it, and test the content thread's kinds against real stories.
 6. **The top 10 use the owner's own order**, with our visual fit standing in for "visually appealing" (section 4.6).
 
 ## 3. The corpus
@@ -139,10 +145,15 @@ scores but never reaches the candidates.
   `tech_ai` Y/N (tech, AI or AI-adjacent: science, health tech, space, robots, computers, energy).
 - `news_shape`: an OPEN code, 2-6 words, the kind of event (for example "a city's water runs out", "a landmark
   restored"); written fresh from each story, never picked from a list.
-- `telling_shape`, ONE of: **the place changes** (a real place is the subject and changes); **the system as a world**;
-  **small you, vast thing**; **above and below**; **the journey**; **an old myth, today**; **a fable for one big idea**;
-  **one person against the world**; **two worlds side by side**; **the zoom to the stars**; **what if?**; **epic
-  history, told as a world**; **none fits** (the content thread's exchange 3 and its pool, `../content_discussion.md`).
+- `telling_shape`, ONE of (how this true story would be told in these views: the content thread's exchange 4 kinds,
+  plus the true-story shapes kept from its exchange 3, `../content_discussion.md`): **nature hits a town** (storms,
+  quakes, fires, floods, and what warned people); **something huge gets built** (or restored, torn down, reborn);
+  **one person crosses a big world** (or one thing travels through it); **a crowd does one thing at once**; **new
+  machines on real streets**; **real capers** (heists, scams, spies in real buildings); **finds at the edge** (the field,
+  the deep sea, the sky: digs, new species, space); **the system as a world** (an invisible system drawn one-to-one, v1);
+  **above and below** (the hidden machine under or behind the visible place); **two worlds side by side** (here and
+  there, before and after); **the place changes** (a real place changes for any other reason); **none fits**. Myths,
+  fables and what-ifs are not on the list (the owner's second steer).
 - `view`: one line, the world we would draw: home place / hero / the far-out thing.
 - `dup_of` (the id of the same event at another outlet), `confidence` (high / med / low: low when the row is too thin
   to judge), `note`.
