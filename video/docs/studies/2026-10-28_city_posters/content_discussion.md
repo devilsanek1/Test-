@@ -1,14 +1,17 @@
 # Content discussion: which stories fit the city-poster style
 
-**State (2026-10-28 ~22:30 UTC): OPEN.** The owner widened the brief to any subject ("Don't be fixated on tech or AI,
-all goes"). Exchange 2 sent: ten content directions with one example each, a top 3 (festivals and seasons explained;
-cities that fixed what yours didn't; good news from a city, with the why), and a series format (one city per video).
-Waiting on the owner's pick. `content_market.md` and `content_fit.md` (the orchestrator's content track) are folded in
-below; both were scoped to tech and AI before the owner widened it. Their final versions (pulled ~22:20 UTC) change
-nothing here: `content_fit.md`'s tech-led ranking (nature against the city with tech on its side 8.12; the system drawn
-as a city and the hidden machine under it 7.76; the street that works differently now 7.40) is the pool's tech row
-(19). The owner's ONE LOOK, ONE BRAND answer (`video/docs/look/poster_refs/README.md`; the playbook) backs the series
-format: every cover in one look, read as one set of posters.
+**State (2026-10-28 ~22:35 UTC): OPEN.** The owner reframed the question (~22:20 UTC): not content ABOUT real cities,
+but stories TOLD through these views, the way Arcane's shots carry stories that have "nothing to do wiht the actual
+cities". Exchange 3 sent: seven story shapes that live in these views, each with an example; a top 3 (the system as a
+world; small you, vast thing; above and below); and a proposal: each story on the next shortlist comes with its world
+(its shape and its big view). Waiting on the owner. Exchange 2's real-city list stays as one option, not the frame.
+
+Notes: `content_market.md` and `content_fit.md` (the orchestrator's content track, scoped to tech and AI) are folded in
+below; their final versions (pulled ~22:20 UTC) changed nothing here. `content_fit.md`'s best kinds already include two
+of the shapes ("the system drawn as a city" and "the hidden machine under the city", 7.76 each). The owner's ONE
+LOOK, ONE BRAND answer (`video/docs/look/poster_refs/README.md`; the playbook) backs the series format: every cover in
+one look. The orchestrator (2026-10-28 ~22:17 UTC): this file is the live record of the content discussion; a firm
+pick or direction goes in this State line.
 
 Run by the parallel thread (helper session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt), started by the
 study's orchestrator (https://claude.ai/code/session_01YGLGMqbgdpycjemYZL3aoL), on branch
@@ -28,6 +31,14 @@ pick); this thread never edits `video/docs/v4/`. If the discussion lands on a to
   brainstorm"
   -> captured as a rule: playbook, Taste signals ("Places on screen": the brainstorm is open to any subject; news from
   cities is positive; picks keep the tech/AI focus until the owner picks a direction here).
+- 2026-10-28 ~22:20 UTC (in this thread, on exchange 2): "okay so in your content you are overfixating on the content
+  around real cities, but im thinking more about what kind of content would contain storytelling that is around these
+  views. Like previously we discusesd arcane shots - they fit within the same kind of category, its content and
+  storytelling that is around these views but has nothing to do wiht the actual cities"
+  -> captured: playbook, Taste signals, "Places on screen" rewritten (the views are a way of telling a story, not its
+  subject; the world can be invented or a metaphor; a real city is one option). The Arcane reference is the owner's
+  2026-10-24 note: "some videos make it feel big and some make it feel small ... this video makes me feel small. My
+  reference is Arcane: cinematic shots always made me feel scale" (HANDOFF section 7).
 
 ## How an idea is judged here
 - **The look** (the seven posters, `video/docs/look/poster_refs/`): one real place, one hero landmark, layered depth
@@ -93,9 +104,42 @@ grid the covers line up like posters (`content_market.md` §4), and place series
   hippocampus studies; Kinkaku-ji (burned 2 Jul 1950, rebuilt 1955); Singapore's HDB share and ownership rate;
   Amsterdam's forward-leaning houses; Baarle; Curon and Lake Resia; Whittier's Begich Towers.
 
+**The owner's reaction:** ~22:20 UTC, "overfixating on the content around real cities" (verbatim above):
+the views are the way of telling, not the subject. -> exchange 3.
+
+### 3. ~22:35 UTC: story shapes that live in these views (sent)
+What we said, in short: "You're right, I was stuck on real cities. Like Arcane, the world can be invented, and the
+story can be about anything. The view is how we tell it." Then seven shapes, a top 3, the proposal, and "Which shapes
+excite you?".
+
+| # | Shape | What the view does (the posters' feeling it uses) | The example we gave (status) | Risk |
+|---|---|---|---|---|
+| 1 | **The system as a world** | an invisible system drawn as a town you can fly over; every "so what" happens to a building (depth, the hero) | every ad on your phone is a split-second auction about you: a giant trading hall behind your bedroom wall (Citizen Lab and Confiant, 15 Oct 2026; Reuters, 27 Oct; `video/docs/v4/scouting_r2/viral_tech.md` #4) | the metaphor must map one-to-one and read cold (playbook, Storyboard); that case is politically sensitive: tell the mechanism, no villain |
+| 2 | **Small you, vast thing** | one tiny figure before something enormous (the far-out scale anchor; Arcane's "makes me feel small") | the hurricane: one small Florida town, a storm filling the sky, and the one forecast line that pointed right (Isaias, 9 Oct; NPR, 26 Oct; v4's shortlist) | scale without a story is a wallpaper |
+| 3 | **Above and below** | Arcane's top city and undercity: the shiny world and what holds it up (vertical layers) | AI songs: the stars on stage above, and underneath, the one shared pot every artist is paid from, which bots drain (v4's parked topic, G0 + G0.5 complete: `video/docs/v4/archive/ai_songs/`) | a manufactured villain (the brief: none); the "below" must be a fact, not a mood |
+| 4 | **The journey** | one traveller crosses the world from near to far; the camera flies with it through the layers | your text message's trip: down the street, under the ocean in a cable, through a server hall and back in about a second (evergreen; needs a news hook, e.g. a cable cut) | a tour with no turn |
+| 5 | **An old myth, today** | a legend's world (a tower, a sea, a labyrinth) is the stage for today's news | the Sorcerer's Apprentice, whose brooms won't stop multiplying, for AI agents that act on their own (needs a news hook) | a forced parallel; the myth must not need explaining |
+| 6 | **A fable for one big idea** | a tiny world plays out one idea end to end | when steam engines got more efficient, Britain burned MORE coal (Jevons, 1865); AI is getting cheaper per answer, and total use keeps climbing (to check; needs a hook) | a lecture; numbers on AI energy are contested |
+| 7 | **One person against the world** | a real person drawn small in a huge world; the world reacts to them | the blind man whose glasses read the city to him: signs light up one by one as he walks (Chris Edwards, ABC, 13 Oct; v4's shortlist) | a product demo (the glasses are a product: v4's ad-or-news note applies) |
+
+**Our top 3:** 1 (how v1 won), 2 and 3 (the two things Arcane's shots do: make you feel small, and show who's on top).
+4 is the camera move inside any of them. **The proposal:** the topic still comes first (TOPIC_CRITERIA); on the next
+shortlist, each story comes with its world: its shape and its big view.
+
+**More shapes, not sent (for the pool):**
+- **What if?** A world built from a thought experiment, labelled as one: "if GPS stopped for a day" (phone networks and
+  bank clocks drift, not just maps). Risk: speculation against the brief's truth rules; only with hard numbers.
+- **The zoom to the stars.** The far-out thing is the sky or deep time: a hobbyist and his AI helpers may have found a
+  planet NASA's filter set aside (Scientific American, 14 Oct; NASA re-checks in November; v4's r4 list); "if Earth's
+  history were one day". Risk: no everyday "so what".
+- **Epic history, told as a world.** The event is the story and the world its stage: the printing press flooding
+  Europe with pamphlets, and what it teaches about the AI flood. Risk: a forced parallel.
+- **Two worlds, side by side.** The same street in two versions (before and after, here and there, with and without):
+  the split view as the argument (`content_fit.md`'s "two places, two choices"). Risk: halves the coziness.
+
 **The owner's reaction:** (waiting)
 
-## The full brainstorm pool (est. scores: a typical good story of each kind, any subject)
+## The real-city pool (exchange 2; est. scores: a typical good story of each kind, any subject)
 Owner = the weighted score on the owner's six criteria /10; Place = place fit (10: the place is the mechanism; 5: a
 stage; 1: no place), as `content_fit.md` §2 defines it. My scores, est.
 
@@ -135,7 +179,9 @@ stage; 1: no place), as `content_fit.md` §2 defines it. My scores, est.
 ## Picks
 None yet.
 
-## Next step (to propose once the owner picks directions)
+## Next step (to propose once the owner picks shapes)
+Each story on the next shortlist comes with its world: which shape, and its big view (one line and the frame-0 picture).
+Then, as before:
 A lean scout round in the picked directions (2 scouts + 1 editor: the owner's lean early-stage rule): real stories
 with a "why now", each with its place line (one real place, who lives there, what changes: `content_market.md` §5.1),
 scored on the criteria, with the column chart. Then the owner picks, and one fact lock. Who produces the video (v4's

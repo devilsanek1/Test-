@@ -321,19 +321,25 @@ Maintenance at the end).
   benefits and when). Every topic scout names the mood the next video needs. — ("we should alternate between positive
   and more negative topics ... something very recent, extremely relevant yet very positive around AI ... a nice
   positive outlook would be the right direction for a story", v4, 2026-10-28).
-- **Places on screen: find the content that fits a world of cities, architecture and buildings.** The owner's examples
-  are v1 (the best performer so far) and v2 (the look they like; its story was the weak part). Which stories fit is
-  studied in `docs/studies/2026-10-28_city_posters/` (the content track) before it changes `docs/TOPIC_CRITERIA.md`.
-  **That brainstorm is open to any subject, not only tech and AI: the content that fits the look best and that people
-  would love to hear about** (the owner's own seeds: history, news from cities, stories); **news from cities is
-  positive.** Until the owner picks a direction from it (`content_discussion.md` in the study), picks keep the tech/AI
-  focus above. — ("I want us to see which type of content would be best fit into videos where we have more of cities /
+- **Places on screen: the posters' views are a way of telling a story, not its subject.** Find the stories that can
+  be TOLD through such views (a layered world, one hero, something WAY far out for scale), the way Arcane's shots carry
+  stories that have nothing to do with a real city: the world can be invented or a metaphor (v1's town of websites, the
+  best performer so far), and a real city is one option, never the requirement. The owner's examples are v1 and v2
+  (the look they like; its story was the weak part). Which stories fit is studied in
+  `docs/studies/2026-10-28_city_posters/` (the content track; the live discussion is its `content_discussion.md`) before
+  it changes `docs/TOPIC_CRITERIA.md`. **The search is open to any subject, not only tech and AI: what people would
+  love to hear about** (the owner's seeds: history, news from cities, stories); **news from a real city is positive.**
+  Until the owner picks a direction, picks keep the tech/AI focus above. — ("I want us to see which type of content would be best fit into videos where we have more of cities /
   architectures / buildings / etc - so for example our very first video was the most successful so far and i
   personally like the last video about google i think the story wasn't quite good, but visually it was nice to be
   honest. Obviously still far away from what we could do to be very successful studio, but initial steps", 2026-10-28;
   then "Don't be fixated on tech or AI, all goes, the best kind of content that fits into this and people would love
   to hear about. Some of the ideas off the top of my head - some history videos? Some news that are happening in the
-  cities, but i want them to be possitive? Some stories? waht else ? Do proper brainstorm", 2026-10-28).
+  cities, but i want them to be possitive? Some stories? waht else ? Do proper brainstorm", 2026-10-28; then "okay so
+  in your content you are overfixating on the content around real cities, but im thinking more about what kind of
+  content would contain storytelling that is around these views. Like previously we discusesd arcane shots - they fit
+  within the same kind of category, its content and storytelling that is around these views but has nothing to do
+  wiht the actual cities", 2026-10-28).
 - **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
   frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
 - **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).
