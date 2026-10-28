@@ -9,8 +9,9 @@ world; small you, vast thing; above and below); and a proposal: each story on th
 Notes: `content_market.md` and `content_fit.md` (the orchestrator's content track, scoped to tech and AI) are folded in
 below; their final versions (pulled ~22:20 UTC) changed nothing here. `content_fit.md`'s best kinds already include two
 of the shapes ("the system drawn as a city" and "the hidden machine under the city", 7.76 each). The owner's ONE
-LOOK, ONE BRAND answer (`video/docs/look/poster_refs/README.md`; the playbook) backs the series format: every cover in
-one look. The orchestrator (2026-10-28 ~22:17 UTC): this file is the live record of the content discussion; a firm
+LOOK, ONE BRAND answer (`video/docs/look/poster_refs/README.md`; the playbook) backs the series format, as a
+direction the look grows into, never a locked template (owner, via the orchestrator ~22:21 UTC: "our look is evolving
+- we are finding out style i don't think we can overfixate on this"). Pip stays, hidden on purpose (same message). The orchestrator (2026-10-28 ~22:17 UTC): this file is the live record of the content discussion; a firm
 pick or direction goes in this State line.
 
 Run by the parallel thread (helper session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt), started by the
