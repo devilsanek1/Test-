@@ -15,11 +15,15 @@ import {CastShadow, ContactShadow, FormShade, ShadowLayer} from '../../lib/light
 import {Batch, Paint, P, ovalPath} from '../kit/canal/core';
 import type {Pt} from '../kit/canal/core';
 import {S3_CAM, onPlane, planeBatch} from './V2S3_depth';
+import {PLANTER_WOOD} from './V2S2_Near';
 
 const cam = S3_CAM;
-/** The near iron (the bench's end frames, the bollard): a mid plum, dark but never near-black (her plum silhouette is
- *  the darkest, clearest shape in the frame). */
-const IRON = CM.coatPlum;
+/** The near iron (bench ends, bollard): a warm slate (L2's near tyres), never plum: her plum silhouette stays the frame's
+ *  darkest, and the near things never its darkest mass. */
+const IRON = '#7E7387';
+/** The mooring bollard: the same slate, deep (a cast-iron post reads dark; its dome stands in front of the boat's plum
+ *  stripe, which it meets at one value, never as a light notch). */
+const BOLLARD_IRON = '#4A4656';
 const PLANE = -2;
 
 /** The bench (metres): its long axis along the canal, its back toward us; x from -2.0 to -0.2 m, the back legs at
@@ -57,8 +61,9 @@ function roundPoly(pts: Pt[], d = 6): string {
 function benchBatch(): Batch {
   const b = new Batch();
   const {x0, x1, zBack, zFront, seat, back0, back1} = BENCH;
-  const wood = CM.line;
-  const woodLit = seamTone(CM.line, -8);
+  // the slats: L2's mid wood (S2's planter on the same towpath), never the darkest mass
+  const wood = PLANTER_WOOD;
+  const woodLit = seamTone(PLANTER_WOOD, -8);
   // the seat (its planks, seen in the gaps between the back slats: the far edge one step lighter, it faces the sky)
   b.poly(woodLit, [pt(x0 + 0.04, zFront, seat), pt(x1 - 0.04, zFront, seat), pt(x1 - 0.04, zBack, seat), pt(x0 + 0.04, zBack, seat)]);
   b.layer();
@@ -105,7 +110,7 @@ export const bollardNeck = (): Pt => {
 
 function bollardBatch(): Batch {
   const b = new Batch();
-  b.fill(IRON, bollardD());
+  b.fill(BOLLARD_IRON, bollardD());
   return planeBatch(b, PLANE);
 }
 

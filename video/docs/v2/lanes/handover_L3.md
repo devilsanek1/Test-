@@ -1,3 +1,85 @@
+# S3 art conform (2026-10-28, session_014PwCXJs9nWENkpKqVhHWMP; brief `context/workflows/v2r-l3-s3-art-brief.md`)
+**State:** V2S3 "Her window" (film 12.98-14.86) brought to the approved look per conform_L3 §1, §3, §4, §6. All code is in
+`src/v2r/scenes/V2S3*` + the S3_SUNSET / S3_AIR append in `world/skies.ts` + the new sheet `scripts/qa/depth_sheets/v2_s3.json`.
+No agent running. Stills: `/tmp/claude-0/-home-user-Test-/6f98c33a-2c7f-5355-893a-0f8c4c5abcb3/scratchpad/s3art/` (session-local).
+
+**What changed, per step**
+1. Sky: `S3_SUNSET = eveningSky({band: CM.sky, horizon: SUNSET_HORIZON, horizonY: 700, sun: {x: 96, y: 687, rx: 200, ry: 60}})`,
+   `S3_AIR = horizonColor(S3_SUNSET, 96)` (#FCBF9B), drawn with `<Sky>` as the bottom layer (no float); SUN3 (96, 652) r 46 a flat
+   disc, no halo, in the west gap.
+2. Planes and air (`V2S3_depth.ts`): one atmosphere `S3_ATM` (air S3_AIR), one camera `S3_CAM` = groundCam(horizon 1150, VP x 540);
+   `planeBatch` (far planes: planePalette, ink dropped; near: nearStep). +2 far city (a plain gasholder drum, far rows tone-on-tone),
+   +1 roofs/chimneys in the west gap (planePalette, three gables, one stack, a slate ground-floor band), 0 the terrace, -0.6 the
+   canal, -1 our boat (+ the water under it), -2 our towpath and its things.
+3. Light (RIG_CANAL): her `LitWindow` (pane PANE_LIT) + `HerSpill` (a screen lift, one step, held to her window box: a spill on the
+   wall failed check_light's light-shape rule); the terrace's casts and forms through `S3TerraceShades` (ShadowLayer + Shade +
+   FormShade, no hand-picked shade fills; `V2S3_light.tsx`); contact + cast shadows for the bench, bollards, bin, lamp, terrace feet,
+   the walker, the boat's roof things; no contact strip on water (the post's waterline is the water's own deeper step).
+4. Tiers / life / foreground: A = her window + silhouette (the only full outline, INK_PX.mid; her plum the darkest); B = Pip and the
+   two lit neighbours (watering, kettle steam); C = the rest (environment: flat, no lines). Movers: the watering neighbour, ONE far
+   walker (128 px, profile, heading west, unlined), the boat's smoke (+ B's kettle steam, the festoon's single twinkles). Cut: the
+   cyclist, extra walkers, the train, duck/heron motion, robin, pigeons, birds, the boat passer-by; herbs, curtains, fenders static.
+   Foreground: bench + bag (L2's mid wood `PLANTER_WOOD`, warm-slate irons: never plum, never the darkest mass), bollard + rope
+   (a deep slate bollard), flat leaves on the slabs, L2's near lamp held exactly (copied from `S2_NEAR_LAMP`:
+   x 1030, w 30, foot 1990, neckY 790, collar y 1640 h 30, authored nearStep(CM.line, -2) #7E3E26, tier C #8F553F on screen; edges
+   identical at 12.95 / 12.98 on every sampled row).
+5. Her window (`V2S3_tHer.tsx`): S8's design at M (335, 785) 132.5 x 164.3: blind up from the first frame, the stile only from the
+   transom (62 % down) to the bottom, the fanlight undivided where her head sits, the silhouette between room and front, the frame
+   band straight in the brick (the architrave and hood removed: they ringed the pane in a light band; pane separation now 32.4).
+6. Line marks: the hand marks deleted (brick ticks, rustication, dentils); thin darks lifted to mid tones (room wood, stack pots,
+   dormers, a stone plinth under every house, S3_IRON for iron, the garden gate, a sage door for house 3, the boat pole, a blue-grey
+   gas bottle, the heron's post, the festoon wire); the bench irons rounded; the roof's near rail kept out of the roof things'
+   shadows; the far walker drawn with `ink={0}`: strokes 276 -> 80 / Mpx, near-miss ends 1325 -> 126 / Mpx.
+7. Water: ONE isolated flat placeholder, `V2S3_water.tsx` (no styling spent; S1's water not copied): every number in the exported
+   `S3_WATER` (canal + sliver regions, edges, what stands in it, what it mirrors, the glitter path, camera, air). The swap to
+   lib/water is one line: the body of `S3Water` becomes the lib call with `S3_WATER`. The glints are a separate Particles field.
+8. Particles (`V2S3_particles.tsx`, presets as they are): glints 26-36 px in the glitter path; two palmate leaves 34-40 px across
+   her towpath and over the canal (born 12.20 / 13.30: no entrance in 12.78-13.18 or 14.66-15.06); far motes 8-10 px x 4 beside her
+   window; near motes (nearSize) x 3 before our hull's shade; <= 15 alive (11 at 13.5); joins [12.98, 14.86]; clear of the
+   caption band, her window and Pip.
+
+**Checks (13.5 full size unless named)**
+- check_light (A/B, --subject 259,693,411,874 --sky '#BCDCCF' --exclude 0,0,1080,700): **OK**: brightest 5 % (L* >= 85.9) centred
+  (572, 965), 0.096 H from the subject (<= 0.15); shadow px 4.1 % (anchor-dark 0); caption band dL* 0.0; light shapes 0.
+- check_depth (v2_s3.json): **0 FAIL, 3 WARN**: subject plane -> +1 dE 21.9 OK; her pane |dL*| 32.4 OK; her silhouette 68.3 OK; west
+  end wall 19.4 / one value 5 % OK. WARN: +2 contrast 4.5 = 0.59x the subject's (<= 0.5x); our boat's roof edge on the canal |dL*|
+  11.2 (>= 12); the towpath texture 1.5 crossings / 100 px far vs 2.9 near.
+- check_banding: **PASS** on the open sky 0,0,1080,595 (band 290-595 dL* 1.12; visible 0, max step dL* 0.05, grain 0.21) and on the
+  west gap 0,0,160,640.
+- skyProblems [], particleProblems [] (joins [12.98, 14.86]), floatProblems []. tsc clean.
+- measure.py (caption band 290-600 masked): strokes **80 / Mpx** (<= 80: PASS, at the limit; 140 components), dark-line **0.37 %**
+  (<= 3 %: PASS), near-miss ends **126 / Mpx (FAIL, <= 40)**. The near-miss pairs by place: her window 66 (S8's Juliet rail
+  crossing the transom and ending in the box planting, tier A), the gunwale 49 (the fenders cut the plum stripe: corner artefacts),
+  the upper terrace 36 (B's watering neighbour, house 3's balcony), the canal 30 (the stove chimney's cap and collar, the heron),
+  the boat roof 15, the ground floor 10, her towpath 8, the cabin 6.
+- Eye check (0.25 contact sheet 12.95 / 12.98 / 13.00 / 13.5 / 14.2 / 14.65 / 14.71): M and Pip on the same spot across the cut, the
+  squint (`final/sheet/squint_13.5.png`): her window is the middle's focal dark, framed by the hull's plum stripe and L2's lamp
+  (the near bench calmed to a mid wood); <= 3 movers, no stranger's back, the particles seen at 360 px (glints and the leaf at
+  once; the motes small but pointable).
+
+**Stills** (under `.../scratchpad/s3art/`): `final/on/f00810.png` (13.5), `final/on/f00852.png` (14.2), `final/off/f00810.png`
+(lights off), `final/light_map.png`, `final/sheet/s3_contact_025.png`, `final/sheet/cut_m_pip.png`, `final/phone/f00810.png`
+(360 px), `final/phone/s3_13.5_360_rings.png`, `final/phone/s3_13.5_360_zoom.png`, `final/sheet/squint_13.5.png`,
+`checks/line/linevis.png` (the line mask).
+
+**Open**
+- near-miss ends 126 / Mpx (FAIL vs <= 40): the rest is tier A's rail (S8's design), tier B's lines and measure.py's corner
+  artefact (a convex corner of a dark fill, e.g. a fender over the stripe, counts as a stroke); not reachable without changing S8's
+  window or S4's boat.
+- the depth WARNs above; the S3 camera's horizon (1150) sits below the far coping (a stylised elevation; the glints take an apparent
+  horizon at y 900 so the far sparkles stay >= 20 px).
+
+**REQUESTS**
+- REQUEST L6: S8Window's stile from the transom down only and its fanlight undivided (S3's window has it, per conform_L3 §1), so the
+  window matches at the S8 match.
+- REQUEST orchestrator (lib/water): S3's swap is the body of `S3Water` in `V2S3_water.tsx` (spec `S3_WATER`); the glints' `on`
+  colour is `S3_WATER.glitter.on`: set it to the new water's colour under the glitter path when lib/water lands.
+- REQUEST qa (measure.py): count a convex corner of a dark fill as no stroke (or report it apart); today a fender over a stripe or a
+  foot in its contact shadow adds strokes and near-miss pairs.
+- REQUEST L2: S3 holds the near lamp by importing `S2_NEAR_LAMP` and copying its path (and takes its bench wood from
+  `PLANTER_WOOD`); keep both exported, and a change to the lamp's path or colour needs the same change in `V2S3_nground.tsx`
+  (`nearLampBatch`).
+
 # >>> Paused 22:40 UTC for the depth pass (third session, session_014PwCXJs9nWENkpKqVhHWMP) <<<
 **State:** resumed 22:16 on the orchestrator's conform message; read DIRECTION.md, CRAFT.md §a-§d, THROUGHLINE.md, `conform_L3.md`
 (wins over everything below), `src/lib/LIGHT.md`, `src/lib/tier.tsx`, the kit READMEs' "Tiers", `world/rigs.ts`, map.ts S3/S4 (the

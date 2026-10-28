@@ -41,7 +41,8 @@ export const HOUSES: House[] = [
 ];
 
 const F = MAP.W2_CUT;
-/** Her French window's outer frame + stone architrave (kept clear of dressing: the calm ring). */
+/** Her French window's opening (its frame band straight in the brick: no architrave; kept clear of dressing: the calm
+ *  ring). */
 export const HER_OPENING = {x0: F.x - F.w / 2, y0: F.y - F.h / 2, x1: F.x + F.w / 2, y1: F.y + F.h / 2} as const;
 
 // ---------------------------------------------------------------- windows and doors
