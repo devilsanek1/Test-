@@ -6,7 +6,7 @@
   {"s":8.44,"e":10.1,"lines":[{"text":"But Google's staff","s":8.44},{"text":"told the BBC","s":9.24}],"highlights":[{"text":"staff","s":8.96}]},
   {"s":10.1,"e":11.57,"lines":[{"text":"they're scared","s":10.1},{"text":"to speak out,","s":10.68}],"highlights":[{"text":"scared","s":10.36}]},
   {"s":11.57,"e":13.16,"lines":[{"text":"because of their","s":11.57},{"text":"contracts.","s":12.2}],"highlights":[{"text":"contracts","s":12.2}]},
-  {"s":13.16,"e":15.07,"lines":[{"text":"So why is she","s":13.16},{"text":"talking?","s":14.28}],"highlights":[{"text":"she","s":13.96}]},
+  {"s":13.16,"e":14.64,"lines":[{"text":"So why is she","s":13.16},{"text":"talking?","s":14.28}],"highlights":[{"text":"she","s":13.96}],"out":14.64},
   {"s":15.07,"e":16.67,"lines":[{"text":"She worked on","s":15.07},{"text":"Google's AI","s":15.64}],"highlights":[{"text":"AI","s":16.12}]},
   {"s":16.67,"e":18.45,"lines":[{"text":"and told the BBC","s":16.67},{"text":"she objected","s":17.72}],"highlights":[{"text":"objected","s":17.96}]},
   {"s":18.45,"e":19.64,"lines":[{"text":"to where its","s":18.45},{"text":"military work","s":18.92}],"highlights":[{"text":"military","s":18.92}]},
