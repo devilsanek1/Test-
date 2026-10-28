@@ -1,0 +1,21 @@
+TIME | A | TIME world October 2026 | 10 | 2 | 2 magazine-issue index pages, 1 section page (before the 2 kept); 5 not taken (cap of 2)
+TIME | A | TIME US and politics October 2026 | 10 | 2 | 1 section page (before the 2 kept); 7 not taken (cap of 2)
+TIME | A | TIME business and economy October 2026 | 10 | 2 | 1 section page, 1 tag page (before the 2 kept); 6 not taken (cap of 2)
+TIME | A | TIME technology and AI October 2026 | 10 | 2 | 1 tag page (before the 2 kept); 7 not taken (cap of 2)
+TIME | A | TIME science October 2026 | 10 | 2 | 2 magazine-issue index pages, 1 RSS feed page, 1 hub page (Best Inventions), 1 methodology page (How We Chose the Best Inventions of 2026), 1 section page (before/between the 2 kept); 2 not taken (cap of 2)
+TIME | lookup | "How a Fake Pollster May Have Hurt Real Candidates" Wedgewood polls | 10 | 0 | headline lookup for the summary of the science query's 2nd row (the rundown did not describe it)
+TIME | A | TIME health October 2026 | 10 | 2 | 1 section page, 1 tag page, 1 magazine-issue page (before/between the 2 kept); 5 not taken (cap of 2)
+TIME | A | TIME climate and environment October 2026 | 10 | 2 | 1 section page (between the 2 kept); 7 not taken (cap of 2)
+TIME | A | TIME culture, arts and entertainment October 2026 | 10 | 2 | 1 section page (before the 2 kept); 7 not taken (cap of 2)
+TIME | lookup | "Four Hands, Two Sonatas" ending explained | 2 | 0 | headline lookup for the summary of the culture query's 2nd row (the rundown gave only its title)
+TIME | A | TIME travel and lifestyle October 2026 | 10 | 0 | query dropped from the sample: TIME runs no current travel or lifestyle section (no section page returned; confirmed by the section check below); its 2 first in-window articles (a Trump interview, a Disney essay) not used
+TIME | lookup | TIME travel section lifestyle section | 10 | 0 | section check: only a lifestyle tag page (newest entries 2019) and an old Living-section sitemap; no current travel or lifestyle section
+TIME | A | TIME history October 2026 | 10 | 2 | 1 index page (Vault covers), 1 magazine-issue page, 1 exact duplicate (Houthis explainer, already C1-002) before the 2 kept; 5 not taken (cap of 2); no history-section article among the 10
+TIME | A | TIME sport October 2026 | 9 | 2 | 2 out of window (TIME100 Sports profiles, dated June 2026 or earlier), 1 sponsored partner-content page (before/between the 2 kept); 4 not taken (cap of 2)
+TIME | lookup | "Co-Writing 'Being Heumann' Still Taught Me So Much" | 10 | 0 | headline lookup for the summary of the sport query's 2nd row (the rundown did not describe it)
+TIME | B | TIME city October 2026 | 10 | 2 | 1 exact duplicate (Houthis, C1-002), 1 magazine-issue page (between the 2 kept); 6 not taken (cap of 2); both kept rows are off-theme (no city story among the 10)
+TIME | B | TIME storm, flood, wildfire or earthquake October 2026 | 10 | 1 | standard mode: 1 exact duplicate (Mbappé, C1-019), 7 out of window (Jul-Sep 2026 disaster pieces), 1 no date seen (old numeric URL); thin (1 in-window article, off-theme), so topped up from the extended run below
+TIME | B | TIME storm, flood, wildfire or earthquake October 2026 | 10 | 1 | extended mode (top-up of 1 for the thin standard run): the first in-window article taken; 9 not taken
+TIME | B | TIME sky or space October 2026 | 10 | 2 | 1 out of window (6 Space Stories To Watch in 2026, a January-era preview per the result), 1 no date seen (Planetary Parade, old numeric URL), 1 out of window (solar storm piece, months earlier per the result) before the 2 kept; 5 not taken (cap of 2); dates of the 2 kept from the lookups below
+TIME | lookup | "Pawan Kumar Chandana Is on the 2026 TIME100 Next" | 10 | 0 | date lookup for the sky query's 1st row (result: dated September 30, 2026)
+TIME | lookup | "Skye Duncan Is on the 2026 TIME100 Next" | 10 | 0 | date and summary lookup for the sky query's 2nd row (result: dated September 30, 2026)
