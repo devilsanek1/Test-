@@ -335,7 +335,8 @@ const rd = (x: number, y: number, w: number, h: number) => `M${f1(x)} ${f1(y)}h$
 
 /** The data center's sign: lit (its beats: the cold light panel, ink letters) or calm (a panel one step over the hazed
  *  facade, letters a calm step over it: it still reads at full size, never the frame's brightest cold light). */
-const SIGN_LIT = {panel: EMBER.led, text: EMBER.ink};
+/** Lit: the frame's brightest cold light (a light box, L* ~92: CRAFT §d.2's 85-92 for lit panes and bulbs). */
+const SIGN_LIT = {panel: '#E2EAFF', text: EMBER.ink};
 const SIGN_CALM = {panel: '#5F6782', text: '#8D95AE'};
 /** The server rows' bands: the clean pen's soft rows on the beat; one value over the body when calm (before the haze). */
 const DC_LED = '#A8B6DE';
@@ -352,12 +353,9 @@ const HallBCalm: React.FC = () => {
     .join('');
   return (
     <Haze k={HALLB_K} color={FAR_AIR}>
-      {units.map((ux, i) => (
-        <React.Fragment key={i}>
-          <path d={rd(ux, top - 11, 26, 12)} fill={EMBER.dcSide} />
-          <path d={rd(ux - 1.5, top - 13, 29, 3)} fill={T9.infLight} />
-        </React.Fragment>
-      ))}
+      {/* the roof units in the body's own value (one silhouette with the hall, never a row of dark dashes on the sky) */}
+      <path d={units.map((ux) => rd(ux, top - 11, 26, 12)).join('')} fill={T9.hallB} />
+      <path d={units.map((ux) => rd(ux - 1.5, top - 13, 29, 3)).join('')} fill={T9.infLight} />
       <path d={rd(x0, top, x1 - x0, base - top)} fill={T9.hallB} />
       <path d={rd(x0, top, 14, base - top)} fill={mixHex(T9.hallB, '#1C2036', 0.5)} />
       <path d={rd(x0 - 2, top - 3, x1 - x0 + 4, 4)} fill={T9.infLight} />
@@ -367,23 +365,21 @@ const HallBCalm: React.FC = () => {
   );
 };
 
-/** The hall's roof: S9's run of 7 fan units (18 px fans on 44), still: no spinning blade ticks (S9 px). */
+/** The hall's roof: S9's run of 7 fan units, still (no spinning blade ticks, no dark fan discs): boxes in the hall's
+ *  own dark value under their snow lids, so the roof reads as one silhouette with snow caps (S9 px). */
 const HallFansCalm: React.FC = () => {
   let box = '';
   let lid = '';
-  let disc = '';
   for (let i = 0; i < 7; i++) {
     const cx = HALL.x - 132 + i * 44;
     const y = HALL_ROOF;
     box += rd(cx - 15, y - 15, 30, 16);
     lid += rd(cx - 16.5, y - 17.5, 33, 3.5);
-    disc += ellD(cx, y - 8, 9, 4.2);
   }
   return (
     <>
-      <path d={box} fill={EMBER.dcSide} />
+      <path d={box} fill={EMBER.dcDark} />
       <path d={lid} fill={EMBER.snow} />
-      <path d={disc} fill={EMBER.dcDark} />
     </>
   );
 };
@@ -798,7 +794,8 @@ export const OutsideStreet: React.FC = () => {
           {/* the factory's wall (warm brick) with its snow cap; the gate's lit yard: a stack of crates inside */}
           <path d={rrect(W.x0, W.y0, W.x1 - W.x0, W.y1 - W.y0 + 4, 3)} fill={EMBER.brick} />
           <path d={rrect(W.x0 - 4, W.y0 - 6, W.x1 - W.x0 + 8, 9, 4)} fill={EMBER.snow} />
-          <path d={`M${W.x0} ${W.y0 + 34}H${W.x1}V${W.y0 + 37}H${W.x0}ZM${W.x0} ${W.y0 + 64}H${W.x1}V${W.y0 + 67}H${W.x0}Z`} fill={EMBER.brickShade} />
+          {/* two string courses: long same-hue bands a calm step under the brick (CRAFT §c: dL* <= ~6), never dark lines */}
+          <path d={`M${W.x0} ${W.y0 + 34}H${W.x1}V${W.y0 + 37}H${W.x0}ZM${W.x0} ${W.y0 + 64}H${W.x1}V${W.y0 + 67}H${W.x0}Z`} fill={mixHex(EMBER.brickShade, EMBER.brick, 0.45)} />
           <path d={rrect(G.x0, G.y0, G.x1 - G.x0, G.y1 - G.y0 + 2, 4)} fill={off ? EMBER.houseLit : mixK(GATE_LIT, GATE_CALM, calm)} />
           <path d={rrect(G.x0 + 16, G.y0 + 34, 40, 38, 2) + rrect(G.x0 + 60, G.y0 + 44, 36, 28, 2)} fill={'#C98A64'} />
           <path d={rrect(G.x0 + 22, G.y0 + 28, 30, 8, 2) + rrect(G.x0 + 64, G.y0 + 38, 28, 8, 2)} fill={EMBER.board} />
