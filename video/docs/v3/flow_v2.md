@@ -10,8 +10,8 @@ cuts in 6 places -> 0 in 2 + 1 reveal; tag gone 17.9 s -> on 91 %; "you" five wa
   camera). On 0-19.2 and 22.45-41.15 (91 %); off only in the declared scale reveal (it leaves from the stick that rose out of the
   tag's laptop; J4 brings it back). $999 -> $1,015 / $1,031 / $1,047 / $1,063 / **$1,079** on O1's launches 1.88 / 2.18 / 2.40 /
   2.60 / 2.72 ("$999" struck from 1.92) -> **$1,099 on "pass" 30.28** (ding). Reactions: the tap 0.50, jolt 15.30, tug 18.30,
-  sway 24.44, tick 30.28, jolt 35.95, turn 39.70; "$999" again in the loop. OFF ITS BEATS the tag is tier B (SQA pilot review: a
-  soft terracotta, no outline, the prices in its light tint; full only 0-4.04, 15.30-15.90, 17.24-18.60, 24.44-25.04,
+  sway 24.95 (after the DC truck's drive, in the voice's pause), tick 30.28, jolt 35.95, turn 39.70; "$999" again in the loop. OFF ITS BEATS the tag is tier B (SQA pilot review: a
+  soft terracotta, no outline, the prices in its light tint; full only 0-4.04, 15.30-15.90, 17.24-18.60, 24.95-25.25,
   29.90-31.00, 35.95-36.98, 38.12-41.15, each switch a 2-step change; `thread_plane.tsx` TAG_FULL). Each window opens ON its
   reaction, never 0.6 s before it: earlier it would put the tag at full strength on the stage's own beats ("+9.7%" 14.74, the
   barrier 24.20) and inside J5's 0.4 s. The tug's window ends at 18.60 (the tug's first swing; the step hides in the stick's fast
@@ -25,7 +25,7 @@ cuts in 6 places -> 0 in 2 + 1 reveal; tag gone 17.9 s -> on 91 %; "you" five wa
   lit gate. **YOU = one right hand** (rust sleeve) on the phone; no figure of you, no strangers' backs.
 - **PIP rides the phone**, clinging to its right edge (phone-local x 370-480, y 110-260 at w 400; <= 1 % of the frame, C* <= 25,
   same-hue ~2 px line): blinks and ears while a subject acts, head turns only in pauses >= 0.4 s from a join (1.20-1.67,
-  9.02-9.42, 11.11-11.58, 30.95-31.42, 33.11-33.49), ears droop 10.92, shrug 40.30; home with the tag in the reveal.
+  9.02-9.42, 11.11-11.58, 30.95-31.42, 33.11-33.49), ears droop 10.92, shrug 40.40-40.55 in its side pose (no frontal swap; still before the loop's travel); home with the tag in the reveal.
 - **Joins:** J1 C 5.80 · J2 C 16.60 · J3 A 19.40 · J4 A 22.68 · loop (midpoints on the first word, in the pause); 0 plain cuts.
 
 ## 2. Sequences = scenes.json rows (60 fps; frame = ceil(t x 60); every shared piece runs on FILM time)
@@ -47,15 +47,17 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
   2-3 flat notes on the wall right of the window (O1's calendar leaves it). The camera is LOCKED through the hook (SQA pilot
   review: O1's 1.05 -> 1.00 pull-out was a zoom in a hold, DIRECTION rule 8); J1 pans x 0 -> -775 over 5.15-6.45, J2 back over
   15.95-17.25 (inOutCubic, peak 14.9 px/f; room and outside together); the SQB hold floats as a PARALLAX float (DIRECTION rule
-  8: the room +-10 x 8 px, the window view `FAR_FLOAT_K` 0.25 of it; home at 6.45 and back home by 15.95). After the hook the
+  8: the room +-10 x 8 px, the window view `FAR_FLOAT_K` 0.25 of it; home at 6.45 and back home by 15.95); it RESTS while the line draws: locked 6.45-9.30 (`SQB_FLOAT_FROM`), then eased in over
+  0.8 s (no velocity step). The window's woodwork (frame, mullion, latch, one kit `Haze` step toward the glass's dusk), the attic's
+  beams, the far roofs' caps, the houses and the desk's two darks settle with the strip, one smooth 0.45 s step as J1's pan lands
+  (`STRIP_CALM` 6.20-6.65; the data center keeps 6.35-6.95). After the hook the
   window view sits back (early review E8; `HOOK_CALM_AT` 6.35, when J1's pan has carried the data center out of frame, so SQA
   stays the pilot; one smooth 0.6 s settle to 6.95, never a switch): the data center tier C (one haze step, its sign a calm
   panel in outside.tsx's values: one data center from both windows), the houses one plane step toward the far snow plus one
   light haze step; in the same settle the desk's two darks beside the card, the mug (its coffee L* ~27) and the pen cup, take
   one light haze step toward the wall (k 0.25: in SQB they held 15-20 % of the frame's top salience). SQB's own corner (E12; only its framing sees
-  H1 x > ~1480): a short run of string lights on the slope right of the skylight (one bulb steps ~every 1.5 s), snow drifting
-  past the skylight (from J1's seam on, each flake sliding in from the pane's top: J1's pan shows the pane in SQA's last
-  0.15 s, which keeps the pilot's frames; kit `Snowfall` `enterAt`), a teacup (`TEACUP`, SQB's steam reads it) and a pencil on
+  H1 x > ~1480): a short run of string lights on the slope right of the skylight (one bulb steps ~every 1.5 s), snow drifting past the skylight (5 scheduled 10-14 px flakes, `SKY_FLAKES`, entering from 9.0, the first in view 9.6, each
+  sliding in from under the pane's top: none while the line draws, none on the band's pop), a teacup (`TEACUP`, SQB's steam reads it) and a pencil on
   the desk's lower right.
 - **`scenes/thread_plane.tsx`** (transition agent; from O1's front plane): hand, phone, listing, tag, Pip, ticker; the screen dims a
   step toward peach when the stage leads (lit 0-4.04, 17.24-18.30: it dims as THE stick leaves it, #9; 29.90-31.00,
@@ -79,7 +81,7 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
   blink; its sign a calm step over the facade) and A on them (19.40-21.60, 36.98-38.70: dark, the sign lit on top, its outline);
   the mountain (PeakPile) summit (800, 640) behind its right side, past the right edge; town 930-1040 (walls half way into the far
   snow, caps one pale step) with a road from our street (x ~300) up to the DC; street 1040-1250: factory wall x 330-950 (y
-  1000-1090; a soft warm brick), lit gate opening x 480-640 spilling down to the floodlight pool (560, 1200) rx 230 ry 55, booth on
+  1000-1090; a soft warm brick, `WALL_BRICK` L* 65, C* 28, its cap a 6 px lid at L* ~84.5), lit gate opening x 480-640 spilling down to the floodlight pool (560, 1200) rx 230 ry 55, booth on
   its left, notice board x 680-880 (y 1010-1150), waiting lane x 720-940 (y 1140-1240), the road-mouth lamp (232) with its own
   pool; sill 1250-1292; flat frost on the glass's side edges below y 620. The snow is the street rig's sky-facing cap (`H2_SNOW`,
   L* 89: caps, lids, flakes, the vans' roofs; never the palette's lit 93), the booth's cream in the dusk ambient, our pavement and
@@ -98,7 +100,7 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
 - **SQB OLD DEAL.** The card (paper, unlit) at screen x 200-940, y 612-1028, ~150 px of night window at the left edge: "US computer
   prices" 58 px, "same computing power" 34 px, axes, 2005, 2025. 6.98-9.28 the line draws downhill (2021 bump); 10.32-10.50 a
   doodle laptop with "$999" drops onto it (~2010), landing on "buy"; 10.82 a shinier, bigger BETTER one, the same "$999", pops
-  right after (~2015); 11.80 the line's end dot pops once ("this past year"); 13.85-14.45 the line hooks UP (hero); 14.74
+  right after (~2015); 11.80 the line's end dot pops once and the past year's soft band pops in with it ("this past year": the hook's stage); 13.85-14.45 the line hooks UP (hero); 14.74
   "+9.7%" (~110 px) pops alone and, in the same frame, the doodles step back to tier B (one event: a soft terracotta, no
   outline, pale screens; the falling line stays the hero); 15.05 "US computers · Sept 2026 vs a year earlier (BLS)" (24 px);
   15.30 tag jolt.
@@ -109,10 +111,11 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
   (their tops tucked behind its bottom edge: gold under it at every zoom, never a strip of sky); its neighbours are kit-shaped
   MemorySticks at H2 size (~26 px); THE stick is 30 px at H2 rest (`SQD_peak` `SUMMIT_W`: >= ~30 so it reads on the summit at
   phone size), so x23 shows real chips (never hay). The pile reads as memory while it is big on screen and
-  calms as it shrinks (final pass, E5): the crest's sticks in THE stick's own gold one value under it, pins, four warm dark
-  chips 20 L* under the board while a crest stick is >= 120 px on screen (**the reveal's declared exception** to CRAFT §c's
-  dL* 15), pale to tier C (11 L*) by 50 px (~20.8-21.2, inside the move's fastest stretch), chips pale further out, the lower
-  pile flat boards with a soft lit top; so the hold, SQE and SQF see the calm pile. ONE pull-back on the S5 ease (155 f,
+  calms as it shrinks (final pass, E5): the crest's sticks in THE stick's own gold one value under it;
+  chips (L* 27) and a 12-pin comb (L* 86) on the crest's 8 sticks only, near level (**the reveal's declared exception** to CRAFT
+  §c's dL* 15, while a crest stick is big on screen); the rows flat gold boards (a pin band near the summit); all detail converges
+  to three flat values (lit slope, gold, form shade) by 39 px (~20.8-21.45, inside the move's fastest stretch); at rest the +3 air
+  step, half on the pile's beat, full from 23.10; so the hold, SQE and SQF see the calm pile. ONE pull-back on the S5 ease (155 f,
   19.40-21.98) to just outside our window: the far plane starts x23.3 (`planeMat` {o: the summit in H2 px, off: (540, 870) - o,
   k: K0 = 700 / SUMMIT_W}), town planes rise from the bottom, our street last; the DC's lit sign in frame by ~21.0 (whole DC by
   ~21.35; orchestrator, 2026-10-27: the S5 move cannot bring it in earlier), the whole mountain by 21.32, thoom 21.72 (p 0.985);
@@ -125,7 +128,8 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
   full size): the far plane 42 px/f as the DC's right edge enters (20.92), the town 22, the street 30 (mostly under the frame):
   clean spacing, no repeating high-contrast pattern near the step (the lower pile is flat): not softened.
 - **SQE FIRST DIBS.** 23.10 the gate comes up (one step: the pool warms, the truck takes its outline); 23.10-24.20 crates of gold
-  sticks go into a DC truck in the gate's pool (two line-only workers); 24.20 the barrier lifts, 24.30-24.95 it drives up the road
+  sticks go into a DC truck in the gate's pool (two line-only workers; after it they load truck B only during 26.22-28.46, between the queue's beats, and idle at the gate's
+  mouth through the pull-up, the hop and the BETTER van); 24.20 the barrier lifts, 24.30-24.95 it drives up the road
   as a second rolls in (waiting trucks sit back one haze step: tier B); the van waits unlit. ONE push x1.35 about (680, 1120)
   24.90-25.70 (flow §7's read fallback), HELD through the queue (early review E4, OPEN 6) to SQF; the queue is laid out inside the
   pushed frame (right of the phone and Pip, left of the right rail); 25.72-26.20 the van rolls into the pool (lit at last), ONE
@@ -134,15 +138,18 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
   the van behind shuffles up (the pause after "price."); 29.20-29.85 the van pulls up at the near kerb (x 565); 29.85-30.29 its
   crate hops over the sill into the listing laptop (D carry), growing to ~120 px at mid-arc as it comes toward the glass and
   shrinking into the lit screen (threadAt(T).listingScreen); 30.28 the ding, $1,099; the van leaves left as the van behind moves
-  up into the pool (30.55-31.15); 31.40-32.84 a van with the BETTER laptop decal joins the queue at the lane's head; 33.50 the
+  up into the pool (30.55-31.15); 31.40-32.84 a van with the BETTER laptop decal joins the queue at the lane's head (its beat, the outline and pill, ends at 33.40,
+  the end of "one.", a 2-step); 33.50 the
   loaded truck leaves left along the street (behind the phone); 34.60 the notice flips to "2027" (84 px) + "Micron: supply
-  'much tighter' in 2027 and 2028 than in 2026" (22 px), full until 35.85; 35.22-36.25 two DC trucks overtake the BETTER van
-  along the near kerb and nudge it back (35.62), one taking the gate, one stopping in front of the pool; 35.95 the tag jolts.
-- **SQF PAYOFF.** 36.36-36.98 nothing new: the push releases (J5's continuous camera); 36.98 the DC's sign LIGHTS (drawn on top of
-  the hall), its rows go dark and light one per syllable of "an AI data center" (37.00-37.80: the hook's 4.04 beat rhymed), in the
+  'much tighter' in 2027 and 2028 than in 2026" (22 px), full until 35.85; 34.95-35.93 two DC trucks overtake the BETTER van along the near kerb and
+  nudge it back (35.38), one taking the gate, one stopping in front of the pool, every outline off by 35.95 (the overtake plays alone
+  and ends before the jolt, clear of J5's 0.4 s); 35.95 the tag jolts.
+- **SQF PAYOFF.** 36.36-36.98 nothing new: the push releases (J5's continuous camera); 36.98 the DC's sign LIGHTS (drawn on top of the hall) with the thoom (`Film3.tsx` `PAYOFF_THOOM`, gain 0.5), and its four rows,
+  bands across the facade drawn on top of the hall at the sign's lit value, light one per syllable of "an AI data center" (37.18 /
+  37.36 / 37.54 / 37.72: the hook's 4.04 beat rhymed), in the
   same frame the notice goes blank and the trucks sit back; nothing near the gate walks while it lights (the workers load from
   38.75; a small far car crosses slowly from 37.3); 38.12-38.62 the phone rises to PAYOFF (DC and mountain uncovered above it; the
-  DC back to tier C at 38.70); 39.70 the tag turns: the mini data center "AI" on its back; 39.88 like-pop; 40.30 Pip shrugs; the
+  DC back to tier C at 38.70); 39.70 the tag turns: the mini data center "AI" on its back; 39.88 like-pop; 40.40-40.55 Pip shrugs in its side pose; the
   loop: 40.55-40.85 the thread plane travels back to frame 0's spot (PAYOFF's inverse scale) as the tag turns to its front, "$999"
   again; 40.85-41.15 one `EraseDown` takes the window, the street and the plane's colour off over SQA's frame-0 lines in the same
   place; captions roll at 41.00 (ink from the roll).
@@ -153,7 +160,7 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
 | SQA | tag (each tick) -> DC 4.04 | sticks (small), hand, Pip | room, town, snow | nook; tag rim (left) while it ticks | "its price goes up each time a stick flies to the AI data center" |
 | SQB | line -> doodles -> hook, +9.7% | tag, Pip, dim phone | wall, notes, window strip | nook, lamp off left; card unlit; pins cast down-right | "the same money bought more for 20 years; now +9.7%" |
 | SQC | listing laptop -> stick | tag (A on its tug 18.30-18.60, then B: THE stick alone on "chips"), Pip, hand | room, DC calm, the desk's mug and pen cup one haze step | nook; the stick's warm rim (on its lamp side, left; CRAFT §d.8) | "your laptop runs on that stick" |
-| SQD | stick -> DC -> mountain | streams, 2 trucks on the road | town, clouds, birds, snow; the street plane calm (lifting across J4) | street; pile tops a step lighter, brightest on the crest THE stick lies on (the frame's brightest 5 % on the stick while it leads; from ~20.6, THE stick under ~150 px on "AI data centers", on the pile: check_light 20.8 OK with the pile as the subject, 0.08 H; with the 122 px stick alone 0.47 H, the town's caps under the pile, accepted by the assembly); its flank turned from the sky in form shade; cold rim on the summit stick (inside its outline, over it); the pile's rim on its silhouette while it is the subject (21.32-23.10) | "one of a mountain of sticks by the data center" |
+| SQD | stick -> DC -> mountain | streams, 2 trucks on the road | town, clouds, birds, snow; the street plane calm (lifting across J4) | street; pile tops a step lighter, brightest on the crest THE stick lies on (the frame's brightest 5 % on the stick while it leads; from ~20.6, THE stick under ~150 px on "AI data centers", on the pile: check_light 20.8 OK with the pile as the subject, 0.08 H; with the 122 px stick alone 0.47 H, the town's caps under the pile, accepted by the assembly); its flank turned from the sky in form shade; cold rim on the summit stick (inside its outline, over it); the pile's rim on its silhouette while it is the subject (21.32-23.10); the pile's detail: chips (L* 27) and a 12-pin comb (L* 86) on the crest's 8 sticks only, near level; the rows flat gold boards (a pin band near the summit); all detail converges to three flat values (lit slope, gold, form shade) by 39 px; at rest the +3 air step, half on the pile's beat, full from 23.10 | "one of a mountain of sticks by the data center" |
 | SQE | truck; van + crate; 5x; hop + tag; BETTER van; flip + trucks | waiting vans and trucks (one haze step), workers, guard, Pip, tag | street (a soft brick wall, pale caps), lamps, walker + dog, steam, town, DC (hazed, calm sign) | street + the gate's pool as THE light (two warm steps, its lit yard spilling down to it), the road-mouth lamp's small pool; van unlit until 25.72 | "their trucks first; one crate, 5x; your price up; the better one stuck; 2027 tighter" |
 | SQF | DC sign (lit, its rows one per syllable) -> tag | Pip | window view (the street calm) | nook on the tag: rim left, form shade right third | "the data center ends up on the price tag" |
 
@@ -190,7 +197,8 @@ upper-left, tops lit, contact only; the DC sign the brightest cold light; 16 px 
   the only full outline and >= 60 % of motion; <= 3-4 noticeable supporters; clean pen budgets; `check_light.py` per panel.
 - Risks: the summit close must read "a stick on a pile of sticks" (else start x18, more sky); the queue must read at phone size
   (the push x1.35, held through the queue to SQF); S9's end frame (tiny you on our roof) is gone: the anchor is our window.
-  Kit: Van `dc` (x1.4, dcSide, mini DC sign) and `better` (NEW laptop, "BETTER"); a 5x | 2027 notice on the Calendar flip; a
+  Kit: Van `dc` (x1.4, dcSide, mini DC sign) and `better` (the van's chassis with a Luton box
+  carrying the chart's BETTER pill over the NEW laptop, kit `BETTER_VAN`); a 5x | 2027 notice on the Calendar flip; a
   crate flight (StickFlight + StickCrate). Order: scenes.json rows + gate_check seams -> the SQA pilot (with `home_set`,
   `thread_plane`, J1's first half) -> lanes HOME (SQB, SQC), REVEAL (SQD), WINDOW (SQE, SQF; `outside` and `h2_window` first,
   REVEAL draws them in its last 0.6 s); one transition agent owns J1-J5 and the loop -> the full render and checks.
