@@ -158,6 +158,15 @@ Everything that agent knew is in this repo. This file is the map; the details li
   (booted from `v2r-helper-boot` with `/effort max`, working on this study's branch), discussing content directions
   with the owner; its notes: `content_discussion.md` in the study folder. The orchestrator messages it when
   `content_market.md` and `content_fit.md` are pushed; archive it when the owner closes the discussion.
+- **The journal-corpus thread (owner: "take a look at the stories posted by big journals recently. like forbest, times,
+  economist, etc for each story evalute if having our visual storytelling would actually be a good fit and then cluster
+  the stories and see if anything comes out of it ... refine it and go"):** helper session
+  https://claude.ai/code/session_01YGLGMqT2EoqkuUBVwxxRZE (booted with `/effort max`, ultracode on), on this study's
+  branch; output `journals/` in the study folder (the rubric, about 200-300 stories from the last 30 days, scores, a
+  blind second scorer on a sample, clusters, a chart, a summary). The environment's network policy denies the news
+  hosts and feeds (checked 2026-10-28 22:20 UTC: economist.com, time.com, forbes.com, nytimes, theguardian.com,
+  reuters.com, apnews.com, GDELT, Google News, wikipedia.org), so the corpus comes from web search results; the owner
+  can allow the hosts under the environment's Network access settings.
 - **The owner's answers (2026-10-28 ~22:10 UTC)** to our nine first observations are rules now where decided (one look,
   one brand; a VERY subtle texture to try; lit and shade faces; a full value range: DIRECTION intro and rules 3-6,
   CRAFT §c, PALETTE, the playbook) and open where not (outline-free edges: an A vs B picture; one consolidated layout

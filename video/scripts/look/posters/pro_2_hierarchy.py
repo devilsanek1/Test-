@@ -49,7 +49,7 @@ BOXES = {
     '02_reykjavik.jpg': [
         ('Hallgrimskirkja', 'A', [45, 398, 532, 1118]), ('Harpa', 'A', [592, 1002, 1140, 1233]),
         ('houses', 'B', [0, 1260, 930, 1605]), ('faceted roofs', 'C', [0, 1118, 630, 1260]),
-        ('far mountain', 'Cf', [0, 390, 180, 960])],
+        ('far mountain', 'Cf', [0, 390, 180, 960]), ('far facets', 'Cf', [900, 600, 1206, 880])],
     '03_hanoi.jpg': [
         ('One Pillar Pagoda', 'A', [675, 829, 1185, 1377]), ('Huc bridge', 'A', [225, 1054, 630, 1204]),
         ('cyclo', 'B', [82, 1279, 368, 1564]), ('patchwork', 'C', [405, 1279, 705, 1609]),
@@ -81,10 +81,10 @@ V2 = {  # v2 master frames (1080 x 1920); A = the beat's subject (docs/v2/STYLE.
 }
 # the crop sheet: rows of (image, [(tier label, centre x, centre y) in the image's own pixels])
 CROPS = [
-    ('01_singapore.jpg', [('A MBS towers', 500, 840), ('B shophouses', 800, 1420), ('C patchwork', 300, 1470), ('C far blocks', 170, 860)]),
-    ('02_reykjavik.jpg', [('A Hallgrimskirkja', 250, 820), ('B houses', 450, 1440), ('C faceted roofs', 300, 1190), ('C far mountain', 120, 700)]),
-    ('04_buenos_aires.jpg', [('A Casa Rosada', 900, 1150), ('B La Boca', 150, 1250), ('C patchwork', 650, 1480), ('C far blocks', 375, 830)]),
-    ('07_kyoto.jpg', [('A Kinkaku-ji', 880, 930), ('B torii', 260, 1170), ('C patchwork', 640, 1240), ('C far mountains', 930, 715)]),
+    ('01_singapore.jpg', [('A MBS towers', 500, 840), ('B shophouses', 800, 1420), ('C patchwork', 300, 1470), ('C far blocks', 120, 760)]),
+    ('02_reykjavik.jpg', [('A Hallgrimskirkja', 250, 820), ('B houses', 450, 1440), ('C faceted roofs', 300, 1190), ('C far facets', 1040, 760)]),
+    ('04_buenos_aires.jpg', [('A Casa Rosada', 900, 1150), ('B La Boca', 150, 1250), ('C patchwork', 760, 1510), ('C far blocks', 375, 830)]),
+    ('07_kyoto.jpg', [('A Kinkaku-ji', 880, 930), ('B torii', 260, 1170), ('C patchwork', 470, 1500), ('C far mountains', 1090, 640)]),
     ('v2_t5.20.png', [('A her + Google door', 610, 930), ('B Google facade', 900, 830), ('C props near', 400, 1640), ('C far city', 160, 770)]),
 ]
 GROUP = {'A': 'A', 'B': 'B', 'C': 'C near', 'Cf': 'C far'}
@@ -242,7 +242,7 @@ def heat_overlay(m, tm, t, boxes):
 
 
 def crop_sheet(maps, stats, path):
-    cw, ch = 300, 250
+    cw, ch = 340, 260
     cap_h = 64
     rows = []
     for name, cells in CROPS:
@@ -263,9 +263,9 @@ def crop_sheet(maps, stats, path):
             d.rectangle([0, 0, cw - 1, ch - 1], outline=COL['A' if tier == 'A' else 'B' if tier == 'B' else 'C'], width=3)
             d.text((6, ch + 3), lab, fill=(20, 20, 20), font=FONT_MB)
             if st:
-                d.text((6, ch + 24), f"fine {st['fine_pct']:.1f}%  faces {st['faces_per_10k']:.0f}/10k  side {st['face_side']:.0f}px",
+                d.text((6, ch + 24), f"fine {st['fine_pct']:.1f}% | faces {st['faces_per_10k']:.0f} | side {st['face_side']:.0f}px",
                        fill=(40, 40, 40), font=FONT_M)
-                d.text((6, ch + 43), f"tone spread {st['tone_spread']:.1f}  L* range {st['L_range']:.0f}  tex {st['texture']:.1f}",
+                d.text((6, ch + 43), f"spread {st['tone_spread']:.1f} | L* {st['L_range']:.0f} | lc {st['local_c']:.1f} | tex {st['texture']:.1f}",
                        fill=(40, 40, 40), font=FONT_M)
             imgs.append(cell)
         label = Image.new('RGB', (150, ch + cap_h), BG)
@@ -278,11 +278,11 @@ def crop_sheet(maps, stats, path):
     head = 92
     sheet = Image.new('RGB', (max(r.width for r in rows) + 10, head + sum(r.height + 12 for r in rows)), BG)
     d = ImageDraw.Draw(sheet)
-    d.text((10, 8), 'One style, four finishes: the same magnification (300 x 250 px at 1080 wide)', fill=(20, 20, 20), font=FONT)
-    d.text((10, 44), 'A crisp hero | B near life | C near: the patchwork (same faces, no small features) | C far: 1-2 tones near the air.'
-           ' Numbers: the whole box (pro_2_hierarchy.py). Last row: v2 S1.', fill=(60, 60, 60), font=FONT_M)
-    d.text((10, 66), 'fine = thin features < 9 px at >= 10 L*; faces = shapes per 10,000 px; side = typical face side; tex = surface texture (std L*).',
-           fill=(60, 60, 60), font=FONT_M)
+    d.text((10, 8), 'One style, four finishes, at one magnification (340 x 260 px at 1080 wide). Last row: v2 S1 (t 5.20 s).', fill=(20, 20, 20), font=FONT)
+    d.text((10, 44), 'A crisp hero | B near life | C near = the patchwork: the same faces and colours, no small features | C far: few tones near the air.'
+           ' Numbers = the whole box (pro_2_hierarchy.py).', fill=(60, 60, 60), font=FONT_M)
+    d.text((10, 66), 'fine = thin features < 9 px at >= 10 L* | faces = shapes per 10,000 px | side = typical face side | spread = L* p90-p10 inside a face'
+           ' | lc = CRAFT local contrast | tex = surface texture', fill=(60, 60, 60), font=FONT_M)
     y = head
     for r in rows:
         sheet.paste(r, (0, y))

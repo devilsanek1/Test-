@@ -305,7 +305,9 @@ def colour(rgb: np.ndarray, valid: np.ndarray, reg: dict | None, k: int = 12, se
     n4 = v4.sum()
     fam = {k_: round(100 * float((m & v4).sum() / n4), 1) for k_, m in hue_family(C4, h4).items()}
     bnd = {k_: round(100 * float((m & v4).sum() / n4), 1) for k_, m in bands(L4, C4, h4).items()}
-    out = {'clusters': clusters, 'families': fam, 'bands': bnd,
+    ml = v4 & (L4 >= 40)  # mid and light fills only: a dark brown or ink is not 'beige' to the eye
+    bnd_ml = {k_: round(100 * float((m & ml).sum() / n4), 1) for k_, m in bands(L4, C4, h4).items()}
+    out = {'clusters': clusters, 'families': fam, 'bands': bnd, 'bands_L40plus': bnd_ml,
            'warm_vs_cool': round(fam['warm'] / max(0.1, fam['warm'] + fam['cool']), 2)}
     # chroma strategy
     Cv = C4[v4]
@@ -1642,7 +1644,7 @@ def dna_check(p: dict) -> list[str]:
             issues.append(f'{role} {c[role]} L{float(L):.0f} C{float(C):.0f}')
     for role, hx in list(c.items()) + [(f"{k}.{i}", h) for k, v in p.get('support', {}).items() for i, h in enumerate(v['colors'])]:
         L, C, h = lch(hex_lab(hx))
-        b = band_name(float(L), float(C), float(h))
+        b = band_name(float(L), float(C), float(h)) if float(L) >= 40 else ''  # an ink or anchor is never 'beige' to the eye
         if b:
             issues.append(f'{role} {hx} in the {b} band (L{float(L):.0f} C{float(C):.0f} h{float(h):.0f})')
     if contrast_ratio(hex_lab(c['ink']), hex_lab(c['bg'])) < 7:

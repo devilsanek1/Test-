@@ -137,7 +137,10 @@ Rules a builder follows: the frame spans **>= 30 L* from the near group's median
 L* < 65 on >= 25 % of the frame outside the caption band and the in-between (65-80) on <= 20 % (posters 27-48 / 8-14;
 v2 11-17 / 21-47); the real darks (< 40) go "where the eye should go" (rule 6: windows, a hull, the shade under trees)
 and stay ~5-10 % (rule 6's dark anchor ~5 %; posters 9-25 %); keep the film's HUES (the owner likes v2's colours) and
-move VALUES by group. One plane is skipped or flat between hero and far (the gap). 5-7 planes per exterior.
+move VALUES by group. One plane is skipped or flat between hero and far (the gap). 5-7 planes per exterior. Hue by
+`recede` as now (a hue on the air's side converges on it, one across keeps its hue at chroma x (1 - 0.8 k)): the near
+group the frame's warmest and most saturated (posters 32-100 deg), the far group at the air's hue or leaning toward
+the rig's cool shade (Reykjavik +34, Cape Town +47 deg off their air, at C* ~4; Kyoto and Hanoi within 6-17 deg).
 
 **3.2 The far scale anchor** (declared per exterior set in W1; drawn new per film from the story's own world: a ridge,
 the sea horizon with a far shore, a far skyline with one landmark, a bridge, gasholders):
@@ -145,9 +148,9 @@ the sea horizon with a far shore, a far skyline with one landmark, a bridge, gas
   its peak or landmark inside x 120-950; >= 65 % of W and off >= 1 side edge; 6-20 % of H tall (posters' 1-20 %).
 - **How pale:** plane +4 (k 0.64) with a +5 ghost behind it (k 0.87) or as the anchor itself; dE to its air 4-16 (the
   ghost <= 6); C* = the air's +-4 (our warm air #FDD6B8 is C* 22, so the anchor stays a warm-lilac or peach tint, never
-  under C* 8); hue within 30 deg of the air's; L* range <= 0.4x the near group's, <= 3 values; real detail (snow,
-  strata, windows) only tone-on-tone (`toneOnTone`, within 15 L*). The Cape Town variant (a mid-valued, desaturated,
-  cool mass) only when the anchor is the view's subject.
+  under C* 8); hue at the air's or up to ~45 deg toward the rig's cool shade; L* range <= 0.4x the near group's, <= 3
+  values; real detail (snow, strata, windows) only tone-on-tone (`toneOnTone`, within 15 L*). The Cape Town variant (a
+  mid-valued, desaturated, cool mass) only when the anchor is the view's subject.
 - **Its foot:** the bottom 10-15 % of its height one flat step nearer the air (+0.1-0.15 k, >= +5 L*): the mist line.
 - **Overlap and scale:** >= 1 nearer plane crosses its base (a roof, a tower, a crown); tiny known things at its foot
   (far roofs without windows, a boat, a lighthouse, a flock) at 1/20-1/40 of its height (Gurney's scale tip).
