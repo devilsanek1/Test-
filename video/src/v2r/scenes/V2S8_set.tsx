@@ -34,7 +34,7 @@ import {Tier} from '../../lib/tier';
 import {useTime} from '../../lib/time';
 import {useExit} from '../../lib/exit';
 import {Sky} from '../../lib/sky';
-import {ContactShadow, FormShade, Shadow, ShadowLayer} from '../../lib/light';
+import {CastShadow, ContactShadow, FormShade, Shadow, ShadowLayer} from '../../lib/light';
 import {recede, seamTone, toneOnTone} from '../../lib/depth';
 import {S8_EVENING} from '../world/skies';
 import {rng, rand} from '../../lib/rng';
@@ -49,6 +49,7 @@ import {S1_IRON} from './V2S1_set_core';
 import {L, LANE, KERB_Y, NEAR_Y, SKYLINE_MIN_Y, lampRunAt} from './V2S8_clock';
 import {EarlyExit} from './V2S8_exit';
 import {S8Plane, S8_ATM, onPlane, planeColors} from './V2S8_depth';
+import {HOUSE_CONTACTS} from './V2S8_house';
 
 // ---------------------------------------------------------------- colour: CM tokens, flat mixes, planes
 
@@ -676,8 +677,13 @@ const HouseBand: React.FC = () => {
   return (
     <>
       {el}
+      {/* ONE shadow layer for the house band: her house's cast shade, then the forecourt things' contact strips (drawn
+          over it inside the layer, so they never double-darken) */}
       <ShadowLayer>
         <Shadow d={houseShadeD(Z_HOUSE, Z_KERB, 1360)} tint="cast" />
+        {HOUSE_CONTACTS.map((c, i) => (
+          <ContactShadow key={i} x={c.x} y={c.y} w={c.w} h={c.h} />
+        ))}
       </ShadowLayer>
     </>
   );
@@ -1169,13 +1175,13 @@ const Planter: React.FC = () => {
   );
 };
 
-/** THE NEAR LAMP: a short heritage post on the near band (the cafe deck's lamp standard, ~1.5 m: its lantern at eye
- *  level), its column cut by the bottom edge, slate (tier C iron, one value step darker on the near plane), 20 px wide,
- *  no swan neck. At the landing its lantern stands in frame at x 1048 (99 px right of W's frame); before the truck
+/** THE NEAR LAMP: a short lamp standard on the near band beside the cafe deck (~1.4 m, 1.6 m from the lens: its foot
+ *  in frame at y 1700, above the planter), slate (tier C iron, one value step darker on the near plane), 20 px wide, no
+ *  swan neck. At the landing its lantern stands in frame at x 1048 (99 px right of W's frame); before the truck
  *  (-320 px) the column (x 718-738) and the lantern (x 714-742, y >= 812) keep >= 24 px off W's frame (y <= 785) and
- *  her walk (x <= 690). The lantern lights ONCE on the run's first switch-on (f2237, lampRunAt('nearPool')).
- *  `top` = the column's top (under the lantern's cup); `lantern` = its glass box; `foot` = below the frame. */
-export const NLAMP = {x: 1048, w: 20, top: 878, arm: 878, lantern: {x: 1048, y0: 812, y1: 878, w: 28}, foot: 1990};
+ *  her walk (x <= 690). The lantern lights ONCE on the run's first switch-on (f2237, lampRunAt('nearPool')); its pool
+ *  belongs round its foot (x, foot). `top` = the column's top (under the lantern's cup); `lantern` = its glass box. */
+export const NLAMP = {x: 1048, w: 20, top: 878, arm: 878, lantern: {x: 1048, y0: 812, y1: 878, w: 28}, foot: 1700};
 
 const NearLamp: React.FC = () => {
   const t = useTime();
@@ -1183,9 +1189,10 @@ const NearLamp: React.FC = () => {
     const b = new Batch();
     const {x, w, top, lantern: ln, foot} = NLAMP;
     const hw = w / 2;
-    // the column (a slight flare to the foot: 20 -> 22 px), one collar
-    b.poly(IRON_NEAR, [[x - hw - 1, foot], [x - hw, top], [x + hw, top], [x + hw + 1, foot]]);
+    // the column (a slight flare to the foot: 20 -> 22 px), one collar, a low plinth on the paving
+    b.poly(IRON_NEAR, [[x - hw - 1, foot - 16], [x - hw, top], [x + hw, top], [x + hw + 1, foot - 16]]);
     b.rect(IRON_NEAR, x - hw - 1, 1404, w + 2, 12);
+    b.poly(IRON_NEAR, [[x - hw - 6, foot], [x - hw - 3, foot - 18], [x + hw + 3, foot - 18], [x + hw + 6, foot]]);
     // the lantern: the cup under it, the cap over it (a flat top: nothing above y 812)
     b.poly(IRON_NEAR, [[x - ln.w / 2 + 3, ln.y1 - 10], [x + ln.w / 2 - 3, ln.y1 - 10], [x + hw - 2, top + 2], [x - hw + 2, top + 2]]);
     b.poly(IRON_NEAR, [[x - ln.w / 2 - 3, ln.y0 + 8], [x + ln.w / 2 + 3, ln.y0 + 8], [x + ln.w / 2 - 2, ln.y0], [x - ln.w / 2 + 2, ln.y0]]);
@@ -1210,6 +1217,10 @@ export const S8Front: React.FC = () => (
       <DeckBoards />
       <DeckContacts />
       <DeckThings />
+      <ShadowLayer>
+        <ContactShadow x={NLAMP.x} y={NLAMP.foot} w={NLAMP.w + 12} />
+        <CastShadow x={NLAMP.x} y={NLAMP.foot} w={NLAMP.w + 6} h={NLAMP.foot - NLAMP.lantern.y0} />
+      </ShadowLayer>
       <NearLamp />
       <Planter />
     </OnPlane>

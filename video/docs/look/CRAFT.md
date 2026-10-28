@@ -259,8 +259,9 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
 6. **A few particles make it natural, and they are SEEN** (owner: "a bit of particles here and there"; then, on v4: "I don't
    see any changes in the particles anywhere": the test is that a viewer can point at them at phone size without
    searching): tier-C life, calm and slow, declared at G3 as `life:` items: motes only inside light and against shade
-   (sized by distance: 6-10 px in the mid and far air, 6-10 of them, and 2-4 near-plane motes at 12-16 px drifting past
-   the nearest shade, which are the ones a phone sees; L* +12 to +20 over what is behind them), dust or pollen in the sun-side air (both
+   (sized by distance: 6-10 px in the mid and far air, and 2-4 near-plane motes at 12-16 px drifting past the nearest
+   shade, which are the ones a phone sees; up to ~10 motes in all, fewer when the shot's cap needs it; L* +12 to +20
+   over what is behind them), dust or pollen in the sun-side air (both
    3-12 px/s), leaves (26-40 px, a visible flutter and turn, 2-3 in view across a hold, crossing the mid ground where the
    eye can catch them, their fall clear of the caption band and the subject: a leaf that would reach them shrinks out
    before, never to come back), glints only in the sun's glitter path (20-36 px sparkles or level dashes, L* +15 to +25,

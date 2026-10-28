@@ -2,6 +2,13 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Note 2026-10-28 08:50 UTC: G4 look clip v5 sent to the owner
+
+`deliverables/v2/v2r_G4_look_v5.mp4` (master; S1 0-6.13 s) + `_phone.jpg` (three frames at 360 px, every particle ringed): the owner's
+"I don't see any changes in the particles": 3 palmate leaves (34-40 px) blown across the water and the quay from 1.2 s, 4-6 glints
+(20-36 px sparkles) in the sun's path, 3 near motes (12-16 px) on the bay tree's shade + 4 far ones; lints clean, depth 0 FAIL,
+banding PASS x5, light OK x3. Shared presets carry the numbers to every lane (`lib/particles`, CRAFT §f.6).
+
 ## Snapshot 2026-10-28 08:19 UTC (hourly)
 
 All five lanes conforming since 07:55 and pushing in steps: L2 S2's joins + sky; L3 S3's per-plane float, Pip seated across S2-S3-S4;
