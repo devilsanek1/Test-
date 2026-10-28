@@ -307,7 +307,7 @@ FILMS = {
     'v1 @20.5': dict(video='deliverables/v1/php2shell_final.mp4', t=20.5, sheet='scripts/qa/depth_sheets/v1_20.5.json'),
     'v1 @38.5': dict(video='deliverables/v1/php2shell_final.mp4', t=38.5, sheet='scripts/qa/depth_sheets/v1_38.5.json'),
 }
-GROUND_WORDS = ('tread', 'towpath', 'footpath', 'landing', 'paving', 'water', 'canal', 'floor', 'ground', 'river')
+GROUND_WORDS = ('tread', 'towpath', 'footpath', 'landing', 'paving', 'water', 'canal', 'floor', 'ground', 'river', 'deck', 'plaza')
 
 
 # ================================================================= image, mask, colour
@@ -580,31 +580,33 @@ def camera_height(thing, horizon):
     return thing['m'] * (thing['base'] - horizon) / max(1e-6, thing['base'] - thing['top'])
 
 
-def frame_cover(frame_masks, near_masks, valid):
-    """How the bottom and the sides are filled: `band_top` = the y (fraction) above which the nearest plane covers less
-    than 40 % of a row (scanning up from the bottom edge); `bottom` = the share of the bottom tenth covered by the
-    nearest plane; `sides` = the share of the outer 15 % columns, lower half, covered by the nearest two (non-ground)
-    planes."""
+def frame_cover(near_masses, grounds, valid):
+    """How the bottom and the sides are filled. `band_top`: the y (fraction) above which the nearest masses (ranks 1-2,
+    ground and water out) cover under 40 % of a row, scanning up from the bottom edge; `bottom_mass` / `bottom_ground`:
+    the shares of the bottom fifth covered by those masses / by ground and water; `sides`: the share of the outer 15 %
+    columns, lower half, covered by the nearest masses."""
     H, W = valid.shape
-    fm = np.zeros((H, W), bool)
-    for m in frame_masks:
-        fm |= m
     nm = np.zeros((H, W), bool)
-    for m in near_masks:
+    for m in near_masses:
         nm |= m
+    gm = np.zeros((H, W), bool)
+    for m in grounds:
+        gm |= m
+    nm &= valid
+    gm &= valid & ~nm
     rows = np.nonzero(valid.any(1))[0]
     y0, y1 = rows[0], rows[-1] + 1
-    cov = fm[y0:y1].mean(1)
-    band = y1
+    cov = nm[y0:y1].mean(1)
+    band = y0
     for y in range(y1 - 1, y0, -1):
         if cov[y - y0] < 0.4:
             band = y + 1
             break
-    bottom = fm[int(y1 - 0.1 * (y1 - y0)):y1].mean()
+    low = slice(int(y1 - 0.2 * (y1 - y0)), y1)
     side_cols = np.r_[0:int(0.15 * W), int(0.85 * W):W]
     lower = slice(int(y0 + 0.5 * (y1 - y0)), y1)
-    sides = nm[lower][:, side_cols].mean()
-    return dict(band_top=round(band / H, 3), bottom=round(float(bottom), 3), sides=round(float(sides), 3))
+    return dict(band_top=round(band / H, 3), bottom_mass=round(float(nm[low].mean()), 3), bottom_ground=round(float(gm[low].mean()), 3),
+                sides=round(float(nm[lower][:, side_cols].mean()), 3))
 
 
 def poster_bands(cfg, views, res, H):
@@ -786,8 +788,8 @@ def analyse_poster(name, cfg, model=None):
     if hb:
         res['hero_frac'] = dict(top=round(hb['top'] / H, 3), base=round(hb['base'] / H, 3), height=round((hb['base'] - hb['top']) / H, 3))
     res['ground_share'] = round(sum(p['share'] for p in res['planes']['planes'] if p['role'] == 'ground'), 4)
-    res['frame'] = frame_cover([plane_mask(bgr.shape, p) for p in cfg['planes'] if p['rank'] == 1],
-                               [plane_mask(bgr.shape, p) for p in cfg['planes'] if p['rank'] <= 2 and p.get('role') != 'ground'], valid)
+    res['frame'] = frame_cover([plane_mask(bgr.shape, p) for p in cfg['planes'] if p['rank'] <= 2 and p.get('role') != 'ground'],
+                               [plane_mask(bgr.shape, p) for p in cfg['planes'] if p.get('role') == 'ground'], valid)
     res['bands'] = poster_bands(cfg, views, res, H)
     if model:
         d = depth_net(bgr, model)
@@ -827,6 +829,13 @@ def analyse_still(png, sheet, model=None, label=''):
                planes=sheet_planes(bgr, sheet) if sheet.get('planes') else dict(planes=[]), rows=row_profile(bgr, valid),
                sheet_name=sheet.get('name', ''))
     res['ground_share'] = round(sum(p['share'] for p in res['planes']['planes'] if p['role'] == 'ground'), 4)
+    if sheet.get('planes'):
+        sx, sy = (W, H) if sheet.get('units') == 'frac' else (W / 1080, W / 1080)
+        rank = {r['name']: r for r in res['planes']['planes']}
+        mk = lambda p: plane_mask((H, W), dict(boxes=p.get('boxes'), poly=p.get('poly'), exclude=p.get('exclude')), sx, sy)
+        near = [mk(p) for p in sheet['planes'] if p['name'] in rank and rank[p['name']]['rank'] <= 2 and rank[p['name']]['role'] != 'ground']
+        grd = [mk(p) for p in sheet['planes'] if p['name'] in rank and rank[p['name']]['role'] == 'ground']
+        res['frame'] = frame_cover(near, grd, valid)
     if model:
         d = depth_net(bgr, model)
         res['depth'] = depth_layering(d)
@@ -1141,7 +1150,7 @@ def diagram_916(posters, films, out):
     bands = [('tallest top', 'tallest_top', MUTED), ('hero top', 'hero_top', bgr_hex(HERO)), ('far horizon', 'far', bgr_hex(FAR_LINE)),
              ('near eye level', 'near', bgr_hex(NEAR_LINE)), ('near frame band', 'frame_top', bgr_hex(SEQ[0]))]
     stats = {k: band_stats(posters, k) for _, k, _ in bands}
-    W, H = 1760, 1200
+    W, H = 1960, 1200
     img = np.full((H, W, 3), 255, np.uint8)
     put(img, 'From the posters to 9:16: where the bands go', (24, 46), 0.95, INK, 2)
     put(img, 'left: the seven posters (median, range bar; fractions of their height); right: the bands in 1080 x 1920 with the tallest top at y 620', (24, 80), 0.55, INK2, 1)
@@ -1184,13 +1193,26 @@ def diagram_916(posters, films, out):
         cv2.line(img, (fx0, Y(y916)), (fx0 + fw, Y(y916)), col, 2, cv2.LINE_AA)
         put(img, f'{name}: y {y916:.0f} ({y916 / 1920:.2f} H)', (fx0 + fw + 14, Y(y916) + 5), 0.5, col, 1)
         dashed(img, (px0 + pw + 4, int(py0 + b[0] * ph)), (fx0 - 4, Y(y916)), col, 1, 8, 8)
-    put(img, "v2's horizons:", (fx0 - 210, Y(560)), 0.45, INK, 1)
+    put(img, "v2's horizons", (fx0 - 150, Y(1260)), 0.45, INK, 1)
     for r in films:
         if r['label'].startswith('v2') and r.get('horizon'):
             y = Y(r['horizon'])
             cv2.line(img, (fx0 - 30, y), (fx0 - 6, y), INK, 2)
             put(img, r['label'].split(' @')[0].replace('v2 ', ''), (fx0 - 64, y + 5), 0.42, INK, 1)
     put(img, '9:16 (1080 x 1920)', (fx0, fy0 + fh + 30), 0.55, INK2, 1)
+    # each plane's share of a sideways float or a crane: drawn size per metre over the nearest plane's (1 / distance)
+    mids = [r['unit_ladder'][k]['k'] for r in posters for k in r['unit_ladder'] if int(k) == 3 and r['unit_ladder'][k]['k'] < 1]
+    fars = [min(v['k'] for v in r['unit_ladder'].values()) for r in posters if len(r['unit_ladder']) > 1]
+    tx, ty = fx0 + fw + 14, Y(1640)
+    put(img, 'share of a float or crane (1/distance,', (tx, ty), 0.47, INK, 1)
+    put(img, 'from the posters\' unit sizes; est.):', (tx, ty + 24), 0.47, INK, 1)
+    put(img, 'near frame 1.0', (tx, ty + 54), 0.47, bgr_hex(SEQ[0]), 1)
+    if mids:
+        put(img, f'mid {np.median(mids):.2f} ({min(mids):.2f}-{max(mids):.2f})', (tx, ty + 78), 0.47, bgr_hex(SEQ[3]), 1)
+    if fars:
+        put(img, f'farthest unit {np.median(fars):.2f} ({min(fars):.2f}-{max(fars):.2f})', (tx, ty + 102), 0.47, bgr_hex(SEQ[5]), 1)
+    put(img, 'ghost blocks, mountains: no unit, ~0', (tx, ty + 126), 0.47, MUTED, 1)
+    put(img, 'sky and caption band: 0', (tx, ty + 150), 0.47, MUTED, 1)
     return save_jpg(out, img)
 
 

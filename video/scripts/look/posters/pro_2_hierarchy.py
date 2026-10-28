@@ -18,7 +18,8 @@ All maps at a common width of 1080 px (CIE L*a*b*), the Instagram UI masked (ui_
   C*          median chroma
   edge w      10-90 % width of strong edges (step >= 15 L*): step / peak gradient, px (blur shows as a wide edge)
   dE pal      median CIEDE2000 from the box's pixels to the 16-colour palette of the image's A and B boxes
-Per image: the share of the fine detail held by the top 10 % of tiles (W/24 px): how concentrated the detail is.
+Per image: the share of the fine detail held by the top 10 % of tiles (W/24 px): how concentrated the detail is (the
+posters' title zone and v2's caption band left out).
 
 Usage:  python3 video/scripts/look/posters/pro_2_hierarchy.py [--v2dir DIR] [--out DIR] [--sheet PATH] [--crops PATH]
 v2 frames: ffmpeg -ss <t> -i video/deliverables/v2/v2r_G7_master_v1.mp4 -frames:v 1 <v2dir>/v2_t<t>.png
@@ -76,9 +77,14 @@ V2 = {  # v2 master frames (1080 x 1920); A = the beat's subject (docs/v2/STYLE.
         ('her + Google door', 'A', [470, 780, 740, 1090]), ('Google facade', 'B', [740, 590, 1080, 1070]),
         ('props near', 'C', [0, 1300, 1080, 1900]), ('canal', 'C', [0, 1090, 1080, 1290]),
         ('far city', 'Cf', [0, 600, 320, 940])],
-    'v2_t17.50.png': [],  # S4: tile map only
-    'v2_t30.50.png': [],  # S7: tile map only
+    'v2_t14.00.png': [  # S3
+        ('her window', 'A', [256, 690, 410, 860]), ('neighbour windows', 'C', [560, 690, 1000, 860]),
+        ('narrowboat', 'C', [0, 1320, 1080, 1580])],
+    'v2_t9.00.png': [], 'v2_t17.50.png': [], 'v2_t22.00.png': [], 'v2_t26.00.png': [], 'v2_t30.50.png': [],
+    'v2_t36.00.png': [],  # S2, S4, S5, S6, S7, S8: tile map only
 }
+TITLE_ROWS = 330          # posters: the title zone (rows above this at 1080 wide) is left out of the tile map
+CAPTION_BAND = (290, 600)  # v2: the caption band (1080 x 1920 rows) is left out of the tile map
 # the crop sheet: rows of (image, [(tier label, centre x, centre y) in the image's own pixels])
 CROPS = [
     ('01_singapore.jpg', [('A MBS towers', 500, 840), ('B shophouses', 800, 1420), ('C patchwork', 300, 1470), ('C far blocks', 120, 760)]),
@@ -308,6 +314,10 @@ def main():
     results, tiles, maps, crop_stats = {}, [], {}, {}
     for name, path, mk, boxes in items:
         a, valid, r0, r1 = load(path, mk)
+        if mk:
+            valid[: int(TITLE_ROWS * a.shape[1] / W)] = False
+        else:
+            valid[CAPTION_BAND[0]:CAPTION_BAND[1]] = False
         m = analyse(a, valid)
         tm, t = tile_map(m)
         pal = ab_palette(m, boxes) if boxes else None
@@ -351,13 +361,13 @@ def main():
             cell.paste(im, (0, 0))
             d = ImageDraw.Draw(cell)
             d.text((8, th + 4), name.replace('.jpg', '').replace('.png', ''), fill=(30, 30, 30), font=FONT)
-            d.text((8, th + 36), f'top 10% of tiles: {top10:.0f}% of fine detail', fill=(30, 30, 30), font=FONT)
+            d.text((8, th + 36), f'top 10% of tiles: {top10:.0f}%', fill=(30, 30, 30), font=FONT)
             cells.append(cell)
         per_row = 5
         rows = [cells[i:i + per_row] for i in range(0, len(cells), per_row)]
         sheet = Image.new('RGB', (max(sum(c.width + 12 for c in r) for r in rows), len(rows) * (th + 82) + 60), BG)
         ImageDraw.Draw(sheet).text((10, 10), 'Where the small features sit (thin features < 9 px at >= 10 L*, per tile; brighter = more).'
-                                   ' Boxes: A green, B blue, C grey', fill=(20, 20, 20), font=FONT_S)
+                                   ' Titles and captions out. Boxes: A green, B blue, C grey', fill=(20, 20, 20), font=FONT_S)
         y = 60
         for r in rows:
             x = 0
