@@ -73,13 +73,16 @@ export function walkerStep(w: Walker, t: number): number {
 }
 
 const PARENT_H = 140;
+/** The pair's darks lifted to mid tones (tier B: fills part by value, no near-black; a dark thin leg reads as a line). */
+const PAIR_TROUSERS = mixHex(CM.line, CM.coatOat, 0.4);
+const KID_TROUSERS = mixHex(CM.shadeWarm, CM.coatOat, 0.4);
 const KID_H = 80;
 /** Where the parent's and the toddler's hands meet (relative to the parent's feet). */
 const HANDS: [number, number] = [-12, -71];
 
 export const WALKERS: Record<string, Walker> = {
-  parent: {seed: 's4parent', x0: 650 + 310, dir: -1, speed: 15, stepPx: 30, feet: 1021, h: PARENT_H, pose: 'walk', hw: 40, phase: 0.1, reach: HANDS, traits: {hair: 'curls', hairColor: CM.hair[2], coat: CM.sage, coatLen: 'jacket', trousers: CM.line, shoes: CM.shadeWarm, acc: 'backpack', accColor: CM.coatMustard, broad: 1.04}},
-  kid: {seed: 's4kid', x0: 650 + 310 - 22, dir: -1, speed: 15, stepPx: 15, feet: 1027, h: KID_H, pose: 'walk', hw: 18, phase: 0.6, reach: [HANDS[0] + 22, HANDS[1] - 7], traits: {hair: 'beanie', hairColor: CM.hair[4], hatColor: CM.coatMustard, coat: CM.box, coatLen: 'jacket', trousers: CM.shadeWarm, shoes: CM.brickDeep, acc: 'none', broad: 1.08}},
+  parent: {seed: 's4parent', x0: 650 + 310, dir: -1, speed: 15, stepPx: 30, feet: 1021, h: PARENT_H, pose: 'walk', hw: 40, phase: 0.1, reach: HANDS, traits: {hair: 'curls', hairColor: CM.hair[2], coat: CM.sage, coatLen: 'jacket', trousers: PAIR_TROUSERS, shoes: CM.brick, acc: 'backpack', accColor: CM.coatMustard, broad: 1.04}},
+  kid: {seed: 's4kid', x0: 650 + 310 - 22, dir: -1, speed: 15, stepPx: 15, feet: 1027, h: KID_H, pose: 'walk', hw: 18, phase: 0.6, reach: [HANDS[0] + 22, HANDS[1] - 7], traits: {hair: 'beanie', hairColor: CM.hair[4], hatColor: CM.coatMustard, coat: CM.box, coatLen: 'jacket', trousers: KID_TROUSERS, shoes: CM.brick, acc: 'none', broad: 1.08}},
 };
 
 /** The walkers' ground shadows at t (plane px; the light layer's S4Ground draws them under everything on the towpath). */
@@ -110,6 +113,8 @@ export const Walkers: React.FC = () => {
 // ---------------------------------------------------------------- the reader on a bench (still)
 
 export const READER = {x: 1150, seat: 1006, h: 96};
+/** The reader's legs and shoes as one calm mid mauve (no dark corners). */
+const READER_LEGS = mixHex(CM.coatPlum, CM.coatOat, 0.45);
 /** The bench's irons and the stool's legs: a calm mid slate (never plum, never a dark line: CRAFT §c). */
 export const S4_IRON = '#9A8C95';
 /** Wood (slats, the planter's box, rods, posts) lifted to a mid oak: on the towpath a thin dark wood reads as a line. */
@@ -132,9 +137,7 @@ export function benchReaderInto(b: Batch) {
   const rx = x - 18;
   const coat = CM.sage;
   const hy = seat - 70;
-  b.rect(CM.coatPlum, rx - 15, seat - 4, 30, 10);
-  b.rect(CM.coatPlum, rx - 14, seat + 4, 28, foot - seat - 8);
-  b.fill(CM.line, `M${P(rx - 18, foot - 7)}L${P(rx + 18, foot - 7)}L${P(rx + 18, foot)}L${P(rx - 18, foot)}Z`);
+  b.fill(READER_LEGS, `M${P(rx - 15, seat - 4)}L${P(rx + 15, seat - 4)}L${P(rx + 14, foot - 4)}Q${P(rx + 14, foot)} ${P(rx + 10, foot)}L${P(rx - 10, foot)}Q${P(rx - 14, foot)} ${P(rx - 14, foot - 4)}Z`);
   b.fill(coat, `M${P(rx - 22, seat + 2)}L${P(rx - 24, hy + 24)}Q${P(rx - 22, hy + 10)} ${P(rx, hy + 9)}Q${P(rx + 22, hy + 10)} ${P(rx + 24, hy + 24)}L${P(rx + 22, seat + 2)}Z`);
   b.layer();
   b.fill(CM.hair[2], ovalPath(rx, hy + 3, 12.5, 12));
@@ -149,6 +152,9 @@ export function benchReaderInto(b: Batch) {
 // ---------------------------------------------------------------- the angler on the coping (still)
 
 export const ANGLER = {x: 404, seat: 1058, foot: 1077};
+/** The angler's legs and boots, one soft slate each (no dark corners). */
+const ANGLER_LEG = mixHex(CM.paneUnlit, CM.glass, 0.4);
+const ANGLER_LEG_FAR = mixHex(CM.paneUnlit, CM.glass, 0.3);
 export const ANGLER_STANDERS: Stander[] = [{x: ANGLER.x - 14, y: ANGLER.foot, w: 64, h: 0}];
 
 /** The rod tip (plane px): still (the float rides the water; no nibble: the life budget). */
@@ -167,10 +173,8 @@ export function anglerInto(b: Batch) {
   b.rect(CM.coatSlate, x + 52, foot - 30, 9, 30);
   b.layer();
   // legs: thigh forward, shin down, boots
-  for (const [dx, c] of [[3, CM.shadeWarm], [0, CM.paneUnlit]] as [number, string][]) {
-    b.poly(c, [[x - 6 + dx, seat - 6], [x - 34 + dx, seat - 4], [x - 34 + dx, seat + 6], [x - 6 + dx, seat + 5]]);
-    b.poly(c, [[x - 36 + dx, seat - 2], [x - 26 + dx, seat - 2], [x - 26 + dx, foot - 4], [x - 36 + dx, foot - 4]]);
-    b.poly(CM.coatPlum, [[x - 44 + dx, foot - 7], [x - 25 + dx, foot - 7], [x - 25 + dx, foot], [x - 46 + dx, foot]]);
+  for (const [dx, c] of [[3, ANGLER_LEG_FAR], [0, ANGLER_LEG]] as [number, string][]) {
+    b.fill(c, `M${P(x - 4 + dx, seat - 7)}L${P(x - 34 + dx, seat - 6)}Q${P(x - 38 + dx, seat - 4)} ${P(x - 37 + dx, seat + 2)}L${P(x - 37 + dx, foot - 7)}L${P(x - 45 + dx, foot - 6)}Q${P(x - 47 + dx, foot)} ${P(x - 43 + dx, foot)}L${P(x - 26 + dx, foot)}L${P(x - 26 + dx, seat + 6)}L${P(x - 4 + dx, seat + 5)}Z`);
   }
   // torso: a padded jacket leaning forward, a bobble hat (round head, no features)
   const sx = x - 8;
@@ -180,7 +184,7 @@ export function anglerInto(b: Batch) {
   const hy = sy - 12;
   b.layer();
   b.fill(CM.brickLight, ovalPath(hx - 5, hy + 4, 6, 7));
-  b.fill(CM.hair[1], ovalPath(hx, hy, 12, 12));
+  b.fill(CM.hair[3], ovalPath(hx, hy, 12, 12));
   b.layer();
   b.fill(CM.brick, `M${P(hx - 13, hy - 1)}A13 12 0 0 1 ${P(hx + 13, hy - 1)}L${P(hx + 13, hy + 2)}L${P(hx - 13, hy + 2)}Z`);
   // arms forward to the rod butt

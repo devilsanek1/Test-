@@ -38,18 +38,20 @@ const EDGE = ROW.edge;
 
 // ---------------------------------------------------------------- garden walls
 
+/** The slate gate lifted to a mid tone (a narrow dark leaf reads as a line mark: CRAFT §c). */
+const GATE_SLATE = '#8794A8';
 type Seg = {x0: number; x1: number; kind: 'brick' | 'render' | 'gate' | 'railing' | 'trellis'; c: string; ivy?: boolean; pot?: boolean; gate?: string};
 const SEGS: Seg[] = [
   {x0: X0, x1: 128, kind: 'brick', c: CM.brick, ivy: true},
   {x0: 128, x1: 300, kind: 'trellis', c: CM.stucco},
-  {x0: 300, x1: 352, kind: 'gate', c: CM.brickDeep, gate: CM.coatSlate},
+  {x0: 300, x1: 352, kind: 'gate', c: CM.brickDeep, gate: GATE_SLATE},
   {x0: 352, x1: 566, kind: 'railing', c: CM.brickLight},
   {x0: 566, x1: 690, kind: 'brick', c: CM.brickDeep},
   {x0: 690, x1: 830, kind: 'brick', c: CM.brick, pot: true},
   {x0: 830, x1: 882, kind: 'gate', c: CM.brick, gate: CM.sage},
   {x0: 882, x1: 1110, kind: 'brick', c: CM.brickLight, ivy: true},
   {x0: 1110, x1: 1250, kind: 'render', c: CM.limestone},
-  {x0: 1250, x1: 1300, kind: 'gate', c: CM.brickLight, gate: CM.brickDeep},
+  {x0: 1250, x1: 1300, kind: 'gate', c: CM.brickLight, gate: CM.brick},
   {x0: 1300, x1: X1, kind: 'railing', c: CM.brick},
 ];
 const PIER_W = 14;
