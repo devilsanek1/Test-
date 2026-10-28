@@ -172,11 +172,12 @@ function petals(): Layer {
   // single petals: a dozen and a half, more toward the trees (left, bottom-right) and a few round the pair
   const spots: [number, number][] = [
     [230, 1262], [405, 1258], [470, 1290], [262, 1318], [560, 1352], [330, 1395], [610, 1300],
+    [432, 1462], [548, 1436], [252, 1488], [602, 1508], [366, 1512],
     [120, 1450], [205, 1540], [68, 1600], [300, 1610], [440, 1760], [260, 1850],
     [760, 1520], [880, 1600], [930, 1700], [820, 1880], [1040, 1820],
   ];
   for (const [x, y] of spots) {
-    const s = 2.2 + 0.034 * k(y) * r.range(0.85, 1.15);
+    const s = 2.8 + 0.04 * k(y) * r.range(0.85, 1.15);
     const e = petalD(x + r.jitter(8), y + r.jitter(4), s, r.range(0, Math.PI));
     const u = r.next();
     if (u < 0.5) a += e;

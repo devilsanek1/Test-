@@ -40,7 +40,7 @@ import {Person, HER, WindowPerson, drawn} from '../kit/cast';
 import {Tier} from '../../lib/tier';
 import type {Tier as TierT} from '../../lib/tier';
 import {Shade} from '../../lib/light';
-import {recede} from '../../lib/depth';
+import {planePalette, recede} from '../../lib/depth';
 import {S1_IRON} from './V2S1_set_core';
 import {S8T, L, lampRunAt, doorOpenK, LANE, SKYLINE_MIN_Y} from './V2S8_clock';
 import {LateExit, EarlyExit} from './V2S8_exit';
@@ -329,16 +329,10 @@ function beyondInto() {
   b.poly(CM.anchor, pm.q(c0, 6.25, c1 - c0, 0.55));
   b.poly(CM.coatMustard, pm.q(c0 + 0.6, 6.35, 2.6, 0.35));
   b.poly(CM.lamp, pm.q(c0 + 0.1, 7.25, 3.3, 2.0));
-  b.poly(CM.lampCore, pm.q(c0 + 0.5, 7.4, 1.9, 1.0));
-  b.poly(CM.line, pm.q(c0 + 0.2, 8.65, 3.1, 0.6));
-  for (let k = 0; k < 3; k++) b.poly([CM.box, CM.paper, CM.sage][k], pm.q(c0 + 0.5 + k * 0.8, 8.3, 0.35, 0.35));
   b.poly(CM.paper, pm.q(c0 + 3.7, 7.1, 1.1, 2.4));
   b.poly(CM.shadeWarm, pm.q(c0 + 3.8, 7.25, 0.9, 2.25));
   b.layer();
-  for (let k = 0; k < 9; k++) {
-    const u = c0 - 0.15 + k * ((c1 - c0 + 0.3) / 9);
-    b.poly(k % 2 ? CM.paper : CM.sage, [pm.p(u, 6.8), pm.p(u + (c1 - c0 + 0.3) / 9, 6.8), pm.p(u + (c1 - c0 + 0.3) / 9 + 0.05, 7.55), pm.p(u + 0.05, 7.55)]);
-  }
+  b.poly(CM.sage, [pm.p(c0 - 0.15, 6.8), pm.p(c1 + 0.15, 6.8), pm.p(c1 + 0.2, 7.55), pm.p(c0 - 0.1, 7.55)]);
   // the railing along the street's edge (above the towpath) and a tree at the bend
   b.layer();
   const rail: Pt[] = [];
@@ -356,8 +350,12 @@ function beyondInto() {
   }
   treeInto(b, 524, 952, 142, 's8h/bendTree', 0, true);
   b.layer();
-  wins.forEach((w, k) => b.poly(rand('s8h/frWin', k) < 0.45 ? CM.lamp : CM.glass, w.q));
-  return {b: remap(b, plus1, false), wins};
+  wins.forEach((w, k) => b.poly(rand('s8h/frWin', k) < 0.15 ? CM.lamp : CM.stoneShade, w.q));
+  // one step toward the air, merged to 4 close values (lib/depth planePalette: a calm row, never busier than her plane)
+  const cols = new Set<string>();
+  for (const l of b.layers) l.fills.forEach((_, c) => cols.add(c === CM.anchor ? IRON : c));
+  const pal = planePalette(Array.from(cols).filter((c) => c !== CM.lamp && c !== CM.lampCore), 1, S8_ATM, {values: 4, spread: 20});
+  return {b: remap(b, (c) => (c === CM.lamp || c === CM.lampCore ? c : pal[c === CM.anchor ? IRON : c] ?? plus1(c)), false), wins};
 }
 
 // ---------------------------------------------------------------- the terrace (static)

@@ -81,14 +81,15 @@ export const DT = {
   stoneMid: mix(CM.limestone, CM.shadeWarm, 0.16),
   stoneShade: CM.stoneShade,
   stoneDeep: mix(CM.stoneShade, CM.shadeWarm, 0.32),
-  // wood, iron (a deep plum, never near-black: L* ~26 before the tier's calm)
+  // wood, iron (painted iron in a calm mid plum, L* 52: the approved look's furniture legs are light, never a row of
+  // near-black strokes; tier C)
   wood: CM.brick,
   woodLit: mix(CM.brick, CM.brickLight, 0.55),
   woodShade: CM.brickDeep,
-  iron: mix(CM.anchor, CM.shadeWarm, 0.3),
-  ironLit: mix(mix(CM.anchor, CM.shadeWarm, 0.3), CM.coatPlum, 0.55),
-  // planting
-  soil: mix(CM.brickDeep, CM.anchor, 0.42),
+  iron: mix(CM.shadeWarm, CM.stoneShade, 0.2),
+  ironLit: mix(CM.shadeWarm, CM.stoneShade, 0.5),
+  // planting (the soil a mid earth: it never shows as a dark sliver)
+  soil: mix(CM.brickDeep, CM.sage, 0.5),
   leaf: CM.sage,
   leafWarm: mix(CM.sage, CM.shadeWarm, 0.18),
   leafShade: mix(CM.sage, CM.anchor, 0.18),

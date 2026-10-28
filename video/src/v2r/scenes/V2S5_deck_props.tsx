@@ -282,29 +282,33 @@ export function tulipBed(X0: number, X1: number, dNear: number, dFar: number, se
   B.poly(DT.soil, [pt(X0 + kw, dNear - kw, kz), pt(X1 - kw, dNear - kw, kz), pt(X1 - kw, dFar + kw, kz), pt(X0 + kw, dFar + kw, kz)]);
   B.layer();
   const r = rng(`s5deck/tul/${seed}`);
-  // drifts: 3-4 along the bed, each a hue
+  // ONE leaf mass over the whole soil (raised: the plants' height), its near face a lobed step down (in the shade
+  // toward us: the sun is beyond), the heads in colour drifts on it (no stripes between drifts)
+  const base: Pt[] = [];
+  const n = 12;
+  for (let j = 0; j <= n; j++) base.push(pt(X0 + kw * 0.6 + ((X1 - X0 - kw * 1.2) * j) / n, dFar + kw * 0.6, kz + 0.22 + r.range(0, 0.1)));
+  base.push(pt(X1 - kw * 0.6, dNear - kw * 0.6, kz + 0.04));
+  base.push(pt(X0 + kw * 0.6, dNear - kw * 0.6, kz + 0.04));
+  B.fill(DT.leaf, smoothClosed(base));
+  const face: Pt[] = [];
+  for (let j = 0; j <= n; j++) face.push(pt(X0 + kw * 0.6 + ((X1 - X0 - kw * 1.2) * j) / n, dNear - kw * 0.6 + 0.12 + r.range(0, 0.1), kz + 0.12 + r.range(0, 0.08)));
+  face.push(pt(X1 - kw * 0.6, dNear - kw * 0.6, kz + 0.04));
+  face.push(pt(X0 + kw * 0.6, dNear - kw * 0.6, kz + 0.04));
+  B.fill(DT.leafShade, smoothClosed(face));
   const nD = Math.max(3, Math.round((X1 - X0) / 0.75));
   const hues = [DT.tulipRose, DT.tulipCream, DT.tulipGold, DT.tulipCoral];
-  const leafA: string[] = [];
-  const leafB: string[] = [];
   const heads = new Map<string, string>();
   const headsLit = new Map<string, string>();
   for (let i = 0; i < nD; i++) {
     const xa = X0 + kw + ((X1 - X0 - 2 * kw) * i) / nD;
     const xb = X0 + kw + ((X1 - X0 - 2 * kw) * (i + 1)) / nD;
     const col = hues[(i + (seed === 'nearR' ? 1 : 0)) % hues.length];
-    // the leaf mass of the drift: one lobed shape from the far edge to the near edge
-    const pts: Pt[] = [];
-    const n = 9;
-    for (let j = 0; j <= n; j++) pts.push(pt(xa + ((xb - xa) * j) / n, dFar + kw, kz + 0.2 + r.range(0, 0.12)));
-    for (let j = n; j >= 0; j--) pts.push(pt(xa + ((xb - xa) * j) / n, dNear - kw, kz + 0.06 + r.range(0, 0.06)));
-    (i % 2 ? leafA : leafB).push(smoothClosed(pts));
-    // the heads: a loose grid, 0.2-0.26 m apart, larger than life (they read at the end)
-    for (let d = dFar + kw - 0.08; d > dNear - kw + 0.1; d -= r.range(0.2, 0.26)) {
+    // the heads: scattered (never a grid), 0.26-0.34 m apart, larger than life (they read at the end)
+    for (let d = dFar + kw - 0.1 - r.range(0, 0.12); d > dNear - kw + 0.12; d -= r.range(0.26, 0.34)) {
       const k = pxmD(d);
-      for (let X = xa + r.range(0.04, 0.14); X < xb - 0.06; X += r.range(0.2, 0.26)) {
-        const [x, y] = pt(X + r.jitter(0.03), d, kz);
-        const hgt = r.range(0.32, 0.46) * k;
+      for (let X = xa + r.range(0.04, 0.2); X < xb - 0.06; X += r.range(0.26, 0.36)) {
+        const [x, y] = pt(X + r.jitter(0.07), d + r.jitter(0.05), kz);
+        const hgt = r.range(0.3, 0.46) * k;
         const hw = 0.06 * k;
         const hx = x;
         const hy = y - hgt;
@@ -314,8 +318,6 @@ export function tulipBed(X0: number, X1: number, dNear: number, dFar: number, se
       }
     }
   }
-  B.fill(DT.leafShade, leafB.join(''));
-  B.fill(DT.leaf, leafA.join(''));
   B.layer();
   heads.forEach((d, col) => B.fill(col, d));
   headsLit.forEach((d, col) => B.fill(mix(col, CM.paper, 0.2), d));

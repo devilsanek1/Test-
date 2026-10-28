@@ -38,55 +38,35 @@ import {S8Her, S8GhostsLayer, S8Public} from './V2S8_cast';
 import {S8Pip} from './V2S8_pip';
 import {S8HouseBandLight, S8LaneLight, S8LaneShadows} from './V2S8_light';
 import {L, S8T} from './V2S8_clock';
+import type {PlaneId} from './V2S8_clock';
 import {S8Plane, S8_ATM} from './V2S8_depth';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
-/** THE PARTICLES (CRAFT §f.6 as raised on v4: SEEN at phone size; conform_L6 §10; THROUGHLINE §5b S8 row), tier C, a
- *  few, slow, calm, each growing in and shrinking out:
- *    motes   S8 is the mote shot (the sun ahead): backlit motes, 6-10 px, in SUN8's light over the lane, against her
- *            house's shaded facade right of her door, under W (clear of W, her path, the ghosts and the band)
- *    leaves  2 at most, 26-36 px, from the plane tree off the right edge, falling and turning leftward across the
- *            forecourt in front of the neighbours' houses to the towpath (clear of W, her path and the band)
- *  No glints: the basin under SUN8 is behind the board and the cafe boat at every pose (no open water in frame).
- *  Births from the wipe's end to 38.60 (nothing enters in the seam's 38.72-39.08); at the un-build they go with the
- *  sky, swept by its contraction into SUN0 (S8Sky's circle). Joins: the wipe in (scene 0) and the seam (6.15). */
+/** THE PARTICLES, SEEN at phone size (CRAFT §f.6; the owner on v4 "I don't see any changes in the particles", on v5
+ *  "leafs are great"; lib/particles' presets, never shrunk; conform_L6 §10; THROUGHLINE §5b S8 row), tier C, calm:
+ *    leaves  the proven particle: three 34-40 px palmate plane leaves blown in from off the right edge on a light
+ *            easterly (born 35.70, 36.35, 37.00: the landing hold), fluttering and turning leftward across the lane's open mid ground,
+ *            the towpath in front of her house, below the ghosts' feet and Pip's bollard, settling on the near paving
+ *    motes   S8 is the mote shot (the sun ahead), sized by distance: FAR 6-10 px backlit in SUN8's light against her
+ *            house's shaded facade right of her door, under W; NEAR 12-16 px (lib plane -2, the preset's nearSize)
+ *            drifting slowly in front of the cafe boat's shaded cabin side at the left edge, above the owner
+ *  No glints: no open water under SUN8 in frame at any pose (the basin is behind the board and the cafe boat).
+ *  Nothing is born after 38.60 (nothing enters in the seam's 38.72-39.08); at the un-build they go with the sky, swept
+ *  by its contraction into SUN0 (S1's frame 0 has none). Joins: the wipe in (scene 0) and the seam (6.15). */
 export const S8_PARTICLE_JOINS = [0, S8T.end];
 const HER_PATH: [number, number, number, number] = [690, 860, 170, 320];
 const W_BOX: [number, number, number, number] = [MAP.W.x - MAP.W.w / 2 - 20, MAP.W.y - MAP.W.h / 2 - 20, MAP.W.w + 40, MAP.W.h + 40];
 const GHOSTS_BOX: [number, number, number, number] = [610, 900, 170, 200];
-export const S8_MOTES: ParticlesProps = {
-  kind: 'motes',
-  seed: 's8motes',
-  region: {rect: [866, 810, 180, 190]},
-  on: '#C99484',
-  count: 7,
-  size: [6, 10],
-  lift: 15,
-  plane: 0,
-  atm: S8_ATM,
-  t0: -3,
-  t1: L(38.6),
-  joins: S8_PARTICLE_JOINS,
-  avoid: [CAPTION_BAND, W_BOX, HER_PATH, GHOSTS_BOX],
-  sun: [MAP.SUN8.x, MAP.SUN8.y],
-};
-export const S8_LEAVES: ParticlesProps = {
-  kind: 'leaves',
-  seed: 's8leaves',
-  region: {rect: [990, 640, 90, 60]},
-  on: '#E8D2BF',
-  colors: [CM.leafGold, CM.leafRust],
-  count: 2,
-  size: [26, 36],
-  drift: [-14, 0],
-  floor: 1190,
-  t0: S8T.wipeT1 + 0.2,
-  t1: L(38.0),
-  joins: S8_PARTICLE_JOINS,
-  avoid: [CAPTION_BAND, W_BOX, HER_PATH],
-  sun: [MAP.SUN8.x, MAP.SUN8.y],
-};
+/** Her board (frame) and Pip on its bollard, board-plane landing coords: the leaves keep clear of both. */
+const BOARD_BOX: [number, number, number, number] = [100, 670, 590, 600];
+const PIP_BOX: [number, number, number, number] = [640, 1100, 120, 215];
+const SUN8_AT: [number, number] = [MAP.SUN8.x, MAP.SUN8.y];
+export const S8_PARTICLE_FIELDS: {p: PlaneId; f: ParticlesProps}[] = [
+  {p: 'house', f: {kind: 'motes', seed: 's8motes', region: {rect: [866, 810, 180, 190]}, on: '#C99484', count: 5, atm: S8_ATM, plane: 0, t0: -3, t1: L(38.6), joins: S8_PARTICLE_JOINS, avoid: [CAPTION_BAND, W_BOX, HER_PATH, GHOSTS_BOX], sun: SUN8_AT}},
+  {p: 'board', f: {kind: 'motes', seed: 's8motesNear', plane: -2, region: {ellipse: {cx: 52, cy: 880, rx: 46, ry: 90}}, on: '#9C7E78', count: 3, lift: 18, margin: 12, t0: -3, t1: L(38.6), joins: S8_PARTICLE_JOINS, avoid: [CAPTION_BAND], sun: SUN8_AT}},
+  {p: 'board', f: {kind: 'leaves', seed: 's8leaves', leaf: 'palmate', region: {rect: [1110, 1150, 40, 70]}, on: '#E8D2BF', colors: [CM.leafRust, CM.leafGold, CM.leafRust], births: [L(35.7), L(36.35), L(37.0)], size: [34, 40], speed: [45, 70], drift: [-115, 0], floor: 1430, margin: 12, t0: S8T.wipeT1, t1: L(38.6), joins: S8_PARTICLE_JOINS, avoid: [CAPTION_BAND, BOARD_BOX, PIP_BOX, GHOSTS_BOX], sun: SUN8_AT}},
+];
 /** The sky's un-build circle (S8Sky's numbers: exit e 0.30 -> 0.92, r 1400 -> 0 easing in, about SUN0). */
 const skyExitR = (e: number) => {
   const k = Math.min(1, Math.max(0, (e - 0.3) / 0.62));
@@ -108,10 +88,11 @@ const S8Particles: React.FC = () => {
         </defs>
       ) : null}
       <g clipPath={clip ? `url(#${id})` : undefined}>
-        <S8Plane p="house">
-          <Particles {...S8_MOTES} />
-          <Particles {...S8_LEAVES} />
-        </S8Plane>
+        {S8_PARTICLE_FIELDS.map(({p, f}) => (
+          <S8Plane key={f.seed} p={p}>
+            <Particles {...f} />
+          </S8Plane>
+        ))}
       </g>
     </>
   );
