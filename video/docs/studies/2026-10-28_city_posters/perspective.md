@@ -110,6 +110,9 @@ chart: 7 posters, 11 film stills), `img/perspective_films.jpg` (v2 S1, S2, S4, S
 - **Yet far:** its base hidden, its top in open sky, paler than the frame (dE to the air: the Obelisco 16,
   Hallgrimskirkja 17; the frames 34-65), a simple silhouette with tiny things at its foot (10 px cars under a 685 px
   obelisk: 1:68).
+- **One allowed exception:** a far landmark may stay a dark silhouette on the pale sky (Copenhagen's Our Saviour spire:
+  L* 33, dE 52 from the air, behind the facade row), as CINEMATIC_GUIDE "Scale cues" 7 has it ("the darkest far shape
+  on the palest cloud"); its far-ness then comes from its size, its hidden base and the planes in front.
 
 ## 2. Where our films stand (v2 first; `img/perspective_films.jpg`, the ladder chart's lower half)
 | Still | Horizon (camera) | Open ground | Bottom fifth: masses | Nearest plane: L*, dE air, edges, contrast | Low lines: level / oblique | Overlap | `check_depth.py` |
@@ -384,6 +387,7 @@ sheet. *Cost:* S-M. *Risk:* more fields at W1; they replace guesses at G5.
 | Cape Town | Bo-Kaap window (pink house) 75 (1.6 m) -> lower house window 45 (1.6 m) -> harbour building window 7 (1.5 m) -> far coast house 5 (5 m) -> Table Mountain: none | r2 1.00, r3 0.60, r4 0.10, r5 0.02 |
 | Copenhagen | bicycle wheel 215 (0.7 m) -> facade window, nearest house 37 (1.5 m) -> facade window, mid row 28 (1.5 m) -> facade window, far end of the row 20 (1.5 m) -> Round Tower window 15 (2.0 m) -> ghost blocks: none | r1 1.00, r3 0.06, r4 0.02 |
 | Kyoto | veranda baluster bay 62 (1.8 m) -> Kinkaku-ji upper window 30 (1.2 m) -> pagoda tier 63 (9 m) -> mountains: none | r1 1.00, r3 0.73, r4 0.20 |
+
 k = the plane's px per metre over the nearest measured plane's (sizes, sideways float shifts and crane shifts all go
 as 1/distance). No poster gives its background a unit: ghost blocks and mountain layers carry no windows or storeys.
 
