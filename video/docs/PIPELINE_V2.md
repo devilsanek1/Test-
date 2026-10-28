@@ -150,13 +150,14 @@ the film's real rate — v3's "smoothness is not there" had no 30 fps surface to
 
 ## Master encode (2026-10-28; `CRAFT.md` §g)
 
-Every master (the G8 file, a 1440 x 2560 YouTube master, any owner download meant to be posted) renders in ONE step with
-`node scripts/render-media.mjs <FilmN> out/<name>.mp4 --entry=<entry> --master` (+ the film's `--props`, `GL=` as its
-chunks): lossless PNG frames, Remotion's BT.709 conversion (limited range, tagged) in the same encode, x264 CRF 14,
-preset slow, aq-mode 3, 8-bit yuv420p (High), mp4 faststart. The settings live there and nowhere else. Measured on the
-sky demo (`docs/look/research/2026-10-27_sky_gradients.md` §5): Remotion's default JPEG q80 frames halve a sky's dither
-and band it, and the old second "TV-range" pass (`scale=in_range=full:out_range=tv` + `-colorspace bt709`) re-encoded
-a BT.601 file and only relabelled it BT.709 (the mint 1.7 L* darker, dE76 up to 2.5) and banded the sky again: retired.
+Every master (the G8 file, a 1440 x 2560 YouTube master with `--scale=4/3`, any owner download meant to be posted)
+renders in ONE step with `node scripts/render-media.mjs <FilmN> out/<name>.mp4 --entry=<entry> --master` (+ the film's
+`--props`, `GL=` as its chunks): lossless PNG frames, Remotion's BT.709 conversion (limited range, tagged) in the same
+encode, x264 CRF 14, preset slow, aq-mode 3, 8-bit yuv420p (High), mp4 faststart. The settings live there and nowhere
+else. Measured on the sky demo (`docs/look/research/2026-10-27_sky_gradients.md` §5): Remotion's default JPEG q80
+frames halve a sky's dither and band it, and the old second "TV-range" pass (`scale=in_range=full:out_range=tv` +
+`-colorspace bt709`) re-encoded a BT.601 file and only relabelled it BT.709 (the mint 1.7 L* darker, dE76 up to 2.5)
+and banded the sky again: retired.
 QA on the master: `python3 -I scripts/qa/check_banding.py out/<name>.mp4 --region <a shot's open sky> --times <its
 seconds>` for every shot with a sky (PASS; a WARN is an isolated soft contour, look at it), then `gate_check.py`.
 

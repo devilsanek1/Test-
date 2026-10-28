@@ -300,25 +300,31 @@ flat. Measured on the S1 demo (`research/2026-10-27_sky_gradients.md` §5):
    cubic: no stop line, no overshoot), as painters paint an evening: a zenith a touch deeper and cooler (dL* <= ~1.3:
    deeper reads richer but contours after a platform's re-encode), the caption field FLAT through the caption band
    (dL* <= 1.5 across y 317-556, ink >= 7:1), then lighter through a pale warm light band (the sky's lightest, a step
-   over both neighbours) into the warm horizon. The cool-to-warm crossing happens in that light band at C* <= 7 (a
-   2-stop sRGB mint -> peach goes through khaki #DCDBC5; a 2-key OKLab one crosses yellow-green at C* 13).
-2. **The sun is part of the sky:** a soft elliptical warmth round a low sun (wider than tall, gone at its rim with a
-   smootherstep: no edge, no ring), never inside the caption band; the disc a flat shape on top, no halo with it.
+   over both neighbours) into the warm horizon. The cool-to-warm crossing happens in that light band at C* <= 7, and so
+   does the sun's warmth where it meets the mint (a 2-stop sRGB mint -> peach goes through khaki #DCDBC5; a 2-key OKLab
+   one crosses yellow-green at C* 13).
+2. **The sun is part of the sky:** a soft elliptical warmth round a low sun, low and wide (ry ~0.45 rx: it hugs the
+   horizon; a 0.6 one rose into the mint as a round glow disc and crossed yellow-green at C* 8.1), gone at its rim
+   with a smootherstep (no edge, no ring), never inside the caption band; the disc a flat shape on top, no halo.
 3. **The far haze = the sky's lowest colour,** warmed under the sun: `horizonColor(sky, x)` is §f.1's AIR.
 4. **Dithered for the encoder:** Chrome's own +-0.5 code gradient dither is erased by any encode, so the sky carries a
    static blue-noise texture of +-2 codes per channel at a 2 px grain (zero-mean, 0.28 L* rms: invisible; a 1 px
-   texture is erased by x264 even at CRF 14). Not grain (§c): it lives on the sky only and is never seen at 1:1.
+   texture is erased by x264 even at CRF 14), only where the sky varies (a flat band cannot band). Not grain (§c): it
+   lives on the sky only and is never seen at 1:1.
 5. **The master keeps it:** lossless PNG frames, one BT.709 conversion, x264 CRF 14 slow aq-mode 3, 8-bit yuv420p
    (`scripts/render-media.mjs --master`; Remotion's default JPEG q80 frames and the old TV-range second pass both band the
    sky, and the TV pass relabelled BT.601 as BT.709: 1.7 L* darker). A platform's re-encode still leaves a dithered sky
-   isolated soft contours (simulated CRF 20-28: WARN) where a plain gradient leaves a staircase: post at the highest
-   quality settings (`POSTING_KIT.md`).
+   isolated soft contours (simulated x264 / x265 / VP9 / AV1 rungs at 720-1080: PASS or WARN) where a plain gradient
+   leaves a staircase (FAIL): post at the highest quality settings (`POSTING_KIT.md`; YouTube: `--master --scale=4/3`).
 - **Code:** `lib/sky.tsx` (`<Sky>`, `eveningSky`, `skyColorAt`, `horizonColor`, `skyProblems`; how-to `lib/SKY.md`), a
   film's skies beside its rigs (v2: `src/v2r/world/skies.ts`), demo `src/entry-v2r-sky.tsx`.
 
 **Check:** `skyProblems(sky, {ink})` is empty (band flatness, ink contrast, no khaki, no grey run), and
-`scripts/qa/check_banding.py <still | master.mp4> --region <the sky's open area>` on the G4 clip and on every master's
-sky shots: PASS (no staircase: < 3 visible steps per 64 px strip, none over 2x the JND; the band within 1.5 L*). The JND
-is CAMBI's (Netflix libvmaf: a luminance step over 1.9 % of the mean) or dE00 1.5 for a hue band. FAIL on a staircase,
-a strong step or a bent band; the six flat steps S1 had on 2026-10-27 FAIL (dE00 5.7). Eye check on the phone, full
-brightness, in a dim room: no line where the sky changes colour, no texture at arm's length.
+`scripts/qa/check_banding.py <still | master.mp4> --region <the sky's OPEN area>` (no cloud, roof or tower in it: a
+flat shape's edge reads as a step) on the G4 clip and on every master's sky shots: PASS (no staircase, down or across
+the sky: < 3 visible steps per 64 px strip and < 3 near-JND steps per 256 px strip, none over 2x the JND, each step
+measured against the sky's own slope; the band within 1.5 L*). The JND is CAMBI's (Netflix libvmaf: a luminance step
+over 1.9 % of the mean) or dE00 1.5 for a hue band; near-JND: just over one 8-bit luma code or dE00 0.8. FAIL on a
+staircase, a strong step or a bent band; the six flat steps S1 had on 2026-10-27 and the plain mint -> peach gradient
+through the master FAIL. Eye check on the phone, full brightness, in a dim room: no line where the sky changes colour,
+no texture at arm's length.

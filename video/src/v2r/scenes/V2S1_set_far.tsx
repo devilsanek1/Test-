@@ -18,7 +18,7 @@ import * as MAP from '../world/map';
 import {CellPaint, Under, barPath, ringPath, S1_IRON, S1_HAZE, S1_ATM, hazeBatch} from './V2S1_set_core';
 import {atmos, backing, recede, toneOnTone} from '../../lib/depth';
 import {tierFill} from '../../lib/pen';
-import {mixHex} from '../../lib/light';
+import {fromLch, lch, mixHex} from '../../lib/light';
 import {floodAt, S1_PALE} from './V2S1_clock';
 import {S1Plane, S1_PLANE} from './V2S1_float';
 
@@ -43,9 +43,11 @@ const CalmTower: React.FC = () => {
   let wins = '';
   for (let y = step + 22; y < FOOT - 60; y += 34) for (const x of [x0 + 12, x0 + 34, x0 + 56]) wins += `M${x} ${y}h14v18h-14Z`;
   // its sun edge (the left: the low sun is west) one lit step; its foot warmed toward the horizon (the air near the
-  // ground is the sky's lowest colour)
+  // ground is the sky's lowest colour): atmos's step toward the haze for its value, the hue turned 50 deg the warm way
+  // round (lavender -> rose -> peach), C* >= 10 (atmos alone keeps a cool hue under a warm air; a straight mix greys)
   const lit = atmos(field, 0.18, '#FFFFFF');
-  const foot = atmos(field, 0.35, S1_HAZE);
+  const f0 = lch(atmos(field, 0.35, S1_HAZE));
+  const foot = fromLch(f0.L, Math.max(10, f0.C), (f0.h + 50) % 360);
   return (
     <>
       {/* the body with a stepped top: a set-back crown and a small plant box on it */}
@@ -434,9 +436,10 @@ const Bus: React.FC = () => {
 
 type BirdSpec = {x: number; y: number; delay: number; dur: number; c1: Pt; c2: Pt; size: number; ph: number};
 
-/** The five on the bridge railing: they lift at 1.40 (her step out; the bus has just passed them) and wheel west on a
- *  curve across the sun, never above y 600. Small and far, slate (never the plum anchor). The six on the far roofs that
- *  lifted on "life" are cut (the hit at 4.98 is the row's). */
+/** The five on the bridge railing: they lift at 2.45 (MAP.S1_CLOCK.birdsLiftBridge, after the first copy) and wheel
+ *  west, low in front of the far roofs, then up off the frame's left edge, never across the sun's disc and never above
+ *  y 600. Small (10-12 px) and pale (BIRD), never the plum anchor. The six on the far roofs that lifted on "life" are
+ *  cut (the hit at 4.98 is the row's). */
 const RAIL_BIRDS: BirdSpec[] = [
   // west, low in front of the far roofs (below the roofline y ~752 until x < 120), then up off the frame's left edge:
   // never across the sun's disc (the art director: five dark birds across the disc competed with the first copy)

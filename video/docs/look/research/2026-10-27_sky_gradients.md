@@ -24,7 +24,7 @@ our own reasoning, not measured.
 2. **Eased, never linear:** one C1 curve through the keys (a monotone cubic, Fritsch-Carlson), sampled into the fewest
    SVG stops that stay within 0.25 of a code value of it, written as `color(srgb ...)` floats (Chrome keeps them at
    sub-code precision, VERIFIED). Every key and both caption-band edges are stops, so the band is exactly flat.
-3. **The sun is part of the sky:** an elliptical warmth (340 x 204 in S1) with a smootherstep falloff, no edge and no
+3. **The sun is part of the sky:** an elliptical warmth (340 x 204 in S1 at first; 340 x 153 since the critic's pass, §8) with a smootherstep falloff, no edge and no
    disc; the disc stays a flat shape on top; the warmth never enters the caption band.
 4. **Dither for the encoder, not for the screen:** Chrome already dithers every gradient by +-0.5 of a code (VERIFIED),
    which keeps the raw frame smooth and is the first thing any encoder throws away. On top: a static **blue-noise**
@@ -180,6 +180,10 @@ tile), `scripts/render-media.mjs --master`, the demo `src/entry-v2r-sky.tsx`, S1
 
 ## 5. Measurements (VERIFIED; `scripts/qa/check_banding.py`, final verdict rules; demo `SkyDemo2R`)
 
+(Measured with the check's first version, whose step sizes were plateau-mean differences: in a fast ramp they included
+the ramp's own change, which inflated the platform rungs' FAILs below and the plain gradient's master FAIL. §8 re-measures
+with the trend-corrected check; the method's conclusions stand.)
+
 Columns: verdict, the most visible steps in one 64 px strip, strong steps (over 2x the JND), the largest step's
 luminance contrast c and dE00, the staircase share, the texture's rms (L*), the clip's bitrate (3 s, static).
 
@@ -275,3 +279,52 @@ west gap keeps the flat steps by design.)
 [35] Lilach Bullock, Instagram Reels blurry after uploading: https://www.lilachbullock.com/instagram-reels-blurry-after-uploading/ ·
 [36] The Post Flow, export settings for YouTube, Instagram, TikTok: https://thepostflow.com/post-production/post-production-workflows/export-settings-youtube-instagram-tiktok/ ·
 [37] Remotion 4.0.538 `@remotion/renderer` (node_modules: image-format.js, jpeg-quality.js, ffmpeg-args.js, options/color-space.js, prespawn-ffmpeg.js; VERIFIED) and https://www.remotion.dev/docs/renderer/render-media
+
+## 8. The critic's pass (2026-10-28): what broke, what changed (VERIFIED)
+
+Adversarial pass on the real output: the demo through the master and five simulated platform rungs (3 s clips, static
+and with a 6 px float): IG1080 = x264 medium CRF 23 / 3.5 Mbps; IG720 = bicubic to 720 x 1280, CRF 23 / 2 Mbps;
+TT265 = x265 medium CRF 28 / 1.5 Mbps; YTvp9 = VP9 1.8 Mbps; YTav1 = SVT-AV1 CRF 40; 1:1, 4x and 4-6x L*a*b*-stretched
+crops; 15 synthetic attacks on the check.
+1. **The check's step sizes were biased by the ramp.** A step was the difference of the plateau means 15 rows apart, so
+   in a fast chroma ramp (the light band into the warm horizon) the ramp's own change rode along: a 0.4 dE00 x265 block
+   edge measured dE00 4.0, "strong", FAIL; a 1-code jump in a synthetic steep ramp measured 1.6. Now each step is its
+   trend-corrected jump (one shared line per channel through both plateaus plus a jump, least squares): 0.56 for that
+   1-code jump, 0 for a smooth ramp however steep.
+2. **It was blind sideways:** a 2-code horizontal staircase PASSed with 0 steps. It now profiles across the sky too
+   (each canvas row first taken back to the strip's median).
+3. **The staircase test:** with honest sizes the plain gradient's steps through the master are near-JND (c 0.012-0.016,
+   dE00 0.9-1.2: stripes the eye still sees at 1:1, because they repeat every 8-18 px). A WIDE strip (256 px) keeps a
+   band that spans the sky sharp and averages an encoder's local wobble away; 3+ near-JND steps there (c >= 0.013, just
+   over one 8-bit luma code, or dE00 >= 0.8) FAIL. Calibration: the 2- and 3-code staircases, radial 2-code rings,
+   sideways bands, hue-only bands and steps under noise FAIL; dithered ramps, a steep ramp with 16 px block wobble and a
+   single small jump PASS. On the demo (west gap): the six flat steps FAIL (12 strong), the plain gradient FAILs in the
+   master (7 stair steps) and at 4 of 5 rungs (4-10), lib/sky PASSes the master (static and floating) and PASSes or
+   WARNs at every rung (at most 2 stair steps; never FAIL). The old table D's lib/sky FAILs at the lowest rungs were the
+   bias of 1.
+4. **The sun's warmth was a disc and crossed yellow-green.** At ry 0.6 rx it rose into the mint as a round blob (plain
+   to see in an open sky) and, composited in sRGB over the mint, crossed h 95-140 at C* 8.1 (rgb 230 224 209) where
+   skyCheck, sampling only the vertical ramp, reported 5.9. Default now `SUN_RY` 0.45 (S1: 340 x 153): C* 6.2, the
+   light band stays clean across the west gap, the warmth hugs the horizon; skyCheck samples the composite (0.6 now
+   reports C* 8.1). S1_AIR #FDD5B8 -> #FDD6B8.
+5. **Render cost:** `skyStops` (~90 ms in V8) re-ran on every render whose spec was a new object (the demo; any inline
+   `eveningSky()`): now cached by value (and the warmth's stops by strength). The dither's two blend layers covered the
+   whole 1320 x 2160 rect (~85 ms a frame at concurrency 1); now only where the sky varies (`ditherRects`: the ramps,
+   the warmth's box; pixel-identical there, the flat band and the sky behind the set lose an invisible texture): ~50 ms,
+   and the static demo master is 24 % smaller (170 -> 130 kB for 3 s).
+6. **`--scale=1.3333` crashed** (Remotion refuses 2559.94 px): `render-media.mjs` takes `--scale=4/3` and snaps a near
+   miss. The 1440 x 2560 master PASSes; its VP9 rungs PASS (1440, 4 Mbps) / WARN (1080, 2.5 Mbps). Chrome resamples the
+   2 px dither at 4/3: sigma 0.73 codes (1x 0.96), zero-mean, no moire peaks.
+7. **Held up:** byte-identical frames in two processes, and the default and angle GL paths render it identically; the
+   dither is zero-mean (G mean -0.0004 code); a 6 px float blurs it slightly at fractional offsets (+-2 levels 3.1 -> 1.6
+   %, 89 % of 2 x 2 texels intact) and the floating master still PASSes; a 6 % push PASSes the master and WARNs at the
+   rungs; the caption band stays flat (dL* <= 0.3) and the ink 11.2:1 (>= 10.9 at the 1st percentile) in the master and
+   every rung; v1 / v3 import nothing of it and `render-media.mjs`'s default path renders a v3 chunk identically to the
+   pre-sky script (one of five runs of that chunk differed by 2.7 % of its pixels: a v3 render flake under load, not the
+   script); the blue-noise tile has no low-frequency power (0.000 below 0.06 cycles/px).
+8. **The check needs OPEN sky:** a pale flat cloud, a far tower or a roofline in the region reads as a step, by design
+   (a big flat step IS what it must FAIL). S1's skies.ts named `0,0,330,712`, which holds S1's pale cloud strip and the
+   far tower (FAIL, with the first check too); S1's open sky at 3.0 s: `0,560,250,712`, `400,0,1080,170`,
+   `0,270,1080,560` (all PASS).
+9. **Not done:** CAMBI itself. A prebuilt ffmpeg with libvmaf was refused by this session's permission policy (code from
+   outside the repo); the check stays our CAMBI-threshold approximation. Worth a run where a libvmaf build is allowed.
