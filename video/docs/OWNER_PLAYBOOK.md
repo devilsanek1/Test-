@@ -81,7 +81,8 @@ Maintenance at the end).
   separate one from the other, no distance effect, no perspective; the bottom part: little to no perspective or depth
   ... research some libraries on GitHub ... add a bit of particles here and there to make things more natural"; on v4: "I don't see any changes in the particles
   anywhere"; on v5: "I don't like the water too much, leafs are great"; "it's just looking way too cheap, not clean or premium
-  quality or refined, just lazy and cheap", v2 G4,
+  quality or refined, just lazy and cheap"; on v6, the researched shared water (true reflections, a gold light
+  column, still glitter, calm ripple lines): "Yeah this is better", v2 G4,
   2026-10-27/28).
 - **A gentle PARALLAX float, never a flat card.** When a held shot floats, its planes move by depth (Disney's multiplane
   idea): the near ground most, far planes little, the sky and the caption band not at all; slow, small, back at rest
