@@ -2,6 +2,13 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Note 2026-10-28 19:25 UTC: G7 master v1 sent to the owner
+
+`deliverables/v2/v2r_G7_master_v1.mp4` (39.083 s, 60 fps, the final sound mix): REVIEW_1's six MUSTs done (fix passes A + B), every
+sound cue on its picture event (SOUND.md "Sound sync (final)"); check_light 17/17, check_depth 0 FAIL, banding 0 FAIL, A/V lag 0 ms,
+loop seam 0.09 %; gate_check's one FAIL (the V2S7 cut found at f1684) waived by eye (MASTER.md §7). Left for the owner's call: the S5
+terrace shadows at 21-22 s, the blank boards waiting for the voice, a few small things (MASTER.md §5). The cover + posting kit next.
+
 ## Snapshot 2026-10-28 16:55 UTC: G5 assembly v1 + the review
 
 `deliverables/v2/v2r_G5_assembly_v1.mp4` (39.083 s, 60 fps, the mix): gate_check PASS (0 fail / 4 warn), A/V sync PASS, lints PASS,

@@ -207,3 +207,9 @@ Most visible first. None of these is a FAIL, and none was among REVIEW_1's MUSTs
     | 36.0, 38.0 | 150,615,935,1220 (the board and W, from the landing at 35.60) |
 - **The seam numbers:** decode f2342-f2344, f0 and f1 with `master_sheets.py frames`. Then take the mean |RGB| difference,
   and the share of pixels whose largest channel difference is over 8 levels.
+
+## 7. Orchestrator's ruling on the gate_check FAIL (2026-10-28)
+The V2S7 cut is found at f1684, not f1686: checked by eye on f1680-f1688 (the S6 -> S7 push into the sun). f1684 is the S6 board's top
+edge and heading leaving the bottom of the frame during one continuous zoom; f1685 is sun and sky; f1686 S7 starts on the sun and its
+board rises from the bottom as it pulls out. No pop: the detector's peak sits on the exit, two frames before the declared boundary.
+WAIVED for this master. Tooling backlog: gate_check should take a push-through join's declared window (or +-3 frames) instead of +-1.
