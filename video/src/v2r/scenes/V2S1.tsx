@@ -30,14 +30,30 @@ import {S1Row, S1HerBehindDoor} from './V2S1_row';
 import {S1Steps} from './V2S1_steps';
 import {S1Pip} from './V2S1_pip';
 import type {ToneKey} from '../../lib/Film';
+import {CAPTION_BAND, Particles, glitterPath} from '../../lib/particles';
+import * as MAP from '../world/map';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
-/** PARTICLES SLOT (the owner's note, 2026-10-27: "a bit of particles here and there ... to make things a bit more
- *  natural"; CRAFT §f): motes drifting in the low sun's light (around SUN0 and over the west gap), a drifting leaf or
- *  two (from the plane branch, top-left), a few glints on the water (y 1130-1215). Filled from the shared, deterministic
- *  src/lib/particles.tsx when it lands (the orchestrator's call): never a hand-rolled particle system here. Empty now. */
-const S1Particles: React.FC = () => null;
+/** THE PARTICLES (the owner's note, 2026-10-27: "a bit of particles here and there ... to make things a bit more
+ *  natural"; CRAFT §f.6; conform_L1 §11): three small tier-C fields from lib/particles, all after the frame-0 flood
+ *  (t0 0.30), no birth after 5.75 (nothing enters in 5.80-6.40 around the push-through join at 6.10), clear of the
+ *  caption band and her path:
+ *    motes   a few in the sun-side air over the west gap, against the far rows (a step lighter toward SUN0)
+ *    glints  in the sun's glitter path on the canal under SUN0 (short level dashes that shorten toward the horizon)
+ *    a leaf  from the plane branch, down the left gutter (x < 95: never through the caption band) */
+export const S1_PARTICLES = {t0: 0.3, t1: 5.75, joins: [6.1], her: [380, 900, 320, 220] as [number, number, number, number]};
+const S1Particles: React.FC = () => {
+  const sun: [number, number] = [MAP.SUN0.x, MAP.SUN0.y];
+  const common = {t0: S1_PARTICLES.t0, t1: S1_PARTICLES.t1, joins: S1_PARTICLES.joins, avoid: [CAPTION_BAND, S1_PARTICLES.her], sun};
+  return (
+    <>
+      <Particles kind="motes" seed="s1motes" region={{rect: [24, 790, 236, 150]}} on="#DEC6B8" {...common} />
+      <Particles kind="glints" seed="s1glints" region={{poly: glitterPath({x: MAP.SUN0.x, yFar: 1104, yNear: 1166})}} on="#E9C98E" horizon={965} {...common} />
+      <Particles kind="leaves" seed="s1leaf" region={{rect: [20, 110, 34, 70]}} on="#DACCBE" colors={[CM.leafGold, CM.leafRust]} floor={1910} count={1} gap={[0.3, 0.9]} {...common} />
+    </>
+  );
+};
 
 const V2S1: React.FC = () => (
   <World sky={CM.white} horizon={1000}>

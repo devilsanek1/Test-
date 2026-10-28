@@ -14,7 +14,7 @@ import {Ink} from '../../lib/Ink';
 import {rng} from '../../lib/rng';
 import {CM} from '../palette';
 import {Batch, P, Pt} from '../kit/canal/core';
-import {mixHex} from '../../lib/light';
+import {atmos, makeAtmosphere, planePalette} from '../../lib/depth';
 
 export type {Pt};
 
@@ -41,15 +41,24 @@ export const S1_SUN_HALO = '#FFD4AE';
 /** THE HAZE (atmospheric perspective in flat colour): the lowest sky step, so the far city's air agrees with the sky
  *  (the owner's continuous-sky note): every far plane mixes toward it, lighter and lower in chroma than the warm wing. */
 export const S1_HAZE: string = S1_SKY[5];
+/** S1's ONE atmosphere (lib/depth): the air = the sky's lowest step; the far city starts at +3 behind the pale wing
+ *  (DEPTH.md "Learned"), its steps stronger than PLANE_STEPS on +3 / +4 (0.66 / 0.90, v1-like: its far city dE 7.2 from the air; a far colour across from the warm air
+ *  turns up to 30 deg toward it) so the ladder falls toward the air (check_depth v2_s1). */
+export const S1_ATM = makeAtmosphere({name: 'v2 S1 canal evening', air: S1_HAZE, steps: [0, 0.12, 0.22, 0.66, 0.9], hueTurn: 30});
 
-/** Mix a batch's fills toward the haze, layer by layer (`ks[i]` for layer i; the last k for any further layer), and
- *  drop its ink: a far plane is simpler and carries no lines. */
-export function hazeBatch(b: Batch, ks: number[], haze = S1_HAZE): Batch {
+/** Recede a batch's fills toward the haze, layer by layer (`ks[i]` for layer i; the last k for any further layer):
+ *  lib/depth `atmos` (CRAFT §f.2: L* toward the air's, a hue on the air's side converging on it, one across from it
+ *  keeping its hue at a lower chroma, never grey or olive); its ink dropped: a far plane is simpler, no lines. */
+export function hazeBatch(b: Batch, ks: number[], haze = S1_HAZE, o: {planes?: number[]} = {}): Batch {
   b.layers.forEach((l, i) => {
     const k = ks[Math.min(i, ks.length - 1)];
+    // with `planes`: the layer's materials receded to that plane AND merged to its few close values (lib/depth
+    // planePalette: +3 three values within dE 12, +4 two within 5): a far row is a calm band, never busy
+    const plane = o.planes ? o.planes[Math.min(i, o.planes.length - 1)] : null;
+    const pal = plane !== null ? planePalette(Array.from(l.fills.keys()), plane, S1_ATM) : null;
     const fills = new Map<string, string[]>();
     l.fills.forEach((ds, c) => {
-      const m = mixHex(c, haze, k);
+      const m = pal ? pal[c] ?? atmos(c, k, haze) : atmos(c, k, haze);
       const a = fills.get(m);
       if (a) a.push(...ds);
       else fills.set(m, [...ds]);
