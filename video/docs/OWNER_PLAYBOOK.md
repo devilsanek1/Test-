@@ -24,7 +24,14 @@ Maintenance at the end).
 ## Audience and goal
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24).
 - **Growth matters: maximise engagement with subtle, defensible hooks**: bait that is true, e.g. "the language everyone
-  loves". Never misleading. — (v1, 2026-10-24).
+  loves". Never misleading, and **never baity: the opening must never sound like a commercial.** A sales question to
+  the viewer ("Buying a laptop soon?"), a pitch-like claim about their purchase, a shopping screen with a price and "Add
+  to cart" as the first image: together they read as an ad, and people skip ads (v3: 60 % gone by ~2 s, skip rate
+  64.5 % against v1's 32 %, no shares or saves). Open like a person telling surprising news they just found out (what
+  happened, then why it matters to you), in a curious, credible voice, with the world's own picture first; before G2,
+  a cold viewer panel hears the first line and sees the first frame and answers "does this sound like an ad or bait?":
+  it must be no. — (v1, 2026-10-24; owner, v3 insights, 2026-10-28: "the engagement is much worse on this video now. My
+  personal read is it sounds more like a bait commercial or rather way too baity".)
 
 ## Script and voice
 - **A script is a coherent STORY, not a collection of true sentences about the topic.**
@@ -374,6 +381,15 @@ Maintenance at the end).
   Reading: the leak is the first 15 s (-42 points by 5 s, another -25 by 15 s); after that it is nearly flat. Saves and
   shares are low, so give people a reason to send it. Screenshots: `context/uploads/inline/2026-10-26_v1_insights_24h_*`.
   — 2026-10-26.
+- v3 "AI is making your next laptop pricier" (IG, the reworked reel, early check):
+  - skip rate 64.5 % ("higher"; v1 32.2 %); likes 1.1 %, shares 0.0 %, saves 0.0 %, reposts 0.0 %, comments 0.0 %;
+  - retention (read off the curve) ~62 % at ~1 s, ~40 % at ~2 s, ~33 % at 5 s, ~24 % at 10 s, ~20 % at 15 s, ~12 % at
+    25 s, ~10 % at 35 s, ~6 % at the end (41 s).
+
+  Reading: the leak is the first 2 s (-60 points), twice v1's skip rate; after 5 s it is a slow slide. The owner's read:
+  the opening sounds like a bait commercial ("Buying a laptop soon? AI's making it pricier." over a shopping app's
+  price tag and "Add to cart") -> the never-baity rule in Audience and goal. Screenshots:
+  `context/uploads/inline/2026-10-28_v3_insights_*`. — 2026-10-28.
 
 ## Retired rules
 - ~~The owner records the voice in ElevenLabs (we hand over the paste text)~~ → generated through the API with the owner's voice (2026-10-26).

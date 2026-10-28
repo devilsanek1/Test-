@@ -75,7 +75,8 @@ Quality and output value come first, spent where it reaches the film. Ideas are 
 - **G0.5 core line (owner rule; folded into G0 by default since 2026-10-28):** the one key sentence is still picked
   before the script. G0's editor drafts it per topic with what the v3-v4 core-line runs taught: one real person in
   their own words, or a direct question, beats a plural headline; plain beats clever; a line whose honest payoff walks
-  back its own claim fails; numbers are checked against the fact file (v4's truth check caught a 2024 figure in a 2026
+  back its own claim fails; a line that sounds like a commercial or bait fails (playbook, Audience and goal: never
+  baity; v3's "Buying a laptop soon?" opening was skipped by 64.5 %); numbers are checked against the fact file (v4's truth check caught a 2024 figure in a 2026
   hook). A separate round runs only when the owner asks for more options: one writer (12-15 lines across the levers:
   loss, unfairness, reversal, personal, curiosity, headline, one real voice) and one critic (the judges' lenses, a
   four-persona gut panel and a truth check in one pass), the top 3 on one screen; bookkeeping
@@ -84,7 +85,8 @@ Quality and output value come first, spent where it reaches the film. Ideas are 
 - **G1 script = story first (owner, 2026-10-26; lean since 2026-10-28):** one writer (1) drafts 2-3 competing story
   spines (the throughline question, the viewer's situation, beats joined by but/so, the turn, the payoff that lands the
   core line) and picks one, with its reason; (2) writes the script with cues; (3) runs `check_rhythm.py` and
-  `check_paste.py` until both pass. Then one critic: a cold retell (a list-like retelling fails), the flow (every line
+  `check_paste.py` until both pass. Then one critic: a cold retell (a list-like retelling fails), the first line heard cold: "ad or news?" (an ad-like or
+  baity opening fails: playbook, never baity), the flow (every line
   follows from the previous) and the facts against the fact file, at most 6 findings; then one fix pass by the same
   writer (resumed, not restarted). The through-line card's carriers come from the script's joins (G1 row). Never
   structure a script as a list of facts to prove. **Rhythm (owner, 2026-10-27):** short sentences (<= 5 words) break up

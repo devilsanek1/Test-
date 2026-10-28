@@ -109,3 +109,11 @@ Only the owner's quoted words carry owner rank; the "->" half is our log, and a 
   video" -> v3 stays as posted (the opening rebuild was stopped before it changed anything).
 - 2026-10-28: "It's done. It's the feedback for the next" -> v3 closed; the opening-effects note is a rule for the next
   videos (playbook Hook and pacing).
+
+## Performance log
+- 2026-10-28, IG early check (the reworked reel): skip rate 64.5 % (higher), likes 1.1 %, shares / saves / reposts /
+  comments 0.0 %; retention ~40 % at ~2 s, ~10 % by 35 s, ~6 % at the end. Owner: "I already see the engagement is much
+  worse on this video now. My personal read is it sounds more like a bait commercial or rather way too baity" -> playbook
+  (Audience and goal: never baity; Performance log), PIPELINE_V2 (G0.5 / G1 ad-or-news check). Our reading of what made
+  it read as an ad: the sales question "Buying a laptop soon?" + "AI's making it pricier." over a shopping app's price
+  tag with "Add to cart" as the first image. Screenshots `context/uploads/inline/2026-10-28_v3_insights_*`.
