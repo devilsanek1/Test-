@@ -9,6 +9,8 @@
 //                   22.85 / 23.17: no entrance near the wipe 23.60-24.00), falling out of its lower crown past its
 //                   trunk onto the paving (pink on the tree's mauve: seen), clear of the Pentagon, the plaque and the
 //                   pair; plane 0 (the deck's end map).
+//   motes           the sun's air against shade, far 7-10 px + 2 near (12-16 px) at the start (gone before the landing)
+//                   and in the landing (from 2.2): <= 6 at once.
 //   (no glints: the Potomac under the end sun is a 23 px band 50 px under the horizon; its glitter path flattens a
 //   28-36 px sparkle to a speck, unseen at phone size: tried 2026-10-28 and dropped)
 // The old near-lens petals (NearPetals5: 14 petals of 4.5-9 px) are retired: too small to see on a phone, too many.
@@ -83,6 +85,25 @@ export const S5_PARTICLE_FIELDS: {group: 'deckStart' | 'deck'; f: ParticlesProps
       avoid: [CAPTION_BAND, END_PENT, END_PLAQUE, END_PAIR],
       sun: [FAR_END.sun.x, FAR_END.sun.y],
     },
+  },
+  // motes in the sun's air, against shade (CRAFT §f.6: far 6-10 px, 2 near at 12-16 px, <= ~10 in all): the start's
+  // slot air before the crowns' shaded undersides (born by 0.6, gone before the landing), the landing's air before the
+  // terrace cherry's shaded crown and the corner crown (from 2.2, a steady field through the wipe)
+  {
+    group: 'deckStart',
+    f: {kind: 'motes', seed: 's5motesStart', region: {rect: [90, 760, 360, 100]}, on: BLOOM_S5.base, count: 3, size: [7, 10], life: [2, 2.6], t0: 0.25, t1: 0.6, lift: 17, margin: 10, joins: S5_JOINS, avoid: [CAPTION_BAND, START_NEWS, START_PAIR], sun: [250, 650]},
+  },
+  {
+    group: 'deckStart',
+    f: {kind: 'motes', seed: 's5motesStartNear', plane: -1, region: {rect: [760, 640, 260, 200]}, on: BLOOM_S5.base, count: 2, life: [2, 2.6], t0: 0.25, t1: 0.6, lift: 18, margin: 12, joins: S5_JOINS, avoid: [CAPTION_BAND, START_NEWS, START_PAIR], sun: [250, 650]},
+  },
+  {
+    group: 'deck',
+    f: {kind: 'motes', seed: 's5motesEnd', region: {rect: [110, 700, 170, 300]}, on: mix(CM.shadeWarm, CM.blossom, 0.2), count: 4, size: [7, 10], t0: 2.2, lift: 17, margin: 10, joins: S5_JOINS, avoid: [CAPTION_BAND, END_PENT, END_PLAQUE, END_PAIR], sun: [FAR_END.sun.x, FAR_END.sun.y]},
+  },
+  {
+    group: 'deck',
+    f: {kind: 'motes', seed: 's5motesEndNear', plane: -1, region: {rect: [880, 1300, 180, 200]}, on: mix(CM.shadeWarm, CM.blossom, 0.2), count: 2, t0: 2.2, lift: 18, margin: 12, joins: S5_JOINS, avoid: [CAPTION_BAND, END_PENT, END_PLAQUE, END_PAIR], sun: [FAR_END.sun.x, FAR_END.sun.y]},
   },
 ];
 
