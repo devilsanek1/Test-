@@ -74,7 +74,8 @@ A clash is a bug: fix the lower doc in the same turn.
   is ONE gentle, smooth gradient (the owner's opt-in: the sky is the one place a gradient is welcome; "find a beautiful
   way to do a gentle gradient"), warmest at the sun and the horizon, dithered so it never bands on a phone, nearly
   flat inside the caption band (captions keep their contrast); the far haze takes the sky's lowest colour; no two big
-  fields of unrelated colour meet in a seam no object explains. -> `PALETTE.md`; `COZY_AND_SCALE.md` 3b.6; `CRAFT.md` §f.
+  fields of unrelated colour meet in a seam no object explains. -> `PALETTE.md`; `COZY_AND_SCALE.md` 3b.6; `CRAFT.md` §f;
+  the sky: `CRAFT.md` §g (`lib/sky.tsx`, `check_banding.py`, the master encode).
 - **7. Cozy, with occasional great scale.** Cozy is the home feeling (>= 50 % of the runtime outside full-frame charts):
   a place that holds you without shutting you in (masses on 2-3 sides, one opening the subject faces), life passing
   through sideways, broken once at most, at the turn; it evolves one measured owner reference at a time. Scale: 1-2

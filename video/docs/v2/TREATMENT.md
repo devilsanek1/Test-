@@ -388,7 +388,8 @@ Small checkpointed tasks, a commit per agent.
   x 120-880, y 290-1250. *Fairness:* §8. *Motion:* `camspeed` <= 7.5 px/f long flat-ink moves, <= 15 detailed; no zoom in a hold, no opacity,
   strobe-free. *Colour:* hero 5-15 % on her shots, pop <= 3 %.
 - **Render:** lanes at 0.5 scale `--gl=angle`; pilot and final 1080x1920 at 60 fps: `npx remotion render src/entry-v2r-film.tsx Film2R
-  out/v2r_final.mp4 --gl=angle --concurrency=2 --crf 14` (~5-8 min) + the TV-range pass (HANDOFF §5); `gate_check`, `density`, `deadframes`,
+  out/v2r_final.mp4 --gl=angle --concurrency=2 --crf 14` (~5-8 min) (2026-10-28: the master is now `scripts/render-media.mjs --master`, one step,
+  PIPELINE_V2 "Master encode"; the TV-range pass is retired); `gate_check`, `density`, `deadframes`,
   `framecheck`, `beatsync`; edges only if the owner wants them; a 1440x2560 Shorts master; cover from 5.30 s; a download, stage named.
 
 ## 10. What the judges flagged, and how this direction answers it
