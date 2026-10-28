@@ -10,22 +10,24 @@ import React, {useMemo} from 'react';
 import type {WiperComponent, WiperProps} from '../../lib/Film';
 import {CM} from '../palette';
 import {mix, crownD} from '../kit/dc/core';
+import {rc} from './V2S5_depth';
 
 /** Nothing of the wiper above this screen y. */
 const CLIP_Y = 560;
 /** The crown's real half-width about x (lobes + misjudged margins); Film runs the edge from -half - 30 to W + half + 30. */
 const HALF = 160;
 
-/** A near cherry against the light (the end sun beyond, to the right): one value step darker than the deck's trees
- *  (plane -2, CRAFT §f.2 "nearer: a value step darker"), flat, no line. */
+/** A near cherry against the light (the end sun beyond, to the right), the NEAREST plane (-2: lib/depth nearStep, one
+ *  value step darker than the terrace frames, hue and chroma kept; CRAFT §f.2): the slot crowns' calm blossom (V2S5_valley
+ *  BLOOM_S5) two steps nearer: a mid mauve mass (L* 40-51), blossom L* 60-73, a warm-dark trunk (L* ~28), flat, no line. */
 const T = {
-  trunk: mix(CM.anchor, CM.brickDeep, 0.3),
-  trunkLit: mix(CM.anchor, CM.brickDeep, 0.62),
-  crownDark: mix(CM.shadeWarm, CM.anchor, 0.5),
-  crown: mix(CM.shadeWarm, CM.anchor, 0.22),
-  bloomShade: mix(CM.blossom, CM.shadeWarm, 0.52),
-  bloom: mix(CM.blossom, CM.shadeWarm, 0.2),
-  bloomLit: CM.blossom,
+  trunk: rc(mix(CM.anchor, CM.shadeWarm, 0.62), -2),
+  trunkLit: rc(mix(CM.brickDeep, CM.shadeWarm, 0.5), -2),
+  crownDark: rc(mix(CM.shadeWarm, CM.blossom, 0.12), -2),
+  crown: rc(mix(CM.shadeWarm, CM.blossom, 0.42), -2),
+  bloomShade: rc(mix(CM.shadeWarm, CM.blossom, 0.64), -2),
+  bloom: rc(mix(CM.blossom, CM.shadeWarm, 0.26), -2),
+  bloomLit: rc(CM.blossom, -2),
 };
 
 /** The tree in local px (x centred on the wipe edge, y screen). Static geometry. */
