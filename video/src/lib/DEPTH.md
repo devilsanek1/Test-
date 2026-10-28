@@ -83,7 +83,7 @@ How to use it: wrap each plane's group in `<g transform={translate(parallaxOffse
   band); motes read only against shade; a field drawn inside a frame-0 `Look` would paint paper-white specks.
 - SEEN at phone size (the owner on S1's v4, 2026-10-28: "I don't see any changes in the particles anywhere"): v4's
   13 px leaves, 14-24 px glints and 3-4 px motes vanished at phone size. Test every shot at 360 px wide (three frames,
-  every particle ringed from `particlesAt`; L1's report has the script): leaves 34-40 px read as leaves there (an
+  every particle ringed from `particlesAt`: `scripts/qa/particles_phone.py`): leaves 34-40 px read as leaves there (an
   almond reads as a seed: use `leaf: 'palmate'`), 26-36 px sparkles read, 8-10 px motes read only as specks, so put
   them in the brightest sunlit air against the darkest shade near the sun. A leaf needs a calm path through the open
   mid ground, where the eye goes (S1: blown in from off-frame on a light breeze, 115 px/s across, ~40 px/s down);
