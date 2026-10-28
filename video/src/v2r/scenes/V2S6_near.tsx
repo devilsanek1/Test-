@@ -249,7 +249,7 @@ const BW = {
   wood: near(WOOD),
   woodLit: near(mix(WOOD, CM.paper, 0.26)),
   woodEdge: near(mix(WOOD, CM.paper, 0.42)),
-  under: near(mix(CM.line, CM.shadeWarm, 0.5)),
+  under: near(mix(WOOD, CM.shadeWarm, 0.3)),
   iron: near(mix(CM.coatSlate, CM.anchor, 0.35)),
 };
 
@@ -311,7 +311,7 @@ const bedCastD = (() => {
   const n = 9;
   for (let i = 0; i <= n; i++) {
     const z = z1 - 0.06 - ((z1 - 0.06 - z0) * i) / n;
-    const reach = 0.3 + 0.12 * (i % 2) + 0.06 * rand('s6bedcast', `r${i}`);
+    const reach = 0.2 + 0.09 * (i % 2) + 0.05 * rand('s6bedcast', `r${i}`);
     pts.push(pt(x1 + reach, z - 0.08, 0));
   }
   return polyD(pts);

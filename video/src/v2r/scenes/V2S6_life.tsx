@@ -22,6 +22,7 @@ import {GATE} from '../kit/dc/gate';
 import {Tier} from '../kit/tiers';
 import {CastShadow, ContactShadow, ShadowLayer} from '../../lib/light';
 import {adultH, QUIET} from './V2S6_rig';
+import {S6_AIR} from '../world/skies';
 
 const smooth = (u: number) => {
   const k = Math.min(1, Math.max(0, u));
@@ -46,7 +47,13 @@ const along4 = (keys: Key4[], t: number): [number, number, number] => {
 
 // ---------------------------------------------------------------- tones
 
+/** S6's steps toward the April air, one flat step per plane (lib/depth PLANE_STEPS are 0.12 / 0.22 / 0.40; S6 takes
+ *  more, so the ladder reads at a squint: the fence + lawn, then the cherries, then the facade, each >= 3 dE closer to
+ *  the air; check_depth at 25.0). */
+export const S6_AIR_K = {fence: 0.15, lawn: 0.62, facade: 0.72} as const;
+
 const LT = {
+  trunkFar: mix(mix(CM.anchor, CM.line, 0.25), S6_AIR, S6_AIR_K.lawn),
   cloud: CM.skyHigh,
   cloudLit: CM.paper,
   cloudBelly: mix(CM.skyHigh, CM.stoneShade, 0.35),
@@ -127,6 +134,7 @@ type TreeSpec = {x: number; base: number; rx: number; ry: number; cy: number; bl
  *  Crown tops = cy - 1.16 ry >= 612 (never above y 600). Lawn coords. Kept off the sun (x 215-305), off Pip's calm ring
  *  (x 690-900) and off the service door (x 900-1060). */
 const LAWN_TREES: TreeSpec[] = [
+  {x: -26, base: 872, rx: 74, ry: 58, cy: 786, bloom: 2.4, seed: 'lt0'},
   {x: 420, base: 852, rx: 90, ry: 72, cy: 700, bloom: 2.6, seed: 'lt1'},
   {x: 572, base: 852, rx: 94, ry: 74, cy: 704, bloom: 2.4, seed: 'lt2'},
   {x: 1152, base: 856, rx: 104, ry: 80, cy: 706, bloom: 2.6, seed: 'lt3'},
@@ -140,7 +148,7 @@ const BLOOM_S6: BloomTones = {
   mid: mix(CM.blossom, CM.shadeWarm, 0.18),
   lit: mix(CM.blossom, CM.paper, 0.32),
 };
-const BLOOM_FAR: BloomTones = Object.fromEntries(Object.entries(BLOOM_S6).map(([k, v]) => [k, mix(v, CM.sky, 0.1)])) as BloomTones;
+const BLOOM_FAR: BloomTones = Object.fromEntries(Object.entries(BLOOM_S6).map(([k, v]) => [k, mix(v, S6_AIR, S6_AIR_K.lawn)])) as BloomTones;
 const LIGHT: [number, number] = [-0.95, -0.3];
 
 const crownOf = (s: TreeSpec): CrownSpec => ({cx: s.x, cy: s.cy, rx: s.rx, ry: s.ry, seed: s.seed, light: LIGHT, bloom: s.bloom, ink: 2.2});
@@ -154,13 +162,13 @@ const trunkInto = (B: Batch, s: TreeSpec, shadow: string) => {
     [s.x + s.rx * 0.86, s.base + 5],
     [s.x - 2, s.base + 6],
   ]);
-  B.poly(LT.bark, [
+  B.poly(LT.trunkFar, [
     [s.x - 7, s.base],
     [s.x - 5, top],
     [s.x + 5, top],
     [s.x + 7, s.base],
   ]);
-  B.poly(mix(LT.bark, CM.paper, 0.25), [
+  B.poly(mix(LT.trunkFar, CM.paper, 0.25), [
     [s.x - 7, s.base],
     [s.x - 5, top],
     [s.x - 2, top],
@@ -188,7 +196,7 @@ export const S6LawnTrees: React.FC = () => {
 
 /** The one jogger (tier C): in from the left edge after the join's quiet window, running right on the far promenade
  *  until the board hides them (x 120, ~25.5). */
-const JOG = {t0: 0.45, x0: -62, v: 168, feet: 874, rate: 2.9, traits: {coat: CM.sage, hair: 'bun', hairColor: CM.hair[4], acc: 'none', coatLen: 'jacket'} as const};
+const JOG = {t0: 0.45, x0: -62, v: 168, feet: 874, rate: 2.9, traits: {coat: CM.sage, hair: 'bun', hairColor: CM.hair[4], acc: 'none', coatLen: 'jacket', trousers: CM.stoneShade} as const};
 
 /** The far promenade (lawn plane): the jogger and their shadows (the rig's: contact + cast). */
 export const S6Promenade: React.FC = () => {

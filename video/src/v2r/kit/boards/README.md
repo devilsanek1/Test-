@@ -45,6 +45,15 @@ returns at 3.0 px in its own shade). Lettering never changes: `WorldText` is raw
 keyline, the header rules, the tag's keyline and leader and the news box's rules are `graphic` (kept); the tag's string
 and the half-wiped menu's scribbles are things (kept, thin); screw slots and edge contours follow the tier.
 
+## Light (lib/light, 2026-10-28)
+The legs' contact shadows and the board's cast shadow come from the SCENE's rig (`src/v2r/world/rigs.ts`), never from
+the kit: pass `shadow={false}` to the board and draw, in the paving's `ShadowLayer`, a `ContactShadow` under each leg
+(x = each stile's centre, y = `legsTo`, w = the stile) and one `CastShadow` with the legs' line as its footprint and h =
+`legsTo` - the frame's top (S6: V2S6_near `S6GroundShadows`). K3's own flat `BoardShadow` stays for scenes without a rig
+(the review sheets). Checked 2026-10-28 on S6 at 25.0 (tier A, full size): ONE closed ~3 px outline in the frame's own
+deep plum (#342138, L* 16: the stile is #36223A), outside the lit strip, from the first frame; the keys and keylines at
+full contrast; nothing in the kit changed.
+
 ## The type scale and the readability rule (ONE scale for the whole film)
 
 | `TYPE` | px | faux weight (the same on every board) | what | must read at |
