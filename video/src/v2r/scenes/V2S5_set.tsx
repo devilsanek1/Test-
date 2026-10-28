@@ -4,22 +4,27 @@
 //   V2S5_start     S5StartBack (behind all) / S5StartFore (over all): the start-only canopy + near foreground (screen, p)
 //   V2S5_far       S5Far (far plane) + S5FarLife (sky life, screen)
 //   V2S5_river     S5River          V2S5_mid  S5Mid          V2S5_nearmid  S5NearMid (start coords)
-//   V2S5_deck      S5Deck / S5DeckOver (deck plane), S5TreeLeft / S5RightFrame (their boxes), S5WipeProp, S5NearEnd
+//   V2S5_deck      S5Deck / S5DeckOver (deck plane), S5TreeLeft / S5RightFrame (their boxes), S5WipeProp
+//   V2S5_particles S5Particles (the 'near' slot: petals and glints, each field in its plane's map)
 //   V2S5_figs      FiguresStart (start coords until the swap) / FiguresEnd (deck plane from the swap)
 //   V2S5_text      NewsBox (start coords, rides the deck) / Plaque (end coords, pops on "Pentagon")
+// Tiers (conform_L4 §5): every plane is C (environment: no outline, calm) but the figures (B, their kits' default) and
+// the A pieces, which set their own: the news box (V2S5_text, 20.90-21.75), the Pentagon (V2S5_mid, from 22.43), the plaque.
 // Draw order: start back -> far -> sky life -> river -> mid -> near-mid -> deck -> figures -> deck over (bench) -> news
 // box -> plaque -> left frame -> right frame -> wipe -> end near masses -> start foreground.
 import React from 'react';
 import {useTime} from '../../lib/time';
 import {XG} from '../../lib/xf';
 import {PullLayer} from '../../lib/pullback';
+import {Tier} from '../../lib/tier';
 import {craneP, planeMat, startMat, boxMat, wipeMat, swapAt, SWAP_P, T5, PLANES} from './V2S5_rig';
 import {S5StartBack, S5StartFore} from './V2S5_start';
 import {S5Far, S5FarLife} from './V2S5_far';
 import {S5River} from './V2S5_river';
 import {S5Mid} from './V2S5_mid';
 import {S5NearMid} from './V2S5_nearmid';
-import {S5Deck, S5DeckOver, S5TreeLeft, S5RightFrame, S5WipeProp, S5NearEnd} from './V2S5_deck';
+import {S5Deck, S5DeckOver, S5TreeLeft, S5RightFrame, S5WipeProp} from './V2S5_deck';
+import {S5Particles} from './V2S5_particles';
 import {FiguresStart, FiguresEnd} from './V2S5_figs';
 import {NewsBox, Plaque} from './V2S5_text';
 
@@ -41,13 +46,21 @@ export const S5Set: React.FC<{p?: number; only?: S5Layer[]}> = ({p: pIn, only}) 
       {on('start') ? <S5StartBack p={p} /> : null}
       {on('far') ? (
         <PullLayer m={planeMat(PLANES.far, p)}>
-          <S5Far />
+          <Tier tier="environment">
+            <S5Far />
+          </Tier>
         </PullLayer>
       ) : null}
-      {on('sky') ? <S5FarLife p={p} /> : null}
+      {on('sky') ? (
+        <Tier tier="environment">
+          <S5FarLife p={p} />
+        </Tier>
+      ) : null}
       {on('river') ? (
         <PullLayer m={planeMat(PLANES.river, p)}>
-          <S5River />
+          <Tier tier="environment">
+            <S5River />
+          </Tier>
         </PullLayer>
       ) : null}
       {on('mid') ? (
@@ -61,7 +74,11 @@ export const S5Set: React.FC<{p?: number; only?: S5Layer[]}> = ({p: pIn, only}) 
         </PullLayer>
       ) : null}
       <PullLayer m={deck}>
-        {on('deck') ? <S5Deck /> : null}
+        {on('deck') ? (
+          <Tier tier="environment">
+            <S5Deck />
+          </Tier>
+        ) : null}
         {swapped && on('figs') ? <FiguresEnd /> : null}
       </PullLayer>
       {swapped || !on('figs') ? null : (
@@ -71,7 +88,9 @@ export const S5Set: React.FC<{p?: number; only?: S5Layer[]}> = ({p: pIn, only}) 
       )}
       {on('deck') ? (
         <PullLayer m={deck}>
-          <S5DeckOver />
+          <Tier tier="environment">
+            <S5DeckOver />
+          </Tier>
         </PullLayer>
       ) : null}
       {on('text') ? (
@@ -86,20 +105,28 @@ export const S5Set: React.FC<{p?: number; only?: S5Layer[]}> = ({p: pIn, only}) 
       ) : null}
       {on('frames') ? (
         <>
-          <PullLayer m={boxMat(PLANES.tree, p)}>
-            <S5TreeLeft />
-          </PullLayer>
-          <PullLayer m={boxMat(PLANES.right, p)}>
-            <S5RightFrame />
-          </PullLayer>
+          <Tier tier="environment">
+            <PullLayer m={boxMat(PLANES.tree, p)}>
+              <S5TreeLeft />
+            </PullLayer>
+            <PullLayer m={boxMat(PLANES.right, p)}>
+              <S5RightFrame />
+            </PullLayer>
+          </Tier>
         </>
       ) : null}
       {on('wipe') && p > WIPE_P[0] && p < WIPE_P[1] ? (
-        <XG m={wipeMat(p)}>
-          <S5WipeProp />
-        </XG>
+        <Tier tier="environment">
+          <XG m={wipeMat(p)}>
+            <S5WipeProp />
+          </XG>
+        </Tier>
       ) : null}
-      {on('near') ? <S5NearEnd p={p} /> : null}
+      {on('near') ? (
+        <Tier tier="environment">
+          <S5Particles p={p} />
+        </Tier>
+      ) : null}
       {on('start') ? <S5StartFore p={p} /> : null}
     </>
   );

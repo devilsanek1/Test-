@@ -30,12 +30,16 @@ import {CanalCast} from '../kit/canal/slots';
 import {k4Person} from '../kit/canal/k4k5';
 import {V2S2Set} from './V2S2_Set';
 import {S2Board, S2Newsagent} from './V2S2_Board';
-import {S2FarLife, S2NearLife} from './V2S2_Life';
+import {S2FarLife, S2Motes} from './V2S2_Life';
 import {staffOverlay} from './V2S2_Staff';
 import {S2BenchPeople} from './V2S2_Bench';
 import {PipS2} from './V2S2_Pip';
 import {S2Plane, S2_PLANE} from './V2S2_Float';
 import {Tier} from '../../lib/tier';
+import {Lit} from '../../lib/light';
+import {RIG_CANAL} from '../world/rigs';
+import {Sky} from '../../lib/sky';
+import {S2_EVENING} from '../world/skies';
 import type {ToneKey} from '../../lib/Film';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
@@ -81,6 +85,14 @@ const storyOverlay = (w: MAP.Spot & {id: string}): React.ReactNode => {
   return staffOverlay(w);
 };
 
+/** The story panes' tiers (conform_L2 §4): her window is the subject from "one" (6.82); each staff window is promoted
+ *  on its own click of "staff" (8.96 + i 0.04) and stays A through the blinds and "contracts"; before that, support. */
+const storyTierAt = (t: number) => (id: string): 'subject' | 'support' => {
+  if (id === 'HER') return t >= S2.outlineAt ? 'subject' : 'support';
+  const i = S2.staffWindows.findIndex((w) => w.id === id);
+  return i >= 0 && t >= S2.staffOnAt + i * S2.staffOnStagger ? 'subject' : 'support';
+};
+
 // ---------------------------------------------------------------- screen space: the sky and its one cloud
 
 /** One small high cloud in the top gutter: flat skyHigh lobes, no ink, x ~620-1050, y ~150-270, drifting left 4 px/s
@@ -108,12 +120,18 @@ const S2Cloud: React.FC = () => {
   return <Fill d={d} color={CM.skyHigh} offset={false} seed="s2cloud" />;
 };
 
+/** The sky (lib/sky, world/skies S2_EVENING: one continuous gentle gradient, flat through the caption band, warm toward
+ *  the horizon behind the tiers) in SCREEN space: it never floats or zooms (DIRECTION rules 6, 8). Then the cloud. */
 const ScreenSky: React.FC = () => (
   <>
-    <Fill rect={[-10, -10, 1100, 610]} color={CM.sky} offset={false} seed="s2skyslab" />
+    <Sky spec={S2_EVENING} />
     <S2Cloud />
   </>
 );
+
+/** The world is clipped to y >= 600 on screen: no built top ever shows in the band margin, even while the pull-back's
+ *  1.12 lifts the tiers (K2 UI.skylineMinY). */
+const WORLD_CLIP_ID = 's2worldclip';
 
 // ---------------------------------------------------------------- the shot
 
@@ -122,31 +140,43 @@ const Shot: React.FC = () => {
   const z = pullZ(t);
   return (
     <>
-      <XG m={s2Cam(t)}>
-        <InkScale zoom={z} k={0.6}>
-          <S2Plane plane={S2_PLANE.subject}>
-          <CanalCast person={k4Person}>
-            <V2S2Set
-              staffCoolAt={S2.staffOnAt}
-              storyOverlay={storyOverlay}
-              aBoard={<S2Board />}
-              agent={<S2Newsagent />}
-              bench={<S2BenchPeople />}
-              pip={<PipS2 />}
-              farLife={<S2FarLife />}
-              near={<S2NearLife />}
-            />
-          </CanalCast>
-          </S2Plane>
-        </InkScale>
-      </XG>
       <ScreenSky />
+      <defs>
+        <clipPath id={WORLD_CLIP_ID}>
+          <rect x={-60} y={600} width={1200} height={1400} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${WORLD_CLIP_ID})`}>
+        <XG m={s2Cam(t)}>
+          <InkScale zoom={z} k={0.6}>
+            <Lit rig={RIG_CANAL}>
+              <CanalCast person={k4Person}>
+                <V2S2Set
+                  staffCoolAt={S2.staffOnAt}
+                  storyOverlay={storyOverlay}
+                  storyTier={storyTierAt(t)}
+                  aBoard={<S2Board />}
+                  agent={<S2Newsagent />}
+                  bench={<S2BenchPeople />}
+                  pip={<PipS2 />}
+                  farLife={<S2FarLife />}
+                  extra={
+                    <S2Plane plane={S2_PLANE.subject}>
+                      <S2Motes />
+                    </S2Plane>
+                  }
+                />
+              </CanalCast>
+            </Lit>
+          </InkScale>
+        </XG>
+      </g>
     </>
   );
 };
 
 const V2S2: React.FC = () => (
-  <World sky={[CM.sky, CM.bandGold]} horizon={1000}>
+  <World sky={CM.sky} horizon={1000}>
     <TimeShift by={-START}>
       <Shot />
     </TimeShift>

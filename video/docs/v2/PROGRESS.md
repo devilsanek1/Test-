@@ -2,6 +2,15 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 08:19 UTC (hourly)
+
+All five lanes conforming since 07:55 and pushing in steps: L2 S2's joins + sky; L3 S3's per-plane float, Pip seated across S2-S3-S4;
+L4 S5's April sky, depth through its own air, the blossom-tree wipe; L5 S6 / S7 skies + the clock push; L6 S8's sky + the landing float.
+L1 raised the shared particle presets to the owner's "SEEN at phone size" numbers (leaves 26-40 px, glints 20-36 px x 6, motes 6-10 px;
+`particleProblems` enforces the floor) and is redoing S1's particles for the G4 look clip v5. Typecheck clean. No lane report yet.
+Spend: orchestrator $3,801 (+$7 since 04:18), helpers L1-L6 $653 (+~$93 since the resume). Estimated weekly ~77 %; projection ~92-102 %
+at the finish, so the lanes get the small-context rule (PIPELINE_V2 anti-waste 9: most cost is re-reading a big context).
+
 ## Snapshot 2026-10-28 07:55 UTC: look APPROVED, L2-L6 conforming
 
 The owner approved the G4 look clip v4 ("Okay I think this is better now the hook video"). L2 (S2), L3 (S3+S4), L4 (S5), L5 (boards + S6 + S7)

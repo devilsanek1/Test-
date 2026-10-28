@@ -21,10 +21,13 @@
 // the paving, the boat and the deck all recede to the lane's VP; the far bank stands 41 m off across the basin.
 // The ink rule (STYLE section 3): ink #2B1B0A only, only where it carries form, never on ground, water or far
 // planes; joints, lane marks and cracks are tone-on-tone FILL slivers.
-import React, {useMemo} from 'react';
+import React, {useId, useMemo} from 'react';
 import {CM, INK_PX} from '../palette';
 import {Fill} from '../../lib/Fill';
 import {useTime} from '../../lib/time';
+import {useExit} from '../../lib/exit';
+import {Sky} from '../../lib/sky';
+import {S8_EVENING} from '../world/skies';
 import {rng, rand} from '../../lib/rng';
 import type {Rng} from '../../lib/rng';
 import {line} from '../../lib/sketch';
@@ -39,6 +42,7 @@ import type {FarSpot} from '../kit/cast/Crowd';
 import {L, LANE, KERB_Y, NEAR_Y, SKYLINE_MIN_Y, lampRunAt, planeOffset} from './V2S8_clock';
 import type {PlaneId} from './V2S8_clock';
 import {EarlyExit} from './V2S8_exit';
+import {S8Plane} from './V2S8_depth';
 
 // ---------------------------------------------------------------- colour: CM tokens and flat mixes of two
 
@@ -106,11 +110,8 @@ const yOf = (Z: number) => HY + (F * EYE) / Z;
 
 const LEAVES = [CM.leafGold, CM.leafRust, CM.coatMustard, CM.leafGold, CM.leafRust] as const;
 
-/** Moves its children with a plane of the multiplane truck. */
-const OnPlane: React.FC<{p: PlaneId; children?: React.ReactNode}> = ({p, children}) => {
-  const t = useTime();
-  return <XG m={mat.translate(planeOffset(p, t), 0)}>{children}</XG>;
-};
+/** Moves its children with a plane of the multiplane truck and its share of the parallax float (V2S8_depth). */
+const OnPlane = S8Plane;
 
 /** A thin filled stroke along a polyline, tapered at its ends: joints, lane marks, cracks, stems (never ink). */
 function sliver(b: Batch, col: string, pts: Pt[], w: number) {
@@ -240,13 +241,44 @@ function grateInto(b: Batch, cx: number, Zf: number, wM: number, dM: number, see
   void seed;
 }
 
-// ================================================================= S8Sky (the sun, the ONE orange)
+// ================================================================= S8Sky (one continuous sky + the sun, the ONE orange)
 
-/** The disc sits 15 px higher than map SUN8 (420, 640): L5's StatementBoard frame tops out at y 680 (20 px above B), so
- *  SUN8's bottom (680) touched it; TREATMENT: the S8 sun never touches her board (REQUEST K2: SUN8 -> (420, 625)). Top
- *  585 (the named sun exception, >= 575; 579 under the 1.05 push). */
-export const S8_SUN = {x: MAP.SUN8.x, y: 625, r: MAP.SUN8.r} as const;
-export const S8Sky: React.FC = () => <Fill d={ovalPath(S8_SUN.x, S8_SUN.y, S8_SUN.r, S8_SUN.r)} color={CM.sun} offset={false} seed="s8sun" />;
+/** The low sun ahead: map SUN8 (420, 625) r 40 (top 585, 95 px over her board's frame top 680; never touches it). */
+export const S8_SUN = {x: MAP.SUN8.x, y: MAP.SUN8.y, r: MAP.SUN8.r} as const;
+/** The sky's un-build: it contracts into SUN0 (S1's sun spot, where S1's flood will grow it back out from: the loop's
+ *  mirror) over exit e 0.30 -> 0.92, easing in, from a radius that covers every sky corner (and the float's margin). */
+const SKY_EXIT = {e0: 0.3, e1: 0.92, r0: 1400} as const;
+/** THE SKY (lib/sky; CRAFT §g, DIRECTION rule 6): ONE gentle, dithered gradient (world/skies S8_EVENING: the caption
+ *  field's mint flat through the band, a pale warm light band, the sunset horizon behind the far rows, the sun's warmth
+ *  low and wide round SUN8), then the sun's disc, a flat shape on top (no halo: the warmth is the sky's). Fixed through
+ *  the truck and the float (the sky plane), raw SVG (the clean pen never recolours it), never under a light layer. At
+ *  the un-build the disc goes FIRST (EarlyExit, gone by e ~0.2) and the sky contracts into SUN0 (S1's sun: its half-disc
+ *  is under the shrinking sky until the last frames), so two suns never share a frame and S1's frame 0 is what is left. */
+export const S8Sky: React.FC = () => {
+  const e = useExit();
+  const id = 's8sky' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const k = Math.min(1, Math.max(0, (e - SKY_EXIT.e0) / (SKY_EXIT.e1 - SKY_EXIT.e0)));
+  const r = SKY_EXIT.r0 * (1 - k * k);
+  return (
+    <>
+      {k > 0 ? (
+        <defs>
+          <clipPath id={id} clipPathUnits="userSpaceOnUse">
+            <circle cx={MAP.SUN0.x} cy={MAP.SUN0.y} r={Math.max(0, r)} />
+          </clipPath>
+        </defs>
+      ) : null}
+      {r > 0 ? (
+        <g clipPath={k > 0 ? `url(#${id})` : undefined}>
+          <Sky spec={S8_EVENING} />
+        </g>
+      ) : null}
+      <EarlyExit to={0.3}>
+        <Fill d={ovalPath(S8_SUN.x, S8_SUN.y, S8_SUN.r, S8_SUN.r)} color={CM.sun} offset={false} seed="s8sun" />
+      </EarlyExit>
+    </>
+  );
+};
 
 // ================================================================= S8Far (beyond the bend; far plane 24)
 
@@ -1297,6 +1329,45 @@ export const S8Ground: React.FC = () => (
  *  standing room for the two readers at x 140-300 / feet ~1500. */
 const DECK = {h: 0.12, Zfar: zAt(1350) * ((EYE - 0.12) / EYE), Xr: -0.05, Xl: -2.6};
 const deckP = (X: number, Z: number): Pt => cam(X, DECK.h, Z);
+/** The deck's left edge runs far off the frame (x ~-1700 at its near end): every deck shape is cut at x -40, so its
+ *  fills keep their real size and un-build like the rest (an off-frame bbox made the deck a 'slab' that wiped down in
+ *  the last frames before the seam). Sutherland-Hodgman against one edge. */
+const DECK_X0 = -40;
+const clipX = (pts: Pt[], x0 = DECK_X0): Pt[] => {
+  const out: Pt[] = [];
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i];
+    const b = pts[(i + 1) % pts.length];
+    const ain = a[0] >= x0;
+    const bin = b[0] >= x0;
+    if (ain) out.push(a);
+    if (ain !== bin) {
+      const u = (x0 - a[0]) / (b[0] - a[0]);
+      out.push([x0, a[1] + (b[1] - a[1]) * u]);
+    }
+  }
+  return out;
+};
+/** A polyline cut to x >= x0 (a joint along the deck). */
+const clipLineX = (pts: Pt[], x0 = DECK_X0): Pt[] => {
+  const out: Pt[] = [];
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i];
+    if (a[0] >= x0) {
+      if (i > 0 && pts[i - 1][0] < x0) {
+        const p = pts[i - 1];
+        const u = (x0 - p[0]) / (a[0] - p[0]);
+        out.push([x0, p[1] + (a[1] - p[1]) * u]);
+      }
+      out.push(a);
+    } else if (i > 0 && pts[i - 1][0] >= x0) {
+      const p = pts[i - 1];
+      const u = (x0 - p[0]) / (a[0] - p[0]);
+      out.push([x0, p[1] + (a[1] - p[1]) * u]);
+    }
+  }
+  return out;
+};
 
 const Deck: React.FC = () => {
   const el = useMemo(() => {
@@ -1304,16 +1375,21 @@ const Deck: React.FC = () => {
     const zN = 1.05;
     const zF = DECK.Zfar;
     // boards: honey wood, a slightly deeper tone on every third, joints as darker slivers, butt ends staggered
-    b.poly(TONE.wood, [deckP(DECK.Xl, zF), deckP(DECK.Xr, zF), deckP(DECK.Xr, zN), deckP(DECK.Xl, zN)]);
+    b.poly(TONE.wood, clipX([deckP(DECK.Xl, zF), deckP(DECK.Xr, zF), deckP(DECK.Xr, zN), deckP(DECK.Xl, zN)]));
     const r = rng('s8deck/planks');
     const pw = 0.062;
     for (let X = DECK.Xl, i = 0; X < DECK.Xr - 0.02; X += pw, i++) {
-      if (i % 3 === 1) b.poly(TONE.wood2, [deckP(X, zF), deckP(X + pw, zF), deckP(X + pw, zN), deckP(X, zN)]);
-      sliver(b, TONE.woodJoint, [deckP(X, zF), deckP(X, (zF + zN) / 2), deckP(X, zN)], 1.2 + (i % 2) * 0.5);
-      for (let zz = zF - r.range(0.1, 0.9); zz > zN; zz -= r.range(0.7, 1.3)) sliver(b, TONE.woodJoint, [deckP(X + 0.004, zz), deckP(X + pw - 0.004, zz)], 1.4);
+      const plank = clipX([deckP(X, zF), deckP(X + pw, zF), deckP(X + pw, zN), deckP(X, zN)]);
+      if (i % 3 === 1 && plank.length >= 3) b.poly(TONE.wood2, plank);
+      const joint = clipLineX([deckP(X, zF), deckP(X, (zF + zN) / 2), deckP(X, zN)]);
+      if (joint.length >= 2) sliver(b, TONE.woodJoint, joint, 1.2 + (i % 2) * 0.5);
+      for (let zz = zF - r.range(0.1, 0.9); zz > zN; zz -= r.range(0.7, 1.3)) {
+        const butt = clipLineX([deckP(X + 0.004, zz), deckP(X + pw - 0.004, zz)]);
+        if (butt.length >= 2) sliver(b, TONE.woodJoint, butt, 1.4);
+      }
     }
     // the deck's edge boards: the far edge (horizontal) and the right edge (to the VP)
-    b.poly(TONE.timber, [deckP(DECK.Xl, zF), deckP(DECK.Xr + 0.04, zF), deckP(DECK.Xr + 0.04, zF - 0.06), deckP(DECK.Xl, zF - 0.06)]);
+    b.poly(TONE.timber, clipX([deckP(DECK.Xl, zF), deckP(DECK.Xr + 0.04, zF), deckP(DECK.Xr + 0.04, zF - 0.06), deckP(DECK.Xl, zF - 0.06)]));
     b.poly(TONE.timber, [deckP(DECK.Xr - 0.04, zF), deckP(DECK.Xr + 0.03, zF), deckP(DECK.Xr + 0.03, zN), deckP(DECK.Xr - 0.04, zN)]);
     b.layer();
     b.ink(line(...deckP(DECK.Xr + 0.03, zF - 0.06), ...deckP(DECK.Xr + 0.03, 1.25), {seed: 's8deck/edge', over: 'small'}), INK_PX.front, CM.ink, 0.2);
