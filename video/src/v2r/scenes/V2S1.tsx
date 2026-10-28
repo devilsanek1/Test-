@@ -50,11 +50,18 @@ const S1Particles: React.FC = () => {
   const common = {t0: S1_PARTICLES.t0, t1: S1_PARTICLES.t1, joins: S1_PARTICLES.joins, avoid: [CAPTION_BAND, S1_PARTICLES.her], sun};
   return (
     <>
+      {/* motes 3-4 px against the shaded far tower beside the sun, where they show (over the pale far rows they did not) */}
       <S1Plane plane={S1_PLANE.farTower}>
-        <Particles kind="motes" seed="s1motes" region={{rect: [24, 790, 236, 150]}} on="#DEC6B8" {...common} />
+        <Particles kind="motes" seed="s1motes" region={{rect: [252, 640, 104, 280]}} on="#B5B7C6" size={[3, 4]} count={4} {...common} />
       </S1Plane>
+      {/* glints as 14-24 px level dashes, 2-4 twinkling at once in the sun's glitter path */}
       <S1Plane plane={S1_PLANE.water}>
-        <Particles kind="glints" seed="s1glints" region={{poly: glitterPath({x: MAP.SUN0.x, yFar: 1104, yNear: 1166})}} on="#E9C98E" horizon={965} {...common} />
+        <Particles kind="glints" seed="s1glints" region={{poly: glitterPath({x: MAP.SUN0.x, yFar: 1104, yNear: 1166})}} on="#E9C98E" horizon={965} size={[14, 24]} count={5} gap={[0.05, 0.3]} {...common} />
+      </S1Plane>
+      {/* a second leaf from the bay tree, across the mid ground from ~2.75 s (its seed's first birth; clear of the row
+          and the caption band) */}
+      <S1Plane plane={S1_PLANE.near}>
+        <Particles kind="leaves" seed="s1leaf2" region={{rect: [70, 1330, 170, 80]}} on="#F4D6C2" colors={[CM.leafGold, CM.leafRust]} floor={1700} count={1} size={[10, 14]} t0={common.t0} t1={4} joins={common.joins} avoid={common.avoid} sun={sun} />
       </S1Plane>
       <S1Plane plane={S1_PLANE.near}>
         <Particles kind="leaves" seed="s1leaf" region={{rect: [20, 110, 34, 70]}} on="#DACCBE" colors={[CM.leafGold, CM.leafRust]} floor={1910} count={1} gap={[0.3, 0.9]} drift={[0, 0]} margin={10} {...common} />

@@ -5,7 +5,8 @@
 //   mid    a long stone bench cut by the right edge (tread 2); the bay tree's crown over the left treads
 //   near   a terracotta planter with the bay tree, cut by the left edge (the terrace); two stacked flower crates (tread
 //          5); a café table and two bistro chairs (tread 4); a stone pier cut by the right edge
-//   front  cut by the bottom edge: a big pot of fern, a third bistro chair (nothing empty at the bottom)
+//   front  cut by the bottom edge: a big pot of fern (nothing empty at the bottom; the tote, the flask and the nearest
+//          chair are cut: the art director on v3 found the near terrace the heaviest area)
 // The small props sit in clusters ON those things (the café table, the bench, the pier, the planter's foot), never as an
 // even scatter. Tier C, but NEAR: the fullest value range of the ground (near = most contrast, far = haze; deeper source
 // colours so the environment tier's page pull leaves them full, never ghostly). Every light shape from RIG_CANAL (the
@@ -17,7 +18,7 @@ import {Tier} from '../../lib/tier';
 import {CastShadow, ContactShadow, FormShade, Shade, ShadowLayer} from '../../lib/light';
 import {CM} from '../palette';
 import {floodAt} from './V2S1_clock';
-import {BANK_LIT, GROUND_VP, edgeSlope} from './V2S1_steps_stone';
+import {BANK_LIT, BANK_PAVE, GROUND_VP, edgeSlope} from './V2S1_steps_stone';
 
 type Pt = [number, number];
 const r1 = (n: number) => Math.round(n * 10) / 10;
@@ -52,13 +53,12 @@ export const FORE = {
   table: {x: 742, top: 1566, foot: 1696},
   bench: {x0: 846, xc: 970, seat: 1438, base: 1500},
   fern: {x: 452, rim: 1826},
-  nearChair: {x: 760, seat: 1888},
 };
 
 // NEAR values (fuller than the far ground's): warm only (a shadow multiplied onto a low-chroma stone reads grey)
 const STONE_LIT = BANK_LIT;
-const STONE = CM.paving;
-const STONE_MID = '#CFB39B'; // the near stone faces (L* ~74)
+const STONE = BANK_PAVE;
+const STONE_MID = '#DDB49B'; // the near stone faces: a warm peach stone (L* ~76; the art director: the taupe read muddy)
 const TERRACOTTA = '#C98A6C'; // the planter and the pots (L* ~63)
 const WOOD = '#C99052'; // the crates (L* ~64)
 const WOOD_LIGHT = '#DDB06F'; // their lighter slat (L* ~74)
@@ -68,27 +68,15 @@ const LEAF_SHADE = '#86A07E'; // the bay's inner lobes, a full step under the sa
 const FERN = '#7E9C74'; // the near fern and the ivy (L* ~61)
 const TERRACOTTA_DEEP = '#BC7D60'; // the planter's second board (L* ~58)
 const SOIL = '#8C6A55'; // the soil inside the planter (L* ~47)
-const ASHLAR = '#C4A68E'; // the pier's second stone (L* ~70)
-const CANVAS = '#F1E3CB'; // the tote's canvas
 
 // ---------------------------------------------------------------- near: the pier (cut by the right edge)
 
 const Pier: React.FC = () => {
   const {x0, cap, base, xc} = FORE.pier;
-  // ashlar: three courses of blocks in two near stones, staggered by half a block (joints as value steps, no line)
-  const courses: [number, number][] = [
-    [cap + 36, cap + 118],
-    [cap + 118, cap + 210],
-    [cap + 210, base],
-  ];
-  const blocks = courses.map(([a, c], j) => {
-    const xs = j % 2 ? [x0, 964, 1060, 1100] : [x0, 920, 1012, 1100];
-    return xs.slice(0, -1).map((xa, i) => <F key={`${j}/${i}`} d={slab(xa, xs[i + 1], xc, a, c)} c={(i + j) % 2 ? STONE_MID : ASHLAR} s={`pierB${j}${i}`} />);
-  });
+  // ONE value and one shade step (the art director, v3: its patchy two-tone ashlar read muddy)
   return (
     <>
       <F d={slab(x0, 1100, xc, cap + 26, base)} c={STONE_MID} s="pierBody" />
-      {blocks}
       {/* the coping stone: proud of the face, a lit top and its front, one shade step under it (NearForm) */}
       <F d={slab(x0 - 16, 1100, xc, cap + 10, cap + 36)} c={STONE} s="pierCapF" />
       <F d={slab(x0 - 16, 1100, xc, cap, cap + 12)} c={STONE_LIT} s="pierCap" />
@@ -129,15 +117,6 @@ const Planter: React.FC = () => {
     </>
   );
 };
-
-/** The planter's foot: a canvas tote someone set down. */
-const PlanterFoot: React.FC = () => (
-  <>
-    <F d={poly([[282, 1704], [334, 1710], [338, 1762], [278, 1756]])} c={CANVAS} s="tote" />
-    <F d={poly([[280, 1722], [337, 1728], [337, 1737], [280, 1731]])} c={CM.sage} s="toteBand" />
-    <F d={`M294 1705C296 1683 320 1685 322 1708L316 1707C314 1693 302 1691 300 1705Z`} c={RATTAN} s="toteH" />
-  </>
-);
 
 const Crates: React.FC = () => {
   const {x0, x1, xc, base} = FORE.crates;
@@ -204,10 +183,9 @@ const Bench: React.FC = () => {
     <>
       <F d={slab(x0 + 8, 1100, xc, seat + 18, base)} c={STONE_MID} s="bnFace" />
       <F d={slab(x0, 1100, xc, seat, seat + 18)} c={STONE_LIT} s="bnSeat" />
-      {/* the cluster on the bench: a backpack and a flask */}
+      {/* the cluster on the bench: a backpack (the flask is cut: the near terrace was the heaviest area) */}
       <F d={`M900 ${seat - 2}L898 ${seat - 46}Q900 ${seat - 66} 926 ${seat - 66}Q952 ${seat - 66} 954 ${seat - 46}L952 ${seat}Z`} c={IRON} s="pack" />
       <F d={poly([[904, seat - 42], [948, seat - 42], [948, seat - 32], [904, seat - 32]])} c={CM.stoneShade} s="packFlap" />
-      <F d={poly([[984, seat - 46], [1000, seat - 46], [1000, seat + 1], [984, seat + 1]])} c={CM.sage} s="flask" />
     </>
   );
 };
@@ -245,7 +223,6 @@ const Leaves: React.FC = () => (
 type Foot = {x: number; y: number; w: number; h?: number};
 const NEAR_FEET: Foot[] = [
   {x: FORE.planter.xc, y: FORE.planter.base, w: 318, h: 226}, // planter
-  {x: 308, y: 1760, w: 58, h: 52}, // tote
   {x: FORE.crates.xc, y: FORE.crates.base, w: 180, h: 164}, // crates
   {x: FORE.table.x, y: FORE.table.foot + 2, w: 96, h: 130}, // table
   {x: 622, y: 1702, w: 92, h: 86}, // chair L
@@ -274,7 +251,6 @@ const PropFeet: React.FC = () => {
     {x: 750, y: top - 2, w: 16},
     {x: 798, y: top + 2, w: 50},
     {x: 926, y: seat + 1, w: 56},
-    {x: 992, y: seat + 1, w: 18},
     {x: 960, y: FORE.pier.cap + 1, w: 52},
   ];
   return (
@@ -323,7 +299,6 @@ export const S1ForeNear: React.FC = () => (
     <Feet feet={NEAR_FEET} />
     <Tier tier="environment">
       <Planter />
-      <PlanterFoot />
       <Crates />
       <CafeSet />
       <Leaves />
@@ -333,7 +308,6 @@ export const S1ForeNear: React.FC = () => (
     <PropFeet />
     <Tier tier="environment">
       <FernPot />
-      <Chair x={FORE.nearChair.x} s="chN" seatY={FORE.nearChair.seat} k={1.35} />
     </Tier>
     <FrontForm />
   </>

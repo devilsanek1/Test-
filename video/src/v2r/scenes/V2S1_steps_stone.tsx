@@ -28,11 +28,15 @@ export const groundScale = (x: number, y: number) => ((x - GROUND_VP[0]) / (540 
 /** The slope (dy/dx) of the bank's edges through a point: tilt contact shadows and slabs by it. */
 export const edgeSlope = (x: number, y: number) => (y - GROUND_VP[1]) / (x - GROUND_VP[0]);
 
-/** Our bank's lit stone: the stucco a hair under the frame's brightest 5 % (L* ~89 < 90.4), so the brightest area stays
- *  on the subject and the lit wing (CRAFT §d.2), not on the pale near steps. */
-export const BANK_LIT = '#EFDDC9';
+/** Our bank's lit stone: a peach cream a hair under the frame's brightest 5 % (L* ~89 < 90.4), so the brightest area
+ *  stays on the subject and the lit wing (CRAFT §d.2), not on the pale near steps. */
+export const BANK_LIT = '#F5DBC9';
+/** Our bank's paving and its second stone: peach cream (h ~61, the art director on v3: the sand-beige h 71-83 read
+ *  muddy), the second a step down; the joints a mid step under them (L* ~80: a value step, never a dark line). */
+export const BANK_PAVE = '#F4D6C2';
+const BANK_ALT = '#EFCEB9';
 /** The joints' stone: a warm mid step under the paving (L* ~80: a value step, never a dark line). */
-const JOINT = '#DCC4AE';
+const JOINT = '#E2C1AD';
 
 /** Our bank, as each edge's y at x = 540 (the edges themselves run to GROUND_VP). */
 export const BANK = {
@@ -46,13 +50,13 @@ export const BANK = {
 /** Band k: 0 = the landing, 1-5 = the treads whose front edge (nosing) is the band's top, 6 = the terrace (to the frame's
  *  bottom). `lip` = the step lip's height at x 540 (grows toward us and toward the right with the local scale). */
 export const BANDS = [
-  {k: 0, y0: BANK.landing[0], y1: BANK.nosings[0], top: CM.paving, lip: 0},
+  {k: 0, y0: BANK.landing[0], y1: BANK.nosings[0], top: BANK_PAVE, lip: 0},
   {k: 1, y0: BANK.nosings[0], y1: BANK.nosings[1], top: BANK_LIT, lip: 5},
-  {k: 2, y0: BANK.nosings[1], y1: BANK.nosings[2], top: CM.paving, lip: 8},
+  {k: 2, y0: BANK.nosings[1], y1: BANK.nosings[2], top: BANK_PAVE, lip: 8},
   {k: 3, y0: BANK.nosings[2], y1: BANK.nosings[3], top: BANK_LIT, lip: 11},
-  {k: 4, y0: BANK.nosings[3], y1: BANK.nosings[4], top: CM.paving, lip: 15},
+  {k: 4, y0: BANK.nosings[3], y1: BANK.nosings[4], top: BANK_PAVE, lip: 15},
   {k: 5, y0: BANK.nosings[4], y1: BANK.terrace, top: BANK_LIT, lip: 21},
-  {k: 6, y0: BANK.terrace, y1: 3600, top: CM.paving, lip: 28},
+  {k: 6, y0: BANK.terrace, y1: 3600, top: BANK_PAVE, lip: 28},
 ] as const;
 
 const X0 = -80;
@@ -88,7 +92,7 @@ export const StoneBand: React.FC<{k: number; seed?: string}> = ({k, seed = 'v2s1
     const yTop = b.y0 + b.lip;
     const yBot = Math.min(b.y1, 2400);
     const base = between(b.y0 - 1, b.y1 + 1);
-    const other = k >= 3 ? CM.coatOat : b.top === BANK_LIT ? CM.paving : BANK_LIT;
+    const other = k >= 3 ? BANK_ALT : b.top === BANK_LIT ? BANK_PAVE : BANK_LIT;
     const slabs: {d: string; color: string; seed: string}[] = [];
     const joints: string[] = [];
     // block boundaries along the tread's middle line, spaced in proportion to the distance from the vanishing point
@@ -121,7 +125,7 @@ export const StoneBand: React.FC<{k: number; seed?: string}> = ({k, seed = 'v2s1
         <Fill key={s.seed} d={s.d} color={s.color} seed={s.seed} offset={false} />
       ))}
       <Fill d={g.joints} color={JOINT} seed={`${seed}/joints${k}`} offset={false} />
-      {g.lip ? <Fill d={g.lip} color={CM.paving} seed={`${seed}/edge${k}`} offset={false} /> : null}
+      {g.lip ? <Fill d={g.lip} color={BANK_PAVE} seed={`${seed}/edge${k}`} offset={false} /> : null}
     </>
   );
 };
