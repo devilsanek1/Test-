@@ -2,6 +2,14 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 12:37 UTC (hourly)
+
+ALL LANES DONE (L3 S3+S4 11:46, L4 S5 11:49) and every helper session archived; their open items are in `docs/v2/ASSEMBLY_TODO.md`.
+Running locally: the water builder (`src/lib/water.tsx`: A's true reflection with B's drawing language and the judge's six must-fixes;
+then S1 through the lib, look clip v6, a fresh critic) and the integrator (map fixes for S2 / S4, S8's window stile + the seam's mint edge
+DONE, S4's brace off SUN1 DONE, K3 NewsBox / Plaque and the April lawn tint in progress). Spend: ~$48 since 11:19 (no helpers); the
+owner's last reading 11:29 (week 89 %); estimated week ~90-91 %; finish ~97-100 % on the lean plan.
+
 ## Snapshot 2026-10-28 11:19 UTC (hourly)
 
 DONE + archived: L2 (S2), L5 (boards, S6, S7; K3's clean face on every board), L6 (S8 + the seam). Running: L3 (S4's art conform:
