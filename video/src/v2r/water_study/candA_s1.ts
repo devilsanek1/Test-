@@ -85,18 +85,20 @@ export const GAPS: Gaps = {
   seed: 4102,
 };
 /** The sun's glitter column (R8): straight under SUN0 (x 196), densest at its still-water mirror point (y 1158),
- *  half-width 3.4 deg slopes: ~20 px at the far edge, ~24 near (a narrow column, ~6x taller than wide here); 14 slots,
- *  each sliver lives 0.42-0.9 s (grows in and out along its length), 11 px far -> 34 px near, 8.5:1; born from 0.30 s
- *  (CRAFT §f.6: after the frame-0 flood). */
+ *  half-width from 3.4 deg slopes: ~20 px at the far edge, ~24 near (a narrow column, ~3.5x taller than wide here,
+ *  where the bridge's reflection fills the water); a still gold bed of level lenses (CandWater) and 6 sliver slots,
+ *  each sliver living 0.42-0.9 s (it grows in and out along its length, never a fade): ~4 alive, at most 6, 18 -> 34 px
+ *  long at 8.5:1, warm white L* 97 (CRAFT §f.6: glints 20-36 px, 4-6 at once, L* +15..+25; S1 keeps <= 16 particles
+ *  alive with the motes and the leaves). Born from 0.30 s (after the frame-0 flood). */
 export const GLITTER: Glitter = {
   x: MAP.SUN0.x,
   mirrorY: G.SUN.mirror.y,
   sigma: 22,
   slope: 0.06,
   elev: (G.SUN.elevationDeg * Math.PI) / 180,
-  slots: 14,
+  slots: 6,
   life: [0.42, 0.9],
-  len: [11, 34],
+  len: [18, 34],
   aspect: 8.5,
   t0: 0.3,
   seed: 4103,
