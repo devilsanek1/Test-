@@ -26,7 +26,7 @@ import {Paint} from '../kit/canal/core';
 import {HER, Person, strideFor, drawn} from '../kit/cast';
 import * as MAP from '../world/map';
 import {S3_BEATS, S3_HER} from './V2S3_rig';
-import {Batch, line, ovalPath, domePath, lobes, leafPath, rng, P} from './V2S3_tParts';
+import {Batch, line, ovalPath, domePath, lobes, leafPath, rng, P, S3_IRON} from './V2S3_tParts';
 
 const F = MAP.W2_CUT;
 const X0 = F.x - F.w / 2; // 268.75
@@ -164,8 +164,8 @@ function herBoxBatch(): Batch {
   b.layer();
   const hh = BOX.y1 - BOX.y0 - 2;
   b.rect(CM.line, BOX.x0, BOX.y0, BOX.x1 - BOX.x0, hh);
-  b.rect(CM.anchor, BOX.x0 + 16, BOX.y1 - 2, 5, 12);
-  b.rect(CM.anchor, BOX.x1 - 22, BOX.y1 - 2, 5, 12);
+  b.rect(S3_IRON, BOX.x0 + 16, BOX.y1 - 2, 5, 12);
+  b.rect(S3_IRON, BOX.x1 - 22, BOX.y1 - 2, 5, 12);
   for (let i = 0; i < 5; i++) {
     const tx = BOX.x0 + 24 + i * 52 + r.jitter(6);
     b.fill(CM.sage, leafPath(tx, BOX.y0 + 14 + r.range(4, 10), r.range(14, 22), 5, 90 + r.jitter(20)));

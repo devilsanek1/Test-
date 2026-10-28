@@ -8,7 +8,11 @@
 // with their one closed tinted line (line-drawn figures); they un-build LAST (LateExit).
 // THE PUBLIC (tier C: no lines, calm): life on the lane at its own planes, crossing SIDEWAYS or walking away (nothing
 // comes at the lens), never teal, never over her, the board text, Pip or the ghosts' heads; <= 3 noticeable supporting
-// movers at once, taking turns; nothing enters in 38.72-39.08 (the seam).
+// movers at once, taking turns; nothing enters in 38.72-39.08 (the seam). The payoff is hers (critic_L6 MUST 2): no
+// one crosses the lane while the quote pens on (36.54-37.70); ONE walker strolls in from the right edge after it.
+// Every walker is a FLAT tier-C figure (CRAFT §b-§c): no outline (ink 0), a calm coat (C* <= 25: oat or slate; never
+// mustard, brickDeep or teal), the head ONE tone (a beanie or a hood over hair of its own colour, no cheek: nothing
+// reads as a face).
 import React from 'react';
 import {Fill} from '../../lib/Fill';
 import {FormShade, Rim} from '../../lib/light';
@@ -81,20 +85,24 @@ type Walker = {
   view: 'back' | 'profile' | 'rear34';
   traits: TraitOverrides;
   rate?: number;
+  /** Stride factor (kit gait strideFor: the feet never slide at this speed and rate). Default 1. */
+  stride?: number;
   /** A lit bike lamp (cycle only). */
   lamp?: boolean;
 };
 
 export const WALKERS: Walker[] = [
-  // pre-truck: a far walker beyond the bend heading away (seen in the gap between the board and her house)
-  {seed: 's8far1', plane: 'house', t0: 32.6, t1: 35.2, from: [612, 1004, 74], to: [540, 978, 62], pose: 'walk', view: 'rear34', traits: {hair: 'cap', coat: CM.coatSlate, acc: 'backpack'}, rate: 1.7},
+  // pre-truck: a far walker beyond the bend heading away (seen in the gap between the board and her house); hooded
+  {seed: 's8far1', plane: 'house', t0: 32.6, t1: 35.2, from: [612, 1004, 74], to: [540, 978, 62], pose: 'walk', view: 'rear34', traits: {hair: 'hood', coat: CM.coatSlate, acc: 'backpack'}, rate: 1.7},
   // pre-truck: a neighbour strolling right along the forecourt, away from her door: the wipe reveals it already
   // walking (S8 shows right of the boat first) and it leaves at the right edge by ~34.6
-  {seed: 's8nb1', plane: 'house', t0: 32.6, t1: 35.0, from: [930, 1074, 146], to: [1300, 1078, 148], pose: 'walk', view: 'profile', traits: {hair: 'short', hairColor: CM.hair[3], coat: CM.coatOat, acc: 'strap', coatLen: 'mid'}, rate: 1.5},
-  // after the truck: a cyclist crossing the forecourt right -> left, behind the ghosts, out of sight behind the board
-  {seed: 's8cyc', plane: 'house', t0: 35.75, t1: 38.3, from: [1300, 1064, 140], to: [600, 1060, 136], pose: 'cycle', view: 'profile', traits: {hair: 'beanie', coat: CM.coatMustard, acc: 'none'}, lamp: true},
-  // after the truck: a jogger out from behind the board, left -> right along the forecourt, off the right edge by ~38.5
-  {seed: 's8jog', plane: 'house', t0: 36.95, t1: 38.55, from: [600, 1066, 146], to: [1240, 1070, 150], pose: 'jog', view: 'profile', traits: {hair: 'short', hairColor: CM.hair[1], coat: CM.brickDeep, acc: 'headphones', coatLen: 'jacket'}, rate: 2.8},
+  {seed: 's8nb1', plane: 'house', t0: 32.6, t1: 35.0, from: [930, 1074, 146], to: [1300, 1078, 148], pose: 'walk', view: 'profile', traits: {hair: 'beanie', hairColor: CM.hair[1], hatColor: CM.hair[1], coat: CM.coatOat, acc: 'strap', coatLen: 'mid'}, rate: 1.5},
+  // after the quote (from 37.95, the lamp run done): ONE slow stroller in from the right edge, already walking, left
+  // along the back of her forecourt (feet y 1064-1066: behind the ghosts' depth, drawn before them), behind the near
+  // lamp's post, never reaching the heritage lamp's foot (x <= 1017) or the ghosts; still there at the seam, it
+  // un-builds with the rest (it entered long before 38.72). Starts just off the right edge (x 1120: the frame edge
+  // after the truck plus its half-width and the float).
+  {seed: 's8w2', plane: 'house', t0: 37.95, t1: 39.08, from: [1120, 1064, 140], to: [1046, 1066, 140], pose: 'walk', view: 'profile', traits: {hair: 'beanie', hairColor: CM.hair[1], hatColor: CM.hair[1], coat: CM.coatSlate, trousers: CM.anchor, shoes: CM.hair[0], acc: 'none', coatLen: 'mid'}, rate: 1.4, stride: strideFor(74 / 1.13 / 1.4, 140)},
 ];
 
 /** A walker's feet + height at scene t (its plane's landing coords), or null outside its time. */
@@ -110,13 +118,17 @@ export const walkerAt = (w: Walker, t: number): {x: number; y: number; h: number
   };
 };
 
+/** The walkers' heads: no skin crescent at the front of a profile head (one tone: nothing reads as a face). */
+const NO_CHEEK = {cheek: false} as const;
+
 const WalkerFig: React.FC<{w: Walker; t: number}> = ({w, t}) => {
   const p = walkerAt(w, t);
   if (!p) return null;
   const lampX = p.x + p.dir * p.h * 0.4;
   return (
     <S8Plane p={w.plane}>
-      <Person x={p.x} y={p.y} h={p.h} seed={w.seed} pose={w.pose} view={w.view} flip={p.dir === 1} traits={w.traits} walk={w.pose === 'cycle' ? undefined : {rate: w.rate ?? 1.6}} />
+      {/* flat tier C: ink 0 (no outline at any LOD), no cheek crescent (the head stays one tone) */}
+      <Person x={p.x} y={p.y} h={p.h} seed={w.seed} pose={w.pose} view={w.view} flip={p.dir === 1} traits={w.traits} walk={w.pose === 'cycle' ? undefined : {rate: w.rate ?? 1.6}} stride={w.stride} ink={0} model={NO_CHEEK} />
       {w.lamp ? <Fill d={`M${(lampX - 4).toFixed(1)} ${(p.y - p.h * 0.4).toFixed(1)}h8v6h-8Z`} color={CM.lampCore} offset={false} seed={`${w.seed}/lamp`} /> : null}
     </S8Plane>
   );

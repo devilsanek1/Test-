@@ -49,7 +49,7 @@ const CC = {
   wood: near(CM.line),
   cane: near(CM.coatOat),
   cup: near(CM.paper),
-  coffee: near(CM.brickDeep),
+  coffee: near('#D6AA82'),
   saucer: near(CM.stucco),
   paper: near(CM.paper),
   print: near('#E3D8C6'),
@@ -79,8 +79,9 @@ function chairBackInto(k: Batch, c: Chair) {
   k.poly(CC.wood, front(x0 + 0.04, x1 - 0.04, z0 + 0.03, 0.17, 0.19));
   const zb = z0 + 0.01;
   k.layer();
-  k.poly(CC.wood, post(x0 + 0.025, zb, 0.03, c.seat, c.back - 0.03));
-  k.poly(CC.wood, post(x1 - 0.025, zb, 0.03, c.seat, c.back - 0.03));
+  // the uprights run down into the seat's front rail (from the seat level they stopped a sliver above it)
+  k.poly(CC.wood, post(x0 + 0.025, zb, 0.03, c.seat - 0.03, c.back - 0.03));
+  k.poly(CC.wood, post(x1 - 0.025, zb, 0.03, c.seat - 0.03, c.back - 0.03));
   const rail = (l: number, h: number, bow: number): P2[] => {
     const pts: P2[] = [];
     for (let i = 0; i <= 16; i++) pts.push(pt(x0 + 0.01 + (c.w - 0.02) * (i / 16), zb, l + h + bow * Math.sin((Math.PI * i) / 16)));
@@ -119,6 +120,8 @@ function tableInto(k: Batch) {
   const {x, z, r, h} = S7_CAFE.table;
   k.poly(CC.iron, ring(x, z, 0.16, 0.025, 36));
   k.poly(CC.iron, ringBand(x, z, 0.16, 0, 0.025));
+  // the pedestal on its own layer: merged into the foot's path its opposite winding cut a hole where they overlap
+  k.layer();
   k.poly(CC.iron, post(x, z, 0.055, 0.02, h - 0.03));
   k.layer();
   k.poly(CC.marbleEdge, ringBand(x, z, r, h - 0.03, h));

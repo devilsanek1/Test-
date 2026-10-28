@@ -12,6 +12,7 @@
 import React, {useMemo} from 'react';
 import {CM} from '../palette';
 import {Paint} from '../kit/canal/core';
+import {seamTone} from '../../lib/depth';
 import * as MAP from '../world/map';
 import {
   Batch, WinSpec, DoorSpec, ShadeSink, shadeSink, winBack, winPane, winFront, litNow, doorInto, areaRailInto, pipeInto, stackInto, binInto, potsInto, rectP, quadP, ovalPath, rng, S3_IRON,
@@ -119,12 +120,12 @@ function backBatch(sh: ShadeSink, stacks: string[]): Batch {
   // ---- the gutter, the cornice band, the string course (their casts on the wall below), a darker plinth at the foot
   for (const h of HOUSES) {
     const c = h.wall === CM.sage || h.roof === 'parapet' ? CM.stucco : CM.limestone;
-    b.rect(CM.shadeCool, h.x0, TL.cornice - 4, h.x1 - h.x0, 4);
+    if (h.roof === 'mansard') b.rect(CM.shadeCool, h.x0, TL.cornice - 4, h.x1 - h.x0, 4);
     b.rect(c, h.x0 - 2, TL.cornice, h.x1 - h.x0 + 4, 14);
     sh.cast.push(rectP(h.x0, TL.cornice + 14, h.x1 - h.x0, 3));
     b.rect(h.wall === CM.sage ? CM.stucco : CM.limestone, h.x0 - 1, TL.string, h.x1 - h.x0 + 2, 10);
     sh.cast.push(rectP(h.x0, TL.string + 10, h.x1 - h.x0, 2.5));
-    b.rect(h.wall === CM.brickDeep ? CM.anchor : h.wall === CM.sage || h.roof === 'parapet' ? CM.shadeCool : CM.brickDeep, h.x0, G - 22, h.x1 - h.x0, 22);
+    b.rect(seamTone(h.wall === CM.sage || h.roof === 'parapet' ? CM.stucco : h.wall, 9), h.x0, G - 22, h.x1 - h.x0, 22);
   }
   b.layer();
   // ---- chimney stacks on the party walls (pots >= 600) + the end stack on her west wall
@@ -135,17 +136,15 @@ function backBatch(sh: ShadeSink, stacks: string[]): Batch {
   // ---- dormers (cheeks and roofs) on the mansards; their east cheeks in shade
   for (const w of WINDOWS.filter((w) => w.bars === 'dormer')) {
     b.rect(CM.stoneShade, w.x - 8, w.y - 6, w.w + 16, w.h + 8);
-    b.poly(CM.shadeCool, [[w.x - 13, w.y - 5], [w.x + w.w / 2, w.y - 17], [w.x + w.w + 13, w.y - 5]]);
+    b.poly(CM.stoneShade, [[w.x - 13, w.y - 5], [w.x + w.w / 2, w.y - 17], [w.x + w.w + 13, w.y - 5]]);
     sh.form.push(rectP(w.x + w.w + 8, w.y - 4, 5, w.h + 6));
   }
   // ---- window and door surrounds, frames
   for (const w of WINDOWS) winBack(b, w, sh);
-  // her French window's stone architrave + hood (the frame itself is V2S3_tHer's); their casts
-  const {x0, y0, x1, y1} = HER_OPENING;
-  b.rect(CM.limestone, x0 - 18, y0 - 18, x1 - x0 + 36, y1 - y0 + 18);
-  b.rect(CM.limestone, x0 - 26, y0 - 32, x1 - x0 + 52, 12);
-  sh.cast.push(rectP(x0 - 26, y0 - 20, x1 - x0 + 52, 3));
-  sh.cast.push(quadP([[x1 + 18, y0 - 16], [x1 + 27, y0 - 10], [x1 + 27, y1 + 2], [x1 + 18, y1 + 2]]));
+  // her French window (V2S3_tHer) sits straight in the brick, as S8's does: no light stone surround round it, so her
+  // lit pane reads in the darker wall (CRAFT §f.3, the brief's separation); its frame band's cast to the east
+  const {x1, y0, y1} = HER_OPENING;
+  sh.cast.push(quadP([[x1 + 9, y0 - 6], [x1 + 16, y0], [x1 + 16, y1 + 4], [x1 + 9, y1 + 4]]));
   // the stucco house's bay: a projection on the ground floor, its cornice and the stucco apron
   b.rect(CM.stucco, BAY.x0 + 2, BAY.y0, BAY.x1 - BAY.x0 - 4, BAY.y1 - BAY.y0);
   b.rect(CM.limestone, BAY.x0, 900, BAY.x1 - BAY.x0, 10);
@@ -162,10 +161,10 @@ function frontBatch(sh: ShadeSink): Batch {
   b.layer();
   for (const d of DOORS) doorInto(b, d, sh);
   // her door: a wall lantern right of the case (lit glass), a blank brass plaque, two pots on her steps
-  b.rect(CM.anchor, 271, 926, 2, 9);
-  b.poly(CM.anchor, [[263, 936], [281, 936], [277, 930], [267, 930]]);
+  b.rect(S3_IRON, 271, 926, 2, 9);
+  b.poly(S3_IRON, [[263, 936], [281, 936], [277, 930], [267, 930]]);
   b.rect(CM.lamp, 265.5, 936, 13, 17);
-  b.rect(CM.anchor, 264, 953, 16, 3);
+  b.rect(S3_IRON, 264, 953, 16, 3);
   b.fill(CM.coatMustard, ovalPath(272, 980, 5, 3.6));
   potsInto(b, [168, 262], 1066, 14, 'herSteps');
   b.layer();

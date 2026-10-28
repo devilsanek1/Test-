@@ -11,12 +11,14 @@
 // shade, h ~305 across from the gold air, kept its hue at C* 8 and averaged the far band to dE 13.9 from the air, no
 // closer than the terrace): far shade faces and the hills are the lit stone in the shade of a gold haze, so their
 // material is the lit stone stepped toward the rig's warm shade (+4: one step within dE 5 of the lit walls, CRAFT §f.2;
-// +3: two steps within dE 12).
+// +3: one step ~9 L* down). Every +3 role is ONE value (lit, shade, roofs, trees; the window dots tone-on-tone): the
+// packed front rows stay a calm band (check_depth: the far box's edges 0.32 -> 0.25 at 23.4).
 // The landmarks keep their separation: the obelisk one step nearer than its row (its shade face the darkest far shape),
 // the Capitol in the back rows.
 import {CM} from '../palette';
 import {mix} from '../kit/dc/core';
 import {rc, rcPalette} from './V2S5_depth';
+import {toneOnTone} from '../../lib/depth';
 
 const S = CM.sky;
 
@@ -44,7 +46,7 @@ export const SKY = {
 };
 
 /** The far stone in shade: the lit stone a warm step down (receded, +4: L* ~85 beside the lit walls' ~89, dE ~4 from
- *  the air; +3: L* ~82 / ~78 beside ~91), never the lilac-blue stone shade of the near planes. */
+ *  the air; +3: L* ~82 beside ~90), never the lilac-blue stone shade of the near planes. */
 const SHADE_STONE = mix(CM.limestone, CM.shadeWarm, 0.7);
 const SHADE_STONE_3 = mix(CM.limestone, CM.shadeWarm, 0.5);
 /** The far plane: hills, the infinity strip, the low white city, the landmarks (receded per role, see the header). */
@@ -52,9 +54,9 @@ const BACK_LIT = role(4, {infLit: CM.paper, backLit: CM.paper, backStone: CM.lim
 const BACK_SHADE = role(4, {hill: SHADE_STONE, hillFar: SHADE_STONE, infShade: SHADE_STONE, backShade: SHADE_STONE, backSlate: SHADE_STONE, capShade: SHADE_STONE});
 const BACK_TREE = role(4, {infTree: mix(CM.sage, CM.shadeCool, 0.15), backTree: mix(CM.sage, CM.shadeCool, 0.1)});
 const FRONT_LIT = role(3, {lit: CM.paper, stone: CM.limestone, warm: mix(CM.stucco, CM.bandGold, 0.5), roofLit: CM.paper});
-const FRONT_SHADE = role(3, {shade: SHADE_STONE_3, shadeDeep: SHADE_STONE, roofSlate: SHADE_STONE}, 2);
-const FRONT_ROOF = role(3, {roofPink: mix(CM.brickLight, CM.blossom, 0.45), roofBrick: CM.brick, brick: CM.brick, brickShade: mix(CM.brick, CM.shadeWarm, 0.35), blossom: CM.blossom}, 2);
-const FRONT_TREE = role(3, {tree: mix(CM.sage, CM.anchor, 0.2), treeLit: mix(CM.sage, CM.paper, 0.15), treeDark: mix(CM.sage, CM.anchor, 0.3), roofCopper: mix(CM.sage, CM.water, 0.4)}, 2);
+const FRONT_SHADE = role(3, {shade: SHADE_STONE_3, shadeDeep: SHADE_STONE_3, roofSlate: SHADE_STONE_3});
+const FRONT_ROOF = role(3, {roofPink: mix(CM.brickLight, CM.blossom, 0.45), roofBrick: CM.brick, brick: CM.brick, brickShade: mix(CM.brick, CM.shadeWarm, 0.35), blossom: CM.blossom});
+const FRONT_TREE = role(3, {tree: mix(CM.sage, CM.anchor, 0.2), treeLit: mix(CM.sage, CM.paper, 0.15), treeDark: mix(CM.sage, CM.anchor, 0.3), roofCopper: mix(CM.sage, CM.water, 0.4)});
 
 export const FAR = {
   // +4 (the hills, the infinity strip, the two back rows, the Capitol)
@@ -67,6 +69,8 @@ export const FAR = {
   ...FRONT_SHADE,
   ...FRONT_ROOF,
   ...FRONT_TREE,
+  /** the front rows' window dots: tone-on-tone on the lit face (CRAFT §f.2: +3 windows within dE 6 of their wall) */
+  win: toneOnTone(FRONT_LIT.lit, {dE: 5}),
   // the obelisk: one step nearer than its row, the darkest far shape (its shade face) on the palest cloud
   obLit: rc(CM.paper, 2.5),
   obShade: rc(mix(CM.stoneShade, CM.shadeCool, 0.7), 2.2),

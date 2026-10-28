@@ -88,14 +88,15 @@ export const S5_AIR = horizonColor(S5_SKY);
 // S8_EVENING  the same evening as S1, later (the sunset state S7 shares, A5): the caption field's mint flat through the
 //             band, a pale warm light band at y ~624 over the far rows, SUNSET_HORIZON (CM.bandSunset #F3C6A6) as the
 //             horizon at y 680 (behind the far rows: it shows in the gaps between the gasholders, the viaduct and the
-//             far roofs), the low sun's warmth 200 x 60 centred 35 px under SUN8 (420, 625), low and wide, hugging the
-//             skyline (centred that low, its top stays under the mint: skyProblems [] with the yellow-green crossing at
-//             C* 5.7, where a warmth centred on the disc crossed at 11; cf. L5's note above for S6 / S7). The disc
-//             stays V2S8_set's flat S8Sky disc, drawn on top; no halo.
+//             far roofs), the low sun's warmth 200 x 50 centred at y 650, 10 px under the SETTING disc (V2S8_set S8_SUN
+//             (420, 640) r 40, half behind the far mill's level roofline at y 646; critic_L6 MUST 1), its top at y 600
+//             (under the mint: skyProblems [] with the yellow-green crossing at C* 5.7, where a warmth centred on the
+//             disc higher up crossed at 11; cf. L5's note above for S6 / S7), so the disc sits in peach (C* 13-33 at
+//             y 620-650). The disc stays V2S8_set's flat S8Sky disc, drawn on top; no halo.
 // S8_AIR      the far haze of the lane (the sky's lowest colour warmed under SUN8): lib/depth's air for S8's far planes.
 // Wired (L6, V2S8_set S8Sky): <Sky spec={S8_EVENING} /> under the set; it contracts into SUN0 at the un-build (the
 // loop's mirror of S1's flood).
-export const S8_EVENING = eveningSky({band: CM.sky, horizon: SUNSET_HORIZON, horizonY: 680, sun: {x: SUN8.x, y: SUN8.y + 35, rx: 200, ry: 60}, bottom: 800});
+export const S8_EVENING = eveningSky({band: CM.sky, horizon: SUNSET_HORIZON, horizonY: 680, sun: {x: SUN8.x, y: 650, rx: 200, ry: 50}, bottom: 800});
 
 /** The far haze of S8's lane (the sky's lowest colour under SUN8): lib/depth's air for the far rows and the far bank. */
 export const S8_AIR = horizonColor(S8_EVENING, SUN8.x);

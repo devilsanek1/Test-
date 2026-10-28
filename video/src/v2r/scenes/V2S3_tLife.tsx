@@ -18,11 +18,13 @@ import {Tier} from '../../lib/tier';
 import {wire as wirePath, wirePoint} from '../../lib/sketch';
 import {CastShadow, ContactShadow, FormShade, ShadowLayer} from '../../lib/light';
 import {Paint} from '../kit/canal/core';
-import {Lamp} from '../kit/canal/towpath';
 import {Puffs} from '../kit/canal/life';
 import {Person, strideFor, drawn, TraitOverrides} from '../kit/cast';
 import {S3_START} from './V2S3_rig';
-import {Batch, binInto, ovalPath, domePath, P} from './V2S3_tParts';
+import {Batch, binInto, ovalPath, domePath, P, S3_IRON} from './V2S3_tParts';
+
+/** Her towpath's bench wood, a mid oak (tier C: never a dark line). */
+const WOOD = '#C09474';
 import {TERRACE_FEET} from './V2S3_tHouses';
 
 /** Her towpath: its back edge (the terrace's foot) and the coping's front edge at the water. */
@@ -67,12 +69,12 @@ const WalkerShadow: React.FC<{w: WalkerSpec}> = ({w}) => {
 /** A London towpath bench seen from the canal (cast-iron ends, a slatted back behind the seat): x centre, y feet. */
 function benchInto(b: Batch, x: number, y: number, w: number) {
   const seatY = y - 22;
-  for (let k = 0; k < 3; k++) b.rect(CM.line, x - w / 2 + 6, seatY - 30 + k * 8, w - 12, 5.4);
-  b.rect(CM.line, x - w / 2 + 2, seatY, w - 4, 6.5);
+  for (let k = 0; k < 3; k++) b.rect(WOOD, x - w / 2 + 6, seatY - 30 + k * 8, w - 12, 5.4);
+  b.rect(WOOD, x - w / 2 + 2, seatY, w - 4, 6.5);
   for (const s of [-1, 1]) {
     const ex = x + s * (w / 2 - 6);
-    b.poly(CM.anchor, [[ex - 3, seatY - 32], [ex + 3, seatY - 32], [ex + 3 + s * 2, y], [ex - 3 + s * 2, y]]);
-    b.rect(CM.anchor, ex - s * 2 - 6, seatY - 14, 12, 3.2);
+    b.poly(S3_IRON, [[ex - 3, seatY - 32], [ex + 3, seatY - 32], [ex + 3 + s * 2, y], [ex - 3 + s * 2, y]]);
+    b.rect(S3_IRON, ex - s * 2 - 6, seatY - 14, 12, 3.2);
   }
 }
 
@@ -102,10 +104,26 @@ function furnitureBatch(): Batch {
   const b = new Batch();
   benchInto(b, BENCH.x, BENCH.y, BENCH.w);
   for (const x of BOLLARDS) {
-    b.fill(CM.anchor, bollardD(x, PATH.edge - 4, BOLLARD_H));
-    b.fill(CM.anchor, domePath(x, PATH.edge - 4 - BOLLARD_H * 0.76, BOLLARD_H * 0.9 * 0.46, BOLLARD_H * 0.26));
+    b.fill(S3_IRON, bollardD(x, PATH.edge - 4, BOLLARD_H));
+    b.fill(S3_IRON, domePath(x, PATH.edge - 4 - BOLLARD_H * 0.76, BOLLARD_H * 0.9 * 0.46, BOLLARD_H * 0.26));
   }
-  binInto(b, BIN.x, BIN.y, BIN.h, CM.anchor);
+  binInto(b, BIN.x, BIN.y, BIN.h, S3_IRON);
+  return b;
+}
+
+/** Her towpath's heritage lamp, lit (flat: a mid-iron post, a plinth, the ladder bar, the lit lantern in lamp gold
+ *  under its cap; no line). */
+function lampBatch(): Batch {
+  const b = new Batch();
+  const {x, y, h} = LAMP;
+  const cw = h * 0.034;
+  b.poly(S3_IRON, [[x - cw * 1.6, y], [x - cw * 1.2, y - h * 0.08], [x + cw * 1.2, y - h * 0.08], [x + cw * 1.6, y]]);
+  b.poly(S3_IRON, [[x - cw * 0.7, y - h * 0.08], [x - cw * 0.45, y - h * 0.8], [x + cw * 0.45, y - h * 0.8], [x + cw * 0.7, y - h * 0.08]]);
+  b.rect(S3_IRON, x - cw * 2.6, y - h * 0.79, cw * 5.2, Math.max(1.5, h * 0.012));
+  const lb = y - h * 0.82;
+  const lt = y - h * 0.94;
+  b.poly(CM.lamp, [[x - cw * 1.5, lb], [x - cw * 2.4, lt], [x + cw * 2.4, lt], [x + cw * 1.5, lb]]);
+  b.poly(S3_IRON, [[x - cw * 2.8, lt], [x, lt - h * 0.045], [x + cw * 2.8, lt]]);
   return b;
 }
 
@@ -137,7 +155,7 @@ export const S3Path: React.FC = () => {
       {BOLLARDS.map((x) => (
         <FormShade key={x} d={bollardD(x, PATH.edge - 4, BOLLARD_H)} kind="crescent" />
       ))}
-      <Lamp x={LAMP.x} y={LAMP.y} h={LAMP.h} seed="s3lamp" on pool={0} />
+      <Paint b={lampBatch()} seed="s3lamp" misreg={false} />
       <WalkerShadow w={WALKER} />
       <Walker w={WALKER} />
     </>
