@@ -15,7 +15,7 @@
 // scripts/qa/check_banding.py --region 0,560,250,712 (the west gap), 400,0,1080,170 (the zenith), 0,270,1080,560 (the
 // band); 0,0,330,712 holds the pale cloud strip and the far tower, which read as steps.
 import {CM} from '../palette';
-import {eveningSky, horizonColor} from '../../lib/sky';
+import {eveningSky, horizonColor, oklabToLch, toOklab} from '../../lib/sky';
 import {SUN0, SUN2} from './map';
 
 /** S1's warm horizon = V2S1_set_core S1_SKY[5] (#FBD9BB), the far city's haze since L1's continuous-sky pass. */
@@ -26,6 +26,23 @@ export const S1_EVENING = eveningSky({band: CM.sky, horizon: S1_HORIZON, horizon
 
 /** The far haze of S1's west gap (the sky's lowest colour under the sun): lib/depth's air for the far city. */
 export const S1_AIR = horizonColor(S1_EVENING, SUN0.x);
+
+/** S2's evening sky (lane L2; the same golden evening as S1, looking north from the south towpath): band CM.sky flat
+ *  through the caption band, the horizon at the wall's vanishing height (y 700, behind the tiers: the light band and the
+ *  horizon's warmth show only over the far tiers near the vanishing point, right), the low sun OFF-SCREEN LEFT (west):
+ *  its warmth hugs the left horizon behind the tiers, low and wide. S2 is the film's one shot with no disc. */
+const S2_LIGHT = (() => {
+  const b = oklabToLch(toOklab(CM.sky));
+  const hz = oklabToLch(toOklab(S1_HORIZON));
+  // eveningSky's default light key at a lower chroma (0.010, not 0.014): S2's ramp is short (556 -> 700), and with the
+  // sun's warmth at the left the default crossed yellow-green at C* 7.3; at 0.010 it crosses at ~6.6 (skyProblems [])
+  return {l: Math.max(b.l, hz.l) + 0.022, c: 0.01, h: hz.h + 8};
+})();
+export const S2_EVENING = eveningSky({band: CM.sky, horizon: S1_HORIZON, horizonY: 700, light: S2_LIGHT, sun: {x: -260, y: 700, rx: 480}});
+
+/** S2's air for lib/depth's makeAtmosphere: the sky's lowest colour behind the far end of the canal (the VP side, away
+ *  from the sun). */
+export const S2_AIR = horizonColor(S2_EVENING, 1000);
 
 // ---------------------------------------------------------------- L5: S6 (Arlington, April morning) and S7 (the forecourt at sunset)
 // Both suns sit at SUN2 (260, 620) r 45 (the S6 -> S7 push-through keeps its screen spot): high in the ramp, 64 px under

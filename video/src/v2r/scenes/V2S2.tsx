@@ -36,6 +36,8 @@ import {S2BenchPeople} from './V2S2_Bench';
 import {PipS2} from './V2S2_Pip';
 import {S2Plane, S2_PLANE} from './V2S2_Float';
 import {Tier} from '../../lib/tier';
+import {Sky} from '../../lib/sky';
+import {S2_EVENING} from '../world/skies';
 import type {ToneKey} from '../../lib/Film';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
@@ -108,12 +110,18 @@ const S2Cloud: React.FC = () => {
   return <Fill d={d} color={CM.skyHigh} offset={false} seed="s2cloud" />;
 };
 
+/** The sky (lib/sky, world/skies S2_EVENING: one continuous gentle gradient, flat through the caption band, warm toward
+ *  the horizon behind the tiers) in SCREEN space: it never floats or zooms (DIRECTION rules 6, 8). Then the cloud. */
 const ScreenSky: React.FC = () => (
   <>
-    <Fill rect={[-10, -10, 1100, 610]} color={CM.sky} offset={false} seed="s2skyslab" />
+    <Sky spec={S2_EVENING} />
     <S2Cloud />
   </>
 );
+
+/** The world is clipped to y >= 600 on screen: no built top ever shows in the band margin, even while the pull-back's
+ *  1.12 lifts the tiers (K2 UI.skylineMinY). */
+const WORLD_CLIP_ID = 's2worldclip';
 
 // ---------------------------------------------------------------- the shot
 
@@ -122,6 +130,13 @@ const Shot: React.FC = () => {
   const z = pullZ(t);
   return (
     <>
+      <ScreenSky />
+      <defs>
+        <clipPath id={WORLD_CLIP_ID}>
+          <rect x={-60} y={600} width={1200} height={1400} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${WORLD_CLIP_ID})`}>
       <XG m={s2Cam(t)}>
         <InkScale zoom={z} k={0.6}>
           <S2Plane plane={S2_PLANE.subject}>
@@ -140,13 +155,13 @@ const Shot: React.FC = () => {
           </S2Plane>
         </InkScale>
       </XG>
-      <ScreenSky />
+      </g>
     </>
   );
 };
 
 const V2S2: React.FC = () => (
-  <World sky={[CM.sky, CM.bandGold]} horizon={1000}>
+  <World sky={CM.sky} horizon={1000}>
     <TimeShift by={-START}>
       <Shot />
     </TimeShift>
