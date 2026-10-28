@@ -1053,6 +1053,9 @@ function buildFlat(s: Resolved, ctx: FrameCtx, out: Runs): void {
 // chroma mixed the C* 34 bed's edges with the teal into olive, and the near-white slivers' rims with the bed into the
 // paving's own peach, dE76 < 5): at C* 42 / 16 (L* 94.5 is the lightest a C* 16 gold-white can be in sRGB) every sRGB
 // mix of a sliver and its lens stays >= 6 from the paving, and fewer of the bed's rims fall in the house bands
+/** A bed lens's most height (px; CRAFT §f.7e: 28-48 x 4-6.6 px): on a steep water (bands of 10-20 px) a lens is a
+ *  slim gold streak in its band, never a blob that fills it (S1's tallest is 6.59999: unchanged). */
+export const BED_H_MAX = 6.6;
 const SUN_DEFAULT = {slope: 0.06, bed: fromLch(81, 42, 71), core: fromLch(94.5, 16, 87), lensPitch: 5, lensLen: 0.85, t0: 0.3, slots: 6, life: [0.5, 0.8] as [number, number], len: [20, 34] as [number, number], sigma: 22};
 /** The column's half-width at screen y (R8, DERIVED for a level camera): a (y - hz) + f a sin(e), e the sun's elevation. */
 export function glitterHalfW(cam: WaterCam, sun: WaterSun, y: number): number {
@@ -1088,8 +1091,9 @@ function glitterBed(st: Static): GlitterLens[] {
     const hw = Math.min(28, col * (0.45 + 0.62 * len + 0.25 * nearPeak));
     // its centre wanders inside the column (never past its edge): seeded per band, still
     const room = Math.max(0, col - hw * 0.55);
-    // a lens fills most of its band (0.8 of the pitch): the slivers it holds can stand >= 3.5 px tall
-    out.push({cx: s.x + (2 * off - 1) * Math.min(room, lerp(8, 16, u)), cy: (top + yb) / 2, len: Math.max(21, hw * 2 * (s.lensLen ?? SUN_DEFAULT.lensLen)), h: Math.max((yb - top) * 0.92, (yb - ya) * 0.8), band: i});
+    // a lens fills most of its band (0.8 of the pitch): the slivers it holds can stand >= 3.5 px tall; never thicker
+    // than BED_H_MAX (CRAFT §f.7e: 4-6.6 px; a steeper water's 10-20 px bands made 8-17 px gold blobs: S3 / S4)
+    out.push({cx: s.x + (2 * off - 1) * Math.min(room, lerp(8, 16, u)), cy: (top + yb) / 2, len: Math.max(21, hw * 2 * (s.lensLen ?? SUN_DEFAULT.lensLen)), h: Math.min(BED_H_MAX, Math.max((yb - top) * 0.92, (yb - ya) * 0.8)), band: i});
   }
   return out;
 }
