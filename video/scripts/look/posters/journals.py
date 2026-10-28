@@ -6,7 +6,8 @@
   python3 video/scripts/look/posters/journals.py check scores.csv [--fix]   # ranges, tags, the sums (--fix recomputes them)
   python3 video/scripts/look/posters/journals.py agreement  # scores.csv vs scores_blind.csv on the sample (markdown)
   python3 video/scripts/look/posters/journals.py stats      # per cluster and the base rates (needs clusters.csv; markdown)
-  python3 video/scripts/look/posters/journals.py top [N]    # the candidates: gate pass, fit >= 6, not a past topic, by owner score
+  python3 video/scripts/look/posters/journals.py slices     # the owner's two slices: tech in the cities, data centres
+  python3 video/scripts/look/posters/journals.py top [N]    # the candidates: gate pass, fit >= 6, WOW >= 1, not a past topic
   python3 video/scripts/look/posters/journals.py chart      # cluster_chart.png: clusters by story value (x) and visual fit (y)
 
 Paths default to the study folder; --dir overrides it. Scores: fit = W+H+D+N+M (0-10); value = (6R+5T+3Mo+2F+1S)/17;
@@ -35,7 +36,7 @@ OUTLETS = {
 CORPUS_COLS = ['id', 'outlet', 'date', 'date_source', 'headline', 'url', 'section', 'type', 'stratum', 'query',
                'summary', 'collector']
 SCORE_COLS = ['id', 'W', 'H', 'D', 'N', 'M', 'fit', 'gate', 'gate_reason', 'R', 'T', 'Mo', 'F', 'S', 'value', 'owner',
-              'world', 'real_place', 'happens_to', 'conflict', 'everyday', 'mood', 'ad_risk', 'past_topic', 'tech_ai',
+              'wow', 'world', 'real_place', 'happens_to', 'conflict', 'everyday', 'mood', 'ad_risk', 'past_topic', 'tech_ai',
               'news_shape', 'telling_shape', 'view', 'dup_of', 'confidence', 'note']
 RANGES = {'W': (0, 3), 'H': (0, 2), 'D': (0, 2), 'N': (0, 1), 'M': (0, 2),
           'R': (1, 10), 'T': (1, 10), 'Mo': (1, 10), 'F': (1, 10), 'S': (1, 10)}
@@ -210,6 +211,9 @@ def cmd_check(args):
             v = num(r.get(k))
             if v is None or not (lo <= v <= hi) or v != int(v):
                 problems.append(f"{r['id']}: {k}={r.get(k)!r} not an integer in {lo}-{hi}")
+        w = num(r.get('wow'))
+        if w is None or w not in (0, 1, 2):
+            problems.append(f"{r['id']}: wow={r.get('wow')!r} not 0, 1 or 2")
         for k, allowed in ENUMS.items():
             if (r.get(k) or '').strip() not in allowed:
                 problems.append(f"{r['id']}: {k}={r.get(k)!r} not in {sorted(allowed)}")
@@ -311,6 +315,11 @@ def cmd_agreement(args):
         out.append(f'| {k} | {sum(x == y for x, y in zip(a, b)) / n:.0%} | '
                    f'{sum(abs(x - y) <= 1 for x, y in zip(a, b)) / n:.0%} | {qwk(a, b, lo, hi):.2f} | '
                    f'{sum(y - x for x, y in zip(a, b)) / n:+.2f} |')
+    a = [int(num(first[i].get('wow')) or 0) for i in ids]
+    b = [int(num(blind[i].get('wow')) or 0) for i in ids]
+    out.append(f'| wow | {sum(x == y for x, y in zip(a, b)) / n:.0%} | '
+               f'{sum(abs(x - y) <= 1 for x, y in zip(a, b)) / n:.0%} | {qwk(a, b, 0, 2):.2f} | '
+               f'{sum(y - x for x, y in zip(a, b)) / n:+.2f} |')
     out += ['', '| Tag | Agreement | Cohen kappa |', '|---|---|---|']
     for k in ('gate', 'world', 'happens_to', 'mood', 'telling_shape', 'conflict', 'everyday', 'ad_risk', 'tech_ai'):
         f = (lambda v: shape_of(v) or v) if k == 'telling_shape' else (lambda v: (v or '').strip())
@@ -356,6 +365,8 @@ def cluster_table(args):
             'real': sum(scores[i]['world'] == 'real' for i in ids) / len(ids),
             'to': sum(scores[i]['happens_to'] == 'to' for i in ids) / len(ids),
             'fail': sum(scores[i]['gate'] == 'fail' for i in ids) / len(ids),
+            'wow2': sum(num(scores[i].get('wow')) == 2 for i in ids) / len(ids),
+            'tech': sum(scores[i].get('tech_ai') == 'Y' for i in ids) / len(ids),
             'shapes': Counter(shape_of(scores[i]['telling_shape']) for i in ids).most_common(2),
             'ids': ids,
         })
@@ -368,14 +379,14 @@ def cmd_stats(args):
     unassigned = sorted(set(scores) - set(clusters))
     print(f'**{len(scores)} scored rows, {len(clusters)} clustered, {len(table)} clusters.**' +
           (f' Not clustered: {" ".join(unassigned)}' if unassigned else ''))
-    print('\n| Cluster | Rows | Events | Mean fit | Mean value | Mean owner | Fit >= 6 | Positive | Real place | '
-          'Happens TO | Gate fail | Top telling shapes |')
-    print('|---|---|---|---|---|---|---|---|---|---|---|---|')
+    print('\n| Cluster | Rows | Events | Mean fit | Mean value | Mean owner | Fit >= 6 | WOW 2 | Positive | Real place | '
+          'Happens TO | Tech/AI | Gate fail | Top telling shapes |')
+    print('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
     for t in table:
         sh = ', '.join(f'{s} ({n})' for s, n in t['shapes'])
         print(f"| {t['cluster']} | {t['rows']} | {t['events']} | {t['fit']:.1f} | {t['value']:.1f} | "
-              f"{t['owner']:.1f} | {t['fit6']:.0%} | {t['pos']:.0%} | {t['real']:.0%} | {t['to']:.0%} | "
-              f"{t['fail']:.0%} | {sh} |")
+              f"{t['owner']:.1f} | {t['fit6']:.0%} | {t['wow2']:.0%} | {t['pos']:.0%} | {t['real']:.0%} | "
+              f"{t['to']:.0%} | {t['tech']:.0%} | {t['fail']:.0%} | {sh} |")
     for label, keep in (('Stratum A (section-neutral: the base rate)', 'A'), ('Stratum B (place-targeted)', 'B'),
                         ('All rows', None)):
         ids = [i for i in scores if sums(scores[i]) and (keep is None or corpus.get(i, {}).get('stratum') == keep)]
@@ -400,17 +411,46 @@ def cmd_stats(args):
             print(f'| {k} | {len(v)} | {sum(v) / len(v):.1f} | {sum(f >= 6 for f in v) / len(v):.0%} |')
 
 
+def print_slice(title, ids, corpus, scores):
+    ids = [i for i in ids if sums(scores[i])]
+    if not ids:
+        print(f'\n**{title}: none.**')
+        return
+    fits = [sums(scores[i])[0] for i in ids]
+    vals = [sums(scores[i])[1] for i in ids]
+    wows = [num(scores[i].get('wow')) or 0 for i in ids]
+    print(f'\n**{title}: {len(ids)} rows.** Mean fit {sum(fits) / len(ids):.1f}, mean value {sum(vals) / len(ids):.1f}, '
+          f'WOW 2: {sum(w == 2 for w in wows)}, positive: {sum(scores[i]["mood"] == "pos" for i in ids)}.')
+    print('\n| id | Owner | Fit | Value | WOW | Outlet, date | Headline | View |\n|---|---|---|---|---|---|---|---|')
+    for i in sorted(ids, key=lambda q: -sums(scores[q])[2]):
+        f, v, o = sums(scores[i])
+        c = corpus.get(i, {})
+        print(f"| {i} | {o:.2f} | {f:.0f} | {v:.2f} | {scores[i].get('wow')} | {c.get('outlet')}, {c.get('date')} | "
+              f"{c.get('headline', '')} | {scores[i].get('view', '')} |")
+
+
+def cmd_slices(args):
+    corpus, scores, _ = load_all(args)
+    tech = [i for i, r in scores.items() if r.get('tech_ai') == 'Y' and (num(r.get('W')) or 0) >= 2]
+    dc = [i for i in scores if re.search(r'data[ -]?cent(er|re)s?', (corpus.get(i, {}).get('headline', '') + ' ' +
+                                                                   corpus.get(i, {}).get('summary', '')), re.I)]
+    print_slice('Tech in the cities (tech_ai Y and W >= 2)', tech, corpus, scores)
+    print_slice('Data centres (headline or summary)', dc, corpus, scores)
+
+
 def cmd_top(args):
     corpus, scores, _ = load_all(args)
     cand = [i for i, r in scores.items() if sums(r) and r['gate'] == 'pass' and r['past_topic'] == 'N'
-            and sums(r)[0] >= 6]
-    cand.sort(key=lambda i: -sums(scores[i])[2])
-    print(f'{len(cand)} candidates (gate pass, fit >= 6, not a past topic); top {args.n} by owner score:\n')
-    print('| # | id | Owner | Fit | Value | Mood | Outlet, date | Headline | View |\n|---|---|---|---|---|---|---|---|---|')
+            and sums(r)[0] >= 6 and (num(r.get('wow')) or 0) >= 1]
+    cand.sort(key=lambda i: (-round(sums(scores[i])[2], 2), -(num(scores[i].get('wow')) or 0)))
+    print(f'{len(cand)} candidates (gate pass, fit >= 6, WOW >= 1, not a past topic); top {args.n} by owner score:\n')
+    print('| # | id | Owner | Fit | Value | WOW | Mood | Outlet, date | Headline | View |\n'
+          '|---|---|---|---|---|---|---|---|---|---|')
     for k, i in enumerate(cand[:args.n], 1):
         f, v, o = sums(scores[i])
         c = corpus.get(i, {})
-        print(f"| {k} | {i} | {o:.2f} | {f:.0f} | {v:.2f} | {scores[i]['mood']} | {c.get('outlet')}, {c.get('date')} | "
+        print(f"| {k} | {i} | {o:.2f} | {f:.0f} | {v:.2f} | {scores[i].get('wow')} | {scores[i]['mood']} | "
+              f"{c.get('outlet')}, {c.get('date')} | "
               f"{c.get('headline', '')} | {scores[i].get('view', '')} |")
 
 
@@ -549,13 +589,14 @@ def main():
     a = sub.add_parser('agreement')
     a.add_argument('--blind', default='scores_blind.csv')
     sub.add_parser('stats')
+    sub.add_parser('slices')
     t = sub.add_parser('top')
     t.add_argument('n', nargs='?', type=int, default=10)
     ch = sub.add_parser('chart')
     ch.add_argument('--title', default='')
     args = ap.parse_args()
     fn = {'merge': cmd_merge, 'sample': cmd_sample, 'check': cmd_check, 'agreement': cmd_agreement,
-          'stats': cmd_stats, 'top': cmd_top, 'chart': cmd_chart}[args.cmd]
+          'stats': cmd_stats, 'slices': cmd_slices, 'top': cmd_top, 'chart': cmd_chart}[args.cmd]
     sys.exit(fn(args) or 0)
 
 

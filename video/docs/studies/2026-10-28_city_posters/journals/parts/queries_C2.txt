@@ -1,0 +1,21 @@
+MIT Technology Review | A | MIT Technology Review technology and AI October 2026 | 10 | 2 | none before the cap; 8 after the cap not taken (3 of them sponsored)
+MIT Technology Review | A | MIT Technology Review US and politics October 2026 | 10 | 2 | 4 The Download newsletter digests (index-like roundups) before the cap; 4 after the cap not taken
+MIT Technology Review | A | MIT Technology Review business and economy October 2026 | 10 | 0 | 4 sponsored (HPE-promoting explainer, TripleTen, Atlan, Microsoft-provided), 2 homepage/media-kit pages, 1 house teaser for its climate list, 1 event promo, 2 The Download digests
+MIT Technology Review | A | MIT Technology Review science October 2026 | 10 | 2 | 1 duplicate (robotics piece already kept), 1 The Download digest, 1 homepage before the cap; 5 after the cap not taken
+MIT Technology Review | A | MIT Technology Review health October 2026 | 10 | 2 | 1 homepage before the cap; 7 after the cap not taken
+MIT Technology Review | A | MIT Technology Review climate and environment October 2026 | 10 | 2 | 1 too little to summarise (Why we're watching these climate tech companies: headline check did not return it), 1 house teaser, 1 methodology page, 3 The Download digests before the cap; 2 after the cap not taken
+MIT Technology Review | A | MIT Technology Review culture, arts and entertainment October 2026 | 10 | 1 | 8 homepage/event/issue pages, 1 duplicate (AI safety essay already kept)
+MIT Technology Review | A | "Industrial Intelligence: The next growth opportunity for manufacturing" | 10 | 0 | headline check (business query): the piece is provided by Microsoft, i.e. sponsored; not a row
+MIT Technology Review | A | "The new economics of enterprise AI" | 9 | 0 | headline check (business query): no sponsor label shown; left skipped as the first result described it as a sponsored-style piece promoting HPE's platform
+MIT Technology Review | A | "Why we're watching these climate tech companies" | 10 | 0 | headline check (climate query): the page itself was not returned; row skipped as too little to summarise
+MIT Technology Review | A | "We can do impossible things" editor letter | 2 | 0 | headline check (culture query): supplied the summary for the kept editor's letter; 1 issue page
+MIT Technology Review | A | MIT Technology Review business and economy October 2026 | 10 | 0 | extended-mode rerun (standard was thin): 5 sponsored, 3 homepage/issue/events pages, 1 house teaser, 1 The Download digest
+MIT Technology Review | A | MIT Technology Review culture, arts and entertainment October 2026 | 10 | 0 | extended-mode rerun (standard was thin): same 10 links as standard (1 already kept, 1 duplicate, 8 homepage/event/issue pages)
+MIT Technology Review | B | MIT Technology Review city October 2026 | 10 | 2 | 4 event pages, 1 The Download digest, 1 fiction (short story, not a true story) before the cap; 2 after the cap not taken
+MIT Technology Review | B | MIT Technology Review megaproject October 2026 | 10 | 1 | 1 homepage, 4 event pages/promos, 2 duplicates, 1 too little to summarise (climate-list column, not returned by its headline check), 1 The Download digest
+MIT Technology Review | B | MIT Technology Review the sky or space October 2026 | 10 | 2 | none before the cap; 8 after the cap not taken
+MIT Technology Review | A | "Redefining enterprise intelligence with autonomous AI" | 10 | 0 | headline check (business extended rerun): part of the sponsored Insights series (provided-by / partnership pieces); not a row
+MIT Technology Review | B | These startups hope "blended" food will cut our appetite for red meat | 10 | 0 | headline check (city query): supplied the summary for the kept row
+MIT Technology Review | A | MIT Technology Review technology and AI late September 2026 | 10 | 2 | extra section query (outlet below 18 rows): 7 out of window (2026-09-14..09-25) before the cap; 1 after the cap not taken
+MIT Technology Review | A | MIT Technology Review business and economy this week | 10 | 0 | extra section query: 4 sponsored, 3 homepage/issue pages, 2 out of window (2026-05, 2025-12), 1 The Download digest
+MIT Technology Review | A | MIT Technology Review culture, arts and entertainment this week | 10 | 0 | extra section query: 7 out of window (2001-2025), 3 issue/profile pages
