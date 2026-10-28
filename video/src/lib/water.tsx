@@ -33,7 +33,7 @@
 // frame time only (no Math.random, no clock). `waterProblems(spec)` is the lint; `waterPalette(spec)` the palette QA
 // hook; `waterFrame(spec, t)` the pure per-frame build (node QA reads the same numbers the picture draws).
 import React, {useId} from 'react';
-import {Sky, fromOklch, mixOklab, oklabToHex, oklch, skyColorAt, toOklab, type SkySpec} from './sky';
+import {Sky, fromOklch, hexToRgb, mixOklab, oklabToHex, oklch, rgbToCieLab, skyColorAt, toOklab, type SkySpec} from './sky';
 import {fromLch, lch} from './light';
 import {ALIVE_MAX} from './particles';
 
@@ -100,6 +100,12 @@ export function camFresnel(c: WaterCam, y: number, n = 1.333): number {
 
 /** CIE L*, C*, h of a hex colour (the house measures, lib/light). */
 export const cie = (hex: string) => lch(hex);
+/** CIE76 colour difference of two hex colours (CIE Lab, D65: the critic's measure). */
+export function dE76(a: string, b: string): number {
+  const p = rgbToCieLab(hexToRgb(a));
+  const q = rgbToCieLab(hexToRgb(b));
+  return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
+}
 /** The house NEVER bands (the playbook: never beige, muddy tan, olive or grey; research R4): '' when clean, else the
  *  band's name. Beige: h 55-95 at C* 6-18 under L* 86 (lighter, a low chroma reads as cream); olive: h 95-118 at C*
  *  6-30; grey: C* < 4 under L* 85. */
@@ -717,13 +723,19 @@ export function waterStatic(spec: WaterSpec): Static {
     st.floodEnd = f.t0 + r / f.speed;
     // frame 0: the reflections as flat pale shapes (whole, unsliced, in z-order) on a flat pale water
     const acc = new Map<string, {layer: number; color: string; parts: string[]}>();
+    const rest: FrameCtx = {st, t: 0, sway: () => 0, shift: () => [0, 0]};
     for (const s of srcs.slice().sort((a, b) => a.layer - b.layer)) {
       if (!s.p.length) continue;
       const color = paleOf(toneOf(st, s, 0.45), f.pale, f.paper);
       const key = `${s.layer}|${color}`;
       let a = acc.get(key);
       if (!a) acc.set(key, (a = {layer: s.layer, color, parts: []}));
-      a.parts.push(s.draw === 'stub' ? stubOf(s, 0) : polyD(s.p));
+      if (s.kind === 'light' && (s.draw ?? 'mass') === 'mass') {
+        // a light lands as its own column's shapes (the block and the slivers), pale
+        const tmp: Runs = new Map();
+        buildLight(s, rest, tmp);
+        for (const r of tmp.values()) a.parts.push(...r.parts);
+      } else a.parts.push(s.draw === 'stub' ? stubOf(s, 0) : polyD(s.p));
     }
     st.pale = Array.from(acc.values())
       .sort((a, b) => a.layer - b.layer)
@@ -742,16 +754,16 @@ function kAt(st: Static, y: number): number {
 }
 /** A source's tone at ladder step k (its value step from another source kept: `sep`). */
 function toneOf(st: Static, s: WaterSource, k: number): string {
-  let c = reflectTone(s.color, k, st.tone, s.kind ?? 'body', s.dL ?? 0);
+  let c = reflectTone(s.color, k, st.tone, s.kind ?? 'body', s.dL ?? 0, s.kMin);
   if (s.sep) {
     const o = st.byId.get(s.sep.from);
     if (o) {
-      const oc = reflectTone(o.color, k, st.tone, o.kind ?? 'body', o.dL ?? 0);
+      const oc = reflectTone(o.color, k, st.tone, o.kind ?? 'body', o.dL ?? 0, o.kMin);
       const L0 = lch(oc).L;
       const L1 = lch(c).L;
       const want = s.sep.dL;
       const have = L1 - L0;
-      if (want < 0 ? have > want : have < want) c = reflectTone(s.color, k, st.tone, s.kind ?? 'body', (s.dL ?? 0) + (want - have));
+      if (want < 0 ? have > want : have < want) c = reflectTone(s.color, k, st.tone, s.kind ?? 'body', (s.dL ?? 0) + (want - have), s.kMin);
     }
   }
   return c;
@@ -785,7 +797,16 @@ const pushRun = (out: Runs, layer: number, color: string, d: string) => {
   else out.set(key, {layer, color, parts: [d]});
 };
 
-type FrameCtx = {st: Static; t: number; sway: (y: number) => number; shift: (plane: number) => Pt};
+type FrameCtx = {st: Static; t: number; sway: (y: number) => number; shift: (plane: number) => Pt; count?: Map<string, PieceCount>};
+/** What a reflection drew in a frame (QA: `waterPieces`): its solid block(s), its bars (a broken band counts twice),
+ *  a light's slivers. */
+export type PieceCount = {blocks: number; bars: number; slivers: number; x: number};
+const counted = (ctx: FrameCtx, s: Resolved, key: 'blocks' | 'bars' | 'slivers', n = 1) => {
+  if (!ctx.count) return;
+  let c = ctx.count.get(s.id);
+  if (!c) ctx.count.set(s.id, (c = {blocks: 0, bars: 0, slivers: 0, x: (s.box.x0 + s.box.x1) / 2}));
+  c[key] += n;
+};
 
 /** A bollard-like stub from the waterline: x at its middle, its far end the reflection's end. */
 function stubOf(s: Resolved, dx: number, sx = 0, sy = 0): string {
@@ -807,6 +828,10 @@ function buildMass(s: Resolved, ctx: FrameCtx, out: Runs, moving: boolean): void
     pushRun(out, s.layer, toneOf(st, s, kAt(st, s.box.y0)), polyD(s.p, sx, sy));
     return;
   }
+  if (s.kind === 'light') {
+    buildLight(s, ctx, out);
+    return;
+  }
   const p = sx || sy ? s.p.map(([x, y]) => [x + sx, y + sy] as Pt) : s.p;
   // ---- the solid block: the reflection itself down to ySolid, its sides bent by the sway (one smooth closed shape);
   // its bottom corners rounded (never a square cut)
@@ -814,8 +839,9 @@ function buildMass(s: Resolved, ctx: FrameCtx, out: Runs, moving: boolean): void
   if (block) {
     const dense = roundBottom(densify(block, 4), s.ySolid, 3.5);
     const top = Math.max(s.box.y0 + sy, st.spec.region.top((s.box.x0 + s.box.x1) / 2));
-    const kb = kAt(st, lerp(top, s.ySolid, 0.3));
+    const kb = kAt(st, lerp(top, Math.min(s.ySolid, s.yEnd), 0.3));
     pushRun(out, s.layer, toneOf(st, s, kb), polyD(dense.map(([x, y]) => [x + ctx.sway(y) * k, y] as Pt)));
+    counted(ctx, s, 'blocks');
   }
   // ---- the bars: one per band below the block, on the shared grid; the reflection narrows along a smooth envelope
   // (a touch of seeded asymmetry), a band breaks once at most and only in its last half, the very last may drop
@@ -825,9 +851,12 @@ function buildMass(s: Resolved, ctx: FrameCtx, out: Runs, moving: boolean): void
   const taperBase = s.taper ?? 3;
   const span = Math.max(1, s.yEnd - s.ySolid);
   const yMax = s.box.y1 + sy;
+  const maxBars = s.maxBars ?? Infinity;
+  let bands = 0;
   for (let i = 0; i + 1 < rows.length; i++) {
     const yb = rows[i + 1];
     if (yb <= s.ySolid + 0.01) continue;
+    if (bands >= maxBars) break;
     // the band under the block starts at the block (a moving source's block ends between two boundaries)
     const ya = Math.max(rows[i], s.ySolid);
     if (ya >= yMax || ya > s.yEnd + 2) break;
@@ -846,13 +875,16 @@ function buildMass(s: Resolved, ctx: FrameCtx, out: Runs, moving: boolean): void
     const pitch = yb - rows[i];
     const kk = kAt(st, ym);
     const col = toneOf(st, s, kk);
-    // the band's trough (its gap): tone-on-tone, the bar's own tone a step toward the open water there; a LIGHT's
-    // slivers part on the open water instead (R7: a column of slivers, the water between)
-    const trough = s.kind === 'light' ? '' : troughOf(st, col, ya);
+    // the band's trough (its gap): tone-on-tone, the bar's own tone a step toward the open water there (a LIGHT is
+    // drawn by buildLight: its slivers part on the open water, R7)
+    const trough = troughOf(st, col, ya);
     const dx = ctx.sway(ym) * k;
+    let drew = 0;
     const seg = (a: number, b: number, tl: number, tr: number) => {
       if (trough) pushRun(out, s.layer, trough, barD(a + dx, b + dx, ya, topY, tl, tr));
-      pushRun(out, s.layer, col, barD(a + dx, b + dx, topY, bot, tl, tr));
+      const d = barD(a + dx, b + dx, topY, bot, tl, tr);
+      pushRun(out, s.layer, col, d);
+      if (d) drew++;
     };
     for (const [x0r, x1r] of intervalsAt(p, ym)) {
       const w = x1r - x0r;
@@ -868,7 +900,74 @@ function buildMass(s: Resolved, ctx: FrameCtx, out: Runs, moving: boolean): void
         if (x1 - xb - g0 / 2 >= 3) seg(xb + g0 / 2, x1, Math.min(taper, (x1 - xb - g0 / 2) * 0.4), taper);
       } else seg(x0, x1, taper, taper);
     }
+    if (drew) {
+      bands++;
+      counted(ctx, s, 'bars', drew);
+    }
   }
+}
+
+/** The grid's band pitch (px) at screen y. */
+function pitchAt(st: Static, y: number): number {
+  const r = st.grid.rows;
+  for (let i = 0; i + 1 < r.length; i++) if (y < r[i + 1]) return r[i + 1] - r[i];
+  return r[r.length - 1] - r[r.length - 2];
+}
+/** A light's top and visible end, and the solid block's bottom (static: from the reflection at rest). */
+export function lightGeom(st: Static, s: Resolved): {top: number; yEnd: number; yBlock: number} {
+  const lo = {...LIGHT_DEFAULT, ...(s.light ?? {})};
+  const xc = (s.box.x0 + s.box.x1) / 2;
+  const top = Math.max(s.box.y0, st.spec.region.top(xc));
+  const yEnd = Math.min(s.box.y1, st.spec.region.bottom(xc) + 4);
+  return {top, yEnd, yBlock: top + Math.max(1, yEnd - top) * Math.min(0.35, lo.solid)};
+}
+/** LIGHT ON WATER (LightOpts): the short block, then the lens slivers on the open water. */
+function buildLight(s: Resolved, ctx: FrameCtx, out: Runs): void {
+  const {st} = ctx;
+  const lo = {...LIGHT_DEFAULT, ...(s.light ?? {})};
+  const [sx, sy] = ctx.shift(s.plane);
+  const k = s.sway ?? 1;
+  const p = sx || sy ? s.p.map(([x, y]) => [x + sx, y + sy] as Pt) : s.p;
+  const g = lightGeom(st, s);
+  const top = g.top + sy;
+  const yEnd = g.yEnd + sy;
+  const yB = g.yBlock + sy;
+  const tones = lightTones(st, s, lerp(top, yB, 0.5));
+  // ---- the block: the light's own mirror, its sides bent by the sway, its bottom corners rounded
+  const block = clipBand(p, -1e9, yB);
+  if (block) {
+    const dense = roundBottom(densify(block, 4), yB, 3.5);
+    pushRun(out, s.layer, tones[0], polyD(dense.map(([x, y]) => [x + ctx.sway(y) * k, y] as Pt)));
+    counted(ctx, s, 'blocks');
+  }
+  // ---- the slivers: lenses on the open water, each `ratio` as long and as thick as the one above
+  const iv = intervalsAt(p, yB - 0.5);
+  if (!iv.length) return;
+  const x0 = iv[0][0];
+  const x1 = iv[iv.length - 1][1];
+  const W = x1 - x0;
+  let len = W;
+  let T = Math.min(lo.thickPx[1], Math.max(lo.thickPx[0], pitchAt(st, yB) * lo.thick));
+  let y = yB;
+  for (let i = 0; i < Math.min(3, lo.slivers); i++) {
+    len *= lo.ratio;
+    if (i > 0) T *= lo.ratio;
+    const gap = Math.max(lo.gap, pitchAt(st, y) * lo.gapK * (1 + lo.gapGrow * i));
+    const yc = y + gap + T / 2;
+    if (yc + T / 2 > yEnd || len < 8) break;
+    const cx = (x0 + x1) / 2 + (2 * hash01(st.seed, s.sd, 40 + i) - 1) * lo.wander * W + ctx.sway(yc) * k;
+    pushRun(out, s.layer, tones[i + 1], lensD(cx, yc, len, T));
+    counted(ctx, s, 'slivers');
+    y = yc + T / 2;
+  }
+}
+/** A light's tones: the block a step (`step` >= 4 L*) under its source, each sliver `fall` further (hue and chroma
+ *  kept). */
+function lightTones(st: Static, s: WaterSource, yMid: number): string[] {
+  const lo = {...LIGHT_DEFAULT, ...(s.light ?? {})};
+  const base = lch(toneOf(st, s, kAt(st, yMid)));
+  const L0 = Math.min(base.L, lch(s.color).L - Math.max(4, lo.step));
+  return [0, 1, 2, 3].map((i) => cleanColour(fromLch(L0 - lo.fall * i, base.C, base.h), st.tone.waterH));
 }
 
 /** Round a clipped shape's bottom corners (the vertices on the cut line y = yb whose other edge rises): each corner
@@ -1132,15 +1231,20 @@ export function waterFrame(spec: WaterSpec, t: number): WaterFrame {
     .sort((a, b) => a.layer - b.layer)
     .map((a) => ({layer: a.layer, color: a.color, d: a.parts.join('')}));
   // ripple lines: light across a reflection, darker across the open water
-  const polys = all.filter(({s}) => s.draw !== 'crisp' && s.p.length >= 3).map(({s}) => {
-    const [sx, sy] = shift(s.plane);
-    return {s, p: s.p, sx, sy, box: s.box};
-  });
+  const polys = all
+    .filter(({s}) => s.draw !== 'crisp' && s.p.length >= 3)
+    .map(({s}) => {
+      const [sx, sy] = shift(s.plane);
+      // a light is solid only down to its block (its slivers part on the open water)
+      const p = s.kind === 'light' ? clipBand(s.p, -1e9, lightGeom(st, s).yBlock) ?? [] : s.p;
+      return {s, p, sx, sy, box: boxOf(p.length ? p : s.p)};
+    })
+    .filter((q) => q.p.length >= 3);
   // the topmost reflection under a point (its tone there), or null for the open water
   const under = (x: number, y: number): string | null => {
     for (let i = polys.length - 1; i >= 0; i--) {
       const q = polys[i];
-      if (x >= q.box.x0 + q.sx && x <= q.box.x1 + q.sx && y >= q.box.y0 + q.sy && y <= q.box.y1 + q.sy && inPoly(q.p, x - q.sx, y - q.sy)) return toneOf(st, q.s, kAt(st, y));
+      if (x >= q.box.x0 + q.sx && x <= q.box.x1 + q.sx && y >= q.box.y0 + q.sy && y <= q.box.y1 + q.sy && inPoly(q.p, x - q.sx, y - q.sy)) return q.s.kind === 'light' ? lightTones(st, q.s, y)[0] : toneOf(st, q.s, kAt(st, y));
     }
     return null;
   };
@@ -1184,6 +1288,21 @@ export function waterFrame(spec: WaterSpec, t: number): WaterFrame {
     lines,
     quayLayer: spec.quayLayer ?? 30,
   };
+}
+
+/** QA: what each reflection draws at t (its solid block, its bars: a broken band counts twice, a light's slivers), by
+ *  source id with its middle x (the critic's comb count: bars outside the glitter in a stretch of the water). */
+export function waterPieces(spec: WaterSpec, t: number): Map<string, PieceCount> {
+  const st = waterStatic(spec);
+  const shift = (plane: number): Pt => (spec.float ? spec.float(plane, t) : [0, 0]);
+  const swayFn = (y: number) => swayAt(spec.cam, st.sway, spec.ramp.yFar, spec.ramp.yNear, st.seed, y, t);
+  const count = new Map<string, PieceCount>();
+  const ctx: FrameCtx = {st, t, sway: swayFn, shift, count};
+  const moving = spec.moving ? spec.moving(t).map((s) => resolveSource(s, spec.cam, st.grid, spec.region, true, st.yBarMin)) : [];
+  const out: Runs = new Map();
+  for (const s of st.srcs) buildMass(s, ctx, out, false);
+  for (const s of moving) buildMass(s, ctx, out, true);
+  return count;
 }
 
 /** Far LOD (R14): 2-4 long, thin, tone-on-tone current lines, still. */
@@ -1321,7 +1440,12 @@ export function waterPalette(spec: WaterSpec): {name: string; hex: string; L: nu
   st.ramp.keys.forEach((k) => add(`ramp y${k.y}`, k.color as string));
   const ks: number[] = [];
   for (let k = st.ladder.k[0]; k <= st.ladder.k[1] + 1e-9; k += st.ladder.step) ks.push(Math.round(k / st.ladder.step) * st.ladder.step);
-  for (const s of st.srcs) for (const k of ks) add(`${s.id} k${k.toFixed(2)}`, toneOf(st, s, k));
+  for (const s of st.srcs) {
+    if (s.kind === 'light' && (s.draw ?? 'mass') === 'mass') {
+      const g = lightGeom(st, s);
+      lightTones(st, s, lerp(g.top, g.yBlock, 0.5)).forEach((c, i) => add(`${s.id} ${i ? `sliver ${i}` : 'block'}`, c));
+    } else for (const k of ks) add(`${s.id} k${k.toFixed(2)}`, toneOf(st, s, k));
+  }
   if (spec.sun) {
     add('glitter bed', spec.sun.bed ?? SUN_DEFAULT.bed);
     add('glitter sliver', spec.sun.core ?? SUN_DEFAULT.core);
@@ -1345,7 +1469,57 @@ export function waterProblems(spec: WaterSpec, o: {t1?: number; otherAlive?: num
   const L = WATER_LIMITS;
   const name = spec.id;
   // ---- colour: nothing in the beige, olive or grey bands (the playbook's never list)
-  for (const c of waterPalette(spec)) if (c.band) out.push(`${name}: ${c.name} ${c.hex} (L* ${c.L} C* ${c.C} h ${c.h}) is in the ${c.band} band`);
+  const pal = waterPalette(spec);
+  for (const c of pal) if (c.band) out.push(`${name}: ${c.name} ${c.hex} (L* ${c.L} C* ${c.C} h ${c.h}) is in the ${c.band} band`);
+  // ---- the ramp as drawn, ROW BY ROW (its keys alone miss what the curve does between them: the critic found 8 rows
+  // in the house bands between two clean keys on v6's first master)
+  const rows: {y: number; hex: string}[] = [];
+  for (let y = Math.floor(st.box.top); y <= Math.ceil(st.box.bottom); y++) rows.push({y, hex: skyColorAt(st.ramp, y)});
+  const runs = (bad: (r: {y: number; hex: string}) => string): string[] => {
+    const msgs: string[] = [];
+    let a: {y: number; hex: string; why: string} | null = null;
+    let last = -1;
+    const flush = () => {
+      if (a) msgs.push(`${name}: the ramp's rows y ${a.y}-${last} (${a.hex}...) ${a.why}`);
+      a = null;
+    };
+    for (const r of rows) {
+      const why = bad(r);
+      if (why && a && r.y === last + 1) last = r.y;
+      else {
+        flush();
+        if (why) {
+          a = {y: r.y, hex: r.hex, why};
+          last = r.y;
+        }
+      }
+    }
+    flush();
+    return msgs;
+  };
+  out.push(...runs((r) => (neverBand(r.hex) ? `are in the ${neverBand(r.hex)} band` : '')));
+  // ---- never mistaken for the lit ground beside it (dE76, CIE Lab)
+  for (const nl of spec.notLike ?? []) {
+    const lim = nl.dE ?? 6;
+    out.push(...runs((r) => (dE76(r.hex, nl.hex) < lim ? `are within dE76 ${lim} of ${nl.name} ${nl.hex}: the water reads as ${nl.name}` : '')));
+    for (const c of pal) if (!c.name.startsWith('ramp') && dE76(c.hex, nl.hex) < lim) out.push(`${name}: ${c.name} ${c.hex} is within dE76 ${lim} of ${nl.name} ${nl.hex}`);
+  }
+  // ---- the far water is a Fresnel step under the air (>= 4 L*): never as light as the sky it mirrors
+  if (spec.air) {
+    const yTop = Math.min(...[0, 0.25, 0.5, 0.75, 1].map((u) => spec.region.top(lerp(spec.region.x0, spec.region.x1, u))));
+    const far = lch(skyColorAt(st.ramp, Math.max(yTop, spec.ramp.yFar))).L;
+    if (far > lch(spec.air).L - 4) out.push(`${name}: the far water is L* ${far.toFixed(1)}, under 4 L* below the air ${spec.air} (L* ${lch(spec.air).L.toFixed(1)}): a Fresnel step under the sky (RampOpts.dl)`);
+  }
+  // ---- a light is light on water (LightOpts): a short block, <= 3 tapering lens slivers, gaps >= 4 px, a step under
+  for (const s of spec.sources) {
+    if (s.kind !== 'light' || (s.draw ?? 'mass') !== 'mass') continue;
+    const lo = {...LIGHT_DEFAULT, ...(s.light ?? {})};
+    if (lo.solid > 0.35) out.push(`${name}: ${s.id}: a light's solid block ${Math.round(lo.solid * 100)} % of its length (<= 35 %: a longer one reads as a slab)`);
+    if (lo.slivers > 3) out.push(`${name}: ${s.id}: ${lo.slivers} slivers (<= 3: more read as a stack)`);
+    if (lo.ratio > 0.85) out.push(`${name}: ${s.id}: sliver ratio ${lo.ratio} (each >= 15 % shorter and thinner than the one above)`);
+    if (lo.gap < 4) out.push(`${name}: ${s.id}: sliver gaps ${lo.gap} px (>= 4: the encode's 4:2:0 chroma turns a thinner gap khaki)`);
+    if (lo.step < 4) out.push(`${name}: ${s.id}: the column ${lo.step} L* under its light (>= 4: a reflection never outshines its source)`);
+  }
   const b = cie(spec.body);
   if (!(b.h >= 150 && b.h <= 250 && b.C > 4)) out.push(`${name}: the body ${spec.body} is not a cool colour (h ${b.h.toFixed(0)}, C* ${b.C.toFixed(1)}): the water is the frame's cool field (DIRECTION rule 6)`);
   if ((spec.tone?.warmMemory ?? 0) > 0) out.push(`${name}: warmMemory ${spec.tone?.warmMemory} is ON (an owner knob): check the water stays >= 80 % cool (docs/v2/water/judge_metrics.py)`);
