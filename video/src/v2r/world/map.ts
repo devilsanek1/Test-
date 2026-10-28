@@ -774,7 +774,8 @@ export const S4 = {
   backsPlaneK: 0.6,
   towpathY: [860, 1080] as const,
   /** The fingerpost at the stop (17.96): ONE post at x ~575, two arrow plates pointing WEST, time order top-to-bottom,
-   *  fill-first pen reveal; she never touches it. Plate lettering: key 56 px, body 34 px, credit small. */
+   *  fill-first pen reveal; she never touches it. Plate lettering: ONE row, the key 52 px + its short word 44 px
+   *  ("DEC 2025 · unclassified"; REVIEW_1 MUST 3: no credit, no small line). */
   post: {x: 575, topY: 735, footY: 1060},
   plateDec2025: {x0: 110, y0: 755, x1: 560, y1: 855} as Rect,
   plateApr2026: {x0: 110, y0: 865, x1: 560, y1: 965} as Rect,
@@ -782,7 +783,9 @@ export const S4 = {
   aprPlatePen: [19.45, 19.8] as const,
   /** The name tag: paper on a thin ink leader, screen-locked above her, builds 15.07 / 16.60, pops off 18.80. Widened
    *  (lane L3, the orchestrator's 2026-10-27 decision) so every line holds unsqueezed and the card ends above y 840. */
-  nameTag: {x0: 590, y0: 600, x1: 1000, y1: 800} as Rect,
+  /** Her name tag (V2S4_tag), x1 fitted to its two lines since REVIEW_1 MUST 3 (1000 -> 892: "Google DeepMind" 264 px
+   *  at 44 from x 608, an 18-20 px margin). */
+  nameTag: {x0: 590, y0: 600, x1: 892, y1: 800} as Rect,
   nameTagBuilds: [15.07, 16.6] as const,
   nameTagOffAt: 18.8,
   /** Truck west at her pace (far roofs 0.3x) -> stop on "objected" (0.6 s ease-out ending 17.96) -> hold, locked or the

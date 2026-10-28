@@ -310,9 +310,9 @@ export const DECK_SHADE: string[] = (() => {
 
 /** The near paving's lit zone ONE value step down (REVIEW_1 SHOULD 3 / check_light FAIL f1404: at the landing the lit
  *  terrace below the subject outshone the Pentagon): the floor nearer than a soft lobed edge across the deck (END y
- *  ~1395, under the header course and the plaque), drawn as the rig's AMBIENT tint in its own ShadowLayer BEFORE the
- *  deck's shade (the shade multiplies over it: the dapple keeps its contrast, a step deeper). It reads as the shade of
- *  the terrace's near trees behind the lens; far below the frame at the start (2.42x about the slot). Static. */
+ *  ~1395, under the header course and the plaque), drawn in the rig's FORM tint (one step; its ambient is white by
+ *  day) FIRST in the deck's ShadowLayer, so the deck's shade paints over it (never a double step under the trees). It
+ *  reads as the shade of the terrace's near trees behind the lens; below the frame at the start (2.42x). Static. */
 export const NEAR_AMBIENT: string = (() => {
   const edge = lobedEdge(
     [

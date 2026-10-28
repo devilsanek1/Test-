@@ -85,7 +85,7 @@ freezes the world). S4's truck is A's walk: its world slide is camera, not suppo
    colour before the flood) -> the flood from SUN0 by 0.30, her teal coat last; W lamp-gold -> plum dark (0.40); the
    ghosts paper, heads plum -> silver.
 2. **S2** (golden). A: her dark window (outline on at 6.82 "one") · the five staff windows (lights 8.96, silhouettes,
-   half blinds 10.26-10.60, the last blind 12.20) · the TOLD THE BBC board (from 8.44). B: Pip (head to the wall on "But"
+   half blinds 10.26-10.60, the last blind 12.20) · the newsstand board "for fear of retaliation" (from 8.44; its header, body and source left the picture in REVIEW_1 MUST 3). B: Pip (head to the wall on "But"
    8.30), reporter and staffer (notebook 9.48; hood ~10.85, after the blinds), newsagent. C: the wall, canal, passing
    boat, far walkers, pigeons, urn steam. Colour: warm brick and gold panes; her pane the plum anchor; the five panes
    cool to white at 8.96; warm-shade blinds; the board's cream face.
@@ -101,7 +101,8 @@ freezes the world). S4's truck is A's walk: its world slide is camera, not suppo
    lamppost wipe, joggers, cars, birds, clouds; the wing's windows warm in ONE step (23.08). Colour: cool mint sky, pale
    gold band, blossom pinks, pale limestone; the far city in pale steps toward the sky.
 6. **S6** (April; held locked at its 24.00 pose: the 4 s parallax truck is retired, DIRECTION rule 8). A: the deal board
-   (the clause from the reveal, the purpose line 24.03, the F12 line 26.40). B: Pip (one ear flick on "veto" 26.50), the
+   (the tag from the reveal, the purpose line 24.03, the F12 line 26.47; the clause and the credit are not drawn since
+   REVIEW_1 MUST 3, the post carries them; the board's top at 780 since MUST 4). B: Pip (one ear flick on "veto" 26.50), the
    door staff (small backs). C: facade, door, fence, tulips, blossom, petals (steady falling weather), one jogger, the
    rest of the promenade small and far; facade windows 27.08-27.80 at <= 3 switch-ons per second. Colour: the cream board
    under a pale sky; tulip confetti; limestone.

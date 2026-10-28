@@ -92,11 +92,10 @@ export const S5Deck: React.FC = () => {
     <>
       <DeckFloor />
       <Paint b={rail} seed="s5deck/rail" misreg={false} />
-      {/* the near paving one value step down (REVIEW_1 SHOULD 3): its own multiply layer, under the deck's shade */}
       <ShadowLayer>
-        <Shadow d={NEAR_AMBIENT} tint="ambient" soft={SHADE_SOFT} />
-      </ShadowLayer>
-      <ShadowLayer>
+        {/* the near paving one value step down (REVIEW_1 SHOULD 3; the rig's FORM tint: its ambient is white by day),
+            FIRST in the layer so the deck's shade paints over it (no double step under the trees) */}
+        <Shadow d={NEAR_AMBIENT} tint="form" soft={SHADE_SOFT} />
         {DECK_SHADE.map((d, i) => (
           <Shadow key={`deck${i}`} d={d} tint="cast" soft={SHADE_SOFT} />
         ))}

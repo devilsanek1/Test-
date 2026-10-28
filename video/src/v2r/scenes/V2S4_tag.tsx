@@ -9,7 +9,7 @@
 //   18.80        the whole tag pops off (shrinks to its centre in 0.12 s), the leader with it.
 // FEW AND BIG (REVIEW_1 MUST 3): only her name and her lab are drawn; her role, "3 years · resigned Oct 2026" and the
 // source are in the post caption and the pinned comment (docs/v2/POSTING_KIT.md).
-// Text left-aligned at x 608 (card x 590-1000; the widest line 263 px of the 378 the card holds).
+// Text left-aligned at x 608 (card x 590-892, fitted to the two lines: the widest, 264 px, of the 270 the card holds).
 // It stays above y 840 (no text in the right rail below it) and never covers her (her head top is y 900) or the post
 // (x 575). Words: K3 `TXT_NAME_TAG` (never retyped; build 1's last two role parts share one line, build 2's two parts
 // share one line, the credit is one line).
@@ -28,7 +28,7 @@ import * as MAP from '../world/map';
 import {S4_BEATS, S4_HER, S4_HER_HEAD} from './V2S4_rig';
 
 const X0 = MAP.S4.nameTag.x0; // 590
-const X1 = MAP.S4.nameTag.x1; // 1000
+const X1 = MAP.S4.nameTag.x1; // 892
 const Y0 = MAP.S4.nameTag.y0; // 600
 const Y1A = 736; // build 1 bottom
 const Y1B = MAP.S4.nameTag.y1 - 2; // 798: build 2 bottom (her head top is y 900)

@@ -64,9 +64,10 @@ export const BOARD_COLORS = {
   contour: CM.ink,
   /** The ground shadow: a warm shade of the paving (colour, never grey). */
   shadow: mixHex(CM.paving, CM.shadeWarm, 0.45),
-  /** The blank face ONE value step down (L* ~88 vs the face's 96; warm, never greyed): `dim` (REVIEW_1 SHOULD 2 /
-   *  check_light 34.0: a blank cream face outshone the beat's subject). `dim.k` scales the step (1 = the whole step). */
-  faceDim: mixHex(CM.paper, CM.shadeWarm, 0.15),
+  /** The blank face ONE value step down (L* ~85 vs the face's 96: CRAFT's near-plane steps run 5-14 L*; warm, never
+   *  greyed): `dim` (REVIEW_1 SHOULD 2 / check_light 34.0: a blank cream face outshone the beat's subject; at L* 88 it
+   *  still topped S8's brightest 5 %, whose next 5 % sits at L* 87 round her). `dim.k` scales the step (1 = all of it). */
+  faceDim: mixHex(CM.paper, CM.shadeWarm, 0.22),
   /** The half-wiped menu (HerBoard): pale flat smears, no legible words (its scribbles are not drawn since REVIEW_1:
    *  they read as a stray grey squiggle). */
   smear: mixHex(CM.paper, CM.coatPlum, 0.09),
