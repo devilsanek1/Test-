@@ -81,9 +81,13 @@ V2S3 (the shot before) was conformed just before you: read its "S3 art conform" 
    CRAFT §f.6; L1 raised `lib/particles`' PRESETS to these numbers: merge origin first, then use the presets and never
    pass a smaller size; pass `size` only if the presets still hold the old ones; check at 360 px wide that a viewer can
    point at them). The owner on look clip v5: "I don't like the water too much, leafs are great, but let's keep it and
-   keep going": leaves blown across the open mid ground are the proven particle; the canal water stays EXACTLY S1's
-   treatment (copy V2S1's water; no new water styling or extra water effort); motes per CRAFT §f.6 (far 6-10 px + 2-4
-   near at 12-16 px via `nearSize`, <= ~10 in all). So: `motes` near SUN1
+   keep going": leaves blown across the open mid ground are the proven particle; motes per CRAFT §f.6 (far 6-10 px +
+   2-4 near at 12-16 px via `nearSize`, <= ~10 in all). THE WATER: the owner then called it "way too cheap, not clean or
+   premium quality or refined, just lazy and cheap"; the orchestrator is redesigning it as ONE shared component
+   (`src/lib/water.tsx`): spend NOTHING on water styling; keep S4's water (the canal strip and the near water) drawn in
+   ONE isolated component each with its geometry in one exported const (region, edges, the coping and hull lines, what
+   stands above it or is reflected in it) so the swap is a one-liner; glints stay a separate Particles field on top;
+   never touch S1's files or `kit/canal/water.tsx`. So: `motes` near SUN1
    (6-10 px, against shade where they can read), a `leaves` field across the towpath (26-40 px, a visible flutter and
    turn, 2-3 across the hold, crossing the mid ground, their fall clear of the band and of her), `glints` under SUN1 on the
    bottom water (20-36 px, L* +15..+25, 4-6 twinkling at once, 0.3-0.8 s). Particles read `useTime()`, which inside S4's
