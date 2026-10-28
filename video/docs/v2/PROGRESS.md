@@ -2,6 +2,14 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 14:34 UTC (hourly)
+
+The fresh-eyes critic on v6's water (`docs/v2/water/CRITIC.md`, 13:40): "not signed off yet, but close": every tell the owner named is
+gone (the band is now the mirrored evening sky, the box patches are reflections, the dashes are 6-11 calm ripple lines, the stars a
+still gold bed), premium 6.5 / 10 (v5: 2); what still reads as procedural: the gold door column as a slab over five equal bars (khaki
+seams in the encode), a few crumbs, a peach "crown" at the near-left where the ramp meets the paving, the canal a step greyer than
+Canal Mint. One fix pass is running (must-fixes 1-4), then v6 goes to the owner. Spend: ~$22 since 13:22; estimated week ~92.5 %.
+
 ## Snapshot 2026-10-28 13:22 UTC (hourly)
 
 The integrator finished the cross-shot items (ASSEMBLY_TODO 1-4 DONE, 5 was a bird already fixed). The water: `src/lib/water.tsx` (A's
