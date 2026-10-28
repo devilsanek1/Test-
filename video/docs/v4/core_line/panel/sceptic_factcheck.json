@@ -1,11 +1,58 @@
-{"verdicts":[
-{"id":"L18","severity":"minor","problem":"PROVISIONAL (web check pending). 97% is one Deezer-commissioned Ipsos test of 3 tracks (Oct 2025); 'COULD YOU?' promises a test the video cannot run.","safer_wording":""},
-{"id":"L3","severity":"minor","problem":"PROVISIONAL (web check pending). The crime was wire-fraud conspiracy over millions in royalties, not bot plays as such.","safer_wording":""},
-{"id":"L35","severity":"minor","problem":"PROVISIONAL. Question presupposes someone always pays; caught bot plays earn nothing.","safer_wording":""},
-{"id":"L34","severity":"major","problem":"PROVISIONAL. Unhedged present-tense claim of an unmeasured harm.","safer_wording":""},
-{"id":"L5","severity":"none","problem":"PROVISIONAL.","safer_wording":""},
-{"id":"L24","severity":"minor","problem":"PROVISIONAL. Implied promise to reveal which songs.","safer_wording":""},
-{"id":"L28","severity":"minor","problem":"PROVISIONAL. Plural frame-0 reads as a general rule.","safer_wording":""},
-{"id":"L1","severity":"major","problem":"PROVISIONAL. Every-AI-song-takes-money claim; on the Never-say list.","safer_wording":""},
-{"id":"L2","severity":"major","problem":"PROVISIONAL (web check pending). Frame 0 drops 'one app' and 'peak days'.","safer_wording":""}
-]}
+{
+ "verdicts": [
+  {
+   "id": "L18",
+   "severity": "minor",
+   "problem": "Holds up: 'BLIND TEST' carries the scope the fact file requires, and Deezer's own release says 97% 'can't tell the difference' (an independent fact-check, Black Dot Research, rates the 97% accurate for that study). Two small gaps. (1) It is one Deezer-commissioned Ipsos online survey (October 2025, 9,000 adults, 8 countries) with only three clips, two fully AI and one human; '97% failed' means they didn't sort those three correctly, so it shows AI songs can fool most people, not that nobody can ever tell. (2) 'COULD YOU?' promises a test the video can't run (no real AI audio may be played), so unless the script answers the question in words straight away, the hook reads as bait. It implies nothing about money, Spotify or AI-using artists.",
+   "safer_wording": "Frame 0: 'BLIND TEST OF 9,000 PEOPLE: 97% COULDN'T TELL. COULD YOU?' Keep the line, and answer it in words within seconds (no quiz is possible)."
+  },
+  {
+   "id": "L3",
+   "severity": "minor",
+   "problem": "Accurate: on 6 Oct 2026 Michael Smith was sentenced to 18 months (SDNY, Judge Koeltl) after pleading guilty to conspiracy to commit wire fraud; prosecutors say bots streamed his AI-made songs billions of times, and the spoken line is the fact file's own safe wording. The gap: the crime was pocketing millions in royalties from those fake plays (agreed loss $8.09M, which he forfeits; prosecutors say $14M+ received in all), not having bots play songs as such. A viewer who leaves at frame 0 can think botting your own songs is itself a jailable act, or that the sentence was absurd. Keep any victim claim out of the hook: his lawyers say no artist suffered 'any appreciable loss', and Spotify says it held his Spotify take to about $60,000.",
+   "safer_wording": "Line: 'A man got 18 months for having bots play his AI songs and pocketing the royalties.' Frame 0: 'PRISON FOR HAVING BOTS PLAY HIS SONGS FOR MILLIONS'"
+  },
+  {
+   "id": "L35",
+   "severity": "none",
+   "problem": "Nothing false: it is a question, and the facts give it an honest answer. Bot plays that get caught are stripped before payout (Spotify, Deezer, Apple), so then only the cheat pays; the fake plays that slip through take a share of that country's monthly pot, so every rights holder in it gets a slightly thinner slice, by an amount nobody has measured. It stays clean only if the script answers it that way: never 'you do' or 'your favourite artist, every time'.",
+   "safer_wording": ""
+  },
+  {
+   "id": "L34",
+   "severity": "minor",
+   "problem": "The mechanism is real; the certainty isn't. Pay is a share of all counted plays in a shared pot, so every fake play that gets counted thins every other slice (Spotify concedes the denominator effect, says spam 'can dilute the royalty pool', and calls its 1,000-play pay line a guard against bad actors trying 'to syphon royalties away from real artists'). But 'are skimming' states as present fact a loss nobody has measured: caught fakes earn nothing (Spotify, Deezer, Apple), Deezer calls the impact on human artists' pay 'minimal on Deezer', and Smith's lawyers say no artist suffered 'any appreciable loss'. This is exactly where the fact file says a hostile fact-checker attacks ('show me the uncaught fraud'), and a viewer can come away thinking the cut is proven and unchecked. Leaving AI off the line is fair to AI-using artists.",
+   "safer_wording": "Bots can skim your favorite artist's pay. (To keep the present tense: 'The bots that slip through are skimming your favorite artist's pay.')"
+  },
+  {
+   "id": "L5",
+   "severity": "none",
+   "problem": "Holds as worded: 'can' claims only what the pot's design guarantees. Pay is a share of all counted plays in each country's monthly pot, so fake plays that slip past the filters thin every real slice (Spotify: spam 'can dilute the royalty pool'). 'Paycheck' is fair shorthand for royalties that reach artists through labels and distributors. For the script, not the line: never give a size (none has been measured), and say that caught fakes earn nothing.",
+   "safer_wording": ""
+  },
+  {
+   "id": "L24",
+   "severity": "minor",
+   "problem": "True as a possibility and fair to AI-using artists: some AI acts have real fans (The Velvet Sundown, 550,000+ monthly Spotify listeners; an AI cover of 'Papaoutai', 14M+ Spotify plays in its first month; Sweden's No. 1 Spotify song, kept off the official chart as mainly AI), and in one blind test 97% couldn't tell. The gap: 'already' implies AI songs have spread through what people play, but the only listening data (Deezer's) puts fully AI tracks at 1-3% of plays, most of them fake, and Spotify says AI-looking tracks are 10 times likelier to fall under its 1,000-play pay line. It also hints at a reveal (which song?) the video can't make, since no real AI audio may be played. Unless the next beat pivots, viewers expect a video about being fooled by AI music, not about fake plays.",
+   "safer_wording": "You might already like an AI song. That's not the problem. (Frame 0: 'YOU MIGHT ALREADY LIKE AN AI SONG. THAT'S NOT THE PROBLEM')"
+  },
+  {
+   "id": "L28",
+   "severity": "minor",
+   "problem": "True in the case that matters: Smith 'pocketed the royalties for all those plays in which no one was listening' (WUNC), because bots made the plays. Two gaps. (1) Until the bots appear, 'nobody hears' reads as 'nobody plays', and a song nobody plays earns nothing and costs no one (the trap behind the fact file's Never-say 'Almost nobody listens, and that's exactly the problem'); a viewer who leaves at frame 0 can think the unheard flood earns just by existing. (2) Frame 0's plural reads as a general rule, but most unheard AI songs earn nothing: on Spotify a track under 1,000 plays a year gets no recording royalty, AI-looking tracks are 10 times likelier to fall under that line, and caught fake plays are stripped. The money comes only from fake plays that slip past the filters.",
+   "safer_wording": "Frame 0 in the singular, as spoken: 'AN AI SONG NOBODY HEARS CAN STILL MAKE MONEY'; and name the bots in the very next line ('Bots play it.')."
+  },
+  {
+   "id": "L1",
+   "severity": "major",
+   "problem": "False as worded, and on the fact file's Never-say list three times ('Every AI song takes money from artists', 'Almost nobody listens, and that's exactly the problem', 'AI is stealing from artists'). 'They still take money from your favourite artist' pins the harm on AI songs rather than on fake plays: most AI uploads earn nothing (Spotify says AI-looking tracks are 10 times likelier to fall under its 1,000-play pay line), caught fake plays are stripped before payout, and a song nobody plays costs nobody anything. With no bots in the line, its own logic (nobody listens, yet they take money) leaves the viewer believing AI songs drain artists just by existing. Frame 0 goes absolute ('NOBODY LISTENS', 'ARTISTS PAY'), states as fact a loss nobody has measured (Deezer calls the impact on human artists' pay 'minimal on Deezer'), and is unfair to AI-using acts that do have real listeners (The Velvet Sundown; an AI 'Papaoutai' cover with 14M+ plays).",
+   "safer_wording": "Line: 'Real people barely play AI songs. Bots do, and the fake plays that slip through take a slice of your favourite artist's pay.' Frame 0: 'AI SONGS: REAL FANS BARELY PLAY THEM. BOTS DO.'"
+  },
+  {
+   "id": "L2",
+   "severity": "major",
+   "problem": "Frame 0 drops 'one app', so a viewer reads 'half of all new songs aren't human', the Never-say 'half of all music is AI' in new clothes. The figure is Deezer's alone (Spotify publishes none) and counts new uploads at peak level in June 2026 (Deezer: 'over 50% of all new music uploads on Deezer at peak level'); the monthly average was 39% in January and 44% in April. With AI at only 1-3% of plays, a viewer who takes 'half of new songs' as 'half of what I hear' is badly misled. The spoken line keeps 'one app' but still drops the peak-day scope, and 'aren't human' overstates 'fully AI-generated' (a person often writes the lyrics and the prompt).",
+   "safer_wording": "Line: 'Some days, over half the new songs on one app are AI-made.' Frame 0: 'SOME DAYS, HALF OF ONE APP'S NEW SONGS ARE AI'"
+  }
+ ]
+}
