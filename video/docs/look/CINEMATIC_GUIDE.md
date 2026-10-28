@@ -175,7 +175,9 @@ quota. Breathers (S3, S4) take theirs from the sky (9-10).
    there, 8-11 % near). Motifs repeat in runs of 4-6 at a fixed period. Calm zones only: the landmark (0.4x the city),
    the deck (0.65x), the sky.
 5. **Atmospheric steps, flat (never a haze gradient):** each plane is one fixed mix toward the sky that about doubles per
-   plane: near 0 / near-mid 12 / mid 22 / far 40 / infinity strip 65 %, shade leaning 0-50 % to the dusk blue. Autumn
+   plane: near 0 / near-mid 12 / mid 22 / far 40 / infinity strip 65 %, shade leaning 0-50 % to the dusk blue (how, in
+   our colour: `CRAFT.md` §f.2, `lib/depth.ts` `recede`: toward the sky's lowest step behind the plane, never through
+   grey or olive). Autumn
    Ember darkest swatches `#3A1F16` L15 | `#533D38` 28 | `#695653` 38 | `#8C7D7C` 54 | `#BAACA8` 71 (the L* 15 step only
    as the ~5 % anchor: `PALETTE.md`); values 5/5/4/3/2; lines by tier, never by depth (`CRAFT.md` §c: the environment
    draws none on any plane); warm near, the sky's hue farthest.

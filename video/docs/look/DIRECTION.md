@@ -119,7 +119,8 @@ stage; the owner may skip gates by name. The clean pen's first test is the v3 re
 - Scratchy film lines (jitter, overshoot, open contours, double strokes, taper everywhere) and misregistered fills
   (`style_bible.md` §3-4, `motion_spec.md`): the clean pen.
 - Line weight or detail by depth (`style_bible.md` §3, `ENGINE.md` rule 8, the old G3 "detail gradient", the "ink
-  full, full, hairline, none" ladders): by story role.
+  full, full, hairline, none" ladders): lines by story role; distance only calms colour and merges small parts, one
+  flat step per plane (rule 2's depth, `CRAFT.md` §f).
 - Equal-weight clutter: dressing, crowds or the mascot as loud as the subject; specks, ticks, hatching, dash rows,
   squiggles, grain.
 - An events-per-second quota or a density FAIL (`ENGINE.md` rule 6, `motion_spec.md` §9, ref 2 as a floor, the old

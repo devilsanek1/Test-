@@ -52,6 +52,7 @@ edit, never silently inside a build (`animatic_mograph.md`).
 | Thread object | near-final (FROZEN) | the through-line card's thread on screen >= 80 % of the runtime, no gap over 3 s (the declared scale reveal aside), a home spot when the shot is elsewhere; it reacts at the end of every cause beat (`CRAFT.md` §a.1) | lint from the board JSON (under 80 % or a gap over 3 s FAILs); cold read |
 | Attention tiers | final weight, in grey (FROZEN) | every element's tier by story role, A/B/C (§3), drawn at its final weight: one subject per beat, a calm world around it | lint: a tier per element; eye jump at each join; "where is your eye, every 2 s?" |
 | Light rig | its shapes (FROZEN) | per set, from the world bible: the key's side, the pool shapes, one grey shadow value, the same in every shot of the set | lint: a rig per set panel; colour shift at each join (unless a light change is declared) |
+| Depth: planes + camera | their steps and lines (FROZEN) | per set, from the world bible (`CRAFT.md` §f): each plane a grey step (the foreground darker, each farther plane paler and simpler), a calm field behind each subject's edge, the horizon and the ground's lines running to the VP drawn, things sized by one camera; particle fields named among the `life:` items | lint: a `planes` and a `vp` field per set panel; eye check: the far reads far, the subject stands off what is behind it, the ground runs into the picture |
 | Mover budget | near-final (FROZEN) | at most 3-4 noticeable supporting movers at once, at most 4 within 0.4 s of a cut; supporting life at its tier, final size and speed (§4) | lint on the declared counts; measured from the G4 look clip on |
 | Key actions / animations | near-final shape+timing | every move the film will have exists here: 2-4 stepped key poses on beat words, smears for fast transits; stillness is a claim | motion check at 1x; "no G5 move without a G3 placeholder" |
 | Aliveness / density | placeholder (plan FROZEN) | every surface that is dense in the final carries a grey mass at final position, size and tier; `life:` list placed; 2-3 ambient loops per set panel; density planned per sequence against the home set's density key (§3) | emptiness lint; density-promise check; owner question |
@@ -77,7 +78,7 @@ texture (tier C only, at a light grey: the tiers below).
   FULL set (shelf clutter, wall fill, street fill), tier C — exempt from the 25-element cap and subject lint. Required
   on every home-base and wide panel.
 - **Tiers by story role, never by depth** (`CRAFT.md` §b; owner-approved 2026-10-27, replacing the depth "detail
-  gradient"): **A**, the beat's 1-3 subject objects: the ink contour (continuous, 9 px), the only dark mass and the only
+  gradient"; distance is the PLANE's job, a grey step per plane, §2 "Depth", `CRAFT.md` §f): **A**, the beat's 1-3 subject objects: the ink contour (continuous, 9 px), the only dark mass and the only
   inner details; **B**, supporting life near the story (the mascot, people, story objects off their beat): mid-grey lines
   only, never a dark mass; **C**, the environment (room, street, town, sky, weather, far life): a pale tone with no
   contour, the owner's scribble mass (yes, 2026-10-27) at a light grey, or a flat tint. More than one fully detailed
@@ -236,6 +237,7 @@ reel needs it — never ahead of a reel.** Nobody builds tooling before drawing 
 | Transition `device` and `carrier` fields + the carrier check (a carrier letter per join, at most 2 plain cuts, each plain cut >= 20 % size or >= 30° change: `CRAFT.md` §a) | JSON schema + board_lint | S |
 | `tier: 'A'\|'B'\|'C'` on every element: SketchReel draws each tier at its grey weight (§3: A the ink contour and the dark mass, B mid-grey lines and no dark mass, C a light-grey tone with no line, the scribble mass at light grey); lint: a tier per element | SketchReel + board_lint | S-M |
 | `rig` per set (key side, pool shapes, the one grey shadow value) and the thread object's screen time and home spot in the board JSON; lint: a rig per set panel, thread coverage >= 80 % and no gap over 3 s (FAIL; the declared scale reveal aside), the declared mover budget | JSON schema + board_lint | S |
+| `planes` (each element's plane: SketchReel draws each one a grey step, paler with distance) and `vp` (horizon, vanishing point(s)) per set panel; lint: both present on every set panel | JSON schema + SketchReel + board_lint | S |
 | Eye jump and colour shift per join on the rendered reel (warnings with a declared exception; the measures come from the craft tooling lane, `PIPELINE_V2.md`) | scripts/qa | S |
 | Camera-plan cross-check: every plan row's move, transition device and carrier, tier map, rig and `life:` item exists in the board JSON, or the plan row is edited | board_lint | S |
 | Red marks: STORYBOARD_STYLE §4 cases (1) and (3) FAIL on any owner-facing render (legal only in internal interim drafts) | board_lint | S |
