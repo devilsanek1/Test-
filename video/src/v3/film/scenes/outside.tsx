@@ -412,18 +412,24 @@ export const SIGN_CALM = {panel: '#717994', text: '#9AA3BC'};
  *  center": I ~37.28, da 37.48, ta ~37.64, cen 37.80, each ~0.1 s ahead of its syllable (37.18 / 37.36 / 37.54 / 37.72;
  *  kit DataCenter `rowsOn`, under the lit rows drawn on top: HallRowsLit). */
 const HALL_ROWS = {at: 37.18, dur: 0.72};
-/** The hall's four server-row slots (S9 px): the kit DataCenter's own row geometry for HALL ('dark', 4 rows, kit
- *  Outside.tsx DataCenterBody), so the lit rows sit exactly in its strips. */
+/** The payoff beat's four server-row slots (S9 px). At H2 rest the town's far snow (from y 930) and its back row's roofs
+ *  stand in front of the hall's lower facade, so the kit's own fourth row (S9 y 962-973, H2 932-941) is never seen and
+ *  its third is cut by the roofs: on the beat the lit rows get their own four slots in the facade's visible part, under
+ *  the sign (S9 y 874-930, H2 854-904, clear of the tallest roofs), over the kit's rows (HallRowsLit covers those with the
+ *  body's own colour). */
 const HALL_ROW_SLOTS = (() => {
   const g = HALL_GEO;
   const w = HALL.w;
   const sideW = w * 0.06;
-  const rowsTop = g.sign.y + g.sign.h + g.H * 0.08;
-  const rowGap = (HALL.y - g.H * 0.08 - rowsTop) / 4;
-  const rowH = Math.max(3, rowGap * 0.42);
   const x0 = g.x0 + sideW + w * 0.04;
   const sw = w - sideW - w * 0.08;
-  return [0, 1, 2, 3].map((i) => ({x: x0, y: rowsTop + i * rowGap, w: sw, h: rowH}));
+  return [0, 1, 2, 3].map((i) => ({x: x0, y: 874 + i * 16, w: sw, h: 8}));
+})();
+/** The facade behind the kit's rows (S9 px): inside the side face's edge and the outline, from under the sign to the base. */
+const HALL_ROW_FACE = (() => {
+  const g = HALL_GEO;
+  const sideW = HALL.w * 0.06;
+  return {x: g.x0 + sideW + 1.5, y: g.sign.y + g.sign.h + 3, w: g.x1 - 2.5 - (g.x0 + sideW + 1.5), h: HALL.y - 1 - (g.sign.y + g.sign.h + 3)};
 })();
 /** The server rows' bands: the clean pen's soft rows on the beat; one value over the body when calm (before the haze). */
 const DC_LED = '#A8B6DE';
@@ -485,20 +491,27 @@ const HallFansCalm: React.FC<{plant?: boolean}> = ({plant}) => {
 };
 
 /** THE ROWS ON THE PAYOFF'S BEAT (assembly review R1-4: the kit's three short bands per row stepped only ~400-500 px
- *  each, so 37.05-38.12 read as the film's longest still run, 1.08 s, under "an AI data center"; the hook's twin rows
- *  step ~1,100-1,300 px). Each row lights as ONE band across the facade's row slot (S9 px: ~277 x 5.6 H2 px, ~1,500 px)
- *  at the sign's lit value, popping whole in one frame on its syllable (HALL_ROWS), drawn over the kit's rows (which
- *  light under it at the same moments); `s` = the hall's step: lit on the beat (0), half way to the calm rows' value at
- *  the half step, gone when calm (the kit's calm bands show). The building is dark from the sign's step, so between
- *  36.98 and the first row its rows are all off. */
+ *  each, and its fourth row hides behind the town at H2 rest, so 37.05-38.12 read as the film's longest still run, 1.08
+ *  s, under "an AI data center"; the hook's twin rows step ~1,100-1,300 px). From the sign's step the facade's row area
+ *  is the body's own dark (it covers the kit's rows) with four dark slots in its visible part (HALL_ROW_SLOTS); each
+ *  slot lights as ONE band across the facade (~277 x 4.8 H2 px, ~1,300 px) at the sign's lit value, popping whole in one
+ *  frame on its syllable (HALL_ROWS). `s` = the hall's step: lit on the beat (0), half way to the calm rows' value at
+ *  the half step (inside the hall's haze), gone when calm (the kit's calm rows show again). */
 const HallRowsLit: React.FC<{T: number; s: number}> = ({T, s}) => {
   if (s >= 1 || T < H2_BEATS.sign) return null;
-  const color = s > 0 ? mixHex(SIGN_LIT.panel, DC_LED_CALM, 0.5) : SIGN_LIT.panel;
-  const bh = 6.4;
-  const d = HALL_ROW_SLOTS.filter((_, i) => T >= HALL_ROWS.at + (i * HALL_ROWS.dur) / 4)
+  const F = HALL_ROW_FACE;
+  const bh = 5.5;
+  const slots = HALL_ROW_SLOTS.map((r) => rrect(r.x, r.y, r.w, r.h, 2)).join('');
+  const lit = HALL_ROW_SLOTS.filter((_, i) => T >= HALL_ROWS.at + (i * HALL_ROWS.dur) / 4)
     .map((r) => rrect(r.x + 4, r.y + r.h / 2 - bh / 2, r.w - 8, bh, bh / 2))
     .join('');
-  return d ? <path d={d} fill={color} /> : null;
+  return (
+    <>
+      <path d={rd(F.x, F.y, F.w, F.h)} fill={EMBER.dcDark} />
+      <path d={slots} fill={'#1C2036'} />
+      {lit ? <path d={lit} fill={s > 0 ? mixHex(SIGN_LIT.panel, DC_LED_CALM, 0.5) : SIGN_LIT.panel} /> : null}
+    </>
+  );
 };
 
 /** THE AI data center at H2 (S9 px; through S9_TO_H2): the kit DataCenter (dark, 'bands' rows, no blink, no sign of its

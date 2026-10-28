@@ -80,3 +80,10 @@ Only the owner's quoted words carry owner rank; the "->" half is our log, and a 
   many parallel work sessions as you need". -> v3 rework: new flow (one home place, carriers at every join, the price tag
   as the thread; `docs/v3/flow_v2.md`), clean pen + tiers, light and shadow; pilot of the first sequence, then the other
   sequences in parallel helper sessions. The G5b cut is not posted.
+- 2026-10-28: "Continue / We hit the [limit] previously" (after the 5-hour limit stopped the assembly) -> the integrator
+  resumed from its transcript and finished (`rework_reports/assembly_integrate.md`); the full film rendered; three
+  reviews written (`assembly_review_R{1,2,3}.md`: the summit pile reads as pallets/bricks is the one blocker).
+- 2026-10-28: "we are getting close to our token limits can we drop some stages some redundant low signal work" -> the
+  separate verifier and the second fix round dropped; the REVEAL lane (the blocker) and the WINDOW lane (its two majors
+  only; minors deferred) resumed lean; then one final agent: master, cover, POSTING. -> rule: playbook, Process (the
+  weekly limit: close to a limit, drop the low-signal stages first).

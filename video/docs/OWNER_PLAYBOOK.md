@@ -274,7 +274,12 @@ Maintenance at the end).
   initial intermediate step", v3 G5, 2026-10-26).
 - **The weekly limit is the real budget: finishing the video comes first** (using up to 100 % of the week is fine if the
   video is completed; with several films in flight they share it, and finishing them comes before starting a new one).
-  Track the spend hourly (helpers' `cost_usd`, workflow tokens), budget every lane, finish before polishing. The
+  Track the spend hourly (helpers' `cost_usd`, workflow tokens), budget every lane, finish before polishing. **Close to
+  a limit, drop the low-signal stages first and keep what changes the film** (owner, v3, 2026-10-28: "we are getting
+  close to our token limits can we drop some stages some redundant low signal work"): keep the fixes for problems already
+  found and the master; drop a separate verifier when the final assembler re-checks every fix at its time, extra
+  reviewers on a lens another already covers, full-film re-renders inside fix lanes (stills at the finding's time do),
+  and the minors (listed as deferred, never silently). Resume stopped lanes scoped to their blockers and majors. The
   **5-hour session limit** is a hard wall shared by every session: watch both; before it hits, PAUSE in a controlled way
   (every lane stops its agents, commits + pushes, writes its handover; schedule the resume after the reset), so nothing
   is lost. **Commit progress periodically, so a limit that hits without warning costs minutes, not work:** every agent
@@ -290,7 +295,7 @@ Maintenance at the end).
   design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the
   quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
   reviewing what will still change, early polish, a review loop that has stopped improving the shot: `docs/PIPELINE_V2.md`
-  rule 2). — (2026-10-25; owner, 2026-10-26).
+  rule 2, and checks that repeat another check). — (2026-10-25; owner, 2026-10-26; 2026-10-28).
 - **Locked means dropped:** rejected options go to `archive/`, never seen by later prompts; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
 - **New feedback is INTEGRATED, never just appended:** when a note changes the direction, rewrite or retire every rule and
   doc it contradicts in the same pass, so the next agent never meets conflicting instructions. The current visual and
