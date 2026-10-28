@@ -2,6 +2,14 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Note 2026-10-28 19:55 UTC: the cover + posting kit done; video 2 ready to post
+
+The film: `deliverables/v2/v2r_G7_master_v1.mp4`. The cover: `deliverables/v2/v2r_cover.png` / `.jpg` (+ `_grid_preview.jpg`): the
+film's own frame at 5.20 s with the core line "SHE SAYS: NO CRITICIZING GOOGLE. FOR LIFE." inside the 4:5 centre. The kit:
+`docs/v2/POSTING_KIT.md` (caption 1,241 chars with the BBC source, a pinned comment with 6 sources, hashtags, TikTok / Shorts
+versions, alt text, upload settings at the highest quality, the file list, a claim-by-claim source table). Open, the owner's call: one
+small polish pass (S5's terrace shadows 21-22 s, the cut head at 22.0 s, S4's teal strip at 15 s; ~1 % of the week).
+
 ## Note 2026-10-28 19:25 UTC: G7 master v1 sent to the owner
 
 `deliverables/v2/v2r_G7_master_v1.mp4` (39.083 s, 60 fps, the final sound mix): REVIEW_1's six MUSTs done (fix passes A + B), every
