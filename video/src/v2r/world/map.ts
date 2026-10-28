@@ -520,12 +520,13 @@ export const s1Zoom = (t: number): number => zoomAt(S1_CAMERA.pullOut, t);
 export const s1Screen = (p: XY, t: number): XY => scaleAbout(p, S1_CAMERA.pullOut.anchor, s1Zoom(t));
 
 /** The S1 clock: the spot-tied moments every S1 builder, K4/K5 and sound share (TREATMENT section 4, THROUGHLINE §4.1).
- *  Frame 0 (DIRECTION rule 9): paper; the C world lands as flat PALE shapes; the A subjects' outlines (her behind the
- *  glass door, the door, W) draw on as one stroke each with Pip's tinted line, from t ~-0.26 so f0 shows them mid-draw;
- *  no colour before the flood (the sun half-coloured: the flood starts from it); the flood from SUN0 by 0.30, Pip with
- *  it, her teal coat last (f18). */
+ *  Frame 0 (DIRECTION rule 9; REVIEW_1 MUST 2): paper; the C world lands as flat PALE shapes; the strokes START at f0
+ *  and are the event: the clean pen draws the A subjects (her behind the glass door, the door, then W, its frame closing
+ *  on the lamp click 0.40) bold (5.4 px), one moving pen each with a visible tip (V2S1_clock S1_DRAW, S1_BOLD); no colour
+ *  before the flood (the sun half-coloured: the flood starts from it); the flood from SUN0 0.44-0.74, Pip's line with
+ *  it, her teal coat last (f47), done by ~0.8 s. */
 export const S1_CLOCK = {
-  flood: {t0: 0.02, t1: 0.3, origin: {x: SUN0.x, y: SUN0.y} as XY, herCoatLastF: 18},
+  flood: {t0: 0.44, t1: 0.74, origin: {x: SUN0.x, y: SUN0.y} as XY, herCoatLastF: 47},
   voiceShe: 0.12,
   wLampOff: 0.4,
   doorsStart: 0.45, // OUR EXIT DING

@@ -19,7 +19,8 @@ import {FormShade, Rim} from '../../lib/light';
 import {S1LobbyContact} from './V2S1_light';
 import {HER} from '../kit/cast/Her';
 import {drawn} from '../kit/cast/gait';
-import {C, s1Step, s1HerXAt, HER_COAT_AT, S1_DRAW} from './V2S1_clock';
+import {C, s1Step, s1HerXAt, HER_COAT_AT, S1_DRAW, s1Bold} from './V2S1_clock';
+import {InkScale} from '../../lib/inkComp';
 import {FigSpec, RowFigure, figParts, FIG_H} from './V2S1_row_fig';
 import {XG, mat} from '../../lib/xf';
 
@@ -141,6 +142,9 @@ export const S1Row: React.FC = () => {
   );
 };
 
+/** While her coat is paper (frame 0's draw-on, to HER_COAT_AT), its line is the teal's own deep shade: full contrast. */
+const HER_PAPER_LINE: Record<string, string> = {[CM.white]: CM.hero};
+
 /** Her behind the glass doors (t < 0.97; frame 0 and the loop underlay included): mid-step at 153 px, her coat paper
  *  until the flood's last frame (HER_COAT_AT). The `behindDoor` slot. */
 export const S1HerBehindDoor: React.FC = () => {
@@ -152,7 +156,9 @@ export const S1HerBehindDoor: React.FC = () => {
   return (
     <Tier tier="subject">
       <S1LobbyContact x={x} y={y} h={h} />
-      <RowFigure seed="s1row/her" spec={herSpec(t < HER_COAT_AT ? CM.white : CM.hero)} x={x} y={y} h={h} step={s1Step(t)} inkPx={HER_INK} draw={S1_DRAW} />
+      <InkScale value={s1Bold(t)}>
+        <RowFigure seed="s1row/her" spec={herSpec(t < HER_COAT_AT ? CM.white : CM.hero)} x={x} y={y} h={h} step={s1Step(t)} inkPx={HER_INK} draw={S1_DRAW.her} lineTone={t < HER_COAT_AT ? HER_PAPER_LINE : undefined} />
+      </InkScale>
     </Tier>
   );
 };

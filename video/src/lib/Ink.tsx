@@ -394,7 +394,7 @@ const InkStrokes: React.FC<InkStrokesProps> = ({d, dIn, at, t, dur, ease, width,
       if (drawn[i] <= 0 || drawn[i] >= 1 || L <= 0.5) continue;
       try {
         const h = getPointAtLength(P.subs[i], drawn[i] * L);
-        out.push(<circle key={`tip${i}`} cx={h.x} cy={h.y} r={w * tip} fill={color} opacity={opacity} style={style} />);
+        if (h) out.push(<circle key={`tip${i}`} cx={h.x} cy={h.y} r={w * tip} fill={color} opacity={opacity} style={style} />);
       } catch {
         // an unmeasurable piece draws no tip
       }
