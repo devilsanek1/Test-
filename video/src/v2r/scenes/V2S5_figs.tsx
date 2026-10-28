@@ -6,6 +6,7 @@
 // plane): the same two, tiny, at the balustrade; Pip stays put (no leap): S5's blossom-tree Wiper covers it ~23.81 and
 // S6's Pip appears at the deal board's foot (360, 1410) in the same column.
 import React from 'react';
+import {ContactShadow, ShadowLayer} from '../../lib/light';
 import {Stranger} from '../kit/cast';
 import {PipTrack} from '../kit/pip';
 import {FIG, T5, DECK} from './V2S5_rig';
@@ -20,6 +21,10 @@ export const FiguresStart: React.FC = () => {
   const pip = FIG.start.pip;
   return (
     <>
+      {/* the stranger's feet on the paving (the bench's own contact and cast are the deck's); Pip sits on the rail */}
+      <ShadowLayer>
+        <ContactShadow x={s.x} y={s.feetY} w={s.h * 0.3} h={9} />
+      </ShadowLayer>
       <Stranger x={s.x} y={s.feetY - 50} h={s.h - 50} turnPageAt={[0.6]} seed="s5/stranger" />
       <PipTrack
         x={pip.x}
@@ -41,6 +46,9 @@ export const FiguresEnd: React.FC = () => {
   const pip = FIG.end.pip;
   return (
     <>
+      <ShadowLayer>
+        <ContactShadow x={s.x} y={s.feetY} w={s.h * 0.3} h={6} />
+      </ShadowLayer>
       <Stranger x={s.x} y={s.feetY - 50 / DECK.k} h={(s.h * DECK.k - 50) / DECK.k} seed="s5/stranger" />
       <PipTrack x={pip[0]} y={pip[1]} size={FIG.end.pipSize} facing="back" seed="s5pip" keys={[]} />
     </>

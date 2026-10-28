@@ -1,393 +1,339 @@
-// V2S6_near.tsx (lane L5): S6's near plane on top of the kit's GateNear (kerb, paving, bollards + chain, the flowering
-// shrub, the bench + bike rack in the rail). NEAR-plane coordinates (the gate's near group drifts +65 px/s); nothing
-// here ever rises above y 1250, so the near plane can slide under the deal board without crossing its lettering.
-//   paving    setts along the kerb, slab tone patches and joints in the free areas, petal litter, a drain grate
-//   troughs   two stone troughs of daffodils behind the chain (the heads nod), with short flat shadows
-//   bench     a reader at rest on the kit's bench (a newspaper, no masthead), its backrest redrawn over them
-//   pigeons   six pecking on the paving in front of the tulip border; three flutter up and away (right) as the
-//             passer-by comes past (1.60 / 1.89 / 2.27)
-//   readers   three head-backs cut by the bottom (hv <= 150: <= ~139 px at the shoulders), the middle one turns to
-//             her neighbour 1.5-2.6; a passer-by's head-back crosses behind them left -> right (0.3-4.06)
+// V2S6_near.tsx (lane L5): S6's footpath and its near plane, on ONE camera (V2S6_rig CAM: eye 1.6 m, horizon y 771,
+// VP (540, 771), f 1400). Every size and place comes from CAM.pt(x m, z m ahead, level m): nothing nearer is smaller per
+// metre than anything farther (CRAFT §f.5; the near plane gets value range, never prop count: FEW, BIG, cut by the frame).
+//   S6Paving         (plane 0)  the footpath from the kerb at the board's feet (z 4.66 m) to the frame's foot (z 1.95 m):
+//                               0.6 m slabs, joints running to the VP, rows foreshortening toward the eye
+//   S6GroundShadows  (plane 0)  RIG_APRIL (sun at the left, shadows right and toward us): contact under the board's legs
+//                               and Pip, the board's and Pip's casts (K3's own flat shadow is off: shadow={false})
+//   S6NearBed        (plane -1) a raised tulip bed along the left (a limestone kerb 0.3 m tall, its inner face turned from
+//                               the sun), tulips in rows (heads 5.5 cm: 30-52 px), a flowering shrub in its far corner cut
+//                               by the left edge (the petals' source); it ends at z 2.6 m, clear of Pip and the board
+//   S6NearBench      (plane -1) a park bench along the right, its long axis into the picture (z 2.15-3.97 m), cut by the
+//                               right edge: wooden slats, iron ends
+//   S6NearShadows    (plane -1) the bed's kerb and tulips' cast on the path, the bench's feet (before the objects);
+//   S6KerbShade      (plane -1) the shade on the kerb's inner face (after the bed)
+// Tiers: the paving and the near pieces are environment (C); the board (A) and Pip (B) are their own.
 import React, {useMemo} from 'react';
 import {CM} from '../palette';
-import {useTime} from '../../lib/time';
-import {rand, rng} from '../../lib/rng';
-import {NearBack, Seated} from '../kit/cast';
-import {Batch, Paint, mix, ellD, circleD, lineD, smoothClosed} from '../kit/dc/core';
-import {benchBack} from '../kit/dc/terrace';
-import {GATE} from '../kit/dc/gate';
-import {DRIFT, dxOf} from './V2S6_rig';
+import {rand} from '../../lib/rng';
+import {Batch, Paint, mix, polyD, crownD, blossomD, type Pt} from '../kit/dc/core';
+import {Tier} from '../kit/tiers';
+import {CastShadow, ContactShadow, Shade, Shadow, ShadowLayer, multiply} from '../../lib/light';
+import {nearStep} from '../../lib/depth';
+import {RIG_APRIL} from '../world/rigs';
+import {S6} from '../world/map';
+import {CAM, KERB_Y, KERB_Z, PIP_SEAT} from './V2S6_rig';
 import {LEAF} from './V2S6_set';
 
-const smooth = (u: number) => {
-  const k = Math.min(1, Math.max(0, u));
-  return k * k * (3 - 2 * k);
+const pt = (x: number, z: number, lv = 0): Pt => CAM.pt(x, z, lv);
+const ppm = (z: number) => CAM.scale(z);
+/** One flat step of the rig's form shade, baked (for small round things: tulip heads, the shrub's far side). */
+const formOf = (c: string) => multiply(c, RIG_APRIL.tints.form);
+/** The near plane's value step (lib/depth: plane -1 is 5 L* darker than the subject's plane, hue and chroma kept). */
+const near = (c: string) => nearStep(c, -1);
+
+// ---------------------------------------------------------------- the footpath (plane 0)
+
+const PV = {
+  slab: CM.paving,
+  joint: mix(CM.paving, CM.line, 0.22),
 };
-const f1 = (n: number) => n.toFixed(1);
-
-const NT = {
-  sett: mix(CM.paving, CM.stoneShade, 0.34),
-  settLit: mix(CM.paving, CM.paper, 0.35),
-  settJoint: mix(CM.paving, CM.line, 0.5),
-  slabLit: mix(CM.paving, CM.paper, 0.4),
-  slabWorn: mix(CM.paving, CM.brickLight, 0.26),
-  slabCool: mix(CM.paving, CM.stoneShade, 0.34),
-  joint: mix(CM.paving, CM.line, 0.45),
-  shadow: mix(CM.paving, CM.shadeWarm, 0.4),
-  shadowSoft: mix(CM.paving, CM.shadeWarm, 0.26),
-  petal: CM.blossom,
-  petalShade: mix(CM.blossom, CM.shadeWarm, 0.25),
-  trough: mix(CM.limestone, CM.stoneShade, 0.25),
-  troughLit: CM.limestone,
-  troughShade: mix(CM.stoneShade, CM.shadeCool, 0.25),
-  soil: mix(CM.brickDeep, CM.anchor, 0.42),
-  grate: mix(CM.anchor, CM.paving, 0.3),
-  pigeon: mix(CM.stoneShade, CM.paneUnlit, 0.32),
-  pigeonWing: mix(CM.stoneShade, CM.paneUnlit, 0.5),
-  pigeonLit: mix(CM.stoneShade, CM.paper, 0.35),
-  pigeonHead: mix(CM.paneUnlit, CM.stoneShade, 0.2),
-  pigeonNeck: mix(CM.sage, CM.waterDeep, 0.5),
-  pigeonBar: CM.anchor,
-  pigeonLeg: CM.brick,
-};
-
-// ---------------------------------------------------------------- free areas (near coords): the kit's near objects
-
-const BOLLARDS = [-460, -130, 200, 530, 860, 1190];
-/** Rects the overlays keep off (the kit's bollards, shrub, bench, rack + bike, my troughs). */
-const KEEP_OFF: [number, number, number, number][] = [
-  ...BOLLARDS.map((x) => [x - 26, 1396, x + 26, 1508] as [number, number, number, number]),
-  [-300, 1250, 150, 1490],
-  [850, 1300, 1120, 1430],
-  [780, 1470, 1050, 1580],
-  [226, 1300, 504, 1400],
-  [556, 1300, 836, 1402],
-];
-const free = (x0: number, y0: number, x1: number, y1: number) => KEEP_OFF.every(([a, b, c, d]) => x1 < a || x0 > c || y1 < b || y0 > d);
-
-// ---------------------------------------------------------------- the paving overlay (static)
+const SLAB = 0.6;
+/** Joint width, m (2.7 px at the kerb, 6.5 px at the frame's foot; a crossing row never under 1.6 px). */
+const JOINT = 0.009;
 
 const pavingBatch = (): Batch => {
   const B = new Batch();
-  const r = rng('s6paving');
-  const ky = GATE.kerbY; // 1252
-  // setts: two rows of small granite blocks along the near kerb (x 150 .. 1120), staggered
-  for (let row = 0; row < 2; row++) {
-    const y = ky + 6 + row * 15;
-    for (let x = 152 + (row ? 14 : 0); x < 1130; x += r.range(25, 33)) {
-      const w = r.range(20, 27);
-      B.rect(r.chance(0.3) ? NT.settLit : NT.sett, x, y, w, 12.5);
+  B.rect(PV.slab, -160, KERB_Y + 3, 1400, 1990 - KERB_Y);
+  B.layer();
+  // crossing rows (level lines: one-point, no yaw), every 0.6 m from the kerb toward the eye
+  for (let z = KERB_Z - SLAB; z > 1.3; z -= SLAB) {
+    let y0 = CAM.y(z + JOINT / 2);
+    let y1 = CAM.y(z - JOINT / 2);
+    if (y1 - y0 < 1.6) {
+      const m = (y0 + y1) / 2;
+      y0 = m - 0.8;
+      y1 = m + 0.8;
     }
+    B.rect(PV.joint, -160, y0, 1400, y1 - y0);
   }
-  B.ink(lineD([[150, ky + 36], [1130, ky + 36]]), 1.6, NT.settJoint, 0.15);
-  B.layer();
-  // slab tone patches + joints in the free areas: rows recede toward the eye line (perspective spacing)
-  const rows = [1300, 1338, 1384, 1440, 1506, 1584, 1676, 1784, 1910];
-  for (let i = 0; i < rows.length - 1; i++) {
-    const y0 = rows[i];
-    const y1 = rows[i + 1];
-    const w = 90 + (y0 - 1300) * 0.35;
-    for (let x = -300 + r.range(0, w); x < 1130; x += w * r.range(0.85, 1.25)) {
-      const ww = w * r.range(0.8, 1.05);
-      if (!free(x, y0, x + ww, y1)) continue;
-      if (r.chance(0.36)) B.rect(r.pick([NT.slabLit, NT.slabWorn, NT.slabCool]), x + 2, y0 + 2, ww - 4, y1 - y0 - 4);
-      const lean = (x - 540) * 0.06;
-      B.ink(lineD([[x, y0 + 1], [x + lean * 0.3, y1 - 1]]), y0 > 1500 ? 2.2 : 1.6, NT.joint, 0.3);
-    }
-    if (i > 3) B.ink(lineD([[-300 + r.range(0, 80), y0], [1130, y0 + r.range(-1.5, 1.5)]]), y0 > 1500 ? 2.2 : 1.6, NT.joint, 0.45);
+  // receding joints at x = 0.3 + 0.6 j (m), from the kerb to under the frame
+  for (let j = -9; j <= 8; j++) {
+    const x = 0.3 + SLAB * j;
+    B.poly(PV.joint, [pt(x - JOINT / 2, 1.3), pt(x + JOINT / 2, 1.3), pt(x + JOINT / 2, KERB_Z), pt(x - JOINT / 2, KERB_Z)]);
   }
-  B.layer();
-  // a drain grate (iron slots) and a manhole lid
-  B.rect(NT.grate, 690, 1716, 64, 30);
-  for (let k = 0; k < 6; k++) B.rect(NT.slabCool, 696 + k * 10, 1720, 5, 22);
-  B.fill(NT.slabCool, ellD(330, 1860, 64, 18));
-  B.ink(ellD(330, 1860, 64, 18), 2.2, NT.joint);
-  B.ink(ellD(330, 1860, 46, 12), 1.6, NT.joint);
-  B.layer();
-  // petal litter: drifts along the kerb and the bollards' feet, a scatter elsewhere (never on the kit's objects)
-  let pa = '';
-  let pb = '';
-  const add = (x: number, y: number, s: number) => {
-    const d = ellD(x, y, s, s * r.range(0.35, 0.6));
-    if (r.chance(0.6)) pa += d;
-    else pb += d;
+  return B;
+};
+
+export const S6Paving: React.FC = () => {
+  const b = useMemo(pavingBatch, []);
+  return (
+    <Tier tier="environment">
+      <Paint b={b} seed="s6paving" misreg={false} />
+    </Tier>
+  );
+};
+
+/** The deal board's legs (K3: the stiles run down to the kerb) and its outer width. */
+const BOARD = S6.board0;
+const LEG_W = 40;
+
+export const S6GroundShadows: React.FC = () => (
+  <ShadowLayer>
+    {/* the deal board: a contact strip under each leg and its cast, the whole panel swept along the light */}
+    <ContactShadow x={BOARD.x0 + LEG_W / 2} y={KERB_Y} w={LEG_W} />
+    <ContactShadow x={BOARD.x1 - LEG_W / 2} y={KERB_Y} w={LEG_W} />
+    <CastShadow
+      x={(BOARD.x0 + BOARD.x1) / 2}
+      y={KERB_Y}
+      w={BOARD.x1 - BOARD.x0}
+      pts={[
+        [BOARD.x0 + 4, KERB_Y - 2],
+        [BOARD.x1, KERB_Y - 2],
+        [BOARD.x1, KERB_Y + 3],
+        [BOARD.x0 + 4, KERB_Y + 3],
+      ]}
+      h={KERB_Y - BOARD.y0}
+    />
+    {/* Pip, seated on the paving */}
+    <ContactShadow x={PIP_SEAT.x} y={PIP_SEAT.y} w={S6.pipH * 0.66} k={1.15} />
+    <CastShadow x={PIP_SEAT.x} y={PIP_SEAT.y} w={S6.pipH * 0.52} h={S6.pipH * 0.92} />
+  </ShadowLayer>
+);
+
+// ---------------------------------------------------------------- the tulip bed (plane -1)
+
+/** The bed (m): x across (left of the axis), z ahead, the kerb's height and top width, the soil's level. */
+const BED = {x0: -1.32, x1: -0.45, z0: 1.3, z1: 2.6, h: 0.3, lip: 0.09, soil: 0.27};
+const BT = {
+  kerb: near(CM.limestone),
+  kerbTop: near(CM.paper),
+  soil: near(mix(CM.brickDeep, CM.paving, 0.3)),
+  heads: [CM.box, CM.blossom, CM.coatMustard, CM.paper, CM.brick].map(near),
+  leaf: near(LEAF.body),
+  leafShade: near(LEAF.shade),
+  stem: near(LEAF.stem),
+};
+
+/** A tulip head: a cup with three pointed petal tips; centre bottom (cx, by), width w, height h. */
+const tulipD = (cx: number, by: number, w: number, h: number, tilt: number): string => {
+  const p = (u: number, v: number): string => {
+    const x = cx + u * w + tilt * v * h;
+    const y = by - v * h;
+    return `${x.toFixed(1)} ${y.toFixed(1)}`;
   };
-  for (let i = 0; i < 70; i++) {
-    const x = r.range(150, 1120);
-    const y = ky + 40 + Math.pow(r.next(), 2) * 40;
-    if (free(x - 6, y - 4, x + 6, y + 4)) add(x, y, r.range(4, 7));
+  return (
+    `M${p(-0.5, 0.55)}` +
+    `C${p(-0.52, 0.12)} ${p(-0.28, -0.02)} ${p(0, -0.02)}` +
+    `C${p(0.28, -0.02)} ${p(0.52, 0.12)} ${p(0.5, 0.55)}` +
+    `L${p(0.42, 1)}L${p(0.22, 0.74)}L${p(0, 1.02)}L${p(-0.22, 0.74)}L${p(-0.42, 1)}Z`
+  );
+};
+
+/** A leaf blade from a base point toward a tip, max half-width hw (screen px). */
+const bladeD = (a: Pt, tip: Pt, hw: number): string => {
+  const dx = tip[0] - a[0];
+  const dy = tip[1] - a[1];
+  const L = Math.hypot(dx, dy) || 1;
+  const nx = -dy / L;
+  const ny = dx / L;
+  const m: Pt = [a[0] + dx * 0.42, a[1] + dy * 0.42];
+  return `M${a[0].toFixed(1)} ${a[1].toFixed(1)}Q${(m[0] + nx * hw * 2).toFixed(1)} ${(m[1] + ny * hw * 2).toFixed(1)} ${tip[0].toFixed(1)} ${tip[1].toFixed(1)}Q${(m[0] - nx * hw * 2).toFixed(1)} ${(m[1] - ny * hw * 2).toFixed(1)} ${a[0].toFixed(1)} ${a[1].toFixed(1)}Z`;
+};
+
+type TulipSpot = {x: number; z: number; top: number; c: number; lean: number; tilt: number; leaf: number};
+/** The tulips: rows across the bed, far to near (draw order). */
+const TULIPS: TulipSpot[] = (() => {
+  const out: TulipSpot[] = [];
+  let row = 0;
+  for (let z = BED.z1 - BED.lip - 0.07; z > BED.z0 + 0.04; z -= 0.115, row++) {
+    for (let x = BED.x0 + 0.07 + (row % 2) * 0.045; x < BED.x1 - BED.lip - 0.03; x += 0.095) {
+      const k = `${row}/${Math.round(x * 100)}`;
+      const jx = (rand('s6tul', `x${k}`) - 0.5) * 0.03;
+      const jz = (rand('s6tul', `z${k}`) - 0.5) * 0.03;
+      out.push({
+        x: x + jx,
+        z: z + jz,
+        top: 0.5 + rand('s6tul', `h${k}`) * 0.1,
+        c: Math.floor(rand('s6tul', `c${k}`) * BT.heads.length),
+        lean: (rand('s6tul', `l${k}`) - 0.5) * 0.04,
+        tilt: (rand('s6tul', `t${k}`) - 0.5) * 0.22,
+        leaf: rand('s6tul', `f${k}`),
+      });
+    }
   }
-  for (let i = 0; i < 160; i++) {
-    const x = r.range(-280, 1120);
-    const y = r.range(1300, 1900);
-    if (free(x - 8, y - 4, x + 8, y + 4)) add(x, y, r.range(4.5, 9));
-  }
-  for (const bx of BOLLARDS) for (let i = 0; i < 7; i++) add(bx + 30 + r.range(-6, 40), 1510 + r.range(-3, 6), r.range(5, 8));
-  B.fill(NT.petal, pa);
-  B.fill(NT.petalShade, pb);
+  return out;
+})();
+
+/** The shrub in the bed's far-left corner (m): its crown's centre and radii. */
+const SHRUB = {x: -1.12, z: 2.42, level: 0.68, r: 0.36, rv: 0.37};
+export const SHRUB_SCREEN = (() => {
+  const c = pt(SHRUB.x, SHRUB.z, SHRUB.level);
+  const k = ppm(SHRUB.z);
+  return {x: c[0], y: c[1], rx: SHRUB.r * k, ry: SHRUB.rv * k};
+})();
+
+const bedBatch = (): Batch => {
+  const B = new Batch();
+  const {x0, x1, z0, z1, h, lip, soil} = BED;
+  // the soil (mostly under the leaves), then the kerb: its inner face (turned from the sun: Shade in the light layer),
+  // the lit top along the inner side and across the far end
+  B.poly(BT.soil, [pt(x0, z0, soil), pt(x1 - lip, z0, soil), pt(x1 - lip, z1 - lip, soil), pt(x0, z1 - lip, soil)]);
+  B.poly(BT.kerb, [pt(x1, z0, 0), pt(x1, z1, 0), pt(x1, z1, h), pt(x1, z0, h)]);
+  B.poly(BT.kerbTop, [pt(x1 - lip, z0, h), pt(x1, z0, h), pt(x1, z1, h), pt(x1 - lip, z1, h)]);
+  B.poly(BT.kerbTop, [pt(x0 - 0.2, z1 - lip, h), pt(x1, z1 - lip, h), pt(x1, z1, h), pt(x0 - 0.2, z1, h)]);
+  // the shrub's crown (behind the near tulips): sage, its far (right) side one step down, blossom clusters on it
   B.layer();
-  // short flat shadows ON THE GROUND to the right of the kit's bollards and the bench (the sun is low on the left)
-  for (const bx of BOLLARDS) B.poly(NT.shadow, [[bx + 20, 1498], [bx + 54, 1496], [bx + 58, 1506], [bx + 20, 1508]]);
-  B.poly(NT.shadow, [[1104, 1414], [1146, 1412], [1150, 1424], [1104, 1426]]);
-  return B;
-};
-
-// ---------------------------------------------------------------- troughs of daffodils (nodding heads)
-
-type Trough = {x0: number; x1: number; top: number; base: number; seed: string};
-const TROUGHS: Trough[] = [
-  {x0: 236, x1: 494, top: 1336, base: 1398, seed: 'trA'},
-  {x0: 566, x1: 826, top: 1338, base: 1400, seed: 'trB'},
-];
-
-const troughBatch = (): Batch => {
-  const B = new Batch();
-  for (const tr of TROUGHS) {
-    const w = tr.x1 - tr.x0;
-    const r = rng(tr.seed);
-    // its short flat shadow on the paving (the sun is low on the left)
-    B.poly(NT.shadow, [[tr.x1 + 5, tr.base - 6], [tr.x1 + 40, tr.base - 8], [tr.x1 + 44, tr.base + 5], [tr.x1 + 5, tr.base + 6]]);
-    // the box: lit front face, a paper rim, the shade end on the right, a plinth shadow
-    B.rect(NT.troughLit, tr.x0, tr.top, w, tr.base - tr.top);
-    B.rect(CM.paper, tr.x0 - 5, tr.top - 8, w + 10, 11);
-    B.rect(NT.troughShade, tr.x1 - 16, tr.top + 3, 16, tr.base - tr.top - 3);
-    B.rect(NT.trough, tr.x0, tr.base - 10, w - 16, 10);
-    B.rect(NT.soil, tr.x0 + 4, tr.top - 13, w - 8, 6);
-    // trailing ivy over the front edge (small leaves, two greens)
-    let ivy = '';
-    let ivyS = '';
-    for (let x = tr.x0 + r.range(4, 30); x < tr.x1 - 30; x += r.range(34, 70)) {
-      const len = r.range(16, 40);
-      for (let k = 0; k < len; k += 7) {
-        const d = ellD(x + Math.sin(k * 0.3) * 3, tr.top - 2 + k, 5, 3.2);
-        if ((k / 7) % 2) ivyS += d;
-        else ivy += d;
-      }
-    }
+  const S = SHRUB_SCREEN;
+  B.fill(formOf(BT.leaf), crownD(S.x + S.rx * 0.08, S.y + S.ry * 0.04, S.rx, S.ry, 's6shrub/s', 9, 0.3));
+  B.fill(BT.leaf, crownD(S.x - S.rx * 0.1, S.y - S.ry * 0.02, S.rx * 0.9, S.ry * 0.94, 's6shrub/b', 9, 0.3));
+  let bl = '';
+  let bs = '';
+  for (let i = 0; i < 46; i++) {
+    const a = rand('s6shrub', `a${i}`) * Math.PI * 2;
+    const d = Math.sqrt(rand('s6shrub', `d${i}`)) * 0.86;
+    const bx = S.x + Math.cos(a) * S.rx * d;
+    const by = S.y + Math.sin(a) * S.ry * d;
+    if (bx < -30 || bx > S.x + S.rx * 0.92) continue;
+    const r = 13 + rand('s6shrub', `r${i}`) * 9;
+    const dd = blossomD(bx, by, r, `s6shrub/f${i}`, 4);
+    if (Math.cos(a) > 0.35) bs += dd;
+    else bl += dd;
+  }
+  B.fill(formOf(near(CM.blossom)), bs);
+  B.fill(near(CM.blossom), bl);
+  // the tulips, far rows first: leaves, stem, head (its far side one flat step down)
+  for (const tl of TULIPS) {
     B.layer();
-    B.fill(LEAF.shade, ivyS);
-    B.fill(LEAF.body, ivy);
-    B.ink(lineD([[tr.x0 - 5, tr.base], [tr.x0 - 5, tr.top - 8], [tr.x1 + 5, tr.top - 8], [tr.x1 + 5, tr.base]]), 3.4, CM.ink, 0.18);
-    // block joints
-    for (let x = tr.x0 + r.range(50, 70); x < tr.x1 - 30; x += r.range(64, 92)) B.ink(lineD([[x, tr.top + 4], [x + 1, tr.base - 2]]), 1.6, NT.troughShade, 0.25);
+    const k = ppm(tl.z);
+    const base = pt(tl.x, tl.z, soil);
+    const headBase = pt(tl.x + tl.lean, tl.z, tl.top);
+    // two broad blades, splayed
+    const s = tl.leaf > 0.5 ? 1 : -1;
+    const tipA = pt(tl.x - 0.07 * s, tl.z - 0.02, soil + 0.17 + tl.leaf * 0.05);
+    const tipB = pt(tl.x + 0.06 * s, tl.z + 0.015, soil + 0.13 + (1 - tl.leaf) * 0.05);
+    B.fill(BT.leafShade, bladeD(base, tipB, 0.012 * k));
+    B.fill(BT.leaf, bladeD(base, tipA, 0.014 * k));
+    // the stem
+    const sw = Math.max(1.6, 0.007 * k);
+    B.poly(BT.stem, [
+      [base[0] - sw / 2, base[1]],
+      [base[0] + sw / 2, base[1]],
+      [headBase[0] + sw / 2, headBase[1] + 2],
+      [headBase[0] - sw / 2, headBase[1] + 2],
+    ]);
+    // the head (cup), and its far-from-the-sun third
+    const col = BT.heads[tl.c];
+    const w = 0.055 * k;
+    const hh = 0.07 * k;
+    B.fill(col, tulipD(headBase[0], headBase[1], w, hh, tl.tilt));
+    B.fill(formOf(col), tulipD(headBase[0] + w * 0.3, headBase[1] - hh * 0.04, w * 0.4, hh * 0.86, tl.tilt));
   }
   return B;
 };
 
-/** Daffodils in the troughs: leaf blades, stems, trumpet heads facing the sun (left); they nod (12 drawings/s). */
-const Daffodils: React.FC<{t: number}> = ({t}) => {
-  const td = Math.floor(t * 12) / 12;
-  const lv = useMemo(() => {
-    const out: {x: number; base: number; hgt: number; white: boolean; ph: number; leanL: boolean}[] = [];
-    for (const tr of TROUGHS) {
-      const r = rng(`${tr.seed}/daff`);
-      for (let x = tr.x0 + 12; x < tr.x1 - 10; x += r.range(12, 18)) out.push({x, base: tr.top - 10, hgt: r.range(40, 64), white: r.chance(0.28), ph: r.range(0, 6.28), leanL: r.chance(0.5)});
-    }
-    return out;
-  }, []);
-  let stems = '';
-  let blades = '';
-  let bladesS = '';
-  let petY = '';
-  let petW = '';
-  let trumpet = '';
-  for (const f of lv) {
-    const sw = Math.sin(td * 1.6 + f.ph) * 2.8 + Math.sin(td * 0.7 + f.ph * 2) * 1.4;
-    const hx = f.x + sw;
-    const hy = f.base - f.hgt;
-    stems += `M${f1(f.x)} ${f.base}Q${f1(f.x + sw * 0.4)} ${f1(f.base - f.hgt * 0.5)} ${f1(hx)} ${f1(hy + 4)}`;
-    const s = f.leanL ? -1 : 1;
-    const bl = `M${f1(f.x - 2.5)} ${f.base}Q${f1(f.x + s * 9)} ${f1(f.base - f.hgt * 0.5)} ${f1(f.x + s * 6)} ${f1(f.base - f.hgt * 0.78)}Q${f1(f.x + s * 2)} ${f1(f.base - f.hgt * 0.4)} ${f1(f.x + 2.5)} ${f.base}Z`;
-    if (f.leanL) bladesS += bl;
-    else blades += bl;
-    // six petals as a star (flat) + the trumpet pointing left (toward the sun)
-    let star = '';
-    for (let k = 0; k < 6; k++) {
-      const a = (k / 6) * Math.PI * 2 + 0.3;
-      star += ellD(hx + Math.cos(a) * 5.5, hy + Math.sin(a) * 4.5, 4.2, 2.6);
-    }
-    if (f.white) petW += star;
-    else petY += star;
-    trumpet += `M${f1(hx + 1)} ${f1(hy - 3)}L${f1(hx - 8)} ${f1(hy - 4.5)}L${f1(hx - 8)} ${f1(hy + 4.5)}L${f1(hx + 1)} ${f1(hy + 3)}Z`;
-  }
+export const S6NearBed: React.FC = () => {
+  const b = useMemo(bedBatch, []);
   return (
-    <>
-      <path d={bladesS} fill={LEAF.shade} />
-      <path d={stems} stroke={LEAF.stem} strokeWidth={2.2} fill="none" strokeLinecap="round" />
-      <path d={blades} fill={LEAF.body} />
-      <path d={petY} fill={mix(CM.coatMustard, CM.lamp, 0.5)} />
-      <path d={petW} fill={CM.paper} />
-      <path d={trumpet} fill={CM.leafGold} />
-    </>
+    <Tier tier="environment">
+      <Paint b={b} seed="s6bed" misreg={2} />
+    </Tier>
   );
 };
 
-// ---------------------------------------------------------------- pigeons
+// ---------------------------------------------------------------- the bench (plane -1)
 
-type Pig = {x: number; y: number; dir: 1 | -1; flutter?: {at: number; dx: number; up: number}; arrive?: {at: number; dur: number; from: [number, number]}};
-// the passer-by reaches ~160 px left of each startled pigeon at about these times (see passerX)
-const PIGEONS: Pig[] = [
-  {x: 262, y: 1700, dir: 1, flutter: {at: 1.6, dx: 200, up: 104}},
-  {x: 336, y: 1726, dir: -1, flutter: {at: 1.89, dx: 170, up: 90}},
-  {x: 414, y: 1690, dir: 1, flutter: {at: 2.27, dx: 220, up: 116}},
-  {x: 488, y: 1736, dir: -1},
-  {x: 584, y: 1704, dir: 1},
-  {x: 672, y: 1738, dir: -1},
-  // one flies in over the border from the left edge (3.18) and lands among them (3.62): from screen (-50, 1560)
-  {x: 150, y: 1718, dir: 1, arrive: {at: 3.18, dur: 0.44, from: [-50 - 65 * 3.18, 1560]}},
-];
-const PIG_S = 60;
-
-/** One pigeon (side view, facing `dir`), feet at (x, y). peck 0..1 (head down), fly 0..1 (wings open), flap phase. */
-const pigeonInto = (B: Batch, x: number, y: number, dir: 1 | -1, s: number, peck: number, fly: number, flap: number, gy: number) => {
-  const X = (u: number) => x + dir * u * s;
-  const Y = (v: number) => y - v * s;
-  // ground shadow (stays on the ground while it flies)
-  B.fill(NT.shadowSoft, ellD(x + s * 0.16, gy + 2, s * 0.42 * (1 - fly * 0.4), s * 0.07));
-  // tail, body, wing, neck, head
-  B.poly(NT.pigeonWing, [[X(-0.3), Y(0.36)], [X(-0.72), Y(0.42 + fly * 0.1)], [X(-0.7), Y(0.3 + fly * 0.1)], [X(-0.28), Y(0.24)]]);
-  const body = smoothClosed([
-    [X(0.3), Y(0.62)],
-    [X(0.42), Y(0.4)],
-    [X(0.24), Y(0.16)],
-    [X(-0.12), Y(0.14)],
-    [X(-0.42), Y(0.3)],
-    [X(-0.14), Y(0.5)],
-  ]);
-  B.fill(NT.pigeon, body);
-  B.fill(NT.pigeonLit, ellD(X(0.22), Y(0.36), s * 0.14, s * 0.1));
-  const hx = X(0.38 + peck * 0.16);
-  const hy = Y(0.74 - peck * 0.5);
-  B.poly(NT.pigeonNeck, [[X(0.18), Y(0.52)], [hx - dir * s * 0.06, hy + s * 0.04], [hx + dir * s * 0.05, hy + s * 0.08], [X(0.38), Y(0.44)]]);
-  B.fill(NT.pigeonHead, circleD(hx, hy, s * 0.11));
-  B.poly(mix(CM.box, CM.paper, 0.3), [[hx + dir * s * 0.09, hy - s * 0.02], [hx + dir * s * 0.2, hy + s * 0.03], [hx + dir * s * 0.09, hy + s * 0.05]]);
-  if (fly > 0.05) {
-    // two wings beating ~8 Hz, raised over the back
-    const up = Math.cos(flap * Math.PI * 2);
-    for (const side of [0, 1]) {
-      const k = side ? 0.82 : 1;
-      B.poly(side ? NT.pigeonWing : mix(NT.pigeonWing, CM.paper, 0.25), [
-        [X(0.18), Y(0.5)],
-        [X(-0.34 + side * 0.08), Y(0.5 + up * 0.62 * k * fly)],
-        [X(-0.6 + side * 0.06), Y(0.44 + up * 0.5 * k * fly)],
-        [X(-0.1), Y(0.4)],
-      ]);
-    }
-  } else {
-    B.fill(NT.pigeonWing, ellD(X(-0.1), Y(0.38), s * 0.26, s * 0.12));
-    B.ink(lineD([[X(-0.16), Y(0.34)], [X(-0.02), Y(0.36)]]), 2.2, NT.pigeonBar);
-    B.ink(lineD([[X(-0.22), Y(0.4)], [X(-0.06), Y(0.42)]]), 2.2, NT.pigeonBar);
-    B.ink(`M${f1(X(0.04))} ${f1(Y(0.15))}v${f1(s * 0.15)}M${f1(X(0.14))} ${f1(Y(0.15))}v${f1(s * 0.15)}`, 2.2, NT.pigeonLeg);
-  }
-  B.ink(lineD([[X(-0.42), Y(0.3)], [X(-0.14), Y(0.5)], [X(0.18), Y(0.56)]]), 2.2, CM.ink, 0.2);
-  B.fill(CM.ink, circleD(hx + dir * s * 0.04, hy - s * 0.02, 1.6));
+const BN = {zA: 2.15, zB: 3.97, ends: [2.25, 3.92], xFront: 0.76, xBack: 1.2, seat: 0.44};
+const WOOD = mix(CM.line, CM.leafGold, 0.45);
+const BW = {
+  wood: near(WOOD),
+  woodLit: near(mix(WOOD, CM.paper, 0.26)),
+  woodEdge: near(mix(WOOD, CM.paper, 0.42)),
+  under: near(mix(CM.line, CM.shadeWarm, 0.5)),
+  iron: near(mix(CM.coatSlate, CM.anchor, 0.35)),
 };
 
-const Pigeons: React.FC<{t: number}> = ({t}) => {
-  const td = Math.floor(t * 24) / 24;
+/** One cast-iron end (a frontal plane at depth z): front leg, rear leg rising into the back post, seat rail, armrest. */
+const benchEnd = (B: Batch, z: number) => {
+  const q = (xa: number, la: number, xb: number, lb: number, w: number): Pt[] => [pt(xa - w / 2, z, la), pt(xa + w / 2, z, la), pt(xb + w / 2, z, lb), pt(xb - w / 2, z, lb)];
+  B.poly(BW.iron, q(0.79, 0, 0.79, 0.66, 0.045));
+  B.poly(BW.iron, q(1.17, 0, 1.25, 0.92, 0.05));
+  B.poly(BW.iron, [pt(0.77, z, 0.4), pt(1.2, z, 0.4), pt(1.2, z, 0.44), pt(0.77, z, 0.44)]);
+  B.poly(BW.iron, [pt(0.73, z, 0.64), pt(1.21, z, 0.64), pt(1.21, z, 0.685), pt(0.73, z, 0.685)]);
+};
+
+const benchBatch = (): Batch => {
   const B = new Batch();
-  PIGEONS.forEach((p, i) => {
-    const ph = rand('s6pig', `p${i}`) * 6;
-    // walking: a slow wander with the head bobbing at each step; pecking in between
-    const wander = Math.sin((td + ph) * 0.8) * 14;
-    let x = p.x + wander;
-    let y = p.y;
-    const pk = Math.sin((td + ph) * 4.6);
-    let peck = pk > 0.55 ? (pk - 0.55) / 0.45 : 0;
-    let fly = 0;
-    let dir = Math.cos((td + ph) * 0.8) >= 0 ? p.dir : (-p.dir as 1 | -1);
-    let gy = y;
-    if (p.arrive) {
-      const a = p.arrive;
-      if (t < a.at) return;
-      const k = Math.min(1, (t - a.at) / a.dur);
-      if (k < 1) {
-        // a glide down with the wings beating, braking into the landing (the near plane carries the landing spot)
-        const e = 1 - (1 - k) * (1 - k);
-        x = a.from[0] + (p.x - a.from[0]) * e;
-        y = a.from[1] + (p.y - a.from[1]) * k * k;
-        gy = p.y;
-        fly = 1;
-        peck = 0;
-        dir = 1;
-      }
-    }
-    if (p.flutter && t >= p.flutter.at) {
-      const f = p.flutter;
-      const k = Math.min(1, (t - f.at) / 0.66);
-      const x0 = p.x + Math.sin((f.at + ph) * 0.8) * 14;
-      x = x0 + f.dx * smooth(k);
-      y = p.y - f.up * 4 * k * (1 - k);
-      gy = p.y;
-      fly = k < 0.94 ? Math.min(1, k / 0.08) : 0;
-      peck = 0;
-      dir = 1;
-    }
-    pigeonInto(B, x, y, dir, PIG_S, peck, fly, t * 8.5 + i * 0.37, gy);
-  });
-  return <Paint b={B} seed="s6pigeons" misreg={2} />;
+  const {zA, zB, xFront, xBack, seat} = BN;
+  benchEnd(B, BN.ends[1]);
+  B.layer();
+  // the back: three slats on the far side (their faces turned toward the path and the sun: lit), a darker underside
+  for (const [l0, l1] of [
+    [0.52, 0.6],
+    [0.65, 0.73],
+    [0.78, 0.86],
+  ] as [number, number][]) {
+    B.poly(BW.wood, [pt(xBack, zA, l0), pt(xBack, zB, l0), pt(xBack, zB, l1), pt(xBack, zA, l1)]);
+    B.poly(BW.woodEdge, [pt(xBack, zA, l1 - 0.012), pt(xBack, zB, l1 - 0.012), pt(xBack, zB, l1), pt(xBack, zA, l1)]);
+  }
+  // the seat: the dark under-seat seen through the gaps, four slats (lit tops), the front slat's lit edge
+  B.layer();
+  B.poly(BW.under, [pt(xFront, zA, seat - 0.03), pt(xBack, zA, seat - 0.03), pt(xBack, zB, seat - 0.03), pt(xFront, zB, seat - 0.03)]);
+  for (let i = 0; i < 4; i++) {
+    const xa = xFront + 0.1 * i;
+    const xb = xa + 0.086;
+    B.poly(BW.woodLit, [pt(xa, zA, seat), pt(xb, zA, seat), pt(xb, zB, seat), pt(xa, zB, seat)]);
+  }
+  B.poly(BW.woodEdge, [pt(xFront, zA, seat - 0.04), pt(xFront, zB, seat - 0.04), pt(xFront, zB, seat), pt(xFront, zA, seat)]);
+  // the near end (mostly past the right edge)
+  B.layer();
+  benchEnd(B, BN.ends[0]);
+  return B;
 };
 
-// ---------------------------------------------------------------- the readers and the passer-by
-
-/** Each near back's shoulder width = 0.84 x hv x broad: hv <= 150 with broad <= 1.1 keeps it <= ~139 px. */
-export const READERS = [
-  {x: 152, hv: 146, seed: 's6/reader1', traits: {hair: 'bun' as const, hairColor: CM.hair[1], coat: CM.coatOat, acc: 'scarf' as const, accColor: CM.coatMustard, broad: 1.0}},
-  {x: 402, hv: 140, seed: 's6/reader2', traits: {hair: 'curls' as const, hairColor: CM.hair[4], coat: CM.brick, acc: 'tote' as const, accColor: CM.paper, broad: 1.04}},
-  {x: 652, hv: 150, seed: 's6/reader3', traits: {hair: 'beanie' as const, hatColor: CM.coatMustard, hairColor: CM.hair[0], coat: CM.coatSlate, acc: 'backpack' as const, accColor: CM.leafRust, broad: 0.98}},
-];
-export const PASSER = {hv: 124, broad: 1.02};
-export const nearBackW = (hv: number, broad: number) => 0.84 * hv * broad;
-
-/** The passer-by (a head-back walking right behind the readers), screen x at t (or null). */
-export const passerX = (t: number) => (t < 0.3 ? null : -110 + 262 * (t - 0.3));
-
-export const S6Readers: React.FC = () => {
-  const t = useTime();
-  const nr = dxOf(DRIFT.near, t);
-  const turn2 = t < 1.5 ? 0 : t < 1.75 ? -0.9 * smooth((t - 1.5) / 0.25) : t < 2.3 ? -0.9 : -0.9 * (1 - smooth((t - 2.3) / 0.3));
-  const turn3 = 0.7 * smooth((t - 3.4) / 0.3);
-  const px = passerX(t);
-  const bob = (k: number) => Math.round(Math.sin(t * 1.9 + k) * 1.2 * 2) / 2;
+export const S6NearBench: React.FC = () => {
+  const b = useMemo(benchBatch, []);
   return (
-    <>
-      {px !== null && px < 1200 ? (
-        <NearBack x={px - nr} y={1924 - Math.abs(Math.sin(t * 9.4)) * 4} hv={PASSER.hv} seed="s6/passer" traits={{hair: 'short', hairColor: CM.hair[2], coat: CM.sage, acc: 'headphones', accColor: CM.anchor, broad: PASSER.broad}} />
-      ) : null}
-      {READERS.map((r, i) => (
-        <NearBack key={r.seed} x={r.x} y={1920 + bob(i * 2.1)} hv={r.hv} seed={r.seed} traits={r.traits} turn={i === 1 ? turn2 : i === 2 ? turn3 : 0} />
+    <Tier tier="environment">
+      <Paint b={b} seed="s6bench" misreg={2} />
+    </Tier>
+  );
+};
+
+// ---------------------------------------------------------------- near shadows (plane -1)
+
+/** The strip the bed's kerb and its tulips throw on the path (sun at the left, el 40: ~0.36 m for the kerb, the tulips'
+ *  heads reaching ~0.55 m past it), and the shade on the kerb's inner face. */
+const bedCastD = (() => {
+  const {x1, z0, z1} = BED;
+  const pts: Pt[] = [pt(x1, z0, 0), pt(x1, z1, 0)];
+  // a scalloped outer edge: the tulip rows' shadows
+  const n = 9;
+  for (let i = 0; i <= n; i++) {
+    const z = z1 - 0.06 - ((z1 - 0.06 - z0) * i) / n;
+    const reach = 0.3 + 0.12 * (i % 2) + 0.06 * rand('s6bedcast', `r${i}`);
+    pts.push(pt(x1 + reach, z - 0.08, 0));
+  }
+  return polyD(pts);
+})();
+const kerbFaceD = polyD([pt(BED.x1, BED.z0, 0), pt(BED.x1, BED.z1, 0), pt(BED.x1, BED.z1, BED.h), pt(BED.x1, BED.z0, BED.h)]);
+
+/** The near plane's ground shadows (after the paving, before the bed and the bench). */
+export const S6NearShadows: React.FC = () => {
+  const feet: Pt[] = [];
+  for (const z of BN.ends) {
+    feet.push(pt(0.79, z, 0));
+    feet.push(pt(1.17, z, 0));
+  }
+  return (
+    <ShadowLayer>
+      <Shadow d={bedCastD} soft={3} />
+      {feet.map(([x, y], i) => (
+        <ContactShadow key={i} x={x} y={y} w={Math.max(10, 0.07 * CAM.pxPerM(y))} />
       ))}
-    </>
+    </ShadowLayer>
   );
 };
 
-// ---------------------------------------------------------------- everything on the near plane (near coords)
-
-/** Behind the tulip border: the paving overlay, the troughs and their daffodils, the bench reader. */
-export const S6NearBack: React.FC = () => {
-  const t = useTime();
-  const paving = useMemo(pavingBatch, []);
-  const troughs = useMemo(troughBatch, []);
-  // the kit's bench backrest, redrawn over the reader (same geometry, layer index and seed as GateNear: exact overlay)
-  const backrest = useMemo(() => {
-    const B = new Batch();
-    for (let i = 0; i < 4; i++) B.layer();
-    benchBack(B, 860, 1110, 1310, 1420, 4.8);
-    return B;
-  }, []);
-  return (
-    <>
-      <Paint b={paving} seed="s6paving" misreg={2} />
-      <Paint b={troughs} seed="s6troughs" misreg={3} />
-      <Daffodils t={t} />
-      <Seated x={985} y={1367} h={104} seed="s6/benchReader2" read turn={-0.55 * smooth((t - 3.12) / 0.28)} traits={{coat: CM.brickLight, hair: 'long', hairColor: CM.hair[0], acc: 'none'}} />
-      <Paint b={backrest} seed="near" misreg={3} />
-    </>
-  );
-};
-
-/** In front of the tulip border: the pigeons. */
-export const S6NearFront: React.FC = () => {
-  const t = useTime();
-  return <Pigeons t={t} />;
-};
+/** The kerb's inner face, turned from the sun: one Shade step (after the bed). */
+export const S6KerbShade: React.FC = () => <Shade d={kerbFaceD} />;

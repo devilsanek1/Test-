@@ -13,11 +13,14 @@
 import React from 'react';
 import {World} from '../../lib/World';
 import {TimeShift} from '../../lib/time';
+import {Lit} from '../../lib/light';
+import {Sky} from '../../lib/sky';
 import {CM} from '../palette';
-import * as MAP from '../world/map';
 import {CanalCast} from '../kit/canal/slots';
 import {k4Person} from '../kit/canal/k4k5';
 import type {ToneKey} from '../../lib/Film';
+import {RIG_CANAL} from '../world/rigs';
+import {S3_SUNSET} from '../world/skies';
 import {S3_START, S3_PLANE} from './V2S3_rig';
 import {S3Plane} from './V2S3_float';
 import {S3Sun, S3Terrace, S3Canal} from './V2S3_terrace';
@@ -28,24 +31,28 @@ export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
 const Shot: React.FC = () => (
   <CanalCast person={k4Person}>
-    <S3Plane plane={S3_PLANE.sky}>
-      <S3Sun />
-    </S3Plane>
-    <S3Plane plane={S3_PLANE.terrace}>
-      <S3Terrace />
-    </S3Plane>
-    <S3Plane plane={S3_PLANE.water}>
-      <S3Canal />
-    </S3Plane>
-    <S3Near />
-    <S3Plane plane={S3_PLANE.terrace}>
-      <S3Pip />
-    </S3Plane>
+    <Lit rig={RIG_CANAL}>
+      {/* the sky plane (no float): ONE continuous, gentle, dithered sky (lib/sky; world/skies S3_SUNSET), then the disc */}
+      <S3Plane plane={S3_PLANE.sky}>
+        <Sky spec={S3_SUNSET} />
+        <S3Sun />
+      </S3Plane>
+      <S3Plane plane={S3_PLANE.terrace}>
+        <S3Terrace />
+      </S3Plane>
+      <S3Plane plane={S3_PLANE.water}>
+        <S3Canal />
+      </S3Plane>
+      <S3Near />
+      <S3Plane plane={S3_PLANE.terrace}>
+        <S3Pip />
+      </S3Plane>
+    </Lit>
   </CanalCast>
 );
 
 const V2S3: React.FC = () => (
-  <World sky={[CM.sky, CM.bandSunset]} horizon={1000}>
+  <World sky={CM.sky} horizon={1000}>
     <TimeShift by={-S3_START}>
       <Shot />
     </TimeShift>

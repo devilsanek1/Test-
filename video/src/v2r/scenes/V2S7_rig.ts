@@ -9,28 +9,28 @@
 // px wide, STYLE.md section 4), and its furniture is sized to the people who use it, so nothing reads as a giant.
 import {S7_T0} from './V2S7_pip';
 
-export const S7_DUR = 4.87;
-/** The scene stays visible under the narrowboat wipe until 33.16 (local 5.10). */
-export const S7_END_VISIBLE = 5.1;
+export const S7_DUR = 4.83;
+/** The scene stays visible under the narrowboat wipe until 33.16 (local 5.06). */
+export const S7_END_VISIBLE = 5.06;
 export const filmOf = (t: number) => S7_T0 + t;
 
-/** Heard word times (local s): public/v2r/voice_words_heard.json minus 28.06. */
+/** Heard word times (local s): public/v2r/voice_words_heard.json minus S7_T0 (28.10). */
 export const W7 = {
-  but: 0.25,
-  google: 0.3,
-  says: 0.7,
-  follows: 1.02,
-  its: 1.42,
-  ai: 1.58,
-  principles: 1.98,
-  and: 2.58,
-  bans: 2.78,
-  retaliation: 3.1,
-  of: 4.02,
-  any: 4.14,
-  kind: 4.46,
-  kindEnd: 4.64,
-  she: 5.1,
+  but: 0.21,
+  google: 0.26,
+  says: 0.66,
+  follows: 0.98,
+  its: 1.38,
+  ai: 1.54,
+  principles: 1.94,
+  and: 2.54,
+  bans: 2.74,
+  retaliation: 3.06,
+  of: 3.98,
+  any: 4.1,
+  kind: 4.42,
+  kindEnd: 4.6,
+  she: 5.06,
 } as const;
 
 // ---------------------------------------------------------------- ground perspective
@@ -129,7 +129,7 @@ export const mixHex = (a: string, b: string, k: number): string => {
 // ---------------------------------------------------------------- the lamp run on "principles" (A5: mirrors S8's on "facts")
 
 /** ONE run on Google's key word, 0.06 s apart like S8's (V2S8_clock LAMP_RUN_STEP), the festoon bulb by bulb at
- *  0.03 s: the first bulb lights ON "principles" (30.04 = local 1.98). Then one twinkle at a time. */
+ *  0.03 s: the first bulb lights ON "principles" (30.04 = local 1.94). Then one twinkle at a time. */
 export const RUN_STEP = 0.06;
 export const BULB_STEP = 0.03;
 export const RUN_ORDER = ['festoonA', 'festoonB', 'treeLights', 'basinLights', 'cafeLights'] as const;
@@ -138,14 +138,14 @@ export const runAt = (id: RunId) => W7.principles + RUN_STEP * RUN_ORDER.indexOf
 
 // ---------------------------------------------------------------- life schedule (local s)
 
-/** The glass doors: [t, open 0..1]. In at 0.62-1.62 (a staffer goes in), out at 2.86-3.84 (one comes out). */
+/** The glass doors: [t, open 0..1]. In at 0.58-1.58 (a staffer goes in), out at 2.82-3.80 (one comes out). */
 export const DOOR_KEYS: [number, number][] = [
-  [0.62, 0],
-  [0.86, 1],
-  [1.38, 1],
-  [1.62, 0],
-  [2.86, 0],
-  [3.1, 1],
-  [3.6, 1],
-  [3.84, 0],
+  [0.58, 0],
+  [0.82, 1],
+  [1.34, 1],
+  [1.58, 0],
+  [2.82, 0],
+  [3.06, 1],
+  [3.56, 1],
+  [3.8, 0],
 ];

@@ -32,7 +32,9 @@ export const Wiper: WiperComponent = S5Wiper;
 const V2S5: React.FC = () => {
   const t = useTime();
   return (
-    <World sky={CM.sky} stage="context">
+    // stage "flat": the push-through's incoming leg (out of the April sun, 20.55-20.72, zoom 7 -> 1 about SUN1) moves the
+    // whole set as one plane (the crane rig's own planes never fold the stage camera in)
+    <World sky={CM.sky}>
       {/* the sky (CRAFT §g): ONE screen-space gradient behind the whole crane, unlit, the bottom layer */}
       <Sky spec={S5_SKY} />
       {/* the light (V2S5_light): RIG_APRIL's family, the sun's shadows swinging with its screen spot through the arc */}
