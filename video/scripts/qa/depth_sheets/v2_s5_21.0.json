@@ -1,0 +1,140 @@
+{
+ "name": "v2 S5 @21.0 (lane L4): the start, the news box (A) on the terrace, the slot between the slope's crowns",
+ "units": "px",
+ "air_hex": "#F6D9BC",
+ "planes": [
+  {
+   "name": "terrace: bench, pair, news box, balustrade",
+   "plane": 0,
+   "role": "subject",
+   "boxes": [
+    [
+     0,
+     1090,
+     470,
+     1240
+    ],
+    [
+     470,
+     903,
+     786,
+     1240
+    ],
+    [
+     780,
+     1090,
+     1080,
+     1240
+    ]
+   ]
+  },
+  {
+   "name": "terrace floor",
+   "plane": 0,
+   "role": "ground",
+   "boxes": [
+    [
+     0,
+     1250,
+     1080,
+     1920
+    ]
+   ]
+  },
+  {
+   "name": "the slope's crowns (left mass, big tree)",
+   "plane": 1,
+   "boxes": [
+    [
+     0,
+     620,
+     140,
+     880
+    ],
+    [
+     560,
+     600,
+     1080,
+     860
+    ]
+   ]
+  },
+  {
+   "name": "valley lawns below the crowns",
+   "plane": 2,
+   "boxes": [
+    [
+     0,
+     1000,
+     460,
+     1085
+    ]
+   ]
+  },
+  {
+   "name": "river and parkland in the slot",
+   "plane": 3,
+   "boxes": [
+    [
+     200,
+     795,
+     520,
+     880
+    ]
+   ]
+  },
+  {
+   "name": "far city in the slot",
+   "plane": 4,
+   "boxes": [
+    [
+     200,
+     752,
+     520,
+     790
+    ]
+   ]
+  }
+ ],
+ "silhouettes": [
+  {
+   "name": "the news box's body (A, 20.90-21.75)",
+   "tier": "A",
+   "poly": [
+    [
+     470,
+     903
+    ],
+    [
+     785,
+     903
+    ],
+    [
+     785,
+     1196
+    ],
+    [
+     470,
+     1196
+    ]
+   ]
+  }
+ ],
+ "ground": [
+  {
+   "name": "terrace floor (the deck camera's VP through the start map)",
+   "roi": [
+    0,
+    1250,
+    1080,
+    1920
+   ],
+   "vps": [
+    [
+     358,
+     44
+    ]
+   ]
+  }
+ ]
+}

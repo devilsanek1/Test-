@@ -30,12 +30,13 @@ import {CanalCast} from '../kit/canal/slots';
 import {k4Person} from '../kit/canal/k4k5';
 import {V2S2Set} from './V2S2_Set';
 import {S2Board, S2Newsagent} from './V2S2_Board';
-import {S2FarLife, S2NearLife} from './V2S2_Life';
+import {S2FarLife, S2Motes} from './V2S2_Life';
 import {staffOverlay} from './V2S2_Staff';
 import {S2BenchPeople} from './V2S2_Bench';
 import {PipS2} from './V2S2_Pip';
-import {S2Plane, S2_PLANE} from './V2S2_Float';
 import {Tier} from '../../lib/tier';
+import {Lit} from '../../lib/light';
+import {RIG_CANAL} from '../world/rigs';
 import {Sky} from '../../lib/sky';
 import {S2_EVENING} from '../world/skies';
 import type {ToneKey} from '../../lib/Film';
@@ -81,6 +82,14 @@ const HerOutline: React.FC = () => {
 const storyOverlay = (w: MAP.Spot & {id: string}): React.ReactNode => {
   if (w.id === 'HER') return <HerOutline />;
   return staffOverlay(w);
+};
+
+/** The story panes' tiers (conform_L2 §4): her window is the subject from "one" (6.82); each staff window is promoted
+ *  on its own click of "staff" (8.96 + i 0.04) and stays A through the blinds and "contracts"; before that, support. */
+const storyTierAt = (t: number) => (id: string): 'subject' | 'support' => {
+  if (id === 'HER') return t >= S2.outlineAt ? 'subject' : 'support';
+  const i = S2.staffWindows.findIndex((w) => w.id === id);
+  return i >= 0 && t >= S2.staffOnAt + i * S2.staffOnStagger ? 'subject' : 'support';
 };
 
 // ---------------------------------------------------------------- screen space: the sky and its one cloud
@@ -137,24 +146,31 @@ const Shot: React.FC = () => {
         </clipPath>
       </defs>
       <g clipPath={`url(#${WORLD_CLIP_ID})`}>
-      <XG m={s2Cam(t)}>
-        <InkScale zoom={z} k={0.6}>
-          <S2Plane plane={S2_PLANE.subject}>
-          <CanalCast person={k4Person}>
-            <V2S2Set
-              staffCoolAt={S2.staffOnAt}
-              storyOverlay={storyOverlay}
-              aBoard={<S2Board />}
-              agent={<S2Newsagent />}
-              bench={<S2BenchPeople />}
-              pip={<PipS2 />}
-              farLife={<S2FarLife />}
-              near={<S2NearLife />}
-            />
-          </CanalCast>
-          </S2Plane>
-        </InkScale>
-      </XG>
+        <XG m={s2Cam(t)}>
+          <InkScale zoom={z} k={0.6}>
+            <Lit rig={RIG_CANAL}>
+              <CanalCast person={k4Person}>
+                <V2S2Set
+                  staffCoolAt={S2.staffOnAt}
+                  storyOverlay={storyOverlay}
+                  storyTier={storyTierAt(t)}
+                  aBoard={<S2Board />}
+                  agent={<S2Newsagent />}
+                  bench={<S2BenchPeople />}
+                  pip={<PipS2 />}
+                  farLife={
+                    <>
+                      <S2FarLife />
+                      <S2Motes layer="far" />
+                    </>
+                  }
+                  leaves={<S2Motes layer="leaves" />}
+                  extra={<S2Motes layer="near" />}
+                />
+              </CanalCast>
+            </Lit>
+          </InkScale>
+        </XG>
       </g>
     </>
   );

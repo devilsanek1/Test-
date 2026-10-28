@@ -13,39 +13,69 @@
 import React from 'react';
 import {World} from '../../lib/World';
 import {TimeShift} from '../../lib/time';
+import {Lit} from '../../lib/light';
+import {Sky} from '../../lib/sky';
+import {Tier} from '../../lib/tier';
 import {CM} from '../palette';
-import * as MAP from '../world/map';
 import {CanalCast} from '../kit/canal/slots';
 import {k4Person} from '../kit/canal/k4k5';
 import type {ToneKey} from '../../lib/Film';
+import {RIG_CANAL} from '../world/rigs';
+import {S3_AIR, S3_SUNSET} from '../world/skies';
 import {S3_START, S3_PLANE} from './V2S3_rig';
 import {S3Plane} from './V2S3_float';
 import {S3Sun, S3Terrace, S3Canal} from './V2S3_terrace';
+import {S3FarCity, S3Roofs} from './V2S3_tWest';
 import {S3Near} from './V2S3_near';
 import {S3Pip} from './V2S3_pip';
+import {S3Particles} from './V2S3_particles';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
 const Shot: React.FC = () => (
   <CanalCast person={k4Person}>
-    <S3Plane plane={S3_PLANE.sky}>
-      <S3Sun />
-    </S3Plane>
-    <S3Plane plane={S3_PLANE.terrace}>
-      <S3Terrace />
-    </S3Plane>
-    <S3Plane plane={S3_PLANE.water}>
-      <S3Canal />
-    </S3Plane>
-    <S3Near />
-    <S3Plane plane={S3_PLANE.terrace}>
-      <S3Pip />
-    </S3Plane>
+    <Lit rig={RIG_CANAL}>
+      {/* the sky plane (no float): ONE continuous, gentle, dithered sky (lib/sky; world/skies S3_SUNSET), then the disc */}
+      <S3Plane plane={S3_PLANE.sky}>
+        <Sky spec={S3_SUNSET} />
+        <S3Sun />
+      </S3Plane>
+      {/* +2 the far city on the sunset band, +1 the roofs and chimneys in front of it (the west gap; V2S3_tWest) */}
+      {/* TIERS (CRAFT §b): every set piece is tier C (flat, no line, calmer: the far planes pulled toward the air, the
+          terrace toward its own brick wall); her window and her silhouette are A (V2S3_tHer), Pip and the two lit
+          neighbours B; L2's near lamp and Pip keep exactly S2's scope (the cut swaps the world behind them) */}
+      <S3Plane plane={S3_PLANE.farCity}>
+        <Tier tier="environment" bg={S3_AIR}>
+          <S3FarCity />
+        </Tier>
+      </S3Plane>
+      <S3Plane plane={S3_PLANE.roofs}>
+        <Tier tier="environment" bg={S3_AIR}>
+          <S3Roofs />
+        </Tier>
+      </S3Plane>
+      <S3Plane plane={S3_PLANE.terrace}>
+        <Tier tier="environment" bg={CM.brick}>
+          <S3Terrace />
+        </Tier>
+      </S3Plane>
+      <S3Plane plane={S3_PLANE.water}>
+        <Tier tier="environment">
+          <S3Canal />
+        </Tier>
+      </S3Plane>
+      <S3Near />
+      <S3Plane plane={S3_PLANE.terrace}>
+        <S3Pip />
+      </S3Plane>
+      {/* the particles, last, each on its plane (V2S3_particles: glints, two leaves, far and near motes) */}
+      <S3Particles />
+    </Lit>
   </CanalCast>
 );
 
 const V2S3: React.FC = () => (
-  <World sky={[CM.sky, CM.bandSunset]} horizon={1000}>
+  <World sky={CM.sky} horizon={1000}>
     <TimeShift by={-S3_START}>
       <Shot />
     </TimeShift>

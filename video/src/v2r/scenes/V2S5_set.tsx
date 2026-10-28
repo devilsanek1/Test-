@@ -4,7 +4,8 @@
 //   V2S5_start     S5StartBack (behind all) / S5StartFore (over all): the start-only canopy + near foreground (screen, p)
 //   V2S5_far       S5Far (far plane) + S5FarLife (sky life, screen)
 //   V2S5_river     S5River          V2S5_mid  S5Mid          V2S5_nearmid  S5NearMid (start coords)
-//   V2S5_deck      S5Deck / S5DeckOver (deck plane), S5TreeLeft / S5RightFrame (their boxes), S5WipeProp, S5NearEnd
+//   V2S5_deck      S5Deck / S5DeckOver (deck plane), S5TreeLeft / S5RightFrame (their boxes), S5WipeProp
+//   V2S5_particles S5Particles (the 'near' slot: petals and glints, each field in its plane's map)
 //   V2S5_figs      FiguresStart (start coords until the swap) / FiguresEnd (deck plane from the swap)
 //   V2S5_text      NewsBox (start coords, rides the deck) / Plaque (end coords, pops on "Pentagon")
 // Tiers (conform_L4 §5): every plane is C (environment: no outline, calm) but the figures (B, their kits' default) and
@@ -22,7 +23,8 @@ import {S5Far, S5FarLife} from './V2S5_far';
 import {S5River} from './V2S5_river';
 import {S5Mid} from './V2S5_mid';
 import {S5NearMid} from './V2S5_nearmid';
-import {S5Deck, S5DeckOver, S5TreeLeft, S5RightFrame, S5WipeProp, S5NearEnd} from './V2S5_deck';
+import {S5Deck, S5DeckOver, S5TreeLeft, S5RightFrame, S5WipeProp} from './V2S5_deck';
+import {S5Particles} from './V2S5_particles';
 import {FiguresStart, FiguresEnd} from './V2S5_figs';
 import {NewsBox, Plaque} from './V2S5_text';
 
@@ -122,7 +124,7 @@ export const S5Set: React.FC<{p?: number; only?: S5Layer[]}> = ({p: pIn, only}) 
       ) : null}
       {on('near') ? (
         <Tier tier="environment">
-          <S5NearEnd p={p} />
+          <S5Particles p={p} />
         </Tier>
       ) : null}
       {on('start') ? <S5StartFore p={p} /> : null}

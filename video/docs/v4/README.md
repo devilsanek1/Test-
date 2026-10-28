@@ -20,7 +20,7 @@ and `video/docs/PIPELINE_V2.md`.
 | Gate | Status | File |
 |---|---|---|
 | G0 topic | **LOCKED**: AI songs and the shared royalty pot | `G0_TOPICS.md` |
-| G0.5 core line | **RUNNING** (resumed 2026-10-27 ~22:40 UTC; stages run as max-effort subagents, see "Next step") | `research/*.md`, `research/factlock.md`, `CORE_LINE.md` |
+| G0.5 core line | **TOP 3 SENT 2026-10-28 ~09:45 UTC, waiting for the owner's pick** (A recommended: "A man got 18 months for having bots play his AI songs."; B "Could you even tell if a song was AI?"; C "Some bots are skimming your favorite artist's pay."). Run data: `core_line/` (6 writers, 47 lines, 4 judges, 4 viewers, 2 sceptics, editor, truth check) | `research/*.md`, `research/factlock.md`, `CORE_LINE.md` |
 | G1+ | not started | |
 
 ## The locked topic in one paragraph

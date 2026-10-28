@@ -2,6 +2,32 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 09:18 UTC (hourly): budget alarm, lanes hold at a checkpoint
+
+Done: the owner took look clip v5 ("leafs are great") but called the water "way too cheap ... lazy and cheap": a workflow redesigns it as
+one shared component (research + diagnosis running; two candidates on S1, a judge, `src/lib/water.tsx`, look clip v6, a critic). Lanes:
+S2 in its critic round; S3 art conform (sky, planes + air, light, her window); S4 brief; S5 depth / sky / particles / birds, QA running;
+S6 conformed + petals seen; S7 one eye-level camera, builder mid-way; S8 sky, float, light, set, particles, critic running. No report yet.
+Spend: the hour ~$252 (helpers $897 total, +$244). Estimated weekly ~85-89 %; this 5-hour window ~50 %, its 85 % guard ~10:05-10:30
+at this burn. The finish projects past 100 %, so: lanes hold at a clean checkpoint after their current agent (no new agents) until the owner's
+readings; scope cuts (no separate G6 pass, one combined final review, sound = re-time + mix only, one critic round + must-fixes per lane).
+
+## Note 2026-10-28 08:50 UTC: G4 look clip v5 sent to the owner
+
+`deliverables/v2/v2r_G4_look_v5.mp4` (master; S1 0-6.13 s) + `_phone.jpg` (three frames at 360 px, every particle ringed): the owner's
+"I don't see any changes in the particles": 3 palmate leaves (34-40 px) blown across the water and the quay from 1.2 s, 4-6 glints
+(20-36 px sparkles) in the sun's path, 3 near motes (12-16 px) on the bay tree's shade + 4 far ones; lints clean, depth 0 FAIL,
+banding PASS x5, light OK x3. Shared presets carry the numbers to every lane (`lib/particles`, CRAFT §f.6).
+
+## Snapshot 2026-10-28 08:19 UTC (hourly)
+
+All five lanes conforming since 07:55 and pushing in steps: L2 S2's joins + sky; L3 S3's per-plane float, Pip seated across S2-S3-S4;
+L4 S5's April sky, depth through its own air, the blossom-tree wipe; L5 S6 / S7 skies + the clock push; L6 S8's sky + the landing float.
+L1 raised the shared particle presets to the owner's "SEEN at phone size" numbers (leaves 26-40 px, glints 20-36 px x 6, motes 6-10 px;
+`particleProblems` enforces the floor) and is redoing S1's particles for the G4 look clip v5. Typecheck clean. No lane report yet.
+Spend: orchestrator $3,801 (+$7 since 04:18), helpers L1-L6 $653 (+~$93 since the resume). Estimated weekly ~77 %; projection ~92-102 %
+at the finish, so the lanes get the small-context rule (PIPELINE_V2 anti-waste 9: most cost is re-reading a big context).
+
 ## Snapshot 2026-10-28 07:55 UTC: look APPROVED, L2-L6 conforming
 
 The owner approved the G4 look clip v4 ("Okay I think this is better now the hook video"). L2 (S2), L3 (S3+S4), L4 (S5), L5 (boards + S6 + S7)

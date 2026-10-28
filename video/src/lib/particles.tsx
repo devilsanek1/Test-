@@ -7,7 +7,9 @@
 // * SEEN AT PHONE SIZE (owner, on v4: "I don't see any changes in the particles anywhere"; CRAFT §f.6): a viewer
 //   points at them in a 360 px wide frame without searching, and they stay calm. Leaves 26-40 px with a visible
 //   flutter and turn, 2-3 in view across a hold; glints 20-36 px sparkles, L* +15..+25, 4-6 twinkling at once for
-//   0.3-0.8 s; motes 6-10 px, L* +12..+20 over the shade behind them, 6-10 in the sunlit air; <= ~16 on screen.
+//   0.3-0.8 s; motes sized by distance: 6-10 px in the far air, 12-16 px near (plane < 0: `nearSize`; 2-4 of them
+//   drifting slowly past the nearest shade are the ones a phone sees), L* +12..+20 over the shade behind them;
+//   <= ~16 on screen.
 // * FLAT SHAPES: a mote is a small disc, a glint a four-point sparkle flattened toward the water, a leaf one closed
 //   almond or a five-lobed palmate leaf (`leaf`), a bird one thin closed V.
 //   No blur, glow, gradient or opacity: a particle GROWS in and SHRINKS out (DIRECTION rule 8), is born inside its
@@ -18,8 +20,9 @@
 // * TIER C by default (the environment: slow and calm, CRAFT §b), but SEEN: its contrast is set against `on`, the
 //   colour right behind it (motes a light tint L* +12..+20, glints +15..+25, birds a tone darker within 15, leaves
 //   their own colours within 30: LIFT_MAX), its colour takes its plane's air step (lib/depth `recede`), and its size
-//   and speed scale with the plane (1.5x per plane: near ones 2-3x the far ones). Tier B only when asked (a leaf near
-//   the story): x1.25, contrast +5.
+//   and speed scale with the plane (1.5x per plane: near ones 2-3x the far ones), except motes nearer than the subject
+//   plane: they take their own on-screen `nearSize` and still drift slowly (unit speed). Tier B only when asked (a leaf
+//   near the story): x1.25, contrast +5.
 // * LIT BY THE SET'S RIG (lib/light <Lit>): light kinds are a step lighter on the sun side (`sun`, or the rig's key
 //   direction), a tumbling leaf shows its shade face in the rig's form tint; under lightOff the lift goes, the field stays.
 // * THE MOVER BUDGET (DIRECTION rule 3, CRAFT §b): few (each kind's cap: motes 10, dust 6, glints 6, leaves 3, a
@@ -83,16 +86,21 @@ export type Preset = {
   join: 'keep' | 'hold';
   /** The plane it lives on by default (sizes and speeds scale 1.5x per plane). */
   plane: number;
+  /** Motes and dust nearer than the subject plane (plane < 0): their own ON-SCREEN size (CRAFT §f.6: motes sized by
+   *  distance), replacing the plane scale; their speed and drift stay as given (unit factor: near motes still drift
+   *  slowly). A field's `size` override is then on-screen px too. */
+  nearSize?: [number, number];
 };
 
 /** The numbers of CRAFT §f.6, SEEN at phone size (owner on v4, 2026-10-28; v4's 13 px leaves, 14-24 px glints and 3-4 px
- *  motes were invisible): motes 6-10 px, L* +15 (13 / 15 / 17 in the three light steps), 6-10 in the sunlit air, at
- *  3-12 px/s; dust 5-8 px (same reason); leaves 26-40 px falling 50-90 px/s with a wide flutter and a visible turn, 2
- *  in view (cap 3); glints 20-36 px sparkles, L* +20 (18 / 20 / 22), 4-6 twinkling at once for 0.3-0.8 s each (grow
- *  in over 30 % of the life, shrink out over 40 %); far birds small and pale (unchanged: a flock reads by its
- *  motion). research/2026-10-27_effects_libraries.md §6. */
+ *  motes were invisible): motes sized by distance: 6-10 px in the far air, 12-16 px near (plane < 0: `nearSize`; 2-4
+ *  drifting past the nearest shade, the ones a phone sees; v5's 8-10 px motes alone read as specks), L* +15 (13 / 15 /
+ *  17 in the three light steps), 6-10 in all, at 3-12 px/s; dust 5-8 px (same reason); leaves 26-40 px falling
+ *  50-90 px/s with a wide flutter and a visible turn, 2 in view (cap 3); glints 20-36 px sparkles, L* +20 (18 / 20 /
+ *  22), 4-6 twinkling at once for 0.3-0.8 s each (grow in over 30 % of the life, shrink out over 40 %); far birds
+ *  small and pale (unchanged: a flock reads by its motion). research/2026-10-27_effects_libraries.md §6. */
 export const PRESETS: Record<ParticleKind, Preset> = {
-  motes: {count: 8, cap: 10, life: [3, 5], gap: [0, 0.4], size: [6, 10], speed: [3, 8], drift: [0, -2.5], lift: 15, grow: 0.15, shrink: 0.25, join: 'keep', plane: 0},
+  motes: {count: 8, cap: 10, life: [3, 5], gap: [0, 0.4], size: [6, 10], speed: [3, 8], drift: [0, -2.5], lift: 15, grow: 0.15, shrink: 0.25, join: 'keep', plane: 0, nearSize: [12, 16]},
   dust: {count: 5, cap: 6, life: [5, 8], gap: [0.2, 0.8], size: [5, 8], speed: [2, 6], drift: [4, 2], lift: 12, grow: 0.15, shrink: 0.25, join: 'keep', plane: 0},
   leaves: {count: 2, cap: 3, life: [5, 8], gap: [1, 3], size: [26, 40], speed: [50, 90], drift: [20, 0], lift: 0, grow: 0.05, shrink: 0.1, join: 'hold', plane: 0},
   glints: {count: 6, cap: 6, life: [0.3, 0.8], gap: [0.02, 0.15], size: [20, 36], speed: [0, 0], drift: [-3, 0], lift: 20, grow: 0.3, shrink: 0.4, join: 'keep', plane: 0},
@@ -103,9 +111,17 @@ export const PRESETS: Record<ParticleKind, Preset> = {
  *  SEEN (CRAFT §f.6: motes +12..+20, glints +15..+25), leaves keep their own colours (within 30 of the ground they
  *  cross), birds stay a tone darker within 15. */
 export const LIFT_MAX: Record<ParticleKind, number> = {motes: 20, dust: 15, leaves: 30, glints: 25, birds: 15};
-/** The phone-size floor (CRAFT §f.6): the on-screen size (after the plane and tier scale) a field's particles reach at
- *  full growth, and the light kinds' least contrast. Under it a viewer does not find them at 360 px wide. */
-export const SEEN_MIN = {size: {motes: 6, dust: 5, leaves: 26, glints: 20} as Partial<Record<ParticleKind, number>>, lift: {motes: 12, glints: 15} as Partial<Record<ParticleKind, number>>};
+/** The phone-size floor (CRAFT §f.6): the on-screen size (after the plane and tier scale, or a near field's own
+ *  `nearSize`) a field's particles reach at full growth, by plane (motes sized by distance: `near` is the floor in front
+ *  of the subject plane, plane < 0), and the light kinds' least contrast. Under it a viewer does not find them at
+ *  360 px wide. */
+export const SEEN_MIN = {
+  size: {motes: 6, dust: 5, leaves: 26, glints: 20} as Partial<Record<ParticleKind, number>>,
+  near: {motes: 12} as Partial<Record<ParticleKind, number>>,
+  lift: {motes: 12, glints: 15} as Partial<Record<ParticleKind, number>>,
+};
+/** A kind's phone-size floor on a plane (on-screen px): the near one when the plane is in front of the subject's. */
+export const seenSizeMin = (kind: ParticleKind, plane: number): number | undefined => (plane < 0 ? SEEN_MIN.near[kind] : undefined) ?? SEEN_MIN.size[kind];
 /** The most particles alive at once across a shot's fields (CRAFT §f.6: a few, never a texture). */
 export const ALIVE_MAX = 16;
 
@@ -127,7 +143,8 @@ export type ParticlesProps = {
   on: string;
   /** Alive at once (clamped to the kind's cap). */
   count?: number;
-  /** Depth plane (lib/depth): sizes and speeds x 1.5^-plane; with `atm`, the colour takes the plane's air step. */
+  /** Depth plane (lib/depth): sizes and speeds x 1.5^-plane (motes nearer than the subject, plane < 0, take the
+   *  preset's on-screen `nearSize` at unit speed instead); with `atm`, the colour takes the plane's air step. */
   plane?: number;
   atm?: Atmosphere;
   /** 'environment' (C, the default) or 'support' (B: only when the field is near the story). */
@@ -286,7 +303,7 @@ const DT = 1 / 30;
 type Resolved = Required<Pick<ParticlesProps, 'kind' | 'seed' | 'region' | 'joins' | 'avoid' | 'margin'>> & {
   p: Preset;
   n: number;
-  k: number; // the plane's size and speed factor
+  k: number; // the plane's size and speed factor (1 for a near field on its own on-screen `nearSize`)
   t0: number;
   t1: number;
   floor?: number;
@@ -302,16 +319,19 @@ type Resolved = Required<Pick<ParticlesProps, 'kind' | 'seed' | 'region' | 'join
 function resolve(o: ParticlesProps): Resolved {
   const base = PRESETS[o.kind];
   const tierK = o.tier === 'support' ? 1.25 : 1;
+  const plane = o.plane ?? base.plane;
+  // motes sized by distance (CRAFT §f.6): nearer than the subject plane, a kind with a `nearSize` takes it (or the
+  // field's `size`) as its on-screen size, at unit speed; everywhere else size and speed scale 1.5x per plane
+  const near = plane < 0 && base.nearSize !== undefined;
   const p: Preset = {
     ...base,
-    size: o.size ?? base.size,
+    size: o.size ?? (near && base.nearSize ? base.nearSize : base.size),
     speed: o.speed ?? base.speed,
     life: o.life ?? base.life,
     gap: o.gap ?? base.gap,
     drift: o.drift ?? base.drift,
     lift: o.lift ?? base.lift,
   };
-  const plane = o.plane ?? base.plane;
   return {
     kind: o.kind,
     seed: o.seed,
@@ -321,7 +341,7 @@ function resolve(o: ParticlesProps): Resolved {
     margin: o.margin ?? 22,
     p,
     n: o.births ? Math.min(o.births.length, base.cap) : clamp(Math.round(o.count ?? base.count), 0, base.cap),
-    k: Math.pow(1.5, -plane),
+    k: near ? 1 : Math.pow(1.5, -plane),
     t0: o.t0 ?? -Infinity,
     t1: o.t1 ?? Infinity,
     floor: o.floor,
@@ -730,16 +750,19 @@ export function particleProblems(fields: ParticlesProps[], o: {joins?: number[]}
     if (lift > liftMax) out.push(`${f.seed}: contrast ${lift} L* over the ${f.kind}' limit (${liftMax}: LIFT_MAX, tier B +5)`);
     const liftMin = SEEN_MIN.lift[f.kind];
     if (liftMin !== undefined && lift < liftMin) out.push(`${f.seed}: contrast ${lift} L*: under ${liftMin}, not seen at phone size (CRAFT §f.6)`);
-    // SEEN at phone size: the smallest particle at full growth, on screen (the plane and tier scale)
-    const sizeMin = SEEN_MIN.size[f.kind];
-    const kSize = Math.pow(1.5, -(f.plane ?? p.plane)) * (f.tier === 'support' ? 1.25 : 1);
-    const sz = f.size ?? p.size;
-    if (sizeMin !== undefined && sz[0] * kSize < sizeMin - 1e-9)
-      out.push(`${f.seed}: ${f.kind} ${(sz[0] * kSize).toFixed(0)}-${(sz[1] * kSize).toFixed(0)} px on screen: under the phone-size floor (${sizeMin} px, CRAFT §f.6: a viewer won't find them at 360 px wide)`);
-    // the top speed on screen: the preset's (the curl flow is capped at unit speed) plus the constant drift
-    const k = Math.pow(1.5, -(f.plane ?? p.plane));
-    const drift = f.drift ?? p.drift;
-    const sp = ((f.speed ?? p.speed)[1] + (f.kind === 'motes' || f.kind === 'dust' ? Math.hypot(drift[0], drift[1]) : 0)) * k;
+    // SEEN at phone size: the smallest particle at full growth, on screen, sized exactly as the field draws it (resolve:
+    // the plane and tier scale, or a near field's own `nearSize`), against its plane's floor (motes sized by distance)
+    const rf = resolve(f);
+    const plane = f.plane ?? p.plane;
+    const sizeMin = seenSizeMin(f.kind, plane);
+    const [s0, s1] = [rf.p.size[0] * rf.k * rf.tierK, rf.p.size[1] * rf.k * rf.tierK];
+    if (sizeMin !== undefined && s0 < sizeMin - 1e-9)
+      out.push(`${f.seed}: ${f.kind} ${s0.toFixed(0)}-${s1.toFixed(0)} px on screen: under the phone-size floor (${sizeMin} px${plane < 0 && SEEN_MIN.near[f.kind] !== undefined ? ' in front of the subject plane' : ''}, CRAFT §f.6: a viewer won't find them at 360 px wide)`);
+    // the top speed on screen: the preset's (the curl flow is capped at unit speed) plus the constant drift, at the
+    // field's own speed factor (resolve: a near field on its `nearSize` keeps unit speed)
+    const k = rf.k;
+    const drift = rf.p.drift;
+    const sp = (rf.p.speed[1] + (f.kind === 'motes' || f.kind === 'dust' ? Math.hypot(drift[0], drift[1]) : 0)) * k;
     const spMax = f.kind === 'motes' || f.kind === 'dust' ? 12 : f.kind === 'leaves' ? 180 : f.kind === 'birds' ? 120 : 0;
     if (spMax > 0 && sp > spMax + 1e-9) out.push(`${f.seed}: ${f.kind} up to ${sp.toFixed(0)} px/s (slow life: <= ${spMax}; CRAFT §f.6)`);
     if (p.join === 'hold') {

@@ -1,29 +1,28 @@
-// V2S6_life.tsx (lane L5): S6's life beyond the fence (BUSY: >= 3.5 medium events/s, no gap > 1 s), all scene time:
-//   S6Clouds      the top gutter (y <= 285): soft April clouds drifting right 3 px/s (huge = slow)      [gate `bars`]
-//   S6Birds       a pair crossing above the facade (y 615-690, never the band), past the sun 2.6        [lawn slot]
-//   S6Promenade   the far promenade at the facade's foot (feet 856-880 = small, 100-125 px, heads on the eye line):
-//                 jogger A (0-2.9, right strip), a dog walker + dog (all shot), a cyclist (2.45-3.6), a parent with a
-//                 stroller (left strip, 0-3.5), jogger B (0.35-1.6, left), a walker (2.6-), a bench reader at rest
-//                 (left), the lawn trees behind them (blossom)                                        [lawn slot]
-//   S6Staff       the service door (far plane): one walks in 0-0.85 (door shuts 1.00 behind them), one steps out
-//                 2.62 for a breath of air and goes back in 3.05-3.6 (door shuts 3.40, never on anyone) [doorPeople]
-//   S6LawnMid     lawn-depth things that never touch the fence (y < 1000), drawn in the mid slot behind the board: a
-//                 young cherry (left), the gardener kneeling at the tulip bed (right, at rest, trowel), a barrow
-//   S6Petals      blossom petals falling through the mid and near planes, never over the board (zones left / right
-//                 of it, drifting away from it) + the GUST burst on "any" (14 petals in 4 frames, 0.05-0.11)
+// V2S6_life.tsx (lane L5): S6's life on the inner clock (film - 24.00) and V2S6_rig's ONE camera (people sized by
+// adultH(feet)). <= 3 noticeable movers at once, taking turns (conform_L5 §2):
+//   S6LawnTrees   the lawn's flowering cherries beyond the fence (plane +2)
+//   S6Promenade   ONE jogger on the far promenade, left of the board, 24.45 on (tier C) (plane +2)
+//   S6Staff       the service door (in the facade's doorway slot, plane +3): one walks in, already under way at the
+//                 cut (the door shuts 25.0 behind them), one steps out 26.62 for a breath of air and goes back in
+//                 27.08-27.62 (the door shuts 27.4, never on anyone); small backs and profiles (tier B)
+//   S6Petals      S6's own declared falling weather: blossom petals from the near shrub (bottom left), <= 8 at once, no
+//                 gust, growing in and shrinking out, never over the board, Pip or the band; none born in the quiet
+//                 windows round the joins (film 23.60-24.00, 27.90-28.30) (plane -1)
+//   S6Clouds      S5's far sky draws it (V2S5_far); S6's own sky is lib/sky's one gradient and carries none
 // Fairness: no uniforms, lanyards, badges, guards, cameras, vehicles or deliveries; staff are small backs / profiles
 // that never look at us; nothing teal (her colour); no Google letters on any prop.
 import React, {useMemo} from 'react';
 import {CM} from '../palette';
 import {useTime} from '../../lib/time';
-import {rand, rng} from '../../lib/rng';
-import {Person, Seated} from '../kit/cast';
-import {Batch, Paint, mix, crownD, blossomD, ellD, circleD, lineD, cloudD, frac} from '../kit/dc/core';
-import {birdD} from '../kit/dc/life';
+import {rand} from '../../lib/rng';
+import {Person} from '../kit/cast';
+import {Batch, Paint, mix, ellD, lineD, cloudD} from '../kit/dc/core';
 import {BloomCrowns, BLOOM_NEAR, type BloomTones, type CrownSpec} from '../kit/dc/bloom';
-import {GATE, GT} from '../kit/dc/gate';
-import {DRIFT, dxOf, adultH} from './V2S6_rig';
-import {LEAF} from './V2S6_set';
+import {GATE} from '../kit/dc/gate';
+import {Tier} from '../kit/tiers';
+import {CastShadow, ContactShadow, ShadowLayer} from '../../lib/light';
+import {adultH, QUIET} from './V2S6_rig';
+import {S6_AIR} from '../world/skies';
 
 const smooth = (u: number) => {
   const k = Math.min(1, Math.max(0, u));
@@ -48,7 +47,13 @@ const along4 = (keys: Key4[], t: number): [number, number, number] => {
 
 // ---------------------------------------------------------------- tones
 
+/** S6's steps toward the April air, one flat step per plane (lib/depth PLANE_STEPS are 0.12 / 0.22 / 0.40; S6 takes
+ *  more, so the ladder reads at a squint: the fence + lawn, then the cherries, then the facade, each >= 3 dE closer to
+ *  the air; check_depth at 25.0). */
+export const S6_AIR_K = {fence: 0.15, lawn: 0.62, facade: 0.72} as const;
+
 const LT = {
+  trunkFar: mix(mix(CM.anchor, CM.line, 0.25), S6_AIR, S6_AIR_K.lawn),
   cloud: CM.skyHigh,
   cloudLit: CM.paper,
   cloudBelly: mix(CM.skyHigh, CM.stoneShade, 0.35),
@@ -121,71 +126,6 @@ export const S6Clouds: React.FC = () => {
   );
 };
 
-// ---------------------------------------------------------------- birds: a pair above the facade (lawn slot)
-
-export const S6Birds: React.FC = () => {
-  const t = useTime();
-  const lawn = dxOf(DRIFT.lawn, t);
-  const t0 = 0.35;
-  if (t < t0 || t > 3.75) return null;
-  const u = t - t0;
-  // screen path: right -> left, gently undulating, always y >= 615 (wing tips >= 607: never the band margin)
-  const x1 = 1130 - 380 * u;
-  const y1 = 642 + 7 * Math.sin(u * 2.3);
-  const x2 = x1 + 46;
-  const y2 = y1 + 17 + 4 * Math.sin(u * 2.9 + 1);
-  const d1 = birdD(x1 - lawn, y1, 27, (t * 3.7) % 1);
-  const d2 = birdD(x2 - lawn, y2, 23, (t * 4.1 + 0.4) % 1);
-  return (
-    <>
-      <path d={d2} stroke={LT.birdFar} strokeWidth={2.3} fill="none" strokeLinecap="round" strokeLinejoin="round" />
-      <path d={d1} stroke={LT.bird} strokeWidth={2.7} fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </>
-  );
-};
-
-/** A second, higher pair in the top gutter (y 150-250: the quiet field, never the band), left -> right from 2.85. */
-export const S6SkyBirds: React.FC = () => {
-  const t = useTime();
-  const t0 = 2.85;
-  if (t < t0) return null;
-  const u = t - t0;
-  const x1 = -40 + 330 * u;
-  const y1 = 214 - 22 * u + 5 * Math.sin(u * 2.1);
-  const x2 = x1 - 40;
-  const y2 = y1 + 15 + 3 * Math.sin(u * 2.7 + 1);
-  return (
-    <>
-      <path d={birdD(x2, y2, 20, (t * 4.0 + 0.3) % 1)} stroke={LT.birdFar} strokeWidth={2.1} fill="none" strokeLinecap="round" strokeLinejoin="round" />
-      <path d={birdD(x1, y1, 23, (t * 3.6) % 1)} stroke={LT.birdFar} strokeWidth={2.3} fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </>
-  );
-};
-
-/** Five sparrows lift off the cherry crown peeking over the board (3.42) and fly low to the left across the sun,
- *  y >= 606 (wing tips >= 600): never in the band margin. Lawn coords (counter-drifted to a screen path). */
-export const S6Sparrows: React.FC = () => {
-  const t = useTime();
-  const t0 = 3.42;
-  if (t < t0) return null;
-  const lawn = dxOf(DRIFT.lawn, t);
-  const u = t - t0;
-  let d = '';
-  for (let i = 0; i < 5; i++) {
-    const delay = (i % 3) * 0.05 + i * 0.02;
-    const k = Math.max(0, u - delay);
-    if (k <= 0) continue;
-    const sx = 404 + i * 17 + 15 * t0;
-    const sy = 640 + (i % 2) * 9;
-    // up off the crown, then level and fast to the left
-    const x = sx - 300 * k - 120 * k * k;
-    const y = Math.max(606 + (i % 3) * 5, sy - 70 * k + 30 * k * k);
-    if (x < -30) continue;
-    d += birdD(x - lawn, y, 13 + (i % 2) * 2, (t * 5.2 + i * 0.27) % 1);
-  }
-  return <path d={d} stroke={LT.bird} strokeWidth={1.9} fill="none" strokeLinecap="round" strokeLinejoin="round" />;
-};
-
 // ---------------------------------------------------------------- the lawn trees (lawn plane, behind the promenade)
 
 type TreeSpec = {x: number; base: number; rx: number; ry: number; cy: number; bloom: number; seed: string};
@@ -194,6 +134,7 @@ type TreeSpec = {x: number; base: number; rx: number; ry: number; cy: number; bl
  *  Crown tops = cy - 1.16 ry >= 612 (never above y 600). Lawn coords. Kept off the sun (x 215-305), off Pip's calm ring
  *  (x 690-900) and off the service door (x 900-1060). */
 const LAWN_TREES: TreeSpec[] = [
+  {x: -26, base: 872, rx: 74, ry: 58, cy: 786, bloom: 2.4, seed: 'lt0'},
   {x: 420, base: 852, rx: 90, ry: 72, cy: 700, bloom: 2.6, seed: 'lt1'},
   {x: 572, base: 852, rx: 94, ry: 74, cy: 704, bloom: 2.4, seed: 'lt2'},
   {x: 1152, base: 856, rx: 104, ry: 80, cy: 706, bloom: 2.6, seed: 'lt3'},
@@ -207,7 +148,7 @@ const BLOOM_S6: BloomTones = {
   mid: mix(CM.blossom, CM.shadeWarm, 0.18),
   lit: mix(CM.blossom, CM.paper, 0.32),
 };
-const BLOOM_FAR: BloomTones = Object.fromEntries(Object.entries(BLOOM_S6).map(([k, v]) => [k, mix(v, CM.sky, 0.1)])) as BloomTones;
+const BLOOM_FAR: BloomTones = Object.fromEntries(Object.entries(BLOOM_S6).map(([k, v]) => [k, mix(v, S6_AIR, S6_AIR_K.lawn)])) as BloomTones;
 const LIGHT: [number, number] = [-0.95, -0.3];
 
 const crownOf = (s: TreeSpec): CrownSpec => ({cx: s.x, cy: s.cy, rx: s.rx, ry: s.ry, seed: s.seed, light: LIGHT, bloom: s.bloom, ink: 2.2});
@@ -221,13 +162,13 @@ const trunkInto = (B: Batch, s: TreeSpec, shadow: string) => {
     [s.x + s.rx * 0.86, s.base + 5],
     [s.x - 2, s.base + 6],
   ]);
-  B.poly(LT.bark, [
+  B.poly(LT.trunkFar, [
     [s.x - 7, s.base],
     [s.x - 5, top],
     [s.x + 5, top],
     [s.x + 7, s.base],
   ]);
-  B.poly(mix(LT.bark, CM.paper, 0.25), [
+  B.poly(mix(LT.trunkFar, CM.paper, 0.25), [
     [s.x - 7, s.base],
     [s.x - 5, top],
     [s.x - 2, top],
@@ -253,138 +194,39 @@ export const S6LawnTrees: React.FC = () => {
 
 // ---------------------------------------------------------------- the promenade (lawn plane)
 
-type Mover = {
-  /** Standing still (a pause: the walk stops mid-stride) at scene t. */
-  still?: (t: number) => boolean;
-  id: string;
-  pose: 'walk' | 'jog' | 'cycle';
-  /** screen x at scene t (the camera's drift is removed when drawing in lawn coords). */
-  x: (t: number) => number;
-  feet: number;
-  dir: 1 | -1; // +1 = facing / moving right
-  rate: number; // steps/s
-  traits: Record<string, unknown>;
-  on: [number, number];
-};
+/** The one jogger (tier C): in from the left edge after the join's quiet window, running right on the far promenade
+ *  until the board hides them (x 120, ~25.5). */
+const JOG = {t0: 0.45, x0: -62, v: 168, feet: 874, rate: 2.9, traits: {coat: CM.sage, hair: 'bun', hairColor: CM.hair[4], acc: 'none', coatLen: 'jacket', trousers: CM.stoneShade} as const};
 
-// The service door's plate (CLASSIFIED / AUTHORIZED PERSONNEL ONLY) is lettering: nobody crosses it while it shows (the
-// door shut 1.00-2.30 and from 3.40). The right strip's movers pass the door only while it stands open (0-1.0, 2.3-3.4).
-const MOVERS: Mover[] = [
-  // right strip, door open: a jogger and a cyclist overtaking her, both heading left behind the post and the board
-  {id: 'jogA', pose: 'jog', x: (t) => 1062 - 150 * t, feet: 866, dir: -1, rate: 2.8, traits: {coat: CM.coatMustard, hair: 'cap', hatColor: CM.coatSlate, acc: 'headphones', coatLen: 'jacket'}, on: [0, 2.7]},
-  {id: 'cyc', pose: 'cycle', x: (t) => 1196 - 300 * t, feet: 870, dir: -1, rate: 0, traits: {coat: CM.coatOat, hair: 'beanie', hatColor: CM.brickDeep, acc: 'backpack', accColor: CM.coatSlate}, on: [0, 1.75]},
-  // right strip, left of the door: a runner at rest (stretching), who sets off left at 2.0
-  {id: 'rest', pose: 'jog', x: (t) => (t < 2.0 ? 872 : 872 - 150 * (t - 2.0) * Math.min(1, (t - 2.0) / 0.25)), still: (t) => t < 2.0, feet: 862, dir: -1, rate: 2.7, traits: {coat: CM.brickLight, hair: 'bun', hairColor: CM.hair[2], acc: 'none', coatLen: 'jacket'}, on: [0, 3.2]},
-  // right strip, door open again: a runner bursts out from behind the post heading right and is gone by 3.35
-  {id: 'jogB2', pose: 'jog', x: (t) => 860 + 228 * (t - 2.35), feet: 874, dir: 1, rate: 3.0, traits: {coat: CM.coatSlate, hair: 'short', hairColor: CM.hair[1], acc: 'none', coatLen: 'jacket'}, on: [2.35, 3.4]},
-  // left strip: a parent with a stroller heading out left; a jogger; the dog walker coming in; a late jogger
-  {id: 'pram', pose: 'walk', x: (t) => 112 - 38 * t, feet: 858, dir: -1, rate: 1.5, traits: {coat: CM.coatPlum, hair: 'lowBun', hairColor: CM.hair[2], acc: 'tote', accColor: CM.coatOat, coatLen: 'long'}, on: [0, 4.1]},
-  {id: 'jogB', pose: 'jog', x: (t) => -62 + 168 * (t - 0.35), feet: 874, dir: 1, rate: 2.9, traits: {coat: CM.sage, hair: 'bun', hairColor: CM.hair[4], acc: 'none', coatLen: 'jacket'}, on: [0.35, 1.9]},
-  // the dog walker stops while the dog sniffs the verge (3.0-3.38), then walks on
-  {id: 'dogW', pose: 'walk', x: (t) => -64 + 72 * Math.min(t - 1.5, 1.5) + 72 * Math.max(0, t - 3.38), still: (t) => t > 3.0 && t < 3.38, feet: 878, dir: 1, rate: 1.7, traits: {coat: CM.brick, hair: 'short', hairColor: CM.hair[3], acc: 'none', coatLen: 'mid'}, on: [1.5, 4.1]},
-  {id: 'jogC', pose: 'jog', x: (t) => -64 + 176 * (t - 3.3), feet: 876, dir: 1, rate: 3.0, traits: {coat: CM.coatMustard, hair: 'curls', hairColor: CM.hair[1], acc: 'none', coatLen: 'jacket'}, on: [3.3, 4.1]},
-];
-
-/** The dog (a small terrier in profile, trotting): screen feet (x, y), facing dir, height h (back), gait phase. */
-const dogInto = (B: Batch, x: number, y: number, dir: 1 | -1, h: number, ph: number, sniff = 0) => {
-  const L = h * 1.45;
-  const legA = Math.sin(ph) * h * 0.18;
-  const bob = Math.abs(Math.sin(ph)) * h * 0.05;
-  const by = y - h * 0.62 - bob;
-  const col = LT.dog[0];
-  // legs (four short bars, two pairs scissoring)
-  for (const [k, s] of [
-    [-0.32, 1],
-    [-0.22, -1],
-    [0.26, -1],
-    [0.36, 1],
-  ] as [number, number][]) {
-    const lx = x + dir * k * L + s * legA * 0.5;
-    B.rect(k > 0 ? col : mix(col, CM.shadeWarm, 0.3), lx - h * 0.05, by + h * 0.1, h * 0.1, y - by - h * 0.1);
-  }
-  B.fill(col, ellD(x, by, L * 0.42, h * 0.27));
-  // head + ear + muzzle (in front), tail up (behind)
-  const hx = x + dir * L * (0.46 + sniff * 0.08);
-  const hy = by - h * 0.28 + sniff * h * 0.42;
-  B.fill(col, circleD(hx, hy, h * 0.24));
-  B.fill(col, ellD(hx + dir * h * 0.22, hy + h * 0.06, h * 0.14, h * 0.09));
-  B.fill(LT.dog[2], ellD(hx - dir * h * 0.05, hy - h * 0.12, h * 0.08, h * 0.14));
-  B.ink(lineD([[x - dir * L * 0.4, by - h * 0.05], [x - dir * L * 0.52, by - h * 0.36]]), 2.2, CM.ink);
-  B.fill(LT.dog[1], ellD(x - dir * L * 0.05, by + h * 0.02, L * 0.18, h * 0.12));
-};
-
-/** The stroller (a pram seen in profile): handle toward its pusher (dir = travel direction). Screen feet line y. */
-const pramInto = (B: Batch, x: number, y: number, dir: 1 | -1, s: number, ph: number) => {
-  const w = s * 0.86;
-  const top = y - s * 0.92;
-  // wheels (ink rings with a flat hub)
-  for (const k of [-0.32, 0.3]) {
-    const wx = x + dir * k * w;
-    B.ink(`M${(wx - s * 0.13).toFixed(1)} ${(y - s * 0.13).toFixed(1)}a${(s * 0.13).toFixed(1)} ${(s * 0.13).toFixed(1)} 0 1 0 ${(s * 0.26).toFixed(1)} 0a${(s * 0.13).toFixed(1)} ${(s * 0.13).toFixed(1)} 0 1 0 ${(-s * 0.26).toFixed(1)} 0`, 1.6, CM.ink);
-    const a = ph + k;
-    B.ink(lineD([[wx - Math.cos(a) * s * 0.12, y - s * 0.13 - Math.sin(a) * s * 0.12], [wx + Math.cos(a) * s * 0.12, y - s * 0.13 + Math.sin(a) * s * 0.12]]), 1.2, CM.ink);
-  }
-  // body (a rounded tub) + hood (a quarter dome toward the travel side) + handle back to the pusher
-  B.fill(LT.pram, `M${(x - w * 0.46).toFixed(1)} ${(y - s * 0.62).toFixed(1)}Q${x.toFixed(1)} ${(y - s * 0.18).toFixed(1)} ${(x + w * 0.46).toFixed(1)} ${(y - s * 0.62).toFixed(1)}Z`);
-  B.fill(LT.pramHood, `M${(x + dir * w * 0.05).toFixed(1)} ${(y - s * 0.6).toFixed(1)}Q${(x + dir * w * 0.1).toFixed(1)} ${top.toFixed(1)} ${(x + dir * w * 0.5).toFixed(1)} ${(y - s * 0.6).toFixed(1)}Z`);
-  B.ink(lineD([[x - dir * w * 0.44, y - s * 0.6], [x - dir * w * 0.62, y - s * 1.0], [x - dir * w * 0.7, y - s * 1.0]]), 2.2, CM.ink);
-  B.ink(lineD([[x - dir * w * 0.3, y - s * 0.3], [x + dir * w * 0.3, y - s * 0.12]]), 1.2, CM.ink);
-};
-
-/** People on the far promenade + the bench reader (lawn coordinates: drawn inside the lawn plane's group). */
+/** The far promenade (lawn plane): the jogger and their shadows (the rig's: contact + cast). */
 export const S6Promenade: React.FC = () => {
   const t = useTime();
-  const lawn = dxOf(DRIFT.lawn, t);
-  const out: React.ReactNode[] = [];
-  const props = new Batch();
-  const shadows: string[] = [];
-  for (const m of MOVERS) {
-    if (t < m.on[0] || t > m.on[1]) continue;
-    const sx = m.x(t);
-    if (sx < -120 || sx > 1220) continue;
-    const x = sx - lawn;
-    const h = adultH(m.feet) * (m.pose === 'jog' ? 1.0 : 0.97);
-    const flip = m.dir === 1;
-    shadows.push(ellD(x + h * 0.2, m.feet + 1.5, h * 0.3, 3.2));
-    if (m.pose === 'cycle') {
-      out.push(<Person key={m.id} x={x} y={m.feet} h={h} seed={`s6/${m.id}`} pose="cycle" view="profile" flip={flip} traits={m.traits} pedal={1.3} />);
-      continue;
-    }
-    const still = m.still ? m.still(t) : false;
-    out.push(<Person key={m.id} x={x} y={m.feet} h={h} seed={`s6/${m.id}`} pose={still ? 'stand' : m.pose} view="profile" flip={flip} walk={still ? undefined : {rate: m.rate, phase: rand('s6walk', m.id) * 4}} traits={m.traits} />);
-    if (m.id === 'dogW') {
-      // the dog trots ahead on a lead; its trot runs at 12 drawings/s like the people
-      const ph = Math.floor(t * 12) / 12;
-      const dogX = x + 66;
-      const dh = 26;
-      dogInto(props, dogX, m.feet + 2, 1, dh, still ? 0.4 : ph * 13, still ? 1 : 0);
-      shadows.push(ellD(dogX + 8, m.feet + 3, 24, 2.6));
-      props.ink(`M${(x + h * 0.1).toFixed(1)} ${(m.feet - h * 0.46).toFixed(1)}Q${(x + 36).toFixed(1)} ${(m.feet - h * 0.2).toFixed(1)} ${(dogX + 26).toFixed(1)} ${(m.feet - dh * 0.95).toFixed(1)}`, 1.4, CM.ink);
-    }
-    if (m.id === 'pram') {
-      const px = x - 52;
-      pramInto(props, px, m.feet + 1, -1, h * 0.56, -t * 9);
-      shadows.push(ellD(px + 14, m.feet + 2, 30, 2.6));
-    }
-  }
+  if (t < JOG.t0) return null;
+  const x = JOG.x0 + JOG.v * (t - JOG.t0);
+  if (x > 160) return null;
+  const h = adultH(JOG.feet);
   return (
-    <>
-      <path d={shadows.join('')} fill={LT.lawnShadow} />
-      {out}
-      <Paint b={props} seed="s6props" misreg={2} />
-    </>
+    <Tier tier="environment">
+      <ShadowLayer>
+        <ContactShadow x={x} y={JOG.feet} w={h * 0.24} k={1.2} />
+        <CastShadow x={x} y={JOG.feet} w={h * 0.2} h={h} />
+      </ShadowLayer>
+      <Person x={x} y={JOG.feet} h={h} seed="s6/jogB" pose="jog" view="profile" flip walk={{rate: JOG.rate, phase: rand('s6walk', 'jogB') * 4}} traits={JOG.traits} />
+    </Tier>
   );
 };
 
 // ---------------------------------------------------------------- the staff at the service door (far plane)
 
 const D = GATE.door; // x 900-1020, y 735-835 (far coords)
-const H_OUT = 80;
-const H_IN = 76;
+/** Heights by the camera: 1.7 m at the doorway's foot (y 835: 68 px) and on the apron (y 842: 75 px). */
+const H_OUT = 75;
+const H_IN = 68;
 
 type StaffKey = {t: number; x: number; feet: number; h: number};
 type StaffPhase = {t0: number; t1: number; view: 'back' | 'profile'; dir: 1 | -1; walking: boolean};
 const STAFF1_KEYS: Key4[] = [
+  [-0.3, 945, 849, H_OUT + 7],
   [0.0, 946, 842, H_OUT],
   [0.24, 949, 833, H_IN],
   [0.34, 948, 831, H_IN - 2],
@@ -416,7 +258,7 @@ const phaseAt = (ph: StaffPhase[], t: number) => ph.find((p) => t >= p.t0 && t <
 export const staffHeadAt = (t: number): [number, number] | null => {
   if (t < 2.6 || t > 3.32) return null;
   const [x, feet, h] = along4(STAFF2_KEYS, t);
-  return [x + dxOf(DRIFT.far, t), feet - h * 0.85];
+  return [x, feet - h * 0.85];
 };
 
 const StaffMember: React.FC<{keys: Key4[]; phases: StaffPhase[]; seed: string; traits: Record<string, unknown>; clipId: string}> = ({keys, phases, seed, traits, clipId}) => {
@@ -442,7 +284,10 @@ const StaffMember: React.FC<{keys: Key4[]; phases: StaffPhase[]; seed: string; t
   if (inside) return <g clipPath={`url(#${clipId})`}>{fig}</g>;
   return (
     <>
-      <path d={ellD(x + h * 0.18, feet + 1, h * 0.26, 2.4)} fill={LT.pathShadow} />
+      <ShadowLayer>
+        <ContactShadow x={x} y={feet} w={h * 0.24} k={1.2} />
+        <CastShadow x={x} y={feet} w={h * 0.2} h={h} />
+      </ShadowLayer>
       {fig}
     </>
   );
@@ -467,143 +312,69 @@ export const S6Staff: React.FC = () => {
   );
 };
 
-// ---------------------------------------------------------------- lawn-depth things in the mid slot (y < 1000)
+// ---------------------------------------------------------------- petals: S6's own falling weather (plane -1)
 
-/** A young cherry on the lawn left of the board (mid coords; its own lawn-depth drift), the gardener kneeling at the
- *  kit's right tulip bed (mid coords: the bed rides the mid plane), a barrow. Nothing here reaches the fence (y 1004). */
-export const S6LawnMid: React.FC = () => {
-  const t = useTime();
-  const md = dxOf(DRIFT.mid, t);
-  // the young cherry: lawn-depth drift ~14 px/s
-  const tdx = dxOf(14, t) - md;
-  const young: TreeSpec = {x: 26, base: 958, rx: 96, ry: 80, cy: 728, bloom: 2.8, seed: 'ltL'};
-  const tree = useMemo(() => {
-    const B = new Batch();
-    trunkInto(B, young, LT.lawnShadow);
-    return B;
-  }, []);
-  const youngCrown = useMemo(() => [crownOf(young)], []);
-  // the gardener: kneeling in front of the kit's right tulip bed (mid coords (1000, 930)), back to us, at rest but
-  // working (the head turns over the bed, the trowel digs); a barrow and a trug beside them on the lawn
-  const gx = 992;
-  const gy = 972;
-  const turn = 0.25 * Math.sin(t * 1.3);
-  const dig = Math.sin(Math.floor(t * 12) / 12 * 7.5) * 5;
-  const g = new Batch();
-  g.fill(LT.lawnShadow, ellD(gx + 30, gy + 3, 46, 5));
-  // barrow (left): tray, wheel, legs, handles
-  const bx = 900;
-  const by = gy - 4;
-  g.fill(LT.lawnShadow, ellD(bx + 24, by + 5, 38, 4));
-  g.poly(mix(CM.coatSlate, CM.sage, 0.3), [
-    [bx - 30, by - 36],
-    [bx + 30, by - 36],
-    [bx + 20, by - 12],
-    [bx - 22, by - 12],
-  ]);
-  g.fill(mix(CM.brickDeep, CM.anchor, 0.3), ellD(bx, by - 37, 28, 7));
-  g.fill(LEAF.body, ellD(bx + 8, by - 41, 12, 5));
-  g.ink(lineD([[bx + 30, by - 32], [bx + 54, by - 24]]), 1.6, CM.ink);
-  g.ink(`M${bx + 16} ${by - 1}a10 10 0 1 0 20 0a10 10 0 1 0 -20 0`, 1.6, CM.ink);
-  g.ink(lineD([[bx - 22, by - 12], [bx - 27, by]]), 1.6, CM.ink);
-  // trug of bulbs (right) + kneeling pad + the trowel
-  g.fill(CM.line, `M${gx + 34} ${gy - 14}h32l-5 14h-22Z`);
-  g.fill(CM.coatOat, ellD(gx + 50, gy - 15, 15, 4));
-  g.rect(CM.brickLight, gx - 26, gy - 5, 46, 7);
-  g.ink(lineD([[gx + 12, gy - 40 + dig], [gx + 20, gy - 18 + dig]]), 2.2, CM.ink);
-  return (
-    <>
-      <g transform={`translate(${tdx.toFixed(2)} 0)`}>
-        <Paint b={tree} seed="s6youngcherry" misreg={2} />
-        <BloomCrowns crowns={youngCrown} tones={BLOOM_S6} seed="s6youngcrown" misreg={3} />
-      </g>
-      <Paint b={g} seed="s6garden" misreg={2} />
-      <Seated x={gx} y={gy - 20} h={66} seed="s6/gardener" turn={turn} traits={{coat: CM.coatOat, hair: 'cap', hatColor: CM.brickDeep, acc: 'none'}} />
-    </>
-  );
-};
+/** The petals: 6 slots, each born every 4.6-5.8 s inside the near shrub's lower crown (bottom left: x 20-90, y 1420-1510,
+ *  under the board's feet), carried right by the breeze 70-110 px/s and falling 18-30 px/s with a sway, living 4.0-5.5 s
+ *  (grow in 0.25 s among the shrub's blossom, shrink out 0.35 s): <= 6 at once, 24-34 px long (near the lens), out over
+ *  the open paving (x 300-700) in rose steps and a pale petal that read on it (the phone-size test: particles_phone.py);
+ *  never over the board (born under its feet), never near Pip (they pass x 310-420 below y 1450), never in the band.
+ *  None born in the quiet windows (V2S6_rig QUIET: film 23.60-24.00, 27.90-28.30). */
+const PET = {n: 6, period: [4.6, 5.8], life: [4.0, 5.5], grow: 0.25, shrink: 0.35, size: [24, 34]} as const;
+const PET_TONES = [mix(CM.blossom, CM.shadeWarm, 0.32), mix(CM.blossom, CM.shadeWarm, 0.48), mix(CM.blossom, CM.paper, 0.6)];
+type Petal = {x: number; y: number; s: number; flip: number; rot: number; tone: 0 | 1 | 2};
+const quiet = (tb: number) => QUIET.some(([a, b]) => tb >= a && tb <= b);
 
-// ---------------------------------------------------------------- petals (screen space, never over the board)
-
-type Petal = {x: number; y: number; s: number; flip: number; tone: 0 | 1 | 2};
-
-/** Falling petals in waves: petal i is born every `period` s (phase-shifted), falls with a sway, then RESTS where it
- *  lands (never vanishes). `pos(i, tb, age)` returns its screen spot and whether it has landed. */
-const waves = (n: number, seed: string, t: number, pos: (i: number, tb: number, age: number) => {x: number; y: number; landed: boolean} | null, size: [number, number], out: Petal[]) => {
-  for (let i = 0; i < n; i++) {
-    const period = 1.6 + rand(seed, `p${i}`) * 1.4;
-    const ph = rand(seed, `ph${i}`) * period;
-    const kMax = Math.floor((t - ph) / period);
-    for (let k = kMax; k >= kMax - 4; k--) {
-      const tb = ph + k * period;
+/** Where the petals born at these inner times are at time t (pure: also the checks' source). */
+export const petalsAt = (t: number): Petal[] => {
+  const ps: Petal[] = [];
+  for (let i = 0; i < PET.n; i++) {
+    const r = (k: string) => rand('s6pet', `${k}${i}`);
+    const P = PET.period[0] + r('p') * (PET.period[1] - PET.period[0]);
+    const ph = r('ph') * P - 5.6;
+    for (let k = Math.floor((t - ph) / P); k >= Math.floor((t - ph) / P) - 1; k--) {
+      const tb = ph + k * P;
+      if (quiet(tb)) continue;
+      const rk = (q: string) => rand('s6pet', `${q}${i}/${k}`);
+      const L = PET.life[0] + rk('L') * (PET.life[1] - PET.life[0]);
       const age = t - tb;
-      if (age < 0) continue;
-      const p = pos(i * 7 + (k & 7), tb, age);
-      if (!p) continue;
-      out.push({x: p.x, y: p.y, s: size[0] + rand(seed, `s${i}/${k}`) * (size[1] - size[0]), flip: p.landed ? 0.35 : Math.abs(Math.cos(t * 3 + i * 1.7 + k)), tone: ((i + k) % 3) as 0 | 1 | 2});
+      if (age < 0 || age > L) continue;
+      const x0 = 20 + rk('x') * 70;
+      const y0 = 1420 + rk('y') * 90;
+      const vx = 70 + rk('vx') * 40;
+      const vy = 18 + rk('vy') * 12;
+      const x = x0 + vx * age + 8 * Math.sin(age * 1.9 + i);
+      const y = y0 + vy * age + 5 * Math.sin(age * 2.7 + i * 0.7);
+      const g = Math.min(1, age / PET.grow, (L - age) / PET.shrink);
+      const s = (PET.size[0] + rk('s') * (PET.size[1] - PET.size[0])) * g;
+      if (s < 1) continue;
+      ps.push({x, y, s, flip: Math.abs(Math.cos(age * 2.4 + i * 1.7)), rot: (age * 70 + i * 50) % 360, tone: ((i + k) % 3) as 0 | 1 | 2});
     }
   }
+  return ps;
+};
+
+/** A petal: a rounded teardrop with a small notch, flipping (its width) as it tumbles. */
+const petalD = (p: Petal): string => {
+  const L = p.s;
+  const W = L * (0.22 + 0.36 * p.flip);
+  const a = (p.rot * Math.PI) / 180;
+  const c = Math.cos(a);
+  const sn = Math.sin(a);
+  const P2 = (u: number, v: number) => `${(p.x + u * c - v * sn).toFixed(1)} ${(p.y + u * sn + v * c).toFixed(1)}`;
+  return `M${P2(-L / 2, 0)}C${P2(-L / 4, -W)} ${P2(L / 4, -W)} ${P2(L / 2, -W * 0.2)}L${P2(L * 0.4, 0)}L${P2(L / 2, W * 0.2)}C${P2(L / 4, W)} ${P2(-L / 4, W)} ${P2(-L / 2, 0)}Z`;
 };
 
 export const S6Petals: React.FC = () => {
   const t = useTime();
-  const ps: Petal[] = [];
-  // LEFT zone: from the young cherry left of the board (it drifts ~14 px/s); they drift LEFT, away from the board (which
-  // drifts right), fall to the lawn at y ~990-1010 and rest there (the lawn's depth, ~14 px/s)
-  waves(5, 's6petL', t, (i, tb, age) => {
-    const x0 = -36 + rand('s6petL', `x${i}`) * 112 + 14 * tb;
-    const y0 = 690 + rand('s6petL', `y${i}`) * 100;
-    const vy = 52 + rand('s6petL', `v${i}`) * 26;
-    const yEnd = 990 + rand('s6petL', `e${i}`) * 22;
-    const fall = Math.min(age, (yEnd - y0) / vy);
-    const x = x0 - 12 * fall + 14 * (age - fall) + 9 * Math.sin(fall * 2.1 + i);
-    const y = y0 + vy * fall;
-    if (x < -20) return null;
-    return {x, y, landed: fall < age};
-  }, [5, 8], ps);
-  // NEAR: petals shaken off the flowering shrub (bottom left), carried right by the breeze and the near plane's drift,
-  // settling on the paving and resting there (y > 1250 always: they never cross the board)
-  const nr = (tb: number) => dxOf(DRIFT.near, tb);
-  waves(7, 's6petN', t, (i, tb, age) => {
-    const x0 = -60 + rand('s6petN', `x${i}`) * 170 + nr(tb);
-    const y0 = 1290 + rand('s6petN', `y${i}`) * 110;
-    const vy = 30 + rand('s6petN', `v${i}`) * 22;
-    const yEnd = 1430 + rand('s6petN', `e${i}`) * 220;
-    const fall = Math.min(age, (yEnd - y0) / vy);
-    const x = x0 + (65 + 30) * fall + 65 * (age - fall) + 14 * Math.sin(fall * 1.6 + i);
-    const y = y0 + vy * fall;
-    if (x > 1110) return null;
-    return {x, y, landed: fall < age};
-  }, [8, 13], ps);
-  // the GUST on "any": 14 petals blown off the shrub in 4 frames (0.05-0.10), skittering right across the footpath,
-  // then resting (riding the near plane). Always below y 1250.
-  for (let i = 0; i < 14; i++) {
-    const tb = 0.05 + (i % 4) / 60;
-    if (t < tb) continue;
-    const age = t - tb;
-    const x0 = 4 + rand('s6gust', `x${i}`) * 112 + nr(tb);
-    const y0 = 1300 + rand('s6gust', `y${i}`) * 96;
-    const v0 = 240 + rand('s6gust', `o${i}`) * 220;
-    const vy0 = -(30 + rand('s6gust', `u${i}`) * 50);
-    const g = 260;
-    const yEnd = 1440 + rand('s6gust', `e${i}`) * 200;
-    // time to land: y0 + vy0 a + g a^2 / 2 = yEnd
-    const aL = (-vy0 + Math.sqrt(vy0 * vy0 + 2 * g * (yEnd - y0))) / g;
-    const a = Math.min(age, aL);
-    const x = x0 + 65 * age + (v0 * (1 - Math.exp(-a * 2.4))) / 2.4 + 8 * Math.sin(a * 5 + i);
-    const y = Math.max(1262, y0 + vy0 * a + 0.5 * g * a * a);
-    if (x > 1110) continue;
-    ps.push({x, y, s: 8 + rand('s6gust', `s${i}`) * 5, flip: a < age ? 0.35 : Math.abs(Math.cos(t * 7 + i * 1.3)), tone: (i % 3) as 0 | 1 | 2});
-  }
   const d: [string, string, string] = ['', '', ''];
-  for (const p of ps) d[p.tone] += ellD(p.x, p.y, p.s, p.s * (0.25 + 0.6 * p.flip));
+  for (const p of petalsAt(t)) d[p.tone] += petalD(p);
   return (
-    <>
-      <path d={d[0]} fill={LT.petal} />
-      <path d={d[1]} fill={LT.petalShade} />
-      <path d={d[2]} fill={LT.petalLit} />
-    </>
+    <Tier tier="environment">
+      <path d={d[0]} fill={PET_TONES[0]} />
+      <path d={d[1]} fill={PET_TONES[1]} />
+      <path d={d[2]} fill={PET_TONES[2]} />
+    </Tier>
   );
 };
 
-void GT;

@@ -72,13 +72,17 @@ Maintenance at the end).
   under a blue sky, warmer under a sunset: atmospheric perspective, in flat colour) and in perspective (a ground plane that recedes: converging edges, foreshortened steps,
   things smaller and paving finer with distance, overlaps), never stacked flat bands. A few particles make it natural, and
   they must be SEEN at phone size without searching (leaves you watch fall, glints that sparkle, motes in the light):
-  calm, never invisible. Proven libraries are welcome where they help (researched,
+  calm, never invisible; leaves blown across the open mid ground are the proven one. Water gets the same clean, premium, refined
+  drawing as everything else, never a lazy fill: a flat band with box-shaped reflection patches, scattered dashes and
+  star sparkles read "way too cheap"; a film with water designs it (researched, the pro way) in its G4 look clip,
+  as one shared component, before the lanes build it. Proven libraries are welcome where they help (researched,
   deterministic per frame for rendering). — ("the foreground and the main focus still blur with the background
   supporting entities ... the Google office vs the building in the background: all blurred together, not clear to
   separate one from the other, no distance effect, no perspective; the bottom part: little to no perspective or depth
   ... research some libraries on GitHub ... add a bit of particles here and there to make things more natural"; on v4: "I don't see any changes in the particles
-  anywhere", v2 G4,
-  2026-10-27).
+  anywhere"; on v5: "I don't like the water too much, leafs are great"; "it's just looking way too cheap, not clean or premium
+  quality or refined, just lazy and cheap", v2 G4,
+  2026-10-27/28).
 - **A gentle PARALLAX float, never a flat card.** When a held shot floats, its planes move by depth (Disney's multiplane
   idea): the near ground most, far planes little, the sky and the caption band not at all; slow, small, back at rest
   by every join; it adds depth in motion without adding movers. — ("switch it on if you think it will make the videos
