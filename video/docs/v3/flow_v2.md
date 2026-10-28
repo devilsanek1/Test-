@@ -108,14 +108,14 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
   loaded truck leaves left along the street (behind the phone); 34.60 the notice flips to "2027" (84 px) + "Micron: supply
   'much tighter' in 2027 and 2028 than in 2026" (22 px), full until 35.85; 35.22-36.25 two DC trucks overtake the BETTER van
   along the near kerb and nudge it back (35.62), one taking the gate, one stopping in front of the pool; 35.95 the tag jolts.
-- **SQF PAYOFF.** 36.36-36.98 nothing new: the push releases (J5's continuous camera); 36.98 the DC's sign LIGHTS (drawn on top
-  of the hall), its rows go dark and light one per syllable of "an AI data center" (37.00-37.80: the hook's 4.04 beat rhymed),
-  in the same frame the notice goes blank and the trucks sit back; nothing walks while it lights (the workers load from 38.75, a
-  far car crosses from 38.6); 38.12-38.62 the phone rises to PAYOFF (DC and mountain uncovered above it; the DC back to tier C at
-  38.70); 39.70 the tag turns: the mini data center "AI" on its back; 39.88 like-pop; 40.30 Pip shrugs; the loop: 40.55-40.85 the
-  thread plane travels back to frame 0's spot (PAYOFF's inverse scale) as the tag turns to its front, "$999" again; 40.85-41.15
-  one `EraseDown` takes the window, the street and the plane's colour off over SQA's frame-0 lines in the same place; captions
-  roll at 41.00 (ink from the roll).
+- **SQF PAYOFF.** 36.36-36.98 nothing new: the push releases (J5's continuous camera); 36.98 the DC's sign LIGHTS (drawn on top of
+  the hall), its rows go dark and light one per syllable of "an AI data center" (37.00-37.80: the hook's 4.04 beat rhymed), in the
+  same frame the notice goes blank and the trucks sit back; nothing near the gate walks while it lights (the workers load from
+  38.75; a small far car crosses slowly from 37.3); 38.12-38.62 the phone rises to PAYOFF (DC and mountain uncovered above it; the
+  DC back to tier C at 38.70); 39.70 the tag turns: the mini data center "AI" on its back; 39.88 like-pop; 40.30 Pip shrugs; the
+  loop: 40.55-40.85 the thread plane travels back to frame 0's spot (PAYOFF's inverse scale) as the tag turns to its front, "$999"
+  again; 40.85-41.15 one `EraseDown` takes the window, the street and the plane's colour off over SQA's frame-0 lines in the same
+  place; captions roll at 41.00 (ink from the roll).
 
 ## 5. Hierarchy, light, read (A subject in turn · B support · C environment; read = the sound-off phone cold read)
 | seq | A | B | C | light | read |

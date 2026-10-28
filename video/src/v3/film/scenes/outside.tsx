@@ -41,7 +41,7 @@
 // near kerb (BETTER nudged back 35.62): C takes the gate, D stops in front of the pool; 36.98 the notice goes blank as
 // the data center's sign lights and its rows go dark, then light one at a time on "an AI data center" (37.00-37.80, the
 // hook's 4.04 beat rhymed; the trucks sit back in the same frame), then the street holds, alive and calm (the workers
-// load C from 38.75, a small car crosses from 38.6: nothing walks while the sign lights). Tiers follow the beat (flow_v2 §5): the
+// load C from 38.75, a small far car crosses slowly from 37.3: nothing near the gate walks while the sign lights). Tiers follow the beat (flow_v2 §5): the
 // beat's subject gets the one outline and the motion.
 // Light (CRAFT §d; the street rig: the open sky the key): the gate's floodlight pool is THE light (two warm steps: L* 87
 // C* 13 / L* 91 C* 16, lighter AND warmer than the road: E11), the gate's lit yard spills onto the pavement down to it,
@@ -966,12 +966,13 @@ export const CrateHop: React.FC<{to?: Pt; street?: Mat}> = ({to, street}) => {
   return q ? <CrateBox x={q.x} y={q.y + (q.w * 0.62) / 2} w={q.w} rot={q.rot} line /> : null;
 };
 
-/** A small car on the street's far side (38.6-41.2, after the data center's beat: right to left at ~105 px/s): a flat
- *  body, a cabin, two lit headlights' dots; C tier, behind everything in the pool. */
-const FAR_CAR_T0 = 38.6;
+/** A small car on the street's far side (from 37.3, once the sign has lit: right to left at a slow ~85 px/s, entering
+ *  the frame ~37.5): a flat body, a cabin, two lit headlights' dots; C tier (small, slow, far), behind everything in the
+ *  pool: the payoff's hold stays alive while nothing near the gate walks. */
+const FAR_CAR_T0 = 37.3;
 const FarCar: React.FC<{T: number}> = ({T}) => {
   if (T < FAR_CAR_T0 || T > 41.2) return null;
-  const x = 1130 - (T - FAR_CAR_T0) * 105;
+  const x = 1130 - (T - FAR_CAR_T0) * 85;
   const y = 1132;
   return (
     <g>
