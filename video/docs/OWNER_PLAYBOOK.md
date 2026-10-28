@@ -253,8 +253,9 @@ Maintenance at the end).
   be possible to make visually appealing ... give me the list of criteria"; then "lets make it relevant first but
   include buzz here too and surprise, then true and solid, then fresh, then visually appealing, then mood. Then
   shareabliity potential"; "lets move the freshness lower and make it last month or so", v4, 2026-10-28). The
-  shortlist always comes with its chart: each story's score on each criterion (`video/scripts/topic_chart.py`; "can
-  you show me the visual next time we do research ... some bar chart", v4, 2026-10-28).
+  shortlist always comes with its column chart: for each story a column per criterion, the most important on the left
+  (`video/scripts/topic_chart.py`; "can you show me the visual next time we do research ... some bar chart"; "make the
+  visual into column chart", v4, 2026-10-28).
 - **Topics: alternate the mood: a positive story after a negative one.** v2 (Google staff resigning), v3 (laptop
   prices) and v4's first pick (AI songs and fake plays) were all bad news, so the next is a very recent, highly
   relevant, genuinely POSITIVE AI story (e.g. AI helping find a medicine or beat a disease) with a hopeful outlook.

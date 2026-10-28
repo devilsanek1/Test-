@@ -4,8 +4,13 @@ The one list the G0 editor scores every candidate on (1-10 each) and the owner s
 order of importance** (2026-10-28: "lets make it relevant first but include buzz here too and surprise, then true and
 solid, then fresh, then visually appealing, then mood. Then shareabliity potential"; then "lets move the freshness lower
 and make it last month or so"). The weighted score is (6 x 1 + 5 x 2 + 4 x 3 + 3 x 4 + 2 x 5 + 1 x 6) / 21, out of 10;
-`video/scripts/topic_chart.py` draws it for the owner (every shortlist comes with that chart). A story that isn't true is out whatever it scores (the
+`video/scripts/topic_chart.py` draws it for the owner as a column chart (every shortlist comes with it). A story that isn't true is out whatever it scores (the
 master brief: "substance is non-negotiable").
+
+**Never baity** (playbook, Audience and goal): each proposed core line is heard cold over its first frame: "ad or
+news?". A line that sounds like a commercial (a sales question, a testimonial, a feature demo, the product as the first
+picture) is reworded as news (what happened, then why it matters) or the story is out. A company's launch or a gadget
+story starts with ad risk (v3 opened like an ad: 64.5 % skipped).
 
 1. **Relevant, with buzz and surprise (weight 6):** a big question millions care about, with a concrete "so what" for
    an ordinary person; people are already talking about it (the "fuss"); a "wait, seriously?" fact or a twist. Tech,

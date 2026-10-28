@@ -231,3 +231,36 @@ two-week window, so it is rescaled to the month (9-8 -> 10, 7 -> 9, 6 -> 8, 5 ->
 | 21 | Florida's AI mosquito trap | 5.5 | 3 | 7 | 6 | 10 | 4 | **5.62** |
 | 22 | UCLA MAESTRO prostate-cancer drug pair | 5.2 | 3 | 5 | 5 | 10 | 4 | **5.01** |
 | 23 | OpenAI's math and physics "discoveries" | 5.7 | 3 | 4 | 4 | 10 | 5 | **4.87** |
+
+## Ad or news? (v3's lesson, applied 2026-10-28 ~17:00 UTC)
+
+The playbook's never-baity rule (Audience and goal; v3 opened like an ad, "Buying a laptop soon?", and 64.5 % skipped):
+each line heard cold over its first frame.
+- **The glasses: ad risk, reworded.** "Chris, who's blind, calls them life-changing" plus "Its AI reads him the menu" is
+  a customer testimonial plus a feature demo over the product: how smart glasses are advertised. As news (what
+  happened, then why it matters): **"Australia's health minister says camera glasses serve 'no useful purpose'. Chris,
+  who's blind, uses his to read the menu."** (Butler's words and Chris Edwards's menu: the fact check above.) Frame 0 is
+  the fight (a ban sign at a pool gate), never the product; no brand.
+- **The vaccine: news.** "A vaccine made from your own cancer just passed its biggest test": what happened; nothing to buy.
+- **The hurricane: news** (an event, two forecasts). **"Could they hear you?": news.**
+- **Quake alerts: ad risk** (a phone feature launch, sourced from Google itself): only with a real quake moment.
+
+## Two owner-suggested candidates (2026-10-28 ~17:21 UTC; Google's two posts read, scored by the orchestrator)
+
+| Story | Relevant | True | Visual | Mood | Fresh | Share | Score |
+|---|---|---|---|---|---|---|---|
+| SynthID: a hidden mark in 180 billion AI pictures | 7 | 7 | 8 | 8 | 8 | 8 | **7.48** (6th) |
+| Gemini 4 Carbon, Google's new model | 6 | 6 | 4 | 6 | 10 | 4 | **5.90** |
+
+- **SynthID** (blog.google, 15 Oct: TIME put it on its Best Inventions list): the invisible watermark Google's AI puts in
+  the images, video, audio and text it makes; "more than 180 billion images and videos" and "240,000 years of audio"
+  marked (Google's counts). Anyone can check a picture in the Gemini app, Search, Chrome or synthid.com. Good: easy for
+  people, useful (fakes worry everyone), very drawable (a hidden mark that lights up, like a banknote's watermark held to
+  the light). Limits: it finds only marks from Google and its partners, so "no mark" proves nothing; the news peg is an
+  award (the tool dates from 2023); a how-to-use-it video reads as a Google ad. Told as news: "180 billion AI pictures
+  carry a mark you can't see", with "no mark doesn't mean it's real" as the honest turn.
+- **Gemini 4 Carbon** (blog.google, 28 Oct): Google's "strongest model", built for cybersecurity and for tasks that run
+  "for days"; #1 on one independent index (Artificial Analysis); fewer unsupported claims (Google's numbers). Not for
+  people yet: a subset of cyber defenders first, no consumer app, no date. Weak for v4: nothing for people to try,
+  Google's own benchmarks, mostly code (hard to draw), and a model launch reads as an ad. Revisit if it reaches the
+  Gemini app with something people can do.
