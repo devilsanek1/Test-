@@ -78,7 +78,7 @@ export type Preset = {
   plane: number;
 };
 
-/** Tier C numbers, measured or chosen inside CRAFT §b and §f.7 (motes 2-4 px at 3-12 px/s; leaves 8-14 px near; glints
+/** Tier C numbers, measured or chosen inside CRAFT §b and §f.6 (motes 2-4 px at 3-12 px/s; leaves 8-14 px near; glints
  *  live 0.2-0.6 s, 3-6 at once; far birds small and pale; research/2026-10-27_effects_libraries.md §6). */
 export const PRESETS: Record<ParticleKind, Preset> = {
   motes: {count: 6, cap: 8, life: [3, 5], gap: [0, 0.4], size: [2, 4], speed: [3, 9], drift: [0, -2.5], lift: 10, grow: 0.15, shrink: 0.25, join: 'keep', plane: 0},
@@ -646,7 +646,7 @@ function palette(o: ParticlesProps, rig: ReturnType<typeof useRig>, off: boolean
 
 // ================================================================= the lint
 
-/** A shot's particle fields against the mover budget (DIRECTION rule 3, CRAFT §b, §f.7; empty = OK): counts within
+/** A shot's particle fields against the mover budget (DIRECTION rule 3, CRAFT §b, §f.6; empty = OK): counts within
  *  the caps, entrances declared with the shot's joins and taking turns (<= ~0.6 entries/s together), regions clear of
  *  the caption band, and the contrast and speed limits of the tier. `joins` = the shot's scene-local join times. */
 export function particleProblems(fields: ParticlesProps[], o: {joins?: number[]} = {}): string[] {

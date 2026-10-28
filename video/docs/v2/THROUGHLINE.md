@@ -141,8 +141,10 @@ freezes the world). S4's truck is A's walk: its world slide is camera, not suppo
 ## 5b. Depth: planes, the air, one camera, separation, a few particles (CRAFT §f; `src/lib/depth.ts`, `src/lib/particles.tsx`, how-to `src/lib/DEPTH.md`)
 The owner on the G4 clip (2026-10-27, `OWNER_NOTES.md`): the wing and the far city "blurred together", no distance, no
 perspective, the bottom flat; "a bit of particles here and there". Every shot, with its rig:
-- **The air** (one atmosphere per set, `makeAtmosphere`): the shot's lowest sky step right behind its far planes (S1
-  `S1_HAZE` #FBD9BB; the gold band #F6D9BC on S2, S4; the sunset band #F3C6A6 on S3, S7, S8; the April band on S5, S6).
+- **The air** (one atmosphere per set, `makeAtmosphere`): the shot's lowest sky colour right behind its far planes,
+  `horizonColor(sky, x)` once the shot draws `lib/sky`'s one continuous sky (CRAFT §g.3; S1 `S1_AIR` in
+  `world/skies.ts`: the #FBD9BB horizon warmed under SUN0, in place of `S1_HAZE`); until a shot's sky is converted, its
+  lowest band (the gold band #F6D9BC on S2, S4; the sunset band #F3C6A6 on S3, S7, S8; the April band on S5, S6).
   Every far fill goes through `recede(colour, plane, ATM)` or `planePalette` (converging on the air, never grey or
   olive), never an sRGB mix toward the mint: the dc kit's `atm()` and S1's `hazeBatch` mix that way, swap them.
 - **One camera per shot** (`groundCam`; the horizon and VP(s) every ground, figure and particle is sized from): S1
@@ -161,7 +163,7 @@ perspective, the bottom flat; "a bit of particles here and there". Every shot, w
 | S3 | -2 our towpath, -1 the boat, the water, 0 her terrace (her window M), +1 roofs and chimneys, +2 the far city on the sunset band | her lit pane in the darker wall; her plum silhouette in it | glints in the low sun's glitter path, motes in her window's spill (on the wall's shade) |
 | S4 | -1 the boat, 0 her, the towpath, the post, +1 the backs (0.6x truck), +2 the far roofs and gasholders (0.3x) | her teal on the towpath; the plates' cream: the backs behind them one shade step darker | motes near SUN1, a leaf or two across the towpath, glints under SUN1 on the bottom water |
 | S5 | the crane's 6 planes (0 / 12 / 22 / 40 / 65 %) through `recede` with the April air | the Pentagon (A from 22.43): half its plane's step, the darkest far shape on the palest cloud bank | petals in the slot's burst (`leaves`, blossom colours, small); the V of birds as planned |
-| S6 | -1 tulip kerb, bench, rack, fence posts, 0 the deal board + paving, +1 the facade band + door, +2 the promenade's trees | the board's cream on the limestone facade (L* ~90): a darker field behind it (the facade's shade step, the fence, a hedge band) | the steady falling petals as one `leaves` field (<= 8, no gust) |
+| S6 | -1 tulip kerb, bench, rack, fence posts, 0 the deal board + paving, +1 the facade band + door, +2 the promenade's trees | the board's cream on the limestone facade (L* ~90): a darker field behind it (the facade's shade step, the fence, a hedge band) | the steady falling petals stay S6's own declared falling weather (`S6Petals`: <= 8, no gust, flat, growing in and shrinking out, never through the band): a `leaves` field holds 2 at most |
 | S7 | -1 café tables and things, 0 Google's board + the forecourt (setts to the VP), +1 the wing's facade, +2 plane trees, far | the board's cream on the wing: the wing behind it one shade step (it faces away from the low sun) | plane-tree leaves, motes in the low sun's light |
 | S8 | -1 the café boat's stern things, 0 her, the board, the lane (to its VP), +1 the far bank across the basin, +2 the far rows on the sunset band | her backlit (rim) on the lane; the board's cream on the shaded lane wall; W lit in its wall | backlit motes in SUN8's light (the sun ahead: the best mote shot), glints in SUN8's glitter column on the basin |
 

@@ -609,8 +609,6 @@ export function depthProblems(atm: Atmosphere, planes: {plane: number; colors: s
       out.push(`plane +${rows[i].plane} is ${rows[i].air.toFixed(1)} from its air, not >= ${DEPTH_TARGETS.ladderDE} closer than plane +${rows[i - 1].plane} (${rows[i - 1].air.toFixed(1)}): the ladder must fall toward the air`);
   }
   const far = rows[rows.length - 1];
-  const sub0 = rows.find((r) => r.plane === 0);
-  if (sub0 && far.plane > 0 && far.air >= sub0.air) out.push(`no air: the farthest plane +${far.plane} is ΔE ${far.air.toFixed(1)} from its air, the subject's plane ${sub0.air.toFixed(1)}: the farthest must be the closest to the air (check_depth's FAIL)`);
   if (Math.round(far.air) > DEPTH_TARGETS.farAirDE) out.push(`farthest plane +${far.plane}: ΔE ${far.air.toFixed(1)} from its air (target <= ${DEPTH_TARGETS.farAirDE})`);
   const sub = rows.find((r) => r.plane === 0);
   const behind = rows.find((r) => r.plane > 0);

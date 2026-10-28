@@ -1,33 +1,48 @@
 #!/usr/bin/env python3
 """check_banding.py: BANDING in a sky (docs/look/CRAFT.md §g "Check"; lib/sky.tsx), on a rendered frame (PNG) or a
 video (mp4: decoded at 16 bits with its own colour tags, so the measurement adds no rounding of its own), before and
-after any encode. It finds the sky's vertical profile in narrow strips and looks for a STAIRCASE: flat plateaus with
-sudden steps, the thing the eye reads as bands (a smooth or properly dithered gradient changes a little on every row).
+after any encode. It finds the sky's profile in strips, DOWN the sky (horizontal bands) and ACROSS it (vertical bands:
+a sky that warms sideways, the sides of the sun's warmth), and looks for a STAIRCASE: flat plateaus with sudden steps,
+the thing the eye reads as bands (a smooth or properly dithered gradient changes a little on every row).
 
   python3 -I scripts/qa/check_banding.py frame.png --region 0,0,330,790
   python3 -I scripts/qa/check_banding.py clip.mp4 --region 0,0,330,790 --times 0.5,1.5,2.5 --json out.json
   python3 -I scripts/qa/check_banding.py frame.png --region 0,0,1080,600 --band 317,556 --max-dl 1.5 --plot prof.png
 
 The measures (canvas px at 1080 wide; CIE L*, a*, b* D65; Y = relative luminance):
-  profile    per strip (default 64 px wide) and row, the mean colour of the SKY pixels (within 2.5 L* of the row's
-             median: caption ink, objects and their edges are left out); a row change over 5 L* or 8 dE76 splits the
-             profile (an object edge: a roofline, the sun's disc; never a band).
-  step       a local peak of the 3-row colour change (dE76), at least max(0.12, 2.5x the local median change): with a
-             flat run on each side it is a band edge. Its size: dL*, dE00 and the luminance contrast c = dY / Y of the
-             plateaus.
+  profile    per strip (default 64 px wide; across the sky 64 px tall, each canvas row first taken back to the strip's
+             median so a vertical ramp neither hides nor fakes a sideways step) and row, the mean colour of the SKY
+             pixels (within 2.5 L* of the row's median: caption ink, objects and their edges are left out); a row change
+             over 5 L* or 8 dE76 splits the profile (an object edge: a roofline, the sun's disc; never a band).
+  step       a local peak of the 3-row colour change (dE76), at least max(0.12, 2.5x the local median change). Its size
+             is its TREND-CORRECTED jump (one shared straight line per channel through the plateaus on both sides plus a
+             jump, least squares): a smooth ramp, however steep, has no jump, so a step inside a fast chroma ramp is
+             measured alone (the plain plateau-mean difference read a 0.4 dE00 encoder block edge in the light band as
+             1.6-4.0). Its size: dL*, dE00 and the luminance contrast c = dY / Y.
   plateau    the run between two steps (px). Short plateaus (< 8 px) are a fine texture the eye averages away.
   visible    a step at or over the JND with plateaus >= 8 px on both sides. The JND is CAMBI's (Netflix, libvmaf):
              c >= 0.019 (its tvi_threshold, a Weber fraction on a BT.1886 display; ~0.6 L* at L* 85), or dE00 >= 1.5
              (a chroma band: CAMBI reads luma only; 1.0 is the side-by-side patch JND, an edge inside a gradient needs
              more). A step over 2x the JND is "strong".
   weak       c >= 0.010 or dE00 >= 0.8 with plateaus >= 16 px: below the JND on a calm display, near it on a phone at full
-             brightness in the dark (one 8-bit code at L* 85 is c ~0.013).
-  staircase  the share of the profile's total change that happens in its steps (0 smooth, 1 pure steps).
+             brightness in the dark (one 8-bit code at L* 85 is c ~0.011).
+  wide       the same profiles in WIDE strips (default 256 px, --wide): a band that spans the sky stays a sharp step
+             there, where an encoder's local wobble and the dither's own noise average away (CAMBI's "a band in a flat
+             region", against blotches). A STAIR step there: c >= 0.013 (just over one 8-bit luma code at sky lightness,
+             the floor of any re-encode that drops the dither) or dE00 >= 0.8, plateaus >= 8 px.
+  staircase  the share of the profile's total change that happens in its steps (0 smooth, 1 pure steps; information).
   grain      the std of the sky pixels' L* round their row mean: the dither's visible amplitude (<= 0.6 L*: invisible).
   band       the caption band's flatness: the range of its rows' sky L* (budget --max-dl, default 1.5: CRAFT §g).
-Verdict: FAIL on a staircase (3+ visible steps in one strip), a strong step, or the band over its budget; WARN on 1-2
-visible steps in a strip (isolated soft blotches: what a platform's re-encode leaves in a dithered sky), 3+ weak steps in
-a strip, or grain > 0.6 L*; else PASS. Exit 1 on FAIL. Several frames: the worst counts.
+Verdict: FAIL on a staircase (3+ visible steps in one strip, or 3+ stair steps in one wide strip: near-JND steps that
+repeat across the sky read as stripes), a strong step, or the band over its budget; WARN on 1-2 visible steps in a strip
+(isolated soft blotches: what a platform's re-encode leaves in a dithered sky), 3+ weak steps in a strip, or grain >
+0.6 L*; else PASS. Exit 1 on FAIL. Several frames: the worst counts.
+Calibrated (critic, 2026-10-28; synthetic attacks and the S1 demo through the master and five simulated platform
+re-encodes): every quantised ramp FAILs (2- and 3-code staircases, radial rings, sideways bands, hue-only bands, steps
+under noise; the plain mint -> peach gradient through the master: 7 stair steps in a wide strip), every smooth one
+PASSes (dithered ramps, a steep ramp with encoder block wobble, one small jump in a fast ramp), lib/sky's master PASSes
+and its platform re-encodes PASS or WARN (at most 2 stair steps). Not CAMBI itself: run libvmaf's cambi
+(max_log_contrast=3 on light skies) as a second opinion where a build with libvmaf is allowed.
 """
 from __future__ import annotations
 
@@ -48,7 +63,8 @@ JND_DE = 1.5  # a chroma step (CAMBI reads luma only; dE00 1.0 is the side-by-si
 WEAK_C = 0.010
 WEAK_DE = 0.8
 STRONG = 2.0  # x the JND: one such step fails alone
-STAIR = 3  # visible steps in one strip = a staircase
+STAIR = 3  # visible steps in one strip (or stair steps in one wide strip) = a staircase
+STAIR_C = 0.013  # a stair step's luminance bar: just over one 8-bit luma code at sky lightness (L* 73-92)
 MIN_PLATEAU = 8
 WEAK_PLATEAU = 16
 GRAIN_MAX = 0.6
@@ -195,8 +211,8 @@ def step_jump(P: np.ndarray, lo0: int, lo1: int, hi0: int, hi1: int, at: float) 
 
 
 def steps_in(prof: np.ndarray, yp: np.ndarray, y0: int):
-    """Steps of one segment: [(y, dL, dE00, c, plateau_before, plateau_after)], the total change and the stepped change
-    (each step's size is its trend-corrected jump: step_jump)."""
+    """Steps of one segment: [(y, dL, dE00, c, plateau_before, plateau_after, aligned)], the total change and the stepped
+    change (each step's size is its trend-corrected jump: step_jump)."""
     Ps = gaussian_filter1d(prof, 0.8, axis=0, mode='nearest')
     Ls = Ps[:, 0]
     n = len(Ls)
@@ -216,6 +232,7 @@ def steps_in(prof: np.ndarray, yp: np.ndarray, y0: int):
             merged.append(i)
     centres = [i + 2 for i in merged]  # the row just after the change
     PY = np.concatenate([prof, yp[:, None]], 1)
+    Pw = gaussian_filter1d(prof, 12.0, axis=0, mode='nearest')  # the sky's own direction, steps smoothed away
     out = []
     stepped = 0.0
     for k, c in enumerate(centres):
@@ -231,8 +248,14 @@ def steps_in(prof: np.ndarray, yp: np.ndarray, y0: int):
         dL = float(b[0] - a[0])
         dE = float(de2000(a, b))
         cc = float(abs(yb - ya) / max(min(ya, yb), 1e-6))
-        out.append((y0 + c, dL, dE, cc, c - prev, nxt - c))
-        stepped += float(np.linalg.norm(b - a))
+        # aligned (information): the jump goes the way the sky itself goes there (the profile smoothed over ~50 rows
+        # moves within 60 deg of it): a band of a quantised ramp, where a blotch or an encoder's wobble goes either way
+        J = b - a
+        d = Pw[min(n - 1, c + 12)] - Pw[max(0, c - 13)]
+        nj, nd = float(np.linalg.norm(J)), float(np.linalg.norm(d))
+        aligned = nj > 0 and nd > 0 and float(J @ d) >= 0.5 * nj * nd
+        out.append((y0 + c, dL, dE, cc, c - prev, nxt - c, aligned))
+        stepped += nj
     total = float(np.sum(np.linalg.norm(np.diff(Ps, axis=0), axis=1)))
     return out, total, stepped
 
@@ -273,6 +296,11 @@ def strip_steps(lab: np.ndarray, Y: np.ndarray, sw: int, k: float, along0: int, 
         vis = [s for s in st if (s[3] >= JND_C or s[2] >= JND_DE) and min(s[4], s[5]) >= MIN_PLATEAU * k]
         strong = [s for s in vis if s[3] >= STRONG * JND_C or s[2] >= STRONG * JND_DE]
         weak = [s for s in st if (s[3] >= WEAK_C or s[2] >= WEAK_DE) and min(s[4], s[5]) >= WEAK_PLATEAU * k and s not in vis]
+        # STAIR steps (counted in the wide strips): near-JND steps, each alone at the edge of seeing, that repeated across
+        # the sky the eye reads as stripes (the plain mint -> peach gradient through x264 CRF 14: dE00 0.9-1.2 hue steps
+        # every 8-18 px). One 8-bit luma code (c ~0.010-0.012 at sky lightness, under CAMBI's threshold) is the floor of
+        # any re-encode that drops the dither, so the luminance bar sits just above it.
+        stair = [s for s in st if (s[3] >= STAIR_C or s[2] >= WEAK_DE) and min(s[4], s[5]) >= MIN_PLATEAU * k]
         plateaus = [s[4] for s in st]
         strips.append({
             'axis': axis,
@@ -281,6 +309,7 @@ def strip_steps(lab: np.ndarray, Y: np.ndarray, sw: int, k: float, along0: int, 
             'visible': len(vis),
             'strong': len(strong),
             'weak': len(weak),
+            'stair': len(stair),
             'max_dL': max([abs(s[1]) for s in st], default=0.0),
             'max_dE00': max([s[2] for s in st], default=0.0),
             'max_c': max([s[3] for s in st], default=0.0),
@@ -292,7 +321,7 @@ def strip_steps(lab: np.ndarray, Y: np.ndarray, sw: int, k: float, along0: int, 
     return strips, grains
 
 
-def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float, axes: str = 'yx') -> dict:
+def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float, axes: str = 'yx', wide: int = 256) -> dict:
     H, W = rgb.shape[:2]
     k = W / 1080.0
     x0, y0, x1, y1 = [int(round(v * k)) for v in region]
@@ -302,11 +331,19 @@ def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float, axes: str 
     sw = max(8, int(round(strip * k)))
     strips = []
     grains = []
+    wides = []
     for axis in axes:
-        st, gr = strip_steps(lab, Y, sw, k, y0 if axis == 'y' else x0, x0 if axis == 'y' else y0, axis)
+        o_along, o_across = (y0, x0) if axis == 'y' else (x0, y0)
+        st, gr = strip_steps(lab, Y, sw, k, o_along, o_across, axis)
         strips += st
         grains += gr
-    res = {'region': list(region), 'strips': strips}
+        # the WIDE pass: a band that spans the sky stays a sharp step in a 256 px average, an encoder's local wobble
+        # and the dither's own noise average away (a coherent staircase, CAMBI's "band in a flat region", vs blotches)
+        across = (x1 - x0) if axis == 'y' else (y1 - y0)
+        ww = max(sw, min(int(round(wide * k)), across))
+        if wide and ww > sw:
+            wides += strip_steps(lab, Y, ww, k, o_along, o_across, axis)[0]
+    res = {'region': list(region), 'strips': strips, 'wide': wides}
     # the caption band: the whole width of the region, rows band[0]..band[1]
     if band and band[1] > band[0]:
         b0, b1 = int(round(band[0] * k)), int(round(band[1] * k))
@@ -336,11 +373,16 @@ def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float, axes: str 
     res['max_c'] = max([s['max_c'] for s in strips], default=0.0)
     res['max_dE00'] = max([s['max_dE00'] for s in strips], default=0.0)
     res['median_plateau'] = float(np.median([s['median_plateau'] for s in strips if s['steps']])) if any(s['steps'] for s in strips) else 0.0
+    stair_worst = max([s['stair'] for s in wides], default=0)
+    res['stair_worst_wide'] = stair_worst
     verdict = 'PASS'
     why = []
     if vis_worst >= STAIR or strong:
         verdict = 'FAIL'
         why.append(f'a staircase: {vis_worst} visible steps in one strip' if vis_worst >= STAIR else f'{strong} strong step(s)')
+    if stair_worst >= STAIR:
+        verdict = 'FAIL'
+        why.append(f'a staircase across the sky: {stair_worst} near-JND steps in one wide strip')
     if 'band' in res and res['band']['dL'] > max_dl + 1e-9:
         verdict = 'FAIL'
         why.append(f"caption band dL* {res['band']['dL']:.2f} > {max_dl}")
@@ -387,6 +429,7 @@ def main() -> int:
     ap.add_argument('input', help='a PNG frame or a video')
     ap.add_argument('--region', default='0,0,1080,800', help='the sky: x0,y0,x1,y1 (canvas px at 1080 wide)')
     ap.add_argument('--strip', type=int, default=64, help='strip width (px)')
+    ap.add_argument('--wide', type=int, default=256, help='the wide strips of the staircase test (px; 0 = off)')
     ap.add_argument('--axes', default='yx', help="profiles down the sky ('y': horizontal bands) and across it ('x': vertical bands, the sides of the sun's warmth); default both")
     ap.add_argument('--band', default='317,556', help="the caption band y0,y1 ('' = none)")
     ap.add_argument('--max-dl', type=float, default=1.5, help='the band flatness budget (dL*)')
@@ -408,7 +451,7 @@ def main() -> int:
             frames.append((f'{t:.2f}s', decode(a.input, t, info)))
     results = []
     for name, rgb in frames:
-        r = analyse(rgb, region, a.strip, band, a.max_dl, a.axes)
+        r = analyse(rgb, region, a.strip, band, a.max_dl, a.axes, a.wide)
         r['frame'] = name
         results.append(r)
         if a.plot and len(results) == 1:
@@ -419,7 +462,7 @@ def main() -> int:
         for r in results:
             b = r.get('band')
             bs = f" | band dL* {b['dL']:.2f} dE00 {b['max_dE00']:.2f} (L* {b['L']:.1f})" if b else ''
-            xs = f" [across: worst strip {r['visible_worst_strip_x']} visible, {r['weak_worst_strip_x']} weak]" if 'x' in a.axes else ''
+            xs = (f" [across: worst strip {r['visible_worst_strip_x']} visible, {r['weak_worst_strip_x']} weak]" if 'x' in a.axes else '') + f", wide staircase {r['stair_worst_wide']}"
             print(f"{r['verdict']:4s} {a.input} @ {r['frame']}: visible {r['visible']} (worst strip {r['visible_worst_strip']}, strong {r['strong']}), weak (worst strip) {r['weak_worst_strip']}{xs}, "
                   f"max step dL* {r['max_dL']:.2f} c {r['max_c']:.4f} dE00 {r['max_dE00']:.2f}, plateau {r['median_plateau']:.0f} px, "
                   f"staircase {r['staircase_median']:.2f}, grain {r['grain']:.2f} L*{bs}" + (f"  [{'; '.join(r['why'])}]" if r['why'] else ''))

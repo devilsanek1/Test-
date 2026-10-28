@@ -38,7 +38,8 @@ A clash is a bug: fix the lower doc in the same turn.
   film; another character only if the story asks, named in W1), tier B unless the line is about it: <= 1 % of the
   frame. Squint at phone size: the eye is on the beat's subject. **Depth and separation too** (owner, v2 G4): the
   subject never melts into what is behind it (its own value against a calmer field); distance shows in colour (far
-  planes lighter, cooler, less saturated, simpler: atmospheric perspective in flat colour) and in perspective (a ground
+  planes converge on the air behind them: lighter, softer in contrast, simpler, cooler under a blue sky and warmer under a
+  sunset: atmospheric perspective in flat colour) and in perspective (a ground
   that recedes: converging edges, foreshortening, things smaller and texture finer with distance, overlaps), never a
   flat elevation of stacked bands; a few subtle particles (motes, a leaf, glints) make it natural. -> `CRAFT.md` §b, §f;
   `LIFE_AND_DENSITY.md` §5.

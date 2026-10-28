@@ -222,26 +222,31 @@ there" (playbook DEPTH AND SEPARATION). Measured on its 5.4 s frame (`research/2
 receding, the near public smaller per metre than her across the water. Every cue said "flat". v1 (fill-only far planes,
 like our pen) is the model for the plane numbers; reference 1 for streets and separation.
 1. **Planes and the air.** Each set declares (W1) its planes, 0 = the subject's, -1, -2 the foreground, +1 ... +4
-   farther (4-6 in a shot, 5-7 on a vista), its AIR (the sky's lowest step right behind them: rule 6's one sky; v2 S1
-   the gold band, never the mint above it) and its camera (horizon, vanishing point(s)).
+   farther (4-6 in a shot, 5-7 on a vista), its AIR (the sky's lowest colour right behind them: rule 6's one sky,
+   `horizonColor(sky, x)` of §g.3, never the mint above it; v2 S1 `S1_AIR`) and its camera (horizon, vanishing point(s)).
 2. **One flat step per plane toward the air**, k = 0 / .12 / .22 / .40 / .65 on every fill of the plane (never a
    gradient, fog or blur): L* toward the air's; a hue on the air's side converges on it, one across from it keeps its
-   hue at chroma x (1 - 0.8 k) (a straight mix would cross grey), never under C* 8, never into the olive band. Simpler
-   with distance: 5 / 5 / 4 / 3 / 2 values, no two more than 24 / 12 / 5 ΔE apart on +2 / +3 / +4, windows tone-on-tone
-   (ΔE <= 6 from the wall, never a dark speck or the lamp colour) from +2 and none at +4, no hairline past +2. Nearer
-   than the subject: no air, a value step darker each (5 / 10 / 13 / 14 L*). Behind a pale subject plane (L* > 70) the far
-   city starts at +3. Targets (references): the farthest plane within ΔE 10 of its air (5.9-10.4; G4 18.3); each plane
-   behind the subject >= 3 closer to its air than the one before; the subject's plane >= ΔE 12 from the plane behind it
-   (11-22.6; G4 5.7; a vista whose ladder falls may step ~5); the farthest plane's darks within 20 L* of the air, its
-   range <= 15 L*, <= 4 values, contrast <= 0.5x the subject plane's and <= 4, visible edges <= 0.5x (v1 0.14-0.44x;
-   G4 1.1x and 1.5x), hue within 30 deg of the air's (the rig's shade family when backlit); no plane behind the subject
-   busier than its plane. The subject on a far plane takes half its plane's step and keeps its separation.
+   hue at chroma x (1 - 0.8 k) (a straight mix would cross grey), never under C* 8, never into the olive band. This is
+   DIRECTION's "lighter, cooler, less saturated" in a day or dusk air; under a warm sunset air the far planes take its
+   warmth and still read far by value, contrast and simplicity (v1 @25.5: the far city more saturated than the near, its
+   air C* 30; PASS). Simpler with distance: 5 / 5 / 4 / 3 / 2 values, no two more than 24 / 12 / 5 ΔE apart on +2 / +3 /
+   +4, windows tone-on-tone (ΔE <= 6 from the wall, never a dark speck or the lamp colour) from +2 and none at +4, no
+   hairline past +2. Nearer than the subject: no air, a value step darker each (5 / 10 / 13 / 14 L*). Behind a pale
+   subject plane (L* > 70) the far city starts at +3. Targets (references): the farthest plane within ΔE 10 of its air
+   (5.9-10.4; G4 18.3); from the second plane behind the subject on, each >= 3 closer to its air than the one before;
+   the subject's plane >= ΔE 12 from the plane behind it (11-22.6; G4 5.7; a vista whose ladder falls may step ~5); the
+   farthest plane's darks within 20 L* of the air, its range <= 15 L*, <= 4 values, contrast <= 0.5x the subject plane's
+   and <= 4, visible edges <= 0.5x (v1 0.14-0.44x; G4 1.1x and 1.5x), hue within 30 deg of the air's (the rig's shade
+   family when backlit); no plane behind the subject busier than its plane (fill contrast <= 1.1x). The subject on a far
+   plane takes half its plane's step and keeps its separation.
 3. **Separation: the subject never shares a value with what is right behind it.** A lit edge on a darker field, a shaded
    edge on a lighter one (counterchange); overlap, never a tangent. Along the silhouette (fill against fill): tier A
    median |ΔL*| >= 15, <= 20 % at one value (|ΔL*| < 5), no unlined one-value run over 60 px (12 / 25 % with its outline
    along >= 80 % of it: the line helps, never replaces the fill step); a big mass of the subject's plane >= 12 / <= 25 %
    / <= 100 px (references 13-38; G4's corner 2.9 / 52 % / 152 px). The field behind is a calm flat shape of its own
-   plane (a far row rising behind a lit corner, a darker band behind light figures), never a halo, glow or outline.
+   plane (a far row rising behind a lit corner, a darker band behind light figures), never a halo, glow or outline: a
+   step that lives only in a thin ring round the silhouette (2-10 px), with the edge melting past it (24-48 px out),
+   is a melt.
 4. **The ground recedes.** ONE camera per shot for every ground, wall, figure and particle; the ground's joints, steps
    and dressing laid out flat in its own coordinates and projected: lines into the picture converge, rows foreshorten
    (>= 2x far to near), joints narrow, sizes fall as 1/distance. Visible lines (|ΔL*| >= 6, or a tone band >= 3 px):
@@ -252,23 +257,30 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
    public 41-63 px/m, her across the water 100); people on one level keep one eye ratio within +-15 %. Calm a figure with
    colour (tier B), never by shrinking it; a camera too low for the foreground's things is raised, not cheated.
 6. **A few particles make it natural** (owner: "a bit of particles here and there"): tier-C life inside rule 3's mover
-   budget, declared at G3 as `life:` items: motes only inside light and against shade (2-4 px, 3-12 px/s, L* +8 to
-   +15), dust or pollen in the sun-side air, a leaf (8-14 px, a flutter, never through the caption band), glints only in
-   the sun's glitter path (short level dashes, L* +10 to +20, 0.2-0.6 s), far birds pale and small; 4-8 a field, <= ~12
-   on screen, each grows in and shrinks out (never fades), a step lighter on the sun side, no entrance in the 0.4 s
-   around a join (a steady field keeps its pace), a pure function of the frame. They are movers, not texture (§c).
+   budget, declared at G3 as `life:` items: motes only inside light and against shade (2-4 px, L* +8 to +15), dust or
+   pollen in the sun-side air (both 3-12 px/s), a leaf (8-14 px, a flutter, its fall clear of the caption band and the
+   subject: a leaf that would reach them shrinks out before, never to come back), glints only in the sun's
+   glitter path (short level dashes, L* +10 to +20, 0.2-0.6 s), far birds pale and small, a flock crossing the whole
+   frame; a few a field (motes 6, dust 5, glints 4, a leaf or two, a flock of 3-5), <= ~12 on screen, each grows in and
+   shrinks out (never fades), a step lighter on the sun side, no entrance (a leaf growing in, a flock flying in)
+   touching the 0.4 s around a join (a steady field keeps its pace), a pure function of the frame. They are movers, not
+   texture (§c).
 - **Code:** `lib/depth.ts` (`makeAtmosphere`, `recede`, `planePalette`, `toneOnTone`, `backing`, `groundCam`, `flight`,
-  `band`, `quadForPlane`, `poissonDisk`, `depthProblems`, `sizeProblems`) and `lib/particles.tsx` (`<Particles kind>`,
-  `particleProblems`); how-to and numbers `lib/DEPTH.md`; demo `src/entry-v2r-depth.tsx`. Flat everywhere: a parallax
-  float, a fog, a depth-of-field blur or a glow are owner decisions (rule 5's sky gradient aside).
+  `band`, `quadForPlane`, `poissonDisk`, `depthProblems`, `sizeProblems`; the parallax float `parallaxOffset`,
+  `floatAt`, `floatProblems`) and `lib/particles.tsx` (`<Particles kind>`, `particleProblems`); how-to and numbers
+  `lib/DEPTH.md`; demo `src/entry-v2r-depth.tsx`. Flat everywhere; the parallax float is approved (owner, 2026-10-28:
+  DIRECTION rule 8); a fog, a depth-of-field blur or a glow stay owner decisions (rule 5's sky gradient aside).
 
 **Check:** `scripts/qa/check_depth.py <still> --sheet <shot>.json` (sheets: `scripts/qa/depth_sheets/README.md`), with
 the G4 look clip and every G5 lane's key stills. Three FAILs, the owner's words made measurable: "no air" (the farthest
-plane no closer to its air than the subject's plane), "melts" (a silhouette's median step under 6, or >= 50 % at one
-value along an unlined run over 100 px), "elevation" (a ground >= 70 % level with < 10 % receding); every other number
-above WARNs with its value. Calibrated: v2's G4 clip FAILs all three; v1 @20.5 / @25.5 / @38.5 and reference 1 @6.0
-PASS (reference 1's lined far planes WARN on contrast). Eye check at phone size: squint; the subject stands off what is
-behind it, the far reads far, the ground runs into the picture.
+plane no closer to its air than the subject's plane), "melts" (a silhouette's median step under 6, >= 50 % at one value
+along an unlined run over 100 px, or a step that lives only in a thin ring round it), "elevation" (a ground >= 70 %
+level with < 10 % receding); a sheet without its planes and air, its silhouettes or its ground FAILs too, unless it
+waives that part with a reason (a check that did not run never passes); every other number above WARNs with its value.
+The sheet is part of the check: every visible plane boxed, the farthest included, and nothing else (read its `--map`;
+a far box that passes on sky inside it WARNs). Calibrated: v2's G4 clip FAILs all three; v1 @20.5 / @25.5 / @38.5 and
+reference 1 @6.0 PASS (reference 1's lined far planes WARN on contrast). Eye check at phone size: squint; the subject
+stands off what is behind it, the far reads far, the ground runs into the picture.
 
 ## g. Sky: one continuous, gentle gradient that survives video
 The owner on v2's G4 look clip (2026-10-27): "why is it blue sky and then suddenly abruptly orange, weird ... maybe when
