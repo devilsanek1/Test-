@@ -1,0 +1,212 @@
+{
+ "name": "v2 S2 @7.0 s (lane L2: her dark window, the board still behind the kiosk)",
+ "units": "px",
+ "air_hex": "#FBD9BB",
+ "planes": [
+  {
+   "name": "our towpath's near rows + things (planter, lamp, bike)",
+   "plane": -1,
+   "boxes": [
+    [
+     0,
+     1420,
+     1080,
+     1920
+    ]
+   ]
+  },
+  {
+   "name": "the wall's near bays (her window M: the subject's plane)",
+   "plane": 0,
+   "role": "subject",
+   "boxes": [
+    [
+     0,
+     650,
+     515,
+     1000
+    ]
+   ],
+   "exclude": [
+    [
+     0,
+     880,
+     140,
+     1010
+    ]
+   ]
+  },
+  {
+   "name": "our bank's things (the kiosk, the bench)",
+   "plane": 0,
+   "boxes": [
+    [
+     0,
+     1000,
+     104,
+     1290
+    ],
+    [
+     600,
+     1110,
+     800,
+     1290
+    ]
+   ]
+  },
+  {
+   "name": "the canal water",
+   "plane": 0.5,
+   "role": "ground",
+   "poly": [
+    [
+     770,
+     925
+    ],
+    [
+     980,
+     852
+    ],
+    [
+     980,
+     872
+    ],
+    [
+     770,
+     962
+    ]
+   ]
+  },
+  {
+   "name": "the wall receding (u 2.5-6.5)",
+   "plane": 1,
+   "boxes": [
+    [
+     530,
+     690,
+     805,
+     870
+    ]
+   ],
+   "exclude": [
+    [
+     530,
+     930,
+     650,
+     1110
+    ]
+   ]
+  },
+  {
+   "name": "the far bays (u 6.5-14.5) + the setbacks over the near bays",
+   "plane": 2,
+   "boxes": [
+    [
+     822,
+     700,
+     1000,
+     800
+    ],
+    [
+     0,
+     610,
+     405,
+     642
+    ]
+   ]
+  },
+  {
+   "name": "the setbacks over u 1.6-8.2",
+   "plane": 3,
+   "boxes": [
+    [
+     420,
+     622,
+     685,
+     656
+    ],
+    [
+     700,
+     636,
+     880,
+     668
+    ]
+   ]
+  },
+  {
+   "name": "the setbacks over the far bays (u 8.2-13.5: the farthest visible; the near lamp's swan-neck covers the rest)",
+   "plane": 4,
+   "boxes": [
+    [
+     895,
+     650,
+     1000,
+     676
+    ]
+   ]
+  }
+ ],
+ "silhouettes": [
+  {
+   "name": "her dark window M (A from 6.82: the plum pane + its 3 px outline)",
+   "tier": "A",
+   "poly": [
+    [
+     266.5,
+     701.0
+    ],
+    [
+     403.5,
+     701.0
+    ],
+    [
+     403.5,
+     869.0
+    ],
+    [
+     266.5,
+     869.0
+    ]
+   ]
+  }
+ ],
+ "ground": [
+  {
+   "name": "our towpath (York stone: long joints to the VP, level cross joints)",
+   "roi": [
+    230,
+    1330,
+    1000,
+    1880
+   ],
+   "vps": [
+    [
+     1400,
+     700
+    ]
+   ]
+  }
+ ],
+ "horizon": 700,
+ "things": [
+  {
+   "name": "the staffer seated on the bench (our towpath)",
+   "y": 1290,
+   "px": 186,
+   "m": 1.25
+  },
+  {
+   "name": "the newsagent (our towpath)",
+   "y": 1296,
+   "px": 250,
+   "m": 1.65
+  },
+  {
+   "name": "Pip's mooring bollard (our coping)",
+   "y": 1098,
+   "px": 47.8,
+   "m": 0.46
+  }
+ ],
+ "note": "L2, 2026-10-28: S2's one camera = groundCam({horizon 700, vpx 1400, f 1400, height 3.83}) (V2S2_Ground), the wall's VP (1400, 700) (THROUGHLINE \u00a75b); air_hex = S2_AIR (lib/sky horizonColor(S2_EVENING, 1000)); planes per conform_L2 \u00a710 (the wall's segments by column u as V2S2_Wall wallPlane draws them). The far walker is left out of `things`: it is sized by the kit wall's own scale (~64 px a person at s2g 1, 'keep exactly: the wall and its receding geometry'), which reads ~0.55x the ground camera's at the wall's base (no inversion: the far is smaller per metre)."
+}

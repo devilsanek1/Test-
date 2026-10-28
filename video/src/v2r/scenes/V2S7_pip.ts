@@ -32,9 +32,12 @@ export const s7FloatProblems = () => floatProblems(S7_FLOAT_LEGS, {rest: S7_FLOA
 /** The near-ground float at film time T. */
 export const s7FloatAt = (T: number): [number, number] => floatAt(T, S7_FLOAT_LEGS) as [number, number];
 
-/** S7's planes (lib/depth parallax planes): -1 the cafe tables and things, 0 the board + forecourt, +1 the wing, +2 the
- *  plane trees on the sunset band, +3 the far roofs in the west gap; the sky and SUN2 never float. */
-export const S7_PLANE = {sky: PARALLAX_SKY, farRoofs: 3, trees: 2, wing: 1, subject: 0, cafe: -1} as const;
+/** S7's planes (lib/depth parallax planes; V2S7_plan has where each thing stands): -1 the cafe tables and things and
+ *  the near paving, -0.5 the fountain basin, 0 Google's board, Pip's bollard and the mid paving, +0.5 the young plane,
+ *  the cyclist and the far paving, +0.6 the motes in its light, +0.75 the festoon (wing -> plane), +1 the wing, its
+ *  steps, the bikes, the door people and the west hedge, +2 the far street's plane trees on the sunset band, +3 the far
+ *  roofs in the west gap; the sky and SUN2 never float. */
+export const S7_PLANE = {sky: PARALLAX_SKY, farRoofs: 3, trees: 2, wing: 1, festoon: 0.75, motes: 0.6, plane: 0.5, subject: 0, basin: -0.5, cafe: -1} as const;
 
 /** One plane's float offset (px) at film time T. */
 export const s7PlaneOffset = (T: number, plane: number): XY => {

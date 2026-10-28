@@ -2,9 +2,9 @@
 // coping follow the wing's base to the VP (kit/canal/wall s2y), our water edge runs to the same VP, so the water narrows
 // toward it. Flat colour (CRAFT §c, §f): the water one fill, a few long calm reflection bands tone-on-tone with it (the
 // wing's lit band and its brick), the far coping's strip at the waterline in the rig's WATER tint (never a contact strip
-// on water), the far towpath stepped to its plane by distance (`recede` toward S2's air). The far lamps in CM.line
-// (STYLE §2: never plum), each stepped to its plane. FILM seconds.
-//   S2Water          the water + its reflections + the far towpath and coping, the far lamps
+// on water), the far towpath stepped to its plane by distance (`recede` toward S2's air). One far lamp in CM.line
+// (STYLE §2: never plum), stepped to its plane. FILM seconds.
+//   S2Water          the water + its reflections + the far towpath and coping, one far lamp (u 5.5)
 //   S2PassingBoat    a narrowboat far down the canal: its bow comes in at the right edge at 7.60, small and slow (it
 //                    nears us at walking pace), chimney puffs every ~0.5 s; it never reaches the story windows' columns
 //                    or Pip (its bow at x ~742 by 12.98)
@@ -108,10 +108,10 @@ export const S2Water: React.FC = () => {
       <ShadowLayer>
         <Shadow d={strip} tint="water" />
       </ShadowLayer>
-      {/* the far lamps along the far towpath, on the fins clear of the story windows (u 5.5, 9.5, 15.5), CM.line
-          stepped to their planes */}
+      {/* ONE far lamp on the far towpath (u 5.5, plane +1, CM.line stepped to it), clear of the story windows; none
+          farther (the far planes stay calm: no dark specks by the VP, CRAFT §f) */}
       <Tier tier="environment">
-        {[5.5, 9.5, 15.5].map((u, i) => (
+        {[5.5].map((u, i) => (
           <Lamp key={i} x={s2x(u)} y={s2y('base', u) + 12 * s2g(u)} h={290 * s2g(u)} color={col(CM.line, wallPlane(u))} seed={`s2lamp${i}`} />
         ))}
       </Tier>

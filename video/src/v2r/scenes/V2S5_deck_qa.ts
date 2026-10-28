@@ -5,10 +5,13 @@
 //    held start, nobody over ~190 px tall at any frame of the move; 2. at the end hold, nobody over the pair, the
 //    plaque or the Pentagon's left two thirds; 3. the balusters' strobe ratio (on-screen px moved per frame / their
 //    on-screen period) over the move; 4. the deck's highest content point on screen at every p (never above y 600);
-//    5. the wipe's basket mass over the stranger at the swap.
+//    5. the wipe's basket mass over the stranger at the swap; 6. the LIFE BUDGET (conform_L4 §6, CRAFT §b): the deck's
+//    noticeable movers on screen at once (a box > 0.3 % of the frame; <= 2), in the end hold (film 23.40-23.62), the
+//    walkers' top screen speed, nothing entering the frame or starting (a peck) in the quiet windows (film 20.35-20.75,
+//    23.55-24.00).
 import '../palette';
 import {craneP, planeMat, applyMat, matScale, DECK, wipeMat, swapAt, WIPE} from '../kit/dc/crane';
-import {castBoxes} from './V2S5_deck_life';
+import {castBoxes, peckAt, QUIET, WALKERS} from './V2S5_deck_life';
 import {RAIL, pxmD, SPOT, CAM} from './V2S5_deck_cam';
 import type {Pt} from '../../lib/sketch';
 
@@ -124,6 +127,68 @@ function wipe(): string[] {
   return [`5. wipe at the swap (t ${swapAt.toFixed(3)}, p ${p.toFixed(3)}): baskets x ${a[0].toFixed(0)}-${b[0].toFixed(0)}, y ${a[1].toFixed(0)}-${b[1].toFixed(0)}; the stranger's head+torso x ${s0[0].toFixed(0)}-${s1[0].toFixed(0)}, y ${s0[1].toFixed(0)}-${s1[1].toFixed(0)}: ${cover ? 'covered' : 'NOT fully covered'}`];
 }
 
+function life(): string[] {
+  const T0 = 20.55;
+  const area = 1080 * 1920;
+  const onBox = (t: number, key: string) => {
+    const b = castBoxes(t).find((x) => x.key === key)!;
+    const p = craneP(t);
+    const a = scr(p, [b.x0, b.y0]);
+    const c = scr(p, [b.x1, b.y1]);
+    const x0 = Math.max(0, a[0]);
+    const x1 = Math.min(1080, c[0]);
+    const y0 = Math.max(0, a[1]);
+    const y1 = Math.min(1920, c[1]);
+    const vis = x1 > x0 && y1 > y0 ? ((x1 - x0) * (y1 - y0)) / area : 0;
+    return {vis, cx: (a[0] + c[0]) / 2, cy: (a[1] + c[1]) / 2};
+  };
+  let most = {n: 0, t: 0};
+  let hold = 0;
+  let vmax = {v: 0, key: '', t: 0};
+  const entries: string[] = [];
+  const wasOn = new Map<string, boolean>();
+  for (let f = -12; f < F + 20; f++) {
+    const t = f / 60;
+    let n = 0;
+    for (const key of WALKERS) {
+      const o = onBox(t, key);
+      const on = o.vis > 0;
+      if (o.vis > 0.003) n++;
+      if (wasOn.has(key) && on && !wasOn.get(key) && QUIET.some(([a, b]) => t >= a && t <= b)) entries.push(`${key} enters at film ${(t + T0).toFixed(2)}`);
+      wasOn.set(key, on);
+      const o2 = onBox(t + 1 / 60, key);
+      if (on) {
+        const v = Math.hypot(o2.cx - o.cx, o2.cy - o.cy) * 60;
+        // the camera's own motion moves everything: the walker's speed relative to the deck is what reads as life
+        const p0 = craneP(t);
+        const p1 = craneP(t + 1 / 60);
+        const b = castBoxes(t).find((x) => x.key === key)!;
+        const anchor0 = scr(p0, [(b.x0 + b.x1) / 2, b.y1]);
+        const anchor1 = scr(p1, [(b.x0 + b.x1) / 2, b.y1]);
+        const vr = Math.abs(v - Math.hypot(anchor1[0] - anchor0[0], anchor1[1] - anchor0[1]) * 60);
+        if (vr > vmax.v) vmax = {v: vr, key, t};
+      }
+    }
+    if (n > most.n) most = {n, t};
+    if (t >= 2.85 && t <= 3.07) hold = Math.max(hold, n);
+  }
+  // pecks: an onset is the first frame a pigeon's head starts down (0 -> > 0)
+  const starts: string[] = [];
+  for (let i = 0; i < 5; i++) {
+    const ph = 0.35 + ((i * 0.37) % 1) * 1.6;
+    const per = 1.75 + ((i * 0.53) % 1) * 0.6;
+    for (let f = -12; f < F + 20; f++) {
+      const t = f / 60;
+      if (peckAt(t, ph, per) > 0 && peckAt(t - 1 / 60, ph, per) === 0 && QUIET.some(([a, b]) => t >= a && t <= b)) starts.push(`a peck starts at film ${(t + T0).toFixed(2)}`);
+    }
+  }
+  return [
+    `6. life: deck walkers noticeable at once (box > 0.3 %): max ${most.n} at film ${(most.t + T0).toFixed(2)} (${most.n <= 2 ? 'ok' : 'FAIL'} <= 2); in the hold (23.40-23.62): ${hold} (${hold <= 2 ? 'ok' : 'FAIL'} <= 2)`,
+    `   walkers' own speed on screen (camera removed): max ${vmax.v.toFixed(0)} px/s (${vmax.key} at film ${(vmax.t + T0).toFixed(2)})`,
+    `   quiet windows (film ${QUIET.map(([a, b]) => `${(a + T0).toFixed(2)}-${(b + T0).toFixed(2)}`).join(', ')}): ${entries.length + starts.length ? 'FAIL ' + [...entries, ...starts].slice(0, 6).join('; ') : 'ok   nothing enters or starts'}`,
+  ];
+}
+
 console.log(
   [
     `V2S5 deck QA (horizon ${CAM.hz}, camera ${CAM.h.toFixed(2)} m, rail ${RAIL.d.toFixed(2)} m: top ${RAIL.top.toFixed(1)}, base ${RAIL.base})`,
@@ -132,5 +197,6 @@ console.log(
     ...strobe(),
     ...topLine(),
     ...wipe(),
+    ...life(),
   ].join('\n'),
 );
