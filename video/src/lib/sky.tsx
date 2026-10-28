@@ -24,7 +24,9 @@
 //     smooth but is erased by any encoder; on top we add a static BLUE-NOISE texture of +-amp codes per channel (a 64 px
 //     void-and-cluster tile, our own: scripts/look/make_blue_noise.py), added exactly in 8-bit with `plus-lighter` /
 //     `difference` blends, so it is zero-mean (the colour stays what the curve says), invisible (+-0.4-0.8 L*, all at
-//     the finest grain) and still strong enough for the master encode to keep (CRAFT §g has the numbers).
+//     the finest grain) and still strong enough for the master encode to keep (CRAFT §g has the numbers). Only where
+//     the sky VARIES (ditherRects: the ramps and the sun's warmth; a flat caption band or the sky held behind the set
+//     cannot band): the full-frame blend layers cost ~110 ms a frame, these ~5 (sky critic, 2026-10-28).
 //  6. THE CAPTION BAND GUARD: inside the caption band (default y 317-556) the sky stays nearly flat (max dL* 1.5 by
 //     default): keys inside it are pulled toward their mean until it holds, and the sun's warmth never reaches it.
 //
@@ -35,8 +37,11 @@
 //   skyProblems(sky, {ink: CM.ink}) // [] = OK: band flatness, caption contrast, no khaki or grey zone
 //
 // Deterministic: a pure function of the spec (no Math.random, no clock); the same spec renders the same pixels on
-// every frame and every machine (Chrome's own dither aside, which is ordered). Unlit (CRAFT §d.9): never put the sky
-// under a light layer; the clean pen never recolours it (raw SVG, no Ink / Fill).
+// every frame and every machine (Chrome's own dither aside, which is ordered; verified byte-identical across processes
+// and GL modes). Models, stops and dither paths are cached by VALUE: a spec rebuilt every render costs nothing, but a
+// spec whose KEYS change every frame refits its stops (~90 ms a frame): animate the sun, never the keys, inside a
+// shot. Unlit (CRAFT §d.9): never put the sky under a light layer; the clean pen never recolours it (raw SVG, no Ink /
+// Fill).
 import React, {useId, useMemo} from 'react';
 
 // ================================================================= OKLab (Ottosson 2020; CSS Color 4 matrices)
@@ -399,9 +404,14 @@ export type SkyStop = {offset: number; color: string; y: number; rgb: Rgb};
 
 /** The vertical gradient as the fewest stops that stay within `tol` code values of the curve between them (checked
  *  for both a straight sRGB run and a straight OKLab run, the two ways a browser interpolates color() stops). */
+const STOPS = new Map<string, SkyStop[]>();
 export function skyStops(spec: SkySpec, tol = 0.25): SkyStop[] {
   const m = skyModel(spec);
   const room = roomOf(m);
+  // cached by VALUE (the fit costs ~90 ms; a spec rebuilt every frame, or a moving sun, must not pay it per frame)
+  const ck = JSON.stringify([m.curve.ky, m.curve.kl, m.curve.linear, m.top, m.bottom, m.band ? [m.band.y0, m.band.y1] : 0, room, tol]);
+  const hit = STOPS.get(ck);
+  if (hit) return hit;
   const step = 2;
   const ys: number[] = [];
   for (let y = m.top; y < m.bottom; y += step) ys.push(y);
@@ -433,13 +443,20 @@ export function skyStops(spec: SkySpec, tol = 0.25): SkyStop[] {
     i = j;
   }
   const span = m.bottom - m.top;
-  return out.map((k) => ({offset: (ys[k] - m.top) / span, color: css(rgbs[k]), y: ys[k], rgb: rgbs[k]}));
+  const res = out.map((k) => ({offset: (ys[k] - m.top) / span, color: css(rgbs[k]), y: ys[k], rgb: rgbs[k]}));
+  if (STOPS.size > 64) STOPS.clear();
+  STOPS.set(ck, res);
+  return res;
 }
 
 /** The sun's warmth as radial stops (offset = elliptical distance 0..1, opacity = the smootherstep weight). */
+const SUNSTOPS = new Map<string, {offset: number; opacity: number}[]>();
 export function sunStops(spec: SkySpec, tol = 0.001): {offset: number; opacity: number}[] {
   const m = skyModel(spec);
   if (!m.sun) return [];
+  const sk = `${m.sun.strength}/${tol}`;
+  const hit = SUNSTOPS.get(sk);
+  if (hit) return hit;
   const n = 256;
   const w = (d: number) => m.sun!.strength * smootherstep(1 - d);
   const out: number[] = [0];
@@ -457,7 +474,9 @@ export function sunStops(spec: SkySpec, tol = 0.001): {offset: number; opacity: 
     out.push(j);
     i = j;
   }
-  return out.map((k) => ({offset: k / n, opacity: w(k / n)}));
+  const res = out.map((k) => ({offset: k / n, opacity: w(k / n)}));
+  SUNSTOPS.set(sk, res);
+  return res;
 }
 
 // ================================================================= the dither: a static blue-noise tile
@@ -587,6 +606,40 @@ export function ditherPaths(d: Required<SkyDither>): DitherPaths {
   return res;
 }
 
+export type SkyRect = {x: number; y: number; width: number; height: number};
+/** WHERE THE SKY CAN BAND: the runs between stops of different colours (full width) and the sun's warmth (its own
+ *  box), never twice over one pixel. A flat run (a flat caption band, the sky held below the horizon behind the set)
+ *  cannot band and gets no dither: less to composite per frame and to encode. */
+export function ditherRects(spec: SkySpec): SkyRect[] {
+  const m = skyModel(spec);
+  const st = skyStops(spec);
+  const runs: [number, number][] = [];
+  for (let i = 0; i + 1 < st.length; i++) {
+    const a = st[i].rgb;
+    const b = st[i + 1].rgb;
+    if (Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]) + Math.abs(a[2] - b[2]) < 1e-9) continue;
+    const last = runs[runs.length - 1];
+    if (last && last[1] >= st[i].y) last[1] = st[i + 1].y;
+    else runs.push([st[i].y, st[i + 1].y]);
+  }
+  const out: SkyRect[] = runs.map(([y0, y1]) => ({x: m.x, y: y0, width: m.width, height: y1 - y0}));
+  if (m.sun) {
+    const sx0 = Math.max(m.x, m.sun.x - m.sun.rx);
+    const sx1 = Math.min(m.x + m.width, m.sun.x + m.sun.rx);
+    let y = Math.max(m.top, m.sun.y - m.sun.ry);
+    const y1 = Math.min(m.bottom, m.sun.y + m.sun.ry);
+    // the warmth's rows that no full-width run covers yet
+    for (const [r0, r1] of runs) {
+      if (r1 <= y) continue;
+      if (r0 >= y1) break;
+      if (r0 > y) out.push({x: sx0, y, width: sx1 - sx0, height: r0 - y});
+      y = Math.max(y, r1);
+    }
+    if (y < y1 && sx1 > sx0) out.push({x: sx0, y, width: sx1 - sx0, height: y1 - y});
+  }
+  return out;
+}
+
 // ================================================================= the component
 
 export type SkyProps = {spec: SkySpec};
@@ -599,6 +652,8 @@ export const Sky: React.FC<SkyProps> = ({spec}) => {
   const stops = useMemo(() => skyStops(spec), [spec]);
   const warm = useMemo(() => sunStops(spec), [spec]);
   const dither = m.dither ? ditherPaths(m.dither) : null;
+  // the dither only where the sky varies (ditherRects), as one path of disjoint rects
+  const dpath = dither ? ditherRects(spec).map((r) => `M${r.x} ${r.y}h${r.width}v${r.height}h${-r.width}z`).join('') : '';
   const {x, width, top, bottom, sun} = m;
   const h = bottom - top;
   const warmRgb = sun ? css(headroom(oklabToRgbInGamut(sun.lab), roomOf(m))) : '';
@@ -651,8 +706,8 @@ export const Sky: React.FC<SkyProps> = ({spec}) => {
       ) : null}
       {dither ? (
         <>
-          <rect x={x} y={top} width={width} height={h} fill={`url(#${id}p)`} style={{mixBlendMode: 'plus-lighter'}} />
-          <rect x={x} y={top} width={width} height={h} fill={`url(#${id}m)`} style={{mixBlendMode: 'difference'}} />
+          <path d={dpath} fill={`url(#${id}p)`} style={{mixBlendMode: 'plus-lighter'}} />
+          <path d={dpath} fill={`url(#${id}m)`} style={{mixBlendMode: 'difference'}} />
         </>
       ) : null}
     </g>

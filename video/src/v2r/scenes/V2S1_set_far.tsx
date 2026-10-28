@@ -34,13 +34,33 @@ const CALM_FIELD = '#8F93AE';
 const TOWER = {x0: 258, x1: 346, top: 598};
 /** (computed at render: the clean pen's tier pull is known only once the film's pen is set) */
 const towerField = () => backing(tierFill(CM.limestone, 'environment'), atmos(CALM_FIELD, HAZE_K.near, S1_HAZE), {tier: 'environment', min: 15});
-const CalmTower: React.FC = () => (
-  <Fill d={`M${TOWER.x0} ${FOOT}L${TOWER.x0} ${TOWER.top + 8}L${TOWER.x0 + 6} ${TOWER.top}L${TOWER.x1} ${TOWER.top}L${TOWER.x1} ${FOOT}Z`} color={towerField()} offset={false} seed="s1farTower" />
-);
+const CalmTower: React.FC = () => {
+  const field = towerField();
+  const {x0, x1, top} = TOWER;
+  const step = top + 26;
+  // its window rows: tone-on-tone (lib/depth toneOnTone, dE <= 6), in a few rows of three: a far office tower, calm
+  const win = toneOnTone(field, {dE: 5});
+  let wins = '';
+  for (let y = step + 22; y < FOOT - 60; y += 34) for (const x of [x0 + 12, x0 + 34, x0 + 56]) wins += `M${x} ${y}h14v18h-14Z`;
+  // its sun edge (the left: the low sun is west) one lit step; its foot warmed toward the horizon (the air near the
+  // ground is the sky's lowest colour)
+  const lit = atmos(field, 0.18, '#FFFFFF');
+  const foot = atmos(field, 0.35, S1_HAZE);
+  return (
+    <>
+      {/* the body with a stepped top: a set-back crown and a small plant box on it */}
+      <Fill d={`M${x0} ${FOOT}L${x0} ${step}L${x0 + 14} ${step}L${x0 + 14} ${top}L${x1} ${top}L${x1} ${FOOT}Z`} color={field} offset={false} seed="s1farTower" />
+      <Fill d={`M${x0 + 22} ${top}L${x0 + 22} ${top - 8}L${x0 + 52} ${top - 8}L${x0 + 52} ${top}Z`} color={atmos(CM.sage, HAZE_K.near, S1_HAZE)} offset={false} seed="s1farTowerGarden" />
+      <Fill d={wins} color={win} offset={false} seed="s1farTowerWin" />
+      <Fill d={`M${x0} ${step}L${x0 + 5} ${step}L${x0 + 5} ${FOOT}L${x0} ${FOOT}Z M${x0 + 14} ${top}L${x0 + 19} ${top}L${x0 + 19} ${step}L${x0 + 14} ${step}Z`} color={lit} offset={false} seed="s1farTowerLit" />
+      <Fill d={`M${x0} ${FOOT - 56}L${x1} ${FOOT - 56}L${x1} ${FOOT}L${x0} ${FOOT}Z`} color={foot} offset={false} seed="s1farTowerFoot" />
+    </>
+  );
+};
 /** Every far building's hidden foot (behind the bridge railing). */
 const FOOT = 944;
 /** How far each far plane mixes toward S1_HAZE (V2S1_set_core): each a clear step, the bridge the nearest. */
-export const HAZE_K = {far: 0.8, mid: 0.62, near: 0.46, bridge: 0.3, rail: 0.36} as const;
+export const HAZE_K = {far: 0.8, mid: 0.62, near: 0.46, bridge: 0.3, rail: 0.36, bus: 0.58} as const;
 
 // ---------------------------------------------------------------- the far roofs
 
@@ -65,8 +85,11 @@ type Bld = {
 
 const FAR: Bld[] = [
   {x0: -30, x1: 28, top: 770, wall: CM.stoneShade, roof: 'flat'},
-  {x0: 118, x1: 196, top: 758, wall: CM.limestone, roof: 'flat', win: {w: 4, h: 5, gx: 9, gy: 11}},
-  {x0: 196, x1: 300, top: 774, wall: CM.stoneShade, roof: 'pitch', roofCol: CM.stoneShade, stacks: [[226, 14], [272, 12]]},
+  // under the sun ONE near-level roof edge cuts the disc (the art director: a V notch between this flat roof and the
+  // gable left an orange tooth under the disc, a speech bubble): the flat roof runs on over the gable's eave, and the
+  // gable keeps no chimneys
+  {x0: 118, x1: 216, top: 758, wall: CM.limestone, roof: 'flat', win: {w: 4, h: 5, gx: 9, gy: 11}},
+  {x0: 196, x1: 300, top: 774, wall: CM.stoneShade, roof: 'pitch', roofCol: CM.stoneShade},
   {x0: 300, x1: 370, top: 752, wall: CM.limestone, roof: 'flat', win: {w: 4, h: 5, gx: 10, gy: 11}},
 ];
 const MID: Bld[] = [
@@ -401,7 +424,9 @@ const Bus: React.FC = () => {
   b.rect(CM.box, xl + L - 24, y0 + 5, 18, 8);
   b.rect(CM.brickDeep, xl, y1 - 10, L, 3);
   for (const wx of [xl + 30, xl + L - 40]) b.fill(CM.coatSlate, ovalPath(wx, y1 - 4, 9, 9));
-  hazeBatch(b, [HAZE_K.bridge]);
+  // calmer than the bridge itself (the art director: it competed with the first copy at ~2.0); its time stays the
+  // sound's (audio/v2r/sheet.py: the bus at 1.10)
+  hazeBatch(b, [HAZE_K.bus]);
   return <CellPaint b={b} seed="s1bus" cell={1000} misreg={0} live />;
 };
 
@@ -413,15 +438,16 @@ type BirdSpec = {x: number; y: number; delay: number; dur: number; c1: Pt; c2: P
  *  curve across the sun, never above y 600. Small and far, slate (never the plum anchor). The six on the far roofs that
  *  lifted on "life" are cut (the hit at 4.98 is the row's). */
 const RAIL_BIRDS: BirdSpec[] = [
-  // the quadratic's midpoint (u 0.5) = 0.25 perch + 0.5 c1 + 0.25 c2 lands on the disc (200, 690): they wheel ACROSS it
-  {x: 150, y: BRIDGE.railTop, delay: 0.0, dur: 1.55, c1: [318, 598], c2: [-170, 612], size: 18, ph: 0.3},
-  {x: 166, y: BRIDGE.railTop, delay: 0.06, dur: 1.7, c1: [330, 612], c2: [-150, 634], size: 17, ph: 1.9},
-  {x: 181, y: BRIDGE.railTop, delay: 0.03, dur: 1.62, c1: [312, 590], c2: [-190, 600], size: 19, ph: 3.1},
-  {x: 197, y: BRIDGE.railTop, delay: 0.11, dur: 1.82, c1: [340, 624], c2: [-140, 648], size: 16, ph: 4.4},
-  {x: 214, y: BRIDGE.railTop, delay: 0.16, dur: 1.75, c1: [326, 604], c2: [-160, 622], size: 18, ph: 5.2},
+  // west, low in front of the far roofs (below the roofline y ~752 until x < 120), then up off the frame's left edge:
+  // never across the sun's disc (the art director: five dark birds across the disc competed with the first copy)
+  {x: 150, y: BRIDGE.railTop, delay: 0.0, dur: 1.9, c1: [40, 880], c2: [-190, 700], size: 12, ph: 0.3},
+  {x: 166, y: BRIDGE.railTop, delay: 0.08, dur: 2.05, c1: [56, 896], c2: [-170, 720], size: 11, ph: 1.9},
+  {x: 181, y: BRIDGE.railTop, delay: 0.04, dur: 1.95, c1: [30, 870], c2: [-210, 690], size: 12, ph: 3.1},
+  {x: 197, y: BRIDGE.railTop, delay: 0.14, dur: 2.15, c1: [66, 904], c2: [-160, 736], size: 10, ph: 4.4},
+  {x: 214, y: BRIDGE.railTop, delay: 0.2, dur: 2.1, c1: [50, 888], c2: [-180, 712], size: 11, ph: 5.2},
 ];
-/** Birds are slate (tier C), never the plum anchor (the anchor is W's alone). */
-const BIRD = CM.coatSlate;
+/** Birds are tier C, pale and small (CRAFT §f.6: far birds pale), never the plum anchor (the anchor is W's alone). */
+const BIRD = atmos(CM.coatSlate, 0.55, S1_HAZE);
 
 function birdsInto(b: Batch, t: number, birds: BirdSpec[], liftAt: number, ceil = 600) {
   for (const s of birds) {

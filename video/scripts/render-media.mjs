@@ -20,7 +20,8 @@
 //   x264 CRF 14, preset slow, aq-mode 3, yuv420p (8-bit High: every phone and platform decodes it), mp4 faststart.
 //   node scripts/render-media.mjs Film2R out/v2r_master.mp4 --entry=src/entry-v2r-film.tsx --master --props='{"draftLabel":false}'
 //   python3 -I scripts/qa/check_banding.py out/v2r_master.mp4 --region <the sky> --times <the sky shots>
-// --crf / --codec still override; a 1440 x 2560 YouTube master is --master --scale=1.3333.
+// --crf / --codec still override; a 1440 x 2560 YouTube master is --master --scale=4/3 (a fraction is fine; a decimal
+// that misses whole pixels, 1.3333 -> 2559.94 px, which Remotion refuses, snaps to the nearest whole-pixel size).
 import path from 'node:path';
 import fs from 'node:fs';
 import {fileURLToPath} from 'node:url';
@@ -39,7 +40,11 @@ const opt = Object.fromEntries(rest.filter((a) => a.startsWith('--')).map((a) =>
   return i < 0 ? [k, 'true'] : [k.slice(0, i), k.slice(i + 1)];
 }));
 const inputProps = opt.props ? JSON.parse(opt.props) : {};
-const scale = opt.scale ? Number(opt.scale) : 1;
+const fraction = (v) => {
+  const m = String(v).match(/^\s*([\d.]+)\s*\/\s*([\d.]+)\s*$/);
+  return m ? Number(m[1]) / Number(m[2]) : Number(v);
+};
+let scale = opt.scale ? fraction(opt.scale) : 1;
 const concurrency = opt.concurrency ? Number(opt.concurrency) : 3;
 const codec = opt.codec ?? 'h264';
 /** The master encode (see the header): lossless frames, one BT.709 conversion, x264 CRF 14 slow + aq-mode 3. */
@@ -63,6 +68,10 @@ fs.mkdirSync(path.dirname(out), {recursive: true});
 const t0 = Date.now();
 const serveUrl = await bundle({entryPoint, rootDir: root, publicDir: path.join(root, 'public'), enableCaching: true, onProgress: () => undefined});
 const composition = await selectComposition({serveUrl, id: compId, inputProps, browserExecutable, chromiumOptions, logLevel: 'error'});
+if (!Number.isInteger(composition.height * scale) || !Number.isInteger(composition.width * scale)) {
+  const snap = Math.round(composition.height * scale) / composition.height;
+  if (Math.abs(snap - scale) < 1e-3 && Number.isInteger(composition.width * snap)) scale = snap;
+}
 const t1 = Date.now();
 const total = frameRange ? frameRange[1] - frameRange[0] + 1 : composition.durationInFrames;
 let shown = 0;
