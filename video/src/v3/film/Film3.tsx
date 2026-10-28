@@ -7,7 +7,8 @@
 //   captions.json  pop captions from public/v3/voice_words.json (scripts/film_captions.py + captions_pages.txt)
 //   scenes/        one file per sequence (each starts as a placeholder playing the G5b panels it replaces:
 //                  scenes/g5b_panels.tsx; lanes replace them; scenes/index.ts registers them)
-//   voice          public/v3/voice.wav; sound cues = the locked board's (public/v3/animatic.json "sfx")
+//   voice          public/v3/voice.wav; sound cues = the locked board's (public/v3/animatic.json "sfx") plus the
+//                  payoff's thoom at 36.98 (PAYOFF_THOOM: the hook's 4.04 beat rhymed in sound too)
 //   frame 0        the core line in words until 3.37 s (and from the loop roll on), spoken captions under it
 //   draft          G5: no edges / paper / texture; a burned-in "G5 · <sequence> · <timecode>" label
 //   seam probe     Film3Seams: each seam's two builders alone at its frames f - 1 and f (lib/sequence.tsx), for
@@ -39,7 +40,12 @@ export const film3Scenes: FilmScene[] = (scenesJson as FilmScene[])
   .map((s) => (sceneTones[s.id] ? {...s, captionTone: sceneTones[s.id]} : s))
   .map((s) => (s.transitionOut?.type === 'unbuild' ? {...s, transitionOut: {...s.transitionOut, captionAt: FILM3_LOOP_CAPTION_AT}} : s));
 export const film3Captions = captionsJson as CaptionBeat[];
-export const film3Sfx = (animatic as {sfx: FilmSfx[]}).sfx;
+/** The payoff's rhyme lands in sound as the hook's did (assembly review R1-7): at 36.98 the data center's sign lights
+ *  and its rows light one per syllable of "an AI data center" (outside.tsx HALL_ROWS), the hook's 4.04 beat rhymed, so it
+ *  takes the hook's thoom (its 21.72 level: the voice stays on top). The locked board's list (public/v3/animatic.json)
+ *  stays as it was. */
+export const PAYOFF_THOOM: FilmSfx = {src: 'v3/v3_thoom.wav', t: 36.98, gain: 0.5};
+export const film3Sfx: FilmSfx[] = [...(animatic as {sfx: FilmSfx[]}).sfx, PAYOFF_THOOM];
 /** Film seconds (the voice: 41.15 s). */
 export const film3Seconds = filmDuration(film3Scenes);
 /** Frames at 60 fps: ceil(seconds * fps), the same rounding as Film's loop seam. */

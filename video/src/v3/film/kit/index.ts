@@ -31,8 +31,8 @@ export type {ChipFactoryProps, VanProps, BubbleProps} from './Props';
 // ---- G5b: the dressing and life kit (kit/README.md "Life and density kit"; docs/v3/density_plan_g5b.md §2)
 export {TAU, sway, sway2, bob, ring, rings, hopY, stepped, ease01, events, twinkle, windowLit, loopPos, crossing, shuttle, puffs, sweep, floatCam} from './idle';
 export type {WindowForce, PuffOpts, Puff, FloatOpts} from './idle';
-export {Pip3, PipTiny, PIP_EMBER, pipPlace} from './Pip3';
-export type {Pip3Props, PipPoseKey, LookKey, PipHop, PipTinyProps} from './Pip3';
+export {Pip3, PipTiny, PIP_EMBER, pipPlace, shrugK} from './Pip3';
+export type {Pip3Props, PipPoseKey, LookKey, PipHop, PipShrug, PipTinyProps} from './Pip3';
 export {WINTER, personGeo, WinterPerson, winterPersonMat, winterPhoneAt, BackRow, backRowLayout, backRowPhones, Walker, Dog, TinyWalkers, Tiny, WindowSilhouette, WindowLife, Worker, MiniCrate, Guard} from './People3';
 export type {Wear, CoatDetail, PersonMove, WinterPersonProps, BackRowPerson, BackRowProps, WalkerProps, TinyKind, TinyWalkersProps, SilWho, WindowSilhouetteProps, LifeWindow, WorkerProps} from './People3';
 export {BAND, SnowLayers, SnowSill, SnowCap, Frost, PuffTrain, Smoke, Steam, CoolingPlume, Exhaust, NearFronts, SkyClouds, LowClouds, BirdV, Icicles} from './Weather';

@@ -1,10 +1,11 @@
 // kit/Fleet.tsx (the WINDOW lane's kit requests, docs/v3/flow_v2.md §7): the street's vehicles and the queue's paper,
 // drawn for the clean pen as flat shapes with soft corners (CRAFT §c), so one file holds them all:
 //   FleetVan     variant 'van' (THE laptop van: cream box, the laptop decal), 'dc' (the data center's truck: x1.4 the
-//                van, dcSide box, a mini data center with its lit "AI" sign on the side) and 'better' (the NEW laptop
-//                decal with "BETTER" over it). `line` = the subject's one closed outline (3.0 px, inside the fill, in
-//                the body's own deep shade); off it, no line at all (B / C). `lift` = warm light on it (the gate's
-//                pool: "lit at last"), 0..1.
+//                van, dcSide box, a mini data center with its lit "AI" sign on the side) and 'better' (a bigger box on
+//                the same chassis, a Luton box van: the chart's BETTER laptop, its "BETTER" pill over the NEW laptop
+//                with the lit peach screen, sized to read at phone size; BETTER_VAN). `line` = the subject's one
+//                closed outline (3.0 px, inside the fill, in the body's own deep shade); off it, no line at all (B /
+//                C). `lift` = warm light on it (the gate's pool: "lit at last"), 0..1.
 //   NoticeFlip   a notice on two posts with a calendar binding: each face swings DOWN over the last from the binding
 //                (squash on, outBack; no fade), as the Calendar flip does up. Faces are nodes in face-local px.
 //   CrateFlight  ONE small crate of gold sticks on an arc, shrinking into its target (StickFlight's grammar for a
@@ -98,18 +99,37 @@ export type FleetVanProps = {
   scaleDc?: boolean;
   /** The decal's own tier (default: the van's: subject when `line`, else environment). */
   decalTier?: TierT;
+  /** 'better': its "BETTER" pill's strength, 0 = full (white pill, its 2 px outline, ink letters: the van's beat), 1 =
+   *  calm (a pale step over the box, no outline, soft letters), 0.5 = the 3-frame half step. Default: 0 while `line`
+   *  (the van is the subject), else 1: the pill steps with the van's own outline, one event. */
+  labelK?: number;
 };
+
+/** THE BETTER VAN (assembly review R3-5: at phone size it was "one more white laptop van": its "BETTER" was ~60 x 18 px
+ *  and its laptop ~60 x 45 px in SQE's held x1.35 push, so "Normally you'd wait for the better one." had no picture).
+ *  The same chassis, length and wheels as the van (the lane's layout, its contact shadow and exhaust stay true), with a
+ *  bigger box: `len` of the van's length (the van's 0.66; the cab shorter) and `tall` x its height (a Luton box rising
+ *  over the cab: still under the notice's lowest line at the lane's head, y 1144 vs the roof snow's 1147). On the box,
+ *  the chart's 10.82 BETTER laptop (SQB_chart BetterBadge): a warm-white pill, its 2 px red-brown outline and ink letters
+ *  at `font` x the van's height (~h x 0.4: 16 -> 27 px at rest, 21.6 -> 36.5 px in the push), over the NEW laptop (its lit
+ *  peach screen, `laptop` x the box) whose lid's top quarter it overlaps; the deck stays clear of the bumper. */
+export const BETTER_VAN = {len: 0.74, tall: 1.2, font: 0.386, pill: {w: 3.34, h: 1.04, top: 3}, laptop: 0.55, lidH: 0.48};
+/** The pill off the van's beat (labelK 1): a pale step over the box, the letters a soft warm brown (L* ~64). */
+const BETTER_CALM = {pill: '#FAEEE4', text: '#BE9180'};
 
 /** The geometry of a FleetVan (canvas px): its outline path (for shadows and rims), its back door (where a crate goes
  *  in / comes out), its size. */
 export function fleetVanGeo(p: Pick<FleetVanProps, 'x' | 'y' | 'w' | 'variant' | 'dir' | 'scaleDc'>) {
   const dir = p.dir ?? 1;
+  const better = p.variant === 'better';
   const w = p.variant === 'dc' && p.scaleDc !== false ? p.w * 1.4 : p.w;
   const h = w * (p.variant === 'dc' ? 0.46 : 0.5);
   const wheelR = w * 0.085;
   const x0 = p.x - w / 2;
-  const top = p.y - h;
-  const boxW = w * (p.variant === 'dc' ? 0.72 : 0.66);
+  /** The cab's reference top (the van's height); `top` is the highest point: the box's top (taller on 'better'). */
+  const cabTop = p.y - h;
+  const top = p.y - h * (better ? BETTER_VAN.tall : 1);
+  const boxW = w * (p.variant === 'dc' ? 0.72 : better ? BETTER_VAN.len : 0.66);
   const floor = p.y - wheelR * 0.55;
   // drawn facing right, mirrored about x for dir -1
   const mx = (x: number) => (dir === 1 ? x : 2 * p.x - x);
@@ -117,13 +137,13 @@ export function fleetVanGeo(p: Pick<FleetVanProps, 'x' | 'y' | 'w' | 'variant' |
     [x0, floor],
     [x0, top],
     [x0 + boxW, top],
-    [x0 + boxW, top + h * 0.2],
-    [x0 + w * 0.88, top + h * 0.24],
-    [x0 + w, top + h * 0.56],
+    [x0 + boxW, cabTop + h * 0.2],
+    [x0 + w * 0.88, cabTop + h * 0.24],
+    [x0 + w, cabTop + h * 0.56],
     [x0 + w, floor],
   ].map(([x, y]) => [mx(x), y] as Pt);
-  const back: Pt = [mx(x0 + 4), top + h * 0.5];
-  return {w, h, wheelR, top, floor, boxW, x0, mx, body, back, box: {x: Math.min(mx(x0), mx(x0 + boxW)), y: top, w: boxW, h: floor - top}};
+  const back: Pt = [mx(x0 + 4), cabTop + h * 0.5];
+  return {w, h, wheelR, top, cabTop, floor, boxW, x0, mx, body, back, box: {x: Math.min(mx(x0), mx(x0 + boxW)), y: top, w: boxW, h: floor - top}};
 }
 
 const VAN_COLORS: Record<FleetVariant, {box: string; boxShade: string; cab: string; band: string}> = {
@@ -133,9 +153,9 @@ const VAN_COLORS: Record<FleetVariant, {box: string; boxShade: string; cab: stri
 };
 
 /** A van or a truck on the street (see the header). */
-export const FleetVan: React.FC<FleetVanProps> = ({x, y, w: w0, variant = 'van', dir = 1, line = false, lift = 0, lights = false, roll = 0, scaleDc = true, decalTier}) => {
+export const FleetVan: React.FC<FleetVanProps> = ({x, y, w: w0, variant = 'van', dir = 1, line = false, lift = 0, lights = false, roll = 0, scaleDc = true, decalTier, labelK}) => {
   const g = fleetVanGeo({x, y, w: w0, variant, dir, scaleDc});
-  const {w, h, wheelR, top, floor, boxW, x0, mx} = g;
+  const {w, h, wheelR, top, cabTop, floor, boxW, x0, mx} = g;
   const L = line ? 3 : false;
   const C0 = VAN_COLORS[variant];
   const warm = (c: string) => (lift > 0 ? mixHex(c, '#FFE2BC', 0.22 * clamp(lift)) : c);
@@ -143,12 +163,12 @@ export const FleetVan: React.FC<FleetVanProps> = ({x, y, w: w0, variant = 'van',
   const P = (pts: Pt[]) => pts.map(([px, py]) => [mx(px), py] as Pt);
   const bodyD = roundPoly(g.body, [3, 8, 6, 4, 10, 8, 3]);
   // the cab's window (sky-dark glass), the bumper band, the wheels
-  const cabWin = roundPoly(P([[x0 + boxW + w * 0.03, top + h * 0.3], [x0 + w * 0.85, top + h * 0.32], [x0 + w * 0.94, top + h * 0.54], [x0 + boxW + w * 0.03, top + h * 0.54]]), 3);
+  const cabWin = roundPoly(P([[x0 + boxW + w * 0.03, cabTop + h * 0.3], [x0 + w * 0.85, cabTop + h * 0.32], [x0 + w * 0.94, cabTop + h * 0.54], [x0 + boxW + w * 0.03, cabTop + h * 0.54]]), 3);
   const band = roundPoly(P([[x0, floor - h * 0.12], [x0 + w, floor - h * 0.12], [x0 + w, floor], [x0, floor]]), 2);
   const wheels = [x0 + w * 0.2, x0 + w * 0.79].map(mx);
   const roofSnow = rrect(Math.min(mx(x0), mx(x0 + boxW)) - 2, top - 5, boxW + 4, 7, 3.5);
-  const head = ellD(mx(x0 + w * 0.975), top + h * 0.66, w * 0.018, w * 0.026);
-  const tail = rrect(Math.min(mx(x0 - 1), mx(x0 + 5)), top + h * 0.56, 6, h * 0.12, 2);
+  const head = ellD(mx(x0 + w * 0.975), cabTop + h * 0.66, w * 0.018, w * 0.026);
+  const tail = rrect(Math.min(mx(x0 - 1), mx(x0 + 5)), cabTop + h * 0.56, 6, h * 0.12, 2);
   // the decal on the box's side (its centre)
   const bx = mx(x0 + boxW * 0.5);
   const tier: TierT = decalTier ?? (line ? 'subject' : 'environment');
@@ -172,20 +192,35 @@ export const FleetVan: React.FC<FleetVanProps> = ({x, y, w: w0, variant = 'van',
         <path d={leds} fill={mixHex(EMBER.led, EMBER.dcDark, 0.35)} />
       </>
     );
-  } else {
-    const lw = boxW * (variant === 'better' ? 0.46 : 0.5);
-    const ly = top + h * (variant === 'better' ? 0.6 : 0.56);
+  } else if (variant === 'better') {
+    // the chart's BETTER laptop on the box: the NEW laptop (lit peach screen), its deck clear of the bumper band, and
+    // the "BETTER" pill across the box over its lid's top (R3-5: sized to read at phone size)
+    const B = BETTER_VAN;
+    const lw = boxW * B.laptop;
+    const bandTop = floor - h * 0.12;
+    const ly = bandTop - 1.5 - lw * 0.28; // the hinge: deck (0.24 w) + its edge (~0.04 w) end just over the band
+    const f = Math.min(h * B.font, (boxW - 8) / B.pill.w);
+    const pw = f * B.pill.w;
+    const ph = f * B.pill.h;
+    const py = top + B.pill.top;
+    const r = ph * 0.3;
+    const k = clamp(labelK ?? (line ? 0 : 1));
     decal = (
       <>
         <Tier tier={tier}>
-          <Laptop x={bx} y={ly} w={lw} variant={variant === 'better' ? 'new' : 'old'} seed={`fleet/${variant}`} ink={2.2} />
+          <Laptop x={bx} y={ly} w={lw} lidH={B.lidH} variant="new" seed="fleet/better" ink={2.2} />
         </Tier>
-        {variant === 'better' ? (
-          <Txt x={bx} y={top + h * 0.2} size={Math.max(16, h * 0.17)} fill={EMBER.beam} fit={boxW * 0.84}>
-            BETTER
-          </Txt>
-        ) : null}
+        <path d={rrect(bx - pw / 2, py, pw, ph, r)} fill={mixHex(EMBER.white, BETTER_CALM.pill, k)} stroke={k < 0.5 ? EMBER.beam : 'none'} strokeWidth={2} />
+        <Txt x={bx} y={py + ph / 2 + f * 0.33} size={f} fill={mixHex(EMBER.ink, BETTER_CALM.text, k)} fit={pw * 0.9}>
+          BETTER
+        </Txt>
       </>
+    );
+  } else {
+    decal = (
+      <Tier tier={tier}>
+        <Laptop x={bx} y={top + h * 0.56} w={boxW * 0.5} variant="old" seed={`fleet/${variant}`} ink={2.2} />
+      </Tier>
     );
   }
   return (
