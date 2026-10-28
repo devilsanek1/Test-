@@ -7,13 +7,10 @@ before G6, instead of review agents). Generic: any entry / composition + its MP4
       [--entry src/entry-v3-film.tsx --comp Film3] [--fps 60] [--only SQD] [--seam-comp Film3Seams] \
       [--frame0 "AI is making your|next laptop pricier." --frame0-until 3.37] [--frame0-geom JSON] [--density] [--json report.json]
 
-  v2r (src/v2r/film/Film2R.tsx: FILM2R_FRAME0's numbers):
+  v2r (no frame-0 block since REVIEW_1 MUST 1, as v3: frame 0 shows the first spoken page):
   python3 -I scripts/qa/gate_check.py --mp4 out/v2r.mp4 --scenes src/v2r/film/scenes.json \
-      --captions src/v2r/film/captions.json --voice public/v2/voice.wav \
-      --frame0 "SHE SAYS: NO CRITICIZING|GOOGLE. FOR LIFE." --frame0-until 5.95 \
-      --frame0-geom '{"size":72,"baselines":[372,452],"captionBaseline":516,"captionScale":0.5306,"spoken":"first",
-                      "keys":["SAYS:","NO","NO CRITICIZING","FOR LIFE."],"source":"Source: BBC News, 21 Oct 2026",
-                      "sourceSize":20,"sourceBaseline":550}'
+      --captions src/v2r/film/captions.json --voice public/v2/voice.wav --entry src/entry-v2r-film.tsx --comp Film2R
+  (--frame0 / --frame0-geom stay for a film that still draws a frame0 block.)
 
 Checks (FAIL = exit 1; WARN never fails):
   fps        the video stream is --fps (default 60); with --entry/--comp also the composition's own fps and length
@@ -28,8 +25,8 @@ Checks (FAIL = exit 1; WARN never fails):
              (lib/Film.tsx), always on (v1's wipes S07 / S10 get the new verdicts too): cut / matchcut /
              camera-continuous / none = one hard cut at the start c (an `unbuild` transitionIn is not modelled: it is
              expected as a cut, though Film's un-build ends on the incoming scene with none);
-             push-through WITH a `bridge` colour = two cuts, into the flat bridge at c - 0.05 and out of it at
-             c + 0.05 (Film's PT_HOLD 0.1 s; the bridge itself is drawn by the film, e.g. Film2R's Bridges: lib/Film
+             push-through WITH a `bridge` colour = two cuts, into the flat bridge at c - hold/2 and out of it at
+             c + hold/2 (the join's own `hold`, else Film's PT_HOLD 0.1 s; the bridge itself is drawn by the film, e.g. Film2R's Bridges: lib/Film
              culls it), cut-like frames on its zoom legs (c - hold/2 - (dur - hold) * 0.45 ..
              c + hold/2 + (dur - hold) * 0.55, +-1 frame) are expected (not listed as extra); a window colour-matched
              to the bridge moves the visible out-cut one frame later (a WARN); the generic peak rule needs short legs
@@ -58,6 +55,7 @@ Checks (FAIL = exit 1; WARN never fails):
              glyph extents from the caption font): every page's ink and highlight boxes inside the caption band
              (--band, default 290-600) and inside the caption clip (no clipped letters), lines within the safe width
              (x 90-950: the right rail), 1-2 lines per page, ~20 characters per line (WARN), pages in time order.
+             A page with "hide" (film_captions `@hide`: a board carries its words) is never drawn, so it is skipped.
              --frame0: the frame-0 words (Film `frame0`, lines split by '|') and the spoken pages lowered under them,
              with Film.tsx's F0 layout. --frame0-geom (JSON) overrides that layout with a film's own Frame0Text
              numbers: size, baselines, captionBaseline, captionScale (as in F0), plus the optional v2r fields:
@@ -260,7 +258,7 @@ def check_captions(caps: list[dict], a, voice_s: float, fps: float) -> None:
             report("FAIL", "captions", f"{tag} starts before the page before it")
             bad += 1
         prev_s = b["s"]
-        if i in hidden:
+        if i in hidden or b.get("hide"):
             continue
         if not 1 <= len(b["lines"]) <= 2:
             report("WARN", "captions", f"{tag}: {len(b['lines'])} lines (pages are 1-2 lines)")
@@ -344,7 +342,8 @@ def check_captions(caps: list[dict], a, voice_s: float, fps: float) -> None:
         report("FAIL", "captions", f"the last page ends at {end:.3f} s, the voice at {voice_s:.3f} s")
         bad += 1
     if not bad:
-        report("PASS", "captions", f"{len(caps)} pages inside the band {band[0]:.0f}-{band[1]:.0f} and the clip {clip[0]:.0f}-{clip[1]:.0f}, x {x_lo}-{x_hi}" + (f"; frame-0 words + {len(low)} lowered pages" + (f" ({len(hidden)} hidden under the block)" if hidden else "") + (" + source line" if f0.get("source") else "") if f0_lines else ""))
+        boards = sum(1 for b in caps if b.get("hide"))
+        report("PASS", "captions", f"{len(caps)} pages" + (f" ({boards} @hide: a board carries the words)" if boards else "") + f" inside the band {band[0]:.0f}-{band[1]:.0f} and the clip {clip[0]:.0f}-{clip[1]:.0f}, x {x_lo}-{x_hi}" + (f"; frame-0 words + {len(low)} lowered pages" + (f" ({len(hidden)} hidden under the block)" if hidden else "") + (" + source line" if f0.get("source") else "") if f0_lines else ""))
 
 
 # ---------------------------------------------------------------- density (scripts/qa/density.py)
@@ -402,7 +401,7 @@ def transition_model(scenes: list[dict], fps: float) -> tuple[list, list, list, 
             seams.append((f"{sid} (seam {c:.2f} s)", fr(c)))
         elif typ == "push-through":
             # Film.tsx pushThrough: the zoom-in leg (d - hold) * 0.45 before the bridge, the pull-back 0.55 after it
-            h = hold if tr.get("bridge") else 0.0
+            h = float(tr.get("hold", hold)) if tr.get("bridge") else 0.0  # Film.tsx pushThroughHold
             if h:
                 expect += [(f"{sid} (into the push-through bridge)", fr(c - h / 2), "bridge"), (f"{sid} (out of the push-through bridge)", fr(c + h / 2), "bridge")]
             else:
@@ -652,6 +651,15 @@ def main() -> int:
                 n = max(sp, key=lambda k: d[k])
                 hit = [n]
                 spikes.append(f"{sid} frame {n} (d={d[n]:.1f}, x{d[n] / max(d[n - 1], d[n + 1], 1e-6):.1f} its neighbours)")
+        if not hit and mode == "bridge":
+            # the flat bridge's own edge: a big change INTO a still frame (or OUT of one) is the bridge's cut, even when
+            # the zoom's last step before it is as big (v2r's 0.45 s dive into W: its plum pane at 8.7x already matches
+            # the plum bridge, so the change into the bridge is no peak)
+            fl = [n for n in (f - 1, f, f + 1) if 1 <= n < len(d) - 1 and d[n] >= a.cut_min and min(d[n - 1], d[n + 1]) < 0.5]
+            if fl:
+                n = max(fl, key=lambda k: d[k])
+                hit = [n]
+                spikes.append(f"{sid} frame {n} (d={d[n]:.1f}, at the flat bridge's edge)")
         if not hit and zs:
             report("WARN", "cuts", f"{sid}: no push-through turn at its declared frame {f} (zoom per frame over {f - PT_TURN - 1}-{f + PT_TURN + 1}: " + " ".join(f"{z:.2f}" for z in zs) + ")")
         if hit:

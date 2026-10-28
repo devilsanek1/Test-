@@ -20,7 +20,7 @@ import React from 'react';
 import {CastShadow, ContactShadow, FormShade, Shade, Shadow, ShadowLayer, hull, polyD} from '../../lib/light';
 import {clamp01} from '../kit/canal/core';
 import {useTime} from '../../lib/time';
-import {B_LEGS_Y1} from '../world/map';
+import {B, B_LEGS_Y1} from '../world/map';
 import {heightAt, kz, pt, S7_BIKES, S7_BOLLARD, S7_CAFE, S7_CAFE_PAIR, S7_TREE, type P2} from './V2S7_plan';
 import {s7Canopy, s7Steps, s7WingShadeD} from './V2S7_wing';
 import {s7WestWallFace} from './V2S7_far';
@@ -66,7 +66,8 @@ export const S7WestWallShade: React.FC = () => <Shade d={s7WestWallFace()} />;
 
 /** The A-board's footprint on the forecourt: its front feet on y 1250, its back legs ~0.2 m behind. */
 const BOARD_FOOT: P2[] = [[110, B_LEGS_Y1], [684, B_LEGS_Y1], [684, 1241], [110, 1241]];
-const BOARD_H = B_LEGS_Y1 - 680;
+/** The board's height, feet to the frame's top (B.y0 - the 20 px rail: 780 since REVIEW_1 MUST 4). */
+const BOARD_H = B_LEGS_Y1 - (B.y0 - 20);
 
 export const S7BoardShadows: React.FC = () => {
   const {x, base, w} = S7_BOLLARD;

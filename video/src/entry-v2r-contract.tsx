@@ -9,7 +9,7 @@
 //   KitContractFrame-V2S1 / -V2S2 / -V2S4 / -V2S8
 //                          one assembled sample frame, 1080 x 1920, FILM seconds (frame = round(T x 60)): the kit's set
 //                          at the map's positions with K4's people, K5's Pip, the life layer and K3 stand-ins, under
-//                          the film's own captions (captions.json, the frame-0 block). The sheet's samples: V2S1 2.50,
+//                          the film's own captions (captions.json; no frame-0 block: REVIEW_1 MUST 1). Samples: V2S1 2.50,
 //                          V2S2 10.00, V2S4 17.00, V2S8 37.00.
 // Render (always GL=angle, 4 shared CPUs):
 //   GL=angle node scripts/render-frames.mjs KitContract <dir> 0 --entry=src/entry-v2r-contract.tsx --scale=0.5
@@ -26,9 +26,8 @@ import {CM, INK_PX, skyBands} from './v2r/palette';
 import * as M from './v2r/world/map';
 import {World} from './lib/World';
 import {Film} from './lib/Film';
-import type {FilmScene, Frame0Text} from './lib/Film';
+import type {FilmScene} from './lib/Film';
 import type {CaptionBeat} from './lib/Captions';
-import {skyCaption} from './lib/theme';
 import {TimeShift, useTime, clamp, ease} from './lib/time';
 import {XG, mat} from './lib/xf';
 import {Fill} from './lib/Fill';
@@ -943,25 +942,6 @@ const SampleS6: React.FC = () => (
 
 const SCENES = scenesJson as unknown as FilmScene[];
 const CAPTIONS = captionsJson as unknown as CaptionBeat[];
-/** = src/v2r/film/Film2R.tsx FILM2R_FRAME0 (mirrored here so the contract never bundles the lanes' scene files). */
-const FRAME0: Frame0Text = {
-  lines: ['SHE SAYS: NO CRITICIZING', 'GOOGLE. FOR LIFE.'],
-  size: M.FRAME0_TEXT.linePx,
-  baselines: [...M.FRAME0_TEXT.baselines],
-  until: M.FRAME0_TEXT.until,
-  source: M.FRAME0_TEXT.source,
-  sourceSize: M.FRAME0_TEXT.sourcePx,
-  sourceBaseline: M.FRAME0_TEXT.sourceBaseline,
-  keys: [
-    {t: 2.06, text: 'SAYS:'},
-    {t: 3.14, text: 'NO'},
-    {t: 3.74, text: 'NO CRITICIZING'},
-    {t: 4.77, text: 'FOR LIFE.'},
-  ],
-  spoken: 'first',
-  captionBaseline: M.FRAME0_TEXT.spokenPage.baseline,
-  captionScale: M.FRAME0_TEXT.spokenPage.px / skyCaption.size,
-};
 const SAMPLES: Record<string, React.FC> = {V2S1: SampleS1, V2S2: SampleS2, V2S4: SampleS4, V2S8: SampleS8};
 const SAMPLE_T: {id: M.ShotId; T: number}[] = [
   {id: 'V2S1', T: 2.5},
@@ -970,9 +950,9 @@ const SAMPLE_T: {id: M.ShotId; T: number}[] = [
   {id: 'V2S8', T: 37.0},
 ];
 /** One assembled shot under the film's captions at film second `at` (+ the composition's frame / 60); `bare` = no
- *  captions and no frame-0 words (the caption-band check: nothing of the kit may be drawn in y 317-556). */
+ *  captions (the caption-band check: nothing of the kit may be drawn in y 317-556). */
 const ContractFrame: React.FC<{id: string; at?: number; bare?: boolean}> = ({id, at = 0, bare}) => (
-  <Film scenes={SCENES} components={SAMPLES} captions={CAPTIONS} only={id} offset={at} audio={false} showCaptions={!bare} captionMotion="pop" frame0={bare ? undefined : FRAME0} edges={false} />
+  <Film scenes={SCENES} components={SAMPLES} captions={CAPTIONS} only={id} offset={at} audio={false} showCaptions={!bare} captionMotion="pop" edges={false} />
 );
 
 /** The map's key shapes of a shot at T (map.ts shotShapes), as thin outlines for the sheet's sample frames. */

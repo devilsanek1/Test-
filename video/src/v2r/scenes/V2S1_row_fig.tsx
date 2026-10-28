@@ -14,10 +14,10 @@
 // and snap fills; the un-build is the engine's (one ExitSync per figure).
 import React, {useId} from 'react';
 import {Fill} from '../../lib/Fill';
-import {Ink} from '../../lib/Ink';
+import {Ink, parseInk} from '../../lib/Ink';
 import {ExitSync} from '../../lib/exit';
 import {mat, XG} from '../../lib/xf';
-import {useTime} from '../../lib/time';
+import {ease, useTime} from '../../lib/time';
 import {rng} from '../../lib/rng';
 import {CM} from '../palette';
 import {penLoop, ellipsePath, circlePath, type Pt} from '../kit/cast/parts';
@@ -504,9 +504,30 @@ export type FigDrawProps = {
   /** Fill misregistration in SCREEN px (false = exact). */
   offset: [number, number] | false;
   seed: string;
+  /** ONE moving pen (frame 0's draw-on, REVIEW_1 MUST 2): the parts draw one after another at one steady speed over
+   *  `inkDur` (each part's strokes in sequence, its window its share of the ink length), a pen tip of this radius
+   *  (x the line width) on the head. Without it: every part at once (the pops). */
+  pen?: number;
+  /** Line tone per fill colour (the subject's line in its FINAL colour's shade while its fill is still paper: her coat
+   *  draws on in the teal's deep shade, at full contrast, before the flood colours it). */
+  lineTone?: Record<string, string>;
 };
 
-export const FigDraw: React.FC<FigDrawProps> = ({parts, inkPx, scale, at, inkDur = 0.1, fillAt, knockout, offset, seed}) => {
+/** Each part's [start, dur] inside a one-pen draw from `at` over `dur` (the window = its share of the ink length). */
+function penWindows(parts: FigPart[], at: number, dur: number): Map<string, [number, number]> {
+  const lens = parts.map((p) => (p.ink ? parseInk(p.ink).total : 0));
+  const total = lens.reduce((a, b) => a + b, 0) || 1;
+  const out = new Map<string, [number, number]>();
+  let acc = 0;
+  parts.forEach((p, i) => {
+    out.set(p.k, [at + (dur * acc) / total, Math.max(1e-3, (dur * lens[i]) / total)]);
+    acc += lens[i];
+  });
+  return out;
+}
+
+export const FigDraw: React.FC<FigDrawProps> = ({parts, inkPx, scale, at, inkDur = 0.1, fillAt, knockout, offset, seed, pen, lineTone}) => {
+  const win = pen !== undefined && at !== undefined ? penWindows(parts, at, inkDur) : null;
   const uid = 'rk' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const out: React.ReactNode[] = [];
   const defs: React.ReactNode[] = [];
@@ -515,7 +536,8 @@ export const FigDraw: React.FC<FigDrawProps> = ({parts, inkPx, scale, at, inkDur
   // no fill of its own (a seam, the bun's outer arc) takes the fill it sits on; the bare outlines take the paper's
   let lastFill: string = CM.ghostPaper;
   parts.forEach((p, i) => {
-    const tone = p.fill ?? lastFill;
+    const tone0 = p.fill ?? lastFill;
+    const tone = lineTone?.[tone0] ?? tone0;
     if (p.fill) lastFill = p.fill;
     if (!knockout && p.d && p.fill) {
       out.push(<Fill key={`f${p.k}`} d={p.d} color={p.fill} at={fillAt} mode="snap" offset={p.exact || off === false ? false : off} seed={`${seed}/${p.k}`} />);
@@ -528,10 +550,12 @@ export const FigDraw: React.FC<FigDrawProps> = ({parts, inkPx, scale, at, inkDur
           width={(inkPx * (p.w ?? 1)) / scale}
           color={CM.ink}
           tone={knockout ? CM.ghostPaper : tone}
-          at={at}
-          order="all"
+          at={win ? win.get(p.k)![0] : at}
+          order={win ? 'seq' : 'all'}
           pace="free"
-          dur={inkDur}
+          dur={win ? win.get(p.k)![1] : inkDur}
+          ease={win ? ease.linear : undefined}
+          tip={win ? pen : undefined}
           taper={p.taper ?? false}
           vary={0.04}
           seed={`${seed}/${p.k}`}
@@ -597,9 +621,11 @@ export type RowFigureProps = {
   offset?: [number, number] | false;
   /** Scale of the default misregistration's x part (the row's ghosts keep it small: their gaps are x). */
   misregX?: number;
-  /** Frame 0's draw-on (instead of a pop): the fills are there (pale until the flood), the outline draws on as ONE
-   *  stroke (every part at once) from `at` over `dur`. */
-  draw?: {at: number; dur: number};
+  /** Frame 0's draw-on (instead of a pop): the fills are there (pale until the flood), the outline draws on from `at`
+   *  over `dur`: every part at once, or with `tip` as ONE moving pen with a tip of that radius (x the line width). */
+  draw?: {at: number; dur: number; tip?: number};
+  /** FigDraw `lineTone` (frame 0: her coat's line in the teal's shade while the coat is paper). */
+  lineTone?: Record<string, string>;
   seed: string;
   /** Inside a parent's ExitSync already. */
   noSync?: boolean;
@@ -607,7 +633,7 @@ export type RowFigureProps = {
 
 export const POP = {outlineS: 0.1, fillDelayS: 2 / 60, settleS: 4 / 60, settleFrom: 1.06} as const;
 
-export const RowFigure: React.FC<RowFigureProps> = ({spec, x, y, h, step, stride = 1, turn = 0, inkPx, at, knockout, offset, misregX = 1, draw, seed, noSync}) => {
+export const RowFigure: React.FC<RowFigureProps> = ({spec, x, y, h, step, stride = 1, turn = 0, inkPx, at, knockout, offset, misregX = 1, draw, lineTone, seed, noSync}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const sq = Math.round(step * 100) / 100;
@@ -623,7 +649,7 @@ export const RowFigure: React.FC<RowFigureProps> = ({spec, x, y, h, step, stride
   const off = offset ?? misreg(h, seed, misregX);
   const g = (
     <XG m={mat.compose(mat.translate(x, y), mat.scale(s, s))}>
-      <FigDraw parts={parts} inkPx={inkPx} scale={s} at={draw ? draw.at : at} inkDur={draw ? draw.dur : POP.outlineS} fillAt={fillAt} knockout={knockout} offset={off} seed={seed} />
+      <FigDraw parts={parts} inkPx={inkPx} scale={s} at={draw ? draw.at : at} inkDur={draw ? draw.dur : POP.outlineS} fillAt={fillAt} knockout={knockout} offset={off} seed={seed} pen={draw?.tip} lineTone={lineTone} />
     </XG>
   );
   return noSync ? g : <ExitSync seed={`fig/${seed}`}>{g}</ExitSync>;

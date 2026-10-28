@@ -1,12 +1,12 @@
 // V2S5_text.tsx (lane L4): the S5 lettering on objects = K3's pieces (lane L5, src/v2r/kit/boards: ONE type scale and
 // one look for every lettered object in the film; TREATMENT section 5 "Texts on objects", section 8 credits):
 //   NewsBox  the US newspaper box beside the bench, START coords (face x 470-780, y 880-1230, no masthead): the headline
-//            "Google–Pentagon deal for classified work" at BODY size 34 (the director, 2026-10-27: 40 is off the type
-//            scale; nothing between 34 and 56) in 3 lines + its 18 px credit; it rides the deck's start map (small at the
-//            rail at the end: x 388-516). K3's box is drawn as is and its front page is re-lettered here at 34 (K3 still
-//            sets 40: a REQUEST to L5 to move its default).
-//   Plaque   the viewpoint plaque, END coords, popping ON "Pentagon" (scene 1.88 = 22.43): "The Pentagon" (key 56) /
-//            "US Department of Defense" (body 30). The lane's spot (L4_spec section 3): its plate on the terrace just in
+//            "Google–Pentagon deal for classified work" at 44 px in 4 rows (REVIEW_1 MUST 3: few and big, every drawn
+//            line >= 44 px; the 276-unit page holds "Google–Pentagon" on one row only under 44), no credit (the post
+//            carries it: docs/v2/POSTING_KIT.md); it rides the deck's start map (small at the rail at the end: x 388-516).
+//            K3's box is drawn as is and its front page is re-lettered here.
+//   Plaque   the viewpoint plaque, END coords, popping ON "Pentagon" (scene 1.88 = 22.43): "The Pentagon" (key 56) alone
+//            (its 30 px body is not drawn since REVIEW_1 MUST 3). The lane's spot (L4_spec section 3): its plate on the terrace just in
 //            front of the balustrade, x 441-769, y 1110-1237 (no post: its bottom edge on the border band, 7 px in front
 //            of the balustrade's base), right of the pair and in front of the news box's right half; at its pop (p 0.70,
 //            the deck 1.30x) the text stays inside x <= 880; at the end it sits below the Pentagon's facades (their bottom
@@ -47,9 +47,10 @@ const PAGE_TONES = {
   environment: {page: fromLch(88, 8, 78), rule: fromLch(73, 9, 62), text: fromLch(52, 12, 48)},
 } as const;
 
-/** The front page at body size (box units, the K3 box's own 310 x 350 frame): page, head rules, the 3-line headline at
- *  34, a short rule, the 18 px credit. Drawn over K3's page (same window; its colours follow the box's tier). */
-const PAGE34 = {headline: [104, 142, 180], midRule: 195, credit: [218, 239]};
+/** The front page (box units, the K3 box's own 310 x 350 frame; 1 unit = 1 px at the START pose): page, head rules and
+ *  the 4-row headline at 44 (rows 46 apart under the head rules at 64-67.5, the last baseline 15 units above the
+ *  window's foot). Drawn over K3's page (same window; its colours follow the box's tier). */
+const PAGE44 = {size: 44, headline: [108, 154, 200, 246]};
 
 export const NewsBox: React.FC = () => {
   const r = S5.start.newsBox;
@@ -74,12 +75,8 @@ export const NewsBox: React.FC = () => {
         <XG m={m}>
           <Fill d={rectD(W.x0 + 4, W.y0 + 3.5, W.x1, W.y1)} color={P.page} offset={false} backdrop seed="s5nb/page" />
           <Fill d={rectD(W.x0 + 14, N.rules[0] - 0.55, W.x1 - 12, N.rules[0] + 0.55) + rectD(W.x0 + 14, N.rules[1] - 0.55, W.x1 - 12, N.rules[1] + 0.55)} color={P.rule} offset={false} backdrop seed="s5nb/rules" />
-          <Fill d={rectD(cx - 72, PAGE34.midRule - 0.6, cx + 72, PAGE34.midRule + 0.6)} color={P.rule} offset={false} backdrop seed="s5nb/mid" />
-          {TXT_NEWS_BOX.headline.map((s, i) => (
-            <WorldText key={`h${i}`} x={cx} y={PAGE34.headline[i]} size={TYPE.body} text={s} anchor="middle" weight={0} color={P.text} maxW={W.x1 - W.x0 - 16} seed={`s5nb/h${i}`} />
-          ))}
-          {TXT_NEWS_BOX.credit.map((s, i) => (
-            <WorldText key={`c${i}`} x={cx} y={PAGE34.credit[i]} size={TYPE.credit} text={s} anchor="middle" color={P.text} maxW={W.x1 - W.x0 - 16} seed={`s5nb/c${i}`} />
+          {TXT_NEWS_BOX.headline44.map((s, i) => (
+            <WorldText key={`h${i}`} x={cx} y={PAGE44.headline[i]} size={PAGE44.size} text={s} anchor="middle" weight={0.9} color={P.text} maxW={W.x1 - W.x0 - 16} seed={`s5nb/h${i}`} />
           ))}
         </XG>
       </Tier>
@@ -94,7 +91,7 @@ export const Plaque: React.FC<{at: number}> = ({at}) => {
   const t = useTime();
   if (t < at) return null;
   const {x, y, stand, panel} = PLAQUE_SPOT;
-  const L = plaqueLayout(TYPE.key, undefined, stand);
+  const L = plaqueLayout(TYPE.key, undefined, stand, false);
   const x0 = x - L.w / 2;
   const x1 = x + L.w / 2;
   return (
@@ -105,7 +102,7 @@ export const Plaque: React.FC<{at: number}> = ({at}) => {
           <ContactShadow x={x + 1.5} y={y + 1} w={L.w + 3} k={1.02} h={10} />
         </ShadowLayer>
       </XG>
-      <K3Plaque at={at} x={x} y={y} stand={stand} panel={panel} tier="subject" />
+      <K3Plaque at={at} x={x} y={y} stand={stand} panel={panel} body={false} tier="subject" />
     </>
   );
 };

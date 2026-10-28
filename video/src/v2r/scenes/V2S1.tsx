@@ -2,15 +2,17 @@
 // sections 5-6 (the S1 scale sheet, S1_CLOCK, s1RowAt). RIVERSIDE from a seated eye level on our steps, looking north
 // across the canal at Google's two-storey canal wing; she walks out of the glass doors into the gold and strolls WEST
 // (screen left) while outline copies of her, greyer each time, pop up ahead of her on the towpath.
-//   t < 0      the clean pen's drawing state (frame 0 and the loop underlay; V2S1_clock S1_F0): paper, every fill a flat
-//              PALE shape, no line but the subject's outlines drawing on from -0.26 (her behind the glass, the door, W),
-//              the sun half-coloured; no Pip (S8's Pip owns the seam); its bollard pale.
-//   0.00-0.30  Pip's tinted line draws on; the flood from SUN0 (sky by f5, the wing f6-12, water, boats, the steps; Pip
-//              with it; her teal coat LAST at f18).
-//   0.40 W goes plum-dark · 0.45-0.52 the glass doors slide (the exit ding) · 0.97 she steps out · 1.10 doors shut
+//   t < 0      the loop underlay (V2S1_clock S1_F0): paper, every fill a flat PALE shape, NO line yet, the sun
+//              half-coloured; no Pip (S8's Pip owns the seam); its bollard pale.
+//   0.00-0.39  REVIEW_1 MUST 2: the strokes START at frame 0 and are the event: the clean pen draws her behind the glass,
+//              then the door (frame, leaves), then W, bold (5.4 px: S1_BOLD) with a moving tip (S1_DRAW)
+//   0.40 W goes plum-dark (its pane in full colour at once: the first colour after the sun) · 0.44-0.78 the flood from
+//              SUN0 (the sky by f30, the wing, water, boats, the steps; Pip's tinted line with it; her teal coat LAST at
+//              f47; the bold line eases back to 3.0 px by 0.80) · 0.45-0.52 the glass doors slide (the exit ding) ·
+//              0.97 she steps out · 1.10 doors shut
 //   2.00 ... 4.79 G1-G6 pop on their words · 4.54-4.98 everyone stops mid-stride · 4.98 "life": one step together,
 //   three bare outlines down the bend, Pip ears-cover · 5.55 Pip sits · 5.59 she looks back at W.
-//   Camera: LOCKED at zoom 1.00 (the pull-out is retired); 5.95-6.25 the push-through into W is the engine's. In
+//   Camera: LOCKED at zoom 1.00 (the pull-out is retired); 5.875-6.325 the push-through into W is the engine's. In
 //   5.80-6.40 nothing enters, pops or turns but the dive.
 //   Light: <Lit rig={RIG_CANAL}> (V2S1_light; the sun low left, shadows right and a little toward us).
 // Parts (each its own file; the shared clock and contract is V2S1_clock.ts):

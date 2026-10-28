@@ -2,7 +2,7 @@
  "name": "v2 S8 'Her words' @ film 38.0 s (the landing hold: her board with the quote, W lit, the lamps on; lane L6)",
  "units": "px",
  "air_hex": "#FBC09C",
- "note": "air_hex = S8_AIR. Landing pose (screen = map px): the board x 110-670 / y 680-1250; the far rows show above its top and left of it, the far bank (+1) left of it.",
+ "note": "air_hex = S8_AIR. Landing pose (screen = map px): the board x 110-670 / y 780-1250 (frame top 780 since REVIEW_1 MUST 4; face 150-630 x 800-1220); the far rows show above its top and left of it, the far bank (+1) left of it.",
  "planes": [
   {
    "name": "near band + cafe deck (things, the near lamp)",
@@ -114,11 +114,11 @@
    "poly": [
     [
      150,
-     700
+     800
     ],
     [
      630,
-     700
+     800
     ],
     [
      630,
@@ -132,7 +132,7 @@
    "roi": [
     [
      120,
-     690,
+     790,
      660,
      1240
     ]

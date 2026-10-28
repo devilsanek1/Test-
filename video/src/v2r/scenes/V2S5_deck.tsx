@@ -21,7 +21,7 @@ import {CastShadow, ContactShadow, Shadow, ShadowLayer} from '../../lib/light';
 import {Paint, ellD} from '../kit/dc/core';
 import {CRANE_T, WIPE, type PullBox} from '../kit/dc/crane';
 import {CM} from '../palette';
-import {DeckFloor, DECK_SHADE} from './V2S5_deck_floor';
+import {DeckFloor, DECK_SHADE, NEAR_AMBIENT} from './V2S5_deck_floor';
 import {balustrade, strangerBench, strangerBenchLight, parkBench, bin, fountain, tulipBed, crabPlanter, bikeAtRail, lectern, type Prop, type PropLight} from './V2S5_deck_props';
 import {lifeItems, type FigLight} from './V2S5_deck_life';
 import {TerraceTree5, RightFrame5, LampPost5, NearPetals5, TREE5_BOX, RIGHT5_BOX} from './V2S5_deck_frames';
@@ -93,6 +93,9 @@ export const S5Deck: React.FC = () => {
       <DeckFloor />
       <Paint b={rail} seed="s5deck/rail" misreg={false} />
       <ShadowLayer>
+        {/* the near paving one value step down (REVIEW_1 SHOULD 3; the rig's FORM tint: its ambient is white by day),
+            FIRST in the layer so the deck's shade paints over it (no double step under the trees) */}
+        <Shadow d={NEAR_AMBIENT} tint="form" soft={SHADE_SOFT} />
         {DECK_SHADE.map((d, i) => (
           <Shadow key={`deck${i}`} d={d} tint="cast" soft={SHADE_SOFT} />
         ))}

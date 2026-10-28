@@ -118,7 +118,7 @@ rects round her, Pip, the ghosts and every board, sign and tag.
   curl, a three-hair tuft, teddy-bear soles, a short knitted mustard scarf lifting in the canal wind; its contour ONE loose continuous stroke per
   pose, 2-3 gaps, open at the head top and base [T2] (fallback: split at the ear). Body `#9497D8` (ΔE76 39-59 from every ground), shade
   `#7579C0`, inner ear `#F2C3CC`, scarf `#D4A960`; ink ~3.4 px, fill offset 3 / 2 px; 86-120 px (>= 44 px in S5's end frame); idle always. Never
-  in y 317-556, the right rail (x > 780 below y 840) or over her; never within 200 px of the F11 clause. One reaction per shot, never a gag near
+  in y 317-556, the right rail (x > 780 below y 840) or over her; never within 200 px of the F11 clause (retired with the clause, REVIEW_1 MUST 3). One reaction per shot, never a gag near
   harm, none on Google's beat.
 - **Pip per shot:** S1 in colour at f0 on the waterline bollard (700, 1235), head follows her 1.25, **ears-cover on "life" 4.98**, hops up-left
   into the dive 5.90 · S2 lands on the railing post behind the bench (590, 1050), **its one beat: on "But" (8.30) its head turns to the wall**,
@@ -232,7 +232,9 @@ body and credits at full-screen phone width, ~390 px):
   9to5Google" (F9).
 - **S5 newspaper box** (§6): **Google–Pentagon deal for classified work** (40 px, 3 lines) + "Reported Apr 2026 · The Information via Japan
   Times; 9to5Google" (18 px). The plaque at 22.43: **The Pentagon · US Department of Defense**.
-- **S6 deal board** (the record, L5; 560 x 560): at the cut the frame, the tag, the FULL clause and the credit are up; the purpose line pops ON
+- **S6 deal board** (REVIEW_1 fix pass B, 2026-10-28: 560 x 460, its top at 780; the clause and the credit are NOT drawn, they
+  are in the post caption and the pinned comment, `POSTING_KIT.md`; every drawn line >= 44 px; the rest of this bullet is
+  the earlier spec) (the record, L5; 560 x 560): at the cut the frame, the tag, the FULL clause and the credit are up; the purpose line pops ON
   "any" 24.03, never before the clause [T6/T3]: **APRIL 2026 DEAL** (34 px tag) / **"any lawful government purpose"** (>= 56 px, 2 lines) /
   **"should not be used for domestic mass surveillance or autonomous weapons (including target selection) without appropriate human
   oversight and control"** (34 px, in full) / 26.40, on "veto": **Lawful use: decided by the Pentagon** (34 px, F12 paraphrase, no quote
@@ -295,8 +297,8 @@ the clause.
   eye level; no glow, rim, looming, dolly-zoom or sting; S7 and S8 share one light. **V4** she is invented, small, faceless; staff faceless,
   unnamed; the narrator reads every quote. **V5** "for life" as text only inside the frame-0 block with SHE SAYS (to 5.95, cover included),
   shown once, boxed once, never quoted or stamped; the ghosts sit under SHE SAYS. **V6** no contract drawn; quote marks only on exact words
-  (F5, F10, F11, F13, F14, F16, F18). **V7** blinds and a hood are people's own privacy, no gag imagery. **V8** nothing legal. **V9** clause
-  first at 24.00, purpose line on "any" 24.03, both readable to 28.06 (the board drifts 25 px/s, parallel to the lens). **V10** "classified",
+  (F5, F10, F11, F13, F14, F16, F18). **V7** blinds and a hood are people's own privacy, no gag imagery. **V8** nothing legal. **V9** (RETIRED by
+  REVIEW_1 MUST 3: the clause is in the post, not on the board) clause first at 24.00, purpose line on "any" 24.03, both readable to 28.06 (the board drifts 25 px/s, parallel to the lens). **V10** "classified",
   never "secret"; no infinity or blank cheque; windows show no use; the board's F12 line says who decides lawful use; nobody is shut out by a
   door. **V11** five windows of ~400 and one bench staffer, no number, no empty desks. **V12** no cameras, eyes, guards, escorts or "watched"
   beat; the camera never inside Google looking out at her; Google's board never mentions her clause. **V13** she is never in Washington; deal

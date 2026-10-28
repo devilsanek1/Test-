@@ -7,8 +7,8 @@ win in that order; `STYLE.md` holds the values); this page is only the plumbing.
 | file | owner | what |
 |---|---|---|
 | `src/v2r/palette.ts` | engine K1 | "10 Canal Mint": role tokens `CM.*` (exact TREATMENT §2 hex), the house theme tokens rewritten IN PLACE at load, the four light states (`LIGHT`, `TOD`, `SHOT_LIGHT`, `skyBands` / `skyKey`), caption tones, `problems()`. **Every entry imports it FIRST.** |
-| `src/entry-v2r-film.tsx` | engine K8 | `Film2R` (2345 f, 60 fps, props `{draftLabel}`: ON for reviews, `false` for the final), `Film2RShot {id}`, `Film2R-<ID>`, `Film2RBare` (no captions / frame-0 words / credits / label). |
-| `src/v2r/film/Film2R.tsx` | engine | `<Film>` + the data below; the frame-0 block (`FILM2R_FRAME0`), engine credits, the push-through bridge, cues. |
+| `src/entry-v2r-film.tsx` | engine K8 | `Film2R` (2345 f, 60 fps, props `{draftLabel}`: ON for reviews, `false` for the final), `Film2RShot {id}`, `Film2R-<ID>`, `Film2RBare` (no captions / credits / label). |
+| `src/v2r/film/Film2R.tsx` | engine | `<Film>` + the data below (no frame-0 block since REVIEW_1 MUST 1); engine credits, the push-through bridge, cues. |
 | `src/v2r/film/scenes.json` | engine (integrator) | V2S1-V2S8: THROUGHLINE §3's times and transitions, each with its join's `carrier` (+ `light`, `lane`, `note`). Hand-written. |
 | `src/v2r/film/captions_pages.txt` -> `captions.json` | engine | pop captions on the HEARD clock (§4). |
 | `public/v2r/voice_words_heard.json` | engine | `public/v2/voice_words.json` with beat_map §2's audible onsets / voiced ends; "can't" + "veto" split. |
@@ -54,13 +54,14 @@ figure wiper there (a stand-in only).
   in the right rail (x > 780 below y 840 for boards and Pip), the draft label lives bottom-left (y > 1850).
 
 ## 3. Frame 0, captions, credits (engine)
-- `FILM2R_FRAME0`: SHE SAYS: NO CRITICIZING / GOOGLE. FOR LIFE. (72 px, baselines 372 / 452) + "Source: BBC News, 21 Oct 2026"
-  (20 px, 550), until 5.95; box keys SAYS: 2.06 · NO 3.14 · NO CRITICIZING 3.74 · FOR LIFE. 4.77; `spoken: 'first'` = only "She
-  [quit] Google." (52 px, baseline 516) under it; from the loop roll (39.04) the words return without a box.
+- Frame 0 (REVIEW_1 MUST 1; playbook "Hook and pacing": no title over the captions, as Film3): page 1 "She [quit] Google."
+  at the house size from f0; "And she says her contract / bans her from [criticizing] it…" 2.00 (its long lines set it at
+  ~81 px), "[for life]." 4.79, out at 5.88 as the dive starts; from the loop roll (39.04) page 1 returns, as at f0. The core
+  line is the cover's text and the source the post's (`docs/v2/POSTING_KIT.md`).
 - Captions: `python3 -I scripts/film_captions.py --words public/v2r/voice_words_heard.json --pages src/v2r/film/captions_pages.txt
   --out src/v2r/film/captions.json --spell criticizing=criticising` (her quote in British spelling). House geometry: 98 px at 387 /
-  510 (the 317-556 block; boxes reach y 299). Pages 2-6 are hidden under the block but keep every word.
-- Credits: the frame-0 source line (0-5.95, and from 39.04) and S8's caption-band source 33.16-36.54 (`FILM2R_CREDITS`); every other
+  510 (the 317-556 block; boxes reach y 299). `@out` empties the band through the two plum dives (5.88, 14.64).
+- Credits: S8's caption-band source 33.16-36.54 (`FILM2R_CREDITS`; S1's source line is gone: REVIEW_1 MUST 1); every other
   credit is drawn on its object by its lane (TREATMENT §8).
 
 ## 4. Previews (always GL / --gl=angle, --concurrency=2; the conform: stills and short clips at --scale 0.25-0.4 only, no full-film renders but the orchestrator's assembly)
@@ -78,12 +79,11 @@ Palette check: `problems()` in `src/v2r/palette.ts` (pass measured coverage for 
 ## 5. The gate check
 ```bash
 python3 -I scripts/qa/gate_check.py --mp4 <render.mp4> --scenes src/v2r/film/scenes.json --captions src/v2r/film/captions.json \
-  --voice public/v2/voice.wav --entry src/entry-v2r-film.tsx --comp Film2R \
-  --frame0 "SHE SAYS: NO CRITICIZING|GOOGLE. FOR LIFE." --frame0-until 5.95 --frame0-geom '{"size":72,"baselines":[372,452],"captionBaseline":516,"captionScale":0.5306,"spoken":"first","keys":["SAYS:","NO","NO CRITICIZING","FOR LIFE."],"source":"Source: BBC News, 21 Oct 2026","sourceSize":20,"sourceBaseline":550}'   # = FILM2R_FRAME0; cuts follow transitionIn (push-through bridge: cuts at c +- 0.05; foreground-wipe: no cut); one shot: --only V2S4 on a Film2R-V2S4 render
+  --voice public/v2/voice.wav --entry src/entry-v2r-film.tsx --comp Film2R   # no --frame0 since REVIEW_1 MUST 1; cuts follow transitionIn (push-through bridge: cuts at c +- hold/2, the join's own `hold` 0.05 for V2S2 / V2S4; foreground-wipe: no cut); one shot: --only V2S4 on a Film2R-V2S4 render
 ```
 Expected (the G5 assembly master, 2026-10-28, full size: `docs/v2/ASSEMBLY.md`): PASS, 4 WARN (V2S2's out-of-bridge cut at
 f370, not f369: the dark window matches the plum bridge; V2S7's cut at f1685, not f1686; a cut-like f1429 inside the S5 -> S6
-wipe, the wiper's own motion, no pop; extra cut-like f24 (the draw-on) and f2336 (the un-build)); frame 0 is checked with
-FILM2R_FRAME0 via --frame0-geom (box x pad not modelled: eye-check the key boxes at full size). The master's other checks
+wipe, the wiper's own motion, no pop; extra cut-like f24 (the draw-on) and f2336 (the un-build)). Fix pass A's numbers:
+`docs/v2/REVIEW_1.md` "Fix pass A". The master's other checks
 (av_lag, the lints, light, depth, banding and their regions): ASSEMBLY.md.
 Engine note: lib/Film never draws a push-through `bridge` (it culls the outgoing scene first); Film2R draws it itself.

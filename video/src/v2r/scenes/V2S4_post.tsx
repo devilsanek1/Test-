@@ -10,9 +10,10 @@
 //   S4Plates  (V2S4.tsx draws it ABOVE Pip and the boat): the two arrow plates pointing WEST, top-to-bottom = time
 //             order. 18.92 "military": the DEC 2025 plate knocks onto the post (its paper face grows out of its socket
 //             to the tip in ~0.1 s with a small overshoot), its ONE closed edge (tier A) and its closed plum keyline,
-//             then "DEC 2025" / "unclassified work" / the credit pen on. 19.43-19.80: the APR 2026 plate, complete ON
-//             "heading". They are the top layer so nothing ever moves over the lettering.
-// Lettering: K3 `WorldText` + `TXT_PLATES` (never retyped): keys 56 px with faux weight 0.9, body 31 px, credits 18 px.
+//             then "DEC 2025 · unclassified" pens on. 19.43-19.80: the APR 2026 plate, complete ON "heading". They are
+//             the top layer so nothing ever moves over the lettering.
+// Lettering: K3 `WorldText` + `TXT_PLATES` (never retyped): ONE row per plate, the key 52 px + its short word 44 px,
+// faux weight 0.9 (REVIEW_1 MUST 3: few and big; the sources are in the post, docs/v2/POSTING_KIT.md).
 import React, {useMemo} from 'react';
 import {CM, INK_PX} from '../palette';
 import {Fill} from '../../lib/Fill';
@@ -121,16 +122,15 @@ export const S4Post: React.FC = () => {
 
 type PlateSpec = {
   r: MAP.Rect;
-  text: {key: string; body: string; credit: string};
+  text: {key: string; short: string; body: string; credit: string};
   /** The face starts to grow out of its socket. */
   at: number;
   /** Spring of the face (w0 rad/s, damping ratio). */
   w0: number;
   zeta: number;
-  /** Pen windows [start, end] for the key, the body, the credit. */
+  /** Pen windows [start, end] for the key and its short word (the row ends on the last). */
   key: [number, number];
   body: [number, number];
-  credit: [number, number];
   seed: string;
 };
 
@@ -142,8 +142,7 @@ const PLATES: PlateSpec[] = [
     w0: 34,
     zeta: 0.74,
     key: [19.0, 19.18],
-    body: [19.12, 19.29],
-    credit: [19.22, 19.4],
+    body: [19.12, 19.4],
     seed: 'dec',
   },
   {
@@ -153,8 +152,7 @@ const PLATES: PlateSpec[] = [
     w0: 46,
     zeta: 0.74,
     key: [19.49, 19.62],
-    body: [19.59, 19.72],
-    credit: [19.66, 19.8], // complete ON "heading" (19.80)
+    body: [19.59, 19.8], // complete ON "heading" (19.80)
     seed: 'apr',
   },
 ];
@@ -218,17 +216,20 @@ const Clamps: React.FC<{p: PlateSpec}> = ({p}) => {
   return <Paint b={b} seed={`${p.seed}clamps`} misreg={false} />;
 };
 
+/** The plates' ONE row: the key at 52 px, its short word at 44 ("DEC 2025 · unclassified": 390 px of the 406 the arm
+ *  holds), on one baseline at the plate's optical middle. */
+const PLATE_KEY = 52;
+const PLATE_SHORT = 44;
 const PlateText: React.FC<{p: PlateSpec}> = ({p}) => {
   useCaptionFont();
   const {r, text} = p;
-  const base = r.y0 + 52; // 807 / 917
+  const base = r.y0 + 67; // 822 / 932
   const keyX = r.x0 + 30;
-  const bodyX = keyX + textW(text.key, 56) + 14;
+  const bodyX = keyX + textW(text.key, PLATE_KEY) + 10;
   return (
     <>
-      <WorldText x={keyX} y={base} size={56} text={text.key} at={p.key[0]} dur={p.key[1] - p.key[0]} weight={0.9} seed={`${p.seed}K`} maxW={232} />
-      <WorldText x={bodyX} y={base} size={31} text={text.body} at={p.body[0]} dur={p.body[1] - p.body[0]} weight={0.55} seed={`${p.seed}B`} maxW={r.x1 - 14 - bodyX} />
-      <WorldText x={keyX} y={r.y0 + 85} size={18} text={text.credit} at={p.credit[0]} dur={p.credit[1] - p.credit[0]} seed={`${p.seed}C`} maxW={r.x1 - 18 - keyX} />
+      <WorldText x={keyX} y={base} size={PLATE_KEY} text={text.key} at={p.key[0]} dur={p.key[1] - p.key[0]} weight={0.9} seed={`${p.seed}K`} maxW={232} />
+      <WorldText x={bodyX} y={base} size={PLATE_SHORT} text={text.short} at={p.body[0]} dur={p.body[1] - p.body[0]} weight={0.9} seed={`${p.seed}B`} maxW={r.x1 - 14 - bodyX} />
     </>
   );
 };

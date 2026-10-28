@@ -37,7 +37,8 @@ export const S7Sun: React.FC = () => {
 
 const ROOF_SRC = [CM.stucco, CM.brickLight, CM.limestone, CM.shadeWarm, CM.brick];
 type House = {x0: number; x1: number; top: number; wall: string; roof: 'flat' | 'pitch'; ridge?: number; stacks: [number, number, number][]};
-/** Three houses of a far terrace row (screen px; the board hides everything right of x 110 below y 680). Tops >= 690
+/** Three houses of a far terrace row (screen px; the board hides everything right of x 110 below y 780 since REVIEW_1
+ *  MUST 4, y 680 before). Tops >= 690
  *  for x >= 100 (the float moves +3 0.45 x less than the board: it may never lift a roof over the board's rail). */
 const HOUSES: House[] = [
   {x0: -70, x1: 18, top: 703, wall: CM.stucco, roof: 'flat', stacks: [[-26, -12, 689], [2, 14, 692]]},

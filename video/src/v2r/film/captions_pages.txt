@@ -6,22 +6,23 @@
 #       --out src/v2r/film/captions.json --spell criticizing=criticising
 # (--spell: the last token is her quote, British spelling "criticising"; the transcript says "criticizing".)
 # TREATMENT section 4-5: pages of 1-2 lines, a change (a page or its 2nd line) every <= 1.5 s; quote marks only on
-# exact words; US spelling outside her quote. The frame-0 block (SHE SAYS: NO CRITICIZING / GOOGLE. FOR LIFE.) is NOT
-# a page: Film2R draws it, and `spoken: 'first'` shows only page 1 under it (pages 2-6 below stay hidden until 5.95,
-# but the paging still holds every word). The hidden pages are ONE line each, so scripts/qa/gate_check.py's lowered-page
-# model (Film.tsx's default F0) passes them too. Page 7 ("You'd think that's") is the first page after the block.
+# exact words; US spelling outside her quote. NO title over the captions (REVIEW_1 MUST 1; playbook "Hook and pacing"):
+# frame 0 shows page 1 at the house size, then the voice's own words pop in its order. Page 2 is the reviewer's paging
+# (2.00-4.79; its long lines set it at ~81 px), page 3 "for life." leaves the band at 5.88 (`@out`), as the dive into
+# W starts, so no ink caption sits on the plum bridge (the band stays empty through the dive, as before); the same for
+# the dive into her at 14.86: "So why is she talking?" leaves at 14.64, as "talking?" ends (MUST 5's longer push).
+# `@hide` (REVIEW_1 MUST 3 (b); playbook: never the same words twice on screen at once): the page keeps its words (the
+# voice check) but is never drawn, because a board in the shot writes the same quoted words in step with the voice: the
+# S6 deal board's purpose line ("any lawful government purpose"), Google's board in S7 ("its AI principles", "bans
+# retaliation", "of any kind") and her board in S8 (her quote, the payoff). The band is empty while the board speaks.
 
 She [quit] Google.
 
-And she says
+And she says her contract
+bans her from [criticizing] it…
 
-her contract
-
-bans her from
-
-criticizing it…
-
-for life.
+[for life].
+@out 5.88
 
 You'd think that's
 one [odd] contract.
@@ -37,6 +38,7 @@ because of their
 
 So why is [she]
 talking?
+@out 14.64
 
 She worked on
 Google's [AI]
@@ -59,6 +61,7 @@ use its AI for
 
 [“any lawful]
 [government purpose”].
+@hide
 
 Google can't [veto]
 how it's used.
@@ -67,11 +70,14 @@ But [Google says]
 it follows
 
 its AI [principles],
+@hide
 
 and bans
 retaliation
+@hide
 
 [“of any kind”].
+@hide
 
 She says she [can't]
 criticize Google.
@@ -80,3 +86,4 @@ But in [her words],
 
 “talking about [facts]
 is not criticising”.
+@hide

@@ -169,27 +169,32 @@ def pen_glide(d, seed, speed=None):
 
 # ------------------------------------------------------------------ V2S1 (0.00-6.10)
 SEAM_XF = 0.015        # the un-build's crossfade into frame 0's draw-on (s)
-DRAW_END = 0.26        # S1_DRAW: the subject's outline draws on -0.26 .. +0.26 (f0 = mid-draw)
+DRAW_END = 0.39        # S1_DRAW (REVIEW_1 MUST 2): the pen draws her, the door, then W from f0; W's frame closes at 0.39
+DRAW_TOUCH = (0.12, 0.18, 0.27)   # the pen moves on: the door frame, the leaves, W (a light lift and re-touch each)
+FLOOD_T0, FLOOD_D = 0.44, 0.36    # the colour flood from SUN0 0.44-0.78 (her coat last), after the lamp click
 
 
 @sound
 def pen_drawon(v=1):
-    """f0 (DIRECTION rule 9): the clean pen's ONE stroke per subject (her, the door, W) is half drawn at frame 0 and
-    finishes at 0.26: a steady felt-tip glide already in motion (it began at -0.26, under the un-build), easing off as
-    the pen lifts; the colour floods out from the sun 0.02-0.30: a soft rising wash that peaks at ~0.12 and is 15 dB
-    down by 0.24, before the /sh/ of "She" (0.25). It opens with the 15 ms crossfade from the un-build (no notch at the
-    loop seam; sfx.match_seam sets the level)."""
-    out = buf(0.50)
+    """f0 (DIRECTION rule 9; REVIEW_1 MUST 2: the draw-on is a bold event that starts AT frame 0): the clean pen draws
+    the subject from the first frame, one steady felt-tip glide 0.00-0.39 (her, the door, then W), lifting a hair and
+    touching down again where it moves on (0.12 the door frame, 0.18 the leaves, 0.27 W), easing off as it lifts just
+    before the lamp click (0.40); then the colour floods out from the sun 0.44-0.80: a soft rising wash (peak ~0.56)
+    under "quit", after the ding's strike. It opens with the 15 ms crossfade from the un-build (no notch at the loop
+    seam; sfx.match_seam sets the level)."""
+    out = buf(0.86)
     n = n_of(DRAW_END + 0.03); t = np.arange(n) / SR
     sp = np.where(t < DRAW_END - 0.07, 1.0, np.clip(1.0 - (t - (DRAW_END - 0.07)) / 0.10, 0.12, 1.0))   # eases as it lifts
+    for tt in DRAW_TOUCH:
+        sp = sp * (1.0 - 0.4 * np.exp(-0.5 * ((t - tt) / 0.012) ** 2))
     st_ = pen_glide(DRAW_END + 0.03, 101, sp)
     st_[: n_of(SEAM_XF)] *= np.sin(0.5 * np.pi * np.linspace(0, 1, n_of(SEAM_XF))) ** 2
     st_[-n_of(0.012):] *= np.cos(0.5 * np.pi * np.linspace(0, 1, n_of(0.012))) ** 2
     put(out, st_, 0.0, 0.62, 0.1)
-    d = 0.30; nw = n_of(d)                                 # the flood: 0.02-0.32, peak ~0.12
-    wash = decor(lambda sd: tv_bandpass(noise(d, sd), np.geomspace(520, 2400, nw), bw_oct=1.0) * env_bell(nw, 0.33, 1.7),
+    nw = n_of(FLOOD_D)                                     # the flood: 0.44-0.80, peak ~0.56
+    wash = decor(lambda sd: tv_bandpass(noise(FLOOD_D, sd), np.geomspace(520, 2400, nw), bw_oct=1.0) * env_bell(nw, 0.33, 1.7),
                  7, 0.65)
-    out[n_of(0.02): n_of(0.02) + nw] += wash * 0.42
+    out[n_of(FLOOD_T0): n_of(FLOOD_T0) + nw] += wash * 0.42
     return out
 
 
@@ -249,26 +254,39 @@ def step_thup(v=1):
 
 @sound
 def letter_pops(v=1):
-    """the six canopy letters fill-pop one by one: a quick ripple of tiny high pops, 25 ms apart, done in 0.15 s
-    (finished before 'Google' opens its vowel)."""
-    out = buf(0.17); r = rng(70)
+    """the six canopy letters fill-pop one by one, 0.06 s apart as the picture pops them (HandLetteredGoogle `each`
+    0.06 from 0.97; sound sync (final): the ripple was 25 ms apart, done by 1.08, while the letters ran to 1.27): six
+    tiny high pops, left to right along the canopy, the later ones a touch softer under the vowel of 'Google'."""
+    out = buf(0.36); r = rng(70)
     for k in range(6):
         f = 2600 * r.uniform(0.98, 1.02)
-        put(out, popper(f, f * 0.62, 0.018, 0.005, 70 + k, 0.06, (3000, 9000)), 0.025 * k, r.uniform(0.85, 1.0),
-            0.02 + 0.035 * k)
+        put(out, popper(f, f * 0.62, 0.018, 0.005, 70 + k, 0.06, (3000, 9000)), 0.06 * k,
+            r.uniform(0.85, 1.0) * (1.0 - 0.06 * k), 0.02 + 0.035 * k)
     return out
+
+
+# the flocks as the picture draws them (sound sync (final)): their lift delays (s) and wing-beat rate (Hz), how many
+# flaps each bird is heard for (they fade as they go), and the flap's length and band (the S4 birds are bigger and
+# slower: a glide-and-flap). v1 = S1's five on the bridge rail (V2S1_set_far RAIL_BIRDS: delays 0-0.20, flap
+# sin(2 pi 6.5 t), lift 2.45); v2 = S4's seven on the gasholder (V2S4_wfar FLOCK: delays 0-0.16, flap sin(24 t) =
+# 3.8 Hz, lift 19.78), gone before the push-through into SUN1 (20.40).
+WINGS = {1: dict(delays=[0.0, 0.04, 0.08, 0.14, 0.20], rate=6.5, nfl=(6, 9), flap=(0.034, 420, 3300)),
+         2: dict(delays=[0.0, 0.03, 0.05, 0.08, 0.11, 0.13, 0.16], rate=3.82, nfl=(3, 4), flap=(0.05, 320, 2600))}
 
 
 @sound
 def wings(v=1):
-    """five birds lift off and wheel west: wing-clap starts, flap trains at 8.5-11 Hz fading as they go."""
+    """a flock lifts off and flies west (WINGS[v], the picture's own delays and wing-beat): wing-clap starts, flap
+    trains at the drawn rate, fading as they go."""
+    spec = WINGS[v]
     out = buf(1.35); r = rng(80 + 1000 * (v - 1))
-    for b, s in enumerate([0.0, 0.04, 0.09, 0.14, 0.21]):
-        rate = r.uniform(8.5, 11.0); nfl = r.integers(7, 11); c = r.uniform(0.85, 1.2)
+    for b, s in enumerate(spec["delays"]):
+        rate = spec["rate"] * r.uniform(0.97, 1.03); nfl = r.integers(*spec["nfl"]); c = r.uniform(0.85, 1.2)
         p0 = r.uniform(-0.1, 0.25)
+        d_fl, lo_fl, hi_fl = spec["flap"]
         for k in range(nfl):
             g = np.exp(-k / (nfl * 0.45)) * (1.4 if k < 2 else 1.0)
-            f = flap(0.034, 420 * c, 3300 * c, 800 + 13 * b + k + 1000 * v, 0.003, 0.009)
+            f = flap(d_fl, lo_fl * c, hi_fl * c, 800 + 13 * b + k + 1000 * v, 0.003, 0.009)
             if k < 2:                       # the take-off wing clap: a soft-edged little crack, not a click
                 cl = bp(noise(0.006, 900 + b + 1000 * v), 1200, 6000) * np.sin(np.pi * np.arange(n_of(0.006)) / n_of(0.006)) ** 2
                 f[: len(cl)] += 0.35 * cl
@@ -296,11 +314,11 @@ def ghost_tick(v=1):
 def outline_pops(v=1):
     """'life': three bare ink outlines pop in down the bending towpath: three soft air puffs, all above 5 kHz (no tone,
     nothing in the voice's band), softer as they recede."""
-    out = buf(0.20)
+    out = buf(0.14)
     for k, (g, p) in enumerate([(1.0, -0.2), (0.78, -0.32), (0.6, -0.44)]):
         d = 0.045; n = n_of(d)
         puff = hp(bp(noise(d, 110 + k), 5200, 11000, 2), 5000, 4) * env_ad(n, 0.0015, 0.010)
-        put(out, puff, 0.06 * k, g, p)
+        put(out, puff, 0.03 * k, g, p)          # O1-O3 pop 4.97 / 5.00 / 5.03 (S1_ROW): 0.03 s apart
     return out
 
 
@@ -316,13 +334,14 @@ def ear_flap(v=1):
     return out
 
 
-DIVE_MID = 0.15        # whoosh_dive: the carrier's midpoint, s after the cue (the push-throughs run 0.30 s)
+DIVE_MID = 0.15        # whoosh_dive: the carrier's midpoint, s after the cue (the push-throughs run 0.45 s since REVIEW_1
+                       # MUST 5; their zoom is seen from ~0.15 s before the midpoint, so the cue stays put)
 
 
 @sound
 def whoosh_dive(v=1):
-    """the A push-throughs with the plum bridge: v1 into her dark window W (5.95-6.25), v2 into her silhouette in her
-    lit window (14.71-15.01). The air rises INTO the glass, a muffled 'through the glass' bump lands ON the midpoint
+    """the A push-throughs with the plum bridge: v1 into her dark window W (5.875-6.325), v2 into her silhouette in her
+    lit window (14.635-15.085). The air rises INTO the glass, a muffled 'through the glass' bump lands ON the midpoint
     (+0.15 s: the plum bridge frame), then the air settles as the new shot opens (decorrelated L/R: no comb); gone by
     +0.32, before the next word (0.18-0.21 s after the midpoint)."""
     d = 0.32; n = n_of(d); k = DIVE_MID / d
@@ -368,10 +387,12 @@ def board_clack(v=1):
 
 @sound
 def light_clicks(v=1):
-    """'staff': the five windows round hers turn a cooler white in ONE step (conform_L2 s6): five tiny switch clicks
-    within 40 ms, one cluster, left of frame (done before the vowel of "staff" opens)."""
-    out = buf(0.22); r = rng(160)
-    for k, (s, p) in enumerate(zip([0, 0.011, 0.019, 0.029, 0.04], [-0.38, -0.14, -0.65, -0.39, -0.15])):
+    """'staff': the five windows round hers turn a cooler white one after another (map staffOnAt 8.96, 0.04 s apart):
+    five tiny switch clicks 0.04 s apart, left of frame, all under 2.6 kHz (the /s t f/ of "staff" keep their band)."""
+    out = buf(0.34); r = rng(160)
+    # sound sync (final): the picture cools the five 0.04 s apart (S2.staffOnStagger, in staffWindows order SW1 W2 SW3
+    # SW4 SW5), so five clicks 0.04 s apart, each toward its window (x 200 / 465 / 460 / 330 / 190)
+    for k, (s, p) in enumerate(zip([0, 0.04, 0.08, 0.12, 0.16], [-0.38, -0.08, -0.09, -0.23, -0.39])):
         f = r.uniform(0.95, 1.05)
         c = struck([900 * f, 1450 * f, 2300 * f], [0.006, 0.004, 0.002], [1, .5, .2], 0.03, 160 + k, exc_ms=0.2,
                    noise_body=0.35, contact_amp=0.4, contact_band=(400, 2500), contact_dec=0.0008, n_extra=1)
@@ -470,12 +491,14 @@ def pen_tick(v=1):
 
 @sound
 def steps_stop(v=1):
-    """her last two steps on the towpath paving; the second (at +0.30 s = 17.96) plants and stops, a tiny scuff."""
-    out = buf(0.52)
+    """her last two footfalls on the towpath paving, on the picture's drawings (V2S4_her herStepAt, 12 a second): the
+    contact of step 4.5 (f1040) and, 0.60 s later (f1076, 2 frames before 'objected'), the stand of step 5.0, which
+    plants and stops, a tiny scuff."""
+    out = buf(0.82)
     put(out, thud(95, 0.09, 0.016, 290) * 0.7, 0.0, 1.0, 0.3)
-    put(out, thud(105, 0.11, 0.022, 291, grit=0.08), 0.30, 1.0, 0.3)
+    put(out, thud(105, 0.11, 0.022, 291, grit=0.08), 0.60, 1.0, 0.3)
     sc = bp(noise(0.08, 293), 1000, 5000) * env_bell(n_of(0.08), 0.3, 1.5) * 0.06
-    put(out, sc, 0.33, 1.0, 0.3)
+    put(out, sc, 0.63, 1.0, 0.3)
     return slap(out, -8.0)
 
 

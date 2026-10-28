@@ -24,7 +24,8 @@ import * as MAP from '../world/map';
 import {CellPaint, barPath, S1_IRON} from './V2S1_set_core';
 import {Tier} from '../../lib/tier';
 import {Fill} from '../../lib/Fill';
-import {S1_DRAW, wIsSubject, doorIsSubject} from './V2S1_clock';
+import {S1_DRAW, s1Bold, wIsSubject, doorIsSubject} from './V2S1_clock';
+import {InkScale} from '../../lib/inkComp';
 
 // ---------------------------------------------------------------- the layout (local metres: u east, v down)
 
@@ -322,6 +323,9 @@ function paneInto(b: Batch, ink: string[], u0: number, v0: number, w: number, h:
 
 /** W's lamp clicks off (the first picture of "quit"). */
 export const W_LAMP_OFF = MAP.S1_CLOCK.wLampOff;
+/** From the lamp click W's plum pane (and its plum details) is in full colour at once, before the flood reaches the
+ *  wing (~0.56): the first colour after the sun is W going dark (REVIEW_1 MUST 2: the click reads in the pale state). */
+const W_DARK_FULL = [CM.anchor, CM.coatPlum] as const;
 
 function wInto(b: Batch, inkF: string[], inkM: string[], dark: boolean) {
   const u0 = WU0;
@@ -479,13 +483,17 @@ export const S1Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) =
       {/* W, the thread: the subject (one closed outline drawing on at frame 0) before the lamp click and from her look
           back; support otherwise (no outline, its plum anchor barely calmed) */}
       <Tier tier={wIsSubject(t) ? 'subject' : 'support'}>
-        <CellPaint b={wb} seed="s1wing/W" cell={400} live draw={S1_DRAW} />
+        <InkScale value={s1Bold(t)}>
+          <CellPaint b={wb} seed="s1wing/W" cell={400} live draw={S1_DRAW.w} full={t >= W_LAMP_OFF ? W_DARK_FULL : undefined} />
+        </InkScale>
       </Tier>
       <CellPaint b={lobby} seed="s1wing/lobby" cell={400} />
       {behindDoor}
       {/* the glass door + its canopy letters: the subject from frame 0 through her step-out (the letters pop on 0.97) */}
       <Tier tier={doorIsSubject(t) ? 'subject' : 'environment'}>
-        <CellPaint b={frame} seed="s1wing/doorframe" cell={400} misreg={0.5} draw={S1_DRAW} />
+        <InkScale value={s1Bold(t)}>
+          <CellPaint b={frame} seed="s1wing/doorframe" cell={400} misreg={0.5} draw={S1_DRAW.doorFrame} />
+        </InkScale>
         <HandLetteredGoogle cx={(F.x0 + F.x1) / 2} baseline={F.y0 + (F.y1 - F.y0) * 0.8} cap={Math.min(S.canopyLetterPx, (F.y1 - F.y0) * 0.84)} at={MAP.S1_CLOCK.steppingOut} each={0.06} />
       </Tier>
     </>
@@ -559,7 +567,9 @@ export const S1DoorLeaves: React.FC = () => {
         </clipPath>
       </defs>
       <g clipPath="url(#s1leavesTrack)">
-        <CellPaint b={b} seed="s1leaves" cell={400} misreg={0.6} live draw={S1_DRAW} />
+        <InkScale value={s1Bold(t)}>
+          <CellPaint b={b} seed="s1leaves" cell={400} misreg={0.6} live draw={S1_DRAW.leaves} />
+        </InkScale>
       </g>
     </Tier>
   );

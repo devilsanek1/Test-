@@ -8,8 +8,8 @@
  {
   "src": "v2r/sfx/pen_drawon.wav",
   "t": 0.0,
-  "gain": 0.0783,
-  "note": "f0: the clean pen finishes drawing her, the door and W on (one stroke each, begun at -0.26 under the un-build), the colour floods from the sun outward (f1-f18), her coat last",
+  "gain": 0.059,
+  "note": "f0: the clean pen draws her, the door, then W from the first frame (bold, one moving pen each, 0.00-0.39: REVIEW_1 MUST 2), then the colour floods from the sun outward 0.44-0.78 (f27-f47), her coat last",
   "under_db": 20,
   "set_by": "sheet"
  },
@@ -39,32 +39,24 @@
  },
  {
   "src": "v2r/sfx/step_thup.wav",
-  "t": 0.9333,
+  "t": 0.9667,
   "gain": 0.1257,
-  "note": "she steps out onto the towpath ('Google' 0.97)",
+  "note": "she steps out onto the towpath ('Google' 0.97): her heel lands on the f60 drawing (12 a second, step 1.5), the thud 2 frames ahead",
   "under_db": 20,
   "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/letter_pops.wav",
-  "t": 0.9333,
-  "gain": 0.0247,
-  "note": "the canopy letters fill-pop one by one: a quick ripple, done by 1.08 (before 'Goo-' opens)",
+  "t": 0.95,
+  "gain": 0.0253,
+  "note": "the six canopy letters fill-pop one by one at 0.97 + 0.06 k (HandLetteredGoogle each 0.06): six tiny pops 0.06 s apart, each 1-2 frames ahead of its letter",
   "under_db": 26,
-  "set_by": "draft -6 dB"
- },
- {
-  "src": "v2r/sfx/wings_1.wav",
-  "t": 1.46,
-  "gain": 0.1786,
-  "note": "five far birds lift off the bridge rail (picture 1.40; far, heard a little later) and wheel west: the claps in the pause after 'Google.'",
-  "under_db": 16,
-  "set_by": "sheet"
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/ghost_tick_1.wav",
   "t": 1.9667,
-  "gain": 0.1328,
+  "gain": 0.1376,
   "note": "G1 pops (one soft wooden tick per ghost, ONE pitch) ('And' 2.00)",
   "under_db": 14,
   "set_by": "group"
@@ -72,15 +64,23 @@
  {
   "src": "v2r/sfx/ghost_tick_2.wav",
   "t": 2.5,
-  "gain": 0.1225,
+  "gain": 0.1269,
   "note": "G2 pops ('contract')",
   "under_db": 14,
   "set_by": "group"
  },
  {
+  "src": "v2r/sfx/wings_1.wav",
+  "t": 2.45,
+  "gain": 0.123,
+  "note": "the five far birds lift off the bridge rail at 2.45 (f147, S1_CLOCK.birdsLiftBridge; their delays 0-0.20 s, 6.5 flaps/s) and wheel west, small and soft under 'her contract'",
+  "under_db": 20,
+  "set_by": "sheet"
+ },
+ {
   "src": "v2r/sfx/ghost_tick_3.wav",
   "t": 3.1667,
-  "gain": 0.1612,
+  "gain": 0.1669,
   "note": "G3 pops ('bans')",
   "under_db": 14,
   "set_by": "group"
@@ -88,7 +88,7 @@
  {
   "src": "v2r/sfx/ghost_tick_4.wav",
   "t": 3.7667,
-  "gain": 0.1168,
+  "gain": 0.1209,
   "note": "G4 pops ('criticizing')",
   "under_db": 14,
   "set_by": "group"
@@ -96,15 +96,15 @@
  {
   "src": "v2r/sfx/ghost_tick_1.wav",
   "t": 4.2,
-  "gain": 0.1328,
+  "gain": 0.1376,
   "note": "G5 pops",
   "under_db": 14,
   "set_by": "group"
  },
  {
   "src": "v2r/sfx/ghost_tick_2.wav",
-  "t": 4.75,
-  "gain": 0.1225,
+  "t": 4.7667,
+  "gain": 0.1269,
   "note": "G6 pops ('for'); the ambience dip 4.54-4.79 is in the bed",
   "under_db": 14,
   "set_by": "band"
@@ -112,8 +112,8 @@
  {
   "src": "v2r/sfx/outline_pops.wav",
   "t": 4.95,
-  "gain": 0.0833,
-  "note": "'life': three bare outlines pop in down the towpath (air puffs above 5 kHz; then air, no note)",
+  "gain": 0.0832,
+  "note": "'life': three bare outlines pop in down the towpath at 4.97 / 5.00 / 5.03 (S1_ROW O1-O3: air puffs above 5 kHz, 0.03 s apart; then air, no note)",
   "under_db": 15,
   "set_by": "draft -5 dB"
  },
@@ -129,21 +129,21 @@
   "src": "v2r/sfx/whoosh_dive_1.wav",
   "t": 5.95,
   "gain": 0.2626,
-  "note": "JOIN S1>S2, the A push-through into her dark window W 5.95-6.25: the air rises into it, 'through the glass' on the midpoint 6.10 (the plum bridge), settles, gone by 6.27",
+  "note": "JOIN S1>S2, the A push-through into her dark window W 5.875-6.325 (seen from ~5.95): the air rises into it, 'through the glass' on the midpoint 6.10 (the plum bridge), settles, gone by 6.27",
   "under_db": 12,
   "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/window_outline.wav",
-  "t": 6.7833,
+  "t": 6.8,
   "gain": 0.2036,
-  "note": "'one': her dark window's A outline pops on (one frame), in the gap before 'one'",
+  "note": "'one': her dark window's A outline pops on (one frame, S2.outlineAt 6.82 = f410)",
   "under_db": 17,
   "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/board_clack_2.wav",
-  "t": 8.4,
+  "t": 8.4167,
   "gain": 0.1877,
   "note": "the newsstand A-board slides out: TOLD THE BBC (the ONE board sound) ('But')",
   "under_db": 13,
@@ -152,8 +152,8 @@
  {
   "src": "v2r/sfx/light_clicks.wav",
   "t": 8.9333,
-  "gain": 0.1545,
-  "note": "'staff': the five windows round hers turn a cooler white in one step (five clicks in 40 ms)",
+  "gain": 0.1482,
+  "note": "'staff': the five windows round hers turn a cooler white one after another, 0.04 s apart (S2.staffOnStagger): five soft clicks 0.04 s apart",
   "under_db": 19,
   "set_by": "sheet"
  },
@@ -201,13 +201,13 @@
   "src": "v2r/sfx/whoosh_dive_2.wav",
   "t": 14.71,
   "gain": 0.1548,
-  "note": "JOIN S3>S4, the A push-through into her silhouette 14.71-15.01, 'through the glass' on 14.86 (the callback, 3 dB softer)",
+  "note": "JOIN S3>S4, the A push-through into her silhouette 14.635-15.085 (seen from ~14.71), 'through the glass' on 14.86 (the callback, 3 dB softer)",
   "under_db": 15,
   "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/pop_high_1.wav",
-  "t": 15.0333,
+  "t": 15.05,
   "gain": 0.2811,
   "note": "her name tag pops (first build) ('She')",
   "under_db": 16,
@@ -223,15 +223,15 @@
  },
  {
   "src": "v2r/sfx/steps_stop.wav",
-  "t": 17.66,
-  "gain": 0.1492,
-  "note": "her last two steps; the stop lands at 17.96 ('objected')",
+  "t": 17.3333,
+  "gain": 0.1682,
+  "note": "her last two footfalls on the picture's drawings (12 a second): the contact (step 4.5) at f1040, the stand (step 5.0) at f1076, 2 frames before 'objected'",
   "under_db": 19,
   "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/plate_knock.wav",
-  "t": 18.8833,
+  "t": 18.9,
   "gain": 0.2162,
   "note": "'military': the DEC 2025 plate builds (wood knock + pop)",
   "under_db": 15,
@@ -248,8 +248,8 @@
  {
   "src": "v2r/sfx/wings_2.wav",
   "t": 19.7667,
-  "gain": 0.1452,
-  "note": "the flock flies west into the sun (19.78; the callback, 3 dB softer) ('heading')",
+  "gain": 0.115,
+  "note": "the seven on the gasholder lift at 19.78 (V2S4_wfar FLOCK_AT: delays 0-0.16 s, a slow glide-and-flap, ~3.8 flaps/s) and fly west into the sun ('heading')",
   "under_db": 19,
   "set_by": "sheet"
  },
@@ -281,7 +281,7 @@
   "src": "v2r/sfx/pop_low.wav",
   "t": 22.4,
   "gain": 0.1881,
-  "note": "'Pentagon': the plaque pops (the bed's soft accent 1 is here too)",
+  "note": "'Pentagon': the plaque pops at 22.43 (V2S5_text, scene 1.88; the bed's soft accent 1 is here too)",
   "under_db": 16,
   "set_by": "sheet"
  },
@@ -343,7 +343,7 @@
  },
  {
   "src": "v2r/sfx/pen_short_2.wav",
-  "t": 29.6,
+  "t": 29.6167,
   "gain": 0.0825,
   "note": "'AI principles' pen-builds, complete on 30.04",
   "under_db": 17,
@@ -384,23 +384,23 @@
  {
   "src": "v2r/sfx/ghost_tick_3.wav",
   "t": 33.75,
-  "gain": 0.1141,
-  "note": "'can't': three ghosts pop ahead of her (3 dB softer, one pitch)",
+  "gain": 0.1182,
+  "note": "'can't': three ghosts pop ahead of her, 0.04 s apart (S8Ghosts stagger: 33.78 / 33.82 / 33.86; 3 dB softer, one pitch)",
   "under_db": 17,
   "set_by": "group"
  },
  {
   "src": "v2r/sfx/ghost_tick_4.wav",
-  "t": 33.8333,
-  "gain": 0.0827,
+  "t": 33.8,
+  "gain": 0.0856,
   "note": "second ghost",
   "under_db": 17,
   "set_by": "group"
  },
  {
   "src": "v2r/sfx/ghost_tick_1.wav",
-  "t": 33.9,
-  "gain": 0.094,
+  "t": 33.8333,
+  "gain": 0.0974,
   "note": "third ghost",
   "under_db": 17,
   "set_by": "group"
@@ -425,13 +425,13 @@
   "src": "v2r/sfx/cloth_wipe.wav",
   "t": 35.6833,
   "gain": 0.1286,
-  "note": "'her words': the cafe owner wipes the board clean in one stroke",
+  "note": "'her words': the cafe owner wipes the board clean in one stroke (35.72-36.14, first frame f2144); the file's soft start is heard from +28 ms = 35.711: 22 ms ahead of the wipe, 9 ms before 'her' (never 0-12 ms after a word)",
   "under_db": 17,
   "set_by": "sheet, words -0.8"
  },
  {
   "src": "v2r/sfx/pen_long.wav",
-  "t": 36.5,
+  "t": 36.5167,
   "gain": 0.086,
   "note": "her quote pen-draws on (THE same pen as Google's, a whisper under 'talking'); its strokes end by 36.95, before 'facts'",
   "under_db": 21,
@@ -448,9 +448,9 @@
  {
   "src": "v2r/sfx/pen_unbuild.wav",
   "t": 38.82,
-  "gain": 0.0612,
+  "gain": 0.0608,
   "note": "JOIN S8>S1, the un-build 38.82-39.08: the pen's line rewinds, turns into frame 0's draw-on at the midpoint 38.95 and crossfades 15 ms into pen_drawon at the seam",
   "under_db": 16,
-  "set_by": "sheet, seam match -5.9"
+  "set_by": "sheet, seam match -6.0"
  }
 ]

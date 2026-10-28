@@ -12,6 +12,19 @@ un-builds with the loop (Fill / Ink / WorldText read `useExit`). Barrel: `index.
 "secret" (V10). **The letters** go through `WorldText` and nowhere else (the caption hand, `lib/font` 'CaptionHand' =
 Patrick Hand, measured exactly once the font has loaded).
 
+**Few and big (REVIEW_1 fix pass B, 2026-10-28; owner playbook: "Words in the world are few and big ... No small
+source lines, quotes or fine print in the picture").** The film draws only these lines, each >= 44 px: S2 the BBC's
+quote "for fear of retaliation" (56, two rows); the tag "Sofia Liguori" (48) + "Google DeepMind" (44); the plates "DEC
+2025 · unclassified" / "APR 2026 · classified" (52 + 44); the news box's headline (44, four rows); the plaque's "The
+Pentagon" (56); S6 "APRIL 2026 DEAL" (44), the purpose line (56) and "Lawful use: decided / by the Pentagon" (44); S7
+GOOGLE SAYS (60), "follows its" / "bans retaliation" (44), "AI principles" / "of any kind" (56); S8 SHE SAYS (60) and her
+quote (60: the column's width). No credit, clause, small row or source anywhere: they are in `docs/v2/POSTING_KIT.md`
+(texts.ts keeps them as the record, marked not drawn). 40-55 px lines share `MID_WEIGHT` 0.9. The big faces are 480 x
+420 since MUST 4 (B and S6's face from y 800, frame tops 780: SUN2 floats > 1 diameter clear). `dim` takes a blank face
+one value step down (`faceDim`, L* ~85): her board until the wipe (the film the stroke wipes away), Google's by half
+until its pen starts. The half-wiped menu draws flat smears only (no scribbles). The type-scale table and the measured
+numbers below are the earlier spec where they disagree.
+
 Review: `src/entry-v2r-boards.tsx` (palette first) registers **KitBoards** (the contact sheet, 2160 x 3000: every piece
 1:1 at its film size and spot, built, on a stand-in of its shot's ground; the key frames at 216 px; the type scale),
 **Boards-Deal / -Google / -Her / -BBC / -S4 / -S5** (1080 x 1920, each piece's timeline on a plain stand-in of its
@@ -83,8 +96,8 @@ start on the caller's clock: every default becomes `t0 + default`; explicit time
 | S4 · L3 | `Fingerpost` (or `SignPost` + 2 `ArrowPlate`) | post x 575, shaft 735-1060 (finial above); plates x 110-560 (tip at x0) y 755-855 / 865-965, path plane; body 31 px | DEC pops 4.06 (18.92), pen to 4.52; APR fill 4.59 (19.45), pen to 4.94 (19.80, "heading") | FILM s: `decAt={18.92} aprAt={19.45} aprEnd={19.8}` |
 | S5 · L4 | `NewsBox` | START coords `S5.start.newsBox` 470-780 x 880-1230 (drawn in 310 x 350 units, fitted to `rect`) | already there (`at` optional) | scene s |
 | S5 · L4 | `Plaque` | END coords x 612, post foot 1182: plate 447-777 x 1029-1156 at key 56 / body 30 (329 x 127); key 40 / body 24: 271 x 104; `panel="dark"` (on light paving): a bronze-dark plate with limestone letters, same size; S5 uses it at x 605, foot 1237 (441-769 x 1110-1237) | pops 1.88 (22.43, "Pentagon") | scene s |
-| S6 · L5 | `DealBoard` | `S6_FACE` 160-640 x 700-1220 = `S6.board0` inset 40 / 20 (frame 120-680 x 680-1250); the scene moves it with the mid plane (`s6BoardAt`); `DEAL_GEOM` | clack 0 (24.00), purpose pops 0.03 (24.03, "any"), F12 + divider 2.40 (26.40, "veto") | scene s |
-| S7 · L5 | `GoogleBoard` | face B 150-630 x 700-1220 (frame 110-670 x 680-1250, wedge to 684); `B_GEOM` | header + credit + clack 0.30 (28.36); follows its 1.59-1.72; "AI principles" 1.72-1.98 (complete 30.04); small row 2.24 (30.30); bans retaliation 2.68-3.22; "of any kind" 3.27-4.02 (complete 32.08) | scene s |
+| S6 · L5 | `DealBoard` | `S6_FACE` 160-640 x 800-1220 = `S6.board0` inset 40 / 20 (frame 120-680 x 780-1250); the scene moves it with the mid plane (`s6BoardAt`); `DEAL_GEOM` | clack 0 (24.00), purpose pops 0.03 (24.03, "any"), F12 + divider 2.40 (26.40, "veto") | scene s |
+| S7 · L5 | `GoogleBoard` | face B 150-630 x 800-1220 (frame 110-670 x 780-1250, wedge to 684); `B_GEOM` | header + credit + clack 0.30 (28.36); follows its 1.59-1.72; "AI principles" 1.72-1.98 (complete 30.04); small row 2.24 (30.30); bans retaliation 2.68-3.22; "of any kind" 3.27-4.02 (complete 32.08) | scene s |
 | S8 · L6 | `HerBoard` | B on the board plane (x -100-380 before the truck) | header already there unless `headerAt` (L6: 0.23 = 33.16, with the clack); wipe 2.79 (35.72) for 0.35 s; quote 3.61-4.17 / 4.27-4.77 (36.54-37.70); credit 3.61 | scene s |
 | any | `DoorSign` | centre x, top y; sized by its lines | `at` optional | any |
 
@@ -199,9 +212,8 @@ loose ink on the outer contour only (never on the face, never round the letters)
 
 ## Open
 
-- **S8: SUN8 touches her board's frame.** SUN8 (420, 640) r 40 ends at y 680, exactly the top of the 20 px top rail
-  (B's face top is 700; map.ts measured SUN8's 20 px clearance from the face). SUN2 (S7) clears it by 15 px. REQUEST to
-  the director: SUN8 -> (420, 625) (top 585 >= the 575 sun minimum; 15 px clear of the frame, like SUN2).
+- RESOLVED (REVIEW_1 MUST 4): SUN8 used to touch her board's frame; with B's top at 800 (frame 780) it floats 100 px
+  clear (> its diameter), and SUN2 115 px over every board.
 - S6: dc/gate's `GateNear` paving (y >= 1255, near plane) covers most of the deal board's ground shadow: pass
   `shadow={false}` and draw `<BoardShadow g={DEAL_GEOM} />` above that paving inside the mid plane's transform, or accept.
 - The kit `NameTag`'s credit row (baseline ~861, x 616-819) enters the right rail (x > 780 below y 840) by 39 px; L3's

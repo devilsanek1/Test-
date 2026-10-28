@@ -10,7 +10,7 @@ import {S1Plane, S1_PLANE} from './V2S1_float';
 
 /** THE PARTICLES, SEEN at phone size (the owner on v4, 2026-10-28: "I don't see any changes in the particles anywhere";
  *  CRAFT §f.6, lib/particles' presets): calm tier-C life a viewer can point at in a 360 px wide frame. Nothing is born
- *  before 0.30 (after the frame-0 flood) or enters in 5.80-6.40 (the push-through join at 6.10), and nothing crosses
+ *  before 0.30 (one near mote is born ~0.6, inside the flood since REVIEW_1 MUST 2: light on pale, unseen) or enters in 5.80-6.40 (the push-through join at 6.10), and nothing crosses
  *  the caption band, her, the row or Pip:
  *    motes   sized by distance (CRAFT §f.6). FAR: 8-10 px, L* +16..+20 over the shade behind them, in the low sun's
  *            air: two against the far tower's shaded column, two in front of the backlit far fronts under the roofline

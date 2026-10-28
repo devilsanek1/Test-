@@ -8,12 +8,20 @@
 // "Google" 28.36). The same face, frame, type, light and shadow as the deal board (S6) and hers (S8): nothing here
 // overrides K3's look, so the three boards stay equal (A5).
 // `shadow`: false once V2S7_light draws the rig's own contact + cast shadows (never both: no doubled shadow).
+// FEW AND BIG (REVIEW_1 MUST 3): the face 480 x 420 (B since MUST 4), the header and Google's words as heard at 44 / 56
+// px; no small row, no credit (the post carries them). The caption steps aside while the board writes (pages 19-21
+// `@hide`). The BLANK face (28.10-29.65, before the pen) sits a half value step down (REVIEW_1 SHOULD 2: it was the
+// brightest thing in the frame) and eases up to the full face as the pen starts (29.65-29.95).
 import React from 'react';
-import {GoogleBoard} from '../kit/boards';
+import {GoogleBoard, GOOGLE_T} from '../kit/boards';
 
 /** Local time (s from S7_T0 = 28.10) the header, the credit and the clack land: film 28.33. */
 export const S7_BOARD_HEADER_AT = 0.23;
+/** The board's clock offset (K3's GOOGLE_T was authored from a 28.06 start). */
+const T0 = -0.04;
+/** The blank face's step: half the deal / her board's step (L* ~92 vs 96), until the pen starts (local 1.55 = 29.65). */
+export const S7_BOARD_DIM = {k: 0.5, until: T0 + GOOGLE_T.follows[0], dur: 0.3} as const;
 
 export const S7Board: React.FC<{shadow?: boolean}> = ({shadow = true}) => (
-  <GoogleBoard tier="subject" t0={-0.04} headerAt={S7_BOARD_HEADER_AT} creditAt={S7_BOARD_HEADER_AT} clackAt={S7_BOARD_HEADER_AT} shadow={shadow ? undefined : false} />
+  <GoogleBoard tier="subject" t0={T0} headerAt={S7_BOARD_HEADER_AT} creditAt={S7_BOARD_HEADER_AT} clackAt={S7_BOARD_HEADER_AT} shadow={shadow ? undefined : false} dim={S7_BOARD_DIM} />
 );

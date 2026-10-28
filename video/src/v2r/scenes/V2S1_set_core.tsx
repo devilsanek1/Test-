@@ -10,7 +10,9 @@
 // Every line here is CM.ink: the clean pen sets its width and colour by the tier in scope (C draws none).
 import React, {useMemo} from 'react';
 import {Fill, bbox} from '../../lib/Fill';
-import {Ink} from '../../lib/Ink';
+import {Ink, parseInk} from '../../lib/Ink';
+import {ease} from '../../lib/time';
+import {Look} from '../../lib/exit';
 import {rng} from '../../lib/rng';
 import {CM} from '../palette';
 import {Batch, P, Pt} from '../kit/canal/core';
@@ -111,23 +113,51 @@ export type CellPaintProps = {
   misreg?: number;
   /** true: the batch is rebuilt every frame (moving / switching things): skip the memo. */
   live?: boolean;
-  /** The lines draw on as ONE stroke (every part at once) from `at` over `dur` (frame 0's subject outlines). */
-  draw?: {at: number; dur: number};
+  /** The lines draw on from `at` over `dur` (frame 0's subject outlines): every part at once, or with `tip` as ONE
+   *  moving pen per ink run (the runs one after another, each its share of the time by its longest stroke; a run's
+   *  strokes together, e.g. the two leaves), a pen tip of that radius (x the line width) on each head (REVIEW_1 MUST 2). */
+  draw?: {at: number; dur: number; tip?: number};
+  /** Fill colours that skip the Look cascade: shown in their own colour at once, pale state or not (W's plum pane from
+   *  the lamp click, so "W goes dark" reads before the flood: REVIEW_1 MUST 2). */
+  full?: readonly string[];
 };
 
+/** A cascade that has already passed every point: full colour. */
+const NO_CASCADE = {at: -1e9, origin: [0, 0] as [number, number]};
+
+/** One-pen windows [start, dur] per ink run of a split batch (weights: each run's longest stroke). */
+function penRuns(s: ReturnType<typeof split>, at: number, dur: number): Map<string, [number, number]> {
+  const runs = s.flatMap((l) => l.inks.map((g) => ({key: g.key, w: parseInk(g.d).maxLen})));
+  const total = runs.reduce((a, r) => a + r.w, 0) || 1;
+  const out = new Map<string, [number, number]>();
+  let acc = 0;
+  for (const r of runs) {
+    out.set(r.key, [at + (dur * acc) / total, Math.max(1e-3, (dur * r.w) / total)]);
+    acc += r.w;
+  }
+  return out;
+}
+
 /** Renders a Batch: per layer, its fills split by region (one <Fill> per colour per cell), then its inks. */
-export const CellPaint: React.FC<CellPaintProps> = ({b, seed, cell = 120, misreg = 1, live = false, draw}) => {
+export const CellPaint: React.FC<CellPaintProps> = ({b, seed, cell = 120, misreg = 1, live = false, draw, full}) => {
   const memo = useMemo(() => (live ? null : split(b, cell, seed, misreg)), [live ? null : b, cell, seed, misreg, live]);
   const s = memo ?? split(b, cell, seed, misreg);
+  const pen = draw?.tip !== undefined ? penRuns(s, draw.at, draw.dur) : null;
   return (
     <>
       {s.map((l, i) => (
         <React.Fragment key={i}>
-          {l.fills.map((g) => (
-            <Fill key={g.key} d={g.d} color={g.color} offset={g.off} seed={`${seed}/${g.key}`} />
-          ))}
+          {l.fills.map((g) =>
+            full?.includes(g.color) ? (
+              <Look key={g.key} cascade={NO_CASCADE}>
+                <Fill d={g.d} color={g.color} offset={g.off} seed={`${seed}/${g.key}`} />
+              </Look>
+            ) : (
+              <Fill key={g.key} d={g.d} color={g.color} offset={g.off} seed={`${seed}/${g.key}`} />
+            ),
+          )}
           {l.inks.map((g) => (
-            <Ink key={g.key} d={g.d} width={g.w} color={CM.ink} open={g.open} seed={`${seed}/${g.key}`} {...(draw ? {at: draw.at, dur: draw.dur, order: 'all' as const, pace: 'free' as const} : {})} />
+            <Ink key={g.key} d={g.d} width={g.w} color={CM.ink} open={g.open} seed={`${seed}/${g.key}`} {...(pen ? {at: pen.get(g.key)![0], dur: pen.get(g.key)![1], order: 'all' as const, pace: 'free' as const, ease: ease.linear, tip: draw!.tip} : draw ? {at: draw.at, dur: draw.dur, order: 'all' as const, pace: 'free' as const} : {})} />
           ))}
         </React.Fragment>
       ))}
