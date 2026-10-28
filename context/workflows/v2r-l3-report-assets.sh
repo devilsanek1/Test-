@@ -61,8 +61,8 @@ echo "== line metrics (full size, caption zone masked)"
 python3 -I scripts/qa/retro_tools/line/measure.py "$OUT/measure.json" "s3_13.5=$(f 13.5 $OUT/full)#290-600" "s4_17.0=$(f 17.0 $OUT/full)#290-600" 2>&1 | tail -2
 (cd scripts/qa/retro_tools/line && python3 ends.py "s3_13.5=$(f 13.5 $OUT/full)#290-600" "s4_17.0=$(f 17.0 $OUT/full)#290-600" 2>&1 | tail -4)
 echo "== banding (open sky)"
-python3 -I scripts/qa/check_banding.py "$(f 13.5 $OUT/full)" --region 0,0,1080,595 --quiet 2>&1 | tail -2
-python3 -I scripts/qa/check_banding.py "$(f 17.0 $OUT/full)" --region 0,0,1080,280 --quiet 2>&1 | tail -2
-python3 -I scripts/qa/check_banding.py "$(f 19.9 $OUT/full)" --region 0,0,1080,280 --quiet 2>&1 | tail -2
-python3 -I scripts/qa/check_banding.py "$(f 19.9 $OUT/full)" --region 322,604,424,730 --quiet 2>&1 | tail -2
+python3 -I scripts/qa/check_banding.py "$(f 13.5 $OUT/full)" --region 0,0,1080,595 2>&1 | grep -E 'PASS|FAIL|WARN' | tail -1
+python3 -I scripts/qa/check_banding.py "$(f 17.0 $OUT/full)" --region 0,0,1080,280 2>&1 | grep -E 'PASS|FAIL|WARN' | tail -1
+python3 -I scripts/qa/check_banding.py "$(f 19.9 $OUT/full)" --region 0,0,1080,280 2>&1 | grep -E 'PASS|FAIL|WARN' | tail -1
+python3 -I scripts/qa/check_banding.py "$(f 19.9 $OUT/full)" --region 322,604,424,730 2>&1 | grep -E 'PASS|FAIL|WARN' | tail -1
 echo "== done: $OUT"
