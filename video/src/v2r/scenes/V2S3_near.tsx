@@ -11,17 +11,25 @@ import {S3NearWater, S3Ground, S3Rope, S3LampFoot} from './V2S3_nground';
 import {S3Plane} from './V2S3_float';
 import {S3_PLANE} from './V2S3_rig';
 import {S3Dress} from './V2S3_ndress';
+import {Tier} from '../../lib/tier';
+import {CM} from '../palette';
+import {onPlane} from './V2S3_depth';
 
 export const S3Near: React.FC = () => (
   <>
     <S3Plane plane={S3_PLANE.boat}>
-      <S3NearWater />
-      <S3Boat />
+      <Tier tier="environment" bg={onPlane(CM.sage, S3_PLANE.boat)}>
+        <S3NearWater />
+        <S3Boat />
+      </Tier>
     </S3Plane>
     <S3Plane plane={S3_PLANE.towpath}>
-      <S3Ground />
-      <S3Dress />
-      <S3Rope />
+      <Tier tier="environment" bg={onPlane(CM.paving, S3_PLANE.towpath)}>
+        <S3Ground />
+        <S3Dress />
+        <S3Rope />
+      </Tier>
+      {/* L2's lamp in its own default scope (tier C, the pen's bg), exactly as S2 draws it */}
       <S3LampFoot />
     </S3Plane>
   </>

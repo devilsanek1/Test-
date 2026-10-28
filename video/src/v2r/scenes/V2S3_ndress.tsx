@@ -17,6 +17,9 @@ import type {Pt} from '../kit/canal/core';
 import {S3_CAM, onPlane, planeBatch} from './V2S3_depth';
 
 const cam = S3_CAM;
+/** The near iron (the bench's end frames, the bollard): a mid plum, dark but never near-black (her plum silhouette is
+ *  the darkest, clearest shape in the frame). */
+const IRON = CM.coatPlum;
 const PLANE = -2;
 
 /** The bench (metres): its long axis along the canal, its back toward us; x from -2.0 to -0.2 m, the back legs at
@@ -59,9 +62,9 @@ function benchBatch(): Batch {
   // the iron end frames: a rear leg up to the back's top, an arm forward at seat height, a front leg
   for (const ex of [x0 + 0.03, x1 - 0.03]) {
     const w = 0.05;
-    b.poly(CM.anchor, [pt(ex - w, zBack, back1 + 0.02), pt(ex + w, zBack, back1 + 0.02), pt(ex + w, zBack, 0), pt(ex - w, zBack, 0)]);
-    b.poly(CM.anchor, [pt(ex - w, zBack, seat + 0.2), pt(ex - w, zFront, seat + 0.2), pt(ex - w, zFront, seat + 0.15), pt(ex - w, zBack, seat + 0.15)]);
-    b.poly(CM.anchor, [pt(ex - w * 0.8, zFront, seat + 0.18), pt(ex + w * 0.8, zFront, seat + 0.18), pt(ex + w * 0.8, zFront, 0), pt(ex - w * 0.8, zFront, 0)]);
+    b.poly(IRON, [pt(ex - w, zBack, back1 + 0.02), pt(ex + w, zBack, back1 + 0.02), pt(ex + w, zBack, 0), pt(ex - w, zBack, 0)]);
+    b.poly(IRON, [pt(ex - w, zBack, seat + 0.2), pt(ex - w, zFront, seat + 0.2), pt(ex - w, zFront, seat + 0.15), pt(ex - w, zBack, seat + 0.15)]);
+    b.poly(IRON, [pt(ex - w * 0.8, zFront, seat + 0.18), pt(ex + w * 0.8, zFront, seat + 0.18), pt(ex + w * 0.8, zFront, 0), pt(ex - w * 0.8, zFront, 0)]);
   }
   return planeBatch(b, PLANE);
 }
@@ -83,7 +86,7 @@ export const bollardNeck = (): Pt => {
 
 function bollardBatch(): Batch {
   const b = new Batch();
-  b.fill(CM.anchor, bollardD());
+  b.fill(IRON, bollardD());
   return planeBatch(b, PLANE);
 }
 
