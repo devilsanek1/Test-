@@ -13,3 +13,18 @@ Work folder: `/tmp/claude-0/-home-user-Test-/e0b06496-a313-5ced-bf0f-bc634eb1274
   lanes' other open spec requests, checked against the code: §1 sway 24.95 and its window 24.95-25.25, Pip's side-pose shrug
   40.40-40.55; §3 the SQB float locked 6.45-9.30, the strip settle 6.20-6.65, the 5 scheduled skylight flakes from 9.0; §4
   SQB the 11.80 past-year band; §7 the BETTER van's Luton box.
+
+## Step 2: the master (in progress)
+- Render: `node scripts/render-media.mjs Film3Final deliverables/v3/v3_final.mp4 --entry=src/entry-v3-film.tsx --master
+  --concurrency=2` (one run, code at c23bd54 = eaa8761 + docs), running.
+- Loudness, done on the film's audio mix (rendered once as WAV: `render-media.mjs Film3Final ... --codec=wav`, so the AAC
+  is encoded once): the mix is -17.0 LUFS integrated, LRA 4.0 LU, true peak -2.2 dBTP (at 37.24, the payoff's thoom;
+  4.23 the hook's, -2.4). A linear +3.5 dB would put the peaks at +1.3 dBTP, so loudnorm's linear mode needs the peaks
+  down first: a true-peak limiter at 4x oversampling (192 kHz, `alimiter` limit -5.5 dBFS, 5 ms look-ahead, 80 ms
+  release, latency compensated) touches 46 short peaks (0.1 % of the samples; voice plosives and the hits) by up to
+  3.3 dB, then two-pass `loudnorm` I -14 / TP -2 / LRA 20, pass 2 `linear=true` (confirmed: "normalization_type":
+  "linear", one constant gain), AAC 320k 48 kHz. Result (ebur128, on the AAC): -13.9 LUFS, LRA 3.3 LU, true peak -1.9
+  dBTP.
+- check_light (light off/on stills, Film3Final, R2's subject boxes): 20.8 LIGHT OK (the brightest 5 % 0.016 H from the
+  pile; R2's run 0.131 H), warm-lit 2.4 %; 21.4 LIGHT OK (0.149 H, as before), warm-lit 7.1 %, 3 light shapes each
+  >= 4 L* over their ground. Warm-lit under CRAFT's 8-15 % is information (the reveal's dusk, the street calmed).
