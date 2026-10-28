@@ -17,15 +17,17 @@ The measures (canvas px at 1080 wide; CIE L*, a*, b* D65; Y = relative luminance
              plateaus.
   plateau    the run between two steps (px). Short plateaus (< 8 px) are a fine texture the eye averages away.
   visible    a step at or over the JND with plateaus >= 8 px on both sides. The JND is CAMBI's (Netflix, libvmaf):
-             c >= 0.019 (its tvi_threshold, a Weber fraction on a BT.1886 display; ~0.6 L* at L* 85), or dE00 >= 1.0
-             (a chroma band: CAMBI reads luma only).
-  weak       c >= 0.010 or dE00 >= 0.5 with plateaus >= 16 px: below the JND on a calm display, near it on a phone at full
+             c >= 0.019 (its tvi_threshold, a Weber fraction on a BT.1886 display; ~0.6 L* at L* 85), or dE00 >= 1.5
+             (a chroma band: CAMBI reads luma only; 1.0 is the side-by-side patch JND, an edge inside a gradient needs
+             more). A step over 2x the JND is "strong".
+  weak       c >= 0.010 or dE00 >= 0.8 with plateaus >= 16 px: below the JND on a calm display, near it on a phone at full
              brightness in the dark (one 8-bit code at L* 85 is c ~0.013).
   staircase  the share of the profile's total change that happens in its steps (0 smooth, 1 pure steps).
   grain      the std of the sky pixels' L* round their row mean: the dither's visible amplitude (<= 0.6 L*: invisible).
   band       the caption band's flatness: the range of its rows' sky L* (budget --max-dl, default 1.5: CRAFT §g).
-Verdict: FAIL if any visible step or the band over its budget; WARN if 3+ weak steps in a strip, or grain > 0.6 L*;
-else PASS. Exit 1 on FAIL. Several frames: the worst counts.
+Verdict: FAIL on a staircase (3+ visible steps in one strip), a strong step, or the band over its budget; WARN on 1-2
+visible steps in a strip (isolated soft blotches: what a platform's re-encode leaves in a dithered sky), 3+ weak steps in
+a strip, or grain > 0.6 L*; else PASS. Exit 1 on FAIL. Several frames: the worst counts.
 """
 from __future__ import annotations
 
@@ -42,9 +44,11 @@ from scipy.ndimage import gaussian_filter1d, median_filter
 sys.dont_write_bytecode = True
 
 JND_C = 0.019  # CAMBI tvi_threshold (libvmaf cambi.c DEFAULT_CAMBI_TVI)
-JND_DE = 1.0
+JND_DE = 1.5  # a chroma step (CAMBI reads luma only; dE00 1.0 is the side-by-side patch JND, an edge in a gradient needs more)
 WEAK_C = 0.010
-WEAK_DE = 0.5
+WEAK_DE = 0.8
+STRONG = 2.0  # x the JND: one such step fails alone
+STAIR = 3  # visible steps in one strip = a staircase
 MIN_PLATEAU = 8
 WEAK_PLATEAU = 16
 GRAIN_MAX = 0.6
@@ -242,12 +246,14 @@ def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float) -> dict:
             total += t
             stepped += sp
         vis = [s for s in st if (s[3] >= JND_C or s[2] >= JND_DE) and min(s[4], s[5]) >= MIN_PLATEAU * k]
+        strong = [s for s in vis if s[3] >= STRONG * JND_C or s[2] >= STRONG * JND_DE]
         weak = [s for s in st if (s[3] >= WEAK_C or s[2] >= WEAK_DE) and min(s[4], s[5]) >= WEAK_PLATEAU * k and s not in vis]
         plateaus = [s[4] for s in st]
         strips.append({
             'x': int(round((x0 + sx) / k)),
             'steps': len(st),
             'visible': len(vis),
+            'strong': len(strong),
             'weak': len(weak),
             'max_dL': max([abs(s[1]) for s in st], default=0.0),
             'max_dE00': max([s[2] for s in st], default=0.0),
@@ -270,10 +276,14 @@ def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float) -> dict:
                 m = pv.mean(0)
                 res['band'] = {'y': [band[0], band[1]], 'dL': float(pv[:, 0].max() - pv[:, 0].min()), 'max_dE00': float(de2000(pv, m[None, :]).max()), 'L': float(m[0]), 'max_dl': max_dl}
     vis = sum(s['visible'] for s in strips)
+    vis_worst = max([s['visible'] for s in strips], default=0)
+    strong = sum(s['strong'] for s in strips)
     weak_worst = max([s['weak'] for s in strips], default=0)
     grain = float(np.nanmedian(grains)) if grains else float('nan')
     res['grain'] = grain
     res['visible'] = vis
+    res['visible_worst_strip'] = vis_worst
+    res['strong'] = strong
     res['weak_worst_strip'] = weak_worst
     res['staircase_median'] = float(np.median([s['staircase'] for s in strips])) if strips else 0.0
     res['max_dL'] = max([s['max_dL'] for s in strips], default=0.0)
@@ -282,12 +292,15 @@ def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float) -> dict:
     res['median_plateau'] = float(np.median([s['median_plateau'] for s in strips if s['steps']])) if any(s['steps'] for s in strips) else 0.0
     verdict = 'PASS'
     why = []
-    if vis:
+    if vis_worst >= STAIR or strong:
         verdict = 'FAIL'
-        why.append(f'{vis} visible step(s)')
+        why.append(f'a staircase: {vis_worst} visible steps in one strip' if vis_worst >= STAIR else f'{strong} strong step(s)')
     if 'band' in res and res['band']['dL'] > max_dl + 1e-9:
         verdict = 'FAIL'
         why.append(f"caption band dL* {res['band']['dL']:.2f} > {max_dl}")
+    if verdict == 'PASS' and vis:
+        verdict = 'WARN'
+        why.append(f'{vis} isolated visible step(s), at most {vis_worst} per strip')
     if verdict == 'PASS' and weak_worst >= 3:
         verdict = 'WARN'
         why.append(f'{weak_worst} weak steps in one strip')
@@ -354,12 +367,12 @@ def main() -> int:
         if a.plot and len(results) == 1:
             plot(rgb, region, a.strip, a.plot)
     order = {'PASS': 0, 'WARN': 1, 'FAIL': 2}
-    worst = max(results, key=lambda r: (order[r['verdict']], r['visible'], r['weak_worst_strip'], r['max_c']))
+    worst = max(results, key=lambda r: (order[r['verdict']], r['visible_worst_strip'], r['visible'], r['weak_worst_strip'], r['max_c']))
     if not a.quiet:
         for r in results:
             b = r.get('band')
             bs = f" | band dL* {b['dL']:.2f} dE00 {b['max_dE00']:.2f} (L* {b['L']:.1f})" if b else ''
-            print(f"{r['verdict']:4s} {a.input} @ {r['frame']}: visible {r['visible']}, weak (worst strip) {r['weak_worst_strip']}, "
+            print(f"{r['verdict']:4s} {a.input} @ {r['frame']}: visible {r['visible']} (worst strip {r['visible_worst_strip']}, strong {r['strong']}), weak (worst strip) {r['weak_worst_strip']}, "
                   f"max step dL* {r['max_dL']:.2f} c {r['max_c']:.4f} dE00 {r['max_dE00']:.2f}, plateau {r['median_plateau']:.0f} px, "
                   f"staircase {r['staircase_median']:.2f}, grain {r['grain']:.2f} L*{bs}" + (f"  [{'; '.join(r['why'])}]" if r['why'] else ''))
     if a.json:
