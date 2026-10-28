@@ -13,6 +13,7 @@
 // No readers (conform_L6 §3: strangers' backs reading a board from the foreground are v3's retired S4 model).
 import React from 'react';
 import {Fill} from '../../lib/Fill';
+import {FormShade} from '../../lib/light';
 import {Tier} from '../../lib/tier';
 import {clamp, ease, useTime} from '../../lib/time';
 import {CM} from '../palette';
@@ -39,7 +40,7 @@ export const boardIsSubject = (t: number) => t >= S8T.herWords;
 
 const HerBoardS8: React.FC<{t: number}> = ({t}) => (
   <Tier tier={boardIsSubject(t) ? 'subject' : 'support'}>
-    <StatementBoard face={MAP.B} legsTo={MAP.B_LEGS_Y1} clackAt={S8T.she} lines={CONTENT.lines} rules={CONTENT.rules} smudges={SMUDGES} wipe={WIPE} seed="her" />
+    <StatementBoard face={MAP.B} legsTo={MAP.B_LEGS_Y1} clackAt={S8T.she} lines={CONTENT.lines} rules={CONTENT.rules} smudges={SMUDGES} wipe={WIPE} shadow={false} seed="her" />
   </Tier>
 );
 
@@ -59,10 +60,13 @@ export const S8_BOLLARD_CAP = (() => {
   return `M${x - hw} ${top + 10}Q${x - hw} ${top} ${x} ${top}Q${x + hw} ${top} ${x + hw} ${top + 10}Z`;
 })();
 const Bollard: React.FC = () => (
-  <Tier tier="environment">
-    <Fill d={S8_BOLLARD_BODY} color={CM.coatSlate} seed="s8bollardBody" />
-    <Fill d={S8_BOLLARD_CAP} color={CM.coatSlate} seed="s8bollardCap" />
-  </Tier>
+  <>
+    <Tier tier="environment">
+      <Fill d={S8_BOLLARD_BODY} color={CM.coatSlate} seed="s8bollardBody" />
+      <Fill d={S8_BOLLARD_CAP} color={CM.coatSlate} seed="s8bollardCap" />
+    </Tier>
+    <FormShade d={S8_BOLLARD_BODY} kind="band" />
+  </>
 );
 
 // ---------------------------------------------------------------- the cafe owner and the squeegee
