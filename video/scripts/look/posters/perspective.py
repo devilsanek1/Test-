@@ -735,3 +735,30 @@ def depth_net(bgr, model_path, size=518):
 
 
 depth_net.sessions = {}
+
+
+def depth_layering(d, valid=None, sky_cut=0.03):
+    """How the depth map is built, over the non-sky pixels (d > sky_cut):
+    side = the share of the depth variance found WITHIN rows (things at one height at different depths: overlaps,
+           side frames, layered silhouettes); 0 = depth set by height alone (a ground ramp, stacked bands).
+    range = p95 - p5 of the depth; modes = peaks of its histogram (distinct layers), prominence >= 0.15 of the max."""
+    m = d > sky_cut
+    if valid is not None:
+        m &= valid
+    if m.sum() < 100:
+        return dict(side=0.0, range=0.0, modes=0)
+    vals = d[m]
+    tot = vals.var()
+    rows = []
+    for y in range(d.shape[0]):
+        r = d[y][m[y]]
+        if len(r) > 5:
+            rows.append((len(r), r.var()))
+    within = sum(n * v for n, v in rows) / max(1, sum(n for n, _ in rows))
+    hist, _ = np.histogram(vals, bins=40, range=(0, 1))
+    hs = np.convolve(hist.astype(float), np.ones(3) / 3, 'same')
+    peaks = 0
+    for i in range(1, len(hs) - 1):
+        if hs[i] >= hs[i - 1] and hs[i] > hs[i + 1] and hs[i] >= 0.15 * hs.max():
+            peaks += 1
+    return dict(side=float(within / max(1e-9, tot)), range=float(np.percentile(vals, 95) - np.percentile(vals, 5)), modes=int(peaks))
