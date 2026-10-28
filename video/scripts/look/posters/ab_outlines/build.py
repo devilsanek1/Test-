@@ -87,7 +87,7 @@ def page(v2_size, rvk_size):
     pip_head = (scene.PIP['x'] - 41, scene.PIP['y'] - 66)
     bay_edge = (438, 1010)  # the bay's front (lit) meets its face turned from the sun (shaded)
     a_marks = markers([(1, (fx1, 738), (88, -34)), (2, (pip_head[0], pip_head[1]), (-72, -70))], COL_W, zoom_h)
-    b_marks = markers([(1, (fx1 + 9, 738), (88, -34)), (2, (pip_head[0] + 74, pip_head[1] + 40), (-30, -150)),
+    b_marks = markers([(1, (fx1 + 9, 738), (88, -34)), (2, (pip_head[0] + 74, pip_head[1] + 40), (30, -185)),
                        (3, bay_edge, (-150, 70))], COL_W, zoom_h)
     css = f'''
     @font-face {{ font-family: InterL; src: url('file:///usr/share/fonts/opentype/inter/Inter-Regular.otf'); font-weight: 400; }}

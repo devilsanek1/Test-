@@ -192,7 +192,7 @@ chart: 7 posters, 11 film stills), `img/perspective_films.jpg` (v2 S1, S2, S4, S
   and Cape Town; each zone consistent; every junction hidden; no receding line in the far zone.
 - *In our films:* W1 writes, per exterior set, the near camera (eye level y, height 1.6-5 m, VPs) and, only if the set
   wants the panorama, a far stage: the far city, its water and the scale anchor on their own horizon (in 9:16 about
-  y 1050-1215 against a near eye level at y 1340-1460; `img/perspective_916.jpg`), behind a hiding band (water, a tree
+  y 1090-1215 against a near eye level at y 1380-1480; `img/perspective_916.jpg`), behind a hiding band (water, a tree
   line, a wall, roofs) that carries no receding line. `lib/persp` gains `farStage({horizon})` (frontal quads standing on
   the stage horizon); `lib/depth` `sizeProblems` and the depth sheet accept things tagged `stage: 'far'` (measured
   against the stage horizon, so the view does not WARN "two cameras"). In motion both horizons hold still (they are at
@@ -202,8 +202,8 @@ chart: 7 posters, 11 film stills), `img/perspective_films.jpg` (v2 S1, S2, S4, S
 
   | Shot type | Eye level / horizon | Camera | What the posters add |
   |---|---|---|---|
-  | place-led vista, establishing shot, a scale landing | near eye ~0.70-0.76 H (y 1340-1460); far stage ~0.55-0.63 H (y 1050-1215); tallest top >= y 620; hero top ~0.45 H | 1.7-5 m, or raised over the roofs with ONE horizon at ~0.60-0.70 H (Reykjavik, Singapore) | the designed view; the frame under the UI; CG's S1/S5 landings (0.40-0.46 H) stay the Arcane option |
-  | figure-led street or bank (a person is the subject) | the subject's head on the eye level, 0.50-0.60 H (`layout.md` §2), so the figure stays in the read zone | 1.6 m standing; a 2.5-5 m first-floor camera shows a figure below the horizon but small (~120 px at 20 m, est.) | the near frame (L1), the off-centre VP (L4); a far stage only above the head and under y 600 |
+  | place-led vista, establishing shot, a scale landing | near eye ~0.72-0.77 H (y 1380-1480; the posters' median maps to 1459); far stage ~0.57-0.63 H (y 1090-1215; the three lifted posters map to 1088-1189); tallest top >= y 620; hero top ~0.45 H | 1.7-5 m, or raised over the roofs with ONE horizon at ~0.60-0.70 H (Reykjavik, Singapore) | the designed view; the frame under the UI; CG's S1/S5 landings (0.40-0.46 H) stay the Arcane option |
+  | figure-led street or bank (a person is the subject) | the subject's head on the eye level, 0.50-0.60 H (`layout.md` §2), so the figure stays in the read zone | 1.6 m standing; a 2.5-5 m first-floor camera shows a figure below the horizon but small (~120 px at 20 m, est.) | the near frame (L1), the off-centre VP (L4); a far stage only between the head and the caption band (y >= 620) |
   | big sky, one landmark (CG S3) | ~0.73 H, as CG S3 | eye level from a rooftop | the hero's hidden base and its size beyond one camera (L3) |
 
   A low poster horizon cannot be copied into a figure-led shot: an eye-level camera puts the subject's head on the
@@ -271,7 +271,7 @@ sheet. *Cost:* S-M. *Risk:* more fields at W1; they replace guesses at G5.
 2. **Rule 2:** may landmarks, far rows and house rows be flat elevations when they overlap and step smaller and paler
    toward the air, keeping "never" for floor bands seen edge to edge (v2 S3, S4)?
 3. **The bottom of the frame:** a dark, detailed near frame (leaves, a rail, a rock, roof edges) under the bottom UI and
-   on the side edges, with the eye lowered to ~0.70-0.76 of the frame, in place of open pale ground (v2 S1: 37 % of the
+   on the side edges, with the eye lowered to ~0.72-0.77 of the frame, in place of open pale ground (v2 S1: 37 % of the
    frame), even if it passes tier C's contrast cap (<= 7; the posters' frames 7.9-12)?
 
 ## Appendix A: the planes, per poster (rank 1 = nearest; dE76 of the plane's mean to the air; edges = share of px on a colour step > 6 per px; depth net = median relative depth, 1 near, 0 far)
