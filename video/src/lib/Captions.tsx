@@ -21,7 +21,8 @@ import {captionFontStack, measureCaption, useCaptionFont} from './font';
 export type CaptionLine = {text: string; s: number};
 export type CaptionHighlight = {text: string; s: number};
 /** `out` (SkyCaptions): the page scrolls up and away at this time with no page replacing it, so the caption band is
- *  empty until the next page rolls in (e.g. across a camera dive or a match cut). */
+ *  empty until the next page rolls in (e.g. across a camera dive or a match cut); with pop captions it pops away in one
+ *  frame. scripts/film_captions.py writes it from a pages file's `@out <seconds>` line. */
 export type CaptionBeat = {s: number; e?: number; out?: number; lines: CaptionLine[]; highlights?: CaptionHighlight[]; style?: 'normal' | 'punch' | 'hook'};
 
 export type CaptionsProps = {
@@ -459,11 +460,14 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', s
     const lu = (T + loopEnd - lp.start) / (lp.scrollDur ?? MOTION.captionScroll.dur);
     if (loopEnd > lp.start && T < lp.start && lu < 1) tail = {q: MOTION.captionScroll.ease(clamp(lu)), prev: pages.length > 1 ? pages[pages.length - 2] : null};
   }
-  // a page with `out` scrolls up and away on its own; the next page then rolls into an empty band (no prev to push)
+  // a page with `out` scrolls up and away on its own; the next page then rolls into an empty band (no prev to push).
+  // Pop captions (`motion` 'pop') pop it away in one frame instead: a roll-out would clip its letters at the band's top
+  // edge (owner playbook: captions pop in place)
   const scroll = MOTION.captionScroll;
-  const prevOutQ = prev?.out !== undefined && T >= prev.out ? scroll.ease(clamp((T - prev.out) / scroll.dur)) : 0;
+  const outAt = (o: number) => (pop ? 1 : scroll.ease(clamp((T - o) / scroll.dur)));
+  const prevOutQ = prev?.out !== undefined && T >= prev.out ? outAt(prev.out) : 0;
   const prevGone = prevOutQ >= 1;
-  const outQ = cur.out !== undefined && T >= cur.out ? scroll.ease(clamp((T - cur.out) / scroll.dur)) : 0;
+  const outQ = cur.out !== undefined && T >= cur.out ? outAt(cur.out) : 0;
   if (outQ >= 1) return null;
   const tn: CaptionTone = typeof tone === 'function' ? tone(T) : tone;
   // the hook frame: the first page's line 1 shows settled before anything starts; later lines/boxes keep their times

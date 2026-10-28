@@ -30,6 +30,9 @@ Mostly because
 your laptop runs on
 
 [memory chips.]
+# J3's push-through sweeps the window and its sign through the band from ~19.12: the page leaves after "chips" (its
+# "s" ends ~19.17) and the band stays empty until "And so do" pops on the cut (early review E6)
+@out 19.12
 
 And so do
 [AI data centers.]

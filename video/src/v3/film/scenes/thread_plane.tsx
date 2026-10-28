@@ -42,6 +42,7 @@
 // LAST (0.15: it closes round the lit screen like the outline thickening outward, never a dark slab under a missing
 // screen). T < 0 is the loop underlay (the frame-0 drawing state).
 import React from 'react';
+import {getInputProps} from 'remotion';
 import {ease, prog, type Ease} from '../../../lib/time';
 import {useFilmTime} from '../../../lib/sequence';
 import {Look} from '../../../lib/exit';
@@ -155,10 +156,12 @@ export function tagReaction(T: number): number {
 }
 
 /** The screen's lit windows (film seconds): elsewhere it sits one value step down (the stage leads). The first one
- *  ends at 4.04 with the data center's beat (one event, not a second change on "data"). */
+ *  ends at 4.04 with the data center's beat (one event, not a second change on "data"). "Your laptop" lights it at
+ *  17.24 and it dims again as THE stick leaves it on "memory" (18.30: the stick is the subject by 18.86, so the
+ *  brightest 5 % sits on the stick, CRAFT §d.2; the HOME lane measured it 0.29 H off with the screen lit to 19.40). */
 export const SCREEN_LIT: [number, number][] = [
   [-99, 4.04],
-  [17.24, 19.4],
+  [17.24, 18.3],
   [29.9, 31.0],
   [38.12, 99],
 ];
@@ -419,10 +422,26 @@ export type ThreadPlaneProps = {
   tagProps?: Partial<React.ComponentProps<typeof PriceTag>>;
 };
 
+/** QA: the render's input props say `{"threadOff": true}`: no thread plane in any composition (the A side of an A/B
+ *  pair, like `lightOff`: the pixels that differ from the normal frame are the plane's exact mask, so a check can
+ *  split the hero pixels, the salience and the motion between the plane and the stage). Read once. */
+let THREAD_OFF: boolean | null = null;
+const threadOff = () => {
+  if (THREAD_OFF === null) {
+    try {
+      THREAD_OFF = (getInputProps() as {threadOff?: unknown} | undefined)?.threadOff === true;
+    } catch {
+      THREAD_OFF = false;
+    }
+  }
+  return THREAD_OFF;
+};
+
 /** THE THREAD PLANE at film time T (see the header). Screen space: draw it after the stage, outside any world camera. */
 export const ThreadPlane: React.FC<ThreadPlaneProps> = ({T: Tin, rig = HOME_RIG, children, pip = true, tag = true, tagProps}) => {
   const Tf = useFilmTime();
   const T = Tin ?? Tf;
+  if (threadOff()) return null;
   if (T >= THREAD_GAP[0] && T < THREAD_GAP[1]) return null;
   const S = threadAt(T);
   const {phone, k} = S;

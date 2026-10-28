@@ -8,7 +8,7 @@
   {"s":11.48,"e":13.56,"lines":[{"text":"But this past year,","s":11.48},{"text":"in the US,","s":12.6}],"highlights":[]},
   {"s":13.56,"e":16.6,"lines":[{"text":"computers went up","s":13.56},{"text":"almost 10%.","s":14.84}],"highlights":[]},
   {"s":16.6,"e":18.28,"lines":[{"text":"Mostly because","s":16.6},{"text":"your laptop runs on","s":17.24}],"highlights":[]},
-  {"s":18.28,"e":19.4,"lines":[{"text":"memory chips.","s":18.28}],"highlights":[{"text":"memory chips.","s":18.28}]},
+  {"s":18.28,"e":19.12,"lines":[{"text":"memory chips.","s":18.28}],"highlights":[{"text":"memory chips.","s":18.28}],"out":19.12},
   {"s":19.4,"e":21.32,"lines":[{"text":"And so do","s":19.4},{"text":"AI data centers.","s":19.96}],"highlights":[{"text":"AI data centers.","s":19.96}]},
   {"s":21.32,"e":22.68,"lines":[{"text":"By the mountain.","s":21.32}],"highlights":[]},
   {"s":22.68,"e":23.64,"lines":[{"text":"They pay more,","s":22.68}],"highlights":[]},
