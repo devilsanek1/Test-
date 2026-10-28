@@ -14,7 +14,8 @@ difference like A vs B what you are talking about".
   B   the posters' way: no outline on anything; the SAME shapes and colours; every volume a lit face and a shade face
         (the same tint family at a poster-like step: B_K below), casts as flat colour, faces turned up a step lighter;
         tiny dark lines only for window bars and railings (the same bars as A).
-  B0  the inset: A with its lines deleted and nothing else changed (v2's gentle light kept): why B needs its shade.
+  B0  the inset, "B without its shade faces": B's no-line drawing with no light and shade at all (flat fills only):
+        why B needs its light and shade.
 
 Geometry and colours are v2's: CM tokens from src/v2r/palette.ts, the terrace from src/v2r/scenes/V2S3_tHouses.tsx and
 V2S3_tHer.tsx (world px of the 1080 x 1920 frame at the 12.98 match), the pen's tier fills from lib/pen.ts (tierFill:
@@ -160,9 +161,18 @@ B_K = dict(form=0.56, under=0.66, cast=0.52, contact=0.78, water=2)
 B_TOP_DL = 6.0
 B_LEFT_DL = 4.0
 
+def own_step(h, dL, ck=1.05):
+    L, C, hh = lch(h)
+    r = math.radians(hh)
+    return lab_hex(L + dL, C * ck * math.cos(r), C * ck * math.sin(r))
+
+
 # the scope grounds the pen's environment fills are pulled toward (S3 measured: the terrace's scope = its brick)
 BG_TERRACE = CM['brick']
 BG_SKY = CM['sky']
+# greens: the leaf's own deeper step (A: v2's form depth on sage, ~-8 L*; B: the poster-like step, ~-23 L*)
+_SAGE = tier_fill(CM['sage'], 'environment', BG_TERRACE)
+LEAF_TINT = {'A': tint_for(_SAGE, own_step(_SAGE, -8)), 'B': tint_for(_SAGE, own_step(_SAGE, -23))}
 
 
 # ----------------------------------------------------------------------------------------------- path helpers
@@ -180,12 +190,17 @@ def rect(x, y, w, h):
 
 
 def poly(pts):
+    """A closed polygon, always clockwise on screen (y down), so overlapping subpaths of one path union under the
+    nonzero rule instead of cancelling."""
+    a = sum(pts[i][0] * pts[(i + 1) % len(pts)][1] - pts[(i + 1) % len(pts)][0] * pts[i][1] for i in range(len(pts)))
+    if a < 0:
+        pts = pts[::-1]
     return 'M' + 'L'.join(P(x, y) for x, y in pts) + 'Z'
 
 
 def ell(cx, cy, rx, ry=None):
     ry = rx if ry is None else ry
-    return f'M{P(cx - rx, cy)}A{f1(rx)} {f1(ry)} 0 1 0 {P(cx + rx, cy)}A{f1(rx)} {f1(ry)} 0 1 0 {P(cx - rx, cy)}Z'
+    return f'M{P(cx - rx, cy)}A{f1(rx)} {f1(ry)} 0 1 1 {P(cx + rx, cy)}A{f1(rx)} {f1(ry)} 0 1 1 {P(cx - rx, cy)}Z'
 
 
 def rrect(x, y, w, h, r):
@@ -247,11 +262,16 @@ class Doc:
             self.shadow(d, 'under', clip=clip)
 
     def shadow(self, d, kind, clip=None):
-        """kind: form | under | cast | contact (the tint family) | water (the water's own step)."""
+        """kind: form | under | cast | contact (the tint family) | water (the water's own step) | leaf (greens'
+        own step). B0 (the inset "B without its shade faces") draws none: the same shapes, flat."""
+        if self.mode == 'B0':
+            return
         cl = f' clip-path="url(#{clip})"' if clip else ''
         if kind == 'water':
             n = self.k['water']
             c = WATER_TINT if n == 1 else multiply(WATER_TINT, *([WATER_TINT] * (n - 1)))
+        elif kind == 'leaf':  # greens keep their hue (v2's LAWN_SHADE: the leaf's own deeper step, never olive)
+            c = LEAF_TINT[self.mode]
         else:
             c = TINT(self.k[kind])
         self.shade.append(f'<path d="{d}" fill="{c}"{cl}/>')
@@ -298,7 +318,7 @@ class Doc:
 
 # ----------------------------------------------------------------------------------------------- the world (S3 px)
 # The views (world px of the 1080 x 1920 frame): the panel, the close-up corner, the inset.
-VIEW_PANEL = (58, 586, 784, 762)  # roofs to the boat's waterline: the west gap, her house, the stock house, the boat
+VIEW_PANEL = (58, 576, 784, 772)  # roofs to the boat's waterline: the west gap, her house, the stock house, the boat
 VIEW_ZOOM = (246, 676, 412, 392)  # her window (A's outline) + Pip (B's thin line) + the railing + the bay's top
 WORLD = (0, 560, 1080, 920)
 
@@ -348,11 +368,11 @@ def tree(d: Doc):
             (152, 944, 26), (30, 906, 28)]
     gold = [(70, 840, 32), (108, 820, 34), (140, 840, 26), (50, 866, 24)]
     rust = [(98, 905, 34), (136, 898, 28), (72, 934, 28), (118, 952, 28)]
-    for group, c in ((sage, CM['sage']), (gold, CM['leafGold']), (rust, CM['leafRust'])):
+    for group, c, kind in ((sage, CM['sage'], 'leaf'), (gold, CM['leafGold'], 'form'), (rust, CM['leafRust'], 'form')):
         dd = ''.join(ell(x, y, r) for x, y, r in group)
         d.fill(dd, c, bg=BG_SKY)
         cid = d.clip(dd)  # each lobe's crescent away from the low western sun (rigs.ts form frac ~0.3)
-        d.shadow(''.join(ell(x + r * 0.55, y + r * 0.35, r * 0.8) for x, y, r in group), 'form', clip=cid)
+        d.shadow(''.join(ell(x + r * 0.55, y + r * 0.35, r * 0.8) for x, y, r in group), kind, clip=cid)
 
 
 def stack(d: Doc, x, w, top, base, brick, pots=3):
@@ -460,30 +480,28 @@ def bay(d: Doc):
     xl, xa, xb, xr = 290, 326, 438, 474  # left face, front, right face
     top, base = 914, 1100
     d.shadow(poly([(xr, top + 4), (xr + 26, top + 14), (xr + 26, base), (xr, base)]), 'cast')
-    d.fill(rect(xl, top, xa - xl, base - top), CM['stucco'], face='left')
-    d.fill(rect(xa, top, xb - xa, base - top), CM['stucco'])
-    d.fill(rect(xb, top, xr - xb, base - top), CM['stucco'], face='right')
-    # the windows in each face
-    for (wx, ww, face) in ((xl + 7, xa - xl - 14, 'left'), (xa + 10, xb - xa - 20, 'front'), (xb + 7, xr - xb - 14, 'right')):
-        wy, wh = top + 18, 104
+    # the windows in each face; the face turned from the sun takes ONE flat shade over all its parts (below)
+    for (fx0, fx1, face) in ((xl, xa, 'left'), (xa, xb, 'front'), (xb, xr, 'front')):
+        d.fill(rect(fx0, top, fx1 - fx0, base - top), CM['stucco'], face=face)
+        inset = 10 if fx1 - fx0 > 60 else 7
+        wx, ww, wy, wh = fx0 + inset, fx1 - fx0 - 2 * inset, top + 18, 104
         d.fill(rect(wx - 3, wy - 3, ww + 6, wh + 3), CM['paper'], face=face)
         d.fill(rect(wx, wy, ww, wh), CM['glass'], face=face)
         d.fill(poly([(wx, wy + wh * 0.55), (wx + ww, wy + wh * 0.38), (wx + ww, wy + wh), (wx, wy + wh)]),
                CM['shadeCool'], face=face)
         d.fill(rect(wx, wy, ww, wh * 0.2), CM['coatOat'], face=face)
-        if face == 'front':
+        if ww > 40:
             lob = ell(wx + 24, wy + wh - 6, 14) + ell(wx + 44, wy + wh - 12, 16) + ell(wx + 64, wy + wh - 6, 12)
             d.fill(lob, CM['sage'])
         bw = 2.4
         d.bar(rect(wx, wy + wh * 0.48, ww, bw), CM['paper'])
         if ww > 40:
             d.bar(rect(wx + ww * 0.5 - bw / 2, wy, bw, wh), CM['paper'])
-        if face != 'right':
+        if fx0 != xb:
             d.shadow(rect(wx, wy, 5, wh), 'form')
             d.shadow(rect(wx, wy, ww, 7), 'cast')
         d.fill(rect(wx - 6, wy + wh, ww + 12, 6), CM['limestone'], face='top' if face == 'front' else face)
-    # re-shade the whole right face after its windows (one flat plane turned from the sun)
-    d.shadow(rect(xb, top, xr - xb, base - top), 'form')
+    d.shadow(rect(xb, top, xr - xb, base - top), 'form')  # the face turned from the sun: one flat plane
     # the bay's stone cornice: front (lit), its underside, its cast on the bay's head
     d.fill(rect(xl - 6, top - 14, xr - xl + 12, 12), CM['limestone'])
     d.fill(poly([(xr + 6, top - 14), (xr + 14, top - 10), (xr + 14, top + 1), (xr + 6, top - 2)]), CM['limestone'],
@@ -561,8 +579,10 @@ def her_window(d: Doc):
     d.fill(dome(fx + w * 0.2, fy + h * 0.32, w * 0.09, h * 0.06), CM['coatMustard'], tier='subject')
     d.fill(rect(fx + w * 0.195, fy + h * 0.32, 2.0, h * 0.6), CM['anchor'], tier='subject')
     sil = her_silhouette_path()
+    # her figure's ONE outline, in its own deep shade: stroked at 2x behind the fill, so only the outer 3 px show
+    # (one line round the whole figure, no seams inside it)
+    d.outline(sil, 'subject', CM['anchor'], width=6.0)
     d.fill(sil, CM['anchor'], tier='subject')
-    d.outline(sil, 'subject', CM['anchor'])
     d.fill(rect(fx + w * 0.48, TRANSOM, w * 0.04, fy + h - TRANSOM), CM['hero'], tier='subject')
     d.fill(rect(fx, TRANSOM, w, w * 0.035), CM['hero'], tier='subject')
     d.fill(rect(fx - WFR, fy + h - w * 0.02, w + 2 * WFR, w * 0.07), CM['hero'], tier='subject')
@@ -580,17 +600,18 @@ def her_window(d: Doc):
 
 def her_silhouette_path():
     """Her profile silhouette on the phone (K4's Person 'phoneEar', simplified): head, bun, coat, legs, arm up."""
-    hx, hy = 331.5, 742
-    head = ell(hx, hy, 13.5, 14.5)
-    bun = ell(hx + 12, hy - 4, 8)
-    body = ('M{}C{} {} {}C{} {} {}L{}L{}L{}L{}L{}C{} {} {}Z'.format(
-        P(hx - 9, hy + 13), P(hx - 22, hy + 22), P(hx - 22, hy + 52), P(hx - 18, hy + 70),
-        P(hx - 16, hy + 84), P(hx - 22, hy + 96), P(hx - 20, hy + 100), P(hx - 14, hy + 120), P(hx - 8, hy + 120),
-        P(hx - 2, hy + 100), P(hx + 5, hy + 120), P(hx + 11, hy + 120), P(hx + 16, hy + 96), P(hx + 16, hy + 50),
-        P(hx + 10, hy + 14)))
-    arm = poly([(hx - 14, hy + 24), (hx - 24, hy + 10), (hx - 18, hy - 2), (hx - 10, hy - 4), (hx - 12, hy + 4),
-                (hx - 15, hy + 12), (hx - 6, hy + 24)])
-    return head + bun + body + arm
+    hx, hy = 331.5, 742  # her head (map S3.pushFrom (330, 742)); she faces left, in profile
+    head = ell(hx, hy, 13, 14.5)
+    bun = ell(hx + 11, hy - 6, 7.5)
+    neck = rect(hx - 4, hy + 10, 9, 8)
+    coat = poly(bez((hx - 4, hy + 16), (hx - 18, hy + 18), (hx - 19, hy + 40), (hx - 18, hy + 60), 10) +
+                [(hx - 22, hy + 100), (hx + 18, hy + 100)] +
+                bez((hx + 15, hy + 56), (hx + 16, hy + 30), (hx + 14, hy + 17), (hx + 4, hy + 16), 10))
+    legs = rect(hx - 12, hy + 99, 9, 21) + rect(hx + 2, hy + 99, 9, 21)
+    # the arm bent up: the elbow out in front, the forearm across the jaw, the hand and the phone at her ear
+    arm = poly([(hx - 4, hy + 20), (hx - 12, hy + 19), (hx - 23, hy + 34), (hx - 19, hy + 42), (hx - 9, hy + 35),
+                (hx + 5, hy + 12), (hx + 5, hy - 2), (hx - 3, hy - 3), (hx - 4, hy + 8)])
+    return head + bun + neck + coat + legs + arm
 
 
 def terrace(d: Doc):
@@ -660,7 +681,7 @@ def window_box(d: Doc):
             (x0 + 248, y0 - 5, 12)]
     dd = ''.join(ell(x, y, r) for x, y, r in west + east)
     d.fill(dd, CM['sage'])
-    d.shadow(''.join(ell(x + r * 0.55, y + r * 0.4, r * 0.85) for x, y, r in west + east), 'form', clip=d.clip(dd))
+    d.shadow(''.join(ell(x + r * 0.55, y + r * 0.4, r * 0.85) for x, y, r in west + east), 'leaf', clip=d.clip(dd))
     for x, y, c in ((x0 + 24, y0 - 20, CM['leafRust']), (x0 + 52, y0 - 30, CM['blossom']), (x0 + 84, y0 - 24, CM['leafRust']),
                     (x0 + 150, y0 - 18, CM['blossom']), (x0 + 214, y0 - 20, CM['box'])):
         d.fill(ell(x, y, 6.5, 5.5), c)
@@ -798,12 +819,14 @@ def water(d: Doc):
     d.fill(rect(-10, y0, 1100, y1 - y0), CM['water'], bg=BG_SKY)
     W = tier_fill(CM['water'], 'environment', BG_SKY)
     for H in HOUSES:
-        c = mix(tier_fill(H['wall'], 'environment', BG_TERRACE), W, 0.58)
-        for k, (yy, hh) in enumerate(((y0 + 14, 22), (y0 + 44, 14), (y0 + 68, 9))):
-            inset = 8 + k * 9
-            d.fill(rect(H['x0'] + inset, yy, H['x1'] - H['x0'] - 2 * inset, hh), c, raw=True)
+        c = mix(tier_fill(H['wall'], 'environment', BG_TERRACE), W, 0.68)
+        for k, (yy, hh) in enumerate(((y0 + 16, 16), (y0 + 42, 10), (y0 + 62, 6))):
+            inset = 10 + k * 12
+            span = H['x1'] - H['x0'] - 2 * inset
+            for s0, s1 in ((0.0, 0.42), (0.5, 1.0)) if k else ((0.0, 1.0),):
+                d.fill(rrect(H['x0'] + inset + span * s0, yy, span * (s1 - s0), hh, hh / 2), c, raw=True)
     for x, w in ((566, 66), (852, 74), (884, 100), (1036, 62), (562, 86), (268, 132)):
-        d.fill(rect(x + 8, y0 + 20, w - 16, 5), mix(CM['lamp'], W, 0.3), raw=True)
+        d.fill(rrect(x + 10, y0 + 22, w - 20, 4, 2), mix(CM['lamp'], W, 0.35), raw=True)
     d.shadow(rect(-10, y0, 1100, 10), 'water')
     for x, yy, w in ((60, 1196, 110), (440, 1204, 80), (690, 1192, 120)):
         d.fill(rrect(x, yy, w, 3, 1.5), mix(CM['paper'], W, 0.3), raw=True)
@@ -838,11 +861,12 @@ def boat(d: Doc):
         if px > cx1 - 20:
             continue
         lit = k % 2 == 0
-        d.fill(ell(px, cab_y + 38, 17), CM['leafGold'])
+        rim = ell(px, cab_y + 38, 17)
+        d.fill(rim, CM['leafGold'])
+        d.shadow(ell(px + 9, cab_y + 46, 13), 'form', clip=d.clip(rim))  # the brass rim's crescent away from the sun
         d.fill(ell(px, cab_y + 38, 12), CM['lamp'] if lit else CM['glass'], raw=lit)
-        if not lit:
-            d.shadow(ell(px - 4, cab_y + 34, 12), 'form', clip=d.clip(ell(px, cab_y + 38, 12)))
-        d.shadow(ell(px + 5, cab_y + 42, 17), 'form', clip=d.clip(ell(px, cab_y + 38, 17) + ''))
+        if not lit:  # the recess of an unlit porthole (lit panes stay unlit)
+            d.shadow(ell(px - 5, cab_y + 33, 12), 'form', clip=d.clip(ell(px, cab_y + 38, 12)))
     dx0 = cx0 + 222
     d.fill(rect(dx0, cab_y + 16, 92, gun_y - 8 - cab_y - 16), CM['brickDeep'])
     d.fill(rect(dx0 + 6, cab_y + 21, 37, gun_y - 8 - cab_y - 26), CM['paper'])
@@ -866,7 +890,7 @@ def boat(d: Doc):
                face='right')
         lob = ell(px - 6, roof_y - 24, 9) + ell(px + 5, roof_y - 28, 10) + ell(px + 1, roof_y - 20, 9)
         d.fill(lob, CM['sage'])
-        d.shadow(ell(px + 9, roof_y - 22, 9), 'form', clip=d.clip(lob))
+        d.shadow(ell(px + 9, roof_y - 22, 9), 'leaf', clip=d.clip(lob))
     d.fill(ell(cx0 + 150, roof_y - 4, 16, 6), CM['coatOat'])
     d.fill(ell(cx0 + 150, roof_y - 4, 9, 3), CM['line'])
     chx = cx1 - 120  # the chimney (a cylinder: lit left, shade right) with a brass band

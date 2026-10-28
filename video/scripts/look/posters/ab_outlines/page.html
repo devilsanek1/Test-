@@ -1,0 +1,105 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>A vs B: outlines</title><style>
+    @font-face { font-family: InterL; src: url('file:///usr/share/fonts/opentype/inter/Inter-Regular.otf'); font-weight: 400; }
+    @font-face { font-family: InterL; src: url('file:///usr/share/fonts/opentype/inter/Inter-SemiBold.otf'); font-weight: 600; }
+    @font-face { font-family: InterL; src: url('file:///usr/share/fonts/opentype/inter/Inter-Bold.otf'); font-weight: 700; }
+    @font-face { font-family: InterL; src: url('file:///usr/share/fonts/opentype/inter/Inter-ExtraBold.otf'); font-weight: 800; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #FBF3E6; }
+    body { width: 1800px; font-family: InterL, Inter, sans-serif; color: #2B1B0A; padding: 44px 26px 54px; }
+    h1 { font-size: 70px; line-height: 1.08; font-weight: 800; letter-spacing: -0.5px; }
+    .sub { font-size: 42px; line-height: 1.3; margin-top: 14px; font-weight: 400; }
+    .row { display: flex; gap: 28px; margin-top: 34px; }
+    .col { width: 860px; position: relative; }
+    .tag { font-size: 54px; line-height: 1.1; font-weight: 800; }
+    .tag2 { font-size: 42px; line-height: 1.25; font-weight: 600; margin-top: 6px; min-height: 106px; }
+    .pic { display: block; width: 860px; border-radius: 18px; overflow: hidden; position: relative; }
+    .pic img { display: block; width: 100%; }
+    .ov { position: absolute; left: 0; top: 0; font-family: InterL, Inter, sans-serif; }
+    h2 { font-size: 52px; line-height: 1.15; font-weight: 800; margin-top: 44px; padding-top: 32px;
+          border-top: 4px solid #E6D3B5; }
+    .legend { font-size: 42px; line-height: 1.28; margin-top: 16px; font-weight: 600; }
+    .legend div { display: flex; gap: 16px; margin-top: 8px; }
+    .legend b { display: inline-flex; width: 52px; height: 52px; flex: 0 0 52px; border-radius: 26px;
+                 border: 4px solid #2B1B0A; justify-content: center; align-items: center; font-size: 32px; font-weight: 800;
+                 background: #fff; }
+    .cap { font-size: 42px; line-height: 1.26; margin-top: 14px; font-weight: 600; }
+    .why { display: flex; gap: 40px; margin-top: 30px; align-items: flex-start; }
+    .why .txt { font-size: 44px; line-height: 1.32; font-weight: 400; width: 1148px; }
+    .why .txt p + p { margin-top: 22px; }
+    .bottom { margin-top: 48px; padding: 38px 44px; background: #F1E4D2; border-radius: 22px; font-size: 50px;
+               line-height: 1.3; font-weight: 700; }
+    .bottom p + p { margin-top: 18px; }
+    </style></head>
+<body>
+  <h1>A vs B: outlines, or edges made by light and shade</h1>
+  <div class="sub">Our own canal street from One Small Window: same shapes, same colours, same low sun on the left.
+    Only the edges, and the light and shade they need, change.</div>
+
+  <div class="row">
+    <div class="col">
+      <div class="tag">A: our line today (outlines)</div>
+      <div class="tag2">a line round the main object, thin lines on Pip and people</div>
+      <div class="pic"><img src="scene_A.svg" width="860" height="847"></div>
+    </div>
+    <div class="col">
+      <div class="tag">B: the posters' way</div>
+      <div class="tag2">no outlines: edges from light and shade</div>
+      <div class="pic"><img src="scene_B.svg" width="860" height="847"></div>
+    </div>
+  </div>
+
+  <h2>Up close: the same corner</h2>
+  <div class="row" style="margin-top: 30px">
+    <div class="col">
+      <div class="tag" style="font-size: 46px">A</div>
+      <div class="pic" style="margin-top: 10px"><img src="zoom_A.svg" width="860" height="818"><svg class="ov" width="860" height="818" viewBox="0 0 860 818"><line x1="431.4" y1="95.4" x2="343.4" y2="129.4" stroke="#2B1B0A" stroke-width="5" stroke-linecap="round"/><circle cx="343.4" cy="129.4" r="7" fill="#2B1B0A"/><circle cx="431.4" cy="95.4" r="30" fill="#FFFFFF" stroke="#2B1B0A" stroke-width="5"/><text x="431.4" y="108.4" text-anchor="middle" font-size="38" font-weight="800" fill="#2B1B0A">1</text><line x1="560.5" y1="572.9" x2="632.5" y2="642.9" stroke="#2B1B0A" stroke-width="5" stroke-linecap="round"/><circle cx="632.5" cy="642.9" r="7" fill="#2B1B0A"/><circle cx="560.5" cy="572.9" r="30" fill="#FFFFFF" stroke="#2B1B0A" stroke-width="5"/><text x="560.5" y="585.9" text-anchor="middle" font-size="38" font-weight="800" fill="#2B1B0A">2</text></svg></div>
+      <div class="legend">
+        <div><b>1</b><span>an outline round her window (3 px, in its own dark teal)</span></div>
+        <div><b>2</b><span>a thin line round Pip (and people)</span></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="tag" style="font-size: 46px">B</div>
+      <div class="pic" style="margin-top: 10px"><img src="zoom_B.svg" width="860" height="818"><svg class="ov" width="860" height="818" viewBox="0 0 860 818"><line x1="450.2" y1="95.4" x2="362.2" y2="129.4" stroke="#2B1B0A" stroke-width="5" stroke-linecap="round"/><circle cx="362.2" cy="129.4" r="7" fill="#2B1B0A"/><circle cx="450.2" cy="95.4" r="30" fill="#FFFFFF" stroke="#2B1B0A" stroke-width="5"/><text x="450.2" y="108.4" text-anchor="middle" font-size="38" font-weight="800" fill="#2B1B0A">1</text><line x1="816.9" y1="541.4" x2="786.9" y2="726.4" stroke="#2B1B0A" stroke-width="5" stroke-linecap="round"/><circle cx="786.9" cy="726.4" r="7" fill="#2B1B0A"/><circle cx="816.9" cy="541.4" r="30" fill="#FFFFFF" stroke="#2B1B0A" stroke-width="5"/><text x="816.9" y="554.4" text-anchor="middle" font-size="38" font-weight="800" fill="#2B1B0A">2</text><line x1="250.8" y1="767.2" x2="400.8" y2="697.2" stroke="#2B1B0A" stroke-width="5" stroke-linecap="round"/><circle cx="400.8" cy="697.2" r="7" fill="#2B1B0A"/><circle cx="250.8" cy="767.2" r="30" fill="#FFFFFF" stroke="#2B1B0A" stroke-width="5"/><text x="250.8" y="780.2" text-anchor="middle" font-size="38" font-weight="800" fill="#2B1B0A">3</text></svg></div>
+      <div class="legend">
+        <div><b>1</b><span>no line: teal against brick, and the frame's shadow</span></div>
+        <div><b>2</b><span>no line: Pip's shaded side keeps head and body apart</span></div>
+        <div><b>3</b><span>the bay: a lit side next to a shaded side</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Why B needs its light and shade</h2>
+  <div class="why">
+    <div style="width: 560px">
+      <div class="pic" style="width: 560px"><img src="zoom_B0.svg" width="560" height="533"></div>
+      <div class="cap">B without the shade faces</div>
+    </div>
+    <div class="txt">
+      <p>Take the light and shade away as well, and shapes of one colour run together: the bay window goes flat, Pip's
+        head sinks into its body.</p>
+      <p>Every edge needs a line (A) or a step of light and shade (B). The posters choose the step, which is why they
+        look so crisp.</p>
+    </div>
+  </div>
+
+  <h2>In our film, and in the posters</h2>
+  <div class="row" style="margin-top: 30px">
+    <div class="col">
+      <div class="pic"><img src="ref_v2_S3_t13.6.jpg" width="860" height="573"></div>
+      <div class="cap">One Small Window, 13.6 s: the outline round her window</div>
+    </div>
+    <div class="col">
+      <div class="pic"><img src="ref_reykjavik.jpg" width="860" height="445"></div>
+      <div class="cap">Reykjavik poster: no outlines; each house a lit side and a shaded side, thin bars only on the
+        windows</div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <p>A draws a line round the main things.</p>
+    <p>B draws no outlines: every shape is a lit side next to a shaded side, and only tiny things (window bars,
+      railings) stay thin lines.</p>
+  </div>
+</body></html>
