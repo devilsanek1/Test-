@@ -10,7 +10,7 @@ import {Fill} from '../../../lib/Fill';
 import {glint, line, poly, polyPath} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
-import {At, b, fillAt, lerp, Pt, quadPt, Show, Txt, W} from './util';
+import {At, b, fillAt, lerp, mixRgb, Pt, quadPt, Show, Txt, W} from './util';
 import {tiered} from '../../../lib/tier';
 import {isClean} from '../../../lib/pen';
 
@@ -40,7 +40,17 @@ export type LaptopProps = {
   lidOnly?: boolean;
   /** Children drawn on the screen (screen-space canvas px; e.g. a see-inside view). */
   children?: React.ReactNode;
+  /** OPT-IN (v3 rework, CRAFT §b: a story object off its beat is tier B): 0 = full strength, 1 = off-beat (the lid,
+   *  deck and keys a soft terracotta, the screen a pale peach: LAPTOP_DIM), 0.5 = the half step of a 2-step change.
+   *  Default 0. The listing's laptop steps down with the phone's screen, so it never out-colours the dimmed tag. */
+  dim?: number;
 };
+
+/** The off-beat laptop (`dim` 1), chosen for the phone's listing: under the screen's peach dim multiply (#F2D9C8) the
+ *  lid and deck land at ~L* 62 C* 34 (the dimmed tag's family: L* 58 C* 38), the keys and the deck's edge ~L* 55, the
+ *  screen ~L* 78 C* 22 (on its beat the listing laptop was C* 66, and off-beat C* 45: the most saturated thing in the
+ *  lower half while the stage led). */
+export const LAPTOP_DIM = {hero: '#D99A84', heroDeep: '#C9806A', screen: '#F6D2C0'};
 
 /** Key points of a laptop (for lanes aiming at it: the screen centre, the keyboard centre, the lid corners). */
 export function laptopGeo(x: number, y: number, w: number, lidH = 0.64) {
@@ -61,10 +71,12 @@ export function laptopGeo(x: number, y: number, w: number, lidH = 0.64) {
   return {H, D, lid, scr, deck, edge, screenC: quadPt(scr, 0.5, 0.5), keysC: quadPt(deck, 0.5, 0.42)};
 }
 
-const LaptopBody: React.FC<LaptopProps> = ({x, y, w, lidH = 0.64, variant = 'old', screen, taped, label, labelAt, rot = 0, at, seed = 'laptop', ink = 3.4, lidOnly, children}) => {
+const LaptopBody: React.FC<LaptopProps> = ({x, y, w, lidH = 0.64, variant = 'old', screen, taped, label, labelAt, rot = 0, at, seed = 'laptop', ink = 3.4, lidOnly, children, dim = 0}) => {
   const g = laptopGeo(x, y, w, lidH);
   const isNew = variant === 'new';
-  const scr = screen ?? (isNew ? EMBER.newScreen : EMBER.anchor);
+  const scr = mixRgb(screen ?? (isNew ? EMBER.newScreen : EMBER.anchor), LAPTOP_DIM.screen, dim);
+  const hero = mixRgb(EMBER.hero, LAPTOP_DIM.hero, dim);
+  const heroDeep = mixRgb(EMBER.heroDeep, LAPTOP_DIM.heroDeep, dim);
   const small = w < 220;
   const thin = Math.max(1.6, ink * 0.65);
   const over: [number, number] = small ? [0, 2] : [1, 5];
@@ -109,7 +121,7 @@ const LaptopBody: React.FC<LaptopProps> = ({x, y, w, lidH = 0.64, variant = 'old
   const body = (
     <>
       {/* lid */}
-      <Fill d={polyPath(g.lid)} color={EMBER.hero} at={fillAt(at)} seed={`${seed}/lid`} />
+      <Fill d={polyPath(g.lid)} color={hero} at={fillAt(at)} seed={`${seed}/lid`} />
       <Fill d={polyPath(g.scr)} color={scr} at={fillAt(at, 0.05)} offset={false} seed={`${seed}/scr`} />
       {children ? <Show at={fillAt(at, 0.05)}>{children}</Show> : null}
       {clean ? (
@@ -129,11 +141,11 @@ const LaptopBody: React.FC<LaptopProps> = ({x, y, w, lidH = 0.64, variant = 'old
       {lidOnly ? null : (
         <>
           {/* deck + its front edge (the hero's flat shade step) */}
-          <Fill d={polyPath(g.edge)} color={EMBER.heroDeep} at={fillAt(at, 0.06)} seed={`${seed}/edge`} />
-          <Fill d={polyPath(g.deck)} color={EMBER.hero} at={fillAt(at, 0.04)} seed={`${seed}/deck`} />
+          <Fill d={polyPath(g.edge)} color={heroDeep} at={fillAt(at, 0.06)} seed={`${seed}/edge`} />
+          <Fill d={polyPath(g.deck)} color={hero} at={fillAt(at, 0.04)} seed={`${seed}/deck`} />
           {clean ? null : <Ink d={poly(g.deck, {closed: true, seed: `${seed}/deckI`, over}) + poly([g.edge[1], g.edge[2], g.edge[3], g.edge[0]], {seed: `${seed}/edgeI`, over: [0, 2]})} at={b(at, 0.04)} width={ink} />}
           {caps ? (
-            <Fill d={caps} color={clean && w < 800 ? EMBER.heroDeep : EMBER.anchor} at={fillAt(at, 0.14)} offset={false} seed={`${seed}/caps`} />
+            <Fill d={caps} color={clean && w < 800 ? heroDeep : EMBER.anchor} at={fillAt(at, 0.14)} offset={false} seed={`${seed}/caps`} />
           ) : (
             <Ink d={rows.join('')} at={b(at, 0.14)} width={kw} color={EMBER.anchor} dash={`${(w * 0.05).toFixed(1)} ${(w * 0.018).toFixed(1)}`} taper={false} />
           )}
@@ -158,7 +170,7 @@ const LaptopBody: React.FC<LaptopProps> = ({x, y, w, lidH = 0.64, variant = 'old
   );
   return rot ? <XG m={mat.about(mat.rotate(rot), x, y)}>{body}</XG> : body;
 };
-export const Laptop = tiered('subject', {tone: EMBER.hero}, LaptopBody);
+export const Laptop = tiered('subject', {tone: (p) => mixRgb(EMBER.hero, LAPTOP_DIM.hero, p.dim ?? 0)}, LaptopBody);
 
 /** The label badge over a laptop ("BETTER"): a small warm-white card with ink lettering, sized from the laptop. */
 const LaptopLabel: React.FC<{x: number; y: number; w: number; text: string; at?: At; seed: string}> = ({x, y, w, text, at, seed}) => {

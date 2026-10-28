@@ -74,7 +74,8 @@ A clash is a bug: fix the lower doc in the same turn.
   is ONE gentle, smooth gradient (the owner's opt-in: the sky is the one place a gradient is welcome; "find a beautiful
   way to do a gentle gradient"), warmest at the sun and the horizon, dithered so it never bands on a phone, nearly
   flat inside the caption band (captions keep their contrast); the far haze takes the sky's lowest colour; no two big
-  fields of unrelated colour meet in a seam no object explains. -> `PALETTE.md`; `COZY_AND_SCALE.md` 3b.6; `CRAFT.md` §f.
+  fields of unrelated colour meet in a seam no object explains. -> `PALETTE.md`; `COZY_AND_SCALE.md` 3b.6; `CRAFT.md` §f;
+  the sky: `CRAFT.md` §g (`lib/sky.tsx`, `check_banding.py`, the master encode).
 - **7. Cozy, with occasional great scale.** Cozy is the home feeling (>= 50 % of the runtime outside full-frame charts):
   a place that holds you without shutting you in (masses on 2-3 sides, one opening the subject faces), life passing
   through sideways, broken once at most, at the turn; it evolves one measured owner reference at a time. Scale: 1-2
@@ -87,7 +88,9 @@ A clash is a bug: fix the lower doc in the same turn.
   pop, grow, wipe or slide in; a draw-on is frame 0's, and after it only where the drawing is the beat (a chart line
   in step with the voice); no opacity fades (a dissolve only as a declared time-passing exception). A reference gives
   a move's SHAPE, never its speed (retime it, usually faster; one speed budget, readable at 1x). Every hold is locked
-  or a slow 2D float, never a zoom; a zoom is a visible story move or a carrier; no roll, no compound moves; visuals
+  or a slow float, never a zoom; a float is a gentle PARALLAX float (owner, 2026-10-28: planes move by depth, the
+  near ground most, far planes little, the sky and the caption band not at all; back at rest by every join and on
+  every map-critical frame; `lib/depth.ts` parallax helper); a zoom is a visible story move or a carrier; no roll, no compound moves; visuals
   lead their word by ~0.1 s. -> `G3_ANIMATIC.md` §4; `PIPELINE_V2.md` "Frame rate"; `COZY_AND_SCALE.md` 3b.5.
 - **9. The opening is a banger.** Frame 0 is the scene being drawn, in the clean pen: the subject's outline (with B's
   tinted lines) draws on, C lands as flat pale shapes and colour floods in within ~0.3 s, with the core line in words,

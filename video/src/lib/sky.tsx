@@ -163,7 +163,8 @@ export type SkyBand = {y0: number; y1: number; maxDL?: number};
  *  (`strength`, 0..1, default 1) and gone at the rim with a smootherstep. Part of the sky, below everything. */
 export type SkySun = {x: number; y: number; color: SkyColor; rx: number; ry?: number; strength?: number};
 /** The blue-noise dither: +-amp code values per channel (TPDF-shaped integers, default 2), at `grain` px per texel
- *  (default 1), the tile shifted by `offset` texels. */
+ *  (default 2: measured, a 1 px texture is the first thing x264 throws away; CRAFT §g), the tile shifted by `offset`
+ *  texels. */
 export type SkyDither = {amp?: number; grain?: number; offset?: [number, number]};
 export type SkySpec = {
   /** At least 2 keys, top to horizon (y ascending). Above the first and below the last the colour holds. */
@@ -176,7 +177,7 @@ export type SkySpec = {
   /** The caption band guard (default CAPTION_BAND; null = none). */
   band?: SkyBand | null;
   sun?: SkySun | null;
-  /** Default {amp: 2, grain: 1}; false = Chrome's own +-0.5 code dither only. */
+  /** Default {amp: 2, grain: 2}; false = Chrome's own +-0.5 code dither only. */
   dither?: SkyDither | false;
   /** 'eased' (default): the monotone cubic; 'linear': straight OKLab runs between keys (kinks at the keys). */
   interp?: 'eased' | 'linear';
@@ -184,7 +185,7 @@ export type SkySpec = {
 
 /** The house caption band (the 317-556 block, DIRECTION rule 10) and its flatness budget (CRAFT §g). */
 export const CAPTION_BAND: SkyBand = {y0: 317, y1: 556, maxDL: 1.5};
-export const DEFAULT_DITHER: Required<SkyDither> = {amp: 2, grain: 1, offset: [0, 0]};
+export const DEFAULT_DITHER: Required<SkyDither> = {amp: 2, grain: 2, offset: [0, 0]};
 
 // ================================================================= the curve: a monotone cubic through the keys
 
@@ -667,7 +668,9 @@ export type EveningSkyOpts = {
   horizon: SkyColor;
   /** Where the horizon colour is reached (behind the far skyline). */
   horizonY: number;
-  /** The top of the sky: the band colour a touch deeper and cooler (default OKLCH L -0.022, C +0.008, h +8). */
+  /** The top of the sky: the band colour a touch deeper and cooler (default OKLCH L -0.012, C +0.004, h +6: dL* 1.3 at
+   *  the key, ~1.0 at the frame top; a deeper zenith reads richer, but a slow ramp over a big area is where a platform's
+   *  re-encode leaves soft contours: dL* 2.4 warned at the 2 Mbps rung, measured: CRAFT §g). */
   zenith?: SkyColor;
   /** The light band just above the warm horizon: lighter than both, low chroma, the horizon's hue turned warm-cream
    *  (default L max + 0.022, C 0.014, h horizon + 8); false = none. The mint crosses to the peach through light, never
@@ -694,7 +697,7 @@ export function eveningSky(o: EveningSkyOpts): SkySpec {
   const band = o.captionBand === undefined ? CAPTION_BAND : o.captionBand;
   const b = oklabToLch(toOklab(o.band));
   const hz = oklabToLch(toOklab(o.horizon));
-  const zenith = o.zenith ?? {l: b.l - 0.022, c: b.c + 0.008, h: b.h + 8};
+  const zenith = o.zenith ?? {l: b.l - 0.012, c: b.c + 0.004, h: b.h + 6};
   const y1 = band ? band.y1 : Math.min(o.horizonY - 120, 556);
   const keys: SkyKey[] = [{y: o.top ?? -120, color: zenith}];
   if (band) keys.push({y: band.y0, color: o.band}, {y: band.y1, color: o.band});

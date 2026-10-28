@@ -23,6 +23,8 @@ From the HOME lane (SQB + SQC, max effort):
 
 ## Early max-effort review (SQB-SQF)
 
+CLAIMED by the SHARED lane (thread_plane / home_set / PriceTag / captions), 2026-10-28 00:23 UTC: E2 (beyond SQA), #9, E1's like-pop, E10, E8, E12 and #10 (the home_set side), E13 (verify), E6's caption and captionTone part. HOME lane: SQB/SQC-side only; pull and re-measure first.
+
 Two independent MAX-effort reviews of SQB-SQF in the early full render (`film_half.mp4`, rendered at 9fab768), merged
 into one list (2026-10-27): R1 story, joins and hierarchy; R2 the look (line, light, fullness). Film seconds, px at
 1080 x 1920, measured per CRAFT §e with the captions masked, with `scripts/qa` (density.py with the scenes shifted by 5.80,
