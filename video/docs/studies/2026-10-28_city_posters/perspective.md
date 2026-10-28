@@ -18,8 +18,8 @@ chart: 7 posters, 11 film stills), `img/perspective_films.jpg` (v2 S1, S2, S4, S
 ## Top findings
 1. **The designed view is a stack of cameras.** Copenhagen, Reykjavik and Singapore are one camera each (Copenhagen's
    facade row and its paving have their VPs on one horizon, 18 px apart in y: a standing eye at 1.7 m). Hanoi, Buenos
-   Aires and Cape Town put the near street at a low eye level (0.75, 0.67-0.80 and 0.77 of the height) and LIFT the far
-   city and its water onto a second horizon 0.14-0.27 of the height higher (0.57, 0.53, 0.59), the junction hidden
+   Aires and Cape Town draw their near and mid structures from a low eye level (0.75; 0.67-0.80; 0.77 of the height)
+   and LIFT the far city and its water onto a second horizon 0.14-0.27 higher (0.57, 0.53, 0.59), the junction hidden
    behind trees, water or roofs; Kyoto's veranda (0.90) is a third view under its pavilion and torii (0.72-0.76).
    Where it can be measured the hero is drawn 1.4-3.6x the size the poster's own camera allows (Buenos Aires,
    Reykjavik), and its base is hidden in 5 of 7. No single camera could take these pictures: that is the "unique
@@ -151,7 +151,7 @@ chart: 7 posters, 11 film stills), `img/perspective_films.jpg` (v2 S1, S2, S4, S
   4. *Centred one-point stages:* S3, S4, S6, S7 and S8 put the VP at x 0.50-0.55 W; no poster centres one.
   5. *A high horizon:* 0.36-0.60 of the frame, so the ground band takes 40-64 % of it; the posters' near eye level,
      placed in 9:16 (L2), lands at ~0.76.
-- **v1 (the best performer):** centred one-point streets whose lined side walls frame the bottom half (v1 @10: the near
+- **v1 (the best performer):** centred one-point streets whose lined side walls frame both sides (v1 @10: the near
   walls L* 66, edges 0.39, contrast 12.3, busier than any v2 near plane), the crowd's backs in front (retired since);
   its plaza (@38.5) is as pale as v2's paving (L* 87, dE 8). v3 has no exterior set to measure.
 
@@ -233,10 +233,12 @@ chart: 7 posters, 11 film stills), `img/perspective_films.jpg` (v2 S1, S2, S4, S
 - *Cost:* S. *Risk:* low. *Clash:* none.
 
 **L5. The planes become the float's layers, moved by their measured scale; the camera moves through the stack.**
-- *Evidence:* Appendix B: per metre the far planes are 0.02-0.40 of the frame (median 0.12), the mid 0.35 (0.06-0.73),
-  the background has no unit (~0), the sky 0. `lib/depth` `PARALLAX_K` gives the subject's plane 0.6, +1 0.45, +2 0.35,
-  +3 0.15: for a poster-like stack the mid and far slide 2-4x more than their drawn size says (`pro_1_depth.md` §3.4
-  finds the same).
+- *Evidence:* Appendix B: per metre the mid planes are 0.35 of the frame (0.06-0.73), the farthest unit 0.12
+  (0.02-0.40), the background has no unit (~0), the sky 0. `lib/depth` `PARALLAX_K` (+2 0.35, +3 0.15, +4 0.05) is
+  close for far planes, but it gives the SUBJECT's plane 0.6 by its index: in a poster-like view the subject is the far
+  landmark (Copenhagen's row 0.06, Marina Bay Sands 0.09, Hallgrimskirkja 0.40), which would slide 1.5-10x more than
+  its size says. The share should follow the plane's measured scale, not its index (`pro_1_depth.md` §3.4 makes the
+  same point for +1 and +2).
 - *In our films:* DIRECTION rule 8's parallax float takes each plane's share from its scale: k = the plane's px per
   metre / the near frame's (`groundCam.scale(z)`, or W1's unit sizes). A crane of 0.25 m moves Copenhagen's bicycle
   77 px, its facade row 5 px, the Round Tower 2 px, the ghost blocks and sky 0: the frame drops away, the stack is

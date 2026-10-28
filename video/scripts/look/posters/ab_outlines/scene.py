@@ -7,9 +7,9 @@ difference like A vs B what you are talking about".
 
   A   our line today = v2 exactly (docs/v2/STYLE.md §3, src/v2r/pen.ts + lib/pen.ts CLEAN_TIERS, CRAFT §c):
         tier A (her French window + her silhouette, S3's subject): one closed 3.0 px outline in the object's own deep
-        shade (lib/pen.ts shadeL(tone, -35, floor 16)); tier B (Pip, the walker): a same-hue line 1.8 px at the fill's
-        L* -20 (Pip's is #616389); tier C (houses, water, boat, tree): no line; things that ARE lines (railings, glazing
-        bars, pipes) stay. Light: v2's rig, the sun at screen left, ONE tint family TINT_CANAL = CM.shadeWarm at
+        shade (lib/pen.ts shadeL(tone, -35, floor 16)); tier B: Pip's same-hue line 1.8 px (#616389), the walker and
+        the neighbours none (as S3 draws them); tier C (houses, water, boat, tree): no line; things that ARE lines
+        (railings, glazing bars, pipes) stay. Light: v2's rig, the sun at screen left, ONE tint family TINT_CANAL = CM.shadeWarm at
         form 0.20 / cast 0.28 / contact 0.48 (multiply), the water's own deeper step on the canal.
   B   the posters' way: no outline on anything; the SAME shapes and colours; every volume a lit face and a shade face
         (the same tint family at a poster-like step: B_K below), casts as flat colour, faces turned up a step lighter;
@@ -792,7 +792,9 @@ def pip(d: Doc):
 
 
 def walker(d: Doc):
-    """A walker on her pavement (tier B, small, from behind, hood up; v2 S3's), a thin tinted line in A."""
+    """A walker on her pavement (small, from behind, hood up; v2 S3's): v2 draws the public with NO line (measured in
+    the G7 master at 13.6 s; DIRECTION rule 4: a same-hue line only on the mascot and line-drawn figures), shapes
+    parted by value, in every mode."""
     x, fy, h = 768, GROUND + 10, 116
     sup = dict(tier='support', bg=CM['paving'])
     coat = CM['coatSlate']
@@ -808,9 +810,6 @@ def walker(d: Doc):
     d.fill(hood, CM['stoneShade'], **sup)
     d.shadow(rect(x + 3, fy - h - 6, 16, 40), 'form', clip=d.clip(hood))
     d.fill(bag, CM['coatMustard'], **sup)
-    d.outline(body, 'support', tier_fill(coat, 'support', CM['paving']))
-    d.outline(hood, 'support', tier_fill(CM['stoneShade'], 'support', CM['paving']))
-    d.outline(bag, 'support', tier_fill(CM['coatMustard'], 'support', CM['paving']))
 
 
 def water(d: Doc):

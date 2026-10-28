@@ -28,6 +28,12 @@ with one max-effort agent each (the briefs are in the scripts above, also readab
 `/root/.claude/projects/-home-user-Test-/fe339b66-57f0-5b47-bb6a-872d2f15f4c0/subagents/workflows/`); each report says
 in its skeleton what is still "(pending)".
 
+**Scheduled resume (owner: "once the 5h limit resets - make sure to continue where you left off"):** a one-shot
+message wakes the orchestrating session at 2026-10-29 02:35 UTC (scheduled task `trig_01PMSVVvCXFsMWZ7vPxaX7t2`; the
+5-hour window resets at 02:30 UTC); both helper threads were asked to schedule their own resume at 02:40 UTC. The
+checkpoint loop (`study_checkpoint.sh` in the orchestrator's scratchpad: commit + pull + push of this folder every 10
+minutes) runs until ~00:50 UTC; the resume restarts it.
+
 ## Helper threads (each has its own machine and the same branch)
 - Content discussion: https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt, notes `content_discussion.md` (the
   owner widened the brief: "Don't be fixated on tech or AI, all goes").
