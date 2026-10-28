@@ -131,7 +131,7 @@ def page(v2_size, rvk_size):
   <div class="row">
     <div class="col">
       <div class="tag">A: our line today (outlines)</div>
-      <div class="tag2">a line round the main object, thin lines on Pip and people</div>
+      <div class="tag2">a line round the main object (her window), a thin line round Pip</div>
       <div class="pic"><img src="scene_A.svg" width="{COL_W}" height="{panel_h}"></div>
     </div>
     <div class="col">
@@ -148,7 +148,7 @@ def page(v2_size, rvk_size):
       <div class="pic" style="margin-top: 10px"><img src="zoom_A.svg" width="{COL_W}" height="{zoom_h}">{a_marks}</div>
       <div class="legend">
         <div><b>1</b><span>an outline round her window (3 px, in its own dark teal)</span></div>
-        <div><b>2</b><span>a thin line round Pip (and people)</span></div>
+        <div><b>2</b><span>a thin line round Pip</span></div>
       </div>
     </div>
     <div class="col">
