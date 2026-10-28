@@ -2,6 +2,12 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 02:19 UTC (hourly)
+
+Waiting for the owner's word on the G4 look clip v4 (sent ~01:55). Prepared meanwhile: `lanes/RESUME_2026-10-28.md` (what every shot now
+gets: depth, sky presets, light + water tint, readable particles, the parallax float; the checks before a report; L5 / L6 deltas incl. the
+sound requests and SUN0). Nothing running; helpers idle. Spend: orchestrator $3,790.34 (+$11 this hour). Estimated weekly ~73 %.
+
 ## Note 2026-10-28 01:55 UTC: G4 look clip v4 sent to the owner
 
 `deliverables/v2/v2r_G4_look_v4.mp4` (master encode; S1 0-6.13 s): the owner's depth / sky / particles notes + the art director's fix list
