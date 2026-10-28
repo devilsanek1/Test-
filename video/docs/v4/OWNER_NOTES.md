@@ -60,3 +60,13 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   "Switch video 4 (Recommended)" -> AI songs parked whole in `archive/ai_songs/` (README says how to resume; listed in
   `docs/IDEAS_BANK.md`); video 4 restarts at G0 round 3 (positive AI), whose five scouts had died at the usage limit
   before writing anything.
+- 2026-10-28 ~14:25 UTC: "no we only use the budget in this session for the video 4 ... so lets do a few stages only -
+  lets scout for the most relevant story, then write a script and generate the sound. That is our goal here"; "no i mean
+  we are spending all tokens here only on the video 4. these tokens we have here are not shared with other videos";
+  and asked to find the waste in the early stages ("30% of the weekly budget" spent) -> cost review
+  `docs/retro/2026-10-28_v4_early_stage_cost.md`; v4 now runs the lean G0-G2: 2 scouts + 1 editor (topic and core line
+  picked together), one fact lock, writer + critic for the script, the voice through the API. -> rule: Process (lean).
+- 2026-10-28 ~14:40 UTC: "i mean if you identify any real inefficincies and redundancies and waste on tokens - update
+  the process / clean up - so that the next videos are not encountering the same issues" -> applied: PIPELINE_V2 (lean
+  G0-G1 defaults, agents report in files, one fact file), playbook, CLAUDE.md, HANDOFF, heavy templates marked; list in
+  the review's "Applied" section. -> rule: Process (spend on the film, never on overhead).

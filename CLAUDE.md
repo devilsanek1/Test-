@@ -24,7 +24,8 @@ Top rules (details in the playbook):
   plan, never with a new mover, place or tier promotion.
 - The look: one flowing story (every join carries something), one subject at a time, a clean premium line, gentle light
   and shadow, alive but calm, warm never sickly (`video/docs/look/DIRECTION.md`; numbers in `video/docs/look/CRAFT.md`).
-- Every video gets ONE core line (its own step, G0.5: brainstorm, critique, owner picks) before the script is written.
+- Every video gets ONE core line, picked before the script is written: by default on the topic screen (each topic comes
+  with its proposed line; a separate G0.5 round, one writer and one critic, only on request; owner, 2026-10-28).
   From the pick we draft its through-line card (one thread object, one home place, one "you"); G1 completes it with a
   carrier for every join, taken from the script's own joins, and the owner approves it with the script.
 - The first 3 s must be a banger: frame 0 is the scene being drawn in the clean pen (the subject's outline, then colour,
@@ -49,7 +50,8 @@ Top rules (details in the playbook):
   `python3 .claude/hooks/max_effort.py --lint|--fix <workflow.js>` checks or repairs a script before it runs.
 - **NO LIMIT ON TOKENS for creative output** (owner, 2026-10-26), inside the weekly limit (owner, 2026-10-27: finishing
   the videos in flight comes first): ideas, writing, design, set building, density, life, animation and polish get as
-  many agents, rounds and tokens as the quality needs, all at MAX effort (above). Never
-  trade quality for savings: brainstorms, competing ideas with judges and design explorations at the early gates are
-  worth their tokens. Cut only waste: rework, reviews of things that will still change, polish before the story lock,
-  and lost work (small checkpointed tasks).
+  many agents, rounds and tokens as the quality needs, all at MAX effort (above). Never trade quality for savings, and spend on the film, not on overhead (owner, 2026-10-28;
+  `video/docs/retro/2026-10-28_v4_early_stage_cost.md`): the early gates run lean (2 scouts + 1 editor for the topic and
+  its line, one fact lock, a writer + a critic for the script); agents write files and report in 3 lines; the
+  orchestrator stays small (a fresh session per gate). Cut waste: rework, repeated checks, reviews of things that will
+  still change, polish before the story lock, and lost work (small checkpointed tasks).

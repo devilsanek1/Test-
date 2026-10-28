@@ -1,3 +1,5 @@
+// HEAVY version (owner, 2026-10-28): the default early pipeline is lean (docs/PIPELINE_V2.md, the G0-G1 bullets; review
+// docs/retro/2026-10-28_v4_early_stage_cost.md). Run this only when the owner asks for a wider search.
 export const meta = {
   name: 'v3-g1-story',
   description: 'v3 G1 from scratch, story first: 4 story spines + 3 judges, 3 writers on the winning spine, cold-read retell panel + flow critic + standards, merge into one script + ElevenLabs paste file, final fact check',

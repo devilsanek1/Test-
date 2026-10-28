@@ -156,13 +156,13 @@ Maintenance at the end).
 - **Profile identity: mascot Pip (the purple PHP elephant), drawn in each film's style;** avatar `deliverables/profile/pip_power_button.png`. — (2026-10-25).
 
 ## Hook and pacing
-- **Every video has ONE core line, picked in its own step (G0.5) before the script:** the single sentence at the core
+- **Every video has ONE core line, picked before the script (by default on the topic screen: each topic comes with its proposed core line, so the owner picks both at once; a separate core-line round only on request):** the single sentence at the core
   of the message with the biggest emotional reaction. It drives frame 0, the hook, the cover and the payoff; every line
   serves it. From the pick we draft its THROUGH-LINE CARD (one thread object, one home place, one "you":
   `docs/look/CRAFT.md` §a); the script (G1) completes it with a carrier for every join, taken from the script's own
   joins, and the owner approves the card with the script. The thread may also leave for a FAIRNESS beat the owner approves
   (the other side's equal-weight reply, a place the subject must never be): declare it on the card. — (v3, 2026-10-25; card:
-  v3 retro, owner yes, 2026-10-27; fairness exception: v2, owner yes, 2026-10-27).
+  v3 retro, owner yes, 2026-10-27; fairness exception: v2, owner yes, 2026-10-27; picked with the topic by default: lean early stages, v4, 2026-10-28).
 - **The first 3 s / first scene must be a banger ("something is about to happen"), and every opening effect must be
   BIG enough to stop a thumb:** judged as a viewer scrolling a feed on a phone, each effect (the draw-on, the hook's
   mechanism, the ticks) is unmistakable on first watch: bold, large on screen, long enough to register, with its own
@@ -313,9 +313,15 @@ Maintenance at the end).
   starting over (owner, v4, 2026-10-27: "make sure to commit the progress periodically if we get stopped on the usage
   limits"). Before any restart, re-read the current direction (`docs/look/DIRECTION.md`, the playbook and the docs they
   link: other sessions change them) and integrate it into the film's one style page first. — (v2, 2026-10-27).
+- **Spend on the film, never on overhead (owner, 2026-10-28: "evaluate if there is anything in the early stages ... that is
+  complete waste"; review `docs/retro/2026-10-28_v4_early_stage_cost.md`).** The early stages run lean: two scouts and one
+  editor for the topic (the owner picks the topic and its core line on one screen), one fact lock (later checks read it
+  and search only for a missing fact), a writer and a critic for the script; agents write files and return at most 3
+  lines; the orchestrator stays small (a fresh session per gate, batched steps, no big skill or doc loads for small
+  questions); check the session's rate limit before a fan-out. A session's budget may be its own: v4's session spends
+  only on v4 ("these tokens we have here are not shared with other videos").
 - **NO LIMIT ON TOKENS for creative output (inside the weekly limit); never trade quality for savings.** Ideas, scripts, judged competing ideas,
-  design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the
-  quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
+  design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the quality needs (workflows larger than the default size guideline too), and the early selection stages (topic, core line, script) need few: a few strong agents with files and one fact check (the rule above); only true waste is cut (rework, lost work,
   reviewing what will still change, early polish, a review loop that has stopped improving the shot: `docs/PIPELINE_V2.md`
   rule 2, and checks that repeat another check). — (2026-10-25; owner, 2026-10-26; 2026-10-28).
 - **Locked means dropped:** rejected options go to `archive/`, never seen by later prompts; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
