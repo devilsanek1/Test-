@@ -15,5 +15,6 @@ export const S5_PLANE = {deck: 0, nearmid: 1, mid: 2, river: 3, cityFront: 3, fa
 /** A colour on its plane (`tier` 'subject' takes half the step). */
 export const rc = (c: string, plane: number, tier?: Tier) => recede(c, plane, S5_ATM, tier ? {tier} : {});
 
-/** A set of materials on one plane, merged to the plane's few values (+3: 3 within dE 12; +4: 2 within 5). */
-export const rcPalette = (colors: string[], plane: number) => planePalette(colors, plane, S5_ATM);
+/** A set of materials on one plane, merged to the plane's few values (+3: 3 within dE 12; +4: 2 within 5), or to
+ *  `values` values (one role: 1). */
+export const rcPalette = (colors: string[], plane: number, values?: number) => planePalette(colors, plane, S5_ATM, values ? {values} : {});
