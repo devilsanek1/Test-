@@ -9,8 +9,7 @@ import {rcAtm, rcShade} from './V2S5_depth';
 import {toneOnTone} from '../../lib/depth';
 import {MID, PENT, PENT_ROT, circ, facesLens, halfSide, pentagon, sideFrame, sidePt, shadowOffset, wallLight, vert} from '../kit/dc/lens';
 import {tiered} from '../kit/tiers';
-import {Shadow, ShadowLayer, fromLch, lch, multiply, tintFor, useRig, type LightRig} from '../../lib/light';
-import {MT5} from './V2S5_valley';
+import {Shadow, ShadowLayer} from '../../lib/light';
 
 /** The kit's atm / atmShade through S5's air at HALF the step (the Pentagon is the shot's subject from 22.43: CRAFT §f
  *  "the subject takes at most half its plane's step"; one value all through, no colour pop on its word). */
@@ -20,9 +19,10 @@ const atmShade = (c: string, d: number) => rcShade(c, d, 'subject');
 // ---------------------------------------------------------------- tones (plane 2: 22 % toward the sky)
 
 const FACADE_LIT = atm(CM.limestone, 2);
-/** The front facades turned from the sun (3/4 backlight): ONE step under the lawn's cast shadow in front of them (L* 60
- *  on the cast's ~69: a shaded edge on a lighter field, CRAFT §f.3 counterchange), their foot a step deeper (L* 55). */
-const FACADE_SHADE = atmShade(mix(CM.stoneShade, CM.shadeCool, 0.85), 2);
+/** The front facades turned from the sun (3/4 backlight): a step under the cast shadow in front of them (L* 59 on the
+ *  cast's ~75 paving / ~68 lawn: a shaded edge on a lighter field, CRAFT §f.3 counterchange; the old L* 72 stood on a
+ *  hand-picked L* 55 fill), their foot a step deeper (L* 55). */
+const FACADE_SHADE = atmShade(mix(CM.stoneShade, CM.shadeCool, 0.9), 2);
 const FACADE_FOOT = atmShade(mix(CM.shadeCool, CM.anchor, 0.1), 2);
 /** The facades' former mid shade (L* 72): the lit facade's plinth and the tone its A outline is drawn from (the clean
  *  pen's subject drop: L* ~37, its own deep shade, never near-black). */
@@ -60,25 +60,13 @@ export const PT5 = {
   ink: inkCol(2),
 };
 
-/** The building's cast on its lawn (left and toward us) is a LIGHT-LAYER shadow, never a hand-picked fill (CRAFT §d.3):
- *  the lawn x the rig's family at the rig's CAST strength (its cast tint on the lawn: L* 79.5 -> ~68), with §d.3's turn
- *  for a cool surface (10-16 deg toward violet, chroma kept). The rose family alone would turn the sage lawn olive (h 107,
- *  C* 12: lib/depth's olive band 88-118), as it greys teal water (world/rigs' `water` key, the same remedy: the
- *  surface's own deeper step as a multiply tint, `tintFor`). Result on the lawn: L* ~69, C* ~15, h ~135. */
-const CAST_CACHE = new Map<string, string>();
-export function lawnCastTint(rig: LightRig): string {
-  const key = rig.tints.cast;
-  let v = CAST_CACHE.get(key);
-  if (!v) {
-    const lawn = lch(MT5.lawn);
-    const L = lch(multiply(MT5.lawn, rig.tints.cast)).L + 1.5;
-    v = tintFor(MT5.lawn, fromLch(L, lawn.C * 0.95, lawn.h + 12));
-    CAST_CACHE.set(key, v);
-  }
-  return v;
-}
+/** The building's cast (left and toward us) is a LIGHT-LAYER shadow, never a hand-picked fill (CRAFT §d.3: the critic,
+ *  2026-10-28: the old flat L* 55 C* 4 fill read grey-olive): the ground under it times the rig's ONE family at its
+ *  CAST strength (`tint="cast"`, the rig from context; CRAFT §d.3's cast dL* -10..-15). It falls mostly on the warm
+ *  boulevard and ring paving (~80 % of what shows: L* 88 -> 75, C* 16, h 53, the terrace's own rose-tan shade) and on
+ *  the lawn's edge (L* 80 -> 68, C* 12). The shaded front facades (L* 60) stand a step under it: a shaded edge on a
+ *  lighter field (§f.3). Its screen path: the footprint swept along the end light (the kit lens' 3D shadow offset). */
 
-/** The cast's screen path (the footprint swept along the end light: the kit lens' 3D shadow offset). */
 const castD = (): string => {
   const outer = pentagon(PENT.apothem);
   return polyD(hull([...outer, ...shifted(outer, shadowOffset(H))].map((q) => P3(q, 0))));
@@ -290,12 +278,11 @@ const PentagonBody: React.FC<Pentagon5Props> = ({warmAt, warmDur = 0.7, seed = '
     };
   }, [warmAt, warmDur, warm, seed]);
   const wd = warmD ? warmD(t) : '';
-  const rig = useRig();
   const cast = useMemo(castD, []);
   return (
     <>
       <ShadowLayer>
-        <Shadow d={cast} tint={lawnCastTint(rig)} soft={3} />
+        <Shadow d={cast} tint="cast" soft={3} />
       </ShadowLayer>
       <Paint b={parts} seed={`${seed}/p`} misreg={false} />
       {wd ? <path d={wd} fill={PT5.paneWarm} /> : null}
