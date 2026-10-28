@@ -335,7 +335,8 @@ export const S1PlaneBranch: React.FC = () => {
     {k: 0.78, R: 46, deg: 120, col: CM.leafGold, side: 1},
     {k: 0.98, R: 44, deg: 40, col: CM.leafRust, side: 0},
   ];
-  let stemD = `M${P(...at(0))}`;
+  // the stem runs on off the left edge (overscan: the branch is a near twig and floats the most)
+  let stemD = `M-70 24L${P(...at(0))}`;
   for (let k = 0.05; k <= 1.001; k += 0.05) stemD += `L${P(...at(k))}`;
   const fills: React.ReactNode[] = [];
   let ribs = '';

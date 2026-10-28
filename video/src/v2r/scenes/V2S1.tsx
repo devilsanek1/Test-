@@ -32,6 +32,7 @@ import {S1Pip} from './V2S1_pip';
 import type {ToneKey} from '../../lib/Film';
 import {CAPTION_BAND, Particles, glitterPath} from '../../lib/particles';
 import * as MAP from '../world/map';
+import {S1Plane, S1_PLANE} from './V2S1_float';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
@@ -48,9 +49,15 @@ const S1Particles: React.FC = () => {
   const common = {t0: S1_PARTICLES.t0, t1: S1_PARTICLES.t1, joins: S1_PARTICLES.joins, avoid: [CAPTION_BAND, S1_PARTICLES.her], sun};
   return (
     <>
-      <Particles kind="motes" seed="s1motes" region={{rect: [24, 790, 236, 150]}} on="#DEC6B8" {...common} />
-      <Particles kind="glints" seed="s1glints" region={{poly: glitterPath({x: MAP.SUN0.x, yFar: 1104, yNear: 1166})}} on="#E9C98E" horizon={965} {...common} />
-      <Particles kind="leaves" seed="s1leaf" region={{rect: [20, 110, 34, 70]}} on="#DACCBE" colors={[CM.leafGold, CM.leafRust]} floor={1910} count={1} gap={[0.3, 0.9]} {...common} />
+      <S1Plane plane={S1_PLANE.farTower}>
+        <Particles kind="motes" seed="s1motes" region={{rect: [24, 790, 236, 150]}} on="#DEC6B8" {...common} />
+      </S1Plane>
+      <S1Plane plane={S1_PLANE.water}>
+        <Particles kind="glints" seed="s1glints" region={{poly: glitterPath({x: MAP.SUN0.x, yFar: 1104, yNear: 1166})}} on="#E9C98E" horizon={965} {...common} />
+      </S1Plane>
+      <S1Plane plane={S1_PLANE.near}>
+        <Particles kind="leaves" seed="s1leaf" region={{rect: [20, 110, 34, 70]}} on="#DACCBE" colors={[CM.leafGold, CM.leafRust]} floor={1910} count={1} gap={[0.3, 0.9]} {...common} />
+      </S1Plane>
     </>
   );
 };

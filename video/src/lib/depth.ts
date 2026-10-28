@@ -641,3 +641,82 @@ export function sizeProblems(things: {name: string; y: number; px: number; m: nu
   }
   return out;
 }
+
+// ================================================================= the parallax float (DIRECTION rule 8, COZY_AND_SCALE 3b.5)
+
+/** How much of a camera float each plane shows (owner, 2026-10-28: "planes move by depth"): the near ground the full
+ *  float, the subject's plane ~0.6, the mid distance ~0.35, the far city ~0.15, the farthest ~0.05; the sky and the
+ *  caption band never move (pass `PARALLAX_SKY`). Index = plane -2 ... +4 (CRAFT §f.1); fractional planes interpolate,
+ *  nearer than -2 take 1, farther than +4 take the last. */
+export const PARALLAX_K: Record<number, number> = {[-2]: 1, [-1]: 0.85, 0: 0.6, 1: 0.45, 2: 0.35, 3: 0.15, 4: 0.05};
+/** The sky's (and the caption band's) plane: fixed, it never floats. */
+export const PARALLAX_SKY = Infinity;
+
+/** The float share of a plane (0 for the sky). */
+export function parallaxK(plane: number): number {
+  if (!Number.isFinite(plane)) return 0;
+  const p = clamp(plane, -2, 4);
+  const i = Math.floor(p);
+  const a = PARALLAX_K[i];
+  const b = PARALLAX_K[Math.min(4, i + 1)];
+  return a + (b - a) * (p - i);
+}
+
+/** A plane's offset (px) under a camera float (the near ground's offset): float x its share. Deterministic, opt-in: a
+ *  scene that never calls it never moves. Use sub-pixel values (no rounding: 3b.5). */
+export const parallaxOffset = (float: Pt, plane: number): Pt => {
+  const k = parallaxK(plane);
+  return [float[0] * k, float[1] * k];
+};
+
+/** One leg of a float: from the previous leg's end (or home) at t0 to `to` (near-ground px from home) at t1. */
+export type FloatLeg = {t0: number; t1: number; to: Pt};
+
+/** A slow 2D float as STRAIGHT LEGS (3b.5: a steady heading, turning eased, back home): the offset at time t. Each
+ *  leg ramps its speed up over the first `ease` share and down over the last (a trapezoid: the peak is
+ *  1 / (1 - ease) x the leg's mean speed), so every turn and every rest is smooth. Home [0, 0] before the first leg,
+ *  between legs that do not touch, and after the last (put a leg back to [0, 0] before each join and map-critical
+ *  frame). `floatProblems` checks the numbers. */
+export function floatAt(t: number, legs: readonly FloatLeg[], ease = 0.25): Pt {
+  let from: Pt = [0, 0];
+  for (const L of legs) {
+    if (t < L.t0) return from;
+    if (t <= L.t1) {
+      const s = clamp((t - L.t0) / Math.max(1e-6, L.t1 - L.t0), 0, 1);
+      const a = clamp(ease, 0, 0.5);
+      const u = a <= 0 ? s : s < a ? (0.5 * s * s) / (a * (1 - a)) : s > 1 - a ? 1 - (0.5 * (1 - s) * (1 - s)) / (a * (1 - a)) : (s - a / 2) / (1 - a);
+      return [from[0] + (L.to[0] - from[0]) * u, from[1] + (L.to[1] - from[1]) * u];
+    }
+    from = L.to;
+  }
+  return from;
+}
+
+/** The float's lints (3b.5): the net offset within `maxOffset` of home (default 12), the peak path speed <= `maxSpeed`
+ *  px/s (default 10; 3b.5 allows 25 at the peak, the owner's cozy holds ~10), home at every `rest` time. */
+export function floatProblems(legs: readonly FloatLeg[], o: {rest?: number[]; maxOffset?: number; maxSpeed?: number; ease?: number; fps?: number} = {}): string[] {
+  const out: string[] = [];
+  const maxO = o.maxOffset ?? 12;
+  const maxV = o.maxSpeed ?? 10;
+  const fps = o.fps ?? 60;
+  const ease = o.ease ?? 0.25;
+  if (!legs.length) return out;
+  const t0 = legs[0].t0;
+  const t1 = legs[legs.length - 1].t1;
+  let prev = floatAt(t0, legs, ease);
+  let peak = 0;
+  let far = 0;
+  for (let f = Math.floor(t0 * fps); f <= Math.ceil(t1 * fps); f++) {
+    const p = floatAt(f / fps, legs, ease);
+    peak = Math.max(peak, Math.hypot(p[0] - prev[0], p[1] - prev[1]) * fps);
+    far = Math.max(far, Math.hypot(p[0], p[1]));
+    prev = p;
+  }
+  if (far > maxO + 1e-6) out.push(`float: net offset ${far.toFixed(1)} px > ${maxO}`);
+  if (peak > maxV + 0.05) out.push(`float: peak speed ${peak.toFixed(1)} px/s > ${maxV}`);
+  for (const r of o.rest ?? []) {
+    const p = floatAt(r, legs, ease);
+    if (Math.hypot(p[0], p[1]) > 0.01) out.push(`float: not at rest at ${r} s (${p[0].toFixed(2)}, ${p[1].toFixed(2)})`);
+  }
+  return out;
+}

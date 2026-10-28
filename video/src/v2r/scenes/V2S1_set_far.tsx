@@ -19,6 +19,7 @@ import {atmos, backing, recede, toneOnTone} from '../../lib/depth';
 import {tierFill} from '../../lib/pen';
 import {mixHex} from '../../lib/light';
 import {floodAt, S1_PALE} from './V2S1_clock';
+import {S1Plane, S1_PLANE} from './V2S1_float';
 
 const S = MAP.S1_SHEET;
 /** The bridge (screen px at zoom 1.00). */
@@ -488,13 +489,19 @@ export const S1WestGap: React.FC = () => {
   }, []);
   return (
     <>
-      <SunDisc />
-      <FarRoofs />
-      <CalmTower />
-      <CellPaint b={body.b} seed="s1bridge/body" cell={90} misreg={0.7} />
-      <Bus />
-      <CellPaint b={rail.b} seed="s1bridge/rail" cell={90} misreg={0} />
-      <RailBirds />
+      <S1Plane plane={S1_PLANE.farRoofs}>
+        <SunDisc />
+        <FarRoofs />
+      </S1Plane>
+      <S1Plane plane={S1_PLANE.farTower}>
+        <CalmTower />
+      </S1Plane>
+      <S1Plane plane={S1_PLANE.bridge}>
+        <CellPaint b={body.b} seed="s1bridge/body" cell={90} misreg={0.7} />
+        <Bus />
+        <CellPaint b={rail.b} seed="s1bridge/rail" cell={90} misreg={0} />
+        <RailBirds />
+      </S1Plane>
     </>
   );
 };

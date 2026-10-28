@@ -16,6 +16,7 @@ import {floodAt} from './V2S1_clock';
 import {BANDS, Coping, StoneBand, edgePath} from './V2S1_steps_stone';
 import {LOW_FOOT, LowRow} from './V2S1_public';
 import {S1ForeMid, S1ForeNear} from './V2S1_fore';
+import {S1Plane, S1_PLANE} from './V2S1_float';
 
 const LowShadows: React.FC = () => (
   <ShadowLayer>
@@ -32,6 +33,7 @@ const LowShadows: React.FC = () => (
  *  <Lit rig={RIG_CANAL}>). Every light shape lands with the flood at its spot: frame 0 is pale shapes only. */
 export const S1Steps: React.FC = () => (
   <>
+    <S1Plane plane={S1_PLANE.bank}>
     <Tier tier="environment">
       <Coping />
       <StoneBand k={0} />
@@ -48,6 +50,9 @@ export const S1Steps: React.FC = () => (
         {b.k === 2 ? <S1ForeMid /> : null}
       </React.Fragment>
     ))}
-    <S1ForeNear />
+    </S1Plane>
+    <S1Plane plane={S1_PLANE.near}>
+      <S1ForeNear />
+    </S1Plane>
   </>
 );

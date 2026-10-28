@@ -37,6 +37,25 @@ farther.
 | `PRESETS`, `CAPTION_BAND`, `COVER_CAP` | per kind: count / cap (motes 6 / 8, dust 5 / 6, leaves 1 / 2, glints 4 / 6, birds 3 / 5), life, gap, size, speed, drift, lift (motes +10, dust +7, glints +15, birds -12 L*), grow / shrink shares, join rule ('keep' a steady field, 'hold' entrances), plane; coverage <= 0.2 % of the frame per field. |
 | `particlesAt(t, props, keyFrom)`, `particleProblems(fields, {joins})`, `glitterPath`, `regionSdf` | the field as data (QA, trails); the mover-budget lint (caps, contrast, speed, entrances <= ~0.6/s with joins declared, regions clear of the band, <= ~12 alive); the sun's glitter column; a region's signed distance. |
 
+## The parallax float (DIRECTION rule 8, COZY_AND_SCALE 3b.5; owner, 2026-10-28)
+A hold either stays locked or floats gently, and a float is a PARALLAX float: each plane shows its own share of one
+2D camera float. Nothing zooms or rotates, and the sky, the caption band and the UI stay fixed.
+
+| export | what |
+|---|---|
+| `PARALLAX_K`, `parallaxK(plane)`, `PARALLAX_SKY` | a plane's share of the float: -2 (near ground) 1, -1 0.85, 0 (the subject) 0.6, +1 0.45, +2 (mid) 0.35, +3 (far city) 0.15, +4 (farthest) 0.05, the sky 0; fractional planes interpolate |
+| `parallaxOffset(float, plane)` | the plane's offset in px (sub-pixel, never rounded) |
+| `floatAt(t, legs, ease?)`, `FloatLeg` | the float as STRAIGHT LEGS `{t0, t1, to}` (near-ground px from home), each with a trapezoid speed profile (ease 0.25: the peak is 1.33x the leg's mean); home before the first leg, after the last and between legs that do not touch |
+| `floatProblems(legs, {rest, maxOffset, maxSpeed})` | the lints: net offset <= 12 px, peak <= 10 px/s, home at every rest time (frame 0 / the loop match, every join, every map-critical frame) |
+
+How to use it: wrap each plane's group in `<g transform={translate(parallaxOffset(floatAt(t, LEGS), plane))}>`.
+- **Shadows and particles** ride their plane's group.
+- **The clip paths** of a group are user-space inside it, so they move with it. A clip cut from another plane (a far
+  jogger seen through a bridge arch) belongs in that plane's group.
+- **Overscan:** give each plane >= 40 px beyond the frame edge (3b.5).
+- **Rest:** the first leg leaves home after the hook's first beat, and the last arrives home >= 0.15 s before a
+  push-through or a match cut, so the move starts from rest.
+
 ## The CRAFT §f numbers it implements
 
 | CRAFT §f | in the code |
