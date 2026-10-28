@@ -41,31 +41,30 @@ const SOCK_H = 26;
 
 // ---------------------------------------------------------------- the post (plane, static)
 
+/** A rounded rect (the post's mouldings get soft corners: CRAFT §c; a sharp convex corner of a dark fill reads as a
+ *  line mark at phone size). */
+const rr = (x: number, y: number, w: number, h: number, r: number) => {
+  const k = Math.min(r, w / 2, h / 2);
+  return `M${P(x + k, y)}L${P(x + w - k, y)}Q${P(x + w, y)} ${P(x + w, y + k)}L${P(x + w, y + h - k)}Q${P(x + w, y + h)} ${P(x + w - k, y + h)}L${P(x + k, y + h)}Q${P(x, y + h)} ${P(x, y + h - k)}L${P(x, y + k)}Q${P(x, y)} ${P(x + k, y)}Z`;
+};
+
 function postBatch(): Batch {
   const b = new Batch();
   const x = POST.x;
   // stone plinth: lit face, a shade side to the east
-  b.rect(CM.limestone, x - 18, PLINTH_TOP, 36, POST.footY - PLINTH_TOP);
-  b.rect(CM.stoneShade, x + 9, PLINTH_TOP, 9, POST.footY - PLINTH_TOP);
-  // the moulded cast-iron foot: a ring, a flared skirt, a lip on the plinth
-  b.poly(CM.anchor, [
-    [x - HW, BASE_TOP],
-    [x + HW, BASE_TOP],
-    [x + HW + 2, BASE_TOP + 16],
-    [x + 13, PLINTH_TOP - 4],
-    [x + 14, PLINTH_TOP],
-    [x - 14, PLINTH_TOP],
-    [x - 13, PLINTH_TOP - 4],
-    [x - HW - 2, BASE_TOP + 16],
-  ]);
-  b.rect(CM.anchor, x - 11, BASE_TOP - 6, 22, 7);
-  b.rect(CM.anchor, x - 11, BASE_TOP + 22, 22, 5);
+  b.fill(CM.limestone, rr(x - 18, PLINTH_TOP, 36, POST.footY - PLINTH_TOP + 2, 3));
+  b.rect(CM.stoneShade, x + 9, PLINTH_TOP + 2, 9, POST.footY - PLINTH_TOP - 2);
+  // the moulded cast-iron foot: ONE smooth flare from the shaft down to the plinth (no protruding rings: a thin dark
+  // moulding beside the shaft reads as a line mark at phone size)
+  b.fill(CM.anchor, `M${P(x - HW, BASE_TOP - 8)}L${P(x + HW, BASE_TOP - 8)}C${P(x + HW, BASE_TOP + 14)} ${P(x + 13, PLINTH_TOP - 14)} ${P(x + 14, PLINTH_TOP - 4)}Q${P(x + 14.5, PLINTH_TOP)} ${P(x + 10, PLINTH_TOP)}L${P(x - 10, PLINTH_TOP)}Q${P(x - 14.5, PLINTH_TOP)} ${P(x - 14, PLINTH_TOP - 4)}C${P(x - 13, PLINTH_TOP - 14)} ${P(x - HW, BASE_TOP + 14)} ${P(x - HW, BASE_TOP - 8)}Z`);
   // the shaft, a sunlit stripe on its west side (the low sun is west)
   b.rect(CM.anchor, x - HW, SHAFT_TOP, HW * 2, BASE_TOP - SHAFT_TOP);
-  b.rect(CM.coatPlum, x - HW + 2, SHAFT_TOP + 4, 3, BASE_TOP - SHAFT_TOP - 10);
-  // the cap collar and the gilt ball finial with its spike
-  b.rect(CM.anchor, x - 11, POST.topY, 22, 9);
-  b.rect(CM.anchor, x - 6, POST.topY - 6, 12, 7);
+  b.fill(CM.coatPlum, rr(x - HW + 2, SHAFT_TOP + 4, 3, BASE_TOP - SHAFT_TOP - 10, 1.5));
+  b.layer();
+  // the gilt finial assembly: the cap collar, the neck, the ball and its spike (gilt like the ball: a dark collar
+  // wider than the shaft would read as two line marks)
+  b.fill(CM.leafGold, rr(x - 10, POST.topY, 20, 10, 4));
+  b.fill(CM.leafGold, rr(x - 5, POST.topY - 7, 10, 9, 3));
   b.fill(CM.leafGold, ovalPath(x, POST.topY - 14, 8, 8));
   b.poly(CM.leafGold, [
     [x - 3, POST.topY - 20],
@@ -73,12 +72,8 @@ function postBatch(): Batch {
     [x, POST.topY - 33],
   ]);
   b.fill(CM.lampCore, ovalPath(x - 3, POST.topY - 17, 2.2, 2.2));
-  // the two empty sockets (where the arms will clamp): a moulded band with a gilt bolt
-  for (const cy of SOCKETS) {
-    b.rect(CM.anchor, x - 12, cy - SOCK_H / 2, 24, SOCK_H);
-    b.rect(CM.anchor, x - 10, cy - SOCK_H / 2 - 3, 20, SOCK_H + 6);
-    b.fill(CM.leafGold, ovalPath(x + 5, cy, 2, 2));
-  }
+  // the two empty sockets (where the arms will clamp): gilt bands round the shaft (soft corners)
+  for (const cy of SOCKETS) b.fill(CM.leafGold, rr(x - 10, cy - SOCK_H / 2, 20, SOCK_H, 4));
   return b;
 }
 
@@ -90,13 +85,13 @@ const POST_D = (() => {
   // the left half, bottom -> top, as (dx, y); the right half mirrors it
   const left: [number, number][] = [
     [-14, PLINTH_TOP],
-    [-13, PLINTH_TOP - 4],
-    [-11, BASE_TOP + 16],
-    [-11, BASE_TOP - 6],
-    [-HW, BASE_TOP - 6],
+    [-14, PLINTH_TOP - 4],
+    [-11, PLINTH_TOP - 14],
+    [-HW - 1, BASE_TOP + 10],
+    [-HW, BASE_TOP - 8],
   ];
-  for (const cy of [...SOCKETS].sort((a, c) => c - a)) left.push([-HW, cy + 13], [-12, cy + 13], [-12, cy - 13], [-HW, cy - 13]);
-  left.push([-HW, top + 9], [-11, top + 9], [-11, top], [-6, top], [-6, top - 6], [-4.5, top - 7.5]);
+  for (const cy of [...SOCKETS].sort((a, c) => c - a)) left.push([-HW, cy + 13], [-10, cy + 13], [-10, cy - 13], [-HW, cy - 13]);
+  left.push([-HW, top + 10], [-10, top + 10], [-10, top], [-5, top], [-5, top - 6], [-4.5, top - 7.5]);
   const right = left.map(([dx, y]) => [-dx, y] as [number, number]).reverse();
   return (
     `M${left.map(([dx, y]) => P(x + dx, y)).join('L')}` +
@@ -215,11 +210,8 @@ const Clamps: React.FC<{p: PlateSpec}> = ({p}) => {
     const s = new Batch();
     const x = POST.x;
     const cy = (p.r.y0 + p.r.y1) / 2;
-    s.rect(CM.anchor, x - 25, cy - SOCK_H / 2, 37, SOCK_H);
-    s.rect(CM.anchor, x - 10, cy - SOCK_H / 2 - 3, 20, SOCK_H + 6);
-    s.fill(CM.leafGold, ovalPath(x - 18, cy - 6, 2.2, 2.2));
-    s.fill(CM.leafGold, ovalPath(x - 18, cy + 6, 2.2, 2.2));
-    s.fill(CM.leafGold, ovalPath(x + 5, cy, 2, 2));
+    s.fill(CM.anchor, rr(x - 25, cy - SOCK_H / 2, 20, SOCK_H, 5));
+    s.fill(CM.leafGold, rr(x - 10, cy - SOCK_H / 2, 20, SOCK_H, 4));
     return s;
   }, [p]);
   if (t < p.at) return null;

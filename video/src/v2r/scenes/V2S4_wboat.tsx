@@ -8,9 +8,9 @@
 //        chimney (its smoke: the shot's one smoke), a log pile
 //   cabin side (y 1290-1640): a brick cantrail painted with diamonds and brass vents, cream coach lines framing the
 //        sage panels, portholes (cream rims, brass rings and dogs, curtains; a pot plant behind one), a window box, the
-//        side doors painted with roses with brass handles, a castle panel; rope fenders hanging from the roof rail on the
-//        cabin side, ending ABOVE the gunwale (so the plum stripe stays ONE unbroken band: S3's lesson, no dark-fill
-//        corners for the line count)
+//        side doors painted with roses with brass handles, a castle panel; rope fenders hanging from cleats under the
+//        cantrail, ending ABOVE the gunwale (so the cantrail and the plum stripe stay unbroken bands: S3's lesson, no
+//        dark-fill corners for the line count)
 //   hull: the ONE plum gunwale stripe, a slate strip with a rubbing strake down to the waterline ~1700
 //   near water (2.0x): the isolated flat placeholder (V2S4_water S4Water 'near'; the glints are V2S4_particles')
 // TIER C (environment: flat, no line), plane -1 (one near value step: planeBatch(-1)). The boat's wood (rails,
@@ -36,6 +36,13 @@ import type {Stander} from './V2S4_light';
 /** The boat's wood lifted to a mid oak and its small dark fittings to a mid slate (S3's BOAT_WOOD / FITTING). */
 const BOAT_WOOD = mixHex(CM.line, CM.coatOat, 0.45);
 const FITTING = '#9399AD';
+/** The portholes' glass reflection: a soft lighter streak (a dark triangle's sharp tips read as line marks). */
+const PORT_GLINT = '#E3EEEC';
+/** A rounded rect (made objects get soft corners: CRAFT §c). */
+const rrect = (x: number, y: number, w: number, h: number, r: number) => {
+  const k = Math.min(r, w / 2, h / 2);
+  return `M${P(x + k, y)}L${P(x + w - k, y)}Q${P(x + w, y)} ${P(x + w, y + k)}L${P(x + w, y + h - k)}Q${P(x + w, y + h)} ${P(x + w - k, y + h)}L${P(x + k, y + h)}Q${P(x, y + h)} ${P(x, y + h - k)}L${P(x, y + k)}Q${P(x, y)} ${P(x + k, y)}Z`;
+};
 
 const RF = ROW.roofFar; // 1222: the roof's far edge
 const RN = 1284; // the roof's near edge (the rolled lip runs to the cabin top)
@@ -94,7 +101,7 @@ function cabinInto(b: Batch) {
   // diamonds painted along the cantrail
   for (let x = 20; x < XR; x += 58) {
     const c = Math.round(x / 58) % 2 ? CM.coatMustard : CM.paper;
-    b.poly(c, [[x, CT + 7], [x + 9, CT + 15], [x, CT + 23], [x - 9, CT + 15]]);
+    b.poly(c, [[x, CT + 9.5], [x + 7.5, CT + 15], [x, CT + 20.5], [x - 7.5, CT + 15]]);
   }
   // T-studs on the gunwale (a mid slate fitting: no dark specks on the stripe)
   for (const x of [52, 588, 1066]) b.fill(FITTING, `M${P(x - 10, GW - 18)}L${P(x + 10, GW - 18)}L${P(x + 10, GW - 13)}L${P(x + 5, GW - 13)}L${P(x + 5, GW)}L${P(x - 5, GW)}L${P(x - 5, GW - 13)}L${P(x - 10, GW - 13)}Z`);
@@ -121,7 +128,7 @@ function cabinInto(b: Batch) {
   // L4: glass, the door panels (a mustard border), the castle's lake and hills
   for (const p of PORTS) b.fill(CM.glass, ovalPath(p.x, PORT_Y, PORT_R, PORT_R));
   for (const [a, c] of [[x0, mid - 2], [mid + 2, x1]] as [number, number][]) b.fill(CM.coatMustard, ringRR(a + 10, y0 + 12, c - 10, y1 - 12, 10, 3));
-  for (const [a, c] of [[x0, mid - 2], [mid + 2, x1]] as [number, number][]) b.rect(CM.stucco, a + 14, y0 + 16, c - a - 28, y1 - y0 - 32);
+  for (const [a, c] of [[x0, mid - 2], [mid + 2, x1]] as [number, number][]) b.fill(CM.stucco, rrect(a + 12.5, y0 + 14.5, c - a - 25, y1 - y0 - 29, 8));
   const cs = CASTLE.rx / 50;
   b.fill(CM.water, `M${P(CASTLE.x - 46 * cs, CASTLE.y + 26 * cs)}Q${P(CASTLE.x, CASTLE.y + 18 * cs)} ${P(CASTLE.x + 46 * cs, CASTLE.y + 26 * cs)}Q${P(CASTLE.x, CASTLE.y + 44 * cs)} ${P(CASTLE.x - 46 * cs, CASTLE.y + 26 * cs)}Z`);
   b.fill(CM.sage, lobes(CASTLE.x - 50 * cs, CASTLE.x - 8 * cs, CASTLE.y + 24 * cs, 18 * cs, 'castleHillA', 2));
@@ -130,7 +137,7 @@ function cabinInto(b: Batch) {
   // L5: what sits on the glass and the panels: the glass's reflection, the plant behind a porthole, the castle, the
   // bouquets' leaves
   for (const p of PORTS) {
-    b.poly(CM.paneUnlit, [[p.x - PORT_R * 0.7, PORT_Y - PORT_R * 0.72], [p.x + PORT_R * 0.1, PORT_Y - PORT_R * 0.98], [p.x - PORT_R * 0.98, PORT_Y + PORT_R * 0.1]]);
+    b.fill(PORT_GLINT, `M${P(p.x - PORT_R * 0.62, PORT_Y - PORT_R * 0.62)}Q${P(p.x - PORT_R * 0.2, PORT_Y - PORT_R * 0.92)} ${P(p.x + PORT_R * 0.12, PORT_Y - PORT_R * 0.86)}Q${P(p.x - PORT_R * 0.5, PORT_Y - PORT_R * 0.5)} ${P(p.x - PORT_R * 0.86, PORT_Y + PORT_R * 0.1)}Q${P(p.x - PORT_R * 0.9, PORT_Y - PORT_R * 0.3)} ${P(p.x - PORT_R * 0.62, PORT_Y - PORT_R * 0.62)}Z`);
     if (p.plant) {
       b.poly(CM.brick, [[p.x - 15, PORT_Y + 12], [p.x + 15, PORT_Y + 12], [p.x + 11, PORT_Y + 34], [p.x - 11, PORT_Y + 34]]);
       b.fill(CM.leafGold, leafPath(p.x + 12, PORT_Y - 14, 18, 6, -40));
@@ -189,7 +196,6 @@ function cabinInto(b: Batch) {
       b.fill(CM.coatMustard, ovalPath(p.x + Math.cos(a) * (PORT_R + 8), PORT_Y + Math.sin(a) * (PORT_R + 8), 3.4, 3.4));
     }
   }
-  for (const x of [196, 566, 956]) b.rect(CM.coatMustard, x - 12, CT + 6, 24, 15);
   // a window box under one porthole: a mid-oak trough of flowers trailing
   const wb = PORTS.find((p) => p.box)!;
   b.rect(BOAT_WOOD, wb.x - 52, PORT_Y + 62, 104, 24);
@@ -202,12 +208,13 @@ function cabinInto(b: Batch) {
   for (let k = 0; k < 7; k++) b.fill([CM.box, CM.blossom, CM.paper, CM.coatMustard][k % 4], ovalPath(wb.x - 42 + k * 14, PORT_Y + 46 + (k % 3) * 6, 5, 4.6));
 }
 
-/** Rope fenders hanging from the roof rail down the cabin side (still), ending above the gunwale's beading: the rope
- *  a thin cream strip, the fender a cream bolster. */
+/** Rope fenders hanging from cleats under the cantrail down the cabin side (still), ending above the gunwale's beading:
+ *  the rope a thin cream strip that never crosses a dark band (the cantrail and the stripe stay unbroken), the fender a
+ *  cream bolster. */
 const FENDERS = [236, 548, 966];
 const FENDER = {top: GW - 92, bottom: GW - 24};
 function fendersInto(b: Batch) {
-  for (const x of FENDERS) b.rect(CM.coatOat, x - 1.6, RN - 4, 3.2, FENDER.top - RN + 8);
+  for (const x of FENDERS) b.rect(CM.coatOat, x - 1.6, CT + 30, 3.2, FENDER.top - CT - 26);
   b.layer();
   for (const x of FENDERS) b.fill(CM.coatOat, `M${P(x - 15, FENDER.top)}L${P(x + 15, FENDER.top)}Q${P(x + 18, (FENDER.top + FENDER.bottom) / 2)} ${P(x + 14, FENDER.bottom)}L${P(x - 14, FENDER.bottom)}Q${P(x - 18, (FENDER.top + FENDER.bottom) / 2)} ${P(x - 15, FENDER.top)}Z`);
 }
@@ -234,12 +241,6 @@ function roofInto(b: Batch) {
   b.layer();
   b.rect(CM.stoneShade, XL, RF, XR - XL, 7);
   b.rect(CM.limestone, XL, RN - 2, XR - XL, CT - RN + 2);
-  // L1: the grab rails (mid oak) on stanchions, far and near
-  b.layer();
-  for (const [y, h] of [[RF + 3, 10], [RN - 6, 12]] as [number, number][]) {
-    b.rect(BOAT_WOOD, XL, y - h, XR - XL, 4);
-    for (let x = XL + 30; x < XR; x += 120) b.rect(BOAT_WOOD, x, y - h, 4, h);
-  }
   // the long things on the far rail: a boat pole with a brass end, a plank, a mop
   b.layer();
   b.rect(CM.coatOat, XL, RF - 20, 440, 5);
@@ -279,6 +280,13 @@ export const ROOF_STANDERS: Stander[] = [
 ];
 
 function roofItemsInto(b: Batch) {
+  // the grab rails (mid oak) on stanchions, far and near: over the roof things' shadows (a shaded thin rail reads as a
+  // line mark: S3's lesson)
+  for (const [y, h] of [[RF + 3, 10], [RN - 6, 12]] as [number, number][]) {
+    b.rect(BOAT_WOOD, XL, y - h, XR - XL, 4);
+    for (let x = XL + 30; x < XR; x += 120) b.rect(BOAT_WOOD, x, y - h, 4, h);
+  }
+  b.layer();
   // a coiled rope (left): a cream coil round its mid-oak core
   const rx = 78;
   const ry = RN - 22;
@@ -302,7 +310,7 @@ function roofItemsInto(b: Batch) {
   // the folded bike: two wheels as rings, the frame and the saddle as flat shapes (a mid slate; no line)
   const bw = 34;
   for (const wx of [740 + bw * 1.25, 740 - bw * 1.25]) b.fill(FITTING, `${ovalPath(wx, RN - 10 - bw, bw, bw)}M${P(wx - bw + 4, RN - 10 - bw)}A${bw - 4} ${bw - 4} 0 1 1 ${P(wx + bw - 4, RN - 10 - bw)}A${bw - 4} ${bw - 4} 0 1 1 ${P(wx - bw + 4, RN - 10 - bw)}Z`);
-  b.fill(CM.brickDeep, `M${P(740 - bw * 1.25, RN - 10 - bw - 2)}L${P(740, RN - 10 - bw - 2)}L${P(740 - bw * 0.35, RN - 10 - bw * 2.15)}L${P(740 - bw * 0.35 - 4, RN - 10 - bw * 2.15)}L${P(740 - 6, RN - 10 - bw + 3)}L${P(740 - bw * 1.25, RN - 10 - bw + 3)}Z`);
+  b.fill(CM.brick, `M${P(740 - bw * 1.25, RN - 10 - bw - 2)}L${P(740, RN - 10 - bw - 2)}L${P(740 - bw * 0.35, RN - 10 - bw * 2.15)}L${P(740 - bw * 0.35 - 4, RN - 10 - bw * 2.15)}L${P(740 - 6, RN - 10 - bw + 3)}L${P(740 - bw * 1.25, RN - 10 - bw + 3)}Z`);
   b.fill(FITTING, ovalPath(740 - bw * 0.35, RN - 10 - bw * 2.2, bw * 0.3, bw * 0.09));
   // a lifebuoy leaning on the chimney
   const lx = 860;
@@ -315,14 +323,12 @@ function roofItemsInto(b: Batch) {
     const ri = 19;
     b.fill(q % 2 ? CM.paper : CM.box, `M${P(lx + Math.cos(a0) * R, ly + Math.sin(a0) * R)}A${R} ${R} 0 0 1 ${P(lx + Math.cos(a1) * R, ly + Math.sin(a1) * R)}L${P(lx + Math.cos(a1) * ri, ly + Math.sin(a1) * ri)}A${ri} ${ri} 0 0 0 ${P(lx + Math.cos(a0) * ri, ly + Math.sin(a0) * ri)}Z`);
   }
-  // the stove chimney: a plum pipe (the boat's one other plum), brass bands, its coolie hat
+  // the stove chimney: a plum pipe (the boat's one other plum), its brass foot, its coolie hat (soft ends)
   const chx = 944;
   b.layer();
   b.rect(CM.anchor, chx - 11, RF - 100, 22, RN - 12 - (RF - 100));
-  b.poly(CM.anchor, [[chx - 26, RF - 100], [chx, RF - 116], [chx + 26, RF - 100]]);
-  b.rect(CM.anchor, chx - 2, RF - 104, 4, 6);
+  b.fill(CM.anchor, rrect(chx - 26, RF - 112, 52, 12, 6));
   b.layer();
-  b.rect(CM.coatMustard, chx - 12, RF - 68, 24, 7);
   b.rect(CM.coatMustard, chx - 14, RN - 20, 28, 8);
   // the log pile (mid-oak bark, pale ends)
   b.layer();
@@ -346,7 +352,7 @@ function herbsInto(b: Batch) {
     b.poly(CM.brick, [[h.x - h.w / 2, h.base - ph], [h.x + h.w / 2, h.base - ph], [h.x + h.w * 0.38, h.base], [h.x - h.w * 0.38, h.base]]);
   });
   b.layer();
-  HERBS.forEach((h) => b.rect(CM.brickDeep, h.x - h.w / 2 - 2, h.base - h.w * 0.9 - 3, h.w + 4, 7));
+  HERBS.forEach((h) => b.fill(CM.brickLight, rrect(h.x - h.w / 2 - 2, h.base - h.w * 0.9 - 3, h.w + 4, 7, 3)));
   b.layer();
   // L1 the herbs (leaning east in the canal breeze; still); the grassy ones' blades are things that ARE lines
   const blades: string[] = [];
