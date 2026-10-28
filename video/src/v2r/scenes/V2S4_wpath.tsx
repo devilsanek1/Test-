@@ -3,10 +3,10 @@
 //   garden walls   y 862-992 at the back: each garden its own (stock brick in three tones, a rendered one, piers with
 //                  stone caps), three wooden gates, iron railings (a calm mid slate, never plum), roses on a trellis,
 //                  ivy spilling over, a pot on the coping
-//   paving         y 992-1070: flagstones in long courses laid out from S4_CAM (V2S4_depth): receding joints every
-//                  0.75 m that converge on the shot's vanishing point (540, 760) at EVERY frame of the truck (re-projected
-//                  per frame: their near ends ride the plane, their far ends move 0.75x, as the ground does) and narrow
-//                  with distance (75 -> 56 px apart, 3.6 -> 2.7 px wide); a manhole, a drain, a few fallen leaves
+//   paving         y 992-1070: flagstones in long courses laid out from S4_CAM (V2S4_depth), every other course one
+//                  soft tone down (dL* 8.5): their edges converge on the shot's vanishing point (540, 760) at EVERY frame of
+//                  the truck (re-projected per frame: their near ends ride the plane, their far ends move 0.75x, as the
+//                  ground does) and narrow with distance (75 -> 56 px a course); a manhole, a drain, a few fallen leaves
 //   coping         y 1070-1082: one stone band and its lip; three bollards
 //   furniture      heritage lamp posts (off: low sun), a planter of grasses, a litter bin, a lifebuoy on its post, the
 //                  reader's bench, the angler, the heron (still)
@@ -127,47 +127,50 @@ const JOINTS_X: number[] = (() => {
   for (let x = X0 - 400; x < X1 + 120; x += 75) out.push(x);
   return out;
 })();
-/** The joints' tone: a visible joint (dL* 11, 3.6 px near, 2.7 px far: CRAFT §f.4, >= 6 or a band >= 3 px reads). The
- *  flags run in long courses INTO the picture (no level joints: level rows crossing every 7-13 px chopped the receding
- *  joints into pieces too short to read as perspective, and stacked the ground into level bands). */
-const JOINT_DEEP = seamTone(CM.paving, 11);
+/** The courses' second tone: every other course of flags one soft step down (dL* 8.5: CRAFT §c, plank seams as long bands
+ *  at dL* 6-8; §f.4, a receding edge reads at >= 6). The flags run in long courses INTO the picture, so every course edge
+ *  is a tone step that runs to the vanishing point (a thin joint line read as nothing to the eye and to the check, and
+ *  level rows crossing every 7-13 px stacked the ground into level bands). */
+const COURSE_DARK = seamTone(CM.paving, 8.5);
 
 function groundInto(b: Batch) {
   b.rect(CM.paving, X0, FOOT, X1 - X0, COP - FOOT + 1);
-  b.layer();
-  // a manhole cover and a drain grate: flat foreshortened shapes on the flags (no hatching)
-  b.poly(CM.stoneShade, [[920, 1026], [978, 1026], [982, 1044], [916, 1044]]);
-  b.poly(CM.limestone, [[925, 1029], [973, 1029], [976, 1041], [922, 1041]]);
-  b.poly(CM.stoneShade, [[456, 1050], [496, 1050], [494, 1060], [458, 1060]]);
-  b.layer();
-  // a few fallen leaves lying flat (sized by distance: 13 px far, 19 px near)
-  const r = rng('s4pleaves');
-  for (let i = 0; i < 7; i++) {
-    const y = r.range(FOOT + 10, COP - 6);
-    const s = 13 + 6 * ((y - FOOT) / (COP - FOOT));
-    b.fill(i % 2 ? CM.leafGold : CM.leafRust, leafPath(r.range(X0 + 60, X1 - 60), y, s, s * 0.34, r.range(-30, 30)));
-  }
   b.layer();
   // the coping: one stone band, its lip in shade toward the water
   b.rect(CM.limestone, X0, COP, X1 - X0, EDGE - COP);
   b.rect(CM.stoneShade, X0, EDGE - 4, X1 - X0, 4);
 }
 
-/** The receding joints at film t: each joint's near end rides the plane (1.0x), its far end the wall foot's depth
- *  (0.75x), so every joint runs to the fixed vanishing point (540, 760) on screen. Plane px (drawn inside the plane's
- *  slide `dx`). */
-function jointsBatch(dx: number): Batch {
+/** What lies on the flags (over the courses): a manhole cover, a drain grate (flat foreshortened shapes, no hatching) and
+ *  a few fallen leaves lying flat (sized by distance: 13 px far, 19 px near). */
+function groundThingsInto(b: Batch) {
+  b.poly(CM.stoneShade, [[920, 1026], [978, 1026], [982, 1044], [916, 1044]]);
+  b.poly(CM.limestone, [[925, 1029], [973, 1029], [976, 1041], [922, 1041]]);
+  b.poly(CM.stoneShade, [[456, 1050], [496, 1050], [494, 1060], [458, 1060]]);
+  b.layer();
+  const r = rng('s4pleaves');
+  for (let i = 0; i < 7; i++) {
+    const y = r.range(FOOT + 10, COP - 6);
+    const s = 13 + 6 * ((y - FOOT) / (COP - FOOT));
+    b.fill(i % 2 ? CM.leafGold : CM.leafRust, leafPath(r.range(X0 + 60, X1 - 60), y, s, s * 0.34, r.range(-30, 30)));
+  }
+}
+
+/** The flag courses at film t: every other course one tone down, each course's edges running to the fixed vanishing point
+ *  (540, 760) on screen: their near ends ride the plane (1.0x), their far ends the wall foot's depth (0.75x). Plane px
+ *  (drawn inside the plane's slide `dx`). */
+function coursesBatch(dx: number): Batch {
   const b = new Batch();
   const k = Z_NEAR / Z_FAR;
   const [vx] = S4_CAM.vp;
-  for (const xn of JOINTS_X) {
-    const sn = xn + dx;
-    const sf = vx + (sn - vx) * k;
-    if (Math.max(sn, sf) < -20 || Math.min(sn, sf) > 1100) continue;
-    const xf = sf - dx;
-    const wn = 3.6;
-    const wf = wn * k;
-    b.poly(JOINT_DEEP, [[xn - wn / 2, COP], [xn + wn / 2, COP], [xf + wf / 2, FOOT], [xf - wf / 2, FOOT]]);
+  const far = (xn: number) => vx + (xn + dx - vx) * k - dx;
+  for (let i = 0; i + 1 < JOINTS_X.length; i += 2) {
+    const a = JOINTS_X[i];
+    const c = JOINTS_X[i + 1];
+    const fa = far(a);
+    const fc = far(c);
+    if (Math.max(c + dx, fc + dx) < -20 || Math.min(a + dx, fa + dx) > 1100) continue;
+    b.poly(COURSE_DARK, [[a, COP], [c, COP], [fc, FOOT], [fa, FOOT]]);
   }
   return b;
 }
@@ -287,6 +290,11 @@ export const PathPlane: React.FC = () => {
     groundInto(b);
     return b;
   }, []);
+  const groundThings = useMemo(() => {
+    const b = new Batch();
+    groundThingsInto(b);
+    return b;
+  }, []);
   const far = useMemo(() => {
     const b = new Batch();
     farThingsInto(b);
@@ -305,7 +313,8 @@ export const PathPlane: React.FC = () => {
   return (
     <>
       <Paint b={ground} seed="s4pathGround" misreg={false} />
-      <Paint b={jointsBatch(dx)} seed="s4pathJoints" misreg={false} />
+      <Paint b={coursesBatch(dx)} seed="s4pathCourses" misreg={false} />
+      <Paint b={groundThings} seed="s4pathThings" misreg={false} />
       <TowpathShadows t={t} dx={dx} />
       <Paint b={far} seed="s4pathFar" misreg={false} />
       <S4FormShades ds={[planterD(), binD()]} />
