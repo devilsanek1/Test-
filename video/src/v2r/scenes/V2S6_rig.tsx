@@ -1,14 +1,29 @@
-// V2S6_rig.tsx (lane L5): the numbers every V2S6 part shares. Scene time t = film - 24.00 (0 .. 4.06 s, 244 frames).
-// The set is the dc kit's gate (src/v2r/kit/dc/gate.tsx `GateSet`) on its lateral truck LEFT: every plane drifts RIGHT
-// linearly (far 10, lawn 15, mid 24.63 = the deal board's contract drift, near 65 px/s). Extra layers that live between
-// two kit planes drift at an interpolated speed (`driftAtY`: a point's screen speed grows with its depth below the eye
-// line), so the parallax stays one camera.
-import {GATE, GATE_DRIFT, gateDx, GATE_DUR} from '../kit/dc/gate';
-import {S6, SUN2, s6BoardAt, type Rect} from '../world/map';
+// V2S6_rig.tsx (lane L5): the numbers every V2S6 part shares.
+// CLOCK: V2S6 starts at film 23.80 (scenes.json: S5's blossom tree wipes it in 23.62-23.98). V2S6.tsx wraps the shot
+//   in <TimeShift by={0.2}>, so every part, and the dc kit's gate (its S6_T0 is 24.00), runs on t = film - 24.00
+//   (-0.20 .. 4.10). Word times below are on that clock.
+// CAMERA (CRAFT §f.5: ONE camera per shot; lib/depth groundCam): eye level, 1.6 m up, horizon y 771, VP (540, 771),
+//   f 1400. It is the camera the gate's own far field already implies: the service door (2.5 m, 100 px tall, foot at
+//   y 835) = 40 px/m, (835 - 771) / 40 = 1.6 m; the far promenade's people (1.7 m, ~105 px at feet ~870); the lawn's
+//   gravel walk runs to (455, 771) on the same horizon. The deal board's feet (the kerb, y 1252): 300 px/m, z 4.66 m
+//   (its face 1.6 m wide); Pip (feet 1410): z 3.5 m; the frame's foot: z 1.95 m (718 px/m). The kit's `GATE.horizon`
+//   836 is the facade's foot, not the eye.
+// FLOAT (DIRECTION rule 8; lib/depth floatAt / parallaxOffset, as S1's V2S1_float): one gentle out-and-back after the
+//   purpose line, home through the join in (to 24.30), on F12 + Pip's flick (26.40 on) and through the push-through
+//   into SUN2 (27.95; F11 measures 27.82). Each plane shows its share; the sky, the sun and the captions none.
+import React from 'react';
+import {useTime} from '../../lib/time';
+import {floatAt, floatProblems, groundCam, parallaxOffset, PARALLAX_SKY, type FloatLeg} from '../../lib/depth';
+import {S6, SUN2, s6BoardAt, shotById, type Rect} from '../world/map';
 
 export const T0 = 24.0;
-export const DUR = GATE_DUR; // 4.06
-/** HEARD word onsets, scene seconds (film - 24.00). */
+/** The shot's start on the film (map SHOTS = scenes.json): 23.80. V2S6 shifts its clock by T0 - S6_START. */
+export const S6_START = shotById('V2S6').start;
+/** The shot on the inner clock: -0.20 (film 23.80) .. 4.10 (film 28.10). */
+export const T_IN = -0.2;
+export const T_OUT = 4.1;
+export const DUR = T_OUT - T_IN;
+/** HEARD word onsets, inner seconds (film - 24.00). */
 export const W6 = {
   any: 0.03,
   lawful: 0.28,
@@ -22,35 +37,57 @@ export const W6 = {
   usedEnd: 3.82,
 } as const;
 
-/** Plane drifts (px/s, rightward) = the kit's. */
-export const DRIFT = GATE_DRIFT;
-export const dxOf = (v: number, t: number) => gateDx(v, t);
-/** The eye line of the set (eye level: a standing adult's head sits about here at any distance). */
-export const EYE_Y = 760;
-/** A ground point's drift speed by its screen y (linear through the kit's far 10 @ 835 and mid 24.63 @ 1252). */
-export const driftAtY = (y: number) => DRIFT.far + ((y - 835) * (DRIFT.mid - DRIFT.far)) / (1252 - 835);
-/** Height (px) of a standing 1.7 m adult whose feet are at screen y (eye level, ~1.64 m eye height). */
-export const adultH = (feetY: number) => 1.04 * (feetY - EYE_Y);
+// ---------------------------------------------------------------- the camera
 
-/** The deal board's contract rect on screen at scene t (map s6BoardAt). */
+export const HORIZON = 771;
+export const VP = {x: 540, y: HORIZON} as const;
+export const CAM = groundCam({horizon: HORIZON, vpx: 540, f: 1400, height: 1.6});
+/** The kerb at the board's feet (the footpath's back edge) and its depth. */
+export const KERB_Y = 1252;
+export const KERB_Z = CAM.z(KERB_Y);
+/** Height (px) of a standing 1.7 m adult whose feet are at screen y. */
+export const adultH = (feetY: number) => 1.7 * CAM.pxPerM(feetY);
+
+// ---------------------------------------------------------------- the float and the planes
+
+/** S6's planes (lib/depth parallax planes): -1 the near bed, shrub and bench, 0 the deal board + footpath + Pip, +1 the
+ *  fence and the lawn, +2 the lawn's cherries and the far promenade, +3 the facade band and its door; the sky never. */
+export const S6_PLANE = {sky: PARALLAX_SKY, facade: 3, lawn: 2, fence: 1, subject: 0, near: -1} as const;
+
+/** The float's legs (near-ground px from home, FILM s). */
+export const S6_FLOAT_LEGS: FloatLeg[] = [
+  {t0: 24.3, t1: 25.35, to: [6, -3]},
+  {t0: 25.35, t1: 26.4, to: [0, 0]},
+];
+/** Home at these FILM times: the join in, the purpose line, F12 and the flick, F11, the push-through. */
+export const S6_FLOAT_REST = [23.8, 24.03, 24.3, 26.4, 26.467, 26.5, 27.82, 27.95, 28.1];
+/** floatProblems(...) must be [] (net <= 12 px, peak <= 10 px/s, home at the rests). */
+export const s6FloatProblems = () => floatProblems(S6_FLOAT_LEGS, {rest: S6_FLOAT_REST});
+/** The near-ground float at inner time t. */
+export const s6Float = (t: number): [number, number] => floatAt(T0 + t, S6_FLOAT_LEGS) as [number, number];
+
+/** One plane's group: translated by its share of the float (the same tree every frame: nothing remounts). */
+export const S6Plane: React.FC<{plane: number; children?: React.ReactNode}> = ({plane, children}) => {
+  const t = useTime();
+  const [dx, dy] = parallaxOffset(s6Float(t), plane);
+  return <g transform={`translate(${dx.toFixed(3)} ${dy.toFixed(3)})`}>{children}</g>;
+};
+
+// ---------------------------------------------------------------- shared spots
+
+/** The deal board's contract rect on screen (map s6BoardAt; held). */
 export const boardAt = (t: number): Rect => s6BoardAt(T0 + t);
-/** Life never crosses the board's lettering: its rect + a margin (screen px at scene t). */
-export const boardKeepOut = (t: number, m = 18): Rect => {
-  const b = boardAt(t);
-  return {x0: b.x0 - m, y0: b.y0 - m, x1: b.x1 + m, y1: b.y1 + 4};
-};
 export const inRect = (x: number, y: number, r: Rect) => x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1;
-
-/** The service door on screen (far plane) and its centre. */
-export const doorAt = (t: number): Rect => {
-  const dx = dxOf(DRIFT.far, t);
-  return {x0: GATE.door.x0 + dx, y0: GATE.door.y0, x1: GATE.door.x1 + dx, y1: GATE.door.y1};
-};
-
-/** Pip's seat in MID-plane coordinates (= the contract's 24.00 screen spot) and its screen spot at t. */
+/** Pip's seat (feet) on the paving in front of the board. */
 export const PIP_SEAT = {x: S6.pipSeat0.x, y: S6.pipSeat0.y};
-export const pipSeatScreen = (t: number) => ({x: PIP_SEAT.x + dxOf(DRIFT.mid, t), y: PIP_SEAT.y});
-
 export const SUN = SUN2;
 /** Never draw here (the caption band, with its flat margin): y 290-600. */
 export const BAND = {y0: 290, y1: 600};
+/** (Retired: the truck's drifts, all 0; kept until every part drops them.) */
+export const DRIFT = {far: 0, lawn: 0, mid: 0, near: 0} as const;
+export const dxOf = (_v: number, _t: number) => 0;
+/** Nothing enters, pops or turns in these inner windows (film 23.60-24.00 and 27.90-28.30). */
+export const QUIET: [number, number][] = [
+  [-0.4, 0.0],
+  [3.9, 4.3],
+];

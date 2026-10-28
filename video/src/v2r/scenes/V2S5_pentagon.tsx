@@ -2,7 +2,7 @@
 // it takes S5's ONE atmosphere (conform_L4 §10): its tones recede toward the April gold at HALF the mid plane's step
 // (the subject from 22.43, CRAFT §f), instead of the kit's sRGB mix toward the mint. The body is the kit's.
 import React, {useMemo} from 'react';
-import {CM} from '../palette';
+import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
 import {Batch, Paint, mix, inkCol, lineD, polyD, quadD, crownD, circleD, rng, type Pt} from '../kit/dc/core';
 import {rcAtm, rcShade} from './V2S5_depth';
@@ -21,10 +21,12 @@ export const PT5 = {
   facadeShade: atmShade(mix(CM.stoneShade, CM.shadeCool, 0.22), 2),
   facadeShadeDeep: atmShade(CM.stoneShade, 2),
   cornice: atm(CM.paper, 2),
-  roofLit: atm(mix(CM.limestone, CM.stoneShade, 0.3), 2),
-  roofShade: atmShade(mix(CM.stoneShade, CM.limestone, 0.2), 2),
-  well: atmShade(mix(CM.shadeCool, CM.paneUnlit, 0.4), 2),
-  wellDeep: atmShade(CM.shadeCool, 2),
+  // the roof: grey (the real building's limestone walls under a darker grey roof), one value under the hazy
+  // parkland behind it, so its far edges hold a fill step (check_depth "melts": a cream roof was 4-5 off it)
+  roofLit: atm(mix(CM.stoneShade, CM.shadeCool, 0.45), 2),
+  roofShade: atmShade(mix(CM.stoneShade, CM.shadeCool, 0.62), 2),
+  well: atmShade(mix(CM.shadeCool, CM.anchor, 0.25), 2),
+  wellDeep: atmShade(mix(CM.shadeCool, CM.anchor, 0.35), 2),
   paneShade: atmShade(mix(CM.paneUnlit, CM.anchor, 0.15), 2),
   paneLit: atm(mix(CM.paneUnlit, CM.limestone, 0.45), 2),
   paneWarm: atm(CM.lamp, 2),
@@ -35,7 +37,8 @@ export const PT5 = {
   courtBlossom: atm(CM.blossom, 2),
   pavilion: atm(CM.paper, 2),
   pavilionRoof: atm(CM.brick, 2),
-  shadow: atm(mix(CM.sage, CM.anchor, 0.3), 2),
+  // its cast shadow on the lawn toward us: deep enough that the shaded front facade keeps a fill step off it (L* ~55)
+  shadow: atm(mix(CM.sage, CM.anchor, 0.46), 2),
   ink: inkCol(2),
 };
 
@@ -210,19 +213,19 @@ const PentagonBody: React.FC<Pentagon5Props> = ({warmAt, warmDur = 0.7, seed = '
     b.fill(PT5.paneShade, winBatch.shade.join(''));
     b.fill(PT5.paneLit, winBatch.lit.join(''));
 
-    // ---- 7. hairline ink: the roof outline, the visible corners, the courtyard opening, the facade bases
+    // ---- 7. ONE closed outline (CRAFT §b tier A, conform_L4 §5/§8): the building's silhouette (the roof's pentagon and
+    // the front facades' bases, hulled) at INK_PX.mid, in ITS OWN SHADE (CM.ink bounding the facade's shade: the clean
+    // pen draws it one step darker than that shade, never near-black). Tier C (before "Pentagon", 22.43) draws no
+    // contour, so it pops on its word; no inner lines (the courtyard and the corners read by their values).
     b.layer();
     const roofOut = outer.map((q) => P3(q, H));
-    b.ink(lineD([...roofOut, roofOut[0]]), 1.6, PT5.ink, 0.18);
-    b.ink(lineD([...pentagon(PENT.courtApothem).map((q) => P3(q, H)), P3(vert(PENT.courtApothem, 0), H)]), 1.3, PT5.ink, 0.25);
+    const bases: Pt[] = [];
     for (const sd of PENT_SIDES5) {
       if (!sd.front) continue;
-      const A = vert(PENT.apothem, sd.i);
-      const B = vert(PENT.apothem, (sd.i + 1) % 5);
-      b.ink(lineD([P3(A, 0), P3(B, 0)]), 1.6, PT5.ink, 0.15);
-      b.ink(lineD([P3(A, 0), P3(A, H)]), 1.6, PT5.ink);
-      b.ink(lineD([P3(B, 0), P3(B, H)]), 1.6, PT5.ink);
+      bases.push(P3(vert(PENT.apothem, sd.i), 0), P3(vert(PENT.apothem, (sd.i + 1) % 5), 0));
     }
+    const sil = hull([...roofOut, ...bases]);
+    b.ink(lineD([...sil, sil[0]]), INK_PX.mid, CM.ink, 0, {tone: PT5.facadeShade});
     return b;
   }, [seed]);
 

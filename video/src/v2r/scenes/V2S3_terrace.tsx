@@ -14,7 +14,7 @@ import React from 'react';
 import {CM} from '../palette';
 import {Fill} from '../../lib/Fill';
 import {ovalPath} from '../kit/canal/core';
-import {S3West, SUN3} from './V2S3_tWest';
+import {S3WestNear, SUN3} from './V2S3_tWest';
 import {S3Houses} from './V2S3_tHouses';
 import {S3Her} from './V2S3_tHer';
 import {S3Path, S3Inside, S3Outside, S3RoofLife} from './V2S3_tLife';
@@ -24,7 +24,7 @@ export const S3Sun: React.FC = () => <Fill d={ovalPath(SUN3.x, SUN3.y, SUN3.r, S
 
 export const S3Terrace: React.FC = () => (
   <>
-    <S3West />
+    <S3WestNear />
     <S3Houses inside={<S3Inside />} />
     <S3Her />
     <S3Outside />

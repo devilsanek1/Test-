@@ -1,0 +1,152 @@
+{
+ "name": "v2 S5 @23.4 (lane L4): the landing, the Pentagon (A) beyond the terrace, the far city and the obelisk",
+ "units": "px",
+ "air_hex": "#F6D9BC",
+ "planes": [
+  {
+   "name": "terrace frame: the cherry (left)",
+   "plane": -1,
+   "boxes": [
+    [
+     0,
+     660,
+     250,
+     1250
+    ]
+   ]
+  },
+  {
+   "name": "terrace: pair, plaque, benches, balustrade",
+   "plane": 0,
+   "boxes": [
+    [
+     300,
+     1130,
+     1080,
+     1262
+    ]
+   ]
+  },
+  {
+   "name": "terrace floor",
+   "plane": 0,
+   "role": "ground",
+   "boxes": [
+    [
+     300,
+     1270,
+     1080,
+     1920
+    ]
+   ]
+  },
+  {
+   "name": "the Pentagon and its lawns",
+   "plane": 2,
+   "role": "subject",
+   "boxes": [
+    [
+     330,
+     870,
+     1080,
+     1100
+    ]
+   ]
+  },
+  {
+   "name": "river (Potomac, banks)",
+   "plane": 3,
+   "boxes": [
+    [
+     300,
+     800,
+     1080,
+     846
+    ]
+   ]
+  },
+  {
+   "name": "far city",
+   "plane": 4,
+   "boxes": [
+    [
+     300,
+     752,
+     1000,
+     792
+    ]
+   ],
+   "exclude": [
+    [
+     372,
+     600,
+     420,
+     800
+    ]
+   ]
+  }
+ ],
+ "silhouettes": [
+  {
+   "name": "the Pentagon (A from 22.43)",
+   "tier": "A",
+   "poly": [
+    [
+     322,
+     987
+    ],
+    [
+     447,
+     867
+    ],
+    [
+     961,
+     846
+    ],
+    [
+     1282,
+     942
+    ],
+    [
+     1280,
+     990
+    ],
+    [
+     902,
+     1104
+    ],
+    [
+     324,
+     1037
+    ]
+   ]
+  },
+  {
+   "name": "the plaque (A from 22.43)",
+   "tier": "A",
+   "rect": [
+    441,
+    1119,
+    769,
+    1246
+   ]
+  }
+ ],
+ "ground": [
+  {
+   "name": "terrace floor (the deck camera's VP)",
+   "roi": [
+    300,
+    1280,
+    1080,
+    1920
+   ],
+   "vps": [
+    [
+     342,
+     750
+    ]
+   ]
+  }
+ ]
+}

@@ -12,6 +12,8 @@
 //            x <= 880; at the end it sits below the Pentagon's facades (their bottom edge ~y 1000-1045).
 import React from 'react';
 import {Fill} from '../../lib/Fill';
+import {useTime} from '../../lib/time';
+import {CastShadow, ContactShadow, ShadowLayer} from '../../lib/light';
 import {XG, mat} from '../../lib/xf';
 import {polyPath} from '../../lib/sketch';
 import {S5} from '../world/map';
@@ -22,6 +24,10 @@ import {NEWS_BOX, SMALL_COLORS} from '../kit/boards/small';
 export const PLAQUE_SPOT = {x: 605, y: 1246, stand: false};
 
 const rectD = (x0: number, y0: number, x1: number, y1: number) => polyPath([[x0, y0], [x1, y0], [x1, y1], [x0, y1]]);
+
+/** The news box is the SUBJECT (tier A: one closed outline in its own shade) from just after the slot's burst to the
+ *  move (film 20.90-21.75; conform_L4 §5), the environment before and after (scene s). */
+export const NEWS_A: [number, number] = [20.9 - 20.55, 21.75 - 20.55];
 
 /** The front page at body size (box units, the K3 box's own 310 x 350 frame): page, head rules, the 3-line headline at
  *  34, a short rule, the 18 px credit. Drawn over K3's page (same window, same colours). */
@@ -34,9 +40,18 @@ export const NewsBox: React.FC = () => {
   const C = SMALL_COLORS;
   const cx = N.w / 2;
   const m = mat.compose(mat.translate(r.x0, r.y0), mat.scale((r.x1 - r.x0) / N.w, (r.y1 - r.y0) / N.h));
+  const t = useTime();
+  const tier = t >= NEWS_A[0] && t < NEWS_A[1] ? 'subject' : 'environment';
+  const bw = r.x1 - r.x0;
   return (
     <>
-      <K3NewsBox />
+      {/* its light (the rig's family, V2S5_light): the strip where its feet meet the paving and its cast (the box's
+          own drawn ground shadow is off: one shadow system) */}
+      <ShadowLayer>
+        <CastShadow x={(r.x0 + r.x1) / 2} y={r.y1 - 6} w={bw * 0.92} depth={bw * 0.16} h={(r.y1 - r.y0) * 0.94} />
+        <ContactShadow x={(r.x0 + r.x1) / 2} y={r.y1} w={bw * 0.86} h={12} />
+      </ShadowLayer>
+      <K3NewsBox tier={tier} shadow={false} />
       <XG m={m}>
         <Fill d={rectD(W.x0 + 4, W.y0 + 3.5, W.x1, W.y1)} color={C.face} offset={false} seed="s5nb/page" />
         <Fill d={rectD(W.x0 + 14, N.rules[0] - 0.55, W.x1 - 12, N.rules[0] + 0.55) + rectD(W.x0 + 14, N.rules[1] - 0.55, W.x1 - 12, N.rules[1] + 0.55)} color={C.pageRule} offset={false} seed="s5nb/rules" />
