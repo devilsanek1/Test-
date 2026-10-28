@@ -82,8 +82,9 @@ push, Pip's bollard pose (= S8's, A5), the band-safe wiper.
 ## 7. Depth + particles (2026-10-27; CRAFT §f, `src/lib/DEPTH.md`, THROUGHLINE §5b)
 - **S6:** -1 the tulip kerb, bench, rack and fence posts, 0 the deal board + paving, +1 the facade band + door, +2 the
   promenade's trees (the April air): the board's cream face stands on the limestone facade (L* ~90), so give it a darker
-  field behind (the facade's shade step, the fence, a hedge band: `backing`); the falling petals become one `leaves`
-  field (blossom colours, <= 8, no gust), `joins` [0, 4.30].
+  field behind (the facade's shade step, the fence, a hedge band: `backing`); the falling petals stay S6's own declared
+  falling weather (`S6Petals`: blossom colours, <= 8, no gust, flat, growing in and shrinking out, never through the
+  band; a `leaves` field holds 2 at most), nothing entering in the 0.4 s around 0 and 4.30.
 - **S7:** -1 the café tables and things, 0 Google's board + the forecourt (setts to the VP (540, 560) at |ΔL*| >= 6),
   +1 the wing's facade (one shade step behind the board: it faces away from the low sun), +2 plane trees on the
   sunset band; particles: plane-tree `leaves` and `motes` in the low sun's light, nothing new in 32.50-33.10.
