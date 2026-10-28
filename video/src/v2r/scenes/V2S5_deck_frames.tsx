@@ -5,30 +5,56 @@
 //   RightFrame5    the RIGHT frame: the terrace lamppost (base cut by the bottom-right, a hanging basket that nods) in
 //                  front of a blossoming corner crown cut by the right edge and the bottom.
 //   LampPost5      the terrace's lamppost family (cast iron, an unlit lantern: April morning), base at (0, 0); with
-//                  `baskets` the WIPE prop: two hanging flower baskets, a ~460 px mass at the backs' height.
+//                  `baskets` the WIPE prop: two hanging flower baskets, a ~460 px mass at the backs' height; with
+//                  `shadows` its contact strip and its cast along the rig's sun (the wipe stands on the deck's floor).
 //   NearPetals5    screen-space petals near the lens, born below y 620, never over the subjects.
-// Crowns are forked from kit/dc/bloom.tsx (same build: mass, ink limbs, clumps, flowers) with backlit tones.
+// Crowns are forked from kit/dc/bloom.tsx (same build: mass, limbs, clumps, flowers). The frames are NEARER than the deck
+// (plane -1): ONE value step darker than the deck and the slot's crowns (`rc(c, -1)`, lib/depth nearStep: hue and chroma
+// kept), a mid-dark mauve mass (L* ~45), never near-black, the blossom close to it in value (no white sparks, no
+// polka dots). Tier C (V2S5_set): no outlines; the basket chains ARE lines (hairlines).
 import React, {useMemo} from 'react';
 import {CM} from '../palette';
 import {useTime} from '../../lib/time';
-import {Batch, Paint, mix, crownD, ellD, lineD, polyD, rng, rand, frac, blossomD, burstScale, circleD, smoothClosed, type Pt} from '../kit/dc/core';
+import {CastShadow, ContactShadow, ShadowLayer} from '../../lib/light';
+import {Batch, Paint, mix, crownD, ellD, lineD, polyD, rng, rand, frac, blossomD, burstScale, circleD, type Pt} from '../kit/dc/core';
 import type {PullBox} from '../kit/dc/crane';
 import {DT} from './V2S5_deck_cam';
+import {rc} from './V2S5_depth';
 
 // ---------------------------------------------------------------- backlit blossom crowns (forked from kit bloom.tsx)
 
 export type Tones5 = {base: string; limb: string; shade: string; mid: string; lit: string; flower: string; flowerShade: string; white: string; bud: string};
-/** Near cherries seen against the light: plum mass and shade clumps dominate, blossom lit on the rim toward the sun. */
+/** A frame colour: one plane nearer than the deck (a value step darker, hue and chroma kept). */
+const near = (c: string) => rc(c, -1);
+/** Near cherries seen against the light (plane -1): a mid-dark mauve mass (L* 45), shade and mid clumps a few steps up,
+ *  the lit rim toward the sun; the flowers in the clumps' own range (56-73: no white sparks). The mixes are V2S5_valley
+ *  BLOOM_S5's recipe (the slot's crowns, plane +1) with the blossom pulled toward the mass, taken one plane nearer. */
 export const BACKLIT: Tones5 = {
-  base: mix(CM.shadeWarm, CM.anchor, 0.62),
-  limb: CM.anchor,
-  shade: mix(CM.shadeWarm, CM.anchor, 0.3),
-  mid: mix(CM.shadeWarm, CM.blossom, 0.3),
-  lit: mix(CM.blossom, CM.brickLight, 0.14),
-  flower: CM.blossom,
-  flowerShade: mix(CM.blossom, CM.shadeWarm, 0.55),
-  white: CM.paper,
-  bud: mix(CM.leafRust, CM.shadeWarm, 0.25),
+  base: near(mix(CM.shadeWarm, CM.blossom, 0.12)),
+  limb: near(mix(CM.anchor, CM.shadeWarm, 0.45)),
+  shade: near(mix(CM.shadeWarm, CM.blossom, 0.3)),
+  mid: near(mix(CM.shadeWarm, CM.blossom, 0.55)),
+  lit: near(mix(mix(CM.blossom, CM.brickLight, 0.2), CM.shadeWarm, 0.15)),
+  flower: near(mix(CM.shadeWarm, CM.blossom, 0.7)),
+  flowerShade: near(mix(CM.shadeWarm, CM.blossom, 0.42)),
+  white: near(mix(CM.shadeWarm, CM.blossom, 0.85)),
+  bud: near(mix(CM.leafRust, CM.shadeWarm, 0.55)),
+};
+/** The frames' iron, bark, leaves and wicker (plane -1). */
+const F5 = {
+  iron: near(DT.iron),
+  ironLit: near(DT.ironLit),
+  glass: near(DT.lanternGlass),
+  glassShade: near(mix(DT.lanternGlass, CM.stoneShade, 0.45)),
+  bark: near(mix(CM.anchor, CM.shadeWarm, 0.6)),
+  barkLit: near(mix(CM.shadeWarm, CM.brickDeep, 0.35)),
+  leaf: near(DT.leaf),
+  leafWarm: near(DT.leafWarm),
+  leafShade: near(DT.leafShade),
+  wicker: near(mix(CM.line, CM.brickDeep, 0.3)),
+  chain: near(mix(DT.iron, CM.shadeWarm, 0.3)),
+  /** Basket flowers: three close blossom tones (no white, no plum specks). */
+  flowers: [near(mix(CM.blossom, CM.brickLight, 0.25)), near(mix(CM.blossom, CM.shadeWarm, 0.18)), near(mix(CM.coatOat, CM.blossom, 0.35))],
 };
 
 export type Crown5 = {cx: number; cy: number; rx: number; ry: number; seed: string; light: Pt; bloom?: number; limbs?: boolean; ink?: number; litK?: number};
@@ -68,7 +94,7 @@ function layout(c: Crown5, T: Tones5) {
   }
   clumps.sort((p, q) => (p.x - c.cx) * c.light[0] + (p.y - c.cy) * c.light[1] - ((q.x - c.cx) * c.light[0] + (q.y - c.cy) * c.light[1]));
   const flowers: Flower[] = [];
-  const nf = Math.round(((c.rx * c.ry) / 380) * (c.bloom ?? 0.8));
+  const nf = Math.round(((c.rx * c.ry) / 680) * (c.bloom ?? 0.8));
   for (let i = 0; i < nf; i++) {
     const a = r.range(0, Math.PI * 2);
     const d = Math.sqrt(r.next()) * 0.94;
@@ -88,11 +114,6 @@ export const Crowns5: React.FC<{crowns: Crown5[]; tones?: Tones5; burstAt?: numb
       const l = L[k];
       B.layer();
       B.fill(tones.base, l.base);
-      if (c.limbs !== false) {
-        const w = c.ink ?? Math.max(2.2, Math.min(5, c.rx / 30));
-        B.ink(l.limbs, w, tones.limb);
-        B.ink(l.twigs, w * 0.55, tones.limb);
-      }
       B.layer();
       let buds = '';
       for (const q of l.clumps) {
@@ -115,6 +136,7 @@ export const Crowns5: React.FC<{crowns: Crown5[]; tones?: Tones5; burstAt?: numb
   const b = bloomed ? full : before ? bare : build((i) => burstScale(t, burstAt, i));
   return <Paint b={b} seed={seed} misreg={misreg} />;
 };
+void lineD;
 
 // ---------------------------------------------------------------- the terrace tree (LEFT frame)
 
@@ -127,15 +149,12 @@ export const TerraceTree5: React.FC<{burstAt?: number}> = ({burstAt}) => {
   const trunk = useMemo(() => {
     const B = new Batch();
     const T = TREE5.trunk;
-    const bark = CM.anchor;
-    const barkLit = mix(CM.anchor, CM.brickDeep, 0.5);
-    // the roots spreading over the floor, cut by both edges (the floor's own shade is the deck's: no light there)
-    // roots: flared buttresses into the ground
-    B.poly(bark, [[T.x - 150, 1990], [T.x - 120, 1902], [T.x - 52, 1866], [T.x - 40, 1990]]);
-    B.poly(bark, [[T.x + 40, 1990], [T.x + 58, 1868], [T.x + 120, 1898], [T.x + 230, 1960], [T.x + 250, 1990]]);
-    B.poly(bark, [[T.x + 110, 1990], [T.x + 150, 1934], [T.x + 260, 1932], [T.x + 330, 1990]]);
+    // the roots: flared buttresses into the ground, cut by the bottom (the floor's shade under the crown is the deck's)
+    B.poly(F5.bark, [[T.x - 150, 1990], [T.x - 120, 1902], [T.x - 52, 1866], [T.x - 40, 1990]]);
+    B.poly(F5.bark, [[T.x + 40, 1990], [T.x + 58, 1868], [T.x + 120, 1898], [T.x + 230, 1960], [T.x + 250, 1990]]);
+    B.poly(F5.bark, [[T.x + 110, 1990], [T.x + 150, 1934], [T.x + 260, 1932], [T.x + 330, 1990]]);
     // the trunk, leaning right, forking into two limbs under the crown
-    B.poly(bark, [
+    B.poly(F5.bark, [
       [T.x - 66, 1990],
       [T.x - 46, 1700],
       [T.x - 40, 1480],
@@ -151,28 +170,8 @@ export const TerraceTree5: React.FC<{burstAt?: number}> = ({burstAt}) => {
       [T.x + 44, 1700],
       [T.x + 74, 1990],
     ]);
-    // lit edge (right: the sun is beyond, right), a few bark marks
-    B.poly(barkLit, [[T.x + 26, 1990], [T.x + 20, 1700], [T.x + 14, 1470], [T.x + 24, 1290], [T.x + 36, 1262], [T.x + 30, 1460], [T.x + 40, 1700], [T.x + 64, 1990]]);
-    let marks = '';
-    const r = rng('s5deck/bark');
-    for (let i = 0; i < 16; i++) {
-      const y = r.range(1330, 1880);
-      const x = T.x + r.range(-36, 18);
-      marks += lineD([[x, y], [x + r.range(8, 16), y + r.range(-2, 2)]]);
-    }
-    B.ink(marks, 1.6, mix(CM.anchor, CM.brickDeep, 0.3));
-    B.layer();
-    B.ink(lineD([[T.x - 66, 1990], [T.x - 46, 1700], [T.x - 40, 1480], [T.x - 64, 1330], [T.x - 118, 1212]]), 4.8, DT.ink, 0.1);
-    B.ink(lineD([[T.x + 74, 1990], [T.x + 44, 1700], [T.x + 34, 1460], [T.x + 46, 1240], [T.x + 92, 1118]]), 4.8, DT.ink, 0.1);
-    B.ink(lineD([[T.x + 40, 1990], [T.x + 58, 1868], [T.x + 120, 1898], [T.x + 230, 1960]]), 3.4, DT.ink, 0.25);
-    // the tree pit's iron grille round the foot (radial bars, cut by the bottom)
-    let bars = '';
-    const gc: Pt = [T.x + 10, 1960];
-    for (let a = -0.15; a < Math.PI + 0.15; a += 0.13) {
-      bars += lineD([[gc[0] + Math.cos(a) * 150, gc[1] - Math.sin(a) * 38], [gc[0] + Math.cos(a) * 250, gc[1] - Math.sin(a) * 66]]);
-    }
-    B.ink(bars, 2.2, mix(CM.anchor, CM.coatPlum, 0.4), 0.15);
-    B.ink(`M${gc[0] - 250} ${gc[1]}A250 66 0 0 1 ${gc[0] + 250} ${gc[1]}`, 2.6, CM.anchor);
+    // its lit edge toward the sun (beyond, right): one flat step
+    B.poly(F5.barkLit, [[T.x + 26, 1990], [T.x + 20, 1700], [T.x + 14, 1470], [T.x + 24, 1290], [T.x + 36, 1262], [T.x + 30, 1460], [T.x + 40, 1700], [T.x + 64, 1990]]);
     return B;
   }, []);
   const crowns = useMemo<Crown5[]>(() => {
@@ -191,8 +190,8 @@ export const TerraceTree5: React.FC<{burstAt?: number}> = ({burstAt}) => {
   }, []);
   return (
     <>
-      <Paint b={trunk} seed="s5deck/treeTrunk" misreg={3} />
-      <Crowns5 crowns={crowns} burstAt={burstAt} seed="s5deck/treeBl" />
+      <Paint b={trunk} seed="s5deck/treeTrunk" misreg={false} />
+      <Crowns5 crowns={crowns} burstAt={burstAt} seed="s5deck/treeBl" misreg={0} />
     </>
   );
 };
@@ -203,11 +202,10 @@ export const TerraceTree5: React.FC<{burstAt?: number}> = ({burstAt}) => {
  *  mound of leaves in two sage values and trailing chains of small leaves (ivy-leaved geraniums) hanging below it. */
 function basketShapes(B: Batch, cx: number, cy: number, k: number, seed: string) {
   const r = rng(`s5deck/basket/${seed}`);
-  B.fill(mix(CM.line, CM.brickDeep, 0.3), `M${cx - 64 * k} ${cy - 4 * k}Q${cx} ${cy + 62 * k} ${cx + 64 * k} ${cy - 4 * k}Z`);
-  B.ink(`M${cx - 52 * k} ${cy + 14 * k}Q${cx} ${cy + 42 * k} ${cx + 52 * k} ${cy + 14 * k}`, Math.max(1, 1.6 * k), mix(CM.line, CM.anchor, 0.4));
-  B.fill(DT.leafShade, crownD(cx, cy - 18 * k, 112 * k, 50 * k, `s5deck/bk/${seed}0`, 11, 0.12));
-  B.fill(DT.leaf, crownD(cx + 14 * k, cy - 32 * k, 84 * k, 34 * k, `s5deck/bk/${seed}1`, 9, 0.15));
-  // trailing chains
+  B.fill(F5.wicker, `M${cx - 64 * k} ${cy - 4 * k}Q${cx} ${cy + 62 * k} ${cx + 64 * k} ${cy - 4 * k}Z`);
+  B.fill(F5.leafShade, crownD(cx, cy - 18 * k, 112 * k, 50 * k, `s5deck/bk/${seed}0`, 11, 0.12));
+  B.fill(F5.leaf, crownD(cx + 14 * k, cy - 32 * k, 84 * k, 34 * k, `s5deck/bk/${seed}1`, 9, 0.15));
+  // trailing chains of small leaves (ivy-leaved geraniums)
   let ca = '';
   let cb = '';
   for (let i = 0; i < 11; i++) {
@@ -223,19 +221,20 @@ function basketShapes(B: Batch, cx: number, cy: number, k: number, seed: string)
       y += r.range(9, 14) * k;
     }
   }
-  B.fill(DT.leafShade, cb);
-  B.fill(DT.leafWarm, ca);
+  B.fill(F5.leafShade, cb);
+  B.fill(F5.leafWarm, ca);
 }
 
-/** A terrace lamppost, BASE at (0, 0), `h` px to the finial (the reference drawing is 560 tall). Unlit lantern. */
-export const LampPost5: React.FC<{h: number; baskets?: 0 | 1 | 2; ink?: number; seed: string; nod?: boolean}> = ({h, baskets = 0, ink = 4.8, seed, nod = true}) => {
+/** A terrace lamppost, BASE at (0, 0), `h` px to the finial (the reference drawing is 560 tall). Unlit lantern. With
+ *  `shadows`: its contact strip and its cast along the rig's sun (a lamppost standing on the deck's floor: the wipe). */
+export const LampPost5: React.FC<{h: number; baskets?: 0 | 1 | 2; seed: string; nod?: boolean; shadows?: boolean}> = ({h, baskets = 0, seed, nod = true, shadows = false}) => {
   const t = useTime();
   const k = h / 560;
+  const pw = 24 * k;
   const b = useMemo(() => {
     const B = new Batch();
-    const pw = 24 * k;
-    const iron = DT.iron;
-    const lit = DT.ironLit;
+    const iron = F5.iron;
+    const lit = F5.ironLit;
     // the base: a fluted plinth with a ring
     B.poly(iron, [[-pw * 1.5, 0], [pw * 1.5, 0], [pw * 1.2, -46 * k], [pw * 0.9, -86 * k], [-pw * 0.9, -86 * k], [-pw * 1.2, -46 * k]]);
     B.poly(lit, [[pw * 0.6, 0], [pw * 1.5, 0], [pw * 1.2, -46 * k], [pw * 0.9, -86 * k], [pw * 0.5, -86 * k], [pw * 0.7, -46 * k]]);
@@ -247,58 +246,56 @@ export const LampPost5: React.FC<{h: number; baskets?: 0 | 1 | 2; ink?: number; 
     B.rect(iron, -pw * 0.95, -470 * k, pw * 1.9, 14 * k);
     // the lantern: a tapered glass box in an iron frame, a cap, a finial
     const lw = 66 * k;
-    B.poly(DT.lanternGlass, [[-lw * 0.4, -472 * k], [lw * 0.4, -472 * k], [lw * 0.55, -538 * k], [-lw * 0.55, -538 * k]]);
-    B.poly(mix(DT.lanternGlass, CM.stoneShade, 0.45), [[-lw * 0.4, -472 * k], [-lw * 0.12, -472 * k], [-lw * 0.16, -538 * k], [-lw * 0.55, -538 * k]]);
+    B.poly(F5.glass, [[-lw * 0.4, -472 * k], [lw * 0.4, -472 * k], [lw * 0.55, -538 * k], [-lw * 0.55, -538 * k]]);
+    B.poly(F5.glassShade, [[-lw * 0.4, -472 * k], [-lw * 0.12, -472 * k], [-lw * 0.16, -538 * k], [-lw * 0.55, -538 * k]]);
+    B.rect(iron, -lw * 0.03, -538 * k, lw * 0.06, 66 * k);
     B.poly(iron, [[-lw * 0.66, -538 * k], [lw * 0.66, -538 * k], [lw * 0.14, -556 * k], [-lw * 0.14, -556 * k]]);
     B.fill(iron, circleD(0, -560 * k, 6 * k));
     if (baskets) {
-      // a scrolled bracket each side at -452 (ink scrolls) and the chains
+      // a bracket arm each side at -452 and the chains (they ARE lines: hairlines on the environment tier)
       for (const s of baskets === 2 ? [-1, 1] : [1]) {
         B.rect(iron, s > 0 ? 0 : -122 * k, -452 * k, 122 * k, 7 * k);
-        B.ink(`M${s * 20 * k} ${-445 * k}Q${s * 60 * k} ${-410 * k} ${s * 96 * k} ${-446 * k}`, Math.max(1.2, 2.2 * k), DT.ink);
-        B.ink(lineD([[s * 118 * k, -446 * k], [s * 70 * k, -392 * k]]) + lineD([[s * 118 * k, -446 * k], [s * 166 * k, -392 * k]]), Math.max(0.9, 1.4 * k), DT.ink);
+        B.ink(lineD([[s * 118 * k, -446 * k], [s * 70 * k, -392 * k]]) + lineD([[s * 118 * k, -446 * k], [s * 166 * k, -392 * k]]), Math.max(0.9, 1.4 * k), F5.chain, 0, {thing: true});
       }
     }
-    B.layer();
-    B.ink(lineD([[-pw / 2, -86 * k], [-pw / 2, -462 * k]]) + lineD([[pw / 2, -86 * k], [pw / 2, -462 * k]]), ink, DT.ink, 0.15);
-    B.ink(lineD([[-pw * 1.5, 0], [-pw * 0.9, -86 * k], [pw * 0.9, -86 * k], [pw * 1.5, 0]]), ink, DT.ink, 0.2);
-    B.ink(lineD([[-lw * 0.4, -472 * k], [-lw * 0.55, -538 * k], [lw * 0.55, -538 * k], [lw * 0.4, -472 * k], [-lw * 0.4, -472 * k]]) + lineD([[0, -472 * k], [0, -538 * k]]), ink * 0.7, DT.ink);
     return B;
-  }, [k, baskets, ink, seed]);
-  // baskets nod a little (a soft sway at the hook; deterministic), the flowers drawn on top
+  }, [k, pw, baskets]);
+  // baskets nod a little (a soft sway at the hook; deterministic), their flowers three close tones in the Batch (the
+  // tier calms them like every fill)
   const sway = nod ? Math.sin(t * 1.25 + rand(seed, 'ph') * 6) * 2.2 * k : 0;
   const bk = useMemo(() => {
     if (!baskets) return null;
     const B = new Batch();
     for (const s of baskets === 2 ? [-1, 1] : [1]) basketShapes(B, s * 118 * k, -378 * k, k, `${seed}${s}`);
-    return B;
-  }, [k, baskets, seed]);
-  const flowers = useMemo(() => {
-    if (!baskets) return [];
+    B.layer();
     const r = rng(`s5deck/fl/${seed}`);
-    const cols = [CM.blossom, CM.paper, CM.coatMustard, CM.blossom, CM.coatPlum, mix(CM.blossom, CM.brick, 0.35)];
-    const out: {x: number; y: number; rr: number; col: string}[] = [];
+    const fl = ['', '', ''];
     for (const s of baskets === 2 ? [-1, 1] : [1]) {
-      for (let i = 0; i < 36; i++) {
+      for (let i = 0; i < 22; i++) {
         const a = r.range(0, Math.PI * 2);
         const dd = Math.sqrt(r.next());
         const trail = r.chance(0.35);
-        out.push({x: s * 118 * k + Math.cos(a) * 100 * k * dd, y: (trail ? -370 * k + r.range(10, 66) * k : -398 * k + Math.sin(a) * 36 * k * dd), rr: r.range(8, 12.5) * k, col: r.pick(cols)});
+        const x = s * 118 * k + Math.cos(a) * 100 * k * dd;
+        const y = trail ? -370 * k + r.range(10, 66) * k : -398 * k + Math.sin(a) * 36 * k * dd;
+        const c = r.int(0, 2);
+        fl[c] += blossomD(x, y, r.range(9, 13) * k, `${seed}${Math.round(x)}${Math.round(y)}`, 3);
       }
     }
-    return out;
+    fl.forEach((d, i) => B.fill(F5.flowers[i], d));
+    return B;
   }, [k, baskets, seed]);
-  const fl = new Map<string, string>();
-  for (const f of flowers) fl.set(f.col, (fl.get(f.col) ?? '') + blossomD(f.x, f.y, f.rr, `${seed}${Math.round(f.x)}${Math.round(f.y)}`, 3));
   return (
     <>
-      <Paint b={b} seed={`s5deck/lamp/${seed}`} misreg={2} />
+      {shadows ? (
+        <ShadowLayer>
+          <CastShadow x={0} y={-2 * k} w={pw * 2.6} depth={pw * 0.5} h={h} />
+          <ContactShadow x={0} y={0} w={pw * 3} h={Math.max(6, 9 * k)} />
+        </ShadowLayer>
+      ) : null}
+      <Paint b={b} seed={`s5deck/lamp/${seed}`} misreg={false} />
       {bk ? (
         <g transform={`translate(${sway.toFixed(2)} 0)`}>
-          <Paint b={bk} seed={`s5deck/lampbk/${seed}`} misreg={2} />
-          {[...fl.entries()].map(([c, d]) => (
-            <path key={c} d={d} fill={c} />
-          ))}
+          <Paint b={bk} seed={`s5deck/lampbk/${seed}`} misreg={false} />
         </g>
       ) : null}
     </>
@@ -325,7 +322,7 @@ export const RightFrame5: React.FC = () => {
   }, []);
   return (
     <>
-      <Crowns5 crowns={crowns} seed="s5deck/cornerBl" />
+      <Crowns5 crowns={crowns} seed="s5deck/cornerBl" misreg={0} />
       <g transform={`translate(${LAMP5.x} ${LAMP5.base})`}>
         <LampPost5 h={LAMP5.h} baskets={1} seed="right" />
       </g>
@@ -369,3 +366,4 @@ export const NearPetals5: React.FC<{n?: number}> = ({n = 14}) => {
 };
 
 void polyD;
+void frac;

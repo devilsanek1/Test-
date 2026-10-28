@@ -114,8 +114,9 @@ const GULLS: {c: Pt; r: Pt; n: number; span: number; seed: number}[] = [
 
 /** The two V's of the hold (END coords): enter left of the frame at ~75 % of the move (t0), fly right and a little up. */
 const VS: {t0: number; from: Pt; v: number; rise: number; span: number; n: number; ink: number; glider: number}[] = [
-  {t0: 1.9, from: [150, 694], v: 242, rise: -9, span: 38, n: 7, ink: 0.18, glider: 3},
-  {t0: 2.08, from: [80, 652], v: 205, rise: -6, span: 27, n: 5, ink: 0.42, glider: -1},
+  // SEEN at phone size (the owner on v4; CRAFT §f.6): at 360 px wide the near V is a 15 px mark, a mid tone over the sky
+  {t0: 1.9, from: [150, 694], v: 242, rise: -9, span: 46, n: 7, ink: 0.3, glider: 3},
+  {t0: 2.08, from: [80, 652], v: 205, rise: -6, span: 34, n: 5, ink: 0.46, glider: -1},
 ];
 
 /** A far flock low over the city (the smallest step of the birds' size ladder: V 38 / far V 27 / gulls 13 / this 8 px),
@@ -155,7 +156,7 @@ export const S5FarLife: React.FC<{p: number}> = ({p}) => {
       const w = V.span * (1 - rank * 0.07);
       d += birdD(x, y, w, (t * 3.6 + i * 0.19) % 1, i === V.glider);
     }
-    vs.push({d, ink: V.ink, w: V.span > 34 ? 2.6 : 2.1});
+    vs.push({d, ink: V.ink, w: V.span > 40 ? 3.4 : 2.8});
   }
   return (
     <XG m={farMat(p)}>

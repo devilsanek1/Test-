@@ -34,8 +34,8 @@ import {Tier} from '../../lib/tier';
 import {useTime} from '../../lib/time';
 import {useExit} from '../../lib/exit';
 import {Sky} from '../../lib/sky';
-import {ContactShadow, FormShade, Shadow, ShadowLayer} from '../../lib/light';
-import {recede, seamTone, toneOnTone} from '../../lib/depth';
+import {CastShadow, ContactShadow, FormShade, Shadow, ShadowLayer} from '../../lib/light';
+import {planePalette, recede, seamTone, toneOnTone} from '../../lib/depth';
 import {S8_EVENING} from '../world/skies';
 import {rng, rand} from '../../lib/rng';
 import type {Pt} from '../../lib/sketch';
@@ -49,6 +49,7 @@ import {S1_IRON} from './V2S1_set_core';
 import {L, LANE, KERB_Y, NEAR_Y, SKYLINE_MIN_Y, lampRunAt} from './V2S8_clock';
 import {EarlyExit} from './V2S8_exit';
 import {S8Plane, S8_ATM, onPlane, planeColors} from './V2S8_depth';
+import {HOUSE_CONTACTS} from './V2S8_house';
 
 // ---------------------------------------------------------------- colour: CM tokens, flat mixes, planes
 
@@ -238,7 +239,7 @@ function farRowInto(
     if (kind === 'pitch') b.poly(roof, [[x - 1.5, top], [x + w * 0.13, top - rh], [x + w * 0.87, top - rh], [x + w + 1.5, top]]);
     else if (kind === 'mansard') b.poly(roof, [[x - 1, top], [x + w * 0.09, top - rh], [x + w * 0.91, top - rh], [x + w + 1, top]]);
     else if (kind === 'gable') b.poly(roof, [[x - 2, top], [x + w / 2, top - rh * 1.15], [x + w + 2, top]]);
-    else b.rect(CM.limestone, x - 1.5, top - 4, w + 3, 4);
+    else b.rect(CM.bandSunset, x - 1.5, top - 4, w + 3, 4);
     if (o.stack > 0 && kind !== 'flat') {
       const ns = r.chance(0.45) ? 2 : 1;
       for (let k = 0; k < ns; k++) {
@@ -246,8 +247,7 @@ function farRowInto(
         const cw = Math.max(5, r.range(0.7, 1.15) * o.stack);
         const chh = r.range(0.9, 1.5) * o.stack;
         const ct = Math.max(SKYLINE_MIN_Y + 7, top - rh * 0.75 - chh);
-        b.rect(CM.brick, cx - cw / 2, ct, cw, top - ct);
-        b.rect(CM.limestone, cx - cw / 2 - 1, ct, cw + 2, 4);
+        b.rect(CM.brickLight, cx - cw / 2, ct, cw, top - ct);
       }
     }
     if (o.win >= 4) {
@@ -272,14 +272,14 @@ function gasholderOwn(b: Batch, cx: number, top: number, base: number, r: number
   const ringY = (k: number) => top + (H * k) / tiers;
   if (o.drum) {
     const dt = base - H * o.drum;
-    b.poly(CM.stucco, [[cx - r * 0.93, dt], [cx + r * 0.93, dt], [cx + r * 0.93, base], [cx - r * 0.93, base]]);
-    b.fill(CM.limestone, ovalPath(cx, dt, r * 0.93, ry * 0.9));
+    b.poly(CM.box, [[cx - r * 0.93, dt], [cx + r * 0.93, dt], [cx + r * 0.93, base], [cx - r * 0.93, base]]);
+    b.fill(CM.bandSunset, ovalPath(cx, dt, r * 0.93, ry * 0.9));
   }
   b.layer();
   const n = 12;
   for (let k = 0; k <= n / 2; k++) {
     const x = cx - Math.cos((k / (n / 2)) * Math.PI) * r;
-    b.rect(CM.brick, x - cw / 2, top - ry * 0.4, cw, base - top + ry * 0.4);
+    b.rect(CM.brickLight, x - cw / 2, top - ry * 0.4, cw, base - top + ry * 0.4);
   }
   for (let k = 0; k <= tiers; k++) {
     const y = ringY(k);
@@ -291,7 +291,7 @@ function gasholderOwn(b: Batch, cx: number, top: number, base: number, r: number
       up.push([px, py - 2]);
       dn.push([px, py + 2 + (k === 0 ? 1 : 0)]);
     }
-    b.poly(CM.brick, [...up, ...dn.reverse()]);
+    b.poly(CM.brickLight, [...up, ...dn.reverse()]);
   }
 }
 
@@ -315,8 +315,8 @@ function farLayout(): FarLayout {
     base: 962,
     top: (x) => (x > CALM[0] - 10 && x < CALM[1] + 10 ? 700 : x < CALM[0] ? 690 : 676),
     seed: 's8far/fb',
-    walls: [CM.brickLight, CM.stucco, CM.brickLight, CM.limestone],
-    roofs: [CM.brick],
+    walls: [CM.box, CM.brickLight, CM.bandSunset, CM.box],
+    roofs: [CM.brickLight],
     w: [18, 44],
     win: 0,
     winTo: 950,
@@ -331,14 +331,14 @@ function farLayout(): FarLayout {
   // the brick viaduct (deck, a stone coping, piers, arches whose openings show the far skyline through)
   const {x0, x1, deck, base, pitch} = VIA;
   const dh = 11;
-  back.rect(CM.brick, x0, deck, x1 - x0, dh);
-  back.rect(CM.limestone, x0, deck - 4, x1 - x0, 4);
+  back.rect(CM.brickLight, x0, deck, x1 - x0, dh);
+  back.rect(CM.bandSunset, x0, deck - 4, x1 - x0, 4);
   for (let x = x0; x < x1; x += pitch) {
     const pw = pitch * 0.26;
-    back.rect(CM.brick, x, deck + dh - 1, pw, base - deck - dh + 1);
+    back.rect(CM.brickLight, x, deck + dh - 1, pw, base - deck - dh + 1);
     const ax = x + pw;
     const aw = pitch - pw;
-    back.fill(CM.brick, `M${P(ax, deck + dh - 1)}L${P(ax + aw, deck + dh - 1)}L${P(ax + aw, deck + dh + aw * 0.55)}A${r1(aw / 2)} ${r1(aw / 2)} 0 0 0 ${P(ax, deck + dh + aw * 0.55)}Z`);
+    back.fill(CM.brickLight, `M${P(ax, deck + dh - 1)}L${P(ax + aw, deck + dh - 1)}L${P(ax + aw, deck + dh + aw * 0.55)}A${r1(aw / 2)} ${r1(aw / 2)} 0 0 0 ${P(ax, deck + dh + aw * 0.55)}Z`);
   }
   const front = new Batch();
   // FM: mid buildings (limestone / stucco / light brick), small windows
@@ -348,26 +348,21 @@ function farLayout(): FarLayout {
     base: 962,
     top: (x) => 652 + Math.sin(x * 0.07) * 6,
     seed: 's8far/fm',
-    walls: [CM.limestone, CM.stucco, CM.brickLight, CM.stucco],
-    roofs: [CM.brick, CM.brickLight],
+    walls: [CM.bandSunset, CM.box, CM.brickLight, CM.bandSunset],
+    roofs: [CM.brickLight],
     w: [26, 54],
-    win: 5,
+    win: 0,
     winTo: 800,
     stack: 7,
     skip: CALM,
   });
   front.layer();
   // the canal warehouse + the works chimney
-  front.rect(CM.brick, WARE.x0, WARE.top, WARE.x1 - WARE.x0, 962 - WARE.top);
-  front.rect(CM.limestone, WARE.x0 - 3, WARE.top - 4, WARE.x1 - WARE.x0 + 6, 5);
-  front.rect(CM.stucco, WARE.x0 + 9, WARE.top + 9, WARE.x1 - WARE.x0 - 18, 5);
-  for (const y of WARE.rows) {
-    front.rect(CM.line, WARE.col[1] - 1, y - 1, 14, 22); // loading doors
-    for (const cx of [WARE.col[0], WARE.col[2]]) front.fill(`win:${CM.brick}`, archPath(cx, y, 11, 19));
-  }
+  front.rect(CM.brickLight, WARE.x0, WARE.top, WARE.x1 - WARE.x0, 962 - WARE.top);
+  front.rect(CM.bandSunset, WARE.x0 - 3, WARE.top - 4, WARE.x1 - WARE.x0 + 6, 5);
+  for (const y of WARE.rows) for (const cx of WARE.col) front.fill(`win:${CM.brickLight}`, archPath(cx, y, 11, 19));
   const c = WARE.chim;
-  front.poly(CM.brick, [[c.x - c.w / 2, c.top], [c.x + c.w / 2, c.top], [c.x + c.w / 2 + 2, 962], [c.x - c.w / 2 - 2, 962]]);
-  front.rect(CM.limestone, c.x - c.w / 2 - 1, c.top + 6, c.w + 2, 4);
+  front.poly(CM.brickLight, [[c.x - c.w / 2, c.top], [c.x + c.w / 2, c.top], [c.x + c.w / 2 + 2, 962], [c.x - c.w / 2 - 2, 962]]);
   front.layer();
   // FN right: the terrace right of the sun (brick, slate, stacks)
   farRowInto(front, {
@@ -376,7 +371,7 @@ function farLayout(): FarLayout {
     base: 962,
     top: (x) => 640 + Math.sin(x * 0.05) * 6,
     seed: 's8far/fn',
-    walls: [CM.brick, CM.brickLight, CM.brick, CM.stucco],
+    walls: [CM.brickLight, CM.box, CM.brickLight, CM.bandSunset],
     roofs: [CM.brick],
     w: [30, 50],
     win: 8,
@@ -385,12 +380,12 @@ function farLayout(): FarLayout {
   });
   // one taller stack (x 594)
   front.rect(CM.brickLight, 589, 628, 11, 22);
-  front.rect(CM.limestone, 588, 628, 13, 4);
-  // the plane's palette: every material merged to its few close values (lib/depth planePalette: <= 4 on +2, the widest
-  // step <= 24 dE), windows one tone-on-tone step on their own wall (never a dark speck or the lamp colour)
+  // the plane's palette: every material merged to its few close values (lib/depth planePalette; behind her pale house
+  // row, L* > 70, CRAFT §f.2 starts the far city at +3's simplicity: 3 values within 12 dE), windows one tone-on-tone
+  // step on their own wall (never a dark speck or the lamp colour)
   const cols = fillsOf(back, front);
-  const P2 = planeColors(cols, FAR_PLANE);
-  const pal = (col: string): string => (col.startsWith('win:') ? toneOnTone(pal(col.slice(4)), {dE: 4}) : P2[col] ?? recede(col, FAR_PLANE, S8_ATM));
+  const P2 = planePalette(cols, FAR_PLANE, S8_ATM, {values: 3, spread: 12});
+  const pal = (col: string): string => (col.startsWith('win:') ? toneOnTone(pal(col.slice(4)), {dE: 3}) : P2[col] ?? recede(col, FAR_PLANE, S8_ATM));
   remap(back, pal);
   remap(front, pal);
   return {back, front, pal};
@@ -656,7 +651,7 @@ const HouseBand: React.FC = () => {
     // pitch from the board band's: the band edge reads as a course), its courses every 0.75 m while they stay >= 6 px
     // apart (to Z ~12 m; past it the joints alone run on to the bend); the forecourt's courses every 0.9 m
     const joint = seamTone(CM.paving, 7);
-    for (let X = COPE_IN + 0.5; X < -0.2; X += 1.0) jointInto(b, joint, X, 24, Z_KERB);
+    for (let X = COPE_IN + 0.5; X < -0.2; X += 1.0) jointInto(b, seamTone(CM.paving, 11), X, 24, Z_KERB);
     for (const z of coursesZ(12.2, Z_KERB, 0.75)) courseInto(b, joint, z, copeInAt, () => VX);
     const sj = seamTone(TONE.sett, 7);
     for (const z of coursesZ(Z_HOUSE, Z_KERB, 0.9)) courseInto(b, sj, z, () => VX, () => 1360);
@@ -676,8 +671,13 @@ const HouseBand: React.FC = () => {
   return (
     <>
       {el}
+      {/* ONE shadow layer for the house band: her house's cast shade, then the forecourt things' contact strips (drawn
+          over it inside the layer, so they never double-darken) */}
       <ShadowLayer>
         <Shadow d={houseShadeD(Z_HOUSE, Z_KERB, 1360)} tint="cast" />
+        {HOUSE_CONTACTS.map((c, i) => (
+          <ContactShadow key={i} x={c.x} y={c.y} w={c.w} h={c.h} />
+        ))}
       </ShadowLayer>
     </>
   );
@@ -886,7 +886,7 @@ const BoardBand: React.FC = () => {
     // the towpath's long joints (X every 1.0 m) and its courses (every 0.6 m) as tone bands to the VP
     const joint = seamTone(CM.paving, 7);
     const right = () => OVER.board1;
-    for (let X = COPE_IN + 1.0; X < 9; X += 1.0) jointInto(b, joint, X, Z_KERB, Z_NEAR);
+    for (let X = COPE_IN + 1.0; X < 9; X += 1.0) jointInto(b, seamTone(CM.paving, 11), X, Z_KERB, Z_NEAR);
     for (const z of coursesZ(Z_KERB, Z_NEAR, 0.6)) courseInto(b, joint, z, copeInAt, right);
     // the coping: cross joints (a stone each), the water lip (its edge face, one step down)
     for (let z = Z_NEAR + 0.2; z < Z_KERB; z += 0.9) b.poly(TONE.copeJoint, [cam(COPE_X + 0.02, 0, z + 0.025), cam(COPE_IN - 0.02, 0, z + 0.025), cam(COPE_IN - 0.02, 0, z - 0.025), cam(COPE_X + 0.02, 0, z - 0.025)]);
@@ -939,7 +939,7 @@ const NearBand: React.FC = () => {
     // long joints (X every 1.0 m, offset half a pitch from the board band's) and courses every 0.6 m: tone bands to the VP
     const joint = seamTone(pave, 7);
     const zBot = zAt(OVER.bottom);
-    for (let X = COPE_IN + 0.5; X < 6; X += 1.0) jointInto(b, joint, X, Z_NEAR, zBot);
+    for (let X = COPE_IN + 0.5; X < 6; X += 1.0) jointInto(b, seamTone(pave, 11), X, Z_NEAR, zBot);
     for (const z of coursesZ(Z_NEAR, zBot, 0.6)) courseInto(b, joint, z, () => OVER.x0, () => OVER.near1);
     // the drain: a slate frame and its slots, foreshortened
     const X = xAt(DRAIN.x, yOf(DRAIN.Zf));
@@ -1169,13 +1169,13 @@ const Planter: React.FC = () => {
   );
 };
 
-/** THE NEAR LAMP: a short heritage post on the near band (the cafe deck's lamp standard, ~1.5 m: its lantern at eye
- *  level), its column cut by the bottom edge, slate (tier C iron, one value step darker on the near plane), 20 px wide,
- *  no swan neck. At the landing its lantern stands in frame at x 1048 (99 px right of W's frame); before the truck
+/** THE NEAR LAMP: a short lamp standard on the near band beside the cafe deck (~1.4 m, 1.6 m from the lens: its foot
+ *  in frame at y 1700, above the planter), slate (tier C iron, one value step darker on the near plane), 20 px wide, no
+ *  swan neck. At the landing its lantern stands in frame at x 1048 (99 px right of W's frame); before the truck
  *  (-320 px) the column (x 718-738) and the lantern (x 714-742, y >= 812) keep >= 24 px off W's frame (y <= 785) and
- *  her walk (x <= 690). The lantern lights ONCE on the run's first switch-on (f2237, lampRunAt('nearPool')).
- *  `top` = the column's top (under the lantern's cup); `lantern` = its glass box; `foot` = below the frame. */
-export const NLAMP = {x: 1048, w: 20, top: 878, arm: 878, lantern: {x: 1048, y0: 812, y1: 878, w: 28}, foot: 1990};
+ *  her walk (x <= 690). The lantern lights ONCE on the run's first switch-on (f2237, lampRunAt('nearPool')); its pool
+ *  belongs round its foot (x, foot). `top` = the column's top (under the lantern's cup); `lantern` = its glass box. */
+export const NLAMP = {x: 1048, w: 20, top: 878, arm: 878, lantern: {x: 1048, y0: 812, y1: 878, w: 28}, foot: 1700};
 
 const NearLamp: React.FC = () => {
   const t = useTime();
@@ -1183,9 +1183,10 @@ const NearLamp: React.FC = () => {
     const b = new Batch();
     const {x, w, top, lantern: ln, foot} = NLAMP;
     const hw = w / 2;
-    // the column (a slight flare to the foot: 20 -> 22 px), one collar
-    b.poly(IRON_NEAR, [[x - hw - 1, foot], [x - hw, top], [x + hw, top], [x + hw + 1, foot]]);
+    // the column (a slight flare to the foot: 20 -> 22 px), one collar, a low plinth on the paving
+    b.poly(IRON_NEAR, [[x - hw - 1, foot - 16], [x - hw, top], [x + hw, top], [x + hw + 1, foot - 16]]);
     b.rect(IRON_NEAR, x - hw - 1, 1404, w + 2, 12);
+    b.poly(IRON_NEAR, [[x - hw - 6, foot], [x - hw - 3, foot - 18], [x + hw + 3, foot - 18], [x + hw + 6, foot]]);
     // the lantern: the cup under it, the cap over it (a flat top: nothing above y 812)
     b.poly(IRON_NEAR, [[x - ln.w / 2 + 3, ln.y1 - 10], [x + ln.w / 2 - 3, ln.y1 - 10], [x + hw - 2, top + 2], [x - hw + 2, top + 2]]);
     b.poly(IRON_NEAR, [[x - ln.w / 2 - 3, ln.y0 + 8], [x + ln.w / 2 + 3, ln.y0 + 8], [x + ln.w / 2 - 2, ln.y0], [x - ln.w / 2 + 2, ln.y0]]);
@@ -1210,6 +1211,10 @@ export const S8Front: React.FC = () => (
       <DeckBoards />
       <DeckContacts />
       <DeckThings />
+      <ShadowLayer>
+        <ContactShadow x={NLAMP.x} y={NLAMP.foot} w={NLAMP.w + 12} />
+        <CastShadow x={NLAMP.x} y={NLAMP.foot} w={NLAMP.w + 6} h={NLAMP.foot - NLAMP.lantern.y0} />
+      </ShadowLayer>
       <NearLamp />
       <Planter />
     </OnPlane>

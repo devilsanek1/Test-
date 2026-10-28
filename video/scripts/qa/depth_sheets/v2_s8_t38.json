@@ -1,0 +1,191 @@
+{
+ "name": "v2 S8 'Her words' @ film 38.0 s (the landing hold: her board with the quote, W lit, the lamps on; lane L6)",
+ "units": "px",
+ "air_hex": "#FBC09C",
+ "note": "air_hex = S8_AIR. Landing pose (screen = map px): the board x 110-670 / y 680-1250; the far rows show above its top and left of it, the far bank (+1) left of it.",
+ "planes": [
+  {
+   "name": "near band + cafe deck (things, the near lamp)",
+   "plane": -1,
+   "boxes": [
+    [
+     0,
+     1352,
+     1080,
+     1920
+    ]
+   ]
+  },
+  {
+   "name": "the towpath (board band)",
+   "plane": 0,
+   "role": "ground",
+   "boxes": [
+    [
+     690,
+     1112,
+     1080,
+     1330
+    ]
+   ],
+   "exclude": [
+    [
+     1026,
+     1100,
+     1072,
+     1340
+    ],
+    [
+     650,
+     1080,
+     770,
+     1270
+    ]
+   ]
+  },
+  {
+   "name": "her house row at the bend (her plane: W, her door)",
+   "plane": 0,
+   "role": "subject",
+   "boxes": [
+    [
+     676,
+     612,
+     1080,
+     1050
+    ]
+   ],
+   "exclude": [
+    [
+     1026,
+     800,
+     1072,
+     1060
+    ]
+   ]
+  },
+  {
+   "name": "the far bank across the basin (left of the board)",
+   "plane": 1,
+   "boxes": [
+    [
+     0,
+     768,
+     100,
+     794
+    ],
+    [
+     0,
+     872,
+     100,
+     935
+    ]
+   ]
+  },
+  {
+   "name": "far rows on the sunset band (viaduct, warehouse, terrace above the board)",
+   "plane": 2,
+   "boxes": [
+    [
+     0,
+     684,
+     100,
+     758
+    ],
+    [
+     244,
+     630,
+     328,
+     678
+    ],
+    [
+     536,
+     652,
+     634,
+     678
+    ]
+   ]
+  }
+ ],
+ "silhouettes": [
+  {
+   "name": "the board's cream face (its edge)",
+   "tier": "A",
+   "poly": [
+    [
+     150,
+     700
+    ],
+    [
+     630,
+     700
+    ],
+    [
+     630,
+     1220
+    ],
+    [
+     150,
+     1220
+    ]
+   ],
+   "roi": [
+    [
+     120,
+     690,
+     660,
+     1240
+    ]
+   ]
+  },
+  {
+   "name": "W, her lit window: its lit pane in the teal frame (the film's last picture)",
+   "tier": "A",
+   "poly": [
+    [
+     785,
+     615
+    ],
+    [
+     935,
+     615
+    ],
+    [
+     935,
+     785
+    ],
+    [
+     785,
+     785
+    ]
+   ],
+   "roi": [
+    [
+     760,
+     595,
+     960,
+     805
+    ]
+   ],
+   "note": "the pane's edge: W's frame (10.5 px) is too thin for the 2-8 px sampler at 540 (it would average the teal frame, L* 50, with the lit room, L* 85, to the shaded wall's 68); the frame itself parts from the wall by 18 L* (measured), the pane from the frame by 35"
+  }
+ ],
+ "ground": [
+  {
+   "name": "the towpath + the near band (one lens: VP (600, 948), f 935, eye 1.3 m)",
+   "roi": [
+    0,
+    1262,
+    1080,
+    1920
+   ],
+   "vps": [
+    [
+     600,
+     948
+    ]
+   ]
+  }
+ ],
+ "horizon": 948
+}
