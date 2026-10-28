@@ -13,7 +13,6 @@
 //   S7Festoon      ONE string from the wing to the plane, its 15 bulbs in THREE groups switching on together on film
 //                  frames 1812 / 1836 / 1848 (30.200 / 30.600 / 30.800: the sound lane's request, map S7.boardBeats):
 //                  three switch-ons, <= 3 in any second; the lit bulbs are lib/light SourceCore (no glow, no flicker)
-//   S7BoatSmoke    smoke from a moored boat's stove beyond the hedge, small and slow, never above y 690
 import React from 'react';
 import {CM} from '../palette';
 import {useTime} from '../../lib/time';
@@ -22,7 +21,6 @@ import {SourceCore} from '../../lib/light';
 import {wire as wirePath, wirePoint} from '../../lib/sketch';
 import {Batch, Paint, P, ovalPath, lerp, clamp01} from '../kit/canal/core';
 import {bikeInto} from '../kit/canal/towpath';
-import {Puffs} from '../kit/canal/life';
 import {Person, Seated, strideFor} from '../kit/cast';
 import {heightAt, kz, onPlane, pt, S7_BIKES, S7_CAFE_PAIR, S7_FESTOON, S7_LANES, S7_STEPS, xAt, yAt} from './V2S7_plan';
 import {S7_DOOR_BOX} from './V2S7_wing';
@@ -165,8 +163,8 @@ export const S7CafePair: React.FC = () => {
   b.fill(onPlane(CM.paper, 1), ovalPath(tx - 0.05 * k, yAt(z, 0.77), 0.04 * k, 0.02 * k));
   return (
     <Tier tier="environment">
-      <Seated x={seats[0]} y={seatY} h={h} seed="s7/pair/a" view="profile" flip cup={cup} side={1} traits={{hair: 'long', acc: 'scarf', coat: CM.brickLight, hairColor: CM.hair[4], accColor: CM.sage}} />
-      <Seated x={seats[1]} y={seatY} h={h * 0.97} seed="s7/pair/b" view="profile" read traits={{hair: 'short', acc: 'none', coat: CM.sage, hairColor: CM.hair[1]}} />
+      <Seated x={seats[0]} y={seatY} h={h} seed="s7/pair/a" view="profile" flip cup={cup} side={1} traits={{hair: 'long', acc: 'scarf', coat: CM.brickLight, trousers: '#B9A9B6', hairColor: CM.hair[4], accColor: CM.sage}} />
+      <Seated x={seats[1]} y={seatY} h={h * 0.97} seed="s7/pair/b" view="profile" read traits={{hair: 'short', acc: 'none', coat: CM.sage, trousers: '#A9A3B9', hairColor: CM.hair[3]}} />
       <Paint b={b} seed="s7/pairTable" misreg={false} />
     </Tier>
   );
@@ -255,7 +253,3 @@ export const S7Festoon: React.FC = () => {
     </Tier>
   );
 };
-
-// ---------------------------------------------------------------- boat smoke beyond the hedge (C)
-
-export const S7BoatSmoke: React.FC = () => <Puffs x={72} y={yAt(36, 1.0)} seed="s7/boatSmoke" kind="smoke" scale={0.34} drift={-12} ceil={700} />;

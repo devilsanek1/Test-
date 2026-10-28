@@ -1,88 +1,18 @@
-// V2S3_tCanal.tsx (lane L3, V2S3 FAR helper): the canal between her towpath and our moored boat, WORLD px at the 12.98
-// match. The water is S1's treatment, exactly (the owner on look clip v5: "I don't like the water too much ... let's
-// keep it and keep going": V2S1_set_life S1Water, its method and numbers, on S3's geometry; no new water styling): the
-// base water, the coping's shade on it (a flat step of the water's own deeper colour), the far water one step toward
-// the air (atmos, C* >= 12), the near water a step deeper along the boat, and TWO reflections only as long flat bands
-// (the terrace's, broken in two by a calm gap; the sun's gold column under SUN3, where the glints live: V2S3
-// particles), each eased into the water through atmos (hue kept, never grey). No ripple dashes, no glints drawn here
-// (CRAFT §c). Then a heron standing still on a mooring post (the post's waterline strip is the water's own deeper step).
-// Our boat (the NEAR part) covers the water from y ~1254.
+// V2S3_tCanal.tsx (lane L3, V2S3 FAR helper): what stands in the canal, WORLD px at the 12.98 match: a heron standing
+// still on a mooring post off her coping (the water itself is V2S3_water's one isolated component; its geometry, this
+// post included, is S3_WATER). The post's waterline is a flat step of the water's own deeper colour (never a contact
+// strip on water). Flat shapes, tier C; no head turn (the life budget).
 import React, {useMemo} from 'react';
 import {CM} from '../palette';
-import {atmos} from '../../lib/depth';
 import {mixHex} from '../../lib/light';
 import {Paint} from '../kit/canal/core';
-import {S3_AIR} from '../world/skies';
-import {SUN3} from './V2S3_tWest';
-import {Batch, ovalPath, rng, P, leafPath} from './V2S3_tParts';
-
-export const CANAL = {top: 1130, bottom: 1420, x0: -80, x1: 1180} as const;
-
-// ---------------------------------------------------------------- the water (S1's S1Water, on S3's geometry)
-
-type Refl = {x0: number; x1: number; color: string; depth: number};
-/** Two reflections only (S1): the terrace's warm brick, and the sun's gold column under the disc. */
-const REFL: Refl[] = [
-  {x0: 165, x1: 1080, color: CM.brickLight, depth: 46},
-  {x0: SUN3.x - 80, x1: SUN3.x + 80, color: CM.sun, depth: 0},
-];
-const REFL_SOFT = 0.5;
-/** The water from her coping's edge down behind our boat's roof (the boat covers it from y ~1254). */
-const WATER = {y0: CANAL.top, y1: 1300, x0: -80, x1: 1180} as const;
-const WATER_H0 = 1262 - CANAL.top + 4;
-/** The far water toward the air (S1: through atmos, a pale teal, C* 12), the near water a step deeper. */
-const WATER_FAR = atmos(CM.water, 0.3, S3_AIR, {chromaFloor: 12});
-const WATER_NEAR = mixHex(CM.water, CM.waterDeep, 0.3);
-/** The sun's reflection colour (behind the glints: their `on`). */
-export const SUN_REFL = atmos(CM.lamp, REFL_SOFT, CM.water, {chromaFloor: 12});
-/** The sun's glitter column's top (just under the reflection's first band). */
-export const REFL_TOP = WATER.y0 + 10;
-
-function waterBase(): Batch {
-  const b = new Batch();
-  const {y0, y1, x0, x1} = WATER;
-  b.rect(CM.water, x0, y0, x1 - x0, y1 - y0);
-  b.rect(WATER_FAR, x0, y0 + 9, x1 - x0, WATER_H0 * 0.3);
-  b.rect(WATER_NEAR, x0, y0 + WATER_H0 * 0.7, x1 - x0, WATER_H0 * 0.35);
-  b.rect(CM.waterDeep, x0, y0, x1 - x0, 9);
-  return b;
-}
-
-function waterReflections(): Batch {
-  const b = new Batch();
-  const rt = REFL_TOP;
-  REFL.forEach((ref, i) => {
-    const color = atmos(ref.color === CM.sun ? CM.lamp : ref.color, REFL_SOFT, CM.water, {chromaFloor: 12});
-    const depth = ref.depth || 60;
-    const W = ref.x1 - ref.x0;
-    const rr = rng(`s3refl/${i}`);
-    const h1 = Math.max(3, depth * 0.2);
-    const h2 = Math.max(4, depth * 0.32);
-    const g1 = W > 300 ? rr.range(0.38, 0.5) : -1;
-    if (g1 > 0) {
-      b.rect(color, ref.x0 + W * 0.02, rt + 2, W * (g1 - 0.04), h1);
-      b.rect(color, ref.x0 + W * (g1 + 0.03), rt + 2, W * (0.95 - g1), h1);
-    } else b.rect(color, ref.x0 + W * 0.04, rt + 2, W * 0.92, h1);
-    if (ref.color === CM.sun) b.rect(color, ref.x0 + W * 0.16, rt + 2 + h1 + depth * 0.18, W * 0.62, h2);
-  });
-  return b;
-}
-
-export const S3Water: React.FC = () => {
-  const base = useMemo(waterBase, []);
-  const refl = useMemo(waterReflections, []);
-  return (
-    <>
-      <Paint b={base} seed="s3c/base" misreg={false} />
-      <Paint b={refl} seed="s3c/refl" misreg={false} />
-    </>
-  );
-};
+import {Batch, ovalPath, P, leafPath} from './V2S3_tParts';
+import {S3_WATER} from './V2S3_water';
 
 // ---------------------------------------------------------------- the heron on its post (still)
 
 /** The heron's mooring post: a timber post standing in the water off the far coping. */
-const POST = {x: 1046, top: 1150, bottom: 1236, w: 12} as const;
+const POST = S3_WATER.standing[0];
 
 function postBatch(): Batch {
   const b = new Batch();

@@ -26,6 +26,7 @@ import {s7WestWallFace} from './V2S7_far';
 import {CAFE_PAIR, cyclistAt, staffIn, staffOut} from './V2S7_folk';
 import {S7_PLANTER, s7BasinFaces, s7CoatD} from './V2S7_near';
 import {S7_CROWN_CLUSTERS} from './V2S7_ground';
+import {S7_WATER} from './V2S7_water';
 
 // ---------------------------------------------------------------- the sun in metres (the one camera)
 
@@ -247,7 +248,7 @@ export const S7BasinContact: React.FC = () => {
 /** The west wall's shadow on the water (after the water, before the rims): the water's own deeper step. */
 export const S7BasinWaterShade: React.FC = () => (
   <ShadowLayer>
-    <Shadow d={polyD(s7BasinFaces().waterShade)} tint="water" />
+    <Shadow d={polyD([...S7_WATER.shade])} tint="water" />
   </ShadowLayer>
 );
 /** The near rim's south face, away from the low sun: one Shade step (after the rims). */

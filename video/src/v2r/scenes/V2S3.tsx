@@ -28,6 +28,7 @@ import {S3Sun, S3Terrace, S3Canal} from './V2S3_terrace';
 import {S3FarCity, S3Roofs} from './V2S3_tWest';
 import {S3Near} from './V2S3_near';
 import {S3Pip} from './V2S3_pip';
+import {S3Particles} from './V2S3_particles';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
@@ -67,6 +68,8 @@ const Shot: React.FC = () => (
       <S3Plane plane={S3_PLANE.terrace}>
         <S3Pip />
       </S3Plane>
+      {/* the particles, last, each on its plane (V2S3_particles: glints, two leaves, far and near motes) */}
+      <S3Particles />
     </Lit>
   </CanalCast>
 );
