@@ -17,7 +17,7 @@ import {useTime} from '../../lib/time';
 import {XG} from '../../lib/xf';
 import {PullLayer} from '../../lib/pullback';
 import {Tier} from '../../lib/tier';
-import {craneP, planeMat, startMat, boxMat, wipeMat, swapAt, SWAP_P, T5, PLANES} from './V2S5_rig';
+import {craneP, planeMat, startMat, boxMat, wipeMat, deckMat, deckStartMat, swapAt, SWAP_P, T5, PLANES} from './V2S5_rig';
 import {S5StartBack, S5StartFore} from './V2S5_start';
 import {S5Far, S5FarLife} from './V2S5_far';
 import {S5River} from './V2S5_river';
@@ -38,8 +38,9 @@ export const S5Set: React.FC<{p?: number; only?: S5Layer[]}> = ({p: pIn, only}) 
   const t = useTime();
   const p = pIn ?? craneP(t);
   const swapped = pIn !== undefined ? pIn >= SWAP_P : t >= swapAt;
-  const deck = planeMat(PLANES.deck, p);
-  const deckStart = startMat(PLANES.deck, p);
+  // the deck on its own pace (V2S5_rig deckP: calmer at the lamppost's edges, the same start, end and beats)
+  const deck = deckMat(p);
+  const deckStart = deckStartMat(p);
   const on = (l: S5Layer) => !only || only.includes(l);
   return (
     <>

@@ -5,7 +5,7 @@
 // every plane (only points ON SCREEN at that frame count), over the whole move; TREATMENT / map.ts CAMSPEED: detailed
 // layers <= 15 px/f, long flat-ink moves <= 7.5 (the wipe is a flat mass: it may be faster).
 import {CAMSPEED} from '../world/map';
-import {applyMat, planeMat, startMat, boxMat, wipeMat, craneP, CRANE_T, PLANES, S5_T0, FAR_S5, swapAt, SWAP_P, FIG, DECK} from './V2S5_rig';
+import {applyMat, planeMat, startMat, boxMat, wipeMat, deckMat, craneP, CRANE_T, PLANES, S5_T0, FAR_S5, swapAt, SWAP_P, FIG, DECK} from './V2S5_rig';
 import {FAR_END} from './V2S5_far';
 import {SUN1} from '../world/map';
 import type {Mat} from '../../lib/xf';
@@ -26,7 +26,7 @@ export function s5Speeds(): SpeedRow[] {
     ['river', (t) => planeMat(PLANES.river, craneP(t)), grid([-600, -200, 0, 540, 1080, 1500], [hz + 50, hz + 80, hz + 110]), CAMSPEED.detailedLayerMax],
     ['mid (Pentagon, lawns)', (t) => planeMat(PLANES.mid, craneP(t)), grid([-400, 0, 322, 700, 1080, 1400], [846, 980, 1104, 1180]), CAMSPEED.detailedLayerMax],
     ['near-mid (slope crowns, start coords)', (t) => startMat(PLANES.nearmid, craneP(t)), grid([0, 300, 600, 900, 1080], [598, 880, 1010, 1100]), CAMSPEED.detailedLayerMax],
-    ['deck (terrace, figures)', (t) => planeMat(PLANES.deck, craneP(t)), grid([-200, 0, 200, 318, 500, 700, 900, 1080, 1300], [1180, 1238, 1350, 1450, 1550, 1650, 1800, 1920]), CAMSPEED.detailedLayerMax],
+    ['deck (terrace, figures; its own pace deckP)', (t) => deckMat(craneP(t)), grid([-200, 0, 200, 318, 500, 700, 900, 1080, 1300], [1180, 1238, 1350, 1450, 1550, 1650, 1800, 1920]), CAMSPEED.detailedLayerMax],
     ['left frame (tree box)', (t) => boxMat(PLANES.tree, craneP(t)), grid([-170, 100, 290], [642, 1000, 1268, 1700]), CAMSPEED.detailedLayerMax],
     ['right frame (lamppost box)', (t) => boxMat(PLANES.right, craneP(t)), grid([860, 1006, 1100], [1350, 1600, 1900]), CAMSPEED.detailedLayerMax],
     ['wipe lamppost (flat mass)', (t) => wipeMat(craneP(t)), [[0, -560] as Pt, [0, -380] as Pt, [-230, -380] as Pt, [230, -380] as Pt], 120],

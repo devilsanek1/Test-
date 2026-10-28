@@ -258,7 +258,9 @@ export const MidGround5 = tiered('environment', {}, MidGroundBody);
  *  near-black plum), the clumps and flowers closer together, all receded one step toward the April air. */
 export const BLOOM_S5: BloomTones = {
   base: atm(mix(CM.shadeWarm, CM.blossom, 0.12), 1),
-  limb: atm(mix(CM.anchor, CM.shadeWarm, 0.45), 1),
+  // limbs TONE-ON-TONE with the mass (L* 48 on its 55: the critic, 2026-10-28: at phone size the old plum limbs, L* 37,
+  // read as scratches across the crowns); the shapes are the kit's
+  limb: atm(mix(CM.shadeWarm, CM.anchor, 0.1), 1),
   shade: atm(mix(CM.shadeWarm, CM.blossom, 0.42), 1),
   mid: atm(mix(CM.shadeWarm, CM.blossom, 0.64), 1),
   lit: atm(mix(CM.blossom, CM.brickLight, 0.12), 1),
