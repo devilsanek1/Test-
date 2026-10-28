@@ -17,15 +17,29 @@ import {CM} from '../palette';
 import {S5Set} from './V2S5_set';
 import type {ToneKey, WiperComponent} from '../../lib/Film';
 import {S5Wiper} from './V2S5_wiper';
+import {Sky} from '../../lib/sky';
+import {S5_SKY} from '../world/skies';
+import {Lit} from '../../lib/light';
+import {useTime} from '../../lib/time';
+import {craneP} from './V2S5_rig';
+import {s5Rig} from './V2S5_light';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
 /** The S5 -> S6 foreground wipe's element (scenes.json V2S6 transitionIn {kind 'foreground-wipe', element 'scene'}). */
 export const Wiper: WiperComponent = S5Wiper;
 
-const V2S5: React.FC = () => (
-  <World sky={CM.sky} stage="context">
-    <S5Set />
-  </World>
-);
+const V2S5: React.FC = () => {
+  const t = useTime();
+  return (
+    <World sky={CM.sky} stage="context">
+      {/* the sky (CRAFT §g): ONE screen-space gradient behind the whole crane, unlit, the bottom layer */}
+      <Sky spec={S5_SKY} />
+      {/* the light (V2S5_light): RIG_APRIL's family, the sun's shadows swinging with its screen spot through the arc */}
+      <Lit rig={s5Rig(craneP(t))}>
+        <S5Set />
+      </Lit>
+    </World>
+  );
+};
 export default V2S5;
