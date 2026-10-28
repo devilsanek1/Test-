@@ -145,10 +145,19 @@ Everything that agent knew is in this repo. This file is the map; the details li
   (`video/docs/look/poster_refs/`) and asked for two things: what we learn from them (perspective, visual style, details,
   composition) and which content fits videos with more cities, architecture and buildings (v1 the best performer, v2
   the look they like with a weaker story). v2's look is the baseline.
-- The study is `video/docs/studies/2026-10-28_city_posters/` (its README is the shared brief): four look lenses, two
-  content lenses, then `STUDY.md` + `SUMMARY.md` and an adversarial check. Nothing in it is a rule until the owner
-  approves it (DIRECTION's "Open study" note). The next step it is meant to feed: v4's topic pick (paused) and a look
-  experiment for the picked content.
+- The study is `video/docs/studies/2026-10-28_city_posters/` (its README is the shared brief): four look lenses
+  (workflow `poster-look-lenses`), two content lenses (`places-content-fit`) and, after the owner named four feelings
+  (depth with a far scale anchor, crisp heroes against a simpler coherent world, real-yet-faceted nature, vibrant
+  coherent colour; v2 "still feels cheap and lazy"), four pro-practice researchers (`poster-pro-practice`: how
+  professional studios get each feeling, as concrete techniques); then `STUDY.md` + `SUMMARY.md`, organised by the four
+  feelings plus what the owner didn't name, and an adversarial check. Nothing in it is a rule until the owner approves
+  it (DIRECTION's "Open study" note). The next step it is meant to feed: v4's topic pick (paused) and a look experiment
+  for the picked content.
+- **The parallel thread (owner: "spin up a parallel thread - i want to discuss the ideas for what kind of video content
+  would fit perfectly in this kind of style"):** helper session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt
+  (booted from `v2r-helper-boot` with `/effort max`, working on this study's branch), discussing content directions
+  with the owner; its notes: `content_discussion.md` in the study folder. The orchestrator messages it when
+  `content_market.md` and `content_fit.md` are pushed; archive it when the owner closes the discussion.
 
 ## 2b. Update 2026-10-25 20:00 UTC: two agents, split by video
 
