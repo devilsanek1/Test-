@@ -103,23 +103,21 @@ export const S7_FESTOON = {from: [712, 722] as P2, to: [962, 700] as P2, sag: 24
 
 // ---------------------------------------------------------------- the basin (bottom right)
 
-/** The fountain basin: its west end at x 0.95, the near rim at z 4.4, the far rim at z 6.6; the rim 0.45 m high with
- *  a 0.3 m coping; the water at 0.35 m; three steady jets in a row running into the picture (x 1.35, z 5.0 / 5.6 /
- *  6.2), 0.5 m over the water. Its far-left corner (screen x ~799) stays right of Pip's bollard (x <= 730). */
-export const S7_BASIN = {x0: 0.95, x1: 6, zN: 4.4, zF: 6.6, rim: 0.45, coping: 0.3, water: 0.35, jets: {x: 1.35, z: [5.0, 5.6, 6.2], h: 0.5, r: 0.045}} as const;
+/** The fountain basin: its west end at x 0.95, the near rim at z 4.4, the far rim at z 6.6; a low rim (0.32 m) with a
+ *  0.22 m coping, the water at 0.24 m (plain and flat, as S1's: the owner on v5); three steady jets in a row running
+ *  into the picture (x 1.36, z 5.0 / 5.55 / 6.1), 0.55 m over the water. Its far-left corner (screen x ~799) stays
+ *  right of Pip's bollard (x <= 730). */
+export const S7_BASIN = {x0: 0.95, x1: 6, zN: 4.4, zF: 6.6, rim: 0.32, coping: 0.22, water: 0.24, jets: {x: 1.36, z: [5.0, 5.55, 6.1], h: 0.55, r: 0.045}} as const;
 
 // ---------------------------------------------------------------- the cafe (bottom left)
 
-/** The bistro table T1 (a round marble top 0.6 m across, 0.75 m high), its two chairs (C1 cropped by the left edge,
- *  C2 right of the table, a coat over its back), and a low planter of grasses in front, cropped by the corner. */
+/** The bistro table (a round marble top 0.6 m across, 0.75 m high) with two bentwood chairs pushed back from it, their
+ *  backs to us: chair A to the left with a coat over it, cut by the left edge; chair B to the right. The table's
+ *  things: two cups on saucers, a folded newspaper. */
 export const S7_CAFE = {
-  table: {x: -0.75, z: 3.45, r: 0.3, h: 0.75},
-  /** Chairs: seat centre (x, z), facing (the screen direction the sitter would face: +1 right, -1 left). */
-  chairs: [
-    {x: -1.32, z: 3.5, face: 1 as 1 | -1, coat: false},
-    {x: -0.2, z: 3.36, face: -1 as 1 | -1, coat: true},
-  ],
-  planter: {x0: -1.25, x1: -0.42, z0: 2.7, z1: 2.98, h: 0.38, grass: 0.78},
+  table: {x: -0.55, z: 3.5, r: 0.3, h: 0.75},
+  chairA: {x: -0.88, z: 3.05, seat: 0.46, back: 0.88, w: 0.42, d: 0.4},
+  chairB: {x: -0.02, z: 3.42, seat: 0.46, back: 0.88, w: 0.42, d: 0.4},
 } as const;
 
 // ---------------------------------------------------------------- the west strip and the far street

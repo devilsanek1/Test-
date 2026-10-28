@@ -7,9 +7,13 @@
 //            sets 40: a REQUEST to L5 to move its default).
 //   Plaque   the viewpoint plaque, END coords, popping ON "Pentagon" (scene 1.88 = 22.43): "The Pentagon" (key 56) /
 //            "US Department of Defense" (body 30). The lane's spot (L4_spec section 3): its plate on the terrace just in
-//            front of the balustrade, x 441-769, y 1119-1246 (no post: its bottom edge on the floor line), right of the
-//            pair and in front of the news box's right half; at its pop (p 0.70, the deck 1.30x) the text stays inside
-//            x <= 880; at the end it sits below the Pentagon's facades (their bottom edge ~y 1000-1045).
+//            front of the balustrade, x 441-769, y 1110-1237 (no post: its bottom edge on the border band, 7 px in front
+//            of the balustrade's base), right of the pair and in front of the news box's right half; at its pop (p 0.70,
+//            the deck 1.30x) the text stays inside x <= 880; at the end it sits below the Pentagon's facades (their bottom
+//            edge ~y 1000-1045). Tier A from its pop (conform_L4 §5). Its separation (check_depth "melts", QA
+//            2026-10-28: at y 1119-1246 the limestone face and its frame sat on the light paving and balustrade, median
+//            |dL*| 5.2): its top edge and pointer tab now stand on the Pentagon's cast shadow (the calm L* ~55 band on
+//            its lawn, y ~1068-1104), its foot on its own contact shadow (+ its cast, left in the end light).
 import React from 'react';
 import {Fill} from '../../lib/Fill';
 import {useTime} from '../../lib/time';
@@ -17,11 +21,11 @@ import {CastShadow, ContactShadow, ShadowLayer} from '../../lib/light';
 import {XG, mat} from '../../lib/xf';
 import {polyPath} from '../../lib/sketch';
 import {S5} from '../world/map';
-import {NewsBox as K3NewsBox, Plaque as K3Plaque, WorldText, TYPE, TXT_NEWS_BOX} from '../kit/boards';
-import {NEWS_BOX, SMALL_COLORS} from '../kit/boards/small';
+import {NewsBox as K3NewsBox, Plaque as K3Plaque, WorldText, TYPE, TXT_NEWS_BOX, plaqueLayout} from '../kit/boards';
+import {NEWS_BOX, SMALL_COLORS, popK} from '../kit/boards/small';
 
 /** The plaque's END spot (K3 Plaque: x = centre, y = the plate's bottom edge when stand = false). */
-export const PLAQUE_SPOT = {x: 605, y: 1246, stand: false};
+export const PLAQUE_SPOT = {x: 605, y: 1237, stand: false};
 
 const rectD = (x0: number, y0: number, x1: number, y1: number) => polyPath([[x0, y0], [x1, y0], [x1, y1], [x0, y1]]);
 
@@ -67,4 +71,25 @@ export const NewsBox: React.FC = () => {
   );
 };
 
-export const Plaque: React.FC<{at: number}> = ({at}) => <K3Plaque at={at} x={PLAQUE_SPOT.x} y={PLAQUE_SPOT.y} stand={PLAQUE_SPOT.stand} />;
+/** The plaque is tier A from its pop (conform_L4 §5: "the Pentagon + the plaque (from 22.43)"): K3's closed outline.
+ *  Its light (the rig's family, V2S5_light; at the end the sun is upper right): the strip where its plate meets the
+ *  terrace and its cast, falling left and toward us; both pop with the plate (K3's build pop from its foot). */
+export const Plaque: React.FC<{at: number}> = ({at}) => {
+  const t = useTime();
+  if (t < at) return null;
+  const {x, y, stand} = PLAQUE_SPOT;
+  const L = plaqueLayout(TYPE.key, undefined, stand);
+  const x0 = x - L.w / 2;
+  const x1 = x + L.w / 2;
+  return (
+    <>
+      <XG m={mat.about(mat.scale(popK(t, at, 0.25)), x, y)}>
+        <ShadowLayer>
+          <CastShadow x={x} y={y} w={L.w} pts={[[x0, y - 3], [x1 + 3, y - 3], [x1 + 3, y + 2], [x0, y + 2]]} h={L.h} />
+          <ContactShadow x={x + 1.5} y={y + 1} w={L.w + 3} k={1.02} h={10} />
+        </ShadowLayer>
+      </XG>
+      <K3Plaque at={at} x={x} y={y} stand={stand} tier="subject" />
+    </>
+  );
+};

@@ -1,5 +1,26 @@
 # L6 handover (V2S8 + the seam)
 
+## HOLD 2026-10-28 ~09:30 UTC (the orchestrator's budget hold): resume state, read this first
+Done and pushed (typecheck clean): the whole conform (sky S8_EVENING + its un-build into SUN0; the parallax float; the
+lamp run f2237 / 2261 / 2273; the seam push retired, Pip's 30 px settle + late un-build; the readers out, the owner left
+of the board with the squeegee; tiers; V2S8_light; particles on the v5 recipe), and the builder's SET + HOUSE pass
+(30b409c, de069f7, 9bfcb02: tier C, depth via S8_ATM, slate iron, specks out, the short near lamp, set light, depth
+sheets scripts/qa/depth_sheets/v2_s8_t34 / _t38). The ONE critic round is done: docs/v2/lanes/critic_L6.md (k1 at
+71ed960): FAIL, 2 MUST; checks in scratch checks/k1/checks.txt, the 0.4 clip checks/k1/clip_s8_seam_0.4.mp4 (scratch is
+lost on a container restart: re-run tools/checks.sh, or re-render).
+On resume, MUST-FIXES ONLY, no second critic round, then report_L6.md (scope set by the orchestrator):
+1. The sun on her board: the disc (420, 625) r 40 sits whole on pale mint 12-15 px over the board's top, its top in the
+   band. Fix: draw it at y 640 (local S8_SUN; REQUEST map SUN8 -> (420, 640)) and cut it with ONE near-level far
+   roofline at y ~650 in S8Far (V2S8_set), so a half-disc sets behind the far rows (S1's model); keep the sky's warmth
+   centred near the disc, under y 600 (skies.ts S8_EVENING; skyProblems [] again).
+2. The payoff is crowded: in V2S8_cast WALKERS, no crossing during 36.54-37.70; ONE walker after 37.90, behind the
+   ghosts (entering at the right edge, nothing new after 38.72); walkers flat C: no outline (Person ink={0}), coats
+   C* <= 25 (no mustard / brickDeep), the head one tone (no face-like oval: a beanie or hood).
+Then: re-render the seam + 38.0 + 36.5-38.3 at 0.4 to confirm, re-run checks.sh's check_light lines, write
+report_L6.md (<= 12 lines; numbers from critic_L6.md's CHECKS + the fix renders), message the orchestrator one line.
+Also on resume (no styling): split S8Water's flat water field into its own component (geometry WATER) so the coming
+lib/water swap is one line (orchestrator, 09:12).
+
 ## RESUMED 2026-10-28 ~08:00 UTC (RESUME_2026-10-28.md; the owner approved the G4 look clip v4) — state as of ~09:10 UTC
 Pushed (typecheck clean): S8's one continuous sky (world/skies.ts `S8_EVENING` / `S8_AIR`: horizon SUNSET_HORIZON at
 y 680, the sun's warmth 200 x 60 centred 35 px under SUN8, skyProblems []), drawn by V2S8_set S8Sky (lib/sky) with the

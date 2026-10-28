@@ -1,0 +1,481 @@
+{
+ "scores": [
+  {
+   "id": "L1",
+   "gut": 7,
+   "truth": 2,
+   "clarity": 4,
+   "payoff": 2,
+   "share": 6,
+   "fix": "Real people barely play AI songs, but bots can still cost artists.",
+   "note": "Breaks the rules (14 words, two sentences, British 'favourite') and is false as worded per the Never-say list: AI songs don't take the money, uncaught fake plays do, so the payoff has to walk the line back."
+  },
+  {
+   "id": "L2",
+   "gut": 6,
+   "truth": 3,
+   "clarity": 7,
+   "payoff": 3,
+   "share": 6,
+   "fix": "Some days, over half the new songs on one app are AI-made.",
+   "note": "A side detail (the flood, not the pot): frame 0 drops 'one app's' and reads as half of all new music, 'half' holds only on peak days, and 'aren't human' edges toward the Never-say 'songs nobody wrote'."
+  },
+  {
+   "id": "L3",
+   "gut": 7,
+   "truth": 9,
+   "clarity": 7,
+   "payoff": 6,
+   "share": 7,
+   "fix": "",
+   "note": "One real person, a fresh peg and the fact lock's own wording, and 'prison for that? who did he hurt?' leads to the pot, but the honest answer is contested (his lawyers, Spotify's ~$60,000), so the 'oh' lands softer, and frame 0 should keep 'AI'."
+  },
+  {
+   "id": "L4",
+   "gut": 5,
+   "truth": 8,
+   "clarity": 8,
+   "payoff": 7,
+   "share": 5,
+   "fix": "An AI song with no real listeners can still get paid.",
+   "note": "A true, clean paradox whose 'whose money?' leads straight to the pot, but it leaves out the AI fuss and the victim and can read as a side-hustle hook."
+  },
+  {
+   "id": "L5",
+   "gut": 7,
+   "truth": 8,
+   "clarity": 9,
+   "payoff": 8,
+   "share": 7,
+   "fix": "Bots playing AI songs can shrink your favorite artist's pay.",
+   "note": "Plain, direct and personal in the shape of the owner's v3 pick, true thanks to 'can', and 'how do bots shrink a paycheck without touching the songs?' is exactly what the pot answers; it only lacks the AI fuss."
+  },
+  {
+   "id": "L6",
+   "gut": 6,
+   "truth": 8,
+   "clarity": 6,
+   "payoff": 6,
+   "share": 5,
+   "fix": "Your fee is split by everyone's plays, and some 'listeners' are bots.",
+   "note": "True, and pooling is half the mechanism, but the sting is normal pooling, so the video needs two turns (pooling, then bots) to reach the fake plays."
+  },
+  {
+   "id": "L7",
+   "gut": 6,
+   "truth": 9,
+   "clarity": 7,
+   "payoff": 8,
+   "share": 6,
+   "fix": "Who pays when bots play AI songs?",
+   "note": "The core question with an honest two-part answer (caught: nobody; slipped through: every real artist pays a sliver), but L35 says it shorter and matches its frame."
+  },
+  {
+   "id": "L8",
+   "gut": 6,
+   "truth": 8,
+   "clarity": 7,
+   "payoff": 7,
+   "share": 5,
+   "fix": "Why would anyone upload songs just for bots to play?",
+   "note": "A good 'why?' that money and the pot answer, but 'make' should be 'upload' (most AI songs made are never uploaded), and real artists only arrive at the turn."
+  },
+  {
+   "id": "L9",
+   "gut": 5,
+   "truth": 8,
+   "clarity": 6,
+   "payoff": 5,
+   "share": 5,
+   "fix": "Why would anyone fake plays on AI songs?",
+   "note": "An accurate stat but a plural headline with a weak gut, and the fakes it counts were caught and stripped out, so its shock is about plays that cost nobody."
+  },
+  {
+   "id": "L10",
+   "gut": 6,
+   "truth": 7,
+   "clarity": 7,
+   "payoff": 6,
+   "share": 5,
+   "fix": "Bots want a slice of the pot that pays real artists.",
+   "note": "Heist intrigue with a real number, but it pins the money on Spotify, implies one global pot and keeps the real victim off screen until the turn."
+  },
+  {
+   "id": "L11",
+   "gut": 7,
+   "truth": 6,
+   "clarity": 7,
+   "payoff": 6,
+   "share": 7,
+   "fix": "On one app, AI songs' biggest 'fans' were bots.",
+   "note": "Funny and sticky with the scope in the voice, but frame 0 drops 'one app', 'are' stretches 2025 data into the present, and the stat counts caught fakes."
+  },
+  {
+   "id": "L12",
+   "gut": 7,
+   "truth": 7,
+   "clarity": 8,
+   "payoff": 9,
+   "share": 7,
+   "fix": "",
+   "note": "The story's true core in nine words (the pot, the bots, a person you care about), with a 'what pot?' gap the video fills by drawing it and nothing to walk back; 'is splitting' could suggest a big share, and the AI fuss must come from frame 0's picture."
+  },
+  {
+   "id": "L13",
+   "gut": 6,
+   "truth": 5,
+   "clarity": 6,
+   "payoff": 5,
+   "share": 6,
+   "fix": "One app says most AI songs are uploaded for bots to play.",
+   "note": "Scale shock plus a twist, but frame 0 drops 'one app' and states Deezer's 'main purpose' judgment as fact, and the line is about the flood, not the pot."
+  },
+  {
+   "id": "L14",
+   "gut": 6,
+   "truth": 6,
+   "clarity": 7,
+   "payoff": 7,
+   "share": 6,
+   "fix": "Bots fake the plays, but the money comes from real artists.",
+   "note": "'Real money' opens 'whose money?' well, but the frame-0 triad sets AI songs next to fake plays (close to 'AI songs are fraud') and never says who pays."
+  },
+  {
+   "id": "L15",
+   "gut": 6,
+   "truth": 8,
+   "clarity": 5,
+   "payoff": 6,
+   "share": 6,
+   "fix": "Apps can't catch every bot, and the ones they miss get paid.",
+   "note": "A clever bridge from the 'can I tell?' fuss, but two clauses that need a second read and no stake on screen: why should I care that apps miss bots?"
+  },
+  {
+   "id": "L16",
+   "gut": 6,
+   "truth": 8,
+   "clarity": 7,
+   "payoff": 6,
+   "share": 5,
+   "fix": "Some of your monthly fee can end up paying bots.",
+   "note": "True with 'some' and 'can', but 'paying for fake plays' is abstract, and the viewer pays the same either way, so the sting has to move to the artists."
+  },
+  {
+   "id": "L17",
+   "gut": 6,
+   "truth": 8,
+   "clarity": 7,
+   "payoff": 8,
+   "share": 6,
+   "fix": "Who pays when bots play AI songs?",
+   "note": "The same honest two-part payoff as L35, a little clunkier ('so who pays?') and with a two-part frame."
+  },
+  {
+   "id": "L18",
+   "gut": 8,
+   "truth": 9,
+   "clarity": 9,
+   "payoff": 3,
+   "share": 8,
+   "fix": "",
+   "note": "The biggest scroll-stop here, but it promises an ear test the video can't run (no AI audio allowed) and the pot can't answer; it's the fuss, not the core, so use it as a beat."
+  },
+  {
+   "id": "L19",
+   "gut": 7,
+   "truth": 8,
+   "clarity": 7,
+   "payoff": 7,
+   "share": 6,
+   "fix": "Part of your subscription can end up paying a bot farm.",
+   "note": "'Bot farm' is vivid and frame 0 keeps 'PART OF', but it's 12 words and the viewer isn't the one who loses."
+  },
+  {
+   "id": "L20",
+   "gut": 4,
+   "truth": 8,
+   "clarity": 5,
+   "payoff": 6,
+   "share": 4,
+   "fix": "",
+   "note": "A smart mid-video 'aha' (bots pay in, then take out more), but as a hook it's a puzzle with no stake and no AI."
+  },
+  {
+   "id": "L21",
+   "gut": 6,
+   "truth": 4,
+   "clarity": 6,
+   "payoff": 5,
+   "share": 5,
+   "fix": "One app says most AI songs are uploaded for bots, not you.",
+   "note": "It says 'made' where the fact lock says 'uploaded' and stretches Deezer's 'main purpose' into 'most', and frame 0 drops the attribution."
+  },
+  {
+   "id": "L22",
+   "gut": 5,
+   "truth": 9,
+   "clarity": 6,
+   "payoff": 9,
+   "share": 5,
+   "fix": "Fake plays the apps miss shrink your favorite artist's pay.",
+   "note": "The most exact payoff sentence here (make it the film's last line), but 'slip through' and 'slice' both go unexplained at a glance, so the hook is muted."
+  },
+  {
+   "id": "L23",
+   "gut": 6,
+   "truth": 9,
+   "clarity": 8,
+   "payoff": 5,
+   "share": 5,
+   "fix": "Your monthly fee doesn't just pay your artists; it can pay bots.",
+   "note": "True almost word for word, but the honest answer to 'then who?' is mostly other real artists, which deflates the implied scandal before the bots appear."
+  },
+  {
+   "id": "L24",
+   "gut": 7,
+   "truth": 8,
+   "clarity": 9,
+   "payoff": 2,
+   "share": 7,
+   "fix": "",
+   "note": "A fun jolt, but the payoff has to say 'that part is fine', which defuses its own line, and the video can't play a single one of the songs."
+  },
+  {
+   "id": "L25",
+   "gut": 6,
+   "truth": 8,
+   "clarity": 6,
+   "payoff": 6,
+   "share": 5,
+   "fix": "",
+   "note": "A real case on 'your apps', but that 'you' carries no stake and the triad frame never says who paid; L3 does this better."
+  },
+  {
+   "id": "L26",
+   "gut": 8,
+   "truth": 5,
+   "clarity": 9,
+   "payoff": 6,
+   "share": 8,
+   "fix": "On one app, AI songs' biggest 'fans' were bots.",
+   "note": "The stickiest, most meme-able line, but it drops 'one app', turns Deezer's 2025 caught-fraud figure into a universal, and brushes AI artists who have real fans."
+  },
+  {
+   "id": "L27",
+   "gut": 7,
+   "truth": 7,
+   "clarity": 7,
+   "payoff": 6,
+   "share": 6,
+   "fix": "Billions of bot plays on his AI songs got him 18 months.",
+   "note": "Strong whiplash with one real person, but with no bots in the line, 'billions of plays' reads as real popularity punished until line 2."
+  },
+  {
+   "id": "L28",
+   "gut": 6,
+   "truth": 8,
+   "clarity": 8,
+   "payoff": 7,
+   "share": 6,
+   "fix": "",
+   "note": "A true paradox ('hears', not 'plays', is the right distinction) whose 'whose money?' leads to the pot, but frame 0 names no victim and can read as a side-hustle hook."
+  },
+  {
+   "id": "L29",
+   "gut": 6,
+   "truth": 5,
+   "clarity": 6,
+   "payoff": 5,
+   "share": 5,
+   "fix": "Real people barely play AI songs, but bots do.",
+   "note": "Most of 'all these AI songs' are barely played at all (most never reach the pay line), and frame 0's 'bots play the AI songs you don't' overgeneralizes."
+  },
+  {
+   "id": "L30",
+   "gut": 5,
+   "truth": 7,
+   "clarity": 6,
+   "payoff": 5,
+   "share": 5,
+   "fix": "If real people barely play AI songs, who's playing them?",
+   "note": "A plain question, but the honest answer to 'why so many?' starts with 'they're nearly free', and the bots are one app's view, so the pot is two hops away."
+  },
+  {
+   "id": "L31",
+   "gut": 5,
+   "truth": 7,
+   "clarity": 5,
+   "payoff": 4,
+   "share": 4,
+   "fix": "",
+   "note": "Accurate, but two numbers at a glance, a dry contrast, and a 'hardly anyone listens' frame the payoff has to correct (a song nobody plays costs nothing)."
+  },
+  {
+   "id": "L32",
+   "gut": 6,
+   "truth": 7,
+   "clarity": 6,
+   "payoff": 6,
+   "share": 5,
+   "fix": "",
+   "note": "Close to the fact lock's safe wording, but a company's plural claim, long with the attribution, and about motive rather than the pot."
+  },
+  {
+   "id": "L33",
+   "gut": 6,
+   "truth": 7,
+   "clarity": 6,
+   "payoff": 5,
+   "share": 5,
+   "fix": "",
+   "note": "Accurate with 'up to', but a stat headline whose fakes were caught and stripped out, and frame 0 drops 'one app, 2025'."
+  },
+  {
+   "id": "L34",
+   "gut": 8,
+   "truth": 7,
+   "clarity": 9,
+   "payoff": 7,
+   "share": 7,
+   "fix": "Bots can skim your favorite artist's pay.",
+   "note": "The strongest gut of the pot lines, and 'skimming' is honest about size, but 'are' asserts an ongoing loss nobody has measured where L5's 'can' stays safe."
+  },
+  {
+   "id": "L35",
+   "gut": 6,
+   "truth": 9,
+   "clarity": 8,
+   "payoff": 8,
+   "share": 6,
+   "fix": "",
+   "note": "The story's core question, short, rhyming and true, with the honest two-part answer as the 'oh', but it isn't a claim, so frame 0 doesn't state the payoff and the picture has to bring the jolt."
+  },
+  {
+   "id": "L36",
+   "gut": 7,
+   "truth": 7,
+   "clarity": 8,
+   "payoff": 7,
+   "share": 6,
+   "fix": "",
+   "note": "Personal and true with 'some' and 'can', and your coin makes a natural thread object, but frame 0 drops 'some', and the viewer pays the same, so the sting moves to the artists."
+  },
+  {
+   "id": "L37",
+   "gut": 5,
+   "truth": 8,
+   "clarity": 7,
+   "payoff": 8,
+   "share": 5,
+   "fix": "What fake plays earn comes out of real artists' pay.",
+   "note": "The payoff itself on frame 0, and it qualifies itself (caught fakes earn nothing), but it's an abstract aphorism with no AI and no 'you'."
+  },
+  {
+   "id": "L38",
+   "gut": 6,
+   "truth": 8,
+   "clarity": 5,
+   "payoff": 5,
+   "share": 5,
+   "fix": "",
+   "note": "A real case as a question, but it's long, the frame is awkward, and its answer is the contested part of the story."
+  },
+  {
+   "id": "L39",
+   "gut": 5,
+   "truth": 7,
+   "clarity": 5,
+   "payoff": 6,
+   "share": 4,
+   "fix": "",
+   "note": "An eerie idea with a logic gap: you never hear anyone else's plays either, so the mystery is hollow at a glance."
+  },
+  {
+   "id": "L40",
+   "gut": 4,
+   "truth": 8,
+   "clarity": 4,
+   "payoff": 7,
+   "share": 3,
+   "fix": "",
+   "note": "A real voice with the mechanism in his words, but 'zero-sum' is jargon, there's no emotion or AI, and frame 0 credits a brand instead of the man."
+  },
+  {
+   "id": "L41",
+   "gut": 7,
+   "truth": 8,
+   "clarity": 6,
+   "payoff": 6,
+   "share": 6,
+   "fix": "",
+   "note": "Concrete, in his own numbers, but it reads like a get-rich scheme, 'his' is unexplained on frame 0, and AI only arrives in line 2."
+  },
+  {
+   "id": "L42",
+   "gut": 6,
+   "truth": 8,
+   "clarity": 7,
+   "payoff": 6,
+   "share": 5,
+   "fix": "",
+   "note": "L3 without the AI songs, so weaker on the fuss."
+  },
+  {
+   "id": "L43",
+   "gut": 6,
+   "truth": 6,
+   "clarity": 5,
+   "payoff": 5,
+   "share": 6,
+   "fix": "",
+   "note": "It leads with the contested half (prosecutor vs. defense) as the headline, so the honest payoff has to soften 'robbed'."
+  },
+  {
+   "id": "L44",
+   "gut": 8,
+   "truth": 8,
+   "clarity": 7,
+   "payoff": 2,
+   "share": 7,
+   "fix": "",
+   "note": "A chilling real story, but it's impersonation, which the pot can't pay off (FL 5.14), so the turn to fake plays is a bait-and-switch."
+  },
+  {
+   "id": "L45",
+   "gut": 5,
+   "truth": 8,
+   "clarity": 5,
+   "payoff": 6,
+   "share": 5,
+   "fix": "",
+   "note": "The con's real logic (spread thin to dodge the filters, with AI making the 'TON' almost free) is a great mid-video beat, but it's opaque as a hook, and Spotify's 1,000-play line now blunts the trick."
+  },
+  {
+   "id": "L46",
+   "gut": 6,
+   "truth": 7,
+   "clarity": 5,
+   "payoff": 2,
+   "share": 5,
+   "fix": "",
+   "note": "Impersonation again, from one outlet, with an unexplained 'her'; the pot can't pay it off."
+  },
+  {
+   "id": "L47",
+   "gut": 5,
+   "truth": 6,
+   "clarity": 5,
+   "payoff": 5,
+   "share": 4,
+   "fix": "Every fake play the apps miss shrinks your favorite artist's share.",
+   "note": "Hayduk's logic, but it blames 'AI slop' where the fact lock blames fake plays, and 'pads the plays' is hard to read at a glance."
+  }
+ ],
+ "top5": [
+  "L12",
+  "L5",
+  "L35",
+  "L34",
+  "L3"
+ ]
+}

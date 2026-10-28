@@ -2,6 +2,16 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 09:18 UTC (hourly): budget alarm, lanes hold at a checkpoint
+
+Done: the owner took look clip v5 ("leafs are great") but called the water "way too cheap ... lazy and cheap": a workflow redesigns it as
+one shared component (research + diagnosis running; two candidates on S1, a judge, `src/lib/water.tsx`, look clip v6, a critic). Lanes:
+S2 in its critic round; S3 art conform (sky, planes + air, light, her window); S4 brief; S5 depth / sky / particles / birds, QA running;
+S6 conformed + petals seen; S7 one eye-level camera, builder mid-way; S8 sky, float, light, set, particles, critic running. No report yet.
+Spend: the hour ~$252 (helpers $897 total, +$244). Estimated weekly ~85-89 %; this 5-hour window ~50 %, its 85 % guard ~10:05-10:30
+at this burn. The finish projects past 100 %, so: lanes hold at a clean checkpoint after their current agent (no new agents) until the owner's
+readings; scope cuts (no separate G6 pass, one combined final review, sound = re-time + mix only, one critic round + must-fixes per lane).
+
 ## Note 2026-10-28 08:50 UTC: G4 look clip v5 sent to the owner
 
 `deliverables/v2/v2r_G4_look_v5.mp4` (master; S1 0-6.13 s) + `_phone.jpg` (three frames at 360 px, every particle ringed): the owner's

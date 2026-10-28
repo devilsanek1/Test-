@@ -15,18 +15,20 @@ import {World} from '../../lib/World';
 import {TimeShift} from '../../lib/time';
 import {Lit} from '../../lib/light';
 import {Sky} from '../../lib/sky';
+import {Tier} from '../../lib/tier';
 import {CM} from '../palette';
 import {CanalCast} from '../kit/canal/slots';
 import {k4Person} from '../kit/canal/k4k5';
 import type {ToneKey} from '../../lib/Film';
 import {RIG_CANAL} from '../world/rigs';
-import {S3_SUNSET} from '../world/skies';
+import {S3_AIR, S3_SUNSET} from '../world/skies';
 import {S3_START, S3_PLANE} from './V2S3_rig';
 import {S3Plane} from './V2S3_float';
 import {S3Sun, S3Terrace, S3Canal} from './V2S3_terrace';
 import {S3FarCity, S3Roofs} from './V2S3_tWest';
 import {S3Near} from './V2S3_near';
 import {S3Pip} from './V2S3_pip';
+import {S3Particles} from './V2S3_particles';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
@@ -39,22 +41,35 @@ const Shot: React.FC = () => (
         <S3Sun />
       </S3Plane>
       {/* +2 the far city on the sunset band, +1 the roofs and chimneys in front of it (the west gap; V2S3_tWest) */}
+      {/* TIERS (CRAFT §b): every set piece is tier C (flat, no line, calmer: the far planes pulled toward the air, the
+          terrace toward its own brick wall); her window and her silhouette are A (V2S3_tHer), Pip and the two lit
+          neighbours B; L2's near lamp and Pip keep exactly S2's scope (the cut swaps the world behind them) */}
       <S3Plane plane={S3_PLANE.farCity}>
-        <S3FarCity />
+        <Tier tier="environment" bg={S3_AIR}>
+          <S3FarCity />
+        </Tier>
       </S3Plane>
       <S3Plane plane={S3_PLANE.roofs}>
-        <S3Roofs />
+        <Tier tier="environment" bg={S3_AIR}>
+          <S3Roofs />
+        </Tier>
       </S3Plane>
       <S3Plane plane={S3_PLANE.terrace}>
-        <S3Terrace />
+        <Tier tier="environment" bg={CM.brick}>
+          <S3Terrace />
+        </Tier>
       </S3Plane>
       <S3Plane plane={S3_PLANE.water}>
-        <S3Canal />
+        <Tier tier="environment">
+          <S3Canal />
+        </Tier>
       </S3Plane>
       <S3Near />
       <S3Plane plane={S3_PLANE.terrace}>
         <S3Pip />
       </S3Plane>
+      {/* the particles, last, each on its plane (V2S3_particles: glints, two leaves, far and near motes) */}
+      <S3Particles />
     </Lit>
   </CanalCast>
 );

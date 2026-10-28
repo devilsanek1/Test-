@@ -140,7 +140,7 @@ function cabinInto(L: Levels) {
   // coach line under the cantrail, the cabin's foot shade, the stripe's mustard edge, the strake
   const b1 = L.at(1);
   b1.rect(CM.limestone, x0, NB.roofNear - 6, W, 6);
-  b1.rect(CM.paper, x0, NB.roofFar + 24, W, 4);
+  b1.rect(CM.stucco, x0, NB.roofFar + 24, W, 4);
   b1.rect(CM.coatOat, x0, CANT1, W, 2.4);
   b1.rect(CM.coatMustard, x0, NB.gun1 - 2, W, 1.8);
   b1.rect(CM.shadeCool, x0, NB.gun1 + 12, W, 3.4);
@@ -150,7 +150,7 @@ function cabinInto(L: Levels) {
   }
   // diamonds painted along the cantrail (mustard and paper), brass vents on it
   for (let x = s4x(20); x < x1; x += 58 * SK) {
-    const c = Math.round((x - s4x(20)) / (58 * SK)) % 2 ? CM.coatMustard : CM.paper;
+    const c = Math.round((x - s4x(20)) / (58 * SK)) % 2 ? CM.coatMustard : CM.stucco;
     const cy = NB.roofNear + 10;
     b1.poly(c, [[x, cy - 5.3], [x + 6, cy], [x, cy + 5.3], [x - 6, cy]]);
   }
@@ -177,13 +177,13 @@ function cabinInto(L: Levels) {
   // ---- level 3: the door leaves (brick), the castle's paper ground, the saloon's lamp-lit glass
   const b3 = L.at(3);
   for (const [a, c] of LEAVES) b3.rect(CM.brickDeep, a, DOORS.y0, c - a, DOORS.y1 - DOORS.y0);
-  b3.fill(CM.paper, ovalPath(CASTLE.x, CASTLE.y, CASTLE.rx, CASTLE.ry));
+  b3.fill(CM.stucco, ovalPath(CASTLE.x, CASTLE.y, CASTLE.rx, CASTLE.ry));
   b3.fill(CM.lamp, `M${P(SALOON.x0, SALOON.y0)}L${P(SALOON.x1, SALOON.y0)}L${P(SALOON.x1, SALOON.y1)}L${P(SALOON.x0, SALOON.y1)}Z`);
   // ---- level 4: the door panels (cream border, paper ground), the castle's lake and hills, the saloon's interior
   const b4 = L.at(4);
   for (const [a, c] of LEAVES) {
     b4.fill(CM.coatOat, ringRR(a + 6.6, DOORS.y0 + 8, c - 6.6, DOORS.y1 - 8, 6.6, 3.3));
-    b4.rect(CM.paper, a + 10, DOORS.y0 + 11.3, c - a - 20, DOORS.y1 - DOORS.y0 - 22.6);
+    b4.rect(CM.stucco, a + 10, DOORS.y0 + 11.3, c - a - 20, DOORS.y1 - DOORS.y0 - 22.6);
   }
   const cs = CASTLE.rx / 50;
   const CX = CASTLE.x;
@@ -294,7 +294,7 @@ function roofInto(L: Levels) {
   a.rect(CM.line, s4x(-40), NB.roofFar - 8, 300 * SK, 4.6);
   a.rect(CM.brickDeep, s4x(160), NB.roofFar - 18.5, 170 * SK, 2.6);
   c.rect(CM.coatMustard, s4x(394), NB.roofFar - 14, 6, 4.6);
-  c.fill(CM.paper, `M${P(s4x(328), NB.roofFar - 22)}Q${P(s4x(356), NB.roofFar - 25)} ${P(s4x(368), NB.roofFar - 16)}Q${P(s4x(352), NB.roofFar - 11)} ${P(s4x(328), NB.roofFar - 15)}Z`);
+  c.fill(CM.stucco, `M${P(s4x(328), NB.roofFar - 22)}Q${P(s4x(356), NB.roofFar - 25)} ${P(s4x(368), NB.roofFar - 16)}Q${P(s4x(352), NB.roofFar - 11)} ${P(s4x(328), NB.roofFar - 15)}Z`);
   for (const x of [s4x(176), s4x(646), s4x(872), 900]) {
     a.rect(CM.coatMustard, x - 2.6, NB.roofFar + 24, 5.3, 6.6);
     a.fill(CM.coatMustard, domePath(x, NB.roofFar + 26, 10, 6.6));
@@ -345,7 +345,7 @@ function roofInto(L: Levels) {
     const a1 = a0 + Math.PI / 2;
     const R = BUOY.R;
     const ri = BUOY.ri;
-    c.fill(q % 2 ? CM.paper : CM.box, `M${P(BUOY.x + Math.cos(a0) * R, BUOY.y + Math.sin(a0) * R)}A${R.toFixed(1)} ${R.toFixed(1)} 0 0 1 ${P(BUOY.x + Math.cos(a1) * R, BUOY.y + Math.sin(a1) * R)}L${P(BUOY.x + Math.cos(a1) * ri, BUOY.y + Math.sin(a1) * ri)}A${ri.toFixed(1)} ${ri.toFixed(1)} 0 0 0 ${P(BUOY.x + Math.cos(a0) * ri, BUOY.y + Math.sin(a0) * ri)}Z`);
+    c.fill(q % 2 ? CM.stucco : CM.box, `M${P(BUOY.x + Math.cos(a0) * R, BUOY.y + Math.sin(a0) * R)}A${R.toFixed(1)} ${R.toFixed(1)} 0 0 1 ${P(BUOY.x + Math.cos(a1) * R, BUOY.y + Math.sin(a1) * R)}L${P(BUOY.x + Math.cos(a1) * ri, BUOY.y + Math.sin(a1) * ri)}A${ri.toFixed(1)} ${ri.toFixed(1)} 0 0 0 ${P(BUOY.x + Math.cos(a0) * ri, BUOY.y + Math.sin(a0) * ri)}Z`);
   }
   inks.push(circleInk(BUOY.x, BUOY.y, BUOY.R, {seed: 's3roofbuoy'}));
   // ---- the stove chimney: a plum pipe, brass bands, its coolie hat (smoke: <Puffs> in S3Boat)
@@ -379,7 +379,7 @@ function roofInto(L: Levels) {
   c.rect(CM.coatMustard, bc[0] - 11, bc[1] - 28, 22, 2.6);
   c.fill(CM.box, ovalPath(bc[0] - 2.6, bc[1] - 16, 4.6, 4.2));
   d.fill(CM.brick, ovalPath(bc[0] - 2, bc[1] - 15.4, 2.1, 1.9));
-  d.fill(CM.paper, ovalPath(bc[0] + 5.3, bc[1] - 13, 2.1, 2.1));
+  d.fill(CM.stucco, ovalPath(bc[0] + 5.3, bc[1] - 13, 2.1, 2.1));
   d.ink(arcInk(bc[0], bc[1] - 40, 8, 8, 180, 360, {seed: 's3nb/bch'}) + `M${P(bc[0] + 11, bc[1] - 32)}L${P(bc[0] + 11, bc[1])}`, hair, CM.ink);
   // ---- the geranium trough cut by the right edge (the flowers sway with the herbs)
   a.poly(CM.brickDeep, [[1066, rn(30)], [1200, rn(30)], [1200, rn(8)], [1070, rn(8)]]);
@@ -435,8 +435,9 @@ function herbsInto(L: Levels, t: number) {
       if (h.kind === 'rosemary') for (let k = 0; k < 7; k++) c.fill(CM.sage, leafPath(x - w * 0.32 + k * w * 0.11 + sway * 0.5, top - w * (0.4 + (k % 3) * 0.32), 6, 1.8, -70 + sway * 6));
     }
   });
-  a.ink(blades.join(''), 1.7, CM.sage);
-  a.ink(thyme.join(''), 2, CM.leafGold);
+  // the blades ARE the herbs (things that are lines: kept as hairlines on the environment tier)
+  a.ink(blades.join(''), 1.7, CM.sage, 0, {thing: true});
+  a.ink(thyme.join(''), 2, CM.leafGold, 0, {thing: true});
   // geraniums in the trough (cut by the right edge)
   const breeze = (ph: number, amp: number) => amp * (0.7 * Math.sin(t * 2.3 + ph) + 0.3 * Math.sin(t * 5.1 + ph * 1.7));
   const ger = lobes(1066 + breeze(7, 1.2), 1210, rn(28), 30, 's3nb/ger', 6);
@@ -519,7 +520,7 @@ function portholesFront(L: Levels) {
   rim.fill(CM.leafGold, lobes(wb.x - 35.6, wb.x + 35.6, by, 20, 's3wbox', 5));
   rim.fill(CM.leafRust, leafPath(wb.x - 30, by + 18, 14.5, 4, 70));
   rim.fill(CM.leafGold, leafPath(wb.x + 28, by + 21, 17, 4, 100));
-  for (let k = 0; k < 7; k++) dog.fill([CM.box, CM.blossom, CM.paper, CM.coatMustard][k % 4], ovalPath(wb.x - 28 + k * 9.2, by - 12 + (k % 3) * 4, 3.4, 3.1));
+  for (let k = 0; k < 7; k++) dog.fill([CM.box, CM.blossom, CM.stucco, CM.coatMustard][k % 4], ovalPath(wb.x - 28 + k * 9.2, by - 12 + (k % 3) * 4, 3.4, 3.1));
   dog.ink(lobes(wb.x - 35.6, wb.x + 35.6, by, 20, 's3wbox', 5).replace(/Z$/, ''), 1.2, CM.ink, 0.35);
 }
 

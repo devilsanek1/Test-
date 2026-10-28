@@ -24,8 +24,9 @@ import {heightAt, kz, pt, S7_BIKES, S7_BOLLARD, S7_CAFE, S7_CAFE_PAIR, S7_TREE, 
 import {s7Canopy, s7Steps, s7WingShadeD} from './V2S7_wing';
 import {s7WestWallFace} from './V2S7_far';
 import {CAFE_PAIR, cyclistAt, staffIn, staffOut} from './V2S7_folk';
-import {CAFE_EDGE_CHAIR, CAFE_NEAR_CHAIR, S7_PLANTER, s7BasinFaces} from './V2S7_near';
+import {S7_PLANTER, s7BasinFaces, s7CoatD} from './V2S7_near';
 import {S7_CROWN_CLUSTERS} from './V2S7_ground';
+import {S7_WATER} from './V2S7_water';
 
 // ---------------------------------------------------------------- the sun in metres (the one camera)
 
@@ -166,50 +167,55 @@ export const S7CyclistShadow: React.FC = () => {
 
 // ---------------------------------------------------------------- the cafe and the planter (-1)
 
-/** A chair's shadow on the ground: the hull of its feet and its seat and back top carried along the sun (metres). */
-function chairShadowPts(c: {x: number; z: number; seat: number; back: number; w: number; d: number}, backNear: boolean): P2[] {
+type Chair = {x: number; z: number; seat: number; back: number; w: number; d: number};
+/** A chair's shadow on the ground: the hull of its feet, its seat and its back's top carried along the sun (metres).
+ *  `back`: which side its back rest stands on ('near' = toward us, chair A; 'right' = chair B). */
+function chairShadowPts(c: Chair, back: 'near' | 'right'): P2[] {
   const x0 = c.x - c.w / 2;
   const x1 = c.x + c.w / 2;
   const z0 = c.z - c.d / 2;
   const z1 = c.z + c.d / 2;
   const pts: P2[] = [pt(x0, z0), pt(x1, z0), pt(x1, z1), pt(x0, z1)];
   for (const [x, z] of [[x0, z0], [x1, z0], [x1, z1], [x0, z1]] as P2[]) pts.push(shadowOf(x, z, c.seat));
-  const zb = backNear ? z0 : z1;
-  for (const x of [x0, x1]) pts.push(shadowOf(x, zb, c.back + 0.04));
+  if (back === 'near') for (const x of [x0, x1]) pts.push(shadowOf(x, z0, c.back + 0.04));
+  else for (const z of [z0, z1]) pts.push(shadowOf(x1, z, c.back));
   return hull(pts);
 }
 
 export const S7CafeShadows: React.FC = () => {
-  const {x, z, r, h} = S7_CAFE.table;
+  const {table, chairA, chairB} = S7_CAFE;
+  const {x, z, r, h} = table;
   const [sx, sz] = sunShift(h);
   const top = groundRing(x + sx, z + sz, r, 40);
   const ped = hull([pt(x - 0.03, z), pt(x + 0.03, z), shadowOf(x - 0.03, z, h), shadowOf(x + 0.03, z, h)]);
   const P = S7_PLANTER;
   const box: P2[] = [pt(P.x0, P.z0), pt(P.x1, P.z0), pt(P.x1, P.z1), pt(P.x0, P.z1)];
-  const boxCast = hull([...box, shadowOf(P.x0, P.z0, P.h), shadowOf(P.x1, P.z0, P.h), shadowOf(P.x1, P.z1, P.h), shadowOf(P.x0, P.z1, P.h), shadowOf((P.x0 + P.x1) / 2, (P.z0 + P.z1) / 2, P.grass * 0.9)]);
-  const contactRing = groundRing(x, z, 0.24, 32);
+  const boxCast = hull([...box, shadowOf(P.x0, P.z0, P.h), shadowOf(P.x1, P.z0, P.h), shadowOf(P.x1, P.z1, P.h), shadowOf(P.x0, P.z1, P.h), shadowOf(P.x0 + 0.2, (P.z0 + P.z1) / 2, P.grass * 0.85)]);
+  const contactRing = groundRing(x, z, 0.18, 32);
+  const feet = (c: Chair) =>
+    [
+      [c.x - c.w / 2 + 0.03, c.z - c.d / 2 + 0.03],
+      [c.x + c.w / 2 - 0.03, c.z - c.d / 2 + 0.03],
+      [c.x - c.w / 2 + 0.03, c.z + c.d / 2 - 0.03],
+      [c.x + c.w / 2 - 0.03, c.z + c.d / 2 - 0.03],
+    ] as P2[];
   return (
     <ShadowLayer>
-      {/* casts: the table's top and pedestal, both chairs (with the coat), the planter and its grasses */}
+      {/* casts: the table's top and pedestal, both chairs (chair A with its coat), the planter and its grasses */}
       <Shadow d={polyD(top)} tint="cast" soft={8} />
       <Shadow d={polyD(ped)} tint="cast" soft={4} />
-      <Shadow d={polyD(chairShadowPts(CAFE_NEAR_CHAIR, true))} tint="cast" soft={8} />
-      <Shadow d={polyD(chairShadowPts(CAFE_EDGE_CHAIR, false))} tint="cast" soft={8} />
+      <Shadow d={polyD(chairShadowPts(chairA, 'near'))} tint="cast" soft={8} />
+      <Shadow d={polyD(chairShadowPts(chairB, 'near'))} tint="cast" soft={8} />
       <Shadow d={polyD(boxCast)} tint="cast" soft={8} />
       {/* contact: the table's foot, the chairs' feet, the planter's foot */}
       <ContactShadow x={pt(x, z)[0]} y={pt(x, z)[1]} w={0} d={polyD(contactRing)} />
-      {[CAFE_NEAR_CHAIR, CAFE_EDGE_CHAIR].flatMap((c, i) =>
-        [
-          [c.x - c.w / 2 + 0.03, c.z - c.d / 2 + 0.03],
-          [c.x + c.w / 2 - 0.03, c.z - c.d / 2 + 0.03],
-          [c.x - c.w / 2 + 0.03, c.z + c.d / 2 - 0.03],
-          [c.x + c.w / 2 - 0.03, c.z + c.d / 2 - 0.03],
-        ].map(([fx, fz], j) => {
+      {[chairA, chairB].flatMap((c, i) =>
+        feet(c).map(([fx, fz], j) => {
           const [px, py] = pt(fx, fz);
           return <ContactShadow key={`cf${i}${j}`} x={px} y={py} w={0.07 * kz(fz)} h={Math.max(6, 0.03 * kz(fz))} />;
         }),
       )}
-      <ContactShadow x={0} y={0} w={0} d={polyD([pt(P.x0 - 0.02, P.z0 - 0.025), pt(P.x1 + 0.02, P.z0 - 0.025), pt(P.x1 + 0.02, P.z0 + 0.03), pt(P.x0 - 0.02, P.z0 + 0.03)])} />
+      <ContactShadow x={0} y={0} w={0} d={polyD([pt(P.x0 - 0.025, P.z0 - 0.025), pt(P.x1 + 0.02, P.z0 - 0.025), pt(P.x1 + 0.02, P.z0 + 0.03), pt(P.x0 - 0.025, P.z1 + 0.02)])} />
     </ShadowLayer>
   );
 };
@@ -218,13 +224,10 @@ export const S7CafeShadows: React.FC = () => {
 export const S7CafeForm: React.FC = () => {
   const P = S7_PLANTER;
   const face = polyD([pt(P.x0, P.z0, P.h), pt(P.x1, P.z0, P.h), pt(P.x1, P.z0, 0), pt(P.x0, P.z0, 0)]);
-  const c = CAFE_NEAR_CHAIR;
-  const zb = c.z - c.d / 2 - 0.02;
-  const coat = polyD([pt(c.x - c.w / 2 - 0.03, zb, c.back + 0.03), pt(c.x + c.w / 2 + 0.03, zb, c.back + 0.03), pt(c.x + c.w / 2 + 0.03, zb, c.seat - 0.12), pt(c.x - c.w / 2 - 0.03, zb, c.seat - 0.12)]);
   return (
     <>
       <Shade d={face} />
-      <FormShade d={coat} frac={0.3} />
+      <FormShade d={polyD(s7CoatD())} frac={0.3} />
     </>
   );
 };
@@ -245,7 +248,7 @@ export const S7BasinContact: React.FC = () => {
 /** The west wall's shadow on the water (after the water, before the rims): the water's own deeper step. */
 export const S7BasinWaterShade: React.FC = () => (
   <ShadowLayer>
-    <Shadow d={polyD(s7BasinFaces().waterShade)} tint="water" />
+    <Shadow d={polyD([...S7_WATER.shade])} tint="water" />
   </ShadowLayer>
 );
 /** The near rim's south face, away from the low sun: one Shade step (after the rims). */
