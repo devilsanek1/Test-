@@ -34,6 +34,7 @@ export const S1WingShades: React.FC = () => (
       ))}
     </ShadowLayer>
     <Shade d={WING.soffit} at={WING_AT} />
+    <Shade d={WING.ground} at={WING_AT} />
   </>
 );
 
