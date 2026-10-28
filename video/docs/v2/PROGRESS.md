@@ -2,6 +2,14 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 13:22 UTC (hourly)
+
+The integrator finished the cross-shot items (ASSEMBLY_TODO 1-4 DONE, 5 was a bird already fixed). The water: `src/lib/water.tsx` (A's
+true reflection + B's drawing language + the judge's must-fixes), `src/lib/WATER.md` (a recipe per scene), S1 through it, and the G4
+look clip v6 master (`deliverables/v2/v2r_G4_look_v6.mp4`, its sheet, phone sheet and the v5-vs-v6 water sheet; diff inside the water
+only, banding PASS). The fresh-eyes critic is reviewing v6 now; then one fix pass if it finds must-fixes; then v6 goes to the owner.
+Spend: ~$27 since 12:37; estimated week ~92 % (owner 91 % at 12:51).
+
 ## Snapshot 2026-10-28 12:37 UTC (hourly)
 
 ALL LANES DONE (L3 S3+S4 11:46, L4 S5 11:49) and every helper session archived; their open items are in `docs/v2/ASSEMBLY_TODO.md`.

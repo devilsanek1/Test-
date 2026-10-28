@@ -73,7 +73,8 @@ A clash is a bug: fix the lower doc in the same turn.
   grey; a warm world held by one cool field; saturation as confetti, never fields. Money and everyday life: #9 Autumn
   Ember (#7 Autumn Ochre read sick). **One continuous sky** (owner, v2 G4): from the frame top to the horizon the sky
   is ONE gentle, smooth gradient (the owner's opt-in: the sky is the one place a gradient is welcome; "find a beautiful
-  way to do a gentle gradient"), warmest at the sun and the horizon, dithered so it never bands on a phone, nearly
+  way to do a gentle gradient"; water may mirror that same sky, toned toward it: the sky's own gradient seen in it,
+  `CRAFT.md` §f.7), warmest at the sun and the horizon, dithered so it never bands on a phone, nearly
   flat inside the caption band (captions keep their contrast); the far haze takes the sky's lowest colour; no two big
   fields of unrelated colour meet in a seam no object explains. -> `PALETTE.md`; `COZY_AND_SCALE.md` 3b.6; `CRAFT.md` §f;
   the sky: `CRAFT.md` §g (`lib/sky.tsx`, `check_banding.py`, the master encode).
