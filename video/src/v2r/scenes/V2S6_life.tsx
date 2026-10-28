@@ -314,14 +314,14 @@ export const S6Staff: React.FC = () => {
 
 // ---------------------------------------------------------------- petals: S6's own falling weather (plane -1)
 
-/** The petals: 6 slots, each born every 4.2-5.4 s inside the near shrub's lower crown (bottom left: x 20-90, y 1380-1500,
- *  under the board's feet), carried right by the breeze 50-90 px/s and falling 25-40 px/s with a sway, living 3.5-5.0 s
- *  (grow in 0.25 s among the shrub's blossom, shrink out 0.35 s): <= 6 at once, 20-28 px long (near the lens: seen at
- *  phone size), crossing the tulips and then the calm paving in rose steps that read on it; never over the board (born
- *  under its feet), never near Pip (they pass x 310 below y 1440), never in the band. None born in the quiet windows
- *  (V2S6_rig QUIET: film 23.60-24.00, 27.90-28.30). */
-const PET = {n: 6, period: [4.2, 5.4], life: [3.5, 5.0], grow: 0.25, shrink: 0.35, size: [20, 28]} as const;
-const PET_TONES = [mix(CM.blossom, CM.shadeWarm, 0.18), mix(CM.blossom, CM.shadeWarm, 0.32), CM.blossom];
+/** The petals: 6 slots, each born every 4.6-5.8 s inside the near shrub's lower crown (bottom left: x 20-90, y 1420-1510,
+ *  under the board's feet), carried right by the breeze 70-110 px/s and falling 18-30 px/s with a sway, living 4.0-5.5 s
+ *  (grow in 0.25 s among the shrub's blossom, shrink out 0.35 s): <= 6 at once, 24-34 px long (near the lens), out over
+ *  the open paving (x 300-700) in rose steps and a pale petal that read on it (the phone-size test: particles_phone.py);
+ *  never over the board (born under its feet), never near Pip (they pass x 310-420 below y 1450), never in the band.
+ *  None born in the quiet windows (V2S6_rig QUIET: film 23.60-24.00, 27.90-28.30). */
+const PET = {n: 6, period: [4.6, 5.8], life: [4.0, 5.5], grow: 0.25, shrink: 0.35, size: [24, 34]} as const;
+const PET_TONES = [mix(CM.blossom, CM.shadeWarm, 0.32), mix(CM.blossom, CM.shadeWarm, 0.48), mix(CM.blossom, CM.paper, 0.6)];
 type Petal = {x: number; y: number; s: number; flip: number; rot: number; tone: 0 | 1 | 2};
 const quiet = (tb: number) => QUIET.some(([a, b]) => tb >= a && tb <= b);
 
@@ -331,7 +331,7 @@ export const petalsAt = (t: number): Petal[] => {
   for (let i = 0; i < PET.n; i++) {
     const r = (k: string) => rand('s6pet', `${k}${i}`);
     const P = PET.period[0] + r('p') * (PET.period[1] - PET.period[0]);
-    const ph = r('ph') * P - 4.5;
+    const ph = r('ph') * P - 5.6;
     for (let k = Math.floor((t - ph) / P); k >= Math.floor((t - ph) / P) - 1; k--) {
       const tb = ph + k * P;
       if (quiet(tb)) continue;
@@ -340,9 +340,9 @@ export const petalsAt = (t: number): Petal[] => {
       const age = t - tb;
       if (age < 0 || age > L) continue;
       const x0 = 20 + rk('x') * 70;
-      const y0 = 1380 + rk('y') * 120;
-      const vx = 50 + rk('vx') * 40;
-      const vy = 25 + rk('vy') * 15;
+      const y0 = 1420 + rk('y') * 90;
+      const vx = 70 + rk('vx') * 40;
+      const vy = 18 + rk('vy') * 12;
       const x = x0 + vx * age + 8 * Math.sin(age * 1.9 + i);
       const y = y0 + vy * age + 5 * Math.sin(age * 2.7 + i * 0.7);
       const g = Math.min(1, age / PET.grow, (L - age) / PET.shrink);
