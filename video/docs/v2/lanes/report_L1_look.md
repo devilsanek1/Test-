@@ -8,6 +8,68 @@ and the plum.
 Commits: 14ac5f5 ... 0b7f2a3 (the conform and the pre-critic clip); c8a9aed, 66aa2af and the last L1 commit (the fixes
 after the critic and after the cold viewer, then this clip).
 
+## v5: particles SEEN at phone size (the owner on v4, 2026-10-28)
+**The clip:** `video/deliverables/v2/v2r_G4_look_v5.mp4`, the master encode (as v4), 3.9 MB.
+**The sheet:** `video/deliverables/v2/v2r_G4_look_v5_sheet.jpg` (0.4 scale, every 0.25 s).
+**The phone test:** `video/deliverables/v2/v2r_G4_look_v5_phone.jpg` (`scripts/qa/particles_phone.py`):
+- three of the master's frames (2.5, 3.8 and 5.0 s) at 360 px wide, as a phone shows them;
+- under them, the same three with every particle ringed, from `particlesAt` plus the float.
+
+**What the owner said:** "I don't see any changes in the particles anywhere, you mentioned some leaves previously no?"
+At phone size, v4's 13 px leaf, 14-24 px glints and 3-4 px motes were invisible.
+
+**lib/particles: shared, so every lane inherits it (CRAFT §f.6).** Commit 797568a.
+- **The presets:**
+
+  | kind | size | contrast | count | how they move |
+  |---|---|---|---|---|
+  | motes | 6-10 px | +15 L* | 8 (cap 10) | slow drift |
+  | dust | 5-8 px | +12 L* | | |
+  | leaves | 26-40 px | | 2 (cap 3) | a 24-44 px flutter; half tumble, the rest turn visibly |
+  | glints | 20-36 px four-point sparkles | +20 L* | 6 at once | twinkle 0.3-0.8 s; flattened toward the horizon, shortened only x0.78-1.15 |
+
+- **Contrast limits per kind** (`LIFT_MAX`): motes 20, glints 25, leaves 30, dust and birds 15; tier B adds 5. The old
+  flat limit of 15 would have washed the leaves' rust toward the paving.
+- **New options:**
+  - `births` places leaves on a hold;
+  - `leaf: 'palmate'` gives the plane leaf's five lobes (at 360 px an almond reads as a seed).
+- **New lint checks in `particleProblems`:**
+  - a phone-size floor on screen: motes 6, dust 5, leaves 26 and glints 20 px, and motes +12, glints +15 L*;
+  - a birth outside [t0, t1] or inside a join's window;
+  - at most 16 alive.
+- **`src/lib/DEPTH.md`:** the new numbers, plus the lessons.
+
+**S1** (`V2S1_particles.tsx`: one exported field list that the scene, the lint and the phone test all read):
+
+| field | what | where and when |
+|---|---|---|
+| leaves | three palmate plane leaves, 34-40 px, rust and gold, fluttering and turning | blown in from the plane tree off-frame left (born 1.2, 2.5, 3.8 s; enter ~2.0, 2.8, 4.1 s), ~115 px/s across and ~40 px/s down: across the water and our landing toward the middle (x 0 → 460, y 1150-1340), below the row, clear of Pip; 1 in view from 2.0 s, 2 from 2.8, 3 from 4.1 |
+| glints | six sparkles, 26-36 px, +20 to +24 L* (L* ~99 on the gold water) | the glitter path under the sun (x 116-276, y 1110-1166): 4-6 at once, 5.0 on average |
+| motes | seven motes, 8-10 px, +16 to +20 L* | two against the far tower's shaded column, five in front of the backlit far fronts under the roofline (the sun is behind them); from 0.3 s, all present by ~3 s |
+
+At most 16 alive (the cap). Nothing is born before 0.3 s or enters in 5.80-6.40, and nothing crosses the caption band,
+her, the row or Pip.
+
+**The phone test, read honestly**
+- **Leaves:** they read at 360 px as small rust and gold leaves crossing the landing, the only things moving there.
+- **Glints:** they read as white sparkles under the sun.
+- **Motes:** at 8-10 px, the top of CRAFT's 6-10, they read only as specks you find once you know where they are.
+- **If you want the motes seen without searching:** this needs a CRAFT §f.6 decision. Either:
+  - motes nearer the camera (plane -1: x1.5, 12-15 px on screen), in the sunlit air in front of the bay tree's shaded
+    crown; or
+  - a motes range up to 12-14 px.
+
+**Checks on the master**
+- `particleProblems` and `floatProblems`: clean (16 alive at most). Typecheck clean.
+- **check_depth:** 0 FAIL, 5 WARN at 5.4 s and at 3.0 s, as in v4. The wing's west edge is 14.0 / 13.7, her 22.1, the
+  copies' row 8.3, G1-G2 9.5.
+- **check_banding:** PASS on all five open-sky regions at 0.5, 3.0 and 5.3 s, except the full-width caption-band
+  region at 0.5 s. That WARN is the caption line's one step, as in v4.
+- **check_light A/B:** OK at all three times. The brightest 5 % sits 0.045-0.058 H from the subject, greyed is 39 / 123
+  / 80 px, and the caption band stays flat.
+
+---
+
 ## v4: the art director's list on v3, in one pass (2026-10-28)
 **The clip:** `video/deliverables/v2/v2r_G4_look_v4.mp4`, the master encode (PNG frames, BT.709, x264 CRF 14 slow
 aq-mode 3, yuv420p). Frames 0-367 (0.00-6.13 s), 1080x1920, 60 fps, with the current mix, 3.8 MB. It is rendered on

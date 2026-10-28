@@ -134,6 +134,11 @@ stages (building, fixing, polishing), where the measured waste happened.
    between gates, a short text status on all active threads (playbook Process, "Progress"), never a rendered reel.
 9. **Lean orchestrator.** Keep the task list short, use short check-in prompts, read agents' final summaries rather than full
    journals, and write handoff notes as a short WRAPUP-style doc instead of a growing log.
+   **Small contexts:** most of a long session's cost is re-reading its own context on every tool call (v2r, 28 Oct: cache
+   reads were roughly two thirds to three quarters of each session's cost; a helper at ~700k tokens pays ~4x per call
+   what it pays at ~150k). So an orchestrator or lane session delegates reading, rendering and critique to fresh agents
+   that write their results into files and return a few lines, never pulls whole reports, diffs or logs into its own
+   context, and starts a new phase (a resume, the next shot) from a short handover in a fresh session or after a compact.
 
 10. **Locked means dropped (owner, 2026-10-25).** When a gate locks, move the rejected options to `docs/vN/archive/`
     (no prompt reads it), trim the gate doc to the locked choice, and point later prompts only at locked docs and
