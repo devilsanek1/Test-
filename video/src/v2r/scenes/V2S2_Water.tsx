@@ -5,9 +5,9 @@
 // on water), the far towpath stepped to its plane by distance (`recede` toward S2's air). The far lamps in CM.line
 // (STYLE §2: never plum), each stepped to its plane. FILM seconds.
 //   S2Water          the water + its reflections + the far towpath and coping, the far lamps
-//   S2PassingBoat    a narrowboat far down the canal: it comes into the frame at the right edge at 7.60, small and slow
-//                    (it nears us at walking pace: ~2.5 px/s of growth), chimney puffs every ~0.5 s; it never reaches
-//                    the story windows' columns (x >= 760 by 12.98)
+//   S2PassingBoat    a narrowboat far down the canal: its bow comes in at the right edge at 7.60, small and slow (it
+//                    nears us at walking pace), chimney puffs every ~0.5 s; it never reaches the story windows' columns
+//                    or Pip (its bow at x ~742 by 12.98)
 //   S2Ducks          two ducks paddling on the narrow water right of Pip, clear of it
 import React, {useMemo} from 'react';
 import {CM} from '../palette';
@@ -119,9 +119,10 @@ export const S2Water: React.FC = () => {
   );
 };
 
-/** The passing narrowboat: from the right edge at 7.60, gliding left (toward us) along the water's middle; its length
- *  ~20 m in the wall's scale; growth as it nears. Never left of x 760 by 12.98. */
-export const S2_BOAT = {at: 7.6, x0: 1150, speed: 64};
+/** The passing narrowboat: its bow comes in at the right edge at 7.60 (clear of 8.44 / 8.96 by > 0.4 s), gliding left
+ *  (toward us) along the water's middle; its length ~20 m in the wall's scale; growth as it nears. Its bow at x ~742
+ *  by 12.98, right of the story windows' columns (x <= 520) and of Pip (x <= 640). */
+export const S2_BOAT = {at: 7.6, x0: 1086, speed: 64};
 export const S2PassingBoat: React.FC = () => {
   const t = useTime();
   if (t < S2_BOAT.at - 0.01) return null;

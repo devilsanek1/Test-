@@ -1,11 +1,12 @@
 // V2S2_Near (lane L2): our bank in S2 (conform_L2 §3, §10; CRAFT §f.4-5; DIRECTION rule 3: things, never a stranger's
 // back). Screen px at the pose, FILM seconds. One camera (V2S2_Ground): everything that runs along the canal runs to
 // the VP (1400, 700), cross joints are level and foreshorten, things are sized by the ground camera at their base.
-//   S2Bank      plane 0: our coping (limestone) along the water edge and the railing (CM.line: posts and rails, never
-//               plum), receding to the VP; Pip sits on the coping at its seat (590, 1050), in front of the railing.
-//   S2Towpath   plane -1 / -2: York-stone courses as long two-tone bands from the VP (joints dL* 7, bands >= 3 px), the
-//               cross joints level and staggered; the nearer rows a value step darker (NEAR_STEPS); a cast-iron drain;
-//               a few fallen leaves as flat shapes.
+//   S2Bank      plane 0: our coping (limestone) along the water edge, receding to the VP, no railing (the King's Cross
+//               towpath: the water stays open); three cast-iron mooring bollards set just back from the edge (CM.line,
+//               never plum), Pip's at its seat (590, 1050), two more receding toward the VP.
+//   S2Towpath   plane -1: York-stone courses as long two-tone bands from the VP (joints dL* 7, bands >= 3 px), the
+//               cross joints level and staggered (the far rows ride the bench's plane in the float, the near rows the
+//               things' plane: ONE tone family, no seam across the path); a cast-iron drain; a few fallen leaves.
 //   S2NearThings  the kiosk's foot (two bundles of papers tied with string, a crate), the dog lying at rest by the kiosk,
 //               the planter of grasses cut by the left edge, the slim near lamp (CM.line, x 1030, cut by the right edge;
 //               its swan-neck leaves the frame right) with a bike locked to its foot (cut by the bottom-right).
@@ -23,30 +24,41 @@ const poly = (pts: Pt[]) => pts.map(([x, y], i) => `${i ? 'L' : 'M'}${P(x, y)}`)
 
 // ---------------------------------------------------------------- colours (near = a value step darker per plane)
 
-/** The towpath's two York-stone tones on plane -1 (behind y NEAR_ROW) and -2 (nearer). */
+/** The towpath's two York-stone tones, plane -1 (one family over the whole path: a value step across it would read
+ *  as a shadow edge). */
 const STONE_A = CM.paving;
 const STONE_B = '#ECD3BE'; // a second warm stone, one soft step from the paving (long two-tone bands)
-export const PAVE = {
-  far: {a: nearStep(STONE_A, -1), b: nearStep(STONE_B, -1)},
-  near: {a: nearStep(STONE_A, -2), b: nearStep(STONE_B, -2)},
-};
-/** Where the nearer value step starts (a cross row near y 1550). */
+const PAVE_TONES = {a: nearStep(STONE_A, -1), b: nearStep(STONE_B, -1)};
+export const PAVE = {far: PAVE_TONES, near: PAVE_TONES};
+/** Where the float's split runs (a cross row near y 1550): the rows above ride plane -0.5, the rows below plane -1. */
 export const NEAR_ROW = CROSS_ROWS.reduce((best, y) => (Math.abs(y - 1550) < Math.abs(best - 1550) ? y : best), CROSS_ROWS[0]);
-/** The railing and the lamp: CM.line (STYLE §2: posts, frames, railings; never plum). */
+/** The bollards and the lamp: CM.line (STYLE §2: posts, frames, railings; never plum). */
 const IRON = CM.line;
+/** The lit (sun, left) face of a CM.line post: one warm step lighter. */
+const IRON_LIT = '#B9744E';
 
 // ---------------------------------------------------------------- our bank: the coping and the railing (plane 0)
 
-/** The railing posts along our edge: one every 1.8 m from the left frame edge toward the VP (x = 1400 - 12726 / z). */
-export const RAIL_POSTS: number[] = (() => {
-  const out: number[] = [];
-  for (let z = 8.4; z < 36; z += 1.8) {
-    const x = 1400 - 12726 / z;
-    if (x > 1090) break;
-    out.push(x);
-  }
-  return out;
-})();
+/** The mooring bollards: Pip's (its top = Pip's seat, 590 1050) and two more on the same line to the VP, 0.46 m tall,
+ *  set just back from the coping. Feet on the line through the VP and Pip's bollard's foot. */
+const BOLLARD_FOOT = (x: number) => GROUND_VP[1] + ((1098 - GROUND_VP[1]) * (GROUND_VP[0] - x)) / (GROUND_VP[0] - 590);
+export const BOLLARDS: {x: number; foot: number; h: number; w: number}[] = [590, 860, 1000].map((x) => {
+  const foot = BOLLARD_FOOT(x);
+  const m = pxPerMAt(foot);
+  return {x, foot, h: m * 0.46, w: m * 0.28};
+});
+
+/** A cast-iron bollard: a drum with a domed cap, a neck under it, a lit left face (the low western sun). */
+function bollard(b: Batch, x: number, foot: number, h: number, w: number) {
+  const top = foot - h;
+  const capH = h * 0.2;
+  const cw = w * 1.22;
+  b.rect(IRON, x - w / 2, top + capH * 0.9, w, h - capH * 0.9);
+  b.rect(IRON_LIT, x - w / 2, top + capH * 0.9, Math.max(1.5, w * 0.24), h - capH * 0.9);
+  b.rect(seamTone(IRON, 8), x - w * 0.42, top + capH * 0.9, w * 0.84, Math.max(1, h * 0.07)); // the neck
+  b.fill(IRON, `M${P(x - cw / 2, top + capH)}C${P(x - cw / 2, top - capH * 0.4)} ${P(x + cw / 2, top - capH * 0.4)} ${P(x + cw / 2, top + capH)}Z`);
+  b.fill(IRON_LIT, `M${P(x - cw / 2, top + capH)}C${P(x - cw / 2, top + capH * 0.2)} ${P(x - cw * 0.2, top - capH * 0.15)} ${P(x - cw * 0.08, top - capH * 0.18)}L${P(x - cw * 0.2, top + capH)}Z`);
+}
 
 export const S2Bank: React.FC = () => {
   const b = useMemo(() => {
@@ -59,22 +71,8 @@ export const S2Bank: React.FC = () => {
     b.poly(CM.limestone, [...top, ...bot] as KPt[]);
     b.poly(seamTone(CM.limestone, 9), [...top, ...xs.map((x) => [x, OUR_EDGE(x) + Math.max(1.5, pxPerMAt(OUR_EDGE(x)) * 0.05)] as Pt).reverse()] as KPt[]);
     b.layer();
-    // the rails (a top rail and a mid rail: the same fan, 1.0 m and 0.5 m up) and the posts
-    const rail = (k: number, th: number) => {
-      const a: Pt[] = xs.map((x) => [x, OUR_EDGE(x) - pxPerMAt(OUR_EDGE(x)) * k]);
-      const c: Pt[] = xs.map((x) => [x, OUR_EDGE(x) - pxPerMAt(OUR_EDGE(x)) * (k - th)] as Pt).reverse();
-      b.poly(IRON, [...a, ...c] as KPt[]);
-    };
-    rail(1.0, 0.045);
-    rail(0.52, 0.03);
-    for (const x of RAIL_POSTS) {
-      const y = OUR_EDGE(x);
-      const m = pxPerMAt(y);
-      const w = Math.max(2, m * 0.06);
-      b.rect(IRON, x - w / 2, y - m * 1.04, w, m * 1.04);
-      // a ball finial
-      b.fill(IRON, `M${P(x - w * 0.9, y - m * 1.04)}a${(w * 0.9).toFixed(2)} ${(w * 0.9).toFixed(2)} 0 1 1 ${(w * 1.8).toFixed(2)} 0a${(w * 0.9).toFixed(2)} ${(w * 0.9).toFixed(2)} 0 1 1 ${(-w * 1.8).toFixed(2)} 0Z`);
-    }
+    // the bollards, far to near
+    for (const o of [...BOLLARDS].reverse()) bollard(b, o.x, o.foot, o.h, o.w);
     return b;
   }, []);
   return (
@@ -120,7 +118,7 @@ export const S2Towpath: React.FC<{part: 'far' | 'near'}> = ({part}) => {
   const b = useMemo(() => {
     const b = new Batch();
     const r = rng('s2towpath');
-    const yTop = 1040;
+    const yTop = Math.floor(OUR_COPING(1140)) - 4; // the coping's near side at the right edge (the clip trims the rest)
     const rows: [number, number, 'far' | 'near'][] = (
       [
         [yTop, NEAR_ROW, 'far'],
@@ -199,7 +197,7 @@ export const NEAR = {
   ],
   crate: {x: -6, y: 1300, w: 84, h: 52},
   dog: {x: 196, y: 1372, len: 128},
-  planter: {x0: -40, x1: 226, rim: 1452, base: 1740},
+  planter: {x0: -40, x1: 226, rim: 1590, base: 1740},
   lamp: {x: 1030, w: 30, foot: 2000},
   bike: {x: 930, y: 1912, r: 112},
 };
@@ -213,9 +211,9 @@ const PlanterGrass: React.FC = () => {
     const b = new Batch();
     const r = rng('s2grass');
     // tall grass blades as flat tapered shapes in two sages, leaning a little with the canal wind
-    for (let i = 0; i < 34; i++) {
+    for (let i = 0; i < 28; i++) {
       const x = x0 + 18 + r.range(0, x1 - x0 - 36);
-      const h = r.range(120, 230);
+      const h = r.range(95, 175);
       const lean = r.range(-0.18, 0.32);
       const w = r.range(7, 12);
       const tx = x + lean * h;
@@ -247,22 +245,38 @@ export const S2KioskFoot: React.FC = () => {
       b.rect(nearStep(CM.line, -1), p.x, p.y - p.h * 0.55, p.w, 2.4);
     }
     b.layer();
-    // ---- the dog lying at rest by the kiosk (a russet dog, an oat chest, head on its paws; a plum collar)
+    // ---- the dog lying at rest by the kiosk, facing it (left): a russet sphinx pose, the head up, one ear down, an oat
+    // muzzle and chest, front legs stretched forward, the haunch a step darker, the tail round the rump; a plum collar
     {
       const {x, y, len} = NEAR.dog;
       const k = len / 128;
+      const X = (v: number) => x + v * k;
+      const Y = (v: number) => y - v * k;
       const fur = nearStep('#9A5A3E', -1);
+      const furDeep = seamTone(fur, 9);
       const chest = nearStep(CM.coatOat, -1);
-      // body: a long low loaf
-      b.fill(fur, `M${P(x, y)}C${P(x - 6 * k, y - 34 * k)} ${P(x + 40 * k, y - 46 * k)} ${P(x + 78 * k, y - 40 * k)}C${P(x + 104 * k, y - 36 * k)} ${P(x + 112 * k, y - 18 * k)} ${P(x + 108 * k, y)}Z`);
-      // the head resting on the paws (front), an ear, the muzzle
-      b.fill(fur, `M${P(x - 4 * k, y)}C${P(x - 10 * k, y - 26 * k)} ${P(x - 40 * k, y - 30 * k)} ${P(x - 44 * k, y - 12 * k)}L${P(x - 44 * k, y)}Z`);
-      b.fill(chest, `M${P(x - 44 * k, y)}C${P(x - 50 * k, y - 8 * k)} ${P(x - 58 * k, y - 6 * k)} ${P(x - 60 * k, y)}Z`);
-      b.fill(nearStep('#7A4530', -1), `M${P(x - 18 * k, y - 26 * k)}C${P(x - 10 * k, y - 18 * k)} ${P(x - 8 * k, y - 8 * k)} ${P(x - 16 * k, y - 4 * k)}C${P(x - 22 * k, y - 10 * k)} ${P(x - 24 * k, y - 20 * k)} ${P(x - 18 * k, y - 26 * k)}Z`);
-      // paws forward, the tail curled round
-      b.fill(chest, `M${P(x - 30 * k, y)}L${P(x + 6 * k, y)}L${P(x + 6 * k, y - 6 * k)}L${P(x - 30 * k, y - 6 * k)}Z`);
-      b.fill(fur, `M${P(x + 104 * k, y - 6 * k)}C${P(x + 126 * k, y - 4 * k)} ${P(x + 128 * k, y + 8 * k)} ${P(x + 96 * k, y + 4 * k)}Z`);
-      b.fill(CM.coatPlum, `M${P(x - 8 * k, y - 22 * k)}L${P(x - 2 * k, y - 22 * k)}L${P(x - 2 * k, y - 4 * k)}L${P(x - 8 * k, y - 4 * k)}Z`);
+      // the far legs (a step darker, behind)
+      b.fill(furDeep, `M${P(X(-6), Y(0))}L${P(X(-44), Y(0))}L${P(X(-44), Y(7))}L${P(X(-6), Y(9))}Z`);
+      // body: shoulders up at the front, a long back, the rump rounded at the rear
+      b.fill(fur, `M${P(X(-8), Y(0))}C${P(X(-12), Y(24))} ${P(X(-2), Y(40))} ${P(X(16), Y(40))}C${P(X(50), Y(38))} ${P(X(78), Y(36))} ${P(X(96), Y(34))}C${P(X(118), Y(32))} ${P(X(122), Y(8))} ${P(X(112), Y(0))}Z`);
+      // the haunch (the near hind leg folded)
+      b.fill(furDeep, `M${P(X(70), Y(0))}C${P(X(70), Y(22))} ${P(X(104), Y(28))} ${P(X(110), Y(12))}C${P(X(112), Y(4))} ${P(X(104), Y(0))} ${P(X(96), Y(0))}Z`);
+      // the near front leg stretched forward, an oat paw
+      b.fill(fur, `M${P(X(4), Y(0))}L${P(X(-40), Y(0))}C${P(X(-44), Y(0))} ${P(X(-44), Y(9))} ${P(X(-40), Y(9))}L${P(X(6), Y(11))}Z`);
+      b.fill(chest, `M${P(X(-40), Y(0))}C${P(X(-46), Y(0))} ${P(X(-47), Y(9))} ${P(X(-40), Y(9))}L${P(X(-32), Y(9))}L${P(X(-32), Y(0))}Z`);
+      // the neck and the head, up
+      b.fill(fur, `M${P(X(-6), Y(26))}C${P(X(-10), Y(46))} ${P(X(-14), Y(58))} ${P(X(-22), Y(64))}C${P(X(-34), Y(70))} ${P(X(-44), Y(62))} ${P(X(-42), Y(52))}C${P(X(-40), Y(42))} ${P(X(-28), Y(34))} ${P(X(-18), Y(24))}Z`);
+      // the muzzle (oat), pointing left, a dark nose
+      b.fill(chest, `M${P(X(-38), Y(60))}C${P(X(-48), Y(60))} ${P(X(-58), Y(56))} ${P(X(-60), Y(51))}C${P(X(-58), Y(46))} ${P(X(-48), Y(45))} ${P(X(-38), Y(48))}Z`);
+      b.fill(CM.anchor, `M${P(X(-61), Y(53))}a${(3.2 * k).toFixed(2)} ${(2.6 * k).toFixed(2)} 0 1 1 ${(6.4 * k).toFixed(2)} 0a${(3.2 * k).toFixed(2)} ${(2.6 * k).toFixed(2)} 0 1 1 ${(-6.4 * k).toFixed(2)} 0Z`);
+      // the oat chest under the neck
+      b.fill(chest, `M${P(X(-18), Y(24))}C${P(X(-26), Y(30))} ${P(X(-30), Y(20))} ${P(X(-24), Y(10))}L${P(X(-10), Y(10))}Z`);
+      // the ear: a dark flap down the side of the head
+      b.fill(furDeep, `M${P(X(-20), Y(66))}C${P(X(-12), Y(62))} ${P(X(-8), Y(50))} ${P(X(-12), Y(42))}C${P(X(-18), Y(46))} ${P(X(-24), Y(56))} ${P(X(-20), Y(66))}Z`);
+      // the collar
+      b.fill(CM.coatPlum, `M${P(X(-10), Y(44))}L${P(X(-3), Y(40))}L${P(X(-6), Y(32))}L${P(X(-14), Y(37))}Z`);
+      // the tail round the rump onto the paving
+      b.fill(fur, `M${P(X(110), Y(6))}C${P(X(128), Y(4))} ${P(X(130), Y(-6))} ${P(X(112), Y(-6))}C${P(X(104), Y(-6))} ${P(X(100), Y(-2))} ${P(X(100), Y(2))}Z`);
     }
     b.layer();
     return b;
@@ -284,7 +298,7 @@ export const S2NearThings: React.FC = () => {
       const woodLit = nearStep('#B9744E', -2);
       b.rect(wood, x0, rim, x1 - x0, base - rim);
       b.rect(woodLit, x0, rim, x1 - x0, 18);
-      for (let k = 1; k < 4; k++) b.rect(seamTone(wood, 7), x0, rim + 18 + ((base - rim - 18) * k) / 4, x1 - x0, 3);
+      for (let k = 1; k < 3; k++) b.rect(seamTone(wood, 7), x0, rim + 18 + ((base - rim - 18) * k) / 3, x1 - x0, 3);
       b.fill(nearStep('#8C6A55', -2), `M${P(x0, rim + 2)}L${P(x1, rim + 2)}L${P(x1 - 6, rim + 12)}L${P(x0, rim + 12)}Z`); // soil
     }
     return b;

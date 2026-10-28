@@ -3,9 +3,9 @@
 // view). The set already holds the parapet pigeons (they lift once, 7.85), the urn's steam (the kit Newsstand), the
 // passing narrowboat (from the right edge at 7.60) and the ducks at rest. No stranger's back, no dog's trot, no paving
 // pigeons (conform_L2 §3, §5). FILM seconds.
-//   S2FarLife   ONE far walker on the far towpath: already walking when it comes in at the right edge (6.90), left-bound
-//               at a stroll (~27 px/s), sized by the wall's scale (~64 px a person at s2g 1), so it stays tiny and
-//               slow by the VP; never reaches the story windows' columns (x >= 940 by 12.98)
+//   S2FarLife   ONE far walker on the far towpath, already walking at the right edge from the first frame (the pull-back
+//               brings it into view by 6.70), left-bound at a stroll (27 px/s), sized by the wall's scale (~64 px a
+//               person at s2g 1), so it stays tiny and slow by the VP; behind the near lamp ~7.1-7.7; x ~874 by 12.98
 //   S2Motes     a few motes in the low light at the left edge (the sun side, CRAFT §f.6; conform_L2 §10): over the
 //               kiosk's painted body, clear of its lit opening, steady through the joins (6.10, 12.98)
 import React from 'react';
@@ -18,13 +18,12 @@ import {s2g, s2u} from '../kit/canal/wall';
 import {farPath} from './V2S2_Water';
 import {S2_ATM} from './V2S2_Wall';
 
-/** The far walker: comes in at the right edge (x 1110, off frame) at 6.90, walking left at 27 px/s. */
-export const S2_WALKER = {enter: 6.9, x0: 1110, speed: 27, hPerG: 64};
+/** The far walker: at x 1060 at 6.10 (off screen under the pull's 1.12), walking left at 27 px/s. */
+export const S2_WALKER = {t0: 6.1, x0: 1060, speed: 27, hPerG: 64};
 
 export const S2FarLife: React.FC = () => {
   const t = useTime();
-  if (t < S2_WALKER.enter) return null;
-  const x = S2_WALKER.x0 - (t - S2_WALKER.enter) * S2_WALKER.speed;
+  const x = S2_WALKER.x0 - (t - S2_WALKER.t0) * S2_WALKER.speed;
   const [, y] = farPath(x);
   const h = S2_WALKER.hPerG * s2g(s2u(x));
   return (
