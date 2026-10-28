@@ -22,6 +22,7 @@ import {Person, Seated} from '../kit/cast';
 import * as MAP from '../world/map';
 import {CellPaint, Under, barPath, planeLeaf, S1_IRON, S1_HAZE} from './V2S1_set_core';
 import {mixHex} from '../../lib/light';
+import {atmos} from '../../lib/depth';
 import {s1ArchOpening} from './V2S1_set_far';
 import {floodAt} from './V2S1_clock';
 import {edgeY} from './V2S1_steps_stone';
@@ -147,8 +148,9 @@ function lampInto(b: Batch, x: number, y: number, h: number, seed: string) {
 
 type Refl = {x0: number; x1: number; color: string; depth: number};
 // two reflections only (the art director, v3: the canal read as a barcode of peach / yellow / terracotta bars): the
-// wing's, and the sun's gold column where the glints live; each mixed into the water (REFL_SOFT) so they sit on its
-// own value steps
+// wing's, and the sun's gold column where the glints live; each eased into the water (REFL_SOFT) so they sit on its
+// own value steps, through `atmos` (hue kept, chroma eased, never under C* 12): a straight sRGB mix of a warm colour
+// into the teal crosses grey (the wing's turned khaki #C0B7A6, the sun's olive #CACBA3: DIRECTION rule 6)
 const REFL: Refl[] = [
   {x0: 330, x1: 1080, color: CM.brickLight, depth: 46},
   {x0: 120, x1: 280, color: CM.sun, depth: 0},
@@ -157,7 +159,9 @@ const REFL_SOFT = 0.5;
 // the water runs on under our bank's slanted coping (it reaches y ~1300 at the right edge; the bank covers the rest)
 const WATER = {y0: S.water.y0 - 2, y1: S.water.y1 + 96, x0: -40, x1: 1120} as const;
 const WATER_H0 = S.water.y1 - S.water.y0 + 4;
-const WATER_FAR = mixHex(CM.water, S1_HAZE, 0.3);
+// the far water toward the haze, through `atmos` too (the sRGB mix read grey-green, C* 9.8 h 149, and any shade on it
+// greyed): a pale teal, C* 12
+const WATER_FAR = atmos(CM.water, 0.3, S1_HAZE, {chromaFloor: 12});
 const WATER_NEAR = mixHex(CM.water, CM.waterDeep, 0.3);
 
 /** The canal between the far coping and our bank: base colour in regions, the wing's broken reflection and the sun's
@@ -186,7 +190,7 @@ export const S1Water: React.FC = () => {
     const b = new Batch();
     const rt = y0 + 10;
     REFL.forEach((ref, i) => {
-      const color = mixHex(ref.color === CM.sun ? CM.lamp : ref.color, CM.water, REFL_SOFT);
+      const color = atmos(ref.color === CM.sun ? CM.lamp : ref.color, REFL_SOFT, CM.water, {chromaFloor: 12});
       const depth = ref.depth || 60;
       const W = ref.x1 - ref.x0;
       const rr = rng(`s1refl/${i}`);
