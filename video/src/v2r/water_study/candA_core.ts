@@ -1,9 +1,10 @@
 // WATER STUDY, candidate A ("TRUE REFLECTION"): THE ENGINE, pure TS (no React; it also runs from node QA). It is the
 // would-be core of a shared lib/water.tsx: a shot feeds it its camera, its sky, its body colour and a LIST of what
 // stands above the water (polygons in screen px, already mirrored about their own waterlines, on their parallax
-// planes); the engine cuts them into perspective ripple rows, sways each row on a travelling wave, tones every
-// reflection toward the water by a Fresnel ladder (in CIE LCh: hue kept, never an RGB mix), and lays the ripple gaps
-// (flat lenses of the open-water colour), the sun's glitter column and its slivers over them. Every number is a pure
+// planes); the engine cuts them into perspective ripple rows, sways each row on a travelling wave, frays every piece's
+// ends (a little far, a lot near), tones every reflection by a Fresnel ladder (in CIE LCh: the value from the world,
+// the hue from the water, lights keep theirs; never an RGB mix), and lays the ripple gaps (flat lenses of the
+// open-water colour), the sun's glitter column and its slivers over them. Every number is a pure
 // function of the frame time and integer seeds (no Math.random, no clock). docs/v2/water/cand_A.md has the why and
 // the numbers; docs/look/research/2026-10-28_water.md the optics (R1-R14).
 import {fromLch, lch} from '../../lib/light';

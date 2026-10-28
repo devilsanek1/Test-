@@ -8,24 +8,27 @@
 // LAYERS, bottom to top (all raw SVG with computed colours: the clean pen's tier pull never re-tints them; inside S1's
 // water plane group, so the float carries them, each reflection counter-shifted onto its THING's plane):
 //   1 the RAMP       S1_EVENING mirrored, compressed and toned toward the body (lib/sky <Sky>: its eased OKLab curve
-//                    and blue-noise dither; the brief's one allowed gradient): warm under the far bank, a pale cream
-//                    crossing, the canal's teal body toward us (the frame's one cool field)
-//   2 REFLECTIONS    one simplified shape per mass, mirrored about its own waterline: the bridge (rose spandrels, its
-//                    arch's bowl, the pilaster, the deck), Google's wing (brick, the light corner pier, the glass slit),
-//                    the lamp posts and bollards, her and the row, the boats' hulls and cabins: solid at the base, then
-//                    level slices on the shared perspective grid, breaking and thinning toward us
-//   3 LIGHT COLUMNS  the lit lobby's gold under the glass doors: a warm column of slices as wide as the door
-//   4 THE QUAY BAND  the far coping's face mirrored: one cool band under the far towpath's dark waterline strip
-//   5 RIPPLES        a few long tapered lines in two tones on the perspective rows, drifting with the westerly
-//   6 THE GLITTER    one narrow column under the low sun of nested slivers (gold lens, warm-white core) over a bed of
-//                    short gold slices: the sun's path, never four-point stars
-// The duck (CandDuck): the kit's mallard as it was, now gliding east at 7 px/s, its reflection under it and a clean,
-// very flat Kelvin V behind it (2.5 deg per arm at its row), tapered, its tails breaking into dashes.
-// Motion (R12): the masses, the ramp and the quay band hold; only the slices sway (+-1.3 px far -> +-4.2 px near, two
-// sines of 4.6 s and 2.9 s whose phase travels toward us at ~0.3 m/s: ~3 px/s far, ~13 px/s near); ripple lines drift
-// east 6-16 px/s and live 2.6-4.6 s; slivers live 0.3-0.7 s; the duck 7 px/s. Frame 0: the water lands PALE (mixed
-// S1_PALE toward the paper, the masses only) and floods in with the front from SUN0 (f5-f12). Deterministic: lib/rng
-// seeds and pure functions of t.
+//                    and blue-noise dither; the brief's one allowed gradient): the warm horizon under the far bank, a
+//                    pale cream crossing, the canal's teal body toward us (the frame's one cool field)
+//   2 REFLECTIONS    one simplified shape per mass, mirrored about its own waterline, far to near: the bridge (one rose
+//                    value, its arch's bowl and ring closing the ellipse, the pilaster, the far city's haze below it),
+//                    Google's wing (brick, the light corner pier, the glass slit) with the lamp posts and her and the
+//                    row, the lit lobby's gold column (R7: as wide as the door), the moored boats' hulls (the bows
+//                    mirrored) and cabins: solid at the base, then level slices on ONE shared perspective grid,
+//                    narrowing along a smooth envelope toward us; Fresnel in three flat steps (rose -> mauve -> the teal)
+//   3 THE QUAY       the bollards' stubs and the far coping's face mirrored (one cool band under the far towpath's
+//                    dark waterline strip)
+//   4 RIPPLES        a few long tapered lines in two tones on the perspective rows, drifting east with the westerly
+//   5 THE GLITTER    one narrow column under the low sun: a still bed of gold lenses with warm-white cores nested in
+//                    them, the cores twinkling (grow in, shrink out): the sun's path, never four-point stars
+// The duck (CandDuck): the kit's mallard as it was, now gliding east at 7 px/s, its reflection under it, a thin contact
+// lens at its waterline and a clean, very flat Kelvin V behind it (2.5 deg per arm at its row), tapered, its tails
+// breaking into dashes.
+// Motion (R12): the masses, the ramp and the quay hold; only the slices and lenses sway (+-1.5 px at the far bank ->
+// +-3.9 px at our feet, at most 2.3 -> 6.5 px/s; two sines of 4.6 s and 2.9 s whose phase travels toward us at
+// ~0.3 m/s: ~3 px/s far, ~16 px/s near); ripple lines drift east 6-16 px/s and live 2.6-4.6 s; glitter cores live
+// 0.3-0.7 s; the duck 7 px/s. Frame 0: the water lands PALE (mixed S1_PALE toward the paper, the masses only) and floods
+// in with the front from SUN0 (f5-f12). Deterministic: lib/rng seeds and pure functions of t.
 import React, {useId, useMemo} from 'react';
 import {Sky, type SkySpec} from '../../lib/sky';
 import {bob} from '../../lib/idle';
@@ -33,7 +36,7 @@ import {CM} from '../palette';
 import * as MAP from '../world/map';
 import {S1_EVENING} from '../world/skies';
 import {S1_PLANE} from '../scenes/V2S1_float';
-import {Batch, P, Paint, ovalPath, rand, rng} from '../kit/canal/core';
+import {Batch, P, Paint, ovalPath, rand} from '../kit/canal/core';
 import {tiered} from '../kit/tiers';
 import {BOATS, DUCK, FLOOD_ORIGIN, PAPER, REFLECTORS, S1_PALE, S1W_CAM, SUN, floatOf, floodRadius, reflTop, rowAt, waterBottom, waterPolygon, waterTop} from './geometry';
 import {
@@ -48,6 +51,7 @@ import {
   lensPath,
   okLch,
   paleOf,
+  perspectiveRows,
   pxPerMDeep,
   rampColour,
   rampKeys,
@@ -105,27 +109,21 @@ const RAMP_PALE: SkySpec = {...RAMP_SKY, keys: RAMP_SKY.keys.map((k) => ({y: k.y
 const waterAt = (y: number) => rampColour(RAMP, y);
 
 /** THE SLICE GRID (R6): bands at 0.45 m of water, projected (4.7 px at the far edge, 7.6 at y 1150, 12.2 at y 1200,
- *  18 at y 1250, 23 at our feet): every band's gap (its trough, the ramp showing through) 20 % of its pitch far ->
- *  32 % near. Few, calm bands: an editorial slice, never a barcode. */
-const ROWS = (() => {
-  const out: number[] = [];
-  let y = 1056;
-  while (y < 1340) {
-    out.push(y);
-    y += Math.max(3, pxPerMDeep(CAM, y) * 0.45);
-  }
-  return out;
-})();
+ *  18 at y 1250, 23 at our feet): every band's gap (its trough, the ramp showing through) 16 % of its pitch far ->
+ *  26 % near. Few, calm bands, shared by every reflection: an editorial slice, never a barcode. */
+const ROWS = perspectiveRows(CAM, 1056, 1340, 0.45, 3);
 const GRID = sliceGrid(ROWS, [0.16, 0.26], 1110, 1290);
 
-/** THE SWAY (R6, R12): +-1.3 px at the far bank -> +-4.2 px at our feet; 4.6 s and 2.9 s, wavelengths 1.5 m and 0.8 m,
- *  the phase travelling toward us (~0.3 m/s). */
+/** THE SWAY (R6, R12): amplitude 1.3 px at y 1090 -> 4.2 px at y 1290 (measured: +-1.5 px at the far bank, +-3.9 at our
+ *  feet; at most 2.3 -> 6.5 px/s); 4.6 s and 2.9 s, wavelengths 1.5 m and 0.8 m, the phase travelling toward us
+ *  (~0.3 m/s). */
 const SWAY: Sway = {amp: [1.3, 4.2], yFar: 1090, yNear: 1290, T: [4.6, 2.9], lambda: [1.5, 0.8], seed: 's1b'};
 
 // ================================================================= colours (R3-R4: toned in OKLCH, never mixed in RGB)
 
-/** Fresnel in three flat steps (R2): a reflection at full design strength under the far bank (k 0.3 toward the water's
- *  body), a step weaker from y 1150, the near third from y 1195 (k 0.6). */
+/** Fresnel in three flat steps (R2): every reflection takes three tones (fresnelSteps: k toward the water's body per
+ *  step, and from the second step less chroma, a warm hue turning through mauve, a cool one through slate): the far
+ *  bank's until y 1150, the middle's until y 1195, then the near third's. */
 const STEPS = [1150, 1195];
 const tone3 = (src: string, k: [number, number, number] = [0.3, 0.45, 0.6], o: {turn?: number; fade?: [number, number]} = {}) => fresnelSteps(src, k, CM.water, o);
 /** On-screen source colours (sampled at 1.0 s, after the clean pen; DIAGNOSIS §2.4). */
@@ -332,14 +330,14 @@ const bollardStubs = (): {x: number; y0: number; y1: number; w: number}[] =>
     return {x: b.x, y0: line - 4, y1: 2 * line - (b.foot - b.h), w: b.h * 0.9 * 0.84};
   });
 
-// ---- the sun's glitter column (R8): straight under SUN0 (x 196), over the whole water there (y 1100 -> 1172), densest
-// at its still-water mirror point (y 1158); half-width 15 px at the far edge -> 32 px at our edge (the low sun at 7.8 deg:
-// a narrow column, ~1.2x taller than wide in this strip, the start of a path ~7x longer than wide)
+// ---- the sun's glitter column (R8): straight under SUN0 (x 196), over the whole water there (y 1099 -> 1172), densest
+// at its still-water mirror point (y 1158); half-width 17 px at the far edge -> 36 px at our edge (the low sun at 7.8 deg:
+// a narrow column, the start of a path ~7x longer than wide); a bed of 12 lenses, 2-12 cores alive (mean 8)
 const GLITTER: Glitter = {x: SUN.x, yTop: reflTop(SUN.x) - 1, yBot: waterBottom(SUN.x) + 2, w: [17, 36], peak: SUN.mirror.y, seed: 's1sun', t0: 0.24};
 
 const GLITTER_BED = glitterBed(GLITTER, GRID);
 
-// ---- ripple lines (R9): 11 alive, mostly in the open near water, clear of the glitter column and Pip's seat
+// ---- ripple lines (R9): 6-11 alive (11 slots), mostly in the open near water, clear of the glitter column and Pip's seat
 const RIPPLES: Ripples = {
   slots: 11,
   seed: 's1rip',
@@ -419,14 +417,11 @@ const WaterBody: React.FC<{t: number}> = ({t}) => {
   return (
     <>
       <Sky spec={RAMP_SKY} />
+      {/* far to near, each reflection on its thing's plane: the bridge, then the wing with its posts, the row and the
+          lobby's light, then the moored boats (nearer: their reflections cover the wing's) */}
       <g transform={tr(floatOf(S1_PLANE.bridge, t))}>
         {bridge.map((r, i) => (
           <RunPaths key={`b${i}`} runs={r} k={`b${i}`} />
-        ))}
-      </g>
-      <g transform={tr(floatOf(S1_PLANE.boats, t))}>
-        {boats.map((r, i) => (
-          <RunPaths key={`o${i}`} runs={r} k={`o${i}`} />
         ))}
       </g>
       <g transform={tr(floatOf(S1_PLANE.subject, t))}>
@@ -436,6 +431,14 @@ const WaterBody: React.FC<{t: number}> = ({t}) => {
         {lobby.map((r, i) => (
           <RunPaths key={`l${i}`} runs={r} k={`l${i}`} />
         ))}
+      </g>
+      <g transform={tr(floatOf(S1_PLANE.boats, t))}>
+        {boats.map((r, i) => (
+          <RunPaths key={`o${i}`} runs={r} k={`o${i}`} />
+        ))}
+      </g>
+      {/* the quay: the bollards' stubs and the coping's face mirrored, on the far towpath's plane */}
+      <g transform={tr(floatOf(S1_PLANE.subject, t))}>
         <path d={stubs} fill={COL.iron[0]} />
         <path d={QUAY_D} fill={QUAY} />
       </g>
@@ -538,8 +541,9 @@ const DuckBodyRaw: React.FC<{t: number}> = ({t}) => {
 const DuckBody = tiered('environment', {}, DuckBodyRaw);
 
 /** The duck's water: its reflection (the body mirrored about its waterline, toned), a thin contact line, and the
- *  Kelvin V (R11): two tapered light lines from its chest back, 2.5 deg per arm at its row (k = (y - hz) / f), 3.3 body
- *  lengths, each breaking into dashes toward its tail; one short transverse arc inside the V near the bird. */
+ *  Kelvin V (R11): two tapered light lines from its chest back, 2.5 deg per arm at its row (k = (y - hz) / f), 2.7 body
+ *  lengths (it ends short of the sun's glitter), each breaking into dashes toward its tail; one short transverse arc
+ *  inside the V near the bird. */
 const DuckWater: React.FC<{t: number}> = ({t}) => {
   const s = DUCK.size;
   const x = duckX(t);
@@ -616,5 +620,5 @@ export const CAND_B_PALETTE = (): {name: string; hex: string; L: number; C: numb
 /** The rows and the sway at a few y (for the doc). */
 export const CAND_B_GEOMETRY = () => ({
   rows: ROWS.length,
-  pitch: [1111, 1150, 1200, 1250, 1290].map((y) => ({y, pitch: +(pxPerMDeep(CAM, y) * 0.32).toFixed(1), depth: +depthAt(CAM, y).toFixed(1)})),
+  pitch: [1111, 1150, 1200, 1250, 1290].map((y) => ({y, pitch: +(pxPerMDeep(CAM, y) * 0.45).toFixed(1), depth: +depthAt(CAM, y).toFixed(1)})),
 });

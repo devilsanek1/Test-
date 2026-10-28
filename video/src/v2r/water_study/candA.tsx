@@ -2,22 +2,24 @@
 // not clean or premium quality or refined. Just lazy and cheap. I mean that about the water"). The canal is drawn like
 // a building: it is the MIRROR of S1 itself under the one camera, seen through the water.
 //   1. The open water: the shot's own sky (S1_EVENING) mirrored about the horizon, toned by Fresnel toward the water's
-//      teal body (warm along the far quay, the pale light band, teal at our edge): the ONE allowed gradient, through
-//      lib/sky's eased curve and blue-noise dither (candA_s1 waterRamp).
-//   2. Every reflection: the bridge and its arch, the far tower and roofs, Google's ground storey (brick, fins, the
-//      slit bay, the stone door bay and the lit lobby's gold column), the lamp posts, the bollards, the coping's own
-//      face, the moored boats, her and the row, the door's sliding leaves, the bus, the duck: each mirrored about its
-//      own waterline, simplified to masses, verticals and lights, cut into level ripple rows spaced by perspective
-//      (3.4 px far -> 15 px near), each row swaying on waves that travel toward us; toned in CIE LCh by a Fresnel ladder
-//      (8 flat steps, k 0.30 -> 0.65: hue kept, never an RGB mix, never beige or tan).
-//   3. The ripple gaps: lenses of the open water's colour: thin light cut lines along the far quay, row-tall gaps near
-//      us (the reflection breaking up, the water's own teal showing between: Fresnel by coverage); each lens grows
+//      teal body (warm along the far quay, a light crossing, teal at our edge): the ONE allowed gradient, through lib/sky's
+//      eased curve and blue-noise dither (candA_s1 waterRamp); it holds still on screen while the water floats.
+//   2. Every reflection: the bridge and its arch, the far tower and roofs, Google's ground storey (the brick wall, the
+//      corner pier, the slit bay, the lit lobby's gold column), the lamp posts, the bollards, the coping's own face, the
+//      moored boats, her and the row, the door's sliding leaves, the bus, the duck: each mirrored about its own waterline
+//      on its own parallax plane, simplified to masses, verticals and lights (R5), cut into level ripple rows spaced by
+//      perspective (2.7 px far -> 13.5 px near), each row swaying on waves that travel toward us, every piece's ends
+//      ragged (a little everywhere, a lot near us, rounded there). HUE FROM THE WATER, VALUE FROM THE WORLD, LIGHT KEEPS
+//      ITS COLOUR: every opaque thing takes the water's teal family at its value, toned by a Fresnel ladder (7 flat steps,
+//      k 0.40 -> 0.70); only the lobby's gold stays gold (never an RGB mix: no khaki, beige, tan or grey).
+//   3. The ripple gaps: lenses of the open water's colour: thin warm light lines along the far quay, row-tall teal pills
+//      near us (the reflection breaking up, the water's own body showing between: Fresnel by coverage); each lens grows
 //      along its length and shrinks out on its own slow cycle.
-//   4. The sun's glitter column under SUN0: a still gold bed sliced by the rows, and warm-white level slivers that
-//      grow in and out (0.42-0.9 s each, ~10 alive), densest at the sun's mirror point. GLINTS_OFF: v5's star field
-//      is gone.
-//   5. The duck (CandDuck): the kit's mallard exactly, its paper V wake replaced by one or two slow, flat rings (a still
-//      duck makes rings, not a V: research R11); its reflection lives in the water's rows.
+//   4. The sun's glitter column under SUN0: a gold bed of level lenses, one per row, each swelling and shrinking on its
+//      own cycle, and warm-white level slivers that grow in and out (0.42-0.9 s each, 4-6 alive), densest at the sun's
+//      mirror point. GLINTS_OFF: v5's star field is gone.
+//   5. The duck (CandDuck): the kit's mallard exactly, its paper V wake replaced by one slow, flat ring (a still duck
+//      makes rings, not a V: research R11); its reflection lives in the water's rows.
 //   Frame 0: the water lands as flat pale shapes (its reflections, unsliced) and the colour floods in from SUN0 with
 //   the rest of the set (a circle at 5800 px/s, f5-f12). Deterministic: integer hashes and the frame time only.
 // docs/v2/water/cand_A.md has the numbers, the render cost and the API sketch for a shared lib/water.

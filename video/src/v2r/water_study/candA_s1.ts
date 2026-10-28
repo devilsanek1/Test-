@@ -51,15 +51,16 @@ export const CAM: WaterCam = {horizon: G.S1W_CAM.horizon, f: G.S1W_CAM.f, eye: G
  *  far (y 1111) -> 7.7 px at y 1215 -> 15 px at y 1290 (research R6: ~5x thicker near). Nearness 0 at the far edge
  *  (y 1111), 1 at our edge on the right (y 1290). */
 export const ROWS = makeRows(CAM, {yTop: 1054, yBot: 1336, dz: 0.33, jitter: 0.3, seed: 41, nearFrom: 1111, nearTo: 1290});
-/** The sway (R6, R12): +-1.3 px far -> +-5 px near; two waves travelling toward us (2.4 m / 4.6 s and 1.3 m / 3.1 s:
- *  0.52 and 0.42 m/s, i.e. 5.5 px/s at the far edge, 16 px/s at y 1215, 27 px/s near on screen); a slice's peak sideways
- *  speed ~2.4 px/s far, ~9 px/s near. Neighbouring rows differ by 49 deg of the long wave: a gentle zigzag. */
+/** The sway (R6, R12): +-1.6 px far -> +-5.5 px near; two waves travelling toward us (2.2 m / 5.0 s and 1.4 m / 3.6 s:
+ *  0.44 and 0.39 m/s, i.e. ~4.5 px/s along the far quay, ~13 px/s at y 1215, ~22 px/s at our edge on screen); a
+ *  slice's peak sideways speed ~2 px/s far, ~7 px/s near. Neighbouring rows differ by 54 deg of the long wave: a gentle
+ *  zigzag that ripples toward us, never a sawtooth. */
 export const SWAY: Sway = {
   ampFar: 1.6,
   ampNear: 5.5,
   waves: [
-    {lambda: 3.4, period: 5.2, w: 0.7},
-    {lambda: 1.9, period: 3.6, w: 0.3},
+    {lambda: 2.2, period: 5.0, w: 0.7},
+    {lambda: 1.4, period: 3.6, w: 0.3},
   ],
   jitter: 0.12,
   seed: 4101,
@@ -85,18 +86,20 @@ export const GAPS: Gaps = {
   seed: 4102,
 };
 /** The sun's glitter column (R8): straight under SUN0 (x 196), densest at its still-water mirror point (y 1158),
- *  half-width 3.4 deg slopes: ~20 px at the far edge, ~24 near (a narrow column, ~6x taller than wide here); 14 slots,
- *  each sliver lives 0.42-0.9 s (grows in and out along its length), 11 px far -> 34 px near, 8.5:1; born from 0.30 s
- *  (CRAFT §f.6: after the frame-0 flood). */
+ *  half-width from 3.4 deg slopes: ~20 px at the far edge, ~24 near (a narrow column, ~3.5x taller than wide here,
+ *  where the bridge's reflection fills the water); a still gold bed of level lenses (CandWater) and 6 sliver slots,
+ *  each sliver living 0.42-0.9 s (it grows in and out along its length, never a fade): ~4 alive, at most 6, 18 -> 34 px
+ *  long at 8.5:1, warm white L* 97 (CRAFT §f.6: glints 20-36 px, 4-6 at once, L* +15..+25; S1 keeps <= 16 particles
+ *  alive with the motes and the leaves). Born from 0.30 s (after the frame-0 flood). */
 export const GLITTER: Glitter = {
   x: MAP.SUN0.x,
   mirrorY: G.SUN.mirror.y,
   sigma: 22,
   slope: 0.06,
   elev: (G.SUN.elevationDeg * Math.PI) / 180,
-  slots: 14,
+  slots: 6,
   life: [0.42, 0.9],
-  len: [11, 34],
+  len: [18, 34],
   aspect: 8.5,
   t0: 0.3,
   seed: 4103,
@@ -109,7 +112,7 @@ export const BODY = '#9CC3BC';
 /** The reflections' toning (R3-R4): L* toward 76 by k; the water's hue family at that value: h 182 at L* 76, 0.9 deg
  *  bluer per L* deeper (L* 62: h 195, C* 14.5; the deep water), greener and paler when lighter (L* 84: h 175, C* 7.4). */
 export const TONE: ToneOpts = {waterL: 76, waterH: 182, waterC: 10, hueSlope: 0.9, chromaSlope: 0.32, cMin: 6.5, cMax: 16};
-/** The Fresnel ladder: k 0.30 along the far quay (R 0.53) -> 0.65 at our edge (R 0.26), in 8 flat steps of 0.05, one per
+/** The Fresnel ladder: k 0.40 along the far quay (R 0.53) -> 0.70 at our edge (R 0.26), in 7 flat steps of 0.05, one per
  *  row: a reflection keeps about half its strength toward us. */
 export const kOf = (row: Row) => Math.round(lerp(0.4, 0.72, row.n) * 20) / 20;
 /** The glitter's still gold bed (the sun's reflected light, R8) and its warm-white slivers (L* ~97, never #FFFFFF). */
@@ -126,23 +129,21 @@ function rampAt(y: number): string {
   const n = (y - 1111) / (1290 - 1111);
   const sky = toOklab({l: s.l - 0.02 - 0.015 * clamp01(n), c: s.c * (0.95 - 0.1 * clamp01(n)), h: s.h});
   // the body's light veil: the water's own teal at the light band's value, then the body itself (R2)
-  const veil = toOklab({l: oklch(BODY).l + 0.06, c: 0.022, h: oklch(BODY).h});
+  const veil = toOklab({l: oklch(BODY).l + 0.085, c: 0.018, h: oklch(BODY).h});
   const body = toOklab(BODY);
-  const a = smooth(0.22, 0.58, n);
-  const b = smooth(0.5, 0.95, n);
+  const a = smooth(0.1, 0.4, n);
+  const b = smooth(0.32, 0.86, n);
   return oklabToHex(mixOklab(mixOklab(sky, veil, a), body, b * 0.92));
 }
 /** THE ONE ALLOWED GRADIENT (the brief): the shot's own sky seen in the water, as a lib/sky spec over the water's box
- *  (keys every 16 px; the eased OKLab curve; lib/sky's blue-noise dither). The sun's warmth mirrored round its still
- *  mirror point (196, 1158), kept low (ry 60, 0.75): Fresnel weakens it toward us, and a full-height one laid over the
- *  near teal crossed yellow-green at C* 7.3 (skyCheck); this one crosses at C* 4.5, the light band at L* 84-87. */
+ *  (keys every 16 px; the eased OKLab curve; lib/sky's blue-noise dither). The far water mirrors the warm horizon
+ *  (L* 86.5), crosses to the water's own pale veil at L* ~86 by y ~1165 (light, never beige, khaki or grey) and settles
+ *  on the teal body (L* 76) from y ~1250: the near water shows its body (R2). No mirrored sun warmth: its ellipse sat
+ *  right on the crossing and turned it khaki (skyCheck C* 7.6); the glitter column carries the sun. */
 export function waterRamp(): SkySpec {
   const keys: {y: number; color: string}[] = [];
   for (let y = 1046; y <= 1338; y += 16) keys.push({y, color: rampAt(y)});
-  const warm = S1_EVENING.sun!;
-  const wc = oklch(typeof warm.color === 'string' ? warm.color : fromOklch(warm.color));
-  const sunCol = fromOklch({l: wc.l - 0.03, c: wc.c * 0.93, h: wc.h});
-  return {keys, band: null, x: -60, width: 1200, top: 1040, bottom: 1340, sun: {x: warm.x, y: 2 * CAM.horizon - warm.y, rx: 300, ry: 60, color: sunCol, strength: 0.75}};
+  return {keys, band: null, x: -60, width: 1200, top: 1040, bottom: 1340, sun: null};
 }
 
 // on-screen colours (what the clean pen shows: the environment tier's calm pull, the far planes' haze, the ground
