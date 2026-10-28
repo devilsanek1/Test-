@@ -143,6 +143,22 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Video 3 is produced by session https://claude.ai/code/session_01K4EiJphpZBfCkniV3UU3wR.** It is at G0 (topic
   scouting): workflow `context/workflows/v3-g0-topics-wf_b78a4844-2b3.js` writes `video/docs/v3/scouting/*.md` and
   `video/docs/v3/G0_TOPICS.md` (top 3 fresh topics for the owner to pick).
+- **v3 status (2026-10-28 ~02:30 UTC): REWORK, FINAL ASSEMBLY RUNNING.**
+  - The hook pilot (SQA 0-5.80) was sent to the owner: `deliverables/v3/v3_rework_pilot.mp4`.
+  - Five max-effort fix lanes are done and pushed. Their reports are in `video/docs/v3/rework_reports/`:
+    - `final_lanes.md`: WINDOW, REVEAL, HOME;
+    - `shared_layer.md`: thread_plane, home_set, PriceTag, captions;
+    - `cross_prepass.md`: what crossed the lane borders;
+    - `OPEN.md`: the work list, E1-E15 and items 1-12.
+  - The final assembly is workflow `context/workflows/v3-assembly.js` (run wf_abe46864-482; resume with `resumeFromRunId`). Its steps:
+    1. integrate (the lanes' open REQUESTS, every join and the loop seam);
+    2. full-size render;
+    3. three independent reviews (story/attention, look/light, a cold owner's eye at phone size);
+    4. a fix round by file lane;
+    5. an independent verify on a fresh render, and a second fix round if blockers or majors remain;
+    6. the master (`render-media.mjs --master`, -14 LUFS / -1 dBTP) to `deliverables/v3/v3_final.mp4`, the cover, `POSTING.md`.
+  - Then the orchestrator looks at the master and sends it to the owner, labelled as the rework cut for review.
+  - The helper sessions W, R and H2 are archived.
 - **v3 status (2026-10-27 evening): REWORK before publishing** (owner: "apply the feedback ... make it better before we
   publish"). The G5b cut was NOT posted. Retro: `docs/retro/2026-10-27_v3_retro.md` (pipeline APPROVED), craft spec
   `docs/look/CRAFT.md`, direction `docs/look/DIRECTION.md`. Rework: new flow `docs/v3/flow_v2.md` (sequences SQA-SQD, the
