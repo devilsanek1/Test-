@@ -1,5 +1,20 @@
 # Journal corpus: which recent big-journal stories fit our visual storytelling (method and rubric)
 
+**State (2026-10-28 22:52 UTC; updated at every step):**
+- Done: the rubric (this file), the tools (`video/scripts/look/posters/journals.py`, tested), the workflow scripts
+  with their full briefs: `context/workflows/journals-collect.js` and `context/workflows/journals-score.js`.
+- Running: collection (workflow `journals-collect`): C1 (TIME, Forbes, Bloomberg, Fortune) and C2 (MIT Technology
+  Review, Scientific American, National Geographic, Smithsonian) are writing `parts/corpus_C*.csv` as they go; C3 (The
+  Washington Post, CNN, NPR) starts when a slot frees (at most 2 agents at once).
+- Next, exactly: (1) when C1-C3 are done (or stopped: their files count as they stand), `journals.py merge` then
+  `journals.py sample`, commit; (2) the scoring step: a first scorer on every row -> `scores.csv`, a blind second
+  scorer on `blind_sample_ids.txt` -> `scores_blind.csv`, an auditor on every id ending in 0 -> `audit.csv` (each
+  writes as it goes; a partial file is resumed from the first missing id); (3) `journals.py check` + `agreement`,
+  result into section 6; (4) the clusterer-editor: `clusters.csv`, `clusters.md`, `journals.py chart`, the top 10
+  (`journals.py top`), the slices (`journals.py slices`); (5) a check of the top 10; (6) `SUMMARY.md`, chart and
+  summary to the owner, a note to the content thread.
+- If C3 never ran (a usage limit), collect The Washington Post, CNN and NPR with the same brief before merging.
+
 **The owner's ask** (2026-10-28 ~22:20 UTC, to the study's orchestrator, verbatim): "another approach we could perhaps
 brainstorm in a dedicated thread is take a look at the stories posted by big journals recently. like forbest, times,
 economist, etc for each story evalute if having our visual storytelling would actually be a good fit and then cluster
