@@ -400,8 +400,7 @@ const HERBS: {x: number; base: number; w: number; kind: 'rosemary' | 'basil' | '
 ];
 
 function herbsInto(b: Batch, t: number) {
-  const land = t - S4_BEATS.pipLand;
-  const fl = land > 0 && land < 0.7 ? Math.sin(land * 30) * 7 * Math.exp(-land * 5) : 0;
+  const fl = 0; // Pip rides seated from the first frame (no landing: the herbs never flinch)
   const pots: string[] = [];
   // L0 pots
   HERBS.forEach((h) => {

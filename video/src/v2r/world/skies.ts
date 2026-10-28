@@ -16,7 +16,7 @@
 // band); 0,0,330,712 holds the pale cloud strip and the far tower, which read as steps.
 import {CM} from '../palette';
 import {eveningSky, horizonColor, oklabToLch, toOklab} from '../../lib/sky';
-import {SUN0, SUN2} from './map';
+import {SUN0, SUN2, SUN8} from './map';
 
 /** S1's warm horizon = V2S1_set_core S1_SKY[5] (#FBD9BB), the far city's haze since L1's continuous-sky pass. */
 export const S1_HORIZON = '#FBD9BB';
@@ -68,3 +68,33 @@ export const SUNSET_HORIZON = CM.bandSunset;
 export const S7_SUNSET = eveningSky({band: CM.sky, horizon: SUNSET_HORIZON, horizonY: 897, sun: null});
 /** The far air of S7's west gap (the far roofs): lib/depth's air. */
 export const S7_AIR = horizonColor(S7_SUNSET, SUN2.x);
+
+// ---------------------------------------------------------------- L4: S5 (Arlington, the crane, April morning)
+/** S5's April morning horizon: the far city's and the hero bank's foot at the end horizon y 750 (the same gold as S6). */
+export const S5_HORIZON = CM.bandGold;
+/** S5's April morning sky, ONE screen-space gradient behind the whole crane (the sky is at infinity: the dolly never
+ *  moves it; the far plane's 12 px drop and its pan are the far city's, and the gradient is level): the caption mint
+ *  flat through the band, the pale light band, the gold at y 750. NO sun warmth (as S6): a warmth round the sun at
+ *  y 646-650 crosses yellow-green at C* 11.5 (khaki; skyProblems, rx 230, measured 2026-10-28); the light band and the
+ *  gold horizon are the sky's warmth and the disc stays the set's flat shape, no halo. skyProblems(S5_SKY) = [].
+ *  Above y 556 it is S6_MORNING exactly (the same band and zenith), so the S5 -> S6 wipe (its tree clipped at y >= 560)
+ *  shows one sky. */
+export const S5_SKY = eveningSky({band: CM.sky, horizon: S5_HORIZON, horizonY: 750, sun: null});
+/** The air of S5's planes (lib/depth makeAtmosphere): the sky's lowest colour (#F6D9BC). */
+export const S5_AIR = horizonColor(S5_SKY);
+
+// ---------------------------------------------------------------- S8 (lane L6): her lane at sunset, looking west
+// S8_EVENING  the same evening as S1, later (the sunset state S7 shares, A5): the caption field's mint flat through the
+//             band, a pale warm light band at y ~624 over the far rows, SUNSET_HORIZON (CM.bandSunset #F3C6A6) as the
+//             horizon at y 680 (behind the far rows: it shows in the gaps between the gasholders, the viaduct and the
+//             far roofs), the low sun's warmth 200 x 60 centred 35 px under SUN8 (420, 625), low and wide, hugging the
+//             skyline (centred that low, its top stays under the mint: skyProblems [] with the yellow-green crossing at
+//             C* 5.7, where a warmth centred on the disc crossed at 11; cf. L5's note above for S6 / S7). The disc
+//             stays V2S8_set's flat S8Sky disc, drawn on top; no halo.
+// S8_AIR      the far haze of the lane (the sky's lowest colour warmed under SUN8): lib/depth's air for S8's far planes.
+// Wired (L6, V2S8_set S8Sky): <Sky spec={S8_EVENING} /> under the set; it contracts into SUN0 at the un-build (the
+// loop's mirror of S1's flood), V2S8_set S8SkyExit.
+export const S8_EVENING = eveningSky({band: CM.sky, horizon: SUNSET_HORIZON, horizonY: 680, sun: {x: SUN8.x, y: SUN8.y + 35, rx: 200, ry: 60}, bottom: 800});
+
+/** The far haze of S8's lane (the sky's lowest colour under SUN8): lib/depth's air for the far rows and the far bank. */
+export const S8_AIR = horizonColor(S8_EVENING, SUN8.x);
