@@ -65,3 +65,8 @@ Status: DONE. Three findings fixed, R3-6 fixed for the sway; its jolt half needs
 2. **SQE lane (`outside.tsx` `vehiclesAt`, optional polish for R3-5):** the BETTER van's beat ends mid-word at 33.14
    (`betterEnd + 0.3`): keep its `line` to ~33.40 (the end of "one.") and pass FleetVan `labelK` as a 2-step, so the
    pill steps down in the pause before "But" (the pill follows `line` in one frame until then, with the outline).
+3. **Whoever owns `docs/v3/flow_v2.md` (the build spec now differs from the build):** §1 "sway 24.44" -> 24.95 and the
+   window "24.44-25.04" -> 24.95-25.25 (after the DC truck's drive, in the voice's pause); §1 "shrug 40.30" and §4 SQF
+   "40.30 Pip shrugs" -> "40.40-40.55 Pip shrugs in its side pose (no frontal swap; still before the loop's travel)";
+   §7 Kit: Van `better` = the van's chassis with a Luton box carrying the chart's BETTER pill over the NEW laptop (kit
+   `BETTER_VAN`). Also the SFX: the payoff's thoom at 36.98 (`Film3.tsx` `PAYOFF_THOOM`).
