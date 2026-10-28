@@ -1,4 +1,4 @@
-# Video 4: state and pick-up notes (RESUMED 2026-10-27 ~22:35 UTC)
+# Video 4: state and pick-up notes (TOPIC SWITCHED 2026-10-28: a positive AI story)
 
 For the agent who picks this up later. Read this file first, then `HANDOFF.md` (root), `video/docs/OWNER_PLAYBOOK.md`
 and `video/docs/PIPELINE_V2.md`.
@@ -19,44 +19,35 @@ and `video/docs/PIPELINE_V2.md`.
 ## Status by gate
 | Gate | Status | File |
 |---|---|---|
-| G0 topic | **LOCKED**: AI songs and the shared royalty pot | `G0_TOPICS.md` |
-| G0.5 core line | **TOP 3 SENT 2026-10-28 ~09:45 UTC, waiting for the owner's pick** (A recommended: "A man got 18 months for having bots play his AI songs."; B "Could you even tell if a song was AI?"; C "Some bots are skimming your favorite artist's pay."). Run data: `core_line/` (6 writers, 47 lines, 4 judges, 4 viewers, 2 sceptics, editor, truth check) | `research/*.md`, `research/factlock.md`, `CORE_LINE.md` |
+| G0 topic | **ROUND 3, a very recent POSITIVE AI story** (owner, 2026-10-28: "alternate between positive and more negative topics ... something very recent, extremely relevant yet very positive around AI. like AI is helping to find medication or solve some disease"; asked to switch video 4: "Switch video 4 (Recommended)"). The first five scouts died at the usage limit before writing anything (11:10-13:30 UTC); the weekly limit is at its warning level (resets ~4 Nov 03:00 UTC), so the owner is asked before the relaunch | `scouting_r3/`, then `G0_TOPICS_r3.md` (top 3) |
+| G0.5 core line | not started for the new topic | |
 | G1+ | not started | |
 
-## The locked topic in one paragraph
-AI-generated songs are flooding streaming. Spotify pulled 50M+ likely-AI tracks from its recommendations this year (NBC,
-20 Oct 2026; not deleted). On Deezer, AI is over half of daily uploads (~90,000/day) but 1-3% of streams. Streaming pays
-artists from one shared pot split by share of all plays, so bot plays that slip past the fraud filters shrink every real
-artist's slice even if no human listens (detected fraud is already removed; the drain is the undetected part; no
-measured per-artist dollar loss exists). Pegs: NPR 27 Oct "Is 2026 the fakest year in music?"; Michael Smith sentenced
-6 Oct 2026 (18 months, ~$8.09M forfeit) for bot-streaming AI songs. Voices: James Blake (NPR, verified), Morgan Hayduk
-of Beatdapp (NBC, quote partly verbatim, finish it). Full beat outline, sources, uncertainties, fairness notes: `G0_TOPICS.md`.
+**Parked, not rejected: AI songs and the shared royalty pot** (G0 + G0.5 complete, top 3 core lines truth-checked, no
+pick made): `archive/ai_songs/` (its README says how to resume), listed in `docs/IDEAS_BANK.md`.
 
 ## The owner's rules for THIS video (all in `OWNER_NOTES.md`)
 - Anthropic must not be a key entity.
-- Focus on tech and AI news (round 1's non-tech picks were rejected).
-- Picked AI songs over the recommended Spotify-family-QR topic because "there is good amount of fuss about AI songs":
-  the core line may ride the wider fuss, not only the royalty mechanism, as long as the video pays it off.
+- Focus on tech and AI news; this round a genuinely POSITIVE AI story (a medicine, a disease, earlier diagnosis, a
+  public good), with a hopeful outlook and the same standards as any story: what AI did and didn't do, trial stage,
+  peer review, who benefits and when (playbook "Taste signals": alternate the mood).
 
-## Next step: G0.5 (facts + core line)
-The workflow `context/workflows/v4-g05-facts-and-core-line-wf_cd902428-060.js` holds the stages and the briefs. The
-resuming session has no Workflow tool, so it runs the same stages as subagents (Agent tool, `effort: max`), stage by
-stage, committing after each: 3 research lanes (mechanism, the fuss, voices + guardrails) -> `research/factlock.md` ->
-6 lever writers -> 4 judges -> 4 viewer personas + 2 sceptics (each sceptic covers every finalist, one verdict per
-line) -> `CORE_LINE.md` (top 3, with a thread idea per pick for the through-line card) -> truth check.
-Then: show the owner the top 3 lines on one screen; after the pick, archive the rest, draft the through-line card
-from the pick (playbook "Hook and pacing"; `docs/look/CRAFT.md` §a) and go to G1 (story-first script, template
-`context/workflows/v3-g1-story-*.js`, which now enforces the rhythm rule: short sentences of 5 words or fewer between
-the long ones, `video/scripts/voice/check_rhythm.py` OK), then G2 voice via the ElevenLabs API
-(`video/docs/voice/API_QUICKSTART.md`). **The key `ELEVENLABS_API_KEY` is not set in the resuming session** (the owner
-was told on 2026-10-27): once the owner adds it as an environment secret, a new session (or a helper session in the
-same environment) sees it; without it, the owner makes the take from our full paste text.
-**Craft tooling lane** (`docs/PIPELINE_V2.md`, "Craft tooling lane" + tooling item 6): the session running v4 owns it
-and it must land before v4's G3; G0-G2 never wait for it. Schedule it against the weekly limit (v2 and the v3 rework
-share it).
+## Next step: G0 round 3, then G0.5 for the pick
+Round 3 runs as subagents (Agent tool, `effort: max`), each writing its results into `scouting_r3/` as it goes: five
+scouts (medicine, diagnosis, science, everyday good, viral good news; briefs in this session's history, the round-2
+template `context/workflows/v4-g0-topics-tech-*.js` for the structure), three judges (growth, standards, creative; an
+"uplift" score added), a synthesis into `G0_TOPICS_r3.md` (top 3 on one screen) and an adversarial fact-check. After
+the owner's pick: lock it as `G0_TOPICS.md`, then G0.5 the same way as the parked AI-songs run (research -> fact lock ->
+lever writers -> judges -> viewer panel + sceptics -> editor -> truth check; bookkeeping `video/scripts/coreline.py`),
+then G1 (story-first script, template `context/workflows/v3-g1-story-*.js`, rhythm rule `check_rhythm.py` OK), then
+G2 voice. **The voice key:** this session has no `ELEVENLABS_API_KEY`; the owner is making a new restricted key (the
+pasted string was the key's ID, not the key) to store as the environment's network secret; a helper session in the
+same environment then runs G2. **Craft tooling lane** (`docs/PIPELINE_V2.md`): owned by the session running v4, must
+land before v4's G3; G0-G2 never wait for it; schedule it against the weekly limit.
 
 ## Files in this folder
-- `G0_TOPICS.md`: the locked topic (only the pick).
+- `archive/ai_songs/`: the parked first topic, complete through G0.5.
+- `scouting_r3/` (round 3, positive AI) and `G0_TOPICS_r3.md` once written.
 - `OWNER_NOTES.md`: every owner note on v4, verbatim, with what we did.
 - `archive/G0_TOPICS_round1.md` (gas tanks, commute to Zoom, padlock key 4) and `archive/G0_TOPICS_round2_options.md`
   (the tech/AI top 3 with score table and runner-ups). No prompt reads the archive.

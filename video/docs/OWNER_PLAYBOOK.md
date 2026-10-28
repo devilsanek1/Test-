@@ -163,10 +163,15 @@ Maintenance at the end).
   joins, and the owner approves the card with the script. The thread may also leave for a FAIRNESS beat the owner approves
   (the other side's equal-weight reply, a place the subject must never be): declare it on the card. — (v3, 2026-10-25; card:
   v3 retro, owner yes, 2026-10-27; fairness exception: v2, owner yes, 2026-10-27).
-- **The first 3 s / first scene must be a banger ("something is about to happen"):**
+- **The first 3 s / first scene must be a banger ("something is about to happen"), and every opening effect must be
+  BIG enough to stop a thumb:** judged as a viewer scrolling a feed on a phone, each effect (the draw-on, the hook's
+  mechanism, the ticks) is unmistakable on first watch: bold, large on screen, long enough to register, with its own
+  sound; a subtle effect counts as none. — (owner, v3, 2026-10-28: "initial animation effects like visual aspect should
+  be better and more effective at capturing people attention ... the initial drawing effect is barely visible or
+  noticeable and really don't impact or amazes me", of a 0.3 s pale draw-on and 30 px memory sticks.)
   - frame 0 is the scene being made, drawn on in the clean pen: the subject's outline (with the supporting lines)
-    first, then colour floods in within ~0.3 s (the lined films drew every line first; the owner sees the clean-pen
-    version in the next G4 look clip);
+    first, then colour floods in, as a visible event (bold line at full contrast, a moving pen tip, long enough to
+    read: ~0.3 s was invisible), never a pale wash (the lined films drew every line first);
   - voice from the first frames (the first word at ~0.12 s, the locked voice file's lead; never a silent lead);
   - the hook's claim made physical and escalating: the expected thing shown, then reality overtaking it at ~2 s,
     through the real mechanism;
@@ -230,6 +235,13 @@ Maintenance at the end).
 - **Topics: tech and AI news is the channel's focus; the existing fuss (people already arguing about it) weighs as much as
   a direct wallet hit,** and an everyday consequence beats a bigger, distant story. — (v3 G0; v4 G0: "focus on tech and AI",
   picked AI songs over the wallet pick: "good amount of fuss about AI songs", 2026-10-27).
+- **Topics: alternate the mood: a positive story after a negative one.** v2 (Google staff resigning), v3 (laptop
+  prices) and v4's first pick (AI songs and fake plays) were all bad news, so the next is a very recent, highly
+  relevant, genuinely POSITIVE AI story (e.g. AI helping find a medicine or beat a disease) with a hopeful outlook.
+  Positive never means hype: the same standards check applies (trial phase, peer review, "helped" vs "did", who
+  benefits and when). Every topic scout names the mood the next video needs. — ("we should alternate between positive
+  and more negative topics ... something very recent, extremely relevant yet very positive around AI ... a nice
+  positive outlook would be the right direction for a story", v4, 2026-10-28).
 - **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
   frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
 - **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).

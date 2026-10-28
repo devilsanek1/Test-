@@ -125,7 +125,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
 
 - **Video 4 is produced by session https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt since 2026-10-27 ~22:35 UTC**
   (owner: "okay lets continue with the video 4 production"), on branch `claude/busy-lovelace-83r39e` (the earlier v4
-  branch below merged in), merged into `video-production` on 2026-10-27 ~23:05 UTC at the owner's yes. G0.5 is RUNNING there; live state in `video/docs/v4/README.md`.
+  branch below merged in), merged into `video-production` on 2026-10-27 ~23:05 UTC at the owner's yes. 2026-10-28: G0.5 for AI songs finished (top 3 lines), then the owner switched video 4 to a positive AI story (alternate the mood); AI songs is parked whole in `video/docs/v4/archive/ai_songs/`. Live state in `video/docs/v4/README.md`.
 - Session https://claude.ai/code/session_014PwCXHBSouhcawFp12X9sT, branch `claude/tender-bardeen-j7duak`.
 - Owner: "research another video topic starting with step 1; the topic must not include Anthropic as the key entity."
 - Workflow `context/workflows/v4-g0-topics-wf_4d4df1c1-d0b.js` writes `video/docs/v4/scouting/*.md` and
@@ -143,7 +143,10 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Video 3 is produced by session https://claude.ai/code/session_01K4EiJphpZBfCkniV3UU3wR.** It is at G0 (topic
   scouting): workflow `context/workflows/v3-g0-topics-wf_b78a4844-2b3.js` writes `video/docs/v3/scouting/*.md` and
   `video/docs/v3/G0_TOPICS.md` (top 3 fresh topics for the owner to pick).
-- **v3 status (2026-10-28): rework master delivered (`deliverables/v3/v3_final.mp4`), awaiting the owner's review.** The
+- **v3 status (2026-10-28): DONE.** The owner posted the reworked reel and closed it ("It's done"). Their notes on the
+  posted reel are rules for the next videos (playbook): words follow the voice (no title over the captions), words in
+  the picture few and big, every opening effect big enough to stop a thumb. `deliverables/v3/v3_final.mp4` is the
+  latest master, with the text fixes. Earlier status: rework master delivered, awaiting the owner's review. The
   final step's report (master facts, checks, cover frame 192, what is deferred): `video/docs/v3/rework_reports/assembly_final.md`.
   - The hook pilot (SQA 0-5.80) was sent to the owner: `deliverables/v3/v3_rework_pilot.mp4`.
   - Five max-effort fix lanes are done and pushed. Their reports are in `video/docs/v3/rework_reports/`:

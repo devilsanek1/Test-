@@ -95,7 +95,8 @@ A clash is a bug: fix the lower doc in the same turn.
   every map-critical frame; `lib/depth.ts` parallax helper); a zoom is a visible story move or a carrier; no roll, no compound moves; visuals
   lead their word by ~0.1 s. -> `G3_ANIMATIC.md` §4; `PIPELINE_V2.md` "Frame rate"; `COZY_AND_SCALE.md` 3b.5.
 - **9. The opening is a banger.** Frame 0 is the scene being drawn, in the clean pen: the subject's outline (with B's
-  tinted lines) draws on, C lands as flat pale shapes and colour floods in within ~0.3 s, with the captions in the voice's order (frame 0 shows the first spoken line, the
+  tinted lines) draws on, C lands as flat pale shapes and colour floods in, as a bold event a scrolling viewer can't miss (~0.3 s was
+  invisible: owner, 2026-10-28; every opening effect large, long enough to register, with its own sound), with the captions in the voice's order (frame 0 shows the first spoken line, the
   payoff in words by ~2 s; no title over them: playbook Hook and pacing),
   the voice from the first frames (the first word at ~0.12 s, the locked voice file's lead) and a positive phone sound
   in the first second; the hook made physical in ONE continuous shot (the expected thing, then reality overtaking it
