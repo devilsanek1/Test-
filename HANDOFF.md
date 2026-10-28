@@ -291,11 +291,13 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Commands for a current film (vN, 60 fps; from `video/`):** the scaffold, one-panel previews, the owner's gate render
   and the scripted gate check are in `video/docs/G5_BLOCKING.md` §1, §4 and §7 (template: v3's `src/entry-v3-film.tsx`,
   compositions `FilmN`, `FilmN-<ID>`); the owner's cut from G5 on renders at full size, chunked per panel (§8b there);
-  the G3 reel renders at 540p60; finals get the TV-range conversion below.
+  the G3 reel renders at 540p60; finals render in one step with `scripts/render-media.mjs --master` (`video/docs/PIPELINE_V2.md`
+  "Master encode": lossless frames, one BT.709 encode; the TV-range pass below is v1's only, it relabelled BT.601 as BT.709).
 - **v1's commands (30 fps `Main`, kept for v1; from `video/`):**
   - Final render: `npx remotion render src/entry-film.ts Main out/X.mp4 --crf 14`. Then convert to TV range:
     `ffmpeg -i out/X.mp4 -vf "scale=in_range=full:out_range=tv,format=yuv420p" -c:v libx264 -crf 14 -preset slow -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -c:a copy -movflags +faststart out/X_tv.mp4`.
-    Remotion's output is full-range yuvj420p, which some players show wrongly.
+    Remotion's output is full-range yuvj420p, which some players show wrongly. (2026-10-28: this pass keeps BT.601
+    coefficients under a BT.709 tag, 1-2.5 dE off, and re-encodes; new films use `--master` instead.)
   - Stills, strips and dev comps: `node scripts/render-frames.mjs`, `scripts/still.sh`, `scripts/strip.sh` and
     `scripts/sheet.sh`. The dev comps are in `src/dev/registry.ts`.
   - Sound: `python3 audio/mix.py --music cinematic --out audio/mix.wav && cp audio/mix.wav public/mix.wav`
