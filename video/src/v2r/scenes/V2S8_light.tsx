@@ -12,26 +12,24 @@
 import React from 'react';
 import {CastShadow, ContactShadow, LightPool, ShadowLayer, WindowSpill, poolUnder, relit} from '../../lib/light';
 import {useTime} from '../../lib/time';
-import {CM} from '../palette';
 import * as MAP from '../world/map';
 import {B_GEOM} from '../kit/boards';
 import {herAt, lampRunAt, S8T} from './V2S8_clock';
-import {S8Plane, onPlane} from './V2S8_depth';
+import {S8Plane} from './V2S8_depth';
 import {OWNER, S8_BOLLARD} from './V2S8_board';
 import {WALKERS, walkerAt} from './V2S8_cast';
-
-/** The lamps whose pools are drawn here (V2S8_house HOUSE_LAMP; V2S8_set NLAMP's column x): foot + height, landing coords. */
-const HOUSE_LAMP = {x: 992, y: 1078, h: 450} as const;
-const NLAMP = {x: 1068} as const;
+import {HOUSE_LAMP} from './V2S8_house';
+import {NLAMP} from './V2S8_set';
 
 // ---------------------------------------------------------------- ground light
 
-/** The forecourt's paving under W (the house band, her plane) and the near band's paving (one value step darker). */
-const FORECOURT = '#EADCCB';
-const NEAR_PAVING = onPlane(CM.paving, 'near');
-/** A pool's two flat steps over a ground: the ring +4 L*, the core +7 L*, both warmer (conform_L6 §6: "+4 L* over the
- *  paving, two flat steps, one lamp at a time"). */
-const poolOn = (ground: string): [string, string] => [relit(ground, 4, {warm: 30}), relit(ground, 7, {warm: 30})];
+/** The grounds the light lands on, as the set paints them (the A side of check_light, measured at 38.0): the forecourt
+ *  setts under W and the heritage lamp (L* 89.0), the near band's paving under the near lamp (L* 82.7). */
+const FORECOURT = '#EEDCCC';
+const NEAR_PAVING = '#E1CAB4';
+/** A pool's two flat steps over a ground: the ring +4.5 L*, the core +7 L*, both warmer (conform_L6 §6: "+4 L* over
+ *  the paving, two flat steps, one lamp at a time"; check_light: each light shape >= its ground + 4). */
+const poolOn = (ground: string): [string, string] => [relit(ground, 4.5, {warm: 30}), relit(ground, 7, {warm: 30})];
 
 /** W's spill: from the forecourt's foot of the facade under W (y 1060), widening toward us over the setts. */
 const W_RECT: [number, number, number, number] = [MAP.W.x - MAP.W.w / 2, MAP.W.y - MAP.W.h / 2, MAP.W.w, MAP.W.h];
@@ -42,14 +40,15 @@ export const S8HouseBandLight: React.FC = () => {
   const t = useTime();
   return (
     <S8Plane p="house">
-      {t >= S8T.wLights ? <WindowSpill win={[W_RECT[0], 1060 - W_RECT[3] * 0.3, W_RECT[2], W_RECT[3] * 0.3]} base={1061} widen={1.4} depth={0.32} color={relit(FORECOURT, 4, {warm: 30})} /> : null}
+      {t >= S8T.wLights ? <WindowSpill win={[W_RECT[0], 1060 - W_RECT[3] * 0.3, W_RECT[2], W_RECT[3] * 0.3]} base={1061} widen={1.4} depth={0.32} color={relit(FORECOURT, 4.5, {warm: 30})} /> : null}
       {t >= lampRunAt('houseLamp') ? <LightPool pool={HOUSE_POOL} colors={poolOn(FORECOURT)} /> : null}
     </S8Plane>
   );
 };
 
-/** The near lamp's pool on the near band (switch-on 1 of the run, f2237). */
-const NEAR_POOL = {cx: NLAMP.x - 120, cy: 1650, rx: 150, ry: 38};
+/** The near lamp's pool round its foot on the near band (switch-on 1 of the run, f2237): under its lantern, CRAFT §d.7's
+ *  rx 3.5x the lantern's half-width. */
+const NEAR_POOL = poolUnder({c: [NLAMP.lantern.x, (NLAMP.lantern.y0 + NLAMP.lantern.y1) / 2], halfW: NLAMP.lantern.w / 2}, NLAMP.foot, {k: 3.5});
 export const S8LaneLight: React.FC = () => {
   const t = useTime();
   if (t < lampRunAt('nearPool')) return null;
