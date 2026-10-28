@@ -17,11 +17,11 @@ import {CastShadow, ContactShadow, ShadowLayer} from '../../lib/light';
 import {XG, mat} from '../../lib/xf';
 import {polyPath} from '../../lib/sketch';
 import {S5} from '../world/map';
-import {NewsBox as K3NewsBox, Plaque as K3Plaque, WorldText, TYPE, TXT_NEWS_BOX} from '../kit/boards';
-import {NEWS_BOX, SMALL_COLORS} from '../kit/boards/small';
+import {NewsBox as K3NewsBox, Plaque as K3Plaque, WorldText, TYPE, TXT_NEWS_BOX, plaqueLayout} from '../kit/boards';
+import {NEWS_BOX, SMALL_COLORS, popK} from '../kit/boards/small';
 
 /** The plaque's END spot (K3 Plaque: x = centre, y = the plate's bottom edge when stand = false). */
-export const PLAQUE_SPOT = {x: 605, y: 1246, stand: false};
+export const PLAQUE_SPOT = {x: 605, y: 1237, stand: false};
 
 const rectD = (x0: number, y0: number, x1: number, y1: number) => polyPath([[x0, y0], [x1, y0], [x1, y1], [x0, y1]]);
 
@@ -67,4 +67,25 @@ export const NewsBox: React.FC = () => {
   );
 };
 
-export const Plaque: React.FC<{at: number}> = ({at}) => <K3Plaque at={at} x={PLAQUE_SPOT.x} y={PLAQUE_SPOT.y} stand={PLAQUE_SPOT.stand} />;
+/** The plaque is tier A from its pop (conform_L4 §5: "the Pentagon + the plaque (from 22.43)"): K3's closed outline.
+ *  Its light (the rig's family, V2S5_light; at the end the sun is upper right): the strip where its plate meets the
+ *  terrace and its cast, falling left and toward us; both pop with the plate (K3's build pop from its foot). */
+export const Plaque: React.FC<{at: number}> = ({at}) => {
+  const t = useTime();
+  if (t < at) return null;
+  const {x, y, stand} = PLAQUE_SPOT;
+  const L = plaqueLayout(TYPE.key, undefined, stand);
+  const x0 = x - L.w / 2;
+  const x1 = x + L.w / 2;
+  return (
+    <>
+      <XG m={mat.about(mat.scale(popK(t, at, 0.25)), x, y)}>
+        <ShadowLayer>
+          <CastShadow x={x} y={y} w={L.w} pts={[[x0, y - 3], [x1 + 3, y - 3], [x1 + 3, y + 2], [x0, y + 2]]} h={L.h} />
+          <ContactShadow x={x + 1.5} y={y + 1} w={L.w + 3} k={1.02} h={10} />
+        </ShadowLayer>
+      </XG>
+      <K3Plaque at={at} x={x} y={y} stand={stand} tier="subject" />
+    </>
+  );
+};
