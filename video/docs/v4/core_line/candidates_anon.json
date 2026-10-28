@@ -1,0 +1,378 @@
+[
+ {
+  "id": "L1",
+  "line": "Almost nobody listens to AI songs. They still take money from your favourite artist.",
+  "frame0": "AI SONGS: NOBODY LISTENS, ARTISTS PAY",
+  "emotion": "",
+  "backing": "",
+  "payoff": ""
+ },
+ {
+  "id": "L2",
+  "line": "Half of one app's new songs aren't human.",
+  "frame0": "HALF OF NEW SONGS AREN'T HUMAN",
+  "emotion": "",
+  "backing": "",
+  "payoff": ""
+ },
+ {
+  "id": "L3",
+  "line": "A man got 18 months for having bots play his AI songs.",
+  "frame0": "PRISON FOR HAVING BOTS PLAY HIS SONGS",
+  "emotion": "Surprise, then a moral itch: 'prison, for that? Who did he even hurt?' Robots playing a man's own songs sounds victimless, so a normal viewer has to find out who got robbed, and a real, recent sentence makes it instantly believable.",
+  "backing": "FL 1.8 (its own safe wording), 4.9 (18 months, sentenced 2026-10-06), 4.10 (prosecutors: hundreds of thousands of AI songs, billions of bot plays, paid for years), 3.1-3.3 and 3.7 (the shared pot); pair any harm claim with 4.14-4.15 and 8.6 (contested: never 'stole $8M from artists'); 7.10 (no AI tool named).",
+  "payoff": "It answers 'who did he rob?': streaming doesn't pay per play, each month's money is a shared pot split by share of all plays, so every bot play that got past the filters was paid out of the same pot as every real artist, a sliver from each."
+ },
+ {
+  "id": "L4",
+  "line": "A song can get paid without a single real listener.",
+  "frame0": "PAID WITHOUT A SINGLE REAL LISTENER",
+  "emotion": "Disbelief with a sting of unfairness: everyone assumes you get paid when people listen, and real musicians fight for every listener, so a song earning with nobody real listening breaks the most basic rule and begs 'how, and whose money?'",
+  "backing": "FL 4.10, 4.12 (bot accounts playing AI songs, paid for years before the charges), 2.4-2.5 (one app: up to 85% of AI-track plays fake in 2025, fake plays the main reason they're uploaded), 3.1-3.3, 3.7 (the pot split by share of plays), 4.1-4.2, 8.2 ('can': caught fakes earn nothing, some slip through).",
+  "payoff": "Bots do the listening, and since each month's money is a shared pot split by share of all plays, a fake play that slips past the filters takes its slice from the same pot that pays every real artist, leaving each of them a little less, by an amount nobody has measured."
+ },
+ {
+  "id": "L5",
+  "line": "Bots can shrink your favorite artist's paycheck.",
+  "frame0": "BOTS CAN SHRINK YOUR FAVORITE ARTIST'S PAYCHECK",
+  "emotion": "Protective indignation plus a 'how?': nearly everyone has a favorite artist they want paid fairly, and robots reaching that pay without touching their songs sounds impossible, so the viewer stays for the trick; the 'you' is natural because the loss is the artist's, never the viewer's.",
+  "backing": "FL 3.2-3.3, 3.7 (Spotify: 'as total streams grow, you need more streams to maintain the same share'), 7.4 (Spotify: spam 'can dilute the royalty pool'), 6.4 (Apple: 'This is a zero-sum game'), 4.1-4.2, 8.2 ('can': only uncaught fakes), 8.1 and 7.6 (size unmeasured, Deezer calls it 'minimal on Deezer': the payoff says 'a little'), 3.6 ('paycheck' is fair shorthand).",
+  "payoff": "The bots never need to touch your artist's songs: each month's money is a shared pot split by share of all plays, so every fake play that slips past the filters makes every real slice a little thinner, your artist's included, by an amount nobody has measured."
+ },
+ {
+  "id": "L6",
+  "line": "Your subscription gets split with songs you've never heard.",
+  "frame0": "SONGS YOU'VE NEVER HEARD SHARE YOUR FEE",
+  "emotion": "Personal surprise and a small sting: people assume their monthly fee goes to the artists they play, so learning it's pooled with songs they've never heard feels like finding out your tip went into one jar for the whole street; the 'you' is natural because it is literally their money.",
+  "backing": "FL 3.3 (the pot is that market's subscription and ad money), 3.2 (split by share of all plays), 3.11 (safe wording: 'Your monthly fee goes into the shared pot, not just to the artists you play'), 3.6; the bot half qualified per 4.1-4.2 and 8.2 (never 'your subscription pays for AI songs').",
+  "payoff": "The loop closes on its own words: some of those songs no human has heard at all, only bots, and while most of those fake plays get caught and stripped out, the ones that slip through take a slice of the same shared pot your fee went into, leaving every real artist you play a little less."
+ },
+ {
+  "id": "L7",
+  "line": "Who pays when a bot plays an AI song?",
+  "frame0": "WHO PAYS WHEN BOTS PLAY AI SONGS?",
+  "emotion": "Curiosity with a whiff of unfairness: it sounds like a riddle with a real answer; most people would guess 'the app pays', so the hint that someone else covers a robot's 'listening' itches until it's answered.",
+  "backing": "FL 3.1-3.3 (no per-play rate; a shared pot per country per month, split by share of plays), 3.7, 6.4 ('This is a zero-sum game'), 4.1-4.2 and 3.13 (caught fakes stripped out: the honest 'nobody' half), 8.1-8.2 (the uncaught share is unmeasured), 2.4, 4.10 (bots playing AI songs is real); 4.3, 4.5 (bots play human songs too: never imply it's only AI).",
+  "payoff": "The answer has two halves: if the filters catch it, nobody, because caught fakes are stripped out of the pot; if it slips through, every real artist in that month's shared pot pays a sliver, by an amount nobody has measured."
+ },
+ {
+  "id": "L8",
+  "line": "Why would anyone make songs just for bots?",
+  "frame0": "WHY MAKE SONGS JUST FOR BOTS?",
+  "emotion": "Bafflement that turns into suspicion: songs with an audience of robots sound absurd and a bit eerie, a normal person can't think of a reason, and the only answer that fits, money, raises the real question: whose money?",
+  "backing": "FL 2.5 (one app: fake streams are 'the main purpose for uploading AI-generated music'), 4.10-4.11 (Smith's email: 'a TON of content with small amounts of Streams'), 2.3-2.4, 3.1-3.3, 3.7, 4.1-4.2, 8.2; 5.13, 6.12 (say that plenty of AI-using artists want real fans: fraud, not AI).",
+  "payoff": "Because streaming doesn't pay per play: each month's money is a shared pot split by share of all plays, so a song nobody wants plus fake plays that slip past the filters can pull a real slice out of the same pot that pays every real artist."
+ },
+ {
+  "id": "L9",
+  "line": "One streaming app found most plays on AI songs were fake.",
+  "frame0": "ONE APP: MOST AI-SONG PLAYS WERE FAKE",
+  "emotion": "Shock and suspicion: a play count is something everyone trusts at a glance, so hearing that most plays on AI songs were fake makes a normal person ask who fakes plays, and why that would ever pay.",
+  "backing": "FL 2.4 ('up to 85% of these streams were fraudulent in 2025, depending on the month'), section 9 step 2 ('most of the plays they do get are fake', on Deezer's numbers only), 8.4 (say 'one app'; small 'Deezer, 2025' credit on frame 0), 2.5, 4.2, 3.1-3.3; 4.3 and the Never-say list: the problem is fake plays, not AI songs.",
+  "payoff": "It answers 'why fake the plays?': each month's money is a shared pot split by share of all plays, so a faked play is a claim on real money; that app caught and stripped out the fakes it found, but any that slip past the filters take their slice from every real artist in the pot."
+ },
+ {
+  "id": "L10",
+  "line": "Bots want a slice of Spotify's $11 billion payout.",
+  "frame0": "BOTS WANT A SLICE OF $11 BILLION",
+  "emotion": "Heist intrigue: a huge, concrete pile of money from an app everyone uses, and robots trying to sneak a piece of it; a normal person wonders how a robot could get paid at all, and whose share it comes out of.",
+  "backing": "FL 3.4 ('Spotify paid out $11 billion last year'), 3.1-3.3 (no per-play rate; split by share of plays, per country per month: never 'one pot'), 3.7, 6.4, 4.1 and 7.1 (Spotify doesn't pay for fakes it catches: give it credit), 4.10, 4.15 (fakes have got through before), 8.1-8.2.",
+  "payoff": "There's no per-play rate: each month, in each country, that money is a shared pot split by share of all plays, so any fake play that slips past the filters takes its slice out of the same payout as every real artist, a sliver from each."
+ },
+ {
+  "id": "L11",
+  "line": "On one app, the biggest fans of AI songs are bots.",
+  "frame0": "THE BIGGEST AI SONG FANS? BOTS.",
+  "emotion": "Amused disbelief that turns into suspicion. Everyone knows what a fan is, so robots in headphones being a song's top fans is absurd and funny, and it makes people ask 'why would anyone want bot fans?'. It rides the 'is any of this even real?' fuss without claiming your playlist is fake.",
+  "backing": "FL 2.4 (on fully AI tracks, up to 85% of plays were fake in 2025, depending on the month), FL 2.3 (AI gets 1-3% of plays), FL 2.5, section 9 step 2 ('most of the plays they do get are fake'), FL 8.4 (Deezer's data only, hence 'on one app' in the voice and a small 'one app' tag under the cover).",
+  "payoff": "Bot fans are worth faking because streaming money sits in a shared pot each month, split by each track's share of all plays: the fakes the filters catch get stripped out, but every fake play that slips through takes a slice, so every real artist's slice gets a little thinner, by an amount nobody has measured."
+ },
+ {
+  "id": "L12",
+  "line": "Your favorite artist is splitting the pot with bots.",
+  "frame0": "REAL ARTISTS SPLIT THE POT WITH BOTS",
+  "emotion": "Protective indignation for someone you love. People feel loyal to their favorite artist, and a robot getting a seat at that artist's money table feels plainly unfair; 'what pot?' adds a curiosity gap. The 'you' is natural: the viewer isn't the loser, their artist is.",
+  "backing": "FL 3.1-3.3 (no per-play rate; a pot per country per month, split by share of plays), FL 3.6 ('artists get paid from the pot' is fair shorthand), FL 3.7 and 7.4 (Spotify: as total streams grow you need more to keep your share; spam 'can dilute the royalty pool'), FL 6.4 (Apple Music's boss: 'This is a zero-sum game'), FL 4.1-4.2 (caught fakes stripped out), FL 8.2 (some slip through), FL 8.1 (no measured size, so never a number).",
+  "payoff": "We draw the pot your artist is paid from: every month, in every country, it's split by share of plays; the fakes the filters catch get thrown out, but the ones that slip through count like real plays and take a slice, so your artist's slice gets a little thinner, by an amount nobody has measured."
+ },
+ {
+  "id": "L13",
+  "line": "Nearly 90,000 AI songs hit one app every day, mostly for bots.",
+  "frame0": "90,000 AI SONGS DAILY. MOSTLY FOR BOTS.",
+  "emotion": "Scale shock ('90,000 a DAY?') snapping into confusion ('made for BOTS?'). It's the flood everyone has heard about, with the twist nobody expects: the audience isn't people.",
+  "backing": "FL 2.1 (nearly 90,000 fully AI tracks a day on one app; the voice keeps 'nearly'), FL 2.5 (that app says fake plays are the main reason AI songs get uploaded, so the voice adds 'it says'), FL 8.4 (one app's figures, tagged on the cover), FL 2.3 (1-3% of plays), FL 3.9-3.10 (most never reach Spotify's pay line), FL 3.1-3.3, FL 8.2.",
+  "payoff": "A song nobody plays earns nothing (most never cross the pay line), so the money is in the fake plays: streaming pays from a shared pot split by share of plays, and every fake play that slips past the filters takes a slice from every real artist."
+ },
+ {
+  "id": "L14",
+  "line": "Bots fake the plays, but the money they skim is real.",
+  "frame0": "AI SONGS. FAKE PLAYS. REAL MONEY.",
+  "emotion": "The gut 'that's a scam' reaction: everyone feels fake shouldn't pay, and 'real money' opens the loop 'whose money?', which the video closes. 'Skim' is honest about the size: small, sneaky slices, not a heist.",
+  "backing": "FL 2.4 (up to 85% of plays on fully AI tracks were fake in 2025), FL 4.10 and 4.12 (bot plays brought one man $14M+, per prosecutors), FL 3.2-3.3 and 3.7 (the pot is split by share of plays), FL 4.1-4.2 (caught fakes earn nothing), FL 8.2 (some slip through; nobody knows how many).",
+  "payoff": "The money isn't new: it comes out of the same shared pot that pays every real artist, split by share of plays, so every fake play the filters miss skims a sliver off all of them."
+ },
+ {
+  "id": "L15",
+  "line": "Can't spot an AI song? Your app can't always spot a bot.",
+  "frame0": "CAN'T SPOT AI? APPS MISS BOTS TOO.",
+  "emotion": "Relief that it isn't just you (most people can't tell), flipped into unease that the app gets fooled too. It rides the hottest public question, 'can I even tell?', and turns it toward the question that costs artists money.",
+  "backing": "FL 5.1 and 8.7 (97% failed one 3-track blind test, so it's asked, never stated as 'you can't'), FL 7.3 (Spotify: detection 'will only get harder'), FL 8.5 and 8.2 (filters miss some fake plays; nobody knows how many), FL 4.1-4.2 (caught fakes stripped out), FL 3.2-3.3.",
+  "payoff": "Apps strip out the fakes they catch, but the ones they miss count like real plays in a shared pot split by share of plays, so each one takes a sliver from every real artist, whether or not anyone can tell the song is AI."
+ },
+ {
+  "id": "L16",
+  "line": "Some of your monthly fee can end up paying for fake plays.",
+  "frame0": "YOUR STREAMING FEE CAN END UP WITH BOTS",
+  "emotion": "A personal 'wait, MY money?'. People know what they pay each month and assume it goes to the artists they play, so learning that a slice can end up with a scammer's fake plays feels like being used, without casting them as losing anything they don't feel.",
+  "backing": "FL 3.11 (your fee goes into the shared pot, not just to the artists you play), FL 3.3 (each country's pot is filled from subscription and ad money), FL 3.2, FL 4.1-4.2 (caught fakes earn nothing), FL 8.2 (some slip through); 'some' and 'can end up' are the qualifiers the Never-say list asks for.",
+  "payoff": "Your fee goes into a shared pot, not straight to the artists you play, and the pot is split by share of all plays, so the fake plays that slip past the filters take a slice of it, and every real artist's slice gets a little thinner."
+ },
+ {
+  "id": "L17",
+  "line": "Bots play AI songs on repeat, so who pays?",
+  "frame0": "BOTS STREAM AI SONGS NONSTOP. WHO PAYS?",
+  "emotion": "Indignation plus a question to the viewer: robots streaming songs all day is absurd, and 'who pays?' makes people guess (most guess 'the app' or 'nobody'), so the real answer lands as the 'oh'.",
+  "backing": "The Never-say list's safe wording ('Fake accounts play their own songs, on repeat, all day'), FL 2.4, FL 4.10-4.12 (up to 10,000 bot accounts at once), FL 4.1-4.2 and 3.13 (caught fakes stripped out), FL 3.2-3.3 and 3.7, FL 8.1-8.2, FL 4.3 and 4.5 (bots go wherever the money is, human songs too).",
+  "payoff": "If the filters catch them, nobody: those plays get stripped out; if they slip through, every real artist in the same shared pot pays a sliver, because the pot is split by share of plays, and nobody has measured how big that sliver is."
+ },
+ {
+  "id": "L18",
+  "line": "Could you even tell if a song was AI?",
+  "frame0": "BLIND TEST: 97% COULDN'T TELL. COULD YOU?",
+  "emotion": "Pride, poked. Almost everyone is sure they would hear it. So a true stat, that 97% of 9,000 people failed a blind test, makes you doubt your own ears for a second and want to test yourself or argue in the comments. It is the question everyone is already asking, put to you.",
+  "backing": "FL 5.1 (VERIFIED: 9,000 adults in 8 countries, 3 tracks, 97% failed; safe: 'In a blind test, 97% of 9,000 people couldn't tell which songs were AI'); FL 8.7 (keep 'blind test' on screen, never a universal claim). The turn to money rests on FL 3.1-3.3, 3.11, 2.4, 4.1-4.2, 4.10, 8.2 and 8.5.",
+  "payoff": "It answers 'probably not', then moves from your ears to your fee (a shared pot split by plays, bots playing cheap AI songs on repeat, and the fake plays that slip past the filters thinning every real artist's slice), and it closes on the echo that you can't always tell a song is AI, the pot can't tell a fake play from a real one either, and only the filters can, though they miss some."
+ },
+ {
+  "id": "L19",
+  "line": "Part of your music subscription can end up paying a bot farm.",
+  "frame0": "PART OF YOUR FEE CAN PAY BOTS",
+  "emotion": "Indignation about your own money. You pay so the music you love gets paid, so picturing even a sliver of that fee landing with a fraudster's fake accounts feels like finding a stranger's hand in your tip jar.",
+  "backing": "FL 3.3 (the pot is filled by subscription and ad money, per country, per month); FL 3.11 (safe: 'Your monthly fee goes into the shared pot, not just to the artists you play'); FL 3.2 (split by share of plays); FL 4.10 (one scheme ran up to 10,000 bot accounts and got paid for years); FL 8.2 (some slip through and nobody knows how many). 'Part of' and 'can' cover FL 4.1-4.2 (caught fakes earn nothing), as in the Never-say fix for 'Your subscription pays for AI songs'.",
+  "payoff": "It follows your fee into the shared pot and shows that the pot is split by plays, so a bot farm's nonstop plays on cheap AI songs count like real listening unless the filters catch them; it credits the platforms for stripping most of them out and lands on the rest getting paid from the same pot as your favorite artist, by an amount nobody has measured."
+ },
+ {
+  "id": "L20",
+  "line": "Some bots pay a fee like yours, then play all day.",
+  "frame0": "THIS BOT PAYS LIKE YOU. PLAYS NONSTOP.",
+  "emotion": "The 'wait, that's the trick?' click, then a sense of unfairness. You'd assume bots are freeloaders, so learning that they pay in just like you and then never stop pressing play makes the scam suddenly make sense. You feel the gap between that and your own hour of listening.",
+  "backing": "FL 4.16 (Smith bought the streaming accounts his bots used, paying fees into the pools); FL 3.11 (under pro-rata, an account that plays round the clock can take out more than its fee put in); FL 4.12 (his own math: about 1,000 bot accounts, 661,000 plays a day); the Never-say list's own wording, 'Fake accounts play their own songs, on repeat, all day'; FL 3.2-3.3; FL 4.1-4.2 (caught plays earn nothing).",
+  "payoff": "It answers why a bot would pay at all: the pot is split by plays, not by people, so an account that never stops playing (cheap AI songs give it endless tracks to spread the plays across) takes more out than its fee put in, from every real artist's slice, unless the filters catch it, and it ends on your phone next to the bot's: the same fee, but only one of you was listening."
+ },
+ {
+  "id": "L21",
+  "line": "Most AI songs aren't even made for you, one app says.",
+  "frame0": "MOST AI SONGS AREN'T MADE FOR YOU",
+  "emotion": "Relief that turns into suspicion. The whole fuss assumes AI songs are out to fool your ears, so hearing that most aren't meant for people at all makes you ask the next question yourself: then who are they for, and who's paying?",
+  "backing": "FL 2.5 (Deezer: generating fake streams is 'the main purpose for uploading AI-generated music'; safe: 'One app says most AI songs are uploaded to farm fake plays', so the line says 'one app says' and frame 0 carries a small 'Deezer, Jan 2026' tag); FL 2.3 (1-3% of plays); FL 2.4 (up to 85% of their plays were fake in 2025); FL 3.10 (Spotify: likely-AI tracks are 10x likelier to earn nothing); FL 4.11 (Smith: 'a TON of content with small amounts of Streams'). Keep it on Deezer's numbers, never Spotify's 50M (FL 8.10).",
+  "payoff": "It answers 'then who for?' with one app's own finding (bots farming fake plays) and shows why that pays: your fee sits in a shared pot split by plays, so fake plays that slip past the filters take a slice from every real artist, and the last line asks who that song was made for, then answers: the pot."
+ },
+ {
+  "id": "L22",
+  "line": "Bots that slip through shrink your favorite artist's slice.",
+  "frame0": "UNCAUGHT BOTS SHRINK YOUR FAVORITE ARTIST'S SLICE",
+  "emotion": "Protective loyalty. Most people have an artist they stream on purpose to support. The idea that fake plays they'll never hear make each of those plays worth less to that artist stings, and it puts the loss on the artist, where it really falls, not on you.",
+  "backing": "FL 3.2 and 3.7 (your slice is your share of all plays; Spotify: 'as total streams grow, you need more streams to maintain the same share'); FL 7.4 (Spotify: spam 'can dilute the royalty pool'); FL 6.4 (Apple: 'This is a zero-sum game'); FL 4.1-4.2 (caught fakes are stripped out, hence 'slip through'); FL 8.1 and section 9 step 6 (thinner by an amount nobody has measured, so never a number).",
+  "payoff": "It shows your plays filling your artist's slice of a shared pot split by everyone's plays, then a bot farm's uncaught plays growing the total so every real slice gets thinner, and it ends plainly: most fakes get caught and stripped out, and the ones that slip through thin the slice by an amount nobody has measured."
+ },
+ {
+  "id": "L23",
+  "line": "Your monthly fee doesn't just pay the artists you play.",
+  "frame0": "YOUR FEE DOESN'T JUST PAY YOUR ARTISTS",
+  "emotion": "A 'wait, what?' about your own money. Most people assume their subscription follows their listening, so finding out it's pooled and split by everyone's plays makes you wonder who else it's paying. The answer can include bots.",
+  "backing": "FL 3.11 (VERIFIED mechanism; its safe wording almost word for word: 'Your monthly fee goes into the shared pot, not just to the artists you play'); FL 3.1-3.3 (no per-play rate; a shared pot per country per month, split by share of plays); FL 3.6 ('artists get paid from the pot' is fair shorthand). The bot turn rests on FL 4.1-4.2, 4.10 and 8.2.",
+  "payoff": "It answers 'then who does it pay?': every track with counted plays in your country that month, which is why bots playing cheap AI songs on repeat want in, and why fake plays that slip past the filters get a slice of your fee next to every real artist; it ends on your coin in the pot: your fee pays for every play that counts, so the fight is over which plays count."
+ },
+ {
+  "id": "L24",
+  "line": "You might already like an AI song.",
+  "frame0": "YOU MIGHT ALREADY LIKE AN AI SONG",
+  "emotion": "A small 'wait, which one?' jolt. It accuses nobody and claims nothing about your playlist. It just says out loud what people half-suspect after a blind test that 97% failed and AI tracks with millions of plays, and it sends you back through the songs you've saved.",
+  "backing": "FL 5.1 and 8.7 (in a blind test, 97% of 9,000 people couldn't tell); FL 5.6 (an AI cover drew 14M+ Spotify plays in its first month; words only, never played); FL 5.7 (an AI 'band' with 550,000+ monthly listeners); FL 5.5 (Sweden's No. 1 Spotify song was mainly AI). 'Might' keeps it a possibility, never a claim about anyone's playlist. The fairness turn rests on FL 5.13 and 7.4 ('all music is treated equally'), the money turn on FL 3.2-3.3, 3.11, 4.1-4.2 and 8.2.",
+  "payoff": "It says that part is fine, since a song real people choose to play gets paid like any other, then turns to plays no person ever made (bots playing cheap AI songs on repeat), which take a slice of the pot your fee fills when they slip past the filters, and it ends on 'Like what you like. It's the fake plays that take the slice.'"
+ },
+ {
+  "id": "L25",
+  "line": "One man's bots played his AI songs on your apps for years.",
+  "frame0": "HIS AI SONGS. HIS BOTS. YOUR APPS.",
+  "emotion": "Indignation with a news hook. A real man just got 18 months for this, and it ran for seven years on the apps you open every day. That makes it feel close and makes you ask how it was even possible.",
+  "backing": "FL 4.10 (2017-2024 on Spotify, Apple Music, Amazon Music and YouTube Music; hundreds of thousands of AI songs and billions of bot plays, prosecutors say); FL 1.8 and 4.9 (18 months, forfeits $8,091,843.64, sentenced 6 Oct 2026); FL 4.11 (his email: 'a TON of content with small amounts of Streams'); FL 7.10 (no AI tool named); FL 4.14-4.15 and 8.6 (the harm is contested, so both sides go on screen, never 'he stole $8M from artists').",
+  "payoff": "It shows how it paid: his bot plays, spread thin across a ton of AI songs to dodge the filters, drew from the same kind of shared pot your subscription fills, split by plays, until he was caught (18 months and $8 million forfeited, though his lawyers say no artist lost out), and it ends on today's filters stripping out most fakes while the ones that still slip through take a slice from every real artist."
+ },
+ {
+  "id": "L26",
+  "line": "The biggest fans of AI songs are bots.",
+  "frame0": "AI SONGS' BIGGEST FANS ARE BOTS",
+  "emotion": "Amused disbelief that turns into suspicion. Everyone assumes a flood of AI songs means somebody wants them; picturing the 'fans' as rows of bots with headphones is funny and a little creepy, and it raises a question a normal person can't answer: why would bots play songs at all?",
+  "backing": "FL 2.4 (Deezer: up to 85% of plays on fully AI tracks were fake in 2025, depending on the month; the row's fact: most of their plays were fake), FL 2.3 (AI gets 1-3% of all plays), FL 2.5 (fake plays are the main reason AI songs get uploaded), the Never-say table's own 'say instead' ('Real people barely play them. Bots do.'), FL 4.10 (Smith's bot plays). Scope per FL 8.4: the second line says 'on one app' and dates the 85% to 2025; FL 5.13 (plenty of people like some AI music) stays in as the fairness beat.",
+  "payoff": "The end answers why bots would be fans: streaming pays out of a shared monthly pot split by each track's share of the plays, so every fake play that slips past the filters shaves a little off every real artist's slice (caught ones are stripped out, and nobody knows how many get through)."
+ },
+ {
+  "id": "L27",
+  "line": "His AI songs got billions of plays, and he got 18 months.",
+  "frame0": "BILLIONS OF PLAYS. 18 MONTHS IN PRISON.",
+  "emotion": "Whiplash: 'billions of plays' sounds like a superstar and '18 months' sounds like a crook, so the gap demands an explanation, with a jolt of justice on top; it is one real person, not a plural headline.",
+  "backing": "FL 1.8 and 4.9 (Michael Smith, sentenced 2026-10-06 to 18 months; forfeits $8,091,843.64), FL 4.10 (prosecutors: 'hundreds of thousands' of AI songs played 'billions' of times by up to 10,000 bot accounts at once; on screen with a 'prosecutors say' credit, and 'over a billion' is the floor), FL 4.11 (his own email: 'a TON of content with small amounts of Streams'), FL 7.10 (no AI tool named or drawn). FL 4.14-4.15 and 8.6: never 'he stole $8 million from artists'; his lawyers' denial gets its line.",
+  "payoff": "We show the plays came from his own bots and why that's a crime: streaming pays from a shared pot split by plays, so fake plays that slip past the filters (his did, for years) shrink every real artist's slice; the apps now strip out the fakes they catch, but nobody knows how many still get through."
+ },
+ {
+  "id": "L28",
+  "line": "An AI song nobody hears can still make money.",
+  "frame0": "AI SONGS NOBODY HEARS CAN MAKE MONEY",
+  "emotion": "Unfairness wrapped in curiosity: it breaks the rule everyone takes for granted (no listeners, no money), and the instant follow-up is 'whose money?', which is exactly where real artists come in.",
+  "backing": "FL 3.1-3.3 (no per-play rate; one shared pot per country per month, split by share of plays), FL 3.7 (more plays in the pot, smaller slices for everyone else), FL 2.4 (most plays on fully AI tracks were fake in 2025, on one app), FL 4.10 (Smith took in $14M+ from bot plays on AI songs over 7 years before he was charged). 'Can', never 'does': caught fakes earn nothing (FL 4.1-4.2, 4.4), most AI tracks never reach Spotify's 1,000-plays-a-year pay line (FL 3.9-3.10), and how much slips through is unknown (FL 8.2).",
+  "payoff": "We show how: bots play it on repeat, the app splits a shared pot by each track's share of plays, so if those fake plays slip past the filters they take a slice of the same pot that pays real artists, leaving every real slice a little thinner."
+ },
+ {
+  "id": "L29",
+  "line": "Somebody's playing all these AI songs, and it's probably not you.",
+  "frame0": "BOTS PLAY THE AI SONGS YOU DON'T",
+  "emotion": "A personal itch: people worry they're being fed AI songs without knowing ('can I even tell?'), and 'it's probably not you' flips that worry into a slightly eerie mystery about their own app: then who is? The 'you' lands as a relief, never an accusation.",
+  "backing": "FL 2.3-2.4 (AI tracks get 1-3% of one app's plays, and up to 85% of those were fake in 2025), FL 3.10 (on Spotify, likely-AI tracks are 10x likelier to fall under the 1,000-play line), FL 2.6 and 1.1 (both apps keep AI slop out of recommendations), FL 5.1 (the blind-test worry it flips, said as 'in a blind test'), FL 3.11 (your fee goes into the shared pot). It never says bots play the viewer's playlist (Never-say): the frame says bots play the songs the viewer doesn't.",
+  "payoff": "The answer is bots, playing them for a share of the same monthly pot your fee goes into, so the fake plays that slip past the filters leave every real artist's slice a little thinner while you never hear a note."
+ },
+ {
+  "id": "L30",
+  "line": "If real people barely play AI songs, why are there so many?",
+  "frame0": "AI SONGS: FEW LISTENERS, LOTS OF BOTS",
+  "emotion": "Plain puzzlement: it breaks basic logic (people make what people want), and a normal viewer can't answer it, so they stay for the answer; it is a question to the viewer, not a lecture.",
+  "backing": "FL 2.3-2.4 (real people barely play them: the fact lock's own 'say instead'), FL 2.1 and 1.6 (nearly 90,000 a day on one app; 42M+ flagged), FL 2.8-2.9 (cheap to make; unlimited uploads for about $25 a year), FL 2.5 (one app says fake plays are the main reason they get uploaded). Spotify's 50M stays out of the 'who are they for' logic (FL 8.10).",
+  "payoff": "The answer is that many are uploaded for bots to play: the pot is split by each track's share of plays, so cheap songs plus fake plays can grab a slice if they slip past the filters, and that slice comes out of every real artist's share."
+ },
+ {
+  "id": "L31",
+  "line": "Nearly half of one app's uploads are AI, and hardly anyone listens.",
+  "frame0": "NEARLY HALF THE UPLOADS. 1-3% OF PLAYS.",
+  "emotion": "The jolt of a huge number set against a tiny one: 'half' feels like a takeover, 'hardly anyone listens' undercuts it, and the mismatch makes you ask what the songs are for.",
+  "backing": "FL 2.2 (44% of daily uploads by April 2026: 'nearly half'), FL 2.1 (over half on peak days in June 2026, nearly 90,000 a day), FL 2.3 (1-3% of plays), FL 8.4 ('one app'; the frame carries a small 'one app, 2026' credit). It never says half of all music (Never-say).",
+  "payoff": "The plays they do get were mostly fake (up to 85% in 2025, same app), and since the pot is split by share of plays, the fakes that slip past the filters thin every real artist's slice."
+ },
+ {
+  "id": "L32",
+  "line": "One app says most AI songs are uploaded for bots to play.",
+  "frame0": "MOST AI SONG UPLOADS ARE FOR BOTS",
+  "emotion": "Indignant disbelief: songs exist to be listened to, so songs uploaded for machines to 'listen' to sounds absurd, like someone gaming the system, and you want to know who gets paid.",
+  "backing": "FL 2.5 (Deezer: 'Generating fake streams continue to be the main purpose for uploading AI-generated music'; safe wording 'One app says most AI songs are uploaded to farm fake plays'), FL 2.4 (up to 85% of their plays fake in 2025), FL 4.11 (Smith's plan in his own words). Always 'uploaded', never 'made': most songs AI apps make never get uploaded (FL 2.8). The frame carries a small 'one app says' credit (FL 8.4).",
+  "payoff": "We show why bots are worth it: the pot is split by each track's share of plays, so fake plays that slip past the filters thin every real artist's slice, which is why the apps strip out every fake they catch and why the ones they miss matter."
+ },
+ {
+  "id": "L33",
+  "line": "On one app, up to 85% of AI song plays were fake.",
+  "frame0": "AI SONG PLAYS: UP TO 85% FAKE",
+  "emotion": "Shock at a big, specific number: 'fake plays' is a scam anyone understands at once, and 'up to 85%' makes it feel organized, so you want to know who fakes them and who pays.",
+  "backing": "FL 2.4 (Deezer: 'up to 85% of these streams were fraudulent in 2025, depending on the month'; 'up to' and the year kept per the Never-say row; the frame carries a small 'one app, 2025' credit), FL 2.3, FL 8.4. The next beat gives the platforms' side: caught fakes get stripped out of the pot (FL 4.1-4.2).",
+  "payoff": "We show who fakes them and why: the pot is split by each track's share of plays, so the fake plays that slip past the filters (caught ones are stripped out) shave a bit off every real artist's slice, by an amount nobody has measured."
+ },
+ {
+  "id": "L34",
+  "line": "Bots are skimming your favorite artist's pay.",
+  "frame0": "BOTS ARE SKIMMING YOUR FAVORITE ARTIST'S PAY",
+  "emotion": "Protective anger on behalf of someone you love. 'Skimming' is the hand-in-the-till feeling everyone gets instantly, and it is honest about size: small, sneaky and ongoing. Nobody likes a cheat being paid out of an honest worker's pocket.",
+  "backing": "FL 3.2-3.3 (pay = your share of all plays in a monthly shared pot); 3.6 ('artists get paid from the pot' is fair shorthand); 3.7 + 7.4 (Spotify: more streams, smaller share; spam 'can dilute the royalty pool'); 7.6 (Deezer, Oct 2026: fraud 'undermines payments to legitimate artists'); 4.1-4.2 (caught fakes earn nothing, so only the ones that slip through skim); 8.2 + 8.5 + 4.10 + 7.3 (some slip through: Smith ran about 7 years on four services, and detection 'will only get harder'); 8.1 ('skimming' claims no size). Guard: bots play their own songs, never the viewer's playlist.",
+  "payoff": "AI lets anyone churn out songs almost free and bots can play them on repeat, but the money is a shared pot cut by share of plays, so while the apps strip out every fake play they catch, each one that slips through shaves a sliver off every real slice, your favorite's included, by an amount nobody has measured."
+ },
+ {
+  "id": "L35",
+  "line": "Who pays when bots play AI songs?",
+  "frame0": "WHO PAYS WHEN BOTS PLAY AI SONGS?",
+  "emotion": "Suspicion with an itch. People assume a fake play is a harmless prank or the app's problem, so the question makes them guess. The answer is the real musicians who share the same pot, and that flips it into 'wait, that's not fair'. It rides the AI-song fuss and asks the viewer directly.",
+  "backing": "FL 2.4-2.5 (on one app, up to 85% of fully AI tracks' plays were fake in 2025, and fake plays are the main reason AI songs get uploaded; Deezer's numbers only); 3.1-3.3 (no per-play rate; a shared pot per country per month); 4.1-4.2 + 3.13 (caught fakes earn nothing; Apple puts that money back in the pool); 3.9-3.10 (most AI tracks never reach Spotify's pay line); 6.4 ('This is a zero-sum game'); 8.2 + 8.1 (some slip through; nobody knows how many or how much).",
+  "payoff": "If the filters catch the bot, nobody pays because the play is stripped out, but if it slips through, its cut comes out of that month's shared pot, so every real artist in it gets a slightly thinner slice."
+ },
+ {
+  "id": "L36",
+  "line": "Some of your subscription can end up with bots.",
+  "frame0": "YOUR SUBSCRIPTION CAN END UP WITH BOTS",
+  "emotion": "'Hey, that's my money.' Most people assume their fee goes to the artists they play, so learning that some of it can leak to fake plays feels like being used, and like the artists they love are being shortchanged. It is personal without making the viewer the loser: they pay the same, and the artists get less.",
+  "backing": "FL 3.11 (your fee goes into the shared pot, not just to the artists you play; an account that plays round the clock can take out more than its fee put in); 3.3-3.4 (the pot is filled by subscription and ad revenue, and about two-thirds is paid back); 4.16 (bot accounts pay fees too); 4.1-4.2 (caught fakes are stripped out); 8.2 + 8.1. This makes the Never-say line 'Your subscription pays for AI songs' true: keep 'some' and 'can', name bots, and never say AI songs.",
+  "payoff": "Your fee doesn't go to the artists you play but into a shared pot split by every counted play, so a bot account that plays all day and slips past the filters can pull out more than it paid in, and the difference comes out of every real artist's slice."
+ },
+ {
+  "id": "L37",
+  "line": "What fake plays earn, real artists don't.",
+  "frame0": "WHAT FAKE PLAYS EARN, REAL ARTISTS DON'T",
+  "emotion": "The zero-sum sting. Most people think streaming fraud cheats a big app, but this says the money comes out of honest musicians' share. It is plain moral math a viewer can repeat to a friend, and it puts the payoff on frame 0.",
+  "backing": "FL 3.1-3.3 (no per-play rate; one pot per country per month, split by share of plays); 3.7 (Spotify: 'as total streams grow, you need more streams to maintain the same share'); 6.4 (Apple Music's Schusser: 'This is a zero-sum game.'); 4.1-4.2 + 3.13 (caught fakes earn nothing, so the line only bites on fakes that slip through: it qualifies itself); 8.2; 8.1 (no amount claimed). FL 4.16: bot accounts pay fees in, so the line says what fakes earn and never gives a net-loss figure.",
+  "payoff": "Each month, in each country, the money is a shared pot cut by share of plays, so whatever a fake play gets past the filters is taken from every real artist's slice, which is why the apps strip out every fake they catch and why the ones they miss still cost real musicians."
+ },
+ {
+  "id": "L38",
+  "line": "Who lost out when one man's bots played his AI songs?",
+  "frame0": "HIS AI SONGS, BOT-PLAYED. WHO LOST OUT?",
+  "emotion": "Curiosity plus a sense of justice. A man got 18 months, so somebody must have been robbed, yet nobody can name the victim. The answer, every real artist a sliver each, is the unfairness, and it comes from a real case rather than a made-up one.",
+  "backing": "FL 1.8 + 4.9-4.10 (Michael Smith: 18 months, forfeits $8,091,843.64; hundreds of thousands of AI songs and billions of bot plays, prosecutors say; $14M+ received over 2017-2024 on four services); 4.14-4.15 + 8.6 + 6.3 (contested: prosecutors say he 'robbed millions in royalty payments from genuine artists and their fans', his lawyers say no artist 'suffered any appreciable loss', and Spotify held his Spotify take to about $60,000); 4.11 (his plan); 3.2-3.3 + 3.7 (the shared pot); 7.10 (no tool named). Guard: the video gives both sides and never says 'he stole $8M from artists'; he appears as a quote card, never as a drawn likeness.",
+  "payoff": "His paid plays came out of shared pots split by share of plays, which is how prosecutors can say he 'robbed millions in royalty payments from genuine artists' while his lawyers say no artist suffered 'any appreciable loss': a sliver from every real artist adds up, and it ran for years before he was charged."
+ },
+ {
+  "id": "L39",
+  "line": "You'll never hear the plays that cost artists money.",
+  "frame0": "YOU'LL NEVER HEAR THE PLAYS COSTING ARTISTS",
+  "emotion": "Unease about a drain you can't see. Everyone is arguing about whether they can tell an AI song by ear, and this says the part that costs musicians happens where nobody hears it at all. It rides the 'can I even tell?' fuss and turns it into a loss.",
+  "backing": "FL 5.1 + 8.7 (the 'can I tell?' fuss: in one 3-track blind test, 97% of 9,000 people couldn't tell; keep that scope); 2.3-2.5 (on one app, real people barely play AI tracks, and up to 85% of their plays were fake in 2025); 4.1-4.2 (caught fakes are stripped out); 8.2 + 7.3 (some slip through; detection 'will only get harder'); 7.6 (fraud 'undermines payments to legitimate artists'); 3.2-3.3 + 3.7 (the shared pot); 8.1 (no size claimed).",
+  "payoff": "Those plays come from bots on repeat that no person ever hears, and every one the filters miss takes its cut of the shared pot from every real artist, so the question that matters isn't only whether you can tell an AI song but whether the filters can tell a fake play."
+ },
+ {
+  "id": "L40",
+  "line": "Apple Music's boss on fake plays: \"This is a zero-sum game.\"",
+  "frame0": "FAKE PLAYS: \"A ZERO-SUM GAME\" —APPLE MUSIC",
+  "emotion": "Proof from the inside. When the man who runs a music app calls it zero-sum, the viewer's hunch that someone honest is losing stops sounding like a conspiracy theory. One real person in his own words beats a plural headline, and he is fighting the fraud, so no company is cast as the villain.",
+  "backing": "FL 6.4 (word for word, VERIFIED: THR 2026-01-30 and 9to5Mac; card 'Oliver Schusser, Apple Music, on streaming fraud, Jan 2026'); 3.13 (Apple puts caught fraud money 'back into the pool so that it goes to honorable artists'; REPORTED, so attribute it); 4.4 (Apple wiped up to 2 billion fake plays from 2025 payouts and doubled the fines); 3.1-3.3 + 3.7 (how the pot works); 8.2 + 8.1 (some slip through; the size is unmeasured). No logo; his name goes on the card.",
+  "payoff": "It's zero-sum because each month's pot is split by share of plays, so a fake play that slips past the filters is paid out of every real artist's slice, which is why Apple strips out the fakes it catches and, in his words, puts the money back 'so that it goes to honorable artists'."
+ },
+ {
+  "id": "L41",
+  "line": "His own math: 1,000 bots, $1.2 million a year.",
+  "frame0": "HIS MATH: 1,000 BOTS = $1.2M A YEAR",
+  "emotion": "Indignant disbelief at easy money from cheating (a million a year, from bots?), then the itch of whose money that is: everyone knows bots aren't listeners, so a paycheck for fake listening feels like it must come out of a real person's pocket, and one man's own numbers make it concrete and believable.",
+  "backing": "FL 4.12 (DOJ, primary: Smith's own estimate of 1,040 bot accounts, ~661,440 plays a day, $1,207,128 a year; the FL's safe wording is \"His own math\"); FL 4.10 + 7.10 (his songs came from an unnamed AI music tool; 2017-2024 on four services; $14M+ received in total); FL 4.9 (18 months); FL 3.1-3.3 (a shared pot per country per month, split by share of plays); FL 4.1-4.2 (caught fakes earn nothing); FL 4.14-4.15 + 8.6 (harm contested: air the defence and Spotify's ~$60,000; never \"$8M stolen from artists\"); FL 8.1-8.2 (no measured loss; slip-through unknown). The AI songs come in line 2, by ~3 s.",
+  "payoff": "His million a year came out of the same shared pot that pays every real artist, split by share of plays, so every bot play that slipped past the filters took a slice; he got 18 months, the apps now strip out the fakes they catch, and the ones that still slip through thin every real slice by an amount nobody has measured."
+ },
+ {
+  "id": "L42",
+  "line": "He used bots instead of listeners, and got 18 months.",
+  "frame0": "BOTS INSTEAD OF LISTENERS: 18 MONTHS",
+  "emotion": "Shock plus a 'wait, why?' itch: having bots play your own songs sounds harmless, almost funny, so 18 months in prison makes a normal viewer ask who on earth got hurt, and that question carries the whole video to the pot.",
+  "backing": "FL 4.9 + 1.8 (18 months, SDNY, 2026-10-06; the FL's safe wording: \"for having bots play his AI songs\"); FL 6.3 (the U.S. Attorney's own phrase, \"automated bots in the place of consumers\"); FL 4.10 + 7.10 (hundreds of thousands of AI songs from an unnamed tool, billions of plays per prosecutors, four services, 2017-2024); FL 3.1-3.3 + 3.7 (shared pot; more plays in it, smaller shares); FL 4.1-4.2 (caught fakes stripped out); FL 4.14-4.15 (harm contested: air both sides); FL 8.1-8.2.",
+  "payoff": "It's a crime because streaming pays from a shared pot split by share of plays, so his bots' plays took a slice from every real artist in those pots until he was stopped, which is why the apps now strip out every fake play they catch, and why the ones they miss still matter."
+ },
+ {
+  "id": "L43",
+  "line": "A prosecutor says his bots robbed real artists, and their fans.",
+  "frame0": "PROSECUTOR: HIS BOTS \"ROBBED\" ARTISTS AND FANS",
+  "emotion": "Outrage at theft, then the twist: 'and their fans' means people like the viewer, so 'how could bots rob me?' becomes the question the video answers; an official's own words make it feel serious, not like internet outrage.",
+  "backing": "FL 6.3 (verbatim: \"Smith robbed millions in royalty payments from genuine artists and their fans\"; card 'Jamie McDonald, U.S. Attorney, Oct 2026', with the full sentence or a marked cut); FL 4.14-4.15 (contested: the defence says no artist \"suffered any appreciable loss\", and Spotify says it held his Spotify take to ~$60,000: both must air, and 'says' stays on frame 0 like v2's SHE SAYS); FL 3.3 + 3.11 (fans' fees fill the shared pot, not just their own artists' share); FL 4.9-4.10; FL 8.1 + 8.6 (never \"$8M stolen from artists\", no per-artist sum).",
+  "payoff": "Fans' fees fill a shared pot split by share of plays, so every bot play that slipped past the filters took a sliver from every real artist in it; his lawyers say no artist suffered \"any appreciable loss\", and both can be true: a thin slice off everyone, by an amount nobody has measured."
+ },
+ {
+  "id": "L44",
+  "line": "A fan congratulated her on an album she never made.",
+  "frame0": "HER NEW ALBUM? SHE NEVER MADE IT.",
+  "emotion": "A small chill of violation plus 'could I tell?': the question everyone asks about AI songs, put in one real fan's mouth; anyone with a favorite singer pictures it happening to them.",
+  "backing": "FL 6.7 (folk singer Emily Portman, AFP, VERIFIED: an AI album went live under her name; impersonation only, no money loss implied; keep AFP's ellipsis on her quote; ask before drawing her); FL 5.1 + 8.7 (\"In a blind test, 97% of 9,000 people couldn't tell\"); FL 2.1-2.5 (one app: over half of new uploads on peak days, 1-3% of plays, up to 85% of those fake in 2025, fake plays the main purpose per Deezer); FL 3.1-3.3; FL 4.1-4.2; FL 8.1-8.2. Risk (FL 5.14): the pot can't pay off impersonation, so the turn must say plainly that the fakes touching every artist's pay need no fans, only bots.",
+  "payoff": "You don't have to be fooled for fakes to cost real artists: bots do the playing, and the shared pot, split by share of plays, pays out for every fake play the filters miss, a thin slice off every real artist, by an amount nobody has measured."
+ },
+ {
+  "id": "L45",
+  "line": "His trick: a TON of AI songs, a few bot plays each.",
+  "frame0": "TONS OF AI SONGS, FEW PLAYS EACH",
+  "emotion": "The thrill of seeing a con from the inside: a fraudster's own plan, simple and sneaky, lets the viewer in on a secret, then makes them wonder who paid for all those little plays.",
+  "backing": "FL 4.11 (his Oct 2018 email in the court record, verbatim: \"in order to not raise any issues with the powers that be we need a TON of content with small amounts of Streams\"; card 'Michael Smith, email, 2018 (court papers)'); FL 4.10 + 7.10 (the content was AI songs from an unnamed tool, played by bot accounts billions of times per prosecutors); FL 2.5 (Deezer: fake plays are the main reason AI songs get uploaded, one app); FL 2.8-2.9 (cheap to make and upload); FL 3.1-3.3; FL 3.9-3.10 (Spotify now pays nothing below 1,000 plays a year); FL 4.1-4.2; FL 8.2.",
+  "payoff": "A few plays each, times a TON of songs, came to billions of plays, prosecutors say, and every one that got past the filters took a slice of the same shared pot real artists are paid from; AI now makes the TON almost free, which is why the filters that strip fakes out of the pot matter so much."
+ },
+ {
+  "id": "L46",
+  "line": "Her fans asked: \"Is it you?\"",
+  "frame0": "\"IS IT YOU?\" IT WAS AI.",
+  "emotion": "Uncanny unease, like reading the DM yourself: her fans sensed something off about a song on her page, which is the 'can I even tell?' fuss in one real message (and it gives the first second a natural message ding).",
+  "backing": "FL 6.6 (indie-folk singer Ormella to TIME, REPORTED, one outlet: \"I had a lot of fans message me, asking, 'Is it you? It doesn't sound like you,'\"; an AI song on her profile; impersonation, and she claims no money loss; card 'Ormella, singer, to TIME, March 2026'; ask before drawing her); FL 5.1 + 8.7; FL 2.3-2.5; FL 3.1-3.3; FL 4.1-4.2; FL 8.2. Risk (FL 5.14): the turn must leave impersonation for fake plays.",
+  "payoff": "Fans ask 'is it you?' and bots never do: fake accounts play their own songs on repeat, and the shared pot counts every play the filters miss, so every real artist's slice gets a little thinner, by an amount nobody has measured."
+ },
+ {
+  "id": "L47",
+  "line": "If AI slop pads the plays, your favorite artist's share shrinks.",
+  "frame0": "SLOP PADDING PLAYS? YOUR ARTIST GETS LESS.",
+  "emotion": "Protective worry for the artist you love: songs you'd never play can still shrink their share, which feels unfair because you never chose them, and it answers 'I don't listen to that stuff, so who cares?'",
+  "backing": "FL 6.1 (Morgan Hayduk, NBC 2026-10-20, verbatim: \"If the denominator has grown because of AI slop, the percentage that each legitimate rights holder or artist will receive is diminished\"; his firm Beatdapp sells fraud detection, so the card and the voice say so; the logic only, never a size); FL 3.2 + 3.7 (Spotify concedes the denominator effect); FL 2.3-2.4 (on one app, AI tracks' few plays were mostly fake in 2025); FL 4.1-4.2 (caught fakes don't count); FL 3.9-3.10 (most AI tracks never reach Spotify's pay line); FL 8.1. Risk: his words blame 'AI slop', so the script narrows it to fake plays that slip through (fraud, not AI).",
+  "payoff": "Streaming splits each month's pot by share of all plays, so every fake play that slips past the filters grows the total and shrinks every real share, your favorite artist's included, by an amount nobody has measured, which is why caught fakes get stripped out before anyone is paid."
+ }
+]
