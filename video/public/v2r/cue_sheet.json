@@ -8,8 +8,8 @@
  {
   "src": "v2r/sfx/pen_drawon.wav",
   "t": 0.0,
-  "gain": 0.0783,
-  "note": "f0: the clean pen finishes drawing her, the door and W on (one stroke each, begun at -0.26 under the un-build), the colour floods from the sun outward (f1-f18), her coat last",
+  "gain": 0.059,
+  "note": "f0: the clean pen draws her, the door, then W from the first frame (bold, one moving pen each, 0.00-0.39: REVIEW_1 MUST 2), then the colour floods from the sun outward 0.44-0.78 (f27-f47), her coat last",
   "under_db": 20,
   "set_by": "sheet"
  },
@@ -129,7 +129,7 @@
   "src": "v2r/sfx/whoosh_dive_1.wav",
   "t": 5.95,
   "gain": 0.2626,
-  "note": "JOIN S1>S2, the A push-through into her dark window W 5.95-6.25: the air rises into it, 'through the glass' on the midpoint 6.10 (the plum bridge), settles, gone by 6.27",
+  "note": "JOIN S1>S2, the A push-through into her dark window W 5.875-6.325 (seen from ~5.95): the air rises into it, 'through the glass' on the midpoint 6.10 (the plum bridge), settles, gone by 6.27",
   "under_db": 12,
   "set_by": "sheet"
  },
@@ -201,7 +201,7 @@
   "src": "v2r/sfx/whoosh_dive_2.wav",
   "t": 14.71,
   "gain": 0.1548,
-  "note": "JOIN S3>S4, the A push-through into her silhouette 14.71-15.01, 'through the glass' on 14.86 (the callback, 3 dB softer)",
+  "note": "JOIN S3>S4, the A push-through into her silhouette 14.635-15.085 (seen from ~14.71), 'through the glass' on 14.86 (the callback, 3 dB softer)",
   "under_db": 15,
   "set_by": "sheet"
  },
@@ -448,9 +448,9 @@
  {
   "src": "v2r/sfx/pen_unbuild.wav",
   "t": 38.82,
-  "gain": 0.0612,
+  "gain": 0.0608,
   "note": "JOIN S8>S1, the un-build 38.82-39.08: the pen's line rewinds, turns into frame 0's draw-on at the midpoint 38.95 and crossfades 15 ms into pen_drawon at the seam",
   "under_db": 16,
-  "set_by": "sheet, seam match -5.9"
+  "set_by": "sheet, seam match -6.0"
  }
 ]

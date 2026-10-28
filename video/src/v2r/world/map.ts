@@ -334,7 +334,7 @@ export const SHOTS: ShotSpec[] = [
     words: "You'd think that's one odd contract. But Google's staff told the BBC they're scared to speak out, because of their contracts.",
     framing: 'RIVERSIDE from the south towpath; the wing in 3/4, cut by the left edge, receding right',
     pose: '6.70 (the pull-back out of M landed, zoom 1.00; the 6 % story push is retired: her window at M to the match)',
-    transitionIn: {type: 'push-through', carrier: 'A', t0: 5.95, t1: 6.25, from: {x: W.x, y: W.y}, to: {x: M.x, y: M.y}, zoom: 12, bridge: PLUM_BRIDGE, inkComp: 0.6},
+    transitionIn: {type: 'push-through', carrier: 'A', t0: 5.875, t1: 6.325, from: {x: W.x, y: W.y}, to: {x: M.x, y: M.y}, zoom: 12, bridge: PLUM_BRIDGE, inkComp: 0.6},
     explains: 'Not one odd contract: a few Google staff, in their account to the BBC, are scared too.',
   }),
   shot({
@@ -350,7 +350,7 @@ export const SHOTS: ShotSpec[] = [
     words: "She worked on Google's AI and told the BBC she objected to where its military work was heading.",
     framing: 'RIVERSIDE truck from the water, a narrowboat gliding with us as the foreground',
     pose: '17.96 (the stop on "objected": the post lands at x ~575); zoom 1.00 throughout (the push toward SUN1 is retired), the hold home by 20.40',
-    transitionIn: {type: 'push-through', carrier: 'A', t0: 14.71, t1: 15.01, from: {x: 330, y: 742}, to: {x: 720, y: 912}, zoom: 12, bridge: PLUM_BRIDGE, inkComp: 0.6},
+    transitionIn: {type: 'push-through', carrier: 'A', t0: 14.635, t1: 15.085, from: {x: 330, y: 742}, to: {x: 720, y: 912}, zoom: 12, bridge: PLUM_BRIDGE, inkComp: 0.6},
     explains: "Who she is (an insider at Google's AI lab who objected, then quit) and that \"heading\" was a direction: unclassified, then classified.",
   }),
   shot({
@@ -508,12 +508,12 @@ export const S1_SHEET = {
 } as const;
 
 /** The S1 camera: zoom 1.00 at every t, held locked or on the 2D float (eased straight legs within +-12 px, home by
- *  5.90); then the A push-through into W 5.95-6.25 (Film 'push-through', inkComp 0.6, plum bridge). `pullOut` is
+ *  5.90); then the A push-through into W 5.875-6.325 (Film 'push-through' 0.45 s, inkComp 0.6, plum bridge 0.05 s: REVIEW_1 MUST 5). `pullOut` is
  *  RETIRED (no zoom in a hold: DIRECTION rule 8; THROUGHLINE §6): from = to = 1.00, so s1Zoom / s1Screen are the
  *  identity and every S1 spot is its zoom-1.00 value; kept so built code compiles. */
 export const S1_CAMERA = {
   pullOut: {from: 1.0, to: 1.0, t0: 0, t1: 4.9, anchor: {x: W.x, y: W.y}, ease: 'in'} as ZoomKey,
-  pushThrough: {t0: 5.95, t1: 6.25, into: {x: W.x, y: W.y} as XY, zoom: 12, bridge: PLUM_BRIDGE, inkComp: 0.6},
+  pushThrough: {t0: 5.875, t1: 6.325, into: {x: W.x, y: W.y} as XY, zoom: 12, bridge: PLUM_BRIDGE, inkComp: 0.6},
 };
 export const s1Zoom = (t: number): number => zoomAt(S1_CAMERA.pullOut, t);
 /** S1 world (zoom 1.00) -> screen at time t. */
@@ -542,7 +542,7 @@ export const S1_CLOCK = {
   herLooksBack: 5.59,
   /** RETIRED (THROUGHLINE §3): Pip stays on its bollard; the push-through into W sweeps it. Kept for built code. */
   pipHopsUpLeft: 5.9,
-  dive: {t0: 5.95, t1: 6.25}, // the A push-through into W; in 5.80-6.40 nothing enters, pops or turns but the dive
+  dive: {t0: 5.875, t1: 6.325}, // the A push-through into W (0.45 s: MUST 5); in 5.80-6.40 nothing enters, pops or turns but the dive
 } as const;
 
 /** S1 frame-0 words. REVIEW_1 MUST 1 (playbook "Hook and pacing": no title over the captions): the frame-0 block is
@@ -1078,7 +1078,7 @@ export type MatchPoint = {cut: string; t: number; f: number; out: ShotId; in: Sh
 
 export const MATCHES: MatchPoint[] = [
   {
-    cut: 'S1 -> S2 push-through', t: 6.1, f: frameOf(6.1), out: 'V2S1', in: 'V2S2', carrier: 'A', kind: 'push-through 5.95-6.25 (zoom 12, plum bridge 6.05-6.15, inkComp 0.6)',
+    cut: 'S1 -> S2 push-through', t: 6.1, f: frameOf(6.1), out: 'V2S1', in: 'V2S2', carrier: 'A', kind: 'push-through 5.875-6.325 (zoom 12, plum bridge 6.075-6.125, inkComp 0.6)',
     shapes: [
       {label: 'S1: dive INTO W (her office window, dark from 0.40)', side: 'out', spot: W},
       {label: 'S2: pull back OUT of her dark office window at M', side: 'in', spot: M},
@@ -1096,7 +1096,7 @@ export const MATCHES: MatchPoint[] = [
     rule: 'M centre (335, 785), 132.5 x 164.3 in BOTH at 12.98; Pip at (590, 1050) on both sides; midpoint 12.98, 0.18 s before "So" 13.16; nothing enters, pops or turns in 12.78-13.18 (the notebook claps by 12.70).',
   },
   {
-    cut: 'S3 -> S4 push-through (into her)', t: 14.86, f: frameOf(14.86), out: 'V2S3', in: 'V2S4', carrier: 'A', kind: 'push-through 14.71-15.01 (zoom 12, plum bridge, inkComp 0.6)',
+    cut: 'S3 -> S4 push-through (into her)', t: 14.86, f: frameOf(14.86), out: 'V2S3', in: 'V2S4', carrier: 'A', kind: 'push-through 14.635-15.085 (zoom 12, plum bridge 14.835-14.885, inkComp 0.6)',
     shapes: [
       {label: "S3: into her silhouette's head (she stands still from 14.60)", side: 'out', seat: S3.pushFrom},
       {label: 'S4: out of her head (her walking, 170 px)', side: 'in', seat: S4.pullFrom},
