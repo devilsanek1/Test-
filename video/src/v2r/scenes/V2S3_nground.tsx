@@ -3,18 +3,19 @@
 // (540, 1150); CRAFT §f.4): the sliver of water in our hull's shade, OUR coping (stone blocks whose joints run to the
 // vanishing point) and OUR towpath y 1652-2016 (slabs laid out in metres and projected: the joints running into the
 // picture as flat tone bands at dL* 7, narrowing with distance; the level joints a softer step), a few fallen leaves as
-// flat shapes (bigger toward us), the boat's rope to our coping, and the near lamp-post foot held from S2 across the
+// flat shapes (bigger toward us), the boat's rope to our mooring bollard, and the near lamp-post held from S2 across the
 // match-cut (L2's lamp, copied exactly). Flat colour only (the clean pen's environment tier draws no lines here): no
 // cracks, grit, dabs or ripple dashes (CRAFT §c). Planes (V2S3_depth planeBatch): the water under the hull rides the
 // boat's plane (-1), the coping, the paving, the leaves and the rope ours (-2): one value step darker each.
 import React, {useMemo} from 'react';
 import {CM} from '../palette';
-import {band, seamTone} from '../../lib/depth';
-import {Batch, Paint, rng, ovalPath, leafPath} from '../kit/canal/core';
+import {band, nearStep, seamTone} from '../../lib/depth';
+import {Batch, Paint, P, rng, ovalPath, leafPath} from '../kit/canal/core';
 import type {Pt} from '../kit/canal/core';
 import {NB, Levels} from './V2S3_nboat';
 import {bollardNeck} from './V2S3_ndress';
-import {Lamp} from '../kit/canal/towpath';
+import {Tier} from '../../lib/tier';
+import {S2_NEAR_LAMP} from './V2S2_Near';
 import {S3_CAM, planeBatch} from './V2S3_depth';
 
 /** Ground lines (world px). */
@@ -39,16 +40,6 @@ const SLAB_D = 0.6;
 const X_SPAN = 4.6;
 
 // ---------------------------------------------------------------- the static ground
-
-/** The water under our hull: in the hull's shade, one flat value, the hull's reflection as one darker band under the
- *  waterline (no dashes). The boat's plane (-1). */
-function waterBatch(): Batch {
-  const b = new Batch();
-  b.rect(CM.waterDeep, NG.x0, NG.waterTop, NG.x1 - NG.x0, NG.lip - NG.waterTop + 3);
-  b.layer();
-  b.rect(CM.paneUnlit, NG.x0, NB.water, NG.x1 - NG.x0, 5);
-  return planeBatch(b, -1);
-}
 
 /** Our coping and towpath (-2): stone blocks and slabs laid out in metres and projected from S3_CAM. */
 function groundBatch(): Batch {
@@ -134,12 +125,6 @@ function ropeBatch(): Batch {
 
 // ---------------------------------------------------------------- components
 
-/** The water sliver (behind the hull's bottom edge): draw BEFORE the boat, in the boat's plane. */
-export const S3NearWater: React.FC = () => {
-  const b = useMemo(waterBatch, []);
-  return <Paint b={b} seed="s3ngWater" misreg={false} />;
-};
-
 /** The coping, the towpath and the leaves (AFTER the boat), in our plane. */
 export const S3Ground: React.FC = () => {
   const g = useMemo(groundBatch, []);
@@ -152,8 +137,30 @@ export const S3Rope: React.FC = () => {
   return <Paint b={rope} seed="s3ngRope" misreg={false} />;
 };
 
-/** The near lamp-post (nearest of all): S2's, held across the cut. L2 draws it in V2S2_Set.tsx as
- *  `<Lamp x={930} y={1990} h={1290} w={30} variant="near" seed="s2nearlamp" />` (S2's push and float are home at the
- *  match: no mapping); copied exactly, so the foreground column stays put while the world swaps behind it. */
-export const NEAR_LAMP = {x: 930, y: 1990, h: 1290, w: 30} as const;
-export const S3LampFoot: React.FC = () => <Lamp x={NEAR_LAMP.x} y={NEAR_LAMP.y} h={NEAR_LAMP.h} w={NEAR_LAMP.w} variant="near" seed="s2nearlamp" />;
+/** The near lamp-post (nearest of all): S2's, HELD across the match-cut, copied exactly from L2's V2S2_Near.tsx
+ *  (S2NearThings' post, its numbers exported as S2_NEAR_LAMP "for L3, who holds it across the cut"): the slim post in
+ *  nearStep(CM.line, -2) (#7E3E26 authored, #8F553F on screen in tier C) from below the frame (foot y 1990, half-width
+ *  0.62 w there, 0.5 w from the neck up) to the neck at y 790, the swan-neck curving right into an arm that leaves the
+ *  frame at y ~644-665, a collar at y 1640 (48 x 30). Same path, colour and tier as S2 draws it, and both floats are
+ *  home at the cut, so the foreground column stays put while the world swaps behind it. (S2's bike locked to it is
+ *  S2's own: the world it belongs to swaps at the cut.) */
+const L = S2_NEAR_LAMP;
+const LAMP_TOP = L.neckY - 90;
+function nearLampBatch(): Batch {
+  const b = new Batch();
+  const {x, w} = L;
+  const c = nearStep(CM.line, -2);
+  b.fill(c, `M${P(x - w * 0.62, L.foot)}L${P(x - w * 0.5, LAMP_TOP + 90)}C${P(x - w * 0.5, LAMP_TOP + 20)} ${P(x + 10, LAMP_TOP - 40)} ${P(x + 60, LAMP_TOP - 46)}L${P(1140, LAMP_TOP - 56)}L${P(1140, LAMP_TOP - 56 + w * 0.7)}L${P(x + 62, LAMP_TOP - 46 + w * 0.72)}C${P(x + 24, LAMP_TOP - 38 + w * 0.7)} ${P(x + w * 0.5, LAMP_TOP + 30)} ${P(x + w * 0.5, LAMP_TOP + 90)}L${P(x + w * 0.62, L.foot)}Z`);
+  b.rect(c, x - w * 0.8, L.collar.y, w * 1.6, L.collar.h);
+  return b;
+}
+/** The lamp's numbers as S3 holds them (= L2's S2_NEAR_LAMP). */
+export const NEAR_LAMP = L;
+export const S3LampFoot: React.FC = () => {
+  const b = useMemo(nearLampBatch, []);
+  return (
+    <Tier tier="environment">
+      <Paint b={b} seed="s2lamppost" misreg={false} />
+    </Tier>
+  );
+};

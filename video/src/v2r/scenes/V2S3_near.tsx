@@ -7,7 +7,8 @@
 // Planes (V2S3_float): the water under the hull and the boat -1 (0.85 of the float), our towpath -2 (all of it).
 import React from 'react';
 import {S3Boat} from './V2S3_nboat';
-import {S3NearWater, S3Ground, S3Rope, S3LampFoot} from './V2S3_nground';
+import {S3Ground, S3Rope, S3LampFoot} from './V2S3_nground';
+import {S3Water} from './V2S3_water';
 import {S3Plane} from './V2S3_float';
 import {S3_PLANE} from './V2S3_rig';
 import {S3Dress} from './V2S3_ndress';
@@ -19,7 +20,7 @@ export const S3Near: React.FC = () => (
   <>
     <S3Plane plane={S3_PLANE.boat}>
       <Tier tier="environment" bg={onPlane(CM.sage, S3_PLANE.boat)}>
-        <S3NearWater />
+        <S3Water part="sliver" />
         <S3Boat />
       </Tier>
     </S3Plane>
