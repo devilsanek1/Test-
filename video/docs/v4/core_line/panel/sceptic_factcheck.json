@@ -1,0 +1,11 @@
+{"verdicts":[
+{"id":"L18","severity":"minor","problem":"PROVISIONAL (web check pending). 97% is one Deezer-commissioned Ipsos test of 3 tracks (Oct 2025); 'COULD YOU?' promises a test the video cannot run.","safer_wording":""},
+{"id":"L3","severity":"minor","problem":"PROVISIONAL (web check pending). The crime was wire-fraud conspiracy over millions in royalties, not bot plays as such.","safer_wording":""},
+{"id":"L35","severity":"minor","problem":"PROVISIONAL. Question presupposes someone always pays; caught bot plays earn nothing.","safer_wording":""},
+{"id":"L34","severity":"major","problem":"PROVISIONAL. Unhedged present-tense claim of an unmeasured harm.","safer_wording":""},
+{"id":"L5","severity":"none","problem":"PROVISIONAL.","safer_wording":""},
+{"id":"L24","severity":"minor","problem":"PROVISIONAL. Implied promise to reveal which songs.","safer_wording":""},
+{"id":"L28","severity":"minor","problem":"PROVISIONAL. Plural frame-0 reads as a general rule.","safer_wording":""},
+{"id":"L1","severity":"major","problem":"PROVISIONAL. Every-AI-song-takes-money claim; on the Never-say list.","safer_wording":""},
+{"id":"L2","severity":"major","problem":"PROVISIONAL (web check pending). Frame 0 drops 'one app' and 'peak days'.","safer_wording":""}
+]}

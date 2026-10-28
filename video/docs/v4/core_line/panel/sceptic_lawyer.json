@@ -1,11 +1,58 @@
-{"verdicts":[
-{"id":"L18","severity":"minor","problem":"PRELIMINARY (checks in progress): one 3-track blind test commissioned by Deezer; '97% couldn't tell' is the all-three-right score.","safer_wording":""},
-{"id":"L3","severity":"minor","problem":"PRELIMINARY (checks in progress): the crime is wire-fraud conspiracy (royalties collected through fake plays), not merely having bots play songs.","safer_wording":""},
-{"id":"L35","severity":"none","problem":"PRELIMINARY (checks in progress).","safer_wording":""},
-{"id":"L34","severity":"minor","problem":"PRELIMINARY (checks in progress): states as present fact an effect that exists only for fakes that slip past the filters and has never been measured.","safer_wording":""},
-{"id":"L5","severity":"none","problem":"PRELIMINARY (checks in progress).","safer_wording":""},
-{"id":"L24","severity":"none","problem":"PRELIMINARY (checks in progress).","safer_wording":""},
-{"id":"L28","severity":"minor","problem":"PRELIMINARY (checks in progress): 'nobody hears' can be read as zero plays.","safer_wording":""},
-{"id":"L1","severity":"major","problem":"PRELIMINARY (checks in progress): says AI songs as a class take money from artists (a 'Never say' row); frame 0 drops 'almost'.","safer_wording":""},
-{"id":"L2","severity":"major","problem":"PRELIMINARY (checks in progress): frame 0 drops 'one app' and 'on peak days', so it reads as half of all new music.","safer_wording":""}
-]}
+{
+ "verdicts": [
+  {
+   "id": "L18",
+   "severity": "minor",
+   "problem": "Survives in substance: the 97% is real, and 'BLIND TEST' is the fact file's own scope (FL 5.1, 8.7). The nuance is that it was one online test of 3 tracks (2 AI, 1 human). Deezer chose the tracks and commissioned the test, and its January 2026 release says it now sells AI detection. Deezer never defines 'failed', so it is an all-or-nothing score on 3 tracks Deezer picked. On frame 0, 'BLIND TEST: 97% COULDN'T TELL' reads like a general law of hearing, not one test's result. It makes no claim about money, platforms or AI artists, and the spoken line is only a question.",
+   "safer_wording": "Line: unchanged (\"Could you even tell if a song was AI?\"). Frame 0: \"ONE BLIND TEST: 97% COULDN'T TELL. COULD YOU?\" (or \"IN A BLIND TEST, 97% OF 9,000 PEOPLE COULDN'T TELL. COULD YOU?\")"
+  },
+  {
+   "id": "L3",
+   "severity": "minor",
+   "problem": "Accurate and fair to Smith. He pleaded guilty to conspiracy to commit wire fraud and on 2026-10-06 got 18 months, plus 2 years' supervised release and an $8.09M forfeiture (re-checked today; no appeal reported). The line makes no claim about harm to artists, which is the contested part (FL 4.14-4.15). The nuance: 'for having bots play his songs' makes the playing itself sound like the crime. The crime was the fraud: collecting royalties from over a billion fake plays across 7 years, per prosecutors, in the first US criminal case of its kind. A viewer could come away thinking that any artist who buys bot plays faces prison, or that prison came for something trivial. Dropping 'AI' on frame 0 is harmless.",
+   "safer_wording": "Line: \"A man got 18 months in prison for cashing in on bots playing his AI songs.\" Frame 0: \"PRISON FOR CASHING IN ON BOTS PLAYING HIS SONGS\""
+  },
+  {
+   "id": "L35",
+   "severity": "none",
+   "problem": "Survives: a question asserts nothing false, and its premise holds. Bots do play AI songs (Deezer: up to 85% of AI tracks' plays were fake in 2025, FL 2.4), and someone does pay: caught plays cost the fraudster (FL 4.6, 4.16), and uncaught ones thin the real artists' slices. It names no platform, no figure and no AI artist. Only the answer carries a duty: it must say 'the fakes that slip through' and 'nobody knows how much' (FL 8.1-8.2), and it must not suggest bot fraud is only an AI problem (FL 4.3).",
+   "safer_wording": ""
+  },
+  {
+   "id": "L34",
+   "severity": "minor",
+   "problem": "Directionally true by the pot's design (FL 3.2, 3.7, 7.4), and 'skim' rightly suggests a small cut. But it states as a present, certain fact about every viewer's favourite artist an effect that comes only from fakes that slip past the filters and that nobody has measured (FL 8.1-8.2; no new measurement found today). It ignores the platforms' first defence: caught fakes earn nothing (Spotify, Deezer, Apple), and Deezer calls the impact on human artists' pay 'minimal on Deezer' (FL 7.6). That is exactly the 'show me the uncaught fraud' attack in factlock section 9. 'Skimming YOUR FAVORITE ARTIST'S pay' can also suggest bots touch that artist's own plays or account, when fake plays sit on the fraudsters' own long-tail tracks (France's CNM: over 80% of detected fraud on Spotify and Deezer was outside the top 10,000; the fact file's 'Never say': 'Bots are listening to your playlist'). Not defamatory: nobody is named.",
+   "safer_wording": "Line: \"Bots that slip past the filters are skimming your favorite artist's pay.\" Frame 0: \"BOTS THAT SLIP THROUGH SKIM YOUR FAVORITE ARTIST'S PAY\""
+  },
+  {
+   "id": "L5",
+   "severity": "none",
+   "problem": "Survives. 'Can' claims only what the pot's design guarantees, and Spotify concedes it: such behaviour, 'left unchecked, ... can dilute the royalty pool' (FL 7.4). It gives no figure and names no platform or AI artist, and 'paycheck' is fair shorthand for royalties paid through rights holders (FL 3.6). The video must still say that only uncaught fakes do it, by an unmeasured amount.",
+   "safer_wording": ""
+  },
+  {
+   "id": "L24",
+   "severity": "none",
+   "problem": "Survives. 'Might' is supported by AI tracks that won real audiences: Velvet Sundown (550,000+ monthly listeners), 'Papaoutai (Afro Soul)' (14M+ plays in a month) and Sweden's No. 1 Spotify song (FL 5.5-5.7). Most apps only began labelling AI music in 2026 (FL 1.3, 1.7, 5.12). It makes no money claim and casts no villain, and toward AI-using artists it is neutral to flattering. It doesn't say AI songs are common in what people play (they get 1-3% of one app's plays, FL 2.3), and the video shouldn't let it imply that.",
+   "safer_wording": ""
+  },
+  {
+   "id": "L28",
+   "severity": "minor",
+   "problem": "True on Smith's case: bot plays of AI songs drew $14M+ from royalty payers (FL 4.10), and 'can' avoids saying every AI song does. The nuance: 'nobody hears' reads as 'nobody plays', and a song with no plays earns nothing (fact file 'Never say': 'Almost nobody listens'). Most AI uploads earn nothing at all: Spotify pays nothing under 1,000 plays a year (FL 3.9-3.10), and Deezer demonetizes the fake plays it detects and deletes AI tracks left unplayed for 6 months (FL 2.6). So on frame 0, the plural 'AI SONGS NOBODY HEARS CAN MAKE MONEY' can be heard as a loophole in which platforms pay for unplayed songs, or as an 'AI-music side hustle' tip. The only route is bot fraud, which platforms filter and which put one man in prison.",
+   "safer_wording": "Line: \"An AI song no human hears can still make money.\" Frame 0: \"AI SONGS NO HUMAN HEARS CAN STILL MAKE MONEY\""
+  },
+  {
+   "id": "L1",
+   "severity": "major",
+   "problem": "'They still take money from your favourite artist' makes AI songs as a class the taker, which the fact file marks FALSE-as-worded ('Never say': 'Every AI song takes money from artists', 'AI is stealing from artists'; FL 8.3). Most AI uploads earn nothing (Spotify's 1,000-play line, FL 3.9-3.10), and caught fake plays are stripped out (FL 4.1-4.2). The drain is uncaught fake plays, which the line never mentions. It is also unfair to AI-using artists, whose real plays earn legitimately like any song's (FL 6.12; Spotify: 'all music is treated equally', FL 7.4). Frame 0 makes it worse. 'NOBODY LISTENS' is an absolute, and it is false for AI hits with millions of real plays (FL 5.5-5.7). 'ARTISTS PAY' states an unmeasured loss as fact (FL 8.1), against Deezer's 'minimal on Deezer' (FL 7.6), and 'almost nobody listens' rests on one app's data (FL 8.4). A reasonable viewer leaves believing that AI songs are draining real artists.",
+   "safer_wording": "Line: \"Real people barely play AI songs. Bots do, and the fake plays that slip through take a cut from your favourite artist.\" Frame 0: \"AI SONGS: HUMANS BARELY LISTEN. BOTS DO. WHO PAYS?\""
+  },
+  {
+   "id": "L2",
+   "severity": "major",
+   "problem": "Frame 0, 'HALF OF NEW SONGS AREN'T HUMAN', drops 'one app', so a reasonable viewer reads it as half of all new music everywhere: the fact file's first 'Never say' row. Every AI share is Deezer's own, and Spotify publishes none (FL 8.4). Both versions also drop the time scope. Deezer's current wording (13 and 15 Oct 2026, re-checked today) is 'more than 50% of the total daily delivery on peak days', and its averages were 39% in January and 44% in April (FL 2.1-2.2). Its July release does put June, the peak month, at 'more than 50%', so 'half' holds for peak days and that month, not as a standing fact. Even the spoken 'half of one app's new songs' overstates the typical day. 'Aren't human' also goes beyond Deezer's 'fully AI-generated', erasing the people who write the lyrics and prompts (FL 6.12; 'Never say': 'Songs nobody wrote').",
+   "safer_wording": "Line: \"Some days, over half the new songs uploaded to one app are AI-made.\" Frame 0: \"SOME DAYS, OVER HALF OF ONE APP'S NEW SONGS ARE AI\""
+  }
+ ]
+}
