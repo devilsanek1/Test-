@@ -168,3 +168,35 @@ the hardest to make beautiful.
 **In the owner's order the vaccine leads again**: relevance and freshness carry the most weight, and its visual risk
 (microscopic) has a plan: the body as a city (immune cells handed a "wanted poster" of the cancer's marks), the result
 as 100 small people (82 lit against 70), a cozy home place in the patient's kitchen.
+
+## All 23 stories re-ranked in the owner's order (2026-10-28)
+
+From the editors' scores above: 1 = relevant (the mean of relevance with "so what", the hook as the buzz signal, and
+surprise), 2 = true (evidence), 3 = fresh, 4 = visual (the dedicated visual check for the top three: vaccine 6, glasses
+9, hurricane 8; the editors' scores for the rest), 5 = mood (uplift), 6 = shareable; weights 6-5-4-3-2-1, out of 10.
+
+| Rank | Story | 1 Relevant | 2 True | 3 Fresh | 4 Visual | 5 Mood | 6 Share | Score /10 |
+|---|---|---|---|---|---|---|---|---|
+| 1 | Personal mRNA melanoma vaccine, Phase 3 | 8.3 | 9 | 9 | 6 | 9 | 9 | **8.38** |
+| 2 | "Pervert glasses" that read a blind man's menu | 8.2 | 8 | 7 | 9 | 8 | 8 | **8.00** |
+| 3 | "Could they hear you?": a bedside EEG reads 1 in 3 "unresponsive" ICU patients | 8.2 | 7 | 9 | 7 | 7 | 8 | **7.76** |
+| 4 | Hurricane Isaias: the AI called the landfall | 8.0 | 7 | 6 | 8 | 8 | 8 | **7.38** |
+| 5 | Android quake alerts reach 200+ countries | 7.5 | 7 | 6 | 9 | 8 | 8 | **7.38** |
+| 6 | First patient given AI-designed phages | 8.2 | 4 | 9 | 9 | 6 | 9 | **7.29** |
+| 7 | Microsoft's diagnosis AI, in Science | 6.8 | 7 | 7 | 7 | 6 | 7 | **6.86** |
+| 8 | AI hears a weak heart: stethoscope + chest X-ray | 6.0 | 7 | 8 | 7 | 7 | 5 | **6.81** |
+| 9 | Pancreatic cancer in "normal" CT scans | 8.0 | 7 | 4 | 6 | 8 | 8 | **6.71** |
+| 10 | A bionic arm that feels goes home | 6.8 | 6 | 4 | 9 | 8 | 8 | **6.57** |
+| 11 | Deer alarm calls warn villagers of tigers, Nepal | 6.7 | 5 | 8 | 9 | 4 | 6 | **6.57** |
+| 12 | Virtual Biotech: 37,000 agents read 56,000 trials | 5.7 | 6 | 8 | 6 | 6 | 4 | **6.19** |
+| 13 | A hobbyist, his AI helpers and a possible planet | 6.0 | 5 | 6 | 8 | 7 | 6 | **6.14** |
+| 14 | Breast-cancer AI: who can skip chemo | 6.7 | 4 | 8 | 5 | 7 | 6 | **6.05** |
+| 15 | Kids' rare diseases diagnosed with o3 Deep Research | 7.3 | 6 | 2 | 7 | 8 | 7 | **6.00** |
+| 16 | AI-designed gene editor, blight-proof rice | 6.2 | 6 | 5 | 6 | 7 | 5 | **5.90** |
+| 17 | ALS voice rebuilt from a 16 s TV clip | 7.0 | 5 | 3 | 8 | 6 | 8 | **5.86** |
+| 18 | Rentosertib, AI-found drug in Phase III | 6.3 | 6 | 4 | 5 | 7 | 5 | **5.62** |
+| 19 | Florida's AI mosquito trap | 5.5 | 3 | 8 | 7 | 6 | 4 | **5.57** |
+| 20 | Penn's epilepsy AI on patients' phones | 5.5 | 5 | 6 | 6 | 6 | 4 | **5.52** |
+| 21 | OpenAI's math and physics "discoveries" | 5.7 | 3 | 9 | 4 | 4 | 5 | **5.24** |
+| 22 | McMaster's free antibiotic-finder AI | 5.7 | 6 | 2 | 6 | 7 | 5 | **5.19** |
+| 23 | UCLA MAESTRO prostate-cancer drug pair | 5.2 | 3 | 8 | 5 | 5 | 4 | **5.10** |
