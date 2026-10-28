@@ -78,3 +78,13 @@ push, Pip's bollard pose (= S8's, A5), the band-safe wiper.
 - `scripts/qa/retro_tools/line/measure.py` at 25.0 and 31.0: strokes <= 80 / Mpx, near-miss ends <= 40, dark-line <= 3 %.
 - Frames 23.80 / 23.98 / 24.03, 27.95 / 28.10 / 28.25 and 32.70 / 32.93 / 33.16; Pip's top-to-clause gap (>= 200 px).
 - Flashes <= 3 per second in 27.08-27.80 and 30.04-30.60; movers <= 3; no stranger's back; `npx tsc --noEmit -p .` clean.
+
+## 7. Depth + particles (2026-10-27; CRAFT §f, `src/lib/DEPTH.md`, THROUGHLINE §5b)
+- **S6:** -1 the tulip kerb, bench, rack and fence posts, 0 the deal board + paving, +1 the facade band + door, +2 the
+  promenade's trees (the April air): the board's cream face stands on the limestone facade (L* ~90), so give it a darker
+  field behind (the facade's shade step, the fence, a hedge band: `backing`); the falling petals become one `leaves`
+  field (blossom colours, <= 8, no gust), `joins` [0, 4.30].
+- **S7:** -1 the café tables and things, 0 Google's board + the forecourt (setts to the VP (540, 560) at |ΔL*| >= 6),
+  +1 the wing's facade (one shade step behind the board: it faces away from the low sun), +2 plane trees on the
+  sunset band; particles: plane-tree `leaves` and `motes` in the low sun's light, nothing new in 32.50-33.10.
+- **Check:** `check_depth.py` at 25.0 and 31.0 with a sheet per shot: no FAIL.

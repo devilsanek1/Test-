@@ -70,3 +70,14 @@ rows in `V2S5_*` (`V2S5_deck_floor` first). K3's NewsBox and Plaque are L5's.
   the board clear by ~23.90).
 - `camspeed` <= 15 px/frame on detailed layers through the crane; the band check (y 317-556 pure sky every frame);
   movers in the hold <= 4; `npx tsc --noEmit -p .` clean; REQUEST lines.
+
+## 10. Depth + particles (2026-10-27; CRAFT §f, `src/lib/DEPTH.md`, THROUGHLINE §5b)
+- **The air:** the crane's 6 planes keep their steps (0 / 12 / 22 / 40 / 65 %) but take them through `recede(c, plane,
+  ATM)` with the April band as the air, in place of the dc kit's `atm()` / `atmShade()` (an sRGB mix toward the mint:
+  far brick and sage go tan and olive); `planePalette` for the far city's values (5 / 5 / 4 / 3 / 2).
+- **Separation:** the Pentagon (A from 22.43) takes half its plane's step and stays the darkest far shape on the palest
+  cloud bank (`backing` if the bank's value comes close); the news box on the warm-dark slot.
+- **Ground:** the deck's flags already converge on its VP; keep the joints visible (|ΔL*| >= 6) through the move.
+- **Particles:** petals in the slot's blossom burst as a small `leaves` field (blossom colours, plane 0, few); the V
+  of birds stays as planned (or `birds` with `t0` at 70 % of the move); nothing enters in 23.60-24.00.
+- **Check:** `check_depth.py` at 21.0 and 23.4 with a sheet for S5: no FAIL.

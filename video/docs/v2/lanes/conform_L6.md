@@ -66,3 +66,12 @@ board pose (= S7's, A5).
 - Frames 32.70 / 32.93 / 33.16 (the wipe, Pip on the stern) and the seam: frames 2330 / 2338 / 2344 beside frame 0 (W the
   same spot and size, 150 x 170; Pip within 30 px; never two suns); a still at 38.7 (no one in front of the board).
 - Flashes <= 3 per second in 37.18-37.80; movers <= 3; `npx tsc --noEmit -p .` clean; REQUEST lines.
+
+## 10. Depth + particles (2026-10-27; CRAFT §f, `src/lib/DEPTH.md`, THROUGHLINE §5b)
+- **Planes:** -1 the café boat's stern things, 0 her, the board and the lane (its one camera: VP (600, 948), f 935, eye
+  1.3 m), +1 the far bank across the basin, +2 the far rows on the sunset band (the air #F3C6A6): far fills through
+  `recede` / `planePalette`.
+- **Separation:** her backlit (rim) on the lane; the board's cream on the shaded lane wall (`backing` if close); W lit.
+- **Particles:** S8 is the mote shot (the sun ahead): backlit `motes` in SUN8's light over the lane (on the shaded
+  wall), `glints` in SUN8's glitter column on the basin; nothing new in 38.72-39.08 (the seam), `joins` [0, 6.15].
+- **Check:** `check_depth.py` at 34.0 and 38.0 with a sheet for S8: no FAIL.
