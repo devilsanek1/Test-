@@ -503,6 +503,8 @@ export type WaterRipples = {
   thick: [number, number];
   drift: [number, number];
   life: [number, number];
+  /** The rest between two lives of a slot (s; default 0.2-0.7). */
+  rest?: [number, number];
   t0: number;
   /** A crest across a reflection: the reflection's own tone this many CIE L* lighter (default 8: R9's +6-10); a trough
    *  across the open water: the water's own colour this many OKLab L darker (default -0.04). */
@@ -845,7 +847,7 @@ function buildFlat(s: Resolved, ctx: FrameCtx, out: Runs): void {
 
 // ================================================================= the sun's glitter (G2: a still bed, nested slivers)
 
-const SUN_DEFAULT = {slope: 0.06, bed: fromLch(82, 34, 74), core: fromLch(97.5, 7, 85), t0: 0.3, slots: 6, life: [0.42, 0.9] as [number, number], len: [20, 34] as [number, number], sigma: 22};
+const SUN_DEFAULT = {slope: 0.06, bed: fromLch(82, 34, 74), core: fromLch(97.5, 7, 85), t0: 0.3, slots: 6, life: [0.5, 0.8] as [number, number], len: [20, 34] as [number, number], sigma: 22};
 /** The column's half-width at screen y (R8, DERIVED for a level camera): a (y - hz) + f a sin(e), e the sun's elevation. */
 export function glitterHalfW(cam: WaterCam, sun: WaterSun, y: number): number {
   const a = sun.slope ?? SUN_DEFAULT.slope;
@@ -873,12 +875,17 @@ function glitterBed(st: Static): GlitterLens[] {
     const u = clamp01((ya - y0) / Math.max(1, y1 - y0));
     const nearPeak = clamp01(1 - Math.abs((ya + yb) / 2 - peak) / ((y1 - y0) * 0.6));
     const top = ya + gapOf(st.grid, ya, yb);
-    const hw = glitterHalfW(st.spec.cam, s, (top + yb) / 2) * (0.52 + 0.4 * len + 0.26 * nearPeak);
-    out.push({cx: s.x + (off - 0.5) * lerp(5, 12, u), cy: (top + yb) / 2, len: hw * 2, h: (yb - top) * 0.92, band: i});
+    const col = glitterHalfW(st.spec.cam, s, (top + yb) / 2);
+    const hw = Math.min(28, col * (0.45 + 0.62 * len + 0.25 * nearPeak));
+    // its centre wanders inside the column (never past its edge): seeded per band, still
+    const room = Math.max(0, col - hw * 0.55);
+    out.push({cx: s.x + (2 * off - 1) * Math.min(room, lerp(8, 16, u)), cy: (top + yb) / 2, len: Math.max(21, hw * 2), h: (yb - top) * 0.92, band: i});
   }
   return out;
 }
 export type Sliver = {x: number; y: number; len: number; h: number; lens: number};
+/** A sliver's dark rest between two lives (s): longer than 0.1 s, so no pixel flickers on and off. */
+export const SLIVER_REST = 0.12;
 /** THE SLIVERS at t: `slots` warm-white lenses nested in the bed's longer lenses (each slot owns its own lenses, so two
  *  never share one), each living `life` s (lit 62-86 % of it), growing in and shrinking out along its length (never a
  *  fade), densest round the sun's mirror point. Born from t0. */
@@ -901,17 +908,18 @@ export function glitterSlivers(st: Static, t: number): Sliver[] {
   for (let j = 0; j < slots; j++) {
     const own = long.filter((_, r) => r % slots === j);
     if (!own.length) continue;
-    // a cycle = a life (lit 60-80 % of it) then a rest of at least 0.16 s (a sliver never re-lights at once)
-    const P = lerp(life[0], life[1], hash01(st.seed, 7100, j, 1)) + 0.16;
+    // a cycle = a life (lit 92-98 % of it) then a rest of at least SLIVER_REST s (a sliver never re-lights at once:
+    // more than 6 frames dark)
+    const P = lerp(life[0], life[1], hash01(st.seed, 7100, j, 1)) + SLIVER_REST;
     const u = (t - t0) / P - hash01(st.seed, 7100, j, 2);
     if (u < 0) continue;
     const cyc = Math.floor(u);
     const tau = (u - cyc) * P;
-    const lit = (P - 0.16) * lerp(0.6, 0.8, hash01(st.seed, 7100, j, 3, cyc));
+    const lit = (P - SLIVER_REST) * lerp(0.92, 0.98, hash01(st.seed, 7100, j, 3, cyc));
     if (tau > lit) continue;
-    // it grows in along its length (40 %), holds (20 %), shrinks out (40 %): eased, never a fade
+    // it grows in along its length (35 %), holds (30 %), shrinks out (35 %): eased, never a fade
     const q = tau / lit;
-    const e0 = q < 0.4 ? q / 0.4 : q > 0.6 ? (1 - q) / 0.4 : 1;
+    const e0 = q < 0.35 ? q / 0.35 : q > 0.65 ? (1 - q) / 0.35 : 1;
     const env = e0 * e0 * (3 - 2 * e0);
     // which of its lenses this cycle: weighted toward the mirror point (a normal draw in y, the nearest lens); with two
     // lenses a slot takes them in turn
@@ -978,7 +986,7 @@ export function ripplesAt(st: Static, t: number, under: (x: number, y: number) =
         if (len >= 2) out.push({x: xc, y, len, h, tone: tone ? 1 : -1, over: tone || undefined});
         break;
       }
-      tb += life + lerp(0.2, 1.2, hash01(st.seed, 7300, s, n, 6));
+      tb += life + lerp(rp.rest?.[0] ?? 0.2, rp.rest?.[1] ?? 0.7, hash01(st.seed, 7300, s, n, 6));
     }
   }
   return out;
@@ -1331,7 +1339,7 @@ export function waterProblems(spec: WaterSpec, o: {t1?: number; otherAlive?: num
     const len = sun.len ?? SUN_DEFAULT.len;
     if ((sun.slots ?? SUN_DEFAULT.slots) > L.sliversAlive) out.push(`${name}: ${sun.slots} sliver slots (CRAFT §f.6: 4-6 twinkling at once)`);
     if (spec.lod !== 'far' && (len[0] < L.sliverLen[0] || len[1] > L.sliverLen[1])) out.push(`${name}: slivers ${len[0]}-${len[1]} px (CRAFT §f.6: ${L.sliverLen[0]}-${L.sliverLen[1]})`);
-    if (life[0] * 0.62 < L.sliverLife[0] - 1e-9 || life[1] > L.sliverLife[1] + 1e-9) out.push(`${name}: sliver lives ${life[0]}-${life[1]} s (lit 0.25-0.8 s: CRAFT §f.6)`);
+    if (life[0] * 0.85 < L.sliverLife[0] - 1e-9 || life[1] > L.sliverLife[1] + 1e-9) out.push(`${name}: sliver lives ${life[0]}-${life[1]} s (lit 0.25-0.8 s: CRAFT §f.6)`);
     const t0 = sun.t0 ?? SUN_DEFAULT.t0;
     if (spec.flood && t0 < st.floodEnd) out.push(`${name}: slivers born from ${t0} s, before the flood has crossed the water (${st.floodEnd.toFixed(2)} s)`);
     // alive at once, sampled over the shot

@@ -273,7 +273,7 @@ const S1_WATER: WaterSpec = {
   grid: {dz: 0.45, minPitch: 3, gap: [0.16, 0.26]},
   sources: [],
   moving: s1Moving,
-  sun: {x: MAP.SUN0.x, y: MAP.SUN0.y, slope: 0.06, rows: SUN_ROWS, t0: 0.3, slots: 6, life: [0.42, 0.9], len: [20, 34], sigma: 22, plane: S1_PLANE.farRoofs},
+  sun: {x: MAP.SUN0.x, y: MAP.SUN0.y, slope: 0.06, rows: SUN_ROWS, t0: 0.3, slots: 6, life: [0.5, 0.8], len: [20, 34], sigma: 22, plane: S1_PLANE.farRoofs},
   // ripple lines: 6-11 alive, mostly in the near water, clear of the glitter column and Pip's seat (S1_PIP)
   ripples: {
     slots: 11,
@@ -287,7 +287,8 @@ const S1_WATER: WaterSpec = {
     thick: [1.5, 3],
     drift: [6, 16],
     life: [2.6, 4.6],
-    t0: 0.24,
+    // a steady field from frame 0, revealed by the flood with the rest of the water's colour (f5-f12): never a pop
+    t0: 0,
   },
   float: s1WaterFloat,
   skyPlane: S1_PLANE.sky,
