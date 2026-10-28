@@ -1,5 +1,5 @@
 // V2S2_Board (lane L2): the newsstand's A-board TOLD THE BBC (TREATMENT §5 S2 "Texts on objects"; map S2.aBoard face
-// x 160-560, y 1050-1250, here 8 px left) and the newsagent who shoves it out from behind the kiosk (the wood clack
+// x 110-510, y 1050-1250) and the newsagent who shoves it out from behind the kiosk (the wood clack
 // 8.44). The board is K3's `ToldTheBBCBoard` (L5): its frame, face, lettering and ground shadow; tier B while it rests
 // behind the kiosk, A on its beat only, 8.42-9.60 (the shove, "But Google's", until the BBC beat has played: the critic
 // 2026-10-28, it owned the eye to the match as the biggest, brightest A), then B again; its shadow only once it moves.
@@ -24,11 +24,11 @@ import {Person} from '../kit/cast';
 import type {View} from '../kit/cast';
 import * as MAP from '../world/map';
 
-/** The board face shifted this far left of the map rect: K3's frame (26 px stiles) then ends at x 536, a clear gap
- *  left of Pip's seat (Pip's lower body starts at x ~560: no tangent, Pip never reads as perched on the board). Its
- *  left stile hides behind the kiosk; at rest the whole board hides behind the kiosk (BOARD_DX0). */
-export const BOARD_SHIFT = -50;
-const F = {x0: MAP.S2.aBoard.x0 + BOARD_SHIFT, y0: MAP.S2.aBoard.y0, x1: MAP.S2.aBoard.x1 + BOARD_SHIFT, y1: MAP.S2.aBoard.y1};
+/** The board face = the map rect S2.aBoard (x 110-510: since 2026-10-28 the map holds this lane's 50 px shift left of
+ *  the treatment's 160-560, the former BOARD_SHIFT): K3's frame (26 px stiles) ends at x 536, a clear gap left of Pip's
+ *  seat (Pip's lower body starts at x ~560: no tangent, Pip never reads as perched on the board). Its left stile hides
+ *  behind the kiosk; at rest the whole board hides behind the kiosk (BOARD_DX0). */
+const F = MAP.S2.aBoard;
 /** K3's small frame (ToldTheBBCBoard's defaults). */
 const STILE = 26;
 /** Ground line under the board (the legs' feet: K3's S2_LEGS_Y1). */

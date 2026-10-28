@@ -694,14 +694,19 @@ export const S2 = {
   /** The wing, cut by the left edge, receding right: rows at the left edge; ~400 windows (one batched path, LOD);
    *  the stepped tiers small behind it, all at y >= 600; pigeons on the parapet. */
   wing: {parapetMinY: 600, firstStoreyY: [700, 880] as const, groundRowY: [900, 1010] as const, windowWLeft: 150, windowWFar: 8, windowsTotal: 400},
-  /** The newsstand A-board TOLD THE BBC (slid out by the newsagent at 8.44). */
-  aBoard: {x0: 160, y0: 1050, x1: 560, y1: 1250} as Rect,
+  /** The newsstand A-board TOLD THE BBC (slid out by the newsagent at 8.44). Its face as S2 draws it (L2's request,
+   *  2026-10-28): 50 px left of the treatment's x 160-560 (V2S2_Board's former BOARD_SHIFT), so K3's frame (26 px
+   *  stiles) ends at x 536, a clear gap left of Pip's seat (590, 1050). */
+  aBoard: {x0: 110, y0: 1050, x1: 510, y1: 1250} as Rect,
   aBoardOutAt: 8.44,
   /** The bench: the reporter (left: satchel, notebook, no BBC marks) and the staffer (right: slate coat, auburn hair,
-   *  plain lanyard; seated >= 180 px, seated from the start). Seated figure boxes (centre x, feet, height). */
-  bench: {x0: 560, y0: 1040, x1: 780, y1: 1230} as Rect,
-  reporter: {x: 612, feetY: 1230, h: 165} as Fig,
-  staffer: {x: 714, feetY: 1230, h: 180} as Fig,
+   *  plain lanyard; seated >= 180 px, seated from the start). Seated figure boxes (centre x, feet, height). As S2 draws
+   *  them (V2S2_Layout, L2's request 2026-10-28): the bench on the A-board's ground line, x 600-800, y 1110-1290 (the
+   *  earlier x 560-780, y 1040-1230 put the reporter's head 15 px under Pip's seat); the pair on its seat line y 1244
+   *  (seat to head 124 / 140: heads at y 1120 / 1104). */
+  bench: {x0: 600, y0: 1110, x1: 800, y1: 1290} as Rect,
+  reporter: {x: 640, feetY: 1290, h: 170} as Fig,
+  staffer: {x: 718, feetY: 1290, h: 186} as Fig,
   /** 9.48 "BBC": the notebook opens, the staffer turns to the reporter; the notebook claps shut by 12.70 (was 12.85):
    *  nothing enters, pops or turns in 12.78-13.18 (the match). */
   notebookOpenAt: 9.48,
@@ -760,12 +765,14 @@ export const S4 = {
    *  plane (0.6x the path's 310 px truck: it starts to enter at ~14.95, half in by ~15.6, whole by ~16.3); teal frame,
    *  Juliet rail, blind UP, a DARK pane (she is not home yet); tier B (the thread's home spot), >= 90 px wide (90 x 102:
    *  S8's W proportion); at the stop she looks west along the plates toward it, and the push-through into SUN1 leaves
-   *  from the sun right beside it. At its pose (17.96) it sits left of SUN1's disc (x <= 180; the disc reaches x 185) and
-   *  6 px above the DEC plate (x 110-560, y 755-855, on the nearer path plane, up from 18.92): an earlier draft's
-   *  ~(150, 790) sat behind that plate (hidden from 18.92 to the join) and crossed the disc. 47 px stay above it for the
-   *  house's eave, mansard and low chimney pots, all at y >= 600 (the backs' ridges sit at y ~615-620). Never over the
-   *  plates, the tag or the band. */
-  herWindow: {x: 135, y: 698, w: 90, h: 102} as Spot,
+   *  from the sun right beside it. At its pose (17.96) it sits left of SUN1's disc (x <= 170, its house's cornice <= 172;
+   *  the disc reaches x 185: a 13-15 px gap, never a tangent; at x 135 (until 2026-10-28) its frame and cornice sat
+   *  3-5 px from the limb, so the integrator moved it 10 px left rather than shrink SUN1, which S5's far plane is
+   *  pinned to) and 6 px above the DEC plate (x 110-560, y 755-855, on the nearer path plane, up from 18.92): an earlier
+   *  draft's ~(150, 790) sat behind that plate (hidden from 18.92 to the join) and crossed the disc. 47 px stay above it
+   *  for the house's eave, mansard and low chimney pots, all at y >= 600 (the backs' ridges sit at y ~615-620). Never
+   *  over the plates, the tag or the band. */
+  herWindow: {x: 125, y: 698, w: 90, h: 102} as Spot,
   backsPlaneK: 0.6,
   towpathY: [860, 1080] as const,
   /** The fingerpost at the stop (17.96): ONE post at x ~575, two arrow plates pointing WEST, time order top-to-bottom,
