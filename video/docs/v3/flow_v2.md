@@ -43,7 +43,9 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
   15.95-17.25 (inOutCubic, peak 14.9 px/f; room and outside together); the SQB hold floats.
 - **`scenes/thread_plane.tsx`** (transition agent; from O1's front plane): hand, phone, listing, tag, Pip, ticker; the screen dims a
   step toward peach when the stage leads (lit 0-4.04, 17.24-19.40, 29.90-31.00, 38.12-41.15), the button and badge then a soft
-  blue; the tag's own off-beat schedule is §1's; price glyphs above y 1480, all left of x 950:
+  blue, the body a soft warm dark (L* 32, no outline) and the listing's laptop a soft terracotta (SQA pilot review: off-beat the
+  plane is tier B, no near-black, never out-colouring the stage); the tag's own off-beat schedule is §1's; price glyphs above
+  y 1480, all left of x 950:
 
   | spot | phone (top-left, w; rot -3) | tag box (top-left, w; rot -6) | when (move) |
   |---|---|---|---|
@@ -65,8 +67,8 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
   lowers 3.64-4.00, the DC dark with its sign lit 4.04), in the clean pen, with the new ticker, LOW-C and Pip on the phone (calm
   keys). After the SQA pilot review: the colour floods out from the tag (the bezel last, every fill one step inside its line);
   the tap acted after the colour lands (the thumb lifts 0.30-0.40, presses 0.50 on "laptop", the cart pop sound 0.50, the badge
-  0 -> 1 at 0.52); the camera locked; at 4.04 ONE event (the DC dark + sign lit, the thread plane off-beat in the same frame),
-  4.16-4.53 the DC's server rows light one by one.
+  0 -> 1 at 0.52); the camera locked; at 4.04 ONE event (the DC dark + sign lit + the thoom, the thread plane off-beat in the
+  same frame), 4.16-4.87 the DC's server rows light one per syllable of "AI data centers" (the subject owns its line's motion).
 - **SQB OLD DEAL.** The card (paper, unlit) at screen x 200-940, y 612-1028, ~150 px of night window at the left edge: "US computer
   prices" 58 px, "same computing power" 34 px, axes, 2005, 2025. 6.98-9.28 the line draws downhill (2021 bump); 10.50 a doodle
   laptop with "$999" lands on it (~2017); 10.82 a shinier BETTER one, same "$999", pops right after; 13.85-14.45 the line hooks

@@ -175,7 +175,7 @@ const PhoneBody: React.FC<PhoneProps> = ({
       ) : null}
       {/* product photo: THE laptop (the 'new' one, lit) on the listing panel */}
       <Fill d={roundRect(S.photo.x, S.photo.y, S.photo.w, S.photo.h, 18 * k)} color={EMBER.paper} at={fillAt(at, 0.04)} offset={false} />
-      {photoLaptop ? <Laptop x={S.laptop.x} y={S.laptop.y} w={S.laptop.w} variant="new" at={b(at, 0.06)} seed={`${seed}/lap`} ink={3} tier={dim >= 0.5 ? 'support' : undefined} /> : null}
+      {photoLaptop ? <Laptop x={S.laptop.x} y={S.laptop.y} w={S.laptop.w} variant="new" at={b(at, 0.06)} seed={`${seed}/lap`} ink={3} tier={dim >= 0.5 ? 'support' : undefined} dim={dim} /> : null}
       {titleRule ? <Ink d={textLines(40 * k, 300 * k, 230 * k, {n: 1, gap: 18 * k, seed: `${seed}/title`, heading: false})} at={b(at, 0.14)} width={thin} /> : null}
       {/* the listing price (struck when it goes up; the new price pops beside it) */}
       {price ? (
