@@ -815,7 +815,8 @@ export const S5 = {
     bench: {x0: 230, y0: 1060, x1: 460, y1: 1230} as Rect,
     stranger: {x: 300, feetY: 1225, h: 150} as Fig,
     pipSeat: {x: 415, y: 1120} as Seat,
-    /** The US newspaper box, no masthead: face 310 px wide; headline 40 px x 3 lines + an 18 px credit. */
+    /** The US newspaper box, no masthead: face 310 px wide; headline body 34 px x 3 lines + an 18 px credit (K3 NewsBox's
+     *  default since 2026-10-28: 40 was off the type scale). */
     newsBox: {x0: 470, y0: 880, x1: 780, y1: 1230} as Rect,
     /** 20.76 "April": the slot's trees burst into blossom in 4 frames (the beat's A); Pip looks up at the blossom (its
      *  one reaction). The disc stays a disc. */
@@ -1309,7 +1310,7 @@ const s5Shapes = (t: number): Shape[] => {
       R('mass', 'bench', s.bench),
       F('figure', 'the stranger (back, newspaper)', s.stranger, SEATED_ASPECT_OVERLAY),
       P('Pip: beside the stranger', s.pipSeat),
-      R('text', 'news box (headline 40 px x 3 + credit)', s.newsBox),
+      R('text', 'news box (headline 34 px x 3 + credit)', s.newsBox),
       R('mass', 'bench front, paving, root', {x0: 0, y0: 1250, x1: FRAME_W, y1: FRAME_H}),
     ];
   }

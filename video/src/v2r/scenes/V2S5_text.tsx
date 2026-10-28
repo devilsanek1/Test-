@@ -12,8 +12,10 @@
 //            the deck 1.30x) the text stays inside x <= 880; at the end it sits below the Pentagon's facades (their bottom
 //            edge ~y 1000-1045). Tier A from its pop (conform_L4 §5). Its separation (check_depth "melts", QA
 //            2026-10-28: at y 1119-1246 the limestone face and its frame sat on the light paving and balustrade, median
-//            |dL*| 5.2): its top edge and pointer tab now stand on the Pentagon's cast shadow (the calm L* ~55 band on
-//            its lawn, y ~1068-1104), its foot on its own contact shadow (+ its cast, left in the end light).
+//            |dL*| 5.2; with its top on the Pentagon's cast band still 6.9-8.3, 34 % at one value): K3's DARK PANEL
+//            (`panel="dark"`, the integrator 2026-10-28, L4's request): a bronze-dark plate (L* 36) with limestone letters
+//            in the same bronze frame, against the paving's L* ~75-87; its foot on its own contact shadow (+ its cast,
+//            left in the end light).
 import React from 'react';
 import {Fill} from '../../lib/Fill';
 import {useTime} from '../../lib/time';
@@ -26,8 +28,8 @@ import {S5} from '../world/map';
 import {NewsBox as K3NewsBox, Plaque as K3Plaque, WorldText, TYPE, TXT_NEWS_BOX, plaqueLayout} from '../kit/boards';
 import {NEWS_BOX, SMALL_COLORS, popK} from '../kit/boards/small';
 
-/** The plaque's END spot (K3 Plaque: x = centre, y = the plate's bottom edge when stand = false). */
-export const PLAQUE_SPOT = {x: 605, y: 1237, stand: false};
+/** The plaque's END spot (K3 Plaque: x = centre, y = the plate's bottom edge when stand = false) and its panel. */
+export const PLAQUE_SPOT = {x: 605, y: 1237, stand: false, panel: 'dark' as const};
 
 const rectD = (x0: number, y0: number, x1: number, y1: number) => polyPath([[x0, y0], [x1, y0], [x1, y1], [x0, y1]]);
 
@@ -91,7 +93,7 @@ export const NewsBox: React.FC = () => {
 export const Plaque: React.FC<{at: number}> = ({at}) => {
   const t = useTime();
   if (t < at) return null;
-  const {x, y, stand} = PLAQUE_SPOT;
+  const {x, y, stand, panel} = PLAQUE_SPOT;
   const L = plaqueLayout(TYPE.key, undefined, stand);
   const x0 = x - L.w / 2;
   const x1 = x + L.w / 2;
@@ -103,7 +105,7 @@ export const Plaque: React.FC<{at: number}> = ({at}) => {
           <ContactShadow x={x + 1.5} y={y + 1} w={L.w + 3} k={1.02} h={10} />
         </ShadowLayer>
       </XG>
-      <K3Plaque at={at} x={x} y={y} stand={stand} tier="subject" />
+      <K3Plaque at={at} x={x} y={y} stand={stand} panel={panel} tier="subject" />
     </>
   );
 };
