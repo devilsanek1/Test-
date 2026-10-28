@@ -11,9 +11,10 @@ and `video/docs/PIPELINE_V2.md`.
   `video-production` on 2026-10-27 ~23:05 UTC (owner: "yes merge it into video-production"): v4 work is committed on the
   session branch, then pulled and pushed to `video-production` at each step, like the other films.
 - The earlier session (G0, the pause): https://claude.ai/code/session_014PwCXHBSouhcawFp12X9sT.
-- Checkpoints: a commit after every agent, plus `video/scripts/autocheckpoint.sh claude/busy-lovelace-83r39e video/docs/v4`
-  in the background (every 10 minutes when v4's files changed; restart it after a session restart, and add v4's
-  `public/`, `assets/` and `src/` paths once those exist).
+- Checkpoints: agents write their results into `video/docs/v4/...` files; a commit after every agent and at every
+  turn's end; `video/scripts/autocheckpoint.sh claude/busy-lovelace-83r39e video/docs/v4` for a long unattended build
+  (a background job lives at most 2 hours). The 5-hour limit hit on 2026-10-28 ~01:30 UTC (reset 03:30): three writers
+  were resumed from their transcripts; three finished writers' lines were saved from their transcripts.
 
 ## Status by gate
 | Gate | Status | File |

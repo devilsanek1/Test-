@@ -44,3 +44,8 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   changed), on top of a commit after every agent; agents write their output file early. -> rule: Process (limits).
 - 2026-10-27 ~23:05 UTC: "yes merge it into video-production" -> v4's branch (with the max-effort hook, the
   auto-checkpoint and the earlier v4 branch's rhythm rule) merged into `video-production`; v4 keeps syncing there.
+- 2026-10-28 ~03:30 UTC: the 5-hour limit hit during the line writers; owner: "I hit my usage limit while you were
+  working, but it has reset now. Please continue from where you left off." -> the three finished writers' lines saved
+  from their transcripts and committed; the three stopped writers resumed from their transcripts (SendMessage), each now
+  writing its result into `core_line/writers/`; the auto-checkpoint loop had ended at its 2-hour cap, so the rule now
+  leans on agents writing files plus a commit at every step. -> rule: Process (limits).
