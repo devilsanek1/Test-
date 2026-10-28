@@ -540,7 +540,7 @@ export type LightOpts = {
   /** The sliver's profile: 2 = a lens (parabolic flanks), 1 = a diamond; 1.5 a willow leaf. */
   leaf?: number;
 };
-export const LIGHT_DEFAULT: Required<LightOpts> = {solid: 0.33, slivers: 3, ratio: 0.68, thinning: 0.85, thick: 1.05, thickPx: [6, 9], gap: 4.5, gapK: 0.95, gapGrow: 0.2, step: 6, fall: 1.3, wander: 0.05, wave: [2.2, 56], leaf: 1.5};
+export const LIGHT_DEFAULT: Required<LightOpts> = {solid: 0.33, slivers: 3, ratio: 0.62, thinning: 0.85, thick: 1.05, thickPx: [6, 9], gap: 4.5, gapK: 0.95, gapGrow: 0.2, step: 6, fall: 1.3, wander: 0.05, wave: [2.2, 56], leaf: 1.5};
 /** The sun's glitter column (R8; CRAFT §f.6's glints are its slivers). */
 export type WaterSun = {
   /** The sun on screen (its disc's centre). */
@@ -550,8 +550,8 @@ export type WaterSun = {
   slope?: number;
   /** The column's y range (default the water's at the sun's x). */
   rows?: [number, number];
-  /** The bed's gold and the slivers' warm white (default L* 82 C* 40 h 72 / L* 97.5 C* 16 h 84: the slivers +15 over the
-   *  bed, CRAFT §f.6). */
+  /** The bed's gold and the slivers' warm white (default L* 81 C* 42 h 71 / L* 94.5 C* 16 h 87: the slivers +13.5 over
+   *  the bed, CRAFT §f.6). */
   bed?: string;
   core?: string;
   /** Slivers are born from t0 (after the frame-0 flood). */
@@ -560,8 +560,11 @@ export type WaterSun = {
   slots?: number;
   life?: [number, number];
   len?: [number, number];
-  /** The bed's lenses only on bands at least this many px (default 5): the far rows are a near mirror. */
+  /** The bed's lenses only on bands at least this many px (default 5): the far rows are a near mirror; and their
+   *  length as a share of the envelope's (default 0.85: every px of gold edge on the teal is an olive fringe in the
+   *  encode). */
   lensPitch?: number;
+  lensLen?: number;
   /** Where it is densest (default the sun's still-water mirror point, 2 hz - y) and the spread (px). */
   mirrorY?: number;
   sigma?: number;
@@ -1044,9 +1047,10 @@ function buildFlat(s: Resolved, ctx: FrameCtx, out: Runs): void {
 // ================================================================= the sun's glitter (G2: a still bed, nested slivers)
 
 // the bed a richer amber gold and the slivers a warm gold-white (the critic on v6's first master: the encode's 4:2:0
-// chroma mixed the C* 34 bed's edges with the teal into olive, and the near-white slivers' rims into the paving's own
-// peach, dE76 < 5): at C* 40 / 16 the edge mixes stay out of the house bands and >= 6 from the paving
-const SUN_DEFAULT = {slope: 0.06, bed: fromLch(82, 40, 72), core: fromLch(97.5, 16, 84), lensPitch: 5, t0: 0.3, slots: 6, life: [0.5, 0.8] as [number, number], len: [20, 34] as [number, number], sigma: 22};
+// chroma mixed the C* 34 bed's edges with the teal into olive, and the near-white slivers' rims with the bed into the
+// paving's own peach, dE76 < 5): at C* 42 / 16 (L* 94.5 is the lightest a C* 16 gold-white can be in sRGB) every sRGB
+// mix of a sliver and its lens stays >= 6 from the paving, and fewer of the bed's rims fall in the house bands
+const SUN_DEFAULT = {slope: 0.06, bed: fromLch(81, 42, 71), core: fromLch(94.5, 16, 87), lensPitch: 5, lensLen: 0.85, t0: 0.3, slots: 6, life: [0.5, 0.8] as [number, number], len: [20, 34] as [number, number], sigma: 22};
 /** The column's half-width at screen y (R8, DERIVED for a level camera): a (y - hz) + f a sin(e), e the sun's elevation. */
 export function glitterHalfW(cam: WaterCam, sun: WaterSun, y: number): number {
   const a = sun.slope ?? SUN_DEFAULT.slope;
@@ -1082,7 +1086,7 @@ function glitterBed(st: Static): GlitterLens[] {
     // its centre wanders inside the column (never past its edge): seeded per band, still
     const room = Math.max(0, col - hw * 0.55);
     // a lens fills most of its band (0.8 of the pitch): the slivers it holds can stand >= 3.5 px tall
-    out.push({cx: s.x + (2 * off - 1) * Math.min(room, lerp(8, 16, u)), cy: (top + yb) / 2, len: Math.max(21, hw * 2), h: Math.max((yb - top) * 0.92, (yb - ya) * 0.8), band: i});
+    out.push({cx: s.x + (2 * off - 1) * Math.min(room, lerp(8, 16, u)), cy: (top + yb) / 2, len: Math.max(21, hw * 2 * (s.lensLen ?? SUN_DEFAULT.lensLen)), h: Math.max((yb - top) * 0.92, (yb - ya) * 0.8), band: i});
   }
   return out;
 }
