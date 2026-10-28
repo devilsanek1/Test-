@@ -5,8 +5,9 @@ must not be "confused with conflicting instructions"). Read it before any visual
 (`docs/OWNER_PLAYBOOK.md`) and `docs/PIPELINE_V2.md`; the film's one style page (`docs/vN/STYLE.md`) picks its values
 inside these rules. Each rule links the section with its numbers, code and checks (paths from `video/`; bare names are
 in `docs/look/` or `docs/`). **In short:** one flowing story about one thing, in a full, calm, cozy world of hand-drawn
-flat colour, drawn clean and lit gently, in ONE look that every video shares (one brand: owner, 2026-10-28, "a coherent
-style across all videos sharing one look, one brand would be absolutely the key here").
+flat colour, drawn clean and lit gently, in ONE look that every video shares and that keeps evolving as we find our style
+(one brand: owner, 2026-10-28, "a coherent style across all videos sharing one look, one brand would be absolutely the
+key here"; "our look is evolving - we are finding out style i don't think we can overfixate on this").
 
 **Which doc wins** (the full statement; other docs repeat its first line):
 1. **The owner's words:** the playbook, and for one film what the owner said in `docs/vN/OWNER_NOTES.md` (the quoted
@@ -28,7 +29,8 @@ A clash is a bug: fix the lower doc in the same turn.
 and wants to experiment with it, starting from v2's look ("i really like the style and i want us to experiment more with
 the style and the focus on our videos"). What we learn from them (perspective, visual style, details, composition) and
 which content fits a world of cities and buildings are studied in `docs/studies/2026-10-28_city_posters/`. **Already
-decided by the owner (2026-10-28), in the rules below:** one look for every video (the intro; rule 3); a VERY subtle
+decided by the owner (2026-10-28), in the rules below:** one look for every video, still evolving (the intro; rule 3);
+Pip stays, hidden on purpose (rules 1-2); a VERY subtle
 paper-and-paint texture may be tried (rule 4); every volume in lit and shade tones (rule 5); a full value range (rule
 6). **Still open:** the posters' outline-free edges (the owner judges an A vs B picture; rule 4's lines stand until
 then), one consolidated layout guide (our earlier layout rules reconciled with the posters' findings), the designed view
@@ -39,17 +41,18 @@ study is a proposal until the owner approves it.
 ## The rules
 - **1. One flowing story, never shots stitched together.** One story on ONE core line (spine first, each line following
   from the last) and a through-line card: one thread object carrying the arc (on screen >= 80 %, no gap over 3 s
-  except the one scale reveal and an owner-approved fairness stretch, declared on the card), one home place (at most 3 places; a chart is paper where you already are), one "you",
-  the mascot on both sides of every join. Every join carries something (A push-through, B thread match, C continuous
+  except the one scale reveal and an owner-approved fairness stretch, declared on the card), one home place (at most 3 places; a chart is paper where you already are), one "you";
+  Pip hides in the world, never a join's carrier (rule 2). Every join carries something (A push-through, B thread match, C continuous
   camera, D object carry or wipe, E card flip; F plain cut: at most 2, on a "But" turn; a dissolve is no carrier), its
   midpoint on the next sentence's first word; shots (panels) average >= 3.5 s. Sound off, every shot reads: literal
   beats clever. -> `CRAFT.md` §a; engine types per carrier: `G5_BLOCKING.md` §2.
 - **2. Attention hierarchy: one subject at a time.** Tier by STORY ROLE, never depth: A, the beat's 1-3 subject objects,
   owns the contrast, the hero colour, the only full outline and >= 60 % of the motion; B, supporting life (people near
   the story, the mascot): soft (C* <= 25), small, steady, a tinted line or none; C, the environment: no outlines, low
-  contrast, slow life only. The film's recurring living character is in every shot (Pip by default, drawn new per
-  film; another character only if the story asks, named in W1), tier B unless the line is about it: <= 1 % of the
-  frame. Squint at phone size: the eye is on the beat's subject. **Depth and separation too** (owner, v2 G4): the
+  contrast, slow life only. Pip stays in every film, hidden on purpose (owner, 2026-10-28: "keep it, but not as
+  obvious"): small, inside the world (a window, a boat, a balcony, a crowd), found on a second look, never on the
+  subject's eye path; drawn new per film in the one look; tier B, <= 1 % of the frame; its hiding spots planned at G3
+  (W1 names them); another character only if the story asks, named in W1. Squint at phone size: the eye is on the beat's subject. **Depth and separation too** (owner, v2 G4): the
   subject never melts into what is behind it (its own value against a calmer field); distance shows in colour (far
   planes converge on the air behind them: lighter, softer in contrast, simpler, cooler under a blue sky and warmer under a
   sunset: atmospheric perspective in flat colour) and in perspective (a ground
@@ -160,7 +163,8 @@ stage; the owner may skip gates by name. The clean pen's first test is the v3 re
 - A zoom, push or "breathe" in any hold (ref 2's per-shot zoom, the old "push 3-5 %", the S3/S4 pull-outs).
 - A light that moves or hops between cuts, the sun as a character or idle motion (v1, `CINE.md`); glow discs and halo
   rings standing in for light.
-- The mascot hopping across cuts on its own (it rides the carrier or keeps its spot); strangers' backs in the
+- The mascot hopping across cuts, riding the carriers or sitting on both sides of every join, or placed for the eye as
+  a visible presence in every shot: Pip hides on purpose (rule 2; owner, 2026-10-28); strangers' backs in the
   foreground, in any film.
 - Faces on people (a protagonist's "face beat", v3's waist-up "you" facing us): people act with their pose; only the
   mascot has a face (rule 3).

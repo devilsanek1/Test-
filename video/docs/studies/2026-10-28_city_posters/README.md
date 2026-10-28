@@ -32,7 +32,12 @@ message, the answers verbatim in `video/docs/look/poster_refs/README.md`). Alrea
   video" -> DIRECTION rule 5.
 - 5 a full value range: "good point too!" -> DIRECTION rule 6 (the study gives its numbers).
 - 9 one look across all videos: "a coherent style across all videos sharing one look, one brand would be absolutely the
-  key here" -> DIRECTION's intro, rule 3, the playbook's ONE LOOK, ONE BRAND.
+  key here", then "the importnat part about one look is our look is evolving - we are finding out style i don't think
+  we can overfixate on this" -> DIRECTION's intro, rule 3, the playbook's ONE LOOK, ONE BRAND, still evolving: the
+  study proposes the next steps of the look, never a frozen style sheet.
+- Pip (our question): "would be good to keep it, but we can perhaps make it way more subtle perhaps hide it deliberately
+  in the video, like keep it, but not as obvious" -> DIRECTION rules 1-2, CRAFT §a.3 and §b, LIFE_AND_DENSITY §5, the
+  playbook: Pip stays, hidden on purpose, no longer a join's carrier.
 Still open, for the synthesis:
 - 2 the geometric patchwork (the mid and far city in overlapping flat blocks): no answer yet.
 - 3 outline-free edges: "i like 3 - but can you draw me a picture of difference like A vs B" -> the A vs B picture

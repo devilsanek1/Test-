@@ -113,7 +113,7 @@ POSTERS: dict[str, dict] = {
                   'lighthouse left vs right': [[228, 1030, 240, 1080], [245, 1030, 254, 1080]]},
         'planes': [],
         'water': {'bay': {'box': [0, 1110, 400, 1200], 'src': [0, 1020, 400, 1105]}},
-        'city': 'Cape Town', 'sky': [100, 270, 1000, 500], 'sky_col': [100, 900], 'skyline': 600,
+        'city': 'Cape Town', 'sky': [100, 270, 1000, 500], 'sky_col': [100, 900], 'skyline': 500,
         'title': [420, 205, 790, 250], 'hero': [330, 630, 1010, 870], 'ground': [0, 1400, 1206, 1605],
         'regions': {'far city': [480, 840, 1100, 1090], 'water': [0, 940, 520, 1200],
                     'mid patchwork': [0, 1180, 560, 1330], 'near houses': [760, 830, 1206, 1550]},
@@ -607,8 +607,7 @@ def title_metrics(rgb: np.ndarray, lab: np.ndarray, box, content_rows) -> dict:
     x0, y0, x1, y1 = box
     sub = lab[y0:y1, x0:x1]
     bg = np.median(sub[..., 0])
-    ink = sub[..., 0] < bg - 18
-    ink = ndi.binary_opening(ink, iterations=1)
+    ink = sub[..., 0] < bg - 18  # no opening: thin title strokes break under it (Cape Town)
     cc, n = ndi.label(ink, structure=np.ones((3, 3)))
     objs = ndi.find_objects(cc)
     letters = []
@@ -919,7 +918,7 @@ def shade_steps(rgb: np.ndarray, valid: np.ndarray, k: int = 18, seed: int = 0) 
 # Canvas px (1080 x 1920). The caption band (y 290-600) is the sky's quiet field: sky boxes sit under the caption line.
 OURS: dict[str, dict] = {
     'v2_t1.0.png': {'film': 'v2 S1', 'sky': [250, 20, 850, 200], 'sky_col': [300, 1000], 'skyline': 600,
-                    'title': [0, 230, 1080, 375], 'ground': [0, 1300, 1080, 1900],
+                    'title': [0, 380, 1080, 500], 'ground': [0, 1300, 1080, 1900],
                     'regions': {'ground': [0, 1300, 1080, 1900], 'far city': [0, 600, 330, 900]},
                     'water': {'canal (lib/water)': {'box': [300, 1110, 900, 1200], 'src': [300, 1000, 900, 1100]}}},
     'v2_t9.0.png': {'film': 'v2 S2', 'sky': [250, 20, 850, 200], 'title': [0, 230, 1080, 375],
@@ -1021,6 +1020,14 @@ def cmd_measure(a) -> None:
 
 
 # ------------------------------------------------------------------------------------------------- encode test
+def lstar(rgb: np.ndarray) -> np.ndarray:
+    """Fast CIE L* (float32) from sRGB uint8."""
+    c = rgb.astype(np.float32) / 255
+    lin = np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
+    Y = lin @ np.array([0.2126729, 0.7151522, 0.0721750], np.float32)
+    return np.where(Y > 216 / 24389, 116 * np.cbrt(Y) - 16, Y * 24389 / 27).astype(np.float32)
+
+
 def _noise(shape, sigma: float, seed: int) -> np.ndarray:
     """Zero-mean, unit-std mono noise, Gaussian-filtered (sigma px); deterministic."""
     rng = np.random.default_rng(seed)
@@ -1091,7 +1098,6 @@ def cmd_encode(a) -> None:
         'E_boiling_grain': 'boil',
         'F_world_mottle_only': 'mottle',
     }
-    flat = flat_map(lab, np.ones((H, W), bool))
     res = {'frame': str(a.frame), 'grain_L': a.grain, 'grain_sigma_px': a.grain_px, 'mottle_L': a.mottle,
            'mottle_sigma_px': a.mottle_px, 'pan_px_per_frame': v, 'conditions': {}}
     for name, mode in conds.items():
@@ -1123,33 +1129,38 @@ def cmd_encode(a) -> None:
         _reencode(master, p720, ['-c:v', 'libx264', '-preset', 'medium', '-b:v', '1500k', '-maxrate', '1500k', '-bufsize', '3000k'], scale='720:1280')
         c = {'master_kbps': _bitrate_kbps(master)}
         src_mid = keep['mid']
+        y_end = 1300  # sky, city and canal: the measured area
+        Ls = lstar(src_mid[:y_end])
+        fm = flat_map(srgb_to_lab(src_mid[:y_end].astype(np.float64)), np.ones(Ls.shape, bool))
+        fm = ndi.binary_erosion(fm, iterations=4)
+        fm[:, :pad] = False; fm[:, -pad:] = False
+        sky = np.zeros_like(fm); sky[20:200, 250:850] = True
+        def tex(L):
+            hp = L - cv2.GaussianBlur(L, (0, 0), 4)
+            lp = cv2.GaussianBlur(L, (0, 0), 4) - cv2.GaussianBlur(L, (0, 0), 40)
+            return float(hp[fm].std()), float(lp[sky].std())
+        c['source_hp_std'], c['source_lp_std'] = [round(v, 3) for v in tex(Ls)]
         for tag, path in (('master', master), ('p1080', p1080), ('p720', p720)):
-            dec = _decode(path, n // 2 + 12)
-            mid = dec[n // 2]
-            Ld = srgb_to_lab(mid.astype(np.float64))[..., 0].astype(np.float32)
-            hp = Ld - cv2.GaussianBlur(Ld, (0, 0), 4)
-            m = ndi.binary_erosion(flat, iterations=8)
-            m[:, :pad] = False; m[:, -pad:] = False
-            c[f'{tag}_hp_std'] = round(float(hp[m].std()), 3)
-            # mottling: detrended low-pass std in the sky's top box
-            lp = cv2.GaussianBlur(Ld, (0, 0), 4) - cv2.GaussianBlur(Ld, (0, 0), 40)
-            c[f'{tag}_lp_std'] = round(float(lp[m].std()), 3)
-            # temporal: align frame i+1 onto frame i by the known pan, mean |dL*| in flat areas
+            dec = _decode(path, n // 2 + 8)
+            Ld = lstar(dec[n // 2][:y_end])
+            c[f'{tag}_hp_std'], c[f'{tag}_lp_std'] = [round(v, 3) for v in tex(Ld)]
             diffs = []
-            for i in range(n // 2 - 10, n // 2 + 10):
-                a0 = srgb_to_lab(dec[i].astype(np.float64))[..., 0].astype(np.float32)
-                a1 = srgb_to_lab(dec[i + 1].astype(np.float64))[..., 0].astype(np.float32)
-                a1s = _shift(a1, v)
-                diffs.append(float(np.abs(a1s - a0)[m].mean()))
+            for i in range(n // 2 - 6, n // 2 + 6):
+                a0 = lstar(dec[i][:y_end]); a1 = _shift(lstar(dec[i + 1][:y_end]), v)
+                diffs.append(float(np.abs(a1 - a0)[fm].mean()))
             c[f'{tag}_temporal_dL'] = round(float(np.mean(diffs)), 3)
             if tag != 'master':
                 c[f'{tag}_kbps'] = _bitrate_kbps(path)
-        Ls = srgb_to_lab(src_mid.astype(np.float64))[..., 0].astype(np.float32)
-        hp = Ls - cv2.GaussianBlur(Ls, (0, 0), 4)
-        m = ndi.binary_erosion(flat, iterations=8); m[:, :pad] = False; m[:, -pad:] = False
-        c['source_hp_std'] = round(float(hp[m].std()), 3)
-        lp = cv2.GaussianBlur(Ls, (0, 0), 4) - cv2.GaussianBlur(Ls, (0, 0), 40)
-        c['source_lp_std'] = round(float(lp[m].std()), 3)
+                cb = VIDEO / 'scripts/qa/check_banding.py'
+                if cb.exists():
+                    jb = out / f'{name}_{tag}_banding.json'
+                    r = subprocess.run([sys.executable, '-I', str(cb), str(path), '--region', '400,0,1080,170', '--band', '',
+                                        '--times', '0.5,1.0,1.5', '--json', str(jb), '--quiet'], capture_output=True, text=True)
+                    try:
+                        bj = json.loads(jb.read_text())
+                        c[f'{tag}_banding'] = bj.get('verdict') or bj.get('worst', {}).get('verdict') or str(bj)[:80]
+                    except Exception:
+                        c[f'{tag}_banding'] = (r.stdout.strip().splitlines() or ['?'])[-1][:80]
         Image.fromarray(src_mid).save(out / f'{name}_mid.png')
         res['conditions'][name] = c
         print(name, json.dumps(c), file=sys.stderr)
@@ -1249,7 +1260,7 @@ def images_for_sheets(J: dict, frames: Path):
 
 
 def sheet_colour(J, items, out: Path):
-    rowh, thw = 230, 172
+    rowh, thw = 200, 150
     W = 2400
     H = 120 + rowh * len(items) + 40
     im = Image.new('RGB', (W, H), PAPER)
@@ -1269,7 +1280,7 @@ def sheet_colour(J, items, out: Path):
         im.paste(bm, (24 + thw + 20, y))
         x0 = 24 + 2 * thw + 50
         label(d, (x0, y), tag, 22, bold=True)
-        bw = 1000
+        bw = 1180
         xx = x0
         for cl in c.get('clusters', []):
             w = max(2, int(round(bw * cl['share'] / 100)))
@@ -1290,7 +1301,7 @@ def sheet_colour(J, items, out: Path):
                  f"never bands: beige {b.get('beige', 0):.1f}  olive {b.get('olive', 0):.1f}  grey {b.get('grey', 0):.1f}  (+ yellow-green {b.get('yellow-green', 0):.1f}) %" +
                  (f";  below the skyline {land:.0f} %" if land is not None else '')]
         for i, t in enumerate(lines):
-            label(d, (x0, y + 112 + 24 * i), t, 18)
+            label(d, (x0 + bw + 24, y + 34 + 26 * i), t, 18)
         y += rowh
     save_sheet(im, out)
 
@@ -1382,16 +1393,16 @@ def sheet_planes_light(J, out: Path):
     d = ImageDraw.Draw(im)
     label(d, (24, 14), 'Translucent planes (a third tone where two overlap) and light (lit face vs shade face), measured.', 24, bold=True)
     # planes: crops, contrast-stretched x3 around their mean so the steps show, with the profile line drawn
-    pl = [('07_kyoto.jpg', [560, 630, 1206, 800], ('x', 725, 600, 1206)), ('02_reykjavik.jpg', [0, 370, 640, 900], ('y', 90, 380, 900)),
-          ('06_copenhagen.jpg', [400, 770, 760, 1010], ('y', 560, 780, 1010)), ('01_singapore.jpg', [0, 240, 330, 1000], ('y', 60, 250, 1000))]
+    pl = [('07_kyoto.jpg', [560, 630, 1206, 800], ('x', 725, 600, 1206), 4), ('02_reykjavik.jpg', [0, 370, 640, 900], ('y', 90, 380, 900), 3),
+          ('06_copenhagen.jpg', [400, 770, 760, 1010], ('y', 560, 780, 1010), 1.6), ('01_singapore.jpg', [0, 240, 330, 1000], ('y', 60, 250, 1000), 3)]
     x = 24
     y0 = 60
-    for name, box, prof in pl:
+    for name, box, prof, k in pl:
         rgb, valid = load_image(REFS / name, ms)
         x0, y0b, x1, y1 = box
         a = rgb[y0b:y1, x0:x1].astype(np.float32)
         m = a.reshape(-1, 3).mean(0)
-        a = np.clip((a - m) * 3 + m, 0, 255).astype(np.uint8)
+        a = np.clip((a - m) * k + m, 0, 255).astype(np.uint8)
         sc = min(560 / a.shape[1], 520 / a.shape[0])
         A = Image.fromarray(a).resize((int(a.shape[1] * sc), int(a.shape[0] * sc)), Image.LANCZOS)
         dd = ImageDraw.Draw(A)
@@ -1401,7 +1412,7 @@ def sheet_planes_light(J, out: Path):
         else:
             dd.line([((at - x0) * sc, (p0 - y0b) * sc), ((at - x0) * sc, (p1 - y0b) * sc)], fill=(255, 0, 170), width=2)
         im.paste(A, (x, y0 + 30))
-        label(d, (x, y0), f"{POSTERS[name]['city']} (contrast x3)", 19, bold=True)
+        label(d, (x, y0), f"{POSTERS[name]['city']} (contrast x{k:g}; the line = the profile)", 19, bold=True)
         prf = next((q for q in J['posters'][name].get('planes', []) if q['axis'] == ax and q['at'] == at), None)
         if prf:
             ty = y0 + 30 + A.height + 6
@@ -1426,12 +1437,12 @@ def sheet_planes_light(J, out: Path):
         bx0 = max(0, min(lit[0], shade[0]) - 40); by0 = max(0, min(lit[1], shade[1]) - 40)
         bx1 = min(rgb.shape[1], max(lit[2], shade[2]) + 40); by1 = min(rgb.shape[0], max(lit[3], shade[3]) + 40)
         a = rgb[by0:by1, bx0:bx1]
-        sc = min(250 / a.shape[1], 300 / a.shape[0])
+        sc = min(240 / a.shape[1], 300 / a.shape[0])
         A = Image.fromarray(a).resize((max(1, int(a.shape[1] * sc)), max(1, int(a.shape[0] * sc))), Image.LANCZOS)
         dd = ImageDraw.Draw(A)
         for bb, col in ((lit, (255, 200, 0)), (shade, (0, 160, 255))):
             dd.rectangle([(bb[0] - bx0) * sc, (bb[1] - by0) * sc, (bb[2] - bx0) * sc, (bb[3] - by0) * sc], outline=col, width=2)
-        if x + 280 > W:
+        if x + 255 > W:
             x = 24; y += 470
         im.paste(A, (x, y))
         r = J['posters'][name]['light'].get(n)
@@ -1445,7 +1456,7 @@ def sheet_planes_light(J, out: Path):
                 L_, C_, h_ = r[k + '_LCh']
                 label(d, (x + 48, ty + 48 + 26 * j), f"{k} L{L_:.0f} C{C_:.0f} h{h_}", 15)
             label(d, (x, ty + 102), f"dL* {r['dL']}, C x{r['C_ratio']}, hue {r['dh']:+d}", 16, bold=True)
-        x += 290
+        x += 263
     save_sheet(im.crop((0, 0, W, y + 470)), out)
 
 
@@ -1503,7 +1514,7 @@ def sheet_texture(J, out: Path, frames: Path, enc: Path | None):
 def sheet_sky_water(J, out: Path, frames: Path):
     ms = load_mask_spec()
     W = 2400
-    im = Image.new('RGB', (W, 1500), PAPER)
+    im = Image.new('RGB', (W, 2600), PAPER)
     d = ImageDraw.Draw(im)
     label(d, (24, 14), 'Sky: each poster\'s open-sky column from the frame top (top) to the skyline (bottom), as measured row medians, and its L* curve '
           '(shared axis, L* 76-96).', 22, bold=True)

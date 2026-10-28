@@ -148,22 +148,23 @@ references and primitives, never the film's people.
   face the viewer across water stay featureless, in side or 3/4 view (3b.2 RIVERSIDE).
 
 ## 5. The recurring living character
-- **One, in every shot** (reference 1: the cat and the sun; v1: Pip and the sun). Default: the channel's mascot **Pip**
+- **One, hidden on purpose** (owner, 2026-10-28: "keep it, but not as obvious ... hide it deliberately in the
+  video"; reference 1's cat and v1's Pip were in every shot, which is no longer the rule). Default: the channel's mascot **Pip**
   (another character only if the story asks for it, named in the W1 world bible and seen by the owner at G3),
   drawn new in the film's design (playbook: no reusable assets; `src/lib/mascot` and `docs/mascot.md` are the reference
   and the API), in a colourway for the video's palette that stays its own hue (ΔE76 >= 20 from
   every ground it sits on, never the hero or the pop colour) and in tier B (`CRAFT.md` §b: C* <= 25, a tinted outline)
   unless the line is about it. A non-character anchor may join it (snow, the weather; the sun is light, never a
   character: `CRAFT.md` §d.1).
-- **Jobs:** (1) perch on or beside the subject and watch it (sit-back, right or middle third); (2) point the eye: its
-  head turns to the next subject a few frames before the voice names it; (3) react on a stressed word (ear flick, hop,
-  trunk-up, ears-cover, shrug): one big reaction per shot at most, never on the subject's own beat; (4) idle always
-  (blink, ears, tail, breath; only blinks and ear moves while the subject moves); (5) carry continuity: it goes where
-  the story goes, and across every join it rides the carrier or keeps its screen spot (`CRAFT.md` §a.3), decided at
-  G3, never a hop added later; (6) sleep or wait in the calm beat.
-- **Size:** 86-130 px in wides and mediums, no bigger in close-ups (at most 1 % of the frame unless the line is about it),
-  a simple silhouette (>= 40 px) beside a tiny figure in a scale wide (where it becomes a scale anchor). Never in the
-  caption band or the right rail, never over the subject.
+- **Jobs (since 2026-10-28: hidden, not a guide):** (1) hide in a spot that belongs to the world (in a window, on a
+  boat, on a balcony, among a crowd), off the subject's eye path, found on a second look; (2) idle quietly (blink, ears,
+  tail, breath; only blinks and ear moves while the subject moves), a small life for whoever finds it; (3) at most a tiny
+  reaction on a stressed word, never on the subject's own beat, never big enough to pull the eye; (4) its hiding spots
+  are planned at G3 (W1 names them), never added later. Retired: perching beside the subject, pointing the eye, carrying
+  continuity across every join (`CRAFT.md` §a.3).
+- **Size:** smaller than before, a start value for the next G4 look clip: about 40-90 px, often partly hidden (behind a
+  railing, in a window), at most 1 % of the frame unless the line is about it; a simple silhouette (>= 40 px) in a
+  scale wide. Never in the caption band or the right rail, never over the subject.
 
 ## 6. The idle layer and secondary motion (never a still frame)
 - **All idle life is tier B or C** (`CRAFT.md` §b), set by its weight, never cut to a low count: at most 3-4 noticeable

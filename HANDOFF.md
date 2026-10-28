@@ -164,6 +164,10 @@ Everything that agent knew is in this repo. This file is the map; the details li
   guide; the designed view; the patchwork): the study README lists them. "merge the findings and key points and
   conclusions into the main repo": this study is merged into `video-production` as it goes, and its conclusions are
   integrated into the main docs when the synthesis lands.
+- **Then (2026-10-28 ~22:30 UTC):** "our look is evolving - we are finding out style i don't think we can overfixate on
+  this" (ONE LOOK, ONE BRAND is a direction, not a freeze) and Pip "would be good to keep it, but ... way more subtle
+  perhaps hide it deliberately in the video": Pip stays, hidden on purpose, no longer on both sides of every join
+  (DIRECTION rules 1-2, CRAFT §a.3 and §b, LIFE_AND_DENSITY §5, the playbook).
 
 ## 2b. Update 2026-10-25 20:00 UTC: two agents, split by video
 

@@ -63,11 +63,14 @@ Maintenance at the end).
   message-sent swoosh), **with one in the first second.** Our own sounds that evoke them, never Apple's or Instagram's. — (2026-10-25).
 
 ## Visual style (one page: `docs/look/DIRECTION.md`; numbers and checks: `docs/look/CRAFT.md`)
-- **ONE LOOK, ONE BRAND: every video shares one coherent style.** The style is the constant (the rendering, light,
-  texture, composition grammar, palette family, type and the cover's layout), refined from film to film; each film's
-  world (its places, people, props, life and music) is drawn new inside it. Our covers on the profile grid should read
-  as one series, as the city posters' 19 do. — ("i agree that a coherent style across all videos sharing one look, one
-  brand would be absolutely the key here", 2026-10-28).
+- **ONE LOOK, ONE BRAND, still evolving: every video shares one coherent style, and we are still finding it.** The
+  style is what carries over (the rendering, light, texture, composition grammar, palette family, type and the cover's
+  layout); each film's world (its places, people, props, life and music) is drawn new inside it. The look keeps
+  evolving: each film may carry its next step (like the city-poster experiments), what works becomes the shared look,
+  and we never over-fixate on matching the last film. Our covers on the profile grid should read as one series, as the
+  city posters' 19 do. — ("i agree that a coherent style across all videos sharing one look, one brand would be
+  absolutely the key here"; "the importnat part about one look is our look is evolving - we are finding out style i
+  don't think we can overfixate on this", 2026-10-28).
 - **Hand-drawn flat colour like reference video 1, drawn CLEAN, REFINED, GENTLE, PREMIUM: never rough or messy.**
   Reference 1 gives the composition, the flat colour and the small people; the line is the clean pen: clean, confident
   lines (smooth, consistent weights, few of them, no jitter, no sketchy overshoot or double strokes), refined shapes,
@@ -147,8 +150,8 @@ Maintenance at the end).
   into the style and the picture. Like you can't immidetaly spot that something is off", 2026-10-28).
 - **Every scene must FEEL ALIVE, calm and tiered: that is the key, not an object count.** A dense, detailed world (a
   city full of buildings and windows, a room full of real things), people near and far, layered depth, a recurring
-  living character in every shot (Pip by default, as reference 1's cat and v1's Pip were; at tier B), ambient life
-  that never stops (clouds, birds, steam, lights switching). A dense world makes a frame
+  living character (Pip, hidden on purpose: the Pip bullet below), ambient life that never stops (clouds, birds, steam,
+  lights switching). A dense world makes a frame
   full even when little moves (Arcane's rooftop; the owner's riverside reference "doesn't feel empty at all"). The
   density sits mostly in the calm environment tier at low contrast, so full never means busy (`docs/look/CRAFT.md` §b).
   The bar: reference 1 (France) and v1 (PHP), then each film's own G3 density key; `scripts/qa/density.py` is a warning
@@ -209,7 +212,13 @@ Maintenance at the end).
   gentle, premium", v3 G5b, 2026-10-27; "i like texture point yes we can perhaps start playing with it, very subtly
   especially if its adding to the premium look sure"; "i like 3 - but can you draw me a picture of difference like A vs
   B what you are talking about", 2026-10-28).
-- **Profile identity: mascot Pip (the purple PHP elephant), drawn in each film's style;** avatar `deliverables/profile/pip_power_button.png`. — (2026-10-25).
+- **Pip stays, hidden on purpose.** The mascot Pip (the purple PHP elephant; the profile avatar
+  `deliverables/profile/pip_power_button.png`) is kept in every film, but far more subtle than before: hidden
+  deliberately in the world (in a window, on a boat, on a balcony, among a crowd), small and drawn in the film's look,
+  found on a second look, never the first thing the eye meets and never competing with the subject. Its hiding spots are
+  planned with the shots (W1 and G3); it no longer rides the joins. — (profile identity, 2026-10-25; "the pip i mean would
+  be good to keep it, but we can perhaps make it way more subtle perhaps hide it deliberately in the video, like keep it,
+  but not as obvious", 2026-10-28).
 
 ## Hook and pacing
 - **Every video has ONE core line, picked before the script (by default on the topic screen: each topic comes with its proposed core line, so the owner picks both at once; a separate core-line round only on request):** the single sentence at the core
@@ -474,6 +483,7 @@ Maintenance at the end).
   1; the pose acts; only the mascot has a face (v2 restart rule, 2026-10-27).
 - ~~The G4 look as stills made in parallel with G3~~ → a playable look clip after the G3 lock, approved before G5
   (the approved pipeline, 2026-10-27).
+- ~~Pip at tier B in every shot and on both sides of every join~~ → Pip stays, hidden on purpose (2026-10-28).
 
 ## Maintenance (keep this file coherent and clear)
 No size budget (owner, 2026-10-27: "let's not focus on the playbook being a certain size; keep it as coherent and clear as

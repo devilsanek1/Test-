@@ -36,6 +36,9 @@
   the content rather that the style and composition- hard to imagine if its going to trasnalte and generalize well / 9
   i agree that a coherent style across all videos sharing one look, one brand would be absolutely the key here"
 - "merge the findings and key points and conclusions into the main repo"
+- "the importnat part about one look is our look is evolving - we are finding out style i don't think we can
+  overfixate on this / the pip i mean would be good to keep it, but we can perhaps make it way more subtle perhaps hide
+  it deliberately in the video, like keep it, but not as obvious"
 
 **The files:** seven of a 19-poster Instagram carousel, as screenshots from the owner's phone (the account isn't named in
 them). The carousel index is in brackets.
