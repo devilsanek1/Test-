@@ -32,8 +32,9 @@ its signal, and they keep their FAIL. Px at 1080 x 1920, CIE L* and C*, %W/s = %
    the same way; at most 3 places and 1 big scale reveal in 45 s. Information (a chart, a number) is paper in the place the
    camera is already in, never a new location made for it (v3: 6 places, a new world per chart).
 3. **One "you":** one drawing of the viewer's stand-in, or POV only; no strangers' backs in the foreground (they read as
-   "you"). The mascot is on both sides of every cut (riding the carrier, or in the same screen spot), never a new pop-in
-   per shot (v3: "you" drawn five ways; Pip in a new spot in each shot).
+   "you"). Pip hides on purpose (owner, 2026-10-28: "keep it, but not as obvious"): never a join's carrier and never
+   a pop-in for the eye; where a shot hides it, it sits in a spot that belongs to the world (a window, a boat, a
+   balcony), planned at G3 (v3: "you" drawn five ways; Pip popping up in a new spot in each shot).
 4. **The picture keeps the script's joins:** a line the script says as one movement ("push into the laptop ... pull out
    through the window") is one camera move, never cuts (v3's board broke three such lines into cuts).
 
@@ -49,7 +50,7 @@ its signal, and they keep their FAIL. Px at 1080 x 1920, CIE L* and C*, %W/s = %
   `camera-continuous` inside one place), D `foreground-wipe` or a carry across a `cut`, E an in-panel card flip (no Film
   type yet: the craft tooling lane), F `cut`. A dissolve is no carrier: only a declared time-passing exception.
 - **Timing:** the transition's midpoint lands on the first word of the new sentence, in the voice's pause; during it the
-  carrier leads (the mascot may ride with it) and nothing else enters, pops, turns or speeds up, while slow life already
+  carrier leads and nothing else enters, pops, turns or speeds up, while slow life already
   moving (snow, steam, a far walker) keeps its pace: a freeze reads as a glitch. Shots average >= 3.5 s (ref 1 5.2, v1
   4.6, v3 2.9; a shot is one panel, from one join between panels to the next: a C move inside a panel keeps one shot),
   so a 40 s film has about 10-12.
@@ -90,8 +91,9 @@ texture and how simple it is:
 - **Big means subject or still:** any moving figure > 5 % of the frame is the subject; a big near figure (the "you"; never
   strangers' backs, §a.3) holds still or breathes (<= 2 %W/s) while the subject acts (v3's audiences, 11-35 % of the
   frame, took up to 97 % of the motion).
-- **The mascot is tier B** unless the line is about it: C* <= 25, a tinted outline <= 2.2 px, <= 1 % of the frame (close-ups
-  too), only blinks and ear moves (<= 10 %W/s) while the subject moves, clear of the subject (v3's Pip, C* 44 with dark
+- **The mascot is tier B and hidden on purpose** (DIRECTION rule 2; owner, 2026-10-28) unless the line is about it:
+  C* <= 25, a tinted outline <= 2.2 px, <= 1 % of the frame (close-ups too), only blinks and ear moves (<= 10 %W/s)
+  while the subject moves, clear of the subject and off its eye path, found on a second look (v3's Pip, C* 44 with dark
   outlines, beat the subject's salience per pixel in 12 of 13 panels).
 - **Code:** `lib/pen.ts` (`setPen('clean')`, `CLEAN_TIERS`; work in progress) maps `subject` / `support` / `environment`
   to line widths and colours, calmer fills and motion factors; its constants are tuned until this check passes.
@@ -121,9 +123,12 @@ G4 frame had the same pen and passed with a quarter of the strokes: the fix is a
   silhouette is the clean fill edge.
 - **Texture:** big areas flat; texture only as flat same-hue shapes (a rug pattern, plank seams as 2 long bands at dL* 6-8
   or less) on 1-2 small surfaces per shot. No specks (static dark marks; §f's particles are light movers, not texture), ticks, hatching, scribble, dash rows, crumbs or steam squiggles,
-  and no grain overlay (the sky's invisible encode dither, §g, is not a texture). The one optional texture is the
-  owner's halftone (`PALETTE.md` "Texture and lines": at most 6 %,
-  on a few chosen elements, a last step after G6; the film must work flat).
+  and no grain overlay by default (the sky's invisible encode dither, §g, is not a texture). Two optional textures, both
+  VERY subtle and both last steps the film must work without: the owner's halftone (`PALETTE.md` "Texture and lines":
+  at most 6 %, on a few chosen elements, after G6), and, being tested since 2026-10-28 (owner: "start playing with it,
+  very subtly especially if its adding to the premium look"), a fine paper-and-paint texture with gentle mottling in
+  the big flats, static and locked to the world (never boiling), its numbers from the city-poster study
+  (`docs/studies/2026-10-28_city_posters/`), judged in a look clip and kept only if it adds to the premium feel.
 - **Line motion:** an object draws on as one stroke, never edge by edge; no `exitLoose`, no boil.
 - **Code: the CLEAN pen** (the sketch pen stays for G3 boards), set once in the film's look module: `lib/pen.ts`
   `setPen('clean')` (the full pen with tiers, work in progress; `lib/sketch.ts` `setPenMode('clean')` is v2r's lighter

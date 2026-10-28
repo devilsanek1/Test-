@@ -63,6 +63,14 @@ Maintenance at the end).
   message-sent swoosh), **with one in the first second.** Our own sounds that evoke them, never Apple's or Instagram's. — (2026-10-25).
 
 ## Visual style (one page: `docs/look/DIRECTION.md`; numbers and checks: `docs/look/CRAFT.md`)
+- **ONE LOOK, ONE BRAND, still evolving: every video shares one coherent style, and we are still finding it.** The
+  style is what carries over (the rendering, light, texture, composition grammar, palette family, type and the cover's
+  layout); each film's world (its places, people, props, life and music) is drawn new inside it. The look keeps
+  evolving: each film may carry its next step (like the city-poster experiments), what works becomes the shared look,
+  and we never over-fixate on matching the last film. Our covers on the profile grid should read as one series, as the
+  city posters' 19 do. — ("i agree that a coherent style across all videos sharing one look, one brand would be
+  absolutely the key here"; "the importnat part about one look is our look is evolving - we are finding out style i
+  don't think we can overfixate on this", 2026-10-28).
 - **Hand-drawn flat colour like reference video 1, drawn CLEAN, REFINED, GENTLE, PREMIUM: never rough or messy.**
   Reference 1 gives the composition, the flat colour and the small people; the line is the clean pen: clean, confident
   lines (smooth, consistent weights, few of them, no jitter, no sketchy overshoot or double strokes), refined shapes,
@@ -70,9 +78,34 @@ Maintenance at the end).
   Spec: `docs/look/CRAFT.md` §c. — ("hand-drawn ink, flat colour, like reference video 1", v1, 2026-10-24; "too rough
   and messy, a lot of rough lines, not clean at all; cleaner, more refined, gentle, premium", v3 G5b, 2026-10-27; the clean pen with tiers and gentle light
   APPROVED at v2's G4 look clip: "okay good continue", 2026-10-27).
+- **Learn from the city posters and experiment with that style in our films, starting from v2's look.** The owner's
+  reference is seven illustrated city posters (`docs/look/poster_refs/`); v2 ("One Small Window") is the visual
+  baseline the owner likes. What we learn from them (perspective, visual style, details, composition, and the one
+  focus) is studied in `docs/studies/2026-10-28_city_posters/`; a lesson becomes a rule only once the owner approves
+  it, and `docs/look/DIRECTION.md` stands until then. What the owner feels in them, in their words: depth, with
+  "something WAY further out that gives me a sense of scale"; the main objects crisper and more detailed, the rest
+  simpler ("a bit more low poly") yet coherent; nature that looks real but, up close, mixes "the real effects with the
+  lower poly kind of effects"; colours "very vibrant" that "coherently fit together". Next to them v2 "still feels cheap
+  and lazy", though the owner likes its colours. The study researches how professional studios get each feeling and
+  turns it into concrete techniques, and adds what we observed that the owner didn't name. The owner's answers to our
+  observations (2026-10-28): texture yes, very subtly; the lit and shaded faces and the full value range yes (their
+  own bullets); outline-free edges liked, to be judged on an A vs B picture; layout "is a big aspect": consolidate
+  our earlier layout rules with the posters' findings into one guide; the posters' "unique camera angle and composition
+  of objects is fascinating" (a designed view of the place that no camera could take); the specific local objects
+  (a protea, a cyclo) belong to the content, not the style ("hard to imagine if its going to trasnalte and generalize
+  well"); one look, one brand (its own bullet). — ("i really like the style
+  and i want us to experiment more with the style and the focus on our videos"; "i want to see how we can learn from
+  these pictures in terms of perspective, visual style, details and composition"; "i think visually in the video about
+  Google we have made good improvemnets in terms of overall style"; "research each further how professional studios
+  approach this and how my feelings translate to a concrete approach and techniques"; "I like the color scheme overall
+  - they feel very vibrant and coherently fit together. I like the colors of our last video about Google, but our
+  video still feels cheap and lazy as if these pictures give a very premium feel to it"; "let me know if i am missing
+  anything you observed too", 2026-10-28).
 - **Light and shadow: gentle, but always there.** One consistent light direction per scene, soft form and cast shadows,
-  gentle light pools that make sense; never absent and never "weirdly put". System: `docs/look/CRAFT.md` §d. — (v3 G5b,
-  2026-10-27; "the shadows added are better", v2 G4, 2026-10-27).
+  gentle light pools that make sense; never absent and never "weirdly put". Every volume reads in 2-3 flat tones, a lit
+  face and a shade face, as the city posters' buildings do. System: `docs/look/CRAFT.md` §d. — (v3 G5b, 2026-10-27;
+  "the shadows added are better", v2 G4, 2026-10-27; on the posters' lit and shaded faces: "4 is a good point and goes
+  along the shadows we discussed in the google video", 2026-10-28).
 - **DEPTH AND SEPARATION: every shot reads in distance, never a flat elevation.** The subject separates from what is
   behind it (its own value and contrast against a calmer field: a building in front never melts into the buildings
   behind it); distance shows in the colour (far planes converge on the air behind them: lighter, softer, simpler; cooler
@@ -90,7 +123,8 @@ Maintenance at the end).
   anywhere"; on v5: "I don't like the water too much, leafs are great"; "it's just looking way too cheap, not clean or premium
   quality or refined, just lazy and cheap"; on v6, the researched shared water (true reflections, a gold light
   column, still glitter, calm ripple lines): "Yeah this is better", v2 G4,
-  2026-10-27/28).
+  2026-10-27/28; the city posters: "some buildings are obviously closer to me, some further out and there is
+  something WAY further out that gives me a sense of scale", 2026-10-28).
 - **A gentle PARALLAX float, never a flat card.** When a held shot floats, its planes move by depth (Disney's multiplane
   idea): the near ground most, far planes little, the sky and the caption band not at all; slow, small, back at rest
   by every join; it adds depth in motion without adding movers. — ("switch it on if you think it will make the videos
@@ -107,11 +141,17 @@ Maintenance at the end).
   saturation and the clear motion; supporting life (a bird, walkers, snow, steam) stays subtle (smaller, lower contrast,
   thinner or no lines, softer colour, calmer motion): alive, but never competing. Supporting environment may be drawn in
   a softer, simpler style than the subject; not every moving piece gets the same treatment. Too many equal moving parts
-  = "I don't know what to keep my attention on". Tiers: `docs/look/CRAFT.md` §b. — (v3 G5b, 2026-10-27).
+  = "I don't know what to keep my attention on". The main objects are the crispest and most detailed; the supporting
+  world is simpler (fewer details, a more faceted, "low poly" build) yet made with the same shapes, colours and light,
+  so nothing looks off at a glance. Tiers: `docs/look/CRAFT.md` §b. — (v3 G5b, 2026-10-27; the city posters: "some
+  objects that are obviously the main parts and so they stand out and they have more details and cleaner lines and
+  just all around crispier and there are rest of the objects that compose the scene and give it fullness and live and
+  the right amount of density, but they are obviously less detailed, a bit more low poly but nonetheless coherently fit
+  into the style and the picture. Like you can't immidetaly spot that something is off", 2026-10-28).
 - **Every scene must FEEL ALIVE, calm and tiered: that is the key, not an object count.** A dense, detailed world (a
   city full of buildings and windows, a room full of real things), people near and far, layered depth, a recurring
-  living character in every shot (Pip by default, as reference 1's cat and v1's Pip were; at tier B), ambient life
-  that never stops (clouds, birds, steam, lights switching). A dense world makes a frame
+  living character (Pip, hidden on purpose: the Pip bullet below), ambient life that never stops (clouds, birds, steam,
+  lights switching). A dense world makes a frame
   full even when little moves (Arcane's rooftop; the owner's riverside reference "doesn't feel empty at all"). The
   density sits mostly in the calm environment tier at low contrast, so full never means busy (`docs/look/CRAFT.md` §b).
   The bar: reference 1 (France) and v1 (PHP), then each film's own G3 density key; `scripts/qa/density.py` is a warning
@@ -136,7 +176,7 @@ Maintenance at the end).
   each new reference is measured (composition, movement, texture, camera, details) and folded into `COZY_AND_SCALE.md`.
   — ("really figure out what about the scene brings out this feeling; this is a recurring topic we need to evolve", 2026-10-26).
 - **Don't rely on reusable assets: every film's sets, characters, props, background life and music are made new for
-  it,** in its own design (a new Pip drawing too). Engine primitives (light and shadow layers included), timing,
+  it,** inside the one shared look (ONE LOOK, ONE BRAND above; a new Pip drawing too). Engine primitives (light and shadow layers included), timing,
   captions and QA tools are tools, not assets; the kit pieces in `src/lib` (cine, kit, mascot) are references to learn
   from, never a film's sets, and a film never imports another film's folder (`src/vN/`). — ("Don't rely on reusable
   assets", v2 restart, 2026-10-27).
@@ -152,16 +192,33 @@ Maintenance at the end).
   as a screen recording under the status bar). Each film decides them with its G4 look clip, 'paint-subtle' at most
   (`docs/EDGES.md`). — (v1 posted reel, 2026-10-25).
 - **Palette: a family of house palettes as tools, not a cage.** A soft, warm, "no screaming colours" base; one sister
-  palette per video; within it one hero, one dark anchor, at most one pop. Rules: `docs/look/PALETTE.md`. — (2026-10-25).
+  palette per video; within it one hero, one dark anchor, at most one pop; the family stays tight enough that every video
+  reads as one brand (ONE LOOK, ONE BRAND above). Rules: `docs/look/PALETTE.md`. — (2026-10-25; one brand, 2026-10-28).
 - **Warm, never sickly:** no beige, muddy tan, olive or grey; peach creams, terracotta, red-brown lines, golden light,
   warm shadows. — ("we need to have a warm feeling, not sick", v3 G4, 2026-10-26).
+- **A full value range: a calm light sky, a mid-tone world and a few real darks where the eye should go** (windows, a
+  hull, the shade under trees), never a narrow band of light pastels (one reason v2 reads cheap next to the city
+  posters). The numbers come from the city-poster study. — (our observation on the posters; "5 - good point too!",
+  2026-10-28).
 - **Texture and lines: VERY subtle.** Lines only in key places: the clean pen's tiers (the main thing's outline and a
   few inner details; `docs/look/CRAFT.md` §c). The owner's "black outlines" are read as dark, warm lines in the
   object's own deep shade, never one near-black ink on everything (v3 G5b's was "too rough"); captions keep the dark
-  ink; the owner judges the line in each G4 look clip. Halftone tactically on a few elements as an optional last step
-  (the film must work flat; the owner decides per video). — ("very subtle texture pieces and the black outlines, VERY
-  subtle but in key places", texture test, 2026-10-25; "cleaner, more refined, gentle, premium", v3 G5b, 2026-10-27).
-- **Profile identity: mascot Pip (the purple PHP elephant), drawn in each film's style;** avatar `deliverables/profile/pip_power_button.png`. — (2026-10-25).
+  ink; the owner judges the line in each G4 look clip. Texture: start playing with a VERY subtle paper-and-paint
+  texture (a fine grain and gentle mottling in the big flats, like the city posters) where it adds to the premium look,
+  tried in a look clip and kept only if it does; the halftone stays an option on a few elements; the film must work
+  flat. The posters' outline-free edges (shapes separated by light and dark steps, only tiny lines for windows and
+  railings) are liked: the owner judges them on an A vs B picture before the line rule changes. — ("very subtle texture
+  pieces and the black outlines, VERY subtle but in key places", texture test, 2026-10-25; "cleaner, more refined,
+  gentle, premium", v3 G5b, 2026-10-27; "i like texture point yes we can perhaps start playing with it, very subtly
+  especially if its adding to the premium look sure"; "i like 3 - but can you draw me a picture of difference like A vs
+  B what you are talking about", 2026-10-28).
+- **Pip stays, hidden on purpose.** The mascot Pip (the purple PHP elephant; the profile avatar
+  `deliverables/profile/pip_power_button.png`) is kept in every film, but far more subtle than before: hidden
+  deliberately in the world (in a window, on a boat, on a balcony, among a crowd), small and drawn in the film's look,
+  found on a second look, never the first thing the eye meets and never competing with the subject. Its hiding spots are
+  planned with the shots (W1 and G3); it no longer rides the joins. — (profile identity, 2026-10-25; "the pip i mean would
+  be good to keep it, but we can perhaps make it way more subtle perhaps hide it deliberately in the video, like keep it,
+  but not as obvious", 2026-10-28).
 
 ## Hook and pacing
 - **Every video has ONE core line, picked before the script (by default on the topic screen: each topic comes with its proposed core line, so the owner picks both at once; a separate core-line round only on request):** the single sentence at the core
@@ -243,7 +300,8 @@ Maintenance at the end).
 - **Topics: tech and AI news, and AI-ADJACENT news (science, health tech, space, robots, computers, energy: where AI is
   part of the story or right next to it), is the channel's focus** ("no too narrow, lets research some more - expand it to
   AI adjacent news", v4, 2026-10-28); the existing fuss (people already arguing about it) weighs as much as
-  a direct wallet hit,** and an everyday consequence beats a bigger, distant story. — (v3 G0; v4 G0: "focus on tech and AI",
+  a direct wallet hit,** and an everyday consequence beats a bigger, distant story. The city-poster brainstorm opened
+  this to any subject, and the owner came back to tech told through its views (Places on screen, below). — (v3 G0; v4 G0: "focus on tech and AI",
   picked AI songs over the wallet pick: "good amount of fuss about AI songs", 2026-10-27).
 - **Topics are picked in the owner's order: relevant (with buzz and surprise) first, then true and solid, then
   visually appealing in our look, then the mood the slate needs, then fresh (news from about the last month), then
@@ -263,6 +321,43 @@ Maintenance at the end).
   benefits and when). Every topic scout names the mood the next video needs. — ("we should alternate between positive
   and more negative topics ... something very recent, extremely relevant yet very positive around AI ... a nice
   positive outlook would be the right direction for a story", v4, 2026-10-28).
+- **Places on screen: the posters' views are a way of telling a story, not its subject.** Find the stories that can
+  be TOLD through such views (a layered world, one hero, something WAY far out for scale), the way Arcane's shots carry
+  stories that have nothing to do with a real city. **Neither extreme: not content ABOUT real cities, and not made-up
+  content (myths, fables, what-ifs as the story). The middle: true stories (real events, people, things) whose action
+  happens in a big world we can show** (streets, buildings, landscapes, the sky); a metaphor world only when a true
+  story needs it and the facts map one-to-one (v1's town of websites, the best performer so far). The owner's examples are v1 and v2
+  (the look they like; its story was the weak part). Which stories fit is studied in
+  `docs/studies/2026-10-28_city_posters/` (the content track; the live discussion is its `content_discussion.md`) before
+  it changes `docs/TOPIC_CRITERIA.md`. **The search is open to any subject, not only tech and AI: what people would
+  love to hear about** (the owner's seeds: history, news from cities, stories); **news from a real city is positive.**
+  **The owner then leaned back to tech topics told this way, researched as a general direction, not one topic:** one
+  possible umbrella is **tech in the cities** (interesting, weird, WOW cases where a city solves a problem with new
+  tech or AI); data centres (one building at a scale you can only show from far away, in surprising places) and
+  driverless taxis ("a good topic too") are kinds inside it. **Every pick needs a WOW**, a "wait, seriously?" fact or
+  picture (London's driverless taxis alone: "perhaps not as WOW"); **tech in a weird place is one** (a data centre in a
+  Cold War bunker, a supercomputer in a chapel, one heating a public pool: "those are interesting ones"), and an older
+  story can carry it if the WOW is strong and it gets a peg. Until the owner picks a direction, picks keep the tech/AI
+  focus above. — ("I want us to see which type of content would be best fit into videos where we have more of cities /
+  architectures / buildings / etc - so for example our very first video was the most successful so far and i
+  personally like the last video about google i think the story wasn't quite good, but visually it was nice to be
+  honest. Obviously still far away from what we could do to be very successful studio, but initial steps", 2026-10-28;
+  then "Don't be fixated on tech or AI, all goes, the best kind of content that fits into this and people would love
+  to hear about. Some of the ideas off the top of my head - some history videos? Some news that are happening in the
+  cities, but i want them to be possitive? Some stories? waht else ? Do proper brainstorm", 2026-10-28; then "okay so
+  in your content you are overfixating on the content around real cities, but im thinking more about what kind of
+  content would contain storytelling that is around these views. Like previously we discusesd arcane shots - they fit
+  within the same kind of category, its content and storytelling that is around these views but has nothing to do
+  wiht the actual cities", 2026-10-28; then, on the story shapes (myths, fables, metaphor worlds): "now i feel like you
+  went the other direction, like completely made up content like", 2026-10-28; then "okay so i kind of like the
+  direction of tech related topics here ... datacenters do fit pretty nice in here - like we have perhaps some wow
+  stories here like i've heard someone plans a datacenter in new your or like a datacenter in some weird places ...
+  the topic about waymos or driverless taxis in London would be good too, but perhaps not as WOW, we need some WOW
+  stories here"; then "no i mean research more - this is a general direction, datacenter is one, having waymo or
+  driverless taxis in citis is a good topic too btw but we need to find a way to generalize it like one POSSIBLE
+  direction is lets say generalizing it to tech in the cities. like some interesting, weird, wow like cases where
+  cities come up with the new solutions to problems, deploy some wow tech / ai / etc"; and on the weird-place data
+  centres: "those are interesting ones", 2026-10-28).
 - **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
   frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
 - **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).
@@ -412,6 +507,7 @@ Maintenance at the end).
   1; the pose acts; only the mascot has a face (v2 restart rule, 2026-10-27).
 - ~~The G4 look as stills made in parallel with G3~~ → a playable look clip after the G3 lock, approved before G5
   (the approved pipeline, 2026-10-27).
+- ~~Pip at tier B in every shot and on both sides of every join~~ → Pip stays, hidden on purpose (2026-10-28).
 
 ## Maintenance (keep this file coherent and clear)
 No size budget (owner, 2026-10-27: "let's not focus on the playbook being a certain size; keep it as coherent and clear as

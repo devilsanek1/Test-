@@ -5,7 +5,9 @@ must not be "confused with conflicting instructions"). Read it before any visual
 (`docs/OWNER_PLAYBOOK.md`) and `docs/PIPELINE_V2.md`; the film's one style page (`docs/vN/STYLE.md`) picks its values
 inside these rules. Each rule links the section with its numbers, code and checks (paths from `video/`; bare names are
 in `docs/look/` or `docs/`). **In short:** one flowing story about one thing, in a full, calm, cozy world of hand-drawn
-flat colour, drawn clean and lit gently.
+flat colour, drawn clean and lit gently, in ONE look that every video shares and that keeps evolving as we find our style
+(one brand: owner, 2026-10-28, "a coherent style across all videos sharing one look, one brand would be absolutely the
+key here"; "our look is evolving - we are finding out style i don't think we can overfixate on this").
 
 **Which doc wins** (the full statement; other docs repeat its first line):
 1. **The owner's words:** the playbook, and for one film what the owner said in `docs/vN/OWNER_NOTES.md` (the quoted
@@ -23,20 +25,34 @@ flat colour, drawn clean and lit gently.
    these: a clash there is a stale summary.
 A clash is a bug: fix the lower doc in the same turn.
 
+**Open study (owner, 2026-10-28):** the owner likes the style of seven illustrated city posters (`docs/look/poster_refs/`)
+and wants to experiment with it, starting from v2's look ("i really like the style and i want us to experiment more with
+the style and the focus on our videos"). What we learn from them (perspective, visual style, details, composition) and
+which content fits a world of cities and buildings are studied in `docs/studies/2026-10-28_city_posters/`. **Already
+decided by the owner (2026-10-28), in the rules below:** one look for every video, still evolving (the intro; rule 3);
+Pip stays, hidden on purpose (rules 1-2); a VERY subtle
+paper-and-paint texture may be tried (rule 4); every volume in lit and shade tones (rule 5); a full value range (rule
+6). **Still open:** the posters' outline-free edges (the owner judges an A vs B picture; rule 4's lines stand until
+then), one consolidated layout guide (our earlier layout rules reconciled with the posters' findings), the designed view
+("unique camera angle and composition of objects", which the owner finds fascinating) and the study's techniques for the
+owner's four feelings. The specific local objects of a place are content, not style (owner). Everything else in the
+study is a proposal until the owner approves it.
+
 ## The rules
 - **1. One flowing story, never shots stitched together.** One story on ONE core line (spine first, each line following
   from the last) and a through-line card: one thread object carrying the arc (on screen >= 80 %, no gap over 3 s
-  except the one scale reveal and an owner-approved fairness stretch, declared on the card), one home place (at most 3 places; a chart is paper where you already are), one "you",
-  the mascot on both sides of every join. Every join carries something (A push-through, B thread match, C continuous
+  except the one scale reveal and an owner-approved fairness stretch, declared on the card), one home place (at most 3 places; a chart is paper where you already are), one "you";
+  Pip hides in the world, never a join's carrier (rule 2). Every join carries something (A push-through, B thread match, C continuous
   camera, D object carry or wipe, E card flip; F plain cut: at most 2, on a "But" turn; a dissolve is no carrier), its
   midpoint on the next sentence's first word; shots (panels) average >= 3.5 s. Sound off, every shot reads: literal
   beats clever. -> `CRAFT.md` §a; engine types per carrier: `G5_BLOCKING.md` §2.
 - **2. Attention hierarchy: one subject at a time.** Tier by STORY ROLE, never depth: A, the beat's 1-3 subject objects,
   owns the contrast, the hero colour, the only full outline and >= 60 % of the motion; B, supporting life (people near
   the story, the mascot): soft (C* <= 25), small, steady, a tinted line or none; C, the environment: no outlines, low
-  contrast, slow life only. The film's recurring living character is in every shot (Pip by default, drawn new per
-  film; another character only if the story asks, named in W1), tier B unless the line is about it: <= 1 % of the
-  frame. Squint at phone size: the eye is on the beat's subject. **Depth and separation too** (owner, v2 G4): the
+  contrast, slow life only. Pip stays in every film, hidden on purpose (owner, 2026-10-28: "keep it, but not as
+  obvious"): small, inside the world (a window, a boat, a balcony, a crowd), found on a second look, never on the
+  subject's eye path; drawn new per film in the one look; tier B, <= 1 % of the frame; its hiding spots planned at G3
+  (W1 names them); another character only if the story asks, named in W1. Squint at phone size: the eye is on the beat's subject. **Depth and separation too** (owner, v2 G4): the
   subject never melts into what is behind it (its own value against a calmer field); distance shows in colour (far
   planes converge on the air behind them: lighter, softer in contrast, simpler, cooler under a blue sky and warmer under a
   sunset: atmospheric perspective in flat colour) and in perspective (a ground
@@ -50,27 +66,33 @@ A clash is a bug: fix the lower doc in the same turn.
   steam, snow, birds, a window lighting, walkers) but stays small, slow and low in contrast: at most 3-4 noticeable
   supporting movers at once, taking turns, none entering in the 0.4 s around a join. Subtle means lighter, never
   removed; counts are examples and meters warn, never quotas. The bar is the film's own G3 density key (v3's G5b pilot
-  O1 shows only how full). Everything is drawn new for each film (sets, people, props, Pip, music); engine, tools and
-  QA are reused, and `lib` pieces are references. -> `LIFE_AND_DENSITY.md` §0-7.
+  O1 shows only how full). Everything is drawn new for each film (sets, people, props, Pip, music) inside the one look
+  every video shares; engine, tools and QA are reused, and `lib` pieces are references. -> `LIFE_AND_DENSITY.md` §0-7.
 - **4. A clean, premium line, never rough or messy.** A: one closed outline (3.0 px, in the object's own deep, warm
   shade: our reading of the owner's "black outlines, VERY subtle, in key places", never one near-black ink on
   everything; the owner judges it in each G4 look clip) and a few thin inner details; B: no outline (a thin same-hue
   line only on the mascot and line-drawn figures); C: none (wires as hairlines). Each shape one closed path: no corner
   crossings, gaps, overshoot, jitter or doubled strokes; fills meet their line exactly; an object draws on as one
-  stroke; no boil; big areas flat, no specks, ticks, hatching or grain; the owner's halftone is the one optional
-  texture, a last step; captions keep the dark ink. The clean pen (`src/lib/pen.ts` `setPen('clean')`) draws the film;
+  stroke; no boil; big areas flat, no specks, ticks or hatching; texture stays VERY subtle and opt-in, a last step
+  the film must work without: a fine paper-and-paint grain with gentle mottling in the big flats, static and locked to
+  the world (owner, 2026-10-28: "start playing with it, very subtly especially if its adding to the premium look"; tried
+  in a look clip, kept only if it adds to the premium feel), or the owner's halftone on a few elements; captions keep
+  the dark ink. The clean pen (`src/lib/pen.ts` `setPen('clean')`) draws the film;
   the sketch pen and the scribble mass stay on the G3 board. -> `CRAFT.md` §c.
 - **5. Gentle light and shadow, always there.** One light rig per set (a key on one side, one shadow tint family, the
   pool colours), kept in all its shots; a source never moves between cuts; the brightest area sits on the subject;
   light is lighter than what it lights, shown on what it hits (never glow discs, blur or gradients, the sky's gentle gradient aside: rule 6; a halo is one step
   of at most 1.7x, or none). Shadows are colour, never grey, gentle in value, flat in shape: contact under all that
-  touches a surface, form away from the key, cast along the light; rim light only on the subject; night is
-  temperature, not darkness. -> `CRAFT.md` §d; `scripts/qa/check_light.py`.
+  touches a surface, form away from the key, cast along the light; every volume reads in 2-3 flat tones, a lit face and
+  a shade face (the city posters; owner, 2026-10-28); rim light only on the subject; night is temperature, not
+  darkness. -> `CRAFT.md` §d; `scripts/qa/check_light.py`.
 - **6. Warm, soft colour, never sickly.** One sister palette per film, proposed in the W1 world bible (its rigs and
   colour script are written in its terms) and approved with the G4 look clip: a soft light page of many fills (warm by
   default), one hero on the story's object, one tinted dark anchor (~5 %), at most one pop ("look here"). Peach
   creams, terracotta, rose, leaf sage, golden light, plum and red-brown shadows; never beige, muddy tan, olive or
-  grey; a warm world held by one cool field; saturation as confetti, never fields. Money and everyday life: #9 Autumn
+  grey; a warm world held by one cool field; saturation as confetti, never fields; a full value range: a calm light
+  sky, a mid-tone world and a few real darks where the eye should go, never a narrow band of light pastels (owner,
+  2026-10-28; numbers: the city-poster study). Money and everyday life: #9 Autumn
   Ember (#7 Autumn Ochre read sick). **One continuous sky** (owner, v2 G4): from the frame top to the horizon the sky
   is ONE gentle, smooth gradient (the owner's opt-in: the sky is the one place a gradient is welcome; "find a beautiful
   way to do a gentle gradient"; water may mirror that same sky, toned toward it: the sky's own gradient seen in it,
@@ -129,7 +151,7 @@ stage; the owner may skip gates by name. The clean pen's first test is the v3 re
   full, full, hairline, none" ladders): lines by story role; distance only calms colour and merges small parts, one
   flat step per plane (rule 2's depth, `CRAFT.md` §f).
 - Equal-weight clutter: dressing, crowds or the mascot as loud as the subject; specks, ticks, hatching, dash rows,
-  squiggles, grain.
+  squiggles, a visible grain (rule 4's VERY subtle texture is an opt-in test, never a loud one).
 - An events-per-second quota or a density FAIL (`ENGINE.md` rule 6, `motion_spec.md` §9, ref 2 as a floor, the old
   "BUSY" profile): events/s and the meters are information.
 - A plain cut by default, "change size and angle at every cut", a zoom over 2x turned into a cut-in, a dissolve as a
@@ -141,7 +163,8 @@ stage; the owner may skip gates by name. The clean pen's first test is the v3 re
 - A zoom, push or "breathe" in any hold (ref 2's per-shot zoom, the old "push 3-5 %", the S3/S4 pull-outs).
 - A light that moves or hops between cuts, the sun as a character or idle motion (v1, `CINE.md`); glow discs and halo
   rings standing in for light.
-- The mascot hopping across cuts on its own (it rides the carrier or keeps its spot); strangers' backs in the
+- The mascot hopping across cuts, riding the carriers or sitting on both sides of every join, or placed for the eye as
+  a visible presence in every shot: Pip hides on purpose (rule 2; owner, 2026-10-28); strangers' backs in the
   foreground, in any film.
 - Faces on people (a protagonist's "face beat", v3's waist-up "you" facing us): people act with their pose; only the
   mascot has a face (rule 3).

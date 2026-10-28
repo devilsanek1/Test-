@@ -139,6 +139,48 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Pick-up notes: `video/docs/v4/README.md`.** **PAUSED 2026-10-27 ~14:40 UTC (owner: "lets pause for now. lets make sure the other session finishes its work")**: the G0.5 run was stopped before any agent finished (nothing produced). To resume, relaunch `context/workflows/v4-g05-facts-and-core-line-*.js` unchanged once the owner says go.
 - G0.5 (paused): `context/workflows/v4-g05-facts-and-core-line-*.js` -> `video/docs/v4/research/`, `CORE_LINE.md`. Next: owner picks the core line; then G1 story-first script.
 
+## 2d. The city-poster study (2026-10-28)
+- **Run by session https://claude.ai/code/session_01YGLGMqbgdpycjemYZL3aoL**, branch `claude/compassionate-hopper-5iqguj`
+  (not merged into `video-production`; the owner decides). The owner sent seven illustrated city posters
+  (`video/docs/look/poster_refs/`) and asked for two things: what we learn from them (perspective, visual style, details,
+  composition) and which content fits videos with more cities, architecture and buildings (v1 the best performer, v2
+  the look they like with a weaker story). v2's look is the baseline.
+- The study is `video/docs/studies/2026-10-28_city_posters/` (its README is the shared brief): four look lenses
+  (workflow `poster-look-lenses`), two content lenses (`places-content-fit`) and, after the owner named four feelings
+  (depth with a far scale anchor, crisp heroes against a simpler coherent world, real-yet-faceted nature, vibrant
+  coherent colour; v2 "still feels cheap and lazy"), four pro-practice researchers (`poster-pro-practice`: how
+  professional studios get each feeling, as concrete techniques); then `STUDY.md` + `SUMMARY.md`, organised by the four
+  feelings plus what the owner didn't name, and an adversarial check. Nothing in it is a rule until the owner approves
+  it (DIRECTION's "Open study" note). The next step it is meant to feed: v4's topic pick (paused) and a look experiment
+  for the picked content.
+- **The parallel thread (owner: "spin up a parallel thread - i want to discuss the ideas for what kind of video content
+  would fit perfectly in this kind of style"):** helper session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt
+  (booted from `v2r-helper-boot` with `/effort max`, working on this study's branch), discussing content directions
+  with the owner; its notes: `content_discussion.md` in the study folder. The orchestrator messages it when
+  `content_market.md` and `content_fit.md` are pushed; archive it when the owner closes the discussion.
+- **The journal-corpus thread (owner: "take a look at the stories posted by big journals recently. like forbest, times,
+  economist, etc for each story evalute if having our visual storytelling would actually be a good fit and then cluster
+  the stories and see if anything comes out of it ... refine it and go"):** helper session
+  https://claude.ai/code/session_01YGLGMqT2EoqkuUBVwxxRZE (booted with `/effort max`, ultracode on), on this study's
+  branch; output `journals/` in the study folder (the rubric, about 200-300 stories from the last 30 days, scores, a
+  blind second scorer on a sample, clusters, a chart, a summary). The environment's network policy denies the news
+  hosts and feeds (checked 2026-10-28 22:20 UTC: economist.com, time.com, forbes.com, nytimes, theguardian.com,
+  reuters.com, apnews.com, GDELT, Google News, wikipedia.org), so the corpus came from web search results; then the
+  owner changed the network policy (~22:28 UTC) and the feeds load (economist.com, time.com, forbes.com, theatlantic.com,
+  theguardian.com, rss.nytimes.com, feeds.a.dj.com, wired.com, newyorker.com, ft.com via a redirect, news.google.com
+  RSS; reuters.com and apnews.com answer 401/403 from their own bot walls; GDELT doesn't answer): the corpus is built
+  from the feeds.
+- **The owner's answers (2026-10-28 ~22:10 UTC)** to our nine first observations are rules now where decided (one look,
+  one brand; a VERY subtle texture to try; lit and shade faces; a full value range: DIRECTION intro and rules 3-6,
+  CRAFT §c, PALETTE, the playbook) and open where not (outline-free edges: an A vs B picture; one consolidated layout
+  guide; the designed view; the patchwork): the study README lists them. "merge the findings and key points and
+  conclusions into the main repo": this study is merged into `video-production` as it goes, and its conclusions are
+  integrated into the main docs when the synthesis lands.
+- **Then (2026-10-28 ~22:30 UTC):** "our look is evolving - we are finding out style i don't think we can overfixate on
+  this" (ONE LOOK, ONE BRAND is a direction, not a freeze) and Pip "would be good to keep it, but ... way more subtle
+  perhaps hide it deliberately in the video": Pip stays, hidden on purpose, no longer on both sides of every join
+  (DIRECTION rules 1-2, CRAFT §a.3 and §b, LIFE_AND_DENSITY §5, the playbook).
+
 ## 2b. Update 2026-10-25 20:00 UTC: two agents, split by video
 
 - **Video 2 (Google DeepMind resignations) is produced by session https://claude.ai/code/session_01BGZ47aBhF9yKpEaeiLeCPQ**
@@ -379,6 +421,8 @@ Everything that agent knew is in this repo. This file is the map; the details li
     `look/COZY_AND_SCALE.md`, `look/LIFE_AND_DENSITY.md`, `look/PALETTE.md` (+ `palettes.json`), `look/research/`.**
   - Per video: `vN/` (`OWNER_NOTES.md`, the core line, the script, the style page, plans; rejected options in
     `vN/archive/`).
+  - Studies: `studies/2026-10-28_city_posters/` (the owner's city-poster references: what we learn for the look, and the
+    content that fits places).
   - The channel's brief (every video): `CREATIVE_BRIEF.md` (the owner's master brief; its banner lists the later
     owner rules that update it).
   - Brief and story (v1): `BRIEF.md` (the v1 project brief; history), `script/` (all script versions, critiques, the
@@ -410,6 +454,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
 | 10-25 ~20:10 | `video/docs/look/texture_refs/autumn_walk_detail.png` (crop of palette ref 4) | "I only really like these very subtle texture pieces and the black outlines, VERY subtle but in key places; test it in production" | `video/docs/look/PALETTE.md` "Texture and lines" (spec and test plan), playbook Visual style; test at G4 |
 | 10-25 17:32 | `context/uploads/inline/2026-10-25_173226_9.jpg` (= `video/docs/look/ref_sense_of_enclosure.jpg`) | "Sense of Enclosure": coziness as a visual twist; keep Arcane-like scale | queue item 2 |
 | 10-26 ~22:50 | `video/docs/look/ref_animated_sketchbook.png` (an urban sketcher's notebook: loose ink street scenes, dense with scribbled suggestion) | "the sketch stage ... frankly the most important stage ... close to final version of the story, transitions, animations, camera movements ... details ... as placeholders ... like an animated sketchbook ... the closest signal to the final story in as little time as possible" | `video/docs/G3_ANIMATIC.md` (the new G3 stage spec), playbook Storyboard rules, STORYBOARD_STYLE / PIPELINE_V2 / G5_BLOCKING / CLAUDE.md updates |
+| 10-28 ~21:35 | `video/docs/look/poster_refs/01-07_*.jpg` (seven illustrated city posters, screenshots of a 19-poster Instagram carousel: Singapore, Reykjavik, Hanoi, Buenos Aires, Cape Town, Copenhagen, Kyoto; the owner's words verbatim in its README) | "i really like the style and i want us to experiment more with the style and the focus on our videos"; "learn from these pictures in terms of perspective, visual style, details and composition"; "which type of content would be best fit into videos where we have more of cities / architectures / buildings"; "save these pictures into the repo as references" | the study `video/docs/studies/2026-10-28_city_posters/` (section 2d); playbook Visual style + Taste signals; DIRECTION's "Open study" note |
 
 Other screenshots in `context/uploads/` (`*-image.png`) are the same Instagram screens as uploaded files.
 

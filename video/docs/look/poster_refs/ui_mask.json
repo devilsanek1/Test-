@@ -1,0 +1,159 @@
+{
+ "_note": "Instagram UI burned into the owner's screenshots: exclude these pixels from every measurement. Boxes are [x0, y0, x1, y1] in image pixels, padded 6 px; 'content_rows' is [first, last) row of the poster itself (black status/nav bars outside it). The mute button is a dark circle: centre (1122, H-90), radius 45 (checked by eye on 01, 04, 06).",
+ "images": {
+  "01_singapore.jpg": {
+   "size": [
+    1206,
+    1639
+   ],
+   "content_rows": [
+    19,
+    1625
+   ],
+   "counter_pill_box": [
+    1042,
+    54,
+    1168,
+    143
+   ],
+   "mute_button_box": [
+    1072,
+    1499,
+    1172,
+    1599
+   ]
+  },
+  "02_reykjavik.jpg": {
+   "size": [
+    1206,
+    1608
+   ],
+   "content_rows": [
+    0,
+    1605
+   ],
+   "counter_pill_box": [
+    1042,
+    34,
+    1169,
+    123
+   ],
+   "mute_button_box": [
+    1072,
+    1468,
+    1172,
+    1568
+   ]
+  },
+  "03_hanoi.jpg": {
+   "size": [
+    1206,
+    1610
+   ],
+   "content_rows": [
+    19,
+    1610
+   ],
+   "counter_pill_box": [
+    1048,
+    75,
+    1147,
+    139
+   ],
+   "mute_button_box": [
+    1072,
+    1470,
+    1172,
+    1570
+   ]
+  },
+  "04_buenos_aires.jpg": {
+   "size": [
+    1206,
+    1587
+   ],
+   "content_rows": [
+    0,
+    1579
+   ],
+   "counter_pill_box": [
+    1026,
+    8,
+    1168,
+    97
+   ],
+   "mute_button_box": [
+    1072,
+    1447,
+    1172,
+    1547
+   ]
+  },
+  "05_cape_town.jpg": {
+   "size": [
+    1206,
+    1605
+   ],
+   "content_rows": [
+    5,
+    1605
+   ],
+   "counter_pill_box": [
+    1028,
+    40,
+    1167,
+    127
+   ],
+   "mute_button_box": [
+    1072,
+    1465,
+    1172,
+    1565
+   ]
+  },
+  "06_copenhagen.jpg": {
+   "size": [
+    1206,
+    1635
+   ],
+   "content_rows": [
+    19,
+    1625
+   ],
+   "counter_pill_box": [
+    1032,
+    54,
+    1169,
+    143
+   ],
+   "mute_button_box": [
+    1072,
+    1495,
+    1172,
+    1595
+   ]
+  },
+  "07_kyoto.jpg": {
+   "size": [
+    1206,
+    1618
+   ],
+   "content_rows": [
+    19,
+    1618
+   ],
+   "counter_pill_box": [
+    1028,
+    56,
+    1167,
+    141
+   ],
+   "mute_button_box": [
+    1072,
+    1478,
+    1172,
+    1578
+   ]
+  }
+ }
+}
