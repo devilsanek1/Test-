@@ -141,8 +141,10 @@ freezes the world). S4's truck is A's walk: its world slide is camera, not suppo
 ## 5b. Depth: planes, the air, one camera, separation, a few particles (CRAFT §f; `src/lib/depth.ts`, `src/lib/particles.tsx`, how-to `src/lib/DEPTH.md`)
 The owner on the G4 clip (2026-10-27, `OWNER_NOTES.md`): the wing and the far city "blurred together", no distance, no
 perspective, the bottom flat; "a bit of particles here and there". Every shot, with its rig:
-- **The air** (one atmosphere per set, `makeAtmosphere`): the shot's lowest sky step right behind its far planes (S1
-  `S1_HAZE` #FBD9BB; the gold band #F6D9BC on S2, S4; the sunset band #F3C6A6 on S3, S7, S8; the April band on S5, S6).
+- **The air** (one atmosphere per set, `makeAtmosphere`): the shot's lowest sky colour right behind its far planes,
+  `horizonColor(sky, x)` once the shot draws `lib/sky`'s one continuous sky (CRAFT §g.3; S1 `S1_AIR` in
+  `world/skies.ts`: the #FBD9BB horizon warmed under SUN0, in place of `S1_HAZE`); until a shot's sky is converted, its
+  lowest band (the gold band #F6D9BC on S2, S4; the sunset band #F3C6A6 on S3, S7, S8; the April band on S5, S6).
   Every far fill goes through `recede(colour, plane, ATM)` or `planePalette` (converging on the air, never grey or
   olive), never an sRGB mix toward the mint: the dc kit's `atm()` and S1's `hazeBatch` mix that way, swap them.
 - **One camera per shot** (`groundCam`; the horizon and VP(s) every ground, figure and particle is sized from): S1

@@ -79,9 +79,13 @@ Your S1 depth pass is by hand; the engine has landed, so pull it where it saves 
   shade (`sun` = SUN0), `glints` in `glitterPath({x: 196, yFar: ~1112, yNear: ~1212})` with `horizon` 965, one
   `leaves` from the plane branch falling down the left gutter (x < 95, `floor` the bottom). This is the owner's newer
   note: §6's cut water glints come back ONLY as this small field. `particleProblems(fields, {joins: [6.1]})` clean.
-- **Haze:** `atmos(c, k, S1_HAZE)` (`lib/depth`) in place of `hazeBatch`'s sRGB `mixHex`: same k, but a far brick
+- **Haze:** `atmos(c, k, S1_AIR)` (`lib/depth`; `S1_AIR` = `horizonColor(S1_EVENING, SUN0.x)` from `world/skies.ts`
+  once the continuous sky is drawn, `S1_HAZE` before) in place of `hazeBatch`'s sRGB `mixHex`: same k, but a far brick
   converges on the air instead of greying; behind the pale wing the far city reads from +3 (`planePalette` merges a far
   row's materials into 2-3 close values).
+- **The leaf:** with the default `margin` (22) and drift (+8 px/s), no fall from x 20-54 stays clear of the caption
+  band (x >= 95): `particleProblems` says 5 of the first 6 leaves shrink out 2.2-5.7 s after their birth (they never
+  grow back). `drift: [0, 0]` and `margin: 10` keep every fall clear (lint clean; the leaf is in view 4.17-6.10 s).
 - **The corner:** `backing(tierFill(stucco, 'environment'), farField, {tier: 'environment'})` gives the far silhouette's
   value behind the lit fin (>= 15 L* SHOWN, the pen's pull included).
 - **Check:** copy `scripts/qa/depth_sheets/v2_g4_look_s1.json` to `v2_s1.json` with your two-point VPs and the

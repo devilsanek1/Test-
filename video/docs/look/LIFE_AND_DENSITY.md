@@ -173,9 +173,9 @@ references and primitives, never the film's people.
   reference 1), never from more movers.
 - **Particles are tier-C life inside this budget, never a texture** (`lib/particles.tsx`, `CRAFT.md` §f.6; owner, v2
   G4: "a bit of particles here and there"): a few motes in the light, dust or pollen in the sun-side air, a leaf, glints
-  in the sun's glitter path, far birds; declared at G3 among the `life:` items, 4-8 a field and <= ~12 on screen, small,
-  slow and a step lighter than what is behind them, growing in and shrinking out; entrances take their turn and never
-  start in the 0.4 s around a join (a steady field of motes or glints keeps its pace).
+  in the sun's glitter path, far birds; declared at G3 among the `life:` items, a few a field and <= ~12 on screen,
+  small, slow and a step lighter than what is behind them, growing in and shrinking out (the numbers: `CRAFT.md` §f.6);
+  entrances take their turn and never touch the 0.4 s around a join (a steady field of motes or glints keeps its pace).
 - **Profile first (§0).** STORY-LED shots run the full idle layer and cadence below. DENSE-CALM (cozy) holds run on a steady lane
   (1-5 movers, never zero: `COZY_AND_SCALE.md` 3b.4) and a locked or floating camera (3b.5), and keep at least ONE quiet
   ambient element on (the playbook's "ambient life that never stops"): slow weather or a slow cloud, steam, a window
