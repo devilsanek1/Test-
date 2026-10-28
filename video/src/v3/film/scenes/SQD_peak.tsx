@@ -8,28 +8,31 @@
 // THE CREST (final pass, E7): THE stick (SUMMIT_W = 30 px, rot -4) rests on a BED of two sticks at its own angle, their tops
 // tucked 1.35 px behind its bottom edge, so at every zoom of the pull it lies on gold (never on a strip of sky); a second
 // layer of six sticks steps the crest out to the flanks; the mound behind follows the bed, so no sky shows through.
-// THE READ (final pass, E5: "a mountain of memory sticks" read as pallets, then as a brick texture): detail is kept
-// where the camera dwells and dropped where it does not. Round the summit (seen at 190-830 px during the pull) the
-// sticks wear THE stick's own colours one value under it: a gold board, a pin strip, four warm dark chips; further out
-// the chips go pale, and the lower pile (first seen small, at the frame's edge, as the camera leaves the crest) is
-// flat boards with a soft lit top, no chips, no pins: one calm golden mass with a pile's silhouette.
-// DETAIL BY SIZE ON SCREEN (atmospheric perspective: far things simpler, lower in contrast): the crest's chips are a
-// warm brown, 20 L* under the board (the reveal's declared exception to CRAFT §c's dL* 15: the sticks must read as
-// memory, not pallets; THE stick's own chips stay near-black, L* 13), while a crest stick is >= 120 px on screen (the
-// pull to ~20.8), and pale out to tier C (11 L* under the board) by the time it is 50 px (~21.2, inside the move's
-// fastest stretch); the pale chips further out go with them. So the hold, SQE and SQF (the far plane at x1.0-1.08) see the calm pile: a golden mass with a pile's
-// silhouette, no specks. One look on both sides of J4 by construction (it is the far plane's scale, the same in every
-// builder). Light (the street rig: the open sky is the key, upper left): the sticks' tops a step lighter, the right
-// flank's boards in shade one step down, no ink inside the pile (the summit stick alone carries the subject's
+// THE READ (assembly fix, R1-3 / R2-1 / R2-2 / R3-1: the pile read as pallets, then bricks, then hay, at 3.7-4.8x the
+// pilot's mark density; at rest its specks were ~7x the pilot window's): ONLY THE CREST'S 8 hand-placed sticks (the bed's
+// two and the second layer's six, lying mostly level) carry a stick's detail, in THE stick's own values one step under
+// it: four dark chips (L* 27 against its 13) and a light pin comb (L* 85 against its 92) on a gold board (L* 70 against
+// its 77). Every row stick is a flat gold board: near the summit (lod 0-1) with its pin strip as ONE flat light band, its
+// lit top and its notched outline, lower down (lod 2) with its lit top only; the seams between sticks (the mound) sit
+// 4 L* under the board, never a dark slot. DETAIL BY SIZE ON SCREEN (atmospheric perspective: far things simpler):
+// every detail tone converges on its board's flat value as THE stick shrinks from 120 to 39 px on screen (~20.8-21.4,
+// inside the move's fastest stretch: a colour change, never a pop or a fade), so the hold, SQE and SQF see the calm
+// pile: its silhouette in three flat values, the lit upper-left slope (the sky key), the gold, the right flank's form
+// shade, no chips, pins or per-stick tops (only THE stick, outside's summit stick, keeps its detail). AT REST (the far
+// plane, +3) the pile takes its plane's step toward the air (CRAFT §f.2, k .40, hue kept: across from the dusk air),
+// half of it while it is the beat's subject ("By the mountain.", the rim's beat), the full step from the load beat
+// (23.10) in the rim's own 2-step. One look on both sides of J4 by construction (scale and film time, every builder).
+// Light (the street rig: the open sky is the key, upper left): the sticks' tops a step lighter, the right
+// flank's boards in shade one step down (chroma kept, CRAFT §d.3), no ink inside the pile (the summit stick alone carries the subject's
 // outline). Static geometry, computed once. H2 px.
 import React from 'react';
 import {rng} from '../../../lib/rng';
 import {clamp, useGlobalTime} from '../../../lib/time';
 import {mat, useXf, type Mat} from '../../../lib/xf';
-import {MemoryStick, STICK_RATIO} from '../kit';
+import {EMBER, MemoryStick, STICK_RATIO} from '../kit';
 import {StickDetail} from '../kit/S8_stick';
-import {Rim, ContactShadow, ShadowLayer, Lit, RIGS, polyD, mixHex, multiply, useLightOff} from '../kit/Light';
-import {T9} from './S9_tones';
+import {Rim, ContactShadow, ShadowLayer, Lit, RIGS, polyD, mixHex, multiply, useLightOff, lch, fromLch} from '../kit/Light';
+import {atmos} from '../../../lib/depth';
 
 type Pt = [number, number];
 const f1 = (v: number) => v.toFixed(2);
@@ -52,18 +55,17 @@ export const K0 = J3_STICK.w / SUMMIT_W;
 export const SUMMIT_STICK = {x: SUMMIT[0], y: SUMMIT[1] - SUMMIT_W * 0.155, w: SUMMIT_W, rot: J3_STICK.rot};
 const THE = SUMMIT_STICK;
 
-/** The pile's tones: THE stick's gold one value under it (L* 70, C* 39), a step darker for the boards turned from the
- *  sky, lit tops a step lighter, gold pins, the mound behind in the gaps; the tops and pins brightest on the crest
- *  THE stick lies on (L* 75.5 / 75), then softer with distance (73.5 / 73, 72.6 / 72.2; the lower pile's tops 71.8, no
- *  pins), all under THE stick's own board (77), pins (92), label and rim: the brightest 5 % of the frame sits on it and
- *  right round it at every zoom of the pull (CRAFT §d.2: the light leads the eye). */
-const TONES = {gold: '#D4A268', deep: '#C5935E', litC: '#DEB37D', lit: '#D9AD76', litB: '#D8AB73', lit2: '#D6A871', pinC: '#D3B58B', pin: '#CEAF85', pinB: '#CDAA7F', mound: '#B98757'} as const;
-/** The chips' two ends (see the header): `near` while a crest stick is big on screen, `far` once it is small; the
- *  crest's chips (A) and the pale ones further out (B). */
-const CHIPS = {A: {near: '#966E59', far: '#B3865F'}, B: {near: '#AD8366', far: '#C99762'}} as const;
-/** On-screen width of a crest stick (px) at which its chips are fully `near`, and fully `far`. */
-const CHIP_NEAR_W = 120;
-const CHIP_FAR_W = 50;
+/** The pile's tones: THE stick's gold one value under it (L* 70, C* 39), a step darker for a few boards (variety), lit
+ *  tops a step lighter, brightest on the crest THE stick lies on (L* 75.5), softer with distance (73.5, 72.6, 71.8); the
+ *  seams (the mound behind the gaps) only 4 L* under the board (R2-1: dark seams read as a brick wall); all under THE
+ *  stick's own board (77), pins (92) and rim: the brightest 5 % of the frame sits on it and right round it at every zoom
+ *  of the pull (CRAFT §d.2). The crest's detail in THE stick's values one step under it: chips L* 27 (its 13), a pin comb
+ *  L* 86 (its 92; R1-3: the old pins sat 5 L* over the board and never read); the rows near the summit one flat pin band
+ *  L* 83. `sun`: the lit upper-left slope of the calm pile (L* 75). */
+const TONES = {gold: '#D4A268', deep: '#C5935E', litC: '#DEB37D', lit: '#D9AD76', litB: '#D8AB73', lit2: '#D6A871', pinC: '#ECD0AC', pin: '#E6C8A2', chip: '#553A2E', mound: '#C99464', sun: '#E4AF73'} as const;
+/** THE stick's width on screen (px) at which the pile shows its full detail, and none (the calm pile: three flat values). */
+const DETAIL_W = 120;
+const CALM_W = 39;
 /** THE FORM SHADE (CRAFT §d.4; the street rig: the open sky's bright side is up-left): the right flank, turned from it,
  *  one flat step down, every fill times the dusk family's form tint (#BBA8DA at 0.5: gold L* 70 -> 60), its
  *  terminator a line from just right of the crest down the flank (~25-35 % of the pile's width), the sticks on it whole
@@ -72,7 +74,35 @@ const FORM_TINT = mixHex('#FFFFFF', '#BBA8DA', 0.5);
 const TERM: [Pt, Pt] = [[818, 640], [960, 1010]];
 const termX = (y: number) => TERM[0][0] + ((y - TERM[0][1]) * (TERM[1][0] - TERM[0][0])) / (TERM[1][1] - TERM[0][1]);
 const SHADE_POLY: Pt[] = [[TERM[0][0], 560], TERM[0], TERM[1], [TERM[1][0], 1100], [1500, 1100], [1500, 560]];
-const shadeOf = (c: string) => multiply(c, FORM_TINT);
+/** The form shade: the surface times the dusk family's form tint for its L* and hue (gold 70 -> 60, turned 9 deg toward
+ *  rose), its chroma kept at >= 0.95x (CRAFT §d.3; the plain multiply left the flank a muddy tan, C* 39 -> 31: R3-1). */
+const SHADES = new Map<string, string>();
+const shadeOf = (c: string) => {
+  let v = SHADES.get(c);
+  if (!v) {
+    const m = lch(multiply(c, FORM_TINT));
+    v = fromLch(m.L, Math.max(m.C, 0.95 * lch(c).C), m.h);
+    SHADES.set(c, v);
+  }
+  return v;
+};
+/** THE LIT SLOPE of the calm pile (the sky key, upper left): the half-plane left of a 52 deg line down-left from just
+ *  left of the summit, inside the pile's left silhouette; its sticks whole (classified by centre, as the terminator). */
+const SUN_TAN = Math.tan((52 * Math.PI) / 180);
+const sunX = (y: number) => PEAK.x - 4 - (y - PEAK.y) / SUN_TAN;
+const SUN_POLY: Pt[] = [[sunX(612), 612], [sunX(1100), 1100], [-300, 1100], [-300, 612]];
+/** Lch interpolation a -> b (hue the short way round): a dark chip converging on the gold passes through warm ambers,
+ *  never the sRGB mix's muddy browns. */
+function lerpLch(a: string, b: string, t: number): string {
+  if (t <= 0) return a;
+  if (t >= 1) return b;
+  const p = lch(a);
+  const q = lch(b);
+  let dh = q.h - p.h;
+  if (dh > 180) dh -= 360;
+  if (dh < -180) dh += 360;
+  return fromLch(p.L + (q.L - p.L) * t, p.C + (q.C - p.C) * t, p.h + dh * t);
+}
 /** THE PILE'S RIM on its beat (CRAFT §d.8: the subject on a darker field gets the key's light along its key-facing
  *  silhouette): from "By the mountain." (21.32) to the street's load beat (23.10, outside.tsx's H2_BEATS.load: the
  *  far field hands the eye to the street there), a lit gold band 4 px (screen) inside the pile's upper-left
@@ -84,8 +114,20 @@ const rimK = (T: number) => {
   if (T < a || T >= b + 0.05) return 0;
   return T < a + 0.05 || T >= b ? 0.5 : 1;
 };
-/** The pile's tones in SQE / SQF (tier C), for other builders that sit things over it (outside's chimney puffs). */
-export const PEAK_TONES = {gold: TONES.gold, deep: TONES.deep, lit: TONES.lit2, pin: TONES.pinB, chip: CHIPS.A.far, mound: TONES.mound} as const;
+/** THE PILE AT REST is the far plane (+3): one plane step toward the air (CRAFT §f.2, k .40; the gold sits across from
+ *  the dusk air, so its hue is kept and its chroma x 0.68: C* 39 -> 26), half of it while the pile is the beat's subject
+ *  (CRAFT §f.2: the subject on a far plane takes half its plane's step; the rim's beat), the full step from the load beat
+ *  (23.10) in the rim's own 2-step. Scaled by how calm the pile is on screen (none while THE stick is >= 120 px). */
+const PLANE_K = 0.4;
+/** outside.tsx's FAR_AIR (the sky's lowest colour), named here so the far plane's builder is not imported back. */
+const AIR = EMBER.skyLow;
+const airK = (T: number) => PLANE_K * (T < PILE_RIM_A[1] ? 0.5 : T < PILE_RIM_A[1] + 0.05 ? 0.75 : 1);
+/** The pile's tones in SQE / SQF (at rest: three flat values with the full +3 step), for other builders that sit
+ *  things over it (outside's chimney puffs). */
+export const PEAK_TONES = (() => {
+  const r = (c: string) => atmos(c, PLANE_K, AIR);
+  return {gold: r(TONES.gold), deep: r(shadeOf(TONES.gold)), lit: r(TONES.sun), pin: r(TONES.gold), chip: r(TONES.gold), mound: r(TONES.gold)} as const;
+})();
 
 /** The kit stick's outline, chips and pins (local, centred on 0, 0), for width w: the same proportions as
  *  kit/Memory.tsx's stickGeo (4 chips, margin 0.06 w, gap 0.04 w, chips 0.13-0.63 h, pins from 0.76 h). */
@@ -109,9 +151,21 @@ export function stickParts(w: number) {
     return [[cx, y0 + h * 0.13], [cx + cw, y0 + h * 0.13], [cx + cw, y0 + h * 0.63], [cx, y0 + h * 0.63]];
   });
   const pins: Pt[] = [[x0 + w * 0.05, y0 + h * 0.76], [x0 + w * 0.95, y0 + h * 0.76], [x0 + w * 0.95, y0 + h], [x0 + w * 0.05, y0 + h]];
+  // the pin strip as one flat band on each side of the key notch (a band across the notch painted over its gap)
+  const band = (a: number, b: number): Pt[] => [[a, y0 + h * 0.76], [b, y0 + h * 0.76], [b, y0 + h], [a, y0 + h]];
+  const pinBand: Pt[][] = [band(x0 + w * 0.05, nx), band(nx + nw, x0 + w * 0.95)];
+  // the crest's pin comb (R1-3: THE stick's light pins with gaps): 12 teeth, 75 % of the pitch, none in the notch
+  const pitch = (w * 0.9) / 12;
+  const comb: Pt[][] = [];
+  for (let i = 0; i < 12; i++) {
+    const a = x0 + w * 0.05 + i * pitch + pitch * 0.125;
+    const b = a + pitch * 0.75;
+    if (b > nx - pitch * 0.1 && a < nx + nw + pitch * 0.1) continue;
+    comb.push(band(a, b));
+  }
   // the lit top: a band along the top edge (12 % of the height), inside the board
   const top: Pt[] = [[x0, y0], [x0 + w, y0], [x0 + w, y0 + h * 0.12], [x0, y0 + h * 0.12]];
-  return {outline, chips, pins, top};
+  return {outline, chips, pins, pinBand, comb, top};
 }
 
 /** A stick's map: local (centred) -> its frame, for a pose {x, y, rot}. */
@@ -126,15 +180,17 @@ const pathOf = (pts: Pt[], P: (q: Pt) => Pt) => pts.map((q, i) => {
   return `${i ? 'L' : 'M'}${f1(x)} ${f1(y)}`;
 }).join('') + 'Z';
 
-/** A stick of the pile. lod: 0 = the crest (chips dark in the reveal), 1 = chips pale, 2 = the lower pile (a flat
- *  board with a soft lit top: no chips, no pins). */
+/** A stick of the pile. `crest` = the 8 hand-placed sticks (chips, pin comb); lod 0-1 = the rows near the summit (a flat
+ *  board, its lit top, one flat pin band); 2 = the lower pile (a flat board with a soft lit top). */
 type S = {x: number; y: number; w: number; rot: number; shade: boolean; lod: 0 | 1 | 2; crest?: boolean};
-type Parts = {board: string; deep: string; topC: string; top: string; topB: string; top2: string; pinsC: string; pins: string; pinsB: string; chipA: string; chipB: string};
-/** One layered group: the lit flank's parts and the shaded flank's (`dark`). */
-type Group = {lit: Parts; dark: Parts};
-const noParts = (): Parts => ({board: '', deep: '', topC: '', top: '', topB: '', top2: '', pinsC: '', pins: '', pinsB: '', chipA: '', chipB: ''});
+type Parts = {board: string; deep: string; topC: string; top: string; topB: string; top2: string; pinsC: string; pins: string; chip: string};
+/** One layered group: the middle of the pile (`norm`), the lit upper-left slope (`sun`) and the shaded flank (`dark`). */
+type Group = {norm: Parts; sun: Parts; dark: Parts};
+type Zone = keyof Group;
+const ZONES: Zone[] = ['norm', 'sun', 'dark'];
+const noParts = (): Parts => ({board: '', deep: '', topC: '', top: '', topB: '', top2: '', pinsC: '', pins: '', chip: ''});
 /** Detail by distance from the summit (H2 px; vertical distances count 0.85x: the camera's view reaches further down
- *  than sideways): the crest's chips to 42 px, pale chips to 150 px, flat beyond. */
+ *  than sideways): the brightest tops to 42 px, a pin band to 150 px, flat beyond. */
 const lodAt = (x: number, y: number): 0 | 1 | 2 => {
   const d = Math.hypot(x - SUMMIT[0], (y - SUMMIT[1]) * 0.85);
   return d < 42 ? 0 : d < 150 ? 1 : 2;
@@ -169,15 +225,15 @@ const PEAK_D = (() => {
     rows.push(row);
     y -= w * STICK_RATIO * 0.74;
   }
-  // the crest's second layer: six sticks stepping out to the flanks (left ones turned down to the left, right ones to
-  // the right), in front of the bed
+  // the crest's second layer: six sticks stepping out to the flanks, in front of the bed, lying mostly level (R1-3; kit
+  // README Pile: tilted backs read as hay), each turned only a little down toward its own flank
   const layer2: S[] = ([
-    [-38, 21, 28, -26, false],
-    [-26, 13, 27, -18, false],
-    [-11, 15.5, 28, -4, false],
-    [12, 16, 28, 6, true],
-    [26, 12, 27, 16, true],
-    [39, 20, 28, 24, true],
+    [-38, 21, 28, -10, false],
+    [-26, 13, 27, -6, false],
+    [-11, 15.5, 28, -2, false],
+    [12, 16, 28, 3, true],
+    [26, 12, 27, 7, true],
+    [39, 20, 28, 10, true],
   ] as [number, number, number, number, boolean][]).map(([dx, dy, w, rot, shade]) => ({x: SUMMIT[0] + dx, y: SUMMIT[1] + dy, w, rot, shade, lod: 0, crest: true}));
   // THE BED: two sticks at THE stick's angle right under it, their tops 1.35 px behind its bottom edge (under the key
   // notch's 1.29 px depth: the notch shows the bed, never the sky), wider than it on both sides so its contact shadow
@@ -195,10 +251,10 @@ const PEAK_D = (() => {
   const groups: Group[] = [];
   for (let ri = rows.length - 1; ri >= 0; ri--) {
     for (const parity of [0, 1]) {
-      const g: Group = {lit: noParts(), dark: noParts()};
+      const g: Group = {norm: noParts(), sun: noParts(), dark: noParts()};
       rows[ri].forEach((s, si) => {
         if (si % 2 !== parity) return;
-        const q = s.x > termX(s.y) ? g.dark : g.lit;
+        const q = s.x > termX(s.y) ? g.dark : s.x < sunX(s.y) ? g.sun : g.norm;
         const P = poseMap(s);
         const k = stickParts(s.w);
         const body = pathOf(k.outline, P);
@@ -211,17 +267,13 @@ const PEAK_D = (() => {
           else if (s.lod === 1) q.topB += pathOf(k.top, P);
           else q.top2 += pathOf(k.top, P);
         }
-        if (s.lod < 2) {
-          if (s.crest) q.pinsC += pathOf(k.pins, P);
-          else if (s.lod === 0) q.pins += pathOf(k.pins, P);
-          else q.pinsB += pathOf(k.pins, P);
-          for (const c of k.chips) {
-            if (s.lod === 0) q.chipA += pathOf(c, P);
-            else q.chipB += pathOf(c, P);
-          }
-        }
+        // chips and the pin comb only on the crest (R2-1, R3-1); the rows near the summit one flat pin band, no chips
+        if (s.crest) {
+          for (const c of k.comb) q.pinsC += pathOf(c, P);
+          for (const c of k.chips) q.chip += pathOf(c, P);
+        } else if (s.lod < 2) for (const c of k.pinBand) q.pins += pathOf(c, P);
       });
-      if (g.lit.board || g.lit.deep || g.dark.board || g.dark.deep) groups.push(g);
+      if (ZONES.some((z) => g[z].board || g[z].deep)) groups.push(g);
     }
   }
   // the mound behind the sticks (no sky through the gaps), inside the silhouette: at the crest its top runs through the
@@ -242,29 +294,51 @@ const PEAK_D = (() => {
   const under = polyD(mound) + bed.map((s) => pathOf(stickParts(s.w).outline, poseMap(s))).join('');
   // the pile's whole silhouette (the mound and every stick: one union), for its rim on its beat
   const silhouette = polyD(mound) + rows.map((row) => row.map((s) => pathOf(stickParts(s.w).outline, poseMap(s))).join('')).join('');
-  return {groups, mound: polyD(mound), under, shade: polyD(SHADE_POLY), silhouette};
+  // every stick's outline (one orientation, so the nonzero fill is their union), for the calm pile's flat regions
+  const sticks = rows.map((row) => row.map((s) => pathOf(stickParts(s.w).outline, poseMap(s))).join('')).join('');
+  return {groups, mound: polyD(mound), sticks, under, shade: polyD(SHADE_POLY), sun: polyD(SUN_POLY), silhouette};
 })();
 function xy(p: Pt) {
   return {x: p[0], y: p[1]};
 }
 
-/** The mountain (H2 px): mound, then ~1000 kit-shaped sticks in layered groups; the chips by the plane's scale on
- *  screen (see the header). Tier C mass (raw fills, no line). */
+/** The mountain (H2 px): mound, then ~1000 kit-shaped sticks in layered groups; the detail by THE stick's width on
+ *  screen, the air step at rest (see the header). Tier C mass (raw fills, no line). */
 export const RevealPeak: React.FC = () => {
   const m = useXf();
   const off = useLightOff();
-  const id = 'sqdpk' + React.useId().replace(/[^a-zA-Z0-9]/g, '');
+  const T = useGlobalTime();
+  const uid = React.useId().replace(/[^a-zA-Z0-9]/g, '');
+  const idShade = 'sqdpk' + uid;
+  const idSun = 'sqdsun' + uid;
   const sc = Math.sqrt(Math.abs(m[0] * m[3] - m[1] * m[2]));
   const wS = THE.w * sc;
-  const rk = rimK(useGlobalTime());
-  const u = clamp((CHIP_NEAR_W - wS) / (CHIP_NEAR_W - CHIP_FAR_W));
-  const chipA = u <= 0 ? CHIPS.A.near : u >= 1 ? CHIPS.A.far : mixHex(CHIPS.A.near, CHIPS.A.far, u);
-  const chipB = u <= 0 ? CHIPS.B.near : u >= 1 ? CHIPS.B.far : mixHex(CHIPS.B.near, CHIPS.B.far, u);
-  const lit: Record<keyof Parts, string> = {board: TONES.gold, deep: TONES.deep, topC: TONES.litC, top: TONES.lit, topB: TONES.litB, top2: TONES.lit2, pinsC: TONES.pinC, pins: TONES.pin, pinsB: TONES.pinB, chipA, chipB};
-  const dark: Record<keyof Parts, string> = {...lit};
-  if (!off) for (const k of Object.keys(lit) as (keyof Parts)[]) dark[k] = shadeOf(lit[k]);
-  const parts = (q: Parts, c: Record<keyof Parts, string>, k: string) => (
-    <React.Fragment key={k}>
+  const rk = rimK(T);
+  // d: how much detail the pile shows (1 while THE stick is >= 120 px on screen, 0 at <= 39 px: the calm pile)
+  const d = clamp((wS - CALM_W) / (DETAIL_W - CALM_W));
+  const k = (1 - d) * airK(T);
+  const air = (c: string) => (k > 0 ? atmos(c, k, AIR) : c);
+  // each zone's tones: every detail converges on the zone's flat value (`rest`) as d -> 0
+  const zone = (rest: string): Record<keyof Parts, string> => ({
+    board: lerpLch(rest, TONES.gold, d),
+    deep: lerpLch(rest, TONES.deep, d),
+    topC: lerpLch(rest, TONES.litC, d),
+    top: lerpLch(rest, TONES.lit, d),
+    topB: lerpLch(rest, TONES.litB, d),
+    top2: lerpLch(rest, TONES.lit2, d),
+    pinsC: lerpLch(rest, TONES.pinC, d),
+    pins: lerpLch(rest, TONES.pin, d),
+    chip: lerpLch(rest, TONES.chip, d),
+  });
+  const norm = zone(TONES.gold);
+  const sun = off ? norm : zone(TONES.sun);
+  const dark: Record<keyof Parts, string> = {...norm};
+  if (!off) for (const key of Object.keys(norm) as (keyof Parts)[]) dark[key] = shadeOf(norm[key]);
+  const tones: Record<Zone, Record<keyof Parts, string>> = {norm, sun, dark};
+  for (const z of ZONES) for (const key of Object.keys(norm) as (keyof Parts)[]) tones[z][key] = air(tones[z][key]);
+  const mound = lerpLch(TONES.gold, TONES.mound, d);
+  const parts = (q: Parts, c: Record<keyof Parts, string>, key: string) => (
+    <React.Fragment key={key}>
       {q.board ? <path d={q.board} fill={c.board} /> : null}
       {q.deep ? <path d={q.deep} fill={c.deep} /> : null}
       {q.topC ? <path d={q.topC} fill={c.topC} /> : null}
@@ -273,26 +347,44 @@ export const RevealPeak: React.FC = () => {
       {q.top2 ? <path d={q.top2} fill={c.top2} /> : null}
       {q.pinsC ? <path d={q.pinsC} fill={c.pinsC} /> : null}
       {q.pins ? <path d={q.pins} fill={c.pins} /> : null}
-      {q.pinsB ? <path d={q.pinsB} fill={c.pinsB} /> : null}
-      {q.chipA ? <path d={q.chipA} fill={c.chipA} /> : null}
-      {q.chipB ? <path d={q.chipB} fill={c.chipB} /> : null}
+      {q.chip ? <path d={q.chip} fill={c.chip} /> : null}
     </React.Fragment>
   );
   return (
     <>
       <defs>
-        <clipPath id={id} clipPathUnits="userSpaceOnUse">
+        <clipPath id={idShade} clipPathUnits="userSpaceOnUse">
           <path d={PEAK_D.shade} />
         </clipPath>
+        <clipPath id={idSun} clipPathUnits="userSpaceOnUse">
+          <path d={PEAK_D.sun} />
+        </clipPath>
       </defs>
-      <path d={PEAK_D.mound} fill={TONES.mound} />
-      {off ? null : <path d={PEAK_D.mound} fill={shadeOf(TONES.mound)} clipPath={`url(#${id})`} />}
-      {PEAK_D.groups.map((g, i) => (
-        <React.Fragment key={i}>
-          {parts(g.lit, lit, 'l')}
-          {parts(g.dark, dark, 'd')}
-        </React.Fragment>
-      ))}
+      {d <= 0 ? (
+        // THE CALM PILE (THE stick <= 39 px on screen): every stick is already its zone's flat value, so the pile is drawn
+        // as its silhouette in three clean regions (R2-2: the stick-edged zone borders were the specks left at rest)
+        <>
+          {(['norm', 'sun', 'dark'] as Zone[]).map((z) =>
+            off && z !== 'norm' ? null : (
+              <g key={z} clipPath={z === 'norm' ? undefined : `url(#${z === 'sun' ? idSun : idShade})`}>
+                <path d={PEAK_D.mound} fill={tones[z].board} />
+                <path d={PEAK_D.sticks} fill={tones[z].board} />
+              </g>
+            ),
+          )}
+        </>
+      ) : (
+        <>
+          <path d={PEAK_D.mound} fill={air(mound)} />
+          {off ? null : <path d={PEAK_D.mound} fill={air(lerpLch(TONES.sun, TONES.mound, d))} clipPath={`url(#${idSun})`} />}
+          {off ? null : <path d={PEAK_D.mound} fill={air(shadeOf(mound))} clipPath={`url(#${idShade})`} />}
+          {PEAK_D.groups.map((g, i) => (
+            <React.Fragment key={i}>
+              {ZONES.map((z) => parts(g[z], tones[z], z))}
+            </React.Fragment>
+          ))}
+        </>
+      )}
       {rk > 0 ? (
         <Lit rig={RIGS.street}>
           <Rim d={PEAK_D.silhouette} c={[640, 840]} size={[900, 420]} width={Math.min(5, 4 / sc)} color={rk >= 1 ? PILE_RIM : mixHex(TONES.gold, PILE_RIM, 0.5)} />
