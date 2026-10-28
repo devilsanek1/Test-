@@ -30,7 +30,8 @@ Top rules (details in the playbook):
 - The first 3 s must be a banger: frame 0 is the scene being drawn in the clean pen (the subject's outline, then colour
   within ~0.3 s), voice from the first frames (the first word at ~0.12 s, the locked voice file's lead; never a silent
   lead), the hook made physical (the expected thing, then reality overtaking it), never a still frame; state the payoff
-  in words on frame 0 (those words are that line's caption: never shown twice). Words in the picture are few and big
+  in words within ~2 s, in the voice's order (frame 0 shows the first spoken line; no title over the captions; the core
+  line as a title goes on the cover). Words in the picture are few and big
   (each reads at phone size, or it is not drawn; sources go in the post's text). Target 30-45 s.
 - A script is one coherent story (spine first; every line follows from the last), never a list of facts. Everyday spoken
   language, no AI-sounding phrasing; detailed emotional cues. The narration is generated with the owner's ElevenLabs voice through the API

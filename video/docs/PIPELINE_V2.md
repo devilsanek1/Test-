@@ -126,7 +126,7 @@ stages (building, fixing, polishing), where the measured waste happened.
    (`G3_ANIMATIC.md` §7) are separate and keep their FAIL.
 7. **The hook goes first at every gate:** its first 3-5 s are built and checked before the rest (a swappable hook
    segment, tooling item 4, was never built), with its sound cue from G1 on (a positive phone sound in the first second,
-   per the playbook). Where it is decided: G0.5 picks the core line (the frame-0 words, the hook's seed); G1 picks the
+   per the playbook). Where it is decided: G0.5 picks the core line (the hook's seed and the cover title; the payoff in words by ~2 s); G1 picks the
    spoken hook line (up to 3 alternatives as text); G2 voices only the pick; G3 decides its picture (the one opening
    shot: concepts judged internally, the owner sees one). v3 picked its hook at G2 from three MP4s, one per hook ("why
    are there multiple versions"): retired with the one-version rule. It is never polished last.

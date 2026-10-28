@@ -96,3 +96,9 @@ Only the owner's quoted words carry owner rank; the "->" half is our log, and a 
   (the street notice's faces) -> the 5x face is "~5x" alone (bars, "last year / now", the 11 px Gartner line gone), the
   2027 face "2027" alone (Micron's 13 px quote gone), and the chart card's 24 px BLS source line gone; the sources stay
   in the pinned comment. -> rules: playbook (frame-0 words are the caption; words in the world are few and big).
+- 2026-10-28 (on the fixed master, frame 0 in the phone's file viewer): "What's this tho?" (the pale frame-0 drawing
+  state) and "Why are we having this out of order weirdly? Should we just show buying ..?" -> the core-line title is gone
+  from the film (`Film3.tsx`: no `frame0`): frame 0 shows "Buying a laptop soon?", "AI's making it pricier." pops at
+  1.64, the loop lands on the question; the core line stays on the cover. The pale frame is the 0.3 s draw-in (frame 0
+  being drawn, then colour) that the loop also un-builds into: explained, the owner's call whether to start on the
+  finished colour frame. -> rule: playbook Hook and pacing (the payoff in words by ~2 s, in the voice's order).

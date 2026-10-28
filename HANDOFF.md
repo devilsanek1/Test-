@@ -91,7 +91,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
   - Voice: `video/audio/vo_clean.wav`, the treated ElevenLabs take `video/assets/vo_v3_final.wav`.
   - Sound: synthesized SFX (`video/audio/sfx`), cues in `video/audio/cues.json`, and a cinematic bed.
 - **Posted to Instagram on 2026-10-25.** After 45 minutes: 155 views, 70 viewers, average watch 21 s of 55 s, and
-  about 80 % of viewers gone by 3 s. The lesson is now a rule: put the payoff in words on frame 0, keep it 30-45 s, and
+  about 80 % of viewers gone by 3 s. The lesson is now a rule: put the payoff in words in the first ~2 s (in the voice's order, since 2026-10-28), keep it 30-45 s, and
   polish the hook most. The numbers are in the playbook's Performance log.
 - **Owner feedback after posting** (all in the playbook):
   - The paper edge at the top looked like a screen recording, so it was removed in the final.
