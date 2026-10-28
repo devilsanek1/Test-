@@ -13,6 +13,7 @@ import {useTime} from '../../lib/time';
 import {Batch, Paint, P, rng, ovalPath, lerp, frac, r1} from '../kit/canal/core';
 import {litAt} from '../kit/canal/life';
 import {ROW, PLANE_X, SUN, sunClear, clamp01, smooth01} from './V2S4_wcore';
+import {S4_PLANE, planeBatch} from './V2S4_depth';
 
 const K = 0.3;
 const [X0, X1] = PLANE_X(K);
@@ -307,11 +308,12 @@ export function farStatic(): Batch {
 
 export const FarPlane: React.FC = () => {
   const t = useTime();
-  const st = useMemo(farStatic, []);
+  const st = useMemo(() => planeBatch(farStatic(), S4_PLANE.far), []);
   const dyn = new Batch();
   trainInto(dyn, t);
   dyn.layer();
   flockInto(dyn, t);
+  planeBatch(dyn, S4_PLANE.far);
   return (
     <>
       <Paint b={st} seed="s4farSt" misreg={false} />
