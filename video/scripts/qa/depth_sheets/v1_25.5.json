@@ -1,6 +1,10 @@
 {
  "name": "v1 @25.5 s (the far city behind the low sun)",
  "units": "frac",
+ "waive": {
+  "separation": "calibration: v1 @25.5 is measured for its far city behind the low sun",
+  "ground": "calibration: v1 @25.5 is measured for its far city behind the low sun"
+ },
  "air": [
   [
    0.0,

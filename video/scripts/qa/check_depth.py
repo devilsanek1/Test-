@@ -11,8 +11,14 @@ in scripts/qa/depth_sheets/, README there), measured in CIE Lab (OpenCV float RG
 FAIL (exit 1) on the three signatures of the owner's note, everything else a WARN with its number (CRAFT's thresholds
 come from a few films: warnings with a declared exception):
   "no air"      the farthest plane is no closer to its air than the subject's plane (distance shows no colour at all)
-  "melts"       a silhouette's median fill step under |dL*| 6, or >= 50 % of it at one value along an unlined run > 100 px
+  "melts"       a silhouette's median fill step under |dL*| 6, or >= 50 % of it at one value along an unlined run > 100 px,
+                or a step that exists only in a thin ring round it (a halo, an outline band or a sliver 2-10 px wide:
+                past it, 12-24 px out, the edge melts along >= 50 % of it; CRAFT §f.3: never a halo)
   "elevation"   a ground the camera looks down on with >= 70 % of its visible lines level and < 10 % receding
+A check that did not run never passes: a sheet without its planes and air, its silhouettes or its ground FAILs ("sheet")
+unless it waives that part with a reason (`"waive": {"ground": "a sky shot: no ground in frame"}`, printed as WAIVE).
+The sheet is part of the check: box every visible plane (the farthest included) and nothing else, and look at the
+--map picture; a box that is mostly sky, or more than 3 vanishing points, WARNs.
 PLANES (each: L*, C*, C90, hue, darks L* p5, range p5-p95, local contrast, visible edges, values, dE76 to its air; drawn
 dark lines are left out: our environment draws none) WARN: the planes behind the subject not stepping >= 3 closer to the
 air each, the farthest over dE 10 from it, the subject's plane < dE 12 from the plane behind it, the farthest plane's
@@ -44,8 +50,39 @@ T = dict(  # = lib/depth.ts DEPTH_TARGETS (CRAFT §f)
     ladder=3.0, far_air=10.0, subject_step=12.0, far_darks=20.0, far_range=15.0, far_values=4, far_lc_k=0.5, far_lc=4.0,
     far_edges_k=0.5, far_chroma=8.0, behind_k=1.1,
     sep_a=(15.0, 0.20, 60), sep_a_lined=12.0, sep_mass=(12.0, 0.25, 100), melt_median=6.0, melt_same=0.50, melt_run=100,
+    ring_share=0.50, ring_warn=0.30, ring_step=8.0,
     ground_level=0.65, ground_recede=0.20, elev_level=0.70, elev_recede=0.10, visible=6.0, spacing=2.0, cam_tol=0.15,
+    max_vps=3, air_like=4.0, air_box=0.25,
 )
+PARTS = {
+    'air': 'planes and air (a subject plane, a plane behind it and the air: the "no air" check)',
+    'separation': 'silhouettes (the "melts" check)',
+    'ground': 'ground (the "elevation" check)',
+}
+
+
+def completeness(sheet, report):
+    """The three signatures each need their part of the sheet; a missing part FAILs unless the sheet waives it."""
+    pl = sheet.get('planes', [])
+    env = lambda p: p.get('role', 'env') != 'ground'
+    has = {
+        'air': bool(sheet.get('air') or sheet.get('air_hex'))
+        and any(p.get('role') == 'subject' or (p.get('plane', 0) == 0 and env(p)) for p in pl)
+        and any(p.get('plane', 0) > 0 and p.get('ladder', env(p)) for p in pl),
+        'separation': bool(sheet.get('silhouettes')),
+        'ground': bool(sheet.get('ground')),
+    }
+    waive = sheet.get('waive', {})
+    fails = 0
+    for k, ok in has.items():
+        if ok:
+            continue
+        if waive.get(k):
+            report.append(('WAIVE', f"{k}: not checked ({waive[k]})"))
+        else:
+            fails += 1
+            report.append(('FAIL', f"sheet: no {PARTS[k]}: declare it, or waive it with the reason (\"waive\": {{\"{k}\": \"...\"}}); a check that did not run never passes"))
+    return fails
 
 
 # ---------------------------------------------------------------- image, units, masks
@@ -147,6 +184,12 @@ def plane_stats(im: Img, m, air, lc_map, grad, lc_fill):
                LCfill=float(lc_fill[m].mean()))
     out['range'] = out['Lp95'] - out['Lp5']
     out['dEair'] = float(np.linalg.norm(mean - air))
+    # the box's air-coloured pixels (sky inside the box, or the plane's own near-air fill): their share, and the plane's
+    # distance to the air without them (a box drawn over sky passes "no air" on the sky, not on the plane)
+    d = np.linalg.norm(lab[m] - air, axis=1)
+    keep = d >= T['air_like']
+    out['air_share'] = float(1 - keep.mean())
+    out['dEair_solid'] = float(np.linalg.norm(lab[m][keep].mean(0) - air)) if keep.sum() >= 30 else out['dEair']
     out['air_L'] = float(air[0])
     out['air_h'] = hue_deg(air[1], air[2])
     out['mean'] = [float(v) for v in mean]
@@ -205,6 +248,8 @@ def check_planes(im: Img, sheet, u: Units, res, report):
     if far['dEair'] >= s['dEair']:
         fails += 1
         report.append(('FAIL', f"no air: the farthest plane '{far['name']}' is dE {far['dEair']:.1f} from its air, the subject's plane '{s['name']}' {s['dEair']:.1f}: distance shows no colour (the farthest must be the closest to the air)"))
+    elif far['air_share'] >= T['air_box'] and far['dEair_solid'] >= s['dEair']:
+        report.append(('WARN', f"the farthest plane '{far['name']}' passes 'no air' on its air-coloured pixels ({far['air_share'] * 100:.0f} % of its box within dE {T['air_like']:.0f} of the air; without them dE {far['dEair_solid']:.1f} >= the subject plane's {s['dEair']:.1f}): if that is sky inside the box, box the plane itself (--map); if it is the plane's own near-air fill, fine"))
     falls = True
     prev = s
     for r in behind:
@@ -262,15 +307,20 @@ def grabcut(bgr, box):
     return cv2.morphologyEx(m.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8)) > 0
 
 
-def separation(lab, near, roi, lines, step=4, rad=10):
+def separation(lab, near, roi, lines, step=4, rad=10, far=(12, 24)):
+    """Fill 2-8 px inside against fill 2-10 px outside, every `step` px along the silhouette (540 px wide); and the field
+    past that ring, `far` px out (24-48 at 1080): a step that exists only in the ring (a halo, an outline band, a sliver)
+    is no separation (CRAFT §f.3: the field behind is a calm flat shape, never a halo, glow or outline)."""
     nm = near.astype(np.uint8)
     din = cv2.distanceTransform(nm, cv2.DIST_L2, 5)
     dout = cv2.distanceTransform(1 - nm, cv2.DIST_L2, 5)
     band_in = (din >= 2) & (din <= 8) & ~lines
     band_out = (dout >= 2) & (dout <= 10) & ~lines
+    band_far = (dout >= far[0]) & (dout <= far[1]) & ~lines
     near_line = cv2.dilate(lines.astype(np.uint8), np.ones((7, 7), np.uint8)) > 0
     cnts, _ = cv2.findContours(nm, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     H, W = nm.shape
+    radf = far[1] + 2
     rows = []
     for c in cnts:
         pts = c[:, 0, :]
@@ -287,11 +337,18 @@ def separation(lab, near, roi, lines, step=4, rad=10):
                 rows.append(None)
                 continue
             li, lo = lab[y0:y1, x0:x1][bi].mean(0), lab[y0:y1, x0:x1][bo].mean(0)
-            rows.append(dict(dL=float(li[0] - lo[0]), dE=float(np.linalg.norm(li - lo)), line=bool(near_line[y, x])))
+            g0, g1, h0, h1 = max(0, y - radf), min(H, y + radf + 1), max(0, x - radf), min(W, x + radf + 1)
+            gy, gx = np.mgrid[g0:g1, h0:h1]
+            bf = band_far[g0:g1, h0:h1] & ((gx - x) ** 2 + (gy - y) ** 2 <= radf * radf)
+            lf = lab[g0:g1, h0:h1][bf].mean(0) if bf.sum() >= 6 else None
+            rows.append(dict(dL=float(li[0] - lo[0]), dE=float(np.linalg.norm(li - lo)), line=bool(near_line[y, x]),
+                             dLfar=None if lf is None else float(li[0] - lf[0]),
+                             ring=lf is not None and abs(lo[0] - lf[0]) >= T['ring_step'] and abs(li[0] - lf[0]) < 5))
     ok = [r for r in rows if r]
     if not ok:
         return None
     dL = np.array([abs(r['dL']) for r in ok])
+    fr = [r for r in ok if r['dLfar'] is not None]
     best = run = 0
     best_unlined = run_u = 0
     for r in rows:
@@ -301,7 +358,9 @@ def separation(lab, near, roi, lines, step=4, rad=10):
         best, best_unlined = max(best, run), max(best_unlined, run_u)
     return dict(n=len(ok), median=float(np.median(dL)), p25=float(np.percentile(dL, 25)), same=float((dL < 5).mean()),
                 run=int(best * step), run_unlined=int(best_unlined * step), line_share=float(np.mean([r['line'] for r in ok])),
-                signed=float(np.median([r['dL'] for r in ok])))
+                signed=float(np.median([r['dL'] for r in ok])),
+                far_median=float(np.median([abs(r['dLfar']) for r in fr])) if fr else None,
+                ring=float(np.mean([r['ring'] for r in fr])) if fr else 0.0)
 
 
 def check_separation(im: Img, sheet, u: Units, res, lines, report):
@@ -326,11 +385,18 @@ def check_separation(im: Img, sheet, u: Units, res, lines, report):
         if r['tier'] == 'A' and r['line_share'] >= 0.8:  # an outline along >= 80 % of it helps; it never replaces the fill step
             med, same = T['sep_a_lined'], T['sep_mass'][1]
         line = f"silhouette '{r['name']}' ({'tier A' if r['tier'] == 'A' else 'a mass'}): median |dL*| {r['median']:.1f}, one value {r['same'] * 100:.0f} %, unlined one-value run {r['run_unlined']} px (lined {r['line_share'] * 100:.0f} %)"
+        ring = f"; the step lives in a thin ring round it along {r['ring'] * 100:.0f} % (a halo, an outline band or a sliver): past it, 24-48 px out, median |dL*| {r['far_median']:.1f}" if r['far_median'] is not None else ''
+        ringed = r['ring'] >= T['ring_share'] and r['far_median'] is not None and r['far_median'] < T['melt_median']
         if r['median'] < T['melt_median'] or (r['same'] >= T['melt_same'] and r['run_unlined'] > T['melt_run']):
             fails += 1
             report.append(('FAIL', f"melts: {line}"))
+        elif ringed:
+            fails += 1
+            report.append(('FAIL', f"melts behind a ring: {line}{ring} (CRAFT §f.3: the field behind is a calm flat shape of its own plane, never a halo or outline)"))
         elif r['median'] < med or r['same'] > same or r['run_unlined'] > run:
             report.append(('WARN', f"{line}  [>= {med:.0f} / <= {same * 100:.0f} % / <= {run} px]"))
+        elif r['ring'] >= T['ring_warn']:
+            report.append(('WARN', f"{line}{ring}"))
         else:
             report.append(('OK', line))
     res['silhouettes'] = out
@@ -430,7 +496,11 @@ def check_ground(path, sheet, report, maps):
     fails = 0
     out = []
     for g in sheet.get('ground', []):
-        r, im = ground(path, g['roi'], sheet.get('units', 'frac'), g.get('vps'))
+        vps = g.get('vps')
+        if vps and len(vps) > T['max_vps']:
+            report.append(('WARN', f"ground '{g['name']}': {len(vps)} vanishing points declared; one camera gives a ground one (one-point) or two (two-point), {T['max_vps']} at most: the first {T['max_vps']} are used"))
+            vps = vps[:T['max_vps']]
+        r, im = ground(path, g['roi'], sheet.get('units', 'frac'), vps)
         r['name'] = g['name']
         out.append(r)
         report.append(('INFO', f"  ground '{g['name']}': visible lines level {r['vis_level'] * 100:.0f} %, to the VP(s) {r['vis_recede'] * 100:.0f} %, other {r['vis_other'] * 100:.0f} %  "
@@ -461,14 +531,24 @@ def check_ground(path, sheet, report, maps):
 # ---------------------------------------------------------------- size
 
 def check_size(sheet, report):
+    """Size inversions: a nearer thing smaller per metre. Nearer = a lower base on the same level; across levels only
+    with the camera's `height` (metres over level 0) in the sheet: depth ~ (height - level) / (base y - horizon)."""
     things = sheet.get('things', [])
     hz = sheet.get('horizon')
     if not things or hz is None:
         return []
+    cam_h = sheet.get('height')
     rows = [dict(t, ppm=t['px'] / t['m'], level=t.get('level', 0)) for t in things]
+    for r in rows:
+        r['z'] = (cam_h - r['level']) / max(1e-6, r['y'] - hz) if cam_h is not None else None
+
+    def nearer(a, b):
+        if a['level'] == b['level']:
+            return a['y'] > b['y'] + 4
+        return a['z'] is not None and b['z'] is not None and a['z'] < b['z'] * 0.97
     for a in rows:
         for b in rows:
-            if a['y'] > b['y'] + 4 and a['ppm'] < b['ppm'] * 0.97:
+            if nearer(a, b) and a['ppm'] < b['ppm'] * 0.97:
                 report.append(('WARN', f"size inversion: {a['name']} (base y {a['y']:.0f}, {a['ppm']:.0f} px/m) is nearer than {b['name']} (base y {b['y']:.0f}, {b['ppm']:.0f} px/m) but smaller per metre"))
     for lv in sorted(set(r['level'] for r in rows)):
         ks = [(r['ppm'] / (r['y'] - hz)) * 100 for r in rows if r['level'] == lv and r['y'] > hz + 1]
@@ -494,7 +574,8 @@ def main() -> int:
     lines = linemask(im.lab)
     report: list[tuple[str, str]] = []
     res: dict = {'sheet': sheet.get('name', a.sheet), 'image': a.image}
-    fails = check_planes(im, sheet, u, res, report)
+    fails = completeness(sheet, report)
+    fails += check_planes(im, sheet, u, res, report)
     fails += check_separation(im, sheet, u, res, lines, report)
     maps = [] if a.map else None
     gf, gres = check_ground(a.image, sheet, report, maps)
@@ -505,7 +586,7 @@ def main() -> int:
     res['fails'], res['warns'] = fails, warns
     print(f"DEPTH check: {res['sheet']}")
     for kind, line in report:
-        if a.quiet and kind not in ('FAIL', 'WARN'):
+        if a.quiet and kind not in ('FAIL', 'WARN', 'WAIVE'):
             continue
         print(line if kind == 'INFO' else f"{kind:4s} {line}")
     verdict = 'FAIL' if fails else 'WARN' if warns else 'PASS'

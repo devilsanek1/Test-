@@ -1,6 +1,10 @@
 {
  "name": "v1 @38.5 s (the wide city)",
  "units": "frac",
+ "waive": {
+  "separation": "calibration: v1 @38.5 is measured for its plane ladder (the wide city)",
+  "ground": "calibration: v1 @38.5 is measured for its plane ladder (the wide city)"
+ },
  "air": [
   [
    0.05,

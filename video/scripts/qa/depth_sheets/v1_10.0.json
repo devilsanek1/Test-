@@ -1,6 +1,9 @@
 {
  "name": "v1 @10.0 s (the square, one-point; the PHP house)",
  "units": "frac",
+ "waive": {
+  "air": "calibration: v1 @10.0 has no plane behind the PHP house (the square closes behind it)"
+ },
  "air": [
   [
    0.05,
