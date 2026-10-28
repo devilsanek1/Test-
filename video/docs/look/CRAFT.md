@@ -292,6 +292,8 @@ stands off what is behind it, the far reads far, the ground runs into the pictur
   a stepped top, a lit sliver on its sun side), never a placeholder rectangle.
 - Particles nobody can see: at phone size the viewer must spot them without searching: leaves 26-40 px crossing the mid ground,
   glints 20-36 px (4-6 at once), motes 6-10 px in the far air plus 2-4 near-plane motes at 12-16 px against the nearest shade (v5: 8-10 px motes alone read as specks; v4 had 13 px leaves, 14-24 px glints, 3-4 px motes: invisible to the owner).
+- Cheap water (owner on v2's v5: "way too cheap ... lazy and cheap"): a flat band with box-shaped reflection patches, scattered dashes
+  and star sparkles. Water is drawn with the care of a building: one shared component, its reflections, ripples and glitter designed.
 - Two cameras: a perspective ground under level, frontal buildings reads as a backdrop on a floor; facades, bridge and far rows share the
   ground's horizon and vanishing point (a narrow side wall in shade shows a building's depth).
 - The heaviest area at a squint must be the subject's, never the near dressing: near planes get value range, not prop count.
