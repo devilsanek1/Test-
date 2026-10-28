@@ -12,7 +12,7 @@
 // every subject's edge.
 //
 //   const ATM = makeAtmosphere({name: 'canal', air: CM.bandGold});   // the air = the sky's lowest step behind the planes
-//   recede(CM.brick, 3, ATM)               // a far brick: L* toward the air, chroma down, hue KEPT  -> #D9A493
+//   recede(CM.brick, 3, ATM)               // a far brick, converging on the gold air (never grey, never olive) -> #DCA38A
 //   const FAR = recedeAll({brick: CM.brick, stucco: CM.stucco}, 3, ATM)  // a whole plane's palette at once
 //   planeLod(3)                            // {values: 3, hairlines: false, minFeature: 8, windows: 'tone', ...}
 //   toneOnTone(FAR.brick)                  // a far window: the wall's own colour one soft step, never a dark speck
@@ -58,21 +58,30 @@ const cached = (key: string, make: () => string): string => {
 // ================================================================= the atmospheric step (CRAFT §f.2)
 
 export type AtmosOpts = {
-  /** Chroma drop at k = 1: C* x (1 - chroma x k). Default 0.8 (the k 0.40 step keeps 0.68 of the chroma). */
+  /** A colour across from the air: its chroma drop at k = 1, C* x (1 - chroma x k). Default 0.8 (k 0.40 keeps 0.68). */
   chroma?: number;
-  /** Degrees the hue turns toward the air's hue at k = 1, along the shorter arc. Default 0: the hue is KEPT. A straight
-   *  mix between a warm colour and an air of the other temperature crosses grey (brick toward a mint sky turns tan, then
-   *  olive-grey: research/2026-10-27_effects_libraries.md §4), so turn at most 30 and only toward an air of the same
-   *  temperature, or toward the rig's shade family on a backlit plane. */
+  /** A colour across from the air: degrees its hue turns toward the air's at k = 1 (default 0: kept; at most 30). A
+   *  straight mix between a warm colour and an air of the other temperature crosses grey (brick toward a mint sky
+   *  turns tan, then olive-grey: research/2026-10-27_effects_libraries.md §4). */
   hueTurn?: number;
   /** A far colour never drops under this C* (never grey), unless it was already greyer. Default 8. */
   chromaFloor?: number;
 };
 
-/** The atmospheric step in flat colour (Koschmieder's airlight with the hue kept): L* moves toward the AIR's L* by k
- *  (so a light colour can darken: "toward the haze's value", not "lighter"), chroma x (1 - 0.8 k) but never under C* 8,
- *  the hue kept (or turned by `hueTurn` x k toward the air's), gamut-fit by keeping L* and hue and lowering chroma.
- *  k = 0 returns the colour. One fixed step per plane, never a gradient. */
+/** CIELCh hues of the olive-khaki band a mix must not enter (a low-chroma yellow-green reads sick at our levels). */
+const OLIVE: [number, number] = [88, 118];
+
+/** The atmospheric step in flat colour (Koschmieder's airlight: the colour converges on the AIR behind it), one fixed
+ *  step per plane (never a gradient); k = 0 returns the colour. L* moves toward the air's L* by k (a light colour can
+ *  darken: "toward the haze's value", not "lighter"). The colour itself:
+ *  - a hue on the AIR'S SIDE (within 90 deg of it, or nearly grey): the straight mix of a*, b* toward the air's, so its
+ *    hue and chroma converge on the air (a far brick under a gold band turns a little gold; a cream gains the band's
+ *    warmth); never under C* 8 unless both already were;
+ *  - a hue ACROSS from the air (a warm colour under a cool air, a cool one under a warm air): the straight mix would
+ *    cross grey (brick toward a mint sky turns tan, then olive-grey: research/2026-10-27_effects_libraries.md §4), so
+ *    the hue is KEPT (or turned by `hueTurn` x k, at most 30) and the chroma eases x (1 - 0.8 k), never under C* 8:
+ *    warm near, dusty-cool far, never grey.
+ *  Gamut-fit by keeping L* and hue and lowering chroma. */
 export function atmos(color: string, k: number, air: string, o: AtmosOpts = {}): string {
   if (!isHex(color) || !isHex(air) || !(k > 0)) return color;
   const kk = Math.min(1, k);
@@ -83,8 +92,21 @@ export function atmos(color: string, k: number, air: string, o: AtmosOpts = {}):
     const c = lch(color);
     const a = lch(air);
     const L = c.L + (a.L - c.L) * kk;
-    const C = Math.max(Math.min(c.C, floor0), c.C * (1 - chroma * kk));
     const d = hueTurnTo(c.h, a.h);
+    if (Math.abs(d) <= 90 || c.C < 4) {
+      const p = lab(color);
+      const q = lab(air);
+      const A = p[1] + (q[1] - p[1]) * kk;
+      const B = p[2] + (q[2] - p[2]) * kk;
+      const floor = Math.min(c.C, a.C, floor0);
+      const C = Math.max(floor, Math.hypot(A, B));
+      let h = ((Math.atan2(B, A) * 180) / Math.PI + 360) % 360;
+      // never INTO the olive-khaki band from outside it (a sage under a gold air, a yellow under a mint one): the hue
+      // stops at the band's edge on its own side ("never beige, muddy tan, olive or grey": DIRECTION rule 6)
+      if (C < 30 && h > OLIVE[0] && h < OLIVE[1] && !(c.h > OLIVE[0] && c.h < OLIVE[1])) h = c.h >= OLIVE[1] && c.h < 300 ? OLIVE[1] : OLIVE[0];
+      return fromLch(L, C, h);
+    }
+    const C = Math.max(Math.min(c.C, floor0), c.C * (1 - chroma * kk));
     const h = c.h + Math.sign(d) * Math.min(Math.abs(d), turnMax * kk);
     return fromLch(L, C, (h + 360) % 360);
   });
@@ -152,7 +174,7 @@ export function nearStep(color: string, plane: number, atm?: Atmosphere): string
 }
 
 /** A colour on plane `plane` (CRAFT §f.2): the subject's plane unchanged; each farther plane ONE fixed flat step toward
- *  its air (the hue kept); a nearer plane a value step darker. `tier: 'subject'` takes half the step (`planeK`). Every
+ *  its air (`atmos`: never grey, never olive); a nearer plane a value step darker. `tier: 'subject'` takes half the step (`planeK`). Every
  *  fill of the plane takes it, windows and small parts included (their colours: `toneOnTone`). */
 export function recede(color: string, plane: number, atm: Atmosphere, o: {tier?: Tier} = {}): string {
   if (!isHex(color)) return color;
@@ -184,17 +206,20 @@ export type PlaneLod = {
   minFeature: number;
   /** Windows and small parts: 'lit' (their own colours), 'tone' (the wall's own colour one soft step: toneOnTone), 'none'. */
   windows: 'lit' | 'tone' | 'none';
+  /** The widest ΔE76 between two values on the plane (planePalette pulls them together): the far planes become calm
+   *  bands whose parts no longer read as edges (v1's far city: 1-4 values, L* range 6-15). */
+  spread: number;
   /** Size of a repeated thing (a building, a window period, a texture) against the subject's plane: ratio^-plane
    *  (2.2-3x smaller per plane on a vista; ratio 2.5). A ground drawn from groundCam gives true sizes instead. */
   scale: number;
 };
 
 const LOD: Omit<PlaneLod, 'plane' | 'scale'>[] = [
-  {values: 5, hairlines: true, minFeature: 0, windows: 'lit'},
-  {values: 5, hairlines: true, minFeature: 3, windows: 'lit'},
-  {values: 4, hairlines: true, minFeature: 4, windows: 'tone'},
-  {values: 3, hairlines: false, minFeature: 8, windows: 'tone'},
-  {values: 2, hairlines: false, minFeature: 12, windows: 'none'},
+  {values: 5, hairlines: true, minFeature: 0, windows: 'lit', spread: 100},
+  {values: 5, hairlines: true, minFeature: 3, windows: 'lit', spread: 100},
+  {values: 4, hairlines: true, minFeature: 4, windows: 'tone', spread: 24},
+  {values: 3, hairlines: false, minFeature: 8, windows: 'tone', spread: 12},
+  {values: 2, hairlines: false, minFeature: 12, windows: 'none', spread: 5},
 ];
 
 /** What a plane may draw (planes nearer than the subject draw like the subject's plane). */
@@ -205,6 +230,35 @@ export function planeLod(plane: number, ratio = 2.5): PlaneLod {
 
 /** Draw a part this big (px at 1080) on this plane? */
 export const keepDetail = (sizePx: number, plane: number) => sizePx >= planeLod(plane).minFeature;
+
+/** A plane's palette, simpler with distance: every source colour receded to the plane (`recede`), merged into at most
+ *  `planeLod(plane).values` values (5 / 5 / 4 / 3 / 2: the receded colours sorted by L* fall into that many groups of
+ *  neighbours, each group takes its mean), and those values pulled toward the plane's mean until no two are more than
+ *  `planeLod(plane).spread` ΔE76 apart (+3: 12, +4: 5). Returns source -> the colour to draw. A far row of four
+ *  materials shows two close values: a calm band, never the busiest region of the frame. */
+export function planePalette(colors: string[], plane: number, atm: Atmosphere, o: {tier?: Tier; values?: number; spread?: number} = {}): Record<string, string> {
+  const src = Array.from(new Set(colors.filter(isHex)));
+  const rec = src.map((c) => ({c, v: lab(recede(c, plane, atm, o))}));
+  rec.sort((a, b) => a.v[0] - b.v[0]);
+  const n = Math.max(1, Math.min(o.values ?? planeLod(plane).values, rec.length));
+  const groups: {cs: string[]; m: number[]}[] = [];
+  for (let g = 0; g < n; g++) {
+    const grp = rec.slice(Math.floor((g * rec.length) / n), Math.floor(((g + 1) * rec.length) / n));
+    if (grp.length) groups.push({cs: grp.map((x) => x.c), m: [0, 1, 2].map((i) => grp.reduce((s, x) => s + x.v[i], 0) / grp.length)});
+  }
+  const mean = [0, 1, 2].map((i) => groups.reduce((s, g) => s + g.m[i] * g.cs.length, 0) / Math.max(1, rec.length));
+  let widest = 0;
+  for (const a of groups) for (const b of groups) widest = Math.max(widest, Math.hypot(a.m[0] - b.m[0], a.m[1] - b.m[1], a.m[2] - b.m[2]));
+  const cap = o.spread ?? planeLod(plane).spread;
+  const k = widest > cap ? cap / widest : 1;
+  const out: Record<string, string> = {};
+  for (const g of groups) {
+    const v = [0, 1, 2].map((i) => mean[i] + (g.m[i] - mean[i]) * k);
+    const hex = fromLch(v[0], Math.hypot(v[1], v[2]), ((Math.atan2(v[2], v[1]) * 180) / Math.PI + 360) % 360);
+    for (const c of g.cs) out[c] = hex;
+  }
+  return out;
+}
 
 /** A small part on a plane that draws no detail colours (a far window, a far door): the wall's own colour one soft step
  *  (ΔE76 = `dE`, default 4, at most 6; lighter for a lit window, darker otherwise), hue and chroma kept: never a dark
