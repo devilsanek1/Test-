@@ -9,12 +9,16 @@ owner's notes, DIRECTION, CRAFT §f, conform_L3 and the approved look v4.
    magnified by the zoom into the sun. Breaks must-check 3 / conform §2 ("nothing crosses the disc") and CRAFT §f.1 (the
    disc is whole). Fix: `V2S4_wfar.tsx` FLOCK: cruise above the disc (y ~505-540) and lift the `ROW.top` clamp for the
    birds, so they climb west over the sun and leave the frame upward as the push grows.
+   **Done** (`V2S4_wfar.tsx`): cruise y 522-548, the climb over 0.35 s, the bird floor 516: none on the disc at
+   19.9-20.55 (0.4 frames), the push carries them up and out.
 2. **S4 15.0-20.4, blank cream slabs beside her.** The two rendered garden-wall stretches (stucco and limestone, screen
    #F0E3D3 / #EBE3D5, L* ~91) are flat, near-white rectangles in her band, the lightest shapes after the tag and plates;
    at 19.9 one sits right beside her. They read as placeholder cards and compete with the tag and plates. Breaks CRAFT
    §f.2 (a backing is a real thing of the set, never a blank slab) and DIRECTION 5 (the brightest area on the subject).
    Fix: `V2S4_wpath.tsx` SEGS / wallsInto: the render walls one step down to a warm mid render, plus one tone-on-tone
    recessed panel each (fills only, no lines), so the tag and plates stay the lightest things in the band.
+   **Done** (`V2S4_wpath.tsx`): the render walls `RENDER` #EDD3BF with one `RENDER_PANEL` #E6C6AF recessed panel
+   (14 px in): they read as rendered garden walls at 360 px.
 
 ## Passed must-checks (measured)
 - S2 -> S3 cut, 12.95 vs 12.98: her window on the M box and Pip on (590, 1050) in both frames; L2's near lamp continuous
@@ -37,6 +41,9 @@ owner's notes, DIRECTION, CRAFT §f, conform_L3 and the approved look v4.
    clump. Offset his path a body width, or pass him while she is clear.
 4. S4 14.92: the pull-back's first frames show the pair's walker large at the left edge beside her head; a later start
    for the pair keeps the landing on her alone.
+5. S4 19.8-20.55 (after MUST 1): the birds now fly at y 522-548, above the lane's flyer ceiling (`ROW.ceil` 590), in the
+   lower caption band under the one-line caption; if the review wants that band empty, a short flight that drops behind
+   the far roofs before the sun's column is the alternative.
 
 ## Stills judged
 `/tmp/claude-0/-home-user-Test-/6f98c33a-2c7f-5355-893a-0f8c4c5abcb3/scratchpad/critic/`: `sh_s3.png`, `sh_j2.png`,
