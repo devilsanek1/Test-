@@ -26,6 +26,7 @@ import type {Pt} from '../kit/canal/core';
 import {Puffs} from '../kit/canal/life';
 import {bikeInto} from '../kit/canal/towpath';
 import {planeBatch} from './V2S3_depth';
+import {CastShadow, ContactShadow, Shade, ShadowLayer} from '../../lib/light';
 
 /** The boat's lines (world px at the match). */
 export const NB = {
@@ -138,11 +139,9 @@ function cabinInto(L: Levels) {
   // ---- level 1: on the bands: the roof's far shade and rolled near edge, the camber catching the low sun, the cream
   // coach line under the cantrail, the cabin's foot shade, the stripe's mustard edge, the strake
   const b1 = L.at(1);
-  b1.rect(CM.stoneShade, x0, NB.roofFar, W, 5);
   b1.rect(CM.limestone, x0, NB.roofNear - 6, W, 6);
   b1.rect(CM.paper, x0, NB.roofFar + 24, W, 4);
   b1.rect(CM.coatOat, x0, CANT1, W, 2.4);
-  b1.rect(CM.stoneShade, x0, NB.cabin1 - 5, W, 5);
   b1.rect(CM.coatMustard, x0, NB.gun1 - 2, W, 1.8);
   b1.rect(CM.shadeCool, x0, NB.gun1 + 12, W, 3.4);
   // cream coach-line frames round the sage panels (S4's, mapped), and one more panel past S4's view
@@ -302,17 +301,8 @@ function roofInto(L: Levels) {
     c.fill(CM.leafGold, domePath(x - 3, NB.roofFar + 24.5, 3.4, 2.4));
   }
   a.fill(CM.coatMustard, ovalPath(s4x(1040), rn(14), 6.6, 2.4));
-  // ---- short east shadows on the roof top (the low sun is west)
-  const sh = (x0: number, x1: number, y: number, len: number, dd = 4) => s1.poly(CM.stoneShade, [[x0, y - 2], [x1, y - 2], [x1 + len, y + dd], [x0 + len * 0.7, y + dd]]);
-  sh(COIL.x - COIL.rx * 0.8, COIL.x + COIL.rx, COIL.y + 8, 14, 5);
-  sh(BUCKET.x0, BUCKET.x1, BUCKET.y, 12);
-  sh(WCAN.x - 16, WCAN.x + 16, WCAN.y, 16);
-  for (const h of HERB_POTS) sh(h.x - h.w * 0.38, h.x + h.w * 0.38, h.base, 12, 3);
-  sh(BIKE.x - 30, BIKE.x + 30, BIKE.y, 14);
-  sh(BUOY.x - 20, BUOY.x + 22, rn(8), 16);
-  sh(NB.chimney.x - 7, NB.chimney.x + 7, NB.chimney.base - 2, 28, 5);
-  sh(LOGS.x - 10, LOGS.x + 72, rn(6), 10);
-  sh(BUCKBY[0] - 11, BUCKBY[0] + 11, BUCKBY[1], 22);
+  // (the roof things' contact and cast shadows are the light layer's: BoatShadows)
+  void s1;
   // ---- the coiled rope (left)
   a.fill(CM.coatOat, ovalPath(COIL.x, COIL.y, COIL.rx, COIL.ry));
   c.fill(CM.line, ovalPath(COIL.x, COIL.y - 1, 16, 5));
@@ -571,6 +561,38 @@ export const boatBob = (t: number) => 1.3 * Math.sin(t * 2.1 + 0.4) + 0.4 * Math
 
 const CLIP_ID = 's3nbWalkerClip';
 
+/** The roof things' contact and cast shadows on the roof (one multiply layer; RIG_CANAL: right and a little toward
+ *  us), the cabin side's foot and the roof's far edge one Shade step (CRAFT §d: the tint family, never a hand-picked
+ *  fill). Drawn after the boat's static batch (the cabin, the roof, its things), so the things they lie under must not
+ *  be covered: the contacts sit at the feet, the casts run along the roof to the right. */
+const BoatShadows: React.FC = () => (
+  <>
+    <Shade d={`M${NB.x0} ${NB.cabin1 - 5}H${NB.x1}V${NB.cabin1}H${NB.x0}Z`} />
+    <Shade d={`M${NB.x0} ${NB.roofFar}H${NB.x1}V${NB.roofFar + 5}H${NB.x0}Z`} />
+    <ShadowLayer>
+      <ContactShadow x={COIL.x} y={COIL.y + 8} w={COIL.rx * 2} h={7} />
+      <ContactShadow x={(BUCKET.x0 + BUCKET.x1) / 2} y={BUCKET.y} w={BUCKET.x1 - BUCKET.x0} h={6} />
+      <CastShadow x={(BUCKET.x0 + BUCKET.x1) / 2} y={BUCKET.y} w={BUCKET.x1 - BUCKET.x0} depth={4} h={24} />
+      <ContactShadow x={WCAN.x} y={WCAN.y} w={33} h={6} />
+      <CastShadow x={WCAN.x} y={WCAN.y} w={30} depth={4} h={30} />
+      {HERB_POTS.map((h, i) => (
+        <React.Fragment key={i}>
+          <ContactShadow x={h.x} y={h.base} w={h.w * 0.8} h={6} />
+          <CastShadow x={h.x} y={h.base} w={h.w * 0.7} depth={3} h={h.w * 1.8} />
+        </React.Fragment>
+      ))}
+      <ContactShadow x={BIKE.x} y={BIKE.y} w={BIKE.R * 3.4} h={6} />
+      <ContactShadow x={BUOY.x} y={rn(8)} w={BUOY.R * 1.6} h={6} />
+      <ContactShadow x={NB.chimney.x} y={NB.chimney.base - 2} w={18} h={6} />
+      <CastShadow x={NB.chimney.x} y={NB.chimney.base - 2} w={14} depth={4} h={NB.chimney.base - NB.chimney.top} />
+      <ContactShadow x={LOGS.x + 31} y={rn(6)} w={86} h={7} />
+      <ContactShadow x={BUCKBY[0]} y={BUCKBY[1]} w={24} h={6} />
+      <CastShadow x={BUCKBY[0]} y={BUCKBY[1]} w={22} depth={4} h={40} />
+      <ContactShadow x={1133} y={rn(8)} w={140} h={6} />
+    </ShadowLayer>
+  </>
+);
+
 /** Our narrowboat (static batches + per-frame life). WORLD px at the match. */
 export const S3Boat: React.FC = () => {
   const t = useTime();
@@ -578,10 +600,15 @@ export const S3Boat: React.FC = () => {
   const stat = useMemo(() => {
     const L = new Levels();
     cabinInto(L);
-    roofInto(L);
     const b = L.merge();
     contoursInto(b);
     return planeBatch(b, -1);
+  }, []);
+  // the roof's things on their own (over their shadows)
+  const roof = useMemo(() => {
+    const L = new Levels();
+    roofInto(L);
+    return planeBatch(L.merge(), -1);
   }, []);
   const back = useMemo(() => {
     const L = new Levels();
@@ -593,37 +620,30 @@ export const S3Boat: React.FC = () => {
     portholesFront(L);
     return planeBatch(L.merge(), -1);
   }, []);
-  const walker = new Batch();
-  walkerInto(walker, t);
-  planeBatch(walker, -1);
   const curtains = new Batch();
-  curtainsInto(curtains, t);
+  curtainsInto(curtains, 0);
   planeBatch(curtains, -1);
   const herbs = new Levels();
-  herbsInto(herbs, t);
+  herbsInto(herbs, 0);
   const fend = new Levels();
-  fendersInto(fend, t);
+  fendersInto(fend, 0);
   // moored and still (the float is the shot's only camera motion)
   const dy = 0;
   const ch = NB.chimney;
-  const ph = PORTHOLES[WALKER_PORT];
+  void t;
   return (
     <XG m={mat.translate(0, dy)}>
       <Paint b={stat} seed="s3nboat" />
+      <BoatShadows />
+      <Paint b={roof} seed="s3nbRoof" />
       <Paint b={back} seed="s3nbBack" misreg={false} />
-      <defs>
-        <clipPath id={CLIP_ID} clipPathUnits="userSpaceOnUse">
-          <circle cx={ph.x} cy={ph.y} r={ph.r} />
-        </clipPath>
-      </defs>
-      <g clipPath={`url(#${CLIP_ID})`}>
-        <Paint b={walker} seed="s3nbWalker" misreg={false} />
-      </g>
       <Paint b={curtains} seed="s3nbCurtains" misreg={false} />
       <Paint b={rims} seed="s3nbRims" />
       <Paint b={planeBatch(herbs.merge(), -1)} seed="s3nbHerbs" />
       <Paint b={planeBatch(fend.merge(), -1)} seed="s3nbFend" />
-      <Puffs x={ch.x} y={ch.top - 10} seed="s3nb/smoke" kind="smoke" scale={1.25} drift={26} bursts={[13.62]} />
+      {/* the stove's smoke (one of the shot's three movers): it rises over the canal and shrinks out under her coping
+          (ceil), never across her towpath, the railing or Pip */}
+      <Puffs x={ch.x} y={ch.top - 10} seed="s3nb/smoke" kind="smoke" scale={0.95} drift={24} ceil={1136} />
     </XG>
   );
 };

@@ -1,176 +1,130 @@
-// V2S3_ndress.tsx (lane L3, V2S3 NEAR helper; WORLD px at the 12.98 match, inside V2S3's camera): the boaters' things
-// on OUR towpath beside the moored boat, so the near ground is a field MADE of things (LIFE_AND_DENSITY §0), never
-// flat paving: a stack of split logs and a coal sack for the stove (the chimney's smoke has a reason), a pair of
-// wellies on the coping by the side doors, a bay tree in a terracotta pot (a mass in the right rail), and a robin that
-// hops along the log stack and pecks, and two pigeons pecking by the puddle (life). Cast shadows run right, away
-// from the low sun at left, as colour.
+// V2S3_ndress.tsx (lane L3, V2S3 NEAR helper; WORLD px at the 12.98 match, inside V2S3's camera): the THINGS on our
+// towpath (conform_L3 §1: things, never people's backs): a towpath bench seen from behind with a bag left on it, a
+// cast-iron mooring bollard on our coping with the boat's rope round its neck (V2S3_nground draws the rope), the fallen
+// leaves (V2S3_nground) and the near lamp foot held from S2 (V2S3_nground). The old dressing (logs, a coal sack,
+// wellies, a bay tree, a robin, pigeons) is thinned out: the near plane gets value range, not prop count (CRAFT §f
+// "Failures"). Laid out in metres from the shot's one camera (V2S3_depth S3_CAM), so each thing has its size at its
+// distance (nothing nearer smaller per metre: the bench ~225 px/m, the bollard ~160 px/m, the boat ~150, the terrace
+// ~85). Flat shapes, tier C; their contact and cast shadows (RIG_CANAL: right and a little toward us) and form shades
+// (the side away from the low western sun) are drawn here as the rig's tint family. Our plane (-2): one value step
+// darker (V2S3_depth planeBatch).
 import React, {useMemo} from 'react';
-import {CM, INK_PX} from '../palette';
-import {useTime} from '../../lib/time';
-import {arc as arcInk, circle as circleInk} from '../../lib/sketch';
-import {Batch, Paint, P, rng, ovalPath, leafPath} from '../kit/canal/core';
+import {CM} from '../palette';
+import {seamTone} from '../../lib/depth';
+import {CastShadow, ContactShadow, FormShade, ShadowLayer} from '../../lib/light';
+import {Batch, Paint, P, ovalPath} from '../kit/canal/core';
 import type {Pt} from '../kit/canal/core';
-import {Levels} from './V2S3_nboat';
-import {Pigeons} from '../kit/canal/life';
-import {planeBatch} from './V2S3_depth';
+import {S3_CAM, onPlane, planeBatch} from './V2S3_depth';
 
-/** A long low-sun shadow lying on the towpath: from an object's foot (x0..x1 at y) it runs RIGHT and a little toward
- *  us (the sun is low at left), as a flat stone-shade shape attached to the foot. */
-export const groundShadow = (b: Batch, x0: number, x1: number, y: number, len: number, h = 10) => {
-  b.poly(CM.stoneShade, [[x0 + 4, y - 2], [x1, y - 2], [x1 + len, y + h * 0.6], [x1 + len - 6, y + h], [x0 + len * 0.55, y + h]]);
+const cam = S3_CAM;
+const PLANE = -2;
+
+/** The bench (metres): its long axis along the canal, its back toward us; x from -2.0 to -0.2 m, the back legs at
+ *  z 6.2 m, the front legs at 6.75 m; the backrest 0.48-0.86 m, the seat at 0.45 m. */
+export const BENCH = {x0: -2.0, x1: -0.2, zBack: 6.2, zFront: 6.75, seat: 0.45, back0: 0.5, back1: 0.86} as const;
+/** The bag left on the seat near its right end (a tote whose handles show over the backrest). */
+const BAG = {x: -0.62, z: 6.45, w: 0.36, h: 0.5} as const;
+/** The mooring bollard on our coping (metres): the boat's rope is tied round its neck. */
+export const BOLLARD = {x: -2.15, z: 8.78, h: 0.55, w: 0.32} as const;
+
+/** Screen point of a world point (metres). */
+const pt = (x: number, z: number, level = 0): Pt => cam.pt(x, z, level);
+
+/** The bench seen from behind: the iron end frames (rear legs, arms), the three back slats, the seat's front edge seen
+ *  through the slats' gaps, the bag on the seat. */
+function benchBatch(): Batch {
+  const b = new Batch();
+  const {x0, x1, zBack, zFront, seat, back0, back1} = BENCH;
+  const wood = CM.line;
+  const woodLit = seamTone(CM.line, -8);
+  // the seat (its planks, seen in the gaps between the back slats: the far edge one step lighter, it faces the sky)
+  b.poly(woodLit, [pt(x0 + 0.04, zFront, seat), pt(x1 - 0.04, zFront, seat), pt(x1 - 0.04, zBack, seat), pt(x0 + 0.04, zBack, seat)]);
+  b.layer();
+  // the bag on the seat (a canvas tote: body, a darker band, the handles' loop over the top)
+  const [bx, by] = pt(BAG.x, BAG.z, seat);
+  const s = cam.pxPerM(pt(BAG.x, BAG.z, 0)[1]);
+  const bw = BAG.w * s;
+  const bh = BAG.h * s;
+  b.poly(CM.coatMustard, [[bx - bw * 0.5, by], [bx + bw * 0.5, by], [bx + bw * 0.44, by - bh * 0.72], [bx - bw * 0.44, by - bh * 0.72]]);
+  b.rect(seamTone(CM.coatMustard, 10), bx - bw * 0.47, by - bh * 0.28, bw * 0.94, bh * 0.08);
+  const hy = by - bh * 0.72;
+  b.fill(seamTone(CM.coatMustard, 14), `M${P(bx - bw * 0.3, hy)}Q${P(bx - bw * 0.26, hy - bh * 0.34)} ${P(bx, hy - bh * 0.34)}Q${P(bx + bw * 0.26, hy - bh * 0.34)} ${P(bx + bw * 0.3, hy)}L${P(bx + bw * 0.2, hy)}Q${P(bx + bw * 0.18, hy - bh * 0.24)} ${P(bx, hy - bh * 0.24)}Q${P(bx - bw * 0.18, hy - bh * 0.24)} ${P(bx - bw * 0.2, hy)}Z`);
+  b.layer();
+  // the back slats (three planks across, a gap between each), on the rear frame
+  for (let k = 0; k < 3; k++) {
+    const l0 = back0 + ((back1 - back0) * k) / 3 + 0.015;
+    const l1 = back0 + ((back1 - back0) * (k + 1)) / 3 - 0.015;
+    b.poly(wood, [pt(x0, zBack, l1), pt(x1, zBack, l1), pt(x1, zBack, l0), pt(x0, zBack, l0)]);
+  }
+  // the iron end frames: a rear leg up to the back's top, an arm forward at seat height, a front leg
+  for (const ex of [x0 + 0.03, x1 - 0.03]) {
+    const w = 0.05;
+    b.poly(CM.anchor, [pt(ex - w, zBack, back1 + 0.02), pt(ex + w, zBack, back1 + 0.02), pt(ex + w, zBack, 0), pt(ex - w, zBack, 0)]);
+    b.poly(CM.anchor, [pt(ex - w, zBack, seat + 0.2), pt(ex - w, zFront, seat + 0.2), pt(ex - w, zFront, seat + 0.15), pt(ex - w, zBack, seat + 0.15)]);
+    b.poly(CM.anchor, [pt(ex - w * 0.8, zFront, seat + 0.18), pt(ex + w * 0.8, zFront, seat + 0.18), pt(ex + w * 0.8, zFront, 0), pt(ex - w * 0.8, zFront, 0)]);
+  }
+  return planeBatch(b, PLANE);
+}
+
+/** The bollard (a cast-iron mooring post on the coping): its silhouette path. */
+function bollardD(): string {
+  const {x, z, h, w} = BOLLARD;
+  const [cx, base] = pt(x, z, 0);
+  const s = cam.pxPerM(base);
+  const W = w * s;
+  const H = h * s;
+  return `M${P(cx - W * 0.46, base)}L${P(cx - W * 0.33, base - H * 0.55)}L${P(cx - W * 0.46, base - H * 0.8)}Q${P(cx, base - H * 1.04)} ${P(cx + W * 0.46, base - H * 0.8)}L${P(cx + W * 0.33, base - H * 0.55)}L${P(cx + W * 0.46, base)}Z`;
+}
+/** Where the rope sits round the bollard's neck (screen px). */
+export const bollardNeck = (): Pt => {
+  const [cx, base] = pt(BOLLARD.x, BOLLARD.z, 0);
+  return [cx, base - BOLLARD.h * cam.pxPerM(base) * 0.6];
 };
 
-/** The log stack's base (its right end) and footprint; the coal sack beside it; the wellies; the bay tree. */
-export const ND = {
-  logs: {x0: 452, x1: 590, y: 1716},
-  sack: [628, 1714] as Pt,
-  wellies: [366, 1647] as Pt,
-  bay: [1036, 1734] as Pt,
-} as const;
+function bollardBatch(): Batch {
+  const b = new Batch();
+  b.fill(CM.anchor, bollardD());
+  return planeBatch(b, PLANE);
+}
 
-// ---------------------------------------------------------------- the static dressing
-
-function logsInto(L: Levels) {
-  const {x0, x1, y} = ND.logs;
-  const r = rng('s3nd/logs');
-  groundShadow(L.at(0), x0, x1, y, 96, 16);
-  // a pile of split logs seen end-on, like the roof's (V2S4's) log pile: each a bark round (warm brown) with its cut
-  // end (cream; the middle row golden) and growth rings; rows staggered, the pile narrowing to the top
-  const rows = [
-    {n: 6, y: y - 13, r: 13},
-    {n: 5, y: y - 37, r: 12.5},
-    {n: 4, y: y - 60, r: 12},
-  ];
-  const bark = L.at(1);
-  const end = L.at(2);
-  const ring = L.at(3);
-  let rings = '';
-  let outline = '';
-  for (const [k, row] of rows.entries()) {
-    const span = (x1 - x0) * (1 - k * 0.16);
-    const cx0 = (x0 + x1) / 2 - span / 2 + row.r;
-    for (let i = 0; i < row.n; i++) {
-      const cx = cx0 + ((span - row.r * 2) * i) / Math.max(1, row.n - 1) + r.jitter(1.5);
-      const cy = row.y + r.jitter(1.2);
-      const rr = row.r * r.range(0.9, 1.06);
-      bark.fill(CM.line, ovalPath(cx, cy, rr * 1.12, rr * 1.02));
-      end.fill(k === 1 ? CM.leafGold : CM.coatOat, ovalPath(cx + 0.8, cy + 0.6, rr * 0.82, rr * 0.74));
-      rings += circleInk(cx + 0.8, cy + 0.6, rr * 0.34, {seed: `s3nd/r${k}${i}`, wobble: 0.05});
-      if (r.chance(0.45)) rings += `M${P(cx + 0.8, cy + 0.6)}L${P(cx + 0.8 + rr * 0.7, cy + 0.6 - rr * 0.3)}`;
-      if (k === rows.length - 1 || i === 0 || i === row.n - 1) outline += arcInk(cx, cy, rr * 1.12, rr * 1.02, 180, 330, {seed: `s3nd/o${k}${i}`});
+/** The bench's footprints (screen, at the feet) for its contact shadows. */
+const benchFeet = (): {x: number; y: number; w: number}[] => {
+  const out: {x: number; y: number; w: number}[] = [];
+  for (const ex of [BENCH.x0 + 0.03, BENCH.x1 - 0.03]) {
+    for (const z of [BENCH.zBack, BENCH.zFront]) {
+      const [x, y] = pt(ex, z, 0);
+      out.push({x, y, w: 0.14 * cam.pxPerM(y)});
     }
   }
-  ring.ink(rings, 1, CM.line);
-  ring.ink(outline, INK_PX.hair, CM.ink, 0.3);
-}
-
-function sackInto(L: Levels) {
-  const [x, y] = ND.sack;
-  groundShadow(L.at(0), x - 24, x + 24, y, 64, 12);
-  const d = `M${P(x - 26, y)}Q${P(x - 30, y - 30)} ${P(x - 14, y - 44)}L${P(x - 8, y - 52)}L${P(x + 4, y - 50)}L${P(x + 10, y - 42)}Q${P(x + 30, y - 30)} ${P(x + 26, y)}Z`;
-  L.at(1).fill(CM.coatSlate, d);
-  const c = L.at(2);
-  c.fill(CM.shadeCool, `M${P(x + 6, y - 38)}Q${P(x + 26, y - 26)} ${P(x + 24, y - 2)}L${P(x + 10, y - 2)}Q${P(x + 14, y - 24)} ${P(x + 6, y - 38)}Z`);
-  c.rect(CM.line, x - 9, y - 47, 18, 4);
-  c.ink(`M${P(x - 26, y)}Q${P(x - 30, y - 30)} ${P(x - 14, y - 44)}M${P(x - 18, y - 20)}Q${P(x - 4, y - 24)} ${P(x + 8, y - 16)}`, INK_PX.far, CM.ink, 0.15);
-}
-
-function welliesInto(L: Levels) {
-  const [x, y] = ND.wellies;
-  const a = L.at(1);
-  const c = L.at(2);
-  for (const [k, dx] of [0, 26].entries()) {
-    const bx = x + dx;
-    const by = y + k * 3;
-    const d = `M${P(bx - 9, by - 40)}L${P(bx + 8, by - 40)}L${P(bx + 8, by - 10)}Q${P(bx + 20, by - 8)} ${P(bx + 20, by)}L${P(bx - 10, by)}Z`;
-    a.fill(k ? CM.coatPlum : CM.coatSlate, d);
-    c.rect(CM.paper, bx - 9, by - 40, 17, 3.4);
-    c.ink(`M${P(bx - 9, by - 40)}L${P(bx - 10, by)}L${P(bx + 20, by)}`, INK_PX.hair, CM.ink, 0.2);
-  }
-}
-
-function bayInto(L: Levels) {
-  const [x, y] = ND.bay;
-  groundShadow(L.at(0), x - 26, x + 26, y, 120, 18);
-  const a = L.at(1);
-  // the terracotta pot with a rolled rim
-  a.fill(CM.brick, `M${P(x - 34, y - 56)}L${P(x + 34, y - 56)}L${P(x + 26, y)}L${P(x - 26, y)}Z`);
-  const c = L.at(2);
-  c.fill(CM.brickDeep, `M${P(x - 38, y - 60)}L${P(x + 38, y - 60)}L${P(x + 36, y - 48)}L${P(x - 36, y - 48)}Z`);
-  c.fill(CM.shadeWarm, `M${P(x + 10, y - 48)}L${P(x + 33, y - 48)}L${P(x + 26, y)}L${P(x + 8, y)}Z`);
-  // the trunk and the clipped crown (two lobed masses)
-  c.rect(CM.line, x - 3, y - 120, 6, 62);
-  // the clipped crown: a lumpy ball (a few overlapping rounds), the low sun catching its left side, cool shade right
-  const cy = y - 158;
-  const lumps: [number, number, number][] = [[0, 0, 44], [-30, -14, 24], [26, -20, 26], [-6, -36, 24], [32, 12, 22], [-34, 14, 22]];
-  const d = L.at(3);
-  for (const [dx, dy, R] of lumps) d.fill(CM.waterDeep, ovalPath(x + dx, cy + dy, R, R * 0.96));
-  const e = L.at(4);
-  e.fill(CM.shadeCool, `M${P(x + 14, cy + 40)}Q${P(x + 52, cy + 30)} ${P(x + 52, cy - 4)}Q${P(x + 40, cy + 22)} ${P(x + 14, cy + 30)}Z`);
-  e.fill(CM.sage, ovalPath(x - 22, cy - 16, 20, 15));
-  e.fill(CM.sage, ovalPath(x - 4, cy - 38, 16, 10));
-  e.fill(CM.sage, ovalPath(x - 36, cy + 8, 12, 9));
-  const f = L.at(5);
-  f.fill(CM.glass, ovalPath(x - 28, cy - 20, 7, 5));
-  f.fill(CM.glass, ovalPath(x - 8, cy - 41, 6, 4));
-  f.fill(CM.leafGold, ovalPath(x + 22, cy - 24, 5, 4));
-  f.ink(arcInk(x, cy - 2, 50, 50, 150, 300, {seed: 's3nd/bayInk'}) + `M${P(x - 34, y - 56)}L${P(x - 26, y)}L${P(x + 26, y)}`, INK_PX.far, CM.ink, 0.2);
-  // a few leaves the tree has dropped
-  for (const [k, [lx, ly, ang]] of ([[x - 52, y + 6, 20], [x + 44, y + 12, 140], [x - 10, y + 16, 70]] as [number, number, number][]).entries()) e.fill(k % 2 ? CM.leafGold : CM.sage, leafPath(lx, ly, 14, 5, ang));
-}
-
-// ---------------------------------------------------------------- life: the robin
-
-/** A robin on the log stack: hops along it at 13.36 and 14.22, pecks in between (drawn poses at 12/s). */
-function robinInto(b: Batch, t: number) {
-  const tq = Math.floor(t * 12 + 1e-6) / 12;
-  const hops: [number, number, number][] = [
-    [13.36, 486, 546],
-    [14.22, 546, 512],
-  ];
-  let x = hops[0][1];
-  let lift = 0;
-  let face = 1;
-  for (const [h0, xa, xb] of hops) {
-    if (tq < h0) break;
-    const k = Math.min(1, (tq - h0) / 0.25);
-    x = xa + (xb - xa) * k;
-    lift = Math.sin(k * Math.PI) * 14;
-    face = xb > xa ? 1 : -1;
-  }
-  const y = ND.logs.y - 72 - lift;
-  const peck = lift === 0 && Math.sin(tq * 7.3) > 0.55 ? 3 : 0;
-  b.fill(CM.line, ovalPath(x, y - 9, 10, 8));
-  b.fill(CM.line, `M${P(x - face * 8, y - 11)}L${P(x - face * 18, y - 16)}L${P(x - face * 16, y - 8)}Z`);
-  b.fill(CM.line, ovalPath(x + face * 7, y - 16 + peck, 5.6, 5.4));
-  b.layer();
-  b.fill(CM.leafRust, ovalPath(x + face * 6, y - 9 + peck * 0.4, 5.4, 5.6));
-  b.fill(CM.ink, ovalPath(x + face * 9, y - 17 + peck, 1.1, 1.1));
-  b.fill(CM.ink, `M${P(x + face * 11, y - 16 + peck)}L${P(x + face * 16, y - 14 + peck * 1.4)}L${P(x + face * 11, y - 14 + peck)}Z`);
-  b.rect(CM.ink, x - 1.5, y - 2, 1.4, 3);
-  b.rect(CM.ink, x + 1.5, y - 2, 1.4, 3);
-}
-
-// ---------------------------------------------------------------- the component
+  return out;
+};
 
 export const S3Dress: React.FC = () => {
-  const t = useTime();
-  const stat = useMemo(() => {
-    const L = new Levels();
-    welliesInto(L);
-    logsInto(L);
-    sackInto(L);
-    bayInto(L);
-    return planeBatch(L.merge(), -2);
-  }, []);
-  const life = new Batch();
-  robinInto(life, t);
+  const bench = useMemo(benchBatch, []);
+  const bollard = useMemo(bollardBatch, []);
+  const feet = useMemo(benchFeet, []);
+  const [bcx, bcy] = pt((BENCH.x0 + BENCH.x1) / 2, BENCH.zBack, 0);
+  const benchH = BENCH.back1 * cam.pxPerM(bcy);
+  const benchW = (BENCH.x1 - BENCH.x0) * cam.pxPerM(bcy);
+  const [ox, oy] = pt(BOLLARD.x, BOLLARD.z, 0);
+  const oS = cam.pxPerM(oy);
+  void onPlane;
+  void ovalPath;
   return (
     <>
-      <Paint b={stat} seed="s3nDress" />
-      <Paint b={life} seed="s3nRobin" misreg={false} />
-      <Pigeons ledge={[596, 800, 1760]} n={2} size={50} seed="s3pave" shuffleAt={[13.9]} />
+      {/* shadows on our paving and coping first (under the things): the bench's long cast to the right, its feet; the
+          bollard's (CRAFT §d.5-§d.6) */}
+      <ShadowLayer>
+        <CastShadow x={bcx} y={bcy} w={benchW} depth={10} h={benchH} />
+        {feet.map((f, i) => (
+          <ContactShadow key={i} x={f.x} y={f.y} w={f.w} h={7} />
+        ))}
+        <ContactShadow x={ox} y={oy} w={BOLLARD.w * oS} h={7} />
+        <CastShadow x={ox} y={oy} w={BOLLARD.w * oS * 0.9} depth={6} h={BOLLARD.h * oS} />
+      </ShadowLayer>
+      <Paint b={bench} seed="s3nBench" misreg={false} />
+      <Paint b={bollard} seed="s3nBollard" misreg={false} />
+      <FormShade d={bollardD()} kind="crescent" />
     </>
   );
 };
-
