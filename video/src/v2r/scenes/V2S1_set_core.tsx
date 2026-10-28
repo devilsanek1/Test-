@@ -15,6 +15,7 @@ import {rng} from '../../lib/rng';
 import {CM} from '../palette';
 import {Batch, P, Pt} from '../kit/canal/core';
 import {atmos, makeAtmosphere, planePalette} from '../../lib/depth';
+import {S1_AIR} from '../world/skies';
 
 export type {Pt};
 
@@ -30,17 +31,10 @@ export function offsetFor(seed: string, k = 1): [number, number] {
  *  from the slate to the stone shade (L* ~63), so thin dark bars never read as lines in the calm world (CRAFT §b-§c). */
 export const S1_IRON = '#939AAD';
 
-/** ONE CONTINUOUS SKY (the owner, 2026-10-27: "why is it blue sky and then suddenly abruptly orange"; playbook rule,
- *  DIRECTION rule 6): the caption field's mint, flat down to y 572 (the band y 317-556 one value), then five flat steps
- *  through pale cream-gold to the warm horizon, each a small turn (dE 4-6, dL* <= 2); the steps hide behind the wing's
- *  roofline and the far skyline. Edges: S1_SKY_Y (the bottom of each step but the last). */
-export const S1_SKY = ['#BCDCCF', '#CEDECD', '#DFE1CB', '#EDE3C9', '#F8E0C3', '#FBD9BB'] as const;
-export const S1_SKY_Y = [572, 618, 664, 708, 752] as const;
-/** The evening sun's one halo: a flat disc one step warmer than the horizon step it sits in (<= 1.7x: CRAFT §d). */
-export const S1_SUN_HALO = '#FFD4AE';
-/** THE HAZE (atmospheric perspective in flat colour): the lowest sky step, so the far city's air agrees with the sky
- *  (the owner's continuous-sky note): every far plane mixes toward it, lighter and lower in chroma than the warm wing. */
-export const S1_HAZE: string = S1_SKY[5];
+/** THE HAZE (atmospheric perspective in flat colour): the sky's lowest colour under the sun (world/skies S1_AIR =
+ *  lib/sky horizonColor(S1_EVENING, SUN0.x)), so the far city's air agrees with the sky (CRAFT §f.1, §g.3): every far
+ *  plane recedes toward it, lighter and lower in chroma than the warm wing. */
+export const S1_HAZE: string = S1_AIR;
 /** S1's ONE atmosphere (lib/depth): the air = the sky's lowest step; the far city starts at +3 behind the pale wing
  *  (DEPTH.md "Learned"), its steps stronger than PLANE_STEPS on +3 / +4 (0.66 / 0.90, v1-like: its far city dE 7.2 from the air; a far colour across from the warm air
  *  turns up to 30 deg toward it) so the ladder falls toward the air (check_depth v2_s1). */
