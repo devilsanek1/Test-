@@ -76,11 +76,21 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
 - **SQC YOUR STICK.** 17.24-17.64 the phone rises to HIGH2, its screen lit. 18.28 one MemoryStick (130 px at the listing screen
   ~(529, 1070)) lifts toward the lens, outCubic, no overshoot, to centre (540, 870), w 700, rot -4 by 18.86 (chips clear on
   "chips"); the tag tugs 18.30; hold to 18.905.
-- **SQD THEIR MOUNTAIN.** 19.40: the same stick on the pile's summit, sky above; its neighbours are kit MemorySticks at H2 size
-  (~26 px), so x27 shows real chips (never hay). ONE pull-back on the S5 ease (155 f, 19.40-21.98) to just outside our window: the
-  far plane starts x27 (`planeMat` {o: the summit in H2 px, off: (540, 870) - o, k: 27}), town planes rise from the bottom, our
-  street last; the DC's lit sign in frame by ~21.0 (whole DC by ~21.35; orchestrator, 2026-10-27: the x27 S5 move cannot bring it in earlier), the whole mountain by 21.32, thoom 21.72 (p 0.985); hold 21.98-22.35 (S9's
-  birds); then J4. S9's streams from 21.0 only, <= 1 per 0.25 s, no trails.
+- **SQD THEIR MOUNTAIN.** 19.40: the same stick on the pile's summit, sky above, lying on a BED of two sticks at its own angle
+  (their tops tucked behind its bottom edge: gold under it at every zoom, never a strip of sky); its neighbours are kit-shaped
+  MemorySticks at H2 size (~26 px), so x27 shows real chips (never hay). The pile reads as memory while it is big on screen and
+  calms as it shrinks (final pass, E5): the crest's sticks in THE stick's own gold one value under it, pins, four warm dark
+  chips 20 L* under the board while a crest stick is >= 120 px on screen (**the reveal's declared exception** to CRAFT §c's
+  dL* 15), pale to tier C (11 L*) by 50 px (~20.8-21.2, inside the move's fastest stretch), chips pale further out, the lower
+  pile flat boards with a soft lit top; so the hold, SQE and SQF see the calm pile. ONE pull-back on the S5 ease (155 f,
+  19.40-21.98) to just outside our window: the far plane starts x27 (`planeMat` {o: the summit in H2 px, off: (540, 870) - o,
+  k: 27}), town planes rise from the bottom, our street last; the DC's lit sign in frame by ~21.0 (whole DC by ~21.35;
+  orchestrator, 2026-10-27: the x27 S5 move cannot bring it in earlier), the whole mountain by 21.32, thoom 21.72 (p 0.985);
+  hold 21.98-22.35 (the birds: OutsideFar's one flock, rising from behind the mountain's flank); then J4. S9's streams from
+  21.0 only, <= 1 per 0.25 s, no trails. While the far field leads, the street's loud pieces are calm until the load beat
+  (`outside.tsx`, film time, both builders: one step at 23.10, none in the hold). Its peak plane speeds (OPEN 5, checked at
+  full size): the far plane 42 px/f as the DC's right edge enters (20.92), the town 22, the street 30 (mostly under the frame):
+  clean spacing, no repeating high-contrast pattern near the step (the lower pile is flat): not softened.
 - **SQE FIRST DIBS.** 23.10-24.20 crates of gold sticks go into a DC truck in the gate's pool (two line-only workers); 24.20 the
   barrier lifts, 24.30-25.24 it drives up the road as a second rolls in; the van waits unlit. Push x1.25 about (600, 1120)
   24.90-25.70; 25.72-26.20 the van rolls into the pool (lit at last), ONE small crate on "left" 26.04; 27.08 the notice's 5x face
@@ -100,7 +110,7 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
 | SQA | tag (each tick) -> DC 4.04 | sticks (small), hand, Pip | room, town, snow | nook; tag rim (left) while it ticks | "its price goes up each time a stick flies to the AI data center" |
 | SQB | line -> doodles -> hook, +9.7% | tag, Pip, dim phone | wall, notes, window strip | nook, lamp off left; card unlit; pins cast down-right | "the same money bought more for 20 years; now +9.7%" |
 | SQC | listing laptop -> stick | tag, Pip, hand | room, DC calm | nook; the stick's warm rim (on its lamp side, left; CRAFT §d.8) | "your laptop runs on that stick" |
-| SQD | stick -> DC -> mountain | streams, 2 trucks on the road | town, clouds, birds, snow | street; pile tops a step lighter; cold rim on the summit stick | "one of a mountain of sticks by the data center" |
+| SQD | stick -> DC -> mountain | streams, 2 trucks on the road | town, clouds, birds, snow; the street calm to 23.10 | street; pile tops a step lighter, brightest on the crest THE stick lies on (the frame's brightest 5 % on the stick); its flank turned from the sky in form shade; cold rim on the summit stick (inside its outline, over it); the pile's rim on its silhouette while it is the subject (21.32-23.10) | "one of a mountain of sticks by the data center" |
 | SQE | truck; van + crate; 5x; hop + tag; BETTER van; flip + trucks | waiting vans, workers, guard, Pip, tag | street, lamps, walker + dog, steam, town, DC | street + the gate's pool as THE light; van unlit until 25.72 | "their trucks first; one crate, 5x; your price up; the better one stuck; 2027 tighter" |
 | SQF | DC sign -> tag | Pip | window view | nook on the tag: rim left, form shade right third | "the data center ends up on the price tag" |
 
@@ -115,7 +125,12 @@ upper-left, tops lit, contact only; the DC sign the brightest cold light; 16 px 
 - **J3 19.40** SQC -> SQD: `{"type": "push-through", "from": [540, 870], "to": [540, 870], "zoom": 7, "dur": 1.1, "carrier": "A"}`,
   no bridge: out 18.905-19.40, cut at frame 1164, in 19.40-20.005. Both sides draw the same MemoryStick (centre (540, 870), w 700,
   rot -4), so at x7 only the bands above and below it change. SQD's own pull-back starts at its t 0 (summed log-zoom speed >= 30 %
-  of its peak through 19.40-21.50). Captions dark until the stick leaves the band (~19.55), then a 'down' wipe to light.
+  of its peak through 19.40-21.50). Captions dark while the stick fills the band, then white as its top edge drops past the
+  line: SQD's `captionTone` 'down' wipe at t 0.016, 0.08 s, its edge riding the stick's (frame 1166). **A declared light
+  change** (the colour shift 17.9 > 15): from the warm nook (the stick's warm rim on its lamp side) to the dusk sky (its cold
+  rim, upper left). The push-out sweeps H1's window, with the data center's sign, through the band (18.905-19.40): calm only
+  once the sign steps to C after SQA's beat (E8, `home_set.tsx`) and the "memory chips." page ends at ~19.12 (`captions.json`:
+  "chips" ends ~19.15 in the voice), so no letters ride under a caption.
 - **J4 22.68** SQD -> SQE, seam mid-entry (frame 1361): `entryCam` 22.35-22.95 (inOutCubic): window x3.0 -> H2 size about (540,
   1100), street x1.12 -> 1, far field x1.03 -> 1; the front plane rises into LEFT 22.45-22.95; the trucks already stand in the
   pool; no new mover 22.28-23.08; a declared light change (into the warm room).
@@ -124,7 +139,7 @@ upper-left, tops lit, contact only; the DC sign the brightest cold light; 16 px 
 
 ## 7. Checks, risks, order
 - CRAFT §a: carriers C C A A + loop, 0 F; thread 91 % (one gap: the reveal); per join carry >= 0.25, eye jump <= 0.10, colour shift
-  <= 15 (J1 keeps the window strip, J3 the stick, J4 declared), <= 4 movers in +-0.4 s. §b-§d: the subject owns contrast, hero,
+  <= 15 (J1 keeps the window strip, J3 the stick and declared, J4 declared), <= 4 movers in +-0.4 s. §b-§d: the subject owns contrast, hero,
   the only full outline and >= 60 % of motion; <= 3-4 noticeable supporters; clean pen budgets; `check_light.py` per panel.
 - Risks: the summit close must read "a stick on a pile of sticks" (else start x18, more sky); the queue must read at phone size
   (else push x1.35, storybook scale, `S10_geo` `figK`); S9's end frame (tiny you on our roof) is gone: the anchor is our window.

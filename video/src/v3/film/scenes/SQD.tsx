@@ -91,10 +91,11 @@ const SQD: React.FC = () => {
 };
 export default SQD;
 
-/** Captions (E6): dark ink while THE stick fills the caption band at the cut (19.40, x7), then white on the dusk sky
- *  the moment its top edge has dropped past "And so do" (frame 1167): a short 'down' wipe that follows that edge down
- *  the band (it crosses the line between frames 1166 and 1167), instead of 0.15 + 0.4 s of dark ink on navy. */
+/** Captions (E6): dark ink while THE stick fills the caption band at the cut (19.40, x7), then white on the dusk sky as
+ *  its top edge drops past "And so do" (ink rows y 317-386): a 'down' wipe whose edge rides that edge through the line
+ *  (the stick's top edge at x 540: 302 at frame 1165, 385 at 1166, 452 at 1167; the wipe's 384 at 1166), instead of
+ *  0.15 + 0.4 s of dark ink on navy (19.43-19.62). */
 export const captionTone: ToneKey[] = [
   {t: 0, tone: 'dark'},
-  {t: 0.022, tone: 'light', wipe: 'down', dur: 0.1},
+  {t: 0.016, tone: 'light', wipe: 'down', dur: 0.08},
 ];
