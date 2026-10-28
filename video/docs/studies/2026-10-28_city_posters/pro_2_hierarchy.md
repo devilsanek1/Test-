@@ -53,9 +53,10 @@ mountains `[660,634,1206,799]` (0.1 %). Hanoi's far city `[360,574,1200,829]` is
    with a clean edge (step 33 L*) against a soft sky. The near life (B) is as rich as the hero (8.4 %) because it is big
    and close: the ladder runs by role first, then distance.
 
-**v2 (the baseline) has a hierarchy of CONTRAST, not of finish.** Its subject leads by muting the world (local contrast
-12.1 against 3.0 in the near ground, 4x; the posters' hero vs patchwork 1.1x), and every tier has the same finish: one
-flat fill per face (tone spread 1.4-3.2, below the posters' FAR planes), no texture. Its largest area, the near quay and
+**v2 (the baseline) has a hierarchy of CONTRAST and amount, not of finish.** Its subject leads by muting the world (local
+contrast 12.1 against 3.0 in the near ground, 4x; the posters' hero vs patchwork 1.1x) and by more of the same detail (S3:
+her window 17.8 % small features, the neighbours' 9.6 %), but every tier has the same kind of finish: one flat fill per
+face (tone spread 1.3-3.2, below the posters' FAR planes), no texture. Its largest area, the near quay and
 props (31 % of the frame), is the emptiest: 3.2 shapes per 10,000 px (patchwork 14.5), L* range 30 (64). Its detail
 clusters in a few spots (the top 10 % of tiles hold 68-91 % of its small features; posters 51-71 %) with dead flats
 between. For this feeling, that is what reads "cheap and lazy": big areas with nothing to read, and a hero no richer
@@ -142,80 +143,76 @@ lines) on a coarser grid; another palette -> C's fills are A and B's fills or th
 another light -> every facet takes its lit or shade tone from the one rig (rule 5); another surface -> the texture, if
 kept, covers every tier, weaker with distance; another line -> no tier invents a width or colour (rule 4).
 
-**3.3 The "can't spot it at a glance" test.** **Owner** (each G4 look clip and G6 cut, on the phone): flick the frame
-past as a scroll (~2 s): does anything look off, is it one picture? Then look 10 s: name the crispest thing. Pass: nothing
-off at 2 s, the beat's A named at 10 s (the UX five-second test, Perfetti, UIE 2005, is the same idea). **The check**
-(`scripts/qa/check_finish.py`, new; prototype: `video/scripts/look/posters/pro_2_hierarchy.py`), on a finish sheet (JSON
-boxes or polygons per tier from the code's geometry, like `scripts/qa/depth_sheets/`) and the frame: (1) finish: A's
-small features >= 3x C near's and >= 5x C far's (posters 3.8x, 10x), A's tones >= C's; (2) glance: after a Gaussian
-blur of sigma 3 px (the < 9 px features gone), each C plane is within CIEDE2000 8 of the A/B palette, edge width within
-1.3x, face side within 2x of A's, local contrast >= 0.4x A's (C must not be a hole); (3) emptiness: no C region over 5 %
-of the frame below 8 shapes per 10,000 px (v2's near ground: 3.2 on 31 %); (4) mismatch: any piece whose line width,
-fill colour, tone count, texture or edge width falls outside its tier's band. Plus CRAFT §b's salience check (the peak on A).
+**3.3 The "can't spot it at a glance" test.** **Owner** (each G4 look clip and G6 cut, on the phone): flick past the
+frame as in a scroll (~2 s): does anything look off? Then look 10 s and name the crispest thing. Pass: nothing off at
+2 s, the beat's A named at 10 s (the UX five-second test, Perfetti, UIE 2005, is the same idea). **Check**
+(`scripts/qa/check_finish.py`, new; prototype `video/scripts/look/posters/pro_2_hierarchy.py`) on the frame and a finish
+sheet (JSON boxes or polygons per tier from the code's geometry, like `scripts/qa/depth_sheets/`): (1) finish: A's small
+features >= 3x C near's and >= 5x C far's (posters 3.8x, 10x); (2) glance: after a Gaussian blur of sigma 3 px (the
+< 9 px features gone) each C plane sits within CIEDE2000 8 of the A/B palette, its edge width within 1.3x and face side
+within 2x of A's, its local contrast >= 0.4x A's (no hole); (3) emptiness: no C region over 5 % of the frame below 8
+shapes per 10,000 px (v2's near ground: 3.2 on 31 %); (4) mismatch: a piece whose line width, fill, tone count, texture or
+edge width leaves its tier's band. CRAFT §b's salience check still puts the peak on A.
 
 **3.4 The engine piece.**
 - **`src/lib/finish.ts`** (new, S-M): `FINISH[tier][plane]` = {minFeature, silhouetteTol, tones, textureK, faceSide};
   `useFinish()` reads `useTierHere()` (`lib/tier.tsx`) and the plane (`lib/depth.ts`) and returns `lod` 2 / 1 / 0;
-  `simplifyPath(pts, tolPx)` wraps simplify-js (Agafonkin, Douglas-Peucker + radial distance, BSD-2:
-  https://mourner.github.io/simplify-js), its tolerance in screen px. An object's lod is fixed per SHOT from its tier and
-  its largest on-screen size along the known camera path (games' screen-size LOD, without the pop): never switched
+  `simplifyPath(pts, tolPx)` wraps simplify-js (Agafonkin; Douglas-Peucker + radial distance:
+  https://mourner.github.io/simplify-js) with its tolerance in screen px. An object's lod is fixed per SHOT from its tier
+  and its largest on-screen size along the known camera path (games' screen-size LOD without the pop), never switched
   mid-shot except as a designed build on its word.
-- **A `lod` prop on the generators** (L): `lib/kit/Building.tsx` (2: frames, glazing bars, sills, cornice, door panels, 3
-  tones; 1: plain window rects, 2 tones, one cornice band; 0: 3-6 facets + <= 3 marks), `Window.tsx`, `Town.tsx`,
-  `Nature.tsx` (0: faceted 2-tone crowns, with feeling 3's lens), `Crowd.tsx` and `Person.tsx` (0: 2-tone silhouettes).
-  Building still calls the v1 sketch helpers (`hatch`, `wallTicks`): the LOD pass moves it onto the clean pen for good.
-- **`src/lib/patchwork.ts`** (new, M-L): fills a C mass (its layout polygon) with flat facets: a recursive guillotine
+- **A `lod` prop on the generators** (L): `lib/kit/Building.tsx` (2: frames, glazing bars, sills, cornice, door panels,
+  3 tones; 1: plain window rects, 2 tones, one cornice band; 0: 3-6 facets + <= 3 marks; it still calls the v1 sketch
+  helpers `hatch` and `wallTicks`: this pass moves it onto the clean pen), `Window.tsx`, `Town.tsx`, `Nature.tsx`
+  (0: faceted 2-tone crowns, with feeling 3's lens), `Crowd.tsx`, `Person.tsx` (0: 2-tone silhouettes).
+- **`src/lib/patchwork.ts`** (new, M-L): fills a C mass (its layout polygon) with flat facets by a recursive guillotine
   (BSP) split snapped to the scene's grid (verticals, horizontals, `lib/persp.tsx`'s vanishing lines, 45-degree cuts),
-  facet sides from the plane's distribution (near ~50 px, far ~75 px), clipped to the mass with polygon-clipping (npm,
-  mfogel); natural masses (hills, crowns) as Delaunay facets (delaunator, Mapbox, ISC: https://github.com/mapbox/delaunator);
-  fills from the plane's 4-7 palette fills, tone by orientation to the key, neighbours dL* 4-10, identity marks seeded
-  every 3-6 facets; facets belong to their plane (they parallax with it) and never move or boil.
-- **Texture** (rule 4's test): a plane factor 1.0 / 0.7 / 0.4 in its shader.
+  sides from the plane's distribution (near ~50 px, far ~75 px), clipped to the mass (polygon-clipping, npm); natural
+  masses as Delaunay facets (delaunator, Mapbox: https://github.com/mapbox/delaunator); fills from the plane's 4-7
+  palette fills, tone by orientation to the key, neighbours dL* 4-10, identity marks every 3-6 facets; facets belong to
+  their plane (they parallax with it) and never move or boil. **Texture** (rule 4's test): a plane factor 1.0 / 0.7 / 0.4.
 
-**3.5 Gates, cost, risk.** W1: the world bible names each tier's finish and which masses are patchwork (with their
-palette subset). G3: the board draws every A at its real silhouette and part count and the C masses as grey patchwork
-at the right facet size (G3 decides focus; the finish map is part of it). G4: the look clip shows the whole ladder in the
-final style (one A at lod 2, B at 1, near and far patchwork); the owner runs the glance test beside a v2-style version;
-check_finish's numbers in its report. G5: fills G3's plan at its finish levels (no finish promotion, as no tier
-promotion). G6-G7: check_finish on the master sheets; the texture last. **Cost:** finish.ts S-M, kit lod L, patchwork.ts
-M-L, check_finish M (the prototype exists). **Risks:** the patchwork reads as abstract collage, not city (identity marks
-every 3-6 facets; the owner hasn't answered on it yet: §6); a contrasty near patchwork under the parallax float adds
-motion energy outside A (rule 2: A >= 60 % of the motion; a moving near patchwork keeps local contrast <= 7); LOD seen
-on a push-in (per-shot lod by largest size); A's 2 px features vanish on a phone (keep them in regular grids, which still
-read as a fine texture when single bars don't).
+**3.5 Gates, cost, risk.** W1: the world bible names each tier's finish and which masses are patchwork. G3: the board
+draws each A at its real silhouette and part count and the C masses as grey patchwork at the right facet size (G3 decides
+focus; the finish map is part of it). G4: the look clip shows the whole ladder in the final style; the owner runs the
+glance test beside a v2-style version; check_finish's numbers in its report. G5: fills G3's plan at its finish levels (no
+finish promotion). G6-G7: check_finish on the master sheets; texture last. **Cost:** finish.ts S-M, kit lod L,
+patchwork.ts M-L, check_finish M (prototype exists). **Risks:** the patchwork reads as collage, not city (identity marks;
+the owner hasn't answered on it: §6); a contrasty near patchwork under the parallax float adds motion outside A (rule 2:
+A >= 60 % of the motion; a moving near patchwork keeps local contrast <= 7); LOD seen on a push-in (per-shot lod); A's
+2 px features lost on a phone (keep them in regular grids, which read as fine texture when single bars don't).
 
 ## 4. What it would change in v2 (the baseline)
-Tiers from `docs/v2/THROUGHLINE.md` §4; "before" from `baseline_v2_sheet.jpg` and the S1 numbers in §1.
-- **S1 (the cover):** before: the glass door and W at the same finish as the café crate; the near quay (31 % of the
-  frame) three flat planes (3.2 shapes / 10,000 px, local contrast 3.0). After: the door, its canopy letters and W at lod
-  2 (frame profiles, glazing bars, 3 tones: she is ~0.3 % of the frame, too small to carry finish, so her objects do);
-  the Google wing at lod 1 (plain rects, 2 tones); the far roofs as far patchwork (already close: 0.9 %, local contrast
-  2.6); the quay as near patchwork (~50 px paving facets, dL* 4-10, a bollard, a drain, a mooring ring as marks); the
-  café set at lod 1 (no plank stripes on the crate).
+Tiers from `docs/v2/THROUGHLINE.md` §4; "before" from `baseline_v2_sheet.jpg`, S1 and S3 measured.
+- **S1 (the cover):** before: the glass door and W at the café crate's finish; the near quay (31 % of the frame) three
+  flat planes (3.2 shapes / 10,000 px, local contrast 3.0). After: the door, its canopy letters and W at lod 2 (frame
+  profiles, glazing bars, 3 tones; she is ~0.3 % of the frame, too small to carry finish, so her objects do); the Google
+  wing at lod 1; the far roofs as far patchwork (already close: 0.9 %, 2.6); the quay as near patchwork (~50 px paving
+  facets, dL* 4-10; a bollard, a drain, a mooring ring as marks); the café set at lod 1 (no plank stripes on the crate).
 - **S2:** her dark window and the five staff windows at lod 2 (bars, 2-tone blind bands); the brick wing between them at
   lod 0 (3-4 brick-tone facets, not one even field); the towpath as near patchwork.
-- **S3 and S4:** the moored narrowboat's rose panels are among the most worked objects in both frames while the boat is C:
-  lod 1 (the roses as 2-3 flat shapes); her window (S3), the name tag and the fingerpost plates (S4) at lod 2; the backs
-  at lod 1, the gasholders and viaduct as far patchwork.
-- **S5 (the scale reveal):** the Pentagon at lod 2 against the city as pale far patchwork in its steps toward the sky
-  (the hero huge yet far keeps its finish); the blossom crowns faceted (feeling 3).
-- **S6, S7, S8 (the boards):** each board is A, and the big foreground furniture (S6's bench, S7's chair and table, S8's
-  deck planks) is drawn at a finish close to it: lod 1 (2 tones, 3 slats instead of 6), the paving and decks as near
-  patchwork instead of even stripes; the facades behind at lod 0-1.
-- **Everywhere:** if the texture test keeps it, its plane factors; one ladder in every shot, so the brand reads.
+- **S3:** v2 varies the AMOUNT (her window 17.8 % small features, the neighbours' windows 9.6 %, the moored boat 3.3 %)
+  but not the KIND (tone spread 2.0-2.5 in all three): the neighbours' windows to lod 1 (a lit pane in 2 tones, no
+  shelves), the terrace to lod 0-1, the boat (13.5 % of the frame) to lod 1 with its rose panels as 2-3 flat shapes.
+  **S4:** the name tag and the fingerpost plates at lod 2; the boat again lod 1; the backs lod 1, gasholders and viaduct
+  as far patchwork.
+- **S5 (the scale reveal):** the Pentagon at lod 2 against the city as pale far patchwork stepping toward the sky (huge
+  yet far, it keeps its finish); the blossom crowns faceted (feeling 3).
+- **S6, S7, S8 (the boards):** each board is A, yet the big foreground furniture (S6's bench, S7's chair and table, S8's
+  deck) is drawn at nearly its finish: lod 1 (2 tones, 3 slats not 6), paving and decks as near patchwork, the facades
+  behind at lod 0-1. **Everywhere:** the texture's plane factors if the test keeps it; one ladder in every shot.
 
 ## 5. What the owner didn't name that matters for this feeling
-1. **The hero's size.** Finish needs room: each poster's main hero box covers 4-20 % of the frame (median 14 %); v2's S1
-   subject is ~0.3 %. Below ~3 px a feature vanishes on a phone, so the crisp object is big where its finish is the point
-   (or the camera pushes in): in a city film the landmark is the natural A.
-2. **Fullness is shape count, not small features.** The patchwork has the hero's density of shapes; v2's flats have a
-   quarter of it. "Low poly" removes features, never shapes.
-3. **The hero leads by finish, not by muting the world** (posters: local contrast A 11.0, near C 9.7; v2: 12.1 vs 3.0).
-   A world muted to a whisper reads unfinished.
-4. **A gradient, not a cliff.** B is nearly as rich as A (8.4 %), and the hero's surroundings take a transition finish
+1. **The hero's size.** Each poster's main hero box covers 4-20 % of the frame (median 14 %); v2's S1 subject ~0.3 %.
+   Below ~3 px a feature vanishes on a phone: the crisp object is big where its finish is the point (or the camera
+   pushes in). In a city film the landmark is the natural A.
+2. **Fullness is shape count, not small features:** the patchwork has the hero's density of shapes, v2's flats a quarter
+   of it. "Low poly" removes features, never shapes.
+3. **The hero leads by finish, not by muting the world** (local contrast: posters A 11.0, near C 9.7; v2 12.1 vs 3.0).
+4. **A gradient, not a cliff:** B is nearly as rich as A (8.4 %), and the hero's surroundings take a transition finish
    (Arcane sharpens where the characters touch the set).
-5. **Regular detail reads crisp, random detail reads noisy:** the heroes' features repeat (grids, columns, balustrades).
-6. **In motion** the ladder must survive the camera: lod fixed per shot, facets owned by their plane, no push-in onto C.
+5. **Regular detail reads crisp, random detail noisy:** the heroes' features repeat (grids, columns, balustrades).
+6. **In motion** the ladder survives the camera: lod fixed per shot, facets owned by their plane, no push-in onto a C.
 7. **The ladder is part of the brand** (ONE LOOK, ONE BRAND): the same finish rules in every video.
 
 ## 6. Clashes with the owner's earlier words, and open questions

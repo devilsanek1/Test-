@@ -1060,7 +1060,7 @@ def ladder_chart(posters, films, out):
     rows.append(None)
     rows += [(f"{r['label']}", r['planes']['planes']) for r in films if r['planes']['planes']]
     panels = [('dE76 to the air', 'dE_air', 0, 65, [0, 10, 20, 30, 40, 50, 60]), ('visible-edge share (detail)', 'edges', 0, 0.85, [0, 0.2, 0.4, 0.6, 0.8]),
-              ('L* (value)', 'L', 25, 95, [30, 50, 70, 90])]
+              ('L* (value)', 'L', 25, 100, [30, 50, 70, 90])]
     lab_w, pw, gap, rh, top = 250, 640, 40, 46, 150
     W = lab_w + len(panels) * pw + (len(panels) - 1) * gap + 40
     n = len(rows)
@@ -1071,6 +1071,12 @@ def ladder_chart(posters, films, out):
     for pi, (ttl, key, lo, hi, ticks) in enumerate(panels):
         x0 = lab_w + pi * (pw + gap)
         put(img, ttl, (x0, top - 28), 0.62, INK, 1)
+        if key == 'dE_air':  # CRAFT §f.2: the farthest plane within dE 10 of its air
+            x10 = int(x0 + 10 / (hi - lo) * pw)
+            ov = img.copy()
+            cv2.rectangle(ov, (x0, top - 8), (x10, top + n * rh), (246, 236, 222), -1)
+            img[:] = cv2.addWeighted(ov, 0.7, img, 0.3, 0)
+            put(img, 'farthest: <= 10', (x0 + 2, top + n * rh + 48), 0.42, INK2, 1)
         for t in ticks:
             x = int(x0 + (t - lo) / (hi - lo) * pw)
             cv2.line(img, (x, top - 10), (x, top + n * rh), GRID, 1)
@@ -1118,69 +1124,72 @@ def ladder_chart(posters, films, out):
 
 # ---------------------------------------------------------------- the 9:16 mapping diagram
 
+def band_stats(posters, key):
+    vals = [r['bands'][key] for r in posters if r['bands'].get(key) is not None]
+    return (float(np.median(vals)), float(min(vals)), float(max(vals)), len(vals)) if vals else None
+
+
+def map916(f, top):
+    """A poster band (fraction of its height) placed in 1080 x 1920: the tallest element's top at y 620 (just under
+    the caption band), the poster's bottom edge at the frame's bottom edge, linear between."""
+    return 620 + (f - top) / (1 - top) * 1300
+
+
 def diagram_916(posters, films, out):
-    """Left: the posters' measured vertical structure (median and range, as fractions of their height). Right: the same
-    bands placed in a 1080 x 1920 frame under our screen zones (G5_BLOCKING §2), with v2's horizons for comparison."""
-    def med(vals):
-        vals = [v for v in vals if v is not None]
-        return (float(np.median(vals)), float(min(vals)), float(max(vals))) if vals else None
-    hero_top = med([r['hero_frac']['top'] for r in posters if r.get('hero_frac')])
-    far = med([v['y'] / r['size'][1] for r in posters for v in r['views'] if 'far' in v['zone'] or 'one camera' in v['zone']])
-    near = med([v['y'] / r['size'][1] for r in posters for v in r['views'] if ('near' in v['zone'] or 'one camera' in v['zone'] or 'mid' in v['zone']) and 'veranda' not in v['zone']])
-    frame_top = med([min(p['y0'] for p in r['planes']['planes'] if p['rank'] == 1) for r in posters])
-    sky_bot = med([min(p['y0'] for p in r['planes']['planes'] if p['role'] != 'sky') for r in posters])
-    W, H = 1700, 1180
+    """Left: the posters' measured vertical structure (median, range bar; one value per poster). Right: the same bands
+    in a 1080 x 1920 frame under our screen zones (G5_BLOCKING §2), with v2's horizons for comparison."""
+    bands = [('tallest top', 'tallest_top', MUTED), ('hero top', 'hero_top', bgr_hex(HERO)), ('far horizon', 'far', bgr_hex(FAR_LINE)),
+             ('near eye level', 'near', bgr_hex(NEAR_LINE)), ('near frame band', 'frame_top', bgr_hex(SEQ[0]))]
+    stats = {k: band_stats(posters, k) for _, k, _ in bands}
+    W, H = 1760, 1200
     img = np.full((H, W, 3), 255, np.uint8)
     put(img, 'From the posters to 9:16: where the bands go', (24, 46), 0.95, INK, 2)
-    put(img, 'left: the seven posters (median, range bar), as fractions of their height; right: the same bands in our 1080 x 1920 frame', (24, 80), 0.55, INK2, 1)
-    # poster column
-    px0, py0, ph = 120, 140, 900
+    put(img, 'left: the seven posters (median, range bar; fractions of their height); right: the bands in 1080 x 1920 with the tallest top at y 620', (24, 80), 0.55, INK2, 1)
+    px0, py0, ph = 150, 150, 900
     pw = int(ph * 0.75)
     cv2.rectangle(img, (px0, py0), (px0 + pw, py0 + ph), MUTED, 1)
-    bands = [('top of the skyline', sky_bot, MUTED), ('hero top', hero_top, bgr_hex(HERO)), ('far horizon', far, bgr_hex(FAR_LINE)),
-             ('near eye level', near, bgr_hex(NEAR_LINE)), ('near frame top', frame_top, bgr_hex(SEQ[0]))]
-    for name, b, col in bands:
+    for j, (name, key, col) in enumerate(bands):
+        b = stats[key]
         if not b:
             continue
-        m, lo, hi = b
+        m, lo, hi, n = b
         y = int(py0 + m * ph)
         cv2.line(img, (px0, y), (px0 + pw, y), col, 2, cv2.LINE_AA)
-        cv2.line(img, (px0 - 30, int(py0 + lo * ph)), (px0 - 30, int(py0 + hi * ph)), col, 4)
-        put(img, f'{name} {m:.2f} ({lo:.2f}-{hi:.2f})', (px0 + 8, y - 8), 0.5, col, 1, bg=(255, 255, 255))
+        xb = px0 - 20 - 14 * j
+        cv2.line(img, (xb, int(py0 + lo * ph)), (xb, int(py0 + hi * ph)), col, 4)
+        put(img, f'{name} {m:.2f} ({lo:.2f}-{hi:.2f}, n {n})', (px0 + 8, y - 8), 0.5, col, 1, bg=(255, 255, 255))
     put(img, 'poster (3:4)', (px0, py0 + ph + 30), 0.55, INK2, 1)
-    # 9:16 column: zones
-    fx0, fy0, fh = 1020, 140, 900
+    fx0, fy0, fh = 1050, 150, 900
     fw = int(fh * 1080 / 1920)
     S = fh / 1920
     Y = lambda y: int(fy0 + y * S)
     overlay = img.copy()
-    cv2.rectangle(overlay, (fx0, Y(0)), (fx0 + fw, Y(180)), (225, 225, 225), -1)
-    cv2.rectangle(overlay, (fx0, Y(1520)), (fx0 + fw, Y(1920)), (225, 225, 225), -1)
-    cv2.rectangle(overlay, (fx0 + int(950 * S), Y(900)), (fx0 + fw, Y(1500)), (225, 225, 225), -1)
+    cv2.rectangle(overlay, (fx0, Y(0)), (fx0 + fw, Y(180)), (228, 228, 228), -1)
+    cv2.rectangle(overlay, (fx0, Y(1520)), (fx0 + fw, Y(1920)), (228, 228, 228), -1)
+    cv2.rectangle(overlay, (fx0 + int(950 * S), Y(900)), (fx0 + fw, Y(1500)), (228, 228, 228), -1)
     cv2.rectangle(overlay, (fx0, Y(290)), (fx0 + fw, Y(600)), (250, 236, 214), -1)
-    img = cv2.addWeighted(overlay, 0.8, img, 0.2, 0)
+    img = cv2.addWeighted(overlay, 0.85, img, 0.15, 0)
     cv2.rectangle(img, (fx0, fy0), (fx0 + fw, fy0 + fh), MUTED, 1)
-    put(img, 'platform UI (top)', (fx0 + 8, Y(120)), 0.42, INK2, 1)
-    put(img, 'caption band 290-600', (fx0 + 8, Y(460)), 0.45, INK2, 1)
-    put(img, 'platform UI (bottom) > 1520', (fx0 + 8, Y(1880)), 0.42, INK2, 1)
-    put(img, 'rail', (fx0 + int(960 * S), Y(1200)), 0.4, INK2, 1)
-    # mapping: the poster's hero top -> y 620 (under the caption band), the bottom -> 1920, linear between
-    ht = hero_top[0] if hero_top else 0.33
-    f2y = lambda f: 620 + (f - ht) / (1 - ht) * 1300
-    for name, b, col in bands[1:]:
+    put(img, 'platform UI', (fx0 + 8, Y(110)), 0.42, INK2, 1)
+    put(img, 'caption band 290-600 (sky)', (fx0 + 8, Y(460)), 0.45, INK2, 1)
+    put(img, 'read zone 600-1480', (fx0 + 8, Y(700)), 0.42, INK2, 1)
+    put(img, 'platform UI > 1520', (fx0 + 8, Y(1880)), 0.42, INK2, 1)
+    put(img, 'rail', (fx0 + int(958 * S), Y(1200)), 0.4, INK2, 1)
+    top = stats['tallest_top'][0]
+    for name, key, col in bands:
+        b = stats[key]
         if not b:
             continue
-        y916 = f2y(b[0])
+        y916 = map916(b[0], top)
         cv2.line(img, (fx0, Y(y916)), (fx0 + fw, Y(y916)), col, 2, cv2.LINE_AA)
         put(img, f'{name}: y {y916:.0f} ({y916 / 1920:.2f} H)', (fx0 + fw + 14, Y(y916) + 5), 0.5, col, 1)
         dashed(img, (px0 + pw + 4, int(py0 + b[0] * ph)), (fx0 - 4, Y(y916)), col, 1, 8, 8)
-    # v2's horizons
+    put(img, "v2's horizons:", (fx0 - 210, Y(560)), 0.45, INK, 1)
     for r in films:
         if r['label'].startswith('v2') and r.get('horizon'):
             y = Y(r['horizon'])
-            cv2.line(img, (fx0 - 26, y), (fx0 - 6, y), INK, 2)
-            put(img, r['label'].split(' @')[0].replace('v2 ', ''), (fx0 - 70, y + 5), 0.42, INK, 1)
-    put(img, "v2's horizons", (fx0 - 120, Y(640)), 0.45, INK, 1)
+            cv2.line(img, (fx0 - 30, y), (fx0 - 6, y), INK, 2)
+            put(img, r['label'].split(' @')[0].replace('v2 ', ''), (fx0 - 64, y + 5), 0.42, INK, 1)
     put(img, '9:16 (1080 x 1920)', (fx0, fy0 + fh + 30), 0.55, INK2, 1)
     return save_jpg(out, img)
 
