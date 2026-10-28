@@ -31,7 +31,7 @@ import {XG} from '../../../lib/xf';
 import {InkScale} from '../../../lib/inkComp';
 import {EMBER, FILM_TOD} from '../kit';
 import {Lit, RIGS} from '../kit/Light';
-import {OutsideFar, OutsideTown, OutsideStreet, FilmClock} from './outside';
+import {OutsideFar, OutsideTown, OutsideStreet, FilmClock, PlaneCamsProvider} from './outside';
 import {H2Window} from './h2_window';
 import {H2Scene} from './SQE';
 import {sqdCams, inkZoom, applyMat, matScale, SUMMIT_STICK, MOVE_END, LIFE_END} from './SQD_rig';
@@ -58,28 +58,32 @@ const SQD: React.FC = () => {
   return (
     <World sky={[{t: 0, tod: FILM_TOD, color: EMBER.sky}]}>
       <FilmClock>
-        <XG m={c.far}>
-          <InkScale {...inkZoom('far', c.far, T)}>
-            <OutsideFar summit={!moving} streams={<RevealStreams T={T} />} />
-          </InkScale>
-        </XG>
-        {moving ? (
-          <Lit rig={RIGS.street}>
-            <J3StickLight x={sc[0]} y={sc[1]} w={sw} rot={SUMMIT_STICK.rot} m={c.far} />
-            <J3Stick x={sc[0]} y={sc[1]} w={sw} rot={SUMMIT_STICK.rot} />
-            <J3StickRim x={sc[0]} y={sc[1]} w={sw} rot={SUMMIT_STICK.rot} />
-          </Lit>
-        ) : null}
-        <XG m={c.town}>
-          <InkScale {...inkZoom('town', c.town, T)}>
-            <OutsideTown onRoad={<RoadTrucks T={T} />} />
-          </InkScale>
-        </XG>
-        <XG m={c.street}>
-          <InkScale {...inkZoom('street', c.street, T)}>
-            <OutsideStreet />
-          </InkScale>
-        </XG>
+        {/* the planes' cameras for outside's own screen-space pieces (the street's snow kept under the caption band in
+            SCREEN px, the road's trucks), as H2View hands them: the pull, the hold and SQE's frames agree */}
+        <PlaneCamsProvider value={{far: c.far, town: c.town, street: c.street}}>
+          <XG m={c.far}>
+            <InkScale {...inkZoom('far', c.far, T)}>
+              <OutsideFar summit={!moving} streams={<RevealStreams T={T} />} />
+            </InkScale>
+          </XG>
+          {moving ? (
+            <Lit rig={RIGS.street}>
+              <J3StickLight x={sc[0]} y={sc[1]} w={sw} rot={SUMMIT_STICK.rot} m={c.far} />
+              <J3Stick x={sc[0]} y={sc[1]} w={sw} rot={SUMMIT_STICK.rot} />
+              <J3StickRim x={sc[0]} y={sc[1]} w={sw} rot={SUMMIT_STICK.rot} />
+            </Lit>
+          ) : null}
+          <XG m={c.town}>
+            <InkScale {...inkZoom('town', c.town, T)}>
+              <OutsideTown onRoad={<RoadTrucks T={T} />} />
+            </InkScale>
+          </XG>
+          <XG m={c.street}>
+            <InkScale {...inkZoom('street', c.street, T)}>
+              <OutsideStreet />
+            </InkScale>
+          </XG>
+        </PlaneCamsProvider>
         <XG m={c.win}>
           <InkScale {...inkZoom('win', c.win, T)}>
             <H2Window />

@@ -163,7 +163,9 @@ const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, old
         {back || dim < 0.5 ? <Ink d={circle(hx, hy, w * 0.045, {seed: `${seed}/ringI`})} at={b(at, 0.06)} width={Math.max(1.6, ink * 0.6)} /> : null}
         {back ? (
           <Show at={fillAt(at)}>
-            <DataCenter x={w * 0.6} y={h * 0.8} w={w * 0.52} variant="mini" sign={backSign} seed={`${seed}/back`} ink={Math.max(1.6, ink * 0.6)} />
+            {/* the clean pen's server rows: three long soft bands per row, steady (CRAFT §c: no dash rows or blinking
+                specks on the payoff's subject) */}
+            <DataCenter x={w * 0.6} y={h * 0.8} w={w * 0.52} variant="mini" sign={backSign} seed={`${seed}/back`} ink={Math.max(1.6, ink * 0.6)} ledStyle="bands" blink={false} />
           </Show>
         ) : (
           <>
