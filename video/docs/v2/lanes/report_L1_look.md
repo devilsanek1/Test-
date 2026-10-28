@@ -129,8 +129,9 @@ bc9d11f and ab8f872 (two fixes the first v4 render's checks found, below), then 
 - **The far plane's edges:** 0.87x the subject plane's.
 - **The bank's texture gradient:** the near half's big things add crossings.
 
-**REQUESTS**
-- **Sound lane (`audio/v2r/sheet.py`, the birds against the picture):**
+**REQUESTS** (the orchestrator's answers, 2026-10-28: the birds' sound goes to the final sound re-time, W4, after
+assembly; the water tint is approved and in `rigs.ts`)
+- **Sound lane (`audio/v2r/sheet.py`, the birds against the picture), for W4:**
   - `wings:1` (1.46) and the bridge birds' calls (1.50, 1.74) were placed in the pause after "Google." (1.46-2.00)
     for the old 1.40 lift. In v4's mix they play while the birds are still on the rail.
   - The voice runs without a pause from 2.00 to 4.54 ("And she says her contract bans her from criticizing it"), and
@@ -140,8 +141,9 @@ bc9d11f and ab8f872 (two fixes the first v4 render's checks found, below), then 
     - no SFX (far birds can lift silently);
     - or the art director accepts a lift back in the 1.46-2.00 pause (still pale, small and off the disc), and I set
       `birdsLiftBridge` to ~1.50.
-- **`src/v2r/world/rigs.ts`:** a `water` tint in TINT_CANAL (`tintFor(CM.water, CM.waterDeep)`), so every lane's
-  waterline strips stay teal. The rig's rose family greys teal water. V2S1_light holds it locally for now.
+- **`src/v2r/world/rigs.ts`: DONE.** TINT_CANAL now has `water` (`tintFor(CM.water, CM.waterDeep)`), so every
+  lane's shades on the canal stay teal; lanes write `tint="water"`. The rig's rose family greys teal water. S1's
+  waterline strips use it, and their frames are pixel-identical to v4's.
 - (The skies.ts banding region I meant to flag, 0,0,330,712, is already replaced by the sky critic's open-sky regions
   in b6861a5.)
 
