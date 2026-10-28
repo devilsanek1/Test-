@@ -118,6 +118,11 @@ export const S7StaffOutside: React.FC = () => {
 
 // ---------------------------------------------------------------- the cyclist (C)
 
+/** The cyclist's coat and trousers: light (L* >= 69: a tier-C figure's same-hue lines stay over L* 55, never a dark
+ *  drawn line), a cool denim that never hides a gold or rust leaf blowing across it (the leaves cross his path at
+ *  ~2.4-3.3 s). */
+const S7_CYCLIST_COAT = '#A4B2C9';
+
 /** The cyclist (z 21: 146 px, a slow 2.6 m/s = 223 px/s): out from behind the board's right edge at ~1.30 s, off the
  *  right edge by ~3.4 s. */
 export const CYCLIST = {z: 21, v: 2.6, t0: 1.3, x0: xAt(640, 21)} as const;
@@ -134,7 +139,7 @@ export const S7Cyclist: React.FC = () => {
   if (!c) return null;
   return (
     <Tier tier="environment">
-      <Person x={c.x} y={c.y} h={c.h} seed="s7/cyclist" pose="cycle" view="profile" flip pedal={1.2} traits={{hair: 'cap', acc: 'backpack', coat: CM.coatMustard, trousers: '#B4AABF', hairColor: CM.hair[2], hatColor: CM.coatOat}} exact />
+      <Person x={c.x} y={c.y} h={c.h} seed="s7/cyclist" pose="cycle" view="profile" flip pedal={1.2} traits={{hair: 'cap', acc: 'backpack', coat: S7_CYCLIST_COAT, trousers: '#B4AABF', hairColor: CM.hair[2], hatColor: CM.coatOat}} exact />
     </Tier>
   );
 };
