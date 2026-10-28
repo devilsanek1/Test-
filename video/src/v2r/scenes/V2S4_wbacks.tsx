@@ -85,10 +85,10 @@ function herWindowBatch(): Batch {
   const pw = px1 - px0;
   const ph = py1 - py0;
   const transom = py0 + ph * 0.62;
-  const pane = onPlane(CM.paneUnlit, 1);
-  const room = onPlane('#6B7C92', 1); // the unlit room one soft step over the dark glass (tone on tone)
+  const pane = onPlane(CM.paneUnlit, S4_PLANE.backs);
+  const room = onPlane('#6B7C92', S4_PLANE.backs); // the unlit room one soft step over the dark glass (tone on tone)
   // L0: the frame band (teal) round the opening
-  b.rect(onPlane(CM.hero, 1), x0, y0, x1 - x0, y1 - y0);
+  b.rect(onPlane(CM.hero, S4_PLANE.backs), x0, y0, x1 - x0, y1 - y0);
   b.layer();
   // L1: the dark pane
   b.rect(pane, px0, py0, pw, ph);
@@ -98,11 +98,11 @@ function herWindowBatch(): Batch {
   b.rect(room, px0 + pw * 0.2, py0 + ph * 0.36, 2, ph * 0.64);
   b.rect(room, px0 + pw * 0.58, py0 + ph * 0.3, pw * 0.36, 3);
   b.rect(room, px0 + pw * 0.58, py0 + ph * 0.5, pw * 0.36, 3);
-  b.rect(onPlane(CM.coatOat, 1), px0, py0, pw, Math.max(4, ph * 0.06));
+  b.rect(onPlane(CM.coatOat, S4_PLANE.backs), px0, py0, pw, Math.max(4, ph * 0.06));
   b.layer();
   // L3: the front: the transom, the stile from the transom down (the fanlight above stays one undivided pane), the
   // bottom rail; then the Juliet rail as ONE closed comb (its top rail and balusters one path: no stroke ends apart)
-  const teal = onPlane(CM.hero, 1);
+  const teal = onPlane(CM.hero, S4_PLANE.backs);
   b.rect(teal, px0, transom, pw, 3);
   b.rect(teal, px0 + pw / 2 - 1.5, transom, 3, py1 - transom);
   const ry = py0 + ph * 0.6;
@@ -115,7 +115,7 @@ function herWindowBatch(): Batch {
     comb += `L${P(bx + half, i === n ? ry : ry + 2.4)}L${P(bx + half, py1)}L${P(bx - half, py1)}L${P(bx - half, i === 0 ? ry : ry + 2.4)}`;
   }
   comb += 'Z';
-  b.fill(onPlane(CM.anchor, 1), comb);
+  b.fill(onPlane(CM.anchor, S4_PLANE.backs), comb);
   return b;
 }
 
@@ -172,7 +172,7 @@ function yardInto(b: Batch) {
 
 type House = {x0: number; x1: number; brick: string; ridge: number; eave: number; roof: string; dormer?: boolean; ext: 'left' | 'right'; extTop: number; ivy?: boolean; render?: boolean};
 export const HOUSES: House[] = [
-  {x0: 512, x1: 676, brick: CM.brickLight, ridge: 618, eave: 660, roof: CM.paneUnlit, ext: 'left', extTop: 776, render: true},
+  {x0: 512, x1: 676, brick: CM.brick, ridge: 618, eave: 660, roof: CM.paneUnlit, ext: 'left', extTop: 776},
   {x0: 676, x1: 846, brick: CM.brick, ridge: 616, eave: 656, roof: CM.shadeCool, dormer: true, ext: 'right', extTop: 770},
   {x0: 846, x1: 1012, brick: CM.brickDeep, ridge: 620, eave: 662, roof: CM.paneUnlit, ext: 'left', extTop: 782, ivy: true},
   {x0: 1012, x1: 1182, brick: CM.brickLight, ridge: 615, eave: 655, roof: CM.shadeCool, dormer: true, ext: 'right', extTop: 772},

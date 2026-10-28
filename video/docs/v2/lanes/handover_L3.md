@@ -1,3 +1,85 @@
+# S4 art conform (2026-10-28, session_014PwCXJs9nWENkpKqVhHWMP; brief `context/workflows/v2r-l3-s4-art-brief.md`)
+**State:** V2S4 "The walk home" (film 14.86-20.55) brought to the approved look per conform_L3 §2, §3, §4, §6, reusing S3's
+solutions. Code: `src/v2r/scenes/V2S4*` (new: `V2S4_depth.ts`, `V2S4_light.tsx`, `V2S4_water.tsx`, `V2S4_particles.tsx`), the
+S4_SKY / S4_AIR append in `world/skies.ts`, two depth sheets `scripts/qa/depth_sheets/v2_s4.json` (17.0, the truck) and
+`v2_s4_hold.json` (19.9, the hold: the truck moves the planes and the plates exist only from 18.92, so one sheet per still).
+Wrapped early at the coordinator's call (11:24 UTC): banding, the final light re-run and the frame-by-frame eye check are open
+(below). No agent running. Stills: `/tmp/claude-0/-home-user-Test-/6f98c33a-2c7f-5355-893a-0f8c4c5abcb3/scratchpad/s4art/`.
+
+**What changed, per step**
+1. Sky: `S4_SKY = eveningSky({band: CM.sky, horizon: S1_HORIZON, horizonY: 760, sun: {x: 250, y: 720, rx: 280, ry: 100}})` (the gold
+   evening of S1/S2; SUN1's warmth low and wide, 70 px UNDER the disc, behind the far roofs: khaki crossing C* 5.94; a horizon at 780
+   with the warmth at 700 crossed at 7.6), `S4_AIR = horizonColor(S4_SKY, 250)` (#FCD7B9); `<Sky>` first in the shot, the World's
+   flat [mint, gold] steps gone; the disc stays the flat SunDisc, no halo, the sky does not truck.
+2. Planes and air (`V2S4_depth.ts`): `S4_ATM` (air S4_AIR), `S4_CAM = groundCam({horizon 760, vpx 540, f 1400, height 3.1})` (her
+   coping 14 m at 100 px/m, the wall foot 18.7 m), `planeBatch`. The towpath (the subject's plane) is pale (L* ~74), so the far
+   city starts farther out (CRAFT §f.2): the backs take the +2 step (k .22), the far roofs / gasholders / viaduct +3.5 (k ~.52),
+   warm stones and bricks only (cool slates and glass greyed to C* 7.6 and failed "no air"); truck factors unchanged.
+3. Thread + gasholders (`V2S4_wbacks.tsx`, `V2S4_wfar.tsx`): the warehouse is now HER END HOUSE (red stock brick, stone cornice,
+   slate mansard with a dormer, a stack with two pots, a narrow sash, her teal door) with her French window at map S4.herWindow
+   (outer box 90 x 102 at (135, 698): teal frame band, the blind UP, a DARK pane with the unlit room tone on tone, S3's undivided
+   fanlight, the stile from the transom down, the Juliet rail ONE closed comb); tier B, no outline. Enters ~14.95, half in 15.63,
+   whole 16.31. G1 moved right of the sun's column (cx 520 r 90: plane-x 430-610, so >= 337 at the cut) and the drum G3 to cx 90
+   (hidden behind her house from ~17.06); the sun's column keeps everything below y 736 (20 px of sky under the disc, no tangent);
+   no line crosses the disc at any frame (the far plane's 93 px included). Far: no windows, aerials, pots, masts, wire or train.
+4. Light (`V2S4_light.tsx`, RIG_CANAL): ONE ShadowLayer for the whole towpath (contact + cast under the lamps, bollards, planter,
+   bin, lifebuoy post, bench, angler, heron, the post (POST_STANDERS), the pair, and HER: placed at her screen x minus the plane's
+   offset, so it stays with her), the gate piers' casts and the walls' foot band; FormShade on the bollards, bin, planter, the post's
+   right side and her far side; the RIM on her coat's left edge (clipped to the coat band); the roof's things and Pip's contact in
+   one ShadowLayer riding the boat's bob; the backs' east returns and dormer cheeks one Shade step, the stacks a form step. The tag
+   is unlit paper; the hand-picked stoneShade shadow quads are gone.
+5. Tiers / life: A = her (INK_PX.mid), the tag, the post (fills at tier A always; its one closed outline pops on with the DEC
+   plate at 18.92), the plates (one closed edge each, a closed keyline); B = Pip, her far window, the pair she passes (ink 0); C =
+   the rest. Movers kept: the pair (B), the ducks, the boat's stove smoke, the birds west at 19.8, the particles. CUT: the train,
+   the washing line, all pigeons, the gull, the raker, the window reader, the backs' two smokes, windows switching, the page turn,
+   the nibble, the jogger, the dog walker AND the cyclist (every route crossed her at the 17.0 check frame or the plates after
+   18.85); herbs, curtains, fenders, trees and the heron still.
+6. Line (conform §3): every hand mark deleted (brick ticks, render patches, gate planks/straps, moss, bloom dots, hatching, mooring
+   rings, leaf specks, ripple/reflection dashes, rivets, swirls); thin darks lifted to mid tones (`S4_IRON` #9A8C95 for iron,
+   lamps, railings, bins, bollards; `S4_WOOD` / BOAT_WOOD mid oak; FITTING slate on the boat); the lamps redrawn in the scene
+   without ink; the boat: door panels flush with their rings, porthole reflections a pale streak, pot rims brickLight, the grab
+   rails drawn over the roof's shadows, fenders hung from cleats UNDER the cantrail (the cantrail and the plum stripe stay unbroken
+   bands: S3's lesson), the chimney's hat a rounded cap; the post: a gilt finial assembly and gilt sockets (dark mouldings wider than
+   the shaft read as two line marks each), one smooth flared foot, soft corners; the people's darks lifted.
+7. Water (`V2S4_water.tsx`): ONE isolated flat placeholder, `S4_WATER` (canal + near regions, edges, standing, reflected, glitter,
+   camera, air); the swap to lib/water is the body of `S4Water` ('canal' | 'near'). The towpath: flag courses laid from S4_CAM,
+   every other one dL* 8.5 down, their edges re-projected per frame to the fixed VP (540, 760) (thin joint lines read as nothing
+   to the eye and to the Hough check; level rows chopped them).
+8. Particles (`V2S4_particles.tsx`, presets as they are): glints 26-36 px in SUN1's glitter path on the near water (screen-fixed);
+   three palmate leaves 34-40 px blown across her flags right of her in the hold (born 18.05 / 18.75 / 19.45); far motes 8-10 px x 4
+   by her house (ride the backs); near motes x 3 on the hull's slate; <= 15 alive; joins [14.86, 20.55]; avoid band / tag / plates / her.
+
+**Checks** (17.0 = `on/f01020.png`, 19.9 = `on/f01194.png`, full size)
+- check_light (`--sky '#BCDCCF' --exclude 0,0,1080,745`): 17.0 **OK** (her box 684,896,758,1072: brightest 5 % 0.079 H; greyed 115
+  px; band dL* 0); 19.9 the brightest 5 % sits on the plates (the beat's A): **OK** 0.000 H with `--subject 100,750,758,1072`, **FAIL**
+  0.177 H with her box alone. Measured before the last two tweaks (the course tone and the wall colours): re-run it.
+- check_depth: **0 FAIL** at both (17.0: 3 WARN; 19.9: 4 WARN): far plane dE 7.3 / 8.0 from the air; her 24.0 / 34.0; the ground
+  51 % / 72 % of its visible lines to the VP. WARN: subject -> backs dE 3.2-4.2 (>= 12), the backs 1.17x busier at 17.0, the DEC
+  plate 10.2 (its top edge on the pale sky / far plane under the sun; lined 51 %), the APR plate 14.5 (a thin ring: the arm's
+  under-shade), texture far 3.8 / near 3.8 at 17.0.
+- skyProblems [], particleProblems [], tsc clean. check_banding NOT RUN: S4's open sky = `0,0,1080,280` (the zenith) and
+  `322,604,424,730` at 19.9 (between the disc and G1; at 17.0 G1 sits at 408-588), the band `0,290,1080,600`.
+- measure.py (#290-600) at 17.0: strokes **73 / Mpx** (PASS), dark-line **0.71 %** (PASS), near-miss **85 / Mpx (FAIL, <= 40)**: the
+  tag's final lettering alone is 84 strokes / 115 pairs (48 / 66 per Mpx); everything else 19 / Mpx. From 501 / 2025 / 3.02 %.
+- Eye: 0.4-scale sheets per step and 360 px views at 17.0 / 19.5 / 19.9 (`step6_phone.png`): glints, leaves and the near motes
+  read; the far motes are specks (as S1's); the sun whole and clear at every rendered frame.
+
+**Open**
+- The eye check every 1 s + 14.86 / 15.01 / 20.35 / 20.40 at the final build, banding, the light re-run (the next agent).
+- Near-miss 85 (the tag lettering, final); the depth WARNs above. Her window's frame corner (180, 647) sits 5 px from SUN1's limb
+  (185, 650): forced by map S4.herWindow (x <= 180) and SUN1 r 65 (a near-tangent; the brief wants it clear, not cut).
+- The plum stove chimney is the bottom third's strongest dark (kept: the boat's design, as S3); `V2S4_rig.ts`'s header comments
+  still describe Pip's old leaps and the 6 % push (code is right), `KEEP.tag` (V2S4_wcore) is the old 870 px tag box.
+
+**REQUESTS**
+- REQUEST qa (measure.py / ends.py): mask or report apart in-world lettering (the tag, the plates): S4 cannot meet near-miss 40
+  while the tag is up, whatever the world does.
+- REQUEST qa (check_depth): sample thin A shapes at 1080 (the post's 15 px shaft is straddled by the 540 px in/out samples: left out
+  of the sheets); Hough's removal of level lines chops receding joints (S4 draws its paving as tone steps for that reason).
+- REQUEST orchestrator (lib/water): S4's swap is the body of `S4Water` in `V2S4_water.tsx` (spec `S4_WATER`, parts 'canal' / 'near');
+  the glints' `on` is `S4_WATER.glitter.on`.
+- REQUEST integrator (map.ts), optional: a clean gap between her far window and SUN1 needs the window 6+ px left or SUN1 r <= 60.
+
 # S3 art conform (2026-10-28, session_014PwCXJs9nWENkpKqVhHWMP; brief `context/workflows/v2r-l3-s3-art-brief.md`)
 **State:** V2S3 "Her window" (film 12.98-14.86) brought to the approved look per conform_L3 §1, §3, §4, §6. All code is in
 `src/v2r/scenes/V2S3*` + the S3_SUNSET / S3_AIR append in `world/skies.ts` + the new sheet `scripts/qa/depth_sheets/v2_s3.json`.

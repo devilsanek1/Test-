@@ -7,12 +7,12 @@
 //               her towpath's coping (y 1070) is 14 m away at 100 px/m (her 170 px = 1.7 m), the garden walls' foot (y 992)
 //               18.7 m: a 4.7 m towpath whose joints converge on the VP and whose slab rows foreshorten (> 2x far to near)
 //   planeBatch  a Batch's fills on their plane: far = one flat step toward the air, merged to the plane's few values
-//               (planePalette: +1 five, +2 four within dE 24), their ink dropped (a far plane draws no lines); near = a
-//               value step darker (5 / 10 L* on -1 / -2, hue and chroma kept)
-// Planes (S4_PLANE; the truck factors are V2S4_rig S4_K): the sky inf (fixed) · +2 the far roofs, the gasholders and the
-// viaduct (0.3x) · +1 the terrace backs, the allotment yard and HER end house with her far window (0.6x) · 0 her towpath,
-// the garden walls, the post, her, the walkers (1.0x; her screen-fixed) · -0.5 the canal strip (1.0x) · -1 our boat
-// (screen-fixed: it glides with us) and the water under it (2.0x).
+//               (planePalette: +2 four within dE 24, +3.5 three within dE 12), their ink dropped (a far plane draws no
+//               lines); near = a value step darker (5 / 10 L* on -1 / -2, hue and chroma kept)
+// Planes (S4_PLANE; the truck factors are V2S4_rig S4_K): the sky inf (fixed) · the far roofs, the gasholders and the
+// viaduct (0.3x; the atmosphere's +3.5 step) · the terrace backs, the allotment yard and HER end house with her far window
+// (0.6x; the +2 step) · 0 her towpath, the garden walls, the post, her, the walkers (1.0x; her screen-fixed) · -0.5 the
+// canal strip (1.0x) · -1 our boat (screen-fixed: it glides with us) and the water under it (2.0x).
 import {groundCam, makeAtmosphere, nearStep, planePalette, recede, PARALLAX_SKY} from '../../lib/depth';
 import {S4_AIR} from '../world/skies';
 import {Batch} from '../kit/canal/core';
@@ -23,8 +23,10 @@ export const S4_ATM = makeAtmosphere({name: 's4', air: S4_AIR});
 /** S4's ONE camera (lib/depth groundCam): horizon y 760 (the sky's), VP x 540, f 1400, the eye 3.1 m over her towpath. */
 export const S4_CAM = groundCam({horizon: 760, vpx: 540, f: 1400, height: 3.1});
 
-/** S4's depth planes (lib/depth indices; the truck factors live in V2S4_rig S4_K). */
-export const S4_PLANE = {sky: PARALLAX_SKY, far: 2, backs: 1, path: 0, canal: -0.5, boat: -1, near: -1} as const;
+/** S4's depth planes, the atmosphere's indices (lib/depth; the truck factors live in V2S4_rig S4_K): the towpath (the subject's plane) is pale (L* ~74), so its far planes start farther
+ *  out (CRAFT §f.2: "behind a pale subject plane (L* > 70) the far city starts at +3"): the backs take +2's step (k .22),
+ *  the far roofs, the gasholders and the viaduct +3.5 (k ~.52); their truck factors stay 0.6x and 0.3x. */
+export const S4_PLANE = {sky: PARALLAX_SKY, far: 3.5, backs: 2, path: 0, canal: -0.5, boat: -1, near: -1} as const;
 
 /** A colour on its plane (far: one step toward the air; near: a value step darker; 0: itself). */
 export const onPlane = (c: string, plane: number) => recede(c, plane, S4_ATM);

@@ -134,6 +134,10 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-28 ~10:52 UTC, budget: "Updated %" (window 59 %, resets in 2 h; weekly 87 %) -> recalibrated ~$33.5 per weekly %, ~$8.7 per
   window %; ~$435 left in the week; the lean plan (water swaps by one fresh agent, one combined review + a cold viewer, one fix pass, sound
   re-time + mix, master) projects ~95-99 %; no new scope.
+- 2026-10-28 ~11:29 UTC, budget: a screenshot (window 64 %, resets in 1 h 23 min; weekly 89 %) -> ~$30 per weekly % (09:29 -> 11:29),
+  ~$290-385 left; the finish projects ~96-102 %, so more cuts that don't show: the water swap only where water shows at size (S2, S3/S4,
+  S5), one fresh agent for the cold watch + the art/flow review, one fix pass (<= 6 musts), sound re-time + mix only, the cover and
+  posting kit from the existing drafts.
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in

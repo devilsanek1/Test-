@@ -1,12 +1,15 @@
 // V2S5_particles.tsx (lane L4): the shot's PARTICLES (lib/particles; CRAFT §f.6; conform_L4 §10; the owner on v4: they
 // must be SEEN at phone size). One exported list of fields, each drawn in its plane's camera group (they ride the crane
 // like the world they live in); S5Particles draws them inside the set's <Lit>, the lint reads the same list.
-//   petals (start)  the slot's burst on "April" (0.21) lets go of two petals: 30-36 px blossom almonds, born in the
-//                   slot trees' crowns left of the news box at 0.32 / 0.90 (after the push-through's 0.2 s), that
-//                   glide LEFT across the middle on a light easterly IN FRONT OF the low crowns' dark undersides (pink on
-//                   mauve: seen; the critic, 2026-10-28: the old pair hid in the far left corner), over the pair's heads,
-//                   then fall past the bench's left end onto the balustrade's top rail; clear of the news box (the
-//                   subject), the pair and the caption band; plane 0 (the deck's start map).
+//   petals (start)  the slot's burst on "April" (0.21) lets go of two petals: 30-36 px blossom almonds, born at the big
+//                   tree's dark lower-left crown at 0.32 / 0.90 (after the push-through's 0.2 s), that glide LEFT across
+//                   the MIDDLE of the frame on a light easterly, over the slot's pale lawns (pink on green: seen; the
+//                   critic, 2026-10-28: the old pair hid in the far left corner; over the low crowns' blossom clumps a
+//                   pink petal vanishes) above the news box and the pair's heads, to the left mass's dark underside;
+//                   clear of the news box (the subject), the pair and the caption band. They belong to the slope's crowns
+//                   (plane +1, the near-mid plane's start map, drawn with it): as the crane rises they sink with the
+//                   crowns behind the balustrade (gone by ~22.35), so none is still afloat when the Pentagon (the subject
+//                   from 22.43) rises where the slope was.
 //   petals (end)    two petals from the terrace tree (the left frame) in the landing hold, born 2.30 / 2.62 (film
 //                   22.85 / 23.17: no entrance near the wipe 23.60-24.00), falling out of its lower crown past its
 //                   trunk onto the paving (pink on the tree's mauve: seen), clear of the Pentagon, the plaque and the
@@ -42,14 +45,15 @@ const END_PAIR: Rect = [286, 1150, 110, 100];
 const PETALS = [CM.blossom, mix(CM.blossom, CM.paper, 0.35), mix(CM.blossom, CM.shadeWarm, 0.18)];
 
 /** The fields and the camera group each is drawn in ('deckStart': the deck's start map, START coords; 'deck': the
- *  deck's map, END coords). */
-export const S5_PARTICLE_FIELDS: {group: 'deckStart' | 'deck'; f: ParticlesProps}[] = [
+ *  deck's map, END coords; 'nearmidStart': the slope's crowns' start map, START coords, drawn in their layer by
+ *  V2S5_set via S5NearMidParticles). */
+export const S5_PARTICLE_FIELDS: {group: 'deckStart' | 'deck' | 'nearmidStart'; f: ParticlesProps}[] = [
   {
-    group: 'deckStart',
+    group: 'nearmidStart',
     f: {
       kind: 'leaves',
       seed: 's5petalsStart',
-      region: {rect: [340, 878, 80, 20]},
+      region: {rect: [500, 798, 60, 26]},
       on: BLOOM_S5.base,
       colors: PETALS,
       leaf: 'almond',
@@ -113,11 +117,21 @@ export const S5Particles: React.FC<{p: number}> = ({p}) => {
   const m = {deckStart: deckStartMat(p), deck: deckMat(p)};
   return (
     <>
-      {S5_PARTICLE_FIELDS.map(({group, f}) => (
-        <PullLayer key={f.seed} m={m[group]}>
-          <Particles {...f} />
-        </PullLayer>
-      ))}
+      {S5_PARTICLE_FIELDS.map(({group, f}) =>
+        group === 'nearmidStart' ? null : (
+          <PullLayer key={f.seed} m={m[group]}>
+            <Particles {...f} />
+          </PullLayer>
+        ),
+      )}
     </>
   );
 };
+
+/** The fields that live on the slope's crowns (drawn INSIDE the near-mid PullLayer, after the crowns: the deck and the
+ *  balustrade, drawn later, cover them as the slope sinks). */
+export const S5NearMidParticles: React.FC = () => (
+  <>
+    {S5_PARTICLE_FIELDS.map(({group, f}) => (group === 'nearmidStart' ? <Particles key={f.seed} {...f} /> : null))}
+  </>
+);

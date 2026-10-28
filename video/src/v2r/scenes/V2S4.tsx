@@ -37,6 +37,7 @@ import {S4Post, S4Plates} from './V2S4_post';
 import {S4Her} from './V2S4_her';
 import {S4Pip} from './V2S4_pip';
 import {S4Tag} from './V2S4_tag';
+import {S4Particles} from './V2S4_particles';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
@@ -66,6 +67,9 @@ const Shot: React.FC = () => (
         <S4Boat />
       </Tier>
       <S4Pip />
+      {/* the particles (V2S4_particles: glints, three leaves in the hold, far and near motes), under the plates and the
+          tag so nothing ever moves over their lettering */}
+      <S4Particles />
       <S4Plates />
       <S4Tag />
     </Lit>
