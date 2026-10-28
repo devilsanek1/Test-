@@ -15,7 +15,7 @@ import {Batch, P, Pt, rng, ovalPath, lobes, lerp, domePath, r1} from '../kit/can
 import {litAt} from '../kit/canal/life';
 import {Person} from '../kit/cast';
 import * as MAP from '../world/map';
-import {CellPaint, Under, barPath, ringPath, S1_IRON, S1_SUN_HALO, S1_HAZE, S1_ATM, hazeBatch} from './V2S1_set_core';
+import {CellPaint, Under, barPath, ringPath, S1_IRON, S1_HAZE, S1_ATM, hazeBatch} from './V2S1_set_core';
 import {atmos, backing, recede, toneOnTone} from '../../lib/depth';
 import {tierFill} from '../../lib/pen';
 import {mixHex} from '../../lib/light';
@@ -254,8 +254,8 @@ function gasholderInto(b: Batch, u: Under, cx: number, base: number, r: number, 
 
 // ---------------------------------------------------------------- SUN0
 
-/** SUN0: the film's one pop colour, flat, no ink, no glow: an EVENING sun in the warmest sky step, setting BEHIND the
- *  far roofs (drawn before them), with one flat halo one step warmer than its sky (1.6x; CRAFT §d: <= 1.7x). Frame 0
+/** SUN0: the film's one pop colour, flat, no ink, no glow: an EVENING sun low in the warm sky (whose warmth round it is
+ *  lib/sky's: no halo), setting BEHIND the far roofs (drawn before them). Frame 0
  *  (before the flood): the lower-left half in colour (the colour already pouring in from the low left), the rest a flat
  *  pale shape like everything else, no halo (the sky is still paper). */
 const SunDisc: React.FC = () => {
@@ -272,12 +272,8 @@ const SunDisc: React.FC = () => {
       </>
     );
   }
-  return (
-    <>
-      <Fill d={ovalPath(x, y, r * 1.6, r * 1.6)} color={S1_SUN_HALO} offset={false} lookExempt exit={false} seed="s1sunhalo" />
-      <Fill d={disc} color={CM.sun} offset={false} seed="s1sun" />
-    </>
-  );
+  // the sky carries the low sun's warmth (lib/sky): the disc alone, flat, no halo (CRAFT §g.2)
+  return <Fill d={disc} color={CM.sun} offset={false} seed="s1sun" />;
 };
 
 // ---------------------------------------------------------------- the road bridge
