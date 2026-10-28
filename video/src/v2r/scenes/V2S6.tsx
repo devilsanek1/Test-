@@ -22,7 +22,7 @@ import {skyBands, TOD} from '../palette';
 import {GateSet} from '../kit/dc/gate';
 import type {ToneKey} from '../../lib/Film';
 import {S6Board} from './V2S6_board';
-import {S6PipOnPost, S6PipHop} from './V2S6_pip';
+import {S6PipSeat} from './V2S6_pip';
 import {S6Clouds, S6SkyBirds, S6Birds, S6Sparrows, S6LawnTrees, S6Promenade, S6Staff, S6LawnMid, S6Petals} from './V2S6_life';
 import {S6NearBack, S6NearFront, S6Readers} from './V2S6_near';
 import {S6HedgeFix, S6ShrubFix, S6Border} from './V2S6_set';
@@ -58,7 +58,7 @@ const V2S6: React.FC = () => (
         </>
       }
       board={<S6Board />}
-      pip={<S6PipOnPost />}
+      pip={<S6PipSeat />}
       near={
         <>
           <S6NearBack />
@@ -70,7 +70,6 @@ const V2S6: React.FC = () => (
       }
     />
     <S6Petals />
-    <S6PipHop />
   </World>
 );
 export default V2S6;

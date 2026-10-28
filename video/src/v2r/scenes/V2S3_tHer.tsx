@@ -2,10 +2,10 @@
 // same size on the cut frame), WORLD px at the 12.98 match. The story point of the shot: S2's blinds came down, hers
 // goes UP. Inside: the lamp-lit room (a standard lamp, a shelf, a picture, a rug) and HER full-figure silhouette (plum,
 // phone at her ear) pacing between the two French leaves, which stand OPEN inward (her window is open); the Juliet
-// rail in front; her long window box below (Pip's seat at its right end, the plants flinch when it lands at 13.10).
+// rail in front; her long window box below (plants; Pip sits on the terrace railing at (590, 1050), not on the box).
 //   12.98  the blind is 35 % down and rolling up; fully up by ~13.08 (a small spring, settled by ~13.16)
-//   13.12-14.56  she walks LEFT across the room (feet honest: steps = distance / step length), then stands at the left
-//          end x 292 through 14.86, so Pip's exit leap (14.70, up-left) passes her for as few frames as possible
+//   13.12-14.56  she walks LEFT across the room (feet honest: steps = distance / step length), then stands still at
+//          x 330 (map S3.stillFrom 14.60, her head on S3.pushFrom (330, 742): the push-through into her)
 //   14.28  her free hand moves (talking)
 import React, {useMemo} from 'react';
 import {CM} from '../palette';
@@ -14,7 +14,7 @@ import {ExitSync} from '../../lib/exit';
 import {Paint} from '../kit/canal/core';
 import {HER, Person, strideFor, drawn} from '../kit/cast';
 import * as MAP from '../world/map';
-import {S3_BEATS, S3_HER, S3_PIP} from './V2S3_rig';
+import {S3_BEATS, S3_HER} from './V2S3_rig';
 import {Batch, TK, boxInto, line, rectInk, ovalPath, domePath, lobes, leafPath, rng, P, r1} from './V2S3_tParts';
 
 const F = MAP.W2_CUT;
@@ -29,7 +29,7 @@ const FRAME = 7;
 
 // ---------------------------------------------------------------- her pacing (film seconds)
 
-const WALK = {t0: 13.12, t1: 14.56, from: 362, to: 302} as const;
+const WALK = {t0: 13.12, t1: 14.56, from: 362, to: S3_HER.stillX} as const;
 const STEP_PX = 30;
 const STRIDE = strideFor(STEP_PX, S3_HER.h, 'profile');
 const smooth = (k: number) => {
@@ -204,12 +204,10 @@ function blindInto(b: Batch, t: number) {
 
 function herBoxInto(b: Batch, t: number) {
   const box = MAP.S3.windowBox;
-  const seat = MAP.S3.pipSeat.x;
+  const seat = box.x1 - 46; // the low mounds at the box's east end
   const r = rng('herBoxPlants');
-  // the plants flinch when Pip lands on the box's right end (13.10): a damped shake, strongest near the seat
-  const d = t - S3_BEATS.pipLand;
-  const shake = (x: number) => (d > 0 && d < 0.8 ? 6 * Math.sin(d * 30) * Math.exp(-d * 6) * Math.max(0.15, 1 - Math.abs(x - seat) / 160) : 0);
-  const sway = (x: number) => Math.sin(t * 1.7 + x * 0.05) * 0.8 + shake(x);
+  const shake = (_x: number) => 0;
+  const sway = (x: number) => Math.sin(t * 1.7 + x * 0.05) * 0.8;
   const top = box.y0 + 1;
   // geraniums at the west end: stems, rounded leaves, rust-red and pink flower heads
   for (let i = 0; i < 6; i++) {
@@ -231,7 +229,7 @@ function herBoxInto(b: Batch, t: number) {
     else b.fill(CM.paper, ovalPath(x + sx, top - hh, 3.2, 2.8));
   }
   b.fill(CM.sage, lobes(box.x0 + 82, box.x0 + 172, top + 1, 14, 'herBoxMid', 5));
-  // low thyme and sedum mounds round Pip's seat (it sits among them)
+  // low thyme and sedum mounds at the east end
   b.fill(CM.sage, lobes(box.x0 + 168, box.x1 - 4, top + 1, 9, 'herBoxLow', 6));
   b.fill(CM.leafGold, lobes(seat - 30 + shake(seat) * 0.6, seat - 6 + shake(seat) * 0.6, top + 1, 7, 'herBoxLowB', 2));
   b.fill(CM.leafGold, lobes(seat + 20 + shake(seat) * 0.6, seat + 46 + shake(seat) * 0.6, top + 1, 6, 'herBoxLowC', 2));
@@ -251,7 +249,6 @@ function herBoxInto(b: Batch, t: number) {
     for (let k = 0; k < 4; k++) b.fill(k === 3 && i % 3 === 0 ? CM.leafGold : CM.sage, leafPath(tx + Math.sin(k * 1.3) * 3 + shake(tx) * 0.5, box.y0 + 6 + (L * (k + 1)) / 4, 6.4, 2.8, 90 + r.jitter(35)));
   }
   b.ink(line(box.x0, box.y0 + 1, box.x1, box.y0 + 1.5, {seed: 'boxTop', over: 'small'}) + line(box.x0 + 2, box.y0 + 16, box.x1 - 2, box.y0 + 16.4, {seed: 'boxMid', over: 'none'}) + line(box.x0, box.y0, box.x0, box.y1 - 2, {seed: 'boxL', over: 'small'}), TK.detail);
-  void S3_PIP;
 }
 
 // ---------------------------------------------------------------- the component
