@@ -24,7 +24,7 @@ Status: DONE. Three findings fixed, R3-6 fixed for the sway; its jolt half needs
   was 16), over the NEW laptop (lit peach screen, 0.55 of the box) whose lid's top quarter it covers. Off the van's beat
   (its own `line` off) the pill steps to calm with the van's outline, one event (`labelK`, default from `line`).
   Measured in the held x1.35 push: the letters 57 x 13 -> 97 x 23 px (cap height; ~8 pt on a phone); contrast 5.1:1
-  (red-brown on cream) -> 16.0:1 (ink on the warm-white pill), calm 2.4:1; the pill's right end x ~934 (< 950, clear of the rail
+  (red-brown on cream) -> 15.8:1 (ink on the warm-white pill), calm 2.4:1; the pill's right end x ~934 (< 950, clear of the rail
   from ~32.4, before "better" at 32.60). Top-3 % salience on its beat (32.20-33.10): the van 20-26 % -> 26-33 % (the
   frame's largest region); calm (33.30-34.20) 17 % -> 17-17.5 %; at the 2027 flip (34.80-35.10) the notice keeps 54-55 %
   (was 55 %). SQE/SQF stills at phone size: the word "BETTER" reads in the 0.25 sheet; at 1:1 the pill and laptop are
