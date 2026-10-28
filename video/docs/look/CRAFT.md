@@ -282,6 +282,15 @@ a far box that passes on sky inside it WARNs). Calibrated: v2's G4 clip FAILs al
 reference 1 @6.0 PASS (reference 1's lined far planes WARN on contrast). Eye check at phone size: squint; the subject
 stands off what is behind it, the far reads far, the ground runs into the picture.
 
+**Failures the eye catches first** (v2 G4 art-director pass, 2026-10-28; each one an owner send-back):
+- A sun disc showing through a V gap or a notch in a roofline (a "speech-bubble" tooth): one near-level edge cuts the disc, or it is whole.
+- A separation backing that is a blank slab: the field behind a subject is a real thing of the set (a building with tone-on-tone windows,
+  a stepped top, a lit sliver on its sun side), never a placeholder rectangle.
+- Particles too small for a phone: glints 12-24 px, leaves 10-14 px, motes 3-4 px set against a shaded field; 2-4 visible at a time.
+- Two cameras: a perspective ground under level, frontal buildings reads as a backdrop on a floor; facades, bridge and far rows share the
+  ground's horizon and vanishing point (a narrow side wall in shade shows a building's depth).
+- The heaviest area at a squint must be the subject's, never the near dressing: near planes get value range, not prop count.
+
 ## g. Sky: one continuous, gentle gradient that survives video
 The owner on v2's G4 look clip (2026-10-27): "why is it blue sky and then suddenly abruptly orange, weird ... maybe when
 it comes to sky we can find a beautiful way to do a gentle gradient ... find the pro way and tools to do it the best way

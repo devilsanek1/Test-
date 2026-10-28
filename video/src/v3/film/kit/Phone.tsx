@@ -49,6 +49,9 @@ export type PhoneProps = {
    *  and the cart badge a soft blue at C* <= 20 with no outline, the listing's laptop at tier 'support', the body a soft
    *  warm dark with no outline: PHONE_DIM_BODY); 0.5 = the half step of a 2-step change (never a fade). Default 0. */
   dim?: number;
+  /** OPT-IN (v3 rework): the off-beat colours `dim` steps toward (default PHONE_DIM_BODY / PHONE_DIM_POP): the thread
+   *  plane's REST level passes calmer ones for the long holds after the hook. */
+  dimColors?: {body?: string; pop?: string};
   /** OPT-IN: the button steps one value darker while the thumb presses it (the press's 0.14 s). */
   pressDark?: boolean;
   /** OPT-IN: the description lines' colour (default: the house ink, the subject's dark line). A light tone (L* >= 64)
@@ -123,6 +126,7 @@ const PhoneBody: React.FC<PhoneProps> = ({
   photoLaptop = true,
   bodyFillAt,
   dim = 0,
+  dimColors,
   pressDark,
   descTone,
   titleRule = true,
@@ -141,9 +145,10 @@ const PhoneBody: React.FC<PhoneProps> = ({
   const bt = S.button;
   const strikeW = price ? price.length * S.price.size * 0.44 : 0;
   // the button and the badge: the pop, one value darker while pressed, a soft blue off-beat (2-step: dim 0 / 0.5 / 1)
-  const popNow = mixRgb(pressDark && pressing ? PHONE_PRESS_POP : EMBER.pop, PHONE_DIM_POP, dim);
+  const dimPop = dimColors?.pop ?? PHONE_DIM_POP;
+  const popNow = mixRgb(pressDark && pressing ? PHONE_PRESS_POP : EMBER.pop, dimPop, dim);
   // the body and the notch: the dark anchor, a soft warm dark off-beat (its outline only on its beat, like the button's)
-  const bodyNow = mixRgb(EMBER.anchor, PHONE_DIM_BODY, dim);
+  const bodyNow = mixRgb(EMBER.anchor, dimColors?.body ?? PHONE_DIM_BODY, dim);
   const bodyAt = bodyFillAt ?? fillAt(at);
   return (
     <XG m={phoneMat(x, y, w, h, rot)}>
@@ -165,7 +170,7 @@ const PhoneBody: React.FC<PhoneProps> = ({
       />
       {badge !== null ? (
         <>
-          <Fill d={blob(S.badge.x, S.badge.y, S.badge.r, S.badge.r, {seed: `${seed}/badge`})} color={mixRgb(EMBER.pop, PHONE_DIM_POP, dim)} at={badgeAt ?? fillAt(at, 0.1)} mode="spring" offset={false} />
+          <Fill d={blob(S.badge.x, S.badge.y, S.badge.r, S.badge.r, {seed: `${seed}/badge`})} color={mixRgb(EMBER.pop, dimPop, dim)} at={badgeAt ?? fillAt(at, 0.1)} mode="spring" offset={false} />
           <Show at={badgeAt ?? fillAt(at, 0.1)}>
             <Txt x={S.badge.x} y={S.badge.y + 9 * k} size={26 * k} fill={EMBER.popText}>
               {String(badge)}

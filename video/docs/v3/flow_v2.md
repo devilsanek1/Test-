@@ -12,7 +12,10 @@ cuts in 6 places -> 0 in 2 + 1 reveal; tag gone 17.9 s -> on 91 %; "you" five wa
   2.60 / 2.72 ("$999" struck from 1.92) -> **$1,099 on "pass" 30.28** (ding). Reactions: the tap 0.50, jolt 15.30, tug 18.30,
   sway 24.44, tick 30.28, jolt 35.95, turn 39.70; "$999" again in the loop. OFF ITS BEATS the tag is tier B (SQA pilot review: a
   soft terracotta, no outline, the prices in its light tint; full only 0-4.04, 15.30-15.90, 17.24-18.90, 24.44-25.04,
-  29.90-31.00, 35.95-36.98, 38.12-41.15, each switch a 2-step change; `thread_plane.tsx` TAG_FULL).
+  29.90-31.00, 35.95-36.98, 38.12-41.15, each switch a 2-step change; `thread_plane.tsx` TAG_FULL). Each window opens ON its
+  reaction, never 0.6 s before it: earlier it would put the tag at full strength on the stage's own beats ("+9.7%" 14.74, the
+  barrier 24.20) and inside J5's 0.4 s. From 6.35 (the window's calm step, E8) every off-beat stretch is the plane's REST level
+  (early review E2: C* 24, prices L* 82, a warm eyelet; `TAG_REST`, `PHONE_REST`).
 - **HOME = the nook, POV:** H1 = O1's framing (glass 180-900 x 630-1060, DC x 322-758) and a chart card pinned right of the window;
   H2 = standing at the glass (the reveal lands there; its far field is wider, so never a direct H1 <-> H2 move: a dolly-zoom).
   **OUTSIDE = one geography:** the DC, the mountain of sticks behind its right side, the town, OUR street with the chip factory's
@@ -40,12 +43,20 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
 - **`scenes/home_set.tsx` + `homeCam(T)`** (the SQA pilot): O1's nook extended right, the card (H1 px x 975-1715, y 612-1028) and
   2-3 flat notes on the wall right of the window (O1's calendar leaves it). The camera is LOCKED through the hook (SQA pilot
   review: O1's 1.05 -> 1.00 pull-out was a zoom in a hold, DIRECTION rule 8); J1 pans x 0 -> -775 over 5.15-6.45, J2 back over
-  15.95-17.25 (inOutCubic, peak 14.9 px/f; room and outside together); the SQB hold floats.
+  15.95-17.25 (inOutCubic, peak 14.9 px/f; room and outside together); the SQB hold floats. After the hook the window view
+  sits back (early review E8; `HOOK_CALM_AT` 6.35, when J1's pan has carried the data center out of frame, so SQA stays the
+  pilot): the data center tier C (one haze step, its sign a calm panel in outside.tsx's values: one data center from both
+  windows), the houses one plane step toward the far snow plus one light haze step. SQB's own corner (E12; only its framing sees
+  H1 x > ~1480): a short run of string lights on the slope right of the skylight (one bulb steps ~every 1.5 s), snow drifting
+  past the skylight, a teacup and a pencil on the desk's lower right.
 - **`scenes/thread_plane.tsx`** (transition agent; from O1's front plane): hand, phone, listing, tag, Pip, ticker; the screen dims a
-  step toward peach when the stage leads (lit 0-4.04, 17.24-19.40, 29.90-31.00, 38.12-41.15), the button and badge then a soft
-  blue, the body a soft warm dark (L* 32, no outline) and the listing's laptop a soft terracotta (SQA pilot review: off-beat the
-  plane is tier B, no near-black, never out-colouring the stage); the tag's own off-beat schedule is §1's; price glyphs above
-  y 1480, all left of x 950:
+  step toward peach when the stage leads (lit 0-4.04, 17.24-18.30: it dims as THE stick leaves it, #9; 29.90-31.00,
+  38.12-41.15), the button and badge then a soft blue, the body a soft warm dark (L* 32, no outline) and the listing's laptop a
+  soft terracotta (SQA pilot review: off-beat the plane is tier B, no near-black, never out-colouring the stage); from 6.35 the
+  REST level (E2: the bezel L* 48, the screen one more peach step, L* 84, the button and badge a screen tint, no pop hue; at
+  9.0 the plane holds 9 % of the top-3 % salience, the chart 36 %); the tag's own off-beat schedule is §1's; the payoff tag lit
+  (E10: a rim 38.62-41.15 on its lamp side, a form shade on its right third); the like-pop (39.88): the back's data center pops
+  x0.6 -> 1.1 -> 1 as the back lands (kit PriceTag `backPopAt`); price glyphs above y 1480, all left of x 950:
 
   | spot | phone (top-left, w; rot -3) | tag box (top-left, w; rot -6) | when (move) |
   |---|---|---|---|
@@ -141,9 +152,10 @@ upper-left, tops lit, contact only; the DC sign the brightest cold light; 16 px 
   of its peak through 19.40-21.50). Captions dark while the stick fills the band, then white as its top edge drops past the
   line: SQD's `captionTone` 'down' wipe at t 0.016, 0.08 s, its edge riding the stick's (frame 1166). **A declared light
   change** (the colour shift 17.9 > 15): from the warm nook (the stick's warm rim on its lamp side) to the dusk sky (its cold
-  rim, upper left). The push-out sweeps H1's window, with the data center's sign, through the band (18.905-19.40): calm only
-  once the sign steps to C after SQA's beat (E8, `home_set.tsx`) and the "memory chips." page ends at ~19.12 (`captions.json`:
-  "chips" ends ~19.15 in the voice), so no letters ride under a caption.
+  rim, upper left). The push-out sweeps H1's window, with the data center's sign, through the band (18.905-19.40): the sign is a
+  calm panel there (E8: C from 6.35, `home_set.tsx`) and the "memory chips." page leaves at 19.12 (`captions_pages.txt`
+  `@out 19.12`: "chips" ends ~19.17 in the voice), so the band holds no caption while the window passes; "And so do" pops at
+  19.36, 2 frames before the cut (the page lead).
 - **J4 22.68** SQD -> SQE, seam mid-entry (frame 1361): `entryCam` 22.35-22.95 (inOutCubic): window x3.0 -> H2 size about (540,
   1100), street x1.12 -> 1, far field x1.03 -> 1; the front plane rises into LEFT 22.45-22.95; the trucks already stand in the
   pool; no new mover 22.28-23.08; a declared light change (into the warm room).
