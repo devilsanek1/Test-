@@ -2,6 +2,15 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 11:19 UTC (hourly)
+
+DONE + archived: L2 (S2), L5 (boards, S6, S7; K3's clean face on every board), L6 (S8 + the seam). Running: L3 (S4's art conform:
+sky, planes + air, light, her end house's dark French window, particles; then its one critic pass), L4 (S5's six critic fixes; the
+birds' V's now enter off-screen). Water: both candidates drawn; the judge picked A (true reflection, every reflection derived from the
+set) as the base, not shippable as is (1-3 px stair-steps, scattered dashes, a faint glitter), with B's drawing language grafted in
+(`docs/v2/water/JUDGE.md`); the builder now makes `src/lib/water.tsx` + look clip v6, then a fresh critic. The owner's readings at
+10:52: window 59 %, week 87 %. Spend: the hour ~$94; estimated week ~88 %, window ~63 % (reset ~12:52); finish ~95-99 %.
+
 ## Snapshot 2026-10-28 10:19 UTC (hourly)
 
 The owner's readings at 09:29 (window 36 %, week 81 %) lifted the hold; lanes resumed lean (one critic pass, must-fixes, one 0.4 clip).
