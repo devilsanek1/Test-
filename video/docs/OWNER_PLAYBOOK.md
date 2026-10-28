@@ -74,10 +74,19 @@ Maintenance at the end).
   reference is seven illustrated city posters (`docs/look/poster_refs/`); v2 ("One Small Window") is the visual
   baseline the owner likes. What we learn from them (perspective, visual style, details, composition, and the one
   focus) is studied in `docs/studies/2026-10-28_city_posters/`; a lesson becomes a rule only once the owner approves
-  it, and `docs/look/DIRECTION.md` stands until then. — ("i really like the style and i want us to experiment more with
-  the style and the focus on our videos"; "i want to see how we can learn from these pictures in terms of perspective,
-  visual style, details and composition"; "i think visually in the video about Google we have made good improvemnets in
-  terms of overall style", 2026-10-28).
+  it, and `docs/look/DIRECTION.md` stands until then. What the owner feels in them, in their words: depth, with
+  "something WAY further out that gives me a sense of scale"; the main objects crisper and more detailed, the rest
+  simpler ("a bit more low poly") yet coherent; nature that looks real but, up close, mixes "the real effects with the
+  lower poly kind of effects"; colours "very vibrant" that "coherently fit together". Next to them v2 "still feels cheap
+  and lazy", though the owner likes its colours. The study researches how professional studios get each feeling and
+  turns it into concrete techniques, and adds what we observed that the owner didn't name. — ("i really like the style
+  and i want us to experiment more with the style and the focus on our videos"; "i want to see how we can learn from
+  these pictures in terms of perspective, visual style, details and composition"; "i think visually in the video about
+  Google we have made good improvemnets in terms of overall style"; "research each further how professional studios
+  approach this and how my feelings translate to a concrete approach and techniques"; "I like the color scheme overall
+  - they feel very vibrant and coherently fit together. I like the colors of our last video about Google, but our
+  video still feels cheap and lazy as if these pictures give a very premium feel to it"; "let me know if i am missing
+  anything you observed too", 2026-10-28).
 - **Light and shadow: gentle, but always there.** One consistent light direction per scene, soft form and cast shadows,
   gentle light pools that make sense; never absent and never "weirdly put". System: `docs/look/CRAFT.md` §d. — (v3 G5b,
   2026-10-27; "the shadows added are better", v2 G4, 2026-10-27).
@@ -98,7 +107,8 @@ Maintenance at the end).
   anywhere"; on v5: "I don't like the water too much, leafs are great"; "it's just looking way too cheap, not clean or premium
   quality or refined, just lazy and cheap"; on v6, the researched shared water (true reflections, a gold light
   column, still glitter, calm ripple lines): "Yeah this is better", v2 G4,
-  2026-10-27/28).
+  2026-10-27/28; the city posters: "some buildings are obviously closer to me, some further out and there is
+  something WAY further out that gives me a sense of scale", 2026-10-28).
 - **A gentle PARALLAX float, never a flat card.** When a held shot floats, its planes move by depth (Disney's multiplane
   idea): the near ground most, far planes little, the sky and the caption band not at all; slow, small, back at rest
   by every join; it adds depth in motion without adding movers. — ("switch it on if you think it will make the videos
@@ -115,7 +125,13 @@ Maintenance at the end).
   saturation and the clear motion; supporting life (a bird, walkers, snow, steam) stays subtle (smaller, lower contrast,
   thinner or no lines, softer colour, calmer motion): alive, but never competing. Supporting environment may be drawn in
   a softer, simpler style than the subject; not every moving piece gets the same treatment. Too many equal moving parts
-  = "I don't know what to keep my attention on". Tiers: `docs/look/CRAFT.md` §b. — (v3 G5b, 2026-10-27).
+  = "I don't know what to keep my attention on". The main objects are the crispest and most detailed; the supporting
+  world is simpler (fewer details, a more faceted, "low poly" build) yet made with the same shapes, colours and light,
+  so nothing looks off at a glance. Tiers: `docs/look/CRAFT.md` §b. — (v3 G5b, 2026-10-27; the city posters: "some
+  objects that are obviously the main parts and so they stand out and they have more details and cleaner lines and
+  just all around crispier and there are rest of the objects that compose the scene and give it fullness and live and
+  the right amount of density, but they are obviously less detailed, a bit more low poly but nonetheless coherently fit
+  into the style and the picture. Like you can't immidetaly spot that something is off", 2026-10-28).
 - **Every scene must FEEL ALIVE, calm and tiered: that is the key, not an object count.** A dense, detailed world (a
   city full of buildings and windows, a room full of real things), people near and far, layered depth, a recurring
   living character in every shot (Pip by default, as reference 1's cat and v1's Pip were; at tier B), ambient life

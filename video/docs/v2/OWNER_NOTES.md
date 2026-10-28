@@ -156,7 +156,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 ## The owner's verdict on the film
 - 2026-10-28 ~21:40 UTC (sent with the city-poster references, `docs/look/poster_refs/`): "i think visually in the video
   about Google we have made good improvemnets in terms of overall style"; "i personally like the last video about google
-  i think the story wasn't quite good, but visually it was nice to be honest" -> v2's look is the baseline of the
+  i think the story wasn't quite good, but visually it was nice to be honest"; then, set beside the posters: "I like the
+  colors of our last video about Google, but our video still feels cheap and lazy as if these pictures give a very
+  premium feel to it" -> v2's look is the baseline of the
   city-poster study (`docs/studies/2026-10-28_city_posters/`). -> rules: playbook Visual style (learn from the city
   posters, from v2's look) and Taste signals (places on screen).
 

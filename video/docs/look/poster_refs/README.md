@@ -9,6 +9,23 @@
   personally like the last video about google i think the story wasn't quite good, but visually it was nice to be
   honest. Obviously still far away from what we could do to be very successful studio, but initial steps"
 - "save these pictures into the repo as references"
+- "So what i like about these, its just feelings, research each further how professional studios approach this and how
+  my feelings translate to a concrete approach and techniques
+  1. Perspective - the pictures feel like they have "depth" like some buildings are obviously closer to me, some further
+  out and there is something WAY further out that gives me a sense of scale. Which we already talked about, but this is
+  obviously there and gives that feeling.
+  2. We also discussed previously that you can feel like there are some objects that are obviously the main parts and so
+  they stand out and they have more details and cleaner lines and just all around crispier and there are rest of the
+  objects that compose the scene and give it fullness and live and the right amount of density, but they are obviously
+  less detailed, a bit more low poly but nonetheless coherently fit into the style and the picture. Like you can't
+  immidetaly spot that something is off, only after looking at details for some time
+  3. Similarly the "nature" objects are very subtle and they are visually very interesting like they are obviously very
+  real, but if you look closely we combine the real effects with the lower poly kind of effects
+  4. I like the color scheme overall - they feel very vibrant and coherently fit together. I like the colors of our last
+  video about Google, but our video still feels cheap and lazy as if these pictures give a very premium feel to it"
+- "let me know if i am missing anything you observed too"
+- "then spin up a parallel thread - i want to discuss the ideas for what kind of video content would fit perfectly in
+  this kind of style as we discussed"
 
 **The files:** seven of a 19-poster Instagram carousel, as screenshots from the owner's phone (the account isn't named in
 them). The carousel index is in brackets.

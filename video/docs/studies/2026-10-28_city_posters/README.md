@@ -10,6 +10,20 @@ They also said: "i really like the style and i want us to experiment more with t
 "i think visually in the video about Google we have made good improvemnets in terms of overall style". So v2 ("One
 Small Window") is the BASELINE the owner likes: every look lesson starts from where v2 stands.
 
+**The owner's four feelings: the frame the synthesis answers** (verbatim in `video/docs/look/poster_refs/README.md`;
+"research each further how professional studios approach this and how my feelings translate to a concrete approach and
+techniques"; "let me know if i am missing anything you observed too"):
+1. **Depth and scale:** some buildings obviously closer, some further, "and there is something WAY further out that
+   gives me a sense of scale".
+2. **A hierarchy of finish:** the main objects stand out, "more details and cleaner lines and just all around
+   crispier"; the rest give fullness, life and density, "less detailed, a bit more low poly but nonetheless coherently
+   fit into the style ... you can't immidetaly spot that something is off".
+3. **Nature:** "very subtle" and "visually very interesting ... obviously very real, but if you look closely we combine
+   the real effects with the lower poly kind of effects".
+4. **Colour:** "very vibrant and coherently fit together"; the owner likes v2's colours, "but our video still feels
+   cheap and lazy as if these pictures give a very premium feel to it".
+Every lens says which feeling its findings explain, and what it observed that the owner didn't name.
+
 **This is a study, not a rule change.** Nothing here outranks `video/docs/look/DIRECTION.md` or the playbook; the owner
 approves what becomes a rule. Paths below are relative to the repo root `/home/user/Test-`.
 
@@ -22,7 +36,9 @@ approves what becomes a rule. Paths below are relative to the repo root `/home/u
 | `composition.md` | look lens 4 | frame structure, the one hero (the owner's "focus"), framing, the title zone, the 9:16 mapping |
 | `content_market.md` | content lens A | what place-led content works on short-form and for visual-explainer studios (sourced) |
 | `content_fit.md` | content lens B | our own evidence (v1-v3), content archetypes that fit cities and buildings, candidates now |
-| `STUDY.md`, `SUMMARY.md` | synthesis | the merged study; SUMMARY is one phone screen for the owner |
+| `pro_1_depth.md`, `pro_2_hierarchy.md`, `pro_3_nature.md`, `pro_4_colour.md` | pro-practice researchers | how professional studios, illustrators and art directors get each of the owner's four feelings, and the concrete techniques for our films |
+| `content_discussion.md` | the parallel thread (a helper session) | the owner's discussion of which content fits this style: ideas, the owner's reactions verbatim, picks |
+| `STUDY.md`, `SUMMARY.md` | synthesis | the merged study, organised by the owner's four feelings plus what they didn't name; SUMMARY is one phone screen |
 | `VERIFY.md` | adversarial check | what was checked, what was wrong, what was fixed |
 | `img/` | everyone | measurement sheets and annotated references (`<lens>_*.jpg`) |
 | `baseline/` | orchestrator | our films' frames at half size (540 x 960): `v1_tNN.NN.jpg` (php2shell, 30 fps, posted 10-25, the best performer), `v2_tNN.NN_<shot>.jpg` (One Small Window, the G7 master; `S1cover` = the cover frame), `v3_tNN.NN.jpg` (the laptop-price reel, posted, 64.5 % skipped); `baseline_v*_sheet.jpg` = one contact sheet per film |
