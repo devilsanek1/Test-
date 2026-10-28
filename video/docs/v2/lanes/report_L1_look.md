@@ -8,6 +8,61 @@ and the plum.
 Commits: 14ac5f5 ... 0b7f2a3 (the conform and the pre-critic clip); c8a9aed, 66aa2af and the last L1 commit (the fixes
 after the critic and after the cold viewer, then this clip).
 
+## v3: the clip for the art director, then the owner (2026-10-28)
+**The clip:** `video/deliverables/v2/v2r_G4_look_v3.mp4`, the MASTER encode: `scripts/render-media.mjs --master`
+(PNG frames, BT.709, x264 CRF 14 slow aq-mode 3, yuv420p). Frames 0-367 (0.00-6.13 s), 1080x1920, 60 fps, with the
+current mix, 4.1 MB.
+**The sheet:** `video/deliverables/v2/v2r_G4_look_v3_sheet.jpg` (0.4 scale, every 0.25 s).
+
+What v3 holds, on top of v2:
+- **The ground:** two-point perspective (one vanishing point on the canal's horizon; treads foreshortened 4.4x), near
+  things at full value, a fern pot and a chair cut by the bottom edge, the planter box and the stone pier.
+- **Depth:** the far city through lib/depth (atmos, planePalette, tone-on-tone windows), and a calm tower backing the
+  wing's west edge.
+- **Particles:** motes, glints in the glitter path, one leaf down the gutter.
+- **The float:** the parallax float, at rest to 1.10 s and from 5.80 s.
+- **People:** they sit at their depth. The seated public is off our bank; two people are on the bridge and one is
+  through the arch; the ducks are at the water's scale.
+- **The sky:** lib/sky's `<Sky spec={S1_EVENING}>`, one gentle OKLab gradient with the caption band flat. The low sun's
+  warmth replaces the halo, and the far haze = `S1_AIR` (#FDD5B8).
+- **The evening sun:** SUN0 (196, 772) r 52, setting behind the far roofs.
+
+**Checks (on the master)**
+- **check_banding** on the open sky (x 0-160 y 262-700, and x 1005-1080 y 0-590), at 0.5, 3.0 and 5.3 s: **PASS**
+  every time.
+
+  | | value |
+  |---|---|
+  | staircase | 0.00-0.06 |
+  | max step dE00 | 0.07-0.82 |
+  | grain | 0.28-0.29 L* |
+  | caption band dL* | 0.13-0.15 (L* 84.9) |
+
+  A box with the plane branch or the cloud bar in it counts their edges as steps.
+- **skyProblems(S1_EVENING, {ink}):** [].
+- **check_depth** on the master's frames: **0 FAIL** at 5.4 s (5 WARN) and at 3.0 s. At 5.4 s:
+
+  | | value |
+  |---|---|
+  | the wing's west edge, median \|ΔL*\| | 14.9 |
+  | her, median \|ΔL*\| | 25.4 |
+  | farthest plane dE from the air | 10.2 |
+  | front row (+3) dE from the air | 12.3 |
+  | the bank's lines to the vanishing points | 91 % |
+  | size inversion | none |
+
+- **check_light A/B:** OK at 0.5, 3.0 and 5.3 s. The brightest 5 % sits 0.015-0.028 H from the subject, and the light
+  layer leaves the caption band flat.
+
+**WARNs left:**
+- the ladder (it falls 2.1; it needs 3);
+- the subject → +3 step (7.7; it needs 12);
+- the far plane's edges (0.85x);
+- the copies' row against the wing (10.4; it needs 15);
+- the bank's texture gradient (the near half's things).
+
+---
+
 ## S1 on lib/depth + lib/particles (2026-10-28; CRAFT §f, conform_L1 §11; the sky lib follows)
 **What changed**
 - **Haze.** It runs through `atmos` (lib/depth), and the far rows go through `planePalette` with S1's one atmosphere
