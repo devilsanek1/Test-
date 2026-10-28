@@ -31,13 +31,18 @@ The measures (CIE L*a*b* D65 from sRGB; C* = chroma, h = CIE hue in degrees; dE 
   patch      the geometric patchwork per region: Felzenszwalb segments on the smoothed image; block widths as % of the
              frame width, rectangularity (area / bbox), neighbouring blocks' dE and |dL*| (shared edge >= 12 px), and
              edge orientation (share of edge pixels within 7.5 deg of level, plumb, the two diagonals).
-  light      lit / shade pairs (boxes): dL*, C* ratio, hue turn (shade minus lit).
-  overlap    translucent planes: from A (ground), A' (ground under the plane), B, B' -> alpha and the plane colour
-             (alpha-over in linear RGB), and the multiply model's error.
+             Plus the straight-edge step: dE and |dL*| 5 px either side of every level or plumb edge pixel.
+  planes     translucent planes along a line (plateaus of one colour and the steps between them: the third tones).
+  light      lit / shade pairs (boxes): dL*, C* ratio, hue turn (shade minus lit); shade_steps = the retro proxy
+             (retro_tools/light/shadepairs.py): the area of flat regions next to a lighter one of the same hue family.
   water      reflection: the column profile of the source above the waterline against the water below (correlation),
              horizontal vs vertical edge energy, the bar height (autocorrelation down the water).
-Every box is [x0, y0, x1, y1] in image px. Scratch defaults to the session scratchpad; nothing here writes outside
---out / --img. Deterministic (seeded k-means and samples).
+  encode     a texture overlay (grain, mottle; locked to the world or the screen, or re-seeded) on a panning film frame
+             through the master encode and two platform-like re-encodes: bitrate, texture kept, frame-to-frame change,
+             scripts/qa/check_banding.py's verdict.
+  dna        palettes.json-format palettes against palette_board.py's DNA and the never bands (colours at L* >= 40).
+Every box is [x0, y0, x1, y1] in image px. Scratch defaults to /tmp/posters-style (the study brief); nothing here writes
+outside --out / --img. Deterministic (seeded k-means, noise and samples).
 """
 from __future__ import annotations
 
@@ -575,7 +580,7 @@ def sky_profile(lab: np.ndarray, valid: np.ndarray, reg: dict, step: int = 10) -
     y_start = int(rows.min()) + 4
     excl = np.zeros(valid.shape, bool)
     tx0, ty0, tx1, ty1 = reg['title']
-    excl[ty0 - 8:ty1 + 8, tx0 - 8:tx1 + 8] = True
+    excl[max(0, ty0 - 8):ty1 + 8, max(0, tx0 - 8):tx1 + 8] = True  # clamp: a negative start would wrap
     prof = []
     for y in range(y_start, y_end - step, step):
         sl = lab[y:y + step, x0:x1].reshape(-1, 3)
@@ -758,29 +763,6 @@ def light_pair(lab: np.ndarray, lit, shade) -> dict:
             'shade_LCh': [round(float(Lb), 1), round(float(Cb), 1), round(float(hb))],
             'dL': round(float(Lb - La), 1), 'C_ratio': round(float(Cb / max(0.5, Ca)), 2),
             'dh': round(float(((hb - ha) + 180) % 360 - 180)), 'dE': round(float(np.linalg.norm(a - b)), 1)}
-
-
-def to_lin(lab):
-    rgb = lab_to_srgb(lab) / 255
-    return np.where(rgb <= 0.04045, rgb / 12.92, ((rgb + 0.055) / 1.055) ** 2.4)
-
-
-def overlap(lab: np.ndarray, A, A2, B=None, B2=None) -> dict:
-    """A = a ground, A2 = the same ground under the translucent plane (B, B2 a second ground, optional)."""
-    a, a2 = to_lin(box_lab(lab, A)), to_lin(box_lab(lab, A2))
-    out = {'A': hexc(box_lab(lab, A)), 'A_under': hexc(box_lab(lab, A2)),
-           'dL': round(float(box_lab(lab, A2)[0] - box_lab(lab, A)[0]), 1),
-           'dE': round(float(np.linalg.norm(box_lab(lab, A2) - box_lab(lab, A))), 1)}
-    if B is not None:
-        b, b2 = to_lin(box_lab(lab, B)), to_lin(box_lab(lab, B2))
-        da, db = a - b, a2 - b2
-        alpha = 1 - float(np.dot(da, db) / max(1e-9, np.dot(da, da)))  # (1 - alpha) = |a2 - b2| / |a - b|
-        P = (a2 - (1 - alpha) * a) / max(1e-6, alpha)
-        mult_a, mult_b = a2 / np.maximum(1e-6, a), b2 / np.maximum(1e-6, b)
-        out.update({'B': hexc(box_lab(lab, B)), 'B_under': hexc(box_lab(lab, B2)), 'alpha': round(alpha, 2),
-                    'plane_lin_rgb': [round(float(x), 3) for x in P],
-                    'multiply_mismatch': round(float(np.abs(mult_a - mult_b).mean()), 3)})
-    return out
 
 
 def water_metrics(lab: np.ndarray, valid: np.ndarray, box, src=None) -> dict:

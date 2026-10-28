@@ -1,11 +1,10 @@
 # Pro practice 2: a hierarchy of finish (crisp heroes, a simpler world that still belongs)
 
-*City-poster study, pro-practice researcher 2, 2026-10-28. Analysis only: nothing here is a rule until the owner approves
-it; `video/docs/look/DIRECTION.md` stands (incl. the owner's answers of 2026-10-28 ~22:10: one look, the VERY subtle
-texture test, lit and shade faces, a full value range; outline-free edges, the patchwork and layout still open).
-Meter: `video/scripts/look/posters/pro_2_hierarchy.py` (all numbers below; JSON in `/tmp/posters-pro_2_hierarchy/`).
-Sheets: `img/pro_2_hierarchy_tiers.jpg` (A / B / C near / C far crops at one magnification, v2 S1 in the last row),
-`img/pro_2_hierarchy_detailmap.jpg` (where the small features sit, 7 posters + v2 S1, S4, S7).*
+*City-poster study, pro-practice 2, 2026-10-28. Analysis only: `video/docs/look/DIRECTION.md` stands (with the owner's
+answers of ~22:10: one look, the VERY subtle texture test, lit and shade faces, a full value range; outlines, the
+patchwork and layout still open). Numbers: `video/scripts/look/posters/pro_2_hierarchy.py`. Sheets: `img/pro_2_hierarchy_tiers.jpg`
+(A / B / C near / C far at one magnification, v2 S1 last), `img/pro_2_hierarchy_detailmap.jpg` (where the small
+features sit: the 7 posters and v2's 8 shots).*
 
 **The owner's feeling** (verbatim in `docs/look/poster_refs/README.md`): "some objects that are obviously the main parts
 and so they stand out and they have more details and cleaner lines and just all around crispier and there are rest of the
@@ -42,9 +41,10 @@ mountains `[660,634,1206,799]` (0.1 %). Hanoi's far city `[360,574,1200,829]` is
 
 **What creates the feeling, three findings:**
 1. **The tiers change resolution, never style.** What stays: the face size (A 49 px, C near 49 px), the palette (C sits
-   within CIEDE2000 ~6 of the hero's colours), the edge (2.3-2.7 px on every tier: nothing is blurred or faded), the light
+   within CIEDE2000 ~4-6 of the hero's colours), the edge (2.3-2.7 px on every tier: nothing is blurred or faded), the light
    and the paper texture (on every plane, weaker with distance: 1.5 / 1.1 / 0.7). What changes: the small features
-   (A 3.8x C near, 10x C far), the tones inside a face (9.5 vs 6), and on the far plane the value range and chroma.
+   (A 3.8x C near, 10x C far), the tones inside a face (9.5 vs 6: painterly mottling and soft ramps, which our rules
+   carry as rule 5's flat tone steps plus rule 4's opt-in texture, never gradients), and far, the value range and chroma.
 2. **The patchwork is the "low poly" layer, and it is FULL.** It keeps the hero's density of shapes (14.5 vs 15.3 per
    10,000 px) and its value range (64 vs 62) but drops the small features, cutting stairs, walls, roofs and reflections
    into flat rectangles and diagonals. At a glance it reads as more city; on a long look, as geometry.
@@ -57,61 +57,54 @@ mountains `[660,634,1206,799]` (0.1 %). Hanoi's far city `[360,574,1200,829]` is
 contrast 12.1 against 3.0 in the near ground, 4x; the posters' hero vs patchwork 1.1x) and by more of the same detail (S3:
 her window 17.8 % small features, the neighbours' 9.6 %), but every tier has the same kind of finish: one flat fill per
 face (tone spread 1.3-3.2, below the posters' FAR planes), no texture. Its largest area, the near quay and
-props (31 % of the frame), is the emptiest: 3.2 shapes per 10,000 px (patchwork 14.5), L* range 30 (64). Its detail
-clusters in a few spots (the top 10 % of tiles hold 68-91 % of its small features; posters 51-71 %) with dead flats
-between. For this feeling, that is what reads "cheap and lazy": big areas with nothing to read, and a hero no richer
-in kind than a crate.
+props (31 % of the frame), is the emptiest: 3.2 shapes per 10,000 px (patchwork 14.5), L* range 30 (64). Across its 8
+shots (captions out) it has about half the posters' small features (2.9 % of the frame vs 5.5 %, titles out), clustered
+in a few spots (the top 10 % of tiles hold 58-86 %, median 67 %; posters 44-64 %, median 48 %) with dead flats between.
+For this feeling, that is what reads "cheap and lazy": big areas with nothing to read, and a hero no richer in kind
+than a crate.
 
 ## 2. How the professionals do it
 Read through search summaries (Valve's PDFs on the steamstatic CDN were not reachable from this session).
-1. **Valve, Team Fortress 2** (Mitchell, Francke, Eng, "Illustrative Rendering in Team Fortress 2", NPAR 2007; Mitchell,
-   "Stylization with a Purpose", GDC 2008: https://cdn.steamstatic.com/apps/valve/2008/GDC2008_StylizationWithAPurpose_TF2.pdf):
-   a "read hierarchy" (team, then class, then weapon); environments of simple forms, minimised visual noise in texture
-   and geometry, an impressionistic painterly look; characters designed to read with NO internal detail (silhouette
-   first), their highest contrast at the chest, more saturated than the desaturated world; one illustrative shading
-   model for both. **Teaches:** finish by role inside one rendering model; silhouette before detail.
-2. **Riot, the Summoner's Rift update** ("Updating Summoner's Rift", 2014-06; "Defining the Rift's Visual Style",
-   2014-11-08: https://archive.runeterra.net/na/riot-official/5E5saupc): visibility ordered UI > effects > champions >
-   environment; the tools were colour control, LOD control and clamped value ranges; clarity = art that keeps visual
-   clutter down, in a handcrafted style. **Teaches:** LOD and value clamps are art-direction levers, set per tier.
-3. **Fortiche, Arcane** (80.lv, "Arcane artists show how they combine traditional art & 3D for backgrounds", est. 2022:
-   https://80.lv/articles/arcane-artists-show-how-they-combine-traditional-art-3d-for-backgrounds): the painters loosen
-   most of a background but sharpen the parts the characters interact with, to match the 3D characters' detail.
+1. **Valve, Team Fortress 2** (Mitchell, Francke, Eng, NPAR 2007; Mitchell, "Stylization with a Purpose", GDC 2008:
+   https://cdn.steamstatic.com/apps/valve/2008/GDC2008_StylizationWithAPurpose_TF2.pdf): a "read hierarchy" (team, class,
+   weapon); environments of simple forms with minimised visual noise in texture and geometry, painterly; characters that
+   read with NO internal detail, their highest contrast at the chest, more saturated than the world; one shading model
+   for both. **Teaches:** finish by role inside one rendering model; silhouette before detail.
+2. **Riot, the Summoner's Rift update** (dev blogs 2014-06 and 2014-11-08, "Defining the Rift's Visual Style":
+   https://archive.runeterra.net/na/riot-official/5E5saupc): UI > effects > champions > environment, by colour control,
+   LOD control and clamped value ranges, in a handcrafted style. **Teaches:** LOD and value clamps as art direction.
+3. **Fortiche, Arcane** (80.lv, est. 2022: https://80.lv/articles/arcane-artists-show-how-they-combine-traditional-art-3d-for-backgrounds):
+   the painters loosen most of a background but sharpen what the characters touch, to match the 3D characters' detail.
    **Teaches:** a finish gradient around the action, never a cliff.
-4. **Sony Imageworks, Spider-Verse** (Cartoon Brew, "If It's Not Broke, Break It", 2018-12, est.:
+4. **Sony Imageworks, Spider-Verse** (Cartoon Brew, est. 2018-12:
    https://www.cartoonbrew.com/feature-film/if-its-not-broke-break-it-sony-imageworks-renegade-approach-to-spider-man-into-the-spider-verse-167321.html):
-   out-of-focus planes shown as offset-print misregistration, not lens blur (Danny Dimian). **Teaches:** lower a tier in
-   the style's own vocabulary (for us: bigger facets, fewer tones), never with a filter (blur, opacity).
-5. **James Gurney**, "Automated Selectivity" (Gurney Journey, 2011-05-23:
-   https://gurneyjourney.blogspot.com/2011/05/automated-selectivity.html): the soft regions of a photo do not hold a
-   viewer's interest the way the softened regions of a Sargent do. **Teaches:** C is designed simplification; a
-   mechanical reduction reads as missing work.
-6. **Eye tracking: Santella and DeCarlo**, "Visual Interest and NPR" (NPAR 2004:
-   https://isgwww.cs.uni-magdeburg.de/~stefans/npr/entry-Santella-2004-VIN.html): viewers examine as many places in
-   images of uniformly high or uniformly low detail as in photos, but are drawn to where detail is locally preserved in
-   meaningfully abstracted images; **Cole et al.**, "Directing Gaze in 3D Models with Stylized Focus" (EGSR 2006:
-   https://gfx.cs.princeton.edu/pubs/Cole_2006_DGI/cole06_stylizedfocus.pdf): local changes of saturation, contrast and
-   line pull the gaze, verified by eye tracking. **Teaches:** the hierarchy of finish is a measured gaze driver; a
-   uniform finish (v2) gives the eye no such cue.
-7. **Pixar, The Good Dinosaur** (2015; Sharon Calahan in AWN:
-   https://www.awn.com/print/animationworld/sharon-calahan-talks-lighting-and-visual-development-good-dinosaur): some
-   reviewers found the soft cartoon cast at odds with the photoreal land; Calahan's "painterly realism" (you can't see
-   every leaf on a tree, yet you know it's a tree). **Teaches:** a change of rendering MODE jumps out; a change of LEVEL
-   inside one mode does not; simplification keeps identity.
-8. **Charley Harper, "minimal realism"** (Audubon, "Counting the Wings", Jan-Feb 2008:
-   https://www.audubon.org/magazine/january-february-2008/counting-wings): the subject reduced to its simplest visual
-   terms without losing its identity (his line, in several wordings: he counts the wings, not the feathers). **Teaches:** what C keeps
-   (silhouette, proportions, colour, the count of big parts) and what it drops (the small features).
-9. **Lost and found edges** (Matt Kohr, Ctrl+Paint, https://www.ctrlpaint.com/videos/lost-edges; Utrecht University,
+   out-of-focus planes as offset-print misregistration, not lens blur (Danny Dimian). **Teaches:** lower a tier in the
+   style's own vocabulary (for us: bigger facets, fewer tones), never with a filter (blur, opacity).
+5. **James Gurney**, "Automated Selectivity" (2011-05-23: https://gurneyjourney.blogspot.com/2011/05/automated-selectivity.html):
+   a photo's soft regions do not hold interest the way a Sargent's softened regions do. **Teaches:** C is designed
+   simplification; a mechanical reduction reads as missing work.
+6. **Eye tracking:** Santella and DeCarlo, "Visual Interest and NPR" (NPAR 2004:
+   https://isgwww.cs.uni-magdeburg.de/~stefans/npr/entry-Santella-2004-VIN.html): images of uniformly high or uniformly
+   low detail are scanned like photos; locally preserved detail in a meaningfully abstracted image draws the gaze. Cole et
+   al., "Directing Gaze in 3D Models with Stylized Focus" (EGSR 2006: https://gfx.cs.princeton.edu/pubs/Cole_2006_DGI/cole06_stylizedfocus.pdf):
+   local saturation, contrast and line changes pull the gaze. **Teaches:** a finish hierarchy is a measured gaze driver;
+   a uniform finish (v2) gives the eye no such cue.
+7. **Pixar, The Good Dinosaur** (2015; Sharon Calahan, AWN: https://www.awn.com/print/animationworld/sharon-calahan-talks-lighting-and-visual-development-good-dinosaur):
+   some reviewers found the soft cartoon cast at odds with the photoreal land; Calahan's "painterly realism" (you can't
+   see every leaf, yet you know it's a tree). **Teaches:** a change of MODE jumps out, a change of LEVEL inside one does not.
+8. **Charley Harper, "minimal realism"** (Audubon, Jan-Feb 2008: https://www.audubon.org/magazine/january-february-2008/counting-wings):
+   the subject at its simplest without losing its identity (he counts the wings, not the feathers). **Teaches:** what C
+   keeps (silhouette, proportions, colour, the big parts) and drops (the small features).
+9. **Lost and found edges** (Proko, "Lost Edges": https://www.proko.com/course-lesson/lost-edges; Utrecht University:
    https://research-portal.uu.nl/en/publications/macchie-passages-and-edges-lost-amp-found/): an edge is lost where two
-   shapes are close in value and hue, found where they differ. **Teaches:** in flat colour, emphasis is the fills' step.
+   shapes match in value (and hue), found where they differ; lost edges merge shapes into masses. **Teaches:** in flat
+   colour, emphasis is the step between two fills.
 10. **Game LOD practice** (Wikipedia, "Level of detail (computer graphics)": by distance "or according to other metrics
-   such as object importance"; texel density, one per scene: https://www.vertexschool.com/texel-density-guide).
-   **Teaches:** each object's level from its role and on-screen size; one detail density per plane.
-11. **Shedworks, Sable** (GDC 2022, https://gdcvault.com/play/1027721/The-Art-of-Sable-Imperfection): a flat-shaded,
-   lined world read through lighting first and a distant fog. **Teaches:** one light and one air make it one world.
-Dropped after search: Kurzgesagt (no first-party writing on detail hierarchy found), Marco Bucci, Sinix and Feng Zhu (no
-checkable source found in this pass), Breath of the Wild's painterly far LOD (not confirmed).
+   such as object importance"; one texel density per scene: https://www.vertexschool.com/texel-density-guide); Shedworks'
+   Sable (GDC 2022: https://gdcvault.com/play/1027721/The-Art-of-Sable-Imperfection: a flat, lined world read through
+   lighting and a distant fog). **Teaches:** level by role and screen size, one density per plane, one light and air.
+Dropped after search: Kurzgesagt (no first-party writing on this found), Marco Bucci, Sinix, Feng Zhu (no checkable
+source found), Breath of the Wild's painterly far LOD (not confirmed).
 
 ## 3. The concrete approach for our films
 **3.1 The finish ladder** (a proposal; px at 1080 x 1920; posters' medians in brackets; "est." = set by eye, to tune in
@@ -184,8 +177,8 @@ A >= 60 % of the motion; a moving near patchwork keeps local contrast <= 7); LOD
 
 ## 4. What it would change in v2 (the baseline)
 Tiers from `docs/v2/THROUGHLINE.md` §4; "before" from `baseline_v2_sheet.jpg`, S1 and S3 measured.
-- **S1 (the cover):** before: the glass door and W at the café crate's finish; the near quay (31 % of the frame) three
-  flat planes (3.2 shapes / 10,000 px, local contrast 3.0). After: the door, its canopy letters and W at lod 2 (frame
+- **S1 (the cover):** before: the glass door at the café crate's finish; the near quay (31 % of the frame) three flat
+  planes (3.2 shapes / 10,000 px, local contrast 3.0). After: the door, its canopy letters and W (when seen) at lod 2 (frame
   profiles, glazing bars, 3 tones; she is ~0.3 % of the frame, too small to carry finish, so her objects do); the Google
   wing at lod 1; the far roofs as far patchwork (already close: 0.9 %, 2.6); the quay as near patchwork (~50 px paving
   facets, dL* 4-10; a bollard, a drain, a mooring ring as marks); the café set at lod 1 (no plank stripes on the crate).
@@ -203,7 +196,7 @@ Tiers from `docs/v2/THROUGHLINE.md` §4; "before" from `baseline_v2_sheet.jpg`, 
   behind at lod 0-1. **Everywhere:** the texture's plane factors if the test keeps it; one ladder in every shot.
 
 ## 5. What the owner didn't name that matters for this feeling
-1. **The hero's size.** Each poster's main hero box covers 4-20 % of the frame (median 14 %); v2's S1 subject ~0.3 %.
+1. **The hero's size.** Each poster's main hero box covers 4-20 % of the frame (median ~15 %); v2's S1 subject ~0.3 %.
    Below ~3 px a feature vanishes on a phone: the crisp object is big where its finish is the point (or the camera
    pushes in). In a city film the landmark is the natural A.
 2. **Fullness is shape count, not small features:** the patchwork has the hero's density of shapes, v2's flats a quarter

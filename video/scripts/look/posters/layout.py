@@ -194,7 +194,7 @@ def panel_zones(p):
     d.rectangle(p.box(CREDIT_TAB), outline=(110, 80, 50), width=2)
     d.rectangle(p.box(DRAFT_LABEL), outline=(110, 80, 50), width=2)
     # labels
-    label(d, p.pt(10, 8), 'top UI  y < 180 (TikTok ad 240-288)', 15)
+    label(d, p.pt(10, 8), 'top UI  y < 180 (ad templates: 240-288)', 15)
     label(d, p.pt(560, 200), 'top gutter y 0-290: framing only', 15)
     label(d, p.pt(70, 195), 'credit tab y 185-288 (v2)', 13)
     label(d, p.pt(10, 296), 'CAPTION BAND y 290-600 (one flat field)', 15, bold=True)
