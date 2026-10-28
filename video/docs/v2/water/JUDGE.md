@@ -18,9 +18,11 @@ OWNER_NOTES) outrank it, then `docs/look/DIRECTION.md`, then `docs/look/CRAFT.md
 
 ## How it was judged
 - **What was rendered:** A at `09eb906` and B at `c48eb2d`, both still the latest commits of their files. A's own
-  `final/` stills predate its last edit, so A was re-rendered. The frames are 0, 3, 6, 9, 12, 60, 150, 228, 300, 345, 360 and 367 of WaterStudyBase / A / B, plus 150-209
-  consecutive (1 s) of each and the light-off pair at 150 and 300. The v5 frames 60 / 150 / 228 / 300 come from the
-  look clip itself. WaterStudyBase's f150 has the same sha256 as DIAGNOSIS §4, so the base is v5 byte for byte.
+  `final/` stills predate its last edit, so A was re-rendered.
+  - Frames 0, 3, 6, 9, 12, 60, 150, 228, 300, 345, 360 and 367 of WaterStudyBase, WaterStudyA and WaterStudyB.
+  - The 60 consecutive frames 150-209 (1 s) of each, and the light-off pair at 150 and 300.
+  - The v5 frames 60 / 150 / 228 / 300 come from the look clip itself.
+  - WaterStudyBase's f150 and f300 have the same sha256 as DIAGNOSIS §4, so the base is v5 byte for byte.
 - **How it was looked at:** at 360 px wide (the phone test), at 720 px wide (what a phone at arm's length resolves), at
   1:1, at 2x on details (the arch, the glitter, the gold column, the boats), the frame-0 draw-in, a motion heat map
   over 1 s, and consecutive 1:1 frames.
@@ -78,7 +80,6 @@ pixels.
 - Nothing new is born in 5.80-6.40 s, read in the code (steady fields keep their pace). A's duck rings start at 0.45 +
   3.4 k s, and the last ghost reflection pops at 5.16 s.
 - Pip parts from the water (dE 28-33).
-- Both base frames, f150 and f300, carry DIAGNOSIS §4's sha256.
 
 ## Why A wins, why it does not ship yet, and what B does better
 - **A's strengths:**
@@ -106,6 +107,8 @@ pixels.
 - **The colour identity is still the owner's call** (research §5.6). The look clip v6 should show the cool canal (the
   approved palette). B's warm memory stays a documented knob (graft G8), shown only if the owner asks for a warmer
   canal.
+- **Two rules clash here.** DIAGNOSIS tell 4 and research R4 say a reflection keeps its own hue family. DIRECTION rule
+  6 ("a warm world held by one cool field") outranks both, so A's rule is the default, and G8 is the owner's knob.
 
 ## Grafts from B (specific, in `src/v2r/water_study/candB_lib.ts` / `candB.tsx`)
 1. **G1, the mass builder (`buildMass`, `barPath`, `sliceGrid`, `snapRow`).**
@@ -197,9 +200,16 @@ pixels.
 ## Files
 - **Measures:** `judge_metrics.py` (this folder).
 - **The candidates:** `cand_A.md`, `cand_B.md`, their sheets, `src/v2r/water_study/candA*.ts(x)`, `candB*.ts(x)`.
-- **The judge's renders** were scratch on the RAM disk and are not kept. To reproduce them:
-  - Render with `scripts/render-frames.mjs` (DIAGNOSIS §3.3) for WaterStudyBase, WaterStudyA and WaterStudyB at
-    1.0 / 2.5 / 3.8 / 5.0 s, and for the motion at the 60 frames 150-209.
-  - Run `judge_metrics.py` on the folders.
-  - Pass `--props='{"lightOff":true}'` for the light check's A side (lib/light reads it from any composition's input
-    props).
+- **The judge's renders** were scratch on the RAM disk and are not kept. To reproduce them (from `video/`, one folder
+  per composition; render-frames takes seconds and writes `f00150.png` ...):
+  ```sh
+  E=--entry=src/entry-v2r-waterstudy.tsx
+  for C in Base A B; do node scripts/render-frames.mjs WaterStudy$C /tmp/ws$C 1.0,2.5,3.8,5.0 $E --concurrency=2; done
+  python3 -I docs/v2/water/judge_metrics.py --dirs v5=/tmp/wsBase,A=/tmp/wsA,B=/tmp/wsB --frames 60,150,228,300
+  T=$(python3 -c "print(','.join(f'{f/60:.5f}' for f in range(150,210)))")
+  for C in Base A; do node scripts/render-frames.mjs WaterStudy$C /tmp/m$C $T $E --concurrency=2; done
+  python3 -I docs/v2/water/judge_metrics.py --dirs v5=/tmp/mBase,A=/tmp/mA --motion 150-209
+  ```
+- **The light check's A side:** the same frames with `--props='{"lightOff":true}'` (lib/light reads it from any
+  composition's input props). Then run `scripts/qa/check_light.py off.png on.png --sky '#BCDCCF' --exclude
+  0,0,1080,950 --subject 520,920,700,1100` (at 5.0 s: `--subject 440,920,700,1100`).
