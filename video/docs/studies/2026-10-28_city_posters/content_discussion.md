@@ -1,10 +1,10 @@
 # Content discussion: which stories fit the city-poster style
 
-**State (2026-10-28 ~22:40 UTC): OPEN.** The owner has steered twice: not content ABOUT real cities (exchange 2), and
-not made-up content either (exchange 3's myths, fables and metaphor worlds: "completely made up content like", a
-message cut off there). Exchange 4 sent: the middle, true stories whose action happens in a big world we can show, in
-seven kinds with a real example each; strongest for us: nature hits a town, one person crosses a big world, a crowd
-does one thing at once. Asked the owner to confirm the middle and finish the cut-off thought. No picks yet.
+**State (2026-10-28 ~22:45 UTC): DIRECTION FIRMING UP.** The owner likes tech topics told through these views, data
+centres especially, and wants WOW stories (driverless taxis in London: "good too, but perhaps not as WOW"). Two scouts
+(max effort) are hunting: WOW data-centre stories (`discussion_scouts/wow_datacentres.md`) and other WOW tech set in a
+big world (`discussion_scouts/wow_tech_world.md`). Next: edit their finds into a shortlist with the column chart for
+the owner. No pick yet; who produces the video stays the owner's call.
 
 Notes: `content_market.md` and `content_fit.md` (the orchestrator's content track, scoped to tech and AI) are folded in
 below; their final versions (pulled ~22:20 UTC) changed nothing here. `content_fit.md`'s best kinds already include two
@@ -44,6 +44,13 @@ pick); this thread never edits `video/docs/v4/`. If the discussion lands on a to
   completely made up content like" (the message ends there)
   -> captured: playbook, Taste signals, "Places on screen": neither extreme; the middle is true stories whose action
   happens in a big world we can show; a metaphor world only when a true story needs it and the facts map (v1).
+- 2026-10-28 ~22:38 UTC (in this thread, on exchange 4): "okay so i kind of like the direction of tech related topics
+  here / like datacenters do fit pretty nice in here - like we have perhaps some wow stories here like i've heard
+  someone plans a datacenter in new your or like a datacenter in some weird places or datacenters kind of fit
+  interestingly here / the topic about waymos or driverless taxis in London would be good too, but perhaps not as WOW,
+  we need some WOW stories here"
+  -> captured: playbook, Taste signals ("Places on screen": the owner leans to tech told this way, data centres
+  especially; every pick needs a WOW; the "Topics" bullet notes the return to tech).
 
 ## How an idea is judged here
 - **The look** (the seven posters, `video/docs/look/poster_refs/`): one real place, one hero landmark, layered depth
@@ -165,6 +172,24 @@ mean? Your message cut off after 'like', so tell me if I misread."
 this weekend). Sources seen for 6 (search results, 2026-10-28):
 https://www.arabnews.com/node/2629661/world ; https://www.khaosodenglish.com/news/crimecourtscalamity/2026/01/06/global-fraud-hub-exposed-new-scam-compound-50km-from-poipet/ ;
 https://www.nationthailand.com/news/asean/40060787
+
+**The owner's reaction:** ~22:38 UTC: tech topics here, data centres especially; WOW stories; London's driverless taxis
+"not as WOW" (verbatim above). -> exchange 5.
+
+### 5. ~22:45 UTC: two scouts on WOW stories (sent)
+Launched (max effort, lean: two scouts, this thread as editor): WOW data-centre stories (the New York one the owner
+heard about; weird places: orbit, the sea floor, bunkers, chapels, mines; heat for pools and homes; district-sized
+campuses; the 3 Nov votes) and WOW tech set in a big world (rocket-catching towers, fusion machines, giant
+telescopes, record builds; no robotaxi launches, no product launches). Each story: the WOW, why now, the big view and
+frame 0, the so-what, ad or news, sources, mood, scores on TOPIC_CRITERIA plus WOW. Quick leads sent to the owner
+meanwhile (search results, to check): data centres in orbit (Starcloud flew an Nvidia H100 in Nov 2025; SpaceX filed
+for up to a million satellites, 30 Jan 2026; Starcloud-2 reportedly due ~Oct 2026, unconfirmed); New York State's
+one-year pause on big new data centres (Ars Technica, July 2026:
+https://arstechnica.com/tech-policy/2026/07/new-york-is-the-first-state-to-impose-a-data-center-moratorium/); the
+3 Nov votes (Boulder City); old but WOW: a data centre in a Cold War bunker under Stockholm (Pionen), a supercomputer
+in a Barcelona chapel (MareNostrum), a small data centre heating a public pool in Devon (2023).
+Orbit sources seen: https://www.fierce-network.com/cloud/space-data-centers-starcloud-spacex-and-project-suncatcher-explained ;
+https://www.geekwire.com/2026/orbital-ai-seattle-area-startup-starcloud-hits-1-1b-valuation-to-build-space-based-data-centers/
 
 **The owner's reaction:** (waiting)
 
