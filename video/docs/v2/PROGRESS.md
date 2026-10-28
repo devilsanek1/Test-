@@ -2,6 +2,13 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Note 2026-10-28 14:50 UTC: G4 look clip v6 sent to the owner (the new water)
+
+`deliverables/v2/v2r_G4_look_v6.mp4` (master; S1 0-6.13 s) + `_water_vs_v5.jpg`: S1's canal is the shared `src/lib/water.tsx`
+(research, two candidates, a judge, the build, a fresh critic, one fix pass: `docs/v2/water/`): the mirrored evening sky toned toward the
+water, every reflection hung from its own waterline, the lit door as a short gold block over three slivers, the sun's glitter as still
+gold slivers, 6-11 calm ripple lines, Canal Mint restored (median C* 14.8); nothing outside the water changed; banding PASS.
+
 ## Snapshot 2026-10-28 14:34 UTC (hourly)
 
 The fresh-eyes critic on v6's water (`docs/v2/water/CRITIC.md`, 13:40): "not signed off yet, but close": every tell the owner named is
