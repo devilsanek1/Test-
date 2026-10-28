@@ -2,6 +2,12 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 16:21 UTC (hourly)
+
+DONE 15:57: the shared water in S2, S3, S4 and S5, and S8's seam fixed (`docs/v2/water/SWAPS.md`, 01afb08). Running: the full 60 fps
+master (`deliverables/v2/v2r_G5_assembly_v1.mp4`) + the gate checks, then the fresh cold + art/flow review. Spend: ~$20 since 15:28;
+estimated week ~94 %; the film projects ~98-99.6 %.
+
 ## Snapshot 2026-10-28 15:28 UTC (hourly)
 
 The owner approved the G4 look clip v6 ("Yeah this is better keep going"). Running (wf_9f2d1e98-ed4): the shared water into S2-S5
