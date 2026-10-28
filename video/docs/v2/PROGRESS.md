@@ -2,6 +2,18 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 01:18 UTC (hourly)
+
+| part | owner | status |
+|---|---|---|
+| Depth + particles toolkit | local (done) | built, adversarially checked and fixed (deterministic, ~0.4 ms/frame, v1/v3 untouched, check_depth hardened) |
+| Pro sky | local `wf_951757bf-213` | built (lib/sky, check_banding, `--master` encode: PNG frames, one-pass bt709, x264 CRF 14 slow aq 3); critic finishing |
+| S1 look clip | L1 | v3 rendered (sky, depth, particles, parallax float; all checks pass); art director: FIX FIRST (sun tooth, blank tower slab, particles too small for a phone; should: calmer terrace, one camera for the wing, birds); L1 doing ONE combined pass -> v4; then the owner |
+| Docs | orchestrator | STYLE.md sky clash fixed; CRAFT §f "failures the eye catches first"; PIPELINE G4: an independent art-director check before the owner |
+| L2-L6 | paused | resume after the owner sees the look clip |
+
+**Spend:** orchestrator $3,779.49 (+$51 in the last hour), L1 $156.46 (+$17). Estimated weekly ~72-73 % (owner 68 % at 23:22). Projection: inside 100 %.
+
 ## Snapshot 2026-10-28 00:18 UTC (hourly)
 
 | part | owner | status |
