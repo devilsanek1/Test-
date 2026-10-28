@@ -5,8 +5,9 @@
 //   S7Sun        SUN2 (260, 620) r 45: a flat disc, no halo (the sky carries the warmth), WHOLE in open sky above the
 //                board's top-left (nothing crosses the 7x window of the push-through, V2S7_plan S7_SUN_WINDOW)
 //   S7FarRoofs   +3: a far London row on the sunset band (three houses, chimneys, tone-on-tone windows), every fill
-//                one step toward the air (planePalette +3, pre-compensated for the pen: V2S7_plan farPalette)
-//   S7FarTrees   +2: the far street's plane trees in autumn, three crowns and their trunks (planePalette +2)
+//                its step toward the air (planePalette at 4.3: nearly the air itself, pre-compensated for the pen)
+//   S7FarTrees   +2: the far street's plane trees in autumn haze, gold crowns lit on the sun side (each value its own
+//                step toward the air: the ladder falls >= 3 per plane from the wing, CRAFT §f.2)
 //   S7WestEdge   +1: the forecourt's west edge, flush with the wing: a clipped hedge on a low limestone wall (z 25)
 // Tier C throughout (<Tier tier="environment" bg={S7_AIR}>): flat fills, no line; the far tops stay at y >= 690 where
 // the float could lift them over the board's top rail (x >= 100).
@@ -16,6 +17,7 @@ import {Sky} from '../../lib/sky';
 import {Tier} from '../../lib/tier';
 import {Batch, Paint, P, ovalPath, lobes} from '../kit/canal/core';
 import {crown as crownD} from '../../lib/sketch';
+import {toneOnTone} from '../../lib/depth';
 import {SUN2} from '../world/map';
 import {S7_SUNSET, S7_AIR} from '../world/skies';
 import {farPalette, onPlane, S7_WEST, yAt} from './V2S7_plan';
@@ -47,7 +49,7 @@ const ROOF_BASE = 925;
 export const S7FarRoofs: React.FC = () => {
   const b = useMemo(() => {
     const k = new Batch();
-    const C = farPalette(ROOF_SRC, 3);
+    const C = farPalette(ROOF_SRC, 4.3);
     for (const h of HOUSES) {
       k.rect(C[h.wall], h.x0, h.top, h.x1 - h.x0 + 0.6, ROOF_BASE - h.top);
       if (h.roof === 'pitch' && h.ridge !== undefined) k.poly(C[CM.shadeWarm], [[h.x0 - 2, h.top], [h.x0 + 10, h.ridge], [h.x1 - 10, h.ridge], [h.x1 + 2, h.top]]);
@@ -60,7 +62,7 @@ export const S7FarRoofs: React.FC = () => {
     k.layer();
     // windows: tone-on-tone (a +3 window is the wall's own colour one soft step, never a speck: CRAFT §f.2), >= 8 px
     for (const h of HOUSES) {
-      const win = farPalette([h.wall], 3.4)[h.wall];
+      const win = toneOnTone(C[h.wall], {dE: 3});
       for (let y = h.top + 14; y < 900; y += 26) for (let x = h.x0 + 9; x + 8 < h.x1 - 4; x += 19) k.rect(win, x, y, 8, 12);
     }
     return k;
@@ -74,27 +76,30 @@ export const S7FarRoofs: React.FC = () => {
 
 // ---------------------------------------------------------------- +2 the far street's plane trees
 
-const TREE_SRC = [CM.leafGold, CM.coatMustard, CM.brickLight, CM.sage];
 type FarTree = {x: number; base: number; cy: number; rx: number; ry: number; tone: string; seed: string};
 /** Plane trees along the far street (z ~70 m, ~7.5 m tall): crowns 745-875, trunks to the hedge's top (y 944). */
 const FAR_TREES: FarTree[] = [
   {x: -8, base: 940, cy: 806, rx: 64, ry: 58, tone: CM.leafGold, seed: 's7/ft/a'},
-  {x: 70, base: 940, cy: 820, rx: 50, ry: 52, tone: CM.coatMustard, seed: 's7/ft/b'},
+  {x: 70, base: 940, cy: 820, rx: 50, ry: 52, tone: CM.leafGold, seed: 's7/ft/b'},
   {x: 132, base: 940, cy: 798, rx: 46, ry: 50, tone: CM.leafGold, seed: 's7/ft/c'},
 ];
 
 export const S7FarTrees: React.FC = () => {
   const b = useMemo(() => {
     const k = new Batch();
-    const C = farPalette(TREE_SRC, 2);
-    const trunk = farPalette([CM.stoneShade, CM.limestone], 2)[CM.stoneShade];
+    // three values per crown on +2, each its own step toward the air (the main gold one plane step, the lit and the
+    // far side a little more: the plane's mean sits >= 3 closer to the air than the wing's, and >= 3 farther than
+    // the roofs': the ladder of CRAFT §f.2)
+    const main = onPlane(CM.leafGold, 1);
+    const lit = onPlane(CM.stucco, 1.8);
+    const far = onPlane(CM.brickLight, 1.8);
+    const trunk = onPlane(CM.stoneShade, 2.4);
     for (const t of FAR_TREES) k.rect(trunk, t.x - 4, t.cy + t.ry * 0.6, 8, t.base - (t.cy + t.ry * 0.6));
     k.layer();
     for (const t of FAR_TREES) {
-      k.fill(C[t.tone], crownD(t.x, t.cy, t.rx, t.ry, {seed: t.seed, round: 0.75}));
-      // the sun side (west, screen left) a lighter patch; the far side one step down: 3 values per crown
-      k.fill(C[CM.brickLight], crownD(t.x - t.rx * 0.3, t.cy - t.ry * 0.22, t.rx * 0.48, t.ry * 0.46, {seed: `${t.seed}/lit`, round: 0.75}));
-      k.fill(C[CM.sage], crownD(t.x + t.rx * 0.34, t.cy + t.ry * 0.3, t.rx * 0.42, t.ry * 0.36, {seed: `${t.seed}/sh`, round: 0.75}));
+      k.fill(main, crownD(t.x, t.cy, t.rx, t.ry, {seed: t.seed, round: 0.75}));
+      k.fill(lit, crownD(t.x - t.rx * 0.3, t.cy - t.ry * 0.22, t.rx * 0.48, t.ry * 0.46, {seed: `${t.seed}/lit`, round: 0.75}));
+      k.fill(far, crownD(t.x + t.rx * 0.34, t.cy + t.ry * 0.3, t.rx * 0.42, t.ry * 0.36, {seed: `${t.seed}/sh`, round: 0.75}));
     }
     return k;
   }, []);
