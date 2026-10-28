@@ -78,7 +78,9 @@ V2S3 (the shot before) was conformed just before you: read its "S3 art conform" 
    `V2S4_post` first, then in every `V2S4_*` (`V2S4_wpath`'s brick ticks, `V2S4_wcanal`'s ripple dashes, ...); author A
    outlines at `INK_PX.mid` or wider; do not strip `INK_PX` or sketch options by hand otherwise; tier every piece.
 8. **Particles, SEEN at phone size** (the owner on v4, 2026-10-28: "I don't see any changes in the particles anywhere";
-   CRAFT §f.6; `lib/particles` PRESETS may still hold the old sizes, so pass `size` / `count` yourself): `motes` near SUN1
+   CRAFT §f.6; L1 raised `lib/particles`' PRESETS to these numbers: merge origin first, then use the presets and never
+   pass a smaller size; pass `size` only if the presets still hold the old ones; check at 360 px wide that a viewer can
+   point at them): `motes` near SUN1
    (6-10 px, against shade where they can read), a `leaves` field across the towpath (26-40 px, a visible flutter and
    turn, 2-3 across the hold, crossing the mid ground, their fall clear of the band and of her), `glints` under SUN1 on the
    bottom water (20-36 px, L* +15..+25, 4-6 twinkling at once, 0.3-0.8 s). Particles read `useTime()`, which inside S4's
