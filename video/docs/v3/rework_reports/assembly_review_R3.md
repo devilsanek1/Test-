@@ -50,6 +50,35 @@ Motion as measured at phone size (moving-area share per 0.5 s, 0.1 s lag, luma s
 (the chart line plus a faint whole-scene float); 19-21.5 41-62 % (the zoom over the heap); 23-36 mostly 0.4-1.6 %,
 with the only peaks at camera moves (25.0, 36.5) and the phone beats (30.0, 31.0).
 
+### Pass 2: sound on (the voice's words and timings beside the frame at each spoken key word; 2 sheets, 38 beats)
+
+The track is the voice alone (no bed): first sound at 0.20 s, pauses of 0.25-0.5 s between lines, silence 40.40-41.15.
+Does the picture show what the voice says, when it says it?
+
+| words heard (s) | on screen at that word | match? |
+|---|---|---|
+| "Buying a laptop soon?" (0.12) / "AI's making it pricier" (1.64-2.6) | the $999 tag, then the price ticking up | yes, exactly |
+| "Well, AI data centers are." (3.64-4.04) | phone washes out, the data-center sign lights | yes |
+| "Which is backwards." (5.80) | an empty chart card | late: "backwards" is only drawn from 7.0 |
+| "Laptops get better for the same money ... right after you buy one" (7.08-10.44) | the falling line, two tiny laptop stickers | yes, but small |
+| "But this past year, in the US," (11.48-12.60) | unchanged frame | NO: the story's turn ("But") has no picture for 2.7 s |
+| "computers went up almost 10%." (13.56-14.84) | the up-kink at 14.2-14.6, "+9.7%" at 14.8 | yes (0.6 s late, fine) |
+| "Mostly because your laptop runs on memory chips." (16.60-18.28) | back to the phone; the stick pops out of it | yes, the best-matched beat after the hook |
+| "And so do" (19.40) | a giant dark close-up of the stick, caption over it | abrupt |
+| "AI data centers." (19.96) | a heap of tan blocks; no data center anywhere | NO: the data center the voice names is not on screen until 21.0, and then as a black slab at the edge |
+| "By the mountain." (21.32) | data center + hill + street | yes |
+| "They pay more, so they get first dibs." (22.68-24.20) | the window band; a row of small vans; the pale phone's tag flashes at the left edge | NO: nobody visibly pays or goes first at phone size |
+| "Which means what's left costs" (25.24-25.72) | a slow push; a few-pixel crate above a white van | NO: "what's left" is not readable |
+| "about five times last year's price." (26.84-27.88) | "~5x RAM chips" notice on the far-right shop | yes, small |
+| "And laptop makers pass that on." (29.16-30.28) | the half-visible phone lights, $1,079 -> $1,099 | yes, on a phone cut by the frame edge |
+| "Normally you'd wait for the better one." (31.32-32.28) | unchanged frame | NO picture for 2.1 s |
+| "But chip makers say next year's even tighter." (33.40-35.32) | "2027" notice replaces "~5x" | yes (from 34.8), small |
+| "So that's how an AI data center ends up on your next laptop's price tag." (36.36-39.88) | sign lights; the phone slides to centre; the tag shows the data center | yes: a clean payoff; the toy elephant's pop at 40.4 competes with it |
+
+Sound on, the film is easier to follow (the voice carries 11.5-14 and 22.7-26), but it confirms that four spoken beats
+have no picture of their own and that two of the film's three longest holds (SQB's card, SQE's window band) are where
+the picture falls behind the words.
+
 ## 2. Verdict
 
 (pending)
