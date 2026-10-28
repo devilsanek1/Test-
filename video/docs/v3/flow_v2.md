@@ -154,8 +154,9 @@ upper-left, tops lit, contact only; the DC sign the brightest cold light; 16 px 
   change** (the colour shift 17.9 > 15): from the warm nook (the stick's warm rim on its lamp side) to the dusk sky (its cold
   rim, upper left). The push-out sweeps H1's window, with the data center's sign, through the band (18.905-19.40): the sign is a
   calm panel there (E8: C from 6.35, `home_set.tsx`) and the "memory chips." page leaves at 19.12 (`captions_pages.txt`
-  `@out 19.12`: "chips" ends ~19.17 in the voice), so the band holds no caption while the window passes; "And so do" pops at
-  19.36, 2 frames before the cut (the page lead).
+  `@out 19.12`: "chips" ends ~19.17 in the voice), so the band holds no caption while the window passes; "And so do" pops ON
+  the cut (19.40, frame 1164: with pop captions a page after an empty band lands on its first word, never the page lead
+  before it, lib/Captions.tsx), dark on the stick's gold edge.
 - **J4 22.68** SQD -> SQE, seam mid-entry (frame 1361): `entryCam` 22.35-22.95 (inOutCubic): window x3.0 -> H2 size about (540,
   1100), street x1.12 -> 1, far field x1.03 -> 1; the front plane rises into LEFT 22.45-22.95; the trucks already stand in the
   pool; no new mover 22.28-23.08; a declared light change (into the warm room).
