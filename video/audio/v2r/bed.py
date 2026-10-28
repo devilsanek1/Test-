@@ -391,8 +391,11 @@ def life_layer(n):
 # the air's layers (review item 6): each normalised to its own level (integrated LUFS over where it plays, dB
 # relative to the laps), then shaped by its scene curve. The laps are the canal's events and sit well above the far
 # city's floor; the birds and the life are events too; the beds are a floor, never a hiss.
-AIR_LEVEL = {"laps": 0.0, "city": -8.0, "parkway": -5.0, "water_bed": -13.0, "leaves": -14.0, "birds": -1.0,
-             "life": -2.0}
+AIR_LEVEL = {"laps": 0.0, "city": -8.0, "parkway": -5.0, "water_bed": -13.0, "leaves": -14.0, "birds": -1.77,
+             "life": -2.58}
+# Sound sync (final): a layer is normalised as a whole, so taking the S4 train out of LIFE (the picture has none) and
+# moving S1's two calls under the voice at -9 / -12 would have lifted every other life sound by 0.58 dB and every
+# other bird by 0.77 dB; birds -1.0 -> -1.77 and life -2.0 -> -2.58 keep each of them at its approved level.
 AIR_UNDER_VOICE = 21.0  # the hook's air (its median) under the voice's speech level (TREATMENT s7: ambiences 20-25 under)
 UNDER_MUSIC_DB = -7.0  # the air steps back wherever the music plays (review item 4: the arc over the air on a phone)
 LAPS_UNDER_MUSIC_DB = -3.0   # and its loudest events, the water laps, 3 dB more

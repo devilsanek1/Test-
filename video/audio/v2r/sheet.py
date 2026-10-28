@@ -39,9 +39,20 @@ def fr(t):
     return round(t * FPS) / FPS
 
 
+def pic_frame(t):
+    """the first frame on which the picture shows an event keyed at film time t: the scenes test `t >= at` on
+    t = frame / 60, so an event between two frames shows on the LATER one (26.467 -> f1589, 8.44 -> f507)."""
+    f = int(t * FPS) - 1
+    while f / FPS < t - 1e-9:
+        f += 1
+    return f
+
+
 def lead(onset, frames=LEAD_FRAMES):
-    """a word-synced cue: `frames` frames before the frame of the word's heard onset."""
-    return (round(onset * FPS) - frames) / FPS
+    """a word-synced cue: `frames` frames before the frame on which the picture shows the event keyed at `onset` (the
+    word's heard onset, or the picture's own time where it differs). Sound sync (final): it counts from that frame
+    (pic_frame), no longer from round(onset * 60), which put nine cues 3 frames (50 ms) ahead of their picture."""
+    return (pic_frame(onset) - frames) / FPS
 
 
 def at_frame(f):
@@ -120,16 +131,18 @@ ARL = [(20.55, 28.10)]
 LIFE = [
     (1.10, "bus", -0.6, "V2S1: the bus crosses the road bridge in the west gap once (V2S1_set_far S1_BUS: in view "
                         "~0.25-2.3, at 1.10 on the doors' shut); heard 0.40-2.70, nearest ~1.20, left toward the wing"),
-    (7.00, "boat_pass", 0.6, "V2S2: a narrowboat glides up from the vanishing point toward us (V2S2_Set boatAt 7.0)"),
+    (7.00, "boat_pass", 0.6, "V2S2: the narrowboat (V2S2_Water S2_BOAT: its bow in at the right edge at 7.60, gliding "
+                              "left toward us): heard from 7.00, its 0.6 s fade-in complete as the bow enters at 7.60"),
     (14.86, "boat_ride", 0.0, "V2S4: our narrowboat glides with us at idle-ahead (14.86-20.55; fades in under the push-through)"),
-    (15.25, "train", -0.5, "V2S4: a train on the far viaduct (V2S4_wfar TRAIN t0 15.25), gone before 'military'"),
+    # (the S4 train is gone: the final picture's far viaduct has no train, V2S4_wfar 'no train')
     (28.10, "fountain", 0.45, "V2S7: the forecourt fountain jets (28.10-32.93)"),
 ]
 # Birds (CC0 grains, field.py): (film t, source, grain a, b, dB, pan, lowpass Hz, why). One at a time, in the voice's
 # pauses where they can be, never in a join's window.
 BIRDS = [
-    (1.50, 409145, 6.92, 7.17, -6, -0.5, 9000, "the bridge birds' calls as they lift (with the wings SFX), pause 1.46-2.00"),
-    (1.74, 409145, 7.42, 7.79, -8, -0.35, 9000, ""),
+    (2.49, 409145, 6.92, 7.17, -9, -0.5, 9000, "the bridge birds' calls as they lift at 2.45 (V2S1_set_far RAIL_BIRDS, "
+                                               "S1_CLOCK.birdsLiftBridge; with wings:1), under 'her contract'"),
+    (2.78, 409145, 7.42, 7.79, -12, -0.35, 9000, "as they wheel west (done 3.15, before G3's tick 3.18)"),
     (8.09, 418425, 12.59, 12.88, -4, 0.6, 9000, "a robin in the pause before 'But' (gone before the board's clack 8.40)"),
     (21.25, (616969, 0), 0.01, 0.50, -13, -0.4, 8000, "April morning: an American robin under the canopy (the 21.24 pause)"),
     (22.95, 626652, 7.13, 9.15, -7, 0.5, 8000, "spring birds far below the terrace (the view)"),
@@ -162,24 +175,28 @@ CUES = [
     (0.45, "exit_ding", 9, "OUR exit ding, two struck glass-chime notes rising a fourth (C6 -> F6): the glass doors start "
                            "to slide (the first-second phone sound, DIRECTION rule 9)"),
     (0.45, "door_glide", 24, "the glass doors' glide under the ding, open on 'quit' 0.52"),
-    (lead(0.97), "step_thup", 20, "she steps out onto the towpath ('Google' 0.97)"),
-    (lead(0.97), "letter_pops", 26, "the canopy letters fill-pop one by one: a quick ripple, done by 1.08 (before 'Goo-' opens)"),
-    (1.46, "wings:1", 16, "five far birds lift off the bridge rail (picture 1.40; far, heard a little later) and wheel "
-                          "west: the claps in the pause after 'Google.'"),
+    (at_frame(58), "step_thup", 20, "she steps out onto the towpath ('Google' 0.97): her heel lands on the f60 drawing "
+                                   "(12 a second, step 1.5), the thud 2 frames ahead"),
+    (lead(0.97), "letter_pops", 26, "the six canopy letters fill-pop one by one at 0.97 + 0.06 k (HandLetteredGoogle "
+                                    "each 0.06): six tiny pops 0.06 s apart, each 1-2 frames ahead of its letter"),
     (lead(2.00), "ghost_tick:1", 14, "G1 pops (one soft wooden tick per ghost, ONE pitch) ('And' 2.00)"),
     (lead(2.53), "ghost_tick:2", 14, "G2 pops ('contract')"),
+    (at_frame(147), "wings:1", 20, "the five far birds lift off the bridge rail at 2.45 (f147, S1_CLOCK.birdsLiftBridge; "
+                                   "their delays 0-0.20 s, 6.5 flaps/s) and wheel west, small and soft under 'her contract'"),
     (lead(3.20), "ghost_tick:3", 14, "G3 pops ('bans')"),
     (lead(3.80), "ghost_tick:4", 14, "G4 pops ('criticizing')"),
     (4.20, "ghost_tick:1", 14, "G5 pops"),
     (lead(4.79), "ghost_tick:2", 14, "G6 pops ('for'); the ambience dip 4.54-4.79 is in the bed"),
-    (lead(4.98), "outline_pops", 15, "'life': three bare outlines pop in down the towpath (air puffs above 5 kHz; then air, no note)"),
+    (lead(4.97), "outline_pops", 15, "'life': three bare outlines pop in down the towpath at 4.97 / 5.00 / 5.03 (S1_ROW O1-O3: "
+                                     "air puffs above 5 kHz, 0.03 s apart; then air, no note)"),
     (lead(4.98), "ear_flap", 23, "Pip's leaf ears cover on 'life' (its one reaction)"),
     (5.95, "whoosh_dive:1", 12, "JOIN S1>S2, the A push-through into her dark window W 5.875-6.325 (seen from ~5.95): the air rises into it, "
                                 "'through the glass' on the midpoint 6.10 (the plum bridge), settles, gone by 6.27"),
     # V2S2 The wall (6.10-12.98)
-    (at_frame(407), "window_outline", 17, "'one': her dark window's A outline pops on (one frame), in the gap before 'one'"),
+    (lead(6.82), "window_outline", 17, "'one': her dark window's A outline pops on (one frame, S2.outlineAt 6.82 = f410)"),
     (lead(8.44), "board_clack:2", 13, "the newsstand A-board slides out: TOLD THE BBC (the ONE board sound) ('But')"),
-    (lead(8.96), "light_clicks", 19, "'staff': the five windows round hers turn a cooler white in one step (five clicks in 40 ms)"),
+    (lead(8.96), "light_clicks", 19, "'staff': the five windows round hers turn a cooler white one after another, 0.04 s "
+                                     "apart (S2.staffOnStagger): five soft clicks 0.04 s apart"),
     (lead(9.48), "notebook_flap", 19, "'BBC': the reporter's notebook opens"),
     (10.26, "blinds_five", 16, "'scared': five blinds drop to half one by one (10.26-10.60)"),
     (lead(12.20), "blind_thump", 15, "'contracts': the blind beside hers comes fully down"),
@@ -192,16 +209,18 @@ CUES = [
     # V2S4 The walk home (14.86-20.55)
     (lead(15.07), "pop_high:1", 16, "her name tag pops (first build) ('She')"),
     (16.60, "pen_tick", 18, "the tag's second build (in the gap after 'AI')"),
-    (17.66, "steps_stop", 19, "her last two steps; the stop lands at 17.96 ('objected')"),
+    (at_frame(1040), "steps_stop", 19, "her last two footfalls on the picture's drawings (12 a second): the contact "
+                                       "(step 4.5) at f1040, the stand (step 5.0) at f1076, 2 frames before 'objected'"),
     (lead(18.92), "plate_knock", 15, "'military': the DEC 2025 plate builds (wood knock + pop)"),
     (19.45, "pen_short:1", 17, "the APR 2026 plate pen-reveals, complete on 'heading'"),
-    (lead(19.80), "wings:2", 19, "the flock flies west into the sun (19.78; the callback, 3 dB softer) ('heading')"),
+    (lead(19.80), "wings:2", 19, "the seven on the gasholder lift at 19.78 (V2S4_wfar FLOCK_AT: delays 0-0.16 s, a slow "
+                                 "glide-and-flap, ~3.8 flaps/s) and fly west into the sun ('heading')"),
     (20.40, "sun_through:1", 14, "JOIN S4>S5, the A push-through into the low October sun 20.40-20.70: a glass shimmer "
                                  "swells into the light and a small glass tink lands on the midpoint 20.55, 30 dB down by 'In' 20.67"),
     # V2S5 The far side (20.55-23.80)
     (lead(20.76), "blossom_pops", 18, "'April': the slot's trees burst into blossom in 4 frames (the calendar flip is retired)"),
     (at_frame(1317), "wipe_air", 17, "the lamppost wipes the backs at the crane's peak speed (22.02-22.19), its air pass centred 22.10"),
-    (lead(22.44), "pop_low", 16, "'Pentagon': the plaque pops (the bed's soft accent 1 is here too)"),
+    (lead(22.43), "pop_low", 16, "'Pentagon': the plaque pops at 22.43 (V2S5_text, scene 1.88; the bed's soft accent 1 is here too)"),
     (lead(23.08), "window_warm", 22, "'use': the wing's windows warm on in ONE step: one far switch"),
     (23.62, "tree_wipe", 18, "JOIN S5>S6, the D wipe: one blossom tree crosses the lens right to left 23.62-23.98, its "
                              "rush peaking on the midpoint 23.80"),
@@ -221,12 +240,15 @@ CUES = [
                              "the midpoint 32.93 (nothing starts before 32.70)"),
     # V2S8 Her words (32.93-39.08)
     (lead(33.16), "board_clack:1", 13, "the wipe clears: SHE SAYS (THE same board file and level as Google's)"),
-    (lead(33.78), "ghost_tick:3", 17, "'can't': three ghosts pop ahead of her (3 dB softer, one pitch)"),
-    (lead(33.78) + 5 / FPS, "ghost_tick:4", 17, "second ghost"),
-    (lead(33.78) + 9 / FPS, "ghost_tick:1", 17, "third ghost"),
+    (lead(33.78), "ghost_tick:3", 17, "'can't': three ghosts pop ahead of her, 0.04 s apart (S8Ghosts stagger: 33.78 / "
+                                      "33.82 / 33.86; 3 dB softer, one pitch)"),
+    (lead(33.82), "ghost_tick:4", 17, "second ghost"),
+    (lead(33.86), "ghost_tick:1", 17, "third ghost"),
     (34.75, "door_latch", 16, "her door shuts behind her"),
     (34.95, "lamp_click:2", 23, "W lights: her home lamp ON (the 12.98 click; the 0.40 click's answer), 3 dB softer"),
-    (lead(35.72), "cloth_wipe", 17, "'her words': the cafe owner wipes the board clean in one stroke"),
+    (at_frame(2141), "cloth_wipe", 17, "'her words': the cafe owner wipes the board clean in one stroke (35.72-36.14, "
+                                       "first frame f2144); the file's soft start is heard from +28 ms = 35.711: 22 ms "
+                                       "ahead of the wipe, 9 ms before 'her' (never 0-12 ms after a word)"),
     (lead(36.54), "pen_long", 21, "her quote pen-draws on (THE same pen as Google's, a whisper under 'talking'); its "
                                   "strokes end by 36.95, before 'facts'"),
     (LAMP_RUN_HER, "lamp_run", 16, "'facts': the lamps light west down the lane: three switch-ons (frames 2237 / 2261 / "
