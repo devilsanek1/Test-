@@ -76,7 +76,7 @@ export function reflectTone(src: string, k: number, water: string, o: {rose?: nu
     h = w.h;
     c = Math.max(s.c, Math.min(w.c, 0.022));
   } else {
-    const warm = s.h >= 15 && s.h <= 110;
+    const warm = s.h >= 300 || s.h <= 110;
     h = warm ? s.h - (o.rose ?? 4) * k : s.h + 6 * k;
     c = (warm ? s.c * (1 - 0.1 * k) : s.c * (1 - 0.3 * k)) * (o.chroma ?? 1);
   }
@@ -86,6 +86,24 @@ export function reflectTone(src: string, k: number, water: string, o: {rose?: nu
     c = lerp(c, Math.min(w.c, 0.03), o.toWater);
   }
   return cleanColour(fromOk(l, c, h), w.h);
+}
+
+/** R2 + R4 in flat colour: a reflection's THREE Fresnel steps (the far bank, the middle, our feet). Each step moves the
+ *  value toward the water's by k[i] (reflectTone), and from the second step on the reflection also loses chroma
+ *  (`fade`) and turns its hue away from the water's complement (`turn` deg: a warm one toward rose and mauve, a cool one
+ *  toward the water's teal), so it sinks into the water through mauve or slate, never through khaki or grey. */
+export function fresnelSteps(src: string, k: [number, number, number], water: string, o: {turn?: number; fade?: [number, number]; rose?: number; toWater?: number} = {}): string[] {
+  const w = okLch(water);
+  return k.map((kk, i) => {
+    const base = okLch(reflectTone(src, kk, water, {rose: o.rose, toWater: o.toWater}));
+    if (i === 0 || base.c < 0.02) return fromOk(base.l, base.c, base.h);
+    const fade = (o.fade ?? [0.78, 0.6])[i - 1];
+    const turn = (o.turn ?? 12) * i;
+    // warm (rose, red, orange, gold: h 300-110 through 0) turns toward mauve; cool turns toward the water's own hue
+    const warm = base.h >= 300 || base.h <= 110;
+    const h = warm ? base.h - turn : hueLerp(base.h, w.h, Math.min(1, (turn / 60) * 1.5));
+    return cleanColour(fromOk(base.l, base.c * fade, h), w.h);
+  });
 }
 
 /** One flat value step of the water itself (a ripple line, a contact band): the water's colour dL (OKLab L) lighter or
@@ -308,10 +326,6 @@ const colourAt = (m: Mass, y: number): string => {
   return m.colors[Math.min(i, m.colors.length - 1)];
 };
 
-const smooth01 = (a: number, b: number, v: number) => {
-  const u = clamp((v - a) / Math.max(1e-6, b - a));
-  return u * u * (3 - 2 * u);
-};
 
 /** Colour runs (colour -> path data), drawn in insertion order, one <path> per colour. */
 export type Runs = Map<string, string[]>;
@@ -351,70 +365,56 @@ export function buildMass(m: Mass, grid: SliceGrid, sway: (y: number) => number,
       pushRun(out, colourAt(m, m.y0), d + 'Z');
     }
   }
-  // ---- the slices
+  // ---- the slices: the bands below the block, in order; the reflection narrows along a smooth envelope (symmetric,
+  // a touch of seeded asymmetry), a band breaks once at most and only in its last half, the very last may drop
   const brk = m.breakup ?? 0.5;
   const narrow = m.narrow ?? 0.22;
   const rows = grid.rows;
-  for (let i = 0; i + 1 < rows.length; i++) {
-    const ya = rows[i];
-    const yb = rows[i + 1];
-    if (yb <= solid + 0.01 || ya >= m.y1) continue;
-    // every band draws its numbers whether or not it is used (one band's pattern never depends on another's)
+  const bands: [number, number, number][] = [];
+  for (let i = 0; i + 1 < rows.length; i++) if (rows[i + 1] > solid + 0.01 && rows[i] < m.y1) bands.push([i, rows[i], rows[i + 1]]);
+  const K = bands.length;
+  bands.forEach(([i, ya, yb], j) => {
     const rr = rng(`mass/${m.id}/${i}`);
+    const asym = rr.next() * 2 - 1;
+    const jit = rr.next();
+    const pbreak = rr.next();
+    const at = rr.next();
     const drop = rr.next();
-    const nbr = rr.next();
-    const pa = rr.next();
-    const pb = rr.next();
-    const la = rr.next();
-    const lb = rr.next();
     const a = Math.max(ya, solid);
     const top = a + grid.gap(ya, yb);
-    const bot = Math.min(yb, m.y1 + (yb - ya) * 0.5);
-    if (bot - top < 0.8) continue;
+    const bot = yb;
+    if (bot - top < 0.8) return;
     const ym = (top + bot) / 2;
     const s = m.span(ym);
-    if (!s) continue;
-    const u = smooth01(solid, m.y1, ym); // 0 at the block, 1 at the reflection's end
-    if (drop < 0.55 * u * u * u) continue; // the very end thins out
+    if (!s) return;
+    const u = (j + 0.5) / Math.max(1, K); // 0 at the block .. 1 at the reflection's end
+    if (u > 0.82 && drop < 0.35) return;
     const pitch = yb - ya;
     const w = s[1] - s[0];
-    const x0 = s[0] + w * u * narrow * (0.4 + 0.6 * la);
-    const x1 = s[1] - w * u * narrow * (0.4 + 0.6 * lb);
-    if (x1 - x0 < 2) continue;
+    const inset = narrow * w * Math.pow(u, 1.5) * (0.85 + 0.3 * jit);
+    const x0 = s[0] + inset * (1 + 0.25 * asym);
+    const x1 = s[1] - inset * (1 - 0.25 * asym);
+    if (x1 - x0 < 3) return;
     const taper = Math.min((m.taper ?? 3) * (0.6 + pitch / 10), (x1 - x0) * 0.4);
-    // breaks along the band (0-2), only past the middle of the slicing: a short gap of the water
-    let nb = 0;
-    if (brk > 0 && x1 - x0 > 36 && u > 0.3) nb = Math.min(2, Math.floor(brk * 2.4 * (u - 0.3) + nbr * 0.9));
-    const cuts: [number, number][] = [];
-    const g0 = Math.max(5, pitch * (0.9 + 1.6 * u));
-    if (nb >= 1) {
-      const xb = x0 + (x1 - x0) * (0.22 + 0.56 * pa);
-      cuts.push([xb - g0 / 2, xb + g0 / 2]);
-    }
-    if (nb >= 2) {
-      const xb = x0 + (x1 - x0) * (pb < 0.5 ? 0.1 + 0.12 * pb : 0.78 + 0.12 * pb);
-      cuts.push([xb - g0 * 0.4, xb + g0 * 0.4]);
-    }
-    cuts.sort((p, q) => p[0] - q[0]);
     const segs: [number, number][] = [];
-    let cur = x0;
-    for (const [c0, c1] of cuts) {
-      if (c0 > cur) segs.push([cur, c0]);
-      cur = Math.max(cur, c1);
-    }
-    if (x1 > cur) segs.push([cur, x1]);
+    if (brk > 0 && u > 0.45 && x1 - x0 > 60 && pbreak < brk * (u - 0.3) * 1.6) {
+      const g0 = Math.max(6, pitch * (1 + 1.4 * u));
+      const xb = x0 + (x1 - x0) * (0.25 + 0.5 * at);
+      segs.push([x0, xb - g0 / 2], [xb + g0 / 2, x1]);
+    } else segs.push([x0, x1]);
     const dx = sway(ym) * k;
     const col = colourAt(m, ym);
     for (const [s0, s1] of segs) {
       if (s1 - s0 < 3) continue;
       pushRun(out, col, barPath(s0 + dx, s1 + dx, top, bot, taper, taper));
     }
-  }
+  });
 }
 
-/** THE SUN'S GLITTER (R8): one narrow column straight under the sun of NESTED level slivers (a gold lens with a warm
- *  white core), living 0.3-0.7 s each, growing in and shrinking out along their length (never fading), densest at
- *  the sun's mirror point; under them a still bed of short gold slices (the sun's reflected colour). */
+/** THE SUN'S GLITTER (R8): one narrow column straight under the sun, drawn as NESTED level slivers: a still bed of
+ *  gold lenses, one per band of the grid (their lengths follow the column's envelope: narrow far, wider near, longest
+ *  round the sun's mirror point), and in them warm-white cores that live 0.3-0.7 s each, growing in and shrinking out
+ *  along their length (never fading): the shimmer is the cores; the column itself holds still (it sways with its rows). */
 export type Glitter = {
   x: number;
   yTop: number;
@@ -423,55 +423,58 @@ export type Glitter = {
   w: [number, number];
   /** Where it is densest (the sun's mirror point, y). */
   peak: number;
-  /** Slots (how many slivers can be alive at once). */
-  slots: number;
-  bed: string;
-  gold: string;
-  core: string;
   seed: string;
-  /** Slivers are born from t0 (after the frame-0 flood). */
+  /** The cores are born from t0 (after the frame-0 flood). */
   t0: number;
 };
-export type Sliver = {x: number; y: number; len: number; h: number; k: number};
-/** The live slivers at t: each slot cycles through lives of 0.3-0.7 s with a short rest between them. */
-export function glitterAt(g: Glitter, cam: WaterCam, t: number): Sliver[] {
-  const out: Sliver[] = [];
-  if (t < g.t0) return out;
-  const span = g.yBot - g.yTop;
-  for (let s = 0; s < g.slots; s++) {
-    const base = rng(`glit/${g.seed}/${s}`);
-    const phase = base.range(0, 0.9);
-    // walk this slot's lives up to t (lives are short: a handful of steps)
-    let tb = g.t0 + phase;
-    let n = 0;
-    while (n < 400) {
-      const r = rng(`glit/${g.seed}/${s}/${n}`);
-      const life = r.range(0.3, 0.7);
-      const rest = r.range(0.05, 0.35);
-      if (t < tb) break;
-      if (t < tb + life) {
-        // where: a row biased toward the peak (a triangular pick), x inside the column at that row
-        const v = (r.next() + r.next()) / 2;
-        const yPick = g.yTop + span * v;
-        const toward = clamp(1 - Math.abs(yPick - g.peak) / span);
-        const y = lerp(yPick, g.peak, 0.35 * r.next());
-        const uy = clamp((y - g.yTop) / span);
-        const hw = lerp(g.w[0], g.w[1], uy);
-        const x = g.x + (r.next() * 2 - 1) * hw * (0.85 - 0.25 * toward);
-        const near = clamp((y - g.yTop) / span);
-        const len = lerp(7, 30, near) * r.range(0.65, 1.15) * (0.8 + 0.35 * toward);
-        const h = lerp(1.6, 3.6, near) * r.range(0.85, 1.1);
-        const q = (t - tb) / life;
-        // grow in along the length (35 %), hold, shrink out (35 %)
-        const k = q < 0.35 ? q / 0.35 : q > 0.65 ? (1 - q) / 0.35 : 1;
-        out.push({x, y, len, h, k: k * k * (3 - 2 * k)});
-        break;
-      }
-      tb += life + rest;
-      n++;
-    }
+export type GlitterLens = {cx: number; cy: number; len: number; h: number};
+/** The bed: one gold lens per band (some bands left out: the column breathes), static. */
+export function glitterBed(g: Glitter, grid: SliceGrid): GlitterLens[] {
+  const out: GlitterLens[] = [];
+  const rows = grid.rows;
+  for (let i = 0; i + 1 < rows.length; i++) {
+    const ya = rows[i];
+    const yb = rows[i + 1];
+    if (ya < g.yTop || yb > g.yBot + 2) continue;
+    const r = rng(`glitbed/${g.seed}/${i}`);
+    const keep = r.next();
+    const len = r.next();
+    const off = r.next();
+    const u = clamp((ya - g.yTop) / (g.yBot - g.yTop));
+    const nearPeak = clamp(1 - Math.abs((ya + yb) / 2 - g.peak) / ((g.yBot - g.yTop) * 0.6));
+    if (keep < 0.18 - 0.12 * nearPeak) continue;
+    const hw = lerp(g.w[0], g.w[1], u) * (0.5 + 0.38 * len + 0.25 * nearPeak);
+    const top = ya + grid.gap(ya, yb);
+    out.push({cx: g.x + (off - 0.5) * lerp(5, 12, u), cy: (top + yb) / 2, len: hw * 2, h: (yb - top) * 0.92});
   }
-  void cam;
+  return out;
+}
+/** The live cores at t: per bed lens one (two on the long near ones) warm-white sliver cycling through lives of
+ *  0.3-0.7 s with rests of 0.1-0.6 s, placed inside its lens, k = its grow-in / shrink-out (0..1). */
+export function glitterCores(g: Glitter, bed: GlitterLens[], t: number): (GlitterLens & {k: number})[] {
+  const out: (GlitterLens & {k: number})[] = [];
+  if (t < g.t0) return out;
+  bed.forEach((b, i) => {
+    const slots = b.len > 44 ? 2 : 1;
+    for (let s = 0; s < slots; s++) {
+      let tb = g.t0 + rng(`glitc/${g.seed}/${i}/${s}`).range(0, 0.8);
+      for (let n = 0; n < 400 && tb <= t; n++) {
+        const r = rng(`glitc/${g.seed}/${i}/${s}/${n}`);
+        const life = r.range(0.3, 0.7);
+        const rest = r.range(0.1, 0.6);
+        if (t < tb + life) {
+          const q = (t - tb) / life;
+          const e = q < 0.35 ? q / 0.35 : q > 0.65 ? (1 - q) / 0.35 : 1;
+          const len = b.len * r.range(0.26, 0.46);
+          const half = slots === 2 ? (s === 0 ? -0.22 : 0.22) : 0;
+          const cx = b.cx + b.len * (half + (r.next() - 0.5) * 0.3);
+          out.push({cx, cy: b.cy + b.h * 0.06, len, h: b.h * 0.56, k: e * e * (3 - 2 * e)});
+          break;
+        }
+        tb += life + rest;
+      }
+    }
+  });
   return out;
 }
 
