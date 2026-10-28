@@ -1,4 +1,20 @@
-# L6 handover (V2S8 + the seam): first session, stopped at the orchestrator's request before writing code
+# L6 handover (V2S8 + the seam)
+
+## RESUMED 2026-10-28 ~08:00 UTC (RESUME_2026-10-28.md; the owner approved the G4 look clip v4) — state as of ~09:10 UTC
+Pushed (typecheck clean): S8's one continuous sky (world/skies.ts `S8_EVENING` / `S8_AIR`: horizon SUNSET_HORIZON at
+y 680, the sun's warmth 200 x 60 centred 35 px under SUN8, skyProblems []), drawn by V2S8_set S8Sky (lib/sky) with the
+flat disc on top; at the un-build the disc goes first, the sky's foot rises to 560 (V2S8.tsx S8SkyAtExit) and the rest
+contracts into SUN0. The parallax float (V2S8_clock S8_FLOAT_LEGS 35.75-38.60, S8_DEPTH planes, V2S8_depth S8Plane
+groups; floatProblems [], peak 9.4 px/s, max 6.7 px). The lamp run in three switch-ons (f2237 / 2261 / 2273,
+LAMP_RUN_FRAMES). The seam push retired; Pip's straight 30 px settle + late un-build (V2S8_pip). The readers out; the
+cafe owner left of the board (66, 1258), 210 px, a long-handled squeegee whose blade rides L5's wipe edge (V2S8_board).
+Her subject tier + form shade + rim; the ghosts A (33.78-34.75) then B with their line (V2S8_cast). V2S8_light: contact
++ cast shadows (her, ghosts, walkers, the board, the owner, the bollard, Pip), W's spill, the two visible lamp pools.
+Particles (V2S8.tsx): backlit motes on her house's shaded facade, two falling leaves 26-36 px (no glints: no open
+water under SUN8 in frame). A builder agent was running the SET + HOUSE pass (V2S8_set / V2S8_house: tiers, depth via
+S8_ATM, slate iron, specks out, the near lamp, set light, depth sheets v2_s8_t34 / _t38). Next: its result, then the
+checks (scratch tools/checks.sh: check_light A/B, line, depth, banding, flashes, seam, clip), ONE critic, report_L6.md.
+
 
 ## PAUSED 22:40 UTC for the depth pass (resume when the orchestrator says; read this first)
 State: conform_L6 started (owner-approved DIRECTION / CRAFT / THROUGHLINE; the brief `conform_L6.md` wins over everything
