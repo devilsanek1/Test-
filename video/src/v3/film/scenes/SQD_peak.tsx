@@ -1,11 +1,11 @@
-// SQD_peak (REVEAL lane): THE mountain of memory sticks, built for SQD's x27 pull-back (docs/v3/flow_v2.md §4 SQD):
+// SQD_peak (REVEAL lane): THE mountain of memory sticks, built for SQD's x23.3 pull-back (docs/v3/flow_v2.md §4 SQD):
 // at the start the camera sits on its summit, where ONE stick (the same MemoryStick SQC lifts out of your laptop) lies
 // on its neighbours, so every stick of the pile must read as a real stick at any zoom: each one is the kit's stick
 // shape (kit/Memory.tsx stickGeo: the board with its key notch and side notches, 4 chips, the pin strip), never a
-// plain quad (x27 shows real chips, never hay). Rows from the foot to the crest (the silhouette's sticks jutting out,
+// plain quad (x23 shows real chips, never hay). Rows from the foot to the crest (the silhouette's sticks jutting out,
 // drawn back to front in layered groups so no chip prints through a nearer stick) at outside's summit (800, 640), H2
 // size: sticks 26 px at the crest -> 52 at the foot (hidden behind the town).
-// THE CREST (final pass, E7): THE stick (700 / 27 px, rot -4) rests on a BED of two sticks at its own angle, their tops
+// THE CREST (final pass, E7): THE stick (SUMMIT_W = 30 px, rot -4) rests on a BED of two sticks at its own angle, their tops
 // tucked 1.35 px behind its bottom edge, so at every zoom of the pull it lies on gold (never on a strip of sky); a second
 // layer of six sticks steps the crest out to the flanks; the mound behind follows the bed, so no sky shows through.
 // THE READ (final pass, E5: "a mountain of memory sticks" read as pallets, then as a brick texture): detail is kept
@@ -38,9 +38,19 @@ const f1 = (v: number) => v.toFixed(2);
 export const SUMMIT: Pt = [800, 640];
 export const PEAK = {x: SUMMIT[0], y: SUMMIT[1], base: 1010, tanL: Math.tan((33 * Math.PI) / 180), tanR: Math.tan((31 * Math.PI) / 180)};
 const X1 = 1260;
-/** THE stick in H2 px (outside.tsx's H2_SUMMIT, SQD_rig's SUMMIT_STICK: J3's 700 px at x27, its pins' edge on the
- *  summit point). The crest is built round it. */
-const THE = {x: SUMMIT[0], y: SUMMIT[1] - (700 / 27) * 0.155, w: 700 / 27, rot: -4};
+/** J3's carrier at the push-through (flow_v2 §6): SQC lifts THE stick out of your laptop to this pose (screen px), and
+ *  SQD's t 0 draws the summit stick exactly here. */
+export const J3_STICK = {x: 540, y: 870, w: 700, rot: -4};
+/** THE stick's width at H2 rest (px): >= ~30, so it still reads on the summit at phone size (early review E5; it was
+ *  700 / 27 = 25.9). ONE number for every builder: the far plane's start zoom at J3's landing is K0 = 700 / SUMMIT_W
+ *  (SQD_rig), outside.tsx's summit stick is this one, and the crest's bed is built round it, so J3 still matches. */
+export const SUMMIT_W = 30;
+/** The far plane's zoom at SQD's t 0 (x23.3): the summit stick at J3_STICK's 700 px. */
+export const K0 = J3_STICK.w / SUMMIT_W;
+/** THE stick in H2 px (outside.tsx's H2_SUMMIT and SQD_rig's SUMMIT_STICK are this object): its pins' edge on the summit
+ *  point (its centre half its height, 0.155 w, above it). The crest is built round it. */
+export const SUMMIT_STICK = {x: SUMMIT[0], y: SUMMIT[1] - SUMMIT_W * 0.155, w: SUMMIT_W, rot: J3_STICK.rot};
+const THE = SUMMIT_STICK;
 
 /** The pile's tones: THE stick's gold one value under it (L* 70, C* 39), a step darker for the boards turned from the
  *  sky, lit tops a step lighter, gold pins, the mound behind in the gaps; the tops and pins brightest on the crest

@@ -98,6 +98,7 @@ import {
 import {Haze, stepAt} from '../kit/Haze';
 import {mixHex} from '../kit/Light';
 import {Letters} from './O1_life';
+import {FAR_SNOW, HALL_K, SIGN_CALM} from './outside';
 
 /** Children see FILM time as useTime() (kit pieces key their beats on it, whatever sequence draws them). */
 export const FilmClock: React.FC<{T: number; children?: React.ReactNode}> = ({T, children}) => (
@@ -219,11 +220,10 @@ const NEAR_HOUSE = '#3E4870';
 export const HOOK_CALM_AT = 6.35;
 /** 0 = the hook's window (SQA), 0.5 = the 3-frame half step, 1 = calm. */
 export const windowCalm = (T: number): number => stepAt(T, HOOK_CALM_AT);
-const DC_CALM_HAZE = 0.35;
+/** outside.tsx's calm data center (its haze step, its calm sign) and its town's far snow: one data center and one town
+ *  seen from both windows, the values imported from their owner, never copied. */
+const DC_CALM_HAZE = HALL_K;
 const SIGN_LIT = {panel: EMBER.led, text: EMBER.ink};
-const SIGN_CALM = {panel: '#5F6782', text: '#8D95AE'};
-/** The far snow the calm walls step toward (outside.tsx's town: one plane back). */
-const FAR_SNOW = '#CDD3E8';
 /** How far each row of houses steps toward FAR_SNOW when calm (the farther, the more). */
 const CALM_STEP = {far: 0.5, town: 0.5, near: 0.38};
 /** Then one light haze step over the houses toward the far snow (kit Haze: far = lighter, lower contrast; the lit panes

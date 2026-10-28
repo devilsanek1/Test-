@@ -5,8 +5,8 @@
 //
 // IN, J3 (the engine's push-through, from = to = (540, 870), x7, no bridge): at t 0 the summit stick is exactly SQC's
 // stick (centre (540, 870), w 700, rot -4: SQD_peak's J3Stick), sky above it and its bed of sticks below, so at x7 only
-// the bands above and below it change. The far plane starts at x27 (planeMat {o: the summit stick, off: (540, 870) -
-// o, k: 27}); the town rises from the bottom, then our street, then our sill and desk.
+// the bands above and below it change. The far plane starts at x23.3 (planeMat {o: the summit stick, off: (540, 870) -
+// o, k: K0 = 700 / 30: SQD_peak's SUMMIT_W}); the town rises from the bottom, then our street, then our sill and desk.
 // OUT, J4 (a seam mid-entry at 22.68, frame 1361): the pull lands on h2_window's entry start state and from 21.98 SQD
 // draws the H2 view through h2Cams on FILM time; from 22.25 (its own life done: nothing new moves 22.28-23.08) it draws
 // SQE's own H2Scene (outside's three planes, h2_window's window and desk, the thread plane rising into LEFT from 22.45).

@@ -6,14 +6,14 @@
 // The move ends EXACTLY on J4's start state (h2_window's entryCam before 22.35: far x1.03, town x1.07, street x1.12,
 // window x3.0, all about (540, 1100)); from 21.98 SQD draws through h2Cams itself, so the hold, the entry (22.35-22.95)
 // and SQE's first frames are one camera.
-//   far    (sky, clouds, the mountain, the DC, the far field): planeMat {o: the summit stick, off: (540, 870) - o, k: 27}
+//   far    (sky, clouds, the mountain, the DC, the far field): planeMat {o: the summit stick, off: (540, 870) - o, k: K0}
 //   town   (930-1040): rises from below the frame (it enters at p ~0.3)
 //   street (1040-1250): rises next (enters at p ~0.55)
 //   win    (the sill and the desk): the nearest plane, rises last of all to its x3 start state
 import {mat, type Mat} from '../../../lib/xf';
 import {planeMat, s5Ease, applyMat, matScale, type PullPlane} from '../kit/Pullback';
 import {ENTRY, entryCam, h2Cams, type H2Cams} from './h2_window';
-import {SUMMIT} from './SQD_peak';
+import {J3_STICK, K0, SUMMIT_STICK} from './SQD_peak';
 
 export const SQD_START = 19.4;
 export const SQD_END = 22.68;
@@ -25,12 +25,10 @@ export const LIFE_END = 22.25;
 /** "mountain." (VO 21.72): the thoom (p 0.985). */
 export const THOOM = 21.72;
 
-/** THE stick: SQC lifts it out of the laptop to (540, 870), w 700, rot -4; SQD finds it lying on the summit. */
-export const J3_STICK = {x: 540, y: 870, w: 700, rot: -4};
-export const K0 = 27;
-/** The summit stick in H2 px: 25.9 px wide, lying on the summit point (its centre half its height above it); the same
- *  numbers as outside.tsx's H2_SUMMIT. */
-export const SUMMIT_STICK = {x: SUMMIT[0], y: SUMMIT[1] - (J3_STICK.w / K0) * 0.155, w: J3_STICK.w / K0, rot: J3_STICK.rot};
+/** THE stick: SQC lifts it out of the laptop to (540, 870), w 700, rot -4 (J3_STICK); SQD finds it lying on the summit
+ *  (SUMMIT_STICK, 30 px wide in H2 px: outside.tsx's H2_SUMMIT is the same object), so the far plane starts at
+ *  K0 = 700 / 30 = x23.3. All three live in SQD_peak (one number, every builder). */
+export {J3_STICK, K0, SUMMIT_STICK};
 
 export type PlaneKey = keyof H2Cams;
 /** J4's start state (entryCam holds it before 22.35): the maps the pull-back lands on. */
@@ -39,8 +37,8 @@ export const E0: H2Cams = entryCam(ENTRY.t0);
 /** The move's progress at film time T. */
 export const pullP = (T: number) => s5Ease((T - SQD_START) / MOVE);
 const STICK_END = applyMat(E0.far, [SUMMIT_STICK.x, SUMMIT_STICK.y]);
-/** The pull, authored on top of E0 (each plane's own pivot and extra start scale). The far plane: x27 on the summit
- *  stick at t 0 (the stick at (540, 870), 700 px). The near planes rise from below the frame. */
+/** The pull, authored on top of E0 (each plane's own pivot and extra start scale). The far plane: x K0 (23.3) on the
+ *  summit stick at t 0 (the stick at (540, 870), 700 px). The near planes rise from below the frame. */
 export const PULL: Record<PlaneKey, PullPlane> = {
   far: {o: STICK_END, off: [J3_STICK.x - STICK_END[0], J3_STICK.y - STICK_END[1]], k: K0 / matScale(E0.far)},
   town: {o: [540, 985], off: [-60, 1500], k: 3},

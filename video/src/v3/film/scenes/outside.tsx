@@ -4,8 +4,8 @@
 // inside another FilmClock, and gives its kit pieces film time), so the frames match bit for bit across J4 and J5.
 //
 // H2 at rest (canvas px): flat sky behind the caption band (white captions); horizon y 930: THE DATA CENTER (S9's hall,
-// dark) w 330 at x 230-560, THE MOUNTAIN (the REVEAL lane's pile: summit (800, 640), the summit stick a kit MemoryStick
-// for SQD's x27 start) behind its right side and past the right edge; the town 930-1040 with the road from our street
+// dark) w 330 at x 230-560, THE MOUNTAIN (the REVEAL lane's pile: summit (800, 640), the summit stick a kit MemoryStick,
+// 30 px, for SQD's x23.3 start) behind its right side and past the right edge; the town 930-1040 with the road from our street
 // (x ~300) up to the data center; OUR STREET 1040-1250: the chip factory's wall x 330-950 (y 1000-1090) with its lit
 // gate x 480-640, the booth on its left, the floodlight's pool (560, 1200) rx 230 ry 55, the notice x 680-880 (y
 // 1010-1150), the waiting lane x 720-940 (y 1140-1240), the road-mouth lamp (232) with its own small pool; the sill is
@@ -58,7 +58,7 @@ import {CrateBox, CrateFlight, ellD, FleetVan, fleetVanGeo, NoticeFlip, rrect, r
 import {Haze, stepAt, twoStepIn} from '../kit/Haze';
 import {CornerCloud, HighClouds, CloudBank, FarGround, InfinityLine, HallPlume, HALL, HALL_GEO, HALL_ROOF, HALLB, HORIZON as S9_HORIZON, roofRows, RoofRowsView, type RoofRowSpec} from './S9_far';
 import {T9} from './S9_tones';
-import {RevealPeak, J3Stick, J3StickLight, PEAK_TONES} from './SQD_peak';
+import {RevealPeak, J3Stick, J3StickLight, PEAK_TONES, SUMMIT_STICK} from './SQD_peak';
 import {RevealBirds} from './SQD_life';
 
 const f1 = (v: number) => (Math.round(v * 10) / 10).toString();
@@ -68,8 +68,9 @@ const f1 = (v: number) => (Math.round(v * 10) / 10).toString();
 export const H2_HORIZON = 930;
 /** THE data center (S9's hall re-laid: dark, sign lit): base centre and width. */
 export const H2_DC = {x: 395, y: 930, w: 330};
-/** THE summit stick (the one that left your laptop; SQD's x27 start: its planeMat o): centre, width, rotation. */
-export const H2_SUMMIT = {x: 800, y: 640 - (700 / 27) * 0.155, w: 700 / 27, rot: -4};
+/** THE summit stick (the one that left your laptop; SQD's start: its planeMat o): centre, width (30 px: SQD_peak's
+ *  SUMMIT_W, so J3's 700 px stick lands at K0 = x23.3), rotation. The REVEAL lane's object, never a copy. */
+export const H2_SUMMIT = SUMMIT_STICK;
 /** Our street: the far pavement's top, the near kerb (the sill's top is h2_window's 1250). */
 export const H2_STREET = {top: 1040, pave: 1092, near: 1250};
 /** The chip factory's wall, its lit gate, the booth, the floodlight and its pool, the notice, the waiting lane. */
@@ -129,7 +130,8 @@ export const HALL_A: [number, number][] = [
 ];
 /** The far field's haze (CRAFT §f: one flat step per plane toward the air, the sky's lowest colour). */
 export const FAR_AIR = EMBER.skyLow;
-const HALL_K = 0.35;
+/** The data center's calm haze step off its beats (kit Haze k; home_set's H1 window takes the same: one building). */
+export const HALL_K = 0.35;
 const HALLB_K = 0.5;
 
 // ---------------------------------------------------------------- film clock
@@ -345,7 +347,7 @@ const rd = (x: number, y: number, w: number, h: number) => `M${f1(x)} ${f1(y)}h$
  *  facade, letters a calm step over it: it still reads at full size, never the frame's brightest cold light). */
 /** Lit: the frame's brightest cold light (a light box, L* ~92: CRAFT §d.2's 85-92 for lit panes and bulbs). */
 const SIGN_LIT = {panel: '#E2EAFF', text: EMBER.ink};
-const SIGN_CALM = {panel: '#5F6782', text: '#8D95AE'};
+export const SIGN_CALM = {panel: '#5F6782', text: '#8D95AE'};
 /** SQF's beat rhymes with the hook's (4.04): as the sign lights at 36.98 the rows go dark, then light one at a time on
  *  "an AI data center" (37.00-37.80: the subject owns its line's motion; kit DataCenter `rowsOn`). */
 const HALL_ROWS = {at: H2_BEATS.sign + 0.02, dur: 0.8};
@@ -481,8 +483,9 @@ const SummitStick: React.FC = () => (
 
 type House = {x: number; w: number; base: number; h: number; roof: number; color: string; wins: [number, number, number, number][]};
 const TOWN_COLORS = ['#3B4570', EMBER.roofs, '#46527C', '#404A74'];
-/** The town's far snow (what the houses stand on and the walls are hazed half way into). */
-const FAR_SNOW = '#CDD3E8';
+/** The town's far snow (what the houses stand on and the walls are hazed half way into; home_set's H1 window steps its
+ *  houses toward it after the hook). */
+export const FAR_SNOW = '#CDD3E8';
 /** Two rows of small houses on the horizon (the back one over the far snow, the front one standing on our street's far
  *  side), with a gap where the road climbs to the data center. */
 const TOWN: {back: House[]; front: House[]} = (() => {
