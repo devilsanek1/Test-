@@ -207,6 +207,12 @@ export const PLANTER_WOOD = nearStep(CM.line, -2);
 
 /** The lamp's swan-neck: from the post's top it curves right out of the frame (below y 600). */
 const LAMP_TOP = 700;
+/** The near lamp as it stands at the match (12.98: every float leg at rest), for L3, who holds it across the cut.
+ *  Measured on the 12.95 frame: the post x 1014-1045 at y 1400 (1012-1047 at y 1900; centre 1030, w 30, half-width
+ *  0.62 w at the foot y 1990, 0.5 w from y 790 up), the swan-neck curving right from y 790 into an arm that leaves
+ *  the frame (x 1079) at y 657-678; a collar y 1640-1670 (48 wide); the bike's lock ring r 26 round it at y 1600.
+ *  One flat colour: authored nearStep(CM.line, -2) = #7E3E26, drawn in tier C (environment) = #8F553F on screen. */
+export const S2_NEAR_LAMP = {x: 1030, w: 30, foot: 1990, neckY: LAMP_TOP + 90, armExitY: [657, 678], collar: {y: 1640, h: 30, w: 48}, authored: '#7E3E26', onScreen: '#8F553F', lockY: 1600};
 
 const PlanterGrass: React.FC = () => {
   const {x0, x1, rim} = NEAR.planter;

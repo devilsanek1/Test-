@@ -10,9 +10,10 @@
 import React, {useMemo} from 'react';
 import {CM} from '../palette';
 import {band, seamTone} from '../../lib/depth';
-import {Batch, Paint, P, rng, ovalPath, leafPath, lerp} from '../kit/canal/core';
+import {Batch, Paint, rng, ovalPath, leafPath} from '../kit/canal/core';
 import type {Pt} from '../kit/canal/core';
-import {NB, ringPath, Levels} from './V2S3_nboat';
+import {NB, Levels} from './V2S3_nboat';
+import {bollardNeck} from './V2S3_ndress';
 import {Lamp} from '../kit/canal/towpath';
 import {S3_CAM, planeBatch} from './V2S3_depth';
 
@@ -26,7 +27,6 @@ export const NG = {
   bottom: 2016,
   /** Vanishing point of every line running into the picture (S3_CAM.vp). */
   vp: S3_CAM.vp,
-  ringRope: [112, 1641] as Pt,
 } as const;
 
 const cam = S3_CAM;
@@ -97,24 +97,24 @@ function groundBatch(): Batch {
 
 // ---------------------------------------------------------------- the rope
 
-/** The boat's rope: from the T-stud on the gunwale down across the water to the ring on our coping, a knot through the
- *  ring and its tail coiled flat on the stones (flat shapes; no twist ticks). Our plane (-2). */
+/** The boat's rope: from the T-stud on the gunwale down across the water to the mooring bollard on our coping
+ *  (V2S3_ndress), a loop round its neck and the tail coiled flat on the stones beside it (flat shapes, no twist
+ *  ticks). Our plane (-2); drawn after the bollard (the loop sits in front of its neck). */
 function ropeBatch(): Batch {
   const L = new Levels();
   const a: Pt = [NB.dolly[0], NB.dolly[1]];
-  const c: Pt = NG.ringRope;
+  const c: Pt = bollardNeck();
   const mid: Pt = [(a[0] + c[0]) / 2 + 6, (a[1] + c[1]) / 2 + 16];
   const pts: Pt[] = [];
   for (let k = 0; k <= 16; k++) {
     const u = k / 16;
     pts.push([(1 - u) * (1 - u) * a[0] + 2 * (1 - u) * u * mid[0] + u * u * c[0], (1 - u) * (1 - u) * a[1] + 2 * (1 - u) * u * mid[1] + u * u * c[1]]);
   }
-  const b0 = L.at(0);
-  b0.rect(CM.anchor, c[0] - 4, c[1] - 9, 8, 6);
-  b0.fill(CM.anchor, ringPath(c[0], c[1], 14, 6.5, 9.5, 3.4));
-  b0.fill(CM.coatOat, `M${P(c[0] + 10, c[1] + 2)}Q${P(c[0] + 40, c[1] + 10)} ${P(c[0] + 58, c[1] + 2)}L${P(c[0] + 58, c[1] + 9)}Q${P(c[0] + 40, c[1] + 17)} ${P(c[0] + 10, c[1] + 9)}Z`);
-  b0.fill(CM.coatOat, ovalPath(c[0] + 76, c[1] + 4, 22, 7));
-  L.at(1).fill(CM.line, ovalPath(c[0] + 76, c[1] + 3, 9, 2.6));
+  // the tail coiled on the coping by the bollard's foot
+  const foot = NG.copingNear - 6;
+  L.at(0).fill(CM.coatOat, ovalPath(c[0] + 40, foot, 20, 5.5));
+  L.at(1).fill(seamTone(CM.coatOat, 8), ovalPath(c[0] + 40, foot - 0.5, 8, 2.2));
+  // the rope as a flat ribbon, and its loop round the neck
   const rib: Pt[] = [];
   const back: Pt[] = [];
   for (let k = 0; k < pts.length; k++) {
@@ -123,12 +123,12 @@ function ropeBatch(): Batch {
     const dx = p1[0] - p0[0];
     const dy = p1[1] - p0[1];
     const m = Math.hypot(dx, dy) || 1;
-    rib.push([pts[k][0] - (dy / m) * 4.4, pts[k][1] + (dx / m) * 4.4]);
-    back.unshift([pts[k][0] + (dy / m) * 4.4, pts[k][1] - (dx / m) * 4.4]);
+    rib.push([pts[k][0] - (dy / m) * 4.2, pts[k][1] + (dx / m) * 4.2]);
+    back.unshift([pts[k][0] + (dy / m) * 4.2, pts[k][1] - (dx / m) * 4.2]);
   }
   L.at(2).poly(CM.coatOat, [...rib, ...back]);
-  L.at(2).fill(CM.coatOat, ovalPath(c[0] + 4, c[1] - 1, 11, 6));
-  void lerp;
+  L.at(2).fill(CM.coatOat, ovalPath(c[0], c[1], 17, 6));
+  L.at(3).fill(seamTone(CM.coatOat, 10), ovalPath(c[0], c[1] + 1.5, 13, 2.4));
   return planeBatch(L.merge(), -2);
 }
 
@@ -140,16 +140,16 @@ export const S3NearWater: React.FC = () => {
   return <Paint b={b} seed="s3ngWater" misreg={false} />;
 };
 
-/** The coping, the towpath, the leaves and the rope (AFTER the boat), in our plane. */
+/** The coping, the towpath and the leaves (AFTER the boat), in our plane. */
 export const S3Ground: React.FC = () => {
   const g = useMemo(groundBatch, []);
+  return <Paint b={g} seed="s3ngGround" misreg={false} />;
+};
+
+/** The boat's rope to the bollard (after the bollard: V2S3_near). */
+export const S3Rope: React.FC = () => {
   const rope = useMemo(ropeBatch, []);
-  return (
-    <>
-      <Paint b={g} seed="s3ngGround" misreg={false} />
-      <Paint b={rope} seed="s3ngRope" misreg={false} />
-    </>
-  );
+  return <Paint b={rope} seed="s3ngRope" misreg={false} />;
 };
 
 /** The near lamp-post (nearest of all): S2's, held across the cut. L2 draws it in V2S2_Set.tsx as
