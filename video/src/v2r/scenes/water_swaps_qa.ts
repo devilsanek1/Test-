@@ -5,6 +5,7 @@
 import '../palette';
 import {cie, dE76, waterColourAt, waterPalette, waterProblems, type WaterSpec} from '../../lib/water';
 import {s1WaterSpec} from './V2S1_water';
+import {s2WaterSpec} from './V2S2_Water';
 import {S1_PARTICLES_ALIVE as S1_OTHER_ALIVE} from './V2S1_particles';
 import {s3WaterSpecs} from './V2S3_water';
 import {S3_OTHER_ALIVE} from './V2S3_particles';
@@ -16,6 +17,8 @@ const rows: Row[] = [];
 const add = (spec: WaterSpec, t0: number, t1: number, other: number) => rows.push({spec, t0, t1, other});
 
 add(s1WaterSpec(), 0, 6.13, S1_OTHER_ALIVE);
+// S2's fields: 2 blown leaves and 6 motes at most (V2S2_Life); S2 has no glitter
+add(s2WaterSpec(), 6.1, 12.98, 8);
 {
   const s = s3WaterSpecs();
   add(s.canal, 12.98, 14.86, S3_OTHER_ALIVE);
