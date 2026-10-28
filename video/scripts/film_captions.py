@@ -11,11 +11,14 @@ caption text to the voice by characters, so spelling must match the transcript (
 A page may end early with a directive line `@out <seconds>` (film seconds, between its first word and the next page):
 it leaves the band at that time (SkyCaptions `out`: pop captions pop away in one frame) and the band stays empty until
 the next page, e.g. while a push-through sweeps big shapes through the band (v3's J3).
+A page may also carry `@hide`: its words stay in the file (the voice check still covers them) but the page is never
+drawn (SkyCaptions `hide`: the band is empty for its time), because a board or sign in the shot carries the same words
+in step with the voice (owner playbook: never the same words twice on screen at once; v2r REVIEW_1 MUST 3).
 
 Output (src/lib/Captions.tsx CaptionBeat, one page per line): {s, e, lines: [{text, s}], highlights: [{text, s}]}, all
 WORD-START seconds (the caption component applies its own leads; never shift times here). e = the next page's s (or
-the page's `@out`, also written as "out"); the last page ends on the voice's durationSec. --hook gives page 1 style
-"hook" (x1.06). Exit 1 on any alignment error.
+the page's `@out`, also written as "out"); the last page ends on the voice's durationSec. `@hide` writes "hide": true.
+--hook gives page 1 style "hook" (x1.06). Exit 1 on any alignment error.
 
 --spell VOICE=CAPTION (optional, repeatable): a caption token may spell a voice word differently, e.g. British
 "criticising" inside a quote where the transcript says "criticizing". Only tokens the paging file actually writes with
@@ -111,12 +114,16 @@ def main() -> int:
         for pi, page0 in enumerate(pages):
             # directive lines ("@out <seconds>") belong to the page; everything else is a caption line
             out_at = None
+            hide = False
             page = []
             for raw in page0:
                 if raw.startswith("@"):
+                    if raw.strip() == "@hide":
+                        hide = True
+                        continue
                     m = re.fullmatch(r"@out\s+([0-9]+(?:\.[0-9]+)?)", raw)
                     if not m:
-                        errors.append(f"page {pi + 1}: unknown directive '{raw}' (only '@out <seconds>')")
+                        errors.append(f"page {pi + 1}: unknown directive '{raw}' (only '@out <seconds>' and '@hide')")
                         raise ValueError
                     out_at = float(m.group(1))
                     continue
@@ -150,6 +157,8 @@ def main() -> int:
             entry = {"s": lines[0]["s"], "e": None, "lines": lines, "highlights": hls}
             if out_at is not None:
                 entry["out"] = round(out_at, 3)
+            if hide:
+                entry["hide"] = True
             out.append(entry)
     except ValueError:
         pass
