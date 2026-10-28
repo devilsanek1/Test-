@@ -8,10 +8,14 @@ Pages file: '#' lines are comments; one page per paragraph (blank line between p
 [brackets] mark a highlight (one phrase per bracket, never across two lines). Every voice word must appear exactly
 once, in order (a voice token like "almost10%." may be split as "almost 10%." in the captions). The script aligns the
 caption text to the voice by characters, so spelling must match the transcript (case and punctuation are free).
+A page may end early with a directive line `@out <seconds>` (film seconds, between its first word and the next page):
+it leaves the band at that time (SkyCaptions `out`: pop captions pop away in one frame) and the band stays empty until
+the next page, e.g. while a push-through sweeps big shapes through the band (v3's J3).
 
 Output (src/lib/Captions.tsx CaptionBeat, one page per line): {s, e, lines: [{text, s}], highlights: [{text, s}]}, all
-WORD-START seconds (the caption component applies its own leads; never shift times here). e = the next page's s; the
-last page ends on the voice's durationSec. --hook gives page 1 style "hook" (x1.06). Exit 1 on any alignment error.
+WORD-START seconds (the caption component applies its own leads; never shift times here). e = the next page's s (or
+the page's `@out`, also written as "out"); the last page ends on the voice's durationSec. --hook gives page 1 style
+"hook" (x1.06). Exit 1 on any alignment error.
 
 --spell VOICE=CAPTION (optional, repeatable): a caption token may spell a voice word differently, e.g. British
 "criticising" inside a quote where the transcript says "criticizing". Only tokens the paging file actually writes with
@@ -104,7 +108,19 @@ def main() -> int:
         return float(words[wi]["s"])
 
     try:
-        for pi, page in enumerate(pages):
+        for pi, page0 in enumerate(pages):
+            # directive lines ("@out <seconds>") belong to the page; everything else is a caption line
+            out_at = None
+            page = []
+            for raw in page0:
+                if raw.startswith("@"):
+                    m = re.fullmatch(r"@out\s+([0-9]+(?:\.[0-9]+)?)", raw)
+                    if not m:
+                        errors.append(f"page {pi + 1}: unknown directive '{raw}' (only '@out <seconds>')")
+                        raise ValueError
+                    out_at = float(m.group(1))
+                    continue
+                page.append(raw)
             if not 1 <= len(page) <= 2:
                 warns.append(f"page {pi + 1}: {len(page)} lines (pages are 1-2 lines)")
             lines = []
@@ -131,7 +147,10 @@ def main() -> int:
                         s = take(m.group(2), f"page {pi + 1}")
                         line_s = s if line_s is None else line_s
                 lines.append({"text": text, "s": round(line_s, 3)})
-            out.append({"s": lines[0]["s"], "e": None, "lines": lines, "highlights": hls})
+            entry = {"s": lines[0]["s"], "e": None, "lines": lines, "highlights": hls}
+            if out_at is not None:
+                entry["out"] = round(out_at, 3)
+            out.append(entry)
     except ValueError:
         pass
     if not errors and pos != len(stream):
@@ -145,9 +164,19 @@ def main() -> int:
     if errors:
         return 1
     for i, p in enumerate(out):
-        p["e"] = out[i + 1]["s"] if i + 1 < len(out) else round(dur, 3)
+        nxt = out[i + 1]["s"] if i + 1 < len(out) else round(dur, 3)
+        p["e"] = nxt
+        if "out" in p:
+            last_word = max([ln["s"] for ln in p["lines"]] + [h["s"] for h in p["highlights"]])
+            if not last_word < p["out"] < nxt:
+                errors.append(f"page {i + 1} '{p['lines'][0]['text']}': @out {p['out']} is not between its last word start ({last_word}) and the next page ({nxt})")
+            p["e"] = p["out"]
         if p["e"] <= p["s"]:
             warns.append(f"page {i + 1} '{p['lines'][0]['text']}' is empty in time ({p['s']}..{p['e']})")
+    for e in errors:
+        print(f"[film_captions] ERROR {e}", file=sys.stderr)
+    if errors:
+        return 1
     if a.hook and out:
         out[0]["style"] = "hook"
     for w in warns:

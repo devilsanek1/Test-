@@ -1,12 +1,12 @@
-// V2S1 helper (lane L1): the sky flood. The World sky stays paper (frame 0 is pale shapes on paper); ONE continuous sky
-// (S1_SKY: the caption field's mint, then five flat steps to the warm horizon) floods out of SUN0 as one growing disc
-// (f2-f5, TREATMENT section 4), ahead of the kit's own cascade (lib/exit Look). The sun itself (frame 0's half-coloured
-// disc too) is the set's SunDisc (V2S1_set_far), drawn behind the far roofs.
+// V2S1 helper (lane L1): the sky flood. The World sky stays paper (frame 0 is pale shapes on paper); ONE continuous,
+// gentle, dithered sky (lib/sky <Sky>, the S1_EVENING preset of world/skies.ts; the owner's "find a beautiful way to do
+// a gentle gradient"; CRAFT §g) floods out of SUN0 as one growing disc (f2-f5, TREATMENT section 4), ahead of the kit's
+// own cascade (lib/exit Look). The sun's disc (frame 0's half-coloured one too) is the set's flat SunDisc
+// (V2S1_set_far), drawn behind the far roofs; the sky carries its warmth, so no halo.
 import React, {useId} from 'react';
-import {Fill} from '../../lib/Fill';
-import {S1_SKY, S1_SKY_Y} from './V2S1_set_core';
+import {Sky} from '../../lib/sky';
+import {S1_EVENING} from '../world/skies';
 import {useTime} from '../../lib/time';
-import {CM} from '../palette';
 import * as MAP from '../world/map';
 
 const S1_FLOOD = MAP.S1_CLOCK.flood;
@@ -27,11 +27,9 @@ export const SkyFlood: React.FC = () => {
         </clipPath>
       </defs>
       <g clipPath={`url(#${id})`}>
-        {S1_SKY.map((c, i) => {
-          const y0 = i === 0 ? -120 : S1_SKY_Y[i - 1];
-          const y1 = i < S1_SKY_Y.length ? S1_SKY_Y[i] + 1 : 1120;
-          return <Fill key={i} rect={[-120, y0, 1320, y1 - y0]} color={c} offset={false} lookExempt exit={false} seed={`s1sky${i}`} />;
-        })}
+        {/* ONE continuous, gentle, dithered sky (lib/sky; the film's preset in world/skies.ts; CRAFT §g): the caption
+            field flat through the band, a pale warm light band, the warm horizon, the low sun's warmth round SUN0 */}
+        <Sky spec={S1_EVENING} />
       </g>
     </>
   );

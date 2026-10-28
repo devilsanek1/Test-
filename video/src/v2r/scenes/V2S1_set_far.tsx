@@ -10,23 +10,59 @@ import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
 import {line, poly, rect as rectInk, arc} from '../../lib/sketch';
 import {Fill} from '../../lib/Fill';
+import {Tier} from '../../lib/tier';
 import {Batch, P, Pt, rng, ovalPath, lobes, lerp, domePath, r1} from '../kit/canal/core';
 import {litAt} from '../kit/canal/life';
 import {Person} from '../kit/cast';
 import * as MAP from '../world/map';
-import {CellPaint, Under, barPath, ringPath, S1_IRON, S1_SUN_HALO, hazeBatch} from './V2S1_set_core';
-import {mixHex} from '../../lib/light';
+import {CellPaint, Under, barPath, ringPath, S1_IRON, S1_HAZE, S1_ATM, hazeBatch} from './V2S1_set_core';
+import {atmos, backing, recede, toneOnTone} from '../../lib/depth';
+import {tierFill} from '../../lib/pen';
+import {fromLch, lch, mixHex} from '../../lib/light';
 import {floodAt, S1_PALE} from './V2S1_clock';
+import {S1Plane, S1_PLANE} from './V2S1_float';
 
 const S = MAP.S1_SHEET;
 /** The bridge (screen px at zoom 1.00). */
 export const BRIDGE = {x0: -60, x1: 350, railTop: 934, deck: 958, course: 972, base: 1056, arch: {cx: 110, half: 148, spring: 1030, crown: 984}} as const;
 /** The far block behind the wing's west edge (before the haze: ~L* 72 after it, cool, no detail). */
 const CALM_FIELD = '#8F93AE';
+/** THE FIELD BEHIND THE WING'S WEST EDGE (CRAFT §f.3; conform_L1 §11 "the corner"): a calm far tower rising behind the
+ *  wing's lit limestone corner up to its roofline, one flat shape of its own plane (+3), its value set by lib/depth
+ *  `backing` so the corner parts from it by >= 15 L* as SHOWN (the clean pen's environment pull included). Before, the
+ *  corner stood on a sky step of its own value (check_depth: melts, median 4.4). */
+const TOWER = {x0: 258, x1: 346, top: 598};
+/** (computed at render: the clean pen's tier pull is known only once the film's pen is set) */
+const towerField = () => backing(tierFill(CM.limestone, 'environment'), atmos(CALM_FIELD, HAZE_K.near, S1_HAZE), {tier: 'environment', min: 15});
+const CalmTower: React.FC = () => {
+  const field = towerField();
+  const {x0, x1, top} = TOWER;
+  const step = top + 26;
+  // its window rows: tone-on-tone (lib/depth toneOnTone, dE <= 6), in a few rows of three: a far office tower, calm
+  const win = toneOnTone(field, {dE: 5});
+  let wins = '';
+  for (let y = step + 22; y < FOOT - 60; y += 34) for (const x of [x0 + 12, x0 + 34, x0 + 56]) wins += `M${x} ${y}h14v18h-14Z`;
+  // its sun edge (the left: the low sun is west) one lit step; its foot warmed toward the horizon (the air near the
+  // ground is the sky's lowest colour): atmos's step toward the haze for its value, the hue turned 50 deg the warm way
+  // round (lavender -> rose -> peach), C* >= 10 (atmos alone keeps a cool hue under a warm air; a straight mix greys)
+  const lit = atmos(field, 0.18, '#FFFFFF');
+  const f0 = lch(atmos(field, 0.35, S1_HAZE));
+  const foot = fromLch(f0.L, Math.max(10, f0.C), (f0.h + 50) % 360);
+  return (
+    <>
+      {/* the body with a stepped top: a set-back crown and a small plant box on it */}
+      <Fill d={`M${x0} ${FOOT}L${x0} ${step}L${x0 + 14} ${step}L${x0 + 14} ${top}L${x1} ${top}L${x1} ${FOOT}Z`} color={field} offset={false} seed="s1farTower" />
+      <Fill d={`M${x0 + 22} ${top}L${x0 + 22} ${top - 8}L${x0 + 52} ${top - 8}L${x0 + 52} ${top}Z`} color={atmos(CM.sage, HAZE_K.near, S1_HAZE)} offset={false} seed="s1farTowerGarden" />
+      <Fill d={wins} color={win} offset={false} seed="s1farTowerWin" />
+      <Fill d={`M${x0} ${step}L${x0 + 5} ${step}L${x0 + 5} ${FOOT}L${x0} ${FOOT}Z M${x0 + 14} ${top}L${x0 + 19} ${top}L${x0 + 19} ${step}L${x0 + 14} ${step}Z`} color={lit} offset={false} seed="s1farTowerLit" />
+      <Fill d={`M${x0} ${FOOT - 56}L${x1} ${FOOT - 56}L${x1} ${FOOT}L${x0} ${FOOT}Z`} color={foot} offset={false} seed="s1farTowerFoot" />
+    </>
+  );
+};
 /** Every far building's hidden foot (behind the bridge railing). */
 const FOOT = 944;
 /** How far each far plane mixes toward S1_HAZE (V2S1_set_core): each a clear step, the bridge the nearest. */
-export const HAZE_K = {far: 0.8, mid: 0.62, near: 0.46, bridge: 0.3, rail: 0.36} as const;
+export const HAZE_K = {far: 0.8, mid: 0.62, near: 0.46, bridge: 0.3, rail: 0.36, bus: 0.58} as const;
 
 // ---------------------------------------------------------------- the far roofs
 
@@ -51,8 +87,11 @@ type Bld = {
 
 const FAR: Bld[] = [
   {x0: -30, x1: 28, top: 770, wall: CM.stoneShade, roof: 'flat'},
-  {x0: 118, x1: 196, top: 758, wall: CM.limestone, roof: 'flat', win: {w: 4, h: 5, gx: 9, gy: 11}},
-  {x0: 196, x1: 300, top: 774, wall: CM.stoneShade, roof: 'pitch', roofCol: CM.stoneShade, stacks: [[226, 14], [272, 12]]},
+  // under the sun ONE near-level roof edge cuts the disc (the art director: a V notch between this flat roof and the
+  // gable left an orange tooth under the disc, a speech bubble): the flat roof runs on over the gable's eave, and the
+  // gable keeps no chimneys
+  {x0: 118, x1: 216, top: 758, wall: CM.limestone, roof: 'flat', win: {w: 4, h: 5, gx: 9, gy: 11}},
+  {x0: 196, x1: 300, top: 774, wall: CM.stoneShade, roof: 'pitch', roofCol: CM.stoneShade},
   {x0: 300, x1: 370, top: 752, wall: CM.limestone, roof: 'flat', win: {w: 4, h: 5, gx: 10, gy: 11}},
 ];
 const MID: Bld[] = [
@@ -77,7 +116,7 @@ const FAR_LIGHT = {row: 'near', bld: 1, k: 1, at: 1.8};
 type WinRef = {x: number; y: number; w: number; h: number; arch: boolean; key: string};
 
 /** One building into the fill batch + its underdrawing (region = the building's centre). Returns its windows. */
-function bldInto(b: Batch, u: Under, o: Bld, key: string, inkW: number, ceil = 590): WinRef[] {
+function bldInto(b: Batch, u: Under, o: Bld, key: string, inkW: number, ceil = 590, detail = true): WinRef[] {
   const r = rng(`s1far/${key}`);
   const {x0, x1, top} = o;
   const w = x1 - x0;
@@ -117,7 +156,8 @@ function bldInto(b: Batch, u: Under, o: Bld, key: string, inkW: number, ceil = 5
     const st = Math.max(ceil + 10, base - sh);
     b.rect(o.wall === CM.brickLight ? CM.brick : CM.brickLight, sx - sw / 2, st, sw, base - st + 1);
     b.rect(CM.stoneShade, sx - sw / 2 - 1.5, st, sw + 3, 2.5);
-    const pots = Math.max(2, Math.round(sw / 5));
+    // chimney pots (2-5 px) only on the near row: a far plane draws no part under 12 px (lib/depth planeLod)
+    const pots = detail ? Math.max(2, Math.round(sw / 5)) : 0;
     for (let k = 0; k < pots; k++) b.rect(k % 2 ? CM.brick : CM.brickLight, sx - sw / 2 + 1 + (k * (sw - 2)) / pots, st - 5, Math.max(2.4, (sw - 2) / pots - 1.4), 5);
     sil += rectInk(sx - sw / 2, st, sw, base - st, {seed: `s1farS/${key}${sx}`, over: 'none', edges: 'tlr'});
     for (let k = 0; k < pots; k++) {
@@ -165,17 +205,17 @@ const FarRoofs: React.FC = () => {
   const {stat, under, wins} = useMemo(() => {
     const stat = new Batch();
     const under = new Under();
-    // the farthest step: a gasholder guide frame (thin stone bars, no ink in colour) + cool stone blocks
-    gasholderInto(stat, under, 72, 900, 50, 160);
-    FAR.forEach((o, i) => bldInto(stat, under, o, `F${i}`, INK_PX.hair));
+    // the farthest step: cool stone blocks only (the gasholder's 1-3 px lattice is gone: nothing under 12 px on +4,
+    // lib/depth planeLod; its bars were the far plane's busiest edges)
+    FAR.forEach((o, i) => bldInto(stat, under, o, `F${i}`, INK_PX.hair, 590, false));
     stat.layer();
     const wins: {w: WinRef; row: string; bld: number; k: number}[] = [];
     // the two far planes are simpler: no windows (only the near row keeps its sash windows)
-    MID.forEach((o, i) => bldInto(stat, under, o, `M${i}`, INK_PX.hair));
+    MID.forEach((o, i) => bldInto(stat, under, o, `M${i}`, INK_PX.hair, 590, false));
     stat.layer();
     NEAR.forEach((o, i) => bldInto(stat, under, o, `N${i}`, INK_PX.far).forEach((w, k) => wins.push({w, row: 'near', bld: i, k})));
     // atmospheric perspective: three clear steps toward the haze (the farthest plane nearly the air itself)
-    hazeBatch(stat, [HAZE_K.far, HAZE_K.mid, HAZE_K.near]);
+    hazeBatch(stat, [HAZE_K.far, HAZE_K.mid, HAZE_K.near], S1_HAZE, {planes: [4, 4, 3]});
     // window outlines in the underdrawing (near row only: the bare-line state reads as a street of sash windows)
     for (const {w, row, bld} of wins) {
       if (row !== 'near') continue;
@@ -192,13 +232,13 @@ const FarRoofs: React.FC = () => {
     // the life budget: ONE window switch at a time, >= 2 s apart in the whole shot (this one 1.80, the wing's 3.90):
     // every other far window holds its frame-0 state
     const on = forced ? t >= FAR_LIGHT.at : litAt(0, 's1farwin', i, n, {litFrac: 0.2, gap: [0.7, 1.6]});
-    const v = rng(`s1farwc/${w.key}`).next();
-    const col = on ? CM.lamp : v < 0.5 ? CM.stoneShade : CM.glass;
+    // a +3 window: tone-on-tone on its own receded wall (CRAFT §f.2: within dE 6, never a dark speck or the lamp
+    // colour; the one story window that lights at 1.80 one soft step lighter)
+    const col = toneOnTone(recede(NEAR[bld].wall, 3, S1_ATM), {lit: on});
     if (w.arch) wb.fill(col, `M${P(w.x, w.y + w.h)}L${P(w.x, w.y + w.w / 2)}A${r1(w.w / 2)} ${r1(w.w / 2)} 0 0 1 ${P(w.x + w.w, w.y + w.w / 2)}L${P(w.x + w.w, w.y + w.h)}Z`);
     else wb.rect(col, w.x, w.y, w.w, w.h);
-    if (row === 'near') wb.rect(CM.limestone, w.x - 1.5, w.y + w.h, w.w + 3, 2.5);
+    if (row === 'near') wb.rect(recede(CM.limestone, 3, S1_ATM), w.x - 1.5, w.y + w.h, w.w + 3, 2.5);
   });
-  hazeBatch(wb, [HAZE_K.near]);
   return (
     <>
       <CellPaint b={stat} seed="s1far/stat" cell={70} misreg={0.6} />
@@ -239,8 +279,8 @@ function gasholderInto(b: Batch, u: Under, cx: number, base: number, r: number, 
 
 // ---------------------------------------------------------------- SUN0
 
-/** SUN0: the film's one pop colour, flat, no ink, no glow: an EVENING sun in the warmest sky step, setting BEHIND the
- *  far roofs (drawn before them), with one flat halo one step warmer than its sky (1.6x; CRAFT §d: <= 1.7x). Frame 0
+/** SUN0: the film's one pop colour, flat, no ink, no glow: an EVENING sun low in the warm sky (whose warmth round it is
+ *  lib/sky's: no halo), setting BEHIND the far roofs (drawn before them). Frame 0
  *  (before the flood): the lower-left half in colour (the colour already pouring in from the low left), the rest a flat
  *  pale shape like everything else, no halo (the sky is still paper). */
 const SunDisc: React.FC = () => {
@@ -257,12 +297,8 @@ const SunDisc: React.FC = () => {
       </>
     );
   }
-  return (
-    <>
-      <Fill d={ovalPath(x, y, r * 1.6, r * 1.6)} color={S1_SUN_HALO} offset={false} lookExempt exit={false} seed="s1sunhalo" />
-      <Fill d={disc} color={CM.sun} offset={false} seed="s1sun" />
-    </>
-  );
+  // the sky carries the low sun's warmth (lib/sky): the disc alone, flat, no halo (CRAFT §g.2)
+  return <Fill d={disc} color={CM.sun} offset={false} seed="s1sun" />;
 };
 
 // ---------------------------------------------------------------- the road bridge
@@ -390,7 +426,9 @@ const Bus: React.FC = () => {
   b.rect(CM.box, xl + L - 24, y0 + 5, 18, 8);
   b.rect(CM.brickDeep, xl, y1 - 10, L, 3);
   for (const wx of [xl + 30, xl + L - 40]) b.fill(CM.coatSlate, ovalPath(wx, y1 - 4, 9, 9));
-  hazeBatch(b, [HAZE_K.bridge]);
+  // calmer than the bridge itself (the art director: it competed with the first copy at ~2.0); its time stays the
+  // sound's (audio/v2r/sheet.py: the bus at 1.10)
+  hazeBatch(b, [HAZE_K.bus]);
   return <CellPaint b={b} seed="s1bus" cell={1000} misreg={0} live />;
 };
 
@@ -398,19 +436,21 @@ const Bus: React.FC = () => {
 
 type BirdSpec = {x: number; y: number; delay: number; dur: number; c1: Pt; c2: Pt; size: number; ph: number};
 
-/** The five on the bridge railing: they lift at 1.40 (her step out; the bus has just passed them) and wheel west on a
- *  curve across the sun, never above y 600. Small and far, slate (never the plum anchor). The six on the far roofs that
- *  lifted on "life" are cut (the hit at 4.98 is the row's). */
+/** The five on the bridge railing: they lift at 2.45 (MAP.S1_CLOCK.birdsLiftBridge, after the first copy) and wheel
+ *  west, low in front of the far roofs, then up off the frame's left edge, never across the sun's disc and never above
+ *  y 600. Small (10-12 px) and pale (BIRD), never the plum anchor. The six on the far roofs that lifted on "life" are
+ *  cut (the hit at 4.98 is the row's). */
 const RAIL_BIRDS: BirdSpec[] = [
-  // the quadratic's midpoint (u 0.5) = 0.25 perch + 0.5 c1 + 0.25 c2 lands on the disc (200, 690): they wheel ACROSS it
-  {x: 150, y: BRIDGE.railTop, delay: 0.0, dur: 1.55, c1: [318, 598], c2: [-170, 612], size: 18, ph: 0.3},
-  {x: 166, y: BRIDGE.railTop, delay: 0.06, dur: 1.7, c1: [330, 612], c2: [-150, 634], size: 17, ph: 1.9},
-  {x: 181, y: BRIDGE.railTop, delay: 0.03, dur: 1.62, c1: [312, 590], c2: [-190, 600], size: 19, ph: 3.1},
-  {x: 197, y: BRIDGE.railTop, delay: 0.11, dur: 1.82, c1: [340, 624], c2: [-140, 648], size: 16, ph: 4.4},
-  {x: 214, y: BRIDGE.railTop, delay: 0.16, dur: 1.75, c1: [326, 604], c2: [-160, 622], size: 18, ph: 5.2},
+  // west, low in front of the far roofs (below the roofline y ~752 until x < 120), then up off the frame's left edge:
+  // never across the sun's disc (the art director: five dark birds across the disc competed with the first copy)
+  {x: 150, y: BRIDGE.railTop, delay: 0.0, dur: 1.9, c1: [40, 880], c2: [-190, 700], size: 12, ph: 0.3},
+  {x: 166, y: BRIDGE.railTop, delay: 0.08, dur: 2.05, c1: [56, 896], c2: [-170, 720], size: 11, ph: 1.9},
+  {x: 181, y: BRIDGE.railTop, delay: 0.04, dur: 1.95, c1: [30, 870], c2: [-210, 690], size: 12, ph: 3.1},
+  {x: 197, y: BRIDGE.railTop, delay: 0.14, dur: 2.15, c1: [66, 904], c2: [-160, 736], size: 10, ph: 4.4},
+  {x: 214, y: BRIDGE.railTop, delay: 0.2, dur: 2.1, c1: [50, 888], c2: [-180, 712], size: 11, ph: 5.2},
 ];
-/** Birds are slate (tier C), never the plum anchor (the anchor is W's alone). */
-const BIRD = CM.coatSlate;
+/** Birds are tier C, pale and small (CRAFT §f.6: far birds pale), never the plum anchor (the anchor is W's alone). */
+const BIRD = atmos(CM.coatSlate, 0.55, S1_HAZE);
 
 function birdsInto(b: Batch, t: number, birds: BirdSpec[], liftAt: number, ceil = 600) {
   for (const s of birds) {
@@ -460,6 +500,18 @@ const RailBirds: React.FC = () => {
   birdsInto(b, t, RAIL_BIRDS, MAP.S1_CLOCK.birdsLiftBridge);
   return <CellPaint b={b} seed="s1railbirds" cell={1000} misreg={0} live />;
 };
+// ---------------------------------------------------------------- two people at rest on the bridge
+
+/** Two people at rest on the bridge's pavement, leaning on the railing (their heads and shoulders above it), at the
+ *  bridge's scale (~27 px/m: the far jogger's), tier C, no lines; far from her (> 300 px), never a dark bun or a long
+ *  dark coat (her look-alike rule). They replace the seated public our bank had (the orchestrator's size decision). */
+const BridgePeople: React.FC = () => (
+  <Tier tier="environment">
+    <Person x={46} y={BRIDGE.deck} h={46} seed="s1/bridge1" ink={0} pose="stand" view="profile" flip traits={{hair: 'short', hairColor: CM.hair[3], coat: CM.sage, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none'}} />
+    <Person x={238} y={BRIDGE.deck} h={44} seed="s1/bridge2" ink={0} pose="stand" view="profile" traits={{hair: 'cap', hatColor: CM.brickLight, hairColor: CM.hair[1], coat: CM.coatOat, coatLen: 'jacket', trousers: CM.line, acc: 'none'}} />
+  </Tier>
+);
+
 // ---------------------------------------------------------------- the west gap
 
 export const S1WestGap: React.FC = () => {
@@ -475,12 +527,20 @@ export const S1WestGap: React.FC = () => {
   }, []);
   return (
     <>
-      <SunDisc />
-      <FarRoofs />
-      <CellPaint b={body.b} seed="s1bridge/body" cell={90} misreg={0.7} />
-      <Bus />
-      <CellPaint b={rail.b} seed="s1bridge/rail" cell={90} misreg={0} />
-      <RailBirds />
+      <S1Plane plane={S1_PLANE.farRoofs}>
+        <SunDisc />
+        <FarRoofs />
+      </S1Plane>
+      <S1Plane plane={S1_PLANE.farTower}>
+        <CalmTower />
+      </S1Plane>
+      <S1Plane plane={S1_PLANE.bridge}>
+        <CellPaint b={body.b} seed="s1bridge/body" cell={90} misreg={0.7} />
+        <Bus />
+        <BridgePeople />
+        <CellPaint b={rail.b} seed="s1bridge/rail" cell={90} misreg={0} />
+        <RailBirds />
+      </S1Plane>
     </>
   );
 };

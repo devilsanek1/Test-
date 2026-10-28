@@ -71,3 +71,14 @@ hood's time); the board's slide-out and text; Pip's head turn; the near lamp.
 - The match: frames 12.95 / 12.98 / 13.00 side by side: M at (335, 785) 133 x 164 and Pip at (590, 1050) in both.
 - Eye check at phone size every 1 s (her window -> the board -> the five windows -> the blinds); movers at 10.3: <= 3; a
   still at 11.0 with no stranger's back; `npx tsc --noEmit -p .` clean; REQUEST lines for map.ts if any.
+
+## 10. Depth + particles (2026-10-27; CRAFT §f, `src/lib/DEPTH.md`, THROUGHLINE §5b)
+- **Planes:** -1 our towpath (things), 0 the bench, board, kiosk and the wall's near bays (her window M), +1 the wall
+  receding to its VP (1400, 700), +2 the stepped tiers, +3 the far bank; far fills through `recede(c, plane, ATM)` with
+  the air = the gold band (#F6D9BC), the far bays and tiers via `planePalette` (fewer values, tone-on-tone windows).
+- **Separation:** the TOLD THE BBC board's cream face stands on a darker field at its top (the wall's shade step or the
+  water: `backing`), never on the pale paving; her plum window on the light wall already parts.
+- **Ground:** our towpath's joints run to the VP as bands (`seamTone`, |ΔL*| >= 6), rows foreshortening; things sized by
+  one camera (`groundCam` from the wall's VP and the bench's people).
+- **Particles:** a few `motes` in the low light at the left edge (sun side), `joins` [0, 6.88]; nothing else new.
+- **Check:** `check_depth.py` at 7.0 and 11.0 with a sheet for S2 (copy the G4 one): no FAIL.

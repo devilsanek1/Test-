@@ -12,7 +12,8 @@ means empty: keep the life and the things a scene needs, lower their weight. The
 `DIRECTION.md`; a film's STYLE.md picks its values inside these rules. **Which doc wins:** owner's words (playbook;
 vN/OWNER_NOTES) > DIRECTION > CRAFT > PIPELINE_V2 > G3_ANIMATIC, G5_BLOCKING > look/*.md > the film's STYLE.md (values
 only) > v1-era docs (API and measurements, never style); in full, with the tie-breaks: DIRECTION's intro. This page's
-thresholds come from two films, so they are warnings with a declared exception, except §a's two FAILs. The board lint's
+thresholds come from two films, so they are warnings with a declared exception, except §a's two FAILs and §f's three
+(the owner's "blurred together, no distance, no perspective" made measurable). The board lint's
 completeness checks (`G3_ANIMATIC.md` §7: a missing carrier, tier or rig field, a set panel with no ambient move,
 undeclared bare paper, a red mark on an owner-facing render) are not craft thresholds: they check that the board shows
 its signal, and they keep their FAIL. Px at 1080 x 1920, CIE L* and C*, %W/s = % of frame width/s; measures: §e.
@@ -65,13 +66,15 @@ its signal, and they keep their FAIL. Px at 1080 x 1920, CIE L* and C*, %W/s = %
 ## b. Attention hierarchy: one subject at a time, a calm world around it
 v3's subject was as strong as the references'; the world around it was louder: environment local contrast 11.3 (ref 1 6.6,
 v1 6.1), the subject's dark line on every crumb, 10x their saturated pixels, 25 movers per 0.5 s, and the story held 22 % of
-the motion (ref 1 60 %). Every element gets a tier by its STORY ROLE, never by its depth:
+the motion (ref 1 60 %). Every element gets a tier by its STORY ROLE, never by its depth; its distance gives it a PLANE
+(§f), and both apply: the tier sets the weight (outline, contrast inside its plane, motion), the plane the colour, size,
+texture and how simple it is:
 
 | tier | value | colour | line (§c) | detail | motion |
 |---|---|---|---|---|---|
 | **A subject** (1-3 objects: the beat's one focus) | L* range >= 80; local contrast >= 2x C's | the hero colour only here (>= 50 % of the frame's C* > 35 pixels) | the only full outline | line coverage >= 2.5x C's | >= 60 % of the motion in its beat; a second story action <= 0.3x of it, never at the same moment |
 | **B supporting life** (the mascot, people near the story, an audience in the mid ground; kit tier `support`, which also takes story objects off their beat) | local contrast <= 1.2x C's; no near-black areas | C* <= 25; never the hero or pop hue | tinted, or none | flat: one tone + one shade | each <= 3 % of the frame; constant speed, <= 0.5x the subject's while it moves (a still subject never freezes the world); no pops; together <= 30 % of the motion |
-| **C environment** (room, shelves, desk dressing, street, town, sky, weather and far life: walkers, cars, birds, steam; kit tier `environment`) | local contrast <= 7; L* range <= 60 | C90 <= 25 (ref 1, v1), or saturated at contrast <= 7 (the cozy look) | no outlines; hairlines only | line coverage <= 6 % | the camera's float plus slow life that never stops (cloud drift, smoke, steam, snow, one window or bulb changing at a time, far walkers, cars and birds), together <= 10 % of the motion |
+| **C environment** (room, shelves, desk dressing, street, town, sky, weather and far life: walkers, cars, birds, steam, particles; kit tier `environment`) | local contrast <= 7, on each plane, not only averaged (§f); L* range <= 60 | C90 <= 25 (ref 1, v1), or saturated at contrast <= 7 (the cozy look) | no outlines; hairlines only | line coverage <= 6 % | the camera's float plus slow life that never stops (cloud drift, smoke, steam, snow, one window or bulb changing at a time, far walkers, cars and birds), together <= 10 % of the motion |
 
 - **Alive but subtle:** supporting life (B and C) never stops (as in the cozy references) but stays small, slow and low in
   contrast, felt at the edges, never popping. As many movers as the scene needs to feel alive, but at most 3-4 noticeable
@@ -117,8 +120,9 @@ G4 frame had the same pen and passed with a quarter of the strokes: the fix is a
 - **Fills** register exactly (offset 0); a tier-A outline is drawn inside its fill (stroke 2x, clipped to the fill), so the
   silhouette is the clean fill edge.
 - **Texture:** big areas flat; texture only as flat same-hue shapes (a rug pattern, plank seams as 2 long bands at dL* 6-8
-  or less) on 1-2 small surfaces per shot. No specks, ticks, hatching, scribble, dash rows, crumbs or steam squiggles,
-  and no grain overlay. The one optional texture is the owner's halftone (`PALETTE.md` "Texture and lines": at most 6 %,
+  or less) on 1-2 small surfaces per shot. No specks (static dark marks; §f's particles are light movers, not texture), ticks, hatching, scribble, dash rows, crumbs or steam squiggles,
+  and no grain overlay (the sky's invisible encode dither, §g, is not a texture). The one optional texture is the
+  owner's halftone (`PALETTE.md` "Texture and lines": at most 6 %,
   on a few chosen elements, a last step after G6; the film must work flat).
 - **Line motion:** an object draws on as one stroke, never edge by edge; no `exitLoose`, no boil.
 - **Code: the CLEAN pen** (the sketch pen stays for G3 boards), set once in the film's look module: `lib/pen.ts`
@@ -204,4 +208,123 @@ wide) = Gaussian σ 10 of (local contrast / 15 + colour contrast / 15 + C* / 60)
 share of the frame-difference energy in a 0.5 s burst at 30 fps, camera removed (ECC affine); movers = separate moving
 regions in that burst ("noticeable" = a box over 0.3 % of the frame, "small" = 0.03-0.3 %). **Lines** (1080 wide): mask =
 black-hat (9 px ellipse) > 14 and L* < 55, specks < 4 px out; strokes = its connected parts; short = skeleton < 40 px;
-near-miss ends = endpoints of different strokes 3-18 px apart.
+near-miss ends = endpoints of different strokes 3-18 px apart. **Depth** (§f, `scripts/qa/check_depth.py`, 540 px wide;
+per plane box: local contrast σ 8, visible edges = colour steps ΔE >= 6 per px, values = 6-L* bins holding >= 3 %, ΔE76
+of the mean to the air; separation sampled every 4 px along the silhouette, fill 2-8 px in against 2-10 px out, drawn
+lines out; ground: Canny + Hough on L* at 1080, segments >= 36 px, walls' verticals out, visible = |ΔL*| >= 6 across).
+
+## f. Depth and separation: every shot reads in distance, never a flat elevation
+The owner on v2's G4 look clip (2026-10-27): "the foreground and the main focus still blurs with the background ... no
+distance effect nor perspective ... the bottom part ... little to no perspective or depth ... a bit of particles here and
+there" (playbook DEPTH AND SEPARATION). Measured on its 5.4 s frame (`research/2026-10-27_depth_analysis.md`,
+`check_depth.py`): the far city as light, saturated and busy as the wing in front of it (ΔE 18.3 from its air, the wing
+13.1), the wing's lit corner on a field of its own value (|ΔL*| 2.9 along 152 px), our bank 84 % level lines and none
+receding, the near public smaller per metre than her across the water. Every cue said "flat". v1 (fill-only far planes,
+like our pen) is the model for the plane numbers; reference 1 for streets and separation.
+1. **Planes and the air.** Each set declares (W1) its planes, 0 = the subject's, -1, -2 the foreground, +1 ... +4
+   farther (4-6 in a shot, 5-7 on a vista), its AIR (the sky's lowest colour right behind them: rule 6's one sky,
+   `horizonColor(sky, x)` of §g.3, never the mint above it; v2 S1 `S1_AIR`) and its camera (horizon, vanishing point(s)).
+2. **One flat step per plane toward the air**, k = 0 / .12 / .22 / .40 / .65 on every fill of the plane (never a
+   gradient, fog or blur): L* toward the air's; a hue on the air's side converges on it, one across from it keeps its
+   hue at chroma x (1 - 0.8 k) (a straight mix would cross grey), never under C* 8, never into the olive band. This is
+   DIRECTION's "lighter, cooler, less saturated" in a day or dusk air; under a warm sunset air the far planes take its
+   warmth and still read far by value, contrast and simplicity (v1 @25.5: the far city more saturated than the near, its
+   air C* 30; PASS). Simpler with distance: 5 / 5 / 4 / 3 / 2 values, no two more than 24 / 12 / 5 ΔE apart on +2 / +3 /
+   +4, windows tone-on-tone (ΔE <= 6 from the wall, never a dark speck or the lamp colour) from +2 and none at +4, no
+   hairline past +2. Nearer than the subject: no air, a value step darker each (5 / 10 / 13 / 14 L*). Behind a pale
+   subject plane (L* > 70) the far city starts at +3. Targets (references): the farthest plane within ΔE 10 of its air
+   (5.9-10.4; G4 18.3); from the second plane behind the subject on, each >= 3 closer to its air than the one before;
+   the subject's plane >= ΔE 12 from the plane behind it (11-22.6; G4 5.7; a vista whose ladder falls may step ~5); the
+   farthest plane's darks within 20 L* of the air, its range <= 15 L*, <= 4 values, contrast <= 0.5x the subject plane's
+   and <= 4, visible edges <= 0.5x (v1 0.14-0.44x; G4 1.1x and 1.5x), hue within 30 deg of the air's (the rig's shade
+   family when backlit); no plane behind the subject busier than its plane (fill contrast <= 1.1x). The subject on a far
+   plane takes half its plane's step and keeps its separation.
+3. **Separation: the subject never shares a value with what is right behind it.** A lit edge on a darker field, a shaded
+   edge on a lighter one (counterchange); overlap, never a tangent. Along the silhouette (fill against fill): tier A
+   median |ΔL*| >= 15, <= 20 % at one value (|ΔL*| < 5), no unlined one-value run over 60 px (12 / 25 % with its outline
+   along >= 80 % of it: the line helps, never replaces the fill step); a big mass of the subject's plane >= 12 / <= 25 %
+   / <= 100 px (references 13-38; G4's corner 2.9 / 52 % / 152 px). The field behind is a calm flat shape of its own
+   plane (a far row rising behind a lit corner, a darker band behind light figures), never a halo, glow or outline: a
+   step that lives only in a thin ring round the silhouette (2-10 px), with the edge melting past it (24-48 px out),
+   is a melt.
+4. **The ground recedes.** ONE camera per shot for every ground, wall, figure and particle; the ground's joints, steps
+   and dressing laid out flat in its own coordinates and projected: lines into the picture converge, rows foreshorten
+   (>= 2x far to near), joints narrow, sizes fall as 1/distance. Visible lines (|ΔL*| >= 6, or a tone band >= 3 px):
+   <= 65 % level and >= 20 % to the vanishing point(s) (references 27-57 % receding; G4 84 % level, 0 %: its joints ran
+   to the VP at |ΔL*| 3.6, invisible). A frontal ground still needs lines into it (joints, a stair cheek, a kerb, a
+   row of bollards) or a 15-30 deg turn into two-point; each nearer ground band a value step darker.
+5. **Size: one camera.** Never a nearer thing smaller per metre than a farther one (G4: the ducks and our landing's
+   public 41-63 px/m, her across the water 100); people on one level keep one eye ratio within +-15 %. Calm a figure with
+   colour (tier B), never by shrinking it; a camera too low for the foreground's things is raised, not cheated.
+6. **A few particles make it natural** (owner: "a bit of particles here and there"): tier-C life inside rule 3's mover
+   budget, declared at G3 as `life:` items: motes only inside light and against shade (2-4 px, L* +8 to +15), dust or
+   pollen in the sun-side air (both 3-12 px/s), a leaf (8-14 px, a flutter, its fall clear of the caption band and the
+   subject: a leaf that would reach them shrinks out before, never to come back), glints only in the sun's
+   glitter path (short level dashes, L* +10 to +20, 0.2-0.6 s), far birds pale and small, a flock crossing the whole
+   frame; a few a field (motes 6, dust 5, glints 4, a leaf or two, a flock of 3-5), <= ~12 on screen, each grows in and
+   shrinks out (never fades), a step lighter on the sun side, no entrance (a leaf growing in, a flock flying in)
+   touching the 0.4 s around a join (a steady field keeps its pace), a pure function of the frame. They are movers, not
+   texture (§c).
+- **Code:** `lib/depth.ts` (`makeAtmosphere`, `recede`, `planePalette`, `toneOnTone`, `backing`, `groundCam`, `flight`,
+  `band`, `quadForPlane`, `poissonDisk`, `depthProblems`, `sizeProblems`; the parallax float `parallaxOffset`,
+  `floatAt`, `floatProblems`) and `lib/particles.tsx` (`<Particles kind>`, `particleProblems`); how-to and numbers
+  `lib/DEPTH.md`; demo `src/entry-v2r-depth.tsx`. Flat everywhere; the parallax float is approved (owner, 2026-10-28:
+  DIRECTION rule 8); a fog, a depth-of-field blur or a glow stay owner decisions (rule 5's sky gradient aside).
+
+**Check:** `scripts/qa/check_depth.py <still> --sheet <shot>.json` (sheets: `scripts/qa/depth_sheets/README.md`), with
+the G4 look clip and every G5 lane's key stills. Three FAILs, the owner's words made measurable: "no air" (the farthest
+plane no closer to its air than the subject's plane), "melts" (a silhouette's median step under 6, >= 50 % at one value
+along an unlined run over 100 px, or a step that lives only in a thin ring round it), "elevation" (a ground >= 70 %
+level with < 10 % receding); a sheet without its planes and air, its silhouettes or its ground FAILs too, unless it
+waives that part with a reason (a check that did not run never passes); every other number above WARNs with its value.
+The sheet is part of the check: every visible plane boxed, the farthest included, and nothing else (read its `--map`;
+a far box that passes on sky inside it WARNs). Calibrated: v2's G4 clip FAILs all three; v1 @20.5 / @25.5 / @38.5 and
+reference 1 @6.0 PASS (reference 1's lined far planes WARN on contrast). Eye check at phone size: squint; the subject
+stands off what is behind it, the far reads far, the ground runs into the picture.
+
+**Failures the eye catches first** (v2 G4 art-director pass, 2026-10-28; each one an owner send-back):
+- A sun disc showing through a V gap or a notch in a roofline (a "speech-bubble" tooth): one near-level edge cuts the disc, or it is whole.
+- A separation backing that is a blank slab: the field behind a subject is a real thing of the set (a building with tone-on-tone windows,
+  a stepped top, a lit sliver on its sun side), never a placeholder rectangle.
+- Particles too small for a phone: glints 12-24 px, leaves 10-14 px, motes 3-4 px set against a shaded field; 2-4 visible at a time.
+- Two cameras: a perspective ground under level, frontal buildings reads as a backdrop on a floor; facades, bridge and far rows share the
+  ground's horizon and vanishing point (a narrow side wall in shade shows a building's depth).
+- The heaviest area at a squint must be the subject's, never the near dressing: near planes get value range, not prop count.
+
+## g. Sky: one continuous, gentle gradient that survives video
+The owner on v2's G4 look clip (2026-10-27): "why is it blue sky and then suddenly abruptly orange, weird ... maybe when
+it comes to sky we can find a beautiful way to do a gentle gradient ... find the pro way and tools to do it the best way
+you can" (playbook ONE CONTINUOUS SKY, DIRECTION rule 6). The sky is the one gradient in the look; everything else stays
+flat. Measured on the S1 demo (`research/2026-10-27_sky_gradients.md` §5):
+1. **One sky, frame top to horizon:** key colours in OKLCH, mixed in OKLab, joined by one eased curve (a monotone
+   cubic: no stop line, no overshoot), as painters paint an evening: a zenith a touch deeper and cooler (dL* <= ~1.3:
+   deeper reads richer but contours after a platform's re-encode), the caption field FLAT through the caption band
+   (dL* <= 1.5 across y 317-556, ink >= 7:1), then lighter through a pale warm light band (the sky's lightest, a step
+   over both neighbours) into the warm horizon. The cool-to-warm crossing happens in that light band at C* <= 7, and so
+   does the sun's warmth where it meets the mint (a 2-stop sRGB mint -> peach goes through khaki #DCDBC5; a 2-key OKLab
+   one crosses yellow-green at C* 13).
+2. **The sun is part of the sky:** a soft elliptical warmth round a low sun, low and wide (ry ~0.45 rx: it hugs the
+   horizon; a 0.6 one rose into the mint as a round glow disc and crossed yellow-green at C* 8.1), gone at its rim
+   with a smootherstep (no edge, no ring), never inside the caption band; the disc a flat shape on top, no halo.
+3. **The far haze = the sky's lowest colour,** warmed under the sun: `horizonColor(sky, x)` is §f.1's AIR.
+4. **Dithered for the encoder:** Chrome's own +-0.5 code gradient dither is erased by any encode, so the sky carries a
+   static blue-noise texture of +-2 codes per channel at a 2 px grain (zero-mean, 0.28 L* rms: invisible; a 1 px
+   texture is erased by x264 even at CRF 14), only where the sky varies (a flat band cannot band). Not grain (§c): it
+   lives on the sky only and is never seen at 1:1.
+5. **The master keeps it:** lossless PNG frames, one BT.709 conversion, x264 CRF 14 slow aq-mode 3, 8-bit yuv420p
+   (`scripts/render-media.mjs --master`; Remotion's default JPEG q80 frames and the old TV-range second pass both band the
+   sky, and the TV pass relabelled BT.601 as BT.709: 1.7 L* darker). A platform's re-encode still leaves a dithered sky
+   isolated soft contours (simulated x264 / x265 / VP9 / AV1 rungs at 720-1080: PASS or WARN) where a plain gradient
+   leaves a staircase (FAIL): post at the highest quality settings (`POSTING_KIT.md`; YouTube: `--master --scale=4/3`).
+- **Code:** `lib/sky.tsx` (`<Sky>`, `eveningSky`, `skyColorAt`, `horizonColor`, `skyProblems`; how-to `lib/SKY.md`), a
+  film's skies beside its rigs (v2: `src/v2r/world/skies.ts`), demo `src/entry-v2r-sky.tsx`.
+
+**Check:** `skyProblems(sky, {ink})` is empty (band flatness, ink contrast, no khaki, no grey run), and
+`scripts/qa/check_banding.py <still | master.mp4> --region <the sky's OPEN area>` (no cloud, roof or tower in it: a
+flat shape's edge reads as a step) on the G4 clip and on every master's sky shots: PASS (no staircase, down or across
+the sky: < 3 visible steps per 64 px strip and < 3 near-JND steps per 256 px strip, none over 2x the JND, each step
+measured against the sky's own slope; the band within 1.5 L*). The JND is CAMBI's (Netflix libvmaf: a luminance step
+over 1.9 % of the mean) or dE00 1.5 for a hue band; near-JND: just over one 8-bit luma code or dE00 0.8. FAIL on a
+staircase, a strong step or a bent band; the six flat steps S1 had on 2026-10-27 and the plain mint -> peach gradient
+through the master FAIL. Eye check on the phone, full brightness, in a dim room: no line where the sky changes colour,
+no texture at arm's length.

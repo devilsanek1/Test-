@@ -1,0 +1,16 @@
+# SHARED layer lane (thread_plane, home_set, kit PriceTag, captions), final pass, 2026-10-28
+- **#9** SCREEN_LIT 17.24-18.30: the screen dims as THE stick leaves it. **E13** verified: the books' shadows turn with them (231b2cc).
+- **E2** The tag's A windows open ON each reaction, as the pilot set them. Opening 0.6 s early would light the tag on "+9.7%" (14.74), on the barrier (24.20) and inside J5. From 6.35 every off-beat stretch is a REST level: bezel L* 48, screen L* 84, button a screen tint, tag C* 24 (kit Phone/PriceTag `dimColors`).
+- **E8** From 6.35, when J1's pan has carried the data center (DC) out of frame, the H1 window sits back. The DC is tier C, hazed, its sign in outside.tsx's calm values; the houses step one plane toward the far snow, plus a light haze.
+- **E12/#10** SQB's corner: string lights on the slope right of the skylight (one bulb steps for 0.6 s about every 1.5 s, kit `twinkleDur`), snow past the skylight, a teacup and a pencil on the desk's lower right.
+- **E1** The like-pop (39.88): the back's DC pops x0.6 -> 1.1 -> 1 as the back lands (the G3 board's "on 'price' its back lands"; `backPopAt`).
+- **E10** Rim 38.62-41.15; a form shade on the tag's right third, under its print so "$1,099" stays crisp (`formShade`); the back's DC in bands, no blink.
+- **E6** "memory chips." leaves at 19.12 (a pages-file `@out`, carried by film_captions.py; SkyCaptions pops it away). "And so do" pops on the cut, 19.40. scenes.json's captionTone now matches the SQD/SQF modules.
+- **Salience** (stage share of the top-3 %, before -> after) at 8.5 / 9.0 / 14.9 / 26.1 / 32.2: 70 / 73 / 98 / 99 / 99 -> 90 / 91 / 99 / 99 / 99. Hero pixels on the stage: 100 % throughout. The chart alone: 14 / 19 / 73 -> 30 / 36 / 92; the plane at 9.0: 27 -> 9.
+- **Light** (check_light, all OK): SQB 9.0; SQC 17.5; SQC 18.88, where the brightest 5 % went from 0.29 H (FAIL) to 0.00 H. SQF 38.9: the tag's light layer went from dL* 0.0 to a 1.6k px rim plus 23.5k px of form shade at dL* -5.0.
+- **Tiers** Subject share of the motion: SQB 78-88 %, the 15.30 jolt 66 %, SQC 92-97 %, the like-pop 78 %; SQC and SQF have 0 noticeable supporters. Clean pen, strokes per Mpx: SQB 82 -> 85, SQC 181 -> 163, SQF 94 -> 85; dark-line 0.8-0.9 %.
+- **Density** SQB, before -> after: detail 18 -> 18 %, flat 39 -> 38 %, objects 88 -> 88; cozy meter 57 -> 57 % of frames with no mover. The new life is below the meter's mover size by design.
+- **Seams and joins** (gate_check on a quarter-size film render): seams PASS (J1 0.00 %, J2 0.01 %), carriers PASS, captions PASS. Joins (carry / eye jump / colour shift): J1 0.88 / 0.053 / 12.0, J2 0.86 / 0.063 / 9.7, J3 0.44 / 0.036 / 21.5 (a declared light change). tsc OK. SQA at 1.0, 2.7, 4.1 and 5.5 is pixel-identical at full size.
+- **Open** gate_check's one FAIL is OPEN #11 (J3's cut at frame 1164 is not detected). In SQB the pen cup and the mug hold 13 % and 10 % of the top-3 % salience, but both sit in SQA's frame, so I left them. 3 skylight flakes show in SQA's last 0.15 s. The 6.35 step is visible on the plane mid-pan.
+- **REQUEST** outside.tsx (WINDOW): export SIGN_CALM, FAR_SNOW and HALL_K, so home_set imports the calm DC values instead of copying them.
+- **REQUEST** gate_check.py (orchestrator): detect a push-through's cut at its declared frame (OPEN #11).

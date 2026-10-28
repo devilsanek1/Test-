@@ -61,6 +61,7 @@ import {
   PenCup,
   Plant,
   Show,
+  signFaceShift,
   SkyClouds,
   Smoke,
   Snowfall,
@@ -71,6 +72,7 @@ import {
   type Pt,
 } from '../kit';
 import {
+  AMBIENT_NOOK,
   Ambient,
   CastShadow,
   ContactShadow,
@@ -83,6 +85,7 @@ import {
   nookRig,
   PoolLift,
   polyD,
+  POOL_NOOK,
   rectD,
   Shade,
   Shadow,
@@ -94,7 +97,10 @@ import {
   type LightHole,
   type LightRig,
 } from '../kit/Light';
+import {Haze, stepAt} from '../kit/Haze';
+import {mixHex} from '../kit/Light';
 import {Letters} from './O1_life';
+import {FAR_SNOW, HALL_K, SIGN_CALM} from './outside';
 
 /** Children see FILM time as useTime() (kit pieces key their beats on it, whatever sequence draws them). */
 export const FilmClock: React.FC<{T: number; children?: React.ReactNode}> = ({T, children}) => (
@@ -115,12 +121,12 @@ export const POOL: Ellipse = NOOK.pool;
 /** THE nook rig (CRAFT §d.1): every shot of the home reads it (the thread plane too). Its ambient step sits at the
  *  bright end of CRAFT §d.2's ladder (the wall 91 -> 84, the desk 68 -> 63, hue kept peach): the owner's "warm, never
  *  sickly" room stays warm. */
-export const HOME_AMBIENT = '#F5E5DA';
+export const HOME_AMBIENT = AMBIENT_NOOK;
 /** The desk pool as LIT TERRACOTTA (SQA pilot review; CRAFT §d.7: "L* 82-85 at C* >= 36"): ring L* 79 C* 42 h 62, core
  *  L* 84 C* 38 h 70, both lighter (+16 / +21 over the ambient desk) and warmer than the desk (h 55), keeping its colour.
  *  The old ring #FFD7A4 / core #FFE8C1 (L* 88 / 93, C* 31 / 22) turned the terracotta into a pale cream disc that read as
  *  a placemat. The brightest 5 % of H1 is the phone's screen (and the card's paper in SQB), so the pool need not be. */
-export const HOME_POOL: [string, string] = ['#FBB580', '#FFC78F'];
+export const HOME_POOL: [string, string] = POOL_NOOK;
 /** The lamp's ONE wash (CRAFT §d.7 room falloff): on the shelf and the window's left reveal behind the lamp, cut at the
  *  desk's crease (washHole), its top at y 838 (the caption band ends at 600). */
 export const HOME_WASH: Ellipse = {cx: 190, cy: 1000, rx: 236, ry: 162};
@@ -205,8 +211,31 @@ const FAR_ROW: [number, number, boolean][] = [
 const ROOF = EMBER.roofs;
 const NEAR_HOUSE = '#3E4870';
 
-/** A far house: a flat body and roof, a snow cap, lit panes at the rig's window value (exact, never recoloured). */
-const FarHouse: React.FC<{x: number; w: number; y: number; h?: number; pitch?: number; lit?: [number, number][]; at?: number; color?: string; chimney?: boolean}> = ({x, w, y, h = w * 0.62, pitch = 0.4, lit = [], at, color = ROOF, chimney}) => {
+/** AFTER THE HOOK THE WINDOW VIEW SITS BACK (early review E8; CRAFT §b; flow_v2 §5: SQB and SQC see the data center
+ *  calm, tier C). At 6.35 J1's pan has just carried the data center out of frame (the switch is never seen on it; 0.55 s
+ *  past the seam, outside its 0.4 s): the data center drops from the subject to the environment under one haze step
+ *  toward the sky's lowest colour, its lit sign to a calm panel one step over the hazed facade (the WINDOW lane's H2
+ *  values: one data center seen from both windows), its rows one value over the body; the town's houses step back one
+ *  plane (walls half way into the far snow, the near row a little less: the WINDOW lane's town), so SQB's window strip
+ *  and SQC's window behind THE stick stop competing with the chart and the stick. A 2-step change (half for 3 frames)
+ *  while the strip slides with the pan's last metres. SQA (0-5.80, the approved pilot) is untouched. */
+export const HOOK_CALM_AT = 6.35;
+/** 0 = the hook's window (SQA), 0.5 = the 3-frame half step, 1 = calm. */
+export const windowCalm = (T: number): number => stepAt(T, HOOK_CALM_AT);
+/** outside.tsx's calm data center (its haze step, its calm sign) and its town's far snow: one data center and one town
+ *  seen from both windows, the values imported from their owner, never copied. */
+const DC_CALM_HAZE = HALL_K;
+const SIGN_LIT = {panel: EMBER.led, text: EMBER.ink};
+/** How far each row of houses steps toward FAR_SNOW when calm (the farther, the more). */
+const CALM_STEP = {far: 0.5, town: 0.5, near: 0.38};
+/** Then one light haze step over the houses toward the far snow (kit Haze: far = lighter, lower contrast; the lit panes
+ *  turn a pale cream on the calm walls instead of yellow specks: a mix toward the blue sky would grey them). */
+const TOWN_HAZE = 0.3;
+
+/** A far house: a flat body and roof, a snow cap, lit panes at the rig's window value (exact, never recoloured).
+ *  `calm` (0..1, x its row's step): the walls step toward the far snow (after the hook, E8). */
+const FarHouse: React.FC<{x: number; w: number; y: number; h?: number; pitch?: number; lit?: [number, number][]; at?: number; color?: string; chimney?: boolean; calm?: number}> = ({x, w, y, h = w * 0.62, pitch = 0.4, lit = [], at, color: color0 = ROOF, chimney, calm = 0}) => {
+  const color = calm > 0 ? mixHex(color0, FAR_SNOW, calm) : color0;
   const eave = y - h;
   const peak = eave - w * pitch;
   const pk = x + w / 2;
@@ -231,37 +260,64 @@ export const DC_SIGN_AT = 0.25;
 /** The server lights: a soft cold value (a quiet texture under the sign, never a field of bright dashes). */
 export const DC_LED = '#A8B6DE';
 export const DC_DARK_AT = 4.04;
-/** 4.16-4.53: the dark building's server rows light up one by one, after the sign's pop (rows OFF from 4.04). */
-export const DC_ROWS_ON = {at: 4.16, dur: 0.4};
+/** 4.16-4.87: the dark building's server rows light up one by one after the sign's pop (rows OFF from 4.04), one row
+ *  per syllable of "AI data centers" (4.16 / 4.38 / 4.59 / 4.81, each row's three bands a quick sweep), so the beat's
+ *  subject owns the motion through its line (the SQA pilot review measured 8 % for it over 4.47-5.10 when the rows were
+ *  done by 4.56 and the phone's float was all that moved). */
+export const DC_ROWS_ON = {at: 4.16, dur: 0.86};
+/** The data center's own sign geometry (H1 px; `signOnFace`), for the calm sign drawn over the hazed building. */
+const DC_GEO = dataCenterGeo(DC_AT.x, DC_AT.y, DC_AT.w);
+const DC_SIGN = {...DC_GEO.sign, x: DC_GEO.sign.x + signFaceShift(DC_AT.w)};
+/** Support before its beat, the subject on it (4.04: dark, the sign lit, the rows one per syllable), calm from
+ *  HOOK_CALM_AT (E8: tier C, hazed, the sign a calm step of its facade). */
 const HomeDataCenter: React.FC<{T: number}> = ({T}) => {
   const k = T >= DC_DARK_AT ? Math.sin(Math.PI * prog(T, DC_DARK_AT, 0.2, ease.linear)) : 0;
   const s = 1 + 0.045 * k;
+  const c = windowCalm(T);
+  const tier = T < DC_DARK_AT ? 'support' : c >= 1 ? 'environment' : c > 0 ? 'support' : 'subject';
   const body = (
     <DataCenter
       x={DC_AT.x}
       y={DC_AT.y}
       w={DC_AT.w}
       variant="normal"
-      sign="AI DATA CENTER"
+      sign={c > 0 ? null : 'AI DATA CENTER'}
       signAt={DC_SIGN_AT}
       darkAt={DC_DARK_AT}
       signLitAt={DC_DARK_AT}
       at={-0.15}
       seed="home/dc"
-      ledColor={DC_LED}
+      ledColor={c > 0 ? mixHex(DC_LED, EMBER.dc, c) : DC_LED}
       ledStyle="bands"
       rowsOn={DC_ROWS_ON}
-      tier={T >= DC_DARK_AT ? 'subject' : 'support'}
+      signOnFace
+      tier={tier}
     />
   );
-  return s > 1.0005 ? <XG m={mat.about(mat.scale(s), DC_AT.x, DC_AT.y)}>{body}</XG> : body;
+  const dc = s > 1.0005 ? <XG m={mat.about(mat.scale(s), DC_AT.x, DC_AT.y)}>{body}</XG> : body;
+  if (c <= 0) return dc;
+  // calm: one haze step on the building, then its sign on top in the calm values (raw fills: the tier never repaints
+  // them, as the WINDOW lane's H2 sign)
+  const signSize = Math.min(DC_SIGN.h * 0.78, DC_AT.w * 0.13);
+  return (
+    <>
+      <Haze k={DC_CALM_HAZE * c} color={EMBER.skyLow}>
+        {dc}
+      </Haze>
+      <rect x={DC_SIGN.x} y={DC_SIGN.y} width={DC_SIGN.w} height={DC_SIGN.h} fill={mixHex(SIGN_LIT.panel, SIGN_CALM.panel, c)} />
+      <Txt x={DC_AT.x + (DC_AT.w * 0.06) / 2} y={DC_SIGN.y + DC_SIGN.h * 0.74} size={signSize} fill={mixHex(SIGN_LIT.text, SIGN_CALM.text, c)} fit={DC_SIGN.w * 0.92}>
+        AI DATA CENTER
+      </Txt>
+    </>
+  );
 };
 
-/** The data center's sign plate (H1 px) grown by a margin (its 4.04 pop scales it x1.045): falling snow stays off it. */
+/** The data center's sign plate (H1 px; centred on the lit front face: `signOnFace`) grown by a margin (its 4.04 pop
+ *  scales it x1.045): falling snow stays off it. */
 const SIGN_PLATE = (() => {
   const g = dataCenterGeo(DC_AT.x, DC_AT.y, DC_AT.w).sign;
   const m = 14;
-  return rectD(g.x - m, g.y - m, g.w + m * 2, g.h + m * 2);
+  return rectD(g.x + signFaceShift(DC_AT.w) - m, g.y - m, g.w + m * 2, g.h + m * 2);
 })();
 /** The snow's clip: the sky box minus the sign plate (even-odd). */
 const SNOW_CLIP = rectD(-400, -400, 2000, 2400) + SIGN_PLATE;
@@ -285,40 +341,51 @@ const HomeSnow: React.FC = () => {
   );
 };
 
-/** The view through the window (far plane, H1 px): exported for any shot that hangs the same window. */
-export const HomeOutside: React.FC<{T: number}> = ({T}) => (
+/** The view through the window (far plane, H1 px): exported for any shot that hangs the same window. After the hook
+ *  (windowCalm) the houses and the data center sit back (E8). */
+export const HomeOutside: React.FC<{T: number}> = ({T}) => {
+  const c = windowCalm(T);
+  const far = c * CALM_STEP.far;
+  const town = c * CALM_STEP.town;
+  const near = c * CALM_STEP.near;
+  return (
   <Tier tier="environment" bg={EMBER.sky}>
     <NightSky x={SKY_BOX[0]} y={SKY_BOX[1]} w={SKY_BOX[2]} h={SKY_BOX[3]} at={-0.5} />
     {/* one far ridge along the horizon (a flat step under the sky) */}
     <Fill d={polyD([[GLASS.x - 40, HORIZON + 4], [GLASS.x - 40, 918], [230, 906], [330, 922], [430, 900], [520, 914], [640, 896], [760, 912], [860, 902], [GLASS.x + GLASS.w + 40, 914], [GLASS.x + GLASS.w + 40, HORIZON + 4]])} color={RIDGE} at={-0.46} offset={false} />
     <Fill rect={[GLASS.x - 40, HORIZON, GLASS.w + 80, GLASS.y + GLASS.h - HORIZON + 40]} color={EMBER.snow} at={-0.44} offset={false} mode="snap" />
-    {/* the far town along the ridge: a row of tiny houses with a few lit panes (flat, far, calm) */}
-    {FAR_ROW.map(([x, w, lit], i) => (
-      <FarHouse key={i} x={x} w={w} y={RIDGE_Y(x + w / 2)} h={w * 0.6} pitch={0.36} color={RIDGE_HOUSE} lit={lit ? [[0.42, 0.34]] : []} at={-0.43} />
-    ))}
-    {/* the town on the horizon: left of the data center, then right of it */}
-    <FarHouse x={190} w={58} y={HORIZON + 2} lit={[[0.22, 0.3]]} at={-0.42} />
-    <FarHouse x={250} w={64} y={HORIZON + 2} h={56} lit={[[0.56, 0.36]]} chimney at={-0.41} />
-    <SnowTree x={326} y={HORIZON + 4} h={92} kind="pine" far seed="home/pine1" at={-0.4} />
-    <FarHouse x={772} w={56} y={HORIZON + 2} h={82} pitch={0.2} lit={[[0.18, 0.2], [0.6, 0.55]]} at={-0.42} />
-    <FarHouse x={836} w={62} y={HORIZON + 2} lit={[[0.4, 0.34]]} chimney at={-0.41} />
-    <SnowTree x={758} y={HORIZON + 4} h={70} kind="pine" far seed="home/pine2" at={-0.4} />
+    <Haze k={TOWN_HAZE * c} color={FAR_SNOW}>
+      {/* the far town along the ridge: a row of tiny houses with a few lit panes (flat, far, calm) */}
+      {FAR_ROW.map(([x, w, lit], i) => (
+        <FarHouse key={i} x={x} w={w} y={RIDGE_Y(x + w / 2)} h={w * 0.6} pitch={0.36} color={RIDGE_HOUSE} lit={lit ? [[0.42, 0.34]] : []} at={-0.43} calm={far} />
+      ))}
+      {/* the town on the horizon: left of the data center, then right of it */}
+      <FarHouse x={190} w={58} y={HORIZON + 2} lit={[[0.22, 0.3]]} at={-0.42} calm={town} />
+      <FarHouse x={250} w={64} y={HORIZON + 2} h={56} lit={[[0.56, 0.36]]} chimney at={-0.41} calm={town} />
+      <SnowTree x={326} y={HORIZON + 4} h={92} kind="pine" far seed="home/pine1" at={-0.4} />
+      <FarHouse x={772} w={56} y={HORIZON + 2} h={82} pitch={0.2} lit={[[0.18, 0.2], [0.6, 0.55]]} at={-0.42} calm={town} />
+      <FarHouse x={836} w={62} y={HORIZON + 2} lit={[[0.4, 0.34]]} chimney at={-0.41} calm={town} />
+      <SnowTree x={758} y={HORIZON + 4} h={70} kind="pine" far seed="home/pine2" at={-0.4} />
+    </Haze>
     {/* a slow cloud band behind the data center (visible either side of it), a lighter flat step of the sky */}
     <Show at={0.15}>
       <SkyClouds x0={GLASS.x - 260} x1={GLASS.x + GLASS.w + 260} y0={640} y1={790} n={3} w={[240, 420]} speed={7} color="#67769F" seed="home/clouds" shape="lobed" />
     </Show>
     <HomeDataCenter T={T} />
-    {/* one window lights up (a neighbour home: 1.05, in the hook's quiet stretch) */}
-    <LitWindow rect={[836 + 62 * 0.66, HORIZON + 2 - 62 * 0.62 + 62 * 0.62 * 0.36, 62 * 0.16, 62 * 0.62 * 0.26]} at={1.05} />
-    {/* the nearest houses down our street (in front of the horizon, behind the sill): small, a lit pane each */}
-    <FarHouse x={186} w={76} y={1054} h={46} pitch={0.32} color={NEAR_HOUSE} lit={[[0.58, 0.3]]} at={-0.38} />
-    <FarHouse x={772} w={70} y={1050} h={46} pitch={0.32} color={NEAR_HOUSE} lit={[[0.24, 0.3]]} at={-0.38} />
-    <FarHouse x={848} w={64} y={1056} h={44} pitch={0.34} color={NEAR_HOUSE} lit={[[0.56, 0.32]]} chimney at={-0.38} />
+    <Haze k={TOWN_HAZE * c} color={FAR_SNOW}>
+      {/* one window lights up (a neighbour home: 1.05, in the hook's quiet stretch) */}
+      <LitWindow rect={[836 + 62 * 0.66, HORIZON + 2 - 62 * 0.62 + 62 * 0.62 * 0.36, 62 * 0.16, 62 * 0.62 * 0.26]} at={1.05} />
+      {/* the nearest houses down our street (in front of the horizon, behind the sill): small, a lit pane each */}
+      <FarHouse x={186} w={76} y={1054} h={46} pitch={0.32} color={NEAR_HOUSE} lit={[[0.58, 0.3]]} at={-0.38} calm={near} />
+      <FarHouse x={772} w={70} y={1050} h={46} pitch={0.32} color={NEAR_HOUSE} lit={[[0.24, 0.3]]} at={-0.38} calm={near} />
+      <FarHouse x={848} w={64} y={1056} h={44} pitch={0.34} color={NEAR_HOUSE} lit={[[0.56, 0.32]]} chimney at={-0.38} calm={near} />
+    </Haze>
     {/* one chimney's smoke drifting right (slow, low contrast) */}
     <Smoke x={250 + 64 * 0.725} y={HORIZON + 2 - 56 - 64 * 0.4 - 4} seed="home/smoke" at={0.2} ceil={640} r1={15} rise={120} drift={-70} />
     <HomeSnow />
   </Tier>
-);
+  );
+};
 
 // ================================================================= the room
 
@@ -357,23 +424,48 @@ const Biscuits: React.FC<{x: number; y: number; at?: number}> = ({x, y, at}) => 
   </>
 );
 
+/** A rounded rect (corner 8) as one closed path: a desk book's cover. */
+const bookRectD = (x: number, y: number, w: number, h: number) =>
+  `M${x + 8} ${y}H${x + w - 8}Q${x + w} ${y} ${x + w} ${y + 8}V${y + h - 8}Q${x + w} ${y + h} ${x + w - 8} ${y + h}H${x + 8}Q${x} ${y + h} ${x} ${y + h - 8}V${y + 8}Q${x} ${y} ${x + 8} ${y}Z`;
+/** A desk book's whole silhouette in its own (unrotated) frame: the cover and the page block under it. */
+const deskBookD = (bk: {x: number; y: number; w: number; h: number}) => bookRectD(bk.x, bk.y, bk.w, bk.h + 10);
+
 /** A closed book lying flat (rotated about its centre): the cover, the page block's edge, a ribbon. */
 const DeskBook: React.FC<(typeof DESK_BOOKS)[number] & {at?: number}> = ({x, y, w, h, rot, color, at}) => (
   <XG m={mat.about(mat.rotate(rot), x + w / 2, y + h / 2)}>
-    <Fill d={`M${x + 8} ${y}H${x + w - 8}Q${x + w} ${y} ${x + w} ${y + 8}V${y + h - 8}Q${x + w} ${y + h} ${x + w - 8} ${y + h}H${x + 8}Q${x} ${y + h} ${x} ${y + h - 8}V${y + 8}Q${x} ${y} ${x + 8} ${y}Z`} color={color} at={at} offset={false} />
+    <Fill d={bookRectD(x, y, w, h)} color={color} at={at} offset={false} />
     <Fill rect={[x + 10, y + h - 2, w - 20, 12]} color={EMBER.paper} at={at} offset={false} />
     <Fill rect={[x + w * 0.72, y + h - 4, 12, 30]} color={EMBER.mugBand} at={at} offset={false} />
   </XG>
 );
 
-/** A roof window in the slope over the card wall (H1 px; seen in SQB's framing): the night sky in it, a snow edge. */
+/** A roof window in the slope over the card wall (H1 px; seen in SQB's framing): the night sky in it, a snow edge, and
+ *  the set's own slow life where SQB looks (E12): snow drifting down past the glass (small, slow, a few flakes at a
+ *  time; the pane clips them, so they never pop in or out inside it). */
 const SKY_PANE: Pt[] = [[1318, 52], [1502, 52], [1522, 214], [1298, 214]];
 const SKY_FRAME: Pt[] = [[1296, 30], [1524, 30], [1548, 236], [1272, 236]];
+const SkylightSnow: React.FC = () => {
+  const id = 'skysnow' + React.useId().replace(/[^a-zA-Z0-9]/g, '');
+  return (
+    <>
+      <defs>
+        <clipPath id={id} clipPathUnits="userSpaceOnUse">
+          <path d={polyD(SKY_PANE)} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id})`}>
+        {/* the wrap rect runs past the pane top and bottom, so a flake wraps out of sight */}
+        <Snowfall x={1298} y={30} w={224} h={206} n={7} size={0.75} speed={0.55} seed="home/skysnow" at={0.3} />
+      </g>
+    </>
+  );
+};
 const Skylight: React.FC = () => (
   <>
     <Fill d={polyD(SKY_FRAME)} color={EMBER.reveal} at={-0.44} offset={false} />
     <Tier tier="environment" bg={EMBER.sky}>
       <Fill d={polyD(SKY_PANE)} color={EMBER.sky} at={-0.42} offset={false} />
+      <SkylightSnow />
       <Fill d={polyD([[1300, 200], [1520, 200], [1522, 214], [1298, 214]])} color={EMBER.snow} at={-0.4} offset={false} />
     </Tier>
     <Show at={0.3}>
@@ -382,6 +474,59 @@ const Skylight: React.FC = () => (
       ))}
     </Show>
   </>
+);
+
+/** SQB'S OWN CORNER (E12, the early review: SQB 6.5-16.6 is the film's longest shot and read "way too empty"; only its
+ *  framing sees H1 x > ~1480): calm tier-C things, flat, no line, low contrast (CRAFT §b-c) and one slow mover. A short
+ *  run of string lights on the slope right of the skylight (one bulb steps down and back about every 1.5 s: the
+ *  set's own slow life in SQB's framing, a 7 px bulb, never a noticeable mover), a teacup on its saucer and a pencil on
+ *  the desk's lower right. */
+const SLOPE_LIGHTS: Pt[] = [[1566, 48], [1732, 116], [1910, 162]];
+const TEACUP = {x: 1736, y: 1772, w: 96};
+/** The pencil lies past the right edge in SQB's framing (cut by it: the world goes on), clear of the hand. */
+const PENCIL = {x: 1832, y: 1652, len: 176, rot: -22};
+/** A teacup on its saucer (flat: the saucer, the cup's body with a soft band, the tea's surface a light amber: a dark
+ *  surface was the mug's salience on the left), seen from above at the desk's angle. */
+const teacupD = (c: typeof TEACUP) => {
+  const {x, y, w} = c;
+  return {
+    saucer: ellipseD({cx: x, cy: y + w * 0.06, rx: w * 0.82, ry: w * 0.26}),
+    well: ellipseD({cx: x, cy: y + w * 0.04, rx: w * 0.52, ry: w * 0.15}),
+    body: `M${x - w * 0.5} ${y - w * 0.42}L${x - w * 0.42} ${y - w * 0.02}Q${x} ${y + w * 0.16} ${x + w * 0.42} ${y - w * 0.02}L${x + w * 0.5} ${y - w * 0.42}Z`,
+    band: `M${x - w * 0.47} ${y - w * 0.3}L${x - w * 0.45} ${y - w * 0.2}Q${x} ${y - w * 0.06} ${x + w * 0.45} ${y - w * 0.2}L${x + w * 0.47} ${y - w * 0.3}Q${x} ${y - w * 0.16} ${x - w * 0.47} ${y - w * 0.3}Z`,
+    rim: ellipseD({cx: x, cy: y - w * 0.42, rx: w * 0.5, ry: w * 0.13}),
+    tea: ellipseD({cx: x, cy: y - w * 0.4, rx: w * 0.42, ry: w * 0.1}),
+    handle: `M${x + w * 0.47} ${y - w * 0.34}Q${x + w * 0.78} ${y - w * 0.34} ${x + w * 0.74} ${y - w * 0.18}Q${x + w * 0.7} ${y - w * 0.06} ${x + w * 0.44} ${y - w * 0.1}L${x + w * 0.45} ${y - w * 0.17}Q${x + w * 0.63} ${y - w * 0.15} ${x + w * 0.64} ${y - w * 0.21}Q${x + w * 0.66} ${y - w * 0.28} ${x + w * 0.47} ${y - w * 0.26}Z`,
+  };
+};
+const TEACUP_D = teacupD(TEACUP);
+const Teacup: React.FC<{at?: number}> = ({at}) => (
+  <>
+    <Fill d={TEACUP_D.saucer} color={EMBER.card} at={at} offset={false} />
+    <Fill d={TEACUP_D.well} color={EMBER.paper} at={at} offset={false} />
+    <Fill d={TEACUP_D.handle} color={EMBER.paper} at={at} offset={false} />
+    <Fill d={TEACUP_D.body} color={EMBER.paper} at={at} offset={false} />
+    <Fill d={TEACUP_D.band} color={EMBER.mugBand} at={at} offset={false} />
+    <Fill d={TEACUP_D.rim} color={EMBER.card} at={at} offset={false} />
+    <Fill d={TEACUP_D.tea} color="#E3A06E" at={at} offset={false} />
+  </>
+);
+/** A pencil lying on the desk (one flat body, a light wood tip, a soft point; no line). */
+const PENCIL_D = (() => {
+  const {x, y, len, rot} = PENCIL;
+  const h = 11;
+  const body = `M${x - len / 2} ${y - h / 2}H${x + len / 2 - 26}L${x + len / 2 - 26} ${y + h / 2}H${x - len / 2 + 4}Q${x - len / 2} ${y + h / 2} ${x - len / 2} ${y + h / 2 - 4}V${y - h / 2 + 4}Q${x - len / 2} ${y - h / 2} ${x - len / 2 + 4} ${y - h / 2}Z`;
+  const tip = `M${x + len / 2 - 26} ${y - h / 2}L${x + len / 2} ${y}L${x + len / 2 - 26} ${y + h / 2}Z`;
+  const point = `M${x + len / 2 - 8} ${y - h * 0.16}L${x + len / 2} ${y}L${x + len / 2 - 8} ${y + h * 0.16}Z`;
+  const outline = `M${x - len / 2 + 4} ${y - h / 2}H${x + len / 2 - 26}L${x + len / 2} ${y}L${x + len / 2 - 26} ${y + h / 2}H${x - len / 2 + 4}Q${x - len / 2} ${y + h / 2} ${x - len / 2} ${y + h / 2 - 4}V${y - h / 2 + 4}Q${x - len / 2} ${y - h / 2} ${x - len / 2 + 4} ${y - h / 2}Z`;
+  return {body, tip, point, outline, m: mat.about(mat.rotate(rot), x, y)};
+})();
+const Pencil: React.FC<{at?: number}> = ({at}) => (
+  <XG m={PENCIL_D.m}>
+    <Fill d={PENCIL_D.body} color={EMBER.hl} at={at} offset={false} />
+    <Fill d={PENCIL_D.tip} color="#F3D9BC" at={at} offset={false} />
+    <Fill d={PENCIL_D.point} color="#B07A62" at={at} offset={false} />
+  </XG>
 );
 
 /** The card's static face (title, subtitle, axes, the two years): the chart on it is SQB's. */
@@ -482,7 +627,10 @@ const NO_POOL: Ellipse = {cx: POOL.cx, cy: POOL.cy, rx: 0.5, ry: 0.5};
 const NOOK_LAYOUT_HOME = {pool: NO_POOL, mug: null, notebook: false, desk: {x0: -60, x1: 1140}, shelf: {...NOOK.shelf!, plant: undefined}};
 /** The room's planes turned from the lamp (CRAFT §d.7 falloff by planes): the attic slope (+ its extension), the
  *  shelf's upper cubbies, the board undersides (the demo's numbers: kit/KitSheetLight.tsx). */
-const SLOPE_SHADE = polyD([[560, -60], [1120, -60], [1120, -30 + 560 * SLOPE_K]]) + polyD([[1100, -60], [ROOM_X1 + 200, -60], [ROOM_X1 + 200, BEAM_TOP], [1100, BEAM_TOP]]);
+const SLOPE_SHADE = polyD([[560, -60], [1120, -60], [1120, -30 + 560 * SLOPE_K]]);
+/** The slope over the right extension (seen in SQB's framing): its own shape, so frame 0's colour wave reaches each part
+ *  by its own centre (one shape spanning both landed its shade at 0.33 s, after everything else). */
+const SLOPE_SHADE_X = polyD([[1120, -60], [ROOM_X1 + 200, -60], [ROOM_X1 + 200, BEAM_TOP], [1120, BEAM_TOP]]);
 const SHELF_X1 = 116;
 const CUBBIES = [[-30, -30, SHELF_X1 + 30, 298], [-30, 284, SHELF_X1 + 30, 300], [-30, 600, SHELF_X1 + 30, 256]].map((r) => rectD(r[0], r[1], r[2], r[3])).join('');
 const UNDERSIDES = [284, 600, 872].map((y) => rectD(-30, y, SHELF_X1 + 30, 9)).join('');
@@ -535,6 +683,8 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
         <FramedPrint x={430} y={40} w={84} h={100} picture="sun" seed="home/print" at={-0.4} />
         <FramedPrint x={330} y={84} w={66} h={82} picture="leaf" seed="home/print2" at={-0.4} />
         <StringLights3 points={[[574, 8], [744, 96], [904, 180], [1090, 262]]} sag={18} n={10} r={7} every={1.6} halo={false} seed="home/lights" at={0.18} />
+        {/* SQB's corner (E12): the slope right of the skylight; one bulb steps about every 1.5 s */}
+        <StringLights3 points={SLOPE_LIGHTS} sag={14} n={6} r={7} every={1.5} twinkleDur={0.6} halo={false} seed="home/lights2" at={0.18} />
       </Tier>
       {/* the card (paper, exact) and the notes on the wall */}
       {/* the card's paper and pins keep their exact colours (the subject tier recolours nothing) */}
@@ -572,9 +722,19 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
         <ContactShadow x={BOOKS_X.x + BOOKS_X.w / 2} y={BOOKS_X.y} w={BOOKS_X.w} h={10} />
         <ContactShadow x={PENS_X.x} y={PENS_X.y} w={PENS_X.w} h={8} />
         <ContactShadow x={BOOKS_P.x + BOOKS_P.w / 2} y={BOOKS_P.y} w={BOOKS_P.w} h={10} />
+        {/* each closed book's soft contact rim: its own silhouette (cover + page block), turned with the book (an
+            unrotated rect under a book turned 8 deg stuck out at two corners: early SQB-SQF review E13), a few px away
+            from the lamp */}
         {DESK_BOOKS.map((bk, i) => (
-          <Shadow key={i} d={rectD(bk.x, bk.y + 6, bk.w, bk.h + 6)} dx={3} dy={5} soft={3} tint="contact" />
+          <XG key={i} m={mat.about(mat.rotate(bk.rot), bk.x + bk.w / 2, bk.y + bk.h / 2)}>
+            <Shadow d={deskBookD(bk)} dx={3} dy={5} soft={3} tint="contact" />
+          </XG>
         ))}
+        {/* SQB's corner (E12): the saucer's contact shadow, the pencil's rim turned with it */}
+        <ContactShadow x={TEACUP.x} y={TEACUP.y + TEACUP.w * 0.22} w={TEACUP.w * 1.5} h={8} />
+        <XG m={PENCIL_D.m}>
+          <Shadow d={PENCIL_D.outline} dx={2} dy={3} soft={2} tint="contact" />
+        </XG>
       </ShadowLayer>
       <Tier tier="environment">
         {headphones}
@@ -595,6 +755,9 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
           <DeskBook key={i} {...bk} at={-0.34} />
         ))}
         <Lamp pose={LAMP} lit at={NOOK_AT + 0.08} seed="home/nook" />
+        {/* SQB's corner (E12), drawn after the lamp (far from it) */}
+        <Pencil at={-0.34} />
+        <Teacup at={-0.34} />
       </Tier>
       {room}
       {/* form: one step on the side away from the lamp, on the lit things in the pool and every desk thing; the planes
@@ -602,10 +765,12 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
       <FormShade of={headphones} c={[HEAD.x, HEAD.y - HEAD.w * 0.25]} size={[HEAD.w, HEAD.w * 0.5]} />
       <FormShade d={LAMP_BASE_D} />
       <FormShade of={mug} c={[MUG.x + MUG.w / 2, MUG.top + MUG.w * 0.57]} size={[MUG.w, MUG.w * 1.14]} />
+      <FormShade d={TEACUP_D.body} />
       {FORMS.map(([el, c, size], i) => (
         <FormShade key={i} of={el} c={c} size={size} />
       ))}
       <Shade d={SLOPE_SHADE} />
+      <Shade d={SLOPE_SHADE_X} />
       <Shade d={CUBBIES} />
       <Shade d={UNDERSIDES} tint="cast" />
       {/* the card and the notes stand a hair off the wall: soft drop shadows falling AWAY from the lamp (it is low on

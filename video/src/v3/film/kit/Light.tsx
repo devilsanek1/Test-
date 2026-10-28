@@ -301,6 +301,14 @@ export const TINT_DUSK: Tints = tintFamily('#BBA8DA', {form: 0.5, cast: 0.58, co
  *  example #EBB07F / #F6CD98, L* 76 / 85, sits under the ambient wall's 82 at the ring: the brightest 5 % then lands on
  *  the upper wall, not on the subject in the pool; measured in the demo.) */
 export const POOL_DESK: [string, string] = ['#FFD7A4', '#FFE8C1'];
+/** v3's NOOK desk pool as LIT TERRACOTTA (the SQA pilot review; CRAFT §d.7 "L* 82-85 at C* >= 36"): ring L* 79 C* 42 h 62,
+ *  core L* 84 C* 38 h 70, both lighter and warmer than the desk (h 55), keeping its colour (POOL_DESK's cream, L* 88 /
+ *  93, turned the terracotta into a placemat and held the brightest 5 % of H2). ONE nook, one rig (CRAFT §d.1): the
+ *  home's HOME_RIG (home_set) and H2's desk (h2_window) both read it. */
+export const POOL_NOOK: [string, string] = ['#FBB580', '#FFC78F'];
+/** v3's nook ambient step at the bright end of CRAFT §d.2's ladder (the wall 91 -> 84, the desk 68 -> 63, peach kept):
+ *  HOME_RIG's and H2_RIG's. */
+export const AMBIENT_NOOK = '#F5E5DA';
 
 const BASE = {
   rim: EMBER.core,

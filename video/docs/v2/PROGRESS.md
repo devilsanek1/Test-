@@ -2,6 +2,55 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 02:19 UTC (hourly)
+
+Waiting for the owner's word on the G4 look clip v4 (sent ~01:55). Prepared meanwhile: `lanes/RESUME_2026-10-28.md` (what every shot now
+gets: depth, sky presets, light + water tint, readable particles, the parallax float; the checks before a report; L5 / L6 deltas incl. the
+sound requests and SUN0). Nothing running; helpers idle. Spend: orchestrator $3,790.34 (+$11 this hour). Estimated weekly ~73 %.
+
+## Note 2026-10-28 01:55 UTC: G4 look clip v4 sent to the owner
+
+`deliverables/v2/v2r_G4_look_v4.mp4` (master encode; S1 0-6.13 s): the owner's depth / sky / particles notes + the art director's fix list
+(the sun cut by one level roofline, the tower a real building, readable particles, a calmer terrace, the wing on the ground's camera, later
+paler birds, the cheap bits). Checks on the master: check_banding PASS (5 open-sky regions), check_depth 0 FAIL / 5 WARN, check_light OK x3,
+particles + float lint clean. Known for the final mix (W4): the birds' wings / calls sound at 1.46-1.74 now precede the 2.45 lift.
+Waiting for the owner; then L2-L6 resume with the full toolkit.
+
+## Snapshot 2026-10-28 01:18 UTC (hourly)
+
+| part | owner | status |
+|---|---|---|
+| Depth + particles toolkit | local (done) | built, adversarially checked and fixed (deterministic, ~0.4 ms/frame, v1/v3 untouched, check_depth hardened) |
+| Pro sky | local `wf_951757bf-213` | built (lib/sky, check_banding, `--master` encode: PNG frames, one-pass bt709, x264 CRF 14 slow aq 3); critic finishing |
+| S1 look clip | L1 | v3 rendered (sky, depth, particles, parallax float; all checks pass); art director: FIX FIRST (sun tooth, blank tower slab, particles too small for a phone; should: calmer terrace, one camera for the wing, birds); L1 doing ONE combined pass -> v4; then the owner |
+| Docs | orchestrator | STYLE.md sky clash fixed; CRAFT §f "failures the eye catches first"; PIPELINE G4: an independent art-director check before the owner |
+| L2-L6 | paused | resume after the owner sees the look clip |
+
+**Spend:** orchestrator $3,779.49 (+$51 in the last hour), L1 $156.46 (+$17). Estimated weekly ~72-73 % (owner 68 % at 23:22). Projection: inside 100 %.
+
+## Snapshot 2026-10-28 00:18 UTC (hourly)
+
+| part | owner | status |
+|---|---|---|
+| Depth + particles toolkit | local `wf_5d776523-d28` | builder finishing (lib/depth.ts, lib/particles.tsx, check_depth.py, DEPTH.md, CRAFT §f, PIPELINE gates, v2 brief sections all pushed); critic next |
+| Pro sky | local `wf_951757bf-213` | sky engineer building (lib/sky.tsx, check_banding.py, v2r/world/skies.ts, encode settings in render-media.mjs); critic next |
+| S1 look clip v3 | L1 | wiring lib/depth + lib/particles into S1, measuring with check_depth; then the sky lib; then v3 render |
+| L2-L6 | paused | resume after the owner sees v3 |
+
+**Spend:** orchestrator $3,728.60 (+$44 in the last hour). The owner dedicated the full remaining week to video 2 (finish inside 100 %).
+
+## Snapshot 2026-10-27 23:18 UTC (hourly)
+
+| part | owner | status |
+|---|---|---|
+| S1 look clip v3 | L1 (idle, waiting for the libs) | done: depth pass (far city in 3 haze steps, the wing separated), ground pass (2-point perspective, treads foreshortened 4.4x, near things in 3 layers), corner polish, stepped sky + smaller, lower sun (SUN0 now (196, 772) r 52); next: wire lib/sky + lib/particles + lib/depth, render v3 |
+| Depth + particles toolkit | local `wf_5d776523-d28` | scout + analyst DONE (research docs in docs/look/research/); builder running; critic next |
+| Pro sky | local `wf_951757bf-213` | sky engineer running (OKLab eased gradient, sun warmth, blue-noise dither, check_banding, encode settings); critic next |
+| Sound revision 2 | done (be9ecc0) | the film plays public/v2r/mix.wav; requests for L5 / L6 held for their resume |
+| L2-L6 | paused (handovers) | resume after the owner sees S1 v3, with depth + sky sections in their briefs (+ L6: SUN0 moved) |
+
+**Spend:** orchestrator $3,684.85 (+$51 in the last hour), L1 $139.21. Owner readings needed (last: 20:59 session 13 %, weekly 62 %).
+
 ## Note 2026-10-27 23:05 UTC: sound revision 2 DONE (be9ecc0)
 
 Joins on their carriers and midpoints, no Pip hops, a positive glass-chime ding at 0.45, calm air from the conformed life, the music director's 12

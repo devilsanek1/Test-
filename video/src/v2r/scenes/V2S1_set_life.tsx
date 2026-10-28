@@ -22,6 +22,7 @@ import {Person, Seated} from '../kit/cast';
 import * as MAP from '../world/map';
 import {CellPaint, Under, barPath, planeLeaf, S1_IRON, S1_HAZE} from './V2S1_set_core';
 import {mixHex} from '../../lib/light';
+import {atmos} from '../../lib/depth';
 import {s1ArchOpening} from './V2S1_set_far';
 import {floodAt} from './V2S1_clock';
 import {edgeY} from './V2S1_steps_stone';
@@ -146,16 +147,21 @@ function lampInto(b: Batch, x: number, y: number, h: number, seed: string) {
 // ---------------------------------------------------------------- the water
 
 type Refl = {x0: number; x1: number; color: string; depth: number};
+// two reflections only (the art director, v3: the canal read as a barcode of peach / yellow / terracotta bars): the
+// wing's, and the sun's gold column where the glints live; each eased into the water (REFL_SOFT) so they sit on its
+// own value steps, through `atmos` (hue kept, chroma eased, never under C* 12): a straight sRGB mix of a warm colour
+// into the teal crosses grey (the wing's turned khaki #C0B7A6, the sun's olive #CACBA3: DIRECTION rule 6)
 const REFL: Refl[] = [
   {x0: 330, x1: 1080, color: CM.brickLight, depth: 46},
-  {x0: 0, x1: 320, color: CM.brick, depth: 30},
-  {x0: 548, x1: 712, color: CM.lamp, depth: 28},
   {x0: 120, x1: 280, color: CM.sun, depth: 0},
 ];
+const REFL_SOFT = 0.5;
 // the water runs on under our bank's slanted coping (it reaches y ~1300 at the right edge; the bank covers the rest)
 const WATER = {y0: S.water.y0 - 2, y1: S.water.y1 + 96, x0: -40, x1: 1120} as const;
 const WATER_H0 = S.water.y1 - S.water.y0 + 4;
-const WATER_FAR = mixHex(CM.water, S1_HAZE, 0.3);
+// the far water toward the haze, through `atmos` too (the sRGB mix read grey-green, C* 9.8 h 149, and any shade on it
+// greyed): a pale teal, C* 12
+const WATER_FAR = atmos(CM.water, 0.3, S1_HAZE, {chromaFloor: 12});
 const WATER_NEAR = mixHex(CM.water, CM.waterDeep, 0.3);
 
 /** The canal between the far coping and our bank: base colour in regions, the wing's broken reflection and the sun's
@@ -184,7 +190,7 @@ export const S1Water: React.FC = () => {
     const b = new Batch();
     const rt = y0 + 10;
     REFL.forEach((ref, i) => {
-      const color = ref.color === CM.sun ? CM.lamp : ref.color;
+      const color = atmos(ref.color === CM.sun ? CM.lamp : ref.color, REFL_SOFT, CM.water, {chromaFloor: 12});
       const depth = ref.depth || 60;
       const W = ref.x1 - ref.x0;
       const rr = rng(`s1refl/${i}`);
@@ -197,7 +203,7 @@ export const S1Water: React.FC = () => {
         b.rect(color, ref.x0 + W * 0.02, rt + 2, W * (g1 - 0.04), h1);
         b.rect(color, ref.x0 + W * (g1 + 0.03), rt + 2, W * (0.95 - g1), h1);
       } else b.rect(color, ref.x0 + W * 0.04, rt + 2, W * 0.92, h1);
-      b.rect(color, ref.x0 + W * 0.16, rt + 2 + h1 + depth * 0.18, W * 0.62, h2);
+      if (ref.color === CM.sun) b.rect(color, ref.x0 + W * 0.16, rt + 2 + h1 + depth * 0.18, W * 0.62, h2);
     });
     return b;
   }, []);
@@ -238,7 +244,8 @@ const OneBoat: React.FC<{o: BoatOpts; smoke?: boolean; bursts?: number[]}> = ({o
  *  its head on the bus (1.10) and on "life" (4.98). */
 export const S1Boats: React.FC = () => (
   <>
-    <OneBoat o={BOAT_A} smoke bursts={[MAP.S1_CLOCK.doorsOpen + 0.18]} />
+    {/* (no chimney puff in S1: the kit's smoke read as lavender bubbles, the art director on v3) */}
+    <OneBoat o={BOAT_A} />
     <Boater />
     <OneBoat o={BOAT_B} />
     <Cat />
@@ -255,7 +262,7 @@ const Boater: React.FC = () => {
   const y = g.roofY - g.roofH - (BOAT_A.topView ?? 0) * 0.4;
   // at rest (the life budget): the cup held low, no turn. Seated height ~0.55 of a 1.70 m figure on the boat's plane.
   const cup = 0 * t;
-  return <Seated x={x} y={y} h={88} seed="s1/boater" cup={cup} turn={0.1} ink={0} traits={{hair: 'beanie', hatColor: CM.brick, coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none'}} />;
+  return <Seated x={x} y={y} h={88} seed="s1/boater" cup={cup} turn={0.1} ink={0} traits={{hair: 'beanie', hatColor: CM.brick, hairColor: CM.hair[1], coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none'}} />;
 };
 
 /** A ginger cat curled on boat B's roof: a loaf of leafRust with a tail curl; lifts its head at 1.10 and 4.98. */
@@ -294,7 +301,7 @@ export const s1JogX = (t: number) => S1_JOG.x0 + ((S1_JOG.x1 - S1_JOG.x0) * (t -
 export const S1FarLife: React.FC = () => {
   const t = useTime();
   const id = 's1jogclip';
-  if (t < S1_JOG.t0 - 0.2 || t > S1_JOG.t1 + 0.2) return null;
+  const jog = t >= S1_JOG.t0 - 0.2 && t <= S1_JOG.t1 + 0.2;
   return (
     <>
       <defs>
@@ -303,7 +310,9 @@ export const S1FarLife: React.FC = () => {
         </clipPath>
       </defs>
       <g clipPath={`url(#${id})`}>
-        <Person x={s1JogX(t)} y={S1_JOG.feet} h={S1_JOG.h} seed="s1/jog1" ink={0} pose="jog" view="profile" flip={false} walk={{rate: 2.6}} traits={{hair: 'cap', hatColor: CM.coatSlate, hairColor: CM.hair[1], coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none', shoes: CM.paper}} />
+        {/* someone at rest on the far bank beyond the bridge, seen through its arch (the jogger's scale, ~29 px/m) */}
+        <Seated x={70} y={S1_JOG.feet - 2} h={34} seed="s1/archSitter" turn={0} ink={0} traits={{hair: 'long', hairColor: CM.hair[2], coat: CM.brickLight, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none'}} />
+        {jog ? <Person x={s1JogX(t)} y={S1_JOG.feet} h={S1_JOG.h} seed="s1/jog1" ink={0} pose="jog" view="profile" flip={false} walk={{rate: 2.6}} traits={{hair: 'cap', hatColor: CM.coatSlate, hairColor: CM.hair[1], coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none', shoes: CM.paper}} /> : null}
       </g>
     </>
   );
@@ -335,7 +344,8 @@ export const S1PlaneBranch: React.FC = () => {
     {k: 0.78, R: 46, deg: 120, col: CM.leafGold, side: 1},
     {k: 0.98, R: 44, deg: 40, col: CM.leafRust, side: 0},
   ];
-  let stemD = `M${P(...at(0))}`;
+  // the stem runs on off the left edge (overscan: the branch is a near twig and floats the most)
+  let stemD = `M-70 24L${P(...at(0))}`;
   for (let k = 0.05; k <= 1.001; k += 0.05) stemD += `L${P(...at(k))}`;
   const fills: React.ReactNode[] = [];
   let ribs = '';

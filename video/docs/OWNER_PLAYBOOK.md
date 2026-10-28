@@ -68,8 +68,8 @@ Maintenance at the end).
   2026-10-27; "the shadows added are better", v2 G4, 2026-10-27).
 - **DEPTH AND SEPARATION: every shot reads in distance, never a flat elevation.** The subject separates from what is
   behind it (its own value and contrast against a calmer field: a building in front never melts into the buildings
-  behind it); distance shows in the colour (far planes lighter, cooler, less saturated and simpler: atmospheric
-  perspective, in flat colour) and in perspective (a ground plane that recedes: converging edges, foreshortened steps,
+  behind it); distance shows in the colour (far planes converge on the air behind them: lighter, softer, simpler; cooler
+  under a blue sky, warmer under a sunset: atmospheric perspective, in flat colour) and in perspective (a ground plane that recedes: converging edges, foreshortened steps,
   things smaller and paving finer with distance, overlaps), never stacked flat bands. A few subtle particles (motes in
   the light, a drifting leaf, glints on water) make it natural. Proven libraries are welcome where they help (researched,
   deterministic per frame for rendering). — ("the foreground and the main focus still blur with the background
@@ -77,6 +77,10 @@ Maintenance at the end).
   separate one from the other, no distance effect, no perspective; the bottom part: little to no perspective or depth
   ... research some libraries on GitHub ... add a bit of particles here and there to make things more natural", v2 G4,
   2026-10-27).
+- **A gentle PARALLAX float, never a flat card.** When a held shot floats, its planes move by depth (Disney's multiplane
+  idea): the near ground most, far planes little, the sky and the caption band not at all; slow, small, back at rest
+  by every join; it adds depth in motion without adding movers. — ("switch it on if you think it will make the videos
+  better and improve engagement", v2 G4, 2026-10-28).
 - **ONE CONTINUOUS SKY, a gentle gradient, no abrupt colour seams.** The sky is one sky from the top of the frame to
   the horizon: ONE gentle, smooth gradient (the sky is the one place a gradient is welcome), warmest around the sun and
   toward the horizon, dithered so it never bands on a phone, nearly flat inside the caption band so captions keep their

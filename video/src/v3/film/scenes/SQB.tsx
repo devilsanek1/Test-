@@ -18,20 +18,49 @@
 // (J2): the card's face is static at J1 and finished at J2.
 // Joins (docs/G5_BLOCKING.md §2b): IN J1, a seam mid-pan at 5.80 (frame 348: SQA draws the same home_set + thread_plane
 // at film time, the card bare); OUT J2, a seam mid-pan at 16.60 (frame 996: SQC draws the same, the card finished).
+// Quiet life (early review E12, final pass: the film's longest shot must stay alive but calm, never stealing the
+// chart): home_set's SQB corner (the slope's string lights, snow past the skylight, the teacup and pencil) plus, here, the
+// teacup's steam (TeaSteam), the set's own slow life (the mug in H1 steams the same way), drawn in the room plane through
+// HomeSet's `room` so the room's light takes it.
 import React from 'react';
+import {Ink} from '../../../lib/Ink';
+import {smooth} from '../../../lib/sketch';
 import {useFilmTime} from '../../../lib/sequence';
+import {Tier} from '../../../lib/tier';
 import {World} from '../../../lib/World';
 import type {ToneKey} from '../../../lib/Film';
-import {EMBER} from '../kit';
+import {EMBER, type Pt} from '../kit';
 import {HomeSet} from './home_set';
 import {ThreadPlane} from './thread_plane';
 import {OldDealChart} from './SQB_chart';
+
+/** The teacup on the desk's lower right (home_set.tsx TEACUP, H1 px: x 1736, y 1772, w 96; its tea's surface at
+ *  y - 0.4 w), seen only in SQB's framing (off screen at both seams: x 1341 on screen at J1 and J2). Keep in step with
+ *  home_set if the cup ever moves. */
+const TEA = {x: 1736, surface: 1772 - 0.4 * 96};
+/** The steam's colour: a light warm step of the desk (L* 82, ~75 under the room's ambient step, the desk ~64 there:
+ *  within CRAFT §c's dL* 15 for tier C), so it is felt at the frame's edge, never seen before the chart. */
+const STEAM = '#EEC2A6';
+/** Two thin strands rising ~70 px from the tea and swaying slowly (a light line: the clean pen keeps it 1.8 px, never
+ *  a dark squiggle), on film time: it never starts or stops inside SQB. */
+const TeaSteam: React.FC<{T: number}> = ({T}) => {
+  const strand = (sx: number, ph: number) => {
+    const pts: Pt[] = [];
+    for (let i = 0; i <= 4; i++) pts.push([sx + Math.sin(i * 1.15 + ph + T * 1.05) * (2 + i * 1.6), TEA.surface - 8 - i * 17]);
+    return smooth(pts);
+  };
+  return (
+    <Tier tier="environment">
+      <Ink thing d={strand(TEA.x - 11, 0) + strand(TEA.x + 13, 2.4)} width={1.8} color={STEAM} />
+    </Tier>
+  );
+};
 
 const SQB: React.FC = () => {
   const T = useFilmTime();
   return (
     <World sky={EMBER.wall}>
-      <HomeSet T={T} card={<OldDealChart T={T} />} />
+      <HomeSet T={T} card={<OldDealChart T={T} />} room={<TeaSteam T={T} />} />
       <ThreadPlane T={T} />
     </World>
   );

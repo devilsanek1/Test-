@@ -14,7 +14,8 @@ import {Ink} from '../../lib/Ink';
 import {rng} from '../../lib/rng';
 import {CM} from '../palette';
 import {Batch, P, Pt} from '../kit/canal/core';
-import {mixHex} from '../../lib/light';
+import {atmos, makeAtmosphere, planePalette} from '../../lib/depth';
+import {S1_AIR} from '../world/skies';
 
 export type {Pt};
 
@@ -30,26 +31,28 @@ export function offsetFor(seed: string, k = 1): [number, number] {
  *  from the slate to the stone shade (L* ~63), so thin dark bars never read as lines in the calm world (CRAFT §b-§c). */
 export const S1_IRON = '#939AAD';
 
-/** ONE CONTINUOUS SKY (the owner, 2026-10-27: "why is it blue sky and then suddenly abruptly orange"; playbook rule,
- *  DIRECTION rule 6): the caption field's mint, flat down to y 572 (the band y 317-556 one value), then five flat steps
- *  through pale cream-gold to the warm horizon, each a small turn (dE 4-6, dL* <= 2); the steps hide behind the wing's
- *  roofline and the far skyline. Edges: S1_SKY_Y (the bottom of each step but the last). */
-export const S1_SKY = ['#BCDCCF', '#CEDECD', '#DFE1CB', '#EDE3C9', '#F8E0C3', '#FBD9BB'] as const;
-export const S1_SKY_Y = [572, 618, 664, 708, 752] as const;
-/** The evening sun's one halo: a flat disc one step warmer than the horizon step it sits in (<= 1.7x: CRAFT §d). */
-export const S1_SUN_HALO = '#FFD4AE';
-/** THE HAZE (atmospheric perspective in flat colour): the lowest sky step, so the far city's air agrees with the sky
- *  (the owner's continuous-sky note): every far plane mixes toward it, lighter and lower in chroma than the warm wing. */
-export const S1_HAZE: string = S1_SKY[5];
+/** THE HAZE (atmospheric perspective in flat colour): the sky's lowest colour under the sun (world/skies S1_AIR =
+ *  lib/sky horizonColor(S1_EVENING, SUN0.x)), so the far city's air agrees with the sky (CRAFT §f.1, §g.3): every far
+ *  plane recedes toward it, lighter and lower in chroma than the warm wing. */
+export const S1_HAZE: string = S1_AIR;
+/** S1's ONE atmosphere (lib/depth): the air = the sky's lowest step; the far city starts at +3 behind the pale wing
+ *  (DEPTH.md "Learned"), its steps stronger than PLANE_STEPS on +3 / +4 (0.66 / 0.90, v1-like: its far city dE 7.2 from the air; a far colour across from the warm air
+ *  turns up to 30 deg toward it) so the ladder falls toward the air (check_depth v2_s1). */
+export const S1_ATM = makeAtmosphere({name: 'v2 S1 canal evening', air: S1_HAZE, steps: [0, 0.12, 0.22, 0.66, 0.9], hueTurn: 30});
 
-/** Mix a batch's fills toward the haze, layer by layer (`ks[i]` for layer i; the last k for any further layer), and
- *  drop its ink: a far plane is simpler and carries no lines. */
-export function hazeBatch(b: Batch, ks: number[], haze = S1_HAZE): Batch {
+/** Recede a batch's fills toward the haze, layer by layer (`ks[i]` for layer i; the last k for any further layer):
+ *  lib/depth `atmos` (CRAFT §f.2: L* toward the air's, a hue on the air's side converging on it, one across from it
+ *  keeping its hue at a lower chroma, never grey or olive); its ink dropped: a far plane is simpler, no lines. */
+export function hazeBatch(b: Batch, ks: number[], haze = S1_HAZE, o: {planes?: number[]} = {}): Batch {
   b.layers.forEach((l, i) => {
     const k = ks[Math.min(i, ks.length - 1)];
+    // with `planes`: the layer's materials receded to that plane AND merged to its few close values (lib/depth
+    // planePalette: +3 three values within dE 12, +4 two within 5): a far row is a calm band, never busy
+    const plane = o.planes ? o.planes[Math.min(i, o.planes.length - 1)] : null;
+    const pal = plane !== null ? planePalette(Array.from(l.fills.keys()), plane, S1_ATM) : null;
     const fills = new Map<string, string[]>();
     l.fills.forEach((ds, c) => {
-      const m = mixHex(c, haze, k);
+      const m = pal ? pal[c] ?? atmos(c, k, haze) : atmos(c, k, haze);
       const a = fills.get(m);
       if (a) a.push(...ds);
       else fills.set(m, [...ds]);

@@ -147,7 +147,17 @@ export type DataCenterProps = {
    *  one row at a time from `at` over `dur` s (each row's bands a quick left-to-right sweep, 2 frames apart), in
    *  `color` (default ledColor): the subject's own motion on its beat ("AI data centers"). */
   rowsOn?: {at: number; dur: number; color?: string};
+  /** OPT-IN (v3 rework): centre the sign plate on the lit FRONT face (shifted right by half the shaded side face), so
+   *  the letters (always centred on that face) sit in the middle of their plate; default: the plate centred on the
+   *  whole building and the letters a few px right of its middle. */
+  signOnFace?: boolean;
+  /** OPT-IN (v3 rework): the colour of its snow (the parapet's line, the roof units' lids); default the palette's lit
+   *  EMBER.snow. H2's outside passes the street rig's sky-facing cap (L* 89, CRAFT §d.2). */
+  snow?: string;
 };
+
+/** How far `signOnFace` moves the sign plate right (px): half the shaded side face (w x 0.06 / 2). */
+export const signFaceShift = (w: number) => w * 0.03;
 
 export function dataCenterGeo(x: number, y: number, w: number, h?: number, variant: DataCenterVariant = 'normal', signH?: number) {
   const H = h ?? (variant === 'hall' ? w * 0.4 : variant === 'mini' ? w * 0.62 : w * 0.7);
@@ -158,10 +168,11 @@ export function dataCenterGeo(x: number, y: number, w: number, h?: number, varia
   return {H, top, sign, x0: x - w / 2, x1: x + w / 2};
 }
 
-const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'normal', sign = 'AI DATA CENTER', signAt, darkAt, signLitAt, units = 3, blink = true, at, seed = 'dc', ink = 3.4, signH, ledColor = EMBER.led, ledStyle = 'ticks', rowsOn}) => {
+const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'normal', sign = 'AI DATA CENTER', signAt, darkAt, signLitAt, units = 3, blink = true, at, seed = 'dc', ink = 3.4, signH, ledColor = EMBER.led, ledStyle = 'ticks', rowsOn, signOnFace, snow = EMBER.snow}) => {
   const t = useTime();
   const variant: DataCenterVariant = darkAt !== undefined && t >= darkAt ? 'dark' : v0;
-  const g = dataCenterGeo(x, y, w, h, v0, signH);
+  const g0 = dataCenterGeo(x, y, w, h, v0, signH);
+  const g = signOnFace ? {...g0, sign: {...g0.sign, x: g0.sign.x + signFaceShift(w)}} : g0;
   const far = variant === 'far';
   const mini = variant === 'mini';
   const dark = variant === 'dark';
@@ -223,7 +234,7 @@ const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'n
       {unitsX.map((ux, i) => (
         <React.Fragment key={i}>
           <Fill rect={[ux, g.top - unitH, unitW, unitH + 2]} color={side} at={fillAt(at, 0.05)} offset={far ? false : undefined} seed={`${seed}/u${i}`} />
-          <Fill rect={[ux - 2, g.top - unitH - 3, unitW + 4, 5]} color={EMBER.snow} at={fillAt(at, 0.08)} offset={false} />
+          <Fill rect={[ux - 2, g.top - unitH - 3, unitW + 4, 5]} color={snow} at={fillAt(at, 0.08)} offset={false} />
           {far ? null : (
             <>
               <Fill d={blob(ux + unitW / 2, g.top - unitH * 0.5, unitW * 0.26, unitH * 0.3, {seed: `${seed}/fan${i}`})} color={body} at={fillAt(at, 0.08)} offset={false} />
@@ -236,7 +247,7 @@ const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'n
       <Fill d={polyPath(outline)} color={body} at={fillAt(at)} offset={far ? false : undefined} seed={`${seed}/body`} />
       <Fill rect={[g.x0, g.top, sideW, g.H]} color={side} at={fillAt(at, 0.02)} offset={false} />
       <Fill rect={[g.x0, g.top, w, parH]} color={side} at={fillAt(at, 0.02)} offset={false} />
-      <Fill rect={[g.x0 - 2, g.top - 4, w + 4, 5]} color={EMBER.snow} at={fillAt(at, 0.06)} offset={false} />
+      <Fill rect={[g.x0 - 2, g.top - 4, w + 4, 5]} color={snow} at={fillAt(at, 0.06)} offset={false} />
       <Show at={fillAt(at, 0.06)}>
         {strips}
         {ticks}

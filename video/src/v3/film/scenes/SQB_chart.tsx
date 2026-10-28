@@ -8,23 +8,39 @@
 //               one small bump in 2021 (FL 1.6); the pen's head is a hero dot that stays on the stroke's end once
 //               drawn ("now": it pops once on "this past year", 11.80, and the hook turns up from it)
 //   10.32-10.50 a doodle laptop drops onto the line (~2010) and lands on "buy" (10.60): its screen says "$999"
-//   10.82       a shinier, bigger BETTER one pops onto the line right after it (~2015.6), the SAME "$999" ("one." 10.92):
+//   10.82       a shinier, bigger BETTER one pops onto the line right after it (~2015), the SAME "$999" ("one." 10.92):
 //               same money, better laptop = lower on the line (the index is quality-adjusted, FL 1.8/1.9)
-//   13.85-14.45 the line hooks UP (Sept 2025 -> Sept 2026), ending just before "up" (14.52)
-//   14.74       "+9.7%" pops alone, above the hook ("almost10%" 14.84)
+//   11.80       "this past year": the dot at the line's end pops once (the eye waits where the hook will turn)
+//   13.85-14.45 the line hooks UP (Sept 2025 -> Sept 2026, the hero colour), ending just before "up" (14.52)
+//   14.74       "+9.7%" pops alone, above the hook ("almost10%" 14.84), and in the same frame the old deal's doodles
+//               step back, ONE event (final pass, the owner's "not sure what to keep my attention on"): both go to tier
+//               B (a soft terracotta, no outline, pale screens, the prices and the badge in a soft ink), a 2-step
+//               change, so the number and the hook own the card's hero; the falling line stays the hero, the eye's
+//               path to the turn. Measured (the frame's top-3 % salience on the card): 76 % at 12.5 and 13.5, 58 % at
+//               14.95. Stepping them (and the line) back earlier, at "But" (11.80), left the card 10 % at 12.5 and gave
+//               the window strip and the mug 65 %; at the hook's start, 33 % while it drew.
 //   15.05       the source, small, at the card's foot: "US computers · Sept 2026 vs a year earlier (BLS)"
 // The shape is the BLS index's (CUUR0000SEEE01, FL 1.6-1.8): falling fast early and slower later, the 2021 bump, the
 // turn up at the end; no y numbers (the label carries the one number). Hierarchy (CRAFT §b): the line, then the
-// doodles, then the hook and "+9.7%" are the subject in turn (the hero colour, the laptops' full outline; the line is a
-// graphic stroke); nothing else on the card moves. Layout: the old deal reads left to right (the falling line, the
-// doodles in the middle, the turn and its number on the right), each clear of the static face.
+// doodles, then the line's end (the dot's pop), then the hook and "+9.7%" are the subject in turn (the hero colour, the
+// laptops' full outline on their beat only; the line is a graphic stroke); nothing else on the card moves. Layout: the old deal reads left to right (the falling
+// line, the doodles in the middle, the turn and its number on the right), each clear of the static face.
+// READ AT PHONE SIZE (final pass, OPEN 12: "$999" / "BETTER" were ~25 / 23 px, ~6 px on a phone): the doodles are the
+// laptop's own shapes (laptopGeo) drawn plain for the chart (lid, screen, deck, a keyboard plate; no trackpad, no
+// glint), so each screen is ONE big price: "$999" at 38 / 42 px (was 25 / 29), "BETTER" at 32 px (was 23), the most
+// the card's plot holds under its subtitle and left of "+9.7%" (doodle boxes checked against the static face's glyph
+// extents: >= 8 px clear of the subtitle, >= 11 px of "+9.7%", 38 px between the doodles).
 import React from 'react';
+import {Fill} from '../../../lib/Fill';
+import {Ink} from '../../../lib/Ink';
+import {poly, polyPath} from '../../../lib/sketch';
 import {Tier} from '../../../lib/tier';
 import {clamp, ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
-import {EMBER, Laptop, laptopGeo, Txt, type Pt} from '../kit';
-import {TCircle, TPath} from '../kit/util';
-import {CARD, plotPt} from './home_set';
+import {EMBER, laptopGeo, quadPt, Txt, type Pt} from '../kit';
+import {stepAt} from '../kit/Haze';
+import {mixRgb, TCircle, TPath} from '../kit/util';
+import {CARD, CARD_PAPER, plotPt} from './home_set';
 
 // ================================================================= the data (year, v: 0..1 of the plot's height)
 
@@ -135,17 +151,41 @@ export const CHART_BEATS = {
   source: 15.05,
   /** "this past year" (11.88): the pen's dot at the line's end pops once (the eye waits where the hook will turn). */
   pulse: 11.8,
+  /** The doodles step back to tier B as "+9.7%" pops: one event. */
+  step: 14.74,
 };
 export const LINE_W = 9;
 
-// ================================================================= the doodles (two kit laptops standing ON the line)
-
-/** A doodle: a kit laptop standing on the line at `year` (its deck's front edge on the stroke, tilted a hint of the
- *  line's slope), "$999" on its screen. Their years leave the right third to the hook and its number. */
-export const DOODLES = {
-  mine: {year: 2010.0, w: 84},
-  better: {year: 2015.6, w: 96},
+/** The doodles OFF their beat (tier B, from CHART_BEATS.step; CRAFT §b: soft, no outline, no near-black): the hero
+ *  60 % toward the paper for the lids (L* 77, C* 27; the B tier's pull takes it to ~C* 24), their deck edge and keys one
+ *  step deeper (L* 69), the screens a pale peach 13 L* over the lid, the prices and BETTER in a soft ink (L* 49 on
+ *  L* 90), the badge's pill one pale step. */
+export const OLD_DEAL_OFF = {
+  lid: mixRgb(EMBER.hero, CARD_PAPER, 0.6),
+  deep: mixRgb(EMBER.heroDeep, CARD_PAPER, 0.5),
+  screen: mixRgb('#F6D2C0', CARD_PAPER, 0.4),
+  ink: '#9A6A55',
+  badge: mixRgb('#F6D2C0', CARD_PAPER, 0.7),
 };
+/** 0 = the doodles on their beat, 0.5 = the 3-frame half step, 1 = off-beat (tier B). */
+export const oldDealOff = (T: number): number => stepAt(T, CHART_BEATS.step);
+
+// ================================================================= the doodles (the laptop, drawn plain, standing ON the line)
+
+/** A doodle: the film's laptop (laptopGeo's shapes) standing on the line at `year` (its deck's front edge on the
+ *  stroke, tilted a hint of the line's slope), ONE big "$999" on its screen (`price` px). Their years leave the right
+ *  third to the hook and its number; their sizes are the most the plot holds (the header's layout check: the BETTER
+ *  badge 9 px under the subtitle's descenders, its right edge 11 px left of "+9.7%"). */
+export const DOODLES = {
+  mine: {year: 2009.6, w: 88, price: 38},
+  better: {year: 2015.2, w: 98, price: 42},
+};
+/** The doodles' lid height (x w): a touch flatter than the kit's 0.64, so the big price fits under the subtitle. */
+const LID_H = 0.6;
+/** BETTER: its letters (px) and a tight warm-white pill round them (w, h x the letters; its gap over the lid x w). */
+const BADGE = {size: 32, w: 3.34, h: 1.04, gap: 0.05};
+/** Doodle 1's landing fall (px along the line's normal): short, so its lid never crosses the subtitle (was 40). */
+const FALL = 18;
 
 /** How much of the line's slope a doodle takes (1 = flush on the slope, like a sled; 0 = level): a hint of it, so it
  *  rests ON the line without sliding down it. */
@@ -164,86 +204,98 @@ export function doodlePose(year: number, w: number): {x: number; y: number; rot:
   return {x: foot[0] + Math.sin(a) * d, y: foot[1] - Math.cos(a) * d, rot, foot};
 }
 
-/** The price on a doodle's screen (upright in the laptop's frame), a little right of centre and up: the kit's screen
- *  glint lies in the screen's lower-left corner. */
-const ScreenPrice: React.FC<{x: number; y: number; w: number; dark: boolean}> = ({x, y, w, dark}) => {
-  const g = laptopGeo(x, y, w);
+/** One doodle laptop, hinge (x, y), width w, in its own frame (the caller tilts it): the fills (lid, deck, its edge,
+ *  ONE keyboard plate: the kit's key rows would be specks at this size), the price filling its screen (no glint, no
+ *  trackpad), then the subject's one closed outline (inside its fill) and the hinge line. `k`: 0 on its beat (the
+ *  subject: the hero, the full outline), 0.5 the half step, 1 off-beat (tier B: OLD_DEAL_OFF, the lines drop). */
+const DoodleLaptop: React.FC<{x: number; y: number; w: number; variant: 'old' | 'new'; price: number; k: number}> = ({x, y, w, variant, price, k}) => {
+  const g = laptopGeo(x, y, w, LID_H);
+  const lid = mixRgb(EMBER.hero, OLD_DEAL_OFF.lid, k);
+  const deep = mixRgb(EMBER.heroDeep, OLD_DEAL_OFF.deep, k);
+  const screen = mixRgb(variant === 'old' ? EMBER.anchor : EMBER.newScreen, OLD_DEAL_OFF.screen, k);
+  const ink = mixRgb(variant === 'old' ? EMBER.core : EMBER.ink, OLD_DEAL_OFF.ink, k);
+  const keys = polyPath([quadPt(g.deck, 0.12, 0.16), quadPt(g.deck, 0.88, 0.16), quadPt(g.deck, 0.9, 0.62), quadPt(g.deck, 0.1, 0.62)]);
+  const body: Pt[] = [g.lid[0], g.lid[1], g.lid[2], g.deck[2], g.edge[2], g.edge[3], g.deck[3], g.lid[3]];
   const [cx, cy] = g.screenC;
-  const size = Math.round(w * 0.3);
   return (
-    <Txt x={cx + w * 0.12} y={cy + size * 0.26} size={size} fill={dark ? EMBER.core : EMBER.ink} fit={w * 0.5}>
-      $999
-    </Txt>
+    <Tier tier={k >= 0.5 ? 'support' : 'subject'} tone={lid}>
+      <Fill d={polyPath(g.lid)} color={lid} offset={false} />
+      <Fill d={polyPath(g.edge)} color={deep} offset={false} />
+      <Fill d={polyPath(g.deck)} color={lid} offset={false} />
+      <Fill d={keys} color={deep} offset={false} />
+      <Fill d={polyPath(g.scr)} color={screen} offset={false} />
+      <Txt x={cx} y={cy + price * 0.33} size={price} fill={ink} fit={(g.scr[1][0] - g.scr[0][0]) * 0.88}>
+        $999
+      </Txt>
+      <Ink d={poly(body, {closed: true})} inside={polyPath(body)} width={3.4} />
+      <Ink d={poly([g.lid[3], g.lid[2]])} width={2.2} />
+    </Tier>
   );
 };
 
-/** The BETTER badge over the new laptop's lid: a small warm-white card with ink letters (the kit's label, at the
- *  doodle's size: the kit's own starts at 34 px letters, too big for a 96 px laptop on the card). */
-const BetterBadge: React.FC<{x: number; y: number; w: number}> = ({x, y, w}) => {
-  const g = laptopGeo(x, y, w);
+/** The BETTER badge over the new laptop's lid: a tight warm-white pill with ink letters at 32 px (was 23: the most
+ *  the gap under the subtitle holds); off-beat its pill one pale step, no outline, the letters soft. */
+const BetterBadge: React.FC<{x: number; y: number; w: number; k: number}> = ({x, y, w, k}) => {
+  const g = laptopGeo(x, y, w, LID_H);
   const top = (g.lid[0][1] + g.lid[1][1]) / 2;
   const cx = (g.lid[0][0] + g.lid[1][0]) / 2;
-  const size = Math.round(w * 0.24);
-  const bw = size * 3.6;
-  const bh = size * 1.2;
-  const by = top - bh - w * 0.06;
-  const r = bh * 0.2;
+  const s = BADGE.size;
+  const bw = s * BADGE.w;
+  const bh = s * BADGE.h;
+  const by = top - bh - w * BADGE.gap;
+  const r = bh * 0.3;
   return (
-    <>
+    <Tier tier={k >= 0.5 ? 'support' : 'subject'} tone={EMBER.white}>
       <TPath
         d={`M${cx - bw / 2 + r} ${by}H${cx + bw / 2 - r}Q${cx + bw / 2} ${by} ${cx + bw / 2} ${by + r}V${by + bh - r}Q${cx + bw / 2} ${by + bh} ${cx + bw / 2 - r} ${by + bh}H${cx - bw / 2 + r}Q${cx - bw / 2} ${by + bh} ${cx - bw / 2} ${by + bh - r}V${by + r}Q${cx - bw / 2} ${by} ${cx - bw / 2 + r} ${by}Z`}
-        fill={EMBER.white}
+        fill={mixRgb(EMBER.white, OLD_DEAL_OFF.badge, k)}
         stroke={EMBER.beam}
         strokeWidth={2}
         tone={EMBER.white}
       />
-      <Txt x={cx} y={by + bh * 0.76} size={size} fit={bw * 0.86}>
+      <Txt x={cx} y={by + bh / 2 + s * 0.33} size={s} fill={mixRgb(EMBER.ink, OLD_DEAL_OFF.ink, k)} fit={bw * 0.9}>
         BETTER
       </Txt>
-    </>
+    </Tier>
   );
 };
 
-const Doodle: React.FC<{year: number; w: number; variant: 'old' | 'new'; seed: string}> = ({year, w, variant, seed}) => {
+const Doodle: React.FC<{year: number; w: number; price: number; variant: 'old' | 'new'; k: number}> = ({year, w, price, variant, k}) => {
   const q = doodlePose(year, w);
   return (
     <XG m={mat.about(mat.rotate(q.rot), q.x, q.y)}>
-      <Laptop x={q.x} y={q.y} w={w} variant={variant} seed={seed}>
-        <ScreenPrice x={q.x} y={q.y} w={w} dark={variant === 'old'} />
-      </Laptop>
-      {variant === 'new' ? <BetterBadge x={q.x} y={q.y} w={w} /> : null}
+      <DoodleLaptop x={q.x} y={q.y} w={w} variant={variant} price={price} k={k} />
+      {variant === 'new' ? <BetterBadge x={q.x} y={q.y} w={w} k={k} /> : null}
     </XG>
   );
 };
 
-/** Laptop 1 drops onto the line (a 40 px fall along the line's normal, outCubic) and lands with a small squash. */
-const MineDoodle: React.FC<{T: number}> = ({T}) => {
+/** Laptop 1 drops onto the line (a short fall along the line's normal, outCubic) and lands with a small squash. */
+const MineDoodle: React.FC<{T: number; k: number}> = ({T, k: off}) => {
   const [t0, t1] = CHART_BEATS.drop;
   if (T < t0) return null;
-  const {w, year} = DOODLES.mine;
+  const {w, year, price} = DOODLES.mine;
   const q = doodlePose(year, w);
   const a = (q.rot * Math.PI) / 180;
-  const fall = 40 * (1 - ease.outCubic(clamp((T - t0) / (t1 - t0))));
+  const fall = FALL * (1 - ease.outCubic(clamp((T - t0) / (t1 - t0))));
   // the landing: one squash of 8 % about the foot (along the laptop's own axes) and back, over 0.12 s
   const k = T < t1 ? 0 : clamp((T - t1) / 0.12);
   const sq = 1 - 0.08 * Math.sin(Math.PI * k);
+  const body = <Doodle year={year} w={w} price={price} variant="old" k={off} />;
+  if (fall < 0.01 && sq > 0.9999) return body;
   const m = mat.mul(mat.translate(Math.sin(a) * fall, -Math.cos(a) * fall), mat.about(mat.compose(mat.rotate(q.rot), mat.scale(1 + (1 - sq) * 0.5, sq), mat.rotate(-q.rot)), q.foot[0], q.foot[1]));
-  return (
-    <XG m={m}>
-      <Doodle year={year} w={w} variant="old" seed="sqb/mine" />
-    </XG>
-  );
+  return <XG m={m}>{body}</XG>;
 };
 
 /** Laptop 2 pops in place (about its foot, 0.2 -> 1 with a small overshoot, 0.14 s). */
-const BetterDoodle: React.FC<{T: number}> = ({T}) => {
+const BetterDoodle: React.FC<{T: number; k: number}> = ({T, k}) => {
   const at = CHART_BEATS.better;
   if (T < at) return null;
-  const {w, year} = DOODLES.better;
+  const {w, year, price} = DOODLES.better;
   const q = doodlePose(year, w);
   const p = prog(T, at, 0.14, ease.outBack(1.4));
   const s = 0.2 + 0.8 * p;
-  const body = <Doodle year={year} w={w} variant="new" seed="sqb/better" />;
+  const body = <Doodle year={year} w={w} price={price} variant="new" k={k} />;
   return s >= 0.999 && p >= 1 ? body : <XG m={mat.about(mat.scale(s), q.foot[0], q.foot[1])}>{body}</XG>;
 };
 
@@ -311,14 +363,15 @@ export const OldDealChart: React.FC<{T?: number}> = ({T: Tin}) => {
   const T = Tin ?? t;
   const {s, pen} = strokeAt(T);
   if (s <= 0) return null;
+  const off = oldDealOff(T);
   const pts = upTo(s);
   const head = pts[pts.length - 1];
   return (
     <Tier tier="subject">
       <TPath d={pathOf(pts)} stroke={EMBER.hero} strokeWidth={LINE_W} strokeLinecap="round" strokeLinejoin="round" fill="none" graphic />
       {pen ? <TCircle cx={head[0]} cy={head[1]} r={LINE_W * 0.95 * dotPulse(T)} fill={EMBER.hero} /> : null}
-      <MineDoodle T={T} />
-      <BetterDoodle T={T} />
+      <MineDoodle T={T} k={off} />
+      <BetterDoodle T={T} k={off} />
       <Label T={T} />
       <Source T={T} />
     </Tier>

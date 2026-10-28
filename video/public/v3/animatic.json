@@ -600,17 +600,17 @@
   },
   {
    "src": "v3/v3_crane_clunk_2.wav",
-   "t": 2.12,
+   "t": 2.18,
    "gain": 0.45
   },
   {
    "src": "v3/v3_crane_clunk_3.wav",
-   "t": 2.3,
+   "t": 2.4,
    "gain": 0.45
   },
   {
    "src": "v3/v3_crane_clunk_4.wav",
-   "t": 2.42,
+   "t": 2.72,
    "gain": 0.45
   },
   {
@@ -640,7 +640,7 @@
   },
   {
    "src": "v3/v3_thoom.wav",
-   "t": 4.76,
+   "t": 4.04,
    "gain": 0.6
   },
   {

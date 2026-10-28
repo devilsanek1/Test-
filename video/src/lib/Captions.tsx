@@ -21,7 +21,8 @@ import {captionFontStack, measureCaption, useCaptionFont} from './font';
 export type CaptionLine = {text: string; s: number};
 export type CaptionHighlight = {text: string; s: number};
 /** `out` (SkyCaptions): the page scrolls up and away at this time with no page replacing it, so the caption band is
- *  empty until the next page rolls in (e.g. across a camera dive or a match cut). */
+ *  empty until the next page rolls in (e.g. across a camera dive or a match cut); with pop captions it pops away in one
+ *  frame. scripts/film_captions.py writes it from a pages file's `@out <seconds>` line. */
 export type CaptionBeat = {s: number; e?: number; out?: number; lines: CaptionLine[]; highlights?: CaptionHighlight[]; style?: 'normal' | 'punch' | 'hook'};
 
 export type CaptionsProps = {
@@ -436,6 +437,17 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', s
     const lines = pg.lines.map((ln) => ({...ln, boxes: ln.boxes.map((bx) => (preDrawn.has(bx.hl) ? {...bx, start: -Infinity} : bx))}));
     return {...pg, lines, scrollDur: loopEnd !== undefined ? loopRollDur(loopEnd - pg.start) : undefined};
   });
+  // pop captions: a page after an empty band (the page before it left with `out`) lands ON its first word, never the
+  // page lead before it (v3's J3: "And so do" pops on the cut frame instead of 2 frames into the push's last frames)
+  if (pop) {
+    for (let i = 1; i < pages.length; i++) {
+      if (list[i - 1].out === undefined || list[i] === loopBeat) continue;
+      const s0 = list[i].s;
+      const pg = pages[i];
+      if (!(s0 > pg.start)) continue;
+      pages[i] = {...pg, start: s0, lines: pg.lines.map((ln) => ({...ln, start: Math.max(ln.start, s0), boxes: ln.boxes.map((bx) => ({...bx, start: Math.max(bx.start, s0)}))}))};
+    }
+  }
   const instantUntil = range && isFinite(range[0]) ? range[0] + instantWithin : -Infinity;
   let k = -1;
   for (let i = 0; i < pages.length; i++) if (pages[i].start <= T) k = i;
@@ -459,11 +471,14 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', s
     const lu = (T + loopEnd - lp.start) / (lp.scrollDur ?? MOTION.captionScroll.dur);
     if (loopEnd > lp.start && T < lp.start && lu < 1) tail = {q: MOTION.captionScroll.ease(clamp(lu)), prev: pages.length > 1 ? pages[pages.length - 2] : null};
   }
-  // a page with `out` scrolls up and away on its own; the next page then rolls into an empty band (no prev to push)
+  // a page with `out` scrolls up and away on its own; the next page then rolls into an empty band (no prev to push).
+  // Pop captions (`motion` 'pop') pop it away in one frame instead: a roll-out would clip its letters at the band's top
+  // edge (owner playbook: captions pop in place)
   const scroll = MOTION.captionScroll;
-  const prevOutQ = prev?.out !== undefined && T >= prev.out ? scroll.ease(clamp((T - prev.out) / scroll.dur)) : 0;
+  const outAt = (o: number) => (pop ? 1 : scroll.ease(clamp((T - o) / scroll.dur)));
+  const prevOutQ = prev?.out !== undefined && T >= prev.out ? outAt(prev.out) : 0;
   const prevGone = prevOutQ >= 1;
-  const outQ = cur.out !== undefined && T >= cur.out ? scroll.ease(clamp((T - cur.out) / scroll.dur)) : 0;
+  const outQ = cur.out !== undefined && T >= cur.out ? outAt(cur.out) : 0;
   if (outQ >= 1) return null;
   const tn: CaptionTone = typeof tone === 'function' ? tone(T) : tone;
   // the hook frame: the first page's line 1 shows settled before anything starts; later lines/boxes keep their times

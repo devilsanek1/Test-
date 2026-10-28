@@ -15,12 +15,15 @@ import React, {useId} from 'react';
 import {clamp, ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
-import {fromLch, lch, mixHex} from './Light';
+import {fromLch, lch, mixHex, RIGS} from './Light';
 import {Laptop} from './Laptop';
 import {Txt, type Pt} from './util';
 import {Tier, type Tier as TierT} from '../../../lib/tier';
 
 const f1 = (v: number) => (Math.round(v * 10) / 10).toString();
+/** The snow on the vans' roofs and the notice's binding: the street rig's sky-facing cap (CRAFT §d.2: L* 87-89, thin,
+ *  never above the pool core), never the palette's lit EMBER.snow (L* 93): the brightest thing outside is never the snow. */
+const SNOW = RIGS.street.snowCap;
 
 /** The subject's line colour: the fill's own deep shade (L* -35, hue kept, never under L* 16; CRAFT §c). */
 export const deepOf = (hex: string) => {
@@ -197,7 +200,7 @@ export const FleetVan: React.FC<FleetVanProps> = ({x, y, w: w0, variant = 'van',
         <path d={band} fill={C.band} />
       </g>
       <path d={cabWin} fill={variant === 'dc' ? '#7D8AB6' : '#8C98C2'} />
-      <path d={roofSnow} fill={EMBER.snow} />
+      <path d={roofSnow} fill={SNOW} />
       <path d={tail} fill={EMBER.beam} />
       <path d={head} fill={lights ? EMBER.core : mixHex(EMBER.houseLit, C.cab, 0.5)} />
       {decal}
@@ -293,8 +296,9 @@ export type NoticeFace = {
 };
 
 /** A notice board on two posts with a calendar binding (see the header). (x, y) = the face's top-left, w x h = the
- *  face; `ground` = the posts' foot. `line` = the subject's outline round the face (when it is the beat). */
-export const NoticeFlip: React.FC<{x: number; y: number; w: number; h: number; ground: number; faces: NoticeFace[]; line?: boolean; dur?: number}> = ({x, y, w, h, ground, faces, line, dur = 0.24}) => {
+ *  face; `ground` = the posts' foot. `line` = the subject's outline round the face (when it is the beat). `binding` /
+ *  `rings` = the header's colours (default the dark anchor and the reveal; a calm board passes softer ones). */
+export const NoticeFlip: React.FC<{x: number; y: number; w: number; h: number; ground: number; faces: NoticeFace[]; line?: boolean; dur?: number; binding?: string; rings?: string}> = ({x, y, w, h, ground, faces, line, dur = 0.24, binding = EMBER.anchor, rings = EMBER.reveal}) => {
   const t = useTime();
   const headH = Math.max(14, h * 0.13);
   const fy = y + headH;
@@ -319,11 +323,11 @@ export const NoticeFlip: React.FC<{x: number; y: number; w: number; h: number; g
       {/* the faces: the older ones under, the newest swinging down over them from the binding */}
       {shown.map((f, i) => (i < top - 1 ? null : face(f, i)))}
       {/* the binding: a dark header with two rings, snow on top */}
-      <Shape d={rrect(x - 3, y, w + 6, headH, 4)} fill={EMBER.anchor} line={false} />
+      <Shape d={rrect(x - 3, y, w + 6, headH, 4)} fill={binding} line={false} />
       {[0.3, 0.7].map((u, i) => (
-        <path key={i} d={rrect(x + w * u - 4, y - headH * 0.35, 8, headH * 0.7, 4)} fill={EMBER.reveal} />
+        <path key={i} d={rrect(x + w * u - 4, y - headH * 0.35, 8, headH * 0.7, 4)} fill={rings} />
       ))}
-      <path d={rrect(x - 4, y - 5, w + 8, 7, 3.5)} fill={EMBER.snow} />
+      <path d={rrect(x - 4, y - 5, w + 8, 7, 3.5)} fill={SNOW} />
     </g>
   );
 };

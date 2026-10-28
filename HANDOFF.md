@@ -143,6 +143,22 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Video 3 is produced by session https://claude.ai/code/session_01K4EiJphpZBfCkniV3UU3wR.** It is at G0 (topic
   scouting): workflow `context/workflows/v3-g0-topics-wf_b78a4844-2b3.js` writes `video/docs/v3/scouting/*.md` and
   `video/docs/v3/G0_TOPICS.md` (top 3 fresh topics for the owner to pick).
+- **v3 status (2026-10-28 ~02:30 UTC): REWORK, FINAL ASSEMBLY RUNNING.**
+  - The hook pilot (SQA 0-5.80) was sent to the owner: `deliverables/v3/v3_rework_pilot.mp4`.
+  - Five max-effort fix lanes are done and pushed. Their reports are in `video/docs/v3/rework_reports/`:
+    - `final_lanes.md`: WINDOW, REVEAL, HOME;
+    - `shared_layer.md`: thread_plane, home_set, PriceTag, captions;
+    - `cross_prepass.md`: what crossed the lane borders;
+    - `OPEN.md`: the work list, E1-E15 and items 1-12.
+  - The final assembly is workflow `context/workflows/v3-assembly.js` (run wf_abe46864-482; resume with `resumeFromRunId`). Its steps:
+    1. integrate (the lanes' open REQUESTS, every join and the loop seam);
+    2. full-size render;
+    3. three independent reviews (story/attention, look/light, a cold owner's eye at phone size);
+    4. a fix round by file lane;
+    5. an independent verify on a fresh render, and a second fix round if blockers or majors remain;
+    6. the master (`render-media.mjs --master`, -14 LUFS / -1 dBTP) to `deliverables/v3/v3_final.mp4`, the cover, `POSTING.md`.
+  - Then the orchestrator looks at the master and sends it to the owner, labelled as the rework cut for review.
+  - The helper sessions W, R and H2 are archived.
 - **v3 status (2026-10-27 evening): REWORK before publishing** (owner: "apply the feedback ... make it better before we
   publish"). The G5b cut was NOT posted. Retro: `docs/retro/2026-10-27_v3_retro.md` (pipeline APPROVED), craft spec
   `docs/look/CRAFT.md`, direction `docs/look/DIRECTION.md`. Rework: new flow `docs/v3/flow_v2.md` (sequences SQA-SQD, the
@@ -235,7 +251,8 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **The file:** 1080x1920, 30 fps (we render 60 fps since v3: `video/docs/POSTING_KIT.md`), H.264 High, SDR BT.709, AAC 48 kHz. Ours is about 11.6 Mbps (CRF 14), which is fine;
   the consensus range is 8-15 Mbps. 4K uploads don't help on Reels (it stores 1080 wide) and add compression risk.
 - **YouTube Shorts is different:** uploads above 1080p get the better VP9/AV1 encodes. Our film is vector (SVG), so a
-  1440x2560 render (`--scale=1.3333`) is genuinely sharper. Render one for YouTube.
+  1440x2560 render (`scripts/render-media.mjs ... --master --scale=4/3`; a plain 1.3333 misses whole pixels and
+  Remotion refuses it) is genuinely sharper. Render one for YouTube.
 - **Getting the file to the phone:** download the original (AirDrop, Files, Drive). Not via WhatsApp/Messenger, which
   recompress it.
 - **In Instagram's editor:** don't apply filters or edits.
@@ -291,11 +308,13 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Commands for a current film (vN, 60 fps; from `video/`):** the scaffold, one-panel previews, the owner's gate render
   and the scripted gate check are in `video/docs/G5_BLOCKING.md` §1, §4 and §7 (template: v3's `src/entry-v3-film.tsx`,
   compositions `FilmN`, `FilmN-<ID>`); the owner's cut from G5 on renders at full size, chunked per panel (§8b there);
-  the G3 reel renders at 540p60; finals get the TV-range conversion below.
+  the G3 reel renders at 540p60; finals render in one step with `scripts/render-media.mjs --master` (`video/docs/PIPELINE_V2.md`
+  "Master encode": lossless frames, one BT.709 encode; the TV-range pass below is v1's only, it relabelled BT.601 as BT.709).
 - **v1's commands (30 fps `Main`, kept for v1; from `video/`):**
   - Final render: `npx remotion render src/entry-film.ts Main out/X.mp4 --crf 14`. Then convert to TV range:
     `ffmpeg -i out/X.mp4 -vf "scale=in_range=full:out_range=tv,format=yuv420p" -c:v libx264 -crf 14 -preset slow -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -c:a copy -movflags +faststart out/X_tv.mp4`.
-    Remotion's output is full-range yuvj420p, which some players show wrongly.
+    Remotion's output is full-range yuvj420p, which some players show wrongly. (2026-10-28: this pass keeps BT.601
+    coefficients under a BT.709 tag, 1-2.5 dE off, and re-encodes; new films use `--master` instead.)
   - Stills, strips and dev comps: `node scripts/render-frames.mjs`, `scripts/still.sh`, `scripts/strip.sh` and
     `scripts/sheet.sh`. The dev comps are in `src/dev/registry.ts`.
   - Sound: `python3 audio/mix.py --music cinematic --out audio/mix.wav && cp audio/mix.wav public/mix.wav`

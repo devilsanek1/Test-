@@ -23,11 +23,18 @@ import {HandLetteredGoogle} from '../kit/canal/lettering';
 import * as MAP from '../world/map';
 import {CellPaint, barPath, S1_IRON} from './V2S1_set_core';
 import {Tier} from '../../lib/tier';
+import {Fill} from '../../lib/Fill';
 import {S1_DRAW, wIsSubject, doorIsSubject} from './V2S1_clock';
 
 // ---------------------------------------------------------------- the layout (local metres: u east, v down)
 
-const LAY = s1Layout();
+/** The wing's lens, a touch steeper than the kit's (the art director, v3: the wing read dead level on a perspective
+ *  floor): the coping falls 600 -> 656 and the base 1090 -> 1072 toward the left vanishing side, so the facade recedes
+ *  with the ground; W's corners move <= 1.7 px (its map spot and the S2 push-through match hold), the door's spot too. */
+const LAY0 = s1Layout();
+const wingTop = (x: number) => 600 + (56 / 750) * (1080 - x);
+const wingBase = (x: number) => 1090.2 - (18 / 750) * (1080 - x);
+const LAY = {...LAY0, quad: [[330, wingTop(330)], [1104, wingTop(1104)], [1104, wingBase(1104)], [330, wingBase(330)]] as typeof LAY0.quad};
 const PM = new PlaneMap(LAY.wM, LAY.hM, LAY.quad);
 const uAt = (x: number) => PM.uAt(x, LAY.hM * 0.6);
 const S = MAP.S1_SHEET;
@@ -368,8 +375,7 @@ function wInto(b: Batch, inkF: string[], inkM: string[], dark: boolean) {
   const s = PM.pxPerM(u0 + w * 0.42);
   const RX = s * 0.24;
   const RY = s * 0.066;
-  b.fill(CM.shadeWarm, `M${P(rx - RX, ry)}A${RX.toFixed(1)} ${RY.toFixed(1)} 0 1 0 ${P(rx + RX, ry)}A${RX.toFixed(1)} ${RY.toFixed(1)} 0 1 0 ${P(rx - RX, ry)}Z`);
-  b.fill(CM.paper, ovalPath(rx, ry - 0.3, RX * 0.7, RY * 0.52));
+  // (the ring itself is gone: under W it read as a pink lifebuoy / a halo ring, the art director on v3)
   b.fill(CM.sage, leafPath(rx + RX * 1.75, ry - 1.5, 16, 5, -18));
   // W's line: the frame, one closed path with no corner overshoot; the mullions, the sill, the shelf, the chair and the
   // lamp are flat fills (their lines and the overshoot ticks broke the short-stroke budget, critic G4)
@@ -466,6 +472,8 @@ export const S1Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) =
   const F = S.canopyFascia;
   return (
     <>
+      {/* the west end wall: lit (it faces the low western sun), the wing a block in the one camera */}
+      <Fill d={s1SideWall()} color={SIDE_LIT} offset={false} seed="s1wing/side" />
       <CellPaint b={stat} seed="s1wing/stat" cell={110} />
       <CellPaint b={dyn} seed="s1wing/panes" cell={110} live />
       {/* W, the thread: the subject (one closed outline drawing on at frame 0) before the lamp click and from her look
@@ -541,9 +549,18 @@ export const S1DoorLeaves: React.FC = () => {
   }
   b.ink(outer, INK_PX.mid);
   b.ink(inner, INK_PX.far);
+  // the track: the leaves slide into pockets inside the door's own opening (clipped to it), never out over the piers
+  const track = poly(q(DU0, DV0, DU1 - DU0, HM - DV0), {closed: true, over: 'none', seed: 's1leaves/track'});
   return (
     <Tier tier={doorIsSubject(t) ? 'subject' : 'environment'}>
-      <CellPaint b={b} seed="s1leaves" cell={400} misreg={0.6} live draw={S1_DRAW} />
+      <defs>
+        <clipPath id="s1leavesTrack" clipPathUnits="userSpaceOnUse">
+          <path d={track} />
+        </clipPath>
+      </defs>
+      <g clipPath="url(#s1leavesTrack)">
+        <CellPaint b={b} seed="s1leaves" cell={400} misreg={0.6} live draw={S1_DRAW} />
+      </g>
     </Tier>
   );
 };
@@ -564,12 +581,38 @@ export const S1WingLife: React.FC = () => {
 
 /** The wing's shadow shapes for the light layer (V2S1_light): each fin's short shade falling right on the facade
  *  (the sun is west), and the canopy soffit (one Shade step). Screen px. */
-export const s1WingShadows = (): {fins: string[]; soffit: string} => {
+export const s1WingShadows = (): {fins: string[]; soffit: string; ground: string} => {
   const toD = (pts: Pt[]) => `M${pts.map((pt) => P(pt[0], pt[1])).join('L')}Z`;
   const fins = FINS.map(([u, full]) => toD(q(u + 0.065, 0.06, 0.07, (full ? V_PLINTH : V_SILL) - 0.06)));
   const F = S.canopyFascia;
   const soffit = `M${P(F.x0 - 6, F.y1)}L${P(F.x1 + 6, F.y1)}L${P(F.x1 + 6, F.y1 + 8)}L${P(F.x0 - 6, F.y1 + 8)}Z`;
-  return {fins, soffit};
+  // the ground storey in the shade of the far city and the bridge (the sun sits on their roofs: only the first storey
+  // and W catch its last light), the door bay and its sign kept lit; the copies and her read against it by value
+  // (the art director, v3: the oat copies melted into the yellow door and the peach wall)
+  const ground = toD(q(-0.02, V_FLOOR, DU0 - 0.12 + 0.02, HM - V_FLOOR + 0.02)) + toD(q(DU1 + 0.12, V_FLOOR, LAY.wM - DU1, HM - V_FLOOR + 0.02)) + toD(sideWall(V_FLOOR));
+  return {fins, soffit, ground};
+};
+
+/** The wing's WEST END WALL, a narrow strip receding from the facade's corner (its top and base continue the
+ *  facade's convergence): the wing reads as a block in the one camera, not a cut-out. From `vFrom` down when given. */
+function sideWall(vFrom = 0): Pt[] {
+  const [xt, yt] = p(0, vFrom);
+  const [xb, yb] = p(0, HM);
+  const d = 16;
+  const k = 0.3; // its edges keep falling toward the left (the facade's slope, a little steeper)
+  return [
+    [xt - d, yt + d * k * (vFrom > 0 ? 0.2 : 1)],
+    [xt, yt],
+    [xb, yb],
+    [xb - d, yb - d * 0.18],
+  ];
+}
+/** The west end wall's stone: the facade's limestone one light step up (it faces the low western sun). */
+const SIDE_LIT = '#F3EBDF';
+/** The west end wall's fill (lit: it faces the low western sun) for S1Wing. */
+export const s1SideWall = (): string => {
+  const pts = sideWall(0);
+  return `M${pts.map((pt) => P(pt[0], pt[1])).join('L')}Z`;
 };
 
 export {PM as S1_WING_PLANE, UPPER as S1_WING_UPPER, LOWER as S1_WING_LOWER, V_SILL as S1_WING_V_SILL, V_PLINTH as S1_WING_V_PLINTH, HM as S1_WING_HM};

@@ -1,0 +1,25 @@
+{
+ "name": "reference 1 @6.0 s (the street with the crowd)",
+ "units": "frac",
+ "waive": {
+  "air": "calibration: reference 1 @6.0 is measured for its street only",
+  "separation": "calibration: reference 1 @6.0 is measured for its street only"
+ },
+ "ground": [
+  {
+   "name": "the street",
+   "roi": [
+    0.28,
+    0.37,
+    0.75,
+    0.68
+   ],
+   "vps": [
+    [
+     0.625,
+     0.3437
+    ]
+   ]
+  }
+ ]
+}

@@ -8,7 +8,7 @@ export {b, fillAt, FILL_LAG, W, Show, Pop, Txt, textW, Rot, Scale, quadPt} from 
 export type {At, Pt} from './util';
 export {Nook, NookOutside, NookWindow, NOOK_LAYOUT, Lamp, Mug, Notebook} from './Nook';
 export type {NookProps, NookLayout, NookOutsideProps, LampPose, Pool, Rect} from './Nook';
-export {NightSky, Snowfall, TownBand, DataCenter, dataCenterGeo, RoofLedge, RoofVent} from './Outside';
+export {NightSky, Snowfall, TownBand, DataCenter, dataCenterGeo, signFaceShift, RoofLedge, RoofVent} from './Outside';
 export type {HouseSpec, DataCenterProps, DataCenterVariant, RoofLedgeProps, RoofVentProps} from './Outside';
 export {BrickStack, ChimneyPot, MidTown, streetAt, RoofDeck} from './Rooftop';
 export type {BrickStackProps, StreetSpec, MidTownProps, RoofDeckProps} from './Rooftop';

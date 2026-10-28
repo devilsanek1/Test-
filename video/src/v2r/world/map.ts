@@ -533,7 +533,7 @@ export const S1_CLOCK = {
   steppingOut: 0.97, // "Google": the canopy letters pop one by one (A: a pop is A's, never B's)
   doorsShut: 1.1, // a bus crosses the far bridge (once)
   pipHeadFollows: 1.25,
-  birdsLiftBridge: 1.4, // the ONLY bird lift in S1: small and far, her step out (none on the 4.98 hit)
+  birdsLiftBridge: 2.45, // the ONLY bird lift in S1: small, pale and far, after the first copy (2.00; the art director, v3: at 1.40 they crossed the sun and competed with it); none on the 4.98 hit
   ghostPops: [2.0, 2.53, 3.2, 3.8, 4.2, 4.79],
   stop: {t0: 4.54, t1: 4.98}, // the "...": everyone stops mid-stride, the ambience dips (to 4.79)
   life: 4.98, // ONE step together, three outlines pop, Pip ears-cover (the hit is the row's: no birds)

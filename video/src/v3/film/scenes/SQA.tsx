@@ -1,20 +1,27 @@
 // SQA HOOK (lines 1-2), film 0.00-5.80 (docs/v3/flow_v2.md §2, §4): H1 = O1's framing in POV; frame 0 = the loop target.
 // The rework pilot (owner on G5b: "too busy, too incoherent ... too rough and messy ... the light is weirdly put"): the
 // same hook in the clean pen, one focus at a time, gently lit, on the shared pieces:
-//   home_set.tsx     the nook + the window view under homeCam(T) (pull-out 1.05 -> 1.00 easing out over 0-5.00; J1's
-//                    pan to the card starts 5.15), lit by the nook rig (the lamp, screen-left, is the key)
+//   home_set.tsx     the nook + the window view under homeCam(T) (locked through the hook; J1's pan to the card starts
+//                    5.15), lit by the nook rig (the lamp, screen-left, is the key)
 //   thread_plane     the hand, the phone with the listing, THE TAG (the thread), Pip peeking from the phone's edge
 // Beats (film seconds = SQA seconds; visuals lead their word by ~0.1 s):
 //   T < 0     the loop underlay: the room lands as flat pale shapes (-0.5 .. -0.18), the subject's outlines and the
-//             supporting lines draw on (-0.15 ..); frame 0 shows the scene being drawn under the core line's words
-//   0.00      the thumb taps "Add to cart" (the cart pop), the badge "1" at 0.05; colour floods out from the tag
-//             (0.00-0.31: each flat shape takes its colour as the wave reaches it; the light arrives with it)
+//             supporting lines draw on (-0.16 ..); frame 0 shows the scene being drawn under the core line's words
+//   0.00-0.31 the colour floods OUT FROM THE TAG (the tag 0.03, the screen 0.05, the listing, the hand, the dark bezel
+//             last at 0.15), each flat shape stepping into its colour inside its own outline (<Look snapPops>); the
+//             light arrives with it; the room camera is LOCKED through the hook (no zoom in a hold)
+//   0.30-0.64 THE TAP, the expected thing acted after the colour lands: the thumb lifts off "Add to cart" (0.30-0.40),
+//             comes down (0.44-0.50) and presses on "laptop" (0.50: the button a value darker, the cart pop sound);
+//             the cart badge pops 0 -> 1 at 0.52; the tag swings from the press
 //   0.25      the data center's sign; 1.22-1.50 Pip looks up at you on "soon?" and back
 //   1.88 ...  five sticks lift off the listing's laptop and fly to the data center (small, tier B); each launch ticks
 //             the tag one step: $1,015 / $1,031 / $1,047 / $1,063 / $1,079 (the $999 struck from 1.92); a warm rim on
 //             the tag's lamp side while it ticks
-//   3.64-4.00 the phone lowers 60 px (HIGH-C -> LOW-C); 4.04 the data center goes dark, its sign lights cold white
-//             (the beat's subject: "AI data centers"); 4.40 the phone's screen dims a step (the stage leads)
+//   3.64-4.00 the phone lowers 60 px (HIGH-C -> LOW-C), the tag's small sway settled by 4.04
+//   4.04      ONE EVENT: the data center goes dark, its sign lights cold white with a small pop (the beat's subject:
+//             "AI data centers"), and the thread plane steps down to its off-beat tier B in the same frame (the screen
+//             toward peach, the button and the badge a soft blue, the tag a soft terracotta with no outline)
+//   4.16-4.53 the data center's server rows light up one by one (the subject's own motion)
 //   5.15      J1: the head turns right to the card on the wall (homeCam pan, x 0 -> -775 by 6.45); SQA hands over
 //             mid-pan at 5.80 (frame 348) to SQB, which draws the same home_set + thread_plane at film time.
 // Hierarchy (flow_v2 §5): A the tag (each tick), then the data center at 4.04; B the sticks (small), the hand, Pip; C

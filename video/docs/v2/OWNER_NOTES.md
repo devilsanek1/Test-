@@ -101,9 +101,19 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-27 ~23:00 UTC: "I think it might make the sky much nicer" / "again find the pro way and tools to do it the best way you can"
   -> playbook rule "Find the PRO way and the pro tools"; a researched lib/sky.tsx (OKLab eased gradient, sun warmth, blue-noise dither, a
   banding check on the encoded mp4) before S1 v3.
+- 2026-10-27 ~23:30 UTC, budget: weekly 68 % (23:22); "V3 is managed by separate account" -> this account's weekly % is video 2's
+  own (plus the idle v4 research session); recalibrated to ~$25 per weekly % (23-29): ~$800 left, video 2 needs ~$500-700 -> ~88-96 %.
+- 2026-10-27 ~23:40 UTC: "Dedicate the full budget to finishing this video" -> the whole remaining week (to 100 %) goes to video 2; the guard
+  becomes "finish inside 100 %": quality where it shows (the S1 look, the lanes' one critic round, the whole-film review), no waste.
+- 2026-10-27 ~23:45 UTC: "Let's do the best job we can" -> quality first inside the full budget: a fresh-eyes art-director check of S1 v3
+  before the owner sees it; lanes may take a second critic round when a must-fix remains; a full whole-film review panel (cold viewer, art,
+  flow/motion, fairness, sound) and a G6 polish pass on the hook and the key beats before the master.
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
   the caption and the pinned comment as text plus a URL people can copy; links in captions aren't clickable; a
   link-in-bio sources page later. Waiting for the owner's yes to make it a default.
+- 2026-10-28 ~00:35 UTC, asked about the scout's parallax-float proposal: "switch it on if you think it will make the videos better and
+  improve engagement" -> ON (orchestrator's call: depth in motion without more movers): playbook rule, DIRECTION rule 8,
+  COZY_AND_SCALE 3b.5; a parallax helper in lib/depth.ts (L1 builds it with S1, the lanes reuse it).
 

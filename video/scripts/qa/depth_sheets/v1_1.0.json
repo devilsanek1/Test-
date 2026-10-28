@@ -1,0 +1,106 @@
+{
+ "name": "v1 @1.0 s (the plaza)",
+ "units": "frac",
+ "waive": {
+  "ground": "calibration: v1 @1.0 is measured for its far city in front of the sun and the plaza figure"
+ },
+ "air": [
+  [
+   0.05,
+   0.02,
+   0.95,
+   0.14
+  ]
+ ],
+ "planes": [
+  {
+   "name": "near: the you + plaza",
+   "plane": -1,
+   "boxes": [
+    [
+     0.0,
+     0.84,
+     1.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "plaza + small people",
+   "plane": -0.5,
+   "role": "ground",
+   "boxes": [
+    [
+     0.0,
+     0.76,
+     1.0,
+     0.83
+    ]
+   ]
+  },
+  {
+   "name": "government buildings (subject)",
+   "plane": 0,
+   "role": "subject",
+   "boxes": [
+    [
+     0.0,
+     0.32,
+     0.58,
+     0.75
+    ],
+    [
+     0.75,
+     0.37,
+     1.0,
+     0.75
+    ]
+   ]
+  },
+  {
+   "name": "far city",
+   "plane": 3,
+   "boxes": [
+    [
+     0.61,
+     0.51,
+     0.715,
+     0.595
+    ]
+   ],
+   "note": "the far city in front of the sun (masked by colour); the power symbol above it left out"
+  }
+ ],
+ "silhouettes": [
+  {
+   "name": "near buildings on the far city",
+   "tier": "mass",
+   "poly": [
+    [
+     0.0,
+     0.3
+    ],
+    [
+     0.6,
+     0.3
+    ],
+    [
+     0.6,
+     0.75
+    ],
+    [
+     0.0,
+     0.75
+    ]
+   ],
+   "roi": [
+    [
+     0.56,
+     0.5,
+     0.78,
+     0.575
+    ]
+   ]
+  }
+ ]
+}

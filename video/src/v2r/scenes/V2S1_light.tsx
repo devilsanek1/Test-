@@ -34,6 +34,7 @@ export const S1WingShades: React.FC = () => (
       ))}
     </ShadowLayer>
     <Shade d={WING.soffit} at={WING_AT} />
+    <Shade d={WING.ground} at={WING_AT} />
   </>
 );
 
@@ -81,7 +82,8 @@ export const S1LobbyContact: React.FC<{x: number; y: number; h: number}> = ({x, 
   </ShadowLayer>
 );
 
-/** The moored boats: a cast-strength strip along each waterline (the hull's shade on the water; never a contact strip). */
+/** The moored boats: a cast-strength strip along each waterline (the hull's shade on the water; never a contact strip),
+ *  in the rig's `water` tint (rigs.ts TINT_CANAL.water: the water's own deeper step; the rose family greys teal). */
 export const S1BoatStrips: React.FC<{which: 'A' | 'B'}> = ({which}) => {
   const o = which === 'A' ? BOAT_A : BOAT_B;
   const g = boatGeom(o);
@@ -91,7 +93,7 @@ export const S1BoatStrips: React.FC<{which: 'A' | 'B'}> = ({which}) => {
   const d = `M${xa} ${y - 1}L${xb} ${y - 1}L${xb} ${y + 6}L${xa + 6} ${y + 6}Z`;
   return (
     <ShadowLayer>
-      <Shadow d={d} tint="cast" at={floodAt((xa + xb) / 2, y)} />
+      <Shadow d={d} tint="water" at={floodAt((xa + xb) / 2, y)} />
     </ShadowLayer>
   );
 };

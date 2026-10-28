@@ -13,7 +13,8 @@ LIFE_AND_DENSITY, PALETTE · BM = `direction/beat_map.md` · map / K1 / rigs = t
 
 ## 1. The film in one paragraph, and ten non-negotiables
 One London canal on one golden October evening, plus one trip through the sun to an April morning in Arlington: hand-drawn flat colour like
-reference 1, drawn with the clean pen and lit gently by one low sun per set; one flat mint sky that holds the captions; small people from behind;
+reference 1, drawn with the clean pen and lit gently by one low sun per set; one continuous sky (one gentle OKLab gradient, nearly flat in the caption band, warm at
+the sun and the horizon: `lib/sky.tsx`, presets in `src/v2r/world/skies.ts`); small people from behind;
 one small woman in teal; her window, the one small window, carrying the story; a new periwinkle Pip at tier B in every shot; one crane that makes
 it vast; one flowing story with no plain cut.
 1. **New (DIR 3; owner: "Don't rely on reusable assets"):** every set, figure, Pip, prop, life element and the music is made for this film;
@@ -21,7 +22,8 @@ it vast; one flowing story with no plain cut.
    never a `lib/cine`, `lib/kit` people or `lib/mascot` drawing piece.
 2. **One palette, fixed jobs (DIR 6):** "10 Canal Mint" (§2): teal = HER only, orange = the sun disc only, plum = the ~5 % anchor; a light
    state changes the bands, the lamps and the season, never a fill.
-3. **One quiet field (DIR 10):** the flat mint sky y 0-600 is the caption field; nothing is drawn in y 317-556; the bottom third y 1250-1920
+3. **One quiet field (DIR 6, 10):** the sky's caption band y 317-556 stays nearly flat (dL* <= 1.5, the mint key) and nothing is drawn
+   in it; above and below it the sky is one gentle gradient (no seam); the bottom third y 1250-1920
    is never quiet and holds things only (map `BOTTOM_THIRD`).
 4. **The thread is her window (DIR 1; TL §1.2, §2):** W (S1, S8), M (S2's dark office window = S3's lit home window), S4's far window; the
    owner-approved fairness stretch S5-S7 (20.55-33.00) runs without it.
@@ -41,8 +43,8 @@ it vast; one flowing story with no plain cut.
 **Palette "10 Canal Mint"** (K1 `CM` = TR §2's hex; `problems()` checks it at render time; CIE L* / C*):
 | role | hex (L* / C*) | may go on | NEVER on |
 |---|---|---|---|
-| sky = caption field | mint `#BCDCCF` (85 / 13) · high step `#CFE6DC` | the whole top y 0-600 in every light state; a cloud's or April's high step | anything drawn in y 317-556; a gradient; a second sky colour |
-| horizon bands | gold `#F6D9BC` · sunset `#F3C6A6` · dusk mint `#B3CDD2` | flat bands BELOW y 600 (World `horizon` >= 760, or a band rides up into the captions) | y 317-556; blends between bands |
+| sky = caption field | mint `#BCDCCF` (85 / 13) · high step `#CFE6DC` | the sky's key in the caption band (y 317-556, nearly flat), the top of the one sky gradient | anything drawn in y 317-556; a hard seam or a second, unrelated sky colour |
+| horizon bands | gold `#F6D9BC` · sunset `#F3C6A6` · dusk mint `#B3CDD2` | the lower stops of the one sky gradient (`lib/sky.tsx` presets in `src/v2r/world/skies.ts`), blending smoothly to the horizon; the far haze = `horizonColor()` | y 317-556; hard steps or seams |
 | page (50-80 %) | stucco `#F4E4D2` · paving `#EFD8C2` · limestone `#EEE4D4` · glass `#CDE1DF` · paper `#FBF3E6` | walls, paving, stone, glass, board faces, frame 0's paper: MANY light fills | one empty slab; pure white (glints only) |
 | mids | brick `#E3A88C` `#C9806A` `#A5604F` · sage `#AFC4A8` · stone shade `#C8C3D3` | facades, roofs, trees, boat cabins, stone in shade | a field big enough to read as a slab |
 | cool (>= 10 % per frame) | water `#9DC6BF` `#7DAEA8` · unlit pane `#5E6F86` | the canal, the Potomac, cool shade, unlit glass | dark water right behind her (only ΔE 24 from the teal) |
@@ -106,7 +108,8 @@ S1, S2 golden (gold band) · S3 a flash-forward in S8's sunset state (lamp on, b
   her) and on their S8 pop (33.78), then B with their tinted line; the bare outlines O1-O3 have no fill.
 - **Fills register exactly; big areas are flat but never empty:** things fill them, not marks (boats, the steps' things, leaves as a few flat
   shapes); texture only as flat same-hue shapes (plank seams or a rug as 2 long bands at dL* 6-8) on 1-2 small surfaces per shot; no grain;
-  linework static per seed (no boil). Nothing soft: no gradient, glow, blur, haze, vignette or opacity; every change is a pop, scale, wipe or
+  linework static per seed (no boil). Nothing soft: no gradient (the sky's gentle gradient aside, DIR 6), glow, blur, vignette or opacity; distance haze is flat-colour
+  atmospheric perspective (`lib/depth.ts`), never a blur; every change is a pop, scale, wipe or
   slide, or a draw-on where the drawing is the beat (frame 0; the boards' pen lines in step with the voice).
 - **Halftone off** (the owner's optional last step after G6; the film works flat). **Paper edges OFF** (Film2R `edges: false`); if the owner
   asks with the look clip or at the final: `paint-subtle` at most, never in y 0-620 or beside the band (sides from y >= 640), exclusion rects
@@ -300,7 +303,7 @@ open contours are retired).
   together, a join that carries neither the eye nor the story.
 - **Emptiness, look and camera (DIR; LD; CS §5):** a big flat empty field, an object alone on a blank wall, a quiet bottom third, a still
   frame, motion on a void · a palette per scene, a hex outside `CM`, a violet world, loud fields, beige, tan, olive, grey, pure black, grey
-  shadows · gradients, glow, blur, haze, opacity, fades, dissolves, card flips, texture, boiling lines, an outline round every silhouette · a
+  shadows · gradients (the sky's one gentle gradient aside), glow, blur, opacity, fades, dissolves, card flips, texture, boiling lines, an outline round every silhouette · a
   roll, a compound or source-speed move, a cut mid-move, a high angle on one person, night-black frames, red skies, more than 3 flashes in a
   second · anything in y 317-556, a clipped or rolling caption, life over lettering, quote marks on paraphrase.
 - **Fairness (BM §4; TR §8):** war imagery: weapons, drones, missiles, explosions, soldiers, tanks, crosshairs, targets, radar over cities,

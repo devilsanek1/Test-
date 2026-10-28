@@ -26,6 +26,7 @@ import {S1WestGap} from './V2S1_set_far';
 import {S1Wing, S1DoorLeaves, S1WingLife} from './V2S1_set_wing';
 import {S1Water, S1FarTowpath, S1PathFurniture, S1Boats, S1FarLife, S1PlaneBranch} from './V2S1_set_life';
 import {S1BoatStrips, S1TowpathShadows, S1WingShades} from './V2S1_light';
+import {S1Plane, S1_PLANE} from './V2S1_float';
 
 export type S1WorldProps = {
   /** Her figure behind the glass doors (between the lobby and the door glass). */
@@ -48,40 +49,56 @@ const Env: React.FC<{children?: React.ReactNode}> = ({children}) => <Tier tier="
 
 export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pip}) => (
   <CanalCast person={k4Person}>
+    {/* every group rides its plane's share of the shot's parallax float (V2S1_float; the sky and its clouds fixed) */}
     <Env>
-      {/* sky things: the hero cloud (upper right, 2 px/s) + one thin bar, the plane branch in the top-left gutter */}
+      {/* sky things: the hero cloud (upper right, 2 px/s) + one thin bar (fixed: the sky never floats) */}
       <Cloud x={S.heroCloud.x0} y={S.heroCloud.y0 + 40} w={S.heroCloud.x1 - S.heroCloud.x0} h={(S.heroCloud.y1 - S.heroCloud.y0) * 0.7} seed="s1cloud" speed={S.heroCloudDriftPxS} top={CM.paper} />
       <Cloud x={CLOUD_BAR.x} y={CLOUD_BAR.y} w={CLOUD_BAR.w} h={CLOUD_BAR.h} seed="s1cloudbar" speed={CLOUD_BAR.speed} />
-      <S1PlaneBranch />
-      {/* the west gap: far roofs, SUN0, the road bridge, the bus once (1.10), the five birds (1.40) */}
+      {/* the plane branch in the top-left gutter: a NEAR twig (the full float) */}
+      <S1Plane plane={S1_PLANE.near}>
+        <S1PlaneBranch />
+      </S1Plane>
+      {/* the west gap: far roofs + SUN0 (+4), the calm tower (+3), the road bridge, its bus and birds (+2); the one far
+          jogger seen through the bridge's arch rides the bridge's plane (its clip is the arch) */}
       <S1WestGap />
-      {/* the water, the far towpath bending away at the left; the one far jogger, seen through the bridge's arch */}
-      <S1Water />
-      <S1FarTowpath />
-      <S1FarLife />
+      <S1Plane plane={S1_PLANE.bridge}>
+        <S1FarLife />
+      </S1Plane>
+      {/* the water */}
+      <S1Plane plane={S1_PLANE.water}>
+        <S1Water />
+      </S1Plane>
     </Env>
-    {/* the wing (her behind the glass inside it; W and the door tier themselves), the sliding leaves, the pigeons */}
-    <Env>
-      <S1Wing behindDoor={behindDoor} />
-      <S1DoorLeaves />
-      <S1WingShades />
-      <S1WingLife />
-    </Env>
-    {/* ground shadows on the far towpath, then its lamps and bollards, then her and the row */}
-    <S1TowpathShadows />
-    <Env>
-      <S1PathFurniture />
-    </Env>
-    {towpath}
+    {/* the subject's plane: the far towpath, the wing (her behind the glass inside it; W and the door tier themselves),
+        the sliding leaves, the pigeons, the towpath's shadows, lamps and bollards, her and the row */}
+    <S1Plane plane={S1_PLANE.subject}>
+      <Env>
+        <S1FarTowpath />
+        <S1Wing behindDoor={behindDoor} />
+        <S1DoorLeaves />
+        <S1WingShades />
+        <S1WingLife />
+      </Env>
+      <S1TowpathShadows />
+      <Env>
+        <S1PathFurniture />
+      </Env>
+      {towpath}
+    </S1Plane>
     {/* the moored boats (the right rail) with their waterline strips; the ducks sit still */}
-    <Env>
-      <S1BoatStrips which="A" />
-      <S1BoatStrips which="B" />
-      <S1Boats />
-      <Ducks ducks={[{x: 470, y: 1182, size: 26, drake: true}, {x: 522, y: 1194, size: 24}, {x: 300, y: 1158, size: 22}]} seed="s1ducks" />
-    </Env>
+    <S1Plane plane={S1_PLANE.boats}>
+      <Env>
+        <S1BoatStrips which="A" />
+        <S1BoatStrips which="B" />
+        <S1Boats />
+        {/* one duck at its water's scale (one camera: ~127 px/m there, a mallard ~0.58 m: ~70 px), by the bend, clear
+            of Pip's zone and the sun's glitter path (the pale drake read as a ghost: the art director on v3) */}
+        <Ducks ducks={[{x: 396, y: 1136, size: 62}]} seed="s1ducks" />
+      </Env>
+    </S1Plane>
+    {/* our bank and its near things split their own planes (V2S1_steps) */}
     {seated}
     {/* (S1BankShade retired: the near foreground's big things carry their own form and front shades now) */}
-    {pip}
+    <S1Plane plane={S1_PLANE.bank}>{pip}</S1Plane>
   </CanalCast>
 );
