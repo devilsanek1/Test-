@@ -378,3 +378,88 @@ at t < 0. The strokes start AT f0 and are the event (`V2S1_clock.ts` S1_DRAW, S1
 - `@out 5.88` departs from the brief's "for life." to 6.28.
 - Page 2 sits at ~81 px.
 - MUST 3's page numbers have moved (see MUST 1).
+
+## Fix pass B (MUSTs 3, 4 and 6 + the two check_light FAILs, 2026-10-28)
+
+Picture only, done by one agent from this review and the playbook's "Words in the world are few and big ... never the
+same words twice on screen at once". No event moved: every pop, pen, wipe and clack keeps its time (the sound pass ran
+alongside on its own files).
+
+**MUST 3 (a), few and big: done.** Every in-world line under ~40 px and both band source lines are gone; each kept line
+is >= 44 px at 1080:
+- S2 board: the BBC's quote "for fear of retaliation" alone, 56 px in two rows (was TOLD THE BBC 56, two 30 px rows, a
+  20 px source).
+- S4 tag: "Sofia Liguori" 48 (build 1) and "Google DeepMind" 44 (build 2); four 30 px rows and the 18 px source cut;
+  the card fitted to them (x 590-892, was 1000).
+- S4 plates: one row each, key 52 + "· unclassified" / "· classified" 44 (body 31 and the 18 px sources cut).
+- S5 news box: the headline at 44 in four rows ("Google– / Pentagon / deal for / classified work"; was 34 x 3 + two
+  18 px source rows). The plaque: "The Pentagon" 56 alone (its 30 px body cut, the plate refitted).
+- S6 board: "APRIL 2026 DEAL" 44 (was 34), the purpose line 56, "Lawful use: decided / by the Pentagon" 44 (was 34);
+  the five-line clause (34) and its source (18) cut.
+- S7 board: GOOGLE SAYS 60, "follows its" / "bans retaliation" 44 (were 34), "AI principles" / "of any kind" 56; the
+  small row (20) and the source (18) cut.
+- S8: SHE SAYS 60 and her quote at 60 px (was 56; its first row 428 of the column's 436 px); her credit (18) and the
+  band's source line (20 px, 33.16-36.54: `FILM2R_CREDITS` and the engine's credit overlay removed) cut.
+- Also cut: S6's door plate letters (CLASSIFIED / AUTHORIZED PERSONNEL ONLY, 20 / 11 px; the plate stays plain).
+- Where it went: `POSTING_KIT.md` lists what left the picture, and the caption and the pinned comment now carry every
+  source, her role and dates, the staffer line and the deal's stated limits (the clause, quoted exactly).
+  `kit/boards/texts.ts` keeps the words as the record, each piece marked DRAWN / not drawn. 40-55 px board lines share
+  `MID_WEIGHT` 0.9.
+
+**MUST 3 (b), one copy of each sentence: done.** `@hide` (new in `film_captions.py`; `"hide": true` in captions.json;
+lib/Captions SkyCaptions draws nothing for a hidden page, and the page after it lands on its first word, as after
+`@out`) on pages 16 (24.03-26.08), 19-21 (29.48-33.16) and 24 (36.54-39.08). The boards carry those words in step with
+the voice. captions.json is otherwise byte-for-byte the same times (diffed). The loop's page 1 at 39.04 is unchanged.
+The two-word SAYS labels stay, as this review allowed.
+
+**MUST 4, the sun off the boards: done.**
+- B and S6's face now run from y 800 (480 x 420; frame tops 780, were 680). The feet stay on 1250, and SUN2 keeps (260,
+  620) r 45 in both shots.
+- Clearance: the disc's bottom (665) is now 115 px over every board's frame top, more than its 90 px diameter (was
+  13-15 px). SUN8 now floats 100 px over her board's frame (was touching it).
+- The disc is whole in S6 and S7 (sky round it; S6's cherries start at x 330), and S8's still sets behind the level
+  coping.
+- The push: the cut frame f1686 (7x) shows only sun and sky. f1685 (3.7x) and f1687 (4.1x) show the board's top rail in
+  the frame's bottom fifth, no longer under the disc. In S6 the lowered board uncovers the pale facade band and the
+  cherries.
+- map.ts: new rules (SUN2 / SUN8 >= one diameter over a board's frame; no board inside the 7x window x 183-337, y
+  483-757), and the Pip-vs-clause rule is retired with the clause. `contractProblems` is clean, with 33 notes as before.
+  S7's board shadow, S6's and S7's Pip look-at and S8's pre-truck board follow B.
+
+**MUST 6, S8's copies: done.**
+- The copies are S1's far-copy figure: `RowFigure(ghostSpec(6))`, oat coat, white hair, grey scarf and legs, solid
+  fills, standing (stride 0).
+- Tier B throughout (support with its tinted line; was A to 34.75, then B).
+- Same spots (S8G4-G6) and the same pops (33.78 / 33.82 / 33.86). Their contact and cast shadows now land with their
+  fill (pop + 0.133 s, was + 0.06).
+
+**check_light: both FAILs pass.**
+- **f2040 (34.00): 0.003 H, OK** (was 0.192).
+  - The blank SHE SAYS face is one value step down (`faceDim`, L* ~85, warm) until the café owner's stroke, which wipes
+    it clean (the dull film is clipped to the not-yet-wiped side).
+  - At L* 88.4 (the first try) the face still held the brightest 5 % (0.168 H), because the frame's next 5 % sits at
+    L* 87, round her.
+  - The menu draws flat smears only (no scribble, no dot leaders).
+  - S7's blank face takes half that step from 28.10 and eases up to the full face 29.65-29.95, as its pen starts.
+- **f1404 (23.40): 0.012 H, OK** (was 0.159).
+  - The near paving's lit zone is one step down (`NEAR_AMBIENT`, from END y ~1395), in the rig's form tint, first in
+    the deck's shadow layer, so the trees' shade is never stepped twice.
+  - The rig's `ambient` tint is white by day, so a first try with it did nothing.
+
+**Checks.**
+- `tsc`: clean.
+- Assembly lints: clean except S8's leaves (s8leaves), as before.
+- v3 renders byte-identical after the lib change (Film3 f6 / f1158: 66852623 / 0fc79e2b, as in pass A).
+- gate_check's caption pages: PASS, 24 pages (5 @hide) inside the band and the clip; page 2's WARN is as before.
+- Stills at 1:1 and 360 px wide: 10.0, 17.2, 19.9, 21.3, 23.4, 25.0, 27.0, 29.0, 32.4, 34.0, 35.9 and 37.8, plus the
+  S6 -> S7 push frames f1678-f1694.
+- Word pass at 0.25 scale (3.0-37.8): every in-world line reads, and no sentence shows twice. The master was not
+  re-rendered in this pass.
+
+**Left open.**
+- At 22.43-23.08 the plaque's "The Pentagon" and the caption's "the Pentagon" are on screen together. It is a place
+  label, not a sentence, and it has its own pop sound, so it was kept.
+- The nearest copy (S8G4) stands mostly behind her board's right stile, both before and after the truck. It is the same
+  spot as before, so two of the three copies read clearly.
+- The lowered deal board shows S6's facade band and cherries under the sun. The push's last S6 frame f1685 (3.7x) shows
+  them, with the board's top, below the disc.
