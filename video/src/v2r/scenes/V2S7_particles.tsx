@@ -3,12 +3,13 @@
 // noticeable mover), each a pure function of the shot's time, every entrance clear of the 0.4 s round both joins
 // (28.10 = local 0, the wipe 32.70 = local 4.60) and of 32.50-33.10 (nothing new but the wiper), clear of the caption
 // band and of Google's board.
-//   leaves       three plane leaves (palmate, 26-39 px on screen) off the young plane's crown, one per birth across the
-//                hold (0.95 / 2.35 / 3.60 s), drifting west on the canal breeze down to the forecourt (plane +0.5)
-//   motes        8 small motes (6-9 px) in the low sun's light against the wing's shaded brick right of the doors and
-//                under the plane's crown (plane +0.6)
-//   near motes   3 near motes (12-16 px, lib/particles nearSize) drifting past the nearest shade: the slate coat over
-//                the cafe chair (plane -1)
+//   leaves       three plane leaves (palmate, the preset's 26-40 px) blown in from off the right edge, one per birth
+//                across the hold (0.75 / 2.15 / 3.25 s: each in view by ~1.0 / 2.4 / 3.5 s), west across the open mid
+//                ground in front of the doors (82 px/s across, ~58 down), landing behind Pip (plane 0)
+//   motes        7 small motes (6-9 px) in the low sun's light against the wing's shaded brick right of the doors and
+//                under the plane's crown (plane +0.6); with the 3 near ones, 10 in all (the owner's note on v5)
+//   near motes   3 near motes (12-16 px, lib/particles nearSize) drifting past the nearest shade: the coat over the
+//                cafe chair and the cafe's cast shadows (plane -1)
 // `particleProblems(S7_PARTICLE_FIELDS, {joins: S7_JOINS})` must be [].
 import React from 'react';
 import {CM} from '../palette';
@@ -28,23 +29,27 @@ const PIP_BOX: Rect = [640, 1095, 120, 185];
 
 /** What lies behind the motes: the wing's brick as shown under its Shade step; the near coat. */
 const BRICK_SHADED = multiply(recede(CM.brickLight, 1, S7_ATM), TINT_CANAL.form);
-const COAT = recede(CM.coatSlate, -1, S7_ATM);
+/** The near motes drift over the cafe's cast shadows on the paving (a warm rose step): lifted they read as sunlit specks. */
+const NEAR_SHADE = multiply(CM.paving, TINT_CANAL.cast);
 
 const common = {joins: S7_JOINS, t0: 0.25, t1: 4.35, atm: S7_ATM, sun: [SUN2.x, SUN2.y] as [number, number]};
 
 export const S7_PARTICLE_FIELDS: ParticlesProps[] = [
   {
+    // plane leaves blown in from off the right edge (the young plane's crown overhangs it) on the canal breeze, WEST
+    // across the open mid ground in front of the doors, landing on the forecourt behind Pip: the proven particle (the
+    // owner on v5: "leafs are great"), the lib preset sizes on the subject's plane (26-40 px), never smaller
     kind: 'leaves',
     seed: 's7/leaves',
-    region: {rect: [S7_TREE.crown.x0 + 14, 700, 120, 120]},
+    region: {rect: [1092, 760, 70, 110]},
     on: BRICK_SHADED,
-    plane: 0.5,
+    plane: 0,
     leaf: 'palmate',
     colors: [CM.leafGold, CM.leafRust, CM.coatMustard],
-    size: [32, 48],
-    floor: 1080,
-    drift: [-18, 0],
-    births: [0.95, 2.35, 3.6],
+    speed: [52, 64],
+    drift: [-82, 0],
+    floor: 1066,
+    births: [0.75, 2.15, 3.25],
     margin: 12,
     avoid: [CAPTION_BAND, S7_BOARD_BOX, PIP_BOX],
     ...common,
@@ -55,7 +60,7 @@ export const S7_PARTICLE_FIELDS: ParticlesProps[] = [
     region: {rect: [870, 640, 150, 330]},
     on: BRICK_SHADED,
     plane: 0.6,
-    count: 8,
+    count: 7,
     size: [8, 12],
     avoid: [CAPTION_BAND, S7_BOARD_BOX],
     ...common,
@@ -63,8 +68,8 @@ export const S7_PARTICLE_FIELDS: ParticlesProps[] = [
   {
     kind: 'motes',
     seed: 's7/nearMotes',
-    region: {rect: [40, 1390, 300, 300]},
-    on: COAT,
+    region: {rect: [20, 1390, 330, 300]},
+    on: NEAR_SHADE,
     plane: -1,
     count: 3,
     speed: [2, 5],
