@@ -201,8 +201,10 @@ export const TopClouds: React.FC<{seed?: string}> = ({seed = 's5top'}) => {
 /** The sun at the END (cut by the right edge): FAR_END in V2S5_far.tsx reads it. */
 export const SUN_END = {x: 1058.5, y: 646, r: 60.2};
 
-/** The hero bank (END coords, base on the horizon 750). Tops >= 610; the saddle behind the obelisk (x ~396); under the
- *  sun (x 998-1119) and its APRIL page (x 1003-1115, bottom 706) the tops stay >= 712. */
+/** The hero bank (END coords, base on the horizon 750). Tops >= 610; the saddle behind the obelisk (x ~396). The sun
+ *  (x 998-1119, bottom 706) stays a WHOLE disc on the sky (CRAFT §f "Failures the eye catches first": the "speech-bubble"
+ *  bite): no lobe reaches it, the nearest bank edge >= 19 px off its rim at every drift (the lobe under it tops at 726,
+ *  the two left of it end at x <= 990: `sunGap` below; the start's sun in the slot is the same disc on the same plane). */
 export const BANK: CloudSpec = {
   base: 750,
   lobes: [
@@ -215,9 +217,9 @@ export const BANK: CloudSpec = {
     [468, 190, 664],
     [586, 300, 626],
     [742, 420, 610], // the hero lobe
-    [905, 300, 638],
-    [985, 150, 686],
-    [1060, 240, 713], // under the sun: low
+    [835, 300, 638],
+    [915, 150, 686],
+    [1060, 240, 726], // under the sun: low, a clear sliver of sky under the disc
     [1150, 150, 704],
     [1236, 220, 664],
     [1360, 380, 616],
@@ -233,6 +235,16 @@ export const BANK: CloudSpec = {
   step: 3,
 };
 export const BANK_DRIFT = 1.2;
+
+/** The bank's nearest edge to the sun disc (px, END coords; < 0 = a lobe cuts the disc) after `drift` px of drift. */
+export function sunGap(drift = 0): number {
+  let best = Infinity;
+  for (let x = SUN_END.x - 160; x <= SUN_END.x + 160; x += 0.5) {
+    const y = cloudTop(BANK, x - drift);
+    best = Math.min(best, Math.hypot(x - SUN_END.x, y - SUN_END.y) - SUN_END.r);
+  }
+  return best;
+}
 
 export const HeroBank: React.FC<{seed?: string}> = ({seed = 's5bank'}) => {
   const t = useTime();

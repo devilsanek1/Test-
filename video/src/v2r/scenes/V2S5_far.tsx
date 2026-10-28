@@ -9,8 +9,8 @@
 //   tones in V2S5_far_tones.
 // S5FarLife (screen space, given p) draws the sky's movers THROUGH the far plane's own map (farMat below = the rig's
 // FAR_S5 exactly), so they ride the camera like the world they fly in: gulls wheeling over the far city (one flock in
-// the start's slot, one over the end's city), and in the scale hold two V's of birds that enter from the left edge at
-// ~75 % of the move, pass behind the terrace tree and cross in front of the obelisk; all at y >= 610.
+// the start's slot, one over the end's city), and two pale V's of birds that the crane's pan brings in from the left
+// edge (~22.0) and that cross the open middle sky to the hold, always RIGHT of the obelisk (never across it); y >= 590.
 // Import rule: never import V2S5_rig / V2S5_set / V2S5_figs (the rig imports this file).
 import React from 'react';
 import {useTime} from '../../lib/time';
@@ -21,9 +21,8 @@ import {mix} from '../kit/dc/core';
 import {CM} from '../palette';
 import type {Pt} from '../../lib/sketch';
 import {HeroBank, SunS5, SUN_END} from './V2S5_far_sky';
-import {TimeShift} from '../../lib/time';
 import {cloudD} from '../kit/dc/core';
-import {S6Clouds} from './V2S6_life';
+import {fromLch} from '../../lib/light';
 import {FarHills, FarCityS5, ObeliskS5, CITY} from './V2S5_far_city';
 
 export const FAR_END = {
@@ -44,12 +43,15 @@ export const FAR_PL: PullPlane = (() => {
 export const farMat = (p: number) => planeMat(FAR_PL, p);
 
 /** The far plane (drawn inside the rig's FAR_S5 PullLayer): back to front. */
-/** The top gutter = S6's clouds (lane L5's `S6Clouds`, film-time aligned: S6 starts at film 23.80 = S5 scene 3.25),
- *  so at the S5 -> S6 wipe (23.62-23.98, its tree clipped at y >= 560) the two skies above the tree are the SAME and
- *  the swap edge never shows in the sky (conform_L4 §1). Two more clouds of the same make lie past the end frame's
- *  right edge (END x >= 1460): the start's top gutter sees them (the far plane is slid ~850 px at p 0). */
+/** The top gutter. At the S5 -> S6 wipe (23.62-23.98) the tree is clipped at y >= 560, so above it the swap edge is a
+ *  bare vertical line: the two skies there must be the SAME (conform_L4 §1). S6 draws NO cloud (its sky is lib/sky's one
+ *  gradient, = S5_SKY above y 556: world/skies), so S5's END frame carries none either. The start's top gutter keeps a
+ *  few clouds of S6's make (`cloudD`, its colours) that lie past the end frame's right edge (END x >= 1090): the far
+ *  plane is slid ~850 px at p 0, and the crane's pan carries them out of the right edge by ~23.3 (before the hold's
+ *  end 23.55; their 3 px/s drift is S6's). */
 const S6_T0_IN_S5 = 23.8 - 20.55;
 const START_CLOUDS: [number, number, number, number][] = [
+  [1090, 330, 246, 96],
   [1470, 470, 236, 104],
   [1880, 420, 160, 86],
 ];
@@ -75,9 +77,6 @@ const S5TopGutter: React.FC = () => {
   }
   return (
     <>
-      <TimeShift by={S6_T0_IN_S5}>
-        <S6Clouds />
-      </TimeShift>
       <path d={body} fill={CM.skyHigh} />
       <path d={belly} fill={mix(CM.skyHigh, CM.stoneShade, 0.35)} />
       <path d={lit} fill={CM.paper} />
@@ -106,22 +105,56 @@ export function birdD(x: number, y: number, w: number, phase: number, glide = fa
   return `M${f(x - w / 2)} ${f(y + tip)}Q${f(x - w * 0.22)} ${f(y + mid - w * 0.08)} ${f(x)} ${f(y + w * 0.04)}Q${f(x + w * 0.22)} ${f(y + mid - w * 0.08)} ${f(x + w / 2)} ${f(y + tip)}`;
 }
 
-/** Gull flocks (END coords): [centre, radii, count, span]. One wheels in the start's slot, one over the end's city. */
+/** Gull flocks (END coords): [centre, radii, count, span]. One wheels in the start's slot, one over the end's city
+ *  (right of the V's lane, under the sun's x but below its disc). */
 const GULLS: {c: Pt; r: Pt; n: number; span: number; seed: number}[] = [
   {c: [1188, 742], r: [88, 15], n: 3, span: 13, seed: 0},
-  {c: [784, 726], r: [120, 20], n: 3, span: 14, seed: 1.7},
+  {c: [952, 774], r: [72, 11], n: 3, span: 14, seed: 1.7},
 ];
 
-/** The two V's of the hold (END coords): enter left of the frame at ~75 % of the move (t0), fly right and a little up. */
-const VS: {t0: number; from: Pt; v: number; rise: number; span: number; n: number; ink: number; glider: number}[] = [
-  // SEEN at phone size (the owner on v4; CRAFT §f.6): at 360 px wide the near V is a 15 px mark, a mid tone over the sky
-  {t0: 1.9, from: [150, 694], v: 242, rise: -9, span: 46, n: 7, ink: 0.3, glider: 3},
-  {t0: 2.08, from: [80, 652], v: 205, rise: -6, span: 34, n: 5, ink: 0.46, glider: -1},
+/** The two V's of the hold (END coords, the far plane's air). They fly RIGHT of the obelisk all the way (every bird at
+ *  END x >= 440 from t0, when the whole V is still off-screen left: the crane's pan brings them in at ~22.0, behind the
+ *  lamppost wipe's moment, and they cross the open middle sky over the hero bank to the hold), so no V ever crosses the
+ *  needle (the critic, 2026-10-28: a dark V over the obelisk read as a windmill on a phone). A PALE AIR TONE on hairline
+ *  strokes (CRAFT §c: things that ARE lines within dL* 15 of what is behind them; §f.6: far birds pale and small):
+ *  L* 75 / 78 over the bank (L* 90) and the mint (85), ~2 px; at 360 px wide the near V is still a 15 px mark. */
+export const VS: {t0: number; from: Pt; v: number; rise: number; span: number; n: number; glider: number; color: string; w: number}[] = [
+  {t0: 1.4, from: [590, 692], v: 116, rise: -6, span: 44, n: 7, glider: 3, color: fromLch(75, 10, 22), w: 2.2},
+  {t0: 1.4, from: [492, 640], v: 98, rise: -4, span: 32, n: 5, glider: -1, color: fromLch(78, 8, 30), w: 2.0},
 ];
+/** The V's vertical spread per rank (x span): a shallow V (the far birds read as a line of marks, never a tall cross). */
+const V_SPREAD = 0.4;
 
-/** A far flock low over the city (the smallest step of the birds' size ladder: V 38 / far V 27 / gulls 13 / this 8 px),
- *  drifting left slowly while it wheels a little (END coords). */
-const FLOCK = {c: [640, 772] as Pt, n: 7, span: 8, vx: -9, seed: 0.6};
+/** Every bird of the V's at scene time t (END coords): centre, span, wing phase, glide. Pure (the QA reads it). */
+export function vBirds(t: number): {v: number; x: number; y: number; w: number; phase: number; glide: boolean}[] {
+  const out: {v: number; x: number; y: number; w: number; phase: number; glide: boolean}[] = [];
+  VS.forEach((V, vi) => {
+    if (t < V.t0) return;
+    const dt = t - V.t0;
+    const hx = V.from[0] + V.v * dt;
+    const hy = V.from[1] + V.rise * dt;
+    for (let i = 0; i < V.n; i++) {
+      const rank = Math.ceil(i / 2);
+      const side = i === 0 ? 0 : i % 2 ? 1 : -1;
+      out.push({
+        v: vi,
+        x: hx - rank * V.span * 0.86 + Math.sin(t * 1.7 + i * 2.3) * 2.2,
+        y: hy + side * rank * V.span * V_SPREAD + Math.sin(t * 2.1 + i * 1.3) * 1.6,
+        w: V.span * (1 - rank * 0.07),
+        phase: (t * 3.6 + i * 0.19) % 1,
+        glide: i === V.glider,
+      });
+    }
+  });
+  return out;
+}
+
+/** A far flock low over the city (the smallest step of the birds' size ladder: V 44 / far V 32 / gulls 14 / this 8 px),
+ *  drifting left slowly while it wheels a little (END coords), under the V's lane and left of the gulls. */
+const FLOCK = {c: [836, 790] as Pt, n: 7, span: 8, vx: -9, seed: 0.6};
+/** The small far birds' pale tones (L* 76 / 74 over the far city and the bank: within dL* 15). */
+const FLOCK_TONE = fromLch(76, 8, 30);
+const GULL_TONE = fromLch(74, 9, 26);
 
 export const S5FarLife: React.FC<{p: number}> = ({p}) => {
   const t = useTime();
@@ -141,30 +174,13 @@ export const S5FarLife: React.FC<{p: number}> = ({p}) => {
       gulls += birdD(x, y, g.span - i * 1.5, (t * 2.6 + i * 0.31 + g.seed) % 1, i === 1 && Math.sin(t * 0.9 + g.seed) > 0.2);
     }
   }
-  const vs: {d: string; ink: number; w: number}[] = [];
-  for (const V of VS) {
-    if (t < V.t0) continue;
-    const dt = t - V.t0;
-    const hx = V.from[0] + V.v * dt;
-    const hy = V.from[1] + V.rise * dt;
-    let d = '';
-    for (let i = 0; i < V.n; i++) {
-      const rank = Math.ceil(i / 2);
-      const side = i === 0 ? 0 : i % 2 ? 1 : -1;
-      const x = hx - rank * V.span * 0.86 + Math.sin(t * 1.7 + i * 2.3) * 2.2;
-      const y = hy + side * rank * V.span * 0.46 + Math.sin(t * 2.1 + i * 1.3) * 1.6;
-      const w = V.span * (1 - rank * 0.07);
-      d += birdD(x, y, w, (t * 3.6 + i * 0.19) % 1, i === V.glider);
-    }
-    vs.push({d, ink: V.ink, w: V.span > 40 ? 3.4 : 2.8});
-  }
+  const vs = VS.map(() => '');
+  for (const b of vBirds(t)) vs[b.v] += birdD(b.x, b.y, b.w, b.phase, b.glide);
   return (
     <XG m={farMat(p)}>
-      <path d={flock} stroke={mix(CM.anchor, CM.sky, 0.55)} strokeWidth={1.2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
-      <path d={gulls} stroke={mix(CM.anchor, CM.sky, 0.42)} strokeWidth={1.7} fill="none" strokeLinecap="round" strokeLinejoin="round" />
-      {vs.map((v, i) => (
-        <path key={i} d={v.d} stroke={mix(CM.anchor, CM.sky, v.ink)} strokeWidth={v.w} fill="none" strokeLinecap="round" strokeLinejoin="round" />
-      ))}
+      <path d={flock} stroke={FLOCK_TONE} strokeWidth={1.2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <path d={gulls} stroke={GULL_TONE} strokeWidth={1.5} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      {VS.map((V, i) => (vs[i] ? <path key={i} d={vs[i]} stroke={V.color} strokeWidth={V.w} fill="none" strokeLinecap="round" strokeLinejoin="round" /> : null))}
     </XG>
   );
 };
