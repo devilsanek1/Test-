@@ -98,32 +98,6 @@
   ]
  },
  {
-  "id": "L7",
-  "source": "lever:curiosity",
-  "line": "Who pays when a bot plays an AI song?",
-  "frame0": "WHO PAYS WHEN BOTS PLAY AI SONGS?",
-  "emotion": "Curiosity with a whiff of unfairness: it sounds like a riddle with a real answer; most people would guess 'the app pays', so the hint that someone else covers a robot's 'listening' itches until it's answered.",
-  "backing": "FL 3.1-3.3 (no per-play rate; a shared pot per country per month, split by share of plays), 3.7, 6.4 ('This is a zero-sum game'), 4.1-4.2 and 3.13 (caught fakes stripped out: the honest 'nobody' half), 8.1-8.2 (the uncaught share is unmeasured), 2.4, 4.10 (bots playing AI songs is real); 4.3, 4.5 (bots play human songs too: never imply it's only AI).",
-  "payoff": 8.8,
-  "gut": 6.0,
-  "truth": 9.0,
-  "clarity": 7.8,
-  "share": 6.0,
-  "score90": 66.2,
-  "judged_by": 4,
-  "fixes": [
-   "Who pays when bots play AI songs?",
-   "Keep; make frame 0 match the voice: WHO PAYS WHEN A BOT PLAYS AN AI SONG?",
-   "Who pays when bots play AI songs?"
-  ],
-  "notes": [
-   "A near-duplicate of L35 whose singular line doesn't match its plural cover.",
-   "The same strong question as L35, two words longer and less punchy in the singular.",
-   "A safe question whose honest two-part answer is the payoff; it is L35 with a singular voice that doesn't match its plural frame 0.",
-   "The core question with an honest two-part answer (caught: nobody; slipped through: every real artist pays a sliver), but L35 says it shorter and matches its frame."
-  ]
- },
- {
   "id": "L5",
   "source": "lever:curiosity",
   "line": "Bots can shrink your favorite artist's paycheck.",
@@ -175,30 +149,29 @@
   ]
  },
  {
-  "id": "L2",
-  "source": "G0 doc",
-  "line": "Half of one app's new songs aren't human.",
-  "frame0": "HALF OF NEW SONGS AREN'T HUMAN",
-  "emotion": "",
-  "backing": "",
-  "payoff": 3.0,
-  "gut": 5.8,
-  "truth": 3.2,
-  "clarity": 6.5,
-  "share": 5.5,
-  "score90": 45.2,
+  "id": "L28",
+  "source": "lever:reversal",
+  "line": "An AI song nobody hears can still make money.",
+  "frame0": "AI SONGS NOBODY HEARS CAN MAKE MONEY",
+  "emotion": "Unfairness wrapped in curiosity: it breaks the rule everyone takes for granted (no listeners, no money), and the instant follow-up is 'whose money?', which is exactly where real artists come in.",
+  "backing": "FL 3.1-3.3 (no per-play rate; one shared pot per country per month, split by share of plays), FL 3.7 (more plays in the pot, smaller slices for everyone else), FL 2.4 (most plays on fully AI tracks were fake in 2025, on one app), FL 4.10 (Smith took in $14M+ from bot plays on AI songs over 7 years before he was charged). 'Can', never 'does': caught fakes earn nothing (FL 4.1-4.2, 4.4), most AI tracks never reach Spotify's 1,000-plays-a-year pay line (FL 3.9-3.10), and how much slips through is unknown (FL 8.2).",
+  "payoff": 7.8,
+  "gut": 6.2,
+  "truth": 7.5,
+  "clarity": 7.8,
+  "share": 6.0,
+  "score90": 63.0,
   "judged_by": 4,
   "fixes": [
-   "Some days, over half the new songs on one app are AI-made.",
-   "Some days, half the new songs on one app are AI-made.",
-   "Some days, over half the new songs on one app are AI. Frame 0: ONE APP, SOME DAYS: HALF THE NEW SONGS ARE AI.",
-   "Some days, over half the new songs on one app are AI-made."
+   "An AI song nobody hears can still get paid.",
+   "An AI song no human hears can still get paid.",
+   "An AI song no real person hears can still get paid."
   ],
   "notes": [
-   "The cover drops 'one app' and 'some days', so it reads as half of all new music, and song counts aren't the mechanism (the pot splits plays).",
-   "A scale stat with no stake: frame 0 drops 'one app' (reads as half of all new music) and it points at song count, not plays, which is the wrong mechanism.",
-   "'Half' holds only on peak days (39-44% on average), 'aren't human' edges toward 'songs nobody wrote', frame 0 drops 'one app' into half of all new music, and uploads don't move the money anyway.",
-   "A side detail (the flood, not the pot): frame 0 drops 'one app's' and reads as half of all new music, 'half' holds only on peak days, and 'aren't human' edges toward the Never-say 'songs nobody wrote'."
+   "A clean, true paradox that rides AI and points at 'whose money?', with a softer sting than the top lines.",
+   "A good paradox that leads to 'how?', though 'nobody hears' blurs into 'nobody plays', and a song nobody plays earns nothing.",
+   "True with 'can', but the hear/play hinge needs 'fake plays' in line 2, or leavers think unheard songs earn just by existing.",
+   "A true paradox ('hears', not 'plays', is the right distinction) whose 'whose money?' leads to the pot, but frame 0 names no victim and can read as a side-hustle hook."
   ]
  },
  {
@@ -226,6 +199,33 @@
    "Two sentences, 14 words and British spelling, and false as worded: most AI songs earn nothing and only uncaught fake plays take a slice (factlock correction 13, two Never-say rows).",
    "Two sentences, 14 words and a Never-say: most AI songs earn nothing and caught fakes are stripped out, so 'they still take money from your favourite artist' and ARTISTS PAY leave a false belief.",
    "Breaks the rules (14 words, two sentences, British 'favourite') and is false as worded per the Never-say list: AI songs don't take the money, uncaught fake plays do, so the payoff has to walk the line back."
+  ]
+ },
+ {
+  "id": "L2",
+  "source": "G0 doc",
+  "line": "Half of one app's new songs aren't human.",
+  "frame0": "HALF OF NEW SONGS AREN'T HUMAN",
+  "emotion": "",
+  "backing": "",
+  "payoff": 3.0,
+  "gut": 5.8,
+  "truth": 3.2,
+  "clarity": 6.5,
+  "share": 5.5,
+  "score90": 45.2,
+  "judged_by": 4,
+  "fixes": [
+   "Some days, over half the new songs on one app are AI-made.",
+   "Some days, half the new songs on one app are AI-made.",
+   "Some days, over half the new songs on one app are AI. Frame 0: ONE APP, SOME DAYS: HALF THE NEW SONGS ARE AI.",
+   "Some days, over half the new songs on one app are AI-made."
+  ],
+  "notes": [
+   "The cover drops 'one app' and 'some days', so it reads as half of all new music, and song counts aren't the mechanism (the pot splits plays).",
+   "A scale stat with no stake: frame 0 drops 'one app' (reads as half of all new music) and it points at song count, not plays, which is the wrong mechanism.",
+   "'Half' holds only on peak days (39-44% on average), 'aren't human' edges toward 'songs nobody wrote', frame 0 drops 'one app' into half of all new music, and uploads don't move the money anyway.",
+   "A side detail (the flood, not the pot): frame 0 drops 'one app's' and reads as half of all new music, 'half' holds only on peak days, and 'aren't human' edges toward the Never-say 'songs nobody wrote'."
   ]
  }
 ]
