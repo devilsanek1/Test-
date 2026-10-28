@@ -63,7 +63,8 @@ default size guideline. The anti-waste rules below only cut true waste (rework, 
 
 Quality and output value come first. Spend generously where ideas are decided, because that is cheap compared to
 building, and it decides the outcome:
-- **G0 topic:** when the owner names no topic, 5 beat scouts search the last 72 h, 3 judges (growth, standards,
+- **G0 topic:** the brief names the mood the next video needs (alternate positive and negative stories: playbook
+  "Taste signals", owner 2026-10-28). When the owner names no topic, 5 beat scouts search the last 72 h, 3 judges (growth, standards,
   creative) score the candidates, one synthesis writes the top 3 and an adversarial fact-check tests them (toolkit row
   "G0 topic"); the owner picks. When the owner names the topic, research it instead and look for its biggest true
   framing (playbook: the hook). Either way the fact lock follows (G0 row). The angle and the hook are no longer G0's:

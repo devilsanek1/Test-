@@ -220,6 +220,13 @@ Maintenance at the end).
 - **Topics: tech and AI news is the channel's focus; the existing fuss (people already arguing about it) weighs as much as
   a direct wallet hit,** and an everyday consequence beats a bigger, distant story. — (v3 G0; v4 G0: "focus on tech and AI",
   picked AI songs over the wallet pick: "good amount of fuss about AI songs", 2026-10-27).
+- **Topics: alternate the mood: a positive story after a negative one.** v2 (Google staff resigning), v3 (laptop
+  prices) and v4's first pick (AI songs and fake plays) were all bad news, so the next is a very recent, highly
+  relevant, genuinely POSITIVE AI story (e.g. AI helping find a medicine or beat a disease) with a hopeful outlook.
+  Positive never means hype: the same standards check applies (trial phase, peer review, "helped" vs "did", who
+  benefits and when). Every topic scout names the mood the next video needs. — ("we should alternate between positive
+  and more negative topics ... something very recent, extremely relevant yet very positive around AI ... a nice
+  positive outlook would be the right direction for a story", v4, 2026-10-28).
 - **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
   frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
 - **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).

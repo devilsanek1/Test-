@@ -49,3 +49,10 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   from their transcripts and committed; the three stopped writers resumed from their transcripts (SendMessage), each now
   writing its result into `core_line/writers/`; the auto-checkpoint loop had ended at its 2-hour cap, so the rule now
   leans on agents writing files plus a commit at every step. -> rule: Process (limits).
+- 2026-10-28 ~09:50 UTC, after the G0.5 top 3 (AI songs): "thinking more about the topics we research and pick. I think
+  we should alternate between positive and more negative topics. I think so far we mainly had negative topics like
+  prices of laptops going up, google scandal. I am thinking if we should focus on something very recent, extremely
+  relevant yet very positive around AI. like AI is helping to find medication or solve some disease, i think having a
+  nice positive outlook would be the right direction for a story" -> rule: Taste signals (alternate the mood); G0
+  round 3 scouts very recent POSITIVE AI stories (`scouting_r3/`, top 3 in `G0_TOPICS_r3.md`); asked whether it
+  replaces AI songs as video 4 (AI songs parked with its research and core line) or becomes video 5.
