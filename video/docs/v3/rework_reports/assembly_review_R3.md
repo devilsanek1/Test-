@@ -1,6 +1,6 @@
 # v3 rework assembly: independent review R3 (the owner's eye, cold)
 
-Status: IN PROGRESS (skeleton). Reviewer R3, 2026-10-28.
+Status: DONE. Reviewer R3, 2026-10-28.
 
 Film under review: `scratchpad/rework/assembly/film_full.mp4` (2469 frames, 1080x1920, 60 fps, voice, code at be03dfa;
 rendered from `Film3`). Bar: the approved hook pilot `video/deliverables/v3/v3_rework_pilot.mp4` (SQA 0-5.80).
@@ -81,12 +81,113 @@ the picture falls behind the words.
 
 ## 2. Verdict
 
-(pending)
+Mostly yes. The rework answers "no story, no clean transitions": one home, one view out, the tag carried through, joins
+that flow at 60 fps (none reads as a cut), and the hook (0-6 s) and the chip pop (18-19 s) sit at the pilot's bar, with a
+clean line and gentle light wherever I looked at phone size. It does not yet answer "too busy / too rough" and "what to
+keep my attention on" in three places. What an owner sees first: the summit heap at 19.4-21.0 reads as wooden pallets or
+bricks, the one rough, busy stretch, on the film's big reveal (the blocker). Then SQB's 10 s chart hold, where the night
+strip at the left edge pulls the eye as hard as the falling line, and "But this past year" has no picture of its own.
+Then the street, where "first dibs" and "the better one" don't read at phone size: the red tag's flash takes the eye off
+the truck going first. Fix the blocker and the four majors and this cut meets the pilot's bar.
 
 ## 3. Scores (the measures run)
 
-(pending)
+- **Cold watch:** 14 sheets at 5 frames per second (0.25 scale) watched with the sound off, 2 word-aligned sheets (38 spoken
+  beats) for the sound-on pass, 8 detail and 1:1 crops; about 21 images per pass. Where I would swipe: ~12-13 s (SQB:
+  nothing new on screen 11.5-14.2), ~20 s (the heap), ~32 s (SQE: nothing readable on screen 31.3-33.4).
+- **Motion at phone size** (share of the frame moving per 0.5 s, luma step > 6 over 0.1 s): hook 2-3 %; SQB 2-5 % (the
+  line, plus a faint whole-scene float); SQD 41-62 % (the pull-back over the heap); SQE 0.4-1.6 %, with peaks only at the
+  camera moves (25.0, 36.5) and the phone beats (30.0, 31.0); SQF 2-9 %; the loop's wipe 52 %.
+- **Salience** (CRAFT §e, the frame's top 3 %, captions out). SQB, card / window strip / phone: 6.6 s 5 / 49 / 32; 7.5 s
+  14 / 44 / 18; 8.5 s 31 / 35 / 16; 9.0 s 36 / 34 / 15 (the strip's mullion column alone 18 %); 10.0 s 36 / 36 / 14;
+  11.0-14.0 s 75-78 / 14-18 / 5-6; 15.0-16.0 s 59 / 24-25 / 8-9; the tag's jolt at 15.5 s takes 82 %. SQE: at 24.0 the
+  gate and trucks hold 57 %, the lane's vans 28 %, the phone 14 %. At 24.3 gate and trucks 42 %, tag 15 %. At 24.6 (the
+  sway) the tag 71 %, gate and trucks 12 %; at 24.9 the tag 71 %. At 26.0 the van into the pool 20 %, at 27.5 the "~5x"
+  notice 53 %, at 32.5 the lane with the BETTER van 31 %, and at 36.1 (the jolt) the tag 69 %. The mountain holds 2.5 %
+  at 24.0: not a magnet.
+- **The heap at 20.40** (y 1000-1900): the largest fill is L* 56 C* 24 h 60 (23 %), then L* 48 C* 24 h 50 (6 %); the gold
+  fills (L* 68-72, C* 36-40) are ~27 %. The crest chips are `#966E59` (L* ~50, C* ~17). SQE's mountain: 4.8-5.2 % of the
+  frame, L* 67 C* 37 (gold, not a field).
+- **J3 at 60 fps:** one continuous push into the stick and out onto the heap. Near-black (L* < 20) goes from 3.6 % at 19.10
+  to 32.5 % at the cut (19.40) and back to 2 % at 19.85; the mean L* drops 71 -> 51. It reads as a 0.25 s whoosh, not a
+  cut: not a finding.
+- **The data center at 21.0-21.5:** its L* < 25 area is 1-3 % of the frame, inside the dark anchor. It enters ~1 s after
+  its word, which flow_v2 §4 accepts (the S5 move); the heap's own read (R3-1) has to carry the line until then.
+- **Right rail:** the "~5x" and "2027" notices end at x 945-948 (the rail starts at x > 950), so they are clear.
+- **Sizes at phone size** (a phone shows 1080 px as ~390 pt, so 0.36 pt per px). Street at H2 rest (24.0): DC truck ~200
+  px wide, workers 45-50 px tall, crates ~25 px (~9 pt). BETTER van: label ~60 x 18 px and decal laptop ~60 x 45 px, both
+  measured in the pushed frame. SQB: the end dot's pulse at 11.80 grows from r 8.6 to 12.8 px. Pip: at 40.0 its side cling
+  is ~110 x 170 px; at 40.30-40.70 a frontal shrug ~160 x 170 px (~1.3 % of the frame) sits over the phone's right edge.
+- **Audio:** the voice plus sound cues (thoom 4.04 +10 dB, 21.72 +15 dB; ding 30.28; like-pop 39.88). No bed. First sound
+  at 0.20 s; pauses of 0.25-0.5 s between lines.
+- **Draft label:** the bottom-left "G5 · SQx · time" shows because this render is `Film3`, not `Film3Final`: expected for
+  a stage-labelled cut.
 
 ## 4. Findings (blockers first, then what the owner sees longest)
 
-(pending)
+- **R3-1. BLOCKER (reveal). SQD 19.40-21.30, the summit heap, centre and lower two thirds.** Owner: "The style is too rough
+  and messy ... cleaner, more refined, gentle, a lot more premium"; "It's too busy". Playbook: "Every shot reads instantly
+  with the sound off: literal beats clever. Recognisable things". DIRECTION 6: "never beige, muddy tan". Measured: cold at
+  phone size it read "a pile ... of pallets? bricks?". These are the busiest frames of the film: 41-62 % of the frame
+  moves per 0.5 s over 19.0-21.5 as the camera pulls back across a frame-filling texture of chip-slotted sticks. At 20.40
+  the heap's largest fill is L* 56 C* 24 h 60 (23 %), plus L* 48 C* 24 (6 %): the crest chips `#966E59` (L* ~50, C* ~17)
+  and the flank's lavender-multiplied boards, a muddy brown-tan. Sound on, the voice says "AI data centers" (19.96) over
+  this heap, and the data center only enters at 21.0, so the heap has to read as memory on its own. **Fix:**
+  `SQD_peak.tsx` `lodAt` / `PEAK_D`: chips and pins only on the hand-placed crest (`s.crest`: the bed's two sticks and the
+  six of the second layer), in THE stick's own chip and pin values (one step under its L* 13 / 92, not `#966E59`); every
+  row stick lod 2 (a flat gold board with its lit top) from frame 1164 on. Then check at phone size that it reads "a
+  stick on a pile of sticks".
+- **R3-2. MAJOR (home). SQB 6.45-10.30, the left window strip (x 0-190) against the card.** Owner: "too many moving parts
+  and I'm not sure what to keep my attention on"; "some supporting environment can be drawn a bit more subtle". Measured:
+  the top-3 % salience, card / strip / phone, is 5 / 49 / 32 % at 6.6, 14 / 44 / 18 at 7.5, 31 / 35 / 16 at 8.5, 36 /
+  34 / 15 at 9.0 and 36 / 36 / 14 at 10.0. The strip's biggest blob is the mullion column (x 28-84, y 826-1060: 18 % at
+  9.0). Only after the doodles land (11.0-14.0) does the card hold 75-78 %. So while the voice says "Laptops get better for
+  the same money", the eye is split with the night strip at the frame's edge. **Fix:** `home_set.tsx` `windowCalm` (the
+  6.35-6.95 settle, so SQA stays the pilot): the mullion and its latch, and the strip's houses, caps and lit windows, take
+  one more `Haze` step toward the pane's dusk (no near-black latch; caps below the card's paper value). Target: the strip
+  under ~10 % and the line leading from 7.08.
+- **R3-3. MAJOR (home). SQB 10.90-13.85, the card's right end: the story's turn ("But this past year, in the US,").**
+  Owner: "There is no story ... just a bunch of shots put together"; G5: "way too empty". Playbook: "Every shot reads
+  instantly with the sound off". Measured: with the sound on and off, 11.48-13.56 has no picture. The only event is the
+  end dot's x1.5 pulse at 11.80 (r 8.6 -> 12.8 px, ~9 pt on a phone), on a framing unchanged since 6.45; 2.4-4.6 % of the
+  frame moves (the float and the snow). It was my first swipe point (~12-13 s); the integrator's density reads SQB static
+  58 %, longest gap 3.3 s. **Fix:** `SQB_chart.tsx` `OldDealChart` at `CHART_BEATS.pulse` (11.80): make "this past year"
+  one visible event on the chart. A soft hero-tint band over the plot's last year (2025-26, the plot's full height, tier-B
+  value, no outline) pops in, the end dot sits in it, and it stays as the stage where the line hooks up at 13.85.
+- **R3-4. MINOR (window). SQE 22.68-24.95, the street band (gate, loading, barrier).** Owner: "Across the story we should
+  have the main arc going where the attention should be". DIRECTION 8: "Every hold is locked or a slow float, never a zoom;
+  a zoom is a visible story move or a carrier". Measured: "They pay more, so they get first dibs" plays at H2's rest size:
+  DC truck ~200 px wide, workers 45-50 px tall, crates ~25 px (~9 pt on a phone). The read push (x1.35) only comes after
+  it, at 24.90-25.70: a second camera move inside SQE's hold, 2 s after J4's entry. Cold watch: "who pays, which van goes
+  first?". **Fix:** `h2_window.tsx` `entryCam`: land on `pushCam`'s held x1.35 framing about (680, 1120) at 22.95 (J4's one
+  move goes into the pushed frame) and remove the separate 24.90-25.70 push. The release at 36.36-36.98 stays.
+- **R3-5. MAJOR (thread). SQE 31.32-33.40, the queue's head: the BETTER van.** Playbook: "Every shot reads instantly with
+  the sound off: literal beats clever. Recognisable things". Owner: "There is no story". Measured: even in the pushed frame
+  the van's "BETTER" label is ~60 x 18 px (~6.5 pt on a phone), drawn at `size` max(16, h*0.17), and the decal laptop is
+  ~60 x 45 px. At phone size it is one more white laptop van, so "Normally you'd wait for the better one." has no readable
+  picture (cold watch: "nothing new on screen", second swipe point ~32 s). At 32.5 the lane holds 31 % of the top-3 %
+  salience: the eye goes there and finds nothing to read. **Fix:** `kit/Fleet.tsx` `FleetVan`, variant 'better': the
+  "BETTER" label on a light panel across the box at ~2.5x (h*0.17 -> ~h*0.4, cap height >= 40 px at H2 rest), over the
+  NEW laptop decal (lit peach screen, 0.6 of the box): the same BETTER laptop the chart showed at 10.82.
+- **R3-6. MAJOR (thread). SQE 24.44-25.04 (and 35.95-36.25): the tag at the left edge against the DC truck going first.**
+  Owner: "too many moving parts and I'm not sure what to keep my attention on"; "the main arc going where the attention
+  should be". CRAFT §b: a second story action "never at the same moment". Measured: the tag's sway window (`TAG_FULL`
+  24.44-25.04, a 2-step switch to full hero red) opens while the DC truck drives up through the lifted barrier
+  (24.30-24.95), which is the picture of "first dibs". Top-3 % salience: at 24.3 gate and trucks 42 %, tag 15 %; at 24.6
+  tag 71 %, gate and trucks 12 %; at 24.9 tag 71 %. The jolt does the same at 35.95: the tag holds 69 % at 36.1 while the
+  overtaking trucks finish at 36.25. Cold watch: at 24.6 I saw the tag flash, not the truck. **Fix:** `thread_plane.tsx`
+  `TAG_FULL`: open the sway window when the drive ends (24.95-25.25, in the pause before "Which means") and the jolt's when
+  the overtake ends (36.25). Each cause beat then plays alone and the tag reacts after it (CRAFT §a: every cause beat ends
+  with it reacting).
+- **R3-7. MINOR (thread). SQF 40.30-40.70, the payoff: Pip at the phone's upper right.** Owner: "the supporting details /
+  supporting animation that adds subtle loveliness ... should be a bit more subtle but yet alive". CRAFT §b, the mascot:
+  "only blinks and ear moves ... while the subject moves, clear of the subject"; tier B: "no pops". Measured: on "tag",
+  Pip swaps its side cling (~110 x 170 px) for a frontal arms-up shrug (~160 x 170 px, ~1.3 % of the frame) over the
+  phone's right edge for 0.4 s, overlapping the plane's travel back (from 40.55). Cold watch: "the toy's pop at the same
+  moment pulls my eye off the tag". **Fix:** `thread_plane.tsx` Pip (flow_v2 §1 "shrug 40.30"): play the shrug in the side
+  pose, with its own ears and shoulders (no frontal pose swap, never over the screen), after "tag" ends (40.42-40.55), and
+  finish it before the plane travels.
+
+Status: DONE (2026-10-28). Overlap with R1/R2, read only after my findings were formed: R3-1 matches R1-3 and R2-1 (the
+same heap; R2's fix is the same crest-only chip pass), and R3-2 matches R1-2 (the same strip and mullion). R3-3 to R3-7
+are new angles: the turn's picture, the read push, the BETTER label, the tag's timing and Pip's pop.
