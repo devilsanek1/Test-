@@ -10,8 +10,8 @@
 //   plane 0    our coping + railing (V2S2_Near S2Bank), Pip (slot) on the coping, the A-board (slot: drawn BEFORE the
 //              kiosk so it slides out from behind it), the kiosk (its awning clear of SW5), the newsagent (slot), the
 //              bench (its iron ends CM.line, never plum) with its people (slot drawn before the backrest)
-//   plane -1   our towpath's near rows (part 'near'), the light on our towpath (V2S2_Light), the kiosk's foot (bundles,
-//              crate), the dog lying at rest, the planter of grasses, the slim near lamp + the bike locked to it
+//   plane -1   our towpath's near rows (part 'near'), the light on our towpath (V2S2_Light), the leaves blown across it
+//              (slot, each in its own plane group), the planter of grasses, the slim near lamp + the bike locked to it
 import React, {useMemo} from 'react';
 import {CM} from '../palette';
 import {Tier} from '../../lib/tier';
@@ -61,11 +61,14 @@ export type V2S2SetProps = Pick<S2WallProps, 'staffCoolAt' | 'storyOverlay' | 's
   pip?: React.ReactNode;
   /** The far towpath's life (plane +1). */
   farLife?: React.ReactNode;
+  /** The leaves blown across our towpath (in its plane group, after its light, BEFORE the near things: the planter's
+   *  grass, the bike and the lamp post pass in front of them). */
+  leaves?: React.ReactNode;
   /** Particles and other light life (drawn last, each in its own plane group). */
   extra?: React.ReactNode;
 };
 
-export const V2S2Set: React.FC<V2S2SetProps> = ({staffCoolAt, storyOverlay, storyTier, aBoard, agent, bench, pip, farLife, extra}) => (
+export const V2S2Set: React.FC<V2S2SetProps> = ({staffCoolAt, storyOverlay, storyTier, aBoard, agent, bench, pip, farLife, leaves, extra}) => (
   <>
     <S2Plane plane={S2_PLANE.wall}>
       <S2Wall staffCoolAt={staffCoolAt} storyOverlay={storyOverlay} storyTier={storyTier} />
@@ -98,6 +101,9 @@ export const V2S2Set: React.FC<V2S2SetProps> = ({staffCoolAt, storyOverlay, stor
     <S2Plane plane={S2_PLANE.towpath}>
       <S2Towpath part="near" />
       <S2TowpathLight />
+    </S2Plane>
+    {leaves}
+    <S2Plane plane={S2_PLANE.towpath}>
       <S2NearThings />
       <S2PlanterForm />
     </S2Plane>

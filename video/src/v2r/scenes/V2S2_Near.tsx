@@ -4,19 +4,24 @@
 //   S2Bank      plane 0: our coping (limestone) along the water edge, receding to the VP, no railing (the King's Cross
 //               towpath: the water stays open); three cast-iron mooring bollards set just back from the edge (CM.line,
 //               never plum), Pip's at its seat (590, 1050), two more receding toward the VP.
-//   S2Towpath   plane -1: York-stone courses as long two-tone bands from the VP (joints dL* 7, bands >= 3 px), the
-//               cross joints level and staggered (the far rows ride the bench's plane in the float, the near rows the
-//               things' plane: ONE tone family, no seam across the path); a cast-iron drain; a few fallen leaves.
+//   S2Towpath   York-stone courses as long two-tone bands from the VP (STONE_B 7 L* under STONE_A, joints a step under
+//               the darker stone), the cross joints level and staggered. The FAR rows (above NEAR_ROW, riding plane
+//               -0.5 in the float) are the un-stepped stone, a peach cream toward S1's ground; the NEAR rows (plane -1)
+//               one value step darker (CRAFT §f.4: each nearer ground band a step darker), the split on the NEAR_ROW
+//               cross joint (drawn across every band); a warm-iron drain; six fallen leaves lying flat, gathered at the
+//               planter's foot, the drain and the lamp's foot (S2_FALLEN).
 //   S2NearThings  the kiosk's foot (two bundles of papers tied with string, a crate), the dog lying at rest by the kiosk,
-//               the planter of grasses cut by the left edge, the slim near lamp (CM.line, x 1030, cut by the right edge;
-//               its swan-neck leaves the frame right) with a bike locked to its foot (cut by the bottom-right).
+//               the planter of grasses cut by the left edge (a mid wood, never the darkest mass), the slim near lamp
+//               (CM.line, x 1030, cut by the right edge; its swan-neck leaves the frame right) with a bike locked to its
+//               foot (cut by the bottom-right; warm-slate tyres).
 // Tiers: environment (flat fills, no lines); things that ARE lines (the bike's frame and wheels, the string) as thin
 // same-hue strokes. The light layers (contact / cast / form) are in V2S2_Light.
 import React, {useMemo} from 'react';
 import {CM} from '../palette';
 import {Tier} from '../../lib/tier';
+import {Fill} from '../../lib/Fill';
 import {nearStep, seamTone} from '../../lib/depth';
-import {Batch, Paint, P, Pt as KPt, rng, leafPath} from '../kit/canal/core';
+import {Batch, Paint, P, Pt as KPt, rng} from '../kit/canal/core';
 import {CROSS_ROWS, GROUND_VP, LONG_JOINTS, OUR_COPING, OUR_EDGE, fanX, pxPerMAt} from './V2S2_Ground';
 
 type Pt = [number, number];
@@ -24,13 +29,21 @@ const poly = (pts: Pt[]) => pts.map(([x, y], i) => `${i ? 'L' : 'M'}${P(x, y)}`)
 
 // ---------------------------------------------------------------- colours (near = a value step darker per plane)
 
-/** The towpath's two York-stone tones, plane -1 (one family over the whole path: a value step across it would read
- *  as a shadow edge). */
-const STONE_A = CM.paving;
-const STONE_B = '#ECD3BE'; // a second warm stone, one soft step from the paving (long two-tone bands)
-const PAVE_TONES = {a: nearStep(STONE_A, -1), b: nearStep(STONE_B, -1)};
-export const PAVE = {far: PAVE_TONES, near: PAVE_TONES};
-/** Where the float's split runs (a cross row near y 1550): the rows above ride plane -0.5, the rows below plane -1. */
+/** Our towpath's York stone (the critic, 2026-10-28: "a flat empty beige floor"): a PEACH cream toward S1's ground
+ *  (S1 on screen #EED8C9, h ~63; the old paving step read beige, h 72), and a real second stone 7 L* under it so the
+ *  long two-tone bands read at phone size (CRAFT §c: long bands at dL* 6-8; §f.4: a receding joint reads at >= 6).
+ *  The towpath is a BACKDROP (the ground plane: the clean pen never recolours it), so these are the on-screen colours:
+ *  A L* 87.6 C* 13 h 63 (under the frame's brightest 5 %, L* ~91 at 7.0: the light stays on the subject), B L* 80.5. */
+const STONE_A = '#F0D7C6';
+const STONE_B = '#DDC3B3';
+/** The far rows: the un-stepped stone (plane 0's colours: the ground under the bank's things); the near rows: one value
+ *  step darker (lib/depth nearStep -1 = -5 L*), split on the NEAR_ROW cross joint. */
+export const PAVE = {
+  far: {a: STONE_A, b: STONE_B},
+  near: {a: nearStep(STONE_A, -1), b: nearStep(STONE_B, -1)},
+};
+/** Where the float's split runs (a cross row near y 1550): the rows above ride plane -0.5, the rows below plane -1; it
+ *  is also the near rows' value step (its cross joint runs across every band, so the step sits under a joint). */
 export const NEAR_ROW = CROSS_ROWS.reduce((best, y) => (Math.abs(y - 1550) < Math.abs(best - 1550) ? y : best), CROSS_ROWS[0]);
 /** The bollards and the lamp: CM.line (STYLE §2: posts, frames, railings; never plum). */
 const IRON = CM.line;
@@ -114,64 +127,115 @@ function fanQuad(xa: number, xb: number, y0: number, y1: number): string {
 
 const S2_TOWPATH_ID = 's2towpathclip';
 
+/** A batch drawn as BACKDROP fills (the ground plane: lib/Fill `backdrop`, never recoloured by the tier), so the stone
+ *  shows its own colours on screen whatever the size of each colour's path. */
+const PaintBackdrop: React.FC<{b: Batch; seed: string}> = ({b, seed}) => (
+  <>
+    {b.layers.map((l, i) => (
+      <React.Fragment key={i}>
+        {[...l.fills.entries()].map(([color, parts]) => (
+          <Fill key={color} d={parts.join('')} color={color} offset={false} backdrop seed={`${seed}/${i}/${color}`} />
+        ))}
+      </React.Fragment>
+    ))}
+  </>
+);
+
+/** A fallen leaf lying flat on the towpath (foreshortened by the ground camera): a five-lobed plane leaf (it reads as a
+ *  leaf at phone size, where an almond reads as a seed), `len` px from stem to tip across, turned `rot` deg in the
+ *  ground's own plane, its depth squashed by `squash` (the ground's foreshortening at its row). One closed path. */
+const PALM: [number, number][] = [
+  [-1.75, 0.42],
+  [-0.95, 0.82],
+  [0, 1],
+  [0.95, 0.82],
+  [1.75, 0.42],
+];
+function fallenLeaf(cx: number, cy: number, len: number, rot: number, squash: number): string {
+  const R = len / 1.32;
+  const c = Math.cos((rot * Math.PI) / 180);
+  const s = Math.sin((rot * Math.PI) / 180);
+  const T = (x: number, y: number): Pt => [cx + x * c - y * s, cy + (x * s + y * c) * squash];
+  const x0 = -len / 2;
+  const ox = x0 + 0.32 * R;
+  const at = (a: number, L: number) => T(ox + Math.cos(a) * R * L, Math.sin(a) * R * L);
+  const pts: Pt[] = [T(x0 - len * 0.12, 0), T(x0, 0)]; // a short stem, then the blade
+  PALM.forEach(([a, L], i) => {
+    if (i > 0) pts.push(at((PALM[i - 1][0] + a) / 2, 0.44));
+    pts.push(at(a - 0.2, L * 0.72), at(a, L), at(a + 0.2, L * 0.72));
+  });
+  pts.push(T(x0, 0.6));
+  return poly(pts);
+}
+/** The ground's foreshortening at row y (the ground camera: depth / width = (y - horizon) / f). */
+const squashAt = (y: number) => Math.min(0.92, (y - GROUND_VP[1]) / 1400);
+
+/** The fallen leaves (the critic, 2026-10-28: 5-6 leaves 30-45 px, flat, warm, gathered where the wind leaves them):
+ *  [x, y, length px, turn deg, colour]. Gold and a brick-light red (rust read as dark ticks on pale stone: S1's
+ *  lesson), a value step nearer (plane -1). Three against the planter's foot (its right end, in its cast shade), one
+ *  caught at the drain's grate, two at the lamp's foot under the bike (the bike and the post pass over them). Sized by
+ *  the ground camera (a 0.15-0.2 m plane leaf at its row). */
+export const S2_FALLEN: [number, number, number, number, string][] = [
+  [238, 1752, 38, -24, CM.leafGold],
+  [276, 1768, 42, 38, CM.brickLight],
+  [252, 1792, 34, 70, CM.leafGold],
+  [552, 1724, 36, -52, CM.brickLight],
+  [902, 1868, 44, 16, CM.leafGold],
+  [968, 1892, 40, -40, CM.brickLight],
+];
+
 export const S2Towpath: React.FC<{part: 'far' | 'near'}> = ({part}) => {
-  const b = useMemo(() => {
+  const {stone, things} = useMemo(() => {
     const b = new Batch();
-    const r = rng('s2towpath');
     const yTop = Math.floor(OUR_COPING(1140)) - 4; // the coping's near side at the right edge (the clip trims the rest)
-    const rows: [number, number, 'far' | 'near'][] = (
-      [
-        [yTop, NEAR_ROW, 'far'],
-        [NEAR_ROW, 1990, 'near'],
-      ] as [number, number, 'far' | 'near'][]
-    ).filter((r) => r[2] === part);
+    // the near rows start 2 px above the split (drawn after the far rows, over them): the two float planes never open
+    // a hairline gap at NEAR_ROW
+    const range: [number, number] = part === 'far' ? [yTop, NEAR_ROW] : [NEAR_ROW - 2, 1990];
+    const [y0, y1] = range;
+    const tone = PAVE[part];
     const joints = [GROUND_VP[0] + 400, ...LONG_JOINTS]; // the first band starts right of the frame
-    // the long two-tone bands between the long joints, each plane its own step
-    for (const [y0, y1, plane] of rows) {
-      const tone = PAVE[plane];
-      for (let k = 0; k < joints.length - 1; k++) b.fill(k % 2 ? tone.b : tone.a, fanQuad(joints[k], joints[k + 1], y0, y1));
-    }
+    // the long two-tone bands between the long joints (A, B, A, ...), this plane's step
+    const bandTone = (k: number) => (k % 2 ? tone.b : tone.a);
+    for (let k = 0; k < joints.length - 1; k++) b.fill(bandTone(k), fanQuad(joints[k], joints[k + 1], y0, y1));
     b.layer();
-    // the long joints: bands that narrow with distance (2 cm of stone gap: >= 3 px from mid ground, dL* 7)
-    for (const [y0, y1, plane] of rows) {
-      const seam = seamTone(PAVE[plane].a, 7);
-      for (const xb of LONG_JOINTS) b.fill(seam, fanBand(xb, y0, y1, (y) => Math.max(2.2, pxPerMAt(y) * 0.02)));
-    }
-    // the cross joints: level, staggered (every other course offset), a softer seam (dL* 5)
+    // the long joints: bands that narrow with distance (2 cm of stone gap: >= 3 px from mid ground), a step under the
+    // darker stone (dL* 12 on A, 5 on B: they read as the gaps between the courses, never as dark lines)
+    const longSeam = seamTone(tone.b, 5);
+    for (const xb of LONG_JOINTS) b.fill(longSeam, fanBand(xb, y0, y1, (y) => Math.max(2.2, pxPerMAt(y) * 0.02)));
+    // the cross joints: level, staggered (every other course offset), each a soft step under its own stone (dL* 5);
+    // the one at NEAR_ROW runs across every band (the near rows' value step sits under it)
     CROSS_ROWS.forEach((y, i) => {
       const plane = y < NEAR_ROW ? 'far' : 'near';
       if (plane !== part) return;
-      const seam = seamTone(PAVE[plane].a, 5);
       const h = Math.max(1.6, pxPerMAt(y) * 0.012);
-      for (let k = i % 2; k < joints.length - 1; k += 2) {
+      const every = y === NEAR_ROW;
+      for (let k = every ? 0 : i % 2; k < joints.length - 1; k += every ? 1 : 2) {
         const xa = fanX(joints[k], y);
         const xc = fanX(joints[k + 1], y);
-        b.rect(seam, Math.min(xa, xc), y - h / 2, Math.abs(xc - xa), h);
+        b.rect(seamTone(bandTone(k), 5), Math.min(xa, xc), y - h / 2, Math.abs(xc - xa), h);
       }
     });
-    b.layer();
-    // a cast-iron drain in the paving (foreshortened, a slate frame and its slots)
+    // the things lying ON the paving (tier C things, recoloured by the tier like the rest of our bank's things)
+    const t = new Batch();
     if (part === 'near') {
+      // a cast-iron drain (foreshortened): warm iron 16 L* under the near stone (1-2 steps under the paving, never a
+      // cool slate hole), its slots a step deeper
       const y = 1716;
       const m = pxPerMAt(y);
       const cx = 486;
       const w = m * 0.5;
       const d = m * 0.5 * 0.42; // foreshortened depth
-      b.fill(CM.coatSlate, poly([[cx - w / 2, y - d / 2], [cx + w / 2, y - d / 2], [cx + w / 2 + 6, y + d / 2], [cx - w / 2 + 6, y + d / 2]]));
+      const iron = seamTone(PAVE.near.a, 16);
+      t.fill(iron, poly([[cx - w / 2, y - d / 2], [cx + w / 2, y - d / 2], [cx + w / 2 + 6, y + d / 2], [cx - w / 2 + 6, y + d / 2]]));
       for (let s = 1; s < 6; s++) {
         const xs = cx - w / 2 + (w * s) / 6;
-        b.rect(seamTone(CM.coatSlate, 8), xs - 3, y - d / 2 + 5, 6, d - 10);
+        t.rect(seamTone(iron, 9), xs - 3, y - d / 2 + 5, 6, d - 10);
       }
+      t.layer();
+      // the fallen leaves, flat, a value step nearer
+      for (const [x, y2, len, rot, c] of S2_FALLEN) t.fill(nearStep(c, -1), fallenLeaf(x, y2, len, rot, squashAt(y2)));
     }
-    // a few fallen leaves lying flat (foreshortened)
-    for (let i = 0; i < 11; i++) {
-      const y = r.range(1330, 1880);
-      const x = r.range(250, 900);
-      if ((y < NEAR_ROW ? 'far' : 'near') !== part) continue;
-      const s = pxPerMAt(y) * 0.11;
-      b.fill(r.pick([CM.leafGold, CM.leafRust, CM.leafGold]), leafPath(x, y, s, s * 0.32, r.range(-30, 30)));
-    }
-    return b;
+    return {stone: b, things: t};
   }, [part]);
   return (
     <Tier tier="environment">
@@ -181,7 +245,8 @@ export const S2Towpath: React.FC<{part: 'far' | 'near'}> = ({part}) => {
         </clipPath>
       </defs>
       <g clipPath={`url(#${S2_TOWPATH_ID}-${part})`}>
-        <Paint b={b} seed={`s2towpath/${part}`} misreg={false} />
+        <PaintBackdrop b={stone} seed={`s2towpath/${part}`} />
+        {things.empty ? null : <Paint b={things} seed={`s2towpath/${part}/things`} misreg={false} />}
       </g>
     </Tier>
   );
@@ -202,8 +267,14 @@ export const NEAR = {
   bike: {x: 930, y: 1912, r: 112},
 };
 
-/** The planter's wood (CM.line a step nearer): the nearest shade at the left edge (the near motes read against it). */
-export const PLANTER_WOOD = nearStep(CM.line, -2);
+/** The planter's wood: a MID wood (the critic, 2026-10-28: the old CM.line two steps nearer, L* 36, was the darkest big
+ *  block at a squint, outweighing her window; S1's planter is a light warm wood, L* ~64): authored L* 57.7 C* 29 h 56,
+ *  L* ~62 on screen after the environment tier. Its lit top a step lighter (L* ~68 on screen). */
+export const PLANTER_WOOD = '#B37F61';
+const PLANTER_WOOD_LIT = '#C69170';
+/** The bike's tyres and the lock: a warm slate a step lighter than the coats' slate (L* ~56 on screen, h ~310: never a
+ *  cool dark ring at the bottom-right). */
+const TYRE = '#7E7387';
 
 /** The lamp's swan-neck: from the post's top it curves right out of the frame (below y 600). */
 const LAMP_TOP = 700;
@@ -304,7 +375,7 @@ export const S2NearThings: React.FC = () => {
     {
       const {x0, x1, rim, base} = NEAR.planter;
       const wood = PLANTER_WOOD;
-      const woodLit = nearStep('#B9744E', -2);
+      const woodLit = PLANTER_WOOD_LIT;
       b.rect(wood, x0, rim, x1 - x0, base - rim);
       b.rect(woodLit, x0, rim, x1 - x0, 18);
       for (let k = 1; k < 3; k++) b.rect(seamTone(wood, 7), x0, rim + 18 + ((base - rim - 18) * k) / 3, x1 - x0, 3);
@@ -316,7 +387,7 @@ export const S2NearThings: React.FC = () => {
     const b = new Batch();
     // ---- the bike locked to the lamp's foot (cut by the bottom-right): wheels and frame are things that ARE lines
     const {x: bx, y: by, r} = NEAR.bike;
-    const tyre = nearStep(CM.coatSlate, -1);
+    const tyre = TYRE;
     const frame = nearStep(CM.coatMustard, -1);
     const ring = (cx: number, cy: number, rr: number, t: number) =>
       `M${P(cx - rr, cy)}a${rr} ${rr} 0 1 1 ${2 * rr} 0a${rr} ${rr} 0 1 1 ${-2 * rr} 0ZM${P(cx - rr + t, cy)}a${rr - t} ${rr - t} 0 1 0 ${2 * (rr - t)} 0a${rr - t} ${rr - t} 0 1 0 ${-2 * (rr - t)} 0Z`;
@@ -344,7 +415,7 @@ export const S2NearThings: React.FC = () => {
     b.fill(nearStep(CM.anchor, -1), `M${P(seat[0] - 26, seat[1] - 10)}L${P(seat[0] + 22, seat[1] - 12)}L${P(seat[0] + 18, seat[1] - 2)}L${P(seat[0] - 22, seat[1])}Z`); // saddle
     b.fill(frame, poly([[head[0] - 6, head[1] - 22], [head[0] + 40, head[1] - 30], [head[0] + 42, head[1] - 22], [head[0] - 4, head[1] - 14]])); // bars
     // the lock: a short D round the post (a thing that IS a line: one tone, never a dark hairline)
-    b.fill(CM.coatSlate, ring(NEAR.lamp.x, 1600, 26, 9));
+    b.fill(TYRE, ring(NEAR.lamp.x, 1600, 26, 9));
     return b;
   }, []);
   // the post AFTER the bike: the bike's head tube and bars pass behind it (no slivers of the dark post between bars)
