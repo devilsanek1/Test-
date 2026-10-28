@@ -1,123 +1,171 @@
-// V2S4_wbacks.tsx (lane L3, V2S4 WORLD helpers): the BACKS plane (0.6x) at the 17.96 pose, in plane px.
-//   left        the back of a canal warehouse (arched windows, stacked loading doors and the hoist beam)
-//   the gap     the sun's column stays low: an allotment yard (a greenhouse, a shed, a water butt, bean poles,
-//               sunflowers gone to seed, an apple tree) so the sun, the gasholders and the viaduct read over it
-//   terrace     five house backs: slate roofs (two with box dormers), party-wall stacks with pots and aerials, rear
-//               sashes (a few warmly lit, one coming on, a neighbour reading at one), back extensions with lean-to
-//               roofs, skylights and French doors, drainpipes, a soil stack, flues, a dish, ivy, window boxes; a
-//               washing line that flaps, two garden trees in autumn leaf, pigeons on an extension, smoke from two
-//               stacks blown east
-// Nothing tops y 604; the sun's column (plane-x sunClear(0.6)) stays below y 716.
-// Batch z-order inside one layer follows each colour's FIRST use: every stacking step opens a new layer (passes).
+// V2S4_wbacks.tsx (lane L3, V2S4 WORLD helpers): the BACKS plane (+1, 0.6x the truck) at the 17.96 pose, in plane px.
+//   left      HER END HOUSE (the thread: conform_L3 §2; map S4.herWindow): the terrace's end house, red stock brick
+//             (S3's her house), a stone cornice, a slate mansard with a dormer, a chimney stack with two pots, her teal
+//             front door; her first-floor French window, 90 x 102 at (135, 698) (S4HerWindow below, tier B): teal frame,
+//             blind UP, a DARK pane (she is not home yet), the fanlight undivided above the transom, the stile from the
+//             transom down, a Juliet rail drawn as ONE closed comb (no stroke ends 3-18 px apart: S3's lesson). It enters
+//             from the left edge with the plane (starts ~14.95, half in by ~15.6, whole by ~16.3) and sits at the pose
+//             left of SUN1's disc (x <= 180; the disc reaches x 185) and 6 px above the DEC plate (y 755).
+//   the gap   the sun's column stays low: an allotment yard (a greenhouse, a shed, a water butt, bean leaves,
+//             sunflowers gone to seed, an apple tree), so the sun, the gasholder and the far roofs read over it
+//   terrace   five house backs: slate roofs (two with box dormers), party-wall stacks with pots, rear sashes (a few
+//             warmly lit, static: nothing switches), back extensions with lean-to roofs, skylights and French doors,
+//             ivy, two garden trees in autumn leaf
+// TIER C (environment: flat, no line; every fill one flat step toward the air: planeBatch(+1), five values); her
+// window is tier B. No life moves here (the life budget: one cyclist, smoke, ducks; conform §2): the washing line, the
+// raker, the pigeons, the gull, the window reader, the stacks' smoke and the falling leaf specks are gone; nothing
+// switches. The light (RIG_CANAL: the low sun at the left) gives the planes turned from it one Shade step and the stacks
+// a form step (V2S4_light S4BacksShades, given `BACKS_SHADES`). Nothing tops y 600; the sun's column (plane-x
+// sunClear(0.6)) stays below y 716.
 import React, {useMemo} from 'react';
-import {CM, INK_PX} from '../palette';
-import {useTime} from '../../lib/time';
-import {line} from '../../lib/sketch';
-import {Batch, Paint, P, rng, ovalPath, lobes, leafPath, lerp, frac, r1} from '../kit/canal/core';
-import {litAt, Puffs} from '../kit/canal/life';
-import {WindowPerson} from '../kit/cast';
-import {ROW, PLANE_X, sunClear, WIND, CLEAN, WINK} from './V2S4_wcore';
+import {CM} from '../palette';
+import {Tier} from '../../lib/tier';
+import {Batch, Paint, P, rng, ovalPath, lobes, leafPath, lerp} from '../kit/canal/core';
+import * as MAP from '../world/map';
+import {ROW, PLANE_X, sunClear} from './V2S4_wcore';
+import {S4_PLANE, planeBatch, onPlane} from './V2S4_depth';
+import {S4BacksShades} from './V2S4_light';
 
 const K = 0.6;
 const [X0, X1] = PLANE_X(K);
 const CLEAR = sunClear(K);
-const HAIR = INK_PX.hair;
 const GROUND = ROW.wallTop + 2; // everything below is behind the garden walls
 
-// ---------------------------------------------------------------- the warehouse (left)
+// ---------------------------------------------------------------- her end house (the thread)
 
-function warehouseInto(b: Batch) {
-  const x0 = X0;
-  const x1 = Math.min(CLEAR[0] - 8, 166);
-  const top = 630;
-  const cols = [x0 + 18, x0 + 62, x0 + 152, x0 + 196].filter((cx) => cx + 14 <= x1 - 4);
-  const lx = x0 + 107;
-  const arch = (cx: number, wy: number, ww: number, wh: number, o: number) =>
-    `M${P(cx - ww / 2 - o, wy + wh + o)}L${P(cx - ww / 2 - o, wy + ww / 2)}A${r1(ww / 2 + o)} ${r1(ww / 2 + o)} 0 0 1 ${P(cx + ww / 2 + o, wy + ww / 2)}L${P(cx + ww / 2 + o, wy + wh + o)}Z`;
-  // L0 the wall
-  b.rect(CM.brickDeep, x0, top, x1 - x0, GROUND - top);
+/** Her end house (plane px at the pose): its front from off the left edge to x 180 (her window's frame), the stone
+ *  cornice at 634-642 under the slate mansard (top 614, a dormer over the door), the chimney stack on the ridge at
+ *  x 96-122 (pots to y 601), a narrow first-floor sash beside her window, her teal front door and a ground-floor sash. */
+export const HER_HOUSE = {x0: X0 - 10, x1: 180, cornice: 634, mansardTop: 614, stack: {x0: 96, x1: 122, top: 606}} as const;
+/** Her window's OUTER box (frame band included): map S4.herWindow, 90 x 102 centred (135, 698). */
+const HW = MAP.S4.herWindow;
+export const HER_WIN = {x0: HW.x - HW.w / 2, x1: HW.x + HW.w / 2, y0: HW.y - HW.h / 2, y1: HW.y + HW.h / 2} as const;
+
+function herHouseInto(b: Batch) {
+  const h = HER_HOUSE;
+  // L0: the brick front, the mansard's slope, the stack
+  b.rect(CM.brick, h.x0, h.cornice, h.x1 - h.x0, GROUND - h.cornice);
+  b.poly(CM.shadeCool, [[h.x0, h.cornice], [h.x0 + 4, h.mansardTop], [h.x1 - 8, h.mansardTop], [h.x1, h.cornice]]);
+  b.rect(CM.brickLight, h.stack.x0, h.stack.top, h.stack.x1 - h.stack.x0, h.mansardTop - h.stack.top + 2);
   b.layer();
-  // L1 bands, window and door surrounds, the drainpipe
-  b.rect(CM.limestone, x0, top - 5, x1 - x0 + 4, 7);
-  b.rect(CM.brick, x0, top + 2, x1 - x0, 5);
-  b.rect(CM.limestone, x0, top + 92, x1 - x0, 4);
-  b.rect(CM.limestone, x0, top + 170, x1 - x0, 4);
-  for (const cx of cols) for (let rr = 0; rr < 3; rr++) b.fill(CM.limestone, arch(cx, top + 22 + rr * 80, 22, 44, 3));
-  for (let rr = 0; rr < 3; rr++) b.rect(CM.limestone, lx - 18, top + 17 + rr * 80, 36, 56);
-  b.rect(CM.shadeCool, x1 - 10, top + 6, 3, GROUND - top - 6);
+  // L1: the cornice, the stack's cap, the dormer's body, the door case, the ground-floor window's surround
+  b.rect(CM.limestone, h.x0, h.cornice, h.x1 - h.x0 + 2, 8);
+  b.rect(CM.limestone, h.stack.x0 - 2, h.stack.top, h.stack.x1 - h.stack.x0 + 4, 4);
+  b.rect(CM.stucco, 18, h.mansardTop + 4, 36, h.cornice - h.mansardTop - 4);
+  b.rect(CM.limestone, 6, 768, 52, GROUND - 768);
+  b.rect(CM.limestone, 98, 774, 64, 66);
+  b.rect(CM.paper, 26, 660, 42, 80);
   b.layer();
-  // L2 glass (one lit), door leaves, the hoist beam
-  for (const cx of cols) for (let rr = 0; rr < 3; rr++) b.fill(rr === 1 && cx === cols[1] ? CM.lamp : CM.paneUnlit, arch(cx, top + 22 + rr * 80, 22, 44, 0));
-  for (let rr = 0; rr < 3; rr++) b.rect(rr === 0 ? CM.coatSlate : CM.line, lx - 15, top + 20 + rr * 80, 30, 50);
-  b.rect(CM.anchor, lx - 3, top - 2, 6, 16);
-  b.rect(CM.anchor, lx - 2, top + 4, 30, 4);
+  // L2: two pots, the dormer's pane, her teal door with its fanlight, the sash's dark glass
+  b.rect(CM.leafRust, h.stack.x0 + 4, h.stack.top - 5, 7, 6);
+  b.rect(CM.brickDeep, h.stack.x0 + 16, h.stack.top - 5, 7, 6);
+  b.rect(CM.paneUnlit, 23, h.mansardTop + 9, 26, h.cornice - h.mansardTop - 13);
+  b.rect(CM.hero, 12, 790, 40, GROUND - 790);
+  b.fill(CM.glass, `M${P(12, 790)}A20 15 0 0 1 ${P(52, 790)}Z`);
+  b.rect(CM.paneUnlit, 104, 780, 52, 54);
+  b.rect(CM.paneUnlit, 30, 664, 34, 72);
   b.layer();
-  // L3 glazing bars, the doors' split
-  for (const cx of cols) {
-    for (let rr = 0; rr < 3; rr++) {
-      const wy = top + 22 + rr * 80;
-      b.rect(CM.limestone, cx - 0.8, wy + 2, 1.6, 42);
-      b.rect(CM.limestone, cx - 11, wy + 24, 22, 1.6);
-    }
-  }
-  for (let rr = 0; rr < 3; rr++) b.rect(CM.shadeWarm, lx - 0.7, top + 20 + rr * 80, 1.4, 50);
-  b.ink(`M${P(lx + 26, top + 8)}L${P(lx + 26, top + 40)}`, 1, CM.ink);
-  b.ink(line(x1, top - 4, x1, GROUND, {...CLEAN, seed: 's4ware/r'}) + line(x0, top - 5, x1 + 4, top - 5, {...CLEAN, seed: 's4ware/t'}), WINK.backs);
+  // L3: the sashes' meeting rails and sills, the door's knob plate (no specks: one calm bar each)
+  b.rect(CM.limestone, 104, 805, 52, 4);
+  b.rect(CM.paper, 30, 698, 34, 3);
+  b.rect(CM.limestone, 22, 740, 50, 5);
+  b.rect(CM.coatMustard, 44, 826, 4, 10);
 }
+
+/** Her French window, TIER B (the thread's home spot; S8's design as V2S3_tHer draws it, with S3's undivided fanlight),
+ *  dark: she is not home yet. On the backs plane (one flat step toward the air), no outline (tier B). */
+function herWindowBatch(): Batch {
+  const b = new Batch();
+  const {x0, x1, y0, y1} = HER_WIN;
+  const fb = 6; // the frame band (S8's 7 % of the width)
+  const px0 = x0 + fb;
+  const px1 = x1 - fb;
+  const py0 = y0 + fb;
+  const py1 = y1 - fb;
+  const pw = px1 - px0;
+  const ph = py1 - py0;
+  const transom = py0 + ph * 0.62;
+  const pane = onPlane(CM.paneUnlit, 1);
+  const room = onPlane('#6B7C92', 1); // the unlit room one soft step over the dark glass (tone on tone)
+  // L0: the frame band (teal) round the opening
+  b.rect(onPlane(CM.hero, 1), x0, y0, x1 - x0, y1 - y0);
+  b.layer();
+  // L1: the dark pane
+  b.rect(pane, px0, py0, pw, ph);
+  b.layer();
+  // L2: the unlit room as one soft step: the standard lamp's shade and stand (left), two shelves (right); the blind UP
+  b.fill(room, `M${P(px0 + pw * 0.12, py0 + ph * 0.36)}L${P(px0 + pw * 0.3, py0 + ph * 0.36)}L${P(px0 + pw * 0.26, py0 + ph * 0.26)}L${P(px0 + pw * 0.16, py0 + ph * 0.26)}Z`);
+  b.rect(room, px0 + pw * 0.2, py0 + ph * 0.36, 2, ph * 0.64);
+  b.rect(room, px0 + pw * 0.58, py0 + ph * 0.3, pw * 0.36, 3);
+  b.rect(room, px0 + pw * 0.58, py0 + ph * 0.5, pw * 0.36, 3);
+  b.rect(onPlane(CM.coatOat, 1), px0, py0, pw, Math.max(4, ph * 0.06));
+  b.layer();
+  // L3: the front: the transom, the stile from the transom down (the fanlight above stays one undivided pane), the
+  // bottom rail; then the Juliet rail as ONE closed comb (its top rail and balusters one path: no stroke ends apart)
+  const teal = onPlane(CM.hero, 1);
+  b.rect(teal, px0, transom, pw, 3);
+  b.rect(teal, px0 + pw / 2 - 1.5, transom, 3, py1 - transom);
+  const ry = py0 + ph * 0.6;
+  const n = 9;
+  const half = 0.7;
+  const xs = Array.from({length: n + 1}, (_, i) => px0 + (pw * i) / n);
+  let comb = `M${P(xs[0] - half, ry)}L${P(xs[n] + half, ry)}`;
+  for (let i = n; i >= 0; i--) {
+    const bx = xs[i];
+    comb += `L${P(bx + half, i === n ? ry : ry + 2.4)}L${P(bx + half, py1)}L${P(bx - half, py1)}L${P(bx - half, i === 0 ? ry : ry + 2.4)}`;
+  }
+  comb += 'Z';
+  b.fill(onPlane(CM.anchor, 1), comb);
+  return b;
+}
+
+/** Her far window (tier B: no outline, calm C* <= 25), drawn on the backs plane over her house. */
+export const S4HerWindow: React.FC = () => {
+  const b = useMemo(herWindowBatch, []);
+  return (
+    <Tier tier="support" tone={CM.hero}>
+      <Paint b={b} seed="s4herWin" misreg={false} />
+    </Tier>
+  );
+};
 
 // ---------------------------------------------------------------- the allotment yard in the sun's gap
 
-const YARD = {gx: 186, gw: 92, ge: 812, gr: 790, sx: 292, sw: 62, st: 800, bx: 376, ax: 486};
-const SUNFLOWERS: [number, number][] = [[408, 742], [428, 756], [446, 748]];
+const YARD = {gx: 196, gw: 84, ge: 812, gr: 790, sx: 300, sw: 58, st: 800, bx: 382, ax: 486};
+const SUNFLOWERS: [number, number][] = [[412, 742], [432, 756], [450, 748]];
 
-function yardInto(b: Batch, t: number) {
+function yardInto(b: Batch) {
   const g = GROUND;
   const {gx, gw, ge, gr, sx, sw, st, bx, ax} = YARD;
-  const sway = (i: number) => Math.sin(t * 1.1 + i * 1.3) * 1.2;
-  // L0 the yard's back wall
-  b.rect(CM.brickLight, CLEAR[0] - 10, 818, CLEAR[1] - CLEAR[0] + 20, g - 818);
+  const w0 = HER_HOUSE.x1;
+  const w1 = CLEAR[1] + 10;
+  // L0 the yard's back wall (from her house's corner to the first back extension)
+  b.rect(CM.brickLight, w0, 818, w1 - w0, g - 818);
   b.layer();
   // L1 coping; greenhouse glass, the shed, the water butt, the apple trunk
-  b.rect(CM.limestone, CLEAR[0] - 10, 815, CLEAR[1] - CLEAR[0] + 20, 4);
+  b.rect(CM.limestone, w0, 815, w1 - w0, 4);
   b.poly(CM.glass, [[gx, g], [gx, ge], [gx + gw / 2, gr], [gx + gw, ge], [gx + gw, g]]);
   b.rect(CM.line, sx, st, sw, g - st);
-  b.rect(CM.sage, sx - 20, 832, 16, g - 832);
+  b.rect(CM.sage, sx - 22, 832, 16, g - 832);
   b.rect(CM.line, ax - 3, 800, 6, g - 800);
   b.layer();
-  // L2 tomato plants in the greenhouse, the shed's roof / window / door, the butt lid, the apple crown, leaves
+  // L2 the tomato plants in the greenhouse, the shed's roof / window / door, the butt's lid, the apple crown, the leaves
   b.fill(CM.sage, lobes(gx + 6, gx + gw - 6, g, 34, 's4gh/tom', 4));
   b.poly(CM.paneUnlit, [[sx - 5, st + 2], [sx + sw + 5, st - 7], [sx + sw + 5, st - 2], [sx - 5, st + 7]]);
   b.rect(CM.glass, sx + 8, st + 14, 18, 14);
-  b.rect(CM.coatSlate, sx + 34, st + 14, 20, g - st - 14);
-  b.rect(CM.coatSlate, sx - 21, 830, 18, 3);
+  b.rect(CM.coatSlate, sx + 32, st + 14, 20, g - st - 14);
+  b.rect(CM.coatSlate, sx - 23, 830, 18, 3);
   b.fill(CM.sage, lobes(ax - 34, ax + 30, 812, 70, 's4yard/apple', 4));
-  for (const [i, [x, y]] of SUNFLOWERS.entries()) b.fill(CM.sage, leafPath(x - 6 + sway(i) * 0.3, y + 40, 14, 4.5, 30));
+  for (const [x, y] of SUNFLOWERS) b.fill(CM.sage, leafPath(x - 6, y + 40, 14, 4.5, 30));
   b.fill(CM.sage, leafPath(bx - 8, 800, 16, 5, 70));
   b.fill(CM.sage, leafPath(bx + 2, 820, 14, 5, 40));
   b.layer();
-  // L3 tomatoes, the greenhouse's top glass, latch, apples and the gold of the crown, the bean leaves, sunflower heads
-  for (let k = 0; k < 5; k++) b.fill(CM.leafRust, ovalPath(gx + 14 + k * 16, g - 14 - (k % 2) * 8, 2.6, 2.6));
+  // L3 the greenhouse's top glass, the gold of the apple crown, the bean leaves' gold, the sunflower heads
   b.poly(CM.glass, [[gx + 4, ge + 3], [gx + gw / 2, gr + 4], [gx + gw / 2, gr + 14], [gx + 4, ge + 12]]);
-  b.rect(CM.coatMustard, sx + 50, st + 34, 2.4, 2.4);
   b.fill(CM.leafGold, lobes(ax - 14, ax + 26, 800, 40, 's4yard/apple2', 3));
   b.fill(CM.leafGold, leafPath(bx + 7, 786, 14, 5, -60));
   b.fill(CM.leafGold, leafPath(bx - 4, 772, 12, 4, -30));
-  for (const [i, [x, y]] of SUNFLOWERS.entries()) b.fill(CM.coatMustard, ovalPath(x + 3 + sway(i), y + 2, 9, 7.5));
-  b.layer();
-  for (const [dx, dy] of [[-18, -40], [6, -54], [16, -30], [-4, -22]]) b.fill(CM.leafRust, ovalPath(ax + dx, 812 + dy, 2.6, 2.6));
-  for (const [i, [x, y]] of SUNFLOWERS.entries()) b.fill(CM.line, ovalPath(x + 4.5 + sway(i), y + 3, 5, 4.4));
-  // the lines: the greenhouse frame, planks, bean poles, sunflower stalks
-  let gl = '';
-  for (let k = 0; k <= 4; k++) gl += `M${P(gx + (gw * k) / 4, k === 0 || k === 4 ? ge : lerp(ge, gr, 1 - Math.abs(k - 2) / 2))}L${P(gx + (gw * k) / 4, g)}`;
-  gl += `M${P(gx, ge)}L${P(gx + gw / 2, gr)}L${P(gx + gw, ge)}M${P(gx, 836)}L${P(gx + gw, 836)}`;
-  for (const dx of [-14, -5, 5, 14]) gl += `M${P(bx + dx, g)}L${P(bx + dx * 0.15, 758)}`;
-  b.ink(gl, 1.2, CM.line);
-  let pl = '';
-  for (let x = sx + 6; x < sx + sw; x += 7) pl += `M${P(x, st + 2)}L${P(x, g)}`;
-  b.ink(pl, 0.7, CM.shadeWarm);
-  let stalks = '';
-  for (const [i, [x, y]] of SUNFLOWERS.entries()) stalks += `M${P(x - 2, g)}Q${P(x - 4, (y + g) / 2)} ${P(x + sway(i), y + 4)}`;
-  b.ink(stalks, 1.5, CM.sage);
+  for (const [x, y] of SUNFLOWERS) b.fill(CM.coatMustard, ovalPath(x + 3, y + 2, 9, 7.5));
 }
 
 // ---------------------------------------------------------------- the terrace backs
@@ -134,6 +182,13 @@ const extOf = (h: House) => {
   const w = h.x1 - h.x0;
   return h.ext === 'left' ? {x0: h.x0, x1: h.x0 + w * 0.48} : {x0: h.x0 + w * 0.52, x1: h.x1};
 };
+/** The party-wall stack on each house's west boundary (x0): its box (the light layer's form step needs it). */
+const stackOf = (h: House, i: number) => {
+  const r = rng(`s4house3/${i}`);
+  const cw = 22;
+  const top = Math.max(ROW.top + 6, h.ridge - 16 - r.range(0, 4));
+  return {x0: h.x0 - cw / 2, x1: h.x0 + cw / 2, top, bottom: h.ridge + 6};
+};
 
 export type BackWin = {x: number; y: number; w: number; h: number; seed: string; i: number};
 
@@ -149,13 +204,10 @@ export const BACK_WINS: BackWin[] = (() => {
   });
   return out;
 })();
-/** House 2's kitchen comes on mid-truck; house 4's left sash is lit (the neighbour reading there). */
-export const BACK_WIN_FORCE = [{i: 5, t: 16.2, on: true}, {i: 9, t: 0, on: true}, {i: 14, t: 18.45, on: true}, {i: 12, t: 19.3, on: false}];
+/** The few warmly lit rear windows (static for the whole shot: nothing switches; CRAFT §b's life budget). */
+const LIT_WINS = new Set([2, 5, 9, 13]);
 
 function housesInto(b: Batch) {
-  const stacksInk: string[] = [];
-  const aer: string[] = [];
-  const pipes: string[] = [];
   // P0: roofs, rear walls
   HOUSES.forEach((h) => {
     const w = h.x1 - h.x0;
@@ -163,72 +215,42 @@ function housesInto(b: Batch) {
     b.rect(h.render ? CM.stucco : h.brick, h.x0, h.eave, w, GROUND - h.eave);
   });
   b.layer();
-  // P1: ridge tiles, the render's plinth band, gutters' fascias, dormer bodies, sparse brick ticks, back extensions
-  HOUSES.forEach((h, i) => {
+  // P1: ridge tiles, the fascia, dormer bodies, the back extensions
+  HOUSES.forEach((h) => {
     const w = h.x1 - h.x0;
-    const r = rng(`s4house/${i}`);
     const e = extOf(h);
     b.rect(CM.stoneShade, h.x0 + 4, h.ridge - 3, w - 8, 3.5);
-    if (h.render) b.rect(CM.stoneShade, h.x0, h.eave, w, 6);
     b.rect(CM.limestone, h.x0 - 3, h.eave - 1, w + 6, 4);
     if (h.dormer) b.rect(CM.stucco, h.x0 + w * 0.3, h.ridge + 4, w * 0.42, h.eave - h.ridge - 4);
-    if (!h.render) {
-      for (let k = 0; k < 16; k++) {
-        const tx = r.range(h.x0 + 6, h.x1 - 16);
-        const ty = r.range(h.eave + 8, GROUND - 10);
-        if (tx + 12 > e.x0 && tx < e.x1 && ty > h.extTop - 6) continue;
-        b.rect(h.brick === CM.brickDeep ? CM.brick : CM.brickDeep, tx, ty, r.range(7, 12), 2);
-      }
-    }
     b.rect(h.brick === CM.brickLight ? CM.brick : CM.brickLight, e.x0, h.extTop + 14, e.x1 - e.x0, GROUND - h.extTop - 14);
   });
   b.layer();
-  // P2: gutters (plum), dormer caps and windows, bathroom windows, extension roofs, door frames, pipes, flues, boxes
+  // P2: dormer caps and windows, bathroom windows, extension roofs, French-door frames
   HOUSES.forEach((h, i) => {
     const w = h.x1 - h.x0;
-    const r = rng(`s4house2/${i}`);
     const e = extOf(h);
     const wy = h.eave + 22;
-    b.rect(CM.anchor, h.x0 - 3, h.eave + 3, w + 6, 2.2);
-    // the low sun is west: the eaves throw a thin shade band, the extension's east end and the dormer's east cheek
-    // are in shade, the dormer drops a small shadow east across the slope
-    b.rect(h.render ? CM.stoneShade : CM.shadeWarm, h.x0, h.eave + 5, w, 4);
-    b.poly(CM.shadeWarm, [[e.x1 - 7, h.extTop + (h.ext === 'left' ? 10 : 16)], [e.x1, h.extTop + (h.ext === 'left' ? 9 : 15)], [e.x1, GROUND], [e.x1 - 7, GROUND]]);
-    if (h.dormer) b.poly(CM.paneUnlit, [[h.x0 + w * 0.72, h.ridge + 6], [h.x0 + w * 0.72 + 14, h.ridge + 14], [h.x0 + w * 0.72 + 14, h.eave - 2], [h.x0 + w * 0.72, h.eave - 2]]);
     if (h.dormer) {
       const dx = h.x0 + w * 0.3;
       const dw = w * 0.42;
       b.rect(CM.stoneShade, dx - 2, h.ridge + 2, dw + 4, 3);
-      b.rect(r.chance(0.5) ? CM.lamp : CM.paneUnlit, dx + 6, h.ridge + 11, dw - 12, h.eave - h.ridge - 18);
+      b.rect(i === 1 ? CM.lamp : CM.paneUnlit, dx + 6, h.ridge + 11, dw - 12, h.eave - h.ridge - 18);
     }
-    const bwx = h.x0 + w * 0.45;
-    b.rect(CM.paper, bwx - 2, wy + 6, 18, 24);
+    b.rect(CM.paper, h.x0 + w * 0.45 - 2, wy + 6, 18, 24);
     b.poly(CM.paneUnlit, [[e.x0 - 3, h.extTop + 16], [e.x0 - 3, h.extTop + (h.ext === 'left' ? 6 : -4)], [e.x1 + 3, h.extTop + (h.ext === 'left' ? -4 : 6)], [e.x1 + 3, h.extTop + 16]]);
-    const fdx = lerp(e.x0, e.x1, 0.3);
-    b.rect(CM.paper, fdx - 3, h.extTop + 28, 46, GROUND - h.extTop - 28);
-    const px = h.x1 - 8;
-    b.rect(CM.anchor, px, h.eave + 4, 2.4, GROUND - h.eave - 4);
-    b.rect(CM.anchor, px - 2, h.eave + 4, 6, 4);
-    pipes.push(`M${P(px + 1.2, h.eave + 8)}L${P(px + 1.2, GROUND)}`);
-    if (i % 2 === 0) b.rect(CM.shadeCool, h.x0 + w * 0.42, h.eave + 4, 5, h.extTop - h.eave + 8);
-    b.rect(CM.paper, h.x0 + w * 0.08, wy + 30, 8, 6);
-    if (i === 1 || i === 4) b.fill(CM.paper, ovalPath(h.x0 + w * 0.88, h.eave + 16, 7, 8));
+    b.rect(CM.paper, lerp(e.x0, e.x1, 0.3) - 3, h.extTop + 28, 46, GROUND - h.extTop - 28);
     b.rect(CM.line, h.x0 + w * 0.2 - 3, wy + 60, 38, 6);
   });
   b.layer();
-  // P3: dormer bars, bathroom glass, skylights, French door glass, window-box flowers, ivy, the stacks
+  // P3: bathroom glass, skylights, French-door glass, ivy, the stacks
   HOUSES.forEach((h, i) => {
     const w = h.x1 - h.x0;
-    const r = rng(`s4house3/${i}`);
     const e = extOf(h);
     const wy = h.eave + 22;
-    if (h.dormer) b.rect(CM.paper, h.x0 + w * 0.3 + w * 0.21 - 0.7, h.ridge + 11, 1.4, h.eave - h.ridge - 18);
-    const bwx = h.x0 + w * 0.45;
-    b.rect(CM.glass, bwx, wy + 8, 14, 20);
+    const r = rng(`s4house3/${i}`);
+    b.rect(CM.glass, h.x0 + w * 0.45, wy + 8, 14, 20);
     b.rect(CM.glass, lerp(e.x0, e.x1, 0.35), h.extTop + (h.ext === 'left' ? 0 : 1), 18, 5);
-    const fdx = lerp(e.x0, e.x1, 0.3);
-    b.rect(r.chance(0.5) ? CM.glass : CM.paneUnlit, fdx, h.extTop + 31, 40, GROUND - h.extTop - 31);
-    for (let k = 0; k < 4; k++) b.fill(k % 2 ? CM.sage : CM.box, ovalPath(h.x0 + w * 0.2 + 1 + k * 8, wy + 58, 3.5, 3.2));
+    b.rect(r.chance(0.5) ? CM.glass : CM.paneUnlit, lerp(e.x0, e.x1, 0.3), h.extTop + 31, 40, GROUND - h.extTop - 31);
     if (h.ivy) {
       for (let k = 0; k < 9; k++) {
         const iy = GROUND - k * 24 - r.range(0, 10);
@@ -236,45 +258,24 @@ function housesInto(b: Batch) {
         b.fill(k % 3 === 2 ? CM.leafGold : CM.sage, lobes(ix - 14, ix + 14, iy, 22, `s4ivy${k}`, 3));
       }
     }
-    // the party-wall stack (on the boundary at x0) with its cap
-    const cw = 22;
-    const ctop = Math.max(ROW.top + 6, h.ridge - 16 - r.range(0, 4));
-    b.rect(i % 2 ? CM.brickLight : CM.brick, h.x0 - cw / 2, ctop, cw, h.ridge - ctop + 6);
-    stacksInk.push(line(h.x0 - cw / 2, ctop, h.x0 - cw / 2, h.ridge + 4, {...CLEAN, seed: `s4stk${i}`}));
-    if (i !== 2) {
-      const ay = Math.max(ROW.top, ctop - 18);
-      aer.push(`M${P(h.x0 + 4, ctop - 4)}L${P(h.x0 + 4, ay)}M${P(h.x0 - 6, ay + 3)}L${P(h.x0 + 14, ay + 3)}M${P(h.x0 - 3, ay + 7)}L${P(h.x0 + 11, ay + 7)}`);
-    }
+    const s = stackOf(h, i);
+    b.rect(i % 2 ? CM.brickLight : CM.brick, s.x0, s.top, s.x1 - s.x0, s.bottom - s.top);
   });
   b.layer();
-  // P4: the stacks' caps and pots, the bathroom blind, the French doors' bar; the ink
+  // P4: the stacks' caps and pots
   HOUSES.forEach((h, i) => {
-    const w = h.x1 - h.x0;
-    const e = extOf(h);
-    const r = rng(`s4house3/${i}`);
-    const cw = 22;
-    const ctop = Math.max(ROW.top + 6, h.ridge - 16 - r.range(0, 4));
-    b.rect(CM.limestone, h.x0 - cw / 2 - 2, ctop, cw + 4, 3.5);
-    b.rect(CM.shadeWarm, h.x0 + 1, ctop + 3.5, cw / 2 - 1, h.ridge - ctop + 2);
-    for (let p = 0; p < 3; p++) b.rect(p === 1 ? CM.leafRust : CM.brickDeep, h.x0 - cw / 2 + 2 + p * 6.5, Math.max(ROW.top, ctop - 5), 5, 5);
-    b.rect(CM.stoneShade, h.x0 + w * 0.45, h.eave + 30, 14, 7);
-    const fdx = lerp(e.x0, e.x1, 0.3);
-    b.rect(CM.paper, fdx + 19, h.extTop + 31, 2, GROUND - h.extTop - 31);
+    const s = stackOf(h, i);
+    b.rect(CM.limestone, s.x0 - 2, s.top, s.x1 - s.x0 + 4, 3.5);
+    for (let p = 0; p < 3; p++) b.rect(p === 1 ? CM.leafRust : CM.brickDeep, s.x0 + 2 + p * 6.5, Math.max(ROW.top, s.top - 5), 5, 5);
   });
-  b.ink(HOUSES.map((h, i) => line(h.x0 - 3, h.eave, h.x1 + 3, h.eave, {...CLEAN, seed: `s4eave${i}`})).join(''), WINK.backs);
-  b.ink(stacksInk.join(''), WINK.backs);
-  b.ink(aer.join(''), 1.0, CM.ink);
-  b.ink(pipes.join(''), 0.6, CM.ink);
 }
 
-/** Rear sashes in three passes (frames, glass and curtains, bars and sills): lit (curtains, a lamp) or unlit. */
-function sashesInto(b: Batch, wins: BackWin[], lit: (w: BackWin) => boolean) {
+/** Rear sashes (frames, glass, a lit room's lamp and curtains; the meeting rail and the sill): static. */
+function sashesInto(b: Batch, wins: BackWin[]) {
+  const lit = (w: BackWin) => LIT_WINS.has(w.i);
   for (const w of wins) b.rect(CM.paper, w.x - 3, w.y - 3, w.w + 6, w.h + 5);
   b.layer();
-  for (const w of wins) {
-    if (lit(w)) b.rect(CM.lamp, w.x, w.y, w.w, w.h);
-    else b.rect(CM.paneUnlit, w.x, w.y, w.w, w.h);
-  }
+  for (const w of wins) b.rect(lit(w) ? CM.lamp : CM.paneUnlit, w.x, w.y, w.w, w.h);
   b.layer();
   for (const w of wins) {
     const r = rng(w.seed);
@@ -283,204 +284,75 @@ function sashesInto(b: Batch, wins: BackWin[], lit: (w: BackWin) => boolean) {
       const c = r.pick([CM.box, CM.coatMustard, CM.blossom, CM.sage, CM.leafRust]);
       b.rect(c, w.x, w.y, w.w * 0.2, w.h);
       b.rect(c, w.x + w.w * 0.8, w.y, w.w * 0.2, w.h);
-    } else {
-      b.poly(CM.glass, [[w.x, w.y], [w.x + w.w * 0.7, w.y], [w.x, w.y + w.h * 0.42]]);
-      if (r.chance(0.5)) b.rect(CM.coatOat, w.x, w.y, w.w, w.h * r.range(0.18, 0.4));
-    }
+    } else if (r.chance(0.5)) b.rect(CM.coatOat, w.x, w.y, w.w, w.h * r.range(0.18, 0.4));
   }
   b.layer();
   for (const w of wins) {
     b.rect(CM.paper, w.x, w.y + w.h * 0.48, w.w, 2.2);
-    b.rect(CM.paper, w.x + w.w / 2 - 0.8, w.y, 1.6, w.h);
     b.rect(CM.limestone, w.x - 5, w.y + w.h + 2, w.w + 10, 4);
   }
 }
 
-/** Trees in the back gardens: a big autumn plane (house 3) and a smaller one (house 5). */
+/** Trees in the back gardens: a big autumn plane (house 3) and a smaller one (house 5); still (no sway). */
 const TREES = [
   {x: 930, base: GROUND, h: 190, seed: 's4tree1'},
   {x: 1250, base: GROUND, h: 150, seed: 's4tree2'},
 ];
 
-function treesInto(b: Batch, t: number) {
-  const geo = TREES.map((tr) => {
-    const r = rng(tr.seed);
-    return {...tr, sw: Math.sin(t * 0.8 + r.next() * 6) * 1.2, R: tr.h * 0.42, cy: tr.base - tr.h * 0.62};
-  });
+function treesInto(b: Batch) {
+  const geo = TREES.map((tr) => ({...tr, R: tr.h * 0.42, cy: tr.base - tr.h * 0.62}));
   for (const g of geo) b.fill(CM.line, `M${P(g.x - 6, g.base)}L${P(g.x - 3, g.cy + g.R * 0.2)}L${P(g.x + 3, g.cy + g.R * 0.2)}L${P(g.x + 6, g.base)}Z`);
   b.layer();
-  for (const g of geo) b.fill(CM.sage, lobes(g.x - g.R + g.sw, g.x + g.R + g.sw, g.cy + g.R * 0.75, g.R * 1.6, `${g.seed}/a`, 5));
+  for (const g of geo) b.fill(CM.sage, lobes(g.x - g.R, g.x + g.R, g.cy + g.R * 0.75, g.R * 1.6, `${g.seed}/a`, 5));
   b.layer();
   for (const g of geo) {
-    b.fill(CM.leafGold, lobes(g.x - g.R * 0.75 + g.sw, g.x + g.R * 0.2 + g.sw, g.cy + g.R * 0.3, g.R * 1.0, `${g.seed}/b`, 3));
-    b.fill(CM.leafRust, lobes(g.x + g.R * 0.05 + g.sw, g.x + g.R * 0.85 + g.sw, g.cy + g.R * 0.62, g.R * 0.8, `${g.seed}/c`, 3));
+    b.fill(CM.leafGold, lobes(g.x - g.R * 0.75, g.x + g.R * 0.2, g.cy + g.R * 0.3, g.R * 1.0, `${g.seed}/b`, 3));
+    b.fill(CM.leafRust, lobes(g.x + g.R * 0.05, g.x + g.R * 0.85, g.cy + g.R * 0.62, g.R * 0.8, `${g.seed}/c`, 3));
   }
   b.layer();
-  for (const g of geo) b.fill(CM.coatMustard, lobes(g.x - g.R * 0.3 + g.sw, g.x + g.R * 0.35 + g.sw, g.cy - g.R * 0.25, g.R * 0.6, `${g.seed}/d`, 2));
-  b.layer();
-  for (const g of geo) b.fill(CM.shadeWarm, lobes(g.x + g.R * 0.35 + g.sw, g.x + g.R * 0.95 + g.sw, g.cy + g.R * 0.78, g.R * 0.5, `${g.seed}/e`, 2));
-  b.ink(geo.map((g) => `M${P(g.x, g.cy + g.R * 0.5)}L${P(g.x - g.R * 0.35, g.cy - g.R * 0.05)}M${P(g.x, g.cy + g.R * 0.35)}L${P(g.x + g.R * 0.32, g.cy)}`).join(''), 1.4, CM.line);
+  for (const g of geo) b.fill(CM.coatMustard, lobes(g.x - g.R * 0.3, g.x + g.R * 0.35, g.cy - g.R * 0.25, g.R * 0.6, `${g.seed}/d`, 2));
 }
 
-/** Leaves falling from the garden trees (they drift east as they fall; the path plane catches more). */
-function treeLeavesInto(b: Batch, t: number) {
-  const r = rng('s4backleaves');
-  for (let i = 0; i < 10; i++) {
-    const tr = TREES[i % 2];
-    const per = r.range(3.4, 5.2);
-    const u = frac(t / per + r.next());
-    const x = tr.x + r.range(-tr.h * 0.35, tr.h * 0.35) + WIND * u * 50 + Math.sin(u * 9 + i) * 10;
-    const y = lerp(tr.base - tr.h * 0.6, GROUND + 4, u);
-    b.fill(i % 2 ? CM.leafGold : CM.leafRust, leafPath(x, y, 8, 3 * Math.abs(Math.cos(t * 5 + i)) + 0.7, t * 140 + i * 40));
-  }
-}
-
-/** A washing line across house 2's garden: pegged clothes that swing and flap in the east wind. */
-const WASH = {x0: 690, y0: 790, x1: 806, y1: 784, sag: 9};
-function washingInto(b: Batch, t: number) {
-  const {x0, y0, x1, y1, sag} = WASH;
-  b.rect(CM.line, x1 - 1.5, y1, 3, GROUND - y1);
-  const at = (u: number): [number, number] => [lerp(x0, x1, u), lerp(y0, y1, u) + sag * 4 * u * (1 - u)];
-  let d = '';
-  for (let k = 0; k <= 12; k++) {
-    const [x, y] = at(k / 12);
-    d += `${k ? 'L' : 'M'}${P(x, y)}`;
-  }
-  b.ink(d, 0.9, CM.ink);
-  b.layer();
-  const items: [number, number, number, string][] = [
-    [0.1, 16, 22, CM.paper],
-    [0.28, 22, 30, CM.coatSlate],
-    [0.46, 10, 14, CM.box],
-    [0.58, 12, 16, CM.coatMustard],
-    [0.76, 20, 26, CM.blossom],
-    [0.92, 9, 13, CM.paper],
-  ];
-  items.forEach(([u, w, h, c], i) => {
-    const [x, y] = at(u);
-    const fl = Math.sin(t * 2.6 + i * 1.7) * 0.5 + Math.sin(t * 4.1 + i) * 0.2;
-    const lean = WIND * (3 + fl * 4);
-    b.poly(c, [[x - w / 2, y], [x + w / 2, y], [x + w / 2 + lean, y + h * (0.92 + fl * 0.06)], [x - w / 2 + lean * 0.8, y + h]]);
+/** The light layer's shapes on this plane (plane px): planes turned from the low western sun (the back extensions' east
+ *  returns, the dormers' east cheeks) take one Shade step; the stacks take a form step on their east side. */
+export const BACKS_SHADES = (() => {
+  const form: string[] = [];
+  const stacks: string[] = [];
+  HOUSES.forEach((h, i) => {
+    const w = h.x1 - h.x0;
+    const e = extOf(h);
+    form.push(`M${P(e.x1 - 10, h.extTop + (h.ext === 'left' ? 10 : 16))}L${P(e.x1, h.extTop + (h.ext === 'left' ? 9 : 15))}L${P(e.x1, GROUND)}L${P(e.x1 - 10, GROUND)}Z`);
+    if (h.dormer) form.push(`M${P(h.x0 + w * 0.72, h.ridge + 6)}L${P(h.x0 + w * 0.72 + 14, h.ridge + 14)}L${P(h.x0 + w * 0.72 + 14, h.eave - 2)}L${P(h.x0 + w * 0.72, h.eave - 2)}Z`);
+    const s = stackOf(h, i);
+    stacks.push(`M${P(s.x0, s.top + 3.5)}L${P(s.x1, s.top + 3.5)}L${P(s.x1, s.bottom)}L${P(s.x0, s.bottom)}Z`);
   });
-  b.layer();
-  items.forEach(([u, w]) => {
-    const [x, y] = at(u);
-    b.rect(CM.line, x - w / 2 + 1, y - 2, 2, 4);
-    b.rect(CM.line, x + w / 2 - 3, y - 2, 2, 4);
-  });
-}
-
-/** Pigeons on house 4's extension (its high end): bob, a shuffle now and then. */
-function pigeonsInto(b: Batch, t: number) {
-  const h = HOUSES[3];
-  const e = extOf(h);
-  const birds = [0, 1, 2].map((i) => {
-    const r = rng(`s4pig/${i}`);
-    const x = e.x0 + 14 + i * 22 + Math.floor(frac(t / 3.4 + r.next()) * 2) * 4;
-    const ey = h.extTop + 6 - (10 * (x - e.x0 + 3)) / (e.x1 - e.x0 + 6);
-    return {x, ey, face: r.chance(0.5) ? 1 : -1, nod: Math.max(0, Math.sin(t * 2.2 + i * 2) - 0.5) * 2.2};
-  });
-  const s = 11;
-  for (const p of birds) b.fill(CM.stoneShade, ovalPath(p.x, p.ey - s * 0.36, s * 0.46, s * 0.3));
-  b.layer();
-  for (const p of birds) {
-    const by = p.ey - s * 0.36;
-    b.fill(CM.shadeCool, ovalPath(p.x - p.face * s * 0.08, by - s * 0.05, s * 0.28, s * 0.14));
-    b.fill(CM.shadeCool, ovalPath(p.x + p.face * (s * 0.38 + p.nod * 0.4), by - s * 0.27 + p.nod * 0.4, s * 0.15, s * 0.15));
-    b.fill(CM.shadeCool, `M${P(p.x - p.face * s * 0.36, by)}L${P(p.x - p.face * s * 0.72, by + s * 0.08)}L${P(p.x - p.face * s * 0.34, by + s * 0.16)}Z`);
-  }
-}
-
-
-/** A gull gliding west over the backs after the stop (a flap now and then); it stays east of the plates. */
-export const GULL = {t0: 18.25, x0: 1112, y0: 704, speed: 108};
-function gullInto(b: Batch, t: number) {
-  const u = t - GULL.t0;
-  if (u < 0) return;
-  const x = GULL.x0 - GULL.speed * u;
-  if (x < 600) return;
-  const y = GULL.y0 - 10 * Math.sin(u * 1.3) - u * 4;
-  const flapping = frac(u / 1.6) < 0.38;
-  const f = flapping ? Math.sin(u * 15) : 0.25;
-  const s = 15;
-  const wy = s * 0.55 * f;
-  // wings (stone, dark tips), body and head (paper), a yellow beak, facing west
-  b.fill(CM.stoneShade, `M${P(x - s * 1.25, y - wy - 2)}Q${P(x - s * 0.55, y - wy * 0.4 - s * 0.22)} ${P(x, y)}Q${P(x + s * 0.55, y - wy * 0.4 - s * 0.22)} ${P(x + s * 1.25, y - wy - 2)}L${P(x + s * 0.6, y - wy * 0.3 + 2)}L${P(x, y + 3)}L${P(x - s * 0.6, y - wy * 0.3 + 2)}Z`);
-  b.layer();
-  b.fill(CM.anchor, ovalPath(x - s * 1.18, y - wy - 1.5, s * 0.16, s * 0.08));
-  b.fill(CM.anchor, ovalPath(x + s * 1.18, y - wy - 1.5, s * 0.16, s * 0.08));
-  b.fill(CM.paper, ovalPath(x, y + 1, s * 0.62, s * 0.2));
-  b.fill(CM.paper, ovalPath(x - s * 0.62, y - 1, s * 0.17, s * 0.15));
-  b.layer();
-  b.fill(CM.coatMustard, `M${P(x - s * 0.76, y - 1)}L${P(x - s * 0.98, y)}L${P(x - s * 0.76, y + 1)}Z`);
-}
-
-
-/** A neighbour raking leaves in house 3's garden: head, shoulders and the rake above the garden wall (the path
- *  plane's wall hides the rest); the rake sweeps on a 1.3 s stroke (12 drawings/s), a leaf pile grows nothing. */
-export const RAKER = {x: 972, base: 868, h: 104};
-function rakerInto(b: Batch, t: number) {
-  const {x, base, h} = RAKER;
-  const tq = Math.floor(t * 12 + 1e-6) / 12;
-  const ph = (tq / 1.3) * Math.PI * 2;
-  const k = 0.5 + 0.5 * Math.sin(ph); // 0 = rake pulled in, 1 = reached out
-  const lean = 4 + k * 6;
-  const sh = base - h * 0.62;
-  const hx = x - lean * 0.6;
-  // the leaf pile at the wall's foot (just its top shows), the rake's head and handle
-  b.fill(CM.leafRust, lobes(x - 64, x - 18, base + 2, 16, 's4rakepile', 3));
-  const rx = x - 34 - k * 34;
-  const ry = base + 4;
-  b.ink(`M${P(x - 6, sh + 18)}L${P(rx, ry - 4)}`, 2.2, CM.line);
-  b.layer();
-  b.fill(CM.leafGold, lobes(x - 52, x - 26, base + 2, 9, 's4rakepile2', 2));
-  // shoulders and torso (a mustard jumper), arms down the handle, a head in a beanie (no face: from behind / side)
-  b.fill(CM.coatMustard, `M${P(x - 22, base + 8)}L${P(x - 20 - lean, sh + 10)}Q${P(x - 14 - lean, sh - 4)} ${P(x - 2 - lean * 0.5, sh - 2)}Q${P(x + 14, sh)} ${P(x + 18, sh + 12)}L${P(x + 20, base + 8)}Z`);
-  b.fill(CM.coatMustard, `M${P(x - 14 - lean, sh + 6)}Q${P(x - 26 - k * 10, sh + 24)} ${P(x - 22 - k * 20, sh + 30 + k * 4)}L${P(x - 16 - k * 20, sh + 34 + k * 4)}Q${P(x - 16 - k * 6, sh + 24)} ${P(x - 4 - lean, sh + 12)}Z`);
-  b.layer();
-  b.fill(CM.brickLight, ovalPath(x - 19 - k * 20, sh + 32 + k * 4, 3.6, 3.6));
-  b.fill(CM.hair[1], ovalPath(hx, sh - 14, 11, 11));
-  b.fill(CM.sage, `M${P(hx - 11.5, sh - 15)}A11.5 11 0 0 1 ${P(hx + 11.5, sh - 15)}L${P(hx + 11.5, sh - 12)}L${P(hx - 11.5, sh - 12)}Z`);
-  b.ink(`M${P(x - 20 - lean, sh + 10)}Q${P(x - 14 - lean, sh - 4)} ${P(x - 2 - lean * 0.5, sh - 2)}Q${P(x + 14, sh)} ${P(x + 18, sh + 12)}`, HAIR, CM.ink, 0.3);
-}
+  const st = HER_HOUSE.stack;
+  stacks.push(`M${P(st.x0, st.top + 4)}L${P(st.x1, st.top + 4)}L${P(st.x1, HER_HOUSE.mansardTop + 2)}L${P(st.x0, HER_HOUSE.mansardTop + 2)}Z`);
+  return {form, stacks};
+})();
 
 // ---------------------------------------------------------------- the plane
 
+/** The whole backs plane (static: one batch, one plane palette), her window over it, then its light layer. */
 export const BacksPlane: React.FC = () => {
-  const t = useTime();
   const stat = useMemo(() => {
     const b = new Batch();
-    warehouseInto(b);
+    herHouseInto(b);
     b.layer();
     housesInto(b);
-    return b;
+    b.layer();
+    sashesInto(b, BACK_WINS);
+    b.layer();
+    yardInto(b);
+    b.layer();
+    treesInto(b);
+    return planeBatch(b, S4_PLANE.backs, {keep: [CM.lamp, CM.lampCore, CM.hero]});
   }, []);
-  const n = BACK_WINS.length;
-  const lit = (w: BackWin) => litAt(t, 's4backs', w.i, n, {litFrac: 0.28, gap: [0.9, 2.2], force: BACK_WIN_FORCE});
-  const dyn = new Batch();
-  sashesInto(dyn, BACK_WINS, lit);
-  dyn.layer();
-  yardInto(dyn, t);
-  dyn.layer();
-  washingInto(dyn, t);
-  dyn.layer();
-  treesInto(dyn, t);
-  dyn.layer();
-  rakerInto(dyn, t);
-  dyn.layer();
-  pigeonsInto(dyn, t);
-  dyn.layer();
-  treeLeavesInto(dyn, t);
-  dyn.layer();
-  gullInto(dyn, t);
-  const nb = BACK_WINS[9];
   return (
     <>
-      <Paint b={stat} seed="s4backsSt" />
-      <Paint b={dyn} seed="s4backsDyn" misreg={false} />
-      <WindowPerson x={nb.x + nb.w / 2} y={nb.y + nb.h} hb={26} seed="s4nbr" act="read" />
-      <Puffs x={HOUSES[1].x0} y={HOUSES[1].ridge - 26} seed="s4smoke1" kind="smoke" scale={0.42} drift={34 * WIND} ceil={ROW.ceil} />
-      <Puffs x={HOUSES[4].x0} y={HOUSES[4].ridge - 26} seed="s4smoke2" kind="smoke" scale={0.38} drift={30 * WIND} ceil={ROW.ceil} />
+      <Paint b={stat} seed="s4backsSt" misreg={false} />
+      <S4HerWindow />
+      <S4BacksShades form={BACKS_SHADES.form} stacks={BACKS_SHADES.stacks} />
     </>
   );
 };

@@ -37,7 +37,7 @@ import {S7WingFront} from './V2S7_wing';
 import {S7Ground, S7TreeGrate, S7NearLeaves, S7TreeTrunk, S7TreeCrown, S7Bollard} from './V2S7_ground';
 import {S7Cafe, S7Planter, S7BasinFarRim, S7BasinRims} from './V2S7_near';
 import {S7BasinWater} from './V2S7_water';
-import {S7StaffInside, S7StaffOutside, S7Cyclist, S7CafePair, S7FarWalker, S7Bikes, S7Festoon} from './V2S7_folk';
+import {S7StaffInside, S7StaffOutside, S7Cyclist, S7CafePair, S7Bikes, S7Festoon} from './V2S7_folk';
 import {S7Field} from './V2S7_particles';
 import {
   S7WingShade, S7WestWallShade, S7BoardShadows, S7BollardForm, S7TreeShadows, S7TrunkForm, S7CrownForm, S7FolkShadows,
@@ -71,7 +71,6 @@ const V2S7: React.FC = () => {
           <S7Plane plane={P.trees}>
             <S7FarTrees />
             <S7BoatSmoke t={t} />
-            <S7FarWalker />
           </S7Plane>
           {/* the forecourt's paving first, each band in its plane (seams on cross joints) */}
           <S7Plane plane={P.plane}>
@@ -108,7 +107,7 @@ const V2S7: React.FC = () => {
             <S7TrunkForm />
             <S7TreeCrown />
             <S7CrownForm />
-            <S7Field seed="s7/leaves" />
+            <S7Field seed="s7/gust" />
           </S7Plane>
           <S7Plane plane={P.motes}>
             <S7Field seed="s7/motes" />

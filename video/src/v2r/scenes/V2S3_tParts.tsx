@@ -12,6 +12,7 @@
 import {CM, INK_PX} from '../palette';
 import {line, rect as rectInk} from '../../lib/sketch';
 import {seamTone} from '../../lib/depth';
+import {mixHex} from '../../lib/light';
 import {Batch, P, r1, rng, ovalPath, domePath, lobes, leafPath, lerp, Pt} from '../kit/canal/core';
 
 export {Batch};
@@ -20,9 +21,13 @@ export type {Pt};
 /** Ink weights (kept for the pieces that still author a line: the clean pen sets every line's width by its tier). */
 export const TK = {struct: INK_PX.far, detail: INK_PX.hair, her: INK_PX.mid, fine: 1.2} as const;
 
-/** Tier C's thin iron on the terrace (area railings, the balcony rail, drainpipes' brackets): a mid plum-rose, so thin
- *  bars never read as dark lines in the calm world (S1's S1_IRON idea; CRAFT §b-§c). */
-export const S3_IRON = CM.shadeWarm;
+/** Tier C's thin iron on the terrace (area railings, the balcony rail, drainpipes, bollards, the bin, benches): a MID
+ *  warm mauve (L* ~61), so thin bars never read as dark lines in the calm world (S1's S1_IRON, CRAFT §b-§c: things
+ *  that ARE lines within dL* 15 of their ground; the line count's budget, <= 80 strokes / Mpx). */
+export const S3_IRON = '#A08E96';
+/** An unlit pane at sunset: the glass holds the evening sky, half way from the slate to the glass (L* ~65), so its
+ *  glazing bars never cut it into dark specks (the tool counts each dark corner as a stroke: L1's report). */
+export const S3_UNLIT = mixHex(CM.paneUnlit, CM.glass, 0.45);
 
 /** Where the builders put their shade shapes (drawn by the light layer as the rig's tint family; CRAFT §d.3-§d.4). */
 export type ShadeSink = {form: string[]; cast: string[]};
@@ -119,7 +124,9 @@ export function winBack(b: Batch, s: WinSpec, sh: ShadeSink) {
   }
 }
 
-const CURTAINS = [CM.box, CM.coatMustard, CM.blossom, CM.sage, CM.coatPlum, CM.leafRust, CM.coatOat];
+const CURTAINS = [CM.box, CM.coatMustard, CM.blossom, CM.sage, CM.leafRust, CM.coatOat];
+/** Wood inside a lit room (rods, shelves, frames, a sideboard): a light oak, never a dark line on the lamp gold. */
+const ROOM_WOOD = '#C69A78';
 
 /** The pane (lit or unlit) with its interior: a lit pane is CM.lamp, flat (no lighter core and no glow disc: her pane
  *  alone carries the lamp's core); an unlit one holds a wedge of the evening sky. */
@@ -136,26 +143,26 @@ export function winPane(b: Batch, s: WinSpec, on: boolean) {
       const cw = w * r.range(0.16, 0.22);
       b.poly(curtain, [[x, y], [x + cw, y], [x + cw * 0.7, y + h * 0.55], [x + cw * 1.05, y + h], [x, y + h]]);
       b.poly(curtain, [[x + w, y], [x + w - cw, y], [x + w - cw * 0.7, y + h * 0.55], [x + w - cw * 1.05, y + h], [x + w, y + h]]);
-      b.rect(CM.line, x - 2, y + 2, w + 4, 2.4);
+      b.rect(ROOM_WOOD, x - 2, y + 2, w + 4, 2.4);
     }
     if (inner === 'lamp') {
       // a table lamp on a sideboard: its shade in a warm colour (no glow disc)
       const lx = x + w * r.range(0.35, 0.65);
       const ly = y + h * 0.78;
       b.poly(r.pick([CM.box, CM.coatMustard, CM.paper]), [[lx - w * 0.12, ly - h * 0.06], [lx + w * 0.12, ly - h * 0.06], [lx + w * 0.08, ly - h * 0.17], [lx - w * 0.08, ly - h * 0.17]]);
-      b.rect(CM.anchor, lx - 1.2, ly - h * 0.06, 2.4, h * 0.1);
-      b.rect(CM.line, x + w * 0.1, ly + h * 0.04, w * 0.8, h * 0.18);
+      b.rect(S3_IRON, lx - 1.2, ly - h * 0.06, 2.4, h * 0.1);
+      b.rect(ROOM_WOOD, x + w * 0.1, ly + h * 0.04, w * 0.8, h * 0.18);
     }
     if (inner === 'frame') {
       const fx = x + w * r.range(0.32, 0.5);
       const fy = y + h * r.range(0.15, 0.25);
-      b.rect(CM.line, fx, fy, w * 0.24, h * 0.16);
+      b.rect(ROOM_WOOD, fx, fy, w * 0.24, h * 0.16);
       b.rect(r.pick([CM.sage, CM.box, CM.paper, CM.blossom]), fx + 2.5, fy + 2.5, w * 0.24 - 5, h * 0.16 - 5);
     }
     if (inner === 'shelf') {
       for (let k = 0; k < 2; k++) {
         const sy = y + h * (0.3 + k * 0.26);
-        b.rect(CM.line, x + w * 0.08, sy, w * 0.84, 2.6);
+        b.rect(ROOM_WOOD, x + w * 0.08, sy, w * 0.84, 2.6);
         // the books as one stepped block per shelf (two tones), never a row of specks
         b.rect(CM.coatMustard, x + w * 0.1, sy - h * 0.1, w * 0.4, h * 0.1);
         b.rect(CM.brick, x + w * 0.52, sy - h * 0.08, w * 0.34, h * 0.08);
@@ -163,7 +170,7 @@ export function winPane(b: Batch, s: WinSpec, on: boolean) {
     }
     if (inner === 'pendant') {
       const px = x + w * r.range(0.35, 0.65);
-      b.rect(CM.anchor, px - 0.8, y, 1.6, h * 0.22);
+      b.rect(S3_IRON, px - 0.8, y, 1.6, h * 0.22);
       b.fill(r.pick([CM.coatMustard, CM.box, CM.sage]), domePath(px, y + h * 0.3, w * 0.15, h * 0.09));
       b.rect(curtain, x, y, w * 0.14, h);
     }
@@ -173,7 +180,7 @@ export function winPane(b: Batch, s: WinSpec, on: boolean) {
     }
     if (s.blind) b.rect(r.pick([CM.paper, CM.coatOat, CM.box]), x, y, w, h * s.blind);
   } else {
-    b.rect(CM.paneUnlit, x, y, w, h);
+    b.rect(S3_UNLIT, x, y, w, h);
     // the evening sky in the glass: two mint wedges
     const k = r.range(0.25, 0.5);
     b.poly(CM.glass, [[x, y], [x + w * k, y], [x, y + h * k * 1.2]]);
@@ -197,7 +204,7 @@ export function winPane(b: Batch, s: WinSpec, on: boolean) {
   }
   if (open > 0) {
     // the raised lower sash: its rail crosses the top half, the gap below shows the room deeper
-    b.rect(CM.line, x, y + h - open, w, 3);
+    b.rect(ROOM_WOOD, x, y + h - open, w, 3);
   }
 }
 
@@ -323,14 +330,14 @@ export function doorInto(b: Batch, d: DoorSpec, sh: ShadeSink) {
     b.rect(CM.stucco, x - 13, top - 4, 11, h + fanH + 8);
     b.rect(CM.stucco, x + w + 2, top - 4, 11, h + fanH + 8);
     b.rect(CM.stucco, x - 18, top - 14, w + 36, 11);
-    sh.cast.push(rectP(x - 18, top - 3, w + 36, 2.6));
+    sh.cast.push(rectP(x - 18, top - 3, w + 36, 10));
     sh.cast.push(quadP([[x + w + 13, top], [x + w + 20, top + 6], [x + w + 20, y + h], [x + w + 13, y + h]]));
   } else {
     sh.cast.push(quadP([[x + w + 3, top + 4], [x + w + 9, top + 9], [x + w + 9, y + h], [x + w + 3, y + h]]));
   }
   b.rect(CM.paper, x - 3, top, w + 6, h + fanH + 4);
-  if (d.fan === 'arch') b.fill(d.fanLit ? CM.lamp : CM.paneUnlit, domePath(x + w / 2, y - 2, w / 2 - 2, fanH - 3));
-  else b.rect(d.fanLit ? CM.lamp : CM.paneUnlit, x + 1, top + 3, w - 2, fanH - 4);
+  if (d.fan === 'arch') b.fill(d.fanLit ? CM.lamp : S3_UNLIT, domePath(x + w / 2, y - 2, w / 2 - 2, fanH - 3));
+  else b.rect(d.fanLit ? CM.lamp : S3_UNLIT, x + 1, top + 3, w - 2, fanH - 4);
   b.rect(d.color, x, y, w, h);
   const pw = w * 0.32;
   const moulding = seamTone(d.color, 8);
@@ -386,7 +393,7 @@ export function stackInto(b: Batch, x: number, w: number, top: number, bottom: n
     const pw = Math.min(9, (w - 4) / n - 2);
     const px = x + 3 + k * ((w - 4) / n) + ((w - 4) / n - pw) / 2;
     const ph = Math.min(capT - 600, r.range(5, 9));
-    b.rect(r.pick([CM.leafRust, CM.brickDeep, CM.brick, CM.coatOat, CM.leafRust]), px, capT - ph, pw, ph + 1);
+    b.rect(r.pick(['#C98B6B', CM.brick, CM.coatOat, '#C98B6B']), px, capT - ph, pw, ph + 1);
   }
   return rectP(x, capT + 5, w, bottom - capT - 5);
 }
@@ -398,7 +405,7 @@ export function binInto(b: Batch, x: number, y: number, h: number, col: string) 
   const w = h * 0.62;
   b.poly(col, [[x - w / 2, y - h * 0.86], [x + w / 2, y - h * 0.86], [x + w * 0.44, y - 2], [x - w * 0.44, y - 2]]);
   b.rect(seamTone(col, -6), x - w * 0.56, y - h, w * 1.12, h * 0.15);
-  b.fill(CM.anchor, ovalPath(x + w * 0.38, y - 3, 3.5, 3.5));
+  b.fill(S3_IRON, ovalPath(x + w * 0.38, y - 3, 3.5, 3.5));
 }
 
 export {line, rectInk, ovalPath, domePath, lobes, leafPath, lerp, rng, P, r1};

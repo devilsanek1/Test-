@@ -2,9 +2,10 @@
 // (docs/v3/flow_v2.md §2, §4, §5): H2. 36.36-36.98 nothing new: SQE's push releases (J5's continuous camera, h2_window)
 // and the street keeps its calm life; 36.98 the data center's sign LIGHTS (outside.tsx: its beat, drawn on top of the
 // hall; the notice goes blank in the same frame); 38.12-38.62 the phone rises to PAYOFF (the data center and the
-// mountain uncovered above it); 39.70 the tag turns: the mini data center "AI" on its back; 39.88 the like-pop; 40.30
-// Pip shrugs; THE LOOP: 40.55-40.85 the whole thread plane travels back to frame 0's spot (PAYOFF is HIGH-C x1.15 about
-// (540, 1180): the inverse scale) while the tag turns back to its front, "$999" again; 40.85-41.15 the window, the
+// mountain uncovered above it); 39.70 the tag turns: the mini data center "AI" on its back; 39.88 the like-pop;
+// 40.40-40.55 Pip shrugs in its side pose; THE LOOP: 40.55-40.85 the whole thread plane travels back to frame 0's spot
+// (PAYOFF is HIGH-C x1.15 about (540, 1180): the inverse scale) while the tag turns back to its front, the payoff's
+// $1,099 under the struck $999 (assembly review R1-6: the last coloured price is the new one); 40.85-41.15 the window, the
 // street, the sky and the plane's colour leave under ONE falling erase edge (desk_window's EraseDown) onto SQA's frame-0
 // lines in the same place, and the captions roll at 41.00 (Film3.tsx).
 // Hierarchy (flow_v2 §5): A = the data center's sign -> the tag; B = Pip; C = the window view. Light: the nook rig on
@@ -27,7 +28,8 @@ import {H2Scene} from './SQE';
 const ERASE = {y0: -40, y1: 2000, e0: 0, e1: 0.8};
 
 /** The loop's carry (film seconds): the plane travels back to frame 0's spot (HIGH-C) as the tag turns to its front
- *  ("$999"), ending as the un-build starts, so the falling edge takes its colour off in place, over the same lines. */
+ *  ($1,099, the struck $999 above it), ending as the un-build starts, so the falling edge takes its colour off in place,
+ *  over the same lines. */
 export const LOOP_BACK = {t0: 40.55, t1: 40.85, k: 1 / 1.15, c: [540, 1180] as [number, number]};
 
 const SQF: React.FC = () => {
@@ -36,7 +38,10 @@ const SQF: React.FC = () => {
   const u = ease.inOutCubic(prog(T, LOOP_BACK.t0, LOOP_BACK.t1 - LOOP_BACK.t0));
   const back = u > 0;
   const wrap = back ? (plane: React.ReactNode) => <XG m={mat.about(mat.scale(Math.pow(LOOP_BACK.k, u)), LOOP_BACK.c[0], LOOP_BACK.c[1])}>{plane}</XG> : undefined;
-  const tagProps = back ? {turn: 1 - u, ticker: [{t: -99, v: '$999'}], old: undefined} : undefined;
+  // the tag turns back to its front as it travels: the PAYOFF price, $1,099 under the struck $999 (assembly review R1-6:
+  // a front reading "$999" again made the old price the last coloured one the viewer sees); the falling erase edge then
+  // takes its colour off onto SQA's frame-0 lines in the same place
+  const tagProps = back ? {turn: 1 - u} : undefined;
   return (
     <World stage="context" sky={unbuilding ? 'transparent' : [{t: 0, tod: FILM_TOD, color: EMBER.sky}]}>
       <EraseDown {...ERASE}>

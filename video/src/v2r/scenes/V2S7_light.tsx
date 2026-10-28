@@ -18,6 +18,7 @@
 //                      shadow on the water (tint "water": the water's own deeper step, never the rose family)
 import React from 'react';
 import {CastShadow, ContactShadow, FormShade, Shade, Shadow, ShadowLayer, hull, polyD} from '../../lib/light';
+import {clamp01} from '../kit/canal/core';
 import {useTime} from '../../lib/time';
 import {B_LEGS_Y1} from '../world/map';
 import {heightAt, kz, pt, S7_BIKES, S7_BOLLARD, S7_CAFE, S7_CAFE_PAIR, S7_TREE, type P2} from './V2S7_plan';
@@ -131,8 +132,12 @@ export const S7FolkShadows: React.FC = () => {
   const out: React.ReactNode[] = [];
   for (const [p, key] of [[staffIn(t), 'a'], [staffOut(t), 'b']] as const) {
     if (!p || p.inside) continue;
-    out.push(<ContactShadow key={`c${key}`} x={p.x} y={p.y} w={p.h * 0.24} k={1.2} />);
-    out.push(<CastShadow key={`s${key}`} x={p.x} y={p.y} w={p.h * 0.2} h={p.h} />);
+    // under the canopy (1.2 m deep: z 23.8-25) the sun is cut off: the cast retracts over z 23.8-24.4 and the contact
+    // narrows to nothing at the door line, so neither pops as the staff go in or come out
+    const cast = clamp01((24.4 - p.z) / 0.6);
+    const contact = clamp01((25.0 - p.z) / 0.25);
+    if (contact > 0.02) out.push(<ContactShadow key={`c${key}`} x={p.x} y={p.y} w={p.h * 0.24 * contact} k={1.2} />);
+    if (cast > 0.02) out.push(<CastShadow key={`s${key}`} x={p.x} y={p.y} w={p.h * 0.2} h={p.h * cast} />);
   }
   const {z, seats} = CAFE_PAIR;
   const k = kz(z);

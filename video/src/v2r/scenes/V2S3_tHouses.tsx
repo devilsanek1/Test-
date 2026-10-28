@@ -12,6 +12,7 @@
 import React, {useMemo} from 'react';
 import {CM} from '../palette';
 import {Paint} from '../kit/canal/core';
+import {seamTone} from '../../lib/depth';
 import * as MAP from '../world/map';
 import {
   Batch, WinSpec, DoorSpec, ShadeSink, shadeSink, winBack, winPane, winFront, litNow, doorInto, areaRailInto, pipeInto, stackInto, binInto, potsInto, rectP, quadP, ovalPath, rng, S3_IRON,
@@ -40,7 +41,8 @@ export const HOUSES: House[] = [
 ];
 
 const F = MAP.W2_CUT;
-/** Her French window's outer frame + stone architrave (kept clear of dressing: the calm ring). */
+/** Her French window's opening (its frame band straight in the brick: no architrave; kept clear of dressing: the calm
+ *  ring). */
 export const HER_OPENING = {x0: F.x - F.w / 2, y0: F.y - F.h / 2, x1: F.x + F.w / 2, y1: F.y + F.h / 2} as const;
 
 // ---------------------------------------------------------------- windows and doors
@@ -72,7 +74,7 @@ export const WINDOWS: WinSpec[] = [
 export const DOORS: DoorSpec[] = [
   {id: 'herDoor', x: 184, y: 940, w: 62, h: 126, color: CM.hero, fan: 'arch', fanLit: true, caseStucco: true, ground: TL.ground},
   {id: 'h2door', x: 690, y: 940, w: 62, h: 126, color: CM.coatMustard, fan: 'rect', fanLit: false, caseStucco: true, ground: TL.ground},
-  {id: 'h3door', x: 792, y: 942, w: 60, h: 124, color: CM.anchor, fan: 'arch', fanLit: true, caseStucco: false, ground: TL.ground},
+  {id: 'h3door', x: 792, y: 942, w: 60, h: 124, color: CM.sage, fan: 'arch', fanLit: true, caseStucco: false, ground: TL.ground},
 ];
 
 /** The stacks on the party walls and her end wall (x, w, top, colour, pots): their bodies take a FormShade. */
@@ -119,12 +121,12 @@ function backBatch(sh: ShadeSink, stacks: string[]): Batch {
   // ---- the gutter, the cornice band, the string course (their casts on the wall below), a darker plinth at the foot
   for (const h of HOUSES) {
     const c = h.wall === CM.sage || h.roof === 'parapet' ? CM.stucco : CM.limestone;
-    b.rect(CM.shadeCool, h.x0, TL.cornice - 4, h.x1 - h.x0, 4);
+    if (h.roof === 'mansard') b.rect(CM.shadeCool, h.x0, TL.cornice - 4, h.x1 - h.x0, 4);
     b.rect(c, h.x0 - 2, TL.cornice, h.x1 - h.x0 + 4, 14);
     sh.cast.push(rectP(h.x0, TL.cornice + 14, h.x1 - h.x0, 3));
     b.rect(h.wall === CM.sage ? CM.stucco : CM.limestone, h.x0 - 1, TL.string, h.x1 - h.x0 + 2, 10);
     sh.cast.push(rectP(h.x0, TL.string + 10, h.x1 - h.x0, 2.5));
-    b.rect(h.wall === CM.brickDeep ? CM.anchor : h.wall === CM.sage || h.roof === 'parapet' ? CM.shadeCool : CM.brickDeep, h.x0, G - 22, h.x1 - h.x0, 22);
+    b.rect(seamTone(CM.stucco, 9), h.x0, G - 22, h.x1 - h.x0, 22);
   }
   b.layer();
   // ---- chimney stacks on the party walls (pots >= 600) + the end stack on her west wall
@@ -135,7 +137,7 @@ function backBatch(sh: ShadeSink, stacks: string[]): Batch {
   // ---- dormers (cheeks and roofs) on the mansards; their east cheeks in shade
   for (const w of WINDOWS.filter((w) => w.bars === 'dormer')) {
     b.rect(CM.stoneShade, w.x - 8, w.y - 6, w.w + 16, w.h + 8);
-    b.poly(CM.shadeCool, [[w.x - 13, w.y - 5], [w.x + w.w / 2, w.y - 17], [w.x + w.w + 13, w.y - 5]]);
+    b.poly(CM.stoneShade, [[w.x - 13, w.y - 5], [w.x + w.w / 2, w.y - 17], [w.x + w.w + 13, w.y - 5]]);
     sh.form.push(rectP(w.x + w.w + 8, w.y - 4, 5, w.h + 6));
   }
   // ---- window and door surrounds, frames
@@ -160,10 +162,10 @@ function frontBatch(sh: ShadeSink): Batch {
   b.layer();
   for (const d of DOORS) doorInto(b, d, sh);
   // her door: a wall lantern right of the case (lit glass), a blank brass plaque, two pots on her steps
-  b.rect(CM.anchor, 271, 926, 2, 9);
-  b.poly(CM.anchor, [[263, 936], [281, 936], [277, 930], [267, 930]]);
+  b.rect(S3_IRON, 271, 926, 2, 9);
+  b.poly(S3_IRON, [[263, 936], [281, 936], [277, 930], [267, 930]]);
   b.rect(CM.lamp, 265.5, 936, 13, 17);
-  b.rect(CM.anchor, 264, 953, 16, 3);
+  b.rect(S3_IRON, 264, 953, 16, 3);
   b.fill(CM.coatMustard, ovalPath(272, 980, 5, 3.6));
   potsInto(b, [168, 262], 1066, 14, 'herSteps');
   b.layer();
@@ -195,7 +197,8 @@ function streetBatch(): Batch {
   const b = new Batch();
   const G = TL.ground;
   const rail: [number, number][] = [[258, 525], [525, 676], [766, 776], [868, 1010], [1010, 1180]];
-  rail.forEach(([a, c], i) => areaRailInto(b, a, c, G, 62, `rail${i}`));
+  // (the rail before the stucco house's ground-floor window rises to its sill: no thin brick gap between them)
+  rail.forEach(([a, c], i) => areaRailInto(b, a, c, G, a === 868 ? 66 : 62, `rail${i}`));
   areaRailInto(b, 160, 168, G, 62, 'railW');
   binInto(b, 742 + 120, G, 46, CM.coatSlate);
   binInto(b, 742 + 152, G, 46, CM.sage);
