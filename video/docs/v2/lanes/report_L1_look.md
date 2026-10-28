@@ -8,6 +8,139 @@ and the plum.
 Commits: 14ac5f5 ... 0b7f2a3 (the conform and the pre-critic clip); c8a9aed, 66aa2af and the last L1 commit (the fixes
 after the critic and after the cold viewer, then this clip).
 
+## v4: the art director's list on v3, in one pass (2026-10-28)
+**The clip:** `video/deliverables/v2/v2r_G4_look_v4.mp4`, the master encode (PNG frames, BT.709, x264 CRF 14 slow
+aq-mode 3, yuv420p). Frames 0-367 (0.00-6.13 s), 1080x1920, 60 fps, with the current mix, 3.9 MB.
+**The sheet:** `video/deliverables/v2/v2r_G4_look_v4_sheet.jpg` (0.4 scale, every 0.25 s).
+Commits: 02e0c9c (the far city, the wing, the canal), f48a342 (the terrace, the particles), a50f725 (the depth sheets),
+bc9d11f and ab8f872 (two fixes the first v4 render's checks found, below).
+
+**MUST**
+1. **The sun's tooth is gone.** One level roof edge runs under the sun: the near far-roof is a flat roof at y 758 from
+   x 118 to 216, and the gable beside it lost its stacks. The disc (196, 772) r 52 sets on a clean roofline.
+2. **The tower is a building** (`CalmTower`, V2S1_set_far), measured on the master:
+
+   | part | what | value |
+   |---|---|---|
+   | body | lavender limestone, set by `backing` | L* 74.1 |
+   | windows | `toneOnTone`, 14x18 px, rows of three every 34 px | L* 69.9, **dE 4.2** from the wall (<= 6) |
+   | top | a set-back crown (26 px) with a small planted box | |
+   | sun edge | a 5 px lit sliver at the left (the low sun is west) | L* 78.0 (+3.9) |
+   | foot | the bottom 56 px in the warm air near the horizon | L* 78.9, h ~335 (rose; the body h 291) |
+
+   The wing's lit end wall stands 17.3 L* off the tower.
+3. **Particles at phone size** (`S1Particles`, V2S1; `particleProblems` and `floatProblems` clean, at most 10 alive):
+
+   | field | size | when | where |
+   |---|---|---|---|
+   | glints | 14-24 px dashes | 2-4 at once from 1.5 s | the glitter path under the sun |
+   | the second leaf | 13 px, gold or rust | alive from 2.75 s | across the mid ground: x 164-213, y 1412-1560 over 3.0-5.0 s, clear of the row and the band |
+   | motes | 3-4 px, at most 4 | from 0.3 s | on the shaded tower (x 252-356, y 640-920) |
+
+**SHOULD**
+
+4. **The near terrace is calmer.**
+   - The paving is peach cream `BANK_PAVE` #F4D6C2 (L* 87.6, C* 15.5, **h 61.8**; it was CM.paving, sand-beige h 71-83).
+     The second stone #EFCEB9 (h 60) and the joints #E2C1AD (h 59) follow it.
+   - The right pier is one warm value, #DDB49B (L* 76, C* 21.5, h 58.5; it was the taupe #B79B8A, L* 66 C* 14.9),
+     under a lit coping, with its one `Shade` step.
+   - Three props are cut: the tote, the flask (the bottle) and the nearest chair.
+5. **One camera.** The wing's top and base now run toward the left vanishing point: the top falls 56 px over 750 px and
+   the base rises 18 px. A 16 px west end wall shows at the corner. W stays on its map spot (its corners within 1.7 px),
+   and so do the door, her path and the caption band.
+   - **Decision: the end wall is LIT** (#F3EBDF), not shaded: it faces the low western sun.
+   - **Decision: the convergence stays slight.** A full convergence to the ground's vanishing point would move W off
+     the spot the S2 push-through needs.
+6. **Birds and bus.**
+   - The rail birds are pale (`atmos` 0.55 toward the haze) and small (10-12 px). They lift at **2.45**
+     (`map.ts` S1_CLOCK.birdsLiftBridge, was 1.40), fly low west in front of the far roofs and leave off the left
+     edge, never over the disc.
+   - **Decision: the bus is calmer but not later.** It sits one step deeper in the haze (k 0.58) and keeps its 1.10
+     time, which is its sound cue (`audio/v2r/sheet.py` LIFE).
+
+**CHEAP**
+- The door leaves are clipped to their track.
+- The canal has two soft reflections only: the wing's and the sun's.
+- The ghost duck is gone: one duck at the water's scale.
+- The boater has hair (no mask-like head).
+- The lavender steam (the chimney puff) is gone.
+- The pink lifebuoy ring under W is gone.
+- **A darker backing behind the oat copies:** the ground storey sits in one `Shade` step behind the row; the door bay
+  and its sign stay lit. See the copies' row under WARNs.
+
+**Found by the first v4 render's checks, fixed before this one**
+- **check_light FAILED at 3.0 s** (greyed 333 px against a budget of 259). My softened reflections and the far water
+  band were straight sRGB mixes, and a warm colour mixed into teal crosses grey:
+  - the wing's reflection was khaki #C0B7A6;
+  - the sun's was olive #CACBA3 (inside the olive band);
+  - the far water was grey-green #BACBBD.
+
+  The boats' waterline strips, in the rig's rose cast, then took them under C* 8. The fix:
+  - all three go through `atmos` (hue kept, C* >= 12): #D7B2A1 soft peach, #E0C69B soft gold, #ADCEC8 pale teal;
+  - the strips take the water's own deeper step (`tintFor(CM.water, CM.waterDeep)`).
+
+  Greyed is now 39 / 123 / 80 px.
+- **The tower's foot was lighter, not warmer.** `atmos` keeps a cool hue under a warm air. The foot now takes atmos's
+  value step with its hue turned 50° the warm way round (lavender → rose → peach), C* >= 10.
+
+**Checks (on the master)**
+- **check_banding** on the open sky (x 0-160 y 262-700, x 1005-1080 y 0-590) at 0.5, 3.0 and 5.3 s: **PASS** every time.
+
+  | | value |
+  |---|---|
+  | staircase | 0.02-0.13 |
+  | max step dE00 | 0.36-0.72 |
+  | grain | 0.21-0.23 L* |
+  | caption band dL* | 0.01-0.02 (L* 84.8) |
+
+- **check_depth: 0 FAIL, 5 WARN** at 5.4 s and at 3.0 s. The sheets' wing outline now follows the end wall's edge
+  (x 314) and the sloped top; the old outline FAILs on v4, the new one on v3.
+
+  | at 5.4 s | v4 | v3 |
+  |---|---|---|
+  | the wing's west edge, median \|ΔL*\| (OK) | 13.8 | 14.9 |
+  | her (OK) | 22.1 | 25.4 |
+  | subject's plane → +3 (WARN, needs 12) | **9.4** | 7.7 |
+  | the copies' row (WARN, needs 15) | 8.5 | 10.4 |
+  | front row (+3) dE from the air | 12.4 | 12.3 |
+  | farthest plane (+4) dE from the air | 10.3 | 10.2 |
+
+  At 3.0 s the wing is 13.7, her 22.1, and G1-G2 **9.1** (6.4 on v3's frame; WARN, needs 12).
+- **check_light A/B** at 0.5, 3.0 and 5.3 s: **OK** every time.
+  - The brightest 5 % sits 0.042-0.053 H from the subject.
+  - Greyed: 39 / 123 / 80 px (v3: 123 / 220 / 158).
+  - The caption band stays flat (spread 0.0).
+- **particleProblems** and **floatProblems**: clean. Typecheck clean.
+
+**WARNs left**
+- **The copies' row (8.5).** The coats now step off the glazed ground storey behind them by ~7 L*: oat L* 84-85
+  against the unlit glass, which went from L* 86.7 to 77.7 in the shade (v3: ~2). But the row's whole outline also has
+  dark heads and legs, and those now sit on a darker wall, so the median fell.
+  - **A next step if you want the row to read by value:** the ground storey's unlit panes one step deeper (glass in
+    shade reads dark). At L* ~70 the coats step ~14. It changes the window life, so it is not in this pass.
+- **Her (22.1, OK, down from 25.4):** the same shade sits behind her dark coat.
+- **The ladder:** +4 is not 3 closer to the air than +3 (10.3 against 12.4).
+- **The far plane's edges:** 0.88x the subject plane's.
+- **The bank's texture gradient:** the near half's big things add crossings.
+
+**REQUESTS**
+- **Sound lane (`audio/v2r/sheet.py`, the birds against the picture):**
+  - `wings:1` (1.46) and the bridge birds' calls (1.50, 1.74) were placed in the pause after "Google." (1.46-2.00)
+    for the old 1.40 lift. In v4's mix they play while the birds are still on the rail.
+  - The voice runs without a pause from 2.00 to 4.54 ("And she says her contract bans her from criticizing it"), and
+    G2's tick is at 2.53.
+  - The options:
+    - wings soft under "her contract" at ~2.50, and the calls in the 4.54-4.79 pause;
+    - no SFX (far birds can lift silently);
+    - or the art director accepts a lift back in the 1.46-2.00 pause (still pale, small and off the disc), and I set
+      `birdsLiftBridge` to ~1.50.
+- **`src/v2r/world/rigs.ts`:** a `water` tint in TINT_CANAL (`tintFor(CM.water, CM.waterDeep)`), so every lane's
+  waterline strips stay teal. The rig's rose family greys teal water. V2S1_light holds it locally for now.
+- **`src/v2r/world/skies.ts`:** the banding note's region (0,0,330,712) takes in the plane branch, the cloud bar, the
+  tower and the sun, and FAILs on their edges. The open-sky regions above are the ones to measure.
+
+---
+
 ## v3: the clip for the art director, then the owner (2026-10-28)
 **The clip:** `video/deliverables/v2/v2r_G4_look_v3.mp4`, the MASTER encode: `scripts/render-media.mjs --master`
 (PNG frames, BT.709, x264 CRF 14 slow aq-mode 3, yuv420p). Frames 0-367 (0.00-6.13 s), 1080x1920, 60 fps, with the
