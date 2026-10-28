@@ -14,7 +14,9 @@ import {Batch, P, Pt, rng, ovalPath, lobes, lerp, domePath, r1} from '../kit/can
 import {litAt} from '../kit/canal/life';
 import {Person} from '../kit/cast';
 import * as MAP from '../world/map';
-import {CellPaint, Under, barPath, ringPath, S1_IRON, S1_SUN_HALO, hazeBatch} from './V2S1_set_core';
+import {CellPaint, Under, barPath, ringPath, S1_IRON, S1_SUN_HALO, S1_HAZE, S1_ATM, hazeBatch} from './V2S1_set_core';
+import {atmos, backing, recede, toneOnTone} from '../../lib/depth';
+import {tierFill} from '../../lib/pen';
 import {mixHex} from '../../lib/light';
 import {floodAt, S1_PALE} from './V2S1_clock';
 
@@ -23,6 +25,16 @@ const S = MAP.S1_SHEET;
 export const BRIDGE = {x0: -60, x1: 350, railTop: 934, deck: 958, course: 972, base: 1056, arch: {cx: 110, half: 148, spring: 1030, crown: 984}} as const;
 /** The far block behind the wing's west edge (before the haze: ~L* 72 after it, cool, no detail). */
 const CALM_FIELD = '#8F93AE';
+/** THE FIELD BEHIND THE WING'S WEST EDGE (CRAFT §f.3; conform_L1 §11 "the corner"): a calm far tower rising behind the
+ *  wing's lit limestone corner up to its roofline, one flat shape of its own plane (+3), its value set by lib/depth
+ *  `backing` so the corner parts from it by >= 15 L* as SHOWN (the clean pen's environment pull included). Before, the
+ *  corner stood on a sky step of its own value (check_depth: melts, median 4.4). */
+const TOWER = {x0: 258, x1: 346, top: 598};
+/** (computed at render: the clean pen's tier pull is known only once the film's pen is set) */
+const towerField = () => backing(tierFill(CM.limestone, 'environment'), atmos(CALM_FIELD, HAZE_K.near, S1_HAZE), {tier: 'environment', min: 15});
+const CalmTower: React.FC = () => (
+  <Fill d={`M${TOWER.x0} ${FOOT}L${TOWER.x0} ${TOWER.top + 8}L${TOWER.x0 + 6} ${TOWER.top}L${TOWER.x1} ${TOWER.top}L${TOWER.x1} ${FOOT}Z`} color={towerField()} offset={false} seed="s1farTower" />
+);
 /** Every far building's hidden foot (behind the bridge railing). */
 const FOOT = 944;
 /** How far each far plane mixes toward S1_HAZE (V2S1_set_core): each a clear step, the bridge the nearest. */
@@ -77,7 +89,7 @@ const FAR_LIGHT = {row: 'near', bld: 1, k: 1, at: 1.8};
 type WinRef = {x: number; y: number; w: number; h: number; arch: boolean; key: string};
 
 /** One building into the fill batch + its underdrawing (region = the building's centre). Returns its windows. */
-function bldInto(b: Batch, u: Under, o: Bld, key: string, inkW: number, ceil = 590): WinRef[] {
+function bldInto(b: Batch, u: Under, o: Bld, key: string, inkW: number, ceil = 590, detail = true): WinRef[] {
   const r = rng(`s1far/${key}`);
   const {x0, x1, top} = o;
   const w = x1 - x0;
@@ -117,7 +129,8 @@ function bldInto(b: Batch, u: Under, o: Bld, key: string, inkW: number, ceil = 5
     const st = Math.max(ceil + 10, base - sh);
     b.rect(o.wall === CM.brickLight ? CM.brick : CM.brickLight, sx - sw / 2, st, sw, base - st + 1);
     b.rect(CM.stoneShade, sx - sw / 2 - 1.5, st, sw + 3, 2.5);
-    const pots = Math.max(2, Math.round(sw / 5));
+    // chimney pots (2-5 px) only on the near row: a far plane draws no part under 12 px (lib/depth planeLod)
+    const pots = detail ? Math.max(2, Math.round(sw / 5)) : 0;
     for (let k = 0; k < pots; k++) b.rect(k % 2 ? CM.brick : CM.brickLight, sx - sw / 2 + 1 + (k * (sw - 2)) / pots, st - 5, Math.max(2.4, (sw - 2) / pots - 1.4), 5);
     sil += rectInk(sx - sw / 2, st, sw, base - st, {seed: `s1farS/${key}${sx}`, over: 'none', edges: 'tlr'});
     for (let k = 0; k < pots; k++) {
@@ -165,17 +178,17 @@ const FarRoofs: React.FC = () => {
   const {stat, under, wins} = useMemo(() => {
     const stat = new Batch();
     const under = new Under();
-    // the farthest step: a gasholder guide frame (thin stone bars, no ink in colour) + cool stone blocks
-    gasholderInto(stat, under, 72, 900, 50, 160);
-    FAR.forEach((o, i) => bldInto(stat, under, o, `F${i}`, INK_PX.hair));
+    // the farthest step: cool stone blocks only (the gasholder's 1-3 px lattice is gone: nothing under 12 px on +4,
+    // lib/depth planeLod; its bars were the far plane's busiest edges)
+    FAR.forEach((o, i) => bldInto(stat, under, o, `F${i}`, INK_PX.hair, 590, false));
     stat.layer();
     const wins: {w: WinRef; row: string; bld: number; k: number}[] = [];
     // the two far planes are simpler: no windows (only the near row keeps its sash windows)
-    MID.forEach((o, i) => bldInto(stat, under, o, `M${i}`, INK_PX.hair));
+    MID.forEach((o, i) => bldInto(stat, under, o, `M${i}`, INK_PX.hair, 590, false));
     stat.layer();
     NEAR.forEach((o, i) => bldInto(stat, under, o, `N${i}`, INK_PX.far).forEach((w, k) => wins.push({w, row: 'near', bld: i, k})));
     // atmospheric perspective: three clear steps toward the haze (the farthest plane nearly the air itself)
-    hazeBatch(stat, [HAZE_K.far, HAZE_K.mid, HAZE_K.near]);
+    hazeBatch(stat, [HAZE_K.far, HAZE_K.mid, HAZE_K.near], S1_HAZE, {planes: [4, 4, 3]});
     // window outlines in the underdrawing (near row only: the bare-line state reads as a street of sash windows)
     for (const {w, row, bld} of wins) {
       if (row !== 'near') continue;
@@ -192,13 +205,13 @@ const FarRoofs: React.FC = () => {
     // the life budget: ONE window switch at a time, >= 2 s apart in the whole shot (this one 1.80, the wing's 3.90):
     // every other far window holds its frame-0 state
     const on = forced ? t >= FAR_LIGHT.at : litAt(0, 's1farwin', i, n, {litFrac: 0.2, gap: [0.7, 1.6]});
-    const v = rng(`s1farwc/${w.key}`).next();
-    const col = on ? CM.lamp : v < 0.5 ? CM.stoneShade : CM.glass;
+    // a +3 window: tone-on-tone on its own receded wall (CRAFT §f.2: within dE 6, never a dark speck or the lamp
+    // colour; the one story window that lights at 1.80 one soft step lighter)
+    const col = toneOnTone(recede(NEAR[bld].wall, 3, S1_ATM), {lit: on});
     if (w.arch) wb.fill(col, `M${P(w.x, w.y + w.h)}L${P(w.x, w.y + w.w / 2)}A${r1(w.w / 2)} ${r1(w.w / 2)} 0 0 1 ${P(w.x + w.w, w.y + w.w / 2)}L${P(w.x + w.w, w.y + w.h)}Z`);
     else wb.rect(col, w.x, w.y, w.w, w.h);
-    if (row === 'near') wb.rect(CM.limestone, w.x - 1.5, w.y + w.h, w.w + 3, 2.5);
+    if (row === 'near') wb.rect(recede(CM.limestone, 3, S1_ATM), w.x - 1.5, w.y + w.h, w.w + 3, 2.5);
   });
-  hazeBatch(wb, [HAZE_K.near]);
   return (
     <>
       <CellPaint b={stat} seed="s1far/stat" cell={70} misreg={0.6} />
@@ -477,6 +490,7 @@ export const S1WestGap: React.FC = () => {
     <>
       <SunDisc />
       <FarRoofs />
+      <CalmTower />
       <CellPaint b={body.b} seed="s1bridge/body" cell={90} misreg={0.7} />
       <Bus />
       <CellPaint b={rail.b} seed="s1bridge/rail" cell={90} misreg={0} />

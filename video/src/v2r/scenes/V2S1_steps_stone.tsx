@@ -106,8 +106,10 @@ export const StoneBand: React.FC<{k: number; seed?: string}> = ({k, seed = 'v2s1
       const jw = Math.max(0.6, 2.6 * groundScale(x, mid));
       joints.push(poly([[a[0] - jw / 2, a[1]], [a[0] + jw / 2, a[1]], [c[0] + jw / 2, c[1]], [c[0] - jw / 2, c[1]]]));
       prev = [a, c];
-      const step = 150 * ((x - GROUND_VP[0]) / (540 - GROUND_VP[0])) * (k === 0 ? 0.8 : 1) * r.range(0.85, 1.2);
-      x += Math.max(26, step);
+      // a ground length ~1.2 m on screen: the local scale along the tread (toward the vanishing point) AND its depth
+      // (finer toward the water: CRAFT §f.4's texture gradient)
+      const step = 150 * ((x - GROUND_VP[0]) / (540 - GROUND_VP[0])) * ((mid - GROUND_VP[1]) / (1500 - GROUND_VP[1])) ** 1.5 * r.range(0.85, 1.2);
+      x += Math.max(18, step);
       i++;
     }
     return {base, slabs, joints: joints.join(''), lip: lipPath(k)};

@@ -8,6 +8,57 @@ and the plum.
 Commits: 14ac5f5 ... 0b7f2a3 (the conform and the pre-critic clip); c8a9aed, 66aa2af and the last L1 commit (the fixes
 after the critic and after the cold viewer, then this clip).
 
+## S1 on lib/depth + lib/particles (2026-10-28; CRAFT §f, conform_L1 §11; the sky lib follows)
+**What changed**
+- **Haze.** It runs through `atmos` (lib/depth), and the far rows go through `planePalette` with S1's one atmosphere
+  `S1_ATM` (V2S1_set_core):
+  - the air is the lowest sky step;
+  - the planes: the back rows at +4 (k 0.90, at most 2-3 values), the front row at +3 (k 0.66), a 30° hue turn toward the
+    warm air;
+  - the front row's windows are `toneOnTone` on their receded wall, so never the lamp colour; the 1.80 window is one
+    soft step lighter;
+  - the gasholder's 1-3 px lattice and the far chimney pots are gone: nothing under 12 px on +4 (`planeLod`).
+- **The wing's corner.** A calm far tower (`CalmTower`, V2S1_set_far) stands behind the wing's west edge. Its value
+  comes from `backing(tierFill(limestone), …, {tier: 'environment', min: 15})`.
+- **The bank's texture gradient.** The block spacing now scales with depth too, so the blocks are finer toward the
+  water.
+- **Particles.** The `S1Particles` slot holds three tier-C `<Particles>` fields:
+
+  | field | where |
+  |---|---|
+  | motes | over the west gap |
+  | glints | in `glitterPath` under SUN0, on the water |
+  | one leaf | from the plane branch, down the left gutter (x < 95) |
+
+  All three share t0 0.30, t1 5.75, joins [6.1], and avoid the caption band and her path. `particleProblems` is
+  clean. On screen: 0-1 motes at first, 4-6 from 3 s; up to 3 glints; the leaf from ~4.3 s.
+
+**Checks** (`scripts/qa/depth_sheets/v2_s1.json`, and `v2_s1_t3.0.json` for 3.0 s)
+- **check_depth at 5.4 s: 0 FAIL, 8 WARN.** The G4 clip had FAIL x3; the first look clip and v2 failed all three too.
+
+  | measure | now | before |
+  |---|---|---|
+  | farthest plane dE from the air | 9.3 | 12.0 |
+  | front row (+3) dE from the air | 11.6 | |
+  | the wing's west edge, median \|ΔL*\| (OK) | 15.3 | 4.4 |
+  | her, median \|ΔL*\| (OK) | 25.8 | |
+  | our bank's lines to the vanishing points | 91 % | 0 % |
+
+- **check_depth at 3.0 s: 0 FAIL.** The wing's edge 15.4 OK; her 20.7 OK; G1-G2 11.3 (WARN).
+- **check_light A/B:** OK at all three times, with the brightest 5 % 0.039-0.045 H from the subject.
+- **Lines:** strokes 64 / 70 per Mpx.
+
+**WARNs left**
+- The ladder falls 2.3 (it needs 3).
+- The subject's plane → +3 step is dE 7.8 (it needs 12).
+- The far plane's edges are 0.89x the subject plane's.
+- The copies' row is at 11.1 (it needs 15).
+- The bank's texture: the near half's things add crossings.
+- **Size inversion (needs your call).** The ducks are at 41 px/m and the seated public at 61 px/m, against her 100 px/m.
+  Fixing it means the seated public at ~95-120 px, which is a composition change.
+
+---
+
 ## One continuous sky + the evening sun (the owner's sky note, 2026-10-27; before the particles)
 **Stills:** `video/docs/v2/lanes/img/L1_sky_0.4.jpg` (0.4 scale, at 0.5, 3.0 and 5.3 s).
 
