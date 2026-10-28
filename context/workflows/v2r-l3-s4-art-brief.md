@@ -116,6 +116,8 @@ Renders (from `video/`): stills `env GL=angle node scripts/render-frames.mjs Fil
 - Public repo: never write an email address or a secret into a file; never commit reference frames.
 - Work in small, checkpointed steps (sky, then planes and air, then the thread and the gasholders, then light, then
   tiers/life, then line marks, then particles), rendering a still after each to see it.
-- Your final message (it is read by the lane, not shown to the owner): what changed per step, every check's numbers,
-  the still paths (under `/tmp/claude-0/-home-user-Test-/6f98c33a-2c7f-5355-893a-0f8c4c5abcb3/scratchpad/s4art/`),
-  open issues, and REQUEST lines.
+- Write all the details (what changed per step, every check's numbers, the still paths under
+  `/tmp/claude-0/-home-user-Test-/6f98c33a-2c7f-5355-893a-0f8c4c5abcb3/scratchpad/s4art/`, open issues, REQUEST lines)
+  into the "S4 art conform" section of `handover_L3.md` and commit it. Your final message (read by the lane, whose
+  context is expensive) is at most 10 lines: each check's verdict with its key number, the commit hash, any must-fix
+  left open. No logs or long tables in it.
