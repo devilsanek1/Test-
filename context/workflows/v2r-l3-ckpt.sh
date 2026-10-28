@@ -16,8 +16,7 @@ cd /home/user/Test- || exit 1
 for p in video/src/v2r/scenes/V2S3* video/src/v2r/scenes/V2S4* video/src/v2r/world/skies.ts video/docs/v2/lanes/*_L3.md video/docs/v2/lanes/img/L3_* context/workflows/v2r-l3-* video/scripts/qa/depth_sheets/v2_s3*.json video/scripts/qa/depth_sheets/v2_s4*.json; do
   [ -e "$p" ] && git add -- "$p"
 done
-git add -u -- video/src/v2r/scenes/ 2>/dev/null  # deletions of L3 scene files
-git reset -q -- $(git diff --cached --name-only -- video/src/v2r/scenes/ | grep -v -E "/V2S[34][^/]*$") 2>/dev/null
+for p in $(git ls-files --deleted -- 'video/src/v2r/scenes/V2S3*' 'video/src/v2r/scenes/V2S4*'); do git rm -q --cached -- "$p"; done  # L3 files deleted
 if git diff --cached --quiet; then echo "nothing to checkpoint"; else
   for i in 1 2 3 4 5; do git commit -q -m "$msg" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" -m "Claude-Session: https://claude.ai/code/session_014PwCXJs9nWENkpKqVhHWMP" && break; sleep 3; done
 fi
