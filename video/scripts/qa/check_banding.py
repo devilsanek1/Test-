@@ -1,33 +1,48 @@
 #!/usr/bin/env python3
 """check_banding.py: BANDING in a sky (docs/look/CRAFT.md §g "Check"; lib/sky.tsx), on a rendered frame (PNG) or a
 video (mp4: decoded at 16 bits with its own colour tags, so the measurement adds no rounding of its own), before and
-after any encode. It finds the sky's vertical profile in narrow strips and looks for a STAIRCASE: flat plateaus with
-sudden steps, the thing the eye reads as bands (a smooth or properly dithered gradient changes a little on every row).
+after any encode. It finds the sky's profile in strips, DOWN the sky (horizontal bands) and ACROSS it (vertical bands:
+a sky that warms sideways, the sides of the sun's warmth), and looks for a STAIRCASE: flat plateaus with sudden steps,
+the thing the eye reads as bands (a smooth or properly dithered gradient changes a little on every row).
 
   python3 -I scripts/qa/check_banding.py frame.png --region 0,0,330,790
   python3 -I scripts/qa/check_banding.py clip.mp4 --region 0,0,330,790 --times 0.5,1.5,2.5 --json out.json
   python3 -I scripts/qa/check_banding.py frame.png --region 0,0,1080,600 --band 317,556 --max-dl 1.5 --plot prof.png
 
 The measures (canvas px at 1080 wide; CIE L*, a*, b* D65; Y = relative luminance):
-  profile    per strip (default 64 px wide) and row, the mean colour of the SKY pixels (within 2.5 L* of the row's
-             median: caption ink, objects and their edges are left out); a row change over 5 L* or 8 dE76 splits the
-             profile (an object edge: a roofline, the sun's disc; never a band).
-  step       a local peak of the 3-row colour change (dE76), at least max(0.12, 2.5x the local median change): with a
-             flat run on each side it is a band edge. Its size: dL*, dE00 and the luminance contrast c = dY / Y of the
-             plateaus.
+  profile    per strip (default 64 px wide; across the sky 64 px tall, each canvas row first taken back to the strip's
+             median so a vertical ramp neither hides nor fakes a sideways step) and row, the mean colour of the SKY
+             pixels (within 2.5 L* of the row's median: caption ink, objects and their edges are left out); a row change
+             over 5 L* or 8 dE76 splits the profile (an object edge: a roofline, the sun's disc; never a band).
+  step       a local peak of the 3-row colour change (dE76), at least max(0.12, 2.5x the local median change). Its size
+             is its TREND-CORRECTED jump (one shared straight line per channel through the plateaus on both sides plus a
+             jump, least squares): a smooth ramp, however steep, has no jump, so a step inside a fast chroma ramp is
+             measured alone (the plain plateau-mean difference read a 0.4 dE00 encoder block edge in the light band as
+             1.6-4.0). Its size: dL*, dE00 and the luminance contrast c = dY / Y.
   plateau    the run between two steps (px). Short plateaus (< 8 px) are a fine texture the eye averages away.
   visible    a step at or over the JND with plateaus >= 8 px on both sides. The JND is CAMBI's (Netflix, libvmaf):
              c >= 0.019 (its tvi_threshold, a Weber fraction on a BT.1886 display; ~0.6 L* at L* 85), or dE00 >= 1.5
              (a chroma band: CAMBI reads luma only; 1.0 is the side-by-side patch JND, an edge inside a gradient needs
              more). A step over 2x the JND is "strong".
   weak       c >= 0.010 or dE00 >= 0.8 with plateaus >= 16 px: below the JND on a calm display, near it on a phone at full
-             brightness in the dark (one 8-bit code at L* 85 is c ~0.013).
-  staircase  the share of the profile's total change that happens in its steps (0 smooth, 1 pure steps).
+             brightness in the dark (one 8-bit code at L* 85 is c ~0.011).
+  wide       the same profiles in WIDE strips (default 256 px, --wide): a band that spans the sky stays a sharp step
+             there, where an encoder's local wobble and the dither's own noise average away (CAMBI's "a band in a flat
+             region", against blotches). A STAIR step there: c >= 0.013 (just over one 8-bit luma code at sky lightness,
+             the floor of any re-encode that drops the dither) or dE00 >= 0.8, plateaus >= 8 px.
+  staircase  the share of the profile's total change that happens in its steps (0 smooth, 1 pure steps; information).
   grain      the std of the sky pixels' L* round their row mean: the dither's visible amplitude (<= 0.6 L*: invisible).
   band       the caption band's flatness: the range of its rows' sky L* (budget --max-dl, default 1.5: CRAFT §g).
-Verdict: FAIL on a staircase (3+ visible steps in one strip), a strong step, or the band over its budget; WARN on 1-2
-visible steps in a strip (isolated soft blotches: what a platform's re-encode leaves in a dithered sky), 3+ weak steps in
-a strip, or grain > 0.6 L*; else PASS. Exit 1 on FAIL. Several frames: the worst counts.
+Verdict: FAIL on a staircase (3+ visible steps in one strip, or 3+ stair steps in one wide strip: near-JND steps that
+repeat across the sky read as stripes), a strong step, or the band over its budget; WARN on 1-2 visible steps in a strip
+(isolated soft blotches: what a platform's re-encode leaves in a dithered sky), 3+ weak steps in a strip, or grain >
+0.6 L*; else PASS. Exit 1 on FAIL. Several frames: the worst counts.
+Calibrated (critic, 2026-10-28; synthetic attacks and the S1 demo through the master and five simulated platform
+re-encodes): every quantised ramp FAILs (2- and 3-code staircases, radial rings, sideways bands, hue-only bands, steps
+under noise; the plain mint -> peach gradient through the master: 7 stair steps in a wide strip), every smooth one
+PASSes (dithered ramps, a steep ramp with encoder block wobble, one small jump in a fast ramp), lib/sky's master PASSes
+and its platform re-encodes PASS or WARN (at most 2 stair steps). Not CAMBI itself: run libvmaf's cambi
+(max_log_contrast=3 on light skies) as a second opinion where a build with libvmaf is allowed.
 """
 from __future__ import annotations
 
@@ -48,7 +63,8 @@ JND_DE = 1.5  # a chroma step (CAMBI reads luma only; dE00 1.0 is the side-by-si
 WEAK_C = 0.010
 WEAK_DE = 0.8
 STRONG = 2.0  # x the JND: one such step fails alone
-STAIR = 3  # visible steps in one strip = a staircase
+STAIR = 3  # visible steps in one strip (or stair steps in one wide strip) = a staircase
+STAIR_C = 0.013  # a stair step's luminance bar: just over one 8-bit luma code at sky lightness (L* 73-92)
 MIN_PLATEAU = 8
 WEAK_PLATEAU = 16
 GRAIN_MAX = 0.6
@@ -232,9 +248,8 @@ def steps_in(prof: np.ndarray, yp: np.ndarray, y0: int):
         dL = float(b[0] - a[0])
         dE = float(de2000(a, b))
         cc = float(abs(yb - ya) / max(min(ya, yb), 1e-6))
-        # ALIGNED: the jump goes the way the sky itself is going there (the profile smoothed over ~50 rows, across the
-        # step, moves within 60 deg of the jump's direction): a band of a quantised ramp. An encoder's block wobble
-        # or a blotch jumps either way: half of them against the sky's own direction.
+        # aligned (information): the jump goes the way the sky itself goes there (the profile smoothed over ~50 rows
+        # moves within 60 deg of it): a band of a quantised ramp, where a blotch or an encoder's wobble goes either way
         J = b - a
         d = Pw[min(n - 1, c + 12)] - Pw[max(0, c - 13)]
         nj, nd = float(np.linalg.norm(J)), float(np.linalg.norm(d))
@@ -281,9 +296,11 @@ def strip_steps(lab: np.ndarray, Y: np.ndarray, sw: int, k: float, along0: int, 
         vis = [s for s in st if (s[3] >= JND_C or s[2] >= JND_DE) and min(s[4], s[5]) >= MIN_PLATEAU * k]
         strong = [s for s in vis if s[3] >= STRONG * JND_C or s[2] >= STRONG * JND_DE]
         weak = [s for s in st if (s[3] >= WEAK_C or s[2] >= WEAK_DE) and min(s[4], s[5]) >= WEAK_PLATEAU * k and s not in vis]
-        # a STAIRCASE of near-JND steps: each alone at the edge of seeing, but repeated down the sky the eye reads the
-        # pattern (a phone in a dim room: the plain gradient through x264 CRF 14 is 1.2-1.6 % steps every ~13 px)
-        stair = [s for s in st if s[6] and (s[3] >= WEAK_C or s[2] >= WEAK_DE) and min(s[4], s[5]) >= MIN_PLATEAU * k]
+        # STAIR steps (counted in the wide strips): near-JND steps, each alone at the edge of seeing, that repeated across
+        # the sky the eye reads as stripes (the plain mint -> peach gradient through x264 CRF 14: dE00 0.9-1.2 hue steps
+        # every 8-18 px). One 8-bit luma code (c ~0.010-0.012 at sky lightness, under CAMBI's threshold) is the floor of
+        # any re-encode that drops the dither, so the luminance bar sits just above it.
+        stair = [s for s in st if (s[3] >= STAIR_C or s[2] >= WEAK_DE) and min(s[4], s[5]) >= MIN_PLATEAU * k]
         plateaus = [s[4] for s in st]
         strips.append({
             'axis': axis,
@@ -365,7 +382,7 @@ def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float, axes: str 
         why.append(f'a staircase: {vis_worst} visible steps in one strip' if vis_worst >= STAIR else f'{strong} strong step(s)')
     if stair_worst >= STAIR:
         verdict = 'FAIL'
-        why.append(f'a staircase across the sky: {stair_worst} near-JND steps the way the sky goes, in one wide strip')
+        why.append(f'a staircase across the sky: {stair_worst} near-JND steps in one wide strip')
     if 'band' in res and res['band']['dL'] > max_dl + 1e-9:
         verdict = 'FAIL'
         why.append(f"caption band dL* {res['band']['dL']:.2f} > {max_dl}")

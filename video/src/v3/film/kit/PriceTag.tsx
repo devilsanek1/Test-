@@ -47,12 +47,19 @@ export type PriceTagProps = {
   turn?: number;
   /** The sign on the back's mini data center (default "AI": the full "AI DATA CENTER" is ~6 px at phone size). */
   backSign?: string;
+  /** OPT-IN (v3 rework, flow_v2 §4's like-pop; the G3 board: "on 'price' its back lands: a tiny AI data center
+   *  (like-pop)"): from this time the back's drawing pops (x0.6 -> 1.1 -> 1 over 0.24 s, about its centre) as the back
+   *  opens, in step with the like-pop sound. Pass the turn's midpoint (turnAt + 0.18), when the back appears. */
+  backPopAt?: number;
   /** 'hero' (burnt orange, default) | 'pop' (the style frame's blue tag). */
   tone?: 'hero' | 'pop';
   /** OPT-IN (v3 rework, CRAFT §b: a story object off its beat is tier B): 0 = full strength (default); 1 = off-beat:
    *  the body a soft terracotta (C* ~38), the prices in the tag's light tint, the eyelet a soft blue, NO outline;
    *  0.5 = the half step of a 2-step change (never a fade). The front only (the back is the payoff's beat). */
   dim?: number;
+  /** OPT-IN (v3 rework): the off-beat colours `dim` steps toward (default TAG_DIM): the thread plane's REST level
+   *  passes calmer ones for the long holds after the hook. */
+  dimColors?: Partial<typeof TAG_DIM>;
   /** OPT-IN: the string is TIED THROUGH THE HOLE: its last stretch runs over the paper into the eyelet (drawn after
    *  the body, under the eyelet ring), in the tag's own deep red (L* ~20), never hidden behind the tag's top edge. */
   stringThrough?: boolean;
@@ -96,14 +103,22 @@ function tickerNow(t: number, value?: string, ticker?: TickerStep[]): {v: string
   return {v, since};
 }
 
-const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, oldSize: oldK = 0.16, oldTone = 'white', oldAt, strikeAt, stringFrom, rot = 0, sway = 0, turnAt, turn, backSign = 'AI', tone = 'hero', dim = 0, stringThrough, at, seed = 'tag', ink = 3.4}) => {
+/** The like-pop's scale at d s after it starts: 0.6 -> 1.1 (outCubic, 0.12 s) -> 1 (inOutSine, 0.12 s). */
+function backPopScale(d: number): number {
+  if (d >= 0.24) return 1;
+  if (d < 0.12) return 0.6 + 0.5 * ease.outCubic(clamp(d / 0.12));
+  return 1.1 - 0.1 * ease.inOutSine(clamp((d - 0.12) / 0.12));
+}
+
+const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, oldSize: oldK = 0.16, oldTone = 'white', oldAt, strikeAt, stringFrom, rot = 0, sway = 0, turnAt, turn, backSign = 'AI', backPopAt, tone = 'hero', dim = 0, dimColors, stringThrough, at, seed = 'tag', ink = 3.4}) => {
   const t = useTime();
   const h = w * 0.5;
   const shape = tagShape(w);
   const [hx, hy] = tagHole(w);
-  const body = mixRgb(tone === 'pop' ? EMBER.pop : EMBER.hero, TAG_DIM.body, dim);
-  const white = mixRgb(EMBER.white, TAG_DIM.text, dim);
-  const ringC = mixRgb(tone === 'pop' ? EMBER.card : EMBER.pop, TAG_DIM.ring, dim);
+  const DIM = {...TAG_DIM, ...dimColors};
+  const body = mixRgb(tone === 'pop' ? EMBER.pop : EMBER.hero, DIM.body, dim);
+  const white = mixRgb(EMBER.white, DIM.text, dim);
+  const ringC = mixRgb(tone === 'pop' ? EMBER.card : EMBER.pop, DIM.ring, dim);
   const {v, since} = tickerNow(t, value, ticker);
   // a step: the price pops (1.3 -> 1) and the tag jolts (a damped swing about the hole)
   const k = since === undefined ? 1 : prog(t, since, 0.14, ease.outCubic);
@@ -146,7 +161,7 @@ const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, old
       stringD = smooth([stringFrom, [mx, my], holeAbs]);
     }
   }
-  const stringInk = stringD ? <Ink thing d={stringD} at={at} width={2.2} color={stringThrough ? (dim >= 0.5 ? TAG_DIM.line : TAG_STRING) : undefined} /> : null;
+  const stringInk = stringD ? <Ink thing d={stringD} at={at} width={2.2} color={stringThrough ? (dim >= 0.5 ? DIM.line : TAG_STRING) : undefined} /> : null;
   return (
     <>
       {stringThrough ? null : stringInk}
@@ -164,8 +179,10 @@ const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, old
         {back ? (
           <Show at={fillAt(at)}>
             {/* the clean pen's server rows: three long soft bands per row, steady (CRAFT §c: no dash rows or blinking
-                specks on the payoff's subject) */}
-            <DataCenter x={w * 0.6} y={h * 0.8} w={w * 0.52} variant="mini" sign={backSign} seed={`${seed}/back`} ink={Math.max(1.6, ink * 0.6)} ledStyle="bands" blink={false} />
+                specks on the payoff's subject); the like-pop scales the drawing about its centre as the back lands */}
+            <XG m={backPopAt !== undefined && t >= backPopAt && t < backPopAt + 0.24 ? mat.about(mat.scale(backPopScale(t - backPopAt)), w * 0.6, h * 0.8 - w * 0.52 * 0.31) : mat.I}>
+              <DataCenter x={w * 0.6} y={h * 0.8} w={w * 0.52} variant="mini" sign={backSign} seed={`${seed}/back`} ink={Math.max(1.6, ink * 0.6)} ledStyle="bands" blink={false} />
+            </XG>
           </Show>
         ) : (
           <>
@@ -176,7 +193,7 @@ const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, old
                 </Txt>
               </Show>
             ) : null}
-            {old ? <Ink d={strikeD} at={strikeAt ?? oldAt ?? b(at, 0.2)} width={Math.max(2.6, w * 0.013)} color={dim >= 0.5 ? TAG_DIM.line : EMBER.ink} /> : null}
+            {old ? <Ink d={strikeD} at={strikeAt ?? oldAt ?? b(at, 0.2)} width={Math.max(2.6, w * 0.013)} color={dim >= 0.5 ? DIM.line : EMBER.ink} /> : null}
             <Show at={fillAt(at)}>
               <XG m={mat.about(mat.scale(clamp(popS, 1, 1.3)), textX, priceY - priceSize * 0.3)}>
                 <Txt x={textX} y={priceY} size={priceSize} fill={white} fit={fit}>
@@ -190,7 +207,7 @@ const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, old
     </>
   );
 };
-export const PriceTag = tiered('subject', {tone: (p) => mixRgb(p.tone === 'pop' ? EMBER.pop : EMBER.hero, TAG_DIM.body, p.dim ?? 0)}, PriceTagBody);
+export const PriceTag = tiered('subject', {tone: (p) => mixRgb(p.tone === 'pop' ? EMBER.pop : EMBER.hero, p.dimColors?.body ?? TAG_DIM.body, p.dim ?? 0)}, PriceTagBody);
 
 /** Screen position of the tag's hole (where a string ties on), for lanes chaining a tag to a phone or a laptop. */
 export const tagHoleAt = (x: number, y: number, w: number): Pt => [x + tagHole(w)[0], y + tagHole(w)[1]];
