@@ -161,7 +161,7 @@ const FLOCK = Array.from({length: 7}, (_, i) => {
   const r = rng(`s4flock/${i}`);
   const x = lerp(G1.cx - G1.r * 0.7, G1.cx + G1.r * 0.2, (i + r.range(0.1, 0.9)) / 7);
   const bow = G1.r * 0.06 * Math.sqrt(Math.max(0, 1 - ((x - G1.cx) / G1.r) ** 2));
-  return {x, y: G1.top - bow - 7, face: r.chance(0.6) ? -1 : 1, delay: r.range(0, 0.16), vx: r.range(250, 320), cruise: r.range(632, 690), s: r.range(12, 15), ph: r.range(0, 6.28)};
+  return {x, y: G1.top - bow - 7, face: r.chance(0.6) ? -1 : 1, delay: r.range(0, 0.16), vx: r.range(250, 320), cruise: r.range(522, 548), s: r.range(12, 15), ph: r.range(0, 6.28)};
 });
 /** The birds' colour: a soft warm grey a tone darker than the sky they cross (planeBatch recedes it one more step). */
 const BIRD = CM.shadeWarm;
@@ -177,10 +177,11 @@ function flockInto(b: Batch, t: number) {
       b.fill(BIRD, `M${P(f.x - f.face * s * 0.28, f.y - s * 0.04)}L${P(f.x - f.face * s * 0.66, f.y + s * 0.12)}L${P(f.x - f.face * s * 0.28, f.y + s * 0.13)}Z`);
       continue;
     }
-    // lift (a hop up), then a long glide-and-flap WEST, dropping into the sun's band (y ~632-690)
+    // lift (a hop up), then a long glide-and-flap WEST, climbing OVER the sun (cruise y 522-548, the disc's top 585):
+    // nothing crosses the disc, and the push-through carries them up and out (critic_L3 MUST 1)
     const x = f.x - f.vx * ft * smooth01(ft / 0.25) * 0.6 - f.vx * Math.max(0, ft - 0.12) * 0.4;
     const up = Math.sin(clamp01(ft / 0.35) * Math.PI) * 14;
-    const y = Math.max(ROW.top, lerp(f.y, f.cruise, smooth01(ft / 0.7)) - up + Math.sin(ft * 3 + f.ph) * 3);
+    const y = Math.max(516, lerp(f.y, f.cruise, smooth01(ft / 0.35)) - up + Math.sin(ft * 3 + f.ph) * 3);
     if (x < X0 - 20) continue;
     const flap = Math.sin(ft * 24 + f.ph);
     const wx = s * 0.66;

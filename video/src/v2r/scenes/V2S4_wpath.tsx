@@ -40,6 +40,11 @@ const EDGE = ROW.edge;
 
 /** The slate gate lifted to a mid tone (a narrow dark leaf reads as a line mark: CRAFT §c). */
 const GATE_SLATE = '#8794A8';
+/** The rendered garden walls: a warm mid render one step under the old stucco, with ONE recessed panel a step deeper
+ *  (fills only), so the field beside her is a real wall, not a blank near-white slab, and the tag and plates stay the
+ *  lightest things in her band (critic_L3 MUST 2; CRAFT §f.2). */
+const RENDER = '#EDD3BF';
+const RENDER_PANEL = '#E6C6AF';
 type Seg = {x0: number; x1: number; kind: 'brick' | 'render' | 'gate' | 'railing' | 'trellis'; c: string; ivy?: boolean; pot?: boolean; gate?: string};
 const SEGS: Seg[] = [
   {x0: X0, x1: 128, kind: 'brick', c: CM.brick, ivy: true},
@@ -47,10 +52,10 @@ const SEGS: Seg[] = [
   {x0: 300, x1: 352, kind: 'gate', c: CM.brickDeep, gate: GATE_SLATE},
   {x0: 352, x1: 566, kind: 'railing', c: CM.brickLight},
   {x0: 566, x1: 690, kind: 'brick', c: CM.brickLight},
-  {x0: 690, x1: 830, kind: 'render', c: CM.stucco, pot: true},
+  {x0: 690, x1: 830, kind: 'render', c: RENDER, pot: true},
   {x0: 830, x1: 882, kind: 'gate', c: CM.brick, gate: CM.sage},
   {x0: 882, x1: 1110, kind: 'brick', c: CM.brickLight, ivy: true},
-  {x0: 1110, x1: 1250, kind: 'render', c: CM.limestone},
+  {x0: 1110, x1: 1250, kind: 'render', c: RENDER},
   {x0: 1250, x1: 1300, kind: 'gate', c: CM.brickLight, gate: CM.brick},
   {x0: 1300, x1: X1, kind: 'railing', c: CM.brick},
 ];
@@ -62,6 +67,7 @@ function wallsInto(b: Batch) {
   const walls = SEGS.filter((s) => s.kind !== 'gate');
   // P0: wall bodies, gate piers, gate leaves (flat: one calm leaf each)
   for (const s of walls) b.rect(s.c, s.x0, TOP, s.x1 - s.x0, FOOT - TOP);
+  for (const s of walls) if (s.kind === 'render') b.rect(RENDER_PANEL, s.x0 + 14, TOP + 14, s.x1 - s.x0 - 28, FOOT - TOP - 30);
   for (const s of gates) {
     for (const px of [s.x0, s.x1 - PIER_W]) b.rect(s.c, px, TOP - 12, PIER_W, FOOT - TOP + 12);
     const gx0 = s.x0 + PIER_W;
