@@ -2,6 +2,14 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 07:55 UTC: look APPROVED, L2-L6 conforming
+
+The owner approved the G4 look clip v4 ("Okay I think this is better now the hook video"). L2 (S2), L3 (S3+S4), L4 (S5), L5 (boards + S6 + S7)
+and L6 (S8 + seam) resumed from `lanes/RESUME_2026-10-28.md` (depth, sky presets, light + water tint, readable particles, the parallax float,
+the checks; L5 / L6 deltas), one agent each at MAX effort, up to two critic rounds, reports with 0.4 clips. L1 idle (S1 done) until the
+whole-film cold read. Hourly report re-enabled; branch sync re-armed. Next: assembly, the review round, fixes, the sound re-time + mix,
+master, QA, cover, posting kit.
+
 ## Snapshot 2026-10-28 02:19 UTC (hourly)
 
 Waiting for the owner's word on the G4 look clip v4 (sent ~01:55). Prepared meanwhile: `lanes/RESUME_2026-10-28.md` (what every shot now
