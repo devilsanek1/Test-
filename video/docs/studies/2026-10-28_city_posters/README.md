@@ -24,6 +24,27 @@ techniques"; "let me know if i am missing anything you observed too"):
    cheap and lazy as if these pictures give a very premium feel to it".
 Every lens says which feeling its findings explain, and what it observed that the owner didn't name.
 
+**The owner's answers to our nine first observations** (2026-10-28 ~22:10 UTC; the observations are in the orchestrator's
+message, the answers verbatim in `video/docs/look/poster_refs/README.md`). Already rules (DIRECTION, playbook):
+- 1 texture: "yes we can perhaps start playing with it, very subtly especially if its adding to the premium look" ->
+  DIRECTION rule 4, CRAFT §c: a VERY subtle paper-and-paint texture is an opt-in test (the study gives its numbers).
+- 4 a lit face and a shade face on every volume: "a good point and goes along the shadows we discussed in the google
+  video" -> DIRECTION rule 5.
+- 5 a full value range: "good point too!" -> DIRECTION rule 6 (the study gives its numbers).
+- 9 one look across all videos: "a coherent style across all videos sharing one look, one brand would be absolutely the
+  key here" -> DIRECTION's intro, rule 3, the playbook's ONE LOOK, ONE BRAND.
+Still open, for the synthesis:
+- 2 the geometric patchwork (the mid and far city in overlapping flat blocks): no answer yet.
+- 3 outline-free edges: "i like 3 - but can you draw me a picture of difference like A vs B" -> the A vs B picture
+  (`img/AB_outlines.jpg`); rule 4's lines stand until the owner decides.
+- 6 layout: "layout is a big aspect. I think we've discussed a bunch of it already, perhaps we can consolidate the
+  previous discussions and reconcile it with your findings here" -> `layout.md`: one consolidated layout guide.
+- 7 the designed view: "it is a unique camera angle and composition of objects is fascinating".
+- 8 specific local objects: "more specific to the content rather that the style and composition- hard to imagine if its
+  going to trasnalte and generalize well" -> content, not a style rule (the content track and the parallel thread).
+And: "merge the findings and key points and conclusions into the main repo": the study's conclusions are integrated
+into the main docs (DIRECTION, CRAFT, PALETTE, the playbook, a layout guide) and merged into `video-production`.
+
 **This is a study, not a rule change.** Nothing here outranks `video/docs/look/DIRECTION.md` or the playbook; the owner
 approves what becomes a rule. Paths below are relative to the repo root `/home/user/Test-`.
 

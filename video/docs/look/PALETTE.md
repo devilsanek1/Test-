@@ -122,8 +122,10 @@ outlines, VERY subtle, in key places" is the subject's one outline in its own de
 B gets a thin tinted line or none, the environment none; taper only where the stroke IS the thing (hair, steam).
 
 **What our kit has:**
-- an optional paper-grain overlay (`public/textures/grain.png`, `Card` `grain`; off by default): retired, never in a
-  film (`CRAFT.md` §c: no grain);
+- an optional paper-grain overlay (`public/textures/grain.png`, `Card` `grain`; off by default): retired as it was;
+  since 2026-10-28 a VERY subtle paper-and-paint texture is being tested again (owner: "start playing with it, very
+  subtly especially if its adding to the premium look"; `CRAFT.md` §c), measured from the city posters
+  (`docs/studies/2026-10-28_city_posters/`);
 - tapered brush lines (the mascot ink; the clean pen keeps taper off unless asked).
 
 **What it lacks:** a halftone fill. Add it as an SVG `<pattern>` (dots in the fill's darker tone), applied per shape
