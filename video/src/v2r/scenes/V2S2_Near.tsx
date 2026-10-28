@@ -202,6 +202,9 @@ export const NEAR = {
   bike: {x: 930, y: 1912, r: 112},
 };
 
+/** The planter's wood (CM.line a step nearer): the nearest shade at the left edge (the near motes read against it). */
+export const PLANTER_WOOD = nearStep(CM.line, -2);
+
 /** The lamp's swan-neck: from the post's top it curves right out of the frame (below y 600). */
 const LAMP_TOP = 700;
 
@@ -294,7 +297,7 @@ export const S2NearThings: React.FC = () => {
     // ---- the planter of grasses (cut by the left edge): two wood tones, plank ends
     {
       const {x0, x1, rim, base} = NEAR.planter;
-      const wood = nearStep(CM.line, -2);
+      const wood = PLANTER_WOOD;
       const woodLit = nearStep('#B9744E', -2);
       b.rect(wood, x0, rim, x1 - x0, base - rim);
       b.rect(woodLit, x0, rim, x1 - x0, 18);

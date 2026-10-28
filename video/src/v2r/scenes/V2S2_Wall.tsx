@@ -16,6 +16,7 @@
 // FILM seconds (the scene runs inside <TimeShift by={-6.1}>).
 import React, {useMemo} from 'react';
 import {CM} from '../palette';
+import {S2_AIR} from '../world/skies';
 import {useTime} from '../../lib/time';
 import {Tier} from '../../lib/tier';
 import {ShadowLayer, Shadow} from '../../lib/light';
@@ -27,8 +28,9 @@ import * as MAP from '../world/map';
 
 type Level = keyof typeof S2_WALL.levels;
 
-/** S2's atmosphere (lib/depth): the air = the gold band (conform_L2 §10: #F6D9BC, the sky's warm low step). */
-export const S2_ATM = makeAtmosphere({name: 'canal S2', air: CM.bandGold});
+/** S2's atmosphere (lib/depth): the air = the converted sky's lowest colour behind the far end (THROUGHLINE §5b,
+ *  RESUME 2026-10-28: `horizonColor`; world/skies S2_AIR). */
+export const S2_ATM = makeAtmosphere({name: 'canal S2', air: S2_AIR});
 
 /** The plane of a wall column position u (steps on the fins at u = 2.5, 6.5, 14.5). */
 export const wallPlane = (u: number): number => (u <= 2.5 ? 0 : u <= 6.5 ? 1 : u <= 14.5 ? 2 : 3);
