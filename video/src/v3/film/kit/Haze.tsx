@@ -4,7 +4,10 @@
 // sky's lowest colour"): out = in x (1 - k) + color x k, per channel in sRGB. It is a colour transform, never blur, a
 // gradient or an opacity fade: flat fills stay flat and keep their exact edges, darks lift more than lights (contrast
 // compresses like air), and a 2-step change of `k` (k/2 for 3 frames) moves a piece between its beat and its calm.
-// k <= 0.001 draws the children bare (no filter).
+// k <= 0.001 draws the children bare (no filter). It is the GROUP form of CRAFT §f.2's plane step, for a kit piece whose
+// inner colours a scene cannot pass (DataCenter's body, side, rows and snow line); a straight mix suits hues on the
+// air's side only (the dusk blues): a warm hue across from the air would cross grey, so recolour such fills one by one
+// with lib/depth.ts `recede` instead (it keeps their hue).
 //   <Haze k={0.35} color={EMBER.skyLow}><DataCenter ... /></Haze>
 import React, {useId} from 'react';
 
