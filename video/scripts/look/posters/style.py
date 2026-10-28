@@ -1157,6 +1157,459 @@ def cmd_encode(a) -> None:
     print('wrote', out / 'encode_test.json')
 
 
+# ------------------------------------------------------------------------------------------------------ sheets
+INK = (34, 30, 28)
+MUTED = (110, 104, 98)
+PAPER = (250, 247, 242)
+BAND_COLOURS = {'beige': (224, 138, 46), 'olive': (96, 128, 30), 'grey': (51, 102, 204), 'yellow-green': (181, 23, 158)}
+
+
+def font(size: int, bold: bool = False):
+    for f in ('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf' if bold else '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+              '/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf'):
+        if os.path.exists(f):
+            return ImageFont.truetype(f, size)
+    return ImageFont.load_default()
+
+
+def save_sheet(im: Image.Image, path: Path) -> None:
+    if max(im.size) > 2400:
+        s = 2400 / max(im.size)
+        im = im.resize((int(im.width * s), int(im.height * s)), Image.LANCZOS)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    im.convert('RGB').save(path, quality=85)
+    print('wrote', path, im.size)
+
+
+def fit(arr: np.ndarray, h: int) -> Image.Image:
+    im = Image.fromarray(arr)
+    return im.resize((max(1, int(im.width * h / im.height)), h), Image.LANCZOS)
+
+
+def masked_view(rgb, valid):
+    v = rgb.copy()
+    v[~valid] = (v[~valid] * 0.25 + 150).astype(np.uint8)
+    return v
+
+
+def band_map(rgb, valid):
+    lab4 = srgb_to_lab(down(rgb, 4).astype(np.float64))
+    v4 = down_mask(valid, 4)
+    L, C, h = lch(lab4)
+    base = down(rgb, 4).astype(np.float32)
+    g = base.mean(-1, keepdims=True)
+    out = (0.35 * g + 0.65 * 235).repeat(3, -1)
+    for k, m in bands(L, C, h).items():
+        out[m & v4] = BAND_COLOURS[k]
+    out[~v4] = 200
+    return out.astype(np.uint8)
+
+
+def sat_map(rgb, valid, thr=35):
+    lab4 = srgb_to_lab(down(rgb, 4).astype(np.float64))
+    v4 = down_mask(valid, 4)
+    L, C, h = lch(lab4)
+    base = down(rgb, 4).astype(np.float32)
+    g = base.mean(-1, keepdims=True).repeat(3, -1)
+    out = 0.3 * g + 0.7 * 240
+    m = (C >= thr) & v4
+    out[m] = base[m]
+    out[~v4] = 200
+    return out.astype(np.uint8)
+
+
+def dark_map(rgb, valid, thr=40):
+    lab4 = srgb_to_lab(down(rgb, 4).astype(np.float64))
+    v4 = down_mask(valid, 4)
+    L = lab4[..., 0]
+    base = down(rgb, 4).astype(np.float32)
+    g = base.mean(-1, keepdims=True).repeat(3, -1)
+    out = 0.3 * g + 0.7 * 240
+    m = (L < thr) & v4
+    out[m] = base[m]
+    out[~v4] = 200
+    return out.astype(np.uint8)
+
+
+def label(d: ImageDraw.ImageDraw, xy, text, size=18, fill=INK, bold=False):
+    d.text(xy, text, fill=fill, font=font(size, bold))
+
+
+def images_for_sheets(J: dict, frames: Path):
+    ms = load_mask_spec()
+    items = []
+    for name in POSTERS:
+        rgb, valid = load_image(REFS / name, ms)
+        items.append((POSTERS[name]['city'], name, rgb, valid, J['posters'].get(name, {})))
+    for name, tag in (('v2_t1.0.png', 'v2 S1 (1.0 s)'), ('v2_t36.0.png', 'v2 S8 (36 s)'), ('v3_t13.0.png', 'v3 (13 s)')):
+        if (frames / name).exists():
+            rgb, valid = load_image(frames / name, ms)
+            items.append((tag, name, rgb, valid, J['ours'].get(name, {})))
+    return items
+
+
+def sheet_colour(J, items, out: Path):
+    rowh, thw = 230, 172
+    W = 2400
+    H = 120 + rowh * len(items) + 40
+    im = Image.new('RGB', (W, H), PAPER)
+    d = ImageDraw.Draw(im)
+    label(d, (24, 18), 'Colour, measured: k-means (k 12, CIELAB) on the masked image; swatch width = share. Middle: the house NEVER bands '
+          '(lib/water.tsx neverBand) at phone scale.', 24, bold=True)
+    x = 24
+    for k, c in BAND_COLOURS.items():
+        d.rectangle([x, 62, x + 26, 84], fill=c); label(d, (x + 32, 62), k, 19); x += 32 + 14 * len(k) + 40
+    label(d, (x + 20, 62), 'grey-washed = clean.   Right: hue families (C* >= 6), chroma and darks on the 4x-downsampled image.', 19, MUTED)
+    y = 110
+    for tag, name, rgb, valid, r in items:
+        c = r.get('colour', {})
+        th = fit(masked_view(rgb, valid), rowh - 20)
+        im.paste(th, (24, y))
+        bm = fit(band_map(rgb, valid), rowh - 20)
+        im.paste(bm, (24 + thw + 20, y))
+        x0 = 24 + 2 * thw + 50
+        label(d, (x0, y), tag, 22, bold=True)
+        bw = 1000
+        xx = x0
+        for cl in c.get('clusters', []):
+            w = max(2, int(round(bw * cl['share'] / 100)))
+            rgbc = tuple(int(cl['hex'][i:i + 2], 16) for i in (1, 3, 5))
+            d.rectangle([xx, y + 34, xx + w - 1, y + 104], fill=rgbc)
+            if w >= 64:
+                tl = INK if cl['L'] > 55 else (250, 250, 250)
+                label(d, (xx + 4, y + 38), f"{cl['share']:.0f}%", 17, tl)
+                label(d, (xx + 4, y + 60), f"L{cl['L']:.0f} C{cl['C']:.0f}", 15, tl)
+                label(d, (xx + 4, y + 79), f"h{cl['h']}" + (f" {cl['band']}" if cl['band'] else ''), 15, tl)
+            xx += w
+        f = c.get('families', {}); b = c.get('bands', {}); ch = c.get('chroma', {}); dk = c.get('dark', {}); li = c.get('lightness', {})
+        bwh = c.get('bands_where', {})
+        land = sum(v['below_pct_of_below'] for k, v in bwh.items() if k != 'yellow-green') if bwh else None
+        lines = [f"warm {f.get('warm', 0):.0f} %  cool {f.get('cool', 0):.0f} %  green-olive {f.get('green-olive', 0):.0f} %  neutral (C*<6) {f.get('neutral', 0):.0f} %",
+                 f"C* median {ch.get('p50', 0):.1f}, p90 {ch.get('p90', 0):.1f};  C*>=30 {ch.get('ge30', 0):.1f} %;  pop C*>=50 {ch.get('ge50_pop', 0):.2f} %",
+                 f"L* p5 / p50 / p95 {li.get('p5', 0):.0f} / {li.get('p50', 0):.0f} / {li.get('p95', 0):.0f};  dark L*<40 {dk.get('lt40_pct', 0):.1f} %  (<30 {dk.get('lt30_pct', 0):.1f} %)",
+                 f"never bands: beige {b.get('beige', 0):.1f}  olive {b.get('olive', 0):.1f}  grey {b.get('grey', 0):.1f}  (+ yellow-green {b.get('yellow-green', 0):.1f}) %" +
+                 (f";  below the skyline {land:.0f} %" if land is not None else '')]
+        for i, t in enumerate(lines):
+            label(d, (x0, y + 112 + 24 * i), t, 18)
+        y += rowh
+    save_sheet(im, out)
+
+
+def sheet_maps(J, items, out: Path):
+    colw = 250
+    W = 24 + colw * len(items) + 24
+    hmax = 0
+    maps = []
+    for tag, name, rgb, valid, r in items:
+        s1 = sat_map(rgb, valid); s2 = dark_map(rgb, valid)
+        a = Image.fromarray(s1).resize((colw - 12, int((colw - 12) * s1.shape[0] / s1.shape[1])), Image.LANCZOS)
+        b = Image.fromarray(s2).resize((colw - 12, int((colw - 12) * s2.shape[0] / s2.shape[1])), Image.LANCZOS)
+        maps.append((tag, a, b, r))
+        hmax = max(hmax, a.height)
+    H = 110 + 2 * (hmax + 70) + 20
+    im = Image.new('RGB', (W, H), PAPER)
+    d = ImageDraw.Draw(im)
+    label(d, (24, 14), 'Where the saturation and the darks sit (4x-downsampled; the rest washed out).', 24, bold=True)
+    label(d, (24, 48), 'Top: C* >= 35 (saturated parts; "parts" = connected pieces >= 0.05 % of the frame, "largest" = the biggest one). '
+          'Bottom: L* < 40 (the dark accents).', 18, MUTED)
+    for i, (tag, a, b, r) in enumerate(maps):
+        x = 24 + i * colw
+        c = r.get('colour', {})
+        sp = c.get('saturated_parts', {}); dk = c.get('dark', {})
+        im.paste(a, (x, 110)); im.paste(b, (x, 110 + hmax + 70))
+        label(d, (x, 110 + a.height + 4), tag, 17, bold=True)
+        label(d, (x, 110 + a.height + 26), f"C*>=35 {sp.get('share_c35', 0):.1f}%, {sp.get('parts_ge_0.05pct', 0)} parts, max {sp.get('largest_pct', 0):.1f}%", 14)
+        label(d, (x, 110 + hmax + 70 + b.height + 4), f"L*<40 {dk.get('lt40_pct', 0):.1f} %  ({dk.get('median', {}).get('hex', '')})", 15)
+    save_sheet(im, out)
+
+
+def sheet_patchwork(J, out: Path, frames: Path):
+    from skimage.segmentation import find_boundaries
+    ms = load_mask_spec()
+    picks = [('01_singapore.jpg', 'near patchwork', [0, 1250, 520, 1625]), ('06_copenhagen.jpg', 'water', [0, 1250, 600, 1530]),
+             ('07_kyoto.jpg', 'mid patchwork', [300, 980, 620, 1450]), ('03_hanoi.jpg', 'near patchwork', [400, 1330, 800, 1610]),
+             ('04_buenos_aires.jpg', 'mid-near patchwork', [280, 1150, 700, 1579]), ('02_reykjavik.jpg', 'mid patchwork', [0, 1110, 640, 1290]),
+             ('05_cape_town.jpg', 'mid patchwork', [0, 1180, 560, 1330])]
+    tiles = []
+    for name, rn, box in picks:
+        rgb, valid = load_image(REFS / name, ms)
+        res, seg = patchwork(rgb, valid, box)
+        st = J['posters'][name]['patch'].get(rn, {}).get('straight_steps', {})
+        x0, y0, x1, y1 = box
+        a = rgb[y0:y1, x0:x1].copy()
+        b = cv2.resize(seg.astype(np.float32), (x1 - x0, y1 - y0), interpolation=cv2.INTER_NEAREST).astype(int)
+        ov = a.copy(); ov[find_boundaries(b)] = (255, 0, 170)
+        tiles.append((f"{POSTERS[name]['city']}: {rn}", a, ov, res, st))
+    rgb, valid = load_image(frames / 'v2_t1.0.png', ms)
+    box = [0, 1300, 1080, 1900]
+    res, seg = patchwork(rgb, valid, box)
+    st = J['ours']['v2_t1.0.png']['patch']['ground'].get('straight_steps', {})
+    a = rgb[1300:1900, 0:1080].copy()
+    b = cv2.resize(seg.astype(np.float32), (1080, 600), interpolation=cv2.INTER_NEAREST).astype(int)
+    ov = a.copy(); ov[find_boundaries(b)] = (255, 0, 170)
+    tiles.append(('v2 S1 (1.0 s): the near ground', a, ov, res, st))
+    tw, th = 1150, 380
+    W = 24 + 2 * (tw + 24)
+    rows = (len(tiles) + 1) // 2
+    H = 110 + rows * (th + 110)
+    im = Image.new('RGB', (W, H), PAPER)
+    d = ImageDraw.Draw(im)
+    label(d, (24, 14), 'The geometric patchwork: each crop as drawn (left) and its flat blocks found by segmentation (right, Felzenszwalb on the '
+          'smoothed image).', 23, bold=True)
+    label(d, (24, 48), 'Block width = median segment width as % of the frame width; step = dE76 / |dL*| across the straight (level or plumb) edges, '
+          '5 px either side; soft = steps under dE 10.', 18, MUTED)
+    for i, (tag, a, ov, res, st) in enumerate(tiles):
+        cx = 24 + (i % 2) * (tw + 24)
+        cy = 100 + (i // 2) * (th + 110)
+        sc = min((tw / 2 - 6) / a.shape[1], th / a.shape[0])
+        A = Image.fromarray(a).resize((int(a.shape[1] * sc), int(a.shape[0] * sc)), Image.LANCZOS)
+        B = Image.fromarray(ov).resize((int(a.shape[1] * sc), int(a.shape[0] * sc)), Image.NEAREST)
+        im.paste(A, (cx, cy)); im.paste(B, (cx + A.width + 8, cy))
+        o = res['edge_orient_pct']
+        label(d, (cx, cy + A.height + 6), tag, 19, bold=True)
+        label(d, (cx, cy + A.height + 32), f"blocks {res['segments']}, width {res['w_med_pctW']} % W (IQR {res['w_p25_p75_pctW'][0]}-{res['w_p25_p75_pctW'][1]}); "
+              f"edges level {o['level']} % / plumb {o['plumb']} % / diagonal {o['diag45']} %", 16)
+        if st:
+            label(d, (cx, cy + A.height + 54), f"straight-edge step dE {st['dE_med']} (IQR {st['dE_p25_p75'][0]}-{st['dE_p25_p75'][1]}), |dL*| {st['dL_med']}; "
+                  f"soft (dE < 10) {st['soft_lt10_pct']} %", 16)
+    save_sheet(im, out)
+
+
+def sheet_planes_light(J, out: Path):
+    ms = load_mask_spec()
+    W = 2400
+    im = Image.new('RGB', (W, 1900), PAPER)
+    d = ImageDraw.Draw(im)
+    label(d, (24, 14), 'Translucent planes (a third tone where two overlap) and light (lit face vs shade face), measured.', 24, bold=True)
+    # planes: crops, contrast-stretched x3 around their mean so the steps show, with the profile line drawn
+    pl = [('07_kyoto.jpg', [560, 630, 1206, 800], ('x', 725, 600, 1206)), ('02_reykjavik.jpg', [0, 370, 640, 900], ('y', 90, 380, 900)),
+          ('06_copenhagen.jpg', [400, 770, 760, 1010], ('y', 560, 780, 1010)), ('01_singapore.jpg', [0, 240, 330, 1000], ('y', 60, 250, 1000))]
+    x = 24
+    y0 = 60
+    for name, box, prof in pl:
+        rgb, valid = load_image(REFS / name, ms)
+        x0, y0b, x1, y1 = box
+        a = rgb[y0b:y1, x0:x1].astype(np.float32)
+        m = a.reshape(-1, 3).mean(0)
+        a = np.clip((a - m) * 3 + m, 0, 255).astype(np.uint8)
+        sc = min(560 / a.shape[1], 520 / a.shape[0])
+        A = Image.fromarray(a).resize((int(a.shape[1] * sc), int(a.shape[0] * sc)), Image.LANCZOS)
+        dd = ImageDraw.Draw(A)
+        ax, at, p0, p1 = prof
+        if ax == 'x':
+            dd.line([((p0 - x0) * sc, (at - y0b) * sc), ((p1 - x0) * sc, (at - y0b) * sc)], fill=(255, 0, 170), width=2)
+        else:
+            dd.line([((at - x0) * sc, (p0 - y0b) * sc), ((at - x0) * sc, (p1 - y0b) * sc)], fill=(255, 0, 170), width=2)
+        im.paste(A, (x, y0 + 30))
+        label(d, (x, y0), f"{POSTERS[name]['city']} (contrast x3)", 19, bold=True)
+        prf = next((q for q in J['posters'][name].get('planes', []) if q['axis'] == ax and q['at'] == at), None)
+        if prf:
+            ty = y0 + 30 + A.height + 6
+            for q in prf['plateaus'][:9]:
+                rgbc = tuple(int(q['hex'][i:i + 2], 16) for i in (1, 3, 5))
+                d.rectangle([x, ty, x + 26, ty + 18], fill=rgbc, outline=MUTED)
+                label(d, (x + 32, ty), f"{q['from']}-{q['to']}: L{q['L']:.0f} C{q['C']:.0f} h{q['h']} {q['band']}", 15)
+                ty += 21
+        x += 600
+    # light pairs
+    y = 860
+    label(d, (24, y), 'Light: lit face vs shade face (boxes on the crop; swatches = medians).  Our rig (CRAFT §d.3, v2 STYLE §2): form dL* -7 to -12 '
+          '(v2 paving -9), chroma kept >= 0.95x, hue 5-20 deg toward rose.', 19, bold=True)
+    pairs = []
+    for name, reg in POSTERS.items():
+        for n, (lit, shade) in reg.get('light', {}).items():
+            pairs.append((name, n, lit, shade))
+    x = 24
+    y += 40
+    for name, n, lit, shade in pairs:
+        rgb, valid = load_image(REFS / name, ms)
+        bx0 = max(0, min(lit[0], shade[0]) - 40); by0 = max(0, min(lit[1], shade[1]) - 40)
+        bx1 = min(rgb.shape[1], max(lit[2], shade[2]) + 40); by1 = min(rgb.shape[0], max(lit[3], shade[3]) + 40)
+        a = rgb[by0:by1, bx0:bx1]
+        sc = min(250 / a.shape[1], 300 / a.shape[0])
+        A = Image.fromarray(a).resize((max(1, int(a.shape[1] * sc)), max(1, int(a.shape[0] * sc))), Image.LANCZOS)
+        dd = ImageDraw.Draw(A)
+        for bb, col in ((lit, (255, 200, 0)), (shade, (0, 160, 255))):
+            dd.rectangle([(bb[0] - bx0) * sc, (bb[1] - by0) * sc, (bb[2] - bx0) * sc, (bb[3] - by0) * sc], outline=col, width=2)
+        if x + 280 > W:
+            x = 24; y += 470
+        im.paste(A, (x, y))
+        r = J['posters'][name]['light'].get(n)
+        ty = y + A.height + 6
+        label(d, (x, ty), f"{POSTERS[name]['city']}", 17, bold=True)
+        label(d, (x, ty + 22), n, 15)
+        if r:
+            for j, (k, col) in enumerate((('lit', (255, 200, 0)), ('shade', (0, 160, 255)))):
+                rgbc = tuple(int(r[k][i:i + 2], 16) for i in (1, 3, 5))
+                d.rectangle([x, ty + 46 + 26 * j, x + 40, ty + 68 + 26 * j], fill=rgbc, outline=col, width=2)
+                L_, C_, h_ = r[k + '_LCh']
+                label(d, (x + 48, ty + 48 + 26 * j), f"{k} L{L_:.0f} C{C_:.0f} h{h_}", 15)
+            label(d, (x, ty + 102), f"dL* {r['dL']}, C x{r['C_ratio']}, hue {r['dh']:+d}", 16, bold=True)
+        x += 290
+    save_sheet(im.crop((0, 0, W, y + 470)), out)
+
+
+def sheet_texture(J, out: Path, frames: Path, enc: Path | None):
+    ms = load_mask_spec()
+    items = [(POSTERS[n]['city'], REFS / n, POSTERS[n]['sky'], J['posters'][n]) for n in POSTERS]
+    items.append(('v2 S1 sky', frames / 'v2_t1.0.png', [250, 20, 850, 200], J['ours'].get('v2_t1.0.png', {})))
+    cw = 280
+    W = 24 + cw * len(items) + 24
+    H = 980 if enc else 820
+    im = Image.new('RGB', (W, H), PAPER)
+    d = ImageDraw.Draw(im)
+    label(d, (24, 14), 'Texture: 1:1 crops of open sky (top), the same stretched x8 around its mean (middle), numbers (bottom).', 24, bold=True)
+    label(d, (24, 48), 'Grain = std of L* minus its blur (sigma 4 px) in flat windows; size = FWHM of its autocorrelation. Mottling = '
+          'L* minus a quadratic surface, blurred (sigma 4): std, p1-p99 range, 1/e radius.', 17, MUTED)
+    for i, (tag, path, box, r) in enumerate(items):
+        rgb, valid = load_image(path, ms)
+        x0, y0, x1, y1 = box
+        cx, cy = (x0 + x1) // 2, (y0 + y1) // 2
+        s = 128 if 'v2' not in tag else 90
+        a = rgb[cy - s:cy + s, cx - s:cx + s]
+        A = Image.fromarray(a).resize((cw - 24, cw - 24), Image.NEAREST)
+        f = a.astype(np.float32)
+        m = f.reshape(-1, 3).mean(0)
+        B = Image.fromarray(np.clip((f - m) * 8 + 128, 0, 255).astype(np.uint8)).resize((cw - 24, cw - 24), Image.NEAREST)
+        x = 24 + i * cw
+        im.paste(A, (x, 90)); im.paste(B, (x, 90 + cw))
+        g = r.get('grain', {}).get('sky') or r.get('grain', {}).get('all', {})
+        mo = r.get('mottling_sky', {})
+        ty = 90 + 2 * cw - 10
+        label(d, (x, ty), tag, 18, bold=True)
+        label(d, (x, ty + 24), f"grain {g.get('L_std', '-')} L*, {g.get('fwhm_px', '-')} px", 15)
+        label(d, (x, ty + 44), f"chroma/L {g.get('chroma_to_L', '-')}", 15)
+        if mo:
+            label(d, (x, ty + 64), f"mottle {mo.get('L_std')} L* (p1-99 {mo.get('L_p2p_p1_p99')})", 15)
+            label(d, (x, ty + 84), f"scale {mo.get('scale_px_1e')} px; col/row {mo['row_vs_col_std'][1]}/{mo['row_vs_col_std'][0]}", 15)
+        label(d, (x, ty + 104), f"(crop {2 * s} px{' , v2 at 1080' if 'v2' in tag else ''})", 13, MUTED)
+    if enc and (enc / 'encode_test.json').exists():
+        E = json.loads((enc / 'encode_test.json').read_text())
+        ty = H - 160
+        label(d, (24, ty), f"Through H.264 (v2 S1 frame panning 30 px/s, 60 fps; texture grain {E['grain_L']} L* sigma {E['grain_sigma_px']} px + mottle "
+              f"{E['mottle_L']} L* sigma {E['mottle_sigma_px']} px): master CRF 14 kbps; texture left after a 3.5 Mbps / 720p 1.5 Mbps re-encode; frame-to-frame |dL*|", 16, bold=True)
+        A0 = E['conditions'].get('A_flat', {})
+        for j, (k, c) in enumerate(E['conditions'].items()):
+            def ret(tag):
+                src = math.sqrt(max(0, c['source_hp_std'] ** 2 - A0.get('source_hp_std', 0) ** 2))
+                got = math.sqrt(max(0, c[f'{tag}_hp_std'] ** 2 - A0.get(f'{tag}_hp_std', 0) ** 2))
+                return f"{100 * got / src:.0f}%" if src > 0.01 else '-'
+            txt = (f"{k}: master {c['master_kbps']:.0f} kbps; grain kept {ret('p1080')} at 1080, {ret('p720')} at 720; "
+                   f"temporal |dL*| master {c['master_temporal_dL']}, 1080 {c['p1080_temporal_dL']}, 720 {c['p720_temporal_dL']}")
+            label(d, (24, ty + 28 + 22 * j), txt, 15)
+    save_sheet(im, out)
+
+
+def sheet_sky_water(J, out: Path, frames: Path):
+    ms = load_mask_spec()
+    W = 2400
+    im = Image.new('RGB', (W, 1500), PAPER)
+    d = ImageDraw.Draw(im)
+    label(d, (24, 14), 'Sky: each poster\'s open-sky column from the frame top (top) to the skyline (bottom), as measured row medians, and its L* curve '
+          '(shared axis, L* 76-96).', 22, bold=True)
+    skies = [(POSTERS[n]['city'], J['posters'][n].get('sky_profile')) for n in POSTERS]
+    skies.append(('v2 S1', J['ours'].get('v2_t1.0.png', {}).get('sky_profile')))
+    x = 24
+    for tag, sp in skies:
+        if not sp:
+            continue
+        rows = np.array(sp['rows'])
+        h = 360
+        strip = np.zeros((h, 70, 3), np.uint8)
+        for i in range(h):
+            j = min(len(rows) - 1, int(i / h * len(rows)))
+            strip[i, :] = lab_to_srgb(np.array([rows[j][1], rows[j][4], rows[j][5]])).round().astype(np.uint8)
+        im.paste(Image.fromarray(strip), (x, 60))
+        # L* curve
+        px0 = x + 80
+        d.rectangle([px0, 60, px0 + 150, 60 + h], outline=(200, 195, 190))
+        for Lg in (80, 85, 90, 95):
+            gx = px0 + (Lg - 76) / 20 * 150
+            d.line([(gx, 60), (gx, 60 + h)], fill=(225, 220, 214))
+            label(d, (gx - 8, 60 + h + 2), str(Lg), 12, MUTED)
+        pts = [(px0 + (r[1] - 76) / 20 * 150, 60 + (i / max(1, len(rows) - 1)) * h) for i, r in enumerate(rows)]
+        d.line(pts, fill=INK, width=2)
+        label(d, (x, 60 + h + 18), tag, 17, bold=True)
+        label(d, (x, 60 + h + 40), f"top {sp['top']['hex']} L{sp['top']['L']:.0f} C{sp['top']['C']:.0f} h{sp['top']['h']}", 14)
+        label(d, (x, 60 + h + 58), f"low {sp['low']['hex']} L{sp['low']['L']:.0f} C{sp['low']['C']:.0f} h{sp['low']['h']}", 14)
+        label(d, (x, 60 + h + 76), f"dL* {sp['dL_top_to_low']:+}, dC* {sp['dC_top_to_low']:+}", 14)
+        x += 290
+    # water crops
+    y = 580
+    label(d, (24, y), 'Water: how each poster builds it (1:1 crops scaled to fit), and v2\'s approved water (lib/water.tsx) for comparison.', 22, bold=True)
+    wl = [('07_kyoto.jpg', [600, 1100, 1206, 1420]), ('06_copenhagen.jpg', [0, 1230, 700, 1540]), ('01_singapore.jpg', [180, 1140, 720, 1420]),
+          ('03_hanoi.jpg', [220, 1150, 1010, 1440]), ('05_cape_town.jpg', [0, 940, 560, 1220])]
+    x = 24; y += 40
+    for name, box in wl:
+        rgb, valid = load_image(REFS / name, ms)
+        x0, y0, x1, y1 = box
+        a = rgb[y0:y1, x0:x1]
+        sc = 330 / a.shape[0]
+        A = Image.fromarray(a).resize((int(a.shape[1] * sc), 330), Image.LANCZOS)
+        if x + A.width > W - 24:
+            x = 24; y += 400
+        im.paste(A, (x, y))
+        ws = J['posters'][name].get('water', {})
+        k0 = next(iter(ws.values()), {})
+        label(d, (x, y + 334), f"{POSTERS[name]['city']}: level/plumb edge energy {k0.get('level_vs_plumb_edge_energy', '-')}"
+              + (f", mirror corr {k0['src_vs_water_col_corr']}" if 'src_vs_water_col_corr' in k0 else ''), 15)
+        x += A.width + 20
+    rgb, valid = load_image(frames / 'v2_t1.0.png', ms)
+    a = rgb[1000:1300, 0:1080]
+    A = Image.fromarray(a).resize((int(1080 * 330 / 300), 330), Image.LANCZOS)
+    if x + A.width > W - 24:
+        x = 24; y += 400
+    im.paste(A, (x, y))
+    k0 = J['ours'].get('v2_t1.0.png', {}).get('water', {}).get('canal (lib/water)', {})
+    label(d, (x, y + 334), f"v2 S1 (approved): level/plumb {k0.get('level_vs_plumb_edge_energy', '-')}", 15)
+    save_sheet(im.crop((0, 0, W, y + 370)), out)
+
+
+def sheet_type(J, out: Path):
+    ms = load_mask_spec()
+    W = 2400
+    im = Image.new('RGB', (W, 1200), PAPER)
+    d = ImageDraw.Draw(im)
+    label(d, (24, 14), 'Type: the posters\' titles at 2x (left), measured (right). Gap and pitch as % of the cap height; position as % of the poster.', 22, bold=True)
+    y = 60
+    for n in POSTERS:
+        t = J['posters'][n].get('title')
+        if not t:
+            continue
+        rgb, valid = load_image(REFS / n, ms)
+        x0, y0, x1, y1 = t['box']
+        a = rgb[y0 - 14:y1 + 14, x0 - 30:x1 + 30]
+        A = Image.fromarray(a).resize((a.shape[1] * 2, a.shape[0] * 2), Image.LANCZOS)
+        if A.width > 1400:
+            A = A.resize((1400, int(A.height * 1400 / A.width)), Image.LANCZOS)
+        im.paste(A, (24, y))
+        c = t['colour']
+        rgbc = tuple(int(c['hex'][i:i + 2], 16) for i in (1, 3, 5))
+        d.rectangle([1450, y + 6, 1490, y + 46], fill=rgbc)
+        label(d, (1500, y), f"{POSTERS[n]['city']}: cap {t['cap_px']:.0f} px ({t['cap_pct_W']} % W), stroke {t['stroke_pct_cap']} % cap", 17, bold=True)
+        label(d, (1500, y + 24), f"letter gap {t['letter_gap_pct_cap']:.0f} %, pitch {t['pitch_pct_cap']:.0f} %" +
+              (f", word gap {t['word_gap_pct_cap']:.0f} %" if t.get('word_gap_pct_cap') else '') + f"; width {t['width_pct_W']} % W", 16)
+        label(d, (1500, y + 46), f"ink {c['hex']} L{c['L']:.0f} C{c['C']:.0f} h{c['h']} on {t['sky_under']['hex']}: {t['contrast_on_sky']}:1; "
+              f"y {t['y_centre_pct_content']} % of the height", 16)
+        y += max(A.height, 76) + 22
+    save_sheet(im.crop((0, 0, W, y + 10)), out)
+
+
+def cmd_sheets(a) -> None:
+    J = json.loads(Path(a.json).read_text())
+    img = Path(a.img)
+    frames = Path(a.frames)
+    items = images_for_sheets(J, frames)
+    sheet_colour(J, items, img / 'style_colour.jpg')
+    sheet_maps(J, items, img / 'style_saturation_darks.jpg')
+    sheet_patchwork(J, img / 'style_patchwork.jpg', frames)
+    sheet_planes_light(J, img / 'style_planes_light.jpg')
+    enc = Path(a.json).parent / 'enc'
+    sheet_texture(J, img / 'style_texture.jpg', frames, enc if enc.exists() else None)
+    sheet_sky_water(J, img / 'style_sky_water.jpg', frames)
+    sheet_type(J, img / 'style_type.jpg')
+
+
 # -------------------------------------------------------------------------------------------------------- dna
 DNA = {  # scripts/look/palette_board.py's house DNA (kept in step with it)
     'bg': lambda L, C: L >= 75 and C <= 20,
