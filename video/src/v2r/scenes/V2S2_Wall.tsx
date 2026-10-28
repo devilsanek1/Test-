@@ -30,7 +30,9 @@ type Level = keyof typeof S2_WALL.levels;
 
 /** S2's atmosphere (lib/depth): the air = the converted sky's lowest colour behind the far end (THROUGHLINE §5b,
  *  RESUME 2026-10-28: `horizonColor`; world/skies S2_AIR). */
-export const S2_ATM = makeAtmosphere({name: 'canal S2', air: S2_AIR});
+// The steps: S1's far steps (V2S1_set_core S1_ATM: +3 / +4 converge on the air), +2 eased (the far bays' peach stucco
+// already sits near the air: the ladder needs room, as the environment tier's chroma cut floors the farthest at ~dE 4).
+export const S2_ATM = makeAtmosphere({name: 'canal S2', air: S2_AIR, steps: [0, 0.12, 0.15, 0.6, 0.9], hueTurn: 30});
 
 /** The plane of a wall column position u (steps on the fins at u = 2.5, 6.5, 14.5). */
 export const wallPlane = (u: number): number => (u <= 2.5 ? 0 : u <= 6.5 ? 1 : u <= 14.5 ? 2 : 3);
@@ -141,6 +143,8 @@ const litAt = (t: number, c: number, row: 'first' | 'ground') => {
 /** The lit staff panes (CRAFT §d: L* 85-92, flat, no glow): lamp-lit before 8.96, then ONE step to a cooler white. */
 export const STAFF_PANE_LIT = CM.lamp;
 export const STAFF_PANE_COOL = '#E3EAE6';
+/** The staff windows' mullion and transom: shadeCool one step lighter (L* ~62: a value step, over the line mask's 55). */
+const STAFF_MULLION = toneOnTone(CM.shadeCool, {lit: true, dE: 9});
 
 export type S2WallProps = {
   /** The staff panes turn the cooler white at this time (map staffOnAt 8.96, 0.04 s apart). */
@@ -157,7 +161,8 @@ export const S2Wall: React.FC<S2WallProps> = ({staffCoolAt = MAP.S2.staffOnAt, s
   const uEnd = s2u(1120);
   const stat = useMemo(() => {
     const b = new Batch();
-    // ---- the tiers (one plane farther than the wall in front of them): far rows first
+    // ---- the tiers (conform_L2 §10: '+2 the stepped tiers'; two planes farther than the wall in front of them, at
+    // least +2, at most +4): far rows first
     for (let k = TIER_ROWS.length - 1; k >= 0; k--) {
       const row = TIER_ROWS[k];
       for (let i = 0; i < TIER_STEPS.length; i++) {
@@ -165,18 +170,21 @@ export const S2Wall: React.FC<S2WallProps> = ({staffCoolAt = MAP.S2.staffOnAt, s
         const u1 = Math.min(u1Raw, uEnd);
         if (u0 >= uEnd) break;
         const top = top0 + row.dy;
-        const p = Math.min(4, wallPlane((u0 + u1) / 2) + 1);
+        const p = Math.min(4, Math.max(2, wallPlane((u0 + u1) / 2) + 2));
         // the block runs from its flat top down behind the parapet (the wing covers its foot)
         const bot = (u: number) => s2y('coping', u);
         const visible = (u: number) => top < s2y('parapet', u) - 2;
         if (!visible(u0) && !visible(u1)) continue;
-        b.poly(wallCol(row.mat, p), bandPts(() => top, bot, u0, u1));
+        // each setback shows as ONE flat block (the nearer rows sit behind it), so it converges straight on the air
+        // (`recede`: planePalette would pull it toward the palette's mean, not the air, and the far tiers stop stepping)
+        const tierC = recede(row.mat, p, S2_ATM);
+        b.poly(tierC, bandPts(() => top, bot, u0, u1));
         // the lit sliver on the block's sun side (west = left): 4 px of the block's own colour a step lighter
         const xl = s2x(u0);
-        b.poly(toneOnTone(wallCol(row.mat, p), {lit: true, dE: 4}), [[xl, top], [xl + 4, top], [xl + 4, s2y('parapet', u0)], [xl, s2y('parapet', u0)]]);
+        b.poly(toneOnTone(tierC, {lit: true, dE: 4}), [[xl, top], [xl + 4, top], [xl + 4, s2y('parapet', u0)], [xl, s2y('parapet', u0)]]);
         // tone-on-tone rows of tiny windows (none on +4)
         if (p < 4) {
-          const wallC = wallCol(row.mat, p);
+          const wallC = tierC;
           for (let u = u0 + 0.2; u < u1 - 0.1; u += 0.34) {
             const g = s2g(u);
             const ww = Math.max(2, 8 * g * g);
@@ -260,8 +268,20 @@ export const S2Wall: React.FC<S2WallProps> = ({staffCoolAt = MAP.S2.staffOnAt, s
       sb.rect(st === 'cool' ? STAFF_PANE_COOL : STAFF_PANE_LIT, x0, y0, w.w, w.h);
       if (st === 'lit') sb.rect(CM.lampCore, x0 + w.w * 0.12, y0 + w.h * 0.1, w.w * 0.76, w.h * 0.45);
     }
-    sb.rect(CM.shadeCool, x0 + w.w * 0.5 - 2, y0, 4, w.h);
-    sb.rect(CM.shadeCool, x0, y0 + w.h * 0.2, w.w, 3);
+    // the mullion and transom (on the staff panes a value step lighter than shadeCool: inner details, never dark
+    // lines); the staff panes' frame in shadeCool, 5 px inside the pane: the A windows' crisp edge (CRAFT §c: tier A
+    // carries its edge), parting the pane from the pale limestone piers and sill it sits against. Her window keeps
+    // shadeCool on its plum pane and its own A outline.
+    const mullC = staffIdx >= 0 ? STAFF_MULLION : CM.shadeCool;
+    sb.rect(mullC, x0 + w.w * 0.5 - 2, y0, 4, w.h);
+    sb.rect(mullC, x0, y0 + w.h * 0.2, w.w, 3);
+    if (staffIdx >= 0) {
+      const f = 5;
+      sb.rect(CM.shadeCool, x0, y0, w.w, f);
+      sb.rect(CM.shadeCool, x0, y0 + w.h - f, w.w, f);
+      sb.rect(CM.shadeCool, x0, y0, f, w.h);
+      sb.rect(CM.shadeCool, x0 + w.w - f, y0, f, w.h);
+    }
     sb.rect(CM.limestone, x0 - 8, y0 + w.h, w.w + 16, 7);
     return {w, sb};
   });
