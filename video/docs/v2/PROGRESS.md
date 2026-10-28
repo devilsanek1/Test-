@@ -2,6 +2,15 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 16:55 UTC: G5 assembly v1 + the review
+
+`deliverables/v2/v2r_G5_assembly_v1.mp4` (39.083 s, 60 fps, the mix): gate_check PASS (0 fail / 4 warn), A/V sync PASS, lints PASS,
+check_depth PASS, check_light 15/17 (f1404, f2040), banding sky 35 PASS + water 11/11; `docs/v2/ASSEMBLY.md`. The fresh review
+(`docs/v2/REVIEW_1.md`): story understood; "nothing structural is wrong"; 6 MUSTs, 3 of them the owner's own newer playbook rules:
+(1) no frame-0 title over the captions, (2) a bold visible draw-on at frame 0, (3) fine print cut and never the same words twice,
+(4) S6 / S7 boards lowered so the sun is no ball on the rail, (5) the two dark push-throughs slower (no blink), (6) S8's hairline
+copies drawn as S1's solid copies. Fix pass A (1, 2, 5) starts now; B (3, 4, 6 + cheap SHOULDs) after it; then the sound re-time + mix.
+
 ## Snapshot 2026-10-28 16:21 UTC (hourly)
 
 DONE 15:57: the shared water in S2, S3, S4 and S5, and S8's seam fixed (`docs/v2/water/SWAPS.md`, 01afb08). Running: the full 60 fps
