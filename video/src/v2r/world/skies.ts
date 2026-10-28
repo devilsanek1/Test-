@@ -115,3 +115,22 @@ export const S3_SUNSET = eveningSky({band: CM.sky, horizon: SUNSET_HORIZON, hori
 
 /** The far haze of S3's west gap (the sky's lowest colour under SUN3): lib/depth's air for the far city and the roofs. */
 export const S3_AIR = horizonColor(S3_SUNSET, 96);
+
+// ---------------------------------------------------------------- L3: S4 (the walk home, the low sun before sunset)
+// S4_SKY  her towpath from the water, looking north while the camera trucks west: the same golden evening as S1 / S2
+//         (THROUGHLINE §5b: S4's gold band; S1_HORIZON as S2 uses it): the caption field's mint flat through the band,
+//         a pale warm light band at y ~668, the warm horizon at y 760 behind the far roofs (the viaduct's parapet hides
+//         everything below y ~745). SUN1 (250, 650) r 65 is the sun the S4 -> S5 push-through dives into, so this sky
+//         carries its warmth (RESUME 2026-10-28: "the warmth is the sky's"), low and wide: 280 x 100 (ry 0.36 rx)
+//         centred 70 px UNDER the disc's centre, behind the far roofs, so the disc's lower half sits in peach and its
+//         top in the pale light band; its top arc (y 620) stays under the mint. skyProblems [] with the yellow-green
+//         crossing at C* 5.94 (a warmth centred on the disc this high in the ramp turns khaki: L5's note above; a
+//         horizon at 780 with the warmth at 700 crossed at 7.6). The disc stays the set's flat SunDisc on top, no halo;
+//         the sky does not truck (it is at infinity: drawn outside every plane's slide).
+// S4_AIR  the far haze under SUN1 (the sky's lowest colour warmed under the sun): lib/depth's air for S4's far planes.
+// Wired (L3, V2S4.tsx): <Sky spec={S4_SKY} /> first in the shot, the World's flat [mint, gold] steps gone.
+export const S4_SKY = eveningSky({band: CM.sky, horizon: S1_HORIZON, horizonY: 760, sun: {x: 250, y: 720, rx: 280, ry: 100}});
+
+/** The far haze of S4 (the sky's lowest colour under SUN1): lib/depth's air for the far roofs, the gasholders and the
+ *  terrace backs. */
+export const S4_AIR = horizonColor(S4_SKY, 250);

@@ -17,6 +17,8 @@
 import React from 'react';
 import {World} from '../../lib/World';
 import {TimeShift} from '../../lib/time';
+import {Sky} from '../../lib/sky';
+import {S4_SKY} from '../world/skies';
 import {CM} from '../palette';
 import * as MAP from '../world/map';
 import {CanalCast} from '../kit/canal/slots';
@@ -36,6 +38,9 @@ export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
 const Shot: React.FC = () => (
   <CanalCast person={k4Person}>
+    {/* the sky (no truck: it is at infinity): ONE continuous, gentle, dithered sky (lib/sky; world/skies S4_SKY) carrying
+        SUN1's warmth low and wide; then the flat disc, no halo */}
+    <Sky spec={S4_SKY} />
     <SunDisc x={MAP.S4.sunAtPose.x} y={MAP.S4.sunAtPose.y} r={MAP.S4.sunAtPose.r} />
     <S4Far />
     <S4Backs />
@@ -52,7 +57,7 @@ const Shot: React.FC = () => (
 );
 
 const V2S4: React.FC = () => (
-  <World sky={[CM.sky, CM.bandGold]} horizon={1000}>
+  <World sky={CM.sky} horizon={1000}>
     <TimeShift by={-S4_START}>
       <Shot />
     </TimeShift>
