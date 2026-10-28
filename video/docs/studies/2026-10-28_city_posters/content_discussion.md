@@ -6,6 +6,8 @@ AI); data centres and driverless taxis are kinds inside it; every pick needs a W
 data centres (a Cold War bunker, a chapel, a public pool). Three scouts (max effort) are hunting:
 `discussion_scouts/wow_datacentres.md`, `wow_tech_world.md`, `tech_in_cities.md`. Next: edit their finds into the
 umbrella's kinds and a shortlist with the column chart. No pick yet; who produces the video stays the owner's call.
+If the 5-hour limit stops this thread: a self check-in fires at 2026-10-29 02:40 UTC (the window resets 02:30) to
+relaunch any unfinished scout (finish its file, don't restart it) and continue from this line.
 
 Notes: `content_market.md` and `content_fit.md` (the orchestrator's content track, scoped to tech and AI) are folded in
 below; their final versions (pulled ~22:20 UTC) changed nothing here. `content_fit.md`'s best kinds already include two
