@@ -27,7 +27,7 @@
    ]
   },
   {
-   "name": "landing (seated public)",
+   "name": "landing (the water step: Pip, things)",
    "plane": -1,
    "boxes": [
     [
@@ -235,18 +235,19 @@
    "m": 1.7
   },
   {
-   "name": "the ducks (water)",
-   "y": 1182,
-   "px": 24,
+   "name": "the ducks (the far water by the bend)",
+   "y": 1132,
+   "px": 70,
    "m": 0.58
   },
   {
-   "name": "the seated public (our landing, the sitter at x 500)",
-   "y": 1269,
-   "px": 58,
-   "m": 0.95
+   "name": "the people on the bridge (deck, ~4 m up)",
+   "y": 958,
+   "px": 45,
+   "m": 1.7,
+   "level": 4
   }
  ],
  "air_hex": "#FBD9BB",
- "note": "L1: the 3.0 s variant of v2_s1 (her and the first two copies as GrabCut boxes at 3.0 s, fixed seed)."
+ "note": "L1: the 3.0 s variant of v2_s1 (her and the first two copies as GrabCut boxes at 3.0 s, fixed seed). 2026-10-28: the seated public left our bank (the orchestrator's size decision); two people on the bridge (level 4 m) and one through the arch (beyond the bend: off the y-camera, not listed); the ducks at their water's scale."
 }

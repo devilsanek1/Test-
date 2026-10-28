@@ -10,6 +10,7 @@ import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
 import {line, poly, rect as rectInk, arc} from '../../lib/sketch';
 import {Fill} from '../../lib/Fill';
+import {Tier} from '../../lib/tier';
 import {Batch, P, Pt, rng, ovalPath, lobes, lerp, domePath, r1} from '../kit/canal/core';
 import {litAt} from '../kit/canal/life';
 import {Person} from '../kit/cast';
@@ -19,6 +20,7 @@ import {atmos, backing, recede, toneOnTone} from '../../lib/depth';
 import {tierFill} from '../../lib/pen';
 import {mixHex} from '../../lib/light';
 import {floodAt, S1_PALE} from './V2S1_clock';
+import {S1Plane, S1_PLANE} from './V2S1_float';
 
 const S = MAP.S1_SHEET;
 /** The bridge (screen px at zoom 1.00). */
@@ -473,6 +475,18 @@ const RailBirds: React.FC = () => {
   birdsInto(b, t, RAIL_BIRDS, MAP.S1_CLOCK.birdsLiftBridge);
   return <CellPaint b={b} seed="s1railbirds" cell={1000} misreg={0} live />;
 };
+// ---------------------------------------------------------------- two people at rest on the bridge
+
+/** Two people at rest on the bridge's pavement, leaning on the railing (their heads and shoulders above it), at the
+ *  bridge's scale (~27 px/m: the far jogger's), tier C, no lines; far from her (> 300 px), never a dark bun or a long
+ *  dark coat (her look-alike rule). They replace the seated public our bank had (the orchestrator's size decision). */
+const BridgePeople: React.FC = () => (
+  <Tier tier="environment">
+    <Person x={46} y={BRIDGE.deck} h={46} seed="s1/bridge1" ink={0} pose="stand" view="profile" flip traits={{hair: 'short', hairColor: CM.hair[3], coat: CM.sage, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none'}} />
+    <Person x={238} y={BRIDGE.deck} h={44} seed="s1/bridge2" ink={0} pose="stand" view="profile" traits={{hair: 'cap', hatColor: CM.brickLight, hairColor: CM.hair[1], coat: CM.coatOat, coatLen: 'jacket', trousers: CM.line, acc: 'none'}} />
+  </Tier>
+);
+
 // ---------------------------------------------------------------- the west gap
 
 export const S1WestGap: React.FC = () => {
@@ -488,13 +502,20 @@ export const S1WestGap: React.FC = () => {
   }, []);
   return (
     <>
-      <SunDisc />
-      <FarRoofs />
-      <CalmTower />
-      <CellPaint b={body.b} seed="s1bridge/body" cell={90} misreg={0.7} />
-      <Bus />
-      <CellPaint b={rail.b} seed="s1bridge/rail" cell={90} misreg={0} />
-      <RailBirds />
+      <S1Plane plane={S1_PLANE.farRoofs}>
+        <SunDisc />
+        <FarRoofs />
+      </S1Plane>
+      <S1Plane plane={S1_PLANE.farTower}>
+        <CalmTower />
+      </S1Plane>
+      <S1Plane plane={S1_PLANE.bridge}>
+        <CellPaint b={body.b} seed="s1bridge/body" cell={90} misreg={0.7} />
+        <Bus />
+        <BridgePeople />
+        <CellPaint b={rail.b} seed="s1bridge/rail" cell={90} misreg={0} />
+        <RailBirds />
+      </S1Plane>
     </>
   );
 };

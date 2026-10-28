@@ -294,7 +294,7 @@ export const s1JogX = (t: number) => S1_JOG.x0 + ((S1_JOG.x1 - S1_JOG.x0) * (t -
 export const S1FarLife: React.FC = () => {
   const t = useTime();
   const id = 's1jogclip';
-  if (t < S1_JOG.t0 - 0.2 || t > S1_JOG.t1 + 0.2) return null;
+  const jog = t >= S1_JOG.t0 - 0.2 && t <= S1_JOG.t1 + 0.2;
   return (
     <>
       <defs>
@@ -303,7 +303,9 @@ export const S1FarLife: React.FC = () => {
         </clipPath>
       </defs>
       <g clipPath={`url(#${id})`}>
-        <Person x={s1JogX(t)} y={S1_JOG.feet} h={S1_JOG.h} seed="s1/jog1" ink={0} pose="jog" view="profile" flip={false} walk={{rate: 2.6}} traits={{hair: 'cap', hatColor: CM.coatSlate, hairColor: CM.hair[1], coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none', shoes: CM.paper}} />
+        {/* someone at rest on the far bank beyond the bridge, seen through its arch (the jogger's scale, ~29 px/m) */}
+        <Seated x={70} y={S1_JOG.feet - 2} h={34} seed="s1/archSitter" turn={0} ink={0} traits={{hair: 'long', hairColor: CM.hair[2], coat: CM.brickLight, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none'}} />
+        {jog ? <Person x={s1JogX(t)} y={S1_JOG.feet} h={S1_JOG.h} seed="s1/jog1" ink={0} pose="jog" view="profile" flip={false} walk={{rate: 2.6}} traits={{hair: 'cap', hatColor: CM.coatSlate, hairColor: CM.hair[1], coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none', shoes: CM.paper}} /> : null}
       </g>
     </>
   );
@@ -335,7 +337,8 @@ export const S1PlaneBranch: React.FC = () => {
     {k: 0.78, R: 46, deg: 120, col: CM.leafGold, side: 1},
     {k: 0.98, R: 44, deg: 40, col: CM.leafRust, side: 0},
   ];
-  let stemD = `M${P(...at(0))}`;
+  // the stem runs on off the left edge (overscan: the branch is a near twig and floats the most)
+  let stemD = `M-70 24L${P(...at(0))}`;
   for (let k = 0.05; k <= 1.001; k += 0.05) stemD += `L${P(...at(k))}`;
   const fills: React.ReactNode[] = [];
   let ribs = '';
