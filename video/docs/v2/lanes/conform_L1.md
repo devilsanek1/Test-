@@ -71,3 +71,18 @@ ears-cover on "life" (its one reaction).
 - `scripts/qa/retro_tools/line/measure.py` at 3.0 and 5.3: strokes <= 80 / Mpx, near-miss ends <= 40, dark-line <= 3 %.
 - Eye check at phone size every 1 s (her / W / the row); movers at 2.0-3.0 <= 3; stills at f0 (lines and pale shapes
   only, the sun aside), f9 and 5.3 (no stranger's back; y 317-556 pure sky); `npx tsc --noEmit -p .` clean; REQUEST lines.
+
+## 11. Depth tooling + the particles slot (2026-10-27; `src/lib/DEPTH.md`, CRAFT §f, THROUGHLINE §5b)
+Your S1 depth pass is by hand; the engine has landed, so pull it where it saves work:
+- **The slot:** fill `S1Particles` (V2S1.tsx) with `<Particles>` from `src/lib/particles.tsx`, inside the `<Lit>`, `t0`
+  0.30 (after the flood), `joins` [6.10], `avoid` [CAPTION_BAND, her box]: `motes` over the west gap on the far rows'
+  shade (`sun` = SUN0), `glints` in `glitterPath({x: 196, yFar: ~1112, yNear: ~1212})` with `horizon` 965, one
+  `leaves` from the plane branch falling down the left gutter (x < 95, `floor` the bottom). This is the owner's newer
+  note: §6's cut water glints come back ONLY as this small field. `particleProblems(fields, {joins: [6.1]})` clean.
+- **Haze:** `atmos(c, k, S1_HAZE)` (`lib/depth`) in place of `hazeBatch`'s sRGB `mixHex`: same k, but a far brick
+  converges on the air instead of greying; behind the pale wing the far city reads from +3 (`planePalette` merges a far
+  row's materials into 2-3 close values).
+- **The corner:** `backing(tierFill(stucco, 'environment'), farField, {tier: 'environment'})` gives the far silhouette's
+  value behind the lit fin (>= 15 L* SHOWN, the pen's pull included).
+- **Check:** copy `scripts/qa/depth_sheets/v2_g4_look_s1.json` to `v2_s1.json` with your two-point VPs and the
+  current planes, then `check_depth.py` at 3.0 and 5.4: no FAIL (the G4 clip FAILs all three: no air, melts, elevation).

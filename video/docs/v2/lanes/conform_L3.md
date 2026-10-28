@@ -67,3 +67,16 @@ foreground.
 - Frames 12.95 / 12.98 / 13.00 (M and Pip in the same spot), 14.71 / 14.86 / 15.01 (into her, out of her) and 20.40 /
   20.55 / 20.70 (into the sun); a still at 16.0 and 19.9 showing her far window.
 - Eye check at phone size every 1 s; movers <= 3; no stranger's back; `npx tsc --noEmit -p .` clean; REQUEST lines.
+
+## 6. Depth + particles (2026-10-27; CRAFT §f, `src/lib/DEPTH.md`, THROUGHLINE §5b)
+- **S3 planes:** -2 our towpath, -1 the boat, the water, 0 her terrace (her window M), +1 roofs and chimneys, +2 the far
+  city on the sunset band (the air #F3C6A6): far fills through `recede` / `planePalette`; the towpath's slab joints to
+  its VP (540, 1150) at |ΔL*| >= 6.
+- **S3 particles:** `glints` in the low sun's glitter path on the water, `motes` in her window's spill on the wall's
+  shade; `joins` [0, 1.88].
+- **S4 planes:** -1 the boat, 0 her + towpath + post, +1 the backs (0.6x truck), +2 far roofs and gasholders (0.3x): the
+  truck already IS a multiplane move; give each plane its air step (gold band) and keep her teal and the plates off
+  their field (the backs behind the plates one shade step darker: `backing`).
+- **S4 particles:** `motes` near SUN1, a `leaves` field (1-2) across the towpath, `glints` under SUN1 on the bottom
+  water; entrances never in 20.35-20.75 (`joins` [0, 5.69]).
+- **Check:** `check_depth.py` at 13.5, 17.0 and 19.9 with a sheet per shot: no FAIL.
