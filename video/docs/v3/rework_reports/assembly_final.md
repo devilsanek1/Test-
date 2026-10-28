@@ -18,6 +18,7 @@ Work folder: `/tmp/claude-0/-home-user-Test-/e0b06496-a313-5ced-bf0f-bc634eb1274
   (2) SQE's queue: the vans are small, the subject holds 11-42 % of the top salience (R3-4's push, deferred); (3) at 20.8 the pile is a busy texture of boards for ~0.6 s of the pull-back;
   (4) the payoff's rows are thin 4 px bands, faint at phone size; (5) Pip's look-up at 9.04 and the phone's rest timing (HOME requests 1-2, deferred).
 - Docs: flow_v2 matches the build; POSTING (master facts, cover, alt text, status), OWNER_NOTES (one line), HANDOFF (status) updated; the kit README's stale `Snowfall` example fixed.
+- Git: one commit per step (c23bd54, ad1ab32, ae7426f, 91f581c, bbb0b44 + this line), pushed to video-production; the merge brought only other sessions' v2 work.
 
 ## Step 1: typecheck + flow_v2 (doc only)
 - `npx tsc --noEmit -p .` in `video/` (the project's TypeScript 5.9.3): 0 errors. Note: `npx tsc --noEmit -p video` run from
