@@ -3,10 +3,10 @@
 //   garden walls   y 862-992 at the back: each garden its own (stock brick in three tones, a rendered one, piers with
 //                  stone caps), three wooden gates, iron railings (a calm mid slate, never plum), roses on a trellis,
 //                  ivy spilling over, a pot on the coping
-//   paving         y 992-1070: flagstones laid out from S4_CAM (V2S4_depth): level joints every 0.6 m (rows that
-//                  foreshorten, 12.7 px near -> 6.5 px far) and receding joints every 0.75 m that converge on the shot's
-//                  vanishing point (540, 760) at EVERY frame of the truck (re-projected per frame: their near ends ride the
-//                  plane, their far ends move 0.75x, as the ground does); a manhole, a drain, a few fallen leaves
+//   paving         y 992-1070: flagstones in long courses laid out from S4_CAM (V2S4_depth): receding joints every
+//                  0.75 m that converge on the shot's vanishing point (540, 760) at EVERY frame of the truck (re-projected
+//                  per frame: their near ends ride the plane, their far ends move 0.75x, as the ground does) and narrow
+//                  with distance (75 -> 56 px apart, 3.6 -> 2.7 px wide); a manhole, a drain, a few fallen leaves
 //   coping         y 1070-1082: one stone band and its lip; three bollards
 //   furniture      heritage lamp posts (off: low sun), a planter of grasses, a litter bin, a lifebuoy on its post, the
 //                  reader's bench, the angler, the heron (still)
@@ -46,8 +46,8 @@ const SEGS: Seg[] = [
   {x0: 128, x1: 300, kind: 'trellis', c: CM.stucco},
   {x0: 300, x1: 352, kind: 'gate', c: CM.brickDeep, gate: GATE_SLATE},
   {x0: 352, x1: 566, kind: 'railing', c: CM.brickLight},
-  {x0: 566, x1: 690, kind: 'brick', c: CM.brickDeep},
-  {x0: 690, x1: 830, kind: 'brick', c: CM.brick, pot: true},
+  {x0: 566, x1: 690, kind: 'brick', c: CM.brickLight},
+  {x0: 690, x1: 830, kind: 'render', c: CM.stucco, pot: true},
   {x0: 830, x1: 882, kind: 'gate', c: CM.brick, gate: CM.sage},
   {x0: 882, x1: 1110, kind: 'brick', c: CM.brickLight, ivy: true},
   {x0: 1110, x1: 1250, kind: 'render', c: CM.limestone},
@@ -121,31 +121,20 @@ function wallsInto(b: Batch) {
 /** The towpath's depth from S4_CAM: the coping (y 1070) is 14.0 m away, the wall foot (y 992) 18.7 m. */
 const Z_NEAR = S4_CAM.z(COP);
 const Z_FAR = S4_CAM.z(FOOT);
-/** Level joints every 0.6 m (y of each row, near -> far, inside the towpath). */
-const ROWS_Y: number[] = (() => {
-  const out: number[] = [];
-  for (let z = Z_NEAR + 0.6; z < Z_FAR - 0.15; z += 0.6) out.push(S4_CAM.y(z));
-  return out;
-})();
 /** Receding joints every 0.75 m along the towpath (their near ends, plane x at the pose: 75 px at 100 px/m). */
 const JOINTS_X: number[] = (() => {
   const out: number[] = [];
   for (let x = X0 - 400; x < X1 + 120; x += 75) out.push(x);
   return out;
 })();
-/** The joints' tones: the receding ones a visible joint (dL* 9, CRAFT §f.4: >= 6 reads), the level ones a soft one (dL* 5)
- *  so the rows foreshorten without stacking the ground into level bands. */
-const JOINT_DEEP = seamTone(CM.paving, 9);
-const JOINT_SOFT = seamTone(CM.paving, 5);
+/** The joints' tone: a visible joint (dL* 11, 3.6 px near, 2.7 px far: CRAFT §f.4, >= 6 or a band >= 3 px reads). The
+ *  flags run in long courses INTO the picture (no level joints: level rows crossing every 7-13 px chopped the receding
+ *  joints into pieces too short to read as perspective, and stacked the ground into level bands). */
+const JOINT_DEEP = seamTone(CM.paving, 11);
 
 function groundInto(b: Batch) {
   b.rect(CM.paving, X0, FOOT, X1 - X0, COP - FOOT + 1);
   b.layer();
-  // the level joints: thin soft bands, narrowing with distance
-  for (const y of ROWS_Y) {
-    const w = 1.2 + 1.1 * ((y - FOOT) / (COP - FOOT));
-    b.rect(JOINT_SOFT, X0, y - w / 2, X1 - X0, w);
-  }
   // a manhole cover and a drain grate: flat foreshortened shapes on the flags (no hatching)
   b.poly(CM.stoneShade, [[920, 1026], [978, 1026], [982, 1044], [916, 1044]]);
   b.poly(CM.limestone, [[925, 1029], [973, 1029], [976, 1041], [922, 1041]]);
@@ -176,7 +165,7 @@ function jointsBatch(dx: number): Batch {
     const sf = vx + (sn - vx) * k;
     if (Math.max(sn, sf) < -20 || Math.min(sn, sf) > 1100) continue;
     const xf = sf - dx;
-    const wn = 2.6;
+    const wn = 3.6;
     const wf = wn * k;
     b.poly(JOINT_DEEP, [[xn - wn / 2, COP], [xn + wn / 2, COP], [xf + wf / 2, FOOT], [xf - wf / 2, FOOT]]);
   }

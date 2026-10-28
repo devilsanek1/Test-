@@ -1,0 +1,176 @@
+{
+ "name": "v2 S4 'The walk home' @17.0 s (Film2R; lane L3's art conform): the truck, the name tag up",
+ "units": "px",
+ "air_hex": "#FCD7B9",
+ "air_note": "S4_AIR = horizonColor(S4_SKY, 250) (world/skies.ts): the sky's lowest colour warmed under SUN1, the far planes' air (V2S4_depth S4_ATM)",
+ "planes": [
+  {
+   "name": "our narrowboat's cabin side (screen-fixed: it glides with us)",
+   "plane": -1,
+   "boxes": [
+    [
+     0,
+     1300,
+     1080,
+     1630
+    ]
+   ]
+  },
+  {
+   "name": "the near water below our hull (the isolated placeholder)",
+   "plane": -1,
+   "role": "ground",
+   "boxes": [
+    [
+     0,
+     1724,
+     1080,
+     1900
+    ]
+   ]
+  },
+  {
+   "name": "the canal strip",
+   "plane": -0.5,
+   "role": "ground",
+   "boxes": [
+    [
+     0,
+     1094,
+     1080,
+     1210
+    ]
+   ],
+   "exclude": [
+    [
+     380,
+     1094,
+     560,
+     1210
+    ],
+    [
+     900,
+     1094,
+     1080,
+     1210
+    ]
+   ]
+  },
+  {
+   "name": "her towpath and its garden walls (the subject's plane: her, the post, the pair)",
+   "plane": 0,
+   "role": "subject",
+   "boxes": [
+    [
+     0,
+     866,
+     1080,
+     1066
+    ]
+   ]
+  },
+  {
+   "name": "the terrace backs and her end house (0.6x the truck; the atmosphere's +2 step)",
+   "plane": 2,
+   "boxes": [
+    [
+     0,
+     652,
+     80,
+     742
+    ],
+    [
+     470,
+     806,
+     1080,
+     852
+    ],
+    [
+     470,
+     640,
+     585,
+     800
+    ]
+   ]
+  },
+  {
+   "name": "the far roofs, the gasholders and the viaduct (0.3x the truck; +3.5: behind a pale subject plane the far city starts at +3)",
+   "plane": 3.5,
+   "boxes": [
+    [
+     190,
+     752,
+     320,
+     788
+    ]
+   ]
+  }
+ ],
+ "silhouettes": [
+  {
+   "name": "her (walking / standing on her towpath)",
+   "tier": "A",
+   "grab": [
+    682,
+    894,
+    764,
+    1078
+   ],
+   "roi": [
+    [
+     656,
+     894,
+     792,
+     1076
+    ]
+   ],
+   "note": "GrabCut of her box (she is screen-fixed at x 720, 170 px): fixed seed"
+  }
+ ],
+ "ground": [
+  {
+   "name": "her towpath (flagstones laid out from S4_CAM: receding joints to its vanishing point)",
+   "roi": [
+    0,
+    998,
+    1080,
+    1066
+   ],
+   "vps": [
+    [
+     540,
+     760
+    ]
+   ]
+  }
+ ],
+ "horizon": 760,
+ "height": 3.1,
+ "things": [
+  {
+   "name": "her (1.7 m) on her towpath",
+   "y": 1070,
+   "px": 170,
+   "m": 1.7
+  },
+  {
+   "name": "the parent she passes (1.66 m)",
+   "y": 1021,
+   "px": 140,
+   "m": 1.66
+  },
+  {
+   "name": "the toddler (0.94 m)",
+   "y": 1027,
+   "px": 80,
+   "m": 0.94
+  },
+  {
+   "name": "a heritage lamp post (2.9 m)",
+   "y": 1064,
+   "px": 290,
+   "m": 2.9
+  }
+ ],
+ "note": "The fingerpost is no silhouette here: its 15 px shaft is narrower than the check's 540 px in/out samples (they straddle it). One sheet per still: the truck slides the planes (path 1.0x, backs 0.6x, far 0.3x of 310 px) and the plates exist only from 18.92, so 19.9 has its own sheet (v2_s4_hold.json). The far plane shows in the sun's column under the disc (the far rows and the viaduct over the allotment yard) and through the gap; its box keeps clear of the yard's things."
+}
