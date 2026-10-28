@@ -20,9 +20,11 @@
 // in the frame-0 drawing, lifts 0.30-0.40, comes down 0.44-0.50 and presses on "laptop" (0.50: the button squashes a
 // value darker, the cart badge pops 0 -> 1 at 0.52 with the cart-pop sound at 0.50, the tag swings from the press).
 // ONE FOCUS (CRAFT §b: a story object off its beat is tier B; SQA pilot review): the thread plane has an OFF-BEAT
-// state. The screen dims one value step toward peach while the stage leads (lit 0-4.04, 17.24-19.40, 29.90-31.00,
+// state. The screen dims one value step toward peach while the stage leads (lit 0-4.04, 17.24-18.30, 29.90-31.00,
 // 38.12-41.15); the button and the cart badge (left out of the screen's multiply) take a soft blue (C* 18) with no
-// outline and the listing's laptop drops to tier B. The TAG dims to a soft terracotta (C* 38, no outline, the prices
+// outline and the listing's laptop drops to tier B. From 6.35 (home_set's HOOK_CALM_AT: the window sits back in the same
+// step, mid-pan) every off-beat stretch is the deeper REST level (early review E2: the bezel L* 48, the screen L* 84,
+// the button and badge a screen tint, the tag C* 24: PHONE_REST, TAG_REST); SQA's 4.04-5.80 keeps the pilot's state. The TAG dims to a soft terracotta (C* 38, no outline, the prices
 // in its light tint) everywhere but its own beats (full 0-4.04, 15.30-15.90, 17.24-18.90, 24.44-25.04, 29.90-31.00,
 // 35.95-36.98, 38.12-41.15: TAG_FULL); off-beat its idle sway is halved and the hand's float drops to 0.3 (eased,
 // never a jump).
@@ -30,7 +32,8 @@
 // step down in the same frame as the data center goes dark: one event.
 //
 // Tiers (CRAFT §b): the TAG is the subject on its beats (A: the only full outline, the hero colour; a warm rim on its
-// lamp side while it ticks, 1.88-3.30); the phone is its frame (its UI calm: no stars, delivery row or cards; the
+// lamp side while it ticks, 1.86-3.30, and through the payoff, 38.62-41.15, with a form shade on its right third: E10;
+// the like-pop at 39.88, its back's data center popping as the back lands); the phone is its frame (its UI calm: no stars, delivery row or cards; the
 // description lines as light hairlines); the HAND is supporting life (B: its own value, L* ~76, >= 12 above the desk it
 // lies over, a same-hue line where it meets the desk and the phone, a form shade crescent on its edges away from the
 // lamp); Pip is B (C* <= 25, a ~2 px same-hue line, the 'peek' pose clinging to the phone's right edge, phone-local
@@ -41,6 +44,7 @@
 // (SQA's <Look snapPops>): the tag 0.03, the screen 0.05, the listing 0.06-0.12, the hand and Pip ~0.1, the dark bezel
 // LAST (0.15: it closes round the lit screen like the outline thickening outward, never a dark slab under a missing
 // screen). T < 0 is the loop underlay (the frame-0 drawing state).
+// QA: the input prop {"threadOff": true} draws no plane (the A side of an A/B pair: the plane's exact mask).
 import React from 'react';
 import {getInputProps} from 'remotion';
 import {ease, prog, type Ease} from '../../../lib/time';
