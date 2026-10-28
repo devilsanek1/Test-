@@ -153,6 +153,13 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-28 ~18:25 UTC, budget: "96%" (the estimate was 96.4 %) -> ~4 % left; the film (fix B, sound sync, master) ~$35-50, the cover +
   posting kit ~$10-20: both fit inside 100 %.
 
+## The owner's verdict on the film
+- 2026-10-28 ~21:40 UTC (sent with the city-poster references, `docs/look/poster_refs/`): "i think visually in the video
+  about Google we have made good improvemnets in terms of overall style"; "i personally like the last video about google
+  i think the story wasn't quite good, but visually it was nice to be honest" -> v2's look is the baseline of the
+  city-poster study (`docs/studies/2026-10-28_city_posters/`). -> rules: playbook Visual style (learn from the city
+  posters, from v2's look) and Taste signals (places on screen).
+
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
   the caption and the pinned comment as text plus a URL people can copy; links in captions aren't clickable; a

@@ -23,6 +23,12 @@ flat colour, drawn clean and lit gently.
    these: a clash there is a stale summary.
 A clash is a bug: fix the lower doc in the same turn.
 
+**Open study (owner, 2026-10-28):** the owner likes the style of seven illustrated city posters (`docs/look/poster_refs/`)
+and wants to experiment with it, starting from v2's look ("i really like the style and i want us to experiment more with
+the style and the focus on our videos"). What we learn from them (perspective, visual style, details, composition) and
+which content fits a world of cities and buildings are studied in `docs/studies/2026-10-28_city_posters/`. Nothing from
+it is a rule until the owner approves it; the rules below stand.
+
 ## The rules
 - **1. One flowing story, never shots stitched together.** One story on ONE core line (spine first, each line following
   from the last) and a through-line card: one thread object carrying the arc (on screen >= 80 %, no gap over 3 s

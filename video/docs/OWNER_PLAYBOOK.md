@@ -70,6 +70,14 @@ Maintenance at the end).
   Spec: `docs/look/CRAFT.md` §c. — ("hand-drawn ink, flat colour, like reference video 1", v1, 2026-10-24; "too rough
   and messy, a lot of rough lines, not clean at all; cleaner, more refined, gentle, premium", v3 G5b, 2026-10-27; the clean pen with tiers and gentle light
   APPROVED at v2's G4 look clip: "okay good continue", 2026-10-27).
+- **Learn from the city posters and experiment with that style in our films, starting from v2's look.** The owner's
+  reference is seven illustrated city posters (`docs/look/poster_refs/`); v2 ("One Small Window") is the visual
+  baseline the owner likes. What we learn from them (perspective, visual style, details, composition, and the one
+  focus) is studied in `docs/studies/2026-10-28_city_posters/`; a lesson becomes a rule only once the owner approves
+  it, and `docs/look/DIRECTION.md` stands until then. — ("i really like the style and i want us to experiment more with
+  the style and the focus on our videos"; "i want to see how we can learn from these pictures in terms of perspective,
+  visual style, details and composition"; "i think visually in the video about Google we have made good improvemnets in
+  terms of overall style", 2026-10-28).
 - **Light and shadow: gentle, but always there.** One consistent light direction per scene, soft form and cast shadows,
   gentle light pools that make sense; never absent and never "weirdly put". System: `docs/look/CRAFT.md` §d. — (v3 G5b,
   2026-10-27; "the shadows added are better", v2 G4, 2026-10-27).
@@ -263,6 +271,13 @@ Maintenance at the end).
   benefits and when). Every topic scout names the mood the next video needs. — ("we should alternate between positive
   and more negative topics ... something very recent, extremely relevant yet very positive around AI ... a nice
   positive outlook would be the right direction for a story", v4, 2026-10-28).
+- **Places on screen: find the content that fits a world of cities, architecture and buildings.** The owner's examples
+  are v1 (the best performer so far) and v2 (the look they like; its story was the weak part). Which stories fit is
+  studied in `docs/studies/2026-10-28_city_posters/` (the content track) before it changes `docs/TOPIC_CRITERIA.md`.
+  — ("I want us to see which type of content would be best fit into videos where we have more of cities /
+  architectures / buildings / etc - so for example our very first video was the most successful so far and i
+  personally like the last video about google i think the story wasn't quite good, but visually it was nice to be
+  honest. Obviously still far away from what we could do to be very successful studio, but initial steps", 2026-10-28).
 - **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
   frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
 - **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).

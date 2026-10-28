@@ -139,6 +139,17 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Pick-up notes: `video/docs/v4/README.md`.** **PAUSED 2026-10-27 ~14:40 UTC (owner: "lets pause for now. lets make sure the other session finishes its work")**: the G0.5 run was stopped before any agent finished (nothing produced). To resume, relaunch `context/workflows/v4-g05-facts-and-core-line-*.js` unchanged once the owner says go.
 - G0.5 (paused): `context/workflows/v4-g05-facts-and-core-line-*.js` -> `video/docs/v4/research/`, `CORE_LINE.md`. Next: owner picks the core line; then G1 story-first script.
 
+## 2d. The city-poster study (2026-10-28)
+- **Run by session https://claude.ai/code/session_01YGLGMqbgdpycjemYZL3aoL**, branch `claude/compassionate-hopper-5iqguj`
+  (not merged into `video-production`; the owner decides). The owner sent seven illustrated city posters
+  (`video/docs/look/poster_refs/`) and asked for two things: what we learn from them (perspective, visual style, details,
+  composition) and which content fits videos with more cities, architecture and buildings (v1 the best performer, v2
+  the look they like with a weaker story). v2's look is the baseline.
+- The study is `video/docs/studies/2026-10-28_city_posters/` (its README is the shared brief): four look lenses, two
+  content lenses, then `STUDY.md` + `SUMMARY.md` and an adversarial check. Nothing in it is a rule until the owner
+  approves it (DIRECTION's "Open study" note). The next step it is meant to feed: v4's topic pick (paused) and a look
+  experiment for the picked content.
+
 ## 2b. Update 2026-10-25 20:00 UTC: two agents, split by video
 
 - **Video 2 (Google DeepMind resignations) is produced by session https://claude.ai/code/session_01BGZ47aBhF9yKpEaeiLeCPQ**
@@ -379,6 +390,8 @@ Everything that agent knew is in this repo. This file is the map; the details li
     `look/COZY_AND_SCALE.md`, `look/LIFE_AND_DENSITY.md`, `look/PALETTE.md` (+ `palettes.json`), `look/research/`.**
   - Per video: `vN/` (`OWNER_NOTES.md`, the core line, the script, the style page, plans; rejected options in
     `vN/archive/`).
+  - Studies: `studies/2026-10-28_city_posters/` (the owner's city-poster references: what we learn for the look, and the
+    content that fits places).
   - The channel's brief (every video): `CREATIVE_BRIEF.md` (the owner's master brief; its banner lists the later
     owner rules that update it).
   - Brief and story (v1): `BRIEF.md` (the v1 project brief; history), `script/` (all script versions, critiques, the
@@ -410,6 +423,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
 | 10-25 ~20:10 | `video/docs/look/texture_refs/autumn_walk_detail.png` (crop of palette ref 4) | "I only really like these very subtle texture pieces and the black outlines, VERY subtle but in key places; test it in production" | `video/docs/look/PALETTE.md` "Texture and lines" (spec and test plan), playbook Visual style; test at G4 |
 | 10-25 17:32 | `context/uploads/inline/2026-10-25_173226_9.jpg` (= `video/docs/look/ref_sense_of_enclosure.jpg`) | "Sense of Enclosure": coziness as a visual twist; keep Arcane-like scale | queue item 2 |
 | 10-26 ~22:50 | `video/docs/look/ref_animated_sketchbook.png` (an urban sketcher's notebook: loose ink street scenes, dense with scribbled suggestion) | "the sketch stage ... frankly the most important stage ... close to final version of the story, transitions, animations, camera movements ... details ... as placeholders ... like an animated sketchbook ... the closest signal to the final story in as little time as possible" | `video/docs/G3_ANIMATIC.md` (the new G3 stage spec), playbook Storyboard rules, STORYBOARD_STYLE / PIPELINE_V2 / G5_BLOCKING / CLAUDE.md updates |
+| 10-28 ~21:35 | `video/docs/look/poster_refs/01-07_*.jpg` (seven illustrated city posters, screenshots of a 19-poster Instagram carousel: Singapore, Reykjavik, Hanoi, Buenos Aires, Cape Town, Copenhagen, Kyoto; the owner's words verbatim in its README) | "i really like the style and i want us to experiment more with the style and the focus on our videos"; "learn from these pictures in terms of perspective, visual style, details and composition"; "which type of content would be best fit into videos where we have more of cities / architectures / buildings"; "save these pictures into the repo as references" | the study `video/docs/studies/2026-10-28_city_posters/` (section 2d); playbook Visual style + Taste signals; DIRECTION's "Open study" note |
 
 Other screenshots in `context/uploads/` (`*-image.png`) are the same Instagram screens as uploaded files.
 
