@@ -40,7 +40,7 @@ Work folder: `/tmp/claude-0/-home-user-Test-/e0b06496-a313-5ced-bf0f-bc634eb1274
   region down to y 856 took in a flat cloud and FAILed on its edge, dL* 4.2: a shape, not a band; v3's skies are flat
   fills, so there is no gradient to band.)
 - `gate_check.py` (Film3Final, `--seam-comp Film3Seams --density`): fps, duration (2469 = ceil(41.150 x 60)), audio in
-  sync, the 4 seams (0.00 % at each, no cut), cuts (J3's push turns at frame 1164), carriers C C A A C (0 plain cuts),
+  sync, the 4 seams (<= 0.02 % of the pixels > 4 L*, no cut), cuts (J3's push turns at frame 1164), carriers C C A A C (0 plain cuts),
   captions (23 pages in the band): PASS. WARN: 17 cut-like in-shot events; caption page 2 has 23 characters (accepted in
   the pilot). FAIL, information only (DIRECTION: never a quota): density film average 6.4 events/s, gap 2.67 s, static
   38 %, flat 35 %, detail 23 % (SQB static 64 %: the locked draw; integrator 35 %).
@@ -64,3 +64,11 @@ tag still shows its back ("AI"; the turn back starts 40.55).
   the pixels, like its neighbours (0.29-0.35 %): no pop.
 - Also seen: 33.0 the BETTER pill reads; 35.95 the tag jolts after the overtake has ended; 27.1 the "~5x" notice.
 - No clear break, so no fix and no re-render: the master stands.
+
+## Step 4: the cover
+- `deliverables/v3/cover.png` re-rendered from Cover3 at **frame 192 (3.2 s)**, full size (1080 x 1920; render-frames.mjs,
+  the master's GL), the same moment as before, now the reworked hook: the phone's listing with its tag at full strength,
+  $999 struck and $1,079, under the window's lit AI DATA CENTER sign (the sticks have landed, the phone not yet lowered:
+  a still, clean frame); the title on the wall above the window, clear of the sign and the tag; title, sign and tag
+  inside the 3:4 profile-grid crop (y 240-1680). Looked at once at full size and once at 270 x 480: the title, "AI DATA
+  CENTER" and "$1,079" all read at phone size.
