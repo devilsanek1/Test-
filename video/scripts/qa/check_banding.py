@@ -180,8 +180,23 @@ def segments(prof: np.ndarray, valid: np.ndarray, min_len: int = 24):
     return out
 
 
+def step_jump(P: np.ndarray, lo0: int, lo1: int, hi0: int, hi1: int, at: float) -> tuple[np.ndarray, np.ndarray]:
+    """The colour just before and just after a step at row `at`, TREND-CORRECTED: per channel one straight line through
+    both plateaus (a shared slope) plus a jump between them, least squares. A flat staircase gives the plateau means; a
+    smooth ramp with no step gives no jump however steep it is; a step inside a ramp gives the step alone (the plain
+    difference of the plateau means adds the ramp's own change across the gap: in a fast chroma ramp, such as the light
+    band into the warm horizon, that read a 0.4 dE00 encoder block edge as a 1.6-4.0 dE00 'strong' band)."""
+    r = np.concatenate([np.arange(lo0, lo1), np.arange(hi0, hi1)]).astype(np.float64)
+    side = np.concatenate([np.zeros(lo1 - lo0), np.ones(hi1 - hi0)])
+    A = np.stack([np.ones_like(r), r - at, side], 1)
+    V = np.concatenate([P[lo0:lo1], P[hi0:hi1]])
+    coef = np.linalg.lstsq(A, V, rcond=None)[0]
+    return coef[0], coef[0] + coef[2]
+
+
 def steps_in(prof: np.ndarray, yp: np.ndarray, y0: int):
-    """Steps of one segment: [(y, dL, dE00, c, plateau_before, plateau_after)], the total change and the stepped change."""
+    """Steps of one segment: [(y, dL, dE00, c, plateau_before, plateau_after)], the total change and the stepped change
+    (each step's size is its trend-corrected jump: step_jump)."""
     Ps = gaussian_filter1d(prof, 0.8, axis=0, mode='nearest')
     Ls = Ps[:, 0]
     n = len(Ls)
@@ -200,6 +215,7 @@ def steps_in(prof: np.ndarray, yp: np.ndarray, y0: int):
         else:
             merged.append(i)
     centres = [i + 2 for i in merged]  # the row just after the change
+    PY = np.concatenate([prof, yp[:, None]], 1)
     out = []
     stepped = 0.0
     for k, c in enumerate(centres):
@@ -209,9 +225,9 @@ def steps_in(prof: np.ndarray, yp: np.ndarray, y0: int):
         hi0, hi1 = c + 1, min(nxt - 2, c + 14)
         if lo1 - lo0 < 2 or hi1 - hi0 < 2:
             continue
-        a = prof[lo0:lo1].mean(0)
-        b = prof[hi0:hi1].mean(0)
-        ya, yb = yp[lo0:lo1].mean(), yp[hi0:hi1].mean()
+        a4, b4 = step_jump(PY, lo0, lo1, hi0, hi1, c - 1.0)
+        a, b = a4[:3], b4[:3]
+        ya, yb = float(a4[3]), float(b4[3])
         dL = float(b[0] - a[0])
         dE = float(de2000(a, b))
         cc = float(abs(yb - ya) / max(min(ya, yb), 1e-6))
@@ -221,27 +237,36 @@ def steps_in(prof: np.ndarray, yp: np.ndarray, y0: int):
     return out, total, stepped
 
 
-def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float) -> dict:
-    H, W = rgb.shape[:2]
-    k = W / 1080.0
-    x0, y0, x1, y1 = [int(round(v * k)) for v in region]
-    x0, x1 = max(0, x0), min(W, x1)
-    y0, y1 = max(0, y0), min(H, y1)
-    lab, Y = rgb_to_lab_y(rgb[y0:y1, x0:x1])
-    sw = max(8, int(round(strip * k)))
+def strip_steps(lab: np.ndarray, Y: np.ndarray, sw: int, k: float, along0: int, across0: int, axis: str):
+    """The strips of a region and their steps. axis 'y': profiles DOWN vertical strips sw px wide (horizontal bands,
+    the usual sky); axis 'x': profiles ACROSS horizontal strips sw px tall (vertical bands: a sky that warms sideways,
+    the sides of the sun's warmth), each strip first detrended row by row (its rows' medians taken back to the strip's
+    own), so a vertical ramp inside the strip neither hides nor fakes a sideways step. Returns the strips and their
+    grains (y only)."""
+    if axis == 'x':
+        lab = lab.transpose(1, 0, 2)
+        Y = Y.T
+    n_along, width = Y.shape
     strips = []
-    all_steps = []
     grains = []
-    for sx in range(0, x1 - x0, sw):
-        if x1 - x0 - sx < sw // 2:
+    for sx in range(0, width, sw):
+        if width - sx < sw // 2:
             break
-        prof, yp, valid, resid = sky_profile(lab[:, sx:sx + sw], Y[:, sx:sx + sw])
+        sl, sy = lab[:, sx:sx + sw], Y[:, sx:sx + sw]
+        if axis == 'x':
+            # each canvas row of this horizontal strip is a column here: take its median back to the strip's median
+            rmed = np.median(sl, axis=0)
+            sl = sl - (rmed - np.median(rmed, axis=0))[None, :, :]
+            ymed = np.median(sy, axis=0)
+            sy = sy - (ymed - np.median(ymed))[None, :]
+        prof, yp, valid, resid = sky_profile(sl, sy)
         g = np.nanstd(resid[valid]) if valid.any() else float('nan')
-        grains.append(g)
+        if axis == 'y':
+            grains.append(g)
         st = []
         total = stepped = 0.0
         for s0, s1 in segments(prof, valid):
-            ss, t, sp = steps_in(prof[s0:s1], yp[s0:s1], y0 + s0)
+            ss, t, sp = steps_in(prof[s0:s1], yp[s0:s1], along0 + s0)
             st += ss
             total += t
             stepped += sp
@@ -250,7 +275,8 @@ def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float) -> dict:
         weak = [s for s in st if (s[3] >= WEAK_C or s[2] >= WEAK_DE) and min(s[4], s[5]) >= WEAK_PLATEAU * k and s not in vis]
         plateaus = [s[4] for s in st]
         strips.append({
-            'x': int(round((x0 + sx) / k)),
+            'axis': axis,
+            ('x' if axis == 'y' else 'y'): int(round((across0 + sx) / k)),
             'steps': len(st),
             'visible': len(vis),
             'strong': len(strong),
@@ -263,7 +289,23 @@ def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float) -> dict:
             'grain': float(g),
             'visible_at': [int(round(s[0] / k)) for s in vis][:12],
         })
-        all_steps += st
+    return strips, grains
+
+
+def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float, axes: str = 'yx') -> dict:
+    H, W = rgb.shape[:2]
+    k = W / 1080.0
+    x0, y0, x1, y1 = [int(round(v * k)) for v in region]
+    x0, x1 = max(0, x0), min(W, x1)
+    y0, y1 = max(0, y0), min(H, y1)
+    lab, Y = rgb_to_lab_y(rgb[y0:y1, x0:x1])
+    sw = max(8, int(round(strip * k)))
+    strips = []
+    grains = []
+    for axis in axes:
+        st, gr = strip_steps(lab, Y, sw, k, y0 if axis == 'y' else x0, x0 if axis == 'y' else y0, axis)
+        strips += st
+        grains += gr
     res = {'region': list(region), 'strips': strips}
     # the caption band: the whole width of the region, rows band[0]..band[1]
     if band and band[1] > band[0]:
@@ -285,7 +327,11 @@ def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float) -> dict:
     res['visible_worst_strip'] = vis_worst
     res['strong'] = strong
     res['weak_worst_strip'] = weak_worst
-    res['staircase_median'] = float(np.median([s['staircase'] for s in strips])) if strips else 0.0
+    ys = [s for s in strips if s['axis'] == 'y']
+    xs = [s for s in strips if s['axis'] == 'x']
+    res['staircase_median'] = float(np.median([s['staircase'] for s in ys])) if ys else 0.0
+    res['visible_worst_strip_x'] = max([s['visible'] for s in xs], default=0)
+    res['weak_worst_strip_x'] = max([s['weak'] for s in xs], default=0)
     res['max_dL'] = max([s['max_dL'] for s in strips], default=0.0)
     res['max_c'] = max([s['max_c'] for s in strips], default=0.0)
     res['max_dE00'] = max([s['max_dE00'] for s in strips], default=0.0)
@@ -341,6 +387,7 @@ def main() -> int:
     ap.add_argument('input', help='a PNG frame or a video')
     ap.add_argument('--region', default='0,0,1080,800', help='the sky: x0,y0,x1,y1 (canvas px at 1080 wide)')
     ap.add_argument('--strip', type=int, default=64, help='strip width (px)')
+    ap.add_argument('--axes', default='yx', help="profiles down the sky ('y': horizontal bands) and across it ('x': vertical bands, the sides of the sun's warmth); default both")
     ap.add_argument('--band', default='317,556', help="the caption band y0,y1 ('' = none)")
     ap.add_argument('--max-dl', type=float, default=1.5, help='the band flatness budget (dL*)')
     ap.add_argument('--times', default='', help='video: seconds to sample (default 3 spread over the clip)')
@@ -361,7 +408,7 @@ def main() -> int:
             frames.append((f'{t:.2f}s', decode(a.input, t, info)))
     results = []
     for name, rgb in frames:
-        r = analyse(rgb, region, a.strip, band, a.max_dl)
+        r = analyse(rgb, region, a.strip, band, a.max_dl, a.axes)
         r['frame'] = name
         results.append(r)
         if a.plot and len(results) == 1:
@@ -372,7 +419,8 @@ def main() -> int:
         for r in results:
             b = r.get('band')
             bs = f" | band dL* {b['dL']:.2f} dE00 {b['max_dE00']:.2f} (L* {b['L']:.1f})" if b else ''
-            print(f"{r['verdict']:4s} {a.input} @ {r['frame']}: visible {r['visible']} (worst strip {r['visible_worst_strip']}, strong {r['strong']}), weak (worst strip) {r['weak_worst_strip']}, "
+            xs = f" [across: worst strip {r['visible_worst_strip_x']} visible, {r['weak_worst_strip_x']} weak]" if 'x' in a.axes else ''
+            print(f"{r['verdict']:4s} {a.input} @ {r['frame']}: visible {r['visible']} (worst strip {r['visible_worst_strip']}, strong {r['strong']}), weak (worst strip) {r['weak_worst_strip']}{xs}, "
                   f"max step dL* {r['max_dL']:.2f} c {r['max_c']:.4f} dE00 {r['max_dE00']:.2f}, plateau {r['median_plateau']:.0f} px, "
                   f"staircase {r['staircase_median']:.2f}, grain {r['grain']:.2f} L*{bs}" + (f"  [{'; '.join(r['why'])}]" if r['why'] else ''))
     if a.json:

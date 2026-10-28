@@ -1,12 +1,15 @@
 // lib/particles.tsx: A FEW NATURAL PARTICLES, an ENGINE primitive (owner, v2 G4, 2026-10-27: "add perhaps a bit of
 // particles here and there just to make things a bit more natural looking"; the playbook's DEPTH AND SEPARATION).
 // Motes in the light, dust or pollen in the sun-side air, a drifting leaf, glints in the sun's glitter path on water,
-// far birds. The rules are docs/look/CRAFT.md §f.7 (it wins), DIRECTION rule 3 and LIFE_AND_DENSITY §6; the how-to is
+// far birds. The rules are docs/look/CRAFT.md §f.6 (it wins), DIRECTION rule 3 and LIFE_AND_DENSITY §6; the how-to is
 // lib/DEPTH.md. Opt-in: nothing draws unless a scene places a <Particles> field.
 //
 // * FLAT SHAPES: a mote is a tiny disc, a glint a short level dash, a leaf one closed almond, a bird one thin closed V.
-//   No blur, glow, gradient or opacity: a particle GROWS in and SHRINKS out (DIRECTION rule 8), and shrinks where it
-//   reaches its region's edge or an avoided zone (the caption band by default, the subject's box), never a hard clip.
+//   No blur, glow, gradient or opacity: a particle GROWS in and SHRINKS out (DIRECTION rule 8), is born inside its
+//   region (clear of its edge), and shrinks where it drifts to the region's edge or an avoided zone (the caption band
+//   by default, the subject's box), never a hard clip. A leaf is only born when its whole fall stays clear of every
+//   avoided zone (it never shrinks away mid-air and comes back); a flock crossing a band narrower than the frame shrinks
+//   at the band's ends.
 // * TIER C by default (the environment: small, slow, low contrast, CRAFT §b): its contrast is set against `on`, the
 //   colour right behind it (motes and glints a light tint, L* +8..+15 / +10..+20; birds a tone darker, within 15), its
 //   colour takes its plane's air step (lib/depth `recede`), and its size and speed scale with the plane (1.5x per
@@ -14,9 +17,11 @@
 // * LIT BY THE SET'S RIG (lib/light <Lit>): light kinds are a step lighter on the sun side (`sun`, or the rig's key
 //   direction), a tumbling leaf shows its shade face in the rig's form tint; under lightOff the lift goes, the field stays.
 // * THE MOVER BUDGET (DIRECTION rule 3, CRAFT §b): few (each kind's cap: motes 8, dust 6, glints 6, leaves 2, a flock
-//   of 5), slots staggered so they take turns, a hard coverage cap (0.2 % of the frame per field); ENTRANCES (a leaf,
-//   a flock: `join: 'hold'`) never start in the 0.4 s around a join, while a steady field (motes, dust, glints) keeps
-//   its pace through it (a freeze reads as a glitch: CRAFT §a). `particleProblems()` lints a shot's fields.
+//   of 5), slots staggered so they take turns, a hard coverage cap (0.2 % of the frame per field); ENTRANCES (a leaf
+//   growing in, a flock flying into its band: `join: 'hold'`) never touch the 0.4 s around a join, while a steady field
+//   (motes, dust, glints) keeps its pace through it (a freeze reads as a glitch: CRAFT §a). Motes and dust drift at
+//   most speed + drift px/s (3-12 at plane 0: the curl flow is capped at unit speed). `particleProblems()` lints a
+//   shot's fields.
 // * DETERMINISTIC: every particle is a pure function of (scene time, seed): seeded births (lib/rng), a fixed period per
 //   slot, closed-form paths (leaves, glints, birds) or a curl-noise drift re-integrated from the particle's birth at a
 //   fixed 1/30 s step with a partial last step (motes, dust), so any frame rendered alone equals the same frame in
@@ -87,7 +92,8 @@ export const PRESETS: Record<ParticleKind, Preset> = {
 export const CAPTION_BAND: Rect = [95, 290, 850, 310];
 /** A field's hard coverage cap: its particles together never cover more than this share of the 1080 x 1920 frame. */
 export const COVER_CAP = 0.002;
-const FRAME_AREA = 1080 * 1920;
+const FRAME_W = 1080;
+const FRAME_AREA = FRAME_W * 1920;
 /** The join window: no entrance within this of a join (CRAFT §a: 0.4 s around it). */
 const JOIN_HALF = 0.2;
 
@@ -195,15 +201,22 @@ const rectOut = (r: Rect, p: Pt) => {
   return dx > 0 || dy > 0 ? Math.hypot(dx, dy) : 0;
 };
 
-/** A seeded point inside a region (rejection sampling in its box; the box centre as the last resort). */
-function spawn(r: Region, seed: string, key: string, avoid: Rect[]): Pt {
+/** A seeded point inside a region and clear of the avoided zones, at least `inset` px from both when it can be (so it
+ *  is born near full size, never already shrinking at an edge: a narrow glitter column with the default 22 px margin
+ *  drew a quarter of its glints under 5 px); rejection sampling in its box, then without the inset, then the box
+ *  centre as the last resort. The same candidates in the same order: a pure function of (seed, key). */
+function spawn(r: Region, seed: string, key: string, avoid: Rect[], inset = 0): Pt {
   const [x, y, w, h] = regionBox(r);
-  for (let k = 0; k < 24; k++) {
-    const p: Pt = [x + w * rand(seed, `${key}x${k}`), y + h * rand(seed, `${key}y${k}`)];
-    if (regionSdf(r, p) < 0 && avoid.every((a) => rectOut(a, p) > 0)) return p;
+  for (const ins of inset > 0 ? [inset, 0] : [0]) {
+    for (let k = 0; k < 24; k++) {
+      const p: Pt = [x + w * rand(seed, `${key}x${k}`), y + h * rand(seed, `${key}y${k}`)];
+      if (regionSdf(r, p) < -ins && avoid.every((a) => rectOut(a, p) > ins)) return p;
+    }
   }
   return [x + w / 2, y + h / 2];
 }
+/** How far inside its region (and away from an avoided zone) a particle is born: 0.6 of the soft edge. */
+const SPAWN_INSET = 0.6;
 
 /** The sun's glitter path on water (where glints live, never all over the water): a column under the sun x from the
  *  water's far edge yFar to its near edge yNear, widening toward us (a low sun gives a narrow column: its width over
@@ -222,7 +235,9 @@ export function glitterPath(o: {x: number; yFar: number; yNear: number; wFar?: n
 // ================================================================= the noise (ONE seed for the module)
 
 const NOISE = 'lib/particles';
-/** Divergence-free drift (curl of a noise stream function): motes swirl, never clump or spread. Unit ~1. */
+/** Divergence-free drift (curl of a noise stream function): motes swirl, never clump or spread. Its speed is capped at
+ *  1 (the raw curl peaks near 3: motes ran up to 28 px/s against CRAFT §f.6's 3-12), so a mote's speed never passes its
+ *  preset `speed` (+ the constant drift); the direction field is unchanged. */
 function curl(x: number, y: number, t: number, ox: number, oy: number): Pt {
   const s = 0.0045; // ~220 px features
   const X = x * s + ox;
@@ -231,7 +246,10 @@ function curl(x: number, y: number, t: number, ox: number, oy: number): Pt {
   const e = 0.02;
   const dy = (noise3D(NOISE, X, Y + e, T) - noise3D(NOISE, X, Y - e, T)) / (2 * e);
   const dx = (noise3D(NOISE, X + e, Y, T) - noise3D(NOISE, X - e, Y, T)) / (2 * e);
-  return [dy * 0.6, -dx * 0.6];
+  const vx = dy * 0.6;
+  const vy = -dx * 0.6;
+  const m = Math.hypot(vx, vy);
+  return m > 1 ? [vx / m, vy / m] : [vx, vy];
 }
 const DT = 1 / 30;
 
@@ -287,11 +305,11 @@ function resolve(o: ParticlesProps): Resolved {
   };
 }
 
-const nearJoin = (t: number, joins: number[]) => joins.some((j) => Math.abs(t - j) <= JOIN_HALF);
-
 /** Slot i's current life at t: a fixed life L and period P = L + gap per slot, phases staggered so the slots take
- *  turns; null in its gap, when its birth was outside [t0, t1], or (entrances) inside a join's window. */
-function slot(r: Resolved, i: number, t: number, lifeOverride?: number): {c: number; born: number; age: number; L: number} | null {
+ *  turns; null in its gap, when its birth was outside [t0, t1], or (entrances) when its ENTRANCE touches a join's
+ *  window: `enter` = [from, to] after the birth (default the grow-in, [0, grow x L]; a flock: until its last bird is in
+ *  its band), so nothing is still growing or flying in during the 0.4 s around a join (CRAFT §a). */
+function slot(r: Resolved, i: number, t: number, lifeOverride?: number, enter?: [number, number]): {c: number; born: number; age: number; L: number} | null {
   const L = lifeOverride ?? lerp(r.p.life, rand(r.seed, `L${i}`));
   const G = lerp(r.p.gap, rand(r.seed, `G${i}`));
   const P = Math.max(0.05, L + G);
@@ -300,7 +318,11 @@ function slot(r: Resolved, i: number, t: number, lifeOverride?: number): {c: num
   const born = c * P - phase;
   const age = t - born;
   if (age > L || born < r.t0 || born > r.t1) return null;
-  if (r.p.join === 'hold' && nearJoin(born, r.joins)) return null;
+  if (r.p.join === 'hold') {
+    const e0 = born + (enter?.[0] ?? 0);
+    const e1 = born + (enter?.[1] ?? r.p.grow * L);
+    if (r.joins.some((j) => e1 >= j - JOIN_HALF && e0 <= j + JOIN_HALF)) return null;
+  }
   return {c, born, age, L};
 }
 
@@ -332,7 +354,7 @@ function drifters(r: Resolved, t: number, keyFrom: number | null): ParticleState
   for (let i = 0; i < r.n; i++) {
     const s = slot(r, i, t);
     if (!s) continue;
-    let [x, y] = spawn(r.region, r.seed, `${i}/${s.c}/`, r.avoid);
+    let [x, y] = spawn(r.region, r.seed, `${i}/${s.c}/`, r.avoid, r.margin * SPAWN_INSET);
     const spd = lerp(r.p.speed, rand(r.seed, `v${i}/${s.c}`)) * r.k;
     const [wx, wy] = [r.p.drift[0] * r.k, r.p.drift[1] * r.k];
     // re-integrated from the birth at a fixed step, the last step partial: a pure function of the age
@@ -358,7 +380,7 @@ function glints(r: Resolved, t: number, keyFrom: number | null): ParticleState[]
   for (let i = 0; i < r.n; i++) {
     const s = slot(r, i, t);
     if (!s) continue;
-    const [x0, y] = spawn(r.region, r.seed, `${i}/${s.c}/`, r.avoid);
+    const [x0, y] = spawn(r.region, r.seed, `${i}/${s.c}/`, r.avoid, r.margin * SPAWN_INSET);
     const x = x0 + r.p.drift[0] * s.age;
     const persp = r.horizon !== undefined ? clamp((y - r.horizon) / Math.max(1, yRef - r.horizon), 0.25, 1.5) : 1;
     const size = lerp(r.p.size, rand(r.seed, `s${i}/${s.c}`)) * persp * r.k * r.tierK * lifeScale(s.age / s.L, r.p.grow, r.p.shrink) * edgeK(r, [x, y], true);
@@ -368,54 +390,99 @@ function glints(r: Resolved, t: number, keyFrom: number | null): ParticleState[]
   return out;
 }
 
+/** One leaf's life: its fall speed, swing, period, phase, tumble and tilt (seeded per slot and cycle). */
+type LeafLife = {v: number; A: number; w: number; ph: number; tumble: boolean; spin: number; r0: number};
+function leafLife(r: Resolved, i: number, c: number): LeafLife {
+  const key = `${i}/${c}`;
+  return {
+    v: lerp(r.p.speed, rand(r.seed, `v${key}`)) * r.k,
+    A: (14 + 14 * rand(r.seed, `A${key}`)) * r.k,
+    w: (Math.PI * 2) / (1.4 + 0.8 * rand(r.seed, `T${key}`)),
+    ph: rand(r.seed, `ph${key}`) * Math.PI * 2,
+    tumble: rand(r.seed, `tb${key}`) < 0.3,
+    spin: 2 + 2 * rand(r.seed, `sp${key}`),
+    r0: (rand(r.seed, `r0${key}`) - 0.5) * 40,
+  };
+}
+
 /** A falling leaf's path (closed form): a side-to-side swing whose tilt leads the sway by a quarter period, falling
  *  slowest at the turns (the flutter of a falling plate); a few tumble (an x-flip). */
-function leafAt(r: Resolved, i: number, c: number, age: number, x0: number, y0: number) {
-  const key = `${i}/${c}`;
-  const v = lerp(r.p.speed, rand(r.seed, `v${key}`)) * r.k;
-  const A = (14 + 14 * rand(r.seed, `A${key}`)) * r.k;
-  const T = 1.4 + 0.8 * rand(r.seed, `T${key}`);
-  const w = (Math.PI * 2) / T;
-  const ph = rand(r.seed, `ph${key}`) * Math.PI * 2;
-  const th = w * age + ph;
+function leafAt(r: Resolved, q: LeafLife, age: number, x0: number, y0: number) {
+  const th = q.w * age + q.ph;
   // y' = v (1 - 0.6 sin^2 th)  ->  y = v (age - 0.6 (age / 2 - (sin 2th - sin 2ph) / (4 w)))
-  const y = y0 + v * (age - 0.6 * (age / 2 - (Math.sin(2 * th) - Math.sin(2 * ph)) / (4 * w)));
-  const x = x0 + r.p.drift[0] * r.k * age + A * (Math.sin(th) - Math.sin(ph));
-  const tumble = rand(r.seed, `tb${key}`) < 0.3;
-  const sx = tumble ? Math.cos((2 + 2 * rand(r.seed, `sp${key}`)) * age + ph) : 0.86 + 0.14 * Math.cos(th);
-  const rot = 28 * Math.cos(th) + (rand(r.seed, `r0${key}`) - 0.5) * 40;
+  const y = y0 + q.v * (age - 0.6 * (age / 2 - (Math.sin(2 * th) - Math.sin(2 * q.ph)) / (4 * q.w)));
+  const x = x0 + r.p.drift[0] * r.k * age + q.A * (Math.sin(th) - Math.sin(q.ph));
+  const sx = q.tumble ? Math.cos(q.spin * age + q.ph) : 0.86 + 0.14 * Math.cos(th);
+  const rot = 28 * Math.cos(th) + q.r0;
   return {x, y, sx, rot};
 }
+
+/** The age a leaf lands on the floor (y grows with the age: bisection), or Infinity when it does not within its life. */
+function leafLanding(r: Resolved, q: LeafLife, L: number, x0: number, y0: number): number {
+  if (r.floor === undefined || leafAt(r, q, L, x0, y0).y < r.floor) return Infinity;
+  let lo = 0;
+  let hi = L;
+  for (let k = 0; k < 22; k++) {
+    const m = (lo + hi) / 2;
+    if (leafAt(r, q, m, x0, y0).y < r.floor) lo = m;
+    else hi = m;
+  }
+  return hi;
+}
+
+/** Where a leaf starts, and until when its fall stays clear: the first seeded point in its source region whose WHOLE
+ *  fall (to the floor, or to the end of its life) stays `margin` clear of every avoided zone (sampled every 0.04 s);
+ *  when none does, the one that stays clear longest, `until` = the age it would first come within `margin` of one.
+ *  The leaf shrinks out over the 0.45 s before `until` and never comes back: it never shrinks away at the caption
+ *  band mid-air and grows again below it (`particleProblems` reports such a field). */
+function leafStart(r: Resolved, q: LeafLife, key: string, L: number): {p: Pt; until: number} {
+  const [x, y, w, h] = regionBox(r.region);
+  const firstHit = (p: Pt) => {
+    const end = Math.min(L, leafLanding(r, q, L, p[0], p[1]));
+    for (let a = 0; a <= end + 1e-9; a += 0.04) {
+      const s = leafAt(r, q, Math.min(a, end), p[0], p[1]);
+      if (r.avoid.some((z) => rectOut(z, [s.x, s.y]) < r.margin)) return a;
+    }
+    return Infinity;
+  };
+  let best: {p: Pt; until: number} | null = null;
+  for (let k = 0; k < 24; k++) {
+    const p: Pt = [x + w * rand(r.seed, `${key}x${k}`), y + h * rand(r.seed, `${key}y${k}`)];
+    if (regionSdf(r.region, p) >= 0) continue;
+    const until = firstHit(p);
+    if (until === Infinity) return {p, until};
+    if (!best || until > best.until) best = {p, until};
+  }
+  if (best) return best;
+  const c: Pt = [x + w / 2, y + h / 2];
+  return {p: c, until: firstHit(c)};
+}
+/** A leaf that would reach an avoided zone shrinks out over this long before it would (s). */
+const LEAF_AWAY = 0.45;
 
 function leaves(r: Resolved, t: number): ParticleState[] {
   const out: ParticleState[] = [];
   for (let i = 0; i < r.n; i++) {
     const s = slot(r, i, t);
     if (!s) continue;
-    const [x0, y0] = spawn(r.region, r.seed, `${i}/${s.c}/`, r.avoid);
-    // landing: the first age at which it reaches the floor (y grows with the age: bisection), then it rests 0.7 s and
-    // shrinks out over the last 0.45 s of the rest; a leaf that never lands shrinks out at the end of its life
+    const q = leafLife(r, i, s.c);
+    const {p: start, until} = leafStart(r, q, `${i}/${s.c}/`, s.L);
+    if (s.age >= until) continue; // gone before it reached an avoided zone, for the rest of its life
+    const [x0, y0] = start;
+    // landing: then it rests 0.7 s and shrinks out over the last 0.45 s of the rest; a leaf that never lands shrinks
+    // out at the end of its life
     const REST = 0.7;
-    let land = Infinity;
-    if (r.floor !== undefined && leafAt(r, i, s.c, s.L, x0, y0).y >= r.floor) {
-      let lo = 0;
-      let hi = s.L;
-      for (let k = 0; k < 22; k++) {
-        const m = (lo + hi) / 2;
-        if (leafAt(r, i, s.c, m, x0, y0).y < r.floor) lo = m;
-        else hi = m;
-      }
-      land = hi;
-      if (s.age > land + REST) continue;
-    }
+    const land = leafLanding(r, q, s.L, x0, y0);
+    if (s.age > land + REST) continue;
     const landed = s.age >= land;
-    const q = leafAt(r, i, s.c, landed ? land : s.age, x0, y0);
-    const y = landed ? Math.min(q.y, r.floor ?? q.y) : q.y;
+    const qq = leafAt(r, q, landed ? land : s.age, x0, y0);
+    const y = landed ? Math.min(qq.y, r.floor ?? qq.y) : qq.y;
     const kLife = landed ? clamp((land + REST - s.age) / 0.45, 0, 1) : lifeScale(s.age / s.L, r.p.grow, land < Infinity ? 0 : r.p.shrink);
-    const size = lerp(r.p.size, rand(r.seed, `s${i}/${s.c}`)) * r.k * r.tierK * kLife * edgeK(r, [q.x, y], false);
+    const kAway = until === Infinity ? 1 : clamp((until - s.age) / LEAF_AWAY, 0, 1);
+    const size = lerp(r.p.size, rand(r.seed, `s${i}/${s.c}`)) * r.k * r.tierK * kLife * kAway * edgeK(r, [qq.x, y], false);
     if (size < 1) continue;
     const pick = Math.floor(rand(r.seed, `col${i}/${s.c}`) * 1000);
-    out.push({x: q.x, y, size, rot: landed ? q.rot * 0.3 : q.rot, sx: landed ? 1 : q.sx, lift: 0, tone: 0, color: pick, id: `${i}/${s.c}`});
+    out.push({x: qq.x, y, size, rot: landed ? qq.rot * 0.3 : qq.rot, sx: landed ? 1 : qq.sx, lift: 0, tone: 0, color: pick, id: `${i}/${s.c}`});
   }
   return out;
 }
@@ -423,13 +490,18 @@ function leaves(r: Resolved, t: number): ParticleState[] {
 function birds(r: Resolved, t: number): ParticleState[] {
   const out: ParticleState[] = [];
   const [bx, by, bw, bh] = regionBox(r.region);
-  // ONE flock slot: its life is the crossing time, so its period depends on its own speed
+  // ONE flock slot: its life is the crossing time of the WHOLE flock (the last bird 1.4 spans per rank behind the lead
+  // clears the band too: it never vanishes half in view), so its period depends on its own speed; its entrance runs
+  // from the birth (3 spans before the band) until the last bird is in, and never touches a join's window
   const v = lerp(r.p.speed, rand(r.seed, 'v')) * r.k;
   const span = lerp(r.p.size, rand(r.seed, 'span')) * r.k * r.tierK;
-  const L = (bw + 6 * span) / Math.max(1, v);
+  const tail = Math.ceil((r.n - 1) / 2) * 1.4 * span;
+  const L = (bw + 6 * span + 2 * tail) / Math.max(1, v);
   const flock: Resolved = {...r, n: 1};
-  const s = slot(flock, 0, t, L);
+  const s = slot(flock, 0, t, L, [0, (4 * span + tail) / Math.max(1, v)]);
   if (!s) return out;
+  // a band narrower than the frame: the birds shrink at its ends (inside the frame), never pop
+  const bandK = (x: number) => Math.min(bx > 0 ? clamp((x - bx) / r.margin, 0, 1) : 1, bx + bw < FRAME_W ? clamp((bx + bw - x) / r.margin, 0, 1) : 1);
   const dir: 1 | -1 = r.dir ?? (rand(r.seed, `dir${s.c}`) < 0.5 ? 1 : -1);
   const yBase = by + bh * (0.2 + 0.6 * rand(r.seed, `y${s.c}`));
   const xLead = dir > 0 ? bx - 3 * span + v * s.age : bx + bw + 3 * span - v * s.age;
@@ -446,7 +518,7 @@ function birds(r: Resolved, t: number): ParticleState[] {
     const tt = s.born + s.age + rand(r.seed, `fp${j}`) * cyc;
     const inCyc = tt - Math.floor(tt / cyc) * cyc;
     const lift = inCyc < cyc * 0.55 ? 0.32 * Math.sin(Math.PI * 2 * f * tt) : 0.14;
-    const size = span * (0.85 + 0.3 * rand(r.seed, `bs${j}`)) * edgeK(r, [x, y], false);
+    const size = span * (0.85 + 0.3 * rand(r.seed, `bs${j}`)) * edgeK(r, [x, y], false) * bandK(x);
     if (size < 1.5) continue;
     out.push({x, y, size, rot: 0, sx: dir, lift, tone: 0, color: 0, id: `${j}/${s.c}`});
   }
@@ -555,7 +627,8 @@ function palette(o: ParticlesProps, rig: ReturnType<typeof useRig>, off: boolean
     return Math.abs(q.L - onL) <= cap ? c : fromLch(onL + Math.sign(q.L - onL) * cap, q.C, q.h);
   };
   const air = (c: string) => (o.atm ? recede(c, plane, o.atm) : c);
-  const light = [-3, 0, off ? 0 : 3].map((dl) => held(air(relit(o.on, Math.max(2, lift + dl), {warm: 20}))));
+  // three flat steps, 2 L* apart (motes +8 / +10 / +12 on what is behind them: CRAFT §f.6's +8 to +15)
+  const light = [-2, 0, off ? 0 : 2].map((dl) => held(air(relit(o.on, Math.max(2, lift + dl), {warm: 20}))));
   const leafCols = o.colors && o.colors.length ? o.colors : ['#D6A563', '#B8714F'];
   const leaves = leafCols.map((c) => {
     const front = held(air(off ? c : relit(c, 3, {warm: 10})));
@@ -587,21 +660,42 @@ export function particleProblems(fields: ParticlesProps[], o: {joins?: number[]}
     alive += Math.min(n, p.cap);
     const lift = Math.abs(f.lift ?? p.lift);
     if (lift > (f.tier === 'support' ? 20 : 15)) out.push(`${f.seed}: contrast ${lift} L* over the tier's limit (C 15, B 20)`);
-    const sp = (f.speed ?? p.speed)[1] * Math.pow(1.5, -(f.plane ?? p.plane));
-    const spMax = f.kind === 'motes' ? 15 : f.kind === 'dust' ? 10 : f.kind === 'leaves' ? 180 : f.kind === 'birds' ? 120 : 0;
-    if (spMax > 0 && sp > spMax) out.push(`${f.seed}: ${f.kind} at ${sp.toFixed(0)} px/s (slow life: <= ${spMax})`);
+    // the top speed on screen: the preset's (the curl flow is capped at unit speed) plus the constant drift
+    const k = Math.pow(1.5, -(f.plane ?? p.plane));
+    const drift = f.drift ?? p.drift;
+    const sp = ((f.speed ?? p.speed)[1] + (f.kind === 'motes' || f.kind === 'dust' ? Math.hypot(drift[0], drift[1]) : 0)) * k;
+    const spMax = f.kind === 'motes' || f.kind === 'dust' ? 12 : f.kind === 'leaves' ? 180 : f.kind === 'birds' ? 120 : 0;
+    if (spMax > 0 && sp > spMax + 1e-9) out.push(`${f.seed}: ${f.kind} up to ${sp.toFixed(0)} px/s (slow life: <= ${spMax}; CRAFT §f.6)`);
     if (p.join === 'hold') {
       const life = f.kind === 'birds' ? 8 : ((f.life ?? p.life)[0] + (f.life ?? p.life)[1]) / 2;
       const gap = ((f.gap ?? p.gap)[0] + (f.gap ?? p.gap)[1]) / 2;
       entries += (f.kind === 'birds' ? 1 : Math.min(n, p.cap)) / Math.max(0.1, life + gap);
-      if ((o.joins?.length ?? 0) > 0 && !(f.joins && f.joins.length)) out.push(`${f.seed}: ${f.kind} are entrances: pass the shot's joins (none may start in the 0.4 s around one)`);
+      if ((o.joins?.length ?? 0) > 0 && !(f.joins && f.joins.length)) out.push(`${f.seed}: ${f.kind} are entrances: pass the shot's joins (none may touch the 0.4 s around one)`);
     }
     const box = regionBox(f.region);
     const avoid = f.avoid ?? [CAPTION_BAND];
     const inBand = avoid.some((a) => box[0] < a[0] + a[2] && box[0] + box[2] > a[0] && box[1] < a[1] + a[3] && box[1] + box[3] > a[1]);
     if (inBand && f.kind !== 'leaves' && f.kind !== 'birds') out.push(`${f.seed}: its region overlaps an avoided zone (the caption band?): particles shrink there, so keep the region clear`);
+    if (f.kind === 'birds' && (box[0] > 0 || box[0] + box[2] < FRAME_W))
+      out.push(`${f.seed}: the flight band spans x ${box[0].toFixed(0)}-${(box[0] + box[2]).toFixed(0)}, not the frame: the flock shrinks in and out at its ends; give it the frame's width (x <= 0 to >= ${FRAME_W})`);
+    if (f.kind === 'leaves' && n > 0) {
+      // a leaf whose fall would reach an avoided zone shrinks out before it does: count the first lives that cannot
+      // fall clear, and how soon after their birth they go
+      const r = resolve(f);
+      const cut: number[] = [];
+      let tried = 0;
+      for (let i = 0; i < r.n; i++)
+        for (let c = 0; c < 6; c++) {
+          tried++;
+          const L = lerp(r.p.life, rand(r.seed, `L${i}`));
+          const {until} = leafStart(r, leafLife(r, i, c), `${i}/${c}/`, L);
+          if (until < Infinity) cut.push(until);
+        }
+      if (cut.length > 0)
+        out.push(`${f.seed}: ${cut.length} of its first ${tried} leaves cannot fall clear of the avoided zones (the caption band, the subject's box) and shrink out ${Math.min(...cut).toFixed(1)}-${Math.max(...cut).toFixed(1)} s after their birth: fine past the shot's end; otherwise move the source, calm the drift, or narrow the margin`);
+    }
   }
   if (entries > 0.6) out.push(`entrances ${entries.toFixed(2)}/s across the fields (supporting movers take turns: ~0.6/s)`);
-  if (alive > 16) out.push(`${alive} particles alive at once across the fields: a few, never a texture (keep it <= ~12)`);
+  if (alive > 12) out.push(`${alive} particles alive at once across the fields: a few, never a texture (<= ~12: CRAFT §f.6)`);
   return out;
 }
