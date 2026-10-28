@@ -86,4 +86,7 @@ f370, not f369: the dark window matches the plum bridge; V2S7's cut at f1685, no
 wipe, the wiper's own motion, no pop; extra cut-like f24 (the draw-on) and f2336 (the un-build)). Fix pass A's numbers:
 `docs/v2/REVIEW_1.md` "Fix pass A". The master's other checks
 (av_lag, the lints, light, depth, banding and their regions): ASSEMBLY.md.
+The G7 master (2026-10-28, `docs/v2/MASTER.md`): FAIL 1, 6 WARN. The FAIL: V2S7's cut is found at f1684, not f1686.
+f1684 is the S6 -> S7 zoom's own motion peak: since pass B lowered the boards, the 7x frame f1686 holds only sun and
+sky, and no frame pops. Its other checks, with the light boxes: MASTER.md.
 Engine note: lib/Film never draws a push-through `bridge` (it culls the outgoing scene first); Film2R draws it itself.

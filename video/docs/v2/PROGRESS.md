@@ -2,6 +2,21 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Note 2026-10-28 19:55 UTC: the cover + posting kit done; video 2 ready to post
+
+The film: `deliverables/v2/v2r_G7_master_v1.mp4`. The cover: `deliverables/v2/v2r_cover.png` / `.jpg` (+ `_grid_preview.jpg`): the
+film's own frame at 5.20 s with the core line "SHE SAYS: NO CRITICIZING GOOGLE. FOR LIFE." inside the 4:5 centre. The kit:
+`docs/v2/POSTING_KIT.md` (caption 1,241 chars with the BBC source, a pinned comment with 6 sources, hashtags, TikTok / Shorts
+versions, alt text, upload settings at the highest quality, the file list, a claim-by-claim source table). Open, the owner's call: one
+small polish pass (S5's terrace shadows 21-22 s, the cut head at 22.0 s, S4's teal strip at 15 s; ~1 % of the week).
+
+## Note 2026-10-28 19:25 UTC: G7 master v1 sent to the owner
+
+`deliverables/v2/v2r_G7_master_v1.mp4` (39.083 s, 60 fps, the final sound mix): REVIEW_1's six MUSTs done (fix passes A + B), every
+sound cue on its picture event (SOUND.md "Sound sync (final)"); check_light 17/17, check_depth 0 FAIL, banding 0 FAIL, A/V lag 0 ms,
+loop seam 0.09 %; gate_check's one FAIL (the V2S7 cut found at f1684) waived by eye (MASTER.md §7). Left for the owner's call: the S5
+terrace shadows at 21-22 s, the blank boards waiting for the voice, a few small things (MASTER.md §5). The cover + posting kit next.
+
 ## Snapshot 2026-10-28 16:55 UTC: G5 assembly v1 + the review
 
 `deliverables/v2/v2r_G5_assembly_v1.mp4` (39.083 s, 60 fps, the mix): gate_check PASS (0 fail / 4 warn), A/V sync PASS, lints PASS,

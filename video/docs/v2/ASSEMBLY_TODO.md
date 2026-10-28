@@ -55,3 +55,4 @@
   gate_check PASS (4 WARN); open: check_light FAIL 23.40 (f1404, the paving outshines the Pentagon since the dark plaque) and
   34.00 (f2040, the board in her walk, known); eye: S5's heavy tree shadows 20.7-22.0, the sun on the boards' corner S6/S7
   (+ the black rail at the f1686 push), the blank boards (S7 28.2-29.9, S8 33.2-36.5).
+- TOOLING BACKLOG +: gate_check cut detector: a push-through join gets its declared window (or +-3 frames), not +-1 (the G7 master v1 FAIL at f1684 was the S6 board leaving the frame mid-zoom).

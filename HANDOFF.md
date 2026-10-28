@@ -1,5 +1,10 @@
 # HANDOFF: start here if you are a new agent picking up this project
 
+> **Status 2026-10-28 19:55 UTC (video 2, "One Small Window"):** the G7 master v1 (`video/deliverables/v2/v2r_G7_master_v1.mp4`), the
+> cover and `video/docs/v2/POSTING_KIT.md` are done and with the owner; the week's budget is at ~97 %. The story of how it got here:
+> `video/docs/v2/PROGRESS.md` (newest first), the owner's notes `video/docs/v2/OWNER_NOTES.md`, open items `video/docs/v2/ASSEMBLY_TODO.md`.
+
+
 Written 2026-10-25 ~20:00 UTC by the orchestrating Claude Code session (https://claude.ai/code/session_01BGZ47aBhF9yKpEaeiLeCPQ),
 on the owner's request: "upload all the context ... so that I can direct another agent to the repo and it will know ALL the
 relevant context, including the reference videos I sent and the ones we produced. It must be as if another agent is the
