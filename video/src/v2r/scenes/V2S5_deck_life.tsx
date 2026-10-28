@@ -114,7 +114,7 @@ const Pigeons: React.FC<{spots: PigeonSpot[]; seed: string; t: number}> = ({spot
     <g>
       <path d={body} fill={paint(pg)} />
       <path d={wing} fill={paint(mix(pg, CM.anchor, 0.18))} />
-      <path d={head} fill={paint(mix(CM.paneUnlit, CM.stoneShade, 0.3))} />
+      <path d={head} fill={paint(mix(CM.paneUnlit, CM.stoneShade, 0.45))} />
     </g>
   );
 };
