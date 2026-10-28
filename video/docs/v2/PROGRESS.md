@@ -2,6 +2,13 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-28 15:28 UTC (hourly)
+
+The owner approved the G4 look clip v6 ("Yeah this is better keep going"). Running (wf_9f2d1e98-ed4): the shared water into S2-S5
+(+ the S8 seam check), then the full 60 fps master (`deliverables/v2/v2r_G5_assembly_v1.mp4`) with the gate checks, then one fresh
+reviewer (cold watch, then art + flow; at most 6 must-fixes) into `docs/v2/REVIEW_1.md`. Spend: ~$24 since 14:34; the owner's 93 % at
+15:00; the film projects ~98-99.6 %; the cover + posting kit last.
+
 ## Note 2026-10-28 14:50 UTC: G4 look clip v6 sent to the owner (the new water)
 
 `deliverables/v2/v2r_G4_look_v6.mp4` (master; S1 0-6.13 s) + `_water_vs_v5.jpg`: S1's canal is the shared `src/lib/water.tsx`
