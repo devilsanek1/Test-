@@ -7,9 +7,13 @@
 //            sets 40: a REQUEST to L5 to move its default).
 //   Plaque   the viewpoint plaque, END coords, popping ON "Pentagon" (scene 1.88 = 22.43): "The Pentagon" (key 56) /
 //            "US Department of Defense" (body 30). The lane's spot (L4_spec section 3): its plate on the terrace just in
-//            front of the balustrade, x 441-769, y 1119-1246 (no post: its bottom edge on the floor line), right of the
-//            pair and in front of the news box's right half; at its pop (p 0.70, the deck 1.30x) the text stays inside
-//            x <= 880; at the end it sits below the Pentagon's facades (their bottom edge ~y 1000-1045).
+//            front of the balustrade, x 441-769, y 1110-1237 (no post: its bottom edge on the border band, 7 px in front
+//            of the balustrade's base), right of the pair and in front of the news box's right half; at its pop (p 0.70,
+//            the deck 1.30x) the text stays inside x <= 880; at the end it sits below the Pentagon's facades (their bottom
+//            edge ~y 1000-1045). Tier A from its pop (conform_L4 §5). Its separation (check_depth "melts", QA
+//            2026-10-28: at y 1119-1246 the limestone face and its frame sat on the light paving and balustrade, median
+//            |dL*| 5.2): its top edge and pointer tab now stand on the Pentagon's cast shadow (the calm L* ~55 band on
+//            its lawn, y ~1068-1104), its foot on its own contact shadow (+ its cast, left in the end light).
 import React from 'react';
 import {Fill} from '../../lib/Fill';
 import {useTime} from '../../lib/time';
