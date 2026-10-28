@@ -430,6 +430,347 @@ def cmd_measure(a) -> None:
     print('wrote', a.out)
 
 
+
+# ------------------------------------------------------------------------------------------------------ the v2 gamut mask
+# A gamut mask (Gurney, Color and Light, 2010; Gurney Journey "Gamut Masking Method", 2011-09) built around Canal Mint's
+# roles, in CIE LCh: the most chroma a fill may carry at each hue. Three lobes (warm terracotta-gold, canal teal-mint,
+# slate-plum), olive (h 95-118) held to near-neutral (the owner's never-olive rule), leaf sage (h 130-165) at C* <= 18-32, the pop alone
+# outside (<= 3 % of the frame: the sun disc). The VALUE-CHROMA envelope scales it by lightness: lights stay calm paper.
+MASK_HUE = [(0, 28), (20, 40), (35, 52), (60, 50), (85, 44), (95, 7), (118, 7), (130, 18), (150, 22), (165, 32),
+            (185, 38), (205, 24), (240, 18), (270, 26), (300, 26), (330, 24), (360, 28)]
+
+
+def mask_cmax(h):
+    hs = np.array([a for a, _ in MASK_HUE], float)
+    cs = np.array([c for _, c in MASK_HUE], float)
+    return np.interp(np.asarray(h, float) % 360, hs, cs)
+
+
+def envelope(L):
+    """The value-chroma envelope: the share of the hue mask a fill may use at lightness L* (1 in the mids)."""
+    return np.interp(np.asarray(L, float), [0, 15, 72, 80, 88, 96, 101], [0.7, 0.8, 1.0, 0.55, 0.3, 0.22, 0.2])
+
+
+def mask_report(lab, valid) -> dict:
+    L, C, h = S.lch(lab)
+    lim = mask_cmax(h) * envelope(L)
+    over = valid & (C > lim + 1.0)
+    pop = over & (C >= 50)
+    return {'outside_pct': r1(100 * over.sum() / valid.sum(), 1), 'outside_not_pop_pct': r1(100 * (over & ~pop).sum() / valid.sum(), 1),
+            'hue_only_outside_pct': r1(100 * (valid & (C > mask_cmax(h) + 1.0)).sum() / valid.sum(), 1)}
+
+
+def cmd_mask(a) -> None:
+    import re
+    src = (VIDEO / 'src/v2r/palette.ts').read_text()
+    blk = src[src.index('export const CM = {'):src.index('};', src.index('export const CM = {'))]
+    rows = []
+    for m in re.finditer(r"(\w+): '(#[0-9A-Fa-f]{6})'", blk):
+        k, hx = m.groups()
+        L, C, h = S.lch(S.hex_lab(hx))
+        lim = float(mask_cmax(h) * envelope(L))
+        rows.append((k, hx, r1(L), r1(C), r1(h, 0), r1(lim), 'OUT' if C > lim + 1 else ''))
+    for r in rows:
+        print('%-12s %s L %5.1f C %5.1f h %4.0f  limit %5.1f %s' % r)
+    J = json.loads(Path(a.json).read_text()) if a.json and Path(a.json).exists() else None
+    out = {'roles': rows}
+    for kind, paths in (('poster', [REFS / n for n in S.POSTERS]), ('v2', pull(V2_MASTER, V2_TIMES, 'v2', SCR / 'frames'))):
+        res = []
+        for p in paths:
+            _, valid, lab, _ = prep(p, kind)
+            res.append(mask_report(lab, valid))
+        out[kind] = res
+        print(kind, 'outside the mask x envelope %:', [r['outside_pct'] for r in res],
+              '| not the pop:', [r['outside_not_pop_pct'] for r in res], '| hue mask only:', [r['hue_only_outside_pct'] for r in res])
+    Path(SCR / 'mask.json').write_text(json.dumps(out, indent=1, default=float))
+
+
+# ------------------------------------------------------------------------------------------------------ sheets
+INK = (34, 30, 28)
+MUTED = (110, 104, 98)
+PAPER = (250, 247, 242)
+VGREYS = [38, 82, 122, 162, 204, 242]
+
+
+def value_map(lab, valid):
+    L = lab[..., 0]
+    idx = np.digitize(L, L_EDGES[1:-1])
+    g = np.array(VGREYS, np.uint8)[idx]
+    out = np.stack([g, g, g], -1)
+    out[~valid] = (214, 196, 214)
+    return out
+
+
+def role_map(rgb_s, lab, valid):
+    L, C, h = S.lch(lab)
+    g = np.array(VGREYS, np.uint8)[np.digitize(L, L_EDGES[1:-1])].astype(np.float32)
+    out = np.stack([g, g, g], -1) * 0.55 + 0.45 * 180
+    pastel = (L >= 75) & (C >= 10)
+    paper = (L >= 75) & (C < 6)
+    soft = (L >= 75) & (C >= 6) & (C < 10)
+    acc = C >= 35
+    out[pastel] = (243, 150, 178)
+    out[soft] = (236, 214, 224)
+    out[paper] = (255, 255, 255)
+    out[acc] = rgb_s[acc]
+    out[~valid] = (214, 196, 214)
+    return out.astype(np.uint8)
+
+
+def fit_h(arr, h):
+    im = Image.fromarray(arr) if isinstance(arr, np.ndarray) else arr
+    return im.resize((max(1, int(round(im.width * h / im.height))), h), Image.LANCZOS)
+
+
+def sheet_value_chroma(J, out_dir: Path) -> None:
+    picks = [('01_singapore.jpg', 'poster', 'Singapore'), ('04_buenos_aires.jpg', 'poster', 'Buenos Aires'),
+             ('05_cape_town.jpg', 'poster', 'Cape Town'), ('07_kyoto.jpg', 'poster', 'Kyoto'),
+             ('v2_t5.2.png', 'v2', 'v2 S1 cover 5.2 s'), ('v2_t9.0.png', 'v2', 'v2 S2 9.0 s'),
+             ('v2_t17.5.png', 'v2', 'v2 S4 17.5 s'), ('v2_t26.0.png', 'v2', 'v2 S6 26.0 s')]
+    byname = {m['file']: m for m in J['items']}
+    Hrow = 400
+    cols = []
+    for fn, kind, title in picks:
+        p = REFS / fn if kind == 'poster' else SCR / 'frames' / fn
+        rgb_s, valid, lab, _ = prep(p, kind)
+        shown = rgb_s.copy()
+        shown[~valid] = (shown[~valid] * 0.3 + 150).astype(np.uint8)
+        m = byname[fn]
+        cols.append((title, [fit_h(shown, Hrow), fit_h(value_map(lab, valid), Hrow), fit_h(role_map(rgb_s, lab, valid), Hrow)], m))
+    gap = 14
+    W = sum(c[1][0].width for c in cols) + gap * (len(cols) + 1)
+    top = 64
+    H = top + 3 * (Hrow + 34) + 170
+    im = Image.new('RGB', (W, H), PAPER)
+    d = ImageDraw.Draw(im)
+    d.text((gap, 10), 'Value plan and where the colour lives: four posters vs four v2 frames (phone scale; UI, title and caption band masked)',
+           fill=INK, font=S.font(24, True))
+    d.text((gap, 38), 'row 1 the frame; row 2 value map (L* <30 / 30-45 / 45-60 / 60-75 / 75-88 / >=88); row 3 colour jobs: '
+           'PINK = pastel (L*>=75, C*>=10), white = calm paper (L*>=75, C*<6), own colour = accents (C*>=35), grey = the rest by value',
+           fill=MUTED, font=S.font(16))
+    x = gap
+    for title, ims, m in cols:
+        y = top
+        for k, tile in enumerate(ims):
+            im.paste(tile, (x, y))
+            if k == 0:
+                d.text((x, y + Hrow + 4), title, fill=INK, font=S.font(18, True))
+            y += Hrow + 34
+        v, c, fl = m['value'], m['chroma'], m['fields']
+        lines = [f"L* p5 {v['pct']['p5']:.0f}  p25 {v['pct']['p25']:.0f}  p50 {v['pct']['p50']:.0f}",
+                 f"dark <45: {v['groups']['dark_lt45']:.0f} %  ({v['darks']['parts_ge4px']} pieces)",
+                 f"pastel {c['pastel_pct']:.0f} %  paper {c['paper_pct']:.0f} %",
+                 f"C*-weighted L* {c['C_weighted_L']:.0f}",
+                 f"accents C*>=35: {c['accents_c35']['share_pct']:.1f} %",
+                 f"big empty fields below sky {fl['big_fields_below_sky_pct']:.0f} %"]
+        for i, t in enumerate(lines):
+            d.text((x, y + 2 + 22 * i), t, fill=INK if i in (0, 2) else MUTED, font=S.font(15))
+        x += ims[0].width + gap
+    S.save_sheet(im, out_dir / 'pro_4_colour_value_chroma.jpg')
+
+
+def _pool(kind_paths, fn):
+    acc = None
+    for p, kind in kind_paths:
+        rgb_s, valid, lab, _ = prep(p, kind)
+        r = fn(rgb_s, lab, valid)
+        acc = r if acc is None else [a + b for a, b in zip(acc, r)]
+    return acc
+
+
+def _lc_hist(rgb_s, lab, valid):
+    L, C, h = S.lch(lab)
+    m = valid & (C < 60)
+    li = np.clip(L[m].astype(int), 0, 99)
+    ci = np.clip((C[m] * 2).astype(int), 0, 119)
+    w = 1.0 / m.sum()
+    cnt = np.zeros((100, 120))
+    np.add.at(cnt, (li, ci), w)
+    col = np.zeros((100, 120, 3))
+    for k in range(3):
+        np.add.at(col[..., k], (li, ci), rgb_s[m][:, k] * w)
+    return [cnt, col]
+
+
+def _ab_hist(rgb_s, lab, valid):
+    a, b = lab[..., 1], lab[..., 2]
+    m = valid
+    ai = np.clip(((a[m] + 60) / 1.0).astype(int), 0, 139)
+    bi = np.clip(((b[m] + 60) / 1.0).astype(int), 0, 139)
+    w = 1.0 / m.sum()
+    cnt = np.zeros((140, 140))
+    np.add.at(cnt, (bi, ai), w)
+    col = np.zeros((140, 140, 3))
+    for k in range(3):
+        np.add.at(col[..., k], (bi, ai), rgb_s[m][:, k] * w)
+    return [cnt, col]
+
+
+def _density_image(cnt, col, scale):
+    meanc = col / np.maximum(cnt[..., None], 1e-12)
+    dens = np.log10(np.maximum(cnt / cnt.sum(), 1e-7))
+    alpha = np.clip((dens + 6.0) / 4.0, 0, 1)[..., None]
+    img = PAPER_ARR = np.array(PAPER, float)[None, None, :] * (1 - alpha) + meanc * alpha
+    img = np.clip(img, 0, 255).astype(np.uint8)
+    return Image.fromarray(img).resize((img.shape[1] * scale[0], img.shape[0] * scale[1]), Image.NEAREST)
+
+
+def sheet_maps(out_dir: Path) -> None:
+    posters = [(REFS / n, 'poster') for n in S.POSTERS]
+    v2 = [(p, 'v2') for p in pull(V2_MASTER, V2_TIMES, 'v2', SCR / 'frames')]
+    lcP, lcV = _pool(posters, _lc_hist), _pool(v2, _lc_hist)
+    abP, abV = _pool(posters, _ab_hist), _pool(v2, _ab_hist)
+    sx, sy = 5, 6  # L-C: C* 0-60 (120 half-unit bins) -> 600 px; L* 0-100 -> 600 px
+    pw = 620
+    W = 2 * pw + 3 * 40 + 2 * 600
+    H = 900
+    im = Image.new('RGB', (W, H), PAPER)
+    d = ImageDraw.Draw(im)
+    d.text((40, 12), 'Where the colour lives (L* against C*, pooled: 7 posters | 10 v2 frames) and the gamut (a* b*, with the proposed Canal Mint mask)',
+           fill=INK, font=S.font(24, True))
+    d.text((40, 42), 'Each cell shows the mean colour of its pixels; opacity = log density. Boxes: PASTEL (L*>=75, C*>=10), PAPER (L*>=75, C*<6), '
+           'ACCENT (C*>=35), DARK (L*<40).', fill=MUTED, font=S.font(16))
+    for k, ((cnt, col), name) in enumerate(((lcP, '7 posters'), (lcV, 'v2, 10 frames'))):
+        x0, y0 = 40 + k * (600 + 40), 110
+        tile = _density_image(cnt[::-1], col[::-1], (sx, sy))  # L* up
+        im.paste(tile, (x0, y0))
+        def P(C, L):
+            return (x0 + C * 10, y0 + (100 - L) * 6)
+        d.rectangle([P(0, 100), P(60, 0)], outline=MUTED)
+        d.rectangle([P(10, 100), P(60, 75)], outline=(214, 60, 110), width=3)
+        d.rectangle([P(0, 100), P(6, 75)], outline=(60, 110, 200), width=3)
+        d.line([P(35, 100), P(35, 0)], fill=(230, 120, 30), width=2)
+        d.line([P(0, 40), P(60, 40)], fill=(80, 80, 80), width=2)
+        for c in (0, 10, 20, 30, 40, 50, 60):
+            d.text((P(c, 0)[0] - 6, P(c, 0)[1] + 4), str(c), fill=MUTED, font=S.font(14))
+        for L in (0, 20, 40, 60, 80, 100):
+            d.text((x0 - 30, P(0, L)[1] - 8), str(L), fill=MUTED, font=S.font(14))
+        d.text((x0, y0 - 28), f'{name}: L* (up) vs C* (right)', fill=INK, font=S.font(18, True))
+        d.text((P(11, 99)[0] + 4, P(11, 99)[1] + 2), 'PASTEL', fill=(214, 60, 110), font=S.font(15, True))
+        d.text((P(0, 74)[0] + 2, P(0, 74)[1] + 2), 'PAPER', fill=(60, 110, 200), font=S.font(15, True))
+        d.text((P(36, 70)[0], P(36, 70)[1]), 'ACCENT', fill=(230, 120, 30), font=S.font(15, True))
+        d.text((P(45, 39)[0], P(45, 39)[1] + 2), 'DARK', fill=(80, 80, 80), font=S.font(15, True))
+    # a*b*: 140 bins of 1 unit (-60..80) -> 4 px each = 560 px
+    import re
+    src = (VIDEO / 'src/v2r/palette.ts').read_text()
+    blk = src[src.index('export const CM = {'):src.index('};', src.index('export const CM = {'))]
+    roles = {k: hx for k, hx in re.findall(r"(\w+): '(#[0-9A-Fa-f]{6})'", blk)}
+    show = ['sky', 'stucco', 'paving', 'brick', 'brickDeep', 'water', 'hero', 'anchor', 'pop', 'leafGold', 'sage', 'pipBody', 'shadeWarm', 'paneUnlit']
+    for k, ((cnt, col), name) in enumerate(((abP, '7 posters'), (abV, 'v2 + the mask'))):
+        x0, y0 = 40 + 2 * 640 + k * (600 + 20), 110
+        tile = _density_image(cnt[::-1], col[::-1], (4, 4))  # b* up
+        im.paste(tile, (x0, y0))
+        def Q(a, b):
+            return (x0 + (a + 60) * 4, y0 + (80 - b) * 4)
+        d.rectangle([Q(-60, 80), Q(80, -60)], outline=MUTED)
+        d.line([Q(-60, 0), Q(80, 0)], fill=(200, 196, 190))
+        d.line([Q(0, -60), Q(0, 80)], fill=(200, 196, 190))
+        for r in (20, 40, 60):
+            d.ellipse([Q(-r, r), Q(r, -r)], outline=(215, 210, 205))
+        d.text((x0, y0 - 28), f'{name}: a* (right) vs b* (up); rings C* 20 / 40 / 60', fill=INK, font=S.font(18, True))
+        # the mask polygon (mids: envelope 1)
+        hh = np.arange(0, 361, 3)
+        cm = mask_cmax(hh)
+        pts = [Q(c * math.cos(math.radians(t)), c * math.sin(math.radians(t))) for t, c in zip(hh, cm)]
+        d.line(pts + [pts[0]], fill=(30, 30, 30), width=3)
+        if k == 1:
+            for nm in show:
+                lab_ = S.hex_lab(roles[nm])
+                px = Q(lab_[1], lab_[2])
+                d.ellipse([px[0] - 9, px[1] - 9, px[0] + 9, px[1] + 9], fill=roles[nm], outline=(0, 0, 0))
+                d.text((px[0] + 11, px[1] - 9), nm, fill=INK, font=S.font(14))
+        d.text((x0 + 6, y0 + 566), 'black line: the proposed hue mask (max C* per hue, in the mids)', fill=MUTED, font=S.font(14))
+    S.save_sheet(im, out_dir / 'pro_4_colour_maps.jpg')
+
+
+def _best_flat_window(lab, valid, y_min, win=64):
+    g = cv2.GaussianBlur(lab.astype(np.float32), (0, 0), 0.7)
+    gx = cv2.Sobel(g, cv2.CV_32F, 1, 0, ksize=3) / 8
+    gy = cv2.Sobel(g, cv2.CV_32F, 0, 1, ksize=3) / 8
+    G = np.sqrt((gx ** 2 + gy ** 2).sum(-1))
+    flat = (G < 2.0) & valid
+    ii = cv2.integral(flat.astype(np.uint8))
+    best, bxy = -1, (0, y_min)
+    H, W = flat.shape
+    for y in range(y_min, H - win, 4):
+        for x in range(0, W - win, 4):
+            s = ii[y + win, x + win] - ii[y, x + win] - ii[y + win, x] + ii[y, x]
+            if s > best:
+                best, bxy = s, (x, y)
+    return bxy, best / win / win
+
+
+def sheet_fields(out_dir: Path) -> None:
+    picks = [('01_singapore.jpg', 'poster', 'Singapore'), ('04_buenos_aires.jpg', 'poster', 'Buenos Aires'),
+             ('07_kyoto.jpg', 'poster', 'Kyoto'), ('v2_t5.2.png', 'v2', 'v2 S1 cover'), ('v2_t17.5.png', 'v2', 'v2 S4'),
+             ('v2_t36.0.png', 'v2', 'v2 S8')]
+    Hrow = 560
+    tiles = []
+    for fn, kind, title in picks:
+        p = REFS / fn if kind == 'poster' else SCR / 'frames' / fn
+        rgb_s, valid, lab, f = prep(p, kind)
+        fl = fields(lab, valid)
+        cc, big_ids, top_ids = fl.pop('_map')
+        ov = rgb_s.astype(np.float32).copy()
+        for i in big_ids:
+            m = cc == i
+            colr = np.array((70, 120, 230) if i in top_ids else (235, 50, 60), np.float32)
+            ov[m] = ov[m] * 0.45 + colr * 0.55
+        ov[~valid] = 200
+        # the flattest window below the sky (poster: under its skyline; v2: under y 1000 of 1920)
+        y_min = int((S.POSTERS[fn]['skyline'] if kind == 'poster' else 1000) / f)
+        (wx, wy), frac = _best_flat_window(lab, valid, y_min)
+        full = np.asarray(Image.open(p).convert('RGB'))
+        X0, Y0 = int(wx * f), int(wy * f)
+        crop = full[Y0:Y0 + 180, X0:X0 + 180]
+        cl = S.srgb_to_lab(crop.astype(np.float64))
+        st = cl.copy()
+        mu = np.median(cl.reshape(-1, 3), 0)
+        st[..., 0] = mu[0] + (cl[..., 0] - mu[0]) * 8
+        st[..., 1:] = mu[1:] + (cl[..., 1:] - mu[1:]) * 8
+        stretched = S.lab_to_srgb(st).astype(np.uint8)
+        resid = cl[..., 0] - cv2.GaussianBlur(cl[..., 0].astype(np.float32), (0, 0), 25)
+        d0 = ImageDraw.Draw(Image.fromarray(ov.astype(np.uint8)))
+        tiles.append((title, ov.astype(np.uint8), crop, stretched, fl, (wx, wy), float(resid.std())))
+    gap = 16
+    tw = [fit_h(t[1], Hrow).width for t in tiles]
+    W = sum(tw) + gap * (len(tiles) + 1)
+    H = 70 + Hrow + 40 + 2 * 196 + 130
+    im = Image.new('RGB', (W, H), PAPER)
+    d = ImageDraw.Draw(im)
+    d.text((gap, 10), 'Empty fields and in-shape variation: BLUE = the big edge-free field touching the top (the sky), RED = big '
+           'edge-free fields below it (each >= 2 % of the frame)', fill=INK, font=S.font(22, True))
+    d.text((gap, 40), 'Below: the flattest 180 px window under the sky at source size (left) and the same with its L* and a*b* '
+           'variation stretched 8x (right): paper mottle vs a dead-flat fill', fill=MUTED, font=S.font(16))
+    x = gap
+    for (title, ov, crop, st, fl, wxy, rstd), w in zip(tiles, tw):
+        t = fit_h(ov, Hrow)
+        im.paste(t, (x, 70))
+        sc = Hrow / ov.shape[0]
+        d.rectangle([x + wxy[0] * sc, 70 + wxy[1] * sc, x + (wxy[0] + 180 / (ov.shape[1] and 1) * 0 + 64) * sc, 70 + (wxy[1] + 64) * sc],
+                    outline=(255, 200, 0), width=3)
+        d.text((x, 70 + Hrow + 6), title, fill=INK, font=S.font(18, True))
+        y = 70 + Hrow + 36
+        im.paste(Image.fromarray(crop).resize((180, 180)), (x, y))
+        im.paste(Image.fromarray(st).resize((180, 180)), (x + 186 if w >= 372 else x, y if w >= 372 else y + 186))
+        yy = y + (190 if w >= 372 else 376)
+        lines = [f"big fields below sky {fl['big_fields_below_sky_pct']:.0f} %",
+                 f"mottle L* {fl.get('mottle_L_std', 0):.2f}  ab {fl.get('mottle_ab_std', 0):.2f}",
+                 f"drift in a field {fl.get('drift_L', 0):.1f} L*"]
+        for i, s_ in enumerate(lines):
+            d.text((x, yy + 20 * i), s_, fill=INK if i == 0 else MUTED, font=S.font(15))
+        x += w + gap
+    S.save_sheet(im, out_dir / 'pro_4_colour_fields.jpg')
+
+
+def cmd_sheets(a) -> None:
+    J = json.loads(Path(a.json).read_text())
+    out = Path(a.img)
+    sheet_value_chroma(J, out)
+    sheet_maps(out)
+    sheet_fields(out)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest='cmd', required=True)
@@ -437,6 +778,13 @@ def main() -> None:
     m.add_argument('--images', nargs='*')
     m.add_argument('--out', default=str(SCR / 'm.json'))
     m.set_defaults(fn=cmd_measure)
+    sh = sub.add_parser('sheets')
+    sh.add_argument('--json', default=str(SCR / 'm.json'))
+    sh.add_argument('--img', default=str(SCR / 'img'))
+    sh.set_defaults(fn=cmd_sheets)
+    mk = sub.add_parser('mask')
+    mk.add_argument('--json', default=str(SCR / 'm.json'))
+    mk.set_defaults(fn=cmd_mask)
     a = ap.parse_args()
     a.fn(a)
 
