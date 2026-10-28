@@ -31,12 +31,16 @@ const W = S7_WING;
 
 // ---------------------------------------------------------------- colours (+1, as shown)
 
-/** The wing's materials on +1 (authored so the pen shows recede(c, 1)). */
+/** The wing's materials on +1 (authored so the pen shows recede(c, 1)). The frames are TONE-ON-TONE (tier C: no line,
+ *  at most dL* 15 inside the plane, CRAFT §c): the window frames are the shaded wall's own value (L* 67 on panes of
+ *  72-79), the doors' a pale bronze one step under the lamp-lit lobby (L* 76 on 88): never a dark bar that reads as a
+ *  drawn line (check_depth's ladder holds: +1 dE 11.3 from the air, +2 7.6, +3 3.6). */
 export const WING_C = {
   brick: onPlane(CM.brickLight, 1),
   stone: onPlane(CM.limestone, 1),
   stoneLit: onPlane(CM.paper, 1),
-  frame: onPlane(CM.brickDeep, 1),
+  frame: onPlane(multiply(recede(CM.brickLight, 1, S7_ATM), TINT_CANAL.form), 0),
+  doorFrame: onPlane(fromLch(76, 16, 62), 0),
   sill: onPlane(CM.stucco, 1),
   fascia: onPlane(CM.paper, 1),
 } as const;
@@ -50,8 +54,8 @@ const paneTone = (lift: number, warm: number) => {
 };
 /** Panes are NOT under the facade's Shade (V2S7_light cuts them out): authored for the environment tier. */
 const PANE = {
-  upper: onPlaneExact(paneTone(7, 16)),
-  upperTop: onPlaneExact(paneTone(10, 20)),
+  upper: onPlaneExact(paneTone(5, 16)),
+  upperTop: onPlaneExact(paneTone(8, 20)),
   lower: onPlaneExact(paneTone(9, 18)),
   lowerTop: onPlaneExact(paneTone(12, 22)),
 };
@@ -199,7 +203,7 @@ function doorsInto(k: Batch, open: number) {
   const D = W.door;
   const leafW = (D.x1 - D.x0) / 2;
   const fr = 4;
-  const frame = WING_C.frame;
+  const frame = WING_C.doorFrame;
   for (const side of [0, 1]) {
     const shift = open * leafW * (side ? 1 : -1);
     const a0 = D.x0 + side * leafW + shift;

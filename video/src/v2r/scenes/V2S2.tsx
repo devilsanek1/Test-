@@ -164,6 +164,7 @@ const Shot: React.FC = () => {
                       <S2Motes layer="far" />
                     </>
                   }
+                  leaves={<S2Motes layer="leaves" />}
                   extra={<S2Motes layer="near" />}
                 />
               </CanalCast>

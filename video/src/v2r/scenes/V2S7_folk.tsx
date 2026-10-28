@@ -1,14 +1,13 @@
 // V2S7_folk.tsx (lane L5): the LIFE of V2S7 that is not a particle, every figure sized by the shot's one camera
 // (V2S7_plan: 1.7 m people at their own depth) and every time shot-local (film - 28.10). Tiers (conform_L5 §3):
 // B (support, thin tinted lines) = the door people, small backs taking turns; C (environment, no line) = the cyclist,
-// the two people at rest at the cafe table in the west strip, a far walker beyond the hedge, the parked bikes, the
-// festoon, the boat smoke. At most three noticeable movers at once, taking turns (the staffer in 0-1.8 s, the cyclist
+// the two people at rest at the cafe table in the west strip (fill only: `ink={0}`), the parked bikes, the festoon, the
+// boat smoke. At most three noticeable movers at once, taking turns (the staffer in 0-1.8 s, the cyclist
 // 1.3-3.5 s, the staffer out from 2.6 s); nothing enters, pops or turns in 27.90-28.30 (local -0.2..0.2): the staffer
 // going in is already walking; nothing new starts in 32.50-33.10 (local 4.40-5.00) but the wiper.
 //   S7StaffInside / S7StaffOutside   the door people (in through the doors on DOOR_KEYS, then out and away right)
 //   S7Cyclist      one cyclist across the forecourt (z 21) from behind the board's right edge, behind the plane's trunk
 //   S7CafePair     two people at rest at a small cafe table in the west strip (z 19.5): a cup lifts, slowly
-//   S7FarWalker    one far walker beyond the west hedge (head and shoulders), right to left
 //   S7Bikes        two Sheffield stands with two bikes along the frontage right of the doors (z 23.2)
 //   S7Festoon      ONE string from the wing to the plane, its 15 bulbs in THREE groups switching on together on film
 //                  frames 1812 / 1836 / 1848 (30.200 / 30.600 / 30.800: the sound lane's request, map S7.boardBeats):
@@ -17,7 +16,7 @@ import React from 'react';
 import {CM} from '../palette';
 import {useTime} from '../../lib/time';
 import {Tier} from '../../lib/tier';
-import {SourceCore} from '../../lib/light';
+import {SourceCore, fromLch} from '../../lib/light';
 import {wire as wirePath, wirePoint} from '../../lib/sketch';
 import {Batch, Paint, P, ovalPath, lerp, clamp01} from '../kit/canal/core';
 import {bikeInto} from '../kit/canal/towpath';
@@ -119,6 +118,11 @@ export const S7StaffOutside: React.FC = () => {
 
 // ---------------------------------------------------------------- the cyclist (C)
 
+/** The cyclist's coat and trousers: light (L* >= 69: a tier-C figure's same-hue lines stay over L* 55, never a dark
+ *  drawn line), a cool denim that never hides a gold or rust leaf blowing across it (the leaves cross his path at
+ *  ~2.4-3.3 s). */
+const S7_CYCLIST_COAT = '#A4B2C9';
+
 /** The cyclist (z 21: 146 px, a slow 2.6 m/s = 223 px/s): out from behind the board's right edge at ~1.30 s, off the
  *  right edge by ~3.4 s. */
 export const CYCLIST = {z: 21, v: 2.6, t0: 1.3, x0: xAt(640, 21)} as const;
@@ -135,12 +139,12 @@ export const S7Cyclist: React.FC = () => {
   if (!c) return null;
   return (
     <Tier tier="environment">
-      <Person x={c.x} y={c.y} h={c.h} seed="s7/cyclist" pose="cycle" view="profile" flip pedal={1.2} traits={{hair: 'cap', acc: 'backpack', coat: CM.leafRust, hairColor: CM.hair[2], hatColor: CM.coatOat}} exact />
+      <Person x={c.x} y={c.y} h={c.h} seed="s7/cyclist" pose="cycle" view="profile" flip pedal={1.2} traits={{hair: 'cap', acc: 'backpack', coat: S7_CYCLIST_COAT, trousers: '#B4AABF', hairColor: CM.hair[2], hatColor: CM.coatOat}} exact />
     </Tier>
   );
 };
 
-// ---------------------------------------------------------------- the west strip: two at rest, a far walker (C)
+// ---------------------------------------------------------------- the west strip: two at rest (C)
 
 /** The pair's seat line and seated height (head top to the seat: 0.85 m at z 19.5), and the small table. */
 export const CAFE_PAIR = (() => {
@@ -158,29 +162,14 @@ export const S7CafePair: React.FC = () => {
   // the small round table between them (marble top on a pedestal) and their two chairs' backs
   const [tx] = pt(S7_CAFE_PAIR.table, z);
   const k = kz(z);
-  b.rect(onPlane(CM.coatSlate, 1), tx - 0.02 * k, yAt(z, 0.72), 0.04 * k, yAt(z) - yAt(z, 0.72));
+  b.rect(onPlane(CM.stoneShade, 1), tx - 0.02 * k, yAt(z, 0.72), 0.04 * k, yAt(z) - yAt(z, 0.72));
   b.fill(onPlane(CM.limestone, 1), ovalPath(tx, yAt(z, 0.74), 0.24 * k, 0.05 * k));
   b.fill(onPlane(CM.paper, 1), ovalPath(tx - 0.05 * k, yAt(z, 0.77), 0.04 * k, 0.02 * k));
   return (
     <Tier tier="environment">
-      <Seated x={seats[0]} y={seatY} h={h} seed="s7/pair/a" view="profile" flip cup={cup} side={1} traits={{hair: 'long', acc: 'scarf', coat: CM.brickLight, trousers: '#B9A9B6', hairColor: CM.hair[4], accColor: CM.sage}} />
-      <Seated x={seats[1]} y={seatY} h={h * 0.97} seed="s7/pair/b" view="profile" read traits={{hair: 'short', acc: 'none', coat: CM.sage, trousers: '#A9A3B9', hairColor: CM.hair[3]}} />
+      <Seated x={seats[0]} y={seatY} h={h} seed="s7/pair/a" view="profile" flip cup={cup} side={1} ink={0} traits={{hair: 'long', acc: 'scarf', coat: CM.brickLight, trousers: '#B9A9B6', hairColor: CM.hair[4], accColor: CM.sage}} />
+      <Seated x={seats[1]} y={seatY} h={h * 0.97} seed="s7/pair/b" view="profile" read ink={0} traits={{hair: 'short', acc: 'none', coat: CM.sage, trousers: '#A9A3B9', hairColor: CM.hair[3]}} />
       <Paint b={b} seed="s7/pairTable" misreg={false} />
-    </Tier>
-  );
-};
-
-/** One far walker on the pavement beyond the hedge (z 33): right to left, 1.25 m/s, 1.5-3.8 s (head and shoulders). */
-export const FAR_WALKER = {z: 33, v: -1.25, t0: 1.5, x0: xAt(116, 33)} as const;
-export const S7FarWalker: React.FC = () => {
-  const t = useTime();
-  if (t < FAR_WALKER.t0 - 0.1) return null;
-  const x = FAR_WALKER.x0 + FAR_WALKER.v * (t - FAR_WALKER.t0);
-  const [sx, sy] = pt(x, FAR_WALKER.z);
-  if (sx < -40) return null;
-  return (
-    <Tier tier="environment">
-      <Person x={sx} y={sy} h={heightAt(FAR_WALKER.z, 1.7)} seed="s7/farWalker" pose="walk" view="profile" walk={{rate: 1.8}} traits={{hair: 'beanie', acc: 'none', coat: CM.coatSlate, hatColor: CM.coatMustard}} exact />
     </Tier>
   );
 };
@@ -215,6 +204,9 @@ export const S7Bikes: React.FC = () => {
 
 // ---------------------------------------------------------------- the festoon (C): three switch-ons
 
+/** The festoon's wire as shown (a 'tone' line: the pen keeps it as authored). */
+const FESTOON_WIRE = fromLch(60, 18, 45);
+
 /** Local switch-on times of the festoon's three groups: film frames 1812 / 1836 / 1848 (30.200 / 30.600 / 30.800). */
 export const FESTOON_ON = [1812, 1836, 1848].map((f) => f / 60 - 28.1) as [number, number, number];
 /** Which group a bulb belongs to (left third first: nearest the board, then outward into the plane). */
@@ -233,7 +225,8 @@ export const S7Festoon: React.FC = () => {
   const t = useTime();
   const {from, to, sag, bulb} = S7_FESTOON;
   const b = new Batch();
-  b.ink(wirePath(from[0], from[1], to[0], to[1], sag, {seed: 's7/festoon'}), 1.4, CM.line, 0, {thing: true});
+  // the wire IS the thing (tier C: a hairline within dL* 15 of the wall and panes behind it, L* 60 on 67-79)
+  b.ink(wirePath(from[0], from[1], to[0], to[1], sag, {seed: 's7/festoon'}), 1.4, FESTOON_WIRE, 0, {thing: true});
   b.layer();
   const bulbs = festoonBulbs();
   const off = onPlane(CM.stoneShade, 1);

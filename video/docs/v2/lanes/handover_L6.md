@@ -1,5 +1,7 @@
 # L6 handover (V2S8 + the seam)
 
+## DONE 2026-10-28 ~10:00 UTC: report_L6.md pushed (the critic's 2 MUSTs fixed in cb46b9a; its SHOULDs listed there as open). Next for L6 only on the orchestrator's word: the SHOULDs, and a seam re-check once lib/water changes S1's frame 0 (S8's water is `S8Canal`).
+
 ## HOLD 2026-10-28 ~09:30 UTC (the orchestrator's budget hold): resume state, read this first
 Done and pushed (typecheck clean): the whole conform (sky S8_EVENING + its un-build into SUN0; the parallax float; the
 lamp run f2237 / 2261 / 2273; the seam push retired, Pip's 30 px settle + late un-build; the readers out, the owner left
