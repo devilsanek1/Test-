@@ -91,7 +91,9 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
         <S1BoatStrips which="A" />
         <S1BoatStrips which="B" />
         <S1Boats />
-        <Ducks ducks={[{x: 470, y: 1182, size: 26, drake: true}, {x: 522, y: 1194, size: 24}, {x: 300, y: 1158, size: 22}]} seed="s1ducks" />
+        {/* two ducks at their water's scale (one camera: ~127 px/m there, a mallard ~0.58 m: ~70 px), by the bend,
+            clear of Pip's zone and the sun's glitter path */}
+        <Ducks ducks={[{x: 318, y: 1130, size: 64, drake: true}, {x: 396, y: 1136, size: 62}]} seed="s1ducks" />
       </Env>
     </S1Plane>
     {/* our bank and its near things split their own planes (V2S1_steps) */}
