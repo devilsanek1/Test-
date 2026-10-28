@@ -74,3 +74,8 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   scans): "no too narrow, lets research some more - expand it to AI adjacent news" -> round 4 (lean): two scouts on
   positive AI-adjacent news (science, health and space; machines and everyday tech), round 3's candidates kept in the
   pool, one editor over both rounds -> `G0_TOPICS_r4.md`. -> rule: Taste signals (topics: AI-adjacent counts).
+- 2026-10-28 ~16:10 UTC, on round 4's top 3: "one important condition for the story pick is we should find a story that
+  is going to be possible to make visually appealing. Like evaluate each one from that point on. And give me the list
+  of criteria you are choosing the story based on" -> `docs/TOPIC_CRITERIA.md` (visual appeal and truth are musts);
+  visual scores in `G0_TOPICS_r4.md`: glasses 9, hurricane 8, vaccine 6; recommendation moved to the glasses.
+  -> rule: Taste signals (visual appeal is a pick condition).

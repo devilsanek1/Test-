@@ -237,6 +237,12 @@ Maintenance at the end).
   AI adjacent news", v4, 2026-10-28); the existing fuss (people already arguing about it) weighs as much as
   a direct wallet hit,** and an everyday consequence beats a bigger, distant story. — (v3 G0; v4 G0: "focus on tech and AI",
   picked AI songs over the wallet pick: "good amount of fuss about AI songs", 2026-10-27).
+- **Topics: VISUAL APPEAL IS A CONDITION OF THE PICK.** A story is picked only if it can be a beautiful film in our look
+  (a literal subject readable with the sound off, a thread object, a cozy home place and room for a scale moment, a
+  physical frame-0 hook, small people acting with their pose, few words in the picture); the full list the editor
+  scores on, and the owner sees: `docs/TOPIC_CRITERIA.md`. — ("one important condition for the story pick is we should
+  find a story that is going to be possible to make visually appealing ... give me the list of criteria", v4,
+  2026-10-28).
 - **Topics: alternate the mood: a positive story after a negative one.** v2 (Google staff resigning), v3 (laptop
   prices) and v4's first pick (AI songs and fake plays) were all bad news, so the next is a very recent, highly
   relevant, genuinely POSITIVE AI story (e.g. AI helping find a medicine or beat a disease) with a hopeful outlook.

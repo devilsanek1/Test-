@@ -144,3 +144,15 @@ want these glasses banned"; the import ban is a minor party's proposal, so never
 bill's status; Chris Edwards's name and title (ABC's; one syndicated piece seen in a search may differ).
 
 **3. Hurricane.** Checked in `G0_TOPICS_r3.md` today (NPR 26 Oct, Wikipedia citing CNN 8 Oct); nothing new needed.
+
+## Visual appeal (the owner's condition, 2026-10-28; criteria in `docs/TOPIC_CRITERIA.md` §1)
+
+| Topic | Visual | Why |
+|---|---|---|
+| The glasses some want banned | **9** | Everything is literal and everyday: a man in glasses in a cafe, a menu, a street, a pool gate with a "no glasses" sign. Thread object: the glasses, in every shot. Home place: his street and cafe (cozy, full of life). Frame-0 hook: a BANNED sign over the glasses, then the same glasses reading a menu to a blind man. A beautiful device: as he turns his head, the things he faces light up one by one while the voice names them. Scale: pull back from his lenses to a whole city of tiny glasses-wearers. People act with their pose, no faces needed. Watch: generic glasses only (no brand); the privacy worry gets its own drawn moment. |
+| The AI that called the hurricane | **8** | Built-in scale: a vast storm over the Gulf seen from high above, the coastline below. Frame-0 hook: every forecast line points to Louisiana, then the storm bends to Florida, where the AI's line already was. Home place: a family on the Florida Panhandle boarding up. Thread object: the storm's path line. Watch: it can slide into maps and arrows (keep it a drawn world, not a weather graphic); no single person to follow; nine people died, so the tone stays gentle. |
+| A vaccine made from your own cancer | **6** | The heart of it is microscopic (tumour DNA, immune cells, mRNA), so the picture needs a metaphor; the strongest one the facts support is the body as a city, with immune cells handed a "wanted poster" of the cancer's 34 marks. The 82-vs-70 result draws well as 100 small people. Watch: it risks looking like stock medical clip art; needles and melanoma skin images are off-putting; the home place (a patient's kitchen after surgery) is quiet, with little to animate. |
+
+**With visual appeal as a must, the recommendation moves to the glasses** (AI front and centre, a real person, a real
+fuss, all of it drawable in our look); the hurricane is the scale-led alternative; the vaccine is the biggest news but
+the hardest to make beautiful.
