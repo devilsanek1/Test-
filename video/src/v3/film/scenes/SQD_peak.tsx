@@ -14,10 +14,10 @@
 // the chips go pale, and the lower pile (first seen small, at the frame's edge, as the camera leaves the crest) is
 // flat boards with a soft lit top, no chips, no pins: one calm golden mass with a pile's silhouette.
 // DETAIL BY SIZE ON SCREEN (atmospheric perspective: far things simpler, lower in contrast): the crest's chips are a
-// warm dark brown, 29 L* under the board (the reveal's declared exception to CRAFT §c's dL* 15: the sticks must read as
-// memory, not pallets), while a crest stick is >= 120 px on screen (the pull to ~20.8), and pale out to tier C (11 L*
-// under the board) by the time it is 50 px (~21.2, inside the move's fastest stretch); the pale chips further out go
-// with them. So the hold, SQE and SQF (the far plane at x1.0-1.08) see the calm pile: a golden mass with a pile's
+// warm brown, 20 L* under the board (the reveal's declared exception to CRAFT §c's dL* 15: the sticks must read as
+// memory, not pallets; THE stick's own chips stay near-black, L* 13), while a crest stick is >= 120 px on screen (the
+// pull to ~20.8), and pale out to tier C (11 L* under the board) by the time it is 50 px (~21.2, inside the move's
+// fastest stretch); the pale chips further out go with them. So the hold, SQE and SQF (the far plane at x1.0-1.08) see the calm pile: a golden mass with a pile's
 // silhouette, no specks. One look on both sides of J4 by construction (it is the far plane's scale, the same in every
 // builder). Light (the street rig: the open sky is the key, upper left): the sticks' tops a step lighter, the right
 // flank's boards in shade one step down, no ink inside the pile (the summit stick alone carries the subject's
@@ -50,7 +50,7 @@ const THE = {x: SUMMIT[0], y: SUMMIT[1] - (700 / 27) * 0.155, w: 700 / 27, rot: 
 const TONES = {gold: '#D4A268', deep: '#C5935E', litC: '#DEB37D', lit: '#D9AD76', litB: '#D8AB73', lit2: '#D6A871', pinC: '#D3B58B', pin: '#CEAF85', pinB: '#CDAA7F', mound: '#B98757'} as const;
 /** The chips' two ends (see the header): `near` while a crest stick is big on screen, `far` once it is small; the
  *  crest's chips (A) and the pale ones further out (B). */
-const CHIPS = {A: {near: '#835D4B', far: '#B3865F'}, B: {near: '#A2785F', far: '#C99762'}} as const;
+const CHIPS = {A: {near: '#966E59', far: '#B3865F'}, B: {near: '#AD8366', far: '#C99762'}} as const;
 /** On-screen width of a crest stick (px) at which its chips are fully `near`, and fully `far`. */
 const CHIP_NEAR_W = 120;
 const CHIP_FAR_W = 50;

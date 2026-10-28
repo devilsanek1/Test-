@@ -1,6 +1,9 @@
 {
  "name": "v1 @20.5 s (the side street; the walker)",
  "units": "frac",
+ "waive": {
+  "air": "calibration: v1 @20.5 is measured for the walker and the side street only"
+ },
  "silhouettes": [
   {
    "name": "the walker (subject)",

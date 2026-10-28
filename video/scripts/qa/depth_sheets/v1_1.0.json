@@ -1,6 +1,9 @@
 {
  "name": "v1 @1.0 s (the plaza)",
  "units": "frac",
+ "waive": {
+  "ground": "calibration: v1 @1.0 is measured for its far city in front of the sun and the plaza figure"
+ },
  "air": [
   [
    0.05,

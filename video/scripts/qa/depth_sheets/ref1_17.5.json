@@ -1,6 +1,9 @@
 {
  "name": "reference 1 @17.5 s (the shelter)",
  "units": "frac",
+ "waive": {
+  "ground": "calibration: reference 1 @17.5 is measured for its planes and its two figures (the shelter floor is hidden)"
+ },
  "air": [
   [
    0.32,

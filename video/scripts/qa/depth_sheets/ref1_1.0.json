@@ -1,6 +1,9 @@
 {
  "name": "reference 1 @1.0 s (the street, one-point)",
  "units": "frac",
+ "waive": {
+  "separation": "calibration: reference 1 @1.0 is measured for its planes and its street (its figures are tiny)"
+ },
  "air": [
   [
    0.58,
