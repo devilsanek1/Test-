@@ -293,8 +293,9 @@ export type NoticeFace = {
 };
 
 /** A notice board on two posts with a calendar binding (see the header). (x, y) = the face's top-left, w x h = the
- *  face; `ground` = the posts' foot. `line` = the subject's outline round the face (when it is the beat). */
-export const NoticeFlip: React.FC<{x: number; y: number; w: number; h: number; ground: number; faces: NoticeFace[]; line?: boolean; dur?: number}> = ({x, y, w, h, ground, faces, line, dur = 0.24}) => {
+ *  face; `ground` = the posts' foot. `line` = the subject's outline round the face (when it is the beat). `binding` /
+ *  `rings` = the header's colours (default the dark anchor and the reveal; a calm board passes softer ones). */
+export const NoticeFlip: React.FC<{x: number; y: number; w: number; h: number; ground: number; faces: NoticeFace[]; line?: boolean; dur?: number; binding?: string; rings?: string}> = ({x, y, w, h, ground, faces, line, dur = 0.24, binding = EMBER.anchor, rings = EMBER.reveal}) => {
   const t = useTime();
   const headH = Math.max(14, h * 0.13);
   const fy = y + headH;
@@ -319,9 +320,9 @@ export const NoticeFlip: React.FC<{x: number; y: number; w: number; h: number; g
       {/* the faces: the older ones under, the newest swinging down over them from the binding */}
       {shown.map((f, i) => (i < top - 1 ? null : face(f, i)))}
       {/* the binding: a dark header with two rings, snow on top */}
-      <Shape d={rrect(x - 3, y, w + 6, headH, 4)} fill={EMBER.anchor} line={false} />
+      <Shape d={rrect(x - 3, y, w + 6, headH, 4)} fill={binding} line={false} />
       {[0.3, 0.7].map((u, i) => (
-        <path key={i} d={rrect(x + w * u - 4, y - headH * 0.35, 8, headH * 0.7, 4)} fill={EMBER.reveal} />
+        <path key={i} d={rrect(x + w * u - 4, y - headH * 0.35, 8, headH * 0.7, 4)} fill={rings} />
       ))}
       <path d={rrect(x - 4, y - 5, w + 8, 7, 3.5)} fill={EMBER.snow} />
     </g>

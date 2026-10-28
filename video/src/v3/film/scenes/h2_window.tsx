@@ -78,6 +78,9 @@ const H2_POOL = {cx: 250, cy: 1560, rx: 360, ry: 112};
 export const H2_RIG = nookRig({lamp: H2_LAMP, pool: H2_POOL, glass: {x: -200, y: -200, w: 1480, h: H2_SILL.top + 200}});
 const RIG = H2_RIG;
 
+/** The desk planner's cover: a muted plum-brown (L* 48, C* 22), a calm step on the terracotta desk. */
+const PLANNER = '#97646C';
+
 /** The frost on the glass's side edges: flat, soft-edged columns (no ticks, no stars). */
 const FROST = (() => {
   const col = (x0: number, side: 1 | -1) => {
@@ -122,9 +125,10 @@ export const H2Window: React.FC = () => {
           <ContactShadow x={970} y={1600} w={70} h={10} />
         </ShadowLayer>
         <Tier tier="environment" bg={EMBER.wall}>
-          {/* a closed planner and a pencil (flat, soft corners) */}
-          <path d={planner} fill={EMBER.dcSide} />
-          <path d={rrect(470, 1580, 300, 14, 7)} fill={mixHex(EMBER.dcSide, EMBER.sky, 0.4)} />
+          {/* a closed planner and a pencil (flat, soft corners); the planner a muted plum-brown on the terracotta desk (tier
+              C: a calm step, never the navy block that out-contrasted the desk's subject) */}
+          <path d={planner} fill={PLANNER} />
+          <path d={rrect(470, 1580, 300, 14, 7)} fill={mixHex(PLANNER, EMBER.desk, 0.35)} />
           <path d={rrect(735, 1580, 18, 190, 4)} fill={EMBER.beam} />
           <path d={roundPoly([[820, 1700], [990, 1640], [996, 1652], [826, 1712]], 3)} fill={EMBER.board} />
           <path d={ellD(906, 1667, 3, 3)} fill={EMBER.ink} />

@@ -32,14 +32,16 @@
 // 23.10-24.20 two workers carry crates into A; 24.20 the barrier lifts, A drives up the road (24.30-25.45, shrinking
 // into the data center's gate) as B rolls up to the gate (24.30-25.20); OUR VAN waits unlit at the head of the lane,
 // rolls into the pool 25.72-26.20 (lit at last), ONE small crate lands on its roof on "left" 26.04; the van behind
-// shuffles up 26.25-26.75; 27.08 the notice's 5x face swings on (full for 1.5 s, then one value down, its small lines
-// hidden: E9); 29.20-29.85 our van pulls up at the near kerb (x 550: clear of Pip); 29.85-30.29 its crate hops over the
+// waits; 27.08 the notice's 5x face swings on (full for 1.5 s, then one value down, its small lines
+// hidden: E9); 28.62-29.12 the van behind shuffles up to the lane's head (the pause after "price."); 29.20-29.85 our van pulls up at the near kerb (x 565: clear of Pip); 29.85-30.29 its crate hops over the
 // sill into the listing laptop, growing to ~120 px as it comes toward the glass and shrinking into the screen (E4: the
 // carry reads), the tag ticks to $1,099 on "pass" (30.28); 30.40 our van leaves left as the van behind moves up into the
 // pool (30.55-31.15); 31.40-32.84 the BETTER van joins the queue at the lane's head; 33.50-34.65 B leaves up the road;
 // 34.60 the notice flips to 2027 (full until 35.85, then one value down); 35.22-36.25 two DC trucks overtake along the
 // near kerb (BETTER nudged back 35.62): C takes the gate, D stops in front of the pool; 36.98 the notice goes blank as
-// the data center's sign lights (SQF), then the street holds, alive and calm. Tiers follow the beat (flow_v2 §5): the
+// the data center's sign lights and its rows go dark, then light one at a time on "an AI data center" (37.00-37.80, the
+// hook's 4.04 beat rhymed; the trucks sit back in the same frame), then the street holds, alive and calm (the workers
+// load C from 38.75, a small car crosses from 38.6: nothing walks while the sign lights). Tiers follow the beat (flow_v2 §5): the
 // beat's subject gets the one outline and the motion.
 // Light (CRAFT §d; the street rig: the open sky the key): the gate's floodlight pool is THE light (two warm steps: L* 87
 // C* 13 / L* 91 C* 16, lighter AND warmer than the road: E11), the gate's lit yard spills onto the pavement down to it,
@@ -103,7 +105,9 @@ export const H2_BEATS = {
   hopEnd: 30.29,
   ding: 30.28,
   vanLeave: 30.4,
-  /** The van behind ours moves up into the pool (the lane's head frees for the BETTER van). */
+  /** The van behind ours shuffles up to the lane's head in the pause after "price." (never during the crate's or the
+   *  5x face's beat), then moves up into the pool (the lane's head frees for the BETTER van). */
+  van2Up: 28.62,
   van2In: 30.55,
   van2InEnd: 31.15,
   better: 31.4,
@@ -243,7 +247,9 @@ const roadUp = (m: Mat): Key[] => {
   return ROAD_UP.map((q, i) => (i < 2 ? q : {t: 0, p: ap(m, q.p), k: (q.k ?? 1) * s}));
 };
 
-export type Vehicle = {id: string; variant: FleetVariant; x: number; y: number; k: number; dir: 1 | -1; line: boolean; roll: number; crate?: boolean};
+/** `calm` (DC trucks): 0 on the truck's own beat, 1 off it (tier B: one haze step toward the street's ambient snow, so a
+ *  dark truck waiting in the bright pool never out-shouts the beat's subject), 0.5 the 3-frame half step. */
+export type Vehicle = {id: string; variant: FleetVariant; x: number; y: number; k: number; dir: 1 | -1; line: boolean; roll: number; crate?: boolean; calm?: number};
 
 /** Every vehicle on the street at film time T (back to front by ground y). `road` = the street -> town-road map. */
 export function vehiclesAt(T: number, road: Mat = mat.I): Vehicle[] {
@@ -255,7 +261,7 @@ export function vehiclesAt(T: number, road: Mat = mat.I): Vehicle[] {
   // 24.95: the push only starts at 24.90, so the road and the street never part under it)
   if (T < B.aGo + 0.7) {
     const a = drive(T, B.aGo, B.aGo + 0.65, up, ease.inOutSine);
-    if (a.k > 0.04) out.push({id: 'A', variant: 'dc', x: a.p[0], y: a.p[1], k: a.k, dir: -1, line: T >= B.load - 0.1 && T < B.vanIn - 0.4, roll: roll(a.p[0], a.k)});
+    if (a.k > 0.04) out.push({id: 'A', variant: 'dc', x: a.p[0], y: a.p[1], k: a.k, dir: -1, line: T >= B.load - 0.1 && T < B.vanIn - 0.4, roll: roll(a.p[0], a.k), calm: 1 - stepAt(T, B.calmEnd)});
   }
   // B: behind A in the pool, rolls up to the gate, loads, leaves while chip makers speak (33.50): left along the street
   // toward the road's mouth, out of view behind the phone (in the held push the town plane's road lies apart from the
@@ -264,7 +270,7 @@ export function vehiclesAt(T: number, road: Mat = mat.I): Vehicle[] {
     const b1 = drive(T, B.aGo, B.aGo + 0.9, [{t: 0, p: [675, Y_POOL]}, {t: 0, p: [455, Y_POOL]}], ease.inOutCubic);
     const b2 = drive(T, B.bGo, B.bGo + 1.5, [{t: 0, p: [455, Y_POOL]}, {t: 0, p: [330, 1214]}, {t: 0, p: [-240, 1214]}], ease.inQuad);
     const q = T < B.bGo ? b1 : b2;
-    if (q.k > 0.04) out.push({id: 'B', variant: 'dc', x: q.p[0], y: q.p[1], k: q.k, dir: -1, line: false, roll: roll(q.p[0], q.k)});
+    if (q.k > 0.04) out.push({id: 'B', variant: 'dc', x: q.p[0], y: q.p[1], k: q.k, dir: -1, line: false, roll: roll(q.p[0], q.k), calm: 1});
   }
   // OUR VAN: waits unlit at the head of the lane; into the pool; the kerb; the hop; away left (slow while it is in
   // view, faster once the phone hides it)
@@ -280,7 +286,7 @@ export function vehiclesAt(T: number, road: Mat = mat.I): Vehicle[] {
   {
     const q =
       T < B.van2In
-        ? drive(T, 26.25, 26.75, [{t: 0, p: [950, Y_LANE]}, {t: 0, p: [LANE_HEAD, Y_LANE]}], ease.inOutCubic)
+        ? drive(T, B.van2Up, B.van2Up + 0.5, [{t: 0, p: [950, Y_LANE]}, {t: 0, p: [LANE_HEAD, Y_LANE]}], ease.inOutCubic)
         : drive(T, B.van2In, B.van2InEnd, [{t: 0, p: [LANE_HEAD, Y_LANE]}, {t: 0, p: [740, 1226]}, {t: 0, p: [680, Y_POOL]}], ease.inOutCubic);
     out.push({id: 'van2', variant: 'van', x: q.p[0], y: q.p[1], k: 1, dir: -1, line: false, roll: roll(q.p[0])});
   }
@@ -295,8 +301,10 @@ export function vehiclesAt(T: number, road: Mat = mat.I): Vehicle[] {
     const c = drive(T, B.trucks, B.trucksEnd, [{t: 0, p: [1200, 1252]}, {t: 0, p: [980, 1252]}, {t: 0, p: [575, 1240]}, {t: 0, p: [455, Y_POOL]}], ease.inOutSine);
     const d = drive(T, B.trucks + 0.1, B.trucksEnd + 0.08, [{t: 0, p: [1420, 1252]}, {t: 0, p: [980, 1252]}, {t: 0, p: [720, 1252]}], ease.inOutSine);
     const lit = T >= B.flip && T < B.trucksEnd + 0.1;
-    out.push({id: 'C', variant: 'dc', x: c.p[0], y: c.p[1], k: 1, dir: -1, line: lit, roll: roll(c.p[0])});
-    out.push({id: 'D', variant: 'dc', x: d.p[0], y: d.p[1], k: 1, dir: -1, line: lit, roll: roll(d.p[0])});
+    // their beat ends where the payoff's starts: from the sign step (36.98) they sit back with the rest of the street
+    const calm = stepAt(T, B.sign);
+    out.push({id: 'C', variant: 'dc', x: c.p[0], y: c.p[1], k: 1, dir: -1, line: lit, roll: roll(c.p[0]), calm});
+    out.push({id: 'D', variant: 'dc', x: d.p[0], y: d.p[1], k: 1, dir: -1, line: lit, roll: roll(d.p[0]), calm});
   }
   return out.sort((p, q) => p.y - q.y);
 }
@@ -338,6 +346,9 @@ const rd = (x: number, y: number, w: number, h: number) => `M${f1(x)} ${f1(y)}h$
 /** Lit: the frame's brightest cold light (a light box, L* ~92: CRAFT §d.2's 85-92 for lit panes and bulbs). */
 const SIGN_LIT = {panel: '#E2EAFF', text: EMBER.ink};
 const SIGN_CALM = {panel: '#5F6782', text: '#8D95AE'};
+/** SQF's beat rhymes with the hook's (4.04): as the sign lights at 36.98 the rows go dark, then light one at a time on
+ *  "an AI data center" (37.00-37.80: the subject owns its line's motion; kit DataCenter `rowsOn`). */
+const HALL_ROWS = {at: H2_BEATS.sign + 0.02, dur: 0.8};
 /** The server rows' bands: the clean pen's soft rows on the beat; one value over the body when calm (before the haze). */
 const DC_LED = '#A8B6DE';
 const DC_LED_CALM = EMBER.dc;
@@ -396,7 +407,10 @@ const H2Hall: React.FC<{s: number}> = ({s}) => {
     <>
       <Haze k={HALL_K * s} color={FAR_AIR}>
         <HallFansCalm />
-        <DataCenter x={HALL.x} y={HALL.y} w={HALL.w} h={HALL.h} variant="dark" units={0} sign={null} signH={52} ink={2.6} ledStyle="bands" ledColor={mixHex(DC_LED, DC_LED_CALM, s)} blink={false} tier={tier} seed="s9/dc" />
+        {/* on FILM time (OutsideFar runs S9's clock for S9's pieces): the rows' darkAt / rowsOn are film seconds */}
+        <FilmClock>
+        <DataCenter x={HALL.x} y={HALL.y} w={HALL.w} h={HALL.h} variant="dark" units={0} sign={null} signH={52} ink={2.6} ledStyle="bands" ledColor={mixHex(DC_LED, DC_LED_CALM, s)} blink={false} darkAt={H2_BEATS.sign} rowsOn={HALL_ROWS} tier={tier} seed="s9/dc" />
+        </FilmClock>
       </Haze>
       <path d={rrect(g.sign.x, g.sign.y, g.sign.w, g.sign.h, 3)} fill={mixHex(SIGN_LIT.panel, SIGN_CALM.panel, s)} />
       <Txt x={HALL.x + sideW / 2} y={g.sign.y + g.sign.h * 0.74} size={signSize} fill={mixHex(SIGN_LIT.text, SIGN_CALM.text, s)} fit={g.sign.w * 0.92}>
@@ -531,9 +545,12 @@ const HouseRow: React.FC<{hs: House[]; seed: string; T: number}> = ({hs, seed, T
  *  the caption band. The steam lies over the mountain's flank: a light step of the pile's own lit gold, small (r <= 7),
  *  so it reads as steam in front of the gold, never as holes in it (E14). */
 const FAB = {x0: 600, x1: 944, base: 1004, h: 34, teeth: 4, tooth: 30, chim: {x: 896, w: 18, top: 900}};
-const FAB_BRICK = mixHex(EMBER.brick, EMBER.sky, 0.3);
-const FAB_SHADE = mixHex(EMBER.brickShade, EMBER.sky, 0.3);
-const STEAM = mixHex(PEAK_TONES.lit, '#FFFFFF', 0.35);
+/** Its roof one plane step behind the street's calm wall (toward the far snow), the chimney a step under it, the north
+ *  glazing a warm glow one step over the roof (not a window-bright stripe: the sawtooth held the frame's top salience). */
+const FAB_BRICK = '#AE8078';
+const FAB_SHADE = '#A16E63';
+const FAB_GLAZE = '#D8AF87';
+const STEAM = mixHex(PEAK_TONES.lit, '#FFFFFF', 0.2);
 const FactoryRoof: React.FC<{T: number}> = ({T}) => {
   const paint = useTierPaint();
   const {x0, x1, base, h, teeth, tooth, chim} = FAB;
@@ -558,7 +575,7 @@ const FactoryRoof: React.FC<{T: number}> = ({T}) => {
       <path d={rrect(chim.x, chim.top, chim.w, base - chim.top, 2)} fill={paint(FAB_SHADE)} />
       <path d={rrect(chim.x - 3, chim.top - 4, chim.w + 6, 6, 2)} fill={paint(EMBER.snow)} />
       <path d={roof} fill={paint(FAB_BRICK)} />
-      <path d={glaze} fill={useLightOff() ? EMBER.houseLit : '#F2C98E'} />
+      <path d={glaze} fill={FAB_GLAZE} />
       <path d={snow} fill={paint(EMBER.snow)} />
     </>
   );
@@ -629,10 +646,11 @@ function workersAt(T: number): {x: number; y: number; h: number; walk: number; c
   const back = backOf(target);
   const fast = T >= B.load && T < B.aGo;
   const period = fast ? 1.1 : 2.6;
-  const start = fast ? B.load : target === 'B' ? B.aGo + 1.3 : B.trucksEnd + 0.4;
+  // C is loaded only after the data center's beat (38.75): nothing walks while the payoff's sign lights
+  const start = fast ? B.load : target === 'B' ? B.aGo + 1.3 : 38.75;
   return [0, 0.5].map((ph, i) => {
     const idle: Pt = [G[0] + (i ? 30 : -14), G[1] + 6];
-    if (!back || T < start || (target === 'B' && T > B.bGo - 0.6) || (target === 'C' && T < B.trucksEnd + 0.4)) {
+    if (!back || T < start || (target === 'B' && T > B.bGo - 0.6) || (target === 'C' && T < 38.75)) {
       return {x: idle[0], y: idle[1], h: 40, walk: 0, carry: false, face: 1 as const};
     }
     const c = (((T - start) / period + ph) % 1 + 1) % 1;
@@ -648,8 +666,9 @@ function workersAt(T: number): {x: number; y: number; h: number; walk: number; c
 
 // ---- the notice's faces (face-local px, 200 x ~122). E9: each face at full contrast ~1.5 s from its swing, then one
 // value down with its small lines hidden; blank from the sign step (36.98). `k` 0 = full, 0.5 the half step, 1 calm.
-/** The calm notice (tier C): a soft warm paper (L* 88), its big glyph a calm warm mid value, its bars pale. */
-const NOTICE_CALM = {paper: '#E9DACF', ink: '#BB8672', now: '#897369', last: '#E0B788', faint: '#D1AF9F'};
+/** The calm notice (tier C): a soft warm paper (L* 88), its big glyph a calm step under it (L* 69: it still reads at
+ *  full size, never as loud as the beat's subject), its bars pale. */
+const NOTICE_CALM = {paper: '#E9DACF', ink: '#C9A08F', now: '#A69389', last: '#E3C09B', faint: '#D8BAAC', binding: '#8E6A62'};
 const mixK = (full: string, calm: string, k: number) => (k <= 0 ? full : k >= 1 ? calm : mixHex(full, calm, k));
 
 /** The 5x face: last year | now bars (S11's), "~5x", the source. */
@@ -739,9 +758,14 @@ const POOL_CALM: [string, string] = ['#E1D1C7', '#EBDAC9'];
 /** The gate's lit yard: full, and one value calmer until the load beat. */
 const GATE_LIT = '#F7CB8E';
 const GATE_CALM = '#E9B881';
-/** The DC trucks' calm (until the load beat): one haze step toward the street's ambient snow. */
-const TRUCK_CALM_K = 0.2;
+/** The DC trucks off their beats (Vehicle.calm: A until the load beat, B always, C and D from the sign step): one haze
+ *  step toward the street's ambient snow. */
+const TRUCK_CALM_K = 0.18;
 const STREET_AMBIENT = '#C9CFE6';
+/** The street's stage (tier C): the factory's wall a soft warm brick, sky-lit snow caps one pale step (L* 86, under the
+ *  pool's core: CRAFT §d.2), so the wall's top edge and the roofline never hold the frame's top salience. */
+const WALL_BRICK = '#A66B5C';
+const STREET_CAP = '#D0D6E7';
 
 /** Our street: ground, the factory's wall and gate, the booth and barrier, the floodlight and its pool, the notice,
  *  the queue, the workers, the walkers, the snow. */
@@ -787,22 +811,24 @@ export const OutsideStreet: React.FC = () => {
         {/* the road-mouth lamp's own small pool (E11; behind the corner house, which stands in front of its far half) */}
         <LightPool light={H2_ROAD_LAMP} colors={POOL_FULL} />
         <Tier tier="environment" bg={EMBER.sky}>
-          {/* the corner house on our side, left of the road's mouth (warm: ours), one lit window */}
-          <path d={rrect(-40, 990, 228, 104, 3)} fill={'#9A5A46'} />
-          <path d={roundPoly([[-50, 994], [70, 952], [200, 994], [194, 1002], [-44, 1002]], 3)} fill={EMBER.snow} />
+          {/* the corner house on our side, left of the road's mouth (warm: ours), one lit window; tier C: its brick a calm
+              step toward the snow, its roof's snow one pale step (the street's stage, never louder than the beat) */}
+          <path d={rrect(-40, 990, 228, 104, 3)} fill={'#A6776E'} />
+          <path d={roundPoly([[-50, 994], [70, 952], [200, 994], [194, 1002], [-44, 1002]], 3)} fill={STREET_CAP} />
           <path d={rrect(40, 1020, 34, 40, 2) + rrect(118, 1020, 34, 40, 2)} fill={off ? EMBER.houseLit : '#FFD27A'} />
-          {/* the factory's wall (warm brick) with its snow cap; the gate's lit yard: a stack of crates inside */}
-          <path d={rrect(W.x0, W.y0, W.x1 - W.x0, W.y1 - W.y0 + 4, 3)} fill={EMBER.brick} />
-          <path d={rrect(W.x0 - 4, W.y0 - 6, W.x1 - W.x0 + 8, 9, 4)} fill={EMBER.snow} />
+          {/* the factory's wall (tier C: a soft warm brick, L* 51 C* 28, never the saturated dark field that held the
+              frame's top salience behind every beat) with its snow cap one pale step; the gate's lit yard: crates inside */}
+          <path d={rrect(W.x0, W.y0, W.x1 - W.x0, W.y1 - W.y0 + 4, 3)} fill={WALL_BRICK} />
+          <path d={rrect(W.x0 - 4, W.y0 - 6, W.x1 - W.x0 + 8, 9, 4)} fill={STREET_CAP} />
           {/* two string courses: long same-hue bands a calm step under the brick (CRAFT §c: dL* <= ~6), never dark lines */}
-          <path d={`M${W.x0} ${W.y0 + 34}H${W.x1}V${W.y0 + 37}H${W.x0}ZM${W.x0} ${W.y0 + 64}H${W.x1}V${W.y0 + 67}H${W.x0}Z`} fill={mixHex(EMBER.brickShade, EMBER.brick, 0.45)} />
+          <path d={`M${W.x0} ${W.y0 + 34}H${W.x1}V${W.y0 + 37}H${W.x0}ZM${W.x0} ${W.y0 + 64}H${W.x1}V${W.y0 + 67}H${W.x0}Z`} fill={mixHex(WALL_BRICK, EMBER.brickShade, 0.3)} />
           <path d={rrect(G.x0, G.y0, G.x1 - G.x0, G.y1 - G.y0 + 2, 4)} fill={off ? EMBER.houseLit : mixK(GATE_LIT, GATE_CALM, calm)} />
           <path d={rrect(G.x0 + 16, G.y0 + 34, 40, 38, 2) + rrect(G.x0 + 60, G.y0 + 44, 36, 28, 2)} fill={'#C98A64'} />
           <path d={rrect(G.x0 + 22, G.y0 + 28, 30, 8, 2) + rrect(G.x0 + 64, G.y0 + 38, 28, 8, 2)} fill={EMBER.board} />
           {/* the booth on the gate's left: a lit window, the guard's silhouette inside */}
           <path d={rrect(H2_BOOTH.x0, H2_BOOTH.y0, H2_BOOTH.x1 - H2_BOOTH.x0, H2_BOOTH.y1 - H2_BOOTH.y0, 3)} fill={EMBER.wall} />
-          <path d={rrect(H2_BOOTH.x0 - 4, H2_BOOTH.y0 - 8, H2_BOOTH.x1 - H2_BOOTH.x0 + 8, 10, 4)} fill={EMBER.dcSide} />
-          <path d={rrect(H2_BOOTH.x0 - 5, H2_BOOTH.y0 - 13, H2_BOOTH.x1 - H2_BOOTH.x0 + 10, 7, 3.5)} fill={EMBER.snow} />
+          <path d={rrect(H2_BOOTH.x0 - 4, H2_BOOTH.y0 - 8, H2_BOOTH.x1 - H2_BOOTH.x0 + 8, 10, 4)} fill={mixHex(EMBER.dcSide, STREET_AMBIENT, 0.3)} />
+          <path d={rrect(H2_BOOTH.x0 - 5, H2_BOOTH.y0 - 13, H2_BOOTH.x1 - H2_BOOTH.x0 + 10, 7, 3.5)} fill={STREET_CAP} />
           <path d={rrect(H2_BOOTH.x0 + 8, H2_BOOTH.y0 + 10, 30, 24, 2)} fill={off ? EMBER.houseLit : '#FFD27A'} />
           <path d={ellD(H2_BOOTH.x0 + 22, H2_BOOTH.y0 + 22, 5, 5.5) + rrect(H2_BOOTH.x0 + 14, H2_BOOTH.y0 + 27, 16, 8, 3)} fill={'#C98A64'} />
         </Tier>
@@ -836,7 +862,7 @@ export const OutsideStreet: React.FC = () => {
           {walkerOn ? <ContactShadow x={walkerX} y={1098} w={14} h={6} k={1.25} /> : null}
         </ShadowLayer>
         {/* the notice on its posts (the subject on its beats: the 5x face, the 2027 flip) */}
-        <NoticeFlip x={H2_NOTICE.x} y={H2_NOTICE.y} w={H2_NOTICE.w} h={H2_NOTICE.h} ground={H2_NOTICE.ground} faces={faces} line={noticeOn} />
+        <NoticeFlip x={H2_NOTICE.x} y={H2_NOTICE.y} w={H2_NOTICE.w} h={H2_NOTICE.h} ground={H2_NOTICE.ground} faces={faces} line={noticeOn} binding={noticeOn ? EMBER.anchor : NOTICE_CALM.binding} rings={noticeOn ? EMBER.reveal : NOTICE_CALM.paper} />
         {/* the far pavement's walkers (C: no line, slow) */}
         {walkerOn ? <Walker x={walkerX} y={1098} dir={T < 31 ? 1 : -1} T={T} /> : null}
         {/* the workers, the vehicles, the barrier: back to front */}
@@ -846,7 +872,7 @@ export const OutsideStreet: React.FC = () => {
           return (
             <React.Fragment key={v.id}>
               {v.variant === 'dc' ? (
-                <Haze k={TRUCK_CALM_K * calm} color={STREET_AMBIENT}>
+                <Haze k={TRUCK_CALM_K * (v.calm ?? 0)} color={STREET_AMBIENT}>
                   {van}
                 </Haze>
               ) : (
@@ -940,11 +966,12 @@ export const CrateHop: React.FC<{to?: Pt; street?: Mat}> = ({to, street}) => {
   return q ? <CrateBox x={q.x} y={q.y + (q.w * 0.62) / 2} w={q.w} rot={q.rot} line /> : null;
 };
 
-/** A small car on the street's far side (36.4-41.2, right to left at ~105 px/s): a flat body, a cabin, two lit
- *  headlights' dots; C tier, behind everything in the pool. */
+/** A small car on the street's far side (38.6-41.2, after the data center's beat: right to left at ~105 px/s): a flat
+ *  body, a cabin, two lit headlights' dots; C tier, behind everything in the pool. */
+const FAR_CAR_T0 = 38.6;
 const FarCar: React.FC<{T: number}> = ({T}) => {
-  if (T < 36.4 || T > 41.2) return null;
-  const x = 1150 - (T - 36.4) * 105;
+  if (T < FAR_CAR_T0 || T > 41.2) return null;
+  const x = 1130 - (T - FAR_CAR_T0) * 105;
   const y = 1132;
   return (
     <g>
