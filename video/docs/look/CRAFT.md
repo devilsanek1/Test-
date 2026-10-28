@@ -121,9 +121,12 @@ G4 frame had the same pen and passed with a quarter of the strokes: the fix is a
   silhouette is the clean fill edge.
 - **Texture:** big areas flat; texture only as flat same-hue shapes (a rug pattern, plank seams as 2 long bands at dL* 6-8
   or less) on 1-2 small surfaces per shot. No specks (static dark marks; §f's particles are light movers, not texture), ticks, hatching, scribble, dash rows, crumbs or steam squiggles,
-  and no grain overlay (the sky's invisible encode dither, §g, is not a texture). The one optional texture is the
-  owner's halftone (`PALETTE.md` "Texture and lines": at most 6 %,
-  on a few chosen elements, a last step after G6; the film must work flat).
+  and no grain overlay by default (the sky's invisible encode dither, §g, is not a texture). Two optional textures, both
+  VERY subtle and both last steps the film must work without: the owner's halftone (`PALETTE.md` "Texture and lines":
+  at most 6 %, on a few chosen elements, after G6), and, being tested since 2026-10-28 (owner: "start playing with it,
+  very subtly especially if its adding to the premium look"), a fine paper-and-paint texture with gentle mottling in
+  the big flats, static and locked to the world (never boiling), its numbers from the city-poster study
+  (`docs/studies/2026-10-28_city_posters/`), judged in a look clip and kept only if it adds to the premium feel.
 - **Line motion:** an object draws on as one stroke, never edge by edge; no `exitLoose`, no boil.
 - **Code: the CLEAN pen** (the sketch pen stays for G3 boards), set once in the film's look module: `lib/pen.ts`
   `setPen('clean')` (the full pen with tiers, work in progress; `lib/sketch.ts` `setPenMode('clean')` is v2r's lighter

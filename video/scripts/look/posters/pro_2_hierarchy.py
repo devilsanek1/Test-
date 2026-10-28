@@ -44,22 +44,22 @@ BOXES = {
     '03_hanoi.jpg': [
         ('One Pillar Pagoda', 'A', [675, 829, 1185, 1377]), ('Huc bridge', 'A', [225, 1054, 630, 1204]),
         ('cyclo', 'B', [82, 1279, 368, 1564]), ('patchwork', 'C', [405, 1279, 705, 1609]),
-        ('far city', 'C', [360, 574, 1200, 829])],
+        ('far city (miniature)', 'C', [360, 574, 1200, 829])],
     '04_buenos_aires.jpg': [
         ('Obelisco', 'A', [558, 393, 670, 1065]), ('Casa Rosada', 'A', [660, 960, 1206, 1395]),
-        ('La Boca', 'B', [0, 930, 300, 1575]), ('patchwork', 'C', [428, 1155, 840, 1575]),
+        ('La Boca', 'B', [0, 930, 300, 1575]), ('patchwork', 'C', [520, 1430, 780, 1575]),
         ('far blocks', 'C', [255, 750, 495, 915])],
     '05_cape_town.jpg': [
         ('Table Mountain', 'A', [0, 605, 1206, 928]), ('Bo-Kaap', 'A', [750, 827, 1206, 1440]),
-        ('city mid', 'B', [480, 845, 900, 1145]), ('patchwork', 'C', [0, 1145, 660, 1430]),
+        ('city mid', 'B', [480, 845, 900, 1145]), ('patchwork', 'C', [90, 1190, 360, 1290]),
         ('protea', 'B', [0, 1250, 495, 1605])],
     '06_copenhagen.jpg': [
         ('Nyhavn facades', 'A', [0, 724, 750, 1219]), ('spire', 'A', [183, 364, 300, 882]),
         ('mermaid', 'A', [840, 1114, 1185, 1490]), ('round tower', 'B', [600, 836, 738, 1069]),
-        ('water patchwork', 'C', [0, 1264, 840, 1519]), ('pale blocks', 'C', [1005, 964, 1206, 1159])],
+        ('water patchwork', 'C', [560, 1282, 840, 1345]), ('pale blocks', 'C', [1005, 964, 1206, 1159])],
     '07_kyoto.jpg': [
         ('Kinkaku-ji', 'A', [638, 739, 1170, 1129]), ('pagoda', 'A', [165, 461, 413, 859]),
-        ('torii', 'B', [90, 1054, 435, 1294]), ('patchwork', 'C', [375, 1264, 675, 1609]),
+        ('torii', 'B', [90, 1054, 435, 1294]), ('patchwork', 'C', [560, 1180, 720, 1300]),
         ('far mountains', 'C', [660, 634, 1206, 799])],
 }
 V2 = {  # v2 master frames (1080 x 1920); A = the beat's subject per docs/v2/STYLE.md

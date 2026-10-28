@@ -690,3 +690,48 @@ def vp_panel(bgr, valid, cfg, structs, horizons, width=560, margin=0.45):
         dashed_hline(canvas, Y(hz['y']), 0, canvas.shape[1], _bgr(hz.get('col', (20, 20, 20))), 2)
         put(canvas, hz['label'], (4, Y(hz['y']) - 5), 0.42, _bgr(hz.get('col', (20, 20, 20))))
     return canvas
+
+
+def unit_period(bgr, box, axis='y', lo=4, hi_frac=0.5):
+    """The repeated unit's size (px) in a box: the first clear peak of the autocorrelation of the high-passed L*
+    profile along `axis` ('y' = a storey or window-row period, 'x' = a bay period). Returns (period px, peak strength)."""
+    x0, y0, x1, y1 = box
+    L = to_lab(bgr[y0:y1, x0:x1])[..., 0]
+    L = L - cv2.GaussianBlur(L, (0, 0), 12)
+    prof = L.mean(1) if axis == 'y' else L.mean(0)
+    prof = prof - prof.mean()
+    n = len(prof)
+    ac = np.correlate(prof, prof, 'full')[n - 1:]
+    ac = ac / (ac[0] + 1e-9)
+    hi = int(n * hi_frac)
+    best, bv = None, 0.15
+    for k in range(lo, max(lo + 1, hi)):
+        if ac[k] > ac[k - 1] and ac[k] >= ac[k + 1 if k + 1 < n else k] and ac[k] > bv:
+            best, bv = k, ac[k]
+            break
+    return (best, float(bv)) if best else (None, 0.0)
+
+
+# ================================================================= a second opinion: a monocular depth network (optional)
+# Depth Anything V2 small (ONNX export, fabio-sim/Depth-Anything-ONNX release v2.0.0, depth_anything_v2_vits.onnx,
+# 518 x 518 input) through onnxruntime: relative inverse depth (higher = nearer). It reads the same cues a viewer does
+# (overlap, size, height in the frame, aerial perspective, converging lines), so it is a proxy for "does it read deep",
+# never a measurement of the drawing. Optional: everything else runs without it.
+
+def depth_net(bgr, model_path, size=518):
+    import onnxruntime as ort  # optional dependency
+    sess = depth_net.sessions.get(model_path)
+    if sess is None:
+        sess = ort.InferenceSession(model_path, providers=['CPUExecutionProvider'])
+        depth_net.sessions[model_path] = sess
+    H, W = bgr.shape[:2]
+    rgb = cv2.cvtColor(cv2.resize(bgr, (size, size), interpolation=cv2.INTER_AREA), cv2.COLOR_BGR2RGB).astype(np.float32) / 255
+    x = (rgb - np.array([0.485, 0.456, 0.406], np.float32)) / np.array([0.229, 0.224, 0.225], np.float32)
+    x = x.transpose(2, 0, 1)[None]
+    d = sess.run(None, {sess.get_inputs()[0].name: x})[0][0]
+    d = cv2.resize(d, (W, H), interpolation=cv2.INTER_CUBIC)
+    lo, hi = np.percentile(d, 1), np.percentile(d, 99)
+    return np.clip((d - lo) / max(1e-6, hi - lo), 0, 1)  # 0 = farthest, 1 = nearest
+
+
+depth_net.sessions = {}

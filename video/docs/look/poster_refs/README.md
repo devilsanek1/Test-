@@ -26,6 +26,16 @@
 - "let me know if i am missing anything you observed too"
 - "then spin up a parallel thread - i want to discuss the ideas for what kind of video content would fit perfectly in
   this kind of style as we discussed"
+- On our nine first observations (texture, the patchwork, no outlines, light on volumes, the value range, the layout,
+  the designed view, specific local objects, one series): "i like texture point yes we can perhaps start playing with
+  it, very subtly especially if its adding to the premium look sure / i like 3 - but can you draw me a picture of
+  difference like A vs B what you are talking about / 4 is a good point and goes along the shadows we discussed in the
+  google video / 5 - good point too! / 6 - layout is a big aspect. I think we've discussed a bunch of it already,
+  perhaps we can consolidate the previous discussions and reconcile it with your findings here / 7 - oh right i was
+  gonna say it is a unique camera angle and composition of objects is fascinating. / 8 - i think its more specific to
+  the content rather that the style and composition- hard to imagine if its going to trasnalte and generalize well / 9
+  i agree that a coherent style across all videos sharing one look, one brand would be absolutely the key here"
+- "merge the findings and key points and conclusions into the main repo"
 
 **The files:** seven of a 19-poster Instagram carousel, as screenshots from the owner's phone (the account isn't named in
 them). The carousel index is in brackets.

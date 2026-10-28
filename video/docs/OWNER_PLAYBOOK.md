@@ -63,6 +63,11 @@ Maintenance at the end).
   message-sent swoosh), **with one in the first second.** Our own sounds that evoke them, never Apple's or Instagram's. — (2026-10-25).
 
 ## Visual style (one page: `docs/look/DIRECTION.md`; numbers and checks: `docs/look/CRAFT.md`)
+- **ONE LOOK, ONE BRAND: every video shares one coherent style.** The style is the constant (the rendering, light,
+  texture, composition grammar, palette family, type and the cover's layout), refined from film to film; each film's
+  world (its places, people, props, life and music) is drawn new inside it. Our covers on the profile grid should read
+  as one series, as the city posters' 19 do. — ("i agree that a coherent style across all videos sharing one look, one
+  brand would be absolutely the key here", 2026-10-28).
 - **Hand-drawn flat colour like reference video 1, drawn CLEAN, REFINED, GENTLE, PREMIUM: never rough or messy.**
   Reference 1 gives the composition, the flat colour and the small people; the line is the clean pen: clean, confident
   lines (smooth, consistent weights, few of them, no jitter, no sketchy overshoot or double strokes), refined shapes,
@@ -79,7 +84,13 @@ Maintenance at the end).
   simpler ("a bit more low poly") yet coherent; nature that looks real but, up close, mixes "the real effects with the
   lower poly kind of effects"; colours "very vibrant" that "coherently fit together". Next to them v2 "still feels cheap
   and lazy", though the owner likes its colours. The study researches how professional studios get each feeling and
-  turns it into concrete techniques, and adds what we observed that the owner didn't name. — ("i really like the style
+  turns it into concrete techniques, and adds what we observed that the owner didn't name. The owner's answers to our
+  observations (2026-10-28): texture yes, very subtly; the lit and shaded faces and the full value range yes (their
+  own bullets); outline-free edges liked, to be judged on an A vs B picture; layout "is a big aspect": consolidate
+  our earlier layout rules with the posters' findings into one guide; the posters' "unique camera angle and composition
+  of objects is fascinating" (a designed view of the place that no camera could take); the specific local objects
+  (a protea, a cyclo) belong to the content, not the style ("hard to imagine if its going to trasnalte and generalize
+  well"); one look, one brand (its own bullet). — ("i really like the style
   and i want us to experiment more with the style and the focus on our videos"; "i want to see how we can learn from
   these pictures in terms of perspective, visual style, details and composition"; "i think visually in the video about
   Google we have made good improvemnets in terms of overall style"; "research each further how professional studios
@@ -88,8 +99,10 @@ Maintenance at the end).
   video still feels cheap and lazy as if these pictures give a very premium feel to it"; "let me know if i am missing
   anything you observed too", 2026-10-28).
 - **Light and shadow: gentle, but always there.** One consistent light direction per scene, soft form and cast shadows,
-  gentle light pools that make sense; never absent and never "weirdly put". System: `docs/look/CRAFT.md` §d. — (v3 G5b,
-  2026-10-27; "the shadows added are better", v2 G4, 2026-10-27).
+  gentle light pools that make sense; never absent and never "weirdly put". Every volume reads in 2-3 flat tones, a lit
+  face and a shade face, as the city posters' buildings do. System: `docs/look/CRAFT.md` §d. — (v3 G5b, 2026-10-27;
+  "the shadows added are better", v2 G4, 2026-10-27; on the posters' lit and shaded faces: "4 is a good point and goes
+  along the shadows we discussed in the google video", 2026-10-28).
 - **DEPTH AND SEPARATION: every shot reads in distance, never a flat elevation.** The subject separates from what is
   behind it (its own value and contrast against a calmer field: a building in front never melts into the buildings
   behind it); distance shows in the colour (far planes converge on the air behind them: lighter, softer, simpler; cooler
@@ -160,7 +173,7 @@ Maintenance at the end).
   each new reference is measured (composition, movement, texture, camera, details) and folded into `COZY_AND_SCALE.md`.
   — ("really figure out what about the scene brings out this feeling; this is a recurring topic we need to evolve", 2026-10-26).
 - **Don't rely on reusable assets: every film's sets, characters, props, background life and music are made new for
-  it,** in its own design (a new Pip drawing too). Engine primitives (light and shadow layers included), timing,
+  it,** inside the one shared look (ONE LOOK, ONE BRAND above; a new Pip drawing too). Engine primitives (light and shadow layers included), timing,
   captions and QA tools are tools, not assets; the kit pieces in `src/lib` (cine, kit, mascot) are references to learn
   from, never a film's sets, and a film never imports another film's folder (`src/vN/`). — ("Don't rely on reusable
   assets", v2 restart, 2026-10-27).
@@ -176,15 +189,26 @@ Maintenance at the end).
   as a screen recording under the status bar). Each film decides them with its G4 look clip, 'paint-subtle' at most
   (`docs/EDGES.md`). — (v1 posted reel, 2026-10-25).
 - **Palette: a family of house palettes as tools, not a cage.** A soft, warm, "no screaming colours" base; one sister
-  palette per video; within it one hero, one dark anchor, at most one pop. Rules: `docs/look/PALETTE.md`. — (2026-10-25).
+  palette per video; within it one hero, one dark anchor, at most one pop; the family stays tight enough that every video
+  reads as one brand (ONE LOOK, ONE BRAND above). Rules: `docs/look/PALETTE.md`. — (2026-10-25; one brand, 2026-10-28).
 - **Warm, never sickly:** no beige, muddy tan, olive or grey; peach creams, terracotta, red-brown lines, golden light,
   warm shadows. — ("we need to have a warm feeling, not sick", v3 G4, 2026-10-26).
+- **A full value range: a calm light sky, a mid-tone world and a few real darks where the eye should go** (windows, a
+  hull, the shade under trees), never a narrow band of light pastels (one reason v2 reads cheap next to the city
+  posters). The numbers come from the city-poster study. — (our observation on the posters; "5 - good point too!",
+  2026-10-28).
 - **Texture and lines: VERY subtle.** Lines only in key places: the clean pen's tiers (the main thing's outline and a
   few inner details; `docs/look/CRAFT.md` §c). The owner's "black outlines" are read as dark, warm lines in the
   object's own deep shade, never one near-black ink on everything (v3 G5b's was "too rough"); captions keep the dark
-  ink; the owner judges the line in each G4 look clip. Halftone tactically on a few elements as an optional last step
-  (the film must work flat; the owner decides per video). — ("very subtle texture pieces and the black outlines, VERY
-  subtle but in key places", texture test, 2026-10-25; "cleaner, more refined, gentle, premium", v3 G5b, 2026-10-27).
+  ink; the owner judges the line in each G4 look clip. Texture: start playing with a VERY subtle paper-and-paint
+  texture (a fine grain and gentle mottling in the big flats, like the city posters) where it adds to the premium look,
+  tried in a look clip and kept only if it does; the halftone stays an option on a few elements; the film must work
+  flat. The posters' outline-free edges (shapes separated by light and dark steps, only tiny lines for windows and
+  railings) are liked: the owner judges them on an A vs B picture before the line rule changes. — ("very subtle texture
+  pieces and the black outlines, VERY subtle but in key places", texture test, 2026-10-25; "cleaner, more refined,
+  gentle, premium", v3 G5b, 2026-10-27; "i like texture point yes we can perhaps start playing with it, very subtly
+  especially if its adding to the premium look sure"; "i like 3 - but can you draw me a picture of difference like A vs
+  B what you are talking about", 2026-10-28).
 - **Profile identity: mascot Pip (the purple PHP elephant), drawn in each film's style;** avatar `deliverables/profile/pip_power_button.png`. — (2026-10-25).
 
 ## Hook and pacing

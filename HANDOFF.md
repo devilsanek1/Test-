@@ -158,6 +158,12 @@ Everything that agent knew is in this repo. This file is the map; the details li
   (booted from `v2r-helper-boot` with `/effort max`, working on this study's branch), discussing content directions
   with the owner; its notes: `content_discussion.md` in the study folder. The orchestrator messages it when
   `content_market.md` and `content_fit.md` are pushed; archive it when the owner closes the discussion.
+- **The owner's answers (2026-10-28 ~22:10 UTC)** to our nine first observations are rules now where decided (one look,
+  one brand; a VERY subtle texture to try; lit and shade faces; a full value range: DIRECTION intro and rules 3-6,
+  CRAFT §c, PALETTE, the playbook) and open where not (outline-free edges: an A vs B picture; one consolidated layout
+  guide; the designed view; the patchwork): the study README lists them. "merge the findings and key points and
+  conclusions into the main repo": this study is merged into `video-production` as it goes, and its conclusions are
+  integrated into the main docs when the synthesis lands.
 
 ## 2b. Update 2026-10-25 20:00 UTC: two agents, split by video
 
