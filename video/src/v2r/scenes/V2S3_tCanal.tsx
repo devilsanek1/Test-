@@ -9,6 +9,7 @@ import {useTime} from '../../lib/time';
 import {Paint, frac} from '../kit/canal/core';
 import {Ducks, FloatingLeaves} from '../kit/canal/life';
 import {Batch, TK, line, ovalPath, rng, P, leafPath} from './V2S3_tParts';
+import {planeBatch} from './V2S3_depth';
 
 export const CANAL = {top: 1130, bottom: 1420, x0: -80, x1: 1180} as const;
 
@@ -47,7 +48,7 @@ function staticBatch(): Batch {
 
 export const S3Water: React.FC = () => {
   const t = useTime();
-  const base = useMemo(staticBatch, []);
+  const base = useMemo(() => planeBatch(staticBatch(), -0.6), []);
   const b = new Batch();
   const r = rng('s3refl');
   // reflections: rows of short broken dashes under each source, sparser and shorter with depth, wobbling sideways
@@ -90,6 +91,7 @@ export const S3Water: React.FC = () => {
     const s = 0.8 + v * 0.6;
     if (on) b.fill(i % 3 ? CM.paper : CM.lampCore, `M${P(x - 8 * s, yy)}L${P(x + 8 * s, yy - 1)}L${P(x + 6 * s, yy + 2 * s)}L${P(x - 6 * s, yy + 2 * s)}Z`);
   }
+  planeBatch(b, -0.6);
   return (
     <>
       <Paint b={base} seed="s3c/base" misreg={false} />

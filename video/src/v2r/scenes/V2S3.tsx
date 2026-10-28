@@ -24,6 +24,7 @@ import {S3_SUNSET} from '../world/skies';
 import {S3_START, S3_PLANE} from './V2S3_rig';
 import {S3Plane} from './V2S3_float';
 import {S3Sun, S3Terrace, S3Canal} from './V2S3_terrace';
+import {S3FarCity, S3Roofs} from './V2S3_tWest';
 import {S3Near} from './V2S3_near';
 import {S3Pip} from './V2S3_pip';
 
@@ -36,6 +37,13 @@ const Shot: React.FC = () => (
       <S3Plane plane={S3_PLANE.sky}>
         <Sky spec={S3_SUNSET} />
         <S3Sun />
+      </S3Plane>
+      {/* +2 the far city on the sunset band, +1 the roofs and chimneys in front of it (the west gap; V2S3_tWest) */}
+      <S3Plane plane={S3_PLANE.farCity}>
+        <S3FarCity />
+      </S3Plane>
+      <S3Plane plane={S3_PLANE.roofs}>
+        <S3Roofs />
       </S3Plane>
       <S3Plane plane={S3_PLANE.terrace}>
         <S3Terrace />

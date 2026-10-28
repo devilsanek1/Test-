@@ -32,14 +32,41 @@ import {ExitSync} from '../../lib/exit';
 import {XG, mat} from '../../lib/xf';
 import {line, rect as rectInk} from '../../lib/sketch';
 import * as MAP from '../world/map';
-import {Batch, Paint, P, Pt, rng, ovalPath, domePath, lobes, leafPath, lerp, PlaneMap} from '../kit/canal/core';
+import {Batch, Paint, P, Pt, r1, rand, ovalPath, domePath, lobes, lerp, PlaneMap} from '../kit/canal/core';
 import {litAt, StringLights, Puffs} from '../kit/canal/life';
 import {sashInto, potsInto} from '../kit/canal/terrace';
 import {railingInto, bikeInto, treeInto, Lamp} from '../kit/canal/towpath';
 import {Person, HER, WindowPerson, drawn} from '../kit/cast';
-import {S8T, L, planeOffset, lampRunAt, doorOpenK, LANE, SKYLINE_MIN_Y} from './V2S8_clock';
+import {Tier} from '../../lib/tier';
+import type {Tier as TierT} from '../../lib/tier';
+import {Shade} from '../../lib/light';
+import {recede} from '../../lib/depth';
+import {S1_IRON} from './V2S1_set_core';
+import {S8T, L, lampRunAt, doorOpenK, LANE, SKYLINE_MIN_Y} from './V2S8_clock';
 import {LateExit, EarlyExit} from './V2S8_exit';
-import {S8Plane} from './V2S8_depth';
+import {S8Plane, S8_ATM} from './V2S8_depth';
+
+/** Tier C iron (V2S1_set_core S1_IRON: the film's slate iron for lamps, railings, rails, bins' wheels; never plum). */
+const IRON = S1_IRON;
+/** Recolour a batch's fills in place (each layer's colours through `f`); `ink` false drops its ink. */
+function remap(b: Batch, f: (c: string) => string, ink = true): Batch {
+  for (const l of b.layers) {
+    const fills = new Map<string, string[]>();
+    l.fills.forEach((ds, c) => {
+      const m = f(c);
+      const a = fills.get(m);
+      if (a) a.push(...ds);
+      else fills.set(m, [...ds]);
+    });
+    l.fills = fills;
+    if (!ink) l.inks = new Map();
+  }
+  return b;
+}
+/** Plum iron -> slate (tier C: lamps, railings, the boot scraper, wheels). */
+const slate = (c: string) => (c === CM.anchor ? IRON : c);
+/** Beyond the bend (depth +1: one step toward the air; lit panes keep their lamp colour). */
+const plus1 = (c: string) => (c === CM.lamp || c === CM.lampCore ? c : recede(c === CM.anchor ? IRON : c, 1, S8_ATM));
 
 // ---------------------------------------------------------------- geometry (landing pose, house plane)
 
@@ -79,18 +106,18 @@ const NB_SASH: Box = {x: 1210, y: 678, w: 54, h: 104};
 const TH_SASH: Box = {x: 1330, y: 666, w: 56, h: 110};
 
 /** The heritage lamp right of her house (its cap clears W's frame by ~6 px; it stands in the rail as a mass). */
-const HOUSE_LAMP = {x: 992, y: 1078, h: 450};
+export const HOUSE_LAMP = {x: 992, y: 1078, h: 450};
 /** The canal-side lamps beyond the board (feet behind it): only their heads show over its frame (the StatementBoard's
  *  top rail is at y 680), each with a little post under the lantern. They stand in the sky's free gaps at the landing,
  *  clear of SUN8 and of the set's far-windows ripple (the warehouse's arched windows x 244-312, the terrace's x 548-
  *  606): one between the sun and the far terrace, one left of the warehouse; the run sweeps right -> left (west). */
-const CANAL_LAMPS = [
+export const CANAL_LAMPS = [
   {id: 'canalLamp1' as const, x: 494, y: 887, h: 270},
   {id: 'canalLamp2' as const, x: 196, y: 887, h: 270},
 ];
-/** Carriage lamps (lantern top centre): right of her door, right of the neighbour's door. */
+/** Her carriage lamp (lantern top centre), right of her door (the neighbour's, right of its door, is retired: at the
+ *  landing it stacked under the near lamp's lantern). */
 const CARRIAGE_L = {x: 793, y: 868};
-const CARRIAGE_R = {x: 1042, y: 890};
 /** The festoon: swags between hooks under the first-floor sills, right -> left (bulbs per swag). */
 const FESTOON: {from: Pt; to: Pt; n: number; sag: number}[] = [
   {from: [1180, 811], to: [1290, 812], n: 3, sag: 9},
@@ -144,23 +171,6 @@ const ellipseInk = (cx: number, cy: number, rx: number, ry: number, deg: number)
   return p.slice(0, 11).map(([x, y], i) => `${i ? 'L' : 'M'}${P(x, y)}`).join('');
 };
 
-/** Brick-bond hints: little clusters of stretchers in a darker brick, never on an opening (fills only). */
-function bricksInto(b: Batch, area: R4, n: number, avoid: R4[], color: string, seed: string, bw = 13, bh = 4.5) {
-  const r = rng(seed);
-  let placed = 0;
-  for (let k = 0; k < n * 10 && placed < n; k++) {
-    const x = r.range(area[0] + 4, area[2] - 34);
-    const y = r.range(area[1] + 4, area[3] - 14);
-    if (avoid.some((a) => hits(x, y, a, 10) || hits(x + 30, y + 8, a, 10))) continue;
-    const m = r.int(2, 5);
-    for (let i = 0; i < m; i++) {
-      const row = i % 2;
-      b.rect(color, x + Math.floor(i / 2) * (bw + 2) + (row ? bw * 0.5 : 0), y + row * (bh + 2), bw * r.range(0.75, 1.05), bh);
-    }
-    placed++;
-  }
-}
-
 /** A keystone lintel over an opening (x0..x1 at y). */
 function lintelInto(b: Batch, x0: number, x1: number, y: number, h: number) {
   b.rect(CM.limestone, x0, y - h, x1 - x0, h);
@@ -213,10 +223,10 @@ function carriageInto(b: Batch, x: number, y: number, s: number, lit: boolean, s
   const w = s * 0.62;
   b.layer();
   // the back plate and the swan bracket
-  b.rect(CM.anchor, x - 2, y - s * 0.42, 4, s * 0.3);
-  b.ink(`M${P(x, y - s * 0.3)}Q${P(x + s * 0.28, y - s * 0.3)} ${P(x + s * 0.2, y - s * 0.12)}Q${P(x + s * 0.12, y - s * 0.02)} ${P(x, y)}`, INK_PX.hair, CM.anchor);
-  // cap, finial, glass, the cup
-  b.poly(CM.anchor, [
+  b.rect(IRON, x - 2, y - s * 0.42, 4, s * 0.3);
+  b.ink(`M${P(x, y - s * 0.3)}Q${P(x + s * 0.28, y - s * 0.3)} ${P(x + s * 0.2, y - s * 0.12)}Q${P(x + s * 0.12, y - s * 0.02)} ${P(x, y)}`, INK_PX.hair, IRON, 0, {thing: true});
+  // cap, glass, the cup
+  b.poly(IRON, [
     [x - w * 0.62, y + s * 0.12],
     [x, y - s * 0.06],
     [x + w * 0.62, y + s * 0.12],
@@ -235,14 +245,13 @@ function carriageInto(b: Batch, x: number, y: number, s: number, lit: boolean, s
       [x - w * 0.16, y + s * 0.72],
     ]);
   b.layer();
-  b.rect(CM.anchor, x - 0.7, y + s * 0.12, 1.4, s * 0.68);
-  b.poly(CM.anchor, [
+  b.poly(IRON, [
     [x - w * 0.42, y + s * 0.8],
     [x + w * 0.42, y + s * 0.8],
     [x + w * 0.12, y + s * 0.98],
     [x - w * 0.12, y + s * 0.98],
   ]);
-  b.ink(rectInk(x - w * 0.5, y + s * 0.12, w, s * 0.68, {seed: `${seed}/lt`, over: 'none', edges: 'lr'}), INK_PX.hair);
+  void seed;
 }
 
 /** A pigeon perched at (x, y feet): the canal kit's pigeon (grey body, darker head, peach feet), nodding. */
@@ -253,8 +262,6 @@ function pigeonInto(b: Batch, x: number, y: number, s: number, face: 1 | -1, t: 
   b.fill(CM.shadeCool, ovalPath(x - face * s * 0.08, by - s * 0.06, s * 0.3, s * 0.16));
   b.fill(CM.shadeCool, ovalPath(x + face * (s * 0.38 + nod * 0.5), by - s * 0.28 + nod * 0.4, s * 0.15, s * 0.15));
   b.fill(CM.shadeCool, `M${P(x - face * s * 0.36, by)}L${P(x - face * s * 0.7, by + s * 0.08)}L${P(x - face * s * 0.34, by + s * 0.16)}Z`);
-  b.rect(CM.box, x - s * 0.08, y - s * 0.08, s * 0.05, s * 0.08);
-  b.rect(CM.box, x + s * 0.06, y - s * 0.08, s * 0.05, s * 0.08);
 }
 
 /** A pigeon in flight (wings at flap -1..1). */
@@ -265,48 +272,10 @@ function pigeonFlyInto(b: Batch, x: number, y: number, s: number, face: 1 | -1, 
   b.fill(CM.shadeCool, ovalPath(x + face * s * 0.3, y - s * 0.02, s * 0.13, s * 0.12));
 }
 
-/** A Virginia creeper turning in October on her house's left corner: stems climbing from the plinth, leaves that sway
- *  a hair (rust, gold, deep brick, a little green), kept off the vent and the stair window. */
-const CREEPER = (() => {
-  const r = rng('s8h/creeper');
-  const leaves: {x: number; y: number; s: number; a: number; c: string; ph: number}[] = [];
-  const stems: string[] = [];
-  const cols = [CM.leafRust, CM.leafGold, CM.brickDeep, CM.leafRust, CM.sage, CM.coatMustard, CM.leafRust];
-  for (let k = 0; k < 4; k++) {
-    const x0 = 645 + k * 6;
-    const top = 690 + k * 26 + r.range(-10, 10);
-    let d = '';
-    for (let y = 1040; y > top; y -= 9) {
-      const x = x0 + Math.sin((1040 - y) / 55 + k * 1.7) * 7 + (1040 - y) * 0.02 * (k % 2 ? 1 : -0.4);
-      d += `${d ? 'L' : 'M'}${P(x, y)}`;
-      if (x > 664 && y < 776 && y > 752) continue;
-      for (const side of [-1, 1]) {
-        if (r.chance(0.25)) continue;
-        const lx = x + side * r.range(3, 8);
-        if (lx < HH.x0 - 2 || (lx > STAIR.x - 6 && y < STAIR.y + STAIR.h + 8)) continue;
-        if (lx > 646 && lx < 666 && y > 756 && y < 776) continue;
-        const dens = y < 900 ? 1 : 0.7;
-        if (!r.chance(dens)) continue;
-        leaves.push({x: lx, y: y + r.range(-3, 3), s: r.range(6.5, 10), a: side * r.range(20, 70) - 90, c: r.pick(cols), ph: r.range(0, 6.28)});
-      }
-    }
-    stems.push(d);
-  }
-  return {leaves, stems: stems.join('')};
-})();
-
-function creeperInto(b: Batch, t: number) {
-  b.ink(CREEPER.stems, 1.2, CM.line);
-  b.layer();
-  for (const l of CREEPER.leaves) {
-    const sw = Math.sin(t * 1.3 + l.ph) * 6 + Math.sin(t * 2.9 + l.ph * 1.7) * 3;
-    b.fill(l.c, leafPath(l.x, l.y, l.s, l.s * 0.42, l.a + sw));
-  }
-}
-
 // ---------------------------------------------------------------- beyond the bend (static)
 
-/** The further row (a plane receding west), its corner cafe, a tree; returns the window quads for the lit states. */
+/** The further row (a plane receding west), its corner cafe, a tree: depth +1 (one step toward the air), its windows
+ *  STATIC (a fixed lit pattern: nothing beyond the bend switches), no lines. */
 function beyondInto() {
   const pm = new PlaneMap(FR_W, FR_H, FR_QUAD);
   const b = new Batch();
@@ -370,15 +339,6 @@ function beyondInto() {
     const u = c0 - 0.15 + k * ((c1 - c0 + 0.3) / 9);
     b.poly(k % 2 ? CM.paper : CM.sage, [pm.p(u, 6.8), pm.p(u + (c1 - c0 + 0.3) / 9, 6.8), pm.p(u + (c1 - c0 + 0.3) / 9 + 0.05, 7.55), pm.p(u + 0.05, 7.55)]);
   }
-  // the near house's TV aerial and the structure ink (far: hair weight)
-  const [ax, ay] = pm.p(16.95, -1.4);
-  let ink = `M${P(ax, ay)}L${P(ax, ay - 16)}M${P(ax - 8, ay - 12)}L${P(ax + 8, ay - 12)}M${P(ax - 6, ay - 7)}L${P(ax + 6, ay - 7)}`;
-  const [nx, ny0] = pm.p(FR_W, 0);
-  const [, ny1] = pm.p(FR_W, FR_H);
-  ink += line(nx, ny0, nx, ny1, {seed: 's8h/frEdge', over: [0, 6]});
-  ink += `M${P(...pm.p(10.5, 0))}L${P(...pm.p(FR_W, 0))}`;
-  ink += `M${P(...pm.p(12, 6.1))}L${P(...pm.p(FR_W, 6.1))}`;
-  b.ink(ink, INK_PX.hair);
   // the railing along the street's edge (above the towpath) and a tree at the bend
   b.layer();
   const rail: Pt[] = [];
@@ -395,7 +355,9 @@ function beyondInto() {
     b.rect(CM.anchor, x0 - 0.6, y0 - 9, 1.2, 9);
   }
   treeInto(b, 524, 952, 142, 's8h/bendTree', 0, true);
-  return {b, wins};
+  b.layer();
+  wins.forEach((w, k) => b.poly(rand('s8h/frWin', k) < 0.45 ? CM.lamp : CM.glass, w.q));
+  return {b: remap(b, plus1, false), wins};
 }
 
 // ---------------------------------------------------------------- the terrace (static)
@@ -416,37 +378,6 @@ function facadeInto(): Batch {
   b.rect(CM.stucco, NB.x0, FIRST, NB.x1 - NB.x0, G - FIRST);
   b.rect(CM.brickDeep, TH.x0, TH.top + 2, TH.x1 - TH.x0, G - TH.top - 2);
   b.layer();
-  // brick-bond hints (fills only, never on an opening)
-  bricksInto(
-    b,
-    [HH.x0 + 18, HH.top + 22, HH.x1 - 14, 1036],
-    30,
-    [
-      [WX0 - 16, 600, WX0 + W8.w + 16, 800],
-      [STAIR.x - 12, STAIR.y - 18, STAIR.x + STAIR.w + 12, STAIR.y + STAIR.h + 10],
-      [D.x0 - 16, 812, D.x1 + 16, G],
-      [GWIN.x - 12, GWIN.y - 18, GWIN.x + GWIN.w + 12, GWIN.y + GWIN.h + 12],
-      [HH.x0, FIRST - 6, HH.x1, FIRST + 16],
-      [CARRIAGE_L.x - 12, CARRIAGE_L.y - 14, CARRIAGE_L.x + 12, CARRIAGE_L.y + 34],
-      [948, 600, 972, G],
-    ],
-    CM.brick,
-    's8h/hhBricks',
-  );
-  bricksInto(
-    b,
-    [NB.x0 + 8, NB.top + 18, NB.x1 - 10, FIRST - 6],
-    12,
-    [
-      [NB_BAL.x - 24, NB_BAL.y - 16, NB_BAL.x + NB_BAL.w + 24, FIRST],
-      [NB_SASH.x - 10, NB_SASH.y - 16, NB_SASH.x + NB_SASH.w + 10, FIRST],
-      [1018, 724, 1054, 764],
-    ],
-    CM.brickDeep,
-    's8h/nbBricks',
-  );
-  // rustication grooves on the neighbour's stucco ground floor
-  for (let y = FIRST + 30; y < G - 18; y += 24) b.rect(CM.stoneShade, NB.x0 + 2, y, NB.x1 - NB.x0 - 4, 2);
   b.layer();
   // ---- parapets, cornices, the string course, plinths, party-wall pilasters, quoins
   b.rect(CM.limestone, HH.x0 - 4, HH.top, HH.x1 - HH.x0 + 8, 8);
@@ -464,13 +395,10 @@ function facadeInto(): Batch {
   b.rect(CM.stoneShade, NB.x0, 1042, NB.x1 - NB.x0, G - 1042);
   for (const x of [HH.x1, NB.x1]) b.rect(CM.brickDeep, x - 2, NB.top + 2, 4, G - NB.top - 2);
   for (let y = HH.top + 22, k = 0; y < 1030; y += 27, k++) b.rect(CM.limestone, HH.x0, y, k % 2 ? 11 : 18, 21);
-  // her rainwater pipe with its hopper; the neighbour's; a vent (steam) on her upper left
-  b.rect(CM.shadeCool, HH.x1 - 15, HH.top + 24, 10, 9);
-  b.rect(CM.shadeCool, HH.x1 - 12, HH.top + 33, 4, 1040 - HH.top - 33);
-  b.rect(CM.shadeCool, NB.x1 - 14, NB.top + 22, 4, 1042 - NB.top - 22);
-  b.rect(CM.stoneShade, 649, 762, 15, 9);
-  b.rect(CM.shadeCool, 651, 764, 11, 1.5);
-  b.rect(CM.shadeCool, 651, 767.5, 11, 1.5);
+  // her rainwater pipe with its hopper; the neighbour's (slate, 4-5 px: a thing, not a line)
+  b.rect(IRON, HH.x1 - 15, HH.top + 24, 10, 9);
+  b.rect(IRON, HH.x1 - 12, HH.top + 33, 5, 1040 - HH.top - 33);
+  b.rect(IRON, NB.x1 - 14, NB.top + 22, 5, 1042 - NB.top - 22);
   // the neighbour's chimney stack (its pots stay under the skyline) and her satellite dish
   b.rect(CM.brickDeep, 1150, 616, 36, NB.top - 616);
   b.rect(CM.limestone, 1147, 612, 42, 5);
@@ -493,14 +421,6 @@ function facadeInto(): Batch {
   // her stair window's box of trailing ivy, the air bricks at her plinth, the bell push by her door
   b.rect(CM.brickDeep, STAIR.x + 2, STAIR.y + STAIR.h - 9, STAIR.w - 4, 9);
   b.fill(CM.sage, lobes(STAIR.x + 3, STAIR.x + STAIR.w - 3, STAIR.y + STAIR.h - 8, 13, 's8h/stairBox', 4));
-  for (let k = 0; k < 4; k++) b.fill(k % 2 ? CM.sage : CM.leafGold, leafPath(STAIR.x + 8 + k * 17, STAIR.y + STAIR.h + 6 + (k % 2) * 4, 9, 3.4, 80 + k * 9));
-  for (const x of [700, 744, 880, 936]) {
-    b.rect(CM.stoneShade, x, 1046, 14, 8);
-    b.rect(CM.shadeCool, x + 2, 1048.5, 10, 1.4);
-    b.rect(CM.shadeCool, x + 2, 1051, 10, 1.4);
-  }
-  b.fill(CM.coatMustard, ovalPath(D.x1 + 6.5, 958, 3.4, 3.4));
-  b.fill(CM.paper, ovalPath(D.x1 + 6.5, 958, 1.4, 1.4));
   // ---- her door: pilasters, the arch round the fanlight, the hood (the leaf and the fanlight's glass come later)
   b.rect(CM.stucco, D.x0 - 13, 826, 13, G - 826);
   b.rect(CM.stucco, D.x1, 826, 13, G - 826);
@@ -525,14 +445,11 @@ function facadeInto(): Batch {
   // ---- the satellite dish on the neighbour's first floor (under the heritage lamp's crossarm)
   b.layer();
   b.rect(CM.stoneShade, 1024, 748, 9, 3);
-  b.rect(CM.stoneShade, 1026, 744, 3, 10);
+  b.rect(CM.stoneShade, 1025, 744, 5, 10);
   b.layer();
   b.poly(CM.paper, ellipsePts(1037, 744, 10, 13, -24));
   b.layer();
   b.poly(CM.stoneShade, ellipsePts(1039.5, 743, 5, 9.5, -24));
-  b.ink(`M${P(1038, 746)}L${P(1052, 738)}`, INK_PX.hair, CM.anchor);
-  b.fill(CM.anchor, ovalPath(1052, 737.5, 2.4, 2.4));
-  b.ink(ellipseInk(1037, 744, 10, 13, -24), 1.2);
   // ---- structure ink: loose architectural lines (no upward overshoot near the skyline)
   let s = '';
   s += line(HH.x0 - 5, HH.top + 1, HH.x1 + 6, HH.top + 1, {seed: 's8h/i/top', over: [0, 0], drift: 0.08, jitter: 0.4});
@@ -568,23 +485,17 @@ function forecourtInto(): Batch {
   b.ink(line(D.x0 - 24, G + 10, D.x1 + 24, G + 10, {seed: 's8h/i/step', over: 'small'}), INK_PX.hair);
   b.layer();
   // her area railings (short, horizontal) and the neighbour's, behind its bins; the corner railing with the bike
-  railingInto(b, GWIN.x + 4, HH.x1 - 8, G + 2, 40, 's8h/area', {pitch: 20, bars: 2});
-  railingInto(b, 1056, NB.x1 + 40, G, 38, 's8h/nbArea', {pitch: 21, bars: 2});
-  railingInto(b, 600, 664, G + 6, 34, 's8h/corner', {pitch: 16, bars: 2});
+  railingInto(b, GWIN.x + 4, HH.x1 - 8, G + 2, 40, 's8h/area', {pitch: 20, bars: 2, color: IRON});
+  railingInto(b, 1056, NB.x1 + 40, G, 38, 's8h/nbArea', {pitch: 21, bars: 2, color: IRON});
+  railingInto(b, 600, 664, G + 6, 34, 's8h/corner', {pitch: 16, bars: 2, color: IRON});
   b.layer();
   bikeInto(b, 628, G + 10, 19, 's8h/bike', CM.brickDeep, -1);
   // pots and herbs on her step, a boot scraper, milk on the neighbour's step
   potsInto(b, D.x0 - 18, D.x0 + 6, G, 13, 's8h/potsL');
   potsInto(b, D.x1 - 4, D.x1 + 20, G, 13, 's8h/potsR');
-  b.rect(CM.anchor, 650, G - 2, 1.6, 12);
-  b.rect(CM.anchor, 661, G - 2, 1.6, 12);
-  b.rect(CM.anchor, 648, G + 3, 16, 2);
-  b.fill(CM.anchor, ovalPath(650.8, G - 3, 2, 2));
-  b.fill(CM.anchor, ovalPath(661.8, G - 3, 2, 2));
-  for (const x of [1036, 1043]) {
-    b.rect(CM.paper, x - 2.5, G - 12, 5, 12);
-    b.rect(CM.coatMustard, x - 2.5, G - 14, 5, 2.5);
-  }
+  b.rect(IRON, 648, G - 2, 4, 12);
+  b.rect(IRON, 660, G - 2, 4, 12);
+  b.rect(IRON, 646, G + 2, 20, 4);
   // the bay tree in a lead tub right of her door
   const bx = 802;
   b.poly(CM.stoneShade, [
@@ -597,8 +508,7 @@ function forecourtInto(): Batch {
   b.rect(CM.line, bx - 1.5, G - 66, 3, 38);
   b.fill(CM.sage, ovalPath(bx, G - 86, 22, 22));
   b.fill(CM.sage, lobes(bx - 20, bx + 20, G - 72, 30, 's8h/bay', 4));
-  for (let k = 0; k < 5; k++) b.fill([CM.leafGold, CM.sage, CM.leafGold, CM.coatMustard, CM.leafGold][k], leafPath(bx - 12 + k * 6, G - 96 + (k % 2) * 16, 8, 3, 30 + k * 40));
-  b.ink(`M${P(bx - 21, G - 80)}A22 22 0 0 1 ${P(bx + 14, G - 104)}`, INK_PX.hair, CM.ink, 0.2);
+  b.fill(CM.leafGold, lobes(bx - 16, bx + 4, G - 96, 22, 's8h/bayLit', 3));
   // two wheelie bins in front of the neighbour's railings
   for (const [x, c] of [
     [1092, CM.coatSlate],
@@ -611,11 +521,9 @@ function forecourtInto(): Batch {
       [x - 19, G + 2],
     ]);
     b.rect(c, x - 25, G - 64, 50, 8);
-    b.rect(CM.shadeWarm, x - 18, G - 50, 36, 2);
-    b.fill(CM.anchor, ovalPath(x - 15, G + 2, 5, 5));
-    b.ink(line(x - 25, G - 64, x + 25, G - 64, {seed: `s8h/bin${x}`, over: 'small'}), INK_PX.hair);
+    b.fill(IRON, ovalPath(x - 15, G + 2, 5, 5));
   }
-  return b;
+  return remap(b, slate);
 }
 
 // ---------------------------------------------------------------- per-frame: windows and lights
@@ -650,8 +558,6 @@ function laceWindowInto(b: Batch, w: Box, seed: string) {
     hem += `Q${P((xa + xb) / 2, y + lh + 7)} ${P(xb, y + lh)}`;
   }
   b.fill(CM.paper, hem + 'Z');
-  const r = rng(seed);
-  for (let i = 0; i < 16; i++) b.fill(CM.stucco, ovalPath(x + 6 + r.range(0, w.w - 12), y + 6 + r.range(0, lh - 10), 2, 2));
   // the raised lower sash's frame, the glazing bar
   b.layer();
   b.rect(CM.paper, x, y + lh + 6, w.w, 5);
@@ -665,8 +571,7 @@ function windowBoxInto(b: Batch, w: Box) {
   b.rect(CM.brickDeep, w.x + 2, y - 12, w.w - 4, 13);
   b.rect(CM.leafRust, w.x + 2, y - 12, w.w - 4, 3);
   b.fill(CM.sage, lobes(w.x + 4, w.x + w.w - 4, y - 11, 19, 's8h/box', 6));
-  const r = rng('s8h/boxFlowers');
-  for (let i = 0; i < 9; i++) b.fill(r.pick([CM.box, CM.blossom, CM.paper, CM.coatMustard]), ovalPath(w.x + 8 + r.range(0, w.w - 16), y - 14 - r.range(0, 12), 2.6, 2.6));
+  b.fill(CM.blossom, lobes(w.x + 14, w.x + w.w * 0.55, y - 13, 12, 's8h/boxFlowers', 3));
 }
 
 /** The neighbour's balcony: slab, railing with pots, in front of the reader. */
@@ -674,62 +579,49 @@ function balconyInto(b: Batch) {
   const y = NB_BAL.y + NB_BAL.h;
   b.rect(CM.limestone, NB_BAL.x - 18, y, NB_BAL.w + 36, 7);
   b.rect(CM.stoneShade, NB_BAL.x - 16, y + 7, NB_BAL.w + 32, 3);
-  railingInto(b, NB_BAL.x - 16, NB_BAL.x + NB_BAL.w + 16, y, 34, 's8h/bal', {pitch: 16, bars: 2});
+  railingInto(b, NB_BAL.x - 16, NB_BAL.x + NB_BAL.w + 16, y, 34, 's8h/bal', {pitch: 16, bars: 2, color: IRON});
   potsInto(b, NB_BAL.x - 14, NB_BAL.x + 14, y, 13, 's8h/balPots');
   potsInto(b, NB_BAL.x + NB_BAL.w - 12, NB_BAL.x + NB_BAL.w + 14, y, 12, 's8h/balPots2');
 }
 
-/** Her stair light follows her up (on as she climbs, off once she is in the front room). */
-const stairLit = (t: number) => t >= L(34.8) && t < L(35.4);
-
-/** The near house's ground window and the neighbour's lit windows: index into the switching group. */
-const NB_SWITCH_N = 4; // 0 the neighbour's fanlight, 1 its second sash, 2 the third house's sash, 3 the third house's fanlight
-
-function windowsInto(t: number, frWins: {q: Pt[]; near: boolean}[]): Batch {
+/** The facade's windows, STATIC (CRAFT §b: one window changing at a time at most; THROUGHLINE §4: no switch in film
+ *  36.80-38.30; W's 34.95 is the shot's one window switch): her stair window unlit, her fanlight lit (the hall), the
+ *  downstairs flat lamp-lit, the neighbour's fanlight and second sash lit, the third house's sash dim, its fanlight lit. */
+function windowsInto(): Batch {
   const b = new Batch();
-  // her stair window, her fanlight (the hall is lit), the downstairs window
-  sashWithBars(b, STAIR, stairLit(t), 's8h/stairWin');
-  if (stairLit(t)) {
-    // the stair's banister rising across the lit pane
-    b.ink(`M${P(STAIR.x + 4, STAIR.y + STAIR.h * 0.86)}L${P(STAIR.x + STAIR.w - 6, STAIR.y + STAIR.h * 0.6)}`, INK_PX.hair, CM.line);
-  }
+  sashWithBars(b, STAIR, false, 's8h/stairWin');
   const fc = (D.x0 + D.x1) / 2;
   b.fill(CM.lamp, domePath(fc, D.y0, DW / 2, DW / 2));
-  b.fill(CM.lampCore, domePath(fc, D.y0, DW * 0.22, DW * 0.22));
   for (let k = 0; k < 5; k++) {
     const a = Math.PI * (0.1 + k * 0.2);
-    b.ink(`M${P(fc + Math.cos(a) * DW * 0.13, D.y0 - Math.sin(a) * DW * 0.13)}L${P(fc + Math.cos(a) * DW * 0.48, D.y0 - Math.sin(a) * DW * 0.48)}`, 1.6, CM.paper);
+    b.ink(`M${P(fc + Math.cos(a) * DW * 0.13, D.y0 - Math.sin(a) * DW * 0.13)}L${P(fc + Math.cos(a) * DW * 0.48, D.y0 - Math.sin(a) * DW * 0.48)}`, 1.6, CM.paper, 0, {thing: true});
   }
-  b.ink(`M${P(fc - 6, D.y0 - 22)}l3 -6l1 9M${P(fc + 2, D.y0 - 27)}q5 -2 4 3q-2 3 -5 6l6 0`, 1.4, CM.paper);
   b.layer();
   laceWindowInto(b, GWIN, 's8h/gwin');
   b.layer();
-  // the neighbour: its fanlight and second sash switch; its ground window (the phone, behind lace) and the balcony
-  // door (the reader) stay lit
-  const nfan = litAt(t, 's8h/nbw', 0, NB_SWITCH_N, {litFrac: 0.6});
-  b.fill(nfan ? CM.lamp : CM.glass, domePath(NB_DOOR.x + NB_DOOR.w / 2, NB_DOOR.y, NB_DOOR.w / 2, NB_DOOR.w / 2));
-  sashWithBars(b, NB_SASH, litAt(t, 's8h/nbw', 1, NB_SWITCH_N, {litFrac: 0.6}), 's8h/nbSash');
-  sashWithBars(b, TH_SASH, litAt(t, 's8h/nbw', 2, NB_SWITCH_N, {litFrac: 0.6}), 's8h/thSash');
+  b.fill(CM.lamp, domePath(NB_DOOR.x + NB_DOOR.w / 2, NB_DOOR.y, NB_DOOR.w / 2, NB_DOOR.w / 2));
+  sashWithBars(b, NB_SASH, true, 's8h/nbSash');
+  sashWithBars(b, TH_SASH, false, 's8h/thSash');
   b.layer();
-  b.fill(litAt(t, 's8h/nbw', 3, NB_SWITCH_N, {litFrac: 0.6}) ? CM.lamp : CM.glass, domePath(1430, 890, 26, 26));
+  b.fill(CM.lamp, domePath(1430, 890, 26, 26));
   b.rect(CM.lamp, NB_GWIN.x, NB_GWIN.y, NB_GWIN.w, NB_GWIN.h);
-  b.rect(CM.lampCore, NB_GWIN.x + NB_GWIN.w * 0.3, NB_GWIN.y + NB_GWIN.h * 0.15, NB_GWIN.w * 0.45, NB_GWIN.h * 0.4);
   b.rect(CM.lamp, NB_BAL.x, NB_BAL.y, NB_BAL.w, NB_BAL.h);
-  b.rect(CM.lampCore, NB_BAL.x + NB_BAL.w * 0.15, NB_BAL.y + NB_BAL.h * 0.1, NB_BAL.w * 0.5, NB_BAL.h * 0.35);
   b.rect(CM.coatOat, NB_BAL.x, NB_BAL.y, NB_BAL.w, NB_BAL.h * 0.08);
-  // the further row's windows: the near house's switch on their own clock (they are the ones in the gap)
-  let iNear = 0;
-  let iFar = 0;
-  const nNear = frWins.filter((w) => w.near).length;
-  const nFar = frWins.length - nNear;
-  b.layer();
-  frWins.forEach((w) => {
-    const on = w.near ? litAt(t, 's8h/frNear', iNear++, nNear, {litFrac: 0.55, gap: [0.5, 1.2]}) : litAt(t, 's8h/frFar', iFar++, nFar, {litFrac: 0.5});
-    b.poly(on ? CM.lamp : CM.glass, w.q);
-    if (!on) b.poly(CM.shadeCool, [w.q[3], lerpPt(w.q[3], w.q[0], 0.45), lerpPt(w.q[2], w.q[1], 0.6), w.q[2]]);
-  });
   return b;
 }
+/** The lit panes on the facade (holes in its Shade: a lit pane is unshaded). */
+const LIT_PANES: [number, number, number, number][] = [
+  [GWIN.x, GWIN.y, GWIN.w, GWIN.h],
+  [NB_GWIN.x, NB_GWIN.y, NB_GWIN.w, NB_GWIN.h],
+  [NB_BAL.x, NB_BAL.y, NB_BAL.w, NB_BAL.h],
+  [NB_SASH.x, NB_SASH.y, NB_SASH.w, NB_SASH.h],
+];
+/** Lit fanlights (domes: centre x, base y, radius). */
+const LIT_DOMES: [number, number, number][] = [
+  [(D.x0 + D.x1) / 2, D.y0, DW / 2],
+  [NB_DOOR.x + NB_DOOR.w / 2, NB_DOOR.y, NB_DOOR.w / 2],
+  [1430, 890, 26],
+];
 const lerpPt = (a: Pt, c: Pt, u: number): Pt => [lerp(a[0], c[0], u), lerp(a[1], c[1], u)];
 
 /** After the window people: the lace window's box, the balcony, the neighbour's ground window lace (in front). */
@@ -897,11 +789,24 @@ function leafInto(k: number, jolt: number): Batch {
 /** The leaf is drawn in S8House (under her) before this time and after the latch; S8DoorLeaf draws it between. */
 const LEAF_SPLIT = L(34.63);
 
-/** The waterer's can: tips on 33.5 and 36.3 (film). */
-const waterTip = (t: number) => Math.max(bump(t, L(33.5), 0.9), bump(t, L(36.3), 0.9));
-/** The pigeons on the neighbour's parapet: x positions; [1] shuffles at 34.3, [0] flutters onto the heritage lamp at 36.0. */
+/** The waterer's can: tips once, on 33.5 (film), early in her walk (never in the board's beats). */
+const waterTip = (t: number) => bump(t, L(33.5), 0.9);
+/** The pigeons on the neighbour's parapet: perched, a slow nod (no shuffle, no flutter: tier C life, calm). */
 const PIGEONS = [1066, 1094, 1122, 1149];
-const FLUTTER = {t0: L(36.0), dur: 0.42, to: [HOUSE_LAMP.x + 22, HOUSE_LAMP.y - HOUSE_LAMP.h * 0.79] as Pt};
+
+/** THE FACADE'S SHADE (lib/light Shade, CRAFT §d; THROUGHLINE §5): her row faces us, away from the sun ahead, so the
+ *  whole facade is one form step down (the end wall's side, turned toward the low sun, keeps its light: a lit sliver
+ *  that shows the house's depth); lit panes, lit fanlights and, while the door is open, the lit hall are holes (each
+ *  drawn the other way round: nonzero), and W, the lamps' glass, the festoon and the forecourt draw after it. */
+function facadeShadeD(doorOpen: boolean): string {
+  const rect = (x: number, y: number, w: number, h: number) => `M${P(x, y)}H${r1(x + w)}V${r1(y + h)}H${r1(x)}Z`;
+  const hole = (x: number, y: number, w: number, h: number) => `M${P(x, y)}V${r1(y + h)}H${r1(x + w)}V${r1(y)}Z`;
+  let d = rect(HH.x0 - 4, HH.top, HH.x1 - HH.x0 + 4, G - HH.top) + rect(NB.x0, NB.top, NB.x1 - NB.x0, G - NB.top) + rect(TH.x0, TH.top, TH.x1 - TH.x0 + 20, G - TH.top);
+  for (const [x, y, w, h] of LIT_PANES) d += hole(x, y, w, h);
+  for (const [cx, y, r] of LIT_DOMES) d += `M${P(cx + r, y)}A${r1(r)} ${r1(r)} 0 0 0 ${P(cx - r, y)}Z`;
+  if (doorOpen) d += hole(D.x0, D.y0, DW, DH);
+  return d;
+}
 
 export const S8House: React.FC = () => {
   const t = useTime();
@@ -910,7 +815,7 @@ export const S8House: React.FC = () => {
   const facade = useMemo(() => facadeInto(), []);
   const fronts = useMemo(() => frontsInto(), []);
   const forecourt = useMemo(() => forecourtInto(), []);
-  const wins = windowsInto(t, beyond.wins);
+  const wins = useMemo(() => windowsInto(), []);
   // her door: the hall while it is open; the leaf shut or opening (under her); the closing swing is S8DoorLeaf's
   const k = swingAt(t);
   const latched = t >= S8T.doorShuts;
@@ -929,29 +834,15 @@ export const S8House: React.FC = () => {
       [xa - 4 + (D.x1 - xa) * 0.15, G + 18],
     ]);
   }
-  const creeper = new Batch();
-  creeperInto(creeper, t);
-  // the life on the facade: pigeons, the flutter onto the heritage lamp
+  // the pigeons on the neighbour's parapet (perched, nodding)
   const pg = new Batch();
-  PIGEONS.forEach((x0, i) => {
-    const ph = i * 1.7 + 0.4;
-    if (i === 0 && t >= FLUTTER.t0) {
-      const u = (t - FLUTTER.t0) / FLUTTER.dur;
-      if (u < 1) {
-        const e = smooth01(u);
-        const x = lerp(x0, FLUTTER.to[0], e);
-        const y = lerp(NB.top - 8, FLUTTER.to[1] - 6, e) - Math.sin(Math.PI * u) * 22;
-        pigeonFlyInto(pg, x, y, 20, -1, Math.sin((t - FLUTTER.t0) * 24));
-      } else pigeonInto(pg, FLUTTER.to[0], FLUTTER.to[1], 19, -1, t, ph);
-      return;
-    }
-    const shuffle = i === 1 ? -9 * smooth01((t - L(34.3)) / 0.3) : 0;
-    pigeonInto(pg, x0 + shuffle, NB.top, 19, i % 2 ? -1 : 1, t, ph);
-  });
-  // the lamp run: carriage lamps (the rest are kit lamps and string lights below)
-  const cl = new Batch();
-  carriageInto(cl, CARRIAGE_L.x, CARRIAGE_L.y, 26, flickOn(t, lampRunAt('carriageL')), 's8h/cL');
-  carriageInto(cl, CARRIAGE_R.x, CARRIAGE_R.y, 24, flickOn(t, lampRunAt('carriageR')), 's8h/cR');
+  PIGEONS.forEach((x0, i) => pigeonInto(pg, x0, NB.top, 19, i % 2 ? -1 : 1, t, i * 1.7 + 0.4));
+  // her carriage lamp (on from the start: every light but the run's), the festoon (on from the start)
+  const cl = useMemo(() => {
+    const b = new Batch();
+    carriageInto(b, CARRIAGE_L.x, CARRIAGE_L.y, 26, true, 's8h/cL');
+    return b;
+  }, []);
   const festoonT0 = lampRunAt('festoon') - FESTOON_FIRST_IN_FRAME * FESTOON_STEP;
   let before = 0;
   const festoon = FESTOON.map((s, j) => {
@@ -959,58 +850,76 @@ export const S8House: React.FC = () => {
     before += s.n;
     return <StringLights key={j} from={s.from} to={s.to} sag={s.sag} n={s.n} seed={`s8h/fest${j}`} onAt={at} step={FESTOON_STEP} runDir={-1} r={4.6} w={INK_PX.hair} />;
   });
-  // the far street lamp beyond the bend lights after the canal lamps, the run's next step west
-  const farLampAt = lampRunAt('canalLamp2') + 0.04;
   return (
-    <S8Plane p="house">
-      <defs>
-        <clipPath id={hallClip} clipPathUnits="userSpaceOnUse">
-          <rect x={D.x0} y={D.y0} width={DW} height={DH} />
-        </clipPath>
-      </defs>
-      {/* beyond the bend */}
-      <Paint b={beyond.b} seed="s8h/beyond" />
-      <Lamp x={622} y={943} h={84} seed="s8h/farLamp" on={t >= farLampAt} />
-      <EarlyExit>
-        <Puffs x={632} y={742} seed="s8h/frSmoke" kind="smoke" scale={0.5} ceil={TOP + 4} drift={-24} />
-      </EarlyExit>
-      {CANAL_LAMPS.map((c) => (
-        <Lamp key={c.id} x={c.x} y={c.y} h={c.h} seed={`s8h/${c.id}`} on={t >= lampRunAt(c.id)} />
-      ))}
-      {/* the terrace */}
-      <Paint b={facade} seed="s8h/facade" />
-      <Paint b={wins} seed="s8h/windows" />
-      <Paint b={creeper} seed="s8h/creeper" misreg={false} />
-      <EarlyExit>
-        <WindowPerson x={896} y={GWIN.y + GWIN.h - 1} hb={46} seed="s8h/waterer" act="water" tip={waterTip(t)} traits={{hair: 'short', hairColor: CM.hair[3], coat: CM.coatMustard}} />
-        <WindowPerson x={NB_BAL.x + 34} y={NB_BAL.y + NB_BAL.h - 26} hb={42} seed="s8h/reader" act="read" traits={{hair: 'curls', hairColor: CM.hair[0], coat: CM.coatOat}} />
-        <WindowPerson x={NB_GWIN.x + 62} y={NB_GWIN.y + NB_GWIN.h * 0.56} hb={40} seed="s8h/phone" act="phone" view="profile" traits={{hair: 'long', hairColor: CM.hair[2], coat: CM.coatSlate}} />
-      </EarlyExit>
-      <Paint b={fronts} seed="s8h/fronts" />
-      {/* her door: the lit hall (under her), the leaf shut / opening */}
-      {k > 0 ? (
-        <g clipPath={`url(#${hallClip})`}>
-          <Paint b={hallInto()} seed="s8h/hall" misreg={false} />
-        </g>
-      ) : null}
-      {leaf ? <Paint b={leaf} seed="s8h/leaf" /> : null}
-      {/* lamps on the facade, the festoon, the steam from her vent */}
-      <Paint b={cl} seed="s8h/carriage" misreg={false} />
-      <EarlyExit>
-        {festoon}
-        <StringLights from={[NB_BAL.x - 16, NB_BAL.y + NB_BAL.h - 30]} to={[NB_BAL.x + NB_BAL.w + 16, NB_BAL.y + NB_BAL.h - 31]} sag={6} n={7} seed="s8h/balLights" on r={3.2} w={INK_PX.hair} />
-        <Puffs x={656} y={760} seed="s8h/vent" kind="steam" scale={0.5} ceil={TOP + 4} drift={-18} />
-      </EarlyExit>
-      {/* the forecourt and the heritage lamp (nearest), then the pigeons (one lands on the lamp) */}
-      <Paint b={forecourt} seed="s8h/forecourt" />
-      {spill ? <Paint b={spill} seed="s8h/spill" misreg={false} /> : null}
-      <Lamp x={HOUSE_LAMP.x} y={HOUSE_LAMP.y} h={HOUSE_LAMP.h} seed="s8h/houseLamp" on={t >= lampRunAt('houseLamp')} />
-      <EarlyExit>
-        <Paint b={pg} seed="s8h/pigeons" misreg={false} />
-      </EarlyExit>
-    </S8Plane>
+    <Tier tier="environment">
+      <S8Plane p="house">
+        <defs>
+          <clipPath id={hallClip} clipPathUnits="userSpaceOnUse">
+            <rect x={D.x0} y={D.y0} width={DW} height={DH} />
+          </clipPath>
+        </defs>
+        {/* beyond the bend (+1): the row, its cafe, the tree; its street lamp (on from the start) */}
+        <Paint b={beyond.b} seed="s8h/beyond" misreg={false} />
+        <Lamp x={622} y={943} h={84} seed="s8h/farLamp" on color={recede(IRON, 1, S8_ATM)} />
+        {/* the canal-side lamps whose heads show over the board (the run's last switch-on, f2273) */}
+        {CANAL_LAMPS.map((c) => (
+          <Lamp key={c.id} x={c.x} y={c.y} h={c.h} seed={`s8h/${c.id}`} on={t >= lampRunAt(c.id)} color={IRON} />
+        ))}
+        {/* the terrace */}
+        <Paint b={facade} seed="s8h/facade" misreg={false} />
+        <Paint b={wins} seed="s8h/windows" misreg={false} />
+        <EarlyExit>
+          <WindowPerson x={896} y={GWIN.y + GWIN.h - 1} hb={46} seed="s8h/waterer" act="water" tip={waterTip(t)} traits={{hair: 'short', hairColor: CM.hair[3], coat: CM.coatMustard}} />
+          <WindowPerson x={NB_BAL.x + 34} y={NB_BAL.y + NB_BAL.h - 26} hb={42} seed="s8h/reader" act="read" traits={{hair: 'curls', hairColor: CM.hair[0], coat: CM.coatOat}} />
+          <WindowPerson x={NB_GWIN.x + 62} y={NB_GWIN.y + NB_GWIN.h * 0.56} hb={40} seed="s8h/phone" act="phone" view="profile" traits={{hair: 'long', hairColor: CM.hair[2], coat: CM.coatSlate}} />
+        </EarlyExit>
+        <Paint b={fronts} seed="s8h/fronts" misreg={false} />
+        {/* her door: the lit hall (under her), the leaf shut / opening (tier B) */}
+        {k > 0 ? (
+          <g clipPath={`url(#${hallClip})`}>
+            <Paint b={hallInto()} seed="s8h/hall" misreg={false} />
+          </g>
+        ) : null}
+        {leaf ? (
+          <Tier tier="support">
+            <Paint b={leaf} seed="s8h/leaf" misreg={false} />
+          </Tier>
+        ) : null}
+        {/* the facade turned from the sun: one form step (lit panes, fanlights, the open door are holes) */}
+        <Shade d={facadeShadeD(k > 0)} />
+        {/* lamps on the facade, the festoon */}
+        <Paint b={cl} seed="s8h/carriage" misreg={false} />
+        <EarlyExit>
+          {festoon}
+          <StringLights from={[NB_BAL.x - 16, NB_BAL.y + NB_BAL.h - 30]} to={[NB_BAL.x + NB_BAL.w + 16, NB_BAL.y + NB_BAL.h - 31]} sag={6} n={7} seed="s8h/balLights" on r={3.2} w={INK_PX.hair} />
+        </EarlyExit>
+        {/* the forecourt and the heritage lamp (nearest), then the pigeons; their contact strips are in the house
+            band's shadow layer (V2S8_set HouseBand, HOUSE_CONTACTS): the forecourt lies in her house's shade, so they
+            cast nothing more */}
+        <Paint b={forecourt} seed="s8h/forecourt" misreg={false} />
+        {spill ? <Paint b={spill} seed="s8h/spill" misreg={false} /> : null}
+        <Lamp x={HOUSE_LAMP.x} y={HOUSE_LAMP.y} h={HOUSE_LAMP.h} seed="s8h/houseLamp" on={t >= lampRunAt('houseLamp')} color={IRON} />
+        <EarlyExit>
+          <Paint b={pg} seed="s8h/pigeons" misreg={false} />
+        </EarlyExit>
+      </S8Plane>
+    </Tier>
   );
 };
+
+/** Contact strips for the forecourt's things (house plane, landing coords): pots on her step, the bay's tub, the bike,
+ *  the boot scraper, the bins, the heritage lamp's foot. Drawn in the house band's ONE shadow layer (V2S8_set), under
+ *  the things, so they never double-darken her house's cast shade. */
+export const HOUSE_CONTACTS: {x: number; y: number; w: number; h?: number}[] = [
+  {x: D.x0 - 6, y: G + 1, w: 24, h: 6},
+  {x: D.x1 + 8, y: G + 1, w: 24, h: 6},
+  {x: 802, y: G + 3, w: 24, h: 6},
+  {x: 628, y: G + 11, w: 64, h: 7},
+  {x: 656, y: G + 6, w: 22, h: 6},
+  {x: 1092, y: G + 3, w: 40, h: 8},
+  {x: 1140, y: G + 3, w: 40, h: 8},
+  {x: HOUSE_LAMP.x, y: HOUSE_LAMP.y + 1, w: 50, h: 9},
+];
 
 // ---------------------------------------------------------------- S8Window: W
 
@@ -1022,8 +931,8 @@ function roomInto(lit: boolean): Batch {
   const fy = WY0;
   b.rect(CM.hero, fx - WFR, W_HEAD, F.w + 2 * WFR, F.h + fy - W_HEAD);
   if (lit) {
+    // the lit room: ONE flat lamp-lit fill (CM.lamp, L* 85.1: a LitWindow value, no glow core)
     b.rect(CM.lamp, fx, fy, F.w, F.h);
-    b.rect(CM.lampCore, fx + F.w * 0.18, fy + F.h * 0.12, F.w * 0.64, F.h * 0.46);
   } else {
     // dim: the glass holds the dusk, the room a cool shade, its things dark shapes
     b.rect(CM.glass, fx, fy, F.w, F.h);
@@ -1058,16 +967,19 @@ function wFrontInto(): Batch {
   const ry = fy + F.h * 0.6;
   b.rect(CM.anchor, fx - F.w * 0.1, ry, F.w * 1.2, Math.max(2, F.w * 0.025));
   for (let bx = fx - F.w * 0.08; bx <= fx + F.w * 1.08; bx += F.w * 0.09) b.rect(CM.anchor, bx, ry, Math.max(1.2, F.w * 0.012), fy + F.h - ry);
+  // the frame's outline: ONE closed path (CRAFT §c), authored at INK_PX.mid (the pen draws it 3.0 px on tier A, in
+  // the teal's own deep shade; none on tier B)
   const x0 = fx - WFR;
   const x1 = fx + F.w + WFR;
-  const y1 = fy + F.h;
-  let d = line(x0, W_HEAD + 1, x1, W_HEAD + 1, {seed: 's8w/fr/t', over: 'small', drift: 0.1, jitter: 0.4});
-  d += line(x0, W_HEAD + 1, x0, y1, {seed: 's8w/fr/l', over: [0, 6]});
-  d += line(x1, W_HEAD + 1, x1, y1, {seed: 's8w/fr/r', over: [0, 6]});
-  d += line(x0, y1, x1, y1, {seed: 's8w/fr/b', over: 'small'});
-  b.ink(d, INK_PX.mid);
+  const y1 = fy + F.h + F.w * 0.05;
+  b.layer();
+  b.ink(`M${P(x0, W_HEAD + 1)}H${r1(x1)}V${r1(y1)}H${r1(x0)}Z`, INK_PX.mid, CM.ink, 0, {tone: CM.hero});
   return b;
 }
+
+/** W's tier (CRAFT §b, THROUGHLINE §4 S8): A while it is the beat (34.55-34.95: she goes in, it lights; and from "not"
+ *  37.70 to the end: the film's last picture), B otherwise. */
+const wTier = (t: number): TierT => ((t >= L(34.55) && t < S8T.wLights) || t >= S8T.not ? 'subject' : 'support');
 
 /** Her silhouette's walk in W (scene s): in from behind the left wall at 35.85, a pause, a short pace back. */
 const HW = {h: 140, feet: WY0 + W8.h - 4};
@@ -1101,13 +1013,14 @@ export const S8Window: React.FC = () => {
   const g = bump(t, L(36.9) + 0.22, 0.45);
   return (
     <LateExit>
+      <Tier tier={wTier(t)}>
       <S8Plane p="house">
         <defs>
           <clipPath id={clip} clipPathUnits="userSpaceOnUse">
             <rect x={WX0} y={WY0} width={W8.w} height={W8.h} />
           </clipPath>
         </defs>
-        <Paint b={room} seed="s8w/room" />
+        <Paint b={room} seed="s8w/room" misreg={false} />
         {w ? (
           <g clipPath={`url(#${clip})`}>
             <ExitSync seed="fig/s8herWin">
@@ -1132,8 +1045,9 @@ export const S8Window: React.FC = () => {
             </ExitSync>
           </g>
         ) : null}
-        <Paint b={front} seed="s8w/front" />
+        <Paint b={front} seed="s8w/front" misreg={false} />
       </S8Plane>
+      </Tier>
     </LateExit>
   );
 };
@@ -1145,8 +1059,10 @@ export const S8DoorLeaf: React.FC = () => {
   const k = swingAt(t);
   if (t < LEAF_SPLIT || t >= S8T.doorShuts || k <= 0) return null;
   return (
-    <S8Plane p="house">
-      <Paint b={leafInto(k, 0)} seed="s8h/leaf" />
-    </S8Plane>
+    <Tier tier="support">
+      <S8Plane p="house">
+        <Paint b={leafInto(k, 0)} seed="s8h/leaf" misreg={false} />
+      </S8Plane>
+    </Tier>
   );
 };
