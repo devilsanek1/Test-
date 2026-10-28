@@ -135,7 +135,7 @@ export const UI = {
 export const SKYLINE_EXCEPTIONS = {
   /** S1: the roof-terrace planting may reach up to y 575 (never higher). */
   s1RoofPlantingTopMinY: 575,
-  /** Sun discs: SUN2 top = 575 (19 px clear of the band); SUN1 top 585; SUN0 top 720 (behind the far roofs from y ~752); SUN8 top 585; S5's end sun 586. */
+  /** Sun discs: SUN2 top = 575 (19 px clear of the band); SUN1 top 585; SUN0 top 720 (behind the far roofs from y ~752); SUN8 top 600 (sets behind S8's level far coping, y 646); S5's end sun 586. */
   sunTopMinY: 575,
   /** S5: the cloud bank and the obelisk tops stay at y >= 610. */
   s5CloudObeliskTopMinY: 610,
@@ -268,7 +268,7 @@ export const SUN1: Disc = {x: 250, y: 650, r: 65};
 export const SUN2: Disc = {x: 260, y: 620, r: 45};
 /** S8's low sun ahead, over the canal past her board (THROUGHLINE §7: top 585, 35 px clear of B's top). Fixed through S8's
  *  truck; it un-builds before S1's SUN0 shows through at the seam (two suns never share a frame). */
-export const SUN8: Disc = {x: 420, y: 625, r: 40};
+export const SUN8: Disc = {x: 420, y: 640, r: 40};
 /** B: the A-board FACE (Google's in S7 at its push landing 30.04; hers in S8 from the truck landing 35.60). */
 export const B: Rect = {x0: 150, y0: 700, x1: 630, y1: 1220};
 export const B_LEGS_Y1 = 1250;
@@ -1356,7 +1356,7 @@ const s8Shapes = (t: number): Shape[] => {
   const dxG = -tr.ghostPlaneDx * (1 - u);
   const dxH = -tr.housePlaneDx * (1 - u);
   const out: Shape[] = [
-    D('sun', 'SUN8: S8 low sun (420, 625) r 40', SUN8),
+    D('sun', 'SUN8: S8 low sun (420, 640) r 40, setting behind one level far coping at y 646', SUN8),
     R('mass', 'her terrace at the bend (house plane)', shiftRect({x0: 640, y0: 600, x1: FRAME_W + 160, y1: 1060}, dxH)),
     R('key', 'W: her home window (lights 34.95)', shiftRect(spotRect(W), dxH)),
     R('key', 'her teal door (shuts 34.75)', shiftRect(S8.door, dxH)),
