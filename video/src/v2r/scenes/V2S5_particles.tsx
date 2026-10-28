@@ -34,7 +34,7 @@ const START_NEWS: Rect = [nb.x0 - 12, nb.y0 - 12, nb.x1 - nb.x0 + 24, nb.y1 - nb
 const START_PAIR: Rect = [210, 980, 270, 260];
 /** END coords: the Pentagon's box, the plaque, the pair at the balustrade. */
 const END_PENT: Rect = [322, 846, 758, 258];
-const END_PLAQUE: Rect = [436, 1110, 340, 142];
+const END_PLAQUE: Rect = [436, 1094, 340, 150];
 const END_PAIR: Rect = [286, 1150, 110, 100];
 
 const PETALS = [CM.blossom, mix(CM.blossom, CM.paper, 0.35), mix(CM.blossom, CM.shadeWarm, 0.18)];
