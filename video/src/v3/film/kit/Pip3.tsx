@@ -72,6 +72,25 @@ const PIP_RIM: Colorway = {name: 'Pip rim', body: EMBER.snow, shade: EMBER.snow,
 
 export type PipPoseKey = {t: number; pose: PoseName; look?: number; expression?: Expression; amount?: number};
 export type LookKey = {t: number; v: number};
+/** A shrug IN THE CURRENT POSE (no pose swap, so never a pop; CRAFT §b, the mascot at tier B: "no pops", clear of the
+ *  subject): over [t, t + dur] the head rises and leans out a hair (a short stretch about the grip, the 'peek' pose a
+ *  step further out), shows `face` (default 'meh': the heavy-lidded "oh well") and settles back. `hold` keeps the face
+ *  after it (a held state, no motion). */
+export type PipShrug = {t: number; dur?: number; face?: Expression; hold?: boolean};
+
+/** The shrug's bump at time t: 0 outside, up over the first 40 % (outCubic), held 20 %, down over the last 40 %. */
+export function shrugK(t: number, s: PipShrug): number {
+  const dur = s.dur ?? 0.15;
+  const u = (t - s.t) / dur;
+  if (u <= 0 || u >= 1) return 0;
+  if (u < 0.4) return 1 - Math.pow(1 - u / 0.4, 3);
+  if (u < 0.6) return 1;
+  const v = (u - 0.6) / 0.4;
+  return 1 - (v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2);
+}
+/** How far the shrug stretches Pip (Elephant `squash`, negative = up) and leans it out (+ the 'peek' amount) at its
+ *  peak: ~6 px up and ~5 px out at the thread plane's PAYOFF scale (~1.55). */
+const SHRUG = {stretch: -0.09, lean: 0.1};
 export type PipHop = {
   /** Take-off time (scene s). */
   t: number;
@@ -105,6 +124,8 @@ export type Pip3Props = {
   hops?: PipHop[];
   /** Startle squashes (anticipate, pop, settle) at these times: a reaction without a pose change. */
   jolts?: number[];
+  /** Shrugs in the current pose (see PipShrug): a reaction without a pose change. */
+  shrugs?: PipShrug[];
   /** Draw-on start (scene s; lines first, colour ~0.16 s after) and its length. Omit = already drawn. */
   at?: At;
   drawDur?: number;
@@ -169,6 +190,7 @@ const Pip3Body: React.FC<Pip3Props> = ({
   idle = 1,
   hops,
   jolts,
+  shrugs,
   at,
   drawDur = 0.6,
   exitAt,
@@ -201,6 +223,15 @@ const Pip3Body: React.FC<Pip3Props> = ({
     if (next) squash += popSwitch(t, next.t);
   }
   for (const j of jolts ?? []) squash += popSwitch(t, j) * 1.4;
+  // shrugs in the current pose: a smooth stretch-and-lean bump (no key switch, so no popSwitch squash)
+  for (const s of shrugs ?? []) {
+    const k = shrugK(t, s);
+    if (k > 0) {
+      squash += SHRUG.stretch * k;
+      if (curPose === 'peek') curAmount = Math.min(1, (curAmount ?? 1) + SHRUG.lean * k);
+    }
+    if (k > 0.35 || (s.hold && t >= s.t + (s.dur ?? 0.15) * 0.4)) curExpr = s.face ?? 'meh';
+  }
   const P = pipPlace(t, x, y, hops);
   squash += P.squash;
   const common = {

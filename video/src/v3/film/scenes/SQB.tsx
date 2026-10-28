@@ -11,7 +11,8 @@
 //   SQB_chart.tsx    THE CHART on the card (this sequence's subject; SQC draws it too through J2's pan back)
 // Beats (film seconds; visuals lead their word by ~0.1 s): the card's face is static until 6.98; 6.98-9.28 the line
 // draws downhill with the voice; 10.32-10.50 a doodle laptop "$999" lands on the line ("buy" 10.60); 10.82 a shinier
-// BETTER one, the same "$999", pops right after it ("one." 10.92); 13.85-14.45 the line hooks UP ("up" 14.52); 14.74
+// BETTER one, the same "$999", pops right after it ("one." 10.92); 11.80 the past year's soft band pops in over the
+// line's end with the dot's swell ("this past year"); 13.85-14.45 the line hooks UP inside it ("up" 14.52); 14.74
 // "+9.7%" pops alone ("almost10%" 14.84); 15.05 the source, small; 15.30 the tag jolts (the thread reacts).
 // Hierarchy (flow_v2 §5, CRAFT §b): A the line -> the doodles -> the hook and "+9.7%", one at a time; B the tag, Pip,
 // the dim phone; C the wall, the notes, the window strip (snow), the desk. Nothing enters 5.40-6.20 (J1) or 16.20-17.00
