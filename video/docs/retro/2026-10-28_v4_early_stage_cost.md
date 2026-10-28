@@ -65,3 +65,16 @@ implied by the orchestrator's meter ($102.70 for its usage, with the standard ra
 - **G2:** the voice through the API (`generate_take.py`, `check_take.py`): no agents.
 
 About 7 agents for G0-G2 instead of about 45, with the orchestrator in a fresh session per gate.
+
+## Applied to the process (2026-10-28, owner: "update the process / clean up - so that the next videos are not encountering the same issues")
+
+- `docs/PIPELINE_V2.md`: the G0, G0.5 and G1 rows and bullets are the lean defaults (G0: 2 scouts + 1 editor, the topic
+  and its core line on one screen; one fact-lock agent, the only web check; G0.5 folded into G0, a separate round only
+  on request; G1: writer + critic + one fix pass); the heavy templates run only on request; anti-waste rule 9 gains
+  "Agents report in files, not in the chat" (files from the first step, 3-line reports, one shared brief file per stage,
+  no big skill loads for small questions, batched steps, a rate-limit check before a fan-out); the agent prompt rules
+  gain the 3-line report and "one fact file".
+- `docs/OWNER_PLAYBOOK.md`: "Spend on the film, never on overhead" (Process); the core line is picked with the topic by
+  default; the NO LIMIT rule says the early selection stages need few agents.
+- `CLAUDE.md` and `HANDOFF.md`: the same, in their summaries and in "Starting the next video".
+- The heavy workflow templates (G0 topics, G0.5 core line, G1 story; v2, v3, v4) carry a "HEAVY version" header.

@@ -54,9 +54,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
   - short, plain updates;
   - playable video rather than stills;
   - files sent as downloads (in-app previews may play muted).
-- They opted into **heavy multi-agent work** ("NO LIMITS on tokens and time", ultracode on). Their latest rule is
-  quality first: brainstorms, judge panels and design explorations are worth their tokens, while waste (rework, polish
-  before the story is locked, lost work) is not. Every agent and helper runs at MAX effort; the weekly limit is the
+- They opted into **heavy multi-agent work** ("NO LIMITS on tokens and time", ultracode on). Their rule is quality first, without waste: since 2026-10-28 the early stages run lean (2 scouts + 1 editor for the topic and its core line, one fact lock, a writer + a critic for the script, agents reporting in files, small orchestrator contexts: `video/docs/retro/2026-10-28_v4_early_stage_cost.md`), while design explorations at G3-G4 still get their judged concepts. Every agent and helper runs at MAX effort; the weekly limit is the
   real budget (playbook, Process).
 - **The assistant's role is orchestrator.** It researches, plans and runs Workflow scripts (writers, judges, builders,
   reviewers), builds the film in Remotion, mixes the sound and delivers. It keeps the playbook, pipeline and docs up to date.
@@ -70,8 +68,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
   first big fan-out (G0's scouts and judges) check the week's usage against what the films in flight still need, and
   ask the owner if it is tight. First steps: create `video/docs/vN/OWNER_NOTES.md`; check the voice key
   (`[ -n "$ELEVENLABS_API_KEY" ] && echo set`; without it, tell the owner before G2: they add the secret, or they make
-  the take in ElevenLabs from our full paste text); then `video/docs/PIPELINE_V2.md` from G0, copying the G0-G1 templates' structure with a fresh brief (its
-  "Studio toolkit" lists what each template's brief needs updated). The craft tooling lane (PIPELINE_V2) must land
+  the take in ElevenLabs from our full paste text); then `video/docs/PIPELINE_V2.md` from G0, in its lean form (its G0-G1 bullets; the heavy templates only when the owner asks for a wider search). The craft tooling lane (PIPELINE_V2) must land
   before the new video's G3; G0-G2 never wait for it.
 
 ## 2. Status at handoff
