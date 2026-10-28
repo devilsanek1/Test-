@@ -28,7 +28,7 @@ export const CITY = {
   castle: {x: 566, base: 786},
 };
 
-type Tone = {faces: [string, number][]; shade: string; shadeDeep: string; roofs: [string, number][]; tree: string; tree2: string; blossom: string; windows: boolean};
+type Tone = {faces: [string, number][]; shade: string; shadeDeep: string; roofs: [string, number][]; tree: string; tree2: string; blossom: string; windows: boolean; win: string};
 
 const BACK: Tone = {
   faces: [
@@ -47,6 +47,7 @@ const BACK: Tone = {
   tree2: FAR.backTree,
   blossom: FAR.backRoof,
   windows: false,
+  win: FAR.backShade,
 };
 const FRONT: Tone = {
   faces: [
@@ -67,6 +68,7 @@ const FRONT: Tone = {
   tree2: FAR.treeDark,
   blossom: FAR.blossom,
   windows: true,
+  win: FAR.win,
 };
 
 type Kind = 'block' | 'gable' | 'hip' | 'tower' | 'long' | 'trees';
@@ -74,11 +76,12 @@ type R = ReturnType<typeof rng>;
 
 /** A few window dots on a facade (front rows only): 1-3 dots at irregular positions on half the facades, never a
  *  regular row (the far plane slides ~12 px a frame at the peak: a fine regular pattern would strobe), so the detail
- *  still peaks in the small back rows just under the horizon. */
+ *  still peaks in the small back rows just under the horizon. Tone-on-tone on the lit face (CRAFT §f.2: +3 windows
+ *  dE <= 6 from their wall, never a dark speck). */
 function windows(B: Batch, x: number, w: number, y: number, tone: Tone, r: R) {
   if (!r.chance(0.5)) return;
   const n = Math.min(3, Math.max(1, Math.floor(w / 5)));
-  for (let i = 0; i < n; i++) B.rect(tone.shadeDeep, x + Math.max(1.6, w * 0.3) + r.range(0.5, Math.max(0.6, w * 0.6 - 2)), y + r.range(-0.6, 1.4), 1.4, 1.5);
+  for (let i = 0; i < n; i++) B.rect(tone.win, x + Math.max(1.6, w * 0.3) + r.range(0.5, Math.max(0.6, w * 0.6 - 2)), y + r.range(-0.6, 1.4), 1.4, 1.5);
 }
 
 /** One far building (3-5 flat shapes: a face, its shade side on the left (the sun is to the right), a roof band). */
