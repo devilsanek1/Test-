@@ -11,8 +11,8 @@ words and the rules. Work in progress: this file is written as the review goes.
 - [x] line budgets per sequence (`retro_tools/line/measure.py`, 39 film frames + 5 pilot frames, caption band out)
 - [x] light per set (`check_light.py`, 21 light-off/on pairs rendered from the code at HEAD; v3 code unchanged since be03dfa)
 - [x] fullness and calm (`density.py --cozy` on the film, per sequence)
-- [ ] depth (far planes), 1:1 crops of the worst areas
-- [ ] findings
+- [x] depth (far planes: `check_depth.py` with an H2 plane sheet, `R2/h2_rest_sheet.json`), 1:1 crops of the worst areas
+- [x] findings
 
 ## Numbers so far (evidence: `/tmp/claude-0/-home-user-Test-/e0b06496-a313-5ced-bf0f-bc634eb12744/scratchpad/rework/assembly/R2/`)
 - **Line** (per Mpx, band out; budget strokes 80 / short 25 / ends 40 / dark px 3 %): the pilot itself runs 98-194 strokes,
@@ -34,6 +34,18 @@ words and the rules. Work in progress: this file is written as the review goes.
 - **The pile** (dark chip marks in y 620-1800): 19.7 231, 20.0 358, 20.4 730, 20.8 596 (573 / Mpx at 20.4) against the
   pilot's room 152-198 (119-155 / Mpx); detail tiles 30 % at 20.8 (pilot 10-15 %); its fills tan-brown (#966D58 L* 50 C*
   23, #B08361 L* 58 C* 28, #D4AC7C L* 73 C* 31) under THE stick's gold (#EFB063, L* 76, C* 50).
+- **Depth, H2 at rest** (`check_depth.py`, 23.5 and 37.2; air = FAR_AIR #7D8AB6): street (subject plane) contrast 9.2-11.0;
+  town +1 dE 18.3 from the air; DC +2 dE 19.5 (WARN: not >= 3 closer than the town); the mountain +3 dE 47.4 (WARN: no air at
+  all), L* range 28, 4 values, C* 32.7 (C90 38.7); the far ridge +4 dE 2.8 (OK). The far pile's box (430 x 245 px) holds
+  ~360-376 specks (4-80 px marks > 4 L* off their 15 px median) at 23.5 / 37.2 / 38.9, about 3,500 / Mpx against ~495 / Mpx
+  in the pilot's whole window band (5.5); Canny edge px 13.6 % (street 8-9 %, town 9 %).
+- **Squint** (L* blurred sigma 25, darkest 3 %): 23.5 the calm DC (squint L* 37.7), then the desk planner (43.4), then the
+  DC truck; 38.0 the DC on its beat (30.0), then the planner (43.4).
+- **Checked and clean**: no rough, doubled or misregistered stroke found at 1:1 in SQB (desk, card, skylight), SQC (the 700 px
+  stick), SQD (THE stick on its bed), SQE (DC sign, vans, booth, gate), SQF (the payoff tag front and back); the rims sit
+  inside their silhouettes (19.7 / 18.5 / 18.88: 0 lit px on the sky colour); E7 (THE stick on gold), E10 (payoff rim +
+  form shade, the back's bands), E13 (book shadows rotated), E15 (dark captions at the loop) are in. The payoff tag's rim
+  covers its outline on the key side exactly as the pilot's tag does at 2.0 (same treatment: not below the bar).
 
 ## Verdict
 (pending)
