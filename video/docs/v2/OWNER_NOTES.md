@@ -119,4 +119,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-28, on the G4 look clip v4 (`deliverables/v2/v2r_G4_look_v4.mp4`: depth, one gentle sky, particles, the parallax float, the art
   director's fixes): "Okay I think this is better now the hook video" -> v4 APPROVED as the look; L2-L6 resume from
   `lanes/RESUME_2026-10-28.md`.
+- 2026-10-28 ~08:00 UTC: "Continue. Tho I don't see any changes in the particles anywhere, you mentioned some leaves previously no?"
+  -> verified: at phone size v4's particles are invisible (13 px leaf, 14-24 px glints, 3-4 px motes); new numbers in CRAFT §f.6 (leaves
+  26-40 px, glints 20-36 px x 4-6, motes 6-10 px) + lib/particles presets; S1 gets a particles pass (look clip v5); lanes inherit.
 

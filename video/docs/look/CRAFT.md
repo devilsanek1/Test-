@@ -256,12 +256,14 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
 5. **Size: one camera.** Never a nearer thing smaller per metre than a farther one (G4: the ducks and our landing's
    public 41-63 px/m, her across the water 100); people on one level keep one eye ratio within +-15 %. Calm a figure with
    colour (tier B), never by shrinking it; a camera too low for the foreground's things is raised, not cheated.
-6. **A few particles make it natural** (owner: "a bit of particles here and there"): tier-C life inside rule 3's mover
-   budget, declared at G3 as `life:` items: motes only inside light and against shade (2-4 px, L* +8 to +15), dust or
-   pollen in the sun-side air (both 3-12 px/s), a leaf (8-14 px, a flutter, its fall clear of the caption band and the
-   subject: a leaf that would reach them shrinks out before, never to come back), glints only in the sun's
-   glitter path (short level dashes, L* +10 to +20, 0.2-0.6 s), far birds pale and small, a flock crossing the whole
-   frame; a few a field (motes 6, dust 5, glints 4, a leaf or two, a flock of 3-5), <= ~12 on screen, each grows in and
+6. **A few particles make it natural, and they are SEEN** (owner: "a bit of particles here and there"; then, on v4: "I don't
+   see any changes in the particles anywhere": the test is that a viewer can point at them at phone size without
+   searching): tier-C life, calm and slow, declared at G3 as `life:` items: motes only inside light and against shade
+   (6-10 px, L* +12 to +20 over what is behind them, 6-10 in the sunlit air), dust or pollen in the sun-side air (both
+   3-12 px/s), leaves (26-40 px, a visible flutter and turn, 2-3 in view across a hold, crossing the mid ground where the
+   eye can catch them, their fall clear of the caption band and the subject: a leaf that would reach them shrinks out
+   before, never to come back), glints only in the sun's glitter path (20-36 px sparkles or level dashes, L* +15 to +25,
+   4-6 twinkling at once, 0.3-0.8 s), far birds pale and small, a flock crossing the whole frame; <= ~16 on screen, each grows in and
    shrinks out (never fades), a step lighter on the sun side, no entrance (a leaf growing in, a flock flying in)
    touching the 0.4 s around a join (a steady field keeps its pace), a pure function of the frame. They are movers, not
    texture (§c).
@@ -286,7 +288,8 @@ stands off what is behind it, the far reads far, the ground runs into the pictur
 - A sun disc showing through a V gap or a notch in a roofline (a "speech-bubble" tooth): one near-level edge cuts the disc, or it is whole.
 - A separation backing that is a blank slab: the field behind a subject is a real thing of the set (a building with tone-on-tone windows,
   a stepped top, a lit sliver on its sun side), never a placeholder rectangle.
-- Particles too small for a phone: glints 12-24 px, leaves 10-14 px, motes 3-4 px set against a shaded field; 2-4 visible at a time.
+- Particles nobody can see: at phone size the viewer must spot them without searching: leaves 26-40 px crossing the mid ground,
+  glints 20-36 px (4-6 at once), motes 6-10 px against shade (v4 had 13 px leaves, 14-24 px glints, 3-4 px motes: invisible to the owner).
 - Two cameras: a perspective ground under level, frontal buildings reads as a backdrop on a floor; facades, bridge and far rows share the
   ground's horizon and vanishing point (a narrow side wall in shade shows a building's depth).
 - The heaviest area at a squint must be the subject's, never the near dressing: near planes get value range, not prop count.
