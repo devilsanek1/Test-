@@ -27,7 +27,11 @@ Status: DONE. Three findings fixed, R3-6 fixed for the sway; its jolt half needs
   from ~32.4, before "better" at 32.60). Top-3 % salience on its beat (32.20-33.10): the van 20-26 % -> 26-33 % (the
   frame's largest region); calm (33.30-34.20) 17 % -> 17-17.5 %; at the 2027 flip (34.80-35.10) the notice keeps 54-55 %
   (was 55 %). SQE/SQF stills at phone size: the word "BETTER" reads in the 0.25 sheet; at 1:1 the pill and laptop are
-  clean single shapes.
+  clean single shapes. The pill is the street notice's warm-white paper (`EMBER.card`: information is unlit paper,
+  CRAFT §d.9), never pure white. Light at 32.90 (check_light, light off/on, subject = the van): brightest 5 % 0.078 H
+  from it, warm-lit 12.3 % (CRAFT 8-15), LIGHT OK. Line (retro_tools/line/measure.py, the van's crop): strokes 257 ->
+  196 per Mpx, short strokes 196 -> 90, near-miss ends 515 -> 378 (fewer, longer strokes: bigger letters); the frame
+  125 -> 101 strokes per Mpx (before is from the CRF 18 render).
 - **R3-6 (major) FIXED for the sway; the jolt half is REQUEST 1.**
   - Sway: `thread_plane.tsx` `REACT.sway` 24.44 -> 24.95 and `TAG_FULL` [24.44, 25.04] -> [24.95, 25.25]: the DC truck
     drives up the road 24.30-24.95 alone, then the tag swings at full strength in the voice's pause ("dibs." ends

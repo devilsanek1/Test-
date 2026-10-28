@@ -110,7 +110,8 @@ export type FleetVanProps = {
  *  The same chassis, length and wheels as the van (the lane's layout, its contact shadow and exhaust stay true), with a
  *  bigger box: `len` of the van's length (the van's 0.66; the cab shorter) and `tall` x its height (a Luton box rising
  *  over the cab: still under the notice's lowest line at the lane's head, y 1144 vs the roof snow's 1147). On the box,
- *  the chart's 10.82 BETTER laptop (SQB_chart BetterBadge): a warm-white pill, its 2 px red-brown outline and ink letters
+ *  the chart's 10.82 BETTER laptop (SQB_chart BetterBadge): a warm-white pill (EMBER.card, the street notice's paper:
+ *  information is unlit paper, CRAFT §d.9), its 2 px red-brown outline and ink letters
  *  at `font` x the van's height (~h x 0.4: 16 -> 27 px at rest, 21.6 -> 36.5 px in the push), over the NEW laptop (its lit
  *  peach screen, `laptop` x the box) whose lid's top quarter it overlaps; the deck stays clear of the bumper. */
 export const BETTER_VAN = {len: 0.74, tall: 1.2, font: 0.386, pill: {w: 3.34, h: 1.04, top: 3}, laptop: 0.55, lidH: 0.48};
@@ -210,7 +211,7 @@ export const FleetVan: React.FC<FleetVanProps> = ({x, y, w: w0, variant = 'van',
         <Tier tier={tier}>
           <Laptop x={bx} y={ly} w={lw} lidH={B.lidH} variant="new" seed="fleet/better" ink={2.2} />
         </Tier>
-        <path d={rrect(bx - pw / 2, py, pw, ph, r)} fill={mixHex(EMBER.white, BETTER_CALM.pill, k)} stroke={k < 0.5 ? EMBER.beam : 'none'} strokeWidth={2} />
+        <path d={rrect(bx - pw / 2, py, pw, ph, r)} fill={mixHex(EMBER.card, BETTER_CALM.pill, k)} stroke={k < 0.5 ? EMBER.beam : 'none'} strokeWidth={2} />
         <Txt x={bx} y={py + ph / 2 + f * 0.33} size={f} fill={mixHex(EMBER.ink, BETTER_CALM.text, k)} fit={pw * 0.9}>
           BETTER
         </Txt>
