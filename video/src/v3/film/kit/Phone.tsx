@@ -46,8 +46,8 @@ export type PhoneProps = {
    *  dark slab under a missing screen. */
   bodyFillAt?: At;
   /** OPT-IN (v3 rework, CRAFT §b: a story object off its beat is tier B): 0 = full strength, 1 = off-beat (the button
-   *  and the cart badge a soft blue at C* <= 20 with no outline, the listing's laptop at tier 'support'); 0.5 = the
-   *  half step of a 2-step change (never a fade). Default 0. */
+   *  and the cart badge a soft blue at C* <= 20 with no outline, the listing's laptop at tier 'support', the body a soft
+   *  warm dark with no outline: PHONE_DIM_BODY); 0.5 = the half step of a 2-step change (never a fade). Default 0. */
   dim?: number;
   /** OPT-IN: the button steps one value darker while the thumb presses it (the press's 0.14 s). */
   pressDark?: boolean;
@@ -84,6 +84,10 @@ export function phoneSlots(w = 400, priceY = 372, buttonY = 400) {
 export const PHONE_DIM_POP = '#9AACCB';
 /** The button while pressed (`pressDark`): one value step down (L* 58 -> 49), hue and chroma kept. */
 export const PHONE_PRESS_POP = '#2276C9';
+/** The off-beat body and notch (`dim` 1): the dark anchor (L* 15) lifted to a soft warm dark (L* 32, the anchor's hue),
+ *  with no outline: tier B has no near-black areas and parts from the desk and the dimmed screen by value (CRAFT §b);
+ *  a near-black bezel round a dimmed phone held a quarter of the frame's salience while the stage led. */
+export const PHONE_DIM_BODY = '#634538';
 
 /** Canvas point of a phone-local point (follows the phone's rotation). */
 export function phonePoint(p: {x: number; y: number; w?: number; h?: number; rot?: number}, lx: number, ly: number): Pt {
@@ -138,13 +142,15 @@ const PhoneBody: React.FC<PhoneProps> = ({
   const strikeW = price ? price.length * S.price.size * 0.44 : 0;
   // the button and the badge: the pop, one value darker while pressed, a soft blue off-beat (2-step: dim 0 / 0.5 / 1)
   const popNow = mixRgb(pressDark && pressing ? PHONE_PRESS_POP : EMBER.pop, PHONE_DIM_POP, dim);
+  // the body and the notch: the dark anchor, a soft warm dark off-beat (its outline only on its beat, like the button's)
+  const bodyNow = mixRgb(EMBER.anchor, PHONE_DIM_BODY, dim);
   const bodyAt = bodyFillAt ?? fillAt(at);
   return (
     <XG m={phoneMat(x, y, w, h, rot)}>
-      <Fill d={roundRect(0, 0, w, h, 56 * k)} color={EMBER.anchor} at={bodyAt} seed={`${seed}/body`} />
+      <Fill d={roundRect(0, 0, w, h, 56 * k)} color={bodyNow} at={bodyAt} seed={`${seed}/body`} />
       <Fill d={roundRect(16 * k, 16 * k, w - 32 * k, h - 32 * k, 42 * k)} color={EMBER.screen} at={fillAt(at, 0.03)} offset={false} />
-      <Ink d={roundRect(0, 0, w, h, 56 * k, {seed: `${seed}/o`})} inside={roundRect(0, 0, w, h, 56 * k)} at={at} width={ink} />
-      <Fill d={roundRect(160 * k, 30 * k, 80 * k, 20 * k, 10 * k)} color={EMBER.anchor} at={bodyFillAt ?? fillAt(at, 0.05)} offset={false} />
+      {dim < 0.5 ? <Ink d={roundRect(0, 0, w, h, 56 * k, {seed: `${seed}/o`})} inside={roundRect(0, 0, w, h, 56 * k)} at={at} width={ink} /> : null}
+      <Fill d={roundRect(160 * k, 30 * k, 80 * k, 20 * k, 10 * k)} color={bodyNow} at={bodyFillAt ?? fillAt(at, 0.05)} offset={false} />
       {/* header: back chevron, title, cart (+ badge) */}
       <Ink d={poly([[52 * k, 70 * k], [40 * k, 82 * k], [52 * k, 94 * k]], {joined: true, seed: `${seed}/chev`})} at={b(at, 0.08)} width={thin} />
       <Show at={fillAt(at, 0.06)}>
