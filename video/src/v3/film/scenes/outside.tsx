@@ -53,7 +53,8 @@ import {rng} from '../../../lib/rng';
 import {Tier, useTierPaint} from '../../../lib/tier';
 import {useFilmTime} from '../../../lib/sequence';
 import {EMBER, BirdV, DataCenter, SnowLayers, windowLit, puffs, Txt, type Pt} from '../kit';
-import {ContactShadow, LightPool, Lit, RIGS, ShadowLayer, WindowSpill, mixHex, useLightOff, withKey, streetLamp} from '../kit/Light';
+import {ContactShadow, LightPool, Lit, RIGS, ShadowLayer, WindowSpill, fromLch, lch, mixHex, useLightOff, withKey, streetLamp} from '../kit/Light';
+import {nearStep} from '../../../lib/depth';
 import {CrateBox, CrateFlight, ellD, FleetVan, fleetVanGeo, NoticeFlip, rrect, roundPoly, type FleetVariant} from '../kit/Fleet';
 import {Haze, stepAt, twoStepIn} from '../kit/Haze';
 import {CornerCloud, HighClouds, CloudBank, FarGround, InfinityLine, HallPlume, HALL, HALL_GEO, HALL_ROOF, HALLB, HORIZON as S9_HORIZON, roofRows, RoofRowsView, type RoofRowSpec} from './S9_far';
@@ -123,6 +124,51 @@ export const H2_BEATS = {
   /** The data center's sign lights (SQF, on "AI"); the notice goes blank in the same frame (one event). */
   sign: 36.98,
 };
+/** THE STREET SITS BACK WHILE THE FAR FIELD LEADS (early review E5, the street half; flow_v2 §4 SQD): through the reveal
+ *  ("And so do AI data centers. By the mountain.") the WHOLE street plane is one calm tier step (CRAFT §b, tier C: low
+ *  contrast, slow life): every colour on it (the ground, the corner house, the factory's wall and lit gate, the booth,
+ *  the blank notice, the vans and the trucks, the workers, our pavement with its bench and bollards, the falling snow)
+ *  keeps `contrast` of its value contrast against the street's own ambient snow and `chroma` of its chroma, hue kept
+ *  (CalmPlane: one colour matrix, never blur, a fade or grey: a warm piece stays warm, the snow stays the snow), so the
+ *  street is calm but present, never emptied; the pool, the gate and the trucks keep their own calm step on top until the
+ *  load beat. (At 21.9 the street held 88 % of the frame's top-3 % salience and the mountain 10 %.) It steps back up
+ *  GRADUALLY across J4, `t0` -> `t1` (smoothstep, under the entry's pull back through our glass, 22.35-22.95): the REVEAL
+ *  lane's whole-street switch read as a cut. SQE's street is whole from 23.05, so the load beat (23.10) stays one event. */
+export const STREET_CALM = {t0: 22.25, t1: 23.05, contrast: 0.6, chroma: 0.9};
+/** The street plane's calm at film time T: 1 through the reveal, smoothly to 0 across J4 (see STREET_CALM). */
+export function streetCalm(T: number): number {
+  if (T <= STREET_CALM.t0) return 1;
+  if (T >= STREET_CALM.t1) return 0;
+  const u = (T - STREET_CALM.t0) / (STREET_CALM.t1 - STREET_CALM.t0);
+  return 1 - u * u * (3 - 2 * u);
+}
+const rgb01 = (hex: string): [number, number, number] => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255) as [number, number, number];
+/** A plane one calm tier step toward its ground (STREET_CALM): out = M in + (I - M) ground, M = q I + (c - q) 1 wT (w the
+ *  Rec. 709 luma weights; c = the value contrast kept, q = the chroma kept, both 1 at s 0): every colour's luma
+ *  difference from the ground x c, its chroma x q, its hue kept, the ground itself exactly unchanged. One feColorMatrix
+ *  in sRGB, on flat fills: no blur, no gradient, no fade. s <= 0.001 draws the children bare. */
+const CalmPlane: React.FC<{s: number; ground: string; children?: React.ReactNode}> = ({s, ground, children}) => {
+  const id = 'calm' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  if (!(s > 0.001)) return <>{children}</>;
+  const c = 1 - (1 - STREET_CALM.contrast) * Math.min(1, s);
+  const q = 1 - (1 - STREET_CALM.chroma) * Math.min(1, s);
+  const w = [0.2126, 0.7152, 0.0722];
+  const P = rgb01(ground);
+  const Y = w[0] * P[0] + w[1] * P[1] + w[2] * P[2];
+  const rows = [0, 1, 2].map((i) => [...[0, 1, 2].map((j) => (i === j ? q : 0) + (c - q) * w[j]), 0, (1 - c) * Y]);
+  const v = [...rows, [0, 0, 0, 1, 0]].map((r) => r.map((x) => x.toFixed(5)).join(' ')).join(' ');
+  return (
+    <>
+      <defs>
+        <filter id={id} x="-5%" y="-5%" width="110%" height="110%" colorInterpolationFilters="sRGB">
+          <feColorMatrix type="matrix" values={v} />
+        </filter>
+      </defs>
+      <g filter={`url(#${id})`}>{children}</g>
+    </>
+  );
+};
+
 /** The data center's beats (E3): A (the subject) inside, C (calm, hazed) outside; each switch a 2-step change. */
 export const HALL_A: [number, number][] = [
   [-99, 21.6],
@@ -130,6 +176,13 @@ export const HALL_A: [number, number][] = [
 ];
 /** The far field's haze (CRAFT §f: one flat step per plane toward the air, the sky's lowest colour). */
 export const FAR_AIR = EMBER.skyLow;
+/** THE OUTSIDE'S SNOW (CRAFT §d.2, a night exterior: sky-facing snow caps L* 87-89, thin, never above the pool core; the
+ *  open ground snow at 83, the rig's groundAmbient): the street rig's own sky-facing cap #D9DFF2 (L* 88.9), never the
+ *  palette's lit EMBER.snow (L* 93, the snow's lit surface colour that the rig's ambient brings to 83), so the brightest
+ *  thing outside is a light (the gate's pool, the lit panes, the data center's sign on its beats), never the snow. Every
+ *  cap, lid, bank and flake of the outside takes it (h2_window's outer sill and kit Fleet's roofs too); SQA's H1 window
+ *  keeps its own (home_set: the approved pilot). */
+export const H2_SNOW = RIGS.street.snowCap;
 /** The data center's calm haze step off its beats (kit Haze k; home_set's H1 window takes the same: one building). */
 export const HALL_K = 0.35;
 const HALLB_K = 0.5;
@@ -392,7 +445,7 @@ const HallFansCalm: React.FC = () => {
   return (
     <>
       <path d={box} fill={EMBER.dcDark} />
-      <path d={lid} fill={EMBER.snow} />
+      <path d={lid} fill={H2_SNOW} />
     </>
   );
 };
@@ -411,7 +464,7 @@ const H2Hall: React.FC<{s: number}> = ({s}) => {
         <HallFansCalm />
         {/* on FILM time (OutsideFar runs S9's clock for S9's pieces): the rows' darkAt / rowsOn are film seconds */}
         <FilmClock>
-        <DataCenter x={HALL.x} y={HALL.y} w={HALL.w} h={HALL.h} variant="dark" units={0} sign={null} signH={52} ink={2.6} ledStyle="bands" ledColor={mixHex(DC_LED, DC_LED_CALM, s)} blink={false} darkAt={H2_BEATS.sign} rowsOn={HALL_ROWS} tier={tier} seed="s9/dc" />
+        <DataCenter x={HALL.x} y={HALL.y} w={HALL.w} h={HALL.h} variant="dark" units={0} sign={null} signH={52} ink={2.6} ledStyle="bands" ledColor={mixHex(DC_LED, DC_LED_CALM, s)} blink={false} darkAt={H2_BEATS.sign} rowsOn={HALL_ROWS} snow={H2_SNOW} tier={tier} seed="s9/dc" />
         </FilmClock>
       </Haze>
       <path d={rrect(g.sign.x, g.sign.y, g.sign.w, g.sign.h, 3)} fill={mixHex(SIGN_LIT.panel, SIGN_CALM.panel, s)} />
@@ -511,12 +564,12 @@ const TOWN: {back: House[]; front: House[]} = (() => {
 })();
 
 /** A row of the town's houses, calm (E3; tier C): walls half way into the far snow (L* ~56-61 before the tier's pull),
- *  caps one pale step (the tier's EMBER.snow, L* ~85, never the frame's white), unlit panes a step under the wall; lit
+ *  caps one pale step (the tier's H2_SNOW, L* ~82, never the frame's white), unlit panes a step under the wall; lit
  *  panes stay emissive (one switching at a time). Every raw fill through the tier's paint. */
 const HouseRow: React.FC<{hs: House[]; seed: string; T: number}> = ({hs, seed, T}) => {
   const paint = useTierPaint();
   const lit = useLightOff() ? EMBER.houseLit : '#FFD27A';
-  const cap = paint(EMBER.snow);
+  const cap = paint(H2_SNOW);
   let n = 0;
   hs.forEach((h) => (n += h.wins.length));
   let k = 0;
@@ -576,10 +629,10 @@ const FactoryRoof: React.FC<{T: number}> = ({T}) => {
         <path key={i} d={ellD(chim.x + chim.w / 2 + q.x, chim.top - 6 + q.y, q.r * 1.25, q.r)} fill={paint(STEAM)} />
       ))}
       <path d={rrect(chim.x, chim.top, chim.w, base - chim.top, 2)} fill={paint(FAB_SHADE)} />
-      <path d={rrect(chim.x - 3, chim.top - 4, chim.w + 6, 6, 2)} fill={paint(EMBER.snow)} />
+      <path d={rrect(chim.x - 3, chim.top - 4, chim.w + 6, 6, 2)} fill={paint(H2_SNOW)} />
       <path d={roof} fill={paint(FAB_BRICK)} />
       <path d={glaze} fill={FAB_GLAZE} />
-      <path d={snow} fill={paint(EMBER.snow)} />
+      <path d={snow} fill={paint(H2_SNOW)} />
     </>
   );
 };
@@ -769,6 +822,13 @@ const STREET_AMBIENT = '#C9CFE6';
  *  pool's core: CRAFT §d.2), so the wall's top edge and the roofline never hold the frame's top salience. */
 const WALL_BRICK = '#A66B5C';
 const STREET_CAP = '#D0D6E7';
+/** The guard booth's cream body in the street's ambient light (CRAFT §d.2-3: a wall facing us under the open sky sits
+ *  one step down, L* 91 -> 81, its chroma kept, turned toward rose): the room's wall cream (EMBER.wall, lit by the nook's
+ *  lamp) was the brightest thing outside, over the snow and the gate's pool. */
+const BOOTH_WALL = (() => {
+  const c = lch(EMBER.wall);
+  return fromLch(c.L - 10, c.C, c.h - 10);
+})();
 
 /** Our street: ground, the factory's wall and gate, the booth and barrier, the floodlight and its pool, the notice,
  *  the queue, the workers, the walkers, the snow. */
@@ -804,6 +864,7 @@ export const OutsideStreet: React.FC = () => {
   const snowTop = (612 - sm[5]) / (sm[3] || 1);
   return (
     <FilmClock>
+      <CalmPlane s={streetCalm(T)} ground={STREET_AMBIENT}>
       <Lit rig={rig}>
         <Tier tier="environment" bg={EMBER.sky}>
           {/* the ground: far pavement, the road (one trodden step), the near kerb's snow bank */}
@@ -829,7 +890,7 @@ export const OutsideStreet: React.FC = () => {
           <path d={rrect(G.x0 + 16, G.y0 + 34, 40, 38, 2) + rrect(G.x0 + 60, G.y0 + 44, 36, 28, 2)} fill={'#C98A64'} />
           <path d={rrect(G.x0 + 22, G.y0 + 28, 30, 8, 2) + rrect(G.x0 + 64, G.y0 + 38, 28, 8, 2)} fill={EMBER.board} />
           {/* the booth on the gate's left: a lit window, the guard's silhouette inside */}
-          <path d={rrect(H2_BOOTH.x0, H2_BOOTH.y0, H2_BOOTH.x1 - H2_BOOTH.x0, H2_BOOTH.y1 - H2_BOOTH.y0, 3)} fill={EMBER.wall} />
+          <path d={rrect(H2_BOOTH.x0, H2_BOOTH.y0, H2_BOOTH.x1 - H2_BOOTH.x0, H2_BOOTH.y1 - H2_BOOTH.y0, 3)} fill={BOOTH_WALL} />
           <path d={rrect(H2_BOOTH.x0 - 4, H2_BOOTH.y0 - 8, H2_BOOTH.x1 - H2_BOOTH.x0 + 8, 10, 4)} fill={mixHex(EMBER.dcSide, STREET_AMBIENT, 0.3)} />
           <path d={rrect(H2_BOOTH.x0 - 5, H2_BOOTH.y0 - 13, H2_BOOTH.x1 - H2_BOOTH.x0 + 10, 7, 3.5)} fill={STREET_CAP} />
           <path d={rrect(H2_BOOTH.x0 + 8, H2_BOOTH.y0 + 10, 30, 24, 2)} fill={off ? EMBER.houseLit : '#FFD27A'} />
@@ -847,7 +908,7 @@ export const OutsideStreet: React.FC = () => {
           {/* the street lamp at the road's mouth (a practical: its lantern lights the small pool at its foot) */}
           <path d={rrect(229, 966, 6, 128, 3)} fill={EMBER.dcSide} />
           <path d={rrect(222, 956, 20, 14, 4)} fill={EMBER.core} />
-          <path d={rrect(220, 951, 24, 6, 3)} fill={EMBER.snow} />
+          <path d={rrect(220, 951, 24, 6, 3)} fill={H2_SNOW} />
         </Tier>
         <ShadowLayer>
           {/* contact shadows: the booth, the notice's posts, the lamp post, every vehicle (16 px), the workers */}
@@ -891,7 +952,7 @@ export const OutsideStreet: React.FC = () => {
           .filter((v) => v.id === 'van2' || v.id === 'better')
           .map((v) =>
             puffs(T, {n: 3, life: 2.4, rise: 26, drift: 22, r0: 2, r1: 6, wobble: 2, seed: `h2/ex/${v.id}`}).map((q, i) => (
-              <path key={`${v.id}${i}`} d={ellD(v.x + VAN_W / 2 + 6 + q.x, v.y - 8 + q.y, q.r * 1.3, q.r)} fill={mixHex(EMBER.snow, EMBER.road, 0.35)} />
+              <path key={`${v.id}${i}`} d={ellD(v.x + VAN_W / 2 + 6 + q.x, v.y - 8 + q.y, q.r * 1.3, q.r)} fill={mixHex(H2_SNOW, EMBER.road, 0.35)} />
             )),
           )}
         {/* a small car crosses the street's far side while the payoff holds (C: flat, slow) */}
@@ -904,7 +965,7 @@ export const OutsideStreet: React.FC = () => {
         <OurPavement />
         {/* the barrier across the lane's exit: striped arm on a post, lifts on "first dibs" */}
         <XG m={mat.about(mat.rotate(-barrier(T)), 334, 1160)}>
-          <path d={rrect(334, 1155, 118, 10, 4)} fill={EMBER.snow} />
+          <path d={rrect(334, 1155, 118, 10, 4)} fill={H2_SNOW} />
           <path d={[0, 2, 4].map((i) => rrect(334 + 10 + i * 20, 1155, 18, 10, 1)).join('')} fill={EMBER.beam} />
         </XG>
         <path d={rrect(328, 1150, 12, 52, 3)} fill={EMBER.dcSide} />
@@ -913,11 +974,12 @@ export const OutsideStreet: React.FC = () => {
           <rect x={-200} y={snowTop} width={1480} height={Math.max(0, 2012 - snowTop)} />
         </clipPath>
         <g clipPath={`url(#${id})`}>
-          <SnowLayers x={-60} y={560} w={1200} h={760} layers={['far', 'mid']} density={0.5} band={null} seed="h2/snow" />
+          <SnowLayers x={-60} y={560} w={1200} h={760} layers={['far', 'mid']} density={0.5} band={null} color={H2_SNOW} seed="h2/snow" />
         </g>
         {/* birds: one small V crossing slow while the chip makers speak (C), under the caption band in the held push */}
         <BirdV at={32.9} from={[-40, 790]} to={[460, 760]} dur={3.2} />
       </Lit>
+      </CalmPlane>
     </FilmClock>
   );
 };
@@ -981,7 +1043,7 @@ const FarCar: React.FC<{T: number}> = ({T}) => {
     <g>
       <path d={roundPoly([[x - 34, y - 14], [x - 20, y - 26], [x + 14, y - 26], [x + 26, y - 14], [x + 36, y - 12], [x + 36, y], [x - 36, y]], 5)} fill={'#8E6A88'} />
       <path d={roundPoly([[x - 16, y - 23], [x + 11, y - 23], [x + 20, y - 15], [x - 25, y - 15]], 3)} fill={'#7D8AB6'} />
-      <path d={rrect(x - 22, y - 30, 30, 5, 2.5)} fill={EMBER.snow} />
+      <path d={rrect(x - 22, y - 30, 30, 5, 2.5)} fill={H2_SNOW} />
       <path d={ellD(x - 38, y - 8, 2.4, 2.4)} fill={EMBER.core} />
       <path d={ellD(x - 20, y, 6, 6) + ellD(x + 22, y, 6, 6)} fill={EMBER.anchor} />
     </g>
@@ -1005,29 +1067,50 @@ const PAVE = (() => {
   const bollards = [130, 330, 530, 730, 930].map((x) => ({x, top: 1300, base: 1352}));
   return {stones, bank, prints, bollards};
 })();
+/** Our pavement's colours: the nearest outdoor plane, in front of the street (CRAFT §f.2: nearer than the subject's
+ *  plane, one value step darker, hue and chroma kept: lib/depth nearStep -1, -5 L*). Its ground is the street's ambient
+ *  snow (L* 83 -> 78; it was a pale #D3D8EC, L* 86.5: lighter than the street behind it, depth inverted), its bank and
+ *  caps the outside's sky-facing snow (89 -> 84), the kerb, the posts, the bench and the bike one step down with it.
+ *  Seen only in SQD's pull, its hold and J4's entry (the sill hides it at rest). */
+const NEAR = (c: string) => nearStep(c, -1);
+const PAVE_C = (() => {
+  const ground = NEAR(STREET_AMBIENT);
+  const road = NEAR(EMBER.road);
+  const post = NEAR(mixHex(EMBER.dcSide, EMBER.sky, 0.25));
+  return {
+    ground,
+    kerb: NEAR(mixHex(EMBER.road, STREET_AMBIENT, 0.3)),
+    snow: NEAR(H2_SNOW),
+    prints: mixHex(ground, road, 0.55),
+    foot: mixHex(ground, road, 0.7),
+    shadow: mixHex(ground, road, 0.6),
+    post,
+    bench: NEAR(EMBER.beam),
+    legs: NEAR(mixHex(EMBER.beam, EMBER.anchor, 0.4)),
+  };
+})();
 const OurPavement: React.FC = () => {
-  const pale = '#D3D8EC';
-  const post = mixHex(EMBER.dcSide, EMBER.sky, 0.25);
+  const C = PAVE_C;
   return (
     <g>
-      <path d={`M-200 1262H1280V1560H-200Z`} fill={pale} />
-      <path d={PAVE.stones} fill={mixHex(EMBER.road, pale, 0.3)} />
-      <path d={PAVE.bank} fill={EMBER.snow} />
-      <path d={PAVE.prints} fill={mixHex(pale, EMBER.road, 0.55)} />
+      <path d={`M-200 1262H1280V1560H-200Z`} fill={C.ground} />
+      <path d={PAVE.stones} fill={C.kerb} />
+      <path d={PAVE.bank} fill={C.snow} />
+      <path d={PAVE.prints} fill={C.prints} />
       {PAVE.bollards.map((b, i) => (
         <g key={i}>
-          <path d={ellD(b.x, b.base, 16, 4)} fill={mixHex(pale, EMBER.road, 0.7)} />
-          <path d={rrect(b.x - 7, b.top, 14, b.base - b.top, 4)} fill={post} />
-          <path d={rrect(b.x - 9, b.top - 4, 18, 7, 3.5)} fill={EMBER.snow} />
+          <path d={ellD(b.x, b.base, 16, 4)} fill={C.foot} />
+          <path d={rrect(b.x - 7, b.top, 14, b.base - b.top, 4)} fill={C.post} />
+          <path d={rrect(b.x - 9, b.top - 4, 18, 7, 3.5)} fill={C.snow} />
         </g>
       ))}
       {/* a bench (seat and back, snow on both) and a parked bike against the fourth bollard */}
-      <path d={rrect(410, 1388, 150, 10, 3) + rrect(410, 1350, 150, 9, 3)} fill={EMBER.beam} />
-      <path d={rrect(420, 1398, 8, 30, 2) + rrect(542, 1398, 8, 30, 2) + rrect(424, 1359, 6, 30, 2) + rrect(540, 1359, 6, 30, 2)} fill={mixHex(EMBER.beam, EMBER.anchor, 0.4)} />
-      <path d={rrect(410, 1345, 150, 6, 3) + rrect(410, 1383, 150, 6, 3)} fill={EMBER.snow} />
-      <path d={ellD(485, 1430, 82, 6)} fill={mixHex(pale, EMBER.road, 0.6)} />
-      <path d={`M700 1392m-22 0a22 22 0 1 0 44 0a22 22 0 1 0 -44 0M770 1392m-22 0a22 22 0 1 0 44 0a22 22 0 1 0 -44 0M700 1392L726 1360L760 1360L770 1392M726 1360L716 1350M752 1360L756 1346`} fill="none" stroke={post} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-      <path d={rrect(708, 1346, 18, 5, 2.5)} fill={EMBER.snow} />
+      <path d={rrect(410, 1388, 150, 10, 3) + rrect(410, 1350, 150, 9, 3)} fill={C.bench} />
+      <path d={rrect(420, 1398, 8, 30, 2) + rrect(542, 1398, 8, 30, 2) + rrect(424, 1359, 6, 30, 2) + rrect(540, 1359, 6, 30, 2)} fill={C.legs} />
+      <path d={rrect(410, 1345, 150, 6, 3) + rrect(410, 1383, 150, 6, 3)} fill={C.snow} />
+      <path d={ellD(485, 1430, 82, 6)} fill={C.shadow} />
+      <path d={`M700 1392m-22 0a22 22 0 1 0 44 0a22 22 0 1 0 -44 0M770 1392m-22 0a22 22 0 1 0 44 0a22 22 0 1 0 -44 0M700 1392L726 1360L760 1360L770 1392M726 1360L716 1350M752 1360L756 1346`} fill="none" stroke={C.post} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={rrect(708, 1346, 18, 5, 2.5)} fill={C.snow} />
     </g>
   );
 };

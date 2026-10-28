@@ -72,6 +72,7 @@ import {
   type Pt,
 } from '../kit';
 import {
+  AMBIENT_NOOK,
   Ambient,
   CastShadow,
   ContactShadow,
@@ -84,6 +85,7 @@ import {
   nookRig,
   PoolLift,
   polyD,
+  POOL_NOOK,
   rectD,
   Shade,
   Shadow,
@@ -119,12 +121,12 @@ export const POOL: Ellipse = NOOK.pool;
 /** THE nook rig (CRAFT §d.1): every shot of the home reads it (the thread plane too). Its ambient step sits at the
  *  bright end of CRAFT §d.2's ladder (the wall 91 -> 84, the desk 68 -> 63, hue kept peach): the owner's "warm, never
  *  sickly" room stays warm. */
-export const HOME_AMBIENT = '#F5E5DA';
+export const HOME_AMBIENT = AMBIENT_NOOK;
 /** The desk pool as LIT TERRACOTTA (SQA pilot review; CRAFT §d.7: "L* 82-85 at C* >= 36"): ring L* 79 C* 42 h 62, core
  *  L* 84 C* 38 h 70, both lighter (+16 / +21 over the ambient desk) and warmer than the desk (h 55), keeping its colour.
  *  The old ring #FFD7A4 / core #FFE8C1 (L* 88 / 93, C* 31 / 22) turned the terracotta into a pale cream disc that read as
  *  a placemat. The brightest 5 % of H1 is the phone's screen (and the card's paper in SQB), so the pool need not be. */
-export const HOME_POOL: [string, string] = ['#FBB580', '#FFC78F'];
+export const HOME_POOL: [string, string] = POOL_NOOK;
 /** The lamp's ONE wash (CRAFT §d.7 room falloff): on the shelf and the window's left reveal behind the lamp, cut at the
  *  desk's crease (washHole), its top at y 838 (the caption band ends at 600). */
 export const HOME_WASH: Ellipse = {cx: 190, cy: 1000, rx: 236, ry: 162};

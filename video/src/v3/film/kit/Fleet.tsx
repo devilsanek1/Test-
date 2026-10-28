@@ -15,12 +15,15 @@ import React, {useId} from 'react';
 import {clamp, ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
-import {fromLch, lch, mixHex} from './Light';
+import {fromLch, lch, mixHex, RIGS} from './Light';
 import {Laptop} from './Laptop';
 import {Txt, type Pt} from './util';
 import {Tier, type Tier as TierT} from '../../../lib/tier';
 
 const f1 = (v: number) => (Math.round(v * 10) / 10).toString();
+/** The snow on the vans' roofs and the notice's binding: the street rig's sky-facing cap (CRAFT §d.2: L* 87-89, thin,
+ *  never above the pool core), never the palette's lit EMBER.snow (L* 93): the brightest thing outside is never the snow. */
+const SNOW = RIGS.street.snowCap;
 
 /** The subject's line colour: the fill's own deep shade (L* -35, hue kept, never under L* 16; CRAFT §c). */
 export const deepOf = (hex: string) => {
@@ -197,7 +200,7 @@ export const FleetVan: React.FC<FleetVanProps> = ({x, y, w: w0, variant = 'van',
         <path d={band} fill={C.band} />
       </g>
       <path d={cabWin} fill={variant === 'dc' ? '#7D8AB6' : '#8C98C2'} />
-      <path d={roofSnow} fill={EMBER.snow} />
+      <path d={roofSnow} fill={SNOW} />
       <path d={tail} fill={EMBER.beam} />
       <path d={head} fill={lights ? EMBER.core : mixHex(EMBER.houseLit, C.cab, 0.5)} />
       {decal}
@@ -324,7 +327,7 @@ export const NoticeFlip: React.FC<{x: number; y: number; w: number; h: number; g
       {[0.3, 0.7].map((u, i) => (
         <path key={i} d={rrect(x + w * u - 4, y - headH * 0.35, 8, headH * 0.7, 4)} fill={rings} />
       ))}
-      <path d={rrect(x - 4, y - 5, w + 8, 7, 3.5)} fill={EMBER.snow} />
+      <path d={rrect(x - 4, y - 5, w + 8, 7, 3.5)} fill={SNOW} />
     </g>
   );
 };
