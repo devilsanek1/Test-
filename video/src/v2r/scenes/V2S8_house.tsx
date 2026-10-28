@@ -953,14 +953,18 @@ function roomInto(lit: boolean): Batch {
   return b;
 }
 
-/** W's front: the glazing bars, the bottom rail and the Juliet rail over her; the frame ink (no upward overshoot). */
+/** W's front: the glazing bars, the bottom rail and the Juliet rail over her; the frame ink (no upward overshoot).
+ *  The meeting stile runs from the transom down and the fanlight above it is ONE undivided pane: S3's window
+ *  (V2S3_tHer, L3's request 2026-10-28: there a full-height stile would cross her head at the push-through point), so
+ *  her window is one design in S3 and S8. */
 function wFrontInto(): Batch {
   const b = new Batch();
   const F = W8;
   const fx = WX0;
   const fy = WY0;
-  b.rect(CM.hero, fx + F.w * 0.48, fy, F.w * 0.04, F.h);
-  b.rect(CM.hero, fx, fy + F.h * 0.62, F.w, F.w * 0.035);
+  const transom = fy + F.h * 0.62;
+  b.rect(CM.hero, fx + F.w * 0.48, transom, F.w * 0.04, fy + F.h - transom);
+  b.rect(CM.hero, fx, transom, F.w, F.w * 0.035);
   b.rect(CM.hero, fx - WFR, fy + F.h - F.w * 0.02, F.w + 2 * WFR, F.w * 0.07);
   const ry = fy + F.h * 0.6;
   b.rect(CM.anchor, fx - F.w * 0.1, ry, F.w * 1.2, Math.max(2, F.w * 0.025));

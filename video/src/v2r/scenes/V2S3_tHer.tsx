@@ -3,10 +3,10 @@
 // The window is S8's design (L6's S8Window in V2S8_house.tsx, roomInto / wFrontInto, scaled to M's 132.5 x 164.3; conform
 // §4): the teal frame band, the closed leaves meeting on a teal stile, the transom at 62 %, the lamp-lit room (a
 // LitWindow pane, the lamp's wash on the back wall, the blind rolled UP from the first frame: "lit, blind up", nothing
-// moves at the cut), the standard lamp's gold shade, two shelves of books, a plant, the Juliet rail. ONE deliberate
-// change: in S8 the meeting stile runs the full height and would cross her head at the push-through point (330, 742),
-// so here it runs from the transom to the bottom only and the glazing above the transom is one undivided fanlight,
-// where her head sits (the lane asks L6 to make S8's window the same).
+// moves at the cut), the standard lamp's gold shade, two shelves of books, a plant, the Juliet rail. ONE change, made
+// here first: a full-height meeting stile would cross her head at the push-through point (330, 742), so the stile runs
+// from the transom to the bottom only and the glazing above the transom is one undivided fanlight, where her head sits
+// (S8's window took the same change on 2026-10-28: one design in both shots).
 // Her silhouette (plum, phone at her ear, 140 px, feet on the room's floor y 862) stands between the room and the
 // front (the transom, the stile and the Juliet rail in front of her body), clipped to the pane:
 //   13.12-14.56  she walks LEFT across the room (feet honest: steps = distance / step length on the 12/s clock), then
