@@ -79,12 +79,12 @@ const NB_SASH: Box = {x: 1210, y: 678, w: 54, h: 104};
 const TH_SASH: Box = {x: 1330, y: 666, w: 56, h: 110};
 
 /** The heritage lamp right of her house (its cap clears W's frame by ~6 px; it stands in the rail as a mass). */
-const HOUSE_LAMP = {x: 992, y: 1078, h: 450};
+export const HOUSE_LAMP = {x: 992, y: 1078, h: 450};
 /** The canal-side lamps beyond the board (feet behind it): only their heads show over its frame (the StatementBoard's
  *  top rail is at y 680), each with a little post under the lantern. They stand in the sky's free gaps at the landing,
  *  clear of SUN8 and of the set's far-windows ripple (the warehouse's arched windows x 244-312, the terrace's x 548-
  *  606): one between the sun and the far terrace, one left of the warehouse; the run sweeps right -> left (west). */
-const CANAL_LAMPS = [
+export const CANAL_LAMPS = [
   {id: 'canalLamp1' as const, x: 494, y: 887, h: 270},
   {id: 'canalLamp2' as const, x: 196, y: 887, h: 270},
 ];
