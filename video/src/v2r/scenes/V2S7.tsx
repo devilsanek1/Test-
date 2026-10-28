@@ -36,7 +36,7 @@ import {
   S7Pigeons, S7GroundPigeons, S7TreeFairyLights,
 } from './V2S7_life';
 import {S7Board} from './V2S7_board';
-import {S7PipHop, S7PipSeat} from './V2S7_pipdraw';
+import {S7PipSeat} from './V2S7_pipdraw';
 import {S7Wiper} from './V2S7_wiper';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
@@ -104,7 +104,6 @@ const V2S7: React.FC = () => {
         <S7NearBacks />
         <S7Planter />
       </XG>
-      <S7PipHop />
     </World>
   );
 };
