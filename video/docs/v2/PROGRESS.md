@@ -2,6 +2,14 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Note 2026-10-28 01:55 UTC: G4 look clip v4 sent to the owner
+
+`deliverables/v2/v2r_G4_look_v4.mp4` (master encode; S1 0-6.13 s): the owner's depth / sky / particles notes + the art director's fix list
+(the sun cut by one level roofline, the tower a real building, readable particles, a calmer terrace, the wing on the ground's camera, later
+paler birds, the cheap bits). Checks on the master: check_banding PASS (5 open-sky regions), check_depth 0 FAIL / 5 WARN, check_light OK x3,
+particles + float lint clean. Known for the final mix (W4): the birds' wings / calls sound at 1.46-1.74 now precede the 2.45 lift.
+Waiting for the owner; then L2-L6 resume with the full toolkit.
+
 ## Snapshot 2026-10-28 01:18 UTC (hourly)
 
 | part | owner | status |
