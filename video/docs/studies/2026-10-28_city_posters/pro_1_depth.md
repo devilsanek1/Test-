@@ -196,7 +196,8 @@ anchor rises 0.15x; K4's world shrinks round an anchor whose size barely changes
   sides, as now), the far city off both edges with a ghost ridge behind it (8-12 % of H, top y >= 620, a pale foot over
   the river) and the obelisk as the landmark rising over it; the sun one step off its sky or set behind the ridge.
 - **S6-S8 (23.8-39.08, the boards on the terrace and deck):** the boards keep tier A; the deck and terrace step down
-  to the near group (bottom quarter 74-78 today), a far group through the railings. Holds that float take 1/z shares.
+  to the near group (bottom quarter L* 87 at 26.0 s, 72 at 36.0 s; L* < 65 on 12-14 %), a far group through the
+  railings. Holds that float take the 1/z shares.
 
 ## 5. What the owner didn't name that matters for this feeling
 - **Value carries the depth, not hue:** the posters' depth is a two-group value structure; v2's colours can stay.
