@@ -163,10 +163,15 @@ Maintenance at the end).
   joins, and the owner approves the card with the script. The thread may also leave for a FAIRNESS beat the owner approves
   (the other side's equal-weight reply, a place the subject must never be): declare it on the card. — (v3, 2026-10-25; card:
   v3 retro, owner yes, 2026-10-27; fairness exception: v2, owner yes, 2026-10-27).
-- **The first 3 s / first scene must be a banger ("something is about to happen"):**
+- **The first 3 s / first scene must be a banger ("something is about to happen"), and every opening effect must be
+  BIG enough to stop a thumb:** judged as a viewer scrolling a feed on a phone, each effect (the draw-on, the hook's
+  mechanism, the ticks) is unmistakable on first watch: bold, large on screen, long enough to register, with its own
+  sound; a subtle effect counts as none. — (owner, v3, 2026-10-28: "initial animation effects like visual aspect should
+  be better and more effective at capturing people attention ... the initial drawing effect is barely visible or
+  noticeable and really don't impact or amazes me", of a 0.3 s pale draw-on and 30 px memory sticks.)
   - frame 0 is the scene being made, drawn on in the clean pen: the subject's outline (with the supporting lines)
-    first, then colour floods in within ~0.3 s (the lined films drew every line first; the owner sees the clean-pen
-    version in the next G4 look clip);
+    first, then colour floods in, as a visible event (bold line at full contrast, a moving pen tip, long enough to
+    read: ~0.3 s was invisible), never a pale wash (the lined films drew every line first);
   - voice from the first frames (the first word at ~0.12 s, the locked voice file's lead; never a silent lead);
   - the hook's claim made physical and escalating: the expected thing shown, then reality overtaking it at ~2 s,
     through the real mechanism;

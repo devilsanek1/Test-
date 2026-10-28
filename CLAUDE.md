@@ -27,8 +27,8 @@ Top rules (details in the playbook):
 - Every video gets ONE core line (its own step, G0.5: brainstorm, critique, owner picks) before the script is written.
   From the pick we draft its through-line card (one thread object, one home place, one "you"); G1 completes it with a
   carrier for every join, taken from the script's own joins, and the owner approves it with the script.
-- The first 3 s must be a banger: frame 0 is the scene being drawn in the clean pen (the subject's outline, then colour
-  within ~0.3 s), voice from the first frames (the first word at ~0.12 s, the locked voice file's lead; never a silent
+- The first 3 s must be a banger: frame 0 is the scene being drawn in the clean pen (the subject's outline, then colour,
+  as a bold visible event: every opening effect big enough to stop a thumb on a phone; a subtle one counts as none), voice from the first frames (the first word at ~0.12 s, the locked voice file's lead; never a silent
   lead), the hook made physical (the expected thing, then reality overtaking it), never a still frame; state the payoff
   in words within ~2 s, in the voice's order (frame 0 shows the first spoken line; no title over the captions; the core
   line as a title goes on the cover). Words in the picture are few and big

@@ -102,3 +102,9 @@ Only the owner's quoted words carry owner rank; the "->" half is our log, and a 
   1.64, the loop lands on the question; the core line stays on the cover. The pale frame is the 0.3 s draw-in (frame 0
   being drawn, then colour) that the loop also un-builds into: explained, the owner's call whether to start on the
   finished colour frame. -> rule: playbook Hook and pacing (the payoff in words by ~2 s, in the voice's order).
+- 2026-10-28 (screen recording of the posted reel's opening): "one first piece of feedback I think initial animation
+  effects like visual aspect should be better and more effective at capturing people attention. Like take a look the
+  initial drawing effect is barely visible or noticeable and really don't impact or amazes me" -> SQA's opening rebuilt
+  to be unmistakable at phone size (a bold, visible draw-on and colour flood; big memory sticks tearing out on "pricier";
+  punchy ticks), shown as a 0-6 s clip before it goes into the master. -> rule: playbook Hook and pacing (every opening
+  effect big enough to stop a thumb).

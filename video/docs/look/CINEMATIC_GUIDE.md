@@ -14,7 +14,7 @@ video; `v1 @25` = 25 s into the v1 film. The sketch animatic (G3) names the S#; 
 From the owner's reference (an explainer reel in our hand-drawn style, 1080x1350, a one-point-perspective street;
 measured, not stored):
 - **0.00-0.35 s, the scene is made:** frame 0 is bare ink lines only; flat colour floods in shape by shape within
-  ~0.3 s. Motion and "making" from the first frame.
+  fast but unmistakable (a ~0.3 s pale draw-on was invisible on a phone: owner, 2026-10-28). Motion and "making" from the first frame.
 - **The voice starts at ~0.05 s.** No silent lead, no title card. (Ours: the first word at ~0.12 s, the locked voice
   file's lead, `docs/voice/API_QUICKSTART.md`.)
 - **0.3-2.2 s, the expectation:** the hook's claim is staged as what SHOULD happen (neat empty markers filling the
@@ -29,7 +29,7 @@ measured, not stored):
 **For our videos** (the reference above is in a lined style; our film is drawn in the clean pen, `DIRECTION.md` rule 9):
 stage the hook as "the expected thing, then the surprising reality overtaking it", inside one opening shot that is
 drawn on from frame 0: the subject's outline (with tier B's tinted lines) draws on, tier C lands as flat pale shapes,
-colour floods in within ~0.3 s; the owner approves this build with the G4 look clip. Never still, but the novelty every
+colour floods in, as a bold visible event (not ~0.3 s: owner, 2026-10-28); the owner approves this build with the G4 look clip. Never still, but the novelty every
 few frames comes from the subject's own build and its mechanism, one mover leading (`CRAFT.md` §b), never from extra
 supporting life. Keep our frame-0 claim text and the first-second phone sound; the film loops back to frame 0's drawing
 state. SketchReel supports it: `draw` (stroke draw-on) and `fillIn` (colour flood) per element.
