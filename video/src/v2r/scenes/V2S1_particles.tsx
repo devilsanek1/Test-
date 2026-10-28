@@ -1,8 +1,9 @@
 // V2S1 helper (lane L1): the shot's PARTICLES (lib/particles; CRAFT §f.6; the owner on v4: they must be SEEN at phone
 // size). One exported list of fields, each on its parallax plane: S1Particles draws it (after the world, inside the
-// set's <Lit>), and the lint and the phone-size test read the same list.
-import React, {createContext, useContext} from 'react';
-import {CAPTION_BAND, Particles, glitterPath, type ParticlesProps} from '../../lib/particles';
+// set's <Lit>), and the lint and the phone-size test read the same list. The sun's glints are the water's own now (its
+// glitter column's slivers: src/lib/water.tsx through V2S1_water; the owner on v5's four-point stars: "cheap").
+import React from 'react';
+import {CAPTION_BAND, Particles, type ParticlesProps} from '../../lib/particles';
 import {CM} from '../palette';
 import * as MAP from '../world/map';
 import {S1Plane, S1_PLANE} from './V2S1_float';
@@ -17,11 +18,13 @@ import {S1Plane, S1_PLANE} from './V2S1_float';
  *            drifting at 3-8 px/s) floating slowly past the shaded side of the bay tree's crown (lower left, the
  *            nearest shade), L* +17 over it (lift 19: the crown is away from the sun, one light step down), 2-3 in
  *            view from ~1.8 s: the ones a phone sees
- *    glints  26-36 px sparkles, L* +20..+24, 4-6 twinkling at once (0.3-0.8 s each) in the sun's glitter path
+ *    glints  the water's: lib/water's glitter column under SUN0 (a still gold bed and 4-6 warm-white slivers of
+ *            20-34 px nested in it, 0.46-0.78 s each: V2S1_water), counted with these fields
  *    leaves  three 34-40 px palmate plane leaves (the branch's shape: it hangs top left) blowing in from the plane tree
  *            off-frame left on a light westerly, born at 1.2, 2.5 and 3.8 s, fluttering and turning across the water
  *            and our landing toward the middle of the frame, below the row and clear of Pip: 2-3 in view from ~3 s
- *  At most 16 alive across the fields (CRAFT §f.6): 4 far motes + 3 near + 6 glints + 3 leaves. */
+ *  At most 16 alive across the fields (CRAFT §f.6): 4 far motes + 3 near + 3 leaves here + the water's <= 6 slivers
+ *  (V2S1_water's lint: waterProblems with otherAlive S1_PARTICLES_ALIVE). */
 export const S1_PARTICLES = {t0: 0.3, t1: 5.75, joins: [6.1], her: [380, 900, 320, 220] as [number, number, number, number]};
 /** The copies' row on the far towpath and Pip on its bollard: the leaves keep clear of both. */
 const S1_ROW_BOX: [number, number, number, number] = [0, 900, 520, 205];
@@ -34,7 +37,6 @@ const common = {t0: S1_PARTICLES.t0, t1: S1_PARTICLES.t1, joins: S1_PARTICLES.jo
 export const S1_PARTICLE_FIELDS: {plane: number; f: ParticlesProps}[] = [
   {plane: S1_PLANE.farTower, f: {kind: 'motes', seed: 's1motes', region: {rect: [258, 612, 54, 290]}, on: '#B5B5C5', count: 2, size: [8, 10], lift: 18, margin: 8, ...common}},
   {plane: S1_PLANE.farTower, f: {kind: 'motes', seed: 's1motesFar', region: {rect: [26, 798, 222, 104]}, on: '#E1C6BF', count: 2, size: [8, 10], lift: 18, margin: 10, ...common}},
-  {plane: S1_PLANE.water, f: {kind: 'glints', seed: 's1glints', region: {poly: glitterPath({x: MAP.SUN0.x, yFar: 1110, yNear: 1166, wFar: 40, wNear: 80})}, on: '#D2C7AF', horizon: 965, size: [26, 36], lift: 22, margin: 8, ...common}},
   {
     plane: S1_PLANE.bank,
     f: {kind: 'leaves', seed: 's1leaves', region: {rect: [-80, 1120, 40, 70]}, on: '#EED4C5', colors: [CM.leafRust, CM.leafGold, CM.leafRust], leaf: 'palmate', births: [1.2, 2.5, 3.8], size: [34, 40], speed: [45, 70], drift: [115, 0], margin: 12, ...common, avoid: [CAPTION_BAND, S1_PARTICLES.her, S1_ROW_BOX, S1_PIP_BOX]},
@@ -45,22 +47,15 @@ export const S1_PARTICLE_FIELDS: {plane: number; f: ParticlesProps}[] = [
   {plane: S1_PLANE.near, f: {kind: 'motes', seed: 's1motesNear101', plane: -2, region: {ellipse: {cx: 228, cy: 1422, rx: 54, ry: 38}}, on: '#A5AD9A', count: 3, lift: 19, margin: 12, ...common, avoid: [CAPTION_BAND, S1_PARTICLES.her, S1_PIP_BOX]}},
 ];
 
-/** THE WATER STUDY SEAM (docs/v2/water/DIAGNOSIS.md): true hides ONLY the glint field (the sun-path sparkles belong
- *  to the water's design now: a candidate water draws its own glitter); the motes and the leaves stay. Default false =
- *  S1 exactly as before. Only src/entry-v2r-waterstudy.tsx sets it. */
-export const S1GlintsOff = createContext<boolean>(false);
+/** The fields' particles alive at most at once (the water's slivers come on top: waterProblems' otherAlive). */
+export const S1_PARTICLES_ALIVE = 10;
 
-export const S1Particles: React.FC = () => {
-  const glintsOff = useContext(S1GlintsOff);
-  return (
-    <>
-      {S1_PARTICLE_FIELDS.map(({plane, f}) =>
-        glintsOff && f.kind === 'glints' ? null : (
-          <S1Plane key={f.seed} plane={plane}>
-            <Particles {...f} />
-          </S1Plane>
-        ),
-      )}
-    </>
-  );
-};
+export const S1Particles: React.FC = () => (
+  <>
+    {S1_PARTICLE_FIELDS.map(({plane, f}) => (
+      <S1Plane key={f.seed} plane={plane}>
+        <Particles {...f} />
+      </S1Plane>
+    ))}
+  </>
+);
