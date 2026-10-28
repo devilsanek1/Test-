@@ -394,7 +394,7 @@ export function swayAt(cam: WaterCam, s: Sway, yFar: number, yNear: number, seed
  *  water is >= 4 L* under the air and never the lit ground's own colour); from the middle water on it is pulled toward
  *  the water's own teal (R2: the near water shows its body) in OKLab, through a light veil of the body's hue. The warm
  *  sky's chroma is cancelled by the teal body where they cross (the physical mix is low in chroma): through the whole
- *  warm-to-cool crossing (CIE h 30-150) the chroma is held in the CLEAN GAP, C* 4.3-`cap` (5.6: the beige and olive
+ *  warm-to-cool crossing (CIE h 30-150) the chroma is held in the CLEAN GAP, C* 4.7-`cap` (5.5: the beige and olive
  *  bands start at 6, grey under 4), as the sky's own light band crosses at C* <= 6 (CRAFT §g.1): so the far water is a
  *  pale warm pearl, never peach paving, beige, olive or grey (R4; the critic on v6's first master, CRITIC.md must-fix
  *  2b: its far end was the paving's colour, dE76 ~1, and its crossing ran through the house beige band). Defaults are
@@ -414,15 +414,15 @@ export type RampOpts = {
   veilAt?: [number, number];
   /** The body mixed in over n bodyAt[0] -> bodyAt[1], up to bodyAt[2]. */
   bodyAt?: [number, number, number];
-  /** Keys every `step` px over the water's box. */
+  /** Keys every `step` px over the water's box (default 8: the curve between two keys follows the clean gap). */
   step?: number;
-  /** The clean gap's chroma ceiling (CIE C*) through the warm-to-cool crossing (default 5.6; the bands start at 6). */
+  /** The clean gap's chroma ceiling (CIE C*) through the warm-to-cool crossing (default 5.5; the bands start at 6). */
   cap?: number;
 };
-export const RAMP_DEFAULT = {dl: [0.05, -0.03] as [number, number], ck: [0.95, 0.1] as [number, number], veil: {l: 0.085, c: 0.018}, veilAt: [0.1, 0.4] as [number, number], bodyAt: [0.32, 0.86, 0.92] as [number, number, number], step: 16, cap: 5.6};
+export const RAMP_DEFAULT = {dl: [0.05, -0.03] as [number, number], ck: [0.95, 0.1] as [number, number], veil: {l: 0.085, c: 0.018}, veilAt: [0.1, 0.4] as [number, number], bodyAt: [0.32, 0.86, 0.92] as [number, number, number], step: 8, cap: 5.5};
 /** The CLEAN GAP (rampColour): through the warm-to-cool crossing (CIE h 55-150, eased off over h 30-55 on the rose side
  *  and 150-168 on the cool side) a colour's chroma is held under `cap` (beige and olive start at C* 6) and, under
- *  L* 85, over 4.3 (grey is C* < 4); its L* and hue are kept. */
+ *  L* 85, over 4.7 (grey is C* < 4); its L* and hue are kept. */
 export function rampGap(hex: string, cap: number = RAMP_DEFAULT.cap): string {
   const c = lch(hex);
   let lim = Infinity;
@@ -430,7 +430,8 @@ export function rampGap(hex: string, cap: number = RAMP_DEFAULT.cap): string {
   else if (c.h >= 30 && c.h < 55) lim = cap + ((55 - c.h) / 25) * 30;
   else if (c.h > 150 && c.h < 168) lim = cap + ((c.h - 150) / 18) * 30;
   let C = Math.min(c.C, lim);
-  if (c.L < 85 && C < 4.3 && lim < Infinity) C = 4.3;
+  // the floor a touch over grey's 4: the sky curve's chords between two keys run a little inside them
+  if (c.L < 85 && C < 4.7 && lim < Infinity) C = 4.7;
   return C === c.C ? hex : fromLch(c.L, C, c.h);
 }
 export function rampColour(cam: WaterCam, sky: SkySpec, body: string, o: RampOpts, y: number): string {
@@ -451,7 +452,9 @@ export function rampColour(cam: WaterCam, sky: SkySpec, body: string, o: RampOpt
 }
 /** The ramp as a lib/sky spec over the water's box (its eased curve and blue-noise dither). */
 export function waterRamp(cam: WaterCam, sky: SkySpec, body: string, o: RampOpts, box: {x0: number; x1: number; top: number; bottom: number}): SkySpec {
-  const step = o.step ?? RAMP_DEFAULT.step;
+  // a short strip crosses from warm to the body in a few rows: keys at least every 1/20 of the toning's span, so the
+  // curve between two keys never cuts through the neutral axis (grey) or back into a band
+  const step = o.step ?? Math.max(2, Math.min(RAMP_DEFAULT.step, Math.round(Math.abs(o.yNear - o.yFar) / 20)));
   const keys: {y: number; color: string}[] = [];
   for (let y = box.top; y <= box.bottom + step - 1e-6; y += step) keys.push({y, color: rampColour(cam, sky, body, o, y)});
   return {keys, band: null, x: box.x0, width: box.x1 - box.x0, top: box.top, bottom: box.bottom, sun: null};
