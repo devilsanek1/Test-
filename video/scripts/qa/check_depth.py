@@ -21,7 +21,7 @@ edges > 0.5x, its C* < 8 (grey), an environment plane over CRAFT §b's tier-C co
 SEPARATION (fill 2-8 px inside against fill 2-10 px outside along the silhouette, sampled every 4 px at 540) WARN: a
 tier-A subject under median |dL*| 15, over 20 % at one value (|dL*| < 5) or an unlined one-value run over 60 px (12 / 25 %
 when an outline runs along >= 80 % of it: the line helps, it never replaces the fill step); a mass under 12 / 25 % / 100 px. GROUND (Canny + Hough on L* at 1080, segments >= 36 px; walls' verticals left out; "visible" =
-|dL*| >= 6 across the line) WARN: over 60 % level, under 20 % to the vanishing point(s), receding lines that exist but
+|dL*| >= 6 across the line) WARN: over 65 % level, under 20 % to the vanishing point(s), receding lines that exist but
 under |dL*| 6 ("invisible perspective"), row spacing growing < 2x from far to near, a texture no finer far than near.
 SIZE (things of known size, `y` = their base) WARN: a size inversion, k's spread over +-15 % on one level.
 Numbers are at 540 px wide unless said (local contrast sigma 8 = CRAFT §e's 16 at 1080); px in the report are 1080-wide.

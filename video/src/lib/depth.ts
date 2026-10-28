@@ -575,7 +575,7 @@ export const DEPTH_TARGETS = {
   sepSubject: {median: 15, same: 0.2, run: 60},
   sepMass: {median: 12, same: 0.25, run: 100},
   /** A ground the camera looks down on: visible line length level at most, receding to the VP(s) at least. */
-  groundLevelMax: 0.6,
+  groundLevelMax: 0.65,
   groundRecedeMin: 0.2,
   /** Ground spacing grows toward the viewer at least this much, far edge to near edge. */
   spacingGrowth: 2,
