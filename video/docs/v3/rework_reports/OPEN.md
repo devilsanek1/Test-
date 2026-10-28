@@ -25,6 +25,7 @@ From the HOME lane (SQB + SQC, max effort):
 
 CLAIMED by the SHARED lane (thread_plane / home_set / PriceTag / captions), 2026-10-28 00:23 UTC: E2 (beyond SQA), #9, E1's like-pop, E10, E8, E12 and #10 (the home_set side), E13 (verify), E6's caption and captionTone part. HOME lane: SQB/SQC-side only; pull and re-measure first.
 DONE by the SHARED lane, 2026-10-28 01:30 UTC: all of the claimed items (E13 was already in, 231b2cc); numbers, what is still open and the REQUESTS in `rework_reports/shared_layer.md`. The thread plane's off-beat state in SQB and SQE is now its REST level, and the H1 window is calm from 6.35: re-measure SQB, SQC and SQE stills before building on them.
+DONE by the CROSS pre-pass, 2026-10-28: E5's street half (the whole street plane calm through the reveal, lifting across J4), the outside's snow at the street rig's cap (L* 89), the 30 px summit stick (K0 x23.3), #11 (gate_check finds a push-through's cut at its declared frame by its zoom turn), the SHARED lane's export request; H2's desk takes the home rig's pool and ambient. Numbers and what is open: `rework_reports/cross_prepass.md`.
 
 Two independent MAX-effort reviews of SQB-SQF in the early full render (`film_half.mp4`, rendered at 9fab768), merged
 into one list (2026-10-27): R1 story, joins and hierarchy; R2 the look (line, light, fullness). Film seconds, px at
