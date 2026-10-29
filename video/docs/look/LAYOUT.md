@@ -224,7 +224,8 @@ frame, rebuilt beside v2's own). A line moves into §1-5 only when the owner app
 ### 8.2 What the posters would change (in §1-5's order)
 **The frame (§1)**
 - **The bottom and side edges become the near frame:** dark, detailed masses cut by >= 2 edges (leaves, a rail, a
-  rock, roof edges), median L* <= 60 and >= 30 from the air, edges >= 0.3, open ground <= 15 % of the frame (PE L1: the
+  rock, roof edges), small and subtle: a hint at the edges, near nature as a few finely drawn real leaf shapes in a
+  corner, calm in colour, never big chunky masses (owner, 2026-10-29: "way too big and not as subtle as they need be"), median L* <= 60 and >= 30 from the air, edges >= 0.3, open ground <= 15 % of the frame (PE L1: the
   posters' nearest plane L* 45, open ground 7 %, the bottom fifth 59 % masses; v2 74, 25 %, 9 %); bottom corners L* <=
   ~55 (CO L1: posters 44 / 53, v2 ~72 / 74). Masses may already run under the UI (§1). [>= 30 L* from the near group
   to the air: owner, DIR 6 (CR §f.8); the near world in mid-tones, its darks in many small pieces: owner-decided

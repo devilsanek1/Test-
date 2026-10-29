@@ -6,6 +6,13 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-29 ~19:10 UTC: still_v1 judged ("suffocating"); still_v2 runs as an iteration
+- still_v1 sent; the owner: no depth or scale (the building "right here"), the quay empty, the sky one colour, the near
+  leaves too big; the near/far separation good; landmarks and camera angles not important. Captured: playbook "DEPTH IS
+  AIR AND DISTANCE" + the sky bullet, DIRECTION rules 6-7, LAYOUT §8.2, `poster_refs/README.md`, `scene_rethink/NOTES.md`.
+- RUNNING: one max-effort agent builds `scene_rethink/still_v2.png` (also `video/deliverables/tests/`) +
+  `compare_v2.jpg` from `video/scripts/look/scene1/`. NEXT: send it, capture the verdict.
+
 ## Status 2026-10-29 ~18:30 UTC: the owner on the look test: "missed the forest for the trees"; scene 1 rebuilt as a still
 - The owner: the test is "good, but ... barely noticeable"; rethink the first scene "from ground up" as ONE still in
   the posters' construction (playbook: "The forest before the trees"). Brief: `scene_rethink/README.md`.

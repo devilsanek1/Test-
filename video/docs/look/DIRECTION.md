@@ -106,7 +106,9 @@ the owner approves it; the look test shows it.
   sky, a mid-tone world and real darks where the eye should go, drawn in many small pieces (windows, doorways, eave
   undersides, the shade under trees: owner, 2026-10-29), never one dark mass or a narrow band of light pastels (owner,
   2026-10-28; numbers: `CRAFT.md` §f.8, from the city-poster study). Money and everyday life: #9 Autumn
-  Ember (#7 Autumn Ochre read sick). **One continuous sky** (owner, v2 G4): from the frame top to the horizon the sky
+  Ember (#7 Autumn Ochre read sick). **One continuous sky** (owner, v2 G4), never an empty field (owner, 2026-10-29: soft
+  clouds, a gentle paint-like variation in its tone, pale far towers rising into it, birds; calm, no abstract
+  rectangles, the caption band clear): from the frame top to the horizon the sky's base
   is ONE gentle, smooth gradient (the owner's opt-in: the sky is the one place a gradient is welcome; "find a beautiful
   way to do a gentle gradient"; water may mirror that same sky, toned toward it: the sky's own gradient seen in it,
   `CRAFT.md` §f.7), warmest at the sun and the horizon, dithered so it never bands on a phone, nearly
@@ -122,7 +124,12 @@ the owner approves it; the look test shows it.
   plain cut except on a "But" turn (rule 1). It must feel GREAT: a world that keeps going past every edge, a landmark
   huge yet far, tiny anchors, a big sky, life in the hold. The home place's establishing view and the scale landing
   may be a designed view (owner, 2026-10-29): the far city lifted onto its own horizon behind water or trees (one far
-  stage) and the landmark drawn bigger than one camera allows; every other frame keeps one camera (rule 2's
+  stage) and the landmark drawn bigger than one camera allows, yet still far: it sits back in the middle distance, well
+  under the frame's width with sky round its top, open water or ground before it and the city receding behind it in
+  many paler layers, never a wall filling the frame up close (owner, 2026-10-29: "I'm really suffocating with the
+  view"); the near frame is a small, subtle hint at the edges, never big chunky masses; the street along the water is
+  full; a real place's landmarks and an exact camera angle matter far less than that depth (playbook: DEPTH IS AIR AND
+  DISTANCE); every other frame keeps one camera (rule 2's
   perspective; `CRAFT.md` §f.5). Arcane gives environments and camera only. ->
   `COZY_AND_SCALE.md` §1-3b; `CINEMATIC_GUIDE.md` S1, S5, "Scale cues"; the framing per shot type: `LAYOUT.md` §2.
 - **8. Motion and camera.** 60 fps from G3 on, timed in seconds; drawn poses may step while the camera glides. Things

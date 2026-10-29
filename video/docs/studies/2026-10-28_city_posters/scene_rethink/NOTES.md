@@ -87,3 +87,17 @@ python3 thumbs.py ../../../docs/studies/2026-10-28_city_posters/scene_rethink
 python3 scene.py  ../../../docs/studies/2026-10-28_city_posters/scene_rethink        # stages 1-4
 ```
 SVGs land in `/tmp/scene1-iter/`. Each run is deterministic (fixed seeds).
+
+## The owner's verdict on still_v1 (2026-10-29)
+"So there is no sense of depth here like the building is right here and there us really no scale depth I’m really
+suffocating with the view / Some bits are good tho like the style of separation of foreground vs background / Also the
+reference do have more details and density like the the street along the canal ours is pretty empty while their have
+density m / Also the sky is not entirely single color there are more things happening / Also dont overindex on adding
+labdmarks or putting weird camera angles on existing real views thats nit as important / The closest leafs and nature
+on the left are way too big and not as subtle as they need be"
+
+-> Keep: the near/far separation (the dark near frame, the lighter far world). Change in still_v2: the hero pulled far
+back into an open, deep view (well under the frame's width, sky round its top, open water before it, the city receding
+behind it in many paler layers to something tiny); the quay full of small life; a sky with things in it; the near
+nature small and subtle; no effort on landmarks or an exact camera angle. The general rule: playbook "DEPTH IS AIR AND
+DISTANCE".

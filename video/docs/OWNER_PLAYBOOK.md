@@ -156,19 +156,38 @@ Maintenance at the end).
   column, still glitter, calm ripple lines): "Yeah this is better", v2 G4,
   2026-10-27/28; the city posters: "some buildings are obviously closer to me, some further out and there is
   something WAY further out that gives me a sense of scale", 2026-10-28).
+- **DEPTH IS AIR AND DISTANCE: the hero sits back in a deep, open view, never a wall in your face.** In the posters the
+  hero stands in the middle distance, well under the frame's width and with sky all round its top, with open water or
+  ground in front of it and the city going on behind it in many paler, smaller layers down to something tiny and far,
+  so the eye travels a long way into the picture. A hero that fills the frame up close, its base hidden and little
+  behind it, reads as no depth and no scale ("suffocating"), however good the paint. The foreground/background
+  separation (a darker near frame, a lighter far world) is right; keep it. The near frame is a hint at the edges:
+  small and subtle (a few real leaf shapes or one branch in a corner, calm in colour and contrast, finely drawn), never
+  big chunky masses that crowd the view. The street or quay in the middle ground is full, as in the posters: people,
+  awnings and café tables, bikes, boats, trees, lamps, many small things in the calm tier, never an empty strip. In a
+  real place, its landmarks and an exact or unusual camera angle matter far less than depth, density and light: never
+  over-index on them. — (on the scene-1 still v1: "there is no sense of depth here like the building is right here
+  and there us really no scale depth I’m really suffocating with the view / Some bits are good tho like the style of
+  separation of foreground vs background / Also the reference do have more details and density like the the street
+  along the canal ours is pretty empty while their have density ... Also dont overindex on adding labdmarks or putting
+  weird camera angles on existing real views thats nit as important / The closest leafs and nature on the left are way
+  too big and not as subtle as they need be", 2026-10-29).
 - **A gentle PARALLAX float, never a flat card.** When a held shot floats, its planes move by depth (Disney's multiplane
   idea): the near ground most, far planes little, the sky and the caption band not at all; slow, small, back at rest
   by every join; it adds depth in motion without adding movers. — ("switch it on if you think it will make the videos
   better and improve engagement", v2 G4, 2026-10-28).
-- **ONE CONTINUOUS SKY, a gentle gradient, no abrupt colour seams.** The sky is one sky from the top of the frame to
-  the horizon: ONE gentle, smooth gradient (the sky is the one place a gradient is welcome), warmest around the sun and
+- **ONE CONTINUOUS SKY, a gentle gradient, no abrupt colour seams, and never an empty field.** The sky is one sky from
+  the top of the frame to the horizon, and things happen in it, as in the posters: soft clouds, a gentle paint-like
+  variation in its tone, pale far towers rising into it, birds; all calm, none of them abstract rectangles, and the
+  caption band stays clear. Its base is ONE gentle, smooth gradient (the sky is the one place a gradient is welcome), warmest around the sun and
   toward the horizon, dithered so it never bands on a phone, nearly flat inside the caption band so captions keep their
   contrast; the caption field is part of that sky, never a separate slab of another colour; the sun sits in sky that
   agrees with it, and the far city takes the sky's lowest colour as its haze. Generally: two big fields of unrelated colour never
   meet in a hard seam unless an object edge explains it. The sun stays calm: one step off its sky, or behind a ridge,
   unless it is the shot's "look here", so the far is the calmest part of the frame. — ("what bothered me is different color of the space and sun,
   like why is it blue sky and then suddenly abruptly orange, weird"; "maybe when it comes to sky we can find a beautiful
-  way to do a gentle gradient", v2 G4, 2026-10-27; the calm sun: "Go with your suggestions", 2026-10-29).
+  way to do a gentle gradient", v2 G4, 2026-10-27; the calm sun: "Go with your suggestions", 2026-10-29; on the
+  scene-1 still v1: "Also the sky is not entirely single color there are more things happening", 2026-10-29).
 - **ATTENTION HIERARCHY: one main arc, one focus at a time.** The story's subject gets the contrast, the deepest
   light-and-shade step, saturation and the clear motion; supporting life (a bird, walkers, snow, steam) stays subtle
   (smaller, lower contrast, gentler shade, softer colour, calmer motion): alive, but never competing. Supporting environment may be drawn in
