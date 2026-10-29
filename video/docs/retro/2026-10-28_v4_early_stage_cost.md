@@ -8,6 +8,9 @@ somewhat high. Can you evaluate if there is anything in the early stages of the 
 From the session's own meter (orchestrator) and the agents' transcripts. Dollar figures for the agents use the rates
 implied by the orchestrator's meter ($102.70 for its usage, with the standard ratios: cache read 0.1x input, cache write
 1.25x, output 5x: about $3.07/M input, $0.31/M cache read, $3.84/M cache write, $15.35/M output). Estimates, not a bill.
+**Caveat (2026-10-28, `2026-10-28_streamline/tokens.md` F8):** summing usage on every transcript line over-counts about
+2.4x (each API call's usage repeats on every content-block line), so the agents' rows may be that much too high; the
+orchestrator's row is the session's own meter and holds.
 
 | Part | Agents / API calls | Cache reads | Cache writes | Output | About |
 |---|---|---|---|---|---|
