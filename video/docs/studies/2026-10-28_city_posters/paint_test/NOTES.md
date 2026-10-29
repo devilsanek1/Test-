@@ -183,3 +183,28 @@ planes, far banks paler, cooler, simpler and flatter toward the horizon (a layer
   - the mid bank (0.45) hides partly behind the leaf branch;
   - nothing has been checked in motion yet (each plane is its own image, ready to drift at its depth).
 
+## v4: design the shapes first, then paint them (the playbook's "forest before the trees")
+- **The outputs:** `stage_v4_design.png` (the flat design in the scene), `paint_still_v4.png` (= `deliverables/tests/painted_scene1_still_v4.png`) and `compare_v4.jpg` (v2, v3, the design, v4, both models). The spec is `scripts/look/paint/v2s1_v4.json`. `paint.py --design` writes the flat design (set `v4design`) and plain `paint.py` paints the same shapes (set `v4`). v1-v3 still render unchanged.
+- **The engine gains `"style": "designed"`: designed shapes in, paint out.**
+  - Each plane is a set of hand-placed billows `[x, y, r, flat, accent]` plus a flat base line.
+  - ONE form per cloud: a lit band follows the whole outline on the light's side (`lit_px`), then a mid band (`mid_px`), then one big shade mass and a shade underside (`under_px`).
+  - Only the accent billows get their own lit cap inside, for depth.
+  - The paint keeps those masses. Edges are firm where they face the light and soft and dry-broken on the shade side, as patches and dry strokes along the edge, never combs. A few broad strokes go inside each mass along its billow, and nothing is smudged or greyed.
+  - The sky is a designed gradient (`gradient` stops + the sun's warmth) with a faint diagonal stroke texture.
+- **Colour, one dusk family lit by the low sun on the left:**
+  - the sky runs lavender-blue at the top, rose-lilac through the caption band and peach-gold at the horizon;
+  - the clouds are gold on the lit tops, peach in the mid band and lilac-violet on the shade sides;
+  - the words' background stays light (luma 204 against the ink's 32).
+- **The 4 designed cloud planes:**
+  - **near** (depth 0): the cumulus, 9 billows, one accent, full value range;
+  - **0.4:** a flatter bank (0.55), 7 billows, 42 % of the way to the sky's colour, narrower bands;
+  - **0.7:** a thin low deck (0.38) in the west gap, 60 % of the way to the sky's colour;
+  - **0.9:** five lit streaks on the sun's line.
+  - Each nearer edge leaves a 12 px band of lighter air on the plane behind it.
+- **The tree:** one designed lit mass on the sun's side and one shade mass, one accent lobe, and the trunk kept crisp from the flat.
+- **Weak spots:**
+  - the paint changes only 2.6 % of the design's pixels (mostly the shade-side edges), so the strokes inside the masses are still faint;
+  - the accent billow and the tree's lit band read a little graphic (crescent-like);
+  - the water stays v2's mint under the new dusk sky;
+  - the caption band is a gentle lilac-to-rose ramp (spread 4.9), not flat.
+
