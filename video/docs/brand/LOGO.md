@@ -133,3 +133,6 @@ Earlier rounds also used Pip's periwinkles (`#7A7FE3`, `#6A6ED6`, `#AEB2F4`), pe
   shapes, one strong colour, usable everywhere).
 - 2026-10-29 ~20:25 UTC, on round 6, written to the logo session directly: "I like the peel yes" -> THE PICK: The Peel.
   Next: refine it into the finished mark (stills only) and the export pack.
+- 2026-10-29 ~20:31 UTC, on The Peel refined (A or B), written to the logo session directly: "Maybe just play with color
+  schemes" then "Okay pick one and give me the final one" -> a colour exploration of The Peel, then the final logo
+  (the session picks), its export pack.
