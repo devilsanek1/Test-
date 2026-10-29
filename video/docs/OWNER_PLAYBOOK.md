@@ -577,11 +577,13 @@ Maintenance at the end).
   panels, QA suites, fix passes, as the quality needs. Iteration is a quick experiment for the owner to judge (a look
   test, a rethought scene, a style probe, a "what if"): one or two agents, no panels, no critics, no QA suites, rough
   where rough is enough (a still, a few stages, a short clip), the result in about an hour and shown at once; the
-  owner's verdict is the review. Ask "is this a film or a question?" before planning: a question is an iteration, and
+  owner's verdict is the review. A look iteration starts with STILLS: motion only once the owner has approved the
+  still. Ask "is this a film or a question?" before planning: a question is an iteration, and
   only what the owner picks from it goes into production (then with the full gates). The no-limit rule on creative
   tokens is about quality in production; in iteration, speed of feedback is the quality. — ("So like we have the
   'production' process and we have 'iteration' process that needs to be more lightweight", 2026-10-29, after a day-long
-  look test with lanes, panels and fix passes that the owner judged in one glance).
+  look test with lanes, panels and fix passes that the owner judged in one glance; "Again let’s start with stills";
+  "No video yet", 2026-10-29, on a painted-look test briefed as a still plus a clip).
 - **Every lesson goes into the generic process, committed** (playbook, a PIPELINE gate, the studio toolkit). — ("we gradually get better", v3, 2026-10-26).
 - **A rejected cut restarts clean.** When the owner says "I don't like it, start from scratch", drop the old visual
   work (archive it), skip the gates the owner names (e.g. no sketch) and make the finished film directly with full
