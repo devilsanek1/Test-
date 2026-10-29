@@ -1,0 +1,131 @@
+{
+ "film": "v2s1_v3",
+ "spec": "scripts/look/paint/v2s1_v3.json",
+ "pieces": [
+  {
+   "id": "v2s1/sky",
+   "src": "paint/v2s1_v3/sky.png",
+   "box": [
+    0,
+    0,
+    1080,
+    1100
+   ],
+   "style": "sky",
+   "seed": 13,
+   "from": "v2s1/sky"
+  },
+  {
+   "id": "v2s1/clouds_p0",
+   "src": "paint/v2s1_v3/clouds_p0.png",
+   "box": [
+    0,
+    670,
+    460,
+    100
+   ],
+   "style": "cloudscape",
+   "seed": 83,
+   "from": "v2s1/clouds",
+   "group": "clouds",
+   "depth": 0.92
+  },
+  {
+   "id": "v2s1/clouds_p1",
+   "src": "paint/v2s1_v3/clouds_p1.png",
+   "box": [
+    -40,
+    590,
+    480,
+    110
+   ],
+   "style": "cloudscape",
+   "seed": 83,
+   "from": "v2s1/clouds",
+   "group": "clouds",
+   "depth": 0.7
+  },
+  {
+   "id": "v2s1/clouds_p2",
+   "src": "paint/v2s1_v3/clouds_p2.png",
+   "box": [
+    80,
+    100,
+    640,
+    190
+   ],
+   "style": "cloudscape",
+   "seed": 83,
+   "from": "v2s1/clouds",
+   "group": "clouds",
+   "depth": 0.45
+  },
+  {
+   "id": "v2s1/clouds_p3",
+   "src": "paint/v2s1_v3/clouds_p3.png",
+   "box": [
+    300,
+    0,
+    780,
+    660
+   ],
+   "style": "cloudscape",
+   "seed": 83,
+   "from": "v2s1/clouds",
+   "group": "clouds",
+   "depth": 0.0
+  },
+  {
+   "id": "v2s1/tree",
+   "src": "paint/v2s1_v3/tree.png",
+   "box": [
+    0,
+    1284,
+    310,
+    270
+   ],
+   "style": "foliage",
+   "seed": 43,
+   "from": "v2s1/tree"
+  },
+  {
+   "id": "v2s1/pier",
+   "src": "paint/v2s1_v3/pier.png",
+   "box": [
+    832,
+    1488,
+    248,
+    432
+   ],
+   "style": "surface",
+   "seed": 55,
+   "from": "v2s1/pier"
+  },
+  {
+   "id": "v2s1/farroofs",
+   "src": "paint/v2s1_v3/farroofs.png",
+   "box": [
+    0,
+    724,
+    396,
+    244
+   ],
+   "style": "surface",
+   "seed": 62,
+   "from": "v2s1/farroofs"
+  },
+  {
+   "id": "v2s1/fartower",
+   "src": "paint/v2s1_v3/fartower.png",
+   "box": [
+    234,
+    566,
+    136,
+    402
+   ],
+   "style": "surface",
+   "seed": 68,
+   "from": "v2s1/fartower"
+  }
+ ]
+}
