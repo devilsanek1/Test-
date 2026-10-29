@@ -674,6 +674,13 @@ def broad_paint(piece, rng, sil, tgt, light2, calm=None, ref=None):
     alpha = np.clip((sd + depth * (drag - 0.55) * 2.0 + b.get('edge_wobble', 10) * coarse + soft * 0.5) / soft, 0, 1)
     # inside the mass the paint is whole (only the rim breaks up)
     alpha = np.maximum(alpha, np.clip((sd - depth * 1.2) / 4, 0, 1))
+    if ref is not None and b.get('crisp_colors'):
+        # parts that keep a clean edge (a trunk, a post): where the flat has one of these colours, no break-up
+        crisp = np.zeros((H, W), bool)
+        for hx in b['crisp_colors']:
+            crisp |= np.abs(ref - hex_rgb(hx)[None, None, :]).sum(-1) < 0.12
+        crisp = ndimage.binary_dilation(crisp, iterations=4)
+        alpha = np.where(crisp, np.clip((sd + 1.0) / 2.0, 0, 1), alpha)
     cv = Canvas(H, W)
     gentle = fbm(rng, H, W, b.get('vary_cell', 140), 3)
     base = shift(tgt, dL=b.get('vary', 0.006) * gentle)

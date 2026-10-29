@@ -424,9 +424,10 @@
       ]
      ],
      "cuts": [
-      0.3,
-      0.6
-     ]
+      0.24,
+      0.58
+     ],
+     "form_blur": 22
     }
    ]
   },
@@ -482,12 +483,12 @@
     ],
     "jitter_L": 0.014,
     "tau": 0.22,
-    "edge_px": 6,
+    "edge_px": 3.5,
     "edge_soft": 2.0,
-    "edge_cell": 18,
-    "edge_wobble": 4,
-    "drag_along": 18,
-    "drag_across": 1.6,
+    "edge_cell": 22,
+    "edge_wobble": 5,
+    "drag_along": 10,
+    "drag_across": 3.0,
     "edge_strokes": 0.9,
     "edge_width": [
      10,
@@ -500,7 +501,10 @@
      0.12,
      0.22
     ],
-    "chisel": 0.03
+    "chisel": 0.03,
+    "crisp_colors": [
+     "#AF7263"
+    ]
    }
   },
   {
