@@ -277,7 +277,9 @@ Maintenance at the end).
   engine to be able to do that", 2026-10-29: so the ENGINE gains the paint pass, `src/lib/paint/`, reusable by every film;
   on the painted still v2, with refs 02 and 03: "The drawing quality is not the same it needs to be a bit more subtle
   and more beautiful / Also I like the drawing style in these two more"; "And again even clouds have layers that give a
-  sense of depth but yours do not", 2026-10-29).
+  sense of depth but yours do not", 2026-10-29). AI-painted background plates (a model repaints only our background
+  pieces from our own layout; the story layers stay ours) are approved as a TEST, judged against our own painter:
+  "I mean let’s try and see if it gets us there", 2026-10-29 (`docs/studies/2026-10-28_city_posters/ai_paint/BRIEF.md`).
 - **Texture and lines: VERY subtle.** No outlines: as on the city posters, shapes are separated by light and shade (a
   lit and a shade face on every volume, the subject's the deepest) and by value, never by a line drawn round them
   (the A vs B picture's B). Thin lines only on small things that are lines (window bars, railings, rigging): dark,
