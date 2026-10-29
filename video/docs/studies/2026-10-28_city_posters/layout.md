@@ -185,10 +185,105 @@ sentence; LD §8's first two bullets; v2S keeps its values. `research/vertical.m
 read). **Risk:** low; the §6 resolutions change numbers and need the owner's yes where they touch the owner's words.
 
 ## 8. Part B: reconciled with the city posters
-*(placeholder: the synthesis fills it from `composition.md` (frame structure, the one hero, framing, the title zone, the
-9:16 mapping) and `perspective.md` (viewpoint, horizon, vanishing points, depth cues, the ground).)* Questions Part A
-leaves for it: (a) does the posters' title zone map onto our caption band and the cover, or ask for a new zone; (b)
-their horizons and viewpoints against §2's per-shot horizons, and the designed view (the owner: "it is a unique camera
-angle and composition of objects is fascinating"; open in DIR); (c) the hero's spot: our centre axis vs the posters'
-placement; (d) what of a 3:4 poster's layout survives 9:16, the UI zones (§1) and motion; (e) the patchwork of mid and
-far blocks against our planes rule (CR §f; open). Each answer lands in §1-§5's structure, marked "owner to approve".
+*Written by the synthesis (2026-10-29) from `composition.md` (CO), `perspective.md` (PE), `pro_1_depth.md` (P1),
+`style.md` (ST), `details.md` (DE), `pro_2_hierarchy.md` (P2), `pro_4_colour.md` (P4); the whole study: `STUDY.md`.*
+Each line carries its status: **[owner]** = already the owner's (the quote or rule named), **[open]** = the owner's
+call, **[proposal]** = ours, to be seen in the next G4 look clip. Part A stands as written until the owner approves a
+change; only [owner] lines may move into `docs/look/LAYOUT.md` (§7 item 7).
+
+### 8.1 What stays: Part A holds against the posters
+- **The zones (§1).** Extended into 9:16 (full width, the poster's top edge on the band's top, y 300) a poster's title
+  lands inside our caption block (y 434-500) in 7 of 7, its tallest top at y 605-832, its hero's centre in the read
+  zone in 6 of 7 and its darkest near frame under the bottom UI (CO §4): the posters fit our map; they ask for no new
+  zone. **(a) answered:** the posters' title zone IS our caption block, on the film and on the cover. [owner: DIR 10]
+- **The band stays one calm flat field.** The posters' skies change by dL* 0.4-3.1 across the block's rows (median
+  1.4); 4 of 7 meet our <= 1.5 (CO §4). We take a poster-like sky flattened inside the band, its gradient above y 290
+  and below y 600, and no texture in the band (rule 10; P4 §3.4). [owner: DIR 6, 10]
+- **Cozy stays the home** (>= 50 % of the runtime). The poster frame's sky (36-53 % of a poster, 45-58 % once
+  extended) is COZY_AND_SCALE's exposed dose: 1-3 frames a film (CO §5). [owner: DIR 7]
+- **One subject at a time, owning the contrast.** The posters' hero is often quiet (the salience peak on it in 2 of 7;
+  the near frame or a second icon holds it in 5: CO §2); in a 2-4 s shot that is the split focus the owner rejected
+  ("too many moving parts", v3). We keep rule 2. [owner: DIR 2]
+- **Words few and big, no title in the film's frame, the cover title in our caption type.** The posters' title caps
+  (16-30 px at 1080) shrink to 5-10 px on a 360-px grid tile; ours are 17-20 px there (CO §6). [owner: playbook]
+- **One camera for the near world; the ground recedes** (CR §f.4); the posters agree for everything near (PE §1.2).
+  [owner: v2 G4, "no perspective"; the far stage below is the only proposed exception]
+
+### 8.2 What the posters change (in Part A's order)
+**§1 The frame**
+- **The bottom and the side edges become the near frame:** dark, detailed masses cut by >= 2 edges (leaves, a rail, a
+  rock, roof edges), median L* <= 60 and >= 30 from the air, edges >= 0.3, open ground <= 15 % of the frame (PE L1:
+  the posters' nearest plane L* 45, open ground 7 %, the bottom fifth 59 % masses; v2 74, 25 %, 9 %); bottom corners
+  L* <= ~55 (CO L1: posters 44 / 53, v2 ~72 / 74). Masses already may run under the UI (§1). [proposal; its values rest
+  on the owner's full value range, DIR 6]
+- **The one quiet field, measured:** when the sky is the field, calm below the skyline <= 5 % of the frame (posters 1-3
+  %, v2 19-31 %: CO §1, §7) and no edge-free field over 2 % below the sky (P4 §3.5); 73-90 % of the detail in the lower
+  half (v2 53-62 %). The bounded-floor variant (LD §0) stays for cozy shots whose quiet field is the floor. [proposal]
+- **The far anchor's zone:** its top at y >= 620 (just under the band), its base on the horizon at y ~850-1050, >= 65 %
+  of the width and off >= 1 side edge, 6-20 % of the height (P1 §3.2). [proposal]
+- **Pip's spot:** the busiest 60-px spot of y 700-1480, x 140-760, >= 250 px from the hero, in the near patchwork; never
+  the sky, the band, the rail or the hero (CO §4). [owner: hidden, DIR 2; the spot rule: proposal]
+
+**§2 Shot grammar**
+- **A new row, the poster frame** (the home place's establishing view and the scale landing's end frame): open sky from
+  the frame top to the hero's shoulders (~45-58 % of the frame, the band inside it, flat), the hero standing in the read
+  zone with its top at y >= 600, centred or on the left third, >= ~80 % of the detail in the lower half, dark bottom
+  corners (CO L1). v2's S5 crane end is one already (sky 39 %, the subject 16.8 %, corners 57 / 57: CO §7). CG's sky
+  30-40 % stays the scale move's default until the owner sees one. [proposal; CO question 1]
+- **(b) Horizons.** For a place-led vista the posters' near eye level (median 0.74 H, 0.62-0.77) maps to y ~1380-1480;
+  where a far city is lifted onto its own horizon (Hanoi, Buenos Aires, Cape Town: 0.14-0.27 H higher), that far stage
+  sits at ~0.57-0.63 H, y ~1090-1215, behind a hiding band with no receding line (PE L2, `img/perspective_916.jpg`). CG's
+  rooftop landings (S1 0.40 H, S5 0.46 H) stay the Arcane option; a figure-led street keeps the head on the eye level
+  at 0.50-0.60 H (at 0.74 H the body would fall under the bottom UI: PE L2). [the low vista eye: proposal; the far
+  stage: open, PE question 1, it clashes with CR §f.4-5's one camera per shot]
+- **Vanishing points off the centre:** exterior vistas default to a yawed camera (`groundCam` yaw 20-25 deg puts the VP
+  at or past a side edge with f 1400); the posters never centre one, v2 centres it in 5 of 8 shots (PE L4). CS's street
+  (VP 0.60-0.70 W, one sight line) and a centred one-point corridor (v1) stay choices. [proposal]
+- **Landmarks are frontal elevations, huge yet far:** no convergence, verticals parallel (21 of 23 posters'
+  structures), the base hidden behind a band (5 of 7), the top in open sky at y >= 620, drawn up to 1.4-3.6x one
+  camera's size, declared in W1 (PE L3). [proposal; rule 2's "never a flat elevation of stacked bands" read for floor
+  bands only: open, PE question 2]
+
+**§3 Composition rules**
+- **(c) The hero's spot:** centred (x 380-700) or on the left third (x ~200-450, est.), never the right third below
+  y 840: the posters' right-third heroes (Hanoi x 604-1061, Kyoto 571-1048) land under the rail (CO §4). [centre:
+  owner (DIR 2's subject axis); the left third: open, CO question 2]
+- **The hero big AND loud:** in a place-led shot the landmark is the biggest icon (>= 2x the next; posters median
+  2.4x), ~8-15 % of the frame (est.), its top in open sky (>= 30 % of its ring), and it owns the salience peak (CO L2;
+  v2's subjects lead per pixel but cover 1.4-4.6 %). Part A's subject box stays for figure-led beats. [proposal]
+- **Lines don't lead, the sky does:** the posters' diagonals cross the hero no more often than chance (lead lift median
+  0.78: CO §1); the hero is found by size, sky and value. Part A's leading lines stay. [no change]
+- **Planes:** 5-7 and the sky in every poster (PE §1.3), as CR §f.1's vista count (§6 row 5); in two value groups with
+  a gap (P1 §3.1, STUDY §1). [range: owner, DIR 6; numbers: proposal]
+- **(e) The patchwork vs our planes rule:** frontal on mid and far masses; on a ground only projected through
+  `groundCam` (facets receding to the VP, never level bands seen edge to edge: PE §5); in the sky only as masses (ghost
+  blocks within dE 6 of the air), never abstract rectangles (ST §4); blocks 3.5-7.5 % W, far 6-10 % (ST §1.3); each
+  facet belongs to its plane and takes its plane's step, so CR §f's ladder holds. [open: the owner has not answered on
+  the patchwork]
+
+**§4 Across shots**
+- **A far landmark carries a join:** kept at one screen spot (±8 %) and size (±20 %) it is a B thread match between two
+  near places of one city (CO §5). Never three wides in a row on a centred landmark (§2 "angle"). [proposal]
+- **The capriccio as a sequence:** several icons of a place, one per beat, the establishing frame with exactly one A
+  (CO L5); which icons is content (the owner). [proposal]
+- **The float by distance:** each plane moves by 1/z (near 1, plane 0 0.6, +1 0.24, +2 0.10, +3 0.04, the anchor, the
+  far stage and the sky 0), or by its measured scale when W1 declares units (P1 §3.4, PE L5). [the parallax float:
+  owner, DIR 8; the numbers: a code-vs-doc fix, `lib/depth.ts` `PARALLAX_K` breaks CS §4's 1.8x]
+
+**§5 The cover and the grid**
+- **(d) What survives 9:16:** the extension (full width, top edge at y ~300, ~300 px more sky above, ~200 px more near
+  frame below), the three bands, the dark bottom corners. What does not: the crop (the title under the top UI at y
+  181-268, a tower through the band in 6 of 7, a quarter of the width lost), the right third, a steep sky in the band
+  (CO §4, §9). In motion the far stage and sky hold still and the near frame moves most; a truck along the far stage's
+  junction is the one move that could expose it (PE L2). [proposal]
+- **One cover frame for the series:** the core line in the sky in our caption type, the film's A drawn big under it
+  (~8-15 %, est.) with open sky round its top, the near frame dark at the bottom, all inside the 4:5 crop y 285-1635
+  (CO L6). [covers read as one series: owner (playbook ONE LOOK); the template: proposal; the case and Pip on the
+  cover: open, §6 rows 15-16]
+
+### 8.3 Into LAYOUT.md (§7 item 7)
+When approved: the poster-frame row into §2; the near frame, the quiet-field numbers and the far anchor's zone into
+§1; the hero's spot and size into §3; the far-landmark carrier and the 1/z float into §4; the cover template into §5;
+`composition.py frame` (the overlay and numbers on any 1080 x 1920 still) promoted to `scripts/qa/check_composition.py`
+in §6 (CO L8, cost M). Cost of Part B in the docs: S; risk: a formula if every film opens on the same poster frame
+(vary the hero's side and the near frame per film: CO L1).
