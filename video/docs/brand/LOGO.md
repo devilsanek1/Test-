@@ -1,11 +1,31 @@
 # Studio logo: "What's All the Fuss About?"
 
-**Status, 2026-10-29 ~20:21 UTC: round 6 (from scratch: modern marks; stills only; no text, no elephant), with the
-owner.** The sheet: `video/deliverables/brand/logo_options_v6.png`. Rounds 1-5 are superseded by the owner's verdicts
-below. All rounds are iterations (owner rule "Two modes"); stills only until the owner picks and approves one ("No
-video yet"). Brief: the owner asked the orchestrator to "spin up a thread to generate me the modern beautiful logo to
-put on the studio". The logo lives on the avatar (a circle crop that must read at 110 px and at 40 px), as a small end
-card or watermark in the videos, in the corner of a cover and on a banner.
+**Status, 2026-10-29 ~20:28 UTC: PICKED, The Peel (round 6); refined, with the owner for the last call (A flat or B
+with the fold shadow).** The sheet: `video/deliverables/brand/logo_peel_v1.png`; the export pack:
+`video/deliverables/brand/peel/`. Stills only until the owner approves a still ("No video yet"). Brief: the owner asked
+the orchestrator to "spin up a thread to generate me the modern beautiful logo to put on the studio". The logo lives on
+the avatar (a circle crop that must read at 110 px and at 40 px), as a small end card or watermark in the videos, in
+the corner of a cover and on a banner.
+
+## The Peel (the owner's pick: "I like the peel yes")
+A speech bubble with its corner peeled back: what everyone's talking about, opened up. No text, no elephant.
+- **Geometry, exactly as picked:** a circle with a straight tail (between 118 and 152 degrees, the tip at 135 degrees,
+  1.45 r out); the fold perpendicular to the upper-right diagonal at 0.56 r from the centre; the flap is the cut-off
+  cap folded over that line. Built from the unit circle in `video/brand/logo/peel_final.py`.
+- **A or B:** A is flat, as picked; B adds a crisp fold shadow (a sliver of coral shade under the flap's curved edge,
+  the films' light and shade), visible at large sizes, gone at small ones. **My pick: B.**
+- **Colours:** coral `#F0643C` (its shade `#C64B27`), the flap `#F8ECE0`, on ink `#1F1630`. On light grounds the mark
+  inverts (an ink bubble, a coral peel), since a cream flap vanishes on cream. One colour (ink or white): the flap
+  parted from the body by a clean cut, with real knock-outs.
+- **Sizes:** the avatar fills 60 % of the square (the platforms crop the circle); it holds at 40 px as a coral bubble
+  with a light corner. The end card centres the mark at 42 % of its width; the banner keeps it inside YouTube's
+  1546 x 423 safe area.
+- **The export pack** (`video/deliverables/brand/peel/`, all from B): `peel_avatar_1080.png` (Instagram, TikTok, YouTube),
+  `peel_mark_1024.png` (transparent), `peel_watermark_white_512.png` (transparent), `peel_end_card_1080x1920.png`,
+  `peel_banner_2560x1440.png`. Vectors in `video/brand/logo/svg/peel/`: `peel_avatar.svg` (B), `peel_avatar_flat.svg`
+  (A), `peel_avatar_light.svg`, `peel_mark.svg`, `peel_mark_light.svg`, `peel_one_colour_ink.svg`,
+  `peel_one_colour_white.svg`, `peel_end_card.svg`, `peel_banner.svg`. Rebuild: `cd video/brand/logo && python3
+  peel_final.py` (no fonts needed).
 
 ## Round 6: modern marks, one idea each
 Built with the methods of today's strong marks, never their shapes (research: one idea, a few bold shapes, warm human
@@ -69,6 +89,8 @@ the elephant `#1A1228` with a rim `#F5A766`; the window's glow `#FFF4DA` -> `#FF
 Earlier rounds also used Pip's periwinkles (`#7A7FE3`, `#6A6ED6`, `#AEB2F4`), peach `#F6B494` and the warm sky `#F9E3D2`.
 
 ## Files
+- The Peel, final: `video/brand/logo/peel_final.py` (geometry, the export pack, the sheet); `svg/peel/`;
+  `../../deliverables/brand/peel/`; the sheet `logo_peel_v1.png`.
 - Round 6: `video/brand/logo/make_logos_r6.py` (the sheet) and `marks_r6.py` (the marks, their one-colour
   versions, and the dropped ones); `svg/r6/`. Rebuild: `cd video/brand/logo && python3 make_logos_r6.py`.
 - Round 5: `video/brand/logo/make_logos_r5.py` (the sheet) and `marks_r5.py` (the city, the three variants, their
