@@ -10,6 +10,9 @@ top, crisp.
         --tree out/aipaint/tree/tree_s0.55_seed1029.png --set v2s1_ai1
 
 Upscaling is Lanczos (PIL). The pier stays our design (v4design's PNG, listed so the set is complete).
+--edge-repair N: the frame's top N rows of the sky take row N (the model paints a thin darker rim along a canvas edge;
+the rule: no paper edge at the top of the frame). The proper fix for production: paint each plate with a bleed margin
+beyond the frame, so the model's edge falls outside it.
 """
 import argparse, json, os, sys
 import numpy as np
@@ -35,7 +38,7 @@ def main():
     ap.add_argument('--sky', required=True)
     ap.add_argument('--tree')
     ap.add_argument('--set', default='v2s1_ai1')
-    ap.add_argument('--meta', help='painter label for the manifest, e.g. "SDXL base 1.0 img2img s0.55 seed 1029"')
+    ap.add_argument('--edge-repair', type=int, default=0, help='top rows of the sky replaced by the next row')
     a = ap.parse_args()
     out = os.path.join(ROOT, 'public/paint', a.set)
     os.makedirs(out, exist_ok=True)
@@ -46,6 +49,10 @@ def main():
     sky = Image.open(a.sky).convert('RGB').resize((sw, sh), Image.LANCZOS)
     frame = Image.new('RGB', (G.FW, G.FH))
     frame.paste(sky, (sx, sy))
+    if a.edge_repair:
+        f = np.asarray(frame).copy()
+        f[:a.edge_repair] = f[a.edge_repair]
+        frame = Image.fromarray(f)
     tree_frame = None
     if a.tree:
         tx, ty, tw, th = G.TREE_PLATE['frame_rect']
@@ -76,7 +83,8 @@ def main():
         Image.fromarray(np.dstack([rgb, alpha]).astype(np.uint8), 'RGBA').save(os.path.join(out, name + '.png'))
         q['src'] = f'paint/{a.set}/{name}.png'
         q['seed'] = m.get('seed', p['seed'])
-        q['painter'] = f"{m.get('model', '?')} img2img strength {m.get('strength', '?')} seed {m.get('seed', '?')}"
+        cn = f" + {m['controlnet']} {m['controlnet_conditioning_scale']}" if m.get('controlnet') else ''
+        q['painter'] = f"{m.get('model', '?')} img2img strength {m.get('strength', '?')}{cn} seed {m.get('seed', '?')}"
         pieces.append(q)
     json.dump({'film': a.set, 'from_design': 'public/paint/v2s1_v4design/manifest.json',
                'spec': 'scripts/look/aipaint (make_inits.py, sdxl_paint.py, cut_plates.py)', 'pieces': pieces},
