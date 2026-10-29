@@ -153,3 +153,14 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   `script-clarity` (`docs/retro/2026-10-29_script_clarity/`): two research lanes, one synthesis (principles, rule text,
   a clarity lint spec), the rules integrated, `check_clarity.py` built, the script reworked (line 1 kept), a cold
   three-viewer panel, a critic and a fix pass.
+- 2026-10-29 ~16:05 UTC, G1 (on draft 2 after fix round 3): "you are again packing more information than needed in the
+  short update - its actually okay to keep the text longer if needed, but you are having again too much of a sidequest -
+  like specifically this "Computers have heated Helsinki before. In twenty ten, a small data center under a cathedral
+  started heating homes." is the sidequest that doesn't really add much to the story. Also i would add more human /
+  conversation like sentences TACTICALLY like before this "Just one of them makes as much heat as FORTY kettles, boiling
+  non-stop." i want to say something like "to put it into perspective" or something like this. or something like
+  "Actually" / "so" that just adds a bit more human to it, figure out what to add / again generalize this feedback and
+  evalute the script once again" -> the cathedral beat is cut (the time-order variant's panel was stopped: moot);
+  -> rules: playbook ONE SUBJECT, GONE DEEP ("No side quests, and only the information the story needs") and Script and
+  voice ("Human connectors, placed TACTICALLY"); draft 3 by a writer, then a cold panel (which line could go; where it
+  sounds like a person) and a critic, a fix pass and a re-hear (workflow `v4-g1-draft3`).

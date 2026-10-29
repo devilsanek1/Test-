@@ -51,7 +51,16 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   towers, not from visiting them. Our v5 draft 1 broke it: orbit, a mountain in Italy, the sea off Shanghai, Stockholm,
   then Helsinki in 43 s, one line each and nothing deepened (a list wearing a story's clothes). **Test, at G0 and G1:**
   name the film's one thing in 3 words; count the places (one home place, at most one comparison shot); every line
-  must be about the one thing. This tightens CRAFT §a's "at most 3 places". — ("I what I don't like about the current story is we are too wide and unfocused again like we talked about a bunch of topics all within 30 seconds - we started with space then mountain then  Stockholm then Helsinki / Compare it with big bend story and create a new rule for storytelling", v5 G1, 2026-10-29).
+  must be about the one thing. This tightens CRAFT §a's "at most 3 places". **No side quests, and only the information
+  the story needs:** a beat that doesn't carry the one story toward its payoff goes, however true, weird or fun (v4's
+  2010 data center under a cathedral, a "twist" since G0: "the sidequest that doesn't really add much to the story").
+  Test every beat at G0 and G1: cut it in your head; if the viewer still gets the story and the payoff, it stays cut.
+  A sentence may grow when the words make it more natural or clearer; the film never carries more facts than its
+  story needs. — ("I what I don't like about the current story is we are too wide and unfocused again like we talked about a bunch of topics all within 30 seconds - we started with space then mountain then  Stockholm then Helsinki / Compare it with big bend story and create a new rule for storytelling", v5 G1, 2026-10-29;
+  "you are again packing more information than needed in the short update - its actually okay to keep the text
+  longer if needed, but you are having again too much of a sidequest - like specifically this 'Computers have heated
+  Helsinki before. In twenty ten, a small data center under a cathedral started heating homes.' is the sidequest that
+  doesn't really add much to the story", v4 G1, 2026-10-29).
 - **The first line sounds like a friend starting a story, and still pulls: curious, never pushy. "Did you know that
   ..." is the owner's model opener.** The Big Bend reel: "Did you know that New York once got a proposal to build this
   giant 2,000-foot tall bending skyscraper? It's called the Big Bend." A friend's question with a surprising fact in it
@@ -107,6 +116,17 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   exactly is it - heat or air or sea?", v4 G1, 2026-10-29; earlier, "Who even knows WordPress now?", v1, October 2026.)
 - **Sound like a real person talking, never like AI (the creative brief's RULE #1): check every sentence for
   AI-sounding wording;** the everyday words it asks for are the clarity rule's, above. — (v1, 2026-10-24).
+- **Human connectors, placed TACTICALLY: a few spoken words a person telling a friend would use, at the moments that
+  need a hand:** "To put that into perspective," before a comparison or a big number; "Actually," before the part that
+  surprises; "So," at a consequence; "Now," when the story moves on. A few in a film (about two to four), never on
+  every line, each one true to the sentence it opens. They make the voice a person's and tell the listener what kind
+  of sentence comes next (listeners follow and recall better with such markers: Chaudron and Richards 1985,
+  `docs/retro/2026-10-29_script_clarity/research_ear.md` finding 11). They are not RULE #1's stock reveal phrases
+  ("Here's the thing", "The catch?", "Turns out", "Let that sink in"), which promise drama and name nothing and stay
+  banned. — ("i would add more human / conversation like sentences TACTICALLY like before this 'Just one of them makes
+  as much heat as FORTY kettles, boiling non-stop.' i want to say something like 'to put it into perspective' or
+  something like this. or something like 'Actually' / 'so' that just adds a bit more human to it, figure out what to
+  add", v4 G1, 2026-10-29).
 - **Rhythm: never a run of long sentences; put a short one (5 words or fewer, e.g. "Let's find out." "But there was a
   problem.") after every 1-2 long ones, at the turns, and the short line keeps its noun** ("But Helsinki wants that
   heat.", never a bare "it" after three things it could mean: five of v4 draft 1's six short lines had shed their
