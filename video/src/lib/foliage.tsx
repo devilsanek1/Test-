@@ -205,6 +205,16 @@ function litSide(line: Pt[], L2: Pt): 1 | -1 {
 /** The lit band of a ribbon (55 % of its width on the light's side) and its shade band (the other 35 %). */
 const litBandOf = (side: 1 | -1, k = 0.1): [number, number] => (side > 0 ? [-k, 1] : [-1, k]);
 const shadeBandOf = (side: 1 | -1, k = 0.3): [number, number] => (side > 0 ? [-1, -k] : [k, 1]);
+/** The part of a line where a width function stays >= `min` px (the lit band of a thin ribbon would be a sub-2 px
+ *  stripe: it twinkles in the float, so a thin end stays one tone). */
+function wideEnough(line: Pt[], w: (s: number) => number, min: number): {line: Pt[]; w: (s: number) => number} | null {
+  const us = arcParams(line);
+  const keep = line.map((p, i) => ({p, u: us[i]})).filter((q) => w(q.u) >= min);
+  if (keep.length < 2) return null;
+  const u0 = keep[0].u;
+  const u1 = keep[keep.length - 1].u;
+  return {line: keep.map((q) => q.p), w: (s: number) => w(lerp(u0, u1, s))};
+}
 const polyLength = (line: Pt[]) => {
   let s = 0;
   for (let i = 1; i < line.length; i++) s += Math.hypot(line[i][0] - line[i - 1][0], line[i][1] - line[i - 1][1]);
@@ -1180,7 +1190,8 @@ function buildCrown(spec: CrownSpec): CrownGeom {
       d: limbs
         .map((l) => {
           const b = litBandOf(litSide(l, L2), -0.25);
-          return polyD(ribbon(l, limbW, b[0], b[1]));
+          const wide = wideEnough(l, limbW, 6.5);
+          return wide ? polyD(ribbon(wide.line, wide.w, b[0], b[1])) : '';
         })
         .join(''),
       color: woodTone(bark.litPatches[1]),
@@ -1346,7 +1357,7 @@ function buildSpray(spec: LeafSpraySpec): SprayGeom {
   // the leaves: spread over the branch and the twigs by length, alternate sides
   const nLeaves = spec.leaves ?? 11;
   const totLen = twigs.reduce((acc, q) => acc + q.len * (q.id < 0 ? 0.7 : 0.75), 0);
-  type Lf = {tw: number; node: Pt; depth: 0 | 1 | 2; facets: {poly: Pt[]; v: number}[]; petiole: Pt[]; veins: Pt[][]; id: number; turned?: 'gold' | 'rust'};
+  type Lf = {tw: number; node: Pt; depth: 0 | 1 | 2; facets: {poly: Pt[]; v: number}[]; petiole: Pt[]; plate: Pt[]; veins: Pt[][]; id: number; turned?: 'gold' | 'rust'};
   const leaves: Lf[] = [];
   const vals: {v: number; w: number}[] = [];
   let id = 0;
@@ -1393,7 +1404,15 @@ function buildSpray(spec: LeafSpraySpec): SprayGeom {
         minWidth.push(2.0);
       }
       const turned = R.chance(spec.autumn ?? 0) ? (R.chance(0.6) ? 'gold' : 'rust') : undefined;
-      leaves.push({tw: tw.id, node: p, depth, facets, petiole, veins: vs, id: id++, turned});
+      // the base plate: a small rounded fan over the facets' meeting point (radius 0.1 of the leaf, >= 5 px)
+      const pr = Math.max(5, size * 0.1);
+      const plate: Pt[] = [];
+      for (let q = 0; q < 9; q++) {
+        const a = rad(axis) + Math.PI * (q / 8 - 0.5) * 1.6;
+        plate.push([base[0] + Math.cos(a) * pr, base[1] + Math.sin(a) * pr]);
+      }
+      plate.push([base[0] - Math.cos(rad(axis)) * pr * 0.35, base[1] - Math.sin(rad(axis)) * pr * 0.35]);
+      leaves.push({tw: tw.id, node: p, depth, facets, petiole, plate, veins: vs, id: id++, turned});
     }
   });
   const th = thresholds(vals, TONE_SHARES.near.slice(0, tones.length));
@@ -1411,6 +1430,9 @@ function buildSpray(spec: LeafSpraySpec): SprayGeom {
     const palette = lf.turned ? tones.map((c) => autumnTone(c, lf.turned as 'gold' | 'rust')) : tones;
     const layers: Layer[] = [{d: polyD(lf.petiole), color: palette[Math.max(1, Math.min(top1, 2))]}];
     layers.push(...levelLayers(items, palette));
+    // the base plate: where the ten facets meet they are slivers (sub-2 px wedges twinkle), so the blade's base is one
+    // tone, the stalk's
+    layers.push({d: polyD(lf.plate), color: palette[Math.max(1, Math.min(top1, 2))]});
     if (lf.veins.length) {
       const vt = lch(palette[Math.min(top1, kHi)]);
       layers.push({d: lf.veins.map(polyD).join(''), color: fromLch(Math.min(84, vt.L + 7), Math.max(8, vt.C - 3), vt.h - 4)});
@@ -1422,7 +1444,8 @@ function buildSpray(spec: LeafSpraySpec): SprayGeom {
     if (tw.id >= 0) {
       const b = litBandOf(litSide(tw.line, L2));
       wd.push({d: polyD(ribbon(tw.line, tw.w)), color: bark.shade});
-      wd.push({d: polyD(ribbon(tw.line, tw.w, b[0], b[1])), color: bark.lit});
+      const wide = wideEnough(tw.line, tw.w, 4.5);
+      if (wide) wd.push({d: polyD(ribbon(wide.line, wide.w, b[0], b[1])), color: bark.lit});
     }
     const ls = leaves
       .filter((q) => q.tw === tw.id)
@@ -1432,10 +1455,9 @@ function buildSpray(spec: LeafSpraySpec): SprayGeom {
   });
   for (let k = 0; k < share.length; k++) share[k] /= tot || 1;
   const bb = litBandOf(litSide(line, L2));
-  const wood: Layer[] = [
-    {d: polyD(ribbon(line, bw)), color: bark.shade},
-    {d: polyD(ribbon(line, bw, bb[0], bb[1])), color: bark.lit},
-  ];
+  const wideB = wideEnough(line, bw, 4.5);
+  const wood: Layer[] = [{d: polyD(ribbon(line, bw)), color: bark.shade}];
+  if (wideB) wood.push({d: polyD(ribbon(wideB.line, wideB.w, bb[0], bb[1])), color: bark.lit});
   const pts = cat(leaves.map((q) => cat(q.facets.map((f) => f.poly)))).concat(line);
   const bbox: [number, number, number, number] = [Math.min(...pts.map((p) => p[0])), Math.min(...pts.map((p) => p[1])), Math.max(...pts.map((p) => p[0])), Math.max(...pts.map((p) => p[1]))];
   return {spec, pivot: line[0], wood, twigs: twigGeoms, bbox, stats: {tones, leaves: leaves.length, minWidth: Math.min(...minWidth), share}};

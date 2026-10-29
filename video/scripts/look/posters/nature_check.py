@@ -23,12 +23,12 @@ docs/studies/2026-10-28_city_posters/test/ENGINE_NATURE.md). Two modes:
             python3 -I scripts/look/posters/nature_check.py motion --frames DIR [--still DIR] [--cal ...] [--out json]
 
   twinkle the clean test (motion cannot confound it): the same still frame moved by pure sub-pixel translations,
-          0-1 px in 0.1 px steps along x (frames 0-10) then y (11-21) (the demo's NatureTwinkle). Per 32 px tile the
-          core contrast (p99 of the 5 x 5 top-hat, the tile's 3 px border left out) across the 11 phases of each axis:
-          twinkle = (max - min) / mean, visible = max - min (L*). Calibrated by the same --cal boxes (1 px line ~0.5-0.6,
-          2 px line 0).
+          0-1 px in 0.1 px steps along x (frames 0-10) then y (11-21) (the demo's NatureTwinkle). Each thin FEATURE (a
+          connected part of the 5 x 5 top-hat over 3 L* at phase 0) is followed through its own mask grown by 2 px, and
+          its core contrast's swing over the phases is its twinkle in L* (the details lens's measure). Calibrated on the
+          demo's card: a 1 px line swings 7.1 L* (all of its 240 px), a 2 px line 0.0.
 
-            python3 -I scripts/look/posters/nature_check.py twinkle --frames DIR [--cal ...] [--out json]
+            python3 -I scripts/look/posters/nature_check.py twinkle --frames DIR --box x0 y0 x1 y1 ... --names a b ... [--out json]
 """
 import argparse
 import glob
@@ -179,37 +179,45 @@ def motion(args):
 
 
 def twinkle(args):
+    """Per thin FEATURE (a connected part of the 5 x 5 top-hat map over 3 L* at phase 0), its core contrast (the max
+    inside its own mask grown by 2 px, so a <= 1 px shift keeps it inside) across the 11 sub-pixel phases of each axis;
+    the swing is max - min (L*): the details lens's measure (details.md §3). Reported per region: how many of its feature
+    pixels belong to features swinging over 2 L* (the float's budget), and the worst features."""
     files = sorted(glob.glob(os.path.join(args.frames, '*.png')))
     if len(files) < 22:
         raise SystemExit(f'need the 22-frame sub-pixel sequence in {args.frames}')
-    TH = np.stack([thin_map(lab_of(f)[1][..., 0].astype(np.float32)) for f in files[:22]])
-    _, Hh, Ww = TH.shape
-    tile, b = 32, 3
+    T = np.stack([thin_map(lab_of(f)[1][..., 0].astype(np.float32)) for f in files[:22]])
+    k5 = np.ones((5, 5), np.uint8)
+    n, lab, st, _ = cv2.connectedComponentsWithStats((T[0] > 3).astype(np.uint8), 8)
+    feats = []
+    for i in range(1, n):
+        x, y, w, h, a = (int(v) for v in st[i])
+        if a < 3:
+            continue
+        pad = 3
+        y0, x0 = max(0, y - pad), max(0, x - pad)
+        big = np.zeros((h + 2 * pad, w + 2 * pad), np.uint8)
+        big[y - y0:y - y0 + h, x - x0:x - x0 + w] = (lab[y:y + h, x:x + w] == i)
+        big = cv2.dilate(big, k5)[: T.shape[1] - y0, : T.shape[2] - x0]
+        sub = T[:, y0:y0 + big.shape[0], x0:x0 + big.shape[1]]
+        core = np.array([float(q[big > 0].max()) for q in sub])
+        sw = max(core[:11].max() - core[:11].min(), core[11:].max() - core[11:].min())
+        feats.append((x, y, w, h, a, float(core.mean()), float(sw)))
 
-    def core_of(x0, y0, x1, y1, q=99):
-        return np.percentile(TH[:, y0:y1, x0:x1].reshape(22, -1), q, axis=1)
+    def region(x0, y0, x1, y1):
+        fs = [f for f in feats if f[0] >= x0 and f[1] >= y0 and f[0] + f[2] <= x1 and f[1] + f[3] <= y1]
+        px = sum(f[4] for f in fs)
+        tw = sum(f[4] for f in fs if f[6] > 2.0)
+        worst = sorted(fs, key=lambda f: -f[6] * f[4])[:3]
+        return {'features': len(fs), 'feature_px': px, 'px_swinging_over_2L': tw, 'share': round(tw / max(1, px), 3),
+                'max_swing_L': round(max([f[6] for f in fs] or [0]), 2),
+                'worst': [{'xywh': list(f[:4]), 'px': f[4], 'core_L': round(f[5], 1), 'swing_L': round(f[6], 1)} for f in worst]}
 
-    rows = []
-    for ty in range(0, Hh - tile + 1, tile):
-        for tx in range(0, Ww - tile + 1, tile):
-            c = core_of(tx + b, ty + b, tx + tile - b, ty + tile - b)
-            m = float(c.mean())
-            if m < 2.0:
-                continue
-            sw = max(float(c[:11].max() - c[:11].min()), float(c[11:].max() - c[11:].min()))
-            rows.append({'tile': [tx, ty], 'core_L': round(m, 2), 'twinkle': round(sw / m, 3), 'visible_L': round(sw, 2)})
-    rows.sort(key=lambda r: -r['visible_L'])
-    vis = [r['visible_L'] for r in rows]
-    out = {'tiles': len(rows), 'visible_L': {'p50': round(float(np.median(vis)), 3), 'p90': round(float(np.percentile(vis, 90)), 3), 'p99': round(float(np.percentile(vis, 99)), 3), 'max': round(float(max(vis)), 3)},
-           'tiles_visible_over_2L': sum(1 for v in vis if v > 2.0), 'worst_tiles': rows[:10]}
-    if args.cal:
-        cal = []
-        for i in range(0, len(args.cal), 4):
-            x0, y0, x1, y1 = args.cal[i:i + 4]
-            c = core_of(x0, y0, x1, y1, 99.5)
-            sw = max(float(c[:11].max() - c[:11].min()), float(c[11:].max() - c[11:].min()))
-            cal.append({'box': [x0, y0, x1, y1], 'core_L': round(float(c.mean()), 2), 'twinkle': round(sw / max(1e-6, float(c.mean())), 3), 'visible_L': round(sw, 2)})
-        out['calibration'] = cal
+    out = {'features': len(feats)}
+    boxes = args.box or []
+    names = args.names or [f'box{i}' for i in range(len(boxes) // 4)]
+    for j in range(len(boxes) // 4):
+        out[names[j]] = region(*boxes[4 * j:4 * j + 4])
     print(json.dumps(out, indent=1))
     if args.out:
         json.dump(out, open(args.out, 'w'), indent=1)
@@ -231,7 +239,8 @@ def main():
     m.add_argument('--out')
     w = sp.add_parser('twinkle')
     w.add_argument('--frames', required=True)
-    w.add_argument('--cal', type=int, nargs='*')
+    w.add_argument('--box', type=int, nargs='*', help='x0 y0 x1 y1 per region (the calibration lines among them)')
+    w.add_argument('--names', nargs='*')
     w.add_argument('--out')
     args = ap.parse_args()
     {'still': still, 'motion': motion, 'twinkle': twinkle}[args.mode](args)

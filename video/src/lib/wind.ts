@@ -11,7 +11,7 @@
 // Three responses, each a pure function of (t, position, seed), so every frame is deterministic and nothing boils:
 //   crownDeg      main bending: a crown rotates about its base, ±0.5-1.0 deg at 0.12-0.25 Hz
 //   clusterShift  detail bending: a leaf cluster shifts as a whole, ±1.5-3 px at 0.3-0.5 Hz, phased by its position
-//   leafFlutter   a near leaf turns about its stalk (±2-4 deg) and shifts (±1-2 px) at 0.6-1.2 Hz
+//   leafFlutter   a near leaf turns about its stalk (±1-1.5 deg: its tip ±1-2 px) and shifts (±1-2 px) at 0.6-1.2 Hz
 // Planes +3 and farther never sway (`planeSway`). The foliage's geometry is built ONCE (lib/foliage memoizes it): the
 // wind only moves it by transforms, never rebuilds a path.
 //
@@ -47,7 +47,8 @@ export type WindSpec = {
   crown?: {deg?: number; hz?: number};
   /** Detail bending: a cluster's shift (px, Hz). Default ±2 px at 0.4 Hz. */
   cluster?: {px?: number; hz?: number};
-  /** Flutter: a near leaf's shift and turn about its stalk (px, deg, Hz). Default ±1.2 px, ±3 deg at 0.85 Hz. */
+  /** Flutter: a near leaf's shift and turn about its stalk (px, deg, Hz). Default ±1.2 px, ±1.2 deg at 0.85 Hz (a
+   *  100 px leaf's tip then moves <= ~2 px: N7's "near leaves flutter ±1-2 px"). */
   leaf?: {px?: number; deg?: number; hz?: number};
   /** Designed gusts (default none: G3 times them). */
   gusts?: Gust[];
@@ -80,7 +81,7 @@ export const WIND_DEFAULTS = {
   speed: 180,
   crown: {deg: 0.6, hz: 0.18},
   cluster: {px: 2, hz: 0.4},
-  leaf: {px: 1.2, deg: 3, hz: 0.85},
+  leaf: {px: 1.2, deg: 1.2, hz: 0.85},
   gust: {strength: 0.6, width: 520},
 } as const;
 
@@ -91,7 +92,7 @@ export const WIND_RANGES = {
   clusterPx: [1.5, 3],
   clusterHz: [0.3, 0.5],
   leafPx: [0, 2],
-  leafDeg: [0, 4],
+  leafDeg: [0, 1.6],
   leafHz: [0.4, 1.2],
   speed: [60, 400],
   joinGap: 0.2,
@@ -199,7 +200,8 @@ export function clusterShift(w: Wind, t: number, o: SwayAt): Pt {
   return [dx, dy];
 }
 
-/** FLUTTER: a near leaf's turn about its stalk (deg) and shift (px); caps 4 deg, 2 px (N7). */
+/** FLUTTER: a near leaf's turn about its stalk (deg) and shift (px); caps 1.6 deg, 2 px (N7: the tip of a 100 px leaf
+ *  moves <= ~2.8 px). */
 export function leafFlutter(w: Wind, t: number, o: SwayAt): {dx: number; dy: number; deg: number} {
   const pf = planeSway(o.plane ?? 0) * w.strength;
   if (!(pf > 0)) return {dx: 0, dy: 0, deg: 0};
@@ -208,7 +210,7 @@ export function leafFlutter(w: Wind, t: number, o: SwayAt): {dx: number; dy: num
   const f = w.leaf.hz * rate;
   const g = gustAt(w, t, o.x, o.y);
   const turn = 0.62 * Math.sin(TAU * f * tl + phase) + 0.38 * noise2D(w.seed, tl * f * 1.4, k + 53.9);
-  const deg = clampAbs(w.leaf.deg * pf * (1 + 0.4 * g) * turn, 4);
+  const deg = clampAbs(w.leaf.deg * pf * (1 + 0.4 * g) * turn, 1.6);
   const s = 0.7 * Math.sin(TAU * f * 0.83 * tl + phase * 1.7) + 0.3 * noise2D(w.seed, tl * f, k + 77.1);
   const c = 0.5 * noise2D(w.seed, tl * f * 0.9, k + 91.3);
   const amp = w.leaf.px * pf * (1 + 0.3 * g);
@@ -226,7 +228,7 @@ export function leafFlutter(w: Wind, t: number, o: SwayAt): {dx: number; dy: num
 export type WindThing = {name: string; x: number; y: number; plane?: number; kind: 'crown' | 'cluster' | 'leaf'; seed?: string};
 
 /** The wind's checks (empty = OK): N7's ranges on the spec; the sampled maxima per thing over [t0, t1] (crown <= 1.0
- *  deg, cluster <= 3 px, leaf <= 2 px and 4 deg); far planes (+3 and farther) still; no gust peaking at a thing or
+ *  deg, cluster <= 3 px, leaf <= 2 px and 1.6 deg); far planes (+3 and farther) still; no gust peaking at a thing or
  *  entering the frame within 0.2 s of a join; at most one gust on screen at a time (one noticeable mover, rule 3). */
 export function windProblems(w: Wind, things: WindThing[] = [], o: {t0?: number; t1?: number; fps?: number; frame?: [number, number]} = {}): string[] {
   const out: string[] = [];
@@ -237,7 +239,7 @@ export function windProblems(w: Wind, things: WindThing[] = [], o: {t0?: number;
   if (!inR(w.cluster.px, R.clusterPx)) out.push(`cluster sway ±${w.cluster.px} px (N7: ${R.clusterPx[0]}-${R.clusterPx[1]})`);
   if (!inR(w.cluster.hz, R.clusterHz)) out.push(`cluster sway ${w.cluster.hz} Hz (N7: ${R.clusterHz[0]}-${R.clusterHz[1]})`);
   if (!inR(w.leaf.px, R.leafPx)) out.push(`leaf flutter ±${w.leaf.px} px (N7: <= ${R.leafPx[1]})`);
-  if (!inR(w.leaf.deg, R.leafDeg)) out.push(`leaf flutter ±${w.leaf.deg} deg (<= ${R.leafDeg[1]})`);
+  if (!inR(w.leaf.deg, R.leafDeg)) out.push(`leaf flutter ±${w.leaf.deg} deg (<= ${R.leafDeg[1]}: a 100 px leaf's tip <= ~2.8 px)`);
   if (!inR(w.leaf.hz, R.leafHz)) out.push(`leaf flutter ${w.leaf.hz} Hz (calm: ${R.leafHz[0]}-${R.leafHz[1]})`);
   if (!inR(w.speed, R.speed)) out.push(`the wind travels ${w.speed} px/s (${R.speed[0]}-${R.speed[1]}: a breeze crossing the set in 3-18 s)`);
   const t0 = o.t0 ?? 0;

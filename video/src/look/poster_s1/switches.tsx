@@ -66,11 +66,12 @@ export const V2_SWITCHES: PosterSwitches = {
 
 export type PosterPreset = 'v2' | 'pass1' | 'pass2';
 
-/** STUDY §10's passes. pass 1 ("the owner-approved lessons" as §10 wrote them on 2026-10-28: the mottle on at 3.5 s, Pip
- *  hidden, the float by depth, rule 4's line kept) and pass 2 (everything: since 2026-10-29 every switch is decided). */
+/** STUDY §10's passes. pass 1 ("the owner-approved lessons" as §10 wrote them on 2026-10-28: the near group in
+ *  mid-tones, the mottle on at 3.5 s, Pip hidden, the float by depth, rule 4's line kept) and pass 2 (everything: since
+ *  2026-10-29 every switch is decided, 10b's palette aside). */
 export const PRESETS: Record<PosterPreset, PosterSwitches> = {
   v2: V2_SWITCHES,
-  pass1: {...V2_SWITCHES, texture: 3.5, pipHidden: true, float1z: true},
+  pass1: {...V2_SWITCHES, nearMid: true, texture: 3.5, pipHidden: true, float1z: true},
   pass2: {
     lineOff: true,
     shadeTier: true,

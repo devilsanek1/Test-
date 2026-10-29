@@ -72,7 +72,7 @@ export type MottleProps = {
   /** The colour share (0-1 of the spec's a*b* <= 0.35; 0 = a pure value mottle). */
   chroma?: number;
   /** Screen rows kept free of texture (default the caption band y 290-600; null = none), with a soft edge of
-   *  `soft` px (stepped in 8, so the mottle eases out instead of stopping on a line). */
+   *  `soft` px outside it (a vertical Gaussian ramp, so the mottle eases out instead of stopping on a line). */
   band?: [number, number] | null;
   soft?: number;
   /** The group's current translation on screen (its float offset): keeps the band screen-locked. [0, 0] at rest. */
@@ -102,20 +102,19 @@ function matrix(chroma: number, cal: typeof CAL): string {
   return rows.map((r) => r.map(fmt).join(' ')).join('  ');
 }
 
-/** The flood strips that keep the band clean: a neutral grey over the noise (the mean: no modulation), its alpha
- *  stepped 1/8 ... 8/8 over `soft` px on each side, full inside the band. Local coordinates (the group's user space). */
-function bandStrips(b: [number, number], soft: number, x: number, w: number, dy: number): {y: number; h: number; a: number}[] {
-  const y0 = b[0] - dy;
-  const y1 = b[1] - dy;
-  const n = soft > 0 ? 8 : 0;
-  const st = n ? soft / n : 0;
-  const out: {y: number; h: number; a: number}[] = [{y: y0, h: y1 - y0, a: 1}];
-  for (let i = 0; i < n; i++) {
-    const a = (n - i) / (n + 1);
-    out.push({y: y0 - (i + 1) * st, h: st, a});
-    out.push({y: y1 + i * st, h: st, a});
-  }
-  return out.map((s) => ({...s, y: Math.round(s.y * 100) / 100, h: Math.round(s.h * 100) / 100}));
+/** The band mask in the group's user space: one neutral grey flood (the noise's mean: no modulation) over the band and
+ *  half the soft edge beyond it, blurred vertically (sigma soft/4), so the mottle is gone 2 sigma inside the band edge
+ *  (2 %) and full from `soft` px outside it: a smooth ramp, no line. null when the region never reaches the band. */
+function bandMask(b: [number, number], soft: number, dy: number, ry: number, rh: number): {y: number; h: number; sigma: number; y0: number; h0: number} | null {
+  const pad = soft / 2;
+  const sigma = Math.max(0.5, soft / 4);
+  const y = b[0] - pad - dy;
+  const h = b[1] - b[0] + 2 * pad;
+  const y0 = y - 3 * sigma;
+  const h0 = h + 6 * sigma;
+  if (y0 > ry + rh || y0 + h0 < ry) return null;
+  const r2 = (n: number) => Math.round(n * 100) / 100;
+  return {y: r2(y), h: r2(h), sigma: r2(sigma), y0: r2(y0), h0: r2(h0)};
 }
 
 /** THE MOTTLE: wraps one plane's fills (inside the plane's float group). Static: a pure function of its props and the
@@ -129,23 +128,20 @@ export const Mottle: React.FC<MottleProps> = ({k = 1, seed = 1, scale = 1, chrom
   const [rx, ry, rw, rh] = region ?? [-160, -160, 1400, 2240];
   const s = cal.s * k;
   const freq = cal.freq / Math.max(0.2, scale);
-  const strips = band ? bandStrips(band, soft, rx, rw, offset[1]).filter((q) => q.h > 0 && q.y < ry + rh && q.y + q.h > ry) : [];
+  const mask = band ? bandMask(band, soft, offset[1], ry, rh) : null;
   return (
     <g filter={`url(#${id})`}>
       <defs>
         <filter id={id} x={rx} y={ry} width={rw} height={rh} filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
           <feTurbulence type="fractalNoise" baseFrequency={fmt(freq)} numOctaves={cal.octaves} seed={Math.round(seed)} stitchTiles="noStitch" result="turb" />
           <feColorMatrix in="turb" type="matrix" values={matrix(Math.max(0, Math.min(1, chroma)), cal)} result="noise" />
-          {strips.length ? (
+          {mask ? (
             <>
-              {strips.map((q, i) => (
-                <feFlood key={i} floodColor="rgb(50%,50%,50%)" floodOpacity={fmt(q.a)} x={rx} y={q.y} width={rw} height={q.h} result={`band${i}`} />
-              ))}
+              <feFlood floodColor="rgb(50%,50%,50%)" x={rx} y={mask.y} width={rw} height={mask.h} result="bandHard" />
+              <feGaussianBlur in="bandHard" stdDeviation={`0 ${mask.sigma}`} x={rx} y={mask.y0} width={rw} height={mask.h0} result="bandSoft" />
               <feMerge result="masked">
                 <feMergeNode in="noise" />
-                {strips.map((_, i) => (
-                  <feMergeNode key={i} in={`band${i}`} />
-                ))}
+                <feMergeNode in="bandSoft" />
               </feMerge>
             </>
           ) : null}
@@ -154,7 +150,7 @@ export const Mottle: React.FC<MottleProps> = ({k = 1, seed = 1, scale = 1, chrom
               reads <= ~0.8 L* darker (0 at rest): a 0.02 px dilation of its silhouette, inside CRAFT §c's float budget
               (<= ~2 L*). The alpha-exact variant (divide by 1 + s/2, multiply back with a transfer) is NOT used: its
               extra 8-bit step truncates, shifting whole planes by 0.05-0.18 L* (ENGINE_PT.md §3). */}
-          <feComposite in="SourceGraphic" in2={strips.length ? 'masked' : 'noise'} operator="arithmetic" k1={fmt(s)} k2={fmt(1 - s * 0.5)} k3="0" k4="0" />
+          <feComposite in="SourceGraphic" in2={mask ? 'masked' : 'noise'} operator="arithmetic" k1={fmt(s)} k2={fmt(1 - s * 0.5)} k3="0" k4="0" />
         </filter>
       </defs>
       {children}
