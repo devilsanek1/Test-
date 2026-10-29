@@ -1,1 +1,66 @@
-{"film": "v2s1", "pieces": []}
+{
+ "film": "v2s1",
+ "spec": "scripts/look/paint/v2s1.json",
+ "pieces": [
+  {
+   "id": "v2s1/sky",
+   "src": "paint/v2s1/sky.png",
+   "box": [
+    0,
+    0,
+    1080,
+    1100
+   ],
+   "style": "sky",
+   "seed": 11
+  },
+  {
+   "id": "v2s1/cloud",
+   "src": "paint/v2s1/cloud.png",
+   "box": [
+    330,
+    0,
+    750,
+    360
+   ],
+   "style": "cloud",
+   "seed": 23
+  },
+  {
+   "id": "v2s1/cloudbar",
+   "src": "paint/v2s1/cloudbar.png",
+   "box": [
+    0,
+    196,
+    420,
+    84
+   ],
+   "style": "cloud",
+   "seed": 31
+  },
+  {
+   "id": "v2s1/tree",
+   "src": "paint/v2s1/tree.png",
+   "box": [
+    0,
+    1290,
+    304,
+    258
+   ],
+   "style": "foliage",
+   "seed": 41
+  },
+  {
+   "id": "v2s1/pier",
+   "src": "paint/v2s1/pier.png",
+   "box": [
+    838,
+    1494,
+    242,
+    426
+   ],
+   "style": "surface",
+   "seed": 53
+  }
+ ]
+}

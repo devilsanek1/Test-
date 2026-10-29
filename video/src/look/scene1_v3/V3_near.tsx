@@ -48,8 +48,13 @@ const shadeEdge = (y540: number, drop: number, bump: number, seed: number): Pt[]
   }
   return pts;
 };
-const NEAR_SHADE = poly([...shadeEdge(1318, 70, 9, 1.3), [1140, 1800], [-60, 1800]]);
-const NEAR_DEEP = poly([...shadeEdge(1560, 40, 6, 4.2), [1140, 1800], [-60, 1800]]);
+/** Three steps of the same cast tint, each one shade step deeper (multiply), so the near frame darkens toward the
+ *  bottom in many small pieces (the patchwork's stones stay readable inside it): the last one at the frame's bottom. */
+const NEAR_SHADES: string[] = [
+  poly([...shadeEdge(1318, 70, 9, 1.3), [1140, 1800], [-60, 1800]]),
+  poly([...shadeEdge(1440, 60, 8, 2.7), [1140, 1800], [-60, 1800]]),
+  poly([...shadeEdge(1580, 40, 6, 4.2), [1140, 1800], [-60, 1800]]),
+];
 
 /** A few small things on the treads (in the shade): fallen plane leaves, a takeaway cup, a folded newspaper. */
 const LEAVES: [number, number, number, number, number][] = [
@@ -119,8 +124,12 @@ export const V3Near: React.FC = () => (
       ))}
       <NearThings />
       {/* the near frame in shade (the cast tint), a deeper step at the bottom */}
-      <Shade d={NEAR_SHADE} tint="cast" at={floodAt(540, 1500)} />
-      <Shade d={NEAR_DEEP} tint="cast" at={floodAt(540, 1650)} />
+      {NEAR_SHADES.map((d, i) => (
+        <React.Fragment key={i}>
+          <Shade d={d} tint="cast" at={floodAt(540, 1400 + 120 * i)} />
+          {i ? <Shade d={d} tint="cast" at={floodAt(540, 1400 + 120 * i)} /> : null}
+        </React.Fragment>
+      ))}
     </S1Plane>
     <S1Plane plane={S1_PLANE.bank} texture={false} under={<HerShadows />}>
       <V3Her x={V3_HER.x} y={V3_HER.feet} h={V3_HER.h} step={V3_HER.step} turn={V3_HER.turn} />

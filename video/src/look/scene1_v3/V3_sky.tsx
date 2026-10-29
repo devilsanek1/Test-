@@ -40,9 +40,11 @@ const SKY_SPEED = 26000;
 
 /** The bank's three flat tones: a warm glowing lit face (apricot cream), a peach body, a rose belly (never beige:
  *  each keeps its chroma; the belly parts from the mint by hue). */
-const BANK_TONES: CloudTones = {lit: '#FFE6CC', body: '#F9CDB7', belly: '#E9B2B8'};
+const BANK_TONES: CloudTones = {lit: '#FFE3BC', body: '#F8C9B1', belly: '#E9B0B6'};
 /** The tower's top, higher in the cooler sky: a touch pinker. */
-const TOP_TONES: CloudTones = {lit: '#FFE3D2', body: '#F6C8BE', belly: '#DDAAB9'};
+const TOP_TONES: CloudTones = {lit: '#FFE6CF', body: '#F5C6BC', belly: '#DEADBB'};
+/** A tower body's tones where its flat base sits in open sky: no belly band (the base is the body's own edge). */
+const flatBase = (c: CloudTones): CloudTones => ({...c, belly: c.body});
 
 const cloudSpecs = (sky: SkySpec): CumulusSpec[] => {
   const at = (x: number, y: number) => skyColorAt(sky, y, x);
@@ -51,8 +53,12 @@ const cloudSpecs = (sky: SkySpec): CumulusSpec[] => {
     // the long low bank behind the wing's roof: its flat base hidden by the roofline and the far roofs, its tops under
     // the band
     {...base, seed: 'v3-bank', x: 300, base: 1010, w: 980, h: 330, towers: 4, lobes: [0.035, 0.07], tones: BANK_TONES},
-    // the tower rising from behind the wing at the right edge, to the frame's top: in the band only at x > ~860
-    {...base, seed: 'v3-tower', x: 924, base: 905, w: 300, h: 900, towers: 2, lobes: [0.13, 0.22], tones: TOP_TONES},
+    // the tower at the right edge, stacked from three bodies (the cumulus is a tablecloth: one body per storey): its
+    // foot behind the wing's roof, its waist through the band only at x > ~880 (the caption ends at ~800), its crown
+    // above the band spreading left like an anvil
+    {...base, seed: 'v3-towerFoot', x: 780, base: 905, w: 420, h: 400, towers: 3, lobes: [0.09, 0.16], tones: BANK_TONES},
+    {...base, seed: 'v3-towerWaist', x: 930, base: 640, w: 280, h: 420, towers: 2, lobes: [0.14, 0.22], tones: flatBase(TOP_TONES)},
+    {...base, seed: 'v3-towerCrown', x: 640, base: 284, w: 560, h: 270, towers: 3, lobes: [0.08, 0.14], tones: flatBase(TOP_TONES)},
     // a small calm cumulus above the band, between the spray and the tower (v2's hero cloud, moved left)
     {...base, seed: 'v3-small', x: 330, base: 258, w: 360, h: 112, towers: 3, lobes: [0.05, 0.09], tones: TOP_TONES},
   ];
