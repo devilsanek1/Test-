@@ -1,0 +1,7 @@
+# merge log
+kept 1209, dropped 5
+- C1-003 (corpus_C1.csv): duplicate of F1044
+- C1-019 (corpus_C1.csv): duplicate of F1060
+- C1-020 (corpus_C1.csv): duplicate of F1056
+- C1-022 (corpus_C1.csv): duplicate of F1057
+- C1-023 (corpus_C1.csv): duplicate of F1042
