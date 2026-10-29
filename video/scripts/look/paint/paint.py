@@ -36,6 +36,7 @@ from PIL import Image
 from scipy import ndimage
 
 DRY: dict = {}  # the current piece's dry-brush stamps (paint_piece)
+DESIGN = False  # --design: write the flat designed shapes instead of their painting (style 'designed', designed skies)
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))  # video/
 
 # ------------------------------------------------------------------ colour (OKLab, as lib/sky)
@@ -1019,6 +1020,221 @@ def style_cloudscape(piece, spec, rng, stamps):
     return outs
 
 
+# ------------------------------------------------------------------ DESIGNED shapes (v4; the playbook's "forest before the
+# trees": design the masses first, then paint them). A piece with "style": "designed" gives its planes as deliberate
+# silhouettes: billows [x, y, r, flat] in drawing order (later ones in front), a flat base line, and the light. Each
+# billow splits into a LIT cap (the crescent facing the light), a MID band and a SHADE side by two circles shifted
+# away from the light (a curved terminator), the base band is shade (a cloud's underside); the plane's three colours
+# converge on the sky's colour with depth. `--design` writes the flat design (the check: squint beside the models), the
+# default paints those same shapes: firm, lightly broken edges where the light hits, soft dry-brush edges on the shade
+# side, a few broad strokes inside each value mass along the billow's form, gentle variation.
+
+def design_plane(pl, box, light, ss=2):
+    """Label map (0 none, 1 shade, 2 mid, 3 lit), coverage, and each pixel's billow centre (for the form's flow)."""
+    bx, by, bw, bh = box
+    H2, W2 = bh * ss, bw * ss
+    yy, xx = np.mgrid[0:H2, 0:W2].astype(np.float32)
+    xx = xx / ss + bx
+    yy = yy / ss + by
+    lab = np.zeros((H2, W2), np.uint8)
+    cxm = np.zeros((H2, W2), np.float32)
+    cym = np.zeros((H2, W2), np.float32)
+    L = np.array(light, np.float32) / (np.linalg.norm(light) + 1e-8)
+    s1, s2 = pl.get('lit_cap', 0.34), pl.get('mid_band', 0.7)
+    for b in pl['billows']:
+        cx, cy, r = b[0], b[1], b[2]
+        f = b[3] if len(b) > 3 else pl.get('flat', 1.0)
+        def disc(dx, dy, k=1.0):
+            return ((xx - cx - dx) / (r * k)) ** 2 + ((yy - cy - dy) / (r * f * k)) ** 2 <= 1.0
+        D = disc(0, 0)
+        A = disc(-L[0] * s1 * r, -L[1] * s1 * r * f)  # shifted away from the light
+        B = disc(-L[0] * s2 * r, -L[1] * s2 * r * f)
+        lit = D & ~A
+        mid = D & A & ~B
+        z = np.where(lit, 3, np.where(mid, 2, 1)).astype(np.uint8)
+        lab = np.where(D, z, lab)
+        cxm = np.where(D, cx, cxm)
+        cym = np.where(D, cy, cym)
+    if pl.get('base'):
+        x0b, y0b, x1b, y1b = pl['base']  # the base line from (x0b, y0b) to (x1b, y1b)
+        yb = y0b + (xx - x0b) * (y1b - y0b) / max(1e-3, (x1b - x0b))
+        lab = np.where(yy > yb, 0, lab)
+        under = (yy > yb - pl.get('under_px', 46)) & (lab > 0)
+        lab = np.where(under & (lab == 3), 2, np.where(under, 1, lab)).astype(np.uint8)
+    cov = cv2.resize((lab > 0).astype(np.float32), (bw, bh), interpolation=cv2.INTER_AREA)
+    zones = [cv2.resize((lab == k).astype(np.float32), (bw, bh), interpolation=cv2.INTER_AREA) for k in (1, 2, 3)]
+    cxs = cv2.resize(cxm, (bw, bh), interpolation=cv2.INTER_NEAREST)
+    cys = cv2.resize(cym, (bw, bh), interpolation=cv2.INTER_NEAREST)
+    return cov, zones, cxs, cys
+
+
+def gradient_sky(spec_g, H, W, y0=0):
+    """A designed sky: vertical stops [[y, hex], ...] mixed in OKLab, plus the low sun's warmth (xy, r, hex, k)."""
+    ys = np.array([g[0] for g in spec_g['stops']], np.float32)
+    cols = np.array([hex_lab(g[1]) for g in spec_g['stops']], np.float32)
+    rows = np.arange(H, dtype=np.float32) + y0
+    lab_rows = np.stack([np.interp(rows, ys, cols[:, k]) for k in range(3)], -1)
+    lab = np.broadcast_to(lab_rows[:, None, :], (H, W, 3)).copy()
+    if spec_g.get('sun'):
+        sn = spec_g['sun']
+        yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+        yy += y0
+        w = np.clip(1 - np.hypot((xx - sn['xy'][0]) / sn.get('sx', 1.4), yy - sn['xy'][1]) / sn['r'], 0, 1) ** 1.6 * sn.get('k', 0.6)
+        if spec_g.get('band_k') is not None:
+            w = w * band_calm(H, y0, spec_g.get('band'), 46)[:, None] ** 0 * 1.0
+        lab = lab + (hex_lab(sn['hex']) - lab) * w[..., None]
+    return lab
+
+
+def style_sky_designed(piece, spec, rng, stamps):
+    H, W = piece.get('size', [1100, 1080])
+    lab = gradient_sky(piece['gradient'], H, W)
+    if DESIGN:
+        return lab_to_rgb(lab), np.ones((H, W), np.float32), (0, 0), 0
+    calm = band_calm(H, 0, spec.get('band'), 46)[:, None] * np.ones((1, W), np.float32)
+    b = piece.get('broad', {})
+    gentle = fbm(rng, H, W, b.get('vary_cell', 260), 3, aniso=2.5)
+    lab = shift(lab, dL=b.get('vary', 0.006) * gentle * (0.3 + 0.7 * calm))
+    diag = streak_noise(rng, H, W, math.radians(b.get('hatch_angle', -24)), b.get('hatch_along', 170), b.get('hatch_across', 1.6)) - 0.5
+    lab = shift(lab, dL=b.get('hatch', 0.008) * diag * (0.15 + 0.85 * calm))
+    out = lab_to_rgb(lab) * grain(rng, H, W, b.get('grain', 0.004))[..., None]
+    return out, np.ones((H, W), np.float32), (0, 0), 0
+
+
+def paint_designed_plane(pl, zones, cov, cxs, cys, cols, light, rng, seed, calm=None):
+    """Paint one designed plane: the value masses as given, a few broad strokes inside each along its billow's form,
+    firm edges where the light hits, soft dry-brush edges on the shade side, a sparse speckle there."""
+    H, W = cov.shape
+    b = pl.get('paint', {})
+    tgt = sum(z[..., None] * c for z, c in zip(zones, cols)) / np.maximum(cov, 1e-4)[..., None]
+    tgt = np.where(cov[..., None] > 1e-4, tgt, cols[1])
+    # fill colours outward so soft edges and strokes sample the mass, never black
+    tgt_f = fill_out(tgt, cov)
+    tgt_f = shift(tgt_f, dL=b.get('vary', 0.007) * fbm(rng, H, W, b.get('vary_cell', 90), 3))
+    # the edge by the light: the outward normal against the light
+    cb = cv2.GaussianBlur(cov, (0, 0), 3)
+    gy, gx = np.gradient(cb)
+    gn = np.hypot(gx, gy) + 1e-6
+    Ln = np.array(light, np.float32) / (np.linalg.norm(light) + 1e-8)
+    facing = (-gx * Ln[0] - gy * Ln[1]) / gn  # +1 where the edge faces the light
+    shade_side = smoothstep(0.15, -0.45, facing)
+    soft = cv2.GaussianBlur(cov, (0, 0), b.get('soft_px', 4.5))
+    alpha = cov * (1 - shade_side) + soft * shade_side
+    # dry-brush break-up on the shade side only: patches (never combs) where the sky shows through
+    band = np.clip(1 - np.abs(soft - 0.5) * 2.2, 0, 1)
+    patches = fbm(rng, H, W, b.get('break_cell', 13), 3)
+    alpha = alpha * (1 - shade_side * band * np.clip((patches + 0.15) * 2.2, 0, 1) * b.get('break_k', 0.75))
+    # firm where the light hits: a whisper of break-up only
+    fine = fbm(rng, H, W, 5, 2)
+    alpha = alpha * (1 - (1 - shade_side) * np.clip(1 - np.abs(cov - 0.5) * 2, 0, 1) * np.clip(fine, 0, 1) * 0.35)
+    if calm is not None:
+        alpha = alpha * calm
+    cv = Canvas(H, W)
+    cv.wash(lab_to_rgb(tgt_f), alpha.astype(np.float32))
+    stamps = make_flat_stamps(np.random.default_rng(seed * 11 + 5), side=tuple(b.get('side', (0.16, 0.28))), chisel=b.get('chisel', 0.05))
+    zone_img = lab_to_rgb(tgt_f).astype(np.float32)
+    n = 0
+    # a few broad strokes inside each mass, along the billow's form (tangent to it), staying in their own mass
+    w_lo, w_hi = b.get('width', (30, 60))
+    count = int(b.get('strokes', 0.5) * float((cov > 0.6).sum()) / ((w_lo + w_hi) * 0.5) ** 2)
+    pts = np.argwhere(cov > 0.85)
+    clipm = alpha.astype(np.float32)
+    for _ in range(count):
+        if len(pts) == 0:
+            break
+        y, x = pts[int(rng.integers(len(pts)))]
+        ang = math.atan2(y - (cys[y, x] - 0), x - cxs[y, x]) + math.pi / 2 if cxs[y, x] != 0 else 0.0
+        lab = tgt_f[y, x] + np.array([rng.normal(0, b.get('jitter_L', 0.010)), rng.normal(0, 0.003), rng.normal(0, 0.004)])
+        wdt = rng.uniform(w_lo, w_hi)
+        cv.stamp(stamps[int(rng.integers(len(stamps)))], x, y, ang + rng.normal(0, 0.12), wdt * rng.uniform(*b.get('len', (1.6, 2.6))), wdt,
+                 lab_to_rgb(lab[None])[0], rng.uniform(*b.get('op', (0.3, 0.5))), clipm, zone_img, b.get('tau', 0.05))
+        n += 1
+    # dry strokes along the shade-side edge (broken, along the edge, in the mass's colour)
+    edge = np.argwhere((soft > 0.25) & (soft < 0.75) & (shade_side > 0.6))
+    for _ in range(int(len(edge) * b.get('dry_edge', 0.01))):
+        y, x = edge[int(rng.integers(len(edge)))]
+        ang = math.atan2(gy[y, x], gx[y, x]) + math.pi / 2
+        wdt = rng.uniform(*b.get('dry_width', (10, 22)))
+        lab = tgt_f[y, x]
+        cv.stamp(stamps[int(rng.integers(len(stamps)))], x, y, ang + rng.normal(0, 0.15), wdt * rng.uniform(2.0, 3.5), wdt, lab_to_rgb(lab[None])[0], rng.uniform(0.35, 0.6), None)
+        n += 1
+    if b.get('specks'):
+        dout = ndimage.distance_transform_edt(cov < 0.5)
+        zone = (np.clip(1 - dout / 26, 0, 1) * (cov < 0.5) * shade_side * 0.02).astype(np.float32)
+        if calm is not None:
+            zone *= calm
+        n += speckle(cv, rng, zone, int(b['specks']), 0.7, 1.8, [lab_to_rgb(cols[1][None])[0]], (0.4, 0.8))
+    out, a = cv.rgba()
+    return out * grain(rng, H, W, b.get('grain', 0.005))[..., None], a, n
+
+
+def style_designed(piece, spec, rng, stamps):
+    """Designed planes (far to near), each its own image: the flat design (--design) or its painting."""
+    FW, FH = spec['frame']
+    light = piece.get('light', spec['light']['dir'])
+    sky_lab = gradient_sky(piece['sky_gradient'], FH, FW) if piece.get('sky_gradient') else rgb_to_lab(load_flat(os.path.join(ROOT, piece['sky_flat']))[0])
+    planes = sorted(piece['planes'], key=lambda q: -q['depth'])
+    designs = []
+    for pl in planes:
+        designs.append(design_plane(pl, pl['box'], pl.get('light', light)))
+    outs = []
+    for j, (pl, (cov, zones, cxs, cys)) in enumerate(zip(planes, designs)):
+        d = float(pl['depth'])
+        bx, by, bw, bh = pl['box']
+        x0, y0 = max(0, bx), max(0, by)
+        x1, y1 = min(FW, bx + bw), min(FH, by + bh)
+        sky_box = np.zeros((bh, bw, 3), np.float32)
+        sky_box[y0 - by:y1 - by, x0 - bx:x1 - bx] = sky_lab[y0:y1, x0:x1]
+        sky_mean = sky_box[cov > 0.5].mean(0) if (cov > 0.5).any() else sky_box.reshape(-1, 3).mean(0)
+        pal = pl.get('palette', piece.get('palette'))
+        conv = pl.get('conv', 0.8 * d)
+        cols = [hex_lab(pal[k]) + (sky_mean - hex_lab(pal[k])) * conv for k in ('shade', 'mid', 'lit')]
+        # the air: a lighter band of the sky's value along every nearer plane's edge
+        nearer = np.zeros((FH, FW), np.float32)
+        for k in range(j + 1, len(planes)):
+            pk = planes[k]
+            c_, _, _, _ = designs[k]
+            kbx, kby, kbw, kbh = pk['box']
+            ax0, ay0 = max(0, kbx), max(0, kby)
+            ax1, ay1 = min(FW, kbx + kbw), min(FH, kby + kbh)
+            nearer[ay0:ay1, ax0:ax1] = np.maximum(nearer[ay0:ay1, ax0:ax1], c_[ay0 - kby:ay1 - kby, ax0 - kbx:ax1 - kbx])
+        calm = None
+        if piece.get('calm_box'):
+            cx0, cy0, cx1, cy1 = piece['calm_box']
+            yy_, xx_ = np.mgrid[0:bh, 0:bw].astype(np.float32)
+            xx_ += bx
+            yy_ += by
+            calm = (1 - np.clip((xx_ - cx0) / 40, 0, 1) * np.clip((cx1 - xx_) / 40, 0, 1) * np.clip((yy_ - cy0) / 40, 0, 1) * np.clip((cy1 - yy_) / 40, 0, 1)).astype(np.float32)
+        if DESIGN:
+            rgb = sum(z[..., None] * lab_to_rgb(c[None])[0] for z, c in zip(zones, cols)) / np.maximum(cov, 1e-4)[..., None]
+            a = cov * (calm if calm is not None else 1)
+            out = rgb
+        else:
+            out, a, n = paint_designed_plane(pl, zones, cov, cxs, cys, cols, pl.get('light', light), np.random.default_rng(int(piece['seed']) * 101 + j), int(piece['seed']) * 101 + j, calm)
+        if nearer.max() > 0 and pl.get('air', True):
+            dn = ndimage.distance_transform_edt(nearer < 0.5)[y0:y1, x0:x1]
+            gap = np.zeros((bh, bw), np.float32)
+            gap[y0 - by:y1 - by, x0 - bx:x1 - bx] = np.clip(1 - dn / piece.get('air_px', 12), 0, 1) * (nearer[y0:y1, x0:x1] < 0.5)
+            air = lab_to_rgb((sky_mean + np.array([piece.get('air_dL', 0.04), 0, 0]))[None])[0]
+            out = out * (1 - gap[..., None] * 0.9) + air * gap[..., None] * 0.9
+        if piece.get('keep_flat'):
+            # parts of the flat kept crisp under the design (a trunk): its pixels in this box, under the painted mass
+            frgb, fa = load_flat(os.path.join(ROOT, piece['keep_flat']['flat']))
+            keep = np.zeros((FH, FW), bool)
+            for hx in piece['keep_flat']['colors']:
+                keep |= (np.abs(frgb - hex_rgb(hx)[None, None, :]).sum(-1) < 0.12) & (fa > 0.5)
+            kb = keep[y0:y1, x0:x1].astype(np.float32)
+            kbox = np.zeros((bh, bw), np.float32)
+            kbox[y0 - by:y1 - by, x0 - bx:x1 - bx] = kb
+            krgb = np.zeros((bh, bw, 3), np.float32)
+            krgb[y0 - by:y1 - by, x0 - bx:x1 - bx] = frgb[y0:y1, x0:x1]
+            under = kbox * (1 - a)
+            out = (out * a[..., None] + krgb * under[..., None]) / np.maximum(a + under, 1e-4)[..., None]
+            a = np.clip(a + under, 0, 1)
+        outs.append((f'p{j}' if len(planes) > 1 else None, out, a, (bx, by), 0, d))
+    return outs
+
+
 # ------------------------------------------------------------------ main
 
 def paint_piece(piece, spec, preview=None):
@@ -1029,6 +1245,12 @@ def paint_piece(piece, spec, preview=None):
     DRY['stamps'] = make_stamps(np.random.default_rng(seed * 7 + 3), n=12, dry_range=(0.5, 0.85))
     st = piece['style']
     t0 = time.time()
+    if st == 'designed':
+        res = style_designed(piece, spec, rng, stamps)
+        return [write_png(piece, spec, rng, out, a, x0, y0, n, t0, suffix=suf, depth=dep) for (suf, out, a, (x0, y0), n, dep) in res]
+    if st == 'sky' and piece.get('gradient'):
+        out, a, (x0, y0), n = style_sky_designed(piece, spec, rng, stamps)
+        return [write_png(piece, spec, rng, out, a, x0, y0, n, t0)]
     if st == 'cloudscape':
         return [write_png(piece, spec, rng, out, a, x0, y0, n, t0, suffix=suf, depth=dep) for (suf, out, a, (x0, y0), n, dep) in style_cloudscape(piece, spec, rng, stamps)]
     if piece.get('brush') == 'broad':
@@ -1070,8 +1292,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('spec')
     ap.add_argument('--only', default='')
+    ap.add_argument('--design', action='store_true', help="write the flat designed shapes (spec 'out_design')")
     args = ap.parse_args()
     spec = json.load(open(args.spec))
+    global DESIGN
+    DESIGN = args.design
+    if DESIGN:
+        spec['out'] = spec['out_design']
     os.makedirs(os.path.join(ROOT, spec['out']), exist_ok=True)
     man_path = os.path.join(ROOT, spec['out'], 'manifest.json')
     rows = {}
