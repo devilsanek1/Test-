@@ -20,3 +20,5 @@ Format: the owner's words in quotes, with the time (UTC); after "->" what we did
   comment-drawing lines (an arguable or bigger claim, e.g. a "weirdest place" ranking people will dispute).
 - 2026-10-29 ~08:50 UTC, on the Big Bend reel's script: "BTW I really like the script too in the video / See how it's using natural language it's first hook sentence is extremely natural like a conversation yet captures the attention and curiosity without being too pushy and the script has a rhythm we discussed before" -> rule: playbook, Script and voice (the first line as a
   friend starting a story); the G1 writer gets the reel's first lines as the model for v5's opener.
+- 2026-10-29 ~08:55 UTC: "Oh I also meant that a video has an opening as "did you know that .." like that what I meant by great opening" -> playbook rule corrected ("Did you know that ..." is the model opener); v5's
+  opener options rewritten in that form.
