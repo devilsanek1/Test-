@@ -11,7 +11,9 @@ the stage render paint_test/stage_v4_design.png), never from the reference image
               masses in their own surroundings. Only the tree's own alpha is kept afterwards.
 
     python3 scripts/look/aipaint/make_inits.py [outdir]     # default out/aipaint/init
-Writes sky_init.png, tree_init.png and geometry.json (the frame <-> plate mapping the cut-out uses).
+Writes sky_init.png (with the stage's sun: the strength trials), sky_init_nosun.png (the final plate: the scene draws
+its crisp SunDisc UNDER the far roofs, so a sun painted into the plate would land inside the far-roofs piece, over the
+crisp one), tree_init.png and geometry.json (the frame <-> plate mapping the cut-out uses).
 """
 import json, os, sys
 import numpy as np
@@ -51,24 +53,26 @@ def main(out):
         can = Image.alpha_composite(can, piece_layer(pieces[name]))
     a = np.asarray(can).astype(np.float32)
     rgb = a[..., :3].copy()
+    nosun = rgb.copy()
     # the sun: the stage's saturated orange half-disc on the haze (x 120..280, y 690..790)
     r, g, b = st[..., 0], st[..., 1], st[..., 2]
     sun = (r > 200) & (r - b > 110) & (g < 150)
     zone = np.zeros_like(sun); zone[690:790, 120:280] = True
     sun &= zone
     rgb[sun] = st[sun]
-    # below the sky: a calm mirrored reflection (slightly darker, cooler, softer)
-    for y in range(SKY_BOTTOM, FH):
-        sy = int(SKY_BOTTOM - 1 - (y - SKY_BOTTOM) * 0.85)
-        sy = max(sy, 0)
-        rgb[y] = rgb[sy] * np.array([0.86, 0.87, 0.93])
-    refl = Image.fromarray(np.clip(rgb[SKY_BOTTOM:], 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(3))
-    rgb[SKY_BOTTOM:] = np.asarray(refl).astype(np.float32)
-    sky_full = Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8))
-    x, y, w, h = SKY_PLATE['frame_rect']
-    sky_init = sky_full.crop((x, y, x + w, y + h)).resize(tuple(SKY_PLATE['size']), Image.LANCZOS)
-    sky_init.save(os.path.join(out, 'sky_init.png'))
-    sky_full.save(os.path.join(out, 'sky_init_frame.png'))
+    for img, name in ((rgb, 'sky_init'), (nosun, 'sky_init_nosun')):
+        # below the sky: a calm mirrored reflection (slightly darker, cooler, softer)
+        for y in range(SKY_BOTTOM, FH):
+            sy = int(SKY_BOTTOM - 1 - (y - SKY_BOTTOM) * 0.85)
+            sy = max(sy, 0)
+            img[y] = img[sy] * np.array([0.86, 0.87, 0.93])
+        refl = Image.fromarray(np.clip(img[SKY_BOTTOM:], 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(3))
+        img[SKY_BOTTOM:] = np.asarray(refl).astype(np.float32)
+        sky_full = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8))
+        x, y, w, h = SKY_PLATE['frame_rect']
+        sky_init = sky_full.crop((x, y, x + w, y + h)).resize(tuple(SKY_PLATE['size']), Image.LANCZOS)
+        sky_init.save(os.path.join(out, name + '.png'))
+        sky_full.save(os.path.join(out, name + '_frame.png'))
 
     # ---- tree: the stage around the tree
     x, y, w, h = TREE_PLATE['frame_rect']
