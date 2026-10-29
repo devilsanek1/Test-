@@ -75,9 +75,10 @@ def compare(v2flat):
     W = 380
     panels = [fit_w(Image.open(p).convert('RGB'), W) for p, _ in stills]
     H = panels[0].height
-    rw = 380 * 2 + 16   # the refs' column
-    r3 = fit_w(Image.open(os.path.join(refs, '03_beach_dusk.jpg')).convert('RGB'), rw)
-    r2 = fit_w(Image.open(os.path.join(refs, '02_bus_stop_night.jpg')).convert('RGB'), rw)
+    i3 = Image.open(os.path.join(refs, '03_beach_dusk.jpg')).convert('RGB')
+    i2 = Image.open(os.path.join(refs, '02_bus_stop_night.jpg')).convert('RGB')
+    rw = int((H - 40) / (i3.height / i3.width + i2.height / i2.width))   # the refs' column: both fit the stills' height
+    r3, r2 = fit_w(i3, rw), fit_w(i2, rw)
     col = Image.new('RGB', (rw, H), PAPER)
     d = ImageDraw.Draw(col)
     col.paste(r3, (0, 0))

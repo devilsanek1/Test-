@@ -88,7 +88,7 @@
   },
   {
    "id": "v2s1/tree",
-   "src": "paint/v2s1_v4design/tree.png",
+   "src": "paint/v2s1_ai1/tree.png",
    "box": [
     0,
     1276,
@@ -96,8 +96,10 @@
     220
    ],
    "style": "designed",
-   "seed": 44,
-   "from": "v2s1/tree"
+   "seed": 1029,
+   "from": "v2s1/tree",
+   "reveal": "dab",
+   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.7 + xinsir/controlnet-canny-sdxl-1.0 0.6 seed 1029"
   },
   {
    "id": "v2s1/pier",

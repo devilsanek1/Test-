@@ -3,7 +3,7 @@
 // code (src/look/scene1_v3, read-only), which needs the clean pen and the house tokens set before any module reads them.
 //   PeopleSheet   the proof sheet (docs/look/paint_recipes/people_sheet.png): our current her beside the refined her
 //                 at 210 and 640 px, the refined her in four poses (+ a local-light variant), a 4-phase wind strip, the
-//                 references beside them. 2400 x 2900, one frame.
+//                 references beside them. 2400 x 2760, one frame.
 //   FigureTest    a quick test frame of the four poses (1920 x 1080).
 // The still (one render at a time on the shared CPUs):
 //   node scripts/render-frames.mjs PeopleSheet /tmp/people-recipe/sheet 0 --entry=src/entry-look-people.tsx

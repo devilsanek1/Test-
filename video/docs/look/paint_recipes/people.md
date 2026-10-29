@@ -176,7 +176,7 @@ Measured in H, her height (1000 local units in the engine).
    - **Local light (ref 03):** a local light (a phone, a lit doorway, a shop window) lights only what is near it and
      faces it: a phone lights the face, the hands and the scarf's front; a doorway lights the back's edge.
    - It is drawn as the same crescent on the side facing the light, lifted +10 to +14 L* and turned at most
-     15 degrees toward the light's hue.
+     12 degrees toward the light's hue. A phone's light is clipped to a disc of ~0.25 H around it.
    - It never covers the whole silhouette and is never a glow disc (DIRECTION rule 5).
 6. **The soft body gradient: a PROPOSAL, off by default.**
    - Ref 04's skirt darkens from the waist to the hem. In the engine this is a multiplied vertical ramp inside the
@@ -314,7 +314,7 @@ import {Figure} from '../../lib/figure';
 
 ## 4. The proof and how close it gets
 
-`people_sheet.png` (2400 x 2900; the frame of `PeopleSheet`):
+`people_sheet.png` (2400 x 2760; the frame of `PeopleSheet`):
 - **Row A:**
   - in the film's own frame (the still v3 landing, shown at 1.5x), our current her and the refined her, both 210 px;
   - then both at 640 px: current, refined in 3 flat planes, and refined with the soft gradient (the proposal);
@@ -327,4 +327,52 @@ import {Figure} from '../../lib/figure';
   - plus a phone-lit variant.
 - **Row C:** the scarf end at 4 phases of the 1.0 s wind cycle, beside ref 04's ribbons.
 
-How close it gets is assessed in §4.1 after the phone-size check below.
+The reference crops the sheet uses are in `public/figure/`.
+
+### 4.1 How close it gets (honest, after viewing the sheet at phone size and one fix pass)
+
+**The fix pass:** the first local lights were far too strong. The door turned her back's edge lime and the phone
+painted a cyan band down to the hem. They are now +11 to +14 L* with at most a 12-degree hue turn, the phone's
+clipped to a disc of 0.25 H around it. The walking-away toe-off foot floated, and now keeps its toe on the ground. The
+wind strip now keeps the tip in view.
+
+**Closer to the references (measured):**
+- **6.75 heads instead of 4.9:** the head is 0.148 H, on a visible neck.
+- **A silhouette with rhythm:** sloped shoulders, a belted waist, an A-line hem.
+- **A terminator that follows the contour,** instead of the straight seam down the middle.
+- **~10 shapes instead of ~14:** no tote, straps or plant blob.
+- **Tapered legs,** with knees, calves and fine ankles.
+- **One flowing element** with a measured wind spec.
+- **A face hint like ref 04's:** the profile edge and one closed-eye line.
+- **Ref 03's gait:** a contact span of ~0.5 H, counterpose arms, a 3-degree lean.
+- **At 210 px in the film's own frame,** she reads taller, slimmer and more grown-up than our current her (row A). At
+  640 px the difference is plain.
+
+**Still short of ref 04:**
+1. **Fluidity.** Ref 04 gets its flow from two light ribbons and a translucent cape. Ours is one wool scarf end, which
+   reads heavier. At 640 px, in some phases it looks like a tube or a third sleeve. A thinner, longer end (a silk
+   scarf, or a coat belt's loose tail) would get closer but is less "London October".
+2. **A teal column at phone size.** The mid-calf coat hides most of the legs, so at 210 px she reads as a long teal
+   column and the pose has less to act with. Ref 04's bell skirt has the same trade, but it is light in value.
+3. **The views from behind are stiffer than the profile.**
+   - The arms still hang long and straight.
+   - The rear 3/4 is a back view with a cheek sliver, not a turned torso.
+   - The contrapposto barely reads.
+
+   The profile is the best view, as in ref 04.
+4. **Crisper than the reference.** Our planes are crisp vector fills; ref 04's are a little soft (its body gradient,
+   soft edges). The soft gradient's A/B is in row A for the owner's call; DIRECTION rule 5 keeps it off until then.
+5. **Placement.** In the still v3 frame, her shade side sits close in value to the teal canal behind her, so her
+   right edge melts. This is a scene fix (a calmer, lighter field behind the "you", rule 2's separation), not a
+   figure fix.
+6. **Local light at 210 px.** Only the phone's light on the hands and the scarf reads; the door's rim is a hairline.
+
+**Net:** in profile, close to ref 04's cleanliness and simplicity. About two-thirds of the way on refinement, less from
+behind. The owner should judge the sheet.
+
+**If the direction is liked, the next steps:**
+- turn the torso in rear 3/4;
+- loosen the back-view arms;
+- try a thinner, longer flowing end;
+- place her in v2's scene 1 against a calm field;
+- then (motion, later) play the wind spec and the walk in a G4-style look clip.

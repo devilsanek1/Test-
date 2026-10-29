@@ -209,7 +209,7 @@ function profile(p: FigurePose): Build {
   const reach = PROP.thigh + PROP.shin - 4;
   const hipFor = (a: Pt, hx: number) => a[1] - Math.sqrt(Math.max(0, reach * reach - (a[0] - hx) ** 2));
   const hx = walking ? 0 : 0;
-  let hipY = PROP.hipY;
+  let hipY: number = PROP.hipY;
   for (const f of [fN, fF]) if (f.ankle[1] > -60) hipY = Math.max(hipY, hipFor(f.ankle, hx));
   const bob = hipY - PROP.hipY;
   const hip: Pt = [hx + 4, hipY];
