@@ -17,7 +17,7 @@ export type PaintS1Props = Omit<PosterS1Props, 'preset'> & {
   paint?: boolean;
   /** Which painted pieces (default all): a subset for A/Bs. */
   pieces?: string[];
-  /** Which bake (paint_set.ts): 'v1' (default) or 'v2' (the bolder dose). */
+  /** Which bake (paint_set.ts): 'v1' (default), 'v2' (the bolder dose), 'v3' (the broad brush, a layered sky). */
   set?: PaintSetName;
 };
 

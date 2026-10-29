@@ -32,7 +32,7 @@ import {useSwitches} from './switches';
 import {CloudSlot, SpraySlot, TextureSlot} from './engine';
 import {useTime} from '../../lib/time';
 import {S1PipShadows} from './V2S1_pip';
-import {PaintedLayer} from '../../lib/paint';
+import {PaintedGroup, PaintedLayer} from '../../lib/paint';
 
 export type S1WorldProps = {
   /** Her figure behind the glass doors (between the lobby and the door glass). */
@@ -58,6 +58,8 @@ const S1SkyThings: React.FC = () => {
     <TextureSlot sw={sw} t={t} plane={S1_PLANE.sky} sky>
       {/* (the paint test) the painted hero cumulus and the painted bar in their places on the sky's layer (fixed: the
           sky never floats), or v2's kit clouds */}
+      {/* (paint v3) a layered cloudscape: one image per cloud plane, far to near; v1/v2's sets paint the two clouds */}
+      <PaintedGroup group="clouds">
       <PaintedLayer piece={"cloud"}>
         <CloudSlot
           sw={sw}
@@ -67,6 +69,7 @@ const S1SkyThings: React.FC = () => {
       <PaintedLayer piece={"cloudbar"}>
         {sw.cloud ? null : <Cloud x={CLOUD_BAR.x} y={CLOUD_BAR.y} w={CLOUD_BAR.w} h={CLOUD_BAR.h} seed="s1cloudbar" speed={CLOUD_BAR.speed} />}
       </PaintedLayer>
+      </PaintedGroup>
     </TextureSlot>
   );
 };

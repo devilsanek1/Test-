@@ -623,18 +623,18 @@ def smoothstep(a, b, x):
     return t * t * (3 - 2 * t)
 
 
-def make_flat_stamps(rng, n=14, L=256, W=64):
+def make_flat_stamps(rng, n=14, L=256, W=64, side=(0.05, 0.10), chisel=0.012):
     """Flat-brush stamps: an even, opaque core (a faint bristle ripple), crisp sides, a chiselled start, and a dry tail
     whose bristle rows break up as the paint runs out."""
     stamps = []
     v = np.linspace(-1, 1, W)
     u = np.linspace(0, 1, L)
     for _ in range(n):
-        side = np.clip((1 - np.abs(v)) / rng.uniform(0.05, 0.10), 0, 1)
+        side_ = np.clip((1 - np.abs(v)) / rng.uniform(*side), 0, 1)
         ripple = 1 - rng.uniform(0.03, 0.10) * value_noise(rng, W, 2, 3, 1)[:, 0]
-        prof = side * ripple
+        prof = side_ * ripple
         slant = rng.uniform(-0.08, 0.08)
-        start = np.clip((u[None, :] - (0.015 + slant * v[:, None])) / 0.012, 0, 1)
+        start = np.clip((u[None, :] - (0.015 + slant * v[:, None])) / chisel, 0, 1)
         tail0 = rng.uniform(0.45, 0.78)
         streak = value_noise(rng, W, L, 1.3, L / rng.uniform(4, 8))
         dry = np.clip((u[None, :] - tail0) / (1 - tail0), 0, 1) ** 1.15
@@ -678,7 +678,11 @@ def broad_paint(piece, rng, sil, tgt, light2, calm=None, ref=None):
     gentle = fbm(rng, H, W, b.get('vary_cell', 140), 3)
     base = shift(tgt, dL=b.get('vary', 0.006) * gentle)
     cv.wash(lab_to_rgb(cv2.GaussianBlur(base.astype(np.float32), (0, 0), b.get('wash_blur', 2.0))), alpha.astype(np.float32))
-    stamps = make_flat_stamps(np.random.default_rng(int(piece['seed']) * 11 + 5))
+    stamps = make_flat_stamps(np.random.default_rng(int(piece['seed']) * 11 + 5), side=tuple(b.get('side', (0.05, 0.10))), chisel=b.get('chisel', 0.012))
+    if ref is None and b.get('mass_tau'):
+        # strokes stay inside their own mass (a stroke never drags the shade over the lit side)
+        ref = lab_to_rgb(tgt).astype(np.float32)
+        b = dict(b, tau=b['mass_tau'])
     n = 0
     # 2. a few broad, deliberate strokes inside the masses, along the brush, each one flat colour of its mass
     area = float((alpha > 0.5).sum())
@@ -884,6 +888,127 @@ def style_flat_broad(piece, spec, rng, stamps):
     return out, a, (x0, y0), n
 
 
+def lobe_height(lobes, box, flat=1.0):
+    """Domes of lobes [x, y, r] (frame px) in a box; `flat` < 1 squashes them vertically (a far, flattened deck)."""
+    bx, by, bw, bh = box
+    yy, xx = np.mgrid[0:bh, 0:bw].astype(np.float32)
+    xx += bx
+    yy += by
+    hgt = np.zeros((bh, bw), np.float32)
+    for (cx, cy, r) in lobes:
+        hgt = np.maximum(hgt, np.sqrt(np.clip(1 - ((xx - cx) / r) ** 2 - ((yy - cy) / (r * flat)) ** 2, 0, 1)))
+    return hgt
+
+
+def style_cloudscape(piece, spec, rng, stamps):
+    """A LAYERED cloudscape (the owner, 2026-10-29: "even clouds have layers that give a sense of depth"): cloud planes
+    by depth (0 near ... 1 far), each its own image (far to near), painted the broad way. With depth a plane converges on
+    the sky's OWN colour behind it (atmospheric perspective), loses contrast, softens its edges, simplifies (fewer
+    strokes, two masses), flattens (`flat`), and turns its strokes level; a nearer plane's edge sits in front of a
+    farther one with a little AIR between them (a lighter band of the sky's value on the farther plane); kind 'streaks'
+    is a deck of long thin level strokes by the sun's line."""
+    FW, FH = spec['frame']
+    sky_rgb, _ = load_flat(os.path.join(ROOT, piece['sky_flat']))
+    sky_lab = rgb_to_lab(sky_rgb)
+    pal = piece['palette']
+    light = piece.get('light', spec['light']['dir'])
+    planes = sorted(piece['planes'], key=lambda q: -q['depth'])  # far first
+    # every solid plane's silhouette in frame px (for the air gaps)
+    sils = []
+    for pl in planes:
+        full = np.zeros((FH, FW), np.float32)
+        if pl.get('kind') != 'streaks':
+            bx, by, bw, bh = pl['box']
+            hgt = lobe_height(pl['lobes'], pl['box'], pl.get('flat', 1.0))
+            sil = np.clip((hgt - 0.12) / 0.06, 0, 1)
+            x0, y0 = max(0, bx), max(0, by)
+            x1, y1 = min(FW, bx + bw), min(FH, by + bh)
+            full[y0:y1, x0:x1] = sil[y0 - by:y1 - by, x0 - bx:x1 - bx]
+        sils.append(full)
+    outs = []
+    for j, pl in enumerate(planes):
+        d = float(pl['depth'])
+        conv = pl.get('conv', 0.8 * d)
+        bx, by, bw, bh = pl['box']
+        x0, y0 = max(0, bx), max(0, by)
+        sky_box = np.zeros((bh, bw, 3), np.float32)
+        x1, y1 = min(FW, bx + bw), min(FH, by + bh)
+        sky_box[y0 - by:y1 - by, x0 - bx:x1 - bx] = sky_lab[y0:y1, x0:x1]
+        prng = np.random.default_rng(int(piece['seed']) * 101 + j)
+        bb = dict(piece.get('broad', {}))
+        bb.update({
+            'edge_soft': bb.get('edge_soft', 3.0) * (1 + 2.5 * d),
+            'edge_px': bb.get('edge_px', 16) * (1 - 0.45 * d),
+            'strokes': bb.get('strokes', 0.7) * (1 - 0.7 * d),
+            'edge_strokes': bb.get('edge_strokes', 0.5) * (1 - 0.6 * d),
+            'width': tuple(w * (1 - 0.35 * d) for w in bb.get('width', (40, 90))),
+            'edge_width': tuple(w * (1 - 0.35 * d) for w in bb.get('edge_width', (18, 44))),
+            'specks': int(bb.get('specks', 0) * (1 - d)),
+            'angle': bb.get('angle', -8) * (1 - d),
+            'jitter_L': bb.get('jitter_L', 0.012) * (1 - 0.6 * d),
+        })
+        bb.update(pl.get('broad', {}))
+        sub = dict(piece, broad=bb, seed=int(piece['seed']) * 101 + j)
+        if pl.get('kind') == 'streaks':
+            cv = Canvas(bh, bw)
+            fst = make_flat_stamps(np.random.default_rng(int(piece['seed']) * 13 + j))
+            for k, (x, y, L_, w_) in enumerate(pl['streaks']):
+                col = hex_lab(pl.get('color', pal['lit']))
+                sk = sky_lab[int(min(FH - 1, max(0, y))), int(min(FW - 1, max(0, x)))]
+                lab = col + (sk - col) * conv
+                cv.stamp(fst[k % len(fst)], x - bx, y - by, math.radians(prng.normal(0, 0.8)), L_, w_, lab_to_rgb(lab[None])[0], prng.uniform(0.65, 0.9))
+            out, a = cv.rgba()
+            outs.append((f'p{j}', out, a, (bx, by), len(pl['streaks']), d))
+            continue
+        hgt = lobe_height(pl['lobes'], pl['box'], pl.get('flat', 1.0))
+        sil = np.clip((hgt - 0.12) / 0.06, 0, 1)
+        calm = np.ones((bh, bw), np.float32)
+        if piece.get('calm_box') and d < 0.3:
+            cx0, cy0, cx1, cy1 = piece['calm_box']
+            yy_, xx_ = np.mgrid[0:bh, 0:bw].astype(np.float32)
+            xx_ += bx
+            yy_ += by
+            inside = np.clip((xx_ - cx0) / 40, 0, 1) * np.clip((cx1 - xx_) / 40, 0, 1) * np.clip((yy_ - cy0) / 40, 0, 1) * np.clip((cy1 - yy_) / 40, 0, 1)
+            calm = (1 - inside).astype(np.float32)
+            sil = sil * calm
+        # the form, lit by the one light; masses (two when far)
+        gy, gx = np.gradient(cv2.GaussianBlur(hgt, (0, 0), pl.get('form_blur', 10)))
+        nrm = np.stack([-gx * 30, -gy * 30, np.full_like(hgt, 1.0)], -1)
+        nrm /= np.linalg.norm(nrm, axis=-1, keepdims=True)
+        L3 = np.array([light[0], light[1], 0.3], np.float32)
+        L3 /= np.linalg.norm(L3)
+        lit = np.clip(nrm @ L3, 0, 1)
+        cxm = np.mean([l[0] for l in pl['lobes']])
+        cym = np.mean([l[1] for l in pl['lobes']])
+        yy, xx = np.mgrid[0:bh, 0:bw].astype(np.float32)
+        big = np.clip(((xx + bx - cxm) * light[0] + (yy + by - cym) * light[1]) / (max(bw, bh) * 0.55), -1, 1)
+        t = np.clip(pl.get('lobe_k', 0.6) * lit + pl.get('big_k', 0.4) * (big * 0.5 + 0.5), 0, 1)
+        shade, mid, litc = (hex_lab(pal[k]) for k in ('shade', 'mid', 'lit'))
+        cuts = pl.get('cuts', [0.36, 0.62] if d < 0.6 else [0.5])
+        labs = [shade, mid, litc] if len(cuts) == 2 else [shade + (mid - shade) * 0.55, litc]
+        ws = masses(t, cuts, 0.035 + 0.04 * d, 0.05 * fbm(prng, bh, bw, 50, 3))
+        tgt = sum(w[..., None] * lab for w, lab in zip(ws, labs))
+        if pal.get('rim') and d < 0.6:
+            e_in = ndimage.distance_transform_edt(sil > 0.5)
+            rim = (np.clip(1 - e_in / pl.get('rim_px', 14), 0, 1) * smoothstep(0.55, 0.8, lit) * (big > -0.2)).astype(np.float32)
+            tgt = tgt + (hex_lab(pal['rim']) - tgt) * rim[..., None] * 0.9 * (1 - d)
+        # atmospheric perspective: toward the sky's own colour behind it
+        tgt = tgt + (sky_box - tgt) * conv
+        # the air between this plane and every nearer one: a lighter band of the sky's value along their edges
+        nearer = np.zeros((FH, FW), np.float32)
+        for k in range(j + 1, len(planes)):
+            nearer = np.maximum(nearer, sils[k])
+        if nearer.max() > 0:
+            dn = ndimage.distance_transform_edt(nearer < 0.5)[y0:y1, x0:x1]
+            gap = np.zeros((bh, bw), np.float32)
+            gap[y0 - by:y1 - by, x0 - bx:x1 - bx] = np.clip(1 - dn / piece.get('air_px', 14), 0, 1)
+            air = sky_box + np.array([piece.get('air_dL', 0.03), 0, 0])
+            tgt = tgt + (air - tgt) * gap[..., None] * 0.85
+        out, a, n = broad_paint(sub, prng, sil, tgt, light, calm)
+        outs.append((f'p{j}', out, a, (bx, by), n, d))
+    return outs
+
+
 # ------------------------------------------------------------------ main
 
 def paint_piece(piece, spec, preview=None):
@@ -894,6 +1019,8 @@ def paint_piece(piece, spec, preview=None):
     DRY['stamps'] = make_stamps(np.random.default_rng(seed * 7 + 3), n=12, dry_range=(0.5, 0.85))
     st = piece['style']
     t0 = time.time()
+    if st == 'cloudscape':
+        return [write_png(piece, spec, rng, out, a, x0, y0, n, t0, suffix=suf, depth=dep) for (suf, out, a, (x0, y0), n, dep) in style_cloudscape(piece, spec, rng, stamps)]
     if piece.get('brush') == 'broad':
         fn = {'sky': style_sky_broad, 'cloud': style_cloud_broad, 'foliage': style_flat_broad, 'surface': style_flat_broad}[st]
         out, a, (x0, y0), n = fn(piece, spec, rng, stamps)
@@ -905,17 +1032,27 @@ def paint_piece(piece, spec, preview=None):
         out, a, (x0, y0), n = style_flat_piece(piece, spec, rng, stamps, dabs)
     else:
         raise SystemExit(f'unknown style {st}')
+    return [write_png(piece, spec, rng, out, a, x0, y0, n, t0)]
+
+
+def write_png(piece, spec, rng, out, a, x0, y0, n, t0, suffix=None, depth=None):
     H, W = a.shape
     # 8-bit with a blue-ish dither (the strokes already break any banding; this keeps the sky's ramp smooth)
     dith = (rng.random((H, W, 1)) - 0.5) / 255
     rgba = np.concatenate([np.clip(out + dith, 0, 1), a[..., None]], -1)
     img = Image.fromarray((rgba * 255 + 0.5).astype(np.uint8), 'RGBA')
     name = piece['id'].split('/')[-1]
-    rel = os.path.join(spec['out'], f'{name}.png')
+    rid = piece['id'] + (f'_{suffix}' if suffix else '')
+    rel = os.path.join(spec['out'], f"{name}{'_' + suffix if suffix else ''}.png")
     img.save(os.path.join(ROOT, rel), optimize=True)
     src = os.path.relpath(rel, 'public') if rel.startswith('public/') else rel
-    row = {'id': piece['id'], 'src': src, 'box': [int(x0), int(y0), int(W), int(H)], 'style': st, 'seed': seed}
-    print(f"{piece['id']:16s} {st:8s} seed {seed:4d}  box {row['box']}  {n:6d} strokes  {time.time() - t0:5.1f}s")
+    st = piece['style']
+    seed = int(piece['seed'])
+    row = {'id': rid, 'src': src, 'box': [int(x0), int(y0), int(W), int(H)], 'style': st, 'seed': seed, 'from': piece['id']}
+    if suffix:
+        row['group'] = name
+        row['depth'] = float(depth)
+    print(f"{rid:16s} {st:10s} seed {seed:4d}  box {row['box']}  {n:6d} strokes  {time.time() - t0:5.1f}s")
     return row
 
 
@@ -927,19 +1064,18 @@ def main():
     spec = json.load(open(args.spec))
     os.makedirs(os.path.join(ROOT, spec['out']), exist_ok=True)
     man_path = os.path.join(ROOT, spec['out'], 'manifest.json')
-    old = {}
+    rows = {}
     if os.path.exists(man_path):
         for r in json.load(open(man_path)).get('pieces', []):
-            old[r['id']] = r
+            rows.setdefault(r.get('from', r['id']), []).append(r)
     only = [s for s in args.only.split(',') if s]
-    rows = dict(old)
     for piece in spec['pieces']:
         name = piece['id'].split('/')[-1]
         if only and piece['id'] not in only and name not in only:
             continue
         rows[piece['id']] = paint_piece(piece, spec)
     order = [p['id'] for p in spec['pieces']]
-    man = {'film': spec['film'], 'spec': os.path.relpath(os.path.abspath(args.spec), ROOT), 'pieces': [rows[i] for i in order if i in rows]}
+    man = {'film': spec['film'], 'spec': os.path.relpath(os.path.abspath(args.spec), ROOT), 'pieces': [r for i in order if i in rows for r in rows[i]]}
     with open(man_path, 'w') as f:
         json.dump(man, f, indent=1)
         f.write('\n')

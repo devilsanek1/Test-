@@ -35,6 +35,10 @@ export type PaintPiece = {
   style: PaintStyle;
   /** The seed it was painted with (a new seed = a new painting of the same shapes). */
   seed: number;
+  /** A piece that is one plane of a group (paint.py's 'cloudscape' writes one PNG per cloud plane): the group's name
+   *  and the plane's depth (0 near ... 1 far); a group's pieces are listed far to near (the drawing order). */
+  group?: string;
+  depth?: number;
 };
 
 /** A film's baked pieces by name (its manifest.json: {pieces: PaintPiece[]}). */
@@ -120,3 +124,21 @@ export function usePainted(pieceIn: PaintPiece | string | undefined, from?: numb
   const on = usePaintOn(piece);
   return on && !!piece && (from === undefined || t >= from);
 }
+
+/** A painted GROUP in its slot: every piece of the set whose `group` is this, in the manifest's order (far to near: a
+ *  layered cloudscape's planes, each its own image, so each can later drift at its own depth), or the children when the
+ *  set has no such group (the paint off, or a set that paints these things one piece at a time). */
+export const PaintedGroup: React.FC<{group: string; children?: React.ReactNode}> = ({group, children}) => {
+  const s = useContext(PaintCtx);
+  const pieces = s.on && s.set ? Object.values(s.set).filter((p) => p.group === group) : [];
+  const shown = pieces.filter((p) => !s.only || s.only.includes(p.id) || s.only.includes(group) || s.only.includes(p.id.split('/').pop() as string));
+  if (!shown.length) return <>{children}</>;
+  return (
+    <>
+      {shown.map((p) => (
+        <PaintImage key={p.id} piece={p} />
+      ))}
+    </>
+  );
+};
+
