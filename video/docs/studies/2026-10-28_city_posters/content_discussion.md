@@ -1,9 +1,8 @@
 # Content discussion: which stories fit the city-poster style
 
-**State (2026-10-29 ~07:57 UTC): PICKED.** The owner picked the heat story ("Okay let's try heat story let's
-generate the script"). It is now **video 5**, produced by this session: `video/docs/v5/` (fact lock running; the core
-line waits on the owner). This discussion is done unless the owner reopens it; IceCube stays the runner-up for a
-later film (peg: the Nobel ceremony, 10 Dec).
+**State (2026-10-29 ~08:25 UTC): PICKED; a reference evaluated.** The heat story is video 5 (`video/docs/v5/`; fact
+lock running; core line waiting on the owner). Exchange 10: the owner's reference reel (the Big Bend) evaluated; a
+proposal to score WOW on the topic screen waits on the owner.
 
 Notes: `content_market.md` and `content_fit.md` (the orchestrator's content track, scoped to tech and AI) are folded in
 below; their final versions (pulled ~22:20 UTC) changed nothing here. `content_fit.md`'s best kinds already include two
@@ -290,6 +289,32 @@ Re-scored by this thread (the drones' R and S lowered for little buzz; the journ
 ours). Every fact is still search-level: the pick gets one fact lock.
 
 **The owner's reaction:** ~07:55 UTC: "Okay let's try heat story let's generate the script" -> video 5 (`video/docs/v5/`).
+
+### 10. 2026-10-29 ~08:20 UTC: the owner's reference reel, evaluated (sent)
+The owner sent an 11 s screen recording of @civilext's "Why This Skyscraper Curves Back Down??" (the Big Bend; saved
+as `refs/bigbend_reel/`), verbatim: "Evaluate this story and the actual script on our rules and criteria / I'm thinking
+it's actually really good on both curious how you would evaluate it".
+
+| Rule or criterion | Verdict | Why |
+|---|---|---|
+| Frame 0 and the first 3 s | strong | the impossible object is already on screen, towering over Central Park; the voice starts at once; a place, a number and a name within 6 s; the title asks the one question (an open loop) |
+| The hook made physical | strong | the expected thing (a skyscraper goes up), then reality (it comes back down) |
+| One story, past its title | strong | one object, one "why", a twist in the caption ("the strange part isn't how high"): it is the LONGEST building, 4,000 ft end to end; curved elevators |
+| The look (the posters' feelings) | strong | one crisp hero, a layered city, Central Park and the rivers, the far skyline; then a scale lineup beside the Burj Khalifa (the far-out anchor as a chart) |
+| Spoken language | good | plain, "this crazy project"; nits: "New York" twice in 11 s; "got a proposal" overstates it (a studio's concept seeking investors, never filed or approved): a sharp commenter would say so |
+| True and solid | 6 | real concept (Oiio, Mar 2017), but only an idea; say "an architect imagined" |
+| Fresh | 2 | 2017, no peg; it did not matter here |
+| Ad or news? | pass | no product; arguably the studio's PR |
+| Our weighted score (est.) | **7.0** | R 7 (buzz and surprise 9, "so what" 4), T 6, V 10, M 7, F 2, S 9; WOW 9; depth 7 (from the 11 s) |
+
+**What it teaches us:** its numbers (11K likes, 1,378 shares) say one impossible picture plus one "why" question beat
+freshness; our criteria under-reward WOW (shown, never weighted) and over-reward freshness for this kind of story. A
+proposal for the owner: score WOW (and depth) on the topic screen (changing `docs/TOPIC_CRITERIA.md` is the owner's
+call). For video 5: open on its one impossible picture with a "why" question (core line 2, "Space is freezing. So why
+does this computer overheat?", works like this reel's title), and land core line 1 at the payoff. Not judged: the rest
+of the script (the recording stops at 11 s).
+
+**The owner's reaction:** (waiting)
 
 ## Picks (leanings, not locks)
 - 2026-10-29 ~07:55 UTC: **PICKED: the heat story** -> video 5, produced by this session (`video/docs/v5/`).
