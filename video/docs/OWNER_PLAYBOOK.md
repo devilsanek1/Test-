@@ -410,7 +410,8 @@ Maintenance at the end).
   restating or overriding a rule (v2's STYLE.md predates DIRECTION and is not the template), and a graded style check
   before it builds. — (v2/v3, 2026-10-27: "parallelize the work as much as you can, start more instances of cloud
   machines if you have to, but clean them up after"; "spin up as many parallel work sessions as you need"; "do each
-  subsection understand ... the full stylistic direction?").
+  subsection understand ... the full stylistic direction?"; "Remember to parallelize the work where appropriate between
+  subagents but also the subthreads just clean them up afterwards", 2026-10-29).
 - **Playable video from the sketch animatic (G3) on, never only stills; before G3 text and audio only. One version: one
   deliverable per gate (one script, one take, one animatic, one look clip), never several renders or takes of one gate
   unless asked;** a choice the owner makes (the topic, the core line, the hook line) comes as up to 3 options on one
@@ -470,11 +471,12 @@ Maintenance at the end).
   dithering, proven libraries, encoder settings); adopt the best, wrap it as a reusable lib + a QA check, never a
   hand-rolled approximation. The same for ANY piece of functionality (geometry, colour, noise, clipping, layout, QA,
   tooling): first search GitHub and npm for a library or existing code (small, maintained, permissively licensed,
-  deterministic, pinned), use it when it fits, wrap it so the API stays ours, hand-write only what nothing good does, and
-  record the choice and the alternatives with the code. — ("research some libraries on GitHub"; "again find the pro way
+  deterministic, pinned) and use it only when it is genuinely better than building it ourselves (more correct, better
+  quality, less code to maintain); wrap it so the API stays ours, and record the choice, the alternatives and why with
+  the code. — ("research some libraries on GitHub"; "again find the pro way
   and tools to do it the best way you can", v2 G4, 2026-10-27; "Search for any libraries or supporting code on GitHub if
   you need for any piece of functionality - we don't necessarily want to be reinventing the wheels if something was
-  already built and available", 2026-10-29).
+  already built and available"; "But only if it's genuinely better than built yourself", 2026-10-29).
 - **Every lesson goes into the generic process, committed** (playbook, a PIPELINE gate, the studio toolkit). — ("we gradually get better", v3, 2026-10-26).
 - **A rejected cut restarts clean.** When the owner says "I don't like it, start from scratch", drop the old visual
   work (archive it), skip the gates the owner names (e.g. no sketch) and make the finished film directly with full

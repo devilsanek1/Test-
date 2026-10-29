@@ -6,6 +6,18 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-29 ~08:20 UTC: the look test builds in four parallel lanes
+- Owner: "Remember to parallelize the work where appropriate between subagents but also the subthreads just clean
+  them up afterwards"; libraries "only if it's genuinely better than built yourself".
+- Lanes (subagents in this container, one working tree, each owning its files): E (depth.ts 1/z, the 10b palette
+  + gamut.ts, light.tsx FormShade per tier, the BEFORE row; notes `test/ENGINE.md`), PT (patchwork.ts, texture.tsx,
+  check_banding's texture mode; `test/ENGINE_PT.md`), N (foliage.tsx + wind.ts, clouds.tsx; `test/ENGINE_NATURE.md`),
+  S (the S1 copy in `video/src/look/poster_s1/`, the darks, the far stage, the switches; `test/SCENE.md`; it stops
+  and waits for E, PT and N, then integrates and renders when the orchestrator messages it). The docs agent turns the
+  decisions into rules (`INTEGRATION.md` §2).
+- Threads: the journal-corpus helper is archived (its work merged; its open question, which shortlist next, moves to
+  the content thread, which stays open with the owner).
+
 ## Status 2026-10-29 ~04:30 UTC: "Go with your suggestions"; building the 7 s look test
 - The owner approved every suggestion (the playbook's city-poster bullet lists them). Running: (1) a docs agent turns
   them into rules (DIRECTION, CRAFT, LAYOUT, LIFE_AND_DENSITY, PALETTE, the playbook's other bullets, STUDY §9,
