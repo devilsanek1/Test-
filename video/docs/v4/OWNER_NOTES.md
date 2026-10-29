@@ -171,3 +171,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   flowing sentences in a row, which our rhythm check failed); draft 3 restarted to use it (its first writer was 5
   minutes in). -> rules: playbook (Human connectors, Rhythm: a run of up to 3, Taste signals); `check_rhythm.py`'s run
   limit 2 -> 3; `docs/voice/VOICE.md` (the pace at G2).
+- 2026-10-29 ~18:40 UTC, G1 -> G2: on draft 3 (123 words; "your chatbot" restored): "i think this is a much better yes -
+  lets turn it into a voice now - play with the cadence and emotions to get to the best possible outcome capturing
+  people attention and keep them engaged" -> **G1 LOCKED** (the script, hook option 1, the core line "Your chatbot could
+  heat an apartment in Helsinki." and the card); G2 explores cadence and emotion internally (a few variants with the
+  voice Lady1: tags, expressiveness, pace, emphasis), measured against the El Niño reference and checked word by word,
+  and the owner gets ONE take. -> rule: playbook, Script and voice (the take is explored for attention, one delivered).
