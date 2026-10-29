@@ -10,6 +10,8 @@ top, crisp.
         --tree out/aipaint/tree/tree_s0.55_seed1029.png --set v2s1_ai1
 
 Upscaling is Lanczos (PIL). The pier stays our design (v4design's PNG, listed so the set is complete).
+--keep-design a,b: those pieces stay OUR design's PNG (the owner's pick, 0.70 without structure control, turned the far
+roofs and the tower into a cloud: so the far city stays ours and the AI gives the sky and the clouds).
 --edge-repair N: the frame's top N rows of the sky take row N (the model paints a thin darker rim along a canvas edge;
 the rule: no paper edge at the top of the frame). The proper fix for production: paint each plate with a bleed margin
 beyond the frame, so the model's edge falls outside it.
@@ -39,6 +41,7 @@ def main():
     ap.add_argument('--tree')
     ap.add_argument('--set', default='v2s1_ai1')
     ap.add_argument('--edge-repair', type=int, default=0, help='top rows of the sky replaced by the next row')
+    ap.add_argument('--keep-design', default='', help='pieces kept from our design, e.g. farroofs,fartower')
     a = ap.parse_args()
     out = os.path.join(ROOT, 'public/paint', a.set)
     os.makedirs(out, exist_ok=True)
@@ -71,6 +74,10 @@ def main():
         if src.size != (w, h):
             src = src.resize((w, h), Image.LANCZOS)
         alpha = np.asarray(src)[..., 3]
+        if name in a.keep_design.split(','):
+            q['painter'] = 'ours (v4 design), kept'
+            pieces.append(q)
+            continue
         if name in G.SKY_PIECES:
             rgb, m = crop_padded(frame, x, y, w, h), meta_sky
             q['reveal'] = 'wash' if (name == 'sky' or p.get('group')) else 'haze'

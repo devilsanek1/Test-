@@ -16,7 +16,7 @@
    "seed": 1029,
    "from": "v2s1/sky",
    "reveal": "wash",
-   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.68 + xinsir/controlnet-canny-sdxl-1.0 0.6 seed 1029"
+   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.7 seed 1029"
   },
   {
    "id": "v2s1/clouds_p0",
@@ -33,7 +33,7 @@
    "group": "clouds",
    "depth": 0.9,
    "reveal": "wash",
-   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.68 + xinsir/controlnet-canny-sdxl-1.0 0.6 seed 1029"
+   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.7 seed 1029"
   },
   {
    "id": "v2s1/clouds_p1",
@@ -50,7 +50,7 @@
    "group": "clouds",
    "depth": 0.7,
    "reveal": "wash",
-   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.68 + xinsir/controlnet-canny-sdxl-1.0 0.6 seed 1029"
+   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.7 seed 1029"
   },
   {
    "id": "v2s1/clouds_p2",
@@ -67,7 +67,7 @@
    "group": "clouds",
    "depth": 0.4,
    "reveal": "wash",
-   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.68 + xinsir/controlnet-canny-sdxl-1.0 0.6 seed 1029"
+   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.7 seed 1029"
   },
   {
    "id": "v2s1/clouds_p3",
@@ -84,7 +84,7 @@
    "group": "clouds",
    "depth": 0.0,
    "reveal": "wash",
-   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.68 + xinsir/controlnet-canny-sdxl-1.0 0.6 seed 1029"
+   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.7 seed 1029"
   },
   {
    "id": "v2s1/tree",
@@ -114,7 +114,7 @@
   },
   {
    "id": "v2s1/farroofs",
-   "src": "paint/v2s1_ai1/farroofs.png",
+   "src": "paint/v2s1_v4design/farroofs.png",
    "box": [
     0,
     724,
@@ -122,14 +122,13 @@
     244
    ],
    "style": "surface",
-   "seed": 1029,
+   "seed": 62,
    "from": "v2s1/farroofs",
-   "reveal": "haze",
-   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.68 + xinsir/controlnet-canny-sdxl-1.0 0.6 seed 1029"
+   "painter": "ours (v4 design), kept"
   },
   {
    "id": "v2s1/fartower",
-   "src": "paint/v2s1_ai1/fartower.png",
+   "src": "paint/v2s1_v4design/fartower.png",
    "box": [
     234,
     566,
@@ -137,10 +136,9 @@
     402
    ],
    "style": "surface",
-   "seed": 1029,
+   "seed": 68,
    "from": "v2s1/fartower",
-   "reveal": "haze",
-   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.68 + xinsir/controlnet-canny-sdxl-1.0 0.6 seed 1029"
+   "painter": "ours (v4 design), kept"
   }
  ]
 }
