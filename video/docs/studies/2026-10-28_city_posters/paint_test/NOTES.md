@@ -153,3 +153,5 @@ const PAINT = paintSet(manifest);                      // {sky, cloud, tree, pie
 style in these two more" (with `refs_human_scale/03_beach_dusk.jpg` and `02_bus_stop_night.jpg`).
 -> paint v3: the painter restyled toward those two (big simple masses, few broad deliberate strokes, soft dry-brush
 edges, calm areas, one colour family and one light), never an even streaky texture.
+Then: "And again even clouds have layers that give a sense of depth but yours do not" -> v3: 2-4 overlapping cloud
+planes, far banks paler, cooler, simpler and flatter toward the horizon (a layered-cloudscape style in the painter).
