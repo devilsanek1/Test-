@@ -213,3 +213,27 @@ planes, far banks paler, cooler, simpler and flatter toward the horizon (a layer
 "Wait but this is actually not bad like it’s not there but we are getting there" (seen at phone size, in compare_v4).
 -> v5 keeps the design-first method and the dusk family; fixes the crescent shapes; puts the whole scene under one
 evening light (water and paving tinted by the dusk); paint a little more visible on cloud edges and inside the cumulus.
+
+## v5: true billows, one evening light, and the owner's layered-brush recipe ("brush it and perhaps draw them in layers a bit more blurry each time"; refs_paint/)
+- **The outputs:** `paint_still_v5.png` (= `deliverables/tests/painted_scene1_still_v5.png`) and `compare_v5.jpg` (v4, v5, refs_paint 01 and 02). The spec is `scripts/look/paint/v2s1_v5.json` (set `v5`), v4's design-first method; v1-v4 still render unchanged.
+- **No crescents:** the new `light_mode: "cap"` draws each billow back to front, with a lit top over a curved terminator (lower on the sun's side), a mid band and a shade underside. The front lobes overlap the ones behind. The near cumulus has 14 lobes and the tree has 9 leaf masses; the accent caps and the giant top-right billow are gone.
+- **The layered brush** (`"brush": "layered"`):
+  - a LIMITED PALETTE of 14 swatches (`palette` in the spec). Every stroke takes one, or a neighbour of the same family;
+  - three passes per mass: big soft strokes blurred as the underpainting (6 px + 6 x depth), mid flat chisel strokes (along the form near the edge, along the wind inside), and a few small crisp strokes only at the light edges and the lit terminator;
+  - the plane blurred by its depth (3.2 px x depth; the streaks 1.0 px, the far roofs 2.2 px, the tower 1.6 px);
+  - speckle only on the near masses;
+  - 4 hand-placed broad strokes inside the near cumulus.
+  - **Water** (`style: "water"`): the flat water as the underpainting, then horizontal dashes from the palette, shorter and thinner far and longer near, gold under the sun.
+- **One evening light** (`src/look/paint_s1/dusk.tsx`, set `v5` only; src/v2r untouched):
+  - the canal turns lavender with rose and peach reflections and a gold glint (a colour matrix fitted to the dusk sky, then the painted dashes);
+  - a lilac shadow family in the rig;
+  - a soft-light wash: peach toward the sun on the left, lilac away from it, over the paving and the near things;
+  - the facade's lit side a touch warmer.
+  - She, the door, the sign, Pip and the captions are drawn untouched, and the words' background stays light (luma 205 against the ink's 32).
+- **Weak spots:**
+  - the near cumulus's lit top is large and rather yellow, and its shade underside thin;
+  - the tree reads pale yellow-green;
+  - the water's lavender is strong, and the far towpath's waterline is still a mint stripe;
+  - the soft-light washes are screen-space rectangles: in motion they would have to ride their planes;
+  - the paint is still subtle inside the masses at 400 px.
+

@@ -79,8 +79,9 @@ def main():
     revision = open(ref).read().strip() if os.path.exists(ref) else 'unknown'   # the commit fetch_model.py pulled
 
     t0 = time.time()
+    snap = os.path.join(os.path.dirname(os.path.dirname(ref)), 'snapshots', revision)   # the local snapshot folder
     pipe = StableDiffusionXLImg2ImgPipeline.from_pretrained(
-        MODEL, torch_dtype=torch.bfloat16, variant='fp16', use_safetensors=True, local_files_only=True)
+        snap, torch_dtype=torch.bfloat16, variant='fp16', use_safetensors=True, local_files_only=True)
     pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config, use_karras_sigmas=True)
     vae = pipe.vae.to(torch.float32)   # encode/decode ourselves in fp32 (bf16 VAE output bands)
     pipe.set_progress_bar_config(disable=True)
