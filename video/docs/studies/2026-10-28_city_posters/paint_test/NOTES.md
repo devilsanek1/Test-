@@ -155,3 +155,31 @@ style in these two more" (with `refs_human_scale/03_beach_dusk.jpg` and `02_bus_
 edges, calm areas, one colour family and one light), never an even streaky texture.
 Then: "And again even clouds have layers that give a sense of depth but yours do not" -> v3: 2-4 overlapping cloud
 planes, far banks paler, cooler, simpler and flatter toward the horizon (a layered-cloudscape style in the painter).
+
+## v3: the broad brush and a layered sky (the owner: "more subtle and more beautiful", the models 03_beach_dusk and 02_bus_stop_night; "even clouds have layers that give a sense of depth")
+- **The outputs:** `paint_still_v3.png` (= `deliverables/tests/painted_scene1_still_v3.png`) and `compare_v3.jpg` (v2, v3, both models). Same base and same engine; set `v3` = `scripts/look/paint/v2s1_v3.json` -> `public/paint/v2s1_v3/`. v1 and v2 still render unchanged (max difference 0).
+- **The painter gains `"brush": "broad"`** for every style:
+  - a mass is a few flat, broad strokes of flat-brush stamps (an even core, soft sides, a dry tail), and its strokes stay inside their own value mass;
+  - its rim breaks up in a dragged, dry scumble along the brush, with a speckle dissolve on the side away from the light;
+  - the inside is calm;
+  - one light gives 2-3 flat masses in the sky's own colour family.
+- **The painter gains `"style": "cloudscape"`** (lib/paint `<PaintedGroup group="clouds">`): one image per cloud plane, far to near. **S1 has 4 planes:**
+  - **near** (depth 0): the big cumulus with its tower beside the captions. Full form: 3 masses, a warm rim on the side facing the low sun, the most strokes, 12 px dry edges and specks.
+  - **0.45:** a paler, flatter bank (0.6) behind it, top left. It moves 38 % of the way to the sky's colour and keeps the masses but gets fewer strokes and softer edges.
+  - **0.7:** a flat, thin deck (0.42) low in the west gap. It moves 55 % of the way to the sky's colour and keeps only 2 masses.
+  - **0.92:** six long, thin, lit level streaks along the sun's line, behind the sun disc.
+  - Each nearer edge sits on the farther plane with a 14 px band of lighter air (the sky's value +0.03 L).
+- **Readings:**
+  - **Sky:** smooth, with a faint diagonal stroke texture at about 1 % of its value, warmer by the sun.
+  - **Captions:** on the words (x 150-800, y 330-480) the most any pixel changes is 6/255, and the cloud stands only right of x 849.
+  - **Tree:** 9 broad clusters in a lit and a shade mass, with the trunk's edge kept clean; darker than v2's flat (luma 159 against 173) and with more value spread (30 against 19).
+  - **Far city:** the roofs and the tower stay a soft haze.
+  - **Fern pot:** dropped (back to flat).
+  - About 31 % of the frame's pixels change. The bake takes 23 s.
+- **Weak spots of v3:**
+  - the near cumulus is so pale and tone-on-tone that at 400 px it reads mostly as a light mass, with its form carried only by the warm rim and the soft shade on the right;
+  - a few shade patches on the tower's right edge still read as round lobes;
+  - the tree's edge is still a little combed;
+  - the mid bank (0.45) hides partly behind the leaf branch;
+  - nothing has been checked in motion yet (each plane is its own image, ready to drift at its depth).
+

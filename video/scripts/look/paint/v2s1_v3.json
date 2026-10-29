@@ -78,10 +78,10 @@
    "air_px": 14,
    "air_dL": 0.03,
    "palette": {
-    "shade": "#B5CDC5",
-    "mid": "#E2ECE3",
-    "lit": "#FCF1E2",
-    "rim": "#FFE8CA"
+    "shade": "#C2D5CD",
+    "mid": "#E3ECE2",
+    "lit": "#FCEEDB",
+    "rim": "#FFE6C4"
    },
    "broad": {
     "angle": -8,
@@ -424,10 +424,11 @@
       ]
      ],
      "cuts": [
-      0.24,
-      0.58
+      0.34,
+      0.62
      ],
-     "form_blur": 22
+     "form_blur": 22,
+     "rim_px": 24
     }
    ]
   },

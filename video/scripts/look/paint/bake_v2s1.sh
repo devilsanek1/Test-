@@ -18,3 +18,4 @@ if [[ "${1:-}" != "--paint" ]]; then
 fi
 python3 scripts/look/paint/paint.py scripts/look/paint/v2s1.json
 python3 scripts/look/paint/paint.py scripts/look/paint/v2s1_v2.json
+python3 scripts/look/paint/paint.py scripts/look/paint/v2s1_v3.json
