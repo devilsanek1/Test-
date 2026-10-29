@@ -1,6 +1,6 @@
 # Recipe: trees and greenery (painted pieces)
 
-STATUS: IN PROGRESS (checkpoint 1: the LOOK section is written; the recipe and the proof follow).
+STATUS: IN PROGRESS (checkpoint 2: LOOK + RESEARCH written; the fix round on the proof and the recipe follow).
 
 The owner (2026-10-29): "Why can't you do the research yourself and come up with a concrete detailed recipes to
 reproduce certain elements?" This is that recipe for the greenery family: a tree crown, bushes in planters, grass and
@@ -65,3 +65,21 @@ foliage had 6-20 px smudged edges on every plane.
 ### 1.6 Texture
 - Inside flat masses: fine grain 1.6-2.4 L* (std, < 1.5 px), mottle 2.3-3 L* (1.5-6 px); leafy crowns 8-10 L* because
   the dabs are structure, not noise.
+
+
+## 2. Research (2026-10-29, ~10 min of web search; sources in section 9)
+
+- **Shapes before leaves.** Split the canopy into a light side and a shadow side from the light's direction; see the
+  shapes, not the leaves; keep darks out of the light and lights out of the shadow; scattered highlights everywhere are
+  the classic fault (Marla, source 1). Missing sky holes and weak light/shadow contrast are the other two (source 2).
+- **Dark first, then lighter.** Gouache and poster colour are opaque: block the mid and dark masses, then lay the
+  lighter clumps on top, working background to foreground (sources 3, 6, 8). The animation background departments that
+  paint in poster colour keep a clear split between light and shadow shapes with very little blending (source 6).
+- **A few colours per leaf region, spherical shading, aerial perspective.** An NPR paper built exactly on animation
+  background practice renders trees as colour regions (a few colours each), shaded as spheres, faded by aerial
+  perspective (source 7): our design-first method, confirmed.
+- **Cluster size falls toward the crown's edge; three depth bands** (far: soft, low contrast; mid: some detail;
+  near: dark and detailed) (source 5).
+- **Atmospheric perspective at sunset is reversed:** against a bright warm sky the far things go lighter and WARMER,
+  not bluer; distant trees lose the contrast between their light and shadow first (sources 4, 9).
+- **Grass:** a dark base mass, then lighter strokes clipped to it, sampling the mid tone and repeating (source 8).
