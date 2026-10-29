@@ -33,7 +33,8 @@ its signal, and they keep their FAIL. Px at 1080 x 1920, CIE L* and C*, %W/s = %
    camera is already in, never a new location made for it (v3: 6 places, a new world per chart).
 3. **One "you":** one drawing of the viewer's stand-in, or POV only; no strangers' backs in the foreground (they read as
    "you"). Pip hides on purpose (owner, 2026-10-28: "keep it, but not as obvious"): never a join's carrier and never
-   a pop-in for the eye; where a shot hides it, it sits in a spot that belongs to the world (a window, a boat, a
+   a pop-in for the eye; where a shot hides it (most exterior shots, none in closes and charts, the cover too: owner,
+   2026-10-29), it sits in a spot that belongs to the world (a window, a boat, a
    balcony), planned at G3 (v3: "you" drawn five ways; Pip popping up in a new spot in each shot).
 4. **The picture keeps the script's joins:** a line the script says as one movement ("push into the laptop ... pull out
    through the window") is one camera move, never cuts (v3's board broke three such lines into cuts).
@@ -68,14 +69,14 @@ its signal, and they keep their FAIL. Px at 1080 x 1920, CIE L* and C*, %W/s = %
 v3's subject was as strong as the references'; the world around it was louder: environment local contrast 11.3 (ref 1 6.6,
 v1 6.1), the subject's dark line on every crumb, 10x their saturated pixels, 25 movers per 0.5 s, and the story held 22 % of
 the motion (ref 1 60 %). Every element gets a tier by its STORY ROLE, never by its depth; its distance gives it a PLANE
-(§f), and both apply: the tier sets the weight (outline, contrast inside its plane, motion), the plane the colour, size,
+(§f), and both apply: the tier sets the weight (shade step, contrast inside its plane, motion), the plane the colour, size,
 texture and how simple it is:
 
 | tier | value | colour | line (§c) | detail | motion |
 |---|---|---|---|---|---|
-| **A subject** (1-3 objects: the beat's one focus) | L* range >= 80; local contrast >= 2x C's | the hero colour only here (>= 50 % of the frame's C* > 35 pixels) | the only full outline | line coverage >= 2.5x C's | >= 60 % of the motion in its beat; a second story action <= 0.3x of it, never at the same moment |
-| **B supporting life** (the mascot, people near the story, an audience in the mid ground; kit tier `support`, which also takes story objects off their beat) | local contrast <= 1.2x C's; no near-black areas | C* <= 25; never the hero or pop hue | tinted, or none | flat: one tone + one shade | each <= 3 % of the frame; constant speed, <= 0.5x the subject's while it moves (a still subject never freezes the world); no pops; together <= 30 % of the motion |
-| **C environment** (room, shelves, desk dressing, street, town, sky, weather and far life: walkers, cars, birds, steam, particles; kit tier `environment`) | local contrast <= 7, on each plane, not only averaged (§f); L* range <= 60 | C90 <= 25 (ref 1, v1), or saturated at contrast <= 7 (the cozy look) | no outlines; hairlines only | line coverage <= 6 % | the camera's float plus slow life that never stops (cloud drift, smoke, steam, snow, one window or bulb changing at a time, far walkers, cars and birds), together <= 10 % of the motion |
+| **A subject** (1-3 objects: the beat's one focus) | L* range >= 80; local contrast >= 2x C's | the hero colour only here (>= 50 % of the frame's C* > 35 pixels) | no outline: the deepest shade step (§d.3) | small-feature coverage (§e's line mask) >= 2.5x C's | >= 60 % of the motion in its beat; a second story action <= 0.3x of it, never at the same moment |
+| **B supporting life** (the mascot, people near the story, an audience in the mid ground; kit tier `support`, which also takes story objects off their beat) | local contrast <= 1.2x C's; no near-black areas | C* <= 25; never the hero or pop hue | none (§c) | flat: one tone + one shade | each <= 3 % of the frame; constant speed, <= 0.5x the subject's while it moves (a still subject never freezes the world); no pops; together <= 30 % of the motion |
+| **C environment** (room, shelves, desk dressing, street, town, sky, weather and far life: walkers, cars, birds, steam, particles; kit tier `environment`) | local contrast <= 7, on each plane, not only averaged (§f); a still near plane (-2, -1: no small features, nothing on it moving) <= 9 (owner, 2026-10-29); L* range <= 60 | C90 <= 25 (ref 1, v1), or saturated at contrast <= 7 (the cozy look) | none; thin lines only on things that are lines (§c) | small-feature coverage <= 6 %; built as the patchwork (below) | the camera's float plus slow life that never stops (cloud drift, smoke, steam, snow, one window or bulb changing at a time, far walkers, cars and birds), together <= 10 % of the motion |
 
 - **Alive but subtle:** supporting life (B and C) never stops (as in the cozy references) but stays small, slow and low in
   contrast, felt at the edges, never popping. As many movers as the scene needs to feel alive, but at most 3-4 noticeable
@@ -85,18 +86,31 @@ texture and how simple it is:
   already moves keeps its pace). Subtle means lighter, never fewer than the scene needs: lower a piece's weight (size,
   contrast, colour, speed, line) before removing it. Fullness comes from a calm, well-tiered world, never from
   equal-weight clutter.
-- **A softer style for B and C is the method:** a light flat fill with a thin tinted line (ref 1's crowds, drawn with B's
-  line, §c), no outlines (the cozy references' walkers), flat tinted silhouettes (v1's far city). Not every moving piece
-  is drawn or animated alike.
+- **A softer style for B and C is the method:** a light flat fill with a lit and a shade face and no outline (the cozy
+  references' walkers; ref 1's line-drawn crowds, with B's thin tinted line, were our way until 2026-10-29), flat
+  tinted silhouettes (v1's far city), and for C's masses the patchwork (next). Not every moving piece is drawn or
+  animated alike.
+- **Tier C's build: the "low poly" patchwork** (owner, 2026-10-29: "Go with your suggestions", `STUDY.md` §9 decision 3
+  (a); first judged in the look test, `STUDY.md` §10; the spec: `STUDY.md` §2a, §5.2): the near ground and the mid and
+  far city as flat, straight-edged facets of the hero's colours (within CIEDE2000 <= 8 of the hero's, under the same rig
+  and texture: one style at two resolutions), one fill per facet by its angle to the key, neighbours dL* 4-10, blocks
+  >= 8 px (3.5-7.5 % W, far 6-10 %), locked to their plane and taking its step (§f.2); frontal on mid and far masses;
+  on a ground only projected through `groundCam`, so it recedes (§f.4; never level bands); in the sky only as masses
+  within dE 6 of the air, never abstract rectangles; never on the subject, nothing in the caption band. The still near
+  world may run richer than C's cap (the table: <= 9). The options not taken (the far city only, or none) are history.
+  Code (to build): `lib/patchwork.ts`.
 - **Big means subject or still:** any moving figure > 5 % of the frame is the subject; a big near figure (the "you"; never
   strangers' backs, §a.3) holds still or breathes (<= 2 %W/s) while the subject acts (v3's audiences, 11-35 % of the
   frame, took up to 97 % of the motion).
 - **The mascot is tier B and hidden on purpose** (DIRECTION rule 2; owner, 2026-10-28) unless the line is about it:
-  C* <= 25, a tinted outline <= 2.2 px, <= 1 % of the frame (close-ups too), only blinks and ear moves (<= 10 %W/s)
-  while the subject moves, clear of the subject and off its eye path, found on a second look (v3's Pip, C* 44 with dark
+  C* <= 25, no outline (its parts part by a lit and a shade face, §c), <= 1 % of the frame, only blinks and ear moves
+  (<= 10 %W/s) while the subject moves, clear of the subject and off its eye path, found on a second look; a quiet
+  "find Pip" in most exterior shots, none in closes and charts, hidden on the cover too (owner, 2026-10-29: `STUDY.md`
+  §9 decision 5) (v3's Pip, C* 44 with dark
   outlines, beat the subject's salience per pixel in 12 of 13 panels).
 - **Code:** `lib/pen.ts` (`setPen('clean')`, `CLEAN_TIERS`; work in progress) maps `subject` / `support` / `environment`
-  to line widths and colours, calmer fills and motion factors; its constants are tuned until this check passes.
+  to calmer fills, shade steps (§d.3) and motion factors, with no outline on any tier (§c; the tier-A line becomes a
+  per-film flag, off: `STUDY.md` §10 item 4); its constants are tuned until this check passes.
 
 **Check** (the paused middle frame, then a 0.5 s burst; target, then ref 1 / v1 / v3 G5b): salience peak/median >= 2.4
 (3.65 / 2.60 / 1.79); background salience <= 1.4 (1.01 / 1.28 / 1.91); salience mass in the top 10 % of the area >= 19 %
@@ -108,19 +122,27 @@ every 2 s; it is on that beat's named subject.
 v3's weight was fine (2.3-3.0 px, like ref 1 and v1); the count, the ends and the contrast were not: 3.4-6.2x the approved G4
 frame's strokes, 10-27x its near-miss ends, every crumb at the hero's contrast (dL* 52-63 on every tier; cozy 24-28). The
 G4 frame had the same pen and passed with a quarter of the strokes: the fix is a new pen, not fewer props.
-- **Line by tier.** **A:** one closed outline 3.0 px, inner details 1.8-2.0 px, in the object's own shade (its fill L* -35,
-  hue kept, never under L* 16; the palette's anchor on dark objects), never near-black; captions keep the dark ink
-  (PALETTE). **B:** no outline: shapes part by value (neighbouring fills at least dL* 12 apart); where close values touch,
-  round the mascot and on a line-drawn figure (ref 1's crowds, a light flat fill), a same-hue line 1.6-2.2 px at fill L*
-  -15 to -25 (a tier scope with `lines`). **C:** no line: flat shapes in 2 tones (lit, shade), at most dL* 15 inside one
-  plane; things that ARE lines (wires, rails, a bird's V) as hairlines 1.2-1.6 px within dL* 15 of their background
-  (glints and lit rails a light tint, L* +10 to +20); none on far planes.
+- **Edges, not outlines** (owner, 2026-10-29: "Go with your suggestions", `STUDY.md` §9 decision 1 (c), the A vs B
+  picture's B: `docs/studies/2026-10-28_city_posters/img/AB_outlines.md`; first judged in the look test, `STUDY.md`
+  §10). No tier draws an outline: an edge is a value step, a lit face against a shade face (§d.3-4: the subject's
+  shade face -20 to -25 L*, B's and C's -7 to -12) or neighbouring fills at least dL* 12 apart; where close values
+  touch (round the mascot, a figure on a wall), a shade face or a counterchanged field parts them, never a line
+  (without its shade faces B goes flat: the picture's inset). C: flat shapes in 2 tones (lit, shade), at most dL* 15
+  inside one plane. **Thin lines only where the thing IS a line** (window and glazing bars, railings, rigging, wires,
+  a bird's V: the posters draw lines only there): dark ones in the object's own deep shade (its fill L* -35, hue kept,
+  never under L* 16, never near-black: the owner's "black outlines, VERY subtle, in key places", 2026-10-25, now
+  lives only here), light ones (lit rails, glints, light window bars) a light tint, L* +10 to +20; on tier C within
+  dL* 15 of their background; none on far planes; 2.0 px on every plane that floats, 1.2-1.6 px only on a locked shot
+  or a still plane (the twinkle bullet below). The subject's details are value steps too (a pane, a reveal, a step),
+  a thin line only where the detail is one. Captions keep the dark ink (PALETTE). Until 2026-10-29 tier A had one
+  closed 3.0 px outline in its own shade with 1.8-2.0 px inner details, and B a same-hue 1.6-2.2 px line round the
+  mascot and line-drawn figures (v2's line, the picture's A): history.
 - **Shapes:** each closed shape is ONE closed path (`Z`, round joins): no corner crossings, gaps or overshoot. Straight edges
   are ruler-true (jitter, drift, bow 0). Made objects get soft corners (r = 3-6 % of the short side, at least 3 px). Curves
   are smooth (Catmull-Rom); circles are true ellipses (wobble 0; organic shapes 0.01 at most). Free ends only where the
   stroke IS the thing (hair, steam, string): round caps, a smooth taper to 60 %.
-- **Fills** register exactly (offset 0); a tier-A outline is drawn inside its fill (stroke 2x, clipped to the fill), so the
-  silhouette is the clean fill edge.
+- **Fills** register exactly (offset 0) and meet edge to edge: with no outline the fill edge IS the silhouette, so it
+  is the cleanest path in the shape (a thin line on a shape is drawn inside its fill: stroke 2x, clipped to the fill).
 - **Texture:** big areas flat; texture only as flat same-hue shapes (a rug pattern, plank seams as 2 long bands at dL* 6-8
   or less) on 1-2 small surfaces per shot. No specks (static dark marks; §f's particles are light movers, not texture), ticks, hatching, scribble, dash rows, crumbs or steam squiggles,
   and no grain overlay by default (the sky's invisible encode dither, §g, is not a texture). Two optional textures, both
@@ -146,15 +168,16 @@ G4 frame had the same pen and passed with a quarter of the strokes: the fix is a
   pixels as it moves, so its core dims and recovers 2.5-25 times a second, in the renderer before any codec: the swing
   of its core contrast is 0.55-0.66 for a 1.0 px line, 0.17-0.27 at 1.5 px, 0.65-0.79 for a 1 px grid; lines of 2 px or
   more and window ticks of 4 x 6 px or more do not twinkle, and on a locked hold everything survives. The visible swing
-  is that share times the line's dL*: keep it <= ~2 L* on anything that floats (est.). It clashes with C's hairlines
-  above (1.2-1.6 px at up to dL* 15 swing ~3-7 L* in a float, est.; every line under 2 px is touched, A's 1.8 px
-  details and B's line from 1.6 px less so), and `STUDY.md` §7 does not settle it, so it is
-  **the owner's call (open):** (a) hairlines 2.0 px on the planes that float; (b) 1.2-1.6 px kept quiet there (twinkle x
-  dL* <= ~2 L*: about dL* 7 at 1.5 px, est.) or only on locked shots and still planes. Until the owner answers, C's
-  hairlines stand: check every float at 1x for twinkle.
+  is that share times the line's dL*: keep it <= ~2 L* on anything that floats (est.). It clashed with C's 1.2-1.6 px
+  hairlines (at up to dL* 15 they swing ~3-7 L* in a float, est.), so **the owner decided** (2026-10-29: "Go with your
+  suggestions", option (a)): every thin line is 2.0 px on a plane that floats, 1.2-1.6 px only on a locked shot or a
+  still plane (option (b), the thin widths kept quiet in the float at twinkle x dL* <= ~2 L*, is history). Check
+  every float at 1x for twinkle.
 - **Code: the CLEAN pen** (the sketch pen stays for G3 boards), set once in the film's look module: `lib/pen.ts`
   `setPen('clean')` (the full pen with tiers, work in progress; `lib/sketch.ts` `setPenMode('clean')` is v2r's lighter
-  one). Its targets: `misreg` {0,0,0}; `stroke` hero 3.0 / detail 2.0 / tone 1.8 / hair 1.2; rects, polys and loops one closed
+  one). Its targets: `misreg` {0,0,0}; no outline on any tier (the tier-A line a per-film flag, off: "Edges, not
+  outlines" above), so `stroke` hero 3.0 goes unused; detail 2.0 / tone 1.8 / hair 1.2, each 2.0 on a plane that
+  floats; rects, polys and loops one closed
   path; `Ink` `taper` off unless asked, `vary` / `open` / `exitLoose` 0, `color` by tier (no near-black default); `Fill`
   `offset` [0,0] + `inkInside`; `hatch`, `scribble`, `scribbleMass`, `wallTicks`, `crownTicks`, `speedLines`, `cross` draw nothing.
 
@@ -162,7 +185,8 @@ G4 frame had the same pen and passed with a quarter of the strokes: the fix is a
 (74 / 45-166 / 140-232 / 248-459); short strokes (< 40 px) <= 25 (42 / 20-108 / 81-166 / 189-384); line length <= 10 k px
 (16 k / 10-26 k / 20-31 k / 21-33 k); dark-line pixels <= 3 % (5.0 / 2.8-6.8 / 7-10 / 5.1-9.4); near-miss ends <= 40 (68 /
 129-413 / 324-691 / 689-1840); colour edges that carry a line <= 40 % (62 / 54-89 / 64-72 / 59-72; the cozy references
-19-22); cleaner than ref 1 and v1 on purpose, never emptier: the props stay, their lines go. Code: `grep -rnE
+19-22); cleaner than ref 1 and v1 on purpose, never emptier: the props stay, their lines go (the line mask counts
+thin marks only: §f.8's dark pieces, >= 4 px across both ways, are left out). Code: `grep -rnE
 "\bover:|misreg|hatch\(|scribble|exitLoose|\bopen=" src/vN/film` finds nothing, and the film draws no `lib/cine`
 drawing piece (city, street, tower, monument, wall, windows, figures, sky, light, props, wipers, lens: raw paths with
 `misreg` and their own hand jitter, which the clean pen never reaches) until the craft tooling lane ports them; its
@@ -181,18 +205,20 @@ G4 frame), halos as opaque discs, no cast or contact shadow in any kit file, no 
    the frame); pool core 92-94 (4 above any lit surface); pool ring and lamp wash 88-91; ambient wall 80-84 (caption band
    78+, ink 8:1+); desk 58-62; shade steps; contact strips 45+. Night exterior: lit windows and bulbs 85-92; pools 88-91 on
    ground snow at 83-85; sky-facing snow caps 87-89, thin, never above the pool core (a sky at ~45 lights them); sky ~45.
-   Day: sun 45-65° high, lit tones lean yellow, the sky the lightest field. Nothing under L* 35 but ink and anchor-dark
-   surfaces (their shadows take one step below).
+   Day: sun 45-65° high, lit tones lean yellow, the sky the lightest field. Nothing under L* 35 but ink, anchor-dark
+   surfaces and §f.8's dark pieces (their shadows take one step below).
 3. **A shadow is its surface times the set's ONE tint family** (multiply; form, cast and contact are three strengths of
    one hue): never grey, never a hand-picked fill. Warm surfaces keep at least 0.95x their chroma and turn 5-20° toward
-   rose or plum; cool ones 10-16° toward violet. On the main surfaces the tints give form dL* -7 to -12, cast -10 to -15,
+   rose or plum; cool ones 10-16° toward violet. On the main surfaces the tints give form dL* -7 to -12 (tier A deeper:
+   below), cast -10 to -15,
    contact -15 to -25 (thin strips only): ref 1's one flat step is "gentle"; the cozy references' -25 to -40 is too hard
    for our pale palettes. (v3: room form #EEDCDC, cast #E3CCD3, contact #C8A3B0; dusk #D3CFEA, contact #B4AED8.)
-   **How deep the subject's shade face goes is the owner's open call** (city-poster study, 2026-10-28: `STUDY.md`
-   §5.3-5.4, §7, §9 decision 1): every poster volume is one deep flat step, -21 to -37 L* (median -29; v2's S3 chimney
-   -5). (a) Keep -7 to -12 on every tier (rule 5's "gentle in value"); (b) the subject's (tier A) shade face -20 to -25
-   L*, B and C keeping -7 to -12, with or without A's outline (the A vs B picture). Until the owner answers, the numbers
-   above stand.
+   **The subject's shade face goes deeper** (owner, 2026-10-29: "Go with your suggestions", `STUDY.md` §9 decision 1
+   (c); first judged in the look test; city-poster study, `STUDY.md` §5.3-5.4, §7): tier A's form step is -20 to -25 L*
+   on its main surfaces (a stronger strength of the same tint family: `FormShade` per tier), B's and C's keep -7 to
+   -12; with no outlines (§c) these faces make the edges. Every poster volume is one deep flat step, -21 to -37 L*
+   (median -29; v2's S3 chimney -5): ours sits under their median because our palettes are paler, and a phone needs
+   bolder steps than print. Keeping -7 to -12 on every tier (v2's step), with or without A's outline, is history.
 4. **Form shadow** on the side away from the key, 25-40 % of the object's width: one flat, hard-edged step, no ink on its
    edge; a crescent on round things; about 3:1 lit to shade by area on what faces the key. Every volume reads in 2-3
    flat tones, a lit face and a shade face (DIRECTION rule 5; city-poster study, 2026-10-28, `style.md` §1.2): a prism
@@ -213,7 +239,7 @@ G4 frame), halos as opaque discs, no cast or contact shadow in any kit file, no 
    one step on the sky, or none: show light on what it hits, never as discs. Room falloff: planes (window reveal, desk
    underside, corners) plus ONE lamp wash with a 2-step (~26 px) edge, never concentric rings (a target). No symbolic glow.
 8. **Rim light only on the subject,** when the key is behind or beside it or it stands on a darker field: 4-6 px inside
-   the silhouette along 25-50 % of the outline on the key side, in the lit colour; never an offset copy of the outline.
+   the silhouette along 25-50 % of its edge on the key side, in the lit colour; never an offset copy of the edge.
 9. **Unlit:** the sky and the sources, insert cards and charts, screens and lit panes, captions, the far town past the
    atmosphere steps. The caption band holds one value; no shadow edge crosses it.
 10. **How much:** night interior 20-30 % lit (pool and wash), 45-60 % ambient, 10-20 % shadow shapes; night exterior 8-15 %
@@ -229,7 +255,8 @@ G4 frame), halos as opaque discs, no cast or contact shadow in any kit file, no 
 
 **Check** (the G4 look clip and every render): every pool at least +4 L* over its ground; a halo's radius at most 1.7x
 its lantern; the brightest 5 % (sky and caption band out) centred within 0.15 H of the subject; no shadow pixel under C* 8,
-nor under L* 35 except on an anchor-dark surface; one value in the caption band; the G4 look clip already shows the rig
+nor under L* 35 except on an anchor-dark surface or a dark piece (§f.8); the subject's shade face -20 to -25 L* under
+its lit face (an eye check until `check_light.py` gets its tier-A step); one value in the caption band; the G4 look clip already shows the rig
 with form, cast and contact shadows. `scripts/qa/check_light.py` (built in the v3 rework: an A/B of the same frame with
 the light layers off and on) checks the pools, the brightest 5 %, the shadow colour and the caption band; the halo and
 the three shadow kinds are an eye check. Eye check: for every shadow, point at its light; for every object in the
@@ -277,13 +304,14 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
    plane takes half its plane's step and keeps its separation.
 3. **Separation: the subject never shares a value with what is right behind it.** A lit edge on a darker field, a shaded
    edge on a lighter one (counterchange); overlap, never a tangent. Along the silhouette (fill against fill): tier A
-   median |ΔL*| >= 15, <= 20 % at one value (|ΔL*| < 5), no unlined one-value run over 60 px (12 / 25 % with its outline
-   along >= 80 % of it: the line helps, never replaces the fill step); a big mass of the subject's plane >= 12 / <= 25 %
+   median |ΔL*| >= 15, <= 20 % at one value (|ΔL*| < 5), no one-value run over 60 px (with no outline, §c, the fill
+   step alone parts it; the lined allowance, 12 / 25 % with an outline along >= 80 %, is history); a big mass of the subject's plane >= 12 / <= 25 %
    / <= 100 px (references 13-38; G4's corner 2.9 / 52 % / 152 px). The field behind is a calm flat shape of its own
    plane (a far row rising behind a lit corner, a darker band behind light figures), never a halo, glow or outline: a
    step that lives only in a thin ring round the silhouette (2-10 px), with the edge melting past it (24-48 px out),
    is a melt.
-4. **The ground recedes.** ONE camera per shot for every ground, wall, figure and particle; the ground's joints, steps
+4. **The ground recedes.** ONE camera per shot for every ground, wall, figure and particle (one exception: the designed
+   view's far stage, §f.5); the ground's joints, steps
    and dressing laid out flat in its own coordinates and projected: lines into the picture converge, rows foreshorten
    (>= 2x far to near), joints narrow, sizes fall as 1/distance. Visible lines (|ΔL*| >= 6, or a tone band >= 3 px):
    <= 65 % level and >= 20 % to the vanishing point(s) (references 27-57 % receding; G4 84 % level, 0 %: its joints ran
@@ -292,6 +320,15 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
 5. **Size: one camera.** Never a nearer thing smaller per metre than a farther one (G4: the ducks and our landing's
    public 41-63 px/m, her across the water 100); people on one level keep one eye ratio within +-15 %. Calm a figure with
    colour (tier B), never by shrinking it; a camera too low for the foreground's things is raised, not cheated.
+   **The designed view, two frames a film** (owner, 2026-10-29: "Go with your suggestions", `STUDY.md` §9 decision 4
+   (a), the posters' "unique camera angle and composition of objects"; first judged in the look test; the spec:
+   `STUDY.md` §5.7, `perspective.md` L2): the home place's establishing view and the scale landing's end frame may lift
+   the far city and its water onto its own horizon, ONE declared far stage (where it sits: `LAYOUT.md` §8.2
+   "Horizons"), its junction hidden behind a band of water, trees or roofs, no receding line in the far zone, and may
+   draw the landmark bigger than one camera allows (the posters 1.4-3.6x), declared in W1 (`stage: 'far'`, `hero:
+   true` in `sizeProblems`). The near world keeps its one camera and every rule above; in motion both horizons hold (a
+   truck along the junction would expose it). Every other frame: one camera (option (b), one camera for everything,
+   is history).
 6. **A few particles make it natural, and they are SEEN** (owner: "a bit of particles here and there"; then, on v4: "I don't
    see any changes in the particles anywhere": the test is that a viewer can point at them at phone size without
    searching): tier-C life, calm and slow, declared at G3 as `life:` items: motes only inside light and against shade
@@ -337,14 +374,15 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
 8. **A full value range: a calm light sky, a mid-tone world and a few real darks where the eye should go** (DIRECTION
    rule 6; owner, 2026-10-28: "good point too!"; numbers: city-poster study, 2026-10-28, `STUDY.md` §1a, §5.5, §7, from
    `pro_1_depth.md` and `pro_4_colour.md`). Per frame, the caption band out: the darkest 5 % of the pixels at L* <= 32
-   (p5; posters 23, v2 48), on anchor-dark pieces (§d.2); >= 30 L* from the near group (planes -2, -1) to the air
+   (p5; posters 23, v2 48), on the dark pieces below (§d.2); >= 30 L* from the near group (planes -2, -1) to the air
    (posters 27-46, v2 10-15); L* < 65 on >= 25 % of the frame and 65-80 on <= 20 % (the posters 27-48 % and 8-14 %;
    v2 21-47 % in between); a jump of >= 15 L* from the subject's group to the far group (posters 19-36). Keep the hues,
    move the values: a grade closes only 16 % of the posters' gap, the rest is drawing (the darks, the filled ground, the
-   colour count). No darks in the caption band or on far planes. **The dark share is the owner's open call** (`STUDY.md`
-   §9 decision 2): (a) about 5 % of the frame dark, rule 6's tinted anchor (`PALETTE.md`), as now; (b) 6-10 % under
-   L* 40 in >= 120 pieces of >= 4 x 4 px across >= 9 of 16 grid cells (windows, doorways, eave undersides, the shade
-   under trees, hulls; the posters 13.8 % in 259 pieces, v2 1.9 % in 41). Until the owner answers, (a) stands. These are
+   colour count). No darks in the caption band or on far planes. **The dark share** (owner, 2026-10-29: "Go with your
+   suggestions", `STUDY.md` §9 decision 2 (b); first judged in the look test): 6-10 % of the frame under L* 40 in >=
+   120 pieces of >= 4 x 4 px across >= 9 of 16 grid cells (windows, doorways, eave undersides, the shade under trees,
+   hulls; the posters 13.8 % in 259 pieces, v2 1.9 % in 41), in the palette's tinted dark hue (`PALETTE.md`'s
+   anchor), the near world in mid-tones; (a), about 5 % as rule 6's one tinted anchor, is history. These are
    WARNs, like this page's other thresholds; a still is measured with `scripts/look/posters/pro_4_colour.py` until
    `check_depth.py` gets its value parts (to build: `STUDY.md` §1a).
 - **Code:** `lib/water.tsx` (§7: `<Water>`, `waterProblems`, `waterPalette`; how-to `lib/WATER.md`, demo
@@ -374,7 +412,8 @@ stands off what is behind it, the far reads far, the ground runs into the pictur
 - Cheap water (owner on v2's v5: "way too cheap ... lazy and cheap"): a flat band with box-shaped reflection patches, scattered dashes
   and star sparkles. Water is drawn with the care of a building: `lib/water.tsx` (§7), its reflections, ripples and glitter designed.
 - Two cameras: a perspective ground under level, frontal buildings reads as a backdrop on a floor; facades, bridge and far rows share the
-  ground's horizon and vanishing point (a narrow side wall in shade shows a building's depth).
+  ground's horizon and vanishing point (a narrow side wall in shade shows a building's depth); the designed view's
+  declared far stage, its junction hidden, is the one exception (§f.5).
 - The heaviest area at a squint must be the subject's, never the near dressing: near planes get value range, not prop count.
 
 ## g. Sky: one continuous, gentle gradient that survives video
@@ -391,7 +430,12 @@ flat. Measured on the S1 demo (`research/2026-10-27_sky_gradients.md` §5):
    one crosses yellow-green at C* 13).
 2. **The sun is part of the sky:** a soft elliptical warmth round a low sun, low and wide (ry ~0.45 rx: it hugs the
    horizon; a 0.6 one rose into the mint as a round glow disc and crossed yellow-green at C* 8.1), gone at its rim
-   with a smootherstep (no edge, no ring), never inside the caption band; the disc a flat shape on top, no halo.
+   with a smootherstep (no edge, no ring), never inside the caption band; the disc a flat shape on top, no halo. The
+   disc sits one flat step off its sky (calmed toward the warm sky band) or behind a ridge, unless it is the shot's
+   "look here" (owner, 2026-10-29: "Go with your suggestions", `STUDY.md` §9 decision 6 (b); first judged in the look
+   test): the far stays the calmest part of the frame, nothing in the far group, the disc included, out-contrasting
+   the subject's separation (`pro_1_depth.md` §3.2; no poster has a sun disc; v2's S5 disc, L* 60 C* 74, sat dE 80
+   off its sky, the loudest far thing). A saturated disc as the pop (option (a), v2's) is history.
 3. **The far haze = the sky's lowest colour,** warmed under the sun: `horizonColor(sky, x)` is §f.1's AIR.
 4. **Dithered for the encoder:** Chrome's own +-0.5 code gradient dither is erased by any encode, so the sky carries a
    static blue-noise texture of +-2 codes per channel at a 2 px grain (zero-mean, 0.28 L* rms: invisible; a 1 px

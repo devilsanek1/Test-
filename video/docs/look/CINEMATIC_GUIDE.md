@@ -30,8 +30,8 @@ measured, not stored):
 
 **For our videos** (the reference above is in a lined style; our film is drawn in the clean pen, `DIRECTION.md` rule 9):
 stage the hook as "the expected thing, then the surprising reality overtaking it", inside one opening shot that is
-drawn on from frame 0: the subject's outline (with tier B's tinted lines) draws on, tier C lands as flat pale shapes,
-colour floods in, as a bold visible event (not ~0.3 s: owner, 2026-10-28); the owner approves this build with the G4 look clip. Never still, but the novelty every
+drawn on from frame 0: the subject's line draws on, tier C lands as flat pale shapes,
+colour floods in over the line (no outline stays: `DIRECTION.md` rule 4), as a bold visible event (not ~0.3 s: owner, 2026-10-28); the owner approves this build with the G4 look clip. Never still, but the novelty every
 few frames comes from the subject's own build and its mechanism, one mover leading (`CRAFT.md` §b), never from extra
 supporting life. Keep the first spoken line as frame 0's caption (never a title over it: playbook "Hook and pacing") and the first-second phone sound; the film loops back to frame 0's drawing
 state. SketchReel supports it: `draw` (stroke draw-on) and `fillIn` (colour flood) per element.
@@ -144,8 +144,8 @@ pull-out; the big scale move belongs to the reveal later in the film (S1 or S5).
 - **Light:** one sun high beyond the city (3/4 backlight): tops lit, camera-facing walls and the backs in shade, shadows
   toward us. Each farther plane is a fixed flat mix toward the sky (0 / 12 / 22 / 40 / 65 %, measured: Scale cues 5),
   its shade leaning to the dusk blue (warm near, dusty-cool far, never grey-blue), with fewer value steps (5 / 5 / 4 /
-  3 / 2); lines by tier, never by depth (`CRAFT.md` §c: the subject's outline only; the environment draws no line on
-  any plane, hairlines only for things that ARE lines). Eye path: lit deck -> warmest lit facades up the canyon ->
+  3 / 2); no outlines, never lines by depth (`CRAFT.md` §c: edges from light and shade on every tier and plane, thin
+  lines only for things that ARE lines). Eye path: lit deck -> warmest lit facades up the canyon ->
   pale hill base -> the landmark, the darkest far shape, against the palest cloud (a low flat bank on the horizon, the
   landmark in its gap). Over the move: bright slot in a dark frame -> darkest at the dormer -> light burst BEFORE the
   landmark lands -> settle. Flat mist cuts: ask the owner first.
@@ -184,8 +184,8 @@ quota. Breathers (S3, S4) take theirs from the sky (9-10).
    our colour: `CRAFT.md` §f.2, `lib/depth.ts` `recede`: toward the sky's lowest step behind the plane, never through
    grey or olive). Autumn
    Ember darkest swatches `#3A1F16` L15 | `#533D38` 28 | `#695653` 38 | `#8C7D7C` 54 | `#BAACA8` 71 (the L* 15 step only
-   as the ~5 % anchor: `PALETTE.md`); values 5/5/4/3/2; lines by tier, never by depth (`CRAFT.md` §c: the environment
-   draws none on any plane); warm near, the sky's hue farthest.
+   in the anchor's small dark pieces: `CRAFT.md` §f.8); values 5/5/4/3/2; no outlines on any plane (`CRAFT.md` §c);
+   warm near, the sky's hue farthest.
 6. **The drop below the camera:** a low crane, not a drone: feet 2-3 F below the horizon (Arcane 2.0-2.4; the S5 end's 3.0
    is the limit; past 3.5 reads as a map), every city roof under it. Ridges halve per plane (infinity 0-12 px under it,
    far 15-40, mid 60-100, near-mid 140-220), then the rail jumps to 480-560: that gap IS the drop. Never draw a street
@@ -197,7 +197,7 @@ quota. Breathers (S3, S4) take theirs from the sky (9-10).
 8. **Tiny anchors, lines up:** the figures from behind (the "you", with a companion only if W1 names one; never Pip,
    which hides: `DIRECTION.md` rule 2) at 1.0 F, heads on a lighter mid
    wall; the near frame mass 30-35 % of the frame, a tier-C mass at L* >= ~30 (the darkest step only on its edge; the
-   anchor colour ~5 %, `PALETTE.md`; `CRAFT.md` §b-§d), cut by 2 edges. Lines lead UP to the landmark: the canyon VP over their heads, the far skyline
+   anchor colour in small pieces, `CRAFT.md` §f.8; §b-§d), cut by 2 edges. Lines lead UP to the landmark: the canyon VP over their heads, the far skyline
    stepping up 40-60 px before the hill, one diagonal (a skylight ridge) at its base; the rail is the one level line.
 9. **A big sky with huge clouds:** sky 30-40 % on a scale end (65-85 % on breathers), clouds 45-55 % of it outside the
    caption band (`LAYOUT.md` §1). One hero mass >= 1.0 W (cut by a side), >= 2.5x the landmark's width and BEHIND it (farther, still bigger): on
