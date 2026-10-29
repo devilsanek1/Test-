@@ -79,6 +79,12 @@ Earlier rounds also used Pip's periwinkles (`#7A7FE3`, `#6A6ED6`, `#AEB2F4`), pe
 - 2026-10-29 ~19:50 UTC, on round 2 (the sheet and the pick, 3 Pip hidden on purpose): "More premium!!" then "No, more
   abstract more premium" -> round 3: abstract marks, premium (precise geometry, few shapes, restrained colour); no
   cartoon, no face; Pip only if abstracted past the cartoon.
-- 2026-10-29 ~20:00 UTC, on round 3 (The Fold, The Eclipse, The Question): "Nope from scratch I don't like none of
+- before 2026-10-29 19:48 UTC, to the orchestrator (relayed): "Again let's start with stills" and "No video yet" ->
+  stills only: no animated logo (no end-card draw-on, no motion) until the owner has picked and approved a still.
+- before 2026-10-29 19:56 UTC, on round 3, to the orchestrator (relayed): "The fold is directionally good but way too
+  abstract" (the orchestrator then asked for a Fold-only round 4: three variants, each more literal; that request
+  reached this session at 20:05, after round 4 below was made).
+- 2026-10-29 ~19:58 UTC, on round 3, written to the logo session directly: "Nope from scratch I don't like none of
   them" and "More premium" -> round 4 from scratch: flat geometric icons read as stock, not premium; premium is the
-  city posters' language (light, depth, atmosphere, craft), drawn as small emblems at dusk.
+  city posters' language (light, depth, atmosphere, craft), drawn as small emblems at dusk. The Fold, less abstract,
+  is the next round if the owner's answer to round 4 points back to it.
