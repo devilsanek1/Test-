@@ -608,7 +608,9 @@ Maintenance at the end).
   videos' corner and on banners. The logo's rounds, sources and the owner's verdicts: `docs/brand/LOGO.md`. — ("The
   logo should not contain any text btw", on logo round 1; "More premium!!" and "No, more abstract more premium", on
   round 2, with two Pip marks and a spiral "?"; "The fold is directionally good but way too abstract", on round 3, then "Nope from scratch I don't like none of
-  them" and "More premium", 2026-10-29: flat geometric icons read as stock; premium is craft, light and depth).
+  them" and "More premium", 2026-10-29: flat geometric icons read as stock; premium is craft, light and depth; on
+  round 4's emblems: "I like the city view but it's too generic like why is it relevant to us", so the mark must say
+  what we do, the talk, the fuss, the question, not just look good).
 - **Upload at the highest quality and natively on each platform** (checklist in `docs/POSTING_KIT.md`). — (2026-10-25).
 - **AI label ON everywhere; no paid boost until 3-5 posts exist,** then boost the best organic performer. — (2026-10-25).
 
