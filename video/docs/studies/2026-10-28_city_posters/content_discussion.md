@@ -1,13 +1,13 @@
 # Content discussion: which stories fit the city-poster style
 
-**State (2026-10-28 ~22:50 UTC): DIRECTION FIRMING UP.** Tech told through these views, researched as a general
-direction: one possible umbrella is **tech in the cities** (WOW cases where a city solves a problem with new tech or
-AI); data centres and driverless taxis are kinds inside it; every pick needs a WOW; the owner liked the weird-place
-data centres (a Cold War bunker, a chapel, a public pool). Three scouts (max effort) are hunting:
-`discussion_scouts/wow_datacentres.md`, `wow_tech_world.md`, `tech_in_cities.md`. Next: edit their finds into the
-umbrella's kinds and a shortlist with the column chart. No pick yet; who produces the video stays the owner's call.
-If the 5-hour limit stops this thread: a self check-in fires at 2026-10-29 02:40 UTC (the window resets 02:30) to
-relaunch any unfinished scout (finish its file, don't restart it) and continue from this line.
+**State (2026-10-29 ~02:45 UTC): DIRECTION FIRMING UP; scouts resumed after the 5-hour limit.** Tech told through
+these views, researched as a general direction: one possible umbrella is **tech in the cities** (WOW cases where a city
+solves a problem with new tech or AI); data centres and driverless taxis are kinds inside it; every pick needs a WOW;
+the owner liked the weird-place data centres. The limit stopped all three scouts at ~22:55 UTC. Done:
+`discussion_scouts/wow_datacentres.md` (top 5: Boulder City's vote, the overheating data centre in orbit, Helsinki's
+AI-heated homes, Stockholm's bunker, a mine in the Dolomites). Resumed at ~02:40 UTC from their transcripts:
+`wow_tech_world.md` (half written) and `tech_in_cities.md` (skeleton only). Next: edit all three into the umbrella's
+kinds and a shortlist with the column chart. No pick yet; who produces the video stays the owner's call.
 
 Notes: `content_market.md` and `content_fit.md` (the orchestrator's content track, scoped to tech and AI) are folded in
 below; their final versions (pulled ~22:20 UTC) changed nothing here. `content_fit.md`'s best kinds already include two

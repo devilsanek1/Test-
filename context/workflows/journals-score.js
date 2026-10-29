@@ -38,7 +38,8 @@ function scorer(role) {
   const which = blind
     ? `ONLY the ids listed in ${J}/blind_sample_ids.txt (a seeded 20 % sample): you are the BLIND second scorer, the
 check on whether the rubric gives the same answer in other hands.`
-    : `EVERY row of the corpus: you are the first scorer.`
+    : `EVERY row listed in ${J}/stage2_ids.txt (stage 2: the triage's top 250 plus a random 10 % control): you are the
+first scorer.`
   return `You are a scorer in the journal-corpus study (a research thread for a short-form explainer channel whose films
 are drawn worlds: v1, the best performer, drew the internet as a town of buildings).
 
@@ -47,8 +48,10 @@ sections 1-2 tell you what the owner wants. Then read ${J}/corpus.csv (every row
 event at two outlets).
 
 Score ${which}
-- Score each story from its corpus row alone (outlet, date, headline, section, type, our one-line summary) plus your
-  general knowledge of what such a story involves. No web searches: both scorers must work from the same information.
+- Score each story from its corpus row alone (outlet, date, headline, section, type, our one-line summary; feed rows,
+  source rss, have no summary: use the headline, the feed section and the feed_tags) plus your general knowledge of
+  what such a story involves; mark confidence low when a headline is too cryptic to judge. No web searches: both
+  scorers must work from the same information. Ignore the triage file: score afresh.
 - Columns of ${J}/${out}, in this order: ${COLS}
   W H D N M: section 4.2 (integers). gate: pass/fail (4.1), gate_reason only for a fail. R T Mo F S: section 4.3,
   integers 1-10 (F follows the date bands; Mo the slate's need). fit, value, owner: fill them; the checker recomputes
@@ -76,7 +79,8 @@ const AUDIT = `You are the corpus auditor of the journal-corpus study. The corpu
 results by three collectors; your job is to check that its rows are real and faithful. Read ${J}/README.md section 3
 first.
 
-Audit every row whose id ends in 0 (J010, J020, J030, ...: about 10 % of the corpus). For each:
+Audit every SEARCH row (source search) whose id ends in 0 (C1-010, C1-020, ..., C2-010, ..., C4-010, ...: about 10 %
+of the search rows; the feed rows come from the outlets' own feeds and are not audited). For each:
 - Run WebSearch (mode "standard") for its headline, with allowed_domains set to the outlet's domain (TIME time.com,
   Forbes forbes.com, Bloomberg bloomberg.com, Fortune fortune.com, MIT Technology Review technologyreview.com, Scientific
   American scientificamerican.com, National Geographic nationalgeographic.com, Smithsonian smithsonianmag.com, The
