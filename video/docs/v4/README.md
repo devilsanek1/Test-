@@ -12,14 +12,21 @@ The earlier v4 session (https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt)
 |---|---|---|
 | G0 topic + core line | topic LOCKED: Helsinki (one city); core line proposed by the writer (default: "Your chatbot could heat a flat in Helsinki.") | `G0_TOPIC.md` |
 | Fact lock | shared with video 5 (one fact file): `video/docs/v5/research/factlock.md` sections 2, 6, 7.1-7.4, 8 | |
-| G1 script | SENT, waiting on the owner (2026-10-29 ~11:20 UTC): 117 words, ~41 s, critic FIX AND SEND, fixes applied | `script/script_g1.md`, `script/script_elevenlabs.md`, `THROUGHLINE.md` |
+| G1 script | DRAFT 2 SENT, waiting on the owner (2026-10-29 ~16:00 UTC): 124 words, ~44 s, five cold panels, all checks OK | `script/script_g1.md`, `script/script_elevenlabs.md`, `THROUGHLINE.md` |
 | G2 voice | after the owner approves the script; voice `MQnUCZUAQLYMCY1Ztz6d` ("Lady1", the owner's try, 2026-10-29: `docs/voice/VOICE.md`); a valid key works in THIS session only (pasted in the chat, used inline, never filed), so G2 runs here; the voice tools are set up in the scratchpad | `public/v4/` |
 
 **Video 4 is produced by session https://claude.ai/code/session_01VwsUCnkJXFuq3YwEYFUg7o since 2026-10-29 ~10:05 UTC**
 (owner: "lets work on the video 4 - pick up where its been left off"), on branch `claude/kind-pascal-lvgsza` (from
 `video-production` at ce5270f; merged into `video-production` at the owner's yes).
 
-**G1 SCRIPT SENT TO THE OWNER (2026-10-29 ~11:20 UTC), waiting on their yes:** the script (117 words, ~41 s; both checks
+**G1 DRAFT 2 SENT TO THE OWNER (2026-10-29 ~16:00 UTC), waiting on their yes:** after the owner's notes on draft 1 ("too
+ambiguous and weird", `OWNER_NOTES.md`), the script-clarity work (`docs/retro/2026-10-29_script_clarity/`: research,
+PRINCIPLES.md, the rules integrated, `check_clarity.py`) reworked it: draft 2, its critic and fix pass, then fix rounds
+1-3 on five cold three-viewer panels (`script/panel/`, `panel_r2/` to `panel_r5/`): 124 words, ~44 s, all three checks
+OK; the last panel: 3 of 3 would send it, one single-viewer snag left (the jump back to 2010 after the 2027 plan), so a
+time-ordered variant is being heard by a sixth panel (`script/panel_timeorder/`).
+
+Earlier: **G1 SCRIPT SENT TO THE OWNER (2026-10-29 ~11:20 UTC), waiting on their yes:** the script (117 words, ~41 s; both checks
 OK), the hook pick (option 1 voiced), the core line ("an apartment" or "a flat") and the card: `script/script_g1.md`,
 `script/script_elevenlabs.md`, `THROUGHLINE.md`; the critique `script/critique_g1.md` (FIX AND SEND, 0 blockers; all
 5 findings applied). Workflow `context/workflows/v4-g1-script-lean-wf_c7c0628a-726.js` (3 agents, ~0.95 M tokens).
