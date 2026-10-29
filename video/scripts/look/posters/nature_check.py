@@ -12,7 +12,7 @@ docs/studies/2026-10-28_city_posters/test/ENGINE_NATURE.md). Two modes:
 
   motion  twinkle and boil on a PNG sequence rendered at 1:1 (a scaled render turns 2 px into 1 px and fakes a
           twinkle). TWINKLE (the details lens's measure, details.md §3): a thin feature's CORE contrast swings as it
-          straddles pixels; per 64 px tile, the core contrast is the p99 of the thin-feature map (a 3 x 3 morphological
+          straddles pixels; per 64 px tile, the core contrast is the p99 of the thin-feature map (a 5 x 5 morphological
           top-hat of L*, bright + dark) and the twinkle is its swing over time ((p95 - p5) / mean, after removing the slow
           trend of the motion itself); the VISIBLE swing is twinkle x the core contrast (L*: keep it <= ~2 on anything that
           floats). BOIL: frame-to-frame change spikes (max / median of the mean |dL*| per frame) and, with --still DIR (the
@@ -21,6 +21,14 @@ docs/studies/2026-10-28_city_posters/test/ENGINE_NATURE.md). Two modes:
           line moving like the near plane) so the foliage's numbers read against a known twinkle.
 
             python3 -I scripts/look/posters/nature_check.py motion --frames DIR [--still DIR] [--cal ...] [--out json]
+
+  twinkle the clean test (motion cannot confound it): the same still frame moved by pure sub-pixel translations,
+          0-1 px in 0.1 px steps along x (frames 0-10) then y (11-21) (the demo's NatureTwinkle). Per 32 px tile the
+          core contrast (p99 of the 5 x 5 top-hat, the tile's 3 px border left out) across the 11 phases of each axis:
+          twinkle = (max - min) / mean, visible = max - min (L*). Calibrated by the same --cal boxes (1 px line ~0.5-0.6,
+          2 px line 0).
+
+            python3 -I scripts/look/posters/nature_check.py twinkle --frames DIR [--cal ...] [--out json]
 """
 import argparse
 import glob
@@ -106,8 +114,9 @@ def still(args):
 
 
 def thin_map(L):
-    """Bright and dark features up to ~2 px wide: a 3 x 3 top-hat of L* (white + black)."""
-    k = np.ones((3, 3), np.uint8)
+    """Bright and dark features up to ~4 px wide: a 5 x 5 top-hat of L* (white + black). (A 3 x 3 element under-reads a
+    2 px line whenever it straddles three rows, and fakes a twinkle on it.)"""
+    k = np.ones((5, 5), np.uint8)
     return (L - cv2.morphologyEx(L, cv2.MORPH_OPEN, k)) + (cv2.morphologyEx(L, cv2.MORPH_CLOSE, k) - L)
 
 
@@ -169,6 +178,44 @@ def motion(args):
     return out
 
 
+def twinkle(args):
+    files = sorted(glob.glob(os.path.join(args.frames, '*.png')))
+    if len(files) < 22:
+        raise SystemExit(f'need the 22-frame sub-pixel sequence in {args.frames}')
+    TH = np.stack([thin_map(lab_of(f)[1][..., 0].astype(np.float32)) for f in files[:22]])
+    _, Hh, Ww = TH.shape
+    tile, b = 32, 3
+
+    def core_of(x0, y0, x1, y1, q=99):
+        return np.percentile(TH[:, y0:y1, x0:x1].reshape(22, -1), q, axis=1)
+
+    rows = []
+    for ty in range(0, Hh - tile + 1, tile):
+        for tx in range(0, Ww - tile + 1, tile):
+            c = core_of(tx + b, ty + b, tx + tile - b, ty + tile - b)
+            m = float(c.mean())
+            if m < 2.0:
+                continue
+            sw = max(float(c[:11].max() - c[:11].min()), float(c[11:].max() - c[11:].min()))
+            rows.append({'tile': [tx, ty], 'core_L': round(m, 2), 'twinkle': round(sw / m, 3), 'visible_L': round(sw, 2)})
+    rows.sort(key=lambda r: -r['visible_L'])
+    vis = [r['visible_L'] for r in rows]
+    out = {'tiles': len(rows), 'visible_L': {'p50': round(float(np.median(vis)), 3), 'p90': round(float(np.percentile(vis, 90)), 3), 'p99': round(float(np.percentile(vis, 99)), 3), 'max': round(float(max(vis)), 3)},
+           'tiles_visible_over_2L': sum(1 for v in vis if v > 2.0), 'worst_tiles': rows[:10]}
+    if args.cal:
+        cal = []
+        for i in range(0, len(args.cal), 4):
+            x0, y0, x1, y1 = args.cal[i:i + 4]
+            c = core_of(x0, y0, x1, y1, 99.5)
+            sw = max(float(c[:11].max() - c[:11].min()), float(c[11:].max() - c[11:].min()))
+            cal.append({'box': [x0, y0, x1, y1], 'core_L': round(float(c.mean()), 2), 'twinkle': round(sw / max(1e-6, float(c.mean())), 3), 'visible_L': round(sw, 2)})
+        out['calibration'] = cal
+    print(json.dumps(out, indent=1))
+    if args.out:
+        json.dump(out, open(args.out, 'w'), indent=1)
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest='mode', required=True)
@@ -182,8 +229,12 @@ def main():
     m.add_argument('--still')
     m.add_argument('--cal', type=int, nargs='*')
     m.add_argument('--out')
+    w = sp.add_parser('twinkle')
+    w.add_argument('--frames', required=True)
+    w.add_argument('--cal', type=int, nargs='*')
+    w.add_argument('--out')
     args = ap.parse_args()
-    still(args) if args.mode == 'still' else motion(args)
+    {'still': still, 'motion': motion, 'twinkle': twinkle}[args.mode](args)
 
 
 if __name__ == '__main__':

@@ -105,9 +105,19 @@ export const S1PathFurniture: React.FC = () => {
       const k = MAP.s1FigureHAt(x) / S.herH;
       s1BollardInto(b, x, edge - coping * 0.5 + s1Bend(x) - 2, 22 * k, darks ? dark('iron') : S1_IRON);
     }
+    // (the look test's darks) two dark iron litter bins at the back of the path, by the lamps
+    if (darks) {
+      for (const x of [338, 726]) {
+        const k = MAP.s1FigureHAt(x) / S.herH;
+        const y = S1_PATH.top + 10 + s1Bend(x);
+        const w = 18 * k;
+        const h = 30 * k;
+        b.fill(dark('iron'), `M${P(x - w / 2, y)}L${P(x - w / 2, y - h)}Q${P(x, y - h - w * 0.35)} ${P(x + w / 2, y - h)}L${P(x + w / 2, y)}Z`);
+      }
+    }
     // (the look test's darks) low iron mooring cleats on the coping between the bollards, at the bend's scale
     if (darks) {
-      for (const x of [640, 350, 212, 112, 22]) {
+      for (const x of [640, 560, 350, 212, 112, 22, 700]) {
         const k = MAP.s1FigureHAt(x) / S.herH;
         const y = edge - coping * 0.72 + s1Bend(x);
         const w = 16 * k;

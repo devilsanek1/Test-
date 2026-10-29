@@ -132,6 +132,16 @@ function facadeStatic(darks = false): Batch {
     u += r.range(0.32, 0.7);
     i++;
   }
+  // (the look test's darks) the roof terrace's planter boxes, dark timber, at the plants' feet along the parapet
+  if (darks) {
+    for (const u of [0.9, 2.3, 3.6, 5.1, 6.4, 7.9]) {
+      if (u > LAY.wM - 0.3) continue;
+      const [x, y] = p(u, 0.0);
+      const s = PM.pxPerM(u);
+      if (y - s * 0.28 < 604) continue;
+      b.poly(dark('wood'), [[x - s * 0.42, y + 1], [x + s * 0.42, y + 1], [x + s * 0.38, y - s * 0.22], [x - s * 0.38, y - s * 0.22]]);
+    }
+  }
   b.layer();
   // ---- the brick wall, in strips (the flood ripples across the facade), and its stone
   const strips = [0, CORNER, 1.3, UPPER[1].u0, UPPER[1].u1, UPPER[2].u0, UPPER[2].u1, WU0, WU1, UPPER[3].u0, LAY.wM];
@@ -364,8 +374,9 @@ function darkPaneInto(b: Batch, qq: PaneQ, pp: PaneP, lit: boolean, seed: string
     b.poly(CM.paper, [pp(0.62, 0), pp(0.7, 0), pp(0.5, lo * 0.66), pp(0.44, lo * 0.66)]);
   } else {
     b.poly(CM.lamp, qq(0, 0, 1, 1));
-    // a small thing on the inside sill against the light (a mug, a pot)
+    // a small thing on the inside sill against the light (a mug, a pot), a low chair back at the other side
     b.poly(dark('wood'), qq(0.78, 0.86, 0.1, 0.08));
+    if (kind !== 0) b.poly(dark('iron'), [pp(0.04, 1), pp(0.05, 0.8), pp(0.1, 0.76), pp(0.22, 0.76), pp(0.26, 0.8), pp(0.27, 1)]);
     if (kind === 0) {
       // a pendant over a long table, two chair backs at it
       b.poly(dark('iron'), [pp(0.36, 0.3), pp(0.64, 0.3), pp(0.56, 0.21), pp(0.44, 0.21)]);

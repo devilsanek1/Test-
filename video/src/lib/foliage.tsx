@@ -37,9 +37,9 @@ import {Fill} from './Fill';
 import {Tier} from './tier';
 import {useTime} from './time';
 import {fromLch, lch, mixHex} from './light';
-import {recede, type Atmosphere} from './depth';
+import {planeK, recede, type Atmosphere} from './depth';
 import {rng, type Rng} from './rng';
-import {neverBand} from './water';
+import {cleanColour, neverBand} from './water';
 import {clusterShift, crownDeg, leafFlutter, STILL_WIND, type Wind} from './wind';
 
 export type Pt = [number, number];
@@ -659,12 +659,17 @@ function specKey(s: object): string {
   return JSON.stringify(s, (k, v) => (typeof v === 'function' ? undefined : k === 'atm' && v ? (v as Atmosphere).name + JSON.stringify((v as Atmosphere).steps) + (v as Atmosphere).air(1) + (v as Atmosphere).air(4) : v));
 }
 
-/** The plane's tones: the given ones, or the ladder on the species green; a mid or far tree steps toward its air. */
+/** The plane's tones: the given ones, or the ladder on the species green; a mid or far tree steps toward its air. A far
+ *  ladder is spread so its steps still measure ~5 L* after the plane's air step (N1: far 2-3 tones in 4-6 L* steps). */
 function planeTones(spec: {tones?: string[]; species?: Species; plane?: number; atm?: Atmosphere}, mode: Mode): string[] {
   const sp = spec.species ?? LONDON_PLANE;
-  const base = spec.tones ?? foliageTones({green: sp.green, L: mode === 'near' ? LADDER_NEAR : mode === 'mid' ? LADDER_MID : LADDER_FAR});
   const plane = spec.plane ?? -1;
-  return spec.atm && plane > 0 ? base.map((c) => recede(c, plane, spec.atm as Atmosphere)) : base;
+  const k = spec.atm && plane > 0 ? planeK(spec.atm, plane) : 0;
+  const farStep = clamp(5 / Math.max(0.2, 1 - k), 5, 14);
+  const ladder = mode === 'near' ? LADDER_NEAR : mode === 'mid' ? LADDER_MID : [55.5 - farStep, 55.5, 55.5 + farStep];
+  const base = spec.tones ?? foliageTones({green: sp.green, L: ladder});
+  // (a green stepped toward a warm air can land on the olive band's edge: lib/water's cleanColour turns it out, cool)
+  return spec.atm && plane > 0 ? base.map((c) => cleanColour(recede(c, plane, spec.atm as Atmosphere))) : base;
 }
 
 /** The crown, built once per spec (cached by its content): clusters, rim leaves, holes, trunk and limbs, all paths. */
@@ -772,7 +777,7 @@ function buildCrown(spec: CrownSpec): CrownGeom {
   const tones = planeTones(spec, mode);
   const top1 = tones.length - 1;
   const bark = spec.bark ?? barkTones();
-  const recedeC = (c: string) => (spec.atm && plane > 0 ? recede(c, plane, spec.atm) : c);
+  const recedeC = (c: string) => (spec.atm && plane > 0 ? cleanColour(recede(c, plane, spec.atm)) : c);
 
   const H = spec.height;
   const W = spec.width ?? H * sp.aspect;

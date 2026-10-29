@@ -14,6 +14,7 @@ import {CM} from '../../v2r/palette';
 import {useSwitches} from './switches';
 import {nearMid} from './near';
 import {dark} from './darks';
+import {PatchFill, treadPatch} from './V2S1_patch';
 
 type Pt = [number, number];
 const r1 = (n: number) => Math.round(n * 10) / 10;
@@ -133,6 +134,19 @@ export const StoneBand: React.FC<{k: number; seed?: string}> = ({k, seed = 'v2s1
     return {base, slabs, joints: joints.join(''), lip: lipPath(k)};
   }, [k, seed]);
   const tone = useBankTone();
+  const {patchwork} = useSwitches();
+  if (patchwork) {
+    // (the look test's "low poly" paving: lane PT's patchwork through the bank's one camera, then v2's step lip)
+    const y1 = Math.min(b.y1, 2400) + 1;
+    const pw = treadPatch(k, [[X0, edgeY(b.y0 - 1, X0)], [X1, edgeY(b.y0 - 1, X1)], [X1, edgeY(y1, X1)], [X0, edgeY(y1, X0)]], tone(b.top));
+    if (pw)
+      return (
+        <>
+          <PatchFill pw={pw} seed={`${seed}/patch${k}`} />
+          {g.lip ? <Fill d={g.lip} color={tone(BANK_PAVE)} seed={`${seed}/edge${k}`} offset={false} /> : null}
+        </>
+      );
+  }
   return (
     <>
       <Fill d={g.base} color={tone(b.top)} seed={`${seed}/base${k}`} offset={false} />
@@ -162,7 +176,7 @@ export const Coping: React.FC<{seed?: string}> = ({seed = 'v2s1bank'}) => {
 };
 
 /** (the look test's darks) two cast-iron gully grates on the landing, laid along the bank's edges. */
-const LANDING_GRATES: string = [250, 560, 880, 40]
+const LANDING_GRATES: string = [250, 560, 880, 40, 410, 1030]
   .map((x) => {
     const y = edgeY((BANK.landing[0] + BANK.nosings[0]) / 2, x);
     const s = groundScale(x, y);

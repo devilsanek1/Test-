@@ -77,8 +77,8 @@ export type MottleProps = {
   soft?: number;
   /** The group's current translation on screen (its float offset): keeps the band screen-locked. [0, 0] at rest. */
   offset?: [number, number];
-  /** The filter region in the group's user space [x, y, w, h]: the plane's extent plus its float (default the frame
-   *  + 160 px). A smaller region is cheaper (the cost is per pixel). */
+  /** The filter region in the group's user space [x, y, w, h] (default the frame + 160 px). It CLIPS the plane: it
+   *  must hold everything the plane draws (plus its float); a tighter one is cheaper (the cost is per pixel). */
   region?: [number, number, number, number];
   /** On from this scene time (s): the look clip's switch ("the mottle switched on at 3.5 s"); true / false. */
   on?: boolean | number;
@@ -149,6 +149,11 @@ export const Mottle: React.FC<MottleProps> = ({k = 1, seed = 1, scale = 1, chrom
               </feMerge>
             </>
           ) : null}
+          {/* the plane x (1 + s (N - 0.5)): mean-exact (+-0.01 L* on every plane, measured). Its one cost: the alpha of
+              a plane's outer anti-aliased pixel rises by s/2, so while the plane floats at a fractional offset that row
+              reads <= ~0.8 L* darker (0 at rest): a 0.02 px dilation of its silhouette, inside CRAFT §c's float budget
+              (<= ~2 L*). The alpha-exact variant (divide by 1 + s/2, multiply back with a transfer) is NOT used: its
+              extra 8-bit step truncates, shifting whole planes by 0.05-0.18 L* (ENGINE_PT.md §3). */}
           <feComposite in="SourceGraphic" in2={strips.length ? 'masked' : 'noise'} operator="arithmetic" k1={fmt(s)} k2={fmt(1 - s * 0.5)} k3="0" k4="0" />
         </filter>
       </defs>

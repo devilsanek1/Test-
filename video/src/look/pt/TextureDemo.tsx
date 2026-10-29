@@ -42,7 +42,7 @@ export const PtTextureDemo: React.FC<{mode: 'flat' | 'mottle'}> = ({mode}) => {
   return (
     <AbsoluteFill style={{background: '#FFFFFF'}}>
       <svg width={1080} height={1920} viewBox="0 0 1080 1920">
-        <Plane plane={PLANES.sky} k={mottleK({sky: true})} seed={11} mottle={m} region={[-40, -40, 1160, 1060]}>
+        <Plane plane={PLANES.sky} k={mottleK({sky: true})} seed={11} mottle={m}>
           <Sky spec={S1_EVENING} />
         </Plane>
         <Plane plane={PLANES.far} k={mottleK({plane: 3})} seed={12} mottle={m} region={[-60, 560, 1200, 440]}>

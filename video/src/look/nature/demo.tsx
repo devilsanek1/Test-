@@ -44,7 +44,7 @@ const holeAt = (x: number, y: number) => {
 // ---------------------------------------------------------------- the pieces
 
 /** The London plane on the near bank: its crown y ~610-1300 (clear of the caption band), cut by the left edge. */
-export const PLANE: CrownSpec = {seed: 'plane-s1', base: [318, 1700], height: 1090, plane: -1, light: KEY, holes: holeAt, holesAbove: 800, species: {...LONDON_PLANE, green: P.sage}};
+export const PLANE: CrownSpec = {seed: 'plane-s1', base: [318, 1724], height: 1040, plane: -1, light: KEY, holes: holeAt, holesAbove: 800, species: {...LONDON_PLANE, green: P.sage}};
 /** A near branch of its leaves in the top gutter (y < 290), entering from the top-left corner. */
 export const SPRAY: LeafSpraySpec = {seed: 'spray-s1', branch: [[-50, -30], [70, 30], [170, 84], [262, 118]], width: [15, 4], leaves: 10, size: [52, 86], droop: 0.32, light: KEY, autumn: 0.1, species: {...LONDON_PLANE, green: P.sage}};
 /** The hero cumulus in S1's spot (the top gutter, y ~122-272: v2 S1's cream cloud was [644, 184, 1004, 270]). */
@@ -53,12 +53,12 @@ export const HERO: CumulusSpec = {seed: 'hero-s1', x: 598, base: 272, w: 430, h:
 const BIG: CumulusSpec = {seed: 'big', x: 90, base: 820, w: 900, h: 190, towers: 4, light: KEY, sky: (x, y) => skyColorAt(S1_EVENING, y, x), drift: 2.5};
 
 const GREEN = {...LONDON_PLANE, green: P.sage};
-const LADDER_NEAR: CrownSpec = {seed: 'ladder-near', base: [820, 1810], height: 860, plane: -1, light: KEY, species: GREEN};
+const LADDER_NEAR: CrownSpec = {seed: 'ladder-near', base: [300, 1810], height: 860, plane: -1, light: KEY, species: GREEN};
 const LADDER_MID: CrownSpec[] = [
   {seed: 'ladder-mid-a', base: [120, 1026], height: 330, plane: 1, light: KEY, atm: ATM, species: GREEN},
   {seed: 'ladder-mid-b', base: [345, 1022], height: 290, plane: 1, light: KEY, atm: ATM, species: GREEN},
 ];
-const LADDER_FAR: CrownSpec[] = [560, 660, 745, 845, 945].map((x, i) => ({seed: `ladder-far-${i}`, base: [x, 1002] as [number, number], height: 120 + (i % 2) * 26, plane: 3, light: KEY, atm: ATM, species: GREEN}));
+const LADDER_FAR: CrownSpec[] = [540, 630, 715, 800, 890].map((x, i) => ({seed: `ladder-far-${i}`, base: [x, 1002] as [number, number], height: 120 + (i % 2) * 26, plane: 3, light: KEY, atm: ATM, species: GREEN}));
 
 /** The demo's lints (empty = OK): run in the browser console of the demo and by the node runner for the notes. */
 export function natureDemoProblems(): [string, string[]][] {
@@ -108,7 +108,7 @@ const FoliageFrame: React.FC<{t: number}> = ({t}) => (
       <Backdrop />
     </Float>
     <Float t={t} plane={-1}>
-      <Contact x={318} y={1700} w={60} />
+      <Contact x={318} y={1724} w={62} />
       <Crown spec={PLANE} wind={WIND} t={t} />
     </Float>
     <Float t={t} plane={-2}>
@@ -141,7 +141,7 @@ export const Ladder: React.FC = () => {
         {LADDER_MID.map((s) => (
           <Crown key={s.seed} spec={s} wind={WIND} t={t} />
         ))}
-        <Contact x={820} y={1810} w={48} />
+        <Contact x={300} y={1810} w={52} />
         <Crown spec={LADDER_NEAR} wind={WIND} t={t} />
       </svg>
     </AbsoluteFill>
@@ -181,6 +181,25 @@ const CalCard: React.FC<{t: number}> = ({t}) => {
         <rect x={x + 16} y={y + 82} width={120} height={2} fill={'#C3B5A9'} />
       </g>
     </g>
+  );
+};
+/** The twinkle test: the wind check's frame held still (t 2.6, the gust's peak) and moved by a pure sub-pixel
+ *  translation, 0-1 px in 0.1 px steps along x (frames 0-10), then along y (11-21). The content never changes, so any
+ *  change in a thin feature's core contrast between the frames IS twinkle (motion cannot confound it). */
+export const TWINKLE_FRAMES = 22;
+export const Twinkle: React.FC = () => {
+  const f = useCurrentFrame();
+  const ph = (f % 11) * 0.1;
+  const [dx, dy] = f < 11 ? [ph, 0] : [0, ph];
+  return (
+    <AbsoluteFill style={{background: P.sky}}>
+      <svg width={WIND_CHECK.w} height={WIND_CHECK.h} viewBox={`${WIND_CHECK.x} ${WIND_CHECK.y} ${WIND_CHECK.w} ${WIND_CHECK.h}`}>
+        <g transform={`translate(${dx.toFixed(3)} ${dy.toFixed(3)})`}>
+          <FoliageFrame t={2.6} />
+          <CalCard t={2.6} />
+        </g>
+      </svg>
+    </AbsoluteFill>
   );
 };
 export const WindCheck: React.FC<{still?: boolean}> = ({still}) => {

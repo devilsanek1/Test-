@@ -491,8 +491,10 @@ def acf_radius(field: np.ndarray, m: np.ndarray, level: float = 1 / math.e) -> f
     return float(i - 1 + (prof[i - 1] - level) / max(1e-9, prof[i - 1] - prof[i]))
 
 
-def texture_ab(tex: np.ndarray, flat: np.ndarray, region, band, k_strength: float) -> dict:
-    """The texture layer T = Lab(tex) - Lab(flat) in the region: its strength, size, colour, grain and its std in the band."""
+def texture_ab(tex: np.ndarray, flat: np.ndarray, region, band, k_strength: float, lossy: bool = False) -> dict:
+    """The texture layer T = Lab(tex) - Lab(flat) in the region: its strength, size, colour, grain and its std in the band.
+    `lossy` (two encoded videos): their codec noise differs, so the layer's high-pass is reported, never judged (the
+    grain is judged on the lossless A/B: the rendered PNGs)."""
     H, W = tex.shape[:2]
     k = W / 1080.0
     x0, y0, x1, y1 = [int(round(v * k)) for v in region]
@@ -563,8 +565,9 @@ def texture_ab(tex: np.ndarray, flat: np.ndarray, region, band, k_strength: floa
         why.append(f'mottle radius {r} px outside {TEX_R[0]:.0f}-{TEX_R[1]:.0f}')
     if res['chroma'] > TEX_AB:
         why.append(f"mottle colour {res['chroma']} > {TEX_AB} a*b*")
-    if res['grain'] > TEX_GRAIN:
+    if res['grain'] > TEX_GRAIN and not lossy:
         why.append(f"a grain: high-pass std {res['grain']} L* > {TEX_GRAIN}")
+    res['lossy'] = lossy
     if why and verdict == 'PASS':
         verdict = 'WARN'
     res['verdict'] = verdict
@@ -655,7 +658,7 @@ def main() -> int:
         if a.texture and flats:
             # the A/B: the texture layer, and the banding of the flat frame (the texture must add no steps)
             tb = [float(v) for v in a.texture_band.split(',')] if a.texture_band else None
-            r['texture'] = texture_ab(rgb, flats[i], region, tb, a.k)
+            r['texture'] = texture_ab(rgb, flats[i], region, tb, a.k, lossy=info is not None)
             rf = analyse(flats[i], region, a.strip, band, a.max_dl, a.axes, a.wide, texture=True)
             r['flat_verdict'] = rf['verdict']
             order0 = {'PASS': 0, 'WARN': 1, 'FAIL': 2}
@@ -682,7 +685,7 @@ def main() -> int:
             b = r.get('band')
             bs = f" | band dL* {b['dL']:.2f} dE00 {b['max_dE00']:.2f} (L* {b['L']:.1f})" if b else ''
             xs = (f" [across: worst strip {r['visible_worst_strip_x']} visible, {r['weak_worst_strip_x']} weak]" if 'x' in a.axes else '') + f", wide staircase {r['stair_worst_wide']}"
-            print(f"{r['verdict']:4s} {a.input} @ {r['frame']}: visible {r['visible']} (worst strip {r['visible_worst_strip']}, strong {r['strong']}), weak (worst strip) {r['weak_worst_strip']}{xs}, "
+            print(f"{r.get('banding_verdict', r['verdict']):4s} {a.input} @ {r['frame']}: visible {r['visible']} (worst strip {r['visible_worst_strip']}, strong {r['strong']}), weak (worst strip) {r['weak_worst_strip']}{xs}, "
                   f"max step dL* {r['max_dL']:.2f} c {r['max_c']:.4f} dE00 {r['max_dE00']:.2f}, plateau {r['median_plateau']:.0f} px, "
                   f"staircase {r['staircase_median']:.2f}, grain {r['grain']:.2f} L*{bs}" + (f"  [{'; '.join(r['why'])}]" if r['why'] else ''))
     verdict = worst['verdict']
@@ -694,8 +697,9 @@ def main() -> int:
             gm = f"grain (high-pass) {r['grain']:.2f} L*, mottle (band-pass) {r.get('mottle', float('nan')):.2f} L*"
             if tx and 'std' in tx:
                 bs = f", in the band {tx['band']['std']}" if tx.get('band') else ''
+                gl = f"grain {tx['grain']}" + (' (two encodes: codec noise, not judged)' if tx.get('lossy') else '')
                 print(f"TEXTURE {tx['verdict']:4s} @ {r['frame']}: layer std {tx['std']} L* (k {tx['k']}), p1-p99 {tx['p1_p99']}, radius {tx['radius_1e']} px, colour {tx['chroma']} a*b*, "
-                      f"grain {tx['grain']}, mean shift {tx['mean_shift']}{bs}; flat frame {r.get('flat_verdict')}; {gm}" + (f"  [{'; '.join(tx['why'])}]" if tx['why'] else ''))
+                      f"{gl}, mean shift {tx['mean_shift']}{bs}; banding: flat {r.get('flat_verdict')}, textured {r.get('banding_verdict')}; {gm}" + (f"  [{'; '.join(tx['why'])}]" if tx['why'] else ''))
             else:
                 print(f"TEXTURE @ {r['frame']}: {gm}")
         if hold:

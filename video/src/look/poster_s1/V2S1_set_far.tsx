@@ -25,7 +25,8 @@ import {useSwitches} from './switches';
 import {S1FarStage} from './V2S1_far_stage';
 import {S1_EVENING} from '../../v2r/world/skies';
 import {skyColorAt} from '../../lib/sky';
-import {dE76} from '../../lib/depth';
+import {dE76, planePalette} from '../../lib/depth';
+import {PatchFill, wallPatch} from './V2S1_patch';
 
 /** (the look test: the sun one flat step off its sky, owner 2026-10-29: decision 6 (b); CRAFT §g.2) the disc mixed
  *  toward the sky round it (its visible cap, y ~720-758) until it sits dE ~18 off it: under the subject's separation
@@ -226,12 +227,33 @@ function bldInto(b: Batch, u: Under, o: Bld, key: string, inkW: number, ceil = 5
   return wins;
 }
 
+/** One layer of a batch as its own batch (memoized per batch and layer: CellPaint memoizes on the batch). */
+const LAYER_OF = new WeakMap<Batch, Batch[]>();
+function layerOf(b: Batch, i: number): Batch {
+  let arr = LAYER_OF.get(b);
+  if (!arr) {
+    arr = b.layers.map((l) => {
+      const one = new Batch();
+      one.layers = [l];
+      return one;
+    });
+    LAYER_OF.set(b, arr);
+  }
+  return arr[i];
+}
+
 /** The far roofs: static fills per building (flooding building by building), windows that switch, the underdrawing. */
 const FarRoofs: React.FC = () => {
   const t = useTime();
-  const {stat, under, wins} = useMemo(() => {
+  const {patchwork} = useSwitches();
+  const {stat, under, wins, walls} = useMemo(() => {
     const stat = new Batch();
     const under = new Under();
+    // (the look test's patchwork) each wall's rect and its plane, its colour receded below (as hazeBatch does it)
+    const walls: {key: string; rect: [number, number, number, number]; wall: string; plane: number; layer: number}[] = [];
+    FAR.forEach((o, i) => walls.push({key: `F${i}`, rect: [o.x0, o.top, o.x1 - o.x0 + 0.6, FOOT - o.top], wall: o.wall, plane: 4, layer: 0}));
+    MID.forEach((o, i) => walls.push({key: `M${i}`, rect: [o.x0, o.top, o.x1 - o.x0 + 0.6, FOOT - o.top], wall: o.wall, plane: 4, layer: 1}));
+    NEAR.forEach((o, i) => walls.push({key: `N${i}`, rect: [o.x0, o.top, o.x1 - o.x0 + 0.6, FOOT - o.top], wall: o.wall, plane: 3, layer: 2}));
     // the farthest step: cool stone blocks only (the gasholder's 1-3 px lattice is gone: nothing under 12 px on +4,
     // lib/depth planeLod; its bars were the far plane's busiest edges)
     FAR.forEach((o, i) => bldInto(stat, under, o, `F${i}`, INK_PX.hair, 590, false));
@@ -241,6 +263,9 @@ const FarRoofs: React.FC = () => {
     MID.forEach((o, i) => bldInto(stat, under, o, `M${i}`, INK_PX.hair, 590, false));
     stat.layer();
     NEAR.forEach((o, i) => bldInto(stat, under, o, `N${i}`, INK_PX.far).forEach((w, k) => wins.push({w, row: 'near', bld: i, k})));
+    // the walls' receded colours: the same planePalette hazeBatch applies to each layer
+    const pals = stat.layers.map((l, i) => (i <= 2 ? planePalette(Array.from(l.fills.keys()), [4, 4, 3][i], S1_ATM) : {}));
+    for (const w of walls) w.wall = pals[w.layer]?.[w.wall] ?? w.wall;
     // atmospheric perspective: three clear steps toward the haze (the farthest plane nearly the air itself)
     hazeBatch(stat, [HAZE_K.far, HAZE_K.mid, HAZE_K.near], S1_HAZE, {planes: [4, 4, 3]});
     // window outlines in the underdrawing (near row only: the bare-line state reads as a street of sash windows)
@@ -249,7 +274,7 @@ const FarRoofs: React.FC = () => {
       const o = NEAR[bld];
       under.add((o.x0 + o.x1) / 2, (o.top + FOOT) / 2, w.arch ? `M${P(w.x, w.y + w.h)}L${P(w.x, w.y + w.w / 2)}A${r1(w.w / 2)} ${r1(w.w / 2)} 0 0 1 ${P(w.x + w.w, w.y + w.w / 2)}L${P(w.x + w.w, w.y + w.h)}` : rectInk(w.x, w.y, w.w, w.h, {seed: `s1farW/${w.key}`, over: 'none', open: 0.35}), INK_PX.hair);
     }
-    return {stat, under, wins};
+    return {stat, under, wins, walls};
   }, []);
   // windows (per frame: a few lit, switching on the far rows' slower clock; the 1.80 window lights for good)
   const wb = new Batch();
@@ -268,7 +293,20 @@ const FarRoofs: React.FC = () => {
   });
   return (
     <>
-      <CellPaint b={stat} seed="s1far/stat" cell={70} misreg={0.6} />
+      {patchwork ? (
+        // (the look test's "low poly" far city: lane PT's frontal blocks on every wall, each row's over its own walls and
+        // under the nearer rows: the batch drawn layer by layer, FAR, MID, NEAR)
+        stat.layers.map((l, i) => (
+          <React.Fragment key={i}>
+            <CellPaint b={layerOf(stat, i)} seed={`s1far/stat/${i}`} cell={70} misreg={0.6} />
+            {walls.filter((w) => w.layer === i).map((w) => (
+              <PatchFill key={w.key} pw={wallPatch(w.key, w.rect, w.wall, w.plane)} seed={`s1far/patch/${w.key}`} marks={false} />
+            ))}
+          </React.Fragment>
+        ))
+      ) : (
+        <CellPaint b={stat} seed="s1far/stat" cell={70} misreg={0.6} />
+      )}
       <CellPaint b={wb} seed="s1far/win" cell={70} misreg={0} live />
     </>
   );

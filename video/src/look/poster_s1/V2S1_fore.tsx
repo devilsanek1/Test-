@@ -85,6 +85,7 @@ const SOIL = '#8C6A55'; // the soil inside the planter (L* ~47)
 
 const Pier: React.FC = () => {
   const {x0, cap, base, xc} = FORE.pier;
+  const {darks} = useSwitches();
   // ONE value and one shade step (the art director, v3: its patchy two-tone ashlar read muddy)
   return (
     <>
@@ -94,6 +95,7 @@ const Pier: React.FC = () => {
       <F d={slab(x0 - 16, 1100, xc, cap, cap + 12)} c={STONE_LIT} s="pierCap" />
       {/* a terracotta pot of thyme on the pier cap */}
       <F d={poly([[930, cap - 44], [990, cap - 44], [982, cap], [938, cap]])} c={TERRACOTTA} s="pierPot" />
+      {darks ? <D d={ell(960, cap - 44, 29, 5)} c={dark('wood')} s="pierSoil" /> : null}
       <F d={`M926 ${cap - 44}C930 ${cap - 74} 950 ${cap - 88} 962 ${cap - 84}C976 ${cap - 92} 996 ${cap - 72} 994 ${cap - 44}Z`} c={CM.sage} s="pierThyme" />
     </>
   );
@@ -266,11 +268,14 @@ const Bench: React.FC = () => {
 /** A big terracotta pot of fern, nearest of all (its foot below the frame). */
 const FernPot: React.FC = () => {
   const {x, rim} = FORE.fern;
+  const {darks} = useSwitches();
   return (
     <>
       <F d={`M${x - 6} ${rim}C${x - 70} ${rim - 50} ${x - 150} ${rim - 60} ${x - 196} ${rim - 34}C${x - 150} ${rim - 40} ${x - 84} ${rim - 22} ${x - 20} ${rim}ZM${x + 6} ${rim}C${x + 60} ${rim - 70} ${x + 140} ${rim - 96} ${x + 196} ${rim - 80}C${x + 136} ${rim - 72} ${x + 74} ${rim - 34} ${x + 22} ${rim}ZM${x - 10} ${rim}C${x - 40} ${rim - 90} ${x - 30} ${rim - 150} ${x + 10} ${rim - 176}C${x - 6} ${rim - 130} ${x + 6} ${rim - 66} ${x + 12} ${rim}Z`} c={FERN} s="fern" />
       <F d={poly([[x - 112, rim + 22], [x + 112, rim + 22], [x + 92, 1960], [x - 92, 1960]])} c={TERRACOTTA} s="fernPot" />
       <F d={slab(x - 122, x + 122, x, rim, rim + 24)} c={'#D9A486'} s="fernRim" />
+      {/* (the look test's darks) the soil inside the pot, between the fronds */}
+      {darks ? <D d={slab(x - 104, x - 22, x, rim + 4, rim + 12) + slab(x + 26, x + 104, x, rim + 4, rim + 12)} c={dark('wood')} s="fernSoil" /> : null}
     </>
   );
 };
@@ -289,7 +294,7 @@ const Leaves: React.FC = () => {
       <F d={leaf(330, 1676, 15, 60) + leaf(600, 1790, 20, -10) + leaf(160, 1830, 26, 30)} c={CM.leafGold} s="lvG" />
       <F d={leaf(566, 1734, 16, -40) + leaf(270, 1900, 30, -20) + leaf(980, 1900, 28, 50)} c={RATTAN} s="lvR" />
       {/* (the look test's darks) a few wet, dark fallen leaves among them */}
-      {darks ? <D d={leaf(420, 1700, 14, 20) + leaf(700, 1830, 19, -35) + leaf(214, 1760, 17, 70) + leaf(860, 1780, 18, 10) + leaf(520, 1880, 24, -60)} c={dark('wood')} s="lvD" /> : null}
+      {darks ? <D d={leaf(420, 1700, 14, 20) + leaf(700, 1830, 19, -35) + leaf(214, 1760, 17, 70) + leaf(860, 1780, 18, 10) + leaf(520, 1880, 24, -60) + leaf(318, 1590, 13, -15) + leaf(640, 1520, 12, 40) + leaf(96, 1890, 22, 25) + leaf(1010, 1660, 16, -50) + leaf(770, 1500, 12, -10) + leaf(560, 1640, 13, 75)} c={dark('wood')} s="lvD" /> : null}
     </>
   );
 };
