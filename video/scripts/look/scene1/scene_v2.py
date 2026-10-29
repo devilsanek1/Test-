@@ -32,10 +32,10 @@ C = dict(
     cloud_l='#FAEEDD', cloud_s='#E8D8D3', cloud_hi='#FDF4E8', bird='#8F8290',
     ink='#2C2232',
     # the far layers, farthest (5) to nearest (1)
-    f5='#EDDACB', f5s='#E8D3C8',
-    f4='#E5D0C6', f4s='#DCC6C1',
-    f3='#DBC3BA', f3s='#CDB6B4', f3w='#CFB7B2',
-    f2='#D2B4A6', f2s='#BCA1A2', f2w='#B99D9D', f2l='#DDBFAE',
+    f5='#EDDDD6', f5s='#E7D6D3',
+    f4='#E4D4D5', f4s='#DACACF',
+    f3='#D9C6CA', f3s='#CCB9C1', f3w='#D0BCC2',
+    f2='#CDB3B5', f2s='#B9A1AC', f2w='#BBA2AA', f2l='#D9C0BB',
     f1='#C99E88', f1s='#A98A8B', f1w='#8E7277', f1l='#D8AE93', f1g='#EFC48A',
     crane='#B9A4A6',
     # the hero
@@ -57,13 +57,13 @@ C = dict(
     her='#13898A', her_l='#2BA8A0', her_d='#0C6266', hair='#2A1E26', legs='#2E2B3C', box='#C9945A', box_d='#A67445',
     pip='#9EA4E8', pip_d='#7C82CF', pip_e='#C9B8EA', pip_eye='#2C2232',
     # water
-    water0='#BDD6D2', water1='#A9CBCA', water2='#93BCBD', ripple='#D3E4DE', ripple_d='#86AFB2', refl='#7FA3A8',
+    water0='#BDD6D2', water1='#A9CBCA', water2='#93BCBD', ripple='#D3E4DE', ripple_d='#86AFB2', refl='#8EB0B3',
     refl_l='#C2D5CF', refl_glow='#EBD3A4', refl_dark='#6B8F97', duck='#6A5A56',
     # the near frame (small, subtle)
     coping_l='#C7A68C', coping='#6A5050', path='#8E6E62', path2='#836459', path3='#9A7868', bollard='#3E3440',
     brick='#B65A3C', brick_d='#86423A', brick_l='#C9704B', slate='#6C6E88', slate_d='#464962', slate_l='#8487A0',
     win_glow='#E9A75A', brick_sh='#9A4A36',
-    tread='#6F8A5E', tread2='#68845A', tread_l='#86A06E', riser='#5A5148',
+    tread='#8A8E6C', tread2='#9C8A75', tread_l='#AA9882', riser='#74625A', tread_gl='#989C78',
     leaf_d='#4F6A4E', leaf_l='#748F63', leaf_a='#B9774A', leaf_al='#CF935E', twig='#5A4446',
 )
 
@@ -184,7 +184,7 @@ def build(stage):
                 s.rect(x + w * 0.78, top, w * 0.22, base - top, P[lit])
             if D and wcol and unit:
                 cols = max(1, int((w * 0.62) / (unit * 2.0)))
-                for yy in range(int(top + unit * 1.6), int(base - unit), int(unit * 2.4)):
+                for yy in range(int(top + unit * 1.6), int(base - unit), int(unit * (2.4 if unit > 4 else 4.2))):
                     for k in range(cols):
                         xx = x + w * 0.3 + k * unit * 2.0
                         c = P[glowc] if (glowc and rnd.random() < 0.08) else P[wcol]
@@ -207,18 +207,18 @@ def build(stage):
                    (744, 10, 962), (150, 8, 1018), (962, 9, 1010)], crane=[(704, 958, 30)])
     # L4 (k ~0.75)
     blocks(rnd, -10, 1090, 1090, 1010, 1046, 22, 48, 'f4', 'f4s',
-           towers=[(70, 16, 958), (96, 11, 980), (900, 18, 950), (928, 12, 972), (1010, 14, 966)],
+           towers=[(70, 16, 958), (96, 11, 980), (930, 18, 950), (958, 12, 972), (1010, 14, 966)],
            crane=[(860, 978, 46), (200, 990, 40)])
     # L3 (k ~0.6): a little bigger, tone-on-tone windows
-    blocks(rnd, -10, 1090, 1110, 990, 1036, 30, 64, 'f3', 'f3s', 'f3w', unit=2.2,
-           towers=[(20, 24, 930), (1036, 26, 920), (812, 20, 950)])
+    blocks(rnd, -10, 1090, 1110, 1010, 1050, 30, 64, 'f3', 'f3s', None, unit=0,
+           towers=[(20, 24, 930), (1036, 26, 920), (60, 14, 960), (984, 16, 950)])
     # L2 (k ~0.4): King's Cross mid-rises beside the hero
-    blocks(rnd, -10, 230, 1150, 980, 1030, 44, 80, 'f2', 'f2s', 'f2w', unit=3.0, lit='f2l')
-    blocks(rnd, 820, 1090, 1150, 970, 1026, 44, 80, 'f2', 'f2s', 'f2w', unit=3.0, lit='f2l',
-           towers=[(990, 40, 940)])
+    blocks(rnd, -10, 200, 1150, 1030, 1070, 44, 80, 'f2', 'f2s', 'f2w', unit=2.6, lit='f2l')
+    blocks(rnd, 846, 1090, 1150, 1036, 1076, 44, 80, 'f2', 'f2s', 'f2w', unit=2.6, lit='f2l',
+           towers=[(1000, 40, 970)])
     # L1 (k ~0.25): warm brick blocks at the hero's ends, real windows, a few lit
-    blocks(rnd, -10, 205, 1210, 1040, 1075, 56, 96, 'f1', 'f1s', 'f1w', unit=4.4, lit='f1l', glowc='f1g')
-    blocks(rnd, 846, 1090, 1196, 1046, 1080, 56, 96, 'f1', 'f1s', 'f1w', unit=4.4, lit='f1l', glowc='f1g')
+    blocks(rnd, -10, 190, 1210, 1086, 1112, 56, 96, 'f1', 'f1s', 'f1w', unit=4.4, lit='f1l', glowc='f1g')
+    blocks(rnd, 866, 1090, 1196, 1084, 1110, 56, 96, 'f1', 'f1s', 'f1w', unit=4.4, lit='f1l', glowc='f1g')
 
     # ---- THE HERO: the landscraper in the middle distance, its whole length visible -----------------------------
     EYE = 1070
@@ -423,13 +423,20 @@ def build(stage):
     else:
         gw = s.lingrad([(0, C['water0']), (0.55, C['water1']), (1, C['water2'])], 0, 0, 0, 1)
         s.rect(0, wy0, W, wy1 - wy0, gw)
-    s.poly([(cx0 - 30, wy0 + 30), (xr + 10, wy0 + 30), (xr + 10, wy0 + 64), (cx0 - 30, wy0 + 82)], P['refl'])
+    wl = qedge + 4   # the waterline the hero mirrors in (compressed: a calm, broken reflection)
+    mirror = [(x, wl + (wl - y) * 0.42) for (x, y) in front if y < 1190] 
+    mirror = [(cx0, wl + 16)] + mirror + [(xr, wl + 16)]
+    s.poly(mirror, P['refl'])
+    if not grey:
+        for k in range(7):
+            yy = wl + 30 + k * 13
+            s.rect(cx0 - 10, yy, xr - cx0 + 20, 3 + k * 0.4, P['water1'])
     if D:
         # the hero's reflection: pale fin strokes and warm glints, broken by ripples
         for j in range(0, 49, 2):
             x = fx(j / 48)
             ln = 26 + 10 * math.sin(j * 1.7)
-            s.rect(x, wy0 + 34, 2.2 * sc(x), ln, P['refl_l'] if j % 4 else P['refl_dark'])
+            s.rect(x, wy0 + 30, 2.0 * sc(x), ln * 0.8, P['refl_l'] if j % 4 else P['refl_dark'])
         for j in range(0, 24, 3):
             x = fx((j + 0.5) / 24)
             s.rect(x, wy0 + 46 + (j % 2) * 8, 6, 3, P['refl_glow'])
@@ -496,11 +503,15 @@ def build(stage):
         s.rect(0, y, W, hgt * 0.30, P['riser'])
         s.rect(0, y + hgt * 0.30, W, hgt * 0.70, P['tread'] if k % 2 == 0 else P['tread2'])
         if D:
-            s.rect(0, y + hgt * 0.30, W, 2.2 + hgt * 0.04, P['tread_l'])
+            s.rect(0, y + hgt * 0.30, W, 2.0 + hgt * 0.04, P['tread_l'] if k % 2 else P['tread_gl'])
         y += hgt
         hgt *= 1.13
         k += 1
     if D:
+        rl = random.Random(61)
+        for k in range(22):
+            lx, ly = rl.uniform(20, 640), rl.uniform(wy1 + 30, H - 10)
+            leaf(s, lx, ly, 9 + (ly - wy1) / 40, rl.uniform(0, 6.28), P['leaf_al'], P['leaf_a'])
         for bx in (470, 548):
             s.rect(bx - 7, wy1 - 18, 14, 20, P['bollard'])
             s.ellipse(bx, wy1 - 18, 9, 3.2, P['bollard'])

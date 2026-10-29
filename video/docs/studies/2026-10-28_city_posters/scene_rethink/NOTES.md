@@ -101,3 +101,86 @@ back into an open, deep view (well under the frame's width, sky round its top, o
 behind it in many paler layers to something tiny); the quay full of small life; a sky with things in it; the near
 nature small and subtle; no effort on landmarks or an exact camera angle. The general rule: playbook "DEPTH IS AIR AND
 DISTANCE".
+
+## still_v2
+
+**The owner, on still_v1** (2026-10-29): "So there is no sense of depth here like the building is right here and there
+us really no scale depth I'm really suffocating with the view / Some bits are good tho like the style of separation of
+foreground vs background / Also the reference do have more details and density like the the street along the canal
+ours is pretty empty while their have density ... Also the sky is not entirely single color there are more things
+happening / Also dont overindex on adding labdmarks or putting weird camera angles on existing real views thats nit
+as important / The closest leafs and nature on the left are way too big and not as subtle as they need be". The
+playbook's rule is now "DEPTH IS AIR AND DISTANCE".
+
+| File | What |
+|---|---|
+| `stage_v2_values.png` | the new construction as values (big shapes, each in the grey of its colour's L*), checked beside Singapore and Cape Town at 400 px before any colour |
+| `still_v2.png` | the still (also `video/deliverables/tests/poster_scene1_still_v2.png`) |
+| `compare_v2.jpg` | still_v1, still_v2, Singapore, Cape Town at 400 px |
+
+**What changed (the construction, not the paint):**
+- **The camera is pulled far back across a canal basin.** The landscraper sits in the middle distance: its front is
+  56 % of the width (59 % with its shade end; v1 ran off the right edge), its whole length is visible, and its base
+  stands on its quay. It is 13 % of the frame's height at its near end (v1: 32 %). Sky and the cloud bank show round
+  its top and both ends, because the blocks beside it are now lower than it. It is still the crispest thing in the
+  frame (the widest value range, L* 30-90): fins, glass, warm windows and the roof garden.
+- **Open water before it:** the basin (y ~1270-1540), with the sky seen in it and the hero's broken reflection.
+  Ripples get longer and thicker as they near, which adds perspective. A narrowboat crosses with its wake, and three
+  ducks.
+- **The city recedes behind and beside it in five layers**, each paler, smaller and simpler:
+  - warm brick blocks at its ends, with real windows, a few lit;
+  - lilac mid-rises with fewer, smaller windows;
+  - plain pale blocks with slender towers at the sides;
+  - paler towers and cranes;
+  - a ghost strip, where tiny towers peek over the hero's lower terraces: the "something tiny on the horizon".
+  The far layers lean cool (lilac-rose) against the warm sky. No landmark is hunted: St Pancras and the Shard are gone
+  into the generic far layers.
+- **The quay is full** (the calm tier, all small):
+  - 13 awnings with dark shade under each and cafe tables with seated people;
+  - 15 walkers and a cyclist;
+  - a row of 13 trees (Singapore's tree band), 7 lamps, planters and parked bikes;
+  - three moored narrowboats.
+  She, in teal and from behind with the box, leaves the lit lobby on a lit pool of paving, the one clear space on the
+  quay. **Pip** is on the blue narrowboat's roof between the plant pots (x ~684, y ~1262).
+- **The sky has things happening, calmly.** It is the gradient plus:
+  - a paint-like tonal variation (fractal noise at a few % opacity, weaker inside the caption band);
+  - a big soft cloud bank low behind the city, and two small clouds outside the band;
+  - pale far towers rising into it, and five tiny birds.
+  The caption band stays clear (median L* 89).
+- **The near frame is a hint at the edges:**
+  - one small branch at the top right and a few real leaf shapes at the bottom left (lit and shade halves, no outlines);
+  - Granary-like steps down to the water: calm, darker bands that thicken as they near, with fallen leaves;
+  - a smaller brick shed in shade at the bottom right;
+  - one lamp.
+- Source: `video/scripts/look/scene1/scene_v2.py` (`python3 scene_v2.py <out> values detail final`); v1 stays
+  reproducible with `scene.py`.
+
+**Measured** (L* outside the caption band; "edges" = share of pixels with a step > 6 L* to a neighbour):
+| | still_v1 | still_v2 | posters |
+|---|---|---|---|
+| hero: width of frame (front) | ran off the edge | 56 % | Singapore ~55 %, heroes 21-45 % of the height |
+| planes, near to far (+ sky) | ~5 | 9 (steps and shed, water, quay and tree band, hero, 5 city layers) + the cloud bank | 5-7 |
+| open sky down to | y ~640-790 | y ~920-950 (48 %) | 36-53 % |
+| quay / middle band edges | 8 % | 15 % | Singapore's tree band 22 %, Copenhagen's quay 36 % |
+| L* < 65 / 65-80 / < 40 | 43 / 10 / 17 % | 33 / 16 / 7 % | 27-48 / 8-14 / 9-25 % |
+| bottom corners | 49 / 48 | 58 / 41 | 44 / 53 |
+| near-to-air span | 40 | 31 | 27-46 |
+
+The v2 depth ladder (median L*): sky 90; far city layers at the sides 82; brick blocks at the hero's ends 68; hero 68
+(p10-p90 30-90: it owns the contrast); quay 83; water 78; near steps 58; near shed 41. That is a lighter, airier world
+in front of a darker near frame, the separation the owner liked.
+
+**Weak spots I see:**
+- The quay is about twice v1's density but still under the posters' (15 % edges vs 22-36 %): its things are crisp but
+  flat, with little texture inside each shape.
+- The steps are the largest near shape (the bottom ~20 %), calm but one repeated pattern. The posters' near frames are
+  objects (roofs, plants): break the steps with a planter or a tree's base, or shorten them.
+- The hero's reflection still reads as a striped block, not a soft broken mirror.
+- The far side layers carry many small windows and read a little busy at the sides. The tiny towers above the hero's
+  terraces nearly vanish at phone size.
+- The high left cloud is cartoon-round, where the posters' clouds are flatter and more painterly. The sky's paint
+  variation is very faint.
+- She is now 44 px: readable as the teal figure on the lit pool, but small at phone size. In the film, a push-in or a
+  stronger lobby glow would carry her.
+- The darks fell to 7 % (posters 9-25 %): the airier world traded some punch. The darks now live in the hero's glass,
+  the shed, the boats and the people.
