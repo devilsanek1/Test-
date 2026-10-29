@@ -494,17 +494,17 @@ def sun_veil(xx_frame, yy_frame, sx=330.0, sy=260.0):
 # wide = share of blocks with a whole face turned to the sun; win = share of blocks with lit windows; h = building
 # heights above the horizon (px); w = widths (px); types = the mix of building kinds.
 FAR_PLANES = [
-    dict(name='p4', k=0.82, chroma=0.40, blur=1.6, lost=3.5, sliver=0.0, wide=0.0, win=0.0, mottle=0.5, jit=0.010,
-         scatter=0.50, mist=0.16, h=(8, 30), w=(18, 60), types=dict(block=0.7, tower=0.18, warehouse=0.12),
+    dict(name='p4', k=0.78, chroma=0.40, blur=1.6, lost=3.5, sliver=0.0, wide=0.0, win=0.0, mottle=0.5, jit=0.010,
+         scatter=0.45, mist=0.12, h=(8, 30), w=(18, 60), types=dict(block=0.7, tower=0.18, warehouse=0.12),
          base=HORIZON_Y + 12),
-    dict(name='p3', k=0.62, chroma=0.55, blur=1.0, lost=2.5, sliver=1.2, wide=0.0, win=0.0, mottle=0.6, jit=0.012,
-         scatter=0.45, mist=0.13, h=(18, 56), w=(20, 64), types=dict(block=0.5, tower=0.25, warehouse=0.2, gable=0.05),
+    dict(name='p3', k=0.56, chroma=0.55, blur=1.0, lost=2.5, sliver=1.4, wide=0.0, win=0.0, mottle=0.6, jit=0.012,
+         scatter=0.40, mist=0.10, h=(18, 56), w=(20, 64), types=dict(block=0.5, tower=0.25, warehouse=0.2, gable=0.05),
          base=HORIZON_Y + 30),
-    dict(name='p2', k=0.40, chroma=0.70, blur=0.6, lost=0.0, sliver=2.0, wide=0.12, win=0.25, mottle=0.7, jit=0.016,
-         scatter=0.35, mist=0.09, h=(22, 64), w=(26, 84), types=dict(block=0.45, tower=0.12, warehouse=0.25,
+    dict(name='p2', k=0.34, chroma=0.70, blur=0.6, lost=0.0, sliver=2.4, wide=0.12, win=0.35, mottle=0.7, jit=0.016,
+         scatter=0.30, mist=0.07, h=(22, 64), w=(26, 84), types=dict(block=0.45, tower=0.12, warehouse=0.25,
                                                                          gable=0.18), base=HORIZON_Y + 90),
-    dict(name='p1', k=0.18, chroma=0.85, blur=0.3, lost=0.0, sliver=3.4, wide=0.15, win=0.35, mottle=0.8, jit=0.025,
-         scatter=0.25, mist=0.05, h=(6, 30), w=(40, 120), types=dict(block=0.2, warehouse=0.35, terrace=0.35,
+    dict(name='p1', k=0.12, chroma=0.85, blur=0.3, lost=0.0, sliver=3.6, wide=0.2, win=0.5, mottle=0.8, jit=0.025,
+         scatter=0.20, mist=0.04, h=(6, 30), w=(40, 120), types=dict(block=0.2, warehouse=0.35, terrace=0.35,
                                                                         gable=0.1), base=HORIZON_Y + 600,
          chimneys=True),
 ]
@@ -682,7 +682,7 @@ def paint_far_city(w=1000, h=300, frame_y0=592, seed=None, passes=9):
                     lampc = to_plane(mix(PAL['lamp'], shade, 0.15), spec['k'] * 0.55, 1.0)
                     near = spec['name'] == 'p1'
                     far_window_grid(brush, p3, b, h, frame_y0, prng, lampc, (7.5, 10.0) if near else (6.0, 8.0),
-                                    (2.4, 1.5) if near else (1.8, 1.2), 0.28)
+                                    (2.4, 1.5) if near else (1.8, 1.2), 0.34)
             if spec['name'] == 'p3':                                                     # the gasholder frame
                 gx0, gx1, gtop = 800.0, 920.0, HORIZON_Y - 70.0
                 gcol = to_plane(darker(shade, 0.2), spec['k'] * 0.85, spec['chroma'])
@@ -918,7 +918,7 @@ def paint_facade(W=600, H=720, seed=None, passes=9, keep=None):
         keep['P0'] = cv.image()
     # ---- P1: big soft strokes per face: +-2 L*, warm/cool, blurred 8 px, clipped to the brick of that face ----
     if passes >= 1:
-        for region, base, n in ((m_fbrick, None, 8), (m_sbrick, C['side'], 4)):
+        for region, base, n in ((m_fbrick, None, 10), (m_sbrick, C['side'], 4)):
             p1 = Layer(H, W)
             xs, ys = sample_by(region, n, rng)
             for x, y in zip(xs, ys):
@@ -927,7 +927,7 @@ def paint_facade(W=600, H=720, seed=None, passes=9, keep=None):
                 c = lighter(b0, rng.uniform(0.15, 0.22), 'terracotta' if base is None else 'glow') if warm else \
                     darker(b0, rng.uniform(0.14, 0.2), 'slate')
                 brush.line(p1, (x, y - rng.uniform(80, 200)), (x + rng.uniform(-12, 12), y + rng.uniform(80, 200)),
-                           rng.uniform(60, 120), c, 0.5, soft=(14, 14), taper=(0.25, 0.25))
+                           rng.uniform(60, 120), c, 0.6, soft=(14, 14), taper=(0.25, 0.25))
             p1.blur(6.0).clip(region)
             cv.over(p1)
         if keep is not None:
@@ -982,7 +982,7 @@ def paint_facade(W=600, H=720, seed=None, passes=9, keep=None):
             brush.mark(p2, x + 40, y, rng.uniform(50, 120), rng.uniform(5, 9), rng.normal(0, 0.5),
                        lighter(C['plinth'], rng.uniform(0.08, 0.16), 'lilac'), rng.uniform(0.45, 0.7),
                        soft=(0.6, 0.6), taper=(0.04, 0.15), dry=0.4)
-        for _ in range(5):                                                     # cool patches: the sky's lilac, high
+        for _ in range(7):                                                     # cool patches: the sky's lilac, high
             x, y = sample_by(m_fbrick * (yy < 400) * (1 - np.exp(-inside_dist(m_fbrick) / 6.0)), 1, rng)
             if len(x):
                 brush.mark(p2, x[0], y[0], rng.uniform(18, 46), rng.uniform(10, 22), 90,
@@ -1311,44 +1311,53 @@ def paint_brick_tiles(T=240, seed=None):
     cv = Canvas(T, T)
     cv.c[:] = sky_backdrop(T, T, 300, 560, disc=False)
     ret = 58.0                                                     # the return (the cornice's end, facing the sun)
+    st_sh = mix(C['stone_sh'], PAL['sand'], 0.25)                  # L~74 Portland-like stone in shade, a touch warm
+    ash_c = mix(st_sh, C['front_top'], 0.15)
     lay = Layer(T, T)
-    lay.fill(poly_mask(T, T, [rect(ret, 40, T, 70)]), C['stone_sh'])                 # the corona's front
+    lay.fill(poly_mask(T, T, [rect(ret, 40, T, 70)]), st_sh)                          # the corona's front
     lay.fill(poly_mask(T, T, [[(0, 52), (ret, 40), (ret, 70), (0, 76)]]), C['stone_lit'])  # its return, sunlit
     lay.fill(poly_mask(T, T, [rect(ret, 70, T, 92)]), C['deep'])                     # the soffit, seen from below
-    lay.fill(poly_mask(T, T, [[(0, 76), (ret, 70), (ret, 92), (0, 96)]]), mix(C['stone_lit'], C['deep'], 0.5))
+    lay.fill(poly_mask(T, T, [[(0, 76), (ret, 70), (ret, 92), (0, 96)]]), mix(C['stone_lit'], C['deep'], 0.45))
     for k_ in range(9):                                                               # modillions under the soffit
         mx = ret + 10 + k_ * 21
-        lay.fill(poly_mask(T, T, [rect(mx, 70, mx + 9, 90)]), mix(C['stone_sh'], C['deep'], 0.35))
+        lay.fill(poly_mask(T, T, [rect(mx, 70, mx + 9, 88)]), mix(st_sh, C['deep'], 0.45))
+        lay.fill(poly_mask(T, T, [rect(mx, 86, mx + 9, 89)]), mix(st_sh, C['deep'], 0.15))   # their lit undersides
     ash = poly_mask(T, T, [rect(ret, 92, T, T), [(0, 96), (ret, 92), (ret, T), (0, T)]])
-    lay.fill(poly_mask(T, T, [rect(ret, 92, T, T)]), mix(C['stone_sh'], C['front_top'], 0.25))
+    lay.fill(poly_mask(T, T, [rect(ret, 92, T, T)]), mix(ash_c, C['deep'], 0.25))     # the joints' colour
     lay.fill(poly_mask(T, T, [[(0, 96), (ret, 92), (ret, T), (0, T)]]), mix(C['stone_lit'], C['side'], 0.35))
     cv.over(lay)
     p2 = Layer(T, T)
     for row, yb in enumerate(range(92, T, 28)):                                       # ashlar: big flat blocks
         x = ret - (30 if row % 2 else 0)
         while x < T:
-            c = jitter(shift(mix(C['stone_sh'], C['front_top'], 0.25), rng.normal(0, 0.018)), rng, 0.004)
-            brush.mark(p2, x + 31, yb + 13.6, 60.0, 25.6, 0, c, rng.uniform(0.6, 0.85), soft=(0.45, 0.45),
-                       taper=(0.005, 0.005))
+            c = jitter(shift(ash_c, rng.normal(0, 0.02), 0.0, rng.normal(0, 0.006)), rng, 0.004)
+            brush.mark(p2, x + 31, yb + 14.3, 59.0, 25.4, 0, c, 0.95, soft=(0.45, 0.45), taper=(0.005, 0.005))
+            if rng.random() < 0.6:                                                    # one flat stroke inside
+                brush.mark(p2, x + 31 + rng.uniform(-12, 12), yb + 14.3 + rng.uniform(-5, 5), rng.uniform(20, 44),
+                           rng.uniform(6, 12), rng.normal(0, 2), lighter(c, 0.12, 'cream') if rng.random() < 0.5
+                           else darker(c, 0.1, 'slate'), rng.uniform(0.4, 0.6), soft=(0.6, 0.6), taper=(0.05, 0.25),
+                           dry=0.4)
             x += 62
     for k_ in range(3):                                                               # the corona: level strokes
         brush.mark(p2, rng.uniform(100, 200), rng.uniform(46, 64), rng.uniform(60, 140), rng.uniform(6, 12), 0,
-                   lighter(C['stone_sh'], 0.12, 'cream') if k_ % 2 else darker(C['stone_sh'], 0.1, 'slate'),
+                   lighter(st_sh, 0.14, 'cream') if k_ % 2 else darker(st_sh, 0.12, 'slate'),
                    rng.uniform(0.5, 0.7), soft=(0.5, 0.5), taper=(0.03, 0.15), dry=0.4)
     p2.clip(poly_mask(T, T, [rect(ret, 40, T, 70), rect(ret, 92, T, T)]))
     cv.over(p2)
     p3 = Layer(T, T)
-    brush.line(p3, (ret, 40.8), (T, 40.8), 1.2, mix(C['stone_sh'], PAL['cream'], 0.5), 0.6, soft=(0.45, 0.45),
-               taper=(0, 0))
+    brush.line(p3, (ret, 40.8), (T, 40.8), 1.2, mix(st_sh, PAL['cream'], 0.5), 0.6, soft=(0.45, 0.45), taper=(0, 0))
     brush.line(p3, (0, 52.8), (ret, 40.8), 2.0, PAL['glow'], 0.9, soft=(0.45, 0.45), taper=(0, 0))
     brush.line(p3, (ret - 0.8, 41), (ret - 0.8, 70), 1.6, mix(C['stone_lit'], PAL['glow'], 0.6), 0.8,
                soft=(0.45, 0.45), taper=(0, 0))
+    for yb in range(92, T, 28):                                                       # lit lower lips of the courses
+        brush.line(p3, (ret, yb + 27.0), (T, yb + 27.0), 1.0, mix(ash_c, PAL['cream'], 0.4), 0.45,
+                   soft=(0.45, 0.45), taper=(0, 0))
     cv.over(p3)
     p4 = Layer(T, T)
     for _ in range(6):                                                                # soot runs from the soffit
         sx = rng.uniform(ret + 6, T - 6)
         brush.line(p4, (sx, 93), (sx, 93 + rng.uniform(40, 130)), rng.uniform(5, 12),
-                   darker(C['stone_sh'], 0.35, 'slate'), rng.uniform(0.12, 0.22), soft=(2.5, 2.5), taper=(0.0, 0.8),
+                   darker(ash_c, 0.4, 'slate'), rng.uniform(0.14, 0.24), soft=(2.5, 2.5), taper=(0.0, 0.8),
                    dry=0.45, dry_len=0.6)
     p4.clip(ash)
     cv.over(p4)
@@ -1585,18 +1594,20 @@ def rock_xy(X, Z):
     return 540.0 + F_PX * X / Z - ROCK_X0, HORIZON_Y + F_PX * EYE_M / Z - ROCK_Y0
 
 
-def boulder_outline(cx, by, a_l, a_r, h, p=2.4, bulge=0.07, n=64):
-    """A dome on a flat base: the top is a superellipse (exponent p: 2 = round, 3 = squarer) with different half-widths
-    left and right (an asymmetric peak); the base bulges toward us (the footprint seen from above)."""
+def boulder_outline(cx, by, a_l, a_r, h, p=2.4, lump=None, sink=None, n=64):
+    """A dome: the top is a superellipse (exponent p: 2 = round, 3 = squarer) with different half-widths left and
+    right (an asymmetric peak), modulated by slow lumps (+-6 % of h); the base is the SAND LINE, a little above the
+    footprint (the boulder sits IN the ground, never on it)."""
     pts = []
-    for t in np.linspace(-1, 1, n):
+    ts = np.linspace(-1, 1, n)
+    lump = np.zeros(n) if lump is None else lump
+    sink = np.zeros(n) if sink is None else sink
+    for t, lu in zip(ts, lump):
         a = a_l if t < 0 else a_r
-        x = cx + t * a
-        y = by - h * (1 - abs(t) ** p) ** (1.0 / p)
-        pts.append((x, y))
-    for t in np.linspace(1, -1, n // 2):
+        pts.append((cx + t * a, by - h * (1 - abs(t) ** p) ** (1.0 / p) * (1 + lu)))
+    for t, sk in zip(ts[::-1], sink[::-1]):
         a = a_l if t < 0 else a_r
-        pts.append((cx + t * a, by + bulge * h * (1 - t * t)))
+        pts.append((cx + t * a, by - sk))
     return pts
 
 
@@ -1659,7 +1670,7 @@ def paint_rocks(W=1000, H=420, seed=None, passes=9, keep=None):
         q = dX * (-sdir[1]) + dZ * sdir[0]
         r = wm / 2 * 0.8
         pen = 0.02 + 0.06 * np.clip(s, 0, None)                  # it softens and fades away from its caster
-        core = smooth((r - np.abs(q)) / pen + 0.5) * smooth(s / 0.1 + 0.5) * (s < L_s)
+        core = smooth((r - np.abs(q)) / pen + 0.5) * smooth((s + 0.6 * r) / 0.1 + 0.5) * (s < L_s)  # from under it
         shadow = np.maximum(shadow, core * np.exp(-np.clip(s, 0, None) / (0.8 + 2.5 * hm)) * (yy > bank_y))
     sl = Layer(H, W)
     sl.fill(shadow * 0.65, mix(sand_sh, PAL['slate'], 0.15))
@@ -1678,17 +1689,19 @@ def paint_rocks(W=1000, H=420, seed=None, passes=9, keep=None):
         if kind == 'dome':
             p_ = ex.get('p', 2.4)
             a_l, a_r = a * (1 - ex.get('skew', 0)), a * (1 + ex.get('skew', 0))
-            outline = boulder_outline(cx, by, a_l, a_r, h, p_)
+            nn_ = 64
+            lump = 0.06 * value_noise(1, nn_, 14.0, rr)[0] * np.sin(np.linspace(0, np.pi, nn_))
+            sink = h * (0.05 + 0.04 * (0.5 + 0.5 * value_noise(1, nn_, 10.0, rr)[0]))
+            outline = boulder_outline(cx, by, a_l, a_r, h, p_, lump, sink, nn_)
             m = poly_mask(H, W, [outline])
-            # P0: the body (cooler high, warmer low), the top plane with a STEPPED lower edge, a warm bounce
+            # P0: the body (cooler high, warmer low) lightening softly toward the sky-lit top: no band, no crescent
             tt = smooth((yy - (by - h)) / max(h, 1))[..., None]
-            lay.fill(m, (body_hi * (1 - tt) + body_lo * tt).astype(np.float32))
+            body = body_hi * (1 - tt) + body_lo * tt
             topy = top_curve(cx, by, a_l, a_r, h, p_, xx)
-            band = 0.12 * h * np.clip(1 - ((xx - cx) / np.where(xx < cx, a_l, a_r)) ** 2, 0, 1) ** 0.7
-            nb = value_noise(1, W, max(a / 2.5, 8.0), rr)[0][None, :]               # an irregular plane break
-            band = band * np.clip(0.8 + 0.35 * nb, 0.4, 1.4) + 1.0
-            m_top = m * (yy < topy + band)
-            lay.fill(m_top, top_c)
+            up = (0.42 * smooth((topy + 0.45 * h - yy) / (0.45 * h)))[..., None]       # the upper body sees the sky
+            body = body * (1 - up) + top_c * up
+            lay.fill(m, body.astype(np.float32))
+            m_top = np.zeros_like(m)
             cv_r = cv.copy()
             cv_r.over(lay)
             if passes >= 1:                                                          # P1: soft along the dome
@@ -1699,7 +1712,7 @@ def paint_rocks(W=1000, H=420, seed=None, passes=9, keep=None):
                               th0 + rr.uniform(0.5, 1.1), max(a * 0.3, 8), lighter(body_hi, rr.uniform(0.08, 0.14),
                                                                                   'lilac'),
                               0.45, soft=(8, 8), taper=(0.3, 0.3), squash=h / a * 0.95)
-                p1.blur(6.0).clip(m * (1 - m_top))
+                p1.blur(6.0).clip(m)
                 cv_r.over(p1)
             if passes >= 2:                                                          # P2: flat strokes along the form
                 p2 = Layer(H, W)
@@ -1711,7 +1724,7 @@ def paint_rocks(W=1000, H=420, seed=None, passes=9, keep=None):
                     brush.arc(p2, (cx, by + h * 0.05), rad, th0, th0 + rr.uniform(0.25, 0.6), max(4, a * rr.uniform(0.05, 0.1)),
                               c, rr.uniform(0.4, 0.65), soft=(0.7, 0.7), taper=(0.08, 0.3), dry=0.4,
                               squash=h / a * 0.95)
-                for _ in range(int(max(2, a / 30))):                                 # the top plane's stroke ends
+                for _ in range(int(max(1, a / 45))):                                 # the top plane's stroke ends
                     xm = cx + rr.uniform(-0.7, 0.7) * (a_l if rr.random() < 0.5 else a_r)
                     ym = float(top_curve(cx, by, a_l, a_r, h, p_, np.array([xm]))[0])
                     tb = 0.12 * h * max(0.0, 1 - ((xm - cx) / a) ** 2) ** 0.7
@@ -1726,12 +1739,18 @@ def paint_rocks(W=1000, H=420, seed=None, passes=9, keep=None):
                 lo.a *= 0.6
                 lo.c *= 0.6
                 over_into(p2, lo)
-                p2.clip(m * (1 - m_top * 0.6))
+                p2.clip(m)
                 cv_r.over(p2)
             if passes >= 3:                                                          # P3: rim, curved lights, contact
                 p3 = Layer(H, W)
-                xs_ = np.linspace(cx - a_l * 0.98, cx - a_l * 0.1, 24)
-                ys_ = top_curve(cx, by, a_l, a_r, h, p_, xs_)
+                oxs = np.array([q[0] for q in outline[:nn_]])
+                oys = np.array([q[1] for q in outline[:nn_]])
+                rw = max(1.5, h * 0.022)
+                for k_ in range(4, nn_ - 5):                                         # the sky-lit arris, all along
+                    brush.line(p3, (oxs[k_], oys[k_] + rw * 0.5), (oxs[k_ + 1], oys[k_ + 1] + rw * 0.5), rw,
+                               mix(top_c, PAL['lilac'], 0.5), 0.75, soft=(0.45, 0.6), taper=(0, 0))
+                xs_ = oxs[2:nn_ // 2 - 4]
+                ys_ = oys[2:nn_ // 2 - 4]
                 for k_ in range(len(xs_) - 1):
                     wgt = 1 - k_ / (len(xs_) - 1)
                     brush.line(p3, (xs_[k_], ys_[k_] + 0.9), (xs_[k_ + 1], ys_[k_ + 1] + 0.9), 1.0 + 1.6 * wgt, rim_c,
@@ -1744,13 +1763,16 @@ def paint_rocks(W=1000, H=420, seed=None, passes=9, keep=None):
                               taper=(0.25, 0.4), squash=h / a * 0.95)
                 p3.clip(m)
                 cv_r.over(p3)
-                cs = Layer(H, W)                                                     # the contact shadow
-                brush.line(cs, (cx - a_l * 0.95, by + 1), (cx + a_r * 0.98, by + 2), max(3.0, h * 0.05),
-                           mix(sand_sh, PAL['ink'], 0.55), 0.75, soft=(0.6, max(4.0, h * 0.08)), taper=(0.1, 0.05))
+                cs = Layer(H, W)                                                     # the contact: the sand meets it
+                bx_ = np.array([q[0] for q in outline[nn_:]])
+                byy = np.array([q[1] for q in outline[nn_:]])
+                for k_ in range(len(bx_) - 1):
+                    brush.line(cs, (bx_[k_], byy[k_] + 0.5), (bx_[k_ + 1], byy[k_ + 1] + 0.5), max(2.5, h * 0.04),
+                               mix(sand_sh, PAL['ink'], 0.5), 0.7, soft=(0.6, max(3.0, h * 0.06)), taper=(0, 0))
                 cs.clip(1 - m)
                 cv_r.over(cs)
             if passes >= 4 and Z0 < 4.0:                                             # P4: speckle, near only
-                apply_dl(cv_r, grain(H, W, m * (1 - m_top), 25, (0.45, 0.9), (3.0, 6.0), rr, light_share=0.7))
+                apply_dl(cv_r, grain(H, W, m, 25, (0.45, 0.9), (3.0, 6.0), rr, light_share=0.7))
             cv = cv_r
         else:
             # faceted (low-poly): a coarse dome outline (8 segments, jittered), fanned from two interior points into
@@ -1758,8 +1780,8 @@ def paint_rocks(W=1000, H=420, seed=None, passes=9, keep=None):
             pl = dict(front=mix(PAL['slate'], PAL['mauve'], 0.35),                  # L~47 faces us (shade)
                       half=mix(mix(PAL['slate'], PAL['mauve'], 0.35), PAL['lilac'], 0.35),  # L~54 half-tone
                       right=mix(PAL['plum'], PAL['slate'], 0.4),                     # L~36 faces away from the sun
-                      top=mix(PAL['lilac'], PAL['cream'], 0.35),                     # L~74 faces up (the sky dome)
-                      sun=mix(PAL['sand'], PAL['glow'], 0.4))                        # L~84 faces the sun
+                      top=mix(PAL['lilac'], PAL['cream'], 0.2),                      # L~70 faces up (the sky dome)
+                      sun=mix(PAL['sand'], PAL['glow'], 0.25))                       # L~82 faces the sun
             N = 8
             ts = np.linspace(-1, 1, N + 1)
             sil = []
@@ -1793,6 +1815,14 @@ def paint_rocks(W=1000, H=420, seed=None, passes=9, keep=None):
             lay.fill(m, pl['front'])
             for poly_, role in facets:
                 lay.fill(m * poly_mask(H, W, [poly_]), jitter(pl[role], rr, 0.008))
+            fu = Layer(H, W)                                                         # P1 inside: soft, mottled
+            for _ in range(3):
+                xq, yq = cx + rr.uniform(-0.6, 0.6) * a, by - rr.uniform(0.2, 0.8) * h
+                brush.line(fu, (xq - 0.4 * a, yq), (xq + 0.4 * a, yq - 0.1 * h), 0.5 * h,
+                           lighter(pl['front'], 0.15, 'lilac') if rr.random() < 0.5 else darker(pl['front'], 0.12),
+                           0.35, soft=(0.2 * h, 0.2 * h), taper=(0.3, 0.3))
+            fu.blur(5.0).clip(m)
+            over_into(lay, fu)
             top_poly = [f[0] for f in facets if f[1] == 'top']
             right_poly = [f[0] for f in facets if f[1] == 'right']
             ls, tl = sil[0], sil[2]
@@ -1859,3 +1889,280 @@ def paint_rocks(W=1000, H=420, seed=None, passes=9, keep=None):
     if keep is not None:
         keep['final'] = cv.image()
     return cv
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# 10. The swatch sheet: each element beside the reference crops that show it (never traced: the crops sit beside)
+# ----------------------------------------------------------------------------------------------------------------
+REFS = dict(  # name: (file under docs/look, crop box in the screenshot's px, label)
+    h01=('refs_human_scale/01_city_hill_sunset.jpg', (0, 120, 1206, 470),
+         'ref 01: dusk city toward the sun: one dark value per tower, pale-gold slivers, window dots, haze'),
+    c07=('poster_refs/07_kyoto.jpg', (380, 620, 1206, 900), 'ref c07: four flat planes, each paler; ghost blocks'),
+    c03=('poster_refs/03_hanoi.jpg', (350, 560, 1206, 900), 'ref c03: pale flat far blocks, windows only near'),
+    p02f=('refs_paint/02_lighthouse_process.jpg', (520, 920, 960, 1240),
+          'ref p02: blocky chips, cool patches, speckle, drips; lit/shade faces'),
+    c06f=('poster_refs/06_copenhagen.jpg', (0, 860, 760, 1120), 'ref c06: flat facades, windows as value shapes'),
+    c05f=('poster_refs/05_cape_town.jpg', (760, 900, 1206, 1150), 'ref c05: crisp planes, deep openings'),
+    c06b=('poster_refs/06_copenhagen.jpg', (180, 600, 300, 890), 'c06 brick'),
+    c06r=('poster_refs/06_copenhagen.jpg', (595, 820, 745, 1090), 'c06 stone'),
+    p02i=('refs_paint/02_lighthouse_process.jpg', (540, 1140, 900, 1520), 'p02 weathered iron'),
+    c05r=('poster_refs/05_cape_town.jpg', (480, 1400, 1066, 1605), 'ref c05: asphalt in level dry dashes, one cast shadow'),
+    h02g=('refs_human_scale/02_bus_stop_night.jpg', (300, 400, 1060, 609),
+          'ref 02 (the owner\'s model): calm level ground, a light pool'),
+    c06p=('poster_refs/06_copenhagen.jpg', (0, 1490, 1066, 1625), 'ref c06: slabs as flat values, big shadow shapes'),
+    p01b=('refs_paint/01_beach_van_dusk.jpg', (400, 190, 720, 345),
+          'ref p01: dark bodies, a sky-lit top band, crisp tops, soft bases'),
+    p02r=('refs_paint/02_lighthouse_process.jpg', (222, 1490, 1060, 1690),
+          'ref p02: blocky planes, white tops, speckle'),
+    c06k=('poster_refs/06_copenhagen.jpg', (820, 1330, 1180, 1520), 'ref c06: big facets, soft inside'),
+)
+
+
+def _font(size, bold=False):
+    for name in (('DejaVuSans-Bold.ttf' if bold else 'DejaVuSans.ttf'),
+                 '/usr/share/fonts/truetype/dejavu/' + ('DejaVuSans-Bold.ttf' if bold else 'DejaVuSans.ttf')):
+        try:
+            return ImageFont.truetype(name, size)
+        except Exception:
+            pass
+    return ImageFont.load_default()
+
+
+def ref_img(key):
+    f, box, label = REFS[key]
+    path = os.path.join(LOOK, f)
+    try:
+        im = Image.open(path).convert('RGB').crop(box)
+    except Exception:
+        im = Image.new('RGB', (box[2] - box[0], box[3] - box[1]), (200, 200, 200))
+    return im, label
+
+
+def fit(im, w=None, h=None):
+    W0, H0 = im.size
+    if w is not None and h is not None:
+        s = min(w / W0, h / H0)
+    elif w is not None:
+        s = w / W0
+    else:
+        s = h / H0
+    return im.resize((max(1, int(round(W0 * s))), max(1, int(round(H0 * s)))), Image.LANCZOS)
+
+
+class Sheet:
+    BG = (246, 242, 236)
+    INK = (40, 36, 48)
+    SUB = (110, 104, 118)
+
+    def __init__(self, w=1600):
+        self.w = w
+        self.parts = []          # (y, image) placements are computed at render
+        self.items = []
+        self.y = 0
+        self.canvas = Image.new('RGB', (w, 6000), self.BG)
+        self.d = ImageDraw.Draw(self.canvas)
+        self.f_title, self.f_head, self.f_lab = _font(22, True), _font(16, True), _font(12)
+
+    def text(self, x, y, s, font, fill):
+        self.d.text((x, y), s, font=font, fill=fill)
+
+    def title(self, s, sub):
+        self.text(16, 14, s, self.f_title, self.INK)
+        self.text(16, 44, sub, self.f_lab, self.SUB)
+        self.y = 70
+
+    def head(self, s):
+        self.y += 14
+        self.text(16, self.y, s, self.f_head, self.INK)
+        self.y += 26
+
+    def place(self, im, x, y, label=None):
+        self.canvas.paste(im, (int(x), int(y)))
+        if label:
+            self.text(x, y + im.size[1] + 3, label, self.f_lab, self.SUB)
+        return y + im.size[1] + (20 if label else 0)
+
+    def column(self, x, y, w, h, keys):
+        """Stack refs in a column of width w, scaled together to fit height h (labels included)."""
+        ims = [ref_img(k) for k in keys]
+        sc = [fit(im, w=w) for im, _ in ims]
+        total = sum(i.size[1] for i in sc) + 22 * len(sc)
+        if total > h:
+            s = (h - 22 * len(sc)) / float(sum(i.size[1] for i in sc))
+            sc = [i.resize((max(1, int(i.size[0] * s)), max(1, int(i.size[1] * s))), Image.LANCZOS) for i in sc]
+        yy = y
+        for im, (_, lab) in zip(sc, ims):
+            yy = self.place(im, x, yy, lab) + 2
+        return yy
+
+    def done(self):
+        return self.canvas.crop((0, 0, self.w, self.y + 16))
+
+
+def zoom(im, box, k=2):
+    c = im.crop(box)
+    return c.resize((c.size[0] * k, c.size[1] * k), Image.LANCZOS)
+
+
+def build_sheet(seed=None, out=OUT_DEFAULT, phone_out=None, timings=None):
+    t0 = time.time()
+    far = paint_far_city(seed=seed).image()
+    t1 = time.time()
+    keep = {}
+    fac = paint_facade(seed=seed, keep=keep).image()
+    t2 = time.time()
+    tiles = paint_brick_tiles(seed=seed)
+    t3 = time.time()
+    pave = paint_paving(seed=seed).image()
+    t4 = time.time()
+    rocks = paint_rocks(seed=seed).image()
+    t5 = time.time()
+    if timings is not None:
+        timings.update(far=t1 - t0, facade=t2 - t1, brick=t3 - t2, paving=t4 - t3, rocks=t5 - t4)
+    S = Sheet(1600)
+    S.title('Buildings, ground and far city: the painting recipe, proved   (seed %d)' % (SEED if seed is None else seed),
+            'docs/look/paint_recipes/built_ground.md  |  code: scripts/look/paint/recipes/built_ground.py  |  ours at '
+            'film scale (px of the 1080 x 1920 frame), the October canal evening, a low sun on the left; the refs '
+            'beside, never traced')
+    # 1 far city
+    S.head('1  FAR CITY AS LAYERED HAZE  4 planes; each farther one k +0.2 toward the air, less chroma, blur '
+           '0.3 > 0.6 > 1.0 > 1.6 px; slivers only on near planes; lost tops by the sun')
+    y0 = S.y
+    S.place(far, 16, y0, 'ours, 1:1 (frame y 592-892): P0 flat blocks + in-scatter + mist, P2 sun-side faces, '
+            'P3 slivers, roof glow, window grids')
+    S.place(zoom(far, (560, 60, 1000, 210), 2), 16 + 60, y0 + far.size[1] + 22, 'ours, 2x: the clock tower, '
+            'the gasholder, slivers and windows')
+    S.column(1030, y0, 554, far.size[1] + 22 + 300 + 20, ['h01', 'c07', 'c03'])
+    S.y = y0 + far.size[1] + 22 + 300 + 22
+    # 2 facade
+    S.head('2  PAINTED FACADE  a sunlit side face and a shaded front from one low sun; windows as value shapes; '
+           'strokes where the form turns and the weather runs')
+    y0 = S.y
+    S.place(fac, 16, y0, 'ours, 1:1: the final (the front in the shade family, every sun-facing edge a sliver)')
+    px = 16 + fac.size[0] + 12
+    for i, k in enumerate(['P0', 'P1', 'P2', 'P3']):
+        im = keep[k].resize((196, 235), Image.LANCZOS)
+        S.place(im, px + (i % 2) * 202, y0 + (i // 2) * 258, {'P0': 'P0 design (flat)', 'P1': 'P1 soft strokes (8 px)',
+                                                             'P2': 'P2 panel strokes + brick', 'P3': 'P3 accents'}[k])
+    S.place(zoom(fac, (176, 268, 376, 368), 2), px, y0 + 2 * 258 + 4, 'ours, 2x: piers, cool patches, reveals')
+    S.column(px + 410, y0, 1600 - (px + 410) - 16, fac.size[1] + 20, ['p02f', 'c06f', 'c05f'])
+    S.y = y0 + fac.size[1] + 24
+    # 3 brick and stone
+    S.head('3  BRICK AND STONE UP CLOSE  brick suggested in patches (never every brick); stone as big flat blocks; '
+           'chips, drips and speckle by the p02 method')
+    y0 = S.y
+    labels = dict(A='A stock brick, raking sun', B='B brick in shade, lit reveal, sill, stains',
+                  C='C stone cornice from below: sunlit return, shaded front', D='D chipped, rust-stained render')
+    for i, k in enumerate('ABCD'):
+        S.place(tiles[k].image(), 16 + i * 250, y0, labels[k])
+    S.place(zoom(tiles['A'].image(), (0, 0, 240, 120), 2), 16, y0 + 262, 'A at 2x')
+    S.place(zoom(tiles['D'].image(), (0, 60, 240, 180), 2), 16 + 500, y0 + 262, 'D at 2x')
+    xs = 1030
+    ims = [ref_img(k) for k in ('c06b', 'c06r', 'p02i')]
+    hh = 300
+    x = xs
+    for im, lab in ims:
+        f_ = fit(im, h=hh)
+        S.place(f_, x, y0, lab)
+        x += f_.size[0] + 8
+    S.y = y0 + 262 + 240 + 24
+    # 4 paving
+    S.head('4  PAVING IN PERSPECTIVE  flags shrink and merge with distance (texture gradient); joints thin and fade; '
+           'the low sun\'s sheen far; long shadows toward us')
+    y0 = S.y
+    S.place(pave, 16, y0, 'ours, 1:1 (frame y 840-1320, Z 31 > 2.8 m): P0 per-flag values + joints + sheen + shadows, '
+            'P1 level bands, P2 near strokes + dry dashes, P3 lit lips, P4 grit near')
+    S.column(1030, y0, 554, pave.size[1] + 20, ['c05r', 'h02g', 'c06p'])
+    S.y = y0 + pave.size[1] + 24
+    # 5 rocks
+    S.head('5  SMOOTH BOULDERS AND FACETED ROCKS  one dark body, a sky-lit top plane (an irregular break, never a '
+           'crescent), a warm rim to the sun, bounce low; facets by orientation')
+    y0 = S.y
+    S.place(rocks, 16, y0, 'ours, 1:1 (frame y 980-1400): domes P0-P4, a low-poly faceted rock, a far rock converted '
+            '(k 0.22, blur 0.6), shadows toward us')
+    S.column(1030, y0, 554, rocks.size[1] + 20, ['p01b', 'p02r', 'c06k'])
+    S.y = y0 + rocks.size[1] + 24
+    # 6 phone width
+    S.head('6  AT PHONE WIDTH  our pieces as they land in the 1080 frame shown 400 px wide (x 0.37), beside the refs '
+           'at their phone width')
+    y0 = S.y
+    k = 400.0 / 1080.0
+    ph = {n: im.resize((int(im.size[0] * k), int(im.size[1] * k)), Image.LANCZOS) for n, im in
+          (('far', far), ('fac', fac), ('pave', pave), ('rocks', rocks))}
+    yy = S.place(ph['far'], 16, y0)
+    yy = S.place(ph['pave'], 16, yy + 6)
+    yy = S.place(ph['rocks'], 16, yy + 6, 'ours (x 0.37): far city, paving, rocks')
+    S.place(ph['fac'], 16 + 380, y0, 'ours: facade')
+    refk = 400.0 / 1206.0
+    r1 = Image.open(os.path.join(LOOK, 'refs_human_scale/01_city_hill_sunset.jpg')).convert('RGB')
+    r1 = r1.resize((400, int(r1.size[1] * refk)), Image.LANCZOS)
+    r2 = Image.open(os.path.join(LOOK, 'refs_paint/01_beach_van_dusk.jpg')).convert('RGB')
+    r2 = r2.resize((400, int(r2.size[1] * refk)), Image.LANCZOS)
+    r3 = Image.open(os.path.join(LOOK, 'refs_paint/02_lighthouse_process.jpg')).convert('RGB').crop((222, 455, 1160,
+                                                                                                    1815))
+    r3 = r3.resize((int(r3.size[0] * refk), int(r3.size[1] * refk)), Image.LANCZOS)
+    yb = S.place(r1, 640, y0, 'ref 01 at phone width')
+    S.place(r2, 640, yb + 4, 'ref p01 at phone width')
+    S.place(r3, 1060, y0, 'ref p02 at phone width')
+    S.y = max(yy, y0 + r3.size[1] + 24, yb + r2.size[1] + 30) + 8
+    sheet = S.done()
+    if out:
+        sheet.save(out, optimize=True)
+    if phone_out:
+        sheet.resize((400, int(sheet.size[1] * 400 / sheet.size[0])), Image.LANCZOS).save(phone_out)
+    return sheet
+
+
+def check(seed=None):
+    """Determinism (two paints of every element, same bytes) and a few measured numbers the recipe promises."""
+    ok = True
+    for name, fn in (('far', lambda: paint_far_city(seed=seed)), ('facade', lambda: paint_facade(seed=seed)),
+                     ('paving', lambda: paint_paving(seed=seed)), ('rocks', lambda: paint_rocks(seed=seed))):
+        a = hashlib.md5(fn().image().tobytes()).hexdigest()
+        b = hashlib.md5(fn().image().tobytes()).hexdigest()
+        print('%-7s deterministic: %s (%s)' % (name, a == b, a[:10]))
+        ok &= (a == b)
+    L = lambda im, box: float(np.median(skcolor.rgb2lab(np.asarray(im.crop(box), np.float64) / 255.0)[..., 0]))  # noqa
+    fac = paint_facade(seed=seed).image()
+    print('facade  L*: side face %.1f  front high %.1f  front low %.1f  reveal %.1f' % (
+        L(fac, (70, 300, 100, 340)), L(fac, (262, 160, 290, 230)), L(fac, (262, 420, 290, 490)),
+        L(fac, (238, 300, 242, 340))))
+    pv = np.asarray(paint_paving(seed=seed).image(), np.float64) / 255.0
+    lab = skcolor.rgb2lab(pv)[..., 0]
+    hp = lab - ndi.gaussian_filter(lab, 3)
+    print('paving  texture (std of L* - blur3, clear of props and shadows): near Z~3 m %.2f  mid Z~7 m %.2f  '
+          'far Z~20 m %.2f' % (hp[400:470, 30:230].std(), hp[150:200, 700:880].std(), hp[15:45, 700:880].std()))
+    return ok
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
+    ap.add_argument('--out', default=OUT_DEFAULT)
+    ap.add_argument('--phone', default=None, help='also save the sheet scaled to 400 px wide here')
+    ap.add_argument('--seed', type=int, default=None)
+    ap.add_argument('--only', default=None, help='far | facade | brick | paving | rocks: paint one element to --out')
+    ap.add_argument('--passes', type=int, default=9, help='stop after pass N (0 = the flat design)')
+    ap.add_argument('--check', action='store_true')
+    a = ap.parse_args()
+    if a.check:
+        sys.exit(0 if check(a.seed) else 1)
+    if a.only:
+        fn = dict(far=paint_far_city, facade=paint_facade, paving=paint_paving, rocks=paint_rocks)
+        if a.only == 'brick':
+            tiles = paint_brick_tiles(seed=a.seed)
+            strip = Image.new('RGB', (4 * 250 - 10, 240), (246, 242, 236))
+            for i, k in enumerate('ABCD'):
+                strip.paste(tiles[k].image(), (i * 250, 0))
+            strip.save(a.out)
+        else:
+            fn[a.only](seed=a.seed, passes=a.passes).image().save(a.out)
+        print('wrote', a.out)
+        return
+    tm = {}
+    t = time.time()
+    build_sheet(a.seed, a.out, a.phone, tm)
+    print('wrote %s in %.1fs (%s)' % (a.out, time.time() - t, ', '.join('%s %.1fs' % kv for kv in tm.items())))
+
+
+if __name__ == '__main__':
+    main()
