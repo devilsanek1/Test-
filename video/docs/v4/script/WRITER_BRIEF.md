@@ -2,8 +2,16 @@
 
 Status 2026-10-29 ~09:40 UTC: the writer was started, then stopped when the owner moved the work to a new session
 ("Can you commit these topic as 4 and 5 and I will continue in another session"); nothing was written yet. Start ONE
-writer (Agent tool, `effort: "max"`) with this brief, then one critic (a cold retell first, at most 6 findings), then
-one fix pass.
+writer (Agent tool, `effort: "max"`) with this brief, then one critic (the cold viewer panel first, then a cold retell:
+`video/docs/PIPELINE_V2.md`, G1), then one fix pass.
+
+**Clarity, for every next pass on this film (owner, 2026-10-29, on draft 1: "too ambiguous and weird"):** every line
+clear to a regular person on one hearing (the playbook, Script and voice, "CLEAR TO A REGULAR PERSON ON ONE HEARING").
+The method: `video/docs/retro/2026-10-29_script_clarity/PRINCIPLES.md` (the 9 principles and the 40-second beat
+order). The check: the writer's clarity pass with this film's word list `script/clarity.json` and
+`video/scripts/voice/check_clarity.py` OK beside `check_rhythm.py` and `check_paste.py`, every warning answered in
+the script doc's "Checks". Then the critic's cold viewer panel (`video/docs/PIPELINE_V2.md`, G1; the run on draft 2:
+`script/panel/`, `script/critique_g1_r2.md`). Where this brief differs, those win.
 
 **The film: Helsinki heats its homes with AI chips** (owner: "Oh I actually like the story of Helsinki hitting homes
 with ai chips"; "Helsinki is actually pretty good too / Let's do both as story 4 and 5"). Brief: `video/docs/v4/G0_TOPIC.md`.
@@ -29,7 +37,8 @@ chatbot questions make some of that heat). The floor: the plant isn't built and 
 Helsinki."; frame 0; word count and length; the story in 3 sentences; throughline; turn; one joke; a delivery cue per
 line; 3 hook options in the "Did you know there's a ..." / "There's a ..." / "Why does this ...?" families, e.g. "Did you
 know Helsinki wants to heat seventy thousand homes with AI?"; comment lines tagged; a fact table),
-`video/docs/v4/script/script_elevenlabs.md` (paste v2, hook 1 voiced; `check_paste.py` OK and `check_rhythm.py` OK),
+`video/docs/v4/script/script_elevenlabs.md` (paste v2, hook 1 voiced; `check_paste.py` OK, `check_rhythm.py` OK and
+`check_clarity.py` OK),
 `video/docs/v4/THROUGHLINE.md` (home place: a snowy Helsinki street with one warm window; thread: the heat as the warm
 water, a drawn object; one "you"; Pip hidden; a carrier per join). (Fix pass, 2026-10-29, `critique_g1.md` finding 2:
 this brief first said "the heat as one warm glow", a clash with DIRECTION rule 5, light shown on what it hits and never

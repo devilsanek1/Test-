@@ -16,10 +16,10 @@ paste), the later rule wins, as the brief's banner lists.
 
 Format: **rule** — why / evidence (video, date).
 
-**Last reviewed for coherence: 2026-10-27 (sixth pass: a cold read as if starting video 4, every conflict it found fixed
-at its source: the card's timing, one version, people without faces, Pip in every shot, the line's colour, parallel
-work and the budget, the brief) · no size budget: coherent and clear wins over short** (owner, 2026-10-27; see
-Maintenance at the end).
+**Last reviewed for coherence: 2026-10-29 (seventh pass, scoped to the script-clarity note: integrated into Script and
+voice and the Taste signals' "Lines", checked against Audience and goal and Hook and pacing; the other sections as of
+the sixth pass, 2026-10-27: a cold read as if starting video 4, every conflict it found fixed at its source) · no size
+budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance at the end).
 
 ## Audience and goal
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24).
@@ -62,22 +62,56 @@ Maintenance at the end).
   too pushy and the script has a rhythm we discussed before"; then "Oh I also meant that a video has an opening as "did you know that .." like that what I meant by great opening"; "Even with did you know the core line is instantly more interesting", 2026-10-29; saved: the study's
   `refs/bigbend_reel/`).
 - **CLEAR TO A REGULAR PERSON ON ONE HEARING: every sentence is understood the first time, at feed speed, by regular
-  people, never only by us.** Ask of every sentence: "is that sentence good, and will it be received well by regular
-  people?" Name every thing in everyday words before talking about it (no bare tech words: "the chips", "a cabinet of
-  them"; a common word with a tech meaning, like "chips", misleads); every "it", "that", "this" or "they" points at
-  one obvious thing, or say the noun again ("But Helsinki WANTS it": the heat, the air or the sea?); say the plain
-  thought itself, never a compressed or clever hint at a deeper one, and no vague scope ("almost everywhere": say what
-  happens, e.g. "in a typical data center, here is what happens"); jokes in simple, gentle, everyday words, never weird
-  or cheeky. Ambiguous or weird loses the biggest audience, the one we write for. The method (research, principles,
-  the clarity check): `docs/retro/2026-10-29_script_clarity/`. — ("so what i don't like about these scripts we write
-  lately is we are being too ambiguous and weird at times"; "We are talking about reaching the biggest audience and
-  getting the engagement - but we would lose people on this sentence. Like we need to ask ourselves - is that sentence
-  good and will be received well by regular people? Chips is a word not a lot of people would understand"; "we need a
-  simpler less scandalous language"; "I think you are having some deeper thought here and you choose to be obscure
-  about it"; "When you say IT - what exactly is it - heat or air or sea?", v4 G1, 2026-10-29).
-- **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24). **Rhythm: never a run of
-  long sentences; put a short one (5 words or fewer, e.g. "Let's find out." "But there was a problem.") after every 1-2
-  long ones, at the turns,** gated by `scripts/voice/check_rhythm.py` OK at G1. — (owner's reference reel, 2026-10-27).
+  people worldwide (many learned English at school; they read the captions as it plays and can't rewind), never only
+  by us.** Ask of every sentence the owner's question, "is that sentence good and will be received well by regular
+  people?", and write it as news you'd pass to a friend (v4's line 1, "Did you know Helsinki wants AI to heat seventy
+  thousand homes?": "great thats what i would like to tell my friends"). How (the principles, their research and the
+  failures of v1-v5: `docs/retro/2026-10-29_script_clarity/PRINCIPLES.md`):
+  - **Everyday names, one per thing:** call each thing what regular people call it and keep that one name all film;
+    no trade words, and no common word in its trade sense ("the chips", "a cabinet of them": to most people chips are
+    food). A term the story needs is described once, plainly, where it first appears ("buildings called data
+    centers"). Rounding a thing to its everyday form is the licence "generalizing is fine" gives (a 72-chip rack is
+    "one stack of these computers").
+  - **Introduce, then point:** "the X", "those X", "that hot" only for what the script already said; every "it",
+    "they", "this" or "that" points at ONE obvious thing in the line before, or say the noun again ("But Helsinki
+    WANTS it": the heat, the air or the sea? -> "But Helsinki wants that heat."). A short line keeps its noun (Rhythm,
+    below).
+  - **The plain thought, as the typical case:** say who does what, where, in physical words; never a compressed or
+    clever hint at a deeper thought, and no vague scope ("almost everywhere": say what happens, e.g. "in a typical
+    data center, here is what happens"). Test: write "What I mean is: ___" under the line; if that is clearer, it
+    becomes the line.
+  - **One new idea per sentence, hooked onto the last:** each sentence starts from what the listener just heard and
+    ends on its new part; the joins are said and true ("but", "so", "because"); the line right after the hook and its
+    payoff gives the plain base (what makes the claim possible) at once, so the viewer wonders about the story
+    ("how?"), never about a word ("which chips?"). The beat order: PRINCIPLES.md, "How a 40-second script is structured".
+  - **Literal words for a worldwide ear:** no idioms, slang or wordplay to decode ("first dibs", "by the mountain").
+  - **The one joke is the plain situation, said kindly:** one step, in simple, gentle, everyday words, never weird,
+    cheeky or scandalous ("nobody's even ..."); after one hearing a viewer smiles AND can say the point, or it goes.
+  - **Numbers and comparisons by ear:** one number per sentence, round, tied to an everyday thing; a comparison says
+    what is alike ("as much heat as forty kettles", never only "like forty kettles").
+  - **A comment line is clear first:** people argue with what they understood, and swipe past what they didn't
+    (Audience and goal: comments are a massive plus).
+  - **Checked, never assumed:** `scripts/voice/check_clarity.py` OK at G1 (no error, every warning fixed or answered
+    in the script doc's "Checks"; OK never means clear), then the G1 critic's cold viewer panel (`docs/PIPELINE_V2.md`,
+    G1): three regular people hear the narration once, sentence by sentence, and every line that snags one of them
+    (heard wrong, missed, re-linked to an earlier line, an unsure or swiping thumb) is rewritten. A readability score
+    proves nothing ("The chips get that hot." scores as the easiest line), and neither does our own ear: we know what
+    we meant.
+  Ambiguous or weird loses the biggest audience, the one we write for. — ("so what i don;t like about these scripts we
+  write lately is we are being too ambiguous and weird at times"; "We are talking about reaching the biggest audience
+  and getting the engagement - but we would lose people on this sentence. Like we need to ask ourselves - is that
+  sentence good and will be received well by regular people? Chips is a word not a lot of people would understand";
+  "this is directionally okay, but still weird we need a simpler less scandalous language"; "I think you are having
+  some deeper thought here and you choose to be obscure about it. So i think you want to say that in a typical
+  datacenter here is what happens. When you say "almost everywhere" - this is very ambigous"; "When you say IT - what
+  exactly is it - heat or air or sea?", v4 G1, 2026-10-29; earlier, "Who even knows WordPress now?", v1, October 2026.)
+- **Sound like a real person talking, never like AI (the creative brief's RULE #1): check every sentence for
+  AI-sounding wording;** the everyday words it asks for are the clarity rule's, above. — (v1, 2026-10-24).
+- **Rhythm: never a run of long sentences; put a short one (5 words or fewer, e.g. "Let's find out." "But there was a
+  problem.") after every 1-2 long ones, at the turns, and the short line keeps its noun** ("But Helsinki wants that
+  heat.", never a bare "it" after three things it could mean: five of v4 draft 1's six short lines had shed their
+  noun), gated by `scripts/voice/check_rhythm.py` OK at G1; rhythm OK is never evidence of clarity. — (owner's
+  reference reel, 2026-10-27; v4 G1, 2026-10-29).
 - **Scripts come with detailed emotional / delivery cues; the owner always gets the full script text with any take.**
   — (v1; "give me the full text to paste, not one line", v3, 2026-10-26).
 - **We generate the narration with the owner's ElevenLabs voice through the API, for every video** (voice id and model
@@ -423,8 +457,11 @@ Maintenance at the end).
   hospital drones: "interesting too but I'm not sure what you can pack in it beyond the title? Why would the people
   want to keep watching?"; "Maybe another story is the 'weirdest / coolest places where datacenters are built' like 3
   weirdest places", 2026-10-29).
-- **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
-  frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
+- **Lines: plain, direct and personal over clever** (how: Script and voice, CLEAR TO A REGULAR PERSON ON ONE
+  HEARING); a friend's question works as a hook ("Did you know ..."), a sales question doesn't (Audience and goal:
+  never baity). A plain line needs the frame-0 image, the first-second sound and the payoff in words by ~2 s (Hook
+  and pacing) to bring the jolt; the line after the payoff is the plain base (what makes the claim possible), never a
+  compressed punch ("The chips get that hot."). — (v3 G0.5-G2; v3 insights, 2026-10-28; v4 G1, 2026-10-29).
 - **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).
 - **Palettes: the warm, everyday one for a money / everyday-life story** (#9 Autumn Ember; #7 Autumn Ochre read sick).
   — (v3 G4).

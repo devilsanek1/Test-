@@ -5,9 +5,19 @@ part A), then ONE fix pass (part B). Every agent writes its file from its first 
 moment), returns at most 3 lines, never runs a git command that changes the index (the orchestrator commits), never
 touches `video/src`, `video/public`, `video/out`, and starts no agents (if it ever does, they run at max effort).
 
-## A. The critic: `video/docs/v4/script/critique_g1.md`, at most 6 findings
+**Clarity, for every next pass on this film (owner, 2026-10-29, on draft 1: "too ambiguous and weird"; these win where
+this brief differs):** the rule is the playbook's "CLEAR TO A REGULAR PERSON ON ONE HEARING"; the method is
+`video/docs/retro/2026-10-29_script_clarity/PRINCIPLES.md`; the gate is `video/docs/PIPELINE_V2.md`, G1: the critic's
+cold viewer panel first (three regular viewers, one sentence at a time), then the cold retell, then
+`video/scripts/voice/check_clarity.py --film video/docs/v4/script/clarity.json --questions` put to the same viewers.
+The panel's clarity findings are uncapped; the other findings stay at most 6. The run on draft 2: `panel/`,
+`critique_g1_r2.md`.
 
-1. **The cold retell, BEFORE reading anything else** (no brief, no notes, no fact file, not `script_g1.md`): read only
+## A. The critic: `video/docs/v4/script/critique_g1.md` (round 2: `critique_g1_r2.md`), at most 6 findings beside the panel's
+
+1. **The cold viewer panel, then the cold retell, BEFORE reading anything else** (no brief, no notes, no fact file,
+   not `script_g1.md`). First the panel (since 2026-10-29: PIPELINE_V2, G1, step (a), with its three viewer cards).
+   Then the retell: read only
    the spoken words of the paste block in `video/docs/v4/script/script_elevenlabs.md` (skip the tags), once, as a viewer
    scrolling past who hears it one time. Then, without looking back, retell it in 3-5 sentences as you would to a friend,
    and write that retell into the critique file first. Judge it: does it come out as one story (one thing, each line
@@ -33,8 +43,9 @@ touches `video/src`, `video/public`, `video/out`, and starts no agents (if it ev
    line; one joke that lands; one or two comment lines, tagged, that are arguable but defensible; positive mood; the 3
    hook options in the brief's families, each one true; the through-line card (`video/docs/v4/THROUGHLINE.md`): one
    thread object, one home place, one "you", Pip hidden, a carrier for every join taken from the script's own joins
-   (`video/docs/look/CRAFT.md` §a). Run `python3 video/scripts/voice/check_rhythm.py` and
-   `python3 video/scripts/voice/check_paste.py` on the paste file and quote their verdicts.
+   (`video/docs/look/CRAFT.md` §a). Run `python3 video/scripts/voice/check_rhythm.py`,
+   `python3 video/scripts/voice/check_paste.py` and `python3 video/scripts/voice/check_clarity.py --film
+   video/docs/v4/script/clarity.json --questions` on the paste file and quote their verdicts.
 
 Rank the findings blocker > major > minor; each names the line, the problem in one sentence, and a concrete fix (a
 replacement line when a line is the problem, checked against the fact file). Then a verdict: **FIX AND SEND** (the fix
@@ -46,5 +57,7 @@ Continue the writer's work: read the writer's own notes first (its spines and wh
 sentences), then the critique, then the fact file. Apply every blocker and major and the minors that are plainly right,
 in the writer's voice; for each finding, one line in the "Fix pass" section: done (what changed) or not done (why). Keep
 `script_g1.md`, the paste in `script_elevenlabs.md` and the card's carriers in `THROUGHLINE.md` in sync (word count,
-length, the joins); re-run both checks until both say OK and record their verdicts. If the critic said REWRITE, redo
+length, the joins); re-run the three checks (rhythm, paste, clarity) until all say OK, record their verdicts and
+answer every clarity warning in "Checks". Then the critic, resumed, re-hears each changed line as the three viewers,
+with the line before and after it (PIPELINE_V2, G1). If the critic said REWRITE, redo
 the spine from the writer's second spine or a new one, then the lines, then the checks.

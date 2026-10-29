@@ -16,6 +16,14 @@
 >   This relaxes §4-8's "never invent or exaggerate consequences" and §18-19's precision; the core event must be real.
 >   Comment bait may now be a claim people correct: comments are "a massive plus to the script" (owner, 2026-10-29),
 >   which updates the ENGAGEMENT LAYER's "never false or misleading" below.
+> - **Clarity (owner, 2026-10-29):** every sentence is understood the first time, at feed speed, by a regular person
+>   anywhere in the world (many learned English at school): everyday names, one per thing (never a trade word like
+>   "chips" or "cabinet"); every "it" or "that" with one obvious target; the plain thought as the typical case, never
+>   a hint; literal words; the one joke plain and kind. This sharpens §3's "a great teacher's clarity" and §11's
+>   "simple language", and narrows §14-17's "natural American expressions", "dry ... humour" and "describing things in
+>   a memorable unexpected way" to what a listener needn't decode (no idioms, slang or irony); RULE #1 still holds, and
+>   the line must also be understood at once. The method and the check: the playbook, "CLEAR TO A REGULAR PERSON ON
+>   ONE HEARING".
 > - **Freshness:** news from about the last month, weighed below relevance, visual appeal, mood and truth (owner,
 >   2026-10-28), not "ideally the past 24-72 h" (§4-8); the full topic criteria: `docs/TOPIC_CRITERIA.md`.
 > - The notes on "THIS script" and the PHP lines below are video 1's (history).

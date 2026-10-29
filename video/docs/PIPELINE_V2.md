@@ -42,7 +42,7 @@ one is approved; the one exception is W1, internal text written beside G1-G2.
 |---|---|---|---|---|
 | G0 Topic | the top 3 topics on one screen of text, **each with its proposed core line** (lean scouting: Creative exploration below), or the owner's own topic | topic **and its core line** (a separate G0.5 only on request), audience, takeaway, length band | topic, core line, length band; then the **fact lock** (built ONCE, by one agent; every later check reads it) (`docs/vN/research/factlock.md`: every fact, number and quote the film may use, each checked against its primary source; v2 and v3 have one) before G0.5 | 2 scouts + 1 editor, skipped when the owner names the topic; then one fact-lock agent |
 | **G0.5 Core line** (owner, 2026-10-25; folded into G0 by default since 2026-10-28) | by default nothing extra: the core line comes with the topic on G0's screen; a separate round (the top 3 lines on one screen) only when the owner asks for more options | **the one sentence** the whole video exists to land, the one that gets the biggest emotional reaction (v3 example: "AI is making your PC more expensive") | the core line: it becomes the frame-0 text, the hook's seed, the cover and title text and the payoff's callback, and every script line must serve it; from the pick we draft its **THROUGH-LINE CARD** (thread object and home spot, home place, one "you": internal; G1 completes it and the owner approves it there) | by default none (G0's editor drafts the line); on request one writer + one critic |
-| G1 Script | **the ElevenLabs-ready script** (a short emotional cue per line, v1 format), with up to **3 hook-line alternatives** as text inside it (the owner picks one; G2 voices only the pick), plus the completed **THROUGH-LINE CARD** (one screen of text, `docs/look/CRAFT.md` §a; owner-approved 2026-10-27): the thread object and its home spot, the one home place (one home place and at most ONE comparison or scale shot: the playbook's ONE SUBJECT, GONE DEEP), the one "you", the mascot rule, and a carrier (A-F) for every join between the script's lines, taken from the script's own joins (the carriers follow the script, never the other way round); the voice comes at G2 | every word, the hook line, the card | meaning and order of lines; the hook line; the card | one writer + one critic + one fix pass; 1 h, then 15 min per round |
+| G1 Script | **the ElevenLabs-ready script** (a short emotional cue per line, v1 format), with up to **3 hook-line alternatives** as text inside it (the owner picks one; G2 voices only the pick), plus the completed **THROUGH-LINE CARD** (one screen of text, `docs/look/CRAFT.md` §a; owner-approved 2026-10-27): the thread object and its home spot, the one home place (one home place and at most ONE comparison or scale shot: the playbook's ONE SUBJECT, GONE DEEP), the one "you", the mascot rule, and a carrier (A-F) for every join between the script's lines, taken from the script's own joins (the carriers follow the script, never the other way round); the voice comes at G2 | every word, the hook line, the card | meaning and order of lines; the hook line; the card | one writer + one critic (with the cold viewer panel) + one fix pass; 1 h, then 15 min per round |
 | G2 Voice lock | **the take, generated through the API with the voice the owner picks** (`docs/voice/VOICE.md`; owner, 2026-10-26; `docs/voice/API_QUICKSTART.md`: paste format v2, `check_paste.py` OK, `generate_take.py` `all_clean`, `check_take.py` MATCH), sent as take.wav with the full script text, locked into `public/vN/`, logged in `ELEVENLABS.md` section 5; word timings taken from it. Only without the key does the owner paste it (always the full `--handoff` text); we check that take the same way. No video (owner, 2026-10-25) | voice, pace | the clock (word timings) | 30 min |
 | **W1 World bible** (text, beside G1-G2; owner-approved 2026-10-27) | no owner step (internal text): the set list (the home place first); the PROPOSED palette (one sister palette from `look/PALETTE.md` by the story's use case; 2-3 candidates judged internally when the topic needs a new look) and, in its terms, one light rig per set (the key and its side, the shadow tint family, the pool colours: `CRAFT.md` §d.1), its depth (the planes, 0 = the subject's, the air behind them = the sky's lowest step, the camera's horizon and vanishing point(s): `CRAFT.md` §f.1) and one colour-script line per beat; tiers A/B/C per shot (`CRAFT.md` §b); the recurring living character (Pip by default, `LIFE_AND_DENSITY.md` §5); its choices reach the owner as G3's grey and the G4 look clip | — (judged at G3 and G4) | — (G3 freezes the tiers and the rig's shapes; G4 approves the palette and freezes the pen, the rigs and the tier palettes; a change at G4 is written back into W1) | in parallel with G1-G2 |
 | **G3 Sketch animatic** | ONE video at 60 fps: the whole film as an ANIMATED SKETCHBOOK (spec: `docs/G3_ANIMATIC.md`) — every cut, camera move, transition and key action PLAYED at sketch fidelity, every join with its carrier, the tiers at their final weights in grey, each set's light rig as shapes and its planes as grey steps (paler with distance, the horizon and the ground's lines to the VP drawn), density and life as grey placeholders (particle fields among the `life:` items), timed to the locked voice (visual concepts judged internally; owner rule: one version) — tool: `SketchReel` board mode + `board_lint` | **the film's rough pass**: story in pictures, cuts, transitions, camera moves, key actions, the density/life plan, and **where the eye goes and what carries each join** (2026-10-27; the hand-off states the fidelity ladder) | the signal contract (`G3_ANIMATIC.md` §2): scene list, cut points, shot content, framing, transition devices and carriers, camera moves, motion plan, density promises, thread coverage, tiers, the light rig, the mover budget | first cut ~3 h (was 2; the hour goes to tiers, carriers and the light marks; assumes `G3_ANIMATIC.md` §7 tier-1 tooling, built once beforehand: not built yet on 2026-10-27, tooling item 6); rounds 30 min |
@@ -82,16 +82,49 @@ Quality and output value come first, spent where it reaches the film. Ideas are 
   four-persona gut panel and a truth check in one pass), the top 3 on one screen; bookkeeping
   `video/scripts/coreline.py`. The heavy version (22 agents: `v3-g05-core-line*.js`, `v4-g05-facts-and-core-line-*.js`)
   cost about $150 on v4 and its four judges barely separated the top lines: never by default.
-- **G1 script = story first (owner, 2026-10-26; lean since 2026-10-28):** one writer (1) drafts 2-3 competing story
-  spines (the throughline question, the viewer's situation, beats joined by but/so, the turn, the payoff that lands the
-  core line) and picks one, with its reason; (2) writes the script with cues; (3) runs `check_rhythm.py` and
-  `check_paste.py` until both pass. Then one critic: a cold retell (a list-like retelling fails), the first line heard cold: "ad or news?" (an ad-like or
-  baity opening fails: playbook, never baity), the flow (every line
-  follows from the previous) and the facts against the fact file, at most 6 findings; then one fix pass by the same
-  writer (resumed, not restarted). The through-line card's carriers come from the script's joins (G1 row). Never
-  structure a script as a list of facts to prove. **Rhythm (owner, 2026-10-27):** short sentences (<= 5 words) break up
-  the long ones, at least one after every 1-2 long sentences; the script must pass `scripts/voice/check_rhythm.py`
-  before it goes to the owner. The heavy version (~12 agents: `v3-g1-story-*.js`) runs only on request.
+- **G1 script = story first, clear on one hearing (owner, 2026-10-26 and 2026-10-29; lean since 2026-10-28):** one
+  writer (1) drafts 2-3 competing story spines (the throughline question, the viewer's situation, beats joined by
+  but/so, the turn, the payoff that lands the core line) and picks one, with its reason; (2) writes the script with
+  cues, in the beat order of `docs/retro/2026-10-29_script_clarity/PRINCIPLES.md` ("How a 40-second script is
+  structured"); (3) **the clarity pass:** fills the film's word list `docs/vN/script/clarity.json` (the thread
+  object's one everyday name and its rivals, the film's trade words with their plain descriptions, any allowed word
+  with its reason; format: `docs/retro/2026-10-29_script_clarity/LINT_SPEC.md` section 3), writes "What I mean is:
+  ___" in the script doc's notes under every line that leans on what the writer knows, and runs `check_clarity.py`
+  (it reads `clarity.json` by itself), `check_rhythm.py` and `check_paste.py` until all three print OK
+  (`check_clarity.py` OK means no error, never that the script is clear), answering every clarity warning in the
+  script doc's "Checks" section (fixed, or why it stays). Then one critic, cold first (before the writer's brief and
+  notes, the script doc or the fact file: only the spoken words): (a) **the cold viewer panel:** the critic plays the
+  three viewers below in turn; each hears the narration once, one sentence at a time, never looking back or ahead,
+  and after each sentence reports what they understood (in their own words), the words they missed or took another
+  way, what each "it", "they", "this", "that" and new "the X" points at, and their thumb (stays, unsure, swipes) with
+  why; after the first sentence each also answers "ad or news?" (an ad-like or baity opening fails: playbook, never
+  baity); (b) the cold retell (a list-like retelling fails); then (c) the lint's targeted questions
+  (`check_clarity.py --questions`) put to the same three viewers; (d) the flow (every line follows from the previous)
+  and the facts against the fact file. **A clarity finding** is any line a viewer retells wrong or can't retell, a
+  word one of them doesn't know or takes in another sense, a pointer one of them resolves wrongly or not at all, a
+  line one of them had to re-link to an earlier one, or an "unsure" or "swipe" thumb; each is listed by line, with
+  the viewer's own words and a plainer line, and never waved through as "paid off by the next line". The panel's list
+  is complete and all of it is fixed; the critic's other findings stay at most 6. Then one fix pass by the same
+  writer (resumed, not restarted): every panel line rewritten, the three checks re-run, and the critic (resumed)
+  re-hears each changed line as the three viewers, with the line before and after it, until no changed line snags.
+  The through-line card's carriers come from the script's joins (G1 row). Never structure a script as a list of facts
+  to prove. **Rhythm (owner, 2026-10-27):** short sentences (<= 5 words) break up the long ones, at least one after
+  every 1-2 long sentences, each keeping its noun; the script must pass `scripts/voice/check_rhythm.py` and
+  `scripts/voice/check_clarity.py` (exit 0) before it goes to the owner. The heavy version (~12 agents:
+  `v3-g1-story-*.js`) runs only on request.
+  - **The three viewers** (each card says what that viewer doesn't know, because a played panel knows every word; each
+    hears one sentence at a time, once, and answers only from that sentence and the ones before it; they may run as
+    three small cold agents instead, the narration inline, no file read, the card as the persona: v4 G1 did, and all
+    three snagged on a line every check had passed, "Nothing is built yet."; never more than three):
+    1. **A non-native English speaker** (24, in São Paulo, Jakarta or Kraków; learned English at school; watches Reels
+       with the captions on): knows everyday words and takes each in its most common, literal sense; knows no idioms
+       beyond the most basic, no slang, no American cultural references; knows world-famous names only (Google,
+       Apple, Microsoft, Amazon, Tesla, Netflix, the FBI), not company or product names from the news; misses irony.
+    2. **A non-tech adult** (45, a nurse or a bus driver; uses a phone daily, never thinks about how computers work):
+       to them chips are food, a cabinet is a cupboard, a server is a waiter, the cloud is in the sky; knows "AI" and
+       "chatbot" from the news, not how they work; a number means something only next to an everyday thing.
+    3. **A fast-scrolling teen** (15; thumb on the screen, two seconds of patience): knows apps and memes, not news,
+       not trade words; swipes on the first line that doesn't make sense or sounds like an ad.
 - **G3 animatic:** 2-3 visual concepts for the whole film, judged internally; the owner sees one animatic (one-version rule).
 - **G4 look:** 2-4 style-frame directions when the topic needs a new look, judged internally; the pick becomes the one
   look clip the owner plays.
@@ -104,7 +137,7 @@ stages (building, fixing, polishing), where the measured waste happened.
 1. **No AI critics on built scenes before G6** (reviews were 28 % of spend, mostly on scenes that changed afterwards).
    Before G6 the owner is the reviewer, plus what judges no taste: scripted checks (the gate check: duration, A/V sync,
    captions inside the safe area; from G3 on, CRAFT's lints, rule 6), cold reads that only retell what they see (G1's
-   retell panel, G3's sound-off and sound-on reads, G5's first-set read) and each lane's style quiz before it builds
+   cold viewer panel and retell, G3's sound-off and sound-on reads, G5's first-set read) and each lane's style quiz before it builds
    (playbook Process: one STYLE.md per film). The divergent stages above keep their judges. `G5_BLOCKING.md` §9's
    art-director reviews were v2r's (an owner-ordered restart with full creative freedom), not the default.
 2. **One combined reviewer per scene per round from G6 on, max 6 findings, then one fix.** Rounds go on as long as the
@@ -203,9 +236,9 @@ the through-line card (G0.5 drafts it from the pick, G1 completes it from the sc
 |---|---|---|
 | G0 topic | lean by default (2 scouts + 1 editor: the G0 bullet); heavy on request: `v3-g0-topics-*.js`; `docs/IDEAS_BANK.md` | the top 3 topics, each with its proposed core line |
 | G0.5 core line | by default inside G0; on request one writer + one critic (`video/scripts/coreline.py` for the bookkeeping); heavy, never by default: `v3-g05-core-line-*.js` | the top 3 lines |
-| G1 script | lean by default (one writer + one critic + one fix pass: the G1 bullet); heavy on request: `v3-g1-story-*.js` | spines, the script with cues, rhythm and paste checks, critique, fix |
+| G1 script | lean by default (one writer + one critic + one fix pass: the G1 bullet); heavy on request: `v3-g1-story-*.js` | spines, the script with cues, the clarity pass (the film's `clarity.json`), the clarity, rhythm and paste checks, critique (the cold viewer panel first), fix |
 | any line | `v3-line2-fix-*.js` | replacement lines tested in context by viewer personas + a standards/flow judge |
-| G1/G2 voice | `docs/ELEVENLABS.md`; `video/scripts/voice/` | paste-file rules + `check_paste.py`; `check_rhythm.py` (long sentences broken by short ones); `check_take.py` (transcribe + diff), `clean_take.py`, `transcribe.py` |
+| G1/G2 voice | `docs/ELEVENLABS.md`; `video/scripts/voice/` | paste-file rules + `check_paste.py`; `check_rhythm.py` (long sentences broken by short ones); `check_clarity.py` (clear to a regular listener on one hearing: errors for trade words and false friends, pointers with rivals or no target, vague scope, idioms; 13 warnings, each a targeted question for the G1 panel via `--questions`; reads the film's word list `docs/vN/script/clarity.json`; `--selftest` keeps the owner's v4 notes as its regression; needs the pinned spaCy and wordfreq, and prints their install line (exit 2) when they are missing; run it without `python3 -I`; spec and build: `docs/retro/2026-10-29_script_clarity/LINT_SPEC.md`, `LINT_REPORT.md`); `check_take.py` (transcribe + diff), `clean_take.py`, `transcribe.py` |
 | G2 voice (API) | `video/scripts/voice/generate_take.py` | per-line generation with the owner's voice, ASR check (Parakeet + Whisper), auto-regenerate, stitch; needs `ELEVENLABS_API_KEY` |
 | G2 sound | `video/audio/tools/make_phone_sfx.py` | our own positive phone sounds (like pop, ding, swoosh, cart add) |
 | G3 animatic | `video/src/v3/SketchReel.tsx` + `v3-g3-animatic-*.js` | 3 visual concepts, judges, storyboard artist writes the animatic JSON; SketchReel draws it with voice and pop captions |

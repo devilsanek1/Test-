@@ -36,13 +36,14 @@ the fix and that line (a case in clarity_tests/cases.json) go in the same commit
 
 Regression (--selftest; clarity_tests/cases.json, R1-R5 of LINT_SPEC.md section 4): v4's G1 draft 1 FAILs on the
 owner's lines for the owner's reasons and flags nothing on line 1; the clean rewrites in PRINCIPLES.md pass with no
-warning; the Big Bend opening passes; v1, v2, v3 and v5 draft 1 give the spec's errors; the spec's unit cases hold.
+warning; the Big Bend opening passes; v1, v2, v3 and v5 draft 1 give the spec's errors; the spec's unit cases hold;
+plus 5 cases (R5.12-R5.16) for the false flags found while building it (pronoun chains, one flag per span, ...).
 
 Libraries (the playbook's "Find the PRO way and the pro tools"; the full comparison is in LINT_REPORT.md):
 - spaCy 3.8.18 + en_core_web_sm 3.8.0 (MIT; deterministic on CPU; a 15 MB model): parts of speech, lemmas, number
   and the dependency parse that passives, subjects, finite verbs, degree words and pronoun candidates need. Weighed:
-  NLTK (no dependency parser), Stanza and Flair (PyTorch, hundreds of MB), UDPipe (models CC BY-NC-SA: no
-  commercial use). Every rule is ours; the parse is the one thing we don't hand-roll.
+  NLTK (no pretrained English dependency parser), Stanza and Flair (PyTorch, hundreds of MB), UDPipe (models CC
+  BY-NC-SA: no commercial use). Every rule is ours; the parse is the one thing we don't hand-roll.
 - wordfreq 3.1.1 (Apache-2.0, data CC BY-SA 4.0; frozen at 2021 data by its author): Zipf frequency blended from 7
   English sources (subtitles from SUBTLEX and OpenSubtitles among them), names included. Weighed: SUBTLEX-US alone
   (one of wordfreq's sources); Brysbaert et al.'s 2019 word prevalence norms (the share of people who know a word:
@@ -51,10 +52,14 @@ Libraries (the playbook's "Find the PRO way and the pro tools"; the full compari
   one antecedent, the check needs the rivals a listener hears; its rule-based candidate lists span 5 sentences (5-12
   per pronoun on draft 1, numbers included), rule out the right reading of "the city above it" and miss "staff" as a
   plural. fastcoref, Maverick and spacy-experimental need transformers or spaCy < 3.8.
+- Sentences: check_rhythm.py's sentences(), imported, so both tools number alike (pysbd: unmaintained since 2021).
+- Numbers: ours over spaCy's like_num. Weighed: text2num 3.1.0 (MIT) reads "tens of thousands" as "10 of 1000"
+  and "twenty twenty-seven" as "20 27", two numbers where the ear hears one; word2number: unmaintained since 2017.
 - Lists (trade words, scope, idioms, scolding): ours, curated for a worldwide ear, regex like check_paste.py.
   Weighed: proselint 0.16.0 (BSD): on our five scripts it flags only "No paragraph should start with a 'But'" (our
   joins), and holds 3 of 26 sampled idioms; no-cliches 0.3.6 (MIT, 740 written cliches) holds 8 of our 36 idioms and
-  none of the six our scripts used; write-good, retext and Vale (MIT) lint written prose by regex or POS patterns.
+  none of the ten idioms and figures our scripts used; write-good, retext and Vale (MIT) lint written prose by regex
+  or POS patterns.
 - No readability score (textstat): it proves nothing on a cold ear (PRINCIPLES P9).
 Install: pip install "spacy==3.8.18" "wordfreq==3.1.1" && python3 -m spacy download en_core_web_sm-3.8.0 --direct
 """

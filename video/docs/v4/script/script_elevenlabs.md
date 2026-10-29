@@ -6,10 +6,10 @@ Those computers get really hot. Just one of them makes as much heat as FORTY ket
 
 [warm] But Helsinki WANTS that heat. So a new data center there would cool its computers with water.
 
-The water comes out warm. Then pipes under the streets carry it into people's homes.
+The water comes out hot. Then pipes under the streets carry it into people's homes.
 
-[steady] Nothing is built yet.
+[steady] That data center isn't built yet. But Helsinki started small.
 
-[curious] But in twenty ten, Helsinki started heating homes with a data center under a cathedral.
+[curious] In twenty ten, Helsinki began heating homes with a data center under a cathedral.
 
 [warm, slower] So from twenty twenty-seven, your chatbot could heat an apartment in Helsinki.
