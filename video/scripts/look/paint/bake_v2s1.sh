@@ -9,7 +9,7 @@ cd "$(dirname "$0")/../../.."
 FLAT=out/paint/v2s1/flat
 mkdir -p "$FLAT"
 if [[ "${1:-}" != "--paint" ]]; then
-  for p in sky tree pier; do
+  for p in sky tree pier farroofs fartower fern; do
     tmp=$(mktemp -d)
     GL=angle node scripts/render-frames.mjs PaintFlatS1 "$tmp" 1.0 --entry=src/entry-look-paint.tsx --props="{\"piece\":\"$p\"}" >/dev/null
     mv "$tmp"/f00060.png "$FLAT/$p.png"
@@ -17,3 +17,4 @@ if [[ "${1:-}" != "--paint" ]]; then
   done
 fi
 python3 scripts/look/paint/paint.py scripts/look/paint/v2s1.json
+python3 scripts/look/paint/paint.py scripts/look/paint/v2s1_v2.json

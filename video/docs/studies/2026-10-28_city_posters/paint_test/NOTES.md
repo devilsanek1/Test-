@@ -135,3 +135,15 @@ const PAINT = paintSet(manifest);                      // {sky, cloud, tree, pie
 - **The sky PNG is 8-bit with stroke dither.** It has not been through `check_banding.py` or the master encode yet.
 - **Flat input times are hand-picked** (1.0 s, after the flood). A shape that animates (a pane switching on, a wiper)
   must stay out of a painted piece, or it needs a bake per state.
+
+## v2: the bold dose (2026-10-29: "obvious at 400 px wide")
+- **`paint_still_v2.png`** (= `deliverables/tests/painted_scene1_still_v2.png`; `compare_v2.jpg`: flat, v1, v2, the motion reference): the same engine, a second bake (`scripts/look/paint/v2s1_v2.json` -> `public/paint/v2s1_v2/`), chosen with `PaintS1 set: 'v2'`; v1 still renders unchanged (max difference 0). `PaintProvider set` + `PaintedLayer piece="tree"` (pieces by name) let one scene carry several doses.
+- **Sky:** bigger, more opaque strokes (r up to 72 px, a dry pass), warmer and more golden toward the sun, cooler and bluer up top. The paint calms in the band: on the caption's words (x 150-800, y 330-480) the most any pixel changes is 10/255 (mean 3.3).
+- **Cumulus:** towers on the right beside the words (from x 849, never behind them). It has a lit golden-peach top and a rose-violet shade, a painted glow haze on its lit side, dry-brush edges and about 280 specks. **Tree:** 18 painted leaf clusters, each lit on the sun's side, with a deep shade side; richer than v2, not paler (mean luma 148 against v2's 173, value spread 33 against 19).
+- **Two more pieces:** the far roofs and the calm tower as a soft painted haze, each on its own plane (+4, +3), with the sun disc left crisp; and the fern pot at the bottom edge. About 40 % of the frame's pixels change; she, the people, the door, the "Google" sign, Pip and the captions are untouched.
+- **Weak spots of v2:**
+  - the far roofs read a little muddy-pink;
+  - the cloud's shade side is more pink than violet;
+  - the tower must clear the widest caption line (v2's 3.0 s line reaches about x 900), so a film needs a calm box per caption page;
+  - bake 14 s, 2.2 MB of PNGs; the render cost is unchanged.
+
