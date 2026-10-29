@@ -33,6 +33,7 @@ sentences; throughline; turn; one joke; a delivery cue per line; 3 hook options 
 ...", "There's a ...", "Why does this ...?", e.g. "Thirty meters under this park in Stockholm, there's a nuclear bunker
 full of computers." / "And it gets hot down there."; comment lines tagged; a fact table), `script/script_elevenlabs.md`
 (paste v2, hook 1 voiced; `check_paste.py` OK and `check_rhythm.py` OK), `THROUGHLINE.md` (home place: the park and the
-bunker under it; thread: the heat as one warm glow; one "you"; Pip hidden; a carrier per join). Rules: 30-45 s (95-125
+bunker under it; thread: the heat as one drawn warm thing (warm air or warm water as a flat shape, never a glow: DIRECTION rule 5,
+CRAFT §d.7; fixed 2026-10-29 by v4's G1, which met the same clash); one "you"; Pip hidden; a carrier per join). Rules: 30-45 s (95-125
 words); real short sentences, never fragments; no AI tells; one or two comment lines; exaggeration fine within the fact
 lock's floor; no em-dashes; never touch `video/src`, `video/public`, `video/out`.

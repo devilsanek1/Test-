@@ -24,9 +24,10 @@ what happened (a computer in orbit overheats; a city signs up for the heat), the
 Each is checked against the fact lock before G1 (`research/factlock.md`).
 
 ## Through-line card (draft; G1 completes it with a carrier for every join)
-- **Thread object:** the heat, drawn as one small warm glow (a wisp of orange air) that leaves a chip and travels; its
+- **Thread object:** the heat, drawn as one small warm thing (a wisp of orange air as a flat shape, never a glow: DIRECTION rule 5,
+  CRAFT §d.7) that leaves a chip and travels; its
   home spot: a Helsinki radiator under a window.
-- **The one "you":** someone asking a chatbot a question on a cold evening; the warmth of the answer is the glow.
+- **The one "you":** someone asking a chatbot a question on a cold evening; the warmth of the answer is the thread.
 - **Places (CRAFT §a: at most 3 places and 1 scale reveal):** home place: Helsinki (a snowy street, one warm window);
   place 2: under the Stockholm park (the bunker); the scale reveal: orbit (the Earth's curve). The mine and the sea
   floor as one quick beat inside place 2's sequence, or cut, so the film keeps to three places: the writer decides

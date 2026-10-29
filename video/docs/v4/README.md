@@ -12,20 +12,26 @@ The earlier v4 session (https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt)
 |---|---|---|
 | G0 topic + core line | topic LOCKED: Helsinki (one city); core line proposed by the writer (default: "Your chatbot could heat a flat in Helsinki.") | `G0_TOPIC.md` |
 | Fact lock | shared with video 5 (one fact file): `video/docs/v5/research/factlock.md` sections 2, 6, 7.1-7.4, 8 | |
-| G1 script | RUNNING (session_01VwsUCnkJXFuq3YwEYFUg7o): writer, critic (`script/CRITIC_BRIEF.md`), fix pass | `script/script_g1.md`, `script/script_elevenlabs.md`, `THROUGHLINE.md` |
+| G1 script | SENT, waiting on the owner (2026-10-29 ~11:20 UTC): 117 words, ~41 s, critic FIX AND SEND, fixes applied | `script/script_g1.md`, `script/script_elevenlabs.md`, `THROUGHLINE.md` |
 | G2 voice | after the owner approves the script; voice `MQnUCZUAQLYMCY1Ztz6d` ("Lady1", the owner's try, 2026-10-29: `docs/voice/VOICE.md`); a valid key works in THIS session only (pasted in the chat, used inline, never filed), so G2 runs here; the voice tools are set up in the scratchpad | `public/v4/` |
 
 **Video 4 is produced by session https://claude.ai/code/session_01VwsUCnkJXFuq3YwEYFUg7o since 2026-10-29 ~10:05 UTC**
 (owner: "lets work on the video 4 - pick up where its been left off"), on branch `claude/kind-pascal-lvgsza` (from
 `video-production` at ce5270f; merged into `video-production` at the owner's yes).
 
-**G1 RUNNING (2026-10-29 ~10:10 UTC):** one workflow, three max-effort agents in a row: the writer (`script/WRITER_BRIEF.md`),
+**G1 SCRIPT SENT TO THE OWNER (2026-10-29 ~11:20 UTC), waiting on their yes:** the script (117 words, ~41 s; both checks
+OK), the hook pick (option 1 voiced), the core line ("an apartment" or "a flat") and the card: `script/script_g1.md`,
+`script/script_elevenlabs.md`, `THROUGHLINE.md`; the critique `script/critique_g1.md` (FIX AND SEND, 0 blockers; all
+5 findings applied). Workflow `context/workflows/v4-g1-script-lean-wf_c7c0628a-726.js` (3 agents, ~0.95 M tokens).
+Next after the yes: G2 here (voice Lady1), W1 beside it.
+
+Was: **G1 RUNNING (2026-10-29 ~10:10 UTC):** one workflow, three max-effort agents in a row: the writer (`script/WRITER_BRIEF.md`),
 the critic (`script/CRITIC_BRIEF.md` part A: a cold retell first, at most 6 findings, into `script/critique_g1.md`) and
 the fix pass (part B; a fresh agent that continues from the writer's notes). Then the owner gets the script, the 3 hook
 options and the card on one screen. G2 runs in this session (the owner pasted a valid key in the chat at ~10:45 UTC;
 it is used inline only and is in no file); a later session needs `ELEVENLABS_API_KEY` as the network secret.
 
-**Next step:** G1 from `script/WRITER_BRIEF.md`.
+**Next step:** the owner's yes on the script, the hook, the core line and the card; then G2.
 **HANDED OVER 2026-10-29 ~09:45 UTC** (owner: "Can you commit these topic as 4 and 5 and I will continue in another
 session"). Both writers were stopped before writing; the next session starts G1 from `script/WRITER_BRIEF.md` (one writer,
 then a critic, then a fix pass), on branch `claude/compassionate-hopper-5iqguj` (not merged into `video-production`).

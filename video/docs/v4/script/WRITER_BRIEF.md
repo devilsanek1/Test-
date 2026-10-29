@@ -30,7 +30,9 @@ Helsinki."; frame 0; word count and length; the story in 3 sentences; throughlin
 line; 3 hook options in the "Did you know there's a ..." / "There's a ..." / "Why does this ...?" families, e.g. "Did you
 know Helsinki wants to heat seventy thousand homes with AI?"; comment lines tagged; a fact table),
 `video/docs/v4/script/script_elevenlabs.md` (paste v2, hook 1 voiced; `check_paste.py` OK and `check_rhythm.py` OK),
-`video/docs/v4/THROUGHLINE.md` (home place: a snowy Helsinki street with one warm window; thread: the heat as one warm
-glow; one "you"; Pip hidden; a carrier per join). Rules: 30-45 s (95-125 words); real short sentences; no AI tells; one or
+`video/docs/v4/THROUGHLINE.md` (home place: a snowy Helsinki street with one warm window; thread: the heat as the warm
+water, a drawn object; one "you"; Pip hidden; a carrier per join). (Fix pass, 2026-10-29, `critique_g1.md` finding 2:
+this brief first said "the heat as one warm glow", a clash with DIRECTION rule 5, light shown on what it hits and never
+as glow discs, and CRAFT §d.7, "No symbolic glow", which outrank it; a thread is a drawn object, CRAFT §a.1.) Rules: 30-45 s (95-125 words); real short sentences; no AI tells; one or
 two comment lines; positive mood; no company in the first line or frame 0; no em-dashes; leave the earlier session's G0
 history in `video/docs/v4/` untouched; never touch `video/src`, `video/public`, `video/out`.
