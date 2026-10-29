@@ -1,0 +1,9 @@
+id,outlet,found,url_match,date_match,summary_ok,note
+C1-010,TIME,Y,exact,Y,partly,"""as a stunt"": the result calls it a test of how easily a fake firm gains credibility"
+C1-030,Forbes,Y,exact,Y,Y,
+C1-040,Forbes,Y,exact,Y,Y,
+C1-050,Forbes,Y,exact,Y,Y,
+C2-010,MIT Technology Review,Y,exact,Y,Y,
+C2-020,Scientific American,Y,exact,Y,Y,"date from the result text (""about a week ago"")"
+C2-030,Scientific American,Y,equivalent,Y,Y,corpus URL lacks www.; same article
+C4-010,National Geographic,Y,exact,Y,Y,
