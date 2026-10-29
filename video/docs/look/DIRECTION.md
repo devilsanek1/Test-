@@ -41,7 +41,7 @@ the float), in the rules below, each first judged in the 7 s look test of v2's c
 outlines, edges from light and shade, thin lines only on small things and steady in the float (rule 4); the subject's
 shade face the deepest (rule 5); the "low poly" patchwork as tier C's build and a quiet "find Pip" (rule 2); real
 darks in many small pieces and a calm sun (rule 6); the designed view (a second horizon for the far city: "unique
-camera angle and composition of objects", which the owner finds fascinating) in two frames a film (rule 7). The
+camera angle and composition of objects", which the owner finds fascinating) in two frames a film (rule 7; on hold since 2026-10-29). The
 specific local objects of a place are content, not style (owner). Everything else in the study is a proposal until
 the owner approves it; the look test shows it.
 
@@ -122,15 +122,16 @@ the owner approves it; the look test shows it.
   moments (~1.5-4 s each), one of them the film's ONE big move (S1 rise-over or the owner's favourite, the S5
   pull-back crane, retimed to the reel: S5's default is a 2.6 s move + a 0.7 s hold); a scale beat never arrives by a
   plain cut except on a "But" turn (rule 1). It must feel GREAT: a world that keeps going past every edge, a landmark
-  huge yet far, tiny anchors, a big sky, life in the hold. The home place's establishing view and the scale landing
-  may be a designed view (owner, 2026-10-29): the far city lifted onto its own horizon behind water or trees (one far
-  stage) and the landmark drawn bigger than one camera allows, yet still far: it sits back in the middle distance, well
-  under the frame's width with sky round its top, open water or ground before it and the city receding behind it in
-  many paler layers, never a wall filling the frame up close (owner, 2026-10-29: "I'm really suffocating with the
-  view"); the near frame is a small, subtle hint at the edges, never big chunky masses; the street along the water is
-  full; a real place's landmarks and an exact camera angle matter far less than that depth (playbook: DEPTH IS AIR AND
-  DISTANCE); every other frame keeps one camera (rule 2's
-  perspective; `CRAFT.md` §f.5). Arcane gives environments and camera only. ->
+  huge yet far, tiny anchors, a big sky, life in the hold. **Depth and scale come from a human viewpoint** (owner,
+  2026-10-29; playbook DEPTH AND SCALE FROM A HUMAN VIEWPOINT; refs `refs_human_scale/`): the camera stands where a
+  person would stand, the "you" near it at a real size (~15-30 % of the frame's height, from behind or in silhouette),
+  the vast world beyond (a city, a big sky, the water) giving the scale; never a wall filling the frame up close
+  ("I'm really suffocating with the view") and never a far poster-like panorama ("too cheap looking"); v2's eye-level
+  view of the canal is the model ("our initial angle snd the view frankly wasn't bad"). The near frame is a small,
+  subtle hint at the edges, never big chunky masses; the street across the water is full; a real place's landmarks
+  and an exact camera angle matter far less than that depth. The designed view (the far city lifted onto its own
+  horizon, the landmark drawn bigger than one camera allows) is on hold since 2026-10-29: every frame keeps one camera
+  (rule 2's perspective; `CRAFT.md` §f.5). Arcane gives environments and camera only. ->
   `COZY_AND_SCALE.md` §1-3b; `CINEMATIC_GUIDE.md` S1, S5, "Scale cues"; the framing per shot type: `LAYOUT.md` §2.
 - **8. Motion and camera.** 60 fps from G3 on, timed in seconds; drawn poses may step while the camera glides. Things
   pop, grow, wipe or slide in; a draw-on is frame 0's, and after it only where the drawing is the beat (a chart line

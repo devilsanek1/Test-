@@ -322,7 +322,9 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
 5. **Size: one camera.** Never a nearer thing smaller per metre than a farther one (G4: the ducks and our landing's
    public 41-63 px/m, her across the water 100); people on one level keep one eye ratio within +-15 %. Calm a figure with
    colour (tier B), never by shrinking it; a camera too low for the foreground's things is raised, not cheated.
-   **The designed view, two frames a film** (owner, 2026-10-29: "Go with your suggestions", `STUDY.md` §9 decision 4
+   **The designed view, two frames a film** (ON HOLD since 2026-10-29: two stills of v2's opening built on it failed,
+   one "suffocating", one "too cheap looking", and the owner prefers v2's own eye-level view; `DIRECTION.md` rule 7;
+   the spec below stays for reference) (owner, 2026-10-29: "Go with your suggestions", `STUDY.md` §9 decision 4
    (a), the posters' "unique camera angle and composition of objects"; first judged in the look test; the spec:
    `STUDY.md` §5.7, `perspective.md` L2): the home place's establishing view and the scale landing's end frame may lift
    the far city and its water onto its own horizon, ONE declared far stage (where it sits: `LAYOUT.md` §8.2

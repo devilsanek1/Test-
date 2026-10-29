@@ -1,0 +1,24 @@
+# Human-scale references: the person near the camera, the vast world beyond (owner, 2026-10-29)
+
+**The owner's words** (2026-10-29, on the scene-1 still v2, `video/deliverables/tests/poster_scene1_still_v2.png`, sent
+with these three pictures and the Cape Town poster, `../poster_refs/05_cape_town.jpg`):
+"I don’t like this we are going away in style i think it’s too cheap looking / And I’m not sure you can do much about it
+in terms of actual video / I think our references point should be closer to the original like where a person would be
+about this size / So I think our initial angle snd the view frankly wasn’t bad"
+
+| File | What it shows | The person |
+|---|---|---|
+| `01_city_hill_sunset.jpg` | two people on a dark grassy hill, from behind, before a vast city of towers under a pink sunset sky with long clouds | the standing one ~30 % of the frame's height, near the camera |
+| `02_bus_stop_night.jpg` | a lone figure on a red-lit bus stop bench in wind-blown reeds under a night sky with one huge soft cloud and stars | ~15 % of the height, in the middle of the frame |
+| `03_beach_dusk.jpg` | a couple walking along the shore at dusk, a huge violet cloud and a flock of birds over the sea, the sun on the horizon | ~25 % of the height, right of centre |
+
+Screenshots from the owner's phone (the Instagram mute button is burned in at the bottom right; mask it out of any
+measurement). The artists aren't named in them. Landscape frames: our films are 9:16.
+
+**How we read them (the owner's words win):** the camera stands where a person would stand, close to the people, and
+the person is a real size in the frame (~15-30 % of its height: seen from behind or in silhouette, no face), while the
+vast world beyond (a city, a sky, the sea) gives the scale. Our own v2 angle and view of scene 1 were "frankly not
+bad"; the far poster-like view of still v2 was "too cheap looking", "going away in style", and hard to use in an actual
+video. The general rule: `video/docs/OWNER_PLAYBOOK.md`, "DEPTH AND SCALE FROM A HUMAN VIEWPOINT". We learn principles
+from them (viewpoint, the person's size, the big sky's drama, the light), never their painterly rendering, and never
+trace or copy them.
