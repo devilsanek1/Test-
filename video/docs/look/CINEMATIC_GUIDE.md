@@ -64,7 +64,8 @@ pull-out; the big scale move belongs to the reveal later in the film (S1 or S5).
   are the anchors (#94's airships: 0.14 / 0.06 / 0.03 / 0.015 W, the smaller ones lower).
 
 ### S2 Sun behind the roofline (light). Confidence: high (avg 7.9; one reviewer 5, since v1 already has the big sun)
-- **Idea:** our orange disc becomes the subject, and everything in front of it is one flat silhouette.
+- **Idea:** our orange disc becomes the subject, and everything in front of it is one flat silhouette (the disc is
+  this shot's "look here", so it may be the pop; elsewhere the sun sits one step off its sky: `CRAFT.md` §g.2).
 - **Frame:** eye level, long lens (flat, compressed). Disc ~650 px wide, centred at (580, 1060), top at y ~735. A roofline
   silhouette in our darkest teal runs across the bottom ~22 % (top edge y ~1500), and one dome or roof mass, cut by the
   left edge, rises to y ~880 over the lower left of the disc. The mint sky above the disc holds the captions.
@@ -192,8 +193,9 @@ quota. Breathers (S3, S4) take theirs from the sky (9-10).
    floor or a far base; one dark canyon slot (50-90 px) falls from a VP on the horizon over the figures.
 7. **The landmark, huge yet far:** the only far shape over the horizon, rising 1.1-1.4 F above it (cluster 1.5-2.4 F wide,
    top y >= 620) on a hill the town climbs in 5-6 rows. Huge: its units are 2x the mid windows though 2 bands farther
-   (lancets 6 x 11 px, one rose or clock 22-28 px). Far: the narrowest value range (0.58x the near), the least detail, ink
-   in its shade colour, behind the hill town and the sea strip, birds crossing in front.
+   (lancets 6 x 11 px, one rose or clock 22-28 px). Far: the narrowest value range (0.58x the near), the least detail,
+   tone-on-tone in its shade colour with no line (`CRAFT.md` §c), behind the hill town and the sea strip, birds
+   crossing in front.
 8. **Tiny anchors, lines up:** the figures from behind (the "you", with a companion only if W1 names one; never Pip,
    which hides: `DIRECTION.md` rule 2) at 1.0 F, heads on a lighter mid
    wall; the near frame mass 30-35 % of the frame, a tier-C mass at L* >= ~30 (the darkest step only on its edge; the
@@ -219,7 +221,7 @@ hero cloud behind it | 3 tiers of life, never 1 s still. Then, at phone size: do
 ## Rules (all types)
 1. **One change per shot.** Each type changes ONE thing in a v1 shot (the move, the light or the composition). The
    palette (`PALETTE.md`), flat fills, small people seen from behind and the caption style stay as in v1; the line is
-   the clean pen by tier (`CRAFT.md` §c), never v1's ink line.
+   the clean pen (`CRAFT.md` §c: no outlines, edges from light and shade), never v1's ink line.
 2. **Captions sit on one calm flat field.** The caption band (`LAYOUT.md` §1) stays one calm flat field in every frame,
    from the start to the end of a move: outdoors the one sky (`DIRECTION.md` rules 6, 10), a flat light wall or facade
    where there is none; no tower top, disc, cloud or roof in it (tops at y >= 600).

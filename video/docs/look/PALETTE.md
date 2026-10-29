@@ -37,8 +37,8 @@ theme and the proposed direction.
 6. **Secondary elements as line-only drawings:** in ref 1 the house and trees are single-colour olive line art, so the
    subject is the only solid mass.
 
-(5-6 describe the references; our lines are the clean pen by tier, `CRAFT.md` §c: the subject's outline, B's thin
-tinted line or none, no line on the environment.)
+(5-6 describe the references; ours, `CRAFT.md` §c: no outlines on any tier since 2026-10-29, edges from light and
+shade, thin lines only on things that are lines.)
 
 ## The house palette family: tools, not a cage (owner, 2026-10-25)
 

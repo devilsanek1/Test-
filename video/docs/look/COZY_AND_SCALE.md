@@ -81,7 +81,7 @@ case of an angle-independent measure, the enclosing mass's share of the screen, 
   are and their values are `CRAFT.md` §d.2 and §d.7 (they replace this file's old ring / core / desk numbers: a desk at
   L* 58-62 under a pool core of 92-94); it lights the hands and face.
 - **Temperature, not darkness:** cold only in the window (Dusk `#BAC3CE` / `#8A9AA8`, frost `#D9DEE5`), glass <= 20 % of the
-  frame; the anchor (Sage `#22332C`, ~5 %) only on dark objects' fills (hair, a spine), thin parts like mullions by tier
+  frame; the anchor (Sage `#22332C`, in small pieces: `CRAFT.md` §f.8) only on dark objects' fills (hair, a spine), thin parts like mullions by tier
   (`CRAFT.md` §c: in tier C a flat shape or a hairline within dL* 15); page L* >= 75 at night too (the ambient wall 80-84,
   §d.2). Hero (5-15 %) on the story's object,
   one hue all video, across the Sage -> Dusk shift too; ONE pop (amber `#F2A541` or coral `#FF7A4D`), 1-3 %, look-here only.
@@ -292,10 +292,10 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
 - **Locked to the world, never boiling** (both references: no boil, no crawl you can see).
 - **Must read full with texture OFF:** C3 flattened to 24 flat colours still reads full and cozy (flat 18 %, detail 37 %);
   texture is worth the last ~5-15 points of flat share, never the fix for an empty set.
-- **Lines by tier** (`CRAFT.md` §c, which wins over the references' ~2.5-3 px warm-dark lines): no outlines on the
-  environment; the things that ARE lines (poles, wires, rails, mullions; C2 ~1.6 % of the pixels, C3 3.8 %: examples,
-  never a quota) as hairlines 1.2-1.6 px within dL* 15 of their ground, light lines as a light tint (railings, lane
-  marks); never warm-dark ink.
+- **Lines** (`CRAFT.md` §c, which wins over the references' ~2.5-3 px warm-dark lines): no outlines on any tier (owner,
+  2026-10-29); the things that ARE lines (poles, wires, rails, mullions; C2 ~1.6 % of the pixels, C3 3.8 %: examples,
+  never a quota) as thin lines within dL* 15 of their ground, 2.0 px on a plane that floats (1.2-1.6 px only on a
+  still one), light lines as a light tint (railings, lane marks); never warm-dark ink.
 - **Paper edges:** opt-in per film, decided with the G4 look clip (playbook: never at the top or beside the caption
   band). Both references edge all four sides. If used, it is `EDGES.md`'s 'paint-subtle' (the owner's pick: white
   paper, the colour painted on top; never medium or loose) on the bottom and the sides from y >= 640, inset 12-40 px,
@@ -343,10 +343,9 @@ big sky with huge slow clouds, life in the hold). Where the planes, haze or life
 
 **Shared rules.** *Haze:* 4-6 flat planes (5-7 on a city vista), a value step darker per plane toward the viewer (one still,
 A7: 12 / 25 / 32 / 36 on a 0-255 scale, ~5 / 10 / 13 / 14 L* [AR §3, our measure]; on a vista the mix toward the sky doubles
-per plane going AWAY, 0 / 12 / 22 / 40 / 65 %, #55 measured: Scale cues 5); lines by tier, never by depth (`CRAFT.md`
-§c): the environment draws no line on any plane, hairlines only for things that ARE lines, and only the subject keeps
-its outline. Dusk ladder: sky `#D9DEE5` (L* 88) -> `#BAC3CE` (78) -> `#8A9AA8` (63)
--> `#545F6D` (40) -> anchor `#1F2433` (14) on the observer; L* <= 40 is anchor-dark, so those two stay ~5 % of a held frame
+per plane going AWAY, 0 / 12 / 22 / 40 / 65 %, #55 measured: Scale cues 5); no outlines, never lines by depth
+(`CRAFT.md` §c): no tier draws an outline (owner, 2026-10-29), thin lines only for things that ARE lines. Dusk ladder: sky `#D9DEE5` (L* 88) -> `#BAC3CE` (78) -> `#8A9AA8` (63)
+-> `#545F6D` (40) -> anchor `#1F2433` (14) on the observer; L* <= 40 is anchor-dark, so those two come only in small pieces (`CRAFT.md` §f.8: 6-10 % of a held frame)
 and big foregrounds are `#8A9AA8` with a `#545F6D` lip (PALETTE). *Parallax* f = 1 - depth: sky 0, far 0.1, city 0.3, near
 0.55, subject 1, foreground frame 1.3-1.5; neighbours >= 1.8x apart (the frame separates by value). *Speed:* the one
 budget, `PIPELINE_V2.md` "Frame rate" (~15 px/frame at the render rate, a WARN; readable at 1x is the test;
