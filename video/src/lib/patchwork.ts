@@ -414,6 +414,9 @@ type Cell = {uv: Pt[]; part: number; top: boolean; whole: boolean};
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
 const pathOf = (pts: Pt[]) => (pts.length >= 3 ? 'M' + pts.map(([x, y]) => `${x} ${y}`).join('L') + 'Z' : '');
+/** One winding for every screen polygon (a projection can mirror one): same-tone facets merged into one compound path
+ *  then share each edge in opposite directions, so the nonzero fill has no anti-aliased seam between them. */
+const wind = (pts: Pt[]) => (area2(pts) < 0 ? pts.slice().reverse() : pts);
 const keyOf = ([u, v]: Pt) => `${Math.round(u * 1e6)},${Math.round(v * 1e6)}`;
 
 /** The min width of a convex screen polygon (rotating calipers, O(n^2) for our few vertices). */
@@ -585,10 +588,10 @@ export function patchwork(o: PatchOpts): Patchwork {
   let dropped = 0;
   uvs.forEach((uv, i) => {
     const pts0 = uv.map(scr);
-    const pts = pts0.filter((q, k) => {
+    const pts = wind(pts0.filter((q, k) => {
       const w = pts0[(k + 1) % pts0.length];
       return q[0] !== w[0] || q[1] !== w[1];
-    });
+    }));
     if (pts.length < 3 || Math.abs(area2(pts)) / 2 < 1) {
       dropped++;
       return;
@@ -781,7 +784,7 @@ export function patchwork(o: PatchOpts): Patchwork {
   // the base: the whole mass (its parts), the middle tone
   let mid = 0;
   for (let k = 0; k < T.length; k++) if (Math.abs(LS[k] - Lmid) < Math.abs(LS[mid] - Lmid)) mid = k;
-  const baseD = parts.map((p) => pathOf(p.map(scr))).join('');
+  const baseD = parts.map((p) => pathOf(wind(p.map(scr)))).join('');
   return {
     facets,
     base: {d: baseD, color: T[mid]},
@@ -866,10 +869,10 @@ export function markShape(pw: Patchwork, f: Facet, kind: MarkKind = 'pair'): {d:
   else if (kind === 'band') rects.push([b[0], b[1] + h * 0.28, w, Math.max(h * 0.12, 0)]);
   else rects.push([cx - s * 0.2, cy - s * 0.2, s * 0.4, s * 0.4]);
   const polys = rects.map(([x, y, rw, rh]) => [[x, y], [x + rw, y], [x + rw, y + rh], [x, y + rh]] as Pt[]);
-  const scr = polys.map((p) => p.map((v) => {
+  const scr = polys.map((p) => wind(p.map((v) => {
     const [x, y] = pw.project(v);
     return [Math.round(x), Math.round(y)] as Pt;
-  }));
+  })));
   if (scr.some((p) => minWidth(p) < pw.spec.minPx * (kind === 'band' ? 0.25 : 0.5))) return null;
   return {d: scr.map(pathOf).join(''), color: markTone(f.color, pw.spec.plane)};
 }

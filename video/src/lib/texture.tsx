@@ -1,0 +1,170 @@
+// lib/texture.tsx: the VERY subtle paper-and-paint MOTTLE, one per parallax plane, an ENGINE primitive (owner,
+// 2026-10-28: "start playing with it, very subtly especially if its adding to the premium look"; DIRECTION rule 4:
+// "a fine paper-and-paint grain with gentle mottling in the big flats, static and locked to the world"; tried in a look
+// clip, kept only if it adds). The spec is docs/look/CRAFT.md §c "The paper-and-paint test, its spec" (it wins over
+// this file); the how-to and the measurements: docs/studies/2026-10-28_city_posters/test/ENGINE_PT.md §3. Opt-in: a
+// scene that never wraps a plane in <Mottle> renders exactly as before; <Mottle k={0}> renders its children unfiltered.
+//
+//   <S1Plane plane={S1_PLANE.bank}>                       // the plane's float group (its transform moves the mottle too)
+//     <Mottle k={mottleK({plane: -1})} seed={3} offset={floatOffsetOfThisPlane}>
+//       ...the plane's fills...
+//     </Mottle>
+//   </S1Plane>
+//
+// HOW: an SVG filter on the plane's group: feTurbulence (fractalNoise: deterministic, specified to the bit by the SVG
+// reference code, no asset to load) -> a colour matrix (one luminance noise plus two faint colour noises) -> the plane's
+// own pixels multiplied by (1 + s (N - 0.5)) in sRGB (feComposite arithmetic: transparent stays transparent, the mean
+// colour is kept). The noise lives in the group's user space: it rides the group's transform exactly (a sub-pixel
+// float moves it with the fills, a zoom scales it with the world), so it is locked to its plane and never boils; the
+// caption band is cut out in SCREEN space (the band rows are mapped back through the group's float offset).
+//
+// What it is NOT: no grain (CRAFT §c: none in the first test; a grain at the subtlest posters' level, 0.25 L*, costs
+// +48 % bitrate and shimmers), no screen-locked or re-seeded texture (6-14x the bitrate, erased by the platform), no
+// texture in the caption band (DIRECTION rule 10), no opacity, blur or glow on anything.
+
+import React, {useId} from 'react';
+import {useTime} from './time';
+import type {Tier} from './pen';
+
+// ================================================================= the spec (CRAFT §c; pro_4 §3.4; pro_2 §3.1)
+
+/** The mottle at k = 1: std 0.5 L* on a light fill (L* ~85; it is a multiplicative paint-density variation, so a
+ *  darker fill shows proportionally less: ~0.7x at L* 60, ~0.4x at L* 33), blotches 30-70 px (the autocorrelation's 1/e
+ *  radius ~28 px, as the study's encode test: sigma 14 px), its colour <= 0.35 in a*b*. */
+export const MOTTLE = {std: 0.5, blotch: [30, 70] as [number, number], radius: 28, chroma: 0.35} as const;
+
+/** The strength by tier and plane (CRAFT §c, pro_2 §3.1 "texture 1.0x / 1.0x / 0.7x / 0.4x"; the sky ~0.6, est.):
+ *  tiers A and B 1.0, near C 0.7, far C 0.4, the sky 0.6. */
+export const MOTTLE_K = {subject: 1, support: 1, nearC: 0.7, farC: 0.4, sky: 0.6} as const;
+
+/** A plane group's k: the sky 0.6; a group holding tier A or B (the subject's plane) 1.0; tier C on plane <= +1 0.7
+ *  (the near ground, the water, the near frame), on +2 and farther 0.4. */
+export function mottleK(o: {plane?: number; tier?: Tier; sky?: boolean} = {}): number {
+  if (o.sky) return MOTTLE_K.sky;
+  if (o.tier === 'subject' || o.tier === 'support') return MOTTLE_K.subject;
+  return (o.plane ?? 0) >= 2 ? MOTTLE_K.farC : MOTTLE_K.nearC;
+}
+
+/** The caption band (keep clear): LAYOUT.md y 290-600. */
+export const MOTTLE_BAND: [number, number] = [290, 600];
+
+/** Calibration (measured on flat fields, `src/look/pt` PtTextureCal, ENGINE_PT.md §3): k = 1 gives std 0.5 L* on a
+ *  light fill with these values. */
+const CAL: {s: number; freq: number; octaves: number; ca: number; cb: number} = {
+  /** feComposite k1 per unit k: the modulation's amplitude. */
+  s: 0.049,
+  /** The turbulence's base frequency for MOTTLE.radius (fractalNoise, 3 octaves): 1/e radius ~30 px measured in 400 px windows (the posters 20-36, median 30). */
+  freq: 0.0125,
+  octaves: 3,
+  /** The two colour noises' weights in the colour matrix (a*-ish: R against G; b*-ish: R+G against B): a*b* std
+   *  0.25-0.35 measured (the value mottle alone leaves 0.04-0.2: the 8-bit rounding). */
+  ca: 0.18,
+  cb: 0.21,
+};
+
+export type MottleProps = {
+  /** Strength: 1 = the spec (std 0.5 L* on a light fill); `mottleK(...)` by tier and plane; 0 = off (no filter). */
+  k?: number;
+  /** The plane's own noise (an integer): each plane a different seed, so two planes never read as one sliding sheet. */
+  seed?: number;
+  /** The blotch scale against the spec's (1 = 1/e radius ~28 px; 0.7-1.3 stays inside 30-70 px blotches). */
+  scale?: number;
+  /** The colour share (0-1 of the spec's a*b* <= 0.35; 0 = a pure value mottle). */
+  chroma?: number;
+  /** Screen rows kept free of texture (default the caption band y 290-600; null = none), with a soft edge of
+   *  `soft` px (stepped in 8, so the mottle eases out instead of stopping on a line). */
+  band?: [number, number] | null;
+  soft?: number;
+  /** The group's current translation on screen (its float offset): keeps the band screen-locked. [0, 0] at rest. */
+  offset?: [number, number];
+  /** The filter region in the group's user space [x, y, w, h]: the plane's extent plus its float (default the frame
+   *  + 160 px). A smaller region is cheaper (the cost is per pixel). */
+  region?: [number, number, number, number];
+  /** On from this scene time (s): the look clip's switch ("the mottle switched on at 3.5 s"); true / false. */
+  on?: boolean | number;
+  /** Calibration only (src/look/pt's PtTextureCal): override the measured constants. Films never pass it. */
+  cal?: Partial<typeof CAL>;
+  children?: React.ReactNode;
+};
+
+const fmt = (n: number) => (Math.abs(n) < 1e-9 ? '0' : n.toFixed(5).replace(/0+$/, '').replace(/\.$/, ''));
+
+/** The colour matrix: R' = G' = B' = the luminance noise (turbulence R) plus two faint colour noises (G, B), A' = 1. */
+function matrix(chroma: number, cal: typeof CAL): string {
+  const a = cal.ca * chroma;
+  const b = cal.cb * chroma;
+  const rows = [
+    [1, a, b / 2, 0, -(a + b / 2) / 2],
+    [1, -a, b / 2, 0, (a - b / 2) / 2],
+    [1, 0, -b, 0, b / 2],
+    [0, 0, 0, 0, 1],
+  ];
+  return rows.map((r) => r.map(fmt).join(' ')).join('  ');
+}
+
+/** The flood strips that keep the band clean: a neutral grey over the noise (the mean: no modulation), its alpha
+ *  stepped 1/8 ... 8/8 over `soft` px on each side, full inside the band. Local coordinates (the group's user space). */
+function bandStrips(b: [number, number], soft: number, x: number, w: number, dy: number): {y: number; h: number; a: number}[] {
+  const y0 = b[0] - dy;
+  const y1 = b[1] - dy;
+  const n = soft > 0 ? 8 : 0;
+  const st = n ? soft / n : 0;
+  const out: {y: number; h: number; a: number}[] = [{y: y0, h: y1 - y0, a: 1}];
+  for (let i = 0; i < n; i++) {
+    const a = (n - i) / (n + 1);
+    out.push({y: y0 - (i + 1) * st, h: st, a});
+    out.push({y: y1 + i * st, h: st, a});
+  }
+  return out.map((s) => ({...s, y: Math.round(s.y * 100) / 100, h: Math.round(s.h * 100) / 100}));
+}
+
+/** THE MOTTLE: wraps one plane's fills (inside the plane's float group). Static: a pure function of its props and the
+ *  group's transform; never re-seeded, never screen-locked. */
+export const Mottle: React.FC<MottleProps> = ({k = 1, seed = 1, scale = 1, chroma = 1, band = MOTTLE_BAND, soft = 48, offset = [0, 0], region, on = true, cal: calIn, children}) => {
+  const t = useTime();
+  const id = 'mottle' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const live = k > 0 && (on === true || (typeof on === 'number' && t >= on));
+  if (!live) return <g>{children}</g>;
+  const cal = calIn ? {...CAL, ...calIn} : CAL;
+  const [rx, ry, rw, rh] = region ?? [-160, -160, 1400, 2240];
+  const s = cal.s * k;
+  const freq = cal.freq / Math.max(0.2, scale);
+  const strips = band ? bandStrips(band, soft, rx, rw, offset[1]).filter((q) => q.h > 0 && q.y < ry + rh && q.y + q.h > ry) : [];
+  return (
+    <g filter={`url(#${id})`}>
+      <defs>
+        <filter id={id} x={rx} y={ry} width={rw} height={rh} filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+          <feTurbulence type="fractalNoise" baseFrequency={fmt(freq)} numOctaves={cal.octaves} seed={Math.round(seed)} stitchTiles="noStitch" result="turb" />
+          <feColorMatrix in="turb" type="matrix" values={matrix(Math.max(0, Math.min(1, chroma)), cal)} result="noise" />
+          {strips.length ? (
+            <>
+              {strips.map((q, i) => (
+                <feFlood key={i} floodColor="rgb(50%,50%,50%)" floodOpacity={fmt(q.a)} x={rx} y={q.y} width={rw} height={q.h} result={`band${i}`} />
+              ))}
+              <feMerge result="masked">
+                <feMergeNode in="noise" />
+                {strips.map((_, i) => (
+                  <feMergeNode key={i} in={`band${i}`} />
+                ))}
+              </feMerge>
+            </>
+          ) : null}
+          <feComposite in="SourceGraphic" in2={strips.length ? 'masked' : 'noise'} operator="arithmetic" k1={fmt(s)} k2={fmt(1 - s * 0.5)} k3="0" k4="0" />
+        </filter>
+      </defs>
+      {children}
+    </g>
+  );
+};
+
+/** The scene's lint for its mottled planes: k over the plane's spec (A/B 1.0, near C 0.7, far C 0.4, the sky 0.6),
+ *  a plane drawn over the caption band without the band kept clear. [] = OK. */
+export function mottleProblems(planes: {name: string; k: number; plane?: number; tier?: Tier; sky?: boolean; band?: [number, number] | null; reachesBand?: boolean}[]): string[] {
+  const out: string[] = [];
+  for (const p of planes) {
+    const max = mottleK(p);
+    if (p.k > max + 1e-6) out.push(`${p.name}: mottle k ${p.k} over its plane's ${max} (CRAFT §c: 1.0 / 0.7 / 0.4, the sky 0.6)`);
+    if (p.reachesBand && p.band === null) out.push(`${p.name}: reaches the caption band with no band kept clear (DIRECTION rule 10)`);
+  }
+  return out;
+}

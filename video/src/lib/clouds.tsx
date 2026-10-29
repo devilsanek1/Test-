@@ -39,11 +39,12 @@ export function cloudTones(o: {sky: string; warmHue?: number; lit?: number; body
   const s = lch(o.sky);
   const litL = o.lit ?? clamp(s.L + 11, 93, 97.5);
   const bodyL = o.body ?? litL - 3.5;
-  const bellyL = o.belly ?? bodyL - 8;
+  const bellyL = o.belly ?? bodyL - 7;
   return {
     lit: fromLch(litL, 7, o.warmHue ?? 78),
     body: fromLch(bodyL, 4.5, (o.warmHue ?? 78) + 8),
-    belly: fromLch(bellyL, 7.5, (s.h + 38) % 360),
+    // the belly: a step down and cooler, its hue between the sky's and a soft violet (never a separate blue slab)
+    belly: fromLch(bellyL, 6.5, (s.h + 22) % 360),
   };
 }
 
@@ -120,19 +121,26 @@ function buildCumulus(spec: CumulusSpec): CumulusGeom {
   const px = spec.soft?.px ?? 3.5;
   const [l0, l1] = spec.lobes ?? [0.03, 0.075];
 
-  // ---- the masses: towers on the flat base (the tallest a little off-centre), shoulders at the ends
+  // ---- the masses: towers on the flat base (the tallest a little off-centre), overlapping, a row of low masses along
+  //      the base joining them (a cumulus is one body on one flat base), shoulders at its ends
   const n = clamp(spec.towers ?? 3, 1, 5);
   const peak = R.range(0.3, 0.55);
   const big: Circle[] = [];
   for (let i = 0; i < n; i++) {
-    const u = n > 1 ? lerp(0.2, 0.8, i / (n - 1)) + R.jitter(0.04) : 0.5;
-    const hi = h * clamp(1 - 1.35 * Math.abs(u - peak) ** 1.5 + R.jitter(0.06), 0.5, 1);
-    const r = Math.min(hi * R.range(0.56, 0.66), (w / n) * 0.62);
+    const u = n > 1 ? lerp(0.22, 0.78, i / (n - 1)) + R.jitter(0.03) : 0.5;
+    const hi = h * clamp(1 - 1.35 * Math.abs(u - peak) ** 1.5 + R.jitter(0.06), 0.55, 1);
+    const r = Math.min(hi * R.range(0.58, 0.68), (w / Math.max(1, n - 0.4)) * 0.62);
     big.push({x: x + u * w, y: base - hi + r, r, soft: false, facing: 0, lobe: false});
   }
-  const sh = h * R.range(0.24, 0.32);
-  big.push({x: x + w * 0.07 + sh * 0.3, y: base - sh * 0.62, r: sh, soft: true, facing: 0, lobe: false});
-  big.push({x: x + w * 0.93 - sh * 0.3, y: base - sh * 0.55, r: sh * 0.92, soft: true, facing: 0, lobe: false});
+  const nb = Math.max(3, n + 2);
+  for (let i = 0; i < nb; i++) {
+    const u = lerp(0.12, 0.88, i / (nb - 1));
+    const r = h * R.range(0.36, 0.44);
+    big.push({x: x + u * w, y: base + r * 0.25, r, soft: false, facing: 0, lobe: false});
+  }
+  const sh = h * R.range(0.26, 0.32);
+  big.push({x: x + w * 0.05 + sh * 0.5, y: base - sh * 0.5, r: sh, soft: true, facing: 0, lobe: false});
+  big.push({x: x + w * 0.95 - sh * 0.5, y: base - sh * 0.45, r: sh * 0.92, soft: true, facing: 0, lobe: false});
 
   // ---- the lobes: small circles along the masses' upper outline (outside every other mass, above the base)
   const lobes: Circle[] = [];

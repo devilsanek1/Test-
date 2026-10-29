@@ -1,6 +1,7 @@
 // PT lane demo: lib/patchwork on a canal set through v2 S1's lens (groundCam horizon 965, f 1400, height 1.3).
 // props.mode 'flat' (v2's way: one fill per surface) | 'patch' (the quay as a receding ground patchwork, the far city as
-// frontal blocks, identity marks, the subject kept clear). Raw <path>s: the tones are exactly the patchwork's.
+// frontal blocks, identity marks, the subject kept clear) | 'grid' (the same with a 0.3 m paving module: cuts align
+// into rows). Raw <path>s: the tones are exactly the patchwork's.
 //   GL=angle node scripts/render-frames.mjs PtPatchworkDemo <dir> 0 --entry=src/look/pt/entry.tsx --props='{"mode":"patch"}'
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
@@ -12,7 +13,6 @@ export const CAM = groundCam({horizon: 965, f: 1400, height: 1.3});
 const ATM = makeAtmosphere({name: 'pt demo', air: '#FDD6B8'});
 const SKY = '#C5DDD3';
 const BRICK = '#C9806A';
-const STUCCO = '#E8DACF';
 const WATER = '#86B4AC';
 const PAVE = '#CFAFA4';
 const COPING = '#E6CFC2';
@@ -37,9 +37,10 @@ export function skyline(seed: string, x0 = -40, x1 = 1120, base = 968): Pt[] {
 
 const SUBJECT: Box = [600, 1240, 700, 1500];
 
-export function demoPatchworks(): {quay: Patchwork; far: Patchwork} {
+export function demoPatchworks(grid = 0): {quay: Patchwork; far: Patchwork} {
   const quay = groundPatchwork(CAM, {
     seed: 'pt-demo-quay',
+    grid,
     poly: [[-4.4, 1.95], [4.4, 1.95], [4.4, 9.0], [-4.4, 9.0]],
     cell: 0.8,
     tones: patchTones(PAVE, {plane: -1}),
@@ -52,8 +53,8 @@ export function demoPatchworks(): {quay: Patchwork; far: Patchwork} {
   return {quay, far};
 }
 
-export const PtPatchworkDemo: React.FC<{mode: 'flat' | 'patch'; lint?: boolean}> = ({mode, lint}) => {
-  const {quay, far} = React.useMemo(demoPatchworks, []);
+export const PtPatchworkDemo: React.FC<{mode: 'flat' | 'patch' | 'grid'; lint?: boolean}> = ({mode, lint}) => {
+  const {quay, far} = React.useMemo(() => demoPatchworks(mode === 'grid' ? 0.3 : 0), [mode]);
   const sky = skyline('pt-demo-sky');
   const skyD = 'M' + sky.map(([x, y]) => `${x} ${y}`).join('L') + 'Z';
   const yQuay = Math.round(CAM.y(9.0));
@@ -70,7 +71,7 @@ export const PtPatchworkDemo: React.FC<{mode: 'flat' | 'patch'; lint?: boolean}>
         <rect x={0} y={0} width={1080} height={1920} fill={SKY} />
         {/* the far city (plane +3) */}
         {mode === 'flat' ? (
-          <path d={skyD} fill={recede(STUCCO, 3, ATM)} />
+          <path d={skyD} fill={far.base.color} />
         ) : (
           <g>
             <path d={far.base.d} fill={far.base.color} />
@@ -88,7 +89,7 @@ export const PtPatchworkDemo: React.FC<{mode: 'flat' | 'patch'; lint?: boolean}>
         <rect x={0} y={yQuay - 14} width={1080} height={14} fill={COPING} />
         {/* our quay (plane -1) through the ONE camera */}
         {mode === 'flat' ? (
-          <path d={quay.base.d} fill={PAVE} />
+          <path d={quay.base.d} fill={quay.base.color} />
         ) : (
           <g>
             <path d={quay.base.d} fill={quay.base.color} />

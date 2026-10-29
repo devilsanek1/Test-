@@ -21,6 +21,8 @@ import {tierFill} from '../../lib/pen';
 import {fromLch, lch, mixHex} from '../../lib/light';
 import {floodAt, S1_PALE} from './V2S1_clock';
 import {S1Plane, S1_PLANE} from './V2S1_float';
+import {useSwitches} from './switches';
+import {S1FarStage} from './V2S1_far_stage';
 
 const S = MAP.S1_SHEET;
 /** The bridge (screen px at zoom 1.00). */
@@ -525,12 +527,28 @@ export const S1WestGap: React.FC = () => {
     hazeBatch(g.b, [HAZE_K.rail]);
     return g;
   }, []);
+  const {farStage} = useSwitches();
   return (
     <>
-      <S1Plane plane={S1_PLANE.farRoofs}>
-        <SunDisc />
-        <FarRoofs />
-      </S1Plane>
+      {farStage ? (
+        // (the look test's far stage, decision 4 a) the sun, then the stage at infinity (it never floats), then the roofs
+        <>
+          <S1Plane plane={S1_PLANE.farRoofs}>
+            <SunDisc />
+          </S1Plane>
+          <S1Plane plane={S1_PLANE.sky}>
+            <S1FarStage />
+          </S1Plane>
+          <S1Plane plane={S1_PLANE.farRoofs}>
+            <FarRoofs />
+          </S1Plane>
+        </>
+      ) : (
+        <S1Plane plane={S1_PLANE.farRoofs}>
+          <SunDisc />
+          <FarRoofs />
+        </S1Plane>
+      )}
       <S1Plane plane={S1_PLANE.farTower}>
         <CalmTower />
       </S1Plane>

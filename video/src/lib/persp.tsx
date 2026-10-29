@@ -222,3 +222,83 @@ export function eyeLevel(o: {horizon?: number; vpx?: number; ratio?: number} = {
 
 /** Camera height / person height measured on a frame: (feet - horizon) / (feet - head top). */
 export const measureEye = (feetY: number, headTopY: number, horizon: number) => (feetY - horizon) / Math.max(1, feetY - headTopY);
+
+// ---------------------------------------------------------------- the designed view's FAR STAGE (CRAFT §f.5)
+
+/** A thing measured for lib/depth `sizeProblems` (base y, its height in px and in metres), tagged with the camera it
+ *  stands under: none = the shot's one camera, 'far' = a declared far stage (the designed view). */
+export type StagedThing = {name: string; y: number; px: number; m: number; level?: number; stage?: 'far'};
+
+export type FarStage = {
+  /** The tag of everything drawn on this stage (`splitStages`: sizeProblems runs once per camera). */
+  stage: 'far';
+  /** The stage's OWN horizon (screen y): its ground meets the sky here, the junction hidden behind a nearer band (water,
+   *  trees, a wall, roofs) that carries no receding line. */
+  horizon: number;
+  vpx: number;
+  /** The stage camera's focal length (px) and height over the stage's ground (m): its scale is f / z px per metre at
+   *  distance z (set f above the shot's lens to draw the far city bigger than one camera allows: the posters 1.4-3.6x). */
+  f: number;
+  height: number;
+  /** The float share of the stage: 0. Its things are at infinity: the float, a crane or a push move the near layers by
+   *  their share and the stage not at all, so both horizons hold (DIRECTION rule 8; P1 §3.4). */
+  parallax: 0;
+  /** A stage point (x metres right of the axis, z metres away, `level` metres up) -> screen px. The camera looks level
+   *  and straight (no yaw): every face is frontal, nothing recedes in the far zone. */
+  pt: (x: number, z: number, level?: number) => Pt;
+  /** Screen y of the stage's ground at distance z: where a thing at z stands (a hair under the horizon when far). */
+  baseY: (z: number) => number;
+  /** px per metre of anything at distance z. */
+  scale: (z: number) => number;
+  /** A frontal elevation standing on the stage: screen x `x0` .. `x1` (px: a designed view is placed on screen), at
+   *  distance z, from `level` to `level + h` metres. TL, TR, BR, BL. */
+  front: (o: {x0: number; x1: number; z: number; h: number; level?: number}) => Quad;
+  /** A skyline profile standing on the stage at distance z: [screen x, height in metres] pairs, left to right, closed
+   *  down to the stage's ground (`level` metres under it to bury the base deeper): one SVG path. */
+  profile: (pts: readonly (readonly [number, number])[], z: number, o?: {level?: number}) => string;
+  /** The thing for sizeProblems (tagged 'far'): base at distance z, `h` metres tall. */
+  thing: (name: string, z: number, h: number, level?: number) => StagedThing;
+};
+
+const fmt = (n: number) => (Math.round(n * 10) / 10).toString();
+
+/** THE FAR STAGE of a designed view (owner, 2026-10-29: "Go with your suggestions", `STUDY.md` §9 decision 4 (a); CRAFT
+ *  §f.5; `perspective.md` L2): ONE declared second horizon for the far city, its water and its scale anchor, in the home
+ *  place's establishing view and the scale landing only. A level pinhole of its own (`horizon`, `f`, `height`), frontal
+ *  (no receding line), its things placed in screen x and sized in metres; the near world keeps the shot's one camera.
+ *  In 9:16 the posters' lifted stages map to y ~1090-1215 against a near eye at y 1380-1480 (`img/perspective_916.jpg`);
+ *  a seated bank like v2's S1 (lens horizon 965) lifts its stage behind its far roofs. Pure; nothing else changes.
+ *    const st = farStage({horizon: 806, f: 2800, height: 30});
+ *    <Fill d={st.profile([[-40, 90], [60, 90], [60, 140], [140, 140]], 3000)} ... />   // a far skyline
+ *    sizeProblems(splitStages(things).far, {horizon: st.horizon, height: st.height})     // measured on its own stage */
+export function farStage(o: {horizon: number; vpx?: number; f?: number; height?: number}): FarStage {
+  const horizon = o.horizon;
+  const vpx = o.vpx ?? 540;
+  const f = o.f ?? 1400;
+  const height = o.height ?? 1.6;
+  const zz = (z: number) => Math.max(1e-3, z);
+  const pt = (x: number, z: number, level = 0): Pt => [vpx + (f * x) / zz(z), horizon + (f * (height - level)) / zz(z)];
+  const scale = (z: number) => f / zz(z);
+  const baseY = (z: number) => horizon + (f * height) / zz(z);
+  const front: FarStage['front'] = ({x0, x1, z, h, level = 0}) => {
+    const b = baseY(z) - level * scale(z);
+    const t = b - h * scale(z);
+    return [[x0, t], [x1, t], [x1, b], [x0, b]];
+  };
+  const profile: FarStage['profile'] = (pts, z, po = {}) => {
+    if (!pts.length) return '';
+    const s = scale(z);
+    const b = baseY(z) + (po.level ?? 0) * s;
+    let d = `M${fmt(pts[0][0])} ${fmt(b)}`;
+    for (const [x, h] of pts) d += `L${fmt(x)} ${fmt(baseY(z) - h * s)}`;
+    return d + `L${fmt(pts[pts.length - 1][0])} ${fmt(b)}Z`;
+  };
+  const thing = (name: string, z: number, h: number, level = 0): StagedThing => ({name, y: baseY(z), px: h * scale(z), m: h, level, stage: 'far'});
+  return {stage: 'far', horizon, vpx, f, height, parallax: 0, pt, baseY, scale, front, profile, thing};
+}
+
+/** Splits measured things by the camera they stand under, so lib/depth `sizeProblems` runs once per camera: the near
+ *  world against the shot's lens, the far stage against its own horizon (it never WARNs "two cameras" across them). */
+export function splitStages<T extends {stage?: 'far'}>(things: readonly T[]): {one: T[]; far: T[]} {
+  return {one: things.filter((t) => t.stage !== 'far'), far: things.filter((t) => t.stage === 'far')};
+}

@@ -345,21 +345,22 @@ function mirrorLeaf(right: Pt[], rayAt: number[], veinAt: number[]): LeafTemplat
  *  basal), shallow sinuses, a few big teeth, a truncate base. Rays: basal tip, sinus, lateral tip, sinus, main tip. */
 export const PLANE_LEAF: LeafTemplate = mirrorLeaf(
   [
-    [0.08, 0.0], [0.22, 0.02], [0.36, -0.01], [0.5, -0.07], [0.6, -0.14], // 4: the basal tip
-    [0.56, -0.23], [0.5, -0.31], // 6: sinus 2
-    [0.55, -0.4], [0.6, -0.47], [0.57, -0.52], [0.62, -0.62], [0.64, -0.75], // 11: the lateral tip
-    [0.52, -0.69], [0.45, -0.7], [0.43, -0.635], [0.36, -0.58], [0.25, -0.5], // 16: sinus 1
-    [0.2, -0.6], [0.135, -0.73], [0.14, -0.8], [0.085, -0.84], [0, -1], // 21: the main tip
+    [0.08, 0.0], [0.24, 0.03], [0.4, 0.0], [0.53, -0.06], [0.64, -0.12], // 4: the basal tip
+    [0.6, -0.19], [0.54, -0.24], // 6: sinus 2
+    [0.6, -0.33], [0.66, -0.38], [0.64, -0.45], [0.69, -0.56], [0.72, -0.7], // 11: the lateral tip
+    [0.6, -0.66], [0.52, -0.69], [0.49, -0.62], [0.38, -0.57], [0.25, -0.5], // 16: sinus 1
+    [0.21, -0.61], [0.15, -0.7], [0.16, -0.78], [0.09, -0.84], [0, -1], // 21: the main tip
   ],
   [4, 6, 11, 16, 21],
   [4, 11, 21],
 );
 
-/** The crown's rim leaf: the same five lobes, no teeth (24-36 px: a tooth would be a 2 px speck), folded on its midrib. */
+/** The crown's rim leaf: the same broad lobes, no teeth (26-46 px: a tooth would be a 2 px speck), folded on its
+ *  midrib. */
 export const PLANE_RIM_LEAF: LeafTemplate = mirrorLeaf(
-  [[0.1, 0.0], [0.34, -0.01], [0.6, -0.14], [0.5, -0.31], [0.66, -0.74], [0.25, -0.5], [0, -1]],
-  [6],
-  [6],
+  [[0.1, 0.0], [0.38, 0.01], [0.56, -0.05], [0.64, -0.13], [0.56, -0.24], [0.64, -0.4], [0.72, -0.7], [0.48, -0.62], [0.26, -0.5], [0.17, -0.72], [0, -1]],
+  [10],
+  [10],
 );
 
 /** A mid crown's leaf bump (12-16 px): a three-lobed scallop, one facet. */
@@ -404,13 +405,13 @@ export const LONDON_PLANE: Species = {
   bumpLeaf: BUMP_LEAF,
   aspect: 0.78,
   clear: 0.36,
-  trunk: 0.05,
+  trunk: 0.068,
   clusters: {near: [9, 12], mid: [5, 7], far: [1, 2]},
   clusterR: {near: [0.27, 0.42], mid: [0.32, 0.46], far: [0.6, 0.8]},
   irregular: 0.13,
   flatBase: 0.3,
-  leafK: {near: 0.1, mid: 0.075},
-  leafPx: {near: [22, 38], mid: [10, 18]},
+  leafK: {near: 0.12, mid: 0.08},
+  leafPx: {near: [26, 46], mid: [11, 18]},
   limbs: [3, 4],
   autumn: 0.07,
 };
@@ -490,6 +491,8 @@ export type CrownSpec = {
   /** Sky holes: the colour of the sky a step down behind the crown (2-4 holes near the thin edge), or false (none:
    *  the crown is not against the sky). Default false. */
   holes?: string | false;
+  /** Holes only where the sky is behind the crown: above this y (canvas px; default: anywhere). */
+  holesAbove?: number;
   /** October: the share of rim leaves turned gold or rust (default species.autumn). */
   autumn?: number;
   /** Override the cluster count. */
@@ -673,6 +676,89 @@ export function crownGeometry(spec: CrownSpec): CrownGeom {
   return g;
 }
 
+/** Sutherland-Hodgman: a polygon clipped by a CONVEX polygon (either winding). */
+function clipConvex(subject: Pt[], clip: Pt[]): Pt[] {
+  const cw = area2(clip) > 0;
+  let out = subject;
+  for (let i = 0; i < clip.length && out.length; i++) {
+    const a = clip[i];
+    const b = clip[(i + 1) % clip.length];
+    const side = (p: Pt) => (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0]);
+    const inside = (p: Pt) => (cw ? side(p) >= 0 : side(p) <= 0);
+    const next: Pt[] = [];
+    for (let j = 0; j < out.length; j++) {
+      const p = out[j];
+      const q = out[(j + 1) % out.length];
+      const pi = inside(p);
+      const qi = inside(q);
+      if (pi) next.push(p);
+      if (pi !== qi) {
+        const sp = side(p);
+        const sq = side(q);
+        const k = sp / (sp - sq);
+        next.push([p[0] + (q[0] - p[0]) * k, p[1] + (q[1] - p[1]) * k]);
+      }
+    }
+    out = next;
+  }
+  return out.length >= 3 ? out : [];
+}
+/** Point in a polygon (ray casting; any shape). */
+function inPoly(poly: Pt[], q: Pt): boolean {
+  let c = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const a = poly[i];
+    const b = poly[j];
+    if (a[1] > q[1] !== b[1] > q[1] && q[0] < ((b[0] - a[0]) * (q[1] - a[1])) / (b[1] - a[1]) + a[0]) c = !c;
+  }
+  return c;
+}
+/** An organic blob (Earle's big shape): an ellipse whose radius breathes on 2nd, 3rd and 5th harmonics. */
+function blob(cx: number, cy: number, rx: number, ry: number, r: Rng, n = 40, amp = 1): Pt[] {
+  const ph = [r.range(0, 6.28), r.range(0, 6.28), r.range(0, 6.28)];
+  const k = [r.range(0.06, 0.12) * amp, r.range(0.04, 0.08) * amp, r.range(0.02, 0.045) * amp];
+  const pts: Pt[] = [];
+  for (let i = 0; i < n; i++) {
+    const t = (i / n) * Math.PI * 2;
+    const f = 1 + k[0] * Math.sin(2 * t + ph[0]) + k[1] * Math.sin(3 * t + ph[1]) + k[2] * Math.sin(5 * t + ph[2]);
+    pts.push([cx + Math.cos(t) * rx * f, cy + Math.sin(t) * ry * f]);
+  }
+  return pts;
+}
+/** The share of a disc on the light side of a cut at signed distance u r from its centre (u in -1 .. 1). */
+const capShare = (u: number) => {
+  const v = clamp(u, -1, 1);
+  return (Math.acos(v) - v * Math.sqrt(1 - v * v)) / Math.PI;
+};
+/** The cut's offset (in radii) that leaves `share` of a disc on the light side. */
+function cutFor(share: number): number {
+  let lo = -1;
+  let hi = 1;
+  for (let i = 0; i < 30; i++) {
+    const m = (lo + hi) / 2;
+    if (capShare(m) > share) lo = m;
+    else hi = m;
+  }
+  return (lo + hi) / 2;
+}
+/** A convex "cap" region on the light side of a cut through a cluster: the cut runs across the light (turned by `turn`
+ *  deg), `u` radii from the centre along it, and bends once toward the shade (a two-facet terminator: low poly). */
+function capRegion(c: Pt, r: number, L2: Pt, u: number, turn: number, bend: number): Pt[] {
+  const a = Math.atan2(L2[1], L2[0]) + rad(turn);
+  const nx = Math.cos(a);
+  const ny = Math.sin(a);
+  const tx = -ny;
+  const ty = nx;
+  const q: Pt = [c[0] + nx * u * r, c[1] + ny * u * r];
+  const far = r * 4;
+  const A: Pt = [q[0] - tx * far, q[1] - ty * far];
+  const B: Pt = [q[0] + tx * far, q[1] + ty * far];
+  const m = bend * r;
+  const s = 0.35 * r * (bend >= 0 ? 1 : -1);
+  const M: Pt = [q[0] + tx * s - nx * Math.abs(m), q[1] + ty * s - ny * Math.abs(m)];
+  return [A, M, B, [B[0] + nx * far, B[1] + ny * far], [A[0] + nx * far, A[1] + ny * far]];
+}
+
 function buildCrown(spec: CrownSpec): CrownGeom {
   const sp = spec.species ?? LONDON_PLANE;
   const plane = spec.plane ?? -1;
@@ -682,7 +768,7 @@ function buildCrown(spec: CrownSpec): CrownGeom {
   const L2n = Math.hypot(L[0], L[1]) || 1;
   const L2: Pt = [L[0] / L2n, L[1] / L2n];
   const tones = planeTones(spec, mode);
-  const shares = TONE_SHARES[mode].slice(0, tones.length);
+  const top1 = tones.length - 1;
   const bark = spec.bark ?? barkTones();
   const recedeC = (c: string) => (spec.atm && plane > 0 ? recede(c, plane, spec.atm) : c);
 
@@ -713,7 +799,7 @@ function buildCrown(spec: CrownSpec): CrownGeom {
   const [nMin, nMax] = sp.clusters[mode];
   const n = Math.max(1, spec.clusters ?? R.int(nMin, nMax));
   const [rMin, rMax] = sp.clusterR[mode];
-  type Cl = {id: number; c: V3; r: V3; m: [V3, V3, V3]; seed: Rng};
+  type Cl = {id: number; c: V3; r: V3; m: [V3, V3, V3]; seed: Rng; core: boolean};
   const cls: Cl[] = [];
   const golden = Math.PI * (3 - Math.sqrt(5));
   for (let i = 0; i < n; i++) {
@@ -723,219 +809,256 @@ function buildCrown(spec: CrownSpec): CrownGeom {
       rr = Rm * R.range(rMin, rMax);
       c = [C[0] + R.jitter(Rx * 0.15), C[1] + R.jitter(Ry * 0.1), 0];
     } else {
-      // directions over the sphere, z from -0.35 (a few behind) to 1 (front), the base kept flat
       const zz = lerp(-0.35, 0.95, (i + 0.5) / n);
       const rho = Math.sqrt(Math.max(0, 1 - zz * zz));
       const th = i * golden + R.range(-0.25, 0.25);
-      let d: V3 = [rho * Math.cos(th), rho * Math.sin(th) * 0.95, zz];
-      d = norm3(d);
+      const d = norm3([rho * Math.cos(th), rho * Math.sin(th) * 0.95, zz]);
       rr = Rm * R.range(rMin, rMax);
       const e = envR(d);
       const surf: V3 = [C[0] + d[0] * Rx * e, C[1] + d[1] * Ry * e, C[2] + d[2] * Rz * e];
-      const inward = envNormal(surf);
-      c = sub3(surf, mul3(inward, rr * 0.62));
+      c = sub3(surf, mul3(envNormal(surf), rr * 0.62));
       const flatY = C[1] + Ry * (1 - sp.flatBase) - rr * 0.4;
       if (c[1] > flatY) c[1] = flatY;
     }
-    cls.push({id: i, c, r: [rr, rr * R.range(0.78, 0.9), rr * R.range(0.85, 0.95)], m: rotation(R), seed: R.fork(`c${i}`)});
+    cls.push({id: i, c, r: [rr, rr * R.range(0.8, 0.92), rr * R.range(0.85, 0.95)], m: rotation(R), seed: R.fork(`c${i}`), core: false});
   }
-  // a filler behind the middle (the crown's dark core: no hole shows through the clusters)
-  if (mode !== 'far' && n >= 3) cls.push({id: n, c: [C[0], C[1] + Ry * 0.12, -Rz * 0.45], r: [Rx * 0.62, Ry * 0.66, Rz * 0.5], m: rotation(R), seed: R.fork('core')});
+  // the crown's dark core behind the middle (no hole shows straight through it)
+  if (mode !== 'far' && n >= 3) cls.push({id: n, c: [C[0], C[1] + Ry * 0.15, -Rz * 0.5], r: [Rx * 0.55, Ry * 0.55, Rz * 0.5], m: rotation(R), seed: R.fork('core'), core: true});
   cls.sort((a, b) => a.c[2] - b.c[2]);
 
-  // ---- facets: each cluster's front faces, shaded by the key (normals blended with the envelope's: one mass)
-  const level: 0 | 1 = mode === 'far' ? 0 : 1;
-  const mesh = icosphere(level);
-  const jit = mode === 'far' ? 0.1 : 0.075;
-  const items: Shaded[] = [];
-  const hulls: Pt[][] = [];
-  const clusterTop = cls.map((c) => c.c[1] - c.r[1]);
-  const topOrder = cls.map((c, i) => [clusterTop[i], i] as [number, number]).sort((a, b) => a[0] - b[0]);
-  const hiSet = new Set(topOrder.slice(0, mode === 'near' ? 3 : 2).map((q) => q[1]));
-  const wF = mode === 'far' ? 0.65 : 0.5;
-  const shadeAt = (nf: V3, p: V3, isCore: boolean) => {
-    const ne = envNormal(p);
-    const nn = norm3(add3(mul3(nf, wF), mul3(ne, 1 - wF)));
-    const s = envDepth(p);
-    const ao = isCore ? 0.45 : 0.55 + 0.45 * smooth(0.42, 1.0, s);
-    // the underside away from the key shades itself (the core crescent): lower and away = darker
-    const under = 1 - 0.18 * smooth(0.2, 1.0, (p[1] - C[1]) / Ry);
-    return lambert(nn, L) * ao * under;
+  // what each tone covers on screen (approx.: occlusion between clusters ignored): a region painted over another
+  // (a cut, a fold) takes its area from the tone `under` it
+  type Region = {c: Pt; area: number; k: number};
+  const regions: Region[] = [];
+  const visible = tones.map(() => 0);
+  const addRegion = (poly: Pt[], k: number, w = 1, under?: number) => {
+    if (poly.length < 3) return;
+    const a = Math.abs(area2(poly)) * w;
+    const kk = clamp(k, 0, top1);
+    regions.push({c: centroid(poly), area: a, k: kk});
+    visible[kk] += a;
+    if (under !== undefined) visible[clamp(under, 0, top1)] -= a;
   };
-  cls.forEach((cl, ci) => {
-    const V = mesh.v.map((p0) => {
-      const j = 1 + cl.seed.jitter(jit);
-      const p = rot(cl.m, mul3(p0, j));
-      return add3(cl.c, [p[0] * cl.r[0], p[1] * cl.r[1], p[2] * cl.r[2]]) as V3;
-    });
-    const proj = V.map((p) => [p[0], p[1]] as Pt);
-    const hull = convexHull(proj);
-    hulls.push(hull);
-    const isCore = cl.id === n && mode !== 'far';
-    const faces = mesh.f
-      .map(([a, b, c]) => {
+  let leafCount = 0;
+  let holesArea = 0;
+  const silhouettes: Pt[][] = [];
+  let clusterGeoms: ClusterGeom[];
+
+  if (mode === 'far') {
+    // ---- FAR: 4-8 flat facets per mass (a jittered icosahedron): straight edges, 2-3 tones by the key
+    const mesh = icosphere(0);
+    const items: {poly: Pt[]; v: number; area: number; ci: number}[] = [];
+    const hulls: Pt[][] = [];
+    cls.forEach((cl, ci) => {
+      const V = mesh.v.map((p0) => add3(cl.c, (([x, y, z]) => [x * cl.r[0], y * cl.r[1], z * cl.r[2]] as V3)(rot(cl.m, mul3(p0, 1 + cl.seed.jitter(0.1))))));
+      const proj = V.map((p) => [p[0], p[1]] as Pt);
+      hulls.push(convexHull(proj));
+      for (const [a, b, c] of mesh.f) {
         let nf = norm3(cross3(sub3(V[b], V[a]), sub3(V[c], V[a])));
         const fc = mul3(add3(add3(V[a], V[b]), V[c]), 1 / 3);
         if (dot3(nf, sub3(fc, cl.c)) < 0) nf = mul3(nf, -1);
-        return {a, b, c, nf, fc};
-      })
-      .filter((q) => q.nf[2] > 0.0)
-      .sort((p, q) => p.fc[2] - q.fc[2]);
-    for (const q of faces) {
-      const poly: Pt[] = [proj[q.a], proj[q.b], proj[q.c]];
-      items.push({poly, v: shadeAt(q.nf, q.fc, isCore), area: Math.abs(area2(poly)), cluster: ci, hiOK: hiSet.has(ci), kind: 'facet'});
-    }
-  });
-
-  // ---- the rim: leaves along every cluster's outline (near: species leaves folded on the midrib; mid: bumps)
-  const leafBase = mode === 'near' ? sp.leafK.near : sp.leafK.mid;
-  const leafRange = mode === 'near' ? sp.leafPx.near : sp.leafPx.mid;
-  const Lf = spec.leafSize ?? clamp(Rm * leafBase, leafRange[0], leafRange[1]);
-  const autumnShare = spec.autumn ?? sp.autumn;
-  let leafCount = 0;
-  const rimLeaves: Shaded[] = [];
-  if (mode !== 'far') {
+        if (nf[2] <= 0) continue;
+        const nn = norm3(add3(mul3(nf, 0.65), mul3(envNormal(fc), 0.35)));
+        const poly: Pt[] = [proj[a], proj[b], proj[c]];
+        items.push({poly, v: lambert(nn, L), area: Math.abs(area2(poly)), ci});
+      }
+    });
+    const th = thresholds(items.map((q) => ({v: q.v, w: q.area})), TONE_SHARES.far.slice(0, tones.length));
+    clusterGeoms = cls.map((cl, ci) => {
+      const mine = items.filter((q) => q.ci === ci).map((q) => ({poly: q.poly, k: toneIndex(q.v, th)}));
+      for (const q of mine) addRegion(q.poly, q.k);
+      silhouettes.push(hulls[ci]);
+      return {id: cl.id, c: [cl.c[0], cl.c[1]], z: cl.c[2], layers: levelLayers(mine, tones, [hulls[ci]])};
+    });
+  } else {
+    // ---- NEAR / MID: each cluster an organic blob whose rim is LEAVES, lit as one mass, cut by straight facets
+    // one value per cluster from the crown's envelope (the game artists' foliage normals: ONE lit mass)
+    const vals = cls.map((cl) => {
+      const d = norm3(sub3(cl.c, C));
+      const n0 = norm3(add3(d, [0, 0, 0.55]));
+      const s = envDepth(cl.c);
+      const ao = cl.core ? 0.4 : 0.6 + 0.4 * smooth(0.25, 0.95, s);
+      return lambert(n0, L, 0.45) * ao * (1 - 0.2 * smooth(0, 1, (cl.c[1] - C[1]) / Ry));
+    });
+    const order = cls.map((_, i) => i).filter((i) => !cls[i].core).sort((a, b) => vals[a] - vals[b]);
+    const baseK = cls.map(() => 0);
+    const nb = order.length;
+    const bands = mode === 'near' ? [0.3, 0.72] : [0.45];
+    order.forEach((ci, rank) => {
+      const f = nb > 1 ? rank / (nb - 1) : 0.5;
+      baseK[ci] = bands.filter((b) => f >= b).length;
+    });
+    const hiCount = mode === 'near' ? 3 : 2;
+    const hiSet = new Set(order.slice(-hiCount));
+    const leafBase = mode === 'near' ? sp.leafK.near : sp.leafK.mid;
+    const leafRange = mode === 'near' ? sp.leafPx.near : sp.leafPx.mid;
+    const Lf = spec.leafSize ?? clamp(Rm * leafBase, leafRange[0], leafRange[1]);
+    const autumnShare = spec.autumn ?? sp.autumn;
     const tpl = mode === 'near' ? sp.rimLeaf : sp.bumpLeaf;
-    cls.forEach((cl, ci) => {
-      if (cl.id === n) return; // the core filler has no rim of its own
-      const hull = insetConvex(hulls[ci], Lf * 0.2);
-      const nearer = hulls.slice(ci + 1).map((h) => insetConvex(h, Lf * 0.3));
-      const step = Lf * (mode === 'near' ? 0.48 : 0.58);
-      for (const {p, n: n2} of alongClosed(hull, step, cl.seed.range(0, step))) {
-        const r = cl.seed;
-        let deg = (Math.atan2(n2[1], n2[0]) * 180) / Math.PI + r.jitter(38);
-        if (n2[1] > 0.35) deg = lerp(deg, 90, 0.25); // the low leaves hang a little
-        const len = Lf * r.range(0.8, 1.15);
-        const base: Pt = [p[0] - n2[0] * len * 0.3, p[1] - n2[1] * len * 0.3];
-        const tip: Pt = [base[0] + Math.cos(rad(deg)) * len, base[1] + Math.sin(rad(deg)) * len];
-        if (nearer.some((h) => inConvex(h, tip) && inConvex(h, base))) continue; // hidden by a nearer cluster
-        const pose = leafPose(base, len, deg, r.jitter(50), r.jitter(32), r.chance(0.5));
-        const rimN = norm3([n2[0], n2[1], 0.35]);
-        const z = cl.c[2] + cl.r[2] * 0.2;
-        const pos: V3 = [p[0], p[1], z];
-        const ne = envNormal(pos);
-        const turned = r.chance(autumnShare * (0.6 + 0.8 * Math.max(0, n2[0] * L2[0] + n2[1] * L2[1]))) ? (r.chance(0.68) ? 'gold' : 'rust') : undefined;
-        leafCount++;
-        for (const f of leafFacets(pose, tpl, mode === 'near' ? 26 : 0)) {
-          const nn = norm3(add3(add3(mul3(f.n, 0.38), mul3(rimN, 0.34)), mul3(ne, 0.28)));
-          const s = envDepth(pos);
-          const v = lambert(nn, L) * (0.62 + 0.38 * smooth(0.5, 1.0, s)) * (1 - 0.15 * smooth(0.2, 1, (p[1] - C[1]) / Ry));
-          rimLeaves.push({poly: f.poly, v, area: Math.abs(area2(f.poly)) * 0.55, cluster: ci, hiOK: hiSet.has(ci), autumn: turned, kind: 'half', leaf: leafCount});
+    const blobs = cls.map((cl) => blob(cl.c[0], cl.c[1], cl.r[0], cl.r[1], cl.seed.fork('blob'), 40, cl.core ? 0.5 : 1));
+    // sky holes near the thin edge (2-4 on the top and side clusters, only where the sky is behind)
+    const holeAt = new Map<number, Pt[]>();
+    if (spec.holes) {
+      const cand = cls
+        .map((cl, ci) => ({ci, cl, up: -(cl.c[1] - C[1]) / Ry + (Math.abs(cl.c[0] - C[0]) / Rx) * 0.6}))
+        .filter((q) => !q.cl.core && q.cl.c[2] > -Rz * 0.1)
+        .sort((a, b) => b.up - a.up)
+        .slice(0, R.int(2, 4));
+      for (const q of cand) {
+        const dir = norm3([q.cl.c[0] - C[0], q.cl.c[1] - C[1] - Ry * 0.3, 0]);
+        const hc: Pt = [q.cl.c[0] + dir[0] * q.cl.r[0] * 0.6, q.cl.c[1] + dir[1] * q.cl.r[1] * 0.6];
+        const hr = q.cl.r[0] * q.cl.seed.range(0.07, 0.11);
+        if (spec.holesAbove !== undefined && hc[1] + hr > spec.holesAbove) continue;
+        const ring = blob(hc[0], hc[1], hr * 1.3, hr, q.cl.seed.fork('hole'), 14, 2.2);
+        holeAt.set(q.ci, ring);
+        holesArea += Math.abs(area2(ring));
+      }
+    }
+    clusterGeoms = cls.map((cl, ci) => {
+      const c2: Pt = [cl.c[0], cl.c[1]];
+      const r = (cl.r[0] + cl.r[1]) / 2;
+      const kb = cl.core ? 0 : baseK[ci];
+      const body = blobs[ci];
+      silhouettes.push(body);
+      // the rim: leaves along the blob's outline, 55 % of each one out past the edge, hidden ones skipped
+      type RimLeaf = {outline: Pt[]; halves: Pt[][]; autumn?: 'gold' | 'rust'};
+      const leaves: RimLeaf[] = [];
+      if (!cl.core) {
+        const nearer = blobs.slice(ci + 1);
+        const rr = cl.seed.fork('rim');
+        const step = Lf * (mode === 'near' ? 0.56 : 0.62);
+        for (const {p, n: n2} of alongClosed(body, step, rr.range(0, step))) {
+          let deg = (Math.atan2(n2[1], n2[0]) * 180) / Math.PI + rr.jitter(40);
+          if (n2[1] > 0.35) deg = lerp(deg, 90, 0.3); // the low leaves hang a little
+          const len = Lf * rr.range(0.78, 1.22);
+          const base: Pt = [p[0] - n2[0] * len * 0.45, p[1] - n2[1] * len * 0.45];
+          const tip: Pt = [base[0] + Math.cos(rad(deg)) * len, base[1] + Math.sin(rad(deg)) * len];
+          const pose = leafPose(base, len, deg, rr.jitter(48), rr.jitter(30), rr.chance(0.5));
+          if (nearer.some((b) => inPoly(b, tip) && inPoly(b, [(base[0] + tip[0]) / 2, (base[1] + tip[1]) / 2]))) continue;
+          const halves = leafFacets(pose, tpl, 0).map((f) => f.poly);
+          const outline = leafPts(pose, tpl);
+          const turned = rr.chance(autumnShare * (0.5 + 0.9 * Math.max(0, n2[0] * L2[0] + n2[1] * L2[1]))) ? (rr.chance(0.68) ? 'gold' : 'rust') : undefined;
+          leaves.push({outline, halves, autumn: turned});
+          leafCount++;
         }
       }
+      // the cuts: a lit cap toward the key (bigger on the brighter clusters, smaller low down: the crown shades
+      // itself), a hi facet on the top clusters, a core crescent on the darkest, low ones; each a straight two-facet cut
+      const rank = order.indexOf(ci);
+      const fr = nb > 1 ? Math.max(0, rank) / (nb - 1) : 0.5;
+      const cs = cl.seed.fork('cut');
+      const cap = cl.core ? null : capRegion(c2, r, L2, cutFor(lerp(0.36, 0.6, fr)), cs.jitter(16), cs.range(0.05, 0.12) * cs.sign());
+      const hi = !cl.core && hiSet.has(ci) && kb + 2 <= top1 ? capRegion(c2, r, L2, cutFor(cs.range(0.16, 0.24)), cs.jitter(22), cs.range(0.04, 0.1) * cs.sign()) : null;
+      const away: Pt = [-L2[0], -L2[1]];
+      const coreCut = !cl.core && kb >= 1 && fr < 0.6 && cl.c[1] > C[1] - Ry * 0.1 ? capRegion(c2, r, away, cutFor(cs.range(0.14, 0.22)), cs.jitter(18), cs.range(0.04, 0.1) * cs.sign()) : null;
+      const green = leaves.filter((q) => !q.autumn);
+      const shapes = [body, ...green.map((q) => q.outline)];
+      const layers: Layer[] = [];
+      const add = (polys: Pt[][], k: number) => {
+        const d = polys.filter((q) => q.length >= 3).map(polyD).join('');
+        if (d) layers.push({d, color: tones[clamp(k, 0, top1)]});
+      };
+      const awayHalf = (q: RimLeaf) => (q.halves.length < 2 ? null : q.halves.slice().sort((a, b) => (centroid(a)[0] - centroid(b)[0]) * L2[0] + (centroid(a)[1] - centroid(b)[1]) * L2[1])[0]);
+      // base, core, cap (+ the folds of the leaves it lights), hi (+ its folds)
+      add(shapes, kb);
+      addRegion(body, kb);
+      for (const q of green) addRegion(q.outline, kb, 0.55);
+      if (coreCut) {
+        const cp = shapes.map((s) => clipConvex(s, coreCut));
+        add(cp, kb - 1);
+        cp.forEach((q, i) => addRegion(q, kb - 1, i ? 0.55 : 1, kb));
+      }
+      const lightCut = (cut: Pt[] | null, k: number) => {
+        if (!cut) return;
+        const cp = shapes.map((s) => clipConvex(s, cut));
+        add(cp, k);
+        cp.forEach((q, i) => addRegion(q, k, i ? 0.55 : 1, k - 1));
+        if (mode === 'near') {
+          const folds = green.filter((q) => inConvex(cut, centroid(q.outline))).map(awayHalf).filter((q): q is Pt[] => !!q).map((q) => clipConvex(q, cut));
+          add(folds, k - 1);
+          for (const q of folds) addRegion(q, k - 1, 0.55, k);
+        }
+      };
+      lightCut(cap, kb + 1);
+      lightCut(hi, kb + 2);
+      // October's turned leaves: gold or rust at the value of the tone where they sit, folded the same way
+      for (const kind of ['gold', 'rust'] as const) {
+        const mine = leaves.filter((q) => q.autumn === kind);
+        if (!mine.length) continue;
+        const kAt = (q: RimLeaf) => {
+          const m = centroid(q.outline);
+          return hi && inConvex(hi, m) ? kb + 2 : cap && inConvex(cap, m) ? kb + 1 : kb;
+        };
+        for (let k = 0; k <= top1; k++) {
+          const at = mine.filter((q) => clamp(kAt(q), 0, top1) === k);
+          if (!at.length) continue;
+          layers.push({d: at.map((q) => polyD(q.outline)).join(''), color: recedeC(autumnTone(tones[Math.max(2, k)], kind))});
+          const f = at.map(awayHalf).filter((q): q is Pt[] => !!q);
+          if (f.length && mode === 'near') layers.push({d: f.map(polyD).join(''), color: recedeC(autumnTone(tones[Math.max(1, k - 1)], kind))});
+        }
+      }
+      const hole = holeAt.get(ci);
+      if (hole) layers.push({d: polyD(hole), color: spec.holes as string});
+      return {id: cl.id, c: c2, z: cl.c[2], layers};
     });
   }
 
-  // ---- the tones: split at the crown's own value quantiles (area-weighted) so its mean sits on the ladder
-  const all = items.concat(rimLeaves);
-  const th = thresholds(all.map((q) => ({v: q.v, w: q.area})), shares);
-  const top1 = tones.length - 1;
-  const kOf = (q: Shaded) => {
-    const k = toneIndex(q.v, th);
-    return mode === 'near' && k === top1 && !q.hiOK ? top1 - 1 : k;
-  };
-
-  // ---- sky holes near the thin edge (2-4, a step under the open sky, <= 3 % of the crown)
-  const holes: {ci: number; poly: Pt[]}[] = [];
-  if (spec.holes && mode !== 'far') {
-    const cand = cls
-      .map((cl, ci) => ({ci, cl, up: -(cl.c[1] - C[1]) / Ry + Math.abs(cl.c[0] - C[0]) / Rx * 0.6}))
-      .filter((q) => q.cl.id !== n && q.cl.c[2] > -Rz * 0.1)
-      .sort((a, b) => b.up - a.up)
-      .slice(0, R.int(2, 4));
-    for (const q of cand) {
-      const dir = norm3([q.cl.c[0] - C[0], q.cl.c[1] - C[1] - Ry * 0.3, 0]);
-      const hc: Pt = [q.cl.c[0] + dir[0] * q.cl.r[0] * 0.58, q.cl.c[1] + dir[1] * q.cl.r[1] * 0.58];
-      const hr = q.cl.r[0] * q.cl.seed.range(0.08, 0.13);
-      const poly: Pt[] = [];
-      const m = 7;
-      for (let i = 0; i < m; i++) {
-        const a = (i / m) * Math.PI * 2 + q.cl.seed.jitter(0.25);
-        const k = i % 2 ? q.cl.seed.range(0.45, 0.65) : q.cl.seed.range(0.85, 1.15);
-        poly.push([hc[0] + Math.cos(a) * hr * k * 1.25, hc[1] + Math.sin(a) * hr * k]);
-      }
-      holes.push({ci: q.ci, poly});
-    }
-  }
-
-  // ---- paint the clusters: rim leaves under their own facets (the silhouette is leaves, the inside facets)
-  const greenTones = tones;
-  const clusterGeoms: ClusterGeom[] = cls.map((cl, ci) => {
-    const layers: Layer[] = [];
-    const myLeaves = rimLeaves.filter((q) => q.cluster === ci);
-    // leaves: the full leaf in its darker half's tone, its lighter half on top (no seam on the midrib)
-    const byLeaf = new Map<number, Shaded[]>();
-    for (const q of myLeaves) byLeaf.set(q.leaf ?? 0, [...(byLeaf.get(q.leaf ?? 0) ?? []), q]);
-    const green: {poly: Pt[]; k: number}[] = [];
-    const turned: {poly: Pt[]; k: number; kind: 'gold' | 'rust'}[] = [];
-    byLeaf.forEach((halves) => {
-      const ks = halves.map(kOf);
-      const kLo = Math.min(...ks);
-      const outline = halves.length > 1 ? halves.map((h) => h.poly) : [halves[0].poly];
-      const kind = halves[0].autumn;
-      const push = (poly: Pt[], k: number) => (kind && k >= 2 ? turned.push({poly, k, kind}) : green.push({poly, k}));
-      for (const o of outline) push(o, kLo);
-      halves.forEach((h, j) => {
-        if (ks[j] > kLo) push(h.poly, ks[j]);
-      });
-    });
-    for (let k = 0; k <= top1; k++) {
-      const d = green.filter((q) => q.k === k).map((q) => polyD(q.poly)).join('');
-      if (d) layers.push({d, color: greenTones[k]});
-    }
-    for (const kind of ['gold', 'rust'] as const) {
-      for (let k = 0; k <= top1; k++) {
-        const d = turned.filter((q) => q.k === k && q.kind === kind).map((q) => polyD(q.poly)).join('');
-        if (d) layers.push({d, color: recedeC(autumnTone(greenTones[k], kind))});
-      }
-    }
-    const facets = items.filter((q) => q.cluster === ci).map((q) => ({poly: q.poly, k: kOf(q)}));
-    layers.push(...levelLayers(facets, greenTones, [hulls[ci]]));
-    for (const h of holes.filter((q) => q.ci === ci)) layers.push({d: polyD(h.poly), color: spec.holes as string});
-    return {id: cl.id, c: [cl.c[0], cl.c[1]], z: cl.c[2], layers};
-  });
-
-  // ---- the wood: a tapered trunk to the fork, 3-4 limbs into the crown (their ends hidden by clusters)
+  // ---- the wood: a tapered trunk to the fork, 3-4 limbs into the crown (their ends hidden by front clusters)
   const wood: Layer[] = [];
   const trunkW = spec.trunkWidth ?? H * sp.trunk;
-  const forkY = bottom + (foot[1] - bottom) * 0.06;
+  const forkY = bottom + (foot[1] - bottom) * 0.04;
   const fork: Pt = [foot[0] + leanDx * ((foot[1] - forkY) / (foot[1] - C[1])), forkY];
-  const bend = R.jitter(trunkW * 0.35);
-  const trunkLine = smoothOpen([foot, [lerp(foot[0], fork[0], 0.35) + bend, lerp(foot[1], fork[1], 0.35)], [lerp(foot[0], fork[0], 0.7) - bend * 0.6, lerp(foot[1], fork[1], 0.7)], fork], 10);
-  const trunkWidth = (s: number) => trunkW * (s < 0.06 ? lerp(1.22, 1, s / 0.06) : lerp(1, 0.74, (s - 0.06) / 0.94));
-  // which side faces the key (the ribbon's +u side is its right-hand normal: screen-right for a line going up)
+  const bend = R.jitter(trunkW * 0.16);
+  const trunkLine = smoothOpen([foot, [lerp(foot[0], fork[0], 0.4) + bend, lerp(foot[1], fork[1], 0.4)], [lerp(foot[0], fork[0], 0.75) - bend * 0.5, lerp(foot[1], fork[1], 0.75)], fork], 10);
+  const trunkWidth = (s: number) => trunkW * (s < 0.07 ? lerp(1.28, 1, smooth(0, 1, s / 0.07)) : lerp(1, 0.8, (s - 0.07) / 0.93));
   const tSide = litSide(trunkLine, L2);
   const shadeBand = shadeBandOf(tSide);
   const litBand = litBandOf(tSide, 0.3);
-  const minWidth: number[] = [trunkW * 0.74];
+  const minWidth: number[] = [trunkW * 0.8];
   const woodTone = (c: string) => recedeC(c);
+  const tus = arcParams(trunkLine);
+  const tlen = polyLength(trunkLine);
+  /** A point of the trunk in its own frame: s along (0 foot .. 1 fork), u across (-1 .. 1). */
+  const tpt = (s: number, u: number): Pt => {
+    const {p, t} = atU(trunkLine, tus, s);
+    const hw = trunkWidth(s) / 2;
+    return [p[0] - t[1] * hw * u, p[1] + t[0] * hw * u];
+  };
+  /** The region of the trunk between s0(u) and s1, u in [ua, ub] (a closed polygon). */
+  const trunkPatch = (s0: (u: number) => number, s1: number, ua: number, ub: number): Pt[] => {
+    const N = 10;
+    const lowEdge: Pt[] = [];
+    const topEdge: Pt[] = [];
+    for (let i = 0; i <= N; i++) {
+      const u = lerp(ua, ub, i / N);
+      lowEdge.push(tpt(clamp(s0(u), 0, 1), u));
+      topEdge.push(tpt(s1, u));
+    }
+    return lowEdge.concat(topEdge.reverse());
+  };
   wood.push({d: polyD(ribbon(trunkLine, trunkWidth)), color: woodTone(bark.lit)});
   const patches = spec.patches ?? mode !== 'far';
   if (patches) {
     // the London plane's plates: same-hue patches in the trunk's (s, u) frame, kept inside their side
-    const us = arcParams(trunkLine);
-    const len = polyLength(trunkLine);
-    const np = Math.round((len * trunkW) / (trunkW * trunkW * 0.55));
+    const np = Math.round((tlen / trunkW) * 3.2);
     const lit: Pt[][][] = [[], [], []];
     const sh: Pt[][][] = [[], []];
     const PR = R.fork('bark');
     for (let i = 0; i < np; i++) {
-      const s = PR.range(0.02, 0.97);
-      const inShade = PR.chance(0.35);
+      const s = PR.range(0.03, 0.8);
+      const inShade = PR.chance(0.33);
       const band = inShade ? shadeBand : litBand;
-      const uc = PR.range(band[0] + 0.18, band[1] - 0.18);
-      const du = PR.range(0.14, 0.3);
-      const ds = (PR.range(0.6, 1.3) * trunkW) / len;
+      const rp = trunkW * PR.range(0.1, 0.2);
+      const du = rp / (trunkW / 2);
+      if (band[1] - band[0] < 2 * du + 0.1) continue;
+      const uc = PR.range(band[0] + du + 0.04, band[1] - du - 0.04);
+      const ds = (rp * PR.range(1.0, 1.6)) / tlen;
       const ring: Pt[] = [];
-      const m = 7;
+      const m = 8;
       for (let k = 0; k < m; k++) {
-        const a = (k / m) * Math.PI * 2;
-        const kk = PR.range(0.7, 1.15);
-        const u = clamp(uc + Math.cos(a) * du * kk, band[0] + 0.04, band[1] - 0.04);
-        const sv = clamp(s + Math.sin(a) * ds * kk, 0, 1);
-        const {p, t} = atU(trunkLine, us, sv);
-        const hw = trunkWidth(sv) / 2;
-        ring.push([p[0] - t[1] * hw * u, p[1] + t[0] * hw * u]);
+        const a = (k / m) * Math.PI * 2 + PR.jitter(0.2);
+        const kk = PR.range(0.72, 1.12);
+        ring.push(tpt(clamp(s + Math.sin(a) * ds * kk, 0, 1), clamp(uc + Math.cos(a) * du * kk, band[0] + 0.03, band[1] - 0.03)));
       }
       if (inShade) sh[PR.int(0, 1)].push(ring);
       else lit[PR.int(0, 2)].push(ring);
@@ -946,81 +1069,72 @@ function buildCrown(spec: CrownSpec): CrownGeom {
   } else {
     wood.push({d: polyD(ribbon(trunkLine, trunkWidth, shadeBand[0], shadeBand[1])), color: woodTone(bark.shade)});
   }
-  // the crown's own shade across the trunk's top (the shade under the tree, a real effect), two flat steps
+  // the crown's own shade over the trunk's top (the shade under the tree: a real effect): its edge slants with the
+  // light, in two flat steps (a half step on the lit side first)
   if (mode !== 'far') {
-    const sub = (a: number, b: number) => {
-      const us = arcParams(trunkLine);
-      return trunkLine.filter((_, i) => us[i] >= a && us[i] <= b);
-    };
-    const sA = 0.74;
-    const s0 = 0.8;
-    const half = sub(sA, s0 + 0.01);
-    const upper = sub(s0, 1);
-    const wHalf = (s: number) => trunkWidth(lerp(sA, s0, s)) + 0.6;
-    const w2 = (s: number) => trunkWidth(lerp(s0, 1, s)) + 0.6;
-    // the half step on the lit side, then the full shade, then the shade side's core
-    if (half.length >= 2) wood.push({d: polyD(ribbon(half, wHalf, litBand[0], litBand[1])), color: woodTone(mixL(bark.lit, bark.shade))});
-    if (upper.length >= 2) {
-      wood.push({d: polyD(ribbon(upper, w2)), color: woodTone(bark.shade)});
-      wood.push({d: polyD(ribbon(upper, w2, shadeBand[0], shadeBand[1])), color: woodTone(bark.core)});
-    }
+    const slope = -0.05 * tSide;
+    const edge = (u: number) => 0.84 + slope * u;
+    wood.push({d: polyD(trunkPatch((u) => edge(u) - 0.035, 1, litBand[0], litBand[1])), color: woodTone(mixL(bark.lit, bark.shade))});
+    wood.push({d: polyD(trunkPatch(edge, 1, -1, 1)), color: woodTone(bark.shade)});
+    wood.push({d: polyD(trunkPatch(edge, 1, shadeBand[0], shadeBand[1])), color: woodTone(bark.core)});
   }
-  // limbs: from the fork up into the lower and middle clusters
-  // (front clusters only: each limb's end must sit under a cluster drawn after it)
+  // limbs: from the fork up into the lower and middle FRONT clusters (their ends hidden under them)
   const targets = cls
-    .filter((c) => c.id !== n && c.c[2] >= 0 && c.c[1] > C[1] - Ry * 0.45)
+    .filter((c) => !c.core && c.c[2] >= 0 && c.c[1] > C[1] - Ry * 0.5)
     .sort((a, b) => Math.abs(a.c[0] - fork[0]) - Math.abs(b.c[0] - fork[0]));
   const nl = mode === 'far' ? 0 : Math.min(targets.length, R.int(sp.limbs[0], sp.limbs[1]));
   const picked = targets.slice(0, nl + 2).sort((a, b) => a.c[0] - b.c[0]);
   const limbs: Pt[][] = [];
   for (let i = 0; i < Math.min(nl, picked.length); i++) {
     const tgt = picked[Math.round((i * (picked.length - 1)) / Math.max(1, nl - 1))];
-    const end: Pt = [tgt.c[0], tgt.c[1] + tgt.r[1] * 0.15];
-    const start: Pt = [fork[0] + (i - (nl - 1) / 2) * trunkW * 0.22, fork[1] + trunkW * 0.3];
-    const mid: Pt = [lerp(start[0], end[0], 0.35) + R.jitter(trunkW * 0.4), lerp(start[1], end[1], 0.55)];
+    const end: Pt = [tgt.c[0], tgt.c[1] + tgt.r[1] * 0.1];
+    const start: Pt = [fork[0] + (i - (nl - 1) / 2) * trunkW * 0.24, fork[1] + trunkW * 0.5];
+    const mid: Pt = [lerp(start[0], end[0], 0.3) + R.jitter(trunkW * 0.35), lerp(start[1], end[1], 0.55)];
     limbs.push(smoothOpen([start, mid, end], 8));
   }
-  const limbW = (s: number) => Math.max(4, trunkW * lerp(0.5, 0.18, s));
-  minWidth.push(...limbs.map(() => Math.max(4, trunkW * 0.18)));
+  const limbW = (s: number) => Math.max(5, trunkW * lerp(0.48, 0.2, s));
+  minWidth.push(...limbs.map(() => Math.max(5, trunkW * 0.2)));
   if (limbs.length) {
     // limbs live under the crown: mostly its shade, a lit strip on the key's side
     wood.push({d: limbs.map((l) => polyD(ribbon(l, limbW))).join(''), color: woodTone(bark.shade)});
-    wood.push({d: limbs.map((l) => {
-      const b = litBandOf(litSide(l, L2), -0.2);
-      return polyD(ribbon(l, limbW, b[0], b[1]));
-    }).join(''), color: woodTone(bark.litPatches[1])});
+    wood.push({
+      d: limbs
+        .map((l) => {
+          const b = litBandOf(litSide(l, L2), -0.25);
+          return polyD(ribbon(l, limbW, b[0], b[1]));
+        })
+        .join(''),
+      color: woodTone(bark.litPatches[1]),
+    });
   }
 
   // ---- split back / front of the limbs, the bbox, the stats
-  const back = clusterGeoms.filter((c) => c.z < 0 || c.id === n);
-  const front = clusterGeoms.filter((c) => !(c.z < 0 || c.id === n));
-  const allPts = cat(hulls).concat(cat(rimLeaves.map((q) => q.poly))).concat(ribbon(trunkLine, trunkWidth));
+  const back = clusterGeoms.filter((c, i) => c.z < 0 || cls[i].core);
+  const front = clusterGeoms.filter((c, i) => !(c.z < 0 || cls[i].core));
+  const allPts = cat(silhouettes).concat(ribbon(trunkLine, trunkWidth));
+  const ext = mode === 'near' ? (spec.leafSize ?? clamp(Rm * sp.leafK.near, sp.leafPx.near[0], sp.leafPx.near[1])) * 0.75 : mode === 'mid' ? 12 : 0;
   const bbox: [number, number, number, number] = [
-    Math.min(...allPts.map((p) => p[0])),
-    Math.min(...allPts.map((p) => p[1])),
-    Math.max(...allPts.map((p) => p[0])),
+    Math.min(...allPts.map((p) => p[0])) - ext,
+    Math.min(...allPts.map((p) => p[1])) - ext,
+    Math.max(...allPts.map((p) => p[0])) + ext,
     Math.max(...allPts.map((p) => p[1])),
   ];
-  const share = tones.map(() => 0);
-  let tot = 0;
-  for (const q of all) {
-    const k = kOf(q);
-    share[k] += q.area;
-    tot += q.area;
-  }
-  for (let k = 0; k < share.length; k++) share[k] /= tot || 1;
+  // the painted share per tone (approx.: occlusion between clusters ignored)
+  const vt = visible.reduce((a, b) => a + Math.max(0, b), 0) || 1;
+  const share = visible.map((v) => Math.max(0, v) / vt);
   const meanL = share.reduce((acc, s, k) => acc + s * lch(tones[k]).L, 0);
   // the light vector: lightest 20 % of the painted area minus the darkest 20 %, as pro_3_nature.py measures it
-  const sorted = all.map((q) => ({q, k: kOf(q), c: centroid(q.poly)})).sort((a, b) => a.k - b.k || a.q.v - b.q.v);
-  const cum = (list: typeof sorted) => {
+  const sorted = regions.slice().sort((a, b) => a.k - b.k);
+  const totA = sorted.reduce((a, g) => a + g.area, 0) || 1;
+  const cum = (list: Region[]) => {
     let acc = 0;
     let x = 0;
     let y = 0;
     for (const e of list) {
-      acc += e.q.area;
-      x += e.c[0] * e.q.area;
-      y += e.c[1] * e.q.area;
-      if (acc >= tot * 0.2) break;
+      acc += e.area;
+      x += e.c[0] * e.area;
+      y += e.c[1] * e.area;
+      if (acc >= totA * 0.2) break;
     }
     return [x / (acc || 1), y / (acc || 1)] as Pt;
   };
@@ -1029,17 +1143,16 @@ function buildCrown(spec: CrownSpec): CrownGeom {
   let gx = 0;
   let gy = 0;
   for (const e of sorted) {
-    gx += e.c[0] * e.q.area;
-    gy += e.c[1] * e.q.area;
+    gx += e.c[0] * e.area;
+    gy += e.c[1] * e.area;
   }
-  gx /= tot || 1;
-  gy /= tot || 1;
+  gx /= totA;
+  gy /= totA;
   let gyr = 0;
-  for (const e of sorted) gyr += ((e.c[0] - gx) ** 2 + (e.c[1] - gy) ** 2) * e.q.area;
-  gyr = Math.sqrt(gyr / (tot || 1)) || 1;
+  for (const e of sorted) gyr += ((e.c[0] - gx) ** 2 + (e.c[1] - gy) ** 2) * e.area;
+  gyr = Math.sqrt(gyr / totA) || 1;
   const dx = light[0] - dark[0];
   const dy = light[1] - dark[1];
-  const holesArea = holes.reduce((acc, h) => acc + Math.abs(area2(h.poly)), 0);
   const crownArea = Math.PI * Rx * Ry;
   const stats: CrownStats = {
     mode,
