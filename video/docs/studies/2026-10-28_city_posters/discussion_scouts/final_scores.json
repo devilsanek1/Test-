@@ -1,0 +1,131 @@
+{
+ "title": "The five candidates, ranked",
+ "subtitle": "Our scores (est.); WOW and depth shown, not weighted",
+ "criteria": [
+  {
+   "key": "relevant",
+   "label": "Relevant (+ buzz, surprise)",
+   "short": "Relevant",
+   "weight": 6
+  },
+  {
+   "key": "true",
+   "label": "True and solid",
+   "short": "True",
+   "weight": 5
+  },
+  {
+   "key": "visual",
+   "label": "Visually appealing",
+   "short": "Visual",
+   "weight": 4
+  },
+  {
+   "key": "mood",
+   "label": "Mood (hopeful)",
+   "short": "Mood",
+   "weight": 3
+  },
+  {
+   "key": "fresh",
+   "label": "Fresh (last month)",
+   "short": "Fresh",
+   "weight": 2
+  },
+  {
+   "key": "share",
+   "label": "Shareable",
+   "short": "Share",
+   "weight": 1
+  },
+  {
+   "key": "wow",
+   "label": "WOW (not weighted)",
+   "short": "WOW",
+   "weight": 0
+  },
+  {
+   "key": "depth",
+   "label": "Story past the title (not weighted)",
+   "short": "Depth",
+   "weight": 0
+  }
+ ],
+ "stories": [
+  {
+   "name": "Where do you put a machine this hot? (Helsinki's AI heat + the weird places)",
+   "scores": {
+    "relevant": 8,
+    "true": 8,
+    "visual": 9,
+    "mood": 9,
+    "fresh": 8,
+    "share": 8,
+    "wow": 8,
+    "depth": 9
+   },
+   "total": 8.33,
+   "rank": 1
+  },
+  {
+   "name": "London's hospitals fly blood samples over the traffic by drone",
+   "scores": {
+    "relevant": 7,
+    "true": 8,
+    "visual": 9,
+    "mood": 9,
+    "fresh": 9,
+    "share": 7,
+    "wow": 7,
+    "depth": 4
+   },
+   "total": 8.1,
+   "rank": 2
+  },
+  {
+   "name": "A volcano's stone forest becomes America's newest national park",
+   "scores": {
+    "relevant": 5,
+    "true": 9,
+    "visual": 10,
+    "mood": 9,
+    "fresh": 9,
+    "share": 6,
+    "wow": 6,
+    "depth": 5
+   },
+   "total": 7.9,
+   "rank": 3
+  },
+  {
+   "name": "Japan's probe to bring back soil from a moon of Mars",
+   "scores": {
+    "relevant": 6,
+    "true": 9,
+    "visual": 9,
+    "mood": 8,
+    "fresh": 9,
+    "share": 6,
+    "wow": 7,
+    "depth": 6
+   },
+   "total": 7.86,
+   "rank": 4
+  },
+  {
+   "name": "A telescope made of South Pole ice wins the Nobel (IceCube)",
+   "scores": {
+    "relevant": 6,
+    "true": 9,
+    "visual": 9,
+    "mood": 8,
+    "fresh": 7,
+    "share": 7,
+    "wow": 8,
+    "depth": 7
+   },
+   "total": 7.71,
+   "rank": 5
+  }
+ ]
+}
