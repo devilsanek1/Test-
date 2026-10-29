@@ -208,3 +208,8 @@ planes, far banks paler, cooler, simpler and flatter toward the horizon (a layer
   - the water stays v2's mint under the new dusk sky;
   - the caption band is a gentle lilac-to-rose ramp (spread 4.9), not flat.
 
+
+## The owner's verdict on paint_still_v4 (2026-10-29)
+"Wait but this is actually not bad like it’s not there but we are getting there" (seen at phone size, in compare_v4).
+-> v5 keeps the design-first method and the dusk family; fixes the crescent shapes; puts the whole scene under one
+evening light (water and paving tinted by the dusk); paint a little more visible on cloud edges and inside the cumulus.
