@@ -138,3 +138,5 @@ Earlier rounds also used Pip's periwinkles (`#7A7FE3`, `#6A6ED6`, `#AEB2F4`), pe
   schemes" then "Okay pick one and give me the final one" -> a colour exploration of The Peel, then the final logo
   (the session picks), its export pack.
 - 2026-10-29 ~20:32 UTC: the final delivered (The Peel, coral and ink; `logo_final.png`, the pack in `deliverables/brand/peel/`).
+- 2026-10-29 ~20:30 UTC, to the orchestrator (relayed): "Logo is done" -> the thread is closed; The Peel in coral and ink is the
+  studio logo. No more rounds.
