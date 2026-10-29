@@ -6,6 +6,21 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-29 ~21:25 UTC: painted look, people, AI test, logo (restart recovered)
+- LOGO: FINAL, The Peel in coral and ink (`video/deliverables/brand/peel/`, `video/docs/brand/LOGO.md`); helper archived.
+- PAINT (our engine painter, `src/lib/paint/`, `scripts/look/paint/paint.py`, demo `src/look/paint_s1/`): v1-v5 stills in
+  `paint_test/`; owner: v4 (design first) "getting there"; v5 = the owner's layered-brush recipe + one evening light.
+- RUNNING after a container restart (~21:20 UTC):
+  - workflow `paint-recipes` (run `wf_493c40ba-54a`): 4 researchers (sky_clouds, water, foliage, built_ground) write
+    `video/docs/look/paint_recipes/<family>.md` + swatches + `scripts/look/paint/recipes/<family>.py`, then a synthesizer
+    writes `video/docs/look/PAINT_RECIPES.md` + `paint_recipes/index.jpg` (owner: "come up with a concrete detailed
+    recipes"). Resume: `Workflow({scriptPath, resumeFromRunId})`.
+  - agent (people recipe): `docs/look/paint_recipes/people.md` + `people_sheet.png`; code `src/lib/figure/`,
+    `src/look/people/` (owner: people "more refined and clean and more fluid", refs 04 girl strip, 03 couple zoom).
+  - agent (local AI test, SDXL on CPU, weights in /tmp/hf-cache): `ai_paint/ai_still_v1.png`, `compare.jpg`,
+    `reveal_strip.jpg`, `NOTES.md`.
+- NEXT: send each result; then v6 of the painter from the recipe book (+ real darks), people into the scene.
+
 ## Status 2026-10-29 ~19:45 UTC: still_v2 rejected ("too cheap looking", "going away in style"); still_v3 in our engine
 - The owner, with three new references (`video/docs/look/refs_human_scale/`): back to v2's own angle and view, the
   person near the camera at a real size. Captured: playbook "DEPTH AND SCALE FROM A HUMAN VIEWPOINT" (replaces DEPTH IS
