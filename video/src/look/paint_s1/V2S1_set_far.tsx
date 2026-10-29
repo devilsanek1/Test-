@@ -5,6 +5,7 @@
 // with its traffic seen through the railing: a double-decker crossing once on 1.10; the five birds on the railing that
 // lift at 1.40 and wheel west ACROSS THE SUN. Tier C (V2S1_set wraps it in <Tier tier="environment">): flat 2-tone
 // shapes, no line; frame 0 shows them as pale shapes (the Look cascade's `pale`), no underdrawing.
+import {PaintedLayer} from '../../lib/paint';
 import React, {useMemo} from 'react';
 import {CM, INK_PX} from '../../v2r/palette';
 import {useTime} from '../../lib/time';
@@ -588,6 +589,8 @@ const BridgePeople: React.FC = () => (
 
 // ---------------------------------------------------------------- the west gap
 
+export {FarRoofs, CalmTower};
+
 export const S1WestGap: React.FC = () => {
   const body = useMemo(() => {
     const g = bridgeBody();
@@ -620,11 +623,16 @@ export const S1WestGap: React.FC = () => {
       ) : (
         <S1Plane plane={S1_PLANE.farRoofs}>
           <SunDisc />
-          <FarRoofs />
+          {/* (the paint test) the far roofs painted as a soft haze, on their own plane */}
+          <PaintedLayer piece="farroofs">
+            <FarRoofs />
+          </PaintedLayer>
         </S1Plane>
       )}
       <S1Plane plane={S1_PLANE.farTower}>
-        <CalmTower />
+        <PaintedLayer piece="fartower">
+          <CalmTower />
+        </PaintedLayer>
       </S1Plane>
       {/* (the look test's texture: none on the bridge: its kit people, birds and bus are scaled groups, which a filter
           would soften (Chrome resamples them), and at k 0.4 the mottle would not show on it) */}

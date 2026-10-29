@@ -9,7 +9,6 @@ import {S1_EVENING, S1_HORIZON} from '../../v2r/world/skies';
 import {CM10B} from './palette_10b';
 import {useSwitches} from './switches';
 import {PaintedLayer} from '../../lib/paint';
-import {PAINT} from './paint_set';
 
 /** (the look test's 10b palette) S1's evening sky with 10b's calmer mint band (C* 10, v2 13): v2's S1_EVENING recipe
  *  (world/skies.ts) on 10b's sky; the horizon, the sun's warmth and so S1's air stay v2's. */
@@ -41,7 +40,7 @@ export const SkyFlood: React.FC = () => {
         {/* ONE continuous, gentle, dithered sky (lib/sky; the film's preset in world/skies.ts; CRAFT §g): the caption
             field flat through the band, a pale warm light band, the warm horizon, the low sun's warmth round SUN0 */}
         {/* (the paint test) the painted sky in the flood's clip, the same disc: it floods in painted */}
-        <PaintedLayer piece={PAINT.sky}>
+        <PaintedLayer piece={"sky"}>
           <Sky spec={s1Sky(palette10b)} />
         </PaintedLayer>
       </g>

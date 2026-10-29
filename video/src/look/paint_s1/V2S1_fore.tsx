@@ -27,7 +27,6 @@ import {S1PipInTree} from './V2S1_pip';
 import {TreeSlot} from './engine';
 import {S1_PIP_IN_CROWN} from './V2S1_nature';
 import {PaintedLayer, usePainted} from '../../lib/paint';
-import {PAINT} from './paint_set';
 
 type Pt = [number, number];
 const r1 = (n: number) => Math.round(n * 10) / 10;
@@ -153,6 +152,8 @@ const CROWN_UNDER: string = [
 const TREE_PAINT_FROM = floodAt(120, 1390);
 /** (the paint test) the pier's paint lands with its body's flood. */
 const PIER_PAINT_FROM = floodAt(980, 1700);
+/** (the paint test) the fern pot's paint lands with its flood. */
+const FERN_PAINT_FROM = floodAt(452, 1880);
 
 export const PlanterTree: React.FC = () => {
   const {rim} = FORE.planter;
@@ -193,7 +194,7 @@ export const PlanterTree: React.FC = () => {
   // (the look test's foliage switch: lane N's London plane in the one wind, Pip inside it; off, v2's crown, with the
   // darks and Pip's hiding spot)
   // (the paint test) the painted crown and trunk in the tree's own slot (the near group: it rides the near float)
-  return <TreeSlot sw={sw} pip={<S1PipInTree seat={S1_PIP_IN_CROWN.seat} />} fallback={<PaintedLayer piece={PAINT.tree} from={TREE_PAINT_FROM}>{tree}</PaintedLayer>} />;
+  return <TreeSlot sw={sw} pip={<S1PipInTree seat={S1_PIP_IN_CROWN.seat} />} fallback={<PaintedLayer piece={"tree"} from={TREE_PAINT_FROM}>{tree}</PaintedLayer>} />;
 };
 
 const Planter: React.FC = () => {
@@ -310,7 +311,7 @@ const Bench: React.FC = () => {
 // ---------------------------------------------------------------- front: cut by the bottom edge
 
 /** A big terracotta pot of fern, nearest of all (its foot below the frame). */
-const FernPot: React.FC = () => {
+export const FernPot: React.FC = () => {
   const {x, rim} = FORE.fern;
   const {darks} = useSwitches();
   return (
@@ -398,7 +399,7 @@ export const PierShades: React.FC = () => (
 );
 
 const NearForm: React.FC = () => {
-  const painted = {pier: usePainted(PAINT.pier, PIER_PAINT_FROM)};
+  const painted = {pier: usePainted("pier", PIER_PAINT_FROM)};
   // (the look test: the crescent on the bay's crown is S1ForeNearOver's: the crown sits in the near group's `under`)
   return (
   <>
@@ -413,7 +414,7 @@ const NearForm: React.FC = () => {
   );
 };
 
-const FrontForm: React.FC = () => (
+export const FrontForm: React.FC = () => (
   <FormShade d={poly([[FORE.fern.x - 112, FORE.fern.rim + 22], [FORE.fern.x + 112, FORE.fern.rim + 22], [FORE.fern.x + 92, 1960], [FORE.fern.x - 92, 1960]])} at={floodAt(452, 1880)} />
 );
 
@@ -451,24 +452,29 @@ export const S1ForeMid: React.FC = () => (
 
 /** The near and front layers: the planter and the bay, the crates, the café set, the pier; then what the bottom edge
  *  cuts: the fern pot and the nearest chair. */
-export const S1ForeNear: React.FC = () => (
+export const S1ForeNear: React.FC = () => {
+  const fernPainted = usePainted('fern', FERN_PAINT_FROM);
+  return (
   <ToneCtx.Provider value={useNearTone(nearEntries(), -2, NEAR_BIG)}>
     <Tier tier="environment">
       <Planter />
       <Crates />
       <CafeSet />
       <Leaves />
-      <PaintedLayer piece={PAINT.pier} from={PIER_PAINT_FROM}>
+      <PaintedLayer piece={"pier"} from={PIER_PAINT_FROM}>
         <Pier />
       </PaintedLayer>
     </Tier>
     <NearForm />
     <Tier tier="environment">
-      <FernPot />
+      <PaintedLayer piece="fern" from={FERN_PAINT_FROM}>
+        <FernPot />
+      </PaintedLayer>
     </Tier>
-    <FrontForm />
+    {fernPainted ? null : <FrontForm />}
   </ToneCtx.Provider>
-);
+  );
+};
 
 /** (the look test's texture) The near group's `under` (drawn first in its translate, outside its mottle; the same place
  *  in the drawing order as v2's): the near things' contact and cast shadows, which lie on the treads (the bank's group;
@@ -495,7 +501,7 @@ export const TreeCrescent: React.FC = () => <FormShade d={crown} kind="crescent"
 export const S1ForeNearOver: React.FC = () => {
   const {foliage} = useSwitches();
   // (the paint test) the painted crown carries its own light: no crescent over it
-  const painted = usePainted(PAINT.tree, TREE_PAINT_FROM);
+  const painted = usePainted("tree", TREE_PAINT_FROM);
   return (
     <>
       <PropFeet />
