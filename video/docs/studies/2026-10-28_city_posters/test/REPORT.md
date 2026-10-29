@@ -3,19 +3,21 @@
 *Lane S, 2026-10-29. Lanes E, PT and N integrated into S1's copy (`SCENE.md` §7), ONE playable clip for the owner's
 phone, ONE A/B sheet, the QA. Everything below was measured on the final code (13:53 UTC).*
 
-**State: FIX PASS 1 IN PROGRESS** (the panel's FIX_FIRST: `REVIEW.md`). The progress log and the exact next step are
-in §8 at the end; §1-§7 below describe v1 as reviewed, until §8 says the clip is re-rendered.
+**State: FIX PASS 1 DONE** (the panel's FIX_FIRST: `REVIEW.md`): every MUST and SHOULD built, the clip re-rendered from
+the fixed code (same structure, same master encode), REVIEW.md §7's re-check and the QA run on it: §8 (what is still
+short, and why, at its end), the owner's lines in §9. §1-§7 below describe v1 as reviewed.
 
 ## 1. What to look at
-- **The clip:** `video/deliverables/tests/poster_look_test_v1.mp4` (8.85 MB, 15.5 s, 1080 x 1920, 60 fps, voice and
-  captions). 0.0-1.2 s a card "Before: the Google video"; 1.2-7.3 s **v2's S1 as shipped** (pixel-identical to
+- **The clip:** `video/deliverables/tests/poster_look_test_v1.mp4` (since fix pass 1: 8.84 MB, 15.5 s, 1080 x 1920,
+  60 fps, voice and captions; v1 8.85 MB). 0.0-1.2 s a card "Before: the Google video"; 1.2-7.3 s **v2's S1 as shipped** (pixel-identical to
   `Film2R-V2S1`); 7.3-8.5 s a card "After: the poster lessons"; 8.5-15.5 s **pass 2**, every decided change (S1 0-6.1 s,
   then the 0.9 s locked hold). Composition `PosterLookTest` (`src/look/poster_s1/PosterLookTest.tsx`, entry
   `src/entry-look-poster.tsx`). The cards' words: the caption hand at 92 / 128 px, centred at y ~900-1060 (the caption
   block is y 290-600), on the film's paper, silent.
 - **The A/B sheet:** `test/ab_switches.jpg`: S1 at 5.2 s, v2 then v2 + ONE switch (line, darks, patchwork, texture, far
   stage) as full frames, then 1:1 crops of each (the texture's: the mottle layer itself x10 next to the frame), and v2
-  next to pass 2. From the same code (`PosterS1`, preset v2 + one switch).
+  next to pass 2. From the same code (`PosterS1`, preset v2 + one switch). Since fix pass 1 re-made from the fixed code,
+  with the palette pair (pass 2 with the 10b palette, and with v2's: the decided switches alone).
 
 ## 2. What the after row beats (STUDY §10 step 1's five scripts, `look_test_row.py`, pass 2 at 1.0 / 3.0 / 5.2 s)
 All numbers: `after_row.json` (the before: `before_row.json`, `BEFORE.md`). Lossless PNG stills, as the before.
@@ -237,8 +239,92 @@ masters, rungs, tools): `/tmp/posters-s/`. Render times: the clip 930 frames in 
   the 10b palette (proposed: the clip's After) and pass 2 with v2's palette (`palette10b: false`: the decided switches
   alone)**, next to v2. The message's lines are in §9.
 
-**Next step:** the re-render (`poster_look_test_v1.mp4`, same structure, same master encode), then the re-check
-(REVIEW.md §7) with SHOULD 10's numbers.
+- **The re-render (17:25 UTC):** `deliverables/tests/poster_look_test_v1.mp4` from the fixed code, the same structure
+  and master encode (PosterLookTest, 930 frames in 459 s, PNG frames, BT.709, x264 CRF 14 slow aq-mode 3; the voice
+  mastered by `s_audio.sh`): 8.83 MB, 15.5 s, video 4.35 Mb/s, -14.0 LUFS, LRA 6.1.
+
+- **The re-check caught one regression:** check_light's greyed shadow pixels 26.7-28.7k (cap 1,037; v1 510-739): the
+  new unlit glass (C* 9) went grey under the ground storey's warm shade (the far city's). Fixed: the glass C* 13 and its
+  streak C* 12 (the ground storey leaves them C* ~10): greyed 479-605 px, **check_light OK x 3**.
+- **And one seam in time:** behind the glass (0.78-0.97 s) she was still v1's drawing (no belt, bow or collar, the
+  tote without its strap, the pale plant), so her drawing changed as she stepped out. Now from the flood on her coat
+  (0.78) she is the towpath's drawing; only the sun's shade and rim arrive at the step-out (0.97). The clip is rendered
+  again from this code (18:00 UTC, the same structure and encode).
+
+- **The final clip (18:09 UTC):** `deliverables/tests/poster_look_test_v1.mp4`, 8.84 MB, 15.5 s, 930 frames at 60 fps,
+  video 4.35 Mb/s (4.56 with audio), -14.0 LUFS, LRA 6.1 (the master in 470 s).
+
+**The table** (pass 2 at 1.0 / 3.0 / 5.2 s, lossless stills that match the clip's frames at 39.1-39.8 dB; "v1" = the clip
+as reviewed; the gate is REVIEW.md §7):
+
+| Item | v1 (as reviewed) | after fix pass 1 | target | |
+|---|---|---|---|---|
+| MUST 1: her, check_depth | 15.4 / 26 % at 5.2 s; 21.9 / 31 % at 3.0 s | **18.5 / 11 %; 19.4 / 15 %** (1.0 s 29.5 / 13 %) | >= 15 / <= 20 % | met |
+| MUST 1: the copies' row, check_depth (the sheet) | 7.9 / 33 % at 5.2 s; G1-G2 15.6 / 13 % at 3.0 s | **7.0-8.1 / 36-39 %; 11.4 / 31 %** | >= 15 | **short** (below) |
+| ... on the exact silhouettes (check_depth's separation, 540 px) | 9.5 / 28 %; G1-G2 15.2 / 12 % | 8.2 / 27 %; G1-G2 10.4 / 19 % | (v2, lined: 8.1 / 31 %; 13.2 / 22 %) | |
+| ... edge by edge at 1080 (the copies' medians at 5.2 s) | coat lit 10, shade 10.5; heads 13-15 / 12 | coat lit 10.8, **shade 18.8**; heads **16.1** / 13.2 | | |
+| MUST 1: her tote | L* 50.2 C* 2.3 (grey) | **L* 85.0 C* 17.4**, its shade 68.7 / 15.8, the strap a 2 px line | cream, warm shade | met |
+| MUST 1: her plant against the lobby's | 3.4 L* | **12.3 L*** | >= 10 | met |
+| MUST 2: the bank, y 1190-1920 | median h 61, C* 19.2, L* 58.9; 56.9 % beige-wide; 7.3 % at h <= 50 | **h 47, C* 22.1, L* 57.0-57.3; 0.4-0.5 %; 68.6-69.2 %** | h <= 50; < 20 %; L* 55-60 | met |
+| MUST 2: the paving | 2 tones on 1.2 m: a diamond chequer, tile-by-tile flood | 3 tones with a hue turn, facets 57-90 px, one flood front; `patchworkProblems` [] | | met |
+| MUST 3: W against the other panes | 6.8 L* | **>= 27 L*** (W 27.0, the others 54-63) | every other pane >= 15 above W | met |
+| MUST 3: the darks | 8.2-8.3 %, 130-134 pieces, 12-13 cells | **6.3-6.6 %, 122-127, 11** | 6-10 %, >= 120, >= 9 | met |
+| MUST 3: local contrast, unlit panes / her (pro_2 sigma 16) | 8.9-15.4 / 15.1 (1.4x) | **5.2-7.7 / 17.1-21.3 (2.2-3.2x)** | panes ~v2's (3.7-5.0), CRAFT C <= 7; her >= 2x | met (one pane 7.7: a copy stands in its box) |
+| MUST 4: the spray | 96 % green, L* 53.3, C* 20.0, 29.5k px; edges 8,990 vs her 5,541 | **86 % warm, L* 67.5, C* 32.6, 17.9k px; edges 5,974 vs 6,935** | >= 80 % warm; under her edges | met |
+| MUST 5 | no palette pair, no message | the pair on `ab_switches.jpg`; the message (§9) | | met |
+| MUST 6: the landmark, row by row | L* 78.2-86.8, dE 7-18.7 | **L* >= 86.5, dE <= 5.7, abs dC* <= 3.8** | L* >= 86, dE <= 8, dC* <= 4 | met |
+| SHOULD 1: caption ink on S1 frames 0-4 | 0 px (both parts) | **10,736-10,737 px** (v2's master 10,734-10,739) | v2's | met |
+| SHOULD 1: the Before half against v2's master | 50.2 dB min over frames 5-354 | **50.5 min, 57.5 mean over 0-354** | >= 50 | met |
+| SHOULD 5: the corner seam, five sub-pixel nudges | swing 3.0 L* (6.2 through the float, tech) | **0.3 L*** | <= 2 | met |
+| SHOULD 5: check_depth west edge | 10.9 WARN / 13.2 / 16.0 | **16.4 / 18.8 / 18.3** | >= 12 | met |
+| SHOULD 8: Pip | 0.046 % of the frame, a lavender blob | 0.04-0.06 %, its ear's curve clears the leaves | <= 1 %, hidden | met |
+| check_light (A/B) | OK x 3 (greyed 510-739 px) | **OK x 3 (greyed 479-605 px)** | <= 1,037 | met |
+
+**REVIEW.md §7, the re-check (the gate) and REPORT's QA, on the final file:**
+| check | result |
+|---|---|
+| the copy is v2 (preset v2 against `Film2R-V2S1`, 1.0 / 3.0 / 5.2 s) | **0 px**; its frame 0 now carries the hook caption on purpose (SHOULD 1) |
+| the Before half against v2's master, S1 frames 0-354 | **Y-PSNR min 50.5 dB, mean 57.5**, frames 0-4 59-61 dB |
+| caption ink on S1 frames 0-5, both parts | **10,736-10,737 px** each (v2's master 10,734-10,739) |
+| the after row (`after_row_fix1.json`) | darks **6.3-6.6 %, 122-127 pieces, 11 cells**; near treads 55.8-55.9, near-to-air 32.1-32.2; big fields below the sky **8.2-8.3 %** (v1 18.8-19.2, v2 15.0-15.2); mottle in fields **0.34-0.35** (now inside 0.3-0.6); busy **38-40 %** (>= 35: now met); accents 4.8-5.2 % in 55-56 parts; colours n90 24-27; C* p90 / p50 **1.66-1.74** (v1 1.42-1.46, v2 1.96); depth 0 FAIL, 2 / 3 / 3 WARN |
+| check_depth | her and the west edge met (above); the copies' row short (above); the ladder and the far plane's edges WARN as in v1 |
+| the darks | met (above) |
+| the hierarchy (pro_2's local contrast) | A (her + the door) **13.4 / 16.4 / 16.3**, B (the facade) 10.0-10.1 (v1 11.6-11.8), C near 3.7 / 5.9-6.1, C far 2.4-2.7: **A >= 2.2x C** |
+| the 300 px squint at 3.0 and 5.2 s | W, then the door with her and the first copies; the crown's shade still the darkest mass at the bottom left (the near frame, decided) |
+| the bank's hue, `patchworkProblems`, the tower, `s1NatureProblems` | met (above); `[]`, `[]` in both palettes |
+| framecheck | 2 ERROR (the label cards: waived as in §4), 3 WARN (the opening flood in the UI zones, both parts): as v1 |
+| capcheck | **22 caption frames, 0 FAIL, 0 warn** |
+| A/V lag, loudness | **0.0 ms** in both windows; **-14.0 LUFS**, LRA 6.1, -4.4 dBFS peak |
+| the master's bitrate | **4.35 Mb/s video**, 4.56 with audio, 8.84 MB (v1 4.36 / 4.57 / 8.85) |
+| the rungs (x264 medium; one decode path, `accurate_rnd` + `full_chroma_int`: SHOULD 10) | 1080p 3.20 Mb/s, 720p 1.40 Mb/s. Darks at 1.0 / 3.0 / 5.2 s: PNG p5 36.0-36.2, 6.3-6.6 %, 122-127 pieces, 11 cells; master 35.9-36.2, 6.4-6.6 %, 123-132, 11; 1080p 6.3-6.6 %, 124-130, 11; **720p 6.2-6.4 %, 113-129, 11** (its encode merges a few small pieces at 1.0 and 5.2 s) |
+| twinkle in motion, the crown's box, every rung on the 1080 tile grid (SHOULD 10) | PNG p95 3.08 / max 3.55 (6 of 19 tiles over 2 L*); master 2.59 / 2.60 (4 / 20); 1080p 2.17 / 2.43 (3 / 20); 720p 1.35 / 1.51 (0 / 20): **the rungs add none** (v1: 3.06 / 2.55 / 2.11; 720p 1.43 on its own grid) |
+| twinkle, strict (lane N's 22 sub-pixel phases, wind still) | WARN as in v1: the crown 23 % (v1 15), its right edge 56 % (42), its top edge 4 % (3), Pip 39 % (29), the spray 60 % (21; its max 13.5, v1 23.5): the autumn leaves' thin stalks and lace ends against the sky; at 3x across the phases the shapes hold (no flicker at 1x) |
+| the texture A/B, stills (pass 2 against its texture off, 1.0 / 3.0 / 5.2 / 6.5 s) | **TEXTURE PASS on every region**: the sky std 0.30, radius 32 px; the bank 0.27; the wing 0.17-0.19; the water 0.23-0.24; the far roofs 0.12-0.13; the full frame 0.25, in the band 0.001 |
+| the texture A/B, video (7 s masters with and without the mottle) | the sky **PASS x 4**, the hold PASS (0.008); **the water (SHOULD 2's re-run)**: WARN x 4 on the mottle's colour through H.264 (0.37-0.42 a*b*, cap 0.35; the stills 0.18-0.20), as v1, hold PASS. The troughs: the clip sits 1.18-1.40 levels from the lossless stills in the troughs box (v1 1.76; the wing 1.6-2.1, the sky 0.7): pass 2 now draws its own troughs |
+| check_light (A/B) | **OK x 3** (greyed 479-605 px; above) |
+| lints, types | `s1NatureProblems`, `particleProblems`, `patchworkProblems` `[]`; `npx tsc --noEmit` clean |
+| at 390 px | the 2 s flick: a warm stone terrace, the canal, the wing with its one dark window, a queue of small figures in belted coats with white heads to the row's far end; the 10 s test: her, the door, W and the row's heads are the crispest things, then the crown's dark mass |
+
+**Still short, and why:**
+1. **The copies' row against check_depth's 15 L*** (7.0-8.1 at 5.2 s; G1-G2 11.4 at 3.0 s). The sheet's GrabCut box
+   finds one blob (the heads' tops, the balustrade and the box's edges, not the coats); on the exact silhouettes at
+   check_depth's 540 px a copy is ~14 px wide, so the measure compares the mean of its lit and shade halves (~L* 70)
+   with the fields behind: the bridge's soffit (L* 76) and the rose piers (68-72), mid values between the halves. No
+   single coat value parts from both by 15 at that scale; the darker oat (lever 5) won the cover's far end (one value
+   41 -> 27 %) and cost G1-G2 in front of the rose piers (15.2 -> 10.4 on the exact silhouettes). Edge by edge at 1080
+   the shade edges part by 18.8 and the heads' key side by 16.1. What would close it: a field behind the copies outside
+   ~55-90 (the soffit a step darker, the piers a step lighter: a set change beyond MUST 1's list), or the line back
+   (rule 4: no). By eye at 390 px the row reads as people.
+2. **L* p5 36.0-36.2** (<= 32; v1 33.1) and **the median edge step 11.4-11.7 at 1.0 / 3.0 s** (12-18): the five dark pane
+   slabs were the frame's darkest 5 % and its hardest edges; the darks now sit in smaller pieces at the door.
+3. **The cumulus' belly band** still ends flat a few px past the lobes: only lib/clouds can round it (flagged to lane N).
+4. **The 720p rung** keeps 113-119 dark pieces at 1.0 and 5.2 s (the PNG 122-127): its encode merges a few small ones.
+5. The study's finish targets stay far (structure tiles 29-32 % against <= 12, the open sky 30.5-30.8 % against the
+   posters' 36-53: the ghost row now spans the west gap); 10b's chroma spread 1.66-1.74 against >= 2.5 (the palette
+   pair on the sheet lets the owner judge it).
+
+**Next step:** none in this lane: the clip, the sheet and this report go to the panel's gate (REVIEW.md §7) and then
+the owner with §9's lines.
 
 ## 9. The message to the owner (REVIEW.md MUST 5.2: the lines to send with the clip)
 - **What it is:** a look test of v2's opening shot (S1), not a film: the same 6 seconds twice. **Before** (v2's S1 as

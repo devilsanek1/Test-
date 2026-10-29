@@ -277,13 +277,17 @@ export const S1HerBehindDoor: React.FC = () => {
   const x = s1HerXAt(t);
   const y = MAP.S1_HER_STEP_OUT.feetFrom;
   const h = MAP.S1_SHEET.herHAtFacade;
+  // (the look test, no outlines: REVIEW MUST 1) from the flood on her coat she is the same drawing as on the towpath
+  // (belt, bow, collar, sleeve, the tote's strap, the mid sage plant); the sun's shade and rim come on as she steps out
+  const vals = sw.lineOff && t >= HER_COAT_AT ? rowTones() : null;
+  const spec = vals ? herSpec(CM.hero, {leaf: vals.herLeaf, values: vals.her}) : herSpec(t < HER_COAT_AT ? CM.white : CM.hero);
   return (
     <Tier tier="subject">
       <S1LobbyContact x={x} y={y} h={h} />
       <InkScale value={s1Bold(t)}>
         {/* (the no-outline switch: her construction line goes under her coat's colour, the last to land) */}
         <Look ink={lineOn(sw, t, LINE_UNTIL.her)}>
-          <RowFigure seed="s1row/her" spec={herSpec(t < HER_COAT_AT ? CM.white : CM.hero)} x={x} y={y} h={h} step={s1Step(t)} inkPx={HER_INK} draw={S1_DRAW.her} lineTone={t < HER_COAT_AT ? herPaperLine() : undefined} />
+          <RowFigure seed="s1row/her" spec={spec} x={x} y={y} h={h} step={s1Step(t)} inkPx={HER_INK} draw={S1_DRAW.her} lineTone={t < HER_COAT_AT ? herPaperLine() : undefined} />
         </Look>
       </InkScale>
     </Tier>

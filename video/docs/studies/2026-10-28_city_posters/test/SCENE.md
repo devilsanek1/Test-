@@ -3,8 +3,9 @@
 *Lane S of the 7 s look test (`STUDY.md` §10: items 5 and 7, the S1 copy and the switches; item 11, the integration and
 the clip). 2026-10-29. Items (1)-(4) done 09:04 UTC; the integration of lanes E, PT and N done 09:50 UTC, its fixes
 through 13:53 (§7); the clip `deliverables/tests/poster_look_test_v1.mp4`, the A/B sheet `ab_switches.jpg` and the QA:
-`REPORT.md` (done 13:58 UTC). **Fix pass 1** (the panel's `REVIEW.md`, FIX_FIRST): every MUST and SHOULD built and
-measured (§8), the sheet re-made; the re-render and the re-check are the next step (`REPORT.md` §8). Scratch work in `/tmp/posters-s/` only (tools in `/tmp/posters-s/tools/`: `s_pxdiff.py`,
+`REPORT.md` (done 13:58 UTC). **Fix pass 1** (the panel's `REVIEW.md`, FIX_FIRST): done 18:30 UTC: every MUST and
+SHOULD built and measured (§8), the sheet re-made, the clip re-rendered from the fixed code, the re-check and the QA in
+`REPORT.md` §8. Scratch work in `/tmp/posters-s/` only (tools in `/tmp/posters-s/tools/`: `s_pxdiff.py`,
 `s_audio.sh`, `s_capcheck.sh`, `s_rungs.py`, `s_absheet.py`, `s_rowtable.py`, `s_edgetrack.py`; node harnesses in
 `/tmp/posters-s/harness/`; an early tool of mine in the shared scratchpad, `tools/pxdiff.py`, is the one that replaced
 lane E's: every proof below was re-run from my own folder).*
@@ -210,9 +211,9 @@ Every change sits behind a pass-2 switch (the v2 preset is still 0 px against `F
 frame 0 now carries the hook caption on purpose: SHOULD 1).
 | Item | What | Switch | Where |
 |---|---|---|---|
-| MUST 1 | the row's drawing as value shapes (`FigValues`: belt band, filled bow, collar lit/shade pair, sleeve sliver, clipped to their parts); the copies' band 40 % at -25 L*, their oat -7 L*, the rig's rim on their key side; every head a crescent (-24, cool) and a lit cap; the head out of the body's band (a mask with holes); her tote its own object (cream, a warm shade, the strap a 2.0 px line), her plant a mid sage, her hair's rim clipped to the door's dark members (`s1DoorDarkD`) | `lineOff` (`shadeTier` for the band's strength) | `V2S1_row_fig.tsx`, `V2S1_row.tsx`, `V2S1_set_wing.tsx` |
+| MUST 1 | the row's drawing as value shapes (`FigValues`: belt band, filled bow, collar lit/shade pair, sleeve sliver, clipped to their parts); the copies' band 40 % at -25 L*, their oat -7 L*, the rig's rim on their key side; every head a crescent (-24, cool) and a lit cap; the head out of the body's band (a mask with holes); her tote its own object (cream, a warm shade, the strap a 2.0 px line), her plant a mid sage, her hair's rim clipped to the door's dark members (`s1DoorDarkD`); behind the glass the same drawing from the flood on her coat (0.78) | `lineOff` (`shadeTier` for the band's strength) | `V2S1_row_fig.tsx`, `V2S1_row.tsx`, `V2S1_set_wing.tsx` |
 | MUST 2 | the bank's big fields read the beige band wide (`noBeigeBig`: h 55-95 under C* 23 -> terracotta-rose, h 46 C* 22); the stone paving (`PAVE_STONE`, `paveTones`); `PatchFill front`: one circle flood front | `darks` / `nearMid`; `patchwork` | `near.ts`, `V2S1_steps_stone.tsx`, `V2S1_fore.tsx`, `V2S1_patch.tsx` |
-| MUST 3 | unlit panes: sky glass L* 68 (shown), the room a band at the foot (16-23 %), a streak one step lighter, no glint, each pane in its own batch layers; the lintel the pane's own shade step; the darks moved to the door (a lobby bench, a framed picture, eight mooring rings) | `darks` | `V2S1_set_wing.tsx`, `V2S1_set_life.tsx` |
+| MUST 3 | unlit panes: sky glass L* 68 C* 13 (shown), the room a band at the foot (16-23 %), a streak one step lighter, no glint, each pane in its own batch layers; the lintel the pane's own shade step; the darks moved to the door (a lobby bench, a framed picture, eight mooring rings) | `darks` | `V2S1_set_wing.tsx`, `V2S1_set_life.tsx` |
 | MUST 4 | the spray autumn 0.88 on 6 leaves / 1 twig, its ladder lifted; the crown autumn 0.18 | `foliage` | `V2S1_nature.tsx` |
 | MUST 5 | the A/B sheet re-made with the palette pair (pass 2 with and without 10b) | (render) | `ab_switches.jpg` |
 | MUST 6 + SHOULD 9 | the landmark toned from the sky at its own height (`bandTone`, two flat bands, the warm foot from y 735); a farther ghost row across the west gap | `farStage` | `V2S1_far_stage.tsx` |
@@ -231,6 +232,6 @@ and a map), `s_lc.py` (pro_2's local contrast in boxes), `s_seam.py` (the corner
 `s_lint` (esbuild). An `npx esbuild` run once from the scratch folder fetched esbuild into npm's own cache (not the
 project: `package.json` and `node_modules` unchanged); every later run used the project's copy.
 
-**Next step:** the re-render of `deliverables/tests/poster_look_test_v1.mp4` (the clip's structure and master encode as
-in `REPORT.md` §6: PosterLookTest frames, `render-media.mjs --master`, the audio mux `s_audio.sh`), then REVIEW.md §7's
-re-check and REPORT.md §8's table.
+Found by the re-check and fixed before the final render: the unlit glass went grey under the ground storey's warm
+shade (check_light: C* 9 -> 13), and behind the glass (0.78-0.97 s) she was still v1's drawing (now the towpath's from
+the flood on her coat). **Next step:** none in this lane (the panel's gate, then the owner: `REPORT.md` §9).

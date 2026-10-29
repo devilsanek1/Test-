@@ -375,11 +375,12 @@ type PaneP = (a: number, c: number) => Pt;
  *  room keeps its furniture in silhouette (one or two dark shapes, kept low and off W's centre: the lit panes stay a
  *  step under W); every pane carries the lintel's shadow at its head (the window's depth). */
 /** (test/REVIEW.md MUST 3) An unlit pane's glass: the sky mirrored in v2's cool family, darker than the sky (L* 68 as
- *  shown, the glass's own hue), so W (L* 22) stays the one pane dark as a whole. */
-const unlitGlass = () => forTier(fromLch(68, 9, 195), 'environment');
+ *  shown, the glass's own hue), so W (L* 22) stays the one pane dark as a whole; C* 13 so the ground storey's warm
+ *  shade (the far city's) leaves it colour (C* ~10; at C* 9 it went grey: check_light). */
+const unlitGlass = () => forTier(fromLch(68, 13, 197), 'environment');
 /** Its reflection streak: one step lighter than the glass (L* 76, v1's sky white at 89 made a tier-C pane as busy as
- *  her: CRAFT §b's C cap 7). */
-const unlitStreak = () => forTier(fromLch(76, 8, 190), 'environment');
+ *  her: CRAFT §b's C cap 7), C* 12 for the same reason. */
+const unlitStreak = () => forTier(fromLch(76, 12, 192), 'environment');
 /** The lintel's shadow at a pane's head as the pane's own shade step (SHOULD 3: v1's eave-dark bar read as a line). */
 const lintelStep = (pane: string, base: string, dL: number) => multiply(pane, step(base, tierFormFor(pane, base, dL)));
 
