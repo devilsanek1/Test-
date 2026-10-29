@@ -17,7 +17,19 @@ Status: IN PROGRESS (this file is updated after each item; a usage limit can sto
 - Left: the docs that still route gate videos through the bare CLI or say "`GL=swangle` matches the CLI" (below).
 
 ## Item 3: chunked renders mux the premixed audio
-- Status: pending.
+- Status: IN PROGRESS (code done; the full-film test is running).
+- Changed: new `video/scripts/render/audio.mjs` (used by `render-media.mjs --parallel`, item 5). The audio is made ONCE
+  for the whole range and encoded exactly as renderMedia encodes a one-step render's (Remotion 4.0.538's own chain,
+  replayed with its own ffmpeg: preprocess `aformat`+`atrim` -> merge `apad`+`amix` -> libfdk_aac 320k ADTS -> mux with
+  the 2048-sample priming shift `-itsoffset -42667us`):
+  - **premixed** when the film's cues (`--cues`, default `public/<film>/cues.json` for `entry-<film>-film.tsx`) are
+    `{"audio": <file>, "sfx": []}` AND Remotion's own asset list at the range's first and last frame (a 0.4-0.9 s probe,
+    no screenshots) shows exactly that one file at volume 1 and rate 1, its media time advancing with the frames (this
+    also gives a shot composition's trim, e.g. Film2R-V2S4 starts the mix at frame 892);
+  - otherwise ONE audio-only pass (`--codec=wav`, seeks only) over the whole range, beside the video chunks, then the
+    same AAC encode (v3: the voice plus sound cues, so v3 takes this path).
+- Test so far (lane clip Film2R-V2S4, 342 frames, premixed with the 892-frame trim): the audio stream of the parallel
+  render is **MD5-equal to the one-step render's** (`5491f2a2...`): same 270 AAC packets, 5.717 s, start 0.
 
 ## Item 4: faster previews (bundle cache, one browser, one sheet call)
 - Status: DONE.
@@ -66,10 +78,46 @@ Status: IN PROGRESS (this file is updated after each item; a usage limit can sto
   the second pass fails, `render-frames.mjs` warns and still succeeds with 3-field lines (as today's ignored mask call).
 
 ## Item 5: `render-media.mjs --parallel=K` (review cuts and lane clips)
-- Status: pending.
+- Status: IN PROGRESS (code done; the full-film test is running).
+- Changed: `video/scripts/render-media.mjs` (cached bundle, one browser, auto entry, `--muted`, `--serve`, the
+  `--parallel` dispatch; the one-step path is otherwise the same code); new `video/scripts/render/parallel.mjs`.
+  K chunks cut on `film_chunks.py`'s boundaries (scene starts and its `--max 360` splits; the K-1 cuts that make the
+  longest chunk shortest, scene starts preferred) when the composition is the film's timeline, else K equal parts;
+  each chunk = a child `render-media.mjs --frames=a-b --muted` on the same bundle with the same encode flags
+  (`--master`, `--crf`, `--scale`, `--props`), its own browser; join = concat demuxer, stream copy, each chunk's exact
+  duration n/fps, `-video_track_timescale 90000`, the master's colour tags; then the audio of item 3; then a check of
+  the joined file (n frames, every pts step = 1/fps, else it fails and keeps the chunks). `--work=<dir>` keeps them.
+  `--parallel` with `--codec` other than h264 is refused.
+- Test, lane clip Film2R-V2S4 at 0.25 (2 chunks): 342 frames; every pts step exactly 1500/90000 s (341 steps); a
+  keyframe at the seam; the decoded frames of the joined file = the chunks' decoded frames in order (framemd5, 0 of
+  342 differ: no frame lost, doubled or moved); duration, start time and the audio as the one-step render's.
+- Speed, measured on V2S4 (342 frames, a shot that keeps all 4 cores busy):
+  | V2S4 | one step (c3) | `--parallel=2` (c2 each) | `--parallel=3` (c2) | `--parallel=3` (c1) | `--parallel=2` (c1) |
+  |---|---|---|---|---|---|
+  | full size, `--master` | 86.4 s | 87.8 s | 85.9 s | 91.2 s | 106.5 s |
+  | 0.5 scale | 23.8 s | 23.8 s | - | - | 28.0 s |
+  | 0.25 scale | 16.9 s | 26.2 s | - | - | - |
+  No gain on this shot: the box is CPU-bound already (render.md's gain was measured on V2S1, a lit shot capped by one
+  Chrome compositor thread). The full film decides (running).
 
 ## v1 couplings cut
-- Status: pending.
+- Status: DONE (checked against the current tree: lane C has moved `src/index.ts`, `src/entry-film.ts`, `src/dev/`
+  and `scripts/engine-numbers.mjs` to `video/archive/`).
+- `sheet.sh` no longer calls `engine-numbers.mjs --check` (it is archived; the check ran on every sheet).
+- `render-frames.mjs --entry=auto` no longer falls back to v1 (`src/dev/registry.ts`'s generated entries,
+  `src/entry-film.ts` for Main/S01.., `src/index.ts` for the rest: all three are gone, so today's script fails on any
+  command without `--entry`). Auto now picks the ONE `src/entry-*.tsx` that registers the composition (a literal
+  `id="X"`, else a template `id={`X-${...}`}`); none or several = exit 2 naming the candidates (before lane C's move,
+  `Animatic` was in both `entry-v2.tsx` and `entry-v3.tsx` and was refused as ambiguous; now it resolves to
+  `entry-v3.tsx`). A wrong pick cannot render the wrong film: `selectComposition` fails if the entry lacks the id.
+  Tested: Film2R, Film2R-V2S4, Film2RShot, Film3, Film3-SQD, Film3Seams, G3Demo, PosterS1, PosterS1-pass2, V2S1,
+  Cover2R, Animatic, ShotSketch resolve to their entry; Main, S07, KitDemo report none. The production keeps passing
+  `$E` (one less lookup, and it documents the film).
+  `render-media.mjs` gets the same auto default (it defaulted to `src/index.ts`, now gone). `--entry=full` still means
+  `src/index.ts` and says it is archived when it is missing.
+- `strip.sh` reads the composition's fps (via `render-frames.mjs`'s new `t0:t1:step` range) and passes `--entry`,
+  `--props` and `--concurrency` through (it dropped them, so it could only render v1's compositions). On a 30 fps
+  composition the strip is byte-equal to before; a 60 fps film gets every frame instead of every 2nd.
 
 ## Doc changes needed
 - (to fill)
