@@ -3,7 +3,8 @@
 > **Later owner rules that update this brief** (`docs/OWNER_PLAYBOOK.md` wins where they differ; the brief stays the
 > source for the channel, story selection and writing):
 > - **Length:** target 30-45 s, ending close to the payoff (v1's insights, 2026-10-25), not §11's 45-60 s; keep §11's
->   order (hook, stakes, explanation, twist, payoff) inside it.
+>   order (hook, stakes, explanation, twist, payoff) inside it, the twist only when the story needs it ("Only what the
+>   story needs", below).
 > - **Sound effects:** more of them, our own positive phone sounds (a like pop, a notification ding) with one in the
 >   first second (2026-10-25); §20-21's "only where they communicate something" still holds for each one: every
 >   sound marks something on screen.
@@ -24,6 +25,19 @@
 >   a memorable unexpected way" to what a listener needn't decode (no idioms, slang or irony); RULE #1 still holds, and
 >   the line must also be understood at once. The method and the check: the playbook, "CLEAR TO A REGULAR PERSON ON
 >   ONE HEARING".
+> - **Only what the story needs (owner, 2026-10-29: no side quests):** a beat that doesn't carry the one story to its
+>   payoff goes, however true, weird or fun (v4's 2010 data center under a cathedral, its "twist" since G0); a sentence
+>   may keep the words that make it natural or clearer. This narrows §11's twist (only when the story needs it), §13's
+>   "something worth knowing every 3–5 seconds" (a step of the one story, never an extra fact) and §22's "COMPRESS
+>   AGGRESSIVELY" (the facts, never the words that make a line natural or clear). The rule: the playbook, ONE
+>   SUBJECT, GONE DEEP.
+> - **Human connectors (owner, 2026-10-29):** a few (about two to four a film), placed tactically where a join needs a
+>   hand, are wanted: "To put that into perspective," "Actually," "So," "Now," and, when they do real work, the El Niño
+>   reference's "So how does it work?" (then answered at length) and "Or in other words," (a plain restatement right
+>   after a term's definition; `docs/voice/refs/2026-10-29_el_nino/README.md`), which RULE #1 no longer bans; its
+>   stock reveals ("Here's the thing", "The catch?", "Turns out", "Let that sink in"), "The result? X." and "In other
+>   words, [zinger]" stay banned. With them, up to three flowing long sentences may run in a row, with a short line at
+>   each turn (the playbook, Script and voice: "Human connectors, placed TACTICALLY" and Rhythm).
 > - **Freshness:** news from about the last month, weighed below relevance, visual appeal, mood and truth (owner,
 >   2026-10-28), not "ideally the past 24-72 h" (§4-8); the full topic criteria: `docs/TOPIC_CRITERIA.md`.
 > - The notes on "THIS script" and the PHP lines below are video 1's (history).

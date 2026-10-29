@@ -204,8 +204,8 @@
     {
       "id": "R2.1",
       "level": "MUST",
-      "what": "the structure's worked example (PRINCIPLES: How each sentence hands the next its subject): no flag",
-      "text": "Did you know Helsinki wants AI to heat seventy thousand homes? AI runs on giant computers, in buildings called data centers. Those computers get really hot. Just one stack of them gives off as much heat as forty kettles, boiling non-stop. In most data centers, big fans just blow that heat outside. But Helsinki wants that heat.",
+      "what": "the structure's worked example (PRINCIPLES: How each sentence hands the next its subject; since 2026-10-29 with the owner's connector before the kettles): no flag",
+      "text": "Did you know Helsinki wants AI to heat seventy thousand homes? AI runs on giant computers, in buildings called data centers. Those computers get really hot. To put that into perspective, just one stack of them gives off as much heat as forty kettles, boiling non-stop. In most data centers, big fans just blow that heat outside. But Helsinki wants that heat.",
       "exit": 0,
       "errors": 0,
       "warnings": 0
@@ -709,6 +709,98 @@
               "chips"
             ],
             1
+          ]
+        }
+      }
+    },
+    {
+      "id": "R5.17",
+      "level": "ADDED",
+      "what": "the owner's own connector, 'To put it into perspective,' (v4 G1 draft 3, 2026-10-29): no W11 for its words, no W1 on its 'it' (before the fix: W11 '5 words before the subject')",
+      "text": "Those computers get really hot. To put it into perspective, just one of these computers makes as much heat as FORTY kettles, boiling non-stop.",
+      "lines": {
+        "2": {
+          "none": true
+        }
+      }
+    },
+    {
+      "id": "R5.18",
+      "level": "ADDED",
+      "what": "the El Niño reference's connectors, as heard (2026-10-29): 'So how does it work?' (no W2: 'does' is the question's auxiliary; its 'it' is El Niño, prominent and recent), 'Or in other words,', 'Normally,' raise no flag of their own (before the fix: W2 'does it')",
+      "text": "El Niño has a sixty-nine percent chance of breaking every climate record in human history, and people aren't really ready for it. So how does it work? El Niño is a change in the surface temperatures of water in the tropical Pacific. Or in other words, El Niño is when ocean water that belongs on one side of the planet is moving to the other side. Normally, trade winds blow west, piling up shallow, warm water against Indonesia and pulling up deeper, colder water off the coast of South America.",
+      "lines": {
+        "2": {
+          "none": true
+        },
+        "4": {
+          "only": true,
+          "may": [
+            [
+              "W8",
+              "Niño"
+            ]
+          ]
+        },
+        "5": {
+          "none": true
+        }
+      }
+    },
+    {
+      "id": "R5.19",
+      "level": "ADDED",
+      "what": "'Actually,', 'So,', 'Now,' and 'The result is that' (no W4 on 'The result') raise no flag of their own (2026-10-29)",
+      "text": "Giant computers make a lot of heat. The result is that big fans blow that heat outside. Actually, Helsinki wants that heat. So Helsinki has a plan. Now, the plan starts in twenty twenty-seven.",
+      "exit": 0,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "id": "R5.20a",
+      "level": "ADDED",
+      "what": "the 'it' of 'So how does it work?' is still a pointer: after a line with two things it could mean, C2 (the playbook: a short line keeps its noun), never W2 (2026-10-29)",
+      "text": "But Helsinki wants that heat. So how does it work?",
+      "lines": {
+        "2": {
+          "has": [
+            [
+              "C2",
+              "it"
+            ]
+          ],
+          "not": [
+            [
+              "W2"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "R5.20b",
+      "level": "ADDED",
+      "what": "the pro-verb stays W2 beside a question's auxiliary: 'But how does it do that?' gives W2 'do that', not 'does it' (2026-10-29)",
+      "text": "Helsinki heats homes with computers. But how does it do that?",
+      "lines": {
+        "2": {
+          "has": [
+            [
+              "W2",
+              "do that"
+            ]
+          ],
+          "not": [
+            [
+              "W2",
+              "does it"
+            ],
+            [
+              "C2"
+            ],
+            [
+              "W1"
+            ]
           ]
         }
       }

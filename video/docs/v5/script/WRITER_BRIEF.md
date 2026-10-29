@@ -44,3 +44,10 @@ on one hearing (the playbook, Script and voice, "CLEAR TO A REGULAR PERSON ON ON
 `video/docs/retro/2026-10-29_script_clarity/PRINCIPLES.md`): the writer's clarity pass with the film's word list
 `script/clarity.json` and `video/scripts/voice/check_clarity.py` OK beside the other two checks, then the critic's cold
 viewer panel (`video/docs/PIPELINE_V2.md`, G1).
+
+**No side quests, and human connectors (owner, 2026-10-29, on video 4's draft 2):** the beats under "Go deep" are
+candidates, not a checklist: keep only what the bunker story needs to reach its payoff (cut each beat in your head; if
+the viewer still gets the story and the payoff, it stays cut: the playbook's "No side quests"; PRINCIPLES P10), and
+place about two to four human connectors where a join needs a hand ("To put that into perspective," "Actually,"
+"So," "Now," and the El Niño reference's "So how does it work?" and "Or in other words,": the playbook's "Human
+connectors, placed TACTICALLY"; P11), never a RULE #1 stock reveal.

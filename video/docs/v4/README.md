@@ -12,14 +12,20 @@ The earlier v4 session (https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt)
 |---|---|---|
 | G0 topic + core line | topic LOCKED: Helsinki (one city); core line proposed by the writer (default: "Your chatbot could heat a flat in Helsinki.") | `G0_TOPIC.md` |
 | Fact lock | shared with video 5 (one fact file): `video/docs/v5/research/factlock.md` sections 2, 6, 7.1-7.4, 8 | |
-| G1 script | DRAFT 2 SENT, waiting on the owner (2026-10-29 ~16:00 UTC): 124 words, ~44 s, five cold panels, all checks OK | `script/script_g1.md`, `script/script_elevenlabs.md`, `THROUGHLINE.md` |
+| G1 script | DRAFT 3 SENT, waiting on the owner (2026-10-29 ~18:30 UTC): 123 words, ~44 s, all checks OK | `script/script_g1.md`, `script/script_elevenlabs.md`, `THROUGHLINE.md` |
 | G2 voice | after the owner approves the script; voice `MQnUCZUAQLYMCY1Ztz6d` ("Lady1", the owner's try, 2026-10-29: `docs/voice/VOICE.md`); a valid key works in THIS session only (pasted in the chat, used inline, never filed), so G2 runs here; the voice tools are set up in the scratchpad | `public/v4/` |
 
 **Video 4 is produced by session https://claude.ai/code/session_01VwsUCnkJXFuq3YwEYFUg7o since 2026-10-29 ~10:05 UTC**
 (owner: "lets work on the video 4 - pick up where its been left off"), on branch `claude/kind-pascal-lvgsza` (from
 `video-production` at ce5270f; merged into `video-production` at the owner's yes).
 
-**G1 DRAFT 2 SENT TO THE OWNER (2026-10-29 ~16:00 UTC), waiting on their yes:** after the owner's notes on draft 1 ("too
+**G1 DRAFT 3 SENT TO THE OWNER (2026-10-29 ~18:30 UTC), waiting on their yes:** the owner's notes on draft 2 (no side quest:
+the 2010 cathedral cut; human connectors, tactically) and their El Niño voice reference (`docs/voice/refs/2026-10-29_el_nino/`)
+-> draft 3 (workflow `v4-g1-draft3b`: writer, cold panel + critic, two fix rounds with re-hears), then the orchestrator
+restored "your chatbot" (`script/script_g1.md`, "Orchestrator note: the core line"): 123 words, ~44 s at 2.87 words/s,
+all three checks OK. Re-check at G8: "starting next year" (line 8) is true while the post goes out in 2026.
+
+Earlier: **G1 DRAFT 2 SENT TO THE OWNER (2026-10-29 ~16:00 UTC), waiting on their yes:** after the owner's notes on draft 1 ("too
 ambiguous and weird", `OWNER_NOTES.md`), the script-clarity work (`docs/retro/2026-10-29_script_clarity/`: research,
 PRINCIPLES.md, the rules integrated, `check_clarity.py`) reworked it: draft 2, its critic and fix pass, then fix rounds
 1-3 on five cold three-viewer panels (`script/panel/`, `panel_r2/` to `panel_r5/`): 124 words, ~44 s, all three checks

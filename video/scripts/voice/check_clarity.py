@@ -32,12 +32,17 @@ Warnings: W1 a pointer with rivals in a longer line; W2 a pointer at a whole ide
           "like" that doesn't say what is alike; W11 more than 4 words before the subject; W12 more than one step;
           W13 a rival name for the film's thread object (needs the film's list).
 The lists sit at the top of this file. When the panel or the owner finds a line the lint missed or flagged wrongly,
-the fix and that line (a case in clarity_tests/cases.json) go in the same commit.
+the fix and that line (a case in clarity_tests/cases.json) go in the same commit. The owner's human connectors
+("To put that into perspective,", "Actually,", "So,", "Now,", "Normally,", "Or in other words,", "So how does it
+work?": playbook, Script and voice, "Human connectors, placed TACTICALLY") are wanted, so none of them raises a flag
+of its own (CONNECTORS, below); the "it" of "So how does it work?" is still a pointer, checked like any other.
 
 Regression (--selftest; clarity_tests/cases.json, R1-R5 of LINT_SPEC.md section 4): v4's G1 draft 1 FAILs on the
 owner's lines for the owner's reasons and flags nothing on line 1; the clean rewrites in PRINCIPLES.md pass with no
 warning; the Big Bend opening passes; v1, v2, v3 and v5 draft 1 give the spec's errors; the spec's unit cases hold;
-plus 5 cases (R5.12-R5.16) for the false flags found while building it (pronoun chains, one flag per span, ...).
+plus 5 cases (R5.12-R5.16) for the false flags found while building it (pronoun chains, one flag per span, ...) and
+5 (R5.17-R5.20b) for the owner's connectors (2026-10-29: no flag of their own; the auxiliary of "how does it work?"
+is no "do it"; its "it" is still a pointer).
 
 Libraries (the playbook's "Find the PRO way and the pro tools"; the full comparison is in LINT_REPORT.md):
 - spaCy 3.8.18 + en_core_web_sm 3.8.0 (MIT; deterministic on CPU; a 15 MB model): parts of speech, lemmas, number
@@ -146,6 +151,15 @@ SOFT_FIGURES = re.compile(r"(?<![\w'-])(?:(?:get|gets|got|getting) a boost|(?:gi
 SCOLDING = re.compile(r"(?<![\w'-])(?:(?:nobody|no one|no-one)(?:'s| is| was| has)? even|not even|"
                       r"(?:can't|cannot|couldn't|doesn't|didn't|won't|isn't|aren't|wasn't|weren't|don't|haven't|hasn't) even|"
                       r"of course|how dare|shameful|outrageous|scandal|scandals|scandalous|ridiculous)(?![\w'-])", re.I)
+# The owner's human connectors (playbook, Script and voice: "Human connectors, placed TACTICALLY"; the El Niño
+# reference, docs/voice/refs/2026-10-29_el_nino/): wanted where a join needs a hand, so a sentence's opening connector
+# is no flag of its own: its words don't count before the subject (W11), and its "that" / "it" and "the result" are
+# the connector's, not pointers or first mentions (W1, W2, W4), nor pronoun candidates later. "So how does it work?"
+# needs no entry: its "does" is the question's auxiliary, not the pro-verb "do it" (W2), and its "it" is a pointer
+# like any other (C2, W1: one obvious target, as El Niño is in the reference). RULE #1's stock reveals ("Here's the
+# thing", "The catch?") are no connectors: the critic catches them ("Turns out" is W6's).
+CONNECTORS = re.compile(r"\s*(?:(?:and|but|so|or|now),?\s+)?(?:to put (?:that|it|this) (?:in|into) perspective|"
+                        r"in other words|actually|normally|now|so|the result is that)(?![\w'-]),?", re.I)
 # W4: nouns any listener knows with "the" from the start (the film's "unique" adds its own)
 UNIQUE = {"world", "sun", "moon", "sky", "air", "sea", "ocean", "weather", "internet", "news", "planet", "earth",
           "future", "past", "rest", "end", "same", "way", "first", "last", "top", "bottom", "middle", "winter",
@@ -430,6 +444,8 @@ def lint_text(text, film=None, label="(text)"):
     chain, pointers, rare, allowed_rare, allowed_hits, resolved = [], [], [], [], {}, {}
     numbers_total, out = 0, []
     idioms_by_line = [[(m.start(), m.end()) for rx in (IDIOMS, SOFT_FIGURES) for m in rx.finditer(x)] for x in ana]
+    conn_by_line = [[m.span()] if (m := CONNECTORS.match(x)) else [] for x in ana]  # the owner's connectors
+    no_thing = [idioms_by_line[k] + conn_by_line[k] for k in range(len(ana))]  # no thing for a pronoun to point at
 
     def allowed(*words):
         for w in words:
@@ -442,6 +458,7 @@ def lint_text(text, film=None, label="(text)"):
     for i, (s, d, a) in enumerate(zip(sents, docs, ana)):
         flags, low = [], a.lower()
         prev_a = ana[i - 1] if i > 0 else ""
+        conn = conn_by_line[i]  # the sentence's opening connector, if any: never a flag of its own
         F = lambda code, st, en, msg, q: flags.append(Flag(code, st, en, s[st:en], msg, q))
 
         # C1: tech words (and the film's trade words), described plainly at their first use or flagged once
@@ -501,7 +518,7 @@ def lint_text(text, film=None, label="(text)"):
                   'plain situation, kindly', "How does this line sound to you: kind, funny or angry?")
 
         # C2 / W1: pointers
-        pointer_flags(i, docs, nwords, ana, F, pointers, idioms_by_line, resolved)
+        pointer_flags(i, docs, nwords, ana, F, pointers, no_thing, resolved, conn)
 
         # W2: a pointer at a whole idea
         m = re.match(r"(?:and |but |so )?(that's|that is|this is|that was|this was)\b"
@@ -515,12 +532,15 @@ def lint_text(text, film=None, label="(text)"):
             F("W2", m.start(1), m.end(1), '"Which" points at a whole idea. Say the thing', 'What does "which" point at here?')
         did = []
         for m in re.finditer(r"\b(?:do|does|did|doing|done) (?:it|that)\b", low):
+            if aux_do(d, m.start()):
+                continue  # "So how does it work?": the question's auxiliary; its "it" is a pointer (C2 / W1)
             did.append((m.start(), m.end()))
             F("W2", m.start(), m.end(), f'"{s[m.start():m.end()]}": which action? Say what is done',
               f'What does "{s[m.start():m.end()]}" mean here?')
         for t in d:
             if t.lower_ in ("this", "that") and t.pos_ == "PRON" and t.dep_ in ("dobj", "pobj") and \
-               not inside(t.idx, did) and not inside(t.idx, idiom_spans):  # "pass that on" is W6's
+               not inside(t.idx, did) and not inside(t.idx, idiom_spans) and not inside(t.idx, conn):
+                # "pass that on" is W6's; "To put that into perspective," is the owner's connector
                 F("W2", t.idx, t.idx + len(t), f'"{t.text}": a whole idea as a pronoun. Say what it is',
                   f'What is "{t.text}" here?')
 
@@ -541,6 +561,8 @@ def lint_text(text, film=None, label="(text)"):
             det, lem, lw = dets[0], t.lemma_.lower(), t.lower_
             if lem in unique or lw in unique or lem in TIME_MEASURE or lw in TIME_MEASURE or inside(t.idx, idiom_spans):
                 continue  # "by the mountain", "the smart move": the idiom's flag asks already
+            if inside(t.idx, conn):
+                continue  # "The result is that ...": the owner's connector, not a first mention
             if lem in heard or lw in heard or lem in {x.lemma_.lower() for x in d[: t.i]} | {x.lower_ for x in d[: t.i]}:
                 continue
             if any(c.dep_ in ("relcl", "acl") for c in t.children) or \
@@ -579,7 +601,7 @@ def lint_text(text, film=None, label="(text)"):
         for t in d:
             if t.pos_ not in ("NOUN", "VERB", "ADJ", "ADV", "PROPN") or is_num(t) or not re.search(r"[a-z]", t.lower_):
                 continue
-            if inside(t.idx, covered) or inside(t.idx, idiom_spans):
+            if inside(t.idx, covered) or inside(t.idx, idiom_spans) or inside(t.idx, conn):
                 continue
             z = best_zipf(t)
             if z >= RARE:
@@ -625,10 +647,12 @@ def lint_text(text, film=None, label="(text)"):
             subj = [t for t in d if t.dep_ in ("nsubj", "nsubjpass", "expl", "csubj")]
             if subj:
                 first = min(x.i for x in subj[0].subtree)
-                n = words_before(d, first)
+                after = conn[0][1] if conn else 0  # the owner's connector ("To put that into perspective,") is no word
+                n = words_before(d, first, after)
                 if n > 4:
-                    F("W11", 0, d[first].idx, f"{n} words before the subject: start with who or what (a place or "
-                      'time signpost of 4 words, "In most data centers,", is fine)', "Say this line back in your own words.")
+                    F("W11", min(after, d[first].idx), d[first].idx, f"{n} words before the subject: start with who or "
+                      'what (a place or time signpost of 4 words, "In most data centers,", is fine)',
+                      "Say this line back in your own words.")
 
         # W12: more than one step
         frame = re.match(r"(?:did|do) you know(?: that)?\b", low)
@@ -722,8 +746,16 @@ def c1_question(surface, d, m):
     return f'What is {"an" if w[:1] in "aeiou" else "a"} {surface}?'
 
 
-def pointer_flags(i, docs, nwords, ana, F, pointers, idioms, resolved):
-    """C2 / W1: each it / they / them / their with its candidates, the reading a script can pick, and why."""
+def aux_do(d, char):
+    """'So how does it work?', 'Did it work?': an auxiliary 'do' before its clause's subject, not the pro-verb 'do it'."""
+    t = next((x for x in d if x.idx == char), None)
+    return t is not None and t.dep_ == "aux" and t.i + 1 < len(d) and d[t.i + 1].dep_ in ("nsubj", "nsubjpass")
+
+
+def pointer_flags(i, docs, nwords, ana, F, pointers, idioms, resolved, conn=()):
+    """C2 / W1: each it / they / them / their with its candidates, the reading a script can pick, and why.
+    idioms: per line, the spans with no thing to point at (idioms, figures, the owner's connectors); conn: this line's
+    connector span ("To put it into perspective,": its "it" is the idea just said, no pointer to resolve)."""
     d = docs[i]
     naming = bool(NAMING.search(ana[i].lower()))
     asked = set()
@@ -731,8 +763,10 @@ def pointer_flags(i, docs, nwords, ana, F, pointers, idioms, resolved):
         low = t.lower_
         if low not in PRONOUNS or t.pos_ != "PRON" or (low == "it" and t.dep_ == "expl"):
             continue
-        if t.i > 0 and d[t.i - 1].lemma_.lower() == "do":
-            continue  # "do it" is W2's
+        if inside(t.idx, conn):
+            continue
+        if t.i > 0 and d[t.i - 1].lemma_.lower() == "do" and not aux_do(d, d[t.i - 1].idx):
+            continue  # "do it" is W2's; the "it" of "So how does it work?" is a pointer like any other
         plural = PRONOUNS[low]
         window, j = [], i - 1
         while j >= 0:  # the line before, extended back over verbless fragments ("by the mountain.")
@@ -851,10 +885,13 @@ def what_question(d, t):
     return q[:1].upper() + q[1:] + "?"
 
 
-def words_before(d, end):
-    """W11: words before the subject; a number counts as one, a hyphenated word as one, a leading join as none."""
+def words_before(d, end, after=0):
+    """W11: words before the subject; a number counts as one, a hyphenated word as one, a leading join as none, and
+    so is the owner's connector (the characters before `after`: "To put that into perspective,")."""
     n, prev_num = 0, False
     for t in d[:end]:
+        if t.idx < after:
+            continue
         if t.i == 0 and t.lower_ in LEADS:
             continue
         if t.is_punct:

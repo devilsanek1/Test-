@@ -84,10 +84,17 @@ Quality and output value come first, spent where it reaches the film. Ideas are 
   cost about $150 on v4 and its four judges barely separated the top lines: never by default.
 - **G1 script = story first, clear on one hearing (owner, 2026-10-26 and 2026-10-29; lean since 2026-10-28):** one
   writer (1) drafts 2-3 competing story spines (the throughline question, the viewer's situation, beats joined by
-  but/so, the turn, the payoff that lands the core line) and picks one, with its reason; (2) writes the script with
-  cues, in the beat order of `docs/retro/2026-10-29_script_clarity/PRINCIPLES.md` ("How a 40-second script is
-  structured"); (3) **the clarity pass:** fills the film's word list `docs/vN/script/clarity.json` (the thread
-  object's one everyday name and its rivals, the film's trade words with their plain descriptions, any allowed word
+  but/so, the turn, the payoff that lands the core line) and picks one, with its reason, then gives every beat its job
+  in one line and runs **the side-quest test** (playbook ONE SUBJECT, GONE DEEP: "No side quests"; PRINCIPLES P10): cut
+  each beat in your head, and if the viewer still gets the story and the payoff, it stays cut, however true, weird or
+  fun (only the information the story needs; a sentence may still grow where its words make it more natural or
+  clearer); (2) writes the script with cues, in the beat order of
+  `docs/retro/2026-10-29_script_clarity/PRINCIPLES.md` ("How a 40-second script is structured"), with about two to
+  four **human connectors** at the joins that need a hand, each true to the sentence it opens and named with its job
+  in the script doc's notes (playbook "Human connectors, placed TACTICALLY"; PRINCIPLES P11, "Where the connectors
+  go"), never a RULE #1 stock reveal; (3) **the clarity pass:** fills the film's word list
+  `docs/vN/script/clarity.json` (the thread object's one everyday name and its rivals, the film's trade words with
+  their plain descriptions, any allowed word
   with its reason; format: `docs/retro/2026-10-29_script_clarity/LINT_SPEC.md` section 3), writes "What I mean is:
   ___" in the script doc's notes under every line that leans on what the writer knows, and runs `check_clarity.py`
   (it reads `clarity.json` by itself), `check_rhythm.py` and `check_paste.py` until all three print OK
@@ -98,15 +105,21 @@ Quality and output value come first, spent where it reaches the film. Ideas are 
   and after each sentence reports what they understood (in their own words), the words they missed or took another
   way, what each "it", "they", "this", "that" and new "the X" points at, and their thumb (stays, unsure, swipes) with
   why; after the first sentence each also answers "ad or news?" (an ad-like or baity opening fails: playbook, never
-  baity); (b) the cold retell (a list-like retelling fails); then (c) the lint's targeted questions
-  (`check_clarity.py --questions`) put to the same three viewers; (d) the flow (every line follows from the previous)
-  and the facts against the fact file. **A clarity finding** is any line a viewer retells wrong or can't retell, a
+  baity); after the last, each also names the sentence they could lose without missing anything the story needs (or
+  "none") and where it sounded most like a real person talking to them and most like a script or an ad (or "none");
+  (b) the cold retell (a list-like retelling fails); then (c) the lint's targeted questions
+  (`check_clarity.py --questions`) put to the same three viewers; (d) the flow (every line follows from the previous;
+  every beat has its job, no side quest; the connectors, about two to four, each doing real work) and the facts
+  against the fact file. **A clarity finding** is any line a viewer retells wrong or can't retell, a
   word one of them doesn't know or takes in another sense, a pointer one of them resolves wrongly or not at all, a
   line one of them had to re-link to an earlier one, or an "unsure" or "swipe" thumb; each is listed by line, with
-  the viewer's own words and a plainer line, and never waved through as "paid off by the next line". The panel's list
-  is complete and all of it is fixed; the critic's other findings stay at most 6. Then one fix pass by the same
-  writer (resumed, not restarted): every panel line rewritten, the three checks re-run, and the critic (resumed)
-  re-hears each changed line as the three viewers, with the line before and after it, until no changed line snags.
+  the viewer's own words and a plainer line, and never waved through as "paid off by the next line". A sentence a
+  viewer could lose gets the side-quest test (it goes unless the story or the payoff needs it; the critic says which),
+  and a line heard as a script or an ad is rewritten the way a person would say it (a connector where the join needs
+  a hand); both are on the panel's list. The panel's list is complete and all of it is fixed; the critic's other
+  findings stay at most 6. Then one fix pass by the same writer (resumed, not restarted): every panel line
+  rewritten, the three checks re-run, and the critic (resumed) re-hears each changed line as the three viewers, with
+  the line before and after it, until no changed line snags.
   The through-line card's carriers come from the script's joins (G1 row). Never structure a script as a list of facts
   to prove. **Rhythm (owner, 2026-10-27):** short sentences (<= 5 words) break up the long ones, at least one after
   at most three long sentences (three only when they flow, joined by connectors: the El Niño reference,
@@ -114,9 +127,10 @@ Quality and output value come first, spent where it reaches the film. Ideas are 
   `scripts/voice/check_clarity.py` (exit 0) before it goes to the owner. The heavy version (~12 agents:
   `v3-g1-story-*.js`) runs only on request.
   - **The three viewers** (each card says what that viewer doesn't know, because a played panel knows every word; each
-    hears one sentence at a time, once, and answers only from that sentence and the ones before it; they may run as
-    three small cold agents instead, the narration inline, no file read, the card as the persona: v4 G1 did, and all
-    three snagged on a line every check had passed, "Nothing is built yet."; never more than three):
+    hears one sentence at a time, once, and answers only from that sentence and the ones before it, then the two
+    questions at the end, (a) above: the sentence they could lose, and where it sounded like a person or a script;
+    they may run as three small cold agents instead, the narration inline, no file read, the card as the persona: v4
+    G1 did, and all three snagged on a line every check had passed, "Nothing is built yet."; never more than three):
     1. **A non-native English speaker** (24, in São Paulo, Jakarta or Kraków; learned English at school; watches Reels
        with the captions on): knows everyday words and takes each in its most common, literal sense; knows no idioms
        beyond the most basic, no slang, no American cultural references; knows world-famous names only (Google,

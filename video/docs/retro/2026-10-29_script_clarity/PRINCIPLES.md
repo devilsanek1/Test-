@@ -1,24 +1,28 @@
 # Script clarity: the principles (2026-10-29)
 
-**Status: DONE.** Distilled from the owner's notes on video 4's G1 draft 1 (`video/docs/v4/OWNER_NOTES.md`, last
-entry), grounded in the two research lanes (`research_ear.md`, `research_explainers.md`: every source below is opened
-and listed there) and checked against our own scripts, v1 to v5, read as one corpus (the table at the end). The rule
-text for each doc is in `RULES_DRAFT.md`; the check is specified in `LINT_SPEC.md`.
+**Status: DONE; updated 2026-10-29 with P10 and P11 (`INTEGRATION_2.md`).** Distilled from the owner's notes on
+video 4's G1 draft 1 (`video/docs/v4/OWNER_NOTES.md`: the line-by-line clarity notes), grounded in the two research
+lanes (`research_ear.md`, `research_explainers.md`: every source below is opened and listed there, except P10's three,
+opened for the update) and checked against our own scripts, v1 to v5, read as one corpus (the table at the end). P10
+and P11 come from the owner's notes on draft 2 (the entry after: "too much of a sidequest"; "add more human /
+conversation like sentences TACTICALLY") and the El Niño voice line the owner rates "directionally good"
+(`video/docs/voice/refs/2026-10-29_el_nino/`). The rule text for each doc is in `RULES_DRAFT.md` (for P10 and P11: the
+playbook's own two bullets); the check is specified in `LINT_SPEC.md`.
 
 **Who we write for:** the biggest audience on TikTok, Reels and Shorts, worldwide. Regular people, not tech people;
 many learned English at school. They hear each line ONCE, at feed speed, reading the captions as it plays, and they
 can't rewind. One confusing sentence is a swipe.
 
 **Every "good" line below is an illustration, not the rework.** Each one stays inside video 4's fact lock
-(`video/docs/v5/research/factlock.md`) and passes the clarity check's prototype with no flag. The rework writes the
-real lines.
+(`video/docs/v5/research/factlock.md`) and passes the clarity check (its prototype, then `check_clarity.py` itself)
+with no flag; P11's El Niño lines are the owner's reference, quoted as heard. The rework writes the real lines.
 
 Strength of a source: **study** (an experiment, or a review of them), **style guide** (a newsroom's, a government's or
 a standards body's rules), **practitioner** (a working writer's advice), **ours** (measured here).
 
 ---
 
-## The 9 principles
+## The 11 principles
 
 ### 1. Tell it like news you'd pass to a friend
 - **The principle:** every sentence passes the owner's own question: "is that sentence good and will be received well
@@ -87,7 +91,8 @@ a standards body's rules), **practitioner** (a working writer's advice), **ours*
 
 ### 5. One new idea per sentence, hooked onto what the last one ended on
 - **The principle:** each sentence starts from something the listener already has and ends on its one new part; the
-  next sentence picks that part up. The joins are said and true ("but", "so", "because"), and no step is skipped.
+  next sentence picks that part up. The joins are said and true ("but", "so", "because"), and no step is skipped;
+  where a join needs a hand, a human connector says what kind of sentence comes next (P11).
 - **Draft 1, the same failure in lines the owner didn't flag:** "Luckily, those chips are water-cooled. So their warm
   water gets a boost from heat pumps, then runs under the snow, into people's radiators." (Why "luckily"? Then three
   steps in one breath.) -> "These computers are cooled with water, so the water gets warm. Machines called heat pumps
@@ -165,42 +170,104 @@ a standards body's rules), **practitioner** (a working writer's advice), **ours*
   https://thejournal.com/articles/2015/05/05/watching-videos-does-not-necessarily-lead-to-learning.aspx).
 - **The test:** the G1 critic's cold viewer panel: three regular people (a non-native English speaker, a non-tech
   adult, a fast-scrolling teen) hear each sentence once and say what they understood, the words they missed, what
-  each "it" points at, and whether their thumb stays. One wrong, unsure or re-linked line, and it is rewritten.
+  each "it" points at, and whether their thumb stays; at the end, the sentence they could lose (P10) and where it
+  sounded most like a person talking and most like a script (P11). One wrong, unsure or re-linked line, and it is
+  rewritten.
+
+### 10. Only what the story needs: no side quests
+- **The principle:** every beat carries the one story toward its payoff. A beat that doesn't goes, however true, weird
+  or fun, and a fact the story doesn't need is never added. Words are not facts: a sentence may grow where its words
+  make it more natural or clearer (a connector, the plain words); the film never carries more facts than its story
+  needs.
+- **The owner's example:** draft 2's "Computers have heated Helsinki before. In twenty ten, a small data center under
+  a cathedral started heating homes." -> "you are again packing more information than needed in the short update -
+  its actually okay to keep the text longer if needed, but you are having again too much of a sidequest ... the
+  sidequest that doesn't really add much to the story". The cathedral had been the film's "twist" since G0; cut, the
+  story and its payoff stand unchanged. Video 5's draft 1 made the same mistake at the size of a film: orbit, a
+  mountain in Italy, the sea off Shanghai, Stockholm, then Helsinki in 43 s (the playbook's ONE SUBJECT, GONE DEEP).
+- **The research:** interesting but irrelevant details ("seductive details") made readers recall fewer of the main
+  ideas and come up with fewer solutions to new problems (Harp and Mayer 1998, four experiments with 357 students,
+  study: https://doi.org/10.1037/0022-0663.90.3.414); across 39 measured effects the cost holds, small to medium for
+  recall and medium for using what was learned (Rey 2012, a meta-analysis, study:
+  https://doi.org/10.1016/j.edurev.2012.05.003; again in Sundararajan and Adesope 2020, a meta-analysis, study:
+  https://doi.org/10.1007/s10648-020-09522-4). Those were readers, who can look back; our viewer hears each line once.
+- **The test:** at the spine (G0's beats, then G1's), give every beat its job in one line: what it carries toward the
+  payoff. Then cut each beat in your head: if the viewer still gets the story and the payoff, it stays cut. The one
+  joke is the exception the brief allows (§13: one bit of personality) because it adds no fact: it is the plain
+  situation of a beat the story already has (P7); a joke that needs a fact or a place of its own is a side quest. The
+  cold panel names the sentence it could lose (P9).
+
+### 11. Human connectors where a join needs a hand
+- **The principle:** a few spoken words a person telling a friend would use, at the joins that need a hand, each true
+  to the sentence it opens: "To put that into perspective," before a comparison or a big number; "Actually," before
+  the part that surprises; "So," at a consequence; "Now," when the story moves on; "Normally," before the usual case;
+  "So how does it work?" before the mechanism (the viewer's own question said aloud, then answered at length); "Or in
+  other words," right after a term's definition, before its plain restatement; "The result is that" before the
+  consequence. About two to four in a film, never on every line. They are not RULE #1's tells (the stock reveals
+  "Here's the thing", "The catch?", "Turns out", "Let that sink in"; a self-answered "The result? X."; "In other
+  words," before a zinger), which promise drama and name nothing: those stay banned.
+- **The owner's example:** on draft 2's "Just one of them makes as much heat as FORTY kettles, boiling non-stop.": "i
+  want to say something like 'to put it into perspective' or something like this. or something like 'Actually' / 'so'
+  that just adds a bit more human to it" -> "To put that into perspective, just one stack of them gives off as much
+  heat as forty kettles, boiling non-stop." Then the El Niño line the owner rates "directionally good" (its first word
+  is cut off in the clip): "... and people aren't really ready for it. So how does it work? El Niño is a change in the
+  surface temperatures of water in the tropical Pacific. Or in other words, El Niño is when ocean water that belongs
+  on one side of the planet is moving to the other side. Normally, trade winds blow west, ..." Its connectors also
+  carry its long sentences: three in a row (15, 24 and 24 words), each one spoken thought.
+- **The research:** second-language students recalled a lecture better when it had markers that show its
+  organization (macro markers, which say what part comes next) than when it had only the small links between
+  sentences (micro markers, such as "so", "now", "well") (Chaudron and Richards 1985, study:
+  https://eric.ed.gov/?id=ED259565); audio has no headings, so "You need deliberate transitions", which "can be
+  explicitly narrated", and "If your listener can't follow along they are more likely to stop listening" (NPR
+  Training, style guide:
+  https://www.npr.org/sections/npr-training/2025/05/30/g-s1-65814/the-journey-from-print-to-radio-storytelling-a-guide-for-navigating-a-new-landscape).
+  So the connectors that say what comes next ("So how does it work?", "To put that into perspective,", "Or in other
+  words,", "Normally,") do the listener's work; the small ones ("So,", "Now,", "Actually,") are there for the voice,
+  the owner's "a bit more human", and stay few.
+- **The test:** for each connector, name the job of the sentence it opens (a comparison, a surprise, a consequence, a
+  move on, the usual case, the mechanism, a plain restatement); a connector that opens none of these, or could open
+  any sentence, goes. Count them: about two to four. "So how does it work?" keeps one obvious "it": the film's one
+  thing, said in the line before (El Niño), or it says the noun (P3; the check asks). The cold panel says where it
+  sounded most like a person talking and where most like a script (P9).
 
 ---
 
 ## How a 40-second script is structured so it lands
 
-About 115 words at our measured ~2.87 words a second (the v2 and v3 takes). One story question, opened at once and
-closed at the end; every beat a step toward the answer.
+About 115 words at our measured ~2.87 words a second (the v2 and v3 takes; the budget follows the pace of the film's
+own voice, measured on its first take: the owner's El Niño reference reads at about 3.6 a second,
+`video/docs/voice/refs/2026-10-29_el_nino/README.md`, and `video/docs/voice/VOICE.md`). Words may grow where they make
+a line more natural or clearer; facts never grow beyond what the story needs (P10). One story question, opened at once
+and closed at the end; every beat a step toward the answer, and a beat that isn't one goes, however true or fun.
 
 **The order of beats**
 
 | Beat | When | Sentences | What it does |
 |---|---|---|---|
 | 1. Hook | 0-4 s | 1 | A friend's "Did you know ..." with one surprising, true claim: a place, a thing, a number. It opens ONE question ("how?") and states the payoff in words by ~2 s. |
-| 2. Base | 4-8 s | 1-2 | The one plain fact that makes the claim possible, in everyday names, at once: the viewer's question stays about the story ("how hot?"), never about a word ("which chips?"). The film's one thing gets its one name here. |
-| 3. BUT, the usual case | 8-14 s | 1-2 | What typically happens, as who does what, where ("In most data centers, big fans just blow that heat outside."). The joke, if any, sits around here. |
+| 2. Base | 4-8 s | 1-2 | The one plain fact that makes the claim possible, in everyday names, at once: the viewer's question stays about the story ("how hot?"), never about a word ("which chips?"). The film's one thing gets its one name here. Its scale, if any, comes after "To put that into perspective," (line 4 below). |
+| 3. BUT, the usual case | 8-14 s | 1-2 | What typically happens, as who does what, where ("In most data centers, big fans just blow that heat outside."), or opened by "Normally," as the El Niño reference opens its usual case. The joke, if any, sits around here. |
 | 4. The turn | ~14 s | 1 short | "But Helsinki wants that heat." Short, and it keeps its noun. |
-| 5. SO, how it works | 14-26 s | 3-4 | The plain mechanism, one physical step per sentence, in the order the thing moves (the computers, the water, a machine, the pipes, the homes). The picture shows each step as it is said. |
+| 5. SO, how it works | 14-26 s | 3-4 | The plain mechanism, one physical step per sentence, in the order the thing moves (the computers, the water, a machine, the pipes, the homes). The picture shows each step as it is said. It may open on the viewer's question said aloud ("So how does it work?"), then answer it at length: up to three long, flowing sentences in a row, each one step. |
 | 6. How much | ~27 s | 1 | One number, tied to an everyday thing ("The new data center would make nearly a tenth of Helsinki's heat."). |
-| 7. BUT, the honest floor, then the proof | 28-36 s | 2-3 | The doubt in plain words, with its noun ("But the new data center doesn't exist yet."), then the proof or twist as one new idea (done before, under a cathedral). |
-| 8. SO, for you: the payoff | 36-41 s | 1 | The core line, last, and the film ends close to it. |
+| 7. BUT, the honest floor; a proof or twist only when the story needs it | 28-36 s | 1-3 | The doubt in plain words, with its noun ("But the new data center doesn't exist yet."). A proof or twist only when the story needs it to reach the payoff, as one new idea, never a side quest (P10: draft 2's "In twenty ten, a small data center under a cathedral started heating homes." was one, and was cut). |
+| 8. SO, for you: the payoff | 36-41 s | 1 | The core line, last, and the film ends close to it. "So," may open it (a consequence). |
 
 **How each sentence hands the next its subject.** Old first, new last: a sentence starts from what the listener
 already has (what the last sentence ended on, or the film's one thing) and ends on its one new part, where the voice
 puts the stress. The next sentence takes that new part as its subject, by its noun ("it" only when nothing else could
 fit). The joins are said and true: "but" brings the problem or the surprise, "so" the consequence, "because" the
-reason; "and" only adds to the same step. At each turn, the first words name the place, the time or the actor ("In
-most data centers, ...", "But Helsinki ...", "Back in twenty ten, ..."). Draft 1's opening, reworked as an
-illustration (no flag from the clarity prototype; `check_rhythm.py` OK; facts: FL 2.1, 2.2, 6.1, 7.1):
+reason; "and" only adds to the same step; where a join needs a hand, a human connector (P11; where they go: below).
+At each turn, the first words name the place, the time or the actor ("In most data centers, ...", "But Helsinki ...",
+"From twenty twenty-seven, ..."). Draft 1's opening, reworked as an illustration, with the owner's connector before the
+kettles (no flag from `check_clarity.py`; `check_rhythm.py` OK; facts: FL 2.1, 2.2, 6.1, 7.1):
 
 | # | Line | Starts from (old) | Ends on (new) |
 |---|---|---|---|
 | 1 | Did you know Helsinki wants AI to heat seventy thousand homes? | (the hook) | AI heating homes |
 | 2 | AI runs on giant computers, in buildings called data centers. | AI | the computers and their building, named once |
 | 3 | Those computers get really hot. | those computers | really hot |
-| 4 | Just one stack of them gives off as much heat as forty kettles, boiling non-stop. | one stack of them | forty kettles |
+| 4 | To put that into perspective, just one stack of them gives off as much heat as forty kettles, boiling non-stop. | that (really hot), one stack of them | forty kettles |
 | 5 | In most data centers, big fans just blow that heat outside. | data centers, that heat | blown outside: wasted |
 | 6 | But Helsinki wants that heat. | Helsinki, that heat | WANTS: the turn |
 
@@ -216,8 +283,19 @@ number goes on paper, in the post's text.
 
 **Where a joke may go.** One per film, after the base, when the viewer has the picture to smile at, or in the payoff
 when the payoff itself is the plain funny thought. Never in the hook, the turn or the mechanism: a joke there costs a
-step. Cut the joke and the story must still stand. It is plain and kind (principle 7), and it passes the panel (a
-smile AND the point).
+step. Cut the joke and the story must still stand: it is the one beat P10's cut test keeps anyway, because it adds no
+fact, only the plain situation of a beat the story already has. It is plain and kind (principle 7), and it passes the
+panel (a smile AND the point).
+
+**Where the connectors go.** At the joins that need a hand, about two to four in a film, never on every line, each
+where its sentence's job is (P11): "To put that into perspective," right before the comparison or the big number (the
+forty kettles, line 4 above, where the owner asked for one); "Actually," before the part that surprises; "Normally,"
+at the usual case (beat 3); "So how does it work?" at the turn into the mechanism (beat 5), with the answer at length
+right after; "Or in other words," right after a term the story must name, before its plain words (the El Niño
+reference: the term, then "ocean water that belongs on one side of the planet is moving to the other side"); "So," or
+"The result is that" at a consequence (beat 8); "Now," when the story moves on. Long sentences ride on them: up to
+three long ones in a row when each is one flowing spoken thought joined by a connector (the El Niño reference: 15, 24
+and 24 words; `check_rhythm.py` allows a run of 3), and a short line at each turn, keeping its noun.
 
 ---
 

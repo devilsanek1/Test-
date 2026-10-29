@@ -1,8 +1,9 @@
 # check_clarity.py: the spec (2026-10-29)
 
-**Status: DONE (spec for the build step).** What `video/scripts/voice/check_clarity.py` checks, how, its inputs and
-outputs, and the regression set it must pass. The principles it serves: `PRINCIPLES.md` (P1-P9); the rule that gates
-it: `RULES_DRAFT.md` (playbook 1a, PIPELINE_V2 G1 2a).
+**Status: DONE (spec for the build step; updated 2026-10-29 for the owner's connectors, `INTEGRATION_2.md`).** What
+`video/scripts/voice/check_clarity.py` checks, how, its inputs and outputs, and the regression set it must pass. The
+principles it serves: `PRINCIPLES.md` (P1-P9; P11's connectors it leaves unflagged, P10 and P11 are the writer's and
+the panel's); the rule that gates it: `RULES_DRAFT.md` (playbook 1a, PIPELINE_V2 G1 2a).
 
 **What it is for.** It finds, by script, the clarity failures a script can find reliably, and turns each one into a
 question for the writer and, after the cold pass, for the critic's viewer panel. **It never passes a line:** "OK"
@@ -37,7 +38,7 @@ becomes a targeted question for the panel after its cold pass):
 | Code | What | Principle |
 |---|---|---|
 | W1 | A pointer with rivals in a longer sentence (the reading a script can't settle) | P3 |
-| W2 | A pointer at a whole idea: a sentence opening "That's" / "This is" / "Which", a bare "this" or "that" as an object, "do it" / "did that" | P3 |
+| W2 | A pointer at a whole idea: a sentence opening "That's" / "This is" / "Which", a bare "this" or "that" as an object, "do it" / "did that" (the pro-verb, never a question's auxiliary: "So how does it work?") | P3 |
 | W3 | A degree with nothing to point at: "that hot", "that much", "this big" | P3 |
 | W4 | A first mention that says we already know it: "the / those / these / that / this" + a noun not heard before | P3 |
 | W5 | No doer: a passive with no "by" or "with" ("gets dumped", "is meant to"), or a vague doer ("someone", "somebody") | P4 |
@@ -46,7 +47,7 @@ becomes a targeted question for the panel after its cold pass):
 | W8 | A rare word or an unknown name: Zipf below 3.0 on its base form (wordfreq 3.1.1) | P2, P6 |
 | W9 | Numbers: more than one in a sentence, a multiplier ("five times", "100 times bigger"), a percentage, a unit nobody pictures | P8 |
 | W10 | A "like" comparison that doesn't say what is alike ("is like FORTY kettles") | P8 |
-| W11 | More than 4 words before the subject | P5 |
+| W11 | More than 4 words before the subject (a leading join or one of the owner's connectors doesn't count) | P5 |
 | W12 | More than one step: 3 or more finite clauses, or a ", then" chain | P5 |
 | W13 | A rival name for the film's thread object (needs the film's word list) | P2 |
 
@@ -93,7 +94,8 @@ treats ’ as '.
 - Never flagged: "AI" and the everyday-new words below.
 
 **C2 and W1, pointers.** For each "it", "its", "itself", "they", "them", "their", "theirs", "themselves" (spaCy
-PRON; expletive "it" and the "it" of "do it" skipped; "do it" is W2's):
+PRON; expletive "it", the "it" of the pro-verb "do it" (W2's) and the "it" inside an opening connector ("To put it
+into perspective,") skipped; the "it" after a question's auxiliary, "So how does it work?", is checked like any other):
 - *Candidates:* the nouns (NOUN, PROPN) in the previous sentence (extended back over verbless fragments such as v3's
   "by the mountain.") and in the pronoun's own sentence before it, whose number agrees (spaCy morphology or tag;
   collective nouns count as plural: staff, team, crew, police, family, audience, public, couple; two nouns joined by
@@ -136,8 +138,16 @@ step(s) up, take(s) off, where ... is / was heading, the smart move. Both lists 
 
 **W2, whole-idea pointers.** A sentence opening (after "And / But / So") on "That's", "That is", "This is", "That
 was", "This was", unless an explanation follows at once ("That's because / why / how / what / where / when");
-a sentence opening on "Which"; "this" or "that" as a bare object pronoun ("done this before"); "do it", "does it",
-"did it", "doing it", "do that", "did that".
+a sentence opening on "Which"; "this" or "that" as a bare object pronoun ("done this before"), except inside an
+opening connector ("To put that into perspective,"); "do it", "does it", "did it", "doing it", "do that", "did that"
+as a pro-verb ("Helsinki did it"), never a question's auxiliary before its subject ("So how does it work?").
+
+**The owner's connectors (2026-10-29, `INTEGRATION_2.md`).** A sentence's opening connector from the list at the top
+of the tool (CONNECTORS: "To put that / it / this into perspective,", "Actually,", "So,", "Now,", "Normally,", "Or in
+other words,", "The result is that", after an optional "And / But / So / Or / Now") raises no flag of its own (the
+playbook, Script and voice: "Human connectors, placed TACTICALLY"): its words don't count for W11, its "that" or "it"
+is no W1 or W2, "The result" is no W4, no W8 inside it, and its nouns ("perspective", "words", "result") are no
+pronoun candidates later. RULE #1's stock reveals are not on the list (the critic's to catch).
 
 **W3, a degree with nothing to point at.** "that" or "this" as a degree word (spaCy advmod) before an adjective or
 adverb: "that hot", "that much", "this big".
@@ -189,7 +199,8 @@ ten" is easier by ear); a unit nobody pictures (degrees without an everyday anch
 "as many", "as ... as", "the size of", "the weight of", "the price of", "worth of").
 
 **W11, front-loading.** Words before the first subject (nsubj, nsubjpass or expletive "there"), counting a number as
-one word and not counting a leading "And / But / So / Then / Plus"; skipped after "Did you know (that)"; fires above 4.
+one word and not counting a leading "And / But / So / Then / Plus" or an opening connector (above); skipped after "Did
+you know (that)"; fires above 4.
 A 4-word signpost that names the place or time ("In most data centers,", "In twenty ten,") is the structure's own
 advice (PRINCIPLES, "How each sentence hands the next its subject") and passes.
 
@@ -296,9 +307,10 @@ W13 on lines 2, 3 and 7 ("chips", "cabinet", "chips").
 **R2, MUST: the clean rewrites in PRINCIPLES.md**, each with its context: exit 0 and **no warning**.
 
 1. "Did you know Helsinki wants AI to heat seventy thousand homes? AI runs on giant computers, in buildings called
-   data centers. Those computers get really hot. Just one stack of them gives off as much heat as forty kettles,
-   boiling non-stop. In most data centers, big fans just blow that heat outside. But Helsinki wants that heat."
-   (the structure's worked example; also P3, P4)
+   data centers. Those computers get really hot. To put that into perspective, just one stack of them gives off as
+   much heat as forty kettles, boiling non-stop. In most data centers, big fans just blow that heat outside. But
+   Helsinki wants that heat." (the structure's worked example; also P3, P4; since 2026-10-29 with the owner's
+   connector before the kettles, as PRINCIPLES has it)
 2. "AI runs on giant computers. Those computers get really hot. Just one stack of these computers gives off as much
    heat as forty kettles, boiling non-stop." (P2, P3, P8)
 3. "These computers are cooled with water, so the water gets warm. Machines called heat pumps make it even hotter.
@@ -348,6 +360,22 @@ v2's legal phrases and v1's "supported" pass: they are the panel's (section 1).
   W5 "someone" (a vague doer), no C2 on the generic "They say", W9 (a unit nobody pictures).
 - "AI runs on giant computers. One cabinet of them is like FORTY kettles." -> C1 "cabinet" and W10; "AI runs on giant
   computers. One cabinet of them gives off as much heat as forty kettles." -> C1 only.
+
+Added 2026-10-29 for the owner's connectors (`INTEGRATION_2.md`; the tool before the fix fails each one):
+- R5.17 "Those computers get really hot. To put it into perspective, just one of these computers makes as much heat
+  as FORTY kettles, boiling non-stop." (v4 G1 draft 3) -> nothing on the second sentence (it got W11, "5 words before
+  the subject").
+- R5.18 the El Niño reference as heard ("... and people aren't really ready for it. So how does it work? El Niño is
+  ... Or in other words, El Niño is when ... Normally, trade winds blow west, ...") -> nothing on "So how does it
+  work?" (it got W2 "does it"; its "it" is El Niño, prominent and recent), only W8 "Niño" on "Or in other words, ...",
+  nothing on "Normally, ...".
+- R5.19 "Giant computers make a lot of heat. The result is that big fans blow that heat outside. Actually, Helsinki
+  wants that heat. So Helsinki has a plan. Now, the plan starts in twenty twenty-seven." -> no flag at all (it got W4
+  "The result").
+- R5.20a "But Helsinki wants that heat. So how does it work?" -> C2 "it" (Helsinki or the heat: a short line keeps its
+  noun), no W2.
+- R5.20b "Helsinki heats homes with computers. But how does it do that?" -> W2 "do that" (the pro-verb), no W2 "does
+  it", no pointer flag.
 
 When the panel or the owner finds a line the lint missed or flagged wrongly, the line joins R5 with what it should do,
 in the same commit as the fix (the playbook: every lesson goes into the generic process).

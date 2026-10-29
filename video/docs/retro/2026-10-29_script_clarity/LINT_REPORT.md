@@ -1,7 +1,8 @@
 # check_clarity.py: the build report (2026-10-29)
 
 **Status: DONE.** `video/scripts/voice/check_clarity.py` is built from `LINT_SPEC.md` (principles: `PRINCIPLES.md`).
-Its selftest passes 33 of 33 cases: the spec's R1-R5 plus 5 cases for fixes made during the build. On v1, v2, v3,
+Its selftest passes 38 of 38 cases: the spec's R1-R5 plus 5 cases for fixes made during the build and, since the
+same day's update for the owner's connectors (section 2, item 11; `INTEGRATION_2.md`), 5 more. On v1, v2, v3,
 v4 draft 1 and v5 draft 1 its errors are exactly the spec's. Every warning on those five scripts was read by hand.
 Files: the tool; `video/scripts/voice/clarity_tests/` (frozen copies of the corpus, two film lists, `cases.json`);
 this report. Nothing else was changed: the doc edits are listed in section 6 for the integrator.
@@ -136,6 +137,15 @@ targeted question for the panel after its cold pass (`--questions`):
     - The name chain merges repeats ("AI 2, 3") and includes "computers", so the one good name shows too.
     - The word count is `check_rhythm.py`'s (114 words for draft 1; the spec's example said 117, counted in spaCy
       tokens).
+11. **The owner's connectors (2026-10-29, after the owner's notes on draft 2 and the El Niño reference; now in the
+    spec, section 2).** A sentence's opening connector (the CONNECTORS list: "To put that / it into perspective,",
+    "Actually,", "So,", "Now,", "Normally,", "Or in other words,", "The result is that") raises no flag of its own: v4
+    draft 3's "To put it into perspective, ..." had got W11, the worked example's "To put that into perspective, ..."
+    W2 and W11, and "The result is that ..." W4. "So how does it work?" had got W2 "does it", a misread: "does" is the
+    question's auxiliary, not the pro-verb "do it"; its "it" is now checked like any other pointer (nothing in the El
+    Niño reference, where it is El Niño; C2 after "But Helsinki wants that heat."). Cases R5.17-R5.20b; each fails on
+    the tool before the fix (checked). The corpus fixtures (v1, v2, v3, v4 draft 1, v5 draft 1, the Big Bend) and v4's
+    archived drafts 2 give the same output as before.
 
 ## 3. The library choice (the playbook's "Find the PRO way and the pro tools")
 
@@ -158,7 +168,8 @@ were installed in a scratch venv, not the system Python, and run on our cases.
 
 ## 4. The selftest
 
-`python3 scripts/voice/check_clarity.py --selftest`. The result: **OK, all 33 regression cases pass.** The cases live
+`python3 scripts/voice/check_clarity.py --selftest`. The result: **OK, all 38 regression cases pass** (33 at the build,
+5 added for the owner's connectors the same day). The cases live
 in `clarity_tests/cases.json`. Each runs as its own script. The corpus fixtures are frozen copies, with their source
 paths and commits recorded in the file.
 
@@ -172,6 +183,7 @@ paths and commits recorded in the file.
 | R4: v1, v2, v3, v5 draft 1 | SHOULD | the spec's errors exactly (section 5) |
 | R5.1-R5.11: the spec's unit cases (12) | MUST | all hold |
 | R5.12-R5.16: the build's own fixes (5) | ADDED | all hold (section 2); R5.12 fails when pronoun chains are switched off (checked) |
+| R5.17-R5.20b: the owner's connectors (5; 2026-10-29) | ADDED | all hold (section 2, item 11); each fails on the tool before the fix (checked), and so does R2.1 with its new connector |
 
 **R1 line by line: the owner's lines are flagged for the owner's reasons.**
 
