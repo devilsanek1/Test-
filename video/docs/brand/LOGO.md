@@ -69,3 +69,6 @@ Wordmark) is out with the rule; The Point and Pip carried into round 2 as marks.
 (the owner's words verbatim, newest at the bottom; the orchestrator folds approach-level lessons into the playbook)
 - 2026-10-29 ~19:37 UTC, on round 1, written to the logo session directly: "The logo should not contain any text btw"
   -> round 2: marks only, no name, no letters (round 1's Wordmark and every lockup are out; the f? monogram too).
+- 2026-10-29 ~19:50 UTC, on round 2 (the sheet and the pick, 3 Pip hidden on purpose): "More premium!!" then "No, more
+  abstract more premium" -> round 3: abstract marks, premium (precise geometry, few shapes, restrained colour); no
+  cartoon, no face; Pip only if abstracted past the cartoon.
