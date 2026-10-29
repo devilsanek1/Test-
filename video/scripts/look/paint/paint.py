@@ -612,6 +612,278 @@ def keep_frame_edges(alpha, mask, crop, frame):
         out[:band, :] = np.maximum(out[:band, :], inside[:band, :])
     return out
 
+# ------------------------------------------------------------------ the BROAD brush (v3; the owner's style models:
+# refs_human_scale/03_beach_dusk.jpg, 02_bus_stop_night.jpg): big, simple masses in one colour family lit by one light,
+# each made of a few broad, deliberate flat-brush strokes; calm, nearly smooth insides; the texture lives at the EDGES
+# (a dragged, dry, scumbled break-up where the paint runs out and the sky shows through, a speckle dissolve); fine strokes
+# only where the thing is fine. A piece opts in with "brush": "broad".
+
+def smoothstep(a, b, x):
+    t = np.clip((x - a) / max(1e-6, b - a), 0, 1)
+    return t * t * (3 - 2 * t)
+
+
+def make_flat_stamps(rng, n=14, L=256, W=64):
+    """Flat-brush stamps: an even, opaque core (a faint bristle ripple), crisp sides, a chiselled start, and a dry tail
+    whose bristle rows break up as the paint runs out."""
+    stamps = []
+    v = np.linspace(-1, 1, W)
+    u = np.linspace(0, 1, L)
+    for _ in range(n):
+        side = np.clip((1 - np.abs(v)) / rng.uniform(0.05, 0.10), 0, 1)
+        ripple = 1 - rng.uniform(0.03, 0.10) * value_noise(rng, W, 2, 3, 1)[:, 0]
+        prof = side * ripple
+        slant = rng.uniform(-0.08, 0.08)
+        start = np.clip((u[None, :] - (0.015 + slant * v[:, None])) / 0.012, 0, 1)
+        tail0 = rng.uniform(0.45, 0.78)
+        streak = value_noise(rng, W, L, 1.3, L / rng.uniform(4, 8))
+        dry = np.clip((u[None, :] - tail0) / (1 - tail0), 0, 1) ** 1.15
+        A = prof[:, None] * start * np.clip((streak - dry * 0.98 + 0.04) / 0.08 + 0.5, 0, 1)
+        stamps.append(np.clip(A, 0, 1).astype(np.float32))
+    return stamps
+
+
+def streak_noise(rng, h, w, theta, along, across):
+    """Noise in streaks along `theta` (radians): long `along` px, fine `across` px (a dragged dry brush)."""
+    D = int(math.ceil(math.hypot(h, w))) + 8
+    n = value_noise(rng, D, D, across, along)
+    M = cv2.getRotationMatrix2D((D / 2, D / 2), -math.degrees(theta), 1.0)
+    r = cv2.warpAffine(n, M, (D, D), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+    y0 = (D - h) // 2
+    x0 = (D - w) // 2
+    return r[y0:y0 + h, x0:x0 + w]
+
+
+def signed_dist(mask):
+    inside = mask > 0.5
+    return (ndimage.distance_transform_edt(inside) - ndimage.distance_transform_edt(~inside)).astype(np.float32)
+
+
+def broad_paint(piece, rng, sil, tgt, light2, calm=None, ref=None):
+    """Paint one mass the broad way. sil: the silhouette (0..1); tgt: OKLab target already in its few flat masses.
+    Returns (rgb, alpha, n strokes)."""
+    H, W = sil.shape
+    b = piece.get('broad', {})
+    theta = math.radians(b.get('angle', -8))
+    sd = signed_dist(sil)
+    # 1. the masses: one wash, the silhouette's edge dragged dry along the brush (the sky shows through the break-up)
+    drag = streak_noise(rng, H, W, theta, b.get('drag_along', 70), b.get('drag_across', 2.2))
+    depth = b.get('edge_px', 16)
+    soft = b.get('edge_soft', 3.0)
+    coarse = fbm(rng, H, W, b.get('edge_cell', 60), 3)
+    alpha = np.clip((sd + depth * (drag - 0.55) * 2.0 + b.get('edge_wobble', 10) * coarse + soft * 0.5) / soft, 0, 1)
+    # inside the mass the paint is whole (only the rim breaks up)
+    alpha = np.maximum(alpha, np.clip((sd - depth * 1.2) / 4, 0, 1))
+    cv = Canvas(H, W)
+    gentle = fbm(rng, H, W, b.get('vary_cell', 140), 3)
+    base = shift(tgt, dL=b.get('vary', 0.006) * gentle)
+    cv.wash(lab_to_rgb(cv2.GaussianBlur(base.astype(np.float32), (0, 0), b.get('wash_blur', 2.0))), alpha.astype(np.float32))
+    stamps = make_flat_stamps(np.random.default_rng(int(piece['seed']) * 11 + 5))
+    n = 0
+    # 2. a few broad, deliberate strokes inside the masses, along the brush, each one flat colour of its mass
+    area = float((alpha > 0.5).sum())
+    w_lo, w_hi = b.get('width', (40, 90))
+    k_n = b.get('strokes', 0.7)
+    count = int(k_n * area / ((w_lo + w_hi) * 0.5) ** 2)
+    pts = np.argwhere(alpha > 0.9)
+    clipm = np.clip(alpha * 1.05, 0, 1).astype(np.float32)
+    for _ in range(count):
+        if len(pts) == 0:
+            break
+        y, x = pts[int(rng.integers(len(pts)))]
+        k = 1.0 if calm is None else float(calm[y, x])
+        lab = tgt[y, x] + np.array([rng.normal(0, b.get('jitter_L', 0.012)), rng.normal(0, 0.003), rng.normal(0, 0.004)]) * k
+        wdt = rng.uniform(w_lo, w_hi)
+        cv.stamp(stamps[int(rng.integers(len(stamps)))], x, y, theta + rng.normal(0, b.get('angj', 0.10)), wdt * rng.uniform(*b.get('len', (1.8, 3.2))), wdt,
+                 lab_to_rgb(lab[None])[0], rng.uniform(*b.get('op', (0.35, 0.65))) * (0.4 + 0.6 * k), clipm, ref, b.get('tau', 0.0))
+        n += 1
+    # 3. the edge's flat-brush strokes: chiselled shapes along the rim, their dry tails running out past it
+    edge_pts = np.argwhere((sd > -2) & (sd < depth * 0.6))
+    e_lo, e_hi = b.get('edge_width', (18, 44))
+    n_edge = int(b.get('edge_strokes', 0.5) * len(edge_pts) / ((e_lo + e_hi) * 0.5) / 3.0)
+    gy, gx = np.gradient(cv2.GaussianBlur(sd, (0, 0), 4))
+    for _ in range(n_edge):
+        if len(edge_pts) == 0:
+            break
+        y, x = edge_pts[int(rng.integers(len(edge_pts)))]
+        k = 1.0 if calm is None else float(calm[y, x])
+        if k < 0.5:
+            continue
+        nx, ny = -gx[y, x], -gy[y, x]
+        nn = math.hypot(nx, ny) + 1e-6
+        # the stroke runs along the brush, pushed a little outward, its tail toward the outside
+        wdt = rng.uniform(e_lo, e_hi)
+        ang = theta + rng.normal(0, b.get('edge_angj', 0.18))
+        if (math.cos(ang) * nx + math.sin(ang) * ny) < 0:
+            ang += math.pi
+        cx = x + nx / nn * wdt * 0.15
+        cy = y + ny / nn * wdt * 0.15
+        lab = tgt[y, x] + np.array([rng.normal(0, b.get('jitter_L', 0.012)), 0, 0])
+        cv.stamp(stamps[int(rng.integers(len(stamps)))], cx, cy, ang, wdt * rng.uniform(1.5, 2.8), wdt, lab_to_rgb(lab[None])[0], rng.uniform(0.75, 0.95), None, ref, b.get('tau', 0.0))
+        n += 1
+    # 4. a speckle dissolve on the side away from the light (the paint scattering into the sky)
+    if b.get('specks', 0):
+        L2 = np.array(light2, np.float32) / (np.linalg.norm(light2) + 1e-8)
+        away = np.clip(-(gx * -L2[0] + gy * -L2[1]) * 6, 0, 1) if False else np.clip(((-gx) * (-L2[0]) + (-gy) * (-L2[1])) / (np.hypot(gx, gy) + 1e-6), 0, 1)
+        dout = np.clip(-sd, 0, None)
+        zone = (np.clip(1 - dout / b.get('speck_px', 34), 0, 1) * (sd < 0) * away).astype(np.float32)
+        if calm is not None:
+            zone *= calm
+        zone *= b.get('speck_density', 0.02)
+        cols = [lab_to_rgb(tgt[int(H / 2), int(W / 2)][None])[0]]
+        ys_, xs_ = np.nonzero(zone > 0)
+        if len(ys_):
+            cols = [lab_to_rgb(np.median(tgt[alpha > 0.9], 0)[None])[0]]
+        n += speckle(cv, rng, zone, int(b['specks']), 0.7, 2.0, cols, (0.5, 0.9))
+    out, a = cv.rgba()
+    out = out * grain(rng, H, W, b.get('grain', 0.006))[..., None]
+    return out, a, n
+
+
+def masses(t, cuts, soft, noise):
+    """Weights of a few flat value masses from a smooth light term t (0..1): cuts between them, a soft, noisy border."""
+    tt = t + noise
+    ws = []
+    prev = np.ones_like(t)
+    for c in cuts:
+        s_ = smoothstep(c - soft, c + soft, tt)
+        ws.append(prev - s_)
+        prev = s_
+    ws.append(prev)
+    return ws
+
+
+def style_sky_broad(piece, spec, rng, stamps):
+    """A calm sky the broad way: the flat gradient kept smooth, a gentle drift (warm by the sun, cooler up top), a faint,
+    very low-contrast diagonal stroke texture (calmer still in the band), and a few long, flat horizontal strokes of lit
+    cloud low by the sun."""
+    rgb, _ = load_flat(os.path.join(ROOT, piece['flat']))
+    x0, y0, x1, y1 = piece.get('crop', [0, 0, rgb.shape[1], rgb.shape[0]])
+    rgb = rgb[y0:y1, x0:x1]
+    H, W = rgb.shape[:2]
+    lab = rgb_to_lab(rgb)
+    calm = band_calm(H, y0, spec.get('band'), 46)[:, None] * np.ones((1, W), np.float32)
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    yy += y0
+    xx += x0
+    tgt = lab.copy()
+    if piece.get('sun_warm'):
+        sw = piece['sun_warm']
+        dsun = np.hypot((xx - sw['xy'][0]) / 1.3, yy - sw['xy'][1])
+        tgt += (np.clip(1 - dsun / sw['r'], 0, 1) ** 1.5 * (0.35 + 0.65 * calm))[..., None] * np.array(sw['d'])
+    if piece.get('top_cool'):
+        tc = piece['top_cool']
+        tgt += (np.clip(1 - yy / tc['y1'], 0, 1) ** 1.3)[..., None] * np.array(tc['d'])
+    b = piece.get('broad', {})
+    gentle = fbm(rng, H, W, b.get('vary_cell', 260), 3, aniso=2.5)
+    tgt = shift(tgt, dL=b.get('vary', 0.006) * gentle * (0.3 + 0.7 * calm))
+    # the faint diagonal texture (the beach sky's): long thin streaks, very low contrast
+    diag = streak_noise(rng, H, W, math.radians(b.get('hatch_angle', -24)), b.get('hatch_along', 160), b.get('hatch_across', 1.6)) - 0.5
+    tgt = shift(tgt, dL=b.get('hatch', 0.007) * diag * (0.15 + 0.85 * calm))
+    cv = Canvas(H, W)
+    cv.wash(lab_to_rgb(tgt), np.ones((H, W), np.float32))
+    n = 0
+    fstamps = make_flat_stamps(np.random.default_rng(int(piece['seed']) * 11 + 5))
+    for st_ in piece.get('layers', []):
+        # one long flat stroke: [x, y, length, width, angle deg, hex colour, opacity]
+        x, y, L_, w_, ang, col, op = st_
+        k = float(band_calm(1, int(y), spec.get('band'), 46)[0])
+        cv.stamp(fstamps[n % len(fstamps)], x - x0, y - y0, math.radians(ang), L_, w_, lab_to_rgb(hex_lab(col)[None])[0], op * (0.25 + 0.75 * k))
+        n += 1
+    out, a = cv.rgba()
+    out = out * grain(rng, H, W, b.get('grain', 0.004))[..., None]
+    return out, np.ones((H, W), np.float32), (x0, y0), n
+
+
+def style_cloud_broad(piece, spec, rng, stamps):
+    """A cloud the broad way: its lobes give the shape and the form, lit by the ONE light into three flat masses of the
+    sky's own family (the lit side warm from the sun), painted with a few broad strokes, its rim dragged dry."""
+    bx, by, bw, bh = piece['box']
+    hgt = lobe_mask(piece['lobes'], piece['box'], rng, 0, 0)
+    sil = np.clip((hgt - 0.12) / 0.06, 0, 1)
+    rows = (np.arange(bh, dtype=np.float32) + by)[:, None]
+    if piece.get('base_y') is not None:
+        sil = sil * np.clip((piece['base_y'] - rows) / piece.get('base_soft', 30), 0, 1)
+    calm = np.ones((bh, bw), np.float32)
+    if piece.get('calm_box'):
+        cx0, cy0, cx1, cy1 = piece['calm_box']
+        yy_, xx_ = np.mgrid[0:bh, 0:bw].astype(np.float32)
+        xx_ += bx
+        yy_ += by
+        inside = np.clip((xx_ - cx0) / 40, 0, 1) * np.clip((cx1 - xx_) / 40, 0, 1) * np.clip((yy_ - cy0) / 40, 0, 1) * np.clip((cy1 - yy_) / 40, 0, 1)
+        calm = (1 - inside).astype(np.float32)
+        sil = sil * calm
+    light = piece.get('light', spec['light']['dir'])
+    gy, gx = np.gradient(cv2.GaussianBlur(hgt, (0, 0), piece.get('form_blur', 10)))
+    nrm = np.stack([-gx * 30, -gy * 30, np.full_like(hgt, 1.0)], -1)
+    nrm /= np.linalg.norm(nrm, axis=-1, keepdims=True)
+    L3 = np.array([light[0], light[1], 0.3], np.float32)
+    L3 /= np.linalg.norm(L3)
+    lit = np.clip(nrm @ L3, 0, 1)
+    cxm = np.mean([l[0] for l in piece['lobes']])
+    cym = np.mean([l[1] for l in piece['lobes']])
+    yy, xx = np.mgrid[0:bh, 0:bw].astype(np.float32)
+    big = np.clip(((xx + bx - cxm) * light[0] + (yy + by - cym) * light[1]) / (max(bw, bh) * 0.55), -1, 1)
+    t = np.clip(piece.get('lobe_k', 0.6) * lit + piece.get('big_k', 0.4) * (big * 0.5 + 0.5), 0, 1)
+    pal = piece['palette']
+    labs = [hex_lab(pal[k]) for k in ('shade', 'mid', 'lit')]
+    ws = masses(t, piece.get('cuts', [0.36, 0.62]), piece.get('mass_soft', 0.035), 0.05 * fbm(rng, bh, bw, 50, 3))
+    tgt = sum(w[..., None] * lab for w, lab in zip(ws, labs))
+    if pal.get('rim'):
+        # the lit rim: where the edge faces the light, one warm step (a band, not a glow)
+        e_in = ndimage.distance_transform_edt(sil > 0.5)
+        rim = (np.clip(1 - e_in / piece.get('rim_px', 14), 0, 1) * smoothstep(0.55, 0.8, lit) * (big > -0.2)).astype(np.float32)
+        tgt = tgt + (hex_lab(pal['rim']) - tgt) * rim[..., None] * 0.9
+    out, a, n = broad_paint(piece, rng, sil, tgt, light, calm)
+    return out, a, (bx, by), n
+
+
+def style_flat_broad(piece, spec, rng, stamps):
+    """foliage / surface from the flat, the broad way: the flat's colours lit into a lit and a shade mass (each a flat
+    step), painted with a few broad strokes inside its own flat regions, the silhouette broken at the rim."""
+    rgb, mask = load_flat(os.path.join(ROOT, piece['flat']))
+    ys, xs = np.nonzero(mask > 0.02)
+    m = piece.get('margin', 24)
+    x0, x1 = max(0, xs.min() - m), min(mask.shape[1], xs.max() + m + 1)
+    y0, y1 = max(0, ys.min() - m), min(mask.shape[0], ys.max() + m + 1)
+    rgb, mask = rgb[y0:y1, x0:x1], mask[y0:y1, x0:x1]
+    H, W = mask.shape
+    rgb = fill_out(rgb, mask)
+    lab = rgb_to_lab(rgb)
+    light = piece.get('light', spec['light']['dir'])
+    lit, _ = form_light(mask, piece.get('form_sigma', 30), light)
+    if piece.get('clusters'):
+        cl = piece['clusters']
+        inside_pts = np.argwhere(mask > 0.5)
+        dome = np.zeros((H, W), np.float32)
+        yy_c, xx_c = np.mgrid[0:H, 0:W].astype(np.float32)
+        for _ in range(int(cl['n'])):
+            cy_, cx_ = inside_pts[int(rng.integers(len(inside_pts)))]
+            r_ = rng.uniform(*cl['r'])
+            dome = np.maximum(dome, np.sqrt(np.clip(1 - ((xx_c - cx_) ** 2 + (yy_c - cy_) ** 2) / (r_ * r_), 0, 1)) * r_)
+        gyc, gxc = np.gradient(cv2.GaussianBlur(dome, (0, 0), 3))
+        nc = np.stack([-gxc, -gyc, np.full_like(dome, 0.9)], -1)
+        nc /= np.linalg.norm(nc, axis=-1, keepdims=True)
+        Lc = np.array([light[0], light[1], 0.6], np.float32)
+        Lc /= np.linalg.norm(Lc)
+        lit = np.clip(cl.get('global', 0.5) * lit + cl.get('local', 0.8) * np.clip((nc @ Lc - 0.5) / 0.5, -1, 1), -1, 1)
+    t = lit * 0.5 + 0.5
+    ws = masses(t, piece.get('cuts', [0.42, 0.66]), piece.get('mass_soft', 0.03), 0.06 * fbm(rng, H, W, 24, 3))
+    offs = [np.array(piece.get('cool', [-0.06, -0.01, -0.01])), np.zeros(3), np.array(piece.get('warm', [0.04, -0.005, 0.03]))]
+    tgt = lab + sum(w[..., None] * o for w, o in zip(ws, offs))
+    if piece.get('chroma_k'):
+        tgt[..., 1:] *= piece['chroma_k']
+    if piece.get('value_bias'):
+        tgt[..., 0] += piece['value_bias']
+    if piece.get('haze'):
+        hz = piece['haze']
+        rr = np.linspace(0, 1, H, dtype=np.float32)[:, None, None]
+        tgt = tgt + (hex_lab(hz['color']) - tgt) * (hz['k'] * (hz.get('top', 0.6) + (1 - hz.get('top', 0.6)) * rr))
+    out, a, n = broad_paint(piece, rng, mask, tgt, light, None, ref=rgb.astype(np.float32))
+    a = keep_frame_edges(a, mask, (x0, y0, x1, y1), spec['frame'])
+    return out, a, (x0, y0), n
+
+
 # ------------------------------------------------------------------ main
 
 def paint_piece(piece, spec, preview=None):
@@ -622,7 +894,10 @@ def paint_piece(piece, spec, preview=None):
     DRY['stamps'] = make_stamps(np.random.default_rng(seed * 7 + 3), n=12, dry_range=(0.5, 0.85))
     st = piece['style']
     t0 = time.time()
-    if st == 'sky':
+    if piece.get('brush') == 'broad':
+        fn = {'sky': style_sky_broad, 'cloud': style_cloud_broad, 'foliage': style_flat_broad, 'surface': style_flat_broad}[st]
+        out, a, (x0, y0), n = fn(piece, spec, rng, stamps)
+    elif st == 'sky':
         out, a, (x0, y0), n = style_sky(piece, spec, rng, stamps)
     elif st == 'cloud':
         out, a, (x0, y0), n = style_cloud(piece, spec, rng, stamps)
