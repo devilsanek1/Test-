@@ -24,6 +24,9 @@ I like the drawing style in these two more". **These two are the painting-style 
 reference): "Another bit is humans we paint - they should be better / These are the references especially the video / On
 the video the person is not substantially different than yours but certainly more refined and clean and more fluid".
 `04_cloud_beast_girl_strip.jpg`: the girl zoomed, 8 frames over 5 s (only her ribbons and cape move).
+Then, resending `03_beach_dusk.jpg`: "Look at this example too" (`03_beach_dusk_couple_zoom.jpg`: the couple
+zoomed: natural proportions mid-stride, 2-3 flat value planes per form, the phone's cool glow as a local story light, no
+outlines, a faint reflection on the wet sand).
 
 **Sizes as the owner sees them:** the landscape pictures fill the phone's width, so their people read at ~8-16 % of
 the screen's WIDTH: ~90-170 px tall in our 1080-wide frame, about v2's original (~150 px); the motion reference's girl
