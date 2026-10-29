@@ -26,6 +26,8 @@ import {nearMid} from './near';
 import {S1PipInTree} from './V2S1_pip';
 import {TreeSlot} from './engine';
 import {S1_PIP_IN_CROWN} from './V2S1_nature';
+import {PaintedLayer, usePainted} from '../../lib/paint';
+import {PAINT} from './paint_set';
 
 type Pt = [number, number];
 const r1 = (n: number) => Math.round(n * 10) / 10;
@@ -105,7 +107,7 @@ const SOIL = '#8C6A55'; // the soil inside the planter (L* ~47)
 
 // ---------------------------------------------------------------- near: the pier (cut by the right edge)
 
-const Pier: React.FC = () => {
+export const Pier: React.FC = () => {
   const {x0, cap, base, xc} = FORE.pier;
   const {darks} = useSwitches();
   // ONE value and one shade step (the art director, v3: its patchy two-tone ashlar read muddy)
@@ -147,7 +149,12 @@ const CROWN_UNDER: string = [
 /** The bay tree in the planter (its trunk, its crown with Pip inside under the "find Pip" switch, the shade under it).
  *  (the look test) Its own component, drawn first in the near group: under the texture switch it stays outside the near
  *  plane's mottle (the wind turns lane N's crown, a rotated group, which a filter would soften). */
-const PlanterTree: React.FC = () => {
+/** (the paint test) the paint lands with the crown's flood (its centre). */
+const TREE_PAINT_FROM = floodAt(120, 1390);
+/** (the paint test) the pier's paint lands with its body's flood. */
+const PIER_PAINT_FROM = floodAt(980, 1700);
+
+export const PlanterTree: React.FC = () => {
   const {rim} = FORE.planter;
   const sw = useSwitches();
   const {darks, pipHidden} = sw;
@@ -185,7 +192,8 @@ const PlanterTree: React.FC = () => {
   );
   // (the look test's foliage switch: lane N's London plane in the one wind, Pip inside it; off, v2's crown, with the
   // darks and Pip's hiding spot)
-  return <TreeSlot sw={sw} pip={<S1PipInTree seat={S1_PIP_IN_CROWN.seat} />} fallback={tree} />;
+  // (the paint test) the painted crown and trunk in the tree's own slot (the near group: it rides the near float)
+  return <TreeSlot sw={sw} pip={<S1PipInTree seat={S1_PIP_IN_CROWN.seat} />} fallback={<PaintedLayer piece={PAINT.tree} from={TREE_PAINT_FROM}>{tree}</PaintedLayer>} />;
 };
 
 const Planter: React.FC = () => {
@@ -381,7 +389,16 @@ const PropFeet: React.FC = () => {
 };
 
 /** The side away from the low western sun on the big things: one form step; the faces turned to us one Shade step. */
+/** The pier's two Shade steps (its face turned to us, the band under the coping): in the bake's input with the pier. */
+export const PierShades: React.FC = () => (
+  <>
+    <Shade d={slab(FORE.pier.x0, 1100, FORE.pier.xc, FORE.pier.cap + 36, FORE.pier.base)} at={floodAt(980, 1700)} />
+    <Shade d={slab(FORE.pier.x0, 1100, FORE.pier.xc, FORE.pier.cap + 36, FORE.pier.cap + 50)} at={floodAt(980, 1640)} />
+  </>
+);
+
 const NearForm: React.FC = () => {
+  const painted = {pier: usePainted(PAINT.pier, PIER_PAINT_FROM)};
   // (the look test: the crescent on the bay's crown is S1ForeNearOver's: the crown sits in the near group's `under`)
   return (
   <>
@@ -389,8 +406,8 @@ const NearForm: React.FC = () => {
     <FormShade d={slab(FORE.crates.x0, FORE.crates.x1, FORE.crates.xc, 1666, FORE.crates.base)} at={floodAt(460, 1700)} />
     <FormShade d={slab(FORE.crates.x0 + 14, FORE.crates.x1 - 10, FORE.crates.xc, 1590, 1666)} at={floodAt(460, 1620)} />
     <FormShade d={poly([[FORE.table.x - 7, FORE.table.top + 10], [FORE.table.x + 7, FORE.table.top + 10], [FORE.table.x + 7, FORE.table.foot], [FORE.table.x - 7, FORE.table.foot]])} at={floodAt(742, 1640)} />
-    <Shade d={slab(FORE.pier.x0, 1100, FORE.pier.xc, FORE.pier.cap + 36, FORE.pier.base)} at={floodAt(980, 1700)} />
-    <Shade d={slab(FORE.pier.x0, 1100, FORE.pier.xc, FORE.pier.cap + 36, FORE.pier.cap + 50)} at={floodAt(980, 1640)} />
+    {/* (the paint test) the pier's two shades are painted into its piece */}
+    {painted.pier ? null : <PierShades />}
     <Shade d={slab(FORE.planter.x0, FORE.planter.x1, FORE.planter.xc, FORE.planter.rim + 16, FORE.planter.rim + 30)} at={floodAt(120, 1560)} />
   </>
   );
@@ -441,7 +458,9 @@ export const S1ForeNear: React.FC = () => (
       <Crates />
       <CafeSet />
       <Leaves />
-      <Pier />
+      <PaintedLayer piece={PAINT.pier} from={PIER_PAINT_FROM}>
+        <Pier />
+      </PaintedLayer>
     </Tier>
     <NearForm />
     <Tier tier="environment">
@@ -470,12 +489,17 @@ export const S1ForeNearUnder: React.FC = () => (
  *  the near group (the crescent in NearForm, the strips before the fern pot); nothing the group draws after them
  *  overlaps them (the fern pot and its form are at the bottom edge, the crates and the table clear of the crown), so
  *  the frame is the same. Under the foliage switch lane N's crown carries its own light: no crescent. */
+/** v2's crescent form shade on the bay's crown (in the bake's input with the tree). */
+export const TreeCrescent: React.FC = () => <FormShade d={crown} kind="crescent" at={floodAt(120, 1390)} />;
+
 export const S1ForeNearOver: React.FC = () => {
   const {foliage} = useSwitches();
+  // (the paint test) the painted crown carries its own light: no crescent over it
+  const painted = usePainted(PAINT.tree, TREE_PAINT_FROM);
   return (
     <>
       <PropFeet />
-      {foliage ? null : <FormShade d={crown} kind="crescent" at={floodAt(120, 1390)} />}
+      {foliage || painted ? null : <TreeCrescent />}
     </>
   );
 };

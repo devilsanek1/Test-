@@ -11,14 +11,13 @@ import {useTime} from '../../lib/time';
 import {floatAt, parallaxOffset, PARALLAX_SKY, type FloatLeg} from '../../lib/depth';
 import {currentFloatTable, TextureSlot} from './engine';
 import {useSwitches} from './switches';
+// (scene 1 still v3) the world's groups are drawn V3_SHIFT px lower: the mottle's caption-band cut is in screen rows
+import {V3_SHIFT} from './V3_layout';
 
 /** The float's legs (near-ground px from home): rest to 1.10 (after "She quit Google." and her step-out at 0.97). */
-export const S1_FLOAT_LEGS: FloatLeg[] = [
-  {t0: 1.1, t1: 2.3, to: [-8, -3]},
-  {t0: 2.3, t1: 3.4, to: [-4, -9]},
-  {t0: 3.4, t1: 4.6, to: [4, -7]},
-  {t0: 4.6, t1: 5.8, to: [0, 0]},
-];
+// (scene 1 still v3: the still is at rest; v2's legs, for when it moves: [1.1-2.3 -> (-8, -3)], [2.3-3.4 -> (-4, -9)],
+// [3.4-4.6 -> (4, -7)], [4.6-5.8 -> (0, 0)])
+export const S1_FLOAT_LEGS: FloatLeg[] = [];
 /** Home at these times (floatProblems): frame 0 / the loop match, the flood, her step-out, from 5.80 to the dive. */
 export const S1_FLOAT_REST = [0, 0.3, 0.97, 5.8, 5.95, 6.1];
 
@@ -65,7 +64,7 @@ export const S1PlaneStack: React.FC<{plane: number; layers: PlaneLayer[]; textur
     <g transform={`translate(${dx.toFixed(3)} ${dy.toFixed(3)})`}>
       {layers.map((L, i) =>
         texture && L.mottle !== false ? (
-          <TextureSlot key={i} sw={sw} t={t} plane={plane} sky={!Number.isFinite(plane)} offset={[dx, dy]} region={region} k={k}>
+          <TextureSlot key={i} sw={sw} t={t} plane={plane} sky={!Number.isFinite(plane)} offset={[dx, dy + (Number.isFinite(plane) && plane > -1.5 ? V3_SHIFT : 0)]} region={region} k={k}>
             {L.node}
           </TextureSlot>
         ) : (
