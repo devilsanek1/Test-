@@ -3,8 +3,8 @@
 > **v1-era (banner, 2026-10-27).** Keep it for the mascot's API (props, poses, timelines, entrances, the un-build).
 > Its look is v1's: the brush ink with corner overshoot and wander, and the colorways' chroma. A new film draws a new
 > Pip in its own design (playbook: no reusable assets) at tier B unless the line is about it (`docs/look/CRAFT.md` §b:
-> C* <= 25, a same-hue line 1.6-2.2 px, <= 1 % of the frame), drawn by the clean pen's mascot brush; across a join it
-> rides the carrier or keeps its spot, never a hop of its own. Current direction: `docs/look/DIRECTION.md`.
+> C* <= 25, no outline since 2026-10-29, <= 1 % of the frame), drawn in the clean pen and hidden on purpose: a quiet "find Pip" in most exterior
+> shots, none in closes and charts, never a join's carrier (DIRECTION rule 2). Current direction: `docs/look/DIRECTION.md`.
 
 An original small elephant that plays the reference cat's role: it is in every scene, perched and watching, reacting,
 and now and then doing a small physical gag. It nods to PHP's "elePHPant" (an elephant in a PHP-ish violet-blue)

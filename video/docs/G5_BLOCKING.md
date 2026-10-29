@@ -107,7 +107,7 @@ exception from the G3 hand-off.
 | F plain cut | `cut` (at most 2 per film, on a "But" turn) |
 
 - **The first panel at t < 0** is the loop underlay and the frame-0 state, the scene being drawn in the clean pen: at
-  `t < 0` the subject's outline (with tier B's tinted lines) draws on and the first motions already run (start times
+  `t < 0` the subject's line draws on (colour then floods in over it: no outline stays, DIRECTION rule 4) and the first motions already run (start times
   slightly negative), tier C lands as flat pale shapes, and colour floods in within ~0.3 s from t 0; voice from the
   first frames (the first word at ~0.12 s, the voice file's lead), one continuous shot (`docs/look/DIRECTION.md` rule 9; the owner approves this build with the G4 look clip). The
   last panel un-builds over its last `dur` s on top of it: build
@@ -136,7 +136,8 @@ exception from the G3 hand-off.
   set, person, prop and Pip is the film's own kit (playbook: no reusable assets; people have no faces); `lib/cine`'s
   drawing pieces are references, never film code, until the craft tooling lane ports them to the clean pen
   (`CRAFT.md` §c; its camera and utilities are fine). The light and shadow layers come from `lib/light.tsx`, depth from
-  `lib/depth.ts` (the set's atmosphere, planes and ONE camera from W1: `CRAFT.md` §f; how-to `lib/DEPTH.md`), particles
+  `lib/depth.ts` (the set's atmosphere, planes and ONE camera from W1, plus the far stage where W1 declares a designed
+  view: `CRAFT.md` §f, §f.5; how-to `lib/DEPTH.md`), particles
   from `lib/particles.tsx`; a film never imports another film's folder (`src/vN/`).
 
 ## 2b. The sequence contract (one scenes.json row = one SEQUENCE; the v3 rework on)

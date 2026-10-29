@@ -251,7 +251,8 @@ Maintenance at the end).
   be better and more effective at capturing people attention ... the initial drawing effect is barely visible or
   noticeable and really don't impact or amazes me", of a 0.3 s pale draw-on and 30 px memory sticks.)
   - frame 0 is the scene being made, drawn on in the clean pen: the subject's outline (with the supporting lines)
-    first, then colour floods in, as a visible event (bold line at full contrast, a moving pen tip, long enough to
+    first, then colour floods in over it (no outline stays: Texture and lines, 2026-10-29), as a visible event (bold
+    line at full contrast, a moving pen tip, long enough to
     read: ~0.3 s was invisible), never a pale wash (the lined films drew every line first);
   - voice from the first frames (the first word at ~0.12 s, the locked voice file's lead; never a silent lead);
   - the hook's claim made physical and escalating: the expected thing shown, then reality overtaking it at ~2 s,
@@ -538,6 +539,11 @@ Maintenance at the end).
 - ~~The G4 look as stills made in parallel with G3~~ → a playable look clip after the G3 lock, approved before G5
   (the approved pipeline, 2026-10-27).
 - ~~Pip at tier B in every shot and on both sides of every join~~ → Pip stays, hidden on purpose (2026-10-28).
+- ~~The main thing's outline in its own deep shade (our reading of "black outlines, VERY subtle, in key places") and
+  the mascot's thin same-hue line, with one gentle shade step on every volume~~ → no outlines: edges from light and
+  shade, the subject's shade face deeper; thin lines only on small things, 2 px where they float (2026-10-29).
+- ~~A few real darks (one tinted dark anchor, about 5 % of the frame)~~ → real darks in many small pieces, 6-10 %
+  (2026-10-29).
 
 ## Maintenance (keep this file coherent and clear)
 No size budget (owner, 2026-10-27: "let's not focus on the playbook being a certain size; keep it as coherent and clear as

@@ -21,8 +21,9 @@ baseline the owner likes. One screen: `SUMMARY.md`; one picture: `img/SUMMARY_sh
 7. **Next:** one 7 s look clip of v2's canal bank (S1 and its cover frame), in two passes (§10).
 
 ## How to read this
-- **Status** on every item: **[owner]** decided by the owner (the quote or rule named); **[open]** the owner's call (§9);
-  **[proposal]** ours, to be seen in the next G4 look clip. Nothing [open] or [proposal] is decided.
+- **Status** on every item: **[owner]** decided by the owner (the quote or rule named); **[open]** the owner's call (§9;
+  all answered 2026-10-29, "Go with your suggestions": §9 names each pick); **[proposal]** ours, to be seen in the next
+  G4 look clip. Nothing [proposal] is decided.
 - **Reports:** PE `perspective.md`, ST `style.md`, DE `details.md`, CO `composition.md` (the look lenses); P1-P4
   `pro_1_depth.md` ... `pro_4_colour.md` (pro practice per feeling); LA `layout.md`; AB `img/AB_outlines.md`; CM
   `content_market.md`, CF `content_fit.md`, CD `content_discussion.md`. Every number is theirs, "est." included.
@@ -317,23 +318,33 @@ on screen").
   (P4). **A poster frame for every shot** (cozy stays the home: CO §9). **A poster or a real skyline copied**; **local
   objects as a style rule** (the owner: content).
 
-## 9. Decisions for the owner
+## 9. Decisions for the owner (all decided, 2026-10-29)
+*The owner (2026-10-29 ~04:20 UTC): "Go with your suggestions": each call below takes our suggestion, first judged in
+the 7 s look test of v2's canal opening (§10); the rules: DIRECTION, CRAFT, LAYOUT, LIFE_AND_DENSITY, PALETTE and the
+playbook (`INTEGRATION.md` §2).*
 1. **Edges (the A vs B picture):** (a) keep A: the subject's 3 px outline and today's gentle shade (-7 to -12 L*); (b)
    the outline plus a deeper shade face on the subject (-20 to -25); (c) B: no outlines, the deeper shade face makes the
-   edge. *Ours:* (c) in the next look clip, beside (a).
+   edge. *Ours:* (c) in the next look clip, beside (a). **Decided (2026-10-29, "Go with your suggestions"): (c).**
 2. **Darks:** (a) about 5 % of the frame dark, as rule 6's anchor now; (b) 6-10 % under L* 40 in many small pieces
    (windows, doorways, eaves, the shade under trees), the near world in mid-tones. *Ours:* (b), seen beside v2.
+   **Decided (2026-10-29, "Go with your suggestions"): (b).**
 3. **The "low poly" world:** cut the near ground and the mid and far city into flat facets of the hero's colours, the
    still near world a little richer than today's cap (local contrast ~9 instead of 7; strata and veins on more
    surfaces): (a) yes, try it; (b) the far city only; (c) no. *Ours:* (a), never on the subject, never as rectangles
-   in the sky.
+   in the sky. **Decided (2026-10-29, "Go with your suggestions"): (a).**
 4. **The designed view:** (a) an establishing view or the scale landing may lift its far city onto its own horizon
    behind water or trees (one far stage) and draw the landmark bigger than one camera allows; (b) one camera for
-   everything, as CRAFT says now. *Ours:* (a), for those two frames only.
+   everything, as CRAFT says now. *Ours:* (a), for those two frames only. **Decided (2026-10-29, "Go with your
+   suggestions"): (a), for those two frames only.**
 5. **Pip's hiding:** (a) a few planned spots per film; (b) a quiet "find Pip" in most exterior shots, none in closes and
-   charts; and on the cover, hidden too or the one place it shows. *Ours:* (b), hidden on the cover too.
+   charts; and on the cover, hidden too or the one place it shows. *Ours:* (b), hidden on the cover too. **Decided
+   (2026-10-29, "Go with your suggestions"): (b), hidden on the cover too.**
 6. **The sun:** (a) keep v2's saturated disc as the pop; (b) one step off its sky, or behind a ridge, unless it is the
-   shot's "look here", so the far stays the calmest part (no poster has a sun disc). *Ours:* (b).
+   shot's "look here", so the far stays the calmest part (no poster has a sun disc). *Ours:* (b). **Decided
+   (2026-10-29, "Go with your suggestions"): (b).**
+7. **Thin lines in the parallax float** (CRAFT §c's call, asked with these): (a) 2.0 px on the planes that float; (b)
+   1.2-1.6 px kept quiet there (twinkle x dL* <= ~2 L*) or only on locked shots and still planes. *Ours:* (a).
+   **Decided (2026-10-29, "Go with your suggestions"): (a).**
 
 ## 10. The next step: one look experiment
 **What:** a 7 s look clip of v2's home place, S1, the canal bank outside her office (0-6.1 s with v2's locked voice and

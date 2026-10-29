@@ -17,7 +17,7 @@ shot recipes and camera moves (S1-S5, the scale cues), `COZY_AND_SCALE.md` the c
 them matches them; a mismatch is a bug, fixed in the same turn. This page records the look as it stands, never a freeze
 (the owner: "our look is evolving - we are finding out style i don't think we can overfixate on this"): each film may
 carry its next step. **Status:** §1-7 are in force, except what they mark as open or proposed. §8 marks each line
-**[owner]** (in force), **[open]** (the owner's call) or **[proposal]** (ours, to be seen in a look clip): a proposal
+**[owner]** or **[owner-decided (2026-10-29)]** (in force), **[open]** (the owner's call) or **[proposal]** (ours, to be seen in a look clip): a proposal
 is never a rule until the owner approves it.
 
 Px at 1080 x 1920, y down, screen space; H = 1920, W = 1080. Diagram: `docs/studies/2026-10-28_city_posters/img/layout_zones.jpg`

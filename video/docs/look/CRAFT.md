@@ -76,7 +76,7 @@ texture and how simple it is:
 |---|---|---|---|---|---|
 | **A subject** (1-3 objects: the beat's one focus) | L* range >= 80; local contrast >= 2x C's | the hero colour only here (>= 50 % of the frame's C* > 35 pixels) | no outline: the deepest shade step (§d.3) | small-feature coverage (§e's line mask) >= 2.5x C's | >= 60 % of the motion in its beat; a second story action <= 0.3x of it, never at the same moment |
 | **B supporting life** (the mascot, people near the story, an audience in the mid ground; kit tier `support`, which also takes story objects off their beat) | local contrast <= 1.2x C's; no near-black areas | C* <= 25; never the hero or pop hue | none (§c) | flat: one tone + one shade | each <= 3 % of the frame; constant speed, <= 0.5x the subject's while it moves (a still subject never freezes the world); no pops; together <= 30 % of the motion |
-| **C environment** (room, shelves, desk dressing, street, town, sky, weather and far life: walkers, cars, birds, steam, particles; kit tier `environment`) | local contrast <= 7, on each plane, not only averaged (§f); a still near plane (-2, -1: no small features, nothing on it moving) <= 9 (owner, 2026-10-29); L* range <= 60 | C90 <= 25 (ref 1, v1), or saturated at contrast <= 7 (the cozy look) | none; thin lines only on things that are lines (§c) | small-feature coverage <= 6 %; built as the patchwork (below) | the camera's float plus slow life that never stops (cloud drift, smoke, steam, snow, one window or bulb changing at a time, far walkers, cars and birds), together <= 10 % of the motion |
+| **C environment** (room, shelves, desk dressing, street, town, sky, weather and far life: walkers, cars, birds, steam, particles; kit tier `environment`) | local contrast <= 7, on each plane, not only averaged (§f); the still near world (planes -2, -1, no small features) <= 9 (owner, 2026-10-29); L* range <= 60 | C90 <= 25 (ref 1, v1), or saturated at contrast <= 7 (the cozy look) | none; thin lines only on things that are lines (§c) | small-feature coverage <= 6 %; built as the patchwork (below) | the camera's float plus slow life that never stops (cloud drift, smoke, steam, snow, one window or bulb changing at a time, far walkers, cars and birds), together <= 10 % of the motion |
 
 - **Alive but subtle:** supporting life (B and C) never stops (as in the cozy references) but stays small, slow and low in
   contrast, felt at the edges, never popping. As many movers as the scene needs to feel alive, but at most 3-4 noticeable
@@ -103,11 +103,11 @@ texture and how simple it is:
   strangers' backs, §a.3) holds still or breathes (<= 2 %W/s) while the subject acts (v3's audiences, 11-35 % of the
   frame, took up to 97 % of the motion).
 - **The mascot is tier B and hidden on purpose** (DIRECTION rule 2; owner, 2026-10-28) unless the line is about it:
-  C* <= 25, no outline (its parts part by a lit and a shade face, §c), <= 1 % of the frame, only blinks and ear moves
-  (<= 10 %W/s) while the subject moves, clear of the subject and off its eye path, found on a second look; a quiet
-  "find Pip" in most exterior shots, none in closes and charts, hidden on the cover too (owner, 2026-10-29: `STUDY.md`
-  §9 decision 5) (v3's Pip, C* 44 with dark
-  outlines, beat the subject's salience per pixel in 12 of 13 panels).
+  C* <= 25, no outline (its parts separated by a lit and a shade face, §c), <= 1 % of the frame, only blinks and ear
+  moves (<= 10 %W/s) while the subject moves, clear of the subject and off its eye path, found on a second look; a
+  quiet "find Pip" in most exterior shots, none in closes and charts, hidden on the cover too (owner, 2026-10-29:
+  `STUDY.md` §9 decision 5). v3's Pip, C* 44 with dark outlines, beat the subject's salience per pixel in 12 of 13
+  panels.
 - **Code:** `lib/pen.ts` (`setPen('clean')`, `CLEAN_TIERS`; work in progress) maps `subject` / `support` / `environment`
   to calmer fills, shade steps (§d.3) and motion factors, with no outline on any tier (§c; the tier-A line becomes a
   per-film flag, off: `STUDY.md` §10 item 4); its constants are tuned until this check passes.
@@ -144,7 +144,9 @@ G4 frame had the same pen and passed with a quarter of the strokes: the fix is a
 - **Fills** register exactly (offset 0) and meet edge to edge: with no outline the fill edge IS the silhouette, so it
   is the cleanest path in the shape (a thin line on a shape is drawn inside its fill: stroke 2x, clipped to the fill).
 - **Texture:** big areas flat; texture only as flat same-hue shapes (a rug pattern, plank seams as 2 long bands at dL* 6-8
-  or less) on 1-2 small surfaces per shot. No specks (static dark marks; §f's particles are light movers, not texture), ticks, hatching, scribble, dash rows, crumbs or steam squiggles,
+  or less) on 1-2 small surfaces per shot, except a material inside a facet (strata bands, veins, bark plates, stone
+  patches, same-hue at dL* 3-8), which may run on more surfaces, nature's and the still near world's (owner,
+  2026-10-29: `STUDY.md` §9 decision 3, `pro_3_nature.md` C1). No specks (static dark marks; §f's particles are light movers, not texture), ticks, hatching, scribble, dash rows, crumbs or steam squiggles,
   and no grain overlay by default (the sky's invisible encode dither, §g, is not a texture). Two optional textures, both
   VERY subtle and both last steps the film must work without: the owner's halftone (`PALETTE.md` "Texture and lines":
   at most 6 %, on a few chosen elements, after G6), and, being tested since 2026-10-28 (owner: "start playing with it,
@@ -371,7 +373,8 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
    `docs/v2/water/judge_metrics.py` against the last approved water (cool %, piece-end edges, thin light marks, glitter
    gold, quick toggles), and `docs/v2/water/master_check.py` on the master (the colour numbers above); eye check at
    phone size: a calm, glassy canal with its reflections, never boxes, dashes, stars or a stack of pancakes.
-8. **A full value range: a calm light sky, a mid-tone world and a few real darks where the eye should go** (DIRECTION
+8. **A full value range: a calm light sky, a mid-tone world and real darks where the eye should go, in many small
+   pieces** (DIRECTION
    rule 6; owner, 2026-10-28: "good point too!"; numbers: city-poster study, 2026-10-28, `STUDY.md` §1a, §5.5, §7, from
    `pro_1_depth.md` and `pro_4_colour.md`). Per frame, the caption band out: the darkest 5 % of the pixels at L* <= 32
    (p5; posters 23, v2 48), on the dark pieces below (§d.2); >= 30 L* from the near group (planes -2, -1) to the air

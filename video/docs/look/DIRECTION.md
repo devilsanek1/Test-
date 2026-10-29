@@ -100,8 +100,7 @@ the owner approves it; the look test shows it.
   subject; night is temperature, not darkness. -> `CRAFT.md` §d; `scripts/qa/check_light.py`.
 - **6. Warm, soft colour, never sickly.** One sister palette per film, proposed in the W1 world bible (its rigs and
   colour script are written in its terms) and approved with the G4 look clip: a soft light page of many fills (warm by
-  default), one hero on the story's object, one tinted dark anchor whose hue carries the frame's darks, at most one
-  pop ("look here"). Peach
+  default), one hero on the story's object, one tinted dark anchor (the darks' hue), at most one pop ("look here"). Peach
   creams, terracotta, rose, leaf sage, golden light, plum and red-brown shadows; never beige, muddy tan, olive or
   grey; a warm world held by one cool field; saturation as confetti, never fields; a full value range: a calm light
   sky, a mid-tone world and real darks where the eye should go, drawn in many small pieces (windows, doorways, eave
@@ -168,12 +167,11 @@ stage; the owner may skip gates by name. The clean pen's first test is the v3 re
 - Line weight or detail by depth (`style_bible.md` §3, `ENGINE.md` rule 8, the old G3 "detail gradient", the "ink
   full, full, hairline, none" ladders): no outlines on any tier, thin lines only on things that are lines (rule 4);
   distance only calms colour and merges small parts, one flat step per plane (rule 2's depth, `CRAFT.md` §f).
-- Outlines: tier A's closed 3.0 px outline in its own deep shade (our reading of the owner's "black outlines, VERY
-  subtle, in key places") and B's thin same-hue line on the mascot and line-drawn figures (v2's line, the A vs B
-  picture's A, which draws one on Pip): edges from light and shade, thin lines only on small things (rule 4; owner,
-  2026-10-29).
-- A single saturated sun disc as the far group's pop (v2's S5 sun, the loudest far thing): the far stays the calmest
-  part, the sun one step off its sky unless it is the shot's "look here" (rule 6; owner, 2026-10-29).
+- Tier A's closed 3.0 px outline in its own deep shade (our reading of "black outlines, VERY subtle, in key places")
+  and B's thin same-hue line on Pip and line-drawn figures (v2's line, the A vs B picture's A): edges from light and
+  shade, thin lines only on small things (rule 4; owner, 2026-10-29).
+- A saturated sun disc as the far group's pop (v2's S5 sun): the sun one step off its sky unless it is the shot's
+  "look here" (rule 6; owner, 2026-10-29).
 - Equal-weight clutter: dressing, crowds or the mascot as loud as the subject; specks, ticks, hatching, dash rows,
   squiggles, a visible grain (rule 4's VERY subtle texture is an opt-in test, never a loud one).
 - An events-per-second quota or a density FAIL (`ENGINE.md` rule 6, `motion_spec.md` §9, ref 2 as a floor, the old

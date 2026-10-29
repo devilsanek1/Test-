@@ -118,6 +118,22 @@ export const PLANE_STEPS = [0, 0.12, 0.22, 0.4, 0.65] as const;
 /** The foreground's value steps, planes -1 ... -4: L* darker than the subject's plane, cumulative (COZY_AND_SCALE §4). */
 export const NEAR_STEPS = [5, 10, 13, 14] as const;
 
+/** The near group's value target in ABSOLUTE terms (city-poster study, 2026-10-29: `pro_1_depth.md` §3.1, `perspective.md`
+ *  L1: the near frame's median L* 45-60, >= 30 from the air; v2 S1's near treads sat at L* 75, LIGHTER than its subject).
+ *  `nearStep` then takes the larger of its relative step (5 / 10 / 13 / 14) and the step that brings the plane's
+ *  reference value down to `maxL`, the same step on every colour of the plane (hue, chroma and internal steps kept). */
+export type NearFloor = {
+  /** The plane's value ceiling, L*: index 0 = plane -1, 1 = plane -2 ...; fractional planes interpolate, nearer ones take
+   *  the last. NEAR_FLOOR_L: 60 / 55. */
+  maxL: readonly number[];
+  /** Nothing lands darker than this L* (a dark that hits it stops there; one already darker is kept). Default 16. */
+  minL?: number;
+  /** The plane's reference value, index as `maxL`: its main mass (a hex) or an L*. The step that brings it to `maxL` is
+   *  the plane's step. Without it each colour is its own reference, so every light colour lands on `maxL` (the plane's
+   *  internal steps collapse): give it, or use `nearPalette`, which takes the plane's median. */
+  ref?: readonly (string | number)[];
+};
+
 export type Atmosphere = {
   name: string;
   /** The air behind plane p: the lowest sky step right behind it (one continuous sky, DIRECTION rule 6; v2 S1: the gold
@@ -128,22 +144,27 @@ export type Atmosphere = {
   /** Foreground value steps (L* darker), index 0 = plane -1. */
   near: readonly number[];
   opts: Required<AtmosOpts>;
+  /** Opt-in: the near group's absolute value target (NearFloor). Absent = `nearStep`'s relative steps only (as before). */
+  nearFloor?: NearFloor;
 };
 
 /** ONE atmosphere per set (written in the W1 world bible with the set's light rig). `air`: one colour (the same air
  *  behind every plane) or a list indexed by plane (air[2] = behind plane +2; missing planes take the nearest one
- *  before them). Take it from the SKY, never a hand-picked haze: the sky's lowest step behind each plane. */
-export function makeAtmosphere(o: {name: string; air: string | readonly string[]; steps?: readonly number[]; near?: readonly number[]} & AtmosOpts): Atmosphere {
+ *  before them). Take it from the SKY, never a hand-picked haze: the sky's lowest step behind each plane. Opt-in:
+ *  `steps: PLANE_STEPS_GHOST` adds the +5 ghost step (k 0.87); `nearFloor` the near group's absolute value target. */
+export function makeAtmosphere(o: {name: string; air: string | readonly string[]; steps?: readonly number[]; near?: readonly number[]; nearFloor?: NearFloor} & AtmosOpts): Atmosphere {
   const airs = typeof o.air === 'string' ? [o.air] : o.air;
   if (!airs.length || !airs.every(isHex)) throw new Error(`makeAtmosphere(${o.name}): air must be hex colour(s)`);
   const air = (plane: number) => airs[clamp(Math.ceil(plane), 0, airs.length - 1)] ?? airs[airs.length - 1];
-  return {
+  const atm: Atmosphere = {
     name: o.name,
     air,
     steps: o.steps ?? PLANE_STEPS,
     near: o.near ?? NEAR_STEPS,
     opts: {chroma: o.chroma ?? 0.8, hueTurn: clamp(o.hueTurn ?? 0, 0, 30), chromaFloor: o.chromaFloor ?? 8},
   };
+  if (o.nearFloor) atm.nearFloor = o.nearFloor;
+  return atm;
 }
 
 /** The sky's lowest step (the air behind the farthest plane) from a list of sky colours, top -> horizon. A film drawn

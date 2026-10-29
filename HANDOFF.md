@@ -175,10 +175,16 @@ Everything that agent knew is in this repo. This file is the map; the details li
   the month's data-centre stories were all backlash). The thread stays open for the owner's reactions.
 - **The owner's answers (2026-10-28 ~22:10 UTC)** to our nine first observations are rules now where decided (one look,
   one brand; a VERY subtle texture to try; lit and shade faces; a full value range: DIRECTION intro and rules 3-6,
-  CRAFT §c, PALETTE, the playbook) and open where not (outline-free edges: an A vs B picture; one consolidated layout
+  CRAFT §c, PALETTE, the playbook) and were open then (outline-free edges: an A vs B picture; one consolidated layout
   guide; the designed view; the patchwork): the study README lists them. "merge the findings and key points and
   conclusions into the main repo": this study is merged into `video-production` as it goes, and its conclusions are
   integrated into the main docs when the synthesis lands.
+- **Decided (2026-10-29 ~04:20 UTC, the owner: "Go with your suggestions"):** every open call of the study: no outlines
+  (edges from light and shade, the subject's shade face the deepest), real darks 6-10 % in many small pieces, the
+  "low poly" patchwork as tier C's build, the designed view in two frames a film, a quiet "find Pip", the sun toned,
+  2 px lines on floating layers; `docs/look/LAYOUT.md` is the one layout guide (DIRECTION, CRAFT, LAYOUT, the playbook;
+  `INTEGRATION.md` §2). All are first judged in the 7 s look test of v2's canal opening, built in four parallel lanes
+  (the study's `HANDOVER.md`).
 - **Then (2026-10-28 ~22:30 UTC):** "our look is evolving - we are finding out style i don't think we can overfixate on
   this" (ONE LOOK, ONE BRAND is a direction, not a freeze) and Pip "would be good to keep it, but ... way more subtle
   perhaps hide it deliberately in the video": Pip stays, hidden on purpose, no longer on both sides of every join
