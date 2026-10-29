@@ -68,3 +68,6 @@ Earlier rounds also used Pip's periwinkles (`#7A7FE3`, `#6A6ED6`, `#AEB2F4`), pe
 - 2026-10-29 ~19:50 UTC, on round 2 (the sheet and the pick, 3 Pip hidden on purpose): "More premium!!" then "No, more
   abstract more premium" -> round 3: abstract marks, premium (precise geometry, few shapes, restrained colour); no
   cartoon, no face; Pip only if abstracted past the cartoon.
+- 2026-10-29 ~20:00 UTC, on round 3 (The Fold, The Eclipse, The Question): "Nope from scratch I don't like none of
+  them" and "More premium" -> round 4 from scratch: flat geometric icons read as stock, not premium; premium is the
+  city posters' language (light, depth, atmosphere, craft), drawn as small emblems at dusk.
