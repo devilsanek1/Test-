@@ -2,7 +2,7 @@
 """The journal-corpus study's tools (video/docs/studies/2026-10-28_city_posters/journals/README.md has the method).
 
   python3 video/scripts/look/posters/journals.py merge      # parts/corpus_feeds.csv + corpus_C*.csv -> corpus.csv (validated, deduped)
-  python3 video/scripts/look/posters/journals.py select [N] # stage 2: triage top N + a random 10 % control -> stage2_ids.txt
+  python3 video/scripts/look/posters/journals.py select     # stage 2: search rows + feed rows t_fit >= 5 or WOW 2 + a 10 % control
   python3 video/scripts/look/posters/journals.py sample     # a seeded 20 % of stage 2, stratified by source -> blind_sample_ids.txt
   python3 video/scripts/look/posters/journals.py check scores.csv [--fix]   # ranges, tags, the sums (--fix recomputes them)
   python3 video/scripts/look/posters/journals.py agreement  # scores.csv vs scores_blind.csv on the sample (markdown)
@@ -149,7 +149,8 @@ def cmd_merge(args):
 
 
 def cmd_select(args):
-    """Stage 2: the top N by the triage (t_fit, then t_wow) plus a seeded random 10 % of the rest as a control."""
+    """Stage 2: every search row (already a sample, with summaries), the feed rows the triage rates t_fit >= FIT or WOW 2,
+    and a seeded random 10 % of the other feed rows as a control (what the triage misses)."""
     corpus = {r['id']: r for r in read_csv(path(args, 'corpus.csv'))}
     tri = {}
     for f in sorted(os.listdir(path(args, 'parts'))):
@@ -157,21 +158,22 @@ def cmd_select(args):
             for r in read_csv(path(args, os.path.join('parts', f))):
                 if r['id'] in corpus:
                     tri[r['id']] = r
-    missing = sorted(set(corpus) - set(tri))
+    feeds = [i for i in corpus if corpus[i]['source'] == 'rss']
+    missing = sorted(i for i in feeds if i not in tri)
     if missing:
-        print(f'not triaged ({len(missing)}): ' + ' '.join(missing[:40]))
-    rank = sorted(tri, key=lambda i: (-(num(tri[i]['t_fit']) or 0), -(num(tri[i]['t_wow']) or 0), i))
-    top = rank[:args.n]
-    rest = rank[args.n:]
+        print(f'feed rows not triaged ({len(missing)}): ' + ' '.join(missing[:40]))
+    search = sorted(i for i in corpus if corpus[i]['source'] == 'search')
+    top = sorted(i for i in feeds if i in tri and ((num(tri[i]['t_fit']) or 0) >= args.fit or num(tri[i]['t_wow']) == 2))
+    rest = sorted(i for i in feeds if i in tri and i not in set(top))
     rng = random.Random(SEED)
     control = sorted(rng.sample(rest, math.ceil(0.1 * len(rest)))) if rest else []
-    write_csv(path(args, 'triage.csv'), [dict(tri[i], stage2='top' if i in top else 'control' if i in control else '')
-                                         for i in sorted(tri)], ['id', 't_fit', 't_wow', 't_conf', 'stage2'])
+    role = {**{i: 'search' for i in search}, **{i: 'top' for i in top}, **{i: 'control' for i in control}}
+    write_csv(path(args, 'triage.csv'), [dict(tri[i], stage2=role.get(i, '')) for i in sorted(tri)],
+              ['id', 't_fit', 't_wow', 't_conf', 'stage2'])
     with open(path(args, 'stage2_ids.txt'), 'w', encoding='utf-8') as f:
-        f.write('\n'.join(sorted(top + control)) + '\n')
-    cut = num(tri[top[-1]]['t_fit']) if top else None
-    print(f'{len(tri)} triaged; stage 2 = top {len(top)} (t_fit >= {cut}) + control {len(control)} = '
-          f'{len(top) + len(control)} -> stage2_ids.txt, triage.csv')
+        f.write('\n'.join(sorted(role)) + '\n')
+    print(f'stage 2 = {len(search)} search rows + {len(top)} feed rows with t_fit >= {args.fit} or WOW 2 + a control of '
+          f'{len(control)} (10 % of the other {len(rest)} feed rows) = {len(role)} -> stage2_ids.txt, triage.csv')
 
 
 def cmd_sample(args):
@@ -623,7 +625,7 @@ def main():
     sub.add_parser('merge')
     sub.add_parser('sample')
     se = sub.add_parser('select')
-    se.add_argument('n', nargs='?', type=int, default=250)
+    se.add_argument('--fit', type=int, default=5)
     c = sub.add_parser('check')
     c.add_argument('file')
     c.add_argument('--fix', action='store_true')
