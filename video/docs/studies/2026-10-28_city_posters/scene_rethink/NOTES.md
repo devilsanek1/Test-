@@ -192,7 +192,8 @@ be about this size / So I think our initial angle snd the view frankly wasn’t 
 `video/docs/look/refs_human_scale/`, and the Cape Town poster).
 
 -> still_v3 goes back to v2's own eye-level angle and view and our own v2 look, built in our Remotion engine (so it
-can move), with her near the camera at the references' size (~15-30 % of the height), the vast evening world beyond.
+can move), with her at the references' size as seen on the phone (about v2's original, ~130-220 px tall; first briefed as
+15-30 % of the height, corrected), the vast evening world beyond.
 Kept from v1-v2: the near/far separation, a full street across the water, a sky with things in it, subtle near
 nature. The designed view is on hold. The general rule: playbook "DEPTH AND SCALE FROM A HUMAN VIEWPOINT" (it replaces
 "DEPTH IS AIR AND DISTANCE").

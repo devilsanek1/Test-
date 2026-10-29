@@ -124,7 +124,7 @@ the owner approves it; the look test shows it.
   plain cut except on a "But" turn (rule 1). It must feel GREAT: a world that keeps going past every edge, a landmark
   huge yet far, tiny anchors, a big sky, life in the hold. **Depth and scale come from a human viewpoint** (owner,
   2026-10-29; playbook DEPTH AND SCALE FROM A HUMAN VIEWPOINT; refs `refs_human_scale/`): the camera stands where a
-  person would stand, the "you" near it at a real size (~15-30 % of the frame's height, from behind or in silhouette),
+  person would stand, the "you" near it at a real size (about v2's original size or a little more, ~130-220 px tall in our 1080 x 1920 frame (the references' people as the owner sees them on the phone, full width: 8-16 % of the screen's width; the 9:16 motion reference's girl ~145 px); from behind or in silhouette),
   the vast world beyond (a city, a big sky, the water) giving the scale; never a wall filling the frame up close
   ("I'm really suffocating with the view") and never a far poster-like panorama ("too cheap looking"); v2's eye-level
   view of the canal is the model ("our initial angle snd the view frankly wasn't bad"). The near frame is a small,

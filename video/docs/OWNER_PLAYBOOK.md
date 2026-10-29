@@ -162,8 +162,8 @@ Maintenance at the end).
   size, with the vast world beyond; never a wall in your face, never a far panorama.** Two stills of v2's opening
   failed both ways: the building filling the frame up close reads as no depth and no scale ("suffocating"), and the
   camera pulled far back into a poster-like panorama reads cheap, drifts from our style and gives a video little to
-  do. The owner's references (`docs/look/refs_human_scale/`) put the person near the camera at ~15-30 % of the frame's
-  height (from behind or in silhouette, no face: the people bullet below) before a vast world (a city, a huge sky, the
+  do. The owner's references (`docs/look/refs_human_scale/`) put the person at a real size near the camera's side of
+  the scene, about v2's original size or a little more, ~130-220 px tall in our 1080 x 1920 frame (the references' people as the owner sees them on the phone, full width: 8-16 % of the screen's width; the 9:16 motion reference's girl ~145 px) (from behind or in silhouette, no face: the people bullet below) before a vast world (a city, a huge sky, the
   sea) that gives the scale; our own v2 eye-level angle and view of the canal "wasn't bad". So the scale comes from a
   near human figure against a far, big world, not from moving the camera away. Keep what worked: the
   foreground/background separation (a darker near frame, a lighter far world); the near frame a small, subtle hint at
@@ -242,7 +242,7 @@ Maintenance at the end).
 - **People small and simple like reference 1** (crowds, small full figures seen from behind or in rear 3/4, round
   heads; near heads <= ~140 px), never big character models or faces: they act with their pose (reach, shrug, slump,
   look up), as reference 1's do; only the mascot has a face. **In the foreground only the film's one "you" or the
-  mascot;** the "you" near the camera may stand at a real size, ~15-30 % of the frame's height, still simple and
+  mascot;** the "you" near the camera stands at a real size, about v2's original (~130-220 px tall), still simple and
   from behind or in silhouette (DEPTH AND SCALE FROM A HUMAN VIEWPOINT above; owner, 2026-10-29); strangers stay small in the mid and far ground (a row of strangers' backs in front reads as "you"). —
   ("don't use big models of people; the people in the first example video are the right direction", v2 restart,
   2026-10-27; v3 retro, 2026-10-27).
