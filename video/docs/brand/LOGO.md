@@ -88,3 +88,6 @@ Earlier rounds also used Pip's periwinkles (`#7A7FE3`, `#6A6ED6`, `#AEB2F4`), pe
   them" and "More premium" -> round 4 from scratch: flat geometric icons read as stock, not premium; premium is the
   city posters' language (light, depth, atmosphere, craft), drawn as small emblems at dusk. The Fold, less abstract,
   is the next round if the owner's answer to round 4 points back to it.
+- 2026-10-29 ~20:10 UTC, on round 4, written to the logo session directly: "I like the city view but it's too generic
+  like why is it relevant to us" -> round 5: keep the city view (the posters' dusk, depth, lit windows) and make it
+  ours: the city is what everyone's talking about, so each variant ties it to the talk, the fuss or the question.
