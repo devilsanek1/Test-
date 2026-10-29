@@ -77,3 +77,79 @@ Strength marks: **study** (peer-reviewed or experimental), **style guide** (a ne
 - Chip Heath and Dan Heath, "The Curse of Knowledge", HBR, Dec 2006: https://hbr.org/2006/12/the-curse-of-knowledge
   (an expert's abstract phrase summarizes "the wealth of concrete data in their heads", the listener hears "only
   opaque phrases"). Practitioner.
+- ISO 24495-1:2023, Plain language, Part 1: https://www.iso.org/standard/78907.html (scope confirmed at
+  https://committee.iso.org/standard/78907.html ; the definition it builds on, quoted by PLAIN:
+  https://plainlanguage.com/what-is-plain-language/ : "A communication is in plain language if its wording,
+  structure, and design are so clear that the intended audience can easily find what they need, understand what they
+  find, and use that information"). Standard. (iplfederation.org is now a hijacked gambling site: never cite it.)
+- digital.gov plain language guides (plainlanguage.gov's successor): https://digital.gov/guides/plain-language/writing
+  (active voice "makes it clear who should do what"; passive "often does not identify who is performing the action")
+  and https://digital.gov/guides/plain-language/test ("Paraphrase testing: individual interviews, best for short
+  ... documents"). Style guide (US government).
+- GOV.UK, "Use clear language":
+  https://guidance.publishing.service.gov.uk/writing-to-gov-uk-standards/writing-guidelines/clear-language/ (plain
+  English mandatory; "80% of people preferred sentences written in clear English" and "the more specialist their
+  knowledge, the greater their preference"; explain a specialist term "the first time you use them"; use the words
+  users use, "heavy goods vehicle" or "lorry"). Style guide (UK government).
+- Caroline Jarrett with Ginny Redish, "Readability formulas: seven reasons to avoid them and what to do instead":
+  https://www.effortmark.co.uk/readability-formulas-seven-reasons-to-avoid-them-and-what-to-do-instead/ ("a big word
+  might be one your readers know, while a short word could be one they don't know"; "Promise Money" scored better than
+  "Security Deposit" and confused low-literacy readers; "No score can accurately predict whether an actual person would
+  be able to understand your content"). Practitioner (Redish: a leading usability researcher). Redish 2000, ACM
+  J. Computer Documentation 24(3): 132-137, https://doi.org/10.1145/344599.344637 (formulas ignore readers and
+  meaning; count only countable features). Study (review).
+- Our own Flesch-Kincaid run on draft 1 (simple syllable heuristic, scratch script): "The chips get that hot." grade
+  -1.8 (the easiest line in the script); "But Helsinki WANTS it." grade 3.7; "So almost everywhere ..." grade 5.9, the
+  same as the owner's favourite line 1. The formula passes every line the owner failed.
+- Bullock, Colón Amill, Shulman and Dixon 2019, "Jargon as a barrier to effective science communication: evidence from
+  metacognitive judgments", Public Understanding of Science, https://doi.org/10.1177/0963662519865687 ; PDF:
+  https://comm.osu.edu/sites/comm.osu.edu/files/PUS%202019-%20Bullock%20et%20al..pdf (N = 650: jargon cut processing
+  fluency, which raised resistance to persuasion and lowered support; definitions on mouseover made no difference,
+  F(1, 636) = 0.37, p = .543). Study. Also Shulman, Dixon, Bullock and Colón Amill 2020, J. Language and Social
+  Psychology 39: 579-597, https://doi.org/10.1177/0261927X20902177 . Study.
+- Somerville and Hassol 2011, "Communicating the science of climate change", Physics Today 64(10): 48-53,
+  https://doi.org/10.1063/PT.3.1296 ; the table as quoted by the Yale Environment Review:
+  https://environment-review.yale.edu/node/3381 (common words with a science meaning: "enhance" heard as improve,
+  "aerosol" as spray can, "positive feedback" as praise, "theory" as hunch). Practitioner (scientist + science
+  communicator).
+- Rakedzon et al. 2017, "Automatic jargon identifier" (the De-Jargonizer), PLOS ONE 12: e0181742,
+  https://pubmed.ncbi.nlm.nih.gov/28792945/ (frequency-based: it cannot flag a COMMON word used in a tech sense). Study.
+- Ed Yong, "On jargon, and why it matters in science writing", National Geographic, 2010:
+  https://www.nationalgeographic.com/science/article/on-jargon-and-why-it-matters-in-science-writing ("things that cause
+  cancer rather than carcinogens"; "Explain a word once and you can often get away with using it again"; "If the
+  difference isn't core to the story ... I leave them out"; science writing "rounds technical concepts to their nearest
+  understandable form"; Tim Radford: "Don't overestimate your reader's knowledge and don't underestimate their
+  intelligence"). Practitioner.
+- Jarvella 1971, "Syntactic processing of connected speech", JVLVB 10: 409-416,
+  https://doi.org/10.1016/S0022-5371(71)80040-3 ; Sachs 1967, Perception & Psychophysics 2: 437-442,
+  https://doi.org/10.3758/BF03208784 ; summarized by Schweppe, Rummer and Fürstenberg 2009, Memory & Cognition 37:
+  73-80, https://doi.org/10.3758/MC.37.1.73 ("what is retained beyond sentence boundaries is meaning information,
+  whereas lexical and syntactic information is only available for the most recent constituent"); qualified by
+  Gurevich, Johnson and Goldberg 2010, Language and Cognition 2: 45-78, https://doi.org/10.1515/langcog.2010.003 (some
+  verbatim memory survives). Study.
+- Baddeley, Thomson and Buchanan 1975, "Word length and the structure of short-term memory" (span = what you can say
+  in about 2 s); Cowan 2001, "The magical number 4", BBS 24: 87-114, https://doi.org/10.1017/S0140525X01003922 . Study.
+- Nation 2006, "How large a vocabulary is needed for reading and listening?", CMLR, ERIC
+  https://eric.ed.gov/?id=EJ750537 (98 % known words -> 6,000-7,000 word families for spoken English); van Zeeland and
+  Schmitt 2013 (95 % may be enough for listening), as summarized by Schmitt, Cobb, Horst and Schmitt 2017, ERIC
+  https://eric.ed.gov/?id=EJ1139942 . Study.
+- Cieślicka 2006, "Literal salience in on-line processing of idiomatic expressions by second language learners",
+  Second Language Research 22: 115-144, https://doi.org/10.1191/0267658306sr263oa (L2 listeners compute the LITERAL
+  meanings first, even for idioms they know). Study. Liao and Fukuya 2004, Language Learning, ERIC
+  https://eric.ed.gov/?id=EJ686952 (learners avoid phrasal verbs, most of all figurative ones). Study.
+- Montero Perez, Peters and Desmet 2014, ReCALL, ERIC https://eric.ed.gov/?id=EJ1020100 (full captions beat no
+  captions and keyword captions for L2 global comprehension). Study. Griffiths 1990, Language Learning, ERIC
+  https://eric.ed.gov/?id=EJ415102 (moderately fast speech significantly cut L2 comprehension). Study.
+- Chaudron and Richards 1985/1986, "The effect of discourse markers on the comprehension of lectures", ERIC
+  https://eric.ed.gov/?id=ED259565 (macro markers, which signal the overall organization, helped ESL recall more than
+  micro markers). Study.
+- Hoffrage, Lindsey, Hertwig and Gigerenzer 2000, "Communicating statistical information", Science 290: 2261-2262,
+  https://pubmed.ncbi.nlm.nih.gov/11188724/ (natural frequencies, "1 in 10", beat probabilities). Study.
+- Microsoft Style Guide, global communications, writing tips:
+  https://learn.microsoft.com/en-us/style-guide/global-communications/writing-tips ("Avoid idioms, colloquial
+  expressions, and culture-specific references"; "Use one word for a concept ... don't use the same word to refer to
+  multiple concepts"; subject + verb + object). Style guide.
+- Google developer documentation style guide, "Write for a global audience":
+  https://developers.google.com/style/translation ("if a pronoun is ambiguous, then replace it with the noun"; "Repeat a
+  word if the redundancy improves comprehension"; "Use words in their primary sense"; "Provide context. Don't assume
+  that the reader already knows what you're talking about"; avoid phrasal verbs, idioms, humor). Style guide.
