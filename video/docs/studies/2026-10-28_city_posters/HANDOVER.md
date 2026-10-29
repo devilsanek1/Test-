@@ -6,6 +6,14 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Resumed 2026-10-29 02:36 UTC (after the 5-hour reset)
+- The limit stopped details, composition, colour (pro_4) and the A vs B critic; nature (pro_3) had finished its file.
+- Running now as single max-effort agents (the Agent tool), each continuing its partial file from its original brief
+  in the workflow scripts: `details.md`, `composition.md`, `pro_4_colour.md`. The checkpoint loop restarted (2 h).
+- The A vs B picture was sent to the owner (the critic skipped; checked by eye: `img/AB_outlines.md`).
+- Next: when the three land, the synthesis (`STUDY.md`, `SUMMARY.md`, `layout.md` part B), then the integration into
+  the main docs and the merge into `video-production`.
+
 ## Done (files here, committed)
 - `perspective.md`, `style.md` (look lenses), `pro_1_depth.md`, `pro_2_hierarchy.md` (pro practice), `layout.md`
   (part A: every earlier layout rule consolidated; part B waits for `composition.md`), `content_market.md`,

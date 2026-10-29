@@ -1,17 +1,21 @@
 # Journal corpus: which recent big-journal stories fit our visual storytelling (method and rubric)
 
-**The owner's ask** (2026-10-28 ~22:20 UTC, to the study's orchestrator, verbatim): "another approach we could perhaps
-brainstorm in a dedicated thread is take a look at the stories posted by big journals recently. like forbest, times,
-economist, etc for each story evalute if having our visual storytelling would actually be a good fit and then cluster
-the stories and see if anything comes out of it? thats directionally an approach - refine it and go".
-
-Run by helper session https://claude.ai/code/session_01YGLGMqT2EoqkuUBVwxxRZE (the journal-corpus thread), started by
-the study's orchestrator (https://claude.ai/code/session_01YGLGMqbgdpycjemYZL3aoL), on branch
-`claude/compassionate-hopper-5iqguj`. Part of the city-poster study (`../README.md`). Nothing here is a rule: it feeds the
-content discussion (`../content_discussion.md`, the parallel thread) and the next topic pick. **This rubric was written
-before any story was collected** (2026-10-28 22:35 UTC; the telling shapes updated at 22:45, still before collecting,
-for the owner's second steer); the reliability result and any sharpening are appended in section 6, never edited into
-the rubric silently.
+**State (2026-10-28 23:05 UTC; updated at every step):**
+- Done: the rubric (this file), the tools (`video/scripts/look/posters/journals.py`, tested), the workflow scripts with
+  their briefs (`context/workflows/journals-collect.js`, `context/workflows/journals-score.js`); the feed frame:
+  1,113 headlines from 9 outlets' RSS feeds, fetched by the orchestrator (`feeds_raw.csv`), given ids F0001-F1113
+  (`parts/corpus_feeds.csv`).
+- Running: (a) search collection (workflow `journals-collect`): C1 (TIME, Forbes, Bloomberg, Fortune), C2 (MIT
+  Technology Review, Scientific American, National Geographic, Smithsonian), then C3 (The Washington Post, CNN, NPR),
+  writing `parts/corpus_C*.csv` as they go; (b) the triage agent on the feed headlines -> `parts/triage_feeds.csv`.
+- Next, exactly: (1) when collection ends (or stops: its files count as they stand), `journals.py merge`; (2) triage
+  the search rows (same brief, rows with summaries) -> `parts/triage_search.csv`; (3) `journals.py select 250` then
+  `journals.py sample`, commit; (4) scoring (section 5): a first scorer on `stage2_ids.txt` -> `scores.csv`, a blind
+  second scorer on `blind_sample_ids.txt` -> `scores_blind.csv`, an auditor on the search rows whose id ends in 0 ->
+  `audit.csv`; a partial file is resumed from the first missing id; (5) `journals.py check` + `agreement` into section
+  6; (6) the clusterer-editor: `clusters.csv`, `clusters.md`, `journals.py chart`, `top`, `slices`; (7) a check of the
+  top 10; (8) `SUMMARY.md`, chart and summary to the owner, a note to the content thread.
+- If C3 never ran, skip it (the feeds bring The New York Times and The Guardian) and say so.
 
 ## 1. The question, made testable
 Of the stories big journals published in the last 30 days (2026-09-28 to 2026-10-28), **which could be TOLD through the
@@ -83,6 +87,13 @@ good fits fall into?** The output is content directions with real examples, not 
   result), `headline` (the result's title), `url`, `section`, `type` (news / feature / analysis / opinion / interview /
   review / list / live), `stratum` (A / B), `query`, `summary` (one line in OUR words, 15-35 words: what happened, where,
   and the so-what; never article text: the repo is public, and paywalls are respected), `collector`.
+- **The feed frame (added 2026-10-28 ~22:55 UTC, when the owner opened the network):** the orchestrating session
+  fetched the outlets' RSS feeds (`feeds_raw.csv`: The Economist 415, The New York Times 299, The Guardian 190, The New
+  Yorker 50, Wired 50, Forbes 48, The Atlantic 25, TIME 25, the FT 11; dated 2026-09-28..10-28; headlines, links and the
+  feeds' tags only, no article text). Ids F0001-F1113, stratum F, source rss; the search rows keep their collector ids
+  (C1-001...), source search. A story found both ways keeps its feed row. Feed rows have no summary: they are scored
+  from the headline, section and tags (confidence marks the cryptic ones). Feeds carry recent items, so the last week
+  is over-represented (about 70 % of feed rows are dated 10-21..28).
 - **Bias, stated:** search favours popular pages; the section list is ours; one week's big events can crowd a section;
   the 13 blocked outlets (above) are missing, and with them much of the long-form analysis the owner named.
 
@@ -182,13 +193,18 @@ thing, its telling shape, and the "ad or news?" check (`TOPIC_CRITERIA.md`: hear
 line sound like a commercial?). A candidate is an idea, not a fact lock.
 
 ## 5. Reliability, clustering and outputs
-- **The blind second scorer** re-scores a 20 % seeded random sample (stratified by collector; ids in
+- **Two stages (for ~1,350 rows, with a usage limit near):** a quick triage of every row (`t_fit` 0-10 and `t_wow`
+  0-2 from the headline, section, tags and summary: `parts/triage_*.csv`, merged in `triage.csv`); then the full rubric
+  on stage 2 (`stage2_ids.txt`): the top 250 by the triage plus a seeded random 10 % of the rest as a control, so the
+  clusters are not only what the triage favoured and the control measures what the triage misses. Base rates come from
+  the triage over every row, corrected by the control.
+- **The blind second scorer** re-scores a 20 % seeded random sample of stage 2 (stratified by source; ids in
   `blind_sample_ids.txt`) without seeing the first scores. Reported: on fit, Spearman rho, the mean absolute difference
   (MAD) and the share within +-1; on each sub-score, exact and +-1 agreement and the quadratic weighted kappa; on the
   gate, `world`, `happens_to`, `mood` and `telling_shape`, Cohen's kappa; on value, rho and MAD. **Good:** fit rho >=
   0.7, MAD <= 1.0 and >= 70 % within +-1. **Poor:** fit rho < 0.6 or MAD > 1.5: then the rubric is sharpened where the
   two disagreed (new anchors, never new weights), every row is rescored, and a fresh 20 % sample is checked.
-- **The audit:** about 10 % of rows re-found by fresh searches (headline, URL and date match a real result); a row
+- **The audit:** the search rows whose id ends in 0 (about 10 %) re-found by fresh searches (headline, URL and date match a real result); a row
   that cannot be re-found is dropped and counted.
 - **Clustering:** the open `news_shape` codes are consolidated into about 8-15 clusters (each with a one-line
   definition; every row in exactly one). Per cluster: size (rows and distinct events), mean fit, mean value, share

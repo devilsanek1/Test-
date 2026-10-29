@@ -15,6 +15,7 @@ import sys
 
 from PIL import Image
 
+sys.dont_write_bytecode = True  # keep the repo folder clean (no __pycache__)
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import scene  # noqa: E402
@@ -68,8 +69,8 @@ def markers(items, w_px, h_px):
         out.append(f'<line x1="{bx:.1f}" y1="{by:.1f}" x2="{tx:.1f}" y2="{ty:.1f}" stroke="{INK}" stroke-width="5" '
                    f'stroke-linecap="round"/>')
         out.append(f'<circle cx="{tx:.1f}" cy="{ty:.1f}" r="7" fill="{INK}"/>')
-        out.append(f'<circle cx="{bx:.1f}" cy="{by:.1f}" r="30" fill="#FFFFFF" stroke="{INK}" stroke-width="5"/>')
-        out.append(f'<text x="{bx:.1f}" y="{by + 13:.1f}" text-anchor="middle" font-size="38" font-weight="800" '
+        out.append(f'<circle cx="{bx:.1f}" cy="{by:.1f}" r="32" fill="#FFFFFF" stroke="{INK}" stroke-width="5"/>')
+        out.append(f'<text x="{bx:.1f}" y="{by + 15:.1f}" text-anchor="middle" font-size="42" font-weight="800" '
                    f'fill="{INK}">{n}</text>')
     out.append('</svg>')
     return ''.join(out)
@@ -110,8 +111,8 @@ def page(v2_size, rvk_size):
           border-top: 4px solid {RULE}; }}
     .legend {{ font-size: 42px; line-height: 1.28; margin-top: 16px; font-weight: 600; }}
     .legend div {{ display: flex; gap: 16px; margin-top: 8px; }}
-    .legend b {{ display: inline-flex; width: 52px; height: 52px; flex: 0 0 52px; border-radius: 26px;
-                 border: 4px solid {INK}; justify-content: center; align-items: center; font-size: 32px; font-weight: 800;
+    .legend b {{ display: inline-flex; width: 58px; height: 58px; flex: 0 0 58px; border-radius: 29px;
+                 border: 4px solid {INK}; justify-content: center; align-items: center; font-size: 42px; font-weight: 800;
                  background: #fff; }}
     .cap {{ font-size: 42px; line-height: 1.26; margin-top: 14px; font-weight: 600; }}
     .why {{ display: flex; gap: 40px; margin-top: 30px; align-items: flex-start; }}
@@ -171,8 +172,8 @@ def page(v2_size, rvk_size):
     <div class="txt">
       <p>Take the light and shade away as well, and shapes of one colour run together: the bay window goes flat, Pip's
         head sinks into its body.</p>
-      <p>Every edge needs a line (A) or a step of light and shade (B). The posters choose the step, which is why they
-        look so crisp.</p>
+      <p>Every edge needs a line (A) or a step in light or colour (B). The posters always take the step: that is
+        their crisp look.</p>
     </div>
   </div>
 
