@@ -242,8 +242,11 @@ def read_film(path):
     except (OSError, ValueError) as e:
         print(f"usage: cannot read the film's word list {path}: {e}")
         sys.exit(2)
+    if not isinstance(raw, dict):
+        print(f"usage: the film's word list {path} must be a JSON object (thread, trade, allow, unique)")
+        sys.exit(2)
     unknown = set(raw) - {"thread", "trade", "allow", "unique"}
-    if not isinstance(raw, dict) or unknown:
+    if unknown:
         print(f"usage: the film's word list {path} has unknown keys {sorted(unknown)} (thread, trade, allow, unique)")
         sys.exit(2)
     thread = raw.get("thread") or {}
@@ -409,16 +412,19 @@ def lint_text(text, film=None, label="(text)"):
     docs = list(NLP.pipe(ana))
     film = film or {"thread_name": "", "rivals": [], "trade": {}, "allow": {}, "unique": set(), "path": None}
     allow, unique = film["allow"], UNIQUE | film["unique"]
-    terms = [(k.lower(), re.compile(r"(?<![\w-])(?:" + rx + r")(?![\w-])", re.I), film["trade"].get(k.lower(), []))
-             for k, rx in TECH_WORDS]
-    known = {k for k, _, _ in terms}
-    for k, gl in film["trade"].items():
-        if k not in known:
-            frag = re.escape(k).replace(r"\ ", "[- ]").replace(r"\-", "[- ]") + ("s?" if k[-1:].isalpha() else "")
-            terms.append((k, re.compile(r"(?<![\w-])(?:" + frag + r")(?![\w-])", re.I), gl))
+    terms = [[k.lower(), re.compile(r"(?<![\w-])(?:" + rx + r")(?![\w-])", re.I), []] for k, rx in TECH_WORDS]
+    for k, gl in film["trade"].items():  # the film's trade words; one the defaults know gets the film's descriptions
+        hit = next((term for term in terms if term[1].fullmatch(k)), None)
+        if hit:
+            hit[2] = hit[2] + gl
+        else:
+            frag = "[- ]".join(re.escape(w) for w in re.split(r"[- ]+", k) if w) + ("s?" if k[-1:].isalpha() else "")
+            terms.append([k, re.compile(r"(?<![\w-])(?:" + frag + r")(?![\w-])", re.I), gl])
+    terms.sort(key=lambda term: -len(term[0]))  # the longer phrase first: "district heating network"
     used, heard = set(), set()
     chain, pointers, rare, allowed_rare, allowed_hits, resolved = [], [], [], [], {}, {}
     numbers_total, out = 0, []
+    idioms_by_line = [[(m.start(), m.end()) for rx in (IDIOMS, SOFT_FIGURES) for m in rx.finditer(x)] for x in ana]
 
     def allowed(*words):
         for w in words:
@@ -432,12 +438,13 @@ def lint_text(text, film=None, label="(text)"):
         flags, low = [], a.lower()
         prev_a = ana[i - 1] if i > 0 else ""
         F = lambda code, st, en, msg, q: flags.append(Flag(code, st, en, s[st:en], msg, q))
-        tok_at = {t.idx: t for t in d}
 
         # C1: tech words (and the film's trade words), described plainly at their first use or flagged once
         covered = []
         for key, rx, glosses in terms:
             for m in rx.finditer(a):
+                if inside(m.start(), covered) or inside(m.end() - 1, covered):
+                    continue  # already part of a longer term here
                 covered.append((m.start(), m.end()))
                 for w in re.findall(r"[a-z]+", m.group(0).lower()):
                     if singular(w) in FALSE_FRIENDS:
@@ -484,11 +491,12 @@ def lint_text(text, film=None, label="(text)"):
                 F("W6", m.start(), m.end(), f'"{s[m.start():m.end()]}": figurative. Would a listener who takes every '
                   'word literally get it?', f'What does "{s[m.start():m.end()]}" mean here?')
         for m in SCOLDING.finditer(a):
-            F("W7", m.start(), m.end(), f'"{s[m.start():m.end()]}": sounds like a scolding or a scandal. Say the plain '
-              'situation, kindly', "How does this line sound to you: kind, funny or angry?")
+            if not allowed(m.group(0)):
+                F("W7", m.start(), m.end(), f'"{s[m.start():m.end()]}": sounds like a scolding or a scandal. Say the '
+                  'plain situation, kindly', "How does this line sound to you: kind, funny or angry?")
 
         # C2 / W1: pointers
-        pointer_flags(i, docs, nwords, ana, F, pointers, idiom_spans, resolved)
+        pointer_flags(i, docs, nwords, ana, F, pointers, idioms_by_line, resolved)
 
         # W2: a pointer at a whole idea
         m = re.match(r"(?:and |but |so )?(that's|that is|this is|that was|this was)\b"
@@ -645,12 +653,12 @@ def lint_text(text, film=None, label="(text)"):
                   for m in re.finditer(r"(?<![\w-])" + re.escape(singular(nm)) + r"(?:s|es)?(?![\w-])", low)
                   if not CHAIN.match(a, m.start())]
         for st, nm in sorted(names):
-            shown = " ".join(w if w.upper() in ACRONYMS else w.lower() for w in s[st: st + len(nm)].split())
-            if chain and chain[-1][0] == shown:  # "AI 2, 3": the same name again
+            name = " ".join(w if w.upper() in ACRONYMS else w.lower() for w in s[st: st + len(nm)].split())
+            if chain and chain[-1][0] == name:  # "AI 2, 3": the same name again
                 if chain[-1][1][-1] != i + 1:
                     chain[-1][1].append(i + 1)
             else:
-                chain.append((shown, [i + 1]))
+                chain.append((name, [i + 1]))
 
         for t in d:
             heard.add(t.lemma_.lower())
@@ -746,7 +754,7 @@ def pointer_flags(i, docs, nwords, ana, F, pointers, idioms, resolved):
                 continue
             if naming and x.pos_ == "PROPN":
                 continue
-            if k == i and inside(x.idx, idioms):
+            if inside(x.idx, idioms[k]):  # "word got out", "a heads-up": no thing to point at
                 continue
             if plural_noun(x) == plural:
                 cands.append((lem, x, k))
@@ -861,6 +869,8 @@ def words_before(d, end):
 # ---------------------------------------------------------------------------------------------------------- output
 def report(res, quiet=False, questions=False):
     film = res["film"]
+    if film and not os.path.relpath(film).startswith(".."):
+        film = os.path.relpath(film)
     print(f"film list: {film}" if film else f"film list: {res.get('film_note') or 'none (W13 off; pass --film)'}")
     note = version_note()
     if note:
@@ -961,6 +971,11 @@ def check_case(case):
             extra = [f for f in fl if not any(matches(f, h) for h in ok)]
             if extra:
                 bad.append(f"line {r['n']}: unexpected " + ", ".join(f"{f.code} {f.span!r}" for f in extra))
+        if "count" in exp:
+            want, k = exp["count"]
+            got = sum(1 for f in fl if matches(f, want))
+            if got != k:
+                bad.append(f"line {r['n']}: {got} x {want}, expected {k}; got {shown}")
     if "errors_exactly" in case:
         errs = [f for _, f in allf if f.code[0] == "C"]
         want = list(case["errors_exactly"])

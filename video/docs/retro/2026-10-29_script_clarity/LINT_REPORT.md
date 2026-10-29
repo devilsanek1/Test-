@@ -10,6 +10,8 @@
 - [x] library choice: spaCy + en_core_web_sm and wordfreq kept; coreferee 1.5.0 and proselint 0.16.0 tested on our
   cases and rejected; no-cliches, write-good, retext, Vale, Stanza, NLTK, UDPipe, textstat weighed (written up below)
 - [x] the tool: `video/scripts/voice/check_clarity.py`, fixtures and cases in `video/scripts/voice/clarity_tests/`
-- [x] the selftest: 28 of 28 cases pass (R1-R5)
-- [ ] the corpus run (v1, v2, v3, v4 draft 1, v5 draft 1): every flag read by hand
-- [ ] "Doc changes needed"
+- [x] the selftest: 33 of 33 cases pass (the spec's R1-R5, 28 cases, plus 5 added for the build step's own fixes)
+- [x] the corpus run (v1, v2, v3, v4 draft 1, v5 draft 1): errors exactly the spec's; every warning read by hand;
+  6 noise patterns fixed (pronoun chains, double flags inside idioms, a repeated W1, "what's left", duplicate rivals,
+  echo-question spacing); a crash sweep over all 359 docs files (34,578 sentences): 0 crashes; deterministic
+- [ ] the full write-up and "Doc changes needed"

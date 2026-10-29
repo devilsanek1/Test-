@@ -8,10 +8,9 @@
 (30-45 s, 95-125 words, one subject, positive, no company in line 1, the floor). Facts: `video/docs/v5/research/factlock.md`
 (FL below; the one fact file for videos 4 and 5); every spoken claim is in the fact table at the end. Card:
 `../THROUGHLINE.md`. Paste: `script_elevenlabs.md` (hook option 1 voiced). Film word list: `clarity.json`. Status:
-**DRAFT 2 DONE, `check_rhythm.py` OK and `check_paste.py` OK, no warnings; `check_clarity.py` did not exist yet when
-this was written (built in parallel), so its codes were checked by hand ("Checks"). Next (the workflow): the cold
-three-viewer panel, the critic, one fix pass; then the owner approves the script, a hook option, the core line and the
-card, then G2.**
+**DRAFT 2 DONE: `check_rhythm.py` OK and `check_paste.py` OK, no warnings; `check_clarity.py` OK, 0 errors and 2
+warnings, both answered ("Checks"; draft 1: 9 errors). Next (the workflow): the cold three-viewer panel, the critic,
+one fix pass; then the owner approves the script, a hook option, the core line and the card, then G2.**
 
 ## Rework after the owner's notes (2026-10-29)
 
@@ -77,7 +76,8 @@ worldwide (many learned English at school; they read the captions as it plays an
    it), never at once: draft 1's critique finding 5 (a question answered by the next line) no longer applies, since
    line 2 is the base, not an answer.
 
-All three tested as their own pastes: both checks OK, no warnings (Checks). Lines 2-13 are the same for all three.
+All three tested as their own pastes: `check_rhythm.py` and `check_paste.py` OK with no warnings, `check_clarity.py`
+0 errors with the same 2 answered warnings (Checks). Lines 2-13 are the same for all three.
 
 ### The writer's clarity pass (PIPELINE_V2 G1, as `RULES_DRAFT.md` 2a words it)
 - **The film's word list:** `clarity.json`: the one name, "computers", and its rivals (chips, cabinet, rack, servers,
@@ -294,7 +294,8 @@ ElevenLabs paste file: `script_elevenlabs.md`.
 ## Hook options (the owner picks one; option 1 is in the paste)
 
 The brief's three families, re-checked under the new rules (Rework, above). Lines 2-13 survive a swap unchanged. Each
-option was tested as its own paste: both checks OK, no warnings. Scores are not re-run here: OPENERS' family scores
+option was tested as its own paste: rhythm and paste OK with no warnings, clarity 0 errors (the same 2 answered
+warnings). Scores are not re-run here: OPENERS' family scores
 are P3 "There's a ..." 8.4, P5 "Why does this ...?" 8.1, P1 "Did you know ..." 8.0, and its own advice is that the
 content of the line matters more than the family; the owner has since praised option 1 in their own words.
 
@@ -375,9 +376,35 @@ No warnings. Hook options 2 and 3, tested as their own pastes (line 1 swapped, t
 warnings (option 2: 121 words, 755 characters, about 43 s by the paste's estimate; option 3: 119 words, 746
 characters, about 42 s; rhythm 13 sentences, 5 short, for both).
 
-**`check_clarity.py`:** not in `video/scripts/voice/` when this draft was finished (it is being built in parallel from
-`LINT_SPEC.md`), so it was not run. The film's word list it will read is ready (`clarity.json`). Until it runs, the
-writer checked every code of the spec by hand, sentence by sentence, as the spec defines them:
+**`check_clarity.py`** (built in parallel; it landed while this draft was being finished, its selftest 28 of 28 per
+`LINT_REPORT.md`): `python3 video/scripts/voice/check_clarity.py video/docs/v4/script/script_elevenlabs.md --film
+video/docs/v4/script/clarity.json --questions`, exit 0, last lines:
+
+```
+names: AI 1, 2 -> computers 2 -> data centers 2 -> computers 3 -> data centers 6 -> data center 8 -> computers 8 -> data center 12 -> chatbot 13
+pointers: 4 them -> computers; 8 its -> data center (the subject of its own line; also Helsinki, heat); 10 it -> water
+numbers: 4 in about 41 s (1.0 per 10 s at 2.87 words a second)
+13 sentences, 0 errors, 2 warnings; 0 of 118 words below Zipf 3.0 (allowed: chatbot)
+OK: none of the error patterns; 2 warnings: fix each, or answer it in the script doc's Checks section. OK never means clear: the cold viewer panel decides
+```
+
+- **The two warnings, answered (both stay):**
+  - **5 W2, "That's" points at a whole idea** ("What is 'that' here?"): its one target is the forty kettles boiling
+    non-stop, the only thing the line before says; "That's a lot of tea." is the joke's plain, natural form, and every
+    rewrite tried was worse ("Forty kettles make a lot of tea." is 6 words and breaks the rhythm: three long lines in a
+    row). The panel is asked the lint's question after its cold pass.
+  - **11 W5, "is built": who does it?** ("Who builds it?"): the state is the point, not the builder; naming the builder
+    would put a company in the voice, which the film keeps out. Tested alternative: "There's no building yet." (no
+    W5, both other checks OK), not taken: it adds a second name for the data center ("building") and reads as noun or
+    verb; it is the fix pass's to take if a panel viewer hears "nothing" as "not even the pipes".
+- **Before and after, the same tool and word list:** draft 1's paste (`../archive/g1_draft1/script_elevenlabs.md`):
+  "13 sentences, 9 errors, 12 warnings" / "FAIL: 9 errors (C1 x5, C2 x3, C3 x1)" (its names: "AI 1 -> chips 2 ->
+  cabinet 3 -> chips 7 -> data center 12 -> chatbot 13"). Draft 2: 0 errors, 2 warnings, one name for the computers.
+- **The hook options and the variants** (each as its own paste, `--film` as above): options 2 and 3, the bomb-shelter
+  line: 0 errors, the same 2 warnings; without the tea line, with all reserve cuts, and the heat-pump add-back: 0
+  errors, 1 warning (W5).
+
+The writer's hand check by the spec's codes, written before the tool landed and confirmed by it line for line:
 - **Errors (C1-C4): none expected.** C1: the one trade word, "data centers", is described where it is first said
   ("in buildings called data centers", the spec's own passing form) and only reused after; no false friend is said
   (no chip, cabinet, rack, server, model); "fans" is used in its everyday sense (fans that blow). C2: no "it", "its",
@@ -397,8 +424,7 @@ writer checked every code of the spec by hand, sentence by sentence, as the spec
   spec's never-flagged list; Helsinki 3.36; everything else 3.5 or above. So no W8: the spec's info line would read
   "0 of 120 words below Zipf 3.0 (chatbot allowed)", inside the ~2 unfamiliar words a 115-word script can carry
   (PRINCIPLES P2).
-When the tool exists, run `python3 video/scripts/voice/check_clarity.py video/docs/v4/script/script_elevenlabs.md
---film video/docs/v4/script/clarity.json --questions`, fix every error, and answer every warning here.
+The fix pass re-runs all three tools on the changed paste and answers any new warning here.
 
 ## Notes for the critic and the fix pass
 
