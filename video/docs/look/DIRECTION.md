@@ -84,7 +84,11 @@ the owner approves it; the look test shows it.
   float: the owner's earlier "black outlines, VERY subtle, in key places" now lives only in these, dark and warm in
   the object's own deep shade, never one near-black ink on everything. Each shape one closed path: no corner
   crossings, gaps, overshoot, jitter or doubled strokes; fills meet exactly; an object draws on as one
-  stroke; no boil; big areas flat, no specks, ticks or hatching; texture stays VERY subtle and opt-in, a last step
+  stroke; no boil; big areas flat, no specks, ticks or hatching, except the PAINTED PIECES (owner, 2026-10-29: "I really like the
+  “painted” pieces like the sky and the clouds"; playbook PAINTED PIECES): the sky and its clouds and a few chosen
+  environment pieces (some near buildings, trees, greenery) uniquely painted, with visible brush texture and soft
+  painted edges, made by our own seeded paint pass and locked to their layer, the subject and people crisp; elsewhere
+  texture stays VERY subtle and opt-in, a last step
   the film must work without: a fine paper-and-paint grain with gentle mottling in the big flats, static and locked to
   the world (owner, 2026-10-28: "start playing with it, very subtly especially if its adding to the premium look"; tried
   in a look clip, kept only if it adds to the premium feel), or the owner's halftone on a few elements; captions keep
@@ -92,7 +96,7 @@ the owner approves it; the look test shows it.
   the sketch pen and the scribble mass stay on the G3 board. -> `CRAFT.md` §c.
 - **5. Gentle light and shadow, always there.** One light rig per set (a key on one side, one shadow tint family, the
   pool colours), kept in all its shots; a source never moves between cuts; the brightest area sits on the subject;
-  light is lighter than what it lights, shown on what it hits (never glow discs, blur or gradients, the sky's gentle gradient aside: rule 6; a halo is one step
+  light is lighter than what it lights, shown on what it hits (never glow discs, blur or gradients, the sky's gentle gradient and the painted pieces' soft paint aside: rules 4, 6; a halo is one step
   of at most 1.7x, or none). Shadows are colour, never grey, gentle in value, flat in shape: contact under all that
   touches a surface, form away from the key, cast along the light; every volume reads in 2-3 flat tones, a lit face and
   a shade face (the city posters; owner, 2026-10-28), and with no outlines (rule 4) these faces make the edges: the
@@ -108,7 +112,7 @@ the owner approves it; the look test shows it.
   2026-10-28; numbers: `CRAFT.md` §f.8, from the city-poster study). Money and everyday life: #9 Autumn
   Ember (#7 Autumn Ochre read sick). **One continuous sky** (owner, v2 G4), never an empty field (owner, 2026-10-29: soft
   clouds, a gentle paint-like variation in its tone, pale far towers rising into it, birds; calm, no abstract
-  rectangles, the caption band clear): from the frame top to the horizon the sky's base
+  rectangles, the caption band clear; its clouds painted: rule 4's PAINTED PIECES): from the frame top to the horizon the sky's base
   is ONE gentle, smooth gradient (the owner's opt-in: the sky is the one place a gradient is welcome; "find a beautiful
   way to do a gentle gradient"; water may mirror that same sky, toned toward it: the sky's own gradient seen in it,
   `CRAFT.md` §f.7), warmest at the sun and the horizon, dithered so it never bands on a phone, nearly
@@ -124,7 +128,7 @@ the owner approves it; the look test shows it.
   plain cut except on a "But" turn (rule 1). It must feel GREAT: a world that keeps going past every edge, a landmark
   huge yet far, tiny anchors, a big sky, life in the hold. **Depth and scale come from a human viewpoint** (owner,
   2026-10-29; playbook DEPTH AND SCALE FROM A HUMAN VIEWPOINT; refs `refs_human_scale/`): the camera stands where a
-  person would stand, the "you" near it at a real size (~15-30 % of the frame's height, from behind or in silhouette),
+  person would stand, the "you" near it at a real size (about v2's original size or a little more, ~130-220 px tall in our 1080 x 1920 frame (the references' people as the owner sees them on the phone, full width: 8-16 % of the screen's width; the 9:16 motion reference's girl ~145 px); from behind or in silhouette),
   the vast world beyond (a city, a big sky, the water) giving the scale; never a wall filling the frame up close
   ("I'm really suffocating with the view") and never a far poster-like panorama ("too cheap looking"); v2's eye-level
   view of the canal is the model ("our initial angle snd the view frankly wasn't bad"). The near frame is a small,

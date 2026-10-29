@@ -162,8 +162,8 @@ Maintenance at the end).
   size, with the vast world beyond; never a wall in your face, never a far panorama.** Two stills of v2's opening
   failed both ways: the building filling the frame up close reads as no depth and no scale ("suffocating"), and the
   camera pulled far back into a poster-like panorama reads cheap, drifts from our style and gives a video little to
-  do. The owner's references (`docs/look/refs_human_scale/`) put the person near the camera at ~15-30 % of the frame's
-  height (from behind or in silhouette, no face: the people bullet below) before a vast world (a city, a huge sky, the
+  do. The owner's references (`docs/look/refs_human_scale/`) put the person at a real size near the camera's side of
+  the scene, about v2's original size or a little more, ~130-220 px tall in our 1080 x 1920 frame (the references' people as the owner sees them on the phone, full width: 8-16 % of the screen's width; the 9:16 motion reference's girl ~145 px) (from behind or in silhouette, no face: the people bullet below) before a vast world (a city, a huge sky, the
   sea) that gives the scale; our own v2 eye-level angle and view of the canal "wasn't bad". So the scale comes from a
   near human figure against a far, big world, not from moving the camera away. Keep what worked: the
   foreground/background separation (a darker near frame, a lighter far world); the near frame a small, subtle hint at
@@ -242,7 +242,7 @@ Maintenance at the end).
 - **People small and simple like reference 1** (crowds, small full figures seen from behind or in rear 3/4, round
   heads; near heads <= ~140 px), never big character models or faces: they act with their pose (reach, shrug, slump,
   look up), as reference 1's do; only the mascot has a face. **In the foreground only the film's one "you" or the
-  mascot;** the "you" near the camera may stand at a real size, ~15-30 % of the frame's height, still simple and
+  mascot;** the "you" near the camera stands at a real size, about v2's original (~130-220 px tall), still simple and
   from behind or in silhouette (DEPTH AND SCALE FROM A HUMAN VIEWPOINT above; owner, 2026-10-29); strangers stay small in the mid and far ground (a row of strangers' backs in front reads as "you"). —
   ("don't use big models of people; the people in the first example video are the right direction", v2 restart,
   2026-10-27; v3 retro, 2026-10-27).
@@ -261,13 +261,23 @@ Maintenance at the end).
   never one dark mass or a narrow band of light pastels (one reason v2 reads cheap next to the city posters). Numbers:
   `docs/look/CRAFT.md` §f.8, from the city-poster study. — (our observation on the posters; "5 - good point too!",
   2026-10-28; the darks in many small pieces: "Go with your suggestions", 2026-10-29).
+- **PAINTED PIECES: the sky and its clouds, and a few chosen environment pieces (some foreground buildings, trees and
+  greenery), are uniquely painted, as in the owner's references** (`docs/look/refs_human_scale/`, the city posters'
+  skies and proteas): visible brush and paint texture, soft painted edges, colour moving within a shape, each piece
+  painted for its place (never one stamp repeated). The subject (tier A) and the faces and people stay crisp and clean,
+  so the paint is the world's, not the story's; the film still works with the paint off. In the engine the painted
+  pieces are layers made by our own deterministic paint pass (seeded, locked to their layer so nothing swims in the
+  float; a cloud may churn slowly), never a filter smeared over the whole frame. The dose is
+  judged on a look test first. — ("Another piece of feedback is I really like the “painted” pieces like the sky and the clouds the references or some foreground buildings and trees / greenery are uniquely painted / Is it possible to modify our engine to match the story? Style"; "Yeah the painted message look above I said about modifying our
+  engine to be able to do that", 2026-10-29: so the ENGINE gains the paint pass, `src/lib/paint/`, reusable by every film).
 - **Texture and lines: VERY subtle.** No outlines: as on the city posters, shapes are separated by light and shade (a
   lit and a shade face on every volume, the subject's the deepest) and by value, never by a line drawn round them
   (the A vs B picture's B). Thin lines only on small things that are lines (window bars, railings, rigging): dark,
   warm lines in the object's own deep shade, never one near-black ink on everything (v3 G5b's was "too rough"), 2 px
   on the layers that float so they never twinkle; the owner's "black outlines" now live only in these; captions keep
   the dark ink. Spec: `docs/look/CRAFT.md` §c. Texture: start playing with a VERY subtle paper-and-paint
-  texture (a fine grain and gentle mottling in the big flats, like the city posters) where it adds to the premium look,
+  texture (a fine grain and gentle mottling in the big flats, like the city posters) where it adds to the premium look
+  (the painted pieces, the bullet above, are the one place paint shows openly),
   tried in a look clip and kept only if it does; the halftone stays an option on a few elements; the film must work
   flat. — ("very subtle texture
   pieces and the black outlines, VERY subtle but in key places", texture test, 2026-10-25; "cleaner, more refined,
@@ -582,6 +592,9 @@ Maintenance at the end).
 ## Platforms and posting
 - **Accounts: Instagram `what.the.fuss.is.about`** (Creator, Education); TikTok and YouTube Shorts under the same name,
   handle and avatar. Posting texts per video: `docs/POSTING_KIT.md`. — (2026-10-25).
+- **The studio logo is a symbol, with no text** (no wordmark, no lettered monogram): it must read alone as the avatar
+  circle at 40-110 px, in the videos' corner and on banners. The logo's rounds, sources and the owner's verdicts:
+  `docs/brand/LOGO.md`. — ("The logo should not contain any text btw", on logo round 1, 2026-10-29).
 - **Upload at the highest quality and natively on each platform** (checklist in `docs/POSTING_KIT.md`). — (2026-10-25).
 - **AI label ON everywhere; no paid boost until 3-5 posts exist,** then boost the best organic performer. — (2026-10-25).
 
