@@ -8,8 +8,8 @@ stays in the session upload; `contact_sheet.jpg` here is 6 frames, 0-11 s). On s
 shares (est. ~12 shares per 100 likes; our v1: 0.7 % shares per view). Photoreal 3D renders over aerial imagery; a
 fixed title bar ("Why This Skyscraper Curves Back Down??"); word-by-word captions; "Source: Big Data Factor" in frame.
 
-**What we heard (0-11 s; transcribed with faster-whisper small.en; the first word was cut by the recording):** "[New
-York] once got a proposal to build this giant 2,000-foot tall bending skyscraper. It's called the Big Bend. This crazy
+**What we heard (0-11 s; transcribed with faster-whisper small.en; the first words were cut by the recording):** "[Did you
+know that New York] once got a proposal to build this giant 2,000-foot tall bending skyscraper. It's called the Big Bend. This crazy
 project was proposed in 2017 for New York City by the architect..." The post's caption starts: "The strange part isn't
 how high this skyscraper...". At ~11 s: a lineup chart, "The longest tower" (the Big Bend's 4,000 ft beside the Burj
 Khalifa's 2,722 ft).
@@ -22,3 +22,6 @@ CNN, 24 Mar 2017: https://edition.cnn.com/2017/03/24/us/u-shaped-building-trnd ;
 6sqft: https://www.6sqft.com/oiios-big-bend-proposal-for-billionaires-row-would-be-the-worlds-longest-building/
 
 **Our evaluation:** `video/docs/studies/2026-10-28_city_posters/content_discussion.md`, exchange 10.
+
+**The owner on its script (2026-10-29 ~08:50 UTC):** "BTW I really like the script too in the video / See how it's using natural language it's first hook sentence is extremely natural like a conversation yet captures the attention and curiosity without being too pushy and the script has a rhythm we discussed before".
+**And (~08:55 UTC):** "Oh I also meant that a video has an opening as "did you know that .." like that what I meant by great opening". So the opener is "Did you know that New York once got a proposal ...".

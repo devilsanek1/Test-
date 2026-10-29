@@ -12,7 +12,11 @@
 >   §1, paste format v2). The "DELIVERY CUES" section's paste format (a bracketed cue on its own line before each
 >   beat) is retired for the paste: it broke takes.
 > - **Visuals:** the current look is `docs/look/DIRECTION.md`.
-> - **Freshness:** news from about the last month, weighed below relevance, truth, visual appeal and mood (owner,
+> - **Accuracy (owner, 2026-10-29):** exaggerating, generalizing and making it bigger are fine; no law-firm precision.
+>   This relaxes §4-8's "never invent or exaggerate consequences" and §18-19's precision; the core event must be real.
+>   Comment bait may now be a claim people correct: comments are "a massive plus to the script" (owner, 2026-10-29),
+>   which updates the ENGAGEMENT LAYER's "never false or misleading" below.
+> - **Freshness:** news from about the last month, weighed below relevance, visual appeal, mood and truth (owner,
 >   2026-10-28), not "ideally the past 24-72 h" (§4-8); the full topic criteria: `docs/TOPIC_CRITERIA.md`.
 > - The notes on "THIS script" and the PHP lines below are video 1's (history).
 

@@ -23,8 +23,11 @@ Maintenance at the end).
 
 ## Audience and goal
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24).
-- **Growth matters: maximise engagement with subtle, defensible hooks**: bait that is true, e.g. "the language everyone
-  loves". Never misleading, and **never baity: the opening must never sound like a commercial.** A sales question to
+- **Growth matters: maximise engagement with subtle, defensible hooks**, e.g. "the language everyone loves".
+  **Exaggerating, generalizing and making it bigger are fine; no law-firm precision** (2026-10-29); the core event is
+  real. **Comments are a massive plus:** a line people will argue with, or correct, in the comments counts FOR a
+  script, so G1 writes one or two on purpose (2026-10-29: "And people commenting is actually great so if comments are increasing the engagement that's a massive plus to the script"). And **never baity: the opening must never
+  sound like a commercial.** A sales question to
   the viewer ("Buying a laptop soon?"), a pitch-like claim about their purchase, a shopping screen with a price and "Add
   to cart" as the first image: together they read as an ad, and people skip ads (v3: 60 % gone by ~2 s, skip rate
   64.5 % against v1's 32 %, no shares or saves). Open like a person telling surprising news they just found out (what
@@ -40,6 +43,14 @@ Maintenance at the end).
   - Spine first, then lines. A list of facts to prove is input, never the structure.
   - Test: someone who hears it once can retell it as a story.
   — ("just a collection of sentences", v3 G1, 2026-10-26).
+- **The first line sounds like a friend starting a story, and still pulls: curious, never pushy. "Did you know that
+  ..." is the owner's model opener.** The Big Bend reel: "Did you know that New York once got a proposal to build this
+  giant 2,000-foot tall bending skyscraper? It's called the Big Bend." A friend's question with a surprising fact in it
+  (a place, a thing, a number), no sell (unlike v3's "Buying a laptop soon?"); the curiosity comes from the picture and
+  the one odd detail. — ("BTW I really like the script too in the video / See how it's using natural language it's
+  first hook sentence is extremely natural like a conversation yet captures the attention and curiosity without being
+  too pushy and the script has a rhythm we discussed before"; then "Oh I also meant that a video has an opening as "did you know that .." like that what I meant by great opening", 2026-10-29; saved: the study's
+  `refs/bigbend_reel/`).
 - **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24). **Rhythm: never a run of
   long sentences; put a short one (5 words or fewer, e.g. "Let's find out." "But there was a problem.") after every 1-2
   long ones, at the turns,** gated by `scripts/voice/check_rhythm.py` OK at G1. — (owner's reference reel, 2026-10-27).
@@ -320,17 +331,17 @@ Maintenance at the end).
   a direct wallet hit,** and an everyday consequence beats a bigger, distant story. The city-poster brainstorm opened
   this to any subject, and the owner came back to tech told through its views (Places on screen, below). — (v3 G0; v4 G0: "focus on tech and AI",
   picked AI songs over the wallet pick: "good amount of fuss about AI songs", 2026-10-27).
-- **Topics are picked in the owner's order: relevant (with buzz and surprise) first, then true and solid, then
-  visually appealing in our look, then the mood the slate needs, then fresh (news from about the last month), then
-  shareable** (weights 6-5-4-3-2-1; a story
-  that isn't true is out whatever it scores). The list the editor scores on, and the owner sees:
+- **Topics are picked in the owner's order: relevant (with buzz and surprise) first, then visually appealing in our
+  look, then the mood the slate needs, then true enough (the core event real; exaggeration fine), then fresh (news from
+  about the last month), then shareable** (weights 6-5-4-3-2-1; a story whose core event didn't happen is out whatever
+  it scores). The list the editor scores on, and the owner sees:
   `docs/TOPIC_CRITERIA.md`. — ("one important condition for the story pick is we should find a story that is going to
   be possible to make visually appealing ... give me the list of criteria"; then "lets make it relevant first but
   include buzz here too and surprise, then true and solid, then fresh, then visually appealing, then mood. Then
   shareabliity potential"; "lets move the freshness lower and make it last month or so", v4, 2026-10-28). The
   shortlist always comes with its column chart: for each story a column per criterion, the most important on the left
   (`video/scripts/topic_chart.py`; "can you show me the visual next time we do research ... some bar chart"; "make the
-  visual into column chart", v4, 2026-10-28).
+  visual into column chart", v4, 2026-10-28; then "Actually let's move truth down the list it's okay to exhagerste a bit like in this case so we don't have to be exactly precise like a law firm / Exaggerating and generalizing and making it bigger is fine", 2026-10-29).
 - **Topics: alternate the mood: a positive story after a negative one.** v2 (Google staff resigning), v3 (laptop
   prices) and v4's first pick (AI songs and fake plays) were all bad news, so the next is a very recent, highly
   relevant, genuinely POSITIVE AI story (e.g. AI helping find a medicine or beat a disease) with a hopeful outlook.
@@ -527,6 +538,9 @@ Maintenance at the end).
   `context/uploads/inline/2026-10-28_v3_insights_*`. — 2026-10-28.
 
 ## Retired rules
+- ~~Topics in the order relevant, TRUE, visual, mood ...; a story that isn't true is out whatever it scores; never
+  misleading~~ → truth moved down (relevant, visual, mood, true enough, fresh, shareable); exaggeration fine; only a
+  made-up core event is out (2026-10-29).
 - ~~The owner records the voice in ElevenLabs (we hand over the paste text)~~ → generated through the API with the owner's voice (2026-10-26).
 - ~~G3: animate only where timing is the question~~ → the animated sketchbook plays every move and transition (2026-10-26).
 - ~~v1's ink line as the film's line (overshoot, open contours, offset fills, weight by depth)~~ → the clean pen, lines
