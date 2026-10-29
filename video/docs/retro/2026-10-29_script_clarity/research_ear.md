@@ -18,9 +18,9 @@ standards body's written rules), **practitioner** (a working writer's, editor's 
   rewind", and "once a listener gets confused, the forward momentum of the information outpaces their ability to
   comprehend what's happening" (Alison MacAdam, NPR Training, [N1] and [N2]; style guide).
 - **When a sentence ends, mostly its meaning survives, not its words:** verbatim recall is good only for the clause
-  just heard (Jarvella 1971; Sachs 1967; [C7]; studies; Gurevich et al. 2010 show some wording does survive). So the
-  listener can't re-parse the last line to find what "it" was: they carry a gist forward.
-- **Working memory holds about four chunks** (Cowan 2001, [C8]; study).
+  just heard (Jarvella 1971, [C5]; Sachs 1967, [C6]; studies; Gurevich et al. 2010 show some wording does survive). So
+  the listener can't re-parse the last line to find what "it" was: they carry a gist forward.
+- **Working memory holds about four chunks** (Cowan 2001, [C7]; study).
 - **Our pace is about 172 words a minute** (2.87 words a second, measured on the v2 and v3 takes), and faster speech
   cuts second-language comprehension (Griffiths 1990, [L5]; study). The speed is set by the feed; word choice and
   sentence shape are the levers left.
@@ -29,14 +29,15 @@ standards body's written rules), **practitioner** (a working writer's, editor's 
 
 ### 1. Name each thing with the everyday word regular people use for it: no tech word, and never a common word in its tech sense (a "false friend": chips, cabinet, rack, cloud, cooling, model).
 - **Why.** The usual meaning of a word comes first, and a context that points at a rarer meaning still costs effort
-  (the "subordinate bias effect": Leinenger and Rayner 2013, [C10]; study). Which meaning is "usual" depends on what you
-  know: baseball experts stumbled, where non-experts didn't, on words whose common meaning for them was the baseball one
-  (Wiley, George and Rayner 2016, [C11]; study). To us "chips" are processors; to most people they are fries or crisps,
-  and a second-language listener reaches for the literal, everyday meaning first (Cieślicka 2006, [L3]; study). A wrong
-  first reading tends to linger even after the sentence corrects it (Christianson et al. 2001, [C9]; study). Jargon
-  lowers processing fluency, which raised resistance and cut support, and definitions on mouseover made no difference
-  (Bullock et al. 2019, N = 650, [J1]; study). Science communicators keep tables of exactly these words: "enhance" heard
-  as improve, "aerosol" as spray can, "positive feedback" as praise (Somerville and Hassol 2011, [J2]; practitioner).
+  (the "subordinate bias effect": Leinenger and Rayner 2013, [C9]; study). Which meaning is "usual" depends on what you
+  know: baseball experts had more trouble than non-experts when a sentence needed the non-baseball meaning of a word
+  (Wiley, George and Rayner 2016, [C10]; study). To us "chips" are processors; to most people they are fries or crisps.
+  Second-language listeners lean on literal, everyday meanings (in an idiom the literal meaning comes first, even when
+  the idiom is known: Cieślicka 2006, [L3]; study). A wrong first reading tends to linger even after the sentence
+  corrects it (Christianson et al. 2001, [C8]; study). Jargon lowers processing fluency, which raised resistance and
+  cut support, and definitions on mouseover made no difference (Bullock et al. 2019, N = 650, [J1]; study). Science
+  communicators keep tables of exactly these words: "enhance" heard as improve, "aerosol" as spray can, "positive
+  feedback" as praise (Somerville and Hassol 2011, [J2]; practitioner).
   Ed Yong writes "things that cause cancer rather than carcinogens" ([J4]; practitioner); GOV.UK: use the words your
   users use, "heavy goods vehicle" or "lorry" ([P3]; style guide). Tools miss false friends: a frequency-based jargon
   finder can't flag a common word (Rakedzon et al. 2017, [J3]; study), and a readability formula rates "The chips get
@@ -77,24 +78,25 @@ standards body's written rules), **practitioner** (a working writer's, editor's 
   guide); "If you use different names for the same thing, translators might think you're referring to different
   concepts" (Google, [L8]; style guide), and a listener is in the translator's seat. Each mention is matched to one
   already heard (finding 2), so every new name is a new thing to place; and listeners track the thing a passage is about
-  and expect it to continue (centering: Gordon, Grosz and Gilliom 1993, [C3]; study).
+  and expect it to continue (centering: Gordon, Grosz and Gilliom 1993, [C2]; study).
 - **Draft 1 -> better.** One thing goes by five names in 40 s: "AI" (line 1), "the chips" (2), "one cabinet of them"
-  (3), "those chips" (7), "a data center" (12), "your chatbot" (13). -> "AI" -> "giant computers" -> "these computers"
-  (lines 3, 7, 8) -> "a data center, a building full of these computers" (once) -> "your chatbot" (fine: everyone knows
-  a chatbot is AI, the film's first name for the thing).
+  (3), "those chips" (7), "a data center" (12), "your chatbot" (13). -> "AI" (1) -> "giant computers", then "those
+  computers" (2) -> "one of them" (3) -> "these computers" (7) -> "a data center, a building full of these computers"
+  (said once, where the story needs it) -> "your chatbot" (13; fine: everyone knows a chatbot is AI, the film's first
+  name for the thing).
 - **Check.** Script: the through-line card names the thread object and its one everyday name; the lint prints the chain
   of thing-nouns in order (here "AI -> chips -> cabinet -> chips -> data center -> chatbot"), so a reviewer sees every
   swap at a glance. Cold listener: "were the chips and the data center the same thing?".
 
 ### 4. Every "it", "they", "this" or "that" points at one obvious thing; when two things could fit, say the noun again (or take the rival out of the line before).
 - **Why.** Listeners pick a pronoun's referent about 200 ms after hearing it, from cues such as gender and which thing
-  is most prominent, the first-mentioned one (Arnold et al. 2000, a listening eye-tracking study, [C4]; study). "It"
+  is most prominent, the first-mentioned one (Arnold et al. 2000, a listening eye-tracking study, [C3]; study). "It"
   has no gender, so "heat", "air" and "sea" all fit, and the prominent one (that heat, the subject) competes with the
   most recent ones (the air or the sea). A pronoun beats a repeated noun only when its referent is the clear center of
-  attention (Gordon et al. 1993, [C3]; in spoken comprehension too, Peters, Boiteau and Almor 2016, [C5]; studies);
-  anywhere else the noun costs nothing and saves the line: "if a pronoun is ambiguous, then replace it with the noun";
-  "Repeat a word if the redundancy improves comprehension" (Google, [L8]; style guide). And the listener can't look back
-  to check (the frame).
+  attention (Gordon et al. 1993, [C2]; in spoken comprehension too, Peters, Boiteau and Almor 2016, [C4]; studies);
+  anywhere else the noun costs nothing and saves the line: "if a pronoun is ambiguous, then replace it with the
+  appropriate noun"; "Repeat a word if the redundancy improves comprehension" (Google, [L8]; style guide). And the
+  listener can't look back to check (the frame).
 - **Draft 1 -> better.** "So almost everywhere, that heat just gets dumped into the air or the sea. But Helsinki WANTS
   it." (the heat, the air or the sea: the owner's question) -> "... But Helsinki wants that heat." Or end the line
   before on the heat alone ("Most data centers just blow that heat outside."), and "But Helsinki WANTS it." has one
@@ -108,16 +110,16 @@ standards body's written rules), **practitioner** (a working writer's, editor's 
 ### 5. Say the plain, concrete thought itself: who does what, where. Never a hint at a thought, never a vague scope.
 - **Why.** The curse of knowledge: people who know something can't think as if they didn't; "Better-informed agents
   are unable to ignore private information even when it is in their interest to do so" (Camerer, Loewenstein and Weber
-  1989, [C14]; study). Tappers expected listeners to name 50 % of the songs they tapped; listeners named 2.5 % (3 of
-  120) (Newton 1990, reported in the BPS Psychologist's review of Pinker's The Sense of Style, [C15]; study). An
+  1989, [C12]; study). Tappers expected listeners to name 50 % of the songs they tapped; listeners named 2.5 % (3 of
+  120) (Newton 1990, reported in the BPS Psychologist's review of Pinker's The Sense of Style, [C13]; study). An
   expert's abstract phrase is them "summarizing the wealth of concrete data in their heads", while the listener hears
-  "only opaque phrases" (Chip and Dan Heath, HBR, [C16]; practitioner). That is the owner's "you are having some deeper
+  "only opaque phrases" (Chip and Dan Heath, HBR, [C14]; practitioner). That is the owner's "you are having some deeper
   thought here and you choose to be obscure about it": we held the fact lock (Helen's CEO said "almost all other
-  countries", with Stockholm and Odense as exceptions), the listener heard "almost everywhere". Concrete wins: across
-  four kinds of text, "Concreteness was overwhelmingly the best predictor of overall comprehensibility, interest, and
-  recall" (Sadoski, Goetz and Rodriguez 2000, [C13]; study). Name the actor: active voice "makes it clear who should do
-  what", and passive sentences "often do not identify who is performing the action" (digital.gov, [P2]; style guide);
-  "Go with S-V-O" (Mervin Block, [N4]; practitioner).
+  countries"; Stockholm and Odense do reuse their heat), and the listener heard only "almost everywhere". Concrete
+  wins: across four kinds of text, "Concreteness was overwhelmingly the best predictor of overall comprehensibility,
+  interest, and recall" (Sadoski, Goetz and Rodriguez 2000, [C11]; study). Name the actor: active voice "makes it
+  clear who should do what", and passive sentences "often do not identify who is performing the action" (digital.gov,
+  [P2]; style guide); "Go with S-V-O" (Mervin Block, [N4]; practitioner).
 - **Draft 1 -> better.** "So almost everywhere, that heat just gets dumped into the air or the sea." (where is "almost
   everywhere"? dumped by whom?) -> "Most data centers just blow that heat outside, into the air or the sea." (The
   owner's own shape: "in a typical datacenter here is what happens".)
@@ -134,11 +136,16 @@ standards body's written rules), **practitioner** (a working writer's, editor's 
   Flesch-Kincaid run on draft 1 passes every line the owner failed: "The chips get that hot." grade -1.8, the easiest
   in the script; "But Helsinki WANTS it." 3.7; "So almost everywhere ..." 5.9, the same as the line the owner loved;
   and it rates "And nobody's even making tea." the hardest (7.6) (a scratch script with a simple syllable count: the
-  ranking is the point, not the decimals). The writer can't check alone (finding 5): draft 1's critic, reading cold,
-  felt line 2 snag ("landed a beat late (I had to re-link it to the question)", `critique_g1.md`) and kept it, because
-  the critic could build the bridge. What works: paraphrase testing, one person at a time (digital.gov, [P2]; style
-  guide); the first edit by ear, without reading along, because "Listeners only have one chance to hear a story"
-  (NPR, [N2]; style guide); Ed Yong's test readers were a fellow blogger's parents ([J4]; practitioner).
+  ranking is the point, not the decimals). The writer can't check alone (finding 5): draft 1's critic, on a cold first
+  listen, felt line 2 snag ("landed a beat late (I had to re-link it to the question)") and line 7 too ("a gear change
+  I had to take on trust", `critique_g1.md`), but read both as pacing, not as words regular people don't use, and both
+  stayed: an informed ear feels the bump, then builds the bridge itself. The plain-language standard judges by the
+  audience, not by the text: a communication is plain "if its wording, structure, and design are so clear that the
+  intended audience can easily find what they need, understand what they find, and use that information" (the
+  definition ISO 24495-1 builds on, [P1]; standard). What works: paraphrase testing, one person at a time
+  (digital.gov, [P2]; style guide); the first edit by ear, without reading along, because "Listeners only have one
+  chance to hear a story" (NPR, [N2]; style guide); Ed Yong's test readers were a fellow blogger's parents ([J4];
+  practitioner).
 - **Draft 1.** Line 2 passed the formula, the writer and the critic, and failed the first regular person who heard it.
 - **Check.** Cold listener (this is the check): 2-3 people who haven't seen the script, at least one non-native English
   speaker and one non-tech person; play the take once, at speed, with the captions, as the feed does; then (a) retell
@@ -147,10 +154,10 @@ standards body's written rules), **practitioner** (a working writer's, editor's 
   clarity lint only raises questions; it never passes a line.
 
 ### 7. Say it the way you'd tell a friend, in the easiest words: easy lines are liked and believed; hard ones get argued with.
-- **Why.** Processing fluency: easier-to-process statements are judged true more often (Reber and Schwarz 1999, [C17];
-  study) and liked more (Reber, Schwarz and Winkielman 2004, [C18]; review), across every kind of ease, "phonologically
-  simple" language included (Alter and Oppenheimer 2009, [C19]; review). Needlessly complex words made writers seem
-  less intelligent, through the same fluency (Oppenheimer 2006, [C20]; study). Jargon's lost fluency raised "motivated
+- **Why.** Processing fluency: easier-to-process statements are judged true more often (Reber and Schwarz 1999, [C15];
+  study) and liked more (Reber, Schwarz and Winkielman 2004, [C16]; review), across every kind of ease, "phonologically
+  simple" language included (Alter and Oppenheimer 2009, [C17]; review). Needlessly complex words made writers seem
+  less intelligent, through the same fluency (Oppenheimer 2006, [C18]; study). Jargon's lost fluency raised "motivated
   resistance to persuasion" (Bullock et al. 2019, [J1]; study): confusion makes people argue against us, which is not
   the comment the ENGAGEMENT LAYER wants (an arguable claim works only once it is clear). Experts prefer plain too: "80%
   of people preferred sentences written in clear English", and "the more specialist their knowledge, the greater their
@@ -164,12 +171,13 @@ standards body's written rules), **practitioner** (a working writer's, editor's 
 
 ### 8. Literal words in their everyday sense, for a worldwide ear: no idioms, figurative phrasal verbs, slang or wordplay; the one joke literal and kind.
 - **Why.** Second-language listeners compute the literal word meanings first, even in idioms they know (Cieślicka
-  2006, [L3]; study), and learners avoid phrasal verbs, the figurative ones most (Liao and Fukuya 2004, [L4]; study).
-  Comfortable listening needs about 95-98 % of the words known (Nation 2006, [L1]; van Zeeland and Schmitt 2013, via
-  [L2]; studies): in a 115-word script that is 2 to 6 unfamiliar words in all. Global style guides: "Avoid idioms,
+  2006, [L3]; study), and learners avoid phrasal verbs, depending on their level and on whether the verb is literal or
+  figurative (Liao and Fukuya 2004, [L4]; study). Comfortable listening needs about 95-98 % of the words known (Nation
+  2006, [L1]; van Zeeland and Schmitt 2013, via [L2]; studies): in a 115-word script that is 2 to 6 unfamiliar words in
+  all. Global style guides: "Avoid idioms,
   colloquial expressions, and culture-specific references" (Microsoft, [L7]; style guide); avoid phrasal verbs, idioms
-  and humor, and "Use words in their primary sense" (Google, [L8]; style guide). Plays on words "can also sound cheesy or
-  corny when it's clear they're there for the sake of appearing clever" (Wodskou, CBC, [N5]; practitioner). Captions
+  and humor, and "Use words in their primary sense" (Google, [L8]; style guide). Plays on words "can also sound cheesy
+  or corny when it's clear they're there for the sake of appearing clever" (Wodskou, CBC, [N5]; practitioner). Captions
   help second-language viewers get the gist (full captions beat none: Montero Perez, Peters and Desmet 2014, [L6];
   study), but a caption shows the same misleading word. The creative brief keeps one joke where documentation guides
   drop humor, so ours is the situation itself, said literally, never irony the listener has to decode.
@@ -178,15 +186,15 @@ standards body's written rules), **practitioner** (a working writer's, editor's 
   nobody uses it." (the empty mug in the picture can carry the smile). Also "gets a boost from heat pumps" -> "heat
   pumps make it even hotter"; "gets dumped" -> "blow ... outside".
 - **Check.** Script: an idiom and figurative phrasal-verb list (get a boost, get dumped, end up, figure out, turn out,
-  run on fumes, ...), flagged for a look. Cold listener: at least one non-native English speaker; ask what each flagged
-  phrase means, and whether the joke landed or puzzled.
+  ...), flagged for a look. Cold listener: at least one non-native English speaker; ask what each flagged phrase means,
+  and whether the joke landed or puzzled.
 
 ### 9. One idea per sentence, subject first, its verb right after it.
 - **Why.** "It's often said that our ears can only handle one fact or idea per sentence"; "keep subjects cozy with their
   verbs"; dependent clauses "are toxic to radio writing" (NPR, [N1]; style guide); "Limit a sentence to one idea"; "Go
   with S-V-O" (Block, [N4]; practitioner); "keep the main subject and verb as close to the beginning of the sentence as
-  possible" (Google, [L8]; style guide). Working memory holds about four chunks (Cowan 2001, [C8]; study), and only the
-  clause just heard is held word for word (Jarvella 1971, [C6]; study).
+  possible" (Google, [L8]; style guide). Working memory holds about four chunks (Cowan 2001, [C7]; study), and only the
+  clause just heard is held word for word (Jarvella 1971, [C5]; study).
 - **Draft 1 -> better.** "So their warm water gets a boost from heat pumps, then runs under the snow, into people's
   radiators." (18 words, three moves, and whose is "their"?) -> "Heat pumps make that warm water even hotter. Then it
   runs in pipes under the snow, into people's radiators." Two full sentences with a subject and a verb each, never
@@ -207,11 +215,11 @@ standards body's written rules), **practitioner** (a working writer's, editor's 
   listener: "which word from that line stuck?": it should be the new one.
 
 ### 11. At every turn, say plainly where we are now: which place, which time, whose heat. A signpost names the scene; a stock reveal names nothing.
-- **Why.** Audio has no headings, so transitions have to be "explicitly narrated" (NPR, [N1]; style guide); "Prepare
-  readers for what to expect" (digital.gov, [P2]; style guide). Second-language students recalled a lecture better with
-  macro markers, which show its overall organization, than with micro markers, the fillers and links between sentences
-  (Chaudron and Richards 1985, [L9]; study). RULE #1's stock reveal phrases ("Here's the thing", "The catch?") promise
-  drama and name nothing: they stay banned.
+- **Why.** Audio has no headings, so it needs "deliberate transitions", "explicitly narrated" or marked with sound
+  (NPR, [N1]; style guide); "Prepare readers for what to expect" (digital.gov, [P2]; style guide). Second-language
+  students recalled a lecture better with macro markers, which show its overall organization, than with micro markers,
+  the fillers and links between sentences (Chaudron and Richards 1985, [L9]; study). RULE #1's stock reveal phrases
+  ("Here's the thing", "The catch?") promise drama and name nothing: they stay banned.
 - **Draft 1 -> better.** "So almost everywhere, that heat just gets dumped into the air or the sea. But Helsinki WANTS
   it." (the film jumps from one cabinet in Helsinki to the whole planet and back, signposted only by "almost
   everywhere") -> "Around the world, most data centers just blow that heat outside. But Helsinki wants to keep that
@@ -223,12 +231,13 @@ standards body's written rules), **practitioner** (a working writer's, editor's 
 - **Why.** Numbers "can require your listener to do math, which distracts from your story", and "Listeners can't see the
   numbers, so they are more easily missed, misheard or forgotten" (NPR, [N1]; style guide); "filling a script with too
   many numbers will guarantee your audience will be either lost or zone out" (Wodskou, CBC, [N5]; practitioner). Round
-  them: "Accuracy is lost, but acceptably so" (Ed Yong, [J4]; practitioner). Counts ("1 in 10") are understood better
-  than percentages and probabilities (natural frequencies: Hoffrage et al. 2000, [L10]; study).
-- **Draft 1 (mostly right here) -> better.** The fact lock's "a seventy-two-chip rack draws a hundred and twenty
-  kilowatts" became "like FORTY kettles, boiling non-stop": round, everyday, one number. Keep that. Draft 1 speaks five
-  numbers in 40 s (seventy thousand, forty, a tenth, twenty ten, twenty twenty-seven), the top of the range: a number
-  the story doesn't need goes on the paper tag only (2010, if the cathedral line works without it).
+  them: "Accuracy is lost, but acceptably so" (Ed Yong, [J4]; practitioner). Statistics told as counts (natural
+  frequencies) are understood better than as probabilities (Hoffrage et al. 2000, [L10]; study): "one in ten" over
+  "nine percent".
+- **Draft 1 (mostly right here) -> better.** The fact lock's number (one 72-chip rack: 120 kW) became "like FORTY
+  kettles, boiling non-stop": round, everyday, one number. Keep that. Draft 1 speaks five numbers in 40 s (seventy
+  thousand, forty, a tenth, twenty ten, twenty twenty-seven), which is plenty: a number the story doesn't need goes on
+  the paper tag only (2010, if the cathedral line works without it).
 - **Check.** Script: numbers per sentence (flag more than one), numbers per 10 s, unrounded figures (more than two
   significant digits), technical units (kW, MW, GWh, °C, %). Cold listener: "what was the number, and what did it
   mean?".
@@ -292,49 +301,49 @@ refine lines that already pass.
   Verbal Learning and Verbal Behavior 13: 512-521, https://doi.org/10.1016/S0022-5371(74)80003-4 ; the authors' PDF:
   https://web.stanford.edu/~clark/1970s/Haviland,%20S.E.%20_%20Clark,%20H.H.%20_What's%20new_%20Acquiring%20new%20information%20as%20a%20process%20in%20comprehension_%201974.pdf
   Study.
-- [C3] Gordon, Grosz and Gilliom 1993, "Pronouns, names, and the centering of attention in discourse", Cognitive
+- [C2] Gordon, Grosz and Gilliom 1993, "Pronouns, names, and the centering of attention in discourse", Cognitive
   Science 17: 311-347, https://doi.org/10.1207/s15516709cog1703_1 Study.
-- [C4] Arnold, Eisenband, Brown-Schmidt and Trueswell 2000, "The rapid use of gender information: evidence of the time
+- [C3] Arnold, Eisenband, Brown-Schmidt and Trueswell 2000, "The rapid use of gender information: evidence of the time
   course of pronoun resolution from eyetracking", Cognition 76: B13-B26, https://pubmed.ncbi.nlm.nih.gov/10822045/
   Study (listeners).
-- [C5] Peters, Boiteau and Almor 2016, "Semantic relations cause interference in spoken language comprehension when
+- [C4] Peters, Boiteau and Almor 2016, "Semantic relations cause interference in spoken language comprehension when
   using repeated definite references, not pronouns", Frontiers in Psychology, https://doi.org/10.3389/fpsyg.2016.00214
   Study (listeners).
-- [C6] Jarvella 1971, "Syntactic processing of connected speech", JVLVB 10: 409-416,
+- [C5] Jarvella 1971, "Syntactic processing of connected speech", JVLVB 10: 409-416,
   https://doi.org/10.1016/S0022-5371(71)80040-3 Study (listeners).
-- [C7] Sachs 1967, "Recognition memory for syntactic and semantic aspects of connected discourse", Perception &
+- [C6] Sachs 1967, "Recognition memory for syntactic and semantic aspects of connected discourse", Perception &
   Psychophysics 2: 437-442, https://doi.org/10.3758/BF03208784 ; both classics as summed up by later work (meaning is
   kept past the sentence boundary, wording mainly for the latest constituent), e.g. Schweppe, Rummer and Fürstenberg
   2009, Memory & Cognition 37: 73-80, https://doi.org/10.3758/MC.37.1.73 ; qualified by Gurevich, Johnson and Goldberg
   2010, Language and Cognition 2: 45-78, https://doi.org/10.1515/langcog.2010.003 Studies.
-- [C8] Cowan 2001, "The magical number 4 in short-term memory", Behavioral and Brain Sciences 24: 87-114,
+- [C7] Cowan 2001, "The magical number 4 in short-term memory", Behavioral and Brain Sciences 24: 87-114,
   https://doi.org/10.1017/S0140525X01003922 Study (review).
-- [C9] Christianson, Hollingworth, Halliwell and Ferreira 2001, "Thematic roles assigned along the garden path
+- [C8] Christianson, Hollingworth, Halliwell and Ferreira 2001, "Thematic roles assigned along the garden path
   linger", Cognitive Psychology 42: 368-407,
   https://ferreiralab.faculty.ucdavis.edu/wp-content/uploads/sites/222/2015/05/Christianson-et-al.-2001_LingeringInterpretationsGP_Cog-Psych.pdf
   Study.
-- [C10] Leinenger and Rayner 2013, "Eye movements while reading biased homographs", Journal of Cognitive Psychology 25:
+- [C9] Leinenger and Rayner 2013, "Eye movements while reading biased homographs", Journal of Cognitive Psychology 25:
   665-681, https://pubmed.ncbi.nlm.nih.gov/24073328/ Study. (Background: Duffy, Morris and Rayner 1988, Journal of
   Memory and Language 27: 429-446, https://doi.org/10.1016/0749-596X(88)90066-6 .)
-- [C11] Wiley, George and Rayner 2016, "Baseball fans don't like lumpy batters: influence of domain knowledge on the
+- [C10] Wiley, George and Rayner 2016, "Baseball fans don't like lumpy batters: influence of domain knowledge on the
   access of subordinate meanings", Quarterly Journal of Experimental Psychology, https://pubmed.ncbi.nlm.nih.gov/27767384/
   Study.
-- [C13] Sadoski, Goetz and Rodriguez 2000, "Engaging texts: effects of concreteness on comprehensibility, interest, and
+- [C11] Sadoski, Goetz and Rodriguez 2000, "Engaging texts: effects of concreteness on comprehensibility, interest, and
   recall in four text types", Journal of Educational Psychology 92: 85-95, https://doi.org/10.1037/0022-0663.92.1.85 ;
   abstract https://eric.ed.gov/?id=EJ619358 Study.
-- [C14] Camerer, Loewenstein and Weber 1989, "The curse of knowledge in economic settings: an experimental analysis",
+- [C12] Camerer, Loewenstein and Weber 1989, "The curse of knowledge in economic settings: an experimental analysis",
   Journal of Political Economy 97: 1232-1254, https://doi.org/10.1086/261651 Study.
-- [C15] Newton 1990 (Stanford PhD), the tapping study, reported in the BPS Psychologist's review of Pinker's The Sense of
-  Style: https://www.bps.org.uk/psychologist/cursed-knowledge Study (reported) and practitioner (Pinker).
-- [C16] Chip Heath and Dan Heath, "The Curse of Knowledge", Harvard Business Review, Dec 2006:
+- [C13] Newton 1990 (Stanford PhD), the tapping study, reported in the BPS Psychologist's review of Pinker's The Sense
+  of Style: https://www.bps.org.uk/psychologist/cursed-knowledge Study (reported) and practitioner (Pinker).
+- [C14] Chip Heath and Dan Heath, "The Curse of Knowledge", Harvard Business Review, Dec 2006:
   https://hbr.org/2006/12/the-curse-of-knowledge Practitioner.
-- [C17] Reber and Schwarz 1999, "Effects of perceptual fluency on judgments of truth", Consciousness and Cognition 8:
+- [C15] Reber and Schwarz 1999, "Effects of perceptual fluency on judgments of truth", Consciousness and Cognition 8:
   338-342, https://pubmed.ncbi.nlm.nih.gov/10487787/ Study.
-- [C18] Reber, Schwarz and Winkielman 2004, "Processing fluency and aesthetic pleasure", Personality and Social
+- [C16] Reber, Schwarz and Winkielman 2004, "Processing fluency and aesthetic pleasure", Personality and Social
   Psychology Review 8: 364-382, https://doi.org/10.1207/s15327957pspr0804_3 Study (review).
-- [C19] Alter and Oppenheimer 2009, "Uniting the tribes of fluency to form a metacognitive nation", Personality and
+- [C17] Alter and Oppenheimer 2009, "Uniting the tribes of fluency to form a metacognitive nation", Personality and
   Social Psychology Review 13: 219-235, https://pubmed.ncbi.nlm.nih.gov/19638628/ Study (review).
-- [C20] Oppenheimer 2006, "Consequences of erudite vernacular utilized irrespective of necessity: problems with using
+- [C18] Oppenheimer 2006, "Consequences of erudite vernacular utilized irrespective of necessity: problems with using
   long words needlessly", Applied Cognitive Psychology 20: 139-156, https://doi.org/10.1002/acp.1178 Study.
 
 **Plain language and readability**
