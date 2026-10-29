@@ -6,6 +6,29 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-29 09:20 UTC: before the 5-hour limit (it resets 12:40 UTC; a scheduled message resumes this
+## session at 12:45 UTC)
+- Done and committed: lanes E (`test/ENGINE.md`), PT (`test/ENGINE_PT.md`), N (`test/ENGINE_NATURE.md`), S steps 1-4
+  (`test/SCENE.md`: the S1 copy `video/src/look/poster_s1/`, entry `video/src/entry-look-poster.tsx`, compositions
+  PosterS1 / -v2 / -pass1 / -pass2, every switch); the decisions as rules (`INTEGRATION.md` §2); DIRECTION rule 1,
+  CRAFT §a, PIPELINE_V2 aligned with the owner's ONE SUBJECT, GONE DEEP. All shipped films proven pixel-identical.
+- RUNNING at 09:20: lane S's integration and render (STUDY §10 item 11). Its orders: wire PT's `<Mottle>` into
+  TextureSlot (seed `mottleSeed(plane)`, offset [dx, dy]; move S1BoatStrips into the water plane or leave the boats
+  unmottled), N's London plane into TreeSlot/SpraySlot (re-fit Pip's hiding spot into the crown; leaf tips out of the
+  caption band), N's cumulus into CloudSlot, calm the patchwork if it reads busy (PT: 2 tones 4.5 apart, 1.2 m cell);
+  render ONE clip: v2's own S1 (6.1 s), a big "Before / After" card, pass 2 (7.0 s), voice and captions, master
+  encode -> `video/deliverables/tests/poster_look_test_v1.mp4`; the still sheet `test/ab_switches.jpg` (5.2 s frame,
+  single-switch A/Bs: line, darks, patchwork, texture, far stage); QA (framecheck, capcheck, check_depth VALUE/NEAR,
+  check_light, check_banding --texture, `look_test_row.py` after vs `BEFORE.md`, bitrate, re-encodes at 1080p 3.5 Mbps
+  and 720p 1.5 Mbps checked for twinkle and the darks) -> `test/REPORT.md`.
+- RESUME: in this session, SendMessage to lane S's agent (it continues from its transcript; the agent id is in the
+  orchestrator's transcript: the 'Build lane S: the S1 test scene' agent); from a new session, one max-effort agent
+  with the orders above, starting from `test/SCENE.md` and whatever `test/REPORT.md` already says. Restart the
+  checkpoint loop (`study_checkpoint3.sh`: the study, `video/src`, `video/public/look`, `video/scripts`, the look docs).
+- THEN: a review panel at max effort (an art director against the posters and v2; a cold viewer at phone size, the
+  2-second glance test; a technical check of REPORT.md's numbers), one fix pass by lane S, send the clip + the sheet
+  to the owner (labelled: a look test, not a film), and merge the reviewed work into `video-production`.
+
 ## Status 2026-10-29 ~07:50 UTC: the look test builds in four parallel lanes
 - Owner: "Remember to parallelize the work where appropriate between subagents but also the subthreads just clean
   them up afterwards"; libraries "only if it's genuinely better than built yourself".
