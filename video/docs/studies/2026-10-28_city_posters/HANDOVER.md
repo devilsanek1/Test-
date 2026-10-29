@@ -6,6 +6,15 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-29 ~18:30 UTC: the owner on the look test: "missed the forest for the trees"; scene 1 rebuilt as a still
+- The owner: the test is "good, but ... barely noticeable"; rethink the first scene "from ground up" as ONE still in
+  the posters' construction (playbook: "The forest before the trees"). Brief: `scene_rethink/README.md`.
+- RUNNING: workflow `scene1-rethink` (run `wf_a122a3ef-9c5`): three concepts (A raised designed view, B waterside
+  frontal hero, C King's Cross capriccio) as value thumbnails -> a judge (`PICK.md`) -> the build in stages
+  (`build_stage_1..3`, `still_v1.png`) -> a critic (`CRITIC.md`) -> one fix pass (`still_v2.png`, also
+  `video/deliverables/tests/poster_scene1_still_v2.png`). Resume: `Workflow({scriptPath, resumeFromRunId})`.
+- NEXT: send still_v2 (with the build stages and the side-by-side) to the owner; capture the verdict.
+
 ## Status 2026-10-29 ~15:30 UTC: review FIX_FIRST; lane S runs fix pass 1
 - `test/REVIEW.md`: 6 must-fixes (her and the copies' drawing as value shapes; the paving off milk-tea; the dark
   panes vs W; the autumn spray and tree; a palette10b:false A/B pair; the far tower toned from its sky), 10 cheap
