@@ -5,39 +5,40 @@ somewhat high. Can you evaluate if there is anything in the early stages of the 
 
 ## What this session spent (2026-10-27 22:30 to 2026-10-28 14:20 UTC)
 
-From the session's own meter (orchestrator) and the agents' transcripts. Dollar figures for the agents use the rates
-implied by the orchestrator's meter ($102.70 for its usage, with the standard ratios: cache read 0.1x input, cache write
-1.25x, output 5x: about $3.07/M input, $0.31/M cache read, $3.84/M cache write, $15.35/M output). Estimates, not a bill.
-**Caveat (2026-10-28, `2026-10-28_streamline/tokens.md` F8):** summing usage on every transcript line over-counts about
-2.4x (each API call's usage repeats on every content-block line), so the agents' rows may be that much too high; the
-orchestrator's row is the session's own meter and holds.
+From the fixed meter (`spend.py` v2: each API call once, at Claude Code's own rates: Opus 5.5 $4/M input, $20/M
+output, $0.20/M cache read, $5/M 5-minute and $8/M 1-hour cache write). The first version of this table took
+get_session's reading ($102.70 at 13:32) as the orchestrator's, but that meter covers the whole session, agents
+included; and it summed the agents' usage per transcript line (2.4x). Its total of about $280 counted the agents twice.
+The real total is about $117 (re-measured 2026-10-29: `2026-10-28_streamline/phase1_meter.md`).
 
-| Part | Agents / API calls | Cache reads | Cache writes | Output | About |
-|---|---|---|---|---|---|
-| **Orchestrator (this session)** | 1 / ~330 | 107.2M | 6.1M | 2.5M (+2.4M input) | **$103** (metered) |
-| Research, 3 lanes | 3 / 380 | 48.9M | 2.2M | 0.9M | $37 |
-| Fact lock | 1 / 105 | 13.6M | 1.2M | 0.45M | $16 |
-| Core-line writers | 6 / 167 | 13.9M | 3.4M | 1.7M | $43 |
-| Judges | 4 / 80 | 7.5M | 2.0M | 0.9M | $24 |
-| Viewer panel | 4 / 23 | 0.8M | 0.5M | 0.1M | $4 |
-| Sceptics | 2 / 85 | 8.3M | 1.0M | 0.4M | $12 |
-| Editor | 1 / 87 | 12.5M | 1.3M | 0.3M | $14 |
-| Truth check | 1 / 123 | 21.9M | 0.8M | 0.45M | $17 |
-| Round-3 scouts (killed by the 5-hour limit) | 5 / 108 | 5.0M | 1.4M | 0.07M | $8 |
-| **Total** | 28 agents | | | | **about $280** |
+| Part | Agents / API calls | Cache reads | Cache writes | Output | $ (exact rates) | $ (doc rates) |
+|---|---|---|---|---|---|---|
+| Orchestrator | 1 / 159 | 60.4M | 2.64M | 0.23M | $37.81 | $32.40 |
+| Research, 3 lanes | 3 / 116 | 15.9M | 0.69M | 0.26M | $11.88 | $11.60 |
+| Fact lock | 1 / 28 | 3.5M | 0.38M | 0.11M | $4.78 | $4.21 |
+| Core-line writers | 6 / 74 | 6.9M | 1.29M | 0.81M | $23.99 | $19.49 |
+| Judges | 4 / 42 | 4.1M | 1.01M | 0.44M | $14.70 | $11.93 |
+| Viewer panel | 4 / 15 | 0.6M | 0.27M | 0.07M | $2.80 | $2.24 |
+| Sceptics | 2 / 30 | 3.1M | 0.33M | 0.13M | $4.84 | $4.20 |
+| Editor | 1 / 32 | 4.7M | 0.43M | 0.11M | $5.35 | $4.85 |
+| Truth check | 1 / 34 | 6.0M | 0.21M | 0.11M | $4.46 | $4.37 |
+| Round-3 scouts (killed by the 5-hour limit) | 5 / 28 | 1.4M | 0.36M | 0.02M | $2.40 | $2.06 |
+| **In the transcripts** | 28 agents / 558 | 106.5M | 7.61M | 2.29M | **$113.02** | $97.35 |
+| + side calls (Haiku web search and fetch, Opus side calls) | | | | | about $4 | |
+| **The window's real total** | | | | | **about $117** (Claude Code's meter at 13:33: $116.94) | |
 
 ## Complete waste: cut it
 
-1. **A whole G0.5 for a topic that was then dropped** (about $150 of agents plus the orchestrator's share). The work was
+1. **A whole G0.5 for a topic that was then dropped** (about $102: 22 agents $73 + the orchestrator's share $29). The work was
    good, but the owner switched the topic right after it ("alternate ... positive"). Cause: the topic was locked
    without the mood the owner wanted. Fix: the scouting brief names the mood (rule added 2026-10-28), and the owner
    confirms the topic on the G0 screen before any G0.5 money is spent.
-2. **Five scouts killed by the 5-hour limit with nothing saved** ($8). They were launched together close to the limit,
+2. **Five scouts killed by the 5-hour limit with nothing saved** ($2.40). They were launched together close to the limit,
    and none had written a file yet. Fix: check the session's rate-limit status (get_session) before a fan-out; every
    agent writes a first partial file at its first step.
-3. **The orchestrator re-reading a 640k-token context on every step** ($103, the largest line). What bloated it: a
+3. **The orchestrator re-reading a 640k-token context on every step** ($38 by 14:20: 159 calls at a mean context of 397k, max 648k; still the largest line). What bloated it: a
    skill that dumped a ~70k-token settings schema for one small hook question; every writer's and judge's full JSON
-   pasted back into the chat instead of read from a file; ~330 small steps (each commit re-reads the whole context);
+   pasted back into the chat instead of read from a file; 159 calls (each commit re-reads the whole context);
    process and doc work mixed into the production session. Fix: a fresh orchestrator session per gate (the video's
    README is the handoff), agents write files and return at most 3 lines, steps batched, process work in its own short
    session.

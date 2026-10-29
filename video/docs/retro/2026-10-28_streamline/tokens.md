@@ -11,7 +11,7 @@ per gate, resume instead of restart. Combined est.: 35-50 % of G3-G8 tokens, abo
 
 ## 1. How it works today
 
-**The meter over-counts about 2.4x.**
+**The meter over-counts about 2.4x.** (Fixed 2026-10-29: spend.py v2, `phase1_meter.md`.)
 - `retro/spend.py:30-34` sums `usage` on every assistant JSONL line and calls each line a turn. Claude Code writes one line
   per content block, and every line repeats the same usage.
 - Deduplicating by message.id + requestId on this session's 37 transcripts: 2.53 lines per API call, totals inflated 2.35x
@@ -28,6 +28,9 @@ input ≈ N·(B + R) + g·N²/2, where N is the number of calls.
 - **Images:** a full 1080x1920 frame plus a 216-px still added 3.0k tokens (about 1.6k for the frame, 0.1k for the
   still), each re-read on every later call.
 - **Scene files:** fixers read and edit files of 30-73 KB, 8-18k tokens each (`v3/film/scenes/outside.tsx` 73 KB).
+- **Idle rewrites:** a cached context lives 1 h (the orchestrator) or 5 min (agents); after a longer idle the next call
+  rewrites all of it ($8/M or $5/M). In session d840f028: six orchestrator wake-ups, $19.80, 33 % of its spend; agents
+  $7.29 (`phase1_meter.md`).
 
 **Where G3-G8 tokens went.**
 - **v1, the old loop** (`spend_out.txt`; shares hold):
@@ -93,7 +96,8 @@ They run at the G5 lanes, at the G6 assembly, at each G4 look-clip version, and 
 - **v1:** mean context **433k** per call, about 800 calls, 3 compactions.
   - Of 634 Bash calls, 171 were commit/push (27 %) and about 217 were check/status/wait.
   - There were also 38 scheduled check-ins and 36 notification reads (`ACTIONS_LOG.md`).
-- **v4:** a 640k context over about 330 steps cost $103, the largest single line.
+- **v4:** a context of up to 648k (mean 397k) over 159 calls cost $38 by 10-28 14:20, still the largest single line
+  (the $103 first quoted was the whole session's meter); $60 over 273 calls by 10-29.
 - **v2:** one session for 4 days ($3,502 → about $4,000, est.). The hour that held the hourly check-in and one hand-off
   cost +$11 (PROGRESS:129); four idle hours with the hourly report off cost +$7 (:114, :122); coordinating hours, local
   workflows included, cost +$26-51 (:149-232).

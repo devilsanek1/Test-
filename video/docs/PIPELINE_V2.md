@@ -26,10 +26,10 @@ a full scene round. Background research: `docs/PIPELINE_RESEARCH.md`.
 **The cost driver is long, image-heavy agent sessions repeated on finished-looking scenes.** Every turn re-reads the
 whole context, and every rendered frame an agent looks at stays in that context. Reading docs was a minor cost.
 
-**The meter over-counted (found 2026-10-28):** these totals come from `docs/retro/spend.py`, which added each API
-call's usage once per transcript line (about 2.4x): v1's agent input was about 5 B tokens and the orchestrator made
-about 800 calls. The shares hold. The meter is fixed in the streamlining plan's Phase 1
-(`docs/retro/2026-10-28_streamline/`).
+**The meter over-counted (found 2026-10-28, fixed 2026-10-29):** these totals come from v1 of `docs/retro/spend.py`,
+which added each API call's usage once per transcript line, about 2.4x too much. So v1's agent input was about 5 B
+tokens and the orchestrator made about 800 calls (est.; v1's transcripts are gone). The shares hold roughly. spend.py
+v2 counts each call once: `python3 video/docs/retro/spend.py` (`docs/retro/2026-10-28_streamline/phase1_meter.md`).
 
 ## The loop: gates G0-G8 (with G0.5, the core line, and W1, the world bible)
 
@@ -66,7 +66,7 @@ lock), then the G5 lanes and G6 (video 1: the first playable film at hour 18.7).
 life, animation, polish) gets as many agents, rounds and tokens as the quality needs, including workflows larger than the
 default size guideline. The anti-waste rules below only cut true waste (rework, lost work, reviews of things that will change).
 
-Quality and output value come first, spent where it reaches the film. Ideas are decided early, where a wrong turn is cheapest to fix, but run as big panels the early stages cost as much as a build (v4: about $280 for a topic and a line, much of it waste: `docs/retro/2026-10-28_v4_early_stage_cost.md`), so they run lean by default: a few strong agents that write files, one fact check, and the owner's picks (owner, 2026-10-28):
+Quality and output value come first, spent where it reaches the film. Ideas are decided early, where a wrong turn is cheapest to fix, but run as big panels the early stages cost as much as a build (v4: about $117 for a topic and a line (re-measured 2026-10-29; the first count, $280, counted the agents twice), much of it waste: `docs/retro/2026-10-28_v4_early_stage_cost.md`), so they run lean by default: a few strong agents that write files, one fact check, and the owner's picks (owner, 2026-10-28):
 - **G0 topic (lean since 2026-10-28):** the brief names the mood the next video needs (alternate positive and negative
   stories: playbook "Taste signals", owner 2026-10-28). When the owner names no topic, two scouts (about 15 searches
   each, each writing its file from its first step) cover the beats the brief asks for, and one editor judges them
@@ -173,7 +173,11 @@ stages (building, fixing, polishing), where the measured waste happened.
    **A fresh orchestrator per gate (2026-10-29):** onboarded by HANDOFF §0's fast path (the film's README and notes, the
    playbook, DIRECTION, the gate's rules), not the full read; woken by events (an agent's completion, the owner's
    message), not the clock; a status or a hand-off comes from `python3 video/scripts/ops/status.py --film vN` (the git
-   log, the film's README and reports, the meter), with no agent and no reading in the session.
+   log, the film's README and reports, the meter), with no agent and no reading in the session. The hourly status is that
+   command's output, pasted as the PROGRESS.md snapshot. The spend comes from the meter (`docs/retro/spend.py`, also in
+   that output): get_session's `usage` includes the agents but is a lower bound (across worker restarts at the 5-hour
+   limits on 2026-10-28 it lost about 10 %), so use get_session for `rate_limit_info`. `spend.py --save` at a gate's end
+   keeps the gate's record in the repo, since the transcripts go with the container.
 
 10. **Locked means dropped (owner, 2026-10-25).** When a gate locks, move the rejected options to `docs/vN/archive/`
     (no prompt reads it), trim the gate doc to the locked choice, and point later prompts only at locked docs and
@@ -246,6 +250,9 @@ the through-line card (G0.5 drafts it from the pick, G1 completes it from the sc
 - An agent writes its result into a file and its chat report is at most 3 lines (rule 9). Cross-lane requests go in one
   block, in an exact format.
 - **One fact file:** after G0, agents read `docs/vN/research/factlock.md` and search the web only for a fact it lacks.
+- **Label every agent `vN G<n> role: what`** (the Agent tool's `description`, a workflow `agent()`'s label; e.g.
+  `v4 G1 critic: cold retell`): the meter groups spend by film, gate and role from the label, and per-gate spend is
+  exact only with it.
 - Lanes: one scene per agent session (G5: a lane owns a SEQUENCE and builds it panel by panel; one agent owns every
   transition); shared kit / engine changes go only through the orchestrator.
 - Renders: 0.33-0.5 scale strips; full res only for a 1-2 frame measurement (an agent's working renders; the owner's

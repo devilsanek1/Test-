@@ -462,7 +462,8 @@ Maintenance at the end).
   initial intermediate step", v3 G5, 2026-10-26).
 - **The weekly limit is the real budget: finishing the video comes first** (using up to 100 % of the week is fine if the
   video is completed; with several films in flight they share it, and finishing them comes before starting a new one).
-  Track the spend hourly (helpers' `cost_usd`, workflow tokens), budget every lane, finish before polishing. **Close to
+  Track the spend hourly (`python3 video/scripts/ops/status.py --film vN`: the meter; a helper's get_session `cost_usd` is a
+  lower bound), budget every lane, finish before polishing. **Close to
   a limit, drop the low-signal stages first and keep what changes the film** (owner, v3, 2026-10-28: "we are getting
   close to our token limits can we drop some stages some redundant low signal work"): keep the fixes for problems already
   found and the master; drop a separate verifier when the final assembler re-checks every fix at its time, extra

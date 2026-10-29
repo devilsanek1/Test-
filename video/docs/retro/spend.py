@@ -47,7 +47,7 @@ DEFAULT_SESSION = '/root/.claude/projects/-home-user-Test-/d840f028-589b-5942-b9
 # distinct cost-state snapshots (2026-10-27..28): Opus 5.5 input 4, output 20, cache read 0.20, cache write 5 (5-minute
 # cache, the agents') or 8 (1-hour cache, the orchestrator's); Haiku 5.5 input 0.10, output 0.50 (its cache rates are
 # the same ratios, unmeasured). 'doc': the rates implied in 2026-10-28_v4_early_stage_cost.md (standard ratios fitted
-# to one meter reading: cache reads 55 % too high, 1-hour cache writes 52 % too low; 4-14 % low on a total).
+# to one meter reading: cache reads 55 % too high, 1-hour cache writes 52 % too low; 3-14 % low on a total).
 RATES = {
     'meter': {
         'claude-opus-5-5': dict(inp=4.0, out=20.0, cr=0.20, cw5m=5.0, cw1h=8.0),

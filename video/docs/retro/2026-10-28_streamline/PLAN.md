@@ -16,13 +16,13 @@ or an MD5 against the delivered v2r master (a re-render of it is byte-identical,
 - **Long sessions cost with the square of their length**, since every step re-reads the whole context. Sessions of 60+
   steps hold 55 % of the recorded G3-G5 tokens; the largest single agent (a G5b fixer, 137 steps) used about 30 M.
 - **Reading lists:** an agent is told to read 26-128k tokens of docs before working, re-paid on every step.
-- **The orchestrator:** big contexts (433k mean per step on v1, 640k on v4) and many small steps (27 % were commits).
+- **The orchestrator:** big contexts (433k mean per step on v1, about 400k mean and up to 782k on v4) and many small steps (27 % were commits).
 - **Each film rewrites its own G3-G8 automation** (168-276 KB of new workflow scripts) and hand-copies about 360 lines of
   film setup; 45 % of `video/src` is finished or dead code (v1, v2's first try, unused v3 panels).
 - **Renders:** a full master takes 6.5 min on an idle box (10 min on a busy one). The bare CLI renders gate videos with
   a slow software GL (`swangle`): 45x slower, with 36 % of pixels different from the master (v3's G5b cut took 63 min +
   26 min of audio). Every still rebuilds the bundle and launches two browsers (3.5 s for a 0.5 s frame).
-- **The meter itself over-counts about 2.4x** (usage repeated per transcript line): v1's "12.5 B tokens" is about 5 B.
+- **The meter itself over-counts about 2.4x** (usage repeated per transcript line): v1's "12.5 B tokens" is about 5 B. Fixed in Phase 1 (spend.py v2).
 
 ## Phase 1: safe now (no pixel changes; each checked by an MD5 or a 0-pixel diff)
 1. **Fix the spend meter** (dedupe per API call; per gate and per role), so every saving below is measured. (S)

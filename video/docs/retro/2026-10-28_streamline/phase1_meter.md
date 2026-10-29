@@ -98,8 +98,9 @@ record), `video/scripts/ops/status.py` (new).
   - **$19.1 never reached the server.** It was lost in two windows with worker restarts at the 5-hour limits of 10-28:
     - **$14.24 by 13:32.** The server's 13:32 reading ($102.70; cache read 107.25M, input 2.42M, output 2.54M) equals
       Claude Code's own 09:22 snapshot ($102.82; 107.85M, 2.42M, 2.54M). The work between about 09:22 and 13:32 never
-      reached it: the viewer panel and the sceptics finishing, the editor, the truth check, and the round-3 scouts
-      killed at 11:26. The gap to Claude Code's meter then stays exactly $14.24 from 13:32 to 15:05.
+      reached it: the orchestrator's 9 calls ($10.66, most of it rewriting its 550-580k context to the cache after
+      idles of 104 and 143 min) and the five round-3 scouts ($2.40, stopped by the limit at 11:09), plus their web
+      searches. The gap to Claude Code's meter then stays exactly $14.24 from 13:32 to 15:05.
     - **$4.86 between 15:05 and 18:33.** These are the limit stops at 16:57, 17:21 and 18:12: the server rose $13.30
       while Claude Code's meter rose $18.16.
 
@@ -141,11 +142,24 @@ record), `video/scripts/ops/status.py` (new).
 - **tokens.md's ratios stand.** Its per-call and per-agent figures came from deduplicated counts. Its "v4: a 640k
   context over about 330 steps cost $103" becomes 159 calls and $38 by 14:20 (273 calls and $60 by 10:27 today).
 
+**A finding the fixed meter makes visible: idle time costs a full cache rewrite.**
+- A cached context lives 1 hour for the orchestrator and 5 minutes for agents. After a longer idle, the next call
+  writes the whole context again: $8/M for the orchestrator, $5/M for an agent.
+- **The orchestrator:** six wake-ups after 96-615 min idle rewrote 181-584k tokens each, for $1.45-4.67 per wake-up and
+  $19.80 in all. That is **33 % of its $59.93**, against cache reads of $0.10-0.13 per call when it is warm.
+- **Agents:** six rewrites after more than 5 min idle cost $7.29.
+  - The render reviewer waited 5-55 min on renders three times, paying $1.2-1.9 each.
+  - Three core-line writers resumed after the 5-hour limit and paid $0.5-1.2 each.
+- **The cost scales with the context.** That is one more reason for F4's small, fresh orchestrator per gate (a 60k
+  context costs $0.48 to wake). When a big context must wait, a check under 5 min (an agent) or under 55 min (the
+  orchestrator) costs a cache read, not a rewrite. The orchestrator decides whether that becomes a rule: it is process,
+  not pixels.
+
 **Left.**
 - v1's table in PIPELINE_V2 cannot be re-run: its transcripts are gone. It stays as measured, with the 2.4x note.
 - Helper sessions run in their own containers: run spend.py there (or `--save` there and commit the JSON).
 - Re-run `spend.py --save` once Phase 1's lanes finish, to freeze this session's final record. The saved one is from
-  10:25 and is overwritten in place.
+  10:30 and is overwritten in place.
 
 ## Item 7 (the status script): `video/scripts/ops/status.py` (new)
 
@@ -214,7 +228,7 @@ Lane M may not edit these files; the orchestrator applies them. Line numbers are
 2. **`video/docs/PIPELINE_V2.md:69`.** Change "(v4: about $280 for a topic and a line, much of it waste:" to "(v4:
    about $117 for a topic and a line, re-measured 2026-10-29 (the first count, $280, counted the agents twice), much of
    it waste:".
-3. **`video/docs/PIPELINE_V2.md`, "Agent prompt rules"** (after the "One fact file" bullet, line ~247). Add:
+3. **`video/docs/PIPELINE_V2.md`, "Agent prompt rules"** (after the "One fact file" bullet, line 248). Add:
    "- **Label every agent `vN G<n> role: what`** (the Agent tool's `description`, a workflow `agent()`'s label; e.g.
    `v4 G1 critic: cold retell`): the meter groups spend by film, gate and role from the label, and per-gate spend is
    exact only with it."
@@ -246,7 +260,11 @@ Lane M may not edit these files; the orchestrator applies them. Line numbers are
 8. **`HANDOFF.md:421`.** "The script is `video/docs/retro/spend.py`." → "The meter is `video/docs/retro/spend.py` (v2
    since 2026-10-29: each API call once; v1's numbers in that table are about 2.4x high). One film's state and spend on
    one screen: `python3 video/scripts/ops/status.py --film vN`."
-9. **For the orchestrator to judge: `video/docs/OWNER_PLAYBOOK.md:465`** ("Track the spend hourly (helpers' `cost_usd`,
+9. **Optional, for the orchestrator: `video/docs/retro/2026-10-28_streamline/tokens.md` §1** ("The cost model"). Add a
+   bullet: "**Idle rewrites:** a cached context lives 1 h (the orchestrator) or 5 min (agents); after a longer idle the
+   next call rewrites all of it ($8/M or $5/M). In session d840f028: six orchestrator wake-ups, $19.80, 33 % of its
+   spend; agents $7.29 (`phase1_meter.md`)."
+10. **For the orchestrator to judge: `video/docs/OWNER_PLAYBOOK.md:465`** ("Track the spend hourly (helpers' `cost_usd`,
    workflow tokens)"). If that half is our wording rather than the owner's, make it "Track the spend hourly
    (`status.py --film vN`: the meter; a helper's get_session `cost_usd` is a lower bound)". If it is the owner's, leave
    it and let rule 4 above carry the how.
@@ -274,6 +292,9 @@ Lane M may not edit these files; the orchestrator applies them. Line numbers are
 
   Paste it as the PROGRESS.md snapshot. To have your open items show up, write them as `**Open:**` or `- [ ]` and mark
   closed ones DONE.
+- **Idle time is not free.** After an hour's idle the orchestrator's next call rewrites its whole context ($8/M:
+  $3.5-4.7 at 440-580k here; a third of this session's orchestrator spend). An agent pays the same after 5 minutes
+  ($5/M), for example while it waits on a long render. Small contexts make every wake-up cheap.
 - **What stays the same:** every render, QA and voice command, every gate and every review. Nothing in `video/src`,
   `video/public` or the render scripts was touched. The only command whose output changed is `spend.py` itself. It now
   prints the v2 report and writes files only with `--save`. v1 wrote `spend.json` for a session whose transcripts are

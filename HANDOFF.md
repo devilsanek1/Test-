@@ -418,7 +418,8 @@ scratch.
     `-alpha set ( +clone -alpha transparent -fill white -draw "circle ..." ) -compose DstIn -composite -background white -alpha remove`.
   - The scratchpad and `video/out/` are not in git (`video/out` is gitignored); deliverables go to `video/deliverables/`.
 - **What v1 cost and why:** `video/docs/PIPELINE_V2.md` has the table (442 agents; fix 40 %, review 28 %; polish
-  never converged). The script is `video/docs/retro/spend.py`.
+  never converged). The meter is `video/docs/retro/spend.py` (v2 since 2026-10-29: each API call once; v1's numbers in
+  that table are about 2.4x high). One film's state and spend on one screen: `python3 video/scripts/ops/status.py --film vN`.
 
 ## 6. Map of the repo
 
