@@ -27,3 +27,9 @@ Format: the owner's words in quotes, with the time (UTC); after "->" what we did
   with a top 3 -> `video/docs/studies/2026-10-28_city_posters/openers/OPENERS.md`.
 - 2026-10-29 ~09:05 UTC: "Even with did you know the core line is instantly more interesting" -> playbook (the core line may open as "Did you know that ..."); the opener agent scores
   each v5 core line in that form.
+
+## G1: the script
+- 2026-10-29 ~09:30 UTC: "Evaluate it based on our script rules - like for example rhythm?" -> `script/spine_eval.md`
+  (the spine as sent: rhythm FAIL, about 51 s, one AI tell; a tightened demo passes at about 42 s).
+- 2026-10-29 ~09:35 UTC: "Give it to the writer snd write it properly like your best version" -> the G1 writer started (max
+  effort): `script/script_g1.md`, `script/script_elevenlabs.md`, `THROUGHLINE.md`; then one critic and one fix pass.
