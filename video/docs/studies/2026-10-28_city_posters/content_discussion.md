@@ -1,6 +1,6 @@
 # Content discussion: which stories fit the city-poster style
 
-**State (2026-10-29 ~05:00 UTC): A FRONT-RUNNER.** The owner liked Helsinki heating homes with AI chips, IceCube,
+**State (2026-10-29 ~07:50 UTC): A FRONT-RUNNER.** The owner liked Helsinki heating homes with AI chips, IceCube,
 and a "weirdest places data centres are built" story; asked what the London drone story has beyond its title.
 Exchange 8 sent: Helsinki and the weird places as ONE story on one thread (the heat), IceCube's arc, an honest answer
 on the drones (mostly one beat: park it), and two questions: take the heat story to the fact lock? who makes it (v4's
@@ -248,13 +248,13 @@ made of Antarctic ice (physics Nobel 6 Oct; ceremony 10 Dec); Onkalo, Finland's 
 (licensed 22 Oct); Japan's MMX probe to Phobos (launched 20 Oct). Its data-centre rows were all backlash, votes, power
 or money (best fit: xAI's Memphis noise), none in a weird place: our scouts' weird-place data centres fill that gap.
 
-**The owner's reaction:** 2026-10-29 ~04:50 UTC, verbatim: "Oh I actually like the story of Helsinki hitting homes
+**The owner's reaction:** 2026-10-29 ~07:45 UTC, verbatim: "Oh I actually like the story of Helsinki hitting homes
 with ai chips / Ice cube is cool / Maybe another story is the "weirdest / coolest places where datacenters are built"
 like 3 weirdest places or smt / London hospital story interesting too but I'm not sure what you can pack in it beyond
 the title? Why would the people want to keep watching?" -> playbook Taste signals (every shortlist story shows what
 keeps people watching past its title; a "top 3" carried on one thread). -> exchange 8.
 
-### 8. ~05:00 UTC: the heat story, IceCube, the drones (sent)
+### 8. ~07:50 UTC: the heat story, IceCube, the drones (sent)
 - **The heat story (Helsinki + the weird places, one thread):** where do you put a machine this hot? (1) Frame 0: kids
   sledge down a snowy Stockholm park; 30 m under the granite, the internet hides in a Cold War bunker. (2) Why there:
   AI chips throw off huge heat, and cooling is the fight. (3) So they go to cold, strange places: under granite, 100 m
