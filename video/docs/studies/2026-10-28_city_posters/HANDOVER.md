@@ -6,6 +6,18 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-29 ~13:35 UTC: the clip is rendered; the review panel runs
+- `video/deliverables/tests/poster_look_test_v1.mp4` (15.5 s: Before card, v2's S1, After card, pass 2; master
+  encode, -14 LUFS), `test/ab_switches.jpg`, `test/REPORT.md` (after row vs v2, QA, waivers; §5 the owner flags:
+  the copies' row separation without outlines 7.9 L* vs 15, the calm paving, the chroma spread, the open sky).
+- RUNNING: workflow `look-test-review` (run `wf_c940970f-596`, script under the session's workflows/scripts): three
+  reviewers (art director, cold phone viewer, technical verifier) -> `test/REVIEW_{art,cold,tech}.md`, then a chair
+  -> `test/REVIEW.md` (verdict + at most 6 must-fixes). Resume: `Workflow({scriptPath, resumeFromRunId})`.
+- NEXT: lane S's agent ("Build lane S: the S1 test scene") does one fix pass on REVIEW.md's must-fixes and re-renders
+  `poster_look_test_v1.mp4`; then the clip, the sheet and a short note go to the owner; then merge into
+  `video-production` (the look-test code is opt-in and pixel-neutral for shipped films) and announce the new
+  `src/lib` modules in `docs/retro/2026-10-28_streamline/CHANGES.md` for the production sessions.
+
 ## Status 2026-10-29 09:20 UTC: before the 5-hour limit (it resets 12:40 UTC; a scheduled message resumes this
 ## session at 12:45 UTC)
 - Done and committed: lanes E (`test/ENGINE.md`), PT (`test/ENGINE_PT.md`), N (`test/ENGINE_NATURE.md`), S steps 1-4
