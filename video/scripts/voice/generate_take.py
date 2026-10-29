@@ -64,9 +64,13 @@ def parse(path):
     return units
 
 
-def words(s):
-    s = s.lower().replace('…', ' ').replace('’', "'").replace("'", '')
-    return re.findall(r'[a-z0-9]+', s)
+def words(s, expected=None):
+    """Normalised words (textnorm.py): numbers the recogniser writes in digits ("70 000", "40") are spelled out the
+    way the script says them, chosen against `expected` (before 2026-10-29 "70 000" became "70 000" here and every
+    take with a number failed)."""
+    sys.path.insert(0, HERE)
+    from textnorm import tokens
+    return tokens(s, expected)
 
 
 def same(heard, expected):
@@ -221,7 +225,8 @@ def main():
             y, sr, _ = tts(st['raw'], a.voice, a.model, '', '', 500 + k, a)
             y = trim(y, sr)
             dur = len(y) / sr
-            heard = words(transcribe(y, sr, a.model_dir).get('text', ''))
+            sf.write(f'{a.out}/whole_try{k + 1}.wav', y, sr)
+            heard = words(transcribe(y, sr, a.model_dir).get('text', ''), script_words)
             ok = same(heard, script_words) and dur <= 1.3 * len(script_words) / 2.8
             print(f'whole try {k + 1}: {"OK " if ok else "BAD"} {dur:.2f}s, {len(heard)} words (script {len(script_words)})')
             if ok:
@@ -247,15 +252,15 @@ def main():
             y, sr, rid = tts(send, a.voice, a.model, prev_text, next_text, 1000 + 97 * i + k, a, accepted_ids)
             y = trim(y, sr)
             sf.write(f'{a.out}/line_{i + 1:02d}_try{k + 1}.wav', y, sr)
-            heard = words(transcribe(y, sr, a.model_dir).get('text', ''))
+            heard = words(transcribe(y, sr, a.model_dir).get('text', ''), expected)
             ratio = difflib.SequenceMatcher(None, heard, expected).ratio()
             dur = len(y) / sr
             wps = len(expected) / dur if dur else 0
             judge = 'parakeet'
             if not same(heard, expected):  # a recogniser slip on a short clip ("BBC" -> "BDC") must not fail a good line
                 alt = second_opinion(y, sr, a.whisper_dir)
-                if alt is not None and same(words(alt), expected):
-                    heard, ratio, judge = words(alt), 1.0, 'whisper'
+                if alt is not None and same(words(alt, expected), expected):
+                    heard, ratio, judge = words(alt, expected), 1.0, 'whisper'
             ok = same(heard, expected) and 1.5 <= wps <= 4.2
             cand = {'line': i + 1, 'try': k + 1, 'judge': judge, 'match': same(heard, expected), 'ratio': round(ratio, 3),
                     'dur': round(dur, 2), 'wps': round(wps, 2), 'heard': ' '.join(heard), 'y': y, 'sr': sr, 'rid': rid,

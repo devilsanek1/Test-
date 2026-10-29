@@ -41,7 +41,10 @@ owner never pastes anything. Proven on 2026-10-26: video 2's API take was clean 
    python3 scripts/voice/generate_take.py docs/vN/script/script_elevenlabs.md assets/vN/api_take1 \
      --voice <the film's voice id: VOICE.md> --model-dir "$PARAKEET_DIR" --whisper-dir "$WHISPER_DIR"
    ```
-   It tries the whole script first (up to 3 tries), then falls back to per paragraph. `report.json` must say
+   It tries the whole script first (up to 3 tries, each kept as `whole_tryK.wav`), then falls back to per paragraph.
+   Numbers: the recogniser writes digits ("70 000", "40"); `scripts/voice/textnorm.py` spells them the way the script
+   says them (cardinal, year, digit by digit) for both checks; until 2026-10-29 "70 000" failed every v4 whole-script
+   read and forced stitched paragraphs (`python3 scripts/voice/textnorm.py --selftest`). `report.json` must say
    `all_clean: true`. Options: `--stability 0.5` (0.4 is more expressive, 0.65 steadier) and `--dry-run`.
 3. **Check:**
    `python3 scripts/voice/check_take.py assets/vN/api_take1/take.wav docs/vN/script/script_elevenlabs.md "$PARAKEET_DIR"`
