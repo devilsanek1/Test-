@@ -91,7 +91,7 @@ export const TENB = {
   // ---- the darks in many small pieces (CRAFT §f.8) and the shade family
   paneUnlit: '#3A5065', // unlit windows L* 33 (v2 46)
   stoneShade: '#A9A3B8', // the tier-A stone shade, -24 under lit stucco (v2 80 -> 68); B and C shade with lib/light FormShade at 0.20
-  coatOat: '#E9D3B0', // leaves the beige band (v2 #E6D3B5: h 84 at C* 17.4 under L* 86): C* 18.6, L* and hue kept
+  coatOat: '#E7D6BC', // leaves the beige band (v2 #E6D3B5: h 84, C* 17.4 under L* 86) upward: L* 86.5, C* 15, hue kept (C* >= 18 instead would leave the gamut mask)
   // ---- new roles
   pavingShade: '#CFAFA4', // paving in shade: rose, never beige (L* 74)
   eaveShade: '#6B4B5F', // the undersides of eaves, awnings, doorways: L* 36
@@ -123,11 +123,18 @@ export const JSON10B = {
 export const SIBLING_ROLES = ['stucco', 'limestone', 'paving', 'pavingShade', 'brickLight', 'brick', 'brickDeep', 'sage', 'water', 'paneUnlit', 'eaveShade'] as const;
 export type SiblingRole = (typeof SIBLING_ROLES)[number];
 
+/** The calm lights' siblings: a C* 5-7 light at L* 89-92 cannot hold 3-5 tints dE 8-14 from it and 8 apart (it can only
+ *  go darker, and its chroma is held to the mask), so they take the lower bound the study sets for "reads as a mistake"
+ *  (dE 6) and up to 6 L* lighter or 10 darker. */
+export const LIGHT_SIBLINGS = {dE: [6, 14] as [number, number], apart: 6, dL: [4, 10] as [number, number]};
+const LIGHT_ROLES = new Set<string>(['stucco', 'limestone', 'paving']);
+
 /** 3-5 sibling tints per fill role of `cm` (default 10b), seeded (lib/gamut `siblings`: hue +-8 deg, L* +-4-10, C* +-3-6,
- *  dE76 8-14 from the role and >= 8 apart, inside the mask, never beige / olive / grey). Deterministic per seed. */
+ *  dE76 8-14 from the role and >= 8 apart, inside the mask, never beige / olive / grey; the calm lights LIGHT_SIBLINGS).
+ *  Deterministic per seed. Check `.length`: a role returns fewer when the constraints leave no more. */
 export function siblings10b(n = 4, seed = 'poster-s1', cm: CanalPalette = CM10B): Record<SiblingRole, string[]> {
   const out = {} as Record<SiblingRole, string[]>;
-  for (const r of SIBLING_ROLES) out[r] = siblings(cm[r], n, `${seed}/${r}`);
+  for (const r of SIBLING_ROLES) out[r] = siblings(cm[r], n, `${seed}/${r}`, LIGHT_ROLES.has(r) ? LIGHT_SIBLINGS : {});
   return out;
 }
 
@@ -185,7 +192,9 @@ export function problems10b(cm: CanalPalette = CM10B): string[] {
     const band = neverBand(cm[k]);
     if (band) out.push(`${k} ${cm[k]} is in the ${band} band`);
   }
-  const outsideOk = new Set(['pop', 'sun', 'lamp', 'lampCore', 'box', 'bandGold', 'bandSunset', 'blossom', 'pipEar', 'pipScarf', 'leafGold', 'coatMustard', 'hero']);
+  // outside by design (pro_4_colour.md §3.3a): the one pop, the light sources, the caption box (UI), and v2's roles the
+  // study lists outside (the sunset band, the blossom, Pip's ear and scarf)
+  const outsideOk = new Set(['pop', 'sun', 'lamp', 'lampCore', 'box', 'bandGold', 'bandSunset', 'blossom', 'pipEar', 'pipScarf']);
   for (const [k, v] of Object.entries(now)) {
     if (typeof v !== 'string' || !v.startsWith('#') || outsideOk.has(k)) continue;
     if (!inMask(v)) out.push(`${k} ${v} is outside the Canal Mint gamut mask`);
@@ -197,9 +206,6 @@ export function problems10b(cm: CanalPalette = CM10B): string[] {
   return out;
 }
 
-/** The coatOat fix, recomputed (the value in TENB): v2's oat with its chroma raised to C* 18.6 (out of the beige band:
- *  h 55-95 at C* 6-18 under L* 86), L* and hue kept. */
-export const coatOat10b = () => {
-  const c = lch(CM_V2.coatOat);
-  return fromLch(c.L, 18.6, c.h);
-};
+/** The coatOat fix, recomputed (the value in TENB): v2's oat lifted out of the beige band (h 55-95 at C* 6-18 under L*
+ *  86) to L* 86.5 at C* 15, its hue kept, inside the mask (C* >= 18 at its own L* would leave it). */
+export const coatOat10b = () => fromLch(86.5, 15, lch(CM_V2.coatOat).h);

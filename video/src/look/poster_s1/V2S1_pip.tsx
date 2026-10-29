@@ -19,6 +19,8 @@ import {CM} from '../../v2r/palette';
 import {PipTrack} from '../../v2r/kit/pip';
 import {POSES} from '../../v2r/kit/pip/poses';
 import {C, S1_PIP, floodAt} from './V2S1_clock';
+import {useSwitches} from './switches';
+import {dark} from './darks';
 
 /** The bollard (screen px): top centre = Pip's seat. */
 export const S1_PIP_BOLLARD = {x: S1_PIP.seat[0], top: S1_PIP.seat[1], w: 48, h: 50} as const;
@@ -45,19 +47,24 @@ const LIGHT_AT = floodAt(B.x, BASE);
 /** EARS-COVER, strengthened for a back view at phone size (the kit's pose reads small from behind). */
 const EARS_COVER = {...POSES.earsCover, hunch: 0.72, headDrop: 8.5, earDroopA: 72, earDroopB: 72, earSwingA: 150, earSwingB: 150, earFoldA: 0.5, earFoldB: 0.5, trunkCurl: 1.55, scarfLift: 0.4};
 
-const Bollard: React.FC = () => (
-  <>
-    <ShadowLayer>
-      <ContactShadow x={B.x} y={BASE} w={B.w * 0.84} at={LIGHT_AT} />
-      <CastShadow x={B.x} y={BASE} w={B.w * 0.8} h={B.h} at={LIGHT_AT} />
-    </ShadowLayer>
-    <Tier tier="environment">
-      <Fill d={BODY} color={CM.coatSlate} seed="s1pipBollardBody" />
-      <Fill d={CAP} color={CM.coatSlate} seed="s1pipBollardCap" />
-    </Tier>
-    <FormShade d={BODY} kind="band" at={LIGHT_AT} />
-  </>
-);
+const Bollard: React.FC = () => {
+  // (the look test's darks) the cast-iron bollard dark iron
+  const {darks} = useSwitches();
+  const iron = darks ? dark('iron') : CM.coatSlate;
+  return (
+    <>
+      <ShadowLayer>
+        <ContactShadow x={B.x} y={BASE} w={B.w * 0.84} at={LIGHT_AT} />
+        <CastShadow x={B.x} y={BASE} w={B.w * 0.8} h={B.h} at={LIGHT_AT} />
+      </ShadowLayer>
+      <Tier tier="environment">
+        <Fill d={BODY} color={iron} seed="s1pipBollardBody" />
+        <Fill d={CAP} color={iron} seed="s1pipBollardCap" />
+      </Tier>
+      <FormShade d={BODY} kind="band" at={LIGHT_AT} />
+    </>
+  );
+};
 
 /** Pip and its bollard. The `pip` slot (drawn after the steps). */
 export const S1Pip: React.FC = () => {

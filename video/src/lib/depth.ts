@@ -191,8 +191,9 @@ export function planeK(atm: Atmosphere, plane: number, tier?: Tier): number {
 }
 
 /** `nearStep`'s absolute floor for one colour: `maxL` the plane's ceiling, `ref` its reference value (a hex or an L*;
- *  default the colour itself), `minL` the lowest L* the step may reach (default 16). */
-export type NearStepOpts = {maxL?: number; minL?: number; ref?: string | number};
+ *  default the colour itself), `minL` the lowest L* the step may reach (default 16); `keepChroma` keeps a pale warm
+ *  colour's chroma when it lands in the mids (default: it takes C* 19 there, out of the beige band). */
+export type NearStepOpts = {maxL?: number; minL?: number; ref?: string | number; keepChroma?: boolean};
 
 /** The near floor of plane `plane` (< 0) from an atmosphere's NearFloor (fractional planes interpolate). */
 function nearFloorAt(f: NearFloor, plane: number): NearStepOpts {
@@ -229,10 +230,15 @@ export function nearStep(color: string, plane: number, atm?: Atmosphere, o?: Nea
   const refL = typeof fl.ref === 'number' ? fl.ref : isHex(fl.ref) ? lab(fl.ref)[0] : lab(color)[0];
   const step = Math.max(dL, refL - fl.maxL);
   const minL = fl.minL ?? 16;
-  return cached(`nf${color}|${step.toFixed(3)}|${minL}`, () => {
+  const keepC = !!(o?.keepChroma ?? fl.keepChroma);
+  return cached(`nf${color}|${step.toFixed(3)}|${minL}|${keepC ? 1 : 0}`, () => {
     const c = lch(color);
-    const L = c.L - step;
-    return fromLch(L >= minL ? L : Math.min(c.L, minL), c.C, c.h);
+    const L0 = c.L - step;
+    const L = L0 >= minL ? L0 : Math.min(c.L, minL);
+    // never beige (P4 §3.2d, lib/water neverBand's band: h 55-95 at C* 6-18 under L* 86): a pale warm fill darkened
+    // into the mid-tones takes C* 19 (apricot, gold: "colour in the mids"; 18 plus the hex's rounding), unless `keepChroma`
+    const C = !keepC && L < 86 && c.h >= 55 && c.h <= 95 && c.C >= 6 && c.C < 18.5 ? 19 : c.C;
+    return fromLch(L, C, c.h);
   });
 }
 
@@ -265,7 +271,7 @@ export function nearPalette(colors: readonly (string | readonly [string, number]
     }
   }
   const maxL = o.maxL ?? (plane < 0 ? NEAR_FLOOR_L[Math.min(NEAR_FLOOR_L.length - 1, Math.max(0, Math.round(-plane) - 1))] : undefined);
-  for (const c of src) out[c] = nearStep(c, plane, atm, {maxL, minL: o.minL, ref: o.ref ?? mid});
+  for (const c of src) out[c] = nearStep(c, plane, atm, {maxL, minL: o.minL, ref: o.ref ?? mid, keepChroma: o.keepChroma});
   return out;
 }
 

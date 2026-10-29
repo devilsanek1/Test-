@@ -39,6 +39,9 @@ export type PosterSwitches = {
   pipHidden: boolean;
   float1z: boolean;
   lines2px: boolean;
+  /** Part of `darks` (decision 2 b): the near world in mid-tones (near.ts). Undefined = follows `darks`; set it to
+   *  split the A/B (the dark pieces alone, or the mid-tones alone). */
+  nearMid?: boolean;
 };
 
 /** v2's S1 as shipped: every switch off. */
@@ -84,7 +87,7 @@ export const PRESETS: Record<PosterPreset, PosterSwitches> = {
 export function resolveSwitches(p: Partial<PosterSwitches> & {preset?: PosterPreset}): PosterSwitches {
   const base = PRESETS[p.preset ?? 'v2'] ?? V2_SWITCHES;
   const out: PosterSwitches = {...base};
-  for (const k of Object.keys(V2_SWITCHES) as (keyof PosterSwitches)[]) {
+  for (const k of [...Object.keys(V2_SWITCHES), 'nearMid'] as (keyof PosterSwitches)[]) {
     const v = p[k];
     if (v !== undefined && v !== null) (out as Record<string, unknown>)[k] = v;
   }

@@ -26,6 +26,8 @@ import {Tier} from '../../lib/tier';
 import {Fill} from '../../lib/Fill';
 import {S1_DRAW, s1Bold, wIsSubject, doorIsSubject} from './V2S1_clock';
 import {InkScale} from '../../lib/inkComp';
+import {useSwitches} from './switches';
+import {DARK, dark} from './darks';
 
 // ---------------------------------------------------------------- the layout (local metres: u east, v down)
 
@@ -90,7 +92,7 @@ export const s1WingX = (u: number) => p(u, HM * 0.6)[0];
 
 // ---------------------------------------------------------------- the static facade
 
-function facadeStatic(): Batch {
+function facadeStatic(darks = false): Batch {
   const b = new Batch();
   const r = rng('s1wing');
   // ---- the roof-terrace planting over the coping (never above y 575): shrubs, grasses with seed heads, small trees
@@ -145,30 +147,38 @@ function facadeStatic(): Batch {
     const w = strips[k + 1] - strips[k] + 0.02;
     b.poly(CM.limestone, q(a, -0.02, w, 0.05));
     b.poly(CM.limestone, q(a, V_SILL, w, V_FLOOR - V_SILL));
-    b.poly(CM.stoneShade, q(a, V_FLOOR - 0.025, w, 0.025));
+    b.poly(darks ? dark('eave') : CM.stoneShade, q(a, V_FLOOR - 0.025, w, 0.025));
     b.poly(CM.limestone, q(a, V_PLINTH, w, HM - V_PLINTH));
-    b.poly(CM.stoneShade, q(a, V_PLINTH, w, 0.05));
+    b.poly(darks ? dark('eave') : CM.stoneShade, q(a, V_PLINTH, w, 0.05));
+    // (the look test's darks) the coping's drip shadow on the brick under the cap, the band's underside
+    if (darks) b.poly(dark('eave'), q(a, 0.03, w, 0.035));
   }
   // the west corner pier (limestone) with its shade return
   b.poly(CM.limestone, q(0, 0, CORNER, HM));
   b.poly(CM.stoneShade, q(CORNER - 0.07, 0.03, 0.07, HM - 0.03));
   // a downpipe on the corner panel
-  b.poly(CM.shadeCool, q(CORNER + 0.1, 0.02, 0.06, HM - 0.02));
-  for (let k = 0; k < 4; k++) b.poly(CM.paneUnlit, q(CORNER + 0.085, 0.5 + k * 1.15, 0.09, 0.05));
+  b.poly(darks ? dark('iron') : CM.shadeCool, q(CORNER + 0.1, 0.02, 0.06, HM - 0.02));
+  for (let k = 0; k < 4; k++) b.poly(darks ? dark('deep') : CM.paneUnlit, q(CORNER + 0.085, 0.5 + k * 1.15, 0.09, 0.05));
+  // (the look test's darks) cast-iron air bricks in the plinth, one under each pier, and the downpipe's shoe
+  if (darks) {
+    for (const u of [0.95, (1.3 + UPPER[1].u0) / 2, PIER_L.u0 + 0.4, PIER_R.u0 + 0.42, (WU1 + LOWER[2].u0) / 2, LOWER[2].u1 + 0.2]) b.poly(dark('iron'), q(u - 0.13, V_PLINTH + 0.1, 0.26, 0.11));
+    b.poly(dark('deep'), q(CORNER + 0.06, HM - 0.16, 0.14, 0.1));
+  }
   b.layer();
   // window reveals (a shade strip on the left: the low sun is west = screen left) + slim stone sills / lintels
   for (const bay of UPPER) {
     b.poly(CM.stoneShade, q(bay.u0 - 0.06, V_HEAD, 0.06, V_SILL - V_HEAD));
-    b.poly(CM.shadeWarm, q(bay.u0 - 0.03, V_HEAD, 0.03, V_SILL - V_HEAD));
+    b.poly(darks ? dark('eave') : CM.shadeWarm, q(bay.u0 - (darks ? 0.045 : 0.03), V_HEAD, darks ? 0.045 : 0.03, V_SILL - V_HEAD));
   }
   for (const bay of LOWER) {
     b.poly(CM.stoneShade, q(bay.u0 - 0.06, V_FLOOR + 0.1, 0.06, V_PLINTH - V_FLOOR - 0.1));
+    if (darks) b.poly(dark('eave'), q(bay.u0 - 0.045, V_FLOOR + 0.11, 0.045, V_PLINTH - V_FLOOR - 0.11));
     b.poly(CM.limestone, q(bay.u0 - 0.06, V_FLOOR + 0.04, bay.u1 - bay.u0 + 0.12, 0.07));
   }
   // the door bay: a stone surround (jambs + head), the shade in its left reveal
   b.poly(CM.limestone, q(DU0 - 0.12, DV0 - 0.1, 0.12, HM - DV0 + 0.1));
   b.poly(CM.limestone, q(DU1, DV0 - 0.1, 0.12, HM - DV0 + 0.1));
-  b.poly(CM.stoneShade, q(DU0, DV0, 0.07, HM - DV0));
+  b.poly(darks ? dark('eave') : CM.stoneShade, q(DU0, DV0, 0.07, HM - DV0));
   b.layer();
   // ---- fins: slim limestone (their short shades to the right are the light layer's: s1WingShadows)
   for (const [u, full] of FINS) {
@@ -178,8 +188,9 @@ function facadeStatic(): Batch {
   // ---- the canopy slab: soffit shadow under the fascia, the fascia (sign face), its top band
   const F = S.canopyFascia;
   // the soffit is limestone; its one Shade step is the light layer's (s1WingShadows)
-  b.rect(CM.limestone, F.x0 - 6, F.y1, F.x1 - F.x0 + 12, 8);
-  b.rect(CM.stoneShade, F.x0 - 6, F.y1 + 8, F.x1 - F.x0 + 12, 3);
+  // (the look test's darks: the canopy's underside, the awning's dark strip over the door)
+  b.rect(darks ? dark('eave') : CM.limestone, F.x0 - 6, F.y1, F.x1 - F.x0 + 12, 8);
+  b.rect(darks ? dark('deep') : CM.stoneShade, F.x0 - 6, F.y1 + 8, F.x1 - F.x0 + 12, darks ? 4 : 3);
   b.rect(CM.paper, F.x0, F.y0, F.x1 - F.x0, F.y1 - F.y0);
   b.rect(CM.limestone, F.x0 - 10, F.y0 - 7, F.x1 - F.x0 + 20, 8);
   b.layer();
@@ -267,10 +278,14 @@ function lobeTop(x0: number, x1: number, base: number, hMax: number, seed: strin
 
 /** One pane's interior on the plane (u0, v0, w, h in metres). Lit: warm, 40-70 % of the pane, a few things in it;
  *  unlit: the golden-hour glass mirroring the sky, the room as a slate band low; plus a few interior lines in ink. */
-function paneInto(b: Batch, ink: string[], u0: number, v0: number, w: number, h: number, lit: boolean, seed: string, kind: number) {
+function paneInto(b: Batch, ink: string[], u0: number, v0: number, w: number, h: number, lit: boolean, seed: string, kind: number, darks = false) {
   const r = rng(seed);
   const qq = (a: number, c: number, ww: number, hh: number) => q(u0 + a * w, v0 + c * h, ww * w, hh * h);
   const pp = (a: number, c: number) => p(u0 + a * w, v0 + c * h);
+  if (darks) {
+    darkPaneInto(b, qq, pp, lit, seed, kind);
+    return;
+  }
   if (!lit) {
     b.poly(CM.glass, qq(0, 0, 1, 1));
     const lo = r.range(0.52, 0.66);
@@ -317,6 +332,58 @@ function paneInto(b: Batch, ink: string[], u0: number, v0: number, w: number, h:
     ink.push(line(...pp(0.02, k), ...pp(0.98, k), {seed: `${seed}/bl`, over: 'none'}));
   }
   b.poly(CM.glass, [pp(1, 0), pp(1, 0.16), pp(0.84, 0)]);
+}
+
+type PaneQ = (a: number, c: number, ww: number, hh: number) => Pt[];
+type PaneP = (a: number, c: number) => Pt;
+
+/** (the look test's darks: pro_4_colour.md §3.1, §4) A pane the way the posters draw a window, a dark recess: unlit, the
+ *  room is dark (10b's pane dark) under the glass's reflection of the sky, its sill a step lighter; lit, the lamp-lit
+ *  room keeps its furniture in silhouette (one or two dark shapes, kept low and off W's centre: the lit panes stay a
+ *  step under W); every pane carries the lintel's shadow at its head (the window's depth). */
+function darkPaneInto(b: Batch, qq: PaneQ, pp: PaneP, lit: boolean, seed: string, kind: number) {
+  const r = rng(`${seed}/dark`);
+  if (!lit) {
+    b.poly(CM.glass, qq(0, 0, 1, 1));
+    const lo = r.range(0.32, 0.44);
+    b.poly(dark('pane'), [pp(0, lo), pp(1, lo - r.range(0.06, 0.14)), pp(1, 1), pp(0, 1)]);
+    // the sill inside (a desk edge catching the light): one step up from the room
+    b.poly(CM.paneUnlit, qq(0, 0.88, 1, 0.05));
+    b.poly(CM.skyHigh, [pp(0.18, 0), pp(0.5, 0), pp(0.1, lo * 0.92), pp(0, lo * 0.92), pp(0, 0.24)]);
+    b.poly(CM.paper, [pp(0.62, 0), pp(0.7, 0), pp(0.5, lo * 0.66), pp(0.44, lo * 0.66)]);
+  } else {
+    b.poly(CM.lamp, qq(0, 0, 1, 1));
+    if (kind === 0) {
+      // a pendant over a long table, two chair backs at it
+      b.poly(dark('iron'), [pp(0.36, 0.3), pp(0.64, 0.3), pp(0.56, 0.21), pp(0.44, 0.21)]);
+      b.poly(dark('wood'), qq(0, 0.72, 1, 0.07));
+      b.poly(dark('wood'), qq(0.14, 0.6, 0.16, 0.24));
+      b.poly(dark('wood'), qq(0.7, 0.62, 0.15, 0.22));
+    } else if (kind === 1) {
+      // a shelf of files and the back of a desk chair
+      b.poly(dark('wood'), qq(0.05, 0.44, 0.9, 0.04));
+      for (let k = 0; k < 3; k++) b.poly(k === 1 ? dark('eave') : dark('pane'), qq(0.12 + k * 0.16, 0.3 + r.range(0, 0.03), 0.12, 0.14));
+      b.poly(dark('iron'), [pp(0.3, 1), pp(0.32, 0.7), pp(0.42, 0.62), pp(0.62, 0.62), pp(0.7, 0.7), pp(0.72, 1)]);
+    } else if (kind === 2) {
+      // a big plant against the glass in its pot, a dark picture frame
+      b.poly(dark('wood'), qq(0.17, 0.84, 0.24, 0.16));
+      const [cx, cy] = pp(0.29, 0.84);
+      const [ex] = pp(0.52, 0.84);
+      const s = Math.abs(ex - cx) * 0.9;
+      b.fill(dark('leaf'), lobes(cx - s, cx + s, cy, s * 2.2, `${seed}/dbp`, 4));
+      b.poly(dark('eave'), qq(0.58, 0.22, 0.28, 0.24));
+      b.poly(CM.paper, qq(0.62, 0.27, 0.2, 0.14));
+    } else {
+      // a blind half down (its slats one fill), the room under it dark
+      const k = r.range(0.32, 0.5);
+      b.poly(CM.coatOat, qq(0, 0, 1, k));
+      b.poly(dark('wood'), qq(0, k - 0.02, 1, 0.03));
+      b.poly(dark('pane'), qq(0, 0.7, 1, 0.3));
+    }
+  }
+  // the lintel's shadow on the glass, and the glass's corner glint under it
+  b.poly(dark('eave'), qq(0, 0, 1, 0.07));
+  b.poly(CM.glass, [pp(1, 0.07), pp(1, 0.2), pp(0.86, 0.07)]);
 }
 
 // ---------------------------------------------------------------- W, her office window
@@ -388,7 +455,7 @@ function wInto(b: Batch, inkF: string[], inkM: string[], dark: boolean) {
 
 // ---------------------------------------------------------------- the lobby behind the door
 
-function lobbyStatic(): Batch {
+function lobbyStatic(darks = false): Batch {
   const b = new Batch();
   const du0 = DU0;
   const du1 = DU1;
@@ -399,15 +466,15 @@ function lobbyStatic(): Batch {
   b.poly(CM.stucco, q(du0, dv1 - 0.42, du1 - du0, 0.42));
   b.poly(CM.paving, q(du0, dv1 - 0.42, du1 - du0, 0.06));
   // the reception counter (wood) on the left, a tall plant in the left corner, three pendants
-  b.poly(CM.line, q(du0 + 0.42, dv1 - 1.12, 0.62, 0.72));
+  b.poly(darks ? dark('wood') : CM.line, q(du0 + 0.42, dv1 - 1.12, 0.62, 0.72));
   b.poly(CM.leafGold, q(du0 + 0.42, dv1 - 1.12, 0.62, 0.07));
   const [plx, ply] = p(du0 + 0.2, dv1 - 0.42);
   const pls = PM.pxPerM(du0);
-  b.fill(CM.brickDeep, `M${P(plx - pls * 0.16, ply)}L${P(plx + pls * 0.16, ply)}L${P(plx + pls * 0.12, ply - pls * 0.34)}L${P(plx - pls * 0.12, ply - pls * 0.34)}Z`);
+  b.fill(darks ? dark('wood') : CM.brickDeep, `M${P(plx - pls * 0.16, ply)}L${P(plx + pls * 0.16, ply)}L${P(plx + pls * 0.12, ply - pls * 0.34)}L${P(plx - pls * 0.12, ply - pls * 0.34)}Z`);
   b.fill(CM.sage, lobes(plx - pls * 0.3, plx + pls * 0.3, ply - pls * 0.34, pls * 1.05, 's1lobby/plant', 3));
   for (let j = 0; j < 3; j++) {
     const [lx, ly] = p(du0 + (du1 - du0) * (0.22 + j * 0.28), dv0 + 0.34);
-    b.fill(S1_IRON, domePath(lx, ly, 7, 6));
+    b.fill(darks ? dark('iron') : S1_IRON, domePath(lx, ly, 7, 6));
     b.fill(CM.lampCore, ovalPath(lx, ly + 1.5, 4.5, 2));
   }
   let d = '';
@@ -422,12 +489,15 @@ function lobbyStatic(): Batch {
 }
 
 /** The door's fixed frame: the head transom, the jambs, the threshold (slate), drawn over the lobby and her. */
-function doorFrameStatic(): Batch {
+function doorFrameStatic(darks = false): Batch {
   const b = new Batch();
-  b.poly(CM.paneUnlit, q(DU0, DV0, DU1 - DU0, 0.07));
-  b.poly(CM.paneUnlit, q(DU0, DV0, 0.05, HM - DV0));
-  b.poly(CM.paneUnlit, q(DU1 - 0.05, DV0, 0.05, HM - DV0));
-  b.poly(CM.stoneShade, q(DU0 - 0.12, HM - 0.05, DU1 - DU0 + 0.24, 0.05));
+  // (the look test's darks: the door's slate frame dark iron, its threshold the deepest; the subject's tier draws them
+  // as authored, so they are DARK's shown values, not forTier's)
+  const frame = darks ? DARK.iron : CM.paneUnlit;
+  b.poly(frame, q(DU0, DV0, DU1 - DU0, 0.07));
+  b.poly(frame, q(DU0, DV0, 0.05, HM - DV0));
+  b.poly(frame, q(DU1 - 0.05, DV0, 0.05, HM - DV0));
+  b.poly(darks ? DARK.deep : CM.stoneShade, q(DU0 - 0.12, HM - 0.05, DU1 - DU0 + 0.24, 0.05));
   b.ink(poly(q(DU0, DV0, DU1 - DU0, HM - DV0), {over: 'small', seed: 's1w/dooropen'}), INK_PX.mid);
   return b;
 }
@@ -439,9 +509,10 @@ const WING_SWITCH = {pane: 6, at: 3.9} as const;
 
 export const S1Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) => {
   const t = useTime();
-  const stat = useMemo(() => facadeStatic(), []);
-  const lobby = useMemo(() => lobbyStatic(), []);
-  const frame = useMemo(() => doorFrameStatic(), []);
+  const {darks} = useSwitches();
+  const stat = useMemo(() => facadeStatic(darks), [darks]);
+  const lobby = useMemo(() => lobbyStatic(darks), [darks]);
+  const frame = useMemo(() => doorFrameStatic(darks), [darks]);
   // panes (per frame: one somewhere switches every 0.6-1.5 s)
   const dyn = new Batch();
   const inkP: string[] = [];
@@ -460,7 +531,7 @@ export const S1Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) =
   }
   panes.forEach(([u0, v0, w, h], k) => {
     const lit = k === WING_SWITCH.pane ? t >= WING_SWITCH.at : litAt(0, 's1wing', k, panes.length, {litFrac: 0.55});
-    paneInto(dyn, inkP, u0, v0, w, h, lit, `s1pane/${k}/${lit ? 'L' : 'U'}`, k % 4);
+    paneInto(dyn, inkP, u0, v0, w, h, lit, `s1pane/${k}/${lit ? 'L' : 'U'}`, k % 4, darks);
   });
   // tier C: the panes carry no lines (their cords, shelves and frames were short strokes, critic G4); inkP unused
   void inkP;
@@ -528,6 +599,7 @@ export function s1DoorOpen(t: number): number {
  *  an ink glint; they slide OUTWARD and stay visible parked over the brick door piers. */
 export const S1DoorLeaves: React.FC = () => {
   const t = useTime();
+  const {darks} = useSwitches();
   const open = s1DoorOpen(t);
   const leafW = (DU1 - DU0) / 2;
   const b = new Batch();
@@ -543,10 +615,11 @@ export const S1DoorLeaves: React.FC = () => {
     const v0 = DV0 + 0.07;
     const v1 = HM - 0.05;
     // stiles, rails, the kick rail (slate)
-    b.poly(CM.paneUnlit, q(a, v0, st, v1 - v0));
-    b.poly(CM.paneUnlit, q(e - st, v0, st, v1 - v0));
-    b.poly(CM.paneUnlit, q(a, v0, leafW, rail));
-    b.poly(CM.paneUnlit, q(a, v1 - kick, leafW, kick));
+    const stile = darks ? DARK.iron : CM.paneUnlit;
+    b.poly(stile, q(a, v0, st, v1 - v0));
+    b.poly(stile, q(e - st, v0, st, v1 - v0));
+    b.poly(stile, q(a, v0, leafW, rail));
+    b.poly(stile, q(a, v1 - kick, leafW, kick));
     b.poly(CM.coatSlate, q(a + st, v1 - kick + 0.04, leafW - 2 * st, 0.025));
     // the handle: a brass pull bar on the meeting side
     const hu = side ? a + st + 0.06 : e - st - 0.1;

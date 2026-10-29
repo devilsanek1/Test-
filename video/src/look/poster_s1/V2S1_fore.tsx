@@ -12,19 +12,29 @@
 // colours so the environment tier's page pull leaves them full, never ghostly). Every light shape from RIG_CANAL (the
 // assembly's Lit): contact under whatever touches (tilted along the ground), casts right and a little toward us, the
 // side away from the low western sun one form step; all landing with the flood (frame 0 is pale shapes only).
-import React from 'react';
+import React, {createContext, useContext} from 'react';
 import {Fill} from '../../lib/Fill';
 import {Tier} from '../../lib/tier';
 import {CastShadow, ContactShadow, FormShade, Shade, ShadowLayer} from '../../lib/light';
 import {CM} from '../../v2r/palette';
 import {floodAt} from './V2S1_clock';
 import {BANK_LIT, BANK_PAVE, GROUND_VP, edgeSlope} from './V2S1_steps_stone';
+import {useSwitches} from './switches';
+import {dark} from './darks';
+import {nearMid} from './near';
 
 type Pt = [number, number];
 const r1 = (n: number) => Math.round(n * 10) / 10;
 const poly = (pts: Pt[]) => pts.map(([x, y], i) => `${i ? 'L' : 'M'}${r1(x)} ${r1(y)}`).join('') + 'Z';
 const ell = (cx: number, cy: number, rx: number, ry: number) => `M${r1(cx - rx)} ${r1(cy)}A${r1(rx)} ${r1(ry)} 0 1 0 ${r1(cx + rx)} ${r1(cy)}A${r1(rx)} ${r1(ry)} 0 1 0 ${r1(cx - rx)} ${r1(cy)}Z`;
-const F: React.FC<{d: string; c: string; s: string}> = ({d, c, s}) => <Fill d={d} color={c} seed={`fore/${s}`} offset={false} />;
+/** (the look test) the near world's tone map in effect (identity = v2; the mid-tones under the darks switch). */
+const ToneCtx = createContext<(c: string) => string>((c) => c);
+const F: React.FC<{d: string; c: string; s: string}> = ({d, c, s}) => {
+  const tone = useContext(ToneCtx);
+  return <Fill d={d} color={tone(c)} seed={`fore/${s}`} offset={false} />;
+};
+/** A dark piece (darks.ts: authored for tier C, never mapped by the tone). */
+const D: React.FC<{d: string; c: string; s: string}> = ({d, c, s}) => <Fill d={d} color={c} seed={`fore/dk/${s}`} offset={false} />;
 
 /** y at x2 on the ground-edge line through (x, y) (the line to GROUND_VP). */
 const along = (x: number, y: number, x2: number) => GROUND_VP[1] + ((y - GROUND_VP[1]) * (x2 - GROUND_VP[0])) / (x - GROUND_VP[0]);
@@ -96,20 +106,43 @@ const crown: string = [
   ell(128, 1348, 70, 40),
 ].join('');
 
+/** (the look test's darks) the crown's underside: the lower lobes shifted down 62 % of their height, clipped to the
+ *  crown, leave a dark band along its bottom (~16-26 px). */
+const CROWN_UNDER: string = [
+  ell(118, 1388 + 52, 104, 34),
+  ell(36, 1420 + 44, 84, 30),
+  ell(206, 1428 + 40, 80, 28),
+].join('');
+
 const Planter: React.FC = () => {
   const {x0, x1, xc, rim, base} = FORE.planter;
+  const {darks} = useSwitches();
+  const clip = 'fcrown' + React.useId().replace(/[^a-zA-Z0-9]/g, '');
   return (
     <>
       {/* the bay's trunk (wider than a line: 16 px) and its crown, cut by the left edge */}
-      <F d={poly([[118, rim + 2], [134, rim + 2], [138, 1420], [124, 1420]])} c={CM.brickDeep} s="bayTrunk" />
+      {darks ? <D d={poly([[118, rim + 2], [134, rim + 2], [138, 1420], [124, 1420]])} c={dark('wood')} s="bayTrunk" /> : <F d={poly([[118, rim + 2], [134, rim + 2], [138, 1420], [124, 1420]])} c={CM.brickDeep} s="bayTrunk" />}
       <F d={crown} c={CM.sage} s="bayCrown" />
       <F d={ell(150, 1414, 52, 30) + ell(70, 1440, 40, 22)} c={LEAF_SHADE} s="bayInner" />
+      {/* (the look test's darks) the shade under the crown: its underside, clipped to the crown (the shade under trees) */}
+      {darks ? (
+        <>
+          <defs>
+            <clipPath id={clip} clipPathUnits="userSpaceOnUse">
+              <path d={crown} />
+            </clipPath>
+          </defs>
+          <g clipPath={`url(#${clip})`}>
+            <D d={CROWN_UNDER} c={dark('leaf')} s="bayUnder" />
+          </g>
+        </>
+      ) : null}
       {/* the planter box: vertical boards in two terracotta woods, a stone coping on top with the soil showing inside
           it (we look down into the box), ivy trailing over its front; every long edge to the vanishing point */}
       {[x0, 58, 164, x1].slice(0, -1).map((xa, i, arr) => (
         <F key={i} d={slab(xa, [58, 164, x1][i], xc, rim + 14, base)} c={i % 2 ? TERRACOTTA_DEEP : TERRACOTTA} s={`plBoard${i}`} />
       ))}
-      <F d={slab(x0 - 8, x1 + 10, xc, rim - 12, rim + 2)} c={SOIL} s="plSoil" />
+      {darks ? <D d={slab(x0 - 8, x1 + 10, xc, rim - 12, rim + 2)} c={dark('wood')} s="plSoil" /> : <F d={slab(x0 - 8, x1 + 10, xc, rim - 12, rim + 2)} c={SOIL} s="plSoil" />}
       <F d={slab(x0 - 8, x1 + 10, xc, rim, rim + 16)} c={STONE_LIT} s="plRim" />
       <F d={`M8 ${rim + 12}C10 ${rim + 40} 26 ${rim + 66} 20 ${rim + 92}C34 ${rim + 70} 40 ${rim + 44} 46 ${rim + 14}ZM92 ${rim + 14}C96 ${rim + 46} 112 ${rim + 58} 106 ${rim + 84}C122 ${rim + 62} 126 ${rim + 40} 130 ${rim + 16}ZM176 ${rim + 18}C178 ${rim + 36} 190 ${rim + 50} 186 ${rim + 66}C200 ${rim + 50} 204 ${rim + 34} 206 ${rim + 18}Z`} c={FERN} s="plIvy" />
       {/* a few grasses at the rim's right corner */}
@@ -120,6 +153,7 @@ const Planter: React.FC = () => {
 
 const Crates: React.FC = () => {
   const {x0, x1, xc, base} = FORE.crates;
+  const {darks} = useSwitches();
   const lower = 1666;
   const upper = 1590;
   const ux0 = x0 + 14;
@@ -135,6 +169,8 @@ const Crates: React.FC = () => {
       <F d={slab(ux0, ux1, xc, upper + 26, upper + 46)} c={WOOD_LIGHT} s="crUs" />
       <F d={slab(x0, x1, xc, lower, base)} c={WOOD} s="crL" />
       <F d={slab(x0, x1, xc, lower + 30, lower + 54)} c={WOOD_LIGHT} s="crLs" />
+      {/* (the look test's darks) the shade under the upper crate, on the lower one's top */}
+      {darks ? <D d={slab(x0, x1, xc, lower, lower + 11)} c={dark('wood')} s="crUnder" /> : null}
     </>
   );
 };
@@ -142,11 +178,15 @@ const Crates: React.FC = () => {
 const Chair: React.FC<{x: number; s: string; flip?: boolean; seatY?: number; k?: number}> = ({x, s, flip, seatY = 1626, k: z = 1}) => {
   const k = (flip ? -1 : 1) * z;
   const foot = seatY + 74 * z;
+  const {darks} = useSwitches();
+  const L = darks ? D : F;
+  const legC = darks ? dark('wood') : CM.stoneShade;
   return (
     <>
-      {/* legs: wide and mid-light (thin dark legs read as lines) */}
-      <F d={poly([[x - 36 * k, seatY], [x - 26 * k, seatY], [x - 30 * k, foot], [x - 42 * k, foot]])} c={CM.stoneShade} s={`${s}L1`} />
-      <F d={poly([[x + 26 * k, seatY], [x + 36 * k, seatY], [x + 42 * k, foot], [x + 30 * k, foot]])} c={CM.stoneShade} s={`${s}L2`} />
+      {/* legs: wide and mid-light (thin dark legs read as lines); the look test's darks: the rattan frame's shade */}
+      <L d={poly([[x - 36 * k, seatY], [x - 26 * k, seatY], [x - 30 * k, foot], [x - 42 * k, foot]])} c={legC} s={`${s}L1`} />
+      <L d={poly([[x + 26 * k, seatY], [x + 36 * k, seatY], [x + 42 * k, foot], [x + 30 * k, foot]])} c={legC} s={`${s}L2`} />
+      {darks ? <D d={ell(x, seatY + 6 * z, 44 * z, 11 * z)} c={dark('wood')} s={`${s}U`} /> : null}
       {/* the back: a rattan hoop seen from the side, the seat a flat oval */}
       <F d={`M${x - 40 * k} ${seatY}C${x - 46 * k} ${seatY - 46 * z} ${x - 40 * k} ${seatY - 80 * z} ${x - 20 * k} ${seatY - 86 * z}L${x - 10 * k} ${seatY - 74 * z}C${x - 26 * k} ${seatY - 66 * z} ${x - 30 * k} ${seatY - 36 * z} ${x - 26 * k} ${seatY}Z`} c={RATTAN} s={`${s}B`} />
       <F d={ell(x, seatY, 46 * z, 12 * z)} c={RATTAN} s={`${s}S`} />
@@ -156,13 +196,14 @@ const Chair: React.FC<{x: number; s: string; flip?: boolean; seatY?: number; k?:
 
 const CafeSet: React.FC = () => {
   const {x, top, foot} = FORE.table;
+  const {darks} = useSwitches();
   return (
     <>
       <Chair x={622} s="chL" />
       <Chair x={856} s="chR" flip />
       {/* the table: a marble top on a slate pedestal (14 px: a form, not a line) and a flat foot on the ground */}
-      <F d={groundEll(x, foot, 48, 9)} c={IRON} s="tFoot" />
-      <F d={poly([[x - 7, top + 10], [x + 7, top + 10], [x + 7, foot], [x - 7, foot]])} c={IRON} s="tPed" />
+      {darks ? <D d={groundEll(x, foot, 48, 9)} c={dark('iron')} s="tFoot" /> : <F d={groundEll(x, foot, 48, 9)} c={IRON} s="tFoot" />}
+      {darks ? <D d={poly([[x - 7, top + 10], [x + 7, top + 10], [x + 7, foot], [x - 7, foot]])} c={dark('iron')} s="tPed" /> : <F d={poly([[x - 7, top + 10], [x + 7, top + 10], [x + 7, foot], [x - 7, foot]])} c={IRON} s="tPed" />}
       <F d={ell(x, top + 7, 94, 20)} c={STONE} s="tEdge" />
       <F d={ell(x, top, 94, 20)} c={STONE_LIT} s="tTop" />
       {/* the cluster on the table: two takeaway cups and a folded paper */}
@@ -179,13 +220,18 @@ const CafeSet: React.FC = () => {
 
 const Bench: React.FC = () => {
   const {x0, xc, seat, base} = FORE.bench;
+  const {darks} = useSwitches();
+  const pack = `M900 ${seat - 2}L898 ${seat - 46}Q900 ${seat - 66} 926 ${seat - 66}Q952 ${seat - 66} 954 ${seat - 46}L952 ${seat}Z`;
+  const flap = poly([[904, seat - 42], [948, seat - 42], [948, seat - 32], [904, seat - 32]]);
   return (
     <>
       <F d={slab(x0 + 8, 1100, xc, seat + 18, base)} c={STONE_MID} s="bnFace" />
+      {/* (the look test's darks) the shade under the seat's overhang, on the bench's face */}
+      {darks ? <D d={slab(x0 + 8, 1100, xc, seat + 18, seat + 27)} c={dark('eave')} s="bnUnder" /> : null}
       <F d={slab(x0, 1100, xc, seat, seat + 18)} c={STONE_LIT} s="bnSeat" />
       {/* the cluster on the bench: a backpack (the flask is cut: the near terrace was the heaviest area) */}
-      <F d={`M900 ${seat - 2}L898 ${seat - 46}Q900 ${seat - 66} 926 ${seat - 66}Q952 ${seat - 66} 954 ${seat - 46}L952 ${seat}Z`} c={IRON} s="pack" />
-      <F d={poly([[904, seat - 42], [948, seat - 42], [948, seat - 32], [904, seat - 32]])} c={CM.stoneShade} s="packFlap" />
+      {darks ? <D d={pack} c={dark('iron')} s="pack" /> : <F d={pack} c={IRON} s="pack" />}
+      {darks ? <D d={flap} c={dark('eave')} s="packFlap" /> : <F d={flap} c={CM.stoneShade} s="packFlap" />}
     </>
   );
 };
@@ -282,20 +328,36 @@ const FrontForm: React.FC = () => (
 
 // ---------------------------------------------------------------- the slots
 
+/** (the look test's darks: the near world in mid-tones, near.ts) the bench on tread 2 (plane -1) and the near things
+ *  (plane -2) with their rough area shares: lane E's near floor puts them at L* 60 and 55. */
+const MID_ENTRIES: [string, number][] = [[STONE_MID, 0.6], [STONE_LIT, 0.3], [IRON, 0.05], [CM.stoneShade, 0.05]];
+const NEAR_ENTRIES: [string, number][] = [
+  [TERRACOTTA, 0.22], [TERRACOTTA_DEEP, 0.08], [STONE_MID, 0.16], [STONE, 0.04], [STONE_LIT, 0.05], [WOOD, 0.08],
+  [WOOD_LIGHT, 0.03], [RATTAN, 0.03], [CM.sage, 0.12], [LEAF_SHADE, 0.03], [FERN, 0.06], [SOIL, 0.02], [IRON, 0.01],
+  [CM.stoneShade, 0.01], [CM.brickDeep, 0.01], ['#D9A486', 0.02], [CM.leafGold, 0.01], [CM.blossom, 0.005],
+  [CM.coatMustard, 0.005], [CM.paper, 0.005], [CM.brick, 0.003],
+];
+const useNearTone = (entries: [string, number][], plane: number): ((c: string) => string) => {
+  const {darks, nearMid: nm} = useSwitches();
+  if (!(nm ?? darks)) return (c) => c;
+  const m = nearMid(entries, plane);
+  return (c) => m[c] ?? c;
+};
+
 /** The mid layer (the bench), drawn after the treads it stands on and before the near layer. */
 export const S1ForeMid: React.FC = () => (
-  <>
+  <ToneCtx.Provider value={useNearTone(MID_ENTRIES, -1)}>
     <Feet feet={MID_FEET} />
     <Tier tier="environment">
       <Bench />
     </Tier>
-  </>
+  </ToneCtx.Provider>
 );
 
 /** The near and front layers: the planter and the bay, the crates, the café set, the pier; then what the bottom edge
  *  cuts: the fern pot and the nearest chair. */
 export const S1ForeNear: React.FC = () => (
-  <>
+  <ToneCtx.Provider value={useNearTone(NEAR_ENTRIES, -2)}>
     <Feet feet={NEAR_FEET} />
     <Tier tier="environment">
       <Planter />
@@ -310,5 +372,5 @@ export const S1ForeNear: React.FC = () => (
       <FernPot />
     </Tier>
     <FrontForm />
-  </>
+  </ToneCtx.Provider>
 );

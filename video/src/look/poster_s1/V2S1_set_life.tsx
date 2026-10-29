@@ -23,6 +23,8 @@ import * as MAP from '../../v2r/world/map';
 import {CellPaint, Under, barPath, planeLeaf, S1_IRON} from './V2S1_set_core';
 import {s1ArchOpening} from './V2S1_set_far';
 import {floodAt} from './V2S1_clock';
+import {useSwitches} from './switches';
+import {dark, recolourBatch} from './darks';
 
 const S = MAP.S1_SHEET;
 const frac = (x: number) => x - Math.floor(x);
@@ -47,6 +49,7 @@ function band(x0: number, x1: number, a: number, c: number, off: (x: number) => 
 /** The far towpath: paving in regions (the flood ripples along it), the wall's foot, the limestone coping (it carries
  *  the canal's edge and the bend) and its shade: flat 2-tone planes, no line (tier C), no specks or joints. */
 export const S1FarTowpath: React.FC = () => {
+  const {darks} = useSwitches();
   const {b, u} = useMemo(() => {
     const b = new Batch();
     const u = new Under();
@@ -74,11 +77,13 @@ export const S1FarTowpath: React.FC = () => {
     for (let x = x0; x < x1; x += 120) {
       const xe = Math.min(x1, x + 121);
       b.poly(CM.waterDeep, band(x - 1, xe, edge, edge + 8, off));
+      // (the look test's darks) the wet dark line where the stone meets the water, under the coping's lip
+      if (darks) b.poly(dark('pane'), band(x - 1, xe, edge, edge + 5, off));
       b.poly(CM.limestone, band(x - 1, xe, edge - coping, edge, off));
       b.poly(CM.stoneShade, band(x - 1, xe, edge - coping * 0.3, edge, off));
     }
     return {b, u};
-  }, []);
+  }, [darks]);
   return (
     <>
       <CellPaint b={b} seed="s1path" cell={140} misreg={0.6} />
@@ -91,12 +96,13 @@ export const S1FarTowpath: React.FC = () => {
 export const S1_BOLLARDS = [770, 430, 262, 160, 66];
 export const S1_FAR_LAMPS = [{x: 1046, h: 366}, {x: 752, h: 340}, {x: 360, h: 0}, {x: 6, h: 0}];
 export const S1PathFurniture: React.FC = () => {
+  const {darks} = useSwitches();
   const b = useMemo(() => {
     const b = new Batch();
     const {edge, coping} = S1_PATH;
     for (const x of S1_BOLLARDS) {
       const k = MAP.s1FigureHAt(x) / S.herH;
-      s1BollardInto(b, x, edge - coping * 0.5 + s1Bend(x) - 2, 22 * k);
+      s1BollardInto(b, x, edge - coping * 0.5 + s1Bend(x) - 2, 22 * k, darks ? dark('iron') : S1_IRON);
     }
     // lamp posts (heritage: plinth, fluted column, lantern), sized by the bend's scale
     for (const L of S1_FAR_LAMPS) {
@@ -106,16 +112,16 @@ export const S1PathFurniture: React.FC = () => {
       lampInto(b, L.x, y, h, `s1lamp/${L.x}`);
     }
     return b;
-  }, []);
+  }, [darks]);
   return <CellPaint b={b} seed="s1furn" cell={120} misreg={0.5} />;
 };
 
 /** A mooring bollard on the coping (kit towpath bollardInto, copied: the kit's is the plum anchor, which is W's alone;
  *  here slate iron, flat, no line: tier C). */
-function s1BollardInto(b: Batch, x: number, y: number, h: number) {
+function s1BollardInto(b: Batch, x: number, y: number, h: number, iron: string = S1_IRON) {
   const w = h * 0.9;
-  b.fill(S1_IRON, `M${P(x - w * 0.42, y)}L${P(x - w * 0.3, y - h * 0.55)}L${P(x - w * 0.42, y - h * 0.78)}L${P(x + w * 0.42, y - h * 0.78)}L${P(x + w * 0.3, y - h * 0.55)}L${P(x + w * 0.42, y)}Z`);
-  b.fill(S1_IRON, `M${P(x - w * 0.46, y - h * 0.76)}A${(w * 0.46).toFixed(1)} ${(h * 0.26).toFixed(1)} 0 0 1 ${P(x + w * 0.46, y - h * 0.76)}Z`);
+  b.fill(iron, `M${P(x - w * 0.42, y)}L${P(x - w * 0.3, y - h * 0.55)}L${P(x - w * 0.42, y - h * 0.78)}L${P(x + w * 0.42, y - h * 0.78)}L${P(x + w * 0.3, y - h * 0.55)}L${P(x + w * 0.42, y)}Z`);
+  b.fill(iron, `M${P(x - w * 0.46, y - h * 0.76)}A${(w * 0.46).toFixed(1)} ${(h * 0.26).toFixed(1)} 0 0 1 ${P(x + w * 0.46, y - h * 0.76)}Z`);
 }
 
 /** A heritage lamp post (kit towpath Lamp, copied: its Paint can't be split by region), off (the golden hour). */
@@ -156,11 +162,18 @@ export const BOAT_A: BoatOpts = {x: 786, water: 1140, len: 560, h: 74, dir: -1, 
 export const BOAT_B: BoatOpts = {x: 930, water: 1196, len: 520, h: 86, dir: -1, seed: 's1boatB', cabin: CM.coatOat, topView: 10, roofItems: true, panel: true};
 
 const OneBoat: React.FC<{o: BoatOpts; smoke?: boolean; bursts?: number[]}> = ({o, smoke, bursts}) => {
+  const {darks} = useSwitches();
   const b = useMemo(() => {
     const b = new Batch();
     boatInto(b, o, 0);
+    // (the look test's darks) a narrowboat's dark hull, its dark portholes and stern doors (the kit takes no colour for
+    // them: its fills are recoloured by layer, 0 = the hull, 1 = the cabin side)
+    if (darks) {
+      recolourBatch(b, {[CM.paneUnlit]: dark('iron')}, [0]);
+      recolourBatch(b, {[CM.glass]: dark('pane'), [CM.line]: dark('wood')}, [1]);
+    }
     return b;
-  }, []);
+  }, [darks]);
   const g = boatGeom(o);
   const chX = g.X(o.chimney ?? 0.22);
   const chTop = g.roofY - g.roofH - (o.topView ?? 0) * 0.5 - 40 * (o.h / 100);

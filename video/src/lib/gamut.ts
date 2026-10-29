@@ -103,6 +103,8 @@ export type SiblingOpts = {
   mask?: boolean;
   /** Lighter or darker only (a facade row in shade: 'darker'). Default both. */
   side?: 'both' | 'lighter' | 'darker';
+  /** No sibling under this C* (never grey: default 4, or the role's own C* when it is greyer). */
+  minC?: number;
 };
 
 const SIB_CACHE = new Map<string, string[]>();
@@ -120,7 +122,7 @@ export function siblings(hex: string, n = 4, seed: string | number = 'sib', o: S
   const [e0, e1] = o.dE ?? [8, 14];
   const apart = o.apart ?? 8;
   const side = o.side ?? 'both';
-  const key = `${hex}|${n}|${seed}|${dh}|${l0},${l1}|${c0},${c1}|${e0},${e1}|${apart}|${o.mask ?? true}|${side}`;
+  const key = `${hex}|${n}|${seed}|${dh}|${l0},${l1}|${c0},${c1}|${e0},${e1}|${apart}|${o.mask ?? true}|${side}|${o.minC ?? ''}`;
   const hit = SIB_CACHE.get(key);
   if (hit) return hit;
   const base = lch(hex);
@@ -129,16 +131,19 @@ export function siblings(hex: string, n = 4, seed: string | number = 'sib', o: S
   const Hs = [-dh, -dh / 2, 0, dh / 2, dh];
   const Cs = [c0, (c0 + c1) / 2, c1].flatMap((d) => [d, -d]);
   const baseIn = base.C <= maskChroma(base.L, base.h) + 1; // a role outside the mask (a gold band) may keep its own chroma
+  const minC = Math.min(o.minC ?? 4, base.C); // never grey (a calm light at C* 6 minus 3-6 would be)
   const cands: string[] = [];
   for (const dl of Ls)
     for (const dhh of Hs)
       for (const dc of Cs) {
         const L = clamp(base.L + dl + R.jitter(0.6), 2, 98.5);
         const C = Math.max(0, base.C + dc + R.jitter(0.4));
-        const h = (base.h + dhh + R.jitter(0.8) + 360) % 360;
+        const h = (base.h + clamp(dhh + R.jitter(0.8), -dh, dh) + 360) % 360;
         const c = fromLch(L, C, h);
         const q = lch(c);
         if (Math.abs(q.L - base.L) < l0 - 0.6) continue; // gamut-fit moved it back onto the role's value
+        if (q.C < minC - 0.3) continue;
+        if (q.C > 4 && Math.abs(((q.h - base.h + 540) % 360) - 180) > dh + 1) continue; // the 8-bit hex turned the hue
         if (o.mask ?? true) {
           const lim = maskChroma(q.L, q.h) + 1;
           if (baseIn ? q.C > lim : q.C > Math.max(lim, base.C + 0.5)) continue;
@@ -148,23 +153,35 @@ export function siblings(hex: string, n = 4, seed: string | number = 'sib', o: S
         if (d < e0 || d > e1) continue;
         if (!cands.includes(c)) cands.push(c);
       }
-  const out: string[] = [];
+  // farthest-first from up to 8 seeded starts; the largest set wins (then the widest spacing), so one unlucky first
+  // pick cannot block the rest
+  let out: string[] = [];
+  let outGap = -1;
   if (cands.length) {
     const order = R.shuffle(cands);
-    out.push(order[0]);
-    while (out.length < n) {
-      let best = '';
-      let bestD = -1;
-      for (const c of order) {
-        if (out.includes(c)) continue;
-        const dMin = Math.min(dE76(c, hex), ...out.map((x) => dE76(c, x)));
-        if (dMin >= apart && dMin > bestD) {
-          best = c;
-          bestD = dMin;
+    for (let s = 0; s < Math.min(8, order.length); s++) {
+      const set = [order[s]];
+      while (set.length < n) {
+        let best = '';
+        let bestD = -1;
+        for (const c of order) {
+          if (set.includes(c)) continue;
+          const dMin = Math.min(dE76(c, hex), ...set.map((x) => dE76(c, x)));
+          if (dMin >= apart && dMin > bestD) {
+            best = c;
+            bestD = dMin;
+          }
         }
+        if (!best) break;
+        set.push(best);
       }
-      if (!best) break;
-      out.push(best);
+      let gap = Infinity;
+      for (let i = 0; i < set.length; i++) for (let j = i + 1; j < set.length; j++) gap = Math.min(gap, dE76(set[i], set[j]));
+      if (set.length > out.length || (set.length === out.length && gap > outGap)) {
+        out = set;
+        outGap = gap;
+      }
+      if (out.length >= n && s >= 2) break;
     }
   }
   if (SIB_CACHE.size > 400) SIB_CACHE.clear();
@@ -194,7 +211,8 @@ export function siblingProblems(hex: string, sibs: readonly string[], o: {dE?: [
     const d = dE76(s, hex);
     if (d < e0 - 0.05 || d > e1 + 0.05) out.push(`${s}: dE ${d.toFixed(1)} from ${hex} (want ${e0}-${e1})`);
     const turn = Math.abs(((lch(s).h - h0 + 540) % 360) - 180);
-    if (lch(s).C > 4 && turn > dh + 1) out.push(`${s}: hue ${turn.toFixed(1)} deg off the role (want <= ${dh})`);
+    if (lch(s).C > 4 && turn > dh + 1.5) out.push(`${s}: hue ${turn.toFixed(1)} deg off the role (want <= ${dh})`);
+    if (lch(s).C < Math.min(4, b.C) - 0.3) out.push(`${s}: C* ${lch(s).C.toFixed(1)} reads grey`);
     if ((o.mask ?? true) && !inMask(s) && (baseIn || lch(s).C > b.C + 0.5)) out.push(`${s}: outside the gamut mask`);
     const band = neverBand(s);
     if (band) out.push(`${s}: in the ${band} band`);

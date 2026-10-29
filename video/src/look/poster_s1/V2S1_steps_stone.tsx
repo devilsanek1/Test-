@@ -11,6 +11,9 @@ import React, {useMemo} from 'react';
 import {Fill} from '../../lib/Fill';
 import {rng} from '../../lib/rng';
 import {CM} from '../../v2r/palette';
+import {useSwitches} from './switches';
+import {nearMid} from './near';
+import {dark} from './darks';
 
 type Pt = [number, number];
 const r1 = (n: number) => Math.round(n * 10) / 10;
@@ -37,6 +40,17 @@ export const BANK_PAVE = '#F4D6C2';
 const BANK_ALT = '#EFCEB9';
 /** The joints' stone: a warm mid step under the paving (L* ~80: a value step, never a dark line). */
 const JOINT = '#E2C1AD';
+
+/** (the look test's darks: the near world in mid-tones) our bank's stones with their rough area shares: lane E's near
+ *  floor puts plane -1 at L* 60 (near.ts). */
+const BANK_ENTRIES: [string, number][] = [[BANK_PAVE, 0.42], [BANK_LIT, 0.36], [BANK_ALT, 0.12], [JOINT, 0.05], [CM.stoneShade, 0.05]];
+/** The bank's colour map: identity, or the near world's mid-tones under the darks switch. */
+export function useBankTone(): (c: string) => string {
+  const {darks, nearMid: nm} = useSwitches();
+  if (!(nm ?? darks)) return (c) => c;
+  const m = nearMid(BANK_ENTRIES, -1);
+  return (c) => m[c] ?? c;
+}
 
 /** Our bank, as each edge's y at x = 540 (the edges themselves run to GROUND_VP). */
 export const BANK = {
@@ -118,14 +132,15 @@ export const StoneBand: React.FC<{k: number; seed?: string}> = ({k, seed = 'v2s1
     }
     return {base, slabs, joints: joints.join(''), lip: lipPath(k)};
   }, [k, seed]);
+  const tone = useBankTone();
   return (
     <>
-      <Fill d={g.base} color={b.top} seed={`${seed}/base${k}`} offset={false} />
+      <Fill d={g.base} color={tone(b.top)} seed={`${seed}/base${k}`} offset={false} />
       {g.slabs.map((s) => (
-        <Fill key={s.seed} d={s.d} color={s.color} seed={s.seed} offset={false} />
+        <Fill key={s.seed} d={s.d} color={tone(s.color)} seed={s.seed} offset={false} />
       ))}
-      <Fill d={g.joints} color={JOINT} seed={`${seed}/joints${k}`} offset={false} />
-      {g.lip ? <Fill d={g.lip} color={BANK_PAVE} seed={`${seed}/edge${k}`} offset={false} /> : null}
+      <Fill d={g.joints} color={tone(JOINT)} seed={`${seed}/joints${k}`} offset={false} />
+      {g.lip ? <Fill d={g.lip} color={tone(BANK_PAVE)} seed={`${seed}/edge${k}`} offset={false} /> : null}
     </>
   );
 };
@@ -133,10 +148,27 @@ export const StoneBand: React.FC<{k: number; seed?: string}> = ({k, seed = 'v2s1
 /** The coping along our waterline (it runs to the vanishing point too): its top and its rounded lip one tone down. */
 export const Coping: React.FC<{seed?: string}> = ({seed = 'v2s1bank'}) => {
   const [y0, y1] = BANK.coping;
+  const {darks} = useSwitches();
+  const tone = useBankTone();
   return (
     <>
-      <Fill d={between(y0, y1 + 2)} color={BANK_LIT} seed={`${seed}/copTop`} offset={false} />
-      <Fill d={between(y0, y0 + 5)} color={CM.stoneShade} seed={`${seed}/copLip`} offset={false} />
+      <Fill d={between(y0, y1 + 2)} color={tone(BANK_LIT)} seed={`${seed}/copTop`} offset={false} />
+      {/* (the look test's darks) the wet dark edge where the coping drops into the water */}
+      <Fill d={between(y0, y0 + 5)} color={darks ? dark('pane') : CM.stoneShade} seed={`${seed}/copLip`} offset={false} />
+      {darks ? <Fill d={COPING_CLEATS} color={dark('iron')} seed={`${seed}/cleats`} offset={false} /> : null}
     </>
   );
 };
+
+/** (the look test's darks) three cast-iron mooring cleats on the coping's top, along its edge (scaled by the bank). */
+const COPING_CLEATS: string = [150, 452, 968]
+  .map((x) => {
+    const y = edgeY(BANK.coping[0] + 9, x);
+    const s = groundScale(x, y);
+    const w = 26 * s;
+    const h = 7 * s;
+    const m = edgeSlope(x, y);
+    const pt = (dx: number, dy: number): Pt => [x + dx, y + dy + m * dx];
+    return poly([pt(-w / 2, 0), pt(-w * 0.32, -h), pt(w * 0.32, -h), pt(w / 2, 0), pt(w * 0.3, h * 0.5), pt(-w * 0.3, h * 0.5)]);
+  })
+  .join('');
