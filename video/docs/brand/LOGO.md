@@ -1,32 +1,36 @@
 # Studio logo: "What's All the Fuss About?"
 
-**Status, 2026-10-29 ~20:15 UTC: round 5 (the city view, made ours; stills only, no text), with the owner.** The
-sheet: `video/deliverables/brand/logo_options_v5.png`. Rounds 1-4 are superseded by the owner's verdicts below. All
-rounds are iterations (owner rule "Two modes"); stills only until the owner picks and approves one ("No video yet").
-Brief: the owner asked the orchestrator to "spin up a thread to generate me the modern beautiful logo to put on the
-studio". The logo lives on the avatar (a circle crop that must read at 110 px and at 40 px), as a small end card or
-watermark in the videos, in the corner of a cover and on a banner.
+**Status, 2026-10-29 ~20:21 UTC: round 6 (from scratch: modern marks; stills only; no text, no elephant), with the
+owner.** The sheet: `video/deliverables/brand/logo_options_v6.png`. Rounds 1-5 are superseded by the owner's verdicts
+below. All rounds are iterations (owner rule "Two modes"); stills only until the owner picks and approves one ("No
+video yet"). Brief: the owner asked the orchestrator to "spin up a thread to generate me the modern beautiful logo to
+put on the studio". The logo lives on the avatar (a circle crop that must read at 110 px and at 40 px), as a small end
+card or watermark in the videos, in the corner of a cover and on a banner.
 
-## Round 5: one dusk city in the posters' language, made ours three ways
-The city (shared by all three): a calm dusk sky, the far skyline with a spire, a clock tower and a dome, the mid city
-with lit windows, the river with the low sun's glints and the windows mirrored, the quay; Pip hidden on it (find Pip).
-1. **Talk of the Town:** the city seen inside a speech bubble with a real tail: the story everyone's talking about,
-   opened up as a place; round 3's Fold (the owner: "directionally good but way too abstract") made concrete.
-2. **The City Is Talking:** speech bubbles rise from the rooftops like lanterns, one glowing brighter than the rest:
-   the whole city is talking about it, and one voice makes it clear.
-3. **The Question Lamp:** on a street corner a lantern's iron bracket bends into a question mark and the lit lantern is
-   its dot: the question everyone's asking, with the light right there; Pip on the quay, looking up.
+## Round 6: modern marks, one idea each
+Built with the methods of today's strong marks, never their shapes (research: one idea, a few bold shapes, warm human
+geometry, one strong colour, clear from 16-40 px up, distinctive; Creative Bloq, ManyPixels, WeAndTheColor, 2026).
+1. **Two Voices:** two speech bubbles, two sides of a story, overlapping; the overlap is a third colour, where it
+   gets clear (the overlap method). Violet and coral on cream, the overlap ink.
+2. **The Peel:** a speech bubble with its corner peeled back: what everyone's talking about, opened up; round 3's Fold
+   (the owner: "directionally good") made clearly a bubble; one shape, one cut. Coral on ink, the flap cream.
+3. **Play the Talk:** a speech bubble with a play button inside: short videos about what everyone's talking about,
+   said in one glance like the best app icons. Cream on coral.
+Dropped on the way: a one-line bubble (read as a letter P), four bubbles in a pinwheel (a flower), a dot with three
+strokes (a sun).
 
-Each is on the sheet large, at 110 px and 40 px on a light and a dark app, in one colour and reversed (the skyline cut
-out), in the corner of a cover, and in a profile mock.
-
-## Recommendation (round 5)
-- **Go with 3, The Question Lamp:** the most clearly ours (the question in our name, the answer as light) and the only
-  one that still reads at 40 px as a symbol, a question mark with a glowing dot.
-- It keeps the city view you liked, adds no text (the question mark is iron in the scene), and hides Pip on the quay.
-- Talk of the Town is the alternative if the speech bubble should lead (round 3's Fold, made concrete).
+## Recommendation (round 6)
+- **Go with 2, The Peel:** the most distinctive of the three and the most ours: the story everyone's talking about,
+  opened up, which is what every video does.
+- It carries the one direction you called good (the fold) and fixes what you didn't like (too abstract): it reads at a
+  glance as a speech bubble being opened, even at 40 px.
+- One shape and one cut, coral on ink: bold in a feed, premium in its restraint, easy everywhere (one colour works).
 
 ## Earlier rounds (superseded)
+- **Round 5** (`logo_options_v5.png`, the city view made ours): Talk of the Town (the city in a speech bubble), The
+  City Is Talking (bubbles rising like lanterns), The Question Lamp (a lantern bracket bent into a question mark), all
+  with Pip hidden on the quay. The owner: "I said no elephant", "Too many details who would use this logo", "No from
+  scratch pick up the modern logos and do it again".
 - **Round 4** (`logo_options_v4.png`, from scratch, premium emblems): The Elephant and the Sun, The Window (a little
   elephant on the sill), The Seal. The owner: "I like the city view but it's too generic like why is it relevant to us".
 - **Round 3** (`logo_options_v3.png`, abstract): The Fold (a folded speech bubble), The Eclipse (two circles), The
@@ -40,10 +44,11 @@ out), in the corner of a cover, and in a profile mock.
   Pip, each with the name. The owner: no text. Round 1's type, all SIL OFL 1.1 and outlined to paths: Fraunces (SOFT
   100, opsz 144, wght 760; npm `@fontsource-variable/fraunces` 5.3.0), Jost 500 (`@fontsource/jost` 5.3.0),
   Bricolage Grotesque (wght 800; `@fontsource-variable/bricolage-grotesque` 5.3.0), Patrick Hand
-  (`@fontsource/patrick-hand` 5.3.0). Rounds 2-5 use no type.
+  (`@fontsource/patrick-hand` 5.3.0). Rounds 2-6 use no type.
 
 ## Palette (proposal, from our warm family; never beige, olive or grey)
-Round 5's dusk: the sky `#2B2757` -> `#6A5A9C` -> `#C596AE` -> `#F5C39A` (horizon), the sun `#FCD8A6`, the far city
+Round 6: coral `#F0643C` (the hero), violet `#6A5CFF`, ink `#1F1630`, cream `#F7EDE3`; the dropped marks also used sun
+`#FFC24B` and teal `#12A58C`. Round 5's dusk: the sky `#2B2757` -> `#6A5A9C` -> `#C596AE` -> `#F5C39A` (horizon), the sun `#FCD8A6`, the far city
 `#9284BF` / `#9D90C8` / `#8678B6`, the mid city `#4A3D7B` / `#544689` / `#3F3470` with unlit windows `#3A2F63` and lit
 ones `#FFCB7E`, the river `#C99BAC` -> `#7E6BA6` -> `#4A3E7A`, the quay and the iron `#1E1733` / `#150E26`, the bubble's
 rim cream `#F7EDE3`. Round 4:
@@ -64,6 +69,8 @@ the elephant `#1A1228` with a rim `#F5A766`; the window's glow `#FFF4DA` -> `#FF
 Earlier rounds also used Pip's periwinkles (`#7A7FE3`, `#6A6ED6`, `#AEB2F4`), peach `#F6B494` and the warm sky `#F9E3D2`.
 
 ## Files
+- Round 6: `video/brand/logo/make_logos_r6.py` (the sheet) and `marks_r6.py` (the marks, their one-colour
+  versions, and the dropped ones); `svg/r6/`. Rebuild: `cd video/brand/logo && python3 make_logos_r6.py`.
 - Round 5: `video/brand/logo/make_logos_r5.py` (the sheet) and `marks_r5.py` (the city, the three variants, their
   one-colour versions); `svg/r5/`. Rebuild: `cd video/brand/logo && python3 make_logos_r5.py`.
 - Round 4: `video/brand/logo/make_logos_r4.py` (the sheet) and `marks_r4.py` (the emblems, the elephant outline,
@@ -98,7 +105,7 @@ Earlier rounds also used Pip's periwinkles (`#7A7FE3`, `#6A6ED6`, `#AEB2F4`), pe
 - 2026-10-29 ~20:10 UTC, on round 4, written to the logo session directly: "I like the city view but it's too generic
   like why is it relevant to us" -> round 5: keep the city view (the posters' dusk, depth, lit windows) and make it
   ours: the city is what everyone's talking about, so each variant ties it to the talk, the fuss or the question.
-- 2026-10-29 ~20:20 UTC, on round 5, written to the logo session directly: "I said no elephant", "Too many details who
+- 2026-10-29 ~20:16 UTC, on round 5, written to the logo session directly: "I said no elephant", "Too many details who
   would use this logo" and "No from scratch pick up the modern logos and do it again" -> round 6 from scratch: no
   elephant (no Pip, not even hidden), no scenes; a logo in the way modern brand marks are built (one idea, a few bold
   shapes, one strong colour, usable everywhere).
