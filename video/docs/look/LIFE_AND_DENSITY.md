@@ -153,11 +153,13 @@ references and primitives, never the film's people.
   (another character only if the story asks for it, named in the W1 world bible and seen by the owner at G3),
   drawn new in the film's design (playbook: no reusable assets; `src/lib/mascot` and `docs/mascot.md` are the reference
   and the API), in a colourway for the video's palette that stays its own hue (ΔE76 >= 20 from
-  every ground it sits on, never the hero or the pop colour) and in tier B (`CRAFT.md` §b: C* <= 25, a tinted outline)
-  unless the line is about it. A non-character anchor may join it (snow, the weather; the sun is light, never a
+  every ground it sits on, never the hero or the pop colour) and in tier B (`CRAFT.md` §b: C* <= 25, no outline: its
+  lit and shade faces part its shapes, as on everything since 2026-10-29) unless the line is about it. A non-character anchor may join it (snow, the weather; the sun is light, never a
   character: `CRAFT.md` §d.1).
 - **Jobs (since 2026-10-28: hidden, not a guide):** (1) hide in a spot that belongs to the world (in a window, on a
-  boat, on a balcony, among a crowd), off the subject's eye path, found on a second look; (2) idle quietly (blink, ears,
+  boat, on a balcony, among a crowd), off the subject's eye path, found on a second look: a quiet "find Pip" in most
+  exterior shots, none in closes and charts, hidden on the cover too (owner, 2026-10-29: "Go with your suggestions",
+  `STUDY.md` §9 decision 5); (2) idle quietly (blink, ears,
   tail, breath; only blinks and ear moves while the subject moves), a small life for whoever finds it; (3) at most a tiny
   reaction on a stressed word, never on the subject's own beat, never big enough to pull the eye; (4) its hiding spots
   are planned at G3 (W1 names them), never added later. Retired: perching beside the subject, pointing the eye, carrying
