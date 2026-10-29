@@ -161,8 +161,14 @@ function facadeStatic(darks = false): Batch {
   for (let k = 0; k < 4; k++) b.poly(darks ? dark('deep') : CM.paneUnlit, q(CORNER + 0.085, 0.5 + k * 1.15, 0.09, 0.05));
   // (the look test's darks) cast-iron air bricks in the plinth, one under each pier, and the downpipe's shoe
   if (darks) {
-    for (const u of [0.95, (1.3 + UPPER[1].u0) / 2, PIER_L.u0 + 0.4, PIER_R.u0 + 0.42, (WU1 + LOWER[2].u0) / 2, LOWER[2].u1 + 0.2]) b.poly(dark('iron'), q(u - 0.13, V_PLINTH + 0.1, 0.26, 0.11));
+    for (const u of [0.95, (1.3 + UPPER[1].u0) / 2, PIER_L.u0 + 0.4, PIER_L.u0 + 1.25, PIER_R.u0 + 0.42, PIER_R.u0 + 1.3, (WU1 + LOWER[2].u0) / 2, LOWER[2].u1 + 0.2, LOWER[1].u0 + 0.5, LOWER[2].u0 + 0.6]) b.poly(dark('iron'), q(u - 0.13, V_PLINTH + 0.1, 0.26, 0.11));
     b.poly(dark('deep'), q(CORNER + 0.06, HM - 0.16, 0.14, 0.1));
+    // a pair of dark wall lanterns on the door piers, and the entry intercom on the right one
+    for (const u of [DU0 - 0.34, DU1 + 0.22]) {
+      b.poly(dark('iron'), q(u, V_FLOOR + 1.0, 0.13, 0.3));
+      b.poly(dark('deep'), q(u - 0.02, V_FLOOR + 0.96, 0.17, 0.05));
+    }
+    b.poly(dark('iron'), q(DU1 + 0.24, V_FLOOR + 1.45, 0.1, 0.17));
   }
   b.layer();
   // window reveals (a shade strip on the left: the low sun is west = screen left) + slim stone sills / lintels
@@ -189,7 +195,10 @@ function facadeStatic(darks = false): Batch {
   const F = S.canopyFascia;
   // the soffit is limestone; its one Shade step is the light layer's (s1WingShadows)
   // (the look test's darks: the canopy's underside, the awning's dark strip over the door)
-  b.rect(darks ? dark('eave') : CM.limestone, F.x0 - 6, F.y1, F.x1 - F.x0 + 12, 8);
+  // (the look test's darks: the canopy's underside, the awning's dark strip over the door; a 3 px stone lip under the
+  // fascia keeps the letters' descenders off it)
+  b.rect(CM.limestone, F.x0 - 6, F.y1, F.x1 - F.x0 + 12, darks ? 3 : 8);
+  if (darks) b.rect(dark('eave'), F.x0 - 6, F.y1 + 3, F.x1 - F.x0 + 12, 6);
   b.rect(darks ? dark('deep') : CM.stoneShade, F.x0 - 6, F.y1 + 8, F.x1 - F.x0 + 12, darks ? 4 : 3);
   b.rect(CM.paper, F.x0, F.y0, F.x1 - F.x0, F.y1 - F.y0);
   b.rect(CM.limestone, F.x0 - 10, F.y0 - 7, F.x1 - F.x0 + 20, 8);
@@ -353,6 +362,8 @@ function darkPaneInto(b: Batch, qq: PaneQ, pp: PaneP, lit: boolean, seed: string
     b.poly(CM.paper, [pp(0.62, 0), pp(0.7, 0), pp(0.5, lo * 0.66), pp(0.44, lo * 0.66)]);
   } else {
     b.poly(CM.lamp, qq(0, 0, 1, 1));
+    // a small thing on the inside sill against the light (a mug, a pot)
+    b.poly(dark('wood'), qq(0.78, 0.86, 0.1, 0.08));
     if (kind === 0) {
       // a pendant over a long table, two chair backs at it
       b.poly(dark('iron'), [pp(0.36, 0.3), pp(0.64, 0.3), pp(0.56, 0.21), pp(0.44, 0.21)]);

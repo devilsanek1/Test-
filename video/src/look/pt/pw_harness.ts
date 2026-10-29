@@ -4,7 +4,7 @@ import {frontalBlocks, groundPatchwork, patchStats, patchTones, patchworkProblem
 
 const t0 = Date.now();
 const cam = groundCam({horizon: 965, f: 1400, height: 1.3});
-const pave = groundPatchwork(cam, {seed: 'h1', poly: [[-9, 2.2], [9, 2.2], [9, 16], [-9, 16]], cell: 0.9, tones: patchTones('#F4D6C2', {plane: -1}), plane: -1, key: [-1, -0.3]});
+const pave = groundPatchwork(cam, {seed: 'h1', poly: [[-3.2, 2.2], [3.2, 2.2], [3.2, 16], [-3.2, 16]], cell: 0.9, tones: patchTones('#F4D6C2', {plane: -1}), plane: -1, key: [-1, -0.3]});
 const t1 = Date.now();
 console.log('ground', JSON.stringify(patchStats(pave)), (t1 - t0) + 'ms', pave.tones.join(' '));
 console.log(' problems', patchworkProblems(pave, 'ground'));
@@ -22,3 +22,15 @@ const hist = new Map<number, number>();
 for (const f of small) hist.set(Math.round(f.c[1] / 100) * 100, (hist.get(Math.round(f.c[1] / 100) * 100) ?? 0) + 1);
 console.log(' small by y', JSON.stringify(Array.from(hist.entries()).sort((a, b) => a[0] - b[0])));
 console.log(' examples', small.slice(0, 5).map((f) => `${f.minW}@${f.c} pts=${JSON.stringify(f.pts)} uv=${JSON.stringify(f.uv.map(([u, v]) => [+u.toFixed(3), +v.toFixed(3)]))}`).join('\n'));
+{
+  const L = pave.tones.map((c) => require('../../lib/light').lab(c)[0]);
+  let same = 0, spike = 0, soft = 0, n = 0;
+  pave.adj.forEach((l, i) => l.forEach((j) => { if (j <= i) return; n++; const a = pave.facets[i].tone, b = pave.facets[j].tone; const d = Math.abs(L[a] - L[b]); if (a === b) same++; else if (d > 10.3) spike++; else if (d < 3.7) soft++; }));
+  console.log(' L', L.map((x: number) => x.toFixed(2)).join(' '), 'pairs', n, 'same', same, 'spike', spike, 'soft', soft);
+  // K4 count
+  const S = pave.adj.map((l) => new Set(l));
+  let k4 = 0;
+  for (let a = 0; a < S.length; a++) for (const b of S[a]) if (b > a) for (const c of S[b]) if (c > b && S[a].has(c)) for (const d of S[c]) if (d > c && S[a].has(d) && S[b].has(d)) k4++;
+  const deg = pave.adj.map((l) => l.length).sort((a, b) => a - b);
+  console.log(' K4s', k4, 'degree p50/p90/max', deg[Math.floor(deg.length / 2)], deg[Math.floor(deg.length * 0.9)], deg[deg.length - 1]);
+}

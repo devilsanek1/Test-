@@ -169,8 +169,9 @@ const Crates: React.FC = () => {
       <F d={slab(ux0, ux1, xc, upper + 26, upper + 46)} c={WOOD_LIGHT} s="crUs" />
       <F d={slab(x0, x1, xc, lower, base)} c={WOOD} s="crL" />
       <F d={slab(x0, x1, xc, lower + 30, lower + 54)} c={WOOD_LIGHT} s="crLs" />
-      {/* (the look test's darks) the shade under the upper crate, on the lower one's top */}
+      {/* (the look test's darks) the shade under the upper crate, on the lower one's top, and each crate's hand slot */}
       {darks ? <D d={slab(x0, x1, xc, lower, lower + 11)} c={dark('wood')} s="crUnder" /> : null}
+      {darks ? <D d={slab(xc - 26, xc + 26, xc, upper + 52, upper + 63) + slab(xc - 30, xc + 30, xc, lower + 62, lower + 74)} c={dark('wood')} s="crSlot" /> : null}
     </>
   );
 };
@@ -257,12 +258,17 @@ function leaf(x: number, y: number, L: number, a: number): string {
   const uy = Math.sin(r) * L * 0.5;
   return `M${r1(x - ux)} ${r1(y - uy)}Q${r1(x - uy)} ${r1(y + ux * 0.25)} ${r1(x + ux)} ${r1(y + uy)}Q${r1(x + uy)} ${r1(y - ux * 0.25)} ${r1(x - ux)} ${r1(y - uy)}Z`;
 }
-const Leaves: React.FC = () => (
-  <>
-    <F d={leaf(330, 1676, 15, 60) + leaf(600, 1790, 20, -10) + leaf(160, 1830, 26, 30)} c={CM.leafGold} s="lvG" />
-    <F d={leaf(566, 1734, 16, -40) + leaf(270, 1900, 30, -20) + leaf(980, 1900, 28, 50)} c={RATTAN} s="lvR" />
-  </>
-);
+const Leaves: React.FC = () => {
+  const {darks} = useSwitches();
+  return (
+    <>
+      <F d={leaf(330, 1676, 15, 60) + leaf(600, 1790, 20, -10) + leaf(160, 1830, 26, 30)} c={CM.leafGold} s="lvG" />
+      <F d={leaf(566, 1734, 16, -40) + leaf(270, 1900, 30, -20) + leaf(980, 1900, 28, 50)} c={RATTAN} s="lvR" />
+      {/* (the look test's darks) a few wet, dark fallen leaves among them */}
+      {darks ? <D d={leaf(420, 1700, 14, 20) + leaf(700, 1830, 19, -35) + leaf(214, 1760, 17, 70) + leaf(860, 1780, 18, 10) + leaf(520, 1880, 24, -60)} c={dark('wood')} s="lvD" /> : null}
+    </>
+  );
+};
 
 // ---------------------------------------------------------------- their light
 

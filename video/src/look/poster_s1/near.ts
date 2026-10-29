@@ -2,25 +2,27 @@
 // pro_1_depth.md §3.1: the near group's median L* 45-60, >= 30 from the air; pro_4_colour.md §4: "the café set and planter
 // as the near group at L* 50-60"). Lane E's absolute near floor (lib/depth `nearPalette`: plane -1 lands at L* 60, -2 at
 // 55, every internal step kept) moves S1's pale bank and its near things into the mid-tones; a result that falls in the
-// never-beige band (a peach stone darkened keeps h ~61 at C* ~13: muddy tan) turns rose as 10b's paving shade does
-// (#CFAFA4: "rose, never beige"); then the pen's tier-C pull is inverted (darks.ts forTier) so the frame SHOWS E's
-// values. Pure, cached per palette.
+// never-beige band (a peach stone darkened keeps h ~61 at C* ~13: muddy tan) takes its warm chroma back as terracotta
+// (pro_4_colour.md §3.2: the mids at C* 18-32; (d) "a warm fill under L* 86 takes C* >= 18 or turns rose": at L* 60 a
+// rose at C* 13 read grey-mauve, terracotta warm and clean); then the pen's tier-C pull is inverted (darks.ts forTier)
+// so the frame SHOWS E's values. Pure, cached per palette.
 import {lch, fromLch} from '../../lib/light';
 import {nearPalette} from '../../lib/depth';
 import {cleanColour, neverBand} from '../../lib/water';
 import {forTier} from './darks';
 
-/** The hue a beige near stone turns to (CIE h, deg): rose-terracotta, 10b's paving shade family. */
-const ROSE_H = 42;
+/** A beige near stone turns terracotta: CIE h <= TERRA_H (out of the beige band, h 55-95), C* >= TERRA_C. */
+const TERRA_H = 50;
+const TERRA_C = 19;
 
-/** A darkened warm colour out of the never bands, its value kept: beige turns rose (h <= ROSE_H, C* >= 12), any other
- *  band goes through lib/water cleanColour. */
+/** A darkened warm colour out of the never bands, its value kept: beige turns terracotta, any other band goes through
+ *  lib/water cleanColour. */
 export function noBeige(hex: string): string {
   const band = neverBand(hex);
   if (!band) return hex;
   if (band === 'beige') {
     const c = lch(hex);
-    const out = fromLch(c.L, Math.max(12, c.C), Math.min(c.h, ROSE_H));
+    const out = fromLch(c.L, Math.max(TERRA_C, c.C), Math.min(c.h, TERRA_H));
     return neverBand(out) ? cleanColour(out) : out;
   }
   return cleanColour(hex);

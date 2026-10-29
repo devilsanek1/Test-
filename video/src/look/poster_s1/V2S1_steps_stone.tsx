@@ -156,17 +156,31 @@ export const Coping: React.FC<{seed?: string}> = ({seed = 'v2s1bank'}) => {
       {/* (the look test's darks) the wet dark edge where the coping drops into the water */}
       <Fill d={between(y0, y0 + 5)} color={darks ? dark('pane') : CM.stoneShade} seed={`${seed}/copLip`} offset={false} />
       {darks ? <Fill d={COPING_CLEATS} color={dark('iron')} seed={`${seed}/cleats`} offset={false} /> : null}
+      {darks ? <Fill d={LANDING_GRATES} color={dark('iron')} seed={`${seed}/grates`} offset={false} /> : null}
     </>
   );
 };
 
-/** (the look test's darks) three cast-iron mooring cleats on the coping's top, along its edge (scaled by the bank). */
-const COPING_CLEATS: string = [150, 452, 968]
+/** (the look test's darks) two cast-iron gully grates on the landing, laid along the bank's edges. */
+const LANDING_GRATES: string = [250, 560, 880, 40]
   .map((x) => {
-    const y = edgeY(BANK.coping[0] + 9, x);
+    const y = edgeY((BANK.landing[0] + BANK.nosings[0]) / 2, x);
+    const s = groundScale(x, y);
+    const w = 44 * s;
+    const h = 11 * s;
+    const m = edgeSlope(x, y);
+    const pt = (dx: number, dy: number): Pt => [x + dx, y + dy + m * dx];
+    return poly([pt(-w / 2, -h / 2), pt(w / 2, -h / 2), pt(w / 2, h / 2), pt(-w / 2, h / 2)]);
+  })
+  .join('');
+
+/** (the look test's darks) cast-iron mooring cleats on the coping's top, along its edge (scaled by the bank). */
+const COPING_CLEATS: string = [150, 452, 968, 30, 300, 610, 800, 1060]
+  .map((x) => {
+    const y = edgeY(BANK.coping[0] + 15, x);
     const s = groundScale(x, y);
     const w = 26 * s;
-    const h = 7 * s;
+    const h = 6 * s;
     const m = edgeSlope(x, y);
     const pt = (dx: number, dy: number): Pt => [x + dx, y + dy + m * dx];
     return poly([pt(-w / 2, 0), pt(-w * 0.32, -h), pt(w * 0.32, -h), pt(w / 2, 0), pt(w * 0.3, h * 0.5), pt(-w * 0.3, h * 0.5)]);

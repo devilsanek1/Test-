@@ -36,7 +36,7 @@ import React from 'react';
 import {Fill} from './Fill';
 import {Tier} from './tier';
 import {useTime} from './time';
-import {fromLch, lch} from './light';
+import {fromLch, lch, mixHex} from './light';
 import {recede, type Atmosphere} from './depth';
 import {rng, type Rng} from './rng';
 import {neverBand} from './water';
@@ -64,6 +64,8 @@ const norm3 = (a: V3): V3 => {
 };
 const rad = (d: number) => (d * Math.PI) / 180;
 const r1 = (n: number) => Math.round(n * 10) / 10;
+/** The half step between two tones (a soft edge's middle band). */
+const mixL = (a: string, b: string) => mixHex(a, b, 0.5);
 
 /** Signed area (screen coords, y down: > 0 = clockwise on screen). */
 function area2(p: Pt[]): number {
@@ -1183,7 +1185,8 @@ function buildSpray(spec: LeafSpraySpec): SprayGeom {
       // veins: thin same-hue light shapes from the base toward the tips (3.0 -> 2.0 px)
       const vs: Pt[][] = [];
       if (veins !== 'none') {
-        const tips = veins === 'main' ? [sp.leaf.veins[sp.leaf.veins.length - 1], ...sp.leaf.veins.filter((_, q) => q === 1 || q === sp.leaf.veins.length - 2)] : [sp.leaf.veins[Math.floor(sp.leaf.veins.length / 2)]];
+        const main = sp.leaf.main ?? sp.leaf.veins.slice(0, 1);
+        const tips = veins === 'main' ? main : main.slice(0, 1);
         const B = leafPt(pose, 0, 0);
         for (const ti of tips) {
           const tp = sp.leaf.pts[ti];
@@ -1213,7 +1216,7 @@ function buildSpray(spec: LeafSpraySpec): SprayGeom {
     const kHi = Math.max(...items.map((q) => q.k));
     const palette = lf.turned ? tones.map((c) => autumnTone(c, lf.turned as 'gold' | 'rust')) : tones;
     const layers: Layer[] = [{d: polyD(lf.petiole), color: palette[Math.max(1, Math.min(top1, 2))]}];
-    layers.push(...levelLayers(items, palette, [[...lf.facets.map((f) => f.poly).flat()].length ? lf.facets.map((f) => f.poly) : []].flat() as unknown as Pt[][]));
+    layers.push(...levelLayers(items, palette));
     if (lf.veins.length) {
       const vt = lch(palette[Math.min(top1, kHi)]);
       layers.push({d: lf.veins.map(polyD).join(''), color: fromLch(Math.min(84, vt.L + 7), Math.max(8, vt.C - 3), vt.h - 4)});
@@ -1223,8 +1226,9 @@ function buildSpray(spec: LeafSpraySpec): SprayGeom {
   const twigGeoms: SprayTwigGeom[] = twigs.map((tw) => {
     const wd: Layer[] = [];
     if (tw.id >= 0) {
+      const b = litBandOf(litSide(tw.line, L2));
       wd.push({d: polyD(ribbon(tw.line, tw.w)), color: bark.shade});
-      wd.push({d: polyD(ribbon(tw.line, tw.w, L2[0] * 0 + (L2[1] < 0 ? -1 : 0.1), L2[1] < 0 ? -0.1 : 1)), color: bark.lit});
+      wd.push({d: polyD(ribbon(tw.line, tw.w, b[0], b[1])), color: bark.lit});
     }
     const ls = leaves
       .filter((q) => q.tw === tw.id)
@@ -1233,11 +1237,12 @@ function buildSpray(spec: LeafSpraySpec): SprayGeom {
     return {id: tw.id, root: tw.line[0], len: tw.len, wood: wd, leaves: ls};
   });
   for (let k = 0; k < share.length; k++) share[k] /= tot || 1;
+  const bb = litBandOf(litSide(line, L2));
   const wood: Layer[] = [
     {d: polyD(ribbon(line, bw)), color: bark.shade},
-    {d: polyD(ribbon(line, bw, L2[1] < 0 ? -1 : 0.1, L2[1] < 0 ? -0.1 : 1)), color: bark.lit},
+    {d: polyD(ribbon(line, bw, bb[0], bb[1])), color: bark.lit},
   ];
-  const pts = leaves.flatMap((q) => q.facets.flatMap((f) => f.poly)).concat(line);
+  const pts = cat(leaves.map((q) => cat(q.facets.map((f) => f.poly)))).concat(line);
   const bbox: [number, number, number, number] = [Math.min(...pts.map((p) => p[0])), Math.min(...pts.map((p) => p[1])), Math.max(...pts.map((p) => p[0])), Math.max(...pts.map((p) => p[1]))];
   return {spec, pivot: line[0], wood, twigs: twigGeoms, bbox, stats: {tones, leaves: leaves.length, minWidth: Math.min(...minWidth), share}};
 }

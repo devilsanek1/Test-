@@ -78,7 +78,7 @@ export const S1FarTowpath: React.FC = () => {
       const xe = Math.min(x1, x + 121);
       b.poly(CM.waterDeep, band(x - 1, xe, edge, edge + 8, off));
       // (the look test's darks) the wet dark line where the stone meets the water, under the coping's lip
-      if (darks) b.poly(dark('pane'), band(x - 1, xe, edge, edge + 5, off));
+      if (darks && x < 780) b.poly(dark('pane'), band(x - 1, Math.min(xe, 780), edge, edge + 5, off));
       b.poly(CM.limestone, band(x - 1, xe, edge - coping, edge, off));
       b.poly(CM.stoneShade, band(x - 1, xe, edge - coping * 0.3, edge, off));
     }
@@ -104,12 +104,30 @@ export const S1PathFurniture: React.FC = () => {
       const k = MAP.s1FigureHAt(x) / S.herH;
       s1BollardInto(b, x, edge - coping * 0.5 + s1Bend(x) - 2, 22 * k, darks ? dark('iron') : S1_IRON);
     }
+    // (the look test's darks) low iron mooring cleats on the coping between the bollards, at the bend's scale
+    if (darks) {
+      for (const x of [640, 350, 212, 112, 22]) {
+        const k = MAP.s1FigureHAt(x) / S.herH;
+        const y = edge - coping * 0.72 + s1Bend(x);
+        const w = 16 * k;
+        const h = 5 * k;
+        b.fill(dark('iron'), `M${P(x - w / 2, y)}L${P(x - w * 0.3, y - h)}L${P(x + w * 0.3, y - h)}L${P(x + w / 2, y)}Z`);
+      }
+    }
     // lamp posts (heritage: plinth, fluted column, lantern), sized by the bend's scale
     for (const L of S1_FAR_LAMPS) {
       const k = MAP.s1FigureHAt(L.x) / S.herH;
       const h = L.h || 350 * k;
       const y = S1_PATH.top + 6 + s1Bend(L.x);
       lampInto(b, L.x, y, h, `s1lamp/${L.x}`);
+      // (the look test's darks) the cast-iron plinth and the lantern's cap of the two big lamps in dark iron
+      if (darks) {
+        const cw = Math.max(2.2, h * 0.034);
+        b.fill(dark('iron'), `M${P(L.x - cw * 1.6, y)}L${P(L.x - cw * 1.2, y - h * 0.08)}L${P(L.x + cw * 1.2, y - h * 0.08)}L${P(L.x + cw * 1.6, y)}Z`);
+        const lt = y - h * 0.94;
+        const lw1 = cw * 2.4;
+        b.fill(dark('iron'), `M${P(L.x - lw1 * 1.15, lt)}L${P(L.x, lt - h * 0.045)}L${P(L.x + lw1 * 1.15, lt)}Z`);
+      }
     }
     return b;
   }, [darks]);
@@ -171,6 +189,7 @@ const OneBoat: React.FC<{o: BoatOpts; smoke?: boolean; bursts?: number[]}> = ({o
     if (darks) {
       recolourBatch(b, {[CM.paneUnlit]: dark('iron')}, [0]);
       recolourBatch(b, {[CM.glass]: dark('pane'), [CM.line]: dark('wood')}, [1]);
+      recolourBatch(b, {[CM.brickDeep]: dark('wood'), [CM.coatSlate]: dark('iron')}, [2, 3, 4, 5]);
     }
     return b;
   }, [darks]);

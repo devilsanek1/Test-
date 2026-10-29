@@ -26,7 +26,7 @@ import {fromLch, lab, lch} from './light';
 import {cleanColour} from './water';
 import {applyH, rectToQuad, type Quad} from './persp';
 import {rng, type Rng} from './rng';
-import type {GroundCam} from './depth';
+import {groundCam, type GroundCam} from './depth';
 
 export type Pt = [number, number];
 /** A screen box [x0, y0, x1, y1] (px at 1080 x 1920). */
@@ -249,6 +249,26 @@ export const frontal: Project = (p) => p;
 /** A ground through the shot's ONE camera: plane (x, z) metres on `level` -> screen px (lib/depth groundCam). Every
  *  point must lie in front of the camera (z > ~0.1 m). */
 export const viaCam = (cam: GroundCam, level = 0): Project => (p) => cam.pt(p[0], p[1], level);
+/** ONE camera from two vanishing points on the horizon (a two-point view, like v2 S1's bank: lines along the canal
+ *  to `vpL`, lines across it to `vpR`): lib/depth groundCam with f = sqrt((vpx - vpL)(vpR - vpx)) and its yaw. World
+ *  z runs to `vpL`, world x to `vpR`. v2 S1's bank: twoPointCam({horizon: 1000, vpL: -1100, vpR: 2600, height}). */
+export function twoPointCam(o: {horizon: number; vpL: number; vpR: number; vpx?: number; height: number}): GroundCam {
+  const vpx = o.vpx ?? 540;
+  const a = vpx - o.vpL;
+  const b = o.vpR - vpx;
+  if (!(a > 0 && b > 0)) throw new Error('twoPointCam: vpL < vpx < vpR');
+  const f = Math.sqrt(a * b);
+  return groundCam({horizon: o.horizon, vpx, f, height: o.height, yaw: (Math.atan(a / f) * 180) / Math.PI});
+}
+/** The ground point under a screen point (the inverse of `cam.pt` on `level`): world [x, z] metres, or null above
+ *  the horizon. Lay a patchwork's polygon out from screen corners (a tread's ends, a quay's edge). */
+export function groundAt(cam: GroundCam, sx: number, sy: number, level = 0): Pt | null {
+  if (sy <= cam.horizon + 1e-6) return null;
+  const zc = (cam.f * (cam.height - level)) / (sy - cam.horizon);
+  const xc = ((sx - cam.vpx) * zc) / cam.f;
+  const th = (cam.yaw * Math.PI) / 180;
+  return [xc * Math.cos(th) + zc * Math.sin(th), -xc * Math.sin(th) + zc * Math.cos(th)];
+}
 /** A plane drawn into a screen quad (TL, TR, BR, BL): plane (u, v) in [0, w] x [0, h] (metres, or any unit) ->
  *  screen through the quad's homography (lib/persp): a tread between two lines to a vanishing point, a wall in
  *  perspective. Exact when the quad is the true perspective image of a w x h rectangle. */
@@ -386,7 +406,7 @@ export type Patchwork = {
   project: Project;
   /** Facets dropped: in the band, in an avoid box, or degenerate after snapping. */
   dropped: number;
-  /** Neighbour pairs whose shown |dL*| left the range (after the solver's repair passes). */
+  /** Neighbour pairs of two different tones whose shown |dL*| left the range (after the repair). */
   offRange: number;
 };
 
@@ -615,9 +635,16 @@ export function patchwork(o: PatchOpts): Patchwork {
     const d = Math.abs(LS[a] - LS[b]);
     return d >= dL[0] - PATCH_TOL && d <= dL[1] + PATCH_TOL;
   };
+  // the cost of a pair: a SPIKE (over the range's top: a contrast the C tier must not have) is the worst; a step
+  // under the bottom reads as one facet with a faint seam (the posters keep 12-52 % such soft steps); the same tone
+  // merges the two into one bigger facet (harmless): lightest
   const viol = (a: number, b: number) => {
+    if (T.length <= 2) return a === b ? 1 : 0;
+    if (a === b) return 0.6;
     const d = Math.abs(LS[a] - LS[b]);
-    return T.length <= 2 ? (a === b ? 1 : 0) : Math.max(0, dL[0] - PATCH_TOL - d) + Math.max(0, d - dL[1] - PATCH_TOL) + (a === b ? 1 : 0);
+    if (d > dL[1] + PATCH_TOL) return 2 + 2 * (d - dL[1] - PATCH_TOL);
+    if (d < dL[0] - PATCH_TOL) return 0.4 + (dL[0] - PATCH_TOL - d);
+    return 0;
   };
   const cs = raws.map((f) => centroid(f.pts));
   const sb = bboxOf(cs.length ? cs : [[0, 0]]);
@@ -671,31 +698,49 @@ export function patchwork(o: PatchOpts): Patchwork {
     usage[pick]++;
     for (const j of adj[i]) if (seen[j][pick]++ === 0) sat[j]++;
   }
-  // repair: recolour a facet on a bad edge to the tone with the least violation (a few sweeps)
-  for (let sweep = 0; sweep < 6; sweep++) {
-    let changed = false;
-    for (let i = 0; i < raws.length; i++) {
-      const cur = adj[i].reduce((s, j) => s + viol(tone[i], tone[j]), 0);
-      if (cur <= 0) continue;
-      let bk = tone[i];
-      let bv = cur;
-      for (let k = 0; k < T.length; k++) {
-        const v = adj[i].reduce((s, j) => s + viol(k, tone[j]), 0);
-        if (v < bv - 1e-9) {
-          bv = v;
-          bk = k;
-        }
-      }
-      if (bk !== tone[i]) {
-        tone[i] = bk;
-        changed = true;
-      }
+  // repair: min-conflicts (a conflicted facet takes its least-cost tone, ties seeded; now and then a random step to
+  // leave a local minimum), kept incrementally, keeping the best assignment. Odd wheels force some same-tone pairs
+  // (four tones, the outer pair never neighbours): those merge into one bigger facet, the cheap way out.
+  const costAt = (i: number, k: number) => adj[i].reduce((s, j) => s + viol(k, tone[j]), 0);
+  const fc = raws.map((_, i) => costAt(i, tone[i]));
+  const bad = new Set<number>();
+  fc.forEach((c, i) => c > 0 && bad.add(i));
+  let cur = fc.reduce((s, c) => s + c, 0) / 2;
+  let bestCost = cur;
+  let bestTone = tone.slice();
+  const mr = r.fork('repair');
+  const steps = Math.min(raws.length * 30, 20000);
+  for (let it = 0; it < steps && bestCost > 1e-9 && bad.size; it++) {
+    const list = Array.from(bad);
+    const i = list[Math.floor(mr.next() * list.length)];
+    let bv = Infinity;
+    let picks: number[] = [];
+    for (let k = 0; k < T.length; k++) {
+      const v = costAt(i, k);
+      if (v < bv - 1e-9) {
+        bv = v;
+        picks = [k];
+      } else if (Math.abs(v - bv) <= 1e-9) picks.push(k);
     }
-    if (!changed) break;
+    const nk = mr.next() < 0.06 ? Math.floor(mr.next() * T.length) : picks[Math.floor(mr.next() * picks.length)];
+    if (nk === tone[i]) continue;
+    const old = tone[i];
+    tone[i] = nk;
+    cur += costAt(i, nk) - adj[i].reduce((s, j) => s + viol(old, tone[j]), 0);
+    for (const j of [i, ...adj[i]]) {
+      fc[j] = costAt(j, tone[j]);
+      if (fc[j] > 1e-9) bad.add(j);
+      else bad.delete(j);
+    }
+    if (cur < bestCost - 1e-9) {
+      bestCost = cur;
+      bestTone = tone.slice();
+    }
   }
+  for (let i = 0; i < raws.length; i++) tone[i] = bestTone[i];
   let offRange = 0;
   raws.forEach((_, i) => adj[i].forEach((j) => {
-    if (j > i && !ok(tone[i], tone[j])) offRange++;
+    if (j > i && tone[i] !== tone[j] && !ok(tone[i], tone[j])) offRange++;
   }));
 
   // identity marks: about one facet in `marks`, roomy ones, never two neighbours
@@ -753,7 +798,8 @@ export function patchwork(o: PatchOpts): Patchwork {
  *  mass in ground (x, z) metres on `level`; `cell` in metres (a paving module, default ~0.9 m near). */
 export function groundPatchwork(cam: GroundCam, o: Omit<PatchOpts, 'project'> & {level?: number}): Patchwork {
   const {level, ...rest} = o;
-  return patchwork({plane: -1, ...rest, project: viaCam(cam, level ?? 0)});
+  // a ground's marks are things (a drain, a mooring ring, a hatch: pro_2 §4), sparser than a facade's windows
+  return patchwork({plane: -1, marks: 16, ...rest, project: viaCam(cam, level ?? 0)});
 }
 
 /** A mid or far city mass, FRONTAL (CRAFT §b: frontal on mid and far masses): the mass in screen px, cuts level and
@@ -833,58 +879,91 @@ export function markShape(pw: Patchwork, f: Facet, kind: MarkKind = 'pair'): {d:
 export type PatchStats = {
   facets: number;
   dropped: number;
-  /** Facets per 10,000 px of the mass (pro_2 §3.1: C near 11-25, C far 2-15; posters 14.5 / 7.1). */
+  /** Facets per 10,000 px of their area (information: pro_2's "shapes per 10,000 px" (C near 11-25) counts every
+   *  segment, the marks and things on the ground included, not just the facets). */
   per10k: number;
-  /** The median facet side, sqrt(area) (px) (C near 30-75 [49], C far 50-200 [77]). */
+  /** The median facet width on screen (along u through its centroid, px): the posters' patches 38-81 px (style.md
+   *  §1.3: 3.5-7.5 % W), far planes 6-10 % W; pro_2 §3.1 face side C near 30-75 [49], C far 50-200 [77]. */
+  medianW: number;
+  /** The median facet depth on screen (along v): on a ground it foreshortens toward the horizon. */
+  medianD: number;
+  /** The median sqrt(area) (px). */
   medianSide: number;
-  /** The smallest min width (px). */
+  /** The smallest min width among the CUT facets (px; an uncut thin part is the mass itself). */
   minW: number;
-  /** Neighbour pairs, and the share whose shown |dL*| is inside the plane's range. */
+  /** Neighbour pairs; of those with two different tones, the share inside the plane's range (with PATCH_TOL); the
+   *  share over its top (a SPIKE: more contrast than the C tier may have); the share of same-tone pairs (they read
+   *  as one bigger facet: odd wheels force a few with four tones). */
   pairs: number;
   inRange: number;
+  spikes: number;
+  merges: number;
   /** The shown tones' L* span (CRAFT §c: <= 15 in one plane). */
   span: number;
   /** Marks flagged. */
   marks: number;
 };
 
+const median = (v: number[]) => {
+  const s = v.slice().sort((a, b) => a - b);
+  return s.length ? s[Math.floor(s.length / 2)] : 0;
+};
+
 export function patchStats(pw: Patchwork): PatchStats {
   const sh = pw.spec.shown;
   const L = pw.tones.map((c) => lab(sh(c))[0]);
   const area = pw.facets.reduce((s, f) => s + f.area, 0);
-  const sides = pw.facets.map((f) => Math.sqrt(f.area)).sort((a, b) => a - b);
   let pairs = 0;
+  let distinct = 0;
   let inR = 0;
+  let spikes = 0;
+  let merges = 0;
   pw.adj.forEach((l, i) => l.forEach((j) => {
     if (j <= i) return;
     pairs++;
-    const d = Math.abs(L[pw.facets[i].tone] - L[pw.facets[j].tone]);
-    if (d >= pw.spec.dL[0] - 1e-6 && d <= pw.spec.dL[1] + 1e-6) inR++;
+    const a = pw.facets[i].tone;
+    const b = pw.facets[j].tone;
+    if (a === b) {
+      merges++;
+      return;
+    }
+    distinct++;
+    const d = Math.abs(L[a] - L[b]);
+    if (d > pw.spec.dL[1] + PATCH_TOL) spikes++;
+    else if (pw.tones.length <= 2 || d >= pw.spec.dL[0] - PATCH_TOL) inR++;
   }));
+  const cut = pw.facets.filter((f) => !f.whole);
   return {
     facets: pw.facets.length,
     dropped: pw.dropped,
     per10k: r1((pw.facets.length / Math.max(1, area)) * 1e4),
-    medianSide: r1(sides.length ? sides[Math.floor(sides.length / 2)] : 0),
-    minW: r1(Math.min(...pw.facets.map((f) => f.minW))),
+    medianW: r1(median(pw.facets.map((f) => f.wU))),
+    medianD: r1(median(pw.facets.map((f) => f.wV))),
+    medianSide: r1(median(pw.facets.map((f) => Math.sqrt(f.area)))),
+    minW: r1(cut.length ? Math.min(...cut.map((f) => f.minW)) : 0),
     pairs,
-    inRange: pairs ? Math.round((1000 * inR) / pairs) / 1000 : 1,
+    inRange: distinct ? Math.round((1000 * inR) / distinct) / 1000 : 1,
+    spikes: distinct ? Math.round((1000 * spikes) / distinct) / 1000 : 0,
+    merges: pairs ? Math.round((1000 * merges) / pairs) / 1000 : 0,
     span: r1(Math.max(...L) - Math.min(...L)),
     marks: pw.facets.filter((f) => f.mark).length,
   };
 }
 
-/** The patchwork lint (run it in the scene's problems()): [] = OK. Facets under the plane's minPx (specks), neighbour
- *  steps off the plane's range (more than 5 % of pairs), the tones' span over 15 L*, anything in the caption band (or
- *  its float margin), anything in an avoid box, a mass too sparse for its plane (C near < 11 per 10,000 px: v2's
- *  empty quay was 3.2) or too busy (> 25). */
+/** The patchwork lint (run it in the scene's problems()): [] = OK. Cut facets under the plane's minPx (slivers and
+ *  specks), any neighbour step over the plane's range (a spike), steps under it on more than 10 % of the pairs, over
+ *  20 % same-tone neighbours (too few tones), the tones' span over 15 L* (CRAFT
+ *  §c), anything in the caption band or its float margin (DIRECTION rule 10), anything in an avoid box ("never on the
+ *  subject"), and facets far off the plane's size (the median width under half or over twice its cellPx). */
 export function patchworkProblems(pw: Patchwork, name = 'patchwork'): string[] {
   const out: string[] = [];
   const s = patchStats(pw);
-  const small = pw.facets.filter((f) => f.minW < pw.spec.minPx - 0.5);
-  if (small.length) out.push(`${name}: ${small.length} facet(s) under ${pw.spec.minPx} px wide (specks; the smallest ${s.minW} px)`);
-  if (s.pairs && s.inRange < 0.95) out.push(`${name}: ${Math.round((1 - s.inRange) * 100)} % of neighbour pairs off dL* ${pw.spec.dL[0]}-${pw.spec.dL[1]} (give more tones, or steps that fit the range)`);
-  if (s.span > PATCH_SPAN_MAX + 1e-6) out.push(`${name}: the tones span ${s.span} L* (> ${PATCH_SPAN_MAX} in one plane, CRAFT §c)`);
+  const small = pw.facets.filter((f) => !f.whole && f.minW < pw.spec.minPx - 0.5);
+  if (small.length) out.push(`${name}: ${small.length} facet(s) under ${pw.spec.minPx} px wide (slivers; the smallest ${s.minW} px)`);
+  if (s.spikes > 0) out.push(`${name}: ${Math.round(s.spikes * 1000) / 10} % of neighbour steps over dL* ${pw.spec.dL[1]} (spikes: more contrast than tier C may have; tones closer together)`);
+  if (s.inRange < 0.9) out.push(`${name}: ${Math.round((1 - s.inRange) * 100)} % of neighbour steps off dL* ${pw.spec.dL[0]}-${pw.spec.dL[1]} (give tones that fit the range)`);
+  if (pw.tones.length > 2 && s.merges > 0.2) out.push(`${name}: ${Math.round(s.merges * 100)} % of neighbours share a tone (they merge: give a fourth tone)`);
+  if (s.span > PATCH_SPAN_MAX + PATCH_TOL) out.push(`${name}: the tones span ${s.span} L* (> ${PATCH_SPAN_MAX} in one plane, CRAFT §c)`);
   const b = pw.spec.band;
   if (b) {
     const inBand = pw.facets.filter((f) => f.box[3] >= b[0] - pw.spec.bandMargin && f.box[1] <= b[1] + pw.spec.bandMargin);
@@ -894,8 +973,8 @@ export function patchworkProblems(pw: Patchwork, name = 'patchwork'): string[] {
     const n = pw.facets.filter((f) => overlaps(f.box, a)).length;
     if (n) out.push(`${name}: ${n} facet(s) in the avoid box [${a.join(', ')}]`);
   }
-  const near = pw.spec.plane < 2;
-  if (s.facets >= 6 && near && s.per10k < 11) out.push(`${name}: ${s.per10k} facets per 10,000 px (C near 11-25: the mass reads empty; a smaller cell)`);
-  if (s.facets >= 6 && s.per10k > 25) out.push(`${name}: ${s.per10k} facets per 10,000 px (> 25: busier than the hero; a bigger cell)`);
+  const cp = patchStep(pw.spec.plane).cellPx;
+  if (s.facets >= 6 && s.medianW < cp * 0.5) out.push(`${name}: median facet width ${s.medianW} px (under half the plane's ${cp}: busier than the hero; a bigger cell)`);
+  if (s.facets >= 6 && s.medianW > cp * 2) out.push(`${name}: median facet width ${s.medianW} px (over twice the plane's ${cp}: reads empty; a smaller cell)`);
   return out;
 }
