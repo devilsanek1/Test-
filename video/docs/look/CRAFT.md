@@ -29,7 +29,7 @@ its signal, and they keep their FAIL. Px at 1080 x 1920, CIE L* and C*, %W/s = %
    12.4 s, owner yes 2026-10-27). Every cause beat ends with it reacting (the tag ticks): each shot answers "what did this do to it?"
    (v3: 35 %, gone 17.9 s mid-cause.)
 2. **One home place.** Other places are entered through something in it (window, phone, screen, a paper chart) and left
-   the same way; at most 3 places and 1 big scale reveal in 45 s. Information (a chart, a number) is paper in the place the
+   the same way; one home place plus at most ONE comparison or scale shot (the playbook's ONE SUBJECT, GONE DEEP, owner 2026-10-29; it replaces "at most 3 places and 1 big scale reveal in 45 s"). Information (a chart, a number) is paper in the place the
    camera is already in, never a new location made for it (v3: 6 places, a new world per chart).
 3. **One "you":** one drawing of the viewer's stand-in, or POV only; no strangers' backs in the foreground (they read as
    "you"). Pip hides on purpose (owner, 2026-10-28: "keep it, but not as obvious"): never a join's carrier and never

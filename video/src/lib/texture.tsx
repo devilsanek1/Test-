@@ -5,11 +5,11 @@
 // this file); the how-to and the measurements: docs/studies/2026-10-28_city_posters/test/ENGINE_PT.md §3. Opt-in: a
 // scene that never wraps a plane in <Mottle> renders exactly as before; <Mottle k={0}> renders its children unfiltered.
 //
-//   <S1Plane plane={S1_PLANE.bank}>                       // the plane's float group (its transform moves the mottle too)
-//     <Mottle k={mottleK({plane: -1})} seed={3} offset={floatOffsetOfThisPlane}>
+//   <g transform={`translate(${dx} ${dy})`}>              // the plane's float group (its transform moves the mottle too)
+//     <Mottle k={mottleK({plane: -1})} seed={mottleSeed(-1)} offset={[dx, dy]}>
 //       ...the plane's fills...
 //     </Mottle>
-//   </S1Plane>
+//   </g>
 //
 // HOW: an SVG filter on the plane's group: feTurbulence (fractalNoise: deterministic, specified to the bit by the SVG
 // reference code, no asset to load) -> a colour matrix (one luminance noise plus two faint colour noises) -> the plane's
@@ -28,28 +28,36 @@ import type {Tier} from './pen';
 
 // ================================================================= the spec (CRAFT §c; pro_4 §3.4; pro_2 §3.1)
 
-/** The mottle at k = 1: std 0.5 L* on a light fill (L* ~85; it is a multiplicative paint-density variation, so a
- *  darker fill shows proportionally less: ~0.7x at L* 60, ~0.4x at L* 33), blotches 30-70 px (the autocorrelation's 1/e
- *  radius ~28 px, as the study's encode test: sigma 14 px), its colour <= 0.35 in a*b*. */
+/** The spec at k = 1 (CRAFT §c): std <= 0.5 L* (measured 0.44 on a big light fill; a multiplicative paint-density
+ *  variation, so a darker fill shows proportionally less: ~0.7x at L* 60, ~0.4x at L* 33), blotches 30-70 px (the
+ *  autocorrelation's 1/e radius ~30 px measured; the study's encode test 28), its colour <= 0.35 in a*b* (0.29-0.31). */
 export const MOTTLE = {std: 0.5, blotch: [30, 70] as [number, number], radius: 28, chroma: 0.35} as const;
 
 /** The strength by tier and plane (CRAFT §c, pro_2 §3.1 "texture 1.0x / 1.0x / 0.7x / 0.4x"; the sky ~0.6, est.):
  *  tiers A and B 1.0, near C 0.7, far C 0.4, the sky 0.6. */
 export const MOTTLE_K = {subject: 1, support: 1, nearC: 0.7, farC: 0.4, sky: 0.6} as const;
 
-/** A plane group's k: the sky 0.6; a group holding tier A or B (the subject's plane) 1.0; tier C on plane <= +1 0.7
- *  (the near ground, the water, the near frame), on +2 and farther 0.4. */
+/** A plane group's k (one per group): the sky 0.6; a group that IS tier A or B (pass `tier`) 1.0; tier C on plane <= +1
+ *  0.7 (the near ground, the water, the near frame, the subject's plane, whose pixels are mostly tier C), on +2 and
+ *  farther 0.4. */
 export function mottleK(o: {plane?: number; tier?: Tier; sky?: boolean} = {}): number {
   if (o.sky) return MOTTLE_K.sky;
   if (o.tier === 'subject' || o.tier === 'support') return MOTTLE_K.subject;
   return (o.plane ?? 0) >= 2 ? MOTTLE_K.farC : MOTTLE_K.nearC;
 }
 
+/** A plane's own seed (an integer): the same for every group of one plane (S1 draws a plane in several groups: they
+ *  stay one surface), different across planes (they never slide as one sheet); the sky (an infinite plane) its own. */
+export function mottleSeed(plane: number, salt = 0): number {
+  if (!Number.isFinite(plane)) return 7919 + salt;
+  return 101 + Math.round((plane + 10) * 40) * 13 + salt * 7;
+}
+
 /** The caption band (keep clear): LAYOUT.md y 290-600. */
 export const MOTTLE_BAND: [number, number] = [290, 600];
 
-/** Calibration (measured on flat fields, `src/look/pt` PtTextureCal, ENGINE_PT.md §3): k = 1 gives std 0.5 L* on a
- *  light fill with these values. */
+/** Calibration (measured on flat fields, `src/look/pt` PtTextureCal, ENGINE_PT.md §3.2): k = 1 gives std 0.44 L* on a
+ *  big light fill (0.40-0.47 by 400 px window), a 1/e radius ~30 px, a*b* 0.29-0.31, the mean kept to 0.03 L*. */
 const CAL: {s: number; freq: number; octaves: number; ca: number; cb: number} = {
   /** feComposite k1 per unit k: the modulation's amplitude. */
   s: 0.049,
@@ -63,11 +71,12 @@ const CAL: {s: number; freq: number; octaves: number; ca: number; cb: number} = 
 };
 
 export type MottleProps = {
-  /** Strength: 1 = the spec (std 0.5 L* on a light fill); `mottleK(...)` by tier and plane; 0 = off (no filter). */
+  /** Strength: 1 = the spec (std 0.44 L* on a light fill, <= 0.5); `mottleK(...)` by tier and plane; 0 = off (no filter). */
   k?: number;
-  /** The plane's own noise (an integer): each plane a different seed, so two planes never read as one sliding sheet. */
+  /** The plane's own noise (an integer, `mottleSeed(plane)`): each plane a different seed, so two planes never read as
+   *  one sliding sheet; every group of one plane the same seed, so they read as one surface. */
   seed?: number;
-  /** The blotch scale against the spec's (1 = 1/e radius ~28 px; 0.7-1.3 stays inside 30-70 px blotches). */
+  /** The blotch scale against the spec's (1 = 1/e radius ~30 px; 0.7-1.3 stays inside 30-70 px blotches). */
   scale?: number;
   /** The colour share (0-1 of the spec's a*b* <= 0.35; 0 = a pure value mottle). */
   chroma?: number;
@@ -147,7 +156,8 @@ export const Mottle: React.FC<MottleProps> = ({k = 1, seed = 1, scale = 1, chrom
           ) : null}
           {/* the plane x (1 + s (N - 0.5)): mean-exact (+-0.01 L* on every plane, measured). Its one cost: the alpha of
               a plane's outer anti-aliased pixel rises by s/2, so while the plane floats at a fractional offset that row
-              reads <= ~0.8 L* darker (0 at rest): a 0.02 px dilation of its silhouette, inside CRAFT §c's float budget
+              reads <= ~0.8 L* darker (an internal seam between two abutting shapes, already a conflation seam, up to
+              ~1.4; 0 at rest): a 0.02 px dilation of its silhouette, inside CRAFT §c's float budget
               (<= ~2 L*). The alpha-exact variant (divide by 1 + s/2, multiply back with a transfer) is NOT used: its
               extra 8-bit step truncates, shifting whole planes by 0.05-0.18 L* (ENGINE_PT.md §3). */}
           <feComposite in="SourceGraphic" in2={mask ? 'masked' : 'noise'} operator="arithmetic" k1={fmt(s)} k2={fmt(1 - s * 0.5)} k3="0" k4="0" />

@@ -48,7 +48,7 @@ the owner approves it; the look test shows it.
 ## The rules
 - **1. One flowing story, never shots stitched together.** One story on ONE core line (spine first, each line following
   from the last) and a through-line card: one thread object carrying the arc (on screen >= 80 %, no gap over 3 s
-  except the one scale reveal and an owner-approved fairness stretch, declared on the card), one home place (at most 3 places; a chart is paper where you already are), one "you";
+  except the one scale reveal and an owner-approved fairness stretch, declared on the card), one subject in one home place, gone deep (the playbook's ONE SUBJECT, GONE DEEP, 2026-10-29: other places only as ONE comparison or scale shot; a chart is paper where you already are), one "you";
   Pip hides in the world, never a join's carrier (rule 2). Every join carries something (A push-through, B thread match, C continuous
   camera, D object carry or wipe, E card flip; F plain cut: at most 2, on a "But" turn; a dissolve is no carrier), its
   midpoint on the next sentence's first word; shots (panels) average >= 3.5 s. Sound off, every shot reads: literal
