@@ -1,1 +1,131 @@
-{"film": "v2s1_v5design", "pieces": []}
+{
+ "film": "v2s1_v5",
+ "spec": "scripts/look/paint/v2s1_v5.json",
+ "pieces": [
+  {
+   "id": "v2s1/sky",
+   "src": "paint/v2s1_v5design/sky.png",
+   "box": [
+    0,
+    0,
+    1080,
+    1100
+   ],
+   "style": "sky",
+   "seed": 14,
+   "from": "v2s1/sky"
+  },
+  {
+   "id": "v2s1/clouds_p0",
+   "src": "paint/v2s1_v5design/clouds_p0.png",
+   "box": [
+    0,
+    672,
+    470,
+    96
+   ],
+   "style": "designed",
+   "seed": 92,
+   "from": "v2s1/clouds",
+   "group": "clouds",
+   "depth": 0.9
+  },
+  {
+   "id": "v2s1/clouds_p1",
+   "src": "paint/v2s1_v5design/clouds_p1.png",
+   "box": [
+    -40,
+    596,
+    470,
+    84
+   ],
+   "style": "designed",
+   "seed": 92,
+   "from": "v2s1/clouds",
+   "group": "clouds",
+   "depth": 0.7
+  },
+  {
+   "id": "v2s1/clouds_p2",
+   "src": "paint/v2s1_v5design/clouds_p2.png",
+   "box": [
+    40,
+    120,
+    640,
+    140
+   ],
+   "style": "designed",
+   "seed": 92,
+   "from": "v2s1/clouds",
+   "group": "clouds",
+   "depth": 0.4
+  },
+  {
+   "id": "v2s1/clouds_p3",
+   "src": "paint/v2s1_v5design/clouds_p3.png",
+   "box": [
+    380,
+    0,
+    700,
+    300
+   ],
+   "style": "designed",
+   "seed": 92,
+   "from": "v2s1/clouds",
+   "group": "clouds",
+   "depth": 0.0
+  },
+  {
+   "id": "v2s1/tree",
+   "src": "paint/v2s1_v5design/tree.png",
+   "box": [
+    0,
+    1276,
+    312,
+    220
+   ],
+   "style": "designed",
+   "seed": 45,
+   "from": "v2s1/tree"
+  },
+  {
+   "id": "v2s1/pier",
+   "src": "paint/v2s1_v5design/pier.png",
+   "box": [
+    832,
+    1488,
+    248,
+    432
+   ],
+   "style": "surface",
+   "seed": 55,
+   "from": "v2s1/pier"
+  },
+  {
+   "id": "v2s1/farroofs",
+   "src": "paint/v2s1_v5design/farroofs.png",
+   "box": [
+    0,
+    724,
+    396,
+    244
+   ],
+   "style": "surface",
+   "seed": 62,
+   "from": "v2s1/farroofs"
+  },
+  {
+   "id": "v2s1/fartower",
+   "src": "paint/v2s1_v5design/fartower.png",
+   "box": [
+    234,
+    566,
+    136,
+    402
+   ],
+   "style": "surface",
+   "seed": 68,
+   "from": "v2s1/fartower"
+  }
+ ]
+}
