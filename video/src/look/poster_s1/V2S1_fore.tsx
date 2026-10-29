@@ -354,12 +354,10 @@ const PropFeet: React.FC = () => {
 
 /** The side away from the low western sun on the big things: one form step; the faces turned to us one Shade step. */
 const NearForm: React.FC = () => {
-  // (the look test's foliage: lane N's crown carries its own light, so v2's crescent on the bay's crown goes)
-  const {foliage} = useSwitches();
+  // (the look test: the crescent on the bay's crown is S1ForeNearOver's: the crown sits in the near group's `under`)
   return (
   <>
     <FormShade d={slab(FORE.planter.x0, FORE.planter.x1, FORE.planter.xc, FORE.planter.rim + 14, FORE.planter.base)} at={floodAt(120, 1640)} />
-    {foliage ? null : <FormShade d={crown} kind="crescent" at={floodAt(120, 1390)} />}
     <FormShade d={slab(FORE.crates.x0, FORE.crates.x1, FORE.crates.xc, 1666, FORE.crates.base)} at={floodAt(460, 1700)} />
     <FormShade d={slab(FORE.crates.x0 + 14, FORE.crates.x1 - 10, FORE.crates.xc, 1590, 1666)} at={floodAt(460, 1620)} />
     <FormShade d={poly([[FORE.table.x - 7, FORE.table.top + 10], [FORE.table.x + 7, FORE.table.top + 10], [FORE.table.x + 7, FORE.table.foot], [FORE.table.x - 7, FORE.table.foot]])} at={floodAt(742, 1640)} />
@@ -435,7 +433,18 @@ export const S1ForeNearUnder: React.FC = () => (
     </ToneCtx.Provider>
   </>
 );
-/** (the look test's texture) The props' contact strips (one lies on the bench, the bank's group): the near group's
- *  `over`, drawn last in its translate, outside its mottle (nothing the near group draws after them in v2 overlaps
- *  them: the fern pot and its form are at the bottom edge). */
-export const S1ForeNearOver: React.FC = () => <PropFeet />;
+/** (the look test's texture) The near group's `over` (drawn last in its translate, outside its mottle): the props'
+ *  contact strips (one lies on the bench, the bank's group) and v2's crescent form shade on the bay's crown (the crown
+ *  is in `under`: inside the mottled group the crescent would paint its tint solid over it). In v2 both came earlier in
+ *  the near group (the crescent in NearForm, the strips before the fern pot); nothing the group draws after them
+ *  overlaps them (the fern pot and its form are at the bottom edge, the crates and the table clear of the crown), so
+ *  the frame is the same. Under the foliage switch lane N's crown carries its own light: no crescent. */
+export const S1ForeNearOver: React.FC = () => {
+  const {foliage} = useSwitches();
+  return (
+    <>
+      <PropFeet />
+      {foliage ? null : <FormShade d={crown} kind="crescent" at={floodAt(120, 1390)} />}
+    </>
+  );
+};
