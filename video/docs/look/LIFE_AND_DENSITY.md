@@ -134,8 +134,8 @@ references and primitives, never the film's people.
   No faces (playbook: people act with their pose, like reference 1's); only the mascot has one. Extras are smaller and
   in mid colours, never mistaken for the protagonist.
 - **Sizes by depth (1080 x 1920 canvas; size names, never the attention tiers A-C of `CRAFT.md`):** in the foreground
-  only the film's one "you" (head 90-140 px, playbook: near heads <= ~140; cut by the bottom edge, head top ~y
-  1380-1560) or the mascot, never a row of strangers' backs (they read as "you": `CRAFT.md` §a.3); a passer-by at the
+  only the film's one "you" (head 90-140 px, playbook: near heads <= ~140; cut by the bottom edge, its body may run
+  under the bottom UI, its head stays above it: head top y <= ~1380, `LAYOUT.md` §1) or the mascot, never a row of strangers' backs (they read as "you": `CRAFT.md` §a.3); a passer-by at the
   lens only as a carrier D wipe. Mid walkers: 110-260 px tall (backpacks, bags, phones, a dog). Far crowd: 15-60 px,
   fill only, rows x0.85 toward the horizon. Window and balcony people: 12-40 px silhouettes in lit windows, moving.
   Strangers stay small in the mid and far ground, tier B near the story and C far off (`CRAFT.md` §b); a big near
@@ -211,10 +211,9 @@ references and primitives, never the film's people.
   insert (the same chart frame twice) keeps the same dressing; the "you" or the character's reaction carries the change.
 
 ## 8. What may stay calm
-- **The caption band** (screen y ~290-600): flat wall or sky; weather may pass at half density or less, flakes <= 6 px;
+- **The caption band** (`LAYOUT.md` §1): flat wall or sky; weather may pass at half density or less, flakes <= 6 px;
   no ink, roof tops, heads or props.
-- **Platform UI zones** (top y < 180, bottom y > 1520, right rail x > 950 / y 900-1500; the one definition:
-  `G5_BLOCKING.md` §2 "Screen zones"): dressing yes (kerbs, the edges of things; no strangers' backs in front), key
+- **Platform UI zones** (the one definition: `LAYOUT.md` §1): dressing yes (kerbs, the edges of things; no strangers' backs in front), key
   information no.
 - **The quiet field** (15-35 %; a bounded floor seen from a balcony up to 50-60 %, `COZY_AND_SCALE.md` 3b.1) and **the
   subject's ring**. **One breath beat per film** (at most 2.5 s, usually after

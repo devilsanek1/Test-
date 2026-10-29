@@ -6,7 +6,8 @@ prices) and v2 (DeepMind resignations). Evidence: `research/` enclosure [EN], co
 `DIRECTION.md`). Tags VERIFIED / REPORTED / UNCERTAIN; untagged numbers are our proposals, starting values that the
 G4 look clip tests, except where `DIRECTION.md` rule 7 makes one a rule (cozy >= 50 % of the runtime outside full-frame
 charts, 1-2 scale moments with ONE big move, holds locked or floating): those are rules. 1080 x
-1920 at 60 fps throughout (G3 too), captions 98 px at y 387 / 510 (block y 317-556, x 95-945). Arcane in words only: never
+1920 at 60 fps throughout (G3 too); the screen zones (the caption band and block, the read zone, the platform UI) and
+each shot type's framing numbers: `LAYOUT.md`, the one definition. Arcane in words only: never
 traced, recorded or copied. **Coziness evolves one measured reference at a time** (playbook): the owner's cozy references
 C1-C3 and what each taught are logged in words at the end of section 3b; section 3b (Coziness v2) wins where 2-3 differ.
 
@@ -31,6 +32,9 @@ C1-C3 and what each taught are logged in words at the end of section 3b; section
    catastrophe" trap [CO §8, VERIFIED term]). Scale shown as fact must be true or signposted as a metaphor (SPJ [VE §7]).
 
 ## 2. Enclosure framing in 9:16
+The zones these doses sit in (the caption band, the read zone, the top gutter, the platform UI): `LAYOUT.md` §1; this
+section is the enclosure recipe inside them.
+
 | dose | H:W (wall : width) | sky / opening | frame cues | use |
 |---|---|---|---|---|
 | canyon | >= 2:1 | sky <= 10 % | both walls cut by the top, no exit | v2 confinement only |
@@ -51,7 +55,7 @@ case of an angle-independent measure, the enclosing mass's share of the screen, 
   sight line, ended by one object (tower, bend, data center) (Cullen, Sitte [EN §6-7, REPORTED]).
 - **Walls:** >= 75 % of each side continuous (trees count), no side gaps below the roofline: sky "across" leaks enclosure
   worse than sky ahead (Ewing & Handy [EN §5, REPORTED]). In a 3/4 view the opposite side is the taller, unbroken one.
-- **Asymmetry for captions:** one side tall and cut by the top edge, a FLAT field (one light fill, no ink or windows: LIFE §8) across y 317-556;
+- **Asymmetry for captions:** one side tall and cut by the top edge, a FLAT field (one light fill, no ink or windows: LIFE §8) through the caption band (y 290-600: `LAYOUT.md` §1);
   the other side tops out below y 600 in x 95-945 (only the gutters rise [AU §3]); a symmetric 1:1 lane can't hold them [EN §3].
 - **Streets:** horizon 0.50-0.60 H, VP at 0.60-0.70 W [EN §3]; kit lane `PerspectiveStreet` camH 160, road 150, walk 150,
   heights 500-750, vp [650-750, 960-1150], once it has a caption `quietY`. **Interiors:** a soffit cuts the
@@ -358,27 +362,24 @@ The kit column names engine pieces as references only (playbook: no reusable ass
 | # | move | emotion | 2D recipe | kit |
 |---|---|---|---|---|
 | K1 | **Close-up -> wide cut** | the jolt of smallness | a plain cut (F: at most 2 per film, only on a "But" turn, the thread on both sides: `CRAFT.md` §a), or made one move by the S5 pull-back: face / object 0.5-0.7 H, cut on a breath to the observer at 0.04-0.08 H and <= 1/8 of the close-up (0.5 H -> <= 0.06 H); wide 2.5-4 s, line <= 6 words; back by a carrier (a push-through into the home place, A), never a second plain cut; incoming camera already moving (first key 0.5-1.5 s before the cut) | EXISTS: `camSpeedAt` (`cine/camera.tsx`), `WipeCut` (`cine/props.tsx`) |
-| K2 | **Tilt-up reveal** | "it keeps going" | `tilt` 600-900 px in 2.5-3.2 s (900 px needs >= 2.9 s), `CAM.reveal`; horizon 0.40 -> 0.70 H; top lands 0.08-0.15 H or cut; + 3-5 % zoom-out (a tilt has no parallax); flat across y 280-570 | EXISTS: `CineCamera tilt`, CineDemo A, `EndlessCity` colossal `quietAbove` (`cine/city.tsx`), `Tower` (`cine/tower.tsx`) |
+| K2 | **Tilt-up reveal** | "it keeps going" | `tilt` 600-900 px in 2.5-3.2 s (900 px needs >= 2.9 s), `CAM.reveal`; horizon 0.40 -> 0.70 H; top lands 0.08-0.15 H or cut; + 3-5 % zoom-out (a tilt has no parallax); flat across the caption band (y 290-600) | EXISTS: `CineCamera tilt`, CineDemo A, `EndlessCity` colossal `quietAbove` (`cine/city.tsx`), `Tower` (`cine/tower.tsx`) |
 | K3 | **Rise-over (crane)** | the world opens past the wall | crane `y` 400-700 px in 2.5-3.5 s (the ledge moves 1.3x: 700 px needs >= 2.9 s), `CAM.reveal`; a roof / ledge (depth -0.3, `#8A9AA8`, `#545F6D` lip) fills the bottom 30-45 % and slides out the bottom; horizon hidden behind rows; the colossus (depth 0.85) drifts down only 0.15x the crane and "rises" against the falling ledge, so start it cut by the top with that margin | EXISTS: `y` keys, `Ledge` / `Balustrade` (`cine/props.tsx`), `Monument quietY`, CineDemo B |
 | K4 | **Pull-back, intimate -> vast** | our world becomes a dot | dolly from push ~0.8 to 0 anchored on the subject; far x0.95 / mid x0.75 / fore x0.67 (ref-2 shot 16); dolly not zoom, so the room shrinks 5x and a depth-0.85 colossus 1.14x; land at 0.04-0.08 H, hold 0.6-1.0 s. Budget: 5x takes 5.6 s centred (9 s anchored low) at peak 15, so skip ~2x of it in a hidden cut on a dark wiper (S09's door match-cut) or settle for 2.3x in 3 s; never a bare allow-list (S09 hit 80 px/frame) | EXISTS: `push` / `anchor`, CineDemo C, `WindowCloseup` LOD hand-off (`cine/props.tsx`); `revealPlan()` TO BUILD |
 | K5 | **Slow push to the vista** | resolve, looking out | `push` 3-8 % in 2-4 s, `CAM.slow`, anchored on the far VP (`anchorDepth` >= 0.85); back-view figure 0.25-0.35 H cut by the bottom (7 of 12 Arcane stills face a vista) | EXISTS: `ShotCam push` (`src/lib/ShotCam.tsx`) |
 | K6 | **Locked tiny-figure wide** | stillness, being watched | locked camera (no handheld jitter: 3b.5); observer 0.04-0.08 H, fill-only, on the axis; colossus cut by the frame >= 10:1; life on 3 speed tiers, never 1 s still, none inside the city mass (Scale cues 11: birds, a pennant, one window on, white steam); 2-3.5 s | EXISTS: `LitWindows` (`cine/windows.tsx`), `WallOfWindows` (`cine/wall.tsx`), `TinyCrowd` (`cine/figures.tsx`), `Birds` (`cine/sky.tsx`) |
-| K7 | **Worm's-eye on the colossus** | power over you | camera 0.3 m, horizon 0.58-0.64 H (the observer's feet above y 1250); colossus >= 0.7 H cut by the top, flat above y 556; one tiny mover 0.01-0.02 H at 10-20 px/s, clouds 8-15 px/s on depth 1; optional 2-4 % tilt | EXISTS: `Tower vpy`, `Monument` (`cine/monument.tsx`), `LensFigure` (`cine/lens.tsx`); data center TO BUILD |
+| K7 | **Worm's-eye on the colossus** | power over you | camera 0.3 m, horizon 0.58-0.64 H (the observer's feet above y 1250); colossus >= 0.7 H cut by the top, flat through the caption band (y 290-600); one tiny mover 0.01-0.02 H at 10-20 px/s, clouds 8-15 px/s on depth 1; optional 2-4 % tilt | EXISTS: `Tower vpy`, `Monument` (`cine/monument.tsx`), `LensFigure` (`cine/lens.tsx`); data center TO BUILD |
 | K8 | **Shaft / one lit window** | one person, one light, in a vast structure | shaft core 0.10-0.14 W on the axis, one halo step of at most 1.7x or none (`CRAFT.md` §d.7), widening 1.3-1.6x down into a pool 2x the core with the observer in it, top below y 600; or one warm window (the pop) in a cold grid (Hopper) | EXISTS: `LightShaft`, `Glow` (`cine/light.tsx`), `WallOfWindows` events |
 | K9 | **Frame push-through** (Cullen here -> there) | leaving the refuge for the stakes | a window / doorway at depth -0.5 [EN §7] holds the opening at 15-25 %; push 0 -> 0.85 anchored on the far subject (depth 0.85) in 1.2-2 s, `CAM.ease`; the opening's edges stay <= 15 px/frame until the mullion wipe, which hides the over-cap pass (allow-list only that window); carry speed into the next shot | TO BUILD: `Portal`, `roomBox` holes; wiper EXISTS (`WipePass`, `cine/props.tsx`) |
 | K10 | **High angle from the institution** | being looked down on by power | horizon 0.15-0.30 H, verticals converging down; calm, linear; once per video, on a crowd or plaza, never on the lone subject | PARTLY: `EndlessCity vp` roof tops (`cine/city.tsx`) |
 
 ## 5. Vertical short-form rules
-- **Stage:** key reads stay out of the platform UI zones (`G5_BLOCKING.md` §2 "Screen zones", the one definition: top
-  y < 180, bottom y > 1520, right rail x > 950 at y 900-1500) and 120 px from the side edges, the subject's read in
-  y 600-1250; ad templates cover more (the bottom 35 %, x > 780 from y 840 [VE §2, REPORTED]). Masses may run under the
-  UI; figures, labels, the pop and contact points never.
-- **Stack the depth vertically:** captions on a flat field at L* >= 70 (7:1 with the ink; `#8A9AA8` is 5.9:1) in y 290-600,
-  the read in y 600-1250, a foreground mass cut by the bottom; <= 2 points of interest per scale shot, x 380-700 [VE §3].
-- **Observer** 60-150 px (floor 40), fill-only below 80 px, the stage's only high-contrast mark. **Horizon** in eye-height
-  scale shots 0.52-0.59 H (top edge >= 45° up, feet above y 1250); a 0.3 m camera allows 0.64 H [VE §1]; a city vista from
-  a roof (S1/S5 landings) 0.43-0.46 H, feet 2-3 figure heights below it (`CINEMATIC_GUIDE.md` Scale cues 6).
-- **Time and captions:** payoff words on frame 0, never a silent scale opener; nothing scale before 3 s unless the move IS the
+- **Stage, the depth stack, the observer and the horizons** moved to `LAYOUT.md` (2026-10-29; the evidence stays
+  [VE §1-3]): §1 the zones (the platform UI, organic and ad; the side margins; the read zone; the caption band's flat
+  field at L* >= 70 for the ink's 7:1, which the dusk ledge `#8A9AA8` misses at 5.9:1; the bottom third), §2 the shot
+  types (the observer's size, the horizon by shot, the roof vistas named apart: S1 lands at 0.40 H, S5 at 0.46 H).
+  Masses may run under the UI; figures, labels, the pop and contact points never.
+- **Time and captions:** frame 0 shows the first spoken line and the payoff is in words by ~2 s (`DIRECTION.md` rule 9),
+  never a silent scale opener; nothing scale before 3 s unless the move IS the
   claim; captions pop in place in screen space (never on a camera layer or clipped by a wiper), a change at least every 1.5 s,
   also through moves; still peak frames 1.5-3 s; target 30-45 s (playbook).
 - **Safety:** never > 3 flashes in any 1 s, at any size (Ofcom's 25 %-of-screen allowance assumes a TV at >= 2 m; WCAG's

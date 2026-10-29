@@ -68,7 +68,7 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
   Before goes on the left, after on the right; more goes up or taller; time runs left to right. A scale panel inverts the
   size rule: its subject is too big to take in (§7, shot `scale: true`).
 - **Silhouette and depth:** filled solid black at 270 x 480, the subject and its action can still be named; nothing touches its key edge,
-  hands stay off faces and bodies, objects overlap clearly or keep 30 px apart. At most 3 planes for staging (near, middle, far); the
+  hands stay off faces and bodies, objects overlap clearly or keep 30 px apart. Stage in 3 planes (near, middle, far; the set's full list, 4-6 in a shot, is its `planes` field: `CRAFT.md` §f.1); the
   weight follows the TIER, never the plane (§2): A (9 px, a dark mass, or paper-white against light), B (3 px mid-grey lines, never a
   dark mass), C (no line: a flat light shape or light-grey scribble, no detail). Overlap does the rest; no perspective grids.
 - **People are gesture figures:** a head circle (r = 0.09 h), a bean-shaped torso along one curved line of action, limb lines, mitten
@@ -88,9 +88,9 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
   breathes. Outside the subject zone, bare paper is legal only where the final film stays plain, declared
   `negative: true`; every surface that will be dense or alive at G5 carries a placeholder mass (`G3_ANIMATIC.md` §3).
   A set panel over ~55 % bare stage, or a wide with no `role:'dress'` layer, is a lint WARN. Nothing important sits within 120 px of a side edge or in a
-  platform UI zone (`docs/G5_BLOCKING.md` §2, "Screen zones": the right rail x > 950 at y 900-1500, the bottom y > 1520, the top y < 180). The
-  **caption band** (y 290-600) is plain paper or one flat light sky, and no lines cross it. The captions keep today's
-  in-place pop (100 px ink), and the frame-0 payoff line sits above them.
+  platform UI zone, and the **caption band** is plain paper or one flat light sky with no lines across it (the zones'
+  one definition: `LAYOUT.md` §1). The captions keep today's in-place pop (100 px ink); frame 0 shows the first spoken
+  line as a normal caption, never a title over it (owner, v3, 2026-10-28: `docs/G5_BLOCKING.md` §5).
 - **Notes strip (big words, v3 G3 fix round):** one strip at y 1680-1920, paper with a 2 px light rule, written for the director
   reading a 25 % contact sheet. Line 1, 48 px ink, bold, at most 2 lines: shot id, shot type, COZY / SCALE and the camera move
   ("S9 · SCALE 2/3: RISE over OUR ROOF (the big move)"). Line 2, 38 px ink, at most 2 lines: the one idea in plain words, then
@@ -223,7 +223,7 @@ Clarity and cinematics are not a trade-off. Each panel names its shot type and f
   colossus cut by BOTH side edges (a wide hall, its sign readable), with a ruler at its foot (a row of houses, drawn paper
   with far lines so they show on a light body). The rise-over's near plane must read as OUR ROOF: a parapet lip (a light
   coping strip) and one vent in the roof's tone, and "OUR ROOF" in the notes; a flat grey slab read as ground, a hill or a
-  sinking building. The worm's-eye: horizon low (~0.78 H), the colossus or pile past both side edges up to the caption band,
+  sinking building. The worm's-eye: horizon 0.58-0.64 H (the figure's feet above y 1250; at ~0.78 H they fell under the bottom UI: `LAYOUT.md` §2), the colossus or pile past both side edges up to the caption band,
   >= 10:1 over the figure; the tiny figure stands on plain ground IN FRONT (against a busy colossus it vanishes). The ladder's
   small end: the one object breaks out of its container (over the bezel and the keys) and is the biggest whole thing in the
   frame (>= 60 % W); inside a screen rectangle it reads as a picture on the display.

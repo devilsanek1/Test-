@@ -417,7 +417,8 @@ Everything that agent knew is in this repo. This file is the map; the details li
     `voice/` (the API voice), `POSTING_KIT.md`, `retro/` (spend forensics; `2026-10-27_v3_retro.md`: the approved
     pipeline change), `PIPELINE_RESEARCH.md`, `WRAPUP.md` (v1 end state).
   - **Look (current): `look/DIRECTION.md` (the one page; read it first), `look/CRAFT.md` (numbers, code, checks),
-    `look/STORYBOARD_STYLE.md` (the G3 board), `look/CINEMATIC_GUIDE.md` (shot types, scale cues, the opening),
+    `look/LAYOUT.md` (the frame: zones, shot framing, composition, the cover), `look/STORYBOARD_STYLE.md` (the G3
+    board), `look/CINEMATIC_GUIDE.md` (shot recipes, scale cues, the opening),
     `look/COZY_AND_SCALE.md`, `look/LIFE_AND_DENSITY.md`, `look/PALETTE.md` (+ `palettes.json`), `look/research/`.**
   - Per video: `vN/` (`OWNER_NOTES.md`, the core line, the script, the style page, plans; rejected options in
     `vN/archive/`).

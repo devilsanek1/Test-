@@ -127,9 +127,31 @@ G4 frame had the same pen and passed with a quarter of the strokes: the fix is a
   VERY subtle and both last steps the film must work without: the owner's halftone (`PALETTE.md` "Texture and lines":
   at most 6 %, on a few chosen elements, after G6), and, being tested since 2026-10-28 (owner: "start playing with it,
   very subtly especially if its adding to the premium look"), a fine paper-and-paint texture with gentle mottling in
-  the big flats, static and locked to the world (never boiling), its numbers from the city-poster study
-  (`docs/studies/2026-10-28_city_posters/`), judged in a look clip and kept only if it adds to the premium feel.
+  the big flats, static and locked to the world (never boiling), to the test spec below, judged in a look clip and kept
+  only if it adds to the premium feel.
+- **The paper-and-paint test, its spec** (city-poster study, 2026-10-28: `docs/studies/2026-10-28_city_posters/`
+  `STUDY.md` §5.1, §7, `style.md` §1.4). The posters carry a grain of 0.2-0.9 L* (~2.5 px) and a coloured mottle of
+  0.4-0.7 L* in 40-70 px blotches on every fill; v2 is dead flat. The test: the mottle only, std <= 0.5 L* in 30-70 px
+  blotches, its colour <= 0.35 in a*b*; static and locked to its parallax plane (each plane carries its own and moves
+  with it), its strength by plane 1.0 / 0.7 / 0.4 (tiers A and B / near C / far C), the sky ~0.6 (est.); none in the
+  caption band (DIRECTION rule 10); no grain in the first test, and a grain, if ever tried, at most 0.25 L* std (~2.5
+  px). Its cost through H.264 at 60 fps (v2 S1 panning): the world-locked mottle +27 % master bitrate, 84-95 % of it
+  kept on the platform's rungs, `check_banding.py` PASS; with the subtlest posters' grain (0.25 L*) +48 %, the grain
+  halves at 720p and starts to shimmer; locked to the screen 6.2x the bitrate, re-seeded each frame 14x and erased:
+  never. Applied after G6; the film works without it. Code (to build): `lib/texture.tsx`, a texture mode in
+  `check_banding.py`.
 - **Line motion:** an object draws on as one stroke, never edge by edge; no `exitLoose`, no boil.
+- **Thin lines twinkle in the float** (measured, city-poster study, 2026-10-28: `details.md` §3 in
+  `docs/studies/2026-10-28_city_posters/`). Under the parallax float (DIRECTION rule 8) a line under 2 px straddles
+  pixels as it moves, so its core dims and recovers 2.5-25 times a second, in the renderer before any codec: the swing
+  of its core contrast is 0.55-0.66 for a 1.0 px line, 0.17-0.27 at 1.5 px, 0.65-0.79 for a 1 px grid; lines of 2 px or
+  more and window ticks of 4 x 6 px or more do not twinkle, and on a locked hold everything survives. The visible swing
+  is that share times the line's dL*: keep it <= ~2 L* on anything that floats (est.). It clashes with C's hairlines
+  above (1.2-1.6 px at up to dL* 15 swing ~3-7 L* in a float, est.; every line under 2 px is touched, A's 1.8 px
+  details and B's line from 1.6 px less so), and `STUDY.md` §7 does not settle it, so it is
+  **the owner's call (open):** (a) hairlines 2.0 px on the planes that float; (b) 1.2-1.6 px kept quiet there (twinkle x
+  dL* <= ~2 L*: about dL* 7 at 1.5 px, est.) or only on locked shots and still planes. Until the owner answers, C's
+  hairlines stand: check every float at 1x for twinkle.
 - **Code: the CLEAN pen** (the sketch pen stays for G3 boards), set once in the film's look module: `lib/pen.ts`
   `setPen('clean')` (the full pen with tiers, work in progress; `lib/sketch.ts` `setPenMode('clean')` is v2r's lighter
   one). Its targets: `misreg` {0,0,0}; `stroke` hero 3.0 / detail 2.0 / tone 1.8 / hair 1.2; rects, polys and loops one closed
@@ -166,8 +188,17 @@ G4 frame), halos as opaque discs, no cast or contact shadow in any kit file, no 
    rose or plum; cool ones 10-16° toward violet. On the main surfaces the tints give form dL* -7 to -12, cast -10 to -15,
    contact -15 to -25 (thin strips only): ref 1's one flat step is "gentle"; the cozy references' -25 to -40 is too hard
    for our pale palettes. (v3: room form #EEDCDC, cast #E3CCD3, contact #C8A3B0; dusk #D3CFEA, contact #B4AED8.)
+   **How deep the subject's shade face goes is the owner's open call** (city-poster study, 2026-10-28: `STUDY.md`
+   §5.3-5.4, §7, §9 decision 1): every poster volume is one deep flat step, -21 to -37 L* (median -29; v2's S3 chimney
+   -5). (a) Keep -7 to -12 on every tier (rule 5's "gentle in value"); (b) the subject's (tier A) shade face -20 to -25
+   L*, B and C keeping -7 to -12, with or without A's outline (the A vs B picture). Until the owner answers, the numbers
+   above stand.
 4. **Form shadow** on the side away from the key, 25-40 % of the object's width: one flat, hard-edged step, no ink on its
-   edge; a crescent on round things; about 3:1 lit to shade by area on what faces the key.
+   edge; a crescent on round things; about 3:1 lit to shade by area on what faces the key. Every volume reads in 2-3
+   flat tones, a lit face and a shade face (DIRECTION rule 5; city-poster study, 2026-10-28, `style.md` §1.2): a prism
+   in two, a round form in up to three stepped bands (the posters use 3-4: their Round Tower L* 30 / 40 / 57 / 70),
+   never a gradient (the posters' shade turns cool on whites and plum on warm walls, chroma kept; ours follows §d.3's
+   tint family).
 5. **Cast shadow** = the footprint swept along the light: 0.3-0.8 h long under a sun; under a lamp h·d / (H_lamp − h),
    capped at 1.5 h and only inside the pool (outside it, contact only); flattened by the ground's ry/rx (desk 0.3,
    street 0.2-0.35); sharp at the base, a 10-14 px half-tint step at the far end.
@@ -303,6 +334,19 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
    `docs/v2/water/judge_metrics.py` against the last approved water (cool %, piece-end edges, thin light marks, glitter
    gold, quick toggles), and `docs/v2/water/master_check.py` on the master (the colour numbers above); eye check at
    phone size: a calm, glassy canal with its reflections, never boxes, dashes, stars or a stack of pancakes.
+8. **A full value range: a calm light sky, a mid-tone world and a few real darks where the eye should go** (DIRECTION
+   rule 6; owner, 2026-10-28: "good point too!"; numbers: city-poster study, 2026-10-28, `STUDY.md` §1a, §5.5, §7, from
+   `pro_1_depth.md` and `pro_4_colour.md`). Per frame, the caption band out: the darkest 5 % of the pixels at L* <= 32
+   (p5; posters 23, v2 48), on anchor-dark pieces (§d.2); >= 30 L* from the near group (planes -2, -1) to the air
+   (posters 27-46, v2 10-15); L* < 65 on >= 25 % of the frame and 65-80 on <= 20 % (the posters 27-48 % and 8-14 %;
+   v2 21-47 % in between); a jump of >= 15 L* from the subject's group to the far group (posters 19-36). Keep the hues,
+   move the values: a grade closes only 16 % of the posters' gap, the rest is drawing (the darks, the filled ground, the
+   colour count). No darks in the caption band or on far planes. **The dark share is the owner's open call** (`STUDY.md`
+   §9 decision 2): (a) about 5 % of the frame dark, rule 6's tinted anchor (`PALETTE.md`), as now; (b) 6-10 % under
+   L* 40 in >= 120 pieces of >= 4 x 4 px across >= 9 of 16 grid cells (windows, doorways, eave undersides, the shade
+   under trees, hulls; the posters 13.8 % in 259 pieces, v2 1.9 % in 41). Until the owner answers, (a) stands. These are
+   WARNs, like this page's other thresholds; a still is measured with `scripts/look/posters/pro_4_colour.py` until
+   `check_depth.py` gets its value parts (to build: `STUDY.md` §1a).
 - **Code:** `lib/water.tsx` (§7: `<Water>`, `waterProblems`, `waterPalette`; how-to `lib/WATER.md`, demo
   `src/entry-v2r-water.tsx`), `lib/depth.ts` (`makeAtmosphere`, `recede`, `planePalette`, `toneOnTone`, `backing`, `groundCam`, `flight`,
   `band`, `quadForPlane`, `poissonDisk`, `depthProblems`, `sizeProblems`; the parallax float `parallaxOffset`,
@@ -341,7 +385,7 @@ flat. Measured on the S1 demo (`research/2026-10-27_sky_gradients.md` §5):
 1. **One sky, frame top to horizon:** key colours in OKLCH, mixed in OKLab, joined by one eased curve (a monotone
    cubic: no stop line, no overshoot), as painters paint an evening: a zenith a touch deeper and cooler (dL* <= ~1.3:
    deeper reads richer but contours after a platform's re-encode), the caption field FLAT through the caption band
-   (dL* <= 1.5 across y 317-556, ink >= 7:1), then lighter through a pale warm light band (the sky's lightest, a step
+   (dL* <= 1.5 across the caption block, y 317-556: `LAYOUT.md` §1; ink >= 7:1), then lighter through a pale warm light band (the sky's lightest, a step
    over both neighbours) into the warm horizon. The cool-to-warm crossing happens in that light band at C* <= 7, and so
    does the sun's warmth where it meets the mint (a 2-stop sRGB mint -> peach goes through khaki #DCDBC5; a 2-key OKLab
    one crosses yellow-green at C* 13).

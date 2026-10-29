@@ -16,27 +16,33 @@ key here"; "our look is evolving - we are finding out style i don't think we can
 2. **Then, in order:** this page > `CRAFT.md` (numbers, code, checks) > `docs/PIPELINE_V2.md` (gates) >
    `docs/G3_ANIMATIC.md`, `docs/G5_BLOCKING.md` (gate specs) > the look docs in `docs/look/` > the film's STYLE.md (its
    values only: it never restates or overrides a rule) > the v1-era docs (API and measurements, never style). Between
-   two look docs, each wins on its own topic (`STORYBOARD_STYLE.md` the board's drawing, `CINEMATIC_GUIDE.md` shot types
-   and camera numbers, `COZY_AND_SCALE.md` cozy framing, `LIFE_AND_DENSITY.md` fullness and life, `PALETTE.md`
-   colour), and a measured number beats a proposal.
+   two look docs, each wins on its own topic (`LAYOUT.md` where things sit in the frame: the zones, each shot type's
+   framing, the cover; `STORYBOARD_STYLE.md` the board's drawing, `CINEMATIC_GUIDE.md` shot recipes and camera moves,
+   `COZY_AND_SCALE.md` cozy framing, `LIFE_AND_DENSITY.md` fullness and life, `PALETTE.md` colour), and a measured
+   number beats a proposal.
 3. **Beside the ladder, each on its own topic and under the owner's words:** `docs/CREATIVE_BRIEF.md` (the channel,
    story selection, writing; the playbook's later rules win where they differ, as its banner lists), `docs/ELEVENLABS.md`
    with `docs/voice/` (the narration), `docs/POSTING_KIT.md` (posting). `CLAUDE.md` and `HANDOFF.md` summarise and map
    these: a clash there is a stale summary.
 A clash is a bug: fix the lower doc in the same turn.
 
-**Open study (owner, 2026-10-28):** the owner likes the style of seven illustrated city posters (`docs/look/poster_refs/`)
-and wants to experiment with it, starting from v2's look ("i really like the style and i want us to experiment more with
-the style and the focus on our videos"). What we learn from them (perspective, visual style, details, composition) and
-which content fits a world of cities and buildings are studied in `docs/studies/2026-10-28_city_posters/`. **Already
-decided by the owner (2026-10-28), in the rules below:** one look for every video, still evolving (the intro; rule 3);
-Pip stays, hidden on purpose (rules 1-2); a VERY subtle
-paper-and-paint texture may be tried (rule 4); every volume in lit and shade tones (rule 5); a full value range (rule
-6). **Still open:** the posters' outline-free edges (the owner judges an A vs B picture; rule 4's lines stand until
-then), one consolidated layout guide (our earlier layout rules reconciled with the posters' findings), the designed view
-("unique camera angle and composition of objects", which the owner finds fascinating) and the study's techniques for the
-owner's four feelings. The specific local objects of a place are content, not style (owner). Everything else in the
-study is a proposal until the owner approves it.
+**The city-poster study (owner, 2026-10-28; done 2026-10-29):** the owner likes the style of seven illustrated city
+posters (`docs/look/poster_refs/`) and wants to experiment with it, starting from v2's look ("i really like the style
+and i want us to experiment more with the style and the focus on our videos"). Its conclusions are
+`docs/studies/2026-10-28_city_posters/STUDY.md` (each marked owner, open or proposal) and `SUMMARY.md` (one screen);
+its numbers for what is decided are in `CRAFT.md` (§c the texture test, §d lit and shade faces, §f.8 the value
+range), its palettes are proposals in `PALETTE.md`, and our earlier layout rules, consolidated and reconciled with the
+posters, are `LAYOUT.md` (the owner: "layout is a big aspect"). **Decided by the owner (2026-10-28), in the rules
+below:** one look for every video, still evolving (the intro; rule 3); Pip stays, hidden on purpose (rules 1-2); a VERY
+subtle paper-and-paint texture may be tried (rule 4); every volume in lit and shade tones (rule 5); a full value range
+(rule 6). **The owner's open calls** (the study's §9; until each is answered, the rules below stand as written):
+outline or no outline (the A vs B picture; rule 4's lines stand); the dark share (rule 6's small tinted anchor as now,
+or more darks in many small pieces); how deep the subject's shade face goes (rule 5's "gentle", or the study's deeper
+step); the "low poly" patchwork world; the designed view (a second horizon for the far city: "unique camera angle and
+composition of objects", which the owner finds fascinating); the sun disc; thin lines in the parallax float (`CRAFT.md` §c:
+2 px, or kept quiet). The specific local objects of a place are
+content, not style (owner). Everything else in the study is a proposal until the owner approves it; its next step is
+one look clip of v2's canal bank (STUDY.md §10).
 
 ## The rules
 - **1. One flowing story, never shots stitched together.** One story on ONE core line (spine first, each line following
@@ -92,7 +98,7 @@ study is a proposal until the owner approves it.
   creams, terracotta, rose, leaf sage, golden light, plum and red-brown shadows; never beige, muddy tan, olive or
   grey; a warm world held by one cool field; saturation as confetti, never fields; a full value range: a calm light
   sky, a mid-tone world and a few real darks where the eye should go, never a narrow band of light pastels (owner,
-  2026-10-28; numbers: the city-poster study). Money and everyday life: #9 Autumn
+  2026-10-28; numbers: `CRAFT.md` §f.8, from the city-poster study). Money and everyday life: #9 Autumn
   Ember (#7 Autumn Ochre read sick). **One continuous sky** (owner, v2 G4): from the frame top to the horizon the sky
   is ONE gentle, smooth gradient (the owner's opt-in: the sky is the one place a gradient is welcome; "find a beautiful
   way to do a gentle gradient"; water may mirror that same sky, toned toward it: the sky's own gradient seen in it,
@@ -107,7 +113,7 @@ study is a proposal until the owner approves it.
   pull-back crane, retimed to the reel: S5's default is a 2.6 s move + a 0.7 s hold); a scale beat never arrives by a
   plain cut except on a "But" turn (rule 1). It must feel GREAT: a world that keeps going past every edge, a landmark
   huge yet far, tiny anchors, a big sky, life in the hold. Arcane gives environments and camera only. ->
-  `COZY_AND_SCALE.md` §1-3b; `CINEMATIC_GUIDE.md` S1, S5, "Scale cues".
+  `COZY_AND_SCALE.md` §1-3b; `CINEMATIC_GUIDE.md` S1, S5, "Scale cues"; the framing per shot type: `LAYOUT.md` §2.
 - **8. Motion and camera.** 60 fps from G3 on, timed in seconds; drawn poses may step while the camera glides. Things
   pop, grow, wipe or slide in; a draw-on is frame 0's, and after it only where the drawing is the beat (a chart line
   in step with the voice); no opacity fades (a dissolve only as a declared time-passing exception). A reference gives
@@ -126,11 +132,11 @@ study is a proposal until the owner approves it.
   life. It loops back to frame 0's drawing state; 30-45 s, ending near the payoff. The lined films drew every shape's
   line first (a bare-line frame 0); the owner sees this clean-pen version in the next G4 look clip. ->
   `CINEMATIC_GUIDE.md` "The opening"; playbook Hook and pacing.
-- **10. Captions** pop in place, burned in, never a roll-in that clips letters; the caption band (screen y ~290-600) is
+- **10. Captions and the frame** (where everything sits: `LAYOUT.md`, the one definition of the zones, shot framing,
+  composition and the cover). Captions pop in place, burned in, never a roll-in that clips letters; the caption band is
   one calm flat field (no lines, detail or shadow edge across it); ink on light, white on dark. No key read in the
-  platform UI zones (top, bottom, right rail: `G5_BLOCKING.md` §2 "Screen zones"). No paper edge at the top or beside
-  the band (edges: opt-in per film, decided with the G4 look clip, 'paint-subtle' at most). -> `G5_BLOCKING.md` §2,
-  §5; `EDGES.md`.
+  platform UI zones (top, bottom, right rail). No paper edge at the top or beside the band (edges: opt-in per film,
+  decided with the G4 look clip, 'paint-subtle' at most). -> `LAYOUT.md` §1, §5; `G5_BLOCKING.md` §5; `EDGES.md`.
 
 ## The approved pipeline (owner, 2026-10-27: "Yes"; gates and budgets in `docs/PIPELINE_V2.md`)
 A DESIGNED sketch: G0 topic (then the fact lock) -> G0.5 core line (and the draft of its through-line card) -> G1
