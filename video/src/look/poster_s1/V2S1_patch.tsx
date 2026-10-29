@@ -26,6 +26,7 @@ const CACHE = new Map<string, Patchwork>();
  *  size on S1 (2026-10-29): the busy one read as a checkerboard over the whole bank; the decided look is `calm`. */
 export const PAVING = {
   busy: {cell: 0.9, n: undefined as number | undefined, step: undefined as number | undefined},
+  mid: {cell: 1.2, n: 3 as number | undefined, step: 4.5 as number | undefined},
   calm: {cell: 1.2, n: 2 as number | undefined, step: 4.5 as number | undefined},
 } as const;
 export type PavingKind = keyof typeof PAVING;

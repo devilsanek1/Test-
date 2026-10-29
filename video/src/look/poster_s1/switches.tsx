@@ -45,8 +45,9 @@ export type PosterSwitches = {
   /** Part of `darks` (decision 2 b): the near world in mid-tones (near.ts). Undefined = follows `darks`; set it to
    *  split the A/B (the dark pieces alone, or the mid-tones alone). */
   nearMid?: boolean;
-  /** Part of `patchwork`: the paving's setting (V2S1_patch PAVING: 'calm', the decided one, or 'busy', the first pass). */
-  paving?: 'calm' | 'busy';
+  /** Part of `patchwork`: the paving's setting (V2S1_patch PAVING: 'calm', the decided one; 'mid', PT's 3 tones at the
+   *  same cell; 'busy', the first pass). */
+  paving?: 'calm' | 'mid' | 'busy';
   /** Part of `texture`: a multiplier on every plane's mottle strength (default 1 = lib/texture's mottleK; for A/Bs). */
   textureK?: number;
 };
