@@ -49,10 +49,19 @@ owner never pastes anything. Proven on 2026-10-26: video 2's API take was clean 
 3. **Check:**
    `python3 scripts/voice/check_take.py assets/vN/api_take1/take.wav docs/vN/script/script_elevenlabs.md "$PARAKEET_DIR"`
    must print MATCH (exit 0). Listen once to anything marked "OK (Whisper)" or "LISTEN".
-4. **Deliver:** send `take.wav` to the owner as an attachment (audio only before G3).
-5. **Lock it for G3:** add a 0.12 s lead and write `public/vN/voice.wav` + `public/vN/voice_words.json`, as for video
+4. **Explore and shape the delivery (owner, v4 G2: "play with the cadence and emotions to get to the best possible
+   outcome"):** Eleven v4 takes no speed or style, so the delivery is explored with the model, the stability and the
+   tags (a few whole-script reads: e.g. v4 at 0.35-0.5 with the plain and a livelier tag set, v3 Conversational),
+   compared with `python3 scripts/voice/measure_take.py A.wav B.wav --words <stressed words>` (words/min, pauses,
+   pitch spread, stress) against the owner's reference (`docs/voice/refs/`), then the best read is shaped with
+   `python3 scripts/voice/shape_take.py take.wav paste.md shaped.wav --tempo 1.10 --tempo-at "<payoff words>=1.0"
+   --beat "<turn words>=0.45" --beat "<payoff words>=0.5" --polish --report shape.json` (gaps 0.26 s at a sentence,
+   0.30 at a paragraph, commas and breaths only shortened; Rubber Band keeps the pitch) and checked again with
+   `check_take.py` (MATCH). The owner still gets ONE take; the variants stay ours.
+5. **Deliver:** send `take.wav` to the owner as an attachment (audio only before G3).
+6. **Lock it for G3:** add a 0.12 s lead and write `public/vN/voice.wav` + `public/vN/voice_words.json`, as for video
    2 in commit 93852c3. The first word then lands at ~0.12 s (frame 7 at 60 fps): that is the playbook's "voice from
    the first frames", with room for frame 0's drawing to lead it; never a longer silent lead.
-6. **Log:** add the take (paste stats, settings, outcome) to `docs/ELEVENLABS.md` section 5.
+7. **Log:** add the take (paste stats, settings, outcome) to `docs/ELEVENLABS.md` section 5.
 
 Cost: about 1 credit per character per try (~700 for a 40 s script). Every API try is charged.

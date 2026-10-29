@@ -177,3 +177,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   heat an apartment in Helsinki." and the card); G2 explores cadence and emotion internally (a few variants with the
   voice Lady1: tags, expressiveness, pace, emphasis), measured against the El Niño reference and checked word by word,
   and the owner gets ONE take. -> rule: playbook, Script and voice (the take is explored for attention, one delivered).
+- 2026-10-29 ~19:00 UTC, G2: "are you able to do some post processing on the voice to play with cadence and controls?" ->
+  yes: `scripts/voice/shape_take.py` (pauses, beats, tempo per sentence by Rubber Band, polish) and
+  `measure_take.py`; nine reads explored (v4 at 0.5/0.35/0.45, v3, v3 Conversational; per paragraph and whole script);
+  the take: eleven_v4, stability 0.35, livelier tags, whole read, shaped to 41.2 s and 183 words/min with a beat before
+  "But Helsinki WANTS that heat" and the payoff; MATCH. Our check had failed every read on "70 000": fixed
+  (`scripts/voice/textnorm.py`). -> rule: playbook, Script and voice (explored and shaped, one take sent).

@@ -9,7 +9,9 @@
     settings were tuned on the default voice, so judge the stability on this one. **Pace:** the owner's El Niño
     reference (`refs/2026-10-29_el_nino/`) reads at about 214 words a minute with 0.2-0.3 s pauses and a lively pitch;
     measure Lady1's pace on the first take and, if it reads much slower, try ElevenLabs' speed setting (about 1.05-1.15)
-    before cutting words; the word budget follows the measured pace.
+    before cutting words; the word budget follows the measured pace. Measured on v4 (2026-10-29): eleven_v4 reads
+    Lady1 at ~220 Hz with a lively 11-12 semitone spread and ~160 words/min whole-script; eleven_v3 renders her lower
+    (~180-190 Hz); v4's take was shaped to 183 words/min (`assets/v4/voice/shape.json`).
 - API key: the environment secret `ELEVENLABS_API_KEY`. Never print it, write it to a file or commit it.
 - Model and settings: `PROPOSAL.md` (root-cause study, 2026-10-26). `python3 video/scripts/voice/generate_take.py
   --list-models` shows what the key can use.

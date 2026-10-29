@@ -149,7 +149,13 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   `public/vN/`; log it in `ELEVENLABS.md` section 5; commit and push after each step (pull first). **One full paste
   must narrate cleanly: a voice failure is our process bug, never the owner's problem** — fix it in the process. The
   key is the secret `ELEVENLABS_API_KEY`: never print, file, prompt or commit it. Only without the key does the owner
-  paste it (then always the full paste text). Never a voice the owner didn't pick: their cloned narrator voice by
+  paste it (then always the full paste text). **The delivery is explored and shaped for attention, one take sent**
+  (owner, v4 G2, 2026-10-29: "play with the cadence and emotions to get to the best possible outcome capturing people
+  attention and keep them engaged"; "are you able to do some post processing on the voice to play with cadence and
+  controls?"): a few whole-script reads (model, stability, tags) measured against the owner's reference read
+  (`docs/voice/refs/`; `scripts/voice/measure_take.py`), the best one shaped in post (`scripts/voice/shape_take.py`:
+  brisk gaps, a beat before the turn and the payoff, tempo per sentence, light polish), checked word for word again;
+  the variants stay ours. Never a voice the owner didn't pick: their cloned narrator voice by
   default, or the voice they name for a film (`docs/voice/VOICE.md`; v4, 2026-10-29: "lets try another voice - with
   this id MQnUCZUAQLYMCY1Ztz6d"). — (owner's standing instruction +
   v2 take 1, 2026-10-26).
