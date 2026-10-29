@@ -150,7 +150,10 @@ Pick: **7.1** (the payoff, a city company's boss) and **7.6** (the hinge, said b
 
 ## What the script may say
 
-The safest lines, in story order (sources in brackets). Words in the picture stay fewer than these.
+The safest lines, in story order (sources in brackets). Words in the picture stay fewer than these. The owner (2026-10-29):
+"it's okay to exhagerste a bit ... Exaggerating and generalizing and making it bigger is fine" (playbook: "true enough, the
+core event real"). So these lines are the floor, not a cage: the writer may round up and go bigger, as far as the next
+section allows.
 
 1. "One cabinet of AI chips gives off as much heat as about 40 kettles, boiling non-stop." (2.2; a 3 kW kettle) / "Almost every watt a data centre uses turns into heat." (2.1)
 2. "In an average data centre, about a third of the power never reaches the computers. Much of it goes on cooling." (2.4, 2.5)
