@@ -39,7 +39,7 @@ Top rules (details in the playbook):
   obvious target; the plain thought, never a hint; `check_clarity.py` OK and the critic's cold viewer panel at G1), no
   AI-sounding phrasing; detailed emotional cues. The narration is generated through the API with the ElevenLabs voice the owner picks
   (`video/docs/voice/VOICE.md`; their cloned narrator by default) (owner, 2026-10-26): follow `video/docs/voice/API_QUICKSTART.md` (paste format v2, `check_paste.py` OK, `generate_take.py`
-  `all_clean`, `check_take.py` MATCH; send take.wav, lock it into `public/vN/`, log it in `ELEVENLABS.md` section 5). Only
+  `all_clean`, `check_take.py` MATCH; send the take as .m4a (the phone app can't play .wav), lock it into `public/vN/`, log it in `ELEVENLABS.md` section 5). Only
   without the key does the owner paste it (then always hand over the full paste text).
 - Every lesson goes into the generic process (playbook, pipeline gate, studio toolkit) and is committed, so the next
   video doesn't repeat it.

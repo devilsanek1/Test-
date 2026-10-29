@@ -145,7 +145,9 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   in `docs/voice/VOICE.md`, procedure `docs/voice/API_QUICKSTART.md`, details `docs/ELEVENLABS.md`): paste format v2
   (few short tags, only at a paragraph start) with `check_paste.py` OK (it blocks every pattern that ever broke a take;
   only its `--handoff` text reaches the owner); `generate_take.py` (whole script first, auto-checked, auto-regenerated)
-  with `report.json` `all_clean`; `check_take.py` MATCH on every take; send take.wav as an attachment; lock it into
+  with `report.json` `all_clean`; `check_take.py` MATCH on every take; send the take as an .m4a attachment, with an .mp3 beside it (the Claude app on
+  the owner's phone can't play a .wav: "Can't open play it here", v4 G2, 2026-10-29; the .wav stays in the repo for
+  the mix); lock it into
   `public/vN/`; log it in `ELEVENLABS.md` section 5; commit and push after each step (pull first). **One full paste
   must narrate cleanly: a voice failure is our process bug, never the owner's problem** — fix it in the process. The
   key is the secret `ELEVENLABS_API_KEY`: never print, file, prompt or commit it. Only without the key does the owner

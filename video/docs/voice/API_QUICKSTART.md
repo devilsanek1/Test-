@@ -1,7 +1,7 @@
 # ElevenLabs API quickstart (any Claude session on this repo)
 
 **The owner's standing instruction for every future video (2026-10-26):** read `HANDOFF.md`, then follow this page;
-send take.wav as an attachment, lock it into `public/vN/`, log it in `docs/ELEVENLABS.md` section 5, and commit and push to
+send the take as .m4a (+ .mp3) attachments (the Claude app on the owner's phone can't play .wav), lock it into `public/vN/`, log it in `docs/ELEVENLABS.md` section 5, and commit and push to
 `video-production` after each step (pull first: another session pushes to the same branch).
 
 Goal: generate a video's narration with the owner's voice through the ElevenLabs API, checked word for word, so the
@@ -58,7 +58,9 @@ owner never pastes anything. Proven on 2026-10-26: video 2's API take was clean 
    --beat "<turn words>=0.45" --beat "<payoff words>=0.5" --polish --report shape.json` (gaps 0.26 s at a sentence,
    0.30 at a paragraph, commas and breaths only shortened; Rubber Band keeps the pitch) and checked again with
    `check_take.py` (MATCH). The owner still gets ONE take; the variants stay ours.
-5. **Deliver:** send `take.wav` to the owner as an attachment (audio only before G3).
+5. **Deliver:** send the take as `take.m4a` and `take.mp3` attachments (`ffmpeg -i take.wav -c:a aac -b:a 256k
+   -movflags +faststart take.m4a`; `-c:a libmp3lame -b:a 320k take.mp3`): the Claude app on the owner's phone shows
+   "File preview unavailable" for a .wav (v4, 2026-10-29). Audio only before G3; the .wav stays in the repo for the mix.
 6. **Lock it for G3:** add a 0.12 s lead and write `public/vN/voice.wav` + `public/vN/voice_words.json`, as for video
    2 in commit 93852c3. The first word then lands at ~0.12 s (frame 7 at 60 fps): that is the playbook's "voice from
    the first frames", with room for frame 0's drawing to lead it; never a longer silent lead.

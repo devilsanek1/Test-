@@ -183,3 +183,6 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   the take: eleven_v4, stability 0.35, livelier tags, whole read, shaped to 41.2 s and 183 words/min with a beat before
   "But Helsinki WANTS that heat" and the payoff; MATCH. Our check had failed every read on "70 000": fixed
   (`scripts/voice/textnorm.py`). -> rule: playbook, Script and voice (explored and shaped, one take sent).
+- 2026-10-29 ~19:20 UTC, G2: a screenshot of the app's "File preview unavailable" on take.wav: "Can't open play it here" ->
+  the same take sent as take.m4a and take.mp3 (`assets/v4/voice/`). -> rule: playbook, Script and voice (audio goes to
+  the owner as .m4a + .mp3); CLAUDE.md, PIPELINE_V2 G2, the quickstart.
