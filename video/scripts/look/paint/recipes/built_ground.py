@@ -489,7 +489,7 @@ def sun_veil(xx_frame, yy_frame, sx=330.0, sy=260.0):
 # ----------------------------------------------------------------------------------------------------------------
 # 5. ELEMENT 1: the far city as layered atmospheric haze (recipe 4.1)
 # ----------------------------------------------------------------------------------------------------------------
-# The plane ladder (recipe 3.4), far -> near. k = share of the way to the air; chroma = chroma kept; blur = the plane's
+# The plane ladder (recipe 3.5), far -> near. k = share of the way to the air; chroma = chroma kept; blur = the plane's
 # sigma (px); lost = the extra sigma on the tops by the sun; sliver = lit-edge width (px) on edges that face the sun;
 # wide = share of blocks with a whole face turned to the sun; win = share of blocks with lit windows; h = building
 # heights above the horizon (px); w = widths (px); types = the mix of building kinds.
@@ -1963,8 +1963,22 @@ class Sheet:
         self.d = ImageDraw.Draw(self.canvas)
         self.f_title, self.f_head, self.f_lab = _font(22, True), _font(16, True), _font(12)
 
-    def text(self, x, y, s, font, fill):
-        self.d.text((x, y), s, font=font, fill=fill)
+    def text(self, x, y, s, font, fill, width=None):
+        """Draw text, wrapped to `width` px; returns the height used."""
+        width = width or (self.w - x - 16)
+        lines, cur = [], ''
+        for word in s.split(' '):
+            trial = (cur + ' ' + word).strip()
+            if cur and self.d.textlength(trial, font=font) > width:
+                lines.append(cur)
+                cur = word
+            else:
+                cur = trial
+        lines.append(cur)
+        lh = int(font.size * 1.25) if hasattr(font, 'size') else 14
+        for i, ln in enumerate(lines):
+            self.d.text((x, y + i * lh), ln, font=font, fill=fill)
+        return lh * len(lines)
 
     def title(self, s, sub):
         self.text(16, 14, s, self.f_title, self.INK)
@@ -1973,22 +1987,22 @@ class Sheet:
 
     def head(self, s):
         self.y += 14
-        self.text(16, self.y, s, self.f_head, self.INK)
-        self.y += 26
+        self.y += self.text(16, self.y, s, self.f_head, self.INK) + 6
 
     def place(self, im, x, y, label=None):
         self.canvas.paste(im, (int(x), int(y)))
+        used = 0
         if label:
-            self.text(x, y + im.size[1] + 3, label, self.f_lab, self.SUB)
-        return y + im.size[1] + (20 if label else 0)
+            used = self.text(x, y + im.size[1] + 3, label, self.f_lab, self.SUB, width=max(im.size[0], 180)) + 5
+        return y + im.size[1] + used
 
     def column(self, x, y, w, h, keys):
         """Stack refs in a column of width w, scaled together to fit height h (labels included)."""
         ims = [ref_img(k) for k in keys]
         sc = [fit(im, w=w) for im, _ in ims]
-        total = sum(i.size[1] for i in sc) + 22 * len(sc)
+        total = sum(i.size[1] for i in sc) + 36 * len(sc)
         if total > h:
-            s = (h - 22 * len(sc)) / float(sum(i.size[1] for i in sc))
+            s = (h - 36 * len(sc)) / float(sum(i.size[1] for i in sc))
             sc = [i.resize((max(1, int(i.size[0] * s)), max(1, int(i.size[1] * s))), Image.LANCZOS) for i in sc]
         yy = y
         for im, (_, lab) in zip(sc, ims):
@@ -2025,63 +2039,65 @@ def build_sheet(seed=None, out=OUT_DEFAULT, phone_out=None, timings=None):
             'film scale (px of the 1080 x 1920 frame), the October canal evening, a low sun on the left; the refs '
             'beside, never traced')
     # 1 far city
-    S.head('1  FAR CITY AS LAYERED HAZE  4 planes; each farther one k +0.2 toward the air, less chroma, blur '
-           '0.3 > 0.6 > 1.0 > 1.6 px; slivers only on near planes; lost tops by the sun')
+    S.head('1  FAR CITY AS LAYERED HAZE  4 flat planes stepping L* 49 > 59 > 68 > 78 to the air (88); less chroma, blur '
+           '0.3 > 0.6 > 1.0 > 1.6 px; slivers and windows near; lost tops by the sun')
     y0 = S.y
-    S.place(far, 16, y0, 'ours, 1:1 (frame y 592-892): P0 flat blocks + in-scatter + mist, P2 sun-side faces, '
-            'P3 slivers, roof glow, window grids')
-    S.place(zoom(far, (560, 60, 1000, 210), 2), 16 + 60, y0 + far.size[1] + 22, 'ours, 2x: the clock tower, '
-            'the gasholder, slivers and windows')
-    S.column(1030, y0, 554, far.size[1] + 22 + 300 + 20, ['h01', 'c07', 'c03'])
-    S.y = y0 + far.size[1] + 22 + 300 + 22
+    ya = S.place(far, 16, y0, 'ours, 1:1 (frame y 592-892): P0 flat blocks + in-scatter + mist, P2 sun-side faces, '
+                 'P3 slivers, roof glow, window grids')
+    yb = S.place(zoom(far, (560, 60, 1000, 210), 2), 16 + 60, ya + 4, 'ours, 2x: the clock tower, the gasholder, '
+                 'slivers and windows')
+    yc = S.column(1030, y0, 554, yb - y0, ['h01', 'c07', 'c03'])
+    S.y = max(yb, yc) + 8
     # 2 facade
     S.head('2  PAINTED FACADE  a sunlit side face and a shaded front from one low sun; windows as value shapes; '
            'strokes where the form turns and the weather runs')
     y0 = S.y
-    S.place(fac, 16, y0, 'ours, 1:1: the final (the front in the shade family, every sun-facing edge a sliver)')
+    ya = S.place(fac, 16, y0, 'ours, 1:1: the final (the front in the shade family, every sun-facing edge a sliver)')
     px = 16 + fac.size[0] + 12
     for i, k in enumerate(['P0', 'P1', 'P2', 'P3']):
         im = keep[k].resize((196, 235), Image.LANCZOS)
-        S.place(im, px + (i % 2) * 202, y0 + (i // 2) * 258, {'P0': 'P0 design (flat)', 'P1': 'P1 soft strokes (8 px)',
+        S.place(im, px + (i % 2) * 202, y0 + (i // 2) * 258, {'P0': 'P0 design (flat)', 'P1': 'P1 soft strokes (blur 6)',
                                                              'P2': 'P2 panel strokes + brick', 'P3': 'P3 accents'}[k])
-    S.place(zoom(fac, (176, 268, 376, 368), 2), px, y0 + 2 * 258 + 4, 'ours, 2x: piers, cool patches, reveals')
-    S.column(px + 410, y0, 1600 - (px + 410) - 16, fac.size[1] + 20, ['p02f', 'c06f', 'c05f'])
-    S.y = y0 + fac.size[1] + 24
+    yb = S.place(zoom(fac, (176, 268, 376, 368), 2), px, y0 + 2 * 258 + 4, 'ours, 2x: piers, cool patches, reveals')
+    yc = S.column(px + 410, y0, 1600 - (px + 410) - 16, fac.size[1] + 20, ['p02f', 'c06f', 'c05f'])
+    S.y = max(ya, yb, yc) + 8
     # 3 brick and stone
     S.head('3  BRICK AND STONE UP CLOSE  brick suggested in patches (never every brick); stone as big flat blocks; '
            'chips, drips and speckle by the p02 method')
     y0 = S.y
     labels = dict(A='A stock brick, raking sun', B='B brick in shade, lit reveal, sill, stains',
                   C='C stone cornice from below: sunlit return, shaded front', D='D chipped, rust-stained render')
+    yt = y0
     for i, k in enumerate('ABCD'):
-        S.place(tiles[k].image(), 16 + i * 250, y0, labels[k])
-    S.place(zoom(tiles['A'].image(), (0, 0, 240, 120), 2), 16, y0 + 262, 'A at 2x')
-    S.place(zoom(tiles['D'].image(), (0, 60, 240, 180), 2), 16 + 500, y0 + 262, 'D at 2x')
+        yt = max(yt, S.place(tiles[k].image(), 16 + i * 250, y0, labels[k]))
+    ya = S.place(zoom(tiles['A'].image(), (0, 0, 240, 120), 2), 16, yt + 4, 'A at 2x')
+    S.place(zoom(tiles['D'].image(), (0, 60, 240, 180), 2), 16 + 500, yt + 4, 'D at 2x')
     xs = 1030
     ims = [ref_img(k) for k in ('c06b', 'c06r', 'p02i')]
     hh = 300
     x = xs
+    yc = y0
     for im, lab in ims:
         f_ = fit(im, h=hh)
-        S.place(f_, x, y0, lab)
+        yc = max(yc, S.place(f_, x, y0, lab))
         x += f_.size[0] + 8
-    S.y = y0 + 262 + 240 + 24
+    S.y = max(ya, yc) + 8
     # 4 paving
     S.head('4  PAVING IN PERSPECTIVE  flags shrink and merge with distance (texture gradient); joints thin and fade; '
            'the low sun\'s sheen far; long shadows toward us')
     y0 = S.y
-    S.place(pave, 16, y0, 'ours, 1:1 (frame y 840-1320, Z 31 > 2.8 m): P0 per-flag values + joints + sheen + shadows, '
-            'P1 level bands, P2 near strokes + dry dashes, P3 lit lips, P4 grit near')
-    S.column(1030, y0, 554, pave.size[1] + 20, ['c05r', 'h02g', 'c06p'])
-    S.y = y0 + pave.size[1] + 24
+    ya = S.place(pave, 16, y0, 'ours, 1:1 (frame y 840-1320, Z 31 > 2.8 m): P0 per-flag values + joints + sheen + '
+                 'shadows, P1 level bands, P2 near strokes + dry dashes, P3 lit lips, P4 grit near')
+    yc = S.column(1030, y0, 554, ya - y0, ['c05r', 'h02g', 'c06p'])
+    S.y = max(ya, yc) + 8
     # 5 rocks
     S.head('5  SMOOTH BOULDERS AND FACETED ROCKS  one dark body, a sky-lit top plane (an irregular break, never a '
            'crescent), a warm rim to the sun, bounce low; facets by orientation')
     y0 = S.y
-    S.place(rocks, 16, y0, 'ours, 1:1 (frame y 980-1400): domes P0-P4, a low-poly faceted rock, a far rock converted '
-            '(k 0.22, blur 0.6), shadows toward us')
-    S.column(1030, y0, 554, rocks.size[1] + 20, ['p01b', 'p02r', 'c06k'])
-    S.y = y0 + rocks.size[1] + 24
+    ya = S.place(rocks, 16, y0, 'ours, 1:1 (frame y 980-1400): domes P0-P4, a low-poly faceted rock, a far rock '
+                 'converted (k 0.22, blur 0.6), shadows toward us')
+    yc = S.column(1030, y0, 554, ya - y0, ['p01b', 'p02r', 'c06k'])
+    S.y = max(ya, yc) + 8
     # 6 phone width
     S.head('6  AT PHONE WIDTH  our pieces as they land in the 1080 frame shown 400 px wide (x 0.37), beside the refs '
            'at their phone width')
