@@ -280,6 +280,11 @@ Maintenance at the end).
   sense of depth but yours do not", 2026-10-29). AI-painted background plates (a model repaints only our background
   pieces from our own layout; the story layers stay ours) are approved as a TEST, judged against our own painter:
   "I mean let’s try and see if it gets us there", 2026-10-29 (`docs/studies/2026-10-28_city_posters/ai_paint/BRIEF.md`).
+  A painted plate must be able to PAINT ON in the opening like the rest of frame 0 (our flat design drawn first, the
+  painted plate revealed stroke by stroke through brush-shaped masks), never pop up; and the owner prefers no extra
+  service where we can run it ourselves (an open model in our own container first). — ("If we do that would we be able
+  to then animate its process like the very first few seconds or would it literally just popup?"; "Oh damn we need a
+  separate service / But you are AI why can’t you do it", 2026-10-29).
 - **Texture and lines: VERY subtle.** No outlines: as on the city posters, shapes are separated by light and shade (a
   lit and a shade face on every volume, the subject's the deepest) and by value, never by a line drawn round them
   (the A vs B picture's B). Thin lines only on small things that are lines (window bars, railings, rigging): dark,

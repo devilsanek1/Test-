@@ -5,7 +5,11 @@ bit more subtle and more beautiful / Also I like the drawing style in these two 
 that give a sense of depth but yours do not"), asked what AI-painted backgrounds are, then: "I mean let’s try and see if
 it gets us there".
 
-**Status:** BLOCKED on a key. There is no image-model API key in the environment. The owner adds one in the environment's
+**Status (updated):** the owner asked "you are AI why can’t you do it", so the FIRST test runs an open-source model
+locally in our own container (no key, no service; CPU only: 4 cores, 15 GB RAM, no GPU), below. The hosted route stays
+the fallback.
+
+**Earlier status:** BLOCKED on a key. There is no image-model API key in the environment. The owner adds one in the environment's
 settings (Network secrets, or an environment variable): `REPLICATE_API_TOKEN` is the default plan (api.replicate.com is
 reachable from the container); `FAL_KEY` is the alternative. A NEW session picks it up, so the test runs in a helper
 session started after the key exists. Never print, file or commit the key.
