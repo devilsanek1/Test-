@@ -1,6 +1,6 @@
 # Content discussion: which stories fit the city-poster style
 
-**State (2026-10-29 ~08:20 UTC): PICKED.** The owner picked the heat story ("Okay let's try heat story let's
+**State (2026-10-29 ~07:57 UTC): PICKED.** The owner picked the heat story ("Okay let's try heat story let's
 generate the script"). It is now **video 5**, produced by this session: `video/docs/v5/` (fact lock running; the core
 line waits on the owner). This discussion is done unless the owner reopens it; IceCube stays the runner-up for a
 later film (peg: the Nobel ceremony, 10 Dec).
@@ -270,11 +270,11 @@ keeps people watching past its title; a "top 3" carried on one thread). -> excha
   children's leukaemia among them; robot dogs carry them from the pad; a Massachusetts town voted 510-13 against drones
   for toothpaste. Mostly one beat, and a faster test is not a faster cure: park it.
 
-**The owner's reaction:** ~08:00 UTC, verbatim: "1 and 4 from the other thread are interesting too / Can you take these
+**The owner's reaction:** ~07:51 UTC, verbatim: "1 and 4 from the other thread are interesting too / Can you take these
 candidates and rank them to pick the best" (read as `journals/clusters.md` section 6, ideas 1 and 4: Japan's MMX probe
 to Phobos; Chiricahua, a volcano's stone forest, the newest US national park). -> exchange 9.
 
-### 9. ~08:05 UTC: the five ranked (sent)
+### 9. ~07:53 UTC: the five ranked (sent)
 Our scores (est.), one scale for all five; WOW and depth (what keeps people watching past the title: the owner's
 2026-10-29 rule) shown but not weighted:
 
@@ -289,10 +289,10 @@ Our scores (est.), one scale for all five; WOW and depth (what keeps people watc
 Re-scored by this thread (the drones' R and S lowered for little buzz; the journal thread's WOW scale differs from
 ours). Every fact is still search-level: the pick gets one fact lock.
 
-**The owner's reaction:** ~08:15 UTC: "Okay let's try heat story let's generate the script" -> video 5 (`video/docs/v5/`).
+**The owner's reaction:** ~07:55 UTC: "Okay let's try heat story let's generate the script" -> video 5 (`video/docs/v5/`).
 
 ## Picks (leanings, not locks)
-- 2026-10-29 ~08:15 UTC: **PICKED: the heat story** -> video 5, produced by this session (`video/docs/v5/`).
+- 2026-10-29 ~07:55 UTC: **PICKED: the heat story** -> video 5, produced by this session (`video/docs/v5/`).
 - IceCube: liked; the runner-up for a later film (peg: 10 Dec).
 
 ## The real-city pool (exchange 2; est. scores: a typical good story of each kind, any subject)

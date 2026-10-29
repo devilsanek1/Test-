@@ -185,7 +185,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
   (DIRECTION rules 1-2, CRAFT §a.3 and §b, LIFE_AND_DENSITY §5, the playbook).
 
 ## 2e. Video 5 (2026-10-29): the heat story
-- **Video 5 is produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt since 2026-10-29 ~08:15 UTC**
+- **Video 5 is produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt since 2026-10-29 ~07:55 UTC**
   (owner: "Okay let's try heat story let's generate the script"), on branch `claude/compassionate-hopper-5iqguj`. The
   topic came out of the city-poster content discussion: "Where do you put a machine this hot?" (data centres in weird
   places, and Helsinki keeping AI's heat for 70,000 homes). Live state: `video/docs/v5/README.md`.

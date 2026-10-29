@@ -1,6 +1,6 @@
 # Video 5: state and pick-up notes
 
-**Produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt since 2026-10-29 ~08:15 UTC** (owner:
+**Produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt since 2026-10-29 ~07:55 UTC** (owner:
 "Okay let's try heat story let's generate the script"), on branch `claude/compassionate-hopper-5iqguj` (not merged
 into `video-production`: the owner decides). Video 4 stays with its own session (paused at its topic pick).
 

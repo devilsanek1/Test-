@@ -1,6 +1,6 @@
 # Video 5, G0: the topic, its core line and the through-line card (draft)
 
-**Topic (owner's pick, 2026-10-29 ~08:15 UTC): "Where do you put a machine this hot?"** AI chips make enormous heat.
+**Topic (owner's pick, 2026-10-29 ~07:55 UTC): "Where do you put a machine this hot?"** AI chips make enormous heat.
 So data centres end up in cold, strange places: a Cold War bunker under a Stockholm park, inside a working mine in
 the Dolomites, on the sea floor off Shanghai, and now a test computer in orbit, which overheats (space is freezing,
 but a vacuum carries no heat away). The payoff: Helsinki does the opposite and keeps the heat: from 2027, heat from AI
