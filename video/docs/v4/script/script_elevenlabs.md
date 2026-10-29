@@ -1,6 +1,6 @@
 [curious, bright] Did you know Helsinki wants AI to heat seventy thousand homes? AI runs on giant computers, in buildings called data centers.
 
-Those computers get really hot. Just one stack of them makes as much heat as FORTY kettles, boiling non-stop.
+Those computers get really hot. Just one of them makes as much heat as FORTY kettles, boiling non-stop.
 
 [light] That's a lot of tea. In most data centers, big fans just blow that heat outside.
 

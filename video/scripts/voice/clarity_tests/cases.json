@@ -1,0 +1,174 @@
+{
+  "about": "check_clarity.py --selftest: the regression set of docs/retro/2026-10-29_script_clarity/LINT_SPEC.md section 4 (R1-R5). Each case runs as its own script. 'lines' keys are sentence numbers (as check_rhythm.py numbers them) or a piece of the sentence's text; an expected flag is [code], [code, a piece of its span] or [code, span piece, message piece]; 'only' means no flag beyond has + may. When the panel or the owner finds a line the lint missed or flagged wrongly, add it here (R5) in the same commit as the fix.",
+  "sources": {
+    "v4_g1_draft1.md": "video/docs/v4/archive/g1_draft1/script_elevenlabs.md @ ca2dc5d (the paste the owner annotated, 2026-10-29)",
+    "v4_clarity_example.json": "LINT_SPEC.md section 3, the example film list",
+    "v1_final_plain.md": "video/docs/script/final_script.md @ 6d803e8, section 1 (the plain script)",
+    "v2_script_elevenlabs.md": "video/docs/v2/script/script_elevenlabs.md @ 6d803e8",
+    "v3_script_elevenlabs.md": "video/docs/v3/script/script_elevenlabs.md @ 6d803e8",
+    "v5_spine_draft1.md": "video/docs/v5/script/spine_draft_as_sent.md @ 1a59849",
+    "bigbend.md": "the owner's model reel's opening (LINT_SPEC.md R3)"
+  },
+  "cases": [
+    {
+      "id": "R1", "level": "MUST",
+      "what": "v4 G1 draft 1, no film list: FAIL on the owner's lines for the owner's reasons, nothing on line 1 (lines 7-13: the spec's SHOULD, kept exact)",
+      "file": "v4_g1_draft1.md", "exit": 1, "errors": 9, "warnings": 9,
+      "lines": {
+        "1": {"none": true},
+        "2": {"has": [["C1", "chips", "food"], ["W4", "chips"]], "may": [["W3", "that hot"]], "only": true},
+        "3": {"has": [["C1", "cabinet", "cupboard"]], "may": [["W10", "like"]], "only": true},
+        "4": {"has": [["W7", "nobody's even"]], "only": true},
+        "5": {"has": [["C3", "almost everywhere"]], "may": [["W5", "gets dumped"]], "only": true},
+        "6": {"has": [["C2", "it", "heat, air, sea"]], "only": true},
+        "7": {"has": [["C1", "water-cooled"]], "only": true},
+        "8": {"has": [["C1", "heat pumps"], ["W6", "gets a boost"], ["W12"]], "only": true},
+        "9": {"has": [["W2", "that's"]], "only": true},
+        "10": {"has": [["C2", "it", "city, heat"]], "only": true},
+        "11": {"has": [["C2", "they", "no plural thing"], ["W2", "this"]], "only": true},
+        "12": {"has": [["C1", "data center"]], "only": true},
+        "13": {"none": true}
+      }
+    },
+    {
+      "id": "R1f", "level": "SHOULD",
+      "what": "v4 G1 draft 1 with v4's example film list: also W13 on lines 2, 3 and 7",
+      "file": "v4_g1_draft1.md", "film": "v4_clarity_example.json", "exit": 1, "errors": 9, "warnings": 12,
+      "lines": {
+        "2": {"has": [["W13", "chips"]]},
+        "3": {"has": [["W13", "cabinet"]]},
+        "7": {"has": [["W13", "chips"]]}
+      }
+    },
+    {
+      "id": "R2.1", "level": "MUST",
+      "what": "the structure's worked example (PRINCIPLES: How each sentence hands the next its subject): no flag",
+      "text": "Did you know Helsinki wants AI to heat seventy thousand homes? AI runs on giant computers, in buildings called data centers. Those computers get really hot. Just one stack of them gives off as much heat as forty kettles, boiling non-stop. In most data centers, big fans just blow that heat outside. But Helsinki wants that heat.",
+      "exit": 0, "errors": 0, "warnings": 0
+    },
+    {
+      "id": "R2.2", "level": "MUST", "what": "P2-P3-P8 rewrite: no flag",
+      "text": "AI runs on giant computers. Those computers get really hot. Just one stack of these computers gives off as much heat as forty kettles, boiling non-stop.",
+      "exit": 0, "errors": 0, "warnings": 0
+    },
+    {
+      "id": "R2.3", "level": "MUST", "what": "P5 rewrite (one step per sentence): no flag",
+      "text": "These computers are cooled with water, so the water gets warm. Machines called heat pumps make it even hotter. Then that hot water runs through pipes under the streets, into people's homes.",
+      "exit": 0, "errors": 0, "warnings": 0
+    },
+    {
+      "id": "R2.4", "level": "MUST", "what": "P6 rewrite (literal words): no flag",
+      "text": "Your laptop needs memory, and so do the giant computers that run AI. AI companies pay more, so they get the memory first.",
+      "exit": 0, "errors": 0, "warnings": 0
+    },
+    {
+      "id": "R2.5", "level": "MUST", "what": "P7 rewrite (the plain joke): no flag",
+      "text": "AI runs on giant computers. Those computers get really hot. Just one stack of them gives off as much heat as forty kettles, boiling non-stop. And usually, nobody uses that heat.",
+      "exit": 0, "errors": 0, "warnings": 0
+    },
+    {
+      "id": "R2.6", "level": "MUST", "what": "P8 rewrite (one number per sentence): no flag",
+      "text": "Helsinki has a plan to heat seventy thousand homes this way. That plan starts in twenty twenty-seven.",
+      "exit": 0, "errors": 0, "warnings": 0
+    },
+    {
+      "id": "R2.7", "level": "MUST", "what": "the structure's beats 6-7: no flag",
+      "text": "AI runs on giant computers, in buildings called data centers. Helsinki wants to build a new data center. The new data center would make nearly a tenth of Helsinki's heat. But the new data center doesn't exist yet.",
+      "exit": 0, "errors": 0, "warnings": 0
+    },
+    {
+      "id": "R2.8a", "level": "MUST", "what": "v1's plain joke raises no flag of its own (in its script)",
+      "file": "v1_final_plain.md",
+      "lines": {"Even the FBI said": {"none": true}}
+    },
+    {
+      "id": "R2.8b", "level": "MUST", "what": "v3's plain joke raises no flag of its own (in its script)",
+      "file": "v3_script_elevenlabs.md",
+      "lines": {"Laptops get better for the same money": {"none": true}, "usually right after you buy one": {"none": true}}
+    },
+    {
+      "id": "R3", "level": "MUST", "what": "the Big Bend opening (the owner's model reel): no error; one W4 on 'the architect' allowed",
+      "file": "bigbend.md", "exit": 0, "errors": 0,
+      "script_only": [["W4", "the architect"]]
+    },
+    {
+      "id": "R4.v1", "level": "SHOULD", "what": "v1's final script: the prototype's errors",
+      "file": "v1_final_plain.md", "exit": 1,
+      "errors_exactly": [["C4", "a heads-up"], ["C4", "word got out"], ["C1", "server"]]
+    },
+    {
+      "id": "R4.v2", "level": "SHOULD", "what": "v2's script (accepted by the owner with no word notes): no error",
+      "file": "v2_script_elevenlabs.md", "exit": 0, "errors": 0
+    },
+    {
+      "id": "R4.v3", "level": "SHOULD", "what": "v3's script: the prototype's errors",
+      "file": "v3_script_elevenlabs.md", "exit": 1,
+      "errors_exactly": [["C1", "data centers"], ["C1", "memory chips"], ["C4", "by the mountain"], ["C4", "first dibs"]]
+    },
+    {
+      "id": "R4.v5", "level": "SHOULD", "what": "v5's spine draft 1: the prototype's errors",
+      "file": "v5_spine_draft1.md", "exit": 1,
+      "errors_exactly": [["C1", "data centre"], ["C1", "chips"], ["C1", "cabinet"]]
+    },
+    {
+      "id": "R5.1", "level": "MUST", "what": "the owner's 'heat or air or sea?': C2 (rivals side by side, a short line) and C3",
+      "text": "So almost everywhere, that heat just gets dumped into the air or the sea. But Helsinki WANTS it.",
+      "lines": {"1": {"has": [["C3", "almost everywhere"]]}, "2": {"has": [["C2", "it", "heat, air, sea"]]}}
+    },
+    {
+      "id": "R5.2", "level": "MUST", "what": "the noun said again: no C2 (C3 and the first line's warnings stay)",
+      "text": "So almost everywhere, that heat just gets dumped into the air or the sea. But Helsinki wants that heat.",
+      "lines": {"1": {"has": [["C3", "almost everywhere"]]}, "2": {"not": [["C2"], ["W1"]]}}
+    },
+    {
+      "id": "R5.3", "level": "MUST", "what": "a naming clause; prominent and recent agree: no C2",
+      "text": "Did you know that New York once got a proposal to build this giant 2,000-foot tall bending skyscraper? It's called the Big Bend.",
+      "lines": {"2": {"not": [["C2"], ["W1"]]}}
+    },
+    {
+      "id": "R5.4", "level": "MUST", "what": "'staff' is plural: no C2",
+      "text": "She worked at Google for years. But Google staff told the BBC they're scared to speak out.",
+      "lines": {"2": {"not": [["C2"], ["W1"]]}}
+    },
+    {
+      "id": "R5.5", "level": "MUST", "what": "a 'they' with no plural thing: C2",
+      "text": "For now, it's a plan. But they've done this before.",
+      "lines": {"2": {"has": [["C2", "they", "no plural thing"]]}}
+    },
+    {
+      "id": "R5.6", "level": "MUST", "what": "one subject in its own sentence: no flag on 'it'",
+      "text": "That bunker under the park has been heating the city above it since 2014.",
+      "lines": {"1": {"not": [["C2"], ["W1"]]}}
+    },
+    {
+      "id": "R5.7", "level": "MUST", "what": "a passive that names its 'with': no W5",
+      "text": "These computers are cooled with water.",
+      "lines": {"1": {"not": [["W5"]]}}
+    },
+    {
+      "id": "R5.8", "level": "MUST", "what": "one year, a 3-word signpost, 'chatbot' allowed: nothing",
+      "text": "So from twenty twenty-seven, your chatbot could heat an apartment in Helsinki.",
+      "lines": {"1": {"none": true}}
+    },
+    {
+      "id": "R5.9", "level": "MUST", "what": "a tech word described by 'called': no C1",
+      "text": "Machines called heat pumps make it even hotter.",
+      "lines": {"1": {"not": [["C1"]]}}
+    },
+    {
+      "id": "R5.10", "level": "MUST", "what": "a vague doer (W5), the generic 'They say' (no C2), a unit nobody pictures (W9)",
+      "text": "Then someone sent one into space this month. They say it runs for 15 minutes. The rock stays at 12 degrees.",
+      "lines": {"1": {"has": [["W5", "someone"]]}, "2": {"not": [["C2"]]}, "3": {"has": [["W9", "12 degrees"]]}}
+    },
+    {
+      "id": "R5.11a", "level": "MUST", "what": "a false friend and a 'like' that doesn't say what is alike: C1 and W10",
+      "text": "AI runs on giant computers. One cabinet of them is like FORTY kettles.",
+      "lines": {"2": {"has": [["C1", "cabinet"], ["W10", "like"]]}}
+    },
+    {
+      "id": "R5.11b", "level": "MUST", "what": "the comparison says what is alike: C1 only",
+      "text": "AI runs on giant computers. One cabinet of them gives off as much heat as forty kettles.",
+      "lines": {"1": {"none": true}, "2": {"has": [["C1", "cabinet"]], "only": true}}
+    }
+  ]
+}
