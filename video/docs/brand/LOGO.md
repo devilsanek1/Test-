@@ -87,9 +87,10 @@ Earlier rounds also used Pip's periwinkles (`#7A7FE3`, `#6A6ED6`, `#AEB2F4`), pe
   cartoon, no face; Pip only if abstracted past the cartoon.
 - before 2026-10-29 19:48 UTC, to the orchestrator (relayed): "Again let's start with stills" and "No video yet" ->
   stills only: no animated logo (no end-card draw-on, no motion) until the owner has picked and approved a still.
-- before 2026-10-29 19:56 UTC, on round 3, to the orchestrator (relayed): "The fold is directionally good but way too
-  abstract" (the orchestrator then asked for a Fold-only round 4: three variants, each more literal; that request
-  reached this session at 20:05, after round 4 below was made).
+- 2026-10-29 ~19:58 UTC, on round 3, to the orchestrator (relayed), just before the next line: "The fold is
+  directionally good but way too abstract" (the orchestrator then asked for a Fold-only round 4: three variants, each
+  more literal; that request reached this session at 20:05, after round 4 below was made; round 5's Talk of the Town
+  carries the Fold, made concrete).
 - 2026-10-29 ~19:58 UTC, on round 3, written to the logo session directly: "Nope from scratch I don't like none of
   them" and "More premium" -> round 4 from scratch: flat geometric icons read as stock, not premium; premium is the
   city posters' language (light, depth, atmosphere, craft), drawn as small emblems at dusk. The Fold, less abstract,
