@@ -564,10 +564,12 @@ def cmd_chart(args):
     mf, mv = sum(allf) / len(allf), sum(allv) / len(allv)
     ax.axhline(mf, color=RULE, lw=1.5, zorder=1)
     ax.axvline(mv, color=RULE, lw=1.5, zorder=1)
-    ax.text(x1 - 0.05, y1 - 0.15, 'fits our look\nand worth telling', ha='right', va='top', fontsize=22,
-            color=MUTED, zorder=2)
-    ax.text(x1 - 0.05, mf - 0.12, f'average fit {mf:.1f}', ha='right', va='top', fontsize=17, color=MUTED)
-    ax.text(mv + 0.04, y0 + 0.12, f'average value {mv:.1f}', ha='left', va='bottom', fontsize=17, color=MUTED)
+    statics = [
+        ax.text(x1 - 0.05, y1 - 0.15, 'fits our look\nand worth telling', ha='right', va='top', fontsize=20,
+                color=MUTED, zorder=2),
+        ax.text(x1 - 0.05, mf - 0.12, f'average fit {mf:.1f}', ha='right', va='top', fontsize=17, color=MUTED),
+        ax.text(mv + 0.04, y1 - 0.15, f'average\nvalue {mv:.1f}', ha='left', va='top', fontsize=17, color=MUTED),
+    ]
     k = 5200 / max(ns)
     ax.scatter(xs, ys, s=[k * n for n in ns], color=SERIES, alpha=0.82, edgecolors=SURFACE, linewidths=2.5,
                zorder=3)
@@ -589,7 +591,7 @@ def cmd_chart(args):
         return not (a[2] < b[0] or a[0] > b[2] or a[3] < b[1] or a[1] > b[3])
 
     inv = ax.transData.inverted()
-    placed = []
+    placed = [(e.x0 - 4, e.y0 - 3, e.x1 + 4, e.y1 + 3) for e in (t.get_window_extent(rend) for t in statics)]
     for j in sorted(range(len(table)), key=lambda q: -ns[q]):
         cx, cy, r = circles[j]
         txt = ax.text(0, 0, f"{table[j]['cluster']} ({ns[j]})", fontsize=20, color=INK, zorder=5,

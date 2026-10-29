@@ -1,15 +1,9 @@
 # Journal corpus: which recent big-journal stories fit our visual storytelling (method and rubric)
 
-**State (2026-10-29 03:58 UTC; updated at every step):**
-- Done: the rubric; the tools; the corpus (1,209: 1,113 feeds + 96 search); the triage; stage 2 (308); the scores
-  (`scores.csv`, 308, 0 problems; `scores_blind.csv`, 63); the agreement: GOOD (section 6); the audit (`audit.csv`:
-  8 of 8 re-found).
-- Running: the clusterer-editor (brief `context/workflows/journals-briefs/brief_cluster.txt`) -> `clusters.csv`,
-  `clusters.md`, `cluster_chart.png`, `SUMMARY.md`, with a web check of its top 10.
-- Next, exactly: read `SUMMARY.md` and the chart; send both to the owner; a note to the content thread
-  (session_01YGLGMrgF1Cfg5gMAND1VNt) and the orchestrator; capture the owner's reactions (playbook + this folder).
-- Dropped to stay lean after the limit: Bloomberg, Fortune, The Washington Post, CNN, NPR. Smithsonian is
-  under-sampled (4 rows).
+**State (2026-10-29 ~04:45 UTC): DONE, waiting on the owner.** Corpus (1,209), triage, stage 2 (308), scores and the
+blind check (GOOD), the audit, 14 clusters (`clusters.csv`, `clusters.md`), the chart (`cluster_chart.png`), the top
+10 checked on the web, and `SUMMARY.md` (the owner's screen). Next: the owner's reactions, captured in the playbook
+and in this folder; the content thread (session_01YGLGMrgF1Cfg5gMAND1VNt) has the summary.
 
 ## 1. The question, made testable
 Of the stories big journals published in the last 30 days (2026-09-28 to 2026-10-28), **which could be TOLD through the

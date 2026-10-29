@@ -1,0 +1,309 @@
+id,cluster
+C1-001,Politics and crime
+C1-002,War and borders
+C1-004,Politics and crime
+C1-005,Climate reports and policy
+C1-006,Politics and crime
+C1-007,AI and the web
+C1-008,AI and the web
+C1-009,Space and sky
+C1-010,Politics and crime
+C1-011,Health and biotech
+C1-012,Politics and crime
+C1-013,Climate reports and policy
+C1-014,Climate reports and policy
+C1-015,Culture and lifestyle
+C1-016,Culture and lifestyle
+C1-017,Politics and crime
+C1-018,Politics and crime
+C1-021,Politics and crime
+C1-024,"Floods, storms, quakes"
+C1-025,Space and sky
+C1-026,Towns and buildings
+C1-027,Politics and crime
+C1-028,Politics and crime
+C1-029,Business
+C1-030,Business
+C1-031,AI and the web
+C1-032,AI and the web
+C1-033,Politics and crime
+C1-034,AI and the web
+C1-035,Health and biotech
+C1-036,AI and the web
+C1-037,Climate reports and policy
+C1-038,Climate reports and policy
+C1-039,Culture and lifestyle
+C1-040,Culture and lifestyle
+C1-041,Culture and lifestyle
+C1-042,Culture and lifestyle
+C1-043,Culture and lifestyle
+C1-044,Culture and lifestyle
+C1-045,Business
+C1-046,Culture and lifestyle
+C1-047,Towns and buildings
+C1-048,Towns and buildings
+C1-049,Space and sky
+C1-050,Space and sky
+C2-001,AI and the web
+C2-002,AI and the web
+C2-003,AI and the web
+C2-004,AI and the web
+C2-005,AI and the web
+C2-006,AI and the web
+C2-007,Health and biotech
+C2-008,Health and biotech
+C2-009,Tech in real places
+C2-010,Tech in real places
+C2-011,AI and the web
+C2-012,Tech in real places
+C2-013,Climate reports and policy
+C2-014,Tech in real places
+C2-015,Space and sky
+C2-016,Space and sky
+C2-017,AI and the web
+C2-018,AI and the web
+C2-019,Politics and crime
+C2-020,Politics and crime
+C2-021,AI and the web
+C2-022,AI and the web
+C2-023,Health and biotech
+C2-024,Health and biotech
+C2-025,Climate reports and policy
+C2-026,Climate reports and policy
+C2-027,History
+C2-028,"Floods, storms, quakes"
+C2-029,"Floods, storms, quakes"
+C2-030,Space and sky
+C2-031,Health and biotech
+C2-032,Space and sky
+C2-033,Health and biotech
+C4-001,Nature
+C4-002,Health and biotech
+C4-003,Towns and buildings
+C4-004,"Floods, storms, quakes"
+C4-005,History
+C4-006,Culture and lifestyle
+C4-007,Culture and lifestyle
+C4-008,Culture and lifestyle
+C4-009,Nature
+C4-010,History
+C4-011,History
+C4-012,Nature
+C4-013,Culture and lifestyle
+C4-014,History
+C4-015,Culture and lifestyle
+C4-016,History
+C4-017,Space and sky
+C4-018,History
+F0002,Culture and lifestyle
+F0008,Culture and lifestyle
+F0028,Business
+F0035,Culture and lifestyle
+F0036,War and borders
+F0040,Politics and crime
+F0042,War and borders
+F0049,Health and biotech
+F0052,Nature
+F0054,Business
+F0060,Business
+F0062,Politics and crime
+F0068,Tech in real places
+F0076,Towns and buildings
+F0077,Journeys
+F0078,Business
+F0091,Nature
+F0094,Politics and crime
+F0097,AI and the web
+F0110,Health and biotech
+F0112,Politics and crime
+F0113,Space and sky
+F0122,War and borders
+F0124,War and borders
+F0127,Nature
+F0132,Business
+F0150,War and borders
+F0157,Towns and buildings
+F0159,Business
+F0160,Business
+F0174,Health and biotech
+F0181,Business
+F0190,Business
+F0191,Tech in real places
+F0196,Nature
+F0199,Tech in real places
+F0216,Politics and crime
+F0218,Politics and crime
+F0226,Politics and crime
+F0227,Towns and buildings
+F0229,War and borders
+F0235,Business
+F0237,Business
+F0239,Business
+F0241,Politics and crime
+F0257,Business
+F0258,Politics and crime
+F0262,AI and the web
+F0272,Tech in real places
+F0281,Towns and buildings
+F0290,Culture and lifestyle
+F0319,Business
+F0327,Space and sky
+F0331,War and borders
+F0332,Nature
+F0336,Politics and crime
+F0337,AI and the web
+F0364,Politics and crime
+F0367,AI and the web
+F0379,Culture and lifestyle
+F0385,Politics and crime
+F0396,Towns and buildings
+F0401,Politics and crime
+F0419,Politics and crime
+F0428,Culture and lifestyle
+F0429,Tech in real places
+F0443,Culture and lifestyle
+F0450,Culture and lifestyle
+F0453,Culture and lifestyle
+F0460,Space and sky
+F0497,Business
+F0501,Culture and lifestyle
+F0502,Nature
+F0504,War and borders
+F0506,Journeys
+F0509,Tech in real places
+F0511,Nature
+F0515,Journeys
+F0522,Culture and lifestyle
+F0525,"Floods, storms, quakes"
+F0532,AI and the web
+F0533,Journeys
+F0534,Culture and lifestyle
+F0536,Culture and lifestyle
+F0538,"Floods, storms, quakes"
+F0542,Journeys
+F0543,Culture and lifestyle
+F0545,"Floods, storms, quakes"
+F0547,Nature
+F0548,Towns and buildings
+F0552,Politics and crime
+F0554,Culture and lifestyle
+F0556,Towns and buildings
+F0565,Towns and buildings
+F0566,Nature
+F0567,Towns and buildings
+F0568,Nature
+F0570,Towns and buildings
+F0571,Towns and buildings
+F0572,History
+F0573,Towns and buildings
+F0574,"Floods, storms, quakes"
+F0583,Space and sky
+F0586,War and borders
+F0593,Towns and buildings
+F0595,Nature
+F0604,Health and biotech
+F0607,AI and the web
+F0610,Journeys
+F0614,History
+F0616,"Floods, storms, quakes"
+F0625,"Floods, storms, quakes"
+F0627,Nature
+F0630,Culture and lifestyle
+F0638,Journeys
+F0647,Towns and buildings
+F0653,Health and biotech
+F0654,History
+F0659,Politics and crime
+F0660,Culture and lifestyle
+F0661,Culture and lifestyle
+F0669,"Floods, storms, quakes"
+F0670,Tech in real places
+F0674,Politics and crime
+F0676,Tech in real places
+F0687,Nature
+F0690,Culture and lifestyle
+F0698,Culture and lifestyle
+F0708,AI and the web
+F0713,Politics and crime
+F0718,Journeys
+F0720,Culture and lifestyle
+F0721,Towns and buildings
+F0738,Culture and lifestyle
+F0740,"Floods, storms, quakes"
+F0741,Climate reports and policy
+F0742,"Floods, storms, quakes"
+F0744,Nature
+F0746,Climate reports and policy
+F0747,"Floods, storms, quakes"
+F0748,Climate reports and policy
+F0749,History
+F0752,Culture and lifestyle
+F0754,Climate reports and policy
+F0755,Nature
+F0756,Tech in real places
+F0757,Climate reports and policy
+F0760,Towns and buildings
+F0764,Nature
+F0765,Nature
+F0769,Nature
+F0773,Nature
+F0778,History
+F0779,Towns and buildings
+F0782,AI and the web
+F0784,Culture and lifestyle
+F0786,AI and the web
+F0788,Tech in real places
+F0791,Towns and buildings
+F0794,Space and sky
+F0795,Nature
+F0796,Culture and lifestyle
+F0803,Space and sky
+F0804,Journeys
+F0820,Culture and lifestyle
+F0833,Business
+F0834,Climate reports and policy
+F0835,Towns and buildings
+F0839,Space and sky
+F0848,Tech in real places
+F0850,Culture and lifestyle
+F0853,War and borders
+F0863,Culture and lifestyle
+F0864,Business
+F0868,Tech in real places
+F0869,AI and the web
+F0876,Nature
+F0879,Tech in real places
+F0883,History
+F0893,Politics and crime
+F0895,Politics and crime
+F0902,Space and sky
+F0905,Business
+F0911,Space and sky
+F0912,Culture and lifestyle
+F0921,"Floods, storms, quakes"
+F0929,Towns and buildings
+F0931,Culture and lifestyle
+F0934,Towns and buildings
+F0946,Culture and lifestyle
+F0949,Politics and crime
+F0952,Business
+F0963,Business
+F0974,Culture and lifestyle
+F0976,Towns and buildings
+F0985,Journeys
+F1002,Towns and buildings
+F1009,"Floods, storms, quakes"
+F1013,Towns and buildings
+F1023,Politics and crime
+F1050,Culture and lifestyle
+F1053,Politics and crime
+F1058,Culture and lifestyle
+F1061,Space and sky
+F1070,AI and the web
+F1073,Space and sky
+F1088,Culture and lifestyle
+F1095,AI and the web
+F1102,Culture and lifestyle
+F1103,Culture and lifestyle
+F1104,Culture and lifestyle
+F1107,Politics and crime
