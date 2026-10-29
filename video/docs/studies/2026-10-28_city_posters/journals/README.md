@@ -1,21 +1,15 @@
 # Journal corpus: which recent big-journal stories fit our visual storytelling (method and rubric)
 
-**State (2026-10-29 03:10 UTC; updated at every step):**
-- Done: the rubric (this file); the tools (`video/scripts/look/posters/journals.py`); the corpus (`corpus.csv`: 1,209
-  stories, 1,113 from 9 outlets' feeds + 96 from search: TIME, Forbes, MIT Technology Review, Scientific American,
-  National Geographic 14, Smithsonian 4; merge log `parts/merge_log.txt`); the triage of every feed row
-  (`parts/triage_feeds.csv`); stage 2 (`stage2_ids.txt`, 308: 96 search + 111 triage picks + a 101-row control; roles
-  in `triage.csv`); the blind sample (`blind_sample_ids.txt`, 63).
-- Running (2 agents, briefs in `context/workflows/journals-briefs/`): the first scorer -> `scores.csv`; the blind
-  second scorer -> `scores_blind.csv`. A stopped scorer is resumed with its brief: it continues from the first missing id.
-- Next, exactly: (1) when the blind scorer ends, the auditor (`journals-briefs/brief_audit.txt`) -> `audit.csv`; (2)
-  `journals.py check scores.csv` and `check scores_blind.csv`, then `journals.py agreement`, result into section 6 (if
-  POOR: sharpen, rescore, fresh sample); (3) the clusterer-editor: `clusters.csv`, `clusters.md`, `journals.py chart`,
-  `top`, `slices`; (4) a check of the top 10; (5) `SUMMARY.md`, chart and summary to the owner, a note to the content
-  thread and the orchestrator.
-- Dropped to stay lean after the limit: Bloomberg, Fortune, The Washington Post, CNN, NPR (the feeds' Economist, FT,
-  New York Times and Guardian cover the same ground). Smithsonian is under-sampled (4 rows: its search results are hub
-  pages; its stories appear only as text without links).
+**State (2026-10-29 03:58 UTC; updated at every step):**
+- Done: the rubric; the tools; the corpus (1,209: 1,113 feeds + 96 search); the triage; stage 2 (308); the scores
+  (`scores.csv`, 308, 0 problems; `scores_blind.csv`, 63); the agreement: GOOD (section 6); the audit (`audit.csv`:
+  8 of 8 re-found).
+- Running: the clusterer-editor (brief `context/workflows/journals-briefs/brief_cluster.txt`) -> `clusters.csv`,
+  `clusters.md`, `cluster_chart.png`, `SUMMARY.md`, with a web check of its top 10.
+- Next, exactly: read `SUMMARY.md` and the chart; send both to the owner; a note to the content thread
+  (session_01YGLGMrgF1Cfg5gMAND1VNt) and the orchestrator; capture the owner's reactions (playbook + this folder).
+- Dropped to stay lean after the limit: Bloomberg, Fortune, The Washington Post, CNN, NPR. Smithsonian is
+  under-sampled (4 rows).
 
 ## 1. The question, made testable
 Of the stories big journals published in the last 30 days (2026-09-28 to 2026-10-28), **which could be TOLD through the
@@ -230,4 +224,50 @@ line sound like a commercial?). A candidate is an idea, not a fact lock.
   news.google.com does not resolve (the session's network settings), and a curl check of the feeds was refused by this
   session's permission check. So the corpus stays search-based from the 11 reachable outlets; a session that can read
   the feeds can add the blocked outlets later with this same rubric (rows marked by source).
-- (The blind check's result is appended here.)
+- **The blind check (2026-10-29 ~03:55 UTC): GOOD, no sharpening needed.** The first scorer scored all 308 stage-2
+  rows (mean fit 3.84; 117 with fit >= 6), the blind scorer 63 of them. How to read it: both scorers are instances of
+  the same model with the same rubric, so the agreement shows the rubric is unambiguous in those hands, not that a
+  human art director would agree (a shared bias would not show here; the owner's reactions to the candidates are the
+  real test). The gate's kappa is 0.00 only because nearly every row passes (98 % agreement: one fail on one side).
+  The hardest calls, from both scorers' notes: W 2 vs 3 for soft, trend-driven change; a street or landform as the
+  hero; M for placeless numbers (a chart = M 1); headline-only feed rows; the gate for TV and film.
+
+  **Blind check: 63 stories** (the second scorer saw only the corpus rows and the rubric).
+
+  | Measure | Fit (0-10) | Value (0-10) | Owner score |
+  |---|---|---|---|
+  | Spearman rho | 0.96 | 0.94 | 0.96 |
+  | Pearson r | 0.96 | 0.94 | 0.97 |
+  | Mean absolute difference | 0.52 | 0.27 | 0.27 |
+  | Within +-1 | 89% | 98% | 98% |
+  | Mean (second - first) | +0.17 | +0.06 | +0.08 |
+
+  **Verdict on fit: GOOD** (good: rho >= 0.7, MAD <= 1.0, >= 70 % within +-1; poor: rho < 0.6 or MAD > 1.5).
+
+  | Sub-score | Exact | Within +-1 | Weighted kappa | Mean (second - first) |
+  |---|---|---|---|---|
+  | W | 84% | 100% | 0.93 | +0.06 |
+  | H | 87% | 100% | 0.90 | -0.03 |
+  | D | 92% | 100% | 0.93 | +0.08 |
+  | N | 98% | 100% | 0.96 | +0.02 |
+  | M | 83% | 100% | 0.82 | +0.05 |
+  | R | 60% | 100% | 0.92 | +0.14 |
+  | T | 78% | 97% | 0.94 | -0.03 |
+  | Mo | 56% | 84% | 0.93 | +0.29 |
+  | F | 86% | 89% | 0.85 | -0.27 |
+  | S | 57% | 100% | 0.90 | -0.08 |
+  | wow | 79% | 100% | 0.73 | -0.17 |
+
+  | Tag | Agreement | Cohen kappa |
+  |---|---|---|
+  | gate | 98% | 0.00 |
+  | world | 89% | 0.76 |
+  | happens_to | 76% | 0.64 |
+  | mood | 87% | 0.81 |
+  | telling_shape | 83% | 0.78 |
+  | conflict | 90% | 0.81 |
+  | everyday | 97% | 0.91 |
+  | ad_risk | 98% | 0.92 |
+  | tech_ai | 97% | 0.93 |
+
+  Fit disagreements of 3+ points: F0552 (0 vs 3); F0450 (0 vs 3)
