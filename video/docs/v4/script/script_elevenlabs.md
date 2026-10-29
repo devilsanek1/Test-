@@ -8,8 +8,8 @@ So almost everywhere, that heat just gets dumped into the air or the sea.
 
 So their warm water gets a boost from heat pumps, then runs under the snow, into people's radiators.
 
-[steady] That's nearly a tenth of the city's heat. It's all still a plan.
+[steady] That's nearly a tenth of the city's heat. For now, it's a plan.
 
-[curious] But they've done this before. In twenty ten, a data center in a bomb shelter, under a cathedral, started heating homes.
+[curious] But they've done this before. In twenty ten, a data center under a cathedral started heating homes.
 
-[warm, slower] So from twenty twenty-seven, your chatbot could heat a flat in Helsinki.
+[warm, slower] So from twenty twenty-seven, your chatbot could heat an apartment in Helsinki.

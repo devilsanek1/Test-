@@ -1,14 +1,18 @@
-# Video 4, G1 script: "Your chatbot could heat a flat in Helsinki"
+# Video 4, G1 script: "Your chatbot could heat an apartment in Helsinki"
 
 Written 2026-10-29 by the G1 writer (lean G1: one writer, one critic, one fix pass; `docs/PIPELINE_V2.md`), from
-`WRITER_BRIEF.md`. Not owner-approved yet. Facts: `video/docs/v5/research/factlock.md` (FL below; the one fact file for
+`WRITER_BRIEF.md`; fixed the same day by the fix pass on `critique_g1.md` (what changed: "Fix pass", at the end).
+Not owner-approved yet. Facts: `video/docs/v5/research/factlock.md` (FL below; the one fact file for
 videos 4 and 5); every spoken claim is in the fact table at the end. Card: `../THROUGHLINE.md`. Paste:
-`script_elevenlabs.md` (hook option 1 voiced). Status: **DRAFT DONE, both checks OK; next: the critic
-(`CRITIC_BRIEF.md` part A), then the fix pass (part B).**
+`script_elevenlabs.md` (hook option 1 voiced). Status: **FIX PASS DONE (critic: FIX AND SEND; both majors and all
+three minors applied), both checks OK; next: the owner approves the script, a hook option, the core line and the card,
+then G2.**
 
-- **Core line (the payoff, the last line):** "Your chatbot could heat a flat in Helsinki." (the brief's default; pick 1
-  of the three below). Spoken as "So from twenty twenty-seven, your chatbot could heat a flat in Helsinki." It is the
-  cover's title (YOUR CHATBOT COULD HEAT A FLAT IN HELSINKI), never a title over the captions.
+- **Core line (the payoff, the last line):** "Your chatbot could heat an apartment in Helsinki." (the brief's default,
+  said the American way since the fix pass: the voice is American English, `docs/voice/VOICE.md`; "a flat" is the
+  alternative, the owner's call; pick 1 of the three below). Spoken as "So from twenty twenty-seven, your chatbot could
+  heat an apartment in Helsinki." It is the cover's title (YOUR CHATBOT COULD HEAT AN APARTMENT IN HELSINKI), never a
+  title over the captions.
 - **The other two core lines** (the owner may swap; the script lands any of them, since each is said in it):
   2. "Helsinki wants AI to heat seventy thousand homes." (the news itself; line 1 without "Did you know"; as a cover:
      HELSINKI WANTS AI TO HEAT 70,000 HOMES). Plainer, a headline, no "you".
@@ -19,32 +23,38 @@ videos 4 and 5); every spoken claim is in the fact table at the end. Card: `../T
 - **One subject, in 3 words: Helsinki's AI heat.** Places: ONE home place (a snowy Helsinki street with one warm window,
   seen with its view down to the harbour: the red-brick cathedral on its rock across the water, the plant's pale plan at
   the city's edge; above and below the snow) and ONE comparison shot (line 5: the rise to the Earth's curve, where heat
-  rises off data centers everywhere else). The bomb shelter under the cathedral is in that same view, one sentence
-  (line 12), the twist; never a bunker tour, never Stockholm (video 5's subject is never mentioned).
+  rises off data centers everywhere else). The data center under the cathedral is in that same view: the rock under it
+  opens like the street's cross-section, one sentence (line 12), the twist. No shelter in the voice or the picture (no
+  "bomb shelter", no blast door, no hall of servers: that is video 5's twist and frame 0); never a bunker tour, never
+  Stockholm (video 5's subject is never mentioned).
 - **Frame-0 on-screen text:** the first spoken line as the captions, popping in the voice's order: DID YOU KNOW
   HELSINKI WANTS AI TO HEAT 70,000 HOMES? No title over them (playbook, Hook and pacing). No company in line 1 or frame 0
   (no company is named anywhere in the voice).
 - **Frame-0 picture (one continuous shot; the expected thing, then reality overtaking it):** the home place drawn on in
   the clean pen, big and bold (the subject's shapes first, then the colour floods in over them, ~0.6 s, with the pen tip
   visible): a snowy Helsinki street at dusk, one apartment block with ONE big window, dark and cold; the street cut open
-  below the snow like a poster's cross-section, one dark pipe running under it; far off across the harbour, the
-  red-brick cathedral with gold domes on its rock (it waits for the twist). The expected: a dark, freezing winter
-  evening. At ~0.4 s a small warm glow (the thread) lights at the pipe's far end, by the harbour, with our own soft
-  "ding". On "AI" (~1.9 s) its source draws on there: one tall cabinet of chips glowing hot orange like a stove, inside a
-  building that is only a pale pencil plan (it isn't built: FL 6.7). On "heat seventy thousand homes" (~2.6-3.6 s) the
-  glow runs along the pipe under the snow and up into the one window, which floods warm gold, then window after window
+  below the snow like a poster's cross-section, one big dark pipe running under it, its water still and cold blue; far
+  off across the harbour, the red-brick cathedral with gold domes on its rock (it waits for the twist). The expected: a
+  dark, freezing winter evening. At ~0.4 s the water at the pipe's far end, by the harbour, turns orange and starts to
+  run (the thread: the warm water, a bold orange ribbon in the cut-open pipe, never a glow: DIRECTION rule 5, CRAFT
+  §d.7), with our own soft "ding". On "AI" (~1.9 s) its source draws on there: one tall cabinet of chips, its coolant
+  pipes running orange and a curl of steam rising off its top into the cold, inside a building that is only a pale
+  pencil plan (it isn't built: FL 6.7). On "heat seventy thousand homes" (~2.6-3.6 s) the orange water runs along the
+  pipe under the snow and up into the radiator under the one window, which lights warm gold, then window after window
   down the street and across the city lights up warm in a ripple: reality overtaking the cold, through the real
-  mechanism (heat carried by water under the street). Never still; the payoff is in the picture by ~2.5 s.
-- **First-second sound:** a soft positive "ding" at ~0.4 s as the glow lights (our own sound, never a platform's;
-  playbook, Music and sound).
-- **Word count (spoken):** 121 (`check_paste.py`, which splits "non-stop", "water-cooled" and "twenty-seven"); 118 by
-  `check_rhythm.py`'s count.
-- **Estimated length:** about 42.3 s at the measured pace of the v2 and v3 API takes (~2.87 words a second: v2's 112
-  words ended at 39.08 s), the 0.12 s lead included, plus ~0.5 s of room tone after the last word; `check_paste.py`
-  says about 43 s at its 2.8 words a second (max 56 s: a take longer than that went wrong). Inside 30-45 s. If the take
+  mechanism (heat carried by water under the street; lit panes are light sources, CRAFT §d.9). Never still; the payoff
+  is in the picture by ~2.5 s.
+- **First-second sound:** a soft positive "ding" at ~0.4 s as the warm water starts to run (our own sound, never a
+  platform's; playbook, Music and sound).
+- **Word count (spoken):** 117 (`check_paste.py`, which splits "non-stop", "water-cooled" and "twenty-seven"); 114 by
+  `check_rhythm.py`'s count (the writer's draft: 121 and 118; the fix pass cut 4 words from line 12).
+- **Estimated length:** about 40.9 s to the last word at the measured pace of the v2 and v3 API takes (~2.87 words a
+  second: v2's 112 words ended at 39.08 s), the 0.12 s lead included, so about 41.4 s with ~0.5 s of room tone after
+  it ("an apartment" has two syllables more than "a flat", well inside the estimate's noise); `check_paste.py` says
+  about 42 s at its 2.8 words a second (max 54 s: a take longer than that went wrong). Inside 30-45 s. If the take
   runs over ~44 s, the reserve cuts are in "Notes for the fix pass". The 2.87 was measured on the owner's cloned voice
-  ("Test 3"); v4's take uses the voice the owner named on 2026-10-29 (`MQnUCZUAQLYMCY1Ztz6d`, `OWNER_NOTES.md`), whose
-  pace is not known yet, so the reserve cuts also cover a slower voice.
+  ("Test 3"); v4's take uses the voice the owner named on 2026-10-29 (`MQnUCZUAQLYMCY1Ztz6d`, "Lady1", female, young,
+  American English: `docs/voice/VOICE.md`), whose pace is not known yet, so the reserve cuts also cover a slower voice.
 - **Spoken numbers:** seventy thousand, forty, a tenth, twenty ten, twenty twenty-seven. On screen only (paper in the
   place, few and big): 70,000 (the captions), ≈ 40, 1 IN 10, FROM 2027, 2010. No megawatts, no company names, no logos.
 - **Rhythm:** 13 sentences, 6 of them short (46 %), never more than two long ones in a row; every short one is a real
@@ -267,3 +277,11 @@ paste's estimate; option 3: 121 words, ~43 s).
   the harbour), and the shelter is a cutaway under it, entered and left by push-throughs.
 - **Distinct from video 5:** the shelter is one sentence of proof, in Helsinki, with its date; Stockholm and its bunker
   are never mentioned; the film's subject is the heat in a city.
+
+## Fix pass
+
+G1 fix pass (`CRITIC_BRIEF.md` part B), 2026-10-29, on `critique_g1.md` (FIX AND SEND; 0 blockers, 2 majors, 3
+minors). Status: **IN PROGRESS** (started; the lines below fill in as each finding is applied).
+
+- Progress: the paste (`script_elevenlabs.md`) carries findings 1, 3 and 4 (lines 12, 10, 13): rhythm OK, paste OK
+  (117 words, about 42 s). Next: this file's table and notes, then the thread (finding 2), the card, option 3.
