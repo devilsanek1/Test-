@@ -1153,13 +1153,13 @@ def palmate_poly(cx, cy, R, ang, rng, n=200, squash=1.0):
     ang = the central lobe's direction; squash < 1 foreshortens it across (a leaf seen turned)."""
     lob = [(0, 1.0), (50, 0.88), (-50, 0.88), (100, 0.58), (-100, 0.58)]
     th = np.linspace(-math.pi, math.pi, n, endpoint=False)
-    r = np.full(n, 0.42)
+    r = np.full(n, 0.50)
     tips = []
     for dthd, ln in lob:
         dth = math.radians(dthd + rng.normal(0, 4))
         l2 = ln * rng.uniform(0.92, 1.05)
         d = np.angle(np.exp(1j * (th - dth)))
-        r = np.maximum(r, 0.42 + (l2 - 0.42) * np.clip(1 - np.abs(d) / 0.42, 0, 1) ** 1.6)
+        r = np.maximum(r, 0.50 + (l2 - 0.50) * np.clip(1 - np.abs(d) / 0.56, 0, 1) ** 1.25)
         tips.append((dth, l2))
     r *= 1 + 0.025 * np.sin(th * 21 + rng.uniform(0, 6))
     dback = np.angle(np.exp(1j * (th - math.pi)))
@@ -1185,19 +1185,24 @@ def paint_corner_leaves(w, h, rng, sky_rgb_at):
         side = bez(p0, p0 + np.array([dx * 0.5, dy * 0.2]), p0 + np.array([dx, dy]), 10)
         m, xa, ya = polys_mask([ribbon(side, np.linspace(2.6, 1.0, 10))])
         L.comp(m, xa, ya, C('aut_deep'))
-    spots = [0.10, 0.22, 0.36, 0.5, 0.63, 0.78, 0.93]
+    # leaves alternate along the twig on short stalks (0.35 R), pointing out from it and drooping, smaller toward
+    # its tip; the two at the corner are the nearest (bigger, then out of focus)
+    spots = [0.05, 0.15, 0.30, 0.42, 0.55, 0.67, 0.79, 0.92]
     leaves = []
+    tang = np.gradient(twig, axis=0)
     for i, f in enumerate(spots):
         k = int(f * (len(twig) - 1))
         px, py = twig[k]
-        side = -1 if i % 2 else 1
-        R = rng.uniform(22, 34) * (1.25 if i < 2 else 1.0)
-        hang = math.radians(rng.uniform(55, 115))  # leaves hang below the twig
-        ln_st = R * 0.55
-        sx, sy = px + math.cos(hang) * ln_st * 0.3 * side, py + 6
-        cx_ = px + math.cos(hang) * (ln_st + R * 0.75)
-        cy_ = py + math.sin(hang) * (ln_st + R * 0.75)
-        leaves.append((i, px, py, cx_, cy_, R, hang))
+        ta = math.atan2(tang[k, 1], tang[k, 0])
+        side = 1 if i % 2 == 0 else -1
+        ang = ta + side * math.radians(rng.uniform(40, 80))
+        ang = ang + (math.pi / 2 - ((ang + math.pi) % (2 * math.pi) - math.pi)) * 0.35  # droop toward down
+        R = rng.uniform(32, 44) * (1 - 0.3 * f) * (1.3 if i < 2 else 1.0)
+        st = 0.35 * R
+        cx_ = px + math.cos(ang) * (st + 0.78 * R)
+        cy_ = py + math.sin(ang) * (st + 0.78 * R)
+        leaves.append((i, px, py, cx_, cy_, R, ang))
+    leaves.sort(key=lambda v: (v[0] >= 2, v[4]))  # far (twig-side) leaves first, nearest last
     for (i, px, py, cx_, cy_, R, hang) in leaves:
         target = near if i < 2 else L
         # the stalk
