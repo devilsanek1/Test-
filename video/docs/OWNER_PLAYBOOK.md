@@ -595,10 +595,12 @@ Maintenance at the end).
 - **Accounts: Instagram `what.the.fuss.is.about`** (Creator, Education); TikTok and YouTube Shorts under the same name,
   handle and avatar. Posting texts per video: `docs/POSTING_KIT.md`. — (2026-10-25).
 - **The studio logo is an abstract, premium symbol, with no text** (no wordmark, no lettered monogram; abstract, not a
-  character: the mascot versions read less premium): it must read alone as the avatar circle at 40-110 px, in the
+  character: the mascot versions read less premium; yet not so abstract that its meaning is lost: it reads at a
+  glance as what it is, e.g. a speech bubble being unfolded): it must read alone as the avatar circle at 40-110 px, in the
   videos' corner and on banners. The logo's rounds, sources and the owner's verdicts: `docs/brand/LOGO.md`. — ("The
   logo should not contain any text btw", on logo round 1; "More premium!!" and "No, more abstract more premium", on
-  round 2, with two Pip marks and a spiral "?", 2026-10-29).
+  round 2, with two Pip marks and a spiral "?"; "The fold is directionally good but way too abstract", on round 3,
+  2026-10-29).
 - **Upload at the highest quality and natively on each platform** (checklist in `docs/POSTING_KIT.md`). — (2026-10-25).
 - **AI label ON everywhere; no paid boost until 3-5 posts exist,** then boost the best organic performer. — (2026-10-25).
 
