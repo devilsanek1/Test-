@@ -485,82 +485,118 @@ def sun_veil(xx_frame, yy_frame, sx=330.0, sy=260.0):
     return (np.exp(-((xx_frame - SUN[0]) / sx) ** 2) * np.exp(-((yy_frame - SUN[1]) / sy) ** 2)).astype(np.float32)
 
 
+
 # ----------------------------------------------------------------------------------------------------------------
 # 5. ELEMENT 1: the far city as layered atmospheric haze (recipe 4.1)
 # ----------------------------------------------------------------------------------------------------------------
-# The plane ladder (recipe 3.4): k = share of the way to the air, chroma = chroma kept, blur = plane sigma (px),
-# lost = the extra sigma on the tops by the sun, sliver = lit-edge width (px) on edges that face the sun,
-# win = share of blocks with lit windows. Heights are px above the horizon; widths px.
-FAR_PLANES = [  # far -> near
-    dict(name='p4', k=0.84, chroma=0.40, blur=1.6, lost=3.5, sliver=0.0, wide=0.0, win=0.0, p1=0, p2=0,
-         top=(6, 26), w=(16, 52), tower=(0.10, 8, 16, 26, 52), gable=0.0, base=HORIZON_Y + 10),
-    dict(name='p3', k=0.66, chroma=0.55, blur=1.0, lost=2.5, sliver=1.2, wide=0.0, win=0.0, p1=0, p2=0,
-         top=(14, 50), w=(18, 62), tower=(0.16, 12, 24, 62, 120), gable=0.25, base=HORIZON_Y + 30),
-    dict(name='p2', k=0.45, chroma=0.70, blur=0.6, lost=0.0, sliver=2.0, wide=0.12, win=0.22, p1=2, p2=1,
-         top=(18, 70), w=(26, 80), tower=(0.10, 26, 44, 120, 170), gable=0.45, base=HORIZON_Y + 80),
-    dict(name='p1', k=0.24, chroma=0.85, blur=0.3, lost=0.0, sliver=2.8, wide=0.15, win=0.42, p1=3, p2=1,
-         top=(-30, 46), w=(44, 118), tower=(0.06, 36, 54, 100, 150), gable=0.6, base=HORIZON_Y + 420,
+# The plane ladder (recipe 3.4), far -> near. k = share of the way to the air; chroma = chroma kept; blur = the plane's
+# sigma (px); lost = the extra sigma on the tops by the sun; sliver = lit-edge width (px) on edges that face the sun;
+# wide = share of blocks with a whole face turned to the sun; win = share of blocks with lit windows; h = building
+# heights above the horizon (px); w = widths (px); types = the mix of building kinds.
+FAR_PLANES = [
+    dict(name='p4', k=0.82, chroma=0.40, blur=1.6, lost=3.5, sliver=0.0, wide=0.0, win=0.0, mottle=0.5, jit=0.010,
+         scatter=0.50, mist=0.16, h=(8, 30), w=(18, 60), types=dict(block=0.7, tower=0.18, warehouse=0.12),
+         base=HORIZON_Y + 12),
+    dict(name='p3', k=0.62, chroma=0.55, blur=1.0, lost=2.5, sliver=1.2, wide=0.0, win=0.0, mottle=0.6, jit=0.012,
+         scatter=0.45, mist=0.13, h=(18, 56), w=(20, 64), types=dict(block=0.5, tower=0.25, warehouse=0.2, gable=0.05),
+         base=HORIZON_Y + 30),
+    dict(name='p2', k=0.40, chroma=0.70, blur=0.6, lost=0.0, sliver=2.0, wide=0.12, win=0.25, mottle=0.7, jit=0.016,
+         scatter=0.35, mist=0.09, h=(22, 64), w=(26, 84), types=dict(block=0.45, tower=0.12, warehouse=0.25,
+                                                                         gable=0.18), base=HORIZON_Y + 90),
+    dict(name='p1', k=0.18, chroma=0.85, blur=0.3, lost=0.0, sliver=3.4, wide=0.15, win=0.35, mottle=0.8, jit=0.025,
+         scatter=0.25, mist=0.05, h=(6, 30), w=(40, 120), types=dict(block=0.2, warehouse=0.35, terrace=0.35,
+                                                                        gable=0.1), base=HORIZON_Y + 600,
          chimneys=True),
 ]
+SUN_GAP = (SUN[0], 95.0, 0.5)    # the skyline dips by half within ~95 px of the sun's x: the sun stays visible
 
 
-def skyline(rng, w, spec, x_from=-30):
-    """Blocks for one plane: flat tops, gables, towers, chimneys, in a slow rise-and-fall rhythm (clusters of taller
-    blocks among low stretches). Returns [(poly, dict(x0, x1, top, kind))], heights in frame px."""
+def skyline(rng, w, spec):
+    """Buildings for one plane, left to right, in a slow rise-and-fall rhythm (clusters of taller blocks among low
+    stretches), with a dip by the sun. Returns [(poly, info)] in frame px; info: x0, x1, top, kind, roof."""
     out = []
-    hmod = value_noise(1, w + 400, 240.0, rng)[0]          # the skyline's slow rhythm along x
-    x = x_from
+    hmod = value_noise(1, w + 400, 260.0, rng)[0]
+    kinds = list(spec['types'].keys())
+    probs = np.array([spec['types'][k] for k in kinds], np.float64)
+    probs /= probs.sum()
+    x = -30.0
     base = spec['base']
     while x < w + 30:
-        m = 1.0 + 0.32 * float(hmod[int(np.clip(x + 60, 0, w + 399))])
+        xi = int(np.clip(x + 60, 0, w + 399))
+        m = (1.0 + 0.35 * float(hmod[xi])) * (1.0 - SUN_GAP[2] * np.exp(-((x - SUN_GAP[0]) / SUN_GAP[1]) ** 2))
+        kind = kinds[int(rng.choice(len(kinds), p=probs))]
         bw = rng.uniform(*spec['w'])
-        p_tower, tw0, tw1, th0, th1 = spec['tower']
-        if rng.random() < p_tower * (0.6 + 0.8 * (m > 1.0)):
-            tw = rng.uniform(tw0, tw1)
-            top = HORIZON_Y - rng.uniform(th0, th1) * m
-            out.append((rect(x, top, x + tw, base), dict(x0=x, x1=x + tw, top=top, kind='tower')))
-            x += tw * rng.uniform(0.55, 1.0)
-            continue
-        top = HORIZON_Y - rng.uniform(*spec['top']) * m
-        if rng.random() < spec.get('gable', 0.0):
-            ridge = top - bw * rng.uniform(0.22, 0.40)
+        hgt = rng.uniform(*spec['h']) * max(m, 0.25)
+        if kind == 'tower':
+            bw = bw * rng.uniform(0.35, 0.55)
+            hgt = hgt * rng.uniform(1.9, 2.8)
+        elif kind == 'warehouse':
+            bw = bw * rng.uniform(1.4, 2.2)
+            hgt = hgt * rng.uniform(0.7, 0.95)
+        top = HORIZON_Y - hgt
+        info = dict(x0=x, x1=x + bw, top=top, kind=kind, roof=None)
+        if kind == 'gable':
+            ridge = top - bw * rng.uniform(0.22, 0.36)
             poly = [(x, top), (x + bw / 2, ridge), (x + bw, top), (x + bw, base), (x, base)]
-            out.append((poly, dict(x0=x, x1=x + bw, top=top, kind='gable', ridge=ridge)))
-            if spec.get('chimneys') and rng.random() < 0.7:
-                cx = x + bw * rng.uniform(0.15, 0.75)
-                cw, ch = rng.uniform(6, 10), rng.uniform(10, 20)
-                cy = top - (bw / 2 - abs(cx + cw / 2 - x - bw / 2)) * (top - ridge) / (bw / 2) - ch
-                out.append((rect(cx, cy, cx + cw, top), dict(x0=cx, x1=cx + cw, top=cy, kind='chimney')))
+            info['roof'] = ridge
+        elif kind == 'warehouse':
+            ridge = top - bw * rng.uniform(0.05, 0.09)                    # a shallow pitch, long and low
+            poly = [(x, top), (x + bw * 0.5, ridge), (x + bw, top), (x + bw, base), (x, base)]
+            info['roof'] = ridge
         else:
-            out.append((rect(x, top, x + bw, base), dict(x0=x, x1=x + bw, top=top, kind='block')))
-            if spec.get('chimneys') and rng.random() < 0.35:
-                cx = x + bw * rng.uniform(0.2, 0.7)
-                cw, ch = rng.uniform(6, 10), rng.uniform(8, 16)
-                out.append((rect(cx, top - ch, cx + cw, top), dict(x0=cx, x1=cx + cw, top=top - ch, kind='chimney')))
-        x += bw * rng.uniform(0.7, 1.05)
+            poly = rect(x, top, x + bw, base)
+        out.append((poly, info))
+        if kind in ('block', 'tower') and rng.random() < 0.3:              # a setback or a roof box on top
+            sw = bw * rng.uniform(0.35, 0.65)
+            sx = x + rng.uniform(0.1, 0.9) * (bw - sw)
+            sh = hgt * rng.uniform(0.08, 0.22)
+            out.append((rect(sx, top - sh, sx + sw, top + 1), dict(x0=sx, x1=sx + sw, top=top - sh, kind='box',
+                                                                    roof=None)))
+        if kind == 'terrace' or (spec.get('chimneys') and kind == 'block' and rng.random() < 0.3):
+            for j in range(int(rng.integers(2, 5))):                       # a row of chimney stacks
+                cx = x + bw * (0.12 + 0.76 * (j + rng.uniform(0.2, 0.8)) / 4.0)
+                cw, ch = rng.uniform(5, 8), rng.uniform(7, 13)
+                out.append((rect(cx, top - ch, cx + cw, top + 1), dict(x0=cx, x1=cx + cw, top=top - ch,
+                                                                        kind='chimney', roof=None)))
+        x += bw * rng.uniform(0.72, 1.02)
     return out
 
 
-def landmarks(spec_name, frame_y0):
-    """King's Cross's own far shapes, as flat design polygons (frame px): a clock tower with its spire (plane p2) and a
-    gasholder's ring of columns (plane p3, drawn as thin lines in P3)."""
+def landmarks(plane):
+    """King's Cross's own far shapes (frame px): the clock tower with its spire on plane p2."""
     out = []
-    if spec_name == 'p2':
+    if plane == 'p2':
         x, tw, top = 668.0, 24.0, HORIZON_Y - 146.0
-        out.append((rect(x, top, x + tw, HORIZON_Y + 80), dict(x0=x, x1=x + tw, top=top, kind='tower')))
+        out.append((rect(x, top, x + tw, HORIZON_Y + 90), dict(x0=x, x1=x + tw, top=top, kind='tower', roof=None)))
         out.append(([(x - 2, top + 1), (x + tw / 2, top - 52), (x + tw + 2, top + 1)],
-                    dict(x0=x - 2, x1=x + tw + 2, top=top - 52, kind='spire')))
-        for px in (x - 3, x + tw - 1):                               # corner pinnacles
+                    dict(x0=x - 2, x1=x + tw + 2, top=top - 52, kind='spire', roof=None)))
+        for px in (x - 3, x + tw - 1):                                     # corner pinnacles
             out.append(([(px, top + 2), (px + 2, top - 13), (px + 4, top + 2)],
-                        dict(x0=px, x1=px + 4, top=top - 13, kind='spire')))
+                        dict(x0=px, x1=px + 4, top=top - 13, kind='spire', roof=None)))
     return out
 
 
-def paint_far_city(w=1000, h=400, frame_y0=592, seed=None, passes=9):
+def far_window_grid(brush, layer, b, h, frame_y0, prng, colour, cell, dash, p_lit):
+    """Window lights as a grid on one block: columns every cell[0] px, rows every cell[1] px, each lit with p_lit
+    (a row's chance varies, so lit windows cluster by floor)."""
+    x0, x1 = b['x0'] + 3, b['x1'] - 3
+    y = b['top'] - frame_y0 + prng.uniform(5, 9)
+    while y < h - 2:
+        pr = p_lit * prng.uniform(0.2, 1.6)
+        x = x0 + prng.uniform(0, cell[0] * 0.5)
+        while x < x1 - dash[0]:
+            if prng.random() < pr:
+                brush.line(layer, (x, y), (x + dash[0], y), dash[1], jitter(colour, prng, 0.01),
+                           prng.uniform(0.65, 0.95), soft=(0.4, 0.4), taper=(0.04, 0.04))
+            x += cell[0]
+        y += cell[1]
+
+
+def paint_far_city(w=1000, h=300, frame_y0=592, seed=None, passes=9):
     """Sky, then 4 planes far -> near. Each plane: P0 flat silhouettes, one value per block (+-1.2 L*), converted
-    toward the air by its k (more toward the sun: in-scatter; more at its base: mist); P1 two or three huge soft
-    strokes (near planes); P2 the sun-side face of a block one step lighter, dark slots; P3 lit slivers on the edges
-    facing the sun + window lights; then the plane blur, and lost tops by the sun on the far planes."""
+    toward the air by its k (more toward the sun: in-scatter; more at its base: mist) and a slow mottle; P2 the
+    sun-side face of a block one step lighter, dark slots (mid planes); P3 lit slivers on the edges that face the sun,
+    glowing roof edges, window grids, the gasholder's frame; then the plane blur, and lost tops by the sun."""
     rng = rng_for('far_city', seed)
     brush = Brush(rng)
     cv = Canvas(h, w)
@@ -572,109 +608,95 @@ def paint_far_city(w=1000, h=400, frame_y0=592, seed=None, passes=9):
     t_air = rgb2ok(PAL['air'])
     for i, spec in enumerate(FAR_PLANES):
         prng = rng_for('far_city/' + spec['name'], seed)
-        blocks = skyline(prng, w, spec) + landmarks(spec['name'], frame_y0)
-        # ---- P0: per-block flat colour, then the plane's depth conversion per pixel
+        blocks = skyline(prng, w, spec) + landmarks(spec['name'])
+        # ---- P0: per-block flat colour, then the plane's depth conversion, per pixel
         pre = Layer(h, w)
         for poly, b in blocks:
             m = poly_mask(h, w, [[(px, py - frame_y0) for px, py in poly]])
             if m.sum() < 1:
                 continue
-            c = shift(shade, prng.normal(0, 0.012), prng.normal(0, 0.003), prng.normal(0, 0.004))
+            c = shift(shade, prng.normal(0, spec['jit']), prng.normal(0, 0.003), prng.normal(0, 0.004))
             pre.fill(m, c)
         mask = pre.a.copy()
         if mask.sum() < 1:
             continue
         o = rgb2ok(np.where(mask[..., None] > 1e-3, pre.c / np.maximum(mask[..., None], 1e-3), shade))
-        k = spec['k'] + (1 - spec['k']) * (0.42 * veil)                              # in-scatter toward the sun
-        k = k + (1 - k) * 0.15 * smooth((fy - (HORIZON_Y - 30)) / 170.0)              # mist: the air is thick low
+        o[..., 0] += 0.01 * spec['mottle'] * value_noise(h, w, 46.0, prng)           # colour moving in the plane
+        k = spec['k'] + (1 - spec['k']) * (spec['scatter'] * veil)                      # in-scatter toward the sun
+        k = k + (1 - k) * spec['mist'] * smooth((fy - (HORIZON_Y - 30)) / 170.0)        # mist: the air is thick low
         o = o * (1 - k[..., None]) + t_air * k[..., None]
         o[..., 1:] = t_air[1:] + (o[..., 1:] - t_air[1:]) * spec['chroma']
-        warm = 0.22 * veil[..., None]                                                 # the in-scatter is the sun's
+        warm = 0.22 * veil[..., None]                                                  # the in-scatter is the sun's
         o = o * (1 - warm) + rgb2ok(SKY['glow']) * warm
         lay = Layer(h, w)
         lay.fill(mask, ok2rgb(o).astype(np.float32))
-        mid = to_plane(shade, spec['k'], spec['chroma'])
-        if passes >= 1 and spec['p1']:
-            # P1: two or three huge soft strokes, +-1 L*, blurred 14 px: the plane's colour moving, never stripes
-            p1 = Layer(h, w)
-            for _ in range(spec['p1']):
-                cx_, cy_ = prng.uniform(0, w), prng.uniform(HORIZON_Y - 120, HORIZON_Y + 60) - frame_y0
-                c = shift(mid, prng.choice([-1, 1]) * prng.uniform(0.008, 0.012), 0.0, prng.normal(0, 0.006))
-                brush.line(p1, (cx_ - 160, cy_), (cx_ + 160, cy_ + prng.uniform(-30, 30)), prng.uniform(120, 200),
-                           c, 0.5, soft=(50, 50), taper=(0.3, 0.3))
-            p1.blur(14.0).clip(mask)
-            over_into(lay, p1)
-        if passes >= 2 and spec['p2']:
+        if passes >= 2 and spec['name'] in ('p2', 'p1'):
             # P2: the sun-side face of a block (a second face, one step lighter and warmer), and dark slots
             p2 = Layer(h, w)
             for poly, b in blocks:
-                if b['kind'] in ('chimney', 'spire'):
+                if b['kind'] in ('chimney', 'spire', 'box'):
                     continue
                 bw_ = b['x1'] - b['x0']
                 toward_left = (b['x0'] + b['x1']) / 2 > SUN[0]
                 top_l = b['top'] - frame_y0
-                if prng.random() < 0.55:
-                    fw = bw_ * prng.uniform(0.2, 0.38)
+                if prng.random() < 0.75:
+                    fw = bw_ * prng.uniform(0.2, 0.36)
                     fx = b['x0'] + fw / 2 if toward_left else b['x1'] - fw / 2
-                    c = to_plane(lighter(shade, 0.24), spec['k'], spec['chroma'])
-                    brush.line(p2, (fx, top_l + 0.5), (fx, h + 4), fw, jitter(c, prng, 0.004), prng.uniform(0.55, 0.75),
+                    c = to_plane(lighter(shade, 0.3), spec['k'], spec['chroma'])
+                    y_start = top_l + 0.5 if b['roof'] is None else top_l + 0.5
+                    brush.line(p2, (fx, y_start), (fx, h + 4), fw, jitter(c, prng, 0.004), prng.uniform(0.6, 0.8),
                                soft=(0.6, 0.6), taper=(0.0, 0.0))
                 if prng.random() < 0.3:
-                    sx = prng.uniform(b['x0'] + 0.3 * bw_, b['x1'] - 4)
+                    sx = prng.uniform(b['x0'] + 0.35 * bw_, b['x1'] - 4)
                     c = to_plane(darker(shade, 0.35), spec['k'], spec['chroma'])
-                    brush.line(p2, (sx, top_l + prng.uniform(4, 14)), (sx, h + 4), prng.uniform(2.5, 5), c,
+                    brush.line(p2, (sx, top_l + prng.uniform(5, 14)), (sx, h + 4), prng.uniform(2.5, 5), c,
                                prng.uniform(0.35, 0.55), soft=(0.6, 0.6), taper=(0.0, 0.0))
             p2.blur(0.4).clip(mask)
             over_into(lay, p2)
         if passes >= 3:
-            # P3: lit slivers on the edges facing the sun; window lights; the gasholder's columns
+            # P3: lit slivers on the edges facing the sun; glowing roof edges; window grids; the gasholder
             p3 = Layer(h, w)
-            sl_col = to_plane(PAL['glow'], spec['k'] * 0.5, 1.0)
+            sl_col = to_plane(PAL['glow'], spec['k'] * 0.45, 1.0)
             for poly, b in blocks:
                 top_l = b['top'] - frame_y0
-                if spec['sliver'] > 0 and b['kind'] in ('tower', 'block', 'gable'):
-                    toward_left = (b['x0'] + b['x1']) / 2 > SUN[0]
-                    sw = spec['sliver']
-                    if prng.random() < spec['wide']:
-                        sw = prng.uniform(5, 12)                                       # a face turned to the sun
-                    ex = b['x0'] + sw / 2 if toward_left else b['x1'] - sw / 2
-                    if b['kind'] == 'tower':
-                        ln = (HORIZON_Y + 40 - b['top']) * prng.uniform(0.6, 1.0)
-                    else:
-                        ln = (HORIZON_Y + 40 - b['top']) * prng.uniform(0.25, 0.7)
-                    if b['kind'] == 'gable':
+                if spec['sliver'] > 0 and b['kind'] in ('tower', 'block', 'warehouse', 'terrace', 'gable', 'box'):
+                    if prng.random() < 0.8:
+                        toward_left = (b['x0'] + b['x1']) / 2 > SUN[0]
+                        sw = spec['sliver']
+                        if prng.random() < spec['wide'] and b['kind'] in ('tower', 'block'):
+                            sw = prng.uniform(5, 11)                                    # a face turned to the sun
                         ex = b['x0'] + sw / 2 if toward_left else b['x1'] - sw / 2
-                    brush.line(p3, (ex, top_l), (ex, top_l + max(ln, 6)), sw, sl_col, prng.uniform(0.75, 0.95),
-                               soft=(0.45, 0.45), taper=(0.0, 0.55), dry=0.25)
-                    if b['kind'] == 'tower':                                           # the roof edge catches it too
-                        brush.line(p3, (b['x0'], top_l + 0.7), (b['x1'], top_l + 0.7), 1.4, sl_col, 0.6,
-                                   soft=(0.45, 0.45), taper=(0.1, 0.1))
+                        vis = min(h + frame_y0, HORIZON_Y + 120) - b['top']
+                        ln = vis * (prng.uniform(0.8, 1.0) if b['kind'] == 'tower' else prng.uniform(0.5, 1.0))
+                        brush.line(p3, (ex, top_l), (ex, top_l + max(ln, 5)), sw, sl_col, prng.uniform(0.8, 0.95),
+                                   soft=(0.45, 0.45), taper=(0.0, 0.6), dry=0.2)
+                    if b['roof'] is None and b['kind'] in ('tower', 'block', 'box') and prng.random() < 0.55:
+                        brush.line(p3, (b['x0'], top_l + 0.7), (b['x1'], top_l + 0.7), 1.3, sl_col, 0.55,
+                                   soft=(0.45, 0.45), taper=(0.08, 0.3))           # the parapet catches the glow
                 if b['kind'] == 'spire' and spec['sliver'] > 0:                        # the spire's sunward flank
-                    (ax, ay), (bx, by), (cx2, cy2) = poly[0], poly[1], poly[2]
-                    brush.line(p3, (ax + 1.0, ay - frame_y0), (bx, by - frame_y0 + 2), 1.6, sl_col, 0.8,
+                    (ax, ay), (bx, by) = poly[0], poly[1]
+                    brush.line(p3, (ax + 1.0, ay - frame_y0), (bx, by - frame_y0 + 2), 1.6, sl_col, 0.85,
                                soft=(0.45, 0.45), taper=(0.0, 0.2))
-                if spec['win'] and b['kind'] in ('block', 'tower', 'gable') and prng.random() < spec['win']:
-                    lampc = to_plane(mix(PAL['lamp'], shade, 0.2), spec['k'] * 0.6, 1.0)
-                    wy = top_l + prng.uniform(7, 12)
-                    while wy < h - 3:
-                        for _ in range(int(prng.integers(1, 5))):
-                            if prng.random() < 0.55:
-                                wx = prng.uniform(b['x0'] + 4, max(b['x1'] - 6, b['x0'] + 5))
-                                brush.line(p3, (wx, wy), (wx + prng.uniform(2.0, 4.5), wy), 1.5, lampc,
-                                           prng.uniform(0.6, 0.95), soft=(0.4, 0.4), taper=(0.05, 0.05))
-                        wy += prng.uniform(8, 11)
-            if spec['name'] == 'p3':                                                    # the gasholder frame
-                gx0, gx1, gtop = 780.0, 905.0, HORIZON_Y - 74.0
+                if spec['win'] and b['kind'] in ('block', 'tower', 'warehouse', 'terrace') and \
+                        prng.random() < spec['win']:
+                    lampc = to_plane(mix(PAL['lamp'], shade, 0.15), spec['k'] * 0.55, 1.0)
+                    near = spec['name'] == 'p1'
+                    far_window_grid(brush, p3, b, h, frame_y0, prng, lampc, (7.5, 10.0) if near else (6.0, 8.0),
+                                    (2.4, 1.5) if near else (1.8, 1.2), 0.28)
+            if spec['name'] == 'p3':                                                     # the gasholder frame
+                gx0, gx1, gtop = 800.0, 920.0, HORIZON_Y - 70.0
                 gcol = to_plane(darker(shade, 0.2), spec['k'] * 0.85, spec['chroma'])
                 for j in range(8):
                     t = (1 - np.cos(np.pi * j / 7)) / 2
                     gx = gx0 + (gx1 - gx0) * t
-                    brush.line(p3, (gx, gtop - frame_y0), (gx, HORIZON_Y + 6 - frame_y0), 1.6, gcol, 0.85,
+                    brush.line(p3, (gx, gtop - frame_y0), (gx, HORIZON_Y + 8 - frame_y0), 1.7, gcol, 0.9,
                                soft=(0.45, 0.45), taper=(0.0, 0.0))
-                for ry in (0.0, 0.33, 0.66):
+                for ry in (0.0, 0.34, 0.68):
                     yv = gtop + (HORIZON_Y - gtop) * ry - frame_y0
-                    brush.line(p3, (gx0, yv), (gx1, yv), 1.8, gcol, 0.85, soft=(0.45, 0.45), taper=(0.0, 0.0))
-            if spec['name'] != 'p3':
+                    brush.line(p3, (gx0, yv), (gx1, yv), 1.8, gcol, 0.9, soft=(0.45, 0.45), taper=(0.0, 0.0))
+                brush.line(p3, (gx0 + 2, gtop - frame_y0 + 1.6), (gx1 - 2, gtop - frame_y0 + 1.6), 1.2, sl_col, 0.6,
+                           soft=(0.45, 0.45), taper=(0.0, 0.0))
+            else:
                 p3.clip(mask)
             over_into(lay, p3)
         # PLANE: one small blur for its depth; the far planes' tops are lost right by the sun
@@ -685,4 +707,451 @@ def paint_far_city(w=1000, h=400, frame_y0=592, seed=None, passes=9):
             lay.c = lay.c * (1 - wgt[..., None]) + soft.c * wgt[..., None]
             lay.a = lay.a * (1 - wgt) + soft.a * wgt
         cv.over(lay)
+    return cv
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# 6. ELEMENT 2: the painted facade (recipe 4.2)
+# ----------------------------------------------------------------------------------------------------------------
+# A four-storey stock-brick warehouse 27 m away, seen from the towpath (eye 1.6 m): its base at frame y 848, its top
+# at y 288, the horizon cutting it 56 px above the base. The sun is low, ahead-left: the SIDE face (facing left) is lit
+# at a grazing angle, the FRONT face (facing us) is in the shade family; every reveal and edge that faces left catches
+# a sliver of sun. Panel px = frame px - (430, 198).
+FAC_X0, FAC_Y0 = 430, 198
+FAC_HZ = HORIZON_Y - FAC_Y0                       # 594: the horizon in panel px (the eye's level)
+FAC_VP = (-900.0, float(FAC_HZ))                  # the side face's vanishing point (left, on the horizon)
+FAC_CORNER, FAC_FAR, FAC_RIGHT = 170.0, 58.0, 570.0
+FAC_TOP, FAC_GROUND = 90.0, 650.0
+
+
+def fac_colours():
+    """The facade's value plan in the dusk light (recipe 4.2 a): 9 values from 3 hue families, all palette mixes."""
+    C = dict(
+        side=mix(PAL['ochre'], PAL['glow'], 0.18),           # L~74 brick on the sunlit side face (warm gold)
+        front_top=mix(PAL['mauve'], PAL['lilac'], 0.30),     # L~55 brick in shade, high: more sky, cooler
+        front_low=mix(PAL['mauve'], PAL['terracotta'], 0.40),  # L~53 brick in shade, low: warm bounce
+        stone_sh=mix(PAL['lilac'], PAL['cream'], 0.30),      # L~72 dressed stone in shade (cornice, bands, sills)
+        stone_lit=mix(PAL['cream'], PAL['glow'], 0.55),      # L~90 dressed stone in the sun (the side face)
+        deep=mix(PAL['plum'], PAL['mauve'], 0.20),           # L~35 soffits seen from below, lintel heads
+        glass=mix(PAL['ink'], PAL['plum'], 0.30),            # L~22 glass in shade
+        glass_sky=mix(PAL['skyglass'], PAL['lilac'], 0.30),  # L~63 the upper pane mirrors the lilac sky behind us
+        lamp=PAL['lamp'],                                    # L~84 a lit interior
+        lamp_low=mix(PAL['lamp'], PAL['terracotta'], 0.45),  # L~72 the same, falling off low
+        plinth=mix(PAL['slate'], PAL['plum'], 0.45),         # L~39 blue engineering brick in shade
+        plinth_lit=mix(PAL['terracotta'], PAL['ochre'], 0.35),  # L~63 the same in the sun
+        pipe=mix(PAL['plum'], PAL['ink'], 0.30),             # L~28
+        reveal=mix(PAL['ochre'], PAL['glow'], 0.32),         # L~78 a reveal facing the sun (the brightest brick)
+        ground_lit=mix(PAL['sand'], PAL['glow'], 0.25),      # the sunlit paving in front
+        ground_sh=mix(PAL['lilac'], PAL['sand'], 0.30),      # the building's shadow wedge on it
+    )
+    return C
+
+
+def fac_side_pt(u, yc):
+    """A point on the side face: u = 0 at its far edge .. 1 at the corner; yc = the height on the corner's scale."""
+    x = FAC_FAR + (FAC_CORNER - FAC_FAR) * u
+    f = (x - FAC_VP[0]) / (FAC_CORNER - FAC_VP[0])
+    return (x, FAC_HZ + (yc - FAC_HZ) * f)
+
+
+def fac_side_quad(u0, u1, y0, y1):
+    return [fac_side_pt(u0, y0), fac_side_pt(u1, y0), fac_side_pt(u1, y1), fac_side_pt(u0, y1)]
+
+
+FAC_ROWS = [(150.0, 236.0), (278.0, 364.0), (406.0, 492.0)]   # window top/bottom per upper floor
+FAC_COLS = [218.0, 318.0, 418.0, 518.0]                        # window centre x on the front (width 50)
+FAC_BANDS = [254.0, 382.0, 510.0]                             # stone string courses (top y), 8 px tall
+FAC_ARCHES = [240.0, 370.0, 500.0]                            # ground-floor loading arches (width 80)
+
+
+def paint_facade(W=600, H=720, seed=None, passes=9, keep=None):
+    """P0 the flat design in its value plan; P1 big soft strokes per face (blurred 8 px); P2 blocky flat strokes where
+    the form turns and the weather runs (blurred 0.5 px); P2b brick suggested in patches (strong in the raking sun,
+    faint in shade); P3 crisp accents (slivers on everything that faces the sun, glazing bars, the arris); P4 weather
+    (stains under sills, soot under the cornice, the splash band) and speckle. `keep` collects pass snapshots."""
+    rng = rng_for('facade', seed)
+    brush = Brush(rng)
+    C = fac_colours()
+    cv = Canvas(H, W)
+    cv.c[:] = sky_backdrop(H, W, FAC_Y0, FAC_X0)
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    # ---- the ground: sunlit paving to the horizon (its glare toward the sun), the shadow wedge along the front ----
+    g = Layer(H, W)
+    m_gr = (yy >= FAC_HZ).astype(np.float32)
+    zf = np.clip((yy - FAC_HZ) / 60.0, 0, 1)[..., None]
+    gcol = mix(PAL['air'], PAL['glow'], 0.4) * (1 - zf) + C['ground_lit'] * zf
+    g.fill(m_gr, gcol.astype(np.float32))
+    sun_foot = (SUN[0] - FAC_X0, float(FAC_HZ))
+    d = np.array([FAC_CORNER - sun_foot[0], FAC_GROUND - sun_foot[1]])
+    d /= np.linalg.norm(d)
+    wedge = [(FAC_CORNER, FAC_GROUND), (FAC_CORNER + d[0] * 2000, FAC_GROUND + d[1] * 2000), (W + 50, FAC_GROUND)]
+    g.fill(poly_mask(H, W, [wedge]) * m_gr, C['ground_sh'])
+    cv.over(g)
+    # ---- DESIGN (P0): faces, stone, openings ----
+    side = [fac_side_pt(0, FAC_TOP), fac_side_pt(1, FAC_TOP), fac_side_pt(1, FAC_GROUND), fac_side_pt(0, FAC_GROUND)]
+    front = rect(FAC_CORNER, FAC_TOP, FAC_RIGHT, FAC_GROUND)
+    m_side = poly_mask(H, W, [side])
+    m_front = poly_mask(H, W, [front])
+    m_bldg = np.clip(m_side + m_front, 0, 1)
+    # front features
+    cornice = rect(FAC_CORNER, FAC_TOP, FAC_RIGHT + 6, 106)
+    soffit = rect(FAC_CORNER, 106, FAC_RIGHT + 6, 116)
+    bedc = rect(FAC_CORNER, 116, FAC_RIGHT, 120)
+    bands = [rect(FAC_CORNER, b, FAC_RIGHT, b + 8) for b in FAC_BANDS]
+    band_under = [rect(FAC_CORNER, b + 8, FAC_RIGHT, b + 9.6) for b in FAC_BANDS]
+    win, sills, sill_under, heads, reveals, wins = [], [], [], [], [], []
+    for (t, b) in FAC_ROWS:
+        for c in FAC_COLS:
+            x0, x1 = c - 25, c + 25
+            wins.append((x0, t, x1, b))
+            win.append(rect(x0, t, x1, b))
+            sills.append(rect(x0 - 5, b, x1 + 5, b + 8))
+            sill_under.append(rect(x0 - 5, b + 8, x1 + 5, b + 9.6))
+            heads.append(rect(x0, t, x1, t + 4))
+            reveals.append(rect(x1 - 6, t + 4, x1, b))
+    arches, arch_reveals, arch_heads = [], [], []
+    for c in FAC_ARCHES:
+        r = 40.0
+        x0, x1, top, spring = c - r, c + r, 548.0, 588.0
+        poly = [(x0, FAC_GROUND), (x0, spring)] + [(c + r * np.cos(a), spring - r * np.sin(a))
+                                                   for a in np.linspace(np.pi, 0, 24)] + [(x1, FAC_GROUND)]
+        arches.append(poly)
+        arch_reveals.append([(x1 - 7, spring + 4), (x1, spring), (x1, FAC_GROUND), (x1 - 7, FAC_GROUND)])
+        ring = [(c + (r + 9) * np.cos(a), spring - (r + 9) * np.sin(a)) for a in np.linspace(np.pi, 0, 24)]
+        ring += [(c + r * np.cos(a), spring - r * np.sin(a)) for a in np.linspace(0, np.pi, 24)]
+        arch_heads.append(ring)
+    plinth_f = rect(FAC_CORNER, 628, FAC_RIGHT, FAC_GROUND)
+    pipe = rect(553, 116, 559, FAC_GROUND)
+    # side features (the same heights, mapped through the side face's perspective)
+    s_cornice = [fac_side_pt(0, FAC_TOP), fac_side_pt(1, FAC_TOP), fac_side_pt(1, 106), fac_side_pt(0, 106)]
+    s_soffit = fac_side_quad(0, 1, 106, 116)
+    s_bands = [fac_side_quad(0, 1, b, b + 8) for b in FAC_BANDS]
+    s_wins = [fac_side_quad(0.40, 0.64, t, b) for (t, b) in FAC_ROWS]
+    s_sills = [fac_side_quad(0.37, 0.67, b, b + 7) for (t, b) in FAC_ROWS]
+    s_arch = []
+    u0, u1 = 0.32, 0.72
+    pts = [fac_side_pt(u0, FAC_GROUND), fac_side_pt(u0, 590)]
+    for a in np.linspace(np.pi, 0, 20):
+        u = (u0 + u1) / 2 + (u1 - u0) / 2 * np.cos(a)
+        pts.append(fac_side_pt(u, 590 - 36 * np.sin(a)))
+    pts += [fac_side_pt(u1, 590), fac_side_pt(u1, FAC_GROUND)]
+    s_arch.append(pts)
+    s_plinth = fac_side_quad(0, 1, 628, FAC_GROUND)
+    M = lambda polys: poly_mask(H, W, polys)                                     # noqa: E731
+    m_win, m_sill, m_sill_u, m_head = M(win), M(sills), M(sill_under), M(heads)
+    m_reveal = M(reveals)
+    m_arch, m_arch_rev, m_arch_head = M(arches), M(arch_reveals), M(arch_heads) * (1 - M(arches))
+    m_cornice, m_soffit, m_bedc = M([cornice]), M([soffit]), M([bedc])
+    m_band, m_band_u = M(bands), M(band_under)
+    m_plinth_f = M([plinth_f]) * (1 - m_arch)
+    m_pipe = M([pipe])
+    m_s_cornice, m_s_soffit, m_s_band = M([s_cornice]), M([s_soffit]), M(s_bands)
+    m_s_win, m_s_sill, m_s_arch, m_s_plinth = M(s_wins), M(s_sills), M(s_arch), M([s_plinth]) * (1 - M(s_arch))
+    stone_f = np.clip(m_cornice + m_bedc + m_band + m_sill, 0, 1) * (1 - m_soffit)
+    open_f = np.clip(m_win + m_arch, 0, 1)
+    m_fbrick = np.clip(m_front - stone_f - m_soffit - open_f - m_plinth_f - m_pipe - m_arch_head * 0, 0, 1)
+    m_fbrick = np.clip(m_fbrick - m_sill_u - m_band_u, 0, 1)
+    m_sbrick = np.clip(m_side - m_s_cornice - m_s_soffit - m_s_band - m_s_win - m_s_sill - m_s_arch - m_s_plinth,
+                       0, 1)
+    lay = Layer(H, W)
+    t = smooth((yy - FAC_TOP) / (FAC_GROUND - FAC_TOP))[..., None]
+    front_img = C['front_top'] * (1 - t) + C['front_low'] * t                   # cooler high, warmer low
+    tb = (np.exp(-(xx - FAC_CORNER) / 120.0) * smooth((yy - 300) / 340.0))[..., None]
+    front_img = front_img * (1 - 0.35 * tb) + lighter(C['front_low'], 0.2, 'terracotta') * 0.35 * tb  # bounce
+    lay.fill(m_front, front_img.astype(np.float32))
+    ts = smooth((FAC_CORNER - xx) / (FAC_CORNER - FAC_FAR))[..., None]
+    side_img = C['side'] * (1 - 0.5 * ts) + lighter(C['side'], 0.2) * 0.5 * ts   # brighter toward the sun's end
+    lay.fill(m_side, side_img.astype(np.float32))
+    lay.fill(m_arch_head * m_front, mix(front_img, C['stone_sh'], 0.25).astype(np.float32))  # a gauged-brick ring
+    lay.fill(stone_f, C['stone_sh'])
+    lay.fill(m_soffit, C['deep'])
+    lay.fill(np.clip(m_sill_u + m_band_u, 0, 1), C['deep'])
+    lay.fill(m_s_cornice, C['stone_lit'])
+    lay.fill(m_s_soffit, mix(C['stone_lit'], C['deep'], 0.55))
+    lay.fill(m_s_band + m_s_sill, C['stone_lit'])
+    lay.fill(m_plinth_f, C['plinth'])
+    lay.fill(m_s_plinth, C['plinth_lit'])
+    lay.fill(m_pipe, C['pipe'])
+    # glass: the upper pane mirrors the lilac sky behind us, the lower pane is dark; a few lit from inside
+    wrng = rng_for('facade/windows', seed)
+    lit_ids = {1, 6, 11}
+    glass = np.zeros((H, W, 3), np.float32)
+    for idx, (x0, t0, x1, b0) in enumerate(wins):
+        m = poly_mask(H, W, [rect(x0, t0, x1, b0)])
+        split = t0 + (b0 - t0) * wrng.uniform(0.32, 0.46) + (xx - x0) * 0.22
+        f = smooth((yy - split) / 2.5 + 0.5)[..., None]
+        col = C['glass_sky'] * (1 - f) + C['glass'] * f
+        col = col * (1 - f) + shift(C['glass'], wrng.normal(0, 0.025)) * f                 # interiors differ
+        if idx in (3, 8):                                                                  # a blind half down
+            fb = (yy < t0 + (b0 - t0) * wrng.uniform(0.3, 0.45))[..., None]
+            col = np.where(fb, mix(C['stone_sh'], C['glass_sky'], 0.5), col)
+        if idx in lit_ids:
+            f2 = smooth((yy - (t0 + (b0 - t0) * 0.55)) / 26.0)[..., None]
+            col = C['lamp'] * (1 - f2) + C['lamp_low'] * f2
+        glass = glass * (1 - m[..., None]) + col * m[..., None]
+    for idx, poly in enumerate(s_wins):                                       # side windows: sky glass, one lit
+        m = poly_mask(H, W, [poly])
+        ys = [p[1] for p in poly]
+        split = min(ys) + (max(ys) - min(ys)) * 0.4
+        f = smooth((yy - split) / 2.5 + 0.5)[..., None]
+        col = mix(C['glass_sky'], PAL['air'], 0.35) * (1 - f) + C['glass'] * f   # it mirrors the brighter west
+        glass = glass * (1 - m[..., None]) + col * m[..., None]
+    lay.fill(m_win + m_s_win, glass)
+    lay.fill(m_head, C['deep'])
+    lay.fill(m_reveal, C['reveal'])
+    # the arches: dark bays, one a lit cafe; their right reveals catch the sun
+    arch_img = np.zeros((H, W, 3), np.float32)
+    for j, poly in enumerate(arches + s_arch):
+        m = poly_mask(H, W, [poly])
+        if j == 1:
+            f2 = smooth((yy - 560) / 80.0)[..., None]
+            col = C['lamp'] * (1 - f2) + C['lamp_low'] * f2
+        else:
+            f2 = smooth((yy - 560) / 90.0)[..., None]
+            col = C['glass'] * (1 - f2) + mix(C['glass'], C['deep'], 0.5) * f2
+        arch_img = arch_img * (1 - m[..., None]) + col * m[..., None]
+    lay.fill(np.clip(m_arch + m_s_arch, 0, 1), arch_img)
+    lay.fill(m_arch_rev, C['reveal'])
+    lay.clip(m_bldg)
+    cv.over(lay)
+    if keep is not None:
+        keep['P0'] = cv.image()
+    # ---- P1: big soft strokes per face: +-2 L*, warm/cool, blurred 8 px, clipped to the brick of that face ----
+    if passes >= 1:
+        for region, base, n in ((m_fbrick, None, 8), (m_sbrick, C['side'], 4)):
+            p1 = Layer(H, W)
+            xs, ys = sample_by(region, n, rng)
+            for x, y in zip(xs, ys):
+                b0 = base if base is not None else (C['front_top'] if y < 380 else C['front_low'])
+                warm = rng.random() < 0.5
+                c = lighter(b0, rng.uniform(0.15, 0.22), 'terracotta' if base is None else 'glow') if warm else \
+                    darker(b0, rng.uniform(0.14, 0.2), 'slate')
+                brush.line(p1, (x, y - rng.uniform(80, 200)), (x + rng.uniform(-12, 12), y + rng.uniform(80, 200)),
+                           rng.uniform(60, 120), c, 0.5, soft=(14, 14), taper=(0.25, 0.25))
+            p1.blur(6.0).clip(region)
+            cv.over(p1)
+        if keep is not None:
+            keep['P1'] = cv.image()
+    # ---- P2: blocky flat-brush strokes, placed where the form turns and the weather runs ----
+    if passes >= 2:
+        p2 = Layer(H, W)
+
+        def panel_stroke(x0, x1, y0, y1, b0, vertical=True):
+            r = rng.random()
+            if r < 0.4:
+                c = lighter(b0, rng.uniform(0.15, 0.24), 'terracotta')            # +4..7 L*, warmer
+            elif r < 0.78:
+                c = darker(b0, rng.uniform(0.14, 0.22))                           # -4..7 L*, cooler
+            else:
+                c = mix(b0, PAL['lilac'], rng.uniform(0.3, 0.42))                 # the sky's hue laid in (p02)
+            if vertical:
+                wd = (x1 - x0) * rng.uniform(0.6, 0.92)
+                cx = x0 + (x1 - x0) / 2 + rng.uniform(-0.15, 0.15) * (x1 - x0 - wd)
+                ln = (y1 - y0) * rng.uniform(0.55, 1.0)
+                cy = y0 + ln / 2 + rng.uniform(0, (y1 - y0) - ln)
+                brush.mark(p2, cx, cy, ln, wd, 90, jitter(c, rng, 0.003), rng.uniform(0.55, 0.8), soft=(0.6, 0.6),
+                           taper=(0.01, 0.1), dry=0.3 if rng.random() < 0.5 else 0.0, dry_len=0.25)
+            else:
+                ln = (x1 - x0) * rng.uniform(0.6, 0.95)
+                cx = x0 + ln / 2 + rng.uniform(0, (x1 - x0) - ln)
+                wd = (y1 - y0) * rng.uniform(0.55, 0.9)
+                brush.mark(p2, cx, (y0 + y1) / 2, ln, wd, rng.normal(0, 1), jitter(c, rng, 0.003),
+                           rng.uniform(0.5, 0.75), soft=(0.6, 0.6), taper=(0.03, 0.12),
+                           dry=0.3 if rng.random() < 0.5 else 0.0, dry_len=0.25)
+        floors = [(120.0, FAC_BANDS[0]), (FAC_BANDS[0] + 9.6, FAC_BANDS[1]), (FAC_BANDS[1] + 9.6, FAC_BANDS[2])]
+        pier_x = [(FAC_CORNER, FAC_COLS[0] - 30)] + [(FAC_COLS[i] + 30, FAC_COLS[i + 1] - 30) for i in range(3)] + \
+                 [(FAC_COLS[3] + 30, 552.0)]
+        for (fy0, fy1) in floors:                                             # each pier: one deliberate stroke
+            for (px0, px1) in pier_x:
+                if rng.random() < 0.8:
+                    panel_stroke(px0, px1, fy0, fy1, C['front_top'] if fy0 < 380 else C['front_low'])
+        for (t0, b0) in FAC_ROWS:                                             # each spandrel: one, half the time
+            band_y = min([bb for bb in FAC_BANDS + [FAC_GROUND] if bb > b0])
+            for c in FAC_COLS:
+                if rng.random() < 0.5:
+                    panel_stroke(c - 28, c + 28, b0 + 11, band_y - 1, C['front_top'] if b0 < 380 else C['front_low'],
+                                 vertical=False)
+        for _ in range(3):                                                     # the corner: the form turns, warm
+            y = rng.uniform(140, 600)
+            brush.mark(p2, FAC_CORNER + rng.uniform(5, 14), y, rng.uniform(40, 110), rng.uniform(8, 16), 90,
+                       lighter(C['front_low'], rng.uniform(0.12, 0.2), 'terracotta'), rng.uniform(0.5, 0.7),
+                       soft=(0.6, 0.6), taper=(0.02, 0.15))
+        for _ in range(4):                                                     # the plinth: level strokes
+            y = rng.uniform(631, 646)
+            x = rng.uniform(FAC_CORNER, FAC_RIGHT - 60)
+            brush.mark(p2, x + 40, y, rng.uniform(50, 120), rng.uniform(5, 9), rng.normal(0, 0.5),
+                       lighter(C['plinth'], rng.uniform(0.08, 0.16), 'lilac'), rng.uniform(0.45, 0.7),
+                       soft=(0.6, 0.6), taper=(0.04, 0.15), dry=0.4)
+        for _ in range(5):                                                     # cool patches: the sky's lilac, high
+            x, y = sample_by(m_fbrick * (yy < 400) * (1 - np.exp(-inside_dist(m_fbrick) / 6.0)), 1, rng)
+            if len(x):
+                brush.mark(p2, x[0], y[0], rng.uniform(18, 46), rng.uniform(10, 22), 90,
+                           mix(C['front_top'], PAL['lilac'], rng.uniform(0.35, 0.5)), rng.uniform(0.55, 0.8),
+                           soft=(0.6, 0.6), taper=(0.02, 0.05))
+        for _ in range(4):                                                     # warm repairs: newer brick, low
+            x, y = sample_by(m_fbrick * (yy > 420), 1, rng)
+            if len(x):
+                brush.mark(p2, x[0], y[0], rng.uniform(14, 34), rng.uniform(10, 26), 0,
+                           mix(C['front_low'], PAL['terracotta'], rng.uniform(0.35, 0.55)), rng.uniform(0.5, 0.75),
+                           soft=(0.6, 0.6), taper=(0.02, 0.05))
+        p2.blur(0.5).clip(np.clip(m_fbrick + m_plinth_f, 0, 1))
+        cv.over(p2)
+        p2s = Layer(H, W)
+        for (fy0, fy1) in [(120.0, FAC_BANDS[0]), (FAC_BANDS[0] + 8, FAC_BANDS[1]), (FAC_BANDS[1] + 8, FAC_BANDS[2]),
+                           (FAC_BANDS[2] + 8, 626.0)]:
+            for (u0_, u1_) in ((0.04, 0.37), (0.67, 0.97)):                    # the two bays beside the window
+                if rng.random() < 0.85:
+                    r = rng.random()
+                    c = lighter(C['side'], rng.uniform(0.2, 0.32)) if r < 0.5 else \
+                        darker(C['side'], rng.uniform(0.12, 0.2), 'terracotta')
+                    ua, ub = sorted(rng.uniform(u0_, u1_, 2))
+                    ub = max(ub, ua + 0.12)
+                    pa, pb_ = fac_side_pt(ua, fy0), fac_side_pt(ub, fy0)
+                    ln = (fy1 - fy0) * rng.uniform(0.5, 0.95)
+                    yc = (pa[1] + pb_[1]) / 2 + ln / 2 + rng.uniform(0, (fy1 - fy0) - ln)
+                    brush.mark(p2s, (pa[0] + pb_[0]) / 2, yc, ln, abs(pb_[0] - pa[0]), 90, jitter(c, rng, 0.003),
+                               rng.uniform(0.5, 0.75), soft=(0.6, 0.6), taper=(0.02, 0.12),
+                               dry=0.3 if rng.random() < 0.5 else 0.0, dry_len=0.25)
+        p2s.blur(0.5).clip(m_sbrick)
+        cv.over(p2s)
+        # P2b: brick suggested, never rendered: patches of courses laid IN THE FACE'S OWN PLANE (the side face's
+        # courses run to its vanishing point), strong in the raking sun, faint in the shade
+        side_w = 280.0                                                         # the side face's true width (px)
+
+        def side_map(fx, fy):
+            return fac_side_pt(fx / side_w, fy)
+
+        for region, base, n_p, amp, crs, blen, fmap in (
+                (m_sbrick, C['side'], 12, (0.16, 0.28), 3.0, 7.5, 'side'),
+                (m_fbrick * np.exp(-inside_dist(m_fbrick) / 18.0), None, 7, (0.12, 0.18), 2.8, 7.0, 'front')):
+            pb = Layer(H, W)
+            cxs, cys = sample_by(region, n_p, rng)
+            for pcx, pcy in zip(cxs, cys):
+                if fmap == 'side':                                             # back to face coordinates
+                    u = (pcx - FAC_FAR) / (FAC_CORNER - FAC_FAR)
+                    f = (pcx - FAC_VP[0]) / (FAC_CORNER - FAC_VP[0])
+                    pcx, pcy = u * side_w, FAC_HZ + (pcy - FAC_HZ) / f
+                pw, ph = rng.uniform(30, 64), rng.uniform(12, 27)
+                b0 = base if base is not None else (C['front_top'] if pcy < 380 else C['front_low'])
+                y = pcy - ph / 2
+                row = 0
+                while y < pcy + ph / 2:
+                    x = pcx - pw / 2 + (blen / 2 if row % 2 else 0) - blen
+                    while x < pcx + pw / 2:
+                        dxn, dyn = (x - pcx) / (pw / 2), (y - pcy) / (ph / 2)
+                        if rng.random() < 0.62 * (1 - min(1.0, dxn * dxn + dyn * dyn)):  # the patch fades out
+                            c = lighter(b0, rng.uniform(*amp)) if rng.random() < 0.5 else \
+                                darker(b0, rng.uniform(*amp) * 0.8, 'terracotta')
+                            a_, b_ = (x + 0.6, y + crs / 2), (x + blen - 0.6, y + crs / 2)
+                            if fmap == 'side':
+                                a_, b_ = side_map(*a_), side_map(*b_)
+                            brush.line(pb, a_, b_, crs - 0.9, c, rng.uniform(0.45, 0.7), soft=(0.4, 0.4),
+                                       taper=(0.02, 0.02))
+                        x += blen
+                    y += crs
+                    row += 1
+            pb.clip(region)
+            cv.over(pb)
+        if keep is not None:
+            keep['P2'] = cv.image()
+    # ---- P3: the crisp light accents, last and few ----
+    if passes >= 3:
+        p3 = Layer(H, W)
+        gl = PAL['glow']
+        bar = mix(C['deep'], C['glass'], 0.4)
+        # the corner arris: the lit face's edge catches the most light; the cornice's sunward end and top on the side
+        brush.line(p3, (FAC_CORNER - 0.9, 120), (FAC_CORNER - 0.9, 628), 1.6, mix(C['side'], gl, 0.55), 0.85,
+                   soft=(0.45, 0.45), taper=(0.0, 0.0))
+        brush.line(p3, fac_side_pt(0.0, FAC_TOP + 1.0), fac_side_pt(1.0, FAC_TOP + 1.0), 2.0, gl, 0.9,
+                   soft=(0.45, 0.45), taper=(0.0, 0.0))
+        for b in FAC_BANDS:
+            brush.line(p3, fac_side_pt(0.0, b + 0.8), fac_side_pt(1.0, b + 0.8), 1.4, gl, 0.8, soft=(0.45, 0.45),
+                       taper=(0.0, 0.0))
+        # slivers on every front-face edge that looks left, toward the sun: reveals, arch jambs, the pipe
+        for (x0, t0, x1, b0) in wins:
+            brush.line(p3, (x1 - 6.0, t0 + 4), (x1 - 6.0, b0), 1.2, mix(C['reveal'], gl, 0.6), 0.75, soft=(0.45, 0.45),
+                       taper=(0.0, 0.0))
+        for c in FAC_ARCHES:
+            brush.line(p3, (c + 40 - 7.0, 592), (c + 40 - 7.0, FAC_GROUND), 1.4, mix(C['reveal'], gl, 0.6), 0.75,
+                       soft=(0.45, 0.45), taper=(0.0, 0.0))
+        brush.line(p3, (553.6, 118), (553.6, FAC_GROUND - 2), 1.2, mix(C['pipe'], gl, 0.55), 0.8, soft=(0.45, 0.45),
+                   taper=(0.0, 0.0))
+        for yb in range(160, 640, 120):                                         # pipe brackets
+            brush.line(p3, (551.5, yb), (561, yb), 2.0, C['deep'], 0.9, soft=(0.45, 0.45), taper=(0.0, 0.0))
+        # the stone's lower edges seen from below: a thin bright lip where a band's face meets its shadow
+        for b in FAC_BANDS:
+            brush.line(p3, (FAC_CORNER, b + 7.2), (FAC_RIGHT, b + 7.2), 1.0, mix(C['stone_sh'], PAL['cream'], 0.5),
+                       0.6, soft=(0.45, 0.45), taper=(0.0, 0.0))
+        # glazing bars: thin dark lines in the window's own deep (CRAFT: lines only on things that are lines)
+        for idx, (x0, t0, x1, b0) in enumerate(wins):
+            xm = (x0 + x1 - 6) / 2
+            lit = idx in lit_ids
+            bc = mix(C['lamp_low'], C['deep'], 0.55) if lit else bar
+            brush.line(p3, (xm, t0 + 4), (xm, b0), 1.5, bc, 0.7, soft=(0.45, 0.45), taper=(0.0, 0.0))
+            ym = t0 + (b0 - t0) * 0.5
+            brush.line(p3, (x0, ym), (x1 - 6, ym), 2.2, bc, 0.75, soft=(0.45, 0.45), taper=(0.0, 0.0))
+        for poly in s_wins:                                                      # side windows: a bar and a rail
+            (ax, ay), (bx, by), (cx_, cy_), (dx, dy) = poly
+            brush.line(p3, ((ax + bx) / 2, (ay + by) / 2), ((dx + cx_) / 2, (dy + cy_) / 2), 1.3, bar, 0.85,
+                       soft=(0.45, 0.45), taper=(0.0, 0.0))
+            brush.line(p3, (ax, (ay + dy) / 2), (bx, (by + cy_) / 2), 2.0, bar, 0.85, soft=(0.45, 0.45),
+                       taper=(0.0, 0.0))
+        p3.clip(m_bldg)
+        cv.over(p3)
+        if keep is not None:
+            keep['P3'] = cv.image()
+    # ---- P4: the weather (stains run down from sills, soot from the cornice, splash at the base) and speckle ----
+    if passes >= 4:
+        p4 = Layer(H, W)
+        for (x0, t0, x1, b0) in wins:
+            for _ in range(int(rng.integers(1, 3))):
+                sx = rng.choice([x0 - 2, x1 + 2, (x0 + x1) / 2]) + rng.uniform(-3, 3)
+                b0_ = C['front_top'] if b0 < 380 else C['front_low']
+                brush.line(p4, (sx, b0 + 10), (sx + rng.uniform(-1, 1), b0 + 10 + rng.uniform(24, 70)),
+                           rng.uniform(3, 7), darker(b0_, 0.42), rng.uniform(0.25, 0.4), soft=(1.2, 1.2),
+                           taper=(0.0, 0.7), dry=0.5, dry_len=0.5)
+        for _ in range(7):
+            sx = rng.uniform(FAC_CORNER + 10, FAC_RIGHT - 20)
+            brush.line(p4, (sx, 121), (sx, 121 + rng.uniform(50, 160)), rng.uniform(5, 12), darker(C['front_top'], 0.4),
+                       rng.uniform(0.14, 0.22), soft=(2.5, 2.5), taper=(0.0, 0.8), dry=0.45, dry_len=0.6)
+        p4s = Layer(H, W)                                                       # the splash band, per face
+        for _ in range(14):
+            sx, sy = rng.uniform(FAC_CORNER - 30, FAC_RIGHT), rng.uniform(612, 630)
+            brush.line(p4, (sx, sy), (sx + rng.uniform(25, 80), sy + rng.uniform(-1.5, 1.5)), rng.uniform(5, 11),
+                       darker(C['front_low'], 0.35), rng.uniform(0.2, 0.38), soft=(2.5, 1.0), taper=(0.1, 0.2),
+                       dry=0.4, edge_dry=0.55)
+        for _ in range(6):
+            u = rng.uniform(0.0, 0.85)
+            a_, b_ = fac_side_pt(u, rng.uniform(612, 628)), fac_side_pt(min(u + rng.uniform(0.15, 0.3), 1.0), 620)
+            brush.line(p4s, a_, (b_[0], a_[1] + (b_[1] - a_[1]) * 0.3), rng.uniform(5, 10),
+                       darker(C['side'], 0.3, 'terracotta'), rng.uniform(0.2, 0.35), soft=(2.5, 1.0), taper=(0.1, 0.2),
+                       dry=0.4, edge_dry=0.55)
+        for (x0, t0, x1, b0) in wins:                                          # a few hard soot drips (p02's rust)
+            if rng.random() < 0.3:
+                sx = rng.uniform(x0, x1)
+                brush.line(p4, (sx, b0 + 9.6), (sx, b0 + 9.6 + rng.uniform(28, 80)), rng.uniform(2.0, 3.2),
+                           darker(C['front_low'], 0.5), rng.uniform(0.45, 0.6), soft=(0.5, 0.5), taper=(0.0, 0.3))
+        p4s.clip(np.clip(m_sbrick + m_s_plinth, 0, 1))
+        cv.over(p4s)
+        for _ in range(14):                                                     # pale chips on the lit side (p02)
+            x, y = sample_by(m_sbrick * (0.3 + (yy > 420)), 1, rng)
+            if len(x):
+                brush.mark(p4, x[0], y[0], rng.uniform(8, 26), rng.uniform(3, 7), 90, lighter(C['side'], 0.5, 'cream'),
+                           rng.uniform(0.45, 0.7), soft=(0.5, 0.5))
+        p4.clip(np.clip(m_fbrick + m_sbrick + m_plinth_f + m_s_plinth, 0, 1))
+        cv.over(p4)
+        gl_ = grain(H, W, m_sbrick + m_s_plinth, 85, (0.45, 0.9), (2.5, 4.0), rng, light_share=0.6)
+        gs_ = grain(H, W, m_fbrick + m_plinth_f + stone_f, 32, (0.45, 0.8), (1.5, 2.5), rng, light_share=0.5)
+        apply_dl(cv, gl_ + gs_)
+    # ---- the base meets the ground: a dark contact line, crisp; the wedge's edge softer away from the corner ----
+    cs = Layer(H, W)
+    brush.line(cs, (FAC_CORNER, FAC_GROUND + 1.0), (FAC_RIGHT, FAC_GROUND + 1.0), 3.0, mix(C['ground_sh'], PAL['plum'],
+               0.6), 0.8, soft=(0.5, 3.0), taper=(0.0, 0.0))
+    a_, b_ = fac_side_pt(0, FAC_GROUND), fac_side_pt(1, FAC_GROUND)
+    brush.line(cs, (a_[0], a_[1] + 1), (b_[0], b_[1] + 1), 2.4, mix(C['ground_lit'], PAL['plum'], 0.5), 0.7,
+               soft=(0.5, 2.5), taper=(0.0, 0.0))
+    cs.clip(m_gr * (1 - m_bldg))
+    cv.over(cs)
+    if keep is not None:
+        keep['final'] = cv.image()
     return cv
