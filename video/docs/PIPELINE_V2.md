@@ -131,7 +131,9 @@ stages (building, fixing, polishing), where the measured waste happened.
    result into a repo file as it goes (never only as its final message), a long unattended build runs
    `video/scripts/autocheckpoint.sh <branch> <the film's paths>` (a commit and push every 10 minutes when they changed;
    a background job lives at most 2 hours), and an agent stopped by a limit resumes from its transcript (SendMessage)
-   after the reset (owner, 2026-10-27). Workflow steps are resumable: each step writes its result to a file
+   after the reset (owner, 2026-10-27), picked up automatically (owner, 2026-10-29): while agents are in flight, an
+   hourly self check-in is armed (`create_trigger` into the session, cron hourly), since a session cannot act while the
+   limit holds; each firing resumes what the limit stopped, and the last one deletes it. Workflow steps are resumable: each step writes its result to a file
    (`runs/<run>/<step>.json` or the stage's report) and a relaunch reuses every step whose file exists, so a relaunch
    after a limit replays nothing (v1's relaunch started every scene over at round 1). One machine runs at most about 4 agents at once
    (this 4-CPU container runs about 2 render-heavy ones well); more parallel work goes to helper cloud sessions, each

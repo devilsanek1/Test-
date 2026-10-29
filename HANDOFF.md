@@ -414,6 +414,9 @@ scratch.
     unattended build runs `video/scripts/autocheckpoint.sh <branch> <your film's paths>` (every 10 minutes when those
     paths changed, at most 2 hours per background job; `--once` for a single checkpoint); after the reset, resume a
     stopped agent with SendMessage instead of starting a new one. The main loop kept working when agents could not.
+    **The resume is automatic** (owner, 2026-10-29): while agents are in flight, keep an hourly self check-in armed
+    (`create_trigger` into your own session, cron hourly; a session cannot act while the limit holds, so arm it first);
+    each firing resumes what the limit stopped, and the last one deletes it.
   - ImageMagick circle avatar mask:
     `-alpha set ( +clone -alpha transparent -fill white -draw "circle ..." ) -compose DstIn -composite -background white -alpha remove`.
   - The scratchpad and `video/out/` are not in git (`video/out` is gitignored); deliverables go to `video/deliverables/`.

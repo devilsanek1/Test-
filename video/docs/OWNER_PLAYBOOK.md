@@ -478,7 +478,11 @@ Maintenance at the end).
   and push every 10 minutes when they changed; a background job lives at most 2 hours, so it covers one build, not a
   whole day). An agent stopped by a limit resumes from its transcript (SendMessage) once the limit resets, rather than
   starting over (owner, v4, 2026-10-27: "make sure to commit the progress periodically if we get stopped on the usage
-  limits"). Before any restart, re-read the current direction (`docs/look/DIRECTION.md`, the playbook and the docs they
+  limits"). **The pick-up after a reset is automatic** (owner, 2026-10-29: "make sure to automatically detect when your
+  limits are reset and pick up from that"; on 2026-10-28/29 work sat four hours past a reset): while delegated work is
+  in flight, the session keeps an hourly self check-in armed (`create_trigger` into its own session; the session cannot
+  act while the limit holds, so it is armed before, not after); each firing resumes what a limit stopped once the limit
+  has reset, ends in one line when work runs normally, and deletes itself when nothing is in flight. Before any restart, re-read the current direction (`docs/look/DIRECTION.md`, the playbook and the docs they
   link: other sessions change them) and integrate it into the film's one style page first. — (v2, 2026-10-27).
 - **The engine and the process serve the production; the films are the customer (owner, 2026-10-29: "Your main task
   here is to work on the engine and the production process ... BUT THE PRODUCTION team is your main customer, we cannot
