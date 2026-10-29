@@ -703,7 +703,7 @@ def paint_mass(box, billows, pal, sky, rng, prm, sun=SUN, stages=None):
                 lit_side = F[iy, ix] > 0.5
                 col = lift(cont[iy, ix], (0.012 if lit_side else -0.008) + rng.normal(0, 0.004))
                 bw = rng.uniform(*prm['level_w'])
-                below = l2[1] > 0.3                         # lit from below: the crisp edge is the stroke's bottom
+                below = l2[1] > 0.2                         # lit from below: the crisp edge is the stroke's bottom
                 paint_line(p2, (ix - L / 2, iy - L / 2 * math.tan(ang)), (ix + L / 2, iy + L / 2 * math.tan(ang)), bw, col,
                            rng.uniform(0.5, 0.8), e_pos=(1.0 if below else 3.0), e_neg=(3.0 if below else 1.0),
                            t_in=0.06, t_out=0.4, dry=rng.uniform(0.1, 0.35), tex_off=tex_off(rng))
@@ -783,12 +783,12 @@ def paint_mass(box, billows, pal, sky, rng, prm, sun=SUN, stages=None):
     soft_edge = smoothstep(4.0, 12.0, ew)
     dd = D + (n_side * ew * prm['dry_amp'] * shade_side * (1.0 - near_base)
               + n_base * prm['edge_base'] * prm['base_drag'] * near_base
-              + n_fine * ew * prm['grain'] * soft_edge * (1.0 - near_base)) * in_band
+              + n_fine * ew * prm['grain'] * soft_edge * (1.0 - near_base) * smoothstep(0.2, -0.2, -ggy / ggn)) * in_band
     canvas.a[...] = smoothstep(-ew * 0.5, ew * 0.5, dd)
     # P4 (near masses only): the speckle dissolve on the side away from the light (sky-coloured holes inside the edge,
     # cloud-coloured flecks outside it, thinning over ~40 px), and a few light flecks off the lit edge
     if prm['n_speck']:
-        dissolve = (facing_big < -0.15) | ((near_base > 0.3) & (X > cen[0] + 0.3 * size))
+        dissolve = ((facing_big < -0.55) & (near_base < 0.3)) | ((near_base > 0.3) & (X > cen[0] + 0.3 * size))
         band = (D < 10) & (D > -30) & dissolve & (facing < 0.2)
         ys_b, xs_b = np.nonzero(band)
         for _ in range(prm['n_speck'] if len(xs_b) else 0):
@@ -832,19 +832,19 @@ DEPTH = {
                  n_block=7, block_w=(14, 28), p2_blur=0.6,
                  n_rim=7, rim_w=(5, 10), rim_min_r=24, underside=0, p3_blur=0.0,
                  edge_lit=1.8, edge_shade=16.0, edge_base=22.0, base_drag=0.12, dry_cell=4.0, dry_aniso=7.0,
-                 dry_amp=0.7, n_speck=120, n_spatter=8, wind=-6.0),
+                 dry_amp=0.7, n_speck=70, n_spatter=8, wind=-6.0),
     'mid': dict(k=0.22, plane_blur=1.3, k_smooth=10.0, base_soft=8.0, base_wobble=3.0, top_light=0.3, lz=0.3,
                 form_sigma=0.4, w_att=0.45, penetration=1.2, w_billow=0.35, cap_lam=(0.3, 0.8), cap_w=0.5,
-                cap_gain=0.2, cap_floor=0.3, skylight=0.8, cuts=[0.12, 0.38, 0.7], soft_cut=0.08, grain=0.25,
+                cap_gain=0.2, cap_floor=0.3, skylight=0.8, cuts=[0.12, 0.38, 0.7], soft_cut=0.08, grain=0.08,
                 rim_px=0.0, p0_blur=3.0, n_soft=2, p1_blur=6.0, n_scoop=2, scoop_w=(0.16, 0.26), scoop_px=(8, 26),
                 scoop_mix=0.4, scoop_lift=0.012, scoop_edge=1.5, n_shade_scoop=0, n_level=11, level_w=(9, 20),
                 n_block=0, block_w=(10, 18), p2_blur=1.0,
                 n_rim=0, rim_w=(4, 7), rim_min_r=999, underside=6.0, p3_blur=0.6,
-                edge_lit=2.6, edge_shade=12.0, edge_base=2.6, base_drag=0.0, dry_cell=5.0, dry_aniso=9.0,
-                dry_amp=0.5, n_speck=0, n_spatter=0, wind=-3.0),
+                edge_lit=2.6, edge_shade=10.0, edge_base=2.6, base_drag=0.0, dry_cell=5.0, dry_aniso=9.0,
+                dry_amp=0.22, n_speck=0, n_spatter=0, wind=-3.0),
     'far': dict(k=0.38, plane_blur=2.4, k_smooth=12.0, base_soft=6.0, base_wobble=2.0, top_light=0.2, lz=0.3,
                 form_sigma=0.45, w_att=0.4, penetration=1.4, w_billow=0.3, cap_lam=(0.3, 0.8), cap_w=0.5,
-                cap_gain=0.15, cap_floor=0.35, skylight=0.6, cuts=[0.1, 0.36, 0.68], soft_cut=0.1, grain=0.2,
+                cap_gain=0.15, cap_floor=0.35, skylight=0.6, cuts=[0.1, 0.36, 0.68], soft_cut=0.1, grain=0.06,
                 rim_px=0.0, p0_blur=2.5, n_soft=2, p1_blur=5.0, n_scoop=1, scoop_w=(0.15, 0.22), scoop_px=(6, 16),
                 scoop_mix=0.3, scoop_lift=0.008, scoop_edge=2.0, n_shade_scoop=0, n_level=8, level_w=(6, 12),
                 n_block=0, block_w=(8, 12), p2_blur=1.5,
@@ -898,7 +898,7 @@ def paint_streaks(layer, pal, rng, sun=SUN, n_rows=4):
             near = float(np.exp(-abs(xc - sun[0]) / 340.0))
             base = layer.c[int(np.clip(yy, 0, layer.h - 1)), int(np.clip(xc, 0, layer.w - 1))]
             body = lift(mix(base, mix(pal['streak'], pal['shade'], 0.15 * ri), 0.9 - 0.1 * ri), -0.012)
-            ti, to = (0.45, 0.15) if xc > sun[0] else (0.15, 0.45)
+            ti, to = (0.15, 0.45) if xc > sun[0] else (0.45, 0.15)   # the long taper on the end away from the sun
             ang = math.radians(rng.normal(0, 0.35))
             p0 = (x, yy)
             p1 = (x + L * math.cos(ang), yy + L * math.sin(ang))
@@ -1097,12 +1097,15 @@ def build_sheet(path, seed=SEED, plate_path=None):
     rows.append(('2b  THE PASSES  P0 flats blurred 4 px, P1 soft strokes blurred 7, P2 scoops blurred 0.6, P3 crisp rims; then edges + speckle', [
         passes[0], passes[1], passes[2], passes[3], (Image.fromarray(final), 'final (edges, speckle)'),
     ], 230))
-    rows.append(('3  BANKS AND DECKS IN DEPTH PLANES  far = closer to the sky (k .30 / .45), softer (blur 1.3 / 2.4 px), flatter, lit from below', [
+    rows.append(('3  BANKS AND DECKS IN DEPTH PLANES  farther = closer to the sky (k .22 / .38), softer (blur 1.3 / 2.4 px), flatter, lit from below', [
         (ref('refs_human_scale/03_beach_dusk.jpg', (560, 80, 1206, 350)), 'ref 03 banks'),
         (ref('refs_paint/02_lighthouse_process.jpg', (226, 700, 560, 1180)), 'ref p02 far layer'),
         (ref('refs_human_scale/01_city_hill_sunset.jpg', (0, 0, 620, 300)), 'ref 01 lit undersides'),
-        (Image.fromarray(PL[100:720, 0:760]), 'ours: mid bank + far deck + streaks'),
     ], 300))
+    rows.append(('3b  OURS  plane 2: a bank lit from below (k .22, blur 1.3); planes 3 + 4: the far deck (k .38, blur 2.4) and the streaks', [
+        (Image.fromarray(PL[110:290, 0:600]), 'ours: mid bank (plane 2)'),
+        (Image.fromarray(PL[610:800, 0:780]), 'ours: far deck + streaks (planes 3, 4)'),
+    ], 230))
     rows.append(('4  HORIZON STREAKS  thin level two-tone strokes on the sun line, lit undersides brightest near the sun', [
         (ref('refs_human_scale/03_beach_dusk.jpg', (0, 370, 760, 452)), 'ref 03 horizon'),
         (Image.fromarray(P[700:800, 0:760]), 'ours'),
