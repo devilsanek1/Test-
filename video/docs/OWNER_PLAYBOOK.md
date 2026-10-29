@@ -61,6 +61,20 @@ Maintenance at the end).
   first hook sentence is extremely natural like a conversation yet captures the attention and curiosity without being
   too pushy and the script has a rhythm we discussed before"; then "Oh I also meant that a video has an opening as "did you know that .." like that what I meant by great opening"; "Even with did you know the core line is instantly more interesting", 2026-10-29; saved: the study's
   `refs/bigbend_reel/`).
+- **CLEAR TO A REGULAR PERSON ON ONE HEARING: every sentence is understood the first time, at feed speed, by regular
+  people, never only by us.** Ask of every sentence: "is that sentence good, and will it be received well by regular
+  people?" Name every thing in everyday words before talking about it (no bare tech words: "the chips", "a cabinet of
+  them"; a common word with a tech meaning, like "chips", misleads); every "it", "that", "this" or "they" points at
+  one obvious thing, or say the noun again ("But Helsinki WANTS it": the heat, the air or the sea?); say the plain
+  thought itself, never a compressed or clever hint at a deeper one, and no vague scope ("almost everywhere": say what
+  happens, e.g. "in a typical data center, here is what happens"); jokes in simple, gentle, everyday words, never weird
+  or cheeky. Ambiguous or weird loses the biggest audience, the one we write for. The method (research, principles,
+  the clarity check): `docs/retro/2026-10-29_script_clarity/`. — ("so what i don't like about these scripts we write
+  lately is we are being too ambiguous and weird at times"; "We are talking about reaching the biggest audience and
+  getting the engagement - but we would lose people on this sentence. Like we need to ask ourselves - is that sentence
+  good and will be received well by regular people? Chips is a word not a lot of people would understand"; "we need a
+  simpler less scandalous language"; "I think you are having some deeper thought here and you choose to be obscure
+  about it"; "When you say IT - what exactly is it - heat or air or sea?", v4 G1, 2026-10-29).
 - **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24). **Rhythm: never a run of
   long sentences; put a short one (5 words or fewer, e.g. "Let's find out." "But there was a problem.") after every 1-2
   long ones, at the turns,** gated by `scripts/voice/check_rhythm.py` OK at G1. — (owner's reference reel, 2026-10-27).

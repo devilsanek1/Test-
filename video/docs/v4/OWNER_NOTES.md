@@ -132,3 +132,24 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   then "try this" with a valid `sk_` key pasted in the chat -> tested (HTTP 200: Pro tier, ~628k of 717k characters
   left; voice MQnUCZUAQLYMCY1Ztz6d is "Lady1", a cloned voice in the account); used inline in this session only, never
   filed, prompted or committed; v4's G2 runs in this session; the owner was told it also belongs in the network secret.
+- 2026-10-29 ~11:30 UTC, G1 (on draft 1, archived in `archive/g1_draft1/`): "so what i don;t like about these scripts we
+  write lately is we are being too ambiguous and weird at times. Like lets break down each sentence", then line by line:
+  - "Did you know Helsinki wants AI to heat seventy thousand homes?": "great thats what i would like to tell my friends."
+  - "The chips get that hot.": "what is it? Like which chips? We are talking about reaching the biggest audience and
+    getting the engagement - but we would lose people on this sentence. Like we need to ask ourselves - is that
+    sentence good and will be received well by regular people? Chips is a word not a lot of people would understand."
+  - "One cabinet of them is like FORTY kettles, boiling non-stop.": "also similarly the next one too."
+  - "And nobody's even making tea.": "this is directionally okay, but still weird we need a simpler less scandalous
+    language."
+  - "So almost everywhere, that heat just gets dumped into the air or the sea.": "also find an easier, simpler way to
+    land the thought. I think you are having some deeper thought here and you choose to be obscure about it. So i think
+    you want to say that in a typical datacenter here is what happens. When you say "almost everywhere" - this is very
+    ambigous like what do you mean? we lose people here."
+  - "But Helsinki WANTS it.": "this is again too ambiguous for the audience. When you say IT - what exactly is it -
+    heat or air or sea?"
+  - "Distill and generalize the principles, then do the research on them around how the message should be structured
+    to land with the audience, bake into our rule set for the script generation and rework the script."
+  -> rule: playbook, Script and voice (CLEAR TO A REGULAR PERSON ON ONE HEARING), captured at once; then the workflow
+  `script-clarity` (`docs/retro/2026-10-29_script_clarity/`): two research lanes, one synthesis (principles, rule text,
+  a clarity lint spec), the rules integrated, `check_clarity.py` built, the script reworked (line 1 kept), a cold
+  three-viewer panel, a critic and a fix pass.
