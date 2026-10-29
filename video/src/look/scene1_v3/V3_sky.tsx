@@ -58,11 +58,21 @@ const cloudSpecs = (sky: SkySpec): CumulusSpec[] => {
     // above the band spreading left like an anvil
     {...base, seed: 'v3-towerFoot', x: 780, base: 905, w: 420, h: 400, towers: 3, lobes: [0.09, 0.16], tones: BANK_TONES},
     {...base, seed: 'v3-towerWaist', x: 930, base: 640, w: 280, h: 420, towers: 2, lobes: [0.14, 0.22], tones: flatBase(TOP_TONES)},
-    {...base, seed: 'v3-towerCrown', x: 640, base: 284, w: 560, h: 270, towers: 3, lobes: [0.08, 0.14], tones: flatBase(TOP_TONES)},
+    {...base, seed: 'v3-towerCrown', x: 650, base: 262, w: 560, h: 270, towers: 3, lobes: [0.08, 0.14], tones: flatBase(TOP_TONES)},
     // a small calm cumulus above the band, between the spray and the tower (v2's hero cloud, moved left)
     {...base, seed: 'v3-small', x: 330, base: 258, w: 360, h: 112, towers: 3, lobes: [0.05, 0.09], tones: TOP_TONES},
   ];
 };;
+
+/** [x, y, r]: lobes along the crown's base (y 284), their bottoms <= 290. */
+const CROWN_UNDER: [number, number, number][] = [
+  [676, 262, 26],
+  [722, 254, 34],
+  [782, 258, 32],
+  [842, 252, 38],
+  [902, 256, 34],
+];
+const circ = (x: number, y: number, r: number) => `M${x - r} ${y}a${r} ${r} 0 1 0 ${r * 2} 0a${r} ${r} 0 1 0 ${-r * 2} 0Z`;
 
 // ---------------------------------------------------------------- strata and birds
 
@@ -131,6 +141,9 @@ export const V3Sky: React.FC = () => {
           {cloudSpecs(sky).map((s) => (
             <Cumulus key={s.seed} spec={s} t={0} />
           ))}
+          {/* the crown's underside: soft lobes under its flat base (left of the waist), so no straight edge runs along
+              the band's top; they stay above y 290 */}
+          <Fill d={CROWN_UNDER.map(([x, y, r]) => circ(x, y, r)).join('')} color={TOP_TONES.body} seed="v3sky/crownUnder" offset={false} />
           <Fill d={BIRDS.map(([x, y, s, f]) => bird(x, y, s, f)).join('')} color={birdC} seed="v3sky/birds" offset={false} />
         </Tier>
       </g>
