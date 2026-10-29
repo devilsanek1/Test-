@@ -19,8 +19,9 @@ How:
 4. Tempo (default 1.0: none): --tempo, --tempo-at "WORDS=FACTOR", by the Rubber Band library (ffmpeg's rubberband
    filter). It time-stretches the VOICE: on v4 a 1.10 stretch sounded "extremely robotic like there is some weird
    background" (owner, 2026-10-29). Pace comes from the generation and the pauses; stretch only on purpose, and listen.
-5. --polish: a high-pass at 70 Hz, a gentle compressor (1.8:1), then loudness to --lufs (no de-esser or EQ boost:
-   they can colour a synthetic voice).
+5. --normalize: one static gain to --lufs (sample peak <= -1 dBFS); the voice is untouched. (--polish, a gentle
+   compressor and ffmpeg's dynamic loudness, made v4's take sound "more like in some chamber" to the owner next to
+   the same voice straight from ElevenLabs "as if someone speaking in the microphone": don't use it on the voice.)
 6. --lead silence before the first word (0.12 s: the playbook's "voice from the first frames"), --tail room tone after.
 
     python3 scripts/voice/shape_take.py TAKE.wav PASTE.md OUT.wav [--tempo 1.06] [--gap-sentence 0.26]
@@ -173,7 +174,8 @@ def main():
     p.add_argument('--tempo-at', action='append', help='"FIRST WORDS=FACTOR": tempo of the sentence starting so')
     p.add_argument('--lead', type=float, default=0.12)
     p.add_argument('--tail', type=float, default=0.5)
-    p.add_argument('--polish', action='store_true')
+    p.add_argument('--polish', action='store_true', help='compressor + dynamic loudness: the owner heard it as "some chamber" (v4); prefer --normalize')
+    p.add_argument('--normalize', action='store_true', help='one static gain to --lufs (true peak <= -1 dBFS): the voice itself untouched')
     p.add_argument('--lufs', type=float, default=-16.0)
     p.add_argument('--whisper-dir', default=os.environ.get('WHISPER_DIR', '/tmp/whisper'))
     p.add_argument('--report')
@@ -324,6 +326,20 @@ def main():
                      f'loudnorm=I={a.lufs}:TP=-1.5:LRA=11')
             subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', i_, '-af', chain, '-ar', str(sr), '-c:a', 'pcm_f32le', o_], check=True)
             z, _ = sf.read(o_, dtype='float32')
+    if a.normalize and not a.polish:
+        # one gain for the whole take, measured by ffmpeg's EBU R128 meter: no compressor, no dynamic loudness, so the
+        # voice sounds exactly as generated (the owner heard the compressed version "like in some chamber", v4 G2)
+        with tempfile.TemporaryDirectory() as d:
+            i_ = os.path.join(d, 'i.wav')
+            sf.write(i_, z, sr, subtype='FLOAT')
+            r = subprocess.run(['ffmpeg', '-hide_banner', '-nostats', '-i', i_, '-af', 'ebur128=peak=true', '-f', 'null', '-'],
+                               capture_output=True, text=True)
+            m = re.findall(r'I:\s+(-?[\d.]+) LUFS', r.stderr)
+            if m:
+                gain_db = a.lufs - float(m[-1])
+                peak_now = float(np.max(np.abs(z))) or 1e-9
+                gain_db = min(gain_db, 20 * np.log10(10 ** (-1.0 / 20) / peak_now))    # sample peak <= -1 dBFS
+                z = (z * 10 ** (gain_db / 20)).astype(np.float32)
     peak = float(np.max(np.abs(z))) if len(z) else 0
     if peak > 0.98:
         z = z * (0.98 / peak)
@@ -334,7 +350,7 @@ def main():
     span = (max(send.values()) - min(sbeg.values())) if send else before
     print(f'{a.take} -> {a.out}: {before:.2f} s -> {after:.2f} s; {len(plan)} pauses set '
           f'({sum(1 for x in plan if x["kind"] in ("sent", "para"))} sentence turns); tempo {a.tempo}'
-          f'{"; polished to " + str(a.lufs) + " LUFS" if a.polish else ""}; about {60 * words_n / max(0.1, after - a.lead - a.tail):.0f} words a minute')
+          f'{"; polished to " + str(a.lufs) + " LUFS" if a.polish else ("; one gain to " + str(a.lufs) + " LUFS" if a.normalize else "")}; about {60 * words_n / max(0.1, after - a.lead - a.tail):.0f} words a minute')
     if a.report:
         json.dump({'take': a.take, 'out': a.out, 'before_s': round(before, 2), 'after_s': round(after, 2),
                    'settings': {k: v for k, v in vars(a).items() if k not in ('take', 'paste', 'out', 'report')},

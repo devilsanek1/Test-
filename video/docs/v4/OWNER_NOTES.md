@@ -199,3 +199,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   setting (probed), so three v4 reads with pace in the tags; take 3 = "brisk" (stability 0.35), shaped by its pauses only:
   41.8 s, 180 words/min (+5 % on take 2's 171), the voice's pitch nearly unchanged (222 Hz vs 218), MATCH; the page
   updated (version 3). -> rule: playbook, Script and voice (pace from the tags on v4).
+- 2026-10-29 ~20:10 UTC, G2: sent their own website take (`ElevenLabs_2026-10-29T20_06_41_Lady1_eleven_v4.wav`): "How about
+  this / I think in your version quality is not the same - here it's as if someone speaking in the microphone while in
+  your version it's more like in some chamber" -> measured: the raw reads match (bands, tails, pace), so the chamber was
+  our compressor and dynamic loudness; take 4 = their read, MATCH, pauses tightened and the two beats added, one static
+  gain, the voice untouched: 42.2 s, 177 words/min; the page updated (version 4). -> rule: playbook, Script and voice
+  (never process the voice itself); `generate_take.py` asks for 48 kHz like the website.

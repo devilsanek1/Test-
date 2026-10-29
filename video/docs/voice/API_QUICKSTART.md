@@ -22,6 +22,7 @@ owner never pastes anything. Proven on 2026-10-26: video 2's API take was clean 
 - **Voice:** the film's voice from `docs/voice/VOICE.md` (the owner picks it per film; the default is
   `gHYdn45bUiDI9umVTpCo`, "Test 3", the owner's cloned narrator voice; v4 uses `MQnUCZUAQLYMCY1Ztz6d`).
 - **Model:** `eleven_v4`, passed explicitly (the key can't list models; the API's default model is older).
+- **Format:** `generate_take.py` asks for `pcm_48000`, the website's own WAV rate (since 2026-10-29; it was 44.1 kHz).
 - **Tools:** `pip install sherpa-onnx faster-whisper soundfile requests numpy` if any is missing; ffmpeg.
 - **Parakeet model:** set `PARAKEET_DIR` to the unpacked model, used for word timings and the check:
   ```
@@ -55,8 +56,9 @@ owner never pastes anything. Proven on 2026-10-26: video 2's API take was clean 
    compared with `python3 scripts/voice/measure_take.py A.wav B.wav --words <stressed words>` (words/min, pauses,
    pitch spread, stress) against the owner's reference (`docs/voice/refs/`), then the best read is shaped with
    `python3 scripts/voice/shape_take.py take.wav paste.md shaped.wav --gap-sentence 0.24 --gap-paragraph 0.28
-   --beat "<turn words>=0.45" --beat "<payoff words>=0.5" --polish --report shape.json` (each pause set from its own
-   audio; commas and breaths only shortened) and checked again with `check_take.py` (MATCH). **No time-stretch**
+   --beat "<turn words>=0.45" --beat "<payoff words>=0.5" --normalize --report shape.json` (each pause set from its own
+   audio; commas and breaths only shortened; `--normalize` is one static gain: never `--polish`, whose compressor and
+   dynamic loudness made v4's take sound "like in some chamber" to the owner) and checked again with `check_take.py` (MATCH). **No time-stretch**
    (`--tempo` stays 1.0): on v4 a 1.10 stretch sounded "extremely robotic like there is some weird background"; for
    more pace, put it in the tags: Eleven v4 ignores `voice_settings.speed` (probed on v4, 2026-10-29), but "brisk" or
    "quick" in the paragraph tags made a whole read 6-10 % faster with no artifact ("quick" also lifts the pitch); v3

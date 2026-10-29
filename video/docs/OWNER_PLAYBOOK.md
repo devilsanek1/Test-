@@ -158,8 +158,11 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   controls?"): a few whole-script reads (model, stability, tags) measured against the owner's reference read
   (`docs/voice/refs/`; `scripts/voice/measure_take.py`), the best one shaped in post (`scripts/voice/shape_take.py`:
   brisk gaps, a beat before the turn and the payoff, a light polish), checked word for word again; the variants stay
-  ours. **Never time-stretch the voice:** a 10 % Rubber Band speed-up made v4's take "extremely robotic like there is
-  some weird background", all but its one unstretched line (owner, 2026-10-29); pace comes from the generation (the
+  ours. **Never process the voice itself: no time-stretch, no compressor, no dynamic loudness;** only its pauses are cut
+  and a single gain sets its level. A 10 % Rubber Band speed-up made v4's take "extremely robotic like there is some
+  weird background", all but its one unstretched line; our compressor and dynamic loudness made it "more like in some
+  chamber" next to the same voice from the ElevenLabs website, "as if someone speaking in the microphone" (owner,
+  2026-10-29); a take the owner makes on the website can be the base, shaped by its pauses only; pace comes from the generation (the
   read, pace words in the tags such as "brisk": Eleven v4 has no speed setting; a model's own speed setting where it
   has one) and from the pauses (v4's take 3: "brisk" tags, +5 %, the voice unchanged). Never a voice the owner didn't pick: their cloned narrator voice by
   default, or the voice they name for a film (`docs/voice/VOICE.md`; v4, 2026-10-29: "lets try another voice - with

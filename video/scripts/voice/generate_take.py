@@ -79,12 +79,12 @@ def same(heard, expected):
     return squash(heard) == squash(expected)
 
 
-_FMT = {'fmt': 'pcm_44100'}
+_FMT = {'fmt': 'pcm_48000'}   # the website's own WAV rate (v4, 2026-10-29: the owner's website take was 48 kHz)
 
 
 def tts(text, voice, model, prev_text, next_text, seed, a, prev_ids=None):
     """One request -> (audio float32, sr, request_id). v4 takes stability + similarity only (no style/speed);
-    request stitching via previous_request_ids (accepted units, <= 3) + next_text; WAV (pcm_44100, Pro plan) first,
+    request stitching via previous_request_ids (accepted units, <= 3) + next_text; WAV (pcm_48000, the website's rate; Pro plan) first,
     MP3 if the plan refuses it; context fields dropped if a model rejects them."""
     vs = {'stability': a.stability, 'similarity_boost': a.similarity}
     if not model.startswith('eleven_v4'):
@@ -112,7 +112,7 @@ def tts(text, voice, model, prev_text, next_text, seed, a, prev_ids=None):
         rid = r.headers.get('request-id') or r.headers.get('x-request-id')
         if _FMT['fmt'].startswith('pcm'):
             y = np.frombuffer(r.content, dtype=np.int16).astype(np.float32) / 32768.0
-            return y, 44100, rid
+            return y, int(_FMT['fmt'].split('_')[1]), rid
         pcm = subprocess.run(['ffmpeg', '-v', 'error', '-i', 'pipe:0', '-ac', '1', '-ar', '48000', '-f', 'f32le', 'pipe:1'],
                              input=r.content, check=True, capture_output=True).stdout
         return np.frombuffer(pcm, dtype=np.float32).copy(), 48000, rid
