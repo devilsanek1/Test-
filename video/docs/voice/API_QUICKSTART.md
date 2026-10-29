@@ -17,8 +17,10 @@ owner never pastes anything. Proven on 2026-10-26: video 2's API take was clean 
   - The key itself starts with `sk_` and is shown only once, when it is created or rotated. The 64-character hex
     string in ElevenLabs' key list is the key's ID: the API rejects it (`api_key_id_used_as_api_key`), and it is not a
     secret. To get a usable key again, rotate the key (or create a new one) and copy the `sk_...` value. (v4,
-    2026-10-27)
-- **Voice:** `gHYdn45bUiDI9umVTpCo` ("Test 3", the owner's cloned narrator voice; `docs/voice/VOICE.md`).
+    2026-10-27; the ID was sent again on 2026-10-29, so the ask to the owner names both: the value that starts with
+    `sk_`, never the 64-character string in the key list, stored as the network secret, never pasted in chat.)
+- **Voice:** the film's voice from `docs/voice/VOICE.md` (the owner picks it per film; the default is
+  `gHYdn45bUiDI9umVTpCo`, "Test 3", the owner's cloned narrator voice; v4 uses `MQnUCZUAQLYMCY1Ztz6d`).
 - **Model:** `eleven_v4`, passed explicitly (the key can't list models; the API's default model is older).
 - **Tools:** `pip install sherpa-onnx faster-whisper soundfile requests numpy` if any is missing; ffmpeg.
 - **Parakeet model:** set `PARAKEET_DIR` to the unpacked model, used for word timings and the check:
@@ -37,7 +39,7 @@ owner never pastes anything. Proven on 2026-10-26: video 2's API take was clean 
 2. **Generate:**
    ```
    python3 scripts/voice/generate_take.py docs/vN/script/script_elevenlabs.md assets/vN/api_take1 \
-     --voice gHYdn45bUiDI9umVTpCo --model-dir "$PARAKEET_DIR" --whisper-dir "$WHISPER_DIR"
+     --voice <the film's voice id: VOICE.md> --model-dir "$PARAKEET_DIR" --whisper-dir "$WHISPER_DIR"
    ```
    It tries the whole script first (up to 3 tries), then falls back to per paragraph. `report.json` must say
    `all_clean: true`. Options: `--stability 0.5` (0.4 is more expressive, 0.65 steadier) and `--dry-run`.

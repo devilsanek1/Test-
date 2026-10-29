@@ -120,3 +120,10 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   work on the video 4 - pick up where its been left off" -> session https://claude.ai/code/session_01VwsUCnkJXFuq3YwEYFUg7o
   (branch `claude/kind-pascal-lvgsza`) runs G1 from `script/WRITER_BRIEF.md`: writer, critic (`script/CRITIC_BRIEF.md`),
   fix pass; the owner was asked to add `ELEVENLABS_API_KEY` as the environment's network secret before G2.
+- 2026-10-29 ~10:20 UTC, G2 prep: the owner sent "eleven labs key" with a 64-character hex string -> one test call:
+  the API answered `api_key_id_used_as_api_key` (it is the key's ID, not the key, as on 2026-10-27; not filed
+  anywhere); the owner was asked for the value that starts with `sk_`, stored as the network secret
+  `ELEVENLABS_API_KEY` (`docs/voice/API_QUICKSTART.md` now names both).
+- 2026-10-29 ~10:20 UTC, G2: "lets try another voice - with this id MQnUCZUAQLYMCY1Ztz6d" -> v4's take uses voice
+  `MQnUCZUAQLYMCY1Ztz6d` (`docs/voice/VOICE.md`; checked with `GET /v1/voices/<id>` once a valid key exists).
+  -> rule: playbook, Script and voice (the voice is the owner's pick per film; their cloned narrator by default).

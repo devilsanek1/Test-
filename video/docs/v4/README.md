@@ -13,7 +13,7 @@ The earlier v4 session (https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt)
 | G0 topic + core line | topic LOCKED: Helsinki (one city); core line proposed by the writer (default: "Your chatbot could heat a flat in Helsinki.") | `G0_TOPIC.md` |
 | Fact lock | shared with video 5 (one fact file): `video/docs/v5/research/factlock.md` sections 2, 6, 7.1-7.4, 8 | |
 | G1 script | RUNNING (session_01VwsUCnkJXFuq3YwEYFUg7o): writer, critic (`script/CRITIC_BRIEF.md`), fix pass | `script/script_g1.md`, `script/script_elevenlabs.md`, `THROUGHLINE.md` |
-| G2 voice | after the owner approves the script; the API key is missing in this container | `public/v4/` |
+| G2 voice | after the owner approves the script; voice `MQnUCZUAQLYMCY1Ztz6d` (owner's try, 2026-10-29: `docs/voice/VOICE.md`); the valid `sk_` key is still missing here (the string sent at 10:20 UTC is the key's ID) | `public/v4/` |
 
 **Video 4 is produced by session https://claude.ai/code/session_01VwsUCnkJXFuq3YwEYFUg7o since 2026-10-29 ~10:05 UTC**
 (owner: "lets work on the video 4 - pick up where its been left off"), on branch `claude/kind-pascal-lvgsza` (from

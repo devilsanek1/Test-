@@ -74,7 +74,9 @@ Maintenance at the end).
   `public/vN/`; log it in `ELEVENLABS.md` section 5; commit and push after each step (pull first). **One full paste
   must narrate cleanly: a voice failure is our process bug, never the owner's problem** — fix it in the process. The
   key is the secret `ELEVENLABS_API_KEY`: never print, file, prompt or commit it. Only without the key does the owner
-  paste it (then always the full paste text). Never a voice other than the owner's. — (owner's standing instruction +
+  paste it (then always the full paste text). Never a voice the owner didn't pick: their cloned narrator voice by
+  default, or the voice they name for a film (`docs/voice/VOICE.md`; v4, 2026-10-29: "lets try another voice - with
+  this id MQnUCZUAQLYMCY1Ztz6d"). — (owner's standing instruction +
   v2 take 1, 2026-10-26).
 
 ## Music and sound

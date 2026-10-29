@@ -35,8 +35,8 @@ Top rules (details in the playbook):
   line as a title goes on the cover). Words in the picture are few and big
   (each reads at phone size, or it is not drawn; sources go in the post's text). Target 30-45 s.
 - A script is one coherent story (spine first; every line follows from the last), never a list of facts. Everyday spoken
-  language, no AI-sounding phrasing; detailed emotional cues. The narration is generated with the owner's ElevenLabs voice through the API
-  (owner, 2026-10-26): follow `video/docs/voice/API_QUICKSTART.md` (paste format v2, `check_paste.py` OK, `generate_take.py`
+  language, no AI-sounding phrasing; detailed emotional cues. The narration is generated through the API with the ElevenLabs voice the owner picks
+  (`video/docs/voice/VOICE.md`; their cloned narrator by default) (owner, 2026-10-26): follow `video/docs/voice/API_QUICKSTART.md` (paste format v2, `check_paste.py` OK, `generate_take.py`
   `all_clean`, `check_take.py` MATCH; send take.wav, lock it into `public/vN/`, log it in `ELEVENLABS.md` section 5). Only
   without the key does the owner paste it (then always hand over the full paste text).
 - Every lesson goes into the generic process (playbook, pipeline gate, studio toolkit) and is committed, so the next
