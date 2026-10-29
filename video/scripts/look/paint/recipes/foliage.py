@@ -1056,11 +1056,12 @@ def paint_protea(w, h, rng, cx, cy, R, leaves=True, scale_leaf=1.0):
     # shade half, three greens; a light midrib on 80 % of the length
     if leaves:
         lv = []
-        for i, a in enumerate([-150, -118, -62, -30, 160, 20, 130]):
-            a = math.radians(a + rng.normal(0, 8))
-            ln = R * rng.uniform(2.0, 2.8) * scale_leaf
-            bx = cx + rng.normal(0, 0.12) * R
-            by = cy + R * (rng.uniform(0.9, 1.3) if i < 4 else rng.uniform(1.6, 2.4))
+        for i, (a, hy) in enumerate([(-138, 1.15), (-104, 1.05), (-74, 1.05), (-42, 1.15), (172, 1.8), (12, 1.9),
+                                     (148, 2.5), (34, 2.6), (160, 3.1)]):
+            a = math.radians(a + rng.normal(0, 7))
+            ln = R * rng.uniform(2.2, 3.0) * scale_leaf
+            bx = cx + rng.normal(0, 0.1) * R
+            by = cy + R * hy
             lv.append((bx, by, ln, ln * rng.uniform(0.30, 0.36), a))
         greens = [('leaf_shade', 'leaf_mid'), ('leaf_deep', 'leaf_shade'), ('leaf_mid', 'leaf_lit')]
         for j, (bx, by, ln, wd, a) in enumerate(lv):
@@ -1096,7 +1097,7 @@ def paint_protea(w, h, rng, cx, cy, R, leaves=True, scale_leaf=1.0):
     for i in range(nb):
         a = math.radians(-172 + 164 * (i + rng.uniform(-0.2, 0.2)) / (nb - 1))
         bx, by = cx + math.cos(a) * 0.40 * R, cy + math.sin(a) * 0.36 * R + 0.15 * R
-        bract(bx, by, R * rng.uniform(1.25, 1.5), R * rng.uniform(0.42, 0.50), a, ('bract_shade', 'bract_mid'),
+        bract(bx, by, R * rng.uniform(1.25, 1.5), R * rng.uniform(0.52, 0.60), a, ('bract_shade', 'bract_mid'),
               rng.uniform(-0.06, 0.06))
     # 4. the dome: cream, lit cap on the sun side, its lower part in shade; fine radial strokes from a point below
     Y, X = np.mgrid[0:h, 0:w].astype(np.float32) + 0.5
@@ -1136,7 +1137,7 @@ def paint_protea(w, h, rng, cx, cy, R, leaves=True, scale_leaf=1.0):
             bx = cx + math.cos(a) * rad * R * 0.9
             by = cy + 0.95 * R + math.sin(a) * 0.12 * R
             ang = math.atan2(math.sin(a), math.cos(a) * 1.25)
-            bract(bx, by, R * rng.uniform(*lm), R * rng.uniform(0.40, 0.48), ang, cols, rng.uniform(-0.08, 0.08))
+            bract(bx, by, R * rng.uniform(*lm), R * rng.uniform(0.48, 0.56), ang, cols, rng.uniform(-0.08, 0.08))
     for a in (152, 28):
         a = math.radians(a + rng.normal(0, 6))
         bract(cx + math.cos(a) * 0.3 * R, cy + 1.0 * R, R * 0.7, R * 0.36, a, ('bract_deep', 'bract_shade'))
