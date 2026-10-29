@@ -20,10 +20,21 @@ const shown = (c: string) => tierFill(c, 'environment');
 
 const CACHE = new Map<string, Patchwork>();
 
+/** The paving's two settings (lane PT's table, ENGINE_PT.md §2 "How busy, and the calmer knobs"; all inside the dL*
+ *  4-10 rule): `busy` the first pass (0.9 m cells, the near plane's 4 tones 4.6 apart: 2.7-3 % edge pixels), `calm`
+ *  PT's calmest in-spec one (1.2 m cells, 2 tones 4.5 apart: 2.3 % edge pixels, local contrast 1.03). Judged at phone
+ *  size on S1 (2026-10-29): the busy one read as a checkerboard over the whole bank; the decided look is `calm`. */
+export const PAVING = {
+  busy: {cell: 0.9, n: undefined as number | undefined, step: undefined as number | undefined},
+  calm: {cell: 1.2, n: 2 as number | undefined, step: 4.5 as number | undefined},
+} as const;
+export type PavingKind = keyof typeof PAVING;
+
 /** One tread's patchwork: its screen polygon (corners in screen px, all under the horizon) laid onto the ground and cut
- *  on the paving module; `base` its stone. Cached per tread, stone and palette. */
-export function treadPatch(k: number, screenPoly: Pt[], base: string): Patchwork | null {
-  const key = `tread|${k}|${base}|${paletteKey()}`;
+ *  on the paving module; `base` its stone. Cached per tread, stone, setting and palette. */
+export function treadPatch(k: number, screenPoly: Pt[], base: string, paving: PavingKind = 'calm'): Patchwork | null {
+  const P = PAVING[paving];
+  const key = `tread|${k}|${base}|${paving}|${paletteKey()}`;
   const hit = CACHE.get(key);
   if (hit) return hit;
   const poly = screenPoly.map(([x, y]) => groundAt(BANK_CAM, x, y)).filter((p): p is Pt => !!p);
@@ -31,10 +42,10 @@ export function treadPatch(k: number, screenPoly: Pt[], base: string): Patchwork
   const pw = groundPatchwork(BANK_CAM, {
     seed: `s1bank/patch/${k}`,
     poly,
-    cell: 0.9,
+    cell: P.cell,
     grid: 0.3,
     plane: -1,
-    tones: patchTones(base, {plane: -1, shown}),
+    tones: patchTones(base, {plane: -1, n: P.n, step: P.step, shown}),
     shown,
     // the low sun is west (screen left), a little behind
     key: [-1, -0.25],

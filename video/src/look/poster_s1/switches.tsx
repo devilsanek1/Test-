@@ -45,6 +45,8 @@ export type PosterSwitches = {
   /** Part of `darks` (decision 2 b): the near world in mid-tones (near.ts). Undefined = follows `darks`; set it to
    *  split the A/B (the dark pieces alone, or the mid-tones alone). */
   nearMid?: boolean;
+  /** Part of `patchwork`: the paving's setting (V2S1_patch PAVING: 'calm', the decided one, or 'busy', the first pass). */
+  paving?: 'calm' | 'busy';
 };
 
 /** v2's S1 as shipped: every switch off. */
@@ -93,7 +95,7 @@ export const PRESETS: Record<PosterPreset, PosterSwitches> = {
 export function resolveSwitches(p: Partial<PosterSwitches> & {preset?: PosterPreset}): PosterSwitches {
   const base = PRESETS[p.preset ?? 'v2'] ?? V2_SWITCHES;
   const out: PosterSwitches = {...base};
-  for (const k of [...Object.keys(V2_SWITCHES), 'nearMid'] as (keyof PosterSwitches)[]) {
+  for (const k of [...Object.keys(V2_SWITCHES), 'nearMid', 'paving'] as (keyof PosterSwitches)[]) {
     const v = p[k];
     if (v !== undefined && v !== null) (out as Record<string, unknown>)[k] = v;
   }

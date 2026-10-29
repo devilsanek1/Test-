@@ -47,7 +47,7 @@ export const s1TreeSpec = (): CrownSpec => ({
 /** Pip's seat in the crown: on a limb behind the crown's front clusters, its head and ears among the leaves (found on
  *  a second look); the clusters drawn over it are the front ones whose index is >= `over`. Fitted to the crown above
  *  (V2S1_pip S1_PIP_TREE's size). */
-export const S1_PIP_IN_CROWN = {seat: [176, 1418] as [number, number], over: 5} as const;
+export const S1_PIP_IN_CROWN = {seat: [178, 1412] as [number, number], over: 4} as const;
 
 const Layers: React.FC<{layers: Layer[]; seed: string}> = ({layers, seed}) => (
   <>

@@ -24,6 +24,7 @@ import {dark} from './darks';
 import {nearMid} from './near';
 import {S1PipInTree} from './V2S1_pip';
 import {TreeSlot} from './engine';
+import {S1_PIP_IN_CROWN} from './V2S1_nature';
 
 type Pt = [number, number];
 const r1 = (n: number) => Math.round(n * 10) / 10;
@@ -162,7 +163,7 @@ const Planter: React.FC = () => {
     <>
       {/* (the look test's foliage switch: lane N's one species tree in this box, in the one wind; a placeholder draws
           v2's crown, with the darks and Pip's hiding spot) */}
-      <TreeSlot sw={sw} box={[-48, 1308, 334, 174]} foot={[126, rim + 2]} plane={-2} fallback={tree} />
+      <TreeSlot sw={sw} pip={<S1PipInTree seat={S1_PIP_IN_CROWN.seat} />} fallback={tree} />
       {/* the planter box: vertical boards in two terracotta woods, a stone coping on top with the soil showing inside
           it (we look down into the box), ivy trailing over its front; every long edge to the vanishing point */}
       {[x0, 58, 164, x1].slice(0, -1).map((xa, i, arr) => (
@@ -344,10 +345,13 @@ const PropFeet: React.FC = () => {
 };
 
 /** The side away from the low western sun on the big things: one form step; the faces turned to us one Shade step. */
-const NearForm: React.FC = () => (
+const NearForm: React.FC = () => {
+  // (the look test's foliage: lane N's crown carries its own light, so v2's crescent on the bay's crown goes)
+  const {foliage} = useSwitches();
+  return (
   <>
     <FormShade d={slab(FORE.planter.x0, FORE.planter.x1, FORE.planter.xc, FORE.planter.rim + 14, FORE.planter.base)} at={floodAt(120, 1640)} />
-    <FormShade d={crown} kind="crescent" at={floodAt(120, 1390)} />
+    {foliage ? null : <FormShade d={crown} kind="crescent" at={floodAt(120, 1390)} />}
     <FormShade d={slab(FORE.crates.x0, FORE.crates.x1, FORE.crates.xc, 1666, FORE.crates.base)} at={floodAt(460, 1700)} />
     <FormShade d={slab(FORE.crates.x0 + 14, FORE.crates.x1 - 10, FORE.crates.xc, 1590, 1666)} at={floodAt(460, 1620)} />
     <FormShade d={poly([[FORE.table.x - 7, FORE.table.top + 10], [FORE.table.x + 7, FORE.table.top + 10], [FORE.table.x + 7, FORE.table.foot], [FORE.table.x - 7, FORE.table.foot]])} at={floodAt(742, 1640)} />
@@ -355,7 +359,8 @@ const NearForm: React.FC = () => (
     <Shade d={slab(FORE.pier.x0, 1100, FORE.pier.xc, FORE.pier.cap + 36, FORE.pier.cap + 50)} at={floodAt(980, 1640)} />
     <Shade d={slab(FORE.planter.x0, FORE.planter.x1, FORE.planter.xc, FORE.planter.rim + 16, FORE.planter.rim + 30)} at={floodAt(120, 1560)} />
   </>
-);
+  );
+};
 
 const FrontForm: React.FC = () => (
   <FormShade d={poly([[FORE.fern.x - 112, FORE.fern.rim + 22], [FORE.fern.x + 112, FORE.fern.rim + 22], [FORE.fern.x + 92, 1960], [FORE.fern.x - 92, 1960]])} at={floodAt(452, 1880)} />
@@ -394,7 +399,6 @@ export const S1ForeMid: React.FC = () => (
  *  cuts: the fern pot and the nearest chair. */
 export const S1ForeNear: React.FC = () => (
   <ToneCtx.Provider value={useNearTone(nearEntries(), -2)}>
-    <Feet feet={NEAR_FEET} />
     <Tier tier="environment">
       <Planter />
       <Crates />
@@ -403,10 +407,18 @@ export const S1ForeNear: React.FC = () => (
       <Pier />
     </Tier>
     <NearForm />
-    <PropFeet />
     <Tier tier="environment">
       <FernPot />
     </Tier>
     <FrontForm />
   </ToneCtx.Provider>
 );
+
+/** (the look test's texture) The near things' contact and cast shadows lie on the treads (the bank's group): the near
+ *  group's `under`, drawn first in its translate but outside its mottle (a mottled group is isolated), the same place
+ *  in the drawing order as v2's (first in the near group). */
+export const S1ForeNearUnder: React.FC = () => <Feet feet={NEAR_FEET} />;
+/** (the look test's texture) The props' contact strips (one lies on the bench, the bank's group): the near group's
+ *  `over`, drawn last in its translate, outside its mottle (nothing the near group draws after them in v2 overlaps
+ *  them: the fern pot and its form are at the bottom edge). */
+export const S1ForeNearOver: React.FC = () => <PropFeet />;

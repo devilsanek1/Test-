@@ -13,7 +13,7 @@ import {Tier} from '../../lib/tier';
 import {Shade} from '../../lib/light';
 import {floodAt} from './V2S1_clock';
 import {BANDS, Coping, StoneBand, edgePath} from './V2S1_steps_stone';
-import {S1ForeMid, S1ForeNear} from './V2S1_fore';
+import {S1ForeMid, S1ForeNear, S1ForeNearOver, S1ForeNearUnder} from './V2S1_fore';
 import {S1Plane, S1_PLANE} from './V2S1_float';
 
 /** Our bank: the `seated` slot (drawn after the water and the boats, before Pip; the light rig is the assembly's
@@ -38,7 +38,8 @@ export const S1Steps: React.FC = () => (
       </React.Fragment>
     ))}
     </S1Plane>
-    <S1Plane plane={S1_PLANE.near}>
+    {/* (the look test's texture: the near things' shadows on the treads and the props' strips go outside its mottle) */}
+    <S1Plane plane={S1_PLANE.near} under={<S1ForeNearUnder />} over={<S1ForeNearOver />}>
       <S1ForeNear />
     </S1Plane>
   </>
