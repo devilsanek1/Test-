@@ -1,6 +1,6 @@
 # Studio logo: "What's All the Fuss About?"
 
-**Status, 2026-10-29 ~20:36 UTC: FINAL. The Peel, coral and ink** (the owner picked The Peel, then: "Okay pick one and
+**Status, 2026-10-29 ~20:32 UTC: FINAL. The Peel, coral and ink** (the owner picked The Peel, then: "Okay pick one and
 give me the final one"). The sheet: `video/deliverables/brand/logo_final.png`; the export pack:
 `video/deliverables/brand/peel/`. Stills only; any motion (an end-card draw-on) waits for the owner's approval of a
 still ("No video yet"). Brief: the owner asked the orchestrator to "spin up a thread to generate me the modern beautiful
@@ -137,4 +137,4 @@ Earlier rounds also used Pip's periwinkles (`#7A7FE3`, `#6A6ED6`, `#AEB2F4`), pe
 - 2026-10-29 ~20:31 UTC, on The Peel refined (A or B), written to the logo session directly: "Maybe just play with color
   schemes" then "Okay pick one and give me the final one" -> a colour exploration of The Peel, then the final logo
   (the session picks), its export pack.
-- 2026-10-29 ~20:36 UTC: the final delivered (The Peel, coral and ink; `logo_final.png`, the pack in `deliverables/brand/peel/`).
+- 2026-10-29 ~20:32 UTC: the final delivered (The Peel, coral and ink; `logo_final.png`, the pack in `deliverables/brand/peel/`).
