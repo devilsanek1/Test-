@@ -61,8 +61,9 @@ not the dither, so:
              never boiling; pro_4 §3.6).
   --k K      the plane's strength (lib/texture mottleK: the sky 0.6, near C 0.7, far C 0.4, A and B 1.0).
 Verdict (with --flat): the TEXTURE's, i.e. what it adds to the flat frame (any region: a sky, a patchwork, a wall):
-FAIL on texture in the band or a texture that adds steps (the textured frame's banding verdict worse than the flat
-one's); WARN on a mottle over its strength (+15 %), a radius outside 15-35 px (the median over ~400 px windows, as the
+FAIL on texture in the band, a texture that adds steps (the textured frame's banding verdict worse than the flat
+one's), or STRUCTURE (the layer's |dL*| p99.9 over 3 L* on flat pixels, 6 between two encodes: the mottle stays under
+~1.5, so a shape changed: a lib/light multiply or screen layer isolated by the plane's filter); WARN on a mottle over its strength (+15 %), a radius outside 15-35 px (the median over ~400 px windows, as the
 posters' boxes were measured), colour over 0.35, a grain, or a hold that moves. Without --flat: the banding verdict
 as before, with the high-pass grain.
 
@@ -101,6 +102,8 @@ TEX_AB = 0.35  # its colour (a*b* std)
 TEX_GRAIN = 0.15  # the texture layer's high-pass std (L*): a grain shows here; the first test has none
 TEX_BAND = 0.08  # its std inside the caption band (L*): none allowed
 TEX_HOLD = 0.08  # frame-to-frame mean |dL*| on a locked hold (pro_4 §3.6)
+TEX_STRUCT = 3.0  # |dL*| of the layer (p99.9 on flat pixels): the mottle stays under ~1.5; more is STRUCTURE (a shape the
+                  # texture changed: e.g. a multiply light layer isolated by the plane's filter), never mottle
 
 
 # ---------------------------------------------------------------- colour
@@ -548,6 +551,7 @@ def texture_ab(tex: np.ndarray, flat: np.ndarray, region, band, k_strength: floa
     res['chroma'] = round(float(math.hypot(la[core].std(), lb[core].std())), 3)
     res['grain'] = round(float(hp[core].std()), 3)
     res['mean_shift'] = round(float(T[..., 0][core].mean()), 3)
+    res['p999_abs'] = round(float(np.percentile(np.abs(T[..., 0][core]), 99.9)), 2)
     if bnd:
         bc = m & inband & ndi_erode(m, 2)
         res['band'] = {'y': [bnd[0], bnd[1]], 'std': round(float(lp[bc].std()), 3) if bc.sum() > 100 else None}
@@ -565,6 +569,9 @@ def texture_ab(tex: np.ndarray, flat: np.ndarray, region, band, k_strength: floa
         why.append(f'mottle radius {r} px outside {TEX_R[0]:.0f}-{TEX_R[1]:.0f}')
     if res['chroma'] > TEX_AB:
         why.append(f"mottle colour {res['chroma']} > {TEX_AB} a*b*")
+    if res['p999_abs'] > TEX_STRUCT * (2.0 if lossy else 1.0):
+        verdict = 'FAIL'
+        why.append(f"structure, not mottle: |dL*| p99.9 {res['p999_abs']} > {TEX_STRUCT * (2.0 if lossy else 1.0):.1f} (a shape changed with the texture on: a blend layer isolated by the plane's filter?)")
     if res['grain'] > TEX_GRAIN and not lossy:
         why.append(f"a grain: high-pass std {res['grain']} L* > {TEX_GRAIN}")
     res['lossy'] = lossy
