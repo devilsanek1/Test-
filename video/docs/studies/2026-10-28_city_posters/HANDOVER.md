@@ -14,7 +14,10 @@ points and conclusions into the main repo"). The brief is `README.md` here; the 
   CRAFT §a, PIPELINE_V2 aligned with the owner's ONE SUBJECT, GONE DEEP. All shipped films proven pixel-identical.
 - Videos 4 and 5 (owner ~09:30 UTC: "Helsinki is actually pretty good too / Let's do both as story 4 and 5"): v4 =
   Helsinki heats its homes with AI chips, v5 = the bunker under the Stockholm park; both produced by session
-  session_01YGLGMrgF1Cfg5gMAND1VNt (HANDOFF 2e), resuming itself at 12:45 UTC; their G3-G4 build on this test.
+  session_01YGLGMrgF1Cfg5gMAND1VNt until ~09:25 UTC, then handed to a new session the owner starts ("Can you commit
+  these topic as 4 and 5 and I will continue in another session"): both at G1, next steps in `video/docs/v4/README.md`
+  and `video/docs/v5/README.md`, HANDOFF 2e; merged into `video-production` (693ca77); that helper is archived. Their
+  G3-G4 build on this test.
 - RUNNING at 09:20: lane S's integration and render (STUDY §10 item 11). Its orders: wire PT's `<Mottle>` into
   TextureSlot (seed `mottleSeed(plane)`, offset [dx, dy]; move S1BoatStrips into the water plane or leave the boats
   unmottled), N's London plane into TreeSlot/SpraySlot (re-fit Pip's hiding spot into the crown; leaf tips out of the
