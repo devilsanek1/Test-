@@ -261,13 +261,22 @@ Maintenance at the end).
   never one dark mass or a narrow band of light pastels (one reason v2 reads cheap next to the city posters). Numbers:
   `docs/look/CRAFT.md` §f.8, from the city-poster study. — (our observation on the posters; "5 - good point too!",
   2026-10-28; the darks in many small pieces: "Go with your suggestions", 2026-10-29).
+- **PAINTED PIECES: the sky and its clouds, and a few chosen environment pieces (some foreground buildings, trees and
+  greenery), are uniquely painted, as in the owner's references** (`docs/look/refs_human_scale/`, the city posters'
+  skies and proteas): visible brush and paint texture, soft painted edges, colour moving within a shape, each piece
+  painted for its place (never one stamp repeated). The subject (tier A) and the faces and people stay crisp and clean,
+  so the paint is the world's, not the story's; the film still works with the paint off. In the engine the painted
+  pieces are layers made by our own deterministic paint pass (seeded, locked to their layer so nothing swims in the
+  float; a cloud may churn slowly), never a filter smeared over the whole frame. The dose is
+  judged on a look test first. — ("Another piece of feedback is I really like the “painted” pieces like the sky and the clouds the references or some foreground buildings and trees / greenery are uniquely painted / Is it possible to modify our engine to match the story? Style", 2026-10-29).
 - **Texture and lines: VERY subtle.** No outlines: as on the city posters, shapes are separated by light and shade (a
   lit and a shade face on every volume, the subject's the deepest) and by value, never by a line drawn round them
   (the A vs B picture's B). Thin lines only on small things that are lines (window bars, railings, rigging): dark,
   warm lines in the object's own deep shade, never one near-black ink on everything (v3 G5b's was "too rough"), 2 px
   on the layers that float so they never twinkle; the owner's "black outlines" now live only in these; captions keep
   the dark ink. Spec: `docs/look/CRAFT.md` §c. Texture: start playing with a VERY subtle paper-and-paint
-  texture (a fine grain and gentle mottling in the big flats, like the city posters) where it adds to the premium look,
+  texture (a fine grain and gentle mottling in the big flats, like the city posters) where it adds to the premium look
+  (the painted pieces, the bullet above, are the one place paint shows openly),
   tried in a look clip and kept only if it does; the halftone stays an option on a few elements; the film must work
   flat. — ("very subtle texture
   pieces and the black outlines, VERY subtle but in key places", texture test, 2026-10-25; "cleaner, more refined,

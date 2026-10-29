@@ -6,6 +6,10 @@ with these three pictures and the Cape Town poster, `../poster_refs/05_cape_town
 in terms of actual video / I think our references point should be closer to the original like where a person would be
 about this size / So I think our initial angle snd the view frankly wasn’t bad"
 
+Then, on the painted look (2026-10-29): "Another piece of feedback is I really like the “painted” pieces like the sky
+and the clouds the references or some foreground buildings and trees / greenery are uniquely painted / Is it possible
+to modify our engine to match the story? Style" (playbook: PAINTED PIECES).
+
 | File | What it shows | The person |
 |---|---|---|
 | `01_city_hill_sunset.jpg` | two people on a dark grassy hill, from behind, before a vast city of towers under a pink sunset sky with long clouds | the standing one ~30 % of the frame's height, near the camera |
@@ -26,5 +30,5 @@ the person is a real size in the frame, seen from behind or in silhouette, no fa
 vast world beyond (a city, a sky, the sea) gives the scale. Our own v2 angle and view of scene 1 were "frankly not
 bad"; the far poster-like view of still v2 was "too cheap looking", "going away in style", and hard to use in an actual
 video. The general rule: `video/docs/OWNER_PLAYBOOK.md`, "DEPTH AND SCALE FROM A HUMAN VIEWPOINT". We learn principles
-from them (viewpoint, the person's size, the big sky's drama, the light), never their painterly rendering, and never
-trace or copy them.
+from them (viewpoint, the person's size, the big sky's drama, the light, and, by the owner's choice, their painted
+skies, clouds and chosen environment pieces), and never trace or copy them.
