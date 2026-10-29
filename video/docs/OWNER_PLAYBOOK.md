@@ -110,9 +110,12 @@ Maintenance at the end).
   anything you observed too", 2026-10-28).
 - **Light and shadow: gentle, but always there.** One consistent light direction per scene, soft form and cast shadows,
   gentle light pools that make sense; never absent and never "weirdly put". Every volume reads in 2-3 flat tones, a lit
-  face and a shade face, as the city posters' buildings do. System: `docs/look/CRAFT.md` §d. — (v3 G5b, 2026-10-27;
+  face and a shade face, as the city posters' buildings do; with no outlines these faces make the edges, so the
+  subject's shade face goes clearly deeper (-20 to -25 L*) while supporting life and the world stay gentle (-7 to
+  -12). System: `docs/look/CRAFT.md` §d. — (v3 G5b, 2026-10-27;
   "the shadows added are better", v2 G4, 2026-10-27; on the posters' lit and shaded faces: "4 is a good point and goes
-  along the shadows we discussed in the google video", 2026-10-28).
+  along the shadows we discussed in the google video", 2026-10-28; the subject's deeper shade: "Go with your
+  suggestions", 2026-10-29).
 - **DEPTH AND SEPARATION: every shot reads in distance, never a flat elevation.** The subject separates from what is
   behind it (its own value and contrast against a calmer field: a building in front never melts into the buildings
   behind it); distance shows in the colour (far planes converge on the air behind them: lighter, softer, simpler; cooler
@@ -141,12 +144,13 @@ Maintenance at the end).
   toward the horizon, dithered so it never bands on a phone, nearly flat inside the caption band so captions keep their
   contrast; the caption field is part of that sky, never a separate slab of another colour; the sun sits in sky that
   agrees with it, and the far city takes the sky's lowest colour as its haze. Generally: two big fields of unrelated colour never
-  meet in a hard seam unless an object edge explains it. — ("what bothered me is different color of the space and sun,
+  meet in a hard seam unless an object edge explains it. The sun stays calm: one step off its sky, or behind a ridge,
+  unless it is the shot's "look here", so the far is the calmest part of the frame. — ("what bothered me is different color of the space and sun,
   like why is it blue sky and then suddenly abruptly orange, weird"; "maybe when it comes to sky we can find a beautiful
-  way to do a gentle gradient", v2 G4, 2026-10-27).
-- **ATTENTION HIERARCHY: one main arc, one focus at a time.** The story's subject gets the contrast, line weight,
-  saturation and the clear motion; supporting life (a bird, walkers, snow, steam) stays subtle (smaller, lower contrast,
-  thinner or no lines, softer colour, calmer motion): alive, but never competing. Supporting environment may be drawn in
+  way to do a gentle gradient", v2 G4, 2026-10-27; the calm sun: "Go with your suggestions", 2026-10-29).
+- **ATTENTION HIERARCHY: one main arc, one focus at a time.** The story's subject gets the contrast, the deepest
+  light-and-shade step, saturation and the clear motion; supporting life (a bird, walkers, snow, steam) stays subtle
+  (smaller, lower contrast, gentler shade, softer colour, calmer motion): alive, but never competing. Supporting environment may be drawn in
   a softer, simpler style than the subject; not every moving piece gets the same treatment. Too many equal moving parts
   = "I don't know what to keep my attention on". The main objects are the crispest and most detailed; the supporting
   world is simpler (fewer details, a more faceted, "low poly" build) yet made with the same shapes, colours and light,
@@ -203,29 +207,34 @@ Maintenance at the end).
   reads as one brand (ONE LOOK, ONE BRAND above). Rules: `docs/look/PALETTE.md`. — (2026-10-25; one brand, 2026-10-28).
 - **Warm, never sickly:** no beige, muddy tan, olive or grey; peach creams, terracotta, red-brown lines, golden light,
   warm shadows. — ("we need to have a warm feeling, not sick", v3 G4, 2026-10-26).
-- **A full value range: a calm light sky, a mid-tone world and a few real darks where the eye should go** (windows, a
-  hull, the shade under trees), never a narrow band of light pastels (one reason v2 reads cheap next to the city
-  posters). The numbers come from the city-poster study. — (our observation on the posters; "5 - good point too!",
-  2026-10-28).
-- **Texture and lines: VERY subtle.** Lines only in key places: the clean pen's tiers (the main thing's outline and a
-  few inner details; `docs/look/CRAFT.md` §c). The owner's "black outlines" are read as dark, warm lines in the
-  object's own deep shade, never one near-black ink on everything (v3 G5b's was "too rough"); captions keep the dark
-  ink; the owner judges the line in each G4 look clip. Texture: start playing with a VERY subtle paper-and-paint
+- **A full value range: a calm light sky, a mid-tone world and real darks where the eye should go, drawn in many
+  small pieces** (windows, doorways, eave undersides, a hull, the shade under trees: 6-10 % of the frame under L* 40),
+  never one dark mass or a narrow band of light pastels (one reason v2 reads cheap next to the city posters). Numbers:
+  `docs/look/CRAFT.md` §f.8, from the city-poster study. — (our observation on the posters; "5 - good point too!",
+  2026-10-28; the darks in many small pieces: "Go with your suggestions", 2026-10-29).
+- **Texture and lines: VERY subtle.** No outlines: as on the city posters, shapes are separated by light and shade (a
+  lit and a shade face on every volume, the subject's the deepest) and by value, never by a line drawn round them
+  (the A vs B picture's B). Thin lines only on small things that are lines (window bars, railings, rigging): dark,
+  warm lines in the object's own deep shade, never one near-black ink on everything (v3 G5b's was "too rough"), 2 px
+  on the layers that float so they never twinkle; the owner's "black outlines" now live only in these; captions keep
+  the dark ink. Spec: `docs/look/CRAFT.md` §c. Texture: start playing with a VERY subtle paper-and-paint
   texture (a fine grain and gentle mottling in the big flats, like the city posters) where it adds to the premium look,
   tried in a look clip and kept only if it does; the halftone stays an option on a few elements; the film must work
-  flat. The posters' outline-free edges (shapes separated by light and dark steps, only tiny lines for windows and
-  railings) are liked: the owner judges them on an A vs B picture before the line rule changes. — ("very subtle texture
+  flat. — ("very subtle texture
   pieces and the black outlines, VERY subtle but in key places", texture test, 2026-10-25; "cleaner, more refined,
   gentle, premium", v3 G5b, 2026-10-27; "i like texture point yes we can perhaps start playing with it, very subtly
   especially if its adding to the premium look sure"; "i like 3 - but can you draw me a picture of difference like A vs
-  B what you are talking about", 2026-10-28).
+  B what you are talking about", 2026-10-28; on the A vs B picture and the thin lines in the float: "Go with your
+  suggestions", 2026-10-29, first judged in the 7 s look test of v2's canal opening).
 - **Pip stays, hidden on purpose.** The mascot Pip (the purple PHP elephant; the profile avatar
   `deliverables/profile/pip_power_button.png`) is kept in every film, but far more subtle than before: hidden
   deliberately in the world (in a window, on a boat, on a balcony, among a crowd), small and drawn in the film's look,
-  found on a second look, never the first thing the eye meets and never competing with the subject. Its hiding spots are
+  found on a second look, never the first thing the eye meets and never competing with the subject: a quiet "find
+  Pip" in most exterior shots, none in closes and charts, and hidden on the cover too (never the one place it shows);
+  drawn like everything else, with no outline. Its hiding spots are
   planned with the shots (W1 and G3); it no longer rides the joins. — (profile identity, 2026-10-25; "the pip i mean would
   be good to keep it, but we can perhaps make it way more subtle perhaps hide it deliberately in the video, like keep it,
-  but not as obvious", 2026-10-28).
+  but not as obvious", 2026-10-28; "find Pip" and the cover: "Go with your suggestions", 2026-10-29).
 
 ## Hook and pacing
 - **Every video has ONE core line, picked before the script (by default on the topic screen: each topic comes with its proposed core line, so the owner picks both at once; a separate core-line round only on request):** the single sentence at the core
