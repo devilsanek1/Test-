@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# still.sh <CompId> <seconds> <out.png> [--scale=0.5]
-# Renders one frame at <seconds> (composition time) to <out.png>.
+# still.sh <CompId> <seconds> <out.png> [--scale=0.5] [--entry=src/entry-<film>.tsx] [--props=JSON]
+# Renders one frame at <seconds> (composition time) to <out.png>; other flags go to render-frames.mjs (its cached
+# bundle and one browser make a repeated still ~1 s).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 [ $# -ge 3 ] || { echo "usage: scripts/still.sh <CompId> <seconds> <out.png> [--scale=0.5]"; exit 2; }

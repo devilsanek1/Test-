@@ -3,8 +3,6 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "still": "remotion still src/index.ts",
-    "render": "remotion render src/index.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

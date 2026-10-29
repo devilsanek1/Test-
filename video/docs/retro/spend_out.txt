@@ -1,3 +1,10 @@
+NOTE (2026-10-29, lane M, `2026-10-28_streamline/phase1_meter.md`): v1's record, kept as is (session 59905704, 2026-10-25;
+its transcripts are gone, so it cannot be re-run). v1 summed `usage` on every transcript line, and Claude Code writes
+one line per content block with the call's usage repeated on each, so every token total and "turns" below OVER-COUNTS
+ABOUT 2.4x (re-measured on session d840f028's 40 transcripts: 3,677 lines for 1,562 API calls, input 2.34x; 1.4-4.1x
+per transcript, so the shares hold only roughly). Est.: v1's 12.5 B agent input is about 5 B real, its 1,922
+orchestrator turns about 800 calls. spend.py v2 counts each API call once: `python3 video/docs/retro/spend.py [session]`.
+----
 agents: 442  total input 12496.7M (cache read 12260.3M)  output 66.24M
 orchestrator: input 832.4M output 2.04M turns 1922
 
