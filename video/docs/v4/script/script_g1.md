@@ -1,5 +1,10 @@
 # Video 4, G1 script: "Your chatbot could heat an apartment in Helsinki"
 
+> **DRAFT 2 IN PROGRESS (2026-10-29, the rework after the owner's notes).** Everything below this box is still draft 1
+> (archived unchanged in `../archive/g1_draft1/`) until this box is replaced by the finished "Rework after the owner's
+> notes (2026-10-29)" section. The rework follows `video/docs/retro/2026-10-29_script_clarity/` (BRIEF, PRINCIPLES,
+> RULES_DRAFT, LINT_SPEC).
+
 Written 2026-10-29 by the G1 writer (lean G1: one writer, one critic, one fix pass; `docs/PIPELINE_V2.md`), from
 `WRITER_BRIEF.md`; fixed the same day by the fix pass on `critique_g1.md` (what changed: "Fix pass", at the end).
 Not owner-approved yet. Facts: `video/docs/v5/research/factlock.md` (FL below; the one fact file for

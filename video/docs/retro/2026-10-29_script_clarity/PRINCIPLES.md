@@ -28,7 +28,7 @@ a standards body's rules), **practitioner** (a working writer's advice), **ours*
   would like to tell my friends." The very next line, "The chips get that hot." -> "we would lose people on this
   sentence." Same script, same writer: one line is news for a friend, the next is a note to ourselves.
 - **The research:** an easy sentence is believed more and liked more (Reber and Schwarz 1999, study:
-  https://pubmed.ncbi.nlm.nih.gov/10487787/); hard words made 650 people push back against the message itself
+  https://pubmed.ncbi.nlm.nih.gov/10487787/); in a 650-person experiment, jargon made people resist the message itself
   (Bullock et al. 2019, study: https://doi.org/10.1177/0963662519865687).
 - **The test:** say the line to an imagined friend who doesn't do tech. If they would ask "what?", rewrite it.
 
@@ -39,15 +39,15 @@ a standards body's rules), **practitioner** (a working writer's advice), **ours*
 - **The owner's example:** "Chips is a word not a lot of people would understand"; then, on "One cabinet of them is
   like FORTY kettles, boiling non-stop.": "also similarly the next one too." -> "Just one stack of these computers
   gives off as much heat as forty kettles, boiling non-stop." Draft 1 called its one thing by five names in 40 s (AI,
-  the chips, one cabinet of them, a data center, your chatbot). Better: "the computers that run AI",
-  then "these computers", every time. A term the story needs is described once, plainly, where it first appears
-  ("buildings called data centers").
+  the chips, one cabinet of them, a data center, your chatbot). Better: "the computers that run AI", then "these
+  computers", every time. A term the story needs is described once, plainly, where it first appears ("buildings
+  called data centers").
 - **The research:** a word's everyday meaning comes first, even when the sentence points elsewhere (Leinenger and
   Rayner 2013, study: https://pubmed.ncbi.nlm.nih.gov/24073328/), and a definition doesn't undo a trade word's cost
-  (Bullock et al. 2019, study); a lay listener needs about 98 % familiar words, so about two unfamiliar words in a
-  115-word script (Rakedzon et al. 2017, study: https://pmc.ncbi.nlm.nih.gov/articles/PMC5549884); "Use one word for
-  a concept" (Microsoft Style Guide, style guide:
-  https://learn.microsoft.com/en-us/style-guide/global-communications/writing-tips).
+  (Bullock et al. 2019, study: https://doi.org/10.1177/0963662519865687); a lay audience needs about 98 % familiar
+  words, so about two unfamiliar words in a 115-word script (Rakedzon et al. 2017, study:
+  https://pmc.ncbi.nlm.nih.gov/articles/PMC5549884); "Use one word for a concept" (Microsoft Style Guide, style
+  guide: https://learn.microsoft.com/en-us/style-guide/global-communications/writing-tips).
 - **The test:** for every noun, "what would a 14-year-old who learned English at school call this?" If not this word,
   use theirs. The check lists every trade word; the panel is asked "what are the chips?".
 
@@ -93,7 +93,8 @@ a standards body's rules), **practitioner** (a working writer's advice), **ours*
   steps in one breath.) -> "These computers are cooled with water, so the water gets warm. Machines called heat pumps
   make it even hotter. Then that hot water runs through pipes under the streets, into people's homes."
 - **The research:** listeners hang each sentence's new part on what they already hold (Haviland and Clark 1974,
-  study); "our ears can only handle one fact or idea per sentence" (NPR Training, style guide:
+  study: https://doi.org/10.1016/S0022-5371(74)80003-4); "our ears can only handle one fact or idea per sentence"
+  (NPR Training, style guide:
   https://www.npr.org/sections/npr-training/2025/05/30/g-s1-65814/the-journey-from-print-to-radio-storytelling-a-guide-for-navigating-a-new-landscape);
   curiosity needs a base, so a skipped step reads as confusion, not as a question (Loewenstein 1994, study:
   https://www.cmu.edu/dietrich/sds/docs/loewenstein/PsychofCuriosity.pdf).
@@ -109,8 +110,9 @@ a standards body's rules), **practitioner** (a working writer's advice), **ours*
   boost from heat pumps" -> "heat pumps make it even hotter".
 - **The research:** listeners in a second language work out an idiom's literal words first, even for idioms they know
   (Cieślicka 2006, study: https://doi.org/10.1191/0267658306sr263oa); "Avoid idioms, colloquial expressions, and
-  culture-specific references" (Microsoft Style Guide, style guide); "Use words in their primary sense" (Google's
-  style guide, style guide).
+  culture-specific references" (Microsoft Style Guide, style guide:
+  https://learn.microsoft.com/en-us/style-guide/global-communications/writing-tips); "Use words in their primary
+  sense" (Google's style guide, style guide: https://developers.google.com/style/translation).
 - **The test:** the panel's non-native viewer is asked "what does 'first dibs' mean here?". The check stops on known
   idioms and asks about figurative verbs ("end up", "gets a boost").
 
@@ -125,8 +127,8 @@ a standards body's rules), **practitioner** (a working writer's advice), **ours*
   usually right after you buy one."
 - **The research:** a joke lands only when the "wrong" in it feels harmless; once it reads as a real wrong, it stops
   being funny (McGraw and Warren 2010, study: https://leeds-faculty.colorado.edu/mcgrawp/pdf/mcgraw.warren.2010.pdf);
-  sarcasm is much harder to catch in a second language (Cheang and Pell 2011, small study:
-  https://www.jbe-platform.com/content/journals/10.1075/pc.19.2.02che); humour does raise how much people like the
+  listeners in a second language catch sarcasm less often (Dolan, BYU, small study:
+  https://schwa.byu.edu/files/2016/01/Dolan_Sarcasm.pdf); humour does raise how much people like the
   speaker and want to comment (Yeo and colleagues, studies: https://jcom.sissa.it/author/sara-k-yeo), so keep one.
 - **The test:** after one cold hearing, did they smile AND can they say the point? Both, or the joke goes. The check
   flags scolding frames ("nobody's even", "can't even", "of course").
@@ -139,7 +141,9 @@ a standards body's rules), **practitioner** (a working writer's advice), **ours*
   thousand homes this way. That plan starts in twenty twenty-seven." Video 4: "One cabinet of them is like FORTY
   kettles" (like in what way: size, noise, heat?) -> "... gives off as much heat as forty kettles".
 - **The research:** numbers make the listener do math and "are more easily missed, misheard or forgotten" (NPR
-  Training, style guide); people understand counts better than percentages (Hoffrage et al. 2000, study:
+  Training, style guide:
+  https://www.npr.org/sections/npr-training/2025/05/30/g-s1-65814/the-journey-from-print-to-radio-storytelling-a-guide-for-navigating-a-new-landscape);
+  people understand counts better than percentages (Hoffrage et al. 2000, study:
   https://pubmed.ncbi.nlm.nih.gov/11188724/); an analogy confuses unless what is alike is said (Glynn's
   Teaching-With-Analogies, from education research:
   https://www.csun.edu/~vceed002/books/sourcebook/chapters/10-analogies/teaching-analogies.html).
@@ -228,7 +232,7 @@ the hints, the joke) and words no list holds (v2's legal phrases, v1's "supporte
 |---|---|---|---|---|---|---|
 | 1. A trade word or false friend, never put in everyday words (P2) | 4/9 | 3/12 | 3/14 | 5/13 | 2/8 | v4 "The chips get that hot."; v1 "somebody still has to install it on every single server." |
 | 2. A pointer with no single target: "it", "they", "which", a new "the X", "that hot" (P3) | 3/9 | 3/12 | 4/14 | 5/13 | 4/8 | v4 "But Helsinki WANTS it."; v3 "They pay more, so they get first dibs." (the chips or the data centers?) |
-| 3. One thing, several names (P2) | 1 name | 1 name | 2 swaps | 5 names | 4 names | v4: AI, the chips, a cabinet, those chips, a data center, your chatbot; v5: a data centre, AI chips, one cabinet, "one" |
+| 3. One thing, several names (P2) | 1 name | 1 name | 2 swaps | 5 names | 4 names | v4: AI, the chips, one cabinet, a data center, your chatbot; v5: a data centre, AI chips, one cabinet, "one" |
 | 4. A hint where the thought belongs: a skipped step, a "luckily" for the reason (P4) | 0/9 | 1/12 | 3/14 | 3/13 | 2/8 | v4 "So almost everywhere, that heat just gets dumped into the air or the sea."; v3 "Which is backwards." |
 | 5. A vague scope, or no doer (P4) | 1/9 | 0/12 | 0/14 | 1/13 | 2/8 | v4 "almost everywhere ... gets dumped"; v5 "Then someone sent one into space this month" |
 | 6. An idiom, slang or figure of speech (P6) | 1/9 | 1/12 | 4/14 | 1/13 | 2/8 | v3 "first dibs", "by the mountain", "pass that on"; v1 "a heads-up, but word got out" |
@@ -239,9 +243,8 @@ the hints, the joke) and words no list holds (v2's legal phrases, v1's "supporte
 **What the corpus says.**
 - **The failures grew as the scripts got shorter and the process leaner.** Video 1, still our best performer, ran a
   clarity critic with a "jargon and names audit" for "a smart non-coder" and fixed its own unclear "it" lines before it
-  shipped; the lean G1 (one writer, one critic) checks the story, the opening, the facts and AI-sounding phrasing, but not
-  whether a regular person knows the words.
-  Draft 1 has the most trade words and pointers of all five.
+  shipped; the lean G1 (one writer, one critic) checks the story, the opening, the facts and AI-sounding phrasing,
+  but not whether a regular person knows the words. Draft 1 has the most trade words and pointers of all five.
 - **The rhythm rule pulls short lines toward pointers.** Five of draft 1's six short sentences lean on a pointer ("that
   hot", "it", "those chips", "it's", "they've ... this"). The rule stands; the short line keeps its noun.
 - **Each video's topic brings its own trade words** (PHP and servers, the Pentagon and "any lawful government purpose",

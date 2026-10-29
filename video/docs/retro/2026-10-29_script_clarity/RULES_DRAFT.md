@@ -22,13 +22,13 @@ ambiguous for the audience. When you say IT - what exactly is it - heat or air o
 
 | Doc | What | Merges / retires |
 |---|---|---|
-| `video/docs/OWNER_PLAYBOOK.md`, Script and voice | 1a: the CLEAR bullet gets the method (8 rules and the check), the owner's quotes verbatim | absorbs the "Everyday spoken language" half of the next bullet |
+| `video/docs/OWNER_PLAYBOOK.md`, Script and voice | 1a: the CLEAR bullet gets the method (7 rules and the check), the owner's quotes verbatim | absorbs the "Everyday spoken language" half of the next bullet |
 | same | 1b: that next bullet splits into RULE #1 (AI-sounding wording) and the rhythm rule, whose short line keeps its noun | "Everyday spoken language" moves into 1a; nothing retired |
 | same, Taste signals | 1c: "Lines: plain, direct and personal over clever" points at 1a and narrows "a question to the viewer works as a hook" to a friend's question | the "question to the viewer" clause narrowed (it already clashed with "never baity"); no rule reversed, so nothing moves to "Retired" |
 | same, Hook and pacing | no change (why: 1e) | none |
 | `video/docs/PIPELINE_V2.md`, the G1 bullet | 2a: the writer's clarity pass, the critic's cold viewer panel, what counts as a finding | none |
 | same, gates table G1 row and tooling table | 2b: the panel and `check_clarity.py` named | none |
-| `video/docs/CREATIVE_BRIEF.md`, the banner | 3: one new bullet: clarity updates §11-17 and RULE #1 | narrows §14-17's "natural American expressions" and "dry ... humour" |
+| `video/docs/CREATIVE_BRIEF.md`, the banner | 3: one new bullet: clarity sharpens §3 and §11 and RULE #1 | narrows §14-17's "natural American expressions" and "dry ... humour" |
 | `CLAUDE.md`, the script bullet | 4: one clause | replaces "Everyday spoken language, no AI-sounding phrasing;" |
 | the G1 briefs and template | 5: the integration list | none |
 
@@ -99,13 +99,14 @@ ambiguous for the audience. When you say IT - what exactly is it - heat or air o
   think you are having some deeper thought here and you choose to be obscure about it. So i think you want to say that
   in a typical datacenter here is what happens. When you say "almost everywhere" - this is very ambigous"; "When you
   say IT - what exactly is it - heat or air or sea?", v4 G1, 2026-10-29; earlier, "Who even knows WordPress now?", v1,
-  2026-10-24.)
+  October 2026.)
 ```
 
-**Why these changes:** the bullet already had the owner's rules; it gains the method (the principles as eight short
-rules, each with the owner's or the corpus's example), the check (the lint and the panel, both new), the structure
+**Why these changes:** the bullet already had the owner's rules; it gains the method (the principles as seven short
+rules and the check, each with the owner's or the corpus's example), the check (the lint and the panel, both new), the structure
 (the base right after the hook: the owner's note on line 2) and the comment-line clause (the Audience and goal rule,
-"comments are a massive plus", made safe: Bullock et al. 2019 found jargon raised resistance, not engagement). The
+"comments are a massive plus", made safe: Bullock et al. 2019 found jargon raised resistance, not engagement, study:
+https://doi.org/10.1177/0963662519865687). The
 quotes are now exactly the owner's (the old bullet had "don't" and an inserted "it" in the question; the playbook keeps
 the owner's spelling elsewhere, "ambigous" included), plus the tea line's quote and v1's WordPress note, so the rule
 carries the evidence of two videos (Maintenance, step 3).
@@ -202,7 +203,7 @@ step 5).
   `docs/retro/2026-10-29_script_clarity/LINT_SPEC.md`), writes "What I mean is: ___" under every line that leans on
   what the writer knows, and runs `check_clarity.py`, `check_rhythm.py` and `check_paste.py` until all three pass,
   answering every clarity warning in the script doc's "Checks" section (fixed, or why it stays). Then one critic, cold
-  first (before the brief, the notes, the script doc or the fact file: only the spoken words): (a) **the cold viewer
+  first (before the writer's brief and notes, the script doc or the fact file: only the spoken words): (a) **the cold viewer
   panel:** the critic plays three regular people in turn (the cards in the critic brief: a non-native English speaker
   who learned English at school, a non-tech adult, a fast-scrolling teen); each hears the narration once, one
   sentence at a time, never looking back or ahead, and after each sentence reports what they understood (in their
@@ -247,13 +248,26 @@ Each hears one sentence at a time, once, and answers only from that sentence and
 
 ### 2b. The gates table and the tooling table
 
-- **Gates table, the G1 row, its last column** (line 45). Replaces: `one writer + one critic + one fix pass; 1 h, then 15
-  min per round`. New: `one writer + one critic (with the cold viewer panel) + one fix pass; 1 h, then 15 min per
-  round`.
-- **Tooling table, the "G1/G2 voice" row** (line 208). Replaces: `paste-file rules + `check_paste.py`; `check_rhythm.py`
-  (long sentences broken by short ones);`. New: `paste-file rules + `check_paste.py`; `check_rhythm.py` (long
-  sentences broken by short ones); `check_clarity.py` (the clarity questions: trade words, pointers, vague scope,
-  idioms, numbers; `docs/retro/2026-10-29_script_clarity/LINT_SPEC.md`);`.
+- **Gates table, the G1 row, its last column** (line 45).
+  Replaces:
+  ```
+  one writer + one critic + one fix pass; 1 h, then 15 min per round
+  ```
+  New:
+  ```
+  one writer + one critic (with the cold viewer panel) + one fix pass; 1 h, then 15 min per round
+  ```
+- **Tooling table, the "G1/G2 voice" row** (line 208).
+  Replaces:
+  ```
+  paste-file rules + `check_paste.py`; `check_rhythm.py` (long sentences broken by short ones);
+  ```
+  New:
+  ```
+  paste-file rules + `check_paste.py`; `check_rhythm.py` (long sentences broken by short ones); `check_clarity.py`
+  (the clarity questions: trade words, pointers, vague scope, idioms, numbers;
+  `docs/retro/2026-10-29_script_clarity/LINT_SPEC.md`);
+  ```
 
 ---
 
@@ -265,10 +279,10 @@ Each hears one sentence at a time, once, and answers only from that sentence and
 > - **Clarity (owner, 2026-10-29):** every sentence is understood the first time by a regular person anywhere in the
 >   world (many learned English at school), on one hearing at feed speed: everyday names, one per thing (never a
 >   trade word like "chips" or "cabinet"); every "it" or "that" with one obvious target; the plain thought as the
->   typical case, never a hint; literal words; the one joke plain and kind. This sharpens §11-17 ("simple language",
->   "a great teacher's clarity") and narrows "natural American expressions" and "dry ... humour" to what a listener
->   needn't decode (no idioms, slang or irony); RULE #1 still holds (a real person talking), and the line must also be
->   understood at once. The method and the check: the playbook, "CLEAR TO A REGULAR PERSON ON ONE HEARING".
+>   typical case, never a hint; literal words; the one joke plain and kind. This sharpens §3 ("a great teacher's
+>   clarity") and §11 ("simple language"), and narrows §14-17's "natural American expressions" and "dry ... humour"
+>   to what a listener needn't decode (no idioms, slang or irony); RULE #1 still holds (a real person talking), and
+>   the line must also be understood at once. The method and the check: the playbook, "CLEAR TO A REGULAR PERSON ON ONE HEARING".
 ```
 
 **Replaces:** nothing (a new bullet). **Why:** the brief's §14-17 asks for "natural American expressions" and "dry,
@@ -280,12 +294,19 @@ idiom like "first dibs", irony like "nobody's even making tea"), while the plain
 
 ## 4. `CLAUDE.md`: the script bullet
 
-**Replaces** (in "Top rules", the bullet "A script is one coherent story ..."): `Everyday spoken language, no
-AI-sounding phrasing;`
+**Replaces** (in "Top rules", the bullet "A script is one coherent story ..."):
 
-**New text:** `Everyday spoken language a regular person gets on ONE hearing (everyday names, never a trade word like
-"chips"; every "it" with one obvious target; the plain thought, never a hint; `check_clarity.py` OK and the critic's
-cold viewer panel at G1), no AI-sounding phrasing;`
+```
+Everyday spoken language, no AI-sounding phrasing;
+```
+
+**New text:**
+
+```
+Everyday spoken language a regular person gets on ONE hearing (everyday names, never a trade word like "chips"; every
+"it" with one obvious target; the plain thought, never a hint; `check_clarity.py` OK and the critic's cold viewer panel
+at G1), no AI-sounding phrasing;
+```
 
 So the bullet reads: "A script is one coherent story (spine first; every line follows from the last), never a list of
 facts. Everyday spoken language a regular person gets on ONE hearing (...), no AI-sounding phrasing; detailed emotional
