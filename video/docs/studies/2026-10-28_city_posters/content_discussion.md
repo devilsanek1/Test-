@@ -1,13 +1,10 @@
 # Content discussion: which stories fit the city-poster style
 
-**State (2026-10-29 ~02:45 UTC): DIRECTION FIRMING UP; scouts resumed after the 5-hour limit.** Tech told through
-these views, researched as a general direction: one possible umbrella is **tech in the cities** (WOW cases where a city
-solves a problem with new tech or AI); data centres and driverless taxis are kinds inside it; every pick needs a WOW;
-the owner liked the weird-place data centres. The limit stopped all three scouts at ~22:55 UTC. Done:
-`discussion_scouts/wow_datacentres.md` (top 5: Boulder City's vote, the overheating data centre in orbit, Helsinki's
-AI-heated homes, Stockholm's bunker, a mine in the Dolomites). Resumed at ~02:40 UTC from their transcripts:
-`wow_tech_world.md` (half written) and `tech_in_cities.md` (skeleton only). Next: edit all three into the umbrella's
-kinds and a shortlist with the column chart. No pick yet; who produces the video stays the owner's call.
+**State (2026-10-29 ~03:15 UTC): SHORTLIST SENT.** All three scouts finished (`discussion_scouts/`). Exchange 7 sent:
+the umbrella "tech in the cities" in five kinds, a top-8 shortlist with the column chart
+(`discussion_scouts/shortlist_chart.png`, data `shortlist_scores.json`: the owner's six criteria plus WOW, not weighted),
+and the three data-centre weird places. Waiting on the owner's pick. A pick then gets one fact lock (every scout fact
+came from search summaries) and the owner decides who produces it (v4's session or a new one).
 
 Notes: `content_market.md` and `content_fit.md` (the orchestrator's content track, scoped to tech and AI) are folded in
 below; their final versions (pulled ~22:20 UTC) changed nothing here. `content_fit.md`'s best kinds already include two
@@ -214,6 +211,35 @@ data-centre scout verifies the three weird places and digs for more with a fresh
 surprising places (e.g. a power plant with a ski slope on its roof). The umbrella's kinds as we framed them for the
 owner: moving people, the hidden machines, fighting nature, city services. The lean shape grew to three scouts at the
 owner's "research more"; this thread edits.
+
+**The owner's reaction:** none yet (the 5-hour limit stopped the scouts at ~22:55 UTC; resumed 02:40 UTC).
+
+### 7. ~03:15 UTC: the umbrella and the WOW shortlist (sent)
+**Tech in the cities, five kinds** (from the three scout files): the hidden machines (bunkers, sewers, sea gates, a city
+under the city); waste turned into warmth (AI chips, flooded mines and a data centre heating homes and a pool); new
+machines over the streets (hospital drones, robots against bears, robotaxis beside the cabbies); giants being built (a
+turbine taller than the Eiffel Tower, a ship tunnel through a mountain, a tower that catches rockets); towns deciding
+(Boulder City's data-centre vote, New York's pause). The heat kind is the positive face of data centres.
+
+| # | Story (scout file, case) | Score | WOW | Why now |
+|---|---|---|---|---|
+| 1 | London's hospitals fly children's blood samples over the traffic by drone (tech_in_cities 2) | 8.4 | 8 | Great Ormond Street joined 20 Oct |
+| 2 | New homes heated by the flooded coal mines under them, Seaham (tech_in_cities 8) | 8.1 | 8 | 750 homes live since 6 Oct |
+| 3 | Norway will blast a tunnel through a mountain, for ships (wow_tech_world 2) | 8.0 | 9 | 7 Oct budget; digging 2027 |
+| 4 | Germany's wind turbine taller than the Eiffel Tower, on old coal land (wow_tech_world 1) | 8.0 | 8 | full height 30 Sep; grid in Nov |
+| 5 | Venice's hidden wall of 78 gates on the seabed (tech_in_cities 6) | 8.0 | 8 | first high tide 21 Oct; a 2026 study |
+| 6 | London's second river under the Thames; sewage in the real one fell 86% (tech_in_cities 1) | 8.0 | 8 | first annual report, mid-Oct |
+| 7 | A tower in Texas will try to catch a spaceship falling from orbit (wow_tech_world 3) | 7.9 | 9 | Flight 15, November |
+| 8 | Bears walk into Japan's towns, so towns hired AI, drones and robots (tech_in_cities 3) | 7.9 | 9 | Washington Post 16 Oct |
+| 9 | The town built for the Hoover Dam votes on data centres (wow_datacentres 1) | 7.9 | 7 | 3 Nov vote |
+| 10 | A fridge-size data centre in orbit that overheats (wow_datacentres 2) | 7.81 | 8 | launched 1 Oct |
+| 11 | Helsinki will heat 70,000 homes with AI chips' waste heat (wow_datacentres 3) | 7.81 | 7 | deal 31 Aug; Forbes 4 Oct |
+| 12 | Stockholm's internet in a Cold War bunker (wow_datacentres 4; owner's pick) | 7.76 | 8 | drone strikes on data centres, Oct |
+| 13 | Under Helsinki, a second city; its pool is a bomb shelter (tech_in_cities 9) | 7.57 | 9 | older; peg needed |
+
+The owner's three weird places, checked by the scout: the Stockholm bunker is true (#12); the Barcelona chapel is true
+but its supercomputer moved next door in 2023 and the chapel now holds quantum computers; the Devon pool is true but
+from 2023. New York: nothing in the city; the state paused big data centres; the fight is upstate (Massena).
 
 **The owner's reaction:** (waiting)
 

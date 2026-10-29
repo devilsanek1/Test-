@@ -1,0 +1,232 @@
+{
+ "title": "Tech in the cities: WOW shortlist",
+ "subtitle": "Scouts' scores (est.); WOW shown, not weighted",
+ "criteria": [
+  {
+   "key": "relevant",
+   "label": "Relevant (+ buzz, surprise)",
+   "short": "Relevant",
+   "weight": 6
+  },
+  {
+   "key": "true",
+   "label": "True and solid",
+   "short": "True",
+   "weight": 5
+  },
+  {
+   "key": "visual",
+   "label": "Visually appealing",
+   "short": "Visual",
+   "weight": 4
+  },
+  {
+   "key": "mood",
+   "label": "Mood (hopeful)",
+   "short": "Mood",
+   "weight": 3
+  },
+  {
+   "key": "fresh",
+   "label": "Fresh (last month)",
+   "short": "Fresh",
+   "weight": 2
+  },
+  {
+   "key": "share",
+   "label": "Shareable",
+   "short": "Share",
+   "weight": 1
+  },
+  {
+   "key": "wow",
+   "label": "WOW (not in the score)",
+   "short": "WOW",
+   "weight": 0
+  }
+ ],
+ "stories": [
+  {
+   "name": "London's hospitals fly children's blood samples over the traffic by drone",
+   "scores": {
+    "relevant": 8,
+    "true": 8,
+    "visual": 9,
+    "mood": 9,
+    "fresh": 9,
+    "share": 8,
+    "wow": 8
+   },
+   "total": 8.43,
+   "rank": 1
+  },
+  {
+   "name": "New homes heated by the flooded coal mines under them",
+   "scores": {
+    "relevant": 7,
+    "true": 9,
+    "visual": 8,
+    "mood": 9,
+    "fresh": 9,
+    "share": 7,
+    "wow": 8
+   },
+   "total": 8.14,
+   "rank": 2
+  },
+  {
+   "name": "Norway will blast a tunnel through a mountain, for ships",
+   "scores": {
+    "relevant": 7,
+    "true": 8,
+    "visual": 10,
+    "mood": 8,
+    "fresh": 7,
+    "share": 8,
+    "wow": 9
+   },
+   "total": 8.0,
+   "rank": 3
+  },
+  {
+   "name": "Germany built a wind turbine taller than the Eiffel Tower",
+   "scores": {
+    "relevant": 7,
+    "true": 8,
+    "visual": 9,
+    "mood": 9,
+    "fresh": 8,
+    "share": 7,
+    "wow": 8
+   },
+   "total": 8.0,
+   "rank": 4
+  },
+  {
+   "name": "Venice's hidden wall of 78 gates on the seabed",
+   "scores": {
+    "relevant": 8,
+    "true": 7,
+    "visual": 10,
+    "mood": 7,
+    "fresh": 8,
+    "share": 8,
+    "wow": 8
+   },
+   "total": 8.0,
+   "rank": 5
+  },
+  {
+   "name": "London dug a second river under the Thames; sewage in the real one fell 86%",
+   "scores": {
+    "relevant": 7,
+    "true": 8,
+    "visual": 9,
+    "mood": 9,
+    "fresh": 8,
+    "share": 7,
+    "wow": 8
+   },
+   "total": 8.0,
+   "rank": 6
+  },
+  {
+   "name": "A tower in Texas will try to catch a spaceship falling from orbit",
+   "scores": {
+    "relevant": 8,
+    "true": 7,
+    "visual": 9,
+    "mood": 7,
+    "fresh": 9,
+    "share": 8,
+    "wow": 9
+   },
+   "total": 7.9,
+   "rank": 7
+  },
+  {
+   "name": "Bears walk into Japan's towns, so the towns hired AI, drones and robots",
+   "scores": {
+    "relevant": 9,
+    "true": 7,
+    "visual": 8,
+    "mood": 6,
+    "fresh": 9,
+    "share": 9,
+    "wow": 9
+   },
+   "total": 7.9,
+   "rank": 8
+  },
+  {
+   "name": "The town built for the Hoover Dam votes on data centres (3 Nov)",
+   "scores": {
+    "relevant": 8,
+    "true": 9,
+    "visual": 8,
+    "mood": 5,
+    "fresh": 10,
+    "share": 6,
+    "wow": 7
+   },
+   "total": 7.9,
+   "rank": 9
+  },
+  {
+   "name": "A fridge-size data centre in orbit that overheats",
+   "scores": {
+    "relevant": 8,
+    "true": 8,
+    "visual": 8,
+    "mood": 7,
+    "fresh": 8,
+    "share": 7,
+    "wow": 8
+   },
+   "total": 7.81,
+   "rank": 10
+  },
+  {
+   "name": "Helsinki will heat 70,000 homes with AI chips' waste heat",
+   "scores": {
+    "relevant": 7,
+    "true": 8,
+    "visual": 9,
+    "mood": 9,
+    "fresh": 6,
+    "share": 7,
+    "wow": 7
+   },
+   "total": 7.81,
+   "rank": 11
+  },
+  {
+   "name": "Stockholm's internet lives in a Cold War bunker under granite",
+   "scores": {
+    "relevant": 8,
+    "true": 8,
+    "visual": 9,
+    "mood": 5,
+    "fresh": 8,
+    "share": 8,
+    "wow": 8
+   },
+   "total": 7.76,
+   "rank": 12
+  },
+  {
+   "name": "Under Helsinki there's a second city; its pool is a bomb shelter",
+   "scores": {
+    "relevant": 8,
+    "true": 8,
+    "visual": 9,
+    "mood": 5,
+    "fresh": 6,
+    "share": 8,
+    "wow": 9
+   },
+   "total": 7.57,
+   "rank": 13
+  }
+ ]
+}
