@@ -71,7 +71,7 @@ def compare(v2flat):
     pt = os.path.join(ROOT, 'docs/studies/2026-10-28_city_posters/paint_test')
     refs = os.path.join(ROOT, 'docs/look/refs_human_scale')
     stills = [(v2flat, '1. v2 S1 (flat, as shipped)'), (os.path.join(pt, 'paint_still_v4.png'), '2. our painter: paint_still_v4'),
-              (os.path.join(OUT, 'ai_still_v1.png'), '3. AI (SDXL, local): ai_still_v1')]
+              (os.path.join(OUT, 'ai_still_v1.png'), '3. AI (SDXL 0.70, local): ai_still_v1')]
     W = 380
     panels = [fit_w(Image.open(p).convert('RGB'), W) for p, _ in stills]
     H = panels[0].height

@@ -21,13 +21,19 @@ if [[ "${1:-}" != "--sheets" ]]; then
   $PY $A/sdxl_paint.py --plate sky --init out/aipaint/init/sky_init.png --out out/aipaint/sky --strength 0.4 --seed $SEED
   $PY $A/sdxl_paint.py --plate sky --init out/aipaint/init/sky_init.png --out out/aipaint/sky --strength 0.7 --seed $SEED
   $PY $A/sdxl_paint.py --plate sky --init out/aipaint/init/sky_init_nosun.png --out out/aipaint/sky_final --strength 0.62 --seed $SEED
-  # the pick: structure control on our edges, so the paint can go further while our shapes hold
+  # structure control on our edges (the canny trials): our shapes hold, the paint is weaker
+  $PY $A/sdxl_paint.py --plate sky --init out/aipaint/init/sky_init_nosun.png --control out/aipaint/init/sky_init_nosun_canny.png \
+      --control-scale 0.6 --tag _cn2 --negative-extra "border, frame, vignette, stripes, banding" --out out/aipaint/sky_final --strength 0.68 --seed $SEED
   $PY $A/sdxl_paint.py --plate sky --init out/aipaint/init/sky_init_nosun.png --control out/aipaint/init/sky_init_nosun_canny.png \
       --control-scale 0.6 --tag _cn --out out/aipaint/sky_final --strength 0.75 --seed $SEED
+  # the owner's pick, "Yeah 0.7 looks reasonable": the sky is the 0.70 trial itself; the tree at 0.70 (alone it drifts into
+  # another picture, so the still's tree is the structure-controlled one)
+  $PY $A/sdxl_paint.py --plate tree --init out/aipaint/init/tree_init.png --out out/aipaint/tree --strength 0.7 --seed $SEED
   $PY $A/sdxl_paint.py --plate tree --init out/aipaint/init/tree_init.png --control out/aipaint/init/tree_init_canny.png \
-      --control-scale 0.6 --tag _cn --out out/aipaint/tree --strength 0.75 --seed $SEED
-  python3 $A/cut_plates.py --sky out/aipaint/sky_final/sky_s0.75_seed${SEED}_cn.png \
-      --tree out/aipaint/tree/tree_s0.75_seed${SEED}_cn.png --set v2s1_ai1
+      --control-scale 0.6 --tag _cn --out out/aipaint/tree --strength 0.7 --seed $SEED
+  # the sky and clouds from the model; the far roofs and the tower ours (0.70 turns them into a cloud)
+  python3 $A/cut_plates.py --sky out/aipaint/sky/sky_s0.70_seed${SEED}.png \
+      --tree out/aipaint/tree/tree_s0.70_seed${SEED}_cn.png --keep-design farroofs,fartower --set v2s1_ai1
 fi
 # the still, the paint-on strip (stills only), v2 flat for the compare; one render at a time (4 shared CPUs)
 render() { local dir=out/aipaint/render/$1; mkdir -p "$dir"; GL=angle node scripts/render-frames.mjs PaintS1 "$dir" 1.0 --entry=src/entry-look-paint.tsx --props="$2" >/dev/null; echo "$dir/f00060.png"; }
