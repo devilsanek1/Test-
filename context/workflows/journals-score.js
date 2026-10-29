@@ -38,14 +38,15 @@ function scorer(role) {
   const which = blind
     ? `ONLY the ids listed in ${J}/blind_sample_ids.txt (a seeded 20 % sample): you are the BLIND second scorer, the
 check on whether the rubric gives the same answer in other hands.`
-    : `EVERY row listed in ${J}/stage2_ids.txt (stage 2: the triage's top 250 plus a random 10 % control): you are the
+    : `EVERY row listed in ${J}/stage2_ids.txt (stage 2: every search row, the feed rows the triage
+picked, and a random 10 % control of the other feed rows): you are the
 first scorer.`
   return `You are a scorer in the journal-corpus study (a research thread for a short-form explainer channel whose films
 are drawn worlds: v1, the best performer, drew the internet as a town of buildings).
 
 Read ${J}/README.md in full first: section 4 (the rubric) is your instrument and its anchors (4.5) are your calibration;
-sections 1-2 tell you what the owner wants. Then read ${J}/corpus.csv (every row, to calibrate and to spot the same
-event at two outlets).
+sections 1-2 tell you what the owner wants. Then read the stage-2 rows of ${J}/corpus.csv (filter it by ${J}/stage2_ids.txt with a
+small script; the full corpus has 1,209 rows), to calibrate and to spot the same event at two outlets.
 
 Score ${which}
 - Score each story from its corpus row alone (outlet, date, headline, section, type, our one-line summary; feed rows,
