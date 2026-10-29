@@ -8,7 +8,8 @@ into `video-production`: the owner decides). Video 4 stays with its own session 
 |---|---|---|
 | G0 topic + core line | topic LOCKED (the heat story); core line: 3 options sent, waiting on the owner | `G0_TOPIC.md` |
 | Fact lock | running (one agent, max effort; the only web check) | `research/factlock.md` |
-| G1 script | next: one writer + one critic + one fix pass, from the fact lock and the picked line | |
+| Openers | running: one research agent, opener patterns scored, a top 3 for v5 | `../studies/2026-10-28_city_posters/openers/OPENERS.md` |
+| G1 script | next: one writer + one critic + one fix pass, from the fact lock, the picked line and the best openers | |
 | G2 voice | after the owner approves the script; the API key is missing here (see `G0_TOPIC.md`) | `public/v5/` |
 
 Owner's words: `OWNER_NOTES.md`. Rules: `video/docs/OWNER_PLAYBOOK.md`, `video/docs/PIPELINE_V2.md` (lean G0-G2).

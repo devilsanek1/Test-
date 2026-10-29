@@ -22,3 +22,6 @@ Format: the owner's words in quotes, with the time (UTC); after "->" what we did
   friend starting a story); the G1 writer gets the reel's first lines as the model for v5's opener.
 - 2026-10-29 ~08:55 UTC: "Oh I also meant that a video has an opening as "did you know that .." like that what I meant by great opening" -> playbook rule corrected ("Did you know that ..." is the model opener); v5's
   opener options rewritten in that form.
+- 2026-10-29 ~09:00 UTC: "Research more of the similar openings in the reels TikTok and score and pick the absolute best
+  options" -> one research agent (max effort): opener patterns with evidence, scored on our rules, and 10-15 v5 openers
+  with a top 3 -> `video/docs/studies/2026-10-28_city_posters/openers/OPENERS.md`.
