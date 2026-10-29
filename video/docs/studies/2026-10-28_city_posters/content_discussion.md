@@ -1,10 +1,10 @@
 # Content discussion: which stories fit the city-poster style
 
-**State (2026-10-29 ~03:15 UTC): SHORTLIST SENT.** All three scouts finished (`discussion_scouts/`). Exchange 7 sent:
-the umbrella "tech in the cities" in five kinds, a top-8 shortlist with the column chart
-(`discussion_scouts/shortlist_chart.png`, data `shortlist_scores.json`: the owner's six criteria plus WOW, not weighted),
-and the three data-centre weird places. Waiting on the owner's pick. A pick then gets one fact lock (every scout fact
-came from search summaries) and the owner decides who produces it (v4's session or a new one).
+**State (2026-10-29 ~05:00 UTC): A FRONT-RUNNER.** The owner liked Helsinki heating homes with AI chips, IceCube,
+and a "weirdest places data centres are built" story; asked what the London drone story has beyond its title.
+Exchange 8 sent: Helsinki and the weird places as ONE story on one thread (the heat), IceCube's arc, an honest answer
+on the drones (mostly one beat: park it), and two questions: take the heat story to the fact lock? who makes it (v4's
+session or a new one)? Picks below are leanings, not locks.
 
 Notes: `content_market.md` and `content_fit.md` (the orchestrator's content track, scoped to tech and AI) are folded in
 below; their final versions (pulled ~22:20 UTC) changed nothing here. `content_fit.md`'s best kinds already include two
@@ -248,7 +248,33 @@ made of Antarctic ice (physics Nobel 6 Oct; ceremony 10 Dec); Onkalo, Finland's 
 (licensed 22 Oct); Japan's MMX probe to Phobos (launched 20 Oct). Its data-centre rows were all backlash, votes, power
 or money (best fit: xAI's Memphis noise), none in a weird place: our scouts' weird-place data centres fill that gap.
 
+**The owner's reaction:** 2026-10-29 ~04:50 UTC, verbatim: "Oh I actually like the story of Helsinki hitting homes
+with ai chips / Ice cube is cool / Maybe another story is the "weirdest / coolest places where datacenters are built"
+like 3 weirdest places or smt / London hospital story interesting too but I'm not sure what you can pack in it beyond
+the title? Why would the people want to keep watching?" -> playbook Taste signals (every shortlist story shows what
+keeps people watching past its title; a "top 3" carried on one thread). -> exchange 8.
+
+### 8. ~05:00 UTC: the heat story, IceCube, the drones (sent)
+- **The heat story (Helsinki + the weird places, one thread):** where do you put a machine this hot? (1) Frame 0: kids
+  sledge down a snowy Stockholm park; 30 m under the granite, the internet hides in a Cold War bunker. (2) Why there:
+  AI chips throw off huge heat, and cooling is the fight. (3) So they go to cold, strange places: under granite, 100 m
+  inside a working mine in the Dolomites, the sea floor off Shanghai. (4) The twist: even space. On 1 Oct a
+  fridge-size test computer went to orbit, and it overheats: space is freezing, but nothing carries the heat away, so
+  it thinks for 15 minutes at a time. (5) The payoff: Helsinki does the opposite and keeps the heat: from 2027 AI chips
+  are meant to warm 70,000 homes (and in 2010 a data centre in a bomb shelter under its cathedral already did, to
+  check). Positive, which is what v4 needs. Lines to try: "Space is freezing. So why does this computer overheat?";
+  "Your chatbot could heat a flat in Helsinki." Sources: `discussion_scouts/wow_datacentres.md` cases 2-5 and 9.
+- **IceCube:** a cubic kilometre of South Pole ice wired with 5,160 light sensors catches particles from deep space;
+  physics Nobel to Francis Halzen, 6 Oct; ceremony 10 Dec (`journals/clusters.md` #7, verified there). Above and below:
+  the station on the white plain, sensor strings deep in the ice, the far universe. The "why ice?" turn is to check.
+- **The drones, honestly:** beyond the title: 2.1 km that took a van 30+ minutes now takes 2-4; bone-marrow samples for
+  children's leukaemia among them; robot dogs carry them from the pad; a Massachusetts town voted 510-13 against drones
+  for toothpaste. Mostly one beat, and a faster test is not a faster cure: park it.
+
 **The owner's reaction:** (waiting)
+
+## Picks (leanings, not locks)
+- 2026-10-29: the heat story (Helsinki and the weird places), front-runner; IceCube, liked. Who produces: to ask.
 
 ## The real-city pool (exchange 2; est. scores: a typical good story of each kind, any subject)
 Owner = the weighted score on the owner's six criteria /10; Place = place fit (10: the place is the mechanism; 5: a
@@ -286,9 +312,6 @@ stage; 1: no place), as `content_fit.md` §2 defines it. My scores, est.
 | Cape Town | the "tablecloth" cloud over Table Mountain; or "Day Zero" (2018), when the city nearly ran dry and cut its use hard | 13 / 6 |
 | Copenhagen | the harbour, once an industrial drain, is clean enough to swim in (harbour baths since 2002) | 2 / 6 |
 | Kyoto | the Golden Pavilion is a 1955 rebuild after a monk burned it in 1950 | 4 |
-
-## Picks
-None yet.
 
 ## Next step (to propose once the owner picks shapes)
 Each story on the next shortlist comes with its world: which shape, and its big view (one line and the frame-0 picture).

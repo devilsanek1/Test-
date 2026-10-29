@@ -364,6 +364,12 @@ Maintenance at the end).
   direction is lets say generalizing it to tech in the cities. like some interesting, weird, wow like cases where
   cities come up with the new solutions to problems, deploy some wow tech / ai / etc"; and on the weird-place data
   centres: "those are interesting ones", 2026-10-28).
+- **Every shortlist story shows what keeps people watching past its title:** its turn and its "oh" in a line or
+  two (the beats after the headline), never the headline alone; a story that is one beat gets said to be one beat. A
+  "top 3" or "weirdest places" idea is welcome, carried on one thread so it stays a story, not a list. — (on London's
+  hospital drones: "interesting too but I'm not sure what you can pack in it beyond the title? Why would the people
+  want to keep watching?"; "Maybe another story is the 'weirdest / coolest places where datacenters are built' like 3
+  weirdest places", 2026-10-29).
 - **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
   frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
 - **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).
