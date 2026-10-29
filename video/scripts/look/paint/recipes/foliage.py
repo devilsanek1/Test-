@@ -404,6 +404,64 @@ def cluster_fields(c, X, Y, crown, bump=None):
     return m.astype(np.float32), s.astype(np.float32)
 
 
+def dab_pass(L, c, m, s, z, front_i, D0, cover, zvar, t, clump_field, rng, recolor=None, k_cov=1.45):
+    """P4 for one cluster (or dome): gouache dabs one step lighter than the zone they sit on, on a jittered grid
+    (spacing 0.58 D), accepted by the zone's coverage (cover = lit, mid, shade, deep) and grouped in sub-clumps by
+    `clump_field`; flat-ish marks tangent to the cluster inside, pointed leaf sprays on the silhouette band (they
+    break the edge by up to 0.42 D); clipped by the clusters in front (front_i). k_cov = mean dab area / cell area."""
+    h, w = m.shape
+    dist_out = ndi.distance_transform_edt(m < 0.5)
+    ndi_edge = ndi.distance_transform_edt(m > 0.5) < 0.9 * D0  # the silhouette band: pointed leaves break it
+    allow = np.clip(1 - (dist_out - 0.42 * D0), 0, 1).astype(np.float32) * (1 - front_i)
+    allow_low = np.clip(1 - (dist_out - 0.18 * D0), 0, 1).astype(np.float32) * (1 - front_i)
+    x0b, x1b = int(max(c['x'] - 1.3 * c['r'], 0)), int(min(c['x'] + 1.3 * c['r'], w))
+    y0b, y1b = int(max(c['y'] - 1.1 * c['r'], 0)), int(min(c['cut'] + 0.2 * c['r'], h))
+    if x1b - x0b < 2 or y1b - y0b < 2:
+        return
+    sp = 0.58 * D0
+    gy, gx = np.mgrid[y0b:y1b:sp, x0b:x1b:sp]
+    pts = np.stack([gx.ravel(), gy.ravel()], 1) + rng.uniform(-0.5, 0.5, (gx.size, 2)) * sp
+    rng.shuffle(pts)
+    smax = float(s[m > 0.5].max()) if (m > 0.5).any() else 1.0
+    nvar = len(zvar[0])
+    for (px, py) in pts:
+        ix, iy = int(px), int(py)
+        if not (0 <= ix < w and 0 <= iy < h) or m[iy, ix] < 0.5 or front_i[iy, ix] > 0.5:
+            continue
+        zk = int(z[iy, ix])
+        cov = cover[3 - zk]
+        if cov <= 0:
+            continue
+        p_acc = min(1.0, -math.log(max(1 - cov, 1e-3)) / k_cov) * (0.55 + 0.45 * float(np.clip(
+            0.5 + 0.5 * clump_field[iy, ix], 0, 1)) * 1.6)
+        if rng.random() > p_acc:
+            continue
+        D = D0 * float(np.clip(rng.lognormal(0, 0.32), 0.55, 2.4)) * [1.35, 1.25, 1.1, 1.0][zk]
+        if zk == 3:  # bigger, calmer dabs in the heart of the light
+            D *= 1.0 + 0.4 * float(np.clip((s[iy, ix] - t[2]) / max(smax - t[2], 1e-3), 0, 1))
+        ox, oy = px - c['x'], py - c['y'] + 0.25 * c['r']
+        ang = math.atan2(oy + 0.55 * math.hypot(ox, oy), ox) if (ox or oy) else math.pi / 2
+        # the marks follow the foliage: tangent to the cluster (flat on its top), drooping toward its sides
+        tang = math.atan2(oy, ox) + math.pi / 2
+        dang = (math.atan2(math.sin(tang), math.cos(tang)) + math.pi / 2) % math.pi - math.pi / 2
+        dang = 0.55 * dang + rng.normal(0, 0.18)
+        near_edge = dist_out[iy, ix] == 0 and ndi_edge[iy, ix]
+        mk, xk, yk = polys_mask(spray(px, py, D * 1.15, ang, rng) if near_edge else dab(px, py, D, dang, rng))
+        clip = allow if zk >= 2 else allow_low
+        hh, ww = mk.shape
+        Xa, Ya, Xb, Yb = max(xk, 0), max(yk, 0), min(xk + ww, w), min(yk + hh, h)
+        if Xb <= Xa or Yb <= Ya:
+            continue
+        sub = np.zeros_like(mk)
+        sub[Ya - yk:Yb - yk, Xa - xk:Xb - xk] = clip[Ya:Yb, Xa:Xb]
+        colv = zvar[zk][int(rng.integers(0, nvar))]
+        if recolor is not None:
+            rc = recolor(zk, ix, iy)
+            if rc is not None:
+                colv = rc
+        L.comp(mk * sub, xk, yk, colv)
+
+
 def paint_tree(w, h, base, crown_c, Wc, Hc, rng, plane='near', bg_at=None, snaps=None, air=None):
     """Paint one tree on its own layer (w x h). base: trunk foot (x, y); crown_c: crown centre; Wc, Hc: crown size.
     bg_at(x, y) -> rgb of what is behind (for sky holes). Returns the Layer (converged and blurred for its plane)."""
@@ -530,56 +588,14 @@ def paint_tree(w, h, base, crown_c, Wc, Hc, rng, plane='near', bg_at=None, snaps
     k_cov = 1.45  # mean spray area / grid cell area (calibrated: 3-5 leaves of 0.62-1.0 D)
     crown_in = ndi.distance_transform_edt(acc_u > 0.5)
     edge_band = crown_in < 0.12 * Wc
-    for ci, (c, (m, s)) in enumerate(zip(cl, fields)):
-        if sum(P['cover']) == 0:
-            break
-        z = zone_maps[ci][1]
-        dist_out = ndi.distance_transform_edt(m < 0.5)
-        ndi_edge = ndi.distance_transform_edt(m > 0.5) < 0.9 * D0  # the silhouette band: pointed leaves break it
-        allow = np.clip(1 - (dist_out - 0.42 * D0), 0, 1).astype(np.float32) * (1 - front[ci])
-        allow_low = np.clip(1 - (dist_out - 0.18 * D0), 0, 1).astype(np.float32) * (1 - front[ci])
-        x0b, x1b = int(max(c['x'] - 1.3 * c['r'], 0)), int(min(c['x'] + 1.3 * c['r'], w))
-        y0b, y1b = int(max(c['y'] - 1.1 * c['r'], 0)), int(min(c['cut'] + 0.2 * c['r'], h))
-        sp = 0.58 * D0
-        gy, gx = np.mgrid[y0b:y1b:sp, x0b:x1b:sp]
-        pts = np.stack([gx.ravel(), gy.ravel()], 1) + rng.uniform(-0.5, 0.5, (gx.size, 2)) * sp
-        rng.shuffle(pts)
-        smax = float(s[m > 0.5].max()) if (m > 0.5).any() else 1.0
-        for (px, py) in pts:
-            ix, iy = int(px), int(py)
-            if not (0 <= ix < w and 0 <= iy < h) or m[iy, ix] < 0.5 or front[ci][iy, ix] > 0.5:
-                continue
-            zk = int(z[iy, ix])
-            cov = P['cover'][3 - zk]
-            if cov <= 0:
-                continue
-            p_acc = min(1.0, -math.log(max(1 - cov, 1e-3)) / k_cov) * (0.55 + 0.45 * float(np.clip(
-                0.5 + 0.5 * clump_field[iy, ix], 0, 1)) * 1.6)
-            if rng.random() > p_acc:
-                continue
-            D = D0 * float(np.clip(rng.lognormal(0, 0.32), 0.55, 2.4)) * [1.35, 1.25, 1.1, 1.0][zk]
-            if zk == 3:  # bigger, calmer dabs in the heart of the light
-                D *= 1.0 + 0.4 * float(np.clip((s[iy, ix] - t[2]) / max(smax - t[2], 1e-3), 0, 1))
-            ox, oy = px - c['x'], py - c['y'] + 0.25 * c['r']
-            ang = math.atan2(oy + 0.55 * math.hypot(ox, oy), ox) if (ox or oy) else math.pi / 2
-            # the marks follow the foliage: tangent to the cluster (flat on its top), drooping toward its sides
-            tang = math.atan2(oy, ox) + math.pi / 2
-            dang = (math.atan2(math.sin(tang), math.cos(tang)) + math.pi / 2) % math.pi - math.pi / 2
-            dang = 0.55 * dang + rng.normal(0, 0.18)
-            near_edge = dist_out[iy, ix] == 0 and ndi_edge[iy, ix]
-            mk, xk, yk = polys_mask(spray(px, py, D * 1.15, ang, rng) if near_edge else dab(px, py, D, dang, rng))
-            clip = allow if zk >= 2 else allow_low
-            hh, ww = mk.shape
-            Xa, Ya, Xb, Yb = max(xk, 0), max(yk, 0), min(xk + ww, w), min(yk + hh, h)
-            if Xb <= Xa or Yb <= Ya:
-                continue
-            sub = np.zeros_like(mk)
-            sub[Ya - yk:Yb - yk, Xa - xk:Xb - xk] = clip[Ya:Yb, Xa:Xb]
-            colv = zvar[zk][int(rng.integers(0, 40))]
-            if (zk == 3 and P['autumn'] > 0 and autumn_field[iy, ix] > 1.0 and edge_band[iy, ix]
-                    and rng.random() < P['autumn'] * 5):
-                colv = amber[int(rng.integers(0, 24))]  # October: the outer, sun-side leaves turn first
-            L.comp(mk * sub, xk, yk, colv)
+    def turn(zk, ix, iy):  # October: the outer, sun-side leaves turn first
+        if zk == 3 and P['autumn'] > 0 and autumn_field[iy, ix] > 1.0 and edge_band[iy, ix] and \
+                rng.random() < P['autumn'] * 5:
+            return amber[int(rng.integers(0, 24))]
+        return None
+    if sum(P['cover']) > 0:
+        for ci, (c, (m, s)) in enumerate(zip(cl, fields)):
+            dab_pass(L, c, m, s, zone_maps[ci][1], front[ci], D0, P['cover'], zvar, t, clump_field, rng, turn)
     # P4b: the undersides hang: shade-coloured sprays along each cluster's lower edge, pointing down (a leafy, flatter
     # bottom edge instead of a smooth dark curve)
     if sum(P['cover']) > 0:
@@ -739,27 +755,28 @@ def bristle_stroke(path, width, rng, nb=5, dry=0.35):
 
 
 def paint_bush(w, h, rng, top_y, x0b, x1b, dome_h):
-    """Domes resting on a planter's top edge at y=top_y."""
+    """A clipped shrub resting on a planter's top edge at y=top_y: 3 domes, painted in the layered order: soft flat
+    value zones -> broad strokes along the form (low contrast) -> dabs one step lighter -> pointed sprays on the
+    silhouette -> grain. The same light and palette as the tree, one scale down."""
     L = Layer(w, h)
     Y, X = np.mgrid[0:h, 0:w].astype(np.float32) + 0.5
     Wb = x1b - x0b
-    domes = [(x0b + 0.30 * Wb, 0.34 * Wb, dome_h * 1.0), (x0b + 0.66 * Wb, 0.30 * Wb, dome_h * 0.86),
-             (x0b + 0.50 * Wb, 0.22 * Wb, dome_h * 0.62)]
-    domes = domes[:2] + [domes[2]]
-    # order: the back dome first; the small front dome last
-    order = [1, 0, 2]
+    domes = [(x0b + 0.66 * Wb, 0.30 * Wb, dome_h * 0.86), (x0b + 0.30 * Wb, 0.34 * Wb, dome_h * 1.0),
+             (x0b + 0.50 * Wb, 0.22 * Wb, dome_h * 0.62)]  # back to front
     crown = ((x0b + x1b) / 2 - 0.05 * Wb, top_y - 0.5 * dome_h, 0.6 * Wb)
     pal = {k: C(k) for k in ['leaf_deep', 'leaf_shade', 'leaf_mid', 'leaf_lit', 'leaf_accent']}
-    zbase = [pal['leaf_deep'], pal['leaf_shade'], mixc(pal['leaf_shade'], pal['leaf_mid'], 0.5),
-             mixc(pal['leaf_mid'], pal['leaf_lit'], 0.4)]
-    zstroke = [mixc(pal['leaf_deep'], pal['leaf_shade'], 0.55), mixc(pal['leaf_shade'], pal['leaf_mid'], 0.55),
-               mixc(pal['leaf_mid'], pal['leaf_lit'], 0.25), pal['leaf_lit']]
-    zvar = [variants(c, rng, 30) for c in zstroke]
+    zbase = [pal['leaf_deep'], pal['leaf_shade'], mixc(pal['leaf_shade'], pal['leaf_mid'], 0.45),
+             mixc(pal['leaf_mid'], pal['leaf_lit'], 0.35)]
+    zdab = [mixc(pal['leaf_deep'], pal['leaf_shade'], 0.55), mixc(pal['leaf_shade'], pal['leaf_mid'], 0.35),
+            pal['leaf_mid'], pal['leaf_lit']]
+    zvar = [variants(c, rng, 30) for c in zdab]
+    Hb = noise2(rng, h, w, 0.06 * Wb)
+    gy, gx = np.gradient(Hb)
+    beta = 0.4 * 0.06 * Wb
+    clump_field = noise2(rng, h, w, 0.04 * Wb)
     fields = []
-    for i in order:
-        dx, rx, ry = domes[i]
+    for (dx, rx, ry) in domes:
         cy0 = top_y + 0.06 * ry
-        # dome: a half-ellipse with a slightly bumpy outline (3-5 lobes along the top)
         th = np.arctan2((Y - cy0) / ry, (X - dx) / rx)
         bump = 1 + 0.06 * np.sin(5 * th + rng.uniform(0, 6)) + 0.04 * np.sin(9 * th + rng.uniform(0, 6))
         rr = np.hypot((X - dx) / rx, (Y - cy0) / ry) / bump
@@ -773,16 +790,23 @@ def paint_bush(w, h, rng, top_y, x0b, x1b, dome_h):
         bz = np.sqrt(np.clip(1 - bx * bx - by * by, 0.02, 1))
         nb = np.stack([bx, by, bz], -1)
         nb /= np.linalg.norm(nb, axis=-1, keepdims=True)
-        nn = 0.7 * n + 0.3 * nb
+        nn = 0.7 * n + 0.3 * nb + np.stack([-gx * beta, -gy * beta, np.zeros_like(gx)], -1)
         nn /= np.linalg.norm(nn, axis=-1, keepdims=True)
         s = nn @ LIGHT.astype(np.float32)
         s -= 0.9 * np.clip((Y - (cy0 - 0.16 * ry)) / (0.16 * ry), 0, 1) ** 1.3  # contact dark at the planter
-        fields.append((i, m.astype(np.float32), s.astype(np.float32), (dx, cy0, rx, ry)))
+        fields.append((m.astype(np.float32), s.astype(np.float32), (dx, cy0, rx, ry)))
     vis = np.full((h, w), np.nan, np.float32)
-    for (_, m, s, _) in fields:
+    for (m, s, _) in fields:
         vis = np.where(m > 0.5, s, vis)
     t = np.percentile(vis[np.isfinite(vis)], [15, 45, 72])
-    for (i, m, s, (dx, cy0, rx, ry)) in fields:
+    front = []
+    acc_u = np.zeros((h, w), np.float32)
+    for (m, s, _) in fields[::-1]:
+        front.append(acc_u.copy())
+        acc_u = np.maximum(acc_u, m)
+    front = front[::-1]
+    D0 = 0.016 * Wb
+    for i, (m, s, (dx, cy0, rx, ry)) in enumerate(fields):
         z = np.digitize(s, t)
         col = np.zeros((h, w, 3), np.float32)
         for k in range(4):
@@ -790,61 +814,33 @@ def paint_bush(w, h, rng, top_y, x0b, x1b, dome_h):
         wgt = ndi.gaussian_filter((m > 0).astype(np.float32), 1.5) + 1e-6
         col = np.stack([ndi.gaussian_filter(col[..., c] * (m > 0), 1.5) / wgt for c in range(3)], -1)
         L.comp_full(m, col)
-        # brushed arcs along the dome (Cape Town's domes): flat bristle strokes on the dome's latitude lines
-        n_str = int(rx * ry / 55)
-        for _ in range(n_str):
+        # broad strokes along the form first (Cape Town's domes), short and low in contrast: the underlayer
+        for _ in range(int(rx * ry / 70)):
             u = rng.uniform(-0.92, 0.92)
-            v = rng.uniform(0.15, 0.97)
-            ang0 = math.pi + math.acos(np.clip(u, -1, 1))  # angle on the ellipse
-            rad = v
-            span = rng.uniform(0.18, 0.34) / max(rad, 0.3)
-            angs = np.linspace(ang0 - span / 2, ang0 + span / 2, 14)
-            path = np.stack([dx + rad * rx * np.cos(angs), cy0 + rad * ry * np.sin(angs)], 1)
-            if rng.random() < 0.5:
-                path = path[::-1]
-            px, py = path[7]
+            v = rng.uniform(0.2, 0.95)
+            ang0 = math.pi + math.acos(np.clip(u, -1, 1))
+            span = rng.uniform(0.10, 0.2) / max(v, 0.3)
+            angs = np.linspace(ang0 - span / 2, ang0 + span / 2, 10)
+            path = np.stack([dx + v * rx * np.cos(angs), cy0 + v * ry * np.sin(angs)], 1)
+            px, py = path[5]
             ix, iy = int(np.clip(px, 0, w - 1)), int(np.clip(py, 0, h - 1))
-            if m[iy, ix] < 0.5:
+            if m[iy, ix] < 0.5 or front[i][iy, ix] > 0.5:
                 continue
             zk = int(z[iy, ix])
-            if rng.random() > [0.25, 0.45, 0.6, 0.7][zk]:
-                continue
-            wd = rng.uniform(4.5, 8.0)
-            items = bristle_stroke(path, wd, rng, nb=int(rng.integers(4, 7)), dry=0.45)
+            items = bristle_stroke(path, rng.uniform(4.0, 6.5), rng, nb=int(rng.integers(4, 6)), dry=0.45)
             if not items:
                 continue
             mk, xk, yk = polys_mask(items)
-            sub = place(m, 0, 0, w, h)
             hh, ww = mk.shape
             Xa, Ya, Xb, Yb = max(xk, 0), max(yk, 0), min(xk + ww, w), min(yk + hh, h)
             if Xb <= Xa or Yb <= Ya:
                 continue
             clip = np.zeros_like(mk)
-            clip[Ya - yk:Yb - yk, Xa - xk:Xb - xk] = sub[Ya:Yb, Xa:Xb]
-            L.comp(mk * clip, xk, yk, zvar[zk][int(rng.integers(0, 30))], rng.uniform(0.7, 0.95))
-        # the leafy edge: small sprays along the silhouette (top and sides), protruding ~40 %
-        D0 = 0.022 * Wb
-        dist_out = ndi.distance_transform_edt(m < 0.5)
-        allow = np.clip(1 - (dist_out - 0.45 * D0), 0, 1).astype(np.float32)
-        nper = int(math.pi * (rx + ry) / 2 / (0.55 * D0))
-        for j in range(nper):
-            a = math.pi + math.pi * (j + rng.random()) / nper
-            px = dx + rx * math.cos(a) * rng.uniform(0.9, 1.0)
-            py = cy0 + ry * math.sin(a) * rng.uniform(0.9, 1.0)
-            ix, iy = int(np.clip(px, 0, w - 1)), int(np.clip(py, 0, h - 1))
-            if m[iy, ix] < 0.3 or py > cy0 - 0.12 * ry:
-                continue
-            zk = int(z[iy, ix])
-            D = D0 * float(np.clip(rng.lognormal(0, 0.3), 0.6, 1.8))
-            ang = math.atan2(math.sin(a) * 0.8 + 0.35, math.cos(a))
-            mk, xk, yk = polys_mask(spray(px, py, D, ang, rng))
-            hh, ww = mk.shape
-            Xa, Ya, Xb, Yb = max(xk, 0), max(yk, 0), min(xk + ww, w), min(yk + hh, h)
-            if Xb <= Xa or Yb <= Ya:
-                continue
-            clip = np.zeros_like(mk)
-            clip[Ya - yk:Yb - yk, Xa - xk:Xb - xk] = allow[Ya:Yb, Xa:Xb]
-            L.comp(mk * clip, xk, yk, variants(zbase[zk] if zk < 3 else zstroke[3], rng, 1)[0])
+            clip[Ya - yk:Yb - yk, Xa - xk:Xb - xk] = m[Ya:Yb, Xa:Xb] * (1 - front[i][Ya:Yb, Xa:Xb])
+            L.comp(mk * clip, xk, yk, mixc(zbase[zk], zdab[zk], 0.5), rng.uniform(0.6, 0.85))
+        # then the dabs (the tree's pass, a scale down), the silhouette broken by pointed sprays
+        c = dict(x=dx, y=cy0 - 0.5 * ry, r=max(rx, ry), cut=cy0)
+        dab_pass(L, c, m, s, z, front[i], D0, (0.70, 0.45, 0.20, 0.06), zvar, t, clump_field, rng, k_cov=1.45)
     texture(L, rng, grain=1.6, mottle=2.0, speck=1 / 600, speck_cols=[pal['leaf_lit'], pal['leaf_shade']])
     return L
 
@@ -1301,23 +1297,26 @@ def build_tree_panel(rng_seed, snaps=None):
 
 
 def build_depth_panel(seed):
-    """The ladder in one strip: the same recipe on three planes, converging on the air behind."""
+    """The ladder in one view: far trees on the far bank, mid trees on the towpath, a near crown cut by the edge;
+    the same recipe on three planes, each converging on the air behind it."""
     rng = np.random.default_rng(seed)
-    w, h = 560, 300
+    w, h = 600, 320
     air = C('horizon')
-    bg = bg_vertical(w, h, [(0, C('field')), (0.55, C('band')), (0.75, C('horizon')), (0.76, C('water')),
-                            (1.0, shift(C('water'), -2))], rng)
+    bg = bg_vertical(w, h, [(0, C('field')), (0.42, C('band')), (0.62, C('horizon')), (0.63, mixc('horizon', 'water', 0.5)),
+                            (0.645, C('water')), (0.76, shift(C('water'), 1)), (0.77, C('paving_far')),
+                            (1.0, C('paving'))], rng)
     out = bg.copy()
-    # far: a row of small crowns on the far bank (y ~ 222)
-    for i, x in enumerate([40, 92, 150, 205]):
-        Lf = paint_tree(w, h, (x, 226), (x, 200), 64 + 8 * (i % 2), 50, rng, 'far', air=air)
+    for i, x in enumerate([30, 78, 128, 176, 226]):  # far: on the far bank (y ~ 200)
+        cw = 52 + 14 * ((i * 7) % 3)
+        Lf = paint_tree(w, h, (x, 203), (x, 203 - 0.36 * cw), cw, 0.8 * cw, rng, 'far', air=air)
         out = over(out, Lf)
-    # mid: two crowns on the near side of the far bank
-    for x in [300, 400]:
-        Lm = paint_tree(w, h, (x, 262), (x, 186), 130, 110, rng, 'mid', air=air,
-                        bg_at=lambda xx, yy: bg[int(yy), int(xx)])
+    for x, cw in [(250, 120), (352, 136)]:  # mid: on the towpath (y ~ 262)
+        Lm = paint_tree(w, h, (x, 262), (x, 262 - 0.95 * cw), cw, 0.82 * cw, rng, 'mid', air=air,
+                        bg_at=lambda xx, yy: bg[int(min(max(yy, 0), h - 1)), int(min(max(xx, 0), w - 1))])
         out = over(out, Lm)
-    return out
+    Ln = paint_tree(w, h, (560, 420), (590, 120), 330, 270, rng, 'near',  # near: cut by the right edge
+                    bg_at=lambda xx, yy: out[int(min(max(yy, 0), h - 1)), int(min(max(xx, 0), w - 1))])
+    return over(out, Ln)
 
 
 def build_bush_panel(seed):
@@ -1431,8 +1430,8 @@ def sheet(seed=SEED):
     rows.append(st)
     row('2  Depth ladder: the same recipe on the far and mid planes (converge on the air, fewer values, simpler)',
         ['hanoi_far', 'bus_trees'], depth,
-        'far: k 0.55, 2 values, no dabs inside, blur 0.9 px | mid: k 0.30, 3 values, dabs 3.8 % of the crown, '
-        'blur 0.5 px | near: row 1 (k 0, 4 values + accents, dabs 2.4 %, no blur)')
+        'far: k 0.55, 2 values, no dabs inside, blur 0.9 px | mid: k 0.30, 3 values, dabs 3.2 % of the crown, '
+        'blur 0.5 px | near (cut, right): k 0, 4 values + accents, dabs 1.8 %, no blur')
     row('3  Bush in a planter: domes, brushed arcs along the form, a leafy edge; the planter flat (lit and shade face)',
         ['cape_domes', 'sing_crowns'], bush,
         'Dome lit cap / mid / shade / contact dark at the planter; bristle strokes on the dome\'s latitude lines; '
