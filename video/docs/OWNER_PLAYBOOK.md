@@ -268,7 +268,8 @@ Maintenance at the end).
   so the paint is the world's, not the story's; the film still works with the paint off. In the engine the painted
   pieces are layers made by our own deterministic paint pass (seeded, locked to their layer so nothing swims in the
   float; a cloud may churn slowly), never a filter smeared over the whole frame. The dose is
-  judged on a look test first. — ("Another piece of feedback is I really like the “painted” pieces like the sky and the clouds the references or some foreground buildings and trees / greenery are uniquely painted / Is it possible to modify our engine to match the story? Style", 2026-10-29).
+  judged on a look test first. — ("Another piece of feedback is I really like the “painted” pieces like the sky and the clouds the references or some foreground buildings and trees / greenery are uniquely painted / Is it possible to modify our engine to match the story? Style"; "Yeah the painted message look above I said about modifying our
+  engine to be able to do that", 2026-10-29: so the ENGINE gains the paint pass, `src/lib/paint/`, reusable by every film).
 - **Texture and lines: VERY subtle.** No outlines: as on the city posters, shapes are separated by light and shade (a
   lit and a shade face on every volume, the subject's the deepest) and by value, never by a line drawn round them
   (the A vs B picture's B). Thin lines only on small things that are lines (window bars, railings, rigging): dark,
