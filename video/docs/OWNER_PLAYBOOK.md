@@ -43,6 +43,11 @@ Maintenance at the end).
   - Spine first, then lines. A list of facts to prove is input, never the structure.
   - Test: someone who hears it once can retell it as a story.
   — ("just a collection of sentences", v3 G1, 2026-10-26).
+- **The first line sounds like a friend starting a story, and still pulls: curious, never pushy.** The owner's model
+  (the Big Bend reel): "New York once got a proposal to build this giant 2,000-foot tall bending skyscraper. It's
+  called the Big Bend." A plain past-tense opener (a place, a thing, a number), no question at the viewer, no sell; the
+  curiosity comes from the picture and the one odd detail. — ("BTW I really like the script too in the video / See how it's using natural language it's first hook sentence is extremely natural like a conversation yet captures the attention and curiosity without being too pushy and the script has a rhythm we discussed before", 2026-10-29; saved: the study's
+  `refs/bigbend_reel/`).
 - **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24). **Rhythm: never a run of
   long sentences; put a short one (5 words or fewer, e.g. "Let's find out." "But there was a problem.") after every 1-2
   long ones, at the turns,** gated by `scripts/voice/check_rhythm.py` OK at G1. — (owner's reference reel, 2026-10-27).

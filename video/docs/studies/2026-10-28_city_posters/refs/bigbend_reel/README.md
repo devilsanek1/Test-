@@ -22,3 +22,5 @@ CNN, 24 Mar 2017: https://edition.cnn.com/2017/03/24/us/u-shaped-building-trnd ;
 6sqft: https://www.6sqft.com/oiios-big-bend-proposal-for-billionaires-row-would-be-the-worlds-longest-building/
 
 **Our evaluation:** `video/docs/studies/2026-10-28_city_posters/content_discussion.md`, exchange 10.
+
+**The owner on its script (2026-10-29 ~08:50 UTC):** "BTW I really like the script too in the video / See how it's using natural language it's first hook sentence is extremely natural like a conversation yet captures the attention and curiosity without being too pushy and the script has a rhythm we discussed before".
