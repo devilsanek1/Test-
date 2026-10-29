@@ -522,6 +522,15 @@ Maintenance at the end).
   and tools to do it the best way you can", v2 G4, 2026-10-27; "Search for any libraries or supporting code on GitHub if
   you need for any piece of functionality - we don't necessarily want to be reinventing the wheels if something was
   already built and available"; "But only if it's genuinely better than built yourself", 2026-10-29).
+- **The forest before the trees: when a reference is far from our picture, rebuild the frame from the ground up; never
+  tune details on the old one.** The gap between our film and a reference like the city posters is in the
+  construction (the viewpoint and the designed view, the big shapes and their values, the hero against the sky, the dark
+  framing near ground, the far pale stage), not in the paint. So a look step starts from a blank frame built in that
+  order: a value thumbnail first (judged beside the reference at phone size), then colour, then detail, texture last.
+  Every look change must be visible at phone size at a glance, or it is not worth its time; a day of barely visible
+  tweaks is a process failure. — ("yes good, but we spent the entire day tweaking the style that is frankly barely
+  noticeable like we focus all our attention on details and missed the forest for the trees ... rethink how you would
+  construct the scene from ground up", on the look test v1, 2026-10-29).
 - **Every lesson goes into the generic process, committed** (playbook, a PIPELINE gate, the studio toolkit). — ("we gradually get better", v3, 2026-10-26).
 - **A rejected cut restarts clean.** When the owner says "I don't like it, start from scratch", drop the old visual
   work (archive it), skip the gates the owner names (e.g. no sketch) and make the finished film directly with full
