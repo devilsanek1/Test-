@@ -207,7 +207,7 @@ change; only [owner] lines may move into `docs/look/LAYOUT.md` (§7 item 7).
 - **Words few and big, no title in the film's frame, the cover title in our caption type.** The posters' title caps
   (16-30 px at 1080) shrink to 5-10 px on a 360-px grid tile; ours are 17-20 px there (CO §6). [owner: playbook]
 - **One camera for the near world; the ground recedes** (CR §f.4); the posters agree for everything near (PE §1.2).
-  [owner: v2 G4, "no perspective"; the far stage below is the only proposed exception]
+  [owner: v2 G4, "no distance effect nor perspective"; the far stage below is the only proposed exception]
 
 ### 8.2 What the posters change (in Part A's order)
 **§1 The frame**
