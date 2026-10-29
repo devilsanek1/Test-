@@ -6,7 +6,7 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
-## Status 2026-10-29 ~08:20 UTC: the look test builds in four parallel lanes
+## Status 2026-10-29 ~07:50 UTC: the look test builds in four parallel lanes
 - Owner: "Remember to parallelize the work where appropriate between subagents but also the subthreads just clean
   them up afterwards"; libraries "only if it's genuinely better than built yourself".
 - Lanes (subagents in this container, one working tree, each owning its files): E (depth.ts 1/z, the 10b palette
@@ -15,6 +15,9 @@ points and conclusions into the main repo"). The brief is `README.md` here; the 
   S (the S1 copy in `video/src/look/poster_s1/`, the darks, the far stage, the switches; `test/SCENE.md`; it stops
   and waits for E, PT and N, then integrates and renders when the orchestrator messages it). The docs agent turns the
   decisions into rules (`INTEGRATION.md` §2).
+- Video 5 (2026-10-29 ~07:55 UTC, owner: "Okay let's try heat story let's generate the script"): the heat story,
+  produced by the content thread's session (session_01YGLGMrgF1Cfg5gMAND1VNt) in `video/docs/v5/` (HANDOFF 2e); its
+  W1, G3 and G4 build on this look test's engine pieces once the owner has judged the test.
 - Threads: the journal-corpus helper is archived (its work merged; its open question, which shortlist next, moves to
   the content thread, which stays open with the owner).
 

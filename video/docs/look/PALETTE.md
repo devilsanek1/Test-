@@ -59,15 +59,23 @@ every palette against the DNA below.
 **The house DNA** keeps the palettes one family. The numbers are CIE L* (lightness) and C (colourfulness):
 - **Background:** soft and light (L* >= 75, C <= 20), never saturated or dark. It fills 50-80 % of the frame.
 - **Mids:** soft, from our clay family (cream, peach, terracotta, rose, leaf sage) or the palette's own tints; never
-  beige, muddy tan, olive or grey (playbook "Warm, never sickly", v3 G4). Background props are
-  flat shapes without lines (`CRAFT.md` §c); a line-drawn figure (reference 1's crowds) takes tier B's thin tinted line.
-- **Ink:** dark and warm (L* <= 25), never pure black, for captions and the darkest lines; drawn lines take their colour by
-  attention tier (`CRAFT.md` §c: the subject's in its own shade). At least 7:1 contrast on the background.
+  beige, muddy tan, olive or grey (playbook "Warm, never sickly", v3 G4). Props and figures are
+  flat shapes without lines, parted by their lit and shade faces (`CRAFT.md` §c).
+- **Where the values and the colour live** (owner, 2026-10-29: "Go with your suggestions", the city-poster study's
+  decision 2; numbers `CRAFT.md` §f.8): calm lights (the page, the sky), the near world in mid-tones carrying the
+  colour, and real darks drawn in many small pieces (windows, doorways, eave undersides, the shade under trees), never
+  a narrow band of light pastels; a palette carries roles for those darks (unlit panes, doorways, an eave shade, as
+  10b does). The study's chroma numbers for it (light fills C* 4-8, mids C* 18-32) are 10b's proposal below.
+- **Ink:** dark and warm (L* <= 25), never pure black, for captions and the darkest thin lines; a thin line takes its
+  object's own deep shade (`CRAFT.md` §c). At least 7:1 contrast on the background.
 - **The references' trick, used tactically:**
   - **one hero** (C >= 30): saturated, on the subject or the story's object, 5-15 % of the frame;
-  - **one dark anchor** (L* <= 40): tinted, instead of black, about 5 %;
-  - **at most one hot pop** (C >= 50): 1-3 %, only on "look here" (the frame-0 hook detail, a notification, a reveal).
-- **Texture and lines:** lines by tier (`CRAFT.md` §c: lines only in key places, the subject's outline first); the
+  - **one dark anchor** (L* <= 40): tinted, instead of black; its hue carries the frame's darks, in many small pieces
+    on 6-10 % of the frame (owner, 2026-10-29: `CRAFT.md` §f.8), never one mass (about 5 % until then);
+  - **at most one hot pop** (C >= 50): 1-3 %, only on "look here" (the frame-0 hook detail, a notification, a reveal);
+    the sun is never the pop unless it is the shot's "look here": one step off its sky, or behind a ridge (owner,
+    2026-10-29: `CRAFT.md` §g.2).
+- **Texture and lines:** no outlines, thin lines only on things that are lines (`CRAFT.md` §c); the
   halftone ("Texture and lines" below) is optional, a last-step polish used tactically on a few elements, never everywhere.
 
 **The family:**
@@ -115,10 +123,12 @@ the owner sees it in a look clip (a W1 proposes it, the G4 clip shows it: "How t
   sky is the one cool field, as Canal Mint's mint is. **Lantern Paper**'s page and ground sit just outside the beige band
   and under the olive band: lint their shaded copies on the frame. The same check flags house palettes #1-2's ground
   (yellow-green) and #5 Sage Study's page (olive, h 116) (`style.md`).
-- **What goes with 10b and waits on the owner:** its darks in many pieces (the dark share is the owner's open call,
-  `CRAFT.md` §f.8: until then rule 6's tinted anchor at about 5 % stands) and its tier-A shade at -24 (how deep the
-  subject's shade face goes is open too, `CRAFT.md` §d.3). The study's chroma plan (light fills calm, the colour in the
-  mid-tones, saturation and darks as confetti: `STUDY.md` §4) is a proposal with it.
+- **What goes with 10b, decided by the owner** (2026-10-29: "Go with your suggestions"): its darks in many pieces
+  (`CRAFT.md` §f.8: 6-10 % under L* 40) and its tier-A shade at -24 (inside `CRAFT.md` §d.3's -20 to -25); its
+  sun-orange pop stays for a "look here", never a calm far sun, which sits one step off its sky (`CRAFT.md` §g.2).
+  Every proposal here follows the same three rules. The palettes themselves and the study's chroma numbers (light
+  fills calm, the colour in the mid-tones, saturation as confetti: `STUDY.md` §4) stay proposals until the owner sees
+  10b in the look test.
 
 ## Texture and lines (owner, 2026-10-25)
 
@@ -139,9 +149,12 @@ The reference is `texture_refs/autumn_walk_detail.png`, a crop of `palette_refs/
   - **The stroke:** dark warm ink, about 2-4 px at 1080 wide, **tapered at both ends** (a brush, not a pen). Our
     `brush()` in `src/lib/mascot/ink.ts` already tapers (`tipIn` / `tipOut`).
 
-**Our lines today: `CRAFT.md` §c** (the clean pen by tier) replaces this reading's line spec. The owner's "black
-outlines, VERY subtle, in key places" is the subject's one outline in its own deep shade plus a few inner details; tier
-B gets a thin tinted line or none, the environment none; taper only where the stroke IS the thing (hair, steam).
+**Our lines today: `CRAFT.md` §c** replaces this reading's line spec: no outlines on any tier since 2026-10-29 (owner:
+"Go with your suggestions", the A vs B picture's B), edges from light and shade, as in this reference ("no outline
+around silhouettes"). The owner's "black outlines, VERY subtle, in key places" now lives only as thin dark lines on
+things that are lines (window bars, railings, rigging), in the object's own deep shade (2026-10-27 to 10-29 it was the
+subject's one outline plus a few inner details, B's thin tinted line or none); taper only where the stroke IS the
+thing (hair, steam).
 
 **What our kit has:**
 - an optional paper-grain overlay (`public/textures/grain.png`, `Card` `grain`; off by default): retired as it was;

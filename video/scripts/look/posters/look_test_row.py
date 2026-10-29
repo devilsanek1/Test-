@@ -104,7 +104,7 @@ def headline(t: str, r: dict) -> dict:
     val, chm, fl, cl = c['value'], c['chroma'], c['fields'], c['colours']
     near = plane(dp, 'near treads')
     wing = plane(dp, 'the wing')
-    air_L = dp.get('air', {}).get('L') if isinstance(dp.get('air'), dict) else None
+    air_L = float(dp['air'][0]) if isinstance(dp.get('air'), list) and dp['air'] else None
     hb = h['boxes']
     g = lambda k, f: (hb.get(k) or {}).get(f)
     return {
@@ -113,6 +113,7 @@ def headline(t: str, r: dict) -> dict:
         'dark cells /16': val['darks']['grid_cells_with_darks'],
         'L*<65 %': v['lt40'] + v['40_65'], 'L* 65-80 %': v['65_80'], 'bottom quarter L* p50': v['bottom_p50'],
         'near treads L*': near and near.get('L'), 'wing (subject plane) L*': wing and wing.get('L'), 'air L*': air_L,
+        'near-to-air span L*': (air_L - near['L']) if (air_L is not None and near) else None,
         'pastel %': chm['pastel_pct'], 'C* p50': chm['pct']['p50'], 'C* p90': chm['pct']['p90'],
         'C*-weighted L*': chm['C_weighted_L'], 'accent C>=35 %': chm['accents_c35']['share_pct'],
         'accent parts': chm['accents_c35']['parts_ge4px'],
@@ -125,7 +126,7 @@ def headline(t: str, r: dict) -> dict:
         'sky %': co['sky'], 'calm below skyline %': co['calm_below'], 'corners BL/BR L*': [co['corners']['BL'], co['corners']['BR']],
         'subject area %': co['icons'][0]['area'] if co.get('icons') else None,
         'subject salience share %': co['icons'][0]['sal_share'] if co.get('icons') else None,
-        'depth verdict': [l for l in dp['_verdict'] if l.startswith('DEPTH:')],
+        'depth FAIL / WARN': [dp.get('fails'), dp.get('warns')],
     }
 
 

@@ -74,7 +74,8 @@ Maintenance at the end).
 - **Hand-drawn flat colour like reference video 1, drawn CLEAN, REFINED, GENTLE, PREMIUM: never rough or messy.**
   Reference 1 gives the composition, the flat colour and the small people; the line is the clean pen: clean, confident
   lines (smooth, consistent weights, few of them, no jitter, no sketchy overshoot or double strokes), refined shapes,
-  only the main thing with a full outline; hand-drawn warmth comes from shape and colour, not from scratchy lines.
+  no outlines (edges from light and shade, thin lines only on small things: Texture and lines below); hand-drawn
+  warmth comes from shape and colour, not from scratchy lines.
   Spec: `docs/look/CRAFT.md` §c. — ("hand-drawn ink, flat colour, like reference video 1", v1, 2026-10-24; "too rough
   and messy, a lot of rough lines, not clean at all; cleaner, more refined, gentle, premium", v3 G5b, 2026-10-27; the clean pen with tiers and gentle light
   APPROVED at v2's G4 look clip: "okay good continue", 2026-10-27).
