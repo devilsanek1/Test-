@@ -30,7 +30,7 @@ whole context, and every rendered frame an agent looks at stays in that context.
 
 The gates below are PRODUCTION: a film on its way to posting. An ITERATION is a question the owner wants answered by
 looking (a look test, a rethought scene, a style probe): it skips the gates and their checks. One or two max-effort
-agents, no review panel, no critic, no QA suite, no fix pass; rough stills, build stages or a short clip; about an hour,
+agents, no review panel, no critic, no QA suite, no fix pass; stills first (a clip only once the owner has approved the still), with its build stages; about an hour,
 then straight to the owner, whose verdict is the review. Only what the owner picks from an iteration enters production,
 and there it passes the gates in full. The playbook's Process section has the rule and the owner's words.
 
