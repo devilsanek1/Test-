@@ -1,0 +1,257 @@
+{
+ "name": "v2 S1 @5.2 s (the cover frame; the look test before row)",
+ "units": "frac",
+ "planes": [
+  {
+   "name": "near treads (bike, planter)",
+   "plane": -2,
+   "boxes": [
+    [
+     0.0,
+     0.87,
+     1.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "mid treads (props)",
+   "plane": -1.5,
+   "boxes": [
+    [
+     0.0,
+     0.685,
+     1.0,
+     0.865
+    ]
+   ]
+  },
+  {
+   "name": "landing (the water step: Pip, things)",
+   "plane": -1,
+   "boxes": [
+    [
+     0.0,
+     0.64,
+     1.0,
+     0.68
+    ]
+   ],
+   "exclude": [
+    [
+     0.6,
+     0.59,
+     0.74,
+     0.685
+    ]
+   ]
+  },
+  {
+   "name": "canal water",
+   "plane": -0.5,
+   "role": "ground",
+   "boxes": [
+    [
+     0.0,
+     0.59,
+     0.7,
+     0.628
+    ]
+   ]
+  },
+  {
+   "name": "far towpath + the row",
+   "plane": 0,
+   "boxes": [
+    [
+     0.0,
+     0.49,
+     0.72,
+     0.565
+    ]
+   ]
+  },
+  {
+   "name": "the wing (the subject's plane)",
+   "plane": 0,
+   "role": "subject",
+   "boxes": [
+    [
+     0.31,
+     0.315,
+     1.0,
+     0.49
+    ]
+   ]
+  },
+  {
+   "name": "far city, front row",
+   "plane": 3,
+   "boxes": [
+    [
+     0.035,
+     0.43,
+     0.3,
+     0.484
+    ]
+   ],
+   "exclude": [
+    [
+     0.1,
+     0.355,
+     0.26,
+     0.445
+    ],
+    [
+     0.2388888888888889,
+     0.3,
+     0.32407407407407407,
+     0.495
+    ]
+   ]
+  },
+  {
+   "name": "far city, back rows",
+   "plane": 4,
+   "boxes": [
+    [
+     0.035,
+     0.392,
+     0.3,
+     0.425
+    ]
+   ],
+   "exclude": [
+    [
+     0.1,
+     0.355,
+     0.26,
+     0.445
+    ],
+    [
+     0.2388888888888889,
+     0.3,
+     0.32407407407407407,
+     0.495
+    ]
+   ]
+  }
+ ],
+ "silhouettes": [
+  {
+   "name": "the wing's west edge",
+   "tier": "mass",
+   "poly": [
+    [
+     0.2914,
+     0.3436
+    ],
+    [
+     0.3062,
+     0.3411
+    ],
+    [
+     1.0,
+     0.3119
+    ],
+    [
+     1.0,
+     0.5645
+    ],
+    [
+     0.2914,
+     0.5645
+    ]
+   ],
+   "roi": [
+    [
+     0.25,
+     0.318,
+     0.36,
+     0.484
+    ]
+   ]
+  },
+  {
+   "name": "her (5.2 s)",
+   "tier": "A",
+   "grab": [
+    0.447,
+    0.478,
+    0.507,
+    0.572
+   ],
+   "roi": [
+    [
+     0.4,
+     0.46,
+     0.54,
+     0.575
+    ]
+   ]
+  },
+  {
+   "name": "the copies' row (5.2 s)",
+   "tier": "A",
+   "grab": [
+    0.035,
+    0.478,
+    0.44,
+    0.572
+   ],
+   "roi": [
+    [
+     0.0,
+     0.47,
+     0.44,
+     0.555
+    ]
+   ]
+  }
+ ],
+ "ground": [
+  {
+   "name": "our bank (the steps, two-point)",
+   "roi": [
+    0.0,
+    0.635,
+    1.0,
+    1.0
+   ],
+   "vps": [
+    [
+     -1.0185185185185186,
+     0.5208333333333334
+    ],
+    [
+     2.4074074074074074,
+     0.5208333333333334
+    ]
+   ]
+  }
+ ],
+ "horizon": 965,
+ "things": [
+  {
+   "name": "her (far towpath)",
+   "y": 1095,
+   "px": 170,
+   "m": 1.7
+  },
+  {
+   "name": "the ducks (the far water by the bend)",
+   "y": 1132,
+   "px": 70,
+   "m": 0.58
+  },
+  {
+   "name": "the people on the bridge (deck, ~4 m up)",
+   "y": 958,
+   "px": 45,
+   "m": 1.7,
+   "level": 4
+  }
+ ],
+ "air_hex": "#FDD6B8",
+ "note": "2026-10-29, the city-poster look test (test/BEFORE.md): v2_s1.json (5.4 s) with her and the row as fixed-seed GrabCut boxes at 5.2 s (her x 483-548, the row x 38-475, y 918-1098). L1, 2026-10-28: copied from v2_g4_look_s1 with the two-point VPs (V2S1_steps_stone GROUND_VP / GROUND_VP2), the far rows at +3 / +4, air_hex = S1_HAZE (the lowest sky step), the sun + halo masked out of the far planes. The calm far tower behind the wing (V2S1_set_far CalmTower, x 258-346) is the corner's backing field, excluded from the far rows' boxes. 2026-10-28: the seated public left our bank (the orchestrator's size decision); two people on the bridge (level 4 m) and one through the arch (beyond the bend: off the y-camera, not listed); the ducks at their water's scale. 2026-10-28: air_hex = S1_AIR (lib/sky horizonColor(S1_EVENING, SUN0.x))."
+}
