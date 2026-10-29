@@ -1,0 +1,1 @@
+Did you know that New York once got a proposal to build this giant 2,000-foot tall bending skyscraper? It's called the Big Bend. This crazy project was proposed in 2017 for New York City by the architect.
