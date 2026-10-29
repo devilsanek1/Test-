@@ -1,10 +1,9 @@
 # Content discussion: which stories fit the city-poster style
 
-**State (2026-10-29 ~08:05 UTC): RANKED; RECOMMENDED: the heat story.** Five candidates ranked on the owner's six
-criteria plus WOW and depth (story past the title), shown unweighted (`discussion_scouts/final_chart.png`, data
-`final_scores.json`): 1 the heat story 8.3; 2 London's drones 8.1 (depth 4: parked); 3 Chiricahua 7.9; 4 MMX 7.9;
-5 IceCube 7.7 (WOW 8, depth 7: the best runner-up, peg 10 Dec). Waiting on the owner's pick and on who produces it
-(v4's session or a new one); then one fact lock.
+**State (2026-10-29 ~08:20 UTC): PICKED.** The owner picked the heat story ("Okay let's try heat story let's
+generate the script"). It is now **video 5**, produced by this session: `video/docs/v5/` (fact lock running; the core
+line waits on the owner). This discussion is done unless the owner reopens it; IceCube stays the runner-up for a
+later film (peg: the Nobel ceremony, 10 Dec).
 
 Notes: `content_market.md` and `content_fit.md` (the orchestrator's content track, scoped to tech and AI) are folded in
 below; their final versions (pulled ~22:20 UTC) changed nothing here. `content_fit.md`'s best kinds already include two
@@ -290,10 +289,11 @@ Our scores (est.), one scale for all five; WOW and depth (what keeps people watc
 Re-scored by this thread (the drones' R and S lowered for little buzz; the journal thread's WOW scale differs from
 ours). Every fact is still search-level: the pick gets one fact lock.
 
-**The owner's reaction:** (waiting)
+**The owner's reaction:** ~08:15 UTC: "Okay let's try heat story let's generate the script" -> video 5 (`video/docs/v5/`).
 
 ## Picks (leanings, not locks)
-- 2026-10-29: the heat story (Helsinki and the weird places), front-runner; IceCube, liked. Who produces: to ask.
+- 2026-10-29 ~08:15 UTC: **PICKED: the heat story** -> video 5, produced by this session (`video/docs/v5/`).
+- IceCube: liked; the runner-up for a later film (peg: 10 Dec).
 
 ## The real-city pool (exchange 2; est. scores: a typical good story of each kind, any subject)
 Owner = the weighted score on the owner's six criteria /10; Place = place fit (10: the place is the mechanism; 5: a
