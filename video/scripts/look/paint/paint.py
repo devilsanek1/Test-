@@ -1041,20 +1041,44 @@ def design_plane(pl, box, light, ss=2):
     cym = np.zeros((H2, W2), np.float32)
     L = np.array(light, np.float32) / (np.linalg.norm(light) + 1e-8)
     s1, s2 = pl.get('lit_cap', 0.34), pl.get('mid_band', 0.7)
-    for b in pl['billows']:
+    def disc_of(b, dx=0.0, dy=0.0):
         cx, cy, r = b[0], b[1], b[2]
-        f = b[3] if len(b) > 3 else pl.get('flat', 1.0)
-        def disc(dx, dy, k=1.0):
-            return ((xx - cx - dx) / (r * k)) ** 2 + ((yy - cy - dy) / (r * f * k)) ** 2 <= 1.0
-        D = disc(0, 0)
-        A = disc(-L[0] * s1 * r, -L[1] * s1 * r * f)  # shifted away from the light
-        B = disc(-L[0] * s2 * r, -L[1] * s2 * r * f)
-        lit = D & ~A
-        mid = D & A & ~B
-        z = np.where(lit, 3, np.where(mid, 2, 1)).astype(np.uint8)
-        lab = np.where(D, z, lab)
-        cxm = np.where(D, cx, cxm)
-        cym = np.where(D, cy, cym)
+        f = b[3] if len(b) > 3 and b[3] else pl.get('flat', 1.0)
+        return ((xx - cx - dx) / r) ** 2 + ((yy - cy - dy) / (r * f)) ** 2 <= 1.0
+    if pl.get('light_mode', 'cloud') == 'billow':
+        # every billow its own lit cap (a small, busy form: a crown of leaves)
+        for b in pl['billows']:
+            r = b[2]
+            f = b[3] if len(b) > 3 and b[3] else pl.get('flat', 1.0)
+            D = disc_of(b)
+            A = disc_of(b, -L[0] * s1 * r, -L[1] * s1 * r * f)
+            B = disc_of(b, -L[0] * s2 * r, -L[1] * s2 * r * f)
+            lab = np.where(D, np.where(D & ~A, 3, np.where(D & A & ~B, 2, 1)), lab).astype(np.uint8)
+            cxm = np.where(D, b[0], cxm)
+            cym = np.where(D, b[1], cym)
+    else:
+        # ONE form for the whole cloud: the lit band follows the whole outline on the light's side, then a mid band,
+        # then one big shade mass; a few ACCENT billows (5th value 1) add their own lit cap inside, for depth
+        sil = np.zeros((H2, W2), bool)
+        for b in pl['billows']:
+            D = disc_of(b)
+            sil |= D
+            cxm = np.where(D, b[0], cxm)
+            cym = np.where(D, b[1], cym)
+        def shifted(m, d):
+            M = np.float32([[1, 0, -L[0] * d * ss], [0, 1, -L[1] * d * ss]])
+            return cv2.warpAffine(m.astype(np.uint8), M, (W2, H2), flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT, borderValue=1) > 0
+        lit = sil & ~shifted(sil, pl.get('lit_px', 34))
+        mid = sil & ~shifted(sil, pl.get('mid_px', 80)) & ~lit
+        lab = np.where(lit, 3, np.where(mid, 2, np.where(sil, 1, 0))).astype(np.uint8)
+        for b in pl['billows']:
+            if len(b) > 4 and b[4]:
+                r = b[2]
+                f = b[3] if b[3] else pl.get('flat', 1.0)
+                D = disc_of(b)
+                A = disc_of(b, -L[0] * s1 * r, -L[1] * s1 * r * f)
+                B = disc_of(b, -L[0] * s2 * r, -L[1] * s2 * r * f)
+                lab = np.where(D & ~A, 3, np.where(D & A & ~B, np.maximum(lab, 2), lab)).astype(np.uint8)
     if pl.get('base'):
         x0b, y0b, x1b, y1b = pl['base']  # the base line from (x0b, y0b) to (x1b, y1b)
         yb = y0b + (xx - x0b) * (y1b - y0b) / max(1e-3, (x1b - x0b))
@@ -1117,7 +1141,7 @@ def paint_designed_plane(pl, zones, cov, cxs, cys, cols, light, rng, seed, calm=
     gn = np.hypot(gx, gy) + 1e-6
     Ln = np.array(light, np.float32) / (np.linalg.norm(light) + 1e-8)
     facing = (-gx * Ln[0] - gy * Ln[1]) / gn  # +1 where the edge faces the light
-    shade_side = smoothstep(0.15, -0.45, facing)
+    shade_side = 1 - smoothstep(-0.45, 0.15, facing)  # 1 where the edge turns away from the light
     soft = cv2.GaussianBlur(cov, (0, 0), b.get('soft_px', 4.5))
     alpha = cov * (1 - shade_side) + soft * shade_side
     # dry-brush break-up on the shade side only: patches (never combs) where the sky shows through

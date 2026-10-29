@@ -19,3 +19,5 @@ fi
 python3 scripts/look/paint/paint.py scripts/look/paint/v2s1.json
 python3 scripts/look/paint/paint.py scripts/look/paint/v2s1_v2.json
 python3 scripts/look/paint/paint.py scripts/look/paint/v2s1_v3.json
+python3 scripts/look/paint/paint.py scripts/look/paint/v2s1_v4.json --design   # v4's flat design stage
+python3 scripts/look/paint/paint.py scripts/look/paint/v2s1_v4.json            # v4 painted
