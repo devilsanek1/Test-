@@ -13,13 +13,18 @@ The earlier v4 session (https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt)
 | G0 topic + core line | topic LOCKED: Helsinki (one city); core line proposed by the writer (default: "Your chatbot could heat a flat in Helsinki.") | `G0_TOPIC.md` |
 | Fact lock | shared with video 5 (one fact file): `video/docs/v5/research/factlock.md` sections 2, 6, 7.1-7.4, 8 | |
 | G1 script | LOCKED (2026-10-29 ~18:40 UTC): draft 3, 123 words | `script/script_g1.md`, `script/script_elevenlabs.md`, `THROUGHLINE.md` |
-| G2 voice | after the owner approves the script; voice `MQnUCZUAQLYMCY1Ztz6d` ("Lady1", the owner's try, 2026-10-29: `docs/voice/VOICE.md`); a valid key works in THIS session only (pasted in the chat, used inline, never filed), so G2 runs here; the voice tools are set up in the scratchpad | `public/v4/` |
+| G2 voice | LOCKED 2026-10-29: take 4 (`public/v4/voice.wav`, 42.24 s) |
+| (was) G2 voice | after the owner approves the script; voice `MQnUCZUAQLYMCY1Ztz6d` ("Lady1", the owner's try, 2026-10-29: `docs/voice/VOICE.md`); a valid key works in THIS session only (pasted in the chat, used inline, never filed), so G2 runs here; the voice tools are set up in the scratchpad | `public/v4/` |
 
 **Video 4 is produced by session https://claude.ai/code/session_01VwsUCnkJXFuq3YwEYFUg7o since 2026-10-29 ~10:05 UTC**
 (owner: "lets work on the video 4 - pick up where its been left off"), on branch `claude/kind-pascal-lvgsza` (from
 `video-production` at ce5270f; merged into `video-production` at the owner's yes).
 
-**G1 LOCKED (owner, 18:40 UTC: "i think this is a much better yes"). G2 TAKE SENT (2026-10-29 ~19:20 UTC), waiting on the
+**G2 LOCKED (2026-10-29 ~20:20 UTC, owner: "Okay good"): `public/v4/voice.wav` + `voice_words.json`. NEXT: the VISUAL SCRIPT
+(owner: "brainstorm a story and like a visual script with what happens on the screen and camera movements"; style still
+evolving), workflow `v4-visual-script` -> `docs/v4/visual/` (research, method, concepts, `VISUAL_SCRIPT.md`); then G3.**
+
+Earlier: **G1 LOCKED (owner, 18:40 UTC: "i think this is a much better yes"). G2 TAKE SENT (2026-10-29 ~19:20 UTC), waiting on the
 owner:** `assets/v4/voice/take.wav` (Lady1, eleven_v4 at stability 0.35, the livelier-tag paste, whole read, shaped by
 `scripts/voice/shape_take.py`, take 4: the owner's own website read of the take-3 paste (ours sounded "like in some
 chamber": our compressor), pauses tightened and the two beats added, one static gain, the voice untouched: 42.2 s,

@@ -391,6 +391,14 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   §a). — (v1; joins, v3 G5b, 2026-10-27).
 
 ## Storyboard (G3) and flow
+- **The film's visual story is written first, as a VISUAL SCRIPT, between the voice lock and the G3 animatic:** shot
+  by shot and timed to the locked voice, what is on screen (subject, place, action), the camera (shot size, angle,
+  move), how each shot joins the next (its carrier), the few words in the picture and the sound cues; brainstormed
+  as a few visual concepts judged internally, one script to the owner, and written the way professional studios write
+  theirs (researched: `docs/v4/visual/`). It describes content, staging, camera and timing, never the rendering
+  style, so it stands while the look is still being found; the G3 animatic then plays it. — ("We are still iterating
+  on the style tho. Instead brainstorm a story and like a visual script with what happens on the screen and camera
+  movements and etc / Again research his professional studios go through this step", v4, 2026-10-29).
 - **The pipeline after v3 (owner APPROVED, 2026-10-27: "Yes"):** a DESIGNED sketch. From the core line comes a
   through-line card (one thread object, one home place, one "you"), completed with the script (a carrier for every
   join); a text world bible (sets, one light rig per set, the proposed palette and a colour-script line per beat,

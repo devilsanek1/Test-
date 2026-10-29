@@ -205,3 +205,10 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   our compressor and dynamic loudness; take 4 = their read, MATCH, pauses tightened and the two beats added, one static
   gain, the voice untouched: 42.2 s, 177 words/min; the page updated (version 4). -> rule: playbook, Script and voice
   (never process the voice itself); `generate_take.py` asks for 48 kHz like the website.
+- 2026-10-29 ~20:20 UTC, G2 -> visual script: on take 4: "Okay good" -> **G2 LOCKED**: `public/v4/voice.wav` (42.24 s,
+  48 kHz) + `public/v4/voice_words.json` (the script's words, Whisper-timed, the first at 0.13 s). Then: "We are still
+  iterating on the style tho. Instead brainstorm a story and like a visual script with what happens on the screen and
+  camera movements and etc / Again research his professional studios go through this step" -> workflow
+  `v4-visual-script`: research (pro pre-production formats; visual storytelling for a 40 s vertical explainer), our
+  method, three visual concepts, two judges, one visual script, a cold read and a critic, a fix pass; style-neutral.
+  -> rule: playbook, Storyboard (G3) and flow (the visual script before G3).
