@@ -374,7 +374,9 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
    flat bands, flecks, current lines). **Check:** `waterProblems(spec)` is empty, and
    `docs/v2/water/judge_metrics.py` against the last approved water (cool %, piece-end edges, thin light marks, glitter
    gold, quick toggles), and `docs/v2/water/master_check.py` on the master (the colour numbers above); eye check at
-   phone size: a calm, glassy canal with its reflections, never boxes, dashes, stars or a stack of pancakes.
+   phone size: a calm, glassy canal with its reflections, never boxes, scattered or uniform dashes, stars or a stack of
+   pancakes; a painted plate may carry a FEW deliberate horizontal strokes on that calm base (75 %+ untouched; the
+   recipe: `paint_recipes/water.md`).
 8. **A full value range: a calm light sky, a mid-tone world and real darks where the eye should go, in many small
    pieces** (DIRECTION
    rule 6; owner, 2026-10-28: "good point too!"; numbers: city-poster study, 2026-10-28, `STUDY.md` §1a, §5.5, §7, from
