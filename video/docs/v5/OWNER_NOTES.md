@@ -33,3 +33,5 @@ Format: the owner's words in quotes, with the time (UTC); after "->" what we did
   (the spine as sent: rhythm FAIL, about 51 s, one AI tell; a tightened demo passes at about 42 s).
 - 2026-10-29 ~09:35 UTC: "Give it to the writer snd write it properly like your best version" -> the G1 writer started (max
   effort): `script/script_g1.md`, `script/script_elevenlabs.md`, `THROUGHLINE.md`; then one critic and one fix pass.
+- 2026-10-29 ~09:40 UTC: "I mean finish your analysis of more openings like maybe there is a better one" -> the opener
+  research decides the first lines (it may beat "Did you know"); the writer keeps them provisional until it lands.
