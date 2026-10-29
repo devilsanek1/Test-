@@ -156,22 +156,28 @@ Maintenance at the end).
   column, still glitter, calm ripple lines): "Yeah this is better", v2 G4,
   2026-10-27/28; the city posters: "some buildings are obviously closer to me, some further out and there is
   something WAY further out that gives me a sense of scale", 2026-10-28).
-- **DEPTH IS AIR AND DISTANCE: the hero sits back in a deep, open view, never a wall in your face.** In the posters the
-  hero stands in the middle distance, well under the frame's width and with sky all round its top, with open water or
-  ground in front of it and the city going on behind it in many paler, smaller layers down to something tiny and far,
-  so the eye travels a long way into the picture. A hero that fills the frame up close, its base hidden and little
-  behind it, reads as no depth and no scale ("suffocating"), however good the paint. The foreground/background
-  separation (a darker near frame, a lighter far world) is right; keep it. The near frame is a hint at the edges:
-  small and subtle (a few real leaf shapes or one branch in a corner, calm in colour and contrast, finely drawn), never
-  big chunky masses that crowd the view. The street or quay in the middle ground is full, as in the posters: people,
-  awnings and café tables, bikes, boats, trees, lamps, many small things in the calm tier, never an empty strip. In a
-  real place, its landmarks and an exact or unusual camera angle matter far less than depth, density and light: never
-  over-index on them. — (on the scene-1 still v1: "there is no sense of depth here like the building is right here
-  and there us really no scale depth I’m really suffocating with the view / Some bits are good tho like the style of
-  separation of foreground vs background / Also the reference do have more details and density like the the street
-  along the canal ours is pretty empty while their have density ... Also dont overindex on adding labdmarks or putting
-  weird camera angles on existing real views thats nit as important / The closest leafs and nature on the left are way
-  too big and not as subtle as they need be", 2026-10-29).
+- **DEPTH AND SCALE FROM A HUMAN VIEWPOINT: the camera stands where a person would stand, near a person at a real
+  size, with the vast world beyond; never a wall in your face, never a far panorama.** Two stills of v2's opening
+  failed both ways: the building filling the frame up close reads as no depth and no scale ("suffocating"), and the
+  camera pulled far back into a poster-like panorama reads cheap, drifts from our style and gives a video little to
+  do. The owner's references (`docs/look/refs_human_scale/`) put the person near the camera at ~15-30 % of the frame's
+  height (from behind or in silhouette, no face: the people bullet below) before a vast world (a city, a huge sky, the
+  sea) that gives the scale; our own v2 eye-level angle and view of the canal "wasn't bad". So the scale comes from a
+  near human figure against a far, big world, not from moving the camera away. Keep what worked: the
+  foreground/background separation (a darker near frame, a lighter far world); the near frame a small, subtle hint at
+  the edges (a few real leaf shapes or one branch in a corner, calm in colour and contrast), never big chunky masses;
+  the street or quay across the water full, as in the posters (people, awnings and café tables, bikes, boats, trees,
+  lamps, many small things in the calm tier), never an empty strip. In a real place, its landmarks and an exact or
+  unusual camera angle matter far less than depth, density and light: never over-index on them. — (on the scene-1
+  still v1: "there is no sense of depth here like the building is right here and there us really no scale depth I’m
+  really suffocating with the view / Some bits are good tho like the style of separation of foreground vs background
+  / Also the reference do have more details and density like the the street along the canal ours is pretty empty
+  while their have density ... Also dont overindex on adding labdmarks or putting weird camera angles on existing real
+  views thats nit as important / The closest leafs and nature on the left are way too big and not as subtle as they
+  need be"; on still v2, with three references: "I don’t like this we are going away in style i think it’s too cheap
+  looking / And I’m not sure you can do much about it in terms of actual video / I think our references point should
+  be closer to the original like where a person would be about this size / So I think our initial angle snd the view
+  frankly wasn’t bad", 2026-10-29).
 - **A gentle PARALLAX float, never a flat card.** When a held shot floats, its planes move by depth (Disney's multiplane
   idea): the near ground most, far planes little, the sky and the caption band not at all; slow, small, back at rest
   by every join; it adds depth in motion without adding movers. — ("switch it on if you think it will make the videos
@@ -234,7 +240,8 @@ Maintenance at the end).
 - **People small and simple like reference 1** (crowds, small full figures seen from behind or in rear 3/4, round
   heads; near heads <= ~140 px), never big character models or faces: they act with their pose (reach, shrug, slump,
   look up), as reference 1's do; only the mascot has a face. **In the foreground only the film's one "you" or the
-  mascot;** strangers stay small in the mid and far ground (a row of strangers' backs in front reads as "you"). —
+  mascot;** the "you" near the camera may stand at a real size, ~15-30 % of the frame's height, still simple and
+  from behind or in silhouette (DEPTH AND SCALE FROM A HUMAN VIEWPOINT above; owner, 2026-10-29); strangers stay small in the mid and far ground (a row of strangers' backs in front reads as "you"). —
   ("don't use big models of people; the people in the first example video are the right direction", v2 restart,
   2026-10-27; v3 retro, 2026-10-27).
 - **Captions are burned in and pop in place (or rise without clipping);** a reveal that cuts letters looks like a glitch;
@@ -549,7 +556,11 @@ Maintenance at the end).
   Every look change must be visible at phone size at a glance, or it is not worth its time; a day of barely visible
   tweaks is a process failure. — ("yes good, but we spent the entire day tweaking the style that is frankly barely
   noticeable like we focus all our attention on details and missed the forest for the trees ... rethink how you would
-  construct the scene from ground up", on the look test v1, 2026-10-29).
+  construct the scene from ground up", on the look test v1, 2026-10-29). A rebuild keeps our own look and what the
+  owner already liked (the v2 angle and view, its colours): a reference teaches principles, never a style to move
+  into; drifting toward the reference's style reads cheap. — ("I don’t like this we are going away in style i think
+  it’s too cheap looking ... So I think our initial angle snd the view frankly wasn’t bad", on the scene-1 still v2,
+  2026-10-29).
 - **Two modes: PRODUCTION and ITERATION.** Production is a film going through the gates (G0-G8): full checks, review
   panels, QA suites, fix passes, as the quality needs. Iteration is a quick experiment for the owner to judge (a look
   test, a rethought scene, a style probe, a "what if"): one or two agents, no panels, no critics, no QA suites, rough
