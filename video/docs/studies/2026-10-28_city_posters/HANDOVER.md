@@ -12,6 +12,10 @@ points and conclusions into the main repo"). The brief is `README.md` here; the 
   AIR AND DISTANCE" + the sky bullet, DIRECTION rules 6-7, LAYOUT §8.2, `poster_refs/README.md`, `scene_rethink/NOTES.md`.
 - RUNNING: one max-effort agent builds `scene_rethink/still_v2.png` (also `video/deliverables/tests/`) +
   `compare_v2.jpg` from `video/scripts/look/scene1/`. NEXT: send it, capture the verdict.
+- PARALLEL THREAD (owner: "spin up a thread to generate me the modern beautiful logo to put on the studio"): helper
+  session https://claude.ai/code/session_01YGLGMoJRWPfUug9D5jmx6A (iteration: 3 directions on one sheet,
+  `video/deliverables/brand/logo_options_v1.png`, `video/docs/brand/LOGO.md`, sources `video/brand/logo/`); it
+  messages the orchestrator when pushed; send the sheet to the owner; archive the helper once the logo is final.
 
 ## Status 2026-10-29 ~18:30 UTC: the owner on the look test: "missed the forest for the trees"; scene 1 rebuilt as a still
 - The owner: the test is "good, but ... barely noticeable"; rethink the first scene "from ground up" as ONE still in
