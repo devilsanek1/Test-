@@ -141,7 +141,7 @@ def make_dabs(rng, n=16, S=64):
         rim = value_noise(rng, S, S, 6, 6) - 0.5
         A = np.clip((1.0 - r + 0.35 * rim) / 0.25, 0, 1)
         tex = value_noise(rng, S, S, 1.5, 9)
-        A = A * np.clip(0.55 + 0.6 * tex, 0, 1)
+        A = A * np.clip(0.78 + 0.32 * tex, 0, 1)
         dabs.append(np.clip(A, 0, 1).astype(np.float32))
     return dabs
 
@@ -159,7 +159,7 @@ class Canvas:
         self.pm = self.pm * (1 - a[..., None]) + rgb.astype(np.float32) * a[..., None]
         self.a = self.a * (1 - a) + a
 
-    def stamp(self, st, cx, cy, ang, length, width, color, opacity, clip=None):
+    def stamp(self, st, cx, cy, ang, length, width, color, opacity, clip=None, ref=None, tau=0.0):
         sh, sw = st.shape
         sx, sy = length / sw, width / sh
         ca, sa = math.cos(ang), math.sin(ang)
@@ -180,6 +180,11 @@ class Canvas:
         a = patch * opacity
         if clip is not None:
             a = a * clip[y0:y1, x0:x1]
+        if ref is not None and tau > 0:
+            # Hertzmann's rule, kept soft: a stroke stays inside its own flat region (the flat's colour at its centre)
+            ci, cj = int(min(self.h - 1, max(0, cy))), int(min(self.w - 1, max(0, cx)))
+            diff = np.abs(ref[y0:y1, x0:x1] - ref[ci, cj]).sum(-1)
+            a = a * np.clip(1.5 - diff / tau, 0, 1)
         pm = self.pm[y0:y1, x0:x1]
         pm *= (1 - a[..., None])
         pm += a[..., None] * np.asarray(color, np.float32)
@@ -251,7 +256,7 @@ def band_calm(h, y0, band, ramp=40):
 
 # ------------------------------------------------------------------ the strokes
 
-def paint_passes(cv, rng, target, where, passes, flow, clip=None, calm=None, jitter=(0.012, 0.006, 0.008), stamps=None, dabs=None):
+def paint_passes(cv, rng, target, where, passes, flow, clip=None, calm=None, jitter=(0.012, 0.006, 0.008), stamps=None, dabs=None, ref=None, tau=0.0):
     """Hertzmann-style passes, big brush to small: each pass lays strokes on a jittered grid inside `where`, each
     sampling the target colour (OKLab) at its centre plus a jitter, oriented by `flow` (radians) per pixel.
     pass = dict(r=brush width px, len=(lo, hi) x r, op=(lo, hi), keep=fraction of grid cells, err=refine threshold,
@@ -294,12 +299,12 @@ def paint_passes(cv, rng, target, where, passes, flow, clip=None, calm=None, jit
             if p.get('dab'):
                 st = dabs[int(rng.integers(len(dabs)))]
                 size = r * rng.uniform(0.8, 1.3)
-                cv.stamp(st, x, y, ang, size * rng.uniform(1.4, 2.0), size, col, op, clip)
+                cv.stamp(st, x, y, ang, size * rng.uniform(1.3, 1.8), size, col, op, clip, ref, p.get('tau', tau))
             else:
                 st = stamps[int(rng.integers(len(stamps)))]
                 length = r * rng.uniform(*p.get('len', (2.5, 5.0)))
                 width = r * rng.uniform(0.85, 1.25)
-                cv.stamp(st, x, y, ang, length, width, col, op, clip)
+                cv.stamp(st, x, y, ang, length, width, col, op, clip, ref, p.get('tau', tau))
             n_total += 1
     return n_total
 
@@ -340,7 +345,8 @@ def style_sky(piece, spec, rng, stamps):
     n1 = fbm(rng, H, W, 180, 3, aniso=3.5)
     n2 = fbm(rng, H, W, 120, 3, aniso=4.0)
     k = 0.25 + 0.75 * calm
-    tgt = shift(lab, dL=0.010 * n1 * k, da=0.004 * n2 * k, db=0.006 * n2 * k)
+    dr = piece.get('drift', [0.010, 0.004, 0.006])
+    tgt = shift(lab, dL=dr[0] * n1 * k, da=dr[1] * n2 * k, db=dr[2] * n2 * k)
     cv = Canvas(H, W)
     cv.wash(lab_to_rgb(tgt), np.ones((H, W), np.float32))
     flow = np.full((H, W), piece.get('angle', -0.035), np.float32) + 0.10 * fbm(rng, H, W, 260, 2)
@@ -350,7 +356,7 @@ def style_sky(piece, spec, rng, stamps):
         dict(r=30, len=(5, 10), op=(0.30, 0.55), spacing=1.0, jit=0.9, angj=0.05, calm_op=0.6),
         dict(r=14, len=(5, 11), op=(0.25, 0.5), spacing=1.0, keep=0.55, jit=0.8, angj=0.06, calm_op=0.5),
     ]
-    n = paint_passes(cv, rng, tgt, where, passes, flow, calm=calm, jitter=(0.008, 0.003, 0.005), stamps=stamps)
+    n = paint_passes(cv, rng, tgt, where, passes, flow, calm=calm, jitter=tuple(piece.get('jitter', (0.008, 0.003, 0.005))), stamps=stamps)
     out, a = cv.rgba()
     g = grain(rng, H, W, 0.010)[..., None] * (0.35 + 0.65 * calm[..., None]) + (1 - (0.35 + 0.65 * calm[..., None]))
     return out * g, np.ones((H, W), np.float32), (x0, y0), n
@@ -365,7 +371,7 @@ def lobe_mask(lobes, box, rng, ragged, cell):
     hgt = np.zeros((bh, bw), np.float32)
     for (cx, cy, r) in lobes:
         d2 = ((xx - cx) ** 2 + (yy - cy) ** 2) / (r * r)
-        hgt = np.maximum(hgt, np.sqrt(np.clip(1 - d2, 0, 1)) * (r / 100.0) ** 0.5)
+        hgt = np.maximum(hgt, np.sqrt(np.clip(1 - d2, 0, 1)))
     return hgt
 
 
@@ -398,7 +404,7 @@ def style_cloud(piece, spec, rng, stamps):
     big = np.clip(((xx + bx - cx) * light[0] + (yy + by - cy) * light[1]) / span, -1, 1)
     pal = piece['palette']
     shade_lab, mid_lab, lit_lab, rim_lab = (hex_lab(pal[k]) for k in ('shade', 'mid', 'lit', 'rim'))
-    t = np.clip(0.42 * lit + 0.38 * (big * 0.5 + 0.5) + 0.12 * fbm(rng, bh, bw, 90, 3), 0, 1)[..., None]
+    t = np.clip(piece.get('lobe_k', 0.62) * lit + piece.get('big_k', 0.38) * (big * 0.5 + 0.5) + piece.get('t_bias', -0.02) + 0.14 * fbm(rng, bh, bw, 110, 3), 0, 1)[..., None]
     tgt = np.where(t < 0.5, shade_lab + (mid_lab - shade_lab) * (t / 0.5), mid_lab + (lit_lab - mid_lab) * ((t - 0.5) / 0.5))
     # the glowing rim: where the silhouette edge faces the light
     e_in = ndimage.distance_transform_edt(sil > 0.5)
@@ -418,15 +424,16 @@ def style_cloud(piece, spec, rng, stamps):
     flow = np.arctan2(gy2, gx2) + math.pi / 2 + 0.25 * fbm(rng, bh, bw, 140, 2)
     flat_flow = np.full_like(flow, piece.get('wind', -0.12))
     mag = np.clip(np.hypot(gx2, gy2) * 160, 0, 1)
-    flow = np.where(mag > 0.15, flow, flat_flow).astype(np.float32)
+    edge_w = np.clip(1 - ndimage.distance_transform_edt(hgt > 0.12) / piece.get('curl_px', 40), 0, 1)
+    flow = np.where((mag > 0.15) & (edge_w > 0.3), flow, flat_flow + 0.35 * fbm(rng, bh, bw, 180, 2)).astype(np.float32)
     where = (sil > 0.25).astype(np.float32)
     clip = np.clip(cv2.GaussianBlur(sil, (0, 0), 3) * 1.6, 0, 1).astype(np.float32)
     s = piece.get('scale', 1.0)
     passes = [
-        dict(r=34 * s, len=(2.5, 4.5), op=(0.45, 0.75), spacing=0.9, angj=0.25),
-        dict(r=18 * s, len=(2.5, 5.0), op=(0.45, 0.8), spacing=0.85, angj=0.25),
-        dict(r=9 * s, len=(2.5, 5.0), op=(0.5, 0.85), spacing=0.9, err=0.05, alive=0.35, angj=0.3),
-        dict(r=5 * s, len=(2.0, 4.0), op=(0.5, 0.9), spacing=0.9, keep=0.6, err=0.06, alive=0.2, angj=0.3),
+        dict(r=52 * s, len=(2.2, 4.0), op=(0.55, 0.8), spacing=0.85, angj=0.2),
+        dict(r=30 * s, len=(2.2, 4.2), op=(0.5, 0.8), spacing=0.85, angj=0.2),
+        dict(r=16 * s, len=(2.2, 4.5), op=(0.5, 0.85), spacing=0.9, err=0.06, alive=0.3, angj=0.25),
+        dict(r=8 * s, len=(2.0, 4.0), op=(0.5, 0.9), spacing=1.0, keep=0.5, err=0.08, alive=0.12, angj=0.3),
     ]
     nst = paint_passes(cv, rng, tgt, where, passes, flow, clip=clip, calm=calm, jitter=(0.012, 0.006, 0.008), stamps=stamps)
     # spatter: light specks just outside the lit edge, a few inside (the reference's floating paint flecks)
@@ -463,41 +470,50 @@ def style_flat_piece(piece, spec, rng, stamps, dabs):
     w_l = np.clip(lit, 0, 1)[..., None]
     w_s = np.clip(-lit, 0, 1)[..., None]
     tgt = lab + w_l * np.array(warm) + w_s * np.array(cool)
+    # the big gradient across the whole piece along the light (a built face is flat: its colour moves light to shade)
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    ln = np.array(light, np.float32) / (np.linalg.norm(light) + 1e-8)
+    proj = xx * ln[0] + yy * ln[1]
+    inside_p = proj[mask > 0.5]
+    ramp = np.clip((proj - inside_p.mean()) / (inside_p.std() * 1.8 + 1e-3), -1, 1)[..., None]
+    rk = piece.get('ramp', 0.7)
+    tgt = tgt + rk * (np.clip(ramp, 0, 1) * np.array(warm) + np.clip(-ramp, 0, 1) * np.array(cool))
     drift = piece.get('drift', [0.018, 0.006, 0.010])
     nA = fbm(rng, H, W, piece.get('drift_cell', 70), 3)
     nB = fbm(rng, H, W, piece.get('drift_cell', 70) * 1.3, 3)
     tgt = shift(tgt, dL=drift[0] * nA, da=drift[1] * nB, db=drift[2] * nB)
     cv = Canvas(H, W)
-    ragged = piece.get('ragged', 7 if foliage else 2.2)
-    soft = piece.get('soft', 3.0 if foliage else 1.6)
+    ragged = piece.get('ragged', 3.5 if foliage else 1.4)
+    soft = piece.get('soft', 2.0 if foliage else 1.4)
     wash_a = soft_edge_mask(rng, mask, ragged, soft, piece.get('edge_cell', 14 if foliage else 30))
     # the outer edge where the frame cuts the piece stays whole (no ragged edge at the frame's edge)
     wash_a = keep_frame_edges(wash_a, mask, (x0, y0, x1, y1), spec['frame'])
     cv.wash(lab_to_rgb(cv2.GaussianBlur(tgt.astype(np.float32), (0, 0), 2.0)), wash_a)
     where = (mask > 0.5).astype(np.float32)
-    clip_r = piece.get('overshoot', 6 if foliage else 1.5)
+    clip_r = piece.get('overshoot', 7 if foliage else 1.0)
     clip = soft_edge_mask(rng, mask, ragged * 0.8, soft + clip_r, piece.get('edge_cell', 14 if foliage else 30))
     clip = keep_frame_edges(clip, mask, (x0, y0, x1, y1), spec['frame'])
     if foliage:
         # leaves: dabs drooping a little, clustered (a cluster noise thins the small dabs between clusters)
         flow = (-0.35 + 0.9 * fbm(rng, H, W, 40, 2)).astype(np.float32)
         passes = [
-            dict(r=16, len=(2.0, 3.2), op=(0.6, 0.85), spacing=0.9, angj=0.5),
-            dict(r=11, dab=True, op=(0.7, 0.95), spacing=0.75, angj=0.6),
-            dict(r=7.5, dab=True, op=(0.7, 0.95), spacing=0.7, err=0.04, alive=0.55, angj=0.7),
-            dict(r=5, dab=True, op=(0.7, 1.0), spacing=0.75, keep=0.7, err=0.05, alive=0.35, angj=0.8),
+            dict(r=24, len=(1.6, 2.4), op=(0.6, 0.85), spacing=0.9, angj=0.5),
+            dict(r=17, dab=True, op=(0.75, 0.95), spacing=0.8, angj=0.6),
+            dict(r=11, dab=True, op=(0.75, 0.95), spacing=0.8, err=0.05, alive=0.45, angj=0.7),
+            dict(r=7, dab=True, op=(0.75, 1.0), spacing=0.9, keep=0.5, err=0.07, alive=0.15, angj=0.8),
         ]
-        jit = piece.get('jitter', (0.022, 0.008, 0.012))
+        jit = piece.get('jitter', (0.02, 0.007, 0.011))
     else:
         ang = math.radians(piece.get('angle', 90))
         flow = (ang + 0.08 * fbm(rng, H, W, 80, 2)).astype(np.float32)
         passes = [
-            dict(r=20, len=(3.0, 6.0), op=(0.35, 0.6), spacing=1.0, angj=0.06),
-            dict(r=11, len=(3.0, 7.0), op=(0.35, 0.6), spacing=0.95, angj=0.07),
-            dict(r=6, len=(3.0, 7.0), op=(0.4, 0.7), spacing=1.0, err=0.035, alive=0.3, angj=0.08),
+            dict(r=30, len=(1.4, 2.6), op=(0.3, 0.5), spacing=0.9, angj=0.1),
+            dict(r=17, len=(1.5, 3.0), op=(0.3, 0.55), spacing=0.9, angj=0.12),
+            dict(r=9, len=(1.5, 3.0), op=(0.35, 0.6), spacing=1.0, keep=0.6, err=0.04, alive=0.25, angj=0.14),
         ]
-        jit = piece.get('jitter', (0.014, 0.004, 0.007))
-    nst = paint_passes(cv, rng, tgt, where, passes, flow, clip=clip, jitter=jit, stamps=stamps, dabs=dabs)
+        jit = piece.get('jitter', (0.012, 0.003, 0.006))
+    ref = rgb.astype(np.float32)  # the flat (filled out): its regions keep each stroke inside its own shape
+    nst = paint_passes(cv, rng, tgt, where, passes, flow, clip=clip, jitter=jit, stamps=stamps, dabs=dabs, ref=ref, tau=piece.get('tau', 0.09))
     nsp = 0
     if foliage:
         # leaf lights on the lit side, a few deep specks in the shade
