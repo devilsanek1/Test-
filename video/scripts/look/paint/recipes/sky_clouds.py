@@ -85,11 +85,11 @@ def lift(c, dL=0.0, da=0.0, db=0.0):
 # THE LIMITED PALETTE (15 swatches per light; recipe 2.1). Sampled from the approved v4 design's light (one dusk family
 # lit by the low sun: lavender zenith, lilac caption field, rose, a pale warm band, peach horizon) and set by target
 # CIELAB values: the sky inside CRAFT section g (zenith 1.1 L* deeper than the flat field, the band the lightest, the
-# cool-warm crossing at C* 7); the clouds with the references' value range (lit +7, half = the sky's value as a hue
-# step, shade -11, deep -20 L* against the field), every swatch within the family's hues (lilac 295-310, rose 30-350,
+# cool-warm crossing at C* 7); the clouds with the references' value range (lit +6, half = the sky's value as a hue
+# step, shade -14, deep -23 L* against the field: 30 L* inside the cloud, refs 11-33), every swatch within the family's hues (lilac 295-310, rose 30-350,
 # peach-gold 60-84).
 DUSK = {k: hx(v) for k, v in {
-    'zenith': '#c9c6e2',     # L* 80.9 C* 15 h 295  lavender, a touch deeper and cooler than the field
+    'zenith': '#c7c6e6',     # L* 80.9 C* 17 h 293  lavender, a touch deeper and cooler than the field
     'field': '#d3c8dd',      # L* 82.0 C* 12 h 310  the caption field, flat through y 317-556
     'rose': '#e6ccd7',       # L* 84.4 C* 11 h 349  rose-lilac under the field
     'band': '#eddcd6',       # L* 88.9 C* 7  h 46   the light band: the sky's lightest, the cool-warm crossing
@@ -97,11 +97,11 @@ DUSK = {k: hx(v) for k, v in {
     'glow': '#ffdfbe',       # L* 90.7 C* 21 h 73   the sun's warmth (an ellipse, never in the caption band)
     'sun': '#fff0db',        # L* 95.5 C* 12 h 82   the disc: one flat step over its band
     'rim': '#ffe8c3',        # L* 93.0 C* 21 h 84   cloud rim: the lightest cloud value, thin, at the sun-facing edges
-    'lit': '#ffd6b2',        # L* 88.2 C* 25 h 68   cloud lit, peach-gold
-    'half': '#eec0ba',       # L* 81.5 C* 18 h 31   cloud half-light: rose-peach AT the sky's value (a hue step)
-    'shade_top': '#beb8d3',  # L* 76.0 C* 15 h 300  shade facing up: lit by the sky dome
-    'shade': '#b4a9c9',      # L* 71.1 C* 18 h 304  cloud shade, lilac-violet
-    'deep': '#a18fb4',       # L* 62.1 C* 22 h 310  accent: the core and the base away from the sun; small areas
+    'lit': '#ffd5ae',        # L* 87.9 C* 27 h 70   cloud lit, peach-gold
+    'half': '#f2bdb6',       # L* 81.1 C* 21 h 31   cloud half-light: rose-peach AT the sky's value (a hue step)
+    'shade_top': '#b8b1cf',  # L* 73.6 C* 17 h 300  shade facing up: lit by the sky dome
+    'shade': '#ab9fc2',      # L* 67.5 C* 20 h 304  cloud shade, lilac-violet: the field -14
+    'deep': '#9985ad',       # L* 58.6 C* 24 h 310  accent: the core, the base away from the sun; small areas, -23
     'streak': '#ddbecd',     # L* 80.0 C* 14 h 346  horizon streak body (rose); its lit underside takes 'glow'
     'bird': '#5a506f',       # L* 36.1 C* 20 h 304  the far flock
 }.items()}
@@ -341,7 +341,7 @@ def sun_warmth(H, W, sun, rx, ry, top_cut):
     return (smootherstep(1.0, 0.0, r) * smoothstep(top_cut, top_cut + 90.0, Y)).astype(np.float32)
 
 
-def hatch_field(rng, H, W, angle=35.0, period=9.0, width=(1.4, 2.4), seg=70.0, on=0.38):
+def hatch_field(rng, H, W, angle=35.0, period=9.0, width=(2.0, 3.0), seg=70.0, on=0.55):
     """The 03 hatch (recipe 3.1 b, pass P3): thin straight lines rising to the right at `angle` deg, `period` px apart
     (each line jittered +-25 %), each line `width` px, broken along its length into segments (~`seg` px correlation,
     `on` = the fraction drawn), each line lighter or darker. Returns a signed field in -1..1 (x the amplitude later).
@@ -390,7 +390,7 @@ def paint_sky(H, W, pal, style, rng, sun=SUN, glow=0.55, stages=None):
         sky.c[...] = sky.c + (pal['glow'] - sky.c) * g[..., None]
     if stages is not None:
         stages['sky_design'] = sky.copy()
-    # P1 big soft strokes: 14 long round strokes, width 160-320, +-0.6-1.0 L*, opacity 0.30-0.45, then blur sigma 24
+    # P1 big soft strokes: 14 long round strokes, width 160-320, +-0.9-1.4 L*, opacity 0.30-0.45, then blur sigma 24
     p1 = Layer(H, W)
     for _ in range(14):
         y = rng.uniform(0, H)
@@ -399,30 +399,30 @@ def paint_sky(H, W, pal, style, rng, sun=SUN, glow=0.55, stages=None):
         ang = math.radians(rng.normal(-4, 2))
         yi = int(np.clip(y, 0, H - 1))
         base = sky.c[yi, int(np.clip(x + L / 2, 0, W - 1))]
-        dl = rng.choice([-1, 1]) * rng.uniform(0.006, 0.010) * calm[yi]
+        dl = rng.choice([-1, 1]) * rng.uniform(0.009, 0.014) * calm[yi]
         col = lift(base, dl, rng.normal(0, 0.003) * calm[yi], rng.normal(0, 0.003) * calm[yi])
         paint_line(p1, (x, y), (x + L * math.cos(ang), y + L * math.sin(ang)), rng.uniform(160, 320), col,
                    rng.uniform(0.30, 0.45), round_=True, t_in=0.3, t_out=0.3)
     p1.blur(24).onto(sky)
-    # P2 mid soft strokes: 40 round strokes, width 40-90, +-0.6-1.0 L*, opacity 0.30-0.45, then blur sigma 6
+    # P2 mid soft strokes: 70 round strokes, width 40-90, +-0.8-1.3 L*, opacity 0.30-0.45, then blur sigma 6
     p2 = Layer(H, W)
-    for _ in range(40):
+    for _ in range(70):
         y, x = rng.uniform(0, H), rng.uniform(-0.2, 0.9) * W
         L = rng.uniform(0.25, 0.6) * W
         ang = math.radians(rng.normal(-5, 3))
         yi = int(np.clip(y, 0, H - 1))
-        col = lift(sky.c[yi, int(np.clip(x + L / 2, 0, W - 1))], rng.choice([-1, 1]) * rng.uniform(0.006, 0.010) * calm[yi])
+        col = lift(sky.c[yi, int(np.clip(x + L / 2, 0, W - 1))], rng.choice([-1, 1]) * rng.uniform(0.008, 0.013) * calm[yi])
         paint_line(p2, (x, y), (x + L * math.cos(ang), y + L * math.sin(ang)), rng.uniform(40, 90), col,
                    rng.uniform(0.3, 0.45), round_=True, t_in=0.3, t_out=0.4)
     p2.blur(6).onto(sky)
     if style == 'dusk':
-        # P3 the hatch: +-0.5-0.8 L*, 2 px lines 9 px apart at 35 deg, in elongated patches covering ~35 % of the sky,
+        # P3 the hatch: +-0.7-1.1 L*, 2 px lines 9 px apart at 35 deg, in elongated patches covering ~55 % of the sky,
         # x0.25 in the caption band, fading out over the warm horizon band
         hf = hatch_field(rng, H, W)
-        patch = smoothstep(0.15, 1.1, noise(rng, H, W, 150, aniso=2.0, angle=-35.0))
+        patch = smoothstep(-0.3, 0.9, noise(rng, H, W, 150, aniso=2.0, angle=-35.0))
         ys = np.arange(H, dtype=np.float32)[:, None]
         fade = np.where((ys > CAPTION[0] - 30) & (ys < CAPTION[1] + 30), 0.25, 1.0) * smoothstep(760, 640, ys)
-        sky.c[..., 0] += hf * patch * fade * 0.0065
+        sky.c[..., 0] += hf * patch * fade * 0.012
     else:
         # P4 the paper tooth: +-0.35 L* fine, very slightly streaky (vertical fibres), and broad patches +-0.3 L*
         sky.c[..., 0] += noise(rng, H, W, 0.9, aniso=2.5, angle=90.0) * 0.0035
@@ -588,7 +588,13 @@ def paint_mass(box, billows, pal, sky, rng, prm, sun=SUN, stages=None):
     bq = u * dlx + v * dly
     t_rim = (-bq + np.sqrt(np.clip(bq * bq - (u * u + v * v - 1.0), 0.0, None))) * br
     cap = smoothstep(prm['cap_lam'][0], prm['cap_lam'][1], lam) * smoothstep(prm['cap_w'] * br, 0.0, t_rim)
-    F = F_big + prm['cap_gain'] * cap * (prm['cap_floor'] + (1.0 - prm['cap_floor']) * F_big)
+    # F: mostly the big form, partly each billow's own sphere light (its top lit, its underside one step down: the
+    # stacked-scales read of p02), plus the cap at its sun-facing rim
+    F = (1.0 - prm['w_billow']) * F_big + prm['w_billow'] * lam
+    F = F + prm['cap_gain'] * cap * (prm['cap_floor'] + (1.0 - prm['cap_floor']) * F_big)
+    if inside.any():
+        lo, hi = np.percentile(F[inside], [2, 98])
+        F = (F - lo) / max(hi - lo, 1e-3)
     F = np.clip(F, 0.0, 1.0).astype(np.float32)
     up_big = np.clip(gy_b / gn_b * e_b, 0.0, 1.0)                    # faces turned up: the sky dome lights the shade
     skyl = np.clip(0.55 * np.clip(-ny, 0.0, 1.0) + 0.45 * up_big, 0.0, 1.0)
@@ -659,10 +665,15 @@ def paint_mass(box, billows, pal, sky, rng, prm, sun=SUN, stages=None):
                     if not (0 <= my_ < h and 0 <= mx_ < w):
                         continue
                     toward = math.cos(mid_a - a_l)
-                    col = lift(cont[my_, mx_], prm['scoop_lift'] * max(toward, 0.0) * (1.0 if s_ == 0 else 0.6)
+                    lit_here = float(smoothstep(0.2, 0.5, F_big[my_, mx_]))   # in the shade zone: no lift, thinner paint
+                    z_ = F[my_, mx_]                  # the scoop carries ONE value step up from the plan under it
+                    tgt = (mix(pal['lit'], pal['rim'], 0.5) if z_ > prm['cuts'][2] else
+                           mix(pal['half'], pal['lit'], 0.55) if z_ > prm['cuts'][1] else pal['shade_top'])
+                    col = mix(cont[my_, mx_], tgt, prm['scoop_mix'] * (0.6 + 0.4 * max(toward, 0.0)) * (1.0 if s_ == 0 else 0.6))
+                    col = lift(col, prm['scoop_lift'] * max(toward, 0.0) * (1.0 if s_ == 0 else 0.6) * lit_here
                                + rng.normal(0, 0.003), rng.normal(0, 0.002), rng.normal(0, 0.002))
                     paint_arc(p2, (cx - x0, cy - y0), R, mid_a - span / 2, mid_a + span / 2, wd, col,
-                              rng.uniform(0.6, 0.85), fl=fl, e_pos=prm['scoop_edge'], e_neg=wd * 0.45, t_in=0.1,
+                              rng.uniform(0.6, 0.85) * (0.55 + 0.45 * lit_here), fl=fl, e_pos=prm['scoop_edge'], e_neg=wd * 0.45, t_in=0.1,
                               t_out=0.35, taper_w=0.55, dry=rng.uniform(0.0, 0.3), tex_off=tex_off(rng))
                     inset += wd * rng.uniform(0.7, 1.1)
             sh = visible_arc(billows[i], i, owner, D, x0, y0, a_l + math.pi, 1.2, inset=0.3 * r)
@@ -677,8 +688,8 @@ def paint_mass(box, billows, pal, sky, rng, prm, sun=SUN, stages=None):
                     if not (0 <= my_ < h and 0 <= mx_ < w) or owner[my_, mx_] != i:
                         continue
                     paint_arc(p2, (cx - x0, cy - y0), R, mid_a - span / 2, mid_a + span / 2, wd,
-                              lift(cont[my_, mx_], -0.012), rng.uniform(0.35, 0.5), fl=fl, e_pos=3.0, e_neg=wd * 0.5,
-                              t_in=0.25, t_out=0.4, taper_w=0.6)
+                              lift(cont[my_, mx_], -0.01), rng.uniform(0.25, 0.4), fl=fl, e_pos=5.0, e_neg=wd * 0.5,
+                              t_in=0.3, t_out=0.4, taper_w=0.6)
         else:
             nb = int(round(prm['n_level'] * (r / size) ** 0.6))
             for _ in range(nb):
@@ -696,6 +707,20 @@ def paint_mass(box, billows, pal, sky, rng, prm, sun=SUN, stages=None):
                 paint_line(p2, (ix - L / 2, iy - L / 2 * math.tan(ang)), (ix + L / 2, iy + L / 2 * math.tan(ang)), bw, col,
                            rng.uniform(0.5, 0.8), e_pos=(1.0 if below else 3.0), e_neg=(3.0 if below else 1.0),
                            t_in=0.06, t_out=0.4, dry=rng.uniform(0.1, 0.35), tex_off=tex_off(rng))
+    # blocky flat strokes on the shade body (03, 02): level, crisp top edge, dry tail; alternately a half step lighter
+    # (toward the skylit shade) and darker (toward the deep), never both edges crisp
+    ys_s, xs_s = np.nonzero(inside & (F < prm['cuts'][1]) & (D > 8))
+    for k_ in range(prm['n_block'] if len(xs_s) else 0):
+        j = rng.integers(len(xs_s))
+        ix, iy = int(xs_s[j]), int(ys_s[j])
+        L = rng.uniform(0.3, 0.8) * size
+        ang = math.radians(prm['wind'] + rng.normal(0, 4.0))
+        tgt = pal['shade_top'] if k_ % 2 == 0 else pal['deep']
+        col = mix(cont[iy, ix], tgt, rng.uniform(0.35, 0.55))
+        bw = rng.uniform(*prm['block_w'])
+        paint_line(p2, (ix - L / 2 * math.cos(ang), iy - L / 2 * math.sin(ang)),
+                   (ix + L / 2 * math.cos(ang), iy + L / 2 * math.sin(ang)), bw, col, rng.uniform(0.5, 0.75),
+                   e_pos=bw * 0.4, e_neg=1.0, t_in=0.04, t_out=0.45, dry=rng.uniform(0.15, 0.4), tex_off=tex_off(rng))
     p2.blur(prm['p2_blur']).onto(canvas)
     if stages is not None:
         stages['P2'] = canvas.copy()
@@ -752,8 +777,13 @@ def paint_mass(box, billows, pal, sky, rng, prm, sun=SUN, stages=None):
     n_side = np.clip(noise(rng, h, w, prm['dry_cell'], aniso=prm['dry_aniso'], angle=prm['wind']), -1.6, 1.6)
     n_base = np.clip(noise(rng, h, w, prm['dry_cell'] * 2.0, aniso=8.0, angle=prm['wind']), -1.6, 1.6)
     in_band = smoothstep(1.2, 0.0, np.abs(D) / ew)
+    # the grain of a dry brush on a soft edge (04's dissolve): a fine 1 px noise displaces the edge inside its band,
+    # only where the edge is soft (shade side, base), so the soft edge reads painted, never airbrushed
+    n_fine = np.clip(noise(rng, h, w, 0.8), -2.0, 2.0)
+    soft_edge = smoothstep(4.0, 12.0, ew)
     dd = D + (n_side * ew * prm['dry_amp'] * shade_side * (1.0 - near_base)
-              + n_base * prm['edge_base'] * prm['base_drag'] * near_base) * in_band
+              + n_base * prm['edge_base'] * prm['base_drag'] * near_base
+              + n_fine * ew * prm['grain'] * soft_edge * (1.0 - near_base)) * in_band
     canvas.a[...] = smoothstep(-ew * 0.5, ew * 0.5, dd)
     # P4 (near masses only): the speckle dissolve on the side away from the light (sky-coloured holes inside the edge,
     # cloud-coloured flecks outside it, thinning over ~40 px), and a few light flecks off the lit edge
@@ -767,7 +797,7 @@ def paint_mass(box, billows, pal, sky, rng, prm, sun=SUN, stages=None):
             if rng.random() > math.exp(-abs(dist) / 14.0):
                 continue
             yy, xx = ys_b[j], xs_b[j]
-            rr_ = rng.uniform(0.7, 2.2)
+            rr_ = rng.uniform(0.6, 1.6)
             if dist > 0:      # a hole: the sky shows through the dissolving cloud
                 b_ = _box(xx - rr_ - 2, yy - rr_ - 2, xx + rr_ + 2, yy + rr_ + 2, h, w)
                 if b_ is not None:
@@ -794,27 +824,30 @@ def paint_mass(box, billows, pal, sky, rng, prm, sun=SUN, stages=None):
 # THE DEPTH LADDER (recipe 3.3 d): one row per plane, px of the 1080 frame. k = how far its colours move toward the sky
 # behind it; plane_blur = the sigma after all passes; edge_* = the 10-90 % edge widths.
 DEPTH = {
-    'near': dict(k=0.0, plane_blur=0.0, k_smooth=6.0, base_soft=18.0, base_wobble=10.0, top_light=0.5, lz=0.3,
-                 form_sigma=0.35, w_att=0.5, penetration=1.0, cap_lam=(0.25, 0.75), cap_w=0.42, cap_gain=0.5,
-                 cap_floor=0.25, skylight=0.8, cuts=[0.14, 0.38, 0.66], soft_cut=0.05,
-                 rim_px=5.0, p0_blur=4.0, n_soft=3, p1_blur=7.0, n_scoop=3, scoop_w=(0.16, 0.28), scoop_px=(9, 38),
-                 scoop_lift=0.018, scoop_edge=1.1, n_shade_scoop=2, n_level=8, level_w=(10, 22), p2_blur=0.6,
+    'near': dict(k=0.0, plane_blur=0.0, k_smooth=6.0, base_soft=18.0, base_wobble=16.0, top_light=0.5, lz=0.3,
+                 form_sigma=0.35, w_att=0.5, penetration=1.0, w_billow=0.42, cap_lam=(0.3, 0.8), cap_w=0.4,
+                 cap_gain=0.22, cap_floor=0.05, skylight=0.8, cuts=[0.14, 0.4, 0.68], soft_cut=0.05, grain=0.14,
+                 rim_px=5.0, p0_blur=4.0, n_soft=3, p1_blur=7.0, n_scoop=4, scoop_w=(0.2, 0.34), scoop_px=(10, 44),
+                 scoop_mix=0.55, scoop_lift=0.012, scoop_edge=1.1, n_shade_scoop=2, n_level=8, level_w=(10, 22),
+                 n_block=7, block_w=(14, 28), p2_blur=0.6,
                  n_rim=7, rim_w=(5, 10), rim_min_r=24, underside=0, p3_blur=0.0,
-                 edge_lit=1.8, edge_shade=16.0, edge_base=24.0, base_drag=0.25, dry_cell=4.0, dry_aniso=7.0,
-                 dry_amp=0.7, n_speck=520, n_spatter=14, wind=-6.0),
-    'mid': dict(k=0.30, plane_blur=1.3, k_smooth=10.0, base_soft=8.0, base_wobble=3.0, top_light=0.3, lz=0.3,
-                form_sigma=0.4, w_att=0.45, penetration=1.2, cap_lam=(0.3, 0.8), cap_w=0.5, cap_gain=0.35,
-                cap_floor=0.3, skylight=0.8, cuts=[0.12, 0.38, 0.7], soft_cut=0.08,
+                 edge_lit=1.8, edge_shade=16.0, edge_base=22.0, base_drag=0.12, dry_cell=4.0, dry_aniso=7.0,
+                 dry_amp=0.7, n_speck=120, n_spatter=8, wind=-6.0),
+    'mid': dict(k=0.22, plane_blur=1.3, k_smooth=10.0, base_soft=8.0, base_wobble=3.0, top_light=0.3, lz=0.3,
+                form_sigma=0.4, w_att=0.45, penetration=1.2, w_billow=0.35, cap_lam=(0.3, 0.8), cap_w=0.5,
+                cap_gain=0.2, cap_floor=0.3, skylight=0.8, cuts=[0.12, 0.38, 0.7], soft_cut=0.08, grain=0.25,
                 rim_px=0.0, p0_blur=3.0, n_soft=2, p1_blur=6.0, n_scoop=2, scoop_w=(0.16, 0.26), scoop_px=(8, 26),
-                scoop_lift=0.012, scoop_edge=1.5, n_shade_scoop=0, n_level=9, level_w=(8, 18), p2_blur=1.0,
+                scoop_mix=0.4, scoop_lift=0.012, scoop_edge=1.5, n_shade_scoop=0, n_level=11, level_w=(9, 20),
+                n_block=0, block_w=(10, 18), p2_blur=1.0,
                 n_rim=0, rim_w=(4, 7), rim_min_r=999, underside=6.0, p3_blur=0.6,
                 edge_lit=2.6, edge_shade=12.0, edge_base=2.6, base_drag=0.0, dry_cell=5.0, dry_aniso=9.0,
                 dry_amp=0.5, n_speck=0, n_spatter=0, wind=-3.0),
-    'far': dict(k=0.45, plane_blur=2.4, k_smooth=12.0, base_soft=6.0, base_wobble=2.0, top_light=0.2, lz=0.3,
-                form_sigma=0.45, w_att=0.4, penetration=1.4, cap_lam=(0.3, 0.8), cap_w=0.5, cap_gain=0.25,
-                cap_floor=0.35, skylight=0.6, cuts=[0.1, 0.36, 0.68], soft_cut=0.1,
+    'far': dict(k=0.38, plane_blur=2.4, k_smooth=12.0, base_soft=6.0, base_wobble=2.0, top_light=0.2, lz=0.3,
+                form_sigma=0.45, w_att=0.4, penetration=1.4, w_billow=0.3, cap_lam=(0.3, 0.8), cap_w=0.5,
+                cap_gain=0.15, cap_floor=0.35, skylight=0.6, cuts=[0.1, 0.36, 0.68], soft_cut=0.1, grain=0.2,
                 rim_px=0.0, p0_blur=2.5, n_soft=2, p1_blur=5.0, n_scoop=1, scoop_w=(0.15, 0.22), scoop_px=(6, 16),
-                scoop_lift=0.008, scoop_edge=2.0, n_shade_scoop=0, n_level=7, level_w=(6, 12), p2_blur=1.5,
+                scoop_mix=0.3, scoop_lift=0.008, scoop_edge=2.0, n_shade_scoop=0, n_level=8, level_w=(6, 12),
+                n_block=0, block_w=(8, 12), p2_blur=1.5,
                 n_rim=0, rim_w=(3, 5), rim_min_r=999, underside=4.0, p3_blur=1.0,
                 edge_lit=3.5, edge_shade=12.0, edge_base=3.5, base_drag=0.0, dry_cell=6.0, dry_aniso=10.0,
                 dry_amp=0.35, n_speck=0, n_spatter=0, wind=-2.0),
@@ -826,24 +859,24 @@ DEPTH = {
 # 0.15), the biggest at the back of the tower, the small ones only along the lit edge; never a necklace of equal circles.
 # Light from the left (the low sun): billows farther right sit in front, so each lit edge lies over a shade.
 NEAR = [
-    (1062, 66, 104, 1.0, 1), (968, 14, 74, 1.0, 0), (900, 92, 80, 1.0, 2), (852, 40, 30, 1.0, 1.5),
-    (838, 164, 70, 1.0, 3), (792, 118, 27, 1.0, 2.5), (990, 178, 132, 1.0, 4), (764, 222, 56, 1.0, 5),
-    (734, 184, 22, 1.0, 4.5), (704, 254, 35, 1.0, 6), (664, 274, 19, 1.0, 7), (902, 256, 66, 1.0, 8),
-    (1040, 262, 78, 1.0, 9),
+    (1062, 66, 104, 1.0, 1), (968, 14, 74, 1.0, 0), (900, 92, 80, 1.0, 2), (846, 46, 36, 1.0, 1.5),
+    (884, 4, 15, 1.0, 0.5), (838, 164, 70, 1.0, 3), (797, 124, 19, 1.0, 2.5), (990, 178, 132, 1.0, 4),
+    (764, 222, 56, 1.0, 5), (731, 190, 27, 1.0, 4.5), (700, 256, 37, 1.0, 6), (667, 279, 15, 1.0, 7),
+    (902, 256, 66, 1.0, 2.8), (1040, 262, 78, 1.0, 2.9),   # the base row recedes: behind the tower (no crescents)
 ]
 NEAR_BOX = (560, 0, 1080, 345)
 NEAR_BASE = 300.0
 
 MID = [   # a long bank, upper left (plane 2): low humps on a level base lit from below, a thin wisp above
-    (30, 214, 96, 0.36, 1), (140, 204, 92, 0.42, 2), (246, 210, 78, 0.38, 3), (334, 218, 60, 0.36, 4),
-    (410, 224, 42, 0.34, 5), (468, 229, 24, 0.3, 6), (300, 172, 72, 0.15, 0), (392, 166, 50, 0.13, 0),
+    (20, 206, 112, 0.46, 1), (136, 190, 104, 0.52, 2), (252, 200, 86, 0.48, 3), (344, 212, 66, 0.44, 4),
+    (422, 221, 44, 0.4, 5), (478, 228, 25, 0.36, 6), (296, 156, 76, 0.15, 0), (392, 150, 54, 0.13, 0),
 ]
-MID_BOX = (0, 120, 560, 290)
+MID_BOX = (0, 100, 580, 290)
 MID_BASE = 240.0
 
 FAR = [   # a thin low deck in the west gap (plane 3): smaller, flatter, closer to the sky, lit underneath
-    (40, 664, 84, 0.27, 1), (168, 668, 68, 0.3, 2), (282, 662, 74, 0.25, 3), (396, 671, 54, 0.27, 4),
-    (498, 670, 44, 0.27, 5), (606, 676, 58, 0.23, 6), (698, 680, 38, 0.23, 7),
+    (40, 662, 86, 0.3, 1), (168, 666, 70, 0.33, 2), (282, 660, 76, 0.28, 3), (396, 669, 56, 0.3, 4),
+    (498, 668, 46, 0.3, 5), (606, 675, 60, 0.26, 6), (698, 679, 40, 0.26, 7),
 ]
 FAR_BOX = (0, 610, 780, 706)
 FAR_BASE = 686.0
@@ -864,7 +897,7 @@ def paint_streaks(layer, pal, rng, sun=SUN, n_rows=4):
             xc = x + L / 2
             near = float(np.exp(-abs(xc - sun[0]) / 340.0))
             base = layer.c[int(np.clip(yy, 0, layer.h - 1)), int(np.clip(xc, 0, layer.w - 1))]
-            body = mix(base, mix(pal['streak'], pal['shade'], 0.15 * ri), 0.85 - 0.1 * ri)
+            body = lift(mix(base, mix(pal['streak'], pal['shade'], 0.15 * ri), 0.9 - 0.1 * ri), -0.012)
             ti, to = (0.45, 0.15) if xc > sun[0] else (0.15, 0.45)
             ang = math.radians(rng.normal(0, 0.35))
             p0 = (x, yy)

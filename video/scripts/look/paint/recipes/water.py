@@ -237,10 +237,11 @@ def chisel(layer, nz, rng, x0, x1, yc, h, col, op=0.9, slope=0.0, bow=0.0, soft=
     layer.over(np.clip(c, 0, 1), (a * op).astype(np.float32), ya, xa)
 
 
-def stroke(layer, nz, rng, x0, x1, yc, h, col, op, soft, dry_scale=1.0, bdepth=0.06, cj=0.008, bow=None, rag=0.4):
-    """A flat, opaque gouache dash with a random end style (taper / square-dry / blunt) and a hand's
-    small wobble: the default mark of the recipe."""
-    te, dr = END_STYLES[int(rng.choice(3, p=(0.4, 0.4, 0.2)))]
+def stroke(layer, nz, rng, x0, x1, yc, h, col, op, soft, dry_scale=1.0, bdepth=0.06, cj=0.008, bow=None, rag=0.4,
+           ends=(0.6, 0.25, 0.15)):
+    """A flat, opaque gouache dash with a random end style (taper 60 % / square-dry 25 % / blunt 15 %)
+    and a hand's small wobble: the default mark of the recipe."""
+    te, dr = END_STYLES[int(rng.choice(3, p=ends))]
     chisel(layer, nz, rng, x0, x1, yc, h, col, op=op, slope=rng.normal(0, 0.004),
            bow=rng.normal(0, 0.08 * h) if bow is None else bow, soft=soft, t1=rng.uniform(0.15, 0.4),
            thin_end=te, dry=dr * dry_scale, bdepth=bdepth, cj=cj, rag=rag)
@@ -271,10 +272,10 @@ def water_palette(P):
     W['w_line'] = shift(c['sky_horizon'], dL=-1, cmul=1.05)                                  # the grazing glow
     W['w_far'] = shift(mix(c['sky_horizon'], c['sky_low'], 0.55), dL=-7, cmul=1.2, dh=-14)  # rose-peach
     W['w_mid'] = shift(mix(c['sky_band'], c['sky_upper'], 0.45), dL=-13, cmul=1.7)          # lilac-rose
-    W['w_near'] = shift(c['sky_upper'], dL=-22, cmul=1.4, dh=-4)                            # lavender
-    W['w_deep'] = shift(c['sky_top'], dL=-33, cmul=1.3, dh=-6)                              # blue-violet
-    W['w_deeper'] = shift(c['sky_top'], dL=-42, cmul=1.2, dh=-8)
-    W['w_plum'] = shift(c['cloud_shade'], dL=-26, cmul=1.15)                                # the dark accent
+    W['w_near'] = shift(c['sky_upper'], dL=-19, cmul=1.45, dh=-4)                           # lavender
+    W['w_deep'] = shift(c['sky_top'], dL=-24, cmul=1.35, dh=-6)                             # blue-violet
+    W['w_deeper'] = shift(c['sky_top'], dL=-32, cmul=1.25, dh=-8)
+    W['w_plum'] = shift(c['cloud_shade'], dL=-22, cmul=1.15)                                # the dark accent
     # the sun's glint: cream core, gold, amber bed, rose fringe (the soft lift)
     W['g_core'] = hexrgb('#fff4dc')
     W['g_gold'] = shift(mix(c['sun'], c['sky_horizon'], 0.58), dL=4)
@@ -284,8 +285,9 @@ def water_palette(P):
     W['f_light'] = mix(c['sky_upper'], c['sky_band'], 0.5)
     W['f_top'] = mix(c['sky_band'], c['sky_horizon'], 0.45)
     # wet ground: the dry colour darker and richer (then it mirrors the sky)
-    W['sand_wet'] = shift(c['sand'], dL=-16, cmul=1.15, dh=-6)
-    W['paving_wet'] = shift(c['paving'], dL=-15, cmul=1.15)
+    W['sand_dry'] = shift(c['sand'], dL=-1, cmul=1.05, dh=-14)                              # peach-rose, not tan
+    W['sand_wet'] = shift(c['sand'], dL=-16, cmul=1.15, dh=-16)
+    W['paving_wet'] = shift(c['paving'], dL=-15, cmul=1.35, dh=-10)
     return W
 
 
@@ -299,11 +301,11 @@ def base_of(W, s):
 
 
 def mark_colour(W, s, dl, dh=0.0):
-    """A mark at depth s: hue and chroma from the ladder 0.35 farther (a light mark: a facet tilted away
-    shows the lower, warmer sky) or 0.35 nearer (a dark mark: tilted toward us, the higher, cooler sky),
+    """A mark at depth s: hue and chroma from the ladder 0.2 farther (a light mark: a facet tilted away
+    shows the lower, warmer sky) or 0.25 nearer (a dark mark: tilted toward us, the higher, cooler sky),
     at exactly dl L* off the local base. So the contrast is the measured one, whatever the ladder."""
     base_L = float(lab(base_of(W, s))[0])
-    src = base_of(W, s - 0.35 if dl > 0 else s + 0.35)
+    src = base_of(W, s - 0.2 if dl > 0 else s + 0.25)
     return shift(with_L(src, base_L + dl), dh=dh)
 
 
@@ -322,15 +324,18 @@ def reflect(src, water, k=0.25, dL=-4.0, cmul=0.9):
 # The marks per depth plane (frame px at 1080 wide). cover = the share of the plane's water the marks
 # cover (light + dark); calm = the wind level under which a patch stays a mirror (no marks).
 PLANES = {
-    'far': dict(s=(-1.0, 0.33), h=(1.2, 2.2), med=12.0, sig=0.85, clip=(5.0, 90.0), gap=(0.4, 2.0),
-                space=(2.2, 3.2), cover=0.025, light=0.5, dl_light=(9.0, 13.0), dl_dark=(-11.0, -8.0),
-                pair=0.0, op=0.85, soft=0.75, blur=0.7),
-    'mid': dict(s=(0.33, 0.66), h=(2.2, 4.2), med=16.0, sig=0.7, clip=(6.0, 130.0), gap=(0.3, 1.6),
-                space=(1.9, 2.8), cover=0.05, light=0.55, dl_light=(10.0, 14.0), dl_dark=(-12.0, -9.0),
-                pair=0.15, op=0.9, soft=0.8, blur=0.5),
-    'near': dict(s=(0.66, 9.0), h=(3.6, 7.5), med=20.0, sig=0.65, clip=(8.0, 170.0), gap=(0.3, 1.4),
-                 space=(1.7, 2.5), cover=0.075, light=0.55, dl_light=(11.0, 16.0), dl_dark=(-14.0, -10.0),
-                 pair=0.3, op=0.93, soft=0.85, blur=0.3),
+    # dash = (median length px, lognormal sigma); chain = dashes per chain (a broken line along a swell);
+    # long = the share of chains that are one long tapered line instead; dl_* = the plane's two mark
+    # colours as L* steps off the base at the plane's centre (ONE light and ONE dark colour per plane).
+    'far': dict(s=(-1.0, 0.33), h=(1.0, 1.8), dash=(18.0, 0.6), chain=(1, 3), chain_gap=(0.15, 0.6), long=0.35,
+                long_len=(60.0, 220.0), gap=(0.5, 2.0), space=(2.2, 3.2), cover=0.04, light=0.55, dl_light=9.0,
+                dl_dark=-7.0, pair=0.0, op=0.85, soft=0.7, blur=0.6),
+    'mid': dict(s=(0.33, 0.66), h=(1.8, 4.0), dash=(30.0, 0.6), chain=(1, 3), chain_gap=(0.1, 0.5), long=0.2,
+                long_len=(60.0, 180.0), gap=(0.4, 1.6), space=(1.8, 2.6), cover=0.07, light=0.55, dl_light=12.0,
+                dl_dark=-10.0, pair=0.15, op=0.9, soft=0.8, blur=0.45),
+    'near': dict(s=(0.66, 9.0), h=(3.5, 8.0), dash=(42.0, 0.6), chain=(1, 3), chain_gap=(0.08, 0.45), long=0.15,
+                 long_len=(70.0, 200.0), gap=(0.3, 1.2), space=(1.7, 2.4), cover=0.09, light=0.55, dl_light=14.0,
+                 dl_dark=-12.0, pair=0.3, op=0.93, soft=0.85, blur=0.3),
 }
 CALM = 0.32  # wind below this: no marks at all (the calm patches keep the mirror)
 
@@ -360,7 +365,7 @@ def underpaint(cv, mask, W, nz, rng, y_top, y_bot, s_of, n=(5, 9), mirrors=(), s
     wash.blur(lerp(6.0, 3.0, s_mid) if sigma is None else sigma).onto(cv, mask)
 
 
-def far_lines(layer, nz, rng, W, mask, s_of, y0, y1, x0, x1, n=(6, 14), wind=None):
+def far_lines(layer, nz, rng, W, mask, s_of, y0, y1, x0, x1, n=(4, 10), wind=None):
     """P2 (far): the long thin lines across the far water (CRAFT f.7 f: 6-14 lines, 40-250 px, tapered):
     a light one is the lower sky seen in a long swell, a dark one its shade side."""
     H, Wd = mask.shape
@@ -374,62 +379,84 @@ def far_lines(layer, nz, rng, W, mask, s_of, y0, y1, x0, x1, n=(6, 14), wind=Non
             continue
         s = float(s_of(y))
         light = rng.random() < 0.55
-        col = mark_colour(W, s, rng.uniform(9, 12) if light else -rng.uniform(7, 10), 0 if light else 3)
-        chisel(layer, nz, rng, x, x + run, y, rng.uniform(1.2, 2.0), col, op=0.8, soft=0.7, dry=0.3,
+        col = mark_colour(W, s, 9.0 if light else -7.0, 0 if light else 3)
+        chisel(layer, nz, rng, x, x + run, y, rng.uniform(1.1, 1.8), col, op=0.8, soft=0.7, dry=0.3,
                bdepth=0.0, cj=0.0, rag=0.2, lens=0.35, slope=rng.normal(0, 0.002))
         count += 1
     return count
 
 
-def plane_marks(layer, nz, rng, W, mask, wind, s_of, spec, y0, y1, x0, x1, dose=1.0):
-    """P2: the marks of one depth plane, coverage-driven. Candidates are laid row by row (lognormal runs,
-    gaps); each gets a weight from the wind (0 on calm patches); then they are accepted with the
-    probability that makes their expected area = cover x the plane's water area. Returns (n, covered px)."""
+def plane_marks(layer, nz, rng, W, mask, wind, s_of, spec, y0, y1, x0, x1, dose=1.0, s_c=None):
+    """P2: the marks of one depth plane, coverage-driven, in the plane's LIMITED palette: one light and one
+    dark colour (+-0.7 L* jitter), set at the plane's centre depth s_c.
+    Marks come in CHAINS along swell rows (1-5 dashes with small gaps: a broken line), or as one long
+    tapered line (`long` of the chains). Every chain gets a weight from the wind (0 on calm patches); the
+    chains are then accepted with the probability that makes their expected area = cover x the plane's
+    water area. Returns (strokes, covered share)."""
     H, Wd = mask.shape
-    cands = []
+    if s_c is None:
+        s_c = float(s_of(0.5 * (y0 + y1)))
+    c_light = mark_colour(W, s_c, spec['dl_light'])
+    c_dark = mark_colour(W, s_c, spec['dl_dark'], dh=3)
+    chains = []
     y = y0 + rng.uniform(0, 2)
     while y < y1:
-        s = float(s_of(y))
-        h = rng.uniform(*spec['h'])
-        x = x0 - rng.uniform(0, 80)
+        k = float(np.clip((y - y0) / max(1, y1 - y0), 0, 1))       # the dashes grow toward us inside the plane
+        h = rng.uniform(*spec['h']) * lerp(0.85, 1.15, k)
+        x = x0 - rng.uniform(0, 120)
         while x < x1:
-            run = float(np.clip(rng.lognormal(np.log(spec['med']), spec['sig']), *spec['clip']))
-            xm, yi = int(np.clip(x + run / 2, 0, Wd - 1)), int(np.clip(y, 0, H - 1))
+            dashes = []
+            if rng.random() < spec['long']:
+                L = rng.uniform(*spec['long_len'])
+                dashes.append((x, L, 0.75 * h, True))
+                xe = x + L
+            else:
+                xe = x
+                for _ in range(int(rng.integers(spec['chain'][0], spec['chain'][1] + 1))):
+                    L = float(np.clip(rng.lognormal(np.log(spec['dash'][0] * lerp(0.85, 1.2, k)), spec['dash'][1]),
+                                      4.5 * h, 9.0 * spec['dash'][0]))
+                    dashes.append((xe, L, h * rng.uniform(0.75, 1.25), False))
+                    xe += L * (1 + rng.uniform(*spec['chain_gap']))
+            xm, yi = int(np.clip(0.5 * (x + xe), 0, Wd - 1)), int(np.clip(y, 0, H - 1))
             wgt = float(mask[yi, xm]) * float(smooth((wind[yi, xm] - CALM) / 0.4))
             if wgt > 0.01:
-                cands.append((x, run, y, h, s, wgt))
-            x += run * (1 + rng.uniform(*spec['gap']))
+                chains.append((y, dashes, wgt))
+            x = xe + (xe - x) * rng.uniform(*spec['gap'])
         y += h * rng.uniform(*spec['space'])
     area = mask[int(max(0, y0)):int(min(H, y1))].sum()
     want = spec['cover'] * dose * area
-    have = sum(c[1] * c[3] * 0.8 * c[5] for c in cands)
-    k = want / max(have, 1e-6)
+    have = sum(sum(L * hh * 0.8 for (_, L, hh, _) in d) * w for (_, d, w) in chains)
+    kacc = want / max(have, 1e-6)
     n = 0
     covered = 0.0
-    for (x, run, y, h, s, wgt) in cands:
-        if rng.random() >= min(1.0, k * wgt):
+    for (y, dashes, wgt) in chains:
+        if rng.random() >= min(1.0, kacc * wgt):
             continue
         light = rng.random() < spec['light']
-        if light:
-            col = mark_colour(W, s, rng.uniform(*spec['dl_light']))
-        else:
-            col = mark_colour(W, s, rng.uniform(*spec['dl_dark']), dh=rng.uniform(1, 4))
-        a, b = (x, x + run) if rng.random() < 0.65 else (x + run, x)
-        stroke(layer, nz, rng, a, b, y, h, col, op=spec['op'] * rng.uniform(0.92, 1.0), soft=spec['soft'])
-        n += 1
-        covered += run * h * 0.8
-        if light and rng.random() < spec['pair']:  # a dark partner under a light mark: a facet's back and shade
-            dk = mark_colour(W, s, rng.uniform(*spec['dl_dark']), dh=3)
-            off = run * rng.uniform(-0.15, 0.3)
-            stroke(layer, nz, rng, a + off, a + off + (b - a) * rng.uniform(0.5, 0.9), y + 0.95 * h, h * 0.8, dk,
-                   op=spec['op'], soft=spec['soft'])
+        for (xa, L, hh, is_long) in dashes:
+            if rng.random() < 0.2:                       # a chain is mostly one colour
+                light = not light
+            col = shift(c_light if light else c_dark, dL=rng.normal(0, 0.7))
+            yy_ = y + rng.normal(0, 0.35)
+            if is_long:
+                chisel(layer, nz, rng, xa, xa + L, yy_, hh, col, op=spec['op'] * 0.9, soft=spec['soft'], dry=0.3,
+                       bdepth=0.0, cj=0.0, rag=0.2, lens=0.3, slope=rng.normal(0, 0.002))
+            else:
+                a, b = (xa, xa + L) if rng.random() < 0.65 else (xa + L, xa)
+                stroke(layer, nz, rng, a, b, yy_, hh, col, op=spec['op'] * rng.uniform(0.93, 1.0), soft=spec['soft'])
             n += 1
-            covered += run * 0.7 * h * 0.8 * 0.8
+            covered += L * hh * 0.8
+            if light and not is_long and rng.random() < spec['pair']:   # a dark partner under a light dash
+                off = L * rng.uniform(-0.1, 0.3)
+                stroke(layer, nz, rng, xa + off, xa + off + L * rng.uniform(0.5, 0.9), yy_ + 0.95 * hh, hh * 0.8,
+                       shift(c_dark, dL=rng.normal(0, 0.7)), op=spec['op'], soft=spec['soft'])
+                n += 1
+                covered += L * 0.7 * hh * 0.8 * 0.8
     return n, covered
 
 
 def water_body(cv, mask, W, seed, key, y_top, y_bot, s_range, mirrors=(), dose=None, wind_cell=(40, 280),
-               accents=4, line=None, far_n=(6, 14), grain=True, base=None, underpaint_n=(5, 9)):
+               accents=4, line=None, far_n=(4, 10), grain=True, base=None, underpaint_n=(5, 9)):
     """The recipe's passes P0-P4 for any calm water shape (mask, 0-1).
     P0 design: the base ladder by depth (or `base`, an (H, W, 3) designed flat), the sky mirrored.
     P1 underpaint: a few big soft strokes + the mirrored sky features, blurred 6 -> 3 px.
@@ -622,13 +649,15 @@ def reflection(cv, mask, W, seed, key, tgt, cover, yw, s_of, lights=(), solid=0.
             (1 - smooth((yy2 - y_top) / (1.5 * length)))
         Layer(H, Wd).fill(mix(col, wc, 0.35), (0.32 * prof).astype(np.float32)).blur(5).onto(cv, mask, mode='screen')
         blk = 0.35 * length
-        yb = y_top + 1.0
-        while yb < y_top + blk:  # the block: stacked flat strokes, its sides wobbled by the ripples
-            wob = rl2.normal(0, 0.8)
-            chisel(lay, nz, rl2, xa + 0.05 * w_ + wob, xb - 0.05 * w_ + wob, yb + 1.5, 3.4, shift(col, dL=-4),
-                   op=0.97, soft=0.8, thin_end=0.2, dry=0.1, bdepth=0.0, cj=0.004, rag=0.3)
-            yb += 2.6
-            n += 1
+        # the block: ONE solid shape (its sides wobbled by the ripples, its lower corners rounded)
+        ry = (yy2 - y_top) / max(1.0, blk)
+        off = ndi.gaussian_filter1d(rl2.standard_normal(H + 20), 3)[10:10 + H]
+        off = (off / (off.std() + 1e-6) * lerp(0.4, 1.4, np.clip((np.arange(H) - y_top) / max(1.0, blk), 0, 1)))[:, None]
+        half = 0.45 * w_ * (1 - 0.1 * np.clip(ry, 0, 1)) - 0.5 * w_ * smooth((ry - 0.75) / 0.25) * 0.35
+        bm = (np.abs(xx2 - xc - off) <= half) & (ry >= 0) & (ry <= 1)
+        blkL = Layer(H, Wd).fill(shift(col, dL=-4), ndi.gaussian_filter(bm.astype(np.float32), 0.6) * 0.97)
+        blkL.onto(cv, mask)
+        n += 1
         ys_, ws_, hs_ = y_top + blk + rl2.uniform(4, 6), 0.85 * w_, 4.2
         for i in range(3):
             if ys_ > y_top + 1.4 * length or ys_ >= H - 2:
@@ -691,14 +720,17 @@ def glint(cv, mask, W, seed, key, xc, D, y0, y1, strength=1.0, slivers=(4, 7)):
     while y < y1 - 2:
         kk = (y - y0) / max(1, y1 - y0)
         wdt = D * lerp(1.1, 2.0, kk)
-        ln = lerp(14, 46, kk) * r2.uniform(0.8, 1.15)
-        hh = lerp(1.6, 5.5, kk) * r2.uniform(0.85, 1.1)
-        x = xc + r2.normal(0, 0.18 * wdt)
-        if mask[int(min(H - 1, y)), int(np.clip(x, 0, Wd - 1))] > 0.5:
-            lens_mark(bed, nz, r2, x, y, ln, hh, mix(W['g_amber'], W['g_gold'], r2.uniform(0.3, 0.8)),
-                      op=lerp(0.95, 0.78, kk) * min(1.0, strength + 0.2))
-            lenses.append((x, y, ln, hh, kk))
-            n += 1
+        for j in range(1 + int(r2.random() < 0.25)):     # a quarter of the bands carry a second lens
+            if kk > 0.6 and r2.random() < 0.3:              # the near column thins out
+                continue
+            ln = lerp(14, 46, kk) * r2.uniform(0.6, 1.4) * (0.7 if j else 1.0)
+            hh = lerp(1.6, 5.5, kk) * r2.uniform(0.8, 1.15) * (0.8 if j else 1.0)
+            x = xc + r2.normal(0, lerp(0.16, 0.3, kk) * wdt) + (r2.choice([-1, 1]) * 0.3 * wdt if j else 0)
+            if mask[int(min(H - 1, y)), int(np.clip(x, 0, Wd - 1))] > 0.5:
+                lens_mark(bed, nz, r2, x, y + r2.normal(0, 0.6), ln, hh, mix(W['g_amber'], W['g_gold'],
+                          r2.uniform(0.3, 0.8)), op=lerp(0.95, 0.72, kk) * min(1.0, strength + 0.2))
+                lenses.append((x, y, ln, hh, kk))
+                n += 1
         for _ in range(int(r2.poisson(lerp(1.4, 0.5, kk) * strength))):
             xs_ = xc + r2.normal(0, 0.45 * wdt)
             fall = float(np.exp(-0.5 * ((xs_ - xc) / (0.5 * wdt)) ** 2))
@@ -774,24 +806,34 @@ def reflect_shape(cv, mask, shape, base_y, colour, length, blur=(2.0, 0.8), op=0
     Layer(H, Wd).fill(colour, (ndi.gaussian_filter(refl, blur) * op).astype(np.float32)).onto(cv, mask)
 
 
-def rock(cv, xx, yy, cx, by, rx, ry, colour, light_dir=(-0.8, -0.6), rng=None, base_cut=True):
-    """A designed rock (flat shapes, no outline): an organic rounded mass standing on base line by, a lit face
-    toward the sun (+10 L*, warmed by the low sky), a shade face, a core shadow at the terminator; the lit
-    edge crisp (0.6 px), the shade edge soft (1.4 px). Returns its mask."""
+def rock(cv, xx, yy, cx, by, rx, ry, colour, W, light=(-0.72, -0.42, 0.55), rng=None):
+    """A designed rock (flat shapes, no outline): an organic rounded mass standing on its base line by,
+    shaded as a dome by the low sun on the left and quantised into FLAT tones (the posters' 2-3 values):
+    a lit face (+11 L*, warmed 25 % toward the low sky), a mid face, a shade face (-3 L*, a cooler turn)
+    and a core shadow (-8 L*) along the terminator, which therefore curves with the form. The lit edge
+    is crisp (0.6 px), the shade edge soft (1.4 px). Returns its mask."""
     cy = by - 0.55 * ry
     nx, ny = (xx - cx) / rx, (yy - cy) / ry
-    wob = 0.06 * np.sin(np.arctan2(ny, nx) * 3 + (0 if rng is None else rng.uniform(0, 6)))
+    ang = np.arctan2(ny, nx)
+    wob = 0.05 * np.sin(ang * 3 + (0 if rng is None else rng.uniform(0, 6))) + \
+        0.03 * np.sin(ang * 5 + (0 if rng is None else rng.uniform(0, 6)))
     r = (np.abs(nx) ** 2.3 + np.abs(ny) ** 2.1) ** (1 / 2.2) - wob
-    inside = (r < 1) & ((yy < by) if base_cut else True)
-    lit_side = (nx * light_dir[0] + ny * light_dir[1]) > 0.05
-    m_crisp = ndi.gaussian_filter(inside.astype(np.float32), 0.6)
-    m_soft = ndi.gaussian_filter(inside.astype(np.float32), 1.4)
-    m = np.where(lit_side, m_crisp, m_soft)
-    tval = nx * light_dir[0] + ny * light_dir[1]
-    lit = shift(colour, dL=10, cmul=1.05)
-    core = shift(colour, dL=-6)
-    col = np.where((tval > 0.15)[..., None], lit, np.where((np.abs(tval - 0.0) < 0.15)[..., None], core, colour))
-    col = ndi.gaussian_filter(col, (0.8, 0.8, 0))
+    inside = (r < 1) & (yy < by)
+    rr = np.clip(r, 0, 1)
+    nzc = np.sqrt(np.clip(1 - rr ** 2, 0, 1))                     # the dome's normal
+    lv = np.array(light) / np.linalg.norm(light)
+    dot = (nx * 0.9 * lv[0] + ny * 0.9 * lv[1] + nzc * lv[2]) / np.sqrt(0.81 * (nx ** 2 + ny ** 2) + nzc ** 2 + 1e-6)
+    dot = ndi.gaussian_filter(dot, 2.0)
+    lit = mix(shift(colour, dL=11), W['sky_low'], 0.25)
+    mid = shift(colour, dL=3)
+    shade = shift(colour, dL=-3, dh=8)
+    core = shift(colour, dL=-8)
+    col = np.where((dot > 0.62)[..., None], lit, np.where((dot > 0.38)[..., None], mid,
+                   np.where((dot > 0.26)[..., None], core, shade)))
+    col = ndi.gaussian_filter(col, (0.7, 0.7, 0))
+    lit_side = dot > 0.38
+    m = np.where(lit_side, ndi.gaussian_filter(inside.astype(np.float32), 0.6),
+                 ndi.gaussian_filter(inside.astype(np.float32), 1.4))
     cv[:] = cv * (1 - m[..., None]) + col.astype(np.float32) * m[..., None]
     return m
 
@@ -808,24 +850,24 @@ def puddle(cv, region, W, seed, key, pud, body, sky_t=(0.62, 0.98), y_span=(190,
     pc = mix(wet_sky(W, lerp(sky_t[0], sky_t[1], pt_)), body, 0.12)
     pc = np.broadcast_to(pc, (H, 1, 3)) if pc.ndim == 2 else pc
     cv[:] = cv * (1 - pud[..., None]) + np.broadcast_to(pc, cv.shape).astype(np.float32) * pud[..., None]
-    rim = np.clip(pud - np.roll(pud, 2, axis=0), 0, 1)
-    Layer(H, Wd).fill(shift(wet_sky(W, 0.08), dL=1), rim * 0.7).onto(cv)
+    rim = np.clip(pud - np.roll(pud, 1, axis=0), 0, 1)
+    Layer(H, Wd).fill(shift(wet_sky(W, 0.08), dL=1), rim * 0.4).onto(cv)
 
 
 # ----------------------------------------------------------------------------------------------
 # 7. Waves and foam on a shore: long sea bands, wave faces, foam of many thin marks, lace, swash
 # ----------------------------------------------------------------------------------------------
-def sea_bands(layer, nz, rng, W, mask, s_of, y0, y1, Wd, n=(10, 16)):
-    """The sea between foam lines: long, straight, thin bands (2-5 px, 200 px to the full width), alternately
-    the lower sky's warm light (+6..+10 L*) and the plum shade (-7..-11), crisp (0.8 px)."""
+def sea_bands(layer, nz, rng, W, mask, s_of, y0, y1, Wd, n=(5, 8)):
+    """The sea between foam lines: a few long, straight, thin bands (2-5 px, 200 px to the full width),
+    alternately the lower sky's light (+5..+7 L*) and the plum shade (-6..-8), crisp (0.8 px)."""
     for _ in range(int(rng.integers(*n))):
         y = rng.uniform(y0 + 2, y1 - 2)
         s = float(s_of(y))
         run = rng.uniform(200, Wd * 1.1)
         x = rng.uniform(-100, Wd - run + 100)
         light = rng.random() < 0.5
-        col = mark_colour(W, s, rng.uniform(6, 10)) if light else \
-            with_L(mix(W['w_plum'], base_of(W, s), 0.4), float(lab(base_of(W, s))[0]) - rng.uniform(7, 11))
+        col = mark_colour(W, s, rng.uniform(5, 7)) if light else \
+            with_L(mix(W['w_plum'], base_of(W, s), 0.4), float(lab(base_of(W, s))[0]) - rng.uniform(6, 8))
         chisel(layer, nz, rng, x, x + run, y, rng.uniform(2.0, 5.0) * lerp(0.6, 1.0, float(np.clip(s, 0, 1))), col,
                op=rng.uniform(0.7, 0.85), soft=0.8, dry=0.3, bdepth=0.0, cj=0.004, rag=0.3, lens=0.25,
                slope=rng.normal(0, 0.0015))
@@ -833,19 +875,22 @@ def sea_bands(layer, nz, rng, W, mask, s_of, y0, y1, Wd, n=(10, 16)):
 
 def foam_line(cv, mask, W, nz, rng, curve, s, hmax, Wd, swell, warm_x=220.0, curls=0):
     """One foam line (a breaking wave) along curve(x):
-    P1 the wave face: a soft darker band just under the foam (1.7 x hmax tall, -8 L*, blur 2 px);
-    P2 the foam body: MANY THIN marks (1.4-3.5 px, 10-60 px long) grouped in segments 30-150 px along the
-       line with gaps (55-95 % covered where the swell breaks), stacked 2-4 rows from a crisp top down to a
-       flat bottom; the sky-lit colour (+10..+16 L* over the sea, never white), the top row the lightest;
-    P3 1-3 curls (short arcs) inside the nearest foam, a few lace dabs under it."""
+    P1 the wave face: a soft darker band just under the foam (1.6 x hmax tall, -9 L*, blur 2 px);
+    P2 the foam body: MASSES 30-160 px long with gaps (55-95 % covered where the swell breaks), each built
+       of THIN flat marks (1.4-3 px) stacked densely (row pitch 0.8 x the mark) from a flat bottom up to a
+       ragged, narrower top (a low mound); the sky-lit colour, never white: +9 L* over the sea far .. +15
+       near, the bottom rows 3 L* darker (the foam's own shade); some rows split by a 2-6 px gap;
+    P3 a crisp lit top on 70 % of the masses (+5 L* over the body), 1-3 curls in the nearest foam, a few
+       lace dabs under it."""
     H = mask.shape[0]
     sea_L = float(lab(base_of(W, s))[0])
+    dl_body = lerp(9.0, 15.0, s)
     face = Layer(H, Wd)
     x = -20.0
     while x < Wd:
         run = rng.uniform(80, 220)
-        chisel(face, nz, rng, x, x + run, curve(x + run / 2) + 1.05 * hmax, hmax * 1.7,
-               with_L(base_of(W, s + 0.25), sea_L - 8), op=0.5, soft=0.35 * hmax * 1.7, dry=0.2, bdepth=0.0,
+        chisel(face, nz, rng, x, x + run, curve(x + run / 2) + 1.0 * hmax, hmax * 1.6,
+               with_L(base_of(W, s + 0.25), sea_L - 9), op=0.6, soft=0.35 * hmax * 1.6, dry=0.2, bdepth=0.0,
                cj=0.0, rag=0.8)
         x += run * 0.9
     face.blur(2.0).onto(cv, mask)
@@ -853,47 +898,53 @@ def foam_line(cv, mask, W, nz, rng, curve, s, hmax, Wd, swell, warm_x=220.0, cur
     n = 0
     x = rng.uniform(-30, 10)
     while x < Wd:
-        seg = rng.uniform(30, 150) * lerp(0.6, 1.0, s)
+        seg = rng.uniform(30, 160) * lerp(0.6, 1.0, s)
         sw_ = float(swell[int(np.clip(x + seg / 2 + 200, 0, len(swell) - 1))])
         if rng.random() < 0.55 + 0.4 * sw_:
-            depth = hmax * lerp(0.45, 1.15, sw_)                 # how far the foam reaches down from its top
-            yt = curve(x + seg / 2) - 0.5 * depth
-            warm = float(smooth((warm_x - x) / warm_x)) * 0.35   # the sun's side (left) a touch warmer
-            rows = max(2, int(round(depth / 2.4)))
-            for j in range(rows):                              # rows from the crisp top to the flat bottom
-                yj = yt + j * depth / rows + rng.normal(0, 0.3)
-                xj = x + rng.uniform(-0.08, 0.12) * seg
-                xe = x + seg * rng.uniform(0.75, 1.05)
-                xx_ = xj
-                while xx_ < xe:                                # each row: thin marks with small gaps (lace)
-                    ln = rng.uniform(10, 60) * lerp(0.6, 1.0, s)
-                    dl = lerp(15.0, 10.0, j / max(1, rows - 1)) * lerp(0.75, 1.0, s)
-                    c = with_L(mix(W['f_light'], W['sky_low'], warm), min(sea_L + dl, 90.0))
-                    chisel(body, nz, rng, xx_, min(xe, xx_ + ln), yj, rng.uniform(1.4, 3.2) * lerp(0.7, 1.0, s), c,
-                           op=0.93, soft=0.7, dry=0.45, bdepth=0.1, cj=0.01, t1=0.35, thin_end=0.4, rag=0.6,
-                           pressure=0.2)
+            depth = hmax * lerp(0.5, 1.2, sw_)
+            yb_ = curve(x + seg / 2) + 0.5 * depth            # the flat bottom
+            warm = float(smooth((warm_x - x) / warm_x)) * 0.35  # the sun's side (left) a touch warmer
+            base_c = mix(W['f_light'], W['sky_low'], warm)
+            mh = rng.uniform(1.4, 3.0) * lerp(0.75, 1.0, s)
+            rows = max(2, int(np.ceil(depth / (0.8 * mh))))
+            for j in range(rows):                             # j = 0 is the bottom row
+                frac = j / max(1, rows - 1)
+                inset = seg * 0.5 * frac ** 1.5 * rng.uniform(0.3, 1.0)
+                xa_ = x + inset * rng.uniform(0.3, 1.0)
+                xb_ = x + seg - inset * rng.uniform(0.3, 1.0)
+                if xb_ - xa_ < 4:
+                    continue
+                c = with_L(base_c, min(sea_L + dl_body + lerp(-3.0, 1.5, frac), 90.0))
+                parts = [(xa_, xb_)]
+                if rng.random() < 0.3 and xb_ - xa_ > 30:
+                    xm = rng.uniform(xa_ + 0.3 * (xb_ - xa_), xa_ + 0.7 * (xb_ - xa_))
+                    gp = rng.uniform(2, 6)
+                    parts = [(xa_, xm - gp / 2), (xm + gp / 2, xb_)]
+                for (pa, pb) in parts:
+                    chisel(body, nz, rng, pa, pb, yb_ - j * 0.8 * mh, mh, c, op=0.95, soft=0.7, dry=0.35, bdepth=0.08,
+                           cj=0.008, t1=0.3, thin_end=0.4, rag=0.5, pressure=0.15)
                     n += 1
-                    xx_ += ln * (1 + rng.uniform(0.05, 0.35))
-            if rng.random() < 0.7:                             # the lit top: thin, crisp, broken
-                chisel(tops, nz, rng, x + 0.1 * seg, x + 0.8 * seg, yt - 0.6, rng.uniform(1.1, 1.8),
-                       with_L(mix(W['f_top'], W['sky_horizon'], warm), min(sea_L + 19 * lerp(0.75, 1.0, s), 92.0)),
+            ytop = yb_ - (rows - 1) * 0.8 * mh - 0.5 * mh
+            if rng.random() < 0.7:                            # the lit top: thin, crisp, broken
+                chisel(tops, nz, rng, x + 0.15 * seg, x + 0.8 * seg, ytop + 0.4, rng.uniform(1.0, 1.6),
+                       with_L(mix(W['f_top'], W['sky_horizon'], warm), min(sea_L + dl_body + 5, 92.0)),
                        op=0.95, soft=0.55, dry=0.5, bdepth=0.0, cj=0.0, rag=0.3)
                 n += 1
-            for _ in range(curls if sw_ > 0.5 else 0):         # curls: short arcs inside the nearest foam
-                cx_ = rng.uniform(x + 0.1 * seg, x + 0.9 * seg)
+            for _ in range(curls if sw_ > 0.5 else 0):        # curls: short arcs inside the nearest foam
+                cx_ = rng.uniform(x + 0.15 * seg, x + 0.85 * seg)
                 th = np.linspace(rng.uniform(0.2, 0.6) * np.pi, rng.uniform(1.2, 1.6) * np.pi, 9)
                 rr = rng.uniform(3, 6)
-                pts = [(cx_ + rr * np.cos(a), yt + 0.55 * depth + 0.8 * rr * np.sin(a)) for a in th]
+                pts = [(cx_ + rr * np.cos(t_), ytop + 0.5 * depth + 0.8 * rr * np.sin(t_)) for t_ in th]
                 for (p0, p1) in zip(pts[:-1], pts[1:]):
                     if abs(p1[0] - p0[0]) > 0.5:
                         chisel(tops, nz, rng, p0[0], p1[0], p0[1], 1.2,
-                               with_L(W['f_light'], min(sea_L + 18, 90.0)), op=0.8, soft=0.6, dry=0.0,
+                               with_L(base_c, min(sea_L + dl_body + 4, 90.0)), op=0.8, soft=0.6, dry=0.0,
                                bdepth=0.0, cj=0.0, rag=0.0, slope=(p1[1] - p0[1]) / (p1[0] - p0[0]), pressure=0.0)
-            for _ in range(int(rng.integers(1, 5))):           # lace dabs under the foam
+            for _ in range(int(rng.integers(1, 5))):          # lace dabs under the foam
                 lx = rng.uniform(x, x + seg)
-                chisel(body, nz, rng, lx, lx + rng.uniform(3, 9), yt + depth * rng.uniform(1.0, 1.5),
-                       rng.uniform(1.0, 2.0), with_L(W['f_light'], min(sea_L + 9, 90.0)), op=0.6, soft=0.7, dry=0.3,
-                       bdepth=0.0, cj=0.0, rag=0.3)
+                chisel(body, nz, rng, lx, lx + rng.uniform(3, 9), yb_ + rng.uniform(2, 0.8 * depth + 3),
+                       rng.uniform(1.0, 2.0), with_L(base_c, min(sea_L + 0.6 * dl_body, 90.0)), op=0.6, soft=0.7,
+                       dry=0.3, bdepth=0.0, cj=0.0, rag=0.3)
         x += seg * rng.uniform(1.04, 1.3)
     body.blur(0.4).onto(cv, mask)
     tops.onto(cv, mask)
@@ -1165,7 +1216,7 @@ def e5_wet(seed, W):
         reflect_shape(cv, left, rshape.astype(np.float32), by, reflect(stone, body, k=0.2, dL=2), 0.55)
         Layer(H, Wd).fill(shift(stone, dL=-10), ndi.gaussian_filter(
             ((np.abs(xx - bx) < brx * 0.85) & (np.abs(yy - by) < 1.6)).astype(np.float32), (0.6, 2)) * 0.6).onto(cv, left)
-        rock(cv, xx, yy, bx, by, brx, bry, stone, rng=rr)
+        rock(cv, xx, yy, bx, by, brx, bry, stone, W, rng=rr)
     r2 = g('edges')                                     # thin water-edge lines (light; a few dark), tapered
     L2 = Layer(H, Wd)
     for i in range(8):
@@ -1180,7 +1231,7 @@ def e5_wet(seed, W):
     wd = H - 40 + 6 * np.sin(xx / 61.0) + 3 * np.sin(xx / 19.0)
     soft_e = lerp(0.8, 3.5, field(g('wd'), H, Wd, 60, 120))
     dry_m = smooth((yy - wd) / (2 * soft_e) + 0.5) * left
-    dry_c = shift(W['sand'], dL=-2)
+    dry_c = W['sand_dry']
     cv[:] = cv * (1 - dry_m[..., None]) + dry_c * dry_m[..., None]
     gn = ndi.gaussian_filter(g('sandgrain').standard_normal((H, Wd)), 0.6)
     cv[:] = np.clip(cv * (1 + 0.014 * gn / (gn.std() + 1e-6) * dry_m)[..., None], 0, 1)
@@ -1188,7 +1239,7 @@ def e5_wet(seed, W):
     for _ in range(80):
         x, y = int(sp.uniform(0, half - 2)), int(sp.uniform(H - 36, H))
         if dry_m[y, x] > 0.8:
-            cv[y, x:x + 2] = shift(W['sand'], dL=float(sp.choice([-14, 10])))
+            cv[y, x:x + 2] = shift(W['sand_dry'], dL=float(sp.choice([-14, 10])))
     # --- wet paving (right half) ------------------------------------------------------------------
     right = (xx >= half).astype(np.float32)
     pbody = W['paving_wet']
@@ -1205,7 +1256,7 @@ def e5_wet(seed, W):
         J.a[yj:yj + 2, half:] = np.maximum(J.a[yj:yj + 2, half:], lerp(0.1, 0.5, yj / H))
     J.rgb[:] = shift(pbody, dL=-12) * J.a[..., None]
     J.blur(0.5).onto(cv, right)
-    env = np.exp(-0.5 * (((xx - 830) / 150.0) ** 2 + ((yy - 228) / 30.0) ** 2))
+    env = np.exp(-0.5 * (((xx - 730) / 150.0) ** 2 + ((yy - 236) / 28.0) ** 2))
     pud = (field(g('pud'), H, Wd, 22, 70) * 0.55 + env > 0.78).astype(np.float32) * right
     pud = ndi.gaussian_filter(ndi.binary_opening(pud > 0.5, iterations=2).astype(np.float32), 0.6)
     puddle(cv, right, W, seed, 'e5pud', pud, pbody)
@@ -1245,7 +1296,7 @@ def e6_foam(seed, W):
     bands.blur(0.4).onto(cv, sea)
     r = g('foam')
     n = 0
-    for i, (y0, hmax, curls) in enumerate([(48, 3.5, 0), (88, 6.0, 0), (shore - 9, 9.0, 2)]):
+    for i, (y0, hmax, curls) in enumerate([(46, 4.0, 0), (88, 7.0, 0), (shore - 10, 12.0, 2)]):
         s = float(s_of(y0))
 
         def curve(x, y0=y0, i=i, s=s):
@@ -1257,7 +1308,7 @@ def e6_foam(seed, W):
     sw.blur(0.5).onto(cv, 1 - sea)
     wd = H - 26 + 5 * np.sin(xx / 70.0) + 2 * np.sin(xx / 23.0)   # the wet/dry edge, the dry sand matte
     dry_m = smooth((yy - wd) / 3.0 + 0.5)
-    cv[:] = cv * (1 - dry_m[..., None]) + shift(W['sand'], dL=-2) * dry_m[..., None]
+    cv[:] = cv * (1 - dry_m[..., None]) + W['sand_dry'] * dry_m[..., None]
     return cv, {'foam': (n, 0)}
 
 
