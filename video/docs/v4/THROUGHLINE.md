@@ -13,8 +13,9 @@ G2 take sets the clock; screen spots are G3's to set (px at 1080 x 1920). FL = `
    title.
 2. **Thread: the heat, drawn as one warm glow** (an ember-orange light about a fist on screen, warming to gold when it
    gets its boost), on screen from ~0.4 s (frame 0's "ding"). **Home spot: the one warm window** in the snowy street
-   (the radiator under its sill), in the lower middle of the frame just above the caption band, where every B match
-   puts it. **It reacts at the end of each cause beat:** it lights at the pipe's far end, runs under the snow into the
+   (the radiator under its sill), in the read zone below the caption band (`docs/look/LAYOUT.md` §1: the band is
+   y 290-600, the stage y 600-1250), on the subject axis (x 380-700), where every B match puts it; G3 sets the exact
+   spot. **It reacts at the end of each cause beat:** it lights at the pipe's far end, runs under the snow into the
    one window and ripples across the city's windows (L1); glows orange-hot in the chips (L2); becomes the forty
    kettles' steam (L3) and hangs round the empty mug (L4); rises with the steam, while on the Earth's curve every other
    plume fades and Helsinki's stays (L5); bends down into the pipe under the snow (L6); turns into warm water (L7);
@@ -34,13 +35,14 @@ G2 take sets the clock; screen spots are G3's to set (px at 1080 x 1920). FL = `
    Helsinki. Entered by C (the rise, the film's one big move, DIRECTION rule 7), left by A (the push down into
    Helsinki's glow). A designed view: generic plumes, no country singled out (FL 7.1 is one man's view; FL 8.2 lists
    the exceptions).
-5. **The one "you": POV only.** Your gloved hand and your phone in the snowy street at L13, a chat bubble popping. No
-   strangers' backs in any foreground: the city's people stay small silhouettes in lit windows, in the mid and far
+5. **The one "you": POV only.** Your gloved hand and your phone in the snowy street at L13, cut by the bottom edge
+   (`LAYOUT.md` §1, the "you" row), a chat bubble popping. No strangers' backs in any foreground: the city's people stay small silhouettes in lit windows, in the mid and far
    ground. No one fetches the mug (L4).
 6. **Pip** (hidden on purpose, owner 2026-10-28; tier B, at most 1 % of the frame, drawn new; never a join's carrier,
-   never on the eye path; none in the closes, the cutaways, the shelter or on the curve, none on the cover): on a snowy
-   balcony two floors above the one window in frame 0's wide view, off the glow's path, and in one of the lit windows
-   of the L9 crane. G3 plans the exact spots; W1 names them.
+   never on the eye path; none in the closes, the cutaways, the shelter or on the curve, none on the cover; never in
+   the caption band or a right rail): on a snowy balcony of the next block, at the one window's height in frame 0's
+   wide view, off the glow's path, and in one of the lit windows of the L9 crane. G3 plans the exact spots; W1 names
+   them.
 7. **Truth in the picture:** the plant is a pale pencil plan with no name and no real site, never a finished building
    (FL 6.7); the cabinet is a generic AI rack with no logo, about a person's height (its height isn't checked: FL 2.2);
    Uspenski is the red-brick cathedral with gold domes, never the white Helsinki Cathedral (FL 6.10); the shelter's
@@ -98,7 +100,8 @@ for it. Frame 0's harbour and red-brick cathedral already say "Helsinki" to anyo
 2. **The comparison shot** is a designed view (generic plumes on the curve, no countries named) and must feel great
    (DIRECTION rule 7): the rise ~1.5-2.5 s, then a hold on the curve while the plumes fade and Helsinki's glow stays.
 3. **The cathedral and the plant's plan share the harbour view:** the cathedral on its real rock; the plan at the
-   city's edge, never on a real landmark spot (the site isn't public).
+   city's edge, never on a real landmark spot (the site isn't public). Both stay below the caption band (the domes'
+   tops at y >= 600, `LAYOUT.md` §1), with the band's flat sky behind frame 0's first caption.
 4. **The kettles:** forty, in rows, small enough to read as a crowd around one cabinet, with the "≈ 40" tag; the
    kettle is 3 kW in the post's text.
 5. **The L9 chimney is optional and unnamed;** if the owner wants the coal voiced (`script/script_g1.md`, notes), it
