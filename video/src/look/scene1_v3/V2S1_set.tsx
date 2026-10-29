@@ -77,14 +77,11 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
       {/* sky things: the hero cloud (upper right, 2 px/s) + one thin bar (fixed: the sky never floats) */}
       {/* (the look test's cloud switch: lane N's hero cumulus in the hero cloud's spot, and no bar (the one cloud; the
           bar's 9 px/s is over N7's 2-6); the sky's mottle, its own seed, no float) */}
-      <S1SkyThings />
+      {/* (scene 1 still v3: the sky things are V3_sky's, in screen px: the sky never shifts with the world) */}
       {/* the plane branch in the top-left gutter: a NEAR twig (the full float) */}
       {/* (the look test's texture: none on the spray: the wind turns its branch, a rotated group, which a filter would
           soften; on a spray of small leaves the mottle would not show) */}
-      <S1Plane plane={S1_PLANE.near} texture={false}>
-        {/* (the look test's foliage switch: lane N's London-plane leaf spray; off, v2's twig) */}
-        <SpraySlot sw={sw} fallback={<S1PlaneBranch />} />
-      </S1Plane>
+      {/* (scene 1 still v3: the near leaf spray is drawn in screen px by V3S1, outside the shifted world: V3Spray) */}
       {/* the west gap: far roofs + SUN0 (+4), the calm tower (+3), the road bridge, its bus and birds (+2); the one far
           jogger seen through the bridge's arch rides the bridge's plane (its clip is the arch) */}
       <S1WestGap />
@@ -169,5 +166,17 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
       {pip}
     </S1Plane>
   </CanalCast>
+  );
+};
+
+/** (scene 1 still v3) the near leaf spray in the top-left gutter, in SCREEN px (the near plane's float share). */
+export const V3Spray: React.FC = () => {
+  const sw = useSwitches();
+  return (
+    <Env>
+      <S1Plane plane={S1_PLANE.near} texture={false}>
+        <SpraySlot sw={sw} fallback={<S1PlaneBranch />} />
+      </S1Plane>
+    </Env>
   );
 };

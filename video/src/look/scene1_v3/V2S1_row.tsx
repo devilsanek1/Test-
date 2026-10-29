@@ -293,3 +293,46 @@ export const S1HerBehindDoor: React.FC = () => {
     </Tier>
   );
 };
+
+// ---------------------------------------------------------------- (scene 1, still v3) her alone, near the camera
+
+/** Her alone on OUR landing (scene 1 still v3: V3_layout V3_HER): the same drawing as on the towpath (the long belted
+ *  teal coat, the low bun, the cream tote, the desk plant under her arm), walking west in rear 3/4, no row. Lit and
+ *  shaded as S1Row lights her: the subject's form shade (the side away from the low western sun, lane E's -22 L*) and
+ *  the rim on her coat's key edge. Tier A. */
+export const V3Her: React.FC<{x: number; y: number; h: number; step: number; turn?: number}> = ({x: hx, y: feetY, h, step, turn = 0}) => {
+  const sw = useSwitches();
+  const vals = sw.lineOff ? rowTones() : null;
+  const herSp = vals ? herSpec(CM.hero, {leaf: vals.herLeaf, values: vals.her}) : herSpec(CM.hero);
+  const common = {seed: 's1row/her', spec: herSp, x: hx, y: feetY, h, step, turn, inkPx: HER_INK};
+  const herFig = <RowFigure {...common} partsFilter={vals ? notTote : undefined} head={vals ? {shade: vals.heads.get(HER.hairColor ?? CM.anchor)?.shade} : undefined} />;
+  const herMask = vals ? <RowFigure {...common} partsFilter={notTote} holes={HEAD_PARTS} /> : herFig;
+  const toteFig = vals ? <RowFigure {...common} partsFilter={onlyTote} /> : null;
+  const sc0 = h / FIG_H;
+  const herC: [number, number] = [hx, feetY - h / 2];
+  const herSize: [number, number] = vals ? [h * COAT_W, h] : [h * 0.36, h];
+  const coatD = figParts(herSpec(CM.hero), {step: Math.round(step * 100) / 100, stride: 1, turn: Math.round(turn * 50) / 50})
+    .filter((q) => q.d && ['coat', 'armN', 'collar'].includes(q.k))
+    .map((q) => q.d)
+    .join('');
+  const coatEl = coatD ? (
+    <XG m={mat.compose(mat.translate(hx, feetY), mat.scale(sc0, sc0))}>
+      <path d={coatD} fill="#FFFFFF" />
+    </XG>
+  ) : (
+    herFig
+  );
+  const herShade = sw.shadeTier ? {strength: subjectStrength(CM.hero, CM.shadeCool), base: CM.shadeCool} : {};
+  const band = vals ? {frac: SHADE_FRAC} : {};
+  return (
+    <Tier tier="subject">
+      <Look ink={!sw.lineOff}>
+        {herFig}
+        <FormShade of={herMask} c={herC} size={herSize} {...band} {...herShade} />
+        {toteFig}
+        {toteFig && vals ? <FormShade of={toteFig} c={[hx + 21.5 * sc0, feetY - 82.5 * sc0]} size={[20.8 * sc0, 24 * sc0]} frac={0.35} strength={vals.tote.strength} base={vals.tote.base} /> : null}
+      </Look>
+      <Rim of={coatEl} c={[hx, feetY - h * 0.45]} size={[h * 0.34, h * 0.6]} width={3.5 * (h / 170)} cover={0.35} />
+    </Tier>
+  );
+};
