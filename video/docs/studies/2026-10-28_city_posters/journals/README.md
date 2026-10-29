@@ -10,8 +10,8 @@
   at 02:40); collector C4 on National Geographic and Smithsonian (`parts/corpus_C4.csv`).
 - Dropped, to stay lean after the limit: Bloomberg, Fortune, The Washington Post, CNN and NPR (the feeds' Economist,
   FT, New York Times and Guardian cover the same ground).
-- Next, exactly: (1) when C4 ends, `journals.py merge`; (2) triage the search rows (the same brief, rows with
-  summaries) -> `parts/triage_search.csv`; (3) `journals.py select 250` then `journals.py sample`, commit; (4) scoring
+- Next, exactly: (1) when C4 ends, `journals.py merge`; (2) the triage is done for the feeds (1,113; 84 with t_fit
+  >= 6, 22 with WOW 2); search rows skip it; (3) `journals.py select` then `journals.py sample`, commit; (4) scoring
   (section 5): a first scorer on `stage2_ids.txt` -> `scores.csv`, a blind second scorer on `blind_sample_ids.txt` ->
   `scores_blind.csv`, an auditor on the search rows whose id ends in 0 -> `audit.csv` (at most 2 agents at once; a
   partial file is resumed from the first missing id); (5) `journals.py check` + `agreement` into section 6; (6) the
@@ -194,11 +194,12 @@ thing, its telling shape, and the "ad or news?" check (`TOPIC_CRITERIA.md`: hear
 line sound like a commercial?). A candidate is an idea, not a fact lock.
 
 ## 5. Reliability, clustering and outputs
-- **Two stages (for ~1,350 rows, with a usage limit near):** a quick triage of every row (`t_fit` 0-10 and `t_wow`
-  0-2 from the headline, section, tags and summary: `parts/triage_*.csv`, merged in `triage.csv`); then the full rubric
-  on stage 2 (`stage2_ids.txt`): the top 250 by the triage plus a seeded random 10 % of the rest as a control, so the
-  clusters are not only what the triage favoured and the control measures what the triage misses. Base rates come from
-  the triage over every row, corrected by the control.
+- **Two stages (for ~1,250 rows, with a usage limit near):** a quick triage of every feed row (`t_fit` 0-10 and
+  `t_wow` 0-2 from the headline, section and tags: `parts/triage_feeds.csv`, one agent); then the full rubric on stage 2
+  (`stage2_ids.txt`, roles in `triage.csv`): every search row (already a sample, with summaries), the feed rows with
+  `t_fit` >= 5 or WOW 2, and a seeded random 10 % of the other feed rows as a control, so the clusters are not only what
+  the triage favoured and the control measures what it misses. Base rates for the feeds come from the triage over every
+  feed row, corrected by the control; for the search rows, from stratum A.
 - **The blind second scorer** re-scores a 20 % seeded random sample of stage 2 (stratified by source; ids in
   `blind_sample_ids.txt`) without seeing the first scores. Reported: on fit, Spearman rho, the mean absolute difference
   (MAD) and the share within +-1; on each sub-score, exact and +-1 agreement and the quadratic weighted kappa; on the
