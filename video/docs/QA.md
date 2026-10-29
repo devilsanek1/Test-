@@ -16,11 +16,14 @@ questions about a render, and the **QA gate** at the end of this page turns the 
 4. **Do the cuts sit on the music?** `beatsync.py`: cut offsets from the beat grid, and a tempo map that bends the
    music so its beats land on the cuts (`audio/tempo_map_proposal.json`).
 
-`run_all.sh <CompId>` runs everything on a fresh half-scale render and writes one report folder.
+`run_all.sh <CompId>` runs everything on a fresh half-scale render and writes one report folder. It and `report.py` are
+v1's per-scene gate runner, archived since 2026-10-29 in `archive/v1/scripts/qa/`: they run at the
+`v1-final` commit (`76c166c1`).
 
 ## Quick start
 
 ```bash
+# run_all.sh (the next 3 lines) is v1's, archived in archive/v1/scripts/qa/: run it at the v1-final commit (76c166c1)
 scripts/qa/run_all.sh S05                         # one scene: render all its frames at 0.5x, check, report, gate
 scripts/qa/run_all.sh Main                        # the film (+ beat sync); ~5 min on the shared box
 scripts/qa/run_all.sh KitDemo --out=out/qa/kit    # any composition (dev comps: scenes = detected cuts)
@@ -36,7 +39,7 @@ are measured the same way. All measurements are in **canvas px of a 1080-wide fr
 (half-scale renders, reference 2 at 720x1280, reference 1 at 1080x1350). The machine is shared: renders default to
 `--scale=0.5 --concurrency=2`; each Python tool uses one core.
 
-`run_all.sh` output (`out/qa/<CompId>-<timestamp>/` or `--out`):
+`run_all.sh` output (v1's, archived in `archive/v1/scripts/qa/`; `out/qa/<CompId>-<timestamp>/` or `--out`):
 
 | file | what |
 |---|---|
@@ -56,6 +59,7 @@ Options: `--t0= --t1=` (a time range), `--keep-frames` (keep the PNGs in `<out>/
 python3 scripts/qa/deadframes.py <frames_dir_or_video> [--fps 30] [--scenes src/data/scenes.json|auto|cuts|none]
        [--t0 0] [--only S05] [--out dir] [--caption-band 280,600] [--dead-limit 0.40] [--allow scripts/qa/holds.json]
 ```
+`--scenes auto` read v1's `src/data/scenes.json`, archived since 2026-10-29: pass `--scenes src/<film>/film/scenes.json`.
 
 **How a frame is measured** (the user's rule: *a frame is dead if nothing on screen moves*, and *camera drift alone
 does NOT count as life*):
@@ -81,8 +85,9 @@ does NOT count as life*):
    slow slide). A one-off pop followed by stillness, idle jitter or a 10-30 px/s drift do not qualify.
 6. **Dead run** = consecutive dead frames inside one scene; **flagged** when longer than **0.40 s** (12 frames), the
    reference's own maximum, unless allow-listed or inside a transition window (camera-continuous, push-through,
-   foreground-wipe and un-build windows from `src/data/scenes.json`, mirroring `src/lib/Film.tsx`: a transition counts
-   as one long event, as in motion_spec 9). Dead frames inside a transition are drawn blue ("excused").
+   foreground-wipe and un-build windows from `src/data/scenes.json` (v1's, archived since 2026-10-29: pass
+   `--scenes src/<film>/film/scenes.json`), mirroring `src/lib/Film.tsx`: a transition counts as one long event, as in
+   motion_spec 9). Dead frames inside a transition are drawn blue ("excused").
 7. **Events** = space-time change blobs: each frame, changed pixels within 12 px of each other form a blob; a blob
    continues the chain whose footprint of the last 2 frames it overlaps (within 4 px), otherwise it starts a new chain;
    chains never merge (a new pop next to an ongoing motion is its own event; a walk cycle's 1-frame pause is not).
@@ -104,6 +109,8 @@ So 4 events/s, no dead run and every gap under a second scores 9.1; one 1-second
 **Scenes.** `--scenes auto` (default) uses `src/data/scenes.json` when the clip is the film (or `--t0` places a
 per-scene composition on the film timeline), otherwise the cuts detected in the pixels (edge newness after camera
 compensation >= 0.5 and >= 12 % of the frame changed, merged within 0.4 s; segments under 1 s join a neighbour).
+`--scenes auto` read v1's `src/data/scenes.json`, archived since 2026-10-29: pass `--scenes src/<film>/film/scenes.json`
+(deadframes, framecheck).
 `--only S05 --t0 23.671` scores one scene composition. Reference scene lists live in `scripts/qa/calib/`.
 
 **Allow-list** (`scripts/qa/holds.json`, read by run_all): deliberate holds, e.g. the beat after "switched themselves
@@ -136,7 +143,7 @@ python3 scripts/qa/framecheck.py <frames_dir_or_video> [--fps 30] [--out dir] [-
 | flash | ERROR | 1 or 2 frames that differ from both neighbours (>= 2 % of pixels, raw difference > 40) while the neighbours agree (difference <= 35 % of that), not at a cut |
 | caption contrast | ERROR > 5 %, WARN > 2 % | caption glyphs found by colour (ink `#2B1B0F` or white) and shape (stroke 0.025-0.22 em, size, on a text line with neighbours, not a hollow rectangle, not a counter inside a letter, not inside a highlight box); background = a ring 0.3 em around the glyphs; share of background pixels below 3:1 WCAG contrast against the glyph colour (the rule of `scripts/capcheck.py`) |
 | caption busy | WARN | edge density of that background > 6 % (detail behind the words) |
-| caption missing | ERROR | a page of `src/data/captions.json` is settled on screen (s + 0.3 .. e - 0.1) but no legible glyphs are found for >= 6 frames: merged with same-coloured art, covered, or the wrong tone |
+| caption missing | ERROR | a page of the film's captions (`--captions <file>`) is settled on screen (s + 0.3 .. e - 0.1) but no legible glyphs are found for >= 6 frames: merged with same-coloured art, covered, or the wrong tone |
 | ui-zone | WARN | platform UI zones (top 180 px, bottom 400 px, right rail x > 950 for y 900-1500): a NEW element (camera-compensated change blob >= 1,500 px^2, >= 60 % inside the zone), one line per zone with its stretches; dense edges in the right rail for >= 0.5 s |
 
 For the film and scene compositions the expected caption tone comes from `captionTone` in `scenes.json` (unknown
@@ -176,6 +183,8 @@ python3 scripts/qa/beatsync.py --fit-tempo [--anchor auto|beat|downbeat] [--max-
   foreground wipe, the end of an un-build), **quantised to the first frame that shows the new scene**
   (`ceil(start x 30) / 30`, up to 33 ms after the nominal start; `--no-quantize` to turn off). `frames:` runs the cut
   detector of deadframes on rendered frames; `json:` takes a `deadframes.json` (its detected cuts) or a list.
+  `--cuts scenes` read v1's `src/data/scenes.json`, archived since 2026-10-29: pass `--cuts json:...` or
+  `--cuts scenes:<path>`.
 - **Warp.** If the cut list is still on the v1 voice timeline (70.69 s) and the music on v2 (78 s), `--warp auto` maps
   it through `assets/timewarp_v1_to_v2.json`. Today scenes.json is already v2, so no warp.
 - **Grid.** From the MIDI's tempo map and time signatures (95.38 BPM, bars of 4/4, 5/4 and 6/4: 124 beats, 28 bars,
@@ -212,7 +221,7 @@ take the `--write-midi` file). Audio-domain renderers (`audio/tools/bedkit.Grid`
 
 ## 5. The QA gate
 
-A composition passes when **all** of these hold (`report.py`, exit code 0):
+A composition passes when **all** of these hold (`report.py`, exit code 0; v1's, archived in `archive/v1/scripts/qa/`):
 
 1. **Life:** every scene has a life score **>= 8/10** and **no dead run over 0.40 s** unless allow-listed in
    `scripts/qa/holds.json` (with a why).
@@ -222,7 +231,8 @@ A composition passes when **all** of these hold (`report.py`, exit code 0):
    has been applied** to the bed. Until the sound stream re-renders with `tempo_map_proposal.json`, this check fails
    and REPORT.md shows what the fit would achieve.
 
-Scene agents: run `scripts/qa/run_all.sh SNN` before calling a scene done, read `REPORT.md`, open `deadframes.png` and
+Scene agents: run `scripts/qa/run_all.sh SNN` (v1's, archived in `archive/v1/scripts/qa/`; at the
+`v1-final` commit (`76c166c1`)) before calling a scene done, read `REPORT.md`, open `deadframes.png` and
 `framecheck_frames.png`, and use `sheets.sh` on any flagged range.
 
 ---

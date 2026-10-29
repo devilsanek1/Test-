@@ -4,7 +4,7 @@ Catches "way too empty" before the owner sees a cut. Generic: any MP4 (any size,
 
   python3 -I scripts/qa/density.py out/v3_g5.mp4 --scenes src/v3/film/scenes.json [--only S9] [--json d.json]
   python3 -I scripts/qa/density.py assets/ref/reference.mp4 --scenes scripts/qa/calib/ref1_scenes.json  # preset ref1
-  python3 -I scripts/qa/density.py deliverables/v1/php2shell_final.mp4 --scenes src/data/scenes.json
+  python3 -I scripts/qa/density.py deliverables/v1/php2shell_final.mp4 --scenes archive/v1/src/data/scenes.json
 
 The numbers are a WARNING SIGNAL, never a quota (OWNER_PLAYBOOK, Visual style: "feeling alive is the key, not an
 object count"). Targets and their reasons: docs/look/research/density_numbers.md (measured on reference 1 and v1).

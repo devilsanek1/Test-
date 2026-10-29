@@ -16,7 +16,7 @@ doubles as the chart. A small animal sits in every shot and hops across every cu
 The rejected v2 cut was rooms, papers and big front-facing characters, in three different palettes, mostly locked off.
 
 ## 1. Shot by shot
-### 1a. v1 "php2shell" (55.4 s, 12 scenes; per-scene notes in `docs/scenes/S01-S12.md`)
+### 1a. v1 "php2shell" (55.4 s, 12 scenes; per-scene notes in `docs/v1/scenes/S01-S12.md`)
 | S | time / line | shown (shot) | camera | in -> out | what moves | Pip | full because |
 |---|---|---|---|---|---|---|---|
 | 01 | 0.00-4.72 "Governments ... on purpose," | Government Plaza, eye-level wide: 3 civic fronts, the sun as a POWER BUTTON in the gap | slow push from rest; dives into govB's door lock at 4.35-4.70 | loop-in from S12 -> match cut on the lock | screens go CRT-dark one by one, a ripple ring out of the sun, the skyline goes dark, shutters slam ON "shut"/"down", "back soon" signs, pigeons, the crowd turns, phones go up (§3) | on a bollard: flinch 0.12, hop 2.9 | 3 rows of back-view people; a hood + a cap cut by the bottom; a branch top right; a skyline |

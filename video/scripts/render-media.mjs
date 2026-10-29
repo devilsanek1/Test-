@@ -41,7 +41,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import {renderMedia, selectComposition} from '@remotion/renderer';
-import {BROWSER_EXECUTABLE, chromiumOptionsFromEnv, getBundle, openRenderBrowser, parseOpts, rel, resolveEntry} from './render/lib.mjs';
+import {chromiumOptionsFromEnv, getBundle, openRenderBrowser, parseOpts, rel, resolveEntry} from './render/lib.mjs';
 
 const [compId, outArg, ...rest] = process.argv.slice(2);
 if (!compId || !outArg) {
@@ -111,7 +111,8 @@ try {
       inputProps,
       scale,
       concurrency,
-      ...(process.env.RM_OWN_BROWSER === '1' ? {browserExecutable: BROWSER_EXECUTABLE} : {puppeteerInstance: browser, browserExecutable: null}),
+      puppeteerInstance: browser,
+      browserExecutable: null,
       chromiumOptions,
       logLevel: 'error',
       timeoutInMilliseconds: opt.timeout ? Number(opt.timeout) : 120000,

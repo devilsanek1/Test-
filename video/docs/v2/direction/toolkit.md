@@ -17,7 +17,8 @@ are tools) and "people small and simple, like reference 1". Every item below is 
 
 ## 1. How a film is wired
 
-**v1 (the posted film, 55.37 s, 30 fps).** `src/entry-film.ts` -> `FilmRoot` registers `Main` (+ one composition per
+**v1 (the posted film, 55.37 s, 30 fps; its code archived in `archive/v1/` since 2026-10-29).** `src/entry-film.ts` ->
+`FilmRoot` registers `Main` (+ one composition per
 scene id). `Main` = `<Film scenes components wipers captions/>` (`src/lib/Film.tsx`, 900 lines: the sequencer).
 - `src/data/scenes.json`: `{id, start, end, transitionIn, transitionOut?, captionTone, note}` in voice seconds. v1: 12
   scenes (2.1-10.4 s); 5 `cut`, 5 `matchcut` (both scenes put the shared object at the same screen spot, each with its
@@ -50,7 +51,7 @@ v3 lesson: the last scene drops its sky slab while it un-builds (`useExit() > 0`
 
 ## 2. Sets and props
 
-**TOOL generators (palette-driven; `src/lib/cine`, CINE.md; seen on the sheet).** Dense out of the box.
+**TOOL generators (palette-driven; `src/lib/cine`, CINE_KIT.md; seen on the sheet).** Dense out of the box.
 
 | piece | what it shows | density / life out of the box | serves v2 for |
 |---|---|---|---|
@@ -69,7 +70,8 @@ v3 lesson: the last scene drops its sky slab while it un-builds (`useExit() > 0`
 for whole kit components), `eyeLevel()` (the lens at 1.1 x a person's height). Hero-type props (laptop, server, paper)
 are borderline: fine as structure, but give the film's hero objects their own design.
 
-**ASSET: v1 shared sets (`src/scenes/shared/sets/**`, SHARED_SETS.md; top two rows of the sheet).** All PHP-story
+**ASSET: v1 shared sets (`src/scenes/shared/sets/**`, archived in `archive/v1/`; v1/SHARED_SETS.md; top two rows
+of the sheet).** All PHP-story
 locations (website buildings with browser chrome, locks, elephant plaques), golden day, mint/clay palette. Each
 renders 115-150 ms/frame and ships 2-3 walkers, 1-2 furniture props, an in-band edge figure, ground marks, multiplane
 `wrap` layers, `outAt` un-build, `<Tod>` relight. Study for: GovernmentPlaza (a colossal 4-building civic wall cut by
@@ -82,7 +84,8 @@ walkers on anchors walking to the VP, `walkerAt`; `Furniture`; `EdgeFigure`), `g
 paving lines + specks, never a tile grid; `Foreground` presets in the visible band), `rows.tsx` (`perspRowLayout`:
 receding rows batched in screen space, LOD tiers).
 
-**ASSET: v1 shared props (`src/scenes/shared/props/**`, SHARED_PROPS.md).** Lock, Bit (ink beetle), BrowserChrome +
+**ASSET: v1 shared props (`src/scenes/shared/props/**`, archived in `archive/v1/`; v1/SHARED_PROPS.md).**
+Lock, Bit (ink beetle), BrowserChrome +
 LoadingRing, ElephantPlaque / Stamp, RollerShutter + padlock + BackSoonTag, SunMorphs (PowerGlyph, SunPie, SunPress),
 RailBoard, LeakSheet, Envelope, MailSlot, Calendar, Bollard, Tram, MakersCart, LabelTag (labels in the world), FixSign,
 CounterBoard (tallies), StickyNote, CheckBoxTag; figure presets `Citizen` (40-55 px, legs), `EdgeOnlooker` (cropped
@@ -186,12 +189,14 @@ python3 scripts/qa/framecheck.py out/v2r.mp4 --fps 60 --scenes <film>/scenes.jso
 python3 scripts/camspeed.py --frames <dir of every frame> --fps 60 --limit 7.5   # camera speed + velocity steps
 python3 -I scripts/qa/colour_meter.py f*.png --hero '#....' --pop '#....' --band 290,600   # colour jobs per still
 python3 scripts/qa/beatsync.py --cuts json:<cuts.json> --midi <bed.mid>  # cuts vs beats
-# the toolkit sheet above:
+# the toolkit sheet above (the set preview at the top is v1's, archived in archive/v1/):
 node src/scenes/shared/sets/preview/render.mjs SetsPreview <dir> 6 --props='{"set":"plaza"}' --scale=0.36  # any set id
 node scripts/render-frames.mjs MascotSheet <dir> 0.34                  # also KitDemo 4.4, CineDemo 2.6,7.5,12.5,19.0
 ```
-`scripts/qa/run_all.sh` knows only `Main`, v1 scene ids and dev comps (call the tools on the MP4 as above);
-`scripts/strip.sh` samples 30 fps from `src/index.ts` (for 60 fps motion list every frame time in `render-frames.mjs`).
+`scripts/qa/run_all.sh` (archived in `archive/v1/`) knows only `Main`, v1 scene ids and dev comps (call the tools on
+the MP4 as above);
+`scripts/strip.sh` samples 30 fps from `src/index.ts` (archived in `archive/v1/`; for 60 fps motion list every frame
+time in `render-frames.mjs`).
 Gates (QA.md §5): life >= 8/10 per scene, no dead run > 0.40 s, no framecheck ERROR; density ev/s >= 5, gap <= 1.0 s.
 
 ## 6. Gaps: what a fresh v2 film must build new

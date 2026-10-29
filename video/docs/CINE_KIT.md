@@ -17,7 +17,7 @@ canvas coordinates (1080 x 1920 = the frame at camera rest), time-based in secon
 import {CineCamera, Layer, Sky, BigSun, EndlessCity, Monument, WallOfWindows, WipeCut, TOD, ...} from '../lib/cine';
 ```
 
-Demo: `src/dev/CineDemo.tsx` (composition `CineDemo`, 22 s): A Arcane vista (peak, the hook) -> D eye-level street
+Demo: `archive/v1/src/dev/CineDemo.tsx` (composition `CineDemo`, 22 s): A Arcane vista (peak, the hook) -> D eye-level street
 (baseline) -> B backlit monument (peak) -> C pull-back from one window (peak). Time of day only moves forward (golden,
 golden, late golden, night), the sun only sets across cuts and HOPS from shot to shot after each wiper has passed, and
 every wipe's midpoint sits on the first word of the incoming caption page. Contact sheet: `docs/cine_demo.png`.
@@ -25,6 +25,8 @@ every wipe's midpoint sits on the first word of the incoming caption page. Conta
 ![CineDemo](cine_demo.png)
 
 ```
+# v1 commands (CineDemo, archived in archive/v1/src/dev/; the last three via src/index.ts): run them at the v1-final
+# commit (76c166c1)
 scripts/sheet.sh CineDemo 0 21.9 32 out.png --cols=8                       # contact sheet (+ caption check)
 node scripts/capcheck.mjs CineDemo --t0=0 --t1=21.9 --n=110              # caption legibility
 scripts/still.sh CineDemo 0 s.png --props='{"mode":"speed"}'             # camera speed report per shot (camSpeed)

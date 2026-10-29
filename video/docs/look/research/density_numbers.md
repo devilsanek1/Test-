@@ -3,7 +3,7 @@
 Meter: `scripts/qa/density.py` (method and definitions in its docstring; in the gate: `gate_check.py --density`). Owner
 rule (OWNER_PLAYBOOK, Visual style): every frame FULL and ALIVE like reference 1 and v1; a warning signal, never a quota.
 Runs (~25 s each): `density.py assets/ref/reference.mp4 --scenes scripts/qa/calib/ref1_scenes.json` (preset ref1: motion in the card above
-its caption strip, fullness in the art panel) · `density.py deliverables/v1/php2shell_final.mp4 --scenes src/data/scenes.json`
+its caption strip, fullness in the art panel) · `density.py deliverables/v1/php2shell_final.mp4 --scenes archive/v1/src/data/scenes.json`
 · `density.py deliverables/v3/v3_g5_blocking.mp4 --scenes src/v3/film/scenes.json` (preset film: caption band 290-600 and
 the draft-label strip 1820-1920 left out). Motion on a 30 fps clock at quarter canvas res, fullness every 0.25 s at half res.
 

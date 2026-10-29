@@ -12,7 +12,7 @@ but copies nothing from the official logo: no "php" lettering, a different body 
 ears, head tuft, teddy-bear soles) and our own hand.
 
 Code: `src/lib/mascot/` (self-contained: plain SVG + React + remotion; it only imports tokens from `src/lib/theme.ts`).
-Dev sheet: `src/dev/MascotSheet.tsx` (composition `MascotSheet`, modes below).
+Dev sheet: `archive/v1/src/dev/MascotSheet.tsx` (composition `MascotSheet`, modes below).
 
 ![pose sheet](mascot_sheet.png)
 
@@ -162,7 +162,8 @@ on a transparent canvas, `docs/mascot_evidence/build_alpha.png`: 0 translucent r
 alpha). All 1,070 remaining partial-alpha non-ink pixels are 1-px anti-aliased seams touching an opaque pixel (largest
 component 20 px, no 2x2 block). Negative control `docs/mascot_evidence/control_translucent.png` (the same elephant inside
 `opacity 0.5`): 64,052 translucent-core pixels, so the test does catch fades. Re-run:
-`npx remotion still src/index.ts MascotSheet docs/mascot_evidence/build_alpha.png --frame=0 --props='{"mode":"build","alpha":true}'`.
+`npx remotion still src/index.ts MascotSheet docs/mascot_evidence/build_alpha.png --frame=0 --props='{"mode":"build","alpha":true}'`
+(a v1 command: at the `v1-final` commit (`76c166c1`)).
 
 ## 5. Size and placement guidance
 
@@ -180,6 +181,7 @@ component 20 px, no 2x2 block). Negative control `docs/mascot_evidence/control_t
 ## 6. Dev sheet
 
 ```
+# v1 commands (MascotSheet via src/index.ts): run them at the v1-final commit (76c166c1)
 npx remotion still src/index.ts MascotSheet docs/mascot_sheet.png --frame=10                       # poses + true-size variants
 npx remotion still src/index.ts MascotSheet docs/mascot_colorways.png --frame=10 --props='{"mode":"colorways"}'
 npx remotion still src/index.ts MascotSheet docs/mascot_scene.png --frame=10 --props='{"mode":"scene"}'

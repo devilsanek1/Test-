@@ -16,7 +16,9 @@ FAIL (exit 1) when, OUTSIDE the allow-listed windows, the camera runs above --li
 --min-run frames or more, or the camera speed steps by more than --dv-limit (default 2.5). Fast LOCAL motion above the
 limit is a WARN (a designed rise moves 50 % of its height in frame 1; --strict-edges makes it fail). Film transitions are allow-listed automatically (push-through runs > 100 px / frame by design): for Main
 from src/data/scenes.json, for a per-scene composition S07 its own transitionIn window at its start. Add your own with
---allow=t0-t1[,t0-t1...] (composition seconds).
+--allow=t0-t1[,t0-t1...] (composition seconds). Main / Sxx durations and windows come from v1's src/data/scenes.json
+and src/dev/registry.ts, archived since 2026-10-29 in archive/v1/src/: for v1's compositions run this at the v1-final
+commit (76c166c1).
 
   scripts/camspeed.py S07                         # the whole scene (renders every frame at --scale 0.5)
   scripts/camspeed.py Main 30 38                  # a range of the film
@@ -55,6 +57,7 @@ def spec_peak(default=18.0) -> float:
 
 def comp_duration(comp: str) -> float | None:
     """Duration (s) of a composition: Main / Sxx from scenes.json, dev compositions from src/dev/registry.ts."""
+    # both files are v1's, archived since 2026-10-29 in archive/v1/src/: None for any other film's composition
     try:
         scenes = json.load(open(os.path.join(ROOT, 'src/data/scenes.json')))
         if comp == 'Main':
@@ -76,6 +79,7 @@ def comp_duration(comp: str) -> float | None:
 
 def transition_windows(comp: str) -> list[tuple[float, float, str]]:
     """Allow-listed windows in COMPOSITION seconds (Film transitions)."""
+    # v1's scenes.json, archived since 2026-10-29 in archive/v1/src/data/: no windows for other films (pass --allow)
     try:
         scenes = json.load(open(os.path.join(ROOT, 'src/data/scenes.json')))
     except (OSError, ValueError):

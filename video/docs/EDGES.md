@@ -22,7 +22,7 @@ This pass refined all three from the two judges' round-3 notes (subtle 6.5 / 5, 
 bigger, hand-laid gestures (no jog, shelf or tab under 26-48 px); a corner left bare only where the scene has line art
 there (scene hints); keep rects, so a hero, the mascot or a lamp is never half colour, half line art; no dashed ink; and
 one decisive gesture in the phone's visible zone. `trim` / `panel` / `clean` are unchanged. Review material:
-`review/edges/loose/final/` (section 8). The user picked **`paint-subtle`** to start (22:30, `docs/BRIEF.md`: "let's start
+`review/edges/loose/final/` (section 8). The user picked **`paint-subtle`** to start (22:30, `docs/v1/BRIEF.md`: "let's start
 with subtle", it may move up to medium); the core lane made it the house default (`FILM_EDGES`) and wraps Film's scene stack
 in `<FilmEdges scene={edgeScene}>`.
 
@@ -235,7 +235,8 @@ and the scene on screen is passed:
 ```
 
 and the same around `Standalone`'s two scene blocks (the loop underlay + the scene). Then pick the look without a code change:
-`npx remotion render src/index.ts Main out.mp4 --props='{"edges":"trim"}'` or `'{"edges":{"variant":"panel","amount":0.8}}'`;
+`npx remotion render src/index.ts Main out.mp4 --props='{"edges":"trim"}'` or `'{"edges":{"variant":"panel","amount":0.8}}'`
+(v1's `Main`, at the `v1-final` commit (`76c166c1`));
 make it the house look by setting `FILM_EDGES` in `src/lib/edges/config.tsx` (e.g. `{variant: 'trim', seed: 'film', amount: 1}`
 or `{variant: 'paint-medium', seed: 'film', amount: 1}`); `--props='{"edges":"paint-loose"}'` works too.
 
@@ -437,7 +438,8 @@ Round 1 (six variants, the geometry the judges scored; code at commit f28ae81): 
 
 Tools: `review/edges/tools/render-lab.mjs` (many EdgeLab stills, one bundle), `render-clips.mjs` (clips and `bench`),
 `edgecheck.py`, `check-shapes.ts`; `review/edges/final/tools/final_sheets.py` (`grid` / `corners` / `labels`) and its job
-files (`stills.json`, `clips.json`, `bench.json`). Lab composition `EdgeLab` (`src/dev/EdgeLab.tsx`), props
+files (`stills.json`, `clips.json`, `bench.json`). Lab composition `EdgeLab` (`archive/v1/src/dev/EdgeLab.tsx`; renders
+at the `v1-final` commit (`76c166c1`)), props
 `{variant, shot: 'street' | 'monument' | 'vista', amount, seed, from, cam, margin, paper, debug, captions}`:
 
 ```bash

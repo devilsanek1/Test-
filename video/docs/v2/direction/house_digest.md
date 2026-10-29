@@ -4,8 +4,9 @@ One page for treatment writers, art directors and builders. It adds no rules: ea
 and a source disagree, the source wins; where sources disagree, the owner's newest words win (PB > CB > look docs > v1 specs).
 **Sources** (`video/docs/`): CB `CREATIVE_BRIEF.md` · PB `OWNER_PLAYBOOK.md` · PL `PIPELINE_V2.md` · CG
 `look/CINEMATIC_GUIDE.md` · CS `look/COZY_AND_SCALE.md` · LD `look/LIFE_AND_DENSITY.md` · PAL `look/PALETTE.md` +
-`palettes.json` · SB `style_bible.md` · MAS `mascot.md` · ED `EDGES.md` · MS `motion_spec.md` · SP `sound_plan.md` · PK
-`POSTING_KIT.md` · BR `BRIEF.md` (v1 cinematic direction, balance note) · G5B `G5_BLOCKING.md` §8-9 · N2/N3
+`palettes.json` · SB `v1/style_bible.md` · MAS `mascot.md` · ED `EDGES.md` · MS `v1/motion_spec.md` · SP `v1/sound_plan.md` ·
+PK
+`POSTING_KIT.md` · BR `v1/BRIEF.md` (v1 cinematic direction, balance note) · G5B `G5_BLOCKING.md` §8-9 · N2/N3
 `v2|v3/OWNER_NOTES.md` · CL `v2/CORE_LINE.md`.
 **Retired, do not apply:** SB/MS measured reference 1's polaroid CARD; the card, its bottom caption zone, the caption
 page-scroll and the 3D card flip are retired (BR "Cinematic direction": full-bleed; PB Captions: pop in place). Their ink,
@@ -195,7 +196,7 @@ stays the look"); the approved density bar `deliverables/v3/v3_g5b_pilot.mp4` (L
   ambiences only under a real vista, 20-25 dB under. Cozy holds: room tone and weather behind glass 18-24 dB under, soft
   foley; the one breach opens the filter, then near-silence (CS §3).
 - **Mix:** -14 LUFS, -1 dBTP, 48 kHz; circular music, tails and dynamics for a clean loop seam; check on phone speakers and
-  earbuds (PB; SP §4, §6). Cues from the FINAL beats (`WRAPUP.md` Sound; `audio/sfx/`, `audio/mix.py`, `audio/cues.json`).
+  earbuds (PB; SP §4, §6). Cues from the FINAL beats (`v1/WRAPUP.md` Sound; `audio/sfx/`, `audio/mix.py`, `audio/cues.json`).
 
 ## 8. Process lessons for a direct-to-final production
 - **A rejected cut restarts clean:** no sketch, the finished film directly, full creative freedom inside these rules; never

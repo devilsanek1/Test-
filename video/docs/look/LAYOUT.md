@@ -28,7 +28,7 @@ CG `look/CINEMATIC_GUIDE.md` · SB `look/STORYBOARD_STYLE.md` · LD `look/LIFE_A
 `v2/THROUGHLINE.md`, PK `v2/POSTING_KIT.md`, v3P `v3/POSTING.md`, v3CP `v3/camera_plan_g3.md` · the study
 (`studies/2026-10-28_city_posters/`): ST `STUDY.md`, CO `composition.md`, PE `perspective.md`, P1 `pro_1_depth.md`, P4
 `pro_4_colour.md` · code: `src/lib/theme.ts` (`safe`, `skyCaption`, `world`), `lib/sky.tsx`, `lib/particles.tsx`,
-`scripts/capcheck.py`, `scripts/qa/framecheck.py`. The v1-era docs (`style_bible.md`, `ENGINE.md`) are never a layout
+`scripts/capcheck.py`, `scripts/qa/framecheck.py`. The v1-era docs (`v1/style_bible.md`, `ENGINE.md`) are never a layout
 source here: their captions at the bottom and big near people are history.
 
 ## 1. The frame (9:16 zones)

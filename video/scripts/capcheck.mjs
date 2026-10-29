@@ -62,6 +62,7 @@ else if (opt.t1 !== undefined) {
   const n = Number(opt.n ?? 24);
   times = Array.from({length: n}, (_, i) => t0 + ((t1 - t0) * i) / Math.max(1, n - 1));
 } else {
+  // v1's scene list (archived since 2026-10-29 in archive/v1/src/data/): pass --times or --t0/--t1 for other films
   const scenes = JSON.parse(fs.readFileSync(path.join(root, 'src/data/scenes.json'), 'utf8'));
   if (comp === 'Main') times = sceneTimes(scenes, 0);
   else {

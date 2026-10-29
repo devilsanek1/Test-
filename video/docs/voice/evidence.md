@@ -9,9 +9,9 @@ are ignored.
 
 | Take (file) | Paste it came from | Length (expected) | Result |
 |---|---|---|---|
-| v1 `assets/vo.mp3` | owner's annotated script (`docs/script/original_annotated.md`) | 70.6 s (~70) | clean, word for word |
+| v1 `assets/vo.mp3` | owner's annotated script (`docs/v1/script/original_annotated.md`) | 70.6 s (~70) | clean, word for word |
 | v1 `assets/vo_v2_eleven.wav` | same paste, regenerated | 77.8 s | clean |
-| v1 `assets/vo_v3_draft_take.wav` | `docs/script/final_script_elevenlabs.txt` @ ece6b55 | 54.6 s | clean |
+| v1 `assets/vo_v3_draft_take.wav` | `docs/v1/script/final_script_elevenlabs.txt` @ ece6b55 | 54.6 s | clean |
 | v1 `assets/vo_v3_final.wav` | same file @ 0f1f845 | 55.4 s | clean |
 | v3 `take1_raw_eleven_v4.wav` | v3 paste @ 4693e6f (notes, H2/H3 block, quoted cues) | 55.9 s (43 + alternates) | 3 read-alouds |
 | v3 `take2_raw_eleven_v4.wav` (commit 1ca72e7 calls it "take 3") | v3 paste @ ac73038 | 45.0 s (43) | opening repeat |

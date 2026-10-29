@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """calibrate.py: run deadframes (and framecheck) on the two reference videos and compare with the numbers the
-analysis streams measured by hand (docs/motion_spec.md section 9, docs/style_bible_ref2.md section 6.4).
+analysis streams measured by hand (docs/v1/motion_spec.md section 9, docs/v1/style_bible_ref2.md section 6.4).
 
   python3 scripts/qa/calibrate.py [--out scripts/qa/calib] [--jobs 2] [--no-framecheck] [-- extra deadframes args]
 
@@ -25,11 +25,11 @@ REFS = {
     'ref1': dict(video='assets/ref/reference.mp4', scenes='scripts/qa/calib/ref1_scenes.json', band='990,1270',
                  spec={'events_per_s': 5.9, 'median_gap_f': 4, 'longest_event_gap_s': 0.97, 'dead_pct': 3.6, 'longest_dead_s': 0.2,
                        'longest_dead_3k_s': 0.4},
-                 src='docs/motion_spec.md 9: medium events 5.9/s, median gap 4 f, longest gap outside transitions 0.97 s; '
+                 src='docs/v1/motion_spec.md 9: medium events 5.9/s, median gap 4 f, longest gap outside transitions 0.97 s; '
                      '3.6 % of frames < 0.1 % pixels changed; longest near-static run 0.2 s (< 1,000 px) / 0.4 s (< 3,000 px)'),
     'ref2': dict(video='assets/ref2/reference2.mp4', scenes='scripts/qa/calib/ref2_scenes.json', band='280,600',
                  spec={'events_per_s': 3.6, 'dead_pct': 35.6, 'longest_dead_s': 1.53},
-                 src='docs/style_bible_ref2.md 6.4: medium events 3.6/s; 36 % of frames change < 0.1 % besides the zoom; '
+                 src='docs/v1/style_bible_ref2.md 6.4: medium events 3.6/s; 36 % of frames change < 0.1 % besides the zoom; '
                      'longest near-static run 1.5 s (shot 12)'),
 }
 

@@ -41,7 +41,7 @@ search-result summaries.
      (`#BAC3CE`, `#8A9AA8`), with Dusk's anchor `#1F2433` on the silhouettes outside (about 5 %). In the nook shot the window is
      the only Dusk area, at most about 20 % of the frame *(proposal)*. In the scale pull-back Dusk takes the whole frame (PALETTE.md allows this pairing).
   2. **Light pools are flat and stepped:** a shade trapezoid widening about 3x, an ellipse pool 0.5-0.7 W (the
-     `style_bible_ref2.md` section 8 baseline) and at most 2 stepped rings (CINE `<Glow>`). No gradients, no blur.
+     `v1/style_bible_ref2.md` section 8 baseline) and at most 2 stepped rings (CINE `<Glow>`). No gradients, no blur.
      The pool lights the subject's **hands and face**, as Shizuku's desk lamp does in *Whisper of the Heart* (S16).
   3. **Low, few sources:** one lamp plus at most one secondary source (a screen or a reflection), no ceiling light
      *(proposal)*. The corners step down one palette step (`ground #D7E0C8`), never to a dark.

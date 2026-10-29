@@ -75,7 +75,7 @@ search-result text. Conventions: 1080 x 1920, `persp1` f 1000, captions block y 
   video gave longer fixations (RealEye); educational TikToks drew "stable" gaze on 1-2 areas (n = 16) (all REPORTED). So **at
   most 2 points of interest per scale shot: the caption and the tiny figure (or one lit detail)**, both on the centre axis.
 
-## 4. Scale compositions for 9:16 (proposals; numbers from §1-3 and `../../style_bible_ref2.md` §8)
+## 4. Scale compositions for 9:16 (proposals; numbers from §1-3 and `../../v1/style_bible_ref2.md` §8)
 - **Tower / colossus:** cut by the top edge, ≥ 0.7 H of mass in frame, base or door inside y 600-1250, ratio colossus :
   observer ≥ 10:1; above the caption bottom it is a flat fill (`quietAbove`).
 - **Wall of windows / canyon:** walls cut by the top AND both side edges (in 9:16 the sides are already tight), the vista

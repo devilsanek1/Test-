@@ -163,8 +163,8 @@ stage; the owner may skip gates by name. The clean pen's first test is the v3 re
 
 ## Retired (never use these; the v1-era docs keep them only as history, under a banner)
 - Scratchy film lines (jitter, overshoot, open contours, double strokes, taper everywhere) and misregistered fills
-  (`style_bible.md` §3-4, `motion_spec.md`): the clean pen.
-- Line weight or detail by depth (`style_bible.md` §3, `ENGINE.md` rule 8, the old G3 "detail gradient", the "ink
+  (`v1/style_bible.md` §3-4, `v1/motion_spec.md`): the clean pen.
+- Line weight or detail by depth (`v1/style_bible.md` §3, `ENGINE.md` rule 8, the old G3 "detail gradient", the "ink
   full, full, hairline, none" ladders): no outlines on any tier, thin lines only on things that are lines (rule 4);
   distance only calms colour and merges small parts, one flat step per plane (rule 2's depth, `CRAFT.md` §f).
 - Tier A's closed 3.0 px outline in its own deep shade (our reading of "black outlines, VERY subtle, in key places")
@@ -174,7 +174,7 @@ stage; the owner may skip gates by name. The clean pen's first test is the v3 re
   "look here" (rule 6; owner, 2026-10-29).
 - Equal-weight clutter: dressing, crowds or the mascot as loud as the subject; specks, ticks, hatching, dash rows,
   squiggles, a visible grain (rule 4's VERY subtle texture is an opt-in test, never a loud one).
-- An events-per-second quota or a density FAIL (`ENGINE.md` rule 6, `motion_spec.md` §9, ref 2 as a floor, the old
+- An events-per-second quota or a density FAIL (`ENGINE.md` rule 6, `v1/motion_spec.md` §9, ref 2 as a floor, the old
   "BUSY" profile): events/s and the meters are information.
 - A plain cut by default, "change size and angle at every cut", a zoom over 2x turned into a cut-in, a dissolve as a
   join: every join carries something (rule 1).
@@ -183,7 +183,7 @@ stage; the owner may skip gates by name. The clean pen's first test is the v3 re
 - Life and detail bolted onto a finished sketch, or a G5 that adds movers, places or tier promotions: they are designed
   into each shot, with their tier, at G3.
 - A zoom, push or "breathe" in any hold (ref 2's per-shot zoom, the old "push 3-5 %", the S3/S4 pull-outs).
-- A light that moves or hops between cuts, the sun as a character or idle motion (v1, `CINE.md`); glow discs and halo
+- A light that moves or hops between cuts, the sun as a character or idle motion (v1, `CINE_KIT.md`); glow discs and halo
   rings standing in for light.
 - The mascot hopping across cuts, riding the carriers or sitting on both sides of every join, or placed for the eye as
   a visible presence in every shot: Pip hides on purpose (rule 2; owner, 2026-10-28); strangers' backs in the
@@ -199,6 +199,6 @@ stage; the owner may skip gates by name. The clean pen's first test is the v3 re
 
 **Still in force, unchanged:** the API voice (`docs/voice/API_QUICKSTART.md`, `docs/ELEVENLABS.md`), story-first
 scripts, the posting rules (`docs/POSTING_KIT.md`), MAX effort for every agent and helper, no token limit for creative
-work, feedback captured the same turn. The v1-era docs (`style_bible.md`, `style_bible_ref2.md`, `motion_spec.md`,
-`ENGINE.md`, `EDGES.md`, `CINE.md`, `BRIEF.md`) carry a banner: they remain the engine API and reference
-measurements; their look rules yield here.
+work, feedback captured the same turn. The v1-era docs (`v1/style_bible.md`, `v1/style_bible_ref2.md`,
+`v1/motion_spec.md`, `ENGINE.md`, `EDGES.md`, `CINE_KIT.md`, `v1/BRIEF.md`) carry a banner: they remain the engine API
+and reference measurements; their look rules yield here.

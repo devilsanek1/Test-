@@ -181,4 +181,4 @@ Result: playable cuts reach the owner at about h1, h3, h8 and h14, instead of h1
 - VideoExplainers process: https://videoexplainers.com/our-process ; b2w process: https://b2w.tv/process ; Contra explainer listings: https://contra.com/s/W6Uo73QL-2-d-animated-explainer-video
 - Denki, "The Importance of Story Reels" (Lasseter quote, secondary): https://denki.co.uk/?p=9285 ; FilmLifestyle, "What is an animatic": https://filmlifestyle.com/what-is-an-animatic/
 - Hook testing: https://www.jeffbullas.com/thread/how-can-i-effectively-a-b-test-different-video-hooks-or-styles-on-tiktok/ ; https://posteverywhere.ai/social-media-terms/hook-rate ; https://www.sotrender.com/blog/?p=56913
-- Our run: `git log` of /home/user/Test- (timestamps above), video/docs/WRAPUP.md, video/docs/storyboard_v3.md.
+- Our run: `git log` of /home/user/Test- (timestamps above), video/docs/v1/WRAPUP.md, video/docs/v1/storyboard_v3.md.

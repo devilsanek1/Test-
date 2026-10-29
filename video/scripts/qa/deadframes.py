@@ -4,6 +4,8 @@ score every scene's life 0-10. Writes a per-scene bar chart (green alive, red de
 
   python3 scripts/qa/deadframes.py <frames_dir_or_video> [--fps 30] [--scenes src/data/scenes.json|auto|none]
          [--t0 0] [--only S05] [--out report_dir] [--caption-band 280,600] [--dead-limit 0.40] [--allow holds.json]
+  (--scenes auto read v1's src/data/scenes.json, archived since 2026-10-29 in archive/v1/src/data/: it takes the
+  detected cuts now; pass --scenes src/<film>/film/scenes.json)
 
 How a frame is measured (docs/QA.md has the full story and the calibration):
  1. The camera is estimated between consecutive frames: ORB features + RANSAC similarity (scale, rotation, shift)
@@ -363,6 +365,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('src', help='frames directory (PNG/JPG, sorted) or a video file')
     ap.add_argument('--fps', type=float, default=None, help='frame rate (default: the video\'s, or 30 for a directory)')
+    # --scenes auto: v1's src/data/scenes.json is archived since 2026-10-29 (archive/v1/src/data/): the detected cuts
     ap.add_argument('--scenes', default='auto', help='scenes JSON (src/data/scenes.json format), "auto" (scenes.json if the '
                     'clip length matches the film, else detected cuts), "cuts" (detected cuts) or "none" (one scene)')
     ap.add_argument('--t0', type=float, default=0.0, help='film time of frame 0 (for a per-scene composition: its start)')
@@ -416,6 +419,7 @@ def main(argv=None):
     cuts = Q.detect_cuts(new, frac, fps)
     # scenes
     scenes_from = args.scenes
+    # v1's cut list, archived since 2026-10-29 (archive/v1/src/data/): auto finds none now and takes the detected cuts
     film = os.path.join(Q.ROOT, 'src', 'data', 'scenes.json')
     sc_path = None
     if args.scenes == 'auto':

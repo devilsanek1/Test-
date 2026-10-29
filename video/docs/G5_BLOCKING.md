@@ -146,9 +146,10 @@ A sequence spans several script lines in ONE place and owns its camera end to en
 not board panels (v3: `docs/v3/flow_v2.md` §2, SQA-SQF). §2 holds for it, plus:
 - **One file per sequence** (`scenes/<SQ>.tsx` + helpers `<SQ>_*.tsx`), one lane each. It starts as a PLACEHOLDER that
   plays the old panels it replaces, each in its own window of film time with its own time base and caption tone, as
-  before (`lib/sequence.tsx` `PanelWindows` + `panelTones`; v3: `scenes/g5b_panels.tsx`), so the film plays end to end
-  from the first commit (v3: pixel-identical to G5b except J3's new push-through). The lane replaces the file whole;
-  the old panel files stay as set libraries, no longer scenes.
+  before (`lib/sequence.tsx` `PanelWindows` + `panelTones`; v3: `scenes/g5b_panels.tsx`, archived since 2026-10-29 in
+  `archive/v3/src/v3/film/scenes/`), so the film plays end to end from the first commit (v3: pixel-identical to G5b
+  except J3's new push-through). The lane replaces the file whole; the old panel files stay as set libraries, no longer
+  scenes.
 - **The camera is the sequence's own:** every move inside it is a function of FILM time on its place's shared camera
   (v3: `homeCam(T)`, `entryCam(T)`), so the framing never jumps where one builder hands over to the next; the engine
   moves a camera only in its own transitions (`push-through`, `camera-continuous`).

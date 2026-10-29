@@ -414,7 +414,8 @@ class Scene:
 
 
 def film_transition_windows(scenes_json):
-    """Transition windows [t0, t1] (VO seconds) of a src/data/scenes.json list, mirroring src/lib/Film.tsx."""
+    """Transition windows [t0, t1] (VO seconds) of a src/data/scenes.json list (v1's format; the file is archived since
+    2026-10-29 in archive/v1/src/data/), mirroring src/lib/Film.tsx."""
     dflt = {'cut': 0, 'matchcut': 0, 'camera-continuous': 1.4, 'foreground-wipe': 0.8, 'push-through': 1.1, 'unbuild': 0.5}
     wins = []
     ss = sorted(scenes_json, key=lambda s: s['start'])
@@ -443,7 +444,8 @@ def film_transition_windows(scenes_json):
 
 
 def load_scenes(path, duration, t0=0.0, only=None):
-    """Scene list on the CLIP timeline (clip t = film t - t0). Accepts src/data/scenes.json-style lists or
+    """Scene list on the CLIP timeline (clip t = film t - t0). Accepts src/data/scenes.json-style lists (v1's file,
+    archived since 2026-10-29 in archive/v1/src/data/) or
     {"scenes": [...]}; each scene needs id/start/end (seconds). Returns (scenes, transition windows)."""
     with open(path) as f:
         data = json.load(f)

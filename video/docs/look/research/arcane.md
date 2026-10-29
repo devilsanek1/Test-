@@ -3,9 +3,9 @@
 For v3 (laptop prices: cozy desk nook at night, the AI data center outside) and v2 (DeepMind staff, military AI). Tags:
 **VERIFIED** = primary source quoted, or several sources agree; **REPORTED** = one secondary source or a search summary;
 **UNCERTAIN** = our memory or inference, to check on the owner's clips (section 8); *(proposal)* = our numbers, test at G4.
-**[M]** = our own measurements of 12 stills (`../../style_bible_ref2.md` section 8, which keeps the doses per device).
+**[M]** = our own measurements of 12 stills (`../../v1/style_bible_ref2.md` section 8, which keeps the doses per device).
 **Caveat:** page fetches were blocked here (DNS / proxy 403), so every claim comes from search-result summaries.
-Colours follow `../PALETTE.md`. Camera fields (`tilt`, `push`, `anchor`, `CAM.reveal`, `Layer depth`) are our kit (`../../CINE.md`).
+Colours follow `../PALETTE.md`. Camera fields (`tilt`, `push`, `anchor`, `CAM.reveal`, `Layer depth`) are our kit (`../../CINE_KIT.md`).
 We describe shots in words only and never copy footage or frames.
 
 ## 0. The rules in brief
@@ -47,7 +47,7 @@ We describe shots in words only and never copy footage or frames.
 ## 2. The moves: Arcane grammar, then our 2D recipe
 
 The grammar below is our reading of the show, [UNCERTAIN] until we measure the clips in section 8. The speeds respect our
-strobe limit: flat inked art strobes above about 15-20 px/frame at 30 fps (CINE.md; `camSpeed` checks it).
+strobe limit: flat inked art strobes above about 15-20 px/frame at 30 fps (CINE_KIT.md; `camSpeed` checks it).
 
 | move (Arcane use) | 2D recipe *(proposal)* |
 |---|---|

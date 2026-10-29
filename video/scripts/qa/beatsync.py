@@ -11,6 +11,8 @@ CUTS. `scenes` (default) = src/data/scenes.json: every scene start after the fir
 for every transition type), quantised to the first frame that shows the new scene (ceil(start * fps) / fps; turn
 off with --no-quantize). `storyboard` = docs/storyboard_v2voice.json scene starts. `frames:` = the cut detector of
 deadframes run on rendered frames. `json:` = a deadframes.json (its detected cuts) or a JSON list of seconds.
+The `scenes` and `storyboard` defaults are v1's, archived since 2026-10-29 (archive/v1/src/data/scenes.json,
+docs/v1/storyboard_v2voice.json): pass --cuts json:<file> or --cuts scenes:<path>.
 WARP. scenes.json may still be on the v1 voice timeline (70.69 s) while the music is on v2 (78 s); --warp auto maps
 v1 -> v2 through assets/timewarp_v1_to_v2.json when the cut list ends on the v1 length and the music does not.
 GRID. From the MIDI's tempo map and time signatures (pretty_midi), or from librosa beat tracking of an audio file.
@@ -41,6 +43,7 @@ sys.dont_write_bytecode = True   # keep scripts/qa free of __pycache__
 sys.path.insert(0, HERE)
 import qalib as Q  # noqa: E402
 
+# FILM and STORY are v1's, archived since 2026-10-29 (archive/v1/src/data/, docs/v1/): pass --cuts
 FILM = os.path.join(Q.ROOT, 'src', 'data', 'scenes.json')
 STORY = os.path.join(Q.ROOT, 'docs', 'storyboard_v2voice.json')
 WARPF = os.path.join(Q.ROOT, 'assets', 'timewarp_v1_to_v2.json')
@@ -142,6 +145,7 @@ def grid_from_audio(path):
 
 def load_warp(direction):
     sys.path.insert(0, os.path.join(Q.ROOT, 'scripts'))
+    # scripts/timewarp.py is v1's, archived in archive/v1/scripts/: --warp runs at the v1-final commit (76c166c1)
     from timewarp import Warp  # scripts/timewarp.py (timing stream)
     d = json.load(open(WARPF))
     return Warp(d['anchors'], inverse=(direction == 'v2-to-v1')), d

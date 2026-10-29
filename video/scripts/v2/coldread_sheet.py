@@ -6,7 +6,10 @@ page starts), and a scale panel with an animated camera (shot "scale": true) giv
   python3 scripts/v2/coldread_sheet.py [public/v2/animatic.json] [out_dir]
 
 Writes <out_dir>/sheet.jpg and <out_dir>/index.json ({"n": {"panel": id, "t": seconds, "what": ...}}). Renders with
-scripts/render-frames.mjs (one bundle, one browser) from src/entry-v2.tsx at 0.25 scale."""
+scripts/render-frames.mjs (one bundle, one browser) from src/entry-v2.tsx at 0.25 scale.
+
+It does not run since 2026-10-29: src/entry-v2.tsx is archived in archive/v2-first/src/. Give it --entry and an
+animatic argument before any reuse (F2 in docs/retro/2026-10-28_streamline/codebase.md)."""
 import json
 import os
 import subprocess
@@ -63,6 +66,7 @@ frames.sort(key=lambda f: f['t'])
 os.makedirs(OUT, exist_ok=True)
 with tempfile.TemporaryDirectory() as tmp:
     times = ','.join(f'{f["t"]:.3f}' for f in frames)
+    # v2's first entry, archived since 2026-10-29 in archive/v2-first/src/ (see the docstring)
     res = subprocess.run(['node', 'scripts/render-frames.mjs', 'Animatic', tmp, times, f'--scale={SCALE}', '--entry=src/entry-v2.tsx'],
                          cwd=ROOT, capture_output=True, text=True, check=True)
     files = [ln.split()[2] for ln in res.stdout.splitlines() if len(ln.split()) == 3 and ln.split()[2].endswith(('.png', '.jpeg', '.jpg'))]

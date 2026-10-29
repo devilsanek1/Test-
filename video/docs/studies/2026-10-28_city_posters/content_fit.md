@@ -19,7 +19,7 @@ frame's subject; **A** = a building's blueprint; **B** = a text board leads; **O
 **What the places did in each film** (our reading, not the owner's words):
 - **v1's city was the mechanism, not a backdrop.** Not a real city: each website is a building (S01's civic buildings
   are the government sites that go dark; S03's street "built from one blueprint" is the 7 in 10 sites on PHP; S06's lane
-  is PHP's own workshop: `docs/scenes/`). Every "so what" happens TO a building, so place, story and payoff are one
+  is PHP's own workshop: `docs/v1/scenes/`). Every "so what" happens TO a building, so place, story and payoff are one
   picture: places that DO the story.
 - **v2's canal was the real place where it happened** (her office's bank, the towpath, her bank; Arlington for the one
   scale reveal: `docs/v2/THROUGHLINE.md` §1.4), the look the owner likes. But the argument rode on text boards (6 of 20

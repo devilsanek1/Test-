@@ -39,6 +39,7 @@ python3 - "$COMP" "$TMP/list.txt" "$TMP/labels.txt" "$CROP" "$SCALE" "$FPS" <<'P
 import json, os, re, subprocess, sys
 comp, lst, outp, crop, scale, fps = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], float(sys.argv[5]), float(sys.argv[6])
 scenes = []
+# v1's scene list (Main's scene ids), archived since 2026-10-29 in archive/v1/src/data/: other films get no ids
 if os.path.exists('src/data/scenes.json'):
     scenes = sorted(json.load(open('src/data/scenes.json')), key=lambda s: s['start'])
 off = 0.0

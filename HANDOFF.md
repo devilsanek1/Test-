@@ -89,14 +89,14 @@ scratch.
 ### Video 1, "php2shell": DELIVERED and POSTED (final means final; don't redo it)
 
 - **Story:** a PHP bug that sat for about 14 years let attackers take over servers, and governments in Europe switched
-  off their own websites on purpose. The script is `video/docs/script/final_script.md`, the facts and sources are in
-  `video/docs/script/sources.md` / `fact_sheet.md`, and the timing is in `video/docs/timing.md`.
+  off their own websites on purpose. The script is `video/docs/v1/script/final_script.md`, the facts and sources are in
+  `video/docs/v1/script/sources.md` / `fact_sheet.md`, and the timing is in `video/docs/v1/timing.md`.
 - **The film:** **`video/deliverables/v1/php2shell_final.mp4`** (1080x1920, 30 fps, 55.37 s, loops seamlessly, -14 LUFS).
   The cover is `video/deliverables/cover.png`, the posting texts are in `video/docs/POSTING_KIT.md`, and the profile
   pictures (mascot Pip) are in `video/deliverables/profile/` (the avatar in use is `pip_power_button.png`).
 - **Built from:**
-  - Remotion composition `Main`, entry `video/src/entry-film.ts`, scenes S01-S12 in `video/src/scenes/` (notes per
-    scene in `video/docs/scenes/`).
+  - Remotion composition `Main`, entry `src/entry-film.ts`, scenes S01-S12 in `src/scenes/` (archived 2026-10-29:
+    `video/archive/v1/src/`, in place at the `v1-final` commit (`76c166c1`)), notes per scene in `video/docs/v1/scenes/`.
   - Style: hand-drawn ink, flat colour, with the elephant mascot "Pip".
   - Voice: `video/audio/vo_clean.wav`, the treated ElevenLabs take `video/assets/vo_v3_final.wav`.
   - Sound: synthesized SFX (`video/audio/sfx`), cues in `video/audio/cues.json`, and a cinematic bed.
@@ -106,7 +106,7 @@ scratch.
 - **Owner feedback after posting** (all in the playbook):
   - The paper edge at the top looked like a screen recording, so it was removed in the final.
   - Captions that roll in clip letters; pop captions are the default from v2.
-- **Accepted quirks** are listed in `video/docs/WRAPUP.md`. Its status line is from 13:58 UTC; the final was re-rendered
+- **Accepted quirks** are listed in `video/docs/v1/WRAPUP.md`. Its status line is from 13:58 UTC; the final was re-rendered
   at 15:50 UTC without the top paper strip.
 
 ### Video 2: Google DeepMind staff resigning over military AI contracts (at gate G0, the angle)
@@ -392,7 +392,8 @@ scratch.
   compositions `FilmN`, `FilmN-<ID>`); the owner's cut from G5 on renders at full size, chunked per panel (§8b there);
   the G3 reel renders at 540p60; finals render in one step with `scripts/render-media.mjs --master` (`video/docs/PIPELINE_V2.md`
   "Master encode": lossless frames, one BT.709 encode; the TV-range pass below is v1's only, it relabelled BT.601 as BT.709).
-- **v1's commands (30 fps `Main`, kept for v1; from `video/`):**
+- **v1's commands (30 fps `Main`; v1 is archived since 2026-10-29: run them at the `v1-final` commit (`76c166c1`), e.g.
+  `git worktree add --detach /tmp/v1 76c166c1 && cd /tmp/v1/video && npm ci`):**
   - Final render: `npx remotion render src/entry-film.ts Main out/X.mp4 --crf 14`. Then convert to TV range:
     `ffmpeg -i out/X.mp4 -vf "scale=in_range=full:out_range=tv,format=yuv420p" -c:v libx264 -crf 14 -preset slow -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -c:a copy -movflags +faststart out/X_tv.mp4`.
     Remotion's output is full-range yuvj420p, which some players show wrongly. (2026-10-28: this pass keeps BT.601
@@ -432,15 +433,15 @@ scratch.
   - `summaries/`: the 3 context-compaction summaries;
   - `uploads/`: the owner's screenshots and screen recordings (indexed in `uploads/README.md`);
   - `workflows/`: every workflow script, with `INDEX.md`;
+  - `workflows/archive/v1/`: video 1's runs;
   - `agent_reports/`: each workflow's agent results;
   - `scratchpad_tools/`: throwaway working scripts from the session.
 - **`video/`** is the Remotion project:
-  - `src/`:
-    - `Main.tsx`, `FilmRoot.tsx` and `entry-film.ts` are the film;
-    - `scenes/sceneNN/` holds each scene's camera, timing, beats and sets;
-    - `lib/` holds the engine, edges, mascot, captions, theme and the clean pen with its tiers (`pen.ts`, `tier.tsx`);
-    - `data/` holds the captions and timing;
-    - `dev/` holds the dev comps, including `ProfilePic.tsx`.
+  - `src/` holds the live code: `lib/` (the engine, edges, mascot, captions, theme, the clean pen and its tiers), one
+    `entry-<film>*.tsx` set and one folder per live film (`v2r/`, `v3/`; v3's G3 engine is `v3/SketchReel.tsx`), `look/`
+    (the look tests).
+  - `archive/` holds finished films' code (`v1/`, `v2-first/`, v3's unused panels), byte for byte as moved; each runs at
+    its tag's commit: `v1-final` (`76c166c1`), `v2-first` (`56f905df`), `v3-final` (`79e956c3`).
   - `assets/` has the reference videos and frames (`ref/`, `ref2/`, `ref_cinematic/`), the VO takes and the timing JSON.
   - `audio/` has the mixer, SFX, music beds, cues and tools.
   - `deliverables/` has v1's final video, cover and profile pictures.
@@ -451,7 +452,7 @@ scratch.
   - Process: `OWNER_PLAYBOOK.md` (rules from the owner), `PIPELINE_V2.md` (gates, budgets, anti-waste, the craft
     tooling lane), `G3_ANIMATIC.md` (the sketch animatic), `G5_BLOCKING.md` (building the film), `ELEVENLABS.md` +
     `voice/` (the API voice), `POSTING_KIT.md`, `retro/` (spend forensics; `2026-10-27_v3_retro.md`: the approved
-    pipeline change), `PIPELINE_RESEARCH.md`, `WRAPUP.md` (v1 end state).
+    pipeline change), `PIPELINE_RESEARCH.md`, `v1/WRAPUP.md` (v1 end state).
   - **Look (current): `look/DIRECTION.md` (the one page; read it first), `look/CRAFT.md` (numbers, code, checks),
     `look/LAYOUT.md` (the frame: zones, shot framing, composition, the cover), `look/STORYBOARD_STYLE.md` (the G3
     board), `look/CINEMATIC_GUIDE.md` (shot recipes, scale cues, the opening),
@@ -462,24 +463,25 @@ scratch.
     content that fits places).
   - The channel's brief (every video): `CREATIVE_BRIEF.md` (the owner's master brief; its banner lists the later
     owner rules that update it).
-  - Brief and story (v1): `BRIEF.md` (the v1 project brief; history), `script/` (all script versions, critiques, the
-    fact sheet and sources; `final_script.md` is the one used), `timing.md` (word timings), `storyboard_v3.md` /
-    `.json` (v1's shot plan).
+  - Brief and story (v1): `v1/BRIEF.md` (the v1 project brief; history), `v1/script/` (all script versions, critiques,
+    the fact sheet and sources; `final_script.md` is the one used), `v1/timing.md` (word timings),
+    `v1/storyboard_v3.md` / `.json` (v1's shot plan).
   - Look and motion (v1-era, HISTORY: the engine API and the reference measurements, each with a banner; never brief a
-    lane from their look): `style_bible.md` (from reference 1), `style_bible_ref2.md` (reference 2: scale and
-    full-bleed), `motion_spec.md` (the reference's animation language, measured; evidence in `motion_evidence/`),
-    `ENGINE.md` (scene engine cheat-sheet: the API), `CINE.md` (cinematic-scale kit; not clean-pen-aware), `EDGES.md`
-    (paper edges), `mascot.md`, `SHARED_SETS.md` / `SHARED_PROPS.md` (v1's world kit), `QA.md`.
-  - Sound: `sound_plan.md`, `sound_credits.md` (v1's; each film makes its own music and sound: playbook).
+    lane from their look): `v1/style_bible.md` (from reference 1), `v1/style_bible_ref2.md` (reference 2: scale and
+    full-bleed), `v1/motion_spec.md` (the reference's animation language, measured; evidence in
+    `v1/motion_evidence/`), `ENGINE.md` (scene engine cheat-sheet: the API), `CINE_KIT.md` (cinematic-scale kit; not
+    clean-pen-aware), `EDGES.md` (paper edges), `mascot.md`, `v1/SHARED_SETS.md` / `v1/SHARED_PROPS.md` (v1's world
+    kit), `QA.md`.
+  - Sound: `v1/sound_plan.md`, `sound_credits.md` (v1's; each film makes its own music and sound: playbook).
   - v2: `v2/` (the v2 session's; `v2/source_bbc_2026-10-21.md` is the source text).
 
 ## 7. The reference material the owner sent
 
 | When (UTC) | File | What the owner said | Where we used it |
 |---|---|---|---|
-| 10-24 13:20 | `video/assets/ref/reference.mp4` (reference video 1) | "look at this video reference extract the style, animation, fluidity, motion design" | the core style; `docs/style_bible.md`, `docs/motion_spec.md`, frames in `assets/ref/` |
+| 10-24 13:20 | `video/assets/ref/reference.mp4` (reference video 1) | "look at this video reference extract the style, animation, fluidity, motion design" | the core style; `docs/v1/style_bible.md`, `docs/v1/motion_spec.md`, frames in `assets/ref/` |
 | 10-24 13:20 | `video/assets/vo.mp3` | the first voice-over ("take the audio and come up with a video") | v1's first script; later rewritten |
-| 10-24 14:30 | `video/assets/ref2/reference2.mp4` (reference video 2) + Arcane collage (`context/uploads/inline/2026-10-24_143047_1.jpg` = `assets/ref_cinematic/arcane_collage.jpg`) | "some videos make it feel big and some make it feel small ... this video makes me feel small. My reference is Arcane: cinematic shots always made me feel scale" | `docs/style_bible_ref2.md`, `docs/CINE.md`, the scale scenes (S01, S08, ...) |
+| 10-24 14:30 | `video/assets/ref2/reference2.mp4` (reference video 2) + Arcane collage (`context/uploads/inline/2026-10-24_143047_1.jpg` = `assets/ref_cinematic/arcane_collage.jpg`) | "some videos make it feel big and some make it feel small ... this video makes me feel small. My reference is Arcane: cinematic shots always made me feel scale" | `docs/v1/style_bible_ref2.md`, `docs/CINE_KIT.md`, the scale scenes (S01, S08, ...) |
 | 10-24 15:45 | `video/assets/vo_v2_eleven.wav` + ElevenLabs export options (`inline/2026-10-24_154553_2.jpg`) | "which quality option to pick" | voice v2 |
 | 10-24 16:48 | `context/uploads/561bcd7a-ScreenRecording_10-24-2026_17-44-07_1.mov` | another creator's reel on building a motion-design studio with Claude: "would any advice make a noticeable quality difference? syncing cuts to the beat, tracing every frame" | beat-locked cuts, closed-form springs, frame-by-frame critique (QA lane) |
 | 10-24 19:04 / 19:13 | `video/assets/vo_v3_draft_take.wav`, `video/assets/vo_v3_final.wav` | the final voice takes | v1 final voice (treated: `audio/vo_clean.wav`) |

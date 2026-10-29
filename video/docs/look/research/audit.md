@@ -1,7 +1,7 @@
 # Kit audit: what we have and what we lack for coziness + scale (research lane, 2026-10-25)
 
-Scope: our own kit (`docs/CINE.md`, `docs/ENGINE.md`, `docs/style_bible_ref2.md`, `src/lib/cine/**`, `src/lib/ShotCam.tsx`,
-`src/lib/persp.tsx`, `src/lib/tod.tsx`, `src/lib/kit/**`) and v1's scale scenes (`docs/scenes/S01, S08, S09, S12`), checked
+Scope: our own kit (`docs/CINE_KIT.md`, `docs/ENGINE.md`, `docs/v1/style_bible_ref2.md`, `src/lib/cine/**`, `src/lib/ShotCam.tsx`,
+`src/lib/persp.tsx`, `src/lib/tod.tsx`, `src/lib/kit/**`) and v1's scale scenes (`docs/v1/scenes/S01, S08, S09, S12`), checked
 against the two goals: v3's cozy desk nook with its data-center reveal, and v2 (DeepMind staff afraid to speak out). Tags:
 **VERIFIED** = read in our files or code, or plain arithmetic; **REPORTED** = from a web search summary (page fetches were blocked
 in this sandbox); **UNCERTAIN** = inference or untested. Theory lives in the sibling notes `enclosure.md`, `coziness.md`, `arcane.md`.
@@ -39,9 +39,9 @@ in this sandbox); **UNCERTAIN** = inference or untested. Theory lives in the sib
 | wipes | `WipeCut` / `WipePass` kinds column, passer, figure, pole, foliage (cine/props.tsx, wipers.tsx) | `wipeToneRegions` keeps the captions readable over the wiper |
 | street | `PerspectiveStreet` (cine/street.tsx) | `heights`, `sides`, `road` / `walk`, `fence`, `poleStart`, `lights`, `windows`, `crowd` |
 | interior bits | kit `Laptop`, `Server` (kit/Icons.tsx), `Window`, `WindowGrid`, `Door`, `Person` (rim, hero detail) | that's all: no shelf, desk, lamp, rug or room shell |
-| light pools | only one-offs in scenes: `scene09/PartA.tsx` (`ell()` lamp pools), `scene09/hill.tsx` `FixedPool`, `scene09/PartB.tsx` headlamp fan, `scene08/tower.tsx` BeamSpot | stepped opaque ellipses (peach outer, cream core); ref 2 numbers in style_bible_ref2 1.7 |
+| light pools | only one-offs in v1's scenes (now under `archive/v1/src/scenes/`): `scene09/PartA.tsx` (`ell()` lamp pools), `scene09/hill.tsx` `FixedPool`, `scene09/PartB.tsx` headlamp fan, `scene08/tower.tsx` BeamSpot | stepped opaque ellipses (peach outer, cream core); ref 2 numbers in style_bible_ref2 1.7 |
 
-## 2. v1's scale scenes and how they did it [VERIFIED from docs/scenes]
+## 2. v1's scale scenes and how they did it [VERIFIED from docs/v1/scenes]
 - **S01, PEAK 1, hook (0-4.7 s).** GovernmentPlaza ~1.35x taller under the y-600 ceiling, horizon y 1384 (0.72 H, low camera), six
   back-view citizens (55-75 px) on the VP axis, an r 155 "power button" sun in the gap. Sine push 1.00 -> 1.04, hold, then a 0.33 s
   dive x3.19 anchored on the lock (inkComp). Parallax: far + sun 0.43, buildings 1, near 1.43.
@@ -54,14 +54,14 @@ in this sandbox); **UNCERTAIN** = inference or untested. Theory lives in the sib
   sun crests the ridge on "server"; stone pier + balustrade framing ~22 % of the bottom edge; tags shrink 44 -> 8 px with depth.
   **Camera peak 80.3 px / frame** (4.5x the cap, allow-listed); S08's crane entry 25.4.
 - **S12, closing.** S01's plaza at PEAK-1 framing, one gentle pull-back 1.03 -> 1.0, then the loop.
-- **CineDemo** (`src/dev/CineDemo.tsx`): A a 640 px tilt in 2.5 s with a colossal tower crossing the caption band as a flat field;
+- **CineDemo** (`archive/v1/src/dev/CineDemo.tsx`): A a 640 px tilt in 2.5 s with a colossal tower crossing the caption band as a flat field;
   B a worm's-eye monument crane ~190 px; C a WallOfWindows pull-back 8x -> 1.3x in 6.2 s, close-ups melting into the grid.
 - **What made them work:** ONE colossus per shot; tiny but readable back-view people on the VP axis; a low horizon; framing cut by the
   bottom edge; the sun as a scale ruler; the move landing on a word; things switching on during the hold. **What to fix:** reveal speed.
 
 ## 3. Gaps, by goal
 **A. Enclosure framing** (the reference: tall walls on both sides, a closed vista, heavy greenery)
-- `PerspectiveStreet` has no caption quiet zone (`quietY` / keepDark, as Monument and WallOfWindows have). CINE.md tells you to keep
+- `PerspectiveStreet` has no caption quiet zone (`quietY` / keepDark, as Monument and WallOfWindows have). CINE_KIT.md tells you to keep
   facades low (~1.5x camH), which is the opposite of the 1:1-1:1.5 cozy ratio in enclosure.md. [VERIFIED]
 - No vista closer (a landmark at the VP ending the street, like the reference's tower), no ivy or overhanging tree masses (the
   reference is roughly 40 % greenery, UNCERTAIN), no wall lamps; no hanging lamp / awning / arch / doorway "portal" piece (style_bible_ref2
@@ -77,7 +77,7 @@ in this sandbox); **UNCERTAIN** = inference or untested. Theory lives in the sib
 - `Glow` rings are static-translucent. Indoors, prefer opaque stepped discs (ref 2's lamp disc is opaque). [VERIFIED]
 
 **C. Cozy interior set**: none. Missing: a room-box helper (walls, floor, ceiling from `persp.tsx` quads); openings as **evenodd
-holes in the wall path**, so a deeper exterior `<Layer>` shows through without a clip (CINE.md 11 limits clips); props: bookshelf
+holes in the wall path**, so a deeper exterior `<Layer>` shows through without a clip (CINE_KIT.md 11 limits clips); props: bookshelf
 (batched spines, quiet above y 600), desk + desk lamp, frosty window from inside (mullions, frost scallops, curtains, Festoon), mug +
 steam (draw-on wisps, no fade), rug, radiator / plant, laptop "old, cracked hinge", price tag. Build in core `Ink` / `Fill` (relight,
 un-build, inkComp), not raw SVG. [VERIFIED gaps]
@@ -138,8 +138,8 @@ un-build, inkComp), not raw SVG. [VERIFIED gaps]
     reveals over cine pieces.
 
 ## Sources
-- Internal [VERIFIED]: `docs/CINE.md` 1-12; `docs/ENGINE.md` 1, 2b, 4, 4b, 7-10, 14; `docs/style_bible_ref2.md` 1.6, 1.7, 8;
-  `docs/look/PALETTE.md`; `docs/look/palettes.json`; `docs/scenes/S01.md`, `S08.md`, `S09.md`, `S12.md`; `docs/SHARED_SETS.md`;
+- Internal [VERIFIED]: `docs/CINE_KIT.md` 1-12; `docs/ENGINE.md` 1, 2b, 4, 4b, 7-10, 14; `docs/v1/style_bible_ref2.md` 1.6, 1.7, 8;
+  `docs/look/PALETTE.md`; `docs/look/palettes.json`; `docs/v1/scenes/S01.md`, `S08.md`, `S09.md`, `S12.md`; `docs/v1/SHARED_SETS.md`;
   `src/lib/{ShotCam.tsx, persp.tsx, tod.tsx, theme.ts, spec.ts}`; `src/lib/cine/*.tsx|ts` headers + exports; `src/lib/kit/{Nature,Icons}.tsx`.
 - Sibling notes: `enclosure.md` (H:W dial, 9:16 sky-share table), `coziness.md`, `arcane.md`.
 - Pools of light, Alexander's *A Pattern Language* (lamps low and apart, darker areas between pools, warm light), via a secondary blog

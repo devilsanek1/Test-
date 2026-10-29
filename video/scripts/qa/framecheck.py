@@ -3,6 +3,8 @@
 
   python3 scripts/qa/framecheck.py <frames_dir_or_video> [--fps 30] [--out report_dir] [--scenes src/data/scenes.json]
          [--t0 0] [--caption-band 280,600] [--no-ui-zones]
+  (--scenes auto and --captions auto read v1's src/data/scenes.json and captions.json, archived since 2026-10-29 in
+  archive/v1/src/data/: pass --scenes src/<film>/film/scenes.json and --captions <file>)
 
 Checks (severity in brackets):
   blank      [ERROR] blank or near-uniform frame (luma std < 4 or one colour >= 98 % of the frame). A run of <= 3 such
@@ -212,6 +214,7 @@ def main(argv=None):
     ap.add_argument('--fps', type=float, default=None)
     ap.add_argument('--out', default=None)
     ap.add_argument('--name', default=None)
+    # "auto" in --scenes / --captions: v1's src/data/*.json, archived since 2026-10-29 (archive/v1/src/data/)
     ap.add_argument('--scenes', default='auto', help='scenes JSON for known cuts ("auto" = src/data/scenes.json when the clip is the film, "none")')
     ap.add_argument('--t0', type=float, default=0.0, help='film time of frame 0')
     ap.add_argument('--caption-band', default='280,600', help='y0,y1 canvas px (0,0 = skip the caption check)')
@@ -238,6 +241,7 @@ def main(argv=None):
     # known cuts (frame indices on this clip)
     cut_frames = set()
     sc_path = None
+    # v1's cut list, archived since 2026-10-29 (archive/v1/src/data/): auto finds none now; pass --scenes
     film = os.path.join(Q.ROOT, 'src', 'data', 'scenes.json')
     if args.scenes == 'auto':
         if os.path.exists(film):
@@ -258,6 +262,7 @@ def main(argv=None):
 
     expect = np.zeros(src.n + 1, bool)
     film_clip = bool(sc_path) and os.path.abspath(sc_path) == os.path.abspath(film)   # our film's scenes -> our captions
+    # v1's captions went with its scenes.json (archived since 2026-10-29 in archive/v1/src/data/): pass --captions
     cap_path = os.path.join(Q.ROOT, 'src', 'data', 'captions.json') if (args.captions == 'auto' and film_clip) else (
         None if args.captions in ('auto', 'none') else args.captions)
     if args.expect_caption:
