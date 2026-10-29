@@ -255,3 +255,208 @@ def lockup_pip(c_head, c_ear, c_inner, c_eye, c_text, c_dot):
          f'{mark_pip(c_head, c_ear, c_inner, c_eye)}</g>')
     body = m + _p(d1, c_text) + _p(h2, c_text) + _p(dot2, c_dot)
     return body, max(b1[2], b2[2]), mark_h
+
+
+# ================================================================ ROUND 2 (owner, 2026-10-29: "The logo should not contain any text")
+def _crescent(c1, c2, r, n=900):
+    """The shade face of a ball lit from c2's side: the part of circle (c1, r) outside circle (c2, r)."""
+    a = np.linspace(0, 2 * math.pi, n, endpoint=False)
+    p1 = np.stack([c1[0] + r * np.cos(a), c1[1] + r * np.sin(a)], 1)
+    out = np.hypot(p1[:, 0] - c2[0], p1[:, 1] - c2[1]) > r
+    i0 = int(np.argmax(~out & np.roll(out, -1))) + 1  # first index of the outside run
+    arc1 = np.roll(p1, -i0, axis=0)[:int(out.sum())]
+    p2 = np.stack([c2[0] + r * np.cos(a), c2[1] + r * np.sin(a)], 1)
+    ins = np.hypot(p2[:, 0] - c1[0], p2[:, 1] - c1[1]) < r
+    j0 = int(np.argmax(~ins & np.roll(ins, -1))) + 1
+    arc2 = np.roll(p2, -j0, axis=0)[:int(ins.sum())]
+    # walk c1's outer arc, then c2's inner arc back (choose the direction that closes the lune)
+    if np.hypot(*(arc1[-1] - arc2[0])) > np.hypot(*(arc1[-1] - arc2[-1])):
+        arc2 = arc2[::-1]
+    from logo_lib import poly_d
+    return poly_d(np.concatenate([arc1, arc2]), close=True)
+
+
+def _pip2_geo(s=1.0, cx=500, cy=500):
+    def T(x, y):
+        return cx + (x - 500) * s, cy + (y - 500) * s
+    g = {'s': s, 'T': T}
+    g['ears'] = []
+    for sgn in (-1, 1):
+        ex, ey = T(500 + sgn * 232, 490)
+        ix, iy = T(500 + sgn * 263, 507)
+        g['ears'].append(dict(cx=ex, cy=ey, rx=176 * s, ry=205 * s, rot=-sgn * 14,
+                              icx=ix, icy=iy, irx=104 * s, iry=140 * s))
+    g['head'] = (*T(500, 452), 204 * s)
+    g['lit'] = (*T(500 - 40, 452 - 30), 204 * s)
+    down = bez((500, 500), (500, 590), (494, 664), (500, 712), 40)
+    curl = arc(584, 712, 84, 180, 28, 70)
+    g['trunk_line'] = np.array([T(x, y) for x, y in join(down, curl)])
+    g['trunk_w'] = 106 * s
+    g['eyes'] = [(*T(500 + sgn * 74, 462), 24 * s) for sgn in (-1, 1)]
+    return g
+
+
+PIP2_BB = (500 - 232 - 178, 452 - 204 - 8, 500 + 232 + 178, 712 + 84 + 53)
+
+
+def mark_pip2(c_lit, c_shade, c_ear, c_inner, c_eye, s=1.0, cx=500, cy=500):
+    """Pip, round 2: the head lit from the upper left with a shade face on the right (the films' volumes: a lit and a
+    shade face, no outline), ears in the deeper shade, peach inside."""
+    g = _pip2_geo(s, cx, cy)
+    out = ''.join(_ell(e, c_ear) + _ell(e, c_inner, True) for e in g['ears'])
+    hx, hy, hr = g['head']
+    out += f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="{hr:.1f}" fill="{c_lit}"/>'
+    out += _p(_crescent((hx, hy), g['lit'][:2], hr), c_shade)
+    out += _p(stroke_outline(g['trunk_line'], g['trunk_w']), c_lit)
+    out += ''.join(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="{c_eye}"/>' for x, y, r in g['eyes'])
+    return out
+
+
+def mark_pip2_mono(color, s=1.0, cx=500, cy=500, gap=26):
+    g = _pip2_geo(s, cx, cy)
+    mid = f'pipm{next(_ids)}'
+    hx, hy, hr = g['head']
+    trunk = stroke_outline(g['trunk_line'], g['trunk_w'])
+    m = (f'<mask id="{mid}" maskUnits="userSpaceOnUse" x="-500" y="-500" width="2000" height="2000">'
+         + ''.join(_ell(e, 'white') for e in g['ears'])
+         + f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="{hr + gap * s:.1f}" fill="black"/>'
+         + _p(stroke_outline(g['trunk_line'], g['trunk_w'] + 2 * gap * s), 'black')
+         + f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="{hr:.1f}" fill="white"/>' + _p(trunk, 'white')
+         + ''.join(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="black"/>' for x, y, r in g['eyes'])
+         + '</mask>')
+    return f'<defs>{m}</defs><rect x="-500" y="-500" width="2000" height="2000" fill="{color}" mask="url(#{mid})"/>'
+
+
+def _peek_geo(s=1.0, cx=500, cy=500, ledge_w=760):
+    """Pip peeking over a ledge: the dome of the head, the ears, the eyes, and the trunk hooked over the edge."""
+    def T(x, y):
+        return cx + (x - 500) * s, cy + (y - 500) * s
+    g = {'s': s}
+    g['ears'] = []
+    for sgn in (-1, 1):
+        ex, ey = T(500 + sgn * 214, 560)
+        ix, iy = T(500 + sgn * 240, 578)
+        g['ears'].append(dict(cx=ex, cy=ey, rx=150 * s, ry=178 * s, rot=-sgn * 18,
+                              icx=ix, icy=iy, irx=88 * s, iry=118 * s))
+    g['head'] = (*T(500, 588), 200 * s)
+    g['lit'] = (*T(500 - 40, 588 - 30), 200 * s)
+    g['eyes'] = [(*T(500 + sgn * 70, 548), 23 * s) for sgn in (-1, 1)]
+    top = 640  # the ledge's top edge
+    g['ledge_top'] = T(0, top)[1]
+    g['ledge'] = (T(500 - ledge_w / 2, top), T(500 + ledge_w / 2, top), 300 * s)  # left, right, depth
+    g['lip'] = 30 * s  # the lit top face of the ledge
+    down = bez((500, 600), (500, 640), (500, 668), (500, 700), 20)
+    curl = arc(560, 700, 60, 180, 30, 60)
+    g['trunk_line'] = np.array([T(x, y) for x, y in join(down, curl)])
+    g['trunk_w'] = 100 * s
+    return g
+
+
+PEEK_BB = (500 - 214 - 155, 588 - 200 - 6, 500 + 214 + 155, 640 + 300)
+
+
+def mark_pip_peek(c_lit, c_shade, c_ear, c_inner, c_eye, c_wall, c_wall_top, s=1.0, cx=500, cy=500,
+                  ledge_w=760, full_width=False, wall_r=40):
+    g = _peek_geo(s, cx, cy, ledge_w)
+    out = ''.join(_ell(e, c_ear) + _ell(e, c_inner, True) for e in g['ears'])
+    hx, hy, hr = g['head']
+    out += f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="{hr:.1f}" fill="{c_lit}"/>'
+    out += _p(_crescent((hx, hy), g['lit'][:2], hr), c_shade)
+    out += ''.join(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="{c_eye}"/>' for x, y, r in g['eyes'])
+    (lx, ly), (rx, _), depth = g['ledge']
+    if full_width:
+        lx, rx, depth = -2000, 3000, 3000
+    rr = 0 if full_width else wall_r * s
+    out += (f'<rect x="{lx:.1f}" y="{ly:.1f}" width="{rx - lx:.1f}" height="{depth:.1f}" rx="{rr:.1f}" '
+            f'fill="{c_wall}"/>')
+    out += (f'<rect x="{lx:.1f}" y="{ly:.1f}" width="{rx - lx:.1f}" height="{g["lip"]:.1f}" rx="{min(rr, g["lip"] / 2):.1f}" '
+            f'fill="{c_wall_top}"/>')
+    out += _p(stroke_outline(g['trunk_line'], g['trunk_w']), c_lit)
+    return out
+
+
+def mark_pip_peek_mono(color, s=1.0, cx=500, cy=500, ledge_w=760, gap=24, wall_r=40):
+    g = _peek_geo(s, cx, cy, ledge_w)
+    mid = f'peekm{next(_ids)}'
+    hx, hy, hr = g['head']
+    (lx, ly), (rx, _), depth = g['ledge']
+    rr = wall_r * g['s']
+    trunk = stroke_outline(g['trunk_line'], g['trunk_w'])
+    m = (f'<mask id="{mid}" maskUnits="userSpaceOnUse" x="-500" y="-500" width="2000" height="2000">'
+         + ''.join(_ell(e, 'white') for e in g['ears'])
+         + f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="{hr + gap * g["s"]:.1f}" fill="black"/>'
+         + f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="{hr:.1f}" fill="white"/>'
+         + ''.join(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="black"/>' for x, y, r in g['eyes'])
+         + f'<rect x="{lx:.1f}" y="{ly - gap * g["s"]:.1f}" width="{rx - lx:.1f}" height="{depth + gap * g["s"]:.1f}" fill="black"/>'
+         + f'<rect x="{lx:.1f}" y="{ly:.1f}" width="{rx - lx:.1f}" height="{depth:.1f}" rx="{rr:.1f}" fill="white"/>'
+         + _p(stroke_outline(g['trunk_line'], g['trunk_w'] + 2 * gap * g['s']), 'black')
+         + _p(trunk, 'white')
+         + '</mask>')
+    return f'<defs>{m}</defs><rect x="-500" y="-500" width="2000" height="2000" fill="{color}" mask="url(#{mid})"/>'
+
+
+def pip_question2(c_lit, c_shade, c_ear, c_inner, c_eye, s=1.0, cx=500, cy=500):
+    """Pose B, round 2: the raised trunk curls into a question's hook; the head (with its shade face) is the dot."""
+    def T(x, y):
+        return cx + (x - 500) * s, cy + (y - 500) * s
+    parts = []
+    for sgn in (-1, 1):
+        e = dict(cx=T(500 + sgn * 170, 702)[0], cy=T(0, 702)[1], rx=126 * s, ry=150 * s, rot=-sgn * 14,
+                 icx=T(500 + sgn * 194, 714)[0], icy=T(0, 714)[1], irx=74 * s, iry=100 * s)
+        parts.append(_ell(e, c_ear) + _ell(e, c_inner, True))
+    hx, hy = T(500, 680)
+    hr = 152 * s
+    parts.append(f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="{hr:.1f}" fill="{c_lit}"/>')
+    parts.append(_p(_crescent((hx, hy), (hx - 30 * s, hy - 22 * s), hr), c_shade))
+    up = bez((500, 720), (500, 640), (500, 520), (500, 470), 40)
+    hook_c, R = (500, 296), 148
+    P = np.array([hook_c[0] + R * math.cos(math.radians(40)), hook_c[1] + R * math.sin(math.radians(40))])
+    s_curve = bez((500, 470), (500, 420), P + np.array([-60, 70]), P, 40)
+    hook = arc(hook_c[0], hook_c[1], R, 40, -200, 200)
+    line = np.array([T(x, y) for x, y in join(up, s_curve, hook)])
+    parts.append(_p(stroke_outline(line, 92 * s), c_lit))
+    for sgn in (-1, 1):
+        ex, ey = T(500 + sgn * 62, 682)
+        parts.append(f'<circle cx="{ex:.1f}" cy="{ey:.1f}" r="{20 * s:.1f}" fill="{c_eye}"/>')
+    return ''.join(parts)
+
+
+def badge_peek(c_sky, c_wall, c_wall_top, c_lit, c_shade, c_ear, c_inner, c_eye, cx=500, cy=500, R=500, k=1.1,
+               clip=True):
+    """Direction 3 as a round badge: Pip peeks over the ground (the band runs to the circle's edge, so it reads as
+    a horizon, never a box), the trunk hooked over the edge. k scales Pip inside the circle."""
+    pip = mark_pip_peek(c_lit, c_shade, c_ear, c_inner, c_eye, c_wall, c_wall_top, s=k, cx=500, cy=500 - 40 * k,
+                        full_width=True)
+    body = f'<circle cx="500" cy="500" r="500" fill="{c_sky}"/>{pip}'
+    if clip:
+        cid = f'bclip{next(_ids)}'
+        body = (f'<defs><clipPath id="{cid}"><circle cx="500" cy="500" r="500"/></clipPath></defs>'
+                f'<g clip-path="url(#{cid})">{body}</g>')
+    sc = R / 500
+    return f'<g transform="translate({cx - 500 * sc:.1f} {cy - 500 * sc:.1f}) scale({sc:.4f})">{body}</g>'
+
+
+def badge_peek_mono(color, cx=500, cy=500, R=500, k=1.1, gap=22):
+    """One colour, in negative space: a solid disc with Pip cut out of it, peeking over the ground line."""
+    g = _peek_geo(k, 500, 500 - 40 * k)
+    mid = f'bpm{next(_ids)}'
+    hx, hy, hr = g['head']
+    edge = g['ledge_top']
+    trunk = stroke_outline(g['trunk_line'], g['trunk_w'])
+    m = (f'<mask id="{mid}" maskUnits="userSpaceOnUse" x="0" y="0" width="1000" height="1000">'
+         f'<circle cx="500" cy="500" r="500" fill="white"/>'
+         + ''.join(_ell(e, 'black') for e in g['ears'])
+         + f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="{hr + gap * k:.1f}" fill="white"/>'
+         + f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="{hr:.1f}" fill="black"/>'
+         + ''.join(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="white"/>' for x, y, r in g['eyes'])
+         + f'<rect x="0" y="{edge - gap * k:.1f}" width="1000" height="{1000 - edge + gap * k:.1f}" fill="black"/>'
+         + f'<rect x="0" y="{edge:.1f}" width="1000" height="{1000 - edge:.1f}" fill="white"/>'
+         + _p(trunk, 'black')
+         + f'<circle cx="500" cy="500" r="500" fill="none"/>'
+         + '</mask>')
+    # the ground stays inside the disc: re-clip the mask's band to the circle
+    cid = f'bpc{next(_ids)}'
+    sc = R / 500
+    return (f'<g transform="translate({cx - 500 * sc:.1f} {cy - 500 * sc:.1f}) scale({sc:.4f})">'
+            f'<defs>{m}<clipPath id="{cid}"><circle cx="500" cy="500" r="500"/></clipPath></defs>'
+            f'<rect width="1000" height="1000" fill="{color}" mask="url(#{mid})" clip-path="url(#{cid})"/></g>')

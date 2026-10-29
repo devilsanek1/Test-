@@ -25,6 +25,10 @@ PAL = {
     'teal': '#0F8273',       # canal teal
     'terra': '#E0683A',      # terracotta, the one pop ("the point")
     'peach': '#F6B494',      # soft accent (inner ear, cheeks)
+    'peri_mid': '#6A6ED6',   # round 2: the shade face of Pip's head
+    'peri_mid_dk': '#9296EC',  # the same on dark
+    'terra_lite': '#EE8F66',   # the lit top of the ledge
+    'sky': '#F9E3D2',        # the warm sky behind the peeking Pip
 }
 
 # ---------------------------------------------------------------- fonts
