@@ -116,3 +116,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   5, rejected as too wide, re-scoped to the bunker).
 - 2026-10-29 ~09:30 UTC: "Helsinki is actually pretty good too / Let's do both as story 4 and 5" -> video 4 = Helsinki's AI-heated homes, produced by session
   https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt; the writer started.
+- 2026-10-29 ~10:00 UTC, G1: "alright pull the latest state of the repo, get familiar with the latest context and lets
+  work on the video 4 - pick up where its been left off" -> session https://claude.ai/code/session_01VwsUCnkJXFuq3YwEYFUg7o
+  (branch `claude/kind-pascal-lvgsza`) runs G1 from `script/WRITER_BRIEF.md`: writer, critic (`script/CRITIC_BRIEF.md`),
+  fix pass; the owner was asked to add `ELEVENLABS_API_KEY` as the environment's network secret before G2.
