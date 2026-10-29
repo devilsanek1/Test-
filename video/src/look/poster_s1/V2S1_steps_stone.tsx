@@ -43,12 +43,12 @@ const JOINT = '#E2C1AD';
 
 /** (the look test's darks: the near world in mid-tones) our bank's stones with their rough area shares: lane E's near
  *  floor puts plane -1 at L* 60 (near.ts). */
-const BANK_ENTRIES: [string, number][] = [[BANK_PAVE, 0.42], [BANK_LIT, 0.36], [BANK_ALT, 0.12], [JOINT, 0.05], [CM.stoneShade, 0.05]];
+const bankEntries = (): [string, number][] => [[BANK_PAVE, 0.42], [BANK_LIT, 0.36], [BANK_ALT, 0.12], [JOINT, 0.05], [CM.stoneShade, 0.05]];
 /** The bank's colour map: identity, or the near world's mid-tones under the darks switch. */
 export function useBankTone(): (c: string) => string {
   const {darks, nearMid: nm} = useSwitches();
   if (!(nm ?? darks)) return (c) => c;
-  const m = nearMid(BANK_ENTRIES, -1);
+  const m = nearMid(bankEntries(), -1);
   return (c) => m[c] ?? c;
 }
 

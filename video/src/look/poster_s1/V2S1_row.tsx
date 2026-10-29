@@ -23,6 +23,9 @@ import {C, s1Step, s1HerXAt, HER_COAT_AT, S1_DRAW, s1Bold} from './V2S1_clock';
 import {InkScale} from '../../lib/inkComp';
 import {FigSpec, RowFigure, figParts, FIG_H} from './V2S1_row_fig';
 import {XG, mat} from '../../lib/xf';
+import {Look} from '../../lib/exit';
+import {useSwitches} from './switches';
+import {LINE_UNTIL, lineOn, subjectStrength} from './engine';
 
 // ---------------------------------------------------------------- the looks (one model sheet)
 
@@ -90,6 +93,7 @@ const lookBack = (t: number) => {
 export const S1Row: React.FC = () => {
   const t = useTime();
   const {legs} = useContext(RowDevCtx);
+  const sw = useSwitches();
   if (t < C.steppingOut) return null;
   const poses = MAP.s1RowAt(t);
   const step = s1Step(t);
@@ -114,41 +118,58 @@ export const S1Row: React.FC = () => {
   ) : (
     herFig
   );
+  // (the look test) no outlines: the copies part from the wall by a lit and a shade face, as she does (CRAFT §c: B
+  // without its shade faces goes flat); the shade per tier: the subject's faces at -22 L* (lane E's tierFormFor), her
+  // teal coat in the cool family, the oat copies in the warm one
+  const shadeCopies = sw.lineOff || sw.shadeTier;
+  const herShade = sw.shadeTier ? {strength: subjectStrength(CM.hero, CM.shadeCool), base: CM.shadeCool} : {};
+  const copyShade = sw.shadeTier ? {strength: subjectStrength(CM.coatOat, CM.shadeWarm), base: CM.shadeWarm} : {};
   return (
     <Tier tier="subject">
-      {members.map(({m, p}) => {
-        const age = m.kind === 'ghost' ? Number(m.id.slice(1)) : 0;
-        return (
-          <RowFigure
-            key={m.id}
-            seed={`s1row/${m.id}`}
-            spec={m.kind === 'ghost' ? ghostSpec(age, legs) : ghostSpec(6, legs)}
-            x={p.x}
-            y={p.feetY}
-            h={p.h}
-            step={step}
-            stride={ghostStride(m.kind === 'ghost' ? age : 6)}
-            inkPx={GHOST_INK}
-            at={m.popT ?? undefined}
-            knockout={false}
-            misregX={0.3}
-          />
-        );
-      })}
-      {herFig}
-      <FormShade of={herFig} c={herC} size={herSize} />
+      <Look ink={!sw.lineOff}>
+        {members.map(({m, p}) => {
+          const age = m.kind === 'ghost' ? Number(m.id.slice(1)) : 0;
+          const fig = (
+            <RowFigure
+              key={m.id}
+              seed={`s1row/${m.id}`}
+              spec={m.kind === 'ghost' ? ghostSpec(age, legs) : ghostSpec(6, legs)}
+              x={p.x}
+              y={p.feetY}
+              h={p.h}
+              step={step}
+              stride={ghostStride(m.kind === 'ghost' ? age : 6)}
+              inkPx={GHOST_INK}
+              at={m.popT ?? undefined}
+              knockout={false}
+              misregX={0.3}
+            />
+          );
+          if (!shadeCopies || (m.popT !== null && m.popT !== undefined && t < m.popT)) return fig;
+          return (
+            <React.Fragment key={m.id}>
+              {fig}
+              <FormShade of={fig} c={[p.x, p.feetY - p.h / 2]} size={[p.h * 0.36, p.h]} {...copyShade} />
+            </React.Fragment>
+          );
+        })}
+        {herFig}
+        <FormShade of={herFig} c={herC} size={herSize} {...herShade} />
+      </Look>
       <Rim of={coatEl} c={[hx, her.feetY - her.h * 0.45]} size={[her.h * 0.34, her.h * 0.6]} width={3.5} cover={0.35} />
     </Tier>
   );
 };
 
-/** While her coat is paper (frame 0's draw-on, to HER_COAT_AT), its line is the teal's own deep shade: full contrast. */
-const HER_PAPER_LINE: Record<string, string> = {[CM.white]: CM.hero};
+/** While her coat is paper (frame 0's draw-on, to HER_COAT_AT), its line is the teal's own deep shade: full contrast.
+ *  (Read at render: the look test's palette switch moves CM.white.) */
+const herPaperLine = (): Record<string, string> => ({[CM.white]: CM.hero});
 
 /** Her behind the glass doors (t < 0.97; frame 0 and the loop underlay included): mid-step at 153 px, her coat paper
  *  until the flood's last frame (HER_COAT_AT). The `behindDoor` slot. */
 export const S1HerBehindDoor: React.FC = () => {
   const t = useTime();
+  const sw = useSwitches();
   if (t >= C.steppingOut) return null;
   const x = s1HerXAt(t);
   const y = MAP.S1_HER_STEP_OUT.feetFrom;
@@ -157,7 +178,10 @@ export const S1HerBehindDoor: React.FC = () => {
     <Tier tier="subject">
       <S1LobbyContact x={x} y={y} h={h} />
       <InkScale value={s1Bold(t)}>
-        <RowFigure seed="s1row/her" spec={herSpec(t < HER_COAT_AT ? CM.white : CM.hero)} x={x} y={y} h={h} step={s1Step(t)} inkPx={HER_INK} draw={S1_DRAW.her} lineTone={t < HER_COAT_AT ? HER_PAPER_LINE : undefined} />
+        {/* (the no-outline switch: her construction line goes under her coat's colour, the last to land) */}
+        <Look ink={lineOn(sw, t, LINE_UNTIL.her)}>
+          <RowFigure seed="s1row/her" spec={herSpec(t < HER_COAT_AT ? CM.white : CM.hero)} x={x} y={y} h={h} step={s1Step(t)} inkPx={HER_INK} draw={S1_DRAW.her} lineTone={t < HER_COAT_AT ? herPaperLine() : undefined} />
+        </Look>
       </InkScale>
     </Tier>
   );

@@ -25,6 +25,7 @@ import {s1ArchOpening} from './V2S1_set_far';
 import {floodAt} from './V2S1_clock';
 import {useSwitches} from './switches';
 import {dark, recolourBatch} from './darks';
+import {live, paletteKey} from './engine';
 
 const S = MAP.S1_SHEET;
 const frac = (x: number) => x - Math.floor(x);
@@ -181,9 +182,11 @@ export const BOAT_B: BoatOpts = {x: 930, water: 1196, len: 520, h: 86, dir: -1, 
 
 const OneBoat: React.FC<{o: BoatOpts; smoke?: boolean; bursts?: number[]}> = ({o, smoke, bursts}) => {
   const {darks} = useSwitches();
+  const pk = paletteKey();
   const b = useMemo(() => {
     const b = new Batch();
-    boatInto(b, o, 0);
+    // (the look test's 10b switch: the cabin's role in the live palette; BOAT_A / B captured v2's at import)
+    boatInto(b, o.cabin ? {...o, cabin: live(o.cabin)} : o, 0);
     // (the look test's darks) a narrowboat's dark hull, its dark portholes and stern doors (the kit takes no colour for
     // them: its fills are recoloured by layer, 0 = the hull, 1 = the cabin side)
     if (darks) {
@@ -192,7 +195,7 @@ const OneBoat: React.FC<{o: BoatOpts; smoke?: boolean; bursts?: number[]}> = ({o
       recolourBatch(b, {[CM.brickDeep]: dark('wood'), [CM.coatSlate]: dark('iron')}, [2, 3, 4, 5]);
     }
     return b;
-  }, [darks]);
+  }, [darks, pk]);
   const g = boatGeom(o);
   const chX = g.X(o.chimney ?? 0.22);
   const chTop = g.roofY - g.roofH - (o.topView ?? 0) * 0.5 - 40 * (o.h / 100);

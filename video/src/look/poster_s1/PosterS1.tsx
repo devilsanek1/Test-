@@ -6,13 +6,14 @@
 // pixel; the voice is played here (trimmed to S1) instead of by Film, so the hold is silent.
 // The scene is this folder's copy of v2r's S1 (src/v2r is never edited); the switches (./switches.tsx) are props.
 import React from 'react';
-import {AbsoluteFill, Audio, interpolate, Sequence, staticFile} from 'remotion';
+import {AbsoluteFill, Audio, interpolate, Sequence, staticFile, useCurrentFrame} from 'remotion';
 import {Film, type FilmScene} from '../../lib/Film';
 import {type CaptionBeat} from '../../lib/Captions';
 import scenesJson from '../../v2r/film/scenes.json';
 import captionsJson from '../../v2r/film/captions.json';
 import V2S1 from './V2S1';
 import {PosterSwitchProvider, resolveSwitches, type PosterPreset, type PosterSwitches} from './switches';
+import {applyFloat, applyPalette, applyPen} from './engine';
 
 export const POSTER_S1_FPS = 60;
 /** v2's S1 ends (its cut into S2) at 6.1 s; the test holds 0.9 s more. */
@@ -54,6 +55,11 @@ const S1Audio: React.FC<{which: 'voice' | 'mix'}> = ({which}) => {
 export const PosterS1: React.FC<PosterS1Props> = (props) => {
   const sw = resolveSwitches(props);
   const audio = props.audio ?? 'voice';
+  // the film-wide module state for this frame, before anything draws: the palette's roles and the pen's line flags
+  const t = useCurrentFrame() / POSTER_S1_FPS;
+  applyPalette(sw);
+  applyPen(sw, t);
+  applyFloat(sw);
   return (
     <PosterSwitchProvider value={sw}>
       <AbsoluteFill>

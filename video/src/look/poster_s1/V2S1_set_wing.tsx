@@ -28,6 +28,8 @@ import {S1_DRAW, s1Bold, wIsSubject, doorIsSubject} from './V2S1_clock';
 import {InkScale} from '../../lib/inkComp';
 import {useSwitches} from './switches';
 import {DARK, dark} from './darks';
+import {LINE_UNTIL, lineOn} from './engine';
+import {Look} from '../../lib/exit';
 
 // ---------------------------------------------------------------- the layout (local metres: u east, v down)
 
@@ -520,7 +522,8 @@ const WING_SWITCH = {pane: 6, at: 3.9} as const;
 
 export const S1Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) => {
   const t = useTime();
-  const {darks} = useSwitches();
+  const sw = useSwitches();
+  const {darks} = sw;
   const stat = useMemo(() => facadeStatic(darks), [darks]);
   const lobby = useMemo(() => lobbyStatic(darks), [darks]);
   const frame = useMemo(() => doorFrameStatic(darks), [darks]);
@@ -566,7 +569,10 @@ export const S1Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) =
           back; support otherwise (no outline, its plum anchor barely calmed) */}
       <Tier tier={wIsSubject(t) ? 'subject' : 'support'}>
         <InkScale value={s1Bold(t)}>
-          <CellPaint b={wb} seed="s1wing/W" cell={400} live draw={S1_DRAW.w} full={t >= W_LAMP_OFF ? W_DARK_FULL : undefined} />
+          {/* (the look test's no-outline switch: W's frame-0 construction line goes under its plum on the lamp click) */}
+          <Look ink={lineOn(sw, t, LINE_UNTIL.w)}>
+            <CellPaint b={wb} seed="s1wing/W" cell={400} live draw={S1_DRAW.w} full={t >= W_LAMP_OFF ? W_DARK_FULL : undefined} />
+          </Look>
         </InkScale>
       </Tier>
       <CellPaint b={lobby} seed="s1wing/lobby" cell={400} />
@@ -574,7 +580,10 @@ export const S1Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) =
       {/* the glass door + its canopy letters: the subject from frame 0 through her step-out (the letters pop on 0.97) */}
       <Tier tier={doorIsSubject(t) ? 'subject' : 'environment'}>
         <InkScale value={s1Bold(t)}>
-          <CellPaint b={frame} seed="s1wing/doorframe" cell={400} misreg={0.5} draw={S1_DRAW.doorFrame} />
+          {/* (the no-outline switch: the door's construction line goes under its colour as the flood reaches it) */}
+          <Look ink={lineOn(sw, t, LINE_UNTIL.door)}>
+            <CellPaint b={frame} seed="s1wing/doorframe" cell={400} misreg={0.5} draw={S1_DRAW.doorFrame} />
+          </Look>
         </InkScale>
         <HandLetteredGoogle cx={(F.x0 + F.x1) / 2} baseline={F.y0 + (F.y1 - F.y0) * 0.8} cap={Math.min(S.canopyLetterPx, (F.y1 - F.y0) * 0.84)} at={MAP.S1_CLOCK.steppingOut} each={0.06} />
       </Tier>
@@ -610,7 +619,8 @@ export function s1DoorOpen(t: number): number {
  *  an ink glint; they slide OUTWARD and stay visible parked over the brick door piers. */
 export const S1DoorLeaves: React.FC = () => {
   const t = useTime();
-  const {darks} = useSwitches();
+  const sw = useSwitches();
+  const {darks} = sw;
   const open = s1DoorOpen(t);
   const leafW = (DU1 - DU0) / 2;
   const b = new Batch();
@@ -652,7 +662,9 @@ export const S1DoorLeaves: React.FC = () => {
       </defs>
       <g clipPath="url(#s1leavesTrack)">
         <InkScale value={s1Bold(t)}>
-          <CellPaint b={b} seed="s1leaves" cell={400} misreg={0.6} live draw={S1_DRAW.leaves} />
+          <Look ink={lineOn(sw, t, LINE_UNTIL.door)}>
+            <CellPaint b={b} seed="s1leaves" cell={400} misreg={0.6} live draw={S1_DRAW.leaves} />
+          </Look>
         </InkScale>
       </g>
     </Tier>

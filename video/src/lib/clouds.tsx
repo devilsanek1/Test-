@@ -39,12 +39,12 @@ export function cloudTones(o: {sky: string; warmHue?: number; lit?: number; body
   const s = lch(o.sky);
   const litL = o.lit ?? clamp(s.L + 11, 93, 97.5);
   const bodyL = o.body ?? litL - 3.5;
-  const bellyL = o.belly ?? bodyL - 7;
+  const bellyL = o.belly ?? bodyL - 6.5;
   return {
     lit: fromLch(litL, 7, o.warmHue ?? 78),
     body: fromLch(bodyL, 4.5, (o.warmHue ?? 78) + 8),
     // the belly: a step down and cooler, its hue between the sky's and a soft violet (never a separate blue slab)
-    belly: fromLch(bellyL, 6.5, (s.h + 22) % 360),
+    belly: fromLch(bellyL, 6, (s.h + 24) % 360),
   };
 }
 
@@ -86,14 +86,55 @@ export type CumulusGeom = {
 };
 
 const circleD = (c: {x: number; y: number; r: number}) => `M${r1(c.x - c.r)} ${r1(c.y)}a${r1(c.r)} ${r1(c.r)} 0 1 0 ${r1(c.r * 2)} 0a${r1(c.r)} ${r1(c.r)} 0 1 0 ${r1(-c.r * 2)} 0Z`;
-/** A regular polygon (a faceted circle: a low-poly terminator) with a seeded rotation; clockwise on screen. */
-function ngonD(x: number, y: number, r: number, k: number, rot: number): string {
-  let d = '';
-  for (let i = 0; i < k; i++) {
-    const a = rot + (i / k) * Math.PI * 2;
-    d += `${i ? 'L' : 'M'}${r1(x + Math.cos(a) * r)} ${r1(y + Math.sin(a) * r)}`;
+
+/** A circle as a 32-gon (its sagitta < 0.5 px up to r ~ 100: reads round). */
+function circlePts(x: number, y: number, r: number, n = 32): Pt[] {
+  const out: Pt[] = [];
+  for (let i = 0; i < n; i++) out.push([x + Math.cos((i / n) * Math.PI * 2) * r, y + Math.sin((i / n) * Math.PI * 2) * r]);
+  return out;
+}
+const area2 = (p: Pt[]) => p.reduce((acc, q, i) => acc + q[0] * p[(i + 1) % p.length][1] - p[(i + 1) % p.length][0] * q[1], 0) / 2;
+const polyD = (p: Pt[]) => {
+  const q = area2(p) < 0 ? p.slice().reverse() : p;
+  return 'M' + q.map(([a, b]) => `${r1(a)} ${r1(b)}`).join('L') + 'Z';
+};
+/** Sutherland-Hodgman: a polygon clipped by a convex polygon (either winding). */
+function clipConvex(subject: Pt[], clip: Pt[]): Pt[] {
+  const cw = area2(clip) > 0;
+  let out = subject;
+  for (let i = 0; i < clip.length && out.length; i++) {
+    const a = clip[i];
+    const b = clip[(i + 1) % clip.length];
+    const side = (p: Pt) => (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0]);
+    const inside = (p: Pt) => (cw ? side(p) >= 0 : side(p) <= 0);
+    const next: Pt[] = [];
+    for (let j = 0; j < out.length; j++) {
+      const p = out[j];
+      const q = out[(j + 1) % out.length];
+      if (inside(p)) next.push(p);
+      if (inside(p) !== inside(q)) {
+        const k = side(p) / (side(p) - side(q));
+        next.push([p[0] + (q[0] - p[0]) * k, p[1] + (q[1] - p[1]) * k]);
+      }
+    }
+    out = next;
   }
-  return d + 'Z';
+  return out.length >= 3 ? out : [];
+}
+/** The convex region on the key's side of a straight cut through `c` (`u` px toward the key), turned `turn` deg, bent
+ *  once by `bend` px toward the shade (a two-facet terminator). */
+function facetCut(c: Pt, L2: Pt, u: number, turn: number, bend: number, size: number): Pt[] {
+  const a = Math.atan2(L2[1], L2[0]) + (turn * Math.PI) / 180;
+  const nx = Math.cos(a);
+  const ny = Math.sin(a);
+  const tx = -ny;
+  const ty = nx;
+  const q: Pt = [c[0] + nx * u, c[1] + ny * u];
+  const far = size * 3;
+  const A: Pt = [q[0] - tx * far, q[1] - ty * far];
+  const B: Pt = [q[0] + tx * far, q[1] + ty * far];
+  const M: Pt = [q[0] + tx * size * 0.12 * Math.sign(bend || 1) - nx * Math.abs(bend), q[1] + ty * size * 0.12 * Math.sign(bend || 1) - ny * Math.abs(bend)];
+  return [A, M, B, [B[0] + nx * far, B[1] + ny * far], [A[0] + nx * far, A[1] + ny * far]];
 }
 
 const CACHE = new Map<string, CumulusGeom>();
@@ -113,8 +154,10 @@ function buildCumulus(spec: CumulusSpec): CumulusGeom {
   const R = rng(`cumulus/${spec.seed}`);
   const {x, base, w, h} = spec;
   const L = lightVec(spec.light);
-  const ln = Math.hypot(L[0], L[1]) || 1;
-  const L2: Pt = [L[0] / ln, L[1] / ln];
+  // a cloud hangs high in the light: its lit side faces up more than a thing on the ground does
+  const up: Pt = [L[0], L[1] - 0.8 * Math.max(0.3, Math.hypot(L[0], L[1]))];
+  const ln = Math.hypot(up[0], up[1]) || 1;
+  const L2: Pt = [up[0] / ln, up[1] / ln];
   const skyAt = (px: number, py: number) => (typeof spec.sky === 'function' ? spec.sky(px, py) : spec.sky);
   const tones = spec.tones ?? cloudTones({sky: skyAt(x + w / 2, base - h / 2)});
   const steps = spec.soft?.steps ?? 2;
@@ -178,20 +221,33 @@ function buildCumulus(spec: CumulusSpec): CumulusGeom {
     rings.push({d: softs.map((c) => circleD({x: c.x, y: c.y, r: c.r + k * px})).join(''), color: mixHex(edge, air, k / (steps + 1))});
   }
 
-  // ---- inside: the body (circles moved toward the key, faceted), the lit caps, the belly band (a faceted top)
-  const body = all.map((c) => ngonD(c.x + L2[0] * c.r * 0.24, c.y + L2[1] * c.r * 0.24, c.r * 1.0, c.lobe ? 9 : 13, R.range(0, 6.28))).join('');
+  // ---- inside: the body is the whole union moved toward the key (its shade a crescent along the edges facing away);
+  //      the lit band is the lobes facing the key, moved further, cut once by a straight facet (low poly where the
+  //      light turns; the silhouette stays round)
+  const d1 = h * 0.06;
+  const body = all.map((c) => circleD({x: c.x + L2[0] * d1, y: c.y + L2[1] * d1, r: c.r})).join('');
+  const d2 = h * 0.13;
+  const cx0 = all.reduce((acc, c) => acc + c.x * c.r * c.r, 0) / all.reduce((acc, c) => acc + c.r * c.r, 0);
+  const cy0 = all.reduce((acc, c) => acc + c.y * c.r * c.r, 0) / all.reduce((acc, c) => acc + c.r * c.r, 0);
+  const cut = facetCut([cx0, cy0], L2, h * R.range(0.12, 0.24), R.jitter(16), h * R.range(0.03, 0.08) * R.sign(), w);
   const caps = all
-    .filter((c) => c.facing > -0.05 && (c.lobe || c.facing > 0.15))
-    .map((c) => ngonD(c.x + L2[0] * c.r * 0.46, c.y + L2[1] * c.r * 0.46, c.r * 0.76, c.lobe ? 8 : 11, R.range(0, 6.28)))
+    .filter((c) => c.facing > -0.05)
+    .map((c) => clipConvex(circlePts(c.x + L2[0] * d2, c.y + L2[1] * d2, c.r * 0.86), cut))
+    .filter((q) => q.length >= 3)
+    .map(polyD)
     .join('');
-  const bellyH = h * R.range(0.2, 0.27);
-  const segs = 5 + R.int(0, 2);
-  let band = `M${r1(x - w * 0.2)} ${r1(base + 2)}`;
-  for (let i = 0; i <= segs; i++) {
-    const bx = x - w * 0.1 + (w * 1.2 * i) / segs;
-    band += `L${r1(bx)} ${r1(base - bellyH * R.range(0.82, 1.18))}`;
+  // the belly: the low masses' undersides in the cloud's own shade (a lobed top, thicker away from the key), the flat
+  //      base under it
+  // the belly: the flat base's own shade, a wedge (thin under the lit side, thick away from the key: the shade wrapping
+  //      under the cloud), its top two straight facets
+  const sag = h * R.range(0.16, 0.21);
+  let band = `M${r1(x - w * 0.1)} ${r1(base + 2)}`;
+  for (let i = 0; i <= 2; i++) {
+    const u = i / 2;
+    const away = L2[0] >= 0 ? 1 - u : u; // 0 on the key's side .. 1 away from it
+    band += `L${r1(x - w * 0.06 + w * 1.12 * u)} ${r1(base - sag * lerp(0.35, 1.45, away) * R.range(0.92, 1.08))}`;
   }
-  band += `L${r1(x + w * 1.2)} ${r1(base + 2)}Z`;
+  band += `L${r1(x + w * 1.1)} ${r1(base + 2)}Z`;
   const inner = [
     {d: body, color: tones.body},
     {d: caps, color: tones.lit},

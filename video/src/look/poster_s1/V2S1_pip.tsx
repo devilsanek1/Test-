@@ -20,6 +20,7 @@ import {PipTrack} from '../../v2r/kit/pip';
 import {POSES} from '../../v2r/kit/pip/poses';
 import {C, S1_PIP, floodAt} from './V2S1_clock';
 import {useSwitches} from './switches';
+import {Look} from '../../lib/exit';
 import {dark} from './darks';
 
 /** The bollard (screen px): top centre = Pip's seat. */
@@ -69,31 +70,68 @@ const Bollard: React.FC = () => {
 /** Pip and its bollard. The `pip` slot (drawn after the steps). */
 export const S1Pip: React.FC = () => {
   const t = useTime();
+  const sw = useSwitches();
   return (
     <>
       <Bollard />
-      {t >= S1_PIP.from ? (
+      {t >= S1_PIP.from && !sw.pipHidden ? (
         <>
           <ShadowLayer>
             <ContactShadow x={B.x} y={B.top + 1} w={B.w * 0.9} h={6} at={LIGHT_AT} />
           </ShadowLayer>
-          <PipTrack
-            x={B.x}
-            y={B.top}
-            size={S1_PIP.size}
-            facing="back"
-            seed="pipS1"
-            paint="look"
-            tier="support"
-            keys={[
-              {t: S1_PIP.from, draw: S1_PIP.drawDur},
-              // no head-follow: the target key turned Pip's whole body (critic G4); Pip watches the water, steady
-              {t: C.life, pose: EARS_COVER, dur: 0.1},
-              {t: 5.55, pose: 'sit', dur: 0.25},
-            ]}
-          />
+          {/* (the look test's no-outline switch: Pip draws no line, B's same-hue line retired) */}
+          <Look ink={!sw.lineOff}>
+            <PipTrack
+              x={B.x}
+              y={B.top}
+              size={S1_PIP.size}
+              facing="back"
+              seed="pipS1"
+              paint="look"
+              tier="support"
+              keys={[
+                {t: S1_PIP.from, draw: S1_PIP.drawDur},
+                // no head-follow: the target key turned Pip's whole body (critic G4); Pip watches the water, steady
+                {t: C.life, pose: EARS_COVER, dur: 0.1},
+                {t: 5.55, pose: 'sit', dur: 0.25},
+              ]}
+            />
+          </Look>
         </>
       ) : null}
     </>
+  );
+};
+
+/** (the look test: a quiet "find Pip", owner 2026-10-29: decision 5 (b); DIRECTION rule 2; LAYOUT §8.2 "Pip's spot")
+ *  Pip hidden IN the bay tree on our bank (the near frame, plane -2: it rides the tree's float), sitting on a branch
+ *  between the crown's back and front lobes, its head and ears found among the leaves on a second look, its body behind
+ *  the front lobe; >= 250 px from her and off her eye path (the row goes west along the far towpath, her look back goes
+ *  right to W); nearer than the waterline bollard, so its size per metre is at least as big (100 px, mostly covered).
+ *  Facing back: it watches her across the water. The same beats as on the bollard (drawn with the flood, ears-cover on
+ *  "life", sits at 5.55). Drawn by V2S1_fore's planter between the lobes. */
+export const S1_PIP_TREE = {seat: [184, 1446] as [number, number], size: 100} as const;
+export const S1PipInTree: React.FC = () => {
+  const t = useTime();
+  const sw = useSwitches();
+  if (t < S1_PIP.from) return null;
+  const [x, y] = S1_PIP_TREE.seat;
+  return (
+    <Look ink={!sw.lineOff}>
+      <PipTrack
+        x={x}
+        y={y}
+        size={S1_PIP_TREE.size}
+        facing="back"
+        seed="pipS1tree"
+        paint="look"
+        tier="support"
+        keys={[
+          {t: S1_PIP.from, draw: S1_PIP.drawDur},
+          {t: C.life, pose: EARS_COVER, dur: 0.1},
+          {t: 5.55, pose: 'sit', dur: 0.25},
+        ]}
+      />
+    </Look>
   );
 };

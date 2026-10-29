@@ -28,6 +28,9 @@ import {boatGeom, type BoatOpts} from '../../v2r/kit/canal/boat';
 import {BOAT_A, BOAT_B, S1_BOLLARDS, S1_DUCK, S1_FAR_LAMPS, S1_PATH, s1Bend} from './V2S1_set_life';
 import {BANK, edgeY} from './V2S1_steps_stone';
 import {S1_PLANE, s1Float} from './V2S1_float';
+import {currentFloatTable, paletteKey} from './engine';
+import {CM10B} from './palette_10b';
+import {S1_EVENING_10B} from './V2S1_sky';
 import {FLOOD, FLOOD_ORIGIN, S1_PALE, s1HerXAt} from './V2S1_clock';
 import {BRIDGE, HAZE_K, S1_BUS, s1BusX} from './V2S1_set_far';
 import {S1_HAZE, S1_IRON} from './V2S1_set_core';
@@ -55,10 +58,11 @@ const lensLine = (yFoot: number): number => H0 + (yFoot - H0) * K_WATER;
 export const s1MirrorLine = (x: number, yBase: number): number =>
   yBase >= MAP.s1TowpathFeetY(x) - 0.5 ? s1WaterTop(x) : lensLine(yBase) + (s1WaterTop(x) - lensLine(MAP.s1TowpathFeetY(x)));
 /** A reflection's counter-shift inside the water's plane group: the shot's float x (its thing's share - the water's). */
-const WATER_K = parallaxK(S1_PLANE.water);
 export const s1WaterFloat = (plane: number, t: number): Pt => {
   const f = s1Float(t);
-  const k = parallaxK(plane) - WATER_K;
+  // (the look test: the shares by 1/z under the switch: lane E's PARALLAX_Z, set per frame by the root)
+  const table = currentFloatTable();
+  const k = parallaxK(plane, table) - parallaxK(S1_PLANE.water, table);
   return [f[0] * k, f[1] * k];
 };
 const PAPER = '#FBF3E6';
@@ -313,14 +317,18 @@ const S1_WATER: WaterSpec = {
   flood: {origin: FLOOD_ORIGIN, t0: FLOOD.t0, speed: FLOOD.speed, pale: S1_PALE, paper: PAPER},
   joins: [6.1],
 };
-// the static things need the clean pen's colours: built on first use (module order: the palette first)
-let built = false;
-const ensure = () => {
-  if (!built) {
-    S1_WATER.sources = s1Sources();
-    built = true;
+// the static things need the clean pen's colours: built on first use (module order: the palette first); (the look
+// test) one spec per live palette: 10b's water is a mid-tone field (L* 70 / 56, pro_4 §3.7) under 10b's sky
+const SPECS = new Map<string, WaterSpec>();
+const ensure = (): WaterSpec => {
+  const key = paletteKey();
+  let spec = SPECS.get(key);
+  if (!spec) {
+    spec = key === '10b' ? {...S1_WATER, body: CM10B.water, sky: S1_EVENING_10B} : S1_WATER;
+    spec.sources = s1Sources();
+    SPECS.set(key, spec);
   }
-  return S1_WATER;
+  return spec;
 };
 /** S1's water spec with its sources built (node QA, the lint). */
 export const s1WaterSpec = (): WaterSpec => ensure();

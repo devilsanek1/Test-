@@ -22,6 +22,8 @@ import {BANK_LIT, BANK_PAVE, GROUND_VP, edgeSlope} from './V2S1_steps_stone';
 import {useSwitches} from './switches';
 import {dark} from './darks';
 import {nearMid} from './near';
+import {S1PipInTree} from './V2S1_pip';
+import {TreeSlot} from './engine';
 
 type Pt = [number, number];
 const r1 = (n: number) => Math.round(n * 10) / 10;
@@ -106,6 +108,10 @@ const crown: string = [
   ell(128, 1348, 70, 40),
 ].join('');
 
+/** (the look test's "find Pip") the crown in two layers, Pip between them: the back lobes, then the front ones. */
+const CROWN_BACK: string = [ell(118, 1388, 104, 70), ell(128, 1348, 70, 40)].join('');
+const CROWN_FRONT: string = [ell(36, 1420, 84, 58), ell(206, 1428, 80, 54)].join('');
+
 /** (the look test's darks) the crown's underside: the lower lobes shifted down 62 % of their height, clipped to the
  *  crown, leave a dark band along its bottom (~16-26 px). */
 const CROWN_UNDER: string = [
@@ -116,13 +122,24 @@ const CROWN_UNDER: string = [
 
 const Planter: React.FC = () => {
   const {x0, x1, xc, rim, base} = FORE.planter;
-  const {darks} = useSwitches();
+  const sw = useSwitches();
+  const {darks, pipHidden} = sw;
   const clip = 'fcrown' + React.useId().replace(/[^a-zA-Z0-9]/g, '');
-  return (
+  // the bay tree: its trunk, its crown (with Pip inside under the "find Pip" switch) and the shade under it
+  const tree = (
     <>
       {/* the bay's trunk (wider than a line: 16 px) and its crown, cut by the left edge */}
       {darks ? <D d={poly([[118, rim + 2], [134, rim + 2], [138, 1420], [124, 1420]])} c={dark('wood')} s="bayTrunk" /> : <F d={poly([[118, rim + 2], [134, rim + 2], [138, 1420], [124, 1420]])} c={CM.brickDeep} s="bayTrunk" />}
-      <F d={crown} c={CM.sage} s="bayCrown" />
+      {pipHidden ? (
+        // (the look test's quiet "find Pip": Pip sits inside the crown, between its back and front lobes)
+        <>
+          <F d={CROWN_BACK} c={CM.sage} s="bayCrown" />
+          <S1PipInTree />
+          <F d={CROWN_FRONT} c={CM.sage} s="bayCrownF" />
+        </>
+      ) : (
+        <F d={crown} c={CM.sage} s="bayCrown" />
+      )}
       <F d={ell(150, 1414, 52, 30) + ell(70, 1440, 40, 22)} c={LEAF_SHADE} s="bayInner" />
       {/* (the look test's darks) the shade under the crown: its underside, clipped to the crown (the shade under trees) */}
       {darks ? (
@@ -137,6 +154,13 @@ const Planter: React.FC = () => {
           </g>
         </>
       ) : null}
+    </>
+  );
+  return (
+    <>
+      {/* (the look test's foliage switch: lane N's one species tree in this box, in the one wind; a placeholder draws
+          v2's crown, with the darks and Pip's hiding spot) */}
+      <TreeSlot sw={sw} box={[-48, 1308, 334, 174]} foot={[126, rim + 2]} plane={-2} fallback={tree} />
       {/* the planter box: vertical boards in two terracotta woods, a stone coping on top with the soil showing inside
           it (we look down into the box), ivy trailing over its front; every long edge to the vanishing point */}
       {[x0, 58, 164, x1].slice(0, -1).map((xa, i, arr) => (
@@ -336,8 +360,9 @@ const FrontForm: React.FC = () => (
 
 /** (the look test's darks: the near world in mid-tones, near.ts) the bench on tread 2 (plane -1) and the near things
  *  (plane -2) with their rough area shares: lane E's near floor puts them at L* 60 and 55. */
-const MID_ENTRIES: [string, number][] = [[STONE_MID, 0.6], [STONE_LIT, 0.3], [IRON, 0.05], [CM.stoneShade, 0.05]];
-const NEAR_ENTRIES: [string, number][] = [
+const midEntries = (): [string, number][] => [[STONE_MID, 0.6], [STONE_LIT, 0.3], [IRON, 0.05], [CM.stoneShade, 0.05]];
+/** (read at render: the 10b switch moves the CM roles) */
+const nearEntries = (): [string, number][] => [
   [TERRACOTTA, 0.22], [TERRACOTTA_DEEP, 0.08], [STONE_MID, 0.16], [STONE, 0.04], [STONE_LIT, 0.05], [WOOD, 0.08],
   [WOOD_LIGHT, 0.03], [RATTAN, 0.03], [CM.sage, 0.12], [LEAF_SHADE, 0.03], [FERN, 0.06], [SOIL, 0.02], [IRON, 0.01],
   [CM.stoneShade, 0.01], [CM.brickDeep, 0.01], ['#D9A486', 0.02], [CM.leafGold, 0.01], [CM.blossom, 0.005],
@@ -352,7 +377,7 @@ const useNearTone = (entries: [string, number][], plane: number): ((c: string) =
 
 /** The mid layer (the bench), drawn after the treads it stands on and before the near layer. */
 export const S1ForeMid: React.FC = () => (
-  <ToneCtx.Provider value={useNearTone(MID_ENTRIES, -1)}>
+  <ToneCtx.Provider value={useNearTone(midEntries(), -1)}>
     <Feet feet={MID_FEET} />
     <Tier tier="environment">
       <Bench />
@@ -363,7 +388,7 @@ export const S1ForeMid: React.FC = () => (
 /** The near and front layers: the planter and the bay, the crates, the café set, the pier; then what the bottom edge
  *  cuts: the fern pot and the nearest chair. */
 export const S1ForeNear: React.FC = () => (
-  <ToneCtx.Provider value={useNearTone(NEAR_ENTRIES, -2)}>
+  <ToneCtx.Provider value={useNearTone(nearEntries(), -2)}>
     <Feet feet={NEAR_FEET} />
     <Tier tier="environment">
       <Planter />

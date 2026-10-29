@@ -28,6 +28,8 @@ import {S1FarTowpath, S1PathFurniture, S1Boats, S1FarLife, S1PlaneBranch} from '
 import {S1Water, S1Duck} from './V2S1_water';
 import {S1BoatStrips, S1TowpathShadows, S1WingShades} from './V2S1_light';
 import {S1Plane, S1_PLANE} from './V2S1_float';
+import {useSwitches} from './switches';
+import {CloudSlot, SpraySlot} from './engine';
 
 export type S1WorldProps = {
   /** Her figure behind the glass doors (between the lobby and the door glass). */
@@ -48,16 +50,25 @@ const CLOUD_BAR = {x: 40, y: 236, w: 300, h: 20, speed: 9} as const;
  *  tiers: {towpath} her + the row (A, V2S1_row), {seated} the lead's bank, {pip} Pip (B) and its bollard (C). */
 const Env: React.FC<{children?: React.ReactNode}> = ({children}) => <Tier tier="environment">{children}</Tier>;
 
-export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pip}) => (
+export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pip}) => {
+  const sw = useSwitches();
+  return (
   <CanalCast person={k4Person}>
     {/* every group rides its plane's share of the shot's parallax float (V2S1_float; the sky and its clouds fixed) */}
     <Env>
       {/* sky things: the hero cloud (upper right, 2 px/s) + one thin bar (fixed: the sky never floats) */}
-      <Cloud x={S.heroCloud.x0} y={S.heroCloud.y0 + 40} w={S.heroCloud.x1 - S.heroCloud.x0} h={(S.heroCloud.y1 - S.heroCloud.y0) * 0.7} seed="s1cloud" speed={S.heroCloudDriftPxS} top={CM.paper} />
+      {/* (the look test's cloud switch: lane N's hero cumulus in this box; a placeholder draws the kit's cloud) */}
+      <CloudSlot
+        sw={sw}
+        box={[S.heroCloud.x0, S.heroCloud.y0 + 40, S.heroCloud.x1 - S.heroCloud.x0, (S.heroCloud.y1 - S.heroCloud.y0) * 0.7]}
+        speed={S.heroCloudDriftPxS}
+        fallback={<Cloud x={S.heroCloud.x0} y={S.heroCloud.y0 + 40} w={S.heroCloud.x1 - S.heroCloud.x0} h={(S.heroCloud.y1 - S.heroCloud.y0) * 0.7} seed="s1cloud" speed={S.heroCloudDriftPxS} top={CM.paper} />}
+      />
       <Cloud x={CLOUD_BAR.x} y={CLOUD_BAR.y} w={CLOUD_BAR.w} h={CLOUD_BAR.h} seed="s1cloudbar" speed={CLOUD_BAR.speed} />
       {/* the plane branch in the top-left gutter: a NEAR twig (the full float) */}
       <S1Plane plane={S1_PLANE.near}>
-        <S1PlaneBranch />
+        {/* (the look test's foliage switch: lane N's London-plane leaf spray here; a placeholder draws v2's twig) */}
+        <SpraySlot sw={sw} box={[S.planeBranch.x0, S.planeBranch.y0, S.planeBranch.x1 - S.planeBranch.x0, S.planeBranch.y1 - S.planeBranch.y0]} fallback={<S1PlaneBranch />} />
       </S1Plane>
       {/* the west gap: far roofs + SUN0 (+4), the calm tower (+3), the road bridge, its bus and birds (+2); the one far
           jogger seen through the bridge's arch rides the bridge's plane (its clip is the arch) */}
@@ -103,4 +114,5 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
     {/* (S1BankShade retired: the near foreground's big things carry their own form and front shades now) */}
     <S1Plane plane={S1_PLANE.bank}>{pip}</S1Plane>
   </CanalCast>
-);
+  );
+};

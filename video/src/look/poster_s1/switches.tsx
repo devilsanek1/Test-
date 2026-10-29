@@ -22,7 +22,8 @@
 //   sunToned    the sun one step off its sky (decision 6 b)                      the scene (S)          built
 //   pipHidden   Pip in a quiet "find Pip" spot, not on the waterline bollard     the scene (S)          built
 //   float1z     the float moves each plane by 1/z                                depth.ts 1/z (E)       placeholder (P1's table)
-//   lines2px    thin lines 2.0 px on the planes that float                       the pen's widths (E?)  built (scene-level)
+//   lines2px    thin lines 2.0 px on the planes that float                       PEN.lineMin (E)        wired
+//   palette10b  lane E's 10b palette (calm lights, colour in the mids)          palette_10b CM10B (E)  wired
 import React, {createContext, useContext} from 'react';
 
 export type PosterSwitches = {
@@ -39,6 +40,8 @@ export type PosterSwitches = {
   pipHidden: boolean;
   float1z: boolean;
   lines2px: boolean;
+  /** Lane E's 10b palette ("10b Canal Mint, full range": calm lights, colour in the mids; a proposal, STUDY §10's pass 2). */
+  palette10b: boolean;
   /** Part of `darks` (decision 2 b): the near world in mid-tones (near.ts). Undefined = follows `darks`; set it to
    *  split the A/B (the dark pieces alone, or the mid-tones alone). */
   nearMid?: boolean;
@@ -58,6 +61,7 @@ export const V2_SWITCHES: PosterSwitches = {
   pipHidden: false,
   float1z: false,
   lines2px: false,
+  palette10b: false,
 };
 
 export type PosterPreset = 'v2' | 'pass1' | 'pass2';
@@ -80,6 +84,7 @@ export const PRESETS: Record<PosterPreset, PosterSwitches> = {
     pipHidden: true,
     float1z: true,
     lines2px: true,
+    palette10b: true,
   },
 };
 

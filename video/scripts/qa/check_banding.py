@@ -43,6 +43,31 @@ under noise; the plain mint -> peach gradient through the master: 7 stair steps 
 PASSes (dithered ramps, a steep ramp with encoder block wobble, one small jump in a fast ramp), lib/sky's master PASSes
 and its platform re-encodes PASS or WARN (at most 2 stair steps). Not CAMBI itself: run libvmaf's cambi
 (max_log_contrast=3 on light skies) as a second opinion where a build with libvmaf is allowed.
+
+TEXTURE MODE (--texture; lib/texture.tsx's mottle, CRAFT §c "The paper-and-paint test"; off by default: without the flag
+every number and verdict above is exactly as before). A deliberate world-locked mottle is not banding, and a grain is
+not the dither, so:
+  grain      is measured as the HIGH-PASS residual (L* minus its Gaussian blur, sigma 4 px, on the sky pixels): the dither
+             and any grain, without the mottle's low frequencies (GRAIN_MAX still applies to it); `mottle` (information)
+             is the band-pass std (blur sigma 4 minus blur sigma 40).
+  --flat F   the A/B: the same frame(s) rendered with the texture OFF. The texture layer T = Lab(input) - Lab(F), on flat
+             pixels (3 px clear of any colour edge of F): its std after a sigma 2 blur (the mottle: CRAFT §c <= 0.5 L* x
+             --k), p1-p99, the autocorrelation's 1/e radius (15-35 px: 30-70 px blotches), its colour (a*b* std, <=
+             0.35), its high-pass std (a grain: <= 0.15 in the first test), and its std inside the caption band rows
+             (--texture-band, default LAYOUT's 290-600: none allowed, <= 0.08; --band stays the sky's flatness band,
+             317-556). Both frames get the banding analysis; the
+             textured one must be no worse than the flat one (a texture that turns a smooth sky into steps FAILs).
+  --hold A,B a video's locked hold (s): consecutive frames there must not move (frame-to-frame mean |dL*| <= 0.08: static,
+             never boiling; pro_4 §3.6).
+  --k K      the plane's strength (lib/texture mottleK: the sky 0.6, near C 0.7, far C 0.4, A and B 1.0).
+Verdict (with --flat): the TEXTURE's, i.e. what it adds to the flat frame (any region: a sky, a patchwork, a wall):
+FAIL on texture in the band or a texture that adds steps (the textured frame's banding verdict worse than the flat
+one's); WARN on a mottle over its strength (+15 %), a radius outside 15-35 px (the median over ~400 px windows, as the
+posters' boxes were measured), colour over 0.35, a grain, or a hold that moves. Without --flat: the banding verdict
+as before, with the high-pass grain.
+
+  python3 -I scripts/qa/check_banding.py tex.png --texture --flat flat.png --region 0,0,1080,1000 --k 0.6
+  python3 -I scripts/qa/check_banding.py clip.mp4 --texture --flat clip_flat.mp4 --region 0,620,1080,960 --times 0.5,1.0 --hold 1.2,1.8
 """
 from __future__ import annotations
 
@@ -68,6 +93,14 @@ STAIR_C = 0.013  # a stair step's luminance bar: just over one 8-bit luma code a
 MIN_PLATEAU = 8
 WEAK_PLATEAU = 16
 GRAIN_MAX = 0.6
+# texture mode (CRAFT §c; lib/texture.tsx)
+TEX_STD = 0.5  # the mottle's std at k 1 (L*)
+TEX_STD_SLACK = 1.15
+TEX_R = (15.0, 35.0)  # its autocorrelation's 1/e radius (px at 1080): blotches 30-70 px
+TEX_AB = 0.35  # its colour (a*b* std)
+TEX_GRAIN = 0.15  # the texture layer's high-pass std (L*): a grain shows here; the first test has none
+TEX_BAND = 0.08  # its std inside the caption band (L*): none allowed
+TEX_HOLD = 0.08  # frame-to-frame mean |dL*| on a locked hold (pro_4 §3.6)
 
 
 # ---------------------------------------------------------------- colour
@@ -321,7 +354,7 @@ def strip_steps(lab: np.ndarray, Y: np.ndarray, sw: int, k: float, along0: int, 
     return strips, grains
 
 
-def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float, axes: str = 'yx', wide: int = 256) -> dict:
+def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float, axes: str = 'yx', wide: int = 256, texture: bool = False) -> dict:
     H, W = rgb.shape[:2]
     k = W / 1080.0
     x0, y0, x1, y1 = [int(round(v * k)) for v in region]
@@ -359,6 +392,10 @@ def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float, axes: str 
     strong = sum(s['strong'] for s in strips)
     weak_worst = max([s['weak'] for s in strips], default=0)
     grain = float(np.nanmedian(grains)) if grains else float('nan')
+    if texture:
+        # texture mode: the grain is the HIGH-PASS residual (the dither, a grain), never the mottle's low frequencies
+        res['grain_full'] = grain
+        grain, res['mottle'] = texture_grain(lab, k)
     res['grain'] = grain
     res['visible'] = vis
     res['visible_worst_strip'] = vis_worst
@@ -400,6 +437,156 @@ def analyse(rgb: np.ndarray, region, strip: int, band, max_dl: float, axes: str 
     return res
 
 
+# ---------------------------------------------------------------- texture mode (lib/texture.tsx; CRAFT §c)
+
+def _blur(a: np.ndarray, sigma: float) -> np.ndarray:
+    return cv2.GaussianBlur(a.astype(np.float32), (0, 0), sigma).astype(np.float64)
+
+
+def _nblur(a: np.ndarray, m: np.ndarray, sigma: float) -> np.ndarray:
+    """Normalised convolution: the blur of `a` over the valid pixels `m` only."""
+    w = _blur(m.astype(np.float64), sigma)
+    return np.where(w > 1e-3, _blur(np.where(m, a, 0.0), sigma) / np.maximum(w, 1e-3), 0.0)
+
+
+def texture_grain(lab: np.ndarray, k: float) -> tuple[float, float]:
+    """(the high-pass grain, the band-pass mottle) of a sky region: L* minus its blur (sigma 4 px) and blur 4 minus blur
+    40, on the sky pixels (within 2.5 L* of the row median), at canvas scale k."""
+    L = lab[..., 0]
+    sky = np.abs(L - np.median(L, axis=1, keepdims=True)) <= 2.5
+    hp = L - _nblur(L, sky, 4 * k)
+    bp = _nblur(L, sky, 4 * k) - _nblur(L, sky, 40 * k)
+    core = sky & ndi_erode(sky, int(round(6 * k)))
+    if core.sum() < 100:
+        return float('nan'), float('nan')
+    deep = core & ndi_erode(sky, int(round(40 * k)))
+    return float(np.std(hp[core])), (float(np.std(bp[deep])) if deep.sum() > 100 else float('nan'))
+
+
+def ndi_erode(m: np.ndarray, n: int) -> np.ndarray:
+    if n <= 0:
+        return m
+    return cv2.erode(m.astype(np.uint8), np.ones((2 * n + 1, 2 * n + 1), np.uint8)).astype(bool)
+
+
+def acf_radius(field: np.ndarray, m: np.ndarray, level: float = 1 / math.e) -> float:
+    """Radius (px) where the radially averaged autocorrelation of `field` (over the valid pixels `m`) falls to `level`."""
+    f = np.where(m, field - field[m].mean(), 0.0)
+    if f[m].std() < 1e-6:
+        return float('nan')
+    F = np.fft.fft2(f, s=(2 * f.shape[0], 2 * f.shape[1]))
+    M = np.fft.fft2(m.astype(np.float64), s=(2 * f.shape[0], 2 * f.shape[1]))
+    ac = np.fft.fftshift(np.fft.ifft2(np.abs(F) ** 2).real)
+    n = np.fft.fftshift(np.fft.ifft2(np.abs(M) ** 2).real)
+    ac = np.where(n > 0.25 * n.max(), ac / np.maximum(n, 1e-9), 0.0)
+    ac /= ac.max()
+    cy, cx = np.array(ac.shape) // 2
+    yy, xx = np.indices(ac.shape)
+    r = np.hypot(yy - cy, xx - cx).astype(int)
+    prof = np.bincount(r.ravel(), ac.ravel()) / np.maximum(1, np.bincount(r.ravel()))
+    below = np.nonzero(prof < level)[0]
+    if not len(below):
+        return float('nan')
+    i = below[0]
+    return float(i - 1 + (prof[i - 1] - level) / max(1e-9, prof[i - 1] - prof[i]))
+
+
+def texture_ab(tex: np.ndarray, flat: np.ndarray, region, band, k_strength: float) -> dict:
+    """The texture layer T = Lab(tex) - Lab(flat) in the region: its strength, size, colour, grain and its std in the band."""
+    H, W = tex.shape[:2]
+    k = W / 1080.0
+    x0, y0, x1, y1 = [int(round(v * k)) for v in region]
+    x0, x1 = max(0, x0), min(W, x1)
+    y0, y1 = max(0, y0), min(H, y1)
+    lt, _ = rgb_to_lab_y(tex[y0:y1, x0:x1])
+    lf, _ = rgb_to_lab_y(flat[y0:y1, x0:x1])
+    T = lt - lf
+    # flat pixels of the flat render: 3 px clear of any colour edge (the texture moves an edge's anti-aliasing a little).
+    # Edges are read on the render blurred sigma 1.2 over a 3 px span: a sky's +-2-code dither averages away, a facet's
+    # 4 L* step does not
+    ls = np.stack([_blur(lf[..., c], 1.2 * k) for c in range(3)], -1)
+    g = np.zeros(lf.shape[:2], bool)
+    d = np.linalg.norm(ls[3:] - ls[:-3], axis=-1) > 1.5
+    g[1:-2] |= d
+    d = np.linalg.norm(ls[:, 3:] - ls[:, :-3], axis=-1) > 1.5
+    g[:, 1:-2] |= d
+    m = ~cv2.dilate(g.astype(np.uint8), np.ones((7, 7), np.uint8)).astype(bool)
+    rows = np.arange(y0, y1)[:, None] / k
+    bnd = band if band and band[1] > band[0] else None
+    inband = np.broadcast_to((rows >= bnd[0]) & (rows <= bnd[1]), m.shape) if bnd else np.zeros_like(m)
+    # the band's soft edge (48 px each side) is neither in nor out
+    near = np.broadcast_to((rows >= bnd[0] - 60) & (rows <= bnd[1] + 60), m.shape) if bnd else np.zeros_like(m)
+    out_m = m & ~near
+    # style.py's mottling definition (the posters' numbers and CRAFT §c's spec): the layer blurred sigma 4 px
+    lp = _nblur(T[..., 0], m, 4 * k)
+    la = _nblur(T[..., 1], m, 4 * k)
+    lb = _nblur(T[..., 2], m, 4 * k)
+    hp = T[..., 0] - _nblur(T[..., 0], m, 4 * k)
+    core = out_m & ndi_erode(m, int(round(4 * k)))
+    res = {'region': list(region), 'k': k_strength, 'flat_px': round(100 * float(m.mean()), 1)}
+    if core.sum() < 400:
+        res['verdict'] = 'PASS'
+        res['why'] = ['no flat pixels outside the band to measure']
+        return res
+    res['std'] = round(float(lp[core].std()), 3)
+    res['p1_p99'] = round(float(np.percentile(lp[core], 99) - np.percentile(lp[core], 1)), 2)
+    # the blotch size as the posters' boxes were measured: the median 1/e radius over ~400 px windows (a whole frame's
+    # autocorrelation reads its largest scales: ~33 px where the windows read ~29)
+    wn = int(round(400 * k))
+    rads = []
+    for wy in range(0, max(1, core.shape[0] - wn // 2), wn):
+        for wx in range(0, max(1, core.shape[1] - wn // 2), wn):
+            cm = core[wy:wy + wn, wx:wx + wn]
+            if cm.sum() >= 0.35 * wn * wn:
+                rv = acf_radius(lp[wy:wy + wn, wx:wx + wn], cm)
+                if rv == rv:
+                    rads.append(rv / k)
+    res['radius_1e'] = round(float(np.median(rads)), 1) if rads else round(acf_radius(lp, core) / k, 1)
+    res['radius_windows'] = len(rads)
+    res['chroma'] = round(float(math.hypot(la[core].std(), lb[core].std())), 3)
+    res['grain'] = round(float(hp[core].std()), 3)
+    res['mean_shift'] = round(float(T[..., 0][core].mean()), 3)
+    if bnd:
+        bc = m & inband & ndi_erode(m, 2)
+        res['band'] = {'y': [bnd[0], bnd[1]], 'std': round(float(lp[bc].std()), 3) if bc.sum() > 100 else None}
+    why = []
+    verdict = 'PASS'
+    if bnd and res['band']['std'] is not None and res['band']['std'] > TEX_BAND:
+        verdict = 'FAIL'
+        why.append(f"texture in the caption band y {bnd[0]:.0f}-{bnd[1]:.0f}: std {res['band']['std']} L* > {TEX_BAND}")
+    lim = TEX_STD * k_strength * TEX_STD_SLACK
+    if res['std'] > lim:
+        why.append(f"mottle std {res['std']} L* > {lim:.2f} (k {k_strength})")
+    r = res['radius_1e']
+    # (a region under one ~400 px window reads a biased radius: reported, never warned)
+    if r == r and res['radius_windows'] and not (TEX_R[0] <= r <= TEX_R[1]):
+        why.append(f'mottle radius {r} px outside {TEX_R[0]:.0f}-{TEX_R[1]:.0f}')
+    if res['chroma'] > TEX_AB:
+        why.append(f"mottle colour {res['chroma']} > {TEX_AB} a*b*")
+    if res['grain'] > TEX_GRAIN:
+        why.append(f"a grain: high-pass std {res['grain']} L* > {TEX_GRAIN}")
+    if why and verdict == 'PASS':
+        verdict = 'WARN'
+    res['verdict'] = verdict
+    res['why'] = why
+    return res
+
+
+def hold_motion(path: str, info: dict, t0: float, t1: float, region, max_frames: int = 24) -> dict:
+    """Frame-to-frame mean |dL*| over a locked hold of a video (static: never boiling)."""
+    fps = eval(info.get('r_frame_rate', '60/1'))
+    n = max(2, min(max_frames, int(round((t1 - t0) * fps)) + 1))
+    W = int(info['width'])
+    k = W / 1080.0
+    x0, y0, x1, y1 = [int(round(v * k)) for v in region]
+    Ls = []
+    for i in range(n):
+        rgb = decode(path, t0 + i / fps, info)
+        Ls.append(rgb_to_lab_y(rgb[y0:y1, x0:x1])[0][..., 0])
+    d = [float(np.abs(Ls[i + 1] - Ls[i]).mean()) for i in range(len(Ls) - 1)]
+    return {'t': [t0, t1], 'frames': len(Ls), 'mean_dL': round(float(np.mean(d)), 4), 'max_dL': round(float(np.max(d)), 4)}
+
+
 def plot(rgb: np.ndarray, region, strip: int, path: str):
     import matplotlib
     matplotlib.use('Agg')
@@ -437,25 +624,57 @@ def main() -> int:
     ap.add_argument('--json', default='', help='write the numbers here')
     ap.add_argument('--plot', default='', help='write the profiles of 4 strips here (PNG)')
     ap.add_argument('--quiet', action='store_true')
+    ap.add_argument('--texture', action='store_true', help='texture mode (lib/texture.tsx): the grain as high-pass; with --flat the A/B texture layer')
+    ap.add_argument('--flat', default='', help='texture mode: the same frame(s) rendered with the texture off (PNG or video)')
+    ap.add_argument('--k', type=float, default=1.0, help="texture mode: the plane's mottle strength (the sky 0.6, near C 0.7, far C 0.4, A/B 1)")
+    ap.add_argument('--hold', default='', help='texture mode, video: a locked hold t0,t1 (s) that must not move')
+    ap.add_argument('--texture-band', default='290,600', help="texture mode: the screen rows kept free of texture (LAYOUT.md's band, y 290-600; '' = none); --band stays the sky's flatness band")
     a = ap.parse_args()
     region = [float(v) for v in a.region.split(',')]
     band = [float(v) for v in a.band.split(',')] if a.band else None
     frames = []
+    flats = []
+    info = None
     if a.input.lower().endswith(('.png', '.jpg', '.jpeg', '.tif', '.tiff')):
         frames.append(('frame', load_png(a.input)))
+        if a.texture and a.flat:
+            flats.append(load_png(a.flat) if a.flat.lower().endswith(('.png', '.jpg', '.jpeg', '.tif', '.tiff')) else decode(a.flat, 0.0, probe(a.flat)))
     else:
         info = probe(a.input)
         dur = info['duration'] or 1.0
         ts = [float(t) for t in a.times.split(',')] if a.times else [dur * f for f in (0.2, 0.5, 0.8)]
+        finfo = probe(a.flat) if a.texture and a.flat else None
         for t in ts:
             frames.append((f'{t:.2f}s', decode(a.input, t, info)))
+            if finfo:
+                flats.append(decode(a.flat, t, finfo))
     results = []
-    for name, rgb in frames:
-        r = analyse(rgb, region, a.strip, band, a.max_dl, a.axes, a.wide)
+    for i, (name, rgb) in enumerate(frames):
+        r = analyse(rgb, region, a.strip, band, a.max_dl, a.axes, a.wide, texture=a.texture)
         r['frame'] = name
+        if a.texture and flats:
+            # the A/B: the texture layer, and the banding of the flat frame (the texture must add no steps)
+            tb = [float(v) for v in a.texture_band.split(',')] if a.texture_band else None
+            r['texture'] = texture_ab(rgb, flats[i], region, tb, a.k)
+            rf = analyse(flats[i], region, a.strip, band, a.max_dl, a.axes, a.wide, texture=True)
+            r['flat_verdict'] = rf['verdict']
+            order0 = {'PASS': 0, 'WARN': 1, 'FAIL': 2}
+            if order0[r['verdict']] > order0[rf['verdict']]:
+                r['why'].append(f"the texture adds steps (flat {rf['verdict']}, textured {r['verdict']})")
+                r['texture']['why'].append('the texture adds steps')
+                r['texture']['verdict'] = 'FAIL'
+            # with the A/B, the verdict is the TEXTURE's: what it adds to the flat frame (a region that is not open sky,
+            # such as a patchwork, fails the sky's banding test in both frames: that is not the texture's doing)
+            r['banding_verdict'] = r['verdict']
+            r['verdict'] = r['texture']['verdict']
         results.append(r)
         if a.plot and len(results) == 1:
             plot(rgb, region, a.strip, a.plot)
+    hold = None
+    if a.texture and a.hold and info is not None:
+        h0, h1 = [float(v) for v in a.hold.split(',')]
+        hold = hold_motion(a.input, info, h0, h1, region)
+        hold['verdict'] = 'WARN' if hold['mean_dL'] > TEX_HOLD else 'PASS'
     order = {'PASS': 0, 'WARN': 1, 'FAIL': 2}
     worst = max(results, key=lambda r: (order[r['verdict']], r['visible_worst_strip'], r['visible'], r['weak_worst_strip'], r['max_c']))
     if not a.quiet:
@@ -466,10 +685,28 @@ def main() -> int:
             print(f"{r['verdict']:4s} {a.input} @ {r['frame']}: visible {r['visible']} (worst strip {r['visible_worst_strip']}, strong {r['strong']}), weak (worst strip) {r['weak_worst_strip']}{xs}, "
                   f"max step dL* {r['max_dL']:.2f} c {r['max_c']:.4f} dE00 {r['max_dE00']:.2f}, plateau {r['median_plateau']:.0f} px, "
                   f"staircase {r['staircase_median']:.2f}, grain {r['grain']:.2f} L*{bs}" + (f"  [{'; '.join(r['why'])}]" if r['why'] else ''))
+    verdict = worst['verdict']
+    if hold and order[hold['verdict']] > order[verdict]:
+        verdict = hold['verdict']
+    if a.texture and not a.quiet:
+        for r in results:
+            tx = r.get('texture')
+            gm = f"grain (high-pass) {r['grain']:.2f} L*, mottle (band-pass) {r.get('mottle', float('nan')):.2f} L*"
+            if tx and 'std' in tx:
+                bs = f", in the band {tx['band']['std']}" if tx.get('band') else ''
+                print(f"TEXTURE {tx['verdict']:4s} @ {r['frame']}: layer std {tx['std']} L* (k {tx['k']}), p1-p99 {tx['p1_p99']}, radius {tx['radius_1e']} px, colour {tx['chroma']} a*b*, "
+                      f"grain {tx['grain']}, mean shift {tx['mean_shift']}{bs}; flat frame {r.get('flat_verdict')}; {gm}" + (f"  [{'; '.join(tx['why'])}]" if tx['why'] else ''))
+            else:
+                print(f"TEXTURE @ {r['frame']}: {gm}")
+        if hold:
+            print(f"HOLD {hold['verdict']} {hold['t'][0]}-{hold['t'][1]} s: frame-to-frame mean |dL*| {hold['mean_dL']} (max {hold['max_dL']}) over {hold['frames']} frames (static <= {TEX_HOLD})")
     if a.json:
         with open(a.json, 'w') as f:
-            json.dump({'input': a.input, 'verdict': worst['verdict'], 'frames': results}, f, indent=1)
-    return 1 if worst['verdict'] == 'FAIL' else 0
+            out = {'input': a.input, 'verdict': verdict, 'frames': results}
+            if hold:
+                out['hold'] = hold
+            json.dump(out, f, indent=1)
+    return 1 if verdict == 'FAIL' else 0
 
 
 if __name__ == '__main__':

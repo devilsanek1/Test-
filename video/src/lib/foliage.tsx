@@ -406,14 +406,14 @@ export const LONDON_PLANE: Species = {
   aspect: 0.78,
   clear: 0.36,
   trunk: 0.068,
-  clusters: {near: [9, 12], mid: [5, 7], far: [1, 2]},
-  clusterR: {near: [0.27, 0.42], mid: [0.32, 0.46], far: [0.6, 0.8]},
+  clusters: {near: [8, 11], mid: [5, 7], far: [1, 2]},
+  clusterR: {near: [0.25, 0.46], mid: [0.32, 0.46], far: [0.6, 0.8]},
   irregular: 0.13,
   flatBase: 0.3,
   leafK: {near: 0.12, mid: 0.08},
   leafPx: {near: [26, 46], mid: [11, 18]},
   limbs: [3, 4],
-  autumn: 0.07,
+  autumn: 0.035,
 };
 
 // ================================================================= the low-poly cluster (an icosphere)
@@ -488,9 +488,10 @@ export type CrownSpec = {
   bark?: BarkTones;
   /** The set's atmosphere (lib/depth): a mid or far tree takes its plane's step toward the air. */
   atm?: Atmosphere;
-  /** Sky holes: the colour of the sky a step down behind the crown (2-4 holes near the thin edge), or false (none:
-   *  the crown is not against the sky). Default false. */
-  holes?: string | false;
+  /** Sky holes: the colour of the sky a step down behind the crown (2-4 holes near the thin edge), as a colour or a
+   *  function of the hole's centre (lib/sky's skyColorAt a step down), or false (none: the crown is not against the
+   *  sky). Default false. A function is not part of the geometry cache's key: keep one per crown. */
+  holes?: string | ((x: number, y: number) => string) | false;
   /** Holes only where the sky is behind the crown: above this y (canvas px; default: anywhere). */
   holesAbove?: number;
   /** October: the share of rim leaves turned gold or rust (default species.autumn). */
@@ -534,7 +535,8 @@ export type CrownGeom = {
   /** The crown envelope's centre and radii (screen px). */
   centre: Pt;
   radii: [number, number];
-  /** Clusters behind the limbs, then the trunk and limbs, then the clusters in front (back to front). */
+  /** Clusters drawn before the wood (none by default: the wood sits under the crown), the trunk and limbs, then the
+   *  clusters over them (back to front). */
   back: ClusterGeom[];
   wood: Layer[];
   front: ClusterGeom[];
@@ -888,14 +890,14 @@ function buildCrown(spec: CrownSpec): CrownGeom {
       const f = nb > 1 ? rank / (nb - 1) : 0.5;
       baseK[ci] = bands.filter((b) => f >= b).length;
     });
-    const hiCount = mode === 'near' ? 3 : 2;
+    const hiCount = 2;
     const hiSet = new Set(order.slice(-hiCount));
     const leafBase = mode === 'near' ? sp.leafK.near : sp.leafK.mid;
     const leafRange = mode === 'near' ? sp.leafPx.near : sp.leafPx.mid;
     const Lf = spec.leafSize ?? clamp(Rm * leafBase, leafRange[0], leafRange[1]);
     const autumnShare = spec.autumn ?? sp.autumn;
     const tpl = mode === 'near' ? sp.rimLeaf : sp.bumpLeaf;
-    const blobs = cls.map((cl) => blob(cl.c[0], cl.c[1], cl.r[0], cl.r[1], cl.seed.fork('blob'), 40, cl.core ? 0.5 : 1));
+    const blobs = cls.map((cl) => blob(cl.c[0], cl.c[1], cl.r[0], cl.r[1], cl.seed.fork('blob'), 44, cl.core ? 0.5 : 1.7));
     // sky holes near the thin edge (2-4 on the top and side clusters, only where the sky is behind)
     const holeAt = new Map<number, Pt[]>();
     if (spec.holes) {
@@ -925,21 +927,36 @@ function buildCrown(spec: CrownSpec): CrownGeom {
       const leaves: RimLeaf[] = [];
       if (!cl.core) {
         const nearer = blobs.slice(ci + 1);
+        const others = blobs.filter((_, j) => j !== ci);
         const rr = cl.seed.fork('rim');
-        const step = Lf * (mode === 'near' ? 0.56 : 0.62);
-        for (const {p, n: n2} of alongClosed(body, step, rr.range(0, step))) {
-          let deg = (Math.atan2(n2[1], n2[0]) * 180) / Math.PI + rr.jitter(40);
-          if (n2[1] > 0.35) deg = lerp(deg, 90, 0.3); // the low leaves hang a little
-          const len = Lf * rr.range(0.78, 1.22);
-          const base: Pt = [p[0] - n2[0] * len * 0.45, p[1] - n2[1] * len * 0.45];
-          const tip: Pt = [base[0] + Math.cos(rad(deg)) * len, base[1] + Math.sin(rad(deg)) * len];
-          const pose = leafPose(base, len, deg, rr.jitter(48), rr.jitter(30), rr.chance(0.5));
-          if (nearer.some((b) => inPoly(b, tip) && inPoly(b, [(base[0] + tip[0]) / 2, (base[1] + tip[1]) / 2]))) continue;
-          const halves = leafFacets(pose, tpl, 0).map((f) => f.poly);
-          const outline = leafPts(pose, tpl);
-          const turned = rr.chance(autumnShare * (0.5 + 0.9 * Math.max(0, n2[0] * L2[0] + n2[1] * L2[1]))) ? (rr.chance(0.68) ? 'gold' : 'rust') : undefined;
-          leaves.push({outline, halves, autumn: turned});
-          leafCount++;
+        const ph = rr.range(0, 100);
+        // two rows: an OUTER row of fewer, bigger leaves standing ~70 % out past the mass and about a leaf apart (each
+        // one's own outline reads against what is behind: the species at the silhouette), then a tucked INNER row
+        // between them (the lace; no saw)
+        const rows = mode === 'near' ? [{step: 1.02, out: 0.3, size: [0.86, 1.2] as [number, number]}, {step: 0.55, out: 0.62, size: [0.6, 0.9] as [number, number]}] : [{step: 0.62, out: 0.5, size: [0.75, 1.2] as [number, number]}];
+        for (const row of rows) {
+          const step = Lf * row.step;
+          for (const {p, n: n2} of alongClosed(body, step, rr.range(0, step))) {
+            if (rr.chance(0.1)) continue;
+            // the lean varies SMOOTHLY along the edge (neighbours lean together, like sprigs), plus a little of its own
+            const along = Math.atan2(p[1] - c2[1], p[0] - c2[0]);
+            const lean = 22 * Math.sin(along * 3 + ph) + 9 * Math.sin(along * 7 + ph * 1.7) + rr.jitter(10);
+            let deg = (Math.atan2(n2[1], n2[0]) * 180) / Math.PI + lean;
+            if (n2[1] > 0.2) deg = lerp(deg, 90, 0.35); // the low leaves hang
+            const len = Lf * rr.range(row.size[0], row.size[1]);
+            const base: Pt = [p[0] - n2[0] * len * row.out, p[1] - n2[1] * len * row.out];
+            const tip: Pt = [base[0] + Math.cos(rad(deg)) * len, base[1] + Math.sin(rad(deg)) * len];
+            const pose = leafPose(base, len, deg, rr.jitter(28), rr.jitter(16), rr.chance(0.5));
+            if (nearer.some((bb) => inPoly(bb, tip) && inPoly(bb, [(base[0] + tip[0]) / 2, (base[1] + tip[1]) / 2]))) continue;
+            const halves = leafFacets(pose, tpl, 0).map((f) => f.poly);
+            const outline = leafPts(pose, tpl);
+            // October: a few leaves turned, only on the crown's outer edge and its lit side (they turn from the outside)
+            const outer = !others.some((bb) => inPoly(bb, tip));
+            const lit = n2[0] * L2[0] + n2[1] * L2[1];
+            const turned = row.out < 0.5 && outer && lit > -0.2 && rr.chance(autumnShare * (0.8 + 1.2 * Math.max(0, lit))) ? (rr.chance(0.65) ? 'gold' : 'rust') : undefined;
+            leaves.push({outline, halves, autumn: turned});
+            leafCount++;
+          }
         }
       }
       // the cuts: a lit cap toward the key (bigger on the brighter clusters, smaller low down: the crown shades
@@ -947,8 +964,8 @@ function buildCrown(spec: CrownSpec): CrownGeom {
       const rank = order.indexOf(ci);
       const fr = nb > 1 ? Math.max(0, rank) / (nb - 1) : 0.5;
       const cs = cl.seed.fork('cut');
-      const cap = cl.core ? null : capRegion(c2, r, L2, cutFor(lerp(0.36, 0.6, fr)), cs.jitter(16), cs.range(0.05, 0.12) * cs.sign());
-      const hi = !cl.core && hiSet.has(ci) && kb + 2 <= top1 ? capRegion(c2, r, L2, cutFor(cs.range(0.16, 0.24)), cs.jitter(22), cs.range(0.04, 0.1) * cs.sign()) : null;
+      const cap = cl.core ? null : capRegion(c2, r, L2, cutFor(lerp(0.34, 0.62, fr)), cs.jitter(26), cs.range(0.06, 0.16) * cs.sign());
+      const hi = !cl.core && hiSet.has(ci) && kb + 2 <= top1 ? capRegion(c2, r, L2, cutFor(cs.range(0.09, 0.14)), cs.jitter(30), cs.range(0.05, 0.12) * cs.sign()) : null;
       const away: Pt = [-L2[0], -L2[1]];
       const coreCut = !cl.core && kb >= 1 && fr < 0.6 && cl.c[1] > C[1] - Ry * 0.1 ? capRegion(c2, r, away, cutFor(cs.range(0.14, 0.22)), cs.jitter(18), cs.range(0.04, 0.1) * cs.sign()) : null;
       const green = leaves.filter((q) => !q.autumn);
@@ -968,19 +985,62 @@ function buildCrown(spec: CrownSpec): CrownGeom {
         add(cp, kb - 1);
         cp.forEach((q, i) => addRegion(q, kb - 1, i ? 0.55 : 1, kb));
       }
+      const towardHalf = (q: RimLeaf) => (q.halves.length < 2 ? null : q.halves.slice().sort((a, b) => (centroid(b)[0] - centroid(a)[0]) * L2[0] + (centroid(b)[1] - centroid(a)[1]) * L2[1])[0]);
       const lightCut = (cut: Pt[] | null, k: number) => {
         if (!cut) return;
         const cp = shapes.map((s) => clipConvex(s, cut));
         add(cp, k);
         cp.forEach((q, i) => addRegion(q, k, i ? 0.55 : 1, k - 1));
-        if (mode === 'near') {
-          const folds = green.filter((q) => inConvex(cut, centroid(q.outline))).map(awayHalf).filter((q): q is Pt[] => !!q).map((q) => clipConvex(q, cut));
-          add(folds, k - 1);
-          for (const q of folds) addRegion(q, k - 1, 0.55, k);
-        }
       };
       lightCut(cap, kb + 1);
       lightCut(hi, kb + 2);
+      // the light reveals the leaves: on the lit facets each rim leaf catches it WHOLE, its key-facing half one step up and
+      // the other half the half step between (a leaf folded on its midrib, N2); cut by the same facet (low poly); in
+      // the shade they merge into the mass (the shade side stays calm)
+      if (mode === 'near') {
+        const regionOf = (m: Pt): [number, Pt[] | null] => (hi && inConvex(hi, m) ? [kb + 2, hi] : cap && inConvex(cap, m) ? [kb + 1, cap] : [-1, null]);
+        // a few sprigs INSIDE the lit cap too (3-4 leaves fanning toward the key): the light shows the foliage
+        const sprigs: RimLeaf[] = [];
+        if (cap && r > Lf * 2.6) {
+          const ss = cl.seed.fork('sprig');
+          const nsp = r > Lf * 4 ? 2 : 1;
+          for (let j = 0; j < nsp; j++) {
+            const a0 = Math.atan2(L2[1], L2[0]) + ss.jitter(0.9);
+            const at: Pt = [c2[0] + Math.cos(a0) * r * ss.range(0.35, 0.6), c2[1] + Math.sin(a0) * r * ss.range(0.35, 0.6)];
+            const m = ss.int(3, 4);
+            for (let q = 0; q < m; q++) {
+              const deg = (a0 * 180) / Math.PI + (q - (m - 1) / 2) * ss.range(32, 46) + ss.jitter(10);
+              const len = Lf * ss.range(0.7, 0.95);
+              const pose = leafPose(at, len, deg, ss.jitter(26), ss.jitter(14), ss.chance(0.5));
+              sprigs.push({outline: leafPts(pose, tpl), halves: leafFacets(pose, tpl, 0).map((f) => f.poly)});
+            }
+          }
+        }
+        const lit = green.concat(sprigs).map((q) => ({q, r: regionOf(centroid(q.outline))})).filter((e) => e.r[0] >= 0);
+        // the fold: the key-facing half one step up (never into hi outside the hi facet: hi stays a dab), the other
+        // half the half step between; on the brightest facets the fold shows as the away half's half step down
+        const byTone = new Map<string, {toward: Pt[][]; away: Pt[][]; kT: number; cA: string}>();
+        for (const e of lit) {
+          const k = e.r[0];
+          const cut = e.r[1] as Pt[];
+          const up = k + 1 <= top1 - 1 || (k + 1 === top1 && cut === hi);
+          const kT = up ? k + 1 : k;
+          const cA = up ? mixL(tones[k], tones[k + 1]) : mixL(tones[Math.max(0, k - 1)], tones[k]);
+          const key = `${kT}|${cA}`;
+          const slot = byTone.get(key) ?? {toward: [], away: [], kT, cA};
+          const tw = towardHalf(e.q);
+          const aw = awayHalf(e.q);
+          if (tw && up) slot.toward.push(clipConvex(tw, cut));
+          if (aw) slot.away.push(clipConvex(aw, cut));
+          byTone.set(key, slot);
+        }
+        byTone.forEach((slot) => {
+          const da = slot.away.filter((q) => q.length >= 3).map(polyD).join('');
+          if (da) layers.push({d: da, color: slot.cA});
+          add(slot.toward, slot.kT);
+          for (const h of slot.toward) addRegion(h, slot.kT, 0.55, slot.kT - 1);
+        });
+      }
       // October's turned leaves: gold or rust at the value of the tone where they sit, folded the same way
       for (const kind of ['gold', 'rust'] as const) {
         const mine = leaves.filter((q) => q.autumn === kind);
@@ -998,7 +1058,22 @@ function buildCrown(spec: CrownSpec): CrownGeom {
         }
       }
       const hole = holeAt.get(ci);
-      if (hole) layers.push({d: polyD(hole), color: spec.holes as string});
+      if (hole && spec.holes) {
+        // a gap between leaves: the sky there, a step down, bitten by three leaves of the mass around it
+        const hc = centroid(hole);
+        layers.push({d: polyD(hole), color: typeof spec.holes === 'function' ? spec.holes(hc[0], hc[1]) : spec.holes});
+        const hr = Math.sqrt(Math.abs(area2(hole)) / Math.PI);
+        const kh = hi && inConvex(hi, hc) ? kb + 2 : cap && inConvex(cap, hc) ? kb + 1 : kb;
+        const bites: Pt[][] = [];
+        const hs = cl.seed.fork('bites');
+        for (let j = 0; j < 3; j++) {
+          const a = hs.range(0, Math.PI * 2);
+          const at: Pt = [hc[0] + Math.cos(a) * hr * 1.25, hc[1] + Math.sin(a) * hr * 1.25];
+          const deg = (Math.atan2(hc[1] - at[1], hc[0] - at[0]) * 180) / Math.PI + hs.jitter(25);
+          bites.push(leafPts(leafPose(at, hr * hs.range(0.9, 1.3), deg, hs.jitter(40), 0, hs.chance(0.5)), tpl));
+        }
+        add(bites, kh);
+      }
       return {id: cl.id, c: c2, z: cl.c[2], layers};
     });
   }
@@ -1072,11 +1147,10 @@ function buildCrown(spec: CrownSpec): CrownGeom {
   // the crown's own shade over the trunk's top (the shade under the tree: a real effect): its edge slants with the
   // light, in two flat steps (a half step on the lit side first)
   if (mode !== 'far') {
-    const slope = -0.05 * tSide;
-    const edge = (u: number) => 0.84 + slope * u;
-    wood.push({d: polyD(trunkPatch((u) => edge(u) - 0.035, 1, litBand[0], litBand[1])), color: woodTone(mixL(bark.lit, bark.shade))});
-    wood.push({d: polyD(trunkPatch(edge, 1, -1, 1)), color: woodTone(bark.shade)});
-    wood.push({d: polyD(trunkPatch(edge, 1, shadeBand[0], shadeBand[1])), color: woodTone(bark.core)});
+    const slope = -0.06 * tSide;
+    const edge = (u: number) => 0.86 + slope * u;
+    wood.push({d: polyD(trunkPatch((u) => edge(u) - 0.04, 1, litBand[0], litBand[1])), color: woodTone(mixL(bark.lit, bark.shade))});
+    wood.push({d: polyD(trunkPatch(edge, 1, litBand[0], litBand[1])), color: woodTone(bark.shade)});
   }
   // limbs: from the fork up into the lower and middle FRONT clusters (their ends hidden under them)
   const targets = cls
@@ -1109,8 +1183,10 @@ function buildCrown(spec: CrownSpec): CrownGeom {
   }
 
   // ---- split back / front of the limbs, the bbox, the stats
-  const back = clusterGeoms.filter((c, i) => c.z < 0 || cls[i].core);
-  const front = clusterGeoms.filter((c, i) => !(c.z < 0 || cls[i].core));
+  // the wood goes under every cluster (the trunk and limbs show below the crown and through its real gaps only: a
+  // limb's end never pokes out of the leaves)
+  const back: ClusterGeom[] = [];
+  const front = clusterGeoms;
   const allPts = cat(silhouettes).concat(ribbon(trunkLine, trunkWidth));
   const ext = mode === 'near' ? (spec.leafSize ?? clamp(Rm * sp.leafK.near, sp.leafPx.near[0], sp.leafPx.near[1])) * 0.75 : mode === 'mid' ? 12 : 0;
   const bbox: [number, number, number, number] = [

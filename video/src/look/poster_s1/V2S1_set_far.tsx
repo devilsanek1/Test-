@@ -23,6 +23,31 @@ import {floodAt, S1_PALE} from './V2S1_clock';
 import {S1Plane, S1_PLANE} from './V2S1_float';
 import {useSwitches} from './switches';
 import {S1FarStage} from './V2S1_far_stage';
+import {S1_EVENING} from '../../v2r/world/skies';
+import {skyColorAt} from '../../lib/sky';
+import {dE76} from '../../lib/depth';
+
+/** (the look test: the sun one flat step off its sky, owner 2026-10-29: decision 6 (b); CRAFT §g.2) the disc mixed
+ *  toward the sky round it (its visible cap, y ~720-758) until it sits dE ~18 off it: under the subject's separation
+ *  (tier A's median step >= 15 L*), so the far stays the calmest part; still the warm disc the flood pours from. */
+export const SUN_TONED_DE = 18;
+const TONED = new Map<string, string>();
+export function sunToned(sun: string): string {
+  const hit = TONED.get(sun);
+  if (hit) return hit;
+  const {x, y} = S.sun;
+  const sky = skyColorAt(S1_EVENING, y - S.sun.r * 0.55, x);
+  let lo = 0;
+  let hi = 1;
+  for (let i = 0; i < 24; i++) {
+    const m = (lo + hi) / 2;
+    if (dE76(mixHex(sun, sky, m), sky) > SUN_TONED_DE) lo = m;
+    else hi = m;
+  }
+  const out = mixHex(sun, sky, (lo + hi) / 2);
+  TONED.set(sun, out);
+  return out;
+}
 
 const S = MAP.S1_SHEET;
 /** The bridge (screen px at zoom 1.00). */
@@ -287,20 +312,22 @@ function gasholderInto(b: Batch, u: Under, cx: number, base: number, r: number, 
  *  pale shape like everything else, no halo (the sky is still paper). */
 const SunDisc: React.FC = () => {
   const t = useTime();
+  const {sunToned: toned} = useSwitches();
   const {x, y, r} = S.sun;
   const disc = ovalPath(x, y, r, r);
+  const sun = toned ? sunToned(CM.sun) : CM.sun;
   if (t < MAP.S1_CLOCK.flood.t0) {
     const a0 = (200 * Math.PI) / 180;
     const half = `M${x + r * Math.cos(a0 - Math.PI)} ${y + r * Math.sin(a0 - Math.PI)}A${r} ${r} 0 0 1 ${x + r * Math.cos(a0)} ${y + r * Math.sin(a0)}Z`;
     return (
       <>
-        <Fill d={disc} color={mixHex(CM.sun, CM.white, S1_PALE)} offset={false} lookExempt exit={false} seed="s1sunpale" />
-        <Fill d={half} color={CM.sun} offset={false} lookExempt exit={false} seed="s1sunhalf" />
+        <Fill d={disc} color={mixHex(sun, CM.white, S1_PALE)} offset={false} lookExempt exit={false} seed="s1sunpale" />
+        <Fill d={half} color={sun} offset={false} lookExempt exit={false} seed="s1sunhalf" />
       </>
     );
   }
   // the sky carries the low sun's warmth (lib/sky): the disc alone, flat, no halo (CRAFT §g.2)
-  return <Fill d={disc} color={CM.sun} offset={false} seed="s1sun" />;
+  return <Fill d={disc} color={sun} offset={false} seed="s1sun" />;
 };
 
 // ---------------------------------------------------------------- the road bridge
@@ -370,7 +397,7 @@ function bridgeBody(): {b: Batch; u: Under} {
 
 /** The bridge railing (in front of the traffic): posts with ball finials, top + bottom rails, thin bars; two lamp
  *  standards. Thin iron = thin FILLS in colour; its f0 underdrawing in ink. */
-function bridgeRail(): {b: Batch; u: Under} {
+function bridgeRail(bar = 1.6): {b: Batch; u: Under} {
   const b = new Batch();
   const u = new Under();
   const {x0, x1, railTop, deck} = BRIDGE;
@@ -379,7 +406,7 @@ function bridgeRail(): {b: Batch; u: Under} {
   b.rect(iron, x0, deck - 4, x1 - x0, 2.4);
   let bars = '';
   for (let x = x0 + 4; x < x1; x += 8.5) {
-    b.rect(iron, x, railTop + 2, 1.6, deck - railTop - 3);
+    b.rect(iron, x, railTop + 2, bar, deck - railTop - 3);
     if (Math.round(x) % 17 < 9) bars += `M${P(x + 0.8, railTop + 3)}L${P(x + 0.8, deck - 2)}`;
   }
   let posts = '';
@@ -522,12 +549,13 @@ export const S1WestGap: React.FC = () => {
     hazeBatch(g.b, [HAZE_K.bridge]);
     return g;
   }, []);
+  const {farStage, lines2px} = useSwitches();
+  // (the look test: thin lines 2 px on the planes that float: the railing's bars are 1.6 px fills in v2)
   const rail = useMemo(() => {
-    const g = bridgeRail();
+    const g = bridgeRail(lines2px ? 2 : 1.6);
     hazeBatch(g.b, [HAZE_K.rail]);
     return g;
-  }, []);
-  const {farStage} = useSwitches();
+  }, [lines2px]);
   return (
     <>
       {farStage ? (

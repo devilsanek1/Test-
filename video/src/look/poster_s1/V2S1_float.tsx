@@ -9,6 +9,8 @@
 import React from 'react';
 import {useTime} from '../../lib/time';
 import {floatAt, parallaxOffset, PARALLAX_SKY, type FloatLeg} from '../../lib/depth';
+import {currentFloatTable, TextureSlot} from './engine';
+import {useSwitches} from './switches';
 
 /** The float's legs (near-ground px from home): rest to 1.10 (after "She quit Google." and her step-out at 0.97). */
 export const S1_FLOAT_LEGS: FloatLeg[] = [
@@ -40,6 +42,15 @@ export const s1Float = (t: number): [number, number] => floatAt(t, S1_FLOAT_LEGS
  *  same tree every frame: nothing remounts when the float starts or stops). */
 export const S1Plane: React.FC<{plane: number; children?: React.ReactNode}> = ({plane, children}) => {
   const t = useTime();
-  const [dx, dy] = parallaxOffset(s1Float(t), plane);
-  return <g transform={`translate(${dx.toFixed(3)} ${dy.toFixed(3)})`}>{children}</g>;
+  const sw = useSwitches();
+  // (the look test: the float by 1/z when the switch is on, lane E's PARALLAX_Z; v2's PARALLAX_K otherwise)
+  const [dx, dy] = parallaxOffset(s1Float(t), plane, currentFloatTable());
+  // (the look test's texture switch: each plane carries its own mottle inside its float group, so it rides with it)
+  return (
+    <g transform={`translate(${dx.toFixed(3)} ${dy.toFixed(3)})`}>
+      <TextureSlot sw={sw} t={t} plane={plane} sky={!Number.isFinite(plane)}>
+        {children}
+      </TextureSlot>
+    </g>
+  );
 };
