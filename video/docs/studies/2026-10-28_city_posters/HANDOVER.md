@@ -6,6 +6,18 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-29 ~04:30 UTC: "Go with your suggestions"; building the 7 s look test
+- The owner approved every suggestion (the playbook's city-poster bullet lists them). Running: (1) a docs agent turns
+  them into rules (DIRECTION, CRAFT, LAYOUT, LIFE_AND_DENSITY, PALETTE, the playbook's other bullets, STUDY §9,
+  `INTEGRATION.md` §2); (2) the engine builder, STUDY §10 items 1, 2, 3, 4, 6, 10 (`test/BEFORE.md`, `test/ENGINE.md`,
+  non-breaking `src/lib` pieces: depth by 1/z, palette 10b + gamut, FormShade per tier, patchwork, texture).
+- Next: the scene builder (items 5, 7, 8, 9, 11: a copy of v2's S1 in `video/src/look/`, renders, QA), then an
+  independent art-director critic, one fix pass, and the clip (v2's S1, then the new look) to the owner as
+  `video/deliverables/tests/poster_look_test_v1.mp4`.
+- The checkpoint loop (`study_checkpoint2.sh` in the orchestrator's scratchpad) commits the study, `src/lib`,
+  `src/look`, `scripts/qa`, `docs/look`, the playbook and HANDOFF to the session branch every 10 minutes; review the
+  diff before merging into `video-production`.
+
 ## Status 2026-10-29 ~03:40 UTC: the study is done
 - All lenses, `STUDY.md`, `SUMMARY.md`, the summary sheet (sent to the owner) and the A vs B picture (sent) are in.
 - Integrated into the main docs (`INTEGRATION.md`: DIRECTION, CRAFT, PALETTE, the new `docs/look/LAYOUT.md`, G5_BLOCKING,
