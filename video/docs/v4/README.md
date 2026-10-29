@@ -1,3 +1,25 @@
+# Video 4: TOPIC PICKED 2026-10-29: Helsinki heats its homes with AI chips
+
+**Owner, 2026-10-29 ~09:30 UTC: "Helsinki is actually pretty good too / Let's do both as story 4 and 5".** Video 4 is now Helsinki's AI-heated homes (one subject, the playbook's ONE
+SUBJECT rule) and is **produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt** (branch `claude/compassionate-hopper-5iqguj`); video 5 is the
+bunker under the Stockholm park (`video/docs/v5/`). The earlier session's G0 rounds below (r1-r4 shortlists, scouting,
+the glasses and the vaccine) stay here unchanged as history; nothing in them was rejected (their topics go to
+`docs/IDEAS_BANK.md` when this film is done).
+The earlier v4 session (https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt) could not be reached on 2026-10-29
+("not found"); nothing of it is running.
+
+| Gate | Status | File |
+|---|---|---|
+| G0 topic + core line | topic LOCKED: Helsinki (one city); core line proposed by the writer (default: "Your chatbot could heat a flat in Helsinki.") | `G0_TOPIC.md` |
+| Fact lock | shared with video 5 (one fact file): `video/docs/v5/research/factlock.md` sections 2, 6, 7.1-7.4, 8 | |
+| G1 script | writer running (2026-10-29 ~09:35 UTC); then one critic and one fix pass | `script/script_g1.md`, `script/script_elevenlabs.md`, `THROUGHLINE.md` |
+| G2 voice | after the owner approves the script; the API key is missing in this container | `public/v4/` |
+
+**Next step:** when the writer lands, send the owner the script with its 3 hook options and core lines; then a critic and
+a fix pass. A self check-in at 12:45 UTC resumes it if the 5-hour limit (reset 12:40 UTC) stops it.
+
+---
+
 # Video 4: state and pick-up notes (TOPIC SWITCHED 2026-10-28: a positive AI story)
 
 For the agent who picks this up later. Read this file first, then `HANDOFF.md` (root), `video/docs/OWNER_PLAYBOOK.md`

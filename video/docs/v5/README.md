@@ -18,3 +18,8 @@ Owner's words: `OWNER_NOTES.md`. Rules: `video/docs/OWNER_PLAYBOOK.md`, `video/d
 (`src/lib/patchwork.ts`, `texture.tsx`, `foliage.tsx` + `wind.ts`, `clouds.tsx`, `depth.ts`, `light.tsx`, `gamut.ts`,
 `persp.tsx`; the scene `src/look/poster_s1/`; notes `video/docs/studies/2026-10-28_city_posters/test/`) once the owner
 has judged that test; never edit those files from here. G0-G2 never wait for it.
+
+**Next step (2026-10-29 ~09:25 UTC):** the G1 writer is rewriting the script as ONE subject, the bunker (`script/script_g1.md`,
+`script/script_elevenlabs.md`, `THROUGHLINE.md`; draft 1 archived in `script/archive/draft1_wide/`). When it lands: send the owner
+the script, its 3 hook options and up to 3 core lines; then one critic (cold retell, at most 6 findings) and one fix
+pass. If the 5-hour limit stops it (reset 12:40 UTC), a self check-in fires at 12:45 UTC to resume the writer.

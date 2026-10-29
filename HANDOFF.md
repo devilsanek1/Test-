@@ -190,7 +190,12 @@ Everything that agent knew is in this repo. This file is the map; the details li
   perhaps hide it deliberately in the video": Pip stays, hidden on purpose, no longer on both sides of every join
   (DIRECTION rules 1-2, CRAFT §a.3 and §b, LIFE_AND_DENSITY §5, the playbook).
 
-## 2e. Video 5 (2026-10-29): the heat story
+## 2e. Videos 4 and 5 (2026-10-29): Helsinki and the bunker
+- **2026-10-29 ~09:30 UTC, owner: "Helsinki is actually pretty good too / Let's do both as story 4 and 5".** Video 4 is now Helsinki's AI-heated homes and video 5 the nuclear bunker
+  under a Stockholm park; both produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt (live state: `video/docs/v4/README.md`, `video/docs/v5/README.md`).
+  The earlier v4 session's G0 rounds stay in `video/docs/v4/` as history.
+
+### Earlier: video 5 as the heat story
 - **Video 5 is produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt since 2026-10-29 ~07:55 UTC**
   (owner: "Okay let's try heat story let's generate the script"), on branch `claude/compassionate-hopper-5iqguj`. The
   topic came out of the city-poster content discussion: "Where do you put a machine this hot?" (data centres in weird

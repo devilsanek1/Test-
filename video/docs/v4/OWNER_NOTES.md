@@ -110,3 +110,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   column chart and the reworded lines wait in `G0_TOPICS_r4.md`); this session runs the streamlining review
   (`docs/retro/2026-10-28_streamline/`: three reviewers, tokens / render / codebase, then one plan for the owner). ->
   rule: playbook Process ("Spend on the film, never on overhead": streamline the process, never the film).
+
+## 2026-10-29: the topic picked (in the city-poster content discussion, session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt)
+- 2026-10-29 ~07:45 UTC: "Oh I actually like the story of Helsinki hitting homes with ai chips" (the heat story; then video
+  5, rejected as too wide, re-scoped to the bunker).
+- 2026-10-29 ~09:30 UTC: "Helsinki is actually pretty good too / Let's do both as story 4 and 5" -> video 4 = Helsinki's AI-heated homes, produced by session
+  https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt; the writer started.
