@@ -208,12 +208,15 @@ only word and sentence length. Clarity on one hearing comes from naming and poin
   [S12, practitioner]; ours: v1's calm opening lost ~80 % by 3 s; v3 was skipped by 64.5 % (playbook) [S25]. A clear
   exposition can feel clear to its makers and still fail [S7]: only a cold listener tells.
 - **Draft 1, bad -> good.** The writer's own "cold retell" reused the fact file's words ("the heat from AI chips, which
-  run so hot ...") and the critic had read the fact lock, so both passed it; the owner, the first truly cold listener,
-  stopped on five lines -> a retell by someone who has seen neither script nor facts, in their own words, compared line
-  by line with what each line means.
+  run so hot ..."). The critic did retell after one hearing, before reading the facts, and noticed the very snags:
+  "'The chips get that hot.' landed a beat late (I had to re-link it to the question)"; "'Luckily, those chips are
+  water-cooled' felt like a gear change I had to take on trust"; then waved them through as "paid off by the next line
+  each time ... no finding of their own" (`archive/g1_draft1/critique_g1.md`). A tech-literate listener re-links; a
+  regular viewer swipes. -> Every snag in a cold retell is a finding, never "paid off by the next line", and the
+  retelling listener is briefed as a regular, non-tech, non-native viewer.
 - **Check.** The cold panel hears the take once, at speed, with no script and no fact file, and retells it line by
-  line; any line retold wrong, or met with "I don't know what X was", is rewritten. At G1, before a take: read aloud
-  once, at speed, to a cold reader.
+  line; any line retold wrong, met with "I don't know what X was", or one they had to re-link, is rewritten. At G1,
+  before a take, the critic's cold retell counts every snag as a finding.
 
 ## The Big Bend reel, line by line (why it is clear)
 
@@ -258,7 +261,8 @@ overstates (a studio's concept), and "New York" twice in 11 s (harmless: a repea
 **The tally.** The owner flagged lines 2-6. Lines 7-11 fail the same ways: pointers (7, 8, 9, 10, 11), trade words (7,
 8), three steps in one sentence (8), a skipped step (7), an abstract total (9). Line 13 is borderline; only lines 1
 and 12 stand on their own. The root causes: the writer's knowledge filled the gaps (finding 3), the subject changed
-names seven times (finding 1), and the short lines shed their nouns for rhythm (finding 10).
+names seven times (finding 1), the short lines shed their nouns for rhythm (finding 10), and the critic heard the snags
+at lines 2 and 7 and let them pass (finding 13).
 
 ## The 6 that matter most
 
