@@ -6,6 +6,23 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-29 ~22:30 UTC: PAUSED for the token limit (owner: "You are about to be paused due to token limits")
+Everything is committed and pushed to `claude/compassionate-hopper-5iqguj` and `video-production`. RESUME HERE:
+1. `git pull` both branches; `git status` (commit any leftover agent files with the usual trailers).
+2. The paint-recipes workflow (run `wf_493c40ba-54a`): sky_clouds and water DONE (`video/docs/look/paint_recipes/
+   sky_clouds.md`, `water.md` + swatches); foliage and built_ground were running (their .md files exist, swatches may
+   be missing); the synthesizer (`video/docs/look/PAINT_RECIPES.md`, `paint_recipes/index.jpg`) not started. Resume:
+   `Workflow({scriptPath: "/root/.claude/projects/-home-user-Test-/fe339b66-57f0-5b47-bb6a-872d2f15f4c0/workflows/
+   scripts/paint-recipes-wf_bde6f405-055.js", resumeFromRunId: "wf_493c40ba-54a"})` (the prompts tell agents to continue
+   from partial files). If the run id is gone, run the script fresh.
+3. DONE and sent: people recipe (`paint_recipes/people.md`, `people_sheet.png`, `src/lib/figure/`: ~2/3 of the way;
+   next: slimmer, shorter coat, thin tapered scarf, warm front light, a lit edge against the water); the AI test
+   (`ai_paint/`: SDXL local 0.70 sky has the depth and mood but an airbrush finish; owner: "Yeah 0.7 looks reasonable",
+   then "Let’s see what’s the best we can do with code after research"); `src/lib/paint/reveal.tsx` paints a plate on.
+4. NEXT (one agent, iteration, stills only): painter v6 from the recipe book (sky and layered clouds, water, the tree,
+   the far city) + real darks + the refined her, on the v3 composition or v2's S1; compare beside ai_still_v1 and v5.
+5. Restart the checkpoint loop (scratchpad `study_checkpoint4.sh`, paths incl. `video/public/paint`, `public/figure`).
+
 ## Status 2026-10-29 ~21:25 UTC: painted look, people, AI test, logo (restart recovered)
 - LOGO: FINAL, The Peel in coral and ink (`video/deliverables/brand/peel/`, `video/docs/brand/LOGO.md`); helper archived.
 - PAINT (our engine painter, `src/lib/paint/`, `scripts/look/paint/paint.py`, demo `src/look/paint_s1/`): v1-v5 stills in

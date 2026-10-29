@@ -48,7 +48,7 @@ PAL = {
     'shadow': (79.0, 14, 330),  # a cast shadow on the paving: lilac
     # greenery (one family: sage lit by peach-gold, shaded toward the lilac-plum sky)
     'leaf_accent': (85, 36, 98), 'leaf_lit': (75, 34, 114), 'leaf_mid': (62, 23, 138),
-    'leaf_shade': (49, 16, 178), 'leaf_deep': (33, 12, 262),
+    'leaf_shade': (49, 16, 178), 'leaf_deep': (33, 11, 232),
     'leaf_amber': (74, 32, 80), 'leaf_rust': (60, 27, 58),  # October: a few turned clusters
     'bark_lit': (54, 18, 50), 'bark_shade': (31, 12, 330),
     # grasses in October: straw-gold plumes, rose-ochre stems, mauve and plum below
@@ -261,6 +261,28 @@ def spray(cx, cy, D, ang, rng, n=None, spread=0.65):
     return out
 
 
+def ellipse_poly(cx, cy, rx, ry, ang, rng, rough=0.14, n=18):
+    th = np.linspace(0, 2 * np.pi, n, endpoint=False)
+    ph = rng.uniform(0, 2 * np.pi, 2)
+    rr = 1 + rough * (0.6 * np.sin(3 * th + ph[0]) + 0.4 * np.sin(5 * th + ph[1]))
+    x, y = rx * rr * np.cos(th), ry * rr * np.sin(th)
+    ca, sa = math.cos(ang), math.sin(ang)
+    return np.stack([cx + x * ca - y * sa, cy + x * sa + y * ca], 1)
+
+
+def dab(cx, cy, D, ang, rng):
+    """A gouache dab (the refs' lit 'foam' inside a crown): 2-3 overlapping small ragged ellipses, aspect 1.2-1.7,
+    leaning along `ang` (the leaves' hang). Pointed leaves are kept for the silhouette (spray)."""
+    out = []
+    for _ in range(int(rng.integers(2, 4))):
+        a = ang + rng.uniform(-0.35, 0.35)
+        Lx = D * rng.uniform(0.5, 0.85)
+        off = D * rng.uniform(-0.3, 0.3)
+        out.append(ellipse_poly(cx + math.cos(ang) * off, cy + math.sin(ang) * off + D * rng.uniform(-0.12, 0.12),
+                                Lx / 2, Lx / 2 / rng.uniform(1.5, 2.2), a, rng))
+    return out
+
+
 def blob_poly(cx, cy, r, rng, k=9, rough=0.22):
     th = np.linspace(0, 2 * np.pi, k * 4, endpoint=False)
     ph = rng.uniform(0, 2 * np.pi, 3)
@@ -298,22 +320,23 @@ def texture(layer, rng, grain=1.6, mottle=2.2, speck=0.0, speck_cols=None):
             layer.comp(m, x0, y0, speck_cols[int(rng.integers(0, len(speck_cols)))], rng.uniform(0.25, 0.5))
 
 
-LIGHT = np.array([-0.80, -0.50, 0.33])  # the key: the low sun on the left, a little above, a little frontal
+LIGHT = np.array([-0.70, -0.62, 0.36])  # the key: the low sun on the left + the sky above, a little frontal
 LIGHT /= np.linalg.norm(LIGHT)
 
 
 # ----------------------------------------------------------------------------------------------------------------
 # 3. ELEMENT 1: the tree crown (recipe 3.1)
 # ----------------------------------------------------------------------------------------------------------------
-CLUSTER_TEMPLATE = [  # (u, v, r) in crown widths/heights: the design's clusters, top (back) to bottom (front)
-    (0.02, -0.33, 0.20), (-0.22, -0.22, 0.18), (0.25, -0.20, 0.17), (-0.35, 0.02, 0.16),
-    (0.03, -0.05, 0.22), (0.34, 0.04, 0.155), (-0.17, 0.22, 0.165), (0.19, 0.24, 0.155), (-0.02, 0.32, 0.13)]
+CLUSTER_TEMPLATE = [  # (u, v, r) in crown widths/heights: the design's clusters, top (back) to bottom (front);
+    # pads wider than tall (squash 0.72-0.86), sizes 0.11-0.24 W, the biggest mass up and toward the light
+    (-0.06, -0.30, 0.24), (0.24, -0.23, 0.17), (-0.31, -0.11, 0.19), (0.37, 0.00, 0.15),
+    (0.03, -0.02, 0.21), (-0.21, 0.19, 0.16), (0.21, 0.19, 0.15), (0.00, 0.31, 0.11)]
 
 PLANES = {  # the depth ladder (recipe 3.1 d): near -> far
-    'near': dict(k=0.0, blur=0.0, values=4, dab=0.024, cover=(0.80, 0.62, 0.28, 0.10), accents=True, holes=1.0,
-                 grain=1.6, mottle=2.2, speck=1 / 450, clusters=8, branch=True, autumn=0.10),
-    'mid': dict(k=0.30, blur=0.5, values=3, dab=0.038, cover=(0.70, 0.50, 0.16, 0.0), accents=False, holes=0.6,
-                grain=1.2, mottle=1.6, speck=0, clusters=7, branch=True, autumn=0.10),
+    'near': dict(k=0.0, blur=0.0, values=4, bump=0.45, dab=0.018, cover=(0.82, 0.55, 0.25, 0.12), accents=True, holes=1.0,
+                 grain=1.6, mottle=2.2, speck=1 / 450, clusters=8, branch=True, autumn=0.05),
+    'mid': dict(k=0.30, blur=0.5, values=3, bump=0.35, dab=0.032, cover=(0.72, 0.48, 0.16, 0.0), accents=False, holes=0.6,
+                grain=1.2, mottle=1.6, speck=0, clusters=7, branch=True, autumn=0.0),
     'far': dict(k=0.55, blur=0.9, values=2, dab=0.055, cover=(0.0, 0.0, 0.0, 0.0), accents=False, holes=0.0,
                 grain=0.8, mottle=1.0, speck=0, clusters=5, branch=False, autumn=0.0),
 }
@@ -329,7 +352,7 @@ def tree_design(rng, cx, cy, W, H, n):
     for (u, v, r) in CLUSTER_TEMPLATE[:n]:
         x = cx + (u + rng.normal(0, 0.022)) * W
         y = cy + (v + rng.normal(0, 0.022)) * H
-        rr = r * W * rng.uniform(0.9, 1.1)
+        rr = r * W * rng.uniform(0.98, 1.16)
         k = int(rng.integers(5, 8))
         angs = np.linspace(-math.pi * 0.96, -math.pi * 0.04, k) + rng.normal(0, 0.12, k)
         angs = np.concatenate([angs, [math.pi * 0.06 + rng.normal(0, 0.1), math.pi * 0.94 + rng.normal(0, 0.1)]])
@@ -337,22 +360,26 @@ def tree_design(rng, cx, cy, W, H, n):
                   y + 0.50 * rr * math.sin(a) * rng.uniform(0.85, 1.1),
                   rr * rng.uniform(0.40, 0.54)) for a in angs]
         lobes.append((x, y + 0.05 * rr, rr * 0.74))
-        cl.append(dict(x=x, y=y, r=rr, lobes=lobes, cut=y + rr * rng.uniform(0.36, 0.46)))
+        q = rng.uniform(0.80, 0.92)
+        lobes = [(lx, y + (ly - y) * q, lr) for (lx, ly, lr) in lobes]
+        cl.append(dict(x=x, y=y, r=rr, q=q, lobes=lobes, cut=y + rr * q * rng.uniform(0.40, 0.50),
+                       ao=rng.uniform(0.45, 0.85)))
     return cl
 
 
-def cluster_fields(c, X, Y, crown):
+def cluster_fields(c, X, Y, crown, bump=None):
     """AA mask and the light value s for one cluster (sphere-ish normals: lobe + cluster + the whole crown)."""
     m = np.zeros_like(X)
     best = np.full_like(X, -1e9)
     nl = np.zeros(X.shape + (3,), np.float32)
+    q = c.get('q', 1.0)
     for (lx, ly, lr) in c['lobes']:
-        d = np.hypot(X - lx, Y - ly)
+        d = np.hypot(X - lx, (Y - ly) / q)
         m = np.maximum(m, np.clip(lr - d + 0.5, 0, 1))
         ins = (lr - d) / lr
         upd = ins > best
         best = np.where(upd, ins, best)
-        nx, ny = (X - lx) / lr, (Y - ly) / lr
+        nx, ny = (X - lx) / lr, (Y - ly) / (lr * q)
         nz = np.sqrt(np.clip(1 - nx * nx - ny * ny, 0, 1))
         nl = np.where(upd[..., None], np.stack([nx, ny, nz], -1), nl)
     # a flat-ish underside: a gentle convex cut
@@ -364,12 +391,16 @@ def cluster_fields(c, X, Y, crown):
         nz = np.sqrt(np.clip(1 - nx * nx - ny * ny, 0.02, 1))
         v = np.stack([nx, ny, nz], -1)
         return v / np.linalg.norm(v, axis=-1, keepdims=True)
-    n = 0.45 * nl + 0.30 * sph(c['x'], c['y'], c['r'] * 1.05) + 0.25 * sph(crown[0], crown[1], crown[2])
+    n = 0.40 * nl + 0.28 * sph(c['x'], c['y'], c['r'] * 1.05) + 0.32 * sph(crown[0], crown[1], crown[2])
     n /= np.maximum(np.linalg.norm(n, axis=-1, keepdims=True), 1e-6)
+    if bump is not None:  # sub-clumps: a smooth height field tilts the normal, so each clump gets its own lit top
+        gy, gx = bump
+        n = n + np.stack([-gx, -gy, np.zeros_like(gx)], -1)
+        n /= np.maximum(np.linalg.norm(n, axis=-1, keepdims=True), 1e-6)
     s = n @ LIGHT.astype(np.float32)
     # occlusion: the underside of every cluster goes deep
-    ao = np.clip((Y - (cut - 0.32 * c['r'])) / (0.32 * c['r']), 0, 1)
-    s = s - 0.75 * ao ** 1.5
+    ao = np.clip((Y - (cut - 0.30 * c['r'])) / (0.30 * c['r']), 0, 1)
+    s = s - c.get('ao', 0.75) * ao ** 1.5
     return m.astype(np.float32), s.astype(np.float32)
 
 
@@ -382,16 +413,17 @@ def paint_tree(w, h, base, crown_c, Wc, Hc, rng, plane='near', bg_at=None, snaps
     cx, cy = crown_c
     cl = tree_design(rng, cx, cy, Wc, Hc, P['clusters'])
     crown = (cx - 0.04 * Wc, cy - 0.06 * Hc, 0.62 * Wc)
-    fields = [cluster_fields(c, X, Y, crown) for c in cl]
+    Hb = noise2(rng, h, w, 0.045 * Wc)  # the sub-clump height field (bumps ~0.1 W across)
+    gy, gx = np.gradient(Hb)
+    beta = P.get('bump', 0.0) * 0.045 * Wc
+    fields = [cluster_fields(c, X, Y, crown, (gy * beta, gx * beta) if beta > 0 else None) for c in cl]
     vis = np.full((h, w), np.nan, np.float32)
-    cm = np.zeros((h, w), np.float32)
     for (m, s) in fields:
         vis = np.where(m > 0.5, s, vis)
-        cm = np.maximum(cm, m)
     vals = vis[np.isfinite(vis)]
     nv = P['values']
-    # the value plan by area: deep 17 %, shade 30 %, mid 27 %, lit 26 % (refs 1.2); fewer values farther
-    t = np.percentile(vals, [17, 47, 74])
+    # the value plan by area: deep 15 %, shade 30 %, mid 28 %, lit 27 % (refs 1.2); fewer values farther
+    t = np.percentile(vals, [15, 45, 73])
     names4 = ['leaf_deep', 'leaf_shade', 'leaf_mid', 'leaf_lit']
     pal = {k: C(k) for k in names4 + ['leaf_accent', 'leaf_amber', 'leaf_rust', 'bark_lit', 'bark_shade']}
     if nv == 3:
@@ -402,52 +434,72 @@ def paint_tree(w, h, base, crown_c, Wc, Hc, rng, plane='near', bg_at=None, snaps
     # base colour of each zone = one step under the dab colour that will cover it (dark first, then lighter dabs)
     zbase = [pal['leaf_deep'], pal['leaf_shade'], mixc(pal['leaf_shade'], pal['leaf_mid'], 0.45),
              mixc(pal['leaf_mid'], pal['leaf_lit'], 0.35)]
-    zdab = [mixc(pal['leaf_deep'], pal['leaf_shade'], 0.5), mixc(pal['leaf_shade'], pal['leaf_mid'], 0.35),
+    zdab = [mixc(pal['leaf_deep'], pal['leaf_shade'], 0.55), mixc(pal['leaf_shade'], pal['leaf_mid'], 0.35),
             pal['leaf_mid'], pal['leaf_lit']]
     if nv == 2:
         zbase = [pal['leaf_shade'], pal['leaf_shade'], pal['leaf_lit'], pal['leaf_lit']]
     zvar = [variants(c, rng, 40) for c in zdab]
     amber = variants(pal['leaf_amber'], rng, 24)
     rust = variants(pal['leaf_rust'], rng, 24)
-    autumn_field = noise2(rng, h, w, 0.09 * Wc)  # turned leaves come in patches, never salt and pepper
+    autumn_field = noise2(rng, h, w, 0.12 * Wc)  # turned leaves come in patches, never salt and pepper
+    clump_field = noise2(rng, h, w, 0.035 * Wc)  # sub-clumps: dabs gather in groups with gaps between
 
-    # P0: the crown's inner darkness (the gaps between clusters, where the branches show)
+    # P0: the crown's inner darkness (the gaps between clusters, where the branches show); never past a cluster's
+    # underside, so no dark 'balloons' hang below the crown
     env = np.zeros((h, w), np.float32)
     for c in cl:
-        env = np.maximum(env, disc_aa(X, Y, c['x'], c['y'] + 0.1 * c['r'], c['r'] * 0.8))
+        d = disc_aa(X, Y, c['x'], c['y'] - 0.02 * c['r'], c['r'] * 0.70)
+        d = np.minimum(d, np.clip(c['cut'] - 0.06 * c['r'] - Y + 0.5, 0, 1))
+        env = np.maximum(env, d)
+    hull_pts = np.array([[c['x'], c['y']] for c in cl])
+    if len(hull_pts) >= 3:
+        from scipy.spatial import ConvexHull
+        hp = hull_pts[ConvexHull(hull_pts).vertices]
+        mk, xk, yk = polys_mask([hp])
+        env = np.maximum(env, place(mk, xk, yk, w, h))
     L.comp_full(env, pal['leaf_deep'])
     if snaps is not None:
         snaps['P0 inner dark'] = L.copy()
 
-    # P1 branches: trunk + limbs, two facets (lit left, shade), drawn before the clusters so leaves cover them
-    limbs = []
+    # P1 branches: the trunk forks below the crown into 2-3 limbs that run into the clusters; two facets (the lit
+    # left third, the shade rest); drawn before the clusters so the leaves cover them
     if P['branch']:
         bx, by = base
-        top = (cx - 0.01 * Wc, cy + 0.22 * Hc)
-        path = bez((bx, by), (bx + 0.03 * Wc, (by + top[1]) / 2), top, 30)
-        tw = 0.075 * Wc
-        widths = np.linspace(tw * 1.28, tw * 0.62, 30)
-        widths[:4] *= np.array([1.25, 1.12, 1.05, 1.0])
-        limbs.append((path, widths))
-        for c in cl[3:]:
-            if rng.random() < 0.8:
-                end = (c['x'] + rng.normal(0, 0.1) * c['r'], c['y'] + 0.15 * c['r'])
-                mid = ((top[0] + end[0]) / 2 + rng.normal(0, 0.04) * Wc, (top[1] + end[1]) / 2 + 0.06 * Hc)
-                limbs.append((bez(top, mid, end, 18), np.linspace(0.032 * Wc, 0.010 * Wc, 18)))
+        fork = (bx + 0.01 * Wc, cy + 0.48 * Hc)
+        tw = 0.072 * Wc
+        trunk = bez((bx, by), (bx + 0.02 * Wc, (by + fork[1]) / 2), fork, 24)
+        tws = np.linspace(tw * 1.22, tw * 0.80, 24)
+        tws[:3] *= np.array([1.3, 1.12, 1.04])
+        limbs = [(trunk, tws)]
+        ends = sorted(cl[2:], key=lambda c: c['x'])
+        picks = [ends[0], ends[len(ends) // 2], ends[-1]]
+        for j, c in enumerate(picks):
+            end = (c['x'] + rng.normal(0, 0.08) * c['r'], c['y'] + 0.05 * c['r'])
+            mid = ((fork[0] * 0.55 + end[0] * 0.45), (fork[1] * 0.45 + end[1] * 0.55) + 0.03 * Hc)
+            wl = tw * (0.62 if j == 1 else 0.5)
+            limbs.append((bez(fork, mid, end, 20), np.linspace(wl, wl * 0.28, 20)))
+            if rng.random() < 0.7:  # a side twig off each limb
+                k = int(rng.integers(7, 13))
+                p0 = limbs[-1][0][k]
+                sgn = -1 if end[0] < fork[0] else 1
+                p2 = (p0[0] + sgn * 0.10 * Wc, p0[1] - 0.12 * Hc)
+                limbs.append((bez(p0, (p0[0] + sgn * 0.03 * Wc, p0[1] - 0.08 * Hc), p2, 12),
+                              np.linspace(wl * 0.42, wl * 0.15, 12)))
         for path, widths in limbs:
             m, x0, y0 = polys_mask([ribbon(path, widths)])
             L.comp(m, x0, y0, pal['bark_shade'])
-            # the lit facet: the left third of the stroke
-            lp = path + np.array([-1, 0]) * widths[:, None] * 0.28
-            m2, x2, y2 = polys_mask([ribbon(lp, widths * 0.36)])
-            mm = m2 * place(m, x0, y0, w, h)[y2:y2 + m2.shape[0], x2:x2 + m2.shape[1]] if (
-                y2 >= 0 and x2 >= 0 and y2 + m2.shape[0] <= h and x2 + m2.shape[1] <= w) else m2
-            L.comp(mm, x2, y2, pal['bark_lit'], 0.85)
+            lp = path + np.array([-1.0, 0.0]) * widths[:, None] * 0.26
+            m2, x2, y2 = polys_mask([ribbon(lp, widths * 0.38)])
+            full = place(m, x0, y0, w, h)
+            hh, ww = m2.shape
+            Xa, Ya, Xb, Yb = max(x2, 0), max(y2, 0), min(x2 + ww, w), min(y2 + hh, h)
+            clip = np.zeros_like(m2)
+            clip[Ya - y2:Yb - y2, Xa - x2:Xb - x2] = full[Ya:Yb, Xa:Xb]
+            L.comp(m2 * clip, x2, y2, pal['bark_lit'], 0.85)
     if snaps is not None:
         snaps['P1 branches'] = L.copy()
 
-    # P2: each cluster back to front: its flat value zones (softened 1.2 px), then its leaf-spray dabs
-    D0 = P['dab'] * Wc
+    # P2: each cluster back to front: its flat value zones (softened 1.2 px)
     zone_maps = []
     for ci, (c, (m, s)) in enumerate(zip(cl, fields)):
         z = np.digitize(s, t)  # 0 deep .. 3 lit
@@ -460,109 +512,153 @@ def paint_tree(w, h, base, crown_c, Wc, Hc, rng, plane='near', bg_at=None, snaps
         col = np.stack([ndi.gaussian_filter(col[..., i] * (m > 0), 1.2) / wgt for i in range(3)], -1)
         L.comp_full(m, col)
         zone_maps.append((m, z))
-        if snaps is not None and ci == len(cl) - 1:
-            snaps['P2a flat value zones'] = L.copy()
+    zall = np.full((h, w), -1)
+    for (m, z) in zone_maps:
+        zall = np.where(m > 0.5, z, zall)
     if snaps is not None:
-        # repaint the dabs on a copy so the strip can show the zones alone
-        pass
+        snaps['P2 flat value zones'] = L.copy()
+
+    holes = []
+    # P4: leaf-spray dabs per cluster, back to front, each clipped by the clusters in front of it; one step lighter
+    # than the zone they sit on; coverage by zone (lit 0.80, mid 0.62, shade 0.28, deep 0.10), grouped in sub-clumps
+    D0 = P['dab'] * Wc
+    front = [np.zeros((h, w), np.float32) for _ in cl]
+    acc_u = np.zeros((h, w), np.float32)
+    for i in range(len(cl) - 1, -1, -1):
+        front[i] = acc_u.copy()
+        acc_u = np.maximum(acc_u, zone_maps[i][0])
+    k_cov = 1.45  # mean spray area / grid cell area (calibrated: 3-5 leaves of 0.62-1.0 D)
+    crown_in = ndi.distance_transform_edt(acc_u > 0.5)
+    edge_band = crown_in < 0.12 * Wc
     for ci, (c, (m, s)) in enumerate(zip(cl, fields)):
-        z = zone_maps[ci][1]
         if sum(P['cover']) == 0:
             break
+        z = zone_maps[ci][1]
         dist_out = ndi.distance_transform_edt(m < 0.5)
-        allow = np.clip(1 - (dist_out - 0.42 * D0), 0, 1).astype(np.float32)  # dabs may break the edge by ~0.4 D
-        allow_deep = np.clip(m * 1.0, 0, 1)
+        ndi_edge = ndi.distance_transform_edt(m > 0.5) < 0.9 * D0  # the silhouette band: pointed leaves break it
+        allow = np.clip(1 - (dist_out - 0.42 * D0), 0, 1).astype(np.float32) * (1 - front[ci])
+        allow_low = np.clip(1 - (dist_out - 0.18 * D0), 0, 1).astype(np.float32) * (1 - front[ci])
         x0b, x1b = int(max(c['x'] - 1.3 * c['r'], 0)), int(min(c['x'] + 1.3 * c['r'], w))
         y0b, y1b = int(max(c['y'] - 1.1 * c['r'], 0)), int(min(c['cut'] + 0.2 * c['r'], h))
         sp = 0.58 * D0
         gy, gx = np.mgrid[y0b:y1b:sp, x0b:x1b:sp]
         pts = np.stack([gx.ravel(), gy.ravel()], 1) + rng.uniform(-0.5, 0.5, (gx.size, 2)) * sp
         rng.shuffle(pts)
+        smax = float(s[m > 0.5].max()) if (m > 0.5).any() else 1.0
         for (px, py) in pts:
             ix, iy = int(px), int(py)
-            if not (0 <= ix < w and 0 <= iy < h) or m[iy, ix] < 0.5:
+            if not (0 <= ix < w and 0 <= iy < h) or m[iy, ix] < 0.5 or front[ci][iy, ix] > 0.5:
                 continue
             zk = int(z[iy, ix])
-            if rng.random() > P['cover'][3 - zk] * 1.6 * (0.58 ** 2) / 0.36:
+            cov = P['cover'][3 - zk]
+            if cov <= 0:
                 continue
-            D = D0 * float(np.clip(rng.lognormal(0, 0.33), 0.55, 2.3))
-            # leaves hang: outward from the cluster centre, drooping
+            p_acc = min(1.0, -math.log(max(1 - cov, 1e-3)) / k_cov) * (0.55 + 0.45 * float(np.clip(
+                0.5 + 0.5 * clump_field[iy, ix], 0, 1)) * 1.6)
+            if rng.random() > p_acc:
+                continue
+            D = D0 * float(np.clip(rng.lognormal(0, 0.32), 0.55, 2.4)) * [1.35, 1.25, 1.1, 1.0][zk]
+            if zk == 3:  # bigger, calmer dabs in the heart of the light
+                D *= 1.0 + 0.4 * float(np.clip((s[iy, ix] - t[2]) / max(smax - t[2], 1e-3), 0, 1))
             ox, oy = px - c['x'], py - c['y'] + 0.25 * c['r']
             ang = math.atan2(oy + 0.55 * math.hypot(ox, oy), ox) if (ox or oy) else math.pi / 2
-            polys = spray(px, py, D, ang, rng)
-            mk, xk, yk = polys_mask(polys)
-            clip = (allow if zk >= 1 else allow_deep)
+            # the marks follow the foliage: tangent to the cluster (flat on its top), drooping toward its sides
+            tang = math.atan2(oy, ox) + math.pi / 2
+            dang = (math.atan2(math.sin(tang), math.cos(tang)) + math.pi / 2) % math.pi - math.pi / 2
+            dang = 0.55 * dang + rng.normal(0, 0.18)
+            near_edge = dist_out[iy, ix] == 0 and ndi_edge[iy, ix]
+            mk, xk, yk = polys_mask(spray(px, py, D * 1.15, ang, rng) if near_edge else dab(px, py, D, dang, rng))
+            clip = allow if zk >= 2 else allow_low
             hh, ww = mk.shape
-            Xa, Ya = max(xk, 0), max(yk, 0)
-            sub = np.zeros_like(mk)
-            Xb, Yb = min(xk + ww, w), min(yk + hh, h)
+            Xa, Ya, Xb, Yb = max(xk, 0), max(yk, 0), min(xk + ww, w), min(yk + hh, h)
             if Xb <= Xa or Yb <= Ya:
                 continue
+            sub = np.zeros_like(mk)
             sub[Ya - yk:Yb - yk, Xa - xk:Xb - xk] = clip[Ya:Yb, Xa:Xb]
             colv = zvar[zk][int(rng.integers(0, 40))]
-            if zk >= 2 and P['autumn'] > 0 and autumn_field[iy, ix] > 1.0 and rng.random() < P['autumn'] * 3.2:
-                colv = (amber if zk == 3 else rust)[int(rng.integers(0, 24))]
+            if (zk == 3 and P['autumn'] > 0 and autumn_field[iy, ix] > 1.0 and edge_band[iy, ix]
+                    and rng.random() < P['autumn'] * 5):
+                colv = amber[int(rng.integers(0, 24))]  # October: the outer, sun-side leaves turn first
             L.comp(mk * sub, xk, yk, colv)
-    if snaps is not None:
-        snaps['P3 leaf-spray dabs'] = L.copy()
-
-    # P4: accents: a few small, lightest sprays where the light hits hardest (never a band along the outline)
-    if P['accents']:
-        acc = variants(pal['leaf_accent'], rng, 16)
-        top_s = np.percentile(vals, 94)
+    # P4b: the undersides hang: shade-coloured sprays along each cluster's lower edge, pointing down (a leafy, flatter
+    # bottom edge instead of a smooth dark curve)
+    if sum(P['cover']) > 0:
         for ci, (c, (m, s)) in enumerate(zip(cl, fields)):
-            ys, xs = np.nonzero((s > top_s) & (m > 0.9))
-            if len(ys) == 0:
-                continue
-            for _ in range(int(rng.integers(3, 8))):
-                i = int(rng.integers(0, len(ys)))
-                D = D0 * rng.uniform(0.55, 0.9)
-                ang = math.atan2(ys[i] - c['y'], xs[i] - c['x'])
-                mk, xk, yk = polys_mask(spray(xs[i], ys[i], D, ang, rng, n=int(rng.integers(2, 4))))
-                L.comp(mk, xk, yk, acc[int(rng.integers(0, 16))], 0.95)
+            xs_ = np.arange(c['x'] - 0.95 * c['r'], c['x'] + 0.95 * c['r'], 0.75 * D0)
+            for xx in xs_:
+                ix = int(np.clip(xx, 0, w - 1))
+                col_m = m[:, ix]
+                yy = np.nonzero(col_m > 0.5)[0]
+                if len(yy) == 0:
+                    continue
+                py = float(yy.max()) - 0.15 * D0
+                iy = int(np.clip(py, 0, h - 1))
+                if front[ci][min(iy + 2, h - 1), ix] > 0.5 or rng.random() < 0.25:
+                    continue
+                D = D0 * rng.uniform(0.6, 1.05)
+                mk, xk, yk = polys_mask(spray(xx, py, D, math.pi / 2 + rng.normal(0, 0.35), rng, n=3, spread=0.5))
+                hh, ww = mk.shape
+                Xa, Ya, Xb, Yb = max(xk, 0), max(yk, 0), min(xk + ww, w), min(yk + hh, h)
+                if Xb <= Xa or Yb <= Ya:
+                    continue
+                sub = np.zeros_like(mk)
+                sub[Ya - yk:Yb - yk, Xa - xk:Xb - xk] = 1 - front[ci][Ya:Yb, Xa:Xb]
+                L.comp(mk * sub, xk, yk, zvar[1 if rng.random() < 0.6 else 0][int(rng.integers(0, 40))])
+    if snaps is not None:
+        snaps['P4 leaf-spray dabs'] = L.copy()
 
-    # P5: sky holes (3.4 % of the crown, many small, near the edges, darker/duller/cooler than what is behind)
+    # P5: sky holes AFTER the dabs, so they read: ~2.5-3.4 % of the crown, in the outer band (0.025-0.09 W in from
+    # the edge), mid and shade zones, leafy-edged (a blob + 1-2 leaf sprays cut out); darker, duller and cooler than
+    # what is behind them (the smaller, the darker)
     a_now = L.alpha().copy()
     if P['holes'] > 0 and bg_at is not None:
         inside = ndi.distance_transform_edt(a_now > 0.5)
-        cand = (inside > 0.035 * Wc) & (inside < 0.16 * Wc)
-        zall = np.full((h, w), -1)
-        for (m, z) in zone_maps:
-            zall = np.where(m > 0.5, z, zall)
-        cand &= (zall <= 2) & (zall >= 1)
+        cand = (inside > 0.02 * Wc) & (inside < 0.07 * Wc) & (zall >= 1) & (zall <= 2) & (Y < cy + 0.15 * Hc)
         ys, xs = np.nonzero(cand)
         area = (a_now > 0.5).sum()
-        target = 0.034 * area * P['holes']
-        got = 0.0
-        tw_lines = []
-        holes = []
-        tries = 0
-        while got < target and len(ys) and tries < 400:
+        target = 0.011 * area * P['holes']
+        got, tries = 0.0, 0
+        while got < target and len(ys) and tries < 600:
             tries += 1
             i = int(rng.integers(0, len(ys)))
-            r = 0.5 * Wc * 0.03 * float(np.clip(rng.lognormal(0, 0.45), 0.5, 2.6))
+            dia = 0.026 * Wc * float(np.clip(rng.lognormal(0, 0.4), 0.5, 2.0))
             hx, hy = float(xs[i]), float(ys[i])
-            if any(math.hypot(hx - a, hy - b) < (r + rr) * 1.6 for a, b, rr in holes):
+            if any(math.hypot(hx - a, hy - b) < (dia + dd) * 1.5 for a, b, dd in holes):
                 continue
-            holes.append((hx, hy, r))
-            polys = [blob_poly(hx, hy, r, rng, k=5, rough=0.28)]
-            if r > 3:
-                polys += spray(hx + r * 0.4, hy - r * 0.2, r * 1.3, rng.uniform(0, 6.28), rng, n=2)
+            holes.append((hx, hy, dia))
+            polys = [blob_poly(hx, hy, dia * 0.38, rng, k=5, rough=0.3)]
+            polys += spray(hx, hy, dia * 0.85, rng.uniform(0, 6.28), rng, n=int(rng.integers(2, 4)), spread=1.2)
             mk, xk, yk = polys_mask(polys)
-            bgc = bg_at(hx, hy)
-            hole = shift(bgc, -5.0, 0.8, -8.0)
-            L.comp(mk, xk, yk, hole)
+            dark = -8.0 - 8.0 * float(np.clip(1.0 - dia / (0.06 * Wc), 0, 1))  # small holes read darker
+            L.comp(mk, xk, yk, shift(bg_at(hx, hy), dark, 0.8, -8.0))
             got += mk.sum()
-            if r > 3.2 and P['branch']:
-                a0 = rng.uniform(math.pi * 0.25, math.pi * 0.75)
-                p0 = (hx - math.cos(a0) * r * 1.4, hy + math.sin(a0) * r * 1.4)
-                p1 = (hx + math.cos(a0) * r * 1.3, hy - math.sin(a0) * r * 1.3)
-                tw_lines.append((np.array([p0, p1]), rng.uniform(1.0, 1.6), 1.0))
-        for ln in tw_lines:
-            mk, xk, yk = lines_mask([ln])
-            L.comp(mk, xk, yk, pal['bark_shade'], 0.9)
     if snaps is not None:
-        snaps['P4 accents + sky holes'] = L.copy()
+        snaps['P5 sky holes'] = L.copy()
+
+    # P5: accents: a few small, lightest sprays where the light hits hardest (never a band along the outline);
+    # twigs across a few of the bigger holes, clipped to the hole
+    if P['accents']:
+        acc = variants(pal['leaf_accent'], rng, 16)
+        top_s = np.percentile(vals, 95)
+        for ci, (c, (m, s)) in enumerate(zip(cl, fields)):
+            ys, xs = np.nonzero((s > top_s) & (m > 0.9) & (front[ci] < 0.5))
+            if len(ys) == 0:
+                continue
+            for _ in range(int(rng.integers(2, 6))):
+                i = int(rng.integers(0, len(ys)))
+                D = D0 * rng.uniform(0.5, 0.85)
+                ang = math.atan2(ys[i] - c['y'], xs[i] - c['x'])
+                mk, xk, yk = polys_mask(spray(xs[i], ys[i], D, ang, rng, n=int(rng.integers(2, 4))))
+                L.comp(mk, xk, yk, acc[int(rng.integers(0, 16))], 0.95)
+    if P['branch']:
+        for (hx, hy, dia) in holes:
+            if dia < 0.035 * Wc or rng.random() > 0.35:
+                continue
+            a0 = rng.uniform(math.pi * 0.3, math.pi * 0.7)
+            ln = (np.array([[hx - math.cos(a0) * dia, hy + math.sin(a0) * dia],
+                            [hx + math.cos(a0) * dia, hy - math.sin(a0) * dia]]), rng.uniform(1.0, 1.4), 1.0)
+            mk, xk, yk = lines_mask([ln])
+            L.comp(mk, xk, yk, pal['bark_shade'], 0.85)
 
     # P6: texture (near only gets speckle), then the plane: converge on the air and blur by distance
     texture(L, rng, grain=P['grain'], mottle=P['mottle'], speck=P['speck'],
@@ -574,7 +670,7 @@ def paint_tree(w, h, base, crown_c, Wc, Hc, rng, plane='near', bg_at=None, snaps
         L.px[..., :3] = conv[..., :3] * a[..., None]
     L.blur(P['blur'])
     if snaps is not None:
-        snaps['final (+ texture)'] = L.copy()
+        snaps['P6 accents + texture (final)'] = L.copy()
     return L
 
 
@@ -800,17 +896,18 @@ def paint_reeds(w, h, rng, x0, x1, yb, hmax, wind=0.42):
     Wd = x1 - x0
     xs = np.arange(w)
     gust = fbm1(rng, w, 55)  # rhythm in the lean: groups lean more, never parallel combing
-    hm = hmax * (0.70 + 0.14 * fbm1(rng, w, 40) + 0.08 * fbm1(rng, w, 12))
+    # the MASS is lower than the blades: the blades and plumes make the ragged top above it (refs 02, van)
+    hm = hmax * (0.60 + 0.06 * fbm1(rng, w, 40) + 0.05 * fbm1(rng, w, 10))
     hm = np.where((xs >= x0) & (xs < x1), hm, 0)
     taper = np.clip(np.minimum(xs - x0, x1 - xs) / 40.0, 0, 1) ** 0.7
     hm = hm * taper
-    lean_x = wind + 0.10 * gust
+    lean_x = wind + 0.16 * gust
     # P0 the MASS: a band with a ragged top, leaning downwind, deep at the root, lighter toward the top
-    top = yb - hm
     Y, X = np.mgrid[0:h, 0:w].astype(np.float32) + 0.5
-    shear = (yb - Y) * np.tan(lean_x)[None, :] * 0.55
+    shear = (yb - Y) * np.tan(lean_x)[None, :] * 0.25
     Xs = np.clip((X - shear).astype(int), 0, w - 1)
-    topv = top[Xs]
+    rag = 4.0 * fbm1(rng, w, 2.5)  # small-scale raggedness only (the blades carry the real edge)
+    topv = (yb - hm + rag)[Xs]
     mass = np.clip(Y - topv + 0.5, 0, 1) * np.clip(yb - Y + 0.5, 0, 1) * (hm[Xs] > 2)
     fr = np.clip((yb - Y) / np.maximum(hm[Xs], 1), 0, 1)  # 0 root .. 1 top
     cols = [C('grass_deep'), C('grass_shade'), C('grass_mid')]
@@ -825,9 +922,9 @@ def paint_reeds(w, h, rng, x0, x1, yb, hmax, wind=0.42):
         ix = int(x)
         if hm[ix] < 6:
             continue
-        ln = hm[ix] * rng.uniform(0.85, 1.28)
-        lean = float(lean_x[ix]) * rng.uniform(0.75, 1.15) + rng.normal(0, 0.07)
-        path = blade_path(x, yb + 2, ln, lean * 0.55, lean * 0.9, rng)
+        ln = hm[ix] * rng.uniform(1.05, 1.62)
+        lean = float(lean_x[ix]) * rng.uniform(0.6, 1.25) + rng.normal(0, 0.09)
+        path = blade_path(x, yb + 2, ln, lean * 0.55, lean * rng.uniform(0.6, 1.2), rng)
         wd = rng.uniform(1.5, 2.6)
         widths = wd * np.linspace(1, 0.12, len(path)) ** 0.9
         tcol = mixc('grass_shade', 'grass_mid', rng.uniform(0.15, 0.8))
@@ -865,9 +962,9 @@ def paint_reeds(w, h, rng, x0, x1, yb, hmax, wind=0.42):
         ix = int(x)
         if hm[ix] < 6:
             continue
-        ln = hm[ix] * rng.uniform(0.5, 1.05)
-        lean = float(lean_x[ix]) * rng.uniform(0.85, 1.25)
-        path = blade_path(x, yb + 3, ln, lean * 0.6, lean, rng)
+        ln = hm[ix] * rng.uniform(0.6, 1.45)
+        lean = float(lean_x[ix]) * rng.uniform(0.7, 1.3) + rng.normal(0, 0.08)
+        path = blade_path(x, yb + 3, ln, lean * 0.6, lean * rng.uniform(0.7, 1.2), rng)
         widths = rng.uniform(1.1, 1.7) * np.linspace(1, 0.1, len(path))
         m, xa, ya = polys_mask([ribbon(path, widths)])
         L.comp(m, xa, ya, litv[int(rng.integers(0, 24))], rng.uniform(0.55, 0.85))
@@ -897,17 +994,19 @@ def paint_reeds(w, h, rng, x0, x1, yb, hmax, wind=0.42):
     return L, snaps
 
 
-def paint_near_blades(w, h, rng, n=6, sigma=3.0):
-    """Out-of-focus near blades framing the bottom corner (02's near reeds): big, deep, low contrast, blurred."""
+def paint_near_blades(w, h, rng, n=4, sigma=2.6):
+    """Out-of-focus near plumes framing a bottom corner (02's near reeds): big, a step darker than the bed, low
+    contrast, blurred (sigma 2.6 px = 10-90 % edges ~6.5 px, as measured)."""
     L = Layer(w, h)
     for i in range(n):
-        x = rng.uniform(-0.05, 0.75) * w
-        ln = rng.uniform(0.45, 0.95) * h
-        lean = rng.uniform(0.25, 0.65)
-        path = blade_path(x, h + 10, ln, lean * 0.6, lean * 0.9, rng, n=30)
-        widths = rng.uniform(7, 13) * np.sin(np.pi * np.clip(np.linspace(0.08, 1, len(path)), 0, 1)) ** 0.6
+        x = (rng.uniform(-0.04, 0.16) if i % 2 == 0 else rng.uniform(0.78, 0.98)) * w
+        ln = rng.uniform(0.45, 0.8) * h
+        lean = rng.uniform(0.3, 0.6) * (1 if x < w / 2 else 0.6)
+        path = blade_path(x, h + 12, ln, lean * 0.6, lean * 0.9, rng, n=30)
+        tt = np.linspace(0, 1, len(path))
+        widths = rng.uniform(14, 21) * (0.3 + 0.7 * np.sin(np.pi * np.clip(tt * 0.95, 0, 1)) ** 0.8) * (1 - tt) ** 0.25
         m, xa, ya = polys_mask([ribbon(path, widths)])
-        L.comp(m, xa, ya, mixc('grass_deep', 'leaf_deep', rng.uniform(0.2, 0.6)), rng.uniform(0.75, 0.92))
+        L.comp(m, xa, ya, shift(C('grass_shade'), -9, 0.9), rng.uniform(0.72, 0.85))
     L.blur(sigma)
     return L
 
@@ -943,92 +1042,104 @@ def facet_masks(bx, by, length, width, ang, curl):
 
 
 def paint_protea(w, h, rng, cx, cy, R, leaves=True, scale_leaf=1.0):
+    """The protea-like flower (05): a cream dome sitting in a CUP of broad, overlapping two-facet bracts; long
+    two-tone leaves behind it make the darker field the head reads against."""
     L = Layer(w, h)
-    # leaves behind (the dark field the flower head sits on): long ellipses, two halves split by the midrib
+
+    def bract(bx, by, ln, wd, ang, cols, curl=0.0):
+        lit, sh = facet_masks(bx, by, ln, wd, ang, curl)
+        for poly, cname in [(sh, cols[0]), (lit, cols[1])]:
+            m, xa, ya = polys_mask([poly])
+            L.comp(m, xa, ya, variants(C(cname), rng, 1)[0])
+
+    # 1. leaves (behind): lanceolate-elliptic, width 0.30-0.36 of the length, split by the midrib into a lit and a
+    # shade half, three greens; a light midrib on 80 % of the length
     if leaves:
         lv = []
-        for i in range(7):
-            a = math.radians(rng.uniform(95, 250) if i < 5 else rng.uniform(-60, 40))
-            ln = R * rng.uniform(2.3, 3.4) * scale_leaf
-            wd = ln * rng.uniform(0.22, 0.3)
-            bx = cx + rng.normal(0, 0.15) * R
-            by = cy + R * rng.uniform(0.9, 1.6)
-            lv.append((bx, by, ln, wd, a))
-        lv.sort(key=lambda v: -v[1])
+        for i, a in enumerate([-150, -118, -62, -30, 160, 20, 130]):
+            a = math.radians(a + rng.normal(0, 8))
+            ln = R * rng.uniform(2.0, 2.8) * scale_leaf
+            bx = cx + rng.normal(0, 0.12) * R
+            by = cy + R * (rng.uniform(0.9, 1.3) if i < 4 else rng.uniform(1.6, 2.4))
+            lv.append((bx, by, ln, ln * rng.uniform(0.30, 0.36), a))
         greens = [('leaf_shade', 'leaf_mid'), ('leaf_deep', 'leaf_shade'), ('leaf_mid', 'leaf_lit')]
         for j, (bx, by, ln, wd, a) in enumerate(lv):
             pair = greens[j % 3]
-            ang = a
-            curl = rng.uniform(-0.12, 0.12)
-            lit, sh = facet_masks(bx, by, ln, wd, ang, curl)
-            for poly, cname in [(sh, pair[0]), (lit, pair[1])]:
+            curl = rng.uniform(-0.10, 0.10)
+            full, le, ri, mid = bract_poly(bx, by, ln, wd, a, curl=curl, n=16)
+            # an elliptic leaf: re-profile the bract into both-ends-pointed
+            t = np.linspace(0, 1, 16)
+            hw = 0.5 * wd * np.sin(np.pi * t) ** 0.75
+            u = t * ln
+            bend = curl * t ** 2 * ln
+            ca, sa = math.cos(a), math.sin(a)
+            Rm = np.array([[ca, -sa], [sa, ca]])
+            left = np.stack([u, hw + bend], 1) @ Rm.T + [bx, by]
+            right = np.stack([u, -hw + bend], 1) @ Rm.T + [bx, by]
+            midl = np.stack([u, bend], 1) @ Rm.T + [bx, by]
+            polyA = np.concatenate([left, midl[::-1]], 0)
+            polyB = np.concatenate([midl, right[::-1]], 0)
+            nA = np.array([-sa, ca])
+            lit_first = (nA @ LIGHT[:2]) > 0
+            lit_p, sh_p = (polyA, polyB) if lit_first else (polyB, polyA)
+            for poly, cname in [(sh_p, pair[0]), (lit_p, pair[1])]:
                 m, xa, ya = polys_mask([poly])
                 L.comp(m, xa, ya, variants(C(cname), rng, 1)[0])
-            # a light midrib (1.3 px) over 80 % of the length + fine strokes along the leaf (texture)
-            full, le, ri, mid = bract_poly(bx, by, ln, wd, ang, curl=curl)
-            m, xa, ya = lines_mask([(mid[1:int(len(mid) * 0.8)], 1.3, 1.0)])
-            L.comp(m, xa, ya, shift(C(pair[1]), 9), 0.65)
-    # the stem
-    stem = bez((cx + 0.1 * R, cy + 3.5 * R), (cx - 0.1 * R, cy + 2.2 * R), (cx, cy + 0.7 * R), 20)
-    m, xa, ya = polys_mask([ribbon(stem, np.linspace(0.13 * R, 0.09 * R, 20))])
+            m, xa, ya = lines_mask([(midl[1:13], 1.3, 1.0)])
+            L.comp(m, xa, ya, shift(C(pair[1]), 9), 0.6)
+    # 2. the stem
+    stem = bez((cx + 0.15 * R, cy + 3.6 * R), (cx - 0.12 * R, cy + 2.2 * R), (cx, cy + 0.8 * R), 20)
+    m, xa, ya = polys_mask([ribbon(stem, np.linspace(0.16 * R, 0.11 * R, 20))])
     L.comp(m, xa, ya, C('stem'))
-    # back bracts (behind the dome): long, up and outward, darker
-    order = []
-    nb = 9
+    # 3. the back ring (behind the dome): broad bracts fanning up and outward, tips 0.7-1.0 R past the dome
+    nb = 11
     for i in range(nb):
-        a = math.radians(-160 + 140 * (i + rng.uniform(-0.25, 0.25)) / (nb - 1))
-        order.append(('back', a))
-    for kind, a in order:
-        bx = cx + math.cos(a) * 0.55 * R
-        by = cy + math.sin(a) * 0.45 * R + 0.25 * R
-        ln = R * rng.uniform(1.15, 1.45)
-        wd = R * rng.uniform(0.30, 0.38)
-        lit, sh = facet_masks(bx, by, ln, wd, a, rng.uniform(-0.06, 0.06))
-        for poly, cname in [(sh, 'bract_deep'), (lit, 'bract_shade')]:
-            m, xa, ya = polys_mask([poly])
-            L.comp(m, xa, ya, variants(C(cname), rng, 1)[0])
-    # the dome: cream, its lower right in shade, fine radial strokes from a point below its centre
+        a = math.radians(-172 + 164 * (i + rng.uniform(-0.2, 0.2)) / (nb - 1))
+        bx, by = cx + math.cos(a) * 0.40 * R, cy + math.sin(a) * 0.36 * R + 0.15 * R
+        bract(bx, by, R * rng.uniform(1.25, 1.5), R * rng.uniform(0.42, 0.50), a, ('bract_shade', 'bract_mid'),
+              rng.uniform(-0.06, 0.06))
+    # 4. the dome: cream, lit cap on the sun side, its lower part in shade; fine radial strokes from a point below
     Y, X = np.mgrid[0:h, 0:w].astype(np.float32) + 0.5
-    ry = R * 0.9
+    ry = R * 0.86
     dm = np.clip((1 - np.hypot((X - cx) / R, (Y - cy) / ry)) * R + 0.5, 0, 1)
     nx, ny = (X - cx) / R, (Y - cy) / ry
     nz = np.sqrt(np.clip(1 - nx * nx - ny * ny, 0.02, 1))
     s = (np.stack([nx, ny, nz], -1) @ LIGHT.astype(np.float32))
-    zc = np.where(s[..., None] > 0.55, C('dome_lit'), np.where(s[..., None] > 0.05, C('dome_mid'), C('dome_shade')))
+    zc = np.where(s[..., None] > 0.55, C('dome_lit'), np.where(s[..., None] > 0.1, C('dome_mid'), C('dome_shade')))
     zc = np.stack([ndi.gaussian_filter(zc[..., i], 1.5) for i in range(3)], -1)
     L.comp_full(dm.astype(np.float32), zc)
-    fx, fy = cx + 0.05 * R, cy + 0.75 * R
+    fx, fy = cx + 0.05 * R, cy + 0.8 * R
     lines = []
-    for i in range(int(R * 5.5)):
+    for i in range(int(R * 7)):
         a = rng.uniform(math.pi * 1.0, math.pi * 2.0)
-        r0 = rng.uniform(0.25, 1.55) * R
+        r0 = rng.uniform(0.3, 1.65) * R
         ln = R * rng.uniform(0.10, 0.20)
         p0 = np.array([fx + math.cos(a) * r0, fy + math.sin(a) * r0 * 0.95])
         if ((p0[0] - cx) / R) ** 2 + ((p0[1] - cy) / ry) ** 2 > 0.86:
             continue
         p1 = p0 + np.array([math.cos(a), math.sin(a)]) * ln
         lines.append((np.array([p0, p1]), rng.uniform(0.9, 1.4), rng.uniform(0.5, 0.95)))
-    m, xa, ya = lines_mask(lines)
-    m = m * place(dm, 0, 0, w, h)[ya:ya + m.shape[0], xa:xa + m.shape[1]] if ya >= 0 and xa >= 0 else m
-    L.comp(m, xa, ya, C('dome_hatch'), 0.55)
-    # front bracts: two rings around the lower half, overlapping the dome's base, two facets each
-    fr = []
-    for ring, (n, rr, lmul, a0, a1) in enumerate([(8, 0.82, 1.0, 175, 5), (6, 0.68, 0.85, 150, 30)]):
+    if lines:
+        m, xa, ya = lines_mask(lines)
+        dmc = place(dm, 0, 0, w, h)
+        hh, ww = m.shape
+        Xa, Ya, Xb, Yb = max(xa, 0), max(ya, 0), min(xa + ww, w), min(ya + hh, h)
+        clip = np.zeros_like(m)
+        clip[Ya - ya:Yb - ya, Xa - xa:Xb - xa] = dmc[Ya:Yb, Xa:Xb]
+        L.comp(m * clip, xa, ya, C('dome_hatch'), 0.5)
+    # 5. the front of the cup: bracts rooted below the dome's middle, pointing up and outward, overlapping its lower
+    # half (the dome shows ~its top 55 %); outer ones a step darker, inner ones lit; 2 small ones turned down
+    for kind, n, rad, a0, a1, lm, cols in [('outer', 8, 0.62, -168, -12, (0.95, 1.2), ('bract_shade', 'bract_mid')),
+                                            ('inner', 6, 0.42, -140, -40, (0.85, 1.05), ('bract_mid', 'bract_lit'))]:
         for i in range(n):
             a = math.radians(a0 + (a1 - a0) * (i + rng.uniform(-0.2, 0.2)) / (n - 1))
-            a = -a  # up and outward
-            bx = cx + math.cos(a) * 0.25 * R
-            by = cy + 0.85 * R + math.sin(a) * 0.15 * R
-            ang = math.atan2(math.sin(a) * 0.9 - 0.35, math.cos(a))
-            ln = R * rng.uniform(0.95, 1.2) * lmul
-            wd = R * rng.uniform(0.30, 0.38)
-            fr.append((ring, bx, by, ln, wd, ang))
-    for ring, bx, by, ln, wd, ang in fr:
-        lit, sh = facet_masks(bx, by, ln, wd, ang, rng.uniform(-0.08, 0.08))
-        cl_ = ('bract_shade', 'bract_mid') if ring == 0 else ('bract_mid', 'bract_lit')
-        for poly, cname in [(sh, cl_[0]), (lit, cl_[1])]:
-            m, xa, ya = polys_mask([poly])
-            L.comp(m, xa, ya, variants(C(cname), rng, 1)[0])
+            bx = cx + math.cos(a) * rad * R * 0.9
+            by = cy + 0.95 * R + math.sin(a) * 0.12 * R
+            ang = math.atan2(math.sin(a), math.cos(a) * 1.25)
+            bract(bx, by, R * rng.uniform(*lm), R * rng.uniform(0.40, 0.48), ang, cols, rng.uniform(-0.08, 0.08))
+    for a in (152, 28):
+        a = math.radians(a + rng.normal(0, 6))
+        bract(cx + math.cos(a) * 0.3 * R, cy + 1.0 * R, R * 0.7, R * 0.36, a, ('bract_deep', 'bract_shade'))
     texture(L, rng, grain=1.8, mottle=1.8, speck=1 / 900, speck_cols=[C('dome_lit'), C('bract_lit')])
     return L
 
@@ -1209,7 +1320,7 @@ def build_reeds_panel(seed):
     bg = bg_vertical(w, h, [(0, C('water')), (0.62, shift(C('water'), 1.5)), (0.63, C('paving_far')),
                             (1.0, C('paving'))], rng)
     reeds, snaps = paint_reeds(w, h, rng, 20, 540, 222, 170)
-    near = paint_near_blades(w, h, np.random.default_rng(seed + 7), n=5, sigma=3.0)
+    near = paint_near_blades(w, h, np.random.default_rng(seed + 7))
     img = over(over(bg, reeds), near)
     strip = [over(bg, snaps[k]) for k in ['P0 mass', 'P1 back blades', 'P2 plumes', 'P3 front blades']]
     return img, strip
@@ -1220,8 +1331,8 @@ def build_protea_panel(seed):
     w, h = 420, 380
     bg = bg_vertical(w, h, [(0, shift(C('planter_shade'), -8, 0.8)), (0.55, C('planter_shade')),
                             (0.56, C('paving_far')), (1.0, C('paving'))], rng)
-    pr = paint_protea(w, h, rng, 200, 140, 40)
-    pr2 = paint_protea(w, h, np.random.default_rng(seed + 3), 322, 214, 27, leaves=False)
+    pr = paint_protea(w, h, rng, 180, 150, 38)
+    pr2 = paint_protea(w, h, np.random.default_rng(seed + 3), 318, 200, 26, leaves=True, scale_leaf=0.8)
     return over(over(bg, pr2), pr)
 
 
@@ -1285,8 +1396,8 @@ def sheet(seed=SEED):
         'Paint: inner dark + branches, flat zones, dabs one step lighter, accents, sky holes 3.4 %, grain. Edges crisp.',
         ref_h=300)
     # the pass strip
-    keys = ['P0 inner dark', 'P1 branches', 'P2a flat value zones', 'P3 leaf-spray dabs', 'P4 accents + sky holes',
-            'final (+ texture)']
+    keys = ['P0 inner dark', 'P1 branches', 'P2 flat value zones', 'P4 leaf-spray dabs', 'P5 sky holes',
+            'P6 accents + texture (final)']
     strip_h = 250
     st = Image.new('RGB', (W, strip_h + 40), (250, 246, 242))
     dr = ImageDraw.Draw(st)
