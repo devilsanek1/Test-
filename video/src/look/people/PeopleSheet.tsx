@@ -12,7 +12,7 @@ import {Figure, type FigurePose, type FigureLight} from '../../lib/figure';
 import {CurrentHer} from './CurrentHer';
 
 export const SHEET_W = 2400;
-export const SHEET_H = 2900;
+export const SHEET_H = 2760;
 
 const PAGE = '#EFE7DF';
 const FIELD = '#E3D8CF';
@@ -47,15 +47,15 @@ export const PeopleSheet: React.FC = () => {
   const wind = (t: number) => ({t, strength: 1});
   const W0 = wind(0.2);
   const pose = (p: FigurePose) => p;
-  const doorLight: FigureLight = {local: {color: '#FFC27A', dL: 16, dir: [1, -0.12], width: 30}};
-  const phoneLight: FigureLight = {local: {color: '#CFE2FF', dL: 26, dir: [-0.55, 0.83], width: 34}};
+  const doorLight: FigureLight = {local: {color: '#FFC27A', dL: 11, dir: [1, -0.12], width: 18}};
+  const phoneLight: FigureLight = {local: {color: '#CFE2FF', dL: 14, dir: [-0.55, 0.83], width: 30, radius: 250}};
   // row A: the in-frame test (1:1), the refined her on the same landing to the right of the current one
   const ax = 40;
   const ay = 140;
   const herX = 470; // still v3 x
   // row C: the wind strip windows
   const cy = 2010;
-  const win = {w: 400, h: 560};
+  const win = {w: 410, h: 560};
   const phases = [0, 0.25, 0.5, 0.75];
   return (
     <AbsoluteFill style={{background: PAGE}}>
@@ -128,7 +128,7 @@ export const PeopleSheet: React.FC = () => {
               </defs>
               <rect x={x0} y={cy} width={win.w} height={win.h} rx={18} fill={FIELD} />
               <g clipPath={`url(#${id})`}>
-                <Figure x={x0 + 150} y={cy + 1560} h={1500} pose={pose({view: 'profile', wind: wind(ph)})} shadow={null} />
+                <Figure x={x0 + 120} y={cy + 1300} h={1200} pose={pose({view: 'profile', wind: wind(ph)})} shadow={null} />
               </g>
               <T x={x0 + 16} y={cy + win.h + 34} s={24} w={600}>
                 t = {ph.toFixed(2)} s

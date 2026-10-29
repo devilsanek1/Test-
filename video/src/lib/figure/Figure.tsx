@@ -36,9 +36,10 @@ export const HER_LOOK: FigureLook = {
 export type FigureLight = {
   /** Unit vector toward the key light, screen space (default: a low sun from the upper left). */
   key?: Pt;
-  /** A local light: its colour, the lift (dL*), the direction toward it (screen space), the lit edge's width (local
-   *  units, H = 1000). */
-  local?: {color: string; dL: number; dir: Pt; width?: number};
+  /** A local light: its colour, the lift (dL*, +10 to +14), the direction toward it (screen space), the lit edge's
+   *  width (local units, H = 1000); `at` + `radius` (local units) limit it to what is near the source (a phone: by
+   *  default the carried phone's centre). It lights only what faces it and is near it, never the whole silhouette. */
+  local?: {color: string; dL: number; dir: Pt; width?: number; at?: Pt; radius?: number};
   /** The soft body gradient's strength (0 = off, the default: DIRECTION rule 5 keeps volumes flat; 1 = the proposal). */
   grad?: number;
   /** false = no rim (a figure outside the subject tier). */
@@ -87,6 +88,10 @@ export const Figure: React.FC<FigureProps> = ({x, y, h, pose, facing = -1, look,
     if (p.overlay) needsClip.add(p.overlay.in);
   });
   const gradId = `fg${uid}-grad`;
+  // the local light's reach: a disc around its source (the carried phone by default), when it has a radius
+  const phone = parts.find((q) => q.k === 'phone');
+  const at: Pt | undefined = loc?.at ?? (phone ? [phone.pts.reduce((a, q) => a + q[0], 0) / phone.pts.length, phone.pts.reduce((a, q) => a + q[1], 0) / phone.pts.length] : undefined);
+  const discId = loc && loc.radius && at ? `fg${uid}-reach` : null;
   const rimOn = light.rim ?? true;
 
   const body: React.ReactNode[] = [];
@@ -125,9 +130,10 @@ export const Figure: React.FC<FigureProps> = ({x, y, h, pose, facing = -1, look,
     }
     if (p.local && loc && lv) {
       const w = loc.width ?? 22;
+      const lit = <path d={xor(p.pts, [-lv[0] * w, -lv[1] * w], tn)} fill={litBy(t.lit, loc.color, loc.dL, 12)} fillRule="evenodd" />;
       g.push(
         <g key="local" clipPath={cp}>
-          <path d={xor(p.pts, [-lv[0] * w, -lv[1] * w], tn)} fill={litBy(t.lit, loc.color, loc.dL)} fillRule="evenodd" />
+          {discId ? <g clipPath={`url(#${discId})`}>{lit}</g> : lit}
         </g>,
       );
     }
@@ -152,6 +158,11 @@ export const Figure: React.FC<FigureProps> = ({x, y, h, pose, facing = -1, look,
             </clipPath>
           );
         })}
+        {discId && at ? (
+          <clipPath id={discId}>
+            <circle cx={at[0]} cy={at[1]} r={loc!.radius} />
+          </clipPath>
+        ) : null}
         <linearGradient id={gradId} x1="0" y1="-640" x2="0" y2="-150" gradientUnits="userSpaceOnUse">
           <stop offset="0" stopColor="#FFFFFF" />
           <stop offset="1" stopColor={mixHex('#FFFFFF', coatT.deep, 0.42 * (light.grad ?? 0))} />

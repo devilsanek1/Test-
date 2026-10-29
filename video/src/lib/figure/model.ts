@@ -443,9 +443,10 @@ function backBoot(ankle: Pt, lift: number, outer: 1 | -1): {boot: Pt[]; sole?: P
       ],
     };
   }
-  // the heel lifted toward us: the boot foreshortened, the sole a dark crescent at its bottom
-  const h = 42 - 10 * lift;
-  const s = 8 + 14 * lift;
+  // the heel lifted toward us at toe-off: the toe stays on the ground (the boot's bottom on y = 0), the shaft
+  // foreshortened above it, the heel's sole a dark band at the bottom
+  const h = -y;
+  const s = 8 + 12 * lift;
   return {
     boot: [
       [x - 21, y - 60],
@@ -490,7 +491,7 @@ function behind(p: FigurePose): Build {
     hipL = [-44, PROP.hipY - 6];
     hipR = [44, PROP.hipY + 6];
     ankL = [-34, -PROP.ankle];
-    ankR = [40, -PROP.ankle - 60 * (0.6 + 0.4 * k) + 22];
+    ankR = [40, -PROP.ankle - 30 * (0.6 + 0.4 * k)];
     liftR = 0.6 + 0.4 * k;
     tilt = -6;
   } else {
