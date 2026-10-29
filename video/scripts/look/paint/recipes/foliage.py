@@ -1384,25 +1384,31 @@ def sheet(seed=SEED):
     pad = 16
 
     def row(title, refs, ours, notes, ref_h=None):
+        """One element: the reference crops (scaled to one height that fits) on the left, ours at 1:1 on the right."""
         ours_im = to_img(ours) if isinstance(ours, np.ndarray) else ours
         oh = ours_im.size[1]
         rh = ref_h or min(oh, 300)
-        ref_ims = [fit(ref_crop(r), rh) for r in refs]
-        hgt = max(oh, rh) + 56
+        crops = [ref_crop(r) for r in refs]
+        avail = W - 3 * pad - ours_im.size[0] - 8 * (len(crops) - 1)
+        tot = sum(c.size[0] * rh / c.size[1] for c in crops)
+        if tot > avail:
+            rh = int(rh * avail / tot)
+        ref_ims = [fit(c, rh) for c in crops]
+        hgt = max(oh, rh) + 60
         im = Image.new('RGB', (W, hgt), (250, 246, 242))
         dr = ImageDraw.Draw(im)
         label(dr, (pad, 8), title, 19, True)
-        label(dr, (pad, 32), notes, 13)
+        label(dr, (pad, 33), notes, 13)
         x = pad
         for r_im, rname in zip(ref_ims, refs):
-            if x + r_im.size[0] > W * 0.6:
-                r_im = r_im.crop((0, 0, int(W * 0.6 - x), r_im.size[1]))
-            im.paste(r_im, (x, 52))
-            label(dr, (x + 4, 52 + r_im.size[1] - 18), 'ref ' + rname, 12, fill=(255, 255, 255))
+            im.paste(r_im, (x, 56))
+            dr.rectangle([x, 56 + r_im.size[1] - 18, x + 8 + 7 * len(rname) + 30, 56 + r_im.size[1]], fill=(40, 36, 48))
+            label(dr, (x + 4, 56 + r_im.size[1] - 17), 'ref ' + rname, 12, fill=(255, 255, 255))
             x += r_im.size[0] + 8
         ox = W - pad - ours_im.size[0]
-        im.paste(ours_im, (ox, 52))
-        label(dr, (ox + 6, 56), 'OURS (painted, 1:1)', 13, True, fill=(40, 34, 48))
+        im.paste(ours_im, (ox, 56))
+        dr.rectangle([ox, 56, ox + 150, 74], fill=(40, 36, 48))
+        label(dr, (ox + 6, 58), 'OURS (painted, 1:1)', 12, True, fill=(255, 255, 255))
         rows.append(im)
 
     row('1  Tree crown: lit and shade masses built from clusters, painted with leaf-spray dabs',
@@ -1439,7 +1445,7 @@ def sheet(seed=SEED):
     row('4  Grass and wind-blown reeds: a MASS first, then blades, plumes with lit upper edges, a few lit front blades',
         ['bus_reeds', 'van_grass', 'hill_grass'], reeds,
         'Mass (deep root -> lit top, ragged top leaning downwind), back blades 1 per 3.4 px, plumes on 45 %, '
-        'front lit blades 1 per 8.5 px, 1 px tip lights; near blades out of focus (sigma 3).', ref_h=220)
+        'front lit blades 1 per 8.5 px, 1 px tip lights; near plumes out of focus (sigma 2.6).', ref_h=220)
     st2 = Image.new('RGB', (W, 190), (250, 246, 242))
     dr = ImageDraw.Draw(st2)
     label(dr, (pad, 6), '4b  The reeds pass by pass', 15, True)
