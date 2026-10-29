@@ -297,7 +297,10 @@ Maintenance at the end).
   painted plate revealed stroke by stroke through brush-shaped masks), never pop up; and the owner prefers no extra
   service where we can run it ourselves (an open model in our own container first). — ("If we do that would we be able
   to then animate its process like the very first few seconds or would it literally just popup?"; "Oh damn we need a
-  separate service / But you are AI why can’t you do it", 2026-10-29).
+  separate service / But you are AI why can’t you do it", 2026-10-29). On the local SDXL sky trials: "Yeah 0.7 looks
+  reasonable" (img2img strength 0.70 from our design); and the priority stays OUR CODE: "Let’s see what’s the best we
+  can do with code after research", 2026-10-29: the painter rebuilt from the researched recipes is the main path, the
+  AI plate the comparison.
 - **Texture and lines: VERY subtle.** No outlines: as on the city posters, shapes are separated by light and shade (a
   lit and a shade face on every volume, the subject's the deepest) and by value, never by a line drawn round them
   (the A vs B picture's B). Thin lines only on small things that are lines (window bars, railings, rigging): dark,
