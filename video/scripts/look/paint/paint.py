@@ -891,8 +891,11 @@ def style_flat_broad(piece, spec, rng, stamps):
         rr = np.linspace(0, 1, H, dtype=np.float32)[:, None, None]
         tgt = tgt + (hex_lab(hz['color']) - tgt) * (hz['k'] * (hz.get('top', 0.6) + (1 - hz.get('top', 0.6)) * rr))
     out, a, n = broad_paint(piece, rng, mask, tgt, light, None, ref=rgb.astype(np.float32))
-    a = keep_frame_edges(a, mask, (x0, y0, x1, y1), spec['frame'])
-    return out, a, (x0, y0), n
+    a2 = keep_frame_edges(a, mask, (x0, y0, x1, y1), spec['frame'])
+    # where the frame's edge keeps the paint whole, the colour is the mass's (never the canvas's unpainted black)
+    fix = (a2 > a + 0.01)
+    out = np.where(fix[..., None], (out * a[..., None] + lab_to_rgb(tgt) * (a2 - a)[..., None]) / np.maximum(a2, 1e-4)[..., None], out)
+    return out, a2, (x0, y0), n
 
 
 def lobe_height(lobes, box, flat=1.0):
