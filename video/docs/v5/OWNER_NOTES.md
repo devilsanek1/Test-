@@ -16,3 +16,5 @@ Format: the owner's words in quotes, with the time (UTC); after "->" what we did
 - 2026-10-29 ~08:35 UTC (after the Big Bend reel's evaluation): "Actually let's move truth down the list it's okay to exhagerste a bit like in this case so we don't have to be exactly precise like a law firm / Exaggerating and generalizing and making it bigger is fine" -> rule: playbook,
   TOPIC_CRITERIA (truth 4th, "true enough"); for this film the G1 writer may round up and go bigger; the fact lock
   stays the floor (the core events are real).
+- 2026-10-29 ~08:45 UTC: "And people commenting is actually great so if comments are increasing the engagement that's a massive plus to the script" -> rule: playbook, Audience and goal; the G1 brief asks for one or two
+  comment-drawing lines (an arguable or bigger claim, e.g. a "weirdest place" ranking people will dispute).

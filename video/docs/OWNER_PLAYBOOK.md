@@ -25,7 +25,9 @@ Maintenance at the end).
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24).
 - **Growth matters: maximise engagement with subtle, defensible hooks**, e.g. "the language everyone loves".
   **Exaggerating, generalizing and making it bigger are fine; no law-firm precision** (2026-10-29); the core event is
-  real. And **never baity: the opening must never sound like a commercial.** A sales question to
+  real. **Comments are a massive plus:** a line people will argue with, or correct, in the comments counts FOR a
+  script, so G1 writes one or two on purpose (2026-10-29: "And people commenting is actually great so if comments are increasing the engagement that's a massive plus to the script"). And **never baity: the opening must never
+  sound like a commercial.** A sales question to
   the viewer ("Buying a laptop soon?"), a pitch-like claim about their purchase, a shopping screen with a price and "Add
   to cart" as the first image: together they read as an ad, and people skip ads (v3: 60 % gone by ~2 s, skip rate
   64.5 % against v1's 32 %, no shares or saves). Open like a person telling surprising news they just found out (what
