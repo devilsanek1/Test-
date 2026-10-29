@@ -6,6 +6,15 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-29 ~19:45 UTC: still_v2 rejected ("too cheap looking", "going away in style"); still_v3 in our engine
+- The owner, with three new references (`video/docs/look/refs_human_scale/`): back to v2's own angle and view, the
+  person near the camera at a real size. Captured: playbook "DEPTH AND SCALE FROM A HUMAN VIEWPOINT" (replaces DEPTH IS
+  AIR), the people and forest bullets, DIRECTION rule 7, the designed view ON HOLD (playbook, DIRECTION, CRAFT §f.5,
+  LAYOUT), `scene_rethink/NOTES.md`.
+- RUNNING: one max-effort agent builds still_v3 in Remotion (`src/look/scene1_v3/`, entry
+  `src/entry-look-scene1v3.tsx`) -> `scene_rethink/still_v3.png`, `compare_v3.jpg`,
+  `video/deliverables/tests/poster_scene1_still_v3.png`. NEXT: send it, capture the verdict. The logo thread runs too.
+
 ## Status 2026-10-29 ~19:10 UTC: still_v1 judged ("suffocating"); still_v2 runs as an iteration
 - still_v1 sent; the owner: no depth or scale (the building "right here"), the quay empty, the sky one colour, the near
   leaves too big; the near/far separation good; landmarks and camera angles not important. Captured: playbook "DEPTH IS

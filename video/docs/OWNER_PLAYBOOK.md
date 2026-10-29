@@ -119,7 +119,9 @@ Maintenance at the end).
   your suggestions", so these are decided, first judged in the 7 s look test of v2's canal opening: no outlines (edges
   from light and shade, the subject's shade face -20 to -25 L*); real darks 6-10 % of the frame in many small pieces;
   the "low poly" patchwork world for the ground and the far city (never on the subject, never in the sky); the designed
-  view (a second horizon for the far city) for the establishing view and the scale landing only; a quiet "find Pip" in
+  view (a second horizon for the far city) for the establishing view and the scale landing only (ON HOLD since
+  2026-10-29: two stills built on it failed, and the owner prefers v2's own eye-level view: DEPTH AND SCALE FROM A
+  HUMAN VIEWPOINT); a quiet "find Pip" in
   most exterior shots, none in closes and charts, hidden on the cover too; the sun toned one step off its sky or
   behind a ridge unless it is the shot's "look here"; thin lines 2 px on the layers that float. — ("i really like the style
   and i want us to experiment more with the style and the focus on our videos"; "i want to see how we can learn from

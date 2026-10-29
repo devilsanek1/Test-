@@ -184,3 +184,15 @@ in front of a darker near frame, the separation the owner liked.
   stronger lobby glow would carry her.
 - The darks fell to 7 % (posters 9-25 %): the airier world traded some punch. The darks now live in the hero's glass,
   the shed, the boats and the people.
+
+## The owner's verdict on still_v2 (2026-10-29)
+"I don’t like this we are going away in style i think it’s too cheap looking / And I’m not sure you can do much about
+it in terms of actual video / I think our references point should be closer to the original like where a person would
+be about this size / So I think our initial angle snd the view frankly wasn’t bad" (sent with three references, now
+`video/docs/look/refs_human_scale/`, and the Cape Town poster).
+
+-> still_v3 goes back to v2's own eye-level angle and view and our own v2 look, built in our Remotion engine (so it
+can move), with her near the camera at the references' size (~15-30 % of the height), the vast evening world beyond.
+Kept from v1-v2: the near/far separation, a full street across the water, a sky with things in it, subtle near
+nature. The designed view is on hold. The general rule: playbook "DEPTH AND SCALE FROM A HUMAN VIEWPOINT" (it replaces
+"DEPTH IS AIR AND DISTANCE").
