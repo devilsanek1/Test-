@@ -108,11 +108,15 @@ export const TextureSlot: React.FC<{sw: PosterSwitches; t: number; plane: number
   if (!textureAt(sw, t)) return <>{children}</>;
   const isSky = sky ?? !Number.isFinite(plane);
   return (
-    <Mottle k={(k ?? mottleK({plane, sky: isSky})) * (sw.textureK ?? 1)} seed={mottleSeed(plane)} offset={offset} region={region}>
+    <Mottle k={(k ?? mottleK({plane, sky: isSky})) * (sw.textureK ?? 1)} seed={mottleSeed(plane)} scale={isSky ? SKY_MOTTLE_SCALE : 1} offset={offset} region={region}>
       {children}
     </Mottle>
   );
 };
+/** The sky plane's blotch scale: at lib/texture's 1.0 S1's open sky measured a 1/e radius of 36-37 px (check_banding
+ *  --texture, 2026-10-29; the spec 15-35, the posters 20-36, median 30, PT's demo sky 33); 0.9 brings it into the spec
+ *  (every group of the sky plane the same, so they stay one surface). */
+export const SKY_MOTTLE_SCALE = 0.9;
 /** Is the texture on at t (the switch's number = on from that second: STUDY §10 pass 1's 3.5 s). */
 export const textureAt = (sw: PosterSwitches, t: number) => textureOn(sw, t);
 
