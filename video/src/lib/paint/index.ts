@@ -3,3 +3,5 @@
 export {PaintProvider, PaintedLayer, PaintedGroup, paintSet, usePaintOn, usePainted, usePiece} from './PaintedLayer';
 export type {PaintBox, PaintPiece, PaintStyle, PaintedLayerProps} from './PaintedLayer';
 export {PaintBakeFrame} from './bake';
+export {RevealMask, revealKind, revealProgress, revealStrokes} from './reveal';
+export type {PaintReveal, RevealKind, RevealStroke} from './reveal';

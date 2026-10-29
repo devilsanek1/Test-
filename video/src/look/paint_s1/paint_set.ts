@@ -14,7 +14,9 @@ import m4d from '../../../public/paint/v2s1_v4design/manifest.json';
 import m4 from '../../../public/paint/v2s1_v4/manifest.json';
 import m5d from '../../../public/paint/v2s1_v5design/manifest.json';
 import m5 from '../../../public/paint/v2s1_v5/manifest.json';
+//   ai1  v4design painted by an open model (SDXL base 1.0 img2img, local CPU): scripts/look/aipaint, ai_paint/NOTES.md
+import mai1 from '../../../public/paint/v2s1_ai1/manifest.json';
 
 type Manifest = Parameters<typeof paintSet>[0];
-export const PAINT_SETS = {v1: paintSet(m1 as unknown as Manifest), v2: paintSet(m2 as unknown as Manifest), v3: paintSet(m3 as unknown as Manifest), v4design: paintSet(m4d as unknown as Manifest), v4: paintSet(m4 as unknown as Manifest), v5design: paintSet(m5d as unknown as Manifest), v5: paintSet(m5 as unknown as Manifest)} as const;
+export const PAINT_SETS = {v1: paintSet(m1 as unknown as Manifest), v2: paintSet(m2 as unknown as Manifest), v3: paintSet(m3 as unknown as Manifest), v4design: paintSet(m4d as unknown as Manifest), v4: paintSet(m4 as unknown as Manifest), v5design: paintSet(m5d as unknown as Manifest), v5: paintSet(m5 as unknown as Manifest), ai1: paintSet(mai1 as unknown as Manifest)} as const;
 export type PaintSetName = keyof typeof PAINT_SETS;
