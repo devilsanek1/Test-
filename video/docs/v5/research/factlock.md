@@ -150,7 +150,10 @@ Pick: **7.1** (the payoff, a city company's boss) and **7.6** (the hinge, said b
 
 ## What the script may say
 
-The safest lines, in story order (sources in brackets). Words in the picture stay fewer than these.
+The safest lines, in story order (sources in brackets). Words in the picture stay fewer than these. The owner (2026-10-29):
+"it's okay to exhagerste a bit ... Exaggerating and generalizing and making it bigger is fine" (playbook: "true enough, the
+core event real"). So these lines are the floor, not a cage: the writer may round up and go bigger, as far as the next
+section allows.
 
 1. "One cabinet of AI chips gives off as much heat as about 40 kettles, boiling non-stop." (2.2; a 3 kW kettle) / "Almost every watt a data centre uses turns into heat." (2.1)
 2. "In an average data centre, about a third of the power never reaches the computers. Much of it goes on cooling." (2.4, 2.5)
@@ -167,19 +170,42 @@ The safest lines, in story order (sources in brackets). Words in the picture sta
 
 ## What it must never say
 
-- "Helsinki heats 70,000 homes with AI." It is a plan for 2027, not built, with no tenant signed (6.7). Always "is meant to".
-- "70,000 houses." They are flats (6.5). And not "70,000 homes signed up": it is a conversion.
-- "Helsinki is the first" or "the biggest". Stockholm (2014), Odense (2019-2020) and Helsinki itself (2010) came first; Microsoft and Fortum next door plan more (6.11, 8.12).
-- "Everyone else throws the heat away" or "Stockholm hides its heat". Pionen has sent heat to Stockholm's pipes since 2014 (1.7).
-- "They hid it in the rock to keep it cool." Pionen is in a shelter for safety; machines cool it (1.7, 1.9).
-- "It can survive a nuclear bomb" as our claim; "a nuclear bunker built in 1943"; "engines pulled from submarines" (1.2, 1.4, 1.5).
-- "The first data centre in a working mine" as fact: the operator's claim (3.6).
-- "A 24-megawatt data centre under the sea" or "deep under the sea": 2.3 MW runs today, about 10 m down (4.2, 4.5).
-- "The sea cools it for free, with no downside" (4.3, 4.9). "Microsoft's undersea data centre failed": it worked, then Microsoft stopped (4.8).
-- "Space will cool it" or "it's cold up there, so it's easy" (8.4). "It runs on sunshine all day": this test uses batteries (5.5).
-- "Google launched a data centre into space": it is a four-chip test (5.3, 8.3). "The first AI chip in space": Starcloud flew one in Nov 2025 (5.11).
-- "The 15-minute limit was measured in orbit": it is the planned limit; no results are out (5.4, 5.10).
-- "Cooling eats a third of every data centre's power": that is an average or older site; the most efficient spend about 7-8% (2.4, 2.5).
-- "An AI rack is 14 times hotter": it makes more heat, not a higher temperature (2.2, 2.3).
-- "Reusing heat solves AI's energy problem": it uses the waste, not less power (8.11).
-- "The cathedral bunker still heats Helsinki": unknown since about 2014 (6.10). Drawing trap: Uspenski Cathedral is the red-brick one with gold domes, not the white Helsinki Cathedral.
+The owner's rule (2026-10-29, playbook): exaggeration is fine; only a made-up core event is out. So three lists: the floor,
+the round-ups that are fine, and a few lines built to draw comments.
+
+**The floor (never, even rounded up): these invent an event, flip the physics, or put words in a real person's mouth.**
+- "Helsinki already heats 70,000 homes with AI" (as done). The plant isn't built and has no tenant: "is set to", "from
+  next year", "is meant to" (6.7).
+- "Space keeps the chips cool" / "it's cold up there, so it's easy". That flips the film's own point (5.6, 8.4).
+- "Microsoft's undersea data centre failed." It worked; Microsoft stopped (4.7, 4.8).
+- "Stockholm wastes its bunker's heat." Pionen has fed Stockholm's pipes since 2014 (1.7). (Sirkka's "almost all other
+  countries ... completely wasted" is fine as his quote, 7.1.)
+- A changed or invented quote. Use the 7.x words exactly, trimmed only at the ends; call 7.6 a translation.
+- "The cathedral bunker still heats Helsinki": unknown since about 2014 (6.10). Say "in 2010".
+- Drawing trap: Uspenski Cathedral is the red-brick one with gold domes, not the white Helsinki Cathedral (6.10).
+
+**Fine to round up or go bigger (true enough); the exact version in brackets:**
+- "70,000 homes" (flats; at full size; the start is 2027) (6.5, 6.7).
+- "40 kettles" or "a furnace in a cabinet" (120 kW) (2.2); "AI chips make ten times the heat" (more heat, not a higher
+  temperature) (2.3).
+- "A third of a data centre's power goes on cooling" (an average or older site; the range is 7% to over 30%) (2.4, 2.5).
+- "Data centres end up in the strangest, coldest places" (only the mine and the sea are there for the cold; the bunker is
+  about safety, orbit about sunlight) (1.9, 3.4, 4.3, 5.7).
+- "A nuclear bunker under a park, built to survive a nuclear war" (a Cold War civil-defence shelter; "nuclear-proof" is
+  its owner's word) (1.2, 1.4). Leave out "engines from submarines" unless hedged: it is lore (1.5).
+- "The first data centre inside a working mine" (the operator's claim) (3.6).
+- "A data centre under the sea, wired to a wind farm" (a 2.3 MW pilot runs; 24 MW is planned; about 10 m down, so don't
+  draw it deep) (4.2, 4.5).
+- "A tiny data centre in orbit" / "Google put AI chips in space" (a four-chip test satellite) (5.3).
+- "It can only think for 15 minutes before it overheats" (the planned limit, reported by NPR and TechRadar) (5.4).
+- "Nearly a tenth of Helsinki's heat" (8.8% of Helen's 2024 sales, at full size) (6.6).
+- "Helsinki is swapping coal for AI heat" (one of several sources replacing coal) (6.8).
+- Still weak, because one reply knocks them down: "Helsinki is the first / the biggest" (6.11, 8.12) and "the first AI
+  chip in space" (Starcloud, 5.11). If size is needed: "one of the biggest plans yet".
+
+**Comment-drawing lines (arguable but defensible; the owner wants one or two):**
+- A ranking: "the four weirdest places we've hidden the internet" (people argue the order and add their own).
+- "Space is the worst place to cool a computer." (No air, no water; a physicist may reply that the cold sky is what makes
+  radiators work: good comments.)
+- "Your chatbot could heat a flat in Helsinki." (The scout's line; true enough at full size.)
+- "The coolest data centre on Earth is under a park in Stockholm." (A pun, and a claim people will dispute.)

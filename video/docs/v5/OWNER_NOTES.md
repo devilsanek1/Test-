@@ -25,3 +25,5 @@ Format: the owner's words in quotes, with the time (UTC); after "->" what we did
 - 2026-10-29 ~09:00 UTC: "Research more of the similar openings in the reels TikTok and score and pick the absolute best
   options" -> one research agent (max effort): opener patterns with evidence, scored on our rules, and 10-15 v5 openers
   with a top 3 -> `video/docs/studies/2026-10-28_city_posters/openers/OPENERS.md`.
+- 2026-10-29 ~09:05 UTC: "Even with did you know the core line is instantly more interesting" -> playbook (the core line may open as "Did you know that ..."); the opener agent scores
+  each v5 core line in that form.

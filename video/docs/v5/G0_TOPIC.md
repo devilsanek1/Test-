@@ -38,3 +38,14 @@ Each is checked against the fact lock before G1 (`research/factlock.md`).
 ## Before G2
 The voice key is not in this container (`ELEVENLABS_API_KEY` missing, checked 2026-10-29): the owner adds the secret
 to the environment, or makes the take in ElevenLabs from our full paste text (`docs/voice/API_QUICKSTART.md`).
+
+## The spine after the fact lock (2026-10-29 ~09:15 UTC; a proposal for G1)
+The fact lock found that the Stockholm bunker isn't underground for the cold (it's a Cold War shelter, cooled by heat
+pumps) and has sent its heat into Stockholm's pipes since 2014. So the film loops: (1) "Did you know ..." a data centre
+in a nuclear bunker under a Stockholm park; (2) AI chips make crazy heat (one cabinet, about 40 kettles boiling
+non-stop); (3) so data centres end up in the weirdest places: inside a mountain where the rock stays at 12 degrees, under
+the sea wired to a wind farm; (4) the twist: one went to space on 1 Oct, and it overheats (no air to carry the heat
+away: 15 minutes, then it stops to cool); (5) the turn: the smart move isn't hiding the heat, it's using it: that bunker
+under the park has been heating the city above it since 2014; (6) the payoff: Helsinki wants to do it about 100 times
+bigger: from 2027 a new AI data centre is meant to heat about 70,000 flats ("Your chatbot could heat a flat in
+Helsinki"). The G1 writer drafts two spines and picks one.

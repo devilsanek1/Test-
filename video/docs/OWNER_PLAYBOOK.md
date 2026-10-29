@@ -47,9 +47,10 @@ Maintenance at the end).
   ..." is the owner's model opener.** The Big Bend reel: "Did you know that New York once got a proposal to build this
   giant 2,000-foot tall bending skyscraper? It's called the Big Bend." A friend's question with a surprising fact in it
   (a place, a thing, a number), no sell (unlike v3's "Buying a laptop soon?"); the curiosity comes from the picture and
-  the one odd detail. — ("BTW I really like the script too in the video / See how it's using natural language it's
+  the one odd detail. The core line itself can open as "Did you know that ..." ("instantly more interesting").
+  — ("BTW I really like the script too in the video / See how it's using natural language it's
   first hook sentence is extremely natural like a conversation yet captures the attention and curiosity without being
-  too pushy and the script has a rhythm we discussed before"; then "Oh I also meant that a video has an opening as "did you know that .." like that what I meant by great opening", 2026-10-29; saved: the study's
+  too pushy and the script has a rhythm we discussed before"; then "Oh I also meant that a video has an opening as "did you know that .." like that what I meant by great opening"; "Even with did you know the core line is instantly more interesting", 2026-10-29; saved: the study's
   `refs/bigbend_reel/`).
 - **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24). **Rhythm: never a run of
   long sentences; put a short one (5 words or fewer, e.g. "Let's find out." "But there was a problem.") after every 1-2

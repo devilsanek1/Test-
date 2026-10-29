@@ -7,7 +7,7 @@ into `video-production`: the owner decides). Video 4 stays with its own session 
 | Gate | Status | File |
 |---|---|---|
 | G0 topic + core line | topic LOCKED (the heat story); core line: 3 options sent, waiting on the owner | `G0_TOPIC.md` |
-| Fact lock | running (one agent, max effort; the only web check) | `research/factlock.md` |
+| Fact lock | DONE 2026-10-29 ~09:15 UTC: 45 of 56 facts VERIFIED; the story-changing find: the Stockholm bunker is there for safety (cooled by heat pumps) and has fed Stockholm's heating pipes since 2014, so Helsinki is the same idea about 100 times bigger, not "the opposite"; only the mine and the sea are there for the cold (orbit is for sunlight); Helsinki's plant isn't built and has no tenant yet ("is meant to") | `research/factlock.md` |
 | Openers | running: one research agent, opener patterns scored, a top 3 for v5 | `../studies/2026-10-28_city_posters/openers/OPENERS.md` |
 | G1 script | next: one writer + one critic + one fix pass, from the fact lock, the picked line and the best openers | |
 | G2 voice | after the owner approves the script; the API key is missing here (see `G0_TOPIC.md`) | `public/v5/` |
