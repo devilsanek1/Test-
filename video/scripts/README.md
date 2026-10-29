@@ -7,14 +7,14 @@ re-run it after adding, moving or re-describing a tool (`--check` exits 1 when t
 toolkit"), `docs/G5_BLOCKING.md` §4 (previews) and §7 (the gate check). v1-only tools are archived in
 `archive/v1/scripts/` (the `v1-final` tag has them in place).
 
-103 tools in 18 folders; 9 without a header (add a docstring or a first comment line).
+105 tools in 18 folders; 9 without a header (add a docstring or a first comment line).
 
 ## `scripts/`
 
 | tool | what it does |
 |---|---|
 | `scripts/autocheckpoint.sh` | Periodic checkpoint (owner, 2026-10-27: "make sure to commit the progress periodically if we get stopped on the usage limits"): commits and pushes ONLY the given paths every CHECKPOINT_INTERVAL seconds (default 600) whenever they changed, so an agent stopped … |
-| `scripts/camspeed.py` | On-screen SPEED and VELOCITY-CONTINUITY check of a real render (any composition: Main, S01..S13, dev). |
+| `scripts/camspeed.py` | on-screen SPEED and VELOCITY-CONTINUITY check of a real render (any composition: Main, S01..S13, dev). |
 | `scripts/capcheck.mjs` | Caption legibility check: renders frames twice (normal + caption mask) and measures, in the caption band, how much of the background behind the text is below 3:1 contrast against the ACTIVE tone (scripts/capcheck.py). |
 | `scripts/capcheck.py` | Caption legibility check (used by scripts/capcheck.mjs and scripts/sheet.sh). |
 | `scripts/coreline.py` | G0.5 core line bookkeeping when the stages run as separate agents (no Workflow tool): the same maths as the G0.5 workflow templates (`context/workflows/v4-g05-facts-and-core-line-*.js`), kept in files so a usage-limit stop loses nothing. |
@@ -23,7 +23,7 @@ toolkit"), `docs/G5_BLOCKING.md` §4 (previews) and §7 (the gate check). v1-onl
 | `scripts/g5_scaffold.py` | Start a video's G5 film from its locked G3 board (docs/G5_BLOCKING.md). |
 | `scripts/index.py` | Write scripts/README.md, the index of every tool in video/scripts, from each tool's own header. |
 | `scripts/render-frames.mjs` | Render arbitrary frames of a composition in ONE bundle + ONE browser session. |
-| `scripts/render-media.mjs` | Render a composition (or a frame range of it) to a video / audio file in ONE bundle with @remotion/renderer's renderMedia and the browser render-frames.mjs uses. |
+| `scripts/render-media.mjs` | Render a composition (or a frame range of it) to a video / audio file with @remotion/renderer's renderMedia, in ONE bundle (cached while src/ and public/ are unchanged) and ONE browser (scripts/render/lib.mjs). |
 | `scripts/sheet.sh` | Renders <count> frames evenly spaced over [t0, t1] seconds (one bundle, one browser) and tiles them into a labeled contact sheet (label = seconds). |
 | `scripts/still.sh` | Renders one frame at <seconds> (composition time) to <out.png>; other flags go to render-frames.mjs (its cached bundle and one browser make a repeated still ~1 s). |
 | `scripts/strip.sh` | Renders EVERY frame (or every Nth with --step) between t0 and t1 seconds at the composition's own fps (60 for the films; it sampled 30 fps until 2026-10-29, every 2nd frame of a 60 fps film) and tiles them with frame numbers: the tool for checking motion … |
@@ -167,7 +167,9 @@ Folder notes: [`qa/retro_tools/README.md`](qa/retro_tools/README.md).
 
 | tool | what it does |
 |---|---|
+| `scripts/render/audio.mjs` | The audio of a chunked render (render-media.mjs --parallel), made ONCE for the whole range and encoded exactly as renderMedia() encodes a one-step render's audio (Remotion 4.0.538: create-audio.js, preprocess-audio-track.js, stringify-ffmpeg-filter.js … |
 | `scripts/render/lib.mjs` | The plumbing render-frames.mjs and render-media.mjs share (streamlining Phase 1, 2026-10-29; docs/retro/2026-10-28_streamline/phase1_render.md). |
+| `scripts/render/parallel.mjs` | render-media.mjs --parallel=K, the review-cut and lane-clip path (see render-media.mjs's header). |
 
 ## `scripts/v2/`
 
@@ -175,7 +177,7 @@ Folder notes: [`qa/retro_tools/README.md`](qa/retro_tools/README.md).
 |---|---|
 | `scripts/v2/build_board.py` | Build video 2's G3 board animatic (SketchReel board mode) -> public/v2/animatic.json. |
 | `scripts/v2/coldread_sheet.py` | Sound-off cold-read sheet for a board animatic: one frame per panel at its middle, plus the opening at fixed times, each labelled only with a number (the notes strip is cropped off so the director's notes don't give the answer). |
-| `scripts/v2/make_sfx.py` | V2 sound cues for the G3 board (and later gates) -> public/v2/v2_<name>.wav, all synthesised here with the shared sfx kit (audio/tools/make_sfx.py: filtered noise, modal resonators, chirps), so every sound is our own: no platform or system sound is copied. 48 … |
+| `scripts/v2/make_sfx.py` | v2 sound cues for the G3 board (and later gates) -> public/v2/v2_<name>.wav, all synthesised here with the shared sfx kit (audio/tools/make_sfx.py: filtered noise, modal resonators, chirps), so every sound is our own: no platform or system sound is copied. 48 … |
 
 ## `scripts/v3/`
 

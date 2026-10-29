@@ -11,6 +11,9 @@ chunks did: a fix to one scene then had to re-render the next chunk too). The la
 the film's last frame. --max N splits a scene longer than N frames into near-equal parts named <id>.1, <id>.2, ...
 (e.g. SQE's 821 frames), so a fix re-renders less and long chunks can run side by side. Chunk borders are invisible
 after a stream-copy join (one composition, one encode per frame); the audio comes from one direct render.
+`scripts/render-media.mjs --parallel=K` (review cuts, lane clips) cuts its K chunks on these boundaries (with --max 360)
+and does the join and the audio itself: the premixed file when the film's cues are one premixed "audio", else one
+audio-only pass.
 """
 from __future__ import annotations
 

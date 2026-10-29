@@ -108,7 +108,8 @@ def first_sentence(name: str, text: str) -> str:
     s = re.sub(r'\s*:$', '.', s)
     if len(s) > MAX:
         s = s[:MAX].rsplit(' ', 1)[0].rstrip(',;:') + ' …'
-    if s and s[0].islower():
+    first = s.split(' ', 1)[0].rstrip(':,;.') if s else ''
+    if s and s[0].islower() and first.isalpha():  # a plain word, never a file name or an identifier
         s = s[0].upper() + s[1:]
     return s
 
