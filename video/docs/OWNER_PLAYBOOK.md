@@ -375,6 +375,11 @@ Maintenance at the end).
   direction is lets say generalizing it to tech in the cities. like some interesting, weird, wow like cases where
   cities come up with the new solutions to problems, deploy some wow tech / ai / etc"; and on the weird-place data
   centres: "those are interesting ones", 2026-10-28).
+- **A reference the owner rates "really good on both" story and script: one impossible object in frame 0, with a "why"
+  question as its title** (@civilext's "Why This Skyscraper Curves Back Down??", the Big Bend, a 2017 concept: a place,
+  a number and a name within 6 s; the twist past the title, "the strange part isn't how high"; a scale lineup; 11K
+  likes, 1,378 shares with no freshness at all). Our evaluation and its lessons: the study's `content_discussion.md`,
+  exchange 10. — ("I'm thinking it's actually really good on both", 2026-10-29).
 - **Every shortlist story shows what keeps people watching past its title:** its turn and its "oh" in a line or
   two (the beats after the headline), never the headline alone; a story that is one beat gets said to be one beat. A
   "top 3" or "weirdest places" idea is welcome, carried on one thread so it stays a story, not a list. — (on London's
