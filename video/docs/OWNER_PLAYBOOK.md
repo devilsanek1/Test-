@@ -93,7 +93,13 @@ Maintenance at the end).
   our earlier layout rules with the posters' findings into one guide; the posters' "unique camera angle and composition
   of objects is fascinating" (a designed view of the place that no camera could take); the specific local objects
   (a protea, a cyclo) belong to the content, not the style ("hard to imagine if its going to trasnalte and generalize
-  well"); one look, one brand (its own bullet). — ("i really like the style
+  well"); one look, one brand (its own bullet). The owner's answer to the study's open calls (2026-10-29): "Go with
+  your suggestions", so these are decided, first judged in the 7 s look test of v2's canal opening: no outlines (edges
+  from light and shade, the subject's shade face -20 to -25 L*); real darks 6-10 % of the frame in many small pieces;
+  the "low poly" patchwork world for the ground and the far city (never on the subject, never in the sky); the designed
+  view (a second horizon for the far city) for the establishing view and the scale landing only; a quiet "find Pip" in
+  most exterior shots, none in closes and charts, hidden on the cover too; the sun toned one step off its sky or
+  behind a ridge unless it is the shot's "look here"; thin lines 2 px on the layers that float. — ("i really like the style
   and i want us to experiment more with the style and the focus on our videos"; "i want to see how we can learn from
   these pictures in terms of perspective, visual style, details and composition"; "i think visually in the video about
   Google we have made good improvemnets in terms of overall style"; "research each further how professional studios
