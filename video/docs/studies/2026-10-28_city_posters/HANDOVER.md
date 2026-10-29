@@ -9,11 +9,13 @@ points and conclusions into the main repo"). The brief is `README.md` here; the 
 ## Status 2026-10-29 ~18:30 UTC: the owner on the look test: "missed the forest for the trees"; scene 1 rebuilt as a still
 - The owner: the test is "good, but ... barely noticeable"; rethink the first scene "from ground up" as ONE still in
   the posters' construction (playbook: "The forest before the trees"). Brief: `scene_rethink/README.md`.
-- RUNNING: workflow `scene1-rethink` (run `wf_a122a3ef-9c5`): three concepts (A raised designed view, B waterside
-  frontal hero, C King's Cross capriccio) as value thumbnails -> a judge (`PICK.md`) -> the build in stages
-  (`build_stage_1..3`, `still_v1.png`) -> a critic (`CRITIC.md`) -> one fix pass (`still_v2.png`, also
-  `video/deliverables/tests/poster_scene1_still_v2.png`). Resume: `Workflow({scriptPath, resumeFromRunId})`.
-- NEXT: send still_v2 (with the build stages and the side-by-side) to the owner; capture the verdict.
+- The owner then: "we have the 'production' process and we have 'iteration' process that needs to be more
+  lightweight" (now a playbook rule). So the heavy workflow was STOPPED (nothing had completed) and ONE max-effort
+  agent runs the rethink as an iteration: 2-3 value thumbnails -> its own pick (`NOTES.md`) -> the build in stages
+  (`stage_1_values`, `stage_2_colour`, `stage_3_detail`, `still_v1.png`, also
+  `video/deliverables/tests/poster_scene1_still_v1.png`), `compare.jpg`; source in `video/scripts/look/scene1/`. No
+  critic, no fix pass. If it stops: resume the agent, or restart the same brief from its partial files.
+- NEXT: send still_v1 (with the build stages and the side-by-side) to the owner; capture the verdict.
 
 ## Status 2026-10-29 ~15:30 UTC: review FIX_FIRST; lane S runs fix pass 1
 - `test/REVIEW.md`: 6 must-fixes (her and the copies' drawing as value shapes; the paving off milk-tea; the dark
