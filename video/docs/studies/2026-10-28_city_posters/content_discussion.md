@@ -314,7 +314,11 @@ call). For video 5: open on its one impossible picture with a "why" question (co
 does this computer overheat?", works like this reel's title), and land core line 1 at the payoff. Not judged: the rest
 of the script (the recording stops at 11 s).
 
-**The owner's reaction:** (waiting)
+**The owner's reaction:** ~08:35 UTC: "Actually let's move truth down the list it's okay to exhagerste a bit like in
+this case so we don't have to be exactly precise like a law firm / Exaggerating and generalizing and making it bigger
+is fine" -> TOPIC_CRITERIA re-ordered (relevant 6, visual 5, mood 4, true enough 3, fresh 2, shareable 1; only a made-up
+core event is out); playbook, brief banner, v5 notes. Re-scored: the heat story still leads (8.4); the Big Bend 7.2.
+Still open: the core-line plan for v5 and whether WOW gets scored.
 
 ## Picks (leanings, not locks)
 - 2026-10-29 ~07:55 UTC: **PICKED: the heat story** -> video 5, produced by this session (`video/docs/v5/`).

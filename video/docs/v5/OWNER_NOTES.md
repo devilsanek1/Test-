@@ -13,3 +13,6 @@ Format: the owner's words in quotes, with the time (UTC); after "->" what we did
 - 2026-10-29 ~07:55 UTC: "Okay let's try heat story let's generate the script" -> topic locked as video 5 (video 4
   stays with its own session, paused at its pick); this session produces it; the fact lock started; three core lines
   sent for the pick (`G0_TOPIC.md`).
+- 2026-10-29 ~08:35 UTC (after the Big Bend reel's evaluation): "Actually let's move truth down the list it's okay to exhagerste a bit like in this case so we don't have to be exactly precise like a law firm / Exaggerating and generalizing and making it bigger is fine" -> rule: playbook,
+  TOPIC_CRITERIA (truth 4th, "true enough"); for this film the G1 writer may round up and go bigger; the fact lock
+  stays the floor (the core events are real).
