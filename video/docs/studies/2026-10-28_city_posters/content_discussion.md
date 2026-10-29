@@ -1,8 +1,10 @@
 # Content discussion: which stories fit the city-poster style
 
-**State (2026-10-29 ~08:25 UTC): PICKED; a reference evaluated.** The heat story is video 5 (`video/docs/v5/`; fact
-lock running; core line waiting on the owner). Exchange 10: the owner's reference reel (the Big Bend) evaluated; a
-proposal to score WOW on the topic screen waits on the owner.
+**State (2026-10-29 ~09:45 UTC): CLOSED, handed over.** Two films came out of it: **video 4, Helsinki heats its homes
+with AI chips** (`video/docs/v4/`) and **video 5, the nuclear bunker under a Stockholm park** (`video/docs/v5/`). The owner
+continues in another session ("Can you commit these topic as 4 and 5 and I will continue in another session"); each
+video's README has the exact next step (G1 from `script/WRITER_BRIEF.md`). Rules made here: the playbook's "Places on
+screen", WOW, "past its title", the "Did you know" opener, ONE SUBJECT GONE DEEP, truth moved down, comments a plus.
 
 Notes: `content_market.md` and `content_fit.md` (the orchestrator's content track, scoped to tech and AI) are folded in
 below; their final versions (pulled ~22:20 UTC) changed nothing here. `content_fit.md`'s best kinds already include two

@@ -12,11 +12,14 @@ The earlier v4 session (https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt)
 |---|---|---|
 | G0 topic + core line | topic LOCKED: Helsinki (one city); core line proposed by the writer (default: "Your chatbot could heat a flat in Helsinki.") | `G0_TOPIC.md` |
 | Fact lock | shared with video 5 (one fact file): `video/docs/v5/research/factlock.md` sections 2, 6, 7.1-7.4, 8 | |
-| G1 script | writer running (2026-10-29 ~09:35 UTC); then one critic and one fix pass | `script/script_g1.md`, `script/script_elevenlabs.md`, `THROUGHLINE.md` |
+| G1 script | NEXT: one writer from `script/WRITER_BRIEF.md`, then one critic and one fix pass | `script/script_g1.md`, `script/script_elevenlabs.md`, `THROUGHLINE.md` |
 | G2 voice | after the owner approves the script; the API key is missing in this container | `public/v4/` |
 
-**Next step:** when the writer lands, send the owner the script with its 3 hook options and core lines; then a critic and
-a fix pass. A self check-in at 12:45 UTC resumes it if the 5-hour limit (reset 12:40 UTC) stops it.
+**Next step:** G1 from `script/WRITER_BRIEF.md`.
+**HANDED OVER 2026-10-29 ~09:45 UTC** (owner: "Can you commit these topic as 4 and 5 and I will continue in another
+session"). Both writers were stopped before writing; the next session starts G1 from `script/WRITER_BRIEF.md` (one writer,
+then a critic, then a fix pass), on branch `claude/compassionate-hopper-5iqguj` (not merged into `video-production`).
+No check-in is scheduled.
 
 ---
 

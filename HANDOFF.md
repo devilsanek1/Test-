@@ -194,6 +194,10 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **2026-10-29 ~09:30 UTC, owner: "Helsinki is actually pretty good too / Let's do both as story 4 and 5".** Video 4 is now Helsinki's AI-heated homes and video 5 the nuclear bunker
   under a Stockholm park; both produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt (live state: `video/docs/v4/README.md`, `video/docs/v5/README.md`).
   The earlier v4 session's G0 rounds stay in `video/docs/v4/` as history.
+- **2026-10-29 ~09:45 UTC: handed over to a new session** (owner: "Can you commit these topic as 4 and 5 and I will continue
+  in another session"). Both films are at G1, nothing written yet: start from `video/docs/v4/script/WRITER_BRIEF.md` and
+  `video/docs/v5/script/WRITER_BRIEF.md` (one writer each, then a critic and a fix pass). All of it is on branch
+  `claude/compassionate-hopper-5iqguj`, not yet merged into `video-production`.
 
 ### Earlier: video 5 as the heat story
 - **Video 5 is produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt since 2026-10-29 ~07:55 UTC**
