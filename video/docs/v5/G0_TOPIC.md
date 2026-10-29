@@ -49,3 +49,18 @@ away: 15 minutes, then it stops to cool); (5) the turn: the smart move isn't hid
 under the park has been heating the city above it since 2014; (6) the payoff: Helsinki wants to do it about 100 times
 bigger: from 2027 a new AI data centre is meant to heat about 70,000 flats ("Your chatbot could heat a flat in
 Helsinki"). The G1 writer drafts two spines and picks one.
+
+## Re-scope to ONE subject (2026-10-29 ~10:20 UTC, after the owner rejected draft 1 as too wide)
+New rule (playbook): one thing in one place, gone deep; other places only as one comparison shot. Options:
+- **A. Helsinki's AI-heated homes** (recommended; the owner's first like): one city. Deeper and deeper: AI chips run as hot
+  as kettles; most data centres dump that heat into the sea or the air (Helen's boss: "completely wasted"); Helsinki
+  will catch it: the chips' warm water, heat pumps, the city's pipes under the snow; about 70,000 flats, nearly a tenth
+  of the city's heat, where coal used to be; the weird twist: in 2010 a data centre in a bomb shelter under Uspenski
+  Cathedral already did it. One comparison shot: the bunker under a Stockholm park doing the same since 2014. Core line
+  last: "Your chatbot could heat a flat in Helsinki." Opener: "Did you know Helsinki wants to heat seventy thousand homes
+  with AI?"
+- **B. The computer in space that overheats**: one object. Why put it there (sunlight round the clock, no neighbours), why
+  it overheats (no air, only radiators), fifteen minutes then a rest, the makers' own caveat, what it says about AI
+  running out of room on Earth. The strongest opener (8.7). Mood: wonder, less "so what".
+- **C. The bunker under the park**: one place. A Cold War nuclear shelter 30 m in granite, servers instead of beds,
+  WikiLeaks once, and since 2014 its heat warms the neighbours. Weird and visual; the weakest news peg.

@@ -13,6 +13,10 @@ news?". A line that sounds like a commercial (a sales question, a testimonial, a
 picture) is reworded as news (what happened, then why it matters) or the story is out. A company's launch or a gadget
 story starts with ad risk (v3 opened like an ad: 64.5 % skipped).
 
+**One subject** (playbook, Script and voice: the Big Bend rule): a topic is ONE thing in ONE place with enough depth for
+30-45 s; a tour of several examples (v5's first draft: orbit, a mountain, the sea, Stockholm, Helsinki) is out, or it
+is cut down to its one best subject before G1. Every shortlist story names its one thing in 3 words.
+
 1. **Relevant, with buzz and surprise (weight 6):** a big question millions care about, with a concrete "so what" for
    an ordinary person; people are already talking about it (the "fuss"); a "wait, seriously?" fact or a twist. Tech,
    AI or AI-adjacent (science, health tech, space, robots, computers, energy); not a past video's topic; Anthropic not

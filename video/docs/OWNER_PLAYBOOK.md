@@ -43,6 +43,15 @@ Maintenance at the end).
   - Spine first, then lines. A list of facts to prove is input, never the structure.
   - Test: someone who hears it once can retell it as a story.
   — ("just a collection of sentences", v3 G1, 2026-10-26).
+- **ONE SUBJECT, GONE DEEP (the Big Bend rule).** One thing in one place carries the whole film, and every line digs
+  deeper into that same thing (what it is, how it works, why, the twist, what it means for you). Other places or
+  examples appear only as ONE comparison or scale shot that serves the subject, never as stops on a tour. The Big Bend
+  reel: one tower, one city, one question (why does it curve back down?); every line deepens it (its height, its name,
+  its year, the twist that it is the longest building, its curved lifts); the scale comes from one lineup beside other
+  towers, not from visiting them. Our v5 draft 1 broke it: orbit, a mountain in Italy, the sea off Shanghai, Stockholm,
+  then Helsinki in 43 s, one line each and nothing deepened (a list wearing a story's clothes). **Test, at G0 and G1:**
+  name the film's one thing in 3 words; count the places (one home place, at most one comparison shot); every line
+  must be about the one thing. This tightens CRAFT §a's "at most 3 places". — ("I what I don't like about the current story is we are too wide and unfocused again like we talked about a bunch of topics all within 30 seconds - we started with space then mountain then  Stockholm then Helsinki / Compare it with big bend story and create a new rule for storytelling", v5 G1, 2026-10-29).
 - **The first line sounds like a friend starting a story, and still pulls: curious, never pushy. "Did you know that
   ..." is the owner's model opener.** The Big Bend reel: "Did you know that New York once got a proposal to build this
   giant 2,000-foot tall bending skyscraper? It's called the Big Bend." A friend's question with a surprising fact in it

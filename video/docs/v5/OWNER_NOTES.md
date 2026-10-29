@@ -35,3 +35,6 @@ Format: the owner's words in quotes, with the time (UTC); after "->" what we did
   effort): `script/script_g1.md`, `script/script_elevenlabs.md`, `THROUGHLINE.md`; then one critic and one fix pass.
 - 2026-10-29 ~09:40 UTC: "I mean finish your analysis of more openings like maybe there is a better one" -> the opener
   research decides the first lines (it may beat "Did you know"); the writer keeps them provisional until it lands.
+- 2026-10-29 ~10:20 UTC, on draft 1: "I what I don't like about the current story is we are too wide and unfocused again like we talked about a bunch of topics all within 30 seconds - we started with space then mountain then  Stockholm then Helsinki / Compare it with big bend story and create a new rule for storytelling" -> the critic stopped (it judged a draft that will change); rule: playbook,
+  Script and voice (ONE SUBJECT, GONE DEEP), TOPIC_CRITERIA (one subject); v5 re-scoped to one subject, three options
+  sent (Helsinki's AI-heated homes recommended; the computer in space; the bunker under the park).
