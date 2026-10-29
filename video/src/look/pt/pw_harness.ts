@@ -17,20 +17,3 @@ const sz = pave.facets.map((f) => Math.round(Math.sqrt(f.area))).sort((a, b) => 
 console.log(' ground sides p10/50/90', sz[Math.floor(sz.length * 0.1)], sz[Math.floor(sz.length * 0.5)], sz[Math.floor(sz.length * 0.9)]);
 const byY = [1000, 1100, 1300, 1600, 1900].map((y) => pave.facets.filter((f) => Math.abs(f.c[1] - y) < 60).map((f) => Math.round(Math.sqrt(f.area))));
 console.log(' ground side by y', byY.map((l) => l.length ? l.sort((a, b) => a - b)[Math.floor(l.length / 2)] : '-').join(' '));
-const small = pave.facets.filter((f) => f.minW < 8);
-const hist = new Map<number, number>();
-for (const f of small) hist.set(Math.round(f.c[1] / 100) * 100, (hist.get(Math.round(f.c[1] / 100) * 100) ?? 0) + 1);
-console.log(' small by y', JSON.stringify(Array.from(hist.entries()).sort((a, b) => a[0] - b[0])));
-console.log(' examples', small.slice(0, 5).map((f) => `${f.minW}@${f.c} pts=${JSON.stringify(f.pts)} uv=${JSON.stringify(f.uv.map(([u, v]) => [+u.toFixed(3), +v.toFixed(3)]))}`).join('\n'));
-{
-  const L = pave.tones.map((c) => require('../../lib/light').lab(c)[0]);
-  let same = 0, spike = 0, soft = 0, n = 0;
-  pave.adj.forEach((l, i) => l.forEach((j) => { if (j <= i) return; n++; const a = pave.facets[i].tone, b = pave.facets[j].tone; const d = Math.abs(L[a] - L[b]); if (a === b) same++; else if (d > 10.3) spike++; else if (d < 3.7) soft++; }));
-  console.log(' L', L.map((x: number) => x.toFixed(2)).join(' '), 'pairs', n, 'same', same, 'spike', spike, 'soft', soft);
-  // K4 count
-  const S = pave.adj.map((l) => new Set(l));
-  let k4 = 0;
-  for (let a = 0; a < S.length; a++) for (const b of S[a]) if (b > a) for (const c of S[b]) if (c > b && S[a].has(c)) for (const d of S[c]) if (d > c && S[a].has(d) && S[b].has(d)) k4++;
-  const deg = pave.adj.map((l) => l.length).sort((a, b) => a - b);
-  console.log(' K4s', k4, 'degree p50/p90/max', deg[Math.floor(deg.length / 2)], deg[Math.floor(deg.length * 0.9)], deg[deg.length - 1]);
-}

@@ -11,7 +11,7 @@ import {Sky} from '../../lib/sky';
 import {Mottle, mottleK} from '../../lib/texture';
 import {useTime} from '../../lib/time';
 import {S1_EVENING} from '../../v2r/world/skies';
-import {CAM, demoPatchworks, skyline} from './PatchworkDemo';
+import {CAM, demoPatchworks} from './PatchworkDemo';
 
 const WATER = '#86B4AC';
 const COPING = '#E6CFC2';
@@ -38,7 +38,6 @@ export const PtTextureDemo: React.FC<{mode: 'flat' | 'mottle'}> = ({mode}) => {
   const {quay, far} = React.useMemo(() => demoPatchworks(0.3), []);
   const m = mode === 'mottle';
   const yQuay = Math.round(CAM.y(9.0));
-  void skyline;
   return (
     <AbsoluteFill style={{background: '#FFFFFF'}}>
       <svg width={1080} height={1920} viewBox="0 0 1080 1920">

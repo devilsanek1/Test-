@@ -20,7 +20,7 @@
 import React, {useId} from 'react';
 import {Fill} from './Fill';
 import {useTime} from './time';
-import {fromLch, lch, mixHex} from './light';
+import {fromLch, lab, lch, mixHex} from './light';
 import {rng} from './rng';
 import {neverBand} from './water';
 import {lightVec, type LightInput, type Pt} from './foliage';
@@ -28,6 +28,11 @@ import type {Wind} from './wind';
 
 const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
+const dE = (a: string, b: string) => {
+  const p = lab(a);
+  const q = lab(b);
+  return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
+};
 const r1 = (n: number) => Math.round(n * 10) / 10;
 
 export type CloudTones = {lit: string; body: string; belly: string};
@@ -35,16 +40,17 @@ export type CloudTones = {lit: string; body: string; belly: string};
 /** A cumulus's three flat tones from its sky: the lit top a warm white (the key's warmth, h 78), the body a step
  *  under it, the belly dL* -8 under the body and cooler (toward the sky's hue, turned toward blue). Never beige: the
  *  body keeps C* < 6 at L* >= 86 or sits in the warm-white band. */
-export function cloudTones(o: {sky: string; warmHue?: number; lit?: number; body?: number; belly?: number}): CloudTones {
+export function cloudTones(o: {sky: string; warmHue?: number; lit?: number; body?: number; belly?: number; bellyHue?: number; bellyC?: number}): CloudTones {
   const s = lch(o.sky);
   const litL = o.lit ?? clamp(s.L + 11, 93, 97.5);
   const bodyL = o.body ?? litL - 3.5;
-  const bellyL = o.belly ?? bodyL - 6.5;
+  const bellyL = o.belly ?? bodyL - 7;
   return {
     lit: fromLch(litL, 7, o.warmHue ?? 78),
     body: fromLch(bodyL, 4.5, (o.warmHue ?? 78) + 8),
-    // the belly: a step down and cooler, its hue between the sky's and a soft violet (never a separate blue slab)
-    belly: fromLch(bellyL, 6, (s.h + 24) % 360),
+    // the belly: a step down and cooler, toward the shade family's soft violet (CM.shadeCool's hue): on a pale sky a
+    // value step alone would melt it into the sky, so it parts by hue (dE ~10 from a mint sky at the same L*)
+    belly: fromLch(bellyL, o.bellyC ?? 7.5, o.bellyHue ?? 262),
   };
 }
 
@@ -210,15 +216,22 @@ function buildCumulus(spec: CumulusSpec): CumulusGeom {
   }
   const union = all.map(circleD).join('');
 
-  // ---- the soft steps where it thins: the soft circles grown by k x px, outermost first, toward the sky there
+  // ---- the soft steps where it thins: the soft circles grown by k x px, outermost first, each step from the tone it
+  //      borders toward the sky there (the low ones border the shaded base: a pale ring there would read as a halo)
   const softs = all.filter((c) => c.soft);
-  const sx = softs.reduce((s, c) => s + c.x, 0) / Math.max(1, softs.length);
-  const sy = softs.reduce((s, c) => s + c.y, 0) / Math.max(1, softs.length);
-  const air = skyAt(sx, sy);
-  const edge = mixHex(tones.body, tones.belly, 0.5);
   const rings: {d: string; color: string}[] = [];
+  const lowY = base - h * 0.22;
+  const groups: [Circle[], string][] = [
+    [softs.filter((c) => c.y < lowY), tones.body],
+    [softs.filter((c) => c.y >= lowY), tones.belly],
+  ];
   for (let k = steps; k >= 1; k--) {
-    rings.push({d: softs.map((c) => circleD({x: c.x, y: c.y, r: c.r + k * px})).join(''), color: mixHex(edge, air, k / (steps + 1))});
+    for (const [cs, edge] of groups) {
+      if (!cs.length) continue;
+      const sx = cs.reduce((acc, c) => acc + c.x, 0) / cs.length;
+      const sy = cs.reduce((acc, c) => acc + c.y, 0) / cs.length;
+      rings.push({d: cs.map((c) => circleD({x: c.x, y: c.y, r: c.r + k * px})).join(''), color: mixHex(edge, skyAt(sx, sy), k / (steps + 1))});
+    }
   }
 
   // ---- inside: the body is the whole union moved toward the key (its shade a crescent along the edges facing away);
@@ -340,6 +353,8 @@ export function cloudProblems(geoms: CumulusGeom[], o: {band?: [number, number];
     if (step < 6 - 0.3 || step > 10 + 0.3) out.push(`${name}: the belly sits ${step.toFixed(1)} L* under the body (6-10)`);
     const sky = typeof s.sky === 'function' ? s.sky(s.x + s.w / 2, s.base - s.h / 2) : s.sky;
     if (tl.L - lch(sky).L < 5) out.push(`${name}: the lit top is only ${(tl.L - lch(sky).L).toFixed(1)} L* over its sky (>= 5)`);
+    const dSky = dE(g.tones.belly, sky);
+    if (dSky < 6) out.push(`${name}: the belly ${g.tones.belly} is only dE ${dSky.toFixed(1)} from its sky (>= 6: it would melt into it)`);
     for (const [k, c] of Object.keys(g.tones).map((q) => [q, (g.tones as Record<string, string>)[q]] as [string, string])) {
       const band = neverBand(c);
       if (band) out.push(`${name}: ${k} ${c} sits in the ${band} band`);

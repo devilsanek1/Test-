@@ -10,25 +10,32 @@
 //   foliageProblems({crowns: [crownGeometry(PLANE)], sprays: [sprayGeometry(SPRAY)]})   // [] = OK
 //
 // HOW A CROWN IS BUILT (once per spec, cached: the wind only moves it by transforms, never rebuilds a path: no boil):
-//   1. the species' envelope (the London plane's broad, irregular dome) holds N clusters, each a jittered low-poly
-//      ellipsoid (an icosphere) in screen-aligned 3D (x right, y down, z toward the viewer), drawn back to front;
-//   2. each facet takes ONE tone from its normal against the key (wrap Lambert + the sky's fill), its normal blended
-//      with the crown envelope's (the game artists' "foliage normals": the crown reads as ONE lit mass) and darkened by
-//      its depth in the crown (the core is the darkest natural tone: rule 6's "the shade under trees");
-//   3. the tones are the plane's ladder (near: core / shade / mid / lit / hi, L* 36 / 45 / 53 / 61 / 70), split at the
-//      crown's own value quantiles, so its mean lands on the ladder's target whatever the light; hi only on the top
-//      clusters (Gurney: lightest at the outer and upper edges);
-//   4. the silhouette is LEAVES: species leaves (near), leaf bumps (mid) or the bare facets (far, >= 40 % straight)
-//      along every cluster's outline, each rim leaf folded on its midrib (two facets, two tones); a few turn gold or
-//      rust in October; 2-4 sky holes near the thin edge (a step under the open sky);
+//   1. the species' envelope (the London plane's broad, irregular dome on a clear trunk) holds 8-11 clusters (near),
+//      placed in screen-aligned 3D (x right, y down, z toward the viewer) and drawn back to front, a dark core behind;
+//   2. each cluster takes ONE value from the crown's envelope normal against the key (wrap Lambert + the sky's fill,
+//      darkened by its depth in the crown and low down: the game artists' "foliage normals", the crown lit as ONE mass,
+//      its core the darkest natural tone: rule 6's "the shade under trees"); ranked into the plane's ladder (near:
+//      core / shade / mid / lit / hi, L* 36 / 45 / 53 / 61 / 70);
+//   3. REAL at the silhouette: each cluster is an organic blob whose rim is the species' own leaves (an outer row ~70 %
+//      out past the mass, about a leaf apart, each outline reading against what is behind it; a tucked inner row: lace,
+//      never a saw); a few October leaves turned gold or rust on the outer, lit edge; 2-4 leaf-bitten sky holes;
+//   4. LOW POLY inside: a lit cap toward the key cut by a straight two-facet line (bigger on the brighter clusters), a
+//      hi facet on the two brightest (a dab), a core crescent on the dark low ones; where the light falls it reveals
+//      the leaves (each rim leaf folded on its midrib: its key-facing half a step up, the other a half step; a sprig or
+//      two inside the cap), in the shade they merge into the mass;
 //   5. a trunk and limbs as tapered closed paths, the shade side away from the key, the bark's plates as same-hue
-//      patches (the London plane's camouflage: N5 b), the crown's own shade across the trunk's top.
+//      patches (the London plane's camouflage: N5 b), the crown's own shade across the trunk's top in two flat steps;
+//      the wood sits under every cluster (a limb's end never pokes out of the leaves).
+//   Mid crowns (0 ... +2) swap the species leaves for 11-18 px leaf bumps and 4 tones; far ones (+3, +4) are 4-8 flat
+//   facets of a jittered icosahedron (>= 40 % straight edge), 3 tones stepped toward the air.
 // Every shape is one closed path and a flat fill (no outline, no gradient, no blur); a layer is the union of the
 // shapes at one tone and lighter (painted dark -> light), so neighbouring facets never leave an antialiasing seam.
 // Thin parts (limbs, twigs, stalks, veins) are >= 2 px: under the parallax float anything thinner twinkles (CRAFT §c).
 //
 // Colour: the tones are FINAL (the nature ladder sets them per plane: N1); `exact` (default) keeps an enclosing clean-pen
-// tier from pulling them again (pass exact={false} to let a Tier scope calm them). A mid or far tree steps toward its
+// tier from pulling them again: it draws the fills in a `subject` Tier scope, the one tier the clean pen never
+// recolours (the tree stays tier C by its story role; nothing else reads that scope here). exact={false} lets an
+// enclosing Tier scope calm them. A mid or far tree steps toward its
 // plane's air through lib/depth's `recede` when given the set's Atmosphere. Libraries: none needed beyond the project's
 // own (the note: docs/studies/2026-10-28_city_posters/test/ENGINE_NATURE.md §2).
 
@@ -271,8 +278,9 @@ export function lightVec(l: LightInput): V3 {
 export const LADDER_NEAR = [36, 45, 53, 61, 70] as const;
 /** The mid ladder (3-4 tones, mean 45-60). */
 export const LADDER_MID = [42, 50, 58, 66] as const;
-/** The far ladder (2-3 tones in 4-6 L* steps), before the plane's air step. */
-export const LADDER_FAR = [50, 55.5, 61] as const;
+/** The far ladder at k = 0 (2-3 tones in 4-6 L* steps); a far crown spreads it by 1 / (1 - k) so the steps survive its
+ *  plane's air step (`planeTones`). */
+export const LADDER_FAR = [50.5, 55.5, 60.5] as const;
 /** The tones' area shares (dark -> light) the quantiles split at, per mode. */
 export const TONE_SHARES = {near: [0.14, 0.26, 0.26, 0.24, 0.1], mid: [0.2, 0.32, 0.31, 0.17], far: [0.3, 0.42, 0.28]} as const;
 
