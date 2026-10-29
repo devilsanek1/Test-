@@ -33,6 +33,7 @@ import {CloudSlot, SpraySlot, TextureSlot} from './engine';
 import {useTime} from '../../lib/time';
 import {S1PipShadows} from './V2S1_pip';
 import {PaintedGroup, PaintedLayer} from '../../lib/paint';
+import {DuskOverlay, DuskWater} from './dusk';
 
 export type S1WorldProps = {
   /** Her figure behind the glass doors (between the lobby and the door glass). */
@@ -103,7 +104,10 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
       </S1Plane>
       {/* the water */}
       <S1Plane plane={S1_PLANE.water}>
-        <S1Water />
+        {/* (paint v5) the canal mirrors the dusk sky */}
+        <DuskWater>
+          <S1Water />
+        </DuskWater>
       </S1Plane>
     </Env>
     {/* the subject's plane: the far towpath, the wing (her behind the glass inside it; W and the door tier themselves),
@@ -137,6 +141,8 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
             </Env>
           ),
         },
+        // (paint v5) the facade's lit side a touch warmer (the low sun on the left), under her and the towpath's things
+        {node: <DuskOverlay x={300} y={596} w={780} h={470} stops={[[0, '#FFB070', 0.55], [0.55, '#FFC890', 0.25], [1, '#C8A8E0', 0.18]]} />, mottle: false},
         {node: <S1TowpathShadows />, mottle: false},
         {
           node: (

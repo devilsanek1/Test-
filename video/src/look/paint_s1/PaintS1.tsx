@@ -9,6 +9,7 @@ import React from 'react';
 import {PaintProvider} from '../../lib/paint';
 import {PosterS1, type PosterS1Props} from './PosterS1';
 import {PAINT_SETS, type PaintSetName} from './paint_set';
+import {DuskProvider} from './dusk';
 
 export {POSTER_S1_FPS as PAINT_S1_FPS, POSTER_S1_FRAMES as PAINT_S1_FRAMES} from './PosterS1';
 
@@ -17,12 +18,15 @@ export type PaintS1Props = Omit<PosterS1Props, 'preset'> & {
   paint?: boolean;
   /** Which painted pieces (default all): a subset for A/Bs. */
   pieces?: string[];
-  /** Which bake (paint_set.ts): 'v1' (default), 'v2' (the bolder dose), 'v3' (the broad brush, a layered sky), 'v4design' (v4's flat designed shapes), 'v4' (them painted). */
+  /** Which bake (paint_set.ts): 'v1' (default), 'v2' (the bolder dose), 'v3' (the broad brush, a layered sky), 'v4design' (v4's flat designed shapes), 'v4' (them painted), 'v5' (v4 redesigned, one evening light for the whole scene). */
   set?: PaintSetName;
 };
 
 export const PaintS1: React.FC<PaintS1Props> = ({paint = true, pieces, set = 'v1', ...rest}) => (
   <PaintProvider on={paint} only={pieces} set={PAINT_SETS[set]}>
-    <PosterS1 preset="v2" audio="none" {...rest} />
+    {/* (v5) one evening light for the whole scene: water, paving, facade (dusk.tsx) */}
+    <DuskProvider on={paint && set === 'v5'}>
+      <PosterS1 preset="v2" audio="none" {...rest} />
+    </DuskProvider>
   </PaintProvider>
 );

@@ -1045,7 +1045,25 @@ def design_plane(pl, box, light, ss=2):
         cx, cy, r = b[0], b[1], b[2]
         f = b[3] if len(b) > 3 and b[3] else pl.get('flat', 1.0)
         return ((xx - cx - dx) / r) ** 2 + ((yy - cy - dy) / (r * f)) ** 2 <= 1.0
-    if pl.get('light_mode', 'cloud') == 'billow':
+    if pl.get('light_mode', 'cloud') == 'cap':
+        # TRUE billows (v5: no crescents): each billow, back to front, a lit TOP above a curved terminator (lower on the
+        # light's side, bowed by the billow's roundness), a mid band under it, a shade underside; front lobes overlap
+        tl, tm = pl.get('t_lit', 0.05), pl.get('t_mid', 0.45)
+        tilt, curv = pl.get('tilt', 0.25), pl.get('curv', 0.14)
+        side = -1.0 if L[0] < 0 else 1.0  # the light's side in x
+        for b in pl['billows']:
+            cx, cy, r = b[0], b[1], b[2]
+            f = b[3] if len(b) > 3 and b[3] else pl.get('flat', 1.0)
+            D = disc_of(b)
+            u = (xx - cx) / r
+            bow = curv * r * f * np.clip(1 - u * u, 0, 1)
+            y_lit = cy + tl * r * f + tilt * side * (xx - cx) * f + bow
+            y_mid = cy + tm * r * f + tilt * side * (xx - cx) * f + bow
+            z = np.where(yy < y_lit, 3, np.where(yy < y_mid, 2, 1)).astype(np.uint8)
+            lab = np.where(D, z, lab).astype(np.uint8)
+            cxm = np.where(D, cx, cxm)
+            cym = np.where(D, cy, cym)
+    elif pl.get('light_mode', 'cloud') == 'billow':
         # every billow its own lit cap (a small, busy form: a crown of leaves)
         for b in pl['billows']:
             r = b[2]
@@ -1173,6 +1191,12 @@ def paint_designed_plane(pl, zones, cov, cxs, cys, cols, light, rng, seed, calm=
         cv.stamp(stamps[int(rng.integers(len(stamps)))], x, y, ang + rng.normal(0, 0.12), wdt * rng.uniform(*b.get('len', (1.6, 2.6))), wdt,
                  lab_to_rgb(lab[None])[0], rng.uniform(*b.get('op', (0.3, 0.5))), clipm, zone_img, b.get('tau', 0.05))
         n += 1
+    # the DESIGNED strokes: a few broad strokes placed by hand along the form ([x, y, length, width, angle deg, zone
+    # 1 shade | 2 mid | 3 lit, dL], frame px), each in its zone's colour a step lighter or deeper, kept in the mass
+    for (sx, sy, sl, sw_, sa, sz, sdl) in b.get('designed_strokes', []):
+        lab = cols[int(sz) - 1] + np.array([sdl, 0, 0])
+        cv.stamp(stamps[n % len(stamps)], sx - b.get('_bx', 0), sy - b.get('_by', 0), math.radians(sa), sl, sw_, lab_to_rgb(lab[None])[0], b.get('designed_op', 0.6), clipm)
+        n += 1
     # dry strokes along the shade-side edge (broken, along the edge, in the mass's colour)
     edge = np.argwhere((soft > 0.25) & (soft < 0.75) & (shade_side > 0.6))
     for _ in range(int(len(edge) * b.get('dry_edge', 0.01))):
@@ -1234,6 +1258,7 @@ def style_designed(piece, spec, rng, stamps):
             a = cov * (calm if calm is not None else 1)
             out = rgb
         else:
+            pl = dict(pl, paint=dict(pl.get('paint', {}), _bx=bx, _by=by))
             out, a, n = paint_designed_plane(pl, zones, cov, cxs, cys, cols, pl.get('light', light), np.random.default_rng(int(piece['seed']) * 101 + j), int(piece['seed']) * 101 + j, calm)
         if nearer.max() > 0 and pl.get('air', True):
             dn = ndimage.distance_transform_edt(nearer < 0.5)[y0:y1, x0:x1]

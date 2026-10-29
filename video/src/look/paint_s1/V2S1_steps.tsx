@@ -8,6 +8,7 @@
 //           sun); contact under every sitter and thing, casts along the light (right, a little toward us)
 // Drawn back to front, each tread's stone before what stands on it. Pip's bollard and Pip are the pip slot's: x 610-790,
 // y 1120-1302 stays clear.
+import {DuskOverlay} from './dusk';
 import React from 'react';
 import {Tier} from '../../lib/tier';
 import {Shade} from '../../lib/light';
@@ -42,5 +43,7 @@ export const S1Steps: React.FC = () => (
     <S1Plane plane={S1_PLANE.near} under={<S1ForeNearUnder />} over={<S1ForeNearOver />}>
       <S1ForeNear />
     </S1Plane>
+    {/* (paint v5) the bank and the near things in the low sun: warm peach toward it (left), lilac away from it */}
+    <DuskOverlay x={0} y={1206} w={1080} h={714} stops={[[0, '#FF9F5C', 0.6], [0.45, '#FFB98A', 0.3], [1, '#8F7CC0', 0.45]]} />
   </>
 );
