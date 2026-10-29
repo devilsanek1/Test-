@@ -1,23 +1,275 @@
 {
-  "film": "v2s1",
-  "about": "v2's S1 painted pieces (paint_test/NOTES.md): the sky, the hero cumulus and the thin bar on the sky's layer, the bay tree (near plane), the stone pier (near plane). Flats from PaintFlatS1 at 1.0 s (bake_v2s1.sh).",
-  "out": "public/paint/v2s1",
-  "frame": [1080, 1920],
-  "band": [290, 600],
-  "light": {"dir": [-0.9, -0.35], "about": "RIG_CANAL: the low western sun, screen left and a little up from the near ground"},
-  "pieces": [
-    {"id": "v2s1/sky", "style": "sky", "seed": 11, "flat": "out/paint/v2s1/flat/sky.png", "crop": [0, 0, 1080, 1100]},
-    {"id": "v2s1/cloud", "style": "cloud", "seed": 23, "box": [330, 0, 750, 360], "base_y": 300, "base_soft": 46,
-     "light": [-0.75, 0.62],
-     "lobes": [[430, 262, 44], [500, 252, 60], [590, 244, 72], [690, 238, 80], [800, 234, 86], [910, 228, 92], [1030, 222, 100],
-               [545, 182, 62], [645, 152, 90], [760, 132, 108], [880, 118, 118], [1010, 108, 128],
-               [720, 46, 78], [850, 14, 118], [980, -8, 136], [1085, 24, 110]],
-     "palette": {"shade": "#D6CAD6", "mid": "#F3D9D0", "lit": "#FDF0E3", "rim": "#FFE5BD"}},
-    {"id": "v2s1/cloudbar", "style": "cloud", "seed": 31, "box": [0, 196, 420, 84], "base_y": 262, "base_soft": 14, "scale": 0.55,
-     "light": [-0.75, 0.62], "edge_cell": 22, "rim_px": 10, "specks": 20,
-     "lobes": [[52, 248, 15], [96, 243, 20], [150, 240, 23], [212, 241, 22], [272, 244, 19], [326, 247, 15], [368, 249, 11]],
-     "palette": {"shade": "#D3D6D6", "mid": "#EEDDD4", "lit": "#FBF1E6", "rim": "#FFE9C8"}},
-    {"id": "v2s1/tree", "style": "foliage", "seed": 41, "flat": "out/paint/v2s1/flat/tree.png"},
-    {"id": "v2s1/pier", "style": "surface", "seed": 53, "flat": "out/paint/v2s1/flat/pier.png", "angle": 84}
-  ]
+ "film": "v2s1",
+ "about": "v2's S1 painted pieces (paint_test/NOTES.md): the sky, the hero cumulus and the thin bar on the sky's layer, the bay tree (near plane), the stone pier (near plane). Flats from PaintFlatS1 at 1.0 s (bake_v2s1.sh).",
+ "out": "public/paint/v2s1",
+ "frame": [
+  1080,
+  1920
+ ],
+ "band": [
+  290,
+  600
+ ],
+ "light": {
+  "dir": [
+   -0.9,
+   -0.35
+  ],
+  "about": "RIG_CANAL: the low western sun, screen left and a little up from the near ground"
+ },
+ "pieces": [
+  {
+   "id": "v2s1/sky",
+   "style": "sky",
+   "seed": 11,
+   "flat": "out/paint/v2s1/flat/sky.png",
+   "crop": [
+    0,
+    0,
+    1080,
+    1100
+   ],
+   "jitter": [
+    0.013,
+    0.004,
+    0.007
+   ],
+   "drift": [
+    0.012,
+    0.004,
+    0.007
+   ]
+  },
+  {
+   "id": "v2s1/cloud",
+   "style": "cloud",
+   "seed": 23,
+   "box": [
+    330,
+    0,
+    750,
+    360
+   ],
+   "base_y": 270,
+   "base_soft": 44,
+   "light": [
+    -0.62,
+    -0.5
+   ],
+   "lobes": [
+    [
+     430,
+     262,
+     44
+    ],
+    [
+     500,
+     252,
+     60
+    ],
+    [
+     590,
+     244,
+     72
+    ],
+    [
+     690,
+     238,
+     80
+    ],
+    [
+     800,
+     234,
+     86
+    ],
+    [
+     910,
+     228,
+     92
+    ],
+    [
+     1030,
+     222,
+     100
+    ],
+    [
+     545,
+     182,
+     62
+    ],
+    [
+     645,
+     152,
+     90
+    ],
+    [
+     760,
+     132,
+     108
+    ],
+    [
+     880,
+     118,
+     118
+    ],
+    [
+     1010,
+     108,
+     128
+    ],
+    [
+     720,
+     46,
+     78
+    ],
+    [
+     850,
+     14,
+     118
+    ],
+    [
+     980,
+     -8,
+     136
+    ],
+    [
+     1085,
+     24,
+     110
+    ]
+   ],
+   "palette": {
+    "shade": "#D3C4CF",
+    "mid": "#F7E2D3",
+    "lit": "#FFF7EA",
+    "rim": "#FFE6B8"
+   },
+   "lobe_k": 0.66,
+   "big_k": 0.34,
+   "t_bias": 0.02
+  },
+  {
+   "id": "v2s1/cloudbar",
+   "style": "cloud",
+   "seed": 31,
+   "box": [
+    0,
+    196,
+    420,
+    84
+   ],
+   "base_y": 262,
+   "base_soft": 14,
+   "scale": 0.55,
+   "light": [
+    -0.62,
+    -0.5
+   ],
+   "edge_cell": 22,
+   "rim_px": 10,
+   "specks": 20,
+   "lobes": [
+    [
+     34.4,
+     250,
+     13
+    ],
+    [
+     60.199999999999996,
+     246,
+     17
+    ],
+    [
+     89.44,
+     243,
+     20
+    ],
+    [
+     120.39999999999999,
+     241,
+     22
+    ],
+    [
+     153.07999999999998,
+     240,
+     23
+    ],
+    [
+     185.76,
+     241,
+     22
+    ],
+    [
+     216.72,
+     242,
+     21
+    ],
+    [
+     247.68,
+     244,
+     19
+    ],
+    [
+     276.92,
+     246,
+     16
+    ],
+    [
+     302.71999999999997,
+     248,
+     13
+    ],
+    [
+     325.08,
+     250,
+     10
+    ]
+   ],
+   "palette": {
+    "shade": "#D3D6D6",
+    "mid": "#EEDDD4",
+    "lit": "#FBF1E6",
+    "rim": "#FFE9C8"
+   }
+  },
+  {
+   "id": "v2s1/tree",
+   "style": "foliage",
+   "seed": 41,
+   "flat": "out/paint/v2s1/flat/tree.png",
+   "warm": [
+    0.055,
+    -0.012,
+    0.055
+   ],
+   "cool": [
+    -0.06,
+    -0.02,
+    0.0
+   ],
+   "drift": [
+    0.018,
+    0.008,
+    0.012
+   ],
+   "tau": 0.3
+  },
+  {
+   "id": "v2s1/pier",
+   "style": "surface",
+   "seed": 53,
+   "flat": "out/paint/v2s1/flat/pier.png",
+   "angle": 62,
+   "warm": [
+    0.03,
+    0.006,
+    0.02
+   ],
+   "cool": [
+    -0.035,
+    -0.002,
+    -0.016
+   ]
+  }
+ ]
 }

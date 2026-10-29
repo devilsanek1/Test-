@@ -48,7 +48,7 @@ const shadeEdge = (y540: number, drop: number, bump: number, seed: number): Pt[]
   }
   return pts;
 };
-/** Two steps of the same cast tint (each laid twice: multiply), so the near frame darkens toward the bottom in many
+/** Two steps of the same cast tint (multiply: the deeper one on top of the first), so the near frame darkens toward the bottom in many
  *  small pieces (the patchwork's stones stay readable inside it); the landing and the first tread stay in the sun. */
 const NEAR_SHADES: string[] = [
   poly([...shadeEdge(1326, 60, 4, 1.3), [1140, 1800], [-60, 1800]]),
@@ -125,7 +125,6 @@ export const V3Near: React.FC = () => (
       {/* the near frame in shade (the cast tint), a deeper step at the bottom */}
       {NEAR_SHADES.map((d, i) => (
         <React.Fragment key={i}>
-          <Shade d={d} tint="cast" at={floodAt(540, 1400 + 160 * i)} />
           <Shade d={d} tint="cast" at={floodAt(540, 1400 + 160 * i)} />
         </React.Fragment>
       ))}

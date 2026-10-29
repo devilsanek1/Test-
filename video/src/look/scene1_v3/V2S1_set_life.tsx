@@ -94,7 +94,8 @@ export const S1FarTowpath: React.FC = () => {
 
 /** Bollards and lamp posts along the far towpath, shrinking round the bend (the row's diminishing reads as "down the
  *  bending towpath"). Lamps stand at the path's back (the wall side), bollards on the coping. */
-export const S1_BOLLARDS = [770, 430, 262, 160, 66];
+// (scene 1 still v3: the bollard at x 262 sat right behind her bun on our landing: dropped)
+export const S1_BOLLARDS = [770, 430, 160, 66];
 export const S1_FAR_LAMPS = [{x: 1046, h: 366}, {x: 752, h: 340}, {x: 360, h: 0}, {x: 6, h: 0}];
 export const S1PathFurniture: React.FC = () => {
   const {darks} = useSwitches();

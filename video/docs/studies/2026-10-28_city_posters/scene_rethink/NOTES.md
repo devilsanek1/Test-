@@ -197,3 +197,26 @@ can move), with her at the references' size as seen on the phone (about v2's ori
 Kept from v1-v2: the near/far separation, a full street across the water, a sky with things in it, subtle near
 nature. The designed view is on hold. The general rule: playbook "DEPTH AND SCALE FROM A HUMAN VIEWPOINT" (it replaces
 "DEPTH IS AIR AND DISTANCE").
+
+## still_v3
+
+`still_v3.png` (also `video/deliverables/tests/poster_scene1_still_v3.png`) and `compare_v3.jpg` (v2's shipped S1, still_v3, still_v2; the three human-scale refs below). Built in our engine, no bitmaps: `src/look/scene1_v3/` (the look test's pass-2 copy plus `V3_*` parts), entry `src/entry-look-scene1v3.tsx` (`GL=angle node scripts/render-frames.mjs Scene1V3 <dir> 1.6 --entry=src/entry-look-scene1v3.tsx --scale=1`).
+- **Kept from v2:**
+  - the angle and view: across the canal to Google's wing with its lit door and "Google" fascia, the bridge, the far city and the toned sun on the left, the water with its gold column, the moored boats;
+  - v2's palette, her drawing, the light rig, the caption in v2's style and place, and every pass-2 lesson (no outlines, shade faces, darks, patchwork, the far stage, the small leaf spray).
+- **Her:** 210 px, 10.9 % of the height. That is the orchestrator's corrected 130-220 px (the owner reads the refs at phone width and sent the 9:16 motion reference), not the brief's 300-550 px.
+  - She is rear 3/4, walking west on OUR landing by the water, with her desk plant and tote. Her feet are at y 1458, above the bottom UI.
+  - Her head and coat sit against the light water (L* 57 on 69) and the far bank. The strangers are 0.66x v2's figure, so she reads as the nearer one.
+- **What changed:**
+  - v2's world is drawn 220 px lower. The sky gets the room for a warm cloud bank: a low bank glowing gold near the sun, a tower at the right edge (in the caption band only at x > 880), its crown above the band, two soft strata and birds. The caption's text sits on clear mint (band median L* 86).
+  - The big pale floor is gone: only the landing and three treads remain, in two cast-shade steps, with a few leaves, a cup and a newspaper.
+  - The far towpath is a full street: three awnings, a café with three seated, five walkers, a cyclist, a bike, a tree and two figures on the bridge.
+  - Pip hides on the near boat's roof (54 px).
+- **Measured** (outside the band; the posters in brackets): L* < 65 40 % (27-48), 65-80 16 % (8-14), < 40 8 % (9-25). The bottom fifth's median is 48 (47-59) and the bottom corners are 45 / 51 (44 / 53).
+- **Weak spots:**
+  - The near steps are still ~28 % of the frame: darker and calmer, but one plain patchwork field.
+  - The clouds are the kit's tablecloth cumulus stacked into a tower, rounder and more cartoon than the refs' masses. The small cloud keeps a flat lilac belly.
+  - The tier-C strangers read pale lilac-grey, a little ghostly, which echoes v2's ghost row.
+  - The lit lobby, the frame's brightest spot, is right of her, not behind her.
+  - Pip is easy to find.
+  - The float is emptied for the still, and frame 0's build was not checked.
