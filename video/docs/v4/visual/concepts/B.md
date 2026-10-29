@@ -38,11 +38,11 @@ picture seen from far away (Kurzgesagt's title is one zoom through ~7 nested sca
 
 **Why it fits its viewers.** A regular person scrolling gets a big, bold event from frame 0 (a whole city drawing
 itself, cut open, then lighting up), a question the picture asks on its own ("what's under that street?") and a
-payoff they can read at a glance in one frame. The owner finds a designed view's "unique camera angle and composition
-of objects ... fascinating" (`DIRECTION.md` intro) and loves the pull-back crane (`CINEMATIC_GUIDE.md` S5). The loop
-pays a rewatch twice: the frame-0 picture that was a puzzle is now readable from the computer to the window, and Pip
-waits on the same balcony to be found (cross-section books do this: Biesty's *Man-of-War* has "the challenge of
-spotting a stowaway", Wikipedia "Stephen Biesty" [guide, weak]).
+payoff they can read at a glance in one frame. The owner said of the posters' designed view: "unique camera angle and
+composition of objects is fascinating" (playbook, Visual style), and loves the pull-back crane (`CINEMATIC_GUIDE.md`
+S5). The loop pays a rewatch twice: the frame-0 picture that was a puzzle is now readable from the computer to the
+window, and Pip waits on the same balcony to be found (cross-section books do this: Biesty's *Man-of-War* has "the
+challenge of spotting a stowaway", Wikipedia "Stephen Biesty" [guide, weak]).
 
 ### The view (what frame 0 draws, top to bottom)
 - **The sky**, one calm field through the caption band.
@@ -77,8 +77,8 @@ leads its word by ~0.1 s at G3 (DIRECTION rule 8).
 **S1 · 0.00-4.28 (4.28 s) · L1** "Did you know Helsinki wants AI to heat seventy thousand homes?" (0.13-3.92)
 - **Screen:** frame 0 is the view drawing itself, big and fast: the block and its one window (unlit), the snowy
   street, then the ground below cut open with one big pipe in it, its water cold and still; the harbour, the plan's
-  footprint and the sky land behind, all filled in by ~0.60. At ~0.40 the water at the pipe's left end turns warm and
-  starts to run right. On "Helsinki" (0.64) the far city settles on its horizon. On "AI" (1.50) the giant computer
+  footprint and the sky land behind and fill in by ~0.60. At ~0.40 the water at the pipe's left end turns warm and
+  starts to run right. On "Helsinki" (0.64) the far city settles on its horizon, last. On "AI" (1.50) the giant computer
   draws on in the footprint, at the water's source. On "heat" (2.14) the warm water climbs the block's cut wall to the
   radiator and the one window lights. From "seventy" (2.34) the light spreads window by window, down the street,
   across the harbour, through the whole far city, until "homes?" ends.
@@ -148,11 +148,12 @@ kettles, boiling non-stop." (10.96-17.34)
   centers appear beyond the city as the world widens: plain boxes with fans on their roofs, more and more. On "big"
   (20.94) the box beside Helsinki, drawn big, spins its big roof fans. On "blow" (21.86) plumes rise off every box and
   thin away below the caption band; Helsinki's spot sends up none and stays lit.
-- **Camera:** INSERT -> EXTREME WIDE · PULL BACK and rise, one move on one ease (the S5 crane's shape), from the pause
-  (~18.95) to "fans" (21.18), Helsinki held at the mug's screen spot all the way out (the pivot); then a slow float to
-  ~22.95 · why: context, the usual case, everywhere (C1).
-- **Thread:** the declared scale reveal (the card's one gap, ~19.6-23.5): it leaves from the steam round the mug,
-  Helsinki's lit spot keeps its place, and the next join returns to the steam.
+- **Camera:** INSERT -> EXTREME WIDE · PULL BACK and rise, one move on one ease (the S5 crane's back-and-up, without
+  its arc), from the pause (~18.95) to "fans" (21.18), Helsinki held at the mug's screen spot all the way out (the
+  pivot); then a slow float to ~22.95 · why: context, the usual case, everywhere (C1).
+- **Thread:** the heat, as every box's plume thinning away and Helsinki's lit spot keeping it (as the card counts it).
+  If G3 counts the curve as a gap, it is `CRAFT.md` §a.1's declared scale reveal (~19.6-23.5): it leaves from the
+  steam round the mug, and the next join returns to the steam.
 - **Words:** none. **Sound:** the whoosh (from 18.84); the fans' whirr (20.94); wind carrying the plumes off (21.86);
   in the pause the wind drops to the street's hush, the sound bridge into "But" (C11).
 - **Join -> S7 on "But" (23.46):** A push-through into Helsinki's lit spot, on screen since ~21.0 and already at the
@@ -270,9 +271,10 @@ the room tone (41.32-42.24)
 | S12 -> S1 | "Did" 0.13 | B thread match + un-draw | the one window, same spot and size |
 
 **Counts:** 12 shots, 3.52 s on average, none three near-equal in a row; carriers A x2, B x1, C x9, F 0; the one big
-move S6 (~18.95-21.18) with a 1.8 s landing hold; the thread on screen from ~0.40 to the end except the declared scale
-reveal (~19.6-23.5), ~92 % of the time outside it, no other gap; words in the picture: one ("2027"). Sizes: XW, XW->W,
-C, M, INSERT, INSERT->XW, XW->W, W->M, C, C, M, C->XW (never three of a size in a row). The home place at human scale
+move S6 (~18.95-21.18) with a 1.8 s landing hold; the thread on screen from ~0.40 to the end, ~99 % (S6's plumes and
+Helsinki's lit spot counted as the card counts them; even without them and S9's still, cool water, ~92 % outside the
+declared reveal, no gap over 3 s); words in the picture: one ("2027"). Sizes: XW, XW->W, C, M, INSERT, INSERT->XW,
+XW->W, W->M, C, C, M, C->XW (never three of a size in a row). The home place at human scale
 (S2-S5, S7-S11) is ~30 s, 71 %, each framed with masses on two or three sides (the plan's walls, the snowbanks, the
 harbour's edge, the cut earth round the pipe): the cozy share is G3's to frame.
 
@@ -289,9 +291,9 @@ frame 0's build in the voice's order (the water's run with its ding at ~0.4, the
 "heat", the city on "seventy thousand homes").
 
 **Changed (each a proposal for the judges):**
-1. **L6's big move is a pull-back and rise** from the mug through the whole view (the S5 crane's shape, the owner's
-   favourite) instead of a rise with the steam; the box with big fans stands beside Helsinki on the curve, drawn big
-   in the designed landing, instead of passing close on the way up.
+1. **L6's big move is a pull-back and rise** from the mug through the whole view (the S5 crane's back-and-up, the
+   owner's favourite move) instead of a rise with the steam; the box with big fans stands beside Helsinki on the
+   curve, drawn big in the designed landing, instead of passing close on the way up.
 2. **L7 dives back to the plan's end of the street and L8 starts there:** no travel along the pipe toward its source,
    so C4's flag on the card's L7 -> L8 never arises (the water never runs back).
 3. **L9's cutaway is the giant computer itself opening:** the street is cut open from frame 0, so the new look inside
@@ -355,6 +357,9 @@ frame 0's build in the voice's order (the water's run with its ding at ~0.4, the
   re-orients; the average stays 3.52 s.
 - **In-and-out moves (S5 in, S6 far out; S7 in, S8 and S9 in):** each has its reason (lean in for the joke, context,
   the turn, the subject); S5's push is small.
+- **S11's follow turns up the block's wall:** one follow of one moving subject, but if G3 reads the turn as a second
+  move, the shot splits there as S11A on "into" (36.80), joined by C; the average would fall to 3.25 s, so L4 and L5
+  then share one shot (S4, the mug popping in its frame, no push) to bring it back to 3.52 s.
 
 **Hard in a 2D layered engine**
 - **The nested pull-back and the dive back (S6, S7):** each scale is a layer with the next drawn inside it at matched
