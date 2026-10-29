@@ -531,6 +531,15 @@ Maintenance at the end).
   tweaks is a process failure. — ("yes good, but we spent the entire day tweaking the style that is frankly barely
   noticeable like we focus all our attention on details and missed the forest for the trees ... rethink how you would
   construct the scene from ground up", on the look test v1, 2026-10-29).
+- **Two modes: PRODUCTION and ITERATION.** Production is a film going through the gates (G0-G8): full checks, review
+  panels, QA suites, fix passes, as the quality needs. Iteration is a quick experiment for the owner to judge (a look
+  test, a rethought scene, a style probe, a "what if"): one or two agents, no panels, no critics, no QA suites, rough
+  where rough is enough (a still, a few stages, a short clip), the result in about an hour and shown at once; the
+  owner's verdict is the review. Ask "is this a film or a question?" before planning: a question is an iteration, and
+  only what the owner picks from it goes into production (then with the full gates). The no-limit rule on creative
+  tokens is about quality in production; in iteration, speed of feedback is the quality. — ("So like we have the
+  'production' process and we have 'iteration' process that needs to be more lightweight", 2026-10-29, after a day-long
+  look test with lanes, panels and fix passes that the owner judged in one glance).
 - **Every lesson goes into the generic process, committed** (playbook, a PIPELINE gate, the studio toolkit). — ("we gradually get better", v3, 2026-10-26).
 - **A rejected cut restarts clean.** When the owner says "I don't like it, start from scratch", drop the old visual
   work (archive it), skip the gates the owner names (e.g. no sketch) and make the finished film directly with full
