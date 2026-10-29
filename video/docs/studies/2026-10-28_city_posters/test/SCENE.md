@@ -1,10 +1,12 @@
 # The look test's scene lane (S): v2's S1 copied, the darks, the far stage, the switches
 
 *Lane S of the 7 s look test (`STUDY.md` §10: items 5 and 7, the S1 copy and the switches; item 11, the integration and
-the clip). 2026-10-29. Items (1)-(4) done 09:04 UTC; the integration of lanes E, PT and N done 09:50 UTC (§7); the
-clip, the A/B sheet and the QA: `REPORT.md` (its "Next step" line is the live state). Scratch work in `/tmp/posters-s/`
-only (an early tool of mine in the shared scratchpad, `tools/pxdiff.py`, is the one that replaced lane E's: every proof
-below was re-run from my own folder).*
+the clip). 2026-10-29. Items (1)-(4) done 09:04 UTC; the integration of lanes E, PT and N done 09:50 UTC, its fixes
+through 13:53 (§7); the clip `deliverables/tests/poster_look_test_v1.mp4`, the A/B sheet `ab_switches.jpg` and the QA:
+`REPORT.md` (done 13:58 UTC). Scratch work in `/tmp/posters-s/` only (tools in `/tmp/posters-s/tools/`: `s_pxdiff.py`,
+`s_audio.sh`, `s_capcheck.sh`, `s_rungs.py`, `s_absheet.py`, `s_rowtable.py`, `s_edgetrack.py`; node harnesses in
+`/tmp/posters-s/harness/`; an early tool of mine in the shared scratchpad, `tools/pxdiff.py`, is the one that replaced
+lane E's: every proof below was re-run from my own folder).*
 
 ## 1. What it is
 - **The copy:** `video/src/look/poster_s1/` holds v2's S1 tree (`src/v2r/scenes/V2S1*`, 18 files; not `V2S1_public.tsx`,
@@ -29,6 +31,7 @@ below was re-run from my own folder).*
 | `PosterS1-v2` | every switch off: v2's S1 plus the hold |
 | `PosterS1-pass1` | STUDY §10's pass 1 as written on 2026-10-28: the near group in mid-tones (`nearMid` alone), the mottle from 3.5 s, Pip hidden, the float by 1/z, v2's line |
 | `PosterS1-pass2` | every switch on (since 2026-10-29 every one is decided, 10b's palette aside: a proposal) |
+| `PosterLookTest` | THE clip for the owner's phone (15.5 s, 930 frames): a card "Before: the Google video", v2's S1 (6.1 s, preset v2), a card "After: the poster lessons", pass 2 (7.0 s); v2's voice and captions in both parts (`PosterLookTest.tsx`; the master and its QA: `REPORT.md`) |
 
 ```bash
 E=--entry=src/entry-look-poster.tsx
@@ -55,6 +58,7 @@ A render takes ~1 s a frame at full size; the bundle 2-6 s.
 | `paving` | (optional) the patchwork's setting: 'calm' (default, decided), 'mid' (PT's 3 tones at 4.5, 1.2 m) or 'busy' (the first pass) | lib/patchwork (PT) | built | `V2S1_patch.tsx` |
 | `textureK` | (optional) a multiplier on every plane's mottle strength (A/Bs; 0.0001 = the filter with no visible mottle: the filter-only test of §7) | lib/texture (PT) | built | `engine.tsx` |
 | `windStill` | (optional) the wind held still (lib/wind `STILL_WIND`): the crown and the spray ride the float only (the QA's twinkle test) | lib/wind (N) | built | `V2S1_nature.tsx` |
+| `nudge` | (QA only) [dx, dy] added to the near plane's float offset: lane N's strict twinkle test (a held frame moved by pure sub-pixel steps) | the scene (S) | built | `V2S1_float.tsx` |
 | `sunToned` | the sun one flat step off its sky (decision 6 b): the disc mixed toward the sky round its cap until dE76 18 (under tier A's separation), frame 0's half-coloured disc in the same toned colour | the scene (S) | built | `V2S1_set_far.tsx` sunToned |
 | `pipHidden` | a quiet "find Pip" (decision 5 b): Pip sits INSIDE the bay tree on our bank (seat 184, 1446; 100 px, nearer than the bollard so never smaller per metre), between the crown's back and front lobes: its head and ears among the leaves, its body behind the front lobe; >= 250 px from her and off her eye path; the same beats (drawn with the flood, ears-cover on "life", sits at 5.55); the empty bollard stays (a dark piece under `darks`) | the scene (S) | built | `V2S1_pip.tsx` S1PipInTree; `V2S1_fore.tsx` |
 | `float1z` | the float by 1/z: E's `PARALLAX_Z` (-2 1, -1 0.8, 0 0.6, +1 0.24, +2 0.10, +3 0.04, +4 and the stage 0) in every plane group and in the water's reflections | lib/depth (E) | wired | `engine.tsx` applyFloat; `V2S1_float.tsx`; `V2S1_water.tsx` |
@@ -185,12 +189,16 @@ design, so 11 of 16 cells is the most S1 can hold.
   cream dots). Under `foliage` they drift inside the crown's shaded right side (ellipse (262, 1326) 46 x 34, `on` its
   core tone '#375C53'), a light tint over it; `particleProblems` `[]`, traced: they stay inside (x 229-303).
 - **Proofs:** every switch off against `Film2R-V2S1` (09:01's frames from v2's own entry) at 0 / 1.0 / 3.0 / 5.2 s after
-  the integration: **0 px** (09:49 UTC). The unmottled pass 2 renders byte-identical in two runs (determinism).
+  the integration: **0 px** (09:49 UTC; again at 12:47 and 13:53 after every later change). The unmottled pass 2 renders byte-identical in two runs (determinism).
   `npx tsc --noEmit` clean. No library added (lib/texture.tsx, lib/foliage.tsx, lib/wind.ts, lib/clouds.tsx unchanged:
   the fixes are all in this folder).
-- **Open flags:** E's 10b `waterDeep` dE 15 from her teal (she stands on the towpath in S1); the roof terrace's dark
-  planters close under the band (y 604-650); the crown is calm (N's own note: local contrast 2.45 against the posters'
-  6.7-12.6).
+- **v2's crescent on the bay** (the texture-only A/B found it): with the crown in the near group's `under`, v2's
+  crescent `FormShade` on it (in the mottled NearForm) painted its tint solid: a white blob. It is drawn in the near
+  group's `over` now (`S1ForeNearOver`, nothing the group draws after it overlaps the crown: 0 px against v2).
+- **Open flags** (the owner's, `REPORT.md` §5): the copies' row without outlines separates by a median 7.9 L* at 5.2 s
+  (>= 15; v2 13.0 with its line); the calm paving's edge-free fields (18.8 % below the sky); 10b's chroma spread and
+  warm-lit share; the open sky 2 points smaller; E's 10b `waterDeep` dE 15 from her teal; the roof terrace's dark planters
+  close under the band (y 604-650); the crown is calm (N's own note: local contrast 2.45 against the posters' 6.7-12.6).
 - **Libraries** (the owner: only when genuinely better): none needed. The far stage is a level pinhole (five formulas
   next to lib/persp's homographies), the darks are drawing, the switches React props; nothing was installed and
   `package.json` is unchanged.
