@@ -29,6 +29,9 @@ PAL = {
     'peri_mid_dk': '#9296EC',  # the same on dark
     'terra_lite': '#EE8F66',   # the lit top of the ledge
     'sky': '#F9E3D2',        # the warm sky behind the peeking Pip
+    'plum_lit': '#433152',   # round 3: the lit face of the plum fold
+    'peach_fold': '#F3C4A6',  # the shade face of the cream fold
+    'teal_deep': '#0A5D53',  # the shade face of the teal fold
 }
 
 # ---------------------------------------------------------------- fonts
