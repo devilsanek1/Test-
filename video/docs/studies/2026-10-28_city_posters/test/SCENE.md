@@ -52,8 +52,9 @@ A render takes ~1 s a frame at full size; the bundle 2-6 s.
 | `foliage` | the planter's tree as ONE species, a young London plane (N's crown geometry in N's one wind: foot (126, 1530), 300 px tall, 372 wide; Pip inside it under `pipHidden`), and the top-left twig as a spray of its own leaves (N's S1 spray), in ONE wind (`S1_WIND`: a light westerly, one gust at 2.6 s) | lib/foliage + lib/wind (N) | wired, rendered | `V2S1_nature.tsx`; `engine.tsx` TreeSlot, SpraySlot; `V2S1_fore.tsx` PlanterTree; `V2S1_set.tsx` |
 | `cloud` | N's hero cumulus in v2's hero-cloud spot (x 598-1028, base y 272: above the band over its 3 px/s drift), the kit's two clouds gone (the thin bar's 9 px/s is over N7's 2-6) | lib/clouds (N) | wired, rendered | `V2S1_nature.tsx` S1Cloud; `engine.tsx` CloudSlot; `V2S1_set.tsx` S1SkyThings |
 | `texture` | the VERY subtle mottle per plane (true, or a number: on from that second): PT's `<Mottle>` in each plane group (`S1PlaneStack` layers), `mottleK` per plane (the sky 0.6 at blotch scale 0.9, the far stage 0.4 on the sky's seed, +3/+4 0.4, the rest 0.7), `mottleSeed(plane)`, the float offset passed (the band stays screen-locked). NOT mottled (§7): the spray, the tree and Pip, the boats and the duck, the bridge, particles; the cross-plane shadows sit outside the filter | lib/texture (PT) | wired, rendered | `engine.tsx` TextureSlot; `V2S1_float.tsx` S1PlaneStack; `V2S1.tsx` (the sky); `V2S1_set.tsx` |
-| `paving` | (optional) the patchwork's setting: 'calm' (default, decided) or 'busy' | lib/patchwork (PT) | built | `V2S1_patch.tsx` |
+| `paving` | (optional) the patchwork's setting: 'calm' (default, decided), 'mid' (PT's 3 tones at 4.5, 1.2 m) or 'busy' (the first pass) | lib/patchwork (PT) | built | `V2S1_patch.tsx` |
 | `textureK` | (optional) a multiplier on every plane's mottle strength (A/Bs; 0.0001 = the filter with no visible mottle: the filter-only test of §7) | lib/texture (PT) | built | `engine.tsx` |
+| `windStill` | (optional) the wind held still (lib/wind `STILL_WIND`): the crown and the spray ride the float only (the QA's twinkle test) | lib/wind (N) | built | `V2S1_nature.tsx` |
 | `sunToned` | the sun one flat step off its sky (decision 6 b): the disc mixed toward the sky round its cap until dE76 18 (under tier A's separation), frame 0's half-coloured disc in the same toned colour | the scene (S) | built | `V2S1_set_far.tsx` sunToned |
 | `pipHidden` | a quiet "find Pip" (decision 5 b): Pip sits INSIDE the bay tree on our bank (seat 184, 1446; 100 px, nearer than the bollard so never smaller per metre), between the crown's back and front lobes: its head and ears among the leaves, its body behind the front lobe; >= 250 px from her and off her eye path; the same beats (drawn with the flood, ears-cover on "life", sits at 5.55); the empty bollard stays (a dark piece under `darks`) | the scene (S) | built | `V2S1_pip.tsx` S1PipInTree; `V2S1_fore.tsx` |
 | `float1z` | the float by 1/z: E's `PARALLAX_Z` (-2 1, -1 0.8, 0 0.6, +1 0.24, +2 0.10, +3 0.04, +4 and the stage 0) in every plane group and in the water's reflections | lib/depth (E) | wired | `engine.tsx` applyFloat; `V2S1_float.tsx`; `V2S1_water.tsx` |
@@ -175,7 +176,14 @@ design, so 11 of 16 cells is the most S1 can hold.
   its tones given explicitly (lib/clouds' own defaults from the sky at its centre) so its geometry cache keys on the
   palette (the cache ignores a function's body). bbox 575-1043 x 111-272. `cloudProblems` `[]`.
 - **The paving:** judged at phone size (390 px wide) against PT's first setting: the first read as a chequer over the
-  whole bank, the calm one as paving. Decided: calm (`PAVING.calm`).
+  whole bank, the calm one as paving. Decided: calm (`PAVING.calm`). Its cost on the study's fields measure (pro_4,
+  3.0 s): edge-free fields below the sky 18.8 % (busy 13.8, PT's middle 3-tone setting 16.5, v2 15.2; target 0): the
+  4.5 L* facet steps sit under the field detector's edge threshold. `paving: 'mid'` is the in-between (by eye close to
+  calm).
+- **The near motes** (V2S1_particles): v2's field sat on the bay crown's shade (`on` '#A5AD9A', L* ~70); N's crown is
+  narrower and darker, so the field straddled its edge and the paving and the motes read +50 L* over the leaves (bright
+  cream dots). Under `foliage` they drift inside the crown's shaded right side (ellipse (262, 1326) 46 x 34, `on` its
+  core tone '#375C53'), a light tint over it; `particleProblems` `[]`, traced: they stay inside (x 229-303).
 - **Proofs:** every switch off against `Film2R-V2S1` (09:01's frames from v2's own entry) at 0 / 1.0 / 3.0 / 5.2 s after
   the integration: **0 px** (09:49 UTC). The unmottled pass 2 renders byte-identical in two runs (determinism).
   `npx tsc --noEmit` clean. No library added (lib/texture.tsx, lib/foliage.tsx, lib/wind.ts, lib/clouds.tsx unchanged:

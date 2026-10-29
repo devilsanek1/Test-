@@ -3,10 +3,11 @@
 *Lane S, 2026-10-29. Integration of lanes E, PT and N into S1's copy (notes: `SCENE.md` §7), one playable clip for the
 owner's phone, one A/B sheet, the QA. Live document: written as each render and check lands.*
 
-**Next step (13:20 UTC):** done: the clip, framecheck, the after row (`after_row.json`, §5), check_depth, check_light.
-Next: capcheck (`/tmp/posters-s/tools/s_capcheck.sh`), the twinkle window (pass 2 f120-179 as PNG), the two 7 s texture
-masters (pass 2 with and without the mottle) for `check_banding --texture --hold`, the rungs
-(`/tmp/posters-s/tools/s_rungs.py <deliverable> /tmp/posters-s/s_win /tmp/posters-s/s_after /tmp/posters-s/rungs`).
+**Next step (13:40 UTC):** the master is re-rendering (`/tmp/posters-s/master/render2.log`) after one fix found by the
+twinkle check: the near motes (bright cream dots over lane N's darker crown: `SCENE.md` §7). Then, on the new master,
+again: the audio mux (`/tmp/posters-s/tools/s_audio.sh <master> deliverables/tests/poster_look_test_v1.mp4`),
+framecheck, capcheck, the after stills (lit and `lightOff`) with the after row, check_depth and check_light, the two 7 s
+texture masters for `check_banding --texture --hold`, the twinkle windows and the rungs (`s_rungs.py`).
 
 ## 1. The clip
 - **File:** `video/deliverables/tests/poster_look_test_v1.mp4`, 8.86 MB, 15.500 s, 930 frames, 1080 x 1920, 60 fps.

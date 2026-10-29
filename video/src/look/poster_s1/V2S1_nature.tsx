@@ -16,7 +16,8 @@ import {Tier} from '../../lib/tier';
 import {useTime} from '../../lib/time';
 import {skyColorAt} from '../../lib/sky';
 import {crownGeometry, foliageProblems, LeafSpray, LONDON_PLANE, sprayGeometry, type ClusterGeom, type CrownSpec, type Layer, type LeafSpraySpec} from '../../lib/foliage';
-import {clusterShift, crownDeg, makeWind, windProblems} from '../../lib/wind';
+import {clusterShift, crownDeg, makeWind, STILL_WIND, windProblems} from '../../lib/wind';
+import {useSwitches} from './switches';
 import {cloudProblems, cloudTones, Cumulus, cumulusGeometry, type CumulusSpec} from '../../lib/clouds';
 import {CM} from '../../v2r/palette';
 import {s1Sky} from './V2S1_sky';
@@ -26,6 +27,8 @@ export const S1_KEY = {kind: 'sun', toward: 15, el: 36} as const;
 
 /** ONE wind for the shot (lane N's recipe, ENGINE_NATURE.md §6). */
 export const S1_WIND = makeWind({seed: 'S1', dir: 0, gusts: [{t: 2.6}], joins: [6.1]});
+/** The wind in effect: S1's, or held still under the `windStill` sub-switch (the QA's twinkle test). */
+const useS1Wind = () => (useSwitches().windStill ? STILL_WIND : S1_WIND);
 
 // ---------------------------------------------------------------- the tree (the planter's, near plane)
 
@@ -62,12 +65,13 @@ const Layers: React.FC<{layers: Layer[]; seed: string}> = ({layers, seed}) => (
  *  Pip sways with the crown and the front leaves cover its body. Tier A scope (`exact`: the ladder's tones kept). */
 export const S1Tree: React.FC<{pip?: React.ReactNode; over?: number}> = ({pip, over = S1_PIP_IN_CROWN.over}) => {
   const t = useTime();
+  const wind = useS1Wind();
   const spec = s1TreeSpec();
   const g = crownGeometry(spec);
   const plane = spec.plane ?? -1;
-  const deg = crownDeg(S1_WIND, t, {x: g.centre[0], y: g.centre[1], plane, seed: spec.seed});
+  const deg = crownDeg(wind, t, {x: g.centre[0], y: g.centre[1], plane, seed: spec.seed});
   const cluster = (c: ClusterGeom) => {
-    const [dx, dy] = clusterShift(S1_WIND, t, {x: c.c[0], y: c.c[1], plane, seed: spec.seed, i: c.id});
+    const [dx, dy] = clusterShift(wind, t, {x: c.c[0], y: c.c[1], plane, seed: spec.seed, i: c.id});
     return (
       <g key={c.id} transform={`translate(${dx.toFixed(3)} ${dy.toFixed(3)})`}>
         <Layers layers={c.layers} seed={`crown/${spec.seed}/${c.id}`} />
@@ -103,7 +107,7 @@ export const s1SpraySpec = (): LeafSpraySpec => ({
   species: {...LONDON_PLANE, green: CM.sage},
 });
 
-export const S1Spray: React.FC = () => <LeafSpray spec={s1SpraySpec()} wind={S1_WIND} />;
+export const S1Spray: React.FC = () => <LeafSpray spec={s1SpraySpec()} wind={useS1Wind()} />;
 
 // ---------------------------------------------------------------- the hero cumulus (the sky, no float)
 

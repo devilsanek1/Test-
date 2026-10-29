@@ -50,6 +50,9 @@ export type PosterSwitches = {
   paving?: 'calm' | 'mid' | 'busy';
   /** Part of `texture`: a multiplier on every plane's mottle strength (default 1 = lib/texture's mottleK; for A/Bs). */
   textureK?: number;
+  /** Part of `foliage`: the wind held still (lib/wind STILL_WIND: the crown and the spray only ride the float; the
+   *  twinkle test of the QA). */
+  windStill?: boolean;
 };
 
 /** v2's S1 as shipped: every switch off. */
@@ -98,7 +101,7 @@ export const PRESETS: Record<PosterPreset, PosterSwitches> = {
 export function resolveSwitches(p: Partial<PosterSwitches> & {preset?: PosterPreset}): PosterSwitches {
   const base = PRESETS[p.preset ?? 'v2'] ?? V2_SWITCHES;
   const out: PosterSwitches = {...base};
-  for (const k of [...Object.keys(V2_SWITCHES), 'nearMid', 'paving', 'textureK'] as (keyof PosterSwitches)[]) {
+  for (const k of [...Object.keys(V2_SWITCHES), 'nearMid', 'paving', 'textureK', 'windStill'] as (keyof PosterSwitches)[]) {
     const v = p[k];
     if (v !== undefined && v !== null) (out as Record<string, unknown>)[k] = v;
   }

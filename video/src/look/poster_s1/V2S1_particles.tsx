@@ -7,6 +7,7 @@ import {CAPTION_BAND, Particles, type ParticlesProps} from '../../lib/particles'
 import {CM} from '../../v2r/palette';
 import * as MAP from '../../v2r/world/map';
 import {S1Plane, S1_PLANE} from './V2S1_float';
+import {useSwitches} from './switches';
 
 /** THE PARTICLES, SEEN at phone size (the owner on v4, 2026-10-28: "I don't see any changes in the particles anywhere";
  *  CRAFT §f.6, lib/particles' presets): calm tier-C life a viewer can point at in a 360 px wide frame. Nothing is born
@@ -50,9 +51,20 @@ export const S1_PARTICLE_FIELDS: {plane: number; f: ParticlesProps}[] = [
 /** The fields' particles alive at most at once (the water's slivers come on top: waterProblems' otherAlive). */
 export const S1_PARTICLES_ALIVE = 10;
 
+/** (the look test's foliage) The near motes drift past the shaded side of lane N's London plane instead of v2's bay
+ *  crown: v2's field sat on the bay's shade (L* ~70, '#A5AD9A'); N's crown is narrower and darker, so that ellipse
+ *  straddled its edge and the paving and the motes (a light tint over `on`) read +50 L* over the leaves. Here: inside
+ *  the crown's shaded right side (93 % its core tone '#375C53', L* 36: measured on pass 2 at 3.0 s), clear of Pip's seat
+ *  (178, 1412), a light tint over that tone. */
+const NEAR_MOTES_N = {region: {ellipse: {cx: 262, cy: 1326, rx: 46, ry: 34}}, on: '#375C53'} as const;
+export function s1ParticleFields(foliage: boolean): {plane: number; f: ParticlesProps}[] {
+  if (!foliage) return S1_PARTICLE_FIELDS;
+  return S1_PARTICLE_FIELDS.map((q) => (q.f.seed === 's1motesNear101' ? {plane: q.plane, f: {...q.f, ...NEAR_MOTES_N}} : q));
+}
+
 export const S1Particles: React.FC = () => (
   <>
-    {S1_PARTICLE_FIELDS.map(({plane, f}) => (
+    {s1ParticleFields(useSwitches().foliage).map(({plane, f}) => (
       // (the look test: a particle is a mover, not a surface: never mottled, and its own small group stays unfiltered)
       <S1Plane key={f.seed} plane={plane} texture={false}>
         <Particles {...f} />
