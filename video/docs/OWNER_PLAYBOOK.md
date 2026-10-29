@@ -595,6 +595,13 @@ Maintenance at the end).
   into; drifting toward the reference's style reads cheap. — ("I don’t like this we are going away in style i think
   it’s too cheap looking ... So I think our initial angle snd the view frankly wasn’t bad", on the scene-1 still v2,
   2026-10-29).
+- **Research the recipe before building a look element.** When a reference shows a look we can't yet make (a painted
+  sky, layered clouds, water, foliage), first study it closely (crops, measured values, palette, edges, stroke sizes,
+  layer order, softness by depth) and research how professional painters do it, then write a CONCRETE, numbered recipe
+  per element and prove it on a swatch beside the reference; only then build it into the engine and the scene. Never
+  iterate a scene blind on a vague brief. The recipes live in `docs/look/PAINT_RECIPES.md` (+ `docs/look/paint_recipes/`).
+  — ("Why can’t you do the research yourself and come up with a concrete detailed recipes to reproduce certain
+  elements? Seems like you should be able to really clearly define a recipe", 2026-10-29, after four painted stills).
 - **Two modes: PRODUCTION and ITERATION.** Production is a film going through the gates (G0-G8): full checks, review
   panels, QA suites, fix passes, as the quality needs. Iteration is a quick experiment for the owner to judge (a look
   test, a rethought scene, a style probe, a "what if"): one or two agents, no panels, no critics, no QA suites, rough
