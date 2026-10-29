@@ -92,6 +92,16 @@ export type PenConfig = {
   emissive: Set<string>;
   /** Corner radius of a clean rect() outline: min(max, k * min(w, h)) (hidden under the line: the fill stays square). */
   corner: {k: number; max: number};
+  /** THE TIER-A LINE FLAG (CRAFT §c "Edges, not outlines", owner 2026-10-29: STUDY.md §9 decision 1 (c)). true (the
+   *  default: every film before the look test) = the tiers' lines as above. false = the no-outline look: no tier draws
+   *  an outline or an edge stroke (the subject's contour, B's same-hue line round the mascot and in `lines` scopes,
+   *  untagged lines all off): an edge is a value step (lib/light FormShade per tier makes it); only strokes that ARE
+   *  the thing (`thing`: glazing bars, railings, wires), light lines and graphic marks still draw. */
+  outlines: boolean;
+  /** Thin lines on planes that float (CRAFT §c, owner 2026-10-29): every tier line, `thing` stroke and light line at
+   *  least this screen width (px; graphic marks keep theirs). 0 (the default) = the tiers' own widths, as before; a
+   *  film whose planes float sets 2. */
+  lineMin: number;
 };
 
 export const PEN: PenConfig = {
@@ -106,6 +116,8 @@ export const PEN: PenConfig = {
   graphic: 6,
   emissive: new Set<string>(),
   corner: {k: 0.04, max: 3},
+  outlines: true,
+  lineMin: 0,
 };
 
 /** True when the clean pen is on (read at call / render time). */
@@ -117,6 +129,10 @@ export type SetPenOpts = {
   bg?: string;
   emissive?: string[];
   tiers?: Partial<Record<Tier, Partial<TierSpec>>>;
+  /** The tier-A line flag (PenConfig.outlines): false = the no-outline look. */
+  outlines?: boolean;
+  /** PenConfig.lineMin: 2 for a film whose planes float. */
+  lineMin?: number;
 };
 
 /** Switch the pen for this bundle: call once, at module load, before the first frame renders (a film's look module). */
@@ -127,7 +143,14 @@ export function setPen(mode: PenMode, o: SetPenOpts = {}) {
   if (o.bg) PEN.bg = o.bg;
   if (o.emissive) PEN.emissive = new Set(o.emissive.map((c) => c.toUpperCase()));
   if (o.tiers) for (const k of Object.keys(o.tiers) as Tier[]) PEN.tiers[k] = {...PEN.tiers[k], ...o.tiers[k]};
+  if (o.outlines !== undefined) PEN.outlines = o.outlines;
+  if (o.lineMin !== undefined) PEN.lineMin = Math.max(0, o.lineMin);
   COLOR_CACHE.clear();
+}
+
+/** The tier-A line flag on its own (PenConfig.outlines), for a film's look module after setPen: false = no outlines. */
+export function setOutlines(on: boolean) {
+  PEN.outlines = on;
 }
 
 /** The lower (less prominent) of two tiers. */
@@ -237,12 +260,14 @@ export function tierLineColor(tier: Tier, tone?: string): {color: string; alpha:
 export function tierWidth(screenW: number, tier: Tier): number {
   if (screenW >= PEN.graphic) return screenW;
   const s = PEN.tiers[tier];
-  return Math.min(s.max, Math.max(s.min, screenW * s.k));
+  const w = Math.min(s.max, Math.max(s.min, screenW * s.k));
+  return PEN.lineMin > 0 ? Math.max(PEN.lineMin, w) : w;
 }
 
 /** Clean screen width of a LIGHT line (glint, snow edge, rim, a steam wisp) on a tier: a hairline on every tier
  *  (CRAFT §c: 1.2-1.8 px). */
 export function tierLightWidth(screenW: number, tier: Tier): number {
   const s = PEN.tiers[tier];
-  return Math.min(1.8, Math.max(1.2, screenW * s.k));
+  const w = Math.min(1.8, Math.max(1.2, screenW * s.k));
+  return PEN.lineMin > 0 ? Math.max(PEN.lineMin, w) : w;
 }

@@ -146,6 +146,9 @@ export type CleanLine = {
 /** The tier, line flags and tone in effect for a scope (null = untagged). */
 export function scopeLine(scope: TierScope | null): {tier: Tier; tone?: string; contours: boolean; strokes: boolean} {
   const tier = scope?.tier ?? PEN.untagged;
+  // the tier-A line flag off (lib/pen PenConfig.outlines): no tier draws an outline or an edge stroke; things, light
+  // lines and graphic marks still draw (Ink and useTierLine keep those whatever this says)
+  if (!PEN.outlines) return {tier, tone: scope?.tone, contours: false, strokes: false};
   const spec = PEN.tiers[tier];
   const lines = scope ? scope.lines : PEN.untaggedLines;
   return {tier, tone: scope?.tone, contours: spec.contours || !!lines, strokes: spec.strokes || !!lines};

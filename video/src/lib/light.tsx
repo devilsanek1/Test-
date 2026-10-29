@@ -38,6 +38,8 @@ import {getInputProps} from 'remotion';
 import {getBoundingBox} from '@remotion/paths';
 import {Fill} from './Fill';
 import {ExitFade, exitFillProgress, Look, useExit, useLook} from './exit';
+import type {Tier} from './pen';
+import {useTierHere} from './tier';
 import {useTime} from './time';
 import {mat, useXf, XG} from './xf';
 
@@ -283,11 +285,69 @@ export type LightRig = {
   windowOff?: string;
   /** Default form shade: fraction of the object's extent (0.25-0.4) and, for a backlit key, 'down' (tops lit). */
   form: {frac: number; backlit?: boolean};
+  /** Opt-in, the form step per attention tier (CRAFT §d.3, owner 2026-10-29: the subject's shade face -20 to -25 L*, B's
+   *  and C's -7 to -12): the tint family's BASE (the colour `tints` were mixed from: tintFamily(base, ...)) ... */
+  shadeBase?: string;
+  /** ... and the form strength of that base per tier (TIER_FORM_K). FormShade / Shade then take the strength of their
+   *  tier (their `tier` prop, else the tier scope they sit in). Absent (every rig before the look test) = `tints.form`. */
+  tierForm?: Partial<Record<Tier, number>>;
   /** Penumbra widths (px): contact, cast [base, tip], a hole's soft edge, the lamp wash. */
   soft: {contact: number; cast: [number, number]; hole: number; wash: number};
   /** A lamp's lit wash on the wall (the room's falloff: the one lit zone above the desk). */
   wash?: Ellipse;
 };
+
+/** The A vs B picture's form strengths (`scripts/look/posters/ab_outlines/scene.py`: B, the posters' way, form 0.56; A,
+ *  v2's TINT_CANAL, form 0.20), of ONE tint family, by attention tier: the subject's shade face one deep flat step
+ *  (CM.shadeWarm at 0.56, measured: stucco -27, paving -26, brickLight -22, brick -18, the hero teal -17 L*; CRAFT §d.3
+ *  asks -20 to -25 on the subject's main surfaces: tune it per film with `tierFormFor`), B and C at v2's strength (0.20:
+ *  stucco -10, brick -6). A warm base greys cool surfaces (glass, water: C* -> 2-5) and a cool one warm surfaces: give
+ *  those objects their family's base (`base`; `familyFor`). */
+export const TIER_FORM_K: Record<Tier, number> = {subject: 0.56, support: 0.2, environment: 0.2};
+/** Undersides (an eave, a sill, a hull's overhang) one notch deeper for the subject (scene.py's B: under 0.66). */
+export const TIER_UNDER_K: Record<Tier, number> = {subject: 0.66, support: 0.2, environment: 0.2};
+
+/** A copy of a rig with the form step per tier: `base` = its tint family's base (the hue every shadow takes, e.g.
+ *  CM.shadeWarm), `k` per tier over TIER_FORM_K. */
+export const withTierForm = (rig: LightRig, base: string, k: Partial<Record<Tier, number>> = {}): LightRig => ({...rig, shadeBase: base, tierForm: {...TIER_FORM_K, ...k}});
+
+/** The multiply tint a FormShade / Shade paints: an explicit `strength` of the base (`base`, else rig.shadeBase) > an
+ *  explicit `tint` (a rig tint name or a hex) > the strength for `tier` (rig.tierForm; TIER_FORM_K when only a base is
+ *  known) of the base > rig.tints.form (as before). */
+export function formTint(rig: LightRig, o: {tier?: Tier; strength?: number; tint?: keyof Tints | string; base?: string} = {}): string {
+  const base = o.base ?? rig.shadeBase;
+  if (o.strength !== undefined && base) return step(base, Math.max(0, Math.min(1, o.strength)));
+  if (o.tint !== undefined) return o.tint in rig.tints ? rig.tints[o.tint as keyof Tints] : o.tint;
+  const table = rig.tierForm ?? (base ? TIER_FORM_K : undefined);
+  const k = o.tier && table ? table[o.tier] : undefined;
+  if (k !== undefined && base) return step(base, Math.max(0, Math.min(1, k)));
+  return rig.tints.form;
+}
+
+/** The shade family for a surface (CRAFT §d.3: warm surfaces turn toward rose or plum, cool ones toward violet): `warm`
+ *  for a warm hue (h < 110 or > 330, or nearly grey), else `cool`. */
+export function familyFor(surface: string, warm: string, cool: string): string {
+  const {C, h} = lch(surface);
+  return C < 4 || h < 110 || h > 330 ? warm : cool;
+}
+
+/** dL* a form strength `k` of `base` gives on `surface` (the browser's multiply: lit face -> shade face). */
+export const formStepOf = (surface: string, base: string, k: number): number => lch(multiply(surface, step(base, k))).L - lch(surface).L;
+
+/** The strength k (0..1) of `base` whose multiply turns `surface` `dL` L* darker (dL < 0; bisection): the subject's main
+ *  surface at CRAFT §d.3's -22, e.g. tierFormFor(CM.stucco, CM.shadeWarm, -22). Returns 1 when even the full base is not
+ *  that deep. */
+export function tierFormFor(surface: string, base: string, dL: number): number {
+  if (formStepOf(surface, base, 1) > dL) return 1;
+  let lo = 0;
+  let hi = 1;
+  for (let i = 0; i < 30; i++) {
+    const m = (lo + hi) / 2;
+    if (formStepOf(surface, base, m) > dL) lo = m;
+    else hi = m;
+  }
+  return (lo + hi) / 2;
+}
 
 /** A sun with an azimuth and an elevation (CRAFT §d.1): `toward` = the SCREEN direction its shadows fall on the ground
  *  (0 right, 90 toward us, 180 left, 270 away), `el` = elevation (deg; shadow length h / tan(el), capped by `rig.cap`:
@@ -770,15 +830,23 @@ export type FormShadeProps = {
   dir?: number;
   tint?: keyof Tints | string;
   at?: At;
+  /** Opt-in: the object's attention tier, for a rig with `tierForm` (default: the tier scope it sits in). */
+  tier?: Tier;
+  /** Opt-in: an explicit strength (0..1) of the rig's shade base (rig.shadeBase): wins over `tint` and `tier`. */
+  strength?: number;
+  /** Opt-in: this object's shade family base (the cool family on a cool surface: `familyFor`), instead of rig.shadeBase. */
+  base?: string;
 };
 
 /** The form shadow (CRAFT §d.4): one flat step (multiply `form`, dL -7..-12) on the side AWAY from the key, 25-40 %
  *  of the object's extent, hard-edged, no ink on the boundary; round things get a crescent. Lit : shade ~3 : 1. Give it
- *  to every object in a lit zone (objects in the ambient get only their contact shadow). */
-export const FormShade: React.FC<FormShadeProps> = ({of, d, c: cIn, size, frac, kind = 'band', dir, tint, at}) => {
+ *  to every object in a lit zone (objects in the ambient get only their contact shadow). Per tier (opt-in, CRAFT §d.3):
+ *  under a rig with `tierForm` (withTierForm) the step is its tier's (`tier`, else the scope's): the subject -20 to -25. */
+export const FormShade: React.FC<FormShadeProps> = ({of, d, c: cIn, size, frac, kind = 'band', dir, tint, at, tier, strength, base}) => {
   const rig = useRig();
   const off = useOff();
   const t = useTime();
+  const here = useTierHere();
   const id = 'lfs' + uid(useId());
   const bb = d ? pathBox(d) : null;
   const c: Pt = cIn ?? (bb ? [bb.x + bb.w / 2, bb.y + bb.h / 2] : [0, 0]);
@@ -790,7 +858,7 @@ export const FormShade: React.FC<FormShadeProps> = ({of, d, c: cIn, size, frac, 
   const lv = lightDir(rig, c);
   const v: Pt = dir !== undefined ? deg(dir) : rig.form.backlit ? [0, 1] : kind === 'band' ? [lv[0] < 0 ? -1 : 1, 0] : lv;
   const f = frac ?? rig.form.frac;
-  const color = tintOf(rig, tint, 'form');
+  const color = strength !== undefined || tier !== undefined || rig.tierForm ? formTint(rig, {tier: tier ?? here, strength, tint, base}) : tintOf(rig, tint, 'form');
   // extent of the object along v (its bbox projected), so `frac` is a share of what you see
   const ext = Math.abs(v[0]) * w + Math.abs(v[1]) * h;
   let inner: React.ReactNode;
@@ -835,13 +903,15 @@ export const FormShade: React.FC<FormShadeProps> = ({of, d, c: cIn, size, frac, 
 };
 
 /** A whole plane in shade (one step): a building's side away from the key, the window reveal facing away from the lamp,
- *  an underside, the eave's strip (tint 'cast'). Multiply. */
-export const Shade: React.FC<{d?: string; of?: React.ReactNode; tint?: keyof Tints | string; at?: At; exit?: boolean}> = ({d, of, tint, at, exit}) => {
+ *  an underside, the eave's strip (tint 'cast'). Multiply. Per tier (opt-in): as FormShade (`tier`, `strength`; an
+ *  underside of the subject: strength TIER_UNDER_K.subject). */
+export const Shade: React.FC<{d?: string; of?: React.ReactNode; tint?: keyof Tints | string; at?: At; exit?: boolean; tier?: Tier; strength?: number; base?: string}> = ({d, of, tint, at, exit, tier, strength, base}) => {
   const rig = useRig();
   const off = useOff();
+  const here = useTierHere();
   const id = 'lsd' + uid(useId());
   if (off || (!d && !of)) return null;
-  const color = tintOf(rig, tint, 'form');
+  const color = strength !== undefined || tier !== undefined || rig.tierForm ? formTint(rig, {tier: tier ?? here, strength, tint, base}) : tintOf(rig, tint, 'form');
   if (d && !of) {
     return (
       <Multiply>

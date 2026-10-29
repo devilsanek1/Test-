@@ -1,0 +1,233 @@
+// V2S1 world (lane L1): the shared helpers of the S1 world parts (V2S1_set*.tsx). Two jobs the kit's Paint can't do:
+//   CellPaint  a Batch painted with its fills SPLIT BY REGION (cells of `cell` px, by each shape's bbox centre), so the
+//              Look cascade (the flood out of SUN0, V2S1_clock FLOOD) colours a big piece region by region, "shape by
+//              shape", instead of one colour of the whole set at once. All regions of one (layer, colour) share ONE
+//              misregistration offset, so strips of one wall never open seams.
+//   Under      RETIRED (2026-10-27, DIRECTION rule 9): the old bare-ink f0 underdrawing. Frame 0 is now the clean pen's
+//              PALE shapes (V2S1_clock S1_F0) with only the subject's outline drawing on; `Under` is a sink that keeps
+//              nothing, left only so the builders that made their f0 lines inline with their fills still compile.
+// Plus small drawing helpers: thin bars as FILLS (a thin coloured element is a thin fill, never a coloured line).
+// Every line here is CM.ink: the clean pen sets its width and colour by the tier in scope (C draws none).
+import React, {useMemo} from 'react';
+import {Fill, bbox} from '../../lib/Fill';
+import {Ink, parseInk} from '../../lib/Ink';
+import {ease} from '../../lib/time';
+import {Look} from '../../lib/exit';
+import {rng} from '../../lib/rng';
+import {CM} from '../../v2r/palette';
+import {Batch, P, Pt} from '../../v2r/kit/canal/core';
+import {atmos, makeAtmosphere, planePalette} from '../../lib/depth';
+import {S1_AIR} from '../../v2r/world/skies';
+
+export type {Pt};
+
+/** One fill misregistration (2-4 px in a seeded direction) for an object part: STYLE "fills 2-5 px off the line". */
+export function offsetFor(seed: string, k = 1): [number, number] {
+  const r = rng(`s1off/${seed}`);
+  const a = r.range(0, Math.PI * 2);
+  const m = r.range(2, 3.6) * k;
+  return [Math.cos(a) * m, Math.sin(a) * m * 0.8];
+}
+
+/** Tier C's iron and frames (window frames, railings, lamp posts, bollards, aerials, far panes): a MID slate, half way
+ *  from the slate to the stone shade (L* ~63), so thin dark bars never read as lines in the calm world (CRAFT §b-§c). */
+export const S1_IRON = '#939AAD';
+
+/** THE HAZE (atmospheric perspective in flat colour): the sky's lowest colour under the sun (world/skies S1_AIR =
+ *  lib/sky horizonColor(S1_EVENING, SUN0.x)), so the far city's air agrees with the sky (CRAFT §f.1, §g.3): every far
+ *  plane recedes toward it, lighter and lower in chroma than the warm wing. */
+export const S1_HAZE: string = S1_AIR;
+/** S1's ONE atmosphere (lib/depth): the air = the sky's lowest step; the far city starts at +3 behind the pale wing
+ *  (DEPTH.md "Learned"), its steps stronger than PLANE_STEPS on +3 / +4 (0.66 / 0.90, v1-like: its far city dE 7.2 from the air; a far colour across from the warm air
+ *  turns up to 30 deg toward it) so the ladder falls toward the air (check_depth v2_s1). */
+export const S1_ATM = makeAtmosphere({name: 'v2 S1 canal evening', air: S1_HAZE, steps: [0, 0.12, 0.22, 0.66, 0.9], hueTurn: 30});
+
+/** Recede a batch's fills toward the haze, layer by layer (`ks[i]` for layer i; the last k for any further layer):
+ *  lib/depth `atmos` (CRAFT §f.2: L* toward the air's, a hue on the air's side converging on it, one across from it
+ *  keeping its hue at a lower chroma, never grey or olive); its ink dropped: a far plane is simpler, no lines. */
+export function hazeBatch(b: Batch, ks: number[], haze = S1_HAZE, o: {planes?: number[]} = {}): Batch {
+  b.layers.forEach((l, i) => {
+    const k = ks[Math.min(i, ks.length - 1)];
+    // with `planes`: the layer's materials receded to that plane AND merged to its few close values (lib/depth
+    // planePalette: +3 three values within dE 12, +4 two within 5): a far row is a calm band, never busy
+    const plane = o.planes ? o.planes[Math.min(i, o.planes.length - 1)] : null;
+    const pal = plane !== null ? planePalette(Array.from(l.fills.keys()), plane, S1_ATM) : null;
+    const fills = new Map<string, string[]>();
+    l.fills.forEach((ds, c) => {
+      const m = pal ? pal[c] ?? atmos(c, k, haze) : atmos(c, k, haze);
+      const a = fills.get(m);
+      if (a) a.push(...ds);
+      else fills.set(m, [...ds]);
+    });
+    l.fills = fills;
+    l.inks = new Map();
+  });
+  return b;
+}
+
+// ---------------------------------------------------------------- CellPaint
+
+type Group = {key: string; color: string; d: string; off: [number, number] | false};
+type InkG = {key: string; w: number; color: string; open: number; d: string};
+type Split = {fills: Group[]; inks: InkG[]}[];
+
+const centreCache = new Map<string, [number, number]>();
+function centreOf(d: string): [number, number] {
+  let c = centreCache.get(d);
+  if (!c) {
+    const b = bbox(d);
+    c = [b.x + b.w / 2, b.y + b.h / 2];
+    if (centreCache.size > 60000) centreCache.clear();
+    centreCache.set(d, c);
+  }
+  return c;
+}
+
+function split(b: Batch, cell: number, seed: string, misreg: number): Split {
+  return b.layers.map((l, i) => {
+    const fills: Group[] = [];
+    l.fills.forEach((parts, color) => {
+      const off: [number, number] | false = misreg > 0 ? offsetFor(`${seed}/${i}/${color}`, misreg) : false;
+      const cells = new Map<string, string[]>();
+      for (const d of parts) {
+        const [cx, cy] = centreOf(d);
+        const k = `${Math.floor(cx / cell)},${Math.floor(cy / cell)}`;
+        const a = cells.get(k);
+        if (a) a.push(d);
+        else cells.set(k, [d]);
+      }
+      cells.forEach((ds, k) => fills.push({key: `f${i}|${color}|${k}`, color, d: ds.join(''), off}));
+    });
+    const inks: InkG[] = [];
+    l.inks.forEach((run, k) => inks.push({key: `i${i}|${k}`, w: run.w, color: run.color, open: run.open, d: run.parts.join('')}));
+    return {fills, inks};
+  });
+}
+
+export type CellPaintProps = {
+  b: Batch;
+  seed: string;
+  /** Region size (px): a shape floods when the front reaches its region's bbox centre. */
+  cell?: number;
+  /** Misregistration scale (0 = exact registration: tiny things). */
+  misreg?: number;
+  /** true: the batch is rebuilt every frame (moving / switching things): skip the memo. */
+  live?: boolean;
+  /** The lines draw on from `at` over `dur` (frame 0's subject outlines): every part at once, or with `tip` as ONE
+   *  moving pen per ink run (the runs one after another, each its share of the time by its longest stroke; a run's
+   *  strokes together, e.g. the two leaves), a pen tip of that radius (x the line width) on each head (REVIEW_1 MUST 2). */
+  draw?: {at: number; dur: number; tip?: number};
+  /** Fill colours that skip the Look cascade: shown in their own colour at once, pale state or not (W's plum pane from
+   *  the lamp click, so "W goes dark" reads before the flood: REVIEW_1 MUST 2). */
+  full?: readonly string[];
+};
+
+/** A cascade that has already passed every point: full colour. */
+const NO_CASCADE = {at: -1e9, origin: [0, 0] as [number, number]};
+
+/** One-pen windows [start, dur] per ink run of a split batch (weights: each run's longest stroke). */
+function penRuns(s: ReturnType<typeof split>, at: number, dur: number): Map<string, [number, number]> {
+  const runs = s.flatMap((l) => l.inks.map((g) => ({key: g.key, w: parseInk(g.d).maxLen})));
+  const total = runs.reduce((a, r) => a + r.w, 0) || 1;
+  const out = new Map<string, [number, number]>();
+  let acc = 0;
+  for (const r of runs) {
+    out.set(r.key, [at + (dur * acc) / total, Math.max(1e-3, (dur * r.w) / total)]);
+    acc += r.w;
+  }
+  return out;
+}
+
+/** Renders a Batch: per layer, its fills split by region (one <Fill> per colour per cell), then its inks. */
+export const CellPaint: React.FC<CellPaintProps> = ({b, seed, cell = 120, misreg = 1, live = false, draw, full}) => {
+  const memo = useMemo(() => (live ? null : split(b, cell, seed, misreg)), [live ? null : b, cell, seed, misreg, live]);
+  const s = memo ?? split(b, cell, seed, misreg);
+  const pen = draw?.tip !== undefined ? penRuns(s, draw.at, draw.dur) : null;
+  return (
+    <>
+      {s.map((l, i) => (
+        <React.Fragment key={i}>
+          {l.fills.map((g) =>
+            full?.includes(g.color) ? (
+              <Look key={g.key} cascade={NO_CASCADE}>
+                <Fill d={g.d} color={g.color} offset={g.off} seed={`${seed}/${g.key}`} />
+              </Look>
+            ) : (
+              <Fill key={g.key} d={g.d} color={g.color} offset={g.off} seed={`${seed}/${g.key}`} />
+            ),
+          )}
+          {l.inks.map((g) => (
+            <Ink key={g.key} d={g.d} width={g.w} color={CM.ink} open={g.open} seed={`${seed}/${g.key}`} {...(pen ? {at: pen.get(g.key)![0], dur: pen.get(g.key)![1], order: 'all' as const, pace: 'free' as const, ease: ease.linear, tip: draw!.tip} : draw ? {at: draw.at, dur: draw.dur, order: 'all' as const, pace: 'free' as const} : {})} />
+          ))}
+        </React.Fragment>
+      ))}
+    </>
+  );
+};
+
+// ---------------------------------------------------------------- the retired frame-0 underdrawing
+
+/** RETIRED: keeps nothing (see the header). */
+export class Under {
+  add(_x: number, _y: number, _d: string, _w = 1.6): this {
+    return this;
+  }
+}
+
+// ---------------------------------------------------------------- small fill helpers
+
+/** A thin bar from a to b, `w` px wide, as a closed FILL path (railing bars, aerials, glazing bars, wires far away). */
+export function barPath(a: Pt, b: Pt, w: number): string {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const L = Math.hypot(dx, dy) || 1;
+  const nx = (-dy / L) * (w / 2);
+  const ny = (dx / L) * (w / 2);
+  return `M${P(a[0] + nx, a[1] + ny)}L${P(b[0] + nx, b[1] + ny)}L${P(b[0] - nx, b[1] - ny)}L${P(a[0] - nx, a[1] - ny)}Z`;
+}
+
+/** A filled annulus-ish ellipse ring (outer minus inner, even-odd is not available in a Batch: two crescents). */
+export function ringPath(cx: number, cy: number, rx: number, ry: number, t: number): string {
+  // the ring as a closed band drawn with two arcs out and two arcs back (a "C" shape on each side, joined)
+  const ix = Math.max(0.5, rx - t);
+  const iy = Math.max(0.3, ry - t * (ry / rx));
+  return (
+    `M${P(cx - rx, cy)}A${rx.toFixed(1)} ${ry.toFixed(1)} 0 0 1 ${P(cx + rx, cy)}L${P(cx + ix, cy)}A${ix.toFixed(1)} ${iy.toFixed(1)} 0 0 0 ${P(cx - ix, cy)}Z` +
+    `M${P(cx - rx, cy)}A${rx.toFixed(1)} ${ry.toFixed(1)} 0 0 0 ${P(cx + rx, cy)}L${P(cx + ix, cy)}A${ix.toFixed(1)} ${iy.toFixed(1)} 0 0 1 ${P(cx - ix, cy)}Z`
+  );
+}
+
+/** A palmate plane-tree leaf (5 pointed lobes, a petiole) as a closed path: base at (x, y), main lobe toward `deg`,
+ *  size R (base to the main tip). Returns {d, ribs} (ribs = the midrib + two veins, for ink). */
+export function planeLeaf(x: number, y: number, R: number, deg: number, seed: string): {d: string; ribs: string; tip: Pt} {
+  const r = rng(`pleaf/${seed}`);
+  const a0 = (deg * Math.PI) / 180;
+  // lobes: angle offset (rad) and length (x R); sinuses between at ~0.42 R
+  const lobes: [number, number][] = [
+    [-1.75, 0.42],
+    [-0.95, 0.82],
+    [0, 1],
+    [0.95, 0.82],
+    [1.75, 0.42],
+  ];
+  const cx = x + Math.cos(a0) * R * 0.32;
+  const cy = y + Math.sin(a0) * R * 0.32;
+  const pts: Pt[] = [];
+  const at = (a: number, L: number): Pt => [cx + Math.cos(a0 + a) * R * L, cy + Math.sin(a0 + a) * R * L];
+  pts.push([x, y]);
+  lobes.forEach(([a, L], i) => {
+    const jl = L * r.range(0.92, 1.08);
+    if (i > 0) pts.push(at((lobes[i - 1][0] + a) / 2 + r.jitter(0.05), 0.44 * r.range(0.9, 1.1)));
+    // a lobe: a shoulder, the tip, a shoulder
+    pts.push(at(a - 0.2, jl * 0.72));
+    pts.push(at(a + r.jitter(0.04), jl));
+    pts.push(at(a + 0.2, jl * 0.72));
+  });
+  pts.push([x, y]);
+  let d = `M${P(pts[0][0], pts[0][1])}`;
+  for (let i = 1; i < pts.length; i++) d += `L${P(pts[i][0], pts[i][1])}`;
+  d += 'Z';
+  const tip = at(0, 1);
+  const ribs = `M${P(x, y)}L${P(tip[0] * 0.9 + x * 0.1, tip[1] * 0.9 + y * 0.1)}M${P(cx, cy)}L${P(...at(-0.95, 0.66))}M${P(cx, cy)}L${P(...at(0.95, 0.66))}`;
+  return {d, ribs, tip};
+}

@@ -241,14 +241,29 @@ export function nearStep(color: string, plane: number, atm?: Atmosphere, o?: Nea
 export const NEAR_FLOOR_L = [60, 55] as const;
 
 /** A near plane's whole palette with ONE step (`nearStep` with its absolute floor): the plane's reference value is the
- *  median L* of `colors` (or `o.ref`), so the plane lands at `o.maxL` (default NEAR_FLOOR_L by plane) with every internal
- *  step kept (a dark that hits `o.minL` stops there). Returns source -> the colour to draw, like `planePalette`. */
-export function nearPalette(colors: string[], plane: number, atm?: Atmosphere, o: NearStepOpts = {}): Record<string, string> {
-  const src = Array.from(new Set(colors.filter(isHex)));
+ *  median L* of `colors` (weighted when an entry is [colour, its area share]; or `o.ref`), so the plane lands at
+ *  `o.maxL` (default NEAR_FLOOR_L by plane) with every internal step kept (a dark that hits `o.minL` stops there).
+ *  Returns source -> the colour to draw, like `planePalette`. */
+export function nearPalette(colors: readonly (string | readonly [string, number])[], plane: number, atm?: Atmosphere, o: NearStepOpts = {}): Record<string, string> {
+  const w = new Map<string, number>();
+  for (const e of colors) {
+    const [c, a] = typeof e === 'string' ? [e, 1] : [e[0], e[1]];
+    if (isHex(c) && a > 0) w.set(c, (w.get(c) ?? 0) + a);
+  }
+  const src = Array.from(w.keys());
   const out: Record<string, string> = {};
   if (!src.length) return out;
-  const Ls = src.map((c) => lab(c)[0]).sort((a, b) => a - b);
-  const mid = Ls.length % 2 ? Ls[(Ls.length - 1) / 2] : (Ls[Ls.length / 2 - 1] + Ls[Ls.length / 2]) / 2;
+  const byL = src.map((c) => ({L: lab(c)[0], a: w.get(c) ?? 1})).sort((x, y) => x.L - y.L);
+  const total = byL.reduce((s, x) => s + x.a, 0);
+  let acc = 0;
+  let mid = byL[byL.length - 1].L;
+  for (const x of byL) {
+    acc += x.a;
+    if (acc >= total / 2 - 1e-9) {
+      mid = x.L;
+      break;
+    }
+  }
   const maxL = o.maxL ?? (plane < 0 ? NEAR_FLOOR_L[Math.min(NEAR_FLOOR_L.length - 1, Math.max(0, Math.round(-plane) - 1))] : undefined);
   for (const c of src) out[c] = nearStep(c, plane, atm, {maxL, minL: o.minL, ref: o.ref ?? mid});
   return out;
@@ -364,6 +379,130 @@ export function seamTone(color: string, dL = 7): string {
     return fromLch(clamp(c.L - dL, 0, 100), c.C * 1.05, c.h);
   });
 }
+
+// ================================================================= the far anchor: something WAY further out (P1 §3.2)
+
+export type AnchorTones = {
+  /** The air it sits in (the atmosphere's air behind its plane, or the hex given). */
+  air: string;
+  plane: number;
+  /** Its step toward the air (plane +4: 0.65; the ghost +5: 0.87). */
+  k: number;
+  /** The mass: ONE flat value at k toward the air, C* = the air's +-4 (never under 8 unless the air is greyer), its hue the
+   *  air's or turned toward the rig's cool shade (`shade`, <= `hueTurn`), dE 4-16 from the air (as the ghost <= 6). */
+  body: string;
+  /** Its lit facet (a ridge's lit side, a tower's lit face): `litStep` L* toward the light (default +4). */
+  lit: string;
+  /** Its pale foot (the bottom 10-15 % of its height): one flat step nearer the air (k + `footK`, default 0.12), >= 5 L*
+   *  toward the air's value: the mist line that detaches the far group. */
+  foot: string;
+  /** The ghost behind it (+5, k 0.87): within dE 6 of the air (the anchor's own ghost when plane < 5). */
+  ghost: string;
+  /** Tone-on-tone detail on the body (strata, snow, a far tower's windows): `toneOnTone(body)`, never a dark speck. */
+  detail: string;
+  /** dE76 of each to the air. */
+  dE: {body: number; lit: number; foot: number; ghost: number};
+  /** Spec misses (empty = OK): the dE band, the C* band, the foot step, the near range (with `nearRange`). */
+  problems: string[];
+};
+
+export type AnchorOpts = {
+  /** The anchor's material before the air (a ridge's stone, a far skyline's brick). Default: the air's own hue 30 L*
+   *  under it (the hero group's value: P1 §3.1's >= 30 L* near-to-air span). */
+  source?: string;
+  /** The rig's cool shade (e.g. CM.shadeCool): the hue the anchor may lean toward (P1 §3.2: up to ~45 deg). */
+  shade?: string;
+  /** Degrees the hue turns from the air's toward `shade` (default 30 with a shade, 0 without; at most 45). */
+  hueTurn?: number;
+  /** Override the step toward the air (default: the plane's, from the atmosphere or PLANE_STEPS_GHOST). */
+  k?: number;
+  /** The lit facet's step, L* (default 4). */
+  litStep?: number;
+  /** The foot's extra step toward the air (default 0.12; P1: 0.10-0.15). */
+  footK?: number;
+  /** The near group's L* range (p5-p95) in the shot: the anchor's range must be <= 0.4x it. */
+  nearRange?: number;
+};
+
+/** The far scale anchor's tones (P1 §3.2: the posters' one pale, wide, simple shape on the horizon, 6 of 7): `air` is the
+ *  set's atmosphere (its air behind `plane`) or a hex; `plane` 4 (k 0.65, with a +5 ghost behind) or 5 (the ghost as
+ *  the anchor). Three values at most (body, lit, foot) plus its ghost; real detail only tone-on-tone. Pure and cached;
+ *  the silhouette is drawn per film from the story's own place (a ridge, a far skyline with one landmark, gasholders),
+ *  tier C, no line (rule 4). */
+export function anchorTones(air: string | Atmosphere, plane = 4, o: AnchorOpts = {}): AnchorTones {
+  const atm = typeof air === 'string' ? null : air;
+  const airHex = atm ? atm.air(plane) : (air as string);
+  const fallback = {air: airHex, plane, k: 0, body: airHex, lit: airHex, foot: airHex, ghost: airHex, detail: airHex, dE: {body: 0, lit: 0, foot: 0, ghost: 0}};
+  if (!isHex(airHex)) return {...fallback, problems: ['anchorTones: the air is not a hex colour']};
+  const ghostOnly = plane >= GHOST_PLANE;
+  const kPlane = atm ? planeK(atm, plane) : planeK(makeAtmosphere({name: 'anchor', air: airHex, steps: PLANE_STEPS_GHOST}), plane);
+  const k = clamp(o.k ?? (ghostOnly ? Math.max(kPlane, GHOST_K) : kPlane), 0, 0.98);
+  const A = lch(airHex);
+  const src = isHex(o.source) ? lch(o.source) : {L: clamp(A.L - 30, 5, 95), C: A.C, h: A.h};
+  const dir = src.L <= A.L ? 1 : -1; // +1: the air is lighter than the source (day), so "toward the air" is lighter
+  // C* = the air's +-4, never under 8 unless +4 cannot reach it
+  const cLo = Math.max(A.C - 4, Math.min(8, A.C + 4));
+  const cHi = A.C + 4;
+  const chromaAt = (kk: number) => clamp(src.C * (1 - 0.8 * kk) + (A.C - src.C * (1 - 0.8 * kk)) * kk, cLo, cHi);
+  const turnMax = clamp(o.hueTurn ?? (o.shade ? 30 : 0), 0, 45);
+  const dTurn = isHex(o.shade) ? hueTurnTo(A.h, lch(o.shade).h) : 0;
+  const hueAt = (share: number) => (A.h + Math.sign(dTurn) * Math.min(Math.abs(dTurn), turnMax) * share + 360) % 360;
+  const Lat = (kk: number) => A.L + (src.L - A.L) * (1 - kk);
+  return cachedAnchor(`${airHex}|${plane}|${k.toFixed(4)}|${o.source ?? ''}|${o.shade ?? ''}|${turnMax}|${o.litStep ?? 4}|${o.footK ?? 0.12}|${o.nearRange ?? ''}`, () => {
+    const band: [number, number] = ghostOnly ? [2, 6] : [4, 16];
+    // the body: L* from k; then into the dE band (toward the air first by value, then by a smaller hue turn)
+    let L = Lat(k);
+    let share = 1;
+    let body = fromLch(L, chromaAt(k), hueAt(share));
+    for (let i = 0; i < 80 && dE76(body, airHex) > band[1]; i++) {
+      if (Math.abs(L - A.L) > 2) L += dir * 0.5;
+      else share = Math.max(0, share - 0.1);
+      body = fromLch(L, chromaAt(k), hueAt(share));
+    }
+    for (let i = 0; i < 80 && dE76(body, airHex) < band[0]; i++) {
+      L -= dir * 0.5;
+      body = fromLch(L, chromaAt(k), hueAt(share));
+    }
+    const lit = fromLch(clamp(L + (o.litStep ?? 4), 0, 99), chromaAt(k), hueAt(share));
+    // the foot: one flat step nearer the air, >= 5 L* toward its value (never past it)
+    const kf = Math.min(0.98, k + (o.footK ?? 0.12));
+    let Lf = Lat(kf);
+    if (ghostOnly) Lf = (L + A.L) / 2; // the ghost as the anchor: no room for a 5 L* foot; half-way to the air
+    else if (dir * (Lf - L) < 5) Lf = L + dir * 5;
+    if (dir * (Lf - A.L) > 0) Lf = A.L - dir * 1;
+    const foot = fromLch(Lf, chromaAt(kf), hueAt(share * 0.5));
+    // the ghost: k 0.87 (or one step past the anchor when it is the ghost), within dE 6 of the air
+    const kg = Math.max(GHOST_K, Math.min(0.98, k + 0.15));
+    let Lg = Lat(kg);
+    const hg = hueAt(share * 0.5);
+    let ghost = fromLch(Lg, chromaAt(kg), hg);
+    for (let i = 0; i < 40 && dE76(ghost, airHex) > 6; i++) {
+      Lg += dir * 0.5;
+      ghost = fromLch(Lg, chromaAt(kg), i < 20 ? hg : A.h);
+    }
+    const dE = {body: dE76(body, airHex), lit: dE76(lit, airHex), foot: dE76(foot, airHex), ghost: dE76(ghost, airHex)};
+    const problems: string[] = [];
+    if (dE.body < band[0] - 0.05 || dE.body > band[1] + 0.05) problems.push(`anchor body dE ${dE.body.toFixed(1)} from its air (want ${band[0]}-${band[1]})`);
+    const bC = lch(body).C;
+    if (bC < cLo - 0.6 || bC > cHi + 0.6) problems.push(`anchor body C* ${bC.toFixed(1)} (want the air's ${A.C.toFixed(1)} +-4, >= 8)`);
+    if (!ghostOnly && dir * (lch(foot).L - lch(body).L) < 4.5) problems.push(`anchor foot only ${(lch(foot).L - lch(body).L).toFixed(1)} L* toward the air (want >= 5)`);
+    if (dE.ghost > 6.05) problems.push(`ghost dE ${dE.ghost.toFixed(1)} from its air (want <= 6)`);
+    const range = Math.max(lch(body).L, lch(lit).L, lch(foot).L) - Math.min(lch(body).L, lch(lit).L, lch(foot).L);
+    if (o.nearRange !== undefined && range > 0.4 * o.nearRange + 0.05) problems.push(`anchor L* range ${range.toFixed(1)} > 0.4x the near group's ${o.nearRange.toFixed(1)}`);
+    return {air: airHex, plane, k, body, lit, foot, ghost, detail: toneOnTone(body, {dE: 4}), dE, problems};
+  });
+}
+
+const ANCHOR_CACHE = new Map<string, AnchorTones>();
+const cachedAnchor = (key: string, make: () => AnchorTones): AnchorTones => {
+  let v = ANCHOR_CACHE.get(key);
+  if (!v) {
+    v = make();
+    if (ANCHOR_CACHE.size > 500) ANCHOR_CACHE.clear();
+    ANCHOR_CACHE.set(key, v);
+  }
+  return v;
+};
 
 // ================================================================= separation (CRAFT §f.3)
 
@@ -741,9 +880,33 @@ export const PARALLAX_K: Record<number, number> = {[-2]: 1, [-1]: 0.85, 0: 0.6, 
 /** The sky's (and the caption band's) plane: fixed, it never floats. */
 export const PARALLAX_SKY = Infinity;
 
-/** The float share of a plane (0 for the sky). */
-export function parallaxK(plane: number): number {
+/** The float shares by 1/z (city-poster study, 2026-10-29: `pro_1_depth.md` §3.4, `perspective.md` L5; STUDY §7: "1/z
+ *  from the shot's camera; P1's table when W1 declares no units"): a plane's share is its size's share, the law of its
+ *  drawn size and of CineCamera (f = 1 - depth): each plane ~2.5x farther (planeLod's ratio), so the subject's plane
+ *  0.6, +1 0.24, +2 0.10, +3 0.04, the far anchor (+4), the ghost (+5) and the sky 0; the near group (-2 the frame, -1
+ *  its far edge 0.8) moves most and separates by value (COZY_AND_SCALE §4). Neighbours from 0 on sit 2.4-2.5x apart
+ *  (§4 asks >= 1.8x; PARALLAX_K's +1 / +2 were 1.2-1.4x: mid planes slid like cards). Opt-in: pass it to
+ *  `parallaxK` / `parallaxOffset`; PARALLAX_K stays their default (the shipped films' floats). */
+export const PARALLAX_Z: Record<number, number> = {[-2]: 1, [-1]: 0.8, 0: 0.6, 1: 0.24, 2: 0.1, 3: 0.04, 4: 0, 5: 0};
+
+/** A share table's value at `plane`: linear between its integer keys, clamped to its ends. */
+function shareIn(table: Readonly<Record<number, number>>, plane: number): number {
+  const keys = Object.keys(table).map(Number).filter(Number.isFinite).sort((a, b) => a - b);
+  if (!keys.length) return 0;
+  if (plane <= keys[0]) return table[keys[0]];
+  if (plane >= keys[keys.length - 1]) return table[keys[keys.length - 1]];
+  let i = 0;
+  while (i < keys.length - 2 && keys[i + 1] <= plane) i++;
+  const a = keys[i];
+  const b = keys[i + 1];
+  return table[a] + (table[b] - table[a]) * ((plane - a) / (b - a));
+}
+
+/** The float share of a plane (0 for the sky). `table` (opt-in) = another share table, e.g. PARALLAX_Z (1/z); default
+ *  PARALLAX_K, exactly as before. */
+export function parallaxK(plane: number, table?: Readonly<Record<number, number>>): number {
   if (!Number.isFinite(plane)) return 0;
+  if (table && table !== PARALLAX_K) return shareIn(table, plane);
   const p = clamp(plane, -2, 4);
   const i = Math.floor(p);
   const a = PARALLAX_K[i];
@@ -752,11 +915,39 @@ export function parallaxK(plane: number): number {
 }
 
 /** A plane's offset (px) under a camera float (the near ground's offset): float x its share. Deterministic, opt-in: a
- *  scene that never calls it never moves. Use sub-pixel values (no rounding: 3b.5). */
-export const parallaxOffset = (float: Pt, plane: number): Pt => {
-  const k = parallaxK(plane);
+ *  scene that never calls it never moves. Use sub-pixel values (no rounding: 3b.5). `table`: as `parallaxK`. */
+export const parallaxOffset = (float: Pt, plane: number, table?: Readonly<Record<number, number>>): Pt => {
+  const k = parallaxK(plane, table);
   return [float[0] * k, float[1] * k];
 };
+
+/** A plane's share from the shot's camera (PE L5: "k = the plane's px per metre / the near frame's"): a thing `z` metres
+ *  away against the near frame at `zNear` (groundCam's scale is f / z, so the share is zNear / z), clamped to 0..1. A far
+ *  landmark that is the subject moves by its own distance, never by its plane index. */
+export const parallaxByDepth = (z: number, zNear: number): number => (z > 0 && zNear > 0 ? clamp(zNear / z, 0, 1) : 0);
+
+/** The same from measured sizes: the plane's px per metre against the near frame's (W1's unit sizes, or
+ *  `groundCam(...).pxPerM(baseY)` of each), clamped to 0..1. */
+export const parallaxByScale = (pxPerM: number, nearPxPerM: number): number => (pxPerM > 0 && nearPxPerM > 0 ? clamp(pxPerM / nearPxPerM, 0, 1) : 0);
+
+/** The float's plane lint (COZY_AND_SCALE §4, P1 §3.5): from the subject's plane (0) outward, each moving plane's share
+ *  >= `minRatio` (default 1.8) times the next farther moving one (planes that do not move, share 0, are the still
+ *  backdrop: the anchor, the ghost, the sky). The near group (< 0) separates by value and is left out. `planes`: the
+ *  shot's planes, or [plane, share] pairs (measured shares: `parallaxByDepth`); `table`: as `parallaxK`. Empty = OK. */
+export function parallaxProblems(planes: readonly (number | readonly [number, number])[], o: {table?: Readonly<Record<number, number>>; minRatio?: number} = {}): string[] {
+  const min = o.minRatio ?? 1.8;
+  const rows = planes
+    .map((p) => (typeof p === 'number' ? ([p, parallaxK(p, o.table)] as const) : ([p[0], p[1]] as const)))
+    .filter(([p, k]) => p >= 0 && k > 1e-6)
+    .sort((a, b) => a[0] - b[0]);
+  const out: string[] = [];
+  for (let i = 1; i < rows.length; i++) {
+    const [pa, ka] = rows[i - 1];
+    const [pb, kb] = rows[i];
+    if (ka / kb < min - 1e-9) out.push(`float: plane ${pa >= 0 ? '+' : ''}${pa} (share ${ka.toFixed(3)}) and plane +${pb} (${kb.toFixed(3)}) are ${(ka / kb).toFixed(2)}x apart (>= ${min}x: neighbours slide like cards)`);
+  }
+  return out;
+}
 
 /** One leg of a float: from the previous leg's end (or home) at t0 to `to` (near-ground px from home) at t1. */
 export type FloatLeg = {t0: number; t1: number; to: Pt};
@@ -782,9 +973,13 @@ export function floatAt(t: number, legs: readonly FloatLeg[], ease = 0.25): Pt {
 }
 
 /** The float's lints (3b.5): the net offset within `maxOffset` of home (default 12), the peak path speed <= `maxSpeed`
- *  px/s (default 10; 3b.5 allows 25 at the peak, the owner's cozy holds ~10), home at every `rest` time. */
-export function floatProblems(legs: readonly FloatLeg[], o: {rest?: number[]; maxOffset?: number; maxSpeed?: number; ease?: number; fps?: number} = {}): string[] {
-  const out: string[] = [];
+ *  px/s (default 10; 3b.5 allows 25 at the peak, the owner's cozy holds ~10), home at every `rest` time. Opt-in:
+ *  `planes` (+ `table`, `minRatio`) adds `parallaxProblems` (the shot's planes' shares >= 1.8x apart). */
+export function floatProblems(
+  legs: readonly FloatLeg[],
+  o: {rest?: number[]; maxOffset?: number; maxSpeed?: number; ease?: number; fps?: number; planes?: readonly (number | readonly [number, number])[]; table?: Readonly<Record<number, number>>; minRatio?: number} = {},
+): string[] {
+  const out: string[] = o.planes ? parallaxProblems(o.planes, {table: o.table, minRatio: o.minRatio}) : [];
   const maxO = o.maxOffset ?? 12;
   const maxV = o.maxSpeed ?? 10;
   const fps = o.fps ?? 60;
