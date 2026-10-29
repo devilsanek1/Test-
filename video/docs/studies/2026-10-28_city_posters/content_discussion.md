@@ -1,10 +1,10 @@
 # Content discussion: which stories fit the city-poster style
 
-**State (2026-10-29 ~07:50 UTC): A FRONT-RUNNER.** The owner liked Helsinki heating homes with AI chips, IceCube,
-and a "weirdest places data centres are built" story; asked what the London drone story has beyond its title.
-Exchange 8 sent: Helsinki and the weird places as ONE story on one thread (the heat), IceCube's arc, an honest answer
-on the drones (mostly one beat: park it), and two questions: take the heat story to the fact lock? who makes it (v4's
-session or a new one)? Picks below are leanings, not locks.
+**State (2026-10-29 ~08:05 UTC): RANKED; RECOMMENDED: the heat story.** Five candidates ranked on the owner's six
+criteria plus WOW and depth (story past the title), shown unweighted (`discussion_scouts/final_chart.png`, data
+`final_scores.json`): 1 the heat story 8.3; 2 London's drones 8.1 (depth 4: parked); 3 Chiricahua 7.9; 4 MMX 7.9;
+5 IceCube 7.7 (WOW 8, depth 7: the best runner-up, peg 10 Dec). Waiting on the owner's pick and on who produces it
+(v4's session or a new one); then one fact lock.
 
 Notes: `content_market.md` and `content_fit.md` (the orchestrator's content track, scoped to tech and AI) are folded in
 below; their final versions (pulled ~22:20 UTC) changed nothing here. `content_fit.md`'s best kinds already include two
@@ -270,6 +270,25 @@ keeps people watching past its title; a "top 3" carried on one thread). -> excha
 - **The drones, honestly:** beyond the title: 2.1 km that took a van 30+ minutes now takes 2-4; bone-marrow samples for
   children's leukaemia among them; robot dogs carry them from the pad; a Massachusetts town voted 510-13 against drones
   for toothpaste. Mostly one beat, and a faster test is not a faster cure: park it.
+
+**The owner's reaction:** ~08:00 UTC, verbatim: "1 and 4 from the other thread are interesting too / Can you take these
+candidates and rank them to pick the best" (read as `journals/clusters.md` section 6, ideas 1 and 4: Japan's MMX probe
+to Phobos; Chiricahua, a volcano's stone forest, the newest US national park). -> exchange 9.
+
+### 9. ~08:05 UTC: the five ranked (sent)
+Our scores (est.), one scale for all five; WOW and depth (what keeps people watching past the title: the owner's
+2026-10-29 rule) shown but not weighted:
+
+| # | Candidate | R | T | V | M | F | S | Score | WOW | Depth | Verdict |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | Where do you put a machine this hot? (Helsinki's AI heat + the weird places) | 8 | 8 | 9 | 9 | 8 | 8 | 8.33 | 8 | 9 | PICK: five beats, a twist (orbit overheats), a positive payoff |
+| 2 | London's hospitals fly blood samples by drone | 7 | 8 | 9 | 9 | 9 | 7 | 8.10 | 7 | 4 | park: one beat |
+| 3 | A volcano's stone forest becomes America's newest national park | 5 | 9 | 10 | 9 | 9 | 6 | 7.90 | 6 | 5 | the most beautiful, but a postcard risk and no tech |
+| 4 | Japan's MMX probe to bring back soil from a moon of Mars | 6 | 9 | 9 | 8 | 9 | 6 | 7.86 | 7 | 6 | a good space film; weak "so what" |
+| 5 | IceCube, a telescope made of South Pole ice, wins the Nobel | 6 | 9 | 9 | 8 | 7 | 7 | 7.71 | 8 | 7 | runner-up: its turn (it looks down through the Earth to see the sky, to check); peg 10 Dec |
+
+Re-scored by this thread (the drones' R and S lowered for little buzz; the journal thread's WOW scale differs from
+ours). Every fact is still search-level: the pick gets one fact lock.
 
 **The owner's reaction:** (waiting)
 
