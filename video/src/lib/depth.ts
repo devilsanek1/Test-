@@ -117,6 +117,14 @@ export function atmos(color: string, k: number, air: string, o: AtmosOpts = {}):
 export const PLANE_STEPS = [0, 0.12, 0.22, 0.4, 0.65] as const;
 /** The foreground's value steps, planes -1 ... -4: L* darker than the subject's plane, cumulative (COZY_AND_SCALE §4). */
 export const NEAR_STEPS = [5, 10, 13, 14] as const;
+/** The ghost plane (+5): the ladder's next doubling, k 0.87 (Gurney's atmospheric ladder; the posters' ghost planes sit
+ *  at k 0.89-0.92: `pro_1_depth.md` §3.1). A pale far shape within dE 6 of its air, <= 6 L*, 2 values, flat facets, no
+ *  line: the "something WAY further out", behind the far anchor (+4) or as the anchor itself. */
+export const GHOST_PLANE = 5;
+export const GHOST_K = 0.87;
+/** PLANE_STEPS with the +5 ghost step (opt-in: makeAtmosphere({..., steps: PLANE_STEPS_GHOST})). Planes 0 ... +4 are
+ *  PLANE_STEPS's own; without it plane +5 takes +4's 0.65, as before. */
+export const PLANE_STEPS_GHOST = [...PLANE_STEPS, GHOST_K] as const;
 
 /** The near group's value target in ABSOLUTE terms (city-poster study, 2026-10-29: `pro_1_depth.md` §3.1, `perspective.md`
  *  L1: the near frame's median L* 45-60, >= 30 from the air; v2 S1's near treads sat at L* 75, LIGHTER than its subject).
@@ -182,18 +190,68 @@ export function planeK(atm: Atmosphere, plane: number, tier?: Tier): number {
   return tier === 'subject' ? k * 0.5 : k;
 }
 
+/** `nearStep`'s absolute floor for one colour: `maxL` the plane's ceiling, `ref` its reference value (a hex or an L*;
+ *  default the colour itself), `minL` the lowest L* the step may reach (default 16). */
+export type NearStepOpts = {maxL?: number; minL?: number; ref?: string | number};
+
+/** The near floor of plane `plane` (< 0) from an atmosphere's NearFloor (fractional planes interpolate). */
+function nearFloorAt(f: NearFloor, plane: number): NearStepOpts {
+  const p = Math.max(0, -plane - 1);
+  const at = <T,>(xs: readonly T[] | undefined): T | undefined => (xs && xs.length ? xs[Math.min(xs.length - 1, Math.round(p))] : undefined);
+  const i = Math.floor(p);
+  const m = f.maxL;
+  const maxL = !m.length ? undefined : i >= m.length - 1 ? m[m.length - 1] : m[i] + (m[i + 1] - m[i]) * (p - i);
+  return {maxL, minL: f.minL, ref: at(f.ref)};
+}
+
 /** A foreground colour (plane -1, -2 ...): darker by the near steps (5 / 10 / 13 / 14 L*, cumulative), hue kept, chroma
- *  kept: it reads near by size, overlap and value, never by air. Fractional planes interpolate. */
-export function nearStep(color: string, plane: number, atm?: Atmosphere): string {
+ *  kept: it reads near by size, overlap and value, never by air. Fractional planes interpolate.
+ *  Opt-in ABSOLUTE floor (`o.maxL`, or the atmosphere's `nearFloor`): the step is the larger of the relative one and
+ *  `refL - maxL` (refL = `o.ref`'s L*, default the colour's own), never below `o.minL` (default 16); a pale palette's
+ *  near group then lands in the mid-tones (P1 §3.1: median L* 45-60) with its internal steps kept. Without either, the
+ *  result is exactly the relative step, as before. */
+export function nearStep(color: string, plane: number, atm?: Atmosphere, o?: NearStepOpts): string {
   if (!isHex(color) || !(plane < 0)) return color;
   const steps = [0, ...(atm?.near ?? NEAR_STEPS)];
   const p = Math.min(-plane, steps.length - 1);
   const i = Math.floor(p);
   const dL = i >= steps.length - 1 ? steps[steps.length - 1] : steps[i] + (steps[i + 1] - steps[i]) * (p - i);
-  return cached(`n${color}|${dL.toFixed(3)}`, () => {
+  // the floor: the call's own maxL wins; else the atmosphere's (with the call's ref / minL, when given)
+  const af = atm?.nearFloor ? nearFloorAt(atm.nearFloor, plane) : undefined;
+  const fl: NearStepOpts | undefined =
+    o?.maxL !== undefined ? o : af ? {maxL: af.maxL, minL: o?.minL ?? af.minL, ref: o?.ref ?? af.ref} : undefined;
+  if (!fl || fl.maxL === undefined || !Number.isFinite(fl.maxL)) {
+    return cached(`n${color}|${dL.toFixed(3)}`, () => {
+      const c = lch(color);
+      return fromLch(Math.max(0, c.L - dL), c.C, c.h);
+    });
+  }
+  const refL = typeof fl.ref === 'number' ? fl.ref : isHex(fl.ref) ? lab(fl.ref)[0] : lab(color)[0];
+  const step = Math.max(dL, refL - fl.maxL);
+  const minL = fl.minL ?? 16;
+  return cached(`nf${color}|${step.toFixed(3)}|${minL}`, () => {
     const c = lch(color);
-    return fromLch(Math.max(0, c.L - dL), c.C, c.h);
+    const L = c.L - step;
+    return fromLch(L >= minL ? L : Math.min(c.L, minL), c.C, c.h);
   });
+}
+
+/** The near floor's default ceilings (L*), plane -1 then -2: the near group's median in the posters' 45-60 band
+ *  (P1 §3.1; PE L1: the nearest plane <= 60), the nearer plane a step darker. */
+export const NEAR_FLOOR_L = [60, 55] as const;
+
+/** A near plane's whole palette with ONE step (`nearStep` with its absolute floor): the plane's reference value is the
+ *  median L* of `colors` (or `o.ref`), so the plane lands at `o.maxL` (default NEAR_FLOOR_L by plane) with every internal
+ *  step kept (a dark that hits `o.minL` stops there). Returns source -> the colour to draw, like `planePalette`. */
+export function nearPalette(colors: string[], plane: number, atm?: Atmosphere, o: NearStepOpts = {}): Record<string, string> {
+  const src = Array.from(new Set(colors.filter(isHex)));
+  const out: Record<string, string> = {};
+  if (!src.length) return out;
+  const Ls = src.map((c) => lab(c)[0]).sort((a, b) => a - b);
+  const mid = Ls.length % 2 ? Ls[(Ls.length - 1) / 2] : (Ls[Ls.length / 2 - 1] + Ls[Ls.length / 2]) / 2;
+  const maxL = o.maxL ?? (plane < 0 ? NEAR_FLOOR_L[Math.min(NEAR_FLOOR_L.length - 1, Math.max(0, Math.round(-plane) - 1))] : undefined);
+  for (const c of src) out[c] = nearStep(c, plane, atm, {maxL, minL: o.minL, ref: o.ref ?? mid});
+  return out;
 }
 
 /** A colour on plane `plane` (CRAFT §f.2): the subject's plane unchanged; each farther plane ONE fixed flat step toward
