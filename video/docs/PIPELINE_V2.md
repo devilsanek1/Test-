@@ -26,6 +26,11 @@ a full scene round. Background research: `docs/PIPELINE_RESEARCH.md`.
 **The cost driver is long, image-heavy agent sessions repeated on finished-looking scenes.** Every turn re-reads the
 whole context, and every rendered frame an agent looks at stays in that context. Reading docs was a minor cost.
 
+**The meter over-counted (found 2026-10-28):** these totals come from `docs/retro/spend.py`, which added each API
+call's usage once per transcript line (about 2.4x): v1's agent input was about 5 B tokens and the orchestrator made
+about 800 calls. The shares hold. The meter is fixed in the streamlining plan's Phase 1
+(`docs/retro/2026-10-28_streamline/`).
+
 ## The loop: gates G0-G8 (with G0.5, the core line, and W1, the world bible)
 
 Start every video by reading `docs/OWNER_PLAYBOOK.md` (the owner's rules), and add any new feedback to it at every gate.
@@ -107,13 +112,18 @@ stages (building, fixing, polishing), where the measured waste happened.
    retell panel, G3's sound-off and sound-on reads, G5's first-set read) and each lane's style quiz before it builds
    (playbook Process: one STYLE.md per film). The divergent stages above keep their judges. `G5_BLOCKING.md` §9's
    art-director reviews were v2r's (an owner-ordered restart with full creative freedom), not the default.
-2. **One combined reviewer per scene per round from G6 on, max 6 findings, then one fix.** Rounds go on as long as the
+2. **Scripts measure first (2026-10-29), then one combined reviewer per scene per round from G6 on, max 6 findings,
+   then one fix.** Every review starts from the scripts' report (`scripts/qa/gate_check.py` and the checks it runs,
+   `check_light`, `check_depth`, `check_banding`, `density`, `framecheck`, `capcheck`, `camspeed`, `beatsync`,
+   `av_lag`, the lints): a FAIL goes straight to the fixer, and the reviewer judges what no script measures, never
+   re-running a script or re-rendering (v1's motion lens, v3's R2 and v2r's LENS_B measured by hand). Rounds go on as long as the
    quality needs (owner, 2026-10-26: polish gets as many rounds as the quality needs) while each round improves the
    scene; the loop ends when a round finds nothing under the bar, or when it stops converging (a finding comes back
    after its fix, or a round finds nothing the last one didn't): then the scene goes to the owner. That loop that no
    longer converged was v1's waste (S08 took 25 reviews and still shipped at 7).
 3. **Fix agents get a turn cap and an image budget** (avg 163 turns): render contact sheets at 0.33-0.5 scale, view at
-   most ~8 images per session, and end the session after the fix. A new session is cheaper than a long one.
+   most ~8 images per session (v3's workflows drifted to 10-20), and end the session after the fix. A new session is
+   cheaper than a long one.
 4. **No downstream build before its gate.** On video 1, engine, kit, mascot, edge lab and QA tooling were built before
    the script was locked, and a 78 s to 55 s script change threw away voice v1/v2, timing, storyboard v1/v2 and music.
 5. **Checkpoint every agent; at most about 4 at once per machine.** 66 agents died at usage limits on v1. Keep each
@@ -121,7 +131,9 @@ stages (building, fixing, polishing), where the measured waste happened.
    result into a repo file as it goes (never only as its final message), a long unattended build runs
    `video/scripts/autocheckpoint.sh <branch> <the film's paths>` (a commit and push every 10 minutes when they changed;
    a background job lives at most 2 hours), and an agent stopped by a limit resumes from its transcript (SendMessage)
-   after the reset (owner, 2026-10-27). One machine runs at most about 4 agents at once
+   after the reset (owner, 2026-10-27). Workflow steps are resumable: each step writes its result to a file
+   (`runs/<run>/<step>.json` or the stage's report) and a relaunch reuses every step whose file exists, so a relaunch
+   after a limit replays nothing (v1's relaunch started every scene over at round 1). One machine runs at most about 4 agents at once
    (this 4-CPU container runs about 2 render-heavy ones well); more parallel work goes to helper cloud sessions, each
    its own machine (playbook Process: parallelize as much as possible), inside the weekly and 5-hour limits.
 6. **Precise numbers are lint numbers, checked only where the picture shows them truly** (owner-approved 2026-10-27).
@@ -158,6 +170,10 @@ stages (building, fixing, polishing), where the measured waste happened.
    every later step). Batch the steps (a commit rides in the same call as the next action). Before a fan-out, check the
    session's rate limit (get_session `rate_limit_info`): agents launched near the limit die with nothing saved (v4: five
    scouts, 2026-10-28).
+   **A fresh orchestrator per gate (2026-10-29):** onboarded by HANDOFF §0's fast path (the film's README and notes, the
+   playbook, DIRECTION, the gate's rules), not the full read; woken by events (an agent's completion, the owner's
+   message), not the clock; a status or a hand-off comes from `python3 video/scripts/ops/status.py --film vN` (the git
+   log, the film's README and reports, the meter), with no agent and no reading in the session.
 
 10. **Locked means dropped (owner, 2026-10-25).** When a gate locks, move the rejected options to `docs/vN/archive/`
     (no prompt reads it), trim the gate doc to the locked choice, and point later prompts only at locked docs and

@@ -14,6 +14,14 @@ Everything that agent knew is in this repo. This file is the map; the details li
 
 ## 0. Read in this order (about 30-45 minutes of reading; worth it)
 
+**Fast path for a session that runs one gate of one film** (2026-10-29, streamlining plan: about half the reading, and
+nothing the gate needs is skipped): `CLAUDE.md`; the film's `video/docs/vN/README.md` and `OWNER_NOTES.md` (the owner's
+words on this film); `video/docs/OWNER_PLAYBOOK.md` (the owner's rules); `video/docs/look/DIRECTION.md` for any visual
+gate; the gate's row and bullet in `video/docs/PIPELINE_V2.md` with its anti-waste and agent prompt rules, and the gate
+spec (`G3_ANIMATIC.md`, `G5_BLOCKING.md`); the state from `python3 video/scripts/ops/status.py --film vN`. Everything
+below only when a question needs it. The full read is for a session that coordinates several films or starts from
+scratch.
+
 1. **This file**, fully.
 2. `CLAUDE.md` (root, auto-loaded; re-read it from disk at a session start or restart: a long-running session's
    auto-loaded copy can be older than the file) and **`video/docs/OWNER_PLAYBOOK.md`**: every piece of owner feedback
