@@ -98,3 +98,7 @@ Earlier rounds also used Pip's periwinkles (`#7A7FE3`, `#6A6ED6`, `#AEB2F4`), pe
 - 2026-10-29 ~20:10 UTC, on round 4, written to the logo session directly: "I like the city view but it's too generic
   like why is it relevant to us" -> round 5: keep the city view (the posters' dusk, depth, lit windows) and make it
   ours: the city is what everyone's talking about, so each variant ties it to the talk, the fuss or the question.
+- 2026-10-29 ~20:20 UTC, on round 5, written to the logo session directly: "I said no elephant", "Too many details who
+  would use this logo" and "No from scratch pick up the modern logos and do it again" -> round 6 from scratch: no
+  elephant (no Pip, not even hidden), no scenes; a logo in the way modern brand marks are built (one idea, a few bold
+  shapes, one strong colour, usable everywhere).
