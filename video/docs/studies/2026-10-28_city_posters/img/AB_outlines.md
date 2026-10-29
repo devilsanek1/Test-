@@ -11,3 +11,8 @@
   - **Things that are lines:** railings, pipes, wires and the light glazing bars, everywhere.
 - **Measured:** Reykjavik's white gable is L* 90 at (225, 1395) against its blue-grey side wall, L* 51 at (65, 1372), a step of -39. Its red roof's lit hip is 57 at (165, 1266) against the main plane, 22 at (120, 1300), a step of -35. In v2's S3 frame at 13.6 s, the chimney's shade face is only -5 L* (172 vs 200, 630) and the frame's cast -10 (412 vs 230, 780). The posters draw no outline anywhere: thin lines appear only on small things, dark for rigging and railings (Copenhagen's masts, Buenos Aires' fence) and light for window bars.
 - **For the owner's call:** rule 4's lines stand until the owner picks (DIRECTION's open study). Choosing B means more than deleting lines: it needs rule 5's lit and shade faces (approved 2026-10-28) at a clearer step than v2's.
+- **Critic:** the independent critic was stopped by the 5-hour usage limit (2026-10-28 ~23:00 UTC) and not rerun, to save
+  the week's budget; the orchestrator checked the picture by eye at 700 px wide (2026-10-29 02:40 UTC): the same geometry,
+  palette and sun in A and B, A matches v2's line as measured above, the labels read on a phone. Sent to the owner as is.
+  The caveat it shows: A and B differ little at panel size, because v2's outlines sit only on each beat's subject; the
+  posters' crispness is the deeper shade step (B), so the owner's real choice is the shade step as much as the line.

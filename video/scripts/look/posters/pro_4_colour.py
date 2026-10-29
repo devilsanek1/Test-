@@ -269,6 +269,12 @@ def fields(lab, valid, grad_thr=2.0, big=0.02) -> dict:
     rows = np.nonzero(valid.any(1))[0]
     top = rows.min()
     top_ids = set(np.unique(cc[top:top + 4])) - {0}
+    # a masked band across the sky (v2's caption band): the field right under it is the same sky (the horizon bands)
+    rv = valid.mean(1) > 0.5
+    for y in range(top + 1, len(rv)):
+        if rv[y] and not rv[y - 1]:
+            top_ids |= set(np.unique(cc[y:y + 4])) - {0}
+            break
     big_ids = [i + 1 for i, s in enumerate(sizes) if s >= big * nv]
     out = {'edge_free_pct': r1(100 * flat.sum() / nv), 'big_fields_n': len(big_ids)}
     bigm = np.isin(cc, big_ids)
@@ -562,7 +568,7 @@ def sheet_value_chroma(J, out_dir: Path) -> None:
                  f"pastel {c['pastel_pct']:.0f} %  paper {c['paper_pct']:.0f} %",
                  f"C*-weighted L* {c['C_weighted_L']:.0f}",
                  f"accents C*>=35: {c['accents_c35']['share_pct']:.1f} %",
-                 f"big empty fields below sky {fl['big_fields_below_sky_pct']:.0f} %"]
+                 f"empty fields below sky {fl['big_fields_below_sky_pct']:.0f} %"]
         for i, t in enumerate(lines):
             d.text((x, y + 2 + 22 * i), t, fill=INK if i in (0, 2) else MUTED, font=S.font(15))
         x += ims[0].width + gap
@@ -683,28 +689,36 @@ def sheet_maps(out_dir: Path) -> None:
     S.save_sheet(im, out_dir / 'pro_4_colour_maps.jpg')
 
 
-def _best_flat_window(lab, valid, y_min, win=64):
+def _best_flat_window(lab, valid, y_min, y_max=None, win=28):
     g = cv2.GaussianBlur(lab.astype(np.float32), (0, 0), 0.7)
     gx = cv2.Sobel(g, cv2.CV_32F, 1, 0, ksize=3) / 8
     gy = cv2.Sobel(g, cv2.CV_32F, 0, 1, ksize=3) / 8
     G = np.sqrt((gx ** 2 + gy ** 2).sum(-1))
     flat = (G < 2.0) & valid
     ii = cv2.integral(flat.astype(np.uint8))
-    best, bxy = -1, (0, y_min)
     H, W = flat.shape
-    for y in range(y_min, H - win, 4):
-        for x in range(0, W - win, 4):
-            s = ii[y + win, x + win] - ii[y, x + win] - ii[y + win, x] + ii[y, x]
-            if s > best:
-                best, bxy = s, (x, y)
+    y_max = H - win if y_max is None else min(H - win, y_max)
+    best, bxy = -1, (0, y_min)
+    for y in range(y_min, y_max, 2):
+        for x in range(0, W - win, 2):
+            s_ = ii[y + win, x + win] - ii[y, x + win] - ii[y + win, x] + ii[y, x]
+            if s_ > best:
+                best, bxy = s_, (x, y)
     return bxy, best / win / win
+
+
+def _stretch(crop, k=8.0):
+    cl = S.srgb_to_lab(crop.astype(np.float64))
+    mu = np.median(cl.reshape(-1, 3), 0)
+    st = mu + (cl - mu) * k
+    return S.lab_to_srgb(st).astype(np.uint8)
 
 
 def sheet_fields(out_dir: Path) -> None:
     picks = [('01_singapore.jpg', 'poster', 'Singapore'), ('04_buenos_aires.jpg', 'poster', 'Buenos Aires'),
              ('07_kyoto.jpg', 'poster', 'Kyoto'), ('v2_t5.2.png', 'v2', 'v2 S1 cover'), ('v2_t17.5.png', 'v2', 'v2 S4'),
              ('v2_t36.0.png', 'v2', 'v2 S8')]
-    Hrow = 560
+    Hrow, T, win = 560, 150, 28
     tiles = []
     for fn, kind, title in picks:
         p = REFS / fn if kind == 'poster' else SCR / 'frames' / fn
@@ -717,50 +731,166 @@ def sheet_fields(out_dir: Path) -> None:
             colr = np.array((70, 120, 230) if i in top_ids else (235, 50, 60), np.float32)
             ov[m] = ov[m] * 0.45 + colr * 0.55
         ov[~valid] = 200
-        # the flattest window below the sky (poster: under its skyline; v2: under y 1000 of 1920)
-        y_min = int((S.POSTERS[fn]['skyline'] if kind == 'poster' else 1000) / f)
-        (wx, wy), frac = _best_flat_window(lab, valid, y_min)
+        sky_y = int((S.POSTERS[fn]['skyline'] if kind == 'poster' else 1000) / f)
+        sky_top = int((S.POSTERS[fn]['sky'][1] if kind == 'poster' else 40) / f)
+        sky_bot = int((S.POSTERS[fn]['sky'][3] if kind == 'poster' else 280) / f)
+        (bx, by), _ = _best_flat_window(lab, valid, sky_y, None, win)
+        (sx, sy), _ = _best_flat_window(lab, valid, sky_top, sky_bot, win)
         full = np.asarray(Image.open(p).convert('RGB'))
-        X0, Y0 = int(wx * f), int(wy * f)
-        crop = full[Y0:Y0 + 180, X0:X0 + 180]
-        cl = S.srgb_to_lab(crop.astype(np.float64))
-        st = cl.copy()
-        mu = np.median(cl.reshape(-1, 3), 0)
-        st[..., 0] = mu[0] + (cl[..., 0] - mu[0]) * 8
-        st[..., 1:] = mu[1:] + (cl[..., 1:] - mu[1:]) * 8
-        stretched = S.lab_to_srgb(st).astype(np.uint8)
-        resid = cl[..., 0] - cv2.GaussianBlur(cl[..., 0].astype(np.float32), (0, 0), 25)
-        d0 = ImageDraw.Draw(Image.fromarray(ov.astype(np.uint8)))
-        tiles.append((title, ov.astype(np.uint8), crop, stretched, fl, (wx, wy), float(resid.std())))
+        crops = []
+        for (x_, y_) in ((bx, by), (sx, sy)):
+            X0, Y0, n = int(x_ * f), int(y_ * f), int(win * f)
+            crops.append(full[Y0:Y0 + n, X0:X0 + n])
+        tiles.append((title, ov.astype(np.uint8), crops, fl, ((bx, by), (sx, sy))))
     gap = 16
-    tw = [fit_h(t[1], Hrow).width for t in tiles]
+    tw = [max(fit_h(t[1], Hrow).width, 2 * T + 6) for t in tiles]
     W = sum(tw) + gap * (len(tiles) + 1)
-    H = 70 + Hrow + 40 + 2 * 196 + 130
+    H = 74 + Hrow + 34 + 2 * (T + 26) + 80
     im = Image.new('RGB', (W, H), PAPER)
     d = ImageDraw.Draw(im)
-    d.text((gap, 10), 'Empty fields and in-shape variation: BLUE = the big edge-free field touching the top (the sky), RED = big '
-           'edge-free fields below it (each >= 2 % of the frame)', fill=INK, font=S.font(22, True))
-    d.text((gap, 40), 'Below: the flattest 180 px window under the sky at source size (left) and the same with its L* and a*b* '
-           'variation stretched 8x (right): paper mottle vs a dead-flat fill', fill=MUTED, font=S.font(16))
+    d.text((gap, 10), 'Empty fields and in-shape variation. BLUE = the big edge-free sky field; RED = big edge-free fields '
+           'below it (each >= 2 % of the frame); grey = masked (UI, title, caption band)', fill=INK, font=S.font(22, True))
+    d.text((gap, 40), 'Under each: a ~62 px window inside ONE shape below the sky (raw | variation x8) and a sky window (x8). '
+           'Yellow boxes mark them. The posters\' fills breathe; v2\'s are dead flat (its sky carries only the invisible encode dither).',
+           fill=MUTED, font=S.font(16))
     x = gap
-    for (title, ov, crop, st, fl, wxy, rstd), w in zip(tiles, tw):
+    for (title, ov, crops, fl, wins), w in zip(tiles, tw):
         t = fit_h(ov, Hrow)
-        im.paste(t, (x, 70))
+        im.paste(t, (x, 74))
         sc = Hrow / ov.shape[0]
-        d.rectangle([x + wxy[0] * sc, 70 + wxy[1] * sc, x + (wxy[0] + 180 / (ov.shape[1] and 1) * 0 + 64) * sc, 70 + (wxy[1] + 64) * sc],
-                    outline=(255, 200, 0), width=3)
-        d.text((x, 70 + Hrow + 6), title, fill=INK, font=S.font(18, True))
-        y = 70 + Hrow + 36
-        im.paste(Image.fromarray(crop).resize((180, 180)), (x, y))
-        im.paste(Image.fromarray(st).resize((180, 180)), (x + 186 if w >= 372 else x, y if w >= 372 else y + 186))
-        yy = y + (190 if w >= 372 else 376)
-        lines = [f"big fields below sky {fl['big_fields_below_sky_pct']:.0f} %",
-                 f"mottle L* {fl.get('mottle_L_std', 0):.2f}  ab {fl.get('mottle_ab_std', 0):.2f}",
-                 f"drift in a field {fl.get('drift_L', 0):.1f} L*"]
+        for (x_, y_) in wins:
+            d.rectangle([x + x_ * sc, 74 + y_ * sc, x + (x_ + win) * sc, 74 + (y_ + win) * sc], outline=(255, 196, 0), width=3)
+        d.text((x, 74 + Hrow + 6), title, fill=INK, font=S.font(18, True))
+        y = 74 + Hrow + 34
+        d.text((x, y), 'one shape: raw | x8', fill=MUTED, font=S.font(13))
+        im.paste(Image.fromarray(crops[0]).resize((T, T), Image.NEAREST), (x, y + 16))
+        im.paste(Image.fromarray(_stretch(crops[0])).resize((T, T), Image.NEAREST), (x + T + 6, y + 16))
+        y2 = y + T + 26
+        d.text((x, y2), 'sky: x8', fill=MUTED, font=S.font(13))
+        im.paste(Image.fromarray(_stretch(crops[1])).resize((T, T), Image.NEAREST), (x, y2 + 16))
+        lines = [f"fields below sky {fl['big_fields_below_sky_pct']:.0f} %",
+                 f"mottle L* {fl.get('mottle_L_std', 0):.2f} / ab {fl.get('mottle_ab_std', 0):.2f}",
+                 f"drift {fl.get('drift_L', 0):.1f} L*"]
         for i, s_ in enumerate(lines):
-            d.text((x, yy + 20 * i), s_, fill=INK if i == 0 else MUTED, font=S.font(15))
+            d.text((x + T + 8, y2 + 22 + 20 * i), s_, fill=INK if i == 0 else MUTED, font=S.font(14))
         x += w + gap
     S.save_sheet(im, out_dir / 'pro_4_colour_fields.jpg')
+
+
+# ------------------------------------------------------------------------------------------------------ the fix ladder
+# A SIMULATION on a finished v2 frame, to show the direction of each colour fix and to measure what it closes. It is a
+# post-process (a value curve, a chroma scale, a noise field), never how a film is built: the real fixes are palette
+# and drawing decisions (pro_4_colour.md section 3). The sky (the big field touching the top and the horizon bands
+# under the caption band) and the caption band itself are left as they are, except where a step says otherwise.
+VALUE_CURVE = [(0, 0), (30, 20), (40, 27), (50, 35), (60, 45), (70, 56), (75, 63), (80, 70), (85, 77), (90, 84),
+               (95, 93), (100, 100)]
+
+
+def _noise(shape, sigma, seed):
+    rng = np.random.default_rng(seed)
+    n = cv2.GaussianBlur(rng.standard_normal(shape).astype(np.float32), (0, 0), sigma)
+    return n / max(1e-6, n.std())
+
+
+def fix_ladder(p: Path):
+    full = np.asarray(Image.open(p).convert('RGB')).astype(np.float64)
+    H, W = full.shape[:2]
+    lab0 = S.srgb_to_lab(full)
+    rgb_s, valid, lab_s, f = prep(p, 'v2')
+    fl = fields(lab_s, valid)
+    cc, big_ids, top_ids = fl.pop('_map')
+    sky_s = np.isin(cc, [i for i in big_ids if i in top_ids])
+    sky = cv2.resize(sky_s.astype(np.uint8), (W, H), interpolation=cv2.INTER_NEAREST).astype(bool)
+    sky = ndi.binary_dilation(sky, iterations=3)
+    band = np.zeros((H, W), bool)
+    band[int(CAPTION_BAND[0] * H / 1920):int(CAPTION_BAND[1] * H / 1920)] = True
+    world = ~sky & ~band
+    xs, ys = zip(*VALUE_CURVE)
+    steps = {}
+    # 1. the value plan: a mid-tone world under the calm light sky (the lower half of the range opened)
+    lab1 = lab0.copy()
+    lab1[..., 0] = np.where(world, np.interp(lab0[..., 0], xs, ys), lab0[..., 0])
+    steps['1 value plan'] = lab1
+    # 2. the chroma plan: calm lights (paper: C* x0.65 at L* >= 86 in the world; the mint sky x0.7), colour in the mids
+    #    (x1.1), and NO beige: a warm fill under L* 86 (h 30-100) never sits at C* 6-18 (the owner's never band): it
+    #    takes C* 18 (apricot, terracotta), hue kept. A uniform chroma cut on the warm mid-lights made them beige.
+    lab2 = lab1.copy()
+    L2 = lab2[..., 0]
+    C2 = np.hypot(lab2[..., 1], lab2[..., 2])
+    h2 = np.degrees(np.arctan2(lab2[..., 2], lab2[..., 1])) % 360
+    k = np.where(world & (L2 >= 86), 0.65, np.where(world & (L2 >= 40) & (L2 < 86), 1.1, 1.0))
+    beige = world & (L2 < 86) & (L2 >= 40) & (h2 >= 30) & (h2 <= 100) & (C2 * 1.1 >= 6) & (C2 * 1.1 < 18)
+    k = np.where(beige, 18.0 / np.maximum(C2, 1e-6), k)
+    k = np.where(sky, 0.7, k)
+    lab2[..., 1:] *= k[..., None]
+    steps['2 + chroma plan'] = lab2
+    # 3. materiality: a VERY subtle world-locked paper mottle (0.55 L*, 0.35 a*b*, ~30 px blotches) + a fine grain
+    #    (0.25 L*, 0.8 px), everywhere but the caption band (rule 10 keeps it one calm field)
+    lab3 = lab2.copy()
+    keep = (~band)[..., None]
+    mot = np.stack([0.55 * _noise((H, W), 14, 1), 0.35 * _noise((H, W), 14, 2), 0.35 * _noise((H, W), 14, 3)], -1)
+    grn = 0.25 * _noise((H, W), 0.8, 4)
+    lab3 = lab3 + keep * mot
+    lab3[..., 0] += (~band) * grn
+    steps['3 + paper mottle'] = lab3
+    return lab0, steps
+
+
+def cmd_simulate(a) -> None:
+    p = Path(a.frame)
+    lab0, steps = fix_ladder(p)
+    J = json.loads(Path(a.json).read_text())
+    P = [m for m in J['items'] if m['kind'] == 'poster']
+    out_dir = SCR / 'sim'
+    out_dir.mkdir(parents=True, exist_ok=True)
+    variants = [('0 as shipped', p)]
+    for name, lab in steps.items():
+        q = out_dir / f'{p.stem}_{name.split()[0]}.png'
+        Image.fromarray(S.lab_to_srgb(lab).round().astype(np.uint8)).save(q)
+        variants.append((name, q))
+    rows = []
+    for name, q in variants:
+        m = measure(q, 'v2')
+        inside, gaps = 0, 0.0
+        for label, path in KEYS:
+            pv = np.array([get(x, path) for x in P if get(x, path) is not None], float)
+            v = get(m, path)
+            if v is None or not len(pv):
+                continue
+            inside += int(pv.min() <= v <= pv.max())
+            gaps += abs(v - np.median(pv)) / max(1e-6, (pv.max() - pv.min()) / 2)
+        rows.append((name, q, m, inside, gaps))
+        print(f"{name:20s} metrics inside the posters' range: {inside}/{len(KEYS)}  sum|gap| {gaps:6.1f}  "
+              f"p5 {m['value']['pct']['p5']} p25 {m['value']['pct']['p25']} dark<45 {m['value']['groups']['dark_lt45']} "
+              f"pastel {m['chroma']['pastel_pct']} CwL {m['chroma']['C_weighted_L']} Cp50 {m['chroma']['pct']['p50']} "
+              f"mottle {m['fields'].get('mottle_L_std')} colours {m['colours']['n_ge05pct']}")
+    # the sheet
+    Hh = 960
+    gap = 16
+    W = 4 * 540 + 5 * gap
+    im = Image.new('RGB', (W, Hh + 300), PAPER)
+    d = ImageDraw.Draw(im)
+    d.text((gap, 10), f'The fix ladder on v2 {p.stem} (a SIMULATION by post-process: the direction of each fix, never the build)',
+           fill=INK, font=S.font(24, True))
+    d.text((gap, 42), 'Sky, horizon bands and caption band kept. 1: a mid-tone world (L* curve under the sky). 2: calm lights, colour in the mids, '
+           'no beige (paper C* x0.65 at L*>=86, sky x0.7, mids x1.1, warm mids out of C* 6-18). 3: a VERY subtle world-locked paper mottle.',
+           fill=MUTED, font=S.font(16))
+    x = gap
+    for name, q, m, inside, gaps in rows:
+        t = Image.open(q).convert('RGB').resize((540, Hh), Image.LANCZOS)
+        im.paste(t, (x, 76))
+        v, c, fl, co = m['value'], m['chroma'], m['fields'], m['colours']
+        lines = [name, f"inside the posters' range: {inside}/{len(KEYS)} metrics",
+                 f"L* p5 {v['pct']['p5']:.0f}  p25 {v['pct']['p25']:.0f}  dark<45 {v['groups']['dark_lt45']:.0f} %",
+                 f"pastel {c['pastel_pct']:.0f} %   C* p50 {c['pct']['p50']:.1f}   C*-weighted L* {c['C_weighted_L']:.0f}",
+                 f"mottle L* {fl.get('mottle_L_std', 0):.2f}   colours >=0.5 %: {co['n_ge05pct']}",
+                 f"empty fields below sky {fl['big_fields_below_sky_pct']:.0f} %"]
+        for i, s_ in enumerate(lines):
+            d.text((x, 76 + Hh + 8 + 24 * i), s_, fill=INK if i < 2 else MUTED, font=S.font(18 if i == 0 else 16, i == 0))
+        x += 540 + gap
+    S.save_sheet(im, Path(a.img) / 'pro_4_colour_fixes.jpg')
+    Path(out_dir / 'ladder.json').write_text(json.dumps([{'step': n, 'inside': i, 'sum_gap': g, 'm': m} for n, q, m, i, g in rows],
+                                                        indent=1, default=float))
 
 
 def cmd_sheets(a) -> None:
@@ -785,6 +915,11 @@ def main() -> None:
     mk = sub.add_parser('mask')
     mk.add_argument('--json', default=str(SCR / 'm.json'))
     mk.set_defaults(fn=cmd_mask)
+    si = sub.add_parser('simulate')
+    si.add_argument('--frame', default=str(SCR / 'frames' / 'v2_t5.2.png'))
+    si.add_argument('--json', default=str(SCR / 'm.json'))
+    si.add_argument('--img', default=str(SCR / 'img'))
+    si.set_defaults(fn=cmd_simulate)
     a = ap.parse_args()
     a.fn(a)
 
