@@ -613,7 +613,9 @@ Maintenance at the end).
   round 4's emblems: "I like the city view but it's too generic like why is it relevant to us", so the mark must say
   what we do, the talk, the fuss, the question, not just look good; on round 5's city scenes: "I said no elephant" /
   "Too many details who would use this logo" / "No from scratch pick up the modern logos and do it again"; the pick,
-  round 6: The Peel, a speech bubble with its corner peeled back: "I like the peel yes", 2026-10-29).
+  round 6: The Peel, a speech bubble with its corner peeled back: "I like the peel yes"; then "Maybe just play with
+  color schemes", "Okay pick one and give me the final one" and "Logo is done", 2026-10-29: FINAL, the pack in
+  `deliverables/brand/peel/`, the spec in `docs/brand/LOGO.md`).
 - **Upload at the highest quality and natively on each platform** (checklist in `docs/POSTING_KIT.md`). — (2026-10-25).
 - **AI label ON everywhere; no paid boost until 3-5 posts exist,** then boost the best organic performer. — (2026-10-25).
 
