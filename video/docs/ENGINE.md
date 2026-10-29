@@ -431,7 +431,7 @@ day → dusk → night (per-object relight), and an un-build that loops mid-moti
 ## 11. Preview and check commands
 
 ```bash
-npx tsc --noEmit                                         # must be clean
+npm run typecheck                                        # must be clean (the pinned TypeScript; never npx tsc)
 scripts/still.sh <Comp> <sec> out.png [--scale=0.5]      # one frame (Comp = Main, S01..S13, KitDemo, CineDemo, ...)
 #   still / sheet / strip bundle ONLY what the composition needs (render-frames --entry=auto): a dev composition gets a
 #   generated entry with just its own file, Main / S01.. use src/entry-film.ts (no dev previews), so another lane's
