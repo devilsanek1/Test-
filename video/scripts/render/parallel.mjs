@@ -138,13 +138,24 @@ export async function renderParallel({compId, out, opt, entryPoint, serveUrl, co
     // ONE audio-only pass over the whole range (seeks every frame, no screenshots), beside the chunks
     kids.push({label: 'audio pass', ...child({label: 'audio pass', args: [compId, wav, `--frames=${a}-${b}`, '--codec=wav', ...same.filter((x) => !/^--(master|crf|codec)/.test(x))], onLine: () => undefined})});
   }
+  const stopAll = () => kids.forEach((k) => k.p.exitCode === null && k.p.signalCode === null && k.p.kill('SIGTERM'));
+  const onSignal = () => {
+    stopAll();
+    if (!opt.work) fs.rmSync(work, {recursive: true, force: true});
+    process.exit(130);
+  };
+  process.once('SIGINT', onSignal);
+  process.once('SIGTERM', onSignal);
   const times = [];
   try {
     for (const k of kids) times.push(await k.done);
   } catch (e) {
-    kids.forEach((k) => k.p.exitCode === null && k.p.kill('SIGTERM'));
+    stopAll();
     if (!opt.work) fs.rmSync(work, {recursive: true, force: true});
     throw e;
+  } finally {
+    process.off('SIGINT', onSignal);
+    process.off('SIGTERM', onSignal);
   }
   const tA = Date.now();
   // the audio, encoded as renderMedia encodes it

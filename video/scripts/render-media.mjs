@@ -5,7 +5,7 @@
 // longer sets 'swangle', which was ~45x slower and moved pixels); GL=swangle|angle|... still picks one.
 //   node scripts/render-media.mjs <CompId> <out> [--entry=src/entry-v3-film.tsx] [--scale=1] [--concurrency=3]
 //        [--frames=a-b] [--props='{"k":1}'] [--codec=h264|wav|...] [--crf=18] [--timeout=120000] [--master] [--muted]
-//        [--parallel=K [--scenes=<scenes.json>|none] [--cues=<cues.json>|none] [--audio=auto|render|none] [--work=dir]]
+//        [--parallel[=K] [--scenes=<scenes.json>|none] [--cues=<cues.json>|none] [--audio=auto|render|none] [--work=dir]]
 // --entry: as render-frames.mjs (default auto: the one src/entry-*.tsx that registers <CompId>).
 // --muted: no audio track. --no-cache: bundle fresh (the bundle is otherwise cached, scripts/render/lib.mjs).
 //
@@ -22,7 +22,7 @@
 // that misses whole pixels, 1.3333 -> 2559.94 px, which Remotion refuses, snaps to the nearest whole-pixel size).
 // The posted MASTER renders in ONE step (no --parallel): its encode is one x264 run over the whole film.
 //
-// --parallel=K: REVIEW CUTS (the owner's gate videos) and LANE CLIPS, K x faster-ish (streamlining Phase 1, PLAN item 5):
+// --parallel[=K] (K default 3): REVIEW CUTS (the owner's gate videos) at full size (streamlining Phase 1, PLAN item 5):
 //   the range is cut into K chunks on the film's own scene boundaries (scripts/film_chunks.py, from --scenes or
 //   src/<film>/film/scenes.json for an entry-<film>-film.tsx, when the composition IS the film's timeline; else K equal
 //   parts), each rendered MUTED by its own process and browser (--concurrency each, default 2) with the same encode
@@ -33,8 +33,10 @@
 //   renderMedia encodes it, so its stream equals a one-step render's. Each chunk is its own x264 run: its last frames
 //   lose ~0.3 dB (invisible at CRF 14) — fine for a review cut, not for the posted master (one step; parallel masters
 //   wait for the owner's yes, PLAN Phase 2). --work=<dir> keeps the chunks and the audio there.
-//   node scripts/render-media.mjs Film2R deliverables/v2/v2r_g6.mp4 --entry=src/entry-v2r-film.tsx --master --parallel=3
-//   node scripts/render-media.mjs Film2R-V2S4 /tmp/v2s4.mp4 --entry=src/entry-v2r-film.tsx --scale=0.5 --parallel=2
+//   node scripts/render-media.mjs Film2R deliverables/v2/v2r_g6.mp4 --entry=src/entry-v2r-film.tsx --master --parallel
+//   Measured on the 4-core box (phase1_render.md): the whole v2r film at full size 7:35 one step -> 5:19 with 3 chunks
+//   (lit shots are capped by one Chrome compositor thread per browser: more browsers help); a shot that already keeps
+//   every core busy gains nothing, and a 0.25-0.5 scale lane clip gains nothing (render it in one step).
 // Old chunked recipe (docs/G5_BLOCKING.md §8b): one chunk = --frames=a-b, the audio once = --codec=wav.
 import path from 'node:path';
 import fs from 'node:fs';
@@ -53,7 +55,7 @@ const fraction = (v) => {
   return m ? Number(m[1]) / Number(m[2]) : Number(v);
 };
 let scale = opt.scale ? fraction(opt.scale) : 1;
-const parallel = opt.parallel ? Number(opt.parallel) : 1;
+const parallel = opt.parallel === undefined ? 1 : opt.parallel === 'true' ? 3 : Number(opt.parallel);
 const concurrency = opt.concurrency ? Number(opt.concurrency) : parallel > 1 ? 2 : 3;
 const codec = opt.codec ?? 'h264';
 /** The master encode (see the header): lossless frames, one BT.709 conversion, x264 CRF 14 slow + aq-mode 3. */
@@ -71,8 +73,8 @@ const chromiumOptions = chromiumOptionsFromEnv();
 const entryPoint = resolveEntry(compId, opt.entry, 'render-media');
 const frameRange = opt.frames ? opt.frames.split('-').map(Number) : null;
 const out = path.resolve(outArg);
-if (parallel > 1 && (codec !== 'h264' || !Number.isInteger(parallel))) {
-  console.error('[render-media] --parallel=K (an integer >= 2) renders h264 mp4 only; audio alone (--codec=wav) is one pass');
+if (!Number.isInteger(parallel) || parallel < 1 || (parallel > 1 && codec !== 'h264')) {
+  console.error('[render-media] --parallel[=K] (K an integer, default 3) renders h264 mp4 only; audio alone (--codec=wav) is one pass');
   process.exit(2);
 }
 fs.mkdirSync(path.dirname(out), {recursive: true});
