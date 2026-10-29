@@ -241,6 +241,13 @@ The owner's three weird places, checked by the scout: the Stockholm bunker is tr
 but its supercomputer moved next door in 2023 and the chapel now holds quantum computers; the Devon pool is true but
 from 2023. New York: nothing in the city; the state paused big data centres; the fight is upstate (Massena).
 
+**Added ~04:20 UTC, from the journal-corpus thread** (`journals/SUMMARY.md`, `clusters.md`; 1,209 stories, 308 scored):
+about 1 story in 10 fits the look; tech news as such fits poorly (about 1.3), and fits well only in a weird place, which
+backs the owner's weird-places note. Its weird-place tech picks, sent to the owner as additions: IceCube, a telescope
+made of Antarctic ice (physics Nobel 6 Oct; ceremony 10 Dec); Onkalo, Finland's nuclear-waste tomb in the bedrock
+(licensed 22 Oct); Japan's MMX probe to Phobos (launched 20 Oct). Its data-centre rows were all backlash, votes, power
+or money (best fit: xAI's Memphis noise), none in a weird place: our scouts' weird-place data centres fill that gap.
+
 **The owner's reaction:** (waiting)
 
 ## The real-city pool (exchange 2; est. scores: a typical good story of each kind, any subject)
