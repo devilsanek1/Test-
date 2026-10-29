@@ -60,5 +60,6 @@ text with HarfBuzz (kerning and the variable axes applied), then writes the outl
 - Every mark is original, drawn from circles, arcs and curves in code; nothing traced, no image generation.
 
 ## Owner's verdict
-(pending: the owner's words go here verbatim, newest at the bottom; the orchestrator folds approach-level lessons into
-the playbook)
+(the owner's words verbatim, newest at the bottom; the orchestrator folds approach-level lessons into the playbook)
+- 2026-10-29 ~19:37 UTC, on round 1, written to the logo session directly: "The logo should not contain any text btw"
+  -> round 2: marks only, no name, no letters (round 1's Wordmark and every lockup are out; the f? monogram too).
