@@ -1388,3 +1388,474 @@ def paint_brick_tiles(T=240, seed=None):
     apply_dl(cv, spk_l + spk_d)
     out['D'] = cv
     return out
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# 8. ELEMENT 4: paving receding in perspective (recipe 4.4)
+# ----------------------------------------------------------------------------------------------------------------
+# York-stone flags on the quay, seen from the towpath (eye 1.6 m, focal 935 px). A ground point at distance Z (m) sits
+# at frame y = 792 + 1496 / Z, and x = 540 + 935 X / Z. The low sun is ahead-left (azimuth -20 deg), so every shadow
+# runs TOWARD US and to the right, and the paving takes a warm sheen along the sun's line, strongest far away.
+PAVE_X0, PAVE_Y0 = 40, 840
+SUN_TAN = (SUN[0] - 540.0) / F_PX                   # -0.368: the sun's direction on the ground (X per metre of Z)
+SUN_ELEV = np.radians(3.0)                          # the sun's height: shadows ~19 x their caster's height
+
+
+def ground_xy(X, Z):
+    """Ground metres -> panel px (paving panel)."""
+    return 540.0 + F_PX * X / Z - PAVE_X0, HORIZON_Y + F_PX * EYE_M / Z - PAVE_Y0
+
+
+def paint_paving(W=1000, H=480, seed=None, passes=9, keep=None):
+    """P0 the design per pixel: rows of flags of random lengths (a texture gradient: they shrink with distance), each
+    flag its own value fading to one band far away, the joints as thin dark gaps whose width and contrast fall with
+    distance, the sheen toward the sun, long cast shadows toward us; P1 level soft strokes (bands); P2 flat strokes
+    along the near flags + dry level dashes; P3 the lit back lips of the near flags, the props' slivers; P4 grit on
+    the near flags; then the depth conversion by Z (toward the air) and a slight softening far."""
+    rng = rng_for('paving', seed)
+    brush = Brush(rng)
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    yf = yy + PAVE_Y0
+    Z = (F_PX * EYE_M / np.maximum(yf - HORIZON_Y, 1.0)).astype(np.float32)        # metres, per pixel row
+    X = ((xx + PAVE_X0 - 540.0) * Z / F_PX).astype(np.float32)
+    lit = mix(PAL['sand'], PAL['granite'], 0.35)                # L~76 the flags in the low sun (and the sky dome)
+    shad = mix(PAL['lilac'], PAL['granite'], 0.25)              # L~66 in shadow: the sky dome only, lilac
+    joint_c = mix(lit, PAL['slate'], 0.45)
+    # ---- the flags: rows of depth D, random lengths, per-flag value; ids per pixel ----
+    D = 0.62
+    row = np.floor(Z / D).astype(np.int32)
+    flag_val = np.zeros((H, W), np.float32)
+    flag_warm = np.zeros((H, W), np.float32)
+    cross_j = np.zeros((H, W), np.float32)                       # distance (px) to the nearest cross joint
+    flag_id = np.zeros((H, W), np.int64)
+    rows_seen = {}
+    for y in range(H):
+        j = int(row[y, 0])
+        if j not in rows_seen:
+            rr = rng_for('paving/row%d' % j, seed)
+            xs_m = np.cumsum(rr.uniform(0.55, 1.25, 120)) - 60.0 + rr.uniform(0, 1.0)
+            vals = rr.normal(0, 1, 121)
+            warm = rr.normal(0, 1, 121)
+            rows_seen[j] = (xs_m, vals, warm)
+        xs_m, vals, warm = rows_seen[j]
+        z = float(Z[y, 0])
+        bx = 540.0 + F_PX * xs_m / z - PAVE_X0                    # the cross joints of this row, in px
+        idx = np.searchsorted(bx, xx[y])
+        idx = np.clip(idx, 0, len(vals) - 1)
+        flag_val[y] = vals[idx]
+        flag_warm[y] = warm[idx]
+        flag_id[y] = j * 1000 + idx
+        left = bx[np.clip(idx - 1, 0, len(bx) - 1)]
+        right = bx[np.clip(idx, 0, len(bx) - 1)]
+        cross_j[y] = np.minimum(np.abs(xx[y] - left), np.abs(right - xx[y]))
+    fade_var = 1.0 - smooth((Z - 4.0) / 16.0)                  # the flags merge with distance (texture gradient)
+    # ---- shadows toward us: casters (X, Z, height, radius) ----
+    casters = [(-2.6, 11.0, 0.9, 0.15), (-0.7, 11.0, 0.9, 0.15), (1.2, 11.0, 0.9, 0.15), (3.0, 6.2, 4.6, 0.07)]
+    sdir = np.array([-SUN_TAN, -1.0])
+    sdir /= np.linalg.norm(sdir)                                 # (0.345, -0.938): toward us, to the right
+    shadow = np.zeros((H, W), np.float32)
+    for (cx_, cz_, ch_, cr_) in casters:
+        L_s = ch_ / np.tan(SUN_ELEV)
+        # ground coords relative to the caster's base, in the shadow's frame
+        dX, dZ = X - cx_, Z - cz_
+        s = dX * sdir[0] + dZ * sdir[1]                          # along the shadow (m)
+        q = dX * (-sdir[1]) + dZ * sdir[0]                       # across it (m)
+        pen = 0.006 + 0.0093 * np.clip(s, 0, None)               # the penumbra grows with the distance from the caster
+        core = smooth((cr_ - np.abs(q)) / pen + 0.5) * (s > -cr_) * (s < L_s)
+        strength = np.exp(-np.clip(s, 0, None) / (L_s * 0.9))    # and the shadow thins away from its caster
+        shadow = np.maximum(shadow, core * strength * (cr_ / (cr_ + 0.5 * pen)))
+    # ---- the sheen: the low sun's glare along its line, strongest far (grazing) ----
+    ang = X / Z - SUN_TAN
+    sheen = (np.exp(-(ang / 0.30) ** 2) * smooth((Z - 2.5) / 18.0)).astype(np.float32)
+    # ---- P0: compose the design per pixel in OKLab ----
+    o = np.empty((H, W, 3), np.float64)
+    o[:] = rgb2ok(lit)
+    o[..., 0] += 0.012 * 2.2 * flag_val * fade_var                         # +-2.5 L* per flag, merging far
+    o[..., 1] += 0.003 * flag_warm * fade_var                                # warmer or cooler flags, never grey
+    o[..., 2] += 0.006 * np.maximum(flag_warm, -0.4) * fade_var
+    so = rgb2ok(shad)
+    o = o * (1 - shadow[..., None]) + so * shadow[..., None]
+    gl = rgb2ok(mix(PAL['glow'], PAL['air'], 0.3))
+    sw = (0.65 * sheen * (1 - 0.7 * shadow))[..., None]
+    o = o * (1 - sw) + gl * sw
+    # the joints: gaps of 9 mm, at least 0.7 px, their contrast fading with distance
+    jw_x = np.maximum(0.009 * F_PX / Z, 0.7)                                # cross joints (px wide)
+    bed_y = HORIZON_Y + F_PX * EYE_M / ((row + 1) * D) - PAVE_Y0            # the bed joint below each row
+    bed_d = np.abs(yy - bed_y)
+    bed_prev = np.abs(yy - (HORIZON_Y + F_PX * EYE_M / (row * D + 1e-6) - PAVE_Y0))
+    bed_d = np.minimum(bed_d, bed_prev)
+    jw_y = np.maximum(F_PX * EYE_M * 0.009 / (Z * Z), 0.6)
+    jc = np.maximum(np.clip(jw_x / 2 + 0.5 - cross_j, 0, 1), np.clip(jw_y / 2 + 0.5 - bed_d, 0, 1))
+    jfade = (1.0 - smooth((Z - 5.0) / 11.0)) * 0.85
+    jcol = rgb2ok(joint_c) * (1 - shadow[..., None]) + rgb2ok(mix(shad, PAL['slate'], 0.4)) * shadow[..., None]
+    o = o * (1 - (jc * jfade)[..., None]) + jcol * (jc * jfade)[..., None]
+    cv = Canvas(H, W)
+    cv.c = ok2rgb(o).astype(np.float32)
+    if keep is not None:
+        keep['P0'] = cv.image()
+    # ---- P1: level soft strokes: the calm bands of the owner's models (02, 03) ----
+    if passes >= 1:
+        p1 = Layer(H, W)
+        for _ in range(7):
+            y = rng.uniform(60, H)
+            x = rng.uniform(-100, W - 200)
+            c = lighter(lit, rng.uniform(0.08, 0.14)) if rng.random() < 0.5 else darker(lit, rng.uniform(0.08, 0.14),
+                                                                                        'lilac')
+            brush.line(p1, (x, y), (x + rng.uniform(300, 600), y + rng.uniform(-4, 4)), rng.uniform(26, 56), c, 0.4,
+                       soft=(12, 12), taper=(0.25, 0.25))
+        p1.blur(8.0)
+        cv.over(p1)
+    # ---- P2: flat strokes along the near flags + dry level dashes (the c05 road's texture), near only ----
+    if passes >= 2:
+        p2 = Layer(H, W)
+        near = (Z < 7.5).astype(np.float32) * (1 - shadow * 0.5)
+        ids = np.unique(flag_id[near > 0.5])
+        for fid in ids:
+            m = (flag_id == fid)
+            ys_, xs_ = np.nonzero(m)
+            if len(xs_) < 400 or rng.random() < 0.35:
+                continue
+            x0_, x1_, y0_, y1_ = xs_.min(), xs_.max(), ys_.min(), ys_.max()
+            for _ in range(int(rng.integers(1, 3))):
+                cy_ = rng.uniform(y0_ + 2, y1_ - 2)
+                ln = (x1_ - x0_) * rng.uniform(0.35, 0.8)
+                cx_ = rng.uniform(x0_ + ln / 2, max(x1_ - ln / 2, x0_ + ln / 2 + 1))
+                wd = max((y1_ - y0_) * rng.uniform(0.25, 0.55), 3)
+                c = lighter(lit, rng.uniform(0.08, 0.15)) if rng.random() < 0.5 else darker(lit, rng.uniform(0.08, 0.14),
+                                                                                            'lilac')
+                brush.mark(p2, cx_, cy_, ln, wd, 0, jitter(c, rng, 0.004), rng.uniform(0.35, 0.55), soft=(1.2, 1.2),
+                           taper=(0.1, 0.35), dry=0.55, dry_len=0.45, clip=m.astype(np.float32))
+        xs, ys = sample_by((Z < 6.0) * 1.0, 90, rng)                              # dry dashes
+        for x, y in zip(xs, ys):
+            c = lighter(lit, rng.uniform(0.1, 0.2)) if rng.random() < 0.55 else darker(lit, rng.uniform(0.1, 0.18),
+                                                                                       'slate')
+            brush.mark(p2, x, y, rng.uniform(8, 32), rng.uniform(1.4, 3.0), rng.normal(0, 1.5), c,
+                       rng.uniform(0.3, 0.5), soft=(0.5, 0.5), taper=(0.1, 0.4), dry=0.5, dry_len=0.5)
+        p2.blur(0.4)
+        cv.over(p2)
+    # ---- P3: the lit back lip of each near flag (the edge that faces the sun), the props ----
+    if passes >= 3:
+        p3 = Layer(H, W)
+        # bed_y is each row's FAR joint (upper in the image): the near flag's back edge, just below it, faces the sun
+        lip = np.clip(1.2 - np.abs(yy - (bed_y + 1.3)), 0, 1) * (Z < 9.0) * (1 - shadow) * (1 - sheen * 0.5)
+        lp = Layer(H, W)
+        lp.fill(lip * 0.7 * (1 - smooth((Z - 5) / 4.0)), mix(lit, PAL['glow'], 0.7))
+        cv.over(lp)
+        prop = mix(PAL['plum'], PAL['slate'], 0.3)
+        for (cx_, cz_, ch_, cr_) in casters:
+            bx_, by_ = ground_xy(cx_, cz_)
+            hpx = F_PX * ch_ / cz_
+            wpx = max(F_PX * 2 * cr_ / cz_, 2.5)
+            brush.line(p3, (bx_, by_ + 1), (bx_, by_ - hpx), wpx, prop, 1.0, soft=(0.5, 0.5), taper=(0.0, 0.0))
+            brush.line(p3, (bx_ - wpx / 2 + 0.7, by_ - 1), (bx_ - wpx / 2 + 0.7, by_ - hpx + 1), 1.2, PAL['glow'], 0.8,
+                       soft=(0.45, 0.45), taper=(0.1, 0.0))
+            if ch_ > 2:                                                          # the lamp's head
+                brush.line(p3, (bx_ - 7, by_ - hpx), (bx_ + 7, by_ - hpx), 6, prop, 1.0, soft=(0.5, 0.5),
+                           taper=(0.0, 0.0))
+                brush.line(p3, (bx_ - 5, by_ - hpx + 4), (bx_ + 5, by_ - hpx + 4), 3, PAL['lamp'], 0.95,
+                           soft=(0.5, 0.5), taper=(0.0, 0.0))
+            brush.line(p3, (bx_ - wpx, by_ + 0.8), (bx_ + wpx, by_ + 0.8), 2.0, mix(shad, PAL['ink'], 0.5), 0.7,
+                       soft=(0.5, 1.2), taper=(0.1, 0.1))
+        cv.over(p3)
+    # ---- P4: grit on the near flags only ----
+    if passes >= 4:
+        near_w = (1.0 - smooth((Z - 3.0) / 4.0)).astype(np.float32)
+        apply_dl(cv, grain(H, W, near_w, 45, (0.45, 0.9), (2.0, 4.0), rng, light_share=0.55))
+    # ---- DEPTH: toward the air by distance, a little softer far ----
+    k = (0.5 * smooth((Z - 3.0) / 30.0)).astype(np.float32)
+    depth_convert(cv, k, 1.0 - 0.5 * k)
+    soft = ndi.gaussian_filter(cv.c, (0.9, 0.9, 0))
+    wsoft = smooth((Z - 10.0) / 12.0)[..., None]
+    cv.c = (cv.c * (1 - wsoft) + soft * wsoft).astype(np.float32)
+    if keep is not None:
+        keep['final'] = cv.image()
+    return cv
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# 9. ELEMENT 5: smooth boulders and faceted rocks (recipe 4.5)
+# ----------------------------------------------------------------------------------------------------------------
+# A sand bed by the canal, 2.5-6 m from the eye (frame y 980-1400). The low sun is ahead-left, so a boulder shows us
+# its shaded front: one dark body, the top band lit by the sky dome, a thin warm rim where its upper-left edge meets
+# the sun, a warm bounce low, a contact shadow and a long soft shadow running toward us.
+ROCK_X0, ROCK_Y0 = 40, 980
+
+
+def rock_xy(X, Z):
+    return 540.0 + F_PX * X / Z - ROCK_X0, HORIZON_Y + F_PX * EYE_M / Z - ROCK_Y0
+
+
+def boulder_outline(cx, by, a_l, a_r, h, p=2.4, bulge=0.07, n=64):
+    """A dome on a flat base: the top is a superellipse (exponent p: 2 = round, 3 = squarer) with different half-widths
+    left and right (an asymmetric peak); the base bulges toward us (the footprint seen from above)."""
+    pts = []
+    for t in np.linspace(-1, 1, n):
+        a = a_l if t < 0 else a_r
+        x = cx + t * a
+        y = by - h * (1 - abs(t) ** p) ** (1.0 / p)
+        pts.append((x, y))
+    for t in np.linspace(1, -1, n // 2):
+        a = a_l if t < 0 else a_r
+        pts.append((cx + t * a, by + bulge * h * (1 - t * t)))
+    return pts
+
+
+def top_curve(cx, by, a_l, a_r, h, p, x):
+    t = np.where(x < cx, (x - cx) / a_l, (x - cx) / a_r)
+    t = np.clip(t, -1, 1)
+    return by - h * (1 - np.abs(t) ** p) ** (1.0 / p)
+
+
+def paint_rocks(W=1000, H=420, seed=None, passes=9, keep=None):
+    """The bed: far water band, bank, calm sand with level strokes. Each boulder: P0 body + the sky-lit top plane (its
+    lower edge stepped, never a smooth crescent) + a warm bounce low; P1 soft strokes along the dome; P2 flat strokes
+    along the form; P3 the warm rim on the sun side, two or three thin curved lights, the contact shadow; P4 speckle
+    (near only). Each faceted rock: P0 planes by orientation (top sky-lit, a sunlit sliver, front shade, right deep),
+    P2 chisel strokes along each plane, P4 speckle. Long soft shadows toward us. A far rock converted for its depth."""
+    rng = rng_for('rocks', seed)
+    brush = Brush(rng)
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    yf = yy + ROCK_Y0
+    Z = (F_PX * EYE_M / np.maximum(yf - HORIZON_Y, 1.0)).astype(np.float32)
+    X = ((xx + ROCK_X0 - 540.0) * Z / F_PX).astype(np.float32)
+    sand = mix(PAL['sand'], PAL['glow'], 0.15)                  # L~82 sunlit sand
+    sand_sh = mix(PAL['lilac'], PAL['sand'], 0.35)              # L~70 sand in shadow
+    water = mix(PAL['lilac'], PAL['air'], 0.45)                 # the canal beyond, mirroring the sky
+    cv = Canvas(H, W)
+    bank_y = 54.0
+    t = smooth((yy - bank_y) / (H - bank_y))[..., None]
+    cv.c[:] = (sand * (1 - t) + mix(sand, PAL['granite'], 0.25) * t).astype(np.float32)
+    wl = Layer(H, W)
+    wl.fill((yy < bank_y).astype(np.float32), water)
+    cv.over(wl)
+    b = Layer(H, W)
+    for _ in range(5):                                          # the water's few level light dashes (water recipe)
+        y = rng.uniform(8, bank_y - 8)
+        x = rng.uniform(0, W - 200)
+        brush.line(b, (x, y), (x + rng.uniform(60, 220), y), rng.uniform(1.5, 3), mix(water, PAL['glow'], 0.5),
+                   rng.uniform(0.4, 0.7), soft=(0.5, 0.5), taper=(0.2, 0.3))
+    brush.line(b, (-5, bank_y), (W + 5, bank_y), 3.0, mix(sand_sh, PAL['plum'], 0.45), 0.8, soft=(0.5, 2.0),
+               taper=(0, 0))
+    cv.over(b)
+    # rocks: (kind, X, Z, width m, height m, extra)
+    rocks = [
+        ('facet', -2.6, 6.0, 0.5, 0.3, dict(far=True)),
+        ('dome', 1.0, 5.2, 0.48, 0.24, dict(p=2.2, skew=0.15)),
+        ('dome', -1.0, 4.4, 1.3, 0.6, dict(p=2.6, skew=-0.2, lights=3)),
+        ('dome', -0.35, 3.7, 0.7, 0.36, dict(p=2.3, skew=0.1)),
+        ('facet', 1.35, 3.3, 0.8, 0.5, dict()),
+        ('dome', 0.35, 3.0, 0.22, 0.11, dict(p=2.0, skew=0.0)),
+        ('dome', -1.3, 2.9, 0.3, 0.17, dict(p=2.1, skew=0.2)),
+    ]
+    rocks.sort(key=lambda r: -r[2])                              # far first
+    # ---- the shadows toward us (in ground metres), on the sand, before the rocks ----
+    sdir = np.array([-SUN_TAN, -1.0])
+    sdir /= np.linalg.norm(sdir)
+    shadow = np.zeros((H, W), np.float32)
+    for kind, X0, Z0, wm, hm, ex in rocks:
+        L_s = hm / np.tan(SUN_ELEV)
+        dX, dZ = X - X0, Z - Z0
+        s = dX * sdir[0] + dZ * sdir[1]
+        q = dX * (-sdir[1]) + dZ * sdir[0]
+        r = wm / 2 * 0.8
+        pen = 0.02 + 0.06 * np.clip(s, 0, None)                  # it softens and fades away from its caster
+        core = smooth((r - np.abs(q)) / pen + 0.5) * smooth(s / 0.1 + 0.5) * (s < L_s)
+        shadow = np.maximum(shadow, core * np.exp(-np.clip(s, 0, None) / (0.8 + 2.5 * hm)) * (yy > bank_y))
+    sl = Layer(H, W)
+    sl.fill(shadow * 0.65, mix(sand_sh, PAL['slate'], 0.15))
+    cv.over(sl)
+    # ---- the rocks, far to near ----
+    body_hi = mix(PAL['plum'], PAL['slate'], 0.4)                # L~38 the shaded front, high (cooler)
+    body_lo = mix(PAL['plum'], PAL['mauve'], 0.45)               # L~40 low: the warm bounce from the sand
+    top_c = mix(PAL['slate'], PAL['lilac'], 0.55)                # L~57 the top plane, lit by the sky dome
+    rim_c = mix(PAL['glow'], PAL['sand'], 0.2)                   # the sun's rim
+    for ri, (kind, X0, Z0, wm, hm, ex) in enumerate(rocks):
+        rr = rng_for('rocks/%d' % ri, seed)
+        cx, by = rock_xy(X0, Z0)
+        a = F_PX * wm / Z0 / 2
+        h = F_PX * hm / Z0
+        lay = Layer(H, W)
+        if kind == 'dome':
+            p_ = ex.get('p', 2.4)
+            a_l, a_r = a * (1 - ex.get('skew', 0)), a * (1 + ex.get('skew', 0))
+            outline = boulder_outline(cx, by, a_l, a_r, h, p_)
+            m = poly_mask(H, W, [outline])
+            # P0: the body (cooler high, warmer low), the top plane with a STEPPED lower edge, a warm bounce
+            tt = smooth((yy - (by - h)) / max(h, 1))[..., None]
+            lay.fill(m, (body_hi * (1 - tt) + body_lo * tt).astype(np.float32))
+            topy = top_curve(cx, by, a_l, a_r, h, p_, xx)
+            band = 0.12 * h * np.clip(1 - ((xx - cx) / np.where(xx < cx, a_l, a_r)) ** 2, 0, 1) ** 0.7
+            nb = value_noise(1, W, max(a / 2.5, 8.0), rr)[0][None, :]               # an irregular plane break
+            band = band * np.clip(0.8 + 0.35 * nb, 0.4, 1.4) + 1.0
+            m_top = m * (yy < topy + band)
+            lay.fill(m_top, top_c)
+            cv_r = cv.copy()
+            cv_r.over(lay)
+            if passes >= 1:                                                          # P1: soft along the dome
+                p1 = Layer(H, W)
+                for _ in range(int(rr.integers(2, 4))):
+                    th0 = rr.uniform(np.pi * 1.1, np.pi * 1.45)
+                    brush.arc(p1, (cx + rr.uniform(-0.2, 0.2) * a, by), a * rr.uniform(0.45, 0.8), th0,
+                              th0 + rr.uniform(0.5, 1.1), max(a * 0.3, 8), lighter(body_hi, rr.uniform(0.08, 0.14),
+                                                                                  'lilac'),
+                              0.45, soft=(8, 8), taper=(0.3, 0.3), squash=h / a * 0.95)
+                p1.blur(6.0).clip(m * (1 - m_top))
+                cv_r.over(p1)
+            if passes >= 2:                                                          # P2: flat strokes along the form
+                p2 = Layer(H, W)
+                for _ in range(int(max(2, a / 22))):
+                    rad = a * rr.uniform(0.35, 0.95)
+                    th0 = rr.uniform(np.pi * 1.05, np.pi * 1.7)
+                    c = lighter(body_hi, rr.uniform(0.06, 0.12), 'lilac') if rr.random() < 0.5 else \
+                        darker(body_lo, rr.uniform(0.08, 0.14), 'ink')
+                    brush.arc(p2, (cx, by + h * 0.05), rad, th0, th0 + rr.uniform(0.25, 0.6), max(4, a * rr.uniform(0.05, 0.1)),
+                              c, rr.uniform(0.4, 0.65), soft=(0.7, 0.7), taper=(0.08, 0.3), dry=0.4,
+                              squash=h / a * 0.95)
+                for _ in range(int(max(2, a / 30))):                                 # the top plane's stroke ends
+                    xm = cx + rr.uniform(-0.7, 0.7) * (a_l if rr.random() < 0.5 else a_r)
+                    ym = float(top_curve(cx, by, a_l, a_r, h, p_, np.array([xm]))[0])
+                    tb = 0.12 * h * max(0.0, 1 - ((xm - cx) / a) ** 2) ** 0.7
+                    slope = np.degrees(np.arctan2(float(top_curve(cx, by, a_l, a_r, h, p_, np.array([xm + 2]))[0]) - ym,
+                                                  2.0))
+                    brush.mark(p2, xm, ym + tb + rr.uniform(-1, 3), rr.uniform(10, 26), rr.uniform(3, 6), slope,
+                               mix(top_c, body_hi, rr.uniform(0.15, 0.4)), rr.uniform(0.5, 0.75), soft=(0.5, 0.5),
+                               taper=(0.1, 0.35))
+                lo = Layer(H, W)                                                     # reflected light, low and warm
+                lo.fill(m * smooth((yy - (by - 0.35 * h)) / (0.3 * h)), lighter(body_lo, 0.16, 'terracotta'))
+                lo.blur(4.0)
+                lo.a *= 0.6
+                lo.c *= 0.6
+                over_into(p2, lo)
+                p2.clip(m * (1 - m_top * 0.6))
+                cv_r.over(p2)
+            if passes >= 3:                                                          # P3: rim, curved lights, contact
+                p3 = Layer(H, W)
+                xs_ = np.linspace(cx - a_l * 0.98, cx - a_l * 0.1, 24)
+                ys_ = top_curve(cx, by, a_l, a_r, h, p_, xs_)
+                for k_ in range(len(xs_) - 1):
+                    wgt = 1 - k_ / (len(xs_) - 1)
+                    brush.line(p3, (xs_[k_], ys_[k_] + 0.9), (xs_[k_ + 1], ys_[k_ + 1] + 0.9), 1.0 + 1.6 * wgt, rim_c,
+                               0.6 + 0.35 * wgt, soft=(0.45, 0.45), taper=(0.0, 0.0))
+                for _ in range(ex.get('lights', 0)):
+                    rad = a * rr.uniform(0.55, 0.85)
+                    th0 = rr.uniform(np.pi * 1.15, np.pi * 1.35)
+                    brush.arc(p3, (cx + a * 0.05, by + h * 0.08), rad, th0, th0 + rr.uniform(0.3, 0.6),
+                              rr.uniform(1.2, 2.0), mix(top_c, body_hi, 0.35), rr.uniform(0.35, 0.55), soft=(0.5, 0.5),
+                              taper=(0.25, 0.4), squash=h / a * 0.95)
+                p3.clip(m)
+                cv_r.over(p3)
+                cs = Layer(H, W)                                                     # the contact shadow
+                brush.line(cs, (cx - a_l * 0.95, by + 1), (cx + a_r * 0.98, by + 2), max(3.0, h * 0.05),
+                           mix(sand_sh, PAL['ink'], 0.55), 0.75, soft=(0.6, max(4.0, h * 0.08)), taper=(0.1, 0.05))
+                cs.clip(1 - m)
+                cv_r.over(cs)
+            if passes >= 4 and Z0 < 4.0:                                             # P4: speckle, near only
+                apply_dl(cv_r, grain(H, W, m * (1 - m_top), 25, (0.45, 0.9), (3.0, 6.0), rr, light_share=0.7))
+            cv = cv_r
+        else:
+            # faceted (low-poly): a coarse dome outline (8 segments, jittered), fanned from two interior points into
+            # facets; each facet takes its plane's value from the way its outer edge faces (recipe 4.5 a)
+            pl = dict(front=mix(PAL['slate'], PAL['mauve'], 0.35),                  # L~47 faces us (shade)
+                      half=mix(mix(PAL['slate'], PAL['mauve'], 0.35), PAL['lilac'], 0.35),  # L~54 half-tone
+                      right=mix(PAL['plum'], PAL['slate'], 0.4),                     # L~36 faces away from the sun
+                      top=mix(PAL['lilac'], PAL['cream'], 0.35),                     # L~74 faces up (the sky dome)
+                      sun=mix(PAL['sand'], PAL['glow'], 0.4))                        # L~84 faces the sun
+            N = 8
+            ts = np.linspace(-1, 1, N + 1)
+            sil = []
+            for t_ in ts:
+                rad = rr.uniform(0.9, 1.06) if abs(t_) < 0.99 else 1.0
+                xv = cx + t_ * a * rad
+                yv = by - h * (1 - abs(t_) ** 2.3) ** (1 / 2.3) * (rad if abs(t_) < 0.99 else 1.0)
+                sil.append((xv, min(yv, by)))
+            Q1, Q2 = (cx - 0.25 * a, by - 0.42 * h), (cx + 0.3 * a, by - 0.38 * h)
+            m = poly_mask(H, W, [sil])
+            facets = []
+            for k_ in range(N):
+                (x1_, y1_), (x2_, y2_) = sil[k_], sil[k_ + 1]
+                nx_, ny_ = (y2_ - y1_), -(x2_ - x1_)                                  # the outer edge's normal
+                nn = np.hypot(nx_, ny_) + 1e-9
+                nx_, ny_ = nx_ / nn, ny_ / nn
+                Qk = Q1 if (x1_ + x2_) / 2 < cx else Q2
+                if ny_ < -0.8:
+                    role = 'top'
+                elif nx_ < -0.45:
+                    role = 'sun'
+                elif nx_ > 0.45:
+                    role = 'right'
+                else:
+                    role = 'top' if ny_ < -0.55 else 'half'
+                facets.append(([sil[k_], sil[k_ + 1], Qk], role))
+            facets.append(([Q1, Q2, sil[N // 2]], 'top'))                            # the crown between the fans
+            facets.append(([sil[0], Q1, (cx - 0.1 * a, by)], 'half'))                 # the front, low: shade
+            facets.append(([Q1, Q2, (cx + 0.45 * a, by), (cx - 0.1 * a, by)], 'front'))
+            facets.append(([Q2, sil[N], (cx + 0.45 * a, by)], 'right'))
+            lay.fill(m, pl['front'])
+            for poly_, role in facets:
+                lay.fill(m * poly_mask(H, W, [poly_]), jitter(pl[role], rr, 0.008))
+            top_poly = [f[0] for f in facets if f[1] == 'top']
+            right_poly = [f[0] for f in facets if f[1] == 'right']
+            ls, tl = sil[0], sil[2]
+            bl = sil[0]
+            cv_r = cv.copy()
+            cv_r.over(lay)
+            if passes >= 2:                                                          # P2: chisel strokes per plane
+                p2 = Layer(H, W)
+                for poly, base_c, ang_ in ((top_poly, pl['top'], -6), (right_poly, pl['right'], 75),
+                                           (None, pl['front'], 85)):
+                    pm = m * (np.clip(poly_mask(H, W, poly), 0, 1) if poly is not None else 1.0)
+                    xs, ys = sample_by(pm, int(rr.integers(2, 5)), rr)
+                    for x_, y_ in zip(xs, ys):
+                        c = lighter(base_c, rr.uniform(0.08, 0.15), 'cream') if rr.random() < 0.5 else \
+                            darker(base_c, rr.uniform(0.08, 0.15), 'plum')
+                        brush.mark(p2, x_, y_, rr.uniform(15, 40), rr.uniform(8, 16), ang_ + rr.normal(0, 6), c,
+                                   rr.uniform(0.5, 0.75), soft=(0.5, 0.5), taper=(0.02, 0.1), clip=pm)
+                cv_r.over(p2)
+            if passes >= 3:
+                p3 = Layer(H, W)
+                for k_ in range(0, 3):                                               # the sunward arrises
+                    brush.line(p3, sil[k_], sil[k_ + 1], 1.8 - 0.4 * k_, PAL['glow'], 0.85, soft=(0.45, 0.45),
+                               taper=(0.0, 0.1))
+                p3.clip(m)
+                cv_r.over(p3)
+                cs = Layer(H, W)
+                brush.line(cs, (cx - a, by + 1), (cx + a, by + 1), max(3.0, h * 0.06), mix(sand_sh, PAL['ink'], 0.55),
+                           0.75, soft=(0.6, max(4.0, h * 0.08)), taper=(0.1, 0.05))
+                cs.clip(1 - m)
+                cv_r.over(cs)
+            if passes >= 4 and not ex.get('far'):
+                apply_dl(cv_r, grain(H, W, m, 45, (0.45, 0.95), (3.0, 6.0), rr, light_share=0.5))
+            if ex.get('far'):                                                        # depth: toward the air, softer
+                rl = Layer(H, W)
+                rl.c = cv_r.c * m[..., None]
+                rl.a = m.copy()
+                rl.c = to_plane(np.where(m[..., None] > 0, cv_r.c, 0), 0.22, 0.85).astype(np.float32) * m[..., None]
+                rl.blur(0.6)
+                cv.over(rl)
+                continue
+            cv = cv_r
+    # ---- the sand: level soft strokes (P1) and grit near (P4) ----
+    p1 = Layer(H, W)
+    for _ in range(6):
+        y = rng.uniform(bank_y + 20, H)
+        x = rng.uniform(-100, W - 200)
+        brush.line(p1, (x, y), (x + rng.uniform(300, 600), y + rng.uniform(-3, 3)), rng.uniform(18, 40),
+                   lighter(sand, 0.1) if rng.random() < 0.5 else darker(sand, 0.1, 'lilac'), 0.35, soft=(10, 10),
+                   taper=(0.25, 0.25))
+    p1.blur(7.0)
+    sand_m = (yy > bank_y + 2).astype(np.float32)
+    rock_m = np.zeros((H, W), np.float32)
+    for kind, X0, Z0, wm, hm, ex in rocks:
+        cx, by = rock_xy(X0, Z0)
+        a, h = F_PX * wm / Z0 / 2, F_PX * hm / Z0
+        rock_m = np.maximum(rock_m, poly_mask(H, W, [rect(cx - 1.15 * a, by - h * 1.05, cx + 1.15 * a, by + 0.12 * h)]))
+    p1.clip(sand_m)
+    p1.a *= 1 - rock_m
+    p1.c *= (1 - rock_m)[..., None]
+    cv.over(p1)
+    if passes >= 4:
+        apply_dl(cv, grain(H, W, sand_m * (1 - rock_m) * smooth((yy - 150) / 200.0), 35, (0.45, 0.9), (2.0, 3.5),
+                           rng, light_share=0.5))
+    if keep is not None:
+        keep['final'] = cv.image()
+    return cv
