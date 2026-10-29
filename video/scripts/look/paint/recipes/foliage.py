@@ -906,7 +906,7 @@ def paint_reeds(w, h, rng, x0, x1, yb, hmax, wind=0.42):
     Y, X = np.mgrid[0:h, 0:w].astype(np.float32) + 0.5
     shear = (yb - Y) * np.tan(lean_x)[None, :] * 0.25
     Xs = np.clip((X - shear).astype(int), 0, w - 1)
-    rag = 4.0 * fbm1(rng, w, 2.5)  # small-scale raggedness only (the blades carry the real edge)
+    rag = 2.0 * fbm1(rng, w, 4.0)  # small-scale raggedness only (the blades carry the real edge)
     topv = (yb - hm + rag)[Xs]
     mass = np.clip(Y - topv + 0.5, 0, 1) * np.clip(yb - Y + 0.5, 0, 1) * (hm[Xs] > 2)
     fr = np.clip((yb - Y) / np.maximum(hm[Xs], 1), 0, 1)  # 0 root .. 1 top
@@ -1004,7 +1004,7 @@ def paint_near_blades(w, h, rng, n=4, sigma=2.6):
         lean = rng.uniform(0.3, 0.6) * (1 if x < w / 2 else 0.6)
         path = blade_path(x, h + 12, ln, lean * 0.6, lean * 0.9, rng, n=30)
         tt = np.linspace(0, 1, len(path))
-        widths = rng.uniform(14, 21) * (0.3 + 0.7 * np.sin(np.pi * np.clip(tt * 0.95, 0, 1)) ** 0.8) * (1 - tt) ** 0.25
+        widths = rng.uniform(22, 30) * (0.45 + 0.55 * np.sin(np.pi * np.clip(tt * 0.95, 0, 1)) ** 0.8) * (1 - tt) ** 0.3
         m, xa, ya = polys_mask([ribbon(path, widths)])
         L.comp(m, xa, ya, shift(C('grass_shade'), -9, 0.9), rng.uniform(0.72, 0.85))
     L.blur(sigma)
@@ -1148,33 +1148,43 @@ def paint_protea(w, h, rng, cx, cy, R, leaves=True, scale_leaf=1.0):
 # ----------------------------------------------------------------------------------------------------------------
 # 8. ELEMENT 5: near leaves framing a corner (recipe 3.5)
 # ----------------------------------------------------------------------------------------------------------------
-def palmate_poly(cx, cy, R, ang, rng, n=180):
-    """A 5-lobed leaf (plane / maple): pointed lobes, the stalk notch at the base. ang = the central lobe's direction."""
-    lob = [(0, 1.0), (52, 0.86), (-52, 0.86), (104, 0.56), (-104, 0.56)]
+def palmate_poly(cx, cy, R, ang, rng, n=200, squash=1.0):
+    """A 5-lobed leaf (plane / maple): broad pointed lobes, shallow sinuses, a few teeth, the stalk notch at the base.
+    ang = the central lobe's direction; squash < 1 foreshortens it across (a leaf seen turned)."""
+    lob = [(0, 1.0), (50, 0.88), (-50, 0.88), (100, 0.58), (-100, 0.58)]
     th = np.linspace(-math.pi, math.pi, n, endpoint=False)
-    r = np.full(n, 0.30)
+    r = np.full(n, 0.42)
+    tips = []
     for dthd, ln in lob:
         dth = math.radians(dthd + rng.normal(0, 4))
+        l2 = ln * rng.uniform(0.92, 1.05)
         d = np.angle(np.exp(1j * (th - dth)))
-        r = np.maximum(r, ln * rng.uniform(0.92, 1.05) * np.exp(-0.5 * (d / 0.20) ** 2) ** 0.9 + 0.30 * np.cos(d / 2) ** 6)
-    # small teeth
-    r *= 1 + 0.03 * np.sin(th * 23 + rng.uniform(0, 6))
-    # the stalk notch at the back
+        r = np.maximum(r, 0.42 + (l2 - 0.42) * np.clip(1 - np.abs(d) / 0.42, 0, 1) ** 1.6)
+        tips.append((dth, l2))
+    r *= 1 + 0.025 * np.sin(th * 21 + rng.uniform(0, 6))
     dback = np.angle(np.exp(1j * (th - math.pi)))
-    r *= 1 - 0.55 * np.exp(-0.5 * (dback / 0.16) ** 2)
-    tt = th + ang
-    pts = np.stack([cx + R * r * np.cos(tt), cy + R * r * np.sin(tt)], 1)
-    tips = [(cx + R * ln * math.cos(ang + math.radians(d)), cy + R * ln * math.sin(ang + math.radians(d)))
-            for d, ln in lob]
-    return pts, tips
+    r *= 1 - 0.45 * np.exp(-0.5 * (dback / 0.18) ** 2)
+    x, y = R * r * np.cos(th), R * r * np.sin(th) * squash
+    ca, sa = math.cos(ang), math.sin(ang)
+    pts = np.stack([cx + x * ca - y * sa, cy + x * sa + y * ca], 1)
+    tp = []
+    for dth, l2 in tips:
+        tx, ty = R * l2 * math.cos(dth), R * l2 * math.sin(dth) * squash
+        tp.append((cx + tx * ca - ty * sa, cy + tx * sa + ty * ca))
+    return pts, tp
 
 
 def paint_corner_leaves(w, h, rng, sky_rgb_at):
     L = Layer(w, h)
     near = Layer(w, h)
-    twig = bez((-10, 26), (w * 0.30, 30), (w * 0.62, h * 0.30), 30)
-    m, xa, ya = polys_mask([ribbon(twig, np.linspace(4.2, 1.6, 30))])
+    twig = bez((-10, 22), (w * 0.30, 28), (w * 0.60, h * 0.30), 30)
+    m, xa, ya = polys_mask([ribbon(twig, np.linspace(5.5, 1.4, 30))])
     L.comp(m, xa, ya, C('aut_deep'))
+    for k, (dx, dy) in [(9, (40, -18)), (17, (34, 30))]:  # two side twigs
+        p0 = twig[k]
+        side = bez(p0, p0 + np.array([dx * 0.5, dy * 0.2]), p0 + np.array([dx, dy]), 10)
+        m, xa, ya = polys_mask([ribbon(side, np.linspace(2.6, 1.0, 10))])
+        L.comp(m, xa, ya, C('aut_deep'))
     spots = [0.10, 0.22, 0.36, 0.5, 0.63, 0.78, 0.93]
     leaves = []
     for i, f in enumerate(spots):
@@ -1194,7 +1204,7 @@ def paint_corner_leaves(w, h, rng, sky_rgb_at):
         m, xa, ya = lines_mask([(np.array([[px, py], [cx_ - math.cos(hang) * R * 0.32, cy_ - math.sin(hang) * R * 0.32]]),
                                  1.6, 1.0)])
         target.comp(m, xa, ya, C('aut_deep'), 0.95)
-        pts, tips = palmate_poly(cx_, cy_, R, hang, rng)
+        pts, tips = palmate_poly(cx_, cy_, R, hang, rng, squash=rng.uniform(0.62, 1.0))
         m, xa, ya = polys_mask([pts])
         turn = rng.random()
         lit_c, sh_c = ('aut_lit', 'aut_mid') if turn < 0.55 else ('aut_mid', 'aut_shade')
