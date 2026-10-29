@@ -5,6 +5,8 @@ SUBJECT rule) and is **produced by session https://claude.ai/code/session_01YGLG
 bunker under the Stockholm park (`video/docs/v5/`). The earlier session's G0 rounds below (r1-r4 shortlists, scouting,
 the glasses and the vaccine) stay here unchanged as history; nothing in them was rejected (their topics go to
 `docs/IDEAS_BANK.md` when this film is done).
+The earlier v4 session (https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt) could not be reached on 2026-10-29
+("not found"); nothing of it is running.
 
 | Gate | Status | File |
 |---|---|---|
