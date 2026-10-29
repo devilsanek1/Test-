@@ -160,7 +160,8 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   brisk gaps, a beat before the turn and the payoff, a light polish), checked word for word again; the variants stay
   ours. **Never time-stretch the voice:** a 10 % Rubber Band speed-up made v4's take "extremely robotic like there is
   some weird background", all but its one unstretched line (owner, 2026-10-29); pace comes from the generation (the
-  read, the tags, a model's own speed setting) and from the pauses. Never a voice the owner didn't pick: their cloned narrator voice by
+  read, pace words in the tags such as "brisk": Eleven v4 has no speed setting; a model's own speed setting where it
+  has one) and from the pauses (v4's take 3: "brisk" tags, +5 %, the voice unchanged). Never a voice the owner didn't pick: their cloned narrator voice by
   default, or the voice they name for a film (`docs/voice/VOICE.md`; v4, 2026-10-29: "lets try another voice - with
   this id MQnUCZUAQLYMCY1Ztz6d"). — (owner's standing instruction +
   v2 take 1, 2026-10-26).

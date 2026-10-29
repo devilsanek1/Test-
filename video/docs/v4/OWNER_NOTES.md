@@ -195,3 +195,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   the rest ran through Rubber Band at 1.10): take 2 keeps every word as generated, shapes only the pauses (from their
   own audio) and the two beats, lighter polish: 44.1 s, 171 words/min, MATCH; the page updated (version 2).
   -> rule: playbook, Script and voice (never time-stretch the voice).
+- 2026-10-29 ~19:55 UTC, G2 (take 2): "Yeah we need to speed it up just a tiny bit yes" -> Eleven v4 ignores the speed
+  setting (probed), so three v4 reads with pace in the tags; take 3 = "brisk" (stability 0.35), shaped by its pauses only:
+  41.8 s, 180 words/min (+5 % on take 2's 171), the voice's pitch nearly unchanged (222 Hz vs 218), MATCH; the page
+  updated (version 3). -> rule: playbook, Script and voice (pace from the tags on v4).

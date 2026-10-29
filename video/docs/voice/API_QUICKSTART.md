@@ -58,7 +58,9 @@ owner never pastes anything. Proven on 2026-10-26: video 2's API take was clean 
    --beat "<turn words>=0.45" --beat "<payoff words>=0.5" --polish --report shape.json` (each pause set from its own
    audio; commas and breaths only shortened) and checked again with `check_take.py` (MATCH). **No time-stretch**
    (`--tempo` stays 1.0): on v4 a 1.10 stretch sounded "extremely robotic like there is some weird background"; for
-   more pace, pick a faster read or a model with a speed setting (v3, v3 Conversational). The owner still gets ONE
+   more pace, put it in the tags: Eleven v4 ignores `voice_settings.speed` (probed on v4, 2026-10-29), but "brisk" or
+   "quick" in the paragraph tags made a whole read 6-10 % faster with no artifact ("quick" also lifts the pitch); v3
+   and v3 Conversational do honour the speed setting. The owner still gets ONE
    take; the variants stay ours.
 5. **Deliver on a player page:** attachments don't play in the Claude app on the owner's phone (a .wav shows "File
    preview unavailable"; an .m4a and an .mp3 came through as "None are available", v4, 2026-10-29). Make the two
