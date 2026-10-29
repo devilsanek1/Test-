@@ -109,7 +109,8 @@ Quality and output value come first, spent where it reaches the film. Ideas are 
   re-hears each changed line as the three viewers, with the line before and after it, until no changed line snags.
   The through-line card's carriers come from the script's joins (G1 row). Never structure a script as a list of facts
   to prove. **Rhythm (owner, 2026-10-27):** short sentences (<= 5 words) break up the long ones, at least one after
-  every 1-2 long sentences, each keeping its noun; the script must pass `scripts/voice/check_rhythm.py` and
+  at most three long sentences (three only when they flow, joined by connectors: the El Niño reference,
+  `docs/voice/refs/2026-10-29_el_nino/`), each short line keeping its noun; the script must pass `scripts/voice/check_rhythm.py` and
   `scripts/voice/check_clarity.py` (exit 0) before it goes to the owner. The heavy version (~12 agents:
   `v3-g1-story-*.js`) runs only on request.
   - **The three viewers** (each card says what that viewer doesn't know, because a played panel knows every word; each

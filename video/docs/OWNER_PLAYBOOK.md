@@ -118,20 +118,27 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   AI-sounding wording;** the everyday words it asks for are the clarity rule's, above. — (v1, 2026-10-24).
 - **Human connectors, placed TACTICALLY: a few spoken words a person telling a friend would use, at the moments that
   need a hand:** "To put that into perspective," before a comparison or a big number; "Actually," before the part that
-  surprises; "So," at a consequence; "Now," when the story moves on. A few in a film (about two to four), never on
+  surprises; "So," at a consequence; "Now," when the story moves on; and the El Niño reference's (`docs/voice/refs/
+  2026-10-29_el_nino/`): "So how does it work?" (the viewer's own question said aloud, then answered at length),
+  "Or in other words," (the plain restatement right after a term's definition), "Normally," (the usual case before
+  the change), "The result is that" (the consequence). A few in a film (about two to four), never on
   every line, each one true to the sentence it opens. They make the voice a person's and tell the listener what kind
   of sentence comes next (listeners follow and recall better with such markers: Chaudron and Richards 1985,
   `docs/retro/2026-10-29_script_clarity/research_ear.md` finding 11). They are not RULE #1's stock reveal phrases
   ("Here's the thing", "The catch?", "Turns out", "Let that sink in"), which promise drama and name nothing and stay
-  banned. — ("i would add more human / conversation like sentences TACTICALLY like before this 'Just one of them makes
+  banned (a question answered at length and "in other words" before a plain restatement are connectors; "The
+  result? X." and "In other words, [zinger]" stay RULE #1's tells). — ("i would add more human / conversation like sentences TACTICALLY like before this 'Just one of them makes
   as much heat as FORTY kettles, boiling non-stop.' i want to say something like 'to put it into perspective' or
   something like this. or something like 'Actually' / 'so' that just adds a bit more human to it, figure out what to
-  add", v4 G1, 2026-10-29).
-- **Rhythm: never a run of long sentences; put a short one (5 words or fewer, e.g. "Let's find out." "But there was a
-  problem.") after every 1-2 long ones, at the turns, and the short line keeps its noun** ("But Helsinki wants that
+  add", v4 G1, 2026-10-29; the El Niño voice line, "it sounds directionally good to me", 2026-10-29).
+- **Rhythm: never a monotone run of long sentences; put a short one (5 words or fewer, e.g. "Let's find out." "So how
+  does it work?") at the turns, after at most three long ones, three only when each is one flowing spoken thought
+  joined by a connector (the El Niño reference runs 15, 24 and 24 words and the owner likes it; a run of short
+  clipped lines sounds as written as a run of long ones), and the short line keeps its noun** ("But Helsinki wants that
   heat.", never a bare "it" after three things it could mean: five of v4 draft 1's six short lines had shed their
-  noun), gated by `scripts/voice/check_rhythm.py` OK at G1; rhythm OK is never evidence of clarity. — (owner's
-  reference reel, 2026-10-27; v4 G1, 2026-10-29).
+  noun), gated by `scripts/voice/check_rhythm.py` OK at G1 (a run of up to 3 since 2026-10-29); rhythm OK is never
+  evidence of clarity. — (owner's reference reel, 2026-10-27; v4 G1, 2026-10-29; the El Niño voice line, "it sounds
+  directionally good to me", 2026-10-29).
 - **Scripts come with detailed emotional / delivery cues; the owner always gets the full script text with any take.**
   — (v1; "give me the full text to paste, not one line", v3, 2026-10-26).
 - **We generate the narration with the owner's ElevenLabs voice through the API, for every video** (voice id and model
@@ -471,6 +478,13 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   a number and a name within 6 s; the twist past the title, "the strange part isn't how high"; a scale lineup; 11K
   likes, 1,378 shares with no freshness at all). Our evaluation and its lessons: the study's `content_discussion.md`,
   exchange 10. — ("I'm thinking it's actually really good on both", 2026-10-29).
+- **A voice line the owner rates "directionally good": the El Niño explainer** (`docs/voice/refs/2026-10-29_el_nino/`;
+  its first word is cut off, a flaw of the clip): stakes up front with a human consequence ("a 69% chance of breaking
+  every climate record in human history, and people aren't really ready for it"), the viewer's question said aloud
+  ("So how does it work?"), the term then its plain words ("Or in other words, ..."), the usual case ("Normally,
+  ..."), long flowing sentences carried by those connectors, and a brisk, lively read (about 214 words a minute, short
+  pauses, a wide pitch range). — ("I'll give you another point of reference - listen there is first word cut off
+  about El nino but it sounds directionally good to me", v4 G1, 2026-10-29).
 - **Every shortlist story shows what keeps people watching past its title:** its turn and its "oh" in a line or
   two (the beats after the headline), never the headline alone; a story that is one beat gets said to be one beat. A
   "top 3" or "weirdest places" idea is welcome, carried on one thread so it stays a story, not a list. — (on London's

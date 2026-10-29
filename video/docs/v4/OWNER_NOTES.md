@@ -164,3 +164,10 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   -> rules: playbook ONE SUBJECT, GONE DEEP ("No side quests, and only the information the story needs") and Script and
   voice ("Human connectors, placed TACTICALLY"); draft 3 by a writer, then a cold panel (which line could go; where it
   sounds like a person) and a critic, a fix pass and a re-hear (workflow `v4-g1-draft3`).
+- 2026-10-29 ~16:10 UTC, G1: sent `Voice_Line_Clean_24bit.wav` (an El Niño explainer, 25.5 s): "I'll give you another
+  point of reference - listen there is first word cut off about El nino but it sounds directionally good to me" ->
+  saved with its transcript and measures (`docs/voice/refs/2026-10-29_el_nino/`: 214 wpm, short pauses, a lively male
+  read; connectors "So how does it work?", "Or in other words,", "Normally,", "The result is that"; three long
+  flowing sentences in a row, which our rhythm check failed); draft 3 restarted to use it (its first writer was 5
+  minutes in). -> rules: playbook (Human connectors, Rhythm: a run of up to 3, Taste signals); `check_rhythm.py`'s run
+  limit 2 -> 3; `docs/voice/VOICE.md` (the pace at G2).

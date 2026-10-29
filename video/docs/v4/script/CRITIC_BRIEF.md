@@ -39,7 +39,7 @@ The panel's clarity findings are uncapped; the other findings stay at most 6. Th
    (owner: exaggeration is fine, no law-firm precision; only a made-up core event is out). Search the web only for a
    fact the file lacks, and never bbc.co.uk.
 6. **The spoken language and the rules:** everyday speech, no AI tells (no "imagine", "here's the thing", "let that
-   sink in", stacked triplets, em-dashes); short sentences (<= 5 words) after every 1-2 long ones; a delivery cue per
+   sink in", stacked triplets, em-dashes); short sentences (<= 5 words) at the turns, after at most three long ones (playbook, Rhythm); a delivery cue per
    line; one joke that lands; one or two comment lines, tagged, that are arguable but defensible; positive mood; the 3
    hook options in the brief's families, each one true; the through-line card (`video/docs/v4/THROUGHLINE.md`): one
    thread object, one home place, one "you", Pip hidden, a carrier for every join taken from the script's own joins
