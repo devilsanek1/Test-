@@ -1035,6 +1035,20 @@ def paint_facade(W=600, H=720, seed=None, passes=9, keep=None):
                 b0 = base if base is not None else (C['front_top'] if pcy < 380 else C['front_low'])
                 y = pcy - ph / 2
                 row = 0
+                if fmap == 'side':
+                    # foreshortened, the head joints vanish: what reads is the COURSES, thin lines to the VP,
+                    # lit tops and shadowed joints alternating, patchy
+                    while y < pcy + ph / 2:
+                        dyn = (y - pcy) / (ph / 2)
+                        half = pw / 2 * np.sqrt(max(0.0, 1 - dyn * dyn)) * rng.uniform(0.5, 1.0)
+                        if half > 4 and rng.random() < 0.8:
+                            xa = pcx - half + rng.uniform(-4, 4)
+                            c = lighter(b0, rng.uniform(*amp)) if rng.random() < 0.55 else \
+                                darker(b0, rng.uniform(*amp) * 0.8, 'terracotta')
+                            brush.line(pb, side_map(xa, y), side_map(xa + 2 * half, y), 1.0, c,
+                                       rng.uniform(0.45, 0.65), soft=(0.4, 0.4), taper=(0.15, 0.15))
+                        y += crs
+                    continue
                 while y < pcy + ph / 2:
                     x = pcx - pw / 2 + (blen / 2 if row % 2 else 0) - blen
                     while x < pcx + pw / 2:
@@ -1102,7 +1116,8 @@ def paint_facade(W=600, H=720, seed=None, passes=9, keep=None):
             keep['P3'] = cv.image()
     # ---- P4: the weather (stains run down from sills, soot from the cornice, splash at the base) and speckle ----
     if passes >= 4:
-        p4 = Layer(H, W)
+        p4 = Layer(H, W)                                                        # the front face's weather
+        p4s = Layer(H, W)                                                       # the side face's weather
         for (x0, t0, x1, b0) in wins:
             for _ in range(int(rng.integers(1, 3))):
                 sx = rng.choice([x0 - 2, x1 + 2, (x0 + x1) / 2]) + rng.uniform(-3, 3)
@@ -1114,7 +1129,6 @@ def paint_facade(W=600, H=720, seed=None, passes=9, keep=None):
             sx = rng.uniform(FAC_CORNER + 10, FAC_RIGHT - 20)
             brush.line(p4, (sx, 121), (sx, 121 + rng.uniform(50, 160)), rng.uniform(5, 12), darker(C['front_top'], 0.4),
                        rng.uniform(0.14, 0.22), soft=(2.5, 2.5), taper=(0.0, 0.8), dry=0.45, dry_len=0.6)
-        p4s = Layer(H, W)                                                       # the splash band, per face
         for _ in range(14):
             sx, sy = rng.uniform(FAC_CORNER - 30, FAC_RIGHT), rng.uniform(612, 630)
             brush.line(p4, (sx, sy), (sx + rng.uniform(25, 80), sy + rng.uniform(-1.5, 1.5)), rng.uniform(5, 11),
@@ -1131,14 +1145,14 @@ def paint_facade(W=600, H=720, seed=None, passes=9, keep=None):
                 sx = rng.uniform(x0, x1)
                 brush.line(p4, (sx, b0 + 9.6), (sx, b0 + 9.6 + rng.uniform(28, 80)), rng.uniform(2.0, 3.2),
                            darker(C['front_low'], 0.5), rng.uniform(0.45, 0.6), soft=(0.5, 0.5), taper=(0.0, 0.3))
-        p4s.clip(np.clip(m_sbrick + m_s_plinth, 0, 1))
-        cv.over(p4s)
         for _ in range(14):                                                     # pale chips on the lit side (p02)
             x, y = sample_by(m_sbrick * (0.3 + (yy > 420)), 1, rng)
             if len(x):
-                brush.mark(p4, x[0], y[0], rng.uniform(8, 26), rng.uniform(3, 7), 90, lighter(C['side'], 0.5, 'cream'),
+                brush.mark(p4s, x[0], y[0], rng.uniform(8, 26), rng.uniform(3, 7), 90, lighter(C['side'], 0.5, 'cream'),
                            rng.uniform(0.45, 0.7), soft=(0.5, 0.5))
-        p4.clip(np.clip(m_fbrick + m_sbrick + m_plinth_f + m_s_plinth, 0, 1))
+        p4s.clip(np.clip(m_sbrick + m_s_plinth, 0, 1))
+        cv.over(p4s)
+        p4.clip(np.clip(m_fbrick + m_plinth_f, 0, 1))
         cv.over(p4)
         gl_ = grain(H, W, m_sbrick + m_s_plinth, 85, (0.45, 0.9), (2.5, 4.0), rng, light_share=0.6)
         gs_ = grain(H, W, m_fbrick + m_plinth_f + stone_f, 32, (0.45, 0.8), (1.5, 2.5), rng, light_share=0.5)
@@ -1155,3 +1169,222 @@ def paint_facade(W=600, H=720, seed=None, passes=9, keep=None):
     if keep is not None:
         keep['final'] = cv.image()
     return cv
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# 7. ELEMENT 3: brick and stone surfaces up close (recipe 4.3)
+# ----------------------------------------------------------------------------------------------------------------
+
+
+def brick_courses(layer, brush, rng, box, course, blen, base, amp, coverage, patch_cell=60.0, mortar=None,
+                  lit_tops=0.0, lit_col=None):
+    """Brick SUGGESTED by flat dabs on a frontal wall: running bond, `course` px per course (joint 1.2-1.6 px),
+    `blen` px per brick; each brick a flat dab of its own value (+-amp as an OKLab mix toward the light or the shade
+    family); a smooth patch field sets where bricks show at all (coverage 0-1), so most of the wall stays calm; an
+    optional lit top arris on a share of the bricks (raking sun)."""
+    x0, y0, x1, y1 = box
+    h, w = layer.h, layer.w
+    field = smooth(0.5 + 0.5 * value_noise(h, w, patch_cell, rng) * 0.9 + (coverage - 0.5))
+    joint = max(1.2, course * 0.16)
+    y = y0
+    row = 0
+    while y < y1:
+        x = x0 - (blen / 2 if row % 2 else 0)
+        while x < x1:
+            cxi, cyi = int(np.clip(x + blen / 2, 0, w - 1)), int(np.clip(y + course / 2, 0, h - 1))
+            if rng.random() < field[cyi, cxi]:
+                r = rng.random()
+                if r < 0.45:
+                    c = lighter(base, rng.uniform(*amp))
+                elif r < 0.85:
+                    c = darker(base, rng.uniform(*amp), 'terracotta')
+                else:
+                    c = darker(base, rng.uniform(amp[1], amp[1] * 1.6), 'plum')          # a burnt header
+                brush.line(layer, (x + joint / 2, y + (course - joint) / 2), (x + blen - joint / 2,
+                           y + (course - joint) / 2), course - joint, jitter(c, rng, 0.004), rng.uniform(0.55, 0.85),
+                           soft=(0.45, 0.45), taper=(0.01, 0.01))
+                if lit_tops and rng.random() < lit_tops:
+                    brush.line(layer, (x + joint, y + 0.6), (x + blen * rng.uniform(0.4, 0.95), y + 0.6), 1.0,
+                               lit_col, rng.uniform(0.5, 0.8), soft=(0.4, 0.4), taper=(0.05, 0.3))
+            x += blen
+        y += course
+        row += 1
+
+
+def chip_marks(layer, brush, rng, weight, n, col_fn, size=((6, 22), (10, 60)), opacity=(0.55, 0.85)):
+    """p02's blocky chips: upright square-ended flat marks, some stepped (a second smaller block on one side)."""
+    xs, ys = sample_by(weight, n, rng)
+    for x, y in zip(xs, ys):
+        wd, ln = rng.uniform(*size[0]), rng.uniform(*size[1])
+        c = col_fn(rng)
+        brush.mark(layer, x, y, ln, wd, 90, c, rng.uniform(*opacity), soft=(0.45, 0.45), taper=(0.01, 0.01))
+        if rng.random() < 0.45:                                                     # stepped: an L-shaped chip
+            side_ = 1 if rng.random() < 0.5 else -1
+            brush.mark(layer, x + side_ * wd * 0.75, y + ln * rng.uniform(-0.3, 0.3), ln * rng.uniform(0.3, 0.6),
+                       wd * rng.uniform(0.4, 0.8), 90, c, rng.uniform(*opacity), soft=(0.45, 0.45), taper=(0.01, 0.01))
+
+
+def paint_brick_tiles(T=240, seed=None):
+    """Four close-up tiles (each T x T px at film scale, a near wall about 1.7 m across): A stock brick in the raking
+    sun, B stock brick in shade with a window's lit reveal and sill, C a stone cornice (its sunlit return and its shaded
+    front, seen from below) over ashlar, D chipped, rust-stained render (the p02 lighthouse method in our palette)."""
+    C = fac_colours()
+    out = {}
+    yy, xx = np.mgrid[0:T, 0:T].astype(np.float32)
+    # ---- A: stock brick in the raking sun ----
+    rng = rng_for('tile/brick_sun', seed)
+    brush = Brush(rng)
+    cv = Canvas(T, T)
+    base = C['side']
+    g = smooth((xx + yy * 0.5) / (1.5 * T))[..., None]
+    cv.c[:] = (lighter(base, 0.18) * (1 - g) + darker(base, 0.06, 'terracotta') * g).astype(np.float32)
+    p1 = Layer(T, T)
+    for _ in range(4):
+        x, y = rng.uniform(0, T, 2)
+        c = lighter(base, rng.uniform(0.12, 0.2)) if rng.random() < 0.5 else darker(base, rng.uniform(0.1, 0.16),
+                                                                                       'terracotta')
+        brush.line(p1, (x, y - 90), (x + rng.uniform(-10, 10), y + 90), rng.uniform(60, 100), c, 0.5, soft=(14, 14),
+                   taper=(0.25, 0.25))
+    p1.blur(6.0)
+    cv.over(p1)
+    pb = Layer(T, T)
+    brick_courses(pb, brush, rng, (-30, -4, T + 30, T + 10), 9.0, 26.0, base, (0.12, 0.24), 0.62, patch_cell=70.0,
+                  lit_tops=0.18, lit_col=mix(base, PAL['glow'], 0.7))
+    pb.blur(0.4)
+    cv.over(pb)
+    p4 = Layer(T, T)
+    brush.line(p4, (150, 0), (152, 150), 14, darker(base, 0.3, 'plum'), 0.14, soft=(3, 3), taper=(0.0, 0.8), dry=0.5,
+               dry_len=0.6)
+    cv.over(p4)
+    apply_dl(cv, grain(T, T, np.ones((T, T), np.float32), 110, (0.45, 0.95), (2.5, 4.5), rng, 0.6))
+    out['A'] = cv
+    # ---- B: stock brick in shade, a window's lit reveal, its stone sill and a stain below ----
+    rng = rng_for('tile/brick_shade', seed)
+    brush = Brush(rng)
+    cv = Canvas(T, T)
+    t = smooth(yy / T)[..., None]
+    wall = C['front_top'] * (1 - t) + C['front_low'] * t
+    cv.c[:] = wall.astype(np.float32)
+    p1 = Layer(T, T)
+    for _ in range(3):
+        x, y = rng.uniform(0, 140), rng.uniform(0, T)
+        c = mix(C['front_top'], PAL['lilac'], 0.2) if rng.random() < 0.5 else darker(C['front_low'], 0.12)
+        brush.line(p1, (x, y - 90), (x, y + 90), rng.uniform(50, 90), c, 0.5, soft=(14, 14), taper=(0.25, 0.25))
+    p1.blur(6.0)
+    cv.over(p1)
+    pb = Layer(T, T)
+    brick_courses(pb, brush, rng, (-30, -4, T + 30, T + 10), 9.0, 26.0, C['front_low'], (0.07, 0.13), 0.5,
+                  patch_cell=60.0)
+    pb.blur(0.4)
+    m_open = poly_mask(T, T, [rect(150, 0, T, 150)])
+    pb.clip(1 - m_open)
+    cv.over(pb)
+    d = Layer(T, T)
+    d.fill(poly_mask(T, T, [rect(150, 0, T, 150)]), C['glass'])
+    f = smooth((yy - 60 - (xx - 150) * 0.25) / 2.5 + 0.5)[..., None]
+    d.fill(poly_mask(T, T, [rect(168, 0, T, 150)]), (C['glass_sky'] * (1 - f) + C['glass'] * f).astype(np.float32))
+    d.fill(poly_mask(T, T, [rect(150, 0, 168, 150)]), C['reveal'])                    # the reveal faces the sun
+    d.fill(poly_mask(T, T, [rect(140, 150, T, 166)]), C['stone_sh'])                  # the sill's front face
+    d.fill(poly_mask(T, T, [rect(140, 166, T, 169)]), C['deep'])                      # its underside (from below)
+    cv.over(d)
+    p3 = Layer(T, T)
+    brush.line(p3, (150.6, 0), (150.6, 150), 1.3, mix(C['reveal'], PAL['glow'], 0.6), 0.8, soft=(0.45, 0.45),
+               taper=(0, 0))
+    brush.line(p3, (204, 0), (204, 150), 2.2, mix(C['deep'], C['glass'], 0.4), 0.75, soft=(0.45, 0.45), taper=(0, 0))
+    brush.line(p3, (168, 92), (T, 92), 3.0, mix(C['deep'], C['glass'], 0.4), 0.8, soft=(0.45, 0.45), taper=(0, 0))
+    brush.line(p3, (140, 150.6), (T, 150.6), 1.2, mix(C['stone_sh'], PAL['cream'], 0.6), 0.7, soft=(0.45, 0.45),
+               taper=(0, 0))
+    cv.over(p3)
+    p4 = Layer(T, T)
+    for sx in (152, 188, 226):
+        brush.line(p4, (sx + rng.uniform(-3, 3), 170), (sx, 170 + rng.uniform(30, 66)), rng.uniform(4, 8),
+                   darker(C['front_low'], 0.45), rng.uniform(0.28, 0.4), soft=(1.2, 1.2), taper=(0.0, 0.7), dry=0.5,
+                   dry_len=0.5)
+    brush.line(p4, (172, 169), (172, 225), 2.4, darker(C['front_low'], 0.55), 0.5, soft=(0.5, 0.5), taper=(0, 0.3))
+    p4.clip(1 - m_open)
+    cv.over(p4)
+    apply_dl(cv, grain(T, T, (1 - m_open), 40, (0.45, 0.85), (1.5, 2.5), rng, 0.5))
+    out['B'] = cv
+    # ---- C: a stone cornice seen from below (a sunlit return on the left, the shaded front) over ashlar ----
+    rng = rng_for('tile/stone', seed)
+    brush = Brush(rng)
+    cv = Canvas(T, T)
+    cv.c[:] = sky_backdrop(T, T, 300, 560, disc=False)
+    ret = 58.0                                                     # the return (the cornice's end, facing the sun)
+    lay = Layer(T, T)
+    lay.fill(poly_mask(T, T, [rect(ret, 40, T, 70)]), C['stone_sh'])                 # the corona's front
+    lay.fill(poly_mask(T, T, [[(0, 52), (ret, 40), (ret, 70), (0, 76)]]), C['stone_lit'])  # its return, sunlit
+    lay.fill(poly_mask(T, T, [rect(ret, 70, T, 92)]), C['deep'])                     # the soffit, seen from below
+    lay.fill(poly_mask(T, T, [[(0, 76), (ret, 70), (ret, 92), (0, 96)]]), mix(C['stone_lit'], C['deep'], 0.5))
+    for k_ in range(9):                                                               # modillions under the soffit
+        mx = ret + 10 + k_ * 21
+        lay.fill(poly_mask(T, T, [rect(mx, 70, mx + 9, 90)]), mix(C['stone_sh'], C['deep'], 0.35))
+    ash = poly_mask(T, T, [rect(ret, 92, T, T), [(0, 96), (ret, 92), (ret, T), (0, T)]])
+    lay.fill(poly_mask(T, T, [rect(ret, 92, T, T)]), mix(C['stone_sh'], C['front_top'], 0.25))
+    lay.fill(poly_mask(T, T, [[(0, 96), (ret, 92), (ret, T), (0, T)]]), mix(C['stone_lit'], C['side'], 0.35))
+    cv.over(lay)
+    p2 = Layer(T, T)
+    for row, yb in enumerate(range(92, T, 28)):                                       # ashlar: big flat blocks
+        x = ret - (30 if row % 2 else 0)
+        while x < T:
+            c = jitter(shift(mix(C['stone_sh'], C['front_top'], 0.25), rng.normal(0, 0.018)), rng, 0.004)
+            brush.mark(p2, x + 31, yb + 13.6, 60.0, 25.6, 0, c, rng.uniform(0.6, 0.85), soft=(0.45, 0.45),
+                       taper=(0.005, 0.005))
+            x += 62
+    for k_ in range(3):                                                               # the corona: level strokes
+        brush.mark(p2, rng.uniform(100, 200), rng.uniform(46, 64), rng.uniform(60, 140), rng.uniform(6, 12), 0,
+                   lighter(C['stone_sh'], 0.12, 'cream') if k_ % 2 else darker(C['stone_sh'], 0.1, 'slate'),
+                   rng.uniform(0.5, 0.7), soft=(0.5, 0.5), taper=(0.03, 0.15), dry=0.4)
+    p2.clip(poly_mask(T, T, [rect(ret, 40, T, 70), rect(ret, 92, T, T)]))
+    cv.over(p2)
+    p3 = Layer(T, T)
+    brush.line(p3, (ret, 40.8), (T, 40.8), 1.2, mix(C['stone_sh'], PAL['cream'], 0.5), 0.6, soft=(0.45, 0.45),
+               taper=(0, 0))
+    brush.line(p3, (0, 52.8), (ret, 40.8), 2.0, PAL['glow'], 0.9, soft=(0.45, 0.45), taper=(0, 0))
+    brush.line(p3, (ret - 0.8, 41), (ret - 0.8, 70), 1.6, mix(C['stone_lit'], PAL['glow'], 0.6), 0.8,
+               soft=(0.45, 0.45), taper=(0, 0))
+    cv.over(p3)
+    p4 = Layer(T, T)
+    for _ in range(6):                                                                # soot runs from the soffit
+        sx = rng.uniform(ret + 6, T - 6)
+        brush.line(p4, (sx, 93), (sx, 93 + rng.uniform(40, 130)), rng.uniform(5, 12),
+                   darker(C['stone_sh'], 0.35, 'slate'), rng.uniform(0.12, 0.22), soft=(2.5, 2.5), taper=(0.0, 0.8),
+                   dry=0.45, dry_len=0.6)
+    p4.clip(ash)
+    cv.over(p4)
+    apply_dl(cv, grain(T, T, ash + poly_mask(T, T, [rect(0, 40, T, 70)]), 60, (0.45, 0.9), (1.5, 3.0), rng, 0.55))
+    out['C'] = cv
+    # ---- D: chipped, rust-stained render, lit left and shaded right (the p02 lighthouse method, our palette) ----
+    rng = rng_for('tile/render', seed)
+    brush = Brush(rng)
+    cv = Canvas(T, T)
+    lit_r = mix(PAL['granite'], PAL['sand'], 0.4)                     # L~73 render in the sun
+    sh_r = mix(PAL['slate'], PAL['mauve'], 0.3)                       # L~47 the same in shade
+    term = smooth((xx - 120) / 40.0)[..., None]                       # a soft terminator band (the wall turns)
+    cv.c[:] = (lit_r * (1 - term) + sh_r * term).astype(np.float32)
+    p1 = Layer(T, T)
+    for x in (95.0, 130.0, 160.0):                                    # the terminator painted as vertical bands
+        brush.mark(p1, x, 120, 260, rng.uniform(16, 26), 90, mix(lit_r, sh_r, (x - 80) / 100.0), 0.6, soft=(1, 1))
+    p1.blur(1.2)
+    cv.over(p1)
+    rust = mix(PAL['terracotta'], PAL['plum'], 0.45)                  # L~42 warm rust/dirt
+    p2 = Layer(T, T)
+    chip_marks(p2, brush, rng, ((xx < 120) * 1.0 + 0.25) * (np.abs(yy - 90) < 70), 16,
+               lambda r: lighter(lit_r, r.uniform(0.35, 0.6), 'cream'))
+    chip_marks(p2, brush, rng, (xx > 130) * 1.0 * (np.abs(yy - 120) < 100), 10,
+               lambda r: mix(sh_r, lit_r, r.uniform(0.3, 0.5)), size=((4, 12), (8, 40)))
+    p2.blur(0.3)
+    cv.over(p2)
+    p3 = Layer(T, T)
+    brush.line(p3, (-5, 150), (T + 5, 152), 12, rust, 0.75, soft=(0.6, 2.5), taper=(0, 0), edge_dry=0.35)
+    for _ in range(9):                                                # drips run down from the band, hard-edged
+        sx = rng.uniform(5, T - 5)
+        brush.line(p3, (sx, 152), (sx + rng.uniform(-1, 1), 152 + rng.uniform(14, 80)), rng.uniform(2.5, 6.0), rust,
+                   rng.uniform(0.6, 0.85), soft=(0.5, 0.5), taper=(0.0, 0.35))
+    brush.line(p3, (-5, 60), (T + 5, 60), 1.4, mix(sh_r, PAL['ink'], 0.4), 0.6, soft=(0.45, 0.45), taper=(0, 0))
+    cv.over(p3)
+    spk_l = grain(T, T, (xx > 120).astype(np.float32) + 0.3, 70, (0.5, 1.1), (6.0, 12.0), rng, light_share=0.85)
+    spk_d = grain(T, T, (xx < 120).astype(np.float32), 50, (0.45, 0.9), (3.0, 6.0), rng, light_share=0.2)
+    apply_dl(cv, spk_l + spk_d)
+    out['D'] = cv
+    return out
