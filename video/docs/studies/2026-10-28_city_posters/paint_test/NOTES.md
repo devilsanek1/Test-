@@ -147,3 +147,11 @@ const PAINT = paintSet(manifest);                      // {sky, cloud, tree, pie
   - the tower must clear the widest caption line (v2's 3.0 s line reaches about x 900), so a film needs a calm box per caption page;
   - bake 14 s, 2.2 MB of PNGs; the render cost is unchanged.
 
+
+## The owner's verdict on paint_still_v2 (2026-10-29)
+"The drawing quality is not the same it needs to be a bit more subtle and more beautiful / Also I like the drawing
+style in these two more" (with `refs_human_scale/03_beach_dusk.jpg` and `02_bus_stop_night.jpg`).
+-> paint v3: the painter restyled toward those two (big simple masses, few broad deliberate strokes, soft dry-brush
+edges, calm areas, one colour family and one light), never an even streaky texture.
+Then: "And again even clouds have layers that give a sense of depth but yours do not" -> v3: 2-4 overlapping cloud
+planes, far banks paler, cooler, simpler and flatter toward the horizon (a layered-cloudscape style in the painter).

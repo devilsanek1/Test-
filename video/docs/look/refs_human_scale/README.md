@@ -9,6 +9,9 @@ about this size / So I think our initial angle snd the view frankly wasn’t bad
 Then, on the painted look (2026-10-29): "Another piece of feedback is I really like the “painted” pieces like the sky
 and the clouds the references or some foreground buildings and trees / greenery are uniquely painted / Is it possible
 to modify our engine to match the story? Style" (playbook: PAINTED PIECES).
+On the painted still v2 (`video/deliverables/tests/painted_scene1_still_v2.png`), resending `03_beach_dusk.jpg` and
+`02_bus_stop_night.jpg`: "The drawing quality is not the same it needs to be a bit more subtle and more beautiful / Also
+I like the drawing style in these two more". **These two are the painting-style models.**
 
 | File | What it shows | The person |
 |---|---|---|

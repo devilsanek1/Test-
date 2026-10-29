@@ -264,12 +264,20 @@ Maintenance at the end).
 - **PAINTED PIECES: the sky and its clouds, and a few chosen environment pieces (some foreground buildings, trees and
   greenery), are uniquely painted, as in the owner's references** (`docs/look/refs_human_scale/`, the city posters'
   skies and proteas): visible brush and paint texture, soft painted edges, colour moving within a shape, each piece
-  painted for its place (never one stamp repeated). The subject (tier A) and the faces and people stay crisp and clean,
+  painted for its place (never one stamp repeated). The painting is SUBTLE AND BEAUTIFUL, in the drawing style of the
+  owner's two favourites (`refs_human_scale/02_bus_stop_night.jpg`, `03_beach_dusk.jpg`): big, simple painted masses
+  made of a few broad, deliberate strokes, soft dry-brush edges, gentle variation inside calm areas, one harmonious
+  colour family per sky lit by one light, fine strokes only where a thing is fine (reeds, a flock), atmosphere over
+  detail; the sky has DEPTH too: clouds in 2-4 overlapping planes, the near mass biggest and strongest, the far banks
+  paler, cooler, softer and simpler, flattening into thin streaks toward the horizon; never an even streaky texture over everything, which reads as a filter and as lower drawing quality. The subject (tier A) and the faces and people stay crisp and clean,
   so the paint is the world's, not the story's; the film still works with the paint off. In the engine the painted
   pieces are layers made by our own deterministic paint pass (seeded, locked to their layer so nothing swims in the
   float; a cloud may churn slowly), never a filter smeared over the whole frame. The dose is
   judged on a look test first. — ("Another piece of feedback is I really like the “painted” pieces like the sky and the clouds the references or some foreground buildings and trees / greenery are uniquely painted / Is it possible to modify our engine to match the story? Style"; "Yeah the painted message look above I said about modifying our
-  engine to be able to do that", 2026-10-29: so the ENGINE gains the paint pass, `src/lib/paint/`, reusable by every film).
+  engine to be able to do that", 2026-10-29: so the ENGINE gains the paint pass, `src/lib/paint/`, reusable by every film;
+  on the painted still v2, with refs 02 and 03: "The drawing quality is not the same it needs to be a bit more subtle
+  and more beautiful / Also I like the drawing style in these two more"; "And again even clouds have layers that give a
+  sense of depth but yours do not", 2026-10-29).
 - **Texture and lines: VERY subtle.** No outlines: as on the city posters, shapes are separated by light and shade (a
   lit and a shade face on every volume, the subject's the deepest) and by value, never by a line drawn round them
   (the A vs B picture's B). Thin lines only on small things that are lines (window bars, railings, rigging): dark,
