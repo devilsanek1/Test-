@@ -109,3 +109,5 @@ Earlier rounds also used Pip's periwinkles (`#7A7FE3`, `#6A6ED6`, `#AEB2F4`), pe
   would use this logo" and "No from scratch pick up the modern logos and do it again" -> round 6 from scratch: no
   elephant (no Pip, not even hidden), no scenes; a logo in the way modern brand marks are built (one idea, a few bold
   shapes, one strong colour, usable everywhere).
+- 2026-10-29 ~20:25 UTC, on round 6, written to the logo session directly: "I like the peel yes" -> THE PICK: The Peel.
+  Next: refine it into the finished mark (stills only) and the export pack.
