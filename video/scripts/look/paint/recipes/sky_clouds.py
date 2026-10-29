@@ -555,27 +555,43 @@ def paint_mass(box, billows, pal, sky, rng, prm, sun=SUN, stages=None):
     l2 = light_dir(cen, sun, prm['top_light'])
     L3 = np.array([l2[0], l2[1], prm['lz']])
     L3 /= np.linalg.norm(L3)
-    # ---- (a) DESIGN: per-billow light x how deep the billow sits in the mass from the light ----
+    # ---- (a) DESIGN: ONE big form lit from one side (2-3 value zones), then a lit cap at each billow's sun-facing
+    # edge, brighter on the lit side of the mass. Never a full light-to-shade ramp per billow: that draws eggs. ----
+    sf = prm['form_sigma'] * size
+    Mb = gauss(M, sf)
+    gy_b, gx_b = np.gradient(Mb)
+    gn_b = np.hypot(gx_b, gy_b) + 1e-6
+    e_b = smoothstep(0.0, 1.0, gn_b * sf * 2.5)
+    facing_big = (-gx_b * l2[0] - gy_b * l2[1]) / gn_b * e_b       # the big shape's outward normal . light
+    step = size * 0.05
+    od = gauss(light_depth(M, l2, step=step, n=30), step * 1.5)
+    att = np.exp(-od / (prm['penetration'] * size))
+    F_big = prm['w_att'] * att + (1.0 - prm['w_att']) * (0.5 + 0.5 * facing_big)
+    if inside.any():
+        lo, hi = np.percentile(F_big[inside], [2, 98])
+        F_big = np.clip((F_big - lo) / max(hi - lo, 1e-3), 0.0, 1.0)
     B = np.array([b[:4] for b in billows], np.float32)
     bx, by, br, bf = (B[own_fill, j] for j in range(4))
     u = (X - bx) / br
     v = (Y - by) / (br * bf)
-    rr = np.minimum(np.hypot(u, v), 1.0)
-    u, v = u / np.maximum(np.hypot(u, v), 1e-6) * rr, v / np.maximum(np.hypot(u, v), 1e-6) * rr
+    rho = np.hypot(u, v)
+    sc_ = np.minimum(rho, 1.0) / np.maximum(rho, 1e-6)
+    u, v = u * sc_, v * sc_
     nz = np.sqrt(np.clip(1.0 - u * u - v * v, 0.0, 1.0))
     nx, ny = u, v / bf
     nn = np.sqrt(nx * nx + ny * ny + nz * nz) + 1e-6
     nx, ny, nz = nx / nn, ny / nn, nz / nn
-    lam = np.clip(nx * L3[0] + ny * L3[1] + nz * L3[2], 0.0, 1.0)
-    step = size * 0.05
-    od = gauss(light_depth(M, l2, step=step, n=30), step * 1.5)
-    att = np.exp(-od / (prm['penetration'] * size))
-    F = lam ** prm['lam_pow'] * (prm['att_floor'] + (1.0 - prm['att_floor']) * att)
-    if inside.any():
-        lo, hi = np.percentile(F[inside], [2, 98])
-        F = np.clip((F - lo) / max(hi - lo, 1e-3), 0.0, 1.0)
-    F = F.astype(np.float32)
-    skyl = np.clip(-ny, 0.0, 1.0) ** 1.2                          # faces turned up: the sky dome lights the shade
+    lam = np.clip(nx * L3[0] + ny * L3[1] + nz * L3[2], 0.0, 1.0)  # the billow as a sphere (an ellipsoid for humps)
+    dlx, dly = l2[0], l2[1] / bf                                    # how far inside the rim, measured toward the light
+    dln = np.hypot(dlx, dly)
+    dlx, dly = dlx / dln, dly / dln
+    bq = u * dlx + v * dly
+    t_rim = (-bq + np.sqrt(np.clip(bq * bq - (u * u + v * v - 1.0), 0.0, None))) * br
+    cap = smoothstep(prm['cap_lam'][0], prm['cap_lam'][1], lam) * smoothstep(prm['cap_w'] * br, 0.0, t_rim)
+    F = F_big + prm['cap_gain'] * cap * (prm['cap_floor'] + (1.0 - prm['cap_floor']) * F_big)
+    F = np.clip(F, 0.0, 1.0).astype(np.float32)
+    up_big = np.clip(gy_b / gn_b * e_b, 0.0, 1.0)                    # faces turned up: the sky dome lights the shade
+    skyl = np.clip(0.55 * np.clip(-ny, 0.0, 1.0) + 0.45 * up_big, 0.0, 1.0)
     shade_c = mix(pal['shade'][None, None], pal['shade_top'][None, None], skyl[..., None] * prm['skylight'])
     low = smoothstep(cen[1] - 0.2 * size, cen[1] + 0.6 * size, Y)  # the deep accent lives low, at the base
     deep_t = (smoothstep(prm['cuts'][0] + 0.06, prm['cuts'][0] - 0.06, F) * low).astype(np.float32)
@@ -727,14 +743,14 @@ def paint_mass(box, billows, pal, sky, rng, prm, sun=SUN, stages=None):
     if stages is not None:
         stages['P3'] = canvas.copy()
     # ---- (c) EDGES: the silhouette's alpha, crisp toward the light, soft or dry-broken away from it ----
-    ew = mix(prm['edge_shade'], prm['edge_lit'], smoothstep(-0.15, 0.55, facing))
+    ew = mix(prm['edge_shade'], prm['edge_lit'], smoothstep(-0.45, 0.1, facing))
     near_base = np.zeros((h, w), np.float32)
     if base_y is not None:
         near_base = smoothstep(prm['base_soft'] * 2.5, 0.0, np.abs(base_y - Y + wob)) * smoothstep(-0.2, 0.2, -ggy / ggn)
         ew = mix(ew, prm['edge_base'], near_base)
-    shade_side = smoothstep(0.35, -0.35, facing)
+    shade_side = smoothstep(-0.1, -0.5, facing) * smoothstep(0.1, -0.3, facing_big)
     n_side = np.clip(noise(rng, h, w, prm['dry_cell'], aniso=prm['dry_aniso'], angle=prm['wind']), -1.6, 1.6)
-    n_base = np.clip(noise(rng, h, w, prm['dry_cell'], aniso=6.0, angle=90.0), -1.6, 1.6)
+    n_base = np.clip(noise(rng, h, w, prm['dry_cell'] * 2.0, aniso=8.0, angle=prm['wind']), -1.6, 1.6)
     in_band = smoothstep(1.2, 0.0, np.abs(D) / ew)
     dd = D + (n_side * ew * prm['dry_amp'] * shade_side * (1.0 - near_base)
               + n_base * prm['edge_base'] * prm['base_drag'] * near_base) * in_band
@@ -742,7 +758,8 @@ def paint_mass(box, billows, pal, sky, rng, prm, sun=SUN, stages=None):
     # P4 (near masses only): the speckle dissolve on the side away from the light (sky-coloured holes inside the edge,
     # cloud-coloured flecks outside it, thinning over ~40 px), and a few light flecks off the lit edge
     if prm['n_speck']:
-        band = (D < 10) & (D > -30) & (shade_side > 0.6) & (near_base < 0.3)
+        dissolve = (facing_big < -0.15) | ((near_base > 0.3) & (X > cen[0] + 0.3 * size))
+        band = (D < 10) & (D > -30) & dissolve & (facing < 0.2)
         ys_b, xs_b = np.nonzero(band)
         for _ in range(prm['n_speck'] if len(xs_b) else 0):
             j = rng.integers(len(xs_b))

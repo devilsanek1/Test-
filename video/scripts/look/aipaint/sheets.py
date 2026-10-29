@@ -96,7 +96,7 @@ def strip(frames):
     s2 = Image.new('RGB', (s.width, s.height + 34), PAPER)
     s2.paste(s, (0, 0))
     ImageDraw.Draw(s2).text((18, s.height - 4), 'Stills only (no video yet). The same scene at 1.0 s; only the paint-on changes: '
-                            'brush strokes in painting order, the sky washes, then the far haze, then the tree.',
+                            'brush strokes in painting order: the sky washes and the cloud planes, then the tree (the far city stays ours).',
                             fill=INK, font=font(16))
     s2.save(os.path.join(OUT, 'reveal_strip.jpg'), quality=88)
     print('strip ->', os.path.join(OUT, 'reveal_strip.jpg'), s2.size)
