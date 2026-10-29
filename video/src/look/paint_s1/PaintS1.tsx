@@ -8,6 +8,7 @@
 import React from 'react';
 import {PaintProvider} from '../../lib/paint';
 import {PosterS1, type PosterS1Props} from './PosterS1';
+import {PAINT_SETS, type PaintSetName} from './paint_set';
 
 export {POSTER_S1_FPS as PAINT_S1_FPS, POSTER_S1_FRAMES as PAINT_S1_FRAMES} from './PosterS1';
 
@@ -16,10 +17,12 @@ export type PaintS1Props = Omit<PosterS1Props, 'preset'> & {
   paint?: boolean;
   /** Which painted pieces (default all): a subset for A/Bs. */
   pieces?: string[];
+  /** Which bake (paint_set.ts): 'v1' (default) or 'v2' (the bolder dose). */
+  set?: PaintSetName;
 };
 
-export const PaintS1: React.FC<PaintS1Props> = ({paint = true, pieces, ...rest}) => (
-  <PaintProvider on={paint} only={pieces}>
+export const PaintS1: React.FC<PaintS1Props> = ({paint = true, pieces, set = 'v1', ...rest}) => (
+  <PaintProvider on={paint} only={pieces} set={PAINT_SETS[set]}>
     <PosterS1 preset="v2" audio="none" {...rest} />
   </PaintProvider>
 );

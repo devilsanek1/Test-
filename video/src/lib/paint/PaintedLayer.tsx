@@ -44,18 +44,26 @@ export function paintSet(manifest: {pieces: PaintPiece[]}): Record<string, Paint
   return out;
 }
 
-type PaintState = {on: boolean; only?: readonly string[]};
+type PaintState = {on: boolean; only?: readonly string[]; set?: Readonly<Record<string, PaintPiece>>};
 const PaintCtx = createContext<PaintState>({on: false});
 
 /** The film's paint switch: `on` (default false: the engine never paints unasked), `only` a subset of piece names or
- *  ids (A/Bs). */
-export const PaintProvider: React.FC<{on?: boolean; only?: readonly string[]; children?: React.ReactNode}> = ({on = false, only, children}) => (
-  <PaintCtx.Provider value={{on, only}}>{children}</PaintCtx.Provider>
+ *  ids (A/Bs), `set` the baked pieces a scene names (paintSet(manifest): two bakes of one scene, e.g. a calmer and a
+ *  bolder dose, are two sets; the scene code stays the same). */
+export const PaintProvider: React.FC<{on?: boolean; only?: readonly string[]; set?: Readonly<Record<string, PaintPiece>>; children?: React.ReactNode}> = ({on = false, only, set, children}) => (
+  <PaintCtx.Provider value={{on, only, set}}>{children}</PaintCtx.Provider>
 );
 
-/** Is this piece painted here (the switch, its subset)? */
-export function usePaintOn(piece: PaintPiece | undefined): boolean {
+/** A piece given as itself or by its name in the provider's set. */
+export function usePiece(piece: PaintPiece | string | undefined): PaintPiece | undefined {
   const s = useContext(PaintCtx);
+  return typeof piece === 'string' ? s.set?.[piece] : piece;
+}
+
+/** Is this piece painted here (the switch, its subset)? */
+export function usePaintOn(pieceIn: PaintPiece | string | undefined): boolean {
+  const s = useContext(PaintCtx);
+  const piece = usePiece(pieceIn);
   if (!s.on || !piece) return false;
   if (!s.only) return true;
   const name = piece.id.split('/').pop() as string;
@@ -84,8 +92,9 @@ const PaintImage: React.FC<{piece: PaintPiece; opacity?: number}> = ({piece, opa
 };
 
 export type PaintedLayerProps = {
-  /** The baked piece (paintSet(manifest).name); undefined = not baked yet: the flat children. */
-  piece?: PaintPiece;
+  /** The baked piece (paintSet(manifest).name) or its name in the provider's set; undefined or not in the set = not
+   *  baked: the flat children. */
+  piece?: PaintPiece | string;
   /** Scene seconds from which the paint shows (before it, the flat children: e.g. the piece's flood time, so the paint
    *  lands with the colour, as one shape). Default: always. */
   from?: number;
@@ -95,8 +104,9 @@ export type PaintedLayerProps = {
 };
 
 /** A painted piece in its own slot (its plane's group, so it rides that plane's float), or its flat shapes. */
-export const PaintedLayer: React.FC<PaintedLayerProps> = ({piece, from, opacity, children}) => {
+export const PaintedLayer: React.FC<PaintedLayerProps> = ({piece: pieceIn, from, opacity, children}) => {
   const t = useTime();
+  const piece = usePiece(pieceIn);
   const on = usePaintOn(piece);
   if (!on || !piece || (from !== undefined && t < from)) return <>{children}</>;
   return <PaintImage piece={piece} opacity={opacity} />;
@@ -104,8 +114,9 @@ export const PaintedLayer: React.FC<PaintedLayerProps> = ({piece, from, opacity,
 
 /** True where the paint replaces a piece's flat shapes: its light layers (form shades, crescents) that the bake
  *  painted in go quiet so they are not drawn twice. */
-export function usePainted(piece: PaintPiece | undefined, from?: number): boolean {
+export function usePainted(pieceIn: PaintPiece | string | undefined, from?: number): boolean {
   const t = useTime();
+  const piece = usePiece(pieceIn);
   const on = usePaintOn(piece);
   return on && !!piece && (from === undefined || t >= from);
 }

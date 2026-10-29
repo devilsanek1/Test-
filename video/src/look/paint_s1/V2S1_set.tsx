@@ -33,7 +33,6 @@ import {CloudSlot, SpraySlot, TextureSlot} from './engine';
 import {useTime} from '../../lib/time';
 import {S1PipShadows} from './V2S1_pip';
 import {PaintedLayer} from '../../lib/paint';
-import {PAINT} from './paint_set';
 
 export type S1WorldProps = {
   /** Her figure behind the glass doors (between the lobby and the door glass). */
@@ -59,13 +58,13 @@ const S1SkyThings: React.FC = () => {
     <TextureSlot sw={sw} t={t} plane={S1_PLANE.sky} sky>
       {/* (the paint test) the painted hero cumulus and the painted bar in their places on the sky's layer (fixed: the
           sky never floats), or v2's kit clouds */}
-      <PaintedLayer piece={PAINT.cloud}>
+      <PaintedLayer piece={"cloud"}>
         <CloudSlot
           sw={sw}
           fallback={<Cloud x={S.heroCloud.x0} y={S.heroCloud.y0 + 40} w={S.heroCloud.x1 - S.heroCloud.x0} h={(S.heroCloud.y1 - S.heroCloud.y0) * 0.7} seed="s1cloud" speed={S.heroCloudDriftPxS} top={CM.paper} />}
         />
       </PaintedLayer>
-      <PaintedLayer piece={PAINT.cloudbar}>
+      <PaintedLayer piece={"cloudbar"}>
         {sw.cloud ? null : <Cloud x={CLOUD_BAR.x} y={CLOUD_BAR.y} w={CLOUD_BAR.w} h={CLOUD_BAR.h} seed="s1cloudbar" speed={CLOUD_BAR.speed} />}
       </PaintedLayer>
     </TextureSlot>
