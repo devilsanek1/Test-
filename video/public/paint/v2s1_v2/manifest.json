@@ -1,0 +1,102 @@
+{
+ "film": "v2s1_v2",
+ "spec": "scripts/look/paint/v2s1_v2.json",
+ "pieces": [
+  {
+   "id": "v2s1/sky",
+   "src": "paint/v2s1_v2/sky.png",
+   "box": [
+    0,
+    0,
+    1080,
+    1100
+   ],
+   "style": "sky",
+   "seed": 12
+  },
+  {
+   "id": "v2s1/cloud",
+   "src": "paint/v2s1_v2/cloud.png",
+   "box": [
+    300,
+    0,
+    780,
+    660
+   ],
+   "style": "cloud",
+   "seed": 24
+  },
+  {
+   "id": "v2s1/cloudbar",
+   "src": "paint/v2s1_v2/cloudbar.png",
+   "box": [
+    0,
+    196,
+    420,
+    84
+   ],
+   "style": "cloud",
+   "seed": 31
+  },
+  {
+   "id": "v2s1/tree",
+   "src": "paint/v2s1_v2/tree.png",
+   "box": [
+    0,
+    1290,
+    304,
+    258
+   ],
+   "style": "foliage",
+   "seed": 42
+  },
+  {
+   "id": "v2s1/pier",
+   "src": "paint/v2s1_v2/pier.png",
+   "box": [
+    838,
+    1494,
+    242,
+    426
+   ],
+   "style": "surface",
+   "seed": 54
+  },
+  {
+   "id": "v2s1/farroofs",
+   "src": "paint/v2s1_v2/farroofs.png",
+   "box": [
+    0,
+    730,
+    390,
+    232
+   ],
+   "style": "surface",
+   "seed": 61
+  },
+  {
+   "id": "v2s1/fartower",
+   "src": "paint/v2s1_v2/fartower.png",
+   "box": [
+    240,
+    572,
+    124,
+    390
+   ],
+   "style": "surface",
+   "seed": 67
+  },
+  {
+   "id": "v2s1/fern",
+   "src": "paint/v2s1_v2/fern.png",
+   "box": [
+    238,
+    1632,
+    428,
+    288
+   ],
+   "style": "foliage",
+   "seed": 73
+  }
+ ]
+}
