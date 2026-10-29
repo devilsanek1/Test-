@@ -479,6 +479,14 @@ Maintenance at the end).
   starting over (owner, v4, 2026-10-27: "make sure to commit the progress periodically if we get stopped on the usage
   limits"). Before any restart, re-read the current direction (`docs/look/DIRECTION.md`, the playbook and the docs they
   link: other sessions change them) and integrate it into the film's one style page first. — (v2, 2026-10-27).
+- **The engine and the process serve the production; the films are the customer (owner, 2026-10-29: "Your main task
+  here is to work on the engine and the production process ... BUT THE PRODUCTION team is your main customer, we cannot
+  sacrifice the efforts and the quality and polish and attention of details that go into the final product. If anything
+  - any work that makes the quality and the polish better in the outcome at the expense of the process taking longer is
+  absolutely worth it").** Engine and process work is judged by the films: a speedup that costs any polish is rejected,
+  and work that adds polish is worth the extra time. An engine change is pixel-neutral (proven by frame diffs) or an
+  owner-approved improvement, keeps every command a production session uses working, and is announced to the production
+  sessions (`docs/retro/2026-10-28_streamline/CHANGES.md`).
 - **Spend on the film, never on overhead (owner, 2026-10-28: "evaluate if there is anything in the early stages ... that is
   complete waste"; review `docs/retro/2026-10-28_v4_early_stage_cost.md`).** The early stages run lean: two scouts and one
   editor for the topic (the owner picks the topic and its core line on one screen), one fact lock (later checks read it
