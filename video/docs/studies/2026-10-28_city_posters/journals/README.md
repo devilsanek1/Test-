@@ -1,22 +1,21 @@
 # Journal corpus: which recent big-journal stories fit our visual storytelling (method and rubric)
 
-**State (2026-10-29 02:45 UTC; updated at every step):**
-- Done: the rubric (this file), the tools (`video/scripts/look/posters/journals.py`, tested), the workflow scripts with
-  their briefs (`context/workflows/journals-collect.js`, `context/workflows/journals-score.js`); the feed frame
-  (1,113 headlines, 9 outlets, `parts/corpus_feeds.csv`); search collection, stopped by the 5-hour limit on 2026-10-28
-  ~23:10 UTC with 83 rows: TIME 26, Forbes 24, MIT Technology Review 18, Scientific American 15 (`parts/corpus_C1.csv`,
-  `corpus_C2.csv`; Bloomberg, Fortune, National Geographic and Smithsonian not reached, C3 never ran).
-- Running (2 agents): the triage of the feed headlines, resumed after the limit (`parts/triage_feeds.csv`, 200 of 1,113
-  at 02:40); collector C4 on National Geographic and Smithsonian (`parts/corpus_C4.csv`).
-- Dropped, to stay lean after the limit: Bloomberg, Fortune, The Washington Post, CNN and NPR (the feeds' Economist,
-  FT, New York Times and Guardian cover the same ground).
-- Next, exactly: (1) when C4 ends, `journals.py merge`; (2) the triage is done for the feeds (1,113; 84 with t_fit
-  >= 6, 22 with WOW 2); search rows skip it; (3) `journals.py select` then `journals.py sample`, commit; (4) scoring
-  (section 5): a first scorer on `stage2_ids.txt` -> `scores.csv`, a blind second scorer on `blind_sample_ids.txt` ->
-  `scores_blind.csv`, an auditor on the search rows whose id ends in 0 -> `audit.csv` (at most 2 agents at once; a
-  partial file is resumed from the first missing id); (5) `journals.py check` + `agreement` into section 6; (6) the
-  clusterer-editor: `clusters.csv`, `clusters.md`, `journals.py chart`, `top`, `slices`; (7) a check of the top 10; (8)
-  `SUMMARY.md`, chart and summary to the owner, a note to the content thread.
+**State (2026-10-29 03:10 UTC; updated at every step):**
+- Done: the rubric (this file); the tools (`video/scripts/look/posters/journals.py`); the corpus (`corpus.csv`: 1,209
+  stories, 1,113 from 9 outlets' feeds + 96 from search: TIME, Forbes, MIT Technology Review, Scientific American,
+  National Geographic 14, Smithsonian 4; merge log `parts/merge_log.txt`); the triage of every feed row
+  (`parts/triage_feeds.csv`); stage 2 (`stage2_ids.txt`, 308: 96 search + 111 triage picks + a 101-row control; roles
+  in `triage.csv`); the blind sample (`blind_sample_ids.txt`, 63).
+- Running (2 agents, briefs in `context/workflows/journals-briefs/`): the first scorer -> `scores.csv`; the blind
+  second scorer -> `scores_blind.csv`. A stopped scorer is resumed with its brief: it continues from the first missing id.
+- Next, exactly: (1) when the blind scorer ends, the auditor (`journals-briefs/brief_audit.txt`) -> `audit.csv`; (2)
+  `journals.py check scores.csv` and `check scores_blind.csv`, then `journals.py agreement`, result into section 6 (if
+  POOR: sharpen, rescore, fresh sample); (3) the clusterer-editor: `clusters.csv`, `clusters.md`, `journals.py chart`,
+  `top`, `slices`; (4) a check of the top 10; (5) `SUMMARY.md`, chart and summary to the owner, a note to the content
+  thread and the orchestrator.
+- Dropped to stay lean after the limit: Bloomberg, Fortune, The Washington Post, CNN, NPR (the feeds' Economist, FT,
+  New York Times and Guardian cover the same ground). Smithsonian is under-sampled (4 rows: its search results are hub
+  pages; its stories appear only as text without links).
 
 ## 1. The question, made testable
 Of the stories big journals published in the last 30 days (2026-09-28 to 2026-10-28), **which could be TOLD through the

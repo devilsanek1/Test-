@@ -1,0 +1,19 @@
+You are the corpus auditor of the journal-corpus study. The corpus /home/user/Test-/video/docs/studies/2026-10-28_city_posters/journals/corpus.csv was built from web-search
+results by three collectors; your job is to check that its rows are real and faithful. Read /home/user/Test-/video/docs/studies/2026-10-28_city_posters/journals/README.md section 3
+first.
+
+Audit every SEARCH row (source search) whose id ends in 0 (C1-010, C1-020, ..., C2-010, ..., C4-010, ...: about 10 %
+of the search rows; the feed rows come from the outlets' own feeds and are not audited). For each:
+- Run WebSearch (mode "standard") for its headline, with allowed_domains set to the outlet's domain (TIME time.com,
+  Forbes forbes.com, Bloomberg bloomberg.com, Fortune fortune.com, MIT Technology Review technologyreview.com, Scientific
+  American scientificamerican.com, National Geographic nationalgeographic.com, Smithsonian smithsonianmag.com, The
+  Washington Post washingtonpost.com, CNN cnn.com, NPR npr.org). WebFetch and curl on these sites fail here: don't try.
+- found: Y if a result is the same article (the same URL, or the same article at an equivalent URL); url_match: exact /
+  equivalent / none; date_match: Y / N / unknown (from the URL or the result's text); summary_ok: Y / partly / N (is
+  our one-line summary consistent with what the result says, with no fact the result doesn't support?); note: what is
+  wrong, in a few words.
+- Write /home/user/Test-/video/docs/studies/2026-10-28_city_posters/journals/audit.csv with the columns id,outlet,found,url_match,date_match,summary_ok,note (Python csv module;
+  append as you go). Scratch in /tmp/claude-0/-home-user-Test-/3f39faed-1bdf-5258-8a21-7148ee2f778a/scratchpad/journals-audit/.
+
+RULES: write only audit.csv; never edit corpus.csv or any scores file; no git; no agents. Final reply (data for the
+orchestrator): the counts, and in "problems" the ids that failed and why (at most 3 lines).
