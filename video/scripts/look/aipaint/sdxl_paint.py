@@ -7,14 +7,16 @@ paints it. The style is steered by WORDS only (never an artist's name, never the
     HF_HOME=/tmp/hf-cache /tmp/aipaint/venv/bin/python scripts/look/aipaint/sdxl_paint.py \
         --plate sky --init out/aipaint/init/sky_init.png --out out/aipaint/sky --strength 0.4,0.55,0.7 --seed 1029
 
-One process loads the model once and paints each strength in turn. Each run writes, as it goes (checkpointed):
+One process loads the model once and paints each strength in turn (memory: the session's cgroup allows 14.3 GB, page
+cache included; the text encoders are dropped once the prompt is encoded, and the last run frees the UNet before its
+fp32 VAE decode: the 0.70 trial was OOM-killed at decode with both still loaded). Each run writes, as it goes:
   <out>/<plate>_s<strength>_seed<seed>.png    the painted plate (VAE decode in fp32)
   <out>/<plate>_s<strength>_seed<seed>.json   every setting + timing (model id + revision, prompt, negative, steps...)
   <out>/<plate>_s<strength>_seed<seed>_preview.png   a cheap latent preview, rewritten every step
   <out>/progress.log                           one line per step (seconds per step)
 The weights stay outside the repo (HF_HOME). Safetensors only; no remote code.
 """
-import argparse, json, os, platform, sys, time
+import argparse, gc, json, os, platform, sys, time
 
 os.environ.setdefault('HF_HOME', '/tmp/hf-cache')
 os.environ.setdefault('HF_HUB_OFFLINE', '1')
@@ -24,6 +26,10 @@ from PIL import Image
 
 MODEL = 'stabilityai/stable-diffusion-xl-base-1.0'
 LICENCE = 'CreativeML Open RAIL++-M (commercial use allowed, with the use restrictions of its Attachment A)'
+# --control: structure control on OUR edges (make_inits.py's canny map), so a higher strength can paint while the
+# layout holds. xinsir/controlnet-canny-sdxl-1.0, licence Apache-2.0 (commercial use allowed).
+CONTROLNET = 'xinsir/controlnet-canny-sdxl-1.0'
+CONTROLNET_LICENCE = 'Apache-2.0 (commercial use allowed)'
 
 # The style in words, from the owner's two models (refs_human_scale 03_beach_dusk, 02_bus_stop_night): big simple masses
 # of a few broad deliberate strokes, soft dry-brush edges and atmosphere, one colour family lit by one low sun, layered
@@ -69,6 +75,9 @@ def main():
     ap.add_argument('--steps', type=int, default=30, help='scheduler steps; img2img runs int(steps*strength) of them')
     ap.add_argument('--cfg', type=float, default=6.5)
     ap.add_argument('--threads', type=int, default=os.cpu_count())
+    ap.add_argument('--control', help='a canny edge map of the init (make_inits.py *_canny.png): ControlNet canny')
+    ap.add_argument('--control-scale', type=float, default=0.6)
+    ap.add_argument('--tag', default='', help='a suffix for the output names (e.g. _cn)')
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
     torch.set_num_threads(a.threads)
@@ -84,9 +93,26 @@ def main():
         snap, torch_dtype=torch.bfloat16, variant='fp16', use_safetensors=True, local_files_only=True)
     pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config, use_karras_sigmas=True)
     vae = pipe.vae.to(torch.float32)   # encode/decode ourselves in fp32 (bf16 VAE output bands)
+    crev = None
+    if a.control:
+        from diffusers import ControlNetModel, StableDiffusionXLControlNetImg2ImgPipeline
+        cref = os.path.join(os.environ['HF_HOME'], 'hub', 'models--' + CONTROLNET.replace('/', '--'), 'refs', 'main')
+        crev = open(cref).read().strip()
+        cn = ControlNetModel.from_pretrained(os.path.join(os.path.dirname(os.path.dirname(cref)), 'snapshots', crev),
+                                             torch_dtype=torch.bfloat16, use_safetensors=True, local_files_only=True)
+        pipe = StableDiffusionXLControlNetImg2ImgPipeline(**pipe.components, controlnet=cn)
+        control = Image.open(a.control).convert('RGB')
     pipe.set_progress_bar_config(disable=True)
     t_load = time.time() - t0
     log(a.out, f'loaded {MODEL}@{revision[:10]} bf16 (VAE fp32) in {t_load:.0f} s, threads {a.threads}')
+
+    # the prompt once, then drop the text encoders (about 1.6 GB)
+    with torch.no_grad():
+        pe, npe, ppe, nppe = pipe.encode_prompt(prompt=PROMPTS[a.plate], negative_prompt=NEGATIVE, device='cpu',
+                                                num_images_per_prompt=1, do_classifier_free_guidance=True)
+    pipe.text_encoder = None
+    pipe.text_encoder_2 = None
+    gc.collect()
 
     init = Image.open(a.init).convert('RGB')
     W, H = init.size
@@ -98,8 +124,9 @@ def main():
     t_enc = time.time() - t0
     log(a.out, f'encoded init {W}x{H} -> latents {tuple(lat0.shape)} in {t_enc:.0f} s')
 
-    for s in [float(v) for v in a.strength.split(',')]:
-        name = f'{a.plate}_s{s:.2f}_seed{a.seed}'
+    strengths = [float(v) for v in a.strength.split(',')]
+    for si, s in enumerate(strengths):
+        name = f'{a.plate}_s{s:.2f}_seed{a.seed}{a.tag}'
         if os.path.exists(os.path.join(a.out, name + '.png')):
             log(a.out, f'{name}: exists, skipped'); continue
         n_run = int(a.steps * s)
@@ -112,12 +139,19 @@ def main():
             return kw
 
         g = torch.Generator('cpu').manual_seed(a.seed)
+        extra = {'control_image': control, 'controlnet_conditioning_scale': a.control_scale} if a.control else {}
         with torch.no_grad():
-            lat = pipe(prompt=PROMPTS[a.plate], negative_prompt=NEGATIVE, image=lat0.to(torch.bfloat16),
+            lat = pipe(prompt_embeds=pe, negative_prompt_embeds=npe, pooled_prompt_embeds=ppe,
+                       negative_pooled_prompt_embeds=nppe, image=lat0.to(torch.bfloat16), **extra,
                        strength=s, num_inference_steps=a.steps, guidance_scale=a.cfg, generator=g,
                        output_type='latent', callback_on_step_end=on_step,
                        callback_on_step_end_tensor_inputs=['latents']).images
             t_den = time.time() - stamps[0]
+            if si == len(strengths) - 1:   # the last run: free the UNet (and ControlNet) before the fp32 decode
+                pipe.unet = None
+                if a.control:
+                    pipe.controlnet = None
+            gc.collect()
             t1 = time.time()
             img = vae.decode(lat.to(torch.float32) / vae.config.scaling_factor).sample
             t_dec = time.time() - t1
@@ -138,6 +172,10 @@ def main():
                          'transformers': transformers.__version__, 'python': platform.python_version()},
             'cpu': platform.processor() or platform.machine(), 'threads': a.threads,
         }
+        if a.control:
+            meta.update({'pipeline': 'StableDiffusionXLControlNetImg2ImgPipeline', 'controlnet': CONTROLNET,
+                         'controlnet_revision': crev, 'controlnet_licence': CONTROLNET_LICENCE,
+                         'control_image': os.path.relpath(a.control), 'controlnet_conditioning_scale': a.control_scale})
         json.dump(meta, open(os.path.join(a.out, name + '.json'), 'w'), indent=1)
         log(a.out, f'{name}: done, {n_run} steps in {t_den:.0f} s ({t_den / max(n_run, 1):.1f} s/step), decode {t_dec:.0f} s')
 

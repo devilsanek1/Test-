@@ -13,7 +13,8 @@ the stage render paint_test/stage_v4_design.png), never from the reference image
     python3 scripts/look/aipaint/make_inits.py [outdir]     # default out/aipaint/init
 Writes sky_init.png (with the stage's sun: the strength trials), sky_init_nosun.png (the final plate: the scene draws
 its crisp SunDisc UNDER the far roofs, so a sun painted into the plate would land inside the far-roofs piece, over the
-crisp one), tree_init.png and geometry.json (the frame <-> plate mapping the cut-out uses).
+crisp one), tree_init.png and geometry.json (the frame <-> plate mapping the cut-out uses), plus a canny edge map of
+each final init (*_canny.png, OpenCV) for the structure-controlled run (ControlNet canny): our edges, never a reference.
 """
 import json, os, sys
 import numpy as np
@@ -38,6 +39,17 @@ def piece_layer(piece):
     layer = Image.new('RGBA', (FW, FH), (0, 0, 0, 0))
     layer.paste(im, (x, y), im)
     return layer
+
+
+CANNY = {'blur': 1.6, 'lo': 18, 'hi': 48}   # low: our far banks sit close to the sky's value; the blur hides its fine grain
+
+
+def canny(img):
+    import cv2
+    g = cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2GRAY)
+    g = cv2.GaussianBlur(g, (0, 0), CANNY['blur'])
+    e = cv2.Canny(g, CANNY['lo'], CANNY['hi'])
+    return Image.fromarray(np.dstack([e, e, e]))
 
 
 def main(out):
@@ -73,15 +85,18 @@ def main(out):
         sky_init = sky_full.crop((x, y, x + w, y + h)).resize(tuple(SKY_PLATE['size']), Image.LANCZOS)
         sky_init.save(os.path.join(out, name + '.png'))
         sky_full.save(os.path.join(out, name + '_frame.png'))
+        if name == 'sky_init_nosun':
+            canny(sky_init).save(os.path.join(out, name + '_canny.png'))
 
     # ---- tree: the stage around the tree
     x, y, w, h = TREE_PLATE['frame_rect']
     tree_init = stage.crop((x, y, x + w, y + h)).resize(tuple(TREE_PLATE['size']), Image.LANCZOS)
     tree_init.save(os.path.join(out, 'tree_init.png'))
+    canny(tree_init).save(os.path.join(out, 'tree_init_canny.png'))
 
     geo = {'frame': [FW, FH], 'sky': SKY_PLATE, 'tree': TREE_PLATE, 'sky_pieces': SKY_PIECES,
            'design_manifest': 'public/paint/v2s1_v4design/manifest.json', 'stage': os.path.relpath(STAGE, ROOT),
-           'sun_px': int(sun.sum())}
+           'sun_px': int(sun.sum()), 'canny': CANNY}
     json.dump(geo, open(os.path.join(out, 'geometry.json'), 'w'), indent=1)
     print(json.dumps(geo))
 
