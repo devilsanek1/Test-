@@ -7,9 +7,9 @@ Reusable on any still (a G4 look-clip frame, a G5 key still): `python3 -I detail
     python3 -I video/scripts/look/posters/details.py frames            # extract full-size film frames to scratch (ffmpeg)
     python3 -I video/scripts/look/posters/details.py regions           # the region overlay sheet (check the polygons)
     python3 -I video/scripts/look/posters/details.py maps              # tile metrics, heat-map sheets, region table
-    python3 -I video/scripts/look/posters/details.py calm              # calm-detail metrics (contrast, repetition, ticks)
-    python3 -I video/scripts/look/posters/details.py motion            # shimmer / encode test (synthetic grids, v2 floats)
-    python3 -I video/scripts/look/posters/details.py measure <img> ... # the per-still numbers for any frame
+    python3 -I video/scripts/look/posters/details.py sizes             # thin features by width (<= 2 / 3-4 / 5-8 px), empty tiles
+    python3 -I video/scripts/look/posters/details.py motion            # twinkle test: lines and ticks under the float, via H.264
+    python3 -I video/scripts/look/posters/details.py measure <img> ... # the per-still numbers for any frame (G4 / G5 stills)
 
 METHOD (every image on a 1080-px-wide CANVAS: posters 1206 -> 1080 with INTER_AREA, our masters as they are):
   edges     Canny on L* x 2.55 after a Gaussian blur of sigma 0.7 px, thresholds 20 / 40 (L2 gradient): a sharp step is
@@ -896,15 +896,15 @@ def sheet_motion(crops: dict, results: dict, out: str) -> None:
     Z, C = 3, 64
     rowsel = _rows().index((10.0, 30.0))
     names = [(s, f) for s, fs in MOTION_SETS.items() for f in fs]
-    labels = [('source 1080', 'the render (8-bit, area AA)'), ('p1080', 'platform 1080p, 3.5 Mbps'), ('p720', 'platform 720p, 1.5 Mbps')]
-    W = len(names) * (C * Z + 12) + 230
+    labels = [('source 1080', 'render, 8-bit'), ('p1080', '1080p 3.5 Mbps'), ('p720', '720p 1.5 Mbps')]
+    W = len(names) * (C * Z + 12) + 180
     H = 120 + len(labels) * (C * Z + 16) + 70
     sheet = Image.new('RGB', (W, H), (250, 250, 248))
     d = ImageDraw.Draw(sheet)
     d.text((12, 10), 'Thin features under the parallax float, through H.264 (mid-clip frame, 10 px/s, dL* 30; 3x, nearest)', fill=INK, font=font(24, True))
     d.text((12, 44), 'Below each: twinkle on the 720p rung at 10 px/s (the swing of the cores\' contrast over time) and the detail kept at 720p.', fill=INK, font=font(17))
     for j, (s, f) in enumerate(names):
-        x = 230 + j * (C * Z + 12)
+        x = 180 + j * (C * Z + 12)
         d.text((x, 84), f[0], fill=INK, font=font(16, True))
         c = [fs[0] for fs in MOTION_SETS[s]].index(f[0])
         for i, (key, lab) in enumerate(labels):
@@ -924,18 +924,57 @@ def sheet_motion(crops: dict, results: dict, out: str) -> None:
     save_jpg(sheet, os.path.join(out, 'details_motion.jpg'))
 
 
+def cmd_measure(a) -> None:
+    """The per-still numbers for any 1080 x 1920 frame (caption band and bottom strip masked) with the study's references.
+    Warnings are information (the study's proposals, details.md section 5), never a FAIL."""
+    rows = []
+    for path in a.images:
+        r = measure(path, 'film')
+        L = lstar(r['_img']['rgb'])
+        v = r['_img']['valid']
+        wc = width_classes(L)
+        thin = {k: float((m & v).sum() / max(1, v.sum())) for k, m in wc.items()}
+        out = {'image': path, 'edge_px': r['ed'], 'busy': r['busy'], 'structure': r['structure'], 'calm': r['calm'],
+               'median_step_L': r['medstep'], 'quiet_share': r['quiet_share'], 'thin_le2': thin['le2'],
+               'thin_3_4': thin['w3_4'], 'thin_5_8': thin['w5_8'], 'density': r['density']}
+        warn = []
+        if out['structure'] > 0.12:
+            warn.append(f"structure tiles {100 * out['structure']:.0f} % > 12 % (posters 8.5 %, v2 22 %): big shapes with nothing inside")
+        if out['busy'] < 0.35:
+            warn.append(f"busy tiles {100 * out['busy']:.0f} % < 35 % (posters 45 %, v1 35 %, v2 30.5 %)")
+        if not 12 <= out['median_step_L'] <= 18:
+            warn.append(f"median edge step {out['median_step_L']:.1f} L* outside 12-18 (posters 14.5; v1 52 = ink)")
+        out['warnings'] = warn
+        rows.append(out)
+        print(f"{os.path.basename(path)}: edges {100 * out['edge_px']:.1f} % | busy / structure / calm "
+              f"{100 * out['busy']:.0f} / {100 * out['structure']:.0f} / {100 * out['calm']:.0f} % | step {out['median_step_L']:.1f} L* "
+              f"(quiet {100 * out['quiet_share']:.0f} %) | thin <= 2 / 3-4 / 5-8 px {100 * thin['le2']:.1f} / "
+              f"{100 * thin['w3_4']:.1f} / {100 * thin['w5_8']:.1f} % | density.py flat {100 * r['density']['flat']:.0f} % "
+              f"detail {100 * r['density']['detail']:.0f} % obj {r['density']['obj']:.0f}/Mpx")
+        for w in warn:
+            print('  WARN', w)
+    print('references (median): posters edges 10.1 %, busy / structure / calm 45 / 8.5 / 43 %, step 14.5 L*, thin 5.8 / 6.5 / 11.0 %; '
+          'v2 5.1 %, 30.5 / 22 / 43.5 %, 12.4 L*, 1.1 / 2.2 / 4.3 %. Near-ground empty tiles need regions: see `sizes`.')
+    if a.json:
+        with open(a.json, 'w') as f:
+            json.dump(rows, f, indent=1)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest='cmd', required=True)
     sub.add_parser('frames')
     sub.add_parser('sizes')
+    me = sub.add_parser('measure')
+    me.add_argument('images', nargs='+')
+    me.add_argument('--json', default=None)
     m = sub.add_parser('motion')
     m.add_argument('--out', default=None)
     for c in ('regions', 'maps'):
         r = sub.add_parser(c)
         r.add_argument('--out', default=None)
     a = ap.parse_args()
-    {'frames': cmd_frames, 'regions': cmd_regions, 'maps': cmd_maps, 'sizes': cmd_sizes, 'motion': cmd_motion}[a.cmd](a)
+    {'frames': cmd_frames, 'regions': cmd_regions, 'maps': cmd_maps, 'sizes': cmd_sizes, 'motion': cmd_motion, 'measure': cmd_measure}[a.cmd](a)
     return 0
 
 
