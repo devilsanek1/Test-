@@ -12,6 +12,9 @@ points and conclusions into the main repo"). The brief is `README.md` here; the 
   (`test/SCENE.md`: the S1 copy `video/src/look/poster_s1/`, entry `video/src/entry-look-poster.tsx`, compositions
   PosterS1 / -v2 / -pass1 / -pass2, every switch); the decisions as rules (`INTEGRATION.md` §2); DIRECTION rule 1,
   CRAFT §a, PIPELINE_V2 aligned with the owner's ONE SUBJECT, GONE DEEP. All shipped films proven pixel-identical.
+- Videos 4 and 5 (owner ~09:30 UTC: "Helsinki is actually pretty good too / Let's do both as story 4 and 5"): v4 =
+  Helsinki heats its homes with AI chips, v5 = the bunker under the Stockholm park; both produced by session
+  session_01YGLGMrgF1Cfg5gMAND1VNt (HANDOFF 2e), resuming itself at 12:45 UTC; their G3-G4 build on this test.
 - RUNNING at 09:20: lane S's integration and render (STUDY §10 item 11). Its orders: wire PT's `<Mottle>` into
   TextureSlot (seed `mottleSeed(plane)`, offset [dx, dy]; move S1BoatStrips into the water plane or leave the boats
   unmottled), N's London plane into TreeSlot/SpraySlot (re-fit Pip's hiding spot into the crown; leaf tips out of the
