@@ -6,6 +6,15 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-29 ~15:30 UTC: review FIX_FIRST; lane S runs fix pass 1
+- `test/REVIEW.md`: 6 must-fixes (her and the copies' drawing as value shapes; the paving off milk-tea; the dark
+  panes vs W; the autumn spray and tree; a palette10b:false A/B pair; the far tower toned from its sky), 10 cheap
+  fixes, §7 the re-check gate. Lane S (the "Build lane S" agent) fixes, re-renders `poster_look_test_v1.mp4` and
+  `ab_switches.jpg`, reruns §7 + the QA, writes REPORT.md "Fix pass 1". Resume it with SendMessage if it stops.
+- THEN: check §7's gate on the new clip (a short verify), send the clip, the sheet and a note to the owner (what is
+  decided vs the 10b palette proposal; the mottle is near-invisible by design; the far stage is small; the halves
+  differ in length), merge into `video-production`, announce the new `src/lib` modules in the streamline CHANGES.md.
+
 ## Status 2026-10-29 ~13:35 UTC: the clip is rendered; the review panel runs
 - `video/deliverables/tests/poster_look_test_v1.mp4` (15.5 s: Before card, v2's S1, After card, pass 2; master
   encode, -14 LUFS), `test/ab_switches.jpg`, `test/REPORT.md` (after row vs v2, QA, waivers; §5 the owner flags:
