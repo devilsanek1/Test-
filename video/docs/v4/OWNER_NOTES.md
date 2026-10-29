@@ -186,3 +186,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-29 ~19:20 UTC, G2: a screenshot of the app's "File preview unavailable" on take.wav: "Can't open play it here" ->
   the same take sent as take.m4a and take.mp3 (`assets/v4/voice/`). -> rule: playbook, Script and voice (audio goes to
   the owner as .m4a + .mp3); CLAUDE.md, PIPELINE_V2 G2, the quickstart.
+- 2026-10-29 ~19:40 UTC, G2: on the .m4a and .mp3 attachments: "None are available" -> the take on a private claude.ai page
+  with a player, the cadence strip and the script to tap through: https://claude.ai/artifact/Gn8KCPfZ6uh1AXos2koE8N
+  (built by `scripts/voice/take_page.py`). -> rule: playbook, Script and voice (a take reaches the owner on a player page);
+  CLAUDE.md, PIPELINE_V2 G2, the quickstart.
