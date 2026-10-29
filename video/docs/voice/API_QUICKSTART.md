@@ -54,10 +54,12 @@ owner never pastes anything. Proven on 2026-10-26: video 2's API take was clean 
    tags (a few whole-script reads: e.g. v4 at 0.35-0.5 with the plain and a livelier tag set, v3 Conversational),
    compared with `python3 scripts/voice/measure_take.py A.wav B.wav --words <stressed words>` (words/min, pauses,
    pitch spread, stress) against the owner's reference (`docs/voice/refs/`), then the best read is shaped with
-   `python3 scripts/voice/shape_take.py take.wav paste.md shaped.wav --tempo 1.10 --tempo-at "<payoff words>=1.0"
-   --beat "<turn words>=0.45" --beat "<payoff words>=0.5" --polish --report shape.json` (gaps 0.26 s at a sentence,
-   0.30 at a paragraph, commas and breaths only shortened; Rubber Band keeps the pitch) and checked again with
-   `check_take.py` (MATCH). The owner still gets ONE take; the variants stay ours.
+   `python3 scripts/voice/shape_take.py take.wav paste.md shaped.wav --gap-sentence 0.24 --gap-paragraph 0.28
+   --beat "<turn words>=0.45" --beat "<payoff words>=0.5" --polish --report shape.json` (each pause set from its own
+   audio; commas and breaths only shortened) and checked again with `check_take.py` (MATCH). **No time-stretch**
+   (`--tempo` stays 1.0): on v4 a 1.10 stretch sounded "extremely robotic like there is some weird background"; for
+   more pace, pick a faster read or a model with a speed setting (v3, v3 Conversational). The owner still gets ONE
+   take; the variants stay ours.
 5. **Deliver on a player page:** attachments don't play in the Claude app on the owner's phone (a .wav shows "File
    preview unavailable"; an .m4a and an .mp3 came through as "None are available", v4, 2026-10-29). Make the two
    phone formats (`ffmpeg -i take.wav -c:a aac -b:a 256k -movflags +faststart take.m4a`; `-c:a libmp3lame -b:a 320k

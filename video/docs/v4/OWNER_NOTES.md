@@ -190,3 +190,8 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   with a player, the cadence strip and the script to tap through: https://claude.ai/artifact/Gn8KCPfZ6uh1AXos2koE8N
   (built by `scripts/voice/take_page.py`). -> rule: playbook, Script and voice (a take reaches the owner on a player page);
   CLAUDE.md, PIPELINE_V2 G2, the quickstart.
+- 2026-10-29 ~19:50 UTC, G2 (take 1 on the player page): "Okay so it sound extremely robotic like there is some weird
+  background / Weirdly except only the last phrase" -> the last phrase was the only part not time-stretched (tempo 1.0;
+  the rest ran through Rubber Band at 1.10): take 2 keeps every word as generated, shapes only the pauses (from their
+  own audio) and the two beats, lighter polish: 44.1 s, 171 words/min, MATCH; the page updated (version 2).
+  -> rule: playbook, Script and voice (never time-stretch the voice).

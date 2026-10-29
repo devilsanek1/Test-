@@ -12,12 +12,15 @@ How:
 1. Pauses come from the audio itself (frame energy below the take's own floor for >= --min-pause s), so they are exact.
 2. Each pause is placed in the script: Whisper's word times (word_timestamps) are aligned to the paste's words
    (textnorm.py), so a pause is a paragraph turn, a sentence end, a comma or a breath inside a phrase.
-3. The take is rebuilt: each speech run is kept; each pause becomes its target length (--gap-paragraph,
-   --gap-sentence, --gap-comma; a breath is capped at --gap-breath; --beat "WORDS=SECONDS" sets the pause before the
-   sentence that starts with WORDS); 10 ms fades at every cut; the pause keeps the take's own room tone.
-4. Tempo: --tempo for every sentence, --tempo-at "WORDS=FACTOR" for the sentence that starts with WORDS, by the Rubber
-   Band library (ffmpeg's rubberband filter: tempo without a pitch change, formants kept), one sentence at a time.
-5. --polish: a high-pass at 70 Hz, a gentle compressor, a little presence, a de-esser, then loudness to --lufs.
+3. The take is rebuilt: each speech run is kept exactly as generated; each pause becomes its target length from its
+   own audio (shortened: its head, with the word's release, and its tail, crossfaded; lengthened: silence in its
+   middle), by kind: --gap-paragraph, --gap-sentence, --gap-comma (only ever shortened), a breath capped at
+   --gap-breath; --beat "WORDS=SECONDS" sets the pause before the sentence that starts with WORDS.
+4. Tempo (default 1.0: none): --tempo, --tempo-at "WORDS=FACTOR", by the Rubber Band library (ffmpeg's rubberband
+   filter). It time-stretches the VOICE: on v4 a 1.10 stretch sounded "extremely robotic like there is some weird
+   background" (owner, 2026-10-29). Pace comes from the generation and the pauses; stretch only on purpose, and listen.
+5. --polish: a high-pass at 70 Hz, a gentle compressor (1.8:1), then loudness to --lufs (no de-esser or EQ boost:
+   they can colour a synthetic voice).
 6. --lead silence before the first word (0.12 s: the playbook's "voice from the first frames"), --tail room tone after.
 
     python3 scripts/voice/shape_take.py TAKE.wav PASTE.md OUT.wav [--tempo 1.06] [--gap-sentence 0.26]
@@ -169,8 +172,6 @@ def main():
     p.add_argument('--tempo', type=float, default=1.0)
     p.add_argument('--tempo-at', action='append', help='"FIRST WORDS=FACTOR": tempo of the sentence starting so')
     p.add_argument('--lead', type=float, default=0.12)
-    p.add_argument('--guard-end', type=float, default=0.06, help='kept after a word at a cut (its release)')
-    p.add_argument('--guard-start', type=float, default=0.03, help='kept before a word at a cut (its onset)')
     p.add_argument('--tail', type=float, default=0.5)
     p.add_argument('--polish', action='store_true')
     p.add_argument('--lufs', type=float, default=-16.0)
@@ -243,9 +244,31 @@ def main():
                     want = sec
         cuts.append((ps, pe, kind, want, nxt))
     tone = lambda sec: room_tone(y, sr, pauses, sec)
-    # each cut keeps a guard of the word before (its release: the "p" of "stop", a fading vowel) and of the word after
-    # (its onset): only the middle of a pause is replaced; cutting a pause to its edges made "stop" "stock"
-    g_end, g_beg = a.guard_end, a.guard_start
+
+    def pause_fill(ps, pe, want):
+        """The pause made `want` long from its own audio: shortened by keeping its head (the word's release) and tail
+        (the next word's lead-in) with a short crossfade, lengthened by silence in its middle. Never a looped tone."""
+        seg = y[int(ps * sr):int(pe * sr)]
+        n = int(want * sr)
+        if n <= 0:
+            return np.zeros(0, dtype=np.float32)
+        if n <= len(seg):
+            h = n // 2
+            head, tail = seg[:h].copy(), seg[len(seg) - (n - h):].copy()
+            k = min(int(0.005 * sr), len(head), len(tail))
+            if k:
+                head[-k:] *= np.linspace(1, 0, k)
+                tail[:k] *= np.linspace(0, 1, k)
+            return np.concatenate([head, tail]).astype(np.float32)
+        h = len(seg) // 2
+        head, tail = seg[:h].copy(), seg[h:].copy()
+        k = min(int(0.005 * sr), len(head), len(tail))
+        if k:
+            head[-k:] *= np.linspace(1, 0, k)
+            tail[:k] *= np.linspace(0, 1, k)
+        return np.concatenate([head, np.zeros(n - len(seg), dtype=np.float32), tail]).astype(np.float32)
+
+    # 3. rebuild: every speech run exactly as generated, every pause set to its length from its own audio
     pieces, bounds = [], []            # bounds: (time in the edited take, tempo of the sentence that follows)
     t_new, pos = 0.0, 0.0
     tempo_now = a.tempo
@@ -255,12 +278,11 @@ def main():
     first_tempo = tempo_now
     for ps, pe, kind, want, nxt in cuts + [(len(y) / sr, len(y) / sr, 'end', None, None)]:
         if kind == 'lead':
-            pos = max(0.0, pe - g_beg)
+            pos = pe
             continue
-        stop = min(ps + g_end, pe) if kind not in ('tail', 'end') else min(ps + g_end, len(y) / sr)
-        speech = y[int(pos * sr):int(stop * sr)]
+        speech = y[int(pos * sr):int(ps * sr)]
         if len(speech):
-            pieces.append(fade(speech, sr, 5)); t_new += len(speech) / sr
+            pieces.append(speech); t_new += len(speech) / sr
         if kind in ('tail', 'end'):
             break
         nxt_tempo = tempo_now
@@ -269,35 +291,36 @@ def main():
             for words_, f in tempos:
                 if first_of[nxt].startswith(words_):
                     nxt_tempo = f
-        # the gap is set so that, after this side's stretch, it lasts `want`
-        kept = (stop - ps) + min(g_beg, pe - stop)
-        gap = max(0.0, want * tempo_now - kept)
+        fill = pause_fill(ps, pe, want * tempo_now)
         if nxt_tempo != tempo_now:
-            pieces.append(tone(gap / 2)); t_new += gap / 2
+            h = len(fill) // 2
+            pieces.append(fill[:h]); t_new += h / sr
             bounds.append((t_new, nxt_tempo))
-            pieces.append(tone(gap / 2)); t_new += gap / 2
+            pieces.append(fill[h:]); t_new += (len(fill) - h) / sr
         else:
-            pieces.append(tone(gap)); t_new += gap
+            pieces.append(fill); t_new += len(fill) / sr
         plan.append({'at': round(ps, 2), 'was': round(pe - ps, 2), 'now': round(want, 2), 'kind': kind,
                      'next': first_of.get(nxt, '')[:40] if nxt is not None else ''})
         tempo_now = nxt_tempo
-        pos = max(stop, pe - g_beg)
+        pos = pe
     edited = np.concatenate(pieces).astype(np.float32)
-    # 4. tempo in one continuous pass per stretch of equal tempo, split only inside the inserted silences
+    # 4. tempo (default 1.0 = none). A tempo other than 1 time-stretches the VOICE with Rubber Band: on v4's take a
+    # 1.10 stretch sounded "extremely robotic like there is some weird background", all but the unstretched last line
+    # (owner, 2026-10-29). Get pace from the generation and the pauses; stretch only on purpose, and listen.
     segs, last_t, cur = [], 0.0, first_tempo
     for bt, nt in bounds:
         segs.append((last_t, bt, cur)); last_t, cur = bt, nt
     segs.append((last_t, len(edited) / sr, cur))
     body = np.concatenate([rubberband(edited[int(s0 * sr):int(s1 * sr)], sr, tp) for s0, s1, tp in segs if s1 > s0])
-    z = np.concatenate([np.zeros(int(a.lead * sr), dtype=np.float32), body, tone(a.tail)]).astype(np.float32)
+    tail_audio = pause_fill(cuts[-1][0], cuts[-1][1], a.tail) if cuts and cuts[-1][2] == 'tail' else np.zeros(int(a.tail * sr), dtype=np.float32)
+    z = np.concatenate([np.zeros(int(a.lead * sr), dtype=np.float32), body, tail_audio]).astype(np.float32)
 
     # 5. polish
     if a.polish:
         with tempfile.TemporaryDirectory() as d:
             i_, o_ = os.path.join(d, 'i.wav'), os.path.join(d, 'o.wav')
             sf.write(i_, z, sr, subtype='FLOAT')
-            chain = ('highpass=f=70,acompressor=threshold=-20dB:ratio=2.5:attack=8:release=120:makeup=2,'
-                     'equalizer=f=3500:t=q:w=1.0:g=2,deesser=i=0.35:m=0.5:f=0.5,'
+            chain = ('highpass=f=70,acompressor=threshold=-18dB:ratio=1.8:attack=12:release=150:makeup=1,'
                      f'loudnorm=I={a.lufs}:TP=-1.5:LRA=11')
             subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', i_, '-af', chain, '-ar', str(sr), '-c:a', 'pcm_f32le', o_], check=True)
             z, _ = sf.read(o_, dtype='float32')

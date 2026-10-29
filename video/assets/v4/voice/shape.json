@@ -1,25 +1,21 @@
 {
  "take": "/tmp/claude-0/-home-user-Test-/67147aa0-f19a-57d7-998b-ab1f0d30daf9/scratchpad/g2/w_v4_35/take.wav",
- "out": "/tmp/claude-0/-home-user-Test-/67147aa0-f19a-57d7-998b-ab1f0d30daf9/scratchpad/g2/shaped_w_v4_35/take.wav",
+ "out": "/tmp/claude-0/-home-user-Test-/67147aa0-f19a-57d7-998b-ab1f0d30daf9/scratchpad/g2/shaped_v2/take.wav",
  "before_s": 46.0,
- "after_s": 41.23,
+ "after_s": 44.09,
  "settings": {
-  "gap_paragraph": 0.3,
-  "gap_sentence": 0.26,
-  "gap_comma": 0.14,
-  "gap_breath": 0.1,
+  "gap_paragraph": 0.28,
+  "gap_sentence": 0.24,
+  "gap_comma": 0.12,
+  "gap_breath": 0.08,
   "min_pause": 0.06,
   "beat": [
    "But Helsinki=0.45",
    "So your chatbot=0.5"
   ],
-  "tempo": 1.1,
-  "tempo_at": [
-   "So your chatbot=1.0"
-  ],
+  "tempo": 1.0,
+  "tempo_at": null,
   "lead": 0.12,
-  "guard_end": 0.06,
-  "guard_start": 0.03,
   "tail": 0.5,
   "polish": true,
   "lufs": -16.0,
@@ -36,28 +32,28 @@
   {
    "at": 3.08,
    "was": 0.13,
-   "now": 0.1,
+   "now": 0.08,
    "kind": "breath",
    "next": ""
   },
   {
    "at": 4.23,
    "was": 0.4,
-   "now": 0.26,
+   "now": 0.24,
    "kind": "sent",
    "next": "ai actually runs on giant computers in b"
   },
   {
    "at": 9.21,
    "was": 0.38,
-   "now": 0.3,
+   "now": 0.28,
    "kind": "para",
    "next": "those computers get really hot"
   },
   {
    "at": 11.84,
    "was": 0.41,
-   "now": 0.26,
+   "now": 0.24,
    "kind": "sent",
    "next": "to put it into perspective just one of t"
   },
@@ -71,35 +67,35 @@
   {
    "at": 13.56,
    "was": 0.25,
-   "now": 0.14,
+   "now": 0.12,
    "kind": "comma",
    "next": ""
   },
   {
    "at": 16.48,
    "was": 0.17,
-   "now": 0.1,
+   "now": 0.08,
    "kind": "breath",
    "next": ""
   },
   {
    "at": 17.58,
    "was": 0.24,
-   "now": 0.14,
+   "now": 0.12,
    "kind": "comma",
    "next": ""
   },
   {
    "at": 19.07,
    "was": 0.44,
-   "now": 0.3,
+   "now": 0.28,
    "kind": "para",
    "next": "thats a lot of tea"
   },
   {
    "at": 20.87,
    "was": 0.55,
-   "now": 0.26,
+   "now": 0.24,
    "kind": "sent",
    "next": "normally data centers just use big fans "
   },
@@ -120,28 +116,28 @@
   {
    "at": 27.79,
    "was": 0.38,
-   "now": 0.26,
+   "now": 0.24,
    "kind": "sent",
    "next": "the city has a plan to use it starting n"
   },
   {
    "at": 29.67,
    "was": 0.16,
-   "now": 0.14,
+   "now": 0.12,
    "kind": "comma",
    "next": ""
   },
   {
    "at": 30.78,
    "was": 0.46,
-   "now": 0.3,
+   "now": 0.28,
    "kind": "para",
    "next": "so how would that work"
   },
   {
    "at": 32.58,
    "was": 0.69,
-   "now": 0.26,
+   "now": 0.24,
    "kind": "sent",
    "next": "a big new data center would take the hea"
   },
@@ -155,14 +151,14 @@
   {
    "at": 37.85,
    "was": 0.35,
-   "now": 0.3,
+   "now": 0.28,
    "kind": "para",
    "next": "then pipes under the streets carry that "
   },
   {
    "at": 38.65,
    "was": 0.09,
-   "now": 0.09,
+   "now": 0.08,
    "kind": "breath",
    "next": ""
   },
@@ -176,7 +172,7 @@
   {
    "at": 42.98,
    "was": 0.09,
-   "now": 0.09,
+   "now": 0.08,
    "kind": "breath",
    "next": ""
   },

@@ -21,7 +21,8 @@ The earlier v4 session (https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt)
 
 **G1 LOCKED (owner, 18:40 UTC: "i think this is a much better yes"). G2 TAKE SENT (2026-10-29 ~19:20 UTC), waiting on the
 owner:** `assets/v4/voice/take.wav` (Lady1, eleven_v4 at stability 0.35, the livelier-tag paste, whole read, shaped by
-`scripts/voice/shape_take.py`: 41.2 s, 183 words/min, beats before the turn and the payoff, -16 LUFS; MATCH); the raw
+`scripts/voice/shape_take.py`, take 2: pauses only, no time-stretch (take 1's stretch sounded robotic): 44.1 s, 171
+words/min, beats before the turn and the payoff, -16 LUFS; MATCH); the raw
 read and the shaping report beside it; log in `docs/ELEVENLABS.md` section 5. The owner listens on the player page
 https://claude.ai/artifact/Gn8KCPfZ6uh1AXos2koE8N (attachments don't play in their phone app; `scripts/voice/take_page.py`). After the yes: lock it into `public/v4/`
 (voice.wav + voice_words.json, the 0.12 s lead is in), then W1 and G3.
