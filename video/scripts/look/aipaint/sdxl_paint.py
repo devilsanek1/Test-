@@ -78,7 +78,9 @@ def main():
     ap.add_argument('--control', help='a canny edge map of the init (make_inits.py *_canny.png): ControlNet canny')
     ap.add_argument('--control-scale', type=float, default=0.6)
     ap.add_argument('--tag', default='', help='a suffix for the output names (e.g. _cn)')
+    ap.add_argument('--negative-extra', default='', help='words appended to the negative prompt (logged)')
     a = ap.parse_args()
+    negative = NEGATIVE + (', ' + a.negative_extra if a.negative_extra else '')
     os.makedirs(a.out, exist_ok=True)
     torch.set_num_threads(a.threads)
 
@@ -108,7 +110,7 @@ def main():
 
     # the prompt once, then drop the text encoders (about 1.6 GB)
     with torch.no_grad():
-        pe, npe, ppe, nppe = pipe.encode_prompt(prompt=PROMPTS[a.plate], negative_prompt=NEGATIVE, device='cpu',
+        pe, npe, ppe, nppe = pipe.encode_prompt(prompt=PROMPTS[a.plate], negative_prompt=negative, device='cpu',
                                                 num_images_per_prompt=1, do_classifier_free_guidance=True)
     pipe.text_encoder = None
     pipe.text_encoder_2 = None
@@ -161,7 +163,7 @@ def main():
             'plate': a.plate, 'model': MODEL, 'revision': revision, 'licence': LICENCE,
             'pipeline': 'StableDiffusionXLImg2ImgPipeline', 'dtype': 'bfloat16 (UNet, text encoders); VAE float32',
             'scheduler': 'DPMSolverMultistepScheduler, use_karras_sigmas=True (DPM++ 2M Karras)',
-            'prompt': PROMPTS[a.plate], 'prompt_2': '(same)', 'negative_prompt': NEGATIVE,
+            'prompt': PROMPTS[a.plate], 'prompt_2': '(same)', 'negative_prompt': negative,
             'init': os.path.relpath(a.init), 'size': [W, H], 'strength': s, 'steps': a.steps, 'steps_run': n_run,
             'guidance_scale': a.cfg, 'seed': a.seed, 'generator': 'torch.Generator(cpu).manual_seed',
             'init_latents': 'vae.encode(init).latent_dist.mode() * scaling_factor',

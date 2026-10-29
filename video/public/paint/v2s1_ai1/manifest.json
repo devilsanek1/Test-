@@ -16,7 +16,7 @@
    "seed": 1029,
    "from": "v2s1/sky",
    "reveal": "wash",
-   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.7 seed 1029"
+   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.75 seed 1029"
   },
   {
    "id": "v2s1/clouds_p0",
@@ -33,7 +33,7 @@
    "group": "clouds",
    "depth": 0.9,
    "reveal": "wash",
-   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.7 seed 1029"
+   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.75 seed 1029"
   },
   {
    "id": "v2s1/clouds_p1",
@@ -50,7 +50,7 @@
    "group": "clouds",
    "depth": 0.7,
    "reveal": "wash",
-   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.7 seed 1029"
+   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.75 seed 1029"
   },
   {
    "id": "v2s1/clouds_p2",
@@ -67,7 +67,7 @@
    "group": "clouds",
    "depth": 0.4,
    "reveal": "wash",
-   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.7 seed 1029"
+   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.75 seed 1029"
   },
   {
    "id": "v2s1/clouds_p3",
@@ -84,7 +84,7 @@
    "group": "clouds",
    "depth": 0.0,
    "reveal": "wash",
-   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.7 seed 1029"
+   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.75 seed 1029"
   },
   {
    "id": "v2s1/tree",
@@ -125,7 +125,7 @@
    "seed": 1029,
    "from": "v2s1/farroofs",
    "reveal": "haze",
-   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.7 seed 1029"
+   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.75 seed 1029"
   },
   {
    "id": "v2s1/fartower",
@@ -140,7 +140,7 @@
    "seed": 1029,
    "from": "v2s1/fartower",
    "reveal": "haze",
-   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.7 seed 1029"
+   "painter": "stabilityai/stable-diffusion-xl-base-1.0 img2img strength 0.75 seed 1029"
   }
  ]
 }

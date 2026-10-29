@@ -36,7 +36,7 @@ SEED = 20261029
 FW = 1080                      # frame width: every size in this file is px of the 1080 x 1920 frame
 PLATE_H = 900                  # the sky plate: the frame's top 900 px (sky to just under the horizon)
 HORIZON = 792                  # the scene's horizon line (behind the far roofs)
-SUN = (196.0, 772.0)           # the low sun, left, its lower part behind the far roofs
+SUN = (196.0, 779.0)           # the low sun, left, its lower part behind the far roofs
 CAPTION = (317, 556)           # the caption band (LAYOUT.md section 1): calm, flat, no cloud behind the words
 
 
@@ -98,12 +98,12 @@ DUSK = {k: hx(v) for k, v in {
     'horizon': '#efd6c4',  # the warm horizon = the far AIR
     'glow': '#f9d9b4',     # the sun's warmth (an ellipse, never in the caption band)
     'sun': '#fff2d9',      # the disc: one flat step over its band
-    'rim': '#fde6bf',      # cloud rim, the lightest cloud value (thin edges toward the sun)
-    'lit': '#f5d0aa',      # cloud lit
-    'mid': '#e4b9b4',      # cloud mid, rose-peach
-    'shade': '#bfa9c8',    # cloud shade, lilac (skylit tops get the lighter end)
-    'deep': '#a08db6',     # cloud accent: notches between billows, small areas only
-    'streak': '#e3c3c6',   # horizon streak body (rose); its lit underside takes 'glow'
+    'rim': '#fee9c6',      # cloud rim, the lightest cloud value (thin edges toward the sun): sky +11 L*
+    'lit': '#f7d9b7',      # cloud lit, peach-gold: sky +6 L*
+    'mid': '#ebc6bf',      # cloud half-light, rose-peach AT the sky's value (a hue step, not a value step)
+    'shade': '#cbbbd5',    # cloud shade, lilac, sky -4..-6 L* (skylit tops get this end)
+    'deep': '#bba9cb',     # cloud accent: undersides away from the sky; small areas only, sky -10
+    'streak': '#e9c9c4',   # horizon streak body (rose), band -5 L*; its lit underside takes 'glow'
     'bird': '#5d4d76',     # the far flock
 }.items()}
 
@@ -362,21 +362,36 @@ def paint_sky(H, W, pal, style, rng, sun=SUN, glow=0.55, grain=1.0):
         paint_line(p1, (x, y), (x + L * math.cos(ang), y + L * math.sin(ang)), w, col, rng.uniform(0.30, 0.45),
                    round_=True, t_in=0.3, t_out=0.3)
     p1.blur(26).onto(sky)
-    # (c) the brush grain: 260 long thin dry strokes, width 6-20, length 160-620, +-0.4..0.7 L, blur 0.7
+    # (b2) mid-scale soft strokes: 40 round strokes, width 40-90, +-0.8..1.3 L, opacity 0.3-0.45, blur 6
+    p1b = Layer(H, W)
+    for i in range(40):
+        y, x = rng.uniform(0, H), rng.uniform(-0.2, 0.9) * W
+        L = rng.uniform(0.25, 0.6) * W
+        ang = math.radians(rng.normal(-5, 3))
+        yi = int(np.clip(y, 0, H - 1))
+        col = lift(sky.c[yi, int(np.clip(x + L / 2, 0, W - 1))],
+                   rng.choice([-1, 1]) * rng.uniform(0.008, 0.013) * calm[yi])
+        paint_line(p1b, (x, y), (x + L * math.cos(ang), y + L * math.sin(ang)), rng.uniform(40, 90), col,
+                   rng.uniform(0.3, 0.45), round_=True, t_in=0.3, t_out=0.4)
+    p1b.blur(6).onto(sky)
+    # (c) the brush grain: 300 long thin dry strokes, width 6-20, length 160-620, +-1.1..1.7 L, blur 0.7
     p2 = Layer(H, W)
     wind = -7.0 if style == 'dusk' else -2.0
-    for i in range(int(260 * grain)):
+    for i in range(int(300 * grain)):
         y = rng.uniform(-20, H)
         x = rng.uniform(-200, W)
         L = rng.uniform(160, 620)
         ang = math.radians(wind + rng.normal(0, 2.5))
         w = rng.uniform(6, 20)
         xc, yc = int(np.clip(x + L / 2, 0, W - 1)), int(np.clip(y, 0, H - 1))
-        dl = rng.choice([-1, 1]) * rng.uniform(0.004, 0.007) * calm[yc]
+        dl = rng.choice([-1, 1]) * rng.uniform(0.011, 0.017) * calm[yc]
         col = lift(sky.c[yc, xc], dl)
-        paint_line(p2, (x, y), (x + L * math.cos(ang), y + L * math.sin(ang)), w, col, rng.uniform(0.35, 0.6),
+        paint_line(p2, (x, y), (x + L * math.cos(ang), y + L * math.sin(ang)), w, col, rng.uniform(0.45, 0.7),
                    e_pos=1.2, e_neg=1.2, t_in=0.15, t_out=0.45, dry=rng.uniform(0.35, 0.6), tex_off=tex_off(rng))
-    p2.blur(0.7).onto(sky)
+    p2.blur(0.7)
+    patch = smoothstep(-0.25, 0.9, noise(rng, H, W, 120, aniso=2.5, angle=-6.0))   # grain in patches, never even
+    p2.a *= (0.15 + 0.85 * patch).astype(np.float32)
+    p2.onto(sky)
     if style == 'day':   # (d) the posters' paper tooth: +-0.35 L fine, very slightly streaky
         n = noise(rng, H, W, 0.9, aniso=2.5, angle=90.0) * 0.0035
         sky.c[..., 0] += n
@@ -402,8 +417,12 @@ def mass_sdf(X, Y, lobes, k, base_y=None, base_soft=30.0, wob=None):
     """Signed distance (px, + inside) of a designed mass: a smooth union of lobes (cx, cy, r, flat), optionally
     cut by a level base line (the bases of one cloud layer share one height)."""
     d = None
-    for (cx, cy, r, fl) in lobes:
-        di = r - np.hypot(X - cx, (Y - cy) / fl)
+    for n_, (cx, cy, r, fl) in enumerate(lobes):
+        # each billow a little irregular: its radius wobbles +-5 % round the lobe (3 slow harmonics, seeded by index)
+        th = np.arctan2((Y - cy) / fl, X - cx)
+        ph = np.random.default_rng([SEED, 77, n_]).uniform(0, 2 * np.pi, 3)
+        rr = r * (1.0 + 0.05 * (0.6 * np.sin(2 * th + ph[0]) + 0.3 * np.sin(3 * th + ph[1]) + 0.25 * np.sin(5 * th + ph[2])))
+        di = rr - np.hypot(X - cx, (Y - cy) / fl)
         d = di if d is None else smax(d, di, k)
     d = norm_sdf(d)
     if base_y is not None:
@@ -438,223 +457,290 @@ def ramp4(stops, t):
     return S[i] + (S[i + 1] - S[i]) * f
 
 
+def fill_out(c, inside):
+    """Colour outside a shape = the colour of the nearest inside pixel, so soft and dry edges fade in the
+    edge's own colour (never darken toward an undefined outside)."""
+    if inside.all() or not inside.any():
+        return c
+    _, (iy, ix) = ndi.distance_transform_edt(~inside, return_indices=True)
+    return c[iy, ix]
+
+
+def longest_run(flags):
+    best, cur = (0, 0), 0
+    for k, f in enumerate(flags):
+        cur = cur + 1 if f else 0
+        if cur > best[1] - best[0]:
+            best = (k - cur + 1, k + 1)
+    return best
+
+
+def inner_arcs(lobes, order, d, x0, y0, l2, max_n):
+    """The billow edges inside a mass: for each front lobe (front = later in `order`), the longest lit-facing
+    arc of its circle that lies over a lobe behind it and well inside the outline. Returns (lobe, a0, a1)."""
+    h, w = d.shape
+    a_l = math.atan2(l2[1], l2[0])
+    res = []
+    for zi in range(len(order) - 1, 0, -1):
+        i = order[zi]
+        cx, cy, r, fl = lobes[i]
+        if fl < 0.75 or r < 24:
+            continue
+        behind = [lobes[j] for j in order[:zi]]
+        angs = a_l + np.linspace(-1.5, 1.5, 49)
+        ok = []
+        for a in angs:
+            px_, py_ = cx + (r + 3) * math.cos(a), cy + (r + 3) * math.sin(a)
+            ix, iy = int(px_ - x0), int(py_ - y0)
+            ok.append(0 <= iy < h and 0 <= ix < w and d[iy, ix] > 10 and
+                      any(math.hypot(px_ - bx, (py_ - by) / bf) < br - 3 for (bx, by, br, bf) in behind))
+        b0, b1 = longest_run(ok)
+        if b1 - b0 >= 6:
+            res.append((i, float(angs[b0]), float(angs[b1 - 1])))
+        if len(res) >= max_n:
+            break
+    return res
+
+
 def paint_mass(box, lobes, pal, sky, rng, prm, sun=SUN):
-    """One cloud plane, designed then painted. box = (x0, y0, x1, y1) in plate px. Returns (Layer over the box,
-    flat-design RGB over the box, info). prm: the plane's numbers from DEPTH (near / mid / far)."""
+    """One cloud plane, designed then painted. box = (x0, y0, x1, y1) in plate px.
+    Returns (Layer over the box, the flat design over the box (OKLab), the mask, info).
+    prm: the plane's numbers from DEPTH (near / mid / far)."""
     x0, y0, x1, y1 = box
     h, w = y1 - y0, x1 - x0
     Y, X = np.mgrid[y0:y1, x0:x1].astype(np.float32) + 0.5
     size = max(r for (_, _, r, _) in lobes)
     wob = noise(rng, h, w, 40, aniso=4.0) * prm['base_wobble']
     d = mass_sdf(X, Y, lobes, prm['k_smooth'], prm.get('base_y'), prm['base_soft'], wob)
+    holes = ndi.binary_fill_holes(d > 0) & (d <= 0)         # slivers of sky trapped between lobes: fill them
+    d = np.where(holes, 14.0, d).astype(np.float32)
     M = smoothstep(-1.0, 1.0, d)
+    inside = M > 0.5
     cen = np.array([(X * M).sum() / M.sum(), (Y * M).sum() / M.sum()])
     l2 = light_dir(cen, sun, prm['top_light'])
-    # ---- (a) DESIGN: value plan from one light ----
-    # key light: per-lobe form (front lobe wins, z = away from the light is in front) x the mass's own shadow
-    order = sorted(range(len(lobes)), key=lambda i: -np.dot(np.array(lobes[i][:2]) - cen, l2) + lobes[i][2] * 0.002)
-    lz = prm['lz']
-    l3 = np.array([l2[0], l2[1], lz]) / np.linalg.norm([l2[0], l2[1], lz])
-    key = np.zeros((h, w), np.float32)
-    skyl = np.zeros((h, w), np.float32)
+    # ---- (a) DESIGN: ONE smooth big form from one light (never a value zone per lobe: that draws crescents) ----
+    sf = prm['form_sigma'] * size
+    Mb = gauss(M, sf)
+    gy, gx = np.gradient(Mb)
+    gn = np.hypot(gx, gy) + 1e-6
+    e = smoothstep(0.0, 1.0, gn * sf * 2.5)
+    facing_g = (-gx * l2[0] - gy * l2[1]) / gn
+    step = size * 0.05
+    od = gauss(light_depth(M, l2, step=step, n=26), step * 1.5)
+    att = np.exp(-od / (prm['penetration'] * size))
+    F = prm['w_att'] * att + (1 - prm['w_att']) * (0.5 + 0.5 * facing_g * e)
+    # soft lobe bulges (front lobe wins; lobes away from the light sit in front): gentle roundness, no crisp edge
+    order = sorted(range(len(lobes)), key=lambda i: -np.dot(np.array(lobes[i][:2]) - cen, l2))
+    B = np.full((h, w), 0.5, np.float32)
     for i in order:
         cx, cy, r, fl = lobes[i]
         nx, ny = (X - cx) / r, (Y - cy) / (r * fl)
-        rho2 = nx * nx + ny * ny
-        nz = np.sqrt(np.clip(1.0 - rho2, 0.0, 1.0))
         di = r - np.hypot(X - cx, (Y - cy) / fl)
-        facing = (nx * l2[0] + ny * l2[1]) / np.sqrt(np.maximum(rho2, 1e-6))
-        ew = mix(prm['inner_soft'], prm['inner_crisp'], smoothstep(-0.2, 0.5, facing))   # crisp toward the light
-        cov = smoothstep(-ew * 0.5, ew * 0.5, di)
-        lam = np.clip((nx * l3[0] + ny * l3[1] + nz * l3[2] + prm['wrap']) / (1 + prm['wrap']), 0.0, 1.0)
-        key = key + (lam - key) * cov
-        skyl = skyl + (np.clip(0.5 - 0.5 * ny, 0, 1) - skyl) * cov
-    od = light_depth(M, l2, step=size * 0.06, n=22)
-    att = np.exp(-od / (prm['penetration'] * size))
-    k = np.clip(key * (0.25 + 0.75 * att) * prm['key_gain'], 0.0, 1.0)
-    # colour: shade (skylit tops lighter) -> mid -> lit -> rim, in OKLab
-    shade_c = mix(pal['deep'][None, None], pal['shade'][None, None], skyl[..., None])
-    stops = [pal['mid'], pal['lit'], pal['rim']]
-    cont = ramp4([np.zeros(3)] + stops, k)                        # stop 0 replaced by the per-pixel shade colour
-    t0 = np.clip(k * 3.0, 0, 1)[..., None]
-    cont = np.where((k < 1 / 3)[..., None], shade_c + (pal['mid'] - shade_c) * smoothstep(0, 1, t0), cont)
-    # the flat design: 4 values, crisp
-    q = np.digitize(k, prm['cuts'])
-    zone_cols = [None, pal['mid'], pal['lit'], pal['rim']]
-    flat = shade_c.copy()
-    for zi in (1, 2, 3):
-        flat = np.where((q == zi)[..., None], zone_cols[zi], flat)
+        lam = 0.5 + 0.5 * np.clip(nx * l2[0] + ny * l2[1], -1, 1)
+        cov = smoothstep(-0.1 * r, 0.35 * r, di)
+        B = B + (lam - B) * cov
+    if inside.any():
+        lo, hi = np.percentile(F[inside], [3, 97])
+        F = (F - lo) / max(hi - lo, 1e-3)
+    F = np.clip(F + prm['bulge'] * (B - 0.5) * 2.0, 0.0, 1.0).astype(np.float32)
+    skyl = np.clip(0.5 + 0.5 * (gy / gn) * e, 0.0, 1.0)          # top-facing: the sky dome lights the shade
+    shade_top = mix(pal['shade'], pal['field'], 0.35)            # the shade's skylit top: toward the sky's own lilac
+    shade_c = mix(pal['deep'][None, None], shade_top[None, None], skyl[..., None])
+    # the continuous plan (for picking stroke colours) and the flat design: 3 values
+    c1, c2 = prm['cuts']
+    sc_ = prm['soft_cut']
+    t_mid = smoothstep(c1 - sc_, c1 + sc_, F)[..., None]
+    t_lit = smoothstep(c2 - sc_, c2 + sc_, F)[..., None]
+    cont = shade_c + (pal['mid'] - shade_c) * t_mid
+    cont = cont + (pal['lit'] - cont) * t_lit
+    q = np.digitize(F, prm['cuts'])
+    flat = np.where((q == 0)[..., None], shade_c, np.where((q == 1)[..., None], pal['mid'], pal['lit']))
+    flat = fill_out(flat.astype(np.float32), inside)
+    cont = fill_out(cont.astype(np.float32), inside)
     # ---- (b) PAINT passes on an opaque colour canvas over the box ----
     canvas = Layer(h, w, alpha=1.0)
-    canvas.c[...] = gauss(flat.astype(np.float32), prm['base_blur'])          # the flats, softened
-    # P1: big soft round strokes along the wind, colour picked from the continuous plan, then blurred
+    canvas.c[...] = gauss(flat, prm['base_blur'])                 # P0: the flats, brushed soft
+    # P1: big soft round strokes laid ALONG the form (the iso-lines of F), colours from the plan, then blurred
     p1 = Layer(h, w)
-    ys_in, xs_in = np.nonzero(M > 0.5)
-    for i in range(prm['n_soft'] if len(xs_in) else 0):
+    gFy, gFx = np.gradient(gauss(F, 6.0))
+    ys_in, xs_in = np.nonzero(inside)
+    for _ in range(prm['n_soft'] if len(xs_in) else 0):
         j = rng.integers(len(xs_in))
         cx, cy = float(xs_in[j]), float(ys_in[j])
-        L = rng.uniform(0.6, 1.6) * size
-        ang = math.radians(prm['wind'] + rng.normal(0, 12))
-        col = lift(cont[int(cy), int(cx)], rng.normal(0, 0.006), rng.normal(0, 0.003), rng.normal(0, 0.003))
+        ang = math.atan2(gFx[ys_in[j], xs_in[j]], -gFy[ys_in[j], xs_in[j]]) if abs(gFx[ys_in[j], xs_in[j]]) + abs(gFy[ys_in[j], xs_in[j]]) > 1e-4 else math.radians(prm['wind'])
+        L = rng.uniform(0.5, 1.2) * size
+        col = lift(cont[ys_in[j], xs_in[j]], rng.normal(0, 0.006), rng.normal(0, 0.003), rng.normal(0, 0.003))
         paint_line(p1, (cx - L / 2 * math.cos(ang), cy - L / 2 * math.sin(ang)),
-                   (cx + L / 2 * math.cos(ang), cy + L / 2 * math.sin(ang)), rng.uniform(0.35, 0.7) * size, col,
-                   rng.uniform(0.35, 0.6), round_=True, t_in=0.3, t_out=0.3)
+                   (cx + L / 2 * math.cos(ang), cy + L / 2 * math.sin(ang)), rng.uniform(0.3, 0.55) * size, col,
+                   rng.uniform(0.25, 0.45), round_=True, t_in=0.35, t_out=0.35)
     p1.blur(prm['p1_blur']).onto(canvas)
-    # P2: blocky flat-brush strokes along each lobe's form (arcs concentric with the lobe), colour from the plan
+    # P2: blocky flat-brush strokes along the form: arcs on the billows (convex edge crisp, concave side soft),
+    # level strokes on flattened banks; a touch lighter than the plan on the lit half, darker on the shade half
     p2 = Layer(h, w)
+    a_l = math.atan2(l2[1], l2[0])
     for i in order:
         cx, cy, r, fl = lobes[i]
-        if fl < 0.75:      # flattened lobes (banks): level flat strokes along the bank instead of arcs
-            for _ in range(int(prm['n_block'] * r / size) + 1):
-                sx = cx + rng.uniform(-0.9, 0.9) * r
-                sy = cy + rng.uniform(-0.6, 0.5) * r * fl
-                L = rng.uniform(0.5, 1.3) * r
-                if not (0 <= int(sy - y0) < h and 0 <= int(sx - x0) < w) or M[int(sy - y0), int(sx - x0)] < 0.5:
-                    continue
-                col = lift(cont[int(sy - y0), int(sx - x0)], rng.normal(0, 0.006))
-                ang = math.radians(prm['wind'] + rng.normal(0, 3))
-                paint_line(p2, (sx - x0 - L / 2 * math.cos(ang), sy - y0 - L / 2 * math.sin(ang)),
-                           (sx - x0 + L / 2 * math.cos(ang), sy - y0 + L / 2 * math.sin(ang)),
-                           rng.uniform(*prm['block_w']) * 0.7, col, rng.uniform(0.5, 0.8),
-                           e_pos=0.9, e_neg=2.5, t_in=0.02, t_out=0.35, dry=rng.uniform(0.1, 0.35),
-                           tex_off=tex_off(rng))
-            continue
-        a_l = math.atan2(l2[1], l2[0])
-        nb = int(prm['n_block'] * (r / size) ** 0.7) + 1
+        nb = int(round(prm['n_block'] * (r / size) ** 0.6))
         for _ in range(nb):
-            R = r * rng.uniform(0.45, 0.93)
-            a_c = a_l + rng.normal(0, 1.1)
-            span = rng.uniform(0.5, 1.3) * (1 if rng.random() < 0.5 else -1)
-            am = a_c
+            if fl < 0.75:
+                sx = cx + rng.uniform(-0.9, 0.9) * r
+                sy = cy + rng.uniform(-0.55, 0.45) * r * fl
+                ix, iy = int(sx - x0), int(sy - y0)
+                if not (0 <= iy < h and 0 <= ix < w) or d[iy, ix] < 3:
+                    continue
+                L = rng.uniform(0.5, 1.2) * r
+                ang = math.radians(prm['wind'] + rng.normal(0, 2.5))
+                lit_side = F[iy, ix] > 0.5
+                col = lift(cont[iy, ix], (0.012 if lit_side else -0.008) + rng.normal(0, 0.004))
+                bw = rng.uniform(*prm['block_w']) * 0.6
+                paint_line(p2, (ix - L / 2 * math.cos(ang), iy - L / 2 * math.sin(ang)),
+                           (ix + L / 2 * math.cos(ang), iy + L / 2 * math.sin(ang)), bw, col, rng.uniform(0.45, 0.75),
+                           e_pos=2.0, e_neg=0.8, t_in=0.03, t_out=0.4, dry=rng.uniform(0.1, 0.35), tex_off=tex_off(rng))
+                continue
+            R = r * rng.uniform(0.55, 0.92)
+            am = a_l + rng.normal(0, 0.9)
+            span = rng.uniform(0.45, 1.1)
             px_, py_ = cx + R * math.cos(am), cy + R * fl * math.sin(am)
             ix, iy = int(px_ - x0), int(py_ - y0)
-            if not (0 <= iy < h and 0 <= ix < w) or M[iy, ix] < 0.5:
+            if not (0 <= iy < h and 0 <= ix < w) or d[iy, ix] < 4:
                 continue
-            col = lift(cont[iy, ix], rng.normal(0, 0.005), rng.normal(0, 0.002), rng.normal(0, 0.002))
+            toward = math.cos(am - a_l)                      # +1 on the lobe's lit side
+            col = lift(cont[iy, ix], prm['block_lift'] * max(toward, 0) - 0.004 * max(-toward, 0) + rng.normal(0, 0.003),
+                       rng.normal(0, 0.002), rng.normal(0, 0.002))
             bw = rng.uniform(*prm['block_w'])
-            paint_arc(p2, (cx - x0, cy - y0), R, am - span / 2, am + span / 2, bw, col, rng.uniform(0.5, 0.85),
-                      e_pos=0.9, e_neg=bw * 0.35, t_in=0.04, t_out=0.4, taper_w=0.3, dry=rng.uniform(0.0, 0.3),
+            crisp = 0.9 if toward > 0 else 2.5             # crisp flat-brush edges only on the lit half
+            paint_arc(p2, (cx - x0, cy - y0), R, am - span / 2, am + span / 2, bw, col, rng.uniform(0.4, 0.7),
+                      e_pos=crisp, e_neg=bw * 0.45, t_in=0.08, t_out=0.4, taper_w=0.45, dry=rng.uniform(0.0, 0.25),
                       tex_off=tex_off(rng))
+    # the billow edges INSIDE the mass: where a front lobe lies over the lobes behind it, its lit-facing arc gets one
+    # light stroke on its own side, crisp at the edge and soft inward (no dark line beside it: that draws a ring)
+    for (i, a0, a1) in inner_arcs(lobes, order, d, x0, y0, l2, prm['n_inner']):
+        cx, cy, r, fl = lobes[i]
+        am = 0.5 * (a0 + a1)
+        mx_, my_ = int(cx + (r * 0.85) * math.cos(am) - x0), int(cy + (r * 0.85) * math.sin(am) - y0)
+        if not (0 <= my_ < h and 0 <= mx_ < w):
+            continue
+        lw = rng.uniform(*prm['inner_w']) * (0.6 + 0.4 * r / size)
+        paint_arc(p2, (cx - x0, cy - y0), r - lw * 0.5, a0, a1, lw, lift(cont[my_, mx_], prm['inner_lift']),
+                  rng.uniform(0.55, 0.8), e_pos=0.9, e_neg=lw * 0.85, t_in=0.3, t_out=0.35, taper_w=0.75)
     p2.blur(prm['p2_blur']).onto(canvas)
     # P3: a few crisp strokes at the light edges: rims on the outer silhouette's lit arcs (outer edge crisp ON the
-    # silhouette, inner edge soft, both ends tapered: never a two-edged crescent)
+    # outline, inner edge soft, both ends tapered: one crisp edge, never a two-edged crescent)
     p3 = Layer(h, w)
     nrim = 0
-    for i in order[::-1]:
+    cand = [i for i in order[::-1] if lobes[i][3] >= 0.75 and lobes[i][2] >= prm['rim_min_r']]
+    cand.sort(key=lambda i: -np.dot(np.array(lobes[i][:2]) - cen, l2))       # most sun-facing lobes first
+    for i in cand:
         if nrim >= prm['n_rim']:
             break
         cx, cy, r, fl = lobes[i]
-        if fl < 0.75 or r < prm['rim_min_r']:
+        angs = a_l + np.linspace(-1.35, 1.35, 41)
+        out = [(0 <= int(cy + (r + 3) * math.sin(a) - y0) < h and 0 <= int(cx + (r + 3) * math.cos(a) - x0) < w
+                and d[int(cy + (r + 3) * math.sin(a) - y0), int(cx + (r + 3) * math.cos(a) - x0)] < 0)
+               for a in angs]
+        best = longest_run(out)
+        if best[1] - best[0] < 6:
             continue
-        a_l = math.atan2(l2[1], l2[0])
-        # the lit arc must lie on the outer silhouette: test a few points just outside the lobe
-        angs = a_l + np.linspace(-1.2, 1.2, 25)
-        out = []
-        for a in angs:
-            qx, qy = cx + (r + 4) * math.cos(a) - x0, cy + (r + 4) * math.sin(a) - y0
-            ok = 0 <= int(qy) < h and 0 <= int(qx) < w and d[int(qy), int(qx)] < 0
-            out.append(ok)
-        out = np.array(out)
-        if out.sum() < 5:
-            continue
-        idx = np.nonzero(out)[0]
-        a0, a1 = angs[idx[0]], angs[idx[-1]]
-        dist_sun = math.hypot(cx - sun[0], cy - sun[1])
-        warm = float(np.clip(1.25 - dist_sun / 900.0, 0.55, 1.0))
-        rw = rng.uniform(*prm['rim_w']) * (0.6 + 0.4 * min(1.0, r / size))
-        col = mix(pal['lit'], pal['rim'], warm)
-        paint_arc(p3, (cx - x0, cy - y0), r - rw * 0.5, a0, a1, rw, col, rng.uniform(0.75, 0.95) * warm,
-                  e_pos=0.6, e_neg=rw * 0.6, t_in=0.25, t_out=0.3, taper_w=0.75)
+        a0, a1 = angs[best[0]], angs[best[1] - 1]
+        warm = float(np.clip(1.3 - math.hypot(cx - sun[0], cy - sun[1]) / 900.0, 0.6, 1.0))
+        rw = rng.uniform(*prm['rim_w']) * (0.55 + 0.45 * min(1.0, r / size))
+        col = mix(pal['lit'], pal['rim'], 0.55 + 0.45 * warm)
+        paint_arc(p3, (cx - x0, cy - y0), r - rw * 0.5 + 0.6, a0, a1, rw, col, rng.uniform(0.8, 0.95) * warm,
+                  e_pos=0.6, e_neg=rw * 0.55, t_in=0.22, t_out=0.3, taper_w=0.8)
         nrim += 1
     p3.blur(prm['p3_blur']).onto(canvas)
     # ---- (c) EDGES: the silhouette's alpha, crisp toward the light, soft or dry-broken away from it ----
-    gy, gx = np.gradient(gauss(d, 2.0))
-    gn = np.hypot(gx, gy) + 1e-6
-    facing = (-gx * l2[0] - gy * l2[1]) / gn          # outward normal . light
+    ggy, ggx = np.gradient(gauss(d, 5.0))               # smoothed: the raw SDF's gradient breaks at the medial axis
+    ggn = np.hypot(ggx, ggy) + 1e-6
+    facing = (-ggx * l2[0] - ggy * l2[1]) / ggn          # the outline's outward normal . light
     ew = mix(prm['edge_shade'], prm['edge_lit'], smoothstep(-0.15, 0.55, facing))
+    near_base = np.zeros((h, w), np.float32)
     if prm.get('base_y') is not None:
-        near_base = smoothstep(prm['base_soft'] * 2.0, 0.0, np.abs(prm['base_y'] - Y + wob))
-        ew = mix(ew, prm['edge_base'], near_base * smoothstep(0.5, -0.2, facing))
-    dryn = noise(rng, h, w, prm['dry_cell'], aniso=prm['dry_aniso'], angle=prm['dry_angle'])
-    shade_side = smoothstep(0.3, -0.4, facing)
-    dd = d + dryn * ew * prm['dry_amp'] * shade_side
-    alpha = smoothstep(-ew * 0.5, ew * 0.5, dd)
-    canvas.a[...] = alpha
-    # P4 (near masses only): speckle dissolve on the shade side, a light spatter off the lit edge
+        # the flat base is soft or lost whatever it faces (a lit underside included), dragged in vertical streaks
+        near_base = smoothstep(prm['base_soft'] * 2.5, 0.0, np.abs(prm['base_y'] - Y + wob)) * smoothstep(-0.2, 0.2, -ggy / ggn)
+        ew = mix(ew, prm['edge_base'], near_base)
+    n_side = np.clip(noise(rng, h, w, prm['dry_cell'], aniso=prm['dry_aniso'], angle=prm['wind']), -1.6, 1.6)
+    n_base = np.clip(noise(rng, h, w, prm['dry_cell'], aniso=6.0, angle=90.0), -1.6, 1.6)
+    shade_side = smoothstep(0.35, -0.35, facing)
+    in_band = smoothstep(1.2, 0.0, np.abs(d) / ew)      # the dry break-up lives in the edge band only
+    dd = d + (n_side * ew * prm['dry_amp'] * shade_side * (1.0 - near_base)
+              + n_base * prm['edge_base'] * prm['base_drag'] * near_base) * in_band
+    canvas.a[...] = smoothstep(-ew * 0.5, ew * 0.5, dd)
+    # P4 (near masses only): a speckle dissolve on the shade side, a few light flecks off the lit edge
     if prm['n_speck']:
-        band = (np.abs(d) < 26) & (shade_side > 0.5)
+        band = (d < 4) & (d > -22) & (shade_side > 0.75) & (near_base < 0.2)
         ys_b, xs_b = np.nonzero(band)
         for _ in range(prm['n_speck'] if len(xs_b) else 0):
             j = rng.integers(len(xs_b))
-            sx, sy = xs_b[j] + rng.uniform(-0.5, 0.5), ys_b[j] + rng.uniform(-0.5, 0.5)
             dist = -d[ys_b[j], xs_b[j]]
-            if dist > 0 and rng.random() < dist / 30.0:
+            if dist > 0 and rng.random() < dist / 24.0:
                 continue
-            col = canvas.c[ys_b[j], xs_b[j]]
-            paint_speck(canvas, sx, sy, rng.uniform(0.7, 2.4), col, rng.uniform(0.45, 0.9))
-        lit_band = (d < -3) & (d > -40) & (facing > 0.4)
+            col = mix(canvas.c[ys_b[j], xs_b[j]], sky.c[y0 + ys_b[j], x0 + xs_b[j]], 0.3)   # the cloud dissolving
+            paint_speck(canvas, xs_b[j] + rng.uniform(0, 1), ys_b[j] + rng.uniform(0, 1), rng.uniform(0.7, 2.2),
+                        col, rng.uniform(0.5, 0.9))
+        lit_band = (d < -4) & (d > -36) & (facing > 0.45)
         ys_b, xs_b = np.nonzero(lit_band)
         for _ in range(prm['n_spatter'] if len(xs_b) else 0):
             j = rng.integers(len(xs_b))
-            paint_speck(canvas, xs_b[j] + 0.5, ys_b[j] + 0.5, rng.uniform(1.2, 3.2), pal['rim'],
-                        rng.uniform(0.25, 0.55))
+            paint_speck(canvas, xs_b[j] + 0.5, ys_b[j] + 0.5, rng.uniform(1.0, 2.8), pal['rim'], rng.uniform(0.25, 0.5))
     # ---- (d) DEPTH: converge on the sky behind by k, then blur the plane ----
     if prm['k'] > 0:
         behind = sky.c[y0:y1, x0:x1]
         canvas.c[...] = canvas.c + (behind - canvas.c) * prm['k']
         flat = flat + (behind - flat) * prm['k']
     canvas.blur(prm['plane_blur'])
-    info = {'l2': l2, 'k_mean': float(k[M > 0.5].mean()) if (M > 0.5).any() else 0.0}
+    info = {'l2': [round(float(v), 3) for v in l2], 'F_inside': float(F[inside].mean()) if inside.any() else 0.0}
     return canvas, flat.astype(np.float32), M, info
 
 
 # The depth ladder: near / mid / far plane numbers (px of the 1080 frame). The horizon streaks are the 4th plane.
 DEPTH = {
-    'near': dict(k=0.0, plane_blur=0.0, k_smooth=26.0, base_soft=24.0, base_wobble=10.0, top_light=0.25, lz=-0.05,
-                 wrap=0.35, penetration=0.55, key_gain=1.15, cuts=[0.22, 0.52, 0.82], base_blur=10.0,
-                 inner_soft=34.0, inner_crisp=2.0, n_soft=16, p1_blur=12.0, n_block=12, block_w=(14, 36),
-                 p2_blur=1.2, n_rim=7, rim_w=(7, 13), rim_min_r=34, p3_blur=0.5, edge_lit=1.8, edge_shade=26.0,
-                 edge_base=56.0, dry_cell=5.0, dry_aniso=6.0, dry_angle=-80.0, dry_amp=0.9, n_speck=190,
-                 n_spatter=14, wind=-6.0),
-    'mid': dict(k=0.22, plane_blur=1.3, k_smooth=22.0, base_soft=16.0, base_wobble=5.0, top_light=0.25, lz=-0.05,
-                wrap=0.4, penetration=0.6, key_gain=1.0, cuts=[0.25, 0.55, 0.86], base_blur=8.0,
-                inner_soft=30.0, inner_crisp=3.0, n_soft=10, p1_blur=10.0, n_block=10, block_w=(16, 34),
-                p2_blur=1.6, n_rim=2, rim_w=(5, 8), rim_min_r=60, p3_blur=0.8, edge_lit=2.6, edge_shade=30.0,
-                edge_base=40.0, dry_cell=6.0, dry_aniso=8.0, dry_angle=-4.0, dry_amp=0.6, n_speck=0,
-                n_spatter=0, wind=-4.0),
-    'far': dict(k=0.40, plane_blur=2.4, k_smooth=18.0, base_soft=10.0, base_wobble=3.0, top_light=0.25, lz=-0.1,
-                wrap=0.45, penetration=0.7, key_gain=0.95, cuts=[0.28, 0.6, 0.9], base_blur=6.0,
-                inner_soft=24.0, inner_crisp=4.0, n_soft=6, p1_blur=8.0, n_block=8, block_w=(14, 28),
-                p2_blur=2.0, n_rim=0, rim_w=(4, 6), rim_min_r=999, p3_blur=1.0, edge_lit=4.0, edge_shade=36.0,
-                edge_base=30.0, dry_cell=6.0, dry_aniso=10.0, dry_angle=-2.0, dry_amp=0.4, n_speck=0,
-                n_spatter=0, wind=-2.0),
+    'near': dict(k=0.0, plane_blur=0.0, k_smooth=7.0, base_soft=20.0, base_wobble=8.0, top_light=0.45,
+                 form_sigma=0.32, penetration=1.1, w_att=0.5, bulge=0.06, cuts=[0.34, 0.66], soft_cut=0.16,
+                 base_blur=12.0, n_soft=10, p1_blur=12.0, n_block=9, block_w=(14, 32), block_lift=0.02, p2_blur=1.0,
+                 n_inner=6, inner_w=(9, 15), inner_lift=0.016, n_rim=8, rim_w=(7, 14), rim_min_r=30, p3_blur=0.5,
+                 edge_lit=1.8, edge_shade=24.0, edge_base=40.0, base_drag=0.06, dry_cell=4.0, dry_aniso=7.0, dry_amp=0.8,
+                 n_speck=170, n_spatter=12, wind=-6.0),
+    'mid': dict(k=0.22, plane_blur=1.3, k_smooth=12.0, base_soft=12.0, base_wobble=4.0, top_light=0.3,
+                form_sigma=0.4, penetration=1.2, w_att=0.45, bulge=0.1, cuts=[0.36, 0.7], soft_cut=0.18,
+                base_blur=8.0, n_soft=6, p1_blur=9.0, n_block=10, block_w=(14, 30), block_lift=0.012, p2_blur=1.5,
+                n_inner=0, inner_w=(6, 9), inner_lift=0.01, n_rim=0, rim_w=(5, 8), rim_min_r=999, p3_blur=0.8,
+                edge_lit=2.6, edge_shade=28.0, edge_base=30.0, base_drag=0.18, dry_cell=5.0, dry_aniso=9.0, dry_amp=0.6,
+                n_speck=0, n_spatter=0, wind=-4.0),
+    'far': dict(k=0.40, plane_blur=2.4, k_smooth=14.0, base_soft=8.0, base_wobble=2.5, top_light=0.35,
+                form_sigma=0.45, penetration=1.4, w_att=0.4, bulge=0.06, cuts=[0.3, 0.66], soft_cut=0.2,
+                base_blur=6.0, n_soft=4, p1_blur=8.0, n_block=7, block_w=(12, 24), block_lift=0.008, p2_blur=2.0,
+                n_inner=0, inner_w=(5, 8), inner_lift=0.008, n_rim=0, rim_w=(4, 6), rim_min_r=999, p3_blur=1.0,
+                edge_lit=4.0, edge_shade=30.0, edge_base=24.0, base_drag=0.18, dry_cell=6.0, dry_aniso=10.0, dry_amp=0.4,
+                n_speck=0, n_spatter=0, wind=-2.0),
 }
 
 
 # -------------------------------------------------------------------------------------- the elements
-# The designed masses (plate px; lobes = (cx, cy, r, flat)). Sizes in a geometric ladder (1 : 0.55 : 0.3), the
-# biggest at the back of the tower, small ones only along the lit edge; never a necklace of equal circles.
+# The designed masses (plate px; lobes = (cx, cy, r, flat)). Sizes in a geometric ladder (1 : 0.6 : 0.35 : 0.2),
+# the biggest at the back of the tower, small ones only along the lit edge; never a necklace of equal circles.
 NEAR_LOBES = [
-    (1010, 70, 175, 1.0), (880, 150, 120, 1.0), (1000, 230, 105, 1.0),   # the body (back)
-    (905, 40, 92, 1.0), (790, 170, 78, 1.0), (1075, 190, 120, 1.0),
-    (820, 92, 60, 1.0), (735, 226, 54, 1.0), (880, 250, 66, 1.0),        # mid billows toward the light
-    (690, 255, 34, 1.0), (765, 128, 40, 1.0), (860, 0, 52, 1.0), (650, 276, 22, 1.0),   # small, the lit edge
+    (1010, 196, 142, 1.0), (1058, 104, 92, 1.0),                         # the body and the top right
+    (905, 150, 100, 1.0), (962, 86, 70, 1.0), (880, 240, 70, 1.0),       # the tower
+    (884, 62, 44, 1.0), (816, 128, 44, 1.0), (1010, 34, 46, 1.0),        # billows toward the light, the tower top
+    (770, 218, 60, 1.0), (842, 92, 26, 1.0),
+    (702, 260, 33, 1.0), (662, 282, 17, 1.0),                            # the shoulder: one medium, one small, one tiny
 ]
 NEAR_BOX = (560, 0, 1080, 345)
-NEAR_BASE = 300.0
+NEAR_BASE = 298.0
 
-MID_LOBES = [   # a flatter bank, upper left (plane 2)
-    (120, 214, 120, 0.42), (270, 200, 96, 0.5), (390, 216, 70, 0.45), (30, 226, 90, 0.4), (200, 182, 60, 0.55),
-    (470, 226, 40, 0.4),
+MID_LOBES = [   # a long bank, upper left (plane 2): humps on a level base, a thin wisp above
+    (30, 222, 92, 0.42), (130, 210, 104, 0.46), (238, 214, 84, 0.44), (330, 224, 66, 0.42),
+    (420, 232, 46, 0.38), (490, 238, 28, 0.36), (300, 170, 70, 0.22), (380, 166, 52, 0.2),
 ]
 MID_BOX = (0, 120, 560, 290)
 MID_BASE = 246.0
 
-FAR_LOBES = [   # a thin low deck in the west gap (plane 3)
-    (60, 662, 80, 0.3), (190, 668, 64, 0.32), (300, 660, 78, 0.28), (420, 672, 52, 0.3), (520, 668, 44, 0.3),
-    (640, 676, 60, 0.26), (110, 640, 46, 0.4),
+FAR_LOBES = [   # a thin low deck in the west gap (plane 3): smaller, flatter, closer to the sky
+    (40, 664, 86, 0.28), (170, 668, 70, 0.3), (285, 662, 76, 0.26), (400, 672, 56, 0.28),
+    (500, 670, 46, 0.28), (610, 676, 60, 0.24), (700, 680, 40, 0.24),
 ]
-FAR_BOX = (0, 600, 760, 710)
+FAR_BOX = (0, 610, 780, 706)
 FAR_BASE = 684.0
 
 
@@ -673,7 +759,7 @@ def paint_streaks(layer, pal, rng, sun=SUN, n_rows=4):
             xc = x + L / 2
             near = float(np.exp(-abs(xc - sun[0]) / 340.0))
             base = layer.c[int(np.clip(yy, 0, layer.h - 1)), int(np.clip(xc, 0, layer.w - 1))]
-            body = mix(base, pal['streak'], 0.55 - 0.1 * ri)
+            body = mix(base, pal['streak'], 0.75 - 0.12 * ri)
             left_tail = xc > sun[0]          # the long taper points away from the sun
             ti, to = (0.45, 0.15) if left_tail else (0.15, 0.45)
             ang = math.radians(rng.normal(0, 0.35))
@@ -681,8 +767,8 @@ def paint_streaks(layer, pal, rng, sun=SUN, n_rows=4):
             p1 = (x + L * math.cos(ang), yy + L * math.sin(ang))
             paint_line(layer, p0, p1, wd, body, rng.uniform(0.55, 0.8), e_pos=0.8, e_neg=1.6, t_in=ti, t_out=to,
                        taper_w=0.5)
-            lit = mix(body, pal['glow'], 0.35 + 0.65 * near)
-            lit = lift(lit, 0.03 * near)
+            lit = mix(body, pal['glow'], 0.45 + 0.55 * near)
+            lit = lift(lit, 0.012 + 0.04 * near)
             # +s is to the right of travel = below the line for a left-to-right stroke: the lit underside
             paint_line(layer, (p0[0], p0[1] + wd * 0.32), (p1[0], p1[1] + wd * 0.32), wd * 0.42, lit,
                        (0.45 + 0.5 * near), e_pos=0.6, e_neg=1.2, t_in=ti, t_out=to, taper_w=0.6)
@@ -706,7 +792,7 @@ def paint_sun(layer, pal, sun=SUN, r=21.0, ridge_y=None):
 BIRD_POSES = [(-0.55, 0.35), (-0.25, 0.25), (0.0, 0.15), (0.35, -0.1), (0.6, -0.25)]   # wing tip lift, elbow lift
 
 
-def paint_flock(layer, pal, rng, path, n=46, span=(5.0, 13.0), band=34.0, far_k=0.45, ss=4):
+def paint_flock(layer, pal, rng, path, n=34, span=(6.0, 15.0), band=30.0, far_k=0.5, ss=4):
     """A far flock: n tiny two-stroke birds along a gentle arc, in loose clumps with gaps, a few stragglers;
     nearer birds (toward path[2]) bigger and darker; every pose different (wing up, level, down). Drawn as
     polylines at 4x and box-filtered down: crisp, never jaggy."""
@@ -719,14 +805,14 @@ def paint_flock(layer, pal, rng, path, n=46, span=(5.0, 13.0), band=34.0, far_k=
     bw, bh = x1 - x0, y1 - y0
     big = Image.new('L', (bw * ss, bh * ss), 0)
     dr = ImageDraw.Draw(big)
-    n_cl = max(3, n // 6)
-    centres = np.sort(rng.beta(1.3, 1.3, n_cl))
+    n_cl = max(4, n // 4)
+    centres = np.sort(rng.uniform(0.0, 1.0, n_cl))
     birds = []
     for i in range(n):
-        if rng.random() < 0.12:
-            t = rng.uniform(0, 1); off = rng.normal(0, band * 1.6)
+        if rng.random() < 0.2:
+            t = rng.uniform(0, 1); off = rng.normal(0, band * 1.4)
         else:
-            t = float(np.clip(centres[rng.integers(n_cl)] + rng.normal(0, 0.035), 0, 1)); off = rng.normal(0, band * 0.5)
+            t = float(np.clip(centres[rng.integers(n_cl)] + rng.normal(0, 0.05), 0, 1)); off = rng.normal(0, band * 0.55)
         px_ = (1 - t) ** 2 * ax + 2 * (1 - t) * t * bx + t * t * cx_
         py_ = (1 - t) ** 2 * ay + 2 * (1 - t) * t * by + t * t * cy_ + off
         birds.append((t, px_ + rng.normal(0, 6), py_))

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """The AI-paint test's sheets (docs/studies/2026-10-28_city_posters/ai_paint/): small labelled jpgs, no new data.
-    python3 scripts/look/aipaint/sheets.py trials  out/aipaint/sky            # trial_sky_s*.jpg + trials_sky.jpg
+    python3 scripts/look/aipaint/sheets.py trials  out/aipaint                # trial_sky_s*.jpg + trials_sky.jpg
     python3 scripts/look/aipaint/sheets.py compare <v2flat.png>               # compare.jpg (v2 flat, v4, AI, refs)
     python3 scripts/look/aipaint/sheets.py strip   <f0.png> <f1.png> <f2.png> <f3.png>   # reveal_strip.jpg
 """
@@ -47,20 +47,22 @@ def trials(d):
     init = Image.open(os.path.join(ROOT, 'out/aipaint/init/sky_init.png')).convert('RGB')
     rows = round(1100 * 1344 / 1890)   # the sky's rows in the plate (frame y 0..1100)
     panels, labels = [fit_w(init.crop((0, 0, 768, rows)), 384)], ['our design (init)']
-    for f in sorted(glob.glob(os.path.join(d, '*_s[0-9].[0-9][0-9]_seed*.png'))):
+    runs = [f for f in glob.glob(os.path.join(d, 'sky*', 'sky_s[0-9].[0-9][0-9]_seed*.png')) if 'preview' not in f]
+    runs.sort(key=lambda f: ('_cn' in f, f.split('_s')[1]))
+    for f in runs:
         m = json.load(open(f[:-4] + '.json'))
         im = fit_w(Image.open(f).convert('RGB').crop((0, 0, 768, rows)), 384)
-        lab = f"strength {m['strength']:.2f}  seed {m['seed']}"
-        sub = f"{m['steps_run']} steps, {m['minutes_total']:.1f} min"
+        cn = f" + canny {m['controlnet_conditioning_scale']}" if m.get('controlnet') else ''
+        lab = f"strength {m['strength']:.2f}{cn}  seed {m['seed']}"
+        sub = f"{m['steps_run']} steps, {m['minutes_total']:.1f} min" + ('' if 'nosun' in m['init'] else ', trial init')
         one = sheet([im], [lab])
-        ImageDraw.Draw(one).text((18, one.height - 4 - 16), '', fill=INK)
         one2 = Image.new('RGB', (one.width, one.height + 26), PAPER)
         one2.paste(one, (0, 0))
         ImageDraw.Draw(one2).text((18, one.height - 6), sub, fill=INK, font=font(16))
         name = os.path.basename(f)[:-4]
         one2.save(os.path.join(OUT, f'trial_{name}.jpg'), quality=86)
         panels.append(im)
-        labels.append(f"{m['strength']:.2f} ({m['steps_run']} steps, {m['minutes_total']:.1f} min)")
+        labels.append(f"{m['strength']:.2f}{' + canny' if cn else ''} ({m['minutes_total']:.1f} min)")
     sheet(panels, labels).save(os.path.join(OUT, 'trials_sky.jpg'), quality=86)
     print('trials ->', OUT)
 
