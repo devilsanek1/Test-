@@ -1,0 +1,60 @@
+You are the clusterer-editor of the journal-corpus study, a research thread for a short-form explainer channel whose
+films are drawn worlds in the style of illustrated city posters (v1, the best performer, drew the internet as a town of
+buildings whose lights go out). The owner's ask (verbatim): "take a look at the stories posted by big journals recently.
+like forbest, times, economist, etc for each story evalute if having our visual storytelling would actually be a good
+fit and then cluster the stories and see if anything comes out of it". You turn the scored stories into the answer.
+
+Folder J = /home/user/Test-/video/docs/studies/2026-10-28_city_posters/journals ; tool T = python3
+/home/user/Test-/video/scripts/look/posters/journals.py (run from /home/user/Test-).
+
+READ FIRST
+- J/README.md in full (the method, the rubric, section 6: the blind check's result and every change).
+- J/scores.csv (the first scorer: every stage-2 story), J/corpus.csv (filter to J/stage2_ids.txt: headline, outlet,
+  date, summary, tags), J/triage.csv (the roles: search / top / control), J/audit.csv.
+- What we already believed, to confirm, refine or overturn: ../content_fit.md section 2 (nine archetypes, ranked) and
+  section 4; ../content_discussion.md, the State line and exchange 4 (the "middle" kinds: true stories set in a big
+  world); /home/user/Test-/video/docs/OWNER_PLAYBOOK.md, Taste signals, "Places on screen" (the owner's latest
+  direction: neither real-city content nor made-up content; every pick needs a WOW; one possible umbrella is tech in
+  the cities; data centres in weird places are "interesting ones").
+
+DO, IN ORDER (write as you go: a usage limit can stop you at any moment; what is on disk counts)
+1. Clusters: consolidate the scorer's open news_shape codes into 8-15 clusters of story KIND (what happens), each with
+   a short name (at most 26 characters, plain words, it is a chart label read on a phone) and a one-line definition;
+   every stage-2 row in exactly one. Let them come from the codes; don't force the old archetypes onto the data. Write
+   J/clusters.csv (header id,cluster; Python csv module).
+2. Run: T stats ; T base ; T slices ; T top 15 ; T chart . Look at J/cluster_chart.png (Read it): the labels must be
+   readable at phone size; if a label collides or a name is too long, shorten the name in clusters.csv and re-run.
+3. Write J/clusters.md (about 150-250 lines), in this order:
+   1. Top findings (one screen, 5-7 bullets, numbers in them).
+   2. The corpus and how far to trust it: outlets and counts, the two sources (feeds, search), the two stages, the
+      blind check's verdict (from README section 6), the audit, and the biases (feeds over-weight the last week; the
+      Economist's cryptic headlines; Smithsonian under-sampled; 13 outlets blocked or dropped).
+   3. Base rates: how many big-journal stories fit our look at all (T base: the triage over all 1,113 feed rows, the
+      control's check of what the triage missed, search stratum A), by outlet and section.
+   4. The clusters: the T stats table with your definitions, and per cluster its 2-3 best examples (id, outlet, date,
+      headline, its view: home place / hero / far-out thing).
+   5. What comes out: the clusters that are BOTH high-fit and high-value, as content directions, each with why it
+      fits the look and the owner's taste signals; then, explicitly, which of content_fit.md's archetypes and which of
+      the content thread's "middle" kinds the real stories confirm, refine or overturn, and the two slices the owner
+      named (tech in the cities; data centres: what exists in the window, how they score, the WOW).
+   6. The 10 best stories as candidate ideas (from T top: gate pass, fit >= 6, WOW >= 1, not a past topic; you may
+      skip a row the scorer got wrong, saying why, and take the next): for each, the story in one plain sentence, home
+      place, hero, the far-out thing, the telling shape, WOW, mood, and the "ad or news?" check (heard cold over its
+      first frame, does it sound like a commercial? if so, the news framing that fixes it). Verify each with 1-2 web
+      searches (WebSearch, mode standard, no domain filter: the feed outlets block the tool, other outlets cover the
+      same events): is it real and as described, anything newer? Mark each "verified" with the source you saw, or
+      "unverified".
+   7. Blind spots: what this approach cannot see (stories the outlets don't cover, evergreen history with no peg,
+      headline-only scoring, one scorer, the window, what search favours), and what would test it.
+4. Write J/SUMMARY.md: ONE phone screen for the owner (about 12-18 short lines, plain everyday words, no jargon, no
+   tables wider than 3 columns): the answer in one line, the 3-4 kinds of story that fit (with one real example each),
+   the 5 best candidates in one line each, what it means for the channel, and one question for the owner.
+
+RULES
+- Write only J/clusters.csv, J/clusters.md, J/cluster_chart.png (through T chart) and J/SUMMARY.md. Never edit the
+  corpus, scores, triage or README files; never edit other docs. No git commands. Don't start agents (if you ever
+  did, they would run at max effort).
+- The repo is public: never paste article text; headlines and our own one-line summaries only.
+- Nothing here is a rule: it is a study; the owner decides.
+- Final reply (data for the orchestrator), at most 3 lines: the cluster count, the top 3 directions, the top 3
+  candidates.

@@ -8,6 +8,7 @@
   python3 video/scripts/look/posters/journals.py agreement  # scores.csv vs scores_blind.csv on the sample (markdown)
   python3 video/scripts/look/posters/journals.py stats      # per cluster and the base rates (needs clusters.csv; markdown)
   python3 video/scripts/look/posters/journals.py slices     # the owner's two slices: tech in the cities, data centres
+  python3 video/scripts/look/posters/journals.py base       # base rates: the feeds' triage, corrected by the control
   python3 video/scripts/look/posters/journals.py top [N]    # the candidates: gate pass, fit >= 6, WOW >= 1, not a past topic
   python3 video/scripts/look/posters/journals.py chart      # cluster_chart.png: clusters by story value (x) and visual fit (y)
 
@@ -479,6 +480,41 @@ def cmd_slices(args):
     print_slice('Data centres (headline or summary)', dc, corpus, scores)
 
 
+def cmd_base(args):
+    """Base rates: the triage over every feed row, corrected by the control; the search rows' stratum A."""
+    corpus, scores, _ = load_all(args)
+    tri = {r['id']: r for r in read_csv(path(args, 'triage.csv'))}
+    feeds = [i for i in corpus if corpus[i]['source'] == 'rss' and i in tri]
+    tf = [num(tri[i]['t_fit']) or 0 for i in feeds]
+    print(f'**Feeds: {len(feeds)} rows triaged.** t_fit >= 6: {sum(f >= 6 for f in tf)} ({sum(f >= 6 for f in tf) / len(tf):.1%}); '
+          f't_fit >= 8: {sum(f >= 8 for f in tf)}; WOW 2: {sum(num(tri[i]["t_wow"]) == 2 for i in feeds)}.')
+    by = defaultdict(list)
+    for i in feeds:
+        by[corpus[i]['outlet']].append(num(tri[i]['t_fit']) or 0)
+    print('\n| Outlet (feeds) | Rows | t_fit >= 6 | Share |\n|---|---|---|---|')
+    for o, v in sorted(by.items(), key=lambda kv: -sum(f >= 6 for f in kv[1]) / len(kv[1])):
+        print(f'| {o} | {len(v)} | {sum(f >= 6 for f in v)} | {sum(f >= 6 for f in v) / len(v):.0%} |')
+    for role in ('top', 'control'):
+        ids = [i for i in feeds if tri[i].get('stage2') == role and i in scores and sums(scores[i])]
+        if not ids:
+            continue
+        full = [sums(scores[i])[0] for i in ids]
+        t = [num(tri[i]['t_fit']) or 0 for i in ids]
+        print(f'\n**{role} ({len(ids)} scored):** mean triage {sum(t) / len(t):.1f} vs full fit {sum(full) / len(full):.1f}; '
+              f'full fit >= 6: {sum(f >= 6 for f in full)} ({sum(f >= 6 for f in full) / len(full):.0%}).')
+        if role == 'control':
+            rest = sum(1 for i in feeds if tri[i].get('stage2') in ('', 'control'))
+            miss = sum(f >= 6 for f in full) / len(full)
+            print(f'Control: the triage left {rest} feed rows out of its picks; at the control rate about '
+                  f'{miss * rest:.0f} of them would score fit >= 6 in full (the triage misses). Missed ids: ' +
+                  ', '.join(i for i, f in zip(ids, full) if f >= 6))
+    a = [i for i in scores if corpus.get(i, {}).get('stratum') == 'A' and sums(scores[i])]
+    if a:
+        fa = [sums(scores[i])[0] for i in a]
+        print(f'\n**Search stratum A ({len(a)} rows, section-neutral):** mean fit {sum(fa) / len(fa):.1f}; fit >= 6: '
+              f'{sum(f >= 6 for f in fa)} ({sum(f >= 6 for f in fa) / len(fa):.0%}).')
+
+
 def cmd_top(args):
     corpus, scores, _ = load_all(args)
     cand = [i for i, r in scores.items() if sums(r) and r['gate'] == 'pass' and r['past_topic'] == 'N'
@@ -633,13 +669,14 @@ def main():
     a.add_argument('--blind', default='scores_blind.csv')
     sub.add_parser('stats')
     sub.add_parser('slices')
+    sub.add_parser('base')
     t = sub.add_parser('top')
     t.add_argument('n', nargs='?', type=int, default=10)
     ch = sub.add_parser('chart')
     ch.add_argument('--title', default='')
     args = ap.parse_args()
     fn = {'merge': cmd_merge, 'select': cmd_select, 'sample': cmd_sample, 'check': cmd_check, 'agreement': cmd_agreement,
-          'stats': cmd_stats, 'slices': cmd_slices, 'top': cmd_top, 'chart': cmd_chart}[args.cmd]
+          'stats': cmd_stats, 'slices': cmd_slices, 'base': cmd_base, 'top': cmd_top, 'chart': cmd_chart}[args.cmd]
     sys.exit(fn(args) or 0)
 
 
