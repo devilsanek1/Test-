@@ -21,6 +21,7 @@ import {tierFill} from '../../lib/pen';
 import {fromLch, lch, mixHex} from '../../lib/light';
 import {floodAt, S1_PALE} from './V2S1_clock';
 import {S1Plane, S1_PLANE} from './V2S1_float';
+import {mottleK} from '../../lib/texture';
 import {useSwitches} from './switches';
 import {S1FarStage} from './V2S1_far_stage';
 import {S1_EVENING} from '../../v2r/world/skies';
@@ -602,7 +603,8 @@ export const S1WestGap: React.FC = () => {
           <S1Plane plane={S1_PLANE.farRoofs}>
             <SunDisc />
           </S1Plane>
-          <S1Plane plane={S1_PLANE.sky}>
+          {/* (the look test's texture: the stage is far tier C, k 0.4, on the sky's own seed) */}
+          <S1Plane plane={S1_PLANE.sky} k={mottleK({plane: 4})}>
             <S1FarStage />
           </S1Plane>
           <S1Plane plane={S1_PLANE.farRoofs}>
@@ -618,7 +620,9 @@ export const S1WestGap: React.FC = () => {
       <S1Plane plane={S1_PLANE.farTower}>
         <CalmTower />
       </S1Plane>
-      <S1Plane plane={S1_PLANE.bridge}>
+      {/* (the look test's texture: none on the bridge: its kit people, birds and bus are scaled groups, which a filter
+          would soften (Chrome resamples them), and at k 0.4 the mottle would not show on it) */}
+      <S1Plane plane={S1_PLANE.bridge} texture={false}>
         <CellPaint b={body.b} seed="s1bridge/body" cell={90} misreg={0.7} />
         <Bus />
         <BridgePeople />

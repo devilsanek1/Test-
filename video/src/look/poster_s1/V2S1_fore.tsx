@@ -123,8 +123,11 @@ const CROWN_UNDER: string = [
   ell(206, 1428 + 40, 80, 28),
 ].join('');
 
-const Planter: React.FC = () => {
-  const {x0, x1, xc, rim, base} = FORE.planter;
+/** The bay tree in the planter (its trunk, its crown with Pip inside under the "find Pip" switch, the shade under it).
+ *  (the look test) Its own component, drawn first in the near group: under the texture switch it stays outside the near
+ *  plane's mottle (the wind turns lane N's crown, a rotated group, which a filter would soften). */
+const PlanterTree: React.FC = () => {
+  const {rim} = FORE.planter;
   const sw = useSwitches();
   const {darks, pipHidden} = sw;
   const clip = 'fcrown' + React.useId().replace(/[^a-zA-Z0-9]/g, '');
@@ -159,11 +162,16 @@ const Planter: React.FC = () => {
       ) : null}
     </>
   );
+  // (the look test's foliage switch: lane N's London plane in the one wind, Pip inside it; off, v2's crown, with the
+  // darks and Pip's hiding spot)
+  return <TreeSlot sw={sw} pip={<S1PipInTree seat={S1_PIP_IN_CROWN.seat} />} fallback={tree} />;
+};
+
+const Planter: React.FC = () => {
+  const {x0, x1, xc, rim, base} = FORE.planter;
+  const {darks} = useSwitches();
   return (
     <>
-      {/* (the look test's foliage switch: lane N's one species tree in this box, in the one wind; a placeholder draws
-          v2's crown, with the darks and Pip's hiding spot) */}
-      <TreeSlot sw={sw} pip={<S1PipInTree seat={S1_PIP_IN_CROWN.seat} />} fallback={tree} />
       {/* the planter box: vertical boards in two terracotta woods, a stone coping on top with the soil showing inside
           it (we look down into the box), ivy trailing over its front; every long edge to the vanishing point */}
       {[x0, 58, 164, x1].slice(0, -1).map((xa, i, arr) => (
@@ -414,10 +422,19 @@ export const S1ForeNear: React.FC = () => (
   </ToneCtx.Provider>
 );
 
-/** (the look test's texture) The near things' contact and cast shadows lie on the treads (the bank's group): the near
- *  group's `under`, drawn first in its translate but outside its mottle (a mottled group is isolated), the same place
- *  in the drawing order as v2's (first in the near group). */
-export const S1ForeNearUnder: React.FC = () => <Feet feet={NEAR_FEET} />;
+/** (the look test's texture) The near group's `under` (drawn first in its translate, outside its mottle; the same place
+ *  in the drawing order as v2's): the near things' contact and cast shadows, which lie on the treads (the bank's group;
+ *  a mottled group is isolated), then the bay tree (PlanterTree: the first thing the planter draws). */
+export const S1ForeNearUnder: React.FC = () => (
+  <>
+    <Feet feet={NEAR_FEET} />
+    <ToneCtx.Provider value={useNearTone(nearEntries(), -2)}>
+      <Tier tier="environment">
+        <PlanterTree />
+      </Tier>
+    </ToneCtx.Provider>
+  </>
+);
 /** (the look test's texture) The props' contact strips (one lies on the bench, the bank's group): the near group's
  *  `over`, drawn last in its translate, outside its mottle (nothing the near group draws after them in v2 overlaps
  *  them: the fern pot and its form are at the bottom edge). */

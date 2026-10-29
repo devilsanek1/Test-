@@ -47,6 +47,8 @@ export type PosterSwitches = {
   nearMid?: boolean;
   /** Part of `patchwork`: the paving's setting (V2S1_patch PAVING: 'calm', the decided one, or 'busy', the first pass). */
   paving?: 'calm' | 'busy';
+  /** Part of `texture`: a multiplier on every plane's mottle strength (default 1 = lib/texture's mottleK; for A/Bs). */
+  textureK?: number;
 };
 
 /** v2's S1 as shipped: every switch off. */
@@ -95,7 +97,7 @@ export const PRESETS: Record<PosterPreset, PosterSwitches> = {
 export function resolveSwitches(p: Partial<PosterSwitches> & {preset?: PosterPreset}): PosterSwitches {
   const base = PRESETS[p.preset ?? 'v2'] ?? V2_SWITCHES;
   const out: PosterSwitches = {...base};
-  for (const k of [...Object.keys(V2_SWITCHES), 'nearMid', 'paving'] as (keyof PosterSwitches)[]) {
+  for (const k of [...Object.keys(V2_SWITCHES), 'nearMid', 'paving', 'textureK'] as (keyof PosterSwitches)[]) {
     const v = p[k];
     if (v !== undefined && v !== null) (out as Record<string, unknown>)[k] = v;
   }

@@ -38,29 +38,51 @@ export const S1_PLANE = {
 /** The near-ground float at time t (S1 seconds). */
 export const s1Float = (t: number): [number, number] => floatAt(t, S1_FLOAT_LEGS) as [number, number];
 
+/** One layer of a plane's group (S1PlaneStack): its nodes and whether the plane's mottle covers it. */
+export type PlaneLayer = {node: React.ReactNode; mottle?: boolean};
+
 /** One plane's group: translated by its share of the float (sub-pixel, never rounded); translate(0 0) at rest (the
- *  same tree every frame: nothing remounts when the float starts or stops).
- *  (the look test) The plane's fills carry its mottle (engine TextureSlot) inside the translate, so it rides the float.
- *  `under` / `over`: drawn in the same translate before / after the plane's fills but OUTSIDE the mottle, for a multiply
- *  layer that falls on ANOTHER plane's group (a mottled group is isolated: inside it such a layer would paint its tint
- *  solid). With the texture off the tree is v2's order exactly (under, children, over). `texture={false}`: never
- *  mottled (a falling leaf); `region`: the mottle's filter region in the group's space (default the frame + 160 px). */
-export const S1Plane: React.FC<{plane: number; under?: React.ReactNode; over?: React.ReactNode; texture?: boolean; region?: [number, number, number, number]; children?: React.ReactNode}> = ({plane, under, over, texture = true, region, children}) => {
+ *  same tree every frame: nothing remounts when the float starts or stops), its layers back to front.
+ *  (the look test) A mottled layer carries the plane's mottle (engine TextureSlot) inside the translate, so it rides the
+ *  float; all the mottled layers of one plane share its seed, so they read as one surface. A layer with `mottle: false`
+ *  is drawn in the same translate but OUTSIDE the mottle: a multiply layer that falls on ANOTHER plane's group (a
+ *  mottled group is isolated: inside it such a layer paints its tint solid), or a piece the filter would soften (a
+ *  rotated or scaled group inside a filtered one is resampled by Chrome: the wind's crown and spray, the kit's boats).
+ *  With the texture off the tree is v2's exactly (the layers in order, no wrapper). `texture={false}`: nothing
+ *  mottled; `region`: the mottle's filter region in the group's space (default the frame + 160 px); `k`: the plane's
+ *  strength, if not lib/texture's mottleK for the plane. */
+export const S1PlaneStack: React.FC<{plane: number; layers: PlaneLayer[]; texture?: boolean; region?: [number, number, number, number]; k?: number}> = ({plane, layers, texture = true, region, k}) => {
   const t = useTime();
   const sw = useSwitches();
   // (the look test: the float by 1/z when the switch is on, lane E's PARALLAX_Z; v2's PARALLAX_K otherwise)
   const [dx, dy] = parallaxOffset(s1Float(t), plane, currentFloatTable());
   return (
     <g transform={`translate(${dx.toFixed(3)} ${dy.toFixed(3)})`}>
-      {under}
-      {texture ? (
-        <TextureSlot sw={sw} t={t} plane={plane} sky={!Number.isFinite(plane)} offset={[dx, dy]} region={region}>
-          {children}
-        </TextureSlot>
-      ) : (
-        children
+      {layers.map((L, i) =>
+        texture && L.mottle !== false ? (
+          <TextureSlot key={i} sw={sw} t={t} plane={plane} sky={!Number.isFinite(plane)} offset={[dx, dy]} region={region} k={k}>
+            {L.node}
+          </TextureSlot>
+        ) : (
+          <React.Fragment key={i}>{L.node}</React.Fragment>
+        ),
       )}
-      {over}
     </g>
   );
 };
+
+/** One plane's group (S1PlaneStack with one mottled layer): `under` / `over` drawn in the same translate before / after
+ *  it, outside the mottle. */
+export const S1Plane: React.FC<{plane: number; under?: React.ReactNode; over?: React.ReactNode; texture?: boolean; region?: [number, number, number, number]; k?: number; children?: React.ReactNode}> = ({plane, under, over, texture, region, k, children}) => (
+  <S1PlaneStack
+    plane={plane}
+    texture={texture}
+    region={region}
+    k={k}
+    layers={[
+      {node: under, mottle: false},
+      {node: children},
+      {node: over, mottle: false},
+    ]}
+  />
+);

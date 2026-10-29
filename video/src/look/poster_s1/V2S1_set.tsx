@@ -27,7 +27,7 @@ import {S1Wing, S1DoorLeaves, S1WingLife} from './V2S1_set_wing';
 import {S1FarTowpath, S1PathFurniture, S1Boats, S1FarLife, S1PlaneBranch} from './V2S1_set_life';
 import {S1Water, S1Duck} from './V2S1_water';
 import {S1BoatStrips, S1TowpathShadows, S1WingShades} from './V2S1_light';
-import {S1Plane, S1_PLANE} from './V2S1_float';
+import {S1Plane, S1PlaneStack, S1_PLANE} from './V2S1_float';
 import {useSwitches} from './switches';
 import {CloudSlot, SpraySlot, TextureSlot} from './engine';
 import {useTime} from '../../lib/time';
@@ -79,14 +79,16 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
           bar's 9 px/s is over N7's 2-6); the sky's mottle, its own seed, no float) */}
       <S1SkyThings />
       {/* the plane branch in the top-left gutter: a NEAR twig (the full float) */}
-      <S1Plane plane={S1_PLANE.near}>
+      {/* (the look test's texture: none on the spray: the wind turns its branch, a rotated group, which a filter would
+          soften; on a spray of small leaves the mottle would not show) */}
+      <S1Plane plane={S1_PLANE.near} texture={false}>
         {/* (the look test's foliage switch: lane N's London-plane leaf spray; off, v2's twig) */}
         <SpraySlot sw={sw} fallback={<S1PlaneBranch />} />
       </S1Plane>
       {/* the west gap: far roofs + SUN0 (+4), the calm tower (+3), the road bridge, its bus and birds (+2); the one far
           jogger seen through the bridge's arch rides the bridge's plane (its clip is the arch) */}
       <S1WestGap />
-      <S1Plane plane={S1_PLANE.bridge}>
+      <S1Plane plane={S1_PLANE.bridge} texture={false}>
         <S1FarLife />
       </S1Plane>
       {/* the water */}
@@ -96,24 +98,53 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
     </Env>
     {/* the subject's plane: the far towpath, the wing (her behind the glass inside it; W and the door tier themselves),
         the sliding leaves, the pigeons, the towpath's shadows, lamps and bollards, her and the row */}
-    <S1Plane plane={S1_PLANE.subject}>
-      <Env>
-        <S1FarTowpath />
-        <S1Wing behindDoor={behindDoor} />
-        <S1DoorLeaves />
-        <S1WingShades />
-        <S1WingLife />
-      </Env>
-      <S1TowpathShadows />
-      <Env>
-        <S1PathFurniture />
-      </Env>
-      {towpath}
-    </S1Plane>
-    {/* the moored boats (the right rail) with their waterline strips; the ducks sit still */}
-    {/* (the look test's texture: the strips multiply onto the WATER, another group: drawn outside the boats' mottle) */}
+    {/* (the look test's texture: the light layers (the wing's shades, the towpath's shadows) spill past the towpath's
+        edge onto the water's group: they go outside the plane's mottle, between its mottled layers) */}
+    <S1PlaneStack
+      plane={S1_PLANE.subject}
+      layers={[
+        {
+          node: (
+            <Env>
+              <S1FarTowpath />
+              <S1Wing behindDoor={behindDoor} />
+              <S1DoorLeaves />
+            </Env>
+          ),
+        },
+        {
+          node: (
+            <Env>
+              <S1WingShades />
+            </Env>
+          ),
+          mottle: false,
+        },
+        {
+          node: (
+            <Env>
+              <S1WingLife />
+            </Env>
+          ),
+        },
+        {node: <S1TowpathShadows />, mottle: false},
+        {
+          node: (
+            <>
+              <Env>
+                <S1PathFurniture />
+              </Env>
+              {towpath}
+            </>
+          ),
+        },
+      ]}
+    />
+    {/* (the look test's texture: none on the boats: the kit draws them as scaled groups, which a filter would soften, and
+        their strips multiply onto the WATER, another group: drawn outside it anyway) */}
     <S1Plane
       plane={S1_PLANE.boats}
+      texture={false}
       under={
         <Env>
           <S1BoatStrips which="A" />
@@ -132,9 +163,9 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
     {/* our bank and its near things split their own planes (V2S1_steps) */}
     {seated}
     {/* (S1BankShade retired: the near foreground's big things carry their own form and front shades now) */}
-    {/* (the look test's texture: the bollard's contact and cast shadows fall on the landing, the seated slot's group:
-        drawn outside this group's mottle) */}
-    <S1Plane plane={S1_PLANE.bank} under={pip ? <S1PipShadows /> : null}>
+    {/* (the look test's texture: none on Pip and its bollard (the kit draws Pip as scaled groups, which a filter would
+        soften); the bollard's contact and cast shadows fall on the landing, the seated slot's group: `under`) */}
+    <S1Plane plane={S1_PLANE.bank} under={pip ? <S1PipShadows /> : null} texture={false}>
       {pip}
     </S1Plane>
   </CanalCast>

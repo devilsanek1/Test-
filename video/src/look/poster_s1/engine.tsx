@@ -104,11 +104,11 @@ export const currentFloatTable = () => FLOAT_TABLE;
  *  0.4), none in the caption band (cut out in SCREEN rows through the group's float `offset`). Off (or before its
  *  switch's second): the children as they are (v2's tree, no wrapper). A mottled group is ISOLATED: a multiply layer
  *  that falls on ANOTHER group goes in S1Plane's `under` / `over` (outside the filter), never inside. */
-export const TextureSlot: React.FC<{sw: PosterSwitches; t: number; plane: number; sky?: boolean; offset?: [number, number]; region?: [number, number, number, number]; children?: React.ReactNode}> = ({sw, t, plane, sky, offset = [0, 0], region, children}) => {
+export const TextureSlot: React.FC<{sw: PosterSwitches; t: number; plane: number; sky?: boolean; offset?: [number, number]; region?: [number, number, number, number]; k?: number; children?: React.ReactNode}> = ({sw, t, plane, sky, offset = [0, 0], region, k, children}) => {
   if (!textureAt(sw, t)) return <>{children}</>;
   const isSky = sky ?? !Number.isFinite(plane);
   return (
-    <Mottle k={mottleK({plane, sky: isSky})} seed={mottleSeed(plane)} offset={offset} region={region}>
+    <Mottle k={(k ?? mottleK({plane, sky: isSky})) * (sw.textureK ?? 1)} seed={mottleSeed(plane)} offset={offset} region={region}>
       {children}
     </Mottle>
   );
