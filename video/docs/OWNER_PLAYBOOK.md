@@ -582,6 +582,9 @@ Maintenance at the end).
 ## Platforms and posting
 - **Accounts: Instagram `what.the.fuss.is.about`** (Creator, Education); TikTok and YouTube Shorts under the same name,
   handle and avatar. Posting texts per video: `docs/POSTING_KIT.md`. — (2026-10-25).
+- **The studio logo is a symbol, with no text** (no wordmark, no lettered monogram): it must read alone as the avatar
+  circle at 40-110 px, in the videos' corner and on banners. The logo's rounds, sources and the owner's verdicts:
+  `docs/brand/LOGO.md`. — ("The logo should not contain any text btw", on logo round 1, 2026-10-29).
 - **Upload at the highest quality and natively on each platform** (checklist in `docs/POSTING_KIT.md`). — (2026-10-25).
 - **AI label ON everywhere; no paid boost until 3-5 posts exist,** then boost the best organic performer. — (2026-10-25).
 
