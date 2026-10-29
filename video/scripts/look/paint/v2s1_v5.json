@@ -1,6 +1,6 @@
 {
  "film": "v2s1_v5",
- "about": "v2's S1, paint v5: v4's design-first method, the dusk family and the layered planes kept; the crescents redesigned as TRUE billows (light_mode 'cap': rounder overlapping lobes back to front, a lit top over a curved terminator, a shade underside), a few hand-placed broad strokes inside the near cumulus, the shade edges a little more broken. The scene's one evening light (water, paving, facade) is the paint_s1 copy's (dusk.tsx), set 'v5'.",
+ "about": "v2's S1, paint v5: v4's design-first method, the dusk family and the layered planes kept; the crescents redesigned as TRUE billows (light_mode 'cap': rounder overlapping lobes back to front, a lit top over a curved terminator, a shade underside), a few hand-placed broad strokes inside the near cumulus, the shade edges a little more broken. The scene's one evening light (water, paving, facade) is the paint_s1 copy's (dusk.tsx), set 'v5'. The LAYERED BRUSH (the owner's recipe, refs_paint/): a limited palette of 14 swatches, three passes per mass (blurred big soft strokes, mid chisel strokes along the form, small crisp strokes at the light edges), each plane blurred by its depth; the water as horizontal dashes from the palette.",
  "out": "public/paint/v2s1_v5",
  "out_design": "public/paint/v2s1_v5design",
  "frame": [
@@ -202,9 +202,17 @@
       "soft_px": 1.2,
       "break_k": 0.4,
       "break_cell": 9,
-      "dry_edge": 0.0
+      "dry_edge": 0.0,
+      "blur_k": 3.2,
+      "under_width": [
+       8,
+       12
+      ],
+      "under_strokes": 0.0,
+      "mid_strokes": 0.0
      },
-     "light_mode": "billow"
+     "light_mode": "billow",
+     "blur": 1.0
     },
     {
      "depth": 0.7,
@@ -278,7 +286,17 @@
       "op": [
        0.35,
        0.55
-      ]
+      ],
+      "blur_k": 3.2,
+      "under_width": [
+       30,
+       60
+      ],
+      "mid_width": [
+       10,
+       18
+      ],
+      "mid_strokes": 0.35
      },
      "lit_px": 9,
      "mid_px": 20,
@@ -376,13 +394,23 @@
       "op": [
        0.35,
        0.55
-      ]
+      ],
+      "blur_k": 3.2,
+      "under_width": [
+       50,
+       90
+      ],
+      "mid_width": [
+       14,
+       26
+      ],
+      "mid_strokes": 0.45
      },
      "lit_px": 24,
      "mid_px": 56,
      "light_mode": "cap",
-     "t_lit": 0.0,
-     "t_mid": 0.45,
+     "t_lit": -0.15,
+     "t_mid": 0.3,
      "tilt": 0.22,
      "curv": 0.12
     },
@@ -401,7 +429,7 @@
       1080,
       280
      ],
-     "under_px": 30,
+     "under_px": 40,
      "billows": [
       [
        1020,
@@ -488,13 +516,13 @@
        12,
        26
       ],
-      "specks": 120,
+      "specks": 60,
       "jitter_L": 0.024,
       "op": [
        0.4,
        0.6
       ],
-      "designed_op": 0.55,
+      "designed_op": 0.8,
       "designed_strokes": [
        [
         760,
@@ -532,6 +560,22 @@
         2,
         0.02
        ]
+      ],
+      "blur_k": 3.2,
+      "under_width": [
+       70,
+       120
+      ],
+      "under_strokes": 1.0,
+      "mid_width": [
+       18,
+       36
+      ],
+      "mid_strokes": 0.55,
+      "crisp_strokes": 0.07,
+      "crisp_width": [
+       5,
+       9
       ]
      },
      "lit_px": 46,
@@ -539,12 +583,13 @@
      "lit_cap": 0.46,
      "mid_band": 0.62,
      "light_mode": "cap",
-     "t_lit": 0.02,
-     "t_mid": 0.42,
+     "t_lit": -0.22,
+     "t_mid": 0.22,
      "tilt": 0.28,
      "curv": 0.16
     }
-   ]
+   ],
+   "brush": "layered"
   },
   {
    "id": "v2s1/tree",
@@ -704,17 +749,36 @@
       "op": [
        0.35,
        0.55
-      ]
+      ],
+      "under_width": [
+       34,
+       60
+      ],
+      "under_strokes": 1.2,
+      "under_blur": 4.0,
+      "mid_width": [
+       10,
+       20
+      ],
+      "mid_strokes": 0.7,
+      "crisp_strokes": 0.08,
+      "crisp_width": [
+       4,
+       7
+      ],
+      "specks": 50,
+      "wind": -25
      },
      "lit_px": 40,
      "mid_px": 41,
      "light_mode": "cap",
-     "t_lit": -0.08,
-     "t_mid": 0.36,
+     "t_lit": -0.2,
+     "t_mid": 0.26,
      "tilt": 0.3,
      "curv": 0.14
     }
-   ]
+   ],
+   "brush": "layered"
   },
   {
    "id": "v2s1/pier",
@@ -841,7 +905,8 @@
      0.22
     ],
     "chisel": 0.03
-   }
+   },
+   "blur": 2.2
   },
   {
    "id": "v2s1/fartower",
@@ -907,7 +972,35 @@
      0.22
     ],
     "chisel": 0.03
-   }
+   },
+   "blur": 1.6
+  },
+  {
+   "id": "v2s1/water",
+   "style": "water",
+   "seed": 77,
+   "flat": "out/paint/v2s1/flat/water.png",
+   "sun_x": 196,
+   "glint_w": 60,
+   "glint": 1.0,
+   "dashes": 1.0,
+   "under_blur": 2.0
   }
+ ],
+ "palette": [
+  "#FFF3DC",
+  "#FCE0AE",
+  "#FDDBB0",
+  "#F7C9A6",
+  "#F0BEA8",
+  "#E5CEDB",
+  "#D2C8E3",
+  "#AFB3D8",
+  "#B89BBA",
+  "#9A88BC",
+  "#7F78A8",
+  "#CBD89C",
+  "#9EBB8E",
+  "#6E9178"
  ]
 }

@@ -105,9 +105,12 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
       {/* the water */}
       <S1Plane plane={S1_PLANE.water}>
         {/* (paint v5) the canal mirrors the dusk sky */}
-        <DuskWater>
-          <S1Water />
-        </DuskWater>
+        {/* (paint v5) the painted water (horizontal dashes from the palette, over the dusk water), or the dusk water */}
+        <PaintedLayer piece="water">
+          <DuskWater>
+            <S1Water />
+          </DuskWater>
+        </PaintedLayer>
       </S1Plane>
     </Env>
     {/* the subject's plane: the far towpath, the wing (her behind the glass inside it; W and the door tier themselves),

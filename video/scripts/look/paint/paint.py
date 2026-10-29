@@ -1216,6 +1216,164 @@ def paint_designed_plane(pl, zones, cov, cxs, cys, cols, light, rng, seed, calm=
     return out * grain(rng, H, W, b.get('grain', 0.005))[..., None], a, n
 
 
+# ------------------------------------------------------------------ the LAYERED BRUSH (v5; the owner's recipe, 2026-10-29:
+# "brush it and perhaps draw them in layers a bit more blurry each time"; refs_paint/02_lighthouse_process.jpg): a
+# LIMITED PALETTE (the spec's swatches; every stroke takes one of them, never a free colour), each designed mass brushed
+# in three passes (big soft strokes, blurred: the underpainting; mid flat chisel strokes along the form; a few small crisp
+# strokes only at the light edges), and the plane blurred by its depth before the planes are composited back to front.
+
+PALETTE = {'lab': None}
+
+
+def swatch(lab, rng=None, spread=2, p_first=0.7):
+    """The palette's swatch nearest a colour (or, with rng, one of the `spread` nearest: the brush's variation)."""
+    pal = PALETTE['lab']
+    if pal is None:
+        return lab
+    d = ((pal - lab[None, :]) ** 2).sum(-1)
+    order = np.argsort(d)
+    if rng is None or spread <= 1 or rng.random() < p_first:
+        return pal[order[0]]
+    # a neighbour swatch only if it is of the same family (never a peach stroke on a green crown)
+    k = order[min(len(order) - 1, int(rng.integers(1, spread)))]
+    return pal[k] if math.sqrt(d[k]) < PALETTE.get('near', 0.075) else pal[order[0]]
+
+
+def blur_rgba(out, a, sigma):
+    if sigma <= 0.05:
+        return out, a
+    pm = cv2.GaussianBlur((out * a[..., None]).astype(np.float32), (0, 0), sigma)
+    aa = cv2.GaussianBlur(a.astype(np.float32), (0, 0), sigma)
+    return np.where(aa[..., None] > 1e-4, pm / np.maximum(aa, 1e-4)[..., None], out), aa
+
+
+def paint_layered_plane(pl, zones, cov, cxs, cys, cols, light, rng, seed, calm, depth):
+    H, W = cov.shape
+    b = pl.get('paint', {})
+    tgt = sum(z[..., None] * c for z, c in zip(zones, cols)) / np.maximum(cov, 1e-4)[..., None]
+    tgt = np.where(cov[..., None] > 1e-4, tgt, cols[1])
+    tgt_f = fill_out(tgt, cov)
+    # the edge by the light (as the designed paint): firm toward it, soft and broken away from it
+    cb = cv2.GaussianBlur(cov, (0, 0), 3)
+    gy, gx = np.gradient(cb)
+    gn = np.hypot(gx, gy) + 1e-6
+    Ln = np.array(light, np.float32) / (np.linalg.norm(light) + 1e-8)
+    facing = (-gx * Ln[0] - gy * Ln[1]) / gn
+    shade_side = 1 - smoothstep(-0.45, 0.15, facing)
+    soft = cv2.GaussianBlur(cov, (0, 0), b.get('soft_px', 4.5) * (1 + depth))
+    alpha = cov * (1 - shade_side) + soft * shade_side
+    band = np.clip(1 - np.abs(soft - 0.5) * 2.2, 0, 1)
+    patches = fbm(rng, H, W, b.get('break_cell', 13), 3)
+    alpha = alpha * (1 - shade_side * band * np.clip((patches + 0.15) * 2.2, 0, 1) * b.get('break_k', 0.75))
+    if calm is not None:
+        alpha = alpha * calm
+    zone_img = lab_to_rgb(tgt_f).astype(np.float32)
+    area = float((cov > 0.6).sum())
+    pts = np.argwhere(cov > 0.8)
+    soft_st = make_flat_stamps(np.random.default_rng(seed * 11 + 7), side=(0.35, 0.5), chisel=0.2)
+    chisel_st = make_flat_stamps(np.random.default_rng(seed * 11 + 8), side=(0.05, 0.1), chisel=0.012)
+    n = 0
+    # pass 1, the underpainting: the masses in their swatches, big soft strokes, then blurred
+    under = Canvas(H, W)
+    base = np.zeros_like(tgt_f)
+    for k in range(3):
+        base = base + zones[k][..., None] * swatch(cols[k])
+    base = np.where(cov[..., None] > 1e-4, base / np.maximum(cov, 1e-4)[..., None], tgt_f)
+    under.wash(lab_to_rgb(fill_out(base, cov)), np.clip(cov * 1.0, 0, 1).astype(np.float32))
+    u_lo, u_hi = b.get('under_width', (60, 110))
+    for _ in range(int(b.get('under_strokes', 1.2) * area / ((u_lo + u_hi) * 0.5) ** 2)):
+        if len(pts) == 0:
+            break
+        y, x = pts[int(rng.integers(len(pts)))]
+        ang = math.radians(b.get('wind', -10)) + rng.normal(0, 0.25)
+        wdt = rng.uniform(u_lo, u_hi) * (1 + 0.4 * depth)
+        under.stamp(soft_st[n % len(soft_st)], x, y, ang + rng.normal(0, 0.2), wdt * rng.uniform(1.4, 2.2), wdt, lab_to_rgb(swatch(tgt_f[y, x], rng, 2)[None])[0], rng.uniform(0.45, 0.7), cov.astype(np.float32))
+        n += 1
+    u_rgb, u_a = under.rgba()
+    u_rgb, u_a = blur_rgba(u_rgb, u_a, b.get('under_blur', 6.0) + 6.0 * depth)
+    cv = Canvas(H, W)
+    cv.wash(u_rgb, np.clip(np.minimum(u_a * 1.15, 1.0) * np.where(alpha > 0, 1.0, 0.0), 0, 1).astype(np.float32) * np.clip(alpha * 1.4, 0, 1))
+    clipm = alpha.astype(np.float32)
+    edist = ndimage.distance_transform_edt(cov > 0.5)
+    # pass 2: mid-size flat chisel strokes along the form, each in its mass's swatch
+    m_lo, m_hi = b.get('mid_width', (16, 34))
+    for _ in range(int(b.get('mid_strokes', 0.5) * (1 - 0.6 * depth) * area / ((m_lo + m_hi) * 0.5) ** 2)):
+        if len(pts) == 0:
+            break
+        y, x = pts[int(rng.integers(len(pts)))]
+        tang = math.atan2(y - cys[y, x], x - cxs[y, x]) + math.pi / 2 if cxs[y, x] != 0 else 0.0
+        tang = (tang + math.pi / 2) % math.pi - math.pi / 2  # a stroke has no head: fold to (-90, 90] degrees
+        near_edge = float(np.clip(1 - edist[y, x] / b.get('form_px', 26), 0, 1))
+        ang = near_edge * tang + (1 - near_edge) * math.radians(b.get('wind', -10))
+        wdt = rng.uniform(m_lo, m_hi)
+        cv.stamp(chisel_st[n % len(chisel_st)], x, y, ang + rng.normal(0, 0.15), wdt * rng.uniform(1.5, 2.6), wdt, lab_to_rgb(swatch(tgt_f[y, x], rng, 2, 0.75)[None])[0],
+                 rng.uniform(0.7, 0.92), clipm, zone_img, b.get('tau', 0.05))
+        n += 1
+    # the hand-placed strokes of the near mass (in their swatches)
+    for (sx, sy, sl, sw_, sa, sz, sdl) in b.get('designed_strokes', []):
+        lab = swatch(cols[int(sz) - 1] + np.array([sdl, 0, 0]))
+        cv.stamp(chisel_st[n % len(chisel_st)], sx - b.get('_bx', 0), sy - b.get('_by', 0), math.radians(sa), sl, sw_, lab_to_rgb(lab[None])[0], b.get('designed_op', 0.75), clipm)
+        n += 1
+    # pass 3: a few small crisp strokes only at the light edges (toward the light, and along the lit terminator)
+    if depth < 0.5:
+        lit_edge = (cov > 0.5) & (cb < 0.92) & (facing > 0.3)
+        term = (zones[2] > 0.3) & (zones[1] > 0.1)
+        cand = np.argwhere(lit_edge | term)
+        c_lo, c_hi = b.get('crisp_width', (5, 9))
+        for _ in range(int(b.get('crisp_strokes', 0.06) * len(cand) / ((c_lo + c_hi) * 0.5))):
+            if len(cand) == 0:
+                break
+            y, x = cand[int(rng.integers(len(cand)))]
+            ang = math.atan2(gy[y, x], gx[y, x]) + math.pi / 2
+            wdt = rng.uniform(c_lo, c_hi)
+            lab = swatch(cols[2] + np.array([0.025, 0, 0]))
+            cv.stamp(chisel_st[n % len(chisel_st)], x, y, ang + rng.normal(0, 0.12), wdt * rng.uniform(2.0, 3.8), wdt, lab_to_rgb(lab[None])[0], rng.uniform(0.8, 1.0), clipm)
+            n += 1
+    # speckle and dry texture, sparingly, on near masses only
+    if b.get('specks') and depth < 0.2:
+        zone = ((cov > 0.6) * 0.004).astype(np.float32)
+        n += speckle(cv, rng, zone, int(b['specks']), 0.6, 1.5, [lab_to_rgb(swatch(cols[2] + np.array([0.03, 0, 0]))[None])[0], lab_to_rgb(swatch(cols[0] - np.array([0.03, 0, 0]))[None])[0]], (0.4, 0.75))
+    out, a = cv.rgba()
+    out = out * grain(rng, H, W, b.get('grain', 0.004))[..., None]
+    # blur by depth: the farther, the softer (the near mass keeps its crisp lit edge)
+    out, a = blur_rgba(out, a, pl.get('blur', b.get('blur_k', 2.4) * depth))
+    return out, a, n
+
+
+def style_water_dashes(piece, spec, rng, stamps):
+    """Water the lighthouse's way: the flat water (it already mirrors the sky) softly underpainted, then horizontal
+    dashes from the palette, shorter and thinner far, longer and thicker near, gold under the sun."""
+    rgb, mask = load_flat(os.path.join(ROOT, piece['flat']))
+    ys, xs = np.nonzero(mask > 0.02)
+    x0, x1 = max(0, xs.min()), min(mask.shape[1], xs.max() + 1)
+    y0, y1 = max(0, ys.min()), min(mask.shape[0], ys.max() + 1)
+    rgb, mask = rgb[y0:y1, x0:x1], mask[y0:y1, x0:x1]
+    H, W = mask.shape
+    rgbf = fill_out(rgb, mask)
+    lab = rgb_to_lab(rgbf)
+    cv = Canvas(H, W)
+    ub = cv2.GaussianBlur(rgbf.astype(np.float32), (0, 0), piece.get('under_blur', 2.0))
+    cv.wash(ub, mask.astype(np.float32))
+    fst = make_flat_stamps(np.random.default_rng(int(piece['seed']) * 11 + 9), side=(0.12, 0.25), chisel=0.03)
+    n = 0
+    sun_x = piece.get('sun_x', 196) - x0
+    count = int(piece.get('dashes', 1.0) * (mask > 0.5).sum() / 700)
+    inside = np.argwhere(mask > 0.5)
+    for _ in range(count):
+        y, x = inside[int(rng.integers(len(inside)))]
+        near = y / max(1, H - 1)  # 0 far (top) .. 1 near (bottom)
+        L_ = rng.uniform(24, 70) * (0.6 + 1.2 * near)
+        w_ = rng.uniform(2.0, 3.5) * (0.6 + 1.0 * near)
+        base_l = lab[y, x].copy()
+        glint = math.exp(-((x - sun_x) / piece.get('glint_w', 70)) ** 2) * piece.get('glint', 1.0)
+        dl = rng.choice([-0.035, -0.02, 0.02, 0.035]) + glint * 0.05
+        c = swatch(base_l + np.array([dl, 0, 0]) + (np.array([0.0, 0.01, 0.04]) * glint), rng, 2, 0.8)
+        cv.stamp(fst[n % len(fst)], x, y, math.radians(rng.normal(0, 0.6)), L_, w_, lab_to_rgb(c[None])[0], rng.uniform(0.55, 0.85), mask.astype(np.float32))
+        n += 1
+    out, a = cv.rgba()
+    return out, a, (x0, y0), n
+
+
 def style_designed(piece, spec, rng, stamps):
     """Designed planes (far to near), each its own image: the flat design (--design) or its painting."""
     FW, FH = spec['frame']
@@ -1259,7 +1417,10 @@ def style_designed(piece, spec, rng, stamps):
             out = rgb
         else:
             pl = dict(pl, paint=dict(pl.get('paint', {}), _bx=bx, _by=by))
-            out, a, n = paint_designed_plane(pl, zones, cov, cxs, cys, cols, pl.get('light', light), np.random.default_rng(int(piece['seed']) * 101 + j), int(piece['seed']) * 101 + j, calm)
+            if piece.get('brush') == 'layered':
+                out, a, n = paint_layered_plane(pl, zones, cov, cxs, cys, cols, pl.get('light', light), np.random.default_rng(int(piece['seed']) * 101 + j), int(piece['seed']) * 101 + j, calm, d)
+            else:
+                out, a, n = paint_designed_plane(pl, zones, cov, cxs, cys, cols, pl.get('light', light), np.random.default_rng(int(piece['seed']) * 101 + j), int(piece['seed']) * 101 + j, calm)
         if nearer.max() > 0 and pl.get('air', True):
             dn = ndimage.distance_transform_edt(nearer < 0.5)[y0:y1, x0:x1]
             gap = np.zeros((bh, bw), np.float32)
@@ -1294,6 +1455,9 @@ def paint_piece(piece, spec, preview=None):
     DRY['stamps'] = make_stamps(np.random.default_rng(seed * 7 + 3), n=12, dry_range=(0.5, 0.85))
     st = piece['style']
     t0 = time.time()
+    if st == 'water':
+        out, a, (x0, y0), n = style_water_dashes(piece, spec, rng, stamps)
+        return [write_png(piece, spec, rng, out, a, x0, y0, n, t0)]
     if st == 'designed':
         res = style_designed(piece, spec, rng, stamps)
         return [write_png(piece, spec, rng, out, a, x0, y0, n, t0, suffix=suf, depth=dep) for (suf, out, a, (x0, y0), n, dep) in res]
@@ -1313,6 +1477,9 @@ def paint_piece(piece, spec, preview=None):
         out, a, (x0, y0), n = style_flat_piece(piece, spec, rng, stamps, dabs)
     else:
         raise SystemExit(f'unknown style {st}')
+    if piece.get('blur'):
+        # blur by depth (the layered brush's ladder): a far piece painted softer
+        out, a = blur_rgba(out, a, float(piece['blur']))
     return [write_png(piece, spec, rng, out, a, x0, y0, n, t0)]
 
 
@@ -1346,6 +1513,7 @@ def main():
     spec = json.load(open(args.spec))
     global DESIGN
     DESIGN = args.design
+    PALETTE['lab'] = np.array([hex_lab(h) for h in spec['palette']], np.float32) if spec.get('palette') else None
     if DESIGN:
         spec['out'] = spec['out_design']
     os.makedirs(os.path.join(ROOT, spec['out']), exist_ok=True)

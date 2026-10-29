@@ -6,6 +6,7 @@
 //   pier   the stone pier (body, coping, the thyme pot) and its two Shade steps
 //   farroofs, fartower   the west gap's far roofs and the calm tower (v2 set)
 //   fern   the big fern pot at the bottom edge and its form shade (v2 set)
+//   water  the canal under v5's dusk light (dusk.tsx), the base of the painted water (v5 set)
 // Rendered once (t = 1.0 s, after the flood) by scripts/look/paint/bake_v2s1.sh.
 import React from 'react';
 import {PaintBakeFrame} from '../../lib/paint';
@@ -17,8 +18,10 @@ import {PosterSwitchProvider, resolveSwitches} from './switches';
 import {s1Sky} from './V2S1_sky';
 import {PlanterTree, Pier, PierShades, TreeCrescent, FernPot, FrontForm} from './V2S1_fore';
 import {FarRoofs, CalmTower} from './V2S1_set_far';
+import {S1Water} from './V2S1_water';
+import {DuskProvider, DuskWater} from './dusk';
 
-export type PaintFlatS1Props = {piece: 'sky' | 'tree' | 'pier' | 'farroofs' | 'fartower' | 'fern'};
+export type PaintFlatS1Props = {piece: 'sky' | 'tree' | 'pier' | 'farroofs' | 'fartower' | 'fern' | 'water'};
 
 export const PaintFlatS1: React.FC<PaintFlatS1Props> = ({piece}) => {
   const sw = resolveSwitches({preset: 'v2'});
@@ -34,6 +37,14 @@ export const PaintFlatS1: React.FC<PaintFlatS1Props> = ({piece}) => {
               </Tier>
               <TreeCrescent />
             </>
+          ) : null}
+          {piece === 'water' ? (
+            // (v5) the water under the dusk light (its colour matrix), the base of the painted water's dashes
+            <DuskProvider on>
+              <DuskWater>
+                <S1Water />
+              </DuskWater>
+            </DuskProvider>
           ) : null}
           {piece === 'farroofs' ? (
             <Tier tier="environment">
