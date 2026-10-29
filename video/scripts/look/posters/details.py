@@ -651,15 +651,291 @@ def cmd_maps(a) -> None:
                os.path.join(out, 'details_maps_v1_ref1_v3.jpg'), 236, 'Detail maps: the benchmarks (v1, reference 1) and v3')
 
 
+# ------------------------------------------------------------------ sizes: thin features by width (what a phone and 720p keep)
+
+WIDTHS = (('le2', 3), ('w3_4', 5), ('w5_8', 9))   # a square opening / closing of side s removes features narrower than s
+THIN_AMP = 6.0                                    # L*: a feature counts when it stands >= 6 L* off its surround
+
+
+def width_classes(L: np.ndarray, amp: float = THIN_AMP) -> dict:
+    """Pixels of thin features (light or dark) by width at canvas scale: <= 2 px, 3-4 px, 5-8 px (each class exclusive)."""
+    out, prev = {}, np.zeros(L.shape, bool)
+    for name, s in WIDTHS:
+        k = cv2.getStructuringElement(cv2.MORPH_RECT, (s, s))
+        m = ((L - cv2.morphologyEx(L, cv2.MORPH_OPEN, k)) >= amp) | ((cv2.morphologyEx(L, cv2.MORPH_CLOSE, k) - L) >= amp)
+        out[name] = m & ~prev
+        prev |= m
+    return out
+
+
+def tile_labels(lab: np.ndarray, tile: int = TILE) -> np.ndarray:
+    h, w = lab.shape
+    ty, tx = h // tile, w // tile
+    b = lab[:ty * tile, :tx * tile].reshape(ty, tile, tx, tile).swapaxes(1, 2).reshape(ty, tx, tile * tile)
+    fr = np.stack([(b == i).mean(-1) for i in range(len(CLASSES))], -1)
+    return np.where(fr.max(-1) > 0, fr.argmax(-1), 255)
+
+
+def sizes_one(path: str, kind: str | None = None) -> dict:
+    d = load_image(path, kind)
+    L, v = lstar(d['rgb']), d['valid']
+    wc = width_classes(L)
+    res = {'name': d['name'], 'all': {k: float((m & v).sum() / max(1, v.sum())) for k, m in wc.items()}}
+    if d['lab'] is not None:
+        t = tiles(edge_maps(d['rgb']), v)
+        tl, ok = tile_labels(d['lab']), t['ok']
+        calm = np.nan_to_num(t['ed'], nan=1.0) < CALM
+        for c in CLASSES:
+            sel = (d['lab'] == CLS_ID[c]) & v
+            a = int(sel.sum())
+            if not a:
+                continue
+            ts = ok & (tl == CLS_ID[c])
+            r = {k: float((m & sel).sum() / a) for k, m in wc.items()}
+            r['calm_of_frame'] = float((calm & ts).sum() / max(1, ok.sum()))
+            r['calm_of_region'] = float((calm & ts).sum() / max(1, ts.sum()))
+            res[c] = r
+    return res
+
+
+def cmd_sizes(a) -> None:
+    os.makedirs(SCRATCH, exist_ok=True)
+    groups = {'posters': [sizes_one(p) for p in poster_paths()], 'v2': [sizes_one(p) for p in film_paths('v2')],
+              'v1': [sizes_one(p) for p in film_paths('v1')], 'v3': [sizes_one(p) for p in film_paths('v3')],
+              'ref1': [sizes_one(p, 'ref1') for p in ref1_paths()]}
+    with open(os.path.join(SCRATCH, 'sizes.json'), 'w') as f:
+        json.dump(groups, f, indent=1)
+    pc = lambda x: f'{100 * x:.1f}'
+    md = ['| image | thin <= 2 px | 3-4 px | 5-8 px (% of the measured frame) | hero <= 2 / 3-4 / 5-8 | near <= 2 / 3-4 / 5-8 | '
+          'far <= 2 / 3-4 / 5-8 | calm tiles in the near ground, % of frame (of the region) |', '|---|---|---|---|---|---|---|---|']
+    for g, rs in groups.items():
+        for r in rs:
+            cells = [r['name'], pc(r['all']['le2']), pc(r['all']['w3_4']), pc(r['all']['w5_8'])]
+            for c in ('hero', 'near', 'far'):
+                cells.append(' / '.join(pc(r[c][k]) for k, _ in WIDTHS) if c in r else '-')
+            cells.append(f"{pc(r['near']['calm_of_frame'])} ({pc(r['near']['calm_of_region'])})" if 'near' in r else '-')
+            md.append('| ' + ' | '.join(cells) + ' |')
+        al = np.array([[r['all'][k] for k, _ in WIDTHS] for r in rs])
+        md.append(f'| **{g} median** | ' + ' | '.join(pc(x) for x in np.median(al, 0)) + ' | | | | |')
+    out = '\n'.join(md)
+    with open(os.path.join(SCRATCH, 'sizes.md'), 'w') as f:
+        f.write(out)
+    print(out)
+
+
+# ------------------------------------------------------------------ motion: thin features under the parallax float through H.264
+
+# Two test charts (1080 x 1920, 5 columns x 8 rows of 216 x 240 patches): rows = float speed x contrast, columns = the
+# feature. Exact box-filter (area) antialiasing like Chrome/Skia's analytic coverage, 8-bit, tone-on-tone on a warm wall.
+MOTION_SETS = {
+    'lines': [('hairline 1.0', 'v', 1.0, 18), ('hairline 1.5', 'v', 1.5, 18), ('line 2.0', 'v', 2.0, 18),
+              ('line 3.0', 'v', 3.0, 18), ('mullions 1.0 / 6', 'grid', 1.0, 6)],
+    'ticks': [('ticks 2x3 / 5x8', 'ticks', (2, 3), (5, 8)), ('ticks 3x4 / 6x10', 'ticks', (3, 4), (6, 10)),
+              ('ticks 4x6 / 8x14', 'ticks', (4, 6), (8, 14)), ('ticks 6x9 / 12x20', 'ticks', (6, 9), (12, 20)),
+              ('ticks 8x12 / 16x26', 'ticks', (8, 12), (16, 26))],
+}
+# px/s at 1080: still; the far city (k 0.15) under a 15 px/s float; the near ground's path speed (8-15); its peak (25).
+SPEEDS = (0.0, 2.5, 10.0, 25.0)
+CONTRASTS = (12.0, 30.0)          # dL*: tone-on-tone (CRAFT §c, <= 15 inside a plane); a dark mullion or a lit pane
+PW, PH = 216, 240
+WALL = (72.0, 8.0, 16.0)          # L*, a*, b*: a warm cream wall; features are the same hue, darker
+FPS, SECS, HEADING = 60, 2.0, 0.35
+RUNGS = {'master': (['-c:v', 'libx264', '-preset', 'slow', '-crf', '14', '-x264-params', 'aq-mode=3'], None),
+         'p1080': (['-c:v', 'libx264', '-preset', 'medium', '-b:v', '3500k', '-maxrate', '3500k', '-bufsize', '7000k'], None),
+         'p720': (['-c:v', 'libx264', '-preset', 'medium', '-b:v', '1500k', '-maxrate', '1500k', '-bufsize', '3000k'], (720, 1280))}
+YUV = ['-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv']
+
+
+def _cover(n: int, pitch: float, w: float, off: float) -> np.ndarray:
+    starts = np.arange(-3 * pitch, n + 3 * pitch, pitch, dtype=np.float64) + (off % pitch)
+    x = np.arange(n, dtype=np.float64)[:, None]
+    ov = np.clip(np.minimum(x + 1, starts[None, :] + w) - np.maximum(x, starts[None, :]), 0, None)
+    return np.clip(ov.sum(1), 0, 1)
+
+
+def _patch(feat, dL: float, ox: float, oy: float) -> np.ndarray:
+    _, kind, size, pitch = feat
+    if kind == 'v':
+        C = np.broadcast_to(_cover(PW, pitch, size, ox)[None, :], (PH, PW))
+    elif kind == 'grid':
+        C = 1 - (1 - _cover(PW, pitch, size, ox)[None, :]) * (1 - _cover(PH, pitch, size, oy)[:, None])
+    else:
+        (tw, th), (px, py) = size, pitch
+        C = _cover(PH, py, th, oy)[:, None] * _cover(PW, px, tw, ox)[None, :]
+    return WALL[0] - dL * C
+
+
+def _rows():
+    return [(sp, c) for sp in SPEEDS for c in CONTRASTS]
+
+
+def _chart_frame(feats, i: int) -> np.ndarray:
+    L = np.empty((1920, 1080), np.float32)
+    for r, (sp, dL) in enumerate(_rows()):
+        ox = sp * i / FPS
+        for c, f in enumerate(feats):
+            L[r * PH:(r + 1) * PH, c * PW:(c + 1) * PW] = _patch(f, dL, ox, ox * HEADING)
+    lab = np.dstack([L, np.full_like(L, WALL[1]), np.full_like(L, WALL[2])])
+    return np.clip(cv2.cvtColor(lab, cv2.COLOR_Lab2RGB) * 255 + 0.5, 0, 255).astype(np.uint8)
+
+
+def _boxes(feats, scale: float = 1.0) -> list:
+    out = []
+    for r in range(len(_rows())):
+        for c, f in enumerate(feats):
+            px, py = (f[3], f[3]) if f[1] == 'grid' else ((f[3], 1) if f[1] == 'v' else f[3])
+            w, h = (PW - 32) // px * px, (PH - 32) // py * py
+            x0, y0 = c * PW + 16, r * PH + 16
+            out.append((r, c, [int(round(v * scale)) for v in (x0, y0, x0 + w, y0 + h)]))
+    return out
+
+
+def _metrics(rgb: np.ndarray, boxes) -> list:
+    L = lstar(rgb.astype(np.float32) / 255.0)
+    res = []
+    for _, _, (x0, y0, x1, y1) in boxes:
+        b = L[y0:y1, x0:x1]
+        p1, p50 = np.percentile(b, [1, 50])
+        res.append((float(b.std()), float(p50 - p1)))
+    return res
+
+
+def _decode_stream(path: str, size: tuple):
+    W, H = size
+    p = subprocess.Popen(['ffmpeg', '-v', 'error', '-i', path, '-f', 'rawvideo', '-pix_fmt', 'rgb24',
+                          '-vf', 'scale=in_color_matrix=bt709:in_range=tv,format=rgb24', '-'], stdout=subprocess.PIPE)
+    n = W * H * 3
+    while True:
+        buf = p.stdout.read(n)
+        if len(buf) < n:
+            break
+        yield np.frombuffer(buf, np.uint8).reshape(H, W, 3)
+    p.wait()
+
+
+def _kbps(path: str) -> float:
+    r = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration,size', '-of', 'json', path],
+                       capture_output=True, text=True, check=True)
+    f = json.loads(r.stdout)['format']
+    return 8 * int(f['size']) / float(f['duration']) / 1000
+
+
+def cmd_motion(a) -> None:
+    out_dir = os.path.join(SCRATCH, 'motion')
+    os.makedirs(out_dir, exist_ok=True)
+    n = int(FPS * SECS)
+    results, crops = {}, {}
+    for set_name, feats in MOTION_SETS.items():
+        b1080, b720 = _boxes(feats), _boxes(feats, 2 / 3)
+        src_m, src720_m = [], []
+        master = os.path.join(out_dir, f'{set_name}_master.mp4')
+        cmd = ['ffmpeg', '-v', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', '1080x1920', '-r', str(FPS), '-i', '-',
+               '-vf', 'scale=out_color_matrix=bt709:out_range=tv,format=yuv420p', *RUNGS['master'][0], *YUV, master]
+        p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+        for i in range(n):
+            fr = _chart_frame(feats, i)
+            p.stdin.write(fr.tobytes())
+            src_m.append(_metrics(fr, b1080))
+            src720_m.append(_metrics(cv2.resize(fr, (720, 1280), interpolation=cv2.INTER_AREA), b720))
+            if i == n // 2:
+                crops[(set_name, 'source 1080')] = fr
+        p.stdin.close()
+        if p.wait():
+            raise SystemExit('ffmpeg failed')
+        streams = {'master': (master, (1080, 1920), b1080, src_m)}
+        for rung in ('p1080', 'p720'):
+            args, sc = RUNGS[rung]
+            path = os.path.join(out_dir, f'{set_name}_{rung}.mp4')
+            vf = (f'scale={sc[0]}:{sc[1]}:flags=bicubic,' if sc else '') + 'format=yuv420p'
+            subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', master, '-vf', vf, *args, *YUV, path], check=True)
+            streams[rung] = (path, sc or (1080, 1920), b720 if sc else b1080, src720_m if sc else src_m)
+        res = {'kbps': {}, 'patches': []}
+        dec = {}
+        for rung, (path, size, boxes, ref) in streams.items():
+            res['kbps'][rung] = _kbps(path)
+            ms = []
+            for i, fr in enumerate(_decode_stream(path, size)):
+                ms.append(_metrics(fr, boxes))
+                if i == n // 2:
+                    crops[(set_name, rung)] = fr.copy()
+            dec[rung] = np.array(ms)              # t x patch x (std, peak)
+        S, S7 = np.array(src_m), np.array(src720_m)
+        for k, (r, c, _) in enumerate(b1080):
+            sp, dL = _rows()[r]
+            row = {'feature': feats[c][0], 'speed': sp, 'dL': dL}
+            for nm, arr in (('src', S), ('src720', S7), *dec.items()):
+                st, pk = arr[:, k, 0], arr[:, k, 1]
+                row[nm] = {'std': float(st.mean()), 'pulse': float(st.std() / max(1e-6, st.mean())),
+                           'twinkle': float((np.percentile(pk, 95) - np.percentile(pk, 5)) / max(1e-6, pk.mean())),
+                           'peak': float(pk.mean())}
+            for rung in dec:
+                ref = row['src720'] if rung == 'p720' else row['src']
+                row[rung]['kept'] = row[rung]['std'] / max(1e-6, ref['std'])
+            res['patches'].append(row)
+        results[set_name] = res
+    with open(os.path.join(out_dir, 'motion.json'), 'w') as f:
+        json.dump(results, f, indent=1)
+    md = []
+    for set_name, res in results.items():
+        md.append(f"### {set_name} (kbps: " + ', '.join(f'{k} {v:.0f}' for k, v in res['kbps'].items()) + ')')
+        md.append('| feature | dL* | px/s | twinkle src / master / 1080p / 720p | pulse src / 720p | kept 1080p / 720p (detail std) |')
+        md.append('|---|---|---|---|---|---|')
+        for r in res['patches']:
+            md.append(f"| {r['feature']} | {r['dL']:.0f} | {r['speed']:g} | {r['src']['twinkle']:.2f} / {r['master']['twinkle']:.2f} / "
+                      f"{r['p1080']['twinkle']:.2f} / {r['p720']['twinkle']:.2f} | {r['src']['pulse']:.3f} / {r['p720']['pulse']:.3f} | "
+                      f"{100 * r['p1080']['kept']:.0f} / {100 * r['p720']['kept']:.0f} % |")
+    txt = '\n'.join(md)
+    with open(os.path.join(out_dir, 'motion.md'), 'w') as f:
+        f.write(txt)
+    print(txt)
+    sheet_motion(crops, results, a.out or IMG)
+
+
+def sheet_motion(crops: dict, results: dict, out: str) -> None:
+    """Each feature at dL* 30 on the 10 px/s row, mid-clip: source, platform 1080p and 720p, 3x (nearest)."""
+    Z, C = 3, 64
+    rowsel = _rows().index((10.0, 30.0))
+    names = [(s, f) for s, fs in MOTION_SETS.items() for f in fs]
+    labels = [('source 1080', 'the render (8-bit, area AA)'), ('p1080', 'platform 1080p, 3.5 Mbps'), ('p720', 'platform 720p, 1.5 Mbps')]
+    W = len(names) * (C * Z + 12) + 230
+    H = 120 + len(labels) * (C * Z + 16) + 70
+    sheet = Image.new('RGB', (W, H), (250, 250, 248))
+    d = ImageDraw.Draw(sheet)
+    d.text((12, 10), 'Thin features under the parallax float, through H.264 (mid-clip frame, 10 px/s, dL* 30; 3x, nearest)', fill=INK, font=font(24, True))
+    d.text((12, 44), 'Below each: twinkle on the 720p rung at 10 px/s (the swing of the cores\' contrast over time) and the detail kept at 720p.', fill=INK, font=font(17))
+    for j, (s, f) in enumerate(names):
+        x = 230 + j * (C * Z + 12)
+        d.text((x, 84), f[0], fill=INK, font=font(16, True))
+        c = [fs[0] for fs in MOTION_SETS[s]].index(f[0])
+        for i, (key, lab) in enumerate(labels):
+            fr = crops[(s, key)]
+            sc = 2 / 3 if key == 'p720' else 1.0
+            cx, cy = (c * PW + PW // 2) * sc, (rowsel * PH + PH // 2) * sc
+            cc = int(round(C * sc))
+            tile = Image.fromarray(fr[int(cy) - cc // 2:int(cy) - cc // 2 + cc, int(cx) - cc // 2:int(cx) - cc // 2 + cc])
+            tile = tile.resize((C * Z, C * Z), Image.NEAREST)
+            y = 120 + i * (C * Z + 16)
+            sheet.paste(tile, (x, y))
+            if j == 0:
+                d.text((12, y + 10), lab, fill=INK, font=font(17, True))
+        row = [r for r in results[s]['patches'] if r['feature'] == f[0] and r['speed'] == 10.0 and r['dL'] == 30.0][0]
+        y = 120 + len(labels) * (C * Z + 16) + 4
+        d.text((x, y), f"twinkle {row['p720']['twinkle']:.2f}  kept {100 * row['p720']['kept']:.0f} %", fill=INK, font=font(16))
+    save_jpg(sheet, os.path.join(out, 'details_motion.jpg'))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest='cmd', required=True)
     sub.add_parser('frames')
+    sub.add_parser('sizes')
+    m = sub.add_parser('motion')
+    m.add_argument('--out', default=None)
     for c in ('regions', 'maps'):
         r = sub.add_parser(c)
         r.add_argument('--out', default=None)
     a = ap.parse_args()
-    {'frames': cmd_frames, 'regions': cmd_regions, 'maps': cmd_maps}[a.cmd](a)
+    {'frames': cmd_frames, 'regions': cmd_regions, 'maps': cmd_maps, 'sizes': cmd_sizes, 'motion': cmd_motion}[a.cmd](a)
     return 0
 
 
