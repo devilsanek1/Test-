@@ -11,6 +11,8 @@ points and conclusions into the main repo"). The brief is `README.md` here; the 
 - Integrated into the main docs (`INTEGRATION.md`: DIRECTION, CRAFT, PALETTE, the new `docs/look/LAYOUT.md`, G5_BLOCKING,
   COZY_AND_SCALE, CINEMATIC_GUIDE, STORYBOARD_STYLE, LIFE_AND_DENSITY, QA, HANDOFF) and merged into `video-production`.
 - Waiting on the owner's calls (DIRECTION's open-call list; `STUDY.md` §9). Next: the 7 s look test (`STUDY.md` §10).
+- The journal-corpus thread is done (`journals/SUMMARY.md`), merged into `video-production`; it sent the owner its
+  summary and chart and stays open for their reactions.
 - Code flagged, not changed: the caption clip window in theme.ts and capcheck, `safe.action`, framecheck's ad rail,
   `PARALLAX_K` (not 1/z), `planeLod`'s 0 px `minFeature` (`INTEGRATION.md`).
 

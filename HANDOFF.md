@@ -169,7 +169,10 @@ Everything that agent knew is in this repo. This file is the map; the details li
   owner changed the network policy (~22:28 UTC) and the feeds load (economist.com, time.com, forbes.com, theatlantic.com,
   theguardian.com, rss.nytimes.com, feeds.a.dj.com, wired.com, newyorker.com, ft.com via a redirect, news.google.com
   RSS; reuters.com and apnews.com answer 401/403 from their own bot walls; GDELT doesn't answer): the corpus is built
-  from the feeds.
+  from the feeds. **Done 2026-10-29 ~04:15 UTC:** `journals/SUMMARY.md`, `clusters.md`, `cluster_chart.png` (1,209
+  stories, 308 fully scored, a blind second scorer agreeing at rho 0.96; about 1 in 10 fits our look; the best
+  directions: new finds about the past, space and sky, nature and its rescues; tech fits only in unusual places;
+  the month's data-centre stories were all backlash). The thread stays open for the owner's reactions.
 - **The owner's answers (2026-10-28 ~22:10 UTC)** to our nine first observations are rules now where decided (one look,
   one brand; a VERY subtle texture to try; lit and shade faces; a full value range: DIRECTION intro and rules 3-6,
   CRAFT §c, PALETTE, the playbook) and open where not (outline-free edges: an A vs B picture; one consolidated layout
