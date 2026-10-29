@@ -1,6 +1,12 @@
 # v4 G1 critique (critic, 2026-10-29)
 
-Status: IN PROGRESS (cold retell written; brief not yet read).
+Status: IN PROGRESS (cold retell written; brief read; checks run; findings being written).
+
+Checks, run by the critic on the paste as it stands:
+- `python3 video/scripts/voice/check_rhythm.py video/docs/v4/script/script_elevenlabs.md`: "13 sentences, 6 short
+  (<= 5 words, 46%), 6 long (>= 9 words)" / "OK: long sentences are broken up by short ones".
+- `python3 video/scripts/voice/check_paste.py video/docs/v4/script/script_elevenlabs.md`: "121 words, 744 characters,
+  6 tags (5.0 per 100 words); expected about 43 s, max 56 s" / "OK: paste-safe".
 
 ## Cold retell
 
