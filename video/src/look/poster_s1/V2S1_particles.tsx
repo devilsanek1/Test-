@@ -53,7 +53,8 @@ export const S1_PARTICLES_ALIVE = 10;
 export const S1Particles: React.FC = () => (
   <>
     {S1_PARTICLE_FIELDS.map(({plane, f}) => (
-      <S1Plane key={f.seed} plane={plane}>
+      // (the look test: a particle is a mover, not a surface: never mottled, and its own small group stays unfiltered)
+      <S1Plane key={f.seed} plane={plane} texture={false}>
         <Particles {...f} />
       </S1Plane>
     ))}

@@ -29,7 +29,9 @@ import {S1Water, S1Duck} from './V2S1_water';
 import {S1BoatStrips, S1TowpathShadows, S1WingShades} from './V2S1_light';
 import {S1Plane, S1_PLANE} from './V2S1_float';
 import {useSwitches} from './switches';
-import {CloudSlot, SpraySlot} from './engine';
+import {CloudSlot, SpraySlot, TextureSlot} from './engine';
+import {useTime} from '../../lib/time';
+import {S1PipShadows} from './V2S1_pip';
 
 export type S1WorldProps = {
   /** Her figure behind the glass doors (between the lobby and the door glass). */
@@ -46,6 +48,22 @@ const S = MAP.S1_SHEET;
 /** The ONE thin cloud bar (y < 290, clear of the caption band 317-556): drifting the hero cloud's way, 9 px/s. */
 const CLOUD_BAR = {x: 40, y: 236, w: 300, h: 20, speed: 9} as const;
 
+/** The sky things (fixed: the sky never floats): the hero cloud and the thin bar, or under the cloud switch lane N's
+ *  hero cumulus alone; in the sky's mottle (the same seed as the sky's other groups: one surface). */
+const S1SkyThings: React.FC = () => {
+  const sw = useSwitches();
+  const t = useTime();
+  return (
+    <TextureSlot sw={sw} t={t} plane={S1_PLANE.sky} sky>
+      <CloudSlot
+        sw={sw}
+        fallback={<Cloud x={S.heroCloud.x0} y={S.heroCloud.y0 + 40} w={S.heroCloud.x1 - S.heroCloud.x0} h={(S.heroCloud.y1 - S.heroCloud.y0) * 0.7} seed="s1cloud" speed={S.heroCloudDriftPxS} top={CM.paper} />}
+      />
+      {sw.cloud ? null : <Cloud x={CLOUD_BAR.x} y={CLOUD_BAR.y} w={CLOUD_BAR.w} h={CLOUD_BAR.h} seed="s1cloudbar" speed={CLOUD_BAR.speed} />}
+    </TextureSlot>
+  );
+};
+
 /** Tier C: the environment (no outlines, hairlines only for the things that ARE lines). The slots keep their own
  *  tiers: {towpath} her + the row (A, V2S1_row), {seated} the lead's bank, {pip} Pip (B) and its bollard (C). */
 const Env: React.FC<{children?: React.ReactNode}> = ({children}) => <Tier tier="environment">{children}</Tier>;
@@ -57,18 +75,13 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
     {/* every group rides its plane's share of the shot's parallax float (V2S1_float; the sky and its clouds fixed) */}
     <Env>
       {/* sky things: the hero cloud (upper right, 2 px/s) + one thin bar (fixed: the sky never floats) */}
-      {/* (the look test's cloud switch: lane N's hero cumulus in this box; a placeholder draws the kit's cloud) */}
-      <CloudSlot
-        sw={sw}
-        box={[S.heroCloud.x0, S.heroCloud.y0 + 40, S.heroCloud.x1 - S.heroCloud.x0, (S.heroCloud.y1 - S.heroCloud.y0) * 0.7]}
-        speed={S.heroCloudDriftPxS}
-        fallback={<Cloud x={S.heroCloud.x0} y={S.heroCloud.y0 + 40} w={S.heroCloud.x1 - S.heroCloud.x0} h={(S.heroCloud.y1 - S.heroCloud.y0) * 0.7} seed="s1cloud" speed={S.heroCloudDriftPxS} top={CM.paper} />}
-      />
-      <Cloud x={CLOUD_BAR.x} y={CLOUD_BAR.y} w={CLOUD_BAR.w} h={CLOUD_BAR.h} seed="s1cloudbar" speed={CLOUD_BAR.speed} />
+      {/* (the look test's cloud switch: lane N's hero cumulus in the hero cloud's spot, and no bar (the one cloud; the
+          bar's 9 px/s is over N7's 2-6); the sky's mottle, its own seed, no float) */}
+      <S1SkyThings />
       {/* the plane branch in the top-left gutter: a NEAR twig (the full float) */}
       <S1Plane plane={S1_PLANE.near}>
-        {/* (the look test's foliage switch: lane N's London-plane leaf spray here; a placeholder draws v2's twig) */}
-        <SpraySlot sw={sw} box={[S.planeBranch.x0, S.planeBranch.y0, S.planeBranch.x1 - S.planeBranch.x0, S.planeBranch.y1 - S.planeBranch.y0]} fallback={<S1PlaneBranch />} />
+        {/* (the look test's foliage switch: lane N's London-plane leaf spray; off, v2's twig) */}
+        <SpraySlot sw={sw} fallback={<S1PlaneBranch />} />
       </S1Plane>
       {/* the west gap: far roofs + SUN0 (+4), the calm tower (+3), the road bridge, its bus and birds (+2); the one far
           jogger seen through the bridge's arch rides the bridge's plane (its clip is the arch) */}
@@ -98,10 +111,17 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
       {towpath}
     </S1Plane>
     {/* the moored boats (the right rail) with their waterline strips; the ducks sit still */}
-    <S1Plane plane={S1_PLANE.boats}>
+    {/* (the look test's texture: the strips multiply onto the WATER, another group: drawn outside the boats' mottle) */}
+    <S1Plane
+      plane={S1_PLANE.boats}
+      under={
+        <Env>
+          <S1BoatStrips which="A" />
+          <S1BoatStrips which="B" />
+        </Env>
+      }
+    >
       <Env>
-        <S1BoatStrips which="A" />
-        <S1BoatStrips which="B" />
         <S1Boats />
         {/* one duck at its water's scale (one camera: ~127 px/m there, a mallard ~0.58 m: ~70 px), by the bend, clear
             of Pip's zone and the sun's glitter path (the pale drake read as a ghost: the art director on v3); its contact
@@ -112,7 +132,11 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
     {/* our bank and its near things split their own planes (V2S1_steps) */}
     {seated}
     {/* (S1BankShade retired: the near foreground's big things carry their own form and front shades now) */}
-    <S1Plane plane={S1_PLANE.bank}>{pip}</S1Plane>
+    {/* (the look test's texture: the bollard's contact and cast shadows fall on the landing, the seated slot's group:
+        drawn outside this group's mottle) */}
+    <S1Plane plane={S1_PLANE.bank} under={pip ? <S1PipShadows /> : null}>
+      {pip}
+    </S1Plane>
   </CanalCast>
   );
 };

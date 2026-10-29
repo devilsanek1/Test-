@@ -39,18 +39,28 @@ export const S1_PLANE = {
 export const s1Float = (t: number): [number, number] => floatAt(t, S1_FLOAT_LEGS) as [number, number];
 
 /** One plane's group: translated by its share of the float (sub-pixel, never rounded); translate(0 0) at rest (the
- *  same tree every frame: nothing remounts when the float starts or stops). */
-export const S1Plane: React.FC<{plane: number; children?: React.ReactNode}> = ({plane, children}) => {
+ *  same tree every frame: nothing remounts when the float starts or stops).
+ *  (the look test) The plane's fills carry its mottle (engine TextureSlot) inside the translate, so it rides the float.
+ *  `under` / `over`: drawn in the same translate before / after the plane's fills but OUTSIDE the mottle, for a multiply
+ *  layer that falls on ANOTHER plane's group (a mottled group is isolated: inside it such a layer would paint its tint
+ *  solid). With the texture off the tree is v2's order exactly (under, children, over). `texture={false}`: never
+ *  mottled (a falling leaf); `region`: the mottle's filter region in the group's space (default the frame + 160 px). */
+export const S1Plane: React.FC<{plane: number; under?: React.ReactNode; over?: React.ReactNode; texture?: boolean; region?: [number, number, number, number]; children?: React.ReactNode}> = ({plane, under, over, texture = true, region, children}) => {
   const t = useTime();
   const sw = useSwitches();
   // (the look test: the float by 1/z when the switch is on, lane E's PARALLAX_Z; v2's PARALLAX_K otherwise)
   const [dx, dy] = parallaxOffset(s1Float(t), plane, currentFloatTable());
-  // (the look test's texture switch: each plane carries its own mottle inside its float group, so it rides with it)
   return (
     <g transform={`translate(${dx.toFixed(3)} ${dy.toFixed(3)})`}>
-      <TextureSlot sw={sw} t={t} plane={plane} sky={!Number.isFinite(plane)}>
-        {children}
-      </TextureSlot>
+      {under}
+      {texture ? (
+        <TextureSlot sw={sw} t={t} plane={plane} sky={!Number.isFinite(plane)} offset={[dx, dy]} region={region}>
+          {children}
+        </TextureSlot>
+      ) : (
+        children
+      )}
+      {over}
     </g>
   );
 };
