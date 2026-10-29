@@ -45,24 +45,29 @@ const BANK_TONES: CloudTones = {lit: '#FFE3BC', body: '#F8C9B1', belly: '#E9B0B6
 const TOP_TONES: CloudTones = {lit: '#FFE6CF', body: '#F5C6BC', belly: '#DEADBB'};
 /** A tower body's tones where its flat base sits in open sky: no belly band (the base is the body's own edge). */
 const flatBase = (c: CloudTones): CloudTones => ({...c, belly: c.body});
+/** The crown: its lit caps a small step over its body (a big facet reads as one hard line otherwise), no belly. */
+const CROWN_TONES: CloudTones = {lit: '#F9D6CB', body: '#F5C6BC', belly: '#F5C6BC'};
 
 const cloudSpecs = (sky: SkySpec): CumulusSpec[] => {
   const at = (x: number, y: number) => skyColorAt(sky, y, x);
   const base = {light: S1_KEY, sky: at, soft: {steps: 0}, drift: 0} as const;
+  // back to front: the crown, the waist (its top lobes over the crown's base), the foot and the bank (over the
+  // waist's base), the small cloud; so no tower body shows a straight base in open sky
   return [
-    // the long low bank behind the wing's roof: its flat base hidden by the roofline and the far roofs, its tops under
-    // the band
-    {...base, seed: 'v3-bank', x: 300, base: 1010, w: 980, h: 330, towers: 4, lobes: [0.035, 0.07], tones: BANK_TONES},
-    // the tower at the right edge, stacked from three bodies (the cumulus is a tablecloth: one body per storey): its
-    // foot behind the wing's roof, its waist through the band only at x > ~880 (the caption ends at ~800), its crown
-    // above the band spreading left like an anvil
+    // the tower's crown above the band, spreading left like an anvil (its far-left base scalloped: CROWN_UNDER); a
+    // gentle facet step only (a big crown's facet cut ran as one long straight line)
+    {...base, seed: 'v3-towerCrown', x: 650, base: 262, w: 560, h: 270, towers: 3, lobes: [0.08, 0.14], tones: CROWN_TONES},
+    // its waist, through the band only at x > ~880 (the caption ends at ~800): its base hidden inside the foot
+    {...base, seed: 'v3-towerWaist', x: 930, base: 780, w: 280, h: 560, towers: 2, lobes: [0.14, 0.22], tones: flatBase(TOP_TONES)},
+    // its foot behind the wing's roof
     {...base, seed: 'v3-towerFoot', x: 780, base: 905, w: 420, h: 400, towers: 3, lobes: [0.09, 0.16], tones: BANK_TONES},
-    {...base, seed: 'v3-towerWaist', x: 930, base: 640, w: 280, h: 420, towers: 2, lobes: [0.14, 0.22], tones: flatBase(TOP_TONES)},
-    {...base, seed: 'v3-towerCrown', x: 650, base: 262, w: 560, h: 270, towers: 3, lobes: [0.08, 0.14], tones: flatBase(TOP_TONES)},
+    // the long low bank behind the wing's roof: its flat base hidden by the roofline and the far roofs, its tops under
+    // the band; its left end catches the low sun (the glow)
+    {...base, seed: 'v3-bank', x: 300, base: 1010, w: 980, h: 330, towers: 4, lobes: [0.035, 0.07], tones: BANK_TONES},
     // a small calm cumulus above the band, between the spray and the tower (v2's hero cloud, moved left)
     {...base, seed: 'v3-small', x: 330, base: 258, w: 360, h: 112, towers: 3, lobes: [0.05, 0.09], tones: TOP_TONES},
   ];
-};;
+};;;
 
 /** [x, y, r]: lobes along the crown's base (y 284), their bottoms <= 290. */
 const CROWN_UNDER: [number, number, number][] = [
