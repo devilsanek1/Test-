@@ -605,6 +605,8 @@ def paint_mass(box, lobes, pal, sky, rng, prm, sun=SUN):
             if not (0 <= iy < h and 0 <= ix < w) or d[iy, ix] < 4:
                 continue
             toward = math.cos(am - a_l)                      # +1 on the lobe's lit side
+            if toward < -0.2:                                # no flat-brush arcs on the shade half: they draw rings
+                continue
             col = lift(cont[iy, ix], prm['block_lift'] * max(toward, 0) - 0.004 * max(-toward, 0) + rng.normal(0, 0.003),
                        rng.normal(0, 0.002), rng.normal(0, 0.002))
             bw = rng.uniform(*prm['block_w'])
@@ -695,11 +697,11 @@ def paint_mass(box, lobes, pal, sky, rng, prm, sun=SUN):
 
 # The depth ladder: near / mid / far plane numbers (px of the 1080 frame). The horizon streaks are the 4th plane.
 DEPTH = {
-    'near': dict(k=0.0, plane_blur=0.0, k_smooth=7.0, base_soft=20.0, base_wobble=8.0, top_light=0.45,
+    'near': dict(k=0.0, plane_blur=0.0, k_smooth=7.0, base_soft=20.0, base_wobble=12.0, top_light=0.45,
                  form_sigma=0.32, penetration=1.1, w_att=0.5, bulge=0.06, cuts=[0.34, 0.66], soft_cut=0.16,
                  base_blur=12.0, n_soft=10, p1_blur=12.0, n_block=9, block_w=(14, 32), block_lift=0.02, p2_blur=1.0,
                  n_inner=6, inner_w=(9, 15), inner_lift=0.016, n_rim=8, rim_w=(7, 14), rim_min_r=30, p3_blur=0.5,
-                 edge_lit=1.8, edge_shade=24.0, edge_base=40.0, base_drag=0.06, dry_cell=4.0, dry_aniso=7.0, dry_amp=0.8,
+                 edge_lit=1.8, edge_shade=24.0, edge_base=40.0, base_drag=0.0, dry_cell=4.0, dry_aniso=7.0, dry_amp=0.8,
                  n_speck=170, n_spatter=12, wind=-6.0),
     'mid': dict(k=0.22, plane_blur=1.3, k_smooth=12.0, base_soft=12.0, base_wobble=4.0, top_light=0.3,
                 form_sigma=0.4, penetration=1.2, w_att=0.45, bulge=0.1, cuts=[0.36, 0.7], soft_cut=0.18,
@@ -748,7 +750,7 @@ def paint_streaks(layer, pal, rng, sun=SUN, n_rows=4):
     """Thin horizon streaks along the sun line (the farthest plane): 4 rows above the horizon, lower = thinner and
     longer; each streak a level flat stroke, two-tone: a rose body a step off the band, its underside lit by the
     sun (brightest near the sun's x), crisp below, softer above, long taper away from the sun."""
-    rows = [(HORIZON - 16, 3.0, 4.5), (HORIZON - 30, 4.0, 6.0), (HORIZON - 48, 5.0, 8.0), (HORIZON - 74, 6.0, 10.0)]
+    rows = [(HORIZON - 16, 3.0, 5.0), (HORIZON - 30, 4.0, 7.0), (HORIZON - 48, 5.0, 9.0), (HORIZON - 74, 6.0, 12.0)]
     for ri, (y, wmin, wmax) in enumerate(rows[:n_rows]):
         x = rng.uniform(-120, 40)
         while x < FW + 40:
@@ -759,13 +761,13 @@ def paint_streaks(layer, pal, rng, sun=SUN, n_rows=4):
             xc = x + L / 2
             near = float(np.exp(-abs(xc - sun[0]) / 340.0))
             base = layer.c[int(np.clip(yy, 0, layer.h - 1)), int(np.clip(xc, 0, layer.w - 1))]
-            body = mix(base, pal['streak'], 0.75 - 0.12 * ri)
+            body = mix(base, mix(pal['streak'], pal['shade'], 0.15 * ri), 0.85 - 0.1 * ri)
             left_tail = xc > sun[0]          # the long taper points away from the sun
             ti, to = (0.45, 0.15) if left_tail else (0.15, 0.45)
             ang = math.radians(rng.normal(0, 0.35))
             p0 = (x, yy)
             p1 = (x + L * math.cos(ang), yy + L * math.sin(ang))
-            paint_line(layer, p0, p1, wd, body, rng.uniform(0.55, 0.8), e_pos=0.8, e_neg=1.6, t_in=ti, t_out=to,
+            paint_line(layer, p0, p1, wd, body, rng.uniform(0.7, 0.9), e_pos=0.8, e_neg=1.6, t_in=ti, t_out=to,
                        taper_w=0.5)
             lit = mix(body, pal['glow'], 0.45 + 0.55 * near)
             lit = lift(lit, 0.012 + 0.04 * near)
@@ -787,9 +789,6 @@ def paint_sun(layer, pal, sun=SUN, r=21.0, ridge_y=None):
     band_c = layer.c[int(min(sun[1] - r - 6, layer.h - 1)), int(sun[0])]
     col = mix(band_c, pal['sun'], 0.85)
     layer.over(sl, cov.astype(np.float32), col)
-
-
-BIRD_POSES = [(-0.55, 0.35), (-0.25, 0.25), (0.0, 0.15), (0.35, -0.1), (0.6, -0.25)]   # wing tip lift, elbow lift
 
 
 def paint_flock(layer, pal, rng, path, n=34, span=(6.0, 15.0), band=30.0, far_k=0.5, ss=4):
@@ -818,19 +817,19 @@ def paint_flock(layer, pal, rng, path, n=34, span=(6.0, 15.0), band=30.0, far_k=
         birds.append((t, px_ + rng.normal(0, 6), py_))
     for (t, px_, py_) in birds:
         sp = span[0] + (span[1] - span[0]) * (t ** 1.3) * rng.uniform(0.75, 1.15)
-        tip, elbow = BIRD_POSES[rng.integers(len(BIRD_POSES))]
-        tip += rng.normal(0, 0.08)
+        lift_ = float(np.clip(rng.normal(0.25, 0.28), -0.35, 0.7))     # wing tips: up (V) ... level ... down
+        bend = rng.uniform(0.12, 0.3)                                  # the gull's arched wing
         a = sp * 0.5
         lw = max(1, int(round((0.9 + 0.8 * t) * ss)))
         bxp, byp = (px_ - x0) * ss, (py_ - y0) * ss
         tilt = rng.normal(0, 0.12)
         for side in (-1, 1):
-            ex = bxp + side * a * 0.48 * ss
-            ey = byp - elbow * a * ss * 0.9 + side * tilt * a * ss * 0.5
-            tx_ = bxp + side * a * ss
-            ty_ = byp - tip * a * ss + side * tilt * a * ss
-            dr.line([(bxp, byp), (ex, ey), (tx_, ty_)], fill=255, width=lw, joint='curve')
-        dr.ellipse([bxp - lw * 0.8, byp - lw * 0.6, bxp + lw * 0.8, byp + lw * 0.9], fill=255)
+            tx_, ty_ = bxp + side * a * ss, byp - (lift_ + side * tilt) * a * ss
+            cx_q, cy_q = bxp + side * a * 0.45 * ss, byp - (lift_ * 0.5 + bend) * a * ss
+            pts = [((1 - u) ** 2 * bxp + 2 * (1 - u) * u * cx_q + u * u * tx_,
+                    (1 - u) ** 2 * byp + 2 * (1 - u) * u * cy_q + u * u * ty_) for u in np.linspace(0, 1, 7)]
+            dr.line(pts, fill=255, width=lw, joint='curve')
+        dr.ellipse([bxp - lw * 0.7, byp - lw * 0.5, bxp + lw * 0.7, byp + lw * 0.8], fill=255)
     cov = np.asarray(big, np.float32).reshape(bh, ss, bw, ss).mean(axis=(1, 3)) / 255.0
     # value by distance: far birds toward the sky behind (by far_k), near ones the full dark
     tt = np.linspace(0, 1, bw)[None, :] if cx_ >= ax else np.linspace(1, 0, bw)[None, :]

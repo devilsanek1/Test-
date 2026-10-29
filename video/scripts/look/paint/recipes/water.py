@@ -270,7 +270,7 @@ def reflect(src, water, k=0.25, dL=-4.0, cmul=0.9):
     """The reflection rule: a reflection moves 25 % toward the water's own colour, then 4 L* darker and
     a little greyer: light things reflect darker, dark things lighter. Works on images too."""
     l = lab(src) * (1 - k) + lab(water) * k
-    l[..., 0] += dL
+    l[..., 0] = l[..., 0] + dL
     l[..., 1:] *= cmul
     return rgb(l)
 
@@ -460,7 +460,8 @@ def wobble_rows(img, rng, amp_of_row, cell=7.0):
     return img[np.arange(H)[:, None], xs]
 
 
-def paint_reflection(cv, mask, W, seed, key, tgt, cover, yw, s_of, lights=(), breaks=True, op=0.95):
+def paint_reflection(cv, mask, W, seed, key, tgt, cover, yw, s_of, lights=(), breaks=True, op=0.95,
+                     simplify=(7, 19)):
     """Reflections of things above the water (the facade, the quay, posts, boats), as the recipe paints
     them: P1 the mirrored flat as an opaque soft underpaint (wobbled per row, its far end lost);
     P2 flat dashes that each take the target's colour at their centre; light sources get a glow column
@@ -470,6 +471,9 @@ def paint_reflection(cv, mask, W, seed, key, tgt, cover, yw, s_of, lights=(), br
     nz = Noise(g('noise'))
     yw_c = np.broadcast_to(np.asarray(yw, np.float64), (Wd,))
     d = np.arange(H)[:, None] - yw_c[None, :]
+    if simplify:  # only masses survive: a median over (rows, cols), the uncovered parts filled with water
+        filled = np.where(cover[..., None] > 0.5, tgt, base_of(W, s_of(np.arange(H)))[:, None, :])
+        tgt = np.stack([ndi.median_filter(filled[..., i], size=simplify) for i in range(3)], -1).astype(np.float32)
     # P1: opaque soft underpaint (no blending of complements: the reflection replaces the water)
     under = Layer(H, Wd)
     a = cover * smooth((d + 0.5) / 1.0) * op
@@ -558,7 +562,7 @@ def far_city(rng, Wd, H, x0, x1, base_y, hmin=6, hmax=30):
         m[ya:base_y, xa:xb] = 1
         tone[ya:base_y, xa:xb] = rng.normal(0, 1)
         x += w * rng.uniform(0.85, 1.05)
-    return ndi.gaussian_filter(m, 0.6), tone
+    return ndi.gaussian_filter(m, 0.9), ndi.gaussian_filter(tone, 0.9)
 
 
 def e1_mirror(seed, W):
@@ -587,9 +591,9 @@ def e1_mirror(seed, W):
     sl.blur(2.2).onto(cv, skym)
     # the far city (left), hazy, with a few tiny lit windows
     rq = g('city')
-    city, tone = far_city(rq, Wd, H, -10, 650, yh, 5, 26)
+    city, tone = far_city(rq, Wd, H, -10, 650, yh, 4, 20)
     haze = mix(W['haze'], W['sky_horizon'], 0.35)
-    cl = (lab(haze)[None, None, :] + np.stack([tone * 1.6, tone * 0.5, tone * 0.5], -1))
+    cl = (lab(haze)[None, None, :] + np.stack([tone * 1.1, tone * 0.4, tone * 0.4], -1))
     cv[:] = cv * (1 - city[..., None]) + rgb(cl).astype(np.float32) * city[..., None]
     wins = [(int(rq.uniform(20, 620)), int(rq.uniform(yh - 16, yh - 4))) for _ in range(9)]
     wins = [(x, y) for (x, y) in wins if city[y, x] > 0.9]
@@ -647,15 +651,16 @@ def e2_windows(seed, W):
     s_of = lambda y: lerp(0.55, 1.0, np.clip((y - yw) / (H - yw), 0, 1))
     # the target: the facade mirrored (the quay's top is not seen in a reflection; its face is)
     tgt, ok = mirror_rows_split(src, yw, H, face, 150, 26)
-    wcol = base_of(W, s_of(np.arange(H)))[:, None, :]
-    tgt = reflect(tgt, wcol).astype(np.float32)
+    srow = s_of(np.arange(H))
+    wcol = base_of(W, srow)[:, None, :]
+    tgt = reflect(tgt, wcol, dL=(-4 - 8 * srow)[:, None]).astype(np.float32)   # + Fresnel: darker toward us
     rr = rng_for(seed, 'e2', 'wob')
     d = np.arange(H) - yw
     tgt = wobble_rows(tgt, rr, 0.6 + 2.6 * np.clip(d / 120, 0, 1))
     ok = wobble_rows(ok[..., None], rr, 0.6 + 2.6 * np.clip(d / 120, 0, 1))[..., 0]
-    far_end = yw + face + (150 - 26)                  # the mirrored facade top: a lost edge
-    edge = 1 - smooth((np.arange(H) - (far_end - 26)) / 30.0)
-    cover = ok * edge[:, None] * (field(rr, H, Wd, 6, 60) * 0.5 + 0.75 > (1 - edge[:, None]) * 1.2)
+    far_end = yw + face + (150 - 26)                  # the mirrored facade top: a lost edge, broken by ripples
+    edge = 1 - smooth((np.arange(H) - (far_end - 34)) / 44.0)
+    cover = ok * (field(rr, H, Wd, 4, 46) < edge[:, None])
     lights = [(xa, xb, yw + face + (150 - yb), 1.8 * (yb - ya), reflect(c, base_of(W, 0.8)))
               for (xa, xb, ya, yb, c) in lit]
     n += paint_reflection(cv, water, W, seed, 'e2r', tgt, cover.astype(np.float32), yw, s_of, lights)
@@ -764,7 +769,8 @@ def e4_ripples(seed, W):
     post = ndi.gaussian_filter(((np.abs(xx - px) <= pw / 2) & (yy >= pt) & (yy < pb)).astype(np.float32), 0.6)
     r = g('post')
     rl = Layer(H, Wd)
-    pc = reflect(W['stone'], base_of(W, 0.9), k=0.3, dL=2)  # dark things reflect lighter
+    post_c = shift(W['stone'], dL=-16)
+    pc = reflect(post_c, base_of(W, 0.9), k=0.3, dL=2)  # dark things reflect lighter (still darker than the water)
     y = pb + 1.0
     while y < min(H, pb + 1.3 * (pb - pt)):
         k = (y - pb) / (1.3 * (pb - pt))
@@ -786,43 +792,60 @@ def e4_ripples(seed, W):
             if abs(x1 - x0) < 6:
                 continue
             near_arc = np.sin(th + span / 2) > 0
-            c = shift(base_of(W, 0.5), dL=3) if near_arc else shift(base_of(W, 1.25), dL=-2)
-            chisel(rings, nz, r, x0, x1, y0, (3.0 if near_arc else 2.2) * (1 - 0.15 * kk), c,
-                   op=[0.9, 0.65, 0.42][kk], slope=(y1 - y0) / (x1 - x0), soft=0.75, dry=0.3, bdepth=0.0, cj=0.0)
+            c = shift(base_of(W, 0.55), dL=2) if near_arc else shift(base_of(W, 1.15), dL=-1)
+            chisel(rings, nz, r, x0, x1, y0, (2.8 if near_arc else 1.8) * (1 - 0.15 * kk), c,
+                   op=[0.8, 0.58, 0.38][kk] * (1 if near_arc else 0.7), slope=(y1 - y0) / (x1 - x0), soft=0.8,
+                   dry=0.35, bdepth=0.0, cj=0.0, rag=0.3)
     rings.blur(0.35).onto(cv)
-    pcol = np.where((xx < px - 4)[..., None], shift(W['stone'], dL=10), W['stone']).astype(np.float32)
+    pcol = np.where((xx < px - 4)[..., None], shift(post_c, dL=12), post_c).astype(np.float32)
     cv[:] = cv * (1 - post[..., None]) + pcol * post[..., None]
     return cv, n
 
 
-def wet_ground(cv, mask, W, seed, key, body_wet, y0, y1, share=(0.7, 0.3), sky_t=(0.0, 0.85), streak=(3.0, 14.0),
-               clouds=((0.35, 0.16), (0.62, 0.1))):
-    """Wet sand / wet paving: the ground's wet colour mixed with the sky mirror (share: far -> near),
-    the sky's own bands (its cloud layers) mirrored as soft streaks along the ground, blurred along the
-    ground (streak sigma y, x)."""
+def wet_sky(W, t):
+    """What a wet surface mirrors, from its far edge (t=0, the low sky) toward us (t=1, the high sky):
+    the sky's own layers, with its cloud bands, so the wet ground gets value structure (bands)."""
+    cloud = mix(W['cloud_shade'], W['sky_upper'], 0.25)
+    return grad([(0, W['sky_horizon']), (0.16, W['sky_low']), (0.32, cloud), (0.5, W['sky_band']),
+                 (0.7, W['sky_upper']), (0.86, shift(W['cloud_shade'], dL=-4)), (1, W['sky_top'])], t)
+
+
+def wet_ground(cv, mask, W, seed, key, body_wet, y0, y1, share=(0.75, 0.35), sky_t=(0.0, 1.0), streak=(3.0, 14.0),
+               n_streaks=16):
+    """Wet sand / wet paving (recipe E5). P0: the ground's wet colour (darker, richer) mixed with the sky
+    mirror, share far -> near (grazing views mirror more). P1: soft streaks of the mirrored sky's own
+    colours laid along the ground, blurred along it (sigma y, x). Returns t (0 far .. 1 near) per row."""
     H, Wd = mask.shape
     g = lambda *k: rng_for(seed, key, *k)
     nz = Noise(g('noise'))
     t = np.clip((np.arange(H) - y0) / max(1, y1 - y0), 0, 1)
-    sk = sky_mirror(W, lerp(sky_t[0], sky_t[1], t))
-    # the sky's cloud bands, mirrored: a lavender band and a rose band
-    for (tc, w) in clouds:
-        b = np.exp(-0.5 * ((t - tc) / (w / 2.2)) ** 2)[:, None]
-        sk = mix(sk, np.broadcast_to(mix(W['cloud_shade'], W['sky_upper'], 0.4), sk.shape), 0.55 * b[:, 0])
+    sk = wet_sky(W, lerp(sky_t[0], sky_t[1], t))
     rows = mix(np.broadcast_to(body_wet, sk.shape), sk, lerp(share[0], share[1], t))
     cv[:] = cv * (1 - mask[..., None]) + rows[:, None, :].astype(np.float32) * mask[..., None]
     r = g('streaks')
     L = Layer(H, Wd)
-    for _ in range(14):
+    for _ in range(n_streaks):
         y = r.uniform(y0, y1)
         tt = (y - y0) / max(1, y1 - y0)
-        hh = r.uniform(8, 26)
-        c = shift(mix(body_wet, sky_mirror(W, r.uniform(0, 0.9)), lerp(share[0], share[1], tt)), dL=r.normal(0, 3))
+        hh = r.uniform(8, 24)
+        tsky = np.clip(lerp(sky_t[0], sky_t[1], tt) + r.normal(0, 0.12), 0, 1)
+        c = shift(mix(body_wet, wet_sky(W, tsky), lerp(share[0], share[1], tt)), dL=r.normal(0, 2))
         xa = r.uniform(-0.3, 0.6) * Wd
-        chisel(L, nz, r, xa, xa + r.uniform(0.3, 0.9) * Wd, y, hh, c, op=r.uniform(0.3, 0.55), soft=0.45 * hh,
-               dry=0.3, bdepth=0.08, cj=0.006)
+        chisel(L, nz, r, xa, xa + r.uniform(0.3, 0.9) * Wd, y, hh, c, op=r.uniform(0.35, 0.6), soft=0.45 * hh,
+               dry=0.3, bdepth=0.08, cj=0.006, rag=1.0)
     L.blur(streak).onto(cv, mask)
     return t
+
+
+def reflect_shape(cv, mask, shape, base_y, colour, length, blur=(2.0, 0.8), op=0.95):
+    """A thing standing on a wet surface: its silhouette mirrored about its base line, shorter (length =
+    share of its height), fading, soft along the view; at nearly its own value (dark reflects a bit lighter)."""
+    H, Wd = shape.shape
+    yy = np.arange(H)[:, None]
+    hgt = max(1, base_y - int(np.argmax(shape.max(1) > 0.5)))
+    refl = shape[np.clip(2 * base_y - np.arange(H), 0, H - 1), :] * (yy >= base_y) * \
+        (1 - smooth((yy - base_y) / (length * hgt)))
+    Layer(H, Wd).fill(colour, (ndi.gaussian_filter(refl, blur) * op).astype(np.float32)).onto(cv, mask)
 
 
 def e5_wet(seed, W):
@@ -835,44 +858,38 @@ def e5_wet(seed, W):
     # --- wet sand (left half) ---------------------------------------------------------------------
     sea_y = 40
     left = (xx < half).astype(np.float32)
-    sand = left * (yy >= sea_y - 3 * np.sin(xx / 70.0))
-    sand = ndi.gaussian_filter(sand.astype(np.float32), 0.6) * left
-    wet_ground(cv, sand, W, seed, 'e5s', W['sand_wet'], sea_y, H - 40)
-    sea = left * (1 - sand)
-    water_body(cv, sea, W, seed, 'e5sea', 0, sea_y, (0.55, 0.75), crisp=1, grain=False)
-    # the swash: the sea's last thin sheet, a lacy light edge
-    r = g('swash')
+    sand = ndi.gaussian_filter((yy >= sea_y - 3 * np.sin(xx / 70.0)).astype(np.float32), 0.6) * left
+    body = shift(W['sand'], dL=-18, cmul=1.15)
+    wet_ground(cv, sand, W, seed, 'e5s', body, sea_y, H - 40)
+    water_body(cv, left * (1 - sand), W, seed, 'e5sea', 0, sea_y, (0.55, 0.75), crisp=1, grain=False)
+    r = g('swash')                                      # the swash: the sea's last thin sheet, a lacy light edge
     sw = Layer(H, Wd)
     x = -30
     while x < half:
         run = r.uniform(40, 160)
         if r.random() < 0.75:
-            yc = sea_y + 2 - 3 * np.sin((x + run / 2) / 70.0)
-            chisel(sw, nz, r, x, x + run, yc, r.uniform(1.6, 2.8), W['f_light'], op=0.75, soft=0.7, dry=0.5, bdepth=0.0,
-                   cj=0.0)
+            chisel(sw, nz, r, x, x + run, sea_y + 2 - 3 * np.sin((x + run / 2) / 70.0), r.uniform(1.6, 2.8),
+                   W['f_light'], op=0.8, soft=0.7, dry=0.5, bdepth=0.0, cj=0.0, rag=0.6)
         x += run * r.uniform(1.05, 1.4)
     sw.onto(cv, left)
-    # the boulder (our flat) and its reflection: mirrored about its base, lifted, soft vertically, short
+    # the boulder (our flat) and its reflection: mirrored about its base, short, soft along the view
     bx, by, brx, bry = 250, 182, 74, 46
     base_y = by + 4
     boulder = ndi.gaussian_filter(((((xx - bx) / brx) ** 2 + ((yy - by) / bry) ** 2 < 1) & (yy < base_y)).astype(
         np.float32), 0.7)
-    refl = boulder[np.clip(2 * base_y - np.arange(H), 0, H - 1), :] * (yy >= base_y) * \
-        (1 - smooth((yy - base_y) / (0.8 * bry)))
-    Layer(H, Wd).fill(reflect(W['stone'], W['sand_wet'], k=0.3, dL=3), ndi.gaussian_filter(refl, (3.0, 1.0)) * 0.9 * left
-                      ).onto(cv)
-    # the thin water-edge lines on the sand (light; a few dark), long, soft-ended
-    r2 = g('edges')
+    stone = shift(W['stone'], dL=-6)
+    reflect_shape(cv, left, boulder, base_y, reflect(stone, body, k=0.2, dL=2), 0.85)
+    r2 = g('edges')                                     # thin water-edge lines (light; a few dark), soft-ended
     L2 = Layer(H, Wd)
-    for i in range(10):
+    for i in range(9):
         y = r2.uniform(sea_y + 12, H - 50)
         x0 = r2.uniform(-120, 360)
         tt = (y - sea_y) / (H - sea_y)
-        c = shift(sky_mirror(W, 0.05), dL=-4 - 10 * tt) if i < 7 else shift(W['sand_wet'], dL=-10)
-        chisel(L2, nz, r2, x0, x0 + r2.uniform(120, 420), y, r2.uniform(1.2, 2.0), c, op=0.75, soft=0.75, dry=0.5,
-               bdepth=0.0, cj=0.0, slope=r2.normal(0, 0.01), bow=r2.normal(0, 2), t1=0.4, thin_end=0.7)
-    L2.blur(0.4).onto(cv, sand)
-    # the wet/dry edge near the bottom: soft and wavy; the dry sand matte, speckled (near only)
+        c = shift(wet_sky(W, 0.05), dL=-6 - 10 * tt) if i < 6 else shift(body, dL=-8)
+        chisel(L2, nz, r2, x0, x0 + r2.uniform(120, 420), y, r2.uniform(1.3, 2.2), c, op=0.7, soft=0.8, dry=0.5,
+               bdepth=0.0, cj=0.0, slope=r2.normal(0, 0.01), bow=r2.normal(0, 2), t1=0.4, thin_end=0.7, rag=0.4)
+    L2.blur(0.5).onto(cv, sand)
+    # the wet/dry edge near the bottom: soft and wavy; the dry sand matte and lighter, speckled (near only)
     dry_m = ndi.gaussian_filter(((yy > H - 46 + 6 * np.sin(xx / 61.0) + 3 * np.sin(xx / 19.0)) & (xx < half)).astype(
         np.float32), 3.5)
     cv[:] = cv * (1 - dry_m[..., None]) + W['sand'] * dry_m[..., None]
@@ -880,45 +897,48 @@ def e5_wet(seed, W):
     cv[:] = np.clip(cv * (1 + 0.014 * gn / (gn.std() + 1e-6) * dry_m)[..., None], 0, 1)
     sp = g('speck')
     for _ in range(70):
-        x, y = int(sp.uniform(0, half)), int(sp.uniform(H - 40, H))
+        x, y = int(sp.uniform(0, half - 2)), int(sp.uniform(H - 40, H))
         if dry_m[y, x] > 0.8:
-            cv[y, x:x + 2] = shift(W['sand'], dL=sp.choice([-14, 10]))
-    lit_side = (xx < bx - 12)[..., None]
-    cv[:] = cv * (1 - boulder[..., None]) + np.where(lit_side, shift(W['stone'], dL=9), W['stone']) * boulder[..., None]
+            cv[y, x:x + 2] = shift(W['sand'], dL=float(sp.choice([-14, 10])))
+    cv[:] = cv * (1 - boulder[..., None]) + np.where((xx < bx - 12)[..., None], shift(stone, dL=9), stone) * \
+        boulder[..., None]
     # --- wet paving (right half) ------------------------------------------------------------------
     right = (xx >= half).astype(np.float32)
-    wet_ground(cv, right, W, seed, 'e5p', W['paving_wet'], 0, H, share=(0.45, 0.25), sky_t=(0.35, 0.95),
-               streak=(10.0, 2.0), clouds=((0.45, 0.2),))
-    # slab joints in perspective: lost far (top), crisp near (bottom), darker where wet
-    J = Layer(H, Wd)
+    pbody = shift(W['paving'], dL=-15, cmul=1.15)
+    wet_ground(cv, right, W, seed, 'e5p', pbody, 0, H, share=(0.5, 0.28), sky_t=(0.3, 1.0), streak=(10.0, 2.0),
+               n_streaks=22)
+    J = Layer(H, Wd)                                    # slab joints in perspective: lost far, crisper near
     vp = (820.0, -1400.0)
     for xb_ in np.arange(half - 600, Wd + 700, 170):
         for y in range(0, H):
             x = vp[0] + (xb_ - vp[0]) * (y - vp[1]) / (H - vp[1])
             if half <= x < Wd - 1:
-                J.a[y, int(x)] = lerp(0.12, 0.6, y / H)
-    for i, yj in enumerate([30, 92, 170, 266]):
-        J.a[yj:yj + 2, half:] = np.maximum(J.a[yj:yj + 2, half:], lerp(0.12, 0.6, yj / H))
-    J.rgb[:] = shift(W['paving_wet'], dL=-12) * J.a[..., None]
+                J.a[y, int(x)] = lerp(0.1, 0.55, y / H)
+    for yj in [30, 92, 170, 266]:
+        J.a[yj:yj + 2, half:] = np.maximum(J.a[yj:yj + 2, half:], lerp(0.1, 0.55, yj / H))
+    J.rgb[:] = shift(pbody, dL=-12) * J.a[..., None]
     J.blur(0.5).onto(cv, right)
-    # the puddle: crisp-edged, a sharper mirror of the higher sky; a light rim on its far edge
-    pud = np.zeros((H, Wd), np.float32)
-    for (cx, cy, ax, ay) in [(800, 222, 150, 28), (905, 240, 105, 24), (715, 238, 85, 18), (860, 205, 60, 12)]:
-        pud = np.maximum(pud, (((xx - cx) / ax) ** 2 + ((yy - cy) / ay) ** 2 < 1).astype(np.float32))
-    pud = ndi.gaussian_filter(pud, 0.6)
+    # the puddle: an organic crisp-edged shape; a darker wet ring round it; inside, a sharper mirror of
+    # the higher sky (lighter than the wet stone) with the lamp's reflections
+    env = np.exp(-0.5 * (((xx - 830) / 150.0) ** 2 + ((yy - 228) / 30.0) ** 2))
+    pud = (field(g('pud'), H, Wd, 22, 70) * 0.55 + env > 0.78).astype(np.float32) * right
+    pud = ndi.gaussian_filter(ndi.binary_opening(pud > 0.5, iterations=2).astype(np.float32), 0.6)
+    ring = np.clip(ndi.gaussian_filter(ndi.binary_dilation(pud > 0.5, iterations=6).astype(np.float32), 3) - pud, 0, 1)
+    Layer(H, Wd).fill(shift(pbody, dL=-7), ring * 0.45).onto(cv, right)
     pt_ = np.clip((yy - 190) / 75.0, 0, 1)
-    pc = mix(sky_mirror(W, lerp(0.55, 0.95, pt_)), W['paving_wet'], 0.12)
+    pc = mix(wet_sky(W, lerp(0.62, 0.98, pt_)), pbody, 0.1)
     cv[:] = cv * (1 - pud[..., None]) + pc.astype(np.float32) * pud[..., None]
-    rim = np.clip(pud - np.roll(pud, 2, axis=0), 0, 1)
-    Layer(H, Wd).fill(shift(sky_mirror(W, 0.1), dL=2), rim * 0.8).onto(cv)
-    # the lamp (our flat: a thin dark pole, its lit head above the swatch) and its reflections
-    lx = 646
+    rim = np.clip(pud - np.roll(pud, 2, axis=0), 0, 1)  # the far edge catches the low sky: a thin light line
+    Layer(H, Wd).fill(shift(wet_sky(W, 0.1), dL=2), rim * 0.75).onto(cv)
+    lx = 646                                            # the lamp: a thin dark pole (its lit head above the frame)
     pole = ((np.abs(xx - lx) < 3) & (yy < 128)).astype(np.float32)
-    rp = ((np.abs(xx - lx) < 3) & (yy > 132) & (yy < 320)).astype(np.float32) * (1 - smooth((yy - 132) / 190.0))
-    Layer(H, Wd).fill(reflect(W['stone'], W['paving_wet'], k=0.2, dL=0), ndi.gaussian_filter(rp, (7, 1.4)) * 0.7
-                      ).onto(cv, right)
+    rp = ((np.abs(xx - lx) < 3) & (yy > 132) & (yy < 330)).astype(np.float32) * (1 - smooth((yy - 132) / 200.0))
+    Layer(H, Wd).fill(reflect(W['stone'], pbody, k=0.2, dL=0), ndi.gaussian_filter(rp, (7, 1.4)) * 0.65
+                      ).onto(cv, right * (1 - pud))
+    Layer(H, Wd).fill(reflect(W['stone'], pbody, k=0.15, dL=-4), ndi.gaussian_filter(rp, (1.5, 0.7)) * 0.9
+                      ).onto(cv, pud)                   # sharper inside the puddle
     gl = np.exp(-0.5 * ((xx - lx) / 8.0) ** 2) * smooth((yy - 190) / 20.0) * (1 - smooth((yy - 230) / 100.0))
-    Layer(H, Wd).fill(reflect(W['window'], W['paving_wet'], k=0.15, dL=0), (0.7 * gl).astype(np.float32)).blur(
+    Layer(H, Wd).fill(reflect(W['window'], pbody, k=0.15, dL=0), (0.7 * gl).astype(np.float32)).blur(
         (6, 1.5)).onto(cv, right, mode='screen')
     cv[:] = cv * (1 - pole[..., None]) + shift(W['stone'], dL=-6) * pole[..., None]
     gp = ndi.gaussian_filter(g('pgrain').standard_normal((H, Wd)), 0.6)
@@ -934,41 +954,47 @@ def e6_foam(seed, W):
     cv = np.zeros((H, Wd, 3), np.float32)
     yy, xx = np.mgrid[0:H, 0:Wd]
     sea = ndi.gaussian_filter((yy < shore + 4 * np.sin(xx / 90.0 + 1)).astype(np.float32), 0.6)
-    wet_ground(cv, 1 - sea, W, seed, 'e6s', W['sand_wet'], shore, H, share=(0.72, 0.4), clouds=((0.5, 0.25),))
-    water_body(cv, sea, W, seed, 'e6sea', 0, shore, (0.1, 0.8), crisp=2, ripple_mul=0.7)
+    wet_ground(cv, 1 - sea, W, seed, 'e6s', shift(W['sand'], dL=-18, cmul=1.15), shore, H, share=(0.75, 0.45),
+               sky_t=(0.0, 0.7))
+    calm = dict(RIPPLE, dens=(0.06, 0.18))
+    water_body(cv, sea, W, seed, 'e6sea', 0, shore, (0.1, 0.8), crisp=2, ripple_spec=calm,
+               strata_spec=dict(STRATA, local_keep=0.1))
     r = g('foam')
-    for i, (y0, k, hmax) in enumerate([(40, 0.45, 4.0), (94, 0.75, 6.0), (shore - 9, 1.0, 9.0)]):
+    for i, (y0, k, hmax) in enumerate([(42, 0.45, 4.5), (96, 0.72, 7.0), (shore - 10, 1.0, 10.0)]):
         def curve(x, y0=y0, k=k, i=i):
             return y0 + 3.5 * k * np.sin(x / 90.0 + 1 + 0.4 * i) + 1.5 * np.sin(x / 31.0 + i)
-        face = Layer(H, Wd)                            # the wave face under the foam: a soft darker band
+        swell = field(rng_for(seed, 'e6', 'swell', i), 1, Wd + 400, 1, 70)[0]   # the line thickens where it breaks
+        face = Layer(H, Wd)                            # the wave face below the foam: a soft darker band
         x = -20
         while x < Wd:
             run = r.uniform(80, 220)
-            chisel(face, nz, r, x, x + run, curve(x + run / 2) + hmax * 1.1, hmax * 1.8,
-                   shift(base_of(W, 0.85 * k + 0.3), dL=-8), op=0.6, soft=0.35 * hmax * 1.8, dry=0.2, bdepth=0.0,
-                   cj=0.0)
+            chisel(face, nz, r, x, x + run, curve(x + run / 2) + hmax * 1.0, hmax * 1.7,
+                   shift(base_of(W, 0.85 * k + 0.3), dL=-8), op=0.45, soft=0.35 * hmax * 1.7, dry=0.2, bdepth=0.0,
+                   cj=0.0, rag=0.8)
             x += run * 0.9
         face.blur(2.0).onto(cv, sea)
         body, tops = Layer(H, Wd), Layer(H, Wd)
         x = r.uniform(-30, 10)
-        while x < Wd:                                  # the foam body: dry-brush segments with gaps
-            run = r.uniform(40, 200) * lerp(0.6, 1.0, k)
-            if r.random() < 0.82:
+        while x < Wd:                                  # the foam body: dry-brush masses with gaps
+            run = r.uniform(30, 150) * lerp(0.6, 1.0, k)
+            sw_ = float(swell[int(np.clip(x + run / 2 + 200, 0, Wd + 399))])
+            if r.random() < 0.55 + 0.4 * sw_:
                 yc = curve(x + run / 2)
-                h = hmax * r.uniform(0.65, 1.0)
+                h = hmax * lerp(0.35, 1.15, sw_) * r.uniform(0.8, 1.1)
                 warm = float(smooth((220 - x) / 220.0)) * 0.35   # the sun's side (left) is a touch warmer
-                c = mix(W['f_shade'], W['sky_low'], warm)
+                c = mix(mix(W['f_shade'], W['f_light'], 0.35), W['sky_low'], warm)
                 a, b = (x, x + run) if r.random() < 0.5 else (x + run, x)
-                chisel(body, nz, r, a, b, yc, h, c, op=0.9, soft=0.85, dry=0.55, bdepth=0.32, cj=0.014, t1=0.45,
-                       bow=r.normal(0, 0.6), thin_end=0.3)
-                if r.random() < 0.6:                    # the lit top: thin, crisp, broken
-                    chisel(tops, nz, r, a + 0.12 * (b - a), b - 0.2 * (b - a), yc - 0.4 * h, r.uniform(1.1, 1.9),
-                           mix(W['f_light'], W['sky_horizon'], warm), op=0.95, soft=0.55, dry=0.5, bdepth=0.0, cj=0.0)
+                chisel(body, nz, r, a, b, yc, h, c, op=0.92, soft=0.85, dry=0.55, bdepth=0.3, cj=0.014, t1=0.45,
+                       bow=r.normal(0, 0.6), thin_end=0.4, pressure=0.3, rag=1.1)
+                if r.random() < 0.65:                   # the lit top: thin, crisp, broken
+                    chisel(tops, nz, r, a + 0.1 * (b - a), b - 0.2 * (b - a), yc - 0.38 * h, r.uniform(1.2, 2.0),
+                           mix(W['f_light'], W['sky_horizon'], warm), op=0.95, soft=0.55, dry=0.5, bdepth=0.0, cj=0.0,
+                           rag=0.4)
                 for _ in range(int(r.integers(1, 5))):  # lace dabs under the foam
                     lx = r.uniform(min(a, b), max(a, b))
                     chisel(body, nz, r, lx, lx + r.uniform(3, 9), yc + h * r.uniform(0.6, 1.4), r.uniform(1.2, 2.4), c,
-                           op=0.6, soft=0.7, dry=0.3, bdepth=0.0, cj=0.0)
-            x += run * r.uniform(1.06, 1.4)
+                           op=0.6, soft=0.7, dry=0.3, bdepth=0.0, cj=0.0, rag=0.3)
+            x += run * r.uniform(1.04, 1.3)
         body.blur(0.45).onto(cv)
         tops.onto(cv)
     sw = Layer(H, Wd)                                  # the swash on the wet sand: thin, lacy, low contrast
@@ -979,8 +1005,8 @@ def e6_foam(seed, W):
             run = r.uniform(40, 150)
             if r.random() < 0.7:
                 chisel(sw, nz, r, x, x + run, y0 + 4 * np.sin((x + run / 2) / 45.0 + j), r.uniform(1.0, 1.7),
-                       shift(W['f_shade'], dL=6 - 5 * j), op=0.6 - 0.14 * j, soft=0.7, dry=0.5, bdepth=0.0, cj=0.0,
-                       slope=r.normal(0, 0.03))
+                       shift(W['f_light'], dL=-4 - 5 * j), op=0.65 - 0.14 * j, soft=0.7, dry=0.5, bdepth=0.0, cj=0.0,
+                       slope=r.normal(0, 0.03), rag=0.4)
             x += run * r.uniform(1.1, 1.6)
     sw.blur(0.5).onto(cv, 1 - sea)
     return cv, 0
@@ -1029,8 +1055,9 @@ def e7_canal(seed, W):
     tgt = des[np.clip(ys, 0, des.shape[0] - 1), xs[None, :]].astype(np.float32)
     tgt[face_rows] = shift(W['stone'], dL=6)
     cover = (face_rows | scene_rows).astype(np.float32)
-    wcol = base_of(W, s_of(np.arange(H)))[:, None, :]
-    tgt = reflect(tgt, wcol).astype(np.float32)
+    srow = s_of(np.arange(H))
+    wcol = base_of(W, srow)[:, None, :]
+    tgt = reflect(tgt, wcol, dL=(-4 - 8 * srow)[:, None]).astype(np.float32)   # + Fresnel: darker toward us
     rr = rng_for(seed, 'e7', 'wob')
     d = np.arange(H) - 75
     amp = 0.6 + 2.4 * np.clip(d / 120, 0, 1)
@@ -1078,9 +1105,10 @@ def e7_canal(seed, W):
             if abs(x1_ - x0_) < 6:
                 continue
             near_arc = np.sin(th + span / 2) > 0
-            c = shift(base_of(W, 0.45), dL=3) if near_arc else shift(base_of(W, 1.2), dL=-2)
-            chisel(rings, nz, r, x0_, x1_, yy0, (2.6 if near_arc else 2.0) * (1 - 0.15 * kk), c,
-                   op=[0.85, 0.6, 0.4][kk], slope=(yy1 - yy0) / (x1_ - x0_), soft=0.75, dry=0.3, bdepth=0.0, cj=0.0)
+            c = shift(base_of(W, 0.5), dL=2) if near_arc else shift(base_of(W, 1.1), dL=-1)
+            chisel(rings, nz, r, x0_, x1_, yy0, (2.4 if near_arc else 1.6) * (1 - 0.15 * kk), c,
+                   op=[0.75, 0.55, 0.35][kk] * (1 if near_arc else 0.7), slope=(yy1 - yy0) / (x1_ - x0_), soft=0.8,
+                   dry=0.35, bdepth=0.0, cj=0.0, rag=0.3)
     rings.blur(0.35).onto(cv, water * (1 - objf))
     # the contact line under the far quay, crisp and dark
     cl = np.clip(1 - np.abs(yy - yw[None, :] - 0.8) / 1.2, 0, 1) * (water > 0)

@@ -22,8 +22,8 @@ export const WIND = {
   T1: 1.0,
   /** The gust swell (s): the reference's ~2.2 s; incommensurate with T1. */
   T2: 2.3,
-  /** Phase lag root -> tip, in cycles of T1 (the tip ~0.6 of a cycle behind the root). */
-  lag: 0.6,
+  /** Phase lag root -> tip, in cycles of T1 (the tip ~0.8 of a cycle behind the root: one S along the end). */
+  lag: 0.8,
   /** Wave amplitude (degrees of bend per segment) at the root and at the tip. */
   ampRoot: 8,
   ampTip: 36,
@@ -46,7 +46,7 @@ export function endChain(root: Pt, length: number, rest: number, wind: Wind, sid
   const segL = length / n;
   for (let i = 0; i < n; i++) {
     const s = (i + 0.5) / n;
-    const amp = (WIND.ampRoot + (WIND.ampTip - WIND.ampRoot) * Math.pow(s, 1.3)) * s0;
+    const amp = (WIND.ampRoot + (WIND.ampTip - WIND.ampRoot) * Math.pow(s, 0.8)) * s0;
     const w1 = Math.sin(2 * Math.PI * (t / WIND.T1 - WIND.lag * s));
     const w2 = Math.sin(2 * Math.PI * (t / WIND.T2 - 0.35 * s) + 1.3);
     const gust = WIND.gustSwing * s0 * Math.sin(2 * Math.PI * (t / WIND.T2));

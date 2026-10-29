@@ -152,18 +152,22 @@ function legLoop(hip: Pt, knee: Pt, ankle: Pt, slim = 1): Pt[] {
 
 // ---------------------------------------------------------------- the scarf (the ONE flowing element)
 
-function scarfEnd(root: Pt, rest: number, wind: Wind, side: 1 | -1, length = 270, w0 = 19, w1 = 14): Part[] {
+function scarfEnd(root: Pt, rest: number, wind: Wind, side: 1 | -1, length = 270, w0 = 19, w1 = 11): Part[] {
   const c = endChain(root, length, rest, wind, side);
   const {top, bot} = ribbonEdges(c, w0, w1);
   // the upper edge faces the key (lit), the lower half rolls under (shade): two planes along its length
-  const loopPts = [...top, ...[...bot].reverse()];
+  // a soft rounded tip (one point past the end on the centreline)
+  const e = c[c.length - 1];
+  const e0 = c[c.length - 2];
+  const tipPt: Pt = [e[0] + (e[0] - e0[0]) * 0.35, e[1] + (e[1] - e0[1]) * 0.35];
+  const loopPts = [...top, tipPt, ...[...bot].reverse()];
   const mid = c;
   const under = [...mid, ...[...bot].reverse()];
   const n = c.length;
   const k0 = Math.floor(n * 0.86);
   const tipTop = top.slice(k0);
   const tipBot = bot.slice(k0);
-  const tip = [...tipTop, ...[...tipBot].reverse()];
+  const tip = [...tipTop, tipPt, ...[...tipBot].reverse()];
   return [
     {k: 'scarfEnd', pts: loopPts, tension: 0.4, mat: 'scarf', plane: 'lit', rim: 0},
     {k: 'scarfUnder', pts: under, tension: 0.4, mat: 'scarf', plane: 'shade'},
@@ -401,7 +405,7 @@ function profile(p: FigurePose): Build {
     ] as Pt[]
   ).map(([x, y]) => [x - lean * 2.4, y + bob * 0.85] as Pt);
   const rootPt: Pt = [36 - lean * 2.4, -826 + bob * 0.85];
-  const ends = scarfEnd(rootPt, walking ? 2 : 14, wind, 1);
+  const ends = scarfEnd(rootPt, walking ? 16 : 30, wind, 1);
   parts.push(...ends);
   if (carry !== 'box') {
     const fe = tube([[-36 - lean * 2.4, -806 + bob * 0.85], [-42 - lean * 2.2, -756 + bob * 0.85], [-45 - lean * 1.8, -712 + bob * 0.85]], [18, 17, 16]);
@@ -515,9 +519,9 @@ function behind(p: FigurePose): Build {
     // the sleeve hangs from a rounded shoulder, a little off the body, the elbow soft, the hand turned in
     const sh: Pt = [ax(side * 92), -792];
     const lenK = 1 - 0.1 * swingK; // foreshortened when swinging away from us
-    const elbow: Pt = [sh[0] + side * 30, sh[1] + PROP.upperArm * lenK];
-    const wrist: Pt = [elbow[0] - side * 6, elbow[1] + PROP.foreArm * lenK * (1 - 0.15 * swingK)];
-    const sleeve = tube([sh, elbow, wrist], [33, 25, 23]);
+    const elbow: Pt = [sh[0] + side * 34, sh[1] + PROP.upperArm * lenK];
+    const wrist: Pt = [elbow[0] - side * 16, elbow[1] + PROP.foreArm * lenK * (1 - 0.15 * swingK)];
+    const sleeve = tube([sh, lerp(sh, elbow, 0.5), elbow, wrist], [34, 30, 25, 22]);
     const hand: Pt[] = [
       [wrist[0] - 12, wrist[1] - 4],
       [wrist[0] + 12, wrist[1] - 4],
@@ -535,11 +539,11 @@ function behind(p: FigurePose): Build {
   const hemL = -PROP.hemHalf + 12 - (walking ? 4 : 0);
   const hemR = PROP.hemHalf - 12 + (walking ? 6 : 0);
   const half: Pt[] = [
-    [-26, -842],
-    [-70, -830],
-    [-104, -812],
-    [-114, -788],
-    [-110, -730],
+    [-26, -844],
+    [-64, -834],
+    [-96, -816],
+    [-110, -794],
+    [-109, -740],
     [-92, -660],
     [-80, -620],
     [-90, -566],
@@ -611,12 +615,13 @@ function behind(p: FigurePose): Build {
     parts.push({
       k: 'cheek',
       pts: [
-        [hx - 56, -948],
-        [hx - 68 - cw * 0.5, -918],
-        [hx - 66 - cw * 0.55, -886],
-        [hx - 50 - cw * 0.45, -858],
-        [hx - 30, -862],
-        [hx - 44, -900],
+        [hx - 50, -940],
+        [hx - 62 - cw * 0.45, -912],
+        [hx - 62 - cw * 0.6, -884],
+        [hx - 50 - cw * 0.55, -856],
+        [hx - 34 - cw * 0.3, -842],
+        [hx - 24, -856],
+        [hx - 40, -900],
       ],
       tension: 0.5,
       mat: 'skin',
@@ -624,7 +629,7 @@ function behind(p: FigurePose): Build {
       rim: 6,
     });
   }
-  const ends = scarfEnd([ax(54), -836], 8, wind, 1, 270, 19, 14);
+  const ends = scarfEnd([ax(54), -836], 24, wind, 1, 270, 19, 11);
   parts.push(...ends);
   parts.push({k: 'scarfWrap', pts: wrap, tension: 0.5, mat: 'scarf', shade: 34, rim: 7});
   parts.push({k: 'hair', pts: head, tension: 0.5, mat: 'hair', shade: 46, rim: 8});
