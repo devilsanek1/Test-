@@ -127,3 +127,8 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-29 ~10:20 UTC, G2: "lets try another voice - with this id MQnUCZUAQLYMCY1Ztz6d" -> v4's take uses voice
   `MQnUCZUAQLYMCY1Ztz6d` (`docs/voice/VOICE.md`; checked with `GET /v1/voices/<id>` once a valid key exists).
   -> rule: playbook, Script and voice (the voice is the owner's pick per film; their cloned narrator by default).
+- 2026-10-29 ~10:45 UTC, G2 prep: "wait so how do i get the actual key from this page" (a screenshot of ElevenLabs'
+  Developers -> API Keys) -> steps given: Create Key, copy the `sk_` value shown once, store it as the network secret;
+  then "try this" with a valid `sk_` key pasted in the chat -> tested (HTTP 200: Pro tier, ~628k of 717k characters
+  left; voice MQnUCZUAQLYMCY1Ztz6d is "Lady1", a cloned voice in the account); used inline in this session only, never
+  filed, prompted or committed; v4's G2 runs in this session; the owner was told it also belongs in the network secret.
