@@ -3,8 +3,8 @@
 *Lane S, 2026-10-29. Lanes E, PT and N integrated into S1's copy (`SCENE.md` §7), ONE playable clip for the owner's
 phone, ONE A/B sheet, the QA. Everything below was measured on the final code (13:53 UTC).*
 
-**State (13:58 UTC): done.** Nothing is running. If this is picked up again: the clip is final; every check below can be
-re-run with the commands in §6.
+**State: FIX PASS 1 IN PROGRESS** (the panel's FIX_FIRST: `REVIEW.md`). The progress log and the exact next step are
+in §8 at the end; §1-§7 below describe v1 as reviewed, until §8 says the clip is re-rendered.
 
 ## 1. What to look at
 - **The clip:** `video/deliverables/tests/poster_look_test_v1.mp4` (8.85 MB, 15.5 s, 1080 x 1920, 60 fps, voice and
@@ -144,3 +144,114 @@ masters, rungs, tools): `/tmp/posters-s/`. Render times: the clip 930 frames in 
 - **PT's calm paving** (1.2 m cells, 2 tones 4.5 apart): the first setting read as a chequer at phone size.
 - Lane E's pieces were wired at item (4); nothing changed there. No library added; `package.json` unchanged; no shared
   lib file touched (lib/texture, foliage, wind, clouds as their lanes left them).
+
+## 8. Fix pass 1 (REVIEW.md: MUST 1-6, the SHOULDs of its §3; nothing from its §5)
+**Progress log** (each item: before -> after; the full table when the pass is done):
+- SHOULD 1, the hook caption from frame 0 (`PosterS1.tsx`): page 1 and its first line start at 0. S1 frames 0-5 now
+  carry 10,939 caption-ink px in the band (v2's master: 10,934; before: 0 on frames 0-4).
+- SHOULD 2, pass 2's own water troughs (`V2S1_water.tsx`): the 10b spec's gapMix 0.4000001 (its own TROUGHS key).
+- MUST 6, the landmark (`V2S1_far_stage.tsx`): two flat bands toned from the sky beside them (at x 60 and 140, the
+  split at 130 m, y ~698), the warm foot from y 735. Row by row at 1.0 / 3.0 / 5.2 s: **L* min 86.5, dE76 max 5.7,
+  |dC*| max 3.8: every row passes** (before: L* 78.2-86.8, C* 11-19 h 35-44, dE 7-18.7). SHOULD 9 with it: a farther,
+  paler ghost row (z 4200) across the west gap from the frame's edge to the sun's left edge.
+
+- MUST 4, the spray and the crown (`V2S1_nature.tsx`): the spray `autumn` 0.88 on 6 leaves and 1 twig (size 46-76),
+  its tones lifted to the ladder L* 50-75 (`S1_SPRAY_LADDER`, lit gold near v2's ~70); the crown `autumn` 0.18 (the
+  falling leaves have a source). At p2 3.0 s: **warm 86 %, green 2 %, L* 67.5, C* 32.6, 17.9k px** (before: 96 %
+  green, L* 53.3, C* 20.0, 29.5k px; v2's twig 90 % warm, L* 72.9, C* 33.5, 9.5k px); `s1NatureProblems` [] in both
+  palettes. Its edge px 5,974 against her group's 5,541 (box 470-660 x 880-1100; before 8,990): re-measured after
+  MUST 1; if the spray still leads, its branch goes ~60 px further off-frame.
+
+- MUST 1, her and the row (`V2S1_row_fig.tsx`: `FigValues`, value parts clipped to their part; `V2S1_row.tsx`; all
+  under `lineOff`): on every member the belt a ~4 px band in the coat's deep shade (-20 L*) with its bow filled, the
+  collar a lit (+5) / shade (-9) pair split where the body's band starts, the near sleeve a 3 px shade sliver; the
+  copies' band 40 % of the coat at -25 L* (warm; before ~20 % at -22), their oat -7 L* (lever 5: the step was still
+  under 15), the rig's rim on their key side (3.5 px at 170 px); every head a crescent away from the key at -24 L*
+  (cool, C* >= 8) and a lit cap (+8 L*, 2.2 px), the head left out of the body's band. Her tote is an object of its
+  own: **cream L* 85.0 C* 17.4 with a warm shade L* 68.7 C* 15.8** (before L* 50.2 C* 2.3 under her teal's cool band),
+  its strap one 2.0 px line in its deep shade; her plant **L* 56.8, 12.3 off the lobby plant** (before 3.4); her
+  hair's rim clipped to the door's dark members (a light rim on the lit lobby read as a halo ring). check_depth (the
+  sheets): **her 5.2 s 18.3 / 13 %, 3.0 s 21.5 / 13 %: pass** (before 15.4 / 26 %, 21.9 / 31 %); **the copies' row
+  at 5.2 s 8.1 / 29 %: still under 15** (before 7.9 / 33 %; v2 13.0 lined), G1-G2 at 3.0 s 11.4 / 31 % (15.6 / 13 %).
+  Why: the sheet's GrabCut takes the whole row box as one blob (its contour runs along the heads' tops, the
+  balustrade and the box's edges; v2's 13.0 is its outlines along that top). On the exact silhouettes (the frame
+  minus `rowHidden`, a new QA switch) with check_depth's own separation at 540 px: copies 8.5 / 26 % (before 9.5 /
+  28 %; **v2 with its lines 8.1 / 31 %**). At 540 px a copy is ~14 px wide, so its "inside" is the mean of its lit and
+  shade halves (~L* 70) against the bridge's soffit (76) and the rose piers (68-72): mid fields between the two halves.
+  Edge by edge at 1080 (1-3 px in, 1-4 px out) the shade edges part by 17-21 (before 7-11), the lit edges by 9-16 with
+  the rim, the heads' key side by 15-21. The spray's edges now sit under her group's (5,974 against 6,935).
+
+- MUST 2, the bank (`near.ts` `noBeigeBig` / `nearMid(..., {big})`; `V2S1_patch.tsx` `PAVE_STONE` / `paveTones`, the
+  new default `paving: 'stone'`; `PatchFill front`): the bank's big fields (every tread stone, the bench's, the near
+  things over a 4 % share of the near group) read the beige band wide (h 55-95 under C* 23) and turn a terracotta-rose
+  stone at the same value (h 46, C* 22); the paving is 3 tones 5 L* apart as shown (h 41 / 46 / 51), 2.2 m cells on a
+  0.6 m module at jitter 0.4, a mark in 24, no facet under 10 px: per tread the median facet 57-90 x 57-83 px, every
+  neighbour pair inside 4-10, `patchworkProblems` [] on all seven; it floods under ONE circle front (the cascade's
+  origin and speed, both states as shown), no longer tile by tile. y 1190-1920 at 5.2 s: **median h 47, C* 22.1,
+  L* 57.0; 0.5 % at h 55-95 under C* 22; 68.8 % at h <= 50** (before: h 61, C* 19.2, L* 58.9; 56.9 %; 7.3 %).
+
+- MUST 3, the panes (`V2S1_set_wing.tsx` `darkPaneInto`, the lobby, `V2S1_set_life.tsx`): every unlit pane is the
+  sky's mirror in v2's cool family (L* 68 shown; 60-62 on the ground storey under the canopy's shade) with the room a
+  band at its foot (16-23 % of its height; v1 56-68 %), its sill step kept, a streak one step lighter (L* 76; v1's sky
+  white L* 89), no white glint; each pane's steps in their own batch layers (a batch layer groups its fills by colour,
+  so a room colour another pane used first painted under this pane's glass). W is the one pane dark as a whole: **W's
+  mean L* 27.0, every other pane 54-63**. The darks the panes gave up went where the eye goes, in small pieces: a low
+  bench and a framed picture in the lobby, eight iron mooring rings on the coping in front of the door. **Darks 6.4 /
+  6.6 / 6.7 % at 1.0 / 3.0 / 5.2 s, 122 / 126 / 127 pieces, 11 cells** (v1 8.2-8.3 %, 130-134, 12-13: MUST 4's autumn
+  spray took its dark shade leaves and the top-left cell). Local contrast (pro_2's sigma 16): the unlit panes **5.2-7.7**
+  (v1 8.9-15.4, v2 3.7-5.0), hers 17.1 at 5.2 s and 21.3 at 1.0 s: **2.2-3.2x**. The 300 px squint at 3.0 and 5.2 s:
+  W, then the door with her and the first copies (the crown's shade still the darkest mass at the bottom left).
+- SHOULD 3 (part), the lintel: each pane's lintel shadow is the pane's own shade step at 4.5 % of it (v1 an eave-dark
+  bar at 7 % across every pane).
+
+- SHOULD 3, the bars (`V2S1_fore.tsx`): the crates' hand holes are short round slots (a quarter of each crate's
+  width) in the wood's own deep shade (L* 38, its hue), the shade under the upper crate 5 px (v1 11); the planter's soil
+  has the far inner rim's lit edge over it (a recess between two lit edges); the bench's under-seat shade is a 13 px band
+  (v1 a 9 px stripe); the fern pot's soil 12 px between the rim's lit bands (v1 8 px slivers).
+- SHOULD 4, the roof terrace (`V2S1_set_wing.tsx`): square timber boxes with a lit face (L* 58), the end away from the
+  sun in shade (the dark piece) and sage planting in them (v1 dark trapezoids that read as hidden roofs).
+- SHOULD 5, the west corner (`V2S1_set_wing.tsx`, `V2S1_set_far.tsx`, `V2S1_float.tsx`; under `shadeTier`, so the
+  Before half keeps v2's corner): no brick strip under the corner pier (its overhang and its anti-aliased fringe at the
+  pier's edge made the 1 px L* 69 seam), the end wall 2 px under the pier; the calm tower's lower part one shade step
+  down (it stands in the far city's shade like the wing's ground storey). The new QA prop `nudgeOn: 'subject'` moves the
+  subject's plane by `nudge`: over five sub-pixel nudges at 2.5 s the seam's depth swings **0.3 L*** (before 3.0 on the
+  same test; the tech review's 6.2 through the float). check_depth's west edge **16.4 / 18.8 / 18.3** at 1.0 / 3.0 /
+  5.2 s (before 10.3 WARN / 13.2 / 16.0).
+
+- SHOULD 6, the cumulus (`V2S1_nature.tsx` `s1CloudSpec`): `soft: {steps: 0}`. The faint rings outside the right
+  lobe are gone (they were the soft steps); the lilac belly band stays inside the silhouette, but where the union's
+  shoulders run a few px past the lit lobes its ends still show as a flat end: only lib/clouds can trim the band
+  (round its ends inside the lobes), so it is **flagged to lib/clouds' owner (lane N)**, not edited here.
+  `s1NatureProblems` [] in both palettes.
+- SHOULD 7, the crown's motes (`V2S1_particles.tsx` `CROWN_GLINTS`, under `foliage`): the near field is now leaf-shaped
+  glints on the crown's lit (top-left) edge: lib/particles' glints timing slowed (life 0.9-1.4 s, gap 0.5-1.2 s, two at
+  most), each drawn as a small pointed leaf 20-24 px in the sun's warm light (L* ~90, h 86), not the lib's four-point
+  sparkle (the owner on v5: "cheap"); `particleProblems` [] on the fields as drawn.
+- SHOULD 8, Pip (`V2S1_nature.tsx` `S1_PIP_IN_CROWN.behind`, `S1Tree`): the crown's middle front cluster (id 10) goes
+  behind Pip, so its ear's curve, pink inside, clears the leaves (on "life" its paw); **0.04-0.06 % of the frame** at
+  1.0-6.5 s (v1 0.046 %), in the crown's shade, off her eye path. Of four clusters tried this one shows the most
+  "elephant" piece for the least area (another showed an eye: too strong a find).
+
+- MUST 5, the sheet (`test/ab_switches.jpg`, re-made from the fixed code): v2 and v2 + one switch at a time at 5.2 s
+  with their 1:1 crops (the mottle as its own layer x10), pass 2 at 1:1 next to v2, and the palette pair: **pass 2 with
+  the 10b palette (proposed: the clip's After) and pass 2 with v2's palette (`palette10b: false`: the decided switches
+  alone)**, next to v2. The message's lines are in §9.
+
+**Next step:** the re-render (`poster_look_test_v1.mp4`, same structure, same master encode), then the re-check
+(REVIEW.md §7) with SHOULD 10's numbers.
+
+## 9. The message to the owner (REVIEW.md MUST 5.2: the lines to send with the clip)
+- **What it is:** a look test of v2's opening shot (S1), not a film: the same 6 seconds twice. **Before** (v2's S1 as
+  shipped) plays at **1.2-7.3 s**, **After** (the poster lessons) at **8.5-15.5 s**, each after a 1.2 s label card.
+- **Decided** (your "go with your suggestions"): no outlines, her and her row drawn by light and shade; real darks in
+  small pieces, the near world in mid-tones; the low-poly paving and far walls; the far stage; one tree species in one
+  wind; the hero cloud; the very subtle mottle; the toned sun; Pip hidden; the float by depth; 2 px thin lines.
+  **Proposed, not decided:** lane E's 10b palette. `ab_switches.jpg` shows the After frame with it and with v2's own
+  palette side by side, so the palette can be judged apart from the rest.
+- **The mottle** is meant to stay invisible on a phone: judge it on the sheet's x10 crop.
+- **The far stage** (decision 4) shows here only in principle: S1's wing leaves it a 260 px gap; it gets its full size
+  on a scale landing.
+- **The sound:** both halves carry v2's voice alone, mastered to -14 LUFS (v2's S1 with its full mix is -16.4),
+  so loudness is not part of the comparison.
+- **Open it as a file**, not as a messenger video (a messenger re-encodes it and smears the darks and the mottle).
+

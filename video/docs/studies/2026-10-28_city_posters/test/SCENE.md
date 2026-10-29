@@ -3,7 +3,8 @@
 *Lane S of the 7 s look test (`STUDY.md` §10: items 5 and 7, the S1 copy and the switches; item 11, the integration and
 the clip). 2026-10-29. Items (1)-(4) done 09:04 UTC; the integration of lanes E, PT and N done 09:50 UTC, its fixes
 through 13:53 (§7); the clip `deliverables/tests/poster_look_test_v1.mp4`, the A/B sheet `ab_switches.jpg` and the QA:
-`REPORT.md` (done 13:58 UTC). Scratch work in `/tmp/posters-s/` only (tools in `/tmp/posters-s/tools/`: `s_pxdiff.py`,
+`REPORT.md` (done 13:58 UTC). **Fix pass 1** (the panel's `REVIEW.md`, FIX_FIRST): every MUST and SHOULD built and
+measured (§8), the sheet re-made; the re-render and the re-check are the next step (`REPORT.md` §8). Scratch work in `/tmp/posters-s/` only (tools in `/tmp/posters-s/tools/`: `s_pxdiff.py`,
 `s_audio.sh`, `s_capcheck.sh`, `s_rungs.py`, `s_absheet.py`, `s_rowtable.py`, `s_edgetrack.py`; node harnesses in
 `/tmp/posters-s/harness/`; an early tool of mine in the shared scratchpad, `tools/pxdiff.py`, is the one that replaced
 lane E's: every proof below was re-run from my own folder).*
@@ -55,10 +56,11 @@ A render takes ~1 s a frame at full size; the bundle 2-6 s.
 | `foliage` | the planter's tree as ONE species, a young London plane (N's crown geometry in N's one wind: foot (126, 1530), 300 px tall, 372 wide; Pip inside it under `pipHidden`), and the top-left twig as a spray of its own leaves (N's S1 spray), in ONE wind (`S1_WIND`: a light westerly, one gust at 2.6 s) | lib/foliage + lib/wind (N) | wired, rendered | `V2S1_nature.tsx`; `engine.tsx` TreeSlot, SpraySlot; `V2S1_fore.tsx` PlanterTree; `V2S1_set.tsx` |
 | `cloud` | N's hero cumulus in v2's hero-cloud spot (x 598-1028, base y 272: above the band over its 3 px/s drift), the kit's two clouds gone (the thin bar's 9 px/s is over N7's 2-6) | lib/clouds (N) | wired, rendered | `V2S1_nature.tsx` S1Cloud; `engine.tsx` CloudSlot; `V2S1_set.tsx` S1SkyThings |
 | `texture` | the VERY subtle mottle per plane (true, or a number: on from that second): PT's `<Mottle>` in each plane group (`S1PlaneStack` layers), `mottleK` per plane (the sky 0.6 at blotch scale 0.9, the far stage 0.4 on the sky's seed, +3/+4 0.4, the rest 0.7), `mottleSeed(plane)`, the float offset passed (the band stays screen-locked). NOT mottled (§7): the spray, the tree and Pip, the boats and the duck, the bridge, particles; the cross-plane shadows sit outside the filter | lib/texture (PT) | wired, rendered | `engine.tsx` TextureSlot; `V2S1_float.tsx` S1PlaneStack; `V2S1.tsx` (the sky); `V2S1_set.tsx` |
-| `paving` | (optional) the patchwork's setting: 'calm' (default, decided), 'mid' (PT's 3 tones at 4.5, 1.2 m) or 'busy' (the first pass) | lib/patchwork (PT) | built | `V2S1_patch.tsx` |
+| `paving` | (optional) the patchwork's setting: 'stone' (default since fix pass 1: 3 tones 5 L* apart with a 5 deg hue turn, 2.2 m cells, jitter 0.4 on a 0.6 m module, one flood front), 'calm' (v1's: 2 tones on 1.2 m, a diamond chequer), 'mid' (PT's 3 tones at 4.5, 1.2 m) or 'busy' (the first pass) | lib/patchwork (PT) | built | `V2S1_patch.tsx` |
 | `textureK` | (optional) a multiplier on every plane's mottle strength (A/Bs; 0.0001 = the filter with no visible mottle: the filter-only test of §7) | lib/texture (PT) | built | `engine.tsx` |
 | `windStill` | (optional) the wind held still (lib/wind `STILL_WIND`): the crown and the spray ride the float only (the QA's twinkle test) | lib/wind (N) | built | `V2S1_nature.tsx` |
-| `nudge` | (QA only) [dx, dy] added to the near plane's float offset: lane N's strict twinkle test (a held frame moved by pure sub-pixel steps) | the scene (S) | built | `V2S1_float.tsx` |
+| `nudge` | (QA only) [dx, dy] added to the near plane's float offset: lane N's strict twinkle test (a held frame moved by pure sub-pixel steps); with `nudgeOn: 'subject'` to the subject's plane (0) instead (the wing's corners, bars, the door frame) | the scene (S) | built | `V2S1_float.tsx` |
+| `rowHidden` | (QA only) her and the row not drawn: the frame minus this one is the figures' exact silhouettes (the separation measured along each figure's own edge) | the scene (S) | built | `V2S1_row.tsx` |
 | `sunToned` | the sun one flat step off its sky (decision 6 b): the disc mixed toward the sky round its cap until dE76 18 (under tier A's separation), frame 0's half-coloured disc in the same toned colour | the scene (S) | built | `V2S1_set_far.tsx` sunToned |
 | `pipHidden` | a quiet "find Pip" (decision 5 b): Pip sits INSIDE the bay tree on our bank (seat 184, 1446; 100 px, nearer than the bollard so never smaller per metre), between the crown's back and front lobes: its head and ears among the leaves, its body behind the front lobe; >= 250 px from her and off her eye path; the same beats (drawn with the flood, ears-cover on "life", sits at 5.55); the empty bollard stays (a dark piece under `darks`) | the scene (S) | built | `V2S1_pip.tsx` S1PipInTree; `V2S1_fore.tsx` |
 | `float1z` | the float by 1/z: E's `PARALLAX_Z` (-2 1, -1 0.8, 0 0.6, +1 0.24, +2 0.10, +3 0.04, +4 and the stage 0) in every plane group and in the water's reflections | lib/depth (E) | wired | `engine.tsx` applyFloat; `V2S1_float.tsx`; `V2S1_water.tsx` |
@@ -202,3 +204,33 @@ design, so 11 of 16 cells is the most S1 can hold.
 - **Libraries** (the owner: only when genuinely better): none needed. The far stage is a level pinhole (five formulas
   next to lib/persp's homographies), the darks are drawing, the switches React props; nothing was installed and
   `package.json` is unchanged.
+
+## 8. Fix pass 1 (REVIEW.md: MUST 1-6, the SHOULDs; numbers in `REPORT.md` §8)
+Every change sits behind a pass-2 switch (the v2 preset is still 0 px against `Film2R-V2S1` at 1.0 / 3.0 / 5.2 s; its
+frame 0 now carries the hook caption on purpose: SHOULD 1).
+| Item | What | Switch | Where |
+|---|---|---|---|
+| MUST 1 | the row's drawing as value shapes (`FigValues`: belt band, filled bow, collar lit/shade pair, sleeve sliver, clipped to their parts); the copies' band 40 % at -25 L*, their oat -7 L*, the rig's rim on their key side; every head a crescent (-24, cool) and a lit cap; the head out of the body's band (a mask with holes); her tote its own object (cream, a warm shade, the strap a 2.0 px line), her plant a mid sage, her hair's rim clipped to the door's dark members (`s1DoorDarkD`) | `lineOff` (`shadeTier` for the band's strength) | `V2S1_row_fig.tsx`, `V2S1_row.tsx`, `V2S1_set_wing.tsx` |
+| MUST 2 | the bank's big fields read the beige band wide (`noBeigeBig`: h 55-95 under C* 23 -> terracotta-rose, h 46 C* 22); the stone paving (`PAVE_STONE`, `paveTones`); `PatchFill front`: one circle flood front | `darks` / `nearMid`; `patchwork` | `near.ts`, `V2S1_steps_stone.tsx`, `V2S1_fore.tsx`, `V2S1_patch.tsx` |
+| MUST 3 | unlit panes: sky glass L* 68 (shown), the room a band at the foot (16-23 %), a streak one step lighter, no glint, each pane in its own batch layers; the lintel the pane's own shade step; the darks moved to the door (a lobby bench, a framed picture, eight mooring rings) | `darks` | `V2S1_set_wing.tsx`, `V2S1_set_life.tsx` |
+| MUST 4 | the spray autumn 0.88 on 6 leaves / 1 twig, its ladder lifted; the crown autumn 0.18 | `foliage` | `V2S1_nature.tsx` |
+| MUST 5 | the A/B sheet re-made with the palette pair (pass 2 with and without 10b) | (render) | `ab_switches.jpg` |
+| MUST 6 + SHOULD 9 | the landmark toned from the sky at its own height (`bandTone`, two flat bands, the warm foot from y 735); a farther ghost row across the west gap | `farStage` | `V2S1_far_stage.tsx` |
+| SHOULD 1 | the hook caption from frame 0 (page 1's first beat and line at s 0) | (both halves) | `PosterS1.tsx` |
+| SHOULD 2 | the 10b water's own troughs (gapMix 0.4000001) | `palette10b` | `V2S1_water.tsx` |
+| SHOULD 3 | the crates' hand holes short round slots, the under-crate shade 5 px, the planter soil with a lit far rim, the bench's shade a 13 px band, the fern soil 12 px | `darks` | `V2S1_fore.tsx` |
+| SHOULD 4 | the roof planters square boxes with a lit face, a shade end and plants | `darks` | `V2S1_set_wing.tsx` |
+| SHOULD 5 | no brick under the corner pier, the end wall 2 px under it; the calm tower's lower part one shade step down | `shadeTier` | `V2S1_set_wing.tsx`, `V2S1_set_far.tsx` |
+| SHOULD 6 | the cumulus without soft steps (the belly's ends flagged to lib/clouds' owner) | `cloud` | `V2S1_nature.tsx` |
+| SHOULD 7 | the near motes as leaf-shaped glints on the crown's lit edge (`CROWN_GLINTS`, drawn as small leaves) | `foliage` | `V2S1_particles.tsx` |
+| SHOULD 8 | the crown's middle front cluster behind Pip: its ear's curve clears the leaves | `foliage` + `pipHidden` | `V2S1_nature.tsx` |
+Tools (scratch, `/tmp/posters-s/tools/`): `s_figsep.py` (check_depth's separation on exact silhouettes), `s_edges.py`
+(per-edge steps at 1080), `s_grabmask.py` (the sheet's GrabCut blob drawn), `s_bankhue.py`, `s_darks.py` (pro_4's darks
+and a map), `s_lc.py` (pro_2's local contrast in boxes), `s_seam.py` (the corner seam under nudges), `s_pip.py`,
+`s_spray.py`, `s_tower.py`, `s_absheet2.py` (the sheet); harnesses `s_rowtones`, `s_bank`, `s_pave`, `s_glints`,
+`s_lint` (esbuild). An `npx esbuild` run once from the scratch folder fetched esbuild into npm's own cache (not the
+project: `package.json` and `node_modules` unchanged); every later run used the project's copy.
+
+**Next step:** the re-render of `deliverables/tests/poster_look_test_v1.mp4` (the clip's structure and master encode as
+in `REPORT.md` §6: PosterLookTest frames, `render-media.mjs --master`, the audio mux `s_audio.sh`), then REVIEW.md §7's
+re-check and REPORT.md §8's table.

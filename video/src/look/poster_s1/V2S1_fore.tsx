@@ -20,7 +20,8 @@ import {CM} from '../../v2r/palette';
 import {floodAt} from './V2S1_clock';
 import {BANK_LIT, BANK_PAVE, GROUND_VP, edgeSlope} from './V2S1_steps_stone';
 import {useSwitches} from './switches';
-import {dark} from './darks';
+import {dark, forTier} from './darks';
+import {fromLch, lch} from '../../lib/light';
 import {nearMid} from './near';
 import {S1PipInTree} from './V2S1_pip';
 import {TreeSlot} from './engine';
@@ -57,6 +58,26 @@ const groundEll = (cx: number, cy: number, rx: number, ry: number) => {
   }
   return poly(pts);
 };
+
+/** (REVIEW SHOULD 3) A short slot with round ends (a crate's hand hole), its long axis along the ground's edges. */
+const roundSlot = (cx: number, cy: number, w: number, h: number) => {
+  const a = Math.atan(edgeSlope(cx, cy));
+  const r = h / 2;
+  const half = Math.max(0, w / 2 - r);
+  const pts: Pt[] = [];
+  for (let k = 0; k <= 12; k++) {
+    const u = -Math.PI / 2 + (k / 12) * Math.PI;
+    pts.push([half + r * Math.cos(u), r * Math.sin(u)]);
+  }
+  for (let k = 0; k <= 12; k++) {
+    const u = Math.PI / 2 + (k / 12) * Math.PI;
+    pts.push([-half + r * Math.cos(u), r * Math.sin(u)]);
+  }
+  return poly(pts.map(([ex, ey]) => [cx + ex * Math.cos(a) - ey * Math.sin(a), cy + ex * Math.sin(a) + ey * Math.cos(a)] as Pt));
+};
+/** (REVIEW SHOULD 3) The crate wood's own deep shade as shown (a warm wood shade, L* 38: still one of the darks),
+ *  authored for tier C. */
+const woodDeep = () => forTier(fromLch(38, 22, lch(WOOD).h - 12), 'environment');
 
 /** The things in screen px (zoom 1.00, the camera is locked): each base on its own tread of the two-point bank. */
 export const FORE = {
@@ -178,6 +199,9 @@ const Planter: React.FC = () => {
         <F key={i} d={slab(xa, [58, 164, x1][i], xc, rim + 14, base)} c={i % 2 ? TERRACOTTA_DEEP : TERRACOTTA} s={`plBoard${i}`} />
       ))}
       {darks ? <D d={slab(x0 - 8, x1 + 10, xc, rim - 12, rim + 2)} c={dark('wood')} s="plSoil" /> : <F d={slab(x0 - 8, x1 + 10, xc, rim - 12, rim + 2)} c={SOIL} s="plSoil" />}
+      {/* (REVIEW SHOULD 3) the far inner rim's lit edge over the soil: the soil reads as a recess between two lit
+          edges, never as an outline */}
+      {darks ? <F d={slab(x0 - 8, x1 + 10, xc, rim - 16, rim - 11)} c={STONE_LIT} s="plFarRim" /> : null}
       <F d={slab(x0 - 8, x1 + 10, xc, rim, rim + 16)} c={STONE_LIT} s="plRim" />
       <F d={`M8 ${rim + 12}C10 ${rim + 40} 26 ${rim + 66} 20 ${rim + 92}C34 ${rim + 70} 40 ${rim + 44} 46 ${rim + 14}ZM92 ${rim + 14}C96 ${rim + 46} 112 ${rim + 58} 106 ${rim + 84}C122 ${rim + 62} 126 ${rim + 40} 130 ${rim + 16}ZM176 ${rim + 18}C178 ${rim + 36} 190 ${rim + 50} 186 ${rim + 66}C200 ${rim + 50} 204 ${rim + 34} 206 ${rim + 18}Z`} c={FERN} s="plIvy" />
       {/* a few grasses at the rim's right corner */}
@@ -205,8 +229,10 @@ const Crates: React.FC = () => {
       <F d={slab(x0, x1, xc, lower, base)} c={WOOD} s="crL" />
       <F d={slab(x0, x1, xc, lower + 30, lower + 54)} c={WOOD_LIGHT} s="crLs" />
       {/* (the look test's darks) the shade under the upper crate, on the lower one's top, and each crate's hand slot */}
-      {darks ? <D d={slab(x0, x1, xc, lower, lower + 11)} c={dark('wood')} s="crUnder" /> : null}
-      {darks ? <D d={slab(xc - 26, xc + 26, xc, upper + 52, upper + 63) + slab(xc - 30, xc + 30, xc, lower + 62, lower + 74)} c={dark('wood')} s="crSlot" /> : null}
+      {/* (REVIEW SHOULD 3) the under-shade thinner, the hand holes short round slots in the wood's own deep shade (v1:
+          two long dark bars that read as outlines) */}
+      {darks ? <D d={slab(x0, x1, xc, lower, lower + 5)} c={dark('wood')} s="crUnder" /> : null}
+      {darks ? <D d={roundSlot(xc + 2, along(xc, upper + 57, xc + 2), (ux1 - ux0) * 0.25, 10) + roundSlot(xc, lower + 68, (x1 - x0) * 0.25, 11)} c={woodDeep()} s="crSlot" /> : null}
     </>
   );
 };
@@ -263,7 +289,8 @@ const Bench: React.FC = () => {
     <>
       <F d={slab(x0 + 8, 1100, xc, seat + 18, base)} c={STONE_MID} s="bnFace" />
       {/* (the look test's darks) the shade under the seat's overhang, on the bench's face */}
-      {darks ? <D d={slab(x0 + 8, 1100, xc, seat + 18, seat + 27)} c={dark('eave')} s="bnUnder" /> : null}
+      {/* (REVIEW SHOULD 3: a band, 13 px under the lit seat, never a 9 px stripe that read as an outline) */}
+      {darks ? <D d={slab(x0 + 8, 1100, xc, seat + 18, seat + 31)} c={dark('eave')} s="bnUnder" /> : null}
       <F d={slab(x0, 1100, xc, seat, seat + 18)} c={STONE_LIT} s="bnSeat" />
       {/* the cluster on the bench: a backpack (the flask is cut: the near terrace was the heaviest area) */}
       {darks ? <D d={pack} c={dark('iron')} s="pack" /> : <F d={pack} c={IRON} s="pack" />}
@@ -284,7 +311,8 @@ const FernPot: React.FC = () => {
       <F d={poly([[x - 112, rim + 22], [x + 112, rim + 22], [x + 92, 1960], [x - 92, 1960]])} c={TERRACOTTA} s="fernPot" />
       <F d={slab(x - 122, x + 122, x, rim, rim + 24)} c={'#D9A486'} s="fernRim" />
       {/* (the look test's darks) the soil inside the pot, between the fronds */}
-      {darks ? <D d={slab(x - 104, x - 22, x, rim + 4, rim + 12) + slab(x + 26, x + 104, x, rim + 4, rim + 12)} c={dark('wood')} s="fernSoil" /> : null}
+      {/* (REVIEW SHOULD 3: 12 px of soil between the rim's lit bands, v1's 8 px slivers read as lines) */}
+      {darks ? <D d={slab(x - 104, x - 22, x, rim + 4, rim + 16) + slab(x + 26, x + 104, x, rim + 4, rim + 16)} c={dark('wood')} s="fernSoil" /> : null}
     </>
   );
 };
@@ -384,16 +412,19 @@ const nearEntries = (): [string, number][] => [
   [CM.stoneShade, 0.01], [CM.brickDeep, 0.01], ['#D9A486', 0.02], [CM.leafGold, 0.01], [CM.blossom, 0.005],
   [CM.coatMustard, 0.005], [CM.paper, 0.005], [CM.brick, 0.003],
 ];
-const useNearTone = (entries: [string, number][], plane: number): ((c: string) => string) => {
+const useNearTone = (entries: [string, number][], plane: number, big?: number): ((c: string) => string) => {
   const {darks, nearMid: nm} = useSwitches();
   if (!(nm ?? darks)) return (c) => c;
-  const m = nearMid(entries, plane);
+  const m = nearMid(entries, plane, {big});
   return (c) => m[c] ?? c;
 };
+/** (REVIEW MUST 2) The near things that are big fields (over ~1 % of the frame: a 4 % share of the near group, which
+ *  covers ~25 % of it) read the beige band wide; the bench's stones all do. */
+const NEAR_BIG = 0.04;
 
 /** The mid layer (the bench), drawn after the treads it stands on and before the near layer. */
 export const S1ForeMid: React.FC = () => (
-  <ToneCtx.Provider value={useNearTone(midEntries(), -1)}>
+  <ToneCtx.Provider value={useNearTone(midEntries(), -1, 0)}>
     <Feet feet={MID_FEET} />
     <Tier tier="environment">
       <Bench />
@@ -404,7 +435,7 @@ export const S1ForeMid: React.FC = () => (
 /** The near and front layers: the planter and the bay, the crates, the café set, the pier; then what the bottom edge
  *  cuts: the fern pot and the nearest chair. */
 export const S1ForeNear: React.FC = () => (
-  <ToneCtx.Provider value={useNearTone(nearEntries(), -2)}>
+  <ToneCtx.Provider value={useNearTone(nearEntries(), -2, NEAR_BIG)}>
     <Tier tier="environment">
       <Planter />
       <Crates />
@@ -426,7 +457,7 @@ export const S1ForeNear: React.FC = () => (
 export const S1ForeNearUnder: React.FC = () => (
   <>
     <Feet feet={NEAR_FEET} />
-    <ToneCtx.Provider value={useNearTone(nearEntries(), -2)}>
+    <ToneCtx.Provider value={useNearTone(nearEntries(), -2, NEAR_BIG)}>
       <Tier tier="environment">
         <PlanterTree />
       </Tier>

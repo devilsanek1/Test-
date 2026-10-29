@@ -15,7 +15,7 @@ import {Fill} from '../../lib/Fill';
 import {Tier} from '../../lib/tier';
 import {useTime} from '../../lib/time';
 import {skyColorAt} from '../../lib/sky';
-import {crownGeometry, foliageProblems, LeafSpray, LONDON_PLANE, sprayGeometry, type ClusterGeom, type CrownSpec, type Layer, type LeafSpraySpec} from '../../lib/foliage';
+import {crownGeometry, foliageProblems, foliageTones, LeafSpray, LONDON_PLANE, sprayGeometry, type ClusterGeom, type CrownSpec, type Layer, type LeafSpraySpec} from '../../lib/foliage';
 import {clusterShift, crownDeg, makeWind, STILL_WIND, windProblems} from '../../lib/wind';
 import {useSwitches} from './switches';
 import {cloudProblems, cloudTones, Cumulus, cumulusGeometry, type CumulusSpec} from '../../lib/clouds';
@@ -44,13 +44,19 @@ export const s1TreeSpec = (): CrownSpec => ({
   plane: -2,
   light: S1_KEY,
   holes: false,
+  // (fix pass 1, REVIEW.md MUST 4) October on the crown too: the falling gold and rust leaves need a source (the
+  // species' 0.035 -> 0.18 of the lit rim leaves); its values stay (it is the dark near frame)
+  autumn: 0.18,
   species: {...LONDON_PLANE, green: CM.sage},
 });
 
 /** Pip's seat in the crown: on a limb behind the crown's front clusters, its head and ears among the leaves (found on
  *  a second look); the clusters drawn over it are the front ones whose index is >= `over`. Fitted to the crown above
- *  (V2S1_pip S1_PIP_TREE's size). */
-export const S1_PIP_IN_CROWN = {seat: [178, 1412] as [number, number], over: 4} as const;
+ *  (V2S1_pip S1_PIP_TREE's size). (fix pass 1, REVIEW.md SHOULD 8) `behind`: front cluster 10 (the crown's middle, over
+ *  Pip's head) goes behind Pip, so one recognisable piece clears the leaves: its ear's curve, pink inside (on "life" its
+ *  paw); v1 showed a lavender blob with a pink dot that read as a flower. Still 0.04-0.06 % of the frame, in the
+ *  crown's shade, off her eye path. */
+export const S1_PIP_IN_CROWN = {seat: [178, 1412] as [number, number], over: 4, behind: [10] as number[]} as const;
 
 const Layers: React.FC<{layers: Layer[]; seed: string}> = ({layers, seed}) => (
   <>
@@ -63,7 +69,7 @@ const Layers: React.FC<{layers: Layer[]; seed: string}> = ({layers, seed}) => (
 /** The tree: lane N's <Crown> drawn from its geometry (the same transforms: the crown turns about the trunk's foot, each
  *  cluster shifts as a whole), with `pip` drawn between the front clusters (index < over, then Pip, then the rest), so
  *  Pip sways with the crown and the front leaves cover its body. Tier A scope (`exact`: the ladder's tones kept). */
-export const S1Tree: React.FC<{pip?: React.ReactNode; over?: number}> = ({pip, over = S1_PIP_IN_CROWN.over}) => {
+export const S1Tree: React.FC<{pip?: React.ReactNode; over?: number; behind?: readonly number[]}> = ({pip, over = S1_PIP_IN_CROWN.over, behind = S1_PIP_IN_CROWN.behind}) => {
   const t = useTime();
   const wind = useS1Wind();
   const spec = s1TreeSpec();
@@ -85,8 +91,11 @@ export const S1Tree: React.FC<{pip?: React.ReactNode; over?: number}> = ({pip, o
         {g.back.map(cluster)}
         <Layers layers={g.wood} seed={`crown/${spec.seed}/wood`} />
         {g.front.slice(0, k).map(cluster)}
+        {/* (fix pass 1, REVIEW.md SHOULD 8) the front clusters in `behind` go behind Pip too: one recognisable piece of
+            it clears the front leaves */}
+        {pip ? g.front.slice(k).filter((c) => behind.includes(c.id)).map(cluster) : null}
         {pip}
-        {g.front.slice(k).map(cluster)}
+        {g.front.slice(k).filter((c) => !pip || !behind.includes(c.id)).map(cluster)}
       </g>
     </Tier>
   );
@@ -95,15 +104,24 @@ export const S1Tree: React.FC<{pip?: React.ReactNode; over?: number}> = ({pip, o
 // ---------------------------------------------------------------- the spray (the top-left gutter, near plane)
 
 /** A near branch of the tree's own leaves entering from the top-left corner (lane N's S1 spray: y <= ~273). */
+/** (fix pass 1, REVIEW.md MUST 4) v2's twig was October: 90 % gold and rust (L* ~73 / 59, C* 33-36), and the owner
+ *  likes v2's colours; N's spray came in summer green, three times the area, and outshouted her. Now: autumn 0.88 (one
+ *  leaf stays sage: >= 80 % warm), its ladder lifted 14 / 5 L* (lib/foliage `autumnTone` keeps each leaf's value + 6 /
+ *  + 4, so the lit gold lands near v2's L* ~75 and the shade steps stay 6-7 L* apart: tier C's), 6 leaves of 46-76 px on
+ *  one side twig instead of 10 of 52-86 on two (its weight back toward v2's twig: fewer edges than her group). The veins and the folds stay
+ *  (REVIEW.md §5 item 4: never a flat silhouette). */
+export const S1_SPRAY_LADDER = [50, 57, 63, 69, 75] as const;
 export const s1SpraySpec = (): LeafSpraySpec => ({
   seed: 's1-spray',
   branch: [[-50, -30], [70, 30], [170, 84], [262, 118]],
   width: [15, 4],
-  leaves: 10,
-  size: [52, 86],
+  leaves: 6,
+  twigs: 1,
+  size: [46, 76],
   droop: 0.32,
   light: S1_KEY,
-  autumn: 0.1,
+  autumn: 0.88,
+  tones: foliageTones({green: CM.sage, L: S1_SPRAY_LADDER}),
   species: {...LONDON_PLANE, green: CM.sage},
 });
 
@@ -118,7 +136,9 @@ export const s1CloudSpec = (palette10b: boolean): CumulusSpec => {
   const sky = s1Sky(palette10b);
   const at = (x: number, y: number) => skyColorAt(sky, y, x);
   const o = {x: 598, base: 272, w: 430, h: 146};
-  return {seed: 'hero-s1', ...o, light: S1_KEY, sky: at, tones: cloudTones({sky: at(o.x + o.w / 2, o.base - o.h / 2)}), drift: 3};
+  // (REVIEW SHOULD 6) no soft steps: the low ones, in the belly's tone, ran past the lobes at both ends as a lilac slab,
+  // the high ones sat outside the right lobe as faint rings (a glow: rule 5); the silhouette is the lobes' own edge
+  return {seed: 'hero-s1', ...o, light: S1_KEY, sky: at, tones: cloudTones({sky: at(o.x + o.w / 2, o.base - o.h / 2)}), drift: 3, soft: {steps: 0}};
 };
 
 export const S1Cloud: React.FC<{palette10b: boolean}> = ({palette10b}) => <Cumulus spec={s1CloudSpec(palette10b)} wind={S1_WIND} />;

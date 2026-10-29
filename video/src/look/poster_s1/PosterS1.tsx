@@ -26,7 +26,11 @@ export const POSTER_S1_AUDIO = {voice: 'v2/voice.wav', mix: 'v2r/mix.wav'} as co
 
 /** v2's shots (read-only): S2's start bounds S1's captions (the next page, 6.28 s, never shows). */
 const SCENES = scenesJson as FilmScene[];
-const CAPTIONS = captionsJson as CaptionBeat[];
+/** v2's captions, the hook page from frame 0: lib/Film renders a shot (`only`) with `hookAtStart` off, so page 1 would
+ *  wait for its own start (0.12 s: no caption on S1 frames 0-4), while v2's shipped master shows "She quit Google." on
+ *  frame 0 (DIRECTION rule 9). Starting page 1 and its first line at 0 gives the shot v2's frame 0 back (fix pass 1,
+ *  REVIEW.md SHOULD 1; REVIEW_tech §10.2); the "quit" highlight keeps its 0.52 s. */
+const CAPTIONS = (captionsJson as CaptionBeat[]).map((b, i) => (i ? b : {...b, s: 0, lines: b.lines.map((l, j) => (j ? l : {...l, s: 0}))}));
 const COMPONENTS: Record<string, React.FC> = {V2S1};
 
 export type PosterS1Props = Partial<PosterSwitches> & {

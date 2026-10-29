@@ -45,9 +45,10 @@ export type PosterSwitches = {
   /** Part of `darks` (decision 2 b): the near world in mid-tones (near.ts). Undefined = follows `darks`; set it to
    *  split the A/B (the dark pieces alone, or the mid-tones alone). */
   nearMid?: boolean;
-  /** Part of `patchwork`: the paving's setting (V2S1_patch PAVING: 'calm', the decided one; 'mid', PT's 3 tones at the
-   *  same cell; 'busy', the first pass). */
-  paving?: 'calm' | 'mid' | 'busy';
+  /** Part of `patchwork`: the paving's setting (V2S1_patch: 'stone', the decided one since the fix pass (REVIEW MUST
+   *  2: 3 tones with a hue turn on 2.2 m cells, one flood front); 'calm', v1's (2 tones on 1.2 m: a diamond chequer);
+   *  'mid', PT's 3 tones at the same cell; 'busy', the first pass). */
+  paving?: 'stone' | 'calm' | 'mid' | 'busy';
   /** Part of `texture`: a multiplier on every plane's mottle strength (default 1 = lib/texture's mottleK; for A/Bs). */
   textureK?: number;
   /** Part of `foliage`: the wind held still (lib/wind STILL_WIND: the crown and the spray only ride the float; the
@@ -56,6 +57,12 @@ export type PosterSwitches = {
   /** QA only: a sub-pixel nudge [dx, dy] added to the near plane's (-2) float offset: lane N's twinkle test (the same
    *  frame moved by pure sub-pixel translations, so motion cannot confound it). Never set in a film. */
   nudge?: [number, number];
+  /** QA only: which plane `nudge` moves: 'near' (default: the near plane, -2) or 'subject' (plane 0: the wing's corners,
+   *  window bars and door frame; REVIEW SHOULD 5). Never set in a film. */
+  nudgeOn?: 'near' | 'subject';
+  /** QA only: her and the row not drawn (the frame minus this one = the figures' exact silhouettes, for the separation
+   *  measure along each figure's own edge: test/REPORT.md §8). Never set in a film. */
+  rowHidden?: boolean;
 };
 
 /** v2's S1 as shipped: every switch off. */
@@ -104,7 +111,7 @@ export const PRESETS: Record<PosterPreset, PosterSwitches> = {
 export function resolveSwitches(p: Partial<PosterSwitches> & {preset?: PosterPreset}): PosterSwitches {
   const base = PRESETS[p.preset ?? 'v2'] ?? V2_SWITCHES;
   const out: PosterSwitches = {...base};
-  for (const k of [...Object.keys(V2_SWITCHES), 'nearMid', 'paving', 'textureK', 'windStill', 'nudge'] as (keyof PosterSwitches)[]) {
+  for (const k of [...Object.keys(V2_SWITCHES), 'nearMid', 'paving', 'textureK', 'windStill', 'nudge', 'nudgeOn', 'rowHidden'] as (keyof PosterSwitches)[]) {
     const v = p[k];
     if (v !== undefined && v !== null) (out as Record<string, unknown>)[k] = v;
   }
