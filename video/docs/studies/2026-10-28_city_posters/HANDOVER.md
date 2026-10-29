@@ -6,6 +6,14 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-29 ~03:40 UTC: the study is done
+- All lenses, `STUDY.md`, `SUMMARY.md`, the summary sheet (sent to the owner) and the A vs B picture (sent) are in.
+- Integrated into the main docs (`INTEGRATION.md`: DIRECTION, CRAFT, PALETTE, the new `docs/look/LAYOUT.md`, G5_BLOCKING,
+  COZY_AND_SCALE, CINEMATIC_GUIDE, STORYBOARD_STYLE, LIFE_AND_DENSITY, QA, HANDOFF) and merged into `video-production`.
+- Waiting on the owner's calls (DIRECTION's open-call list; `STUDY.md` §9). Next: the 7 s look test (`STUDY.md` §10).
+- Code flagged, not changed: the caption clip window in theme.ts and capcheck, `safe.action`, framecheck's ad rail,
+  `PARALLAX_K` (not 1/z), `planeLod`'s 0 px `minFeature` (`INTEGRATION.md`).
+
 ## Resumed 2026-10-29 02:36 UTC (after the 5-hour reset)
 - The limit stopped details, composition, colour (pro_4) and the A vs B critic; nature (pro_3) had finished its file.
 - Running now as single max-effort agents (the Agent tool), each continuing its partial file from its original brief

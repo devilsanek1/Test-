@@ -116,14 +116,11 @@ exception from the G3 hand-off.
   (white) on dark skies; check the contrast (`contrast(a, b)` in `lib/Captions`: v3's dusk blue #5B6A94 takes white
   5.3:1, ink only 3.1:1). Export it from the panel file (the engine merges it over scenes.json); a `wipe` key follows a
   sky wipe edge (ENGINE §6).
-- **Screen zones** (the one definition; the board, `LIFE_AND_DENSITY.md` §8 and `COZY_AND_SCALE.md` §5 point here):
-  the caption band (y ~290-600, screen space) belongs to the captions: no busy detail there. Platform UI covers the top
-  (y < 180), the bottom (y > 1520) and a right rail (x > 950, y 900-1500), as `scripts/qa/framecheck.py` checks them:
-  dressing may run under them, key information never. Key action (the subject's action, a label, a number, a contact
-  point) inside x 120-950, y 600-1480 (the board stages its subject in the read zone, y 600-1250:
-  `docs/look/STORYBOARD_STYLE.md` §3); the draft label sits at the bottom-left (y > 1850). Ad templates cover more (the
-  bottom 35 %, and x > 780 from y 840): a cut made for ads keeps its key reads above y 1250 and, below y 840, left of
-  x 780.
+- **Screen zones:** the one definition is `docs/look/LAYOUT.md` §1 (moved there 2026-10-29 with every other layout
+  rule; the board, `LIFE_AND_DENSITY.md` and `COZY_AND_SCALE.md` point there too): the caption band belongs to the
+  captions; the platform UI (organic, and the larger ad overlays) may have dressing under it, key information never
+  (`scripts/qa/framecheck.py` checks the organic zones); also there: the key-read box, the read zone where the board
+  stages the subject, and the draft label's corner.
 - **Board notation is not film**: the red pencil marks and the notes strip never appear. A red focus circle becomes a
   production emphasis that fits the look (light, the hero colour, a pop), never a drawn circle.
 - **Density and life: fill what G3 decided.** Every G3 placeholder and `life:` item becomes its real dressing and life
@@ -134,7 +131,8 @@ exception from the G3 hand-off.
   a cut (its events/s and gap are never a reason to add movers).
 - **Look**: the approved G4 look clip and its kit (the clean pen, the set's light rig, the tier palettes), the video's
   STYLE.md (v3: LOOK.md) and palette roles (one hero colour, one dark anchor, at most one pop), inside
-  `docs/look/DIRECTION.md` and `CRAFT.md`; then `docs/look/COZY_AND_SCALE.md`, `docs/look/CINEMATIC_GUIDE.md`. Every
+  `docs/look/DIRECTION.md` and `CRAFT.md`; then `docs/look/LAYOUT.md`, `docs/look/COZY_AND_SCALE.md`,
+  `docs/look/CINEMATIC_GUIDE.md`. Every
   set, person, prop and Pip is the film's own kit (playbook: no reusable assets; people have no faces); `lib/cine`'s
   drawing pieces are references, never film code, until the craft tooling lane ports them to the clean pen
   (`CRAFT.md` §c; its camera and utilities are fine). The light and shadow layers come from `lib/light.tsx`, depth from
@@ -227,7 +225,7 @@ film (§8b's recipe).
   `frame0` title block over the captions (owner, v3, 2026-10-28: it answered before the question and repeated the spoken
   line). The core line as a title belongs on the cover. (`frame0` stays in `Film.tsx` for the films that used it.)
 - (v2) Pages before `until` AND the page starting ON `until` stay lowered: make them one line. Credits = FilmN's own overlay keyed by the panel on screen (scenes.json `credit`), one ink-on-cream tab at y ~185-288 (under the top UI, above the band), hidden while the frame-0 words show (seam = frame 0).
-- (v2) A frame-0 credit needs a custom `Frame0Text` layout (words 70 on 340 / 424, credit 34 on 472, captions 556 at 0.68); gate_check reads Film.tsx's default F0, so re-check custom numbers. `FilmNBare` = `<Film showCaptions={false}>`, no frame0 / label / overlay: sound-off cold reads.
+- (v2, history: v2's REVIEW_1 MUST 1 took its frame-0 block out; no film puts a title over the captions, above) A frame-0 credit needed a custom `Frame0Text` layout (words 70 on 340 / 424, credit 34 on 472, captions 556 at 0.68); gate_check reads Film.tsx's default F0, so re-check custom numbers. `FilmNBare` = `<Film showCaptions={false}>`, no frame0 / label / overlay: sound-off cold reads.
 
 ## 6. 60 fps notes
 

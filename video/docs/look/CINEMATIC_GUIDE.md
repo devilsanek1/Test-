@@ -7,7 +7,9 @@ v1 (`deliverables/v1/php2shell_final.mp4`) is the baseline for composition and c
 tier, one light rig per set, warm palettes) is `DIRECTION.md` and `CRAFT.md`, which win where this guide differs. Each
 shot type below is ONE targeted upgrade of a v1 shot (a better move, light or composition).
 
-Notation: frame 1080 x 1920, H = 1920 px, captions at y 317-556. `#94 @238.0` = Arcane shot 94 at 238.0 s into the source
+Notation: frame 1080 x 1920, H = 1920 px; the screen zones (the caption band and block, the read zone, the platform UI)
+and each shot type's framing numbers in one table: `LAYOUT.md` (it wins on where things sit, this guide on the moves).
+`#94 @238.0` = Arcane shot 94 at 238.0 s into the source
 video; `v1 @25` = 25 s into the v1 film. The sketch animatic (G3) names the S#; blocking (G5) sets the exact numbers.
 
 ## The opening: the first 3 seconds (owner rule, 2026-10-26; the most important shot of every video)
@@ -45,8 +47,8 @@ pull-out; the big scale move belongs to the reveal later in the film (S1 or S5).
 
 ### S1 Rise-over reveal (move). Confidence: highest, the only shot that passed all 3 reviewers (min 7, avg 7.7)
 - **Idea:** stand behind the rooftop wall, then rise over it: the wall drops out the bottom and the whole city settles in.
-- **Frame:** eye level at rooftop height. Start: the wall and the film's "you" from behind (with the mascot; never
-  strangers in front: `CRAFT.md` §a.3) fill the bottom 25 % (top edge y ~1440),
+- **Frame:** eye level at rooftop height. Start: the wall and the film's "you" from behind (never the mascot as an
+  anchor: Pip hides, `DIRECTION.md` rule 2; never strangers in front: `CRAFT.md` §a.3) fill the bottom 25 % (top edge y ~1440),
   horizon at 0.37 H. Land: the wall is gone, horizon at 0.40 H (y ~770), city in the lower 60 %, flat sky in the top 40 %.
 - **Planes (5), travel down during the rise:** wall + the "you" ~520 px (they leave the frame), near
   towers ~400 px (cut by both side edges, tops kept out of the caption band), mid city ~220 px, horizon ~60 px, sky 0.
@@ -91,8 +93,10 @@ pull-out; the big scale move belongs to the reveal later in the film (S1 or S5).
 - **Idea:** almost all sky, with a thin strip of ground at the bottom, so the caption owns the frame for one pause.
 - **Frame:** eye level, standing height. Horizon at 0.82 H (y ~1575), with a thin low city strip on it. A promenade or
   wall band runs across the bottom 15-18 %, with 3-5 evenly spaced posts (250-360 px apart). Sky ~80 %: one flat cloud
-  bank cut by the left edge (y ~700-1200) and empty sky to the right. Add the "you" or the mascot small (~0.08 H)
-  bottom-left, or nobody (never strangers in front: `CRAFT.md` §a.3).
+  bank cut by the left edge (y ~700-1200) and empty sky to the right. Add the "you" small (~0.08 H) at the bottom-left,
+  its feet above y 1480 on a wall or a step rising out of the strip (the strip may run under the bottom UI as a mass, a
+  figure may not: `LAYOUT.md` §1), or nobody (Pip only hidden: `DIRECTION.md` rule 2; never strangers in front:
+  `CRAFT.md` §a.3).
 - **Planes (3):** sky with the cloud, city strip, ground band.
 - **Move:** locked or the `COZY_AND_SCALE.md` 3b.5 float.
 - **Closer variant:** the sun as a half disc on the horizon at centre, right above a wall band with merlons every ~180 px
@@ -104,7 +108,8 @@ pull-out; the big scale move belongs to the reveal later in the film (S1 or S5).
 
 ### S5 The pull-back crane reveal (the owner's favourite). Confidence: the owner's pick (2026-10-26), measured per frame
 - **Idea:** the film's ONE big reveal, from the viewer's small world to the vast system. Two figures from behind (the
-  film's "you" and the mascot; never strangers) in rooftop clutter
+  film's "you" and a companion only if the story names one in W1, else the "you" alone; never Pip, which hides:
+  `DIRECTION.md` rule 2; never strangers) in rooftop clutter
   look at something we can't see; the camera pulls back, cranes up and arcs round them until they are tiny at a rail and
   the whole city lands. The move follows their look, then pays it off. Owner: "It has pretty much everything: suspense,
   sense of scale, fantastic environment and composition, and the animation, the actual camera movement."
@@ -189,12 +194,13 @@ quota. Breathers (S3, S4) take theirs from the sky (9-10).
    top y >= 620) on a hill the town climbs in 5-6 rows. Huge: its units are 2x the mid windows though 2 bands farther
    (lancets 6 x 11 px, one rose or clock 22-28 px). Far: the narrowest value range (0.58x the near), the least detail, ink
    in its shade colour, behind the hill town and the sea strip, birds crossing in front.
-8. **Tiny anchors, lines up:** the two figures from behind (the "you" and the mascot) at 1.0 F, heads on a lighter mid
+8. **Tiny anchors, lines up:** the figures from behind (the "you", with a companion only if W1 names one; never Pip,
+   which hides: `DIRECTION.md` rule 2) at 1.0 F, heads on a lighter mid
    wall; the near frame mass 30-35 % of the frame, a tier-C mass at L* >= ~30 (the darkest step only on its edge; the
    anchor colour ~5 %, `PALETTE.md`; `CRAFT.md` §b-§d), cut by 2 edges. Lines lead UP to the landmark: the canyon VP over their heads, the far skyline
    stepping up 40-60 px before the hill, one diagonal (a skylight ridge) at its base; the rail is the one level line.
-9. **A big sky with huge clouds:** sky 30-40 % on a scale end (65-85 % on breathers), clouds 45-55 % of it outside y
-   317-556. One hero mass >= 1.0 W (cut by a side), >= 2.5x the landmark's width and BEHIND it (farther, still bigger): on
+9. **A big sky with huge clouds:** sky 30-40 % on a scale end (65-85 % on breathers), clouds 45-55 % of it outside the
+   caption band (`LAYOUT.md` §1). One hero mass >= 1.0 W (cut by a side), >= 2.5x the landmark's width and BEHIND it (farther, still bigger): on
    S1/S5 a bank on the horizon (150-280 px tall), the landmark in its gap. Flat base, lobed top (lobes 180-450 px), 3 flat
    fills: crown `#FAF1EA` 15-25 %, body `#ECD8CB` 30-40 %, belly `#CFC5C4` on the base; new, so show the owner at G4.
 10. **Huge means slow:** hero cloud 0-6 px/s, thin bars 5-15 px/s, all one way and <= 1/10 of the birds (a fast cloud
@@ -203,7 +209,7 @@ quota. Breathers (S3, S4) take theirs from the sky (9-10).
     goes in the sky and by the figures: 3-4 kinds of mover on 3 speed tiers, something always moving (> 1 s without is a
     dead frame), <= 2 % of the frame, never competing with the figures and the landmark. Fast: a flock of 3-6 V's, 24-44
     px (far ones paler), 5-6 wingspans/s, flap 3-4 Hz, one gliding, entering at 70-80 % of the move and crossing toward
-    the landmark in 1.5-2.5 s, outside y 317-556. Periodic: a pennant on the near frame, 1-3 Hz. Mid-move: 1-3 white steam
+    the landmark in 1.5-2.5 s, outside the caption band. Periodic: a pennant on the near frame, 1-3 Hz. Mid-move: 1-3 white steam
     wisps; cloth 1-3 px. All of it at tier B / C weight (`CRAFT.md` §b). The film draws its own birds; `Birds`
     (`cine/sky.tsx`: size 24-44, flap 3-4, dur = path / (5.5 x size)) is the reference, not clean-pen-aware.
 **Checklist:** nothing ends inside the frame | 5-7 planes 2.2-3x apart | far band packed, detail peaking under the horizon
@@ -214,13 +220,15 @@ hero cloud behind it | 3 tiers of life, never 1 s still. Then, at phone size: do
 1. **One change per shot.** Each type changes ONE thing in a v1 shot (the move, the light or the composition). The
    palette (`PALETTE.md`), flat fills, small people seen from behind and the caption style stay as in v1; the line is
    the clean pen by tier (`CRAFT.md` §c), never v1's ink line.
-2. **Captions sit on flat sky.** y 317-556 stays plain sky in every frame, from the start to the end of a move: no tower
-   top, disc, cloud or roof in it (tops at y >= 600).
+2. **Captions sit on one calm flat field.** The caption band (`LAYOUT.md` §1) stays one calm flat field in every frame,
+   from the start to the end of a move: outdoors the one sky (`DIRECTION.md` rules 6, 10), a flat light wall or facade
+   where there is none; no tower top, disc, cloud or roof in it (tops at y >= 600).
 3. **One big move per video (S1 or S5, never both).** Every other hold, cozy or breather (S2-S4 too), is locked or the
    `COZY_AND_SCALE.md` 3b.5 float (8-15 px/s, legs that turn back); never a slow pull-out or push in a hold (a 2 %
    pull-out moves the frame edges only ~4-8 px/s and reads frozen). A zoom is a visible story move or a carrier
    (`CRAFT.md` §a). No roll, no compound moves, no cut mid-move.
-4. **Depth and light in flat steps.** Use 3-4 planes (5 in S1, 6 in S5), each farther plane one value step paler and
+4. **Depth and light in flat steps.** Use 4-6 planes, 5-7 on a vista (`CRAFT.md` §f.1, which wins; S1 5, S5 6; S4's 3
+   is its declared exception, a breather that is almost all sky), each farther plane one value step paler and
    nearer the sky's hue (as in #75 @185.3; scale wides: Scale cues 5). One light rig per set (`CRAFT.md` §d.1): by day
    the sun is the key, one lit side and one shade side per building; at night the lamps and lit windows on a light
    night (§d.2); silhouettes in the palette's anchor. No bloom, haze, glow or gradients.

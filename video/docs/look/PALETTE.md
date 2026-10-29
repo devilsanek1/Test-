@@ -98,6 +98,28 @@ every palette against the DNA below.
     the DNA check, and adding it to `palettes.json` with its mood and use cases.
 - The palettes evolve: polish the existing ones with each video's lessons (owner feedback goes in the playbook).
 
+## Proposed by the city-poster study (2026-10-28): proposals, not in `palettes.json`
+The study (`docs/studies/2026-10-28_city_posters/STUDY.md` §4) found v2's hues inside the posters' range on every
+harmony measure: the gap to their premium feel is value and where the colour lives, not hue (the owner: "I like the
+colors of our last video about Google, but our video still feels cheap and lazy"). It proposes three sister palettes in
+`palettes.json`'s role format, each passing the DNA check above. None is added to `palettes.json` or the board until
+the owner sees it in a look clip (a W1 proposes it, the G4 clip shows it: "How to use it" above); the DNA above stands.
+
+| # | Palette (proposal) | What it is | Use cases | Its JSON |
+|---|---|---|---|---|
+| 10b | Canal Mint, full range | v2's Canal Mint with the posters' value and chroma plan, every hue within 7 deg of v2's (only L* and C* move): a calmer mint sky (C* 13 -> 10), cream-paper lights (stucco C* 11 -> 6, lit paving 14.5 -> 7, a rose paving shade), colour in the mid-tone brick, water (L* 77 -> 70 / 56) and sage (77 -> 66), slate and plum darks in many small pieces (unlit panes L* 46 -> 33, a new eave shade), a tier-A stone shade at -24; the brick family, hero, anchor, pop, line, ink and caption box unchanged | the next step for the look we have (the study's look clip of v2's canal bank); whether its calm creams are still "the colours of the Google video" is the owner's eye | `pro_4_colour.md` §3.7 |
+| 11 | Poster Harbour | a city by water on a clear morning (Singapore, Reykjavik, Cape Town) with Canal Mint's DNA: a pale blue paper sky and the harbour as the one cool field, warm limestone and white walls, facades as confetti, slate windows as the darks, a terracotta-roof hero, a marigold pop | a new place film by water (a W1 candidate) | `style.md` "Sister palettes" |
+| 12 | Lantern Paper | old-town warmth (Hanoi, Kyoto, Buenos Aires) without their beige, olive and grey: a warm paper sky, peach-cream stone, pine and leaf-sage greens, rose-grey stone, red-brown wood, a gold hero, a vermilion pop, deep pine as the anchor; the pond the one cool field | a new old-town place film (a W1 candidate) | `style.md` "Sister palettes" |
+
+- **Poster Harbour** breaks one DNA line on purpose: a cool page (L* 87, C* 9) where rule 6 says warm by default; its
+  sky is the one cool field, as Canal Mint's mint is. **Lantern Paper**'s page and ground sit just outside the beige band
+  and under the olive band: lint their shaded copies on the frame. The same check flags house palettes #1-2's ground
+  (yellow-green) and #5 Sage Study's page (olive, h 116) (`style.md`).
+- **What goes with 10b and waits on the owner:** its darks in many pieces (the dark share is the owner's open call,
+  `CRAFT.md` §f.8: until then rule 6's tinted anchor at about 5 % stands) and its tier-A shade at -24 (how deep the
+  subject's shade face goes is open too, `CRAFT.md` §d.3). The study's chroma plan (light fills calm, the colour in the
+  mid-tones, saturation and darks as confetti: `STUDY.md` §4) is a proposal with it.
+
 ## Texture and lines (owner, 2026-10-25)
 
 > "I only really like these very subtle texture pieces and the black outlines, VERY subtle but in key places. Perhaps
@@ -124,8 +146,8 @@ B gets a thin tinted line or none, the environment none; taper only where the st
 **What our kit has:**
 - an optional paper-grain overlay (`public/textures/grain.png`, `Card` `grain`; off by default): retired as it was;
   since 2026-10-28 a VERY subtle paper-and-paint texture is being tested again (owner: "start playing with it, very
-  subtly especially if its adding to the premium look"; `CRAFT.md` §c), measured from the city posters
-  (`docs/studies/2026-10-28_city_posters/`);
+  subtly especially if its adding to the premium look"; `CRAFT.md` §c, which holds the test's spec), measured from the
+  city posters (`docs/studies/2026-10-28_city_posters/`);
 - tapered brush lines (the mascot ink; the clean pen keeps taper off unless asked).
 
 **What it lacks:** a halftone fill. Add it as an SVG `<pattern>` (dots in the fill's darker tone), applied per shape
