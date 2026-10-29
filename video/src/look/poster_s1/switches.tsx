@@ -53,6 +53,9 @@ export type PosterSwitches = {
   /** Part of `foliage`: the wind held still (lib/wind STILL_WIND: the crown and the spray only ride the float; the
    *  twinkle test of the QA). */
   windStill?: boolean;
+  /** QA only: a sub-pixel nudge [dx, dy] added to the near plane's (-2) float offset: lane N's twinkle test (the same
+   *  frame moved by pure sub-pixel translations, so motion cannot confound it). Never set in a film. */
+  nudge?: [number, number];
 };
 
 /** v2's S1 as shipped: every switch off. */
@@ -101,7 +104,7 @@ export const PRESETS: Record<PosterPreset, PosterSwitches> = {
 export function resolveSwitches(p: Partial<PosterSwitches> & {preset?: PosterPreset}): PosterSwitches {
   const base = PRESETS[p.preset ?? 'v2'] ?? V2_SWITCHES;
   const out: PosterSwitches = {...base};
-  for (const k of [...Object.keys(V2_SWITCHES), 'nearMid', 'paving', 'textureK', 'windStill'] as (keyof PosterSwitches)[]) {
+  for (const k of [...Object.keys(V2_SWITCHES), 'nearMid', 'paving', 'textureK', 'windStill', 'nudge'] as (keyof PosterSwitches)[]) {
     const v = p[k];
     if (v !== undefined && v !== null) (out as Record<string, unknown>)[k] = v;
   }

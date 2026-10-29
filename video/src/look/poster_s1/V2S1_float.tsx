@@ -55,7 +55,11 @@ export const S1PlaneStack: React.FC<{plane: number; layers: PlaneLayer[]; textur
   const t = useTime();
   const sw = useSwitches();
   // (the look test: the float by 1/z when the switch is on, lane E's PARALLAX_Z; v2's PARALLAX_K otherwise)
-  const [dx, dy] = parallaxOffset(s1Float(t), plane, currentFloatTable());
+  const [fx, fy] = parallaxOffset(s1Float(t), plane, currentFloatTable());
+  // (QA only: the twinkle test's sub-pixel nudge of the near plane)
+  const nudge = plane <= -1.5 && sw.nudge ? sw.nudge : [0, 0];
+  const dx = fx + nudge[0];
+  const dy = fy + nudge[1];
   return (
     <g transform={`translate(${dx.toFixed(3)} ${dy.toFixed(3)})`}>
       {layers.map((L, i) =>
