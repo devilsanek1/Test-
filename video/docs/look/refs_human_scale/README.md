@@ -20,6 +20,11 @@ I like the drawing style in these two more". **These two are the painting-style 
 | `03_beach_dusk.jpg` | a couple walking along the shore at dusk, a huge violet cloud and a flock of birds over the sea, the sun on the horizon | ~25 % of the height, right of centre |
 | `04_cloud_beast_motion.mp4` (+ `04_cloud_beast_frame.jpg`) | a 9:16 motion illustration (sent later as a phone screen recording, with no words; trimmed to 5.6 s, the phone's status bar burned in): a huge glowing orange-pink cumulus fills ~70 % of the frame, a giant patterned grazing beast with long horns at the bottom left, a small girl in a dress and blowing cape by a potted bare plant, a pink moon, tiny birds, drifting motes, a misty flat ground; calm motion, ~5 % of the pixels change over 4.5 s (the cloud's edges, motes, the cape, birds) | the girl ~145 px tall in 1920 (7.5 % of the height, 13 % of the width) |
 
+**On people** (2026-10-29, resending `03_beach_dusk.jpg`, `../refs_paint/01_beach_van_dusk.jpg` and the 9:16 motion
+reference): "Another bit is humans we paint - they should be better / These are the references especially the video / On
+the video the person is not substantially different than yours but certainly more refined and clean and more fluid".
+`04_cloud_beast_girl_strip.jpg`: the girl zoomed, 8 frames over 5 s (only her ribbons and cape move).
+
 **Sizes as the owner sees them:** the landscape pictures fill the phone's width, so their people read at ~8-16 % of
 the screen's WIDTH: ~90-170 px tall in our 1080-wide frame, about v2's original (~150 px); the motion reference's girl
 is ~145 px. (A first reading of "about this size" as 15-30 % of the frame's height, 300-550 px, was corrected the same

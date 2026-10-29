@@ -243,7 +243,13 @@ Maintenance at the end).
   heads; near heads <= ~140 px), never big character models or faces: they act with their pose (reach, shrug, slump,
   look up), as reference 1's do; only the mascot has a face. **In the foreground only the film's one "you" or the
   mascot;** the "you" near the camera stands at a real size, about v2's original (~130-220 px tall), still simple and
-  from behind or in silhouette (DEPTH AND SCALE FROM A HUMAN VIEWPOINT above; owner, 2026-10-29); strangers stay small in the mid and far ground (a row of strangers' backs in front reads as "you"). —
+  from behind or in silhouette (DEPTH AND SCALE FROM A HUMAN VIEWPOINT above; owner, 2026-10-29); strangers stay small in the mid and far ground (a row of strangers' backs in front reads as "you"). Simple, but REFINED,
+  CLEAN and FLUID like the girl in the owner's 9:16 motion reference (`docs/look/refs_human_scale/04_cloud_beast_girl_strip.jpg`):
+  elegant proportions, a clear silhouette and line of action, few shapes lit warm on one side with soft gradients, no
+  outlines, one flowing element (a scarf, ribbon, coat hem or hair) that moves with follow-through while the body stays
+  calm; the recipe: `docs/look/paint_recipes/people.md`. — ("Another bit is humans we paint - they should be better /
+  These are the references especially the video / On the video the person is not substantially different than yours
+  but certainly more refined and clean and more fluid", 2026-10-29.) —
   ("don't use big models of people; the people in the first example video are the right direction", v2 restart,
   2026-10-27; v3 retro, 2026-10-27).
 - **Captions are burned in and pop in place (or rise without clipping);** a reveal that cuts letters looks like a glitch;
