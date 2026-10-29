@@ -64,3 +64,7 @@ New rule (playbook): one thing in one place, gone deep; other places only as one
   running out of room on Earth. The strongest opener (8.7). Mood: wonder, less "so what".
 - **C. The bunker under the park**: one place. A Cold War nuclear shelter 30 m in granite, servers instead of beds,
   WikiLeaks once, and since 2014 its heat warms the neighbours. Weird and visual; the weakest news peg.
+
+**PICKED (2026-10-29 ~10:25 UTC, owner: "I like bunker"): C, the bunker under the park.** The one thing in 3 words: the
+**internet's nuclear bunker**. Facts: `research/factlock.md` section 1 (Pionen) and 7.5-7.6 (Jon Karlung: "All the global fuss is
+made by these two little boxes.", 2010, AFP; the channel's own word). The core line is re-proposed by the writer (up to 3).

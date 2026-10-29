@@ -38,3 +38,5 @@ Format: the owner's words in quotes, with the time (UTC); after "->" what we did
 - 2026-10-29 ~10:20 UTC, on draft 1: "I what I don't like about the current story is we are too wide and unfocused again like we talked about a bunch of topics all within 30 seconds - we started with space then mountain then  Stockholm then Helsinki / Compare it with big bend story and create a new rule for storytelling" -> the critic stopped (it judged a draft that will change); rule: playbook,
   Script and voice (ONE SUBJECT, GONE DEEP), TOPIC_CRITERIA (one subject); v5 re-scoped to one subject, three options
   sent (Helsinki's AI-heated homes recommended; the computer in space; the bunker under the park).
+- 2026-10-29 ~10:25 UTC: "I like bunker" -> v5's one subject: the nuclear bunker under a Stockholm park (Pionen), full of
+  computers, that heats its neighbours; the writer rewrites from the fact lock's section 1 (and 7.5-7.6, Jon Karlung's words).
