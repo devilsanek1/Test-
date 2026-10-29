@@ -279,7 +279,12 @@ Maintenance at the end).
   and more beautiful / Also I like the drawing style in these two more"; "And again even clouds have layers that give a
   sense of depth but yours do not", 2026-10-29). The method that is "getting there" is DESIGN FIRST: the sky and
   clouds designed as flat shapes in one colour family and planes first, then painted (our painter's v4, `--design`):
-  "Wait but this is actually not bad like it’s not there but we are getting there", 2026-10-29. AI-painted background plates (a model repaints only our background
+  "Wait but this is actually not bad like it’s not there but we are getting there", 2026-10-29. Then BRUSH the design
+  in layers, the owner's recipe (`docs/look/refs_paint/`): a limited palette sampled from the scene (~10-14 colours);
+  each mass brushed in passes, big soft blurred strokes first, then blocky flat-brush strokes along the form, then a few
+  crisp strokes at the light edges; each plane painted softer and blurrier the farther it is; water in horizontal
+  dashes; speckle only on near masses. — ("I think we just need to brush it and perhaps draw them in layers a bit more
+  blurry each time like look how this is done or this", 2026-10-29.) AI-painted background plates (a model repaints only our background
   pieces from our own layout; the story layers stay ours) are approved as a TEST, judged against our own painter:
   "I mean let’s try and see if it gets us there", 2026-10-29 (`docs/studies/2026-10-28_city_posters/ai_paint/BRIEF.md`).
   A painted plate must be able to PAINT ON in the opening like the rest of frame 0 (our flat design drawn first, the
