@@ -277,7 +277,10 @@ Maintenance at the end).
   simplified way. THE PICK (2026-10-30): direction C, MODERN GRAPHIC (`docs/look/people_design/dir_graphic.md`: about
   7.8 heads, rounded polygons in two flat tones, crisp, no outlines, the styling carried by clothes and hair), but NOT its
   face (one brow-into-nose mark), which "looks messed up": the face is redesigned before the system is final. — ("I
-  actually kind of like the last one modern graphic except the face that looks messed up", 2026-10-30.) — ("Yes then people I think we should target 20-30 yo today with styles that are just cool and
+  actually kind of like the last one modern graphic except the face that looks messed up", 2026-10-30.) The face now:
+  LASH (closed-eye lash lines and a small soft nose; the contour only under ~200 px; sunglasses and caps as some
+  people's accessories; her often turned away), kept for now and to be iterated later ("It’s better let’s keep it for
+  now / We will iterate more later on", 2026-10-30; `docs/look/PEOPLE_DESIGN.md`). — ("Yes then people I think we should target 20-30 yo today with styles that are just cool and
   appealing to look at so think instagram infkuebcers, New York, Los Angeles, including hair clothing and perhaps less
   of faces like faces we need to find a way to draw in a more generic way"; "Let’s land version 6 first", 2026-10-30.) — ("Another bit is humans we paint - they should be better /
   These are the references especially the video / On the video the person is not substantially different than yours

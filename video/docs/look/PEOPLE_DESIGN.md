@@ -1,8 +1,17 @@
-# PEOPLE_DESIGN: how we draw people (the direction, and a DRAFT design system)
+# PEOPLE_DESIGN: how we draw people (direction C with the LASH face, in use for now)
 
-**OWNER'S PICK (2026-10-30): direction C, MODERN GRAPHIC, except its face:** "I actually kind of like the last one
-modern graphic except the face that looks messed up". So §5's system (written for A) is superseded: the system is
-rebuilt on C (`people_design/dir_graphic.md`) with a NEW face (options in `people_design/faces_graphic.*`), then final.
+**IN USE FOR NOW (owner, 2026-10-30): direction C, MODERN GRAPHIC, with the LASH face.** The owner picked C "except
+the face that looks messed up", then, on six new faces (`people_design/faces_graphic.png`, `faces_graphic.md`): "It’s
+better let’s keep it for now / We will iterate more later on". So the people we draw now:
+- **Body, shapes, light, clothes, hair:** direction C as in `people_design/dir_graphic.md` (about 7.8 heads, rounded
+  polygons in two flat tones, crisp, no outlines; the styling from `people_design/fashion.md`; teal only on her).
+- **Face:** LASH (closed-eye lash lines, one flick each, a short soft nose hook; in profile the hair tucked behind the
+  eye), from `src/look/people_dirs/graphic_faces/` (`FaceOpt`); under ~200 px tall it drops to EDGE (the contour only);
+  sunglasses and caps are accessories some people wear, never everyone; her as the "you" often seen turned away (TURN).
+- **Still to iterate later** (the owner): the face, the stiffness of poses and limbs, a level-of-detail switch for small
+  figures (dir_graphic.md §8), back views for the supporting cast.
+§5 below was written for direction A before the pick: superseded where it differs from C; its research-based rules
+(proportions, wardrobe by setting, poses) still guide.
 
 **Status (2026-10-30): the people study's decision page. The design system in §5 is a DRAFT until the owner picks a
 direction** on `people_design/directions_compare.png`. A look doc: it ranks below the playbook, `DIRECTION.md` and
