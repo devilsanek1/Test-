@@ -344,3 +344,152 @@ export function cuffOf(sk: Skel, side: 'l' | 'r', c: Cam, len = 1): {p: V2; dir:
   return {p, dir: norm(sub(p, e))};
 }
 export const depthOf = (p: V3, c: Cam) => toCam(p, c)[2];
+
+// ---------------------------------------------------------------- bare limbs and short sleeves
+/** A bare arm from the shoulder (or partway down the upper arm) to the wrist, in skin. */
+export function bareArm(sk: Skel, side: 'l' | 'r', c: Cam, t: Tone, z: number | null, from = 0.0): Part & {tube: Tube} {
+  const A = sk.arm[side];
+  const b = sk.b;
+  const s0: V3 = lerp3v(A.sh, A.el, from);
+  return tubePart(`arm-${side}`, [s0, A.el, A.wr], [b.armR * (1 - 0.1 * from), b.elbowR, b.wristR], c, t, z, {start: 'round', end: 'flat', endR: 2, r: 16});
+}
+/** A short sleeve: from the shoulder to a fraction k of the upper arm. */
+export function shortSleeve(sk: Skel, side: 'l' | 'r', c: Cam, t: Tone, r0: number, r1: number, k: number, z: number | null): Part & {tube: Tube} {
+  const A = sk.arm[side];
+  const top: V3 = [A.sh[0] * 0.9, A.sh[1] + 12, A.sh[2]];
+  const end: V3 = lerp3v(A.sh, A.el, k);
+  return tubePart(`ssleeve-${side}`, [top, A.sh, end], [r0 - 2, r0, r1], c, t, z, {start: 'round', end: 'flat', endR: 2, r: 12});
+}
+/** Bare lower legs (below a skirt): knee, calf, ankle. */
+export function bareLegs(sk: Skel, c: Cam, t: Tone, z: number): Part[] {
+  const b = sk.b;
+  return (['l', 'r'] as const).map((side) => {
+    const L = sk.leg[side];
+    const calf: V3 = lerp3v(L.knee, L.ankle, 0.22);
+    const lowCalf: V3 = lerp3v(L.knee, L.ankle, 0.55);
+    const p = tubePart(`shin-${side}`, [L.knee, calf, lowCalf, L.ankle], [b.kneeR, b.calfR, b.calfR * 0.72, b.ankleR], c, t, null, {start: 'round', end: 'round', r: 14});
+    return {...p, z: z + p.tube.z * 0.001};
+  });
+}
+const lerp3v = (a: V3, b: V3, t: number): V3 => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+
+// ---------------------------------------------------------------- the bomber (N6): roomy body, rib hem band, rib cuffs
+export type BomberSpec = {tone: Tone; rib: Tone; z: number; /** the V at the neck showing the tee: depth (y of the zip's end) */ vY?: number};
+export function bomber(sk: Skel, c: Cam, s: BomberSpec): Part[] {
+  const ch = sk.chest;
+  const pv = sk.pelvis;
+  const b = sk.b;
+  const wa = blend(pv, ch, 0.55);
+  const sh = b.shoulderW / 2 + 14;
+  const rings: Ring[] = [
+    fr(ch, 846, 46, 48, -12),
+    fr(ch, 814, sh - 16, 74, -10),
+    fr(ch, 790, sh, 86, -6),
+    fr(ch, 730, sh - 6, 94, -2),
+    fr(wa, 650, sh - 10, 94, 2),
+    fr(wa, 616, sh - 16, 90, 2),
+    fr(pv, 604, b.waistW / 2 + 16, b.waistD + 16, 2),
+  ];
+  const band: Ring[] = [fr(pv, 606, b.waistW / 2 + 16, b.waistD + 16, 2), fr(pv, 568, b.waistW / 2 + 18, b.waistD + 16, 2)];
+  // the V at the neck: the zip opened to vY
+  const vY = s.vY ?? 750;
+  const e1 = surf(rings[0], 90 - 26, c);
+  const e2 = surf(rings[0], 90 + 26, c);
+  const tip = surf({...rings[3], y: vY}, 90, c);
+  let cut: string | undefined;
+  if (e1.facing || e2.facing || tip.facing) cut = poly([add(e1.p, [0, -80]) as V2, e1.p, tip.p, e2.p, add(e2.p, [0, -80]) as V2]);
+  return [
+    loftPart('bomber', rings, c, s.tone, s.z, {r: [6, 30, 34, 24, 20, 8, 2], hemR: 2, cut}),
+    loftPart('bomberBand', band, c, s.rib, s.z + 0.2, {r: 2, hemR: 3}),
+  ];
+}
+/** A sleeve with a rib cuff (a narrower band at the wrist). */
+export function ribSleeve(sk: Skel, side: 'l' | 'r', c: Cam, t: Tone, rib: Tone, r: [number, number, number], z: number): Part[] {
+  const A = sk.arm[side];
+  const top: V3 = [A.sh[0] * 0.92, A.sh[1] + 14, A.sh[2]];
+  const cuffStart: V3 = lerp3v(A.el, A.wr, 0.8);
+  const cuffEnd: V3 = lerp3v(A.el, A.wr, 0.98);
+  const body = tubePart(`sleeve-${side}`, [top, A.sh, A.el, cuffStart], [r[0] - 2, r[0], r[1], r[2]], c, t, z, {start: 'round', end: 'flat', endR: 4, r: 14});
+  const cuff = tubePart(`cuff-${side}`, [lerp3v(A.el, A.wr, 0.76), cuffEnd], [r[2] * 0.78, r[2] * 0.74], c, rib, z + 0.1, {start: 'flat', end: 'flat', endR: 2, r: 4});
+  return [body, cuff];
+}
+
+// ---------------------------------------------------------------- the cropped leather jacket (N3)
+export type JacketSpec = {tone: Tone; z: number; hemY?: number; zip?: string};
+export function leatherJacket(sk: Skel, c: Cam, s: JacketSpec): Part[] {
+  const ch = sk.chest;
+  const pv = sk.pelvis;
+  const b = sk.b;
+  const wa = blend(pv, ch, 0.55);
+  const sh = b.shoulderW / 2 + 6;
+  const hemY = s.hemY ?? 612;
+  const rings: Ring[] = [
+    fr(ch, 866, 36, 38, -8),
+    fr(ch, 834, 44, 44, -12),
+    fr(ch, 812, sh - 14, 66, -10),
+    fr(ch, 792, sh, 76, -6),
+    fr(ch, 730, sh - 8, 84, -2),
+    fr(wa, 660, sh - 12, 82, 0),
+    fr(wa, hemY, sh - 12, 80, 0),
+  ];
+  const L = loft(rings, c);
+  // the leather's crisp sheen: one streak inside the key-side silhouette, from the shoulder down
+  const streak: V2[] = [];
+  const inner: V2[] = [];
+  for (let i = 2; i < rings.length - 1; i++) {
+    const p = L.left[i];
+    streak.push([p[0] + 9, p[1] + (i === 2 ? 10 : 0)]);
+    inner.push([p[0] + 16, p[1] + (i === 2 ? 10 : 0)]);
+  }
+  const parts: Part[] = [
+    loftPart('jacket', rings, c, s.tone, s.z, {r: [4, 10, 26, 30, 20, 10, 2], hemR: 2, regions: [{d: poly([...streak, ...inner.reverse()]), fill: s.tone.sheen}]}),
+  ];
+  if (s.zip) {
+    // the zip: a true line down the centre front, from the collar to the hem
+    const pts: V2[] = [];
+    for (const r of [rings[0], rings[2], rings[4], rings[5], rings[6]]) {
+      const q = surf(r, 90, c);
+      if (q.facing) pts.push(q.p);
+    }
+    if (pts.length >= 2) parts.push({name: 'zip', d: 'M' + pts.map((p) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join('L'), fill: 'none', z: s.z + 0.3, line: {w: 3, color: s.zip, cap: 'butt'}});
+  }
+  return parts;
+}
+/** A sleeve with the leather's sheen streak along its key side. */
+export function leatherSleeve(sk: Skel, side: 'l' | 'r', c: Cam, t: Tone, r: [number, number, number], z: number): Part {
+  const p = sleeve(sk, side, c, {tone: t, r, len: 0.97, z});
+  const tb = p.tube;
+  // the key-side silhouette is the one NOT in shade; the streak runs just inside it, toward the axis
+  const lit = tb.shadeSide === 'A' ? tb.B : tb.A;
+  const inward = (i: number): V2 => norm(sub(tb.axis[i], lit[i]));
+  const a = lit.slice(1, -1).map((q, j) => add(q, mul(inward(j + 1), 6)) as V2);
+  const b2 = lit.slice(1, -1).map((q, j) => add(q, mul(inward(j + 1), 12)) as V2);
+  return {...p, regions: [...(p.regions ?? []), {d: poly([...a, ...b2.reverse()]), fill: t.sheen}]};
+}
+
+// ---------------------------------------------------------------- the bias satin midi skirt (L3 / N3)
+export type SkirtSpec = {tone: Tone; z: number; hemY: number; hemA: number; swing?: number};
+export function slipSkirt(sk: Skel, c: Cam, s: SkirtSpec): Part {
+  const pv = sk.pelvis;
+  const b = sk.b;
+  const sw = s.swing ?? 0;
+  const rings: Ring[] = [
+    fr(pv, 622, b.waistW / 2 + 4, b.waistD + 4, 0),
+    fr(pv, 560, b.hipW / 2 - 2, b.hipD + 2, 0),
+    fr(pv, 505, b.hipW / 2 + 4, b.hipD + 6, 2),
+    fr(pv, 400, b.hipW / 2 + 12, b.hipD + 14, 4, sw * 0.3),
+    fr(pv, 300, s.hemA - 14, b.hipD + 24, 6, sw * 0.6),
+    fr(pv, s.hemY, s.hemA, b.hipD + 30, 8, sw),
+  ];
+  const L = loft(rings, c);
+  // the satin's sheen: one soft band across the hip on the key side, running down the bias
+  const p0 = L.left[1];
+  const p1 = L.left[3];
+  const sheen: V2[] = [
+    [p0[0] + 18, p0[1] + 6],
+    [p0[0] + 46, p0[1] - 2],
+    [p1[0] + 60, p1[1] + 40],
+    [p1[0] + 26, p1[1] + 60],
+  ];
+  return loftPart('skirt', rings, c, s.tone, s.z, {r: [3, 30, 24, 30, 30, 2], hemR: 3, regions: [{d: poly(sheen), fill: s.tone.sheen}]});
+}

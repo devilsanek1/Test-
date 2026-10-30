@@ -36,7 +36,9 @@ export function hairLong(c: HairCtx, o: {len?: number} = {}): Part[] {
   const parts: Part[] = [];
   if (c.view === 'q') {
     const fx = c.faceX;
-    const part: V2 = [fx + 0.16, -0.555];
+    const part: V2 = [fx + 0.16, -0.5];
+    // the parting: the notch between the two curtains shows the hair's shade, never the background
+    parts.push({name: 'hairParting', d: PG(c, [[part[0] - 0.07, -0.53], [part[0] + 0.08, -0.55], [part[0] + 0.02, -0.42], [part[0] - 0.03, -0.42]]), fill: t.deep, z: 54});
     // the back mass: behind the neck, framing it in the deep tone
     parts.push({
       name: 'hairBack',
@@ -73,12 +75,13 @@ export function hairLong(c: HairCtx, o: {len?: number} = {}): Part[] {
       [0.35, L - 0.2, 0.01],
       [0.3, L - 0.48, 0.16],
       [0.25, 0.86, 0.12],
-      [0.21, 0.56, 0.1],
-      [0.17, 0.32, 0.06],
-      [0.11, 0.1, 0.06],
-      [0.05, -0.1, 0.07],
-      [-0.02, -0.28, 0.1],
-      [-0.08, -0.43, 0.08],
+      [0.2, 0.58, 0.1],
+      [0.13, 0.36, 0.08],
+      [0.075, 0.16, 0.06],
+      [0.05, -0.02, 0.06],
+      [0.02, -0.19, 0.08],
+      [-0.04, -0.33, 0.08],
+      [-0.1, -0.44, 0.06],
     ];
     const nearRegs: Region[] = [
       // the side of the head and the lock's outer half in the shade plane
@@ -158,15 +161,17 @@ export function hairLong(c: HairCtx, o: {len?: number} = {}): Part[] {
       [0.6, -0.2, 0.14],
       [0.6, 0.14, 0.12],
       [0.52, 0.42, 0.1],
-      [0.34, 0.52, 0.06],
-      [0.13, 0.44, 0.06],
-      [0.03, 0.24, 0.08],
-      [-0.05, 0.05, 0.06],
-      [-0.11, -0.08, 0.04],
-      [-0.27, 0.11, 0.01],
-      [-0.4, -0.06, 0.06],
-      [-0.45, -0.24, 0.08],
+      [0.34, 0.53, 0.06],
+      [0.12, 0.47, 0.06],
+      [0.03, 0.33, 0.08],
+      [-0.05, 0.17, 0.06],
+      [-0.15, 0.085, 0.04],
+      [-0.27, 0.085, 0.06],
+      [-0.355, 0.0, 0.08],
+      [-0.405, -0.13, 0.1],
+      [-0.4, -0.31, 0.1],
     ];
+
     parts.push({
       name: 'hairCap',
       d: R(c, cap),
@@ -238,4 +243,289 @@ export function hairLong(c: HairCtx, o: {len?: number} = {}): Part[] {
     });
   }
   return parts;
+}
+
+// ---------------------------------------------------------------- H5-under-a-cap: the ponytail pulled through the cap
+/** The hair under a cap: the sides pulled back above the ear, a face-framing wisp, and the ponytail through the cap's
+ *  back opening (the flowing element). */
+export function hairPonytail(c: HairCtx): Part[] {
+  const t = c.t;
+  const sw = c.swing ?? 0;
+  const parts: Part[] = [];
+  if (c.view === 'q') {
+    parts.push({
+      name: 'hairSide',
+      d: R(c, [
+        [0.0, -0.19, 0.02],
+        [0.3, -0.12, 0.08],
+        [0.48, -0.02, 0.08],
+        [0.5, 0.14, 0.08],
+        [0.42, 0.3, 0.06],
+        [0.33, 0.24, 0.04],
+        [0.36, 0.1, 0.05],
+        [0.2, -0.08, 0.06],
+        [0.08, -0.12, 0.04],
+      ]),
+      fill: t.lit,
+      regions: [{d: rightOf(c, [[0.3, -0.4], [0.36, 0.1], [0.4, 0.5]]), fill: t.shade}],
+      z: 54,
+    });
+    parts.push({
+      name: 'hairWisp',
+      d: R(c, [
+        [-0.36, -0.19, 0.02],
+        [-0.47, -0.17, 0.04],
+        [-0.48, -0.02, 0.06],
+        [-0.44, 0.13, 0.01],
+        [-0.42, 0.0, 0.06],
+        [-0.37, -0.12, 0.04],
+      ]),
+      fill: t.lit,
+      z: 56,
+    });
+    parts.push({
+      name: 'ponytail',
+      d: R(c, [
+        [0.4, -0.14, 0.04],
+        [0.64, -0.1, 0.12],
+        [0.74, 0.28, 0.14],
+        [0.78, 0.78, 0.14],
+        [0.72, 1.16, 0.1],
+        [0.58, 1.22, 0.08],
+        [0.52, 1.1, 0.03],
+        [0.56, 1.02, 0.01],
+        [0.52, 0.66, 0.14],
+        [0.44, 0.28, 0.1],
+        [0.38, 0.02, 0.04],
+      ]),
+      fill: t.lit,
+      regions: [
+        {d: rightOf(c, [[0.6, -0.2], [0.64, 0.5], [0.66, 1.3]]), fill: t.shade},
+        {d: crescent(c, 0.86, 0.36, 0.32, 0.5, 168, 214, 0.05), fill: t.sheen},
+      ],
+      z: 19,
+    });
+  } else if (c.view === 'p') {
+    parts.push({
+      name: 'hairSide',
+      d: R(c, [
+        [-0.32, -0.17, 0.02],
+        [0.3, -0.09, 0.06],
+        [0.56, -0.05, 0.06],
+        [0.56, 0.12, 0.08],
+        [0.42, 0.3, 0.06],
+        [0.3, 0.27, 0.04],
+        [0.26, 0.08, 0.06],
+        [0.1, -0.06, 0.05],
+        [-0.1, -0.05, 0.05],
+        [-0.22, 0.04, 0.02],
+        [-0.3, -0.06, 0.04],
+      ]),
+      fill: t.lit,
+      regions: [{d: rightOf(c, [[0.36, -0.4], [0.4, 0.1], [0.42, 0.5]]), fill: t.shade}],
+      z: 54,
+    });
+    parts.push({
+      name: 'ponytail',
+      d: R(c, [
+        [0.46, -0.16, 0.04],
+        [0.72, -0.12, 0.12],
+        [0.88 + sw * 0.5, 0.22, 0.14],
+        [0.94 + sw, 0.62, 0.14],
+        [0.88 + sw, 1.0, 0.1],
+        [0.74 + sw, 1.05, 0.08],
+        [0.69 + sw, 0.94, 0.03],
+        [0.74 + sw, 0.86, 0.01],
+        [0.72 + sw * 0.8, 0.5, 0.14],
+        [0.6 + sw * 0.4, 0.14, 0.1],
+        [0.5, 0.0, 0.04],
+      ]),
+      fill: t.lit,
+      regions: [
+        {d: rightOf(c, [[0.7, -0.2], [0.82 + sw, 0.5], [0.84 + sw, 1.2]]), fill: t.shade},
+        {d: crescent(c, 1.02 + sw, 0.42, 0.36, 0.5, 165, 210, 0.05), fill: t.sheen},
+      ],
+      z: 18,
+    });
+  } else {
+    const tn = c.turn ?? 0;
+    parts.push({
+      name: 'hairNape',
+      d: R(c, [
+        [-0.46, -0.08, 0.02],
+        [0.46, -0.08, 0.02],
+        [0.44, 0.12, 0.08],
+        [0.26, 0.32, 0.1],
+        [0.0, 0.36, 0.1],
+        [-0.26, 0.32, 0.1],
+        [-0.42 + 0.04 * tn, 0.12, 0.08],
+      ]),
+      fill: t.lit,
+      regions: [{d: rightOf(c, [[0.1, -0.2], [0.14, 0.4]]), fill: t.shade}],
+      z: 76,
+    });
+    parts.push({
+      name: 'ponytail',
+      d: R(c, [
+        [-0.13, -0.16, 0.04],
+        [0.13, -0.16, 0.04],
+        [0.2 + sw * 0.3, 0.3, 0.12],
+        [0.2 + sw, 0.82, 0.12],
+        [0.12 + sw, 1.2, 0.1],
+        [-0.04 + sw, 1.24, 0.08],
+        [-0.1 + sw, 1.12, 0.03],
+        [-0.02 + sw, 1.06, 0.01],
+        [-0.12 + sw * 0.8, 0.7, 0.12],
+        [-0.16 + sw * 0.3, 0.3, 0.1],
+      ]),
+      fill: t.lit,
+      regions: [
+        {d: rightOf(c, [[0.05, -0.2], [0.08 + sw, 0.6], [0.06 + sw, 1.3]]), fill: t.shade},
+        {d: crescent(c, 0.26, 0.4, 0.3, 0.45, 160, 205, 0.045), fill: t.sheen},
+      ],
+      z: 78,
+    });
+  }
+  return parts;
+}
+
+// ---------------------------------------------------------------- H10: soft curtains with a longer nape (men)
+export function hairCurtains(c: HairCtx): Part[] {
+  const t = c.t;
+  const fx = c.faceX;
+  if (c.view !== 'q') return [];
+  const part: V2 = [fx + 0.13, -0.4];
+  return [
+    {
+      name: 'hairMan',
+      d: R(c, [
+        [-0.47, -0.08, 0.02],
+        [-0.5, -0.34, 0.12],
+        [-0.22, -0.66, 0.2],
+        [0.18, -0.67, 0.22],
+        [0.5, -0.44, 0.16],
+        [0.55, -0.08, 0.1],
+        [0.5, 0.2, 0.06],
+        [0.42, 0.27, 0.04],
+        [0.36, 0.1, 0.06],
+        [0.2, -0.1, 0.05],
+        [0.05, -0.13, 0.04],
+        // the near curtain's tip at the brow, the part, the far curtain down to the cheekbone
+        [fx + 0.27, -0.06, 0.02],
+        [part[0] + 0.03, -0.27, 0.06],
+        [part[0], part[1], 0],
+        [part[0] - 0.05, -0.26, 0.06],
+        [-0.4, -0.03, 0.02],
+      ]),
+      fill: t.lit,
+      regions: [
+        {d: rightOf(c, [[0.1, -0.8], [0.2, -0.3], [0.28, 0.3]]), fill: t.shade},
+        {d: crescent(c, 0.0, -0.04, 0.52, 0.56, 214, 300, 0.07), fill: t.sheen},
+        // the part as a crisp notch of shade
+        {d: PG(c, [[part[0] - 0.012, part[1] + 0.002], [part[0] + 0.03, -0.6], [part[0] + 0.05, -0.6], [part[0] + 0.012, part[1] + 0.01]]), fill: t.shade},
+      ],
+      z: 56,
+    },
+  ];
+}
+
+// ---------------------------------------------------------------- H6: boho knotless braids, half-up, curly ends
+export function hairBraids(c: HairCtx, ends: Tone, o: {len?: number} = {}): Part[] {
+  const t = c.t;
+  const L = o.len ?? 2.3;
+  if (c.view !== 'q') return [];
+  const grooves = (xs: number[], y0: number, y1: number, lean = 0): {d: string; fill: string}[] =>
+    xs.map((x, i) => ({
+      d: PG(c, [
+        [x, y0],
+        [x + 0.012 + lean * 0.3, (y0 + y1) / 2],
+        [x + lean, y1],
+        [x - 0.012 + lean * 0.3, (y0 + y1) / 2],
+      ]),
+      fill: i % 2 ? t.deep : t.shade,
+    }));
+  const curls = (cx: number, cy: number, w: number): string => {
+    // a row of small loose curls: unequal lobes
+    const pts: RV[] = [];
+    const n = 5;
+    pts.push([cx - w / 2, cy - 0.12, 0.02]);
+    for (let i = 0; i <= n; i++) {
+      const x = cx - w / 2 + (w * i) / n;
+      const dy = i % 2 ? 0.05 : 0.0;
+      pts.push([x, cy + 0.12 + dy, 0.04]);
+    }
+    pts.push([cx + w / 2, cy - 0.12, 0.02]);
+    return R(c, pts);
+  };
+  return [
+    // the length behind the shoulders, framing the neck
+    {
+      name: 'braidsBack',
+      d: R(c, [
+        [-0.46, -0.2, 0.1],
+        [-0.6, 0.3, 0.14],
+        [-0.64, 1.0, 0.14],
+        [-0.5, 1.2, 0.08],
+        [0.3, 1.2, 0.08],
+        [0.6, 1.0, 0.14],
+        [0.6, 0.3, 0.14],
+        [0.44, -0.3, 0.14],
+      ]),
+      fill: t.deep,
+      regions: grooves([-0.5, -0.36], 0.1, 1.1),
+      z: 18,
+    },
+    // the head: the braids' roots pulled back from a centre part, a top knot at the crown
+    {
+      name: 'braidsCap',
+      d: R(c, [
+        [-0.43, -0.06, 0.02],
+        [-0.49, -0.32, 0.12],
+        [-0.22, -0.6, 0.2],
+        [0.2, -0.6, 0.2],
+        [0.5, -0.38, 0.16],
+        [0.54, 0.0, 0.1],
+        [0.5, 0.3, 0.06],
+        [0.3, 0.32, 0.04],
+        [0.24, 0.1, 0.06],
+        [0.1, -0.16, 0.08],
+        [c.faceX + 0.16, -0.36, 0.02],
+        [-0.3, -0.24, 0.1],
+        [-0.38, -0.08, 0.02],
+      ]),
+      fill: t.lit,
+      regions: [
+        {d: rightOf(c, [[0.12, -0.8], [0.22, -0.2], [0.3, 0.4]]), fill: t.shade},
+        ...grooves([-0.2, 0.0, 0.2, 0.36], -0.56, -0.1, 0.06),
+        {d: crescent(c, 0.0, -0.02, 0.5, 0.54, 212, 262, 0.05), fill: t.sheen},
+      ],
+      z: 56,
+    },
+    {
+      name: 'topKnot',
+      d: R(c, [[0.02, -0.62, 0.1], [0.18, -0.78, 0.12], [0.38, -0.7, 0.1], [0.36, -0.5, 0.08], [0.16, -0.48, 0.08]]),
+      fill: t.lit,
+      regions: [{d: rightOf(c, [[0.22, -0.9], [0.26, -0.4]]), fill: t.shade}, {d: crescent(c, 0.2, -0.6, 0.15, 0.12, 200, 280, 0.035), fill: t.sheen}],
+      z: 57,
+    },
+    // a group of braids over the near shoulder, down the front, breaking into curly ends
+    {
+      name: 'braidsFront',
+      d: R(c, [
+        [0.26, 0.08, 0.04],
+        [0.5, 0.2, 0.1],
+        [0.58, 0.7, 0.14],
+        [0.62, L - 0.4, 0.12],
+        [0.6, L - 0.1, 0.06],
+        [0.3, L - 0.1, 0.06],
+        [0.3, L - 0.5, 0.14],
+        [0.26, 0.7, 0.14],
+        [0.22, 0.3, 0.08],
+      ]),
+      fill: t.lit,
+      regions: [{d: rightOf(c, [[0.46, 0.0], [0.5, 1.0], [0.52, L]]), fill: t.shade}, ...grooves([0.36, 0.44, 0.52], 0.25, L - 0.15, 0.02)],
+      z: 75,
+    },
+    {name: 'braidsEnds', d: curls(0.45, L - 0.02, 0.36), fill: ends.lit, regions: [{d: rightOf(c, [[0.5, L - 0.3], [0.52, L + 0.3]]), fill: ends.shade}], z: 74.9},
+  ];
 }

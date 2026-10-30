@@ -5,7 +5,7 @@
 // there is none. No eyes, brows or mouth are ever drawn: the hair, the head's angle and the light carry the person.
 // Head units: u = the skull's height (crown to chin); origin at the skull's centre; y down; the crown at y -0.5.
 import {V2, V3, RV, rpath, rot, rad, add, mul, poly, clamp} from './geo';
-import {Cam, proj, toCam, tube, tubeShade} from './rig';
+import {Cam, proj, toCam, tube} from './rig';
 import type {Skel} from './body';
 import type {Tone} from './color';
 import type {Part} from './part';
@@ -71,13 +71,16 @@ function head34(f: Face, yaw: number): {skin: RV[]; mark: RV[]; faceX: number; j
     [jw, jy, 0.03 + 0.02 * k],
     // the jaw line: a straight from the angle to the chin (S1: the straight against the round skull)
     [fx + 0.22 + chinW * 0.5, 0.465, 0.05],
-    [fx + 0.1, 0.5, 0.05 + 0.02 * f.chin],
-    [fx + 0.02 - 0.01 * k, 0.495, 0.03],
-    // the far contour, up: chin front, the cheek's long straight, the cheekbone, the eye socket, the brow, the temple
-    [fx - 0.035 - 0.01 * k, 0.44, 0.05],
-    [-sil + 0.075 - 0.01 * k, 0.29, 0.07],
-    // the nose breaks the contour: under the tip, the tip, the ridge going back into the face
-    [tipX + 0.034, tipY + 0.04, 0.012],
+    [fx + 0.1, 0.49 + 0.01 * k, 0.05 + 0.02 * f.chin],
+    [fx + 0.02 - 0.01 * k, 0.483 + 0.012 * k, 0.03],
+    // the far contour, up: the chin, the lips just proud of the cheek, the nose breaking the contour, the cheekbone,
+    // the eye socket's dip, the brow, the temple
+    [fx - 0.045 - 0.01 * k, 0.435, 0.04],
+    [fx - 0.045, 0.398, 0.02],
+    [fx - 0.067 + 0.012 * k, 0.354, 0.012],
+    [fx - 0.055, 0.327, 0.005],
+    [fx - 0.074 + 0.01 * k, 0.3, 0.012],
+    [tipX + 0.036, tipY + 0.042, 0.01],
     [tipX, tipY, 0.012],
     [tipX + 0.02, tipY - 0.055, 0.006],
     [-sil + 0.025, 0.1, 0.02],
@@ -87,17 +90,26 @@ function head34(f: Face, yaw: number): {skin: RV[]; mark: RV[]; faceX: number; j
     [-sil + 0.025, -0.2, 0.12],
     [-sil + 0.12, -0.4, 0.14],
   ];
+  // THE MARK, one crisp shape in the skin's shade: the shade under the near brow ridge (the socket's top, never an
+  // eye) running into the nose's shaded side and ending in a foot under the tip: a "7" read as light, not as features
+  const bw = 0.17 + 0.03 * k; // the brow arm's length
   const mark: RV[] = [
-    [fx + 0.012, -0.07, 0],
-    [fx + 0.03, 0.06, 0.04],
-    [fx + 0.022, tipY - 0.005, 0.025],
-    [fx + 0.004, tipY + 0.042, 0.02],
-    [tipX + 0.035, tipY + 0.032, 0.015],
-    [tipX + 0.012, tipY + 0.012, 0.012],
-    [tipX + 0.028, tipY - 0.004, 0.008],
-    [fx - 0.025, tipY - 0.03, 0.03],
-    [fx - 0.06 * t, 0.07, 0.04],
-    [fx - 0.012, -0.03, 0.02],
+    [fx + 0.004, -0.058, 0.01],
+    [fx + bw * 0.45, -0.07, 0.03],
+    [fx + bw, -0.045, 0.02],
+    [fx + bw + 0.02, -0.03, 0.0],
+    [fx + bw * 0.6, -0.033, 0.03],
+    [fx + 0.05, -0.022, 0.03],
+    [fx + 0.026, 0.06, 0.03],
+    [fx + 0.034, 0.17, 0.03],
+    [fx + 0.036, tipY + 0.02, 0.02],
+    [fx + 0.012, tipY + 0.052, 0.015],
+    [tipX + 0.03, tipY + 0.045, 0.012],
+    [tipX + 0.008, tipY + 0.028, 0.004],
+    [tipX + 0.036, tipY + 0.02, 0.008],
+    [fx - 0.018, tipY + 0.002, 0.02],
+    [fx - 0.012, 0.1, 0.04],
+    [fx - 0.006, 0.0, 0.02],
   ];
   return {
     skin,
@@ -191,66 +203,48 @@ export function headParts(sk: Skel, c: Cam, skin: Tone, o: {neckDeep?: boolean} 
   let view: 'q' | 'p' | 'b' = 'q';
   if (ay >= 70 && ay <= 112) view = 'p';
   else if (ay > 112) view = 'b';
-  // the neck: a tube from its base to under the skull, all in the shade plane (it sits under the jaw), with the jaw's
-  // cast shadow as a deep band at the top
+  // the neck: a slender column from its base to under the skull, ONE flat shade plane (it sits under the jaw): the
+  // lit face against the shaded neck is the jaw's line
   const nr = sk.b.neckW / 2;
-  const nt = tube([sk.neckBase, sk.neckTop, [sk.neckTop[0], sk.neckTop[1] + 30, sk.neckTop[2] - 4]], [nr * 1.06, nr, nr], c);
+  const nt = tube([sk.neckBase, sk.neckTop, [sk.neckTop[0], sk.neckTop[1] + 34, sk.neckTop[2] - 6]], [nr * 1.08, nr, nr * 0.96], c);
   const neckD = rpath(
-    [...nt.A.map((q) => [q[0], q[1], 0] as RV), ...nt.B.slice().reverse().map((q) => [q[0], q[1], 0] as RV)],
+    [...nt.A.map((q, i) => [q[0], q[1], i === 1 ? 6 : 0] as RV), ...nt.B.slice().reverse().map((q, i) => [q[0], q[1], i === 1 ? 6 : 0] as RV)],
     true,
   );
-  const neckRegs = [];
-  if (view !== 'b') {
-    // the lit strip on the neck's key side (the throat catches the light), then the jaw's shadow
-    neckRegs.push({d: poly(tubeShade(nt, 80)), fill: skin.shade});
-  }
-  parts.push({name: 'neck', d: neckD, fill: view === 'b' ? skin.shade : skin.lit, regions: neckRegs, z: 50});
+  parts.push({name: 'neck', d: neckD, fill: skin.shade, z: 50});
+  void o;
 
   let lm: HeadOut['lm'];
   if (view === 'q') {
     const h = head34(f, yaw);
     const d = hf.R(h.skin);
-    // the side plane of the head away from the key: a crisp line down the near cheek (mostly under the hair)
-    const xT = 0.2 + 0.1 * Math.cos(rad(yaw));
-    const shade = poly(hf.PP([[xT, -0.7], [xT - 0.06, 0.62], [1.2, 0.62], [1.2, -0.7]]));
-    // the jaw's underside and the neck's top in the jaw's cast shadow
-    const jawSh = poly(
+    // the side plane away from the key: a designed terminator from the near temple, past the cheekbone's outer edge,
+    // to the jaw (the face's front plane stays lit; the mark is the only feature)
+    const ts = Math.sin(rad(-yaw));
+    const x0 = -0.02 + 0.12 * (0.64 - ts);
+    const side = poly(
       hf.PP([
-        [h.jawAngle[0] + 0.05, h.jawAngle[1] - 0.02],
-        [h.chin[0], 0.52],
-        [h.chin[0] - 0.1, 0.62],
-        [0.5, 0.62],
+        [x0 + 0.06, -0.62],
+        [x0 + 0.03, -0.26],
+        [x0 - 0.01, -0.02],
+        [x0 - 0.015, 0.12],
+        [x0 + 0.03, 0.29],
+        [x0 + 0.12, 0.42],
+        [x0 + 0.3, 0.62],
+        [1.2, 0.62],
+        [1.2, -0.62],
       ]),
     );
-    parts.push({name: 'head', d, fill: skin.lit, regions: [{d: shade, fill: skin.shade}, {d: jawSh, fill: skin.shade}], z: 52});
+    parts.push({name: 'head', d, fill: skin.lit, regions: [{d: side, fill: skin.shade}], z: 52});
     parts.push({name: 'mark', d: hf.R(h.mark), fill: skin.shade, z: 53});
-    // the neck below the jaw: the jaw's cast shadow, deep, as one crisp band
-    if (o.neckDeep !== false) {
-      const band = hf.R([
-        [h.jawAngle[0] + 0.02, h.jawAngle[1] - 0.04, 0],
-        [h.chin[0] + 0.02, 0.47, 0.02],
-        [h.chin[0] + 0.05, 0.6, 0.04],
-        [h.jawAngle[0] + 0.06, 0.6, 0],
-      ]);
-      parts.push({name: 'jawShadow', d: band, fill: skin.deep, z: 51, opacity: 0.55});
-    }
     lm = {faceX: h.faceX, nape: h.nape, jawAngle: h.jawAngle, view};
   } else if (view === 'p') {
     const h = headProfile(f);
     const d = hf.R(h.skin);
     // the back of the head and the jaw's underside away from the key
-    const shade = poly(hf.PP([[0.18, -0.7], [0.1, 0.36], [-0.3, 0.56], [1.2, 0.7], [1.2, -0.7]]));
+    const shade = poly(hf.PP([[0.2, -0.7], [0.14, 0.2], [0.1, 0.36], [-0.3, 0.5], [-0.3, 0.7], [1.2, 0.7], [1.2, -0.7]]));
     parts.push({name: 'head', d, fill: skin.lit, regions: [{d: shade, fill: skin.shade}], z: 52});
     parts.push({name: 'mark', d: hf.R(h.mark), fill: skin.shade, z: 53});
-    if (o.neckDeep !== false) {
-      const band = hf.R([
-        [0.14, 0.3, 0],
-        [-0.33, 0.48, 0.02],
-        [-0.3, 0.6, 0.03],
-        [0.2, 0.6, 0],
-      ]);
-      parts.push({name: 'jawShadow', d: band, fill: skin.deep, z: 51, opacity: 0.55});
-    }
     lm = {faceX: -0.43, nape: h.nape, jawAngle: h.jawAngle, view};
   } else {
     const h = headBack(f, yaw);

@@ -31,14 +31,14 @@ living artist is a style target. Paths are from `video/`.
   squinted, ten separate regions pull at >= 50 % of the strongest (three of them within 30 % of it), and in colour the
   four yellow upper windows out-shout the lit door (the colour formula's #1, #3, #4, #5; the door is #2). The owner's
   painting-style models have one or two such regions (refs 02, 03, 04: 1-2 calls, one rival). Below the calls, v6
-  breaks into 31 separate value pieces (refs 2-7) and about 40 named things (by eye; refs 4-6 objects plus their big
+  breaks into 32 separate value pieces (refs 2-7) and about 40 named things (by eye; refs 4-6 objects plus their big
   fields), 12 of them on our own quay.
 - **The references group their values into three big masses, and their density lives INSIDE a mass.** At a 1 %
   squint and 3 values, their three largest connected masses hold 88-97 % of the frame (v6 82 %); the busiest
   reference, the city at sunset, keeps hundreds of buildings and still holds 95 % in three masses (a dark hill, a mid
   city, a light sky): full is not busy when the detail stays inside its mass at low contrast.
 - **Their quiet is big and connected; ours is in pieces.** The references are 67-91 % quiet at a squint (the city
-  35 %), with one or two connected quiet masses of 51-77 % and 12-14 %; v6 is 60 % quiet, but in a sky of 28 % and a
+  35 %), with one or two connected quiet masses of 51-77 % and 12-14 %; v6 is 61 % quiet, but in a sky of 29 % and a
   paving of 24 % perforated by props, and its middle third is only 34 % quiet against the references' 60-93 %.
 - **One focal point = the subject + the story light + the hardest value step, in one place.** The bus stop's man
   sits inside its one light; the beach couple stand as dark silhouettes ON the lit horizon line; the city's men stand
@@ -60,9 +60,9 @@ living artist is a style target. Paths are from `video/`.
 ## 1. How it was measured (`composition_study.py`)
 
 - **Inputs.** Still v6 (`docs/studies/2026-10-28_city_posters/paint_test/paint_still_v6.png`, the captions taken out:
-  inside the caption block x 90-990, y 292-600 each row is re-made from the sky beside it; checked against the
-  engine's captions-off render of the same frame: the band is the one calm sky); v5 and v2's S1 as shipped (1.0 s) the
-  same way; `refs_human_scale/01`-`04` (the mute button inpainted; 04 cropped below the phone's status bar to 720 x
+  inside the caption block, x 95-985, y 299-560, the ink and the peach highlight are masked, grown by 4 px and inpainted
+  from the sky around them; against the engine's captions-off render of the same frame this is within 0.10 L* on
+  average in the block, p99 1.6); v5 and v2's S1 as shipped (1.0 s) the same way; `refs_human_scale/01`-`04` (the mute button inpainted; 04 cropped below the phone's status bar to 720 x
   1294, which is 9:16 within 1 %), `refs_paint/01` (the print's border cropped), the seven posters (`ui_mask.json`'s
   boxes inpainted). Everything at **400 px wide**: phone width, as the owner sees the landscape references full-width on
   his phone.
@@ -96,8 +96,8 @@ living artist is a style target. Paths are from `video/`.
 | ref 01 city hill sunset | 95 | 5 | 14 | 11 (5) / 7 (4) | yes (value): the men dark against the lit city | 35: 11 + 5 | 39 / 25 / 42 | 17 / 46 / 37 (8 / 44 / 69) |
 | paint ref 01 beach van | 86 | 7 | 7 | 5 (3) / 2 (2) | no: the van and the boulders | 53: 48 + 1 | 94 / 53 / 14 | 18 / 27 / 55 (24 / 46 / 69) |
 | the 7 posters (range) | 78-89 | 5-8 | 11-41 | 8-19 (3-8) / 9-18 (2-7) | (the quiet hero: city-poster `composition.md` §2) | 45-63: 35-52 + 1-7 | 93-98 / 23-67 / 10-24 | 17-33 / 21-34 / 42-60 (33-41 / 58-65 / 85-93) |
-| **our v6** | **82** | **10** | **31** | **10 (3) / 11 (4)** | **value yes, colour no (#2)** | **60: 28 + 24** | **80 / 34 / 66** | **16 / 39 / 45 (45 / 60 / 81)** |
-| v5 / v2 as shipped | 76 / 78 | 9 / 8 | 26 / 28 | 4 (2) / 9 (2); 3 (2) / 11 (3) | v5 yes; v2 value yes, colour no | 69: 30 + 18; 69: 35 + 15 | 88 / 47 / 73; 93 / 46 / 68 | 2 / 32 / 66; 2 / 28 / 70 |
+| **our v6** | **82** | **10** | **32** | **10 (3) / 11 (4)** | **value yes, colour no (#2)** | **61: 29 + 24** | **83 / 34 / 66** | **16 / 39 / 45 (45 / 60 / 81)** |
+| v5 / v2 as shipped | 73 / 78 | 9 / 8 | 25 / 28 | 4 (2) / 9 (2); 3 (2) / 11 (3) | v5 yes; v2 value yes, colour no | 69: 30 + 18; 69: 35 + 15 | 88 / 47 / 73; 93 / 46 / 68 | 2 / 33 / 65; 2 / 28 / 70 |
 
 **How each reference reads** (the method, never the picture):
 - **Ref 02, the bus stop** (one of the owner's two drawing-style models): three huge masses (the cloud, the night sky,
@@ -125,7 +125,7 @@ living artist is a style target. Paths are from `video/`.
   far quay; 7-10 the right edge, the boat's lamp and small specks. **In colour:** the four yellow upper windows are #1, #3, #4 and #5 (the door #2); the
   yellow side panel, the post box, the top-left leaves and the near tree follow. The door is the right focal and v6
   already lights it; what defeats it is everything else at the same pull.
-- **The pieces (31) and the named things (about 40, by eye at 400 px):** the sky 6 (the leaf branch, the cloud bar,
+- **The pieces (32) and the named things (about 40, by eye at 400 px):** the sky 6 (the leaf branch, the cloud bar,
   the cumulus, the low deck, the flock, the sun); the far world 3 (the tower, the roofs, the bridge) and 4 lamp posts;
   the facade 10 (five upper windows, three ground-floor panes, the yellow side panel, the door with her); the far quay
   and the water 7 (the bollard row, the man, two boats, the cat, the duck, Pip on his post); our quay 12 (the tree, its
@@ -134,7 +134,7 @@ living artist is a style target. Paths are from `video/`.
 - **The masses:** 10 masses >= 1 %, the three largest 82 %. The 2-value notan splits the frame in two halves (the light
   sky and facade above, the paving below) with no shape to it: there is no dark mass, the darkest group (16 %, mean L*
   45) is scattered pieces (64 % in its two largest regions; the references 89-100 %).
-- **The quiet:** 60 %, but the sky (28 %) is cut by the leaves, two cloud layers and the flock, and the paving (24 %) is
+- **The quiet:** 61 %, but the sky (29 %) is cut by the leaves, two cloud layers and the flock, and the paving (24 %) is
   quiet only between its 12 props: the quiet is the ground the props stand on, not a mass of its own ("things ON a
   field", LIFE_AND_DENSITY §0's failure).
 - **Pip** sits on a post right under the door, where the door's light column leads the eye: on the subject's eye path
@@ -153,7 +153,7 @@ frame` runs R1-R5, R7 and R10 on any still (§6); WARNs, never FAILs: the owner'
   (the board's grey tiers already are one: `STORYBOARD_STYLE.md`), checked at phone width before G4.
 - **R2 Few pieces: <= 10 value pieces (0.02-1 % of the frame) in a 9:16 frame; the rest is texture inside a mass**
   (variation within a mass 2-8 L*, the references' in-mass spread). The references 2-7 per frame (ref 04, the one 9:16
-  frame, 7), the city 14, the posters 11-41; v6 31; T1-T3 4-6. A small thing either joins a mass (tone-on-tone, no own
+  frame, 7), the city 14, the posters 11-41; v6 32; T1-T3 4-6. A small thing either joins a mass (tone-on-tone, no own
   silhouette at a squint) or is one of the few named objects (R6).
 - **R3 One call: <= 3 regions pull at >= 50 % of the strongest, and only one at >= 70 % (the focal), in value AND in
   colour.** The painted models 1-2 calls with one rival; the van 5; the city 11 (a held scale shot); the posters 8-19;
@@ -170,7 +170,7 @@ frame` runs R1-R5, R7 and R10 on any still (§6); WARNs, never FAILs: the owner'
 - **R5 Big quiet: >= 65 % of the frame quiet at a squint, in two connected masses: the sky field (>= 30 %, the caption
   band inside it) at the top and the near ground (>= 15 %) at the bottom; the things live in the belt between them.**
   The painted models are 67-91 % quiet with masses of 51-77 % and 12-14 %; the middle third holds the detail (ref 02:
-  top 76 / mid 60 / bottom 63 % quiet; ref 03: 86 / 80 / 58). v6: 60 %, 28 + 24, its middle third 34 % quiet. T1-T3 (flat
+  top 76 / mid 60 / bottom 63 % quiet; ref 03: 86 / 80 / 58). v6: 61 %, 29 + 24, its middle third 34 % quiet. T1-T3 (flat
   values): 86-88 %, 36-39 + 23-33. **Quiet is never empty:** a quiet mass is patterned within +-4-6 L* (painted
   variation, dapples, paving joints, fallen leaves, tone-on-tone things), so "full, never empty" (DIRECTION rule 3)
   still holds; what goes is the contrast, not the content (§7 reconciles the doc rules).
@@ -182,14 +182,15 @@ frame` runs R1-R5, R7 and R10 on any still (§6); WARNs, never FAILs: the owner'
   within +-6 L* of the band and none with its own silhouette at a squint (R2).
 - **R7 The caption band sits in the light quiet mass, and the focal sits just under it.** The band (y 290-600) is part
   of the frame's largest light quiet mass, flat (dL* <= 1.5, ink >= 7:1: LAYOUT §1). The focal's centre at **y 860-1200
-  (0.45-0.62 H) and x 380-700** (the subject axis), **<= 0.15 W off the caption's centre line (x 520)** and **300-650 px
+  (0.45-0.62 H) and x 380-700** (the subject axis), **<= 0.2 W off the caption's centre line (x 520)** and **300-650 px
   below the caption block's bottom (y 556)**: the eye reads the words, then drops once, a short way, to the light. Nothing
   calls between the words and the focal (the sky and the far city there stay quiet), and the story light's glow stops
   >= 10 px outside the band (the light lane, `organic/light.md` §5.4). Why these numbers: LAYOUT's read zone (y
   600-1250) and subject axis; a cut made for ads keeps its key reads above y 1250 (LAYOUT §1); the posters' hero centre
   (0.52 of a poster's height, median) lands near y 1050 (0.55 H) once a poster is extended into 9:16 with its top on the
   band at y 300 (our reading of the city-poster `composition.md` §1 and §4). v6's door (630, 965): inside, its centre
-  409 px under the block (its top 292); T1's focal (686, 1002): 446 px; T3, tilted for a bigger sky, (686, 1140): 584 px.
+  409 px under the block (its top 292) and 110 px right of the line; T1's focal, her silhouette (686, 1002): 446 px
+  under it, 166 px right; T3, tilted for a bigger sky, (686, 1140): 584 px under it.
 - **R8 One counterweight: one big, soft, quiet secondary mass balances the small loud focal** (the hero cloud in the
   top gutter, y 0-290, and the side gutter x > 945, or the far city's glow by the sun), on the other side of the frame
   from the focal, its pull < 50 % of the focal's (it is never a call), its lit side turned toward the key. Method: the
@@ -234,7 +235,7 @@ caption is drawn where the film puts it. Measured with the same script as the re
 
 | Thumbnail | value plan (L*) | calls (rivals) value / colour | on her | 3 largest masses; pieces | quiet: share, largest + 2nd | dark group | under L* 40 |
 |---|---|---|---|---|---|---|---|
-| v6 now | (the still) | 10 (3) / 11 (4) | value yes, colour no | 82 %; 31 | 60 %: 28 + 24 | 16 % at 45, scattered | 6 % |
+| v6 now | (the still) | 10 (3) / 11 (4) | value yes, colour no | 82 %; 32 | 61 %: 29 + 24 | 16 % at 45, scattered | 6 % |
 | **T1 one lit door, a shaded quay** (recommended) | sky 80-92, the band 86; facade 52, panes 47 (two lit at 60); door 97, her 24; water 72 with the door's column 90; our quay 42 in the canopy's shade, its lit coping 56 | 1 (1) / 1 (1) | yes, yes | 90 %; 4 | 88 %: 36 + 29 | 39 % at 43 | 1 % |
 | **T2 counterchange** | the far side backlit into one dark band (facade 31, towpath 34, boats 27); door 97, her 16; light water 82 with the column 95; our quay light and quiet (62-66) | 3 (1) / 3 (1) | yes, yes | 94 %; 4 | 87 %: 36 + 33 | 17 % at 32 | 16 % |
 | **T3 low key, a bigger sky** | the sky darker at the top (60 -> 77 in the band -> 91 by the sun); a dark cloud (52) lit on the sun's side (83); facade 37, door 97, her 14; dusk water 52; our quay one deep mass (25); the camera tilted up 140 px (at 1080) | 1 (1) / 1 (1) | yes, yes | 89 %; 6 | 86 %: 39 + 23 | 31 % at 27 | 45 % |

@@ -92,23 +92,20 @@ _poster_inputs()
 for _t in ('T1', 'T2', 'T3'):  # our recomposed value thumbnails, measured the same way
     INPUTS[_t] = dict(path=os.path.join(SCRATCH, 'thumbs', _t + '.png'), label='thumbnail ' + _t)
 
-# our caption block at 1080 x 1920 (LAYOUT §1): the ink and its highlight boxes live in x 95-985, y 290-600
-CAP_BOX = (90, 292, 990, 600)
-
-
 def remove_caption(rgb):
-    """Take the burned-in caption out of a 1080 x 1920 frame: inside the block, every row is re-made by a straight
-    interpolation between the sky just left and just right of the block (the band is one calm sky: CRAFT §g.1)."""
-    out = rgb.copy().astype(np.float32)
-    s = rgb.shape[1] / 1080.0  # a 9:16 frame at any width
-    x0, y0, x1, y1 = [int(round(v * s)) for v in CAP_BOX]
-    e = max(2, int(round(6 * s)))
-    for y in range(y0, y1):
-        a = out[y, x0 - e:x0].mean(axis=0)
-        b = out[y, x1:x1 + e].mean(axis=0)
-        t = np.linspace(0, 1, x1 - x0)[:, None]
-        out[y, x0:x1] = a * (1 - t) + b * t
-    return np.clip(out, 0, 255).astype(np.uint8)
+    """Take the burned-in caption out of a 9:16 frame: inside the caption block (x 95-985, y 299-560 at 1080 wide:
+    LAYOUT §1, the highlight boxes included) the ink (L* < 55) and the peach highlight (a* > 4 and b* > 12) are masked,
+    grown by 4 px and inpainted (OpenCV Telea) from the sky around them. On v6 this matches the engine's captions-off
+    render of the same frame within 0.10 L* (mean) in the block (p99 1.6)."""
+    sc = rgb.shape[1] / 1080.0
+    x0, y0, x1, y1 = [int(round(v * sc)) for v in (95, 299, 985, 560)]
+    lab = lab_of(rgb)
+    cand = (lab[..., 0] < 55) | ((lab[..., 2] > 12) & (lab[..., 1] > 4))
+    m = np.zeros(rgb.shape[:2], np.uint8)
+    m[y0:y1, x0:x1] = cand[y0:y1, x0:x1]
+    k = max(3, int(round(9 * sc)) | 1)
+    m = cv2.dilate(m, np.ones((k, k), np.uint8))
+    return cv2.inpaint(np.ascontiguousarray(rgb), m * 255, max(3, int(round(6 * sc))), cv2.INPAINT_TELEA)
 
 
 def load(name, width=None):
@@ -806,7 +803,7 @@ def wrap(d, text, f, width):
 
 RULES_AT_A_GLANCE = [
     ('1 Notan first', '3 value masses hold >= 85 % of the frame (refs 86-97, v6 82); <= 8 masses >= 1 %'),
-    ('2 Few pieces', '<= 10 value pieces of 0.02-1 % per frame (refs 2-7, v6 31); the rest is texture in a mass'),
+    ('2 Few pieces', '<= 10 value pieces of 0.02-1 % per frame (refs 2-7, v6 32); the rest is texture in a mass'),
     ('3 One call', 'calls the eye <= 3 and ONE rival (refs 1-2, v6 10 with 3 rivals); #1 on the subject in value '
                    'AND colour'),
     ('4 The focal', 'subject + story light + the frame\'s hardest value step in one place: lit door, her dark '
@@ -815,7 +812,7 @@ RULES_AT_A_GLANCE = [
                     'ground (>= 15 %)'),
     ('6 Props', '<= 6 named objects read at phone size (refs 4-6, v6 about 40); the near frame <= 2 props, cut by an '
                 'edge, inside the shade'),
-    ('7 Under the band', 'the focal at y 860-1200, x 380-700, <= 0.15 W off the caption\'s centre line; nothing '
+    ('7 Under the band', 'the focal at y 860-1200, x 380-700, <= 0.2 W off the caption\'s centre line; nothing '
                          'calls between them'),
     ('8 One counterweight', 'one big soft secondary mass (the hero cloud) opposite the focal, its pull < 50 % of it'),
     ('9 Edges', 'found (crisp, hardest step) only at the focal; lost where two masses are within ~10 L*'),

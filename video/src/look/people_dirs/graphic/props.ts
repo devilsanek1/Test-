@@ -12,7 +12,6 @@ export type HandKind = 'relaxed' | 'edge' | 'grip' | 'open';
  *  left of the axis, +1 = right, 0 = hidden (seen from the little-finger side). */
 export function hand(name: string, w: V2, dir: V2, len: number, thumb: -1 | 0 | 1, t: Tone, z: number, kind: HandKind = 'relaxed', breakDeg = 12): Part {
   // design the mitten in a local frame: the wrist at the origin, the hand along +y, the thumb on -x
-  const b = kind === 'edge' ? 0.27 : 0.42;
   let pts: RV[];
   if (kind === 'grip') {
     // a closed hand round something: a rounded block with the thumb over it
@@ -37,19 +36,19 @@ export function hand(name: string, w: V2, dir: V2, len: number, thumb: -1 | 0 | 
       [-0.13, 0.05, 0.02],
     ];
   } else {
+    // a relaxed hand seen from its back: the fingers together and tapering, a small thumb lobe, the notch 45 % down
     pts = [
-      [0.5 * b * 0.72, 0, 0.02],
-      [0.5 * b, 0.3, 0.12],
-      [0.48 * b, 0.56, 0.12],
-      [0.36 * b, 0.82, 0.1],
-      [0.04, 0.985, 0.06],
-      [-0.3 * b, 0.9, 0.08],
-      [-0.44 * b, 0.66, 0.08],
-      // the notch between the fingers and the thumb
-      [-0.36 * b, 0.5, 0.01],
-      [-0.66 * b, 0.47, 0.06],
-      [-0.62 * b, 0.25, 0.1],
-      [-0.4 * b, 0.04, 0.03],
+      [0.13, 0, 0.02],
+      [0.18, 0.27, 0.12],
+      [0.175, 0.52, 0.12],
+      [0.12, 0.78, 0.1],
+      [0.03, 0.975, 0.05],
+      [-0.08, 0.9, 0.06],
+      [-0.14, 0.66, 0.08],
+      [-0.12, 0.5, 0.01],
+      [-0.235, 0.43, 0.05],
+      [-0.215, 0.23, 0.08],
+      [-0.13, 0.03, 0.02],
     ];
   }
   const ang = (Math.atan2(dir[1], dir[0]) * 180) / Math.PI - 90; // local +y onto dir
