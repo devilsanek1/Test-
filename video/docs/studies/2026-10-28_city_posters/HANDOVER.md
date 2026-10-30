@@ -6,6 +6,12 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-30 22:50 UTC: resumed after the 22:40 reset (the limit hit ~21:50; the worker restarted)
+- composition-library-v2 (run `wf_6be51888-82f`) resumed: catalogue, 3 judges, library, library critic and the Helsinki
+  first draft are cached; library-fix, helsinki-critic and helsinki-fix run live with RESUMING notes.
+- v7 step B (agent aa74c53934541d244) resumed by message (it was starting the quay painter).
+- Checkpoint commits by send_later at 23:40 and 00:30 (WIP never to video 4's branch; the Helsinki files from v4wt are).
+
 ## Status 2026-10-30 ~20:55 UTC: one state with video 4 (owner: production of video 4 in parallel)
 - Merged `claude/kind-pascal-lvgsza` into ours (one conflict, PIPELINE_V2's table rows, merged word by word; DIRECTION's
   stale LASH lines -> the open-eye pick; typecheck clean) and pushed the same commit to all three branches. The v7 step B
