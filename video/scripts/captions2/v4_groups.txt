@@ -3,11 +3,14 @@
 # The recipes the guide's examples name for video 4: R2 the hook at frame 0, R3 the numbers (70,000; 40), R4 "wants"
 # (the turn), R5 "hot." (the quiet lift), R6 "That's a lot / of tea.", R7 the "2027" tag (a world word, on the plan's
 # wall), R8 through the big move (S6, seat C), R9 the payoff ("heat"); every other group R1, its seat walking (auto).
-# Shots and their starts: docs/v4/visual/VISUAL_SCRIPT.md (v2). Syntax: build_captions.py's docstring.
+# Shots, their starts and each block's caption line: docs/v4/visual/VISUAL_SCRIPT.md (v3, locked for G3); the cut on
+# "But" at frame 1402 (its sound plan: "H 23.37 (f1402)"). Syntax: build_captions.py's docstring.
 # Calls made here (each flagged by the builder; the G3 watch judges them): S4 and S8 keep the stagger only as wide as
 # the frame allows (34-44 px: their second lines are 804-813 px); S8 merges "The city has a plan" + "to use it," as the
-# guide's section f.5 says (8 words on screen: the 2-group alternative runs 23.8 cps and 0.73 s); S11 sets the hand's own
-# spacing (track 0, an exception) so "Then pipes under / the streets" fits (853 px at +0.02 em; the frame holds 848);
+# guide's section f.5 and v3 say (8 words on screen: the 2-group alternative runs 23.8 cps and 0.73 s); S11 sets the
+# hand's own spacing (track 0, an exception) so v3's "Then pipes / under the streets" fits (863 px at +0.02 em; the
+# frame holds 848); S7's lockup pops on the cut (f1402), as v3 asks ("within 2 frames of the cut"); S9 keeps "So how
+# would / that work?" (v3 wrote "So how / would that work?": its second line is 852 px, over the 830 max);
 # S10 and S11 break "out of / its computers" and "into / people's homes." (Netflix: never a determiner from its noun);
 # S6 keeps the guide's "to blow that / heat outside." (the only break that fits that group).
 @film v4
@@ -16,7 +19,7 @@
 @tone dark
 @key heat
 @cover Your chatbot / could *heat* / an apartment / in Helsinki.
-@world R7 2027 at=next until=29.02 width=280 object="a paper tag pinned to the plan's front wall (S8)"
+@world R7 2027 at=next until=how width=280 object="a paper tag pinned to the plan's front wall (S8)"
 
 @shot S1 0.00 WIDE
 R2 x=120,400         | Did you know / +Helsinki
@@ -48,10 +51,10 @@ R8                   | just use / big fans
 R8                   | to blow that / heat outside.
 
 @shot S7 23.46 WIDE
-R4                   | But Helsinki / +*wants* / +that heat.
+R4 pop=f1402         | But Helsinki / +*wants* / +that heat.
 
 @shot S8 25.54 MEDIUM
-R1 seat=auto         | The city has / +a plan +to use it,
+R1 seat=auto         | The city has / a plan +to use it,
 R1 seat=C            | starting / next year.
 
 @shot S9 28.34 CLOSE
@@ -64,7 +67,7 @@ R1 seat=auto         | out of / its computers
 R1 seat=auto         | with water / in pipes.
 
 @shot S11 34.46 MEDIUM
-R1 seat=auto track=0 | Then +pipes +under / +the streets
+R1 seat=auto track=0 | Then +pipes / +under the streets
 R1 seat=auto         | carry that heat
 R1 seat=auto         | into / people's homes.
 

@@ -150,8 +150,8 @@ nearly as written; the hand file differs where judgement beat the rules).
   background: `scripts/type/bg/bg_night.png` by default), renders the times to `out/v4/captions2_test_<t>.png` (+
   `_phone.jpg`), and with `--capcheck` the mask and bare passes and the list for capcheck; ~10 s for ten frames.
   `--comp=Captions2Cover --bg=scripts/type/bg/bg_night_cover.png` draws R10 (matches the type still 11 to a sub-pixel)
-  and the R7 word on a plain tag. The 2026-10-30 run: `out/v4/captions2_test_*.png`, `captions2_test_sheet.jpg` (ten
-  moments at the 0.25 glance scale), `captions2_cover_27_700.png`.
+  and the R7 word on a plain tag. The 2026-10-30 run: `out/v4/captions2_test_*.png`, `captions2_test_sheet.jpg` (twelve
+  moments at the 0.25 glance scale, the cut on "But" among them), `captions2_cover_27_700.png`.
 - `python3 scripts/capcheck.py <list> --words [--min=4.5] [--captions=<file>]`: every word's colour against the BARE
   frame's pixels 2-20 px from its own glyphs (the type stills' method); FAIL when more than 5 % is under 4.5:1. It
   switches to this mode by itself on a captions2 mask; the old SkyCaptions mode (3:1) is unchanged.
@@ -160,12 +160,14 @@ nearly as written; the hand file differs where judgement beat the rules).
 
 ## Video 4 (`public/v4/captions2.json`, from `scripts/captions2/v4_groups.txt`)
 
-30 groups, 0 errors, 21 warnings. By shot: S1 R2 "Did you know / Helsinki" (frame 0, "Helsinki" builds at 0.600) ·
+30 groups, 0 errors, 22 warnings, every block's caption line as the locked visual script v3 names it
+(`docs/v4/visual/VISUAL_SCRIPT.md`, "Words"), except where noted below. By shot: S1 R2 "Did you know / Helsinki" (frame 0, "Helsinki" builds at 0.600) ·
 R2 "wants AI / to heat" (seat R) · R3 "70,000 / homes?" (2.300, blooming with the windows); S2 R1 C, L, R, C as the
 guide walks them; S3 R5 "Those computers / get really **hot.**" (word by word, the lift at 10.167); S4 R1 x 3, R3
 "40 / kettles," (15.017), R1; S5 R6 "That's a lot / of **tea.**" (18.583, with the mug); S6 R8 x 3 at seat C; S7 R4
-"But Helsinki / **wants** / that heat." ("wants" at 24.000); S8 R1 x 2 and the R7 "2027" tag (27.40-29.02); S9-S11
-R1; S12 R9 "So your chatbot / could soon **heat**" ("heat" at 39.933) then "an apartment / in Helsinki." (136 px,
+"But Helsinki / **wants** / that heat." (popping on the cut on "But", frame 1402, as v3 asks: "within 2 frames of
+the cut"; "wants" at 24.000); S8 R1 x 2 ("The city has a plan" + "to use it," as a build) and the R7 "2027" tag
+(27.40 to "how", 28.70: v3); S9-S11 R1; S12 R9 "So your chatbot / could soon **heat**" ("heat" at 39.933) then "an apartment / in Helsinki." (136 px,
 held to frame 2515). The cover: R10. Calls and flags, for the G3 watch (each in the file's `checks`):
 1. **The two lit words follow the take, not the guide's example frames:** "wants" pops at frame 1440 (the guide wrote
    1438) and "heat" at 2396 (the guide wrote 2394): both are 2 frames before the locked take's word (24.04 s, 39.98 s),
@@ -175,13 +177,16 @@ held to frame 2515). The cover: R10. Calls and flags, for the G3 watch (each in 
    too brief, the fix is a call for the owner (pop it on "soon", or hold the lockup a few frames past "an").
 3. **S8 keeps the guide's merge "The city has / a plan to use it,"** (8 words on screen; §f.4 says <= 7): the
    2-group alternative runs 23.8 cps with a 0.73 s group.
-4. **Three seat groups keep only the stagger the frame holds** (34-44 px instead of 80-140: "To put it / into
-   perspective,", "just one of / these computers", "The city has / a plan to use it,"): their second lines are
-   804-813 px.
-5. **S11 sets tracking 0 on "Then pipes under / the streets"** (853 px at +0.02 em; the frame holds 848): the one
-   exception to the hand's +0.02 em.
-6. **Two line breaks follow Netflix over the guide's draft:** "out of / its computers", "into / people's homes."
-   (never a determiner or possessive from its noun). "to blow that / heat outside." stays (the only break that fits).
+4. **Four seat groups keep only the stagger the frame holds** (20-44 px instead of 80-140: "To put it / into
+   perspective,", "just one of / these computers", "The city has / a plan to use it,", "Then pipes / under the
+   streets"): their second lines are 804-826 px.
+5. **S11 sets tracking 0 on v3's "Then pipes / under the streets"** ("under the streets" is 863 px at +0.02 em; the
+   frame holds 848; 826 px at 0, with a 20 px stagger): the one exception to the hand's +0.02 em.
+   **S9 keeps "So how would / that work?"**: v3 wrote "So how / would that work?", whose second line is 852 px (over
+   the 830 max, wider than the frame); it fits only with the same tracking exception.
+6. **Two line breaks follow Netflix over the guide's (and v3's) draft:** "out of / its computers", "into / people's
+   homes." (never a determiner or possessive from its noun). "to blow that / heat outside." stays (the only break that
+   fits).
 7. Eight groups have 5 words outside a lockup (2-4 is the aim; the guide's own examples include five), and four run
    20.5-22.2 cps (S4
    "just one of / these computers", S10 "would take / the heat" and "out of / its computers", S11; the guide's §f.5

@@ -19,6 +19,7 @@ A film's entry imports from `src/lib/g3` only (never another film's folder); a G
 | `SketchIcons.tsx` | the icon kit (copied from v3: laptop, phone, server rack, mug, window, house, factory, truck, chart, ...) |
 | `scripts/g3/board_lint.py` | the shared lint (run before every render) |
 | `scripts/g3/g3kit.py` | Python helpers for a film's board builder (elements, panels, the pose test, camera keys, joins, word times) |
+| `scripts/g3/merge_panels.py` | lands each lane's drawn panels into the board by shot id (sets and sfx merged; times and double-drawn panels refused) |
 | `scripts/g3/build_selftest.py` | the kit's self-test board (`public/g3kit/selftest.json`, `src/entry-g3kit.tsx`): every delta on screen, lint-clean |
 
 ## Commands (from `video/`)
@@ -39,9 +40,25 @@ Render one at a time on the shared CPUs. The skeleton reel of video 4: `out/v4/g
 import {G3ReelComposition} from './lib/g3';
 registerRoot(() => <G3ReelComposition id="G3Reel" film="v4" animatic="v4/animatic.json" voice="v4/voice.wav" />);
 ```
-`captions={MyLayer}` swaps the caption layer (a `React.FC<{t, fps, words}>`); default `PopCaptions`. **Never bundle the
-reel with a module that calls `setPen('clean')`** (`lib/pen.ts` is global): the clean pen draws no scribble, hatch or
-board marks.
+`captions={MyLayer}` swaps the caption layer (a `React.FC<{t, fps, words}>`); default `PopCaptions` (v3's pop captions).
+Video 4's entry plays the production captions on the board: `() => <Captions2 src="v4/captions2.json" tone="light" mono />`
+(`src/lib/captions2/`: the type guide's seats, builds and stressed sizes, plum ink on the light paper, `mono` = the lit
+hand by size, weight and swell, no colour or glow). **Never bundle the reel with a module that calls `setPen('clean')`**
+(`lib/pen.ts` is global): the clean pen draws no scribble, hatch or board marks.
+
+## For the board lanes (phase B: replacing the skeleton's placeholders)
+
+1. Start from the skeleton (`public/v4/animatic.json`, written by `scripts/v4/g3_skeleton.py` from the locked visual
+   script; each panel `placeholder: true` with its times, name, join in, life list from the camera plan). Keep every
+   shot's id, times and transition (they are the visual script's; a change reopens it).
+2. Write your panels with a builder in `scripts/v4/` (`g3kit.Panel`: elements, ids, moves, `poses`, `cam_keys`,
+   `join`) to your own file, `{"shots": [...], "sets": {...}}`, drop `placeholder`, and land it:
+   `python3 -I scripts/g3/merge_panels.py public/v4/animatic.json <your file>`. One lane owns each set (the home place's
+   shared drawing, its rig `{name: 'H', key: 'left', shadow: 'mid', pools}`, planes, vp): the others reference it by id
+   and re-tier its elements per panel (`tiers`), hide some (`hide`) or draw their own close at size (`ownWorld`).
+3. Lint (`board_lint.py`, its TODOs are the panel's to-do list; the camera plan is cross-checked), render the panel's
+   stills (`render-frames.mjs` at its start, peak, landing and join frames), then the whole reel at 540p60.
+4. When no placeholder is left, set `"draft": false`: the owner-facing rules apply (red marks (1) / (3), placeholders FAIL).
 
 ## The schema in one screen (`types.ts` has every field)
 
@@ -65,8 +82,9 @@ board marks.
   the set's `els` are drawn under the panel's own in every panel of the set (one world space: pushes and cranes are
   camera moves, not cuts; the density key is drawn once). `ownWorld: true` = a panel drawn at its own size (no set
   drawing); `hide: [ids]` = set elements left out of this panel.
-- **The rig** (`sets.<id>.rig`): `key` ('left' | 'right' | 'top-left' | 'top-right' | 'top' | 'back' | 'back-left' |
-  'back-right' | 'front'), `source`, `shadow` ('mid' default, the ONE shadow value), `pools` (names). An element's
+- **The rig** (`sets.<id>.rig`): `name` (W1's: 'H' the home place, 'P' the planet), `key` ('left' | 'right' |
+  'top-left' | 'top-right' | 'top' | 'back' | 'back-left' | 'back-right' | 'front'), `source`, `shadow` ('mid' default,
+  the ONE shadow value), `pools` (names). An element's
   `shadow: true` (or `{len, w}`) casts a contact + cast shadow from its foot AWAY from the key, in the shadow value, so
   the key's side reads in every panel of the set; `{t: 'shade', ...}` = an explicit shadow shape; `{t: 'pool', cx, cy,
   rx, ry}` = a light pool (paper).
@@ -136,8 +154,11 @@ declared dissolve exception; per-device checks (B's match boxes +-8 % / +-20 %, 
 continuity across a join inside one set's world); the join's midpoint on a sentence's first word; nothing but the
 carrier entering in the 0.4 s round a join; thread coverage >= 80 % with no gap over 3 s (FAIL; the declared reveal
 aside); pacing (>= 3.5 s average, no three near-equal); sfx type + event; the camera-plan cross-check against
-`docs/<film>/camera_plan_g3.md` (rows' shots exist, carriers equal: FAIL; move words, tier letters, rig side, life
-items: WARN; a tolerant read of its markdown tables, outgoing joins by default, "join in" columns understood).
+`docs/<film>/camera_plan_g3.md` (its shots exist, carriers equal: FAIL; move words, tier letters, the rig's name ("Rig
+H" vs `rig.name` or the set's id) and stated key side, life items: WARN). It reads the plan's markdown tables (a shot
+id in the first cell; columns named move / join / tier / rig / life; joins outgoing unless the header says "in") AND its
+per-shot prose blocks (`### S1 ...` then `- **Move:**`, `- **Join:**`, `- **Tiers:**` "A ... · B ... · C ...",
+`- **Rig (W1 Rig H):**`, `- **life:**` "a · b · c"), the format of `docs/v4/camera_plan_g3.md`.
 
 ## Gotchas
 
@@ -156,5 +177,4 @@ items: WARN; a tolerant read of its markdown tables, outgoing joins by default, 
   tooling lane).
 - Tier 2 (built when a reel first needs it): `crowd-row`, `facade-row`, `window-ticks`, `foliage-blob` primitives
   (the `window` ambient preset covers lit windows); board parallax stays v3's `shot.parallax` + `f` only.
-- Captions: `PopCaptions` until the production component (`src/lib/captions2/`, TYPE_GUIDE) is finished; it has a
-  `mono` mode for the grey board, and a film's entry swaps it in through `captions`.
+- A per-film caption choice beyond the entry: `PopCaptions` is the kit's default; video 4 wires `Captions2` (above).

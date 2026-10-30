@@ -33,7 +33,8 @@ width=<object px> object="<what it sits on>"`, `@cover <rows with / and *key*>`.
 
 recipe R1-R9 (R9.last = the payoff's last group); opts: seat=L|C|R|auto, step=<px>, x=<px>[,<px>...] (anchored rows'
 ink start), tone=dark|light, enter=pop|soft, leave=auto|cut|soft, out=<s> (leave at), hold=<frames>, track=<em> (an
-exception: tightens a group the frame cannot hold; warned), id=<name>. Words: `+word` starts a build chunk (it and the
+exception: tightens a group the frame cannot hold; warned), pop=<s>|f<frame> (the group's first pop on that frame
+instead of 2 frames before its first word: a plain cut, so the words change with the shot), id=<name>. Words: `+word` starts a build chunk (it and the
 words after it pop on its time; no `+` = the group pops whole); `*word*` is the stressed word (R4 / R9 landing, R5
 lift); `[70,000](seventy thousand)` draws numerals for spoken words. Spelling and case are the picture's (the take's
 "WANTS" is set "wants"); words are matched to the voice by their letters.
@@ -323,13 +324,19 @@ def resolve(g, tone, words, first_group):
     nrows = len(toks)
     track_over = float(opts['track']) if 'track' in opts else None
 
-    # the build chunks: a token with '+' starts a chunk; the first token starts the first
+    # the build chunks: a token with '+' starts a chunk; the first token starts the first. `pop=` puts the first chunk
+    # on a given frame (a cut): its `at` is set so the component's floor((at - lead) x fps) lands exactly there
     at = None
     first_tok = toks[0][0]
+    pop_at = None
+    if 'pop' in opts:
+        v = opts['pop']
+        fr = int(v[1:]) if v.startswith('f') else int(round(float(v) * FPS))
+        pop_at = (fr + LEAD + 1e-4) / FPS
     for row in toks:
         for tok in row:
             if at is None or tok['build']:
-                at = 0.0 if (first_group and tok is first_tok) else words[tok['words'][0]]['s']
+                at = 0.0 if (first_group and tok is first_tok) else pop_at if (tok is first_tok and pop_at is not None) else words[tok['words'][0]]['s']
             tok['at'] = at
 
     def mk(tok, sty):
