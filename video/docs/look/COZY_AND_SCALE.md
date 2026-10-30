@@ -76,10 +76,12 @@ case of an angle-independent measure, the enclosing mass's share of the screen, 
 
 ## 3. Cozy rules
 - **Light:** one low lamp + <= 1 secondary (a screen), no ceiling light; warm lamp one side, cool window the other (warm, dim
-  light raised perceived cosiness [CO §3, REPORTED]): the set's ONE light rig (`CRAFT.md` §d.1). Pools: flat, opaque, two
-  steps lighter and warmer than their ground, darker gaps between pools, no gradient or blur; where they sit, how big they
-  are and their values are `CRAFT.md` §d.2 and §d.7 (they replace this file's old ring / core / desk numbers: a desk at
-  L* 58-62 under a pool core of 92-94); it lights the hands and face.
+  light raised perceived cosiness [CO §3, REPORTED]): the set's ONE light rig (`CRAFT.md` §d.1), the lamp the story
+  light (playbook PROPER LIGHT). Pools: lighter and warmer than their ground, with real falloff from the lamp (a
+  dithered ramp in a baked light map, or two opaque flat steps on a vector pool; never concentric rings), darker gaps
+  between pools; a soft glow and gentle bloom only at the lamp itself; where they sit, how big they are and their values
+  are `CRAFT.md` §d.2 and §d.7 (they replace this file's old ring / core / desk numbers: a desk at L* 58-62 under a pool
+  core of 92-94); it lights the hands and face.
 - **Temperature, not darkness:** cold only in the window (Dusk `#BAC3CE` / `#8A9AA8`, frost `#D9DEE5`), glass <= 20 % of the
   frame; the anchor (Sage `#22332C`, in small pieces: `CRAFT.md` §f.8) only on dark objects' fills (hair, a spine), thin parts like mullions by tier
   (`CRAFT.md` §c: in tier C a flat shape or a hairline within dL* 15); page L* >= 75 at night too (the ambient wall 80-84,
@@ -182,8 +184,9 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
   below y 600, a hard building column on the other); the top edge sky and wires only, the bottom edge water only; stitches
   cross the bands (a tall tree, poles, a stair from the seam into the wall, sagging wires), never through the caption plane.
 - **Life in ONE lane:** people on the seam, about half sitting still on its edge (a cluster at 1.2-1.5 body heights apart
-  + a loner), backs to the wall, facing the water in side or 3/4 view, featureless at this size (a head in the hair
-  colour: LIFE_AND_DENSITY §4's no-faces rule holds); movers cross parallel to the bands, both ways; one far, slow,
+  + a loner), backs to the wall, facing the water in side or 3/4 view, featureless at this size (under ~200 px tall the
+  LASH face is the contour only: `PEOPLE_DESIGN.md`, LIFE_AND_DENSITY §4); movers cross parallel to the bands, both
+  ways; one far, slow,
   small mover higher up (a stair, an upper walk, ~60 px). Seated ~85 px (0.045 H), standing ~140 px (0.074 H); wall :
   standing figure 6-9:1 (>= 10:1 is scale); a storey ~1 standing figure (compressed depth).
 
@@ -263,14 +266,17 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
   or leaf to sage (HSV hue >= 95); never a yellow-green (hue < 95) under C 30: lowered to our chroma it turns olive-khaki,
   the colour the owner called sick (playbook: "Warm, never sickly").
 - **Saturation as confetti, not fields:** many small patches, each < 1 % of the frame (awnings, balcony panels, signs,
-  clothes, a reflection), across many hue families (what C3 held: References), at C <= min(40, the hero's C - 10) in hues
+  clothes, a reflection), spread across the scene's ONE colour key, never unrelated hues (C3 held many hue families; we
+  keep its confetti, not its hue count: owner, 2026-10-30, PROPER LIGHT's one colour key; off-family colour below the
+  band <= 3 %, `ORGANIC.md` §4.3), at C <= min(40, the hero's C - 10) in hues
   other than the hero's and the pop's, so the hero (C >= 30) and the one pop (C >= 50) stay the loudest (colour jobs,
   PALETTE). PALETTE's "background 50-80 %" is met by many light soft fills together (each facade, the sky, the floor its own
   tint), never by one empty slab (LIFE §0's biggest-field check).
 - **Good-weather light, one sun:** lit tones lean yellow-gold; lit : shade on buildings ~3:1 (C3); shadows gentle in
-  value and edge, flat steps, never a blur or a gradient; their lengths, steps and edges are `CRAFT.md` §d.5-§d.6 (a
-  sun's cast shadow 0.3-0.8 h, sharp at the base with a 10-14 px half-tint step at the far end), which replace C2's
-  measured "<= 3-4 % W" and its 15-25 px penumbra.
+  value, sharp at the base and softening toward the far end, never a blur over the frame or a vignette; their lengths,
+  steps and edges are `CRAFT.md` §d.5-§d.6 (under a high sun 0.3-0.8 h; under a low sun long and converging, capped at
+  <= 2.5 h where a sunlit dusk ground is designed; a 10-14 px half-tint step at the far end of a vector shadow, a
+  penumbra in a baked map), which replace C2's measured "<= 3-4 % W" and its 15-25 px penumbra.
 - **Shadows are colour, never grey:** the references measure dL* -25 to -40 at chroma x0.6-0.7, too hard for our pale
   palettes, so depth and chroma come from `CRAFT.md` §d (form dL* -7 to -12, chroma kept >= 0.95x). Their hue turns away
   from yellow: 10-15° toward blue on a cool surface (C2), toward plum on warm walls (C3: orange to plum), a deep red-brown
@@ -283,13 +289,16 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
   sandwich (C3); never a vignette gradient, never a dark band in front of a cozy backdrop.
 
 ### 3b.7 Texture and edges (VERY subtle, playbook; the rules are `CRAFT.md` §c)
-- **Texture goes inverse to area, as flat shapes only.** Large fields stay flat in fill (C2's road: high-pass 1.5-2 L*);
-  their "paint" is a few long tone-on-tone flat shapes (dL* 3-8): lane marks as flat bands, two long soft tones on
-  water, stone blocks 25-80 px a value step darker; texture shapes on 1-2 small surfaces per shot (a rug, wood, blossom
-  daubs 23-45 px with no rim line). The references' ripple dashes (C3: ~10-15 per 100 x 100 px), dry wall streaks and
-  foliage hatching are NOT copied: no specks, ticks, hatching, scribble or dash rows (`CRAFT.md` §c). The one optional
-  texture is the owner's halftone (<= 6 %, `PALETTE.md`), a last step on a few chosen elements. Nothing on people,
-  props or captions.
+- **Texture goes inverse to area, in ONE painted language** (playbook PAINTED PIECES; `CRAFT.md` §c). Large fields
+  stay quiet in value, never dead flat (C2's road: high-pass 1.5-2 L*): their paint is a wash and a few long
+  tone-on-tone shapes and marks (dL* 3-8): lane marks as flat bands, two long soft tones on water, stone blocks 25-80 px
+  a value step darker; drawn texture shapes on 1-2 small surfaces per shot (a rug, wood, blossom daubs 23-45 px with no
+  rim line); every piece but the subject and the people painted at its plane's dose (`ORGANIC.md` §5: near finer,
+  far coarser marks), the props too. The references' ripple dashes (C3: ~10-15 per 100 x 100 px), dry wall streaks and
+  foliage hatching are NOT copied: no specks, ticks, hatching, scribble or dash rows but the paint's own marks, laid by
+  intent (`CRAFT.md` §c). Beyond the paint: the one paper on every plane and mover, VERY subtle (`CRAFT.md` §c; <= 15 %
+  of its strength in the caption band), and the owner's halftone as an option (<= 6 %, `PALETTE.md`) on a few chosen
+  elements. People and captions are never painted.
 - **Locked to the world, never boiling** (both references: no boil, no crawl you can see).
 - **Must read full with texture OFF:** C3 flattened to 24 flat colours still reads full and cozy (flat 18 %, detail 37 %);
   texture is worth the last ~5-15 points of flat share, never the fix for an empty set.
@@ -312,7 +321,8 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
    the sky, never the canopy), with no wires, windows or roof edges in y 290-600 inside x 95-945.
 4. Playing: `density.py --cozy` (`LIFE_AND_DENSITY.md` §9): movers >= 2, empty <= 5 %, cv in its dose, the camera locked
    (~0) or floating 8-15 px/s; half the people at rest, nothing coming at us, one quiet ambient element on.
-5. Colour: one calm field, warm world and cool frame, confetti not fields, short coloured shadows, tinted whites, rare warm darks.
+5. Colour: one colour key, one calm field, warm world and cool frame, confetti not fields, coloured shadows of the sun's
+   length (`CRAFT.md` §d.5), tinted whites, rare warm darks.
 
 ### References (words only, never frames or clips in the repo; add the next one here with what it taught)
 - **C1** (2026-10-25): the owner's sense-of-enclosure photo, an eye-level cobbled lane with a tall wall cut by the top on one
@@ -369,7 +379,7 @@ The kit column names engine pieces as references only (playbook: no reusable ass
 | K5 | **Slow push to the vista** | resolve, looking out | `push` 3-8 % in 2-4 s, `CAM.slow`, anchored on the far VP (`anchorDepth` >= 0.85); back-view figure 0.25-0.35 H cut by the bottom (7 of 12 Arcane stills face a vista) | EXISTS: `ShotCam push` (`src/lib/ShotCam.tsx`) |
 | K6 | **Locked tiny-figure wide** | stillness, being watched | locked camera (no handheld jitter: 3b.5); observer 0.04-0.08 H, fill-only, on the axis; colossus cut by the frame >= 10:1; life on 3 speed tiers, never 1 s still, none inside the city mass (Scale cues 11: birds, a pennant, one window on, white steam); 2-3.5 s | EXISTS: `LitWindows` (`cine/windows.tsx`), `WallOfWindows` (`cine/wall.tsx`), `TinyCrowd` (`cine/figures.tsx`), `Birds` (`cine/sky.tsx`) |
 | K7 | **Worm's-eye on the colossus** | power over you | camera 0.3 m, horizon 0.58-0.64 H (the observer's feet above y 1250); colossus >= 0.7 H cut by the top, flat through the caption band (y 290-600); one tiny mover 0.01-0.02 H at 10-20 px/s, clouds 8-15 px/s on depth 1; optional 2-4 % tilt | EXISTS: `Tower vpy`, `Monument` (`cine/monument.tsx`), `LensFigure` (`cine/lens.tsx`); data center TO BUILD |
-| K8 | **Shaft / one lit window** | one person, one light, in a vast structure | shaft core 0.10-0.14 W on the axis, one halo step of at most 1.7x or none (`CRAFT.md` §d.7), widening 1.3-1.6x down into a pool 2x the core with the observer in it, top below y 600; or one warm window (the pop) in a cold grid (Hopper) | EXISTS: `LightShaft`, `Glow` (`cine/light.tsx`), `WallOfWindows` events |
+| K8 | **Shaft / one lit window** | one person, one light, in a vast structure | shaft core 0.10-0.14 W on the axis, a soft glow and gentle bloom only at the source, the shaft itself a soft wedge of +2-4 L* against darker air (`CRAFT.md` §d.7), widening 1.3-1.6x down into a pool 2x the core with the observer in it, top below y 600; or one warm window (the pop) in a cold grid (Hopper) | EXISTS: `LightShaft`, `Glow` (`cine/light.tsx`), `WallOfWindows` events |
 | K9 | **Frame push-through** (Cullen here -> there) | leaving the refuge for the stakes | a window / doorway at depth -0.5 [EN §7] holds the opening at 15-25 %; push 0 -> 0.85 anchored on the far subject (depth 0.85) in 1.2-2 s, `CAM.ease`; the opening's edges stay <= 15 px/frame until the mullion wipe, which hides the over-cap pass (allow-list only that window); carry speed into the next shot | TO BUILD: `Portal`, `roomBox` holes; wiper EXISTS (`WipePass`, `cine/props.tsx`) |
 | K10 | **High angle from the institution** | being looked down on by power | horizon 0.15-0.30 H, verticals converging down; calm, linear; once per video, on a crowd or plaza, never on the lone subject | PARTLY: `EndlessCity vp` roof tops (`cine/city.tsx`) |
 

@@ -623,53 +623,73 @@ About half repeat the research lanes' flags (`light.md` §9, `composition.md` §
   biggest clash: CRAFT prescribes the geometry the owner calls "too square and proper". Proposed: §4.1 (natural outlines
   displaced at the short octaves, 0.7-2.5 % of R; man-made hand-cut, sides turned 0.8-2.2 degrees, bowed 0.3-0.9 %,
   corners worn 0.6-3.5 px), keeping "each shape one closed path, fills meet exactly, no doubled strokes, no boil".
+  **FIXED** (CRAFT §c "Shapes": natural free curves, hand-cut made things, no ruler line, template or 25 %+ right
+  angles, one dominant mass; a new "Edges, lost and found" bullet; §c's check adds the three measures).
 - **C2. §c Texture: "big areas flat ... no grain overlay by default", a grain "at most 0.25 L*", "none in the caption
   band"** against the one paper (`light_proof.md` §9). Proposed: "one paper per film: tooth + fibre + mottle, soft-light,
   <= ~1 L* added on a mid-tone, <= 15 % in the band (spread <= 1.5 L*), baked per plane", adopted once its float bitrate
-  and 720p shimmer pass (§6 step 5).
+  and 720p shimmer pass (§6 step 5). **FIXED** (CRAFT §c "Paint and texture" and "The one paper": as proposed, the
+  2026-10-28 test kept as history; DIRECTION rule 4; `LAYOUT.md` §1's band row and `COZY_AND_SCALE.md` 3b.7 to match).
 - **C3. §d.4's form shadow "one flat, hard-edged step ... never a gradient" and §g's "The sky is the one gradient in the
   look; everything else stays flat"** against colour and light moving inside a shape (PAINTED PIECES; PROPER LIGHT's
   falloff). Proposed (`techniques.md` §8): a dithered ramp inside a tone (<= +-3-4 L*) is allowed; a volume's 2-3 tones
-  stay readable.
+  stay readable. **FIXED** (CRAFT §d.4: the ramp inside each tone, the lit / shade step kept; §g's intro: the sky the
+  one big gradient field, light and colour moving inside shapes).
 - **C4. §d.7 "A halo: at most 1.7x the lantern ... No symbolic glow" and §d's code line "Soft edges: 2 flat steps, no
-  `feGaussianBlur`"** against the bloom at emitters (`light.md` D-L1's wording, §4.2 here).
-- **C5. §d.8 "Rim light only on the subject"** against rims by tier (`light.md` D-L2).
+  `feGaussianBlur`"** against the bloom at emitters (`light.md` D-L1's wording, §4.2 here). **FIXED** (CRAFT §d.7: real
+  falloff, the bloom at emitters only, shafts; §d's code: the three homes of light; §d's check: the bloom).
+- **C5. §d.8 "Rim light only on the subject"** against rims by tier (`light.md` D-L2). **FIXED** (CRAFT §d.8: rims by
+  tier from the distance field, scaled by height, and the light wrap).
 - **C6. §d.5 "Cast shadow ... 0.3-0.8 h long under a sun"** against a dusk sun (8.9 degrees: ~6.5 h). Proposed: "at
   golden hour <= 2.5 h, the far end fading; a sun on the roofline puts the ground in shade instead" (`light.md` D-L4).
+  **FIXED** (CRAFT §d.5: projective shadows, a low sun's long ones capped at <= 2.5 h, shade masses with a named
+  caster; `COZY_AND_SCALE.md` 3b.6 to match).
 - **C7. §d.2's brightest-5 % check** leaves out the sky and the band but not the far planes, so it fails by design with a
   sun in frame over a pale far city (`light.md` D-L5: leave out +3 and beyond); and §d.2's "Nothing under L* 35 but ink,
   anchor-dark surfaces and §f.8's dark pieces" (with its check line) against a shade mass at L* 30-39 (proof 2's bank) or
-  T3's quay at 25.
+  T3's quay at 25. **FIXED** for the far planes (CRAFT §d.2 and its check: +3 and beyond left out, 0.07-0.15 H;
+  `check_light.py --exclude`); **OPEN** for the L* 35 floor (it waits for D3; a pending note in §d.2 and the check).
 - **C8. §f.8, darks "6-10 % of the frame under L* 40 in >= 120 pieces ... the near world in mid-tones"** against R10: D3
-  above (`composition.md` §7.3, `light_proof.md` §9).
+  above (`composition.md` §7.3, `light_proof.md` §9). **OPEN** (waits for D3; CRAFT §f.8 carries the pending note).
 - **C9. §g.1, a zenith "a touch deeper ... dL* <= ~1.3"** against v7's sky top B (#afb3d8, L* 75.9 under a field of ~82)
-  and the key's -5 L* at the top: `check_banding.py` on a master before it ships (`PAINT_RECIPES.md` C14).
+  and the key's -5 L* at the top: `check_banding.py` on a master before it ships (`PAINT_RECIPES.md` C14). **FIXED**
+  (CRAFT §g.1: <= ~1.3 by default, up to ~6 L* deeper only with `check_banding.py` PASS on a master; top B as our call
+  by the playbook's "can't tell apart" rule; `PAINT_RECIPES.md` C14 to match).
 - **C10. §g.2, "the disc a flat shape on top, no halo"** against the key sun's gentle bloom (proof 2: +2.2 L* within 70
   px). Proposed: a key sun may carry a bloom of <= +2-3 L*, stretched along the horizon, and stays one step off its sky.
+  **FIXED** (CRAFT §g.2 as proposed; `PAINT_RECIPES.md` §2.1's sun row and `sky_clouds.md` §3.5 to match).
 - **C11. §b's check** (salience peak / median, background, top-10 % mass) passes v6 while ten things compete. Proposed:
-  add R3's calls (<= 3, one rival, the strongest on the subject in value and colour) (`composition.md` §7.6).
+  add R3's calls (<= 3, one rival, the strongest on the subject in value and colour) (`composition.md` §7.6). **FIXED**
+  (CRAFT §b's check: the calls first, by `composition_study.py frame`; peak/median information only; `LAYOUT.md` §6).
 - **C12. §f.2, "never a gradient, fog or blur on the flat world"** against the light's falloff and the sun's in-scatter
   veil baked on the far planes (a graded k). Proposed: "(the light's falloff and veil, baked per plane, are light, §d,
-  not the plane's air step)".
+  not the plane's air step)". **FIXED** (CRAFT §f.2 as proposed, with the far planes' coarse marks; §f's code line: a
+  glow only at a source; `CINEMATIC_GUIDE.md` cue 5 to match).
 
 **PAINT_RECIPES**
 - **P1. §1 items 5-6, §3 C3 and the depth ladder: "solid silhouettes" crisp to +3; +3 "P0" with slivers; +4 "the silhouette
   only"** against the owner's balance ("further objects are more like brushes and painting"). Proposed: far planes keep
   fewer values and fewer marks, but the marks they keep are the coarsest passes, broad and visible, and their solid
-  edges lose by plane (teeth, tops lost by the sun): §5's rows +2 to +4.
+  edges lose by plane (teeth, tops lost by the sun): §5's rows +2 to +4. **FIXED** (`PAINT_RECIPES.md` §1 items 5-6, the
+  depth ladder's +2 to +4 rows and the near frame, §3 C3 as proposed; CRAFT §f.2).
 - **P2. §1.7, "Texture only where the paint is near"** against one paper over every plane (point 9). Proposed: the paper
   is one material on every plane at `MOTTLE_K`'s strength; a near mass's own brush grain and speckle sit on top of it.
+  **FIXED** (`PAINT_RECIPES.md` §1 items 3 and 7 as proposed).
 - **P3. §4.1 and §4.5: the facade and the paving "stay the film's crisp flat"; "the facade, only if the owner asks"**
   against the one painted language (2026-10-30) and proof 1. Proposed: the whole frame in one language, the subject's
-  plane at the crispest dose (§5), the door, the fascia and W kept crisp as the focal.
+  plane at the crispest dose (§5), the door, the fascia and W kept crisp as the focal. **FIXED** (`PAINT_RECIPES.md`
+  intro, the ladder's plane 0, §4.1's new v7 bullet, §4.3's objects and §4.5 item 5; v6's list marked history).
 - **P4. §2.3's tree crown** (9 pads, ~1550 dabs, a 0.88 px edge; its own review: "a little topiary") against §4.1's trees
   (three levels, fewer and bigger clumps) and edges (lost >= 7 %, crisp <= 30 %); the owner called v6's tree out of style
-  (`shapes.md` §8).
+  (`shapes.md` §8). **FIXED** (`PAINT_RECIPES.md` §2.3's row and `paint_recipes/foliage.md` §4.1: superseded, §4.1's
+  shape and edges for the next tree).
 - **P5. §2.1's near cumulus** (billows drawn as round lobes) and `lib/clouds.tsx`'s union of circles (83 % compass arcs by
-  calibration): ellipses on a ladder plus the cloud octaves, arcs <= 10 % (§4.1).
+  calibration): ellipses on a ladder plus the cloud octaves, arcs <= 10 % (§4.1). **FIXED** for the docs
+  (`PAINT_RECIPES.md` §2.1's row, `paint_recipes/sky_clouds.md` §3.2, CRAFT §c); `lib/clouds.tsx` is shared code (below).
 - **P6. §1.10, "never ... crescents (a lit band along an outline)"** against PROPER LIGHT's rims. Proposed wording: a rim
   is the light grazing a form, n . l-weighted, uneven, broken by lost stretches, on the light's side only; a crescent is
-  an even lit band following every billow (still never).
+  an even lit band following every billow (still never). **FIXED** (`PAINT_RECIPES.md` §1 item 10 as proposed; CRAFT
+  §d.8).
 - **Not a doc clash, a fix to proof 2:** its colour key broke C8 (the tree turned olive) and CRAFT §f.2's C* >= 8 floor
   (the glass at C* 4, the lantern glass at 2): §4.3 and step 1 correct it.
 

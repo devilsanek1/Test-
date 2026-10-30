@@ -73,7 +73,8 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
   dark mass), C (no line: a flat light shape or light-grey scribble, no detail). Overlap does the rest; no perspective grids.
 - **People are gesture figures:** a head circle (r = 0.09 h), a bean-shaped torso along one curved line of action, limb lines, mitten
   hands, and arms held away from the body so the gaps show the pose. The pose is the verb (reach, point, shrug, slump, look up) and carries
-  the emotion: people have no faces (playbook, like reference 1's); only the mascot has one. A crowd is a row of small mid-grey figures, all the same size.
+  the emotion: on the board people carry no face marks (the film's people get their generic LASH face from the kit,
+  only the contour under ~200 px tall: `PEOPLE_DESIGN.md`, owner 2026-10-30); only the mascot has a drawn face. A crowd is a row of small mid-grey figures, all the same size.
 - **Objects** come from the icon kit, in their usual view (from slightly above, at 3/4), with the one feature that names them exaggerated:
   a laptop's open hinge and keyboard, a 1:2 phone with a notch, a price tag's hole and string, a chip's pins, a rack's stacked slots.
   Never a box with a word in it. If an object can't be drawn so that people recognise it, rethink the panel.
@@ -169,7 +170,7 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
 New props: `role?: 'subject'|'mid'|'far'` on every element, icons and figures included; `sw?: number`, a rare stroke override (`w` is already a width);
 shot `scale?: true` for a scale panel (the lint then wants its subject BIG: >= 60 % of the frame or cut by both side edges);
 figure `pose?: 'stand'|'walk'|'point'|'reach'|'hold'|'shrug'|'slump'|'lookup'|'sit'`, `facing?: 'l'|'r'`,
-`face?: 'none'|'happy'|'sad'|'shock'|'worried'` (people stay `'none'`: they have no faces, §3); text `strike?: boolean`; a new element `{t: 'mark', kind: 'circle'|'arrow'|'underline'|'frame',
+`face?: 'none'|'happy'|'sad'|'shock'|'worried'` (people stay `'none'`: no face marks on the board, §3); text `strike?: boolean`; a new element `{t: 'mark', kind: 'circle'|'arrow'|'underline'|'frame',
 …, word?}` on the red annotation layer (5 px; `frame` = a dashed end-frame box with corner arrows), with `in` and `out` like any other element.
 **To build (tier 1, `G3_ANIMATIC.md` §7; owner-approved 2026-10-27):** `tier?: 'A'|'B'|'C'` on every element (stroke and fill by story
 role, §2: it replaces `role` for the weight), `carrier` on every transition, `rig` per set panel, and the thread object's screen time.
@@ -235,7 +236,7 @@ Clarity and cinematics are not a trade-off. Each panel names its shot type and f
   (three dots over the cab). Side-on, the same objects read as "three buildings side by side". The reprise of a matched
   frame changes only what the voice says (who cuts in, who is pushed back) and moves the subject role to the newcomer.
 - **Literal reads, small things (fix round cold read):** the mildest pose (or mascot reaction) that carries the beat (a
-  shock face read as "something bad happened"; people have no faces now, §3); "better" drawn as bigger plus the voice's own word as the label; an object keeps its tone
+  shock face read as "something bad happened"; people carry no face marks on the board now, §3); "better" drawn as bigger plus the voice's own word as the label; an object keeps its tone
   across panels unless the change is the idea (a laptop turned dark read as "a different, infected laptop"); a speech
   bubble's speaker is a figure and the tail ends at its head (a tail toward buildings has no speaker); the stake's number
   is on frame 0 and in the loop frame (an empty tag read as "price unknown").

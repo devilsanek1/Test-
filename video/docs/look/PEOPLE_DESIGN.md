@@ -4,7 +4,9 @@
 the face that looks messed up", then, on six new faces (`people_design/faces_graphic.png`, `faces_graphic.md`): "It’s
 better let’s keep it for now / We will iterate more later on". So the people we draw now:
 - **Body, shapes, light, clothes, hair:** direction C as in `people_design/dir_graphic.md` (about 7.8 heads, rounded
-  polygons in two flat tones, crisp, no outlines; the styling from `people_design/fashion.md`; teal only on her).
+  polygons in two flat tones, crisp, no outlines; the styling from `people_design/fashion.md`; teal only on her). Its
+  rim, drawn on her alone, now follows the tiers (`CRAFT.md` §d.8: people near the story get 2 px where the light
+  touches them; playbook PROPER LIGHT).
 - **Face:** LASH (closed-eye lash lines, one flick each, a short soft nose hook; in profile the hair tucked behind the
   eye), from `src/look/people_dirs/graphic_faces/` (`FaceOpt`); under ~200 px tall it drops to EDGE (the contour only);
   sunglasses and caps are accessories some people wear, never everyone; her as the "you" often seen turned away (TURN).
@@ -152,8 +154,8 @@ strangers at 7.4-8.0); **the sticker risk** (light from the scene's rig, tested 
 
 **The grafts:**
 - **From C (graphic):** two flat tones with a crisp terminator for people under ~130 px (A's gradient is a few pixels
-  there); a level-of-detail switch with a shape budget by size; the black-silhouette test at 140 and 200 px; the rim on
-  the subject only (DIRECTION rule 5); the cap's brim shadow as a face option; the camera that bows hems and shows soles
+  there); a level-of-detail switch with a shape budget by size; the black-silhouette test at 140 and 200 px; the rim
+  (then the subject's only; since 2026-10-30 by tier: DIRECTION rule 5, `CRAFT.md` §d.8); the cap's brim shadow as a face option; the camera that bows hems and shows soles
   from just above (`design_research.md` C10).
 - **From B (painterly):** light from the scene's own rig, read off the forms in camera space, so a figure keeps its
   light when it turns or is mirrored (A and C mirror the key with the figure today); the warm, saturated skin band along
@@ -212,8 +214,10 @@ marks what A's code already draws; the rest is to build.
 - **Level of detail (from C, to build):** at >= 130 px the gradient finish; at 60-130 px two flat tones per form (lit
   and shade, a crisp terminator from the same model: DIRECTION rule 5's flat tones); under 60 px one or two flat values.
 - **Light (from B, to build):** the key and its colour come from the set's rig and are read off the model in camera
-  space, so a figure keeps the scene's light when it turns or is mirrored. **Rim:** only on the subject (DIRECTION rule
-  5): a thin warm edge on the key side (+12-14 L\*, toward gold, ~0.9 % H). **Local light:** a phone or a lit door
+  space, so a figure keeps the scene's light when it turns or is mirrored. **Rim:** by tier, on what the key and the
+  story light touch (DIRECTION rule 5 and `CRAFT.md` §d.8 since 2026-10-30, playbook PROPER LIGHT; until then the
+  subject's only): on the subject a thin warm edge on the key side (+12-14 L\*, toward gold, ~0.9 % H), on people near
+  the story 2 px at +6-8 L\*, never on skin as an even band. **Local light:** a phone or a lit door
   lifts only the planes that face it and are near it (+10-14 L\*, at most 12 degrees toward its hue; a phone's light
   clipped to ~0.25 H round it), never the whole silhouette (`people.md` §b.5). **Skin in close shots (>= 300 px):** a
   warm band along the terminator, C\* x1.25, 10 degrees toward red, 0.004-0.006 H wide. A contact shadow under the

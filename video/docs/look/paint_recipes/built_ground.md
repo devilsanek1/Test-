@@ -330,6 +330,9 @@ Last, convert the whole plane for its depth (toward the air, less chroma, a litt
 **(c) EDGES**
 - The near planes' silhouettes stay crisp (0.3-0.6 px).
 - The far planes soften (1.0-1.6 px), and their tops are LOST right by the sun.
+- Since 2026-10-30 (`PAINT_RECIPES.md` §1 item 6, §3 C3; `ORGANIC.md` §5): from +2 on, a solid's silhouette is found
+  only where the sun touches it and elsewhere broken by dry-brush teeth (2.5 px on +2, 2 px on +3, roof tops 6 px on
+  +4); the far planes keep the coarsest marks, few, broad and visible, never only a blur.
 - Slivers are the crispest marks on the plane (crisp against the sky, 1.3 px against the body).
 - No outline anywhere.
 

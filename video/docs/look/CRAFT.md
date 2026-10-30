@@ -298,42 +298,82 @@ G4 frame), halos as opaque discs, no cast or contact shadow in any kit file, no 
    +-3-4 L*, dithered (+-0.5 code, never banded), warm toward the light and cool away (+-0.8-1.0 on OKLab b), a dappled
    shade from a named caster; never so strong that it blurs the lit / shade step, which stays the volume's read. A
    gradient across a whole volume in place of its steps stays out (until 2026-10-30: "never a gradient").
-5. **Cast shadow** = the footprint swept along the light: 0.3-0.8 h long under a sun; under a lamp h·d / (H_lamp − h),
-   capped at 1.5 h and only inside the pool (outside it, contact only); flattened by the ground's ry/rx (desk 0.3,
-   street 0.2-0.35); sharp at the base, a 10-14 px half-tint step at the far end.
+5. **Cast shadow** = the footprint swept along the light, built by projection (one homography through the light's image
+   point and its foot: `ORGANIC.md` §4.2): 0.3-0.8 h long under a high sun; long under a low one (h / tan(elevation):
+   ~6.5 h at scene 1's 8.9 degrees), converging on the point straight below the sun on the horizon; where a design
+   needs a sunlit dusk ground, cap them at <= 2.5 h with the far end fading; a sun on the roofline puts the near ground
+   in shade instead, and nothing inside a shade mass casts a sun shadow. Under a lamp h·d / (H_lamp − h), capped at
+   1.5 h and only inside the pool (outside it, contact only); flattened by the ground's ry/rx (desk 0.3, street
+   0.2-0.35); sharp at the base, softening toward the far end (a 10-14 px half-tint step on a vector shadow; in a baked
+   map a penumbra of the caster's distance x the sun's 0.53 degrees). A shade mass has a named caster (a canopy
+   off-screen, the far roofs) and the caster's shape (clumps of three sizes in an uneven rhythm, holes of light near its
+   edge, a 10-30 px penumbra on our near ground), never a vignette; dapples are the sun's image through gaps (ellipses
+   stretched along the light, in clusters of uneven sizes), or none.
 6. **Contact shadow under everything that touches a surface** (people, chairs, mugs, laptops, vans, lamp bases, pots):
    1.05-1.15x the footprint (1.1-1.3x a person's stance), 6-12 px tall (16 for a vehicle), 3-4 px away from the key, a
    3-4 px half-tint edge. The cheapest premium tell.
-7. **Pools and spills agree with their source:** centred under the lamp's mouth (pushed along the shade's tilt), rx
-   2.5-3.5x the mouth's half-width (a street lamp: 0.8-1.0x its post height), ry/rx = the ground's flattening; two opaque
-   flat steps, both lighter and warmer than their ground (v3: snow #EADBD2 / #F6E4CA, desk #EBB07F / #F6CD98). A window
-   spill: a trapezoid widening 1.3-1.6x, 0.6-1x the window's height, +4 L*. Warm objects in a pool are lifted +6 to +11 L*
-   (a clipped copy screen-blended with #4A2E10; never on cool surfaces, it greys them). A halo: at most 1.7x the lantern,
-   one step on the sky, or none: show light on what it hits, never as discs. Room falloff: planes (window reveal, desk
-   underside, corners) plus ONE lamp wash with a 2-step (~26 px) edge, never concentric rings (a target). No symbolic glow.
-8. **Rim light only on the subject,** when the key is behind or beside it or it stands on a darker field: 4-6 px inside
-   the silhouette along 25-50 % of its edge on the key side, in the lit colour; never an offset copy of the edge.
+7. **Pools and spills agree with their source, with real falloff:** centred under the lamp's mouth (pushed along the
+   shade's tilt), rx 2.5-3.5x the mouth's half-width (a street lamp: 0.8-1.0x its post height), ry/rx = the ground's
+   flattening, lighter and warmer than their ground (v3: snow #EADBD2 / #F6E4CA, desk #EBB07F / #F6CD98). The falloff
+   is real (playbook PROPER LIGHT; `ORGANIC.md` §4.2): under a lamp cos^3(theta) / h^2 (a bright core, a fast drop, a
+   long tail), an area source (a doorway) falling off more slowly near it; in a baked light map a smooth ramp dithered
+   +-0.5 code (seeded), never concentric rings (a target); a vector pool may keep two opaque flat steps. A doorway's
+   pool is the opening projected forward (1.45x by its near edge), +7-10 L* at the threshold, its sides softening 3 ->
+   12 px with distance, every caster in it cutting its own shadow out; it never lands on water (the water shows the
+   source's column). A window spill: a trapezoid widening 1.3-1.6x, 0.6-1x the window's height, +4 L*. Warm objects in a
+   pool are lifted +6 to +11 L* (a clipped copy screen-blended with #4A2E10; never on cool surfaces, it greys them).
+   **A soft glow and a gentle bloom AT a source** (playbook PROPER LIGHT: "a glow is right where a source is"): three
+   blurs at ~0.1 / 0.4 / 1.2 x the source's size (a door 2.5 / 8 / 22 px; the sun 4 / 14 / 40 / 110 px, the two wide
+   ones stretched 1.8-2.4x along the horizon), weights ~0.3 / 0.2 / 0.1, cut out of the source itself; at most +6-8 L*
+   at its edge, +2 one size away, nothing past three; on emitters (a sun, a lit opening, a lamp, a screen) and their
+   reflections only; never on a lit surface, never a disc or ring, never in the caption band; a sun that is the key but
+   not the story light keeps it at +2-3 L* (§g.2). Shafts, if any: at most 2-3 soft wedges from the source's image
+   point, +2-4 L*, against darker air only, never across the caption band or the focal. Show light on what it hits; no
+   symbolic glow (a glow away from a source). Room falloff: planes (window reveal, desk underside, corners) plus ONE lamp
+   wash. Until 2026-10-30 a halo was at most 1.7x the lantern, one step on the sky, or none: history.
+8. **Rims on what the key and the story light touch, by tier** (playbook PROPER LIGHT: "lit edges (rim light) on what it
+   touches", owner, 2026-10-30; `ORGANIC.md` §4.2): a band inside the silhouette from the shape's distance field x
+   max(0, n . l)^p (p 0.8-1.2), so uneven by construction, on the light's side only, in the light's colour; never an
+   even outline or an offset copy of the edge. The subject 4-6 px on a ~300 px figure, scaled with its height (1.7 px
+   plus a 3.4 px band at 0.4 on a 153 px figure), +12-18 L*, strongest when the key is behind or beside it or it stands
+   on a darker field; tier B (people near the story, the mascot) 2 px, +6-8; tier C 1.5-2.5 px, +4-8 (a ~3 px sliver up
+   a building's sun-facing corner, a sunlit coping's lip); far planes none, or +2-3 L* lost in the haze. Light wrap
+   where the subject stands against the story light's source: the source blurred (sigma ~7 px) laid on her inner edge
+   band (3-4 px at ~300 px tall, scaled), fading as she leaves it; on the back edge only where an even band would read
+   as an outline. Until 2026-10-30 the rim was the subject's only: history.
 9. **Unlit:** the sky and the sources, insert cards and charts, screens and lit panes, captions, the far town past the
    atmosphere steps. The caption band holds one value; no shadow edge crosses it.
 10. **How much:** night interior 20-30 % lit (pool and wash), 45-60 % ambient, 10-20 % shadow shapes; night exterior 8-15 %
     warm-lit, ground ambient at least 50 %; day 20-30 % shade and cast. Every object in a lit zone gets a form and a
     contact shadow, every person a cast shadow too; supporting life stays in the ambient band.
-- **Code (shapes, not blur): `lib/light.tsx`** (2026-10-27: being ported from v3's opt-in first version,
+- **Code: `lib/light.tsx`** (2026-10-27: being ported from v3's opt-in first version,
   `src/v3/film/kit/Light.tsx`; the craft tooling lane finishes it, `PIPELINE_V2.md`). These are engine primitives, not
   assets, and a film never imports another film's folder (`src/vN/`): a new film takes them from `lib/light.tsx`. A
   `LightRig` context per set; `<ShadowLayer>` = one isolated
   `<g style={{mixBlendMode: 'multiply'}}>` after the fills, before the ink (no double-darkening), holding `<ContactShadow>`,
   `<CastShadow>` (the footprint swept along the light) and `<FormShade>` (the path clipped to the side away from the key);
-  then `<LightPool>`, `<PoolLift>`, `<Rim>`; ink and captions on top, unlit. Soft edges: 2 flat steps, no `feGaussianBlur`.
+  then `<LightPool>`, `<PoolLift>`, `<Rim>`; ink and captions on top, unlit. Soft edges on these vector layers: 2 flat
+  steps, no `feGaussianBlur`. **The proper light** (owner, 2026-10-30) lives in three homes, cheapest first
+  (`ORGANIC.md` §4.2, §3.1 rows 8-11): the colours (what is simply lit or shaded and never changes: 0 ms); baked maps per
+  plane, ONE multiply + ONE screen map solved per pixel against the plane's own render, cropped to their box, one set per
+  state (the falloff, the shade masses, the pools, a static source's bloom: `src/look/light_s1/bake/`, drawn by
+  `lib/light2` `LightMaps` in the plane's group); live layers on movers, from their own drawing (`lib/light2` `RimOf`,
+  `WrapOf`, `ShadeOf`, `ShadowCut`, `GrainOn`; a changing source's bloom as a cropped live filter). A full-frame blended
+  image costs ~40-70 ms: crop and merge. `lib/light.tsx`'s header ("never a glow disc ... no blur, gradient or opacity
+  fade") predates this and is the engine's to update; a scene that takes the maps switches its `lib/light` layers off
+  (~340 ms of v6's ~550 ms frame).
 
-**Check** (the G4 look clip and every render): every pool at least +4 L* over its ground; a halo's radius at most 1.7x
-its lantern; the brightest 5 % (sky and caption band out) centred within 0.15 H of the subject; no shadow pixel under C* 8,
-nor under L* 35 except on an anchor-dark surface or a dark piece (§f.8); the subject's shade face -20 to -25 L* under
+**Check** (the G4 look clip and every render): every pool at least +4 L* over its ground; a bloom only at a source, inside
+its three sizes and <= +6-8 L* at the source's edge, none on a lit surface or in the band; the brightest 5 % (the sky,
+the caption band and the far planes out) centred within 0.07-0.15 H of the subject; rims by tier, none an even outline;
+no shadow pixel under C* 8, nor under L* 35 except on an anchor-dark surface or a dark piece (§f.8; a shade mass under
+it waits for the dark key, §d.2); the subject's shade face -20 to -25 L* under
 its lit face (an eye check until `check_light.py` gets its tier-A step); one value in the caption band; the G4 look clip already shows the rig
 with form, cast and contact shadows. `scripts/qa/check_light.py` (built in the v3 rework: an A/B of the same frame with
-the light layers off and on) checks the pools, the brightest 5 %, the shadow colour and the caption band; the halo and
-the three shadow kinds are an eye check. Eye check: for every shadow, point at its light; for every object in the
-light, point at its shadow.
+the light layers off and on) checks the pools, the brightest 5 %, the shadow colour and the caption band (pass the far
+planes' boxes as `--exclude`); a scene on baked maps runs `src/look/light_s1/bake/measure.py`
+(`ORGANIC.md` §6 step 2's check); the bloom, the rims and the three shadow kinds are an eye check. Eye check: for every
+shadow, point at its light and its caster; for every object in the light, point at its shadow.
 
 ## e. How to measure (until `scripts/qa` has these: the retro's tooling lane)
 OpenCV, captions masked. **Joins** (frames 108 px wide, OpenCV 8-bit Lab): carry = share of pixels whose mean |ΔLab| < 8
@@ -361,8 +401,11 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
    farther (4-6 in a shot, 5-7 on a vista), its AIR (the sky's lowest colour right behind them: rule 6's one sky,
    `horizonColor(sky, x)` of §g.3, never the mint above it; v2 S1 `S1_AIR`) and its camera (horizon, vanishing point(s)).
 2. **One flat step per plane toward the air**, k = 0 / .12 / .22 / .40 / .65 on every fill of the plane (never a
-   gradient, fog or blur on the flat world; a PAINTED piece softens by its plane, the owner's "a bit more blurry each
-   time": `PAINT_RECIPES.md` §1, §3 C3): L* toward the air's; a hue on the air's side converges on it, one across from it keeps its
+   gradient, fog or blur on the flat world: the light's falloff and the sun's in-scatter veil, baked per plane, are
+   light, §d, not the plane's air step; a PAINTED piece softens by its plane, the owner's "a bit more blurry each
+   time": `PAINT_RECIPES.md` §1, §3 C3, and its marks coarsen with distance: a far plane keeps fewer values and fewer
+   marks, but the marks it keeps are the coarsest, broad and visible, "more like brushes and painting" (owner,
+   2026-10-30), never a plane that is only blurred: `ORGANIC.md` §5): L* toward the air's; a hue on the air's side converges on it, one across from it keeps its
    hue at chroma x (1 - 0.8 k) (a straight mix would cross grey), never under C* 8, never into the olive band. This is
    DIRECTION's "lighter, cooler, less saturated" in a day or dusk air; under a warm sunset air the far planes take its
    warmth and still read far by value, contrast and simplicity (v1 @25.5: the far city more saturated than the near, its
@@ -461,15 +504,18 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
    suggestions", `STUDY.md` §9 decision 2 (b); first judged in the look test): 6-10 % of the frame under L* 40 in >=
    120 pieces of >= 4 x 4 px across >= 9 of 16 grid cells (windows, doorways, eave undersides, the shade under trees,
    hulls; the posters 13.8 % in 259 pieces, v2 1.9 % in 41), in the palette's tinted dark hue (`PALETTE.md`'s
-   anchor), the near world in mid-tones; (a), about 5 % as rule 6's one tinted anchor, is history. These are
+   anchor), the near world in mid-tones (owner's pick pending: `ORGANIC.md` §8 D3); (a), about 5 % as rule 6's one
+   tinted anchor, is history. These are
    WARNs, like this page's other thresholds; a still is measured with `scripts/look/posters/pro_4_colour.py` until
    `check_depth.py` gets its value parts (to build: `STUDY.md` §1a).
 - **Code:** `lib/water.tsx` (§7: `<Water>`, `waterProblems`, `waterPalette`; how-to `lib/WATER.md`, demo
   `src/entry-v2r-water.tsx`), `lib/depth.ts` (`makeAtmosphere`, `recede`, `planePalette`, `toneOnTone`, `backing`, `groundCam`, `flight`,
   `band`, `quadForPlane`, `poissonDisk`, `depthProblems`, `sizeProblems`; the parallax float `parallaxOffset`,
   `floatAt`, `floatProblems`) and `lib/particles.tsx` (`<Particles kind>`, `particleProblems`); how-to and numbers
-  `lib/DEPTH.md`; demo `src/entry-v2r-depth.tsx`. Flat everywhere; the parallax float is approved (owner, 2026-10-28:
-  DIRECTION rule 8); a fog, a depth-of-field blur or a glow stay owner decisions (rule 5's sky gradient aside).
+  `lib/DEPTH.md`; demo `src/entry-v2r-depth.tsx`. Flat in the design, with the paint and the light on top (§c, §d); the
+  parallax float is approved (owner, 2026-10-28: DIRECTION rule 8); a fog or a depth-of-field blur stay owner decisions
+  (the near framing's one optical blur, 2.2-3 px, aside: `PAINT_RECIPES.md` §3 C3); a glow only AT a source (§d.7;
+  owner, 2026-10-30, PROPER LIGHT).
 
 **Check:** `scripts/qa/check_depth.py <still> --sheet <shot>.json` (sheets: `scripts/qa/depth_sheets/README.md`), with
 the G4 look clip and every G5 lane's key stills. Three FAILs, the owner's words made measurable: "no air" (the farthest
@@ -498,18 +544,25 @@ stands off what is behind it, the far reads far, the ground runs into the pictur
 ## g. Sky: one continuous, gentle gradient that survives video
 The owner on v2's G4 look clip (2026-10-27): "why is it blue sky and then suddenly abruptly orange, weird ... maybe when
 it comes to sky we can find a beautiful way to do a gentle gradient ... find the pro way and tools to do it the best way
-you can" (playbook ONE CONTINUOUS SKY, DIRECTION rule 6). The sky is the one gradient in the look; everything else stays
-flat. Measured on the S1 demo (`research/2026-10-27_sky_gradients.md` §5):
+you can" (playbook ONE CONTINUOUS SKY, DIRECTION rule 6). The sky is the one big gradient field in the look; elsewhere
+colour and light move only inside a shape (§d.4's ramp, §d.7's falloff and bloom) and the planes step flat (§f.2).
+Measured on the S1 demo (`research/2026-10-27_sky_gradients.md` §5):
 1. **One sky, frame top to horizon:** key colours in OKLCH, mixed in OKLab, joined by one eased curve (a monotone
-   cubic: no stop line, no overshoot), as painters paint an evening: a zenith a touch deeper and cooler (dL* <= ~1.3:
-   deeper reads richer but contours after a platform's re-encode), the caption field FLAT through the caption band
+   cubic: no stop line, no overshoot), as painters paint an evening: a zenith deeper and cooler than the caption field,
+   dL* <= ~1.3 by default and deeper (up to ~6 L*) only with `check_banding.py` PASS on a master encode, since deeper
+   reads richer but contours after a platform's re-encode (v7 takes sky top B, #afb3d8, L* 75.9 over a field of ~82:
+   the owner saw no difference between A and B, so the call was ours, 2026-10-30, by the playbook's "Never ask the
+   owner to choose between options they can't tell apart"), the caption field FLAT through the caption band
    (dL* <= 1.5 across the caption block, y 317-556: `LAYOUT.md` §1; ink >= 7:1), then lighter through a pale warm light band (the sky's lightest, a step
    over both neighbours) into the warm horizon. The cool-to-warm crossing happens in that light band at C* <= 7, and so
    does the sun's warmth where it meets the mint (a 2-stop sRGB mint -> peach goes through khaki #DCDBC5; a 2-key OKLab
    one crosses yellow-green at C* 13).
 2. **The sun is part of the sky:** a soft elliptical warmth round a low sun, low and wide (ry ~0.45 rx: it hugs the
    horizon; a 0.6 one rose into the mint as a round glow disc and crossed yellow-green at C* 8.1), gone at its rim
-   with a smootherstep (no edge, no ring), never inside the caption band; the disc a flat shape on top, no halo. The
+   with a smootherstep (no edge, no ring), never inside the caption band; the disc a flat shape on top. A sun that is
+   the key but not the story light carries a gentle bloom (§d.7; owner, 2026-10-30, PROPER LIGHT): <= +2-3 L* at its
+   edge, its wide blurs stretched 1.8-2.4x along the horizon (proof 2: +2.2 L* within 70 px), never a ring or a disc of
+   glow (until 2026-10-30: "no halo"). The
    disc sits one flat step off its sky (calmed toward the warm sky band) or behind a ridge, unless it is the shot's
    "look here" (owner, 2026-10-29: "Go with your suggestions", `STUDY.md` §9 decision 6 (b); first judged in the look
    test): the far stays the calmest part of the frame, nothing in the far group, the disc included, out-contrasting

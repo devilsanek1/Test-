@@ -42,7 +42,7 @@ recorded from some other video?" (v1, 2026-10-25); "check out the text capture. 
 | platform UI (organic) | top y < 180; bottom y > 1520; right rail x > 950 at y 900-1500 | masses and dressing may run under it (kerbs, the edges of things, a foreground cut by the bottom); key information never (the subject's action, a small figure, a label, a number, the pop, a contact point; a big near "you" may be cut there, its head above: the "you" row) | G5 §2 and CS §5 (moved here); theme.ts `safe`; framecheck; LD §8 |
 | ad overlay (a boosted post) | top 240-288; bottom 35 % (y > ~1250); rail x > 780 from y 840; sides 48-192 (REPORTED) | a cut made for ads keeps its key reads above y 1250 and, below y 840, left of x 780 | VT §2; G5 §2 |
 | top gutter | y 0-290 | framing only: a top-edge object (a lamp, branches, a beam; a whole lid from a high angle), wires (only here and below y 600), the jagged skyline and its sky, the hero cloud (v2 S1: y 120-280); a credit tab y ~185-288 (v2); never a paper edge | CS §2, 3b.2-3b.3; VT §1; v2S §5; G5 §5; PB |
-| caption band (keep clear) | y 290-600; its flat field spans at least x 95-945 (full width where the sky fills it) | ONE calm flat field: outdoors the one sky (DIR 6), elsewhere a flat light wall or facade (L* >= 70; a cozy lid or far row L* >= 75); no lines, detail, roof tops, heads, props, shadow edge or texture across it; weather at half density at most (flakes <= 6 px); tops of towers, discs and clouds at y >= 600 unless the film declares an exception (v2 S1: its planting to y 575) | DIR 6, 10; CR §c, §d.9; CS 3b.2, §2; LD §8; CG rule 2; `particles.tsx` |
+| caption band (keep clear) | y 290-600; its flat field spans at least x 95-945 (full width where the sky fills it) | ONE calm flat field: outdoors the one sky (DIR 6), elsewhere a flat light wall or facade (L* >= 70; a cozy lid or far row L* >= 75); no lines, detail, roof tops, heads, props, shadow edge or paint marks across it (the one paper at most faint: <= 15 % of its strength, the band's spread <= 1.5 L*, CR §c); weather at half density at most (flakes <= 6 px); tops of towers, discs and clouds at y >= 600 unless the film declares an exception (v2 S1: its planting to y 575) | DIR 6, 10; CR §c, §d.9; CS 3b.2, §2; LD §8; CG rule 2; `particles.tsx` |
 | caption block (the ink) | y 317-556, x 95-945: Patrick Hand 98 px, baselines 387 / 510 (one line 448), centred on x 520 (left of centre: clear of the rail), <= 850 px wide, <= 2 lines of ~20 characters; highlight boxes reach y 299 | pops in place in screen space, never on a camera layer, never clipped; a change at least every 1.5 s; ink >= 7:1 on its field; the sky flat to dL* <= 1.5 across it; frame 0 shows the first spoken line as a normal caption, never a title over it | theme.ts `skyCaption`; CR §g.1; `sky.tsx`; CS §5; G5 §5; PB Hook; capcheck |
 | read zone ("the stage") | y 600-1250, x 120-880 | the beat's subject and its action, staged here (the board: SB §3); a cozy shot's one opening; on a cut made for ads, every key read | SB §3; CS §2; VT §0-2 |
 | key-read box (organic) | x 120-950, y 600-1480 | the outer limit for any key read on an organic post (a label, a number, a contact point beside the subject) | G5 §2 (moved here) |
@@ -170,6 +170,10 @@ everything: suspense, sense of scale, fantastic environment and composition" (v3
   `lib/sky.tsx` `skyProblems`: the sky's flatness behind the block (CR §g).
 - The board lint (`G3_ANIMATIC.md` §7; SB §5-6): the subject box, the band, words >= 48 px.
 - `scripts/qa/check_depth.py`: the planes, separation and the receding ground (CR §f).
+- `docs/look/organic/composition_study.py frame <still> --caption --subject x0,y0,x1,y1` (from `video/`, run with
+  `python3 -B`): the composition rules R1-R12 (`ORGANIC.md` §4.4; CR §b's check): the notan, the calls (<= 3 regions at
+  >= 50 % of the strongest, one rival, the strongest on the subject in value and colour), the two quiet masses, <= 6
+  named objects, the focal under the band, the real dark mass (its key: the owner's pick, `ORGANIC.md` §8 D3).
 - By eye: every word at 0.25 scale; the cover at 360 px wide; the frame at phone size, sound off, squinting (the eye
   is on the beat's subject).
 - Proposed: `scripts/look/posters/composition.py frame` (the overlay and numbers on any 1080 x 1920 still) promoted to
@@ -214,7 +218,8 @@ frame, rebuilt beside v2's own). A line moves into §1-5 only when the owner app
   zone; their title zone IS our caption block, on the film and on the cover. [owner: DIR 10]
 - **The band stays one calm flat field.** The posters' skies change by dL* 0.4-3.1 across the block's rows (median
   1.4; 4 of 7 meet our <= 1.5: CO §4): a poster-like sky is flattened inside the band, its gradient above y 290 and
-  below y 600, and no texture in the band (ST §7). [owner: DIR 6, 10]
+  below y 600, and no texture in the band but the one paper at <= 15 % of its strength (CR §c, 2026-10-30; ST §7 said
+  none). [owner: DIR 6, 10]
 - **Cozy stays the home** (>= 50 % of the runtime). The poster frame's sky (36-53 % of a poster, 45-58 % once
   extended) is COZY_AND_SCALE's exposed dose: 1-3 frames a film (CO §5). [owner: DIR 7]
 - **One subject at a time, owning the contrast.** The posters' hero is often quiet (the salience peak on it in 2 of 7:
@@ -227,21 +232,27 @@ frame, rebuilt beside v2's own). A line moves into §1-5 only when the owner app
 
 ### 8.2 What the posters would change (in §1-5's order)
 **The frame (§1)**
-- **The bottom and side edges become the near frame:** dark, detailed masses cut by >= 2 edges (leaves, a rail, a
-  rock, roof edges), small and subtle: a hint at the edges, near nature as a few finely drawn real leaf shapes in a
-  corner, calm in colour, never big chunky masses (owner, 2026-10-29: "way too big and not as subtle as they need be"), median L* <= 60 and >= 30 from the air, edges >= 0.3, open ground <= 15 % of the frame (PE L1: the
-  posters' nearest plane L* 45, open ground 7 %, the bottom fifth 59 % masses; v2 74, 25 %, 9 %); bottom corners L* <=
-  ~55 (CO L1: posters 44 / 53, v2 ~72 / 74). Masses may already run under the UI (§1). [>= 30 L* from the near group
-  to the air: owner, DIR 6 (CR §f.8); the near world in mid-tones, its darks in many small pieces: owner-decided
-  (2026-10-29), ST §9 decision 2 (CR §f.8); the rest: proposal]
-- **The one quiet field, measured:** when the sky is the field, calm below the skyline <= 5 % of the frame (posters 1-3
-  %, v2 19-31 %: CO §1, §7) and no edge-free field over 2 % below the sky (P4 §3.5); 73-90 % of the detail in the lower
-  half (v2 53-62 %); open ground <= 15 % as W1's planning number (ST §7). A cozy shot whose quiet field is the floor
-  keeps LD §0's rule. [proposal]
+- **The bottom and side edges become the near frame:** dark and quiet masses cut by >= 2 edges (leaves, a rail, a
+  rock, roof edges), with at most 2 props in them, cut by the edges, inside the near shade mass (`ORGANIC.md` R5-R6;
+  owner, 2026-10-30: "our scene is very busy"), small and subtle: a hint at the edges, near nature as a few finely
+  drawn real leaf shapes in a corner, calm in colour, never big chunky masses (owner, 2026-10-29: "way too big and not
+  as subtle as they need be"), median L* <= 60 and >= 30 from the air, edges >= 0.3 (PE L1: the posters' nearest plane
+  L* 45, the bottom fifth 59 % masses; v2 74, 9 %); bottom corners L* <= ~55 (CO L1: posters 44 / 53, v2 ~72 / 74).
+  Masses may already run under the UI (§1). Retired 2026-10-30: "detailed" near masses and the posters' "open ground
+  <= 15 %" (the near ground is now the second quiet field: §1). [>= 30 L* from the near group to the air: owner, DIR 6
+  (CR §f.8); the near world in mid-tones, its darks in many small pieces: owner-decided (2026-10-29), ST §9 decision 2
+  (CR §f.8; the dark key: the owner's pick, pending, `ORGANIC.md` §8 D3); quiet, <= 2 props: owner (SCENE COMPOSITION,
+  2026-10-30); the rest: proposal]
+- **Retired (2026-10-30): the one quiet field, measured.** The posters' "calm below the skyline <= 5 %", "no edge-free
+  field over 2 % below the sky", "73-90 % of the detail in the lower half" and "open ground <= 15 %" (CO §1, §7; P4
+  §3.5; ST §7) were a proposal; the posters' loaded lower half is the busy frame the owner rejected ("our scene is very
+  busy", SCENE COMPOSITION). A film frame keeps up to two quiet fields, the sky at the top and the near ground at the
+  bottom (§1; `ORGANIC.md` R5). [retired]
 - **The far anchor's zone:** its top at y >= 620 (just under the band), its base on the horizon at y ~850-1050, >= 65 %
   of the width and off >= 1 side edge, 6-20 % of the height, pale (k 0.64-0.87) unless it is the declared scale subject
   (P1 §3.2; ST §1b, §7). [proposal]
-- **Pip's spot:** the busiest 60-px spot of y 700-1480, x 140-760, >= 250 px from the hero, in the near patchwork;
+- **Pip's spot:** inside a mass of the busy belt, tone-on-tone (y 700-1480, x 140-760: the busiest 60-px spot there),
+  >= 250 px from the hero, never between the words and the focal or on a leading line into it (`ORGANIC.md` R12);
   never the sky, the band, the rail or the hero (CO §4). [hidden: owner, DIR 2; a quiet "find Pip" in most exterior
   shots, none in closes and charts, hidden on the cover too: owner-decided (2026-10-29), ST §9 decision 5 (§1, §5);
   the spot rule: proposal]
@@ -283,8 +294,9 @@ frame, rebuilt beside v2's own). A line moves into §1-5 only when the owner app
 - **The patchwork vs our planes rule:** frontal on mid and far masses; on a ground only projected through `groundCam`
   (facets receding to the VP, never level bands seen edge to edge: PE §5); in the sky only as masses (ghost blocks
   within dE 6 of the air), never abstract rectangles (ST §5.2); blocks 3.5-7.5 % W, far 6-10 %; each facet takes its
-  plane's step, so CR §f's ladder holds; never on the subject, nothing in the band. [owner-decided (2026-10-29): the
-  "low poly" world, ST §9 decision 3 (CR §b, tier C's build)]
+  plane's step, so CR §f's ladder holds; each facet hand-cut, the edge between neighbours within ~4-6 L* lost, far
+  facets carrying their plane's coarse marks (owner, 2026-10-30, ORGANIC, NOT GEOMETRIC: CR §b); never on the subject,
+  nothing in the band. [owner-decided (2026-10-29): the "low poly" world, ST §9 decision 3 (CR §b, tier C's build)]
 
 **Across shots (§4)**
 - **A far landmark carries a join:** kept at one screen spot (±8 %) and size (±20 %), it is a B thread match between
@@ -321,8 +333,9 @@ home); a poster or a real skyline copied; local objects as a style rule (the own
 
 ### 8.4 Into §1-5, once approved
 Already in §1-5 (owner-decided, 2026-10-29): Pip's "find Pip" and the cover (§1, §5), the designed view in two frames
-(§2, §3; CR §f.5; on hold since 2026-10-29: DIR 7), the sun (§2). Once approved: the poster-frame row into §2; the near frame, the quiet-field numbers
-and the far anchor's zone into §1; the hero's
+(§2, §3; CR §f.5; on hold since 2026-10-29: DIR 7), the sun (§2); the near ground as the second quiet field (§1,
+2026-10-30). Once approved: the poster-frame row into §2; the near frame and the far anchor's zone into §1 (the
+posters' quiet-field numbers are retired, §8.2); the hero's
 spot and size into §3; the far-landmark carrier into §4; the cover template into §5; `check_composition.py` into §6.
 The risk: a formula if every film opens on the same poster frame (vary the hero's side and the near frame per film:
 CO L1).

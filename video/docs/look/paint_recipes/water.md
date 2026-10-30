@@ -676,7 +676,9 @@ Right half, the paving:
 **(a) Design.**
 - The water's shape: measured from the v4 design. The far waterline (the quay's foot) runs from y 1068 at x 0 to
   1111 at x >= 460; the near quay edge is y = 1143 + 0.131 x.
-- The objects standing in the water stay our crisp flat: the two boats, the duck and Pip's post.
+- The objects standing in the water stay our crisp flat: the two boats, the duck and Pip's post (v4-v6; since
+  2026-10-30 a prop that stays joins the one painted language at its plane's dose, or leaves the frame: playbook
+  PAINTED PIECES, `PAINT_RECIPES.md` §4.1, `ORGANIC.md` §5 and R6; Pip stays crisp, tier B).
 - The mirror target: the design above the waterline, per column:
   - 7 px of the quay face (stone +6 L*) first;
   - the quay's 10 px top skipped;

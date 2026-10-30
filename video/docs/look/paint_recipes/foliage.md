@@ -230,6 +230,15 @@ PIECES: soft underpainting first, then marks along the form, then a few crisp li
 
 ### 4.1 Tree crown (`paint_tree()`; near: crown 330 x 270 px, trunk foot at the bottom)
 
+**Superseded for the next tree (2026-10-30; `PAINT_RECIPES.md` §2.3).** The owner called v6's tree, painted from this
+recipe, out of style ("it is weird looking tree we have on the forefront like it doesn’t fit the style there"), and
+the playbook's ORGANIC, NOT GEOMETRIC asks for fewer, bigger, irregular shapes: v6's crown measures 67 % small shapes by
+area and 58 % crisp edges (the painted trees 34 % and 20 %), and this recipe's own verdict (§0) finds the pads "too
+alike" ("a little topiary"). A tree takes `ORGANIC.md` §4.1's shape (a body wider than tall with a flattened underside, 3-5 big
+lobes never evenly spaced, 2-4 clumps half sunk on each lobe, 1-3 sky gaps; the biggest mass 20-30 % of the area,
+small <= 40 %) and edges (lost >= 7 %, crisp <= 30 %), its crown from `shapes_gen.crown`; the light, palette and pass
+order below still hold.
+
 **(a) Design: the flat shapes first**
 - **Pads, not balls.** 9 pads (`PAD_TEMPLATE`, (u, v, half-width) in crown W/H), back (top) to front (bottom):
   - half-width rx = 0.17-0.24 W (x U(0.96, 1.12)); dome height ry = rx x U(0.52, 0.64); the underside sits
