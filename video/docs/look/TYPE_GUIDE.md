@@ -1,11 +1,6 @@
-# TYPE GUIDE: the words on screen (fonts, placement, motion, recipes) · DRAFT until the owner picks
+# TYPE GUIDE: the words on screen (fonts, placement, motion, recipes) · PICKED 2026-10-30
 
-**Status: DRAFT (2026-10-30, the type iteration).** Nothing here is a rule until the owner picks from the stills
-(`docs/look/type/stills/`); until then `LAYOUT.md` (the band, Patrick Hand 98 px, the peach box) stays the default
-(playbook: "The words on screen are DESIGNED"). The research behind every number: `docs/look/type/RESEARCH.md` (findings
-F1-F15, with sources); the pleasantness pass after the owner's note of 2026-10-30 ("shouldn't look like a blood message
-on the wall"): `docs/look/type/PLEASANT.md` (findings P1-P8, the options, the pick: THE LIT HAND). The owner's playbook
-rule wins over this guide: the words are PLEASANT to look at, soft, warm and calm, never menacing. Px at 1080 x 1920, y down, 60 fps; times are video 4's take (`public/v4/voice_words.json`, 42.24 s,
+**Status: PICKED (2026-10-30).** The owner handed the pick over: "Okay you pick your best option for maximum engagement and pleasantry and user attention retention". Picked on those three, from the stills (`docs/look/type/stills/`): **the hand Gaegu** for every spoken word (Mali stays the fallback); **the stress both ways**: the big lit word (R4) for the film's 3-5 landing words and the numbers, the same-size Bold lift (R5) for everyday stress; **the warm halo** behind the stressed word on light skies (dusk option C; night B, honey with the golden glow; the number B); **words that follow the open space** by the subject on one steady anchor per shot (§c); **the cover in the hand** with one lit word (R10; the posters' caps stay a comparison); **the size steps as they are** (§b: 116 px is the largest that keeps 2-4 words on a line). Retired by the owner's note ("shouldn't look like a blood message on the wall"): the brush, the burnt red, the write-on. Positions live in `LAYOUT.md` §1 (applied, §g); the motion (the builds, the bloom) is judged moving in the film's G4 look clip before G5. The research behind every number: `docs/look/type/RESEARCH.md` (findings F1-F15, with sources); the pleasantness pass: `docs/look/type/PLEASANT.md` (P1-P8, the options). The owner's playbook rules win over this guide: the words are DESIGNED, and PLEASANT to look at, soft, warm and calm, never menacing. Px at 1080 x 1920, y down, 60 fps; times are video 4's take (`public/v4/voice_words.json`, 42.24 s,
 177.7 words/min); a "pop" happens 2 frames before its word's start (text a hair ahead of the sound reads as in sync).
 
 ## a. Principles (what makes our words premium, dynamic and engaging; the owner's rules never change)
@@ -269,7 +264,7 @@ Each example uses video 4's real words and times; a frame number is t x 60.
    red, burnt, rust or brown words; no rough, scratchy, dripping or tapering letters; no capitals for stress; the stress
    by size, weight and warm light only (`PLEASANT.md`).
 
-## g. What changes in our docs if the owner picks this (the exact edits; NOT applied now)
+## g. What changed in our docs with the pick (applied 2026-10-30)
 - **`LAYOUT.md` §1, the "caption block (the ink)" row:** replace "Patrick Hand 98 px, baselines 387 / 510 (one line
   448), centred on x 520 (left of centre: clear of the rail), <= 850 px wide, <= 2 lines of ~20 characters; highlight
   boxes reach y 299" with "the words (`TYPE_GUIDE.md`): the hand (Gaegu 300 / 400) 116 px, baselines 395 / 515 (one
@@ -297,7 +292,10 @@ Each example uses video 4's real words and times; a frame number is t x 60.
   <list>); positions in `LAYOUT.md`", and add the owner's verdict quote. If the cover pick changes, the cover's "title
   in the caption type" lines in `LAYOUT.md` §5 and `docs/POSTING_KIT.md` follow. The "Captions are burned in and pop in
   place" bullet stays as it is (it holds for every recipe).
-- **This guide:** drop "DRAFT", keep only the picked recipes, and mark the others "not picked (<date>)".
+- **This guide:** "DRAFT" dropped (2026-10-30); every recipe R1-R10 picked (R4 and R5 both: the big lit word for the
+  landing words and numbers, the same-size lift for everyday stress); not picked: Mali (the fallback hand), the posters'
+  caps (a comparison), the painted wash, the script and the serif italic (PLEASANT.md options); retired: the brush, the
+  burnt red, the write-on.
 
 ## h. THE STILL LIST (for job 2)
 All 1080 x 1920 with `scripts/type/render.mjs` (`--phone --ui`), backgrounds `{{BG_NIGHT}}` (video 4's key) and

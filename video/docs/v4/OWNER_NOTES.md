@@ -244,3 +244,11 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   skies, a soft warm halo on light skies; plum running ink on light skies), the brush and its write-on retired; options in
   stills 15-17; `docs/look/type/PLEASANT.md`; page version 2 (same link). -> rule: playbook, Visual style (the words
   are PLEASANT to look at).
+- 2026-10-30 ~14:10 UTC, on page version 2: "Okay you pick your best option for maximum engagement and pleasantry and
+  user attention retention" -> picked (1A Gaegu; 2 both: the big lit word for the 3-5 landing words and the numbers, the
+  same-size Bold lift for everyday stress; 3C the warm halo on light skies, night B, the number B; 4A words follow the
+  open space on one steady anchor; 5A the cover in the hand with one lit word; 6A the size steps as they are) and
+  applied: `docs/look/TYPE_GUIDE.md` PICKED, `LAYOUT.md` §1/§5/§6, DIRECTION rule 10, G5_BLOCKING's caption tones, the
+  playbook (the DESIGNED rule picked; the old captions retired). The code (font.ts, theme.ts, Captions.tsx, capcheck)
+  follows with the tooling lane; the motion (builds, the bloom) is judged moving in v4's G4 look clip. -> rule:
+  playbook, Process (a pick handed over: engagement, pleasantness, retention).

@@ -112,8 +112,8 @@ exception from the G3 hand-off.
   first frames (the first word at ~0.12 s, the voice file's lead), one continuous shot (`docs/look/DIRECTION.md` rule 9; the owner approves this build with the G4 look clip). The
   last panel un-builds over its last `dur` s on top of it: build
   with `Ink` / `Fill` / kit (they read the exit value) or read `useExit()` for raw SVG (`<ExitShrink>` for characters).
-- **Caption tone**: `captionTone` keys are scene-local `{t, tone}`: `'dark'` (ink) on light walls and skies, `'light'`
-  (white) on dark skies; check the contrast (`contrast(a, b)` in `lib/Captions`: v3's dusk blue #5B6A94 takes white
+- **Caption tone**: `captionTone` keys are scene-local `{t, tone}`: `'dark'` (the deep plum ink, `docs/look/TYPE_GUIDE.md` §b)
+  on light walls and skies, `'light'` (warm white) on dark skies; check the contrast (`contrast(a, b)` in `lib/Captions`: v3's dusk blue #5B6A94 takes white
   5.3:1, ink only 3.1:1). Export it from the panel file (the engine merges it over scenes.json); a `wipe` key follows a
   sky wipe edge (ENGINE §6).
 - **Screen zones:** the one definition is `docs/look/LAYOUT.md` §1 (moved there 2026-10-29 with every other layout

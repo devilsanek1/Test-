@@ -217,8 +217,12 @@ Everything that agent knew is in this repo. This file is the map; the details li
   adjustments to the visual script (`video/docs/v4/visual/STYLE_ADJUSTMENTS.md`) wait to be folded in before G3. **The
   words on screen** (owner, 2026-10-30: fonts and caption placement "premium, more interesting, dynamic and more
   engaging"): an iteration (research, the guide `video/docs/look/TYPE_GUIDE.md` DRAFT with 10 recipes, 14 stills in
-  `video/docs/look/type/stills/`, tooling `video/scripts/type/`), sent on https://claude.ai/artifact/1magumGxnA4TGdeEQPc1Hv
-  with six picks; on the owner's picks, apply the guide's §g doc edits (LAYOUT, DIRECTION rule 10, the playbook).
+  `video/docs/look/type/stills/`, tooling `video/scripts/type/`), sent on https://claude.ai/artifact/1magumGxnA4TGdeEQPc1Hv;
+  after the owner's "blood message on the wall" note the stress became the lit hand (`type/PLEASANT.md`); the owner
+  handed the pick over ("you pick your best option for maximum engagement and pleasantry and user attention
+  retention"): **PICKED and applied** (TYPE_GUIDE status; LAYOUT, DIRECTION rule 10, G5_BLOCKING, the playbook). Still to
+  do: the code (font.ts, theme.ts, Captions.tsx, capcheck: LAYOUT "The code must match") with the tooling lane before
+  v4's G3; the motion judged in v4's G4 look clip.
 
 ### Earlier: video 5 as the heat story
 - **Video 5 is produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt since 2026-10-29 ~07:55 UTC**

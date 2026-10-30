@@ -1,6 +1,6 @@
 # The type stills (job 2 of the type iteration, 2026-10-30)
 
-The guide's still list (`docs/look/TYPE_GUIDE.md` §h, DRAFT), rendered at 1080 x 1920 from the pages in
+The guide's still list (`docs/look/TYPE_GUIDE.md` §h; the guide picked 2026-10-30), rendered at 1080 x 1920 from the pages in
 `scripts/type/stills/` (`bash scripts/type/stills/render_all.sh`, from `video/`). Each still has `NN_<recipe>.png` and
 `NN_<recipe>_ui.jpg` (phone size, with a generic app UI over it). All of them on one page at the 0.25 glance scale:
 `contact_sheet.jpg`. Video 4's real words at their real times (`public/v4/voice_words.json`); the backgrounds are

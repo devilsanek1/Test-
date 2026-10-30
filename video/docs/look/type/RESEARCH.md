@@ -1,6 +1,6 @@
 # The words on screen: research (job 1 of 2, iteration 2026-10-30)
 
-**What this is:** the research behind `docs/look/TYPE_GUIDE.md` (DRAFT): how premium short films design their words, where
+**What this is:** the research behind `docs/look/TYPE_GUIDE.md` (picked 2026-10-30): how premium short films design their words, where
 words may sit in a 9:16 frame, what keeps them readable with a voice, which free fonts match the owner's references, and how
 words move without looking cheap. Only what changes our answer is here. The owner's rules in `BRIEF.md` win over all of it.
 

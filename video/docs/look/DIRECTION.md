@@ -156,13 +156,15 @@ the owner approves it; the look test shows it.
   line first (a bare-line frame 0); the owner sees this clean-pen version in the next G4 look clip. ->
   `CINEMATIC_GUIDE.md` "The opening"; playbook Hook and pacing.
 - **10. Captions and the frame** (where everything sits: `LAYOUT.md`, the one definition of the zones, shot framing,
-  composition and the cover). Captions pop in place, burned in, never a roll-in that clips letters; the caption band is
-  one calm flat field (no lines, detail or shadow edge across it); ink on light, white on dark. No key read in the
+  composition and the cover). The words on screen follow `TYPE_GUIDE.md` (owner, 2026-10-30; picked for engagement,
+  pleasantness and retention): one hand (Gaegu) for every word, its Bold, bigger and lit, for the few stressed words,
+  numbers and titles; pleasant to look at (soft, warm, calm: never red or brown, never rough or dripping, never
+  capitals for stress); set in the open space by the subject on one steady anchor per shot (the band is home);
+  popping in place or built word by word on the voice, never clipped; deep plum on light skies, warm white on dusk and
+  night, the stressed word lit by the film's warm light. The caption band is one calm flat field (no lines, detail or
+  shadow edge across it). No key read in the
   platform UI zones (top, bottom, right rail). No paper edge at the top or beside the band (edges: opt-in per film,
-  decided with the G4 look clip, 'paint-subtle' at most). The words on screen are DESIGNED, never one static block
-  (owner, 2026-10-30: fonts, size, placement and motion chosen beat by beat from the type guide's recipes,
-  `TYPE_GUIDE.md`, DRAFT until the owner picks from its stills; until then this rule and `LAYOUT.md`'s band are the
-  default). -> `LAYOUT.md` §1, §5; `G5_BLOCKING.md` §5; `EDGES.md`.
+  decided with the G4 look clip, 'paint-subtle' at most). -> `LAYOUT.md` §1, §5; `TYPE_GUIDE.md`; `G5_BLOCKING.md` §5; `EDGES.md`.
 
 ## The approved pipeline (owner, 2026-10-27: "Yes"; gates and budgets in `docs/PIPELINE_V2.md`)
 A DESIGNED sketch: G0 topic (then the fact lock) -> G0.5 core line (and the draft of its through-line card) -> G1

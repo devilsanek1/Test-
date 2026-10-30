@@ -383,15 +383,18 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   platform auto-captions stay off. — (v1 reel, 2026-10-25).
 - **The words on screen are DESIGNED, never one static block: the fonts, the size, where the words sit and how they
   move are chosen beat by beat to look premium, interesting, dynamic and engaging.** One font, one size and one fixed
-  band for the whole film was the old default ("pretty static"). The recipes come from the type guide
-  (`docs/look/TYPE_GUIDE.md`, researched), and the owner picks from still examples before a film uses one; until a
-  pick, the current caption rules (`docs/look/LAYOUT.md`) stay the default. The captions keep their duties: burned in,
+  band for the whole film was the old default ("pretty static"). The system and its recipes are the type guide's
+  (`docs/look/TYPE_GUIDE.md`, researched; picked 2026-10-30 for engagement, pleasantness and attention retention): one
+  hand (Gaegu) for every spoken word; its Bold, bigger and lit, for the film's few stressed words and its numbers;
+  words set in the open space by the subject, moving a little between groups on one steady anchor; the cover in the
+  same hand; positions in `docs/look/LAYOUT.md`. The captions keep their duties: burned in,
   never clipped, read at phone size at a glance, in the voice's order, frame 0 showing the first spoken line. — ("One
   aspect I want you to evaluate and research is the fonts and the text caption positioning I'll give you a few
   references / We previously would have the text to be pretty static but there is so much more we can do to make it
   look premium, more interesting, dynamic and more engaging / Research —-> distill it in the guidebook and recipes to
   use —-> give me still examples", 2026-10-30; the references: a reel's thin hand-lettered words, one or two at a
-  time, placed in the open space above the subject, and a sketched-stories reel's brush-script title.)
+  time, placed in the open space above the subject, and a sketched-stories reel's brush-script title; on the stills:
+  "Okay you pick your best option for maximum engagement and pleasantry and user attention retention", 2026-10-30.)
 - **The words are PLEASANT to look at: soft, warm and calm, never menacing.** No dark red or blood-like colours, no
   rough, scratchy or dripping letters, no shouting capitals; a stressed word stands out by size, weight, light or a
   gentle warm colour, never by looking aggressive. Judge every word on screen as a regular viewer would at a glance:
@@ -668,6 +671,10 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   (12-24 drawings/s) while the camera glides; the G3 reel also renders at 60 (`G3_ANIMATIC.md`, 2026-10-26). — (v3, 2026-10-26).
 
 ## Process and communication
+- **When the owner hands a pick over ("you pick"), pick by the owner's three criteria: engagement, pleasantness and
+  attention retention.** Name each pick and its one-line why in one place, apply it to the docs in the same turn, and
+  move on; the owner can overrule any of it later. — ("Okay you pick your best option for maximum engagement and
+  pleasantry and user attention retention", on the type stills, 2026-10-30.)
 - **EFFORT IS ALWAYS MAX, for ALL delegated work:** every workflow and sub-workflow agent (`effort: 'max'` in each
   `agent()` call), every subagent (the Agent tool's `effort: "max"`; only a "fork" inherits the session's effort), every
   agent an agent starts (each brief says that anything its agent starts runs at max too) and every helper session (first
@@ -852,6 +859,9 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   `context/uploads/inline/2026-10-28_v3_insights_*`. — 2026-10-28.
 
 ## Retired rules
+- ~~Captions in Patrick Hand with a peach box on the key word, one fixed band, one size~~ → the type guide's hand
+  (Gaegu) and its lit stress, set in the open space by the subject (`docs/look/TYPE_GUIDE.md`, 2026-10-30). The brush
+  for landing words, tried in the same iteration, read as "a blood message on the wall" and is out.
 - ~~Topics in the order relevant, TRUE, visual, mood ...; a story that isn't true is out whatever it scores; never
   misleading~~ → truth moved down (relevant, visual, mood, true enough, fresh, shareable); exaggeration fine; only a
   made-up core event is out (2026-10-29).
