@@ -274,7 +274,10 @@ Maintenance at the end).
   and pleasant and the clothing is appealing. Our. Current design is very old style and frankly ugly so it’s tricky I
   think it will require its own deep research", 2026-10-30.) The target: people aged 20-30 today, styled cool and appealing,
   like Instagram influencers in New York and Los Angeles (hair and clothing), with faces drawn in a more generic,
-  simplified way. — ("Yes then people I think we should target 20-30 yo today with styles that are just cool and
+  simplified way. THE PICK (2026-10-30): direction C, MODERN GRAPHIC (`docs/look/people_design/dir_graphic.md`: about
+  7.8 heads, rounded polygons in two flat tones, crisp, no outlines, the styling carried by clothes and hair), but NOT its
+  face (one brow-into-nose mark), which "looks messed up": the face is redesigned before the system is final. — ("I
+  actually kind of like the last one modern graphic except the face that looks messed up", 2026-10-30.) — ("Yes then people I think we should target 20-30 yo today with styles that are just cool and
   appealing to look at so think instagram infkuebcers, New York, Los Angeles, including hair clothing and perhaps less
   of faces like faces we need to find a way to draw in a more generic way"; "Let’s land version 6 first", 2026-10-30.) — ("Another bit is humans we paint - they should be better /
   These are the references especially the video / On the video the person is not substantially different than yours
