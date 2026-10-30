@@ -39,8 +39,8 @@ def main():
     Wb, Hb = 1080, 1920
     ws, hs = 400, 711
     width = 3 * Wb + 2 * gap + 2 * m
-    title_h, lab_h, sec_h, num_h = 74, 52, 70, 92
-    height = m + title_h + lab_h + Hb + sec_h + lab_h + hs + num_h + m
+    title_h, lab_h, big_h, sec_h, num_h = 74, 52, 80, 70, 92
+    height = m + title_h + big_h + Hb + sec_h + lab_h + hs + num_h + m
     sheet = Image.new('RGB', (width, height), BG)
     d = ImageDraw.Draw(sheet)
     d.text((m, m), 'Light and texture proof: scene 1 ("She quit Google.") at 1.0 s, rendered by the engine (src/look/light_s1)', font=font(40, True), fill=INK)
@@ -49,9 +49,9 @@ def main():
         x = m + i * (Wb + gap)
         d.text((x, y + 2), big_labels[i][0], font=font(28, True), fill=INK)
         if big_labels[i][1]:
-            d.text((x + 6 + d.textlength(big_labels[i][0], font=font(28, True)), y + 6), '\u00b7 ' + big_labels[i][1], font=font(23), fill=GREY)
-        sheet.paste(im, (x, y + lab_h))
-    y += lab_h + Hb + 18
+            d.text((x, y + 40), big_labels[i][1], font=font(23), fill=GREY)
+        sheet.paste(im, (x, y + big_h))
+    y += big_h + Hb + 18
     d.text((m, y + 8), 'At phone width (400 px), beside the owner’s two painting-style models (400 px wide)', font=font(34, True), fill=INK)
     y += sec_h
     for i, im in enumerate(stills):

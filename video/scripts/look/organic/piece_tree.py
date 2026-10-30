@@ -350,7 +350,12 @@ def make(out_dir, seed=('organic', 'tree', 1), dose=1.0):
     wd = wood(seed)
     inside = flat[..., 3] > 0.5
     plan = plan_strokes(zone, cols, info, inside, seed, dose)
-    painted, sec = L.mypaint(flat, plan.strokes, tag='tree')
+    # the value masses melt into each other inside the crown (no razor zone seams: the marks carry the found edges)
+    pre = cv2.GaussianBlur(flat[..., :3] * flat[..., 3:4], (0, 0), 1.8)
+    aa = cv2.GaussianBlur(flat[..., 3], (0, 0), 1.8)
+    soft_rgb = pre / np.maximum(aa[..., None], 1e-6)
+    base = np.dstack([np.where(inside[..., None], soft_rgb, flat[..., :3]), flat[..., 3]])
+    painted, sec = L.mypaint(base, plan.strokes, tag='tree')
     crown = lost_edges(painted, seed)
     # the wood under the crown (the limbs show in its gaps and under it)
     out = np.zeros_like(crown)

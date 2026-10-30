@@ -9,8 +9,8 @@
 //                 bank in shade masses; baked per plane (./maps) + live on her and Pip (./movers.tsx)
 //   look 'full'   + the ONE colour key (a dusk family, the doorway's gold the one hot accent) and the paper grain,
 //                 folded into the same per-plane maps (and the grain on the movers)
-// The bake's input (bake/README in light_proof.md §6): `parts` renders named segments alone on a black or white slab
-// (`slab`), with no Film and no captions. Props: look, captions (default true), parts, slab, movers (default true).
+// The bake's input (light_proof.md §2.2): `parts` renders named segments alone on a black or white slab (`slab`), with
+// no Film and no captions. Props: look, captions (default true), parts, slab, movers (default true).
 import React from 'react';
 import {AbsoluteFill, useCurrentFrame} from 'remotion';
 import {Film, type FilmScene} from '../../lib/Film';
