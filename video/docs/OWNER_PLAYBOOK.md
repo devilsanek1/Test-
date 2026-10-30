@@ -392,6 +392,12 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   look premium, more interesting, dynamic and more engaging / Research —-> distill it in the guidebook and recipes to
   use —-> give me still examples", 2026-10-30; the references: a reel's thin hand-lettered words, one or two at a
   time, placed in the open space above the subject, and a sketched-stories reel's brush-script title.)
+- **The words are PLEASANT to look at: soft, warm and calm, never menacing.** No dark red or blood-like colours, no
+  rough, scratchy or dripping letters, no shouting capitals; a stressed word stands out by size, weight, light or a
+  gentle warm colour, never by looking aggressive. Judge every word on screen as a regular viewer would at a glance:
+  would they call it calm and friendly? — ("The text should be pleasant to look at like it shouldn't look like a
+  blood message on the wall / Reevaluate", on the type stills' landing word: "WANTS" in a rough dry brush, dark
+  burnt red, all capitals, on a light sky, 2026-10-30.)
 - **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
   as a screen recording under the status bar). Each film decides them with its G4 look clip, 'paint-subtle' at most
   (`docs/EDGES.md`). — (v1 posted reel, 2026-10-25).

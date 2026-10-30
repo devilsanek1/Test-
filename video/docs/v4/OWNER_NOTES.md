@@ -236,3 +236,8 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   `docs/look/TYPE_GUIDE.md` DRAFT, the research `docs/look/type/RESEARCH.md`); the references measured in
   `docs/look/type/refs/README.md`. -> rule: playbook, Visual style (the words
   on screen are designed, never one static block).
+- 2026-10-30 ~13:20 UTC, on the type page (a crop of still 02: "But Helsinki / **WANTS** / that heat.", WANTS in Nanum
+  Brush Script, burnt #8E3A12, all capitals, on the dusk sky): "One immediate note / The text should be pleasant to look
+  at like it shouldn't look like a blood message on the wall / Reevaluate" -> the brush in dark burnt red retired; the
+  emphasis re-evaluated for pleasantness (colour, stroke, case), options compared on the same moment, the stills and the
+  page updated. -> rule: playbook, Visual style (the words are PLEASANT to look at).
