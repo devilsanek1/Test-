@@ -25,7 +25,7 @@ import {v6Rig} from '../paint_s1/v6';
 import {duskS1Rig} from '../light_s1/LightV2S1';
 import {CM_V2} from '../paint_s1/palette_10b';
 import {keyV7} from './palette_v7';
-import {Seg, useKeyed, useV7} from './context';
+import {litLook, Seg, useKeyed, useV7} from './context';
 import {V7World} from './V7World';
 import {HerLit, PipLit} from './movers';
 import {V7Particles} from './V7Particles';
@@ -34,7 +34,7 @@ import {V7Particles} from './V7Particles';
 const MARK = CM_V2.lamp.toUpperCase();
 const markerV7 = (c: string) => (c && c.toUpperCase() === MARK ? '#00FF00' : keyV7(c));
 
-/** The key around a subtree (looks 'key' and 'v7a'); look 'cut' draws v6's colours. */
+/** The key around a subtree (looks 'key', 'v7a' and 'v7'); look 'cut' draws v6's colours. */
 const Keyed: React.FC<{children?: React.ReactNode}> = ({children}) => {
   const keyed = useKeyed();
   const {marker} = useV7();
@@ -46,7 +46,7 @@ export const V7Scene: React.FC<{slab?: string}> = ({slab}) => {
   const t = useTime();
   const {look} = useV7();
   const v6 = v6Rig(shadeRig(sw, RIG_CANAL, CM.shadeWarm));
-  const rig = look === 'v7a' ? duskS1Rig(v6) : v6;
+  const rig = litLook(look) ? duskS1Rig(v6) : v6;
   return (
     <World sky={slab ?? CM.white} horizon={1000}>
       <Lit rig={rig}>

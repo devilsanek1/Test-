@@ -30,7 +30,7 @@ import {BANDS, Coping, StoneBand, edgePath} from '../paint_s1/V2S1_steps_stone';
 import {accentV7, identityV7} from './palette_v7';
 import {Seg, Slot, useKeyed, useV7} from './context';
 import {V7Boat, V7NearProps} from './V7Props';
-import {PieceSlot} from './pieces';
+import {PieceSlot, usePiece} from './pieces';
 
 export type V7WorldProps = {
   /** Her (and her live light) in the subject plane's towpath slot. */
@@ -237,31 +237,40 @@ export const V7World: React.FC<V7WorldProps> = ({towpath, pip}) => (
 );
 
 /** OUR BANK (light_s1's LightS1Steps, cut): the coping, the landing and the treads with their lips' shades (the bench
- *  is cut); the near plane holds the one table and chair (./V7Props). */
-export const V7Steps: React.FC = () => (
-  <>
-    <S1Plane plane={S1_PLANE.bank} over={<Slot name="bank" />}>
-      <Seg name="bank">
-        <Tier tier="environment">
-          <Coping />
-          <StoneBand k={0} />
-        </Tier>
-        {BANDS.slice(1).map((b) => (
-          <React.Fragment key={b.k}>
-            <Tier tier="environment">
-              <StoneBand k={b.k} />
-            </Tier>
-            <Shade d={edgePath(b.k)} at={floodAt(540, b.y0)} />
-          </React.Fragment>
-        ))}
-        <PieceSlot name="paving" />
-      </Seg>
-    </S1Plane>
-    <S1Plane plane={S1_PLANE.near} over={<Slot name="near" />}>
-      <Seg name="near">
-        <V7NearProps />
-        <PieceSlot name="prop" />
-      </Seg>
-    </S1Plane>
-  </>
-);
+ *  is cut); the near plane holds the one table and chair (./V7Props). In look 'v7' the painted quay REPLACES the stone
+ *  bands (painted from their flat render: the same coping, landing, treads and lips), so they are not drawn under it. */
+export const V7Steps: React.FC = () => {
+  const paving = usePiece('paving');
+  return (
+    <>
+      <S1Plane plane={S1_PLANE.bank} over={<Slot name="bank" />}>
+        <Seg name="bank">
+          {paving ? null : (
+            <>
+              <Tier tier="environment">
+                <Coping />
+                <StoneBand k={0} />
+              </Tier>
+              {BANDS.slice(1).map((b) => (
+                <React.Fragment key={b.k}>
+                  <Tier tier="environment">
+                    <StoneBand k={b.k} />
+                  </Tier>
+                  <Shade d={edgePath(b.k)} at={floodAt(540, b.y0)} />
+                </React.Fragment>
+              ))}
+            </>
+          )}
+          <PieceSlot name="paving" />
+        </Seg>
+      </S1Plane>
+      <S1Plane plane={S1_PLANE.near} over={<Slot name="near" />}>
+        <Seg name="near">
+          <V7NearProps />
+          <PieceSlot name="prop" />
+          <PieceSlot name="leaves" />
+        </Seg>
+      </S1Plane>
+    </>
+  );
+};
