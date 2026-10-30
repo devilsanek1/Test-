@@ -4,8 +4,9 @@
 //   the cut (step 4)   only what composition.md's T1/T3 keeps is drawn: the sky's one hero cloud and its calm planes,
 //                      the far city, the bridge and its far life, the canal, the far towpath with its furniture, the wing
 //                      with her, boat A with Pip on its roof (./V7Props), our bank, one table and one chair at the right
-//                      edge. Never drawn: the leaf spray, the cloud bar, the duck, boat B, the boater, the cat, the bench,
-//                      the bay tree, the planter, the crates, the pier and its thyme, the fern pot, the fallen leaves
+//                      edge, nine fallen leaves (./V7Props). Never drawn: the leaf spray, the cloud bar, the duck, boat
+//                      B, the boater, the cat, the bench, the bay tree, the planter, the crates, the pier and its thyme,
+//                      the fern pot, the composers' own seventeen fallen leaves
 //   the lobby          the wing drawn a second time inside the door's opening only, through the ACCENT map: the lobby
 //                      takes the scene's one hot accent while every lit pane takes the calm cream (they share v2's lamp
 //                      role, and paint_s1 keeps the lobby inside S1Wing). Its own segment ('lobby'), so the bake finds it

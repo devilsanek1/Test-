@@ -38,7 +38,7 @@ def lines_for(q):
     e = q['edges_with_captions']
     return [
         f"under L* 40: {q['darks_L40_pct']:.0f} %  ·  median L* {q['L_median']:.0f}",
-        f"facade {q['facade_L']:.0f} · lobby {q['lobby_L']:.0f} · quay {q['quay_L']:.0f} · water {q['water_L']:.0f}",
+        f"facade {q['facade_L']:.0f} · door {q['lobby_p95_L']:.0f} · quay {q['quay_L']:.0f} · water {q['water_L']:.0f}",
         f"off-family {q['offfamily_below_band_pct']:.1f} %  ·  hot light at the door {q['hottest1pct_at_door_pct']:.0f} %",
         f"calls: value {v} · colour {col}",
         f"composition: {c['warns']} WARNs of 10",
@@ -114,6 +114,7 @@ def main():
     shutil.copyfile(os.path.join(S, 'v7a.png'), os.path.join(DELIV, 'painted_scene1_still_v7a.png'))
     shutil.copyfile(os.path.join(S, 'key.png'), os.path.join(OUT, 'v7a_step1.png'))
     shutil.copyfile(os.path.join(S, 'v7a.png'), os.path.join(OUT, 'v7a_step2.png'))
+    shutil.copyfile(os.path.join(scr, 'check.json'), os.path.join(OUT, 'v7a_checks.json'))
     print(out, sheet.size, os.path.getsize(out))
 
 

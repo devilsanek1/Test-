@@ -24,7 +24,7 @@ export type SlotName = (typeof SLOTS)[number];
 /** The segments, in drawing order. 'farroofs' and 'fartower' are mask-only (the bake's split of the west gap). The
  *  movers: 'her', 'pip' (on the boat's roof, with its contact strip), 'particles'. Cut by step 4 (never drawn): the
  *  leaf spray, the cloud bar, the duck, boat B, the boater, the cat, the bench, the bay tree, the planter, the crates,
- *  the potted thyme and the pier, the fern pot, the fallen leaves. */
+ *  the potted thyme and the pier, the fern pot, the composers' fallen leaves (./V7Props draws nine in 'near'). */
 export const SEGMENTS = [
   'sky', 'clouds', 'westgap', 'farroofs', 'fartower', 'farlife', 'water', 'fartowpath', 'wing', 'lobby', 'doorleaves',
   'wingshades', 'winglife', 'towpathshadows', 'pathfurniture', 'her', 'boatstrips', 'boats', 'pip', 'bank', 'near',

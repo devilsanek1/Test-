@@ -11,7 +11,7 @@
 //                    distance), facing back toward her; tone-on-tone with the boat in the facade's shade (step 2)
 // Cut in the scene's composers (never drawn): the leaf spray (top left), the cloud bar, the duck, the bench and its
 // backpack, the bay tree and its grass, the planter and its ivy, the flower crates, the pier with its potted thyme, the
-// fern pot, the fallen leaves, Pip's bollard.
+// fern pot, the fallen leaves (nine are redrawn below), Pip's bollard.
 import React, {useMemo} from 'react';
 import {Fill} from '../../lib/Fill';
 import {Tier} from '../../lib/tier';

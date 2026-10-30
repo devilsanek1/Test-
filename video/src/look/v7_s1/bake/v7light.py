@@ -30,7 +30,7 @@ LOBBY = lin_hex('#FFC27F')  # the lobby's lift: apricot-gold (h 70), so the lift
 W_SKY = lin_hex('#77709F')  # the violet dusk sky behind the camera, as W's glass reflects it (L* 49)
 # T3's shade family (CIE LCh; chroma kept, toward the sky's violet): deeper than the light proof's (#C79AB4, #A49BD6)
 SH_FW = lin_hex('#8C5E86')   # the facade's warm surfaces: rose-plum (L* 46 C* 30 h 330)
-SH_FC = lin_hex('#76729F')   # the facade's cool ones (the glass): violet (L* 50 C* 26 h 296)
+SH_FC = lin_hex('#837FA9')   # the facade's cool ones (the glass): violet (L* 55 C* 24 h 296)
 SH_B = lin_hex('#6F6698')    # our bank in open-sky shade: violet (L* 46 C* 30 h 300)
 SH_T = lin_hex('#A088AC')    # the far towpath in the far roofs' shadow (L* 60 C* 22 h 315)
 
@@ -46,7 +46,7 @@ DOSE = dict(
     far=(0.62, 0.6, 0.7),
     boats=0.85,
     bank=1.0,            # our bank under the canopy (T3's 25)
-    water=0.45,          # the facade's reflection takes 45 % of its shade (Fresnel: the dusk canal ~50, a step over the quay)
+    water=0.35,          # the facade's reflection takes 35 % of its shade (Fresnel: the dusk canal ~50, a step over the quay)
     glaze_bank=0.55,     # the quay's shade colour: the sky's violet-plum at its value (the dusk family's shade end)
     glaze_facade=0.25,   # the backlit facade's shade a little toward it too (one mass, its two faces kept)
     sun_bloom=1.0, veil=1.0, rims=1.0, lobby=1.0, door_bloom=1.0, pool=1.0, jambs=1.0, column=1.0,
@@ -147,11 +147,10 @@ def light_v7(base, L, vis, A, dose=DOSE):
     bankL = L['bank'] + L['near']
     # the canopy's shade deepens away from the open water (the sky dome lights the quay's far edge more; the frame's
     # bottom lies deepest under the leaves): a ramp INSIDE the one mass (CRAFT §d.4: colour and light moving in a shape)
-    skylit = 1 - 0.16 * (1 - smoothstep(1240, 1880, YY))
-    # two small clusters of sun flecks through the leaves (light.md §4.2: the sun's image through gaps, ellipses
-    # stretched along the light, uneven sizes; the light proof's clusters, dim here: the quiet field patterned, never lit)
-    dap = LT.dapples(canopy, edge)
-    shade(bankL * dose['bank'] * canopy * skylit * (1 - 0.6 * dap), SH_B[None, None])
+    skylit = 1 - 0.26 * (1 - smoothstep(1240, 1880, YY))
+    # no sun flecks inside it (light.md §4.2: dapples "in clusters of uneven sizes, or none": the proof's clusters read as
+    # specks at 400 px here); the fallen leaves and the ramp pattern the quiet field
+    shade(bankL * dose['bank'] * canopy * skylit, SH_B[None, None])
     G = np.zeros((H, W, 3), np.float32)
     # W, her dark office pane (its lamp off since 0.40): its glass reflects the violet dusk sky behind the camera, a
     # quarter of it (light.md §2.8), so it reads as a dark pane, never a black hole calling the eye (R3)
@@ -161,7 +160,6 @@ def light_v7(base, L, vis, A, dose=DOSE):
     E += (L['towpath'] * gap)[..., None] * KEY * 0.18                         # the far towpath's sunlit gap
     E += (bankL * (1 - canopy) * (1 - holes))[..., None] * KEY * 0.15          # the lit lip beyond the canopy's edge
     E += (bankL * holes)[..., None] * KEY * 0.12                               # the dim gaps of light near the edge
-    E += (bankL * dap)[..., None] * KEY * 0.22                                 # the flecks: the sun itself, dim and warm
 
     # ---------------------------------------------------------------- 3. rims on what the sun touches (static)
     sil = lambda *ks: sum(vis[k] for k in ks)
@@ -249,5 +247,5 @@ def light_v7(base, L, vis, A, dose=DOSE):
         lab_l[..., 2] += (rb - lab_l[..., 2]) * wgl[..., 0]
         lit = np.where(wgl > 0, np.clip(lab_to_lin(lab_l), 0, None), lit)
     lit_pool = lit + B * pool_E
-    return lit, lit_pool, dict(E=E, G=G, canopy=canopy, holes=holes, dapples=dap, rims=rims, sun=(sx, sy, sr), pool=pf * ground,
+    return lit, lit_pool, dict(E=E, G=G, canopy=canopy, holes=holes, rims=rims, sun=(sx, sy, sr), pool=pf * ground,
                                bloom_sun=bl, bloom_door=bloom_d * outside, edge=edge, column=gblur(col, 4))

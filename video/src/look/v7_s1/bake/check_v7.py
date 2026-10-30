@@ -110,6 +110,7 @@ def measure(still_cap, still_nocap, L, her_c, her_box):
     q['brightest5_within_0.1H_pct'] = round(float((np.hypot(tx - her_c[0], ty - her_c[1]) < 0.1 * H).mean() * 100), 1)
     lob, wall = L['lobby'] > 0.6, L['wall'] > 0.6
     q['lobby_L'] = round(float(Lv[lob].mean()), 1)
+    q['lobby_p95_L'] = round(float(np.percentile(Lv[lob], 95)), 1)
     q['facade_L'] = round(float(Lv[wall].mean()), 1)
     q['lobby_over_facade'] = round(q['lobby_L'] - q['facade_L'], 1)
     q['quay_L'] = round(float(Lv[(L['bank'] > 0.6) & (yy > 1300)].mean()), 1)
