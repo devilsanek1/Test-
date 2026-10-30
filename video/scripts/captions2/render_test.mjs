@@ -5,6 +5,7 @@
 //
 //   node scripts/captions2/render_test.mjs [--times=0,3.6,24.7,40] [--src=public/v4/captions2.json]
 //        [--bg=scripts/type/bg/bg_night.png | --bg=none] [--out=out/v4] [--prefix=captions2_test] [--capcheck] [--debug]
+//        [--comp=Captions2Test | Captions2Cover]   (the cover title R10 and the world word R7 on a plain tag)
 //
 // Writes <out>/<prefix>_<t>.png (+ _phone.jpg, 360 px wide: read it at 100 %), and with --capcheck <prefix>_<t>_mask.png,
 // <prefix>_<t>_bg.png and <prefix>_capcheck.txt (the list capcheck.py reads). It bundles ONLY src/lib/captions2/demo/
@@ -30,6 +31,7 @@ const outDir = path.resolve(root, opt.out ?? 'out/v4');
 const prefix = opt.prefix ?? 'captions2_test';
 const capcheck = opt.capcheck === 'true';
 const debug = opt.debug === 'true';
+const compId = opt.comp ?? 'Captions2Test';
 const browserExecutable = '/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell';
 
 // the scratch public dir
@@ -54,7 +56,7 @@ if (capcheck) passes.push({name: '_mask', props: {capcheck: 'mask'}}, {name: '_b
 const list = [];
 for (const pass of passes) {
   const inputProps = {src: 'cap/captions2.json', bg, debug: debug && !pass.name, ...pass.props};
-  const composition = await selectComposition({serveUrl, id: 'Captions2Test', inputProps, browserExecutable, logLevel: 'error'});
+  const composition = await selectComposition({serveUrl, id: compId, inputProps, browserExecutable, logLevel: 'error'});
   const fps = composition.fps;
   const frameOf = (s) => Math.max(0, Math.min(composition.durationInFrames - 1, Math.round(s * fps)));
   const frames = [...new Set(times.map(frameOf))].sort((a, b) => a - b);

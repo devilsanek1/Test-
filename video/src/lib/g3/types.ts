@@ -227,6 +227,8 @@ export type Move = {
 /** The set's light rig as shapes (W1; the same in every shot of the set): the key's side (sets every auto shadow's
  *  direction), what the key is, the one grey shadow value, the pools by name (drawn as {t: 'pool'} elements). */
 export type Rig = {
+  /** the world bible's name for the rig ('H' the home place, 'P' the planet); the lint's plan cross-check compares it */
+  name?: string;
   key: 'left' | 'right' | 'top-left' | 'top-right' | 'top' | 'back' | 'back-left' | 'back-right' | 'front';
   source?: string;
   shadow?: 'mid' | 'light' | `#${string}`;

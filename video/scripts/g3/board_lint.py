@@ -1304,6 +1304,43 @@ def plain(s):
     return re.sub(r'[*_`]', '', s)
 
 
+PROSE_KEYS = {'move': 'move (block)', 'join': 'join out (block)', 'tiers': 'tier (block)', 'tier': 'tier (block)',
+              'rig': 'rig (block)', 'life': 'life (block)'}
+
+
+def md_blocks(text):
+    """per-shot prose blocks: '### S1 ...' then bullets '- **Label (...):** text' (continuation lines indented) ->
+    {sid: {key: [text]}}"""
+    out = {}
+    sid = None
+    cur = None
+    for line in text.splitlines():
+        h = re.match(r'^#{2,4}\s+(S\d+[a-z]?)\b', line)
+        if h:
+            sid, cur = h.group(1), None
+            continue
+        if line.startswith('#'):
+            sid, cur = None, None
+            continue
+        if sid is None:
+            continue
+        b = re.match(r'^- \*\*([^*:(]+?)\s*(\([^)]*\))?:\*\*\s*(.*)$', line)
+        if b:
+            key = PROSE_KEYS.get(b.group(1).strip().lower().split(' ')[0])
+            cur = None
+            if key:
+                # a label's own parenthesis ("Rig (W1 Rig P)") leads the text: it names the thing
+                out.setdefault(sid, {}).setdefault(key, []).append(((b.group(2) or '') + ' ' + b.group(3)).strip())
+                cur = (sid, key)
+            continue
+        if cur and line.startswith('  ') and line.strip():
+            lst = out[cur[0]][cur[1]]
+            lst[-1] += ' ' + line.strip()
+        elif not line.strip() or line.startswith('- '):
+            cur = None
+    return out
+
+
 JOIN_CODE_CARRIER = {'RJ4': 'C', 'RM3': 'C', 'RJ2': 'F', 'RJ3': 'B', 'J2': 'A', 'J3': 'B'}  # COMPOSITION_SHOTS join codes
 
 
@@ -1341,6 +1378,9 @@ def cross_check(data, rep, path, panels):
             for hname, cell in zip(header, r):
                 cols_seen.add(hname)
                 d.setdefault(hname, []).append(cell)
+    for sid, d in md_blocks(text).items():
+        for key, cells in d.items():
+            rows.setdefault(sid, {}).setdefault(key, []).extend(cells)
     rel = os.path.relpath(path, VIDEO) if os.path.abspath(path).startswith(VIDEO + os.sep) else path
     if not rows:
         rep.add('plan', 'INFO', f'{rel}: no table rows with shot ids found: the cross-check is skipped')
@@ -1378,7 +1418,8 @@ def cross_check(data, rep, path, panels):
         if (sh.get('camera') or {}).get('word'):
             board_words.add(sh['camera']['word'].upper())
         for cell in col(d, 'move', 'camera'):
-            want = [w for w in MOVE_WORDS if re.search(r'\b' + w + r'\b', plain(cell).upper())]
+            head = re.split(r'[·,.;(:]', plain(cell), maxsplit=1)[0]   # the move word leads the cell
+            want = [w for w in MOVE_WORDS if re.search(r'\b' + w + r'\b', head.upper())]
             for w in want:
                 syn = next((s for s in MOVE_SYNONYMS if w in s), {w})
                 if not any(any(x in bw for x in syn) for bw in board_words) and not sh.get('placeholder'):
@@ -1413,22 +1454,32 @@ def cross_check(data, rep, path, panels):
                     rep.add(where, 'ERROR', f'the plan says carrier {car}, the board {bc or "none"} ({h})')
         # tiers
         for cell in col(d, 'tier'):
-            for letter in re.findall(r'\b([ABC])\s*[:=]', plain(cell)):
+            letters = set(re.findall(r'\b([ABC])\s*[:=]', plain(cell)))
+            letters |= {m.group(1) for part in plain(cell).split('·') for m in [re.match(r'\s*([ABC])\s+\S', part)] if m}
+            for letter in sorted(letters):
                 if items is not None and not any(tier_of(it.el, sh.get('tiers')) == letter for it in items):
                     rep.add(sid, 'WARN', f'the plan\'s tier map names {letter}, the board draws no tier-{letter} element', )
         # rig
         st = (data.get('sets') or {}).get(sh.get('set') or '') or {}
-        key = ((st.get('rig') or {}).get('key') or '')
+        rig = st.get('rig') or {}
+        key = rig.get('key') or ''
+        rname = str(rig.get('name') or sh.get('set') or '')
         for cell in col(d, 'rig', 'light'):
-            sides = re.findall(r'\b(left|right|back|front|top)\b', plain(cell).lower())
-            if sides and key and not any(s in key for s in sides[:1]):
-                rep.add(sid, 'WARN', f'the plan\'s rig says "{sides[0]}", the board\'s set rig key is "{key}"')
-            if sides and not key:
-                rep.add(sid, 'WARN', f'the plan names a rig ({sides[0]}), the board\'s panel has none')
+            c = plain(cell)
+            nm = re.search(r'\bRig\s+([A-Z])\b', c)
+            side = re.search(r'\bscreen\s+(left|right)\b', c, re.I) or re.search(r'\bkey\b[^.;()]*?\b(left|right|back|front|top)\b', c, re.I)
+            if not rig:
+                rep.add(sid, 'WARN', f'the plan names a rig ({nm.group(0) if nm else c[:30]}), the board\'s panel has none')
+                continue
+            if nm and rname and nm.group(1) != rname:
+                rep.add(sid, 'WARN', f'the plan\'s rig is "{nm.group(0)}", the board\'s is "{rname}" (rig.name or the set\'s id)')
+            if side and key and side.group(1).lower() not in key:
+                rep.add(sid, 'WARN', f'the plan\'s rig key is "{side.group(1).lower()}", the board\'s set rig key is "{key}"')
         # life
         life = [x.lower() for x in (sh.get('life') or [])]
         for cell in col(d, 'life'):
-            for item in re.split(r'[,;·]| and ', plain(cell)):
+            c = re.sub(r'\([^)]*\)', '', plain(cell))
+            for item in re.split(r'[,;·]| and ', c):
                 it = item.strip().strip('.').lower()
                 if len(it) < 3 or it in ('none', '-', '—'):
                     continue
