@@ -38,6 +38,9 @@ export type Surface = {
   flat?: boolean;
   /** Skip the RIM on this surface. */
   noRim?: boolean;
+  /** Normals from the grid's winding alone (no inside/outside test against the axis): a thin slab (a cap's brim),
+   *  where the axis cannot tell up from forward. 'neg' turns them over. */
+  winding?: 'pos' | 'neg';
   /** A simplified twin of the grid (the same rows and columns): the light reads its normals, mixed with the real
    *  ones by `simplify` (0 = real forms only, 1 = the simplified forms only). A painter's simplification: the face's
    *  features shade softly instead of as hard holes. */
@@ -202,7 +205,9 @@ export function projectSurface(sf: Surface, c: Cam): PS {
       let nn = cross(du, dv);
       const radial = sub(q, ax[i]);
       if (Math.hypot(nn[0], nn[1], nn[2]) < 1e-6) nn = radial;
-      if (dot(nn, radial) < 0) nn = scl(nn, -1);
+      if (sf.winding) {
+        if (sf.winding === 'neg') nn = scl(nn, -1);
+      } else if (dot(nn, radial) < 0) nn = scl(nn, -1);
       let N0 = nrm(nn);
       if (pole(i) && rows > 2) {
         const out = i < rows / 2 ? sub(ax[i], ax[Math.min(rows - 1, i + 2)]) : sub(ax[i], ax[Math.max(0, i - 2)]);
@@ -485,7 +490,7 @@ export function regionsOf(ps: PS, c: Cam, opt: {extPx: number; small: boolean}):
   const oFront = ps.hasFront ? extract(ps, [front, ...mk]) : [];
   // a closed form's silhouette has no holes: a fold (the inside of a bent elbow) leaves back-facing islands inside the
   // visible region; orient every loop the same way so the nonzero fill (and the clip) covers them
-  if (!open) for (const l of oFront) if (area(l) < 0) l.reverse();
+  if (!ps.sf.mask) for (const l of oFront) if (area(l) < 0) l.reverse();
   const outline = pathOf(oFront);
   const under = open && ps.hasBack ? pathOf(extract(ps, [back, ...mk])) : '';
   if (ps.sf.flat || !ps.hasFront) return {outline, under, shade: '', hi: '', rim: '', glow: '', deep: ''};
@@ -510,7 +515,8 @@ export function regionsOf(ps: PS, c: Cam, opt: {extPx: number; small: boolean}):
   }
   let rim = '';
   if (!ps.sf.noRim) {
-    const tR = look.rim ?? 0.5;
+    // the rim is narrower on small figures (it must never read as a halo)
+    const tR = (look.rim ?? 0.5) + (opt.small ? 0.1 : 0);
     const v = new Float64Array(n);
     // the rim lives on the side away from the key (never on a lit face)
     for (let i = 0; i < n; i++) v[i] = Math.min(ps.ndr[i] - tR, 0.32 - ps.ndl[i]);

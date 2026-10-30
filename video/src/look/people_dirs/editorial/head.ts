@@ -3,7 +3,7 @@
 // the face front, a jaw rising ~25 degrees to its angle), so a profile's silhouette IS the face; turned toward or away
 // from the camera it becomes the lost profile or the 3/4 face by the same geometry. Faces are never features on a blank
 // oval: the profile line, one lash line, the lost profile's cheek, sunglasses, a nose shade, a lip tone.
-import {type PP, type Sec, type SecKey, type V2, type V3, type View, add3, clamp, lerp, pitchAbout, proj, rollAbout, sections, sub3, surf, yawAbout} from './core';
+import {type PP, type Sec, type SecKey, type V2, type V3, type View, add3, clamp, lerp, pchip, pitchAbout, proj, rollAbout, sections, sub3, surf, yawAbout} from './core';
 import type {Build, Skeleton} from './body';
 
 type Row = [number, number, number, number, number?];
@@ -61,7 +61,10 @@ export function headKeys(b: Build): SecKey[] {
     an: a * h,
     bf: ((zf - zb) / 2) * h,
     bb: ((zf - zb) / 2) * h,
-    n: t > 0.7 ? 2.15 : 2.0,
+    // the face's front is a flatter plane than the skull's round back (the eyes sit on it, so a 3/4 face keeps its
+    // far eye): a squarer front exponent from the brow to the jaw, the back round
+    n: pchip([0, 0.25, 0.42, 0.7, 0.85, 1], [2.0, 2.05, 2.45, 2.45, 2.25, 2.1])(t),
+    nb: 2.0,
     bump: [(bump ?? 0) * h, t > 0.75 ? 34 : 15],
   }));
 }
@@ -110,23 +113,27 @@ const nearSide = (r: HeadRig) => (faceYaw(r) >= 0 ? 1 : -1);
 
 /** The one lash line (design_research §11.4): at t 0.5, from just behind the face front back ~0.09 h; closed = an arc
  *  bowed down with the outer end flicking up and back; open = straighter. An OPEN path (a true line). */
-export function lashLine(r: HeadRig, v: View, open = false, lower = 0): PP[] | null {
+export function lashLine(r: HeadRig, v: View, open = false, lower = 0, far = false): PP[] | null {
   const fy = Math.abs(faceYaw(r));
-  if (fy < 25 || fy > 160) return null;
-  const s = nearSide(r);
+  if (fy > 160 || (!far && fy < 8) || (far && fy > 62)) return null;
+  const s = far ? -nearSide(r) : nearSide(r);
   const pts: PP[] = [];
   const n = 7;
   for (let i = 0; i <= n; i++) {
     const u = i / n;
-    // inner corner near the nose (phi 90 -/+ 22) to the outer corner (90 -/+ 50)
-    const phi = 90 - s * lerp(23, 49, u);
+    // inner corner near the nose (phi 90 -/+ 22) to the outer corner (90 -/+ 50); the far eye a little nearer the nose
+    const phi = 90 - s * (far ? lerp(15, 42, u) : lerp(16, 47, u));
     const bow = open ? 0.004 * Math.sin(Math.PI * u) : 0.016 * Math.sin(Math.PI * u) - 0.012 * Math.max(0, u - 0.82) / 0.18;
     const t = 0.505 + lower + bow;
     const q = facePt(r, v, t, phi, 0.6);
     if (!q.vis && fy < 120) continue;
     pts.push(q.p);
   }
-  return pts.length >= 3 ? pts : null;
+  if (pts.length < 3) return null;
+  // a foreshortened far lash that would read as a dot is left out (dots are never a face here)
+  const len = pts.slice(1).reduce((a, p, i) => a + Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1]), 0);
+  if (far && len < 0.05 * r.h) return null;
+  return pts;
 }
 
 /** A region on the head's surface (t0..t1 rows, a phi interval per row) as a closed outline (front-facing part only
@@ -212,37 +219,53 @@ export function sunglasses(r: HeadRig, v: View): {lenses: PP[][]; bridge: PP[] |
   return {lenses, bridge, arms, glints};
 }
 
-/** The 3/4 face's nose shade (on the side away from the key) and lip tone: the face made of light, used only with
- *  sunglasses or a lowered gaze (dir_editorial.md §3). */
-export function noseShade(r: HeadRig, v: View): PP[] | null {
+/** The 3/4 face's T-shade (design_research §11.7, our no-outline form of the brow-and-nose stroke): from the brow down
+ *  the side of the nose that faces away from the key, widening to the nostril's wing, with a small wedge under the
+ *  tip. `keyX` < 0 = the key from screen-left (in the drawing's own space). */
+export function noseShade(r: HeadRig, v: View, keyX = -1): PP[] | null {
   const fy = faceYaw(r);
-  if (Math.abs(fy) < 12 || Math.abs(fy) > 70) return null;
-  // the side of the nose away from the key: the key is screen-left, so the shade is on the nose's screen-right side
-  const s = fy > 0 ? -1 : 1;
-  return headRegion(r, v, 0.47, 0.71, (t) => {
-    const u = (t - 0.47) / 0.24;
-    const w = 6 + 10 * u;
-    return s === -1 ? [90 + 1, 90 + w] : [90 - w, 90 - 1];
-  }, 0.4, 7);
+  if (Math.abs(fy) < 10 || Math.abs(fy) > 68) return null;
+  const s = keyX < 0 ? 1 : -1;
+  const wF = pchip([0.48, 0.54, 0.6, 0.65, 0.685, 0.705, 0.72], [1.5, 3.5, 6, 8.5, 10, 8, 4]);
+  return headRegion(r, v, 0.48, 0.72, (t) => {
+    const w = wF(t);
+    return s === 1 ? [90 - w, 90 - 1.2] : [90 + 1.2, 90 + w];
+  }, 0.5, 10);
 }
+/** The lips as one soft tone (never a line): on the face's near half only, so a turned face never shows a blot on its
+ *  far contour. */
 export function lipTone(r: HeadRig, v: View): PP[] | null {
-  const fy = Math.abs(faceYaw(r));
-  // only near the front: turned further, the lips sit on the contour and read as a blemish
-  if (fy > 30) return null;
+  const fy = faceYaw(r);
+  if (Math.abs(fy) > 50) return null;
+  const nearLo = fy >= 0;
   return headRegion(r, v, 0.775, 0.875, (t) => {
     const u = (t - 0.775) / 0.1;
-    const w = 15 + 4 * Math.sin(Math.PI * u) - (u > 0.45 && u < 0.55 ? 1 : 0);
-    return [90 - w, 90 + w];
+    const w = 10 + 3 * Math.sin(Math.PI * u);
+    const wf = Math.abs(fy) > 25 ? 4 : w;
+    return nearLo ? [90 - w, 90 + wf] : [90 - wf, 90 + w];
   }, 0.3, 6);
 }
-/** The lost profile's lash flick: from behind (the face turned 110-150 degrees away) a 1-px flick past the cheek. */
+/** The lost profile's lashes peeking past the cheek (the classic touch; design_research §11.5): a short flick out from
+ *  the cheek's contour at the eye's height, curving up. Null when the face is turned too far or not enough. */
 export function lostFlick(r: HeadRig, v: View): PP[] | null {
-  const fy = Math.abs(faceYaw(r));
-  if (fy < 105 || fy > 150) return null;
-  const s = faceYaw(r) >= 0 ? 1 : -1;
-  const a = facePt(r, v, 0.5, 90 - s * 30, 0.5);
-  const b = facePt(r, v, 0.49, 90 - s * 12, 1.6);
-  return [a.p, b.p];
+  const fa = faceYaw(r);
+  const fy = Math.abs(fa);
+  if (fy < 100 || fy > 145) return null;
+  const dir = fa >= 0 ? -1 : 1;
+  // the cheek's contour at the eye's height: the visible point furthest toward where the face looks
+  let best: V2 | null = null;
+  for (let a = 0; a < 360; a += 3) {
+    const q = facePt(r, v, 0.5, a, 0.3);
+    if (!q.vis) continue;
+    if (!best || q.p[0] * dir > best[0] * dir) best = q.p;
+  }
+  if (!best) return null;
+  const h = r.h;
+  return [
+    [best[0] - dir * 0.012 * h, best[1] + 0.004 * h],
+    [best[0] + dir * 0.022 * h, best[1] - 0.004 * h],
+    [best[0] + dir * 0.045 * h, best[1] - 0.026 * h],
+  ];
 }
 
 export {clamp, proj, lerp};

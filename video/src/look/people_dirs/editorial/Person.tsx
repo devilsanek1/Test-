@@ -28,6 +28,8 @@ export type PersonProps = {
   /** Only these part keys (a face crop, a silhouette test), or a fill override (the black-fill test). */
   only?: (p: Part) => boolean;
   fillAll?: string;
+  /** Screen px per unit of `h` when the figure is drawn inside a scaled group (a zoomed panel), for the face budget. */
+  pxScale?: number;
 };
 
 function gradAxis(pts: PP[], key: V2, forced?: V2): {a: V2; b: V2} {
@@ -73,9 +75,9 @@ function gradAxis(pts: PP[], key: V2, forced?: V2): {a: V2; b: V2} {
   return {a: [cx + g[0] * smax, cy + g[1] * smax], b: [cx + g[0] * smin, cy + g[1] * smin]};
 }
 
-export const EdPerson: React.FC<PersonProps> = ({x, y, h, person, pose, flip = false, finish = 'gradient', shadow = '#C9B2A6', only, fillAll}) => {
+export const EdPerson: React.FC<PersonProps> = ({x, y, h, person, pose, flip = false, finish = 'gradient', shadow = '#C9B2A6', only, fillAll, pxScale}) => {
   const uid = useId().replace(/:/g, '');
-  const built = buildPerson(person, pose, flip);
+  const built = buildPerson(person, pose, flip, h * (pxScale ?? 1));
   const ramps: Record<string, Ramp> = {};
   for (const [k, m] of Object.entries(person.mats)) ramps[k] = ramp(m.c, m.kind);
   const s = h / 1000;

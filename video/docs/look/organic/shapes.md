@@ -23,7 +23,7 @@ measured), and no living artist is a style target.
 | `shapes.md` | this report |
 | `shapes_sheet.png` | the measures side by side: 15 small multiples (ours against every reference, per element) and the 54 crops with their edge-class overlays |
 | `shapes_generators.png` | the generators' proof: five before / after panels (cumulus, banks and streaks, a tree crown, a facade, paving) with their overlays and measured numbers |
-| `shapes_crops.py` | the 54 crop boxes (ours 10, painted references 23, city posters 21) |
+| `shapes_crops.py` | the 54 crop boxes (ours 10, painted references 25, city posters 19) |
 | `shapes_lib.py` | the measures (pure numpy / SciPy / OpenCV / scikit-image, deterministic) |
 | `shapes_measure.py` | runs the measures on every crop: `shapes_data.json` + overlays |
 | `shapes_sheet.py` | draws `shapes_sheet.png` from a run (matplotlib, sheet only) |
@@ -33,7 +33,7 @@ measured), and no living artist is a style target.
 ## 0. Bottom line
 
 - **"I can see shapes and angles very clearly" is measurable, and it is six things** (§2; ours against the painted
-  references' median, the city posters in brackets; every picture at the phone's width through the same JPEG codec):
+  references' median, then the city posters'; every picture at the phone's width through the same JPEG codec):
   1. **Primitives.** Our edges are made of constant-curvature pieces: on the facade 76 % of the visible edge length
      is straight (painted refs 29 %, posters 47 %), on the paving 80 % (refs 27 %), on her 55 % (refs 6 %); our
      cumulus is 27 % compass arcs (refs 10 %, a union of circles measures 83 %).
@@ -46,26 +46,31 @@ measured), and no living artist is a style target.
   4. **Clean, crisp steps.** Our edges are one clean step along their whole length: crisp (10-90 % width <= 2 px) on
      73 % of the facade's clean edges, 86 % of the paving's, 75 % of hers (refs 57 %, 38 %, 46 %); "broken" (no clean
      step: brush, texture along the edge) on 5-34 % of our solid pieces' mass boundaries against 45-58 % for the
-     painted refs' buildings, ground and people. The masses never melt: lost edges are 1 % on our ground and tree (refs 13 % and
-     10 %).
+     painted refs' buildings, ground and people. The masses never melt: lost edges are 1 % on our ground and tree
+     (refs 13 % and 10 %).
   5. **Symmetry and repetition.** Our shapes are their own mirror images: median mirror IoU 0.78 (facade), 0.88 (far
      city), 0.87 (paving), 0.90 (the man) against the painted refs' 0.54-0.56 for the same elements; 24 % of the far
      city's shapes have a near-twin neighbour (refs 2 %).
   6. **No dominant shape, too many small ones.** On the facade the biggest shape holds 4 % of the shape area (refs 13 %,
      a dominant mass); our tree is 67 % small shapes by area (the painted trees 34 %, with 44 % medium).
 - **Not the gap (measured nulls).** The amount of wiggle in the outlines: per octave, from 6 to 400 px wavelengths, the
-  RMS displacement is 2-3 % of the wavelength (about 2.5 %) for ours and the references alike. What differs is its KIND: ours
-  sits in corners and in the cusps between circles, with constant curvature between; theirs is spread along free
-  curves. So "add noise" alone is not the fix: replace the constant-curvature pieces, break the ruler lines, vary the
-  edge along its length. Spacing regularity and the size-ladder ratio do not separate us either.
+  RMS displacement is 2-3 % of the wavelength (about 2.5 %) for ours and the references alike. What differs is its
+  KIND: ours sits in corners and in the cusps between circles, with constant curvature between; theirs is spread
+  along free curves. So "add noise" alone is not the fix: replace the constant-curvature pieces, break the ruler
+  lines, vary the edge along its length. Spacing regularity, the size-ladder ratio and curvature variance (except the
+  facade's: 5.5 against 0.5-2.3, its curvature all in corner spikes between rulers) do not separate us either.
 - **The fix, in three layers** (§3, with numbers): (a) **design**: natural silhouettes from ellipse unions on size
   ladders, displaced by value noise; man-made shapes hand-cut, worn at the corners, broken by overlaps and lost
   stretches, never a frontal grid of identical rectangles, each window with one asymmetric element; a dominant mass
   per element; (b) **procedure**: the generators in `shapes_gen.py` (§4), seeded and deterministic; (c) **edges**:
   found where the light and the focus are, lost and broken elsewhere (the edge pass of `techniques.md` §3.6, with the
   per-element targets of §3.3 here).
-- **Proof** (§5, `shapes_generators.png`): the generators move every panel toward the references on the measures that
-  matter (numbers in §5); the seed check shows it holds for unpicked seeds.
+- **Proof** (§5, `shapes_generators.png`, every panel measured with the references' code): the cumulus 48 -> 7 % compass
+  arcs and 69 -> 30 % crisp edges, its outline alternating found and lost along 89 % of its length (the painted clouds
+  81 %, v6 44 %); the streaks 95 -> 0 % ruler lines; the crown 26 -> 8 % arcs; the facade 97 -> 59 % straight, 26 -> 6 %
+  ruler, 100 -> 58 % right angles; the paving's clear geometric edge 61 -> 1 px per 100 x 100. Six unpicked seeds per
+  generator hold the arc share at 0-8 %. Flat shapes do not reach the references' broken edges (4-19 % against 24-58 %)
+  or the facade's right-angle target: those come from the paint pass and a turned view (§5).
 - **Next step:** the generators feed the v7 iteration still that `techniques.md` §6 proposes (v6 + design variation +
   edges by intent); measure it with `shapes_measure.py` on the same crop boxes against the targets of §6.
 
@@ -133,10 +138,10 @@ All lengths are px of a 1080-px-wide frame. Code: `shapes_lib.py`; run: `shapes_
 |---|---|---|---|---|---|---|---|
 | a rectangle (axis-aligned or turned 17 degrees) | 99 % | 99 % | 0 | 1 % | 100 % (89-90 degrees) | 1.009 | 100 % |
 | a circle, r 110 or r 30 | 0 | 0 | 100 % | 0 | - | 1.00 | 100 % |
-| a union of 7 circles (our billow design) | 0 | 0 | 83 % | 17 % (the cusps) | cusps 90-147 degrees | 1.012 | - |
+| a union of 7 circles (our billow design) | 0 | 0 | 83 % | 17 % (the cusps) | 33 % (cusps at 90-147 degrees) | 1.012 | - |
 | a blob, smooth noise at 2 % of R | 52 % | 8 % | 8 % | 41 % | - | 1.001 | 100 % |
 | a blob, 5 % of R | 6 % | 0 | 18 % | 77 % | - | 1.003 | 99 % |
-| a blob, 10 % / 20 % of R | 0 | 0 | 0 | 100 % | - | 1.010 / 1.032 | 99 % |
+| a blob, 10 % / 20 % of R | 0 | 0 | 0 | 100 % | 0 (its corners 104-152 degrees) | 1.010 / 1.032 | 99 % |
 | a window grid (5 x 4) | 96 % | 0 | 0 | 4 % | 100 % | 1.037 | 98 % |
 | a hand-cut rectangle (2-3 cuts a side, joints jogging +-2.5 px, like `edges/rough.ts` `cutPoly`) | 99 % | 99 % | 0 | 1 % | 100 % (87-94 degrees) | 1.007 | 100 % |
 
@@ -178,8 +183,9 @@ Bold = a gap outside the references' whole range or far from their median. Every
 | mirror symmetry | 0.22 / **0.81** | 0.57 [0.45-0.79] | 0.64 |
 
 Reading: the low sky's streaks are constant-width straight bars (a ruler line each, all parallel: 76 %), where the
-references' streaks swell, pinch and break; the upper sky's bank edge is compass arcs. The open sky's hatch is calm and
-fine (its numbers sit with the references).
+references' streaks swell, pinch and break; the upper sky's bank edge is compass arcs (27 %) and one clean step all
+along (broken 4 % against 29 %). The open sky's hatch itself reads calm (the upper sky's straight and ruler shares sit
+with the references).
 
 ### 2.2 Cloud
 
@@ -214,8 +220,8 @@ along the same outline, with jags and dry-brush breaks (2.6 times our corners pe
 | edge density (px per 1000 px^2) | **62** | 26 [25-26] | 70 [49-106] |
 | clear geometric | **62** | 2.6 [0-5.1] | 105 [10-179] |
 
-Reading: our tree is drawn like a poster tree (crisp, many small clumps, ruler-straight trunk and planter) but sits in
-a frame whose other natural pieces are painted: "a weird looking tree ... doesn't fit the style there" (the owner, on
+Reading: our tree is drawn like a poster tree (crisp, many small clumps; the straight edges in its crop are the trunk
+and the wall behind it) but sits in a frame whose other natural pieces are painted: "a weird looking tree ... doesn't fit the style there" (the owner, on
 v6). The painted trees are a few medium masses with soft, lost edges and half the edge density.
 
 ### 2.4 Building
@@ -237,8 +243,7 @@ v6). The painted trees are a few medium masses with soft, lost edges and half th
 
 Reading: the facade is, with the paving and the low sky, among the most geometric of the 54 crops: a frontal
 elevation (62 % of its edges on the axes), a grid of near-identical rectangles (mirror IoU 0.78), ruler edges as one
-clean step. Its curvature comes in spikes (rounded
-rectangle corners) and zeros (rulers): the 5.5 variance. The references' buildings are just as man-made and still
+clean step. Its curvature comes in spikes (rounded rectangle corners) and zeros (rulers): the 5.5 variance. The references' buildings are just as man-made and still
 read hand-made: their straight edges are shorter (6 % ruler), broken along their length (58 % broken), seen at an
 angle, and nothing repeats.
 
@@ -288,7 +293,8 @@ for its check.
   2-3 % of the wavelength in every octave from 6 to 400 px, for ours and the references alike (e.g. buildings,
   small shapes: ours 0.18 / 0.47 / 1.15 / 2.03 px at wavelengths 6-13 / 13-25 / 25-50 / 50-100 px; painted refs 0.20 /
   0.49 / 1.09 / 2.20). The amount is not the gap; its kind is (corners and cusps against free curves).
-- **Spacing regularity** (CV 0.6-1.3 everywhere) and **the size-ladder ratio** (0.7-0.95) do not separate us.
+- **Spacing regularity** (the CV of nearest-neighbour distances: ours 0.4-1.0, the references 0.2-1.6) and **the
+  size-ladder ratio** (ours 0.6-0.9, the references 0.4-0.95) do not separate us.
 
 ## 3. The rules (design and procedure), with numbers
 
@@ -310,15 +316,32 @@ generator or engine piece that does it (§4). Lengths in px of the 1080 x 1920 f
   1.0 px RMS), 0.2 R (min 6 px) at 1.3 % (min 0.8 px) and 0.1 R (min 4 px) at 0.7 % (min 0.6 px); foliage, wavelengths
   <= 0.25 R: 0.25 R (min 7 px) at 2.5 % of R (min 1 px) and 0.1 R (min 4 px) at 1.2 % (min 0.7 px). The SHORT octave
   is the one that matters: measured on six unpicked cumulus seeds, without the 0.1 R octave 11-20 % of the edge stayed
-  compass arcs (the 0.2-0.4 R octaves look smooth inside a 31 px window); with it, 0-4 % (§5). The floors keep a small
+  compass arcs (the 0.2-0.4 R octaves look smooth inside a 31 px window); with it, 0-7 % (§5). The floors keep a small
   or far shape off the compass. The undersides (a cloud's base, a pad's belly) take 20-40 % of that amplitude: flat and
   quiet, as in the references.
+- **The octaves per element and size** (`spectrum_for`; wavelength px / RMS displacement px). On an ellipse union
+  (clouds, crowns) only the short end is applied (wavelengths <= 0.5 R for clouds, <= 0.25 R for foliage: the ellipses
+  make the long ones); a shape grown from a simple base (a rock from an ellipse, a cast shadow from its caster's
+  outline, a water edge from a polyline) takes the whole row:
+
+  | Element | R = 20 px (a far or small piece) | R = 60 px | R = 150 px (a near hero mass) |
+  |---|---|---|---|
+  | cloud | 40 / 2.0, 20 / 1.2, 10 / 1.0, 6 / 0.8, 4 / 0.6 | 96 / 3.6, 48 / 2.1, 24 / 1.3, 12 / 0.8, 6 / 0.6 | 240 / 9.0, 120 / 5.3, 60 / 3.3, 30 / 1.9, 15 / 1.1 |
+  | foliage | 30 / 2.0, 14 / 1.4, 7 / 1.0, 4 / 0.7 | 84 / 4.2, 36 / 2.7, 15 / 1.5, 6 / 0.7 | 210 / 10.5, 90 / 6.8, 38 / 3.8, 15 / 1.8 |
+  | rock | 40 / 1.5, 16 / 0.8, 8 / 0.4 | 108 / 3.0, 42 / 1.2, 15 / 0.5 | 270 / 7.5, 105 / 3.0, 38 / 1.2 |
+  | cast shadow | 60 / 1.5, 24 / 0.7 | 120 / 2.4, 48 / 0.9 | 300 / 6.0, 120 / 2.2 |
+  | water edge | 80 / 1.2, 20 / 0.5 | 150 / 1.8, 36 / 0.6 | 375 / 4.5, 90 / 1.5 |
+
+  These sit above the references' average wiggle (2-3 % of the wavelength, §2.7) on purpose: on a flat shape the
+  displacement is the only source of irregularity (the references add brush texture), and the measured result lands
+  in the references' band (§5). Shadows and water edges stay long and low: their edges are soft or lost anyway.
 - **Targets on the finished piece** (`shapes_measure.py`): compass arcs <= 10 % of its edge length (refs' median; ours
   27 %), straight <= 10 % (a cloud's flat base excepted: a level base is a third of an isolated cumulus's outline),
   free >= 80 %, corners per 100 px >= 1.2 on clouds (refs 1.9: jags and breaks). The divider dimension of the
-  references (clouds 1.09-1.15, foliage 1.18-1.23) comes mostly from brush texture at 2-16 px: flat generated shapes
-  stay at 1.02-1.06 and reach it only with the paint pass (P2-P3 marks, edge teeth), so D is a check on the painted
-  piece, not on the silhouette.
+  references (clouds 1.09-1.15, foliage 1.18-1.23) comes mostly from brush texture and broken edges at 2-16 px: a bare
+  generated silhouette stays at 1.02-1.06; with light and lost edges the proof cloud reaches 1.09 and the crown 1.10;
+  the rest comes with the paint pass (P2-P3 marks, edge teeth), so D is a check on the painted piece, not on the
+  silhouette.
 - **Asymmetry:** the biggest tower or lobe off-centre by 2-16 % of the width, toward the light or the lean; inner shapes
   (lit caps, shade masses) mirror IoU <= 0.7. A whole isolated dome (a cumulus, a crown) measures 0.66-0.86 by nature:
   never above 0.9, and never a mirror-symmetric template.
@@ -429,9 +452,12 @@ range; ours in brackets):
 - **Bake, for the painted pieces** (`scripts/look/paint/paint.py`): `shapes_gen.py` runs as is (numpy, SciPy, OpenCV):
   masks for the painted cloud, the crown, the banks; `edge_alpha` re-edges a piece's mask with found, broken and lost
   stretches; `shade3` gives flat 3-value light from the silhouette itself.
-- **Cost:** a generator call is 20-150 ms in Python per piece (the crown with holes is the slowest); in the engine a
-  displaced outline is a polyline of ~1 point per 2 px (the cost of `techniques.md` §3.7: +7-13 ms per frame for 300
-  such outlines). Motion: every outline is fixed per seed and rides its layer; never re-seeded per frame (no boil).
+- **Cost** (measured on this machine, one core, shared): a generator call takes 1-70 ms in Python (a limb 0.6 ms, a
+  bank 6 ms, a cumulus 15 ms at 370 x 205 and 71 ms at 900 x 480, a crown 42 ms); `edge_alpha` 32 ms and `shade3`
+  81 ms on a 460 x 330 piece (about 0.4 s and 1.1 s on a full-frame layer). All of it runs once per bake, 0 ms at
+  render. In the engine a displaced outline is a polyline of ~1 point per 2 px (the cost of `techniques.md` §3.7:
+  +7-13 ms per frame for 300 such outlines). Motion: every outline is fixed per seed and rides its layer; never
+  re-seeded per frame (no boil).
 
 ## 4. The generators (`shapes_gen.py`)
 
@@ -445,17 +471,17 @@ string, as the paint recipes seed), the same bytes on every run. Lengths in px o
 | `displace(P, octaves, seed, billow, amp_at)` | the noise-displaced outline: resampled every 1 px, pushed along the outward normal | `billow` turns one octave into convex bumps with sharp inward cusps; `amp_at` quiets a side (a base, a belly) |
 | `spectrum_for(R, element)` | the displacement octaves for a shape of size R | §3.1's table: cloud, foliage, rock, shadow, water edge |
 | `size_ladder(n, seed, ratio)` | n sizes, biggest first, each 0.55-0.8 of the last | never two within 10 % |
-| `billows(seed, path, r_of, ...)` | ellipses along a skyline: sizes from a function of the position, sunk 25-75 %, spaced 0.45-0.95 of two radii (overlapping, never kissing); level 2 on the outer arcs | aspect 0.6-0.98, tilt +-12 degrees |
+| `billows(seed, path, r_of, ...)` | ellipses along a skyline: sizes from a function of the position, sunk 25-80 % of their radius, spaced 0.45-0.95 of two radii (overlapping, never kissing); level 2 on the outer arcs | aspect 0.42-0.98, tilt +-12 degrees |
 | `raster_union(ells, box, poly)` | the union at 4x, box-reduced | anti-aliased |
 | `cumulus(seed, cx, base, width, height)` | 2-4 towers (heights 0.62-0.9 of the last) over a skirt that tapers at two rates; billows in three levels; a flat base tilted <= 1.2 degrees; the cloud octaves, quiet on the base | returns the outline and R |
 | `bank(seed, cx, base, length, height)` | a dusk deck or stratocumulus: 2-4 humps on a ladder, ends dragged at two rates, a near-level base, pinched in two 35 % of the time | tails end at 2 px |
 | `crown(seed, cx, cy, width, height)` | a tree crown in three levels (body, 3-5 lobes, clumps, small clumps), a flat lens underside with 1-3 bites, 1-3 sky gaps where lobes meet, the foliage octaves | returns coverage, offset, outline |
 | `streak(seed, x0, x1, y, thick)` | a sky streak: swelling +-35 %, two different tapers, a bowed wandering centre line | never a bar |
-| `limb(seed, p0, p1, w0, w1)` | a trunk, branch or stem: bowed 5 %, tapered, a root flare, a +-0.5 px wobble | a man-made post: wobble 0, bend <= 0.4 % |
-| `hand_cut(corners, seed)` | a man-made outline: each side turned 0.8-2.2 degrees (opposite sides differing by >= 1 degree), bowed 0.3-0.9 %, cut in 1-3 pieces jogging 0.3-1 px, corners rounded 0.6-3.5 px | never a noise wobble |
+| `limb(seed, p0, p1, w0, w1)` | a trunk, branch or stem: bowed 5 %, tapered, a root flare, a +-0.8 px wobble at 12-60 px (a smooth bow alone measures straight) | a man-made post: wobble 0, bend <= 0.4 % |
+| `hand_cut(corners, seed)` | a man-made outline: each side turned 0.8-2.2 degrees (opposite sides differing by >= 1 degree), bowed 0.3-0.9 %, cut in 1-3 pieces jogging 0.3-1 px, corners rounded 0.6-2 px (windows 2-3.5) | never a noise wobble |
 | `vary_rects(seed, rects)` | windows or panels without a template: sizes +-5-12 %, positions +-1.5 px, states never twice running | twins nudged apart |
 | `broken_line(seed, p0, p1, width)` | a joint, mullion or rail: width +-30 %, a 0.4 % bow, 2-5 pieces with lost gaps (10-25 %), faded ends | |
-| `edge_alpha(cov, seed, light, ...)` | lost and found for a raster piece: found (crisp ~1.2 px) where the outline faces the light, lost (16-28 px) away from it, broken (dry-brush teeth 2-6 px deep, >= 2 px wide, along the brush direction) between; a slow noise along the outline makes them alternate | the shares found / lost are parameters |
+| `edge_alpha(cov, seed, light, ...)` | the eroded edge, lost and found, for a raster piece: found (crisp ~1.2 px) where the outline faces the light, lost (16-28 px) away from it, broken (dry-brush teeth 2-6 px deep, >= 2 px wide, along the brush direction) between; a slow noise along the outline makes them alternate | the shares found / lost are parameters |
 | `shade3(cov, seed, light, ...)` | flat lit / body / shade values read from the silhouette (a dome height from the distance inside, normals at the billow scale over the mass scale) with a wandering terminator | never a crescent along the outline, never a ruler terminator |
 | `place(seed, box, sizes)`, `tangents()`, `parallels()`, `interval_cv()` | placement that overlaps or keeps a gap, never kisses; the checks of §3.5 | |
 
@@ -465,7 +491,68 @@ outline need not be displaced) or polygon-clipping (MIT) / d3-contour (ISC) to g
 
 ## 5. Proof: before and after (`shapes_generators.png`)
 
-PROOF_TABLE_PLACEHOLDER
+Five panels at the frame's scale (460 x 330 px each), flat values only (the measures are about shape and edge, not
+paint), through the same codec as the references, measured by `shapes_measure.measure_crop` (the references' code).
+**Before** is our current way: a union of circles with lit caps (`lib/clouds.tsx`'s method), constant-width bars with
+round ends (v6's low sky), a scalloped crown of equal bumps on a rectangle trunk (`sketch.ts` `crown`), a frontal
+rectangle with a grid of identical windows, ruler joints evenly spaced. **After** is `shapes_gen.py` with §3's rules:
+`cumulus` + `edge_alpha` + `shade3` and a belly band; `bank` and `streak`; `crown` + `limb`; `hand_cut` faces in a slight
+two-point view, `vary_rects` windows each with one asymmetric element, a lost shade-face edge, overlaps (a branch, a
+shrub); flags as value patches, a few `broken_line` joints near, a crown's flattened cast shadow.
+
+| Measure | Cumulus | Banks, streaks | Tree | Facade | Paving |
+|---|---|---|---|---|---|
+| clear geometric (px / 100 x 100) | 46 -> 22 | 164 -> 33 | 30 -> 23 | 224 -> 153 | 61 -> 1 |
+| straight | 16 % -> 15 % | 95 % -> 22 % | 9 % -> 13 % | 97 % -> 59 % | 95 % -> 42 % |
+| ruler lines | 16 % -> 0 % | 95 % -> 0 % | 5 % -> 0 % | 26 % -> 6 % | 56 % -> 0 % |
+| compass arcs | 48 % -> 7 % | 0 % -> 0 % | 26 % -> 8 % | 0 % -> 0 % | 0 % -> 4 % |
+| free curve | 36 % -> 78 % | 5 % -> 78 % | 65 % -> 79 % | 3 % -> 41 % | 5 % -> 54 % |
+| right-angle corners | 20 % -> 7 % | - -> 0 % | 4 % -> 6 % | 100 % -> 58 % | 100 % -> 0 % |
+| parallels | - -> 0 % | 100 % -> 30 % | 100 % -> 0 % | 64 % -> 53 % | 0 % -> 17 % |
+| on the axes | 20 % -> 14 % | 93 % -> 33 % | 12 % -> 6 % | 87 % -> 45 % | 1 % -> 6 % |
+| crisp visible edges | 69 % -> 30 % | 100 % -> 44 % | 82 % -> 40 % | 75 % -> 59 % | 99 % -> 69 % |
+| visible edge width, median (px) | 1.5 -> 3.8 | 1.5 -> 2.5 | 1.4 -> 2.2 | 1.6 -> 1.6 | 1.4 -> 1.7 |
+| broken mass edges | 4 % -> 4 % | 0 % -> 16 % | 4 % -> 8 % | 0 % -> 4 % | 91 % -> 19 % |
+| outline alternates found / lost | 0 % -> 89 % | 0 % -> 32 % | 100 % -> 91 % | 0 % -> 30 % | 4 % -> 100 % |
+| mirror symmetry | 0.55 -> 0.65 | 1.00 -> 0.40 | 0.74 -> 0.63 | 0.97 -> 0.85 | 0.95 -> 0.70 |
+| neighbour likeness | 0.43 -> 0.46 | 1.00 -> 0.43 | 0.42 -> 0.48 | 1.00 -> 0.74 | 0.97 -> 0.76 |
+| twins | 0 % -> 0 % | 0 % -> 0 % | 0 % -> 0 % | 100 % -> 22 % | 96 % -> 0 % |
+| divider D | 1.048 -> 1.090 | 1.016 -> 1.057 | 1.043 -> 1.095 | 1.025 -> 1.035 | 1.029 -> 1.050 |
+
+**Reading.**
+- **The cumulus** stops being a compass drawing: arcs 48 -> 7 %, crisp 69 -> 30 % (the painted clouds 24 %), and its
+  outline alternates found and lost along 89 % of its length (painted clouds 81 %, v6 44 %). Its 15 % straight is the
+  level base (lost in the panel, so no ruler line any more); its divider D reaches 1.09 (the painted clouds 1.09-1.15).
+- **Banks and streaks:** ruler lines 95 -> 0, parallels 100 -> 30 %, edges on the axes 93 -> 33 %, symmetry 1.00 ->
+  0.40, crisp 100 -> 44 %.
+- **The tree:** arcs 26 -> 8 %, crisp 82 -> 40 %, symmetry 0.74 -> 0.63, D 1.04 -> 1.10; the trunk is no ruler line
+  (a bowed, knobbly, tapered `limb`: 5 -> 0 %).
+- **The facade:** straight 97 -> 59 %, ruler lines 26 -> 6 %, right angles 100 -> 58 %, edges on the axes 87 -> 45 %,
+  twins 100 -> 22 %, clear geometric 224 -> 153.
+- **The paving:** ruler lines 56 -> 0, right angles 100 -> 0, clear geometric 61 -> 1, twins 96 -> 0 %; its masses now
+  melt (lost 14 % at the mass scale; the painted grounds 13 %).
+- **Two cells to ignore:** the paving "before" is thin joints on a flat ground, lines rather than mass boundaries, so at
+  sigma 3 its lost (83 %) and broken (91 %) shares are artefacts; and the scalloped crown's notan outline already
+  alternates (each bump's lit and shade halves), so the alternation measure does not separate the two trees.
+- **What flat shapes do not reach** (the paint pass's and the design's job, measured here so nobody expects it from the
+  generators): broken edges stay 4-19 % (the painted refs 24-58 %: brush marks and texture along the edges,
+  `techniques.md` §3.6); the facade keeps 58 % right angles (rounded corners do not move it: a turned view and broken
+  corners do, §3.2) and 0.85 symmetry (its windows' parts are still rectangles; the references' painted patches break
+  them); a flat silhouette's divider D stays 1.02-1.06 (the seed check) and reaches the references' 1.10-1.20 only
+  with light, lost edges and marks.
+
+**The seed check** (six unpicked seeds per generator, the bare silhouette in one flat value on the sky, every edge
+found; `shapes_generators.json` `seed_check`):
+
+| Generator | straight | ruler lines | compass arcs | free | right angles | mirror symmetry | divider D |
+|---|---|---|---|---|---|---|---|
+| `cumulus` | 23-34 % (the level base) | 6-31 % (the base) | 0-7 % | 66-77 % | 0-14 % | 0.77-0.85 | 1.025-1.031 |
+| `crown` | 0-3 % | 0 | 0-8 % | 92-100 % | 0-19 % | 0.66-0.86 | 1.029-1.056 |
+| `bank` | 12-27 % | 0 | 0-4 % | 72-88 % | 0 | 0.45-0.77 | 1.024-1.047 |
+
+Every seed meets the arc rule (<= 10 %) and the ruler rule outside a cumulus's level base. Before the short cloud
+octave was added (§3.1) the same six cumulus seeds measured 11-20 % arcs. A whole isolated dome is fairly symmetric
+by nature (0.66-0.86); the light and the lost edges bring the panel's shapes to 0.65.
 
 ## 6. Checks for the next still (v7, an iteration)
 
@@ -481,7 +568,7 @@ Run `shapes_measure.py` on the new still with the same crop boxes (only `SRC['ou
 | mirror symmetry | <= 0.65 | <= 0.65 | <= 0.6 | <= 0.65 | <= 0.65 |
 | lost mass edges | >= 10 % | 15-25 % | >= 7 % | 2-5 % | >= 10 % |
 | broken mass edges | >= 25 % | >= 20 % | >= 35 % | >= 40 % | >= 40 % |
-| clear geometric (px / 100 x 100) | <= 10 | <= 15 | <= 20 | <= 60 | <= 45 |
+| clear geometric (px / 100 x 100) | <= 10 | <= 15 | <= 20 | - (not a gap: refs 66, ours 63-64) | <= 45 |
 
 The numbers only warn; the owner's eye at phone size beside v6 and the two models (`refs_human_scale/02`, `03`) decides.
 
@@ -500,8 +587,8 @@ The numbers only warn; the owner's eye at phone size beside v6 and the two model
 | clipper2-js 1.2.4 / clipper-lib 6.4.2 (npm) | optional: offsets and booleans | Boost Software License 1.0 |
 | **Mixbox** | never (non-commercial) | CC BY-NC 4.0 |
 
-Nothing here needs a library outside the repo's Python bake stack; the engine port needs none (the npm ones are
-options).
+Nothing here needs a library outside the repo's Python bake stack (`scripts/look/` already imports numpy, SciPy,
+OpenCV and scikit-image); the engine port needs none (the npm ones are options).
 
 ## 8. Doc clashes found (flagged for the orchestrator, not edited here)
 
@@ -512,9 +599,11 @@ options).
 - **`src/lib/edges/rough.ts` `organic()`** (3-21 harmonics per loop, resampled every 26 px) gives smooth wobbles that
   measure as straight lines and arcs locally (§1.3): fine for a sketch line, not for a natural silhouette under the
   new rule.
-- **`paint_recipes/foliage.md` §4.1's crown** ("9 pads ... a leafy edge of clumps out and notches in") and v6's tree
-  measure 67 % small shapes by area and 58 % crisp edges; the owner called v6's tree out of style. §3.1's trees (three
-  levels, fewer and bigger clumps, a flat underside) and §3.3's tree edges are the proposed reading.
+- **The tree crown recipe** (`PAINT_RECIPES.md` §2.3, `paint_recipes/foliage.md` §4.1: "9 pads ... ~1550 dabs ... a
+  leafy edge of clumps out and notches in", edge 0.88 px): v6's painted tree measures 67 % small shapes by area and
+  58 % crisp edges against the painted trees' 34 % and 20 %, and the owner called it out of style. §3.1's trees (three
+  levels, fewer and bigger clumps, a flat underside) and §3.3's tree edges (lost >= 7 %, crisp <= 30 %) are the
+  proposed reading; the recipe's own review already names the pads "too alike (a little topiary)".
 - **CRAFT §c "Thin lines twinkle" / flecks >= 2 px** agrees with §3.1 (tails end at 2 px; teeth >= 2 px wide); no
   clash, noted because `edge_alpha`'s teeth must keep it (the proof's banks still show a few finer flecks: fix before
   production).
@@ -525,7 +614,7 @@ All from `video/`; scratch in `/tmp/organic/shapes/` (nothing installs into the 
 
 ```
 python3 -m venv /tmp/organic/shapes/venv && /tmp/organic/shapes/venv/bin/pip install numpy scipy opencv-python-headless scikit-image matplotlib
-python3 docs/look/organic/shapes_measure.py --out /tmp/organic/shapes/run2          # 54 crops, ~8 min on one core
+python3 docs/look/organic/shapes_measure.py --out /tmp/organic/shapes/run2          # 54 crops, ~9 min on one core
 python3 docs/look/organic/shapes_measure.py --out /tmp/organic/shapes/run2 --add-along   # only the along-boundary numbers
 /tmp/organic/shapes/venv/bin/python docs/look/organic/shapes_sheet.py --run /tmp/organic/shapes/run2
 /tmp/organic/shapes/venv/bin/python docs/look/organic/shapes_generators_sheet.py --sheet   # panels, seed check, sheet

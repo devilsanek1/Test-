@@ -54,7 +54,7 @@ export const EdHeads: React.FC<{span?: number; only?: number[]}> = ({span = 250,
           const cx = it.flip ? -c.x : c.x;
           return (
             <svg key={i} x={col * pw} y={row * (ph + 10)} width={pw} height={ph} viewBox={`${cx - vw / 2} ${c.y - 30 - 0.5 * vh} ${vw} ${vh}`}>
-              <EdPerson x={0} y={0} h={1000} person={it.p} pose={it.pose} flip={it.flip} shadow={null} />
+              <EdPerson x={0} y={0} h={1000} person={it.p} pose={it.pose} flip={it.flip} shadow={null} pxScale={ph / vh} />
             </svg>
           );
         })}

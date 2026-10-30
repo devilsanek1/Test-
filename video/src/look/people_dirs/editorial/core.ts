@@ -173,7 +173,7 @@ export function pchip(xs: number[], ys: number[]): (x: number) => number {
  *  to the front (`bf`) and back (`bb`), superellipse exponent `n` (2 = ellipse, higher = squarer), a frontal tilt
  *  (degrees: + lifts the figure's LEFT side, a hip or shoulder line), and `bump`: extra forward depth near the front
  *  centre (a nose, the lips: [amount, half-angle in degrees]). */
-export type Sec = {y: number; cx: number; cz: number; ap: number; an: number; bf: number; bb: number; n?: number; tilt?: number; bump?: [number, number]};
+export type Sec = {y: number; cx: number; cz: number; ap: number; an: number; bf: number; bb: number; n?: number; nb?: number; tilt?: number; bump?: [number, number]};
 export type SecKey = Partial<Sec> & {y: number};
 
 /** The point of a section at angle phi (degrees: 0 = +X the figure's left, 90 = the front, 180 = -X, 270 = the back). */
@@ -181,7 +181,7 @@ export function secPt(s: Sec, phi: number): V3 {
   const r = deg(phi);
   const c = Math.cos(r);
   const sn = Math.sin(r);
-  const ex = 2 / (s.n ?? 2);
+  const ex = 2 / (sn >= 0 ? (s.n ?? 2) : (s.nb ?? s.n ?? 2));
   const ax = c >= 0 ? s.ap : s.an;
   const bz = sn >= 0 ? s.bf : s.bb;
   let X = s.cx + ax * Math.sign(c) * Math.abs(c) ** ex;
@@ -221,6 +221,7 @@ export function sections(keys: SecKey[], step = 8): Sec[] {
   const ys = full.map((s) => -s.y);
   const fn = (key: 'cx' | 'cz' | 'ap' | 'an' | 'bf' | 'bb' | 'n' | 'tilt') => pchip(ys, full.map((s) => (s[key] ?? (key === 'n' ? 2 : 0)) as number));
   const F = {cx: fn('cx'), cz: fn('cz'), ap: fn('ap'), an: fn('an'), bf: fn('bf'), bb: fn('bb'), n: fn('n'), tilt: fn('tilt')};
+  const nbF = pchip(ys, full.map((s) => s.nb ?? s.n ?? 2));
   const bumpA = pchip(ys, full.map((s) => s.bump?.[0] ?? 0));
   const bumpW = pchip(ys, full.map((s) => s.bump?.[1] ?? 20));
   const out: Sec[] = [];
@@ -230,7 +231,7 @@ export function sections(keys: SecKey[], step = 8): Sec[] {
   for (let i = 0; i <= n; i++) {
     const y = y0 + ((y1 - y0) * i) / n;
     const t = -y;
-    out.push({y, cx: F.cx(t), cz: F.cz(t), ap: Math.max(0.01, F.ap(t)), an: Math.max(0.01, F.an(t)), bf: Math.max(0.01, F.bf(t)), bb: Math.max(0.01, F.bb(t)), n: F.n(t), tilt: F.tilt(t), bump: [bumpA(t), bumpW(t)]});
+    out.push({y, cx: F.cx(t), cz: F.cz(t), ap: Math.max(0.01, F.ap(t)), an: Math.max(0.01, F.an(t)), bf: Math.max(0.01, F.bf(t)), bb: Math.max(0.01, F.bb(t)), n: F.n(t), nb: nbF(t), tilt: F.tilt(t), bump: [bumpA(t), bumpW(t)]});
   }
   return out;
 }
@@ -341,6 +342,7 @@ export function surf(secs: Sec[], y: number, phi: number, v: View, xf: Xf = ID, 
     bf: lerp(a.bf, b.bf, k),
     bb: lerp(a.bb, b.bb, k),
     n: lerp(a.n ?? 2, b.n ?? 2, k),
+    nb: lerp(a.nb ?? a.n ?? 2, b.nb ?? b.n ?? 2, k),
     tilt: lerp(a.tilt ?? 0, b.tilt ?? 0, k),
     bump: [lerp(a.bump?.[0] ?? 0, b.bump?.[0] ?? 0, k), lerp(a.bump?.[1] ?? 20, b.bump?.[1] ?? 20, k)],
   };

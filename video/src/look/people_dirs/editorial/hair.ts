@@ -20,8 +20,9 @@ const tab = (ts: number[], ws: number[]) => {
   return (t: number) => (t < ts[0] ? null : f(t));
 };
 const FACE: Record<HairStyle, {l: (t: number) => number | null; r: (t: number) => number | null; t0: number; t1: number}> = (() => {
-  // long, centre part: the hair falls from the part over the temples and the ears; the jaw's angle shows
-  const long = tab([0.14, 0.18, 0.22, 0.27, 0.32, 0.45, 0.6, 0.75, 0.85, 1.0], [8, 40, 60, 73, 79, 82, 84, 92, 100, 108]);
+  // long layers with curtain bangs (fashion H2), centre part: the bangs open from the part in a soft arch to the
+  // cheekbones, framing the eyes; below, the hair falls over the ears; the jaw's angle shows
+  const long = tab([0.13, 0.17, 0.22, 0.28, 0.35, 0.42, 0.5, 0.58, 0.66, 0.76, 0.86, 1.0], [2, 10, 20, 31, 42, 53, 64, 74, 82, 90, 98, 106]);
   // high pony: pulled back from a clean hairline, the ear free, the nape clean
   const pony = tab([0.13, 0.17, 0.22, 0.3, 0.4, 0.5, 0.58, 0.66, 0.74, 0.82, 0.9], [10, 42, 62, 76, 88, 102, 116, 136, 156, 172, 179]);
   // bob, a side part on the figure's right: the swept side covers more of the left temple
@@ -30,7 +31,7 @@ const FACE: Record<HairStyle, {l: (t: number) => number | null; r: (t: number) =
   // a crop on a low taper: the hairline at the brow, the temples, in front of and behind the ear, the nape
   const crop = tab([0.15, 0.18, 0.24, 0.32, 0.42, 0.52, 0.6, 0.68, 0.76, 0.84], [30, 52, 64, 72, 82, 98, 118, 140, 164, 179]);
   return {
-    long: {l: long, r: long, t0: 0.14, t1: 0.96},
+    long: {l: long, r: long, t0: 0.13, t1: 0.96},
     pony: {l: pony, r: pony, t0: 0.13, t1: 0.95},
     bob: {l: bobL, r: bobR, t0: 0.14, t1: 1.16},
     twists: {l: crop, r: crop, t0: 0.15, t1: 0.92},

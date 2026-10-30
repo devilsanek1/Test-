@@ -724,12 +724,13 @@ def shade3(cov: np.ndarray, seed, light=(-0.7, -0.7), lz: float = 0.55, scale: f
         if n_:
             sizes = ndi.sum(b, lab_, np.arange(1, n_ + 1))
             small = np.isin(lab_, 1 + np.where(sizes < min_island * area)[0])
-            m_[small] = 0.0
+            m_[ndi.binary_dilation(small, iterations=2)] = 0.0      # with its anti-aliased rim: no ghost ring
         holes = ndi.binary_fill_holes(m_ > 0.5) & ~(m_ > 0.5)
         lab_, n_ = ndi.label(holes)
         if n_:
             sizes = ndi.sum(holes, lab_, np.arange(1, n_ + 1))
-            m_[np.isin(lab_, 1 + np.where(sizes < min_island * area)[0])] = 1.0
+            fill = np.isin(lab_, 1 + np.where(sizes < min_island * area)[0])
+            m_[ndi.binary_dilation(fill, iterations=2) & (inside > 0)] = 1.0
     lit = ndi.gaussian_filter(lit, 0.6) * cov; shade = ndi.gaussian_filter(shade, 0.6) * cov
     return lit, shade
 

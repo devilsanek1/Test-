@@ -118,15 +118,15 @@ export function capSurfaces(sk: Skeleton, cp: {mat: string; brimMat?: string}, r
   const dome: Surface = {key: 'cap', mat: cp.mat, grid, axis, wrap: true, open: true, mask, bias: 50, look: {blur: 4.5, hi: 0.8, rim: 0.45}};
   // the brim: a thin closed slab (its top in the light, its underside and its front edge in shade), forward and a little
   // down from the band, its sides curving down
-  const bR = rowsFor(16, res, 7);
-  const bC = rowsFor(28, res, 14);
+  const bR = rowsFor(22, res, 9);
+  const bC = rowsFor(36, res, 16);
   const bg: V3[][] = [];
   const ba: V3[] = [];
-  const TH = 0.03;
+  const TH = 0.045;
   for (let i = 0; i < bR; i++) {
-    const a = mix(-1.18, 1.18, i / (bR - 1));
+    const a = mix(-1.08, 1.08, i / (bR - 1));
     const base = shellPoint(0.735, a, 0.058);
-    const L0 = 0.6 * Math.pow(Math.max(0, Math.cos(a * 1.25)), 0.75) + 0.02;
+    const L0 = 0.6 * Math.pow(Math.max(0, Math.cos(a * 1.42)), 0.9) + 0.004;
     const row: V3[] = [];
     for (let k = 0; k < bC; k++) {
       const ph = (k / bC) * Math.PI * 2;
@@ -143,7 +143,7 @@ export function capSurfaces(sk: Skeleton, cp: {mat: string; brimMat?: string}, r
     const lm = 0.5 * L0;
     ba.push(toWorld(sk.head, scl([base[0] * (1 - 0.08), base[1] - lm * Math.sin(17 * D2R) - 0.065 * a * a, base[2] + lm * Math.cos(17 * D2R)], h)));
   }
-  const brim: Surface = {key: 'brim', mat: cp.brimMat ?? cp.mat, grid: bg, axis: ba, wrap: true, bias: 52, look: {blur: 3, hi: 0.85, rim: 0.4}};
+  const brim: Surface = {key: 'brim', mat: cp.brimMat ?? cp.mat, grid: bg, axis: ba, wrap: true, winding: 'neg', bias: 52, look: {blur: 3, hi: 0.85, rim: 0.4}};
   // the brim's shadow across the brow and the eyes: a soft cool band on the face (the cap hides the eyes: a generic,
   // cool face for free)
   const plain: FaceShape = {nose: 0, lips: 0, jaw: 1, chin: 0, cheek: 0, brow: 0};

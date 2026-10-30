@@ -58,7 +58,7 @@ export const HER_EVENING: Person = {
     {
       hides: {legsFrom: 330},
       build: (sk, res) => ({
-        surfaces: [skirtSurface(sk, {key: 'skirt', mat: 'skirt', waist: 648, hem: 208, ease: 5, hemHalf: 122, folds: {n: 5, amp: 6, seed: 1.1}, look: {hi: 0.93, blur: 7}, bias: 12}, res)],
+        surfaces: [skirtSurface(sk, {key: 'skirt', mat: 'skirt', waist: 648, hem: 208, ease: 5, hemHalf: 122, folds: {n: 5, amp: 6, seed: 1.1}, look: {hi: 0.975, blur: 8}, bias: 12}, res)],
       }),
     },
     {
@@ -140,8 +140,8 @@ export const HER_WEEKEND: Person = {
             },
             res,
           ),
-          sleeveSurface(sk, 'L', {key: 'shSleeve', mat: 'shirt', to: 236, ease: (d) => 5 + 7 * smooth(30, 120, d), bunch: 5, look: {blur: 6}, bias: 15}, res),
-          sleeveSurface(sk, 'R', {key: 'shSleeve', mat: 'shirt', to: 236, ease: (d) => 5 + 7 * smooth(30, 120, d), bunch: 5, look: {blur: 6}, bias: 15}, res),
+          sleeveSurface(sk, 'L', {key: 'shSleeve', mat: 'shirt', to: 236, ease: (d) => 5 + 7 * smooth(30, 120, d), bunch: 3, look: {blur: 6}, bias: 15}, res),
+          sleeveSurface(sk, 'R', {key: 'shSleeve', mat: 'shirt', to: 236, ease: (d) => 5 + 7 * smooth(30, 120, d), bunch: 3, look: {blur: 6}, bias: 15}, res),
         ],
       }),
     },

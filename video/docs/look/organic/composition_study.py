@@ -59,6 +59,17 @@ INPUTS = {
 }
 _POSTERS = ['01_singapore', '02_reykjavik', '03_hanoi', '04_buenos_aires', '05_cape_town', '06_copenhagen', '07_kyoto']
 SHEET_ROWS = ['v6', 'r04', 'r02', 'r03', 'r01']  # v6 and the four references drawn on the sheet
+# the story's subject in each picture (normalised x0, y0, x1, y1 of the cleaned picture; by eye, +-2 %): is the focal
+# point on it?
+SUBJECT = {
+    'v6': (0.495, 0.435, 0.675, 0.567),       # the lit Google doorway with her (S1_SHEET.door 540-720 x 848-1082)
+    'v5': (0.495, 0.435, 0.675, 0.567), 'v2ship': (0.495, 0.435, 0.675, 0.567),
+    'r04': (0.62, 0.74, 0.76, 0.86),          # the girl (and her cape) by the potted plant
+    'r02': (0.355, 0.535, 0.655, 0.875),      # the lit shelter with the man
+    'r03': (0.69, 0.57, 0.765, 0.85),         # the couple with the phone's glow
+    'r01': (0.37, 0.51, 0.49, 0.87),          # the two men on the hill
+    'p01van': (0.48, 0.42, 0.56, 0.52),       # the couple on the boulder
+}
 
 
 def _poster_inputs():
@@ -204,6 +215,40 @@ def salience(lab):
     return ndi.gaussian_filter(s, 10 * k)
 
 
+CALL = 0.5    # a region whose value pull is >= 50 % of the frame's strongest (above the median) calls the eye
+RIVAL = 0.7   # a call whose own peak is >= 70 % of the strongest is a rival: equal weight
+
+
+def value_salience(L):
+    """CRAFT §b's luminance centre-surround term alone, at 400 px wide: what a squinting eye catches in a notan."""
+    k = W400 / 540.0
+    lc = 0.5 * (np.abs(L - ndi.gaussian_filter(L, 8 * k)) + np.abs(L - ndi.gaussian_filter(L, 32 * k)))
+    return ndi.gaussian_filter(lc / 15, 10 * k)
+
+
+def salience_calls(S):
+    """Connected regions of S >= median + CALL * (max - median): one per thing that calls the eye, each with its own
+    peak height h (relative), peak and centroid (normalised), area share and box. Sorted by h."""
+    H, W = S.shape
+    med = float(np.median(S)); top = float(S.max())
+    cc, n = ndi.label(S >= med + CALL * (top - med), structure=np.ones((3, 3)))
+    out = []
+    for i, sl in enumerate(ndi.find_objects(cc), start=1):
+        m = cc[sl] == i
+        sub = S[sl]
+        j = np.argmax(np.where(m, sub, -1))
+        py, px = np.unravel_index(j, m.shape)
+        cy, cx = ndi.center_of_mass(m)
+        out.append(dict(h=round(float((sub[py, px] - med) / (top - med)), 3),
+                        px=round((px + sl[1].start) / W, 3), py=round((py + sl[0].start) / H, 3),
+                        cx=round((cx + sl[1].start) / W, 3), cy=round((cy + sl[0].start) / H, 3),
+                        area=round(float(m.sum()) / (H * W), 5),
+                        box=[round(sl[1].start / W, 3), round(sl[0].start / H, 3), round(sl[1].stop / W, 3),
+                             round(sl[0].stop / H, 3)]))
+    out.sort(key=lambda c: -c['h'])
+    return out
+
+
 def salience_blobs(S, rel=0.5):
     """Blobs of the salience map above median + rel * (p99.5 - median); each blob's weight = its salience mass above
     the median. Returns blobs sorted by weight: (weight, peak, cy, cx, area, label) and the label map."""
@@ -221,62 +266,111 @@ def salience_blobs(S, rel=0.5):
     return blobs, cc, t
 
 
+NOTAN = 4.0       # px at 400 wide (1 % W): the notan's squint, where texture merges into its mass and props stay
+PEAK_DIST = 12    # px (3 % W): two salience peaks closer than this are one element
+
+
+def salience_peaks(S, floor_rel=0.25):
+    """Local maxima of the salience map (each a thing that calls the eye), heights above the frame's median,
+    normalised by the highest: [(h, x, y)] sorted high to low."""
+    from skimage.feature import peak_local_max
+    med = float(np.median(S)); top = float(S.max())
+    pk = peak_local_max(S, min_distance=PEAK_DIST, threshold_abs=med + floor_rel * (top - med), exclude_border=False)
+    out = [((S[y, x] - med) / (top - med), int(x), int(y)) for y, x in pk]
+    out.sort(key=lambda t: -t[0])
+    return out
+
+
+def in_box(x, y, box, W, H, pad=0.03):
+    x0, y0, x1, y1 = box
+    return (x0 - pad) * W <= x <= (x1 + pad) * W and (y0 - pad) * H <= y <= (y1 + pad) * H
+
+
 def measure_one(name, save_maps=True):
     rgb = load(name)
     H, W = rgb.shape[:2]
     N = H * W
     lab = lab_of(rgb)
     L = lab[..., 0]
-    Ls = squint(L)
     res = dict(name=name, label=INPUTS[name]['label'], size=[W, H])
-    # value structure
+    # value structure (unblurred)
     res['L_median'] = float(np.median(L))
     res['L_p5_p95'] = [float(np.percentile(L, 5)), float(np.percentile(L, 95))]
     res['dark_share_L40'] = float((L < 40).mean())
-    for k in (2, 3, 5):
-        labk, thr = posterise(Ls, k)
-        res['eta%d' % k] = otsu_eta(Ls, thr)
-        res['thr%d' % k] = [float(t) for t in thr]
-        res['share%d' % k] = [float((labk == g).mean()) for g in range(k)]
-        res['meanL%d' % k] = [float(Ls[labk == g].mean()) if (labk == g).any() else None for g in range(k)]
-        comps, rid = components(labk)
-        areas = sorted([c[0] for c in comps], reverse=True)
-        res['masses%d' % k] = int(sum(a >= MASS_MIN * N for a in areas))
-        res['top3_share%d' % k] = float(sum(areas[:3]) / N)
-        res['top5_share%d' % k] = float(sum(areas[:5]) / N)
-        frags = [a for a in areas if FRAG_MIN * N <= a < MASS_MIN * N]
-        res['frags%d' % k] = len(frags)
-        res['frags%d_per100k' % k] = len(frags) / N * 1e5
-        res['boundary%d' % k] = boundary_share(labk)
-        if save_maps:
-            np.save(os.path.join(SCRATCH, 'maps', '%s_post%d.npy' % (name, k)), labk.astype(np.uint8))
-    # quiet
-    sd = local_std(Ls)
+    # notan: posterise at the squints; masses, pieces, boundaries
+    for tag, sig in (('s2', SQUINT), ('s4', NOTAN)):
+        Ls = squint(L, sig)
+        for k in (2, 3, 5):
+            labk, thr = posterise(Ls, k)
+            key = '%s_k%d' % (tag, k)
+            comps, rid = components(labk)
+            areas = np.array(sorted([c[0] for c in comps], reverse=True), float)
+            big = areas[areas >= MASS_MIN * N]
+            pieces = areas[(areas >= FRAG_MIN * N) & (areas < MASS_MIN * N)]
+            res[key] = dict(
+                thr=[float(t) for t in thr], eta=otsu_eta(Ls, thr),
+                share=[float((labk == g).mean()) for g in range(k)],
+                meanL=[float(L[labk == g].mean()) if (labk == g).any() else None for g in range(k)],
+                masses=int(len(big)), mass_cover=float(big.sum() / N), top3=float(areas[:3].sum() / N),
+                pieces=int(len(pieces)), pieces_per100k=float(len(pieces) / N * 1e5),
+                piece_cover=float(pieces.sum() / N), boundary=boundary_share(labk))
+            if save_maps:
+                np.save(os.path.join(SCRATCH, 'maps', '%s_%s.npy' % (name, key)), labk.astype(np.uint8))
+        # in-mass texture: inside the 3-value masses >= 1 %, the spread of the unblurred L*
+        if tag == 's4':
+            labk, _ = posterise(Ls, 3)
+            comps, rid = components(labk)
+            sds = []
+            for a, g, i in comps:
+                if a >= MASS_MIN * N:
+                    sds.append((a, float(L[rid == i].std())))
+            sds.sort(key=lambda t: -t[0])
+            res['inmass_std_top3'] = [round(sd, 2) for a, sd in sds[:3]]
+    # quiet: calm at a squint
+    sd = local_std(squint(L, SQUINT))
     quiet = sd < QUIET_STD
     qcc, qn = ndi.label(quiet, structure=np.ones((3, 3)))
     qareas = np.sort(ndi.sum(np.ones_like(qcc), qcc, index=np.arange(1, qn + 1)))[::-1] if qn else np.array([0])
     res['quiet_share'] = float(quiet.mean())
     res['quiet_largest'] = float(qareas[0] / N)
+    res['quiet_second'] = float(qareas[1] / N) if len(qareas) > 1 else 0.0
     res['quiet_regions_2pc'] = int((qareas >= 0.02 * N).sum())
     res['quiet_big_share'] = float(qareas[qareas >= 0.02 * N].sum() / N)
-    # salience and the focal point
+    # by thirds of the height (the frame's top / middle / bottom)
+    res['quiet_by_third'] = [float(quiet[int(i * H / 3):int((i + 1) * H / 3)].mean()) for i in range(3)]
+    # what calls the eye: CRAFT §b's luminance term alone (a notan sees value), and its full colour formula
+    V = value_salience(L)
+    calls = salience_calls(V)
+    res['calls'] = len(calls)
+    res['rivals'] = int(sum(c['h'] >= RIVAL for c in calls))
+    res['calls_list'] = calls[:16]
+    res['focal'] = [calls[0]['px'], calls[0]['py']] if calls else None
     S = salience(lab)
-    med = float(np.median(S))
-    res['sal_peak_over_median'] = float(np.percentile(S, 99) / med)
-    blobs, bcc, bt = salience_blobs(S)
-    ws = np.array([b[0] for b in blobs]) if blobs else np.array([1.0])
-    res['sal_blobs'] = len(blobs)
-    res['sal_neff'] = float(ws.sum() ** 2 / (ws ** 2).sum())
-    res['sal_top_share'] = float(ws[0] / ws.sum())
-    res['sal_equal_weight'] = int((ws >= 0.5 * ws[0]).sum())
-    res['sal_second_over_first'] = float(ws[1] / ws[0]) if len(ws) > 1 else 0.0
-    res['focal'] = [float(blobs[0][3] / W), float(blobs[0][2] / H)] if blobs else None
-    res['blobs'] = [dict(w=float(b[0] / ws[0]), x=float(b[3] / W), y=float(b[2] / H), area=float(b[4] / N))
-                    for b in blobs[:12]]
+    ccalls = salience_calls(S)
+    res['colour_calls'] = len(ccalls)
+    res['colour_rivals'] = int(sum(c['h'] >= RIVAL for c in ccalls))
+    res['colour_focal'] = [ccalls[0]['px'], ccalls[0]['py']] if ccalls else None
+    res['sal_p99_over_median'] = float(np.percentile(S, 99) / np.median(S))
+    box = SUBJECT.get(name)
+    if box:
+        res['focal_on_subject'] = bool(calls and in_box(calls[0]['px'] * W, calls[0]['py'] * H, box, W, H))
+        res['colour_focal_on_subject'] = bool(ccalls and in_box(ccalls[0]['px'] * W, ccalls[0]['py'] * H, box, W,
+                                                                  H))
+        rk = [i for i, c in enumerate(calls) if in_box(c['px'] * W, c['py'] * H, box, W, H)]
+        res['subject_call_rank'] = rk[0] + 1 if rk else None
+        rk = [i for i, c in enumerate(ccalls) if in_box(c['px'] * W, c['py'] * H, box, W, H)]
+        res['subject_colour_rank'] = rk[0] + 1 if rk else None
+    if save_maps:
+        np.save(os.path.join(SCRATCH, 'maps', '%s_V.npy' % name), V.astype(np.float32))
+    # the brightest 1 % at the notan squint: where is the light?
+    Ls4 = squint(L, NOTAN)
+    t = np.percentile(Ls4, 99)
+    yy, xx = np.nonzero(Ls4 >= t)
+    res['bright1_centroid'] = [round(float(xx.mean() / W), 3), round(float(yy.mean() / H), 3)]
+    res['bright1_spread'] = round(float(np.hypot(xx.std() / W, yy.std() / H)), 3)
     if save_maps:
         np.save(os.path.join(SCRATCH, 'maps', '%s_quiet.npy' % name), quiet)
         np.save(os.path.join(SCRATCH, 'maps', '%s_sal.npy' % name), S.astype(np.float32))
-        np.save(os.path.join(SCRATCH, 'maps', '%s_blobs.npy' % name), bcc.astype(np.int16))
         Image.fromarray(rgb).save(os.path.join(SCRATCH, 'maps', '%s_400.png' % name))
     return res
 
@@ -288,13 +382,13 @@ def cmd_measure(names=None):
     for n in names:
         out[n] = measure_one(n)
         r = out[n]
-        print('%-22s eta2 %.2f eta3 %.2f eta5 %.2f | masses3 %2d top3 %.2f frags3/100k %5.1f bnd3 %.3f | quiet %.2f '
-              'largest %.2f big %d | neff %.1f eq %d top %.2f 2nd %.2f focal %s | dark %.3f Lmed %.0f' % (
-                  n, r['eta2'], r['eta3'], r['eta5'], r['masses3'], r['top3_share3'], r['frags3_per100k'],
-                  r['boundary3'], r['quiet_share'], r['quiet_largest'], r['quiet_regions_2pc'], r['sal_neff'],
-                  r['sal_equal_weight'], r['sal_top_share'], r['sal_second_over_first'],
-                  None if r['focal'] is None else '(%.2f,%.2f)' % tuple(r['focal']), r['dark_share_L40'],
-                  r['L_median']))
+        a = r['s4_k3']
+        print('%-20s s4k3 masses %2d cover %.2f top3 %.2f pieces %3d | quiet %.2f L %.2f 2nd %.2f thirds %s | calls %2d '
+              'rivals %2d focal %s on-subj %s (#%s) | colour calls %2d rivals %2d focal %s on-subj %s (#%s)'
+              % (n, a['masses'], a['mass_cover'], a['top3'], a['pieces'], r['quiet_share'], r['quiet_largest'],
+                 r['quiet_second'], [round(v, 2) for v in r['quiet_by_third']], r['calls'], r['rivals'], r['focal'],
+                 r.get('focal_on_subject'), r.get('subject_call_rank'), r['colour_calls'], r['colour_rivals'],
+                 r['colour_focal'], r.get('colour_focal_on_subject'), r.get('subject_colour_rank')))
     return out
 
 

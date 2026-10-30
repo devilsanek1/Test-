@@ -91,8 +91,14 @@ def cloud_after():
     cov = G.fill_outline(P, (PH, PW))
     a = G.edge_alpha(cov, 'sheet/cloud/e', light=(-0.75, -0.65), found=0.4, lost=0.3, crisp_w=1.4, soft_w=(4.0, 9.0),
                      lost_w=(14.0, 24.0), teeth_px=(2.0, 4.0), teeth_dir_deg=0, slow_px=110, broken=0.15)
-    lit, shade = G.shade3(cov, 'sheet/cloud/l', light=(-0.75, -0.65), scale=R / 20, big=R / 4, big_w=0.35,
-                          lit_t=0.06, shade_t=-0.14, wander=0.08, wander_px=40)
+    lit, shade = G.shade3(cov, 'sheet/cloud/l', light=(-0.75, -0.65), scale=R / 20, big=R / 4, big_w=0.25,
+                          lit_t=0.0, shade_t=-0.3, wander=0.08, wander_px=40)
+    # the belly: a band over the flat base, its top wavy (the billows hang into it): the cumulus's own shade
+    yy, xx = np.mgrid[0:PH, 0:PW]
+    band = 272 - 205 * 0.2 + 9 * G.noise2d((PH, PW), 45, 'sheet/cloud/belly', 4, gain=0.6)   # a short octave too: never an arc
+    belly = np.clip((yy - band) / 2.0 + 0.5, 0, 1) * cov
+    shade = np.maximum(shade, belly)
+    lit = np.minimum(lit, 1 - belly)
     put(img, a, CLOUD_BODY)
     put(img, np.minimum(lit, a), CLOUD_LIT)
     put(img, np.minimum(shade, a), CLOUD_SHADE)
@@ -444,6 +450,8 @@ def main():
                   flush=True)
     if not args.no_seeds:
         res['seed_check'] = _clean(seed_check())
+    elif os.path.exists(os.path.join(args.out, 'shapes_generators.json')):   # keep the last seed check
+        res['seed_check'] = json.load(open(os.path.join(args.out, 'shapes_generators.json'))).get('seed_check')
     json.dump(res, open(os.path.join(args.out, 'shapes_generators.json'), 'w'), indent=1)
     if args.sheet:
         compose(res, args.out, os.path.join(HERE, 'shapes_generators.png'))

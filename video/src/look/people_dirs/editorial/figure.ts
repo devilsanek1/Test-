@@ -28,23 +28,39 @@ export type Person = {
   face: FaceSpec;
 };
 
-const neckPart = (sk: Skeleton, v: View, r: HeadRig): Part => {
+const neckChain = (sk: Skeleton, r: HeadRig): V3[] => {
   const b = sk.b;
   // from inside the collar up under the jaw, slanting forward ~13 degrees (design_research §11.4): the throat meets the
   // jaw ~0.3 h behind the chin, the nape leaves the skull's base far back
   const base = add3(sk.neckBase, [0, -16, -2]);
   const top = r.xf([0, b.pivotY + 0.08 * b.skull, -0.1 * b.skull]);
   const mid: V3 = [lerp(base[0], top[0], 0.5), lerp(base[1], top[1], 0.5), lerp(base[2], top[2], 0.5) + 2];
-  const pts = tubeOutline([base, mid, top], (u) => ({ru: b.neckR * (1.1 - 0.12 * u), rv: b.neckD * (1.08 - 0.06 * u)}), v, [0, 0, 1], {m: 14});
+  return [base, mid, top];
+};
+const neckR = (b: Skeleton['b']) => (u: number) => ({ru: b.neckR * (1.1 - 0.12 * u), rv: b.neckD * (1.08 - 0.06 * u)});
+/** The neck, under the tops: a crew or mock neckline covers its base, an open collar shows the chest under it. */
+const neckPart = (sk: Skeleton, v: View, r: HeadRig): Part => {
+  const pts = tubeOutline(neckChain(sk, r), neckR(sk.b), v, [0, 0, 1], {m: 14});
   return {k: 'neck', pts, mat: 'skin', z: Z.neck, tension: 0.5};
+};
+/** The neck above the front neckline, drawn over the outer layers when we see the front or the side: a coat's or a
+ *  jacket's back collar stands BEHIND the neck there (from behind, the collar covers the nape instead). */
+const neckTopPart = (sk: Skeleton, v: View, r: HeadRig): Part | null => {
+  if (Math.cos((v.yaw * Math.PI) / 180) < -0.2) return null;
+  const [base, mid, top] = neckChain(sk, r);
+  const k = 0.32;
+  const from: V3 = [lerp(base[0], top[0], k), lerp(base[1], top[1], k), lerp(base[2], top[2], k)];
+  const rr = neckR(sk.b);
+  const pts = tubeOutline([from, mid[1] > from[1] ? mid : from, top].filter((p, i, a) => i === 0 || p !== a[i - 1]), (u) => rr(k + (1 - k) * u), v, [0, 0, 1], {m: 10, capStart: false});
+  return {k: 'neckTop', pts, mat: 'skin', z: Z.outer + 1, tension: 0.5, grp: 'neckG'};
 };
 
 /** The head's cast shadow on the neck: the head's outline shifted away from the key, clipped to the neck (a crisp shape
  *  under the jaw: the classic editorial device that turns a neck from a pipe into a form). */
-const jawShadow = (head: PP[], key: V2, h: number): Part => {
+const jawShadow = (head: PP[], key: V2, h: number, onTop: boolean): Part => {
   const dx = -key[0] * 0.05 * h;
   const dy = 0.13 * h;
-  return {k: 'jawShadow', pts: head.map((p) => [p[0] + dx, p[1] + dy] as PP), mat: 'skin', tone: 'shade', z: Z.neck + 0.5, clip: 'neck', tension: 0.42};
+  return {k: 'jawShadow', pts: head.map((p) => [p[0] + dx, p[1] + dy] as PP), mat: 'skin', tone: 'shade', z: onTop ? Z.outer + 1.5 : Z.neck + 0.5, clip: onTop ? 'neckTop' : 'neck', tension: 0.42};
 };
 
 /** The ear (short hair only): a small skin shape at the side, t 0.43-0.63, where that side faces the camera. */
@@ -72,27 +88,46 @@ const earPart = (sk: Skeleton, v: View, r: HeadRig): Part | null => {
   return {k: 'ear', pts, mat: 'skin', z: Z.hairDetail + 1, tension: 0.55};
 };
 
-function faceParts(p: Person, sk: Skeleton, v: View, r: HeadRig): Part[] {
+/** The face budget by the head's size on screen (design_research §11.3; the skull's height in px):
+ *   < 12 px   nothing but the facing (where skin meets hair); sunglasses from ~11 px
+ *   12-18     ONE of: the profile line (the geometry), sunglasses, the lost profile's cheek
+ *   18-40     + at most one mark: a lash (profile, lost profile), or in a 3/4 front face the nose shade
+ *   >= 40     close shots: both lashes on a 3/4 front face, the T-shade, a lip tone, the lost profile's flick */
+function faceParts(p: Person, sk: Skeleton, v: View, r: HeadRig, key: V2, skullPx: number): Part[] {
   const out: Part[] = [];
   const fy = Math.abs(faceYaw(r));
+  const close = skullPx >= 40;
+  const mark = skullPx >= 18;
   if (p.face.glasses) {
+    if (skullPx < 11) return out;
     const g = sunglasses(r, v);
     g.lenses.forEach((l, i) => out.push({k: `lens${i}`, pts: l, mat: 'lens', tone: 'base', z: Z.hairDetail + 2, tension: 0.45}));
     if (g.bridge) out.push({k: 'bridge', pts: g.bridge, mat: 'lens', tone: 'base', z: Z.hairDetail + 2, tension: 0.4});
-    g.arms.forEach((a, i) => out.push({k: `garm${i}`, pts: a, mat: 'lens', tone: 'base', z: Z.hairDetail + 1.5, line: 0.006 * sk.b.skull * 8, tension: 0.4}));
-    g.glints.forEach((gl, i) => out.push({k: `glint${i}`, pts: gl, mat: 'lens', tone: 'sheen', z: Z.hairDetail + 2.5, clip: `lens${0}`, tension: 0.4}));
-  } else if (p.face.lash !== 'none' && fy > 25 && fy < 150) {
-    const l = lashLine(r, v, p.face.lash === 'open', p.face.lash === 'closed' ? 0.006 : 0);
+    if (mark) g.arms.forEach((a, i) => out.push({k: `garm${i}`, pts: a, mat: 'lens', tone: 'base', z: Z.hairDetail + 1.5, line: 0.006 * sk.b.skull * 8, tension: 0.4}));
+    if (mark) g.glints.forEach((gl, i) => out.push({k: `glint${i}`, pts: gl, mat: 'lens', tone: 'sheen', z: Z.hairDetail + 2.5, clip: `lens${0}`, tension: 0.4}));
+    return out;
+  }
+  const frontal = fy < 62;
+  if (mark && p.face.lash !== 'none' && fy < 150 && (!frontal || close)) {
+    // the one mark: a lash line (open = looking, closed = serene or looking down); a 3/4 front face shows both eyes'
+    // lashes (the far one foreshortened), never one eye, so it gets lashes only when close
+    const open = p.face.lash === 'open';
+    const lower = p.face.lash === 'closed' ? 0.006 : 0;
+    const l = lashLine(r, v, open, lower);
     if (l) out.push({k: 'lash', pts: l, mat: 'hair', tone: 'deep', z: Z.face + 0.5, line: 4.2, tension: 0.5});
+    const l2 = frontal ? lashLine(r, v, open, lower, true) : null;
+    if (l2) out.push({k: 'lash2', pts: l2, mat: 'hair', tone: 'deep', z: Z.face + 0.5, line: 3.6, tension: 0.5});
   }
-  if (p.face.planes && fy < 75) {
-    const n = noseShade(r, v);
-    if (n) out.push({k: 'noseShade', pts: n, mat: 'skin', tone: 'shade', z: Z.face, clip: 'head', op: 0.85, tension: 0.5});
+  if (mark && frontal && (p.face.planes || !close)) {
+    const n = noseShade(r, v, key[0]);
+    if (n) out.push({k: 'noseShade', pts: n, mat: 'skin', tone: 'shade', z: Z.face, clip: 'head', op: 0.6, tension: 0.5});
+  }
+  if (close && p.face.planes) {
     const lt = lipTone(r, v);
-    if (lt) out.push({k: 'lips', pts: lt, mat: 'lip', tone: 'base', z: Z.face, clip: 'head', op: 0.9, tension: 0.55});
+    if (lt) out.push({k: 'lips', pts: lt, mat: 'lip', tone: 'base', z: Z.face, clip: 'head', op: 0.55, tension: 0.6});
   }
-  const lf = lostFlick(r, v);
-  if (lf && !p.face.glasses) out.push({k: 'flick', pts: lf, mat: 'hair', tone: 'deep', z: Z.hairDetail + 0.5, line: 3.6, tension: 0.4});
+  const lf = mark ? lostFlick(r, v) : null;
+  if (lf) out.push({k: 'flick', pts: lf, mat: 'hair', tone: 'deep', z: Z.hairDetail + 0.5, line: 3.2, tension: 0.4});
   return out;
 }
 
@@ -227,7 +262,8 @@ function phone(sk: Skeleton, v: View): Part[] {
 
 export type Built = {parts: Part[]; ground: {x: number; w: number}; sk: Skeleton};
 
-export function buildPerson(p: Person, pose: Pose, flip = false): Built {
+/** `px` = the figure's height on screen (crown to sole): the face's detail follows it (faceParts). */
+export function buildPerson(p: Person, pose: Pose, flip = false, px = 640): Built {
   const v: View = {yaw: pose.yaw};
   const key: V2 = [flip ? 0.82 : -0.82, -0.57];
   const sk = skeleton(p.build, pose);
@@ -235,17 +271,20 @@ export function buildPerson(p: Person, pose: Pose, flip = false): Built {
   const parts: Part[] = [];
   parts.push(...outfit(p, sk, v));
   const neck = neckPart(sk, v, r);
+  neck.grp = 'neckG';
   parts.push(neck);
+  const neckTop = neckTopPart(sk, v, r);
+  if (neckTop) parts.push(neckTop);
   const headPts = loftOutline(r.secs, v, r.xf);
   parts.push({k: 'head', pts: headPts, mat: 'skin', z: Z.head, tension: 0.42});
-  parts.push(jawShadow(headPts, key, p.build.skull));
+  parts.push(jawShadow(headPts, key, p.build.skull, !!neckTop));
   const hr = hair(p.hair, p.build, sk, r, v, 'hair', neck.pts, {key});
   parts.push(...hr.parts);
   if (p.hair === 'twists' || p.hair === 'pony') {
     const e = earPart(sk, v, r);
     if (e) parts.push(e);
   }
-  parts.push(...faceParts(p, sk, v, r));
+  parts.push(...faceParts(p, sk, v, r, key, (px * p.build.skull) / 1000));
   parts.sort((a, b) => a.z - b.z);
   const al = proj(sk.ankle.l, v);
   const ar = proj(sk.ankle.r, v);

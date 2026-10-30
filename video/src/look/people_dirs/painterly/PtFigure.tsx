@@ -4,8 +4,8 @@
 // is in camera space, so a figure keeps its light when it turns. Everything is deterministic (no randomness).
 import React, {useMemo} from 'react';
 import {buildModel, type Person} from './figure';
-import type {Pose} from './body';
-import {type Cam} from './mesh';
+import {type Pose, skeleton} from './body';
+import {type Cam, project} from './mesh';
 import {paintFigure} from './paint';
 import {type Rig, DUSK} from './color';
 import {type V3, nrm} from './math';
@@ -15,7 +15,7 @@ export type View = 'front34' | 'front34R' | 'profileL' | 'profileR' | 'back' | '
 export const yawOf = (v: View): number =>
   typeof v === 'number'
     ? v
-    : {front34: -32, front34R: 32, profileL: -90, profileR: 90, back: 180, back34: 148, front: 0}[v];
+    : {front34: -32, front34R: 32, profileL: -90, profileR: 90, back: 180, back34: -150, front: 0}[v];
 
 /** The default light: the key from the upper left and a little in front, the sky rim from the right and behind. */
 export const KEY_LEFT: {L: V3; R: V3} = {L: nrm([-0.62, 0.5, 0.6]), R: nrm([0.82, 0.22, -0.52])};
@@ -41,6 +41,8 @@ export type FigureProps = {
   groundGrad?: number;
   brush?: number;
   flat?: boolean;
+  /** The black-fill test colour. */
+  silhouette?: string;
 };
 
 export function camFor(p: {view: View; h: number; x: number; y: number; light?: {L: V3; R: V3}; eye?: number; dist?: number}): Cam {
@@ -54,5 +56,12 @@ export const PainterlyFigure: React.FC<FigureProps> = (p) => {
   const res = p.res ?? resFor(p.h);
   const model = useMemo(() => buildModel(p.person, p.pose, res), [p.person, p.pose, res]);
   const cam = camFor(p);
-  return paintFigure(model, cam, {rig: p.rig ?? DUSK, uid: p.uid, shadow: p.shadow, groundGrad: p.groundGrad, brush: p.brush, flat: p.flat});
+  return paintFigure(model, cam, {rig: p.rig ?? DUSK, uid: p.uid, shadow: p.shadow, groundGrad: p.groundGrad, brush: p.brush, flat: p.flat, silhouette: p.silhouette});
 };
+
+/** Where a figure's face is on screen (the skull's centre, a little below the eyes): for crops on the head. */
+export function headCentre(person: Person, pose: Pose, cam: Cam): [number, number] {
+  const sk = skeleton(person.build, pose);
+  const o = sk.head.o;
+  return project(cam, [o[0], o[1] + 0.02 * person.build.head, o[2]]);
+}

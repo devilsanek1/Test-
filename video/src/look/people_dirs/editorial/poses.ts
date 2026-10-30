@@ -14,8 +14,9 @@ export const POSES = {
   herWeekendFront: {yaw: 34, weight: 'l', contra: 1, free: {fwd: 40, out: 10, turn: 26}, armL: {kind: 'jeansPocket'}, armR: {kind: 'strap'}, head: {turn: 12, nod: 1, roll: -2}} as Pose,
   /** Her B, profile: walking, the near hand holding the tote's strap at the hip, the far arm swinging. */
   herWeekendProfile: {yaw: 90, walk: 1.12, armL: {kind: 'hold'}, armR: {kind: 'swing', amount: 12}, head: {nod: 2}} as Pose,
-  /** Her B, from behind: contrapposto, the tote on her left shoulder, the arms easy, the ponytail down her back. */
-  herWeekendBack: {yaw: 192, weight: 'r', contra: 1, free: {fwd: 26, out: 16, turn: 20}, armL: {kind: 'hang'}, armR: {kind: 'hang'}, head: {turn: 24, nod: 0}} as Pose,
+  /** Her B, from behind: contrapposto, the tote on her left shoulder, the right hand in the back pocket, the ponytail
+   *  down her back. */
+  herWeekendBack: {yaw: 192, weight: 'r', contra: 1, free: {fwd: 26, out: 16, turn: 20}, armL: {kind: 'hang'}, armR: {kind: 'backPocket'}, head: {turn: 24, nod: 0}} as Pose,
   /** The man, front 3/4: the near hand in the trouser pocket, the far hand holding the phone; looking down at it. */
   manFront: {yaw: 36, weight: 'r', contra: 0.8, free: {fwd: 40, out: 18, turn: 26}, armL: {kind: 'phone'}, armR: {kind: 'pocket'}, head: {turn: 4, nod: 22}} as Pose,
   /** The woman, front 3/4 (drawn facing right): the thumb hooked in the jeans pocket, the head turned to a profile. */

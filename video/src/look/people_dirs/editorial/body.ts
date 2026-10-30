@@ -125,7 +125,7 @@ export const MAN: Build = {
 // ---------------------------------------------------------------- the pose
 
 export type Side = 'l' | 'r';
-export type ArmKind = 'hang' | 'pocket' | 'jeansPocket' | 'phone' | 'phoneLow' | 'strap' | 'swing' | 'hold';
+export type ArmKind = 'hang' | 'pocket' | 'jeansPocket' | 'backPocket' | 'phone' | 'phoneLow' | 'strap' | 'swing' | 'hold';
 export type ArmPose = {kind: ArmKind; amount?: number};
 
 export type Pose = {
@@ -329,6 +329,13 @@ export function skeleton(b: Build, pose: Pose): Skeleton {
         target = [S[0] - ss * 6, b.shY - 60 - bob, 62];
         pole = [ss * 0.7, -1, -0.5];
         hd = 'grip';
+        break;
+      }
+      case 'backPocket': {
+        // the hand slipped into the back jeans pocket: the elbow out and back, the hand hidden on the seat
+        target = [cx(b.hipY) + ss * (b.hipA - 34), b.hipY + 18 - bob, -b.hipBb + 6];
+        pole = [ss * 1, -0.1, -0.35];
+        hd = 'hidden';
         break;
       }
       case 'hold': {

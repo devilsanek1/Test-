@@ -45,10 +45,14 @@ export type PaintOpts = {
   groundGrad?: number;
   /** Dry-brush break of the shade edges (0 = off); automatic below 300 px. */
   brush?: number;
+  /** A fine paint grain over the figure, locked to it (0 = off; default 1 at >= 260 px). */
+  grain?: number;
   /** A unique id prefix (filters, clips). */
   uid: string;
   /** Debug: draw outlines only. */
   flat?: boolean;
+  /** The black-fill test: every surface in this one colour, no light, no shadow (design_research L1). */
+  silhouette?: string;
 };
 
 type Entry = {sf: Surface; reg: Regions; under: boolean; key: number};
@@ -125,7 +129,7 @@ export function paintFigure(model: Model, cam: Cam, opt: PaintOpts): React.React
     return `url(#${P}-${k})`;
   };
   const blurId = (u?: number) => (u === undefined || u <= 0 ? undefined : u <= 3 ? 'bD1' : u <= 7 ? 'bD2' : 'bD3');
-  const decals: Decal[] = model.decals.flatMap((f) => f(cam));
+  const decals: Decal[] = opt.silhouette ? [] : model.decals.flatMap((f) => f(cam));
   const byTarget = new Map<string, Decal[]>();
   const loose: Decal[] = [];
   for (const d of decals) {
@@ -159,12 +163,16 @@ export function paintFigure(model: Model, cam: Cam, opt: PaintOpts): React.React
     const t = tones[e.sf.mat] ?? planes('#FF00FF', 'cloth', rig);
     const id = `${P}-c${n++}`;
     if (e.under) {
-      body.push(<path key={`${id}u`} d={e.reg.under} fill={t.under} />);
+      body.push(<path key={`${id}u`} d={e.reg.under} fill={opt.silhouette ?? t.under} />);
       unionPaths.push(e.reg.under);
       continue;
     }
     const r = e.reg;
     unionPaths.push(r.outline);
+    if (opt.silhouette) {
+      body.push(<path key={id} d={r.outline} fill={opt.silhouette} />);
+      continue;
+    }
     if (opt.flat || e.sf.flat) {
       body.push(<path key={id} d={r.outline} fill={t.lit} />);
       const ds = byTarget.get(e.sf.key);
@@ -192,7 +200,7 @@ export function paintFigure(model: Model, cam: Cam, opt: PaintOpts): React.React
   }
   // the contact shadow
   let shadow: React.ReactNode = null;
-  if (opt.shadow !== null && model.feet.length) {
+  if (opt.shadow !== null && !opt.silhouette && model.feet.length) {
     const pts = model.feet.map((f) => project(cam, f));
     const xs = pts.map((p) => p[0]);
     const y = Math.max(...pts.map((p) => p[1]));
@@ -201,17 +209,28 @@ export function paintFigure(model: Model, cam: Cam, opt: PaintOpts): React.React
     shadow = <ellipse cx={cx} cy={y + 2 * s} rx={rx} ry={Math.max(2, 16 * s)} fill={opt.shadow ?? '#C9B3A8'} style={{mixBlendMode: 'multiply'}} filter={`url(#${P}-bD2)`} />;
   }
   // the soft ground occlusion over the whole figure: no change above the knees, a little deeper toward the feet
-  const gg = opt.groundGrad ?? 0.5;
+  const gg = opt.silhouette ? 0 : opt.groundGrad ?? 0.5;
   const union = unionPaths.join('');
   const gTop = project(cam, [0, 420, 0])[1];
   const gBot = project(cam, [0, 0, 0])[1];
+  // the paint grain: a fine, sparse mottle in the figure's own units (it rides the figure, never the screen)
+  const gr = opt.silhouette ? 0 : opt.grain ?? (small ? 0 : 1);
+  const grainEl =
+    gr > 0 ? (
+      <>
+        <defs>
+          <filter id={`${P}-grain`} filterUnits="userSpaceOnUse" x={fx} y={fy} width={fw} height={fh} colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency={`${fmt3(1 / (3.2 * s))} ${fmt3(1 / (4.6 * s))}`} numOctaves={1} seed={11} result="t" />
+            <feColorMatrix in="t" type="matrix" values="0 0 0 0 0.36  0 0 0 0 0.27  0 0 0 0 0.3  1.3 0 0 0 -0.6" />
+          </filter>
+        </defs>
+        <rect x={fx} y={fy} width={fw} height={fh} filter={`url(#${P}-grain)`} clipPath={`url(#${P}-u)`} opacity={0.07 * gr} style={{mixBlendMode: 'multiply'}} />
+      </>
+    ) : null;
   const gradEl =
     gg > 0 ? (
       <>
         <defs>
-          <clipPath id={`${P}-u`}>
-            <path d={union} />
-          </clipPath>
           <linearGradient id={`${P}-g`} x1="0" y1={fmt(gTop)} x2="0" y2={fmt(gBot)} gradientUnits="userSpaceOnUse">
             <stop offset="0" stopColor="#FFFFFF" />
             <stop offset="1" stopColor={mixLab('#FFFFFF', '#6E5A78', 0.3 * gg)} />
@@ -222,10 +241,16 @@ export function paintFigure(model: Model, cam: Cam, opt: PaintOpts): React.React
     ) : null;
   return (
     <g>
-      <defs>{defs}</defs>
+      <defs>
+        {defs}
+        <clipPath id={`${P}-u`}>
+          <path d={union} />
+        </clipPath>
+      </defs>
       {shadow}
       {body}
       {gradEl}
+      {grainEl}
       {loose.map(decalEl)}
     </g>
   );

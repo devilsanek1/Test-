@@ -4,7 +4,7 @@
 // ground; her in the painted still v6's doorway (before / after, 1:1 and 2x).
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
-import {PainterlyFigure, type View, KEY_LEFT} from './PtFigure';
+import {PainterlyFigure, type View, KEY_LEFT, camFor, headCentre} from './PtFigure';
 import {CAST, CAST_POSES, type Views} from './cast';
 import {DOOR_AFTER, DOOR_BEFORE, DOOR_CROP, DOOR_SPOT} from './doorway';
 import {poseKey} from './Test';
@@ -44,18 +44,35 @@ const fig = (who: string, view: View, h: number, x: number, y: number, uid: stri
   return <PainterlyFigure key={uid} person={p} pose={ps} view={view} h={h} x={x} y={y} uid={uid} />;
 };
 
+/** The direction's palette as worn (the rig derives each material's lit, shade, highlight and rim planes from these). */
+const PALETTE: {name: string; c: string[]}[] = [
+  {name: 'skin', c: ['#E0B196', '#C79671', '#8B5A42']},
+  {name: 'hair', c: ['#8C4C33', '#3A2B27', '#2B2324']},
+  {name: 'her', c: ['#0B8577', '#2E2426', '#EFE5D8', '#6E2E33', '#476E8E']},
+  {name: 'cast', c: ['#B58058', '#254161', '#F0EAE1', '#664334', '#2E2426']},
+  {name: 'rig', c: ['#F2C98A', '#9C8FC0']},
+];
+
 const VIEW_NAME: Record<string, string> = {front34: 'front 3/4, standing', profileL: 'profile, walking', back: 'from behind, turning'};
 
-/** A head crop: the figure drawn at `H` px, the window on its head and shoulders. */
-const HeadCrop: React.FC<{who: string; view: View; x: number; y: number; w: number; h: number; uid: string; label: string}> = ({who, view, x, y, w, h, uid, label}) => {
-  const H = 1700;
+/** A head crop: the figure drawn at 640 px (the face budget of a 640 px figure), shown `zoom` x, centred on the head. */
+const HeadCrop: React.FC<{who: string; view: View; x: number; y: number; w: number; h: number; uid: string; label: string; zoom?: number}> = ({who, view, x, y, w, h, uid, label, zoom = 2.6}) => {
+  const H = 640;
+  const p = CAST[who];
+  const ps = CAST_POSES[who][poseKey(view)];
+  const cam = camFor({view, h: H, x: 0, y: 0});
+  const [hx, hy] = headCentre(p, ps, cam);
+  const vw = w / zoom;
+  const vh = h / zoom;
+  const vx = hx - vw / 2;
+  const vy = hy - vh * 0.36;
   return (
     <g>
-      <svg x={x} y={y} width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
-        <rect width={w} height={h} fill="#D8CACA" />
-        {fig(who, view, H, w / 2, 60 + H, uid)}
+      <svg x={x} y={y} width={w} height={h} viewBox={`${vx} ${vy} ${vw} ${vh}`}>
+        <rect x={vx} y={vy} width={vw} height={vh} fill="#D8CACA" />
+        <PainterlyFigure person={p} pose={ps} view={view} h={H} x={0} y={0} uid={uid} />
       </svg>
-      <Label x={x + w / 2} y={y + h + 34} size={22}>
+      <Label x={x + w / 2} y={y + h + 34} size={21}>
         {label}
       </Label>
     </g>
@@ -125,16 +142,16 @@ export const PtSheet: React.FC = () => {
           long open coat, dark column
         </Label>
         <Label x={860} y={Y_SUP + 50} size={30} color={INK} anchor="start" weight={700}>
-          The face: a soft suggestion (heads drawn at 1700 px)
+          The face, a soft suggestion: as drawn at 640 px, shown 2.6x
         </Label>
         {(
           [
-            ['herEvening', 'front34', 'lids lowered, a lip tone'],
-            ['herEvening', 'profileL', 'profile: the skin edge'],
-            ['herEvening', 'back34', 'lost profile'],
+            ['herEvening', 'front34', 'lids lowered, lip tone'],
+            ['herEvening', 'profileL', 'profile: skin edge'],
+            ['herWeekend', 'back34', 'lost profile'],
             ['herWeekend', 'front34', 'the brim hides the eyes'],
-            ['man', 'front34', 'deep skin, warm sheen'],
-            ['woman', 'front34', 'oversized sunglasses'],
+            ['man', 'front34', 'deep skin, a sheen'],
+            ['woman', 'front34', 'big sunglasses'],
           ] as [string, View, string][]
         ).map(([who, v, l], i) => (
           <HeadCrop key={`fc${i}`} who={who} view={v} x={860 + i * 252} y={Y_SUP + 90} w={240} h={620} uid={`fc${i}`} label={l} />
@@ -175,6 +192,36 @@ export const PtSheet: React.FC = () => {
         <Label x={60 + dc.w * 2 + 80 + 280} y={Y_DOOR + 70 + 600 + 36} size={22}>
           2x
         </Label>
+
+        {/* the black-fill test at 140 px and the palette */}
+        <Label x={1800} y={Y_DOOR + 50} size={26} color={INK} anchor="start" weight={700}>
+          Filled black, 140 px
+        </Label>
+        {(
+          [
+            ['herEvening', 'front34'],
+            ['herWeekend', 'profileL'],
+            ['man', 'front34'],
+            ['woman', 'front34'],
+          ] as [string, View][]
+        ).map(([who, v], i) => {
+          const pr = CAST[who];
+          const ps = CAST_POSES[who][poseKey(v)];
+          return <PainterlyFigure key={`bk${i}`} person={pr} pose={ps} view={v} h={140} x={1850 + i * 140} y={Y_DOOR + 80 + 150} uid={`bk${i}`} silhouette="#2A2022" />;
+        })}
+        <Label x={1800} y={Y_DOOR + 300} size={26} color={INK} anchor="start" weight={700}>
+          Palette (as worn, before the light)
+        </Label>
+        {PALETTE.map((row, r) => (
+          <g key={`pr${r}`}>
+            <Label x={1800} y={Y_DOOR + 352 + r * 78} size={18} anchor="start">
+              {row.name}
+            </Label>
+            {row.c.map((c, i) => (
+              <rect key={c + i} x={1920 + i * 62} y={Y_DOOR + 326 + r * 78} width={54} height={40} rx={4} fill={c} />
+            ))}
+          </g>
+        ))}
       </svg>
     </AbsoluteFill>
   );
