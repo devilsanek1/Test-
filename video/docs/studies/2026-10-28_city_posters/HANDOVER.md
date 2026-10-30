@@ -21,7 +21,14 @@ points and conclusions into the main repo"). The brief is `README.md` here; the 
   engine + look fit) -> core / situational / rare tiers (owner override) -> guidelines (by beat and emotion; sequencing
   and rhythm; the motion and transition grammar) -> the Helsinki pass on its 12 shots (commit on
   `claude/kind-pascal-lvgsza` beside its visual script). Then COMPOSITION_SHOTS' 14 clashes after the owner settles it.
-- Still queued: sound sync (refs in `video/docs/look/refs_sound_sync/`); painter v7 (ORGANIC.md §6).
+- DONE: the device catalogue (owner's 41: 24 used, 17 adapted, 0 rejected; `COMPOSITION_SHOTS.md` Part 1;
+  `composition/devices_sheet.png`, sent to the owner).
+- RUNNING in parallel (owner: "remember to parallelize work"): workflow `sound-sync-research` (run `wf_74169695-356`,
+  script `.../workflows/scripts/sound-sync-research-wf_74169695-356.js`): the owner's 2 reels measured (the spine), the
+  craft, our audit -> `video/docs/look/sound_sync/` -> the distill `video/docs/look/SOUND_SYNC.md` +
+  `sound_sync/PROPOSED_DOC_EDITS.md` (the orchestrator applies). Its PRACTICE: the Helsinki cue plan, with the
+  composition pass (text only before G3).
+- Still queued: painter v7 (ORGANIC.md §6).
 
 ## Status 2026-10-30 ~12:50 UTC: organic synthesis + composition research running; sound sync queued
 - organic-look DONE: `video/docs/look/ORGANIC.md` (the v7 roadmap §6; 27 doc clashes §8; 3 owner questions at the end
