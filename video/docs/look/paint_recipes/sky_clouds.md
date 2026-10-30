@@ -260,6 +260,12 @@ which are 2-3 px with 0.6 px AA.
 **(f) IMPLEMENTATION.** `sky_ramp`, `sun_warmth`, `paint_sky`, `hatch_field` (5.5).
 
 ### 3.2 The near cumulus (plane 1)
+**Since 2026-10-30 (playbook ORGANIC, NOT GEOMETRIC; `PAINT_RECIPES.md` §2.1):** each billow below is an ellipse on the
+same size ladder, never a round lobe (aspect 0.6-0.98, tilted +-12-20 degrees, sunk 35-75 % into its parent), its
+outline displaced by the cloud octaves (0.4 R / 0.2 R / 0.1 R at 2.2 / 1.3 / 0.7 % of R RMS), so compass arcs stay <=
+10 % of the outline (v6 27 %) and found and lost edges alternate along >= 70 % of it (`ORGANIC.md` §4.1). The "+-4.5 %
+in 3 slow harmonics" wobble below is too smooth for that: it reads as arcs. The light, values and passes still hold.
+
 **(a) DESIGN.**
 1. **Billows.** A hand-placed list `(cx, cy, r, flat, z)` of 10-14 billows.
    - **Size ladder:** 1 : 0.75 : 0.55 : 0.4 : 0.25 : 0.15. Here r is 132, 104, 80, 78, 74, 70, 66, 56, 37, 36, 27,
@@ -432,7 +438,9 @@ level strokes.
   band (CRAFT g.2), never saturated.
 - **Its lower part** sits behind the far roofs, which cut it with one level edge.
 - **The glow** is the sky's warmth ellipse (3.1 a) plus the warm lit undersides of the streaks and decks nearest the
-  sun. **No halo disc.**
+  sun. **No halo disc.** Since 2026-10-30 (playbook PROPER LIGHT; CRAFT §g.2) a sun that is the key but not the story
+  light also carries a gentle bloom: <= +2-3 L* at its edge, its wide blurs stretched 1.8-2.4x along the horizon,
+  never a ring; it is baked with the scene's light maps (`ORGANIC.md` §4.2), not by this recipe.
 
 **(b) PAINT.** One flat shape, then the roofs over it.
 

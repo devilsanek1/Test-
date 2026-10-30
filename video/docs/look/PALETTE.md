@@ -59,8 +59,10 @@ every palette against the DNA below.
 **The house DNA** keeps the palettes one family. The numbers are CIE L* (lightness) and C (colourfulness):
 - **Background:** soft and light (L* >= 75, C <= 20), never saturated or dark. It fills 50-80 % of the frame.
 - **Mids:** soft, from our clay family (cream, peach, terracotta, rose, leaf sage) or the palette's own tints; never
-  beige, muddy tan, olive or grey (playbook "Warm, never sickly", v3 G4). Props and figures are
-  flat shapes without lines, parted by their lit and shade faces (`CRAFT.md` §c).
+  beige, muddy tan, olive or grey (playbook "Warm, never sickly", v3 G4). Figures are crisp flat shapes and props are
+  painted at their plane's dose (ONE painted language since 2026-10-30), all without lines, parted by their lit and
+  shade faces (`CRAFT.md` §c). Each scene keeps ONE colour key inside its palette: one strong family (the sky's own),
+  one hot accent at the focal, every other colour tone-on-tone in its mass (playbook PROPER LIGHT; `ORGANIC.md` §4.3).
 - **Where the values and the colour live** (owner, 2026-10-29: "Go with your suggestions", the city-poster study's
   decision 2; numbers `CRAFT.md` §f.8): calm lights (the page, the sky), the near world in mid-tones carrying the
   colour, and real darks drawn in many small pieces (windows, doorways, eave undersides, the shade under trees), never
@@ -159,8 +161,9 @@ thing (hair, steam).
 **What our kit has:**
 - an optional paper-grain overlay (`public/textures/grain.png`, `Card` `grain`; off by default): retired as it was;
   since 2026-10-28 a VERY subtle paper-and-paint texture is being tested again (owner: "start playing with it, very
-  subtly especially if its adding to the premium look"; `CRAFT.md` §c, which holds the test's spec), measured from the
-  city posters (`docs/studies/2026-10-28_city_posters/`);
+  subtly especially if its adding to the premium look"), measured from the city posters
+  (`docs/studies/2026-10-28_city_posters/`), and since 2026-10-30 it is the one paper per film (owner, on an overall
+  texture: "that seems solvable too?"; its spec: `CRAFT.md` §c);
 - tapered brush lines (the mascot ink; the clean pen keeps taper off unless asked).
 
 **What it lacks:** a halftone fill. Add it as an SVG `<pattern>` (dots in the fill's darker tone), applied per shape

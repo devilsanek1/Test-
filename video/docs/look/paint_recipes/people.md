@@ -1,10 +1,15 @@
 # People: a concrete recipe for the people we paint (the "you" first)
 
-**Status:** a proposal from the people study of 2026-10-29, proven as stills in `people_sheet.png` (next to this
-file). It is a look doc: it ranks below the playbook, `DIRECTION.md` and `CRAFT.md` and never overrides them. One
-item is marked as a proposal against DIRECTION (the soft body gradient, §b.6). Until the owner approves something
-here, it is only a proposal. The engine piece is `src/lib/figure/` (§g). The sheet is rendered by
-`src/entry-look-people.tsx` (`PeopleSheet`).
+**Status (2026-10-30): superseded in part by the owner's pick, direction C (MODERN GRAPHIC) with the LASH face**
+(`docs/look/PEOPLE_DESIGN.md`, which wins on people between the look docs; the playbook's people bullet). Superseded
+here, each marked in place: §a's proportions (C: about 7.8 heads), §b.6's soft body gradient (off: C draws two flat
+tones), §c's face (LASH) and §d's wardrobe (today's looks). Still in force: the silhouette rules and the line of
+action (§a), the local light (§b.5), ONE flowing element (§d), the motion specs (§e: the wind, the walk, the idle) and
+the mistakes (§f) where C agrees; rims follow CRAFT §d.8 by tier (the "you" as the subject; people near the story 2
+px). Before the pick this was a proposal from the people study of 2026-10-29, proven as stills in `people_sheet.png`
+(next to this file). It is a look doc: it ranks below the playbook, `DIRECTION.md` and `CRAFT.md` and never overrides
+them. The engine piece is `src/lib/figure/` (§g); C's code is `src/look/people_dirs/graphic/` (LASH:
+`src/look/people_dirs/graphic_faces/`). The sheet is rendered by `src/entry-look-people.tsx` (`PeopleSheet`).
 
 ## 0. What the owner asked (verbatim, 2026-10-29)
 
@@ -15,10 +20,10 @@ here, it is only a proposal. The engine piece is `src/lib/figure/` (§g). The sh
 - "Look at this example too" (resending `refs_human_scale/03_beach_dusk.jpg`, the couple walking at dusk).
 - On stills first: "Again let's start with stills", "No video yet".
 
-The rules that still hold (playbook, "People small and simple like reference 1"):
-- people are simple;
-- they are seen from behind, in rear 3/4 or in profile;
-- faces get no more than a hint;
+The rules that still hold (playbook, "People small and simple like reference 1", with its pick of 2026-10-30):
+- people are simple, beautiful and pleasant, styled like today's 20-30-year-olds;
+- they are seen from behind, in rear 3/4, in profile or turned away;
+- faces are generic: the LASH face where one is seen, only the contour under ~200 px tall;
 - they act with their pose;
 - only the one "you" stands at a real size (~130-220 px tall in 1080 x 1920).
 
@@ -113,6 +118,13 @@ through their search summaries, so the numbers this recipe relies on are our own
 
 ### a. Design: proportions, silhouette, line of action
 
+**The proportions are superseded by direction C (owner, 2026-10-30; `people_design/dir_graphic.md` §2):** about 7.8
+heads (the skull 0.128 H; with its hair the head never above 0.14 H), a long neck showing 0.04-0.05 H, the hip joint at
+0.545 H, the knee at 0.295 H, real hands (0.098 H) and feet (0.148 H), limbs tapered (thigh : ankle ~3 : 1); a
+standing contrapposto with one hand always anchored; every form ONE rounded polygon (straight edges joined by
+deliberate radii, crisp corners only where the material is crisp). The table below (6.75 heads) is history; the
+silhouette rules and the line of action under it still hold.
+
 Measured in H, her height (1000 local units in the engine).
 
 | | Value | Why |
@@ -178,11 +190,11 @@ Measured in H, her height (1000 local units in the engine).
    - It is drawn as the same crescent on the side facing the light, lifted +10 to +14 L* and turned at most
      12 degrees toward the light's hue. A phone's light is clipped to a disc of ~0.25 H around it.
    - It never covers the whole silhouette and is never a glow disc (DIRECTION rule 5).
-6. **The soft body gradient: a PROPOSAL, off by default.**
+6. **The soft body gradient: off (decided by the pick, 2026-10-30).**
    - Ref 04's skirt darkens from the waist to the hem. In the engine this is a multiplied vertical ramp inside the
      coat, from no change at 0.64 H to ~-8 L* at the hem (the ground's occlusion).
-   - DIRECTION rule 5 says "never ... gradients" outside the sky, so it stays off until the owner chooses. The sheet's
-     row A shows the A/B.
+   - The owner's pick, direction C, draws people in two flat tones with a crisp terminator and no gradient, so it stays
+     off; the sheet's row A keeps the A/B as history.
 7. **No outlines.** Edges are steps of value (rule 4). The true lines are only:
    - the closed-eye line in profile (0.46 % H, in the hair's deep tone);
    - a strap or a phone's edge (they ARE lines).
@@ -190,6 +202,13 @@ Measured in H, her height (1000 local units in the engine).
    reflection, ref 03).
 
 ### c. The minimal face and hands
+
+**The face is now LASH** (owner, 2026-10-30: "Let’s keep lash"; `people_design/faces_graphic.md`, `PEOPLE_DESIGN.md`):
+closed-eye lash lines, one flick each (two in 3/4 and at a slight turn), and a short soft nose hook; no brows, mouth or
+eye colour; under ~200 px tall only the contour (EDGE); in profile the hair tucked behind the eye; in the lost profile
+the cheek's sliver, with the nose tip and a lash flick peeking past it; sunglasses and caps as some people's
+accessories, never everyone's; never looking at the camera. Hands are C's mitten with a thumb lobe (0.098 H). The
+rules below are history where they differ (the single eye line, the 0.064 H teardrop hand).
 
 - **Profile:** the skin's own edge carries the face (brow, a small nose 0.013 H proud, lips, chin), plus at most ONE
   short closed-eye line, as ref 04 has. No brow, mouth, pupil or blush.
@@ -217,7 +236,11 @@ Measured in H, her height (1000 local units in the engine).
   - For a stranger the flowing element is optional (a coat hem in a gust, a ponytail); never two at once.
 - **Carried objects** are one simple shape in 2 planes (a kraft box with its top face and a tape band), held by
   arms that really carry it (the forearm under the box).
-- **London October evening:**
+- **London October evening** (superseded, 2026-10-30: today's looks from `people_design/fashion.md`, as direction C
+  dresses her: N1 the long open coat, L2 the baby tee with jeans, a cap and a ponytail, N6 the suede bomber, N3 the
+  cropped leather jacket over a statement skirt; one roomy piece and one detail per look, one accent per person, the
+  film's hero colour on the "you" only; the belted A-line coat, tights, ankle boots and blanket scarf read 2010s:
+  `dir_graphic.md` §7):
   - the teal wool coat, belted;
   - the rose wool scarf;
   - plum tights;
@@ -309,8 +332,8 @@ import {Figure} from '../../lib/figure';
 - **Keys of light:** the default key is a low sun from the upper left (`[-0.92, -0.39]`). A film passes its own rig's
   direction. A profile facing right mirrors the drawing, and the key with it.
 - **A film draws its own people with it:** its colours, poses and light. Strangers in the mid ground use the same
-  model with `light.rim: false`, a calmer look (C* <= 25, tier B) and no flowing element. Never another film's
-  figure.
+  model with a calmer look (C* <= 25, tier B), a tier-B rim only where the key or the story light touches them (2 px,
+  +6-8 L*: CRAFT §d.8; `light.rim: false` elsewhere) and no flowing element. Never another film's figure.
 
 ## 4. The proof and how close it gets
 
@@ -361,7 +384,8 @@ wind strip now keeps the tip in view.
 
    The profile is the best view, as in ref 04.
 4. **Crisper than the reference.** Our planes are crisp vector fills; ref 04's are a little soft (its body gradient,
-   soft edges). The soft gradient's A/B is in row A for the owner's call; DIRECTION rule 5 keeps it off until then.
+   soft edges). The soft gradient's A/B is in row A; the owner's pick of 2026-10-30 (direction C, two flat tones,
+   crisp) keeps it off.
 5. **Placement.** In the still v3 frame, her shade side sits close in value to the teal canal behind her, so her
    right edge melts. This is a scene fix (a calmer, lighter field behind the "you", rule 2's separation), not a
    figure fix.

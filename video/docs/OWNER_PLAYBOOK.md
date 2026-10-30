@@ -170,6 +170,12 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   v2 take 1, 2026-10-26).
 
 ## Music and sound
+- **Sync picture to sound ON PURPOSE.** Cuts, camera moves and key actions land on the sound's beats, hits and the
+  voice's stresses where that adds energy or meaning, and NOT everywhere: we already do it "decently okay", now it is a
+  researched, named practice with a rule for where it fits (`docs/look/refs_sound_sync/`; the research is queued). —
+  ("the research distill and practice of syncing the video and shots with with sounds ... We already do this and I think
+  decently okay we just need to be more intentional and educated about this effect and where it make sense to use",
+  2026-10-30.)
 - **Music: cinematic but subtle, especially at the start.** The voice and the hook carry the opening. — (v1).
 - **Mix to -14 LUFS / -1 dBTP, voice always on top**; SFX land on visual hits. — (v1).
 - **More sound effects, especially ones people link with something good on their phone** (like pop, notification ding,
@@ -232,8 +238,8 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   one hot accent, never a mix of unrelated pastels) are palette work, done in every scene ("dark and contrast are great
   but that’s very doable that’s just color palette and selection? Similarly point 2").
 - **Light and shadow: gentle, but always there.** One consistent light direction per scene, soft form and cast shadows,
-  gentle light pools that make sense; never absent and never "weirdly put". Every volume reads in 2-3 flat tones, a lit
-  face and a shade face, as the city posters' buildings do; with no outlines these faces make the edges, so the
+  gentle light pools that make sense; never absent and never "weirdly put". Every volume reads in 2-3 tones, a lit
+  face and a shade face, with colour and light moving gently inside them (never dead-flat: ORGANIC, NOT GEOMETRIC), as the city posters' buildings do; with no outlines these faces make the edges, so the
   subject's shade face goes clearly deeper (-20 to -25 L*) while supporting life and the world stay gentle (-7 to
   -12). System: `docs/look/CRAFT.md` §d. — (v3 G5b, 2026-10-27;
   "the shadows added are better", v2 G4, 2026-10-27; on the posters' lit and shaded faces: "4 is a good point and goes
@@ -304,6 +310,12 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   way to solve properly. It feels like a lot of our design is too square and proper like I can see shapes and angles
   very clearly while references are obviously not like that. They are more regular more naturally blend Do deep
   research into techniques libraries etc", 2026-10-30.)
+- **Every film's visual script gets a composition-and-motion pass from the shot library** (once the library and the
+  approach are settled): for each shot, which composition recipe it uses, how the camera and the action move WITHIN the
+  shot, and how it moves to the next (the join); done before G3 builds it. First on video 4 (Helsinki). — ("When we
+  settle on the composition library recipes and overall approach we need to evaluate our visual script for Helsinki
+  story to figure out how to compose each scene and how we animate and move within a scene and from scene to scene",
+  2026-10-30.)
 - **SCENE COMPOSITION: big quiet areas and one place to look** (owner agreed, 2026-10-30: "8 agreed this is an important
   point about scene composition"; on still v6: "our scene is very busy"): few elements of equal weight, values grouped into a few big masses, one focal point
   with the most contrast and the story light, negative space; a busy frame of many mid-tone props is the failure.
@@ -350,9 +362,11 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   captions and QA tools are tools, not assets; the kit pieces in `src/lib` (cine, kit, mascot) are references to learn
   from, never a film's sets, and a film never imports another film's folder (`src/vN/`). — ("Don't rely on reusable
   assets", v2 restart, 2026-10-27).
-- **People small and simple like reference 1** (crowds, small full figures seen from behind or in rear 3/4, round
-  heads; near heads <= ~140 px), never big character models or faces: they act with their pose (reach, shrug, slump,
-  look up), as reference 1's do; only the mascot has a face. **In the foreground only the film's one "you" or the
+- **People: small and simple in the frame, contemporary and refined in design** (small full figures, often seen from
+  behind or in rear 3/4; adult proportions of about 7.8 heads in direction C, below, which replaces reference 1's
+  round-headed crowd as the drawing model; near heads <= ~140 px), never big character models: they act with their pose
+  (reach, shrug, slump, look up); faces stay generic (the LASH face of the people design below, never eyes looking at us
+  or a mouth). **In the foreground only the film's one "you" or the
   mascot;** the "you" near the camera stands at a real size, about v2's original (~130-220 px tall), still simple and
   from behind or in silhouette (DEPTH AND SCALE FROM A HUMAN VIEWPOINT above; owner, 2026-10-29); strangers stay small in the mid and far ground (a row of strangers' backs in front reads as "you"). Simple, but REFINED,
   CLEAN and FLUID like the girl in the owner's 9:16 motion reference (`docs/look/refs_human_scale/04_cloud_beast_girl_strip.jpg`):
@@ -414,8 +428,9 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   never one dark mass or a narrow band of light pastels (one reason v2 reads cheap next to the city posters). Numbers:
   `docs/look/CRAFT.md` §f.8, from the city-poster study. — (our observation on the posters; "5 - good point too!",
   2026-10-28; the darks in many small pieces: "Go with your suggestions", 2026-10-29).
-- **PAINTED PIECES: the sky and its clouds, and a few chosen environment pieces (some foreground buildings, trees and
-  greenery), are uniquely painted, as in the owner's references** (`docs/look/refs_human_scale/`, the city posters'
+- **PAINTED PIECES: the sky and its clouds and the whole environment (buildings, trees and greenery, ground, water) are
+  uniquely painted in ONE painted language, as in the owner's references** (first asked for the sky, clouds and chosen
+  pieces; then "one painted language" for the whole frame, below) (`docs/look/refs_human_scale/`, the city posters'
   skies and proteas): visible brush and paint texture, soft painted edges, colour moving within a shape, each piece
   painted for its place (never one stamp repeated). The painting is SUBTLE AND BEAUTIFUL, in the drawing style of the
   owner's two favourites (`refs_human_scale/02_bus_stop_night.jpg`, `03_beach_dusk.jpg`): big, simple painted masses
@@ -878,7 +893,7 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
 - ~~Density and life added after the sketch ("blocking: staging only; next: density, life, polish")~~ → designed into
   G3 with their tiers; G5 fills G3's plan (v3 G5b, 2026-10-27).
 - ~~A face for the protagonist's emotion beat (v3's waist-up "you" facing us)~~ → people have no faces, like reference
-  1; the pose acts; only the mascot has a face (v2 restart rule, 2026-10-27).
+  1; the pose acts; only the mascot has a face (v2 restart rule, 2026-10-27); faces now: generic LASH faces (2026-10-30).
 - ~~The G4 look as stills made in parallel with G3~~ → a playable look clip after the G3 lock, approved before G5
   (the approved pipeline, 2026-10-27).
 - ~~Pip at tier B in every shot and on both sides of every join~~ → Pip stays, hidden on purpose (2026-10-28).
