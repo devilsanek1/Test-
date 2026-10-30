@@ -24,6 +24,15 @@ The earlier v4 session (https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt)
 (owner: "brainstorm a story and like a visual script with what happens on the screen and camera movements"; style still
 evolving), workflow `v4-visual-script` -> `docs/v4/visual/` (research, method, concepts, `VISUAL_SCRIPT.md`); then G3.**
 
+**PRODUCTION STARTED (2026-10-30 ~20:40 UTC; owner: "Okay I think we have everything we need to actually start production
+of the video 4 ... Go ahead and start working on the video 4 ... parallelize the work ... give me periodic updates").**
+Phase A runs as two workflows in parallel: `v4-prod-a-script-world` (A1 the visual script v3 locked with the folds and
+the delegated calls + `camera_plan_g3.md`; A2 the W1 world bible `WORLD_BIBLE.md` + `world/colour_script.png`) and
+`v4-prod-b-tooling` (A3 the shared G3 kit `src/lib/g3/` + `scripts/g3/board_lint.py` + `src/entry-v4.tsx` +
+`public/v4/animatic.json` skeleton; A4 the production captions `src/lib/captions2/` per TYPE_GUIDE). Shared brief:
+`production/BRIEF.md`. Then phase B: the G3 panels in lanes, the motion pass, lint, cold reads, one fix round, the
+540p60 reel to the owner.
+
 **BEFORE G3 (2026-10-30, from the look and composition study; HANDOFF 2e):** fold into `visual/VISUAL_SCRIPT.md` (1) the
 owner-approved `visual/STYLE_ADJUSTMENTS.md`; (2) the composition-and-motion pass `visual/COMPOSITION_PASS.md` (per shot
 the frame, the move within, the join, by `docs/look/COMPOSITION_SHOTS.md` codes; a FIRST DRAFT now, final after its

@@ -324,3 +324,14 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   4's branch, the study branch and video-production carry one state (HANDOFF 2e; the composition library, SOUND_SYNC,
   the Helsinki composition pass draft, the people overhaul in use); production of video 4 continues in parallel with
   the study's results.
+
+## 2026-10-30: production starts
+- 2026-10-30 ~20:35 UTC: "Okay I think we have everything we need to actually start production of the video 4 / I think we
+  have a voice sound , visual script, we have made a collection and a guideline on the composition of scenes and
+  transitions, we made a lot of guidelines and recipes on visual part and style, etc / Go ahead and start working on the
+  video 4, make sure to refresh the repo to take the latest context and the guidelines and recipes and references / Make
+  sure to parallelize the work between subagents and subthreads if you need / Make sure to give me periodic updates with
+  what's been cooked - visuals, videos if done" -> video-production merged in (the composition library, sound sync, painter
+  v7, the Helsinki pass draft); phase A in two parallel workflows (the visual script v3 lock with the folds and the
+  delegated calls + the camera plan; the W1 world bible; the G3 kit with the tier-1 deltas; the production captions);
+  then G3. Periodic updates with visuals and videos as they land.
