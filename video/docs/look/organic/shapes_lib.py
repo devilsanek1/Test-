@@ -56,9 +56,49 @@ def segment(lab: np.ndarray, scale: float = 60.0, sigma: float = 0.8, min_size: 
     lab64 = lab.astype(np.float64)
     seg = segmentation.felzenszwalb(lab64, scale=scale, sigma=sigma, min_size=min_size, channel_axis=-1)
     seg = _merge_by_colour(lab64, seg, merge_de)
+    for _ in range(3):
+        seg = _absorb_slivers(lab64, seg)
     seg = _absorb_small(lab64, seg, min_area)
     _, seg = np.unique(seg, return_inverse=True)
     return seg.reshape(lab.shape[:2]).astype(np.int32)
+
+
+def _absorb_slivers(lab: np.ndarray, seg: np.ndarray, line_dl: float = 6.0) -> np.ndarray:
+    """Codec and anti-aliasing slivers are not shapes: a region at most ~2 px thick (no pixel more than 0.5 px inside
+    it) whose lightness lies between its neighbours' (an anti-aliased blend, or JPEG's 4:2:0 chroma ring) joins the
+    neighbour closest in colour (lightness weighted twice: the codec smears chroma). A thin region darker or lighter
+    than all its neighbours by >= line_dl L* is a real drawn line (a bar, a wire) and stays."""
+    ids, inv = np.unique(seg, return_inverse=True)
+    inv = inv.reshape(seg.shape)
+    n = len(ids)
+    inner = segmentation.find_boundaries(inv, mode='inner')
+    edt = ndi.distance_transform_edt(~inner)
+    depth = ndi.maximum(edt, inv, index=np.arange(n))
+    thin = np.where(np.asarray(depth) <= 0.5)[0]
+    if len(thin) == 0:
+        return inv
+    cnt = np.bincount(inv.ravel(), minlength=n).astype(float)
+    means = np.stack([np.bincount(inv.ravel(), lab[..., c].ravel(), minlength=n) for c in range(3)], 1) / np.maximum(cnt, 1)[:, None]
+    a = np.concatenate([inv[:, :-1].ravel(), inv[:-1, :].ravel()])
+    b = np.concatenate([inv[:, 1:].ravel(), inv[1:, :].ravel()])
+    m = a != b
+    pairs = np.unique(np.stack([a[m], b[m]], 1), axis=0)
+    nbrs: dict[int, set] = {}
+    for p, q in pairs:
+        nbrs.setdefault(int(p), set()).add(int(q)); nbrs.setdefault(int(q), set()).add(int(p))
+    remap = np.arange(n)
+    w = np.array([2.0, 1.0, 1.0])
+    for t in sorted(thin, key=lambda k: cnt[k]):
+        nb = [k for k in nbrs.get(int(t), ()) if remap[k] == k and k not in thin]
+        if not nb:
+            continue
+        Ls = means[nb, 0]
+        L = means[t, 0]
+        if L < Ls.min() - line_dl or L > Ls.max() + line_dl:
+            continue   # a real line
+        d = np.sqrt((((means[nb] - means[t]) * w) ** 2).sum(1))
+        remap[t] = nb[int(np.argmin(d))]
+    return remap[inv]
 
 
 def _merge_by_colour(lab: np.ndarray, seg: np.ndarray, thresh: float) -> np.ndarray:
@@ -269,95 +309,266 @@ def _cover(flag_centres: np.ndarray, h: int, closed: bool) -> np.ndarray:
 
 # The thresholds (calibrated on synthetic shapes through the same codec: shapes.md §1.3)
 LINE_H = 10           # straight windows: 21 px of arc ...
-LINE_TOL = 0.22       # ... within 0.22 px RMS of a line
+LINE_TOL = 0.06       # ... within 0.06 px RMS of a line (the codec's noise on a ruler edge: 0.02), and every
+LINE_DEV = 0.4        # run within 0.4 px (or 0.6 % of its length) of ONE line
 LONG_RUN = 60         # a "ruler line": a straight run of >= 60 px
 ARC_H = 15            # compass arcs: 31 px of arc ...
-ARC_TOL = 0.12        # ... within 0.12 px RMS of a circle (a free curve drifts off a circle faster)
+ARC_TOL = 0.12        # ... within 0.12 px RMS of a circle, every run within ARC_DEV of ONE circle, turning >= 25 deg
+ARC_DEV = 0.6
+ARC_TURN = 25.0
 ARC_RMIN, ARC_RMAX = 4.0, 600.0
 CORNER_MIN = 35.0     # a corner turns >= 35 deg ...
 CORNER_A, CORNER_B = 3, 8   # ... within +-3 px, and most of its +-8 px turn happens there
 CORNER_CONC = 0.6
 AXIS_TOL = 2.0        # deg from horizontal / vertical
+MIN_CHAIN = 16        # px: shorter edge chains are texture, not shape
 
 
-def contour_stats(contours, region_req: dict | None = None):
-    """Per-point classification of every contour and the length-weighted totals.
-    Returns a dict of totals and per-contour arrays (for the drawn overlay)."""
-    tot = {'len': 0.0, 'straight': 0.0, 'long': 0.0, 'arc': 0.0, 'axis': 0.0, 'axis_straight': 0.0,
-           'curv_var_sum': 0.0, 'curv_n': 0, 'flat': 0.0, 'dk_sum': 0.0, 'dk_n': 0}
-    corners = []        # (x, y, interior angle deg)
-    runs = []           # straight runs: (x0, y0, x1, y1, length)
-    per = []
-    for c in contours:
-        P0 = resample(c['pts'], c['closed'], 1.0)
-        if len(P0) < 2 * LINE_H + 3:
+# ---------------------------------------------------------------- edges: a colour Canny with sub-pixel chains
+
+
+CHROMA_SIGMA = 2.0    # px: the codec keeps chroma at half resolution (4:2:0), so chroma edges are read at twice the scale
+CHROMA_WEIGHT = 0.7   # and count a little less (shape is read mostly through value)
+
+
+def colour_gradient(lab: np.ndarray, sigma: float):
+    """Di Zenzo's colour gradient of CIELAB at scale sigma (chroma at max(sigma, CHROMA_SIGMA), weighted
+    CHROMA_WEIGHT): magnitude (delta-E per px) and direction (radians)."""
+    Jxx = Jyy = Jxy = 0
+    for c in range(3):
+        s = sigma if c == 0 else max(sigma, CHROMA_SIGMA)
+        w = 1.0 if c == 0 else CHROMA_WEIGHT
+        gx = w * ndi.gaussian_filter(lab[..., c], s, order=(0, 1))
+        gy = w * ndi.gaussian_filter(lab[..., c], s, order=(1, 0))
+        Jxx = Jxx + gx * gx; Jyy = Jyy + gy * gy; Jxy = Jxy + gx * gy
+    lam = (Jxx + Jyy) / 2 + np.sqrt(((Jxx - Jyy) / 2) ** 2 + Jxy ** 2)
+    return np.sqrt(lam), 0.5 * np.arctan2(2 * Jxy, Jxx - Jyy)
+
+
+def edge_chains(lab: np.ndarray, sigma: float = 1.0, high: float = 2.0, low: float = 1.0, min_len: int = MIN_CHAIN):
+    """A colour Canny: non-maximum suppression across the edge with a parabolic sub-pixel peak, hysteresis (high /
+    low in delta-E per px at this sigma: a crisp step of ~5.5 dE passes `high`), thinning, then the edge pixels
+    linked into chains (junctions cut). Returns a list of dicts {pts: N x 2 sub-pixel x y, closed}."""
+    from skimage.filters import apply_hysteresis_threshold
+    from skimage.morphology import thin
+    mag, th = colour_gradient(lab, sigma)
+    H, W = mag.shape
+    c, s = np.cos(th), np.sin(th)
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    m1 = _bilinear(mag[..., None], xx + c, yy + s)[..., 0]
+    m0 = _bilinear(mag[..., None], xx - c, yy - s)[..., 0]
+    nms = (mag >= m1) & (mag >= m0) & (mag > low)
+    den = m0 - 2 * mag + m1
+    off = np.zeros_like(mag)
+    np.divide(0.5 * (m0 - m1), den, out=off, where=np.abs(den) > 1e-9)
+    off = np.clip(off, -0.5, 0.5)
+    sx = xx + off * c; sy = yy + off * s
+    e = apply_hysteresis_threshold(np.where(nms, mag, 0), low, high)
+    e = thin(e)
+    e[:2, :] = e[-2:, :] = False; e[:, :2] = e[:, -2:] = False
+    e = _clean_skeleton(e)
+    return _link(e, sx, sy, min_len), mag
+
+
+def _nbcount(e):
+    k = np.ones((3, 3), np.float32); k[1, 1] = 0
+    return cv2.filter2D(e.astype(np.float32), -1, k, borderType=cv2.BORDER_CONSTANT).round().astype(int)
+
+
+def _clean_skeleton(e, spur: int = 3):
+    """Make the skeleton a clean 8-connected curve set: drop staircase-corner pixels (a pixel whose only two
+    neighbours are 4-neighbours of it and diagonal to each other), then prune spurs up to `spur` px."""
+    e = e.copy()
+    for _ in range(2):
+        cnt = _nbcount(e)
+        Np = np.zeros_like(e); Sp = np.zeros_like(e); Wp = np.zeros_like(e); Ep = np.zeros_like(e)
+        Np[1:] = e[:-1]; Sp[:-1] = e[1:]; Wp[:, 1:] = e[:, :-1]; Ep[:, :-1] = e[:, 1:]
+        red = e & (cnt == 2) & ((Np & Ep) | (Np & Wp) | (Sp & Ep) | (Sp & Wp))
+        # never remove two touching redundant pixels in one pass
+        red &= ~ndi.binary_dilation(red, structure=np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]]))
+        e &= ~red
+    for _ in range(spur):
+        cnt = _nbcount(e)
+        junction_near = ndi.binary_dilation(e & (cnt >= 3), iterations=spur + 1)
+        ends = e & (cnt == 1) & junction_near
+        if not ends.any():
+            break
+        e &= ~ends
+    return e
+
+
+_NB = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+
+
+def _link(e: np.ndarray, sx: np.ndarray, sy: np.ndarray, min_len: int):
+    k = np.ones((3, 3), np.uint8); k[1, 1] = 0
+    cnt = cv2.filter2D(e.astype(np.uint8), -1, k, borderType=cv2.BORDER_CONSTANT)
+    junction = e & (cnt >= 3)
+    # a junction pixel and its 8 neighbours that are junctions too form one blob: cut them all
+    path = e & ~junction
+    lab_, n = ndi.label(path, structure=np.ones((3, 3)))
+    chains = []
+    if n == 0:
+        return chains
+    objs = ndi.find_objects(lab_)
+    for i, sl in enumerate(objs, 1):
+        if sl is None:
             continue
-        closed = c['closed']
-        P = smooth_pts(P0, closed, 1.0)
-        n = len(P)
-        L = float(n)
-        # straight
-        lr = line_rms(P, closed, LINE_H)
-        st_c = np.nan_to_num(lr, nan=9) <= LINE_TOL
-        st = _cover(st_c, LINE_H, closed)
-        # runs of straight points
-        lab_runs, nr = ndi.label(st)
-        if closed and nr > 1 and st[0] and st[-1]:
-            lab_runs[lab_runs == lab_runs[-1]] = lab_runs[0]
-        long_mask = np.zeros(n, bool)
-        for k in range(1, nr + 1):
-            idx = np.where(lab_runs == k)[0]
-            if len(idx) == 0:
-                continue
-            if len(idx) >= LONG_RUN:
-                long_mask[idx] = True
-            if len(idx) >= 2 * LINE_H + 1:
-                # endpoints along the run (ordered by arc position; wrapping handled loosely)
-                a, b = P[idx[0]], P[idx[-1]]
-                runs.append((a[0], a[1], b[0], b[1], float(len(idx))))
-        # arcs (constant curvature) that are not lines
-        r, rg = circle_fit(P, closed, ARC_H)
-        arc_c = (np.nan_to_num(rg, nan=9) <= ARC_TOL) & (np.nan_to_num(r, nan=0) >= ARC_RMIN) & (np.nan_to_num(r, nan=1e9) <= ARC_RMAX)
-        arc = _cover(arc_c, ARC_H, closed) & ~st
-        # tangent and curvature (on a slightly smoother copy)
-        P2 = smooth_pts(P0, closed, 2.0)
-        d = np.gradient(P2, axis=0) if not closed else (np.roll(P2, -1, 0) - np.roll(P2, 1, 0)) / 2
-        th = np.unwrap(np.arctan2(d[:, 1], d[:, 0]))
-        if closed:
-            dth = np.angle(np.exp(1j * (np.roll(th, -1) - np.roll(th, 1)))) / 2
-        else:
-            dth = np.gradient(th)
-        kappa = dth  # per px of arc
-        req = (region_req or {}).get(c['rid'], None)
-        req = req if req else max(L / (2 * math.pi), 4.0)
-        kh = kappa * req
-        # orientation (mod 180), axis-aligned
-        ori = np.degrees(np.mod(np.arctan2(d[:, 1], d[:, 0]), math.pi))
-        dax = np.minimum.reduce([np.abs(ori - 0), np.abs(ori - 90), np.abs(ori - 180)])
-        ax = dax <= AXIS_TOL
-        # corners on the 1-px smoothed copy
-        d1 = (np.roll(P, -1, 0) - np.roll(P, 1, 0)) / 2 if closed else np.gradient(P, axis=0)
-        t1 = np.unwrap(np.arctan2(d1[:, 1], d1[:, 0]))
-        cpts = _corners(P, t1, closed)
-        corners.extend(cpts)
-        cmask = np.zeros(n, bool)
-        for (ci, _, _, _) in cpts:
-            cmask[max(ci - 5, 0):ci + 6] = True
-        free = ~cmask
-        tot['len'] += L
-        tot['straight'] += float(st.sum())
-        tot['long'] += float(long_mask.sum())
-        tot['arc'] += float(arc.sum())
-        tot['axis'] += float(ax.sum())
-        tot['axis_straight'] += float((ax & st).sum())
-        kv = kh[free]
-        tot['curv_var_sum'] += float(((kv - kv.mean()) ** 2).sum()) if len(kv) else 0.0
-        tot['curv_n'] += int(len(kv))
-        tot['flat'] += float((np.abs(kh) < 0.15).sum())
-        dk = np.abs(np.gradient(kh)) * req  # d(kappa*R)/d(s/R)
-        tot['dk_sum'] += float((dk[free] ** 2).sum()); tot['dk_n'] += int(free.sum())
-        per.append({'P': P, 'straight': st, 'long': long_mask, 'arc': arc, 'corners': [(x, y, a) for (_, x, y, a) in cpts]})
-    return tot, corners, runs, per
+        sub = lab_[sl] == i
+        ys, xs = np.nonzero(sub)
+        if len(xs) < min_len:
+            continue
+        ys = ys + sl[0].start; xs = xs + sl[1].start
+        pix = {(int(y), int(x)) for y, x in zip(ys, xs)}
+        # neighbour counts inside the component
+        def nbrs(p):
+            return [(p[0] + dy, p[1] + dx) for dy, dx in _NB if (p[0] + dy, p[1] + dx) in pix]
+        ends = [p for p in pix if len(nbrs(p)) == 1]
+        start = min(ends) if ends else min(pix)
+        order = [start]; seen = {start}; cur = start
+        while True:
+            nb = [q for q in nbrs(cur) if q not in seen]
+            if not nb:
+                break
+            # prefer 4-neighbours (straight steps) to keep the walk on the curve
+            nb.sort(key=lambda q: abs(q[0] - cur[0]) + abs(q[1] - cur[1]))
+            cur = nb[0]; order.append(cur); seen.add(cur)
+        if len(order) < min_len:
+            continue
+        closed = (not ends) and len(order) == len(pix) and max(abs(order[0][0] - order[-1][0]), abs(order[0][1] - order[-1][1])) <= 1
+        oy = np.array([p[0] for p in order]); ox = np.array([p[1] for p in order])
+        pts = np.stack([sx[oy, ox], sy[oy, ox]], 1).astype(np.float64)
+        chains.append({'pts': pts, 'closed': bool(closed), 'rid': -1})
+    return chains
+
+
+# ---------------------------------------------------------------- geometry along a curve
+
+
+def _runs(mask: np.ndarray, closed: bool, start: int = 0):
+    n = len(mask)
+    if not mask.any():
+        return []
+    if mask.all():
+        return [np.r_[start:n, 0:start]] if closed else [np.arange(n)]
+    order = np.r_[np.where(~mask)[0][0]:n, 0:np.where(~mask)[0][0]] if closed else np.arange(n)
+    runs, cur = [], []
+    for i in order:
+        if mask[i]:
+            cur.append(i)
+        elif cur:
+            runs.append(np.array(cur)); cur = []
+    if cur:
+        runs.append(np.array(cur))
+    return runs
+
+
+def _tls_dev(Q: np.ndarray):
+    m = Q.mean(0)
+    X = Q - m
+    w, V = np.linalg.eigh(X.T @ X)
+    nrm = V[:, 0]
+    return np.abs(X @ nrm)
+
+
+def _split_line(P, idx, min_len):
+    """Douglas-Peucker: keep a run if all its points lie within LINE_DEV of one (total least squares) line, else
+    split it where it strays farthest from its chord."""
+    if len(idx) < min_len:
+        return []
+    Q = P[idx]
+    dev = _tls_dev(Q)
+    if dev.max() <= max(LINE_DEV, 0.006 * len(idx)):
+        return [idx]
+    a, b = Q[0], Q[-1]
+    ab = b - a
+    L = np.hypot(*ab)
+    if L < 1e-6:
+        dch = np.hypot(*(Q - a).T)
+    else:
+        dch = np.abs((Q[:, 0] - a[0]) * ab[1] - (Q[:, 1] - a[1]) * ab[0]) / L
+    k = int(np.argmax(dch[1:-1])) + 1
+    return _split_line(P, idx[:k + 1], min_len) + _split_line(P, idx[k:], min_len)
+
+
+def _kasa(Q: np.ndarray):
+    m = Q.mean(0)
+    x, y = (Q - m).T
+    A = np.stack([x, y, np.ones_like(x)], 1)
+    b = -(x * x + y * y)
+    sol, *_ = np.linalg.lstsq(A, b, rcond=None)
+    D, E, F = sol
+    cx, cy = -D / 2, -E / 2
+    r = math.sqrt(max(cx * cx + cy * cy - F, 1e-12))
+    dev = np.abs(np.hypot(x - cx, y - cy) - r)
+    return r, dev
+
+
+def _split_arc(P, idx, min_len):
+    if len(idx) < min_len:
+        return []
+    r, dev = _kasa(P[idx])
+    if dev.max() <= ARC_DEV and ARC_RMIN <= r <= ARC_RMAX:
+        turn = math.degrees(len(idx) / r)
+        return [idx] if turn >= ARC_TURN else []
+    k = len(idx) // 2   # binary subdivision: robust where an arc meets a line or turns the other way
+    return _split_arc(P, idx[:k + 1], min_len) + _split_arc(P, idx[k:], min_len)
+
+
+def curve_geometry(pts: np.ndarray, closed: bool, req: float | None = None):
+    """Classify every point of one curve (resampled every 1 px of arc): straight run, compass arc, free; corners
+    with their interior angles; curvature; orientation. Returns a dict, or None for curves under MIN_CHAIN."""
+    P0 = resample(pts, closed, 1.0)
+    n = len(P0)
+    if n < MIN_CHAIN:
+        return None
+    P = smooth_pts(P0, closed, 1.0)
+    # straight runs: windows within LINE_TOL of a line, merged, then every run within LINE_DEV of one line
+    lr = line_rms(P, closed, LINE_H)
+    cov = _cover(np.nan_to_num(lr, nan=9) <= LINE_TOL, LINE_H, closed)
+    straight = np.zeros(n, bool); pieces = []
+    for run in _runs(cov, closed, int(np.nanargmax(np.nan_to_num(lr, nan=-1)))):
+        for piece in _split_line(P, run, 2 * LINE_H + 1):
+            straight[piece] = True; pieces.append(piece)
+    long_ = np.zeros(n, bool)
+    for run in _runs(straight, closed):
+        if len(run) >= LONG_RUN:
+            long_[run] = True
+    # compass arcs (constant curvature, not straight)
+    r, rg = circle_fit(P, closed, ARC_H)
+    lr2 = line_rms(P, closed, ARC_H)
+    cand = ((np.nan_to_num(rg, nan=9) <= ARC_TOL) & (np.nan_to_num(r, nan=0) >= ARC_RMIN) &
+            (np.nan_to_num(r, nan=1e9) <= ARC_RMAX) & (np.nan_to_num(lr2, nan=0) > LINE_TOL))
+    cov = _cover(cand, ARC_H, closed) & ~straight
+    arc = np.zeros(n, bool)
+    for run in _runs(cov, closed, int(np.nanargmax(np.nan_to_num(rg, nan=-1)))):
+        for piece in _split_arc(P, run, 2 * ARC_H + 1):
+            arc[piece] = True
+    # tangent, curvature (sigma 2), orientation
+    P2 = smooth_pts(P0, closed, 2.0)
+    d = (np.roll(P2, -1, 0) - np.roll(P2, 1, 0)) / 2 if closed else np.gradient(P2, axis=0)
+    th = np.arctan2(d[:, 1], d[:, 0])
+    dth = np.angle(np.exp(1j * (np.roll(th, -1) - np.roll(th, 1)))) / 2 if closed else np.gradient(np.unwrap(th))
+    kappa = dth
+    ori = np.degrees(np.mod(th, math.pi))
+    dax = np.minimum.reduce([np.abs(ori), np.abs(ori - 90), np.abs(ori - 180)])
+    # corners
+    d1 = (np.roll(P, -1, 0) - np.roll(P, 1, 0)) / 2 if closed else np.gradient(P, axis=0)
+    t1 = np.unwrap(np.arctan2(d1[:, 1], d1[:, 0]))
+    cps = _corners(P, t1, closed)
+    cmask = np.zeros(n, bool)
+    for (ci, _, _, _) in cps:
+        idx = np.arange(ci - 5, ci + 6)
+        idx = idx % n if closed else idx[(idx >= 0) & (idx < n)]
+        cmask[idx] = True
+    segs = []
+    for piece in pieces:
+        Q = P[piece]
+        m = Q.mean(0); w, V = np.linalg.eigh((Q - m).T @ (Q - m)); u = V[:, 1]
+        t = (Q - m) @ u
+        segs.append((*(m + u * t.min()), *(m + u * t.max()), float(len(piece))))
+    return {'P': P, 'n': n, 'straight': straight, 'long': long_, 'arc': arc, 'kappa': kappa, 'axis': dax <= AXIS_TOL,
+            'corners': [(x, y, a) for (_, x, y, a) in cps], 'cmask': cmask, 'segs': segs, 'closed': closed}
 
 
 def _corners(P, th, closed):
@@ -369,28 +580,22 @@ def _corners(P, th, closed):
         Ta = _wrapdiff(th, a)
         Tb = _wrapdiff(th, b)
     else:
-        Ta = np.full(n, 0.0); Tb = np.full(n, 0.0)
+        Ta = np.zeros(n); Tb = np.zeros(n)
         Ta[a:n - a] = th[2 * a:] - th[:n - 2 * a]
         Tb[b:n - b] = th[2 * b:] - th[:n - 2 * b]
     A = np.degrees(np.abs(Ta)); B = np.degrees(np.abs(Tb))
-    cand = (A >= CORNER_MIN) & (A >= CORNER_CONC * np.maximum(B, 1e-6))
+    cand = (A >= CORNER_MIN) & (A >= CORNER_CONC * np.maximum(B, 1e-6)) & (B >= 0.8 * CORNER_MIN)
     out = []
     if not cand.any():
         return out
-    # non-max suppression within +-6 px
-    order = np.argsort(-A)
     taken = np.zeros(n, bool)
-    for i in order:
+    for i in np.argsort(-A):
         if not cand[i] or taken[i]:
             continue
-        lo, hi = i - 6, i + 7
-        if closed:
-            idx = np.arange(lo, hi) % n
-        else:
-            idx = np.arange(max(lo, 0), min(hi, n))
+        idx = np.arange(i - 6, i + 7)
+        idx = idx % n if closed else idx[(idx >= 0) & (idx < n)]
         taken[idx] = True
-        ang = 180.0 - min(B[i], 179.0)
-        out.append((int(i), float(P[i, 0]), float(P[i, 1]), float(ang)))
+        out.append((int(i), float(P[i, 0]), float(P[i, 1]), float(180.0 - min(B[i], 179.0))))
     return out
 
 
@@ -403,8 +608,34 @@ def _wrapdiff(th, b):
 
 
 def _seam(th):
-    """The step that closes the loop: the angle difference from the last to the first point."""
     return float(np.angle(np.exp(1j * (th[0] - th[-1]))))
+
+
+def geometry_totals(curves, req_of=None):
+    """Length-weighted totals over a list of curve_geometry() results."""
+    t = {'len': 0.0, 'straight': 0.0, 'long': 0.0, 'arc': 0.0, 'axis': 0.0, 'axis_straight': 0.0, 'n_corners': 0}
+    angles = []; kv = []; segs = []
+    for g in curves:
+        if g is None:
+            continue
+        t['len'] += g['n']; t['straight'] += g['straight'].sum(); t['long'] += g['long'].sum(); t['arc'] += g['arc'].sum()
+        t['axis'] += g['axis'].sum(); t['axis_straight'] += (g['axis'] & g['straight']).sum()
+        t['n_corners'] += len(g['corners']); angles += [a for (_, _, a) in g['corners']]
+        req = g.get('req') or max(g['n'] / (2 * math.pi), 6.0)
+        k = g['kappa'][~g['cmask'] & ~g['straight']] * req
+        kv.append(k); segs += g['segs']
+    L = max(t['len'], 1.0)
+    ang = np.array(angles)
+    kv = np.concatenate(kv) if kv else np.zeros(0)
+    out = {'length': L, 'straight': t['straight'] / L, 'long': t['long'] / L, 'arc': t['arc'] / L,
+           'primitive': (t['straight'] + t['arc']) / L, 'free': 1 - (t['straight'] + t['arc']) / L,
+           'axis': t['axis'] / L, 'axis_of_straight': t['axis_straight'] / max(t['straight'], 1),
+           'corners_per_100px': 100 * t['n_corners'] / L, 'n_corners': t['n_corners'],
+           'right_angle': float(((ang >= 83) & (ang <= 97)).mean()) if len(ang) else float('nan'),
+           'corner_angle_iqr': float(np.subtract(*np.percentile(ang, [75, 25]))) if len(ang) >= 4 else float('nan'),
+           'curv_var': float(np.var(kv)) if len(kv) else float('nan'),
+           'parallel': parallel_share(segs) if len(segs) >= 2 else float('nan')}
+    return out, ang
 
 
 # ----------------------------------------------------------------------------------------------------------------
@@ -459,8 +690,13 @@ def edge_profiles(lab: np.ndarray, contours, every: float = 4.0, reach: float = 
     left = prof[:, t <= -side].mean(1); right = prof[:, t >= side].mean(1)
     dv = right - left
     step = np.linalg.norm(dv, axis=1)
-    u = dv / np.maximum(step, 1e-9)[:, None]
-    p = ((prof - left[:, None]) * u[:, None]).sum(-1) / np.maximum(step, 1e-9)[:, None]   # ~0 -> 1
+    # read the width on lightness wherever the step is mostly value (the codec halves chroma resolution, which would
+    # make a chroma-only reading look ~2 px softer than it is); on a chroma edge, on the full CIELAB projection
+    value_led = np.abs(dv[:, 0]) >= 0.5 * step
+    dv = np.where(value_led[:, None], dv * np.array([1.0, 0.0, 0.0]), dv)
+    u = dv / np.maximum(np.linalg.norm(dv, axis=1), 1e-9)[:, None]
+    step_proj = np.linalg.norm(dv, axis=1)
+    p = ((prof - left[:, None]) * u[:, None]).sum(-1) / np.maximum(step_proj, 1e-9)[:, None]   # ~0 -> 1
     widths = np.full(len(pts), np.nan); rms = np.full(len(pts), np.nan); kind = np.zeros(len(pts), int)
     for i in range(len(pts)):
         if step[i] < min_step:
@@ -639,9 +875,10 @@ def size_ladder(rows, crop_area: int, min_area: int = 25):
 
 
 def divider_dimension(P: np.ndarray, closed: bool, rulers=(2, 3, 4, 6, 8, 12, 16)) -> float:
-    """Richardson's divider dimension: walk the contour with rulers of each length; D = 1 - slope(log L, log r).
-    1.0 = a smooth or straight line; natural coastlines ~1.1-1.3."""
-    Q = resample(P, closed, 0.25)
+    """Richardson's divider dimension: walk the curve with dividers of each opening r (each step lands exactly r
+    from the last, on the curve); D = 1 - slope(log L, log r). 1.0 = a smooth or straight line; natural coastlines
+    ~1.1-1.3. Rulers above a tenth of the curve's length are skipped."""
+    Q = resample(P, closed, 0.5)
     if closed:
         Q = np.vstack([Q, Q[:1]])
     per = float(np.hypot(*np.diff(Q, axis=0).T).sum())
@@ -650,15 +887,22 @@ def divider_dimension(P: np.ndarray, closed: bool, rulers=(2, 3, 4, 6, 8, 12, 16
         return float('nan')
     Ls = []
     for r in rs:
-        i = 0; n = 0; cur = Q[0]
-        N = len(Q)
-        while True:
-            d = np.hypot(Q[i:, 0] - cur[0], Q[i:, 1] - cur[1])
-            j = np.argmax(d >= r)
-            if d[j] < r:
-                rem = d[-1]
+        cur = Q[0].copy(); k = 1; n = 0; N = len(Q)
+        while k < N:
+            d = np.hypot(Q[k:, 0] - cur[0], Q[k:, 1] - cur[1])
+            hit = np.nonzero(d >= r)[0]
+            if len(hit) == 0:
                 break
-            i = i + j; cur = Q[i]; n += 1
+            j = k + int(hit[0])
+            a0, a1 = Q[j - 1], Q[j]
+            # the point on segment a0-a1 at distance r from cur
+            f = a1 - a0; g = a0 - cur
+            A = f @ f; B = 2 * f @ g; C = g @ g - r * r
+            disc = max(B * B - 4 * A * C, 0.0)
+            t = (-B + math.sqrt(disc)) / (2 * A) if A > 1e-12 else 1.0
+            t = min(max(t, 0.0), 1.0)
+            cur = a0 + t * f; n += 1; k = j
+        rem = float(np.hypot(*(Q[-1] - cur)))
         Ls.append(n * r + rem)
     slope = np.polyfit(np.log(rs), np.log(Ls), 1)[0]
     return float(1 - slope)
