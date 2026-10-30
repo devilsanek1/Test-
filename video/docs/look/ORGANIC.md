@@ -748,7 +748,7 @@ pieces through `staticFile` only (pieces must live under `public/`) and has no `
 superseded by `libraries.md`; `scripts/qa/check_banding.py --texture` still FAILs any texture in the caption band,
 where CRAFT §c's paper now allows <= 15 % of its strength (the band's spread <= 1.5 L*).
 
-**Decided 2026-10-30 ~19:30 UTC under the owner's hand-over** ("Do what you think is right and make the videos better";
+**Decided 2026-10-30 ~19:00 UTC under the owner's hand-over** ("Do what you think is right and make the videos better";
 playbook: when the owner hands a call over, make it): 1. the key is T3, the references' low key, the caption band kept
 light (about L* 77) and lifted toward T1 only if it reads gloomy at 400 px beside refs 02 and 03; 2. the wing stays
 frontal (his "our initial angle snd the view frankly wasn't bad"), its corners broken by overlaps and painted edges;

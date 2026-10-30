@@ -1,7 +1,7 @@
 # Sound sync: the doc edits the distill needs (2026-10-30; the orchestrator applies them)
 
-**Applied 2026-10-30 ~19:00 UTC by the orchestrator:** A1-A12 and B1-B11 (23 edits, by script, each `old` found once).
-**A13 applied too (2026-10-30 ~19:20 UTC)** after the owner's hand-over ("Do what you think is right and make the videos
+**Applied 2026-10-30 ~18:50 UTC by the orchestrator:** A1-A12 and B1-B11 (23 edits, by script, each `old` found once).
+**A13 applied too (2026-10-30 ~19:00 UTC)** after the owner's hand-over ("Do what you think is right and make the videos
 better"). Part C decided the same way: 1. "more effects" = more NOTICEABLE story sounds, each heard, not more cues;
 2. no separate A/B iteration: the four comparisons are played in Helsinki's G3 sound pass, where the owner hears them
 in a real film. **Still to do:** MR20's window in the composition library (Part C), after the

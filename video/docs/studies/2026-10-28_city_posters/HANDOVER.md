@@ -6,7 +6,7 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
-## Status 2026-10-30 ~19:30 UTC: the owner handed the calls over; painter v7 runs
+## Status 2026-10-30 ~19:05 UTC: the owner handed the calls over; painter v7 runs
 - Owner: "Do what you think is right and make the videos better" -> playbook rule (Process: when the owner hands a call
   over, make it); sound-sync A13 applied, its questions decided; ORGANIC.md's three look questions decided (T3 key,
   frontal wing, our paint dose; ORGANIC.md §8 end).
@@ -16,7 +16,7 @@ points and conclusions into the main repo"). The brief is `README.md` here; the 
   playbook's value-range bullet; launch step B.
 - Check-ins commit the loop's whole path list (scratchpad study_checkpoint4.sh P=...), not only composition.
 
-## Status 2026-10-30 ~19:00 UTC: sound sync DONE; composition library runs
+## Status 2026-10-30 ~18:50 UTC: sound sync DONE; composition library runs
 - `video/docs/look/SOUND_SYNC.md` + `sound_sync/` (reels.md + two timelines, craft.md, audit.md); 23 doc edits applied
   (`sound_sync/PROPOSED_DOC_EDITS.md` header); A13 and two questions go to the owner. TODO after the composition run:
   MR20's sound window (0 to +2 f, never early) into the library.
