@@ -1,0 +1,22 @@
+# Hints for build_captions.py --propose on video 4 (what the voice alone cannot tell; the visual script's shots).
+@key heat
+@r5 hot.
+@r6 That's a lot of tea.
+@r8 19.26-23.46
+@shot S1 0.00 WIDE
+@shot S2 4.28 WIDE-MEDIUM
+@shot S3 8.76 CLOSE
+@shot S4 10.96 MEDIUM
+@shot S5 17.76 CLOSE
+@shot S6 19.26 CLOSE-EXTREME-WIDE
+@shot S7 23.46 WIDE
+@shot S8 25.54 MEDIUM
+@shot S9 28.34 CLOSE
+@shot S10 29.56 CLOSE
+@shot S11 34.46 MEDIUM
+@shot S12 38.48 WIDE-POV
+# phrases the proposer must never break (compounds and fixed phrases its word lists can't tell)
+@keep data centers
+@keep data center
+@keep big fans
+@keep as much

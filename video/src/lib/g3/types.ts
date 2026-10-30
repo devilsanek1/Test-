@@ -34,8 +34,8 @@ export type Common = {
   id?: string;
   /** the attention tier by STORY ROLE, never by depth (G3_ANIMATIC §3): A the beat's 1-3 subjects (9 px ink outline,
    *  5 px inner details, the only dark mass); B supporting life near the story (3 px mid-grey lines, never a dark mass);
-   *  C the environment (a light tone with no contour; open lines that ARE lines at 3 px light; the scribble at light
-   *  grey). Lint: required on every element (a dress element is C by its role). */
+   *  C the environment (a light tone with no contour; open lines that ARE lines at 3 px, a step under the light tone;
+   *  the scribble at light grey). Lint: required on every element (a dress element is C by its role). */
   tier?: Tier;
   role?: Role;
   /** the set's plane (CRAFT §f.1): 0 = the subject's, -1 / -2 nearer (a darker step each), +1 ... +4 farther (each a
@@ -131,7 +131,8 @@ export type Ambient =
    *  action); cycle = s: one window toggles every cycle s (ambient); lit = the lit tone (paper), dark = the unlit (mid) */
   | {t: 'ambient'; kit: 'window'; x: number; y: number; w: number; h: number; cols?: number; rows?: number; pane?: [number, number];
       wave?: [number, number]; cycle?: number; startLit?: boolean; lit?: Fill; dark?: Fill; seed?: string}
-  /** a cloud drifting across the box at speed px/s, wrapping round (rw x rh = the cloud's size) */
+  /** a cloud drifting across the box at speed px/s, wrapping round (rw x rh = the cloud's size; phase 0..1 = where it
+   *  starts, default from the seed) */
   | {t: 'ambient'; kit: 'cloud'; x: number; y: number; w: number; h: number; rw?: number; rh?: number; speed?: number; phase?: number; seed?: string}
   /** water moving in a pipe or a channel: marks travelling along pts at speed px/s */
   | {t: 'ambient'; kit: 'water'; pts: Pt[]; speed?: number; gap?: number; dash?: number; width?: number; seed?: string}
@@ -241,8 +242,11 @@ export type SetDef = {
   planes?: PlaneDef[];
   vp?: VP;
   /** the set's shared drawing (world px of the set), drawn under the panel's own els in every panel of the set (unless
-   *  the panel says ownWorld) */
+   *  the panel says ownWorld). Its times (in, out, draw, undraw, fillIn) are FILM seconds: the set lives on the film
+   *  clock, so its life continues across the set's joins. */
   els?: El[];
+  /** moves on the set's elements (by id or index), in FILM seconds (a ferry's loop crossing every panel of the set) */
+  moves?: Move[];
   /** what the density key says about this set */
   density?: string;
 };

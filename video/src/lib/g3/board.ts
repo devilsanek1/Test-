@@ -4,7 +4,7 @@
 //   A  the beat's 1-3 subjects: the ink outline 9 px, inner details 5 px, the only dark mass
 //   B  supporting life near the story (the mascot, people, story objects off their beat): 3 px mid-grey lines, no dark mass
 //   C  the environment (room, street, town, sky, weather, far life): a light tone with no contour; open lines that ARE
-//      lines (rails, wires, the ground's lines to the VP) at 3 px light; the scribble mass at light grey
+//      lines (rails, wires, the ground's lines to the VP) at 3 px, a step under the light tone; the scribble at light grey
 // The PLANE (CRAFT §f.1) sets a grey step on top: each farther plane paler (converging on the paper's air), each nearer
 // one a step darker. Elements without a tier keep v3's role weights (subject 9 px ink, mid 5 px ink, far 3 px mid).
 
@@ -30,7 +30,10 @@ const lstarRgb = ([r, g, b]: [number, number, number]) => {
   const y = 0.2126 * lin(r / 255) + 0.7152 * lin(g / 255) + 0.0722 * lin(b / 255);
   return y > 216 / 24389 ? 116 * Math.cbrt(y) - 16 : (24389 / 27) * y;
 };
-const hex2 = (n: number) => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, '0');
+const hex2 = (n: number) => {
+  const v = Math.max(0, Math.min(255, Math.round(n))).toString(16);
+  return v.length < 2 ? `0${v}` : v;
+};
 const toHex = (c: [number, number, number]) => `#${hex2(c[0])}${hex2(c[1])}${hex2(c[2])}`.toUpperCase();
 
 /** CIE L* (0 = black, 100 = white) of a #hex colour; NaN if it isn't one. */
@@ -164,6 +167,9 @@ export function tierOf(el: {tier?: Tier; role?: Role; fill?: unknown; id?: strin
 export const v3Role = (el: {role?: Role; fill?: unknown; f?: number}): 'subject' | 'mid' | 'far' =>
   el.role && el.role !== 'dress' ? el.role : el.fill === 'pop' ? 'subject' : el.f !== undefined && el.f < 0.5 ? 'far' : 'mid';
 
+/** tier C's open-line tone: 12 L* under the light tone (L* ~70), between light (82) and B's mid (63) */
+export const C_LINE = stepL(BOARD.light, -12);
+
 export function weightOf(el: {tier?: Tier; role?: Role; fill?: unknown; id?: string; f?: number; sw?: number; plane?: number},
   overrides?: Record<string, Tier>): Weight {
   const tier = tierOf(el, overrides);
@@ -179,8 +185,10 @@ export function weightOf(el: {tier?: Tier; role?: Role; fill?: unknown; id?: str
       openLine: tone(BOARD.mid), fill: (f) => (f === undefined ? undefined : tone(f === 'dark' || f === 'pop' ? BOARD.mid : boardFill(f, 'far')))};
   }
   if (tier === 'C') {
+    // an open line on C (the ground's lines, rails, wires) sits a step under the light tone, so it reads on a C mass
+    // and stays softer than B's mid line
     return {tier, role: 'env', line: null, w: el.sw ?? 3, detail: 3, dark: false, plane, tone,
-      openLine: tone(BOARD.light), fill: (f) => tone(f === 'paper' ? BOARD.paper : BOARD.light)};
+      openLine: tone(C_LINE), fill: (f) => tone(f === 'paper' ? BOARD.paper : BOARD.light)};
   }
   const r = v3Role(el);
   const rl = roleLine(r, el.sw);

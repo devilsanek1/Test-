@@ -1,0 +1,2032 @@
+{
+ "film": "v4",
+ "style": "board",
+ "label": "v4 G3 SKELETON (visual script v3: 12 placeholder panels)",
+ "audio": "v4/voice.wav",
+ "durationSec": 42.24,
+ "fps": 60,
+ "words": [
+  {
+   "w": "Did",
+   "s": 0.129,
+   "e": 0.28
+  },
+  {
+   "w": "you",
+   "s": 0.28,
+   "e": 0.46
+  },
+  {
+   "w": "know",
+   "s": 0.46,
+   "e": 0.64
+  },
+  {
+   "w": "Helsinki",
+   "s": 0.64,
+   "e": 1.1
+  },
+  {
+   "w": "wants",
+   "s": 1.1,
+   "e": 1.5
+  },
+  {
+   "w": "AI",
+   "s": 1.5,
+   "e": 1.88
+  },
+  {
+   "w": "to",
+   "s": 1.88,
+   "e": 2.14
+  },
+  {
+   "w": "heat",
+   "s": 2.14,
+   "e": 2.34
+  },
+  {
+   "w": "seventy",
+   "s": 2.34,
+   "e": 2.9
+  },
+  {
+   "w": "thousand",
+   "s": 2.9,
+   "e": 3.42
+  },
+  {
+   "w": "homes?",
+   "s": 3.42,
+   "e": 3.92
+  },
+  {
+   "w": "AI",
+   "s": 4.28,
+   "e": 4.54
+  },
+  {
+   "w": "actually",
+   "s": 4.54,
+   "e": 5.04
+  },
+  {
+   "w": "runs",
+   "s": 5.04,
+   "e": 5.32
+  },
+  {
+   "w": "on",
+   "s": 5.32,
+   "e": 5.68
+  },
+  {
+   "w": "giant",
+   "s": 5.68,
+   "e": 5.94
+  },
+  {
+   "w": "computers,",
+   "s": 5.94,
+   "e": 6.5
+  },
+  {
+   "w": "in",
+   "s": 6.5,
+   "e": 6.92
+  },
+  {
+   "w": "buildings",
+   "s": 6.92,
+   "e": 7.24
+  },
+  {
+   "w": "called",
+   "s": 7.24,
+   "e": 7.56
+  },
+  {
+   "w": "data",
+   "s": 7.56,
+   "e": 7.84
+  },
+  {
+   "w": "centers.",
+   "s": 7.84,
+   "e": 8.22
+  },
+  {
+   "w": "Those",
+   "s": 8.76,
+   "e": 8.98
+  },
+  {
+   "w": "computers",
+   "s": 8.98,
+   "e": 9.4
+  },
+  {
+   "w": "get",
+   "s": 9.4,
+   "e": 9.74
+  },
+  {
+   "w": "really",
+   "s": 9.74,
+   "e": 10.2
+  },
+  {
+   "w": "hot.",
+   "s": 10.2,
+   "e": 10.64
+  },
+  {
+   "w": "To",
+   "s": 10.96,
+   "e": 11.06
+  },
+  {
+   "w": "put",
+   "s": 11.06,
+   "e": 11.2
+  },
+  {
+   "w": "it",
+   "s": 11.2,
+   "e": 11.32
+  },
+  {
+   "w": "into",
+   "s": 11.32,
+   "e": 11.5
+  },
+  {
+   "w": "perspective,",
+   "s": 11.5,
+   "e": 11.98
+  },
+  {
+   "w": "just",
+   "s": 12.4,
+   "e": 12.54
+  },
+  {
+   "w": "one",
+   "s": 12.54,
+   "e": 12.9
+  },
+  {
+   "w": "of",
+   "s": 12.9,
+   "e": 13.06
+  },
+  {
+   "w": "these",
+   "s": 13.06,
+   "e": 13.24
+  },
+  {
+   "w": "computers",
+   "s": 13.24,
+   "e": 13.72
+  },
+  {
+   "w": "makes",
+   "s": 13.72,
+   "e": 14.04
+  },
+  {
+   "w": "as",
+   "s": 14.04,
+   "e": 14.24
+  },
+  {
+   "w": "much",
+   "s": 14.24,
+   "e": 14.56
+  },
+  {
+   "w": "heat",
+   "s": 14.56,
+   "e": 14.82
+  },
+  {
+   "w": "as",
+   "s": 14.82,
+   "e": 15.06
+  },
+  {
+   "w": "FORTY",
+   "s": 15.06,
+   "e": 15.54
+  },
+  {
+   "w": "kettles,",
+   "s": 15.54,
+   "e": 16.1
+  },
+  {
+   "w": "boiling",
+   "s": 16.22,
+   "e": 16.56
+  },
+  {
+   "w": "non-stop.",
+   "s": 16.56,
+   "e": 17.34
+  },
+  {
+   "w": "That's",
+   "s": 17.76,
+   "e": 18.08
+  },
+  {
+   "w": "a",
+   "s": 18.08,
+   "e": 18.2
+  },
+  {
+   "w": "lot",
+   "s": 18.2,
+   "e": 18.46
+  },
+  {
+   "w": "of",
+   "s": 18.46,
+   "e": 18.62
+  },
+  {
+   "w": "tea.",
+   "s": 18.62,
+   "e": 18.84
+  },
+  {
+   "w": "Normally,",
+   "s": 19.26,
+   "e": 19.64
+  },
+  {
+   "w": "data",
+   "s": 19.94,
+   "e": 20.1
+  },
+  {
+   "w": "centers",
+   "s": 20.1,
+   "e": 20.38
+  },
+  {
+   "w": "just",
+   "s": 20.38,
+   "e": 20.7
+  },
+  {
+   "w": "use",
+   "s": 20.7,
+   "e": 20.94
+  },
+  {
+   "w": "big",
+   "s": 20.94,
+   "e": 21.18
+  },
+  {
+   "w": "fans",
+   "s": 21.18,
+   "e": 21.62
+  },
+  {
+   "w": "to",
+   "s": 21.62,
+   "e": 21.86
+  },
+  {
+   "w": "blow",
+   "s": 21.86,
+   "e": 22.02
+  },
+  {
+   "w": "that",
+   "s": 22.02,
+   "e": 22.2
+  },
+  {
+   "w": "heat",
+   "s": 22.2,
+   "e": 22.4
+  },
+  {
+   "w": "outside.",
+   "s": 22.4,
+   "e": 22.88
+  },
+  {
+   "w": "But",
+   "s": 23.46,
+   "e": 23.6
+  },
+  {
+   "w": "Helsinki",
+   "s": 23.6,
+   "e": 24.04
+  },
+  {
+   "w": "WANTS",
+   "s": 24.04,
+   "e": 24.62
+  },
+  {
+   "w": "that",
+   "s": 24.62,
+   "e": 24.94
+  },
+  {
+   "w": "heat.",
+   "s": 24.94,
+   "e": 25.22
+  },
+  {
+   "w": "The",
+   "s": 25.54,
+   "e": 25.64
+  },
+  {
+   "w": "city",
+   "s": 25.64,
+   "e": 25.8
+  },
+  {
+   "w": "has",
+   "s": 25.8,
+   "e": 26.04
+  },
+  {
+   "w": "a",
+   "s": 26.04,
+   "e": 26.18
+  },
+  {
+   "w": "plan",
+   "s": 26.18,
+   "e": 26.34
+  },
+  {
+   "w": "to",
+   "s": 26.34,
+   "e": 26.52
+  },
+  {
+   "w": "use",
+   "s": 26.52,
+   "e": 26.74
+  },
+  {
+   "w": "it,",
+   "s": 26.74,
+   "e": 27.0
+  },
+  {
+   "w": "starting",
+   "s": 27.08,
+   "e": 27.4
+  },
+  {
+   "w": "next",
+   "s": 27.4,
+   "e": 27.7
+  },
+  {
+   "w": "year.",
+   "s": 27.7,
+   "e": 27.96
+  },
+  {
+   "w": "So",
+   "s": 28.34,
+   "e": 28.7
+  },
+  {
+   "w": "how",
+   "s": 28.7,
+   "e": 29.02
+  },
+  {
+   "w": "would",
+   "s": 29.02,
+   "e": 29.16
+  },
+  {
+   "w": "that",
+   "s": 29.16,
+   "e": 29.3
+  },
+  {
+   "w": "work?",
+   "s": 29.3,
+   "e": 29.56
+  },
+  {
+   "w": "A",
+   "s": 29.56,
+   "e": 29.96
+  },
+  {
+   "w": "big",
+   "s": 29.96,
+   "e": 30.18
+  },
+  {
+   "w": "new",
+   "s": 30.18,
+   "e": 30.4
+  },
+  {
+   "w": "data",
+   "s": 30.4,
+   "e": 30.58
+  },
+  {
+   "w": "center",
+   "s": 30.58,
+   "e": 30.88
+  },
+  {
+   "w": "would",
+   "s": 30.88,
+   "e": 31.14
+  },
+  {
+   "w": "take",
+   "s": 31.14,
+   "e": 31.38
+  },
+  {
+   "w": "the",
+   "s": 31.38,
+   "e": 31.56
+  },
+  {
+   "w": "heat",
+   "s": 31.56,
+   "e": 31.76
+  },
+  {
+   "w": "out",
+   "s": 31.76,
+   "e": 32.0
+  },
+  {
+   "w": "of",
+   "s": 32.0,
+   "e": 32.12
+  },
+  {
+   "w": "its",
+   "s": 32.12,
+   "e": 32.26
+  },
+  {
+   "w": "computers",
+   "s": 32.26,
+   "e": 32.66
+  },
+  {
+   "w": "with",
+   "s": 32.66,
+   "e": 33.02
+  },
+  {
+   "w": "water",
+   "s": 33.02,
+   "e": 33.34
+  },
+  {
+   "w": "in",
+   "s": 33.34,
+   "e": 33.64
+  },
+  {
+   "w": "pipes.",
+   "s": 33.64,
+   "e": 33.98
+  },
+  {
+   "w": "Then",
+   "s": 34.46,
+   "e": 34.74
+  },
+  {
+   "w": "pipes",
+   "s": 34.96,
+   "e": 35.18
+  },
+  {
+   "w": "under",
+   "s": 35.18,
+   "e": 35.36
+  },
+  {
+   "w": "the",
+   "s": 35.36,
+   "e": 35.56
+  },
+  {
+   "w": "streets",
+   "s": 35.56,
+   "e": 35.82
+  },
+  {
+   "w": "carry",
+   "s": 35.82,
+   "e": 36.28
+  },
+  {
+   "w": "that",
+   "s": 36.28,
+   "e": 36.54
+  },
+  {
+   "w": "heat",
+   "s": 36.54,
+   "e": 36.8
+  },
+  {
+   "w": "into",
+   "s": 36.8,
+   "e": 37.04
+  },
+  {
+   "w": "people's",
+   "s": 37.04,
+   "e": 37.48
+  },
+  {
+   "w": "homes.",
+   "s": 37.48,
+   "e": 37.76
+  },
+  {
+   "w": "So",
+   "s": 38.48,
+   "e": 38.64
+  },
+  {
+   "w": "your",
+   "s": 38.64,
+   "e": 38.86
+  },
+  {
+   "w": "chatbot",
+   "s": 38.86,
+   "e": 39.4
+  },
+  {
+   "w": "could",
+   "s": 39.4,
+   "e": 39.68
+  },
+  {
+   "w": "soon",
+   "s": 39.68,
+   "e": 39.98
+  },
+  {
+   "w": "heat",
+   "s": 39.98,
+   "e": 40.26
+  },
+  {
+   "w": "an",
+   "s": 40.26,
+   "e": 40.4
+  },
+  {
+   "w": "apartment",
+   "s": 40.4,
+   "e": 40.76
+  },
+  {
+   "w": "in",
+   "s": 40.76,
+   "e": 41.06
+  },
+  {
+   "w": "Helsinki.",
+   "s": 41.06,
+   "e": 41.32
+  }
+ ],
+ "sfx": [],
+ "shots": [
+  {
+   "id": "S1",
+   "s": 0.0,
+   "e": 4.28,
+   "note": "WIDE, THE HOME VIEW \u00b7 planned: HOLD\nthe street paints itself; computer heat warms a home, then the city",
+   "transition": {
+    "type": "cut",
+    "carrier": "B",
+    "device": "thread-match",
+    "what": "frame 0: the loop",
+    "label": "frame 0"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "word": "HOLD"
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": 110,
+     "y": 640,
+     "w": 860,
+     "h": 1000,
+     "tier": "B",
+     "negative": true,
+     "promise": "the drawn panel goes here",
+     "id": "frame"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 840,
+     "text": "S1",
+     "size": 180,
+     "tier": "A",
+     "id": "id"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 990,
+     "text": "the street paints",
+     "size": 62,
+     "tier": "B",
+     "id": "name0"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1068,
+     "text": "itself; computer heat",
+     "size": 62,
+     "tier": "B",
+     "id": "name1"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1146,
+     "text": "warms a home, then the",
+     "size": 62,
+     "tier": "B",
+     "id": "name2"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1224,
+     "text": "city",
+     "size": 62,
+     "tier": "B",
+     "id": "name3"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       200,
+       1400
+      ],
+      [
+       880,
+       1400
+      ]
+     ],
+     "tier": "B",
+     "curve": "joined",
+     "draw": [
+      0,
+      4.28
+     ],
+     "tip": true,
+     "promise": "the shot's time, drawn across it",
+     "id": "clock"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1500,
+     "text": "0.00-4.28 s \u00b7 WIDE",
+     "size": 52,
+     "tier": "B",
+     "id": "times"
+    }
+   ],
+   "name": "the street paints itself; computer heat warms a home, then the city",
+   "type": "WIDE, THE HOME VIEW",
+   "placeholder": true,
+   "life": [
+    "snow",
+    "a ferry crossing the harbour",
+    "a far tram"
+   ],
+   "comp": {
+    "frame": "D7",
+    "move": "RM7",
+    "join": "RJ4"
+   }
+  },
+  {
+   "id": "S2",
+   "s": 4.28,
+   "e": 8.76,
+   "note": "WIDE -> MEDIUM \u00b7 planned: PUSH IN + DOLLY IN\nthe brush un-paints the heat back to the computer; walls rise",
+   "transition": {
+    "type": "cut",
+    "carrier": "C",
+    "device": "continuous",
+    "what": "the brush tip"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "word": "HOLD"
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": 110,
+     "y": 640,
+     "w": 860,
+     "h": 1000,
+     "tier": "B",
+     "negative": true,
+     "promise": "the drawn panel goes here",
+     "id": "frame"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 840,
+     "text": "S2",
+     "size": 180,
+     "tier": "A",
+     "id": "id"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 990,
+     "text": "the brush un-paints the",
+     "size": 62,
+     "tier": "B",
+     "id": "name0"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1068,
+     "text": "heat back to the",
+     "size": 62,
+     "tier": "B",
+     "id": "name1"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1146,
+     "text": "computer; walls rise",
+     "size": 62,
+     "tier": "B",
+     "id": "name2"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       200,
+       1400
+      ],
+      [
+       880,
+       1400
+      ]
+     ],
+     "tier": "B",
+     "curve": "joined",
+     "draw": [
+      0,
+      4.48
+     ],
+     "tip": true,
+     "promise": "the shot's time, drawn across it",
+     "id": "clock"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1500,
+     "text": "4.28-8.76 s \u00b7 WIDE -> MEDIUM",
+     "size": 52,
+     "tier": "B",
+     "id": "times"
+    }
+   ],
+   "name": "the brush un-paints the heat back to the computer; walls rise",
+   "type": "WIDE -> MEDIUM",
+   "placeholder": true,
+   "life": [
+    "snow",
+    "the computer's lights",
+    "a gull over the harbour"
+   ],
+   "comp": {
+    "frame": "Z3",
+    "move": "RM4",
+    "join": "RJ4"
+   }
+  },
+  {
+   "id": "S3",
+   "s": 8.76,
+   "e": 10.96,
+   "note": "CLOSE \u00b7 planned: PUSH IN\nclose: snow melts on its top, then steam pours off",
+   "transition": {
+    "type": "cut",
+    "carrier": "C",
+    "device": "continuous",
+    "what": "RJ4"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "word": "HOLD"
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": 110,
+     "y": 640,
+     "w": 860,
+     "h": 1000,
+     "tier": "B",
+     "negative": true,
+     "promise": "the drawn panel goes here",
+     "id": "frame"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 840,
+     "text": "S3",
+     "size": 180,
+     "tier": "A",
+     "id": "id"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 990,
+     "text": "close: snow melts on its",
+     "size": 62,
+     "tier": "B",
+     "id": "name0"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1068,
+     "text": "top, then steam pours",
+     "size": 62,
+     "tier": "B",
+     "id": "name1"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1146,
+     "text": "off",
+     "size": 62,
+     "tier": "B",
+     "id": "name2"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       200,
+       1400
+      ],
+      [
+       880,
+       1400
+      ]
+     ],
+     "tier": "B",
+     "curve": "joined",
+     "draw": [
+      0,
+      2.2
+     ],
+     "tip": true,
+     "promise": "the shot's time, drawn across it",
+     "id": "clock"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1500,
+     "text": "8.76-10.96 s \u00b7 CLOSE",
+     "size": 52,
+     "tier": "B",
+     "id": "times"
+    }
+   ],
+   "name": "close: snow melts on its top, then steam pours off",
+   "type": "CLOSE",
+   "placeholder": true,
+   "life": [
+    "snow"
+   ],
+   "comp": {
+    "frame": "N9",
+    "move": "RM4",
+    "join": "RJ4"
+   }
+  },
+  {
+   "id": "S4",
+   "s": 10.96,
+   "e": 17.76,
+   "note": "MEDIUM \u00b7 planned: PULL BACK\nthe computer alone; 40 kettles pop on at its foot and boil",
+   "transition": {
+    "type": "cut",
+    "carrier": "C",
+    "device": "continuous",
+    "what": "RJ4"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "word": "HOLD"
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": 110,
+     "y": 640,
+     "w": 860,
+     "h": 1000,
+     "tier": "B",
+     "negative": true,
+     "promise": "the drawn panel goes here",
+     "id": "frame"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 840,
+     "text": "S4",
+     "size": 180,
+     "tier": "A",
+     "id": "id"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 990,
+     "text": "the computer alone; 40",
+     "size": 62,
+     "tier": "B",
+     "id": "name0"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1068,
+     "text": "kettles pop on at its",
+     "size": 62,
+     "tier": "B",
+     "id": "name1"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1146,
+     "text": "foot and boil",
+     "size": 62,
+     "tier": "B",
+     "id": "name2"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       200,
+       1400
+      ],
+      [
+       880,
+       1400
+      ]
+     ],
+     "tier": "B",
+     "curve": "joined",
+     "draw": [
+      0,
+      6.8
+     ],
+     "tip": true,
+     "promise": "the shot's time, drawn across it",
+     "id": "clock"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1500,
+     "text": "10.96-17.76 s \u00b7 MEDIUM",
+     "size": 52,
+     "tier": "B",
+     "id": "times"
+    }
+   ],
+   "name": "the computer alone; 40 kettles pop on at its foot and boil",
+   "type": "MEDIUM",
+   "placeholder": true,
+   "life": [
+    "snow",
+    "steam"
+   ],
+   "comp": {
+    "frame": "D7",
+    "move": "I4",
+    "join": "RJ4"
+   }
+  },
+  {
+   "id": "S5",
+   "s": 17.76,
+   "e": 19.26,
+   "note": "CLOSE \u00b7 planned: PUSH IN\nits top in the steam; a mug of tea pops on",
+   "transition": {
+    "type": "cut",
+    "carrier": "C",
+    "device": "continuous",
+    "what": "RJ4"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "word": "HOLD"
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": 110,
+     "y": 640,
+     "w": 860,
+     "h": 1000,
+     "tier": "B",
+     "negative": true,
+     "promise": "the drawn panel goes here",
+     "id": "frame"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 840,
+     "text": "S5",
+     "size": 180,
+     "tier": "A",
+     "id": "id"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 990,
+     "text": "its top in the steam; a",
+     "size": 62,
+     "tier": "B",
+     "id": "name0"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1068,
+     "text": "mug of tea pops on",
+     "size": 62,
+     "tier": "B",
+     "id": "name1"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       200,
+       1400
+      ],
+      [
+       880,
+       1400
+      ]
+     ],
+     "tier": "B",
+     "curve": "joined",
+     "draw": [
+      0,
+      1.5
+     ],
+     "tip": true,
+     "promise": "the shot's time, drawn across it",
+     "id": "clock"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1500,
+     "text": "17.76-19.26 s \u00b7 CLOSE",
+     "size": 52,
+     "tier": "B",
+     "id": "times"
+    }
+   ],
+   "name": "its top in the steam; a mug of tea pops on",
+   "type": "CLOSE",
+   "placeholder": true,
+   "life": [
+    "the steam"
+   ],
+   "comp": {
+    "frame": "N9",
+    "move": "RM4",
+    "join": "RJ4"
+   }
+  },
+  {
+   "id": "S6",
+   "s": 19.26,
+   "e": 23.46,
+   "note": "CLOSE -> EXTREME WIDE \u00b7 planned: PULL BACK\nout from the mug to Earth's curve; data centers blow heat away",
+   "transition": {
+    "type": "cut",
+    "carrier": "C",
+    "device": "continuous",
+    "what": "RJ4"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "word": "HOLD"
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": 110,
+     "y": 640,
+     "w": 860,
+     "h": 1000,
+     "tier": "B",
+     "negative": true,
+     "promise": "the drawn panel goes here",
+     "id": "frame"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 840,
+     "text": "S6",
+     "size": 180,
+     "tier": "A",
+     "id": "id"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 990,
+     "text": "out from the mug to",
+     "size": 62,
+     "tier": "B",
+     "id": "name0"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1068,
+     "text": "Earth's curve; data",
+     "size": 62,
+     "tier": "B",
+     "id": "name1"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1146,
+     "text": "centers blow heat away",
+     "size": 62,
+     "tier": "B",
+     "id": "name2"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       200,
+       1400
+      ],
+      [
+       880,
+       1400
+      ]
+     ],
+     "tier": "B",
+     "curve": "joined",
+     "draw": [
+      0,
+      4.2
+     ],
+     "tip": true,
+     "promise": "the shot's time, drawn across it",
+     "id": "clock"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1500,
+     "text": "19.26-23.46 s \u00b7 CLOSE -> EXTREME WIDE",
+     "size": 52,
+     "tier": "B",
+     "id": "times"
+    }
+   ],
+   "name": "out from the mug to Earth's curve; data centers blow heat away",
+   "type": "CLOSE -> EXTREME WIDE",
+   "placeholder": true,
+   "life": [
+    "drifting clouds",
+    "a far flock"
+   ],
+   "comp": {
+    "frame": "D2",
+    "move": "I4",
+    "join": "RJ2"
+   },
+   "reveal": true
+  },
+  {
+   "id": "S7",
+   "s": 23.46,
+   "e": 25.54,
+   "note": "WIDE \u00b7 planned: SETTLE\ncut to the computer; on \"WANTS\" the city's pipe reaches for it",
+   "transition": {
+    "type": "cut",
+    "carrier": "F",
+    "device": "plain-cut",
+    "what": "RJ2"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "word": "HOLD"
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": 110,
+     "y": 640,
+     "w": 860,
+     "h": 1000,
+     "tier": "B",
+     "negative": true,
+     "promise": "the drawn panel goes here",
+     "id": "frame"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 840,
+     "text": "S7",
+     "size": 180,
+     "tier": "A",
+     "id": "id"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 990,
+     "text": "cut to the computer; on",
+     "size": 62,
+     "tier": "B",
+     "id": "name0"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1068,
+     "text": "\"WANTS\" the city's pipe",
+     "size": 62,
+     "tier": "B",
+     "id": "name1"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1146,
+     "text": "reaches for it",
+     "size": 62,
+     "tier": "B",
+     "id": "name2"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       200,
+       1400
+      ],
+      [
+       880,
+       1400
+      ]
+     ],
+     "tier": "B",
+     "curve": "joined",
+     "draw": [
+      0,
+      2.08
+     ],
+     "tip": true,
+     "promise": "the shot's time, drawn across it",
+     "id": "clock"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1500,
+     "text": "23.46-25.54 s \u00b7 WIDE",
+     "size": 52,
+     "tier": "B",
+     "id": "times"
+    }
+   ],
+   "name": "cut to the computer; on \"WANTS\" the city's pipe reaches for it",
+   "type": "WIDE",
+   "placeholder": true,
+   "life": [
+    "snow",
+    "a far tram"
+   ],
+   "comp": {
+    "frame": "N15",
+    "move": "RM4",
+    "join": "RJ4"
+   }
+  },
+  {
+   "id": "S8",
+   "s": 25.54,
+   "e": 28.34,
+   "note": "MEDIUM \u00b7 planned: PUSH IN\nthe plan stands out wall by wall; the 2027 tag",
+   "transition": {
+    "type": "cut",
+    "carrier": "C",
+    "device": "continuous",
+    "what": "RJ4"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "word": "HOLD"
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": 110,
+     "y": 640,
+     "w": 860,
+     "h": 1000,
+     "tier": "B",
+     "negative": true,
+     "promise": "the drawn panel goes here",
+     "id": "frame"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 840,
+     "text": "S8",
+     "size": 180,
+     "tier": "A",
+     "id": "id"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 990,
+     "text": "the plan stands out wall",
+     "size": 62,
+     "tier": "B",
+     "id": "name0"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1068,
+     "text": "by wall; the 2027 tag",
+     "size": 62,
+     "tier": "B",
+     "id": "name1"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       200,
+       1400
+      ],
+      [
+       880,
+       1400
+      ]
+     ],
+     "tier": "B",
+     "curve": "joined",
+     "draw": [
+      0,
+      2.8
+     ],
+     "tip": true,
+     "promise": "the shot's time, drawn across it",
+     "id": "clock"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1500,
+     "text": "25.54-28.34 s \u00b7 MEDIUM",
+     "size": 52,
+     "tier": "B",
+     "id": "times"
+    }
+   ],
+   "name": "the plan stands out wall by wall; the 2027 tag",
+   "type": "MEDIUM",
+   "placeholder": true,
+   "life": [
+    "snow",
+    "the ferry behind the plan"
+   ],
+   "comp": {
+    "frame": "C1",
+    "move": "RM4",
+    "join": "RJ4"
+   }
+  },
+  {
+   "id": "S9",
+   "s": 28.34,
+   "e": 29.56,
+   "note": "MEDIUM \u00b7 planned: DOLLY IN\ndolly in through the plan; the computer's door swings open",
+   "transition": {
+    "type": "cut",
+    "carrier": "C",
+    "device": "continuous",
+    "what": "RJ4"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "word": "HOLD"
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": 110,
+     "y": 640,
+     "w": 860,
+     "h": 1000,
+     "tier": "B",
+     "negative": true,
+     "promise": "the drawn panel goes here",
+     "id": "frame"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 840,
+     "text": "S9",
+     "size": 180,
+     "tier": "A",
+     "id": "id"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 990,
+     "text": "dolly in through the",
+     "size": 62,
+     "tier": "B",
+     "id": "name0"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1068,
+     "text": "plan; the computer's",
+     "size": 62,
+     "tier": "B",
+     "id": "name1"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1146,
+     "text": "door swings open",
+     "size": 62,
+     "tier": "B",
+     "id": "name2"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       200,
+       1400
+      ],
+      [
+       880,
+       1400
+      ]
+     ],
+     "tier": "B",
+     "curve": "joined",
+     "draw": [
+      0,
+      1.22
+     ],
+     "tip": true,
+     "promise": "the shot's time, drawn across it",
+     "id": "clock"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1500,
+     "text": "28.34-29.56 s \u00b7 MEDIUM",
+     "size": 52,
+     "tier": "B",
+     "id": "times"
+    }
+   ],
+   "name": "dolly in through the plan; the computer's door swings open",
+   "type": "MEDIUM",
+   "placeholder": true,
+   "life": [
+    "snow beyond the plan"
+   ],
+   "comp": {
+    "frame": "E2",
+    "move": "RM4",
+    "join": "RJ4"
+   }
+  },
+  {
+   "id": "S10",
+   "s": 29.56,
+   "e": 34.46,
+   "note": "MEDIUM, S9'S FRAME HELD \u00b7 planned: HOLD\na planned hall behind; water takes the heat, the steam stops",
+   "transition": {
+    "type": "cut",
+    "carrier": "C",
+    "device": "continuous",
+    "what": "RJ4"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "word": "HOLD"
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": 110,
+     "y": 640,
+     "w": 860,
+     "h": 1000,
+     "tier": "B",
+     "negative": true,
+     "promise": "the drawn panel goes here",
+     "id": "frame"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 840,
+     "text": "S10",
+     "size": 180,
+     "tier": "A",
+     "id": "id"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 990,
+     "text": "a planned hall behind;",
+     "size": 62,
+     "tier": "B",
+     "id": "name0"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1068,
+     "text": "water takes the heat,",
+     "size": 62,
+     "tier": "B",
+     "id": "name1"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1146,
+     "text": "the steam stops",
+     "size": 62,
+     "tier": "B",
+     "id": "name2"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       200,
+       1400
+      ],
+      [
+       880,
+       1400
+      ]
+     ],
+     "tier": "B",
+     "curve": "joined",
+     "draw": [
+      0,
+      4.9
+     ],
+     "tip": true,
+     "promise": "the shot's time, drawn across it",
+     "id": "clock"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1500,
+     "text": "29.56-34.46 s \u00b7 MEDIUM",
+     "size": 52,
+     "tier": "B",
+     "id": "times"
+    }
+   ],
+   "name": "a planned hall behind; water takes the heat, the steam stops",
+   "type": "MEDIUM, S9'S FRAME HELD",
+   "placeholder": true,
+   "life": [
+    "snow beyond the plan"
+   ],
+   "comp": {
+    "move": "RM7",
+    "join": "RM3"
+   }
+  },
+  {
+   "id": "S11",
+   "s": 34.46,
+   "e": 38.48,
+   "note": "WIDE, THE HOME VIEW A STEP CLOSER \u00b7 planned: FOLLOW\nfollow the hot water under the street into the one home",
+   "transition": {
+    "type": "cut",
+    "carrier": "C",
+    "device": "continuous",
+    "what": "RM3"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "word": "HOLD"
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": 110,
+     "y": 640,
+     "w": 860,
+     "h": 1000,
+     "tier": "B",
+     "negative": true,
+     "promise": "the drawn panel goes here",
+     "id": "frame"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 840,
+     "text": "S11",
+     "size": 180,
+     "tier": "A",
+     "id": "id"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 990,
+     "text": "follow the hot water",
+     "size": 62,
+     "tier": "B",
+     "id": "name0"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1068,
+     "text": "under the street into",
+     "size": 62,
+     "tier": "B",
+     "id": "name1"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1146,
+     "text": "the one home",
+     "size": 62,
+     "tier": "B",
+     "id": "name2"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       200,
+       1400
+      ],
+      [
+       880,
+       1400
+      ]
+     ],
+     "tier": "B",
+     "curve": "joined",
+     "draw": [
+      0,
+      4.02
+     ],
+     "tip": true,
+     "promise": "the shot's time, drawn across it",
+     "id": "clock"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1500,
+     "text": "34.46-38.48 s \u00b7 WIDE",
+     "size": 52,
+     "tier": "B",
+     "id": "times"
+    }
+   ],
+   "name": "follow the hot water under the street into the one home",
+   "type": "WIDE, THE HOME VIEW A STEP CLOSER",
+   "placeholder": true,
+   "life": [
+    "the tram",
+    "walkers' feet in the snow"
+   ],
+   "comp": {
+    "frame": "E3",
+    "move": "RM3",
+    "join": "RJ4"
+   }
+  },
+  {
+   "id": "S12",
+   "s": 38.48,
+   "e": 42.24,
+   "note": "WIDE \u00b7 planned: PULL BACK\nthe home view and your phone; your chat sends heat home",
+   "transition": {
+    "type": "cut",
+    "carrier": "C",
+    "device": "continuous",
+    "what": "RJ4"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "word": "HOLD"
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": 110,
+     "y": 640,
+     "w": 860,
+     "h": 1000,
+     "tier": "B",
+     "negative": true,
+     "promise": "the drawn panel goes here",
+     "id": "frame"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 840,
+     "text": "S12",
+     "size": 180,
+     "tier": "A",
+     "id": "id"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 990,
+     "text": "the home view and your",
+     "size": 62,
+     "tier": "B",
+     "id": "name0"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1068,
+     "text": "phone; your chat sends",
+     "size": 62,
+     "tier": "B",
+     "id": "name1"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1146,
+     "text": "heat home",
+     "size": 62,
+     "tier": "B",
+     "id": "name2"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       200,
+       1400
+      ],
+      [
+       880,
+       1400
+      ]
+     ],
+     "tier": "B",
+     "curve": "joined",
+     "draw": [
+      0,
+      3.76
+     ],
+     "tip": true,
+     "promise": "the shot's time, drawn across it",
+     "id": "clock"
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1500,
+     "text": "38.48-42.24 s \u00b7 WIDE",
+     "size": 52,
+     "tier": "B",
+     "id": "times"
+    }
+   ],
+   "name": "the home view and your phone; your chat sends heat home",
+   "type": "WIDE",
+   "placeholder": true,
+   "life": [
+    "snow",
+    "the ferry",
+    "a far tram"
+   ],
+   "comp": {
+    "frame": "N14",
+    "move": "RM7"
+   }
+  }
+ ],
+ "draft": true,
+ "loopJoin": {
+  "type": "cut",
+  "carrier": "B",
+  "device": "thread-match",
+  "what": "the run's start and the brush tip at frame 0"
+ },
+ "throughline": {
+  "thread": "the heat: warm water in a pipe, the melt over it, the steam where it is let go",
+  "home": "the one window and its radiator",
+  "reveal": [
+   19.26,
+   23.46
+  ]
+ }
+}

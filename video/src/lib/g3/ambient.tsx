@@ -55,8 +55,6 @@ export const AmbientView: React.FC<{el: Ambient & {fill?: Fill; id?: string}; T:
       const h = el.h ?? 260;
       const w = el.w ?? 160;
       const r0 = el.r ?? Math.max(14, w * 0.18);
-      const level = Math.max(0, Math.min(1, keyed(el.level, local, 1)));
-      if (level <= 0.001) return null;
       const life = h / rise;
       const k1 = Math.floor(T * rate);
       const k0 = k1 - Math.ceil(life * rate) - 1;
@@ -68,7 +66,9 @@ export const AmbientView: React.FC<{el: Ambient & {fill?: Fill; id?: string}; T:
         const age = T - k / rate;
         if (age < 0 || age >= life) continue;
         const R = rng(`${sd}/p${k}`);
-        if (R.next() > level) continue; // thinning: fewer puffs at a lower level
+        // the level when this puff was born: a thinning or a stop lets the puffs already rising drift away
+        const level = Math.max(0, Math.min(1, keyed(el.level, local - age, 1)));
+        if (R.next() >= level) continue;
         const f = age / life;
         const x = el.x + Math.sin(f * 3.1 + R.range(0, 6.28)) * w * 0.16 + R.jitter(w * 0.08);
         const y = el.y - rise * age;
@@ -118,7 +118,7 @@ export const AmbientView: React.FC<{el: Ambient & {fill?: Fill; id?: string}; T:
       const rh = el.rh ?? 110;
       const v = el.speed ?? 10;
       const span = el.w + rw;
-      const x = el.x - rw / 2 + mod((el.phase ?? 0) * span + v * T, span);
+      const x = el.x - rw / 2 + mod((el.phase ?? rng(`${sd}/ph`).next()) * span + v * T, span);
       const cy = el.y + el.h / 2;
       const d = crown(x, cy, rw / 2, rh / 2, {seed: `${sd}/c`});
       const lineC = wt.tier === 'C' || wt.tier === null ? null : wt.line;

@@ -1,0 +1,2926 @@
+{
+ "format": "captions2/1",
+ "film": "v4",
+ "fps": 60,
+ "lead": 2,
+ "durationSec": 42.24,
+ "words": "public/v4/voice_words.json",
+ "groupsFile": "scripts/captions2/v4_groups.txt",
+ "groups": [
+  {
+   "id": "g01",
+   "recipe": "R2",
+   "shot": "S1",
+   "tone": "dark",
+   "text": "Did you know / Helsinki",
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "x": 120.0,
+     "anchor": "start",
+     "pieces": [
+      {
+       "t": "Did",
+       "words": [
+        0
+       ],
+       "s": 0.129,
+       "e": 0.28,
+       "at": 0.0,
+       "style": "hook",
+       "size": 136,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "you",
+       "words": [
+        1
+       ],
+       "s": 0.28,
+       "e": 0.46,
+       "at": 0.0,
+       "style": "hook",
+       "size": 136,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "know",
+       "words": [
+        2
+       ],
+       "s": 0.46,
+       "e": 0.64,
+       "at": 0.0,
+       "style": "hook",
+       "size": 136,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 525,
+     "x": 400.0,
+     "anchor": "start",
+     "pieces": [
+      {
+       "t": "Helsinki",
+       "words": [
+        3
+       ],
+       "s": 0.64,
+       "e": 1.1,
+       "at": 0.64,
+       "style": "hook",
+       "size": 136,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 0.0,
+   "end": 1.0667,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 120.0,
+    "x1": 879.6,
+    "y0": 316,
+    "y1": 532,
+    "cx": 499.8
+   }
+  },
+  {
+   "id": "g02",
+   "recipe": "R2",
+   "shot": "S1",
+   "tone": "dark",
+   "text": "wants AI / to heat",
+   "seat": "R",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "wants",
+       "words": [
+        4
+       ],
+       "s": 1.1,
+       "e": 1.5,
+       "at": 1.1,
+       "style": "hook",
+       "size": 136,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "AI",
+       "words": [
+        5
+       ],
+       "s": 1.5,
+       "e": 1.88,
+       "at": 1.1,
+       "style": "hook",
+       "size": 136,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 525,
+     "pieces": [
+      {
+       "t": "to",
+       "words": [
+        6
+       ],
+       "s": 1.88,
+       "e": 2.14,
+       "at": 1.1,
+       "style": "hook",
+       "size": 136,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "heat",
+       "words": [
+        7
+       ],
+       "s": 2.14,
+       "e": 2.34,
+       "at": 1.1,
+       "style": "hook",
+       "size": 136,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 1.0667,
+   "end": 2.3,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 343.0,
+    "x1": 857.0,
+    "y0": 320,
+    "y1": 531,
+    "cx": 600.0
+   }
+  },
+  {
+   "id": "g03",
+   "recipe": "R3",
+   "shot": "S1",
+   "tone": "dark",
+   "text": "70,000 / homes?",
+   "stress": {
+    "kind": "number",
+    "t": "70,000",
+    "piece": [
+     0,
+     0
+    ]
+   },
+   "rows": [
+    {
+     "baseline": 482,
+     "x": 466,
+     "anchor": "middle",
+     "pieces": [
+      {
+       "t": "70,000",
+       "words": [
+        8,
+        9
+       ],
+       "s": 2.34,
+       "e": 3.42,
+       "at": 2.34,
+       "style": "number",
+       "size": 250,
+       "weight": 700,
+       "track": -0.02,
+       "lit": true,
+       "tuck": [
+        0.02,
+        0.05
+       ]
+      }
+     ]
+    },
+    {
+     "baseline": 578,
+     "x": 930,
+     "anchor": "end",
+     "pieces": [
+      {
+       "t": "homes?",
+       "words": [
+        10
+       ],
+       "s": 3.42,
+       "e": 3.92,
+       "at": 3.42,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 2.3,
+   "end": 4.2333,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 131.6,
+    "x1": 930.0,
+    "y0": 352,
+    "y1": 583,
+    "cx": 530.8
+   }
+  },
+  {
+   "id": "g04",
+   "recipe": "R1",
+   "shot": "S2",
+   "tone": "dark",
+   "text": "AI actually runs",
+   "seat": "C",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 455,
+     "pieces": [
+      {
+       "t": "AI",
+       "words": [
+        11
+       ],
+       "s": 4.28,
+       "e": 4.54,
+       "at": 4.28,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "actually",
+       "words": [
+        12
+       ],
+       "s": 4.54,
+       "e": 5.04,
+       "at": 4.28,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "runs",
+       "words": [
+        13
+       ],
+       "s": 5.04,
+       "e": 5.32,
+       "at": 4.28,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 4.2333,
+   "end": 5.2833,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 125.5,
+    "x1": 914.5,
+    "y0": 390,
+    "y1": 483,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g05",
+   "recipe": "R1",
+   "shot": "S2",
+   "tone": "dark",
+   "text": "on giant / computers,",
+   "seat": "L",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "on",
+       "words": [
+        14
+       ],
+       "s": 5.32,
+       "e": 5.68,
+       "at": 5.32,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "giant",
+       "words": [
+        15
+       ],
+       "s": 5.68,
+       "e": 5.94,
+       "at": 5.32,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "computers,",
+       "words": [
+        16
+       ],
+       "s": 5.94,
+       "e": 6.5,
+       "at": 5.32,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 5.2833,
+   "end": 6.4667,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 131.0,
+    "x1": 749.0,
+    "y0": 331,
+    "y1": 541,
+    "cx": 440.0
+   }
+  },
+  {
+   "id": "g06",
+   "recipe": "R1",
+   "shot": "S2",
+   "tone": "dark",
+   "text": "in buildings / called",
+   "seat": "R",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "in",
+       "words": [
+        17
+       ],
+       "s": 6.5,
+       "e": 6.92,
+       "at": 6.5,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "buildings",
+       "words": [
+        18
+       ],
+       "s": 6.92,
+       "e": 7.24,
+       "at": 6.5,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "called",
+       "words": [
+        19
+       ],
+       "s": 7.24,
+       "e": 7.56,
+       "at": 6.5,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 6.4667,
+   "end": 7.5167,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 321.8,
+    "x1": 878.2,
+    "y0": 327,
+    "y1": 520,
+    "cx": 600.0
+   }
+  },
+  {
+   "id": "g07",
+   "recipe": "R1",
+   "shot": "S2",
+   "tone": "dark",
+   "text": "data centers.",
+   "seat": "C",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 455,
+     "pieces": [
+      {
+       "t": "data",
+       "words": [
+        20
+       ],
+       "s": 7.56,
+       "e": 7.84,
+       "at": 7.56,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "centers.",
+       "words": [
+        21
+       ],
+       "s": 7.84,
+       "e": 8.22,
+       "at": 7.56,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 7.5167,
+   "end": 8.7167,
+   "enter": "pop",
+   "leave": "soft",
+   "est": {
+    "x0": 198.7,
+    "x1": 841.3,
+    "y0": 387,
+    "y1": 460,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g08",
+   "recipe": "R5",
+   "shot": "S3",
+   "tone": "dark",
+   "text": "Those computers / get really hot.",
+   "seat": "C",
+   "step": 100.0,
+   "stress": {
+    "kind": "lift",
+    "t": "hot.",
+    "piece": [
+     1,
+     2
+    ]
+   },
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "Those",
+       "words": [
+        22
+       ],
+       "s": 8.76,
+       "e": 8.98,
+       "at": 8.76,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "computers",
+       "words": [
+        23
+       ],
+       "s": 8.98,
+       "e": 9.4,
+       "at": 8.76,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "get",
+       "words": [
+        24
+       ],
+       "s": 9.4,
+       "e": 9.74,
+       "at": 9.4,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "really",
+       "words": [
+        25
+       ],
+       "s": 9.74,
+       "e": 10.2,
+       "at": 9.74,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "hot.",
+       "words": [
+        26
+       ],
+       "s": 10.2,
+       "e": 10.64,
+       "at": 10.2,
+       "style": "lift",
+       "size": 116,
+       "weight": 700,
+       "track": 0.02,
+       "lit": true
+      }
+     ]
+    }
+   ],
+   "start": 8.7167,
+   "end": 10.9167,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 108.7,
+    "x1": 931.3,
+    "y0": 328,
+    "y1": 543,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g09",
+   "recipe": "R1",
+   "shot": "S4",
+   "tone": "dark",
+   "text": "To put it / into perspective,",
+   "seat": "C",
+   "step": 36.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "To",
+       "words": [
+        27
+       ],
+       "s": 10.96,
+       "e": 11.06,
+       "at": 10.96,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "put",
+       "words": [
+        28
+       ],
+       "s": 11.06,
+       "e": 11.2,
+       "at": 10.96,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "it",
+       "words": [
+        29
+       ],
+       "s": 11.2,
+       "e": 11.32,
+       "at": 10.96,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "into",
+       "words": [
+        30
+       ],
+       "s": 11.32,
+       "e": 11.5,
+       "at": 11.32,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "perspective,",
+       "words": [
+        31
+       ],
+       "s": 11.5,
+       "e": 11.98,
+       "at": 11.32,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 10.9167,
+   "end": 12.3667,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 95.9,
+    "x1": 944.1,
+    "y0": 331,
+    "y1": 541,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g10",
+   "recipe": "R1",
+   "shot": "S4",
+   "tone": "dark",
+   "text": "just one of / these computers",
+   "seat": "C",
+   "step": 44.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "just",
+       "words": [
+        32
+       ],
+       "s": 12.4,
+       "e": 12.54,
+       "at": 12.4,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "one",
+       "words": [
+        33
+       ],
+       "s": 12.54,
+       "e": 12.9,
+       "at": 12.4,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "of",
+       "words": [
+        34
+       ],
+       "s": 12.9,
+       "e": 13.06,
+       "at": 12.4,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "these",
+       "words": [
+        35
+       ],
+       "s": 13.06,
+       "e": 13.24,
+       "at": 12.4,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "computers",
+       "words": [
+        36
+       ],
+       "s": 13.24,
+       "e": 13.72,
+       "at": 12.4,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 12.3667,
+   "end": 13.6833,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 96.0,
+    "x1": 944.0,
+    "y0": 324,
+    "y1": 541,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g11",
+   "recipe": "R1",
+   "shot": "S4",
+   "tone": "dark",
+   "text": "makes as much / heat as",
+   "seat": "C",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "makes",
+       "words": [
+        37
+       ],
+       "s": 13.72,
+       "e": 14.04,
+       "at": 13.72,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "as",
+       "words": [
+        38
+       ],
+       "s": 14.04,
+       "e": 14.24,
+       "at": 13.72,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "much",
+       "words": [
+        39
+       ],
+       "s": 14.24,
+       "e": 14.56,
+       "at": 13.72,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "heat",
+       "words": [
+        40
+       ],
+       "s": 14.56,
+       "e": 14.82,
+       "at": 13.72,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "as",
+       "words": [
+        41
+       ],
+       "s": 14.82,
+       "e": 15.06,
+       "at": 13.72,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 13.6833,
+   "end": 15.0167,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 149.0,
+    "x1": 891.0,
+    "y0": 328,
+    "y1": 520,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g12",
+   "recipe": "R3",
+   "shot": "S4",
+   "tone": "dark",
+   "text": "40 / kettles,",
+   "stress": {
+    "kind": "number",
+    "t": "40",
+    "piece": [
+     0,
+     0
+    ]
+   },
+   "rows": [
+    {
+     "baseline": 482,
+     "x": 466,
+     "anchor": "middle",
+     "pieces": [
+      {
+       "t": "40",
+       "words": [
+        42
+       ],
+       "s": 15.06,
+       "e": 15.54,
+       "at": 15.06,
+       "style": "number",
+       "size": 250,
+       "weight": 700,
+       "track": -0.02,
+       "lit": true,
+       "tuck": [
+        0.02,
+        0.05
+       ]
+      }
+     ]
+    },
+    {
+     "baseline": 576,
+     "x": 930,
+     "anchor": "end",
+     "pieces": [
+      {
+       "t": "kettles,",
+       "words": [
+        43
+       ],
+       "s": 15.54,
+       "e": 16.1,
+       "at": 15.54,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 15.0167,
+   "end": 16.1833,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 344.8,
+    "x1": 930.0,
+    "y0": 349,
+    "y1": 585,
+    "cx": 637.4
+   }
+  },
+  {
+   "id": "g13",
+   "recipe": "R1",
+   "shot": "S4",
+   "tone": "dark",
+   "text": "boiling / non-stop.",
+   "seat": "L",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "boiling",
+       "words": [
+        44
+       ],
+       "s": 16.22,
+       "e": 16.56,
+       "at": 16.22,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "non-stop.",
+       "words": [
+        45
+       ],
+       "s": 16.56,
+       "e": 17.34,
+       "at": 16.22,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 16.1833,
+   "end": 17.7167,
+   "enter": "pop",
+   "leave": "soft",
+   "est": {
+    "x0": 163.5,
+    "x1": 716.5,
+    "y0": 330,
+    "y1": 541,
+    "cx": 440.0
+   }
+  },
+  {
+   "id": "g14",
+   "recipe": "R6",
+   "shot": "S5",
+   "tone": "dark",
+   "text": "That's a lot / of tea.",
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 400,
+     "x": 110,
+     "anchor": "start",
+     "pieces": [
+      {
+       "t": "That's",
+       "words": [
+        46
+       ],
+       "s": 17.76,
+       "e": 18.08,
+       "at": 17.76,
+       "style": "phrase",
+       "size": 150,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "a",
+       "words": [
+        47
+       ],
+       "s": 18.08,
+       "e": 18.2,
+       "at": 17.76,
+       "style": "phrase",
+       "size": 150,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "lot",
+       "words": [
+        48
+       ],
+       "s": 18.2,
+       "e": 18.46,
+       "at": 17.76,
+       "style": "phrase",
+       "size": 150,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 570,
+     "x": 890,
+     "anchor": "end",
+     "pieces": [
+      {
+       "t": "of",
+       "words": [
+        49
+       ],
+       "s": 18.46,
+       "e": 18.62,
+       "at": 18.46,
+       "style": "phrase",
+       "size": 150,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "tea.",
+       "words": [
+        50
+       ],
+       "s": 18.62,
+       "e": 18.84,
+       "at": 18.62,
+       "style": "phraseBig",
+       "size": 190,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false,
+       "gap": 72.0
+      }
+     ]
+    }
+   ],
+   "start": 17.7167,
+   "end": 19.2167,
+   "enter": "pop",
+   "leave": "soft",
+   "est": {
+    "x0": 110.0,
+    "x1": 890.0,
+    "y0": 296,
+    "y1": 578,
+    "cx": 500.0
+   }
+  },
+  {
+   "id": "g15",
+   "recipe": "R8",
+   "shot": "S6",
+   "tone": "dark",
+   "text": "Normally, / data centers",
+   "seat": "C",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "Normally,",
+       "words": [
+        51
+       ],
+       "s": 19.26,
+       "e": 19.64,
+       "at": 19.26,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "data",
+       "words": [
+        52
+       ],
+       "s": 19.94,
+       "e": 20.1,
+       "at": 19.94,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "centers",
+       "words": [
+        53
+       ],
+       "s": 20.1,
+       "e": 20.38,
+       "at": 19.94,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 19.2167,
+   "end": 20.3333,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 165.7,
+    "x1": 874.3,
+    "y0": 329,
+    "y1": 520,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g16",
+   "recipe": "R8",
+   "shot": "S6",
+   "tone": "dark",
+   "text": "just use / big fans",
+   "seat": "C",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "just",
+       "words": [
+        54
+       ],
+       "s": 20.38,
+       "e": 20.7,
+       "at": 20.38,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "use",
+       "words": [
+        55
+       ],
+       "s": 20.7,
+       "e": 20.94,
+       "at": 20.38,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "big",
+       "words": [
+        56
+       ],
+       "s": 20.94,
+       "e": 21.18,
+       "at": 20.38,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "fans",
+       "words": [
+        57
+       ],
+       "s": 21.18,
+       "e": 21.62,
+       "at": 20.38,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 20.3333,
+   "end": 21.5833,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 276.1,
+    "x1": 763.9,
+    "y0": 331,
+    "y1": 541,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g17",
+   "recipe": "R8",
+   "shot": "S6",
+   "tone": "dark",
+   "text": "to blow that / heat outside.",
+   "seat": "C",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "to",
+       "words": [
+        58
+       ],
+       "s": 21.62,
+       "e": 21.86,
+       "at": 21.62,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "blow",
+       "words": [
+        59
+       ],
+       "s": 21.86,
+       "e": 22.02,
+       "at": 21.62,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "that",
+       "words": [
+        60
+       ],
+       "s": 22.02,
+       "e": 22.2,
+       "at": 21.62,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "heat",
+       "words": [
+        61
+       ],
+       "s": 22.2,
+       "e": 22.4,
+       "at": 21.62,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "outside.",
+       "words": [
+        62
+       ],
+       "s": 22.4,
+       "e": 22.88,
+       "at": 21.62,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 21.5833,
+   "end": 23.4167,
+   "enter": "pop",
+   "leave": "soft",
+   "est": {
+    "x0": 155.5,
+    "x1": 884.5,
+    "y0": 328,
+    "y1": 520,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g18",
+   "recipe": "R4",
+   "shot": "S7",
+   "tone": "dark",
+   "text": "But Helsinki / wants / that heat.",
+   "stress": {
+    "kind": "landing",
+    "t": "wants",
+    "piece": [
+     1,
+     0
+    ]
+   },
+   "rows": [
+    {
+     "baseline": 362,
+     "x": 130,
+     "anchor": "start",
+     "pieces": [
+      {
+       "t": "But",
+       "words": [
+        63
+       ],
+       "s": 23.46,
+       "e": 23.6,
+       "at": 23.46,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "Helsinki",
+       "words": [
+        64
+       ],
+       "s": 23.6,
+       "e": 24.04,
+       "at": 23.46,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 482,
+     "x": 236,
+     "anchor": "start",
+     "pieces": [
+      {
+       "t": "wants",
+       "words": [
+        65
+       ],
+       "s": 24.04,
+       "e": 24.62,
+       "at": 24.04,
+       "style": "landing",
+       "size": 156,
+       "weight": 700,
+       "track": 0.02,
+       "lit": true
+      }
+     ]
+    },
+    {
+     "baseline": 578,
+     "x": 920,
+     "anchor": "end",
+     "pieces": [
+      {
+       "t": "that",
+       "words": [
+        66
+       ],
+       "s": 24.62,
+       "e": 24.94,
+       "at": 24.62,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "heat.",
+       "words": [
+        67
+       ],
+       "s": 24.94,
+       "e": 25.22,
+       "at": 24.62,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 23.4167,
+   "end": 25.5,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 130.0,
+    "x1": 920.0,
+    "y0": 292,
+    "y1": 583,
+    "cx": 525.0
+   }
+  },
+  {
+   "id": "g19",
+   "recipe": "R1",
+   "shot": "S8",
+   "tone": "dark",
+   "text": "The city has / a plan to use it,",
+   "seat": "C",
+   "step": 34.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "The",
+       "words": [
+        68
+       ],
+       "s": 25.54,
+       "e": 25.64,
+       "at": 25.54,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "city",
+       "words": [
+        69
+       ],
+       "s": 25.64,
+       "e": 25.8,
+       "at": 25.54,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "has",
+       "words": [
+        70
+       ],
+       "s": 25.8,
+       "e": 26.04,
+       "at": 25.54,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "a",
+       "words": [
+        71
+       ],
+       "s": 26.04,
+       "e": 26.18,
+       "at": 26.04,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "plan",
+       "words": [
+        72
+       ],
+       "s": 26.18,
+       "e": 26.34,
+       "at": 26.04,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "to",
+       "words": [
+        73
+       ],
+       "s": 26.34,
+       "e": 26.52,
+       "at": 26.34,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "use",
+       "words": [
+        74
+       ],
+       "s": 26.52,
+       "e": 26.74,
+       "at": 26.34,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "it,",
+       "words": [
+        75
+       ],
+       "s": 26.74,
+       "e": 27.0,
+       "at": 26.34,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 25.5,
+   "end": 27.0333,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 96.3,
+    "x1": 943.7,
+    "y0": 328,
+    "y1": 541,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g20",
+   "recipe": "R1",
+   "shot": "S8",
+   "tone": "dark",
+   "text": "starting / next year.",
+   "seat": "C",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "starting",
+       "words": [
+        76
+       ],
+       "s": 27.08,
+       "e": 27.4,
+       "at": 27.08,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "next",
+       "words": [
+        77
+       ],
+       "s": 27.4,
+       "e": 27.7,
+       "at": 27.08,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "year.",
+       "words": [
+        78
+       ],
+       "s": 27.7,
+       "e": 27.96,
+       "at": 27.08,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 27.0333,
+   "end": 28.3,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 221.0,
+    "x1": 819.0,
+    "y0": 331,
+    "y1": 543,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g21",
+   "recipe": "R1",
+   "shot": "S9",
+   "tone": "dark",
+   "text": "So how would / that work?",
+   "seat": "C",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "So",
+       "words": [
+        79
+       ],
+       "s": 28.34,
+       "e": 28.7,
+       "at": 28.34,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "how",
+       "words": [
+        80
+       ],
+       "s": 28.7,
+       "e": 29.02,
+       "at": 28.34,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "would",
+       "words": [
+        81
+       ],
+       "s": 29.02,
+       "e": 29.16,
+       "at": 28.34,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "that",
+       "words": [
+        82
+       ],
+       "s": 29.16,
+       "e": 29.3,
+       "at": 28.34,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "work?",
+       "words": [
+        83
+       ],
+       "s": 29.3,
+       "e": 29.56,
+       "at": 28.34,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 28.3,
+   "end": 29.5167,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 187.6,
+    "x1": 852.4,
+    "y0": 325,
+    "y1": 518,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g22",
+   "recipe": "R1",
+   "shot": "S10",
+   "tone": "dark",
+   "text": "A big new / data center",
+   "seat": "C",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "A",
+       "words": [
+        84
+       ],
+       "s": 29.56,
+       "e": 29.96,
+       "at": 29.56,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "big",
+       "words": [
+        85
+       ],
+       "s": 29.96,
+       "e": 30.18,
+       "at": 29.56,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "new",
+       "words": [
+        86
+       ],
+       "s": 30.18,
+       "e": 30.4,
+       "at": 29.56,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "data",
+       "words": [
+        87
+       ],
+       "s": 30.4,
+       "e": 30.58,
+       "at": 29.56,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "center",
+       "words": [
+        88
+       ],
+       "s": 30.58,
+       "e": 30.88,
+       "at": 29.56,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 29.5167,
+   "end": 30.8333,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 188.0,
+    "x1": 852.0,
+    "y0": 332,
+    "y1": 520,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g23",
+   "recipe": "R1",
+   "shot": "S10",
+   "tone": "dark",
+   "text": "would take / the heat",
+   "seat": "L",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "would",
+       "words": [
+        89
+       ],
+       "s": 30.88,
+       "e": 31.14,
+       "at": 30.88,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "take",
+       "words": [
+        90
+       ],
+       "s": 31.14,
+       "e": 31.38,
+       "at": 30.88,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "the",
+       "words": [
+        91
+       ],
+       "s": 31.38,
+       "e": 31.56,
+       "at": 30.88,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "heat",
+       "words": [
+        92
+       ],
+       "s": 31.56,
+       "e": 31.76,
+       "at": 30.88,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 30.8333,
+   "end": 31.7167,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 179.7,
+    "x1": 700.3,
+    "y0": 327,
+    "y1": 520,
+    "cx": 440.0
+   }
+  },
+  {
+   "id": "g24",
+   "recipe": "R1",
+   "shot": "S10",
+   "tone": "dark",
+   "text": "out of / its computers",
+   "seat": "C",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "out",
+       "words": [
+        93
+       ],
+       "s": 31.76,
+       "e": 32.0,
+       "at": 31.76,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "of",
+       "words": [
+        94
+       ],
+       "s": 32.0,
+       "e": 32.12,
+       "at": 31.76,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "its",
+       "words": [
+        95
+       ],
+       "s": 32.12,
+       "e": 32.26,
+       "at": 31.76,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "computers",
+       "words": [
+        96
+       ],
+       "s": 32.26,
+       "e": 32.66,
+       "at": 31.76,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 31.7167,
+   "end": 32.6167,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 142.5,
+    "x1": 897.5,
+    "y0": 324,
+    "y1": 541,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g25",
+   "recipe": "R1",
+   "shot": "S10",
+   "tone": "dark",
+   "text": "with water / in pipes.",
+   "seat": "L",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "with",
+       "words": [
+        97
+       ],
+       "s": 32.66,
+       "e": 33.02,
+       "at": 32.66,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "water",
+       "words": [
+        98
+       ],
+       "s": 33.02,
+       "e": 33.34,
+       "at": 32.66,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "in",
+       "words": [
+        99
+       ],
+       "s": 33.34,
+       "e": 33.64,
+       "at": 32.66,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "pipes.",
+       "words": [
+        100
+       ],
+       "s": 33.64,
+       "e": 33.98,
+       "at": 32.66,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 32.6167,
+   "end": 34.4167,
+   "enter": "pop",
+   "leave": "soft",
+   "est": {
+    "x0": 174.9,
+    "x1": 705.1,
+    "y0": 328,
+    "y1": 541,
+    "cx": 440.0
+   }
+  },
+  {
+   "id": "g26",
+   "recipe": "R1",
+   "shot": "S11",
+   "tone": "dark",
+   "text": "Then pipes under / the streets",
+   "seat": "C",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "Then",
+       "words": [
+        101
+       ],
+       "s": 34.46,
+       "e": 34.74,
+       "at": 34.46,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.0,
+       "lit": false
+      },
+      {
+       "t": "pipes",
+       "words": [
+        102
+       ],
+       "s": 34.96,
+       "e": 35.18,
+       "at": 34.96,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.0,
+       "lit": false
+      },
+      {
+       "t": "under",
+       "words": [
+        103
+       ],
+       "s": 35.18,
+       "e": 35.36,
+       "at": 35.18,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.0,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "the",
+       "words": [
+        104
+       ],
+       "s": 35.36,
+       "e": 35.56,
+       "at": 35.36,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.0,
+       "lit": false
+      },
+      {
+       "t": "streets",
+       "words": [
+        105
+       ],
+       "s": 35.56,
+       "e": 35.82,
+       "at": 35.36,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.0,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 34.4167,
+   "end": 35.7833,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 109.8,
+    "x1": 930.2,
+    "y0": 327,
+    "y1": 520,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g27",
+   "recipe": "R1",
+   "shot": "S11",
+   "tone": "dark",
+   "text": "carry that heat",
+   "seat": "C",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 455,
+     "pieces": [
+      {
+       "t": "carry",
+       "words": [
+        106
+       ],
+       "s": 35.82,
+       "e": 36.28,
+       "at": 35.82,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "that",
+       "words": [
+        107
+       ],
+       "s": 36.28,
+       "e": 36.54,
+       "at": 35.82,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "heat",
+       "words": [
+        108
+       ],
+       "s": 36.54,
+       "e": 36.8,
+       "at": 35.82,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 35.7833,
+   "end": 36.7667,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 138.1,
+    "x1": 901.9,
+    "y0": 388,
+    "y1": 483,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g28",
+   "recipe": "R1",
+   "shot": "S11",
+   "tone": "dark",
+   "text": "into / people's homes.",
+   "seat": "C",
+   "step": 82.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "into",
+       "words": [
+        109
+       ],
+       "s": 36.8,
+       "e": 37.04,
+       "at": 36.8,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 515,
+     "pieces": [
+      {
+       "t": "people's",
+       "words": [
+        110
+       ],
+       "s": 37.04,
+       "e": 37.48,
+       "at": 36.8,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "homes.",
+       "words": [
+        111
+       ],
+       "s": 37.48,
+       "e": 37.76,
+       "at": 36.8,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 36.7667,
+   "end": 38.3667,
+   "enter": "pop",
+   "leave": "soft",
+   "est": {
+    "x0": 96.3,
+    "x1": 943.7,
+    "y0": 331,
+    "y1": 541,
+    "cx": 520.0
+   }
+  },
+  {
+   "id": "g29",
+   "recipe": "R9",
+   "shot": "S12",
+   "tone": "dark",
+   "text": "So your chatbot / could soon heat",
+   "stress": {
+    "kind": "landing",
+    "t": "heat",
+    "piece": [
+     1,
+     2
+    ]
+   },
+   "rows": [
+    {
+     "baseline": 390,
+     "x": 110,
+     "anchor": "start",
+     "pieces": [
+      {
+       "t": "So",
+       "words": [
+        112
+       ],
+       "s": 38.48,
+       "e": 38.64,
+       "at": 38.48,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "your",
+       "words": [
+        113
+       ],
+       "s": 38.64,
+       "e": 38.86,
+       "at": 38.48,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "chatbot",
+       "words": [
+        114
+       ],
+       "s": 38.86,
+       "e": 39.4,
+       "at": 38.48,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 545,
+     "x": 120,
+     "anchor": "start",
+     "pieces": [
+      {
+       "t": "could",
+       "words": [
+        115
+       ],
+       "s": 39.4,
+       "e": 39.68,
+       "at": 39.4,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "soon",
+       "words": [
+        116
+       ],
+       "s": 39.68,
+       "e": 39.98,
+       "at": 39.4,
+       "style": "hand",
+       "size": 116,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "heat",
+       "words": [
+        117
+       ],
+       "s": 39.98,
+       "e": 40.26,
+       "at": 39.98,
+       "style": "landing",
+       "size": 156,
+       "weight": 700,
+       "track": 0.02,
+       "lit": true,
+       "gap": 40
+      }
+     ]
+    }
+   ],
+   "start": 38.4333,
+   "end": 40.2167,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 110.0,
+    "x1": 919.1,
+    "y0": 320,
+    "y1": 551,
+    "cx": 514.6
+   }
+  },
+  {
+   "id": "g30",
+   "recipe": "R9",
+   "part": "last",
+   "shot": "S12",
+   "tone": "dark",
+   "text": "an apartment / in Helsinki.",
+   "seat": "C",
+   "step": 100.0,
+   "stress": null,
+   "rows": [
+    {
+     "baseline": 395,
+     "pieces": [
+      {
+       "t": "an",
+       "words": [
+        118
+       ],
+       "s": 40.26,
+       "e": 40.4,
+       "at": 40.26,
+       "style": "hook",
+       "size": 136,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "apartment",
+       "words": [
+        119
+       ],
+       "s": 40.4,
+       "e": 40.76,
+       "at": 40.26,
+       "style": "hook",
+       "size": 136,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    },
+    {
+     "baseline": 525,
+     "pieces": [
+      {
+       "t": "in",
+       "words": [
+        120
+       ],
+       "s": 40.76,
+       "e": 41.06,
+       "at": 40.26,
+       "style": "hook",
+       "size": 136,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      },
+      {
+       "t": "Helsinki.",
+       "words": [
+        121
+       ],
+       "s": 41.06,
+       "e": 41.32,
+       "at": 40.26,
+       "style": "hook",
+       "size": 136,
+       "weight": 300,
+       "track": 0.02,
+       "lit": false
+      }
+     ]
+    }
+   ],
+   "start": 40.2167,
+   "end": 41.9333,
+   "enter": "pop",
+   "leave": "cut",
+   "est": {
+    "x0": 136.0,
+    "x1": 904.0,
+    "y0": 320,
+    "y1": 532,
+    "cx": 520.0
+   }
+  }
+ ],
+ "world": [
+  {
+   "id": "w1",
+   "recipe": "R7",
+   "t": "2027",
+   "at": 27.4,
+   "until": 29.02,
+   "object": "a paper tag pinned to the plan's front wall (S8)",
+   "objectWidth": 280.0,
+   "fitPad": 44,
+   "ink": "#3A2B48",
+   "weight": 700,
+   "track": 0
+  }
+ ],
+ "cover": {
+  "recipe": "R10",
+  "tone": "dark",
+  "text": "Your chatbot / could heat / an apartment / in Helsinki.",
+  "rows": [
+   {
+    "baseline": 365,
+    "x": 110,
+    "anchor": "start",
+    "pieces": [
+     {
+      "t": "Your",
+      "words": [],
+      "s": 0,
+      "e": 0,
+      "at": 0,
+      "style": "title",
+      "size": 112,
+      "weight": 300,
+      "track": 0.02,
+      "lit": false
+     },
+     {
+      "t": "chatbot",
+      "words": [],
+      "s": 0,
+      "e": 0,
+      "at": 0,
+      "style": "title",
+      "size": 112,
+      "weight": 300,
+      "track": 0.02,
+      "lit": false
+     }
+    ]
+   },
+   {
+    "baseline": 530,
+    "x": 180,
+    "anchor": "start",
+    "pieces": [
+     {
+      "t": "could",
+      "words": [],
+      "s": 0,
+      "e": 0,
+      "at": 0,
+      "style": "title",
+      "size": 112,
+      "weight": 300,
+      "track": 0.02,
+      "lit": false
+     },
+     {
+      "t": "heat",
+      "words": [],
+      "s": 0,
+      "e": 0,
+      "at": 0,
+      "style": "titleKey",
+      "size": 200,
+      "weight": 700,
+      "track": 0.02,
+      "lit": true,
+      "gap": 36
+     }
+    ]
+   },
+   {
+    "baseline": 628,
+    "x": 130,
+    "anchor": "start",
+    "pieces": [
+     {
+      "t": "an",
+      "words": [],
+      "s": 0,
+      "e": 0,
+      "at": 0,
+      "style": "title",
+      "size": 112,
+      "weight": 300,
+      "track": 0.02,
+      "lit": false
+     },
+     {
+      "t": "apartment",
+      "words": [],
+      "s": 0,
+      "e": 0,
+      "at": 0,
+      "style": "title",
+      "size": 112,
+      "weight": 300,
+      "track": 0.02,
+      "lit": false
+     }
+    ]
+   },
+   {
+    "baseline": 737,
+    "x": 290,
+    "anchor": "start",
+    "pieces": [
+     {
+      "t": "in",
+      "words": [],
+      "s": 0,
+      "e": 0,
+      "at": 0,
+      "style": "title",
+      "size": 112,
+      "weight": 300,
+      "track": 0.02,
+      "lit": false
+     },
+     {
+      "t": "Helsinki.",
+      "words": [],
+      "s": 0,
+      "e": 0,
+      "at": 0,
+      "style": "title",
+      "size": 112,
+      "weight": 300,
+      "track": 0.02,
+      "lit": false
+     }
+    ]
+   }
+  ],
+  "est": {
+   "x0": 110.0,
+   "x1": 812.7,
+   "y0": 300,
+   "y1": 743,
+   "cx": 461.3
+  }
+ },
+ "checks": {
+  "errors": [],
+  "warnings": [
+   "g12 R3 \"40 / kettles,\": row 2 lifted 2 px to keep its ink above the band floor (585)",
+   "g26 R1 \"Then pipes under / the streets\": tracking set to 0 em (an exception to +0.02: the frame cannot hold the line)",
+   "g09 R1 \"To put it / into perspective,\": the stagger tightened to 36 px (the frame cannot hold 80-140)",
+   "g10 R1 \"just one of / these computers\": the stagger tightened to 44 px (the frame cannot hold 80-140)",
+   "g19 R1 \"The city has / a plan to use it,\": the stagger tightened to 34 px (the frame cannot hold 80-140)",
+   "g08 R5 \"Those computers get really hot.\": 5 words (2-4)",
+   "g09 R1 \"To put it into perspective,\": 5 words (2-4)",
+   "g10 R1 \"just one of these computers\": 5 words (2-4)",
+   "g10 R1 \"just one of these computers\": 20.5 cps (<= 20)",
+   "g11 R1 \"makes as much heat as\": 5 words (2-4)",
+   "g17 R8 \"to blow that heat outside.\": 5 words (2-4)",
+   "g19 R1 \"The city has a plan to use it,\": 8 words (2-4)",
+   "g19 R1 \"The city has a plan to use it,\": 8 words on screen at once (<= 7)",
+   "g21 R1 \"So how would that work?\": 5 words (2-4)",
+   "g22 R1 \"A big new data center\": 5 words (2-4)",
+   "g23 R1 \"would take the heat\": 21.5 cps (<= 20)",
+   "g24 R1 \"out of its computers\": 22.2 cps (<= 20)",
+   "g26 R1 \"Then pipes under the streets\": 5 words (2-4)",
+   "g26 R1 \"Then pipes under the streets\": 20.5 cps (<= 20)",
+   "g29 R9 \"So your chatbot could soon heat\": 6 words (2-4, 5 in a lockup)",
+   "g29 R9: \"heat\" built 0.28 s before the group leaves (>= 0.35)"
+  ]
+ }
+}
