@@ -591,25 +591,31 @@ About half repeat the research lanes' flags (`light.md` §9, `composition.md` §
   VERY subtle"),** against the playbook's PAINTED PIECES ("always ONE painted language for the whole frame: a lone painted
   object among flat vector pieces reads pasted in") and the references' 0-20 % dead-flat area. Proposed: "every
   non-subject piece in ONE painted language at its plane's dose (`ORGANIC.md` §5); big areas quiet in value, never dead
-  flat; the subject and people crisp".
+  flat; the subject and people crisp". **FIXED** (DIRECTION rule 4: one painted language at each plane's dose, near
+  sharper, far coarser marks; big areas quiet in value, never dead flat; the one paper; Retired: "a few chosen").
 - **D2. Rule 5's "rim light only on the subject" and "otherwise never glow discs, blur or gradients ... a halo is one step
   of at most 1.7x, or none"** sit in the same rule as its 2026-10-30 PROPER LIGHT sentence (rims on what the light
   touches, a soft glow and bloom at the source, real falloff). Proposed: "rims on what the key and the story light touch,
   by tier; a bloom at emitters only (three sigmas, <= +6-8 L* at the edge); falloff as a dithered ramp in a baked light
-  map; never a glow on a lit surface, a disc or a ring" (`light.md` D-L1, D-L2).
+  map; never a glow on a lit surface, a disc or a ring" (`light.md` D-L1, D-L2). **FIXED** (DIRECTION rule 5: rims by
+  tier, a bloom at a source only, real falloff as a dithered ramp; Retired: rim only on the subject, the 1.7x halo).
 - **D3. Rule 6, real darks "drawn in many small pieces ..., never one dark mass"** (and the playbook's own "A full value
   range" bullet, 2026-10-28/29), against SCENE COMPOSITION (2026-10-30: "values grouped into a few big masses"), R10 and
   proof 2's 33-38 % in two masses. The owner's two notes pull different ways: ask him with T1 (the gentle key) beside T3
   (the references' key), then reword rule 6, CRAFT §f.8 and the playbook bullet together. Proposed: "small darks at the
   focal (windows, a hull, her silhouette) plus one or two big quiet dark masses below the band (15-40 % of the frame)".
+  **OPEN** (waits for the owner's pick of the key; the rules stand, each with a one-line pending note: DIRECTION rule
+  6, CRAFT §d.2 and §f.8, LAYOUT §1's bottom third).
 - **D4. Rule 3's "no hole bigger than the caption band"** (with `LIFE_AND_DENSITY.md`'s "one quiet field" and
   `LAYOUT.md` §1's quiet-field row) against R5's two big quiet masses. Proposed (`composition.md` §7.1): up to two quiet
   fields, the sky with the band at the top and the near ground at the bottom, each patterned within +-4-6 L*, so never a
-  hole.
+  hole. **FIXED** (DIRECTION rule 3: up to two patterned quiet fields, never a hole, elsewhere none over the band;
+  `LIFE_AND_DENSITY.md` §0-2, §8 and `LAYOUT.md` §1, §3, §7 row 14 to match; `COZY_AND_SCALE.md` 3b.3, 3b.8).
 - **D5. Rule 2's tier C "built as a 'low poly' patchwork ... in flat facets"** (CRAFT §b: "flat, straight-edged facets",
   neighbours dL* 4-10) against ORGANIC, NOT GEOMETRIC ("I can see shapes and angles very clearly") and the balance (far
   "more like brushes"). Proposed: "low poly" means fewer, bigger, simpler shapes and fewer values; the facets are
-  hand-cut, their shared edges lost where they sit within ~4-6 L*, and far facets carry §5's coarse marks.
+  hand-cut, their shared edges lost where they sit within ~4-6 L*, and far facets carry §5's coarse marks. **FIXED**
+  (DIRECTION rule 2 as proposed; CRAFT §b's patchwork to match, C-list below).
 
 **CRAFT**
 - **C1. §c "Shapes": "Straight edges are ruler-true (jitter, drift, bow 0) ... circles are true ellipses (wobble 0;

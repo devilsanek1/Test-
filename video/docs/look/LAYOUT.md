@@ -48,8 +48,8 @@ recorded from some other video?" (v1, 2026-10-25); "check out the text capture. 
 | key-read box (organic) | x 120-950, y 600-1480 | the outer limit for any key read on an organic post (a label, a number, a contact point beside the subject) | G5 §2 (moved here) |
 | subject axis and box | x 380-700; the subject 270-460 px wide (35-60 % of the 760 px stage; a standing figure 300-650 px tall), 80 px clear round it; <= 2 points of interest in a scale shot, inside x 380-700 | the beat's subject (tier A); a scale panel inverts it (>= 60 % of the frame, or cut by both sides) | SB §3 and its lint; CS §5 (moved here); VT §0, §3 |
 | side margins | nothing key within 120 px of a side edge; the gutters beside the block (x < 95, x > 945) may hold quiet detail and may rise through the band's height | | CS §2, 3b.2; SB §3 |
-| bottom third | y 1250-1920 | masses: the foreground cut by the bottom edge, in mid-tones with its small darks (CR §f.8), a big near "you" that reads by mass; quiet only when it is the frame's one quiet field (next row) | LD §0; VT §1; CS 3b.2 (§7 row 14) |
-| the one quiet field | one band touching the top or the bottom edge (the sky, water, a floor), 15-35 % of the frame (a bounded floor seen from a balcony up to 50-60 %), patterned, in at most one of the thirds (y 0-640 / 640-1280 / 1280-1920): when it is the sky, the bottom third holds things; when it is a floor or water, the top holds a lid or a skyline | elsewhere no hole over ~200 px and no flat region over 20 %; drawn detail in most 240 px bands | LD §0, §2, §8; CS 3b.1, 3b.3 |
+| bottom third | y 1250-1920 | the near ground as one quiet mass, patterned (the second quiet field, next row), with at most 2 props in it, cut by the frame edges (R6), and a big near "you" that reads by mass; the foreground cut by the bottom edge, in mid-tones with its small darks (CR §f.8; the dark key is the owner's pick, pending: `ORGANIC.md` §8 D3) | LD §0; VT §1; CS 3b.2; `ORGANIC.md` §4.4 R5-R6 (§7 row 14) |
+| the quiet fields | up to two (owner, 2026-10-30, SCENE COMPOSITION: "big quiet areas"): the sky with the caption band, touching the top edge (>= 30 % of the frame), and the near ground, water or a floor, touching the bottom (>= 15 %; a bounded floor seen from a balcony up to 50-60 %); most of the frame quiet at a squint (R5: ~65 %, the painted models 67-91 %); each patterned in value (+-4-6 L*), so never a hole; the things live in the belt between | elsewhere no hole over ~200 px and no flat region over 20 %; drawn detail in most of the belt's 240 px bands | LD §0, §2, §8; CS 3b.1, 3b.3; `ORGANIC.md` §4.4 R5 |
 | labels and marks | world labels at y 600-1480, never in the band; the draft label bottom-left, y > 1850 (drafts only); the G3 notes strip y 1680-1920 (the board only) | | G5 §2 (moved here); SB §3 |
 | paper edge (opt-in) | the sides from y >= 640 and the bottom, inset 12-40 px, 'paint-subtle' at most | never at the top of the frame or beside the band; each film decides with its G4 look clip | PB; DIR 10; CS 3b.7; EDGES (its code paints past the top since 2026-10-25) |
 | sky and horizon | the sky is ONE gentle gradient from the frame top to the horizon; the default horizon y 768 (0.40 H, reference 2's median); by shot type: §2 | measured (`layout.py --measure`): the flat field behind the captions ends at y ~580-750 in v1 and v2 (medians 684 and 621); v3's interiors keep a flat wall to y ~1000-1380 | DIR 6; CR §g; theme.ts `world` |
@@ -107,8 +107,9 @@ everything: suspense, sense of scale, fantastic environment and composition" (v3
   long sight line, ended by one object; BALCONY's C-curve enters just under the band (y 600-700), leaves at y 860-1060
   and dives under a mass through a mouth <= 8 % of that edge; in a scale wide lines lead UP to the landmark (a canyon VP
   over the figures' heads, a skyline stepping up, one diagonal at its base; the rail the one level line).
-- **People** (DIR 3; PB; LD §4; the owner: "don't use big models of people; the people in the first example video are
-  the right direction", v2): small, from behind or rear 3/4, no faces; near heads <= ~140 px, mid walkers 110-260 px
+- **People** (DIR 3; PB; LD §4; `PEOPLE_DESIGN.md`; the owner: "don't use big models of people; the people in the first
+  example video are the right direction", v2; direction C with the LASH face, 2026-10-30): small, mostly from behind,
+  in rear 3/4, in profile or turned away, the face only its contour under ~200 px tall; near heads <= ~140 px, mid walkers 110-260 px
   tall, far 15-60 px fill only, window people 12-40 px; RIVERSIDE seated ~85 px, standing ~140 px; BALCONY 70-190 px in
   the life band; v2: no figure over ~260 px, no tier-B figure over 3 % of the frame; about half at rest.
 - **Words in the picture** (PB; SB §3; LD §7; the owner on v3: "Also this text is weird", of 11-13 px source lines):
@@ -118,8 +119,11 @@ everything: suspense, sense of scale, fantastic environment and composition" (v3
   go in the post's text); never the same words twice on screen; nothing in front of words while they are the beat;
   nothing in the caption band; the core line as a title only on the cover.
 - **Where the calm goes** (LD §0, §2; CS 3b.3; the owner: "way too empty", "less prescriptive on the amount of
-  objects", v3 G5): calm only at a frame edge (the one quiet field), round the subject or behind the captions, never a
-  slab mid-frame; in a scale wide the detail peaks just under the horizon (CG "Scale cues" 4).
+  objects", v3 G5; "our scene is very busy", 2026-10-30): calm only at a frame edge (the quiet fields: the sky with
+  the band at the top, the near ground at the bottom), round the subject or behind the captions, never a slab
+  mid-frame; the belt between holds the things, as texture inside its masses, with <= 6 named objects at phone size
+  and one place to look (DIR 2-3; `ORGANIC.md` §4.4 R3-R6); in a scale wide the detail peaks just under the horizon
+  (CG "Scale cues" 4).
 
 ## 4. Across shots
 - **Joins and carriers** (DIR 1; CR §a; G5 §2's engine table; the owner: "no clean transitions, just a bunch of shots
@@ -190,7 +194,7 @@ evidence. "Fixed" names the lower doc changed in the same pass (the list: the st
 | 11 | frame 0's words | frame 0 shows the first spoken line as a normal caption; no title over the captions | the owner: "Wait why do we have the text repeat itself?"; "Why are we having this out of order weirdly?" (v3) | SB §3; G5 §5's v2 `Frame0Text` note marked history; v2S §7's block is v2's (REVIEW_1 MUST 1 removed it) |
 | 12 | small words | few and big: >= 56 px for any word a viewer must read (the board's floor 48) | the playbook; the owner: "Also this text is weird" (v3) | none: v2S's 30-34 px body and ENG's 34-40 px labels are history |
 | 13 | Pip's place | hidden; never a carrier or a scale anchor (the anchor is the "you") | the newest words: "keep it, but not as obvious ... hide it deliberately in the video" | CG S1, S4, S5, cue 8; v2's seats are history |
-| 14 | the bottom third | one quiet field per frame, at the top (then the bottom third holds things) or at the bottom (then the top holds a lid or skyline) | LD §0 | none (v2S's "never quiet" is v2's value) |
+| 14 | the bottom third | (2026-10-30) up to two quiet fields: the sky with the band at the top and the near ground at the bottom, the things in the belt between (until 2026-10-30: one quiet field per frame) | the owner's SCENE COMPOSITION ("big quiet areas"; "our scene is very busy"), `ORGANIC.md` R5 | DIR 3; LD §0, §2, §8; CS 3b.3, 3b.8 (v2S's "never quiet" is v2's value) |
 | 15 | the cover's case | one cover template (§5); the case is the owner's call | "a coherent style across all videos sharing one look, one brand" | none (open) |
 | 16 | Pip on the cover | hidden there too (owner-decided, 2026-10-29: ST §9 decision 5) | "keep it, but not as obvious"; "Go with your suggestions" | §5 |
 | 17 | paper at the top | never at the top or beside the band | the owner: "this white part at the top of the reel" | none: EDGES notes its code paints past the top since 2026-10-25 (the preset table's top numbers predate it) |

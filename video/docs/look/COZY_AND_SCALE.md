@@ -192,10 +192,11 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
   flat shapes, not lines: `CRAFT.md` §c): C2's top 35 % holds 56 % of all linework (lid cells 3-6x the floor's); C3's
   facade belt has 66 % detail tiles while sky and water stay low in contrast (local colour std 10-22 vs 39-46 in the
   detailed belts).
-- Calm sits only where the eye can rest: one band touching the top or bottom edge (sky, water, floor), the subject's ring,
-  the caption plane. Never a slab mid-frame (C3's middle 60 %: 2-3 % flat tiles).
-- Calm is never empty: patterned (<= 6 lane marks as flat bands, two long soft tones), and no hole bigger than the caption
-  band anywhere else (`LIFE_AND_DENSITY.md` §0).
+- Calm sits only where the eye can rest: the quiet fields at the frame's edges (up to two: the sky at the top, and water,
+  a floor or the near ground at the bottom; owner, 2026-10-30, SCENE COMPOSITION: `LIFE_AND_DENSITY.md` §0), the
+  subject's ring, the caption plane. Never a slab mid-frame (C3's middle 60 %: 2-3 % flat tiles).
+- Calm is never empty: patterned in value (+-4-6 L*: painted variation, <= 6 lane marks as flat bands, two long soft
+  tones, tone-on-tone things), and no hole bigger than the caption band anywhere else (`LIFE_AND_DENSITY.md` §0).
 - Rhythm in tiny things: kerb stripes, rails, wires, windows, blossoms, each 1-6 % W, all tier C (low contrast). The
   frame's strongest contrast goes to the beat's subject (`CRAFT.md` §b), never to a rhythm or a big shape (C2 gave it to
   its kerb stripes, 3 % W period: a painting with no story subject).
@@ -304,7 +305,8 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
 
 ### 3b.8 Check a cozy shot (phone size, sound off)
 1. Paused, at phone size beside the cozy reference: full by `LIFE_AND_DENSITY.md` §0 (its DENSE-CALM row and its checks:
-   no hole bigger than the caption band, no big field apart from the one calm field at an edge); the numbers live there.
+   no hole bigger than the caption band, no big field apart from the quiet fields at the edges, up to two); the numbers
+   live there.
 2. Mass 35-70 % of the frame with the void in its dose; a floor bounded, its far end hidden; >= 40 % of the perimeter closed, open toward us.
 3. Detail gradient: detailed far side and edges (tier C), calm floor or centre; the captions on one flat plane (a light facade fill or
    the sky, never the canopy), with no wires, windows or roof edges in y 290-600 inside x 95-945.

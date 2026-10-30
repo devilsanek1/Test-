@@ -5,12 +5,13 @@ shots to use / Take a look at this folder I collected some initial references bu
 (`docs/look/refs_composition/`). Earlier the same day, on our list of differences from the references: "8 agreed this is
 an important point about scene composition"; on still v6: "our scene is very busy".
 
-**What this is.** The cinematography and animation-layout lane of that research: shot sizes and angles and what each
-says (§2-3), the classic devices (§4), staging and silhouette (§5), background layout in 2D studios (§6), colour
-scripts (§7) and how a camera move changes a composition over a shot (§8), each turned into placement rules in pixels
-for our frame; the owner's reels and their cheat sheet read in 9:16 (§9); the rules distilled (§10); doc clashes (§11);
-20 sources (§12, cited [S1]-[S20]). Its sibling, the measured notan study of scene 1 with rules R1-R12, is
-`docs/look/organic/composition.md`; this page cites those rules as R1-R12 and does not repeat them.
+**What this is.** The cinematography and animation-layout lane of that research: the 9:16 frame as a grid and where
+the eye goes in it (§1), shot sizes and angles and what each says (§2-3), the classic devices (§4), staging and
+silhouette (§5), background layout in 2D studios (§6), colour scripts (§7) and how a camera move changes a
+composition over a shot (§8), each turned into placement rules in pixels for our frame; the owner's reels and their
+cheat sheet read in 9:16 (§9); the rules distilled (§10); doc clashes (§11); 20 sources (§12, cited [S1]-[S20]).
+Its sibling, the measured notan study of scene 1 with rules R1-R12, is `docs/look/organic/composition.md`; this page
+cites those rules as R1-R12 and does not repeat them.
 **Rank:** research notes, the lowest rank on DIRECTION's ladder; nothing here is a rule until it is integrated into
 `LAYOUT.md` (§1-3), `CINEMATIC_GUIDE.md`, `STORYBOARD_STYLE.md` (§3, §7), `G3_ANIMATIC.md` or W1 (§10 names the
 target of each). Methods only: no footage traced or copied, no reference used as an input to a picture of ours, no
@@ -31,13 +32,13 @@ living artist as a style target. Paths are from `video/`. Px at 1080 x 1920, y d
    the screen centre, whatever the picture holds [S7]; in moving pictures many viewers look at the same place at once,
    at motion and people, and when one thing moves, everyone looks at it [S8, S9]; in a frame where everything moves, a
    still thing wins [S6]; viewers prefer a front-facing subject at the centre and a side-facing one facing INTO the
-   frame [S10]. So: the focal near the centre (x 413-667, y 950-1190), one mover at a time, the "you" facing into the
+   frame [S10]. So: the focal near the centre (x 413-667, y 951-1187), one mover at a time, the "you" facing into the
    frame and toward the subject.
 3. **In 9:16 the full frame's classic points mostly land where we cannot use them** (§1): the dynamic-symmetry eyes and
    the golden-spiral poles fall in the caption band or under the read zone, the thirds' verticals just outside the
-   subject axis. The usable picture is the **stage square** under the band (y 600-1520, 1080 x 920): its thirds, golden
-   lines and diagonal "eyes" all fall on the subject axis, its four eyes make the box x 454-626, y 987-1133, inside
-   R7's focal range.
+   subject axis. The usable picture is the **stage square** under the band (y 600-1520, 1080 x 920): its golden lines
+   (x 413, 667; y 951, 1169) and its diagonal "eyes" fall on the subject axis and inside R7's focal range, the four eyes
+   making the box x 454-626, y 987-1133.
 4. **The horizon's height is the master decision of a 9:16 exterior** (§3). With a level camera the horizon cuts every
    standing figure on the camera's ground at (camera height / figure height) of its height, near or far; at eye level
    (1.6 m) every standing head sits on the horizon. The owner's human-scale references all use a LOW eye: horizon
@@ -45,7 +46,7 @@ living artist as a style target. Paths are from `video/`. Px at 1080 x 1920, y d
    the sky the big quiet mass. Still v6 keeps v2's low camera (~1 m) but its quay lines meet at y ~995, the frame's
    half; our documented default horizon (0.40 H, y 768) with an eye-level camera stands a 180 px "you" at y 757-937,
    right under the captions and between the words and the focal (which R7 forbids). A near "you" low in the frame at
-   eye level needs a LOW horizon; with a mid or high horizon it needs a camera 4-7 m up. Hence two setups, each with
+   eye level needs a LOW horizon; with a mid or high horizon it needs a camera 3-7 m up. Hence two setups, each with
    its figure placement in pixels: **A, the low eye** (camera 0.9-1.6 m, horizon 0.60-0.68 H: the references) and
    **B, the raised eye** (camera 3-7 m, horizon 0.36-0.45 H). W1 declares one per set; the horizon at the half (v6)
    is neither.
@@ -80,28 +81,28 @@ and the reciprocal by their constructions [S4]):
 | dynamic-symmetry eyes (a corner's perpendicular to the diagonal [S4]) | 0.240 along it: (260, 461), (820, 461), (260, 1459), (820, 1459) | the upper two inside the caption band; the lower two at y 1459, under the read zone and 61 px above the bottom UI: no place for a focal |
 | reciprocal line from a top corner | meets the far edge at y 608 | at the band's bottom edge: the band's lower edge is the frame's own reciprocal |
 | golden-spiral pole (a golden rectangle 1080 x 1747 fitted to the width) | 0.276 of each side from a corner: x 298 or 782; y 483-656 or 1265-1437 by the rectangle's placement | outside the subject axis (by ~80 px), in or at the band, or under the read zone; inside the read zone's own golden rectangle (y 600-1267) the pole is (298 or 782, 784 or 1083) |
-| **stage square** (y 600-1520, full width, 1080 x 920) | thirds y 907, 1213 (x 360, 720); golden y 951, 1169 (x 413, 667); diagonal 40.4 deg; eyes (454, 987), (626, 1133), (454, 1133), (626, 987) | the picture under the words: its eyes make the box x 454-626, y 987-1133, inside R7's focal range and the subject axis; its 40 deg diagonals are the comfortable "dynamic" ones |
+| **stage square** (y 600-1520, full width, 1080 x 920, near-square) | thirds y 907, 1213 (x 360, 720); golden y 951, 1169 (x 413, 667); diagonal 40.4 deg; eyes (454, 987), (626, 1133), (454, 1133), (626, 987) | the picture under the words: its eyes make the box x 454-626, y 987-1133, inside R7's focal range and the subject axis; its 40 deg diagonals are the comfortable "dynamic" ones |
 
 **What it means.**
 - The 9:16 frame is three stacked pictures: the words (the band, in the top square's sky), the stage square (where the
-  story happens) and the near band (y 1250-1920, half of it under the platform UI). Compose the story inside the
+  story happens) and the near band (y 1250-1920, most of it under the platform UI). Compose the story inside the
   stage square; the top of the frame is the sky that holds the captions; the full-frame armatures are for the
   big masses only (the sky against the ground, a tower against the sky).
 - **The focal's home** is the stage square's golden box: x 413-667, y 951-1187 (its eyes x 454-626, y 987-1133 at its
   heart). It agrees with three independent things: the centre bias of the eye [S7, S10], R7's drop from the words (y
   860-1200), and LAYOUT's subject axis.
 - **The horizon goes near a third or a golden line of the full frame, never near the half:** y 640-860 (sky a third
-  or so: ground-led, setup B, §3.3) or y 1150-1300 (sky two thirds: sky-led, setup A); never y 900-1020 (0.47-0.53 H), Smith's
-  "precise formal half" [S3] and the composition guides' "The horizon line should not divide the art work in two
-  equal parts" [S3]. v6's horizon is at the half: its paving lines meet at (-1124, 995), 0.52 H (`/tmp/comp/cinema/
-  tools/v6_vp.py`, Hough lines on our quay, 131 pairs, interquartile y 988-1003).
-- **A spiral or a golden triangle needs the stage square, or the left-third hero spot** (x ~200-450, LAYOUT §8.2's
-  open question): in the full frame their eyes fall in the band or the UI.
+  or so: ground-led, setup B, §3.3) or y 1150-1300 (sky two thirds: sky-led, setup A); never y 900-1020 (0.47-0.53
+  H), Smith's "precise formal half" [S3] and the composition guides' "The horizon line should not divide the art work
+  in two equal parts" [S3]. v6's horizon is at the half: its paving lines meet at (-1124, 995), 0.52 H (Hough lines on
+  our quay, the median of 131 crossings, interquartile y 988-1003; method in §12).
+- **A spiral or a golden triangle needs the stage square, or the left-third hero spot** (x ~200-450, still open in
+  LAYOUT §8.2): in the full frame their eyes fall in the band or the UI.
 
 **Where the eye goes (the evidence behind the numbers).**
 - **The centre first.** "When the scene appeared, the initial response was to orient to the center of the screen", and
-  the bias held whatever the picture's features or the viewer's task [S7]. Every cut restarts at (540, 960): a focal
-  at the centre costs no search; one 300 px off costs a saccade and a moment.
+  the bias held whatever the picture's features or the viewer's task [S7]. A new shot starts the eye near (540, 960):
+  a focal there costs no search; one 300 px away (~3.6 deg at phone size) costs a saccade and a moment.
 - **Motion, people, one at a time.** In moving scenes, gaze clusters ("attentional synchrony") on motion and people,
   and "initial saccades default toward the screen center, areas of high motion and people" [S8]; "If there is only
   one point of motion at a particular moment, then all viewers will look at the motion", and the greater the motion
@@ -171,8 +172,7 @@ camera per shot").
 On level ground, a level camera at height c sees the horizon cut every standing figure at c / (figure height) of its
 height from the feet, whatever its distance: feet at y_h + P c / h and head top at y_h - P (h - c) / h (P the figure's
 height in px, h its height in metres, y_h the horizon). This is CRAFT §f.5's "people on one level keep one eye ratio
-within +-15 %", in numbers. For a 1.7 m "you" drawn 180 px tall (P scales the offsets linearly; 145 px and 220 px in
-`/tmp/comp/cinema/horizon_cut.txt`):
+within +-15 %", in numbers. For a 1.7 m "you" drawn 180 px tall (the offsets scale with P):
 
 | horizon y | camera 0.9 m (waist) | camera 1.6 m (eye) | camera 3 m (a wall, a step) | camera 6 m (a first floor) |
 |---|---|---|---|---|
@@ -246,7 +246,7 @@ the golden spiral is a log spiral built from nested golden rectangles [S4]. Hamb
 rectangle's diagonal and the perpendicular to it from a corner (the reciprocal) and composes on that net [S4].
 **Rule:** the stage square's golden lines (x 413, 667; y 951, 1169) are the focal's home (§1); a spiral composition
 works only inside the stage square or the read zone, its pole at x 298 or 782 (outside the subject axis), so it needs
-the left-third hero spot (LAYOUT §8.2's open question 2) and is a deliberate variant, never the default; the full
+the left-third hero spot (x ~200-450, still open in LAYOUT §8.2) and is a deliberate variant, never the default; the full
 frame's reciprocal meets the far edge at y 608, at the band's lower edge: keep that edge clean (no prop or roof across
 it).
 
@@ -264,7 +264,8 @@ object is, the greater its weight or attraction. Therefore ... a very important 
 the centre may be balanced by a very small object on the other side of the centre and further removed from it"; "where
 the subject is on one side of the centre it must exist close to the centre, or ... show positive anchorage to the
 other side"; "the small balancing weight of the steelyard should not become a point causing divided interest"; and
-balance runs in depth too: a foreground is "aggressive" when the back planes lack balancing weight [S1]. **Rule:**
+balance runs in depth too: the "aggressiveness" of a foreground comes from "the lack of their balancing complements in
+the back planes of the picture" [S1]. **Rule:**
 weight x distance from x 540 balances: the focal 0-130 px off centre (inside the axis) is balanced by one counterweight
 >= 300 px out on the other side (x < 240 or > 840: the hero cloud in a top corner, a soft mass at a side edge),
 bigger and softer, its pull < 50 % of the focal's (R8), and never isolated and crisp (isolation adds weight [S1] and
@@ -276,7 +277,8 @@ along this avenue of entrance is confusing"; in deep pictures "the best mode of 
 series of zigzags"; where lines are missing, "an arrangement of receding spots, or accents is an equivalent"; "The eye
 should never be permitted to leave the principal figure or object and go straight back and out through the centre";
 "The eye always follows the course of light from the shadow"; a line "cutting a picture diagonally, almost from corner
-to corner" must be interrupted [S1]. In 2D layout "Spiral and radiating pathways are the most common types" [S16];
+to corner" must be interrupted [S1]. "Spiral and radiating pathways are the most common types used in layout
+compositions" [S16];
 "Many lines without a clear subject-point suggest chaos" [S3]. **Rule:** every line in the stage either leads to the
 focal or is calm (level, tone-on-tone). The path enters from the near band (or drops from the words: R7), zigzags in 2-3
 legs of >= 150 px that alternate sides, and its last leg ends on the focal (within 40 px of its box) or at a vanishing
@@ -288,8 +290,8 @@ foreground that directs the viewer's eye into the composition by bracketing (fra
 sense of depth"; in 1762 the term meant "strongly coloured or deeply shaded objects placed in the foreground ... to
 make the other objects appear farther away" [S14]. Claude's two schemes, as Poore reads them: sides darkened so "the
 light of the centre might gain by contrast", or a large shadowed first third, "reserving the more distant mass, which
-is the most attractive, to gain by the sacrifice of the foreground mass"; and sky seen through a dark mass is an "air
-hole" [S1]. **Rule:** one inner frame (a door, a window, an arch, the gap between two masses) of 15-30 % of the frame
+is the most attractive, to gain by the sacrifice of the foreground mass"; and "sky spots in a dark background are air
+holes" [S1]. **Rule:** one inner frame (a door, a window, an arch, the gap between two masses) of 15-30 % of the frame
 (LAYOUT §2's one opening), its aperture >= 10 L* off its rim and holding the focal; the rim darker or lighter as a
 mass, quieter than the aperture, with <= 2 props (R6); the repoussoir on ONE side only, cut by that edge (x 0-200 or
 880-1080), never two equal wings; in 9:16 width is scarce, so side wings stay <= 20 % W each and the frame's natural
@@ -301,8 +303,8 @@ stationary subjects"; without it a car's "progress will seem impeded" [S14]; vie
 face into the frame (the inward bias), and painters give an animal more space in front than behind [S10]. Headroom
 "changes relative to how much of the frame is filled by the subject"; "Too much room ... results in dead space"; in an
 extreme wide "It can be more visually pleasing to give equal weight to the sky and ground" [S14]. **Rule:** a facing or
-moving subject gets 1.5-2x more room in front than behind: facing right at x 380-450 (630-700 px ahead, 1.4-1.8x),
-facing left at x 630-700; a figure looking up has the thing it looks at above it on its sightline, clear of the band;
+moving subject gets 1.5-2x more room in front than behind: facing right at x 380-430 (650-700 px ahead, 1.5-1.8x),
+facing left at x 650-700; a figure looking up has the thing it looks at above it on its sightline, clear of the band;
 a moving thing keeps or grows its lead room through a move (the camera leads). Our negative space is R5's quiet masses
 (>= 65 % quiet in two connected masses), and the space between the words and the focal is the focal's headroom: quiet
 (R7).
@@ -310,10 +312,11 @@ a moving thing keeps or grows its lead room through a move (the camera leads). O
 **4.8 Depth layering and foreground framing.** The multiplane camera moved layers "at various distances" and speeds,
 "the further away from the camera, the slower" [S15]. Guo Xi named three distances for a landscape: high (looking up
 at a mountain from below), deep (from the front of a mountain to the ranges behind it), level (out over low hills)
-[S19]; the vertical scroll and the vertical print [S19] are the old 9:16. Poore: "We feel the vastness of a scene by the
-presence of a lone figure" [S1]. **Rule:** at least three readable zones (near frame, the subject's plane, the far and
-the sky) and 4-6 planes (CRAFT §f.1); in 9:16 the planes STACK UP the frame (the near at the bottom, each farther one
-higher), overlapping, never touching tangent, no two plane tops within 40 px of each other; the near frame a quiet
+[S19]; his hanging scroll and the later vertical woodblock print [S19] are the old 9:16. Poore: "We feel the vastness
+of a scene by the presence of a lone figure" [S1]. **Rule:** at least three readable zones (near frame, the subject's
+plane, the far and the sky) and 4-6 planes (CRAFT §f.1); in 9:16 the planes STACK UP the frame (the near at the
+bottom, each farther one higher), overlapping, never touching tangent, no two plane tops within ~40 px of each other
+(est.: two equal tops read as one stacked band); the near frame a quiet
 mass with <= 2 props cut by the edges (R6). Our three shot families are Guo Xi's three distances: high = the tilt-up
 and worm's-eye (K2, K7), deep = the S1 and S5 vistas, level = the S4 breather (a thin band of land under a huge sky).
 
@@ -356,8 +359,17 @@ scale, on a field of the other value; counterchange at the focal (light on dark 
 story light; CRAFT §f.3's median >= 15 L* along the silhouette); no shape at the focal that reads both ways.
 
 **4.14 Value grouping.** R1, R2 and R10 hold it (three masses >= 85 %, <= 10 pieces, a real dark mass), from Dow's
-massing and Payne's armatures (`organic/composition.md` §4, §8). The cinema addition: the shot's value plan is drawn at
-G3 (the board's grey tiers, `STORYBOARD_STYLE.md`) and the film's in the value script (§7).
+massing and Payne's armatures (`organic/composition.md` §4, §8). Poore adds how the masses serve the one point: the
+setting sun, "covering but a very limited measure of the picture is what we see and remember, the remaining space
+serving this by subordination"; masters reach that point "either by banking up abruptly about it ... or by vast
+gradations toward it"; and a principal object "made to occupy too much space is one of the commonest of faults" [S1].
+**Rule:** the focal's light is small (the light lane's brightest 5 % below the sky, within 0.07-0.15 H of the subject:
+`organic/light.md` §5.4), reached either by a bank of darker masses close round it (counterchange) or by one long
+gradation of the story light toward it, never both at once and never a big bright area. In setup A (§3.3) the
+natural notan is three stacked bands: the light sky (the words in it), the mid far belt, the dark near ground, with the
+"you" a dark silhouette rising from the dark mass against the light at the line of heads (the beach couple's plan).
+The shot's value plan is drawn at G3 (the board's grey tiers, `STORYBOARD_STYLE.md`), the film's in the value script
+(§7).
 
 **4.15 Pattern, repetition, rhythm.** Dow's principles are opposition, transition, subordination, repetition and
 symmetry [S2]; in Block's terms rhythm runs from slow to fast [S17]. **Rule:** a repeated motif (a row of windows,
@@ -468,8 +480,9 @@ schemes" [S2]: one dominant per frame, and over the film one dominant key per sc
   its focal (R4's >= 65 L*) and its one hot accent; the scale reveal's in-shot script (a bright slot in a dark frame,
   the darkest moment, a burst of light before the landing, the settle: CINEMATIC_GUIDE S5) is the model inside a shot.
 - **The key changes only on a story turn,** once or twice a film, as the first script's colour changes only for the
-  sinister turn [S18]; the change is carried by the light (a lamp switching, the sun sinking through a move), never cut
-  in, and an ordinary join keeps LAYOUT §4's colour shift <= 15.
+  sinister turn [S18]; the change is carried by the light changing in place (a lamp or a window switching on, a cloud
+  crossing the sun; a source never moves: DIRECTION 5), never cut in, and an ordinary join keeps LAYOUT §4's colour
+  shift <= 15.
 - **Check the strip at its own size:** every thumbnail's focal found in under a second, no two neighbours with the
   same intensity when the story changes between them, one hot accent per thumbnail.
 
@@ -508,3 +521,147 @@ is a sequence of compositions, and every frame of it is seen.
 | pan or truck | follow, survey | the subject entering with lead room | the subject with lead room ahead | background length = the view plus the travel; planes by 1/z |
 | the float (holds) | life in a still frame | home | home | planes by depth, back at rest by every join (DIRECTION 8) |
 | dolly zoom | "disorientation and discomfort" [S20] | | | never (it is a compound move and a feeling we never want) |
+
+## 9. The owner's reels in film terms, and the cheat sheet in 9:16
+
+The five reels (`docs/look/refs_composition/`; their full catalogue is the sibling lane's `reels.md`) are photography
+and drawing lessons in a vertical feed: landscape pictures letterboxed across a 9:16 phone screen, one device per
+example, the device drawn as lines over the picture. Two things carry over directly. **One device per example** is the
+right dose for a film frame (§4's intro). **The letterbox is our stage:** a 16:9 picture at full width is 1080 x 608,
+a 3:2 one 1080 x 720, a 4:3 one 1080 x 810; laid under our band (from y 600) they cover y 600-1208, 600-1320 and
+600-1410: the read zone and the stage square. A landscape lesson's composition maps onto our stage, with our sky and
+words above it and the near band below.
+
+| device (reel) | in film and animation practice | in our 9:16 frame | ours |
+|---|---|---|---|
+| frame within a frame (01, 02, 04) | doorways, windows, arches; the repoussoir; the start of a reveal (§4.6, §8) | one aperture of 15-30 % in the stage square, >= 10 L* off its rim | the lit door; a window; S5's slot |
+| leading lines, vanishing point, one point (01, 02, 04) | radiating and spiral pathways; one-point layouts (§4.5, §4.12) | 2-3 legs of >= 150 px; the vanishing point on the subject or hidden by it | quay edges, a lane, the light column on the water |
+| foreground (02, 05) | repoussoir and coulisse; depth layering (§4.6, §4.8) | one side only, <= 20 % W; the top lid and the near band | the playbook's "small, subtle hint at the edges" |
+| rule of thirds, golden ratio (02, 03, 04, 05) | proportions and a nudge off the centre (§4.1-4.2) | horizon near y 640 or 1280; the focal in the stage's golden box | proportions, never hot spots |
+| symmetry, balance (02, 03, 04) | formal balance; the steelyard (§4.3-4.4) | the axis x 520-540; a counterweight >= 300 px out | symmetry for a formal or final beat; the steelyard for the rest |
+| parallel lines, patterns and repetition (01, 04) | rhythm; one texture with one break (§4.15) | a row within +-6 L*, one break at the focal | the far facade's windows, one lit |
+| level change (01) | two stacked stages, a step in height | the 9:16 frame is two stacked squares (§1) | setup B: the "you" on the upper level, the world below |
+| negative space (04) | the quiet masses; headroom (§4.7) | >= 65 % quiet in two masses (R5) | the sky and the near ground |
+| scale (04) | a known-size figure beside a big world: "We feel the vastness of a scene by the presence of a lone figure" [S1] | the "you" 130-220 px, or 60-150 px in the K wides | DEPTH AND SCALE; the scale beat |
+| juxtaposition (05) | contrast and affinity: two opposites side by side are intense [S17] | opposite values or colours meeting at the focal | counterchange at the lit door |
+| spiral (05: a stair seen from above) | an overhead circular view | top-down is paper only (§3.1) | not for a film frame |
+| pyramid; V-shape (03) | stability; the inverted one for instability (§4.10) | base y 1350-1520 >= 50 % W, apex in the golden box; the V a canyon (>= 2:1) | stable beats; the V for the turn |
+| diagonal, double diagonal (03) | movement, tension, intensity (§4.9) | 30-45 deg inside the stage; an X crossing at (540, 960) only for a centred subject | one diagonal, for the turn or the payoff |
+| S-curve, C-shape (03) | the line of beauty; the circuit (§4.11) | 2-3 bends entering at the bottom edge; the C open to the sky | a canal, a path, a quay |
+| L-shape (03) | a side mass with a ground base framing an open field | a side mass x 0-200 (or 880-1080) and a ground band from y ~1250; the focal toward the L's inner corner | LAYOUT §2's cozy masses on 2-3 sides with one opening |
+| unbalanced (03) | deliberate tension: one heavy side and nothing against it | the focal far off centre with no counterweight | the "But" turn only |
+| radiating; circular (03) | rays and perspective lines to one point; the eye's circuit with the subject inside it, "never outside the circle" [S1] | the point within 60 px of the subject; the circuit inside the stage square | light rays at the story light; a round window |
+| golden triangle (03) | Hambidge's diagonal and reciprocals (§4.2) | full frame: its eyes fall in the band and at y 1459 (unusable); the stage square's eyes (454, 987) and (626, 1133) | the stage version only |
+| cross (03) | a strong vertical across a horizontal (a tree against the horizon) | the crossing at a golden point of the stage | a lone tree, a mast, a lamp post against the horizon |
+
+## 10. The rules, distilled (each a proposal, with the doc it would go into)
+
+| # | rule (numbers at 1080 x 1920) | why | target |
+|---|---|---|---|
+| C1 | **The focal's home:** the beat's focal centred in the stage square's golden box, x 413-667, y 951-1187 (its eyes x 454-626, y 987-1133 the heart); off it only for a declared reason (a left-third spiral, a scale shot, a chart) | the centre bias [S7, S10]; R7's drop; §1 | `LAYOUT.md` §1 (subject axis row), §3 |
+| C2 | **The horizon:** near y 640-860 (setup B) or 1150-1300 (setup A); never y 900-1020; breathers and scale shots keep CINEMATIC_GUIDE's numbers | Smith's 2:1 and the half [S3]; §3 | `LAYOUT.md` §1 (sky and horizon), §2 |
+| C3 | **The camera height, per set:** A (0.9-1.6 m, horizon 0.60-0.68 H) or B (3-7 m, horizon 0.36-0.45 H), declared in W1; every standing figure placed by the horizon-cut rule (feet y_h + P c / h, head y_h - P (h - c) / h); the scene-1 look test shows A beside v6's view | §3.2-3.3; the references; CRAFT §f.5 | W1; `LAYOUT.md` §2; `CRAFT.md` §f.5 |
+| C4 | **The size ladder:** sizes step 2-3x; an F cut between two shots of one subject changes size by >= ~1.5-2x or angle by >= 30 deg, or keeps the exact frame | 6-12 field [S16]; 20 mm / 30 deg [S20] | `LAYOUT.md` §2 |
+| C5 | **Angles:** eye level the default; a low angle only on the quantity; a high angle only on crowds, patterns and maps; overhead only as paper; never a Dutch tilt | [S12, S13]; DIRECTION 8 | `LAYOUT.md` §2 (angle row) |
+| C6 | **One device per shot,** pointing at the focal (§4); a second only when it points at the same focal; the G3 panel names it | Smith, Dow, Poore, staging [S1-S3, S5, S6] | `LAYOUT.md` §3; `STORYBOARD_STYLE.md` §3 |
+| C7 | **The eye's path:** entry from the near band or the words; 2-3 zigzag legs of >= 150 px; the last leg ends within 40 px of the focal's box; no line corner to corner, none through the band; no empty vanishing point behind the focal | Poore's entrance and exit [S1]; layout pathways [S16] | `LAYOUT.md` §3 (leading lines) |
+| C8 | **The steelyard:** the focal <= 130 px off x 540; one counterweight >= 300 px out on the other side, bigger and softer, < 50 % of the focal's pull, never isolated and crisp; the words on top balanced by the near dark mass (R10) | Poore's balance [S1]; R8 | `LAYOUT.md` §3 |
+| C9 | **Facing and lead room:** 1.5-2x more room in front of a facing or moving subject than behind (on the axis: facing right at x 380-430, facing left at 650-700); the "you" beside the subject stands outside the axis on the side it looks from (x 120-380 or 700-900), faces into the frame, its sightline through the focal's box | lead room [S14]; inward bias [S10]; gaze cues [S9] | `LAYOUT.md` §3 (people) |
+| C10 | **The G3 panel is a layout:** the eight declarations of §6.4 (size and setup; vanishing point, device and path; focal box and counterweight; planes; a 3-value notan; the "you" and Pip; the move's three frames; the hook-up) | 2D layout practice [S16] | `STORYBOARD_STYLE.md` §3; `G3_ANIMATIC.md` |
+| C11 | **The value script and the colour script:** one strip per film, one 108 x 192 thumbnail per beat, in values at W1/G3 and in colour at G4; affinity in the cozy beats, contrast at the hook, the turn and the payoff; the key changes only on a story turn, carried by light | colour scripts [S18]; contrast and affinity [S17] | `PIPELINE_V2.md` (W1, G3, G4); `PALETTE.md` |
+| C12 | **Moves:** the start, middle and end frames designed; one variable per move; the subject the pivot (+-40 px) or one path between two golden points; a push scales about the target's centre; lead room grows with travel; the band a fixed mat; tangents pass in <= ~0.1 s | §8 [S6, S14-S17] | `CINEMATIC_GUIDE.md` rules |
+| C13 | **Staging:** the silhouette test at 0.25 scale; action in profile or 3/4 back, the acting part >= ~12 px outside the body; contours overlap >= ~10 px or keep >= ~20 px apart; one actor at a time, in turns; the background read in a glance | staging [S5, S6]; eye tracking [S9]; layout [S16] | `LAYOUT.md` §3; `CRAFT.md` §b, §f.3 |
+| C14 | **Rhythm and symmetry:** a repeated motif is one texture with one break, the break being the call; full symmetry in at most two shots a film, for formal beats; never two equal halves of anything (sky and ground, two masses, two lights) | Smith [S3]; Dow [S2]; Block [S17] | `LAYOUT.md` §3 |
+
+Numbers marked ~ or est. are our estimates for phone size; the look test and the owner's eye at phone size decide.
+
+## 11. Doc clashes found (flagged for the orchestrator; not edited here)
+
+1. **The "you", the camera and the horizon.** DIRECTION 7 and the playbook's DEPTH AND SCALE FROM A HUMAN VIEWPOINT
+   (the camera where a person would stand, the "you" near it at ~130-220 px), `LAYOUT.md` §2's angle row ("eye level
+   by default, at or below the person's eye level"), `LAYOUT.md` §1's default horizon (y 768, 0.40 H) and R7 (nothing
+   calls between the words and the focal) cannot all hold: at eye level a standing "you" has its head on the horizon,
+   so at y 768 it stands at y ~757-937, between the words and the focal, and in v2's and v6's view (horizon ~995) it
+   stands level with the focal. **Proposal:** C3: the camera height and the horizon declared per set (A for a
+   human-scale view, horizon 0.60-0.68 H; B when the ground must spread, camera 3-7 m); `LAYOUT.md` §1's default
+   horizon becomes a per-setup value.
+2. **Two sizes of "you".** `LAYOUT.md` §1's "you" row (head 90-140 px, cut by the bottom edge, head top y <= ~1380:
+   at 7-7.5 heads a figure of ~650-1050 px) predates the playbook's ~130-220 px whole figure (2026-10-29, owner).
+   **Proposal:** name two cases: the human-scale "you" (130-220 px, standing on the ground, placed by C3) for
+   exteriors, and the near "you" cut by the bottom (head <= 140 px) only for an interior or POV beat (v3's hands).
+3. **R7's focal range in setup A.** R7 sets the focal's centre at y 860-1200; in setup A a subject on the horizon belt
+   sits at y ~1100-1300. **Proposal:** in setup A the focal may reach y ~1300 (inside `LAYOUT.md` §1's key-read box, y
+   <= 1480), or the subject rises above the horizon (a facade, a tower).
+4. **v6's horizon at the half.** Not a doc clash but a gap between the docs and the picture: v6 measures 0.52 H, where
+   Smith and the composition guides put no horizon [S3]; composition.md's T3 (+140 px, ~0.59 H) moves it off. The look
+   test should show it.
+
+## 12. Sources (methods only; no picture copied)
+
+- **[S1]** H. R. Poore, *Pictorial Composition and the Critical Judgment of Pictures* (1903; 10th ed.), public domain:
+  the steelyard, balance in depth, entrance and exit, principality, the pyramid, the circle, the figure in landscape,
+  Claude's two schemes. [Project Gutenberg #26638](https://www.gutenberg.org/ebooks/26638).
+- **[S2]** A. W. Dow, *Composition* (1899; 1913 ed.), public domain: notan, subordination, two and three values.
+  [Project Gutenberg #45410](https://www.gutenberg.org/ebooks/45410); with Wikipedia,
+  [Notan](https://en.wikipedia.org/wiki/Notan) and
+  [Figure-ground (perception)](https://en.wikipedia.org/wiki/Figure%E2%80%93ground_(perception)).
+- **[S3]** Wikipedia, [Rule of thirds](https://en.wikipedia.org/wiki/Rule_of_thirds) (J. T. Smith's 1797 text and
+  Reynolds's 2:1, via Field 1845; Amirshahi et al. 2014's measurement),
+  [Composition (visual arts)](https://en.wikipedia.org/wiki/Composition_(visual_arts)) (lines, curves, triangles, the
+  rule of odds and of space, the horizon not at the half),
+  [Rabatment of the rectangle](https://en.wikipedia.org/wiki/Rabatment_of_the_rectangle).
+- **[S4]** Wikipedia, [Golden ratio](https://en.wikipedia.org/wiki/Golden_ratio) (the 565-painting study, Fechner's
+  preference "at best, inconclusive"), [Golden spiral](https://en.wikipedia.org/wiki/Golden_spiral),
+  [Dynamic rectangle](https://en.wikipedia.org/wiki/Root_rectangle) (Hambidge's diagonal and reciprocal).
+- **[S5]** F. Thomas and O. Johnston, *The Illusion of Life* (1981): staging, as summarised in Wikipedia,
+  [Twelve basic principles of animation](https://en.wikipedia.org/wiki/Twelve_basic_principles_of_animation).
+- **[S6]** ACM SIGGRAPH Education, HyperGraph,
+  [Principles of Animation: Staging](https://education.siggraph.org/static/HyperGraph/animation/character_animation/principles/staging.htm)
+  (after Lasseter, "Principles of Traditional Animation Applied to 3D Computer Animation", SIGGRAPH 1987).
+- **[S7]** B. W. Tatler, "The central fixation bias in scene viewing", *Journal of Vision* 7(14):4 (2007),
+  [doi:10.1167/7.14.4](https://doi.org/10.1167/7.14.4).
+- **[S8]** T. J. Smith and P. K. Mital, "Attentional synchrony and the influence of viewing task on gaze behavior in
+  static and dynamic scenes", *Journal of Vision* 13(8):16 (2013), [doi:10.1167/13.8.16](https://doi.org/10.1167/13.8.16).
+- **[S9]** T. J. Smith, "Watching you watch THERE WILL BE BLOOD" (2011), on D. Bordwell and K. Thompson's blog,
+  [davidbordwell.net](https://www.davidbordwell.net/blog/2011/02/14/watching-you-watch-there-will-be-blood/).
+- **[S10]** S. E. Palmer, J. S. Gardner and T. D. Wickens, "Aesthetic issues in spatial composition: effects of
+  position and direction on framing single objects", *Spatial Vision* 21 (2008),
+  [doi:10.1163/156856808784532662](https://doi.org/10.1163/156856808784532662); with M. Bertamini et al., "The anterior
+  bias in visual art", *Laterality* 16 (2011), [doi:10.1080/1357650X.2010.508219](https://doi.org/10.1080/1357650X.2010.508219).
+- **[S11]** J. Sammartino and S. E. Palmer, "Aesthetic issues in spatial composition: effects of vertical position and
+  perspective on framing single objects", *J. Exp. Psychol.: Human Perception and Performance* 38 (2012),
+  [doi:10.1037/a0027736](https://doi.org/10.1037/a0027736).
+- **[S12]** Wikipedia, [Shot (filmmaking)](https://en.wikipedia.org/wiki/Shot_(filmmaking)),
+  [Camera angle](https://en.wikipedia.org/wiki/Camera_angle), [Medium shot](https://en.wikipedia.org/wiki/Medium_shot),
+  [Close-up](https://en.wikipedia.org/wiki/Close-up).
+- **[S13]** StudioBinder, [Types of camera shots](https://www.studiobinder.com/blog/types-of-camera-shots-sizes-in-film/),
+  [Types of camera angles](https://www.studiobinder.com/blog/types-of-camera-shot-angles-in-film/),
+  [Rules of shot composition](https://www.studiobinder.com/blog/rules-of-shot-composition-in-film/).
+- **[S14]** Wikipedia, [Lead room](https://en.wikipedia.org/wiki/Lead_room),
+  [Headroom (photographic framing)](https://en.wikipedia.org/wiki/Headroom_(photographic_framing)),
+  [Repoussoir](https://en.wikipedia.org/wiki/Repoussoir),
+  [Framing (visual arts)](https://en.wikipedia.org/wiki/Framing_(visual_arts)).
+- **[S15]** Wikipedia, [Multiplane camera](https://en.wikipedia.org/wiki/Multiplane_camera).
+- **[S16]** B. Lemay, Animation School, [Layouts](https://brianlemay.com/Pages/animationschool/layout/layoutexamples.html)
+  and the notes on each layout (e.g. [the pump and the shack](https://brianlemay.com/Pages/Portfolio/layout/layout15a.html),
+  [the stairs to a doorway](https://brianlemay.com/Pages/Portfolio/layout/layout28a.html),
+  [the alley](https://brianlemay.com/Pages/Portfolio/layout/layout32.html),
+  [the stairs from the deck](https://brianlemay.com/Pages/Portfolio/layout/layout280.html)): a layout practitioner's
+  teaching, read for method.
+- **[S17]** B. Block, *The Visual Story* (2001; 3rd ed. 2020): the publisher's
+  [description](https://shop.elsevier.com/books/the-visual-story/block/978-0-08-052073-5) and a
+  [review summarising contrast and affinity](https://betterposters.blogspot.com/2022/07/review-visual-story.html).
+- **[S18]** Hyperallergic, "25 Years of Pixar's Vibrant, Emotional Color Palettes" (2020), on *The Art of Pixar: The
+  Complete Colorscripts*, [hyperallergic.com](https://hyperallergic.com/610771/the-art-of-pixar-chronicle-books/).
+- **[S19]** JAANUS, [san-en](https://www.aisf.or.jp/~jaanus/deta/s/sanen.htm) (Guo Xi's three distances, from *The
+  Lofty Message of Forests and Streams*); Wikipedia, [Guo Xi](https://en.wikipedia.org/wiki/Guo_Xi) (*Early Spring*,
+  1072, a hanging scroll) and
+  [One Hundred Famous Views of Edo](https://en.wikipedia.org/wiki/One_Hundred_Famous_Views_of_Edo) (the vertical
+  format).
+- **[S20]** Wikipedia, [180-degree rule](https://en.wikipedia.org/wiki/180-degree_rule),
+  [30-degree rule](https://en.wikipedia.org/wiki/30-degree_rule), [Dolly zoom](https://en.wikipedia.org/wiki/Dolly_zoom).
+
+**Our own measurements** (scratch, `/tmp/comp/cinema/`): the grids of §1 and the horizon-cut table of §3.2 are
+arithmetic from the formulas given; v6's vanishing point is OpenCV's probabilistic Hough transform on our quay
+(x 0-1080, y 1150-1500; Canny 20/60; segments >= 180 px with slopes 0.03-0.6), the median of 131 pairwise
+intersections; the references' horizons are by eye (+-0.03 H).

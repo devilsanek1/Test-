@@ -45,6 +45,16 @@ camera angle and composition of objects", which the owner finds fascinating) in 
 specific local objects of a place are content, not style (owner). Everything else in the study is a proposal until
 the owner approves it; the look test shows it.
 
+**Decided by the owner (2026-10-30), answering our list of the ten biggest differences between still v6 and his
+references, in the rules below:** shapes that blend naturally, never square and proper (playbook ORGANIC, NOT
+GEOMETRIC: rules 2, 4); ONE painted language for the whole frame, near sharper and far more like brushwork (PAINTED
+PIECES: rule 4); one story light per scene done properly, with darks, contrast and one colour key as palette work
+(PROPER LIGHT: rules 5-6); big quiet areas and one place to look (SCENE COMPOSITION: rules 2-3); people in direction C
+with the LASH face (rule 3). Their numbers are `ORGANIC.md` (shapes and edges, the light's method, the composition
+rules R1-R12, the dose by plane, the paper), carried into `CRAFT.md` as first values for the v7 look test (WARNs; the
+owner's eye at phone size decides), and `PEOPLE_DESIGN.md`. One call is still the owner's: the dark key, T1 (one gentle
+dark mass) or T3 (the references' low key) (`ORGANIC.md` §8 D3; rule 6).
+
 ## The rules
 - **1. One flowing story, never shots stitched together.** One story on ONE core line (spine first, each line following
   from the last) and a through-line card: one thread object carrying the arc (on screen >= 80 %, no gap over 3 s
@@ -56,60 +66,102 @@ the owner approves it; the look test shows it.
 - **2. Attention hierarchy: one subject at a time.** Tier by STORY ROLE, never depth: A, the beat's 1-3 subject objects,
   owns the contrast, the hero colour, the deepest shade step and >= 60 % of the motion; B, supporting life (people near
   the story, the mascot): soft (C* <= 25), small, steady; C, the environment: low contrast (the still near world a
-  little richer), slow life only, built as a "low poly" patchwork: the near ground and the mid and far city in flat
-  facets of the hero's colours, never on the subject, never as rectangles in the sky (owner, 2026-10-29). No tier draws
-  an outline (rule 4). Pip stays in every film, hidden on purpose (owner, 2026-10-28: "keep it, but not as
+  little richer), slow life only, built as a "low poly" patchwork (owner, 2026-10-29): the near ground and the mid and
+  far city in fewer, bigger, simpler shapes and fewer values, in the hero's colours, never on the subject, never as
+  rectangles in the sky; and never square and proper (owner, 2026-10-30, ORGANIC, NOT GEOMETRIC): each facet hand-cut,
+  the edge between neighbours within ~4-6 L* lost, far facets carrying their plane's coarse marks (rule 4). No tier
+  draws an outline (rule 4). Pip stays in every film, hidden on purpose (owner, 2026-10-28: "keep it, but not as
   obvious"): small, inside the world (a window, a boat, a balcony, a crowd), found on a second look, never on the
   subject's eye path; a quiet "find Pip" in most exterior shots, none in closes and charts, hidden on the cover too
   (owner, 2026-10-29); drawn new per film in the one look; tier B, <= 1 % of the frame; its hiding spots planned at G3
-  (W1 names them); another character only if the story asks, named in W1. Squint at phone size: the eye is on the beat's subject. **Depth and separation too** (owner, v2 G4): the
+  (W1 names them); another character only if the story asks, named in W1. Squint at phone size: the eye is on the beat's subject.
+  **One place to look** (owner, 2026-10-30, SCENE COMPOSITION: "our scene is very busy"): values grouped into a few
+  big masses (a 2- and 3-value notan first); ONE focal, where the subject, the story light (rule 5) and the hardest
+  value step meet; at most 3 regions pulling at half the focal's strength, one rival at most, in value and in colour;
+  <= 6 named objects at phone size (the subject, one big quiet secondary mass, 1-3 supporting things); a busy frame
+  of many mid-tone props of equal weight is the failure (`ORGANIC.md` §4.4, R1-R12). **Depth and separation too** (owner, v2 G4): the
   subject never melts into what is behind it (its own value against a calmer field); distance shows in colour (far
   planes converge on the air behind them: lighter, softer in contrast, simpler, cooler under a blue sky and warmer under a
   sunset: atmospheric perspective in flat colour) and in perspective (a ground
   that recedes: converging edges, foreshortening, things smaller and texture finer with distance, overlaps), never a
   flat elevation of stacked bands; a few subtle particles (motes, a leaf, glints) make it natural. -> `CRAFT.md` §b, §f;
-  `LIFE_AND_DENSITY.md` §5.
-- **3. Alive but calm: full, never empty, never busy.** Every paused frame is full: a world made of things, people
-  (small and simple like reference 1, seen from behind or in rear 3/4, no faces: they act with their pose, near heads
-  <= ~140 px, many at rest; in the foreground only the one "you" or the mascot, strangers small in the mid and far
-  ground), layered depth, things cut by the edges, no hole bigger than the caption band. Life never stops (clouds,
+  `ORGANIC.md` §4.4; `LIFE_AND_DENSITY.md` §5.
+- **3. Alive but calm: full, never empty, never busy.** Every paused frame is full: a world made of things, people,
+  layered depth, things cut by the edges. Full is never busy (owner, 2026-10-30, SCENE COMPOSITION: "big quiet areas"):
+  the many small things live as texture inside the belt's masses (tone-on-tone, no silhouette of their own at a
+  squint), never as many named objects (rule 2); the frame keeps up to two big quiet fields, the sky with the caption
+  band at the top and the near ground at the bottom (most of the frame quiet at a squint: `ORGANIC.md` §4.4 R5), each
+  patterned in value (+-4-6 L*: painted variation, dapples, joints, tone-on-tone things), so a quiet field is never a
+  hole; elsewhere no hole bigger than the caption band. **People** (owner, 2026-10-30: "beautiful and pleasant",
+  styled like today's 20-30-year-olds in New York and Los Angeles, faces drawn "in a more generic way";
+  `PEOPLE_DESIGN.md`): direction C, MODERN GRAPHIC (about 7.8 heads, rounded polygons in two flat tones, crisp, no
+  outlines, the styling carried by clothes and hair) with the LASH face (closed-eye lash lines and a small soft nose;
+  only the contour under ~200 px tall; sunglasses and caps as some people's accessories; never looking at the camera);
+  simple, seen mostly from behind, in profile or turned away, acting with their pose; near heads <= ~140 px, many at
+  rest; in the foreground only the one "you" (often turned away) or the mascot, strangers small in the mid and far
+  ground. Life never stops (clouds,
   steam, snow, birds, a window lighting, walkers) but stays small, slow and low in contrast: at most 3-4 noticeable
   supporting movers at once, taking turns, none entering in the 0.4 s around a join. Subtle means lighter, never
   removed; counts are examples and meters warn, never quotas. The bar is the film's own G3 density key (v3's G5b pilot
   O1 shows only how full). Everything is drawn new for each film (sets, people, props, Pip, music) inside the one look
-  every video shares; engine, tools and QA are reused, and `lib` pieces are references. -> `LIFE_AND_DENSITY.md` §0-7.
-- **4. A clean, premium line, never rough or messy.** No outlines on any tier (owner, 2026-10-29: the A vs B picture's
-  B, "Go with your suggestions"): an edge is a step of light and shade (rule 5) or of value, as on the city posters.
-  Thin lines only on small things that ARE lines (window bars, railings, rigging, wires), drawn to hold steady in the
-  float: the owner's earlier "black outlines, VERY subtle, in key places" now lives only in these, dark and warm in
-  the object's own deep shade, never one near-black ink on everything. Each shape one closed path: no corner
-  crossings, gaps, overshoot, jitter or doubled strokes; fills meet exactly; an object draws on as one
-  stroke; no boil; big areas flat, no specks, ticks or hatching, except the PAINTED PIECES (owner, 2026-10-29: "I really like the
-  “painted” pieces like the sky and the clouds"; playbook PAINTED PIECES): the sky and its clouds and a few chosen
-  environment pieces (some near buildings, trees, greenery) uniquely painted, with visible brush texture and soft
-  painted edges, made by our own seeded paint pass and locked to their layer, the subject and people crisp; elsewhere
-  texture stays VERY subtle and opt-in, a last step
-  the film must work without: a fine paper-and-paint grain with gentle mottling in the big flats, static and locked to
-  the world (owner, 2026-10-28: "start playing with it, very subtly especially if its adding to the premium look"; tried
-  in a look clip, kept only if it adds to the premium feel), or the owner's halftone on a few elements; captions keep
-  the dark ink. The clean pen (`src/lib/pen.ts` `setPen('clean')`) draws the film;
-  the sketch pen and the scribble mass stay on the G3 board. -> `CRAFT.md` §c.
-- **5. Gentle light and shadow, always there.** One light rig per set (a key on one side, one shadow tint family, the
-  pool colours), kept in all its shots; a source never moves between cuts; the brightest area sits on the subject;
-  light is lighter than what it lights, shown on what it hits; ONE story light per scene done properly (owner, 2026-10-30: "can we do the proper lights?"): real falloff, rim light on what it touches, a soft glow and gentle bloom AT a source (a sun, a lamp, a lit door, a screen), cast shadows and pools that follow it (playbook PROPER LIGHT); otherwise never glow discs, blur or gradients (the sky's gentle gradient and the painted pieces' soft paint aside: rules 4, 6; a halo is one step
-  of at most 1.7x, or none). Shadows are colour, never grey, gentle in value, flat in shape: contact under all that
-  touches a surface, form away from the key, cast along the light; every volume reads in 2-3 flat tones, a lit face and
-  a shade face (the city posters; owner, 2026-10-28), and with no outlines (rule 4) these faces make the edges: the
-  subject's shade face goes clearly deeper, B's and C's stay gentle (owner, 2026-10-29); rim light only on the
-  subject; night is temperature, not darkness. -> `CRAFT.md` §d; `scripts/qa/check_light.py`.
+  every video shares; engine, tools and QA are reused, and `lib` pieces are references. -> `LIFE_AND_DENSITY.md` §0-7;
+  `PEOPLE_DESIGN.md`.
+- **4. A clean, premium line, never rough or messy; shapes that blend naturally, never square and proper.** No
+  outlines on any tier (owner, 2026-10-29: the A vs B picture's B, "Go with your suggestions"): an edge is a step of
+  light and shade (rule 5) or of value, as on the city posters. Thin lines only on small things that ARE lines (window
+  bars, railings, rigging, wires), drawn to hold steady in the float: the owner's earlier "black outlines, VERY subtle,
+  in key places" now lives only in these, dark and warm in the object's own deep shade, never one near-black ink on
+  everything. Each shape one closed path: no corner crossings, gaps, overshoot, jitter or doubled strokes; fills meet
+  exactly; an object draws on as one stroke; no boil; no specks, ticks, hatching or scribble but the paint's own marks,
+  laid by intent. **Organic, not geometric** (owner, 2026-10-30, ORGANIC, NOT GEOMETRIC: "too square and proper like I
+  can see shapes and angles very clearly"): silhouettes irregular and varied (big, medium, small; one dominant mass per
+  element); natural shapes are free curves, never compass arcs; made things stay straight but hand-cut at design time
+  (no ruler line left unbroken, no template, no frontal grid of identical rectangles), fixed in time, never wobbling;
+  shapes overlap and melt; edges lost and found (found where the light hits, at the focal and at big value steps; lost
+  where close values meet, made with strokes or dry-brush teeth, never a blur). **ONE painted language for the whole
+  frame** (playbook PAINTED PIECES; owner, 2026-10-29: "I really like the “painted” pieces like the sky and the
+  clouds"; 2026-10-30, on still v6's lone painted tree among flat pieces: "it doesn’t fit the style there"): every piece but the
+  subject and the people is painted by our own seeded paint pass, locked to its layer (never a filter over the frame,
+  never an even streaky texture), at its plane's dose: near and at the focal sharper (found edges, the finest marks,
+  the most detail), far "more like brushes and painting" (lost edges, fewer values, the coarsest marks, few, broad and
+  visible, never only blurred); the subject and the people crisp and clean; big areas quiet in value, never dead
+  flat; the film still works with the paint off. Texture beyond the paint: ONE paper per film, VERY subtle and the
+  last step the film must work without (owner, 2026-10-28: "start playing with it, very subtly especially if its
+  adding to the premium look"; 2026-10-30, on an overall texture: "that seems solvable too?"): a fine tooth, a little
+  fibre and a gentle mottle on every plane and mover, locked to them, never to the screen, about 1 L* on a mid-tone and
+  faint in the caption band; kept only if it adds to the premium feel; the owner's halftone stays an option on a few
+  elements; captions keep the dark ink. The clean pen (`src/lib/pen.ts` `setPen('clean')`) draws the film's flat
+  design; the sketch pen and the scribble mass stay on the G3 board. -> `CRAFT.md` §c; `ORGANIC.md` §4.1 (shapes and
+  edges), §5 (the dose by plane), §4.5 (the paper); `PAINT_RECIPES.md`.
+- **5. Light and shadow: one story light done properly, gentle, always there.** One light rig per set (the key, a sun
+  or a lamp, on one side; one shadow tint family; the pool colours), kept in all its shots; a source never moves
+  between cuts. ONE story light per scene, on the subject (owner, 2026-10-30: "can we do the proper lights?";
+  playbook PROPER LIGHT): the brightest area sits on the subject (the sky, the caption band and the far planes left
+  out), every other light at least a step under it; light is lighter than what it lights, shown on what it hits, with
+  real falloff from its source (a smooth, dithered ramp, never concentric rings); a soft glow and gentle bloom AT a
+  source only (a sun, a lamp, a lit door, a screen, and their reflections), never a disc or ring and never a glow on a
+  lit surface; rims on what the key and the story light touch, by tier (the subject's the widest, B's and C's thin,
+  far planes none), uneven with the light's angle, never an even outline; cast shadows and pools that follow the
+  light. Shadows are colour, never grey, gentle in value: contact under all that touches a surface, form away from
+  the key, cast along the light (long and converging under a low sun); a shade mass has a named caster, never a
+  vignette. Every volume reads in 2-3 tones, a lit face and a shade face (the city posters; owner, 2026-10-28), colour
+  and light moving gently inside each (PAINTED PIECES), and with no outlines (rule 4) these faces make the edges: the
+  subject's shade face goes clearly deeper, B's and C's stay gentle (owner, 2026-10-29). No blur, fog or gradient laid
+  over the world: the sky's gradient (rule 6), the paint's softness (rule 4) and the light's own falloff and bloom are
+  the soft things. Night is temperature, not darkness. -> `CRAFT.md` §d; `ORGANIC.md` §4.2;
+  `scripts/qa/check_light.py`.
 - **6. Warm, soft colour, never sickly.** One sister palette per film, proposed in the W1 world bible (its rigs and
   colour script are written in its terms) and approved with the G4 look clip: a soft light page of many fills (warm by
-  default), one hero on the story's object, one tinted dark anchor (the darks' hue), at most one pop ("look here"). Peach
-  creams, terracotta, rose, leaf sage, golden light, plum and red-brown shadows; never beige, muddy tan, olive or
-  grey; a warm world held by one cool field; saturation as confetti, never fields; a full value range: a calm light
-  sky, a mid-tone world and real darks where the eye should go, drawn in many small pieces (windows, doorways, eave
-  undersides, the shade under trees: owner, 2026-10-29), never one dark mass or a narrow band of light pastels (owner,
-  2026-10-28; numbers: `CRAFT.md` §f.8, from the city-poster study). Money and everyday life: #9 Autumn
+  default), one hero on the story's object, one tinted dark anchor (the darks' hue), at most one pop ("look here").
+  ONE colour key per scene (owner, 2026-10-30, of the darks and the key: "that’s just color palette and selection?
+  Similarly point 2"; playbook PROPER LIGHT): one strong colour family, the sky's own, with one hot accent at the focal
+  (the story light's), every other colour tone-on-tone in its mass, never a mix of unrelated pastels (`ORGANIC.md`
+  §4.3). Peach creams, terracotta, rose, leaf sage, golden light, plum and red-brown shadows; never beige, muddy tan,
+  olive or grey; a warm world held by one cool field; saturation as confetti inside the key, never fields; a full
+  value range: a calm light sky, a mid-tone world and real darks where the eye should go, drawn in many small pieces
+  (windows, doorways, eave undersides, the shade under trees: owner, 2026-10-29), never one dark mass or a narrow band
+  of light pastels (owner, 2026-10-28; numbers: `CRAFT.md` §f.8, from the city-poster study; owner's pick pending:
+  `ORGANIC.md` §8 D3). Money and everyday life: #9 Autumn
   Ember (#7 Autumn Ochre read sick). **One continuous sky** (owner, v2 G4), never an empty field (owner, 2026-10-29: soft
   clouds, a gentle paint-like variation in its tone, pale far towers rising into it, birds; calm, no abstract
   rectangles, the caption band clear; its clouds painted: rule 4's PAINTED PIECES): from the frame top to the horizon the sky's base
@@ -132,7 +184,8 @@ the owner approves it; the look test shows it.
   the vast world beyond (a city, a big sky, the water) giving the scale; never a wall filling the frame up close
   ("I'm really suffocating with the view") and never a far poster-like panorama ("too cheap looking"); v2's eye-level
   view of the canal is the model ("our initial angle snd the view frankly wasn't bad"). The near frame is a small,
-  subtle hint at the edges, never big chunky masses; the street across the water is full; a real place's landmarks
+  subtle hint at the edges, never big chunky masses (at most 2 props, cut by a frame edge, inside the near ground's
+  quiet mass); the street across the water is full, as texture in its band (rule 3); a real place's landmarks
   and an exact camera angle matter far less than that depth. The designed view (the far city lifted onto its own
   horizon, the landmark drawn bigger than one camera allows) is on hold since 2026-10-29: every frame keeps one camera
   (rule 2's perspective; `CRAFT.md` §f.5). Arcane gives environments and camera only. ->
@@ -176,16 +229,26 @@ stage; the owner may skip gates by name. The clean pen's first test is the v3 re
 ## Retired (never use these; the v1-era docs keep them only as history, under a banner)
 - Scratchy film lines (jitter, overshoot, open contours, double strokes, taper everywhere) and misregistered fills
   (`style_bible.md` §3-4, `motion_spec.md`): the clean pen.
-- Line weight or detail by depth (`style_bible.md` §3, `ENGINE.md` rule 8, the old G3 "detail gradient", the "ink
+- Line weight by depth (`style_bible.md` §3, `ENGINE.md` rule 8, the old G3 "detail gradient", the "ink
   full, full, hairline, none" ladders): no outlines on any tier, thin lines only on things that are lines (rule 4);
-  distance only calms colour and merges small parts, one flat step per plane (rule 2's depth, `CRAFT.md` §f).
+  distance calms colour, merges small parts and coarsens the paint, one flat step per plane (rule 2's depth, rule 4's
+  dose by plane, `CRAFT.md` §f).
+- Square and proper shapes (`CRAFT.md` §c until 2026-10-30: "straight edges ruler-true", "circles true ellipses",
+  soft-cornered made objects): compass-arc clouds built as a union of circles, ruler lines, frontal grids of identical
+  rectangles, mirror-image templates, one edge quality all round: rule 4's organic shapes, lost and found edges.
+- "A few chosen" painted pieces among flat vector ones, and "big areas flat" (v6's lone painted tree): ONE painted
+  language for the whole frame at each plane's dose (rule 4; owner, 2026-10-30).
+- "Rim light only on the subject", a halo as one step of at most 1.7x, and "no glow, no gradient" for light (`CRAFT.md`
+  §d until 2026-10-30): rims by tier, a soft glow and bloom at a source, real falloff (rule 5; playbook PROPER LIGHT).
+- One quiet field per frame and "12+ distinct props" in a wide (`LIFE_AND_DENSITY.md`, `LAYOUT.md` until 2026-10-30):
+  up to two quiet fields, <= 6 named objects, the rest texture inside a mass (rules 2-3; SCENE COMPOSITION).
 - Tier A's closed 3.0 px outline in its own deep shade (our reading of "black outlines, VERY subtle, in key places")
   and B's thin same-hue line on Pip and line-drawn figures (v2's line, the A vs B picture's A): edges from light and
   shade, thin lines only on small things (rule 4; owner, 2026-10-29).
 - A saturated sun disc as the far group's pop (v2's S5 sun): the sun one step off its sky unless it is the shot's
   "look here" (rule 6; owner, 2026-10-29).
 - Equal-weight clutter: dressing, crowds or the mascot as loud as the subject; specks, ticks, hatching, dash rows,
-  squiggles, a visible grain (rule 4's VERY subtle texture is an opt-in test, never a loud one).
+  squiggles, a visible grain (rule 4's one paper is VERY subtle, never a loud one).
 - An events-per-second quota or a density FAIL (`ENGINE.md` rule 6, `motion_spec.md` §9, ref 2 as a floor, the old
   "BUSY" profile): events/s and the meters are information.
 - A plain cut by default, "change size and angle at every cut", a zoom over 2x turned into a cut-in, a dissolve as a
@@ -200,8 +263,11 @@ stage; the owner may skip gates by name. The clean pen's first test is the v3 re
 - The mascot hopping across cuts, riding the carriers or sitting on both sides of every join, or placed for the eye as
   a visible presence in every shot: Pip hides on purpose (rule 2; owner, 2026-10-28); strangers' backs in the
   foreground, in any film.
-- Faces on people (a protagonist's "face beat", v3's waist-up "you" facing us): people act with their pose; only the
-  mascot has a face (rule 3).
+- A face as a beat (a protagonist's "face beat", v3's waist-up "you" facing us) or a face with features (dot eyes, a
+  mouth, brows): people act with their pose, and their face is the generic LASH, never looking at the camera (rule 3;
+  owner, 2026-10-30). "No faces at all" (people before 2026-10-30) is history too.
+- The pictogram person (a ball head with no neck on a tombstone torso, 3.7-4.9 heads, a sack coat; the owner: "very
+  old style and frankly ugly", 2026-10-30): direction C (rule 3; `PEOPLE_DESIGN.md`).
 - The G4 look made in parallel with G3 (stills, or a clip before the lock): the look clip follows the G3 lock.
 - One house kit (sets, people, Pip, music) reused across films, or `lib/cine` drawing pieces in film code: each film
   draws its own; engine and tools are reused.

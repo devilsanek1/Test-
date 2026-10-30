@@ -18,6 +18,12 @@ completeness checks (`G3_ANIMATIC.md` §7: a missing carrier, tier or rig field,
 undeclared bare paper, a red mark on an owner-facing render) are not craft thresholds: they check that the board shows
 its signal, and they keep their FAIL. Px at 1080 x 1920, CIE L* and C*, %W/s = % of frame width/s; measures: §e.
 
+**The owner's words of 2026-10-30 are integrated here** (playbook ORGANIC, NOT GEOMETRIC; PROPER LIGHT; SCENE
+COMPOSITION; PAINTED PIECES' balance and its ONE painted language): §b's patchwork and its calls, §c's shapes, edges,
+paint and paper, §d's light, §f.2's painted planes and §g's sky take `ORGANIC.md`'s numbers (§4-5 there), first values
+for the v7 look test and WARNs like the rest of this page; the owner's eye at phone size decides. One call waits for
+the owner: the dark key (§d.2, §f.8; `ORGANIC.md` §8 D3).
+
 ## a. One flowing story
 **The through-line** (written down beside the core line, before any drawing):
 1. **One thread object carries the main arc** (v3: your laptop's price tag): on screen for at least 80 % of the runtime,
@@ -92,9 +98,13 @@ texture and how simple it is:
   animated alike.
 - **Tier C's build: the "low poly" patchwork** (owner, 2026-10-29: "Go with your suggestions", `STUDY.md` §9 decision 3
   (a); first judged in the look test, `STUDY.md` §10; the spec: `STUDY.md` §2a, §5.2): the near ground and the mid and
-  far city as flat, straight-edged facets of the hero's colours (within CIEDE2000 <= 8 of the hero's, under the same rig
-  and texture: one style at two resolutions), one fill per facet by its angle to the key, neighbours dL* 4-10, blocks
-  >= 8 px (3.5-7.5 % W, far 6-10 %), locked to their plane and taking its step (§f.2); frontal on mid and far masses;
+  far city as fewer, bigger, simpler shapes with fewer values (the posters' "a bit more low poly", owner, 2026-10-28),
+  in the hero's colours (within CIEDE2000 <= 8 of the hero's, under the same rig and texture: one style at two
+  resolutions), one value per facet by its angle to the key, neighbours dL* 4-10, blocks >= 8 px (3.5-7.5 % W, far
+  6-10 %), locked to their plane and taking its step (§f.2). Never square and proper (owner, 2026-10-30, ORGANIC, NOT
+  GEOMETRIC: "I can see shapes and angles very clearly"): each facet hand-cut (§c's shapes), never a ruler grid; the
+  edge between neighbours within ~4-6 L* is lost (edge strokes near, dry-brush teeth far: §c), so a patch of facets
+  reads as one painted mass; far facets carry their plane's coarse marks (`ORGANIC.md` §5); frontal on mid and far masses;
   on a ground only projected through `groundCam`, so it recedes (§f.4; never level bands); in the sky only as masses
   within dE 6 of the air, never abstract rectangles; never on the subject, nothing in the caption band. The still near
   world may run richer than C's cap (the table: <= 9). The options not taken (the far city only, or none) are history.
@@ -112,11 +122,16 @@ texture and how simple it is:
   to calmer fills, shade steps (§d.3) and motion factors, with no outline on any tier (§c; the tier-A line becomes a
   per-film flag, off: `STUDY.md` §10 item 4); its constants are tuned until this check passes.
 
-**Check** (the paused middle frame, then a 0.5 s burst; target, then ref 1 / v1 / v3 G5b): salience peak/median >= 2.4
-(3.65 / 2.60 / 1.79); background salience <= 1.4 (1.01 / 1.28 / 1.91); salience mass in the top 10 % of the area >= 19 %
-(21 / 20 / 17); environment local contrast <= 7 (6.6 / 6.1 / 11.3); subject / environment local contrast >= 2 (2.1 / 2.6 /
-1.1); the subject's share of the motion >= 60 % (60 / 34 / 22). Eye check at phone size: squint and say where your eye is
-every 2 s; it is on that beat's named subject.
+**Check** (the paused middle frame, then a 0.5 s burst; target, then ref 1 / v1 / v3 G5b): **the calls first** (owner,
+2026-10-30, SCENE COMPOSITION; `ORGANIC.md` §4.4 R3, from `video/`: `python3 -B docs/look/organic/composition_study.py
+frame <still> --caption --subject x0,y0,x1,y1`): <= 3 regions pull at >= 50 % of the strongest and only one at >= 70 %,
+in value AND in colour, the strongest on the subject's box (the painted models 1-2; v6 10, three of them rivals,
+while it passed the three salience numbers below), with its other R-checks (the notan, the quiet masses, <= 6 named
+objects); background salience <= 1.4 (1.01 / 1.28 / 1.91); salience mass in the top 10 % of the area >= 19 % (21 / 20 /
+17); salience peak/median as information only (3.65 / 2.60 / 1.79; two painted references read 1.59-2.02 at 400 px,
+a big glowing mass lifting the median); environment local contrast <= 7 (6.6 / 6.1 / 11.3); subject / environment
+local contrast >= 2 (2.1 / 2.6 / 1.1); the subject's share of the motion >= 60 % (60 / 34 / 22). Eye check at phone
+size: squint and say where your eye is every 2 s; it is on that beat's named subject.
 
 ## c. The clean line: premium, gentle
 v3's weight was fine (2.3-3.0 px, like ref 1 and v1); the count, the ends and the contrast were not: 3.4-6.2x the approved G4
@@ -137,33 +152,73 @@ G4 frame had the same pen and passed with a quarter of the strokes: the fix is a
   a thin line only where the detail is one. Captions keep the dark ink (PALETTE). Until 2026-10-29 tier A had one
   closed 3.0 px outline in its own shade with 1.8-2.0 px inner details, and B a same-hue 1.6-2.2 px line round the
   mascot and line-drawn figures (v2's line, the picture's A): history.
-- **Shapes:** each closed shape is ONE closed path (`Z`, round joins): no corner crossings, gaps or overshoot. Straight edges
-  are ruler-true (jitter, drift, bow 0). Made objects get soft corners (r = 3-6 % of the short side, at least 3 px). Curves
-  are smooth (Catmull-Rom); circles are true ellipses (wobble 0; organic shapes 0.01 at most). Free ends only where the
-  stroke IS the thing (hair, steam, string): round caps, a smooth taper to 60 %.
+- **Shapes: clean, and organic, never square and proper** (owner, 2026-10-30, ORGANIC, NOT GEOMETRIC: "It feels like
+  a lot of our design is too square and proper like I can see shapes and angles very clearly"; the numbers and their
+  measures: `ORGANIC.md` §4.1). Each closed shape is ONE closed path (`Z`, round joins): no corner crossings, gaps,
+  overshoot or doubled strokes, and no boil: a shape's irregularity is designed once, seeded per object, and holds
+  still in time. **Natural shapes** (clouds, foliage, rocks, cast shadows, water edges) are free curves, never compass
+  arcs: ellipses on a size ladder, never circles (aspect 0.6-0.98, each level 0.28-0.55 of its parent, overlapping
+  18-40 % or apart, never kissing), the outline displaced by value noise at the short octaves (0.7-2.5 % of R; never
+  sines), compass arcs <= 10 % of a cloud's outline. **Made things** stay straight but hand-cut at design time: each side
+  turned 0.8-2.2 degrees, bowed 0.3-0.9 %, corners worn 0.6-2 px (windows, doors, sills 2-3.5 px); no ruler line reads
+  unbroken on planes 0 to +2 (straight runs of 60 px or more <= 15 % of a crop's edge length: broken by an overlap, a
+  lost stretch, a joint that stops, a chip); no template (repeats vary 5-12 % in size, +-1.5 px in place and in state,
+  each with one asymmetric thing); right angles <= 25 % of the corners in the picture, edges on the axes <= 50 %.
+  **Rhythm:** one dominant mass per element (15-35 % of its shape area), fewer and bigger clumps, rows never evenly
+  spaced, every mass on planes 0 to +2 broken once by a thing in front of it. Curves are smooth; free ends only where
+  the stroke IS the thing (hair, steam, string): round caps, a smooth taper to 60 %. The subject and people keep their
+  own crisp drawing (her outline free curves; people: `PEOPLE_DESIGN.md`). Until 2026-10-30 straight edges were
+  ruler-true and circles true ellipses (wobble 0), made objects soft-cornered (r 3-6 % of the short side): history.
+- **Edges, lost and found** (owner, 2026-10-30; `ORGANIC.md` §4.1): **found** (crisp, 0.5-1.5 px) where the light hits a
+  form, at the focal and wherever the value step is >= 14 L*; **lost** (10-24 px, or broken by teeth) where two values
+  within 4 L* meet (a shade face against the dusk air, a cloud's base, a shadow's far edge); blended between. Every
+  natural outline over 300 px alternates, at least one found and one lost stretch of >= 15 px, never one quality all
+  round. A lost edge is made, never blurred: edge strokes on near and mid planes (one flat-brush stamp every 14-26 px,
+  3-7 px wide, lapping over the edge), dry-brush teeth on far planes and vapour (along the brush: the wind, the
+  perspective, the growth); teeth, gaps and breaks >= 2 px across on a plane that floats. The subject's box stays
+  crisp: found all round on its lit side.
 - **Fills** register exactly (offset 0) and meet edge to edge: with no outline the fill edge IS the silhouette, so it
   is the cleanest path in the shape (a thin line on a shape is drawn inside its fill: stroke 2x, clipped to the fill).
-- **Texture:** big areas flat; texture only as flat same-hue shapes (a rug pattern, plank seams as 2 long bands at dL* 6-8
-  or less) on 1-2 small surfaces per shot, except a material inside a facet (strata bands, veins, bark plates, stone
+- **Paint and texture: ONE painted language, quiet in value, never dead flat** (playbook PAINTED PIECES; owner,
+  2026-10-30: "I think we need to find a balance I think even in the references the close objects are more sharp while
+  further objects are more like brushes and painting"; the dose by plane: `ORGANIC.md` §5; the recipes:
+  `PAINT_RECIPES.md`). Every piece but the subject and the people (a prop, a boat, a lamp post as much as the sky, a
+  tree or a facade) is painted by our own seeded paint pass at its plane's dose, locked to its layer, because one flat
+  vector piece among painted ones reads pasted in (v6's lone tree); a piece that cannot join the language at its dose
+  leaves the frame (`ORGANIC.md` R6). Near and at the focal: found edges, the finest marks, the most detail; far: lost
+  edges, fewer values and the coarsest marks, few, broad and visible, never a plane that is only blurred. Big areas
+  stay quiet in value, never dead flat: colour moves in them (a wash, value patches, the paper); dead-flat area (L*
+  within 0.35 over 31 px) <= 20 % of the frame (the painted references 0-20 %, v6 35 %). The flat design under the paint
+  (its P0) keeps its drawn texture to flat same-hue shapes (a rug pattern, plank seams as 2 long bands at dL* 6-8 or
+  less) on 1-2 small surfaces per shot, except a material inside a facet (strata bands, veins, bark plates, stone
   patches, same-hue at dL* 3-8), which may run on more surfaces, nature's and the still near world's (owner,
-  2026-10-29: `STUDY.md` §9 decision 3, `pro_3_nature.md` C1). No specks (static dark marks; §f's particles are light movers, not texture), ticks, hatching, scribble, dash rows, crumbs or steam squiggles,
-  and no grain overlay by default (the sky's invisible encode dither, §g, is not a texture). Two optional textures, both
-  VERY subtle and both last steps the film must work without: the owner's halftone (`PALETTE.md` "Texture and lines":
-  at most 6 %, on a few chosen elements, after G6), and, being tested since 2026-10-28 (owner: "start playing with it,
-  very subtly especially if its adding to the premium look"), a fine paper-and-paint texture with gentle mottling in
-  the big flats, static and locked to the world (never boiling), to the test spec below, judged in a look clip and kept
-  only if it adds to the premium feel.
-- **The paper-and-paint test, its spec** (city-poster study, 2026-10-28: `docs/studies/2026-10-28_city_posters/`
-  `STUDY.md` §5.1, §7, `style.md` §1.4). The posters carry a grain of 0.2-0.9 L* (~2.5 px) and a coloured mottle of
-  0.4-0.7 L* in 40-70 px blotches on every fill; v2 is dead flat. The test: the mottle only, std <= 0.5 L* in 30-70 px
-  blotches, its colour <= 0.35 in a*b*; static and locked to its parallax plane (each plane carries its own and moves
-  with it), its strength by plane 1.0 / 0.7 / 0.4 (tiers A and B / near C / far C), the sky ~0.6 (est.); none in the
-  caption band (DIRECTION rule 10); no grain in the first test, and a grain, if ever tried, at most 0.25 L* std (~2.5
-  px). Its cost through H.264 at 60 fps (v2 S1 panning): the world-locked mottle +27 % master bitrate, 84-95 % of it
-  kept on the platform's rungs, `check_banding.py` PASS; with the subtlest posters' grain (0.25 L*) +48 %, the grain
-  halves at 720p and starts to shimmer; locked to the screen 6.2x the bitrate, re-seeded each frame 14x and erased:
-  never. Applied after G6; the film works without it. Code (to build): `lib/texture.tsx`, a texture mode in
-  `check_banding.py`.
+  2026-10-29: `STUDY.md` §9 decision 3, `pro_3_nature.md` C1). No specks (static dark marks; §f's particles are light
+  movers, not texture), ticks, hatching, scribble, dash rows, crumbs or steam squiggles but the paint's own marks, laid
+  by intent (speckle only on near masses); never an even streaky texture or a filter over the frame (the sky's
+  invisible encode dither, §g, is not a texture). Beyond the paint: the one paper (next), VERY subtle and the last step
+  the film must work without; and the owner's halftone as an option (`PALETTE.md` "Texture and lines": at most 6 %, on
+  a few chosen elements, after G6).
+- **The one paper (was the paper-and-paint test), its spec** (owner, 2026-10-30, on an overall texture: "that seems
+  solvable too?"; 2026-10-28: "start playing with it, very subtly especially if its adding to the premium look";
+  `ORGANIC.md` §4.5, proved in `organic/light_proof.md`). ONE material per film, on every plane and every mover: a fine
+  tooth, a little fibre (2 x 1 px along one angle; 4 x 1 px reads as brushed linen: never) and a gentle mottle (40-90 px
+  blotches), soft-light round mid-grey (an equal lift and darkening, strongest in the mid-tones: the darks keep their
+  depth, the lights never grey). Strength ~0.9 L* std on a mid-tone, <= ~1 L* added on the flats (proof 2: +0.4-0.8);
+  by plane as `lib/texture` `MOTTLE_K`: tiers A and B 1.0, tier C up to +1 0.7, +2 and farther 0.4, the sky 0.6; in
+  the caption band <= 15 % of that (its spread <= 1.5 L*, the ink's contrast unchanged; proof 2: 12 %, 1.27 L*).
+  Locked: baked into each plane's painted pieces and its one multiply light map (it rides the plane's float), a tile
+  locked to each mover (`lib/light2` `GrainOn`); on a floating plane its finest feature >= 2 px; never fixed to the
+  screen, never re-seeded per frame. A film takes it only once it passes in the float: the paint and the paper
+  together <= +30 % master bitrate over v6 and no shimmer at 720p (`check_banding.py --texture`, the platform's rungs:
+  `ORGANIC.md` §6 step 5); judged at phone size and kept only if it adds to the premium feel. History, the city-poster
+  test (2026-10-28: `docs/studies/2026-10-28_city_posters/` `STUDY.md` §5.1, §7, `style.md` §1.4): the posters carry a
+  grain of 0.2-0.9 L* (~2.5 px) and a coloured mottle of 0.4-0.7 L* in 40-70 px blotches on every fill (v2 dead flat);
+  the test was the mottle only (std <= 0.5 L*), none in the band, a grain at most 0.25 L*. Its cost through H.264 at
+  60 fps (v2 S1 panning): the world-locked mottle +27 % master bitrate, 84-95 % of it kept on the platform's rungs,
+  `check_banding.py` PASS; a 0.25 L* grain +48 %, halving at 720p and starting to shimmer; locked to the screen 6.2x
+  the bitrate, re-seeded each frame 14x and erased: never. Code: `lib/texture.tsx` (`MOTTLE_K`), the v7 bake's
+  `texture.py`, `lib/light2` `GrainOn`, `check_banding.py --texture` (its band limit still says "none": to raise to
+  this spec's <= 15 %, a tooling fix).
 - **Line motion:** an object draws on as one stroke, never edge by edge; no `exitLoose`, no boil.
 - **Thin lines twinkle in the float** (measured, city-poster study, 2026-10-28: `details.md` §3 in
   `docs/studies/2026-10-28_city_posters/`). Under the parallax float (DIRECTION rule 8) a line under 2 px straddles
@@ -193,7 +248,12 @@ thin marks only: §f.8's dark pieces, >= 4 px across both ways, are left out). C
 drawing piece (city, street, tower, monument, wall, windows, figures, sky, light, props, wipers, lens: raw paths with
 `misreg` and their own hand jitter, which the clean pen never reaches) until the craft tooling lane ports them; its
 camera, perspective, atmosphere and colour utilities are engine primitives, and `lib/kit` draws through `Ink` / `Fill`
-(clean-pen-aware). Eye check at 1:1: no "+" at a corner, no doubled loop, no fill sliding off its line.
+(clean-pen-aware). Eye check at 1:1: no "+" at a corner, no doubled loop, no fill sliding off its line. **Shapes,
+edges and paint** (WARNs; `ORGANIC.md` §4.1's targets by element; from `video/`: `python3
+docs/look/organic/techniques_demo.py --measure` and `shapes_measure.py`): razor edges (10-90 % width under 1.5 px) <= 8 %
+of the frame's edges, the subject's box apart (the references 0.3-4.6 %, v6 22 %); straight runs of 60 px or more <=
+15 % (1-13 %, v6 26.5 %); dead-flat area <= 20 % (0-20 %, v6 35 %); per element its compass arcs, right angles, mirror
+symmetry and lost and broken edges. Eye check at 400 px beside the references: nothing reads pasted, the marks read.
 
 ## d. Light and shadow: gentle, but always there
 v3: light pools darker than the snow they lit, a night room brightest at the top (farthest from a low lamp; already in the
@@ -202,13 +262,19 @@ G4 frame), halos as opaque discs, no cast or contact shadow in any kit file, no 
    azimuth and elevation; or the sky), the shadow tints, the pool colours. Every shot in the set uses it; the key stays on
    the same screen side unless the camera turns over 90°; a source never moves between cuts. A lamp's shadows radiate from
    the point under it, a sun's are parallel; blue-hour sky light only lights tops and gives contact shadows.
-2. **Light is lighter than what it lights, and it leads the eye:** the centroid of the brightest 5 % of the frame (the sky
-   and the caption band left out) lies within 0.15 H of the subject. Night interior (L*): bulb or screen 95-98 (<= 1 % of
+2. **Light is lighter than what it lights, and it leads the eye: ONE story light per scene, on the subject** (owner,
+   2026-10-30: "can we do the proper lights?"; playbook PROPER LIGHT: one dominant source the eye goes to; `ORGANIC.md`
+   §4.2): the centroid of the brightest 5 % of the frame (the sky, the caption band and the far planes, +3 and beyond,
+   left out: they are the sky's air, and a sun in frame over a pale far city fails the check by design) lies within
+   0.07-0.15 H of the subject; every other light at least a step under the story light (lit panes +6-8 L* over their
+   facade, never a saturated yellow; far lamps off or tone-on-tone). Night interior (L*): bulb or screen 95-98 (<= 1 % of
    the frame); pool core 92-94 (4 above any lit surface); pool ring and lamp wash 88-91; ambient wall 80-84 (caption band
    78+, ink 8:1+); desk 58-62; shade steps; contact strips 45+. Night exterior: lit windows and bulbs 85-92; pools 88-91 on
    ground snow at 83-85; sky-facing snow caps 87-89, thin, never above the pool core (a sky at ~45 lights them); sky ~45.
-   Day: sun 45-65° high, lit tones lean yellow, the sky the lightest field. Nothing under L* 35 but ink, anchor-dark
-   surfaces and §f.8's dark pieces (their shadows take one step below).
+   Day: sun 45-65° high, lit tones lean yellow, the sky the lightest field. Dusk: the low sun is the key, a local light
+   (a lit door, a lamp, a screen) the story light. Nothing under L* 35 but ink, anchor-dark surfaces and §f.8's dark
+   pieces (their shadows take one step below); a big shade mass under it (proof 2's bank at L* 30-39, T3's quay at 25)
+   waits for the owner's pick of the dark key (`ORGANIC.md` §8 D3).
 3. **A shadow is its surface times the set's ONE tint family** (multiply; form, cast and contact are three strengths of
    one hue): never grey, never a hand-picked fill. Warm surfaces keep at least 0.95x their chroma and turn 5-20° toward
    rose or plum; cool ones 10-16° toward violet. On the main surfaces the tints give form dL* -7 to -12 (tier A deeper:
@@ -221,12 +287,17 @@ G4 frame), halos as opaque discs, no cast or contact shadow in any kit file, no 
    -12; with no outlines (§c) these faces make the edges. Every poster volume is one deep flat step, -21 to -37 L*
    (median -29; v2's S3 chimney -5): ours sits under their median because our palettes are paler, and a phone needs
    bolder steps than print. Keeping -7 to -12 on every tier (v2's step), with or without A's outline, is history.
-4. **Form shadow** on the side away from the key, 25-40 % of the object's width: one flat, hard-edged step, no ink on its
-   edge; a crescent on round things; about 3:1 lit to shade by area on what faces the key. Every volume reads in 2-3
-   flat tones, a lit face and a shade face (DIRECTION rule 5; city-poster study, 2026-10-28, `style.md` §1.2): a prism
-   in two, a round form in up to three stepped bands (the posters use 3-4: their Round Tower L* 30 / 40 / 57 / 70),
-   never a gradient (the posters' shade turns cool on whites and plum on warm walls, chroma kept; ours follows §d.3's
-   tint family).
+4. **Form shadow** on the side away from the key, 25-40 % of the object's width: one step, no ink on its edge, its edge
+   found or lost by its value step and the light (§c's lost and found edges: a shade face meeting the dusk air at a
+   close value is lost over 25-40 % of its far edge); a crescent of shade on round things; about 3:1 lit to shade by
+   area on what faces the key. Every volume reads in 2-3 tones, a lit face and a shade face (DIRECTION rule 5;
+   city-poster study, 2026-10-28, `style.md` §1.2): a prism in two, a round form in up to three stepped bands (the
+   posters use 3-4: their Round Tower L* 30 / 40 / 57 / 70; their shade turns cool on whites and plum on warm walls,
+   chroma kept; ours follows §d.3's tint family). Inside each tone colour and light move (playbook PAINTED PIECES:
+   "colour moving within a shape"; PROPER LIGHT's real falloff; `ORGANIC.md` §3.1 row 3): a ramp toward the key of <=
+   +-3-4 L*, dithered (+-0.5 code, never banded), warm toward the light and cool away (+-0.8-1.0 on OKLab b), a dappled
+   shade from a named caster; never so strong that it blurs the lit / shade step, which stays the volume's read. A
+   gradient across a whole volume in place of its steps stays out (until 2026-10-30: "never a gradient").
 5. **Cast shadow** = the footprint swept along the light: 0.3-0.8 h long under a sun; under a lamp h·d / (H_lamp − h),
    capped at 1.5 h and only inside the pool (outside it, contact only); flattened by the ground's ry/rx (desk 0.3,
    street 0.2-0.35); sharp at the base, a 10-14 px half-tint step at the far end.

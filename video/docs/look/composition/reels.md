@@ -30,7 +30,7 @@ width (DIRECTION rule 7 converts the same way). Our zones are from `LAYOUT.md` �
 
 - **Five recordings hold six reels and 30 named ideas.** The hand-drawn sheet (reel 03) alone shows 18 of them; the
   README's first look missed its "tunnel" and a second, nested "golden section". On top of those, the examples make 11
-  moves they never name (§3 E). Five ideas recur across reels:
+  moves they never name (§3 E). Seven ideas recur across reels:
   - rule of thirds (4 reels);
   - golden spiral or golden ratio (4);
   - frame within a frame (3, plus the two title shots seen through train windows);
@@ -48,10 +48,11 @@ width (DIRECTION rule 7 converts the same way). Our zones are from `LAYOUT.md` �
   leading line has to end at the hardest value step and the story light, not just at the subject. The two calmest
   examples, a stairwell's lit gap with one man in it and a row of windows with one man in one window, are the closest to
   "big quiet areas and one place to look" (§6).
-- **One small human figure is the reels' constant.** 11 of the 23 photo examples put one person at the device's focal
-  point, mostly seen from behind or in silhouette (8 of the 11). At full phone width, 8 of the 12 measured figures are
-  150-226 px tall (median 178). Three far anchors are 92-97 px; one mid shot is 447. That is the size DIRECTION rule 7 asks for
-  (~130-220 px): new evidence for DEPTH AND SCALE FROM A HUMAN VIEWPOINT.
+- **One small human figure is the reels' constant.** 11 of the 24 photo examples put one small person at the device's
+  focal point, mostly seen from behind or in silhouette (8 of the 11); four more frame a person big (a mid shot or a
+  close). At full phone width, 8 of the 12 measured figures are 150-226 px tall (median 178); three far anchors are
+  92-97 px and one mid shot is 447. That is the size DIRECTION rule 7 asks for (~130-220 px): new evidence for DEPTH AND
+  SCALE FROM A HUMAN VIEWPOINT.
 - **The read-zone transfer.** At full width a 16:9 reel picture is 1080 x 610 px, almost exactly the shape of our read
   zone (y 600-1250, 1080 x 650). Place the picture there, with our sky and caption band above it and our near ground
   below it (R5's two quiet masses). Then 16 of the 21 focal points land inside R7's focal box or within 40 px of it. So
@@ -114,10 +115,10 @@ width (DIRECTION rule 7 converts the same way). Our zones are from `LAYOUT.md` �
 
 | Reel | Length, shape | Ideas, in order (recording time) | How each idea is drawn | Timing per idea |
 |---|---|---|---|---|
-| **01** London | 17.9 s, 4:3 | title 0-4.25 s ("THE ART OF COMPOSITION" over a carriage's doors: the red grab pole on the centre line, the platform streaking past through two windows; the type style swaps every ~0.25 s); parallel lines 4.25; level change 7.25; frame within a frame 10.0; vanishing point 13.0; loops at 16.0 | 1-4 red lines (~2 px at 540) on black, tracing the shot's main lines exactly, plus a two-word bold yellow label in capitals; the shot fades in under them and both fade | line card 0.5-0.75 s, line over the shot 0.5-0.75 s, shot alone 1.75-2.0 s (~3 s per idea) |
+| **01** London | 17.9 s, 4:3 | title 0-4.25 s ("THE ART OF COMPOSITION" over a carriage's doors: the red grab pole on the centre line, the platform streaking past through two windows; the type style swaps several times); parallel lines 4.25; level change 7.25; frame within a frame 10.0; vanishing point 13.0; loops at 16.0 | 1-4 red lines (~2 px at 540) on black, tracing the shot's main lines exactly, plus a two-word bold yellow label in capitals; the shot fades in under them and both fade | line card 0.5-0.75 s, line over the shot 0.5-0.75 s, shot alone 1.75-2.0 s (~3 s per idea) |
 | **02** China | 13.8 s, 4:3 | frame within a frame 0 s; foreground 2.25; rule of thirds 4.75; symmetry 7.5; leading lines 10.0 | 1 px white hairlines with a small lowercase serif label beside the line, nothing else; calm, low-contrast shots (dusk, haze, overcast) | card 1.0-1.5 s, overlay 0.5-0.75 s, shot alone 0.5-1.25 s: the drawing holds longer than the picture |
 | **03** drawing tablet | 19.2 s, 9:16 footage | "Composition examples", one sheet of 18 panel pairs (an abstract red diagram in a box above a grey value thumbnail of a landscape). A pen traces each red armature over its thumbnail while the phone pans: rule of thirds 0-2.5 s, golden spiral 2.5, diagonal 3.5, pyramid 4.5, S-curve 5.5, L-shape 6.0, C-shape 7.0, golden section 8.0, V-shape 9.0, unbalanced 9.5, balance 11.0, double diagonal 11.5, radiating 13.0, tunnel 14.0, golden triangle 14.5, circular 15.5, golden section (nested) 16.5, cross 18.0 | a live draw-on in red marker over 3-4 flat greys (each thumbnail is a notan: darks massed, sky light) | ~1 s per panel, no holds |
-| **04a** | 19.0 s, 16:9 | title 0-3.0 s ("The power of Composition" over an ochre villa with a man walking toward it; frame 0 carries a white golden spiral with its eye on him, gone by 0.75 s); symmetry 3.0; frame within a frame 5.25; rule of thirds 7.5; negative space 9.75; leading lines 12.0; patterns / repetition 14.25; scale 16.5 | thin white lines with small sans labels in sentence case; boxes mark the figure and the big mass (negative space, scale); arrows for leading lines; one small figure in every shot | card 0.5-0.75 s, overlay 0.5-0.75 s, shot alone 0.75-1.5 s (~2.25 s) |
+| **04a** | 19.0 s, 16:9 | title 0-3.0 s ("The power of Composition" over an ochre villa with a man walking toward it; frame 0 carries a white golden spiral with its eye on him, gone by 0.75 s); symmetry 3.0; frame within a frame 5.25; rule of thirds 7.5; negative space 9.75; leading lines 12.0; patterns / repetition 14.25; scale 16.5 | thin white lines with small sans labels in sentence case; boxes mark the figure and the big mass (negative space, scale); arrows for leading lines; a person in every shot, small in all but the rule of thirds | card 0.5-0.75 s, overlay 0.5-0.75 s, shot alone 0.75-1.5 s (~2.25 s) |
 | **04b** | from 19.25 s, 10.9 s seen | title 19.25-22.0 s ("The Art of Composition" in gold over two symmetric train-door windows, the station streaking past); golden ratio 22.25; one point 25.25; rule of thirds 28.25 (the recording ends at 30.1) | dark-red lines, gold sans capitals | card ~0.75 s, overlay 1.0-1.25 s, shot alone ~1.0 s |
 | **05** Italy | 14.5 s, ~16:10 | joined at its second shot: spiral composition 0 s; golden ratio 3.25; juxtaposition 6.0; foreground 9.0; then it loops to its hook at 12.25 ("THE ART OF" beside a hand holding a camera on a gimbal over a spiral stair) | thin white lines with white sans labels; small circles mark tiny things (boats) | card 0.25-0.75 s, overlay 0.75-1.0 s, shot alone 1.25-2.0 s (~3 s) |
 
@@ -137,7 +138,7 @@ The numbers in that column are ours (1080 x 1920).
 | A1 | **Rule of thirds** (02 4.75 s; 03 0 s; 04a 7.5 s; 04b 28.25 s) | the frame cut 3 x 3; the subject on a line or an intersection, the horizon on a third, never centred | 02: a photographer on a boat under a canopy, her face at (0.65, 0.42), aiming up-left into open forest. 03: a palm on the left line, the horizon on the upper line, a boat circled at the upper-right intersection. 04a: from low in the grass, the man's face on the right line (0.66, 0.53), grass blades soft at the left. 04b: a blurred near profile on the left line, a lit tram at the lower right | a 3 x 3 grid (white hairline, thin white, red marker, dark red) | **adapt.** The lines fall at x 360 / 720 (the edges of our subject axis, 380-700) and y 640 / 1280. The upper intersections sit 40 px under the band; the lower ones sit 30 px below the read zone (y 1250, the floor for ad cuts). So the subject goes on a vertical third at y 860-1200 (R7), and the top third belongs to the caption's sky |
 | A2 | **Golden section**, the phi grid (03 8.0 s) | the thirds' cousin: lines at 0.382 / 0.618 of the frame, nearer the centre | a lone tree on the right line at the upper line, mountains at the left, a river winding in front | two red verticals and two horizontals, close to the centre | **yes.** In our frame the lines fall at x 413 / 667, y 733 / 1187: our subject axis (380-700), our default horizon (768) and the floor of R7's focal box (1200). Our layout already is this grid |
 | A3 | **Golden section, nested** (03 16.5 s) | the frame cut at phi, the smaller part cut again (the golden rectangles in turn), homing in on the point the golden spiral curls into | a big tree on the main line; a small house, with a path to it, in the nested cell at its foot | one long red vertical, a horizontal meeting it, and a small # of short lines in the corner cell | **adapt.** A full-frame version puts the nested point at ~0.62-0.72 of the height (y 1190-1380): at or under the read zone's floor. Scale it so the point sits on the subject (y 860-1200) |
-| A4 | **Golden spiral / golden ratio** (03 2.5 s; 04a frame 0; 04b 22.25 s; 05 3.25 s) | a spiral built on the golden rectangles; the eye travels the curve into its eye, where the subject is | 05: a hiker on a ledge at the eye (0.68, 0.73), the peaks filling the sweep. 04a: the walker at the eye (0.67, 0.75) as the title appears. 04b: a firework burst at the eye (0.27, 0.27). 03: a treehouse at the eye, the spiral running along the hill | the spiral with its squares (white; dark red), or the spiral alone (red marker) | **adapt.** A full-frame golden rectangle (1080 x 1747) puts the eye at x 298 / 782 and y ~480 (in the band) or ~1270 (the read zone's floor). Scale the spiral so its eye sits on the subject (e.g. x 640-700, y 1000-1150) and let the outer arc leave the frame. In 9:16 that arc can run from the hero cloud in the top-right gutter down the side mass into the subject: R8's counterweight tied to R4's focal |
+| A4 | **Golden spiral / golden ratio** (03 2.5 s; 04a frame 0; 04b 22.25 s; 05 3.25 s) | a spiral built on the golden rectangles; the eye travels the curve into its eye, where the subject is | 05: a hiker on a ledge at the eye (0.68, 0.73), the peaks filling the sweep. 04a: the walker at the eye (0.67, 0.75) as the title appears. 04b: a firework burst at the eye (0.27, 0.27). 03: a treehouse at the eye, the spiral running along the hill | the spiral with its squares (white; dark red), or the spiral alone (red marker) | **adapt.** A full-frame golden rectangle (1080 x 1747) puts the eye at x 298 / 782 and, anchored at the top, y ~482 (in the band) or ~1265 (the read zone's floor); anchored at the bottom, y ~655 or ~1438. Scale the spiral so its eye sits on the subject (e.g. x 640-700, y 1000-1150) and let the outer arc leave the frame. In 9:16 that arc can run from the hero cloud in the top-right gutter down the side mass into the subject: R8's counterweight tied to R4's focal |
 | A5 | **Golden triangle** (03 14.5 s) | a corner-to-corner diagonal plus the perpendiculars to it from the other two corners: three similar triangles, subjects at the two feet | a mountain slope on the long diagonal, two smoke plumes on the perpendiculars | three red lines | **weak** as a placement grid. In 1080 x 1920 the diagonal is 61° steep and the feet fall at (820, 461) and (260, 1459), or mirrored: in the caption band and by the bottom UI. The steep diagonal alone is B6 |
 | A6 | **Cross** (03 18.0 s) | one strong vertical crossing one strong horizontal | a bare tree's trunk crossing the horizon, a moon at the upper left | a red plus, off centre | **yes.** A tall frame gives the vertical its full height: a lamp post, a mast, a trunk or a standing figure crossing the horizon at the subject (x 380-700, horizon y ~770-1000) |
 | A7 | **Symmetry** (02 7.5 s; 04a 3.0 s; the titles 01 0 s and 04b 19.25 s) | a mirror axis down the centre (left-right), or the water's mirror (up-down); the subject on the axis | 02: a pavilion on a bridge at x 0.5, mirrored in a still lake at dusk (waterline 0.62 H), two hazy ridges in a peach sky, a dark tree mass on each side, one egret crossing. 04a: a pier straight out to a red-and-white tower at x 0.5 (horizon 0.47), a man running away down the axis. The titles: a carriage's two doors around the centre pole | one vertical hairline (02); an axis-and-horizon cross (04a) | **yes, once.** The axis (x 540) is 20 px from the caption's centre line (x 520). A mirror in still water doubles the subject downward and fills the tall frame: landmark at y ~850-1050, waterline ~1050, a calmer reflection below. Use it for a stillness beat, once (LAYOUT §2: never three wides sharing a centred landmark) |
@@ -157,14 +158,14 @@ The numbers in that column are ours (1080 x 1920).
 | B9 | **C-shape** (03 7.0 s) | a curve that wraps the subject on one side, its opening facing the subject | a big tree arching its trunk and canopy over a valley | a red C | **yes.** This is LAYOUT's BALCONY C-curve: it enters just under the band (y 600-700) and leaves at y 860-1060 |
 | B10 | **L-shape** (03 6.0 s) | one tall vertical at one side plus the ground line: a frame on two sides, open on the others | a tall cypress at the left edge, standing on the horizon line, a low sun at the right | a red L | **yes.** This is our cozy asymmetric frame (LAYOUT §2): one tall side cut by the top and flat through the band, the other side topping out below y 600 |
 | B11 | **V-shape** (03 9.0 s) | two masses sloping in to a point | two rows of tall buildings on a street, converging | a red V | **adapt.** The V's open top is the sky with the band in it. The slopes stay in the gutters (x < 95, x > 945) at y 290-600, come in below, and meet at the subject (y ~1000): LAYOUT's canyon (>= 2:1, sky <= 10 %) |
-| B12 | **Spiral composition** (05 0 s) | the subject's own spiral form leads the eye round and in to its centre | a double spiral stair seen from straight above, its pale floor at the centre, low at (0.5, 0.75), people dotted along the ramps; a slow turn | white loops. Scored: the busiest example (11 value calls, 17 % quiet): people and railing ornament everywhere | **adapt.** A high angle (LAYOUT K10, once), the centre at y ~1000-1100. Its rails would cross the band |
+| B12 | **Spiral composition** (05 0 s) | the subject's own spiral form leads the eye round and in to its centre | a spiral stair seen from straight above, its pale floor at the centre, low at (0.5, 0.75), people dotted along the ramps; the camera locked | white loops. Scored: the busiest example (11 value calls, 17 % quiet): people and railing ornament everywhere | **adapt.** A high angle (LAYOUT K10, once), the centre at y ~1000-1100. Its rails would cross the band |
 | B13 | **Circular** (03 15.5 s) | things in a ring that hold the eye inside it | a round pond ringed by rocks and reeds | a red circle | **adapt.** A ring fits the width in the read zone, but seen from eye level it flattens to an ellipse. A round window or porthole is the frame-within-a-frame version |
 
 ### C. Frames, layers and levels
 
 | # | Idea (reel, time) | What it is | The example(s) | How drawn, how framed (measured) | 9:16 |
 |---|---|---|---|---|---|
-| C1 | **Frame within a frame** (01 10.0 s; 02 0 s; 04a 5.25 s; the titles) | an opening inside the frame (a gate, a door, a window, a stairwell's gap) that frames the subject; the eye goes through it | 02: a round moon gate in a sunlit plastered wall, 0.48 W wide and centred at (0.5, 0.47), the lit green garden inside it, a dark walker in it (0.27 H, 219 px at full width), dappled leaf shadows on the wall, a slow push toward the gate. 01: a platform's dark roof and two pillars framing a train streaking past, two people walking across in front. 04a: the gap between two flights of a stairwell seen as a diamond, a lit wall inside it, a man on the stairs at its lower point (0.37 H, 226 px). The titles: two carriage windows with the world streaking past behind them | the opening's own outline: a keyhole hairline (02), a red rectangle inside the frame's border (01), a white diamond (04a). Scored: the moon gate's strongest call is its lit opening in value and colour (50 % quiet); the stairwell is the calmest example of all (three masses = 100 % of the frame, 1 piece, 83 % quiet) | **yes, the best fit.** Openings are tall (a door, an arch, a gate, a window): the inner frame lit, the surround darker, the figure dark inside it (E2). That is v6's lit door with her in it (R4). It also sets up a push-through join (A in DIRECTION rule 1); the reel's slow push into the moon gate is that move |
+| C1 | **Frame within a frame** (01 10.0 s; 02 0 s; 04a 5.25 s; the titles) | an opening inside the frame (a gate, a door, a window, a stairwell's gap) that frames the subject; the eye goes through it | 02: a round moon gate in a sunlit plastered wall, 0.48 W wide and centred at (0.5, 0.47), the lit green garden inside it, a dark walker crossing it (0.27 H, 219 px at full width), dappled leaf shadows on the wall, the camera locked. 01: a platform's dark roof and two pillars framing a train streaking past, two people walking across in front. 04a: the gap between two flights of a stairwell seen as a diamond, a lit wall inside it, a man on the stairs at its lower point (0.37 H, 226 px). The titles: two carriage windows with the world streaking past behind them | the opening's own outline: a keyhole hairline (02), a red rectangle inside the frame's border (01), a white diamond (04a). Scored: the moon gate's strongest call is its lit opening in value and colour (50 % quiet); the stairwell is the calmest example of all (three masses = 100 % of the frame, 1 piece, 83 % quiet) | **yes, the best fit.** Openings are tall (a door, an arch, a gate, a window): the inner frame lit, the surround darker, the figure dark inside it (E2). That is v6's lit door with her in it (R4). It also sets up a push-through join (A in DIRECTION rule 1). The reels hold these frames still; the push would be ours |
 | C2 | **Foreground** (02 2.25 s; 05 9.0 s) | a near layer at the frame's edge that gives depth and a place to stand | 02: a lotus pond, soft and out of focus, in the bottom 35 % (its top an organic line at 0.65-0.70 H), then a band of trees, a small pagoda at (0.5, 0.42), hazy ridges, a low sky. 05: from high up, the corner of a white house (a tiled roof edge, a terrace with plants) over the lower-left half, the sea filling the rest, three small boats at the top right | one wavy hairline along the near layer's top (02); a stepped line along the roof edge plus three circles on the boats (05). Scored: the lotus shot is the quietest landscape example (80 % quiet, in masses of 33 + 26 %) | **yes.** The bottom third (y 1250-1920) is the near layer's home, and it may run under the bottom UI as a mass. Ours stays "a small, subtle hint at the edges" (playbook; R6: <= 2 props cut by an edge, inside the near shade mass). 05's terrace, half the frame, is the "big chunky mass" the owner rejected, and focus blur is not our look (E5) |
 | C3 | **Level change** (01 7.25 s) | two levels in one frame, joined by a stair or slope, with people on both | a station footbridge stair coming down diagonally from the top left; a walker high on it (0.12 H, 97 px), three people waiting on the platform below (0.22 H, ~179 px), the station sign low at the left | a red line stepping high, slope, low | **yes: the height is made for it.** An upper level (a bridge, a street, a balcony) at y ~700-950 and a lower one (the quay, the towpath, a platform) at y ~1150-1450, with steps between. The subject on one level, life on the other: e.g. the canal's street above the towpath |
 
@@ -184,7 +185,7 @@ The numbers in that column are ours (1080 x 1920).
 
 | # | Move | Where | 9:16 |
 |---|---|---|---|
-| E1 | **One small figure where the lines meet**, from behind or in silhouette | 11 of the 23 photo examples. At full width: the walker toward the villa 152 px; the runner down the pier 305 -> 92 px as he runs; the man in the stairwell 226; the boy in the forest 177; the man on the path 152; the man by the tower 214; the man on the pier 201; the hiker 94; the walker in the moon gate 219; the people on the platform 179 | **yes.** DIRECTION rule 7's person at 130-220 px, now with eleven more references |
+| E1 | **One small figure where the lines meet**, from behind or in silhouette | 11 of the 24 photo examples. At full width: the walker toward the villa 152 px; the runner down the pier 305 -> 92 px as he runs; the man in the stairwell 226; the boy in the forest 177; the man on the path 152; the man by the tower 214; the man on the pier 201; the hiker 94; the walker in the moon gate 219; the people on the platform 179 | **yes.** DIRECTION rule 7's person at 130-220 px, now with eleven more references |
 | E2 | **The lit opening**: the inner frame is the brightest area, and the figure is dark inside it | the moon gate's lit garden; the stairwell's lit wall; the light at the tunnel's end; the one occupied window in the row | **yes.** This is R4: the subject, the story light and the hardest value step in one place |
 | E3 | **Stillness against motion**: a still, sharp subject in front of a moving world | 01: two walkers sharp in front of a train streaking past; the titles: a still carriage frame with the platform streaking past through its windows | **yes, without blur.** The subject is still while life passes sideways in one band behind it (DIRECTION rule 7), slow and low in contrast (rule 3). Our look has no motion blur (rule 5) |
 | E4 | **Looking room**: the subject faces into the open part of the frame | 02: the photographer aims up-left into the forest. 04b: the near profile looks right toward the tram. 04a: the boy faces the stair into the light | **adapt.** For a figure seen from behind, the room is in front of it, up the frame into the depth. A profile at x ~380 looks right (time runs left to right: LAYOUT §3) |
@@ -192,17 +193,17 @@ The numbers in that column are ours (1080 x 1920).
 | E6 | **Atmospheric layers**: ridges and far shores paler with distance | 02: two ridges in a peach haze behind the pavilion, and the far ridge behind the pagoda; 04a: hazy hills behind the tower; 05: mist among the peaks | **yes.** DIRECTION rule 2's distance shown in colour |
 | E7 | **The closed vista**: one sight line, ended by one object | 01: the street ended by a house and trees; 02: the path ended by the tree; 04a: the pier ended by the tower; 04b: the pier ended by the man | **yes.** LAYOUT §2 street: "one long sight line at most, ended by one object" |
 | E8 | **One colour accent on the subject** | 05: the hiker's blue shirt is the one saturated colour among grey peaks, the strongest call in both value and colour; 01: the red train behind the walkers; 04a: the tower's red top | **yes.** R11, and the one colour key's hot accent at the focal (playbook PROPER LIGHT) |
-| E9 | **The camera move keeps the device** | 04a: the camera tracks a runner down the pier's axis as he shrinks toward the tower. 01: it rides the escalator, the parallels fixed while the posters slide. 02: a slow push toward the moon gate. 05: a slow turn over the spiral, and drifts over the beach and the coast | **yes.** One move, never compound (DIRECTION rule 8); a push is a story move or a carrier. A move along the device's own line keeps every frame composed (the pier, the path) |
+| E9 | **The camera holds; the subject travels the device's line** | Measured by image registration: 17 of the 23 example shots are locked or nearly (drift <= 0.3 % of the width per second). The life in them is the subject moving along the line: a man running away down the pier's axis toward the tower (305 -> 92 px in 1 s), a man walking toward the villa into the spiral's eye, a walker crossing the moon gate, two walkers crossing in front of the platform's frame, an egret crossing the mirrored lake. Four shots move, slowly and singly: riding the escalator along its parallels (2.7 % W/s), two slow push-ins (the photographer 2.6 %/s, the window row 1.4 %/s), one slow pan (the hiker, 1.7 % W/s); the stairwell and the fireworks drift a little | **yes.** DIRECTION rule 8: every hold locked or a slow float, one move, never compound. Let the subject travel the line (into the vanishing point, along the path, through the opening) while the camera stays still |
 | E10 | **The near "you" over the shoulder** | 04b: a big blurred near profile on the left third, looking into a sunset with a lit tram at the lower right | **adapt.** LAYOUT's "you" row: head 90-140 px, cut by the bottom edge, reads by mass. Never a big blurred head |
 | E11 | **The POV hook**: the maker's hand and tool in the near frame | 05's first shot: a hand holding a camera up into the frame over the spiral stair, the title beside it | **yes.** Our POV, "hands cut by the bottom" (LAYOUT §1's "you" row); v3's opening put the effect in the hand |
 
 ## 4. What works in a vertical frame
 
 **Count:** of the 41 ideas and moves, 26 work as they are (**yes**), 12 work with a change (**adapt**) and 3 are **weak**:
-balance, double diagonal and the golden triangle as a placement grid. Thirteen of the 30 named ideas need a change or
-are weak, because they were drawn for a landscape frame:
+balance, double diagonal and the golden triangle as a placement grid. Twelve of the 30 named ideas need a change or are
+weak, because they were drawn for a landscape frame:
 - grids that place the subject (A1, A3, A4, A5);
-- lines or masses that reach the frame's corners or sides (A5, B4, B5, B7, B11, B12, B13, D3, D6).
+- lines or masses that reach the frame's corners, ceiling or sides (B4, B5, B7, B11, B12, B13, D3, D6).
 
 **The transfer, in one move: open the frame up and down at the same width.** A landscape reel picture at full width
 (1080 x 610 for 16:9, 1080 x 812 for 4:3) becomes our read zone. Above it go the sky and the caption band (y 0-600: R5's
@@ -212,9 +213,9 @@ Placed this way:
 
 | The reels' focal points (21) | Where they land in our frame | Count |
 |---|---|---|
-| inside R7's focal box (x 380-700, y 860-1200) | the moon gate (540, 941), the pagoda (540, 941), the pavilion (540, 989), the stairwell man (540, 1008), the pier man (540, 953), the runner (529, 917), the platform walkers (540, 1087), the street's vista (561, 1087), the spiral's centre (540, 1105) | 9 |
+| inside R7's focal box (x 380-700, y 860-1200) | the moon gate (540, 941), the pagoda (540, 941), the pavilion (540, 989), the stairwell man (540, 1008), the pier man (540, 953), the runner (529, 917), the walkers before the train (540, 1087), the street's vista (561, 1087), the spiral's centre (540, 1105) | 9 |
 | within 40 px of it | the photographer (702, 941), the low-angle face (712, 923), the man in the window (702, 905), the man on the path (378, 978), the walker by the villa (723, 1057), the hiker (734, 1092), the tree at the path's end (561, 1233) | 7 |
-| outside | the boy in the forest (324, 1106), the man by the tower (237, 1008), the firework burst (291, 764), the platform crowd (572, 1273), the tram (939, 1118) | 5 |
+| outside | the boy in the forest (324, 1106), the man by the tower (237, 1008), the firework burst (291, 764), the people on the station platform (572, 1273), the tram (939, 1118) | 5 |
 
 The five outside are width-built: a figure on the far left third (negative space, scale), a spiral's eye in the upper
 left, a subject at the right edge, a crowd at the foot. In 9:16 each moves to the axis and uses the height instead. The
@@ -223,9 +224,9 @@ negative space goes above the figure (the sky); the tower rises past the top edg
 **A shortlist for our films** (one home place, one subject, a thread object, a person near the camera, a story light),
 each with its 9:16 recipe:
 
-1. **Frame within a frame + the lit opening (C1, E2).** A door, gate, window or arch, 270-460 px wide (the subject box),
-   its inside the frame's brightest area, the figure dark in it at y 860-1200, the surround a mid or dark mass. It sets
-   up a push-through join (A). v6's lit doorway is one already; the composition lane's T1 is its value plan.
+1. **Frame within a frame + the lit opening (C1, E2).** A door, gate, window or arch on the subject axis, its inside the
+   frame's brightest area, the figure dark in it at y 860-1200, the surround a mid or dark mass. It sets up a
+   push-through join (A). v6's lit doorway is one already; the composition lane's T1 is its value plan.
 2. **Leading lines or one point, up the tall ground, to a closed vista (B1, B2, E7).** Path edges, kerbs, a canal's
    coping or a pier's rails rise from the bottom corners at ~60° and meet at the subject (x 480-640, y 950-1150). The
    sight line ends on one object, and the lines end at the light (§0: the lines lead, the light decides).
@@ -251,7 +252,7 @@ each with its 9:16 recipe:
 **What fights our rules** (none of these come in):
 - focus and motion blur (E3, E5; DIRECTION rule 5);
 - titles over the shots (01, 04a, 04b; the playbook's "no title over the captions": the core line goes on the cover);
-- the busy photographic texture: the scores show the photos are 2-14 calls busy, so we take their armatures, not their
+- the busy photographic texture: the photos score 1-14 value calls (median 6), so we take their armatures, not their
   density (R2, R3);
 - top-down angles for anything but one K10 shot;
 - a big near layer (05's terrace) or a big blurred near head (04b);
@@ -293,7 +294,7 @@ What it means for us (proposals, not rules):
 | 01 parallel lines, escalator | 57 % | 15 | 6 (3) / 2 (1) | (no single subject) | 45 %: 9 + 9 |
 | 01 level change, station stairs | 85 | 17 | 11 (3) / 7 (2) | **yes / yes** (the platform people) | 28: 7 + 3 |
 | 01 frame within a frame, platform | 68 | 25 | 7 (4) / 4 (2) | no (rank 6) / no (rank 3) | 32: 9 + 7 |
-| 01 vanishing point, street | 92 | 24 | 14 (7) / 5 (2) | no (rank 2) / no | 43: 17 + 11 |
+| 01 vanishing point, street | 92 | 24 | 14 (7) / 5 (2) | no (rank 2) / no (rank 5) | 43: 17 + 11 |
 | 02 frame within a frame, moon gate | 82 | 18 | 5 (3) / 3 (1) | **yes / yes** (the lit opening) | 50: 34 + 9 |
 | 02 foreground, lotus and pagoda | 69 | 11 | 7 (4) / 8 (6) | no / no | **80: 33 + 26** |
 | 02 rule of thirds, photographer | 72 | 22 | 5 (4) / 14 (2) | no (rank 3) / no | 41: 19 + 5 |
@@ -301,9 +302,9 @@ What it means for us (proposals, not rules):
 | 02 leading lines, path to the tree | 73 | 14 | 2 (1) / 7 (3) | no (rank 2) / no (rank 3) | 64: 40 + 10 |
 | 04a title, walker on the spiral's eye | 93 | 11 | 4 (3) / 6 (3) | no (rank 4) / no | 48: 33 + 4 |
 | 04a symmetry, pier to tower | 90 | 4 | 7 (3) / 3 (1) | **yes / yes** | **78: 31 + 19** |
-| 04a frame within a frame, stairwell | **100** | **1** | **2 (2) / 2 (2)** | no (rank 2: the lit wall's corner wins) | **83: 58 + 25** |
+| 04a frame within a frame, stairwell | **100** | **1** | **2 (2) / 2 (2)** | no (rank 2: the lit wall's corner wins) / no (rank 2) | **83: 58 + 25** |
 | 04a rule of thirds, low angle | 96 | 16 | 8 (6) / 12 (5) | no (rank 3) / **yes** | 42: 19 + 5 |
-| 04a negative space, forest | 77 | 35 | 4 (3) / 3 (2) | no (rank 3: the lit clearing wins) | 34: 15 + 6 |
+| 04a negative space, forest | 77 | 35 | 4 (3) / 3 (2) | no (rank 3: the lit clearing wins) / no (rank 3) | 34: 15 + 6 |
 | 04a leading lines, path and stair | 84 | 32 | 4 (3) / 6 (2) | no (the sunlit patch wins) / no (rank 2) | 23: 16 + 1 |
 | 04a patterns, window row | 88 | 4 | **1 (1) / 1 (1)** | no / **yes** | **73: 64 + 5** |
 | 04a scale, man and tower | 68 | 12 | 9 (4) / 6 (2) | no (rank 5) / no (rank 4) | 52: 35 + 6 |
@@ -316,8 +317,8 @@ What it means for us (proposals, not rules):
 | *for scale: the owner's painted models (refs 02-04)* | *88-97* | *2-7* | *1-2 (1) / 1-7 (1)* | *yes* | *67-91: 51-77 + 12-14* |
 
 **Reading it.**
-- The photo examples sit between our v6 (10 calls, 61 % quiet) and the owner's painted models. They are references
-  for armatures, not for value plans.
+- By calls, the photo examples (median 6) sit between our v6 (10) and the owner's painted models (1-2); by quiet they
+  are below both (median 51 %; v6 61 %; the models 67-91 %). They are references for armatures, not for value plans.
 - Five land the strongest value call on their subject (the station people, the moon gate's opening, the pier to the
   tower, the man on the pier, the hiker). Each is one subject on a plain or lit field with the lines running to it.
 - Where the lines point at a figure but a brighter patch sits elsewhere (the sunlit path, a white car, the sky's
@@ -332,11 +333,12 @@ What it means for us (proposals, not rules):
 - **What we don't take:** any reel's footage, layout, place, motif, palette or type style (the yellow, gold and red
   title types, the serif hairline labels), and the creators' handles (visible in the app's UI; not named here or on the
   sheet).
-- **Names and families.** The ideas are named as the reels name them. Several of the hand-drawn sheet's panels are
-  classical landscape-painting armatures: Edgar Payne's composition types (*Composition of Outdoor Painting*, 1941;
-  the summary cited in `organic/composition.md` §8) include the S or compound curve, the cross, the circle, the
-  triangle, radiating lines, the tunnel, the steelyard (the sheet's "unbalanced") and the balance scale. The deeper,
-  sourced research on composition is the distill's other parts; this file covers the reels.
+- **Names and families.** The ideas are named as the reels name them. Several of the hand-drawn sheet's panels look
+  like the classical landscape-painting armatures in Edgar Payne's *Composition of Outdoor Painting* (1941; the summary
+  cited in `organic/composition.md` §8): the steelyard (the sheet's "unbalanced"), the balance scale, the S or compound
+  curve, the cross, the circle, the triangle, radiating lines and the tunnel. That list is recalled from memory: the
+  cited page could not be reached from this session (its host is outside the allowed network), so check it before
+  quoting it. The deeper, sourced research on composition is the distill's other parts; this file covers the reels.
 - **Rerun** (scratch only; nothing here is a repo tool):
   - frames: `ffmpeg -v error -i docs/look/refs_composition/NN_*.mp4 -vf fps=4 -q:v 2 /tmp/comp/reels/rNN/f_%04d.jpg`;
   - the numbers: import `docs/look/organic/composition_study.py` (with `sys.dont_write_bytecode = True`), register each
