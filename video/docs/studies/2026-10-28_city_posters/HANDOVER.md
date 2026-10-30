@@ -6,6 +6,15 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-30 ~00:15 UTC: the recipe book is DONE; painter v6 runs
+- DONE: `video/docs/look/PAINT_RECIPES.md` (+ `paint_recipes/{sky_clouds,water,foliage,built_ground,people}.md`, swatches,
+  `index.jpg`; scripts `video/scripts/look/paint/recipes/`). Doc clash D1 fixed in CRAFT §f.2 (painted pieces soften by
+  plane); the dashes clash closed in CRAFT §f.7; D2-D5 are recipe-level, fixed in v6's code.
+- RUNNING: one agent builds painter v6 from the book §4 (+ real darks outside the caption band + the refined her):
+  `paint_test/paint_still_v6.png`, `skytop_v6_choice.jpg`, `compare_v6.jpg` (v5, v6, ai_still_v1, refs 03/02). If it stops:
+  resume the agent, or rerun the same brief from its partial files.
+- NEXT: send v6 + the sky-top choice; capture the verdict.
+
 ## Status 2026-10-29 ~22:30 UTC: PAUSED for the token limit (owner: "You are about to be paused due to token limits")
 Everything is committed and pushed to `claude/compassionate-hopper-5iqguj` and `video-production`. RESUME HERE:
 1. `git pull` both branches; `git status` (commit any leftover agent files with the usual trailers).
