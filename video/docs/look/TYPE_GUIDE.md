@@ -21,9 +21,9 @@ F1-F15, with sources). Px at 1080 x 1920, y down, 60 fps; times are video 4's ta
 | role | face (CSS family) | weight | size (font-size) | measured at that size | tracking | lines |
 |---|---|---|---|---|---|---|
 | **The hand:** every running word | **Gaegu** | 300 on dusk and night skies; 400 on light skies (dark ink reads thinner) | **116 px** everyday; **136 px** for the hook's first two groups and the payoff's last group | 116 px: cap 71, x-height ~45, stroke ~6 px (8 % of its S; Patrick Hand 98 px: cap 65, stroke 9 px) | +0.02 em | baselines 120 px apart (1.03 em); a line <= 830 px (prefer <= 760, ~13 characters); <= 2 baselines (3 in a landing-word lockup) |
-| **The brush:** the landing word | **Nanum Brush Script** | 400 | **200 px** (1.7x the hand) | cap ~98, stroke ~12 px; "WANTS" 541 px wide | +0.02 em | its own row, stepped right of the line before |
-| **The brush:** big numbers | Nanum Brush Script | 400 | **260 px** | figures ~165 px tall; "70,000" 593 px, "40" 237 px | +0.02 em | its own row; the unit word beside or under it in the hand |
-| **The brush:** a world word (on a thing) | Nanum Brush Script | 400 | 140-200 px, figures >= 120 px tall (`LAYOUT.md`: one number 120-160 px) | | 0 | on the object, in the object's ink |
+| **The brush:** the landing word | **Nanum Brush Script** | 400 | **184 px** (1.6x the hand; 200 px did not fit three rows in the band: stills) | cap ~89, stroke ~11 px; "WANTS" 487 px wide (ink) | +0.02 em | its own row, stepped right of the line before |
+| **The brush:** big numbers | Nanum Brush Script | 400 | **300 px** | figures ~136 px tall (this brush's figures are 0.45 em: 260 px gave 118 px, not 165); "70,000" 666 px, "40" ~246 px (ink) | +0.02 em | its own row; the unit word beside or under it in the hand |
+| **The brush:** a world word (on a thing) | Nanum Brush Script | 400 | 140-160 px (`LAYOUT.md`: one number 120-160 px, a font size), fitted to its object | figures ~0.44 em (62-71 px tall); "2027" at 148 px: 234 px wide | 0 | on the object, in the object's ink |
 | **The title:** the cover's core line | the hand + the brush key word | hand 400 | hand 112-128 px; the key word 240-280 px | | +0.02 em | 3-4 rows, ragged, stepped |
 | **The title:** a series title (later) | the brush over the hand (ref 2's lockup) | 400 / 300 | brush 2.5-3x the hand | | +0.02 / +0.04 em | left-aligned lockup |
 
@@ -53,12 +53,13 @@ right rail is x > 950 at y 900-1500). A cut made for ads: x 120-888, y 288-1248,
 
 **The anchor and the seats:** the home anchor is the band (y 290-600: the one calm flat field, `LAYOUT.md`): baselines
 **395 / 515** (one line 455), group centre on one of three seats, **L x 440 · C x 520 · R x 600**. A landing-word
-lockup uses three rows at baselines **365 / 495 / 598** (the middle one the brush). A big number sits at baseline 500,
-its unit word at 600.
+lockup uses three rows at baselines **362 / 484 / 578** (the middle one the brush). A big number sits at baseline 480,
+its unit word at 578. All ink in the band stays at y <= 585: the subject's top (a roof) starts at ~590-600, and a row
+at 598 sat on the roof in the stills.
 
 **Where words sit, by shot type:**
 - **WIDE and the home view (S1, S7, S12):** the open sky above the subject, in the band. The far city starts just
-  under it, so ink stays at y <= 610.
+  under it, so ink stays at y <= 585.
 - **MEDIUM (S2's end, S4, S8, S11):** the same seats; the subject's top stays at y >= 600 (`LAYOUT.md`), so the words
   read straight above it, close to the eye (F5).
 - **CLOSE (S3, S5, S9, S10):** above the subject's top while the band is clear (video 4's closes are all centred). When
@@ -110,9 +111,10 @@ Each example uses video 4's real words and times; a frame number is t x 60.
 - **Sync:** pops whole 2 frames before its first word; cuts out when the next group pops. 2-4 words, >= 0.8 s, <= 20 cps;
   a phrase shorter than 0.8 s joins the next as a build.
 - **Video 4:** S2 (4.28-8.76, WIDE -> MEDIUM push onto the giant computer, landing on "giant" 5.68): "AI actually runs"
-  (one line, 803 px, seat L) 4.233-5.283 s (frames 254-317) · **"on giant / computers,"** (two baselines: "on giant"
-  407 px from x 300, "computers," 541 px from x 400; seat C) 5.283-6.467 s (frames 317-388) · "in buildings / called"
-  (911 px on one line, so two; seat R) 6.467-7.517 s · "data centers." (one line, seat C) 7.517-8.717 s.
+  (one line, 789 px, seat C: the only seat it fits inside x 96-944) 4.233-5.283 s (frames 254-317) · **"on giant /
+  computers,"** (two baselines, seat L: "on giant" 396 px from x 131, "computers," 518 px from x 231) 5.283-6.467 s
+  (frames 317-388) · "in buildings / called" (893 px on one line, so two; seat R) 6.467-7.517 s · "data centers." (one
+  line, seat C) 7.517-8.717 s.
 - **Checks:** <= 2 baselines; each line <= 830 px; centre moves <= 220 px; 0.25-scale glance; >= 4.5:1; >= 0.8 s.
 
 ### R2 · The hook at frame 0
@@ -129,26 +131,28 @@ Each example uses video 4's real words and times; a frame number is t x 60.
 
 ### R3 · The big number
 - **For:** a number the story turns on (the hook's claim, a comparison's punch); 1-2 per film.
-- **Spec:** the brush (Nanum Brush Script 400), **260 px**, +0.02 em, accent amber #FFB868 (burnt #8E3A12 on light
-  skies), the halo; figures on their own row at baseline 500, centred near seat C; the unit word in the hand (Gaegu 300,
-  116 px, +0.02 em, warm white) on the row below (baseline 600), its right edge stepped to x ~900. Numerals, not words
+- **Spec:** the brush (Nanum Brush Script 400), **300 px** (figures ~136 px tall), +0.02 em, accent amber #FFB868 (burnt
+  #8E3A12 on light skies), the halo; figures on their own row at baseline 480, centred near x 440; the unit word in the
+  hand (Gaegu 300, 116 px, +0.02 em, warm white) on the row below (baseline 578), its right edge stepped to x ~930, clear
+  of the brush comma's long tail. Numerals, not words
   ("70,000", "40": 6 characters instead of 16). The swell on landing (5 + 9 frames).
 - **Sync:** the figures pop (and swell) 2 frames before the number's first word; the unit word builds on its word.
 - **Video 4 (two):** S1, from "seventy" (2.34) to the end of "homes?" (3.92), as the windows light one by one, so the
-  amber figures land with the warm windows: **"70,000"** (593 px) pops at 2.300 s (frame 138), **"homes?"** at 3.383 s
+  amber figures land with the warm windows: **"70,000"** (666 px) pops at 2.300 s (frame 138), **"homes?"** at 3.383 s
   (frame 203), both until 4.233 s. And S4, "40" with "kettles," at 15.017 s (frame 901), the 40 drawn kettles popping
   on at the computer's foot on the same word (S4 keeps no "≈ 40" tag in the picture, so the caption's 40 is the only
   one: never twice).
 - **Checks:** the figures read at 0.25 scale in < 0.5 s; >= 3:1 (the brush) and >= 4.5:1 (the hand); the figures never
-  collide with the far city (ink <= 610).
+  collide with the far city (ink <= 585).
 
 ### R4 · The landing word (the brush)
 - **For:** the film's 3-5 key words, the ones the voice stresses (the take writes them in capitals: "FORTY", "WANTS")
   and the core line's key word; at most one per sentence.
 - **Spec:** a three-row lockup in the band, like hand lettering: row 1, the lead-in words in the hand (Gaegu 300 / 400,
-  116 px, +0.02 em, warm white or umber, baseline 365, from x ~130); row 2, **the word in the brush (Nanum Brush Script
-  400), 200 px, +0.02 em, in the accent**, baseline 495, stepped right (from x ~260); row 3, the words after it in the
-  hand, baseline 598, right-aligned near x 920; the halo on all. Inside y 294-610. The swell (5 + 9 frames) or, if
+  116 px, +0.02 em, warm white or umber, baseline 362, from x ~130); row 2, **the word in the brush (Nanum Brush Script
+  400), 184 px, +0.02 em, in the accent**, baseline 484, stepped right (from x ~260); row 3, the words after it in the
+  hand, baseline 578, right-aligned near x 920; the halo on all (on light skies only where the field varies). Inside
+  y 292-585 (the brush's T reaches up to ~18 px under row 1 and down beside row 3: an interlock, never a touch). The swell (5 + 9 frames) or, if
   approved, the brush write-on (12 frames) on the word.
 - **Sync:** row 1 pops on its first word; the landing word on its own word; row 3 on its first word; all leave together
   when the next group pops. The lockup is one group (<= 5 words).
@@ -173,7 +177,8 @@ Each example uses video 4's real words and times; a frame number is t x 60.
 - **For:** a slow, warm or funny beat with few words: the joke, a breath, a line meant to be felt. Once or twice per
   film.
 - **Spec:** the hand (Gaegu 300 / 400), bigger: **150 px**, +0.02 em, warm white or umber, the halo; row 1 the
-  lead-in, row 2 lower right with its last word **1.3x bigger (190 px)**, the ref's "our / day"; set in the open space
+  lead-in, row 2 lower right with its last word **1.3x bigger (190 px)**, the ref's "our / day", a 0.48 em space before it (the
+  crossbars of "f" and "t" reach toward each other); set in the open space
   above the subject's top, inside the band (baselines 400 / 570). Pops by phrase (1 frame); the last word may land alone;
   the first line may leave first.
 - **Video 4:** S5 (17.76-19.26, CLOSE: the computer's top in all that steam; a mug pops onto it on "tea"): **"That's a
@@ -184,7 +189,8 @@ Each example uses video 4's real words and times; a frame number is t x 60.
 ### R7 · The word placed in the world
 - **For:** a word that belongs to a thing in the picture (a year on a tag, a name on a sign): it lives on the thing and
   moves with it. At most one per film (the visual script's "one word in the picture").
-- **Spec:** the brush (Nanum Brush Script 400), 140-200 px, tracking 0, figures >= 120 px tall, in the object's ink
+- **Spec:** the brush (Nanum Brush Script 400), 140-160 px, tracking 0 (figures ~0.44 em; at 148 px "2027" is 234 px
+  wide on a ~280 x 170 tag and reads at phone size), in the object's ink
   (umber #2B1B0A on cream paper), straight-on and level on its object (`LAYOUT.md`: words in the world), no halo (the
   paper is its ground); on the world layer with the camera's parallax, entering with its object; the captions keep their
   screen seats above it and never say the same words.
@@ -207,10 +213,10 @@ Each example uses video 4's real words and times; a frame number is t x 60.
 
 ### R9 · The payoff line
 - **For:** the film's last sentence, the core line in the voice; it lands, then the loop.
-- **Spec:** two lockups: first, three rows like R4's (the hand 116 px, the brush 200 px in the accent with the swell,
-  +0.02 em, the halo) with the core line's key word in the brush on the LAST row, so the rows sit at baselines 365 /
-  470 / 600 (the brush's tall letters need the room), stepped down-right; then the last group in the hand (Gaegu 300, **136 px**: the
-  hook's size, so the film's bookends match), two baselines at seat C, holding 36 frames past the last word, then
+- **Spec:** two lockups: first, two rows (the hand 116 px; the core line's key word in the brush, 184 px, in the accent
+  with the swell, +0.02 em, the halo, LAST on row 2 after a 50 px space), baselines 390 / 545, row 1 from x ~110, row 2
+  from x ~120 (three rows put the brush word on the roofline in the stills); then the last group in the hand (Gaegu 300,
+  **136 px**: the hook's size, so the film's bookends match), two baselines at seat C, holding 36 frames past the last word, then
   cutting out in 1 frame before the loop's un-draw reaches the band.
 - **Video 4:** S12 (38.48-42.24, WIDE POV: the home view again, your gloved hand and phone at the bottom right; on
   "could" the computer's lights blink back and a pulse of warm water runs home): **"So your chatbot"** pops at 38.433 s
@@ -224,7 +230,8 @@ Each example uses video 4's real words and times; a frame number is t x 60.
 - **Spec:** a frame of the film's own scene without captions; the core line in the hand (weight 400 on light skies, 300
   on dark; 112-128 px), its key word in the brush (240-280 px, the accent); 3-4 rows, ragged and stepped, on the sky's
   flat field, inside the 4:5 crop (y 285-1635) and the 3:4 crop (y 240-1680), x 96-944; read at 360 px wide (the grid
-  tile); Pip hidden as in the film; no box, no source line.
+  tile); Pip hidden as in the film; no box, no source line. The still: the hand 112 px, the brush 250 px, baselines 365 /
+  530 / 624 / 733, rows from x 110 / 180 / 130 / 290 (ink y 300-740, inside the open sky).
 - **Video 4:** "Your chatbot / could **heat** / an apartment / in Helsinki." over the home view's night sky, "heat" in
   amber (the core line: `docs/v4/THROUGHLINE.md`).
 - **Checks:** reads at 360 px wide in one glance; inside both crops; the same words as the core line, nothing added.

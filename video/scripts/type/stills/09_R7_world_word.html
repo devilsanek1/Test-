@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset="utf-8"><script src="../lib/type.js"></script>
+<style>html,body{margin:0;padding:0}#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:url('{{BG_NIGHT}}') center/cover no-repeat}
+.lab{position:absolute;font-family:'Jost';font-weight:400;font-size:30px;letter-spacing:0.04em;color:rgba(255,240,222,0.78)}</style></head>
+<body><div id="stage"></div>
+<script>
+// caption "starting / next year." pops 27.033 s, on to 28.300 s; the tag swung on at "next" (27.40 s), still settling (3.5°)
+window.__ready = TYPE.run(() => {
+  const S = TYPE.stage(), NS = 'http://www.w3.org/2000/svg', tone = 'night';
+  TYPE.group(S, {seat: 'C', baselines: [395, 515], step: 100, lines: ['starting', 'next year.'], tone});
+  // the tag: ~280 x 170, pinned at its top centre on the facade above the door, swinging 3.5°, a soft contact shadow
+  const W = 280, H = 170, cx = 600, top = 772, ang = 3.5;
+  const g = document.createElementNS(NS, 'g');
+  g.setAttribute('transform', `rotate(${ang} ${cx} ${top + 14})`);
+  g.innerHTML = `
+    <defs><filter id="soft" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="7"/></filter>
+      <filter id="paper" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.35  0 0 0 0 0.28  0 0 0 0 0.20  0 0 0 0.10 0"/><feComposite in2="SourceGraphic" operator="in" result="g"/>
+      <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="g"/></feMerge></filter>
+      <linearGradient id="lit" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#F3E3C6"/><stop offset="1" stop-color="#D9CDBA"/></linearGradient></defs>
+    <rect class="noink" x="${cx - W / 2 + 10}" y="${top + 14}" width="${W}" height="${H}" rx="6" fill="#0d1030" opacity="0.55" filter="url(#soft)"/>
+    <rect class="noink" x="${cx - W / 2}" y="${top}" width="${W}" height="${H}" rx="6" fill="url(#lit)" filter="url(#paper)"/>
+    <circle class="noink" cx="${cx}" cy="${top + 14}" r="7" fill="#3a2a1c"/><circle class="noink" cx="${cx - 2}" cy="${top + 12}" r="2.2" fill="#c9b79a"/>`;
+  S.appendChild(g);
+  // the year, figures fitted to the tag (ink <= W - 40), umber, tracking 0, no halo, riding the tag
+  const size = Math.floor(189 * (W - 40) / 306);
+  TYPE.text(S, {t: '2027', x: cx, y: top + H / 2 + 0.444 * size / 2 + 8, anchor: 'middle', role: 'brush', size, track: 0, fill: '#2B1B0A', halo: false, parent: g});
+});
+</script></body></html>

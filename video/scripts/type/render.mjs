@@ -10,6 +10,11 @@
 //            action rail, the bottom caption and nav) at our documented zones (LAYOUT.md: top y < 180, bottom
 //            y > 1520, right rail x > 950 at y 900-1500), phone-sized
 //   --zones  the UI preview also tints the unsafe zones red
+//   --mask   also writes <out>_mask.png (the words only, white on black, no halo: elements with class "ink") and
+//            <out>_bare.png (the frame with the words hidden), for check_stills.py (ink box, row gaps, contrast)
+//
+// A page that lays itself out in JS (scripts/type/lib/type.js) sets `window.__ready` to a promise; the renderer waits
+// for it before the screenshot.
 //
 // An HTML page is laid out on a 1080 x 1920 stage at 1x (body margin 0). Relative URLs resolve from the page's folder;
 // `{{BG_DUSK}}`, `{{BG_NIGHT}}` and `{{REPO}}` in the page are replaced with file:// URLs.
@@ -32,7 +37,14 @@ try { playwright = require('playwright'); } catch { playwright = require(require
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const VIDEO = path.resolve(HERE, '..', '..');
 const FONTS = path.join(HERE, '.fonts');
-const BG = {bg_dusk: path.join(HERE, 'bg', 'bg_dusk.png'), bg_night: path.join(HERE, 'bg', 'bg_night.png')};
+const BG = {bg_dusk: path.join(HERE, 'bg', 'bg_dusk.png'), bg_night: path.join(HERE, 'bg', 'bg_night.png'),
+  bg_night_cover: path.join(HERE, 'bg', 'bg_night_cover.png')};
+// --mask: everything hidden but the words (class "ink"), white on black; --bare: the words hidden
+const MASK_CSS = `html.mask,html.mask body{background:#000!important}
+html.mask body *:not(defs):not(defs *):not(mask):not(mask *):not(clipPath):not(clipPath *){visibility:hidden!important}
+html.mask body .ink,html.mask body .ink *{visibility:visible!important;fill:#fff!important;color:#fff!important;filter:none!important;text-shadow:none!important;opacity:1!important;stroke:none!important}
+html.mask body defs,html.mask body defs *,html.mask body mask,html.mask body mask *,html.mask body clipPath,html.mask body clipPath *{visibility:visible!important}
+html.bare body .ink,html.bare body .ink *{visibility:hidden!important}`;
 const W = 1080, H = 1920;
 
 function fontFaceCss() {
@@ -98,18 +110,28 @@ function pageFromSpec(st) {
 
 async function shoot(browser, html, baseDir, out, opts) {
   const css = fontFaceCss();
-  html = html.replaceAll('{{BG_DUSK}}', pathToFileURL(BG.bg_dusk).href).replaceAll('{{BG_NIGHT}}', pathToFileURL(BG.bg_night).href).replaceAll('{{REPO}}', pathToFileURL(VIDEO).href);
-  html = html.includes('</head>') ? html.replace('</head>', `<style>${css}</style></head>`) : `<style>${css}</style>` + html;
+  html = html.replaceAll('{{BG_DUSK}}', pathToFileURL(BG.bg_dusk).href).replaceAll('{{BG_NIGHT_COVER}}', pathToFileURL(BG.bg_night_cover).href).replaceAll('{{BG_NIGHT}}', pathToFileURL(BG.bg_night).href).replaceAll('{{REPO}}', pathToFileURL(VIDEO).href);
+  html = html.includes('</head>') ? html.replace('</head>', `<style>${css}${MASK_CSS}</style></head>`) : `<style>${css}${MASK_CSS}</style>` + html;
   const tmp = path.join(baseDir, `.render_${process.pid}_${Math.random().toString(36).slice(2)}.html`);
   fs.writeFileSync(tmp, html);
   const page = await browser.newPage({viewport: {width: W, height: H}, deviceScaleFactor: 1});
   try {
     await page.goto(pathToFileURL(tmp).href, {waitUntil: 'load'});
-    await page.evaluate(async () => { await document.fonts.ready; });
+    await page.evaluate(async () => { await document.fonts.ready; if (window.__ready) await window.__ready; await document.fonts.ready; });
     await page.waitForTimeout(150);
     fs.mkdirSync(path.dirname(out), {recursive: true});
     await page.screenshot({path: out, clip: {x: 0, y: 0, width: W, height: H}});
     const stem = out.replace(/\.png$/i, '');
+    const typeLog = await page.evaluate(() => window.__typeLog || null);
+    if (typeLog && opts.mask) fs.writeFileSync(stem + '_layout.json', JSON.stringify(typeLog, null, 1));
+    if (opts.mask) {
+      for (const [cls, suffix] of [['mask', '_mask.png'], ['bare', '_bare.png']]) {
+        await page.evaluate((c) => document.documentElement.classList.add(c), cls);
+        await page.waitForTimeout(50);
+        await page.screenshot({path: stem + suffix, clip: {x: 0, y: 0, width: W, height: H}});
+        await page.evaluate((c) => document.documentElement.classList.remove(c), cls);
+      }
+    }
     if (opts.ui) {
       await page.evaluate((svg) => { const d = document.createElement('div'); d.innerHTML = svg; d.style.cssText = 'position:absolute;left:0;top:0;width:1080px;height:1920px;z-index:99999'; document.body.appendChild(d); }, UI_SVG(opts.zones));
       await page.screenshot({path: stem + '_ui_full.png', clip: {x: 0, y: 0, width: W, height: H}});
@@ -130,13 +152,13 @@ async function main() {
   const args = process.argv.slice(2);
   const flags = new Set(args.filter((a) => a.startsWith('--')));
   const pos = args.filter((a) => !a.startsWith('--'));
-  if (!pos.length) { console.error('usage: node render.mjs page.html out.png | spec.json [--phone] [--ui] [--zones]'); process.exit(2); }
-  const opts = {phone: flags.has('--phone'), ui: flags.has('--ui'), zones: flags.has('--zones')};
+  if (!pos.length) { console.error('usage: node render.mjs page.html [out.png] | spec.json [--phone] [--ui] [--zones] [--mask]'); process.exit(2); }
+  const opts = {phone: flags.has('--phone'), ui: flags.has('--ui'), zones: flags.has('--zones'), mask: flags.has('--mask')};
   const browser = await playwright.chromium.launch();
   try {
     if (pos[0].endsWith('.json')) {
       const spec = JSON.parse(fs.readFileSync(pos[0], 'utf8'));
-      const o = {phone: opts.phone || !!spec.phone, ui: opts.ui || !!spec.ui, zones: opts.zones || !!spec.zones};
+      const o = {phone: opts.phone || !!spec.phone, ui: opts.ui || !!spec.ui, zones: opts.zones || !!spec.zones, mask: opts.mask || !!spec.mask};
       for (const st of spec.stills) {
         const out = path.resolve(VIDEO, st.out);
         await shoot(browser, pageFromSpec(st), path.dirname(path.resolve(pos[0])), out, o);

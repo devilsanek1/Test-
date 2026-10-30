@@ -1,0 +1,26 @@
+<!doctype html><html><head><meta charset="utf-8"><script src="../lib/type.js"></script>
+<style>html,body{margin:0;padding:0}#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:url('{{BG_DUSK}}') center/cover no-repeat}
+.lab{position:absolute;font-family:'Jost';font-weight:400;font-size:30px;letter-spacing:0.04em;color:rgba(255,240,222,0.78)}</style></head>
+<body><div id="stage"></div>
+<script>
+// S7 at 24.10 s (the page "But Helsinki / WANTS that heat." is on screen 24.04-25.54 s, unchanged): theme.ts skyCaption
+// (cx 520, baselines 387 / 510, Patrick Hand 98 px, tracking 0), skyHighlightBox (pad 0.19 em, top 0.9 em, bottom 0.19 em,
+// radius 0.02 em), captionTones.dark (ink #2B1B0A, peach #F6B892, the word ink on peach).
+window.__ready = TYPE.run(() => {
+  const S = TYPE.stage(), NS = 'http://www.w3.org/2000/svg', size = 98, cx = 520;
+  const o = {font: 'Patrick Hand', weight: 400, size, track: 0};
+  const lines = [['But Helsinki', 387], ['WANTS that heat.', 510]];
+  // the box first (behind), from the advance positions, as SkyCaptions lays it out
+  const adv2 = TYPE.measure('WANTS that heat.', o).adv, x0 = cx - adv2 / 2, x1 = x0 + TYPE.measure('WANTS', o).adv, pad = 0.19 * size;
+  const r = document.createElementNS(NS, 'rect');
+  Object.entries({x: x0 - pad, y: 510 - 0.9 * size, width: x1 - x0 + 2 * pad, height: 1.09 * size, rx: 0.02 * size, fill: '#F6B892'}).forEach(([k, v]) => r.setAttribute(k, v));
+  r.setAttribute('class', 'noink'); S.appendChild(r);
+  for (const [t, y] of lines) {
+    const el = document.createElementNS(NS, 'text');
+    el.setAttribute('x', cx); el.setAttribute('y', y); el.setAttribute('text-anchor', 'middle'); el.setAttribute('class', 'ink');
+    el.style.cssText = `font-family:'Patrick Hand';font-size:${size}px;fill:#2B1B0A;font-kerning:normal`;
+    el.textContent = t; S.appendChild(el);
+    const m = TYPE.measure(t, o); TYPE.log.push({t, x0: Math.round(cx - m.adv / 2 + m.left), x1: Math.round(cx - m.adv / 2 + m.right), top: Math.round(y - m.asc), base: y, bottom: Math.round(y + m.desc), font: 'Patrick Hand 400 98px', fill: '#2B1B0A'});
+  }
+});
+</script></body></html>

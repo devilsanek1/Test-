@@ -77,9 +77,9 @@ references, measured (`refs/README.md`).
    **For us:** the running captions are an upright, open hand-PRINT (no script, no slant, no rough brush); a script or
    brush face is kept for one big word, a number or a title, where size carries it.
 
-10. **Slightly wider letter spacing reads faster; extra spacing helps struggling readers.** [S1] Zorzi et al. 2012, PNAS
-    https://doi.org/10.1073/pnas.1205566109 (extra-large spacing improved reading in dyslexia). Ref 1's airy spacing
-    (gap ~0.45 x-height) agrees. **For us:** track the hand +2 % (its natural gaps are already open); never the posters'
+10. **Open letter spacing helps struggling readers and suits the airy look.** [S1] Zorzi et al. 2012, PNAS
+    https://doi.org/10.1073/pnas.1205566109 (extra-large spacing improved reading in dyslexia; a benefit for typical
+    readers is not claimed here). Ref 1's airy spacing (gap ~0.45 x-height) agrees [REF]. **For us:** track the hand +2 % (its natural gaps are already open); never the posters'
     1.0-1.6 cap-height gaps on running words (those are for one-word titles).
 
 11. **Contrast without boxes: thin strokes need more contrast, or more size.** WCAG 2.x asks 4.5:1 for text and 3:1 for

@@ -1,0 +1,15 @@
+<!doctype html><html><head><meta charset="utf-8"><script src="../lib/type.js"></script>
+<style>html,body{margin:0;padding:0}#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:url('{{BG_NIGHT}}') center/cover no-repeat}
+.lab{position:absolute;font-family:'Jost';font-weight:400;font-size:30px;letter-spacing:0.04em;color:rgba(255,240,222,0.78)}</style></head>
+<body><div id="stage"></div>
+<script>
+// "So your chatbot" pops 38.433 s, "could soon" 39.367 s, "heat" 39.933 s (frame 2396; swell 0.94 -> 1.04 in 5 frames: at
+// frame 2400 = 40.00 s it is 1.04); "an apartment / in Helsinki." follows at 40.217 s
+window.__ready = TYPE.run(() => {
+  const S = TYPE.stage(), tone = 'night';
+  // after the stills' fix: two rows (390 / 545); "heat" in the brush (184 px, amber) ends row 2, ink 320-552
+  TYPE.text(S, {t: 'So your chatbot', x: 110, y: 390, role: 'hand', size: 116, tone});
+  const c = TYPE.text(S, {t: 'could soon', x: 120, y: 545, role: 'hand', size: 116, tone});
+  TYPE.text(S, {t: 'heat', x: c.x1 + 50, y: 545, role: 'brush', size: 184, tone, accent: true, scale: 1.04});
+});
+</script></body></html>

@@ -7,6 +7,10 @@ bg_dusk:  paint_still_v6.png with its burned-in caption ("She quit Google." in t
 bg_night: bg_dusk re-graded to video 4's colour key (a cold blue night, one warm accent): the world darkened and pushed
           blue, the sun removed, the warm windows and the doorway kept warm with a soft bloom, light snow falling.
           A stand-in for the light-ink recipes until video 4's own art exists; never a film asset.
+bg_night_cover: bg_night shifted down 180 px for the cover stills (TYPE_GUIDE §h 11-12): the leaves cut by the top edge
+          painted out (a harmonic fill, snow added back), the sky extended above in its own colour (a soft mirror of
+          the top rows fading into the sky's colour), so the open sky reaches y ~780: a stand-in for a cover frame
+          composed with more sky.
 """
 import os
 import numpy as np
@@ -104,11 +108,53 @@ def night(d):
     return out
 
 
+def flakes(a, box, seed, n):
+    """Add night snow (the night() look) into a float RGB array a (0-255) inside box (x0, y0, x1, y1)."""
+    from PIL import ImageDraw
+    H, W = a.shape[:2]
+    snow = Image.new('L', (W, H), 0)
+    dr = ImageDraw.Draw(snow)
+    rng = np.random.default_rng(seed)
+    x0, y0, x1, y1 = box
+    for _ in range(n):
+        x, y = rng.uniform(x0, x1), rng.uniform(y0, y1)
+        depth = rng.uniform(0, 1) ** 2
+        rad = 1.0 + 4.0 * depth
+        dr.ellipse([x - rad, y - rad, x + rad, y + rad], fill=int(90 + 120 * depth))
+    sa = np.asarray(snow.filter(ImageFilter.GaussianBlur(0.9))).astype(np.float64)[..., None] / 255
+    flake = np.array([0.88, 0.92, 1.0]) * 255
+    return a * (1 - 0.85 * sa) + flake * 0.85 * sa
+
+
+def night_cover(nt, shift=180):
+    a = np.asarray(nt).astype(np.float64)
+    # the leaves and twig at the top left, cut by the frame's top: painted out (they would show a hard cut once shifted)
+    y0, y1, x0, x1 = 1, 236, 1, 300
+    a = harmonic_fill(a, y0, y1, x0, x1, iters=2500)
+    a[:y1, :x1] = flakes(a[:y1 + 40, :x1 + 40], (0, 0, x1, y1), 7, 40)[:y1, :x1]
+    H, W = a.shape[:2]
+    out = np.zeros_like(a)
+    out[shift:] = a[:H - shift]
+    # the extension: the top rows mirrored (the cloud continues upward), fading into the sky's own colour toward the top
+    mir = a[:shift][::-1].copy()
+    sky = a[200:320, 300:640].reshape(-1, 3)
+    sky = np.median(sky, axis=0) * 0.93                      # the night sky darkens toward the top
+    soft = np.asarray(Image.fromarray(mir.clip(0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(6))).astype(np.float64)
+    w = np.linspace(0.0, 1.0, shift)[::-1][:, None, None] ** 1.5   # 1 at the very top (all sky), 0 at the seam
+    ext = soft * (1 - w) + sky * w
+    out[:shift] = ext
+    out[:shift + 30] = flakes(out[:shift + 30], (0, 0, W, shift), 11, 70)
+    im = Image.fromarray(out.clip(0, 255).round().astype(np.uint8))
+    im.save(os.path.join(OUT, 'bg_night_cover.png'))
+    return im
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     d = dusk()
     nt = night(d)
-    for name, im in (('bg_dusk', d), ('bg_night', nt)):
+    nc = night_cover(nt)
+    for name, im in (('bg_dusk', d), ('bg_night', nt), ('bg_night_cover', nc)):
         s = im.copy()
         s.thumbnail((540, 960))
         s.save(os.path.join(OUT, f'{name}_small.jpg'), quality=85)

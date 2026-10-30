@@ -1,0 +1,12 @@
+<!doctype html><html><head><meta charset="utf-8"><script src="../lib/type.js"></script>
+<style>html,body{margin:0;padding:0}#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:url('{{BG_NIGHT}}') center/cover no-repeat}
+.lab{position:absolute;font-family:'Jost';font-weight:400;font-size:30px;letter-spacing:0.04em;color:rgba(255,240,222,0.78)}</style></head>
+<body><div id="stage"></div>
+<script>
+// "70,000" pops 2.300 s (frame 138), "homes?" builds 3.383 s (frame 203), both on to 4.233 s
+window.__ready = TYPE.run(() => {
+  const S = TYPE.stage(), tone = 'night';
+  TYPE.text(S, {t: '70,000', x: 440, y: 480, anchor: 'middle', role: 'brush', size: 300, tone, accent: true});
+  TYPE.text(S, {t: 'homes?', x: 930, y: 578, anchor: 'end', role: 'hand', size: 116, tone});
+});
+</script></body></html>
