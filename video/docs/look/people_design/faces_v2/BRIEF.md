@@ -27,3 +27,14 @@ from `video/`); draws its design sheets as SVG/HTML rendered with `video/scripts
 PNG; see `video/scripts/type/README.md`) or with Python; starts no agents (if it ever does, at max effort); cites a
 source (URL) for every research claim with its strength (a peer-reviewed study; a textbook, a surgeon's or a studio's
 own account; a practitioner's advice); never bbc.co.uk. WebFetch may be missing: fetch with curl through the proxy.
+
+## The owner's latest (2026-10-30 ~18:10 UTC): ref 03's bob beside our v3 W1, no words
+The owner sent a crop of the v3 comparison sheet: the students' girl (ref 03, her bob) beside our v3 W1, and nothing else
+(`../refs_hair_2026-10-30/owner_note_ref03_bob_vs_v3.jpg`). Read as THE BAR and the size of the gap. Her hair: real
+VOLUME around the skull, a jaw-length bob whose hem turns OUT in a few big flips, two thin placed arcs (flyaways), one
+broad S through the mass, flat colour with a soft shadow and a RIM / gloss of light that makes it read glossy and
+premium; her face: delicate, appealing, alive. Ours: small, flat, plain, a dome with a cut line, a blank face. Every cut
+must reach that level of appeal in our own clean style; the assembled stills put ref 03 beside our bob again, and the
+orchestrator judges them side by side before the owner sees anything. (Her face there has open eyes looking away; our
+faces keep the closed-eye LASH unless the owner says otherwise: show one "open eyes, looking away, never at us" variant
+of her head beside LASH in the final stills so the owner can choose.)

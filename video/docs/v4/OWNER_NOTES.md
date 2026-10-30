@@ -288,3 +288,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   chains with spring physics), proven with motion strips; research on how pro 2D pipelines draw and rig hair runs
   beside the design-and-build agent. -> rule: playbook, Visual style (hair built to animate, drawn clean); Process
   (the orchestrator looks before sending).
+- 2026-10-30 ~18:10 UTC: a crop of the v3 comparison sheet, ref 03's bob beside our v3 W1, no words -> read as the bar
+  and the gap (her volume, the hem's outward flips, two placed flyaways, the gloss and rim light, a delicate appealing
+  face; ours small, flat, plain, a blank face); written into the overhaul's briefs (the assembler reads it), the final
+  stills put ref 03 beside our bob again and show an "open eyes, looking away" head beside LASH for the owner to choose.
