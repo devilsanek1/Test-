@@ -159,9 +159,9 @@
     "blend": "multiply",
     "box": [
      0,
-     0,
-     1017,
-     775
+     618,
+     682,
+     157
     ],
     "file": "sky_mul.lmap.png"
    },
@@ -169,9 +169,9 @@
     "blend": "screen",
     "box": [
      0,
-     0,
-     1017,
-     959
+     617,
+     731,
+     342
     ],
     "file": "sky_scr.lmap.png"
    }
