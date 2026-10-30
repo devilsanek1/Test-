@@ -80,3 +80,51 @@ Status: IN PROGRESS (this file is written as the work goes).
   resident's feet ~1340, is G3's to move; W1 §1.0-§1.1 gives them on 1150: the computer 858-1236, the harbour
   ~1152-1181, her feet ~1319). Checked: no code or data carries a horizon yet (`public/v4/animatic.json`,
   `scripts/v4/`).
+
+### 2. The visual script agent's flags (`VISUAL_SCRIPT.md`, "For the orchestrator")
+
+**2a. `docs/look/TYPE_GUIDE.md` R4, line 161-164 (video 4's example).**
+- Before: "S7 (23.46-25.54, the turn: WIDE, the dive lands on "WANTS" and holds while the pen draws the plan's pipe out
+  toward the computer): "But Helsinki" pops at 23.417 s (frame 1405) · "wants" at 23.967 s (frame 1438, 2 frames before
+  its word) · ..."
+- After: "S7 (23.46-25.54, the turn: WIDE, after the film's one plain cut, a small settle in lands on "WANTS" and holds
+  while the plan's stretch is drawn out toward the computer): "But Helsinki" pops on the cut at 23.367 s (frame 1402:
+  the group changes within 2 frames of it) · "wants" at 24.000 s (frame 1440, 2 frames before its word) · "that heat."
+  at 24.583 s (frame 1475) · all until 25.500 s (frame 1530)."
+- Why: v3 S7 has no dive (the plain cut at 23.37, f1402, then a 1.04x settle landing on "WANTS"), a brush and "the
+  plan's stretch" (no pen, no pipe drawn) and asks "the group changes within 2 frames of the cut"; f1405 is 3 after.
+  "WANTS" starts at 24.04 in the locked take (f1442), so 2 frames before is f1440, the guide's own rule; the production
+  captions (`public/v4/captions2.json` g18) already play exactly these frames. The picture's action is named without
+  "brush" here, since in this guide "the brush" is the retired type face.
+
+**2b. `docs/look/TYPE_GUIDE.md` R7, line 204-208 (video 4's example).**
+- Before: "S8 (25.54-28.34, MEDIUM: the plan, walls only marked out; the slow push lands on "plan" 26.18): ... pinned to
+  the plan's front wall on the subject axis below the computer's middle: "2027", until S9's push takes it out of the
+  frame's bottom (by "would", 29.02)."
+- After: "S8 (... ; the push lands on "has" 25.80, the walls stand out on "plan" 26.18): ... on the subject axis at the
+  computer's middle: "2027", until S9's dolly takes it out of the frame's bottom (by "how", 28.70)."
+- Why: v3 S8's push runs from the end of "heat." to "has" (25.80) with the walls' light pull on "plan"; the tag sits at
+  the computer's middle (the drop's 650 px limit: v3, the camera plan's (540, 1150), drop 594); S9's dolly slides it
+  out by "how" (v3 S8 Words, `captions2.json` w1 "until": 28.7). The caption's seat C and times (27.033-28.300) already
+  matched (`captions2.json` g20).
+
+**2c. `docs/look/TYPE_GUIDE.md` R9, lines 229, 231, 234.**
+- Before: "your gloved hand and phone at the bottom right"; ""heat" in the lit hand, honey, at 39.900 s (frame 2394, 2
+  frames before its word)"; Checks: "clear of the phone (bottom right)".
+- After: "at the bottom left"; "at 39.933 s (frame 2396, 2 frames before its word)"; "clear of the phone (bottom left)".
+- Why: v3's delegated call 9 moved the phone to the bottom left (Instagram's buttons run down the right; SR13, E11).
+  "heat" starts at 39.98 in the locked take, so the pop is f2396 by the guide's rule (as `captions2.json` g29 plays it);
+  2394 came from an earlier word time. The other R9 times (38.433, 39.367, 40.217, held to f2515) already matched.
+
+**2d. Leftover brush wording after the pleasantness pass: `docs/look/TYPE_GUIDE.md` §i, line 368-370 (a head note).**
+- Before: §i's bullets ("The brush's comma", "The brush's real size: ... R3 is now 300 px (figures ~136 px), centred
+  near x 440", "its brush to 184 px", "R10: ... the brush 250 px", "Still 14 added: the brush write-on") read as current
+  numbers after the owner's last note retired the brush.
+- After (one note under the heading): "The bullets before the owner's note (the last) are the brush era, kept as
+  history: the pleasantness pass then retired the brush, and §b-§e hold the numbers now (R3 250 px, figures ~130 px,
+  near x 466; R4 at 362 / 482 / 578, the lit word 160 / 156 px; R7's "2027" at 122 px, figures ~72 px; R10's lit word
+  ~200 px)."
+- Why: the owner (2026-10-30, "shouldn't look like a blood message on the wall") retired the brush, the burnt red and
+  the write-on; §i's earlier bullets contradicted §b-§e's picked numbers. Checked: no recipe (R1-R10), no check in §f and
+  no motion row in §d carries brush or burnt wording ("burned in" in §g is the captions being in the picture, not the
+  colour); §h is job 2's still list, a record of what each still showed, left as it is.
