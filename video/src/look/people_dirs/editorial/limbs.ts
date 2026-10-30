@@ -2,7 +2,7 @@
 // ankle ~3.6 : 1, upper arm : wrist ~1.9 : 1) with offset bulges (the calf's peak behind and high, design_research
 // S2, S6); hands are real-size (0.096 H) mittens with a thumb lobe and a wrist break; shoes are the style statement at
 // our sizes (fashion §3.2): a slim pointed pump, a slim low sneaker with its light sole band, a loafer, a ballet flat.
-import {type PP, type V2, type V3, type View, add3, clamp, cross3, hull, lerp, len2, mul3, norm2, norm3, pchip, proj, rot2, sub2, sub3, tubeOutline} from './core';
+import {type PP, type V2, type V3, type View, add3, clamp, cross3, hull, lerp, len2, mul3, norm2, norm3, pchip, proj, rot2, spindle, sub2, sub3, tubeOutline} from './core';
 import {type Build, type Side, type Skeleton, armRadius, legRadius} from './body';
 import {type Part, Z} from './parts';
 
@@ -51,6 +51,8 @@ export type SleeveSpec = {
   drop?: number;
   /** A cuff band (a value step) of this length at the end. */
   cuff?: number;
+  /** The garment part the sleeve belongs to: its cap is clipped to that garment's shoulder. */
+  body?: string;
 };
 
 /** A sleeve along the arm chain: a tube with a crisp cuff edge. It starts just below the shoulder line, inside the
@@ -64,13 +66,31 @@ export function sleeve(sk: Skeleton, s: Side, v: View, mat: string, spec: Sleeve
   // the sleeve's top: its cap's dome rises to the shoulder line, its outer edge on the garment's shoulder (the garment
   // rows put the shoulder at shX + r0 + 2), so the arm leaves the shoulder in one line, never a puffed cap
   const ua: V3 = norm3(sub3(E, S0));
-  const S = add3(S0, mul3(ua, spec.r[0] * 0.5 + drop * 0.5));
+  const S = add3(S0, mul3(ua, spec.r[0] * 0.72 + drop * 0.5));
   const end = spec.end ?? 1;
   const Wend: V3 = [lerp(E[0], W[0], end), lerp(E[1], W[1], end), lerp(E[2], W[2], end)];
   const [r0, r1, r2] = spec.r;
   const ru = pchip([0, 0.12, 0.5, 1], [r0 * 1.02, r0, r1, r2]);
   const pts = tubeOutline([S, E, Wend], (u) => ({ru: ru(u), rv: ru(u) * 1.04}), v, [0, 0, 1], {m: 30, capEnd: false});
+  const armpit = proj(S0, v).y + (sk.b.shY - sk.b.armpitY) * 0.9;
+  void armpit;
   const out: Part[] = [{k: `sleeve_${s}`, pts: crispEnd(pts), mat, z: armZ(sk, s, v), tension: 0.5, grp: grp ? `${grp}_${s}` : undefined}];
+  // the inner-elbow fold of a bent sleeve (a half-lock: a wedge from the crook across the sleeve; C7)
+  {
+    const Sp = proj(S0, v);
+    const Ep = proj(E, v);
+    const Wp = proj(Wend, v);
+    const u1: V2 = norm2([Sp.x - Ep.x, Sp.y - Ep.y]);
+    const f1: V2 = norm2([Wp.x - Ep.x, Wp.y - Ep.y]);
+    const bend = 180 - (Math.acos(clamp(u1[0] * f1[0] + u1[1] * f1[1], -1, 1)) * 180) / Math.PI;
+    if (bend > 28) {
+      const bis = norm2([u1[0] + f1[0], u1[1] + f1[1]]);
+      const r1 = spec.r[1];
+      const a: V2 = [Ep.x + bis[0] * r1 * 1.05, Ep.y + bis[1] * r1 * 1.05];
+      const e: V2 = [Ep.x - bis[0] * r1 * 0.25 + f1[0] * r1 * 0.3, Ep.y - bis[1] * r1 * 0.25 + f1[1] * r1 * 0.3];
+      out.push({k: `elbowFold_${s}`, pts: spindle(a, e, r1 * 0.42, 0.25, 0), mat, tone: 'shade', z: armZ(sk, s, v) + 0.4, clip: `sleeve_${s}`, tension: 0.5, op: 0.6});
+    }
+  }
   if (spec.cuff) {
     const L = Math.hypot(...sub3(Wend, E));
     const k = 1 - spec.cuff / L;

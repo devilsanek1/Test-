@@ -12,6 +12,9 @@ export type Part = {
   z: number;
   /** Clip to another part's outline (a cast shape inside its form). */
   clip?: string;
+  /** Clip to the union of another part's outline and everything below a screen y: a sleeve's cap may never rise out of
+   *  its garment's shoulder, while the arm below the armpit stays free. */
+  clipBelow?: {k: string; y: number};
   /** Regions cut out of this part (an open coat's front opening). */
   cut?: PP[][];
   /** A true line (a strap, a lash, a sunglasses arm): the stroke width; the path is open. */

@@ -126,7 +126,8 @@ function faceParts(p: Person, sk: Skeleton, v: View, r: HeadRig, key: V2, skullP
     const lt = lipTone(r, v);
     if (lt) out.push({k: 'lips', pts: lt, mat: 'lip', tone: 'base', z: Z.face, clip: 'head', op: 0.55, tension: 0.6});
   }
-  const lf = mark ? lostFlick(r, v) : null;
+  // the flick peeks past the cheek only where no hair covers the eye's height (curtain bangs do)
+  const lf = mark && p.hair !== 'long' ? lostFlick(r, v) : null;
   if (lf) out.push({k: 'flick', pts: lf, mat: 'hair', tone: 'deep', z: Z.hairDetail + 0.5, line: 3.2, tension: 0.4});
   return out;
 }
@@ -147,7 +148,7 @@ function outfit(p: Person, sk: Skeleton, v: View): Part[] {
       out.push(...slipSkirt(sk, v, 'skirt'));
       out.push(...knit(sk, v, 'knit'));
       out.push(...coat(sk, v, 'coat'));
-      out.push(...sleeves(sk, v, 'coat', {r: [34, 31, 29], drop: 8}));
+      out.push(...sleeves(sk, v, 'coat', {r: [34, 31, 29], drop: 8, body: 'coat'}));
       out.push(...hands(sk, v));
       break;
     }
@@ -156,7 +157,7 @@ function outfit(p: Person, sk: Skeleton, v: View): Part[] {
       out.push(...trousers(sk, v, 'jeans', 'straight', 646, {hemDrop: 16}));
       out.push(...tee(sk, v, 'tee', 846, 632));
       out.push(...cardigan(sk, v, 'cardigan'));
-      out.push(...sleeves(sk, v, 'cardigan', {r: [29, 25, 19], drop: 6, cuff: 16}));
+      out.push(...sleeves(sk, v, 'cardigan', {r: [29, 25, 19], drop: 6, cuff: 16, body: 'cardigan'}));
       out.push(...hands(sk, v));
       out.push(...tote(sk, v));
       break;
@@ -167,7 +168,7 @@ function outfit(p: Person, sk: Skeleton, v: View): Part[] {
       out.push(...trousers(sk, v, 'trousers', 'relaxed', 612, {hemDrop: -16}));
       out.push(...tee(sk, v, 'tee', 840, 560, 1.12));
       out.push(...choreJacket(sk, v, 'jacket'));
-      out.push(...sleeves(sk, v, 'jacket', {r: [38, 35, 33], drop: 10}));
+      out.push(...sleeves(sk, v, 'jacket', {r: [38, 35, 33], drop: 10, body: 'jacket'}));
       out.push(...hands(sk, v));
       out.push(...phone(sk, v));
       break;
@@ -178,7 +179,7 @@ function outfit(p: Person, sk: Skeleton, v: View): Part[] {
       out.push(...trousers(sk, v, 'jeans', 'wide', 644, {hemDrop: 30}));
       out.push(forearm(sk, 'l', v), forearm(sk, 'r', v));
       out.push(...bigShirt(sk, v, 'shirt', 644));
-      out.push(...sleeves(sk, v, 'shirt', {r: [35, 32, 29], drop: 12, end: 0.42, cuff: 20}));
+      out.push(...sleeves(sk, v, 'shirt', {r: [35, 32, 29], drop: 12, end: 0.42, cuff: 20, body: 'shirt'}));
       out.push(...hands(sk, v));
       break;
     }

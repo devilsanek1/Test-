@@ -115,7 +115,8 @@ const nearSide = (r: HeadRig) => (faceYaw(r) >= 0 ? 1 : -1);
  *  bowed down with the outer end flicking up and back; open = straighter. An OPEN path (a true line). */
 export function lashLine(r: HeadRig, v: View, open = false, lower = 0, far = false): PP[] | null {
   const fy = Math.abs(faceYaw(r));
-  if (fy > 160 || (!far && fy < 8) || (far && fy > 62)) return null;
+  // past ~112 degrees the eye is behind the cheek: the lost profile's flick takes over (lostFlick)
+  if (fy > 112 || (!far && fy < 8) || (far && fy > 62)) return null;
   const s = far ? -nearSide(r) : nearSide(r);
   const pts: PP[] = [];
   const n = 7;
@@ -250,7 +251,7 @@ export function lipTone(r: HeadRig, v: View): PP[] | null {
 export function lostFlick(r: HeadRig, v: View): PP[] | null {
   const fa = faceYaw(r);
   const fy = Math.abs(fa);
-  if (fy < 100 || fy > 145) return null;
+  if (fy <= 112 || fy > 148) return null;
   const dir = fa >= 0 ? -1 : 1;
   // the cheek's contour at the eye's height: the visible point furthest toward where the face looks
   let best: V2 | null = null;

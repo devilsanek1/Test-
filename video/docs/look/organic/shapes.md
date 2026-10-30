@@ -1,7 +1,7 @@
 # ORGANIC shapes: why our design reads "too square and proper", measured, and the rules that close it (research, 2026-10-30)
 
 The owner (2026-10-30), on our list of the 10 biggest differences between still v6 and the references: "5 and 6 and 7
-think that's the biggest difference we need to find a way to solve properly. It feels like a lot of our design is too
+think that’s the biggest difference we need to find a way to solve properly. It feels like a lot of our design is too
 square and proper like I can see shapes and angles very clearly while references are obviously not like that. They are
 more regular more naturally blend Do deep research into techniques libraries etc" (5 = brushwork with intent, 6 =
 shape variety and rhythm, 7 = lost-and-found edges); "8 agreed this is an important point about scene composition";
@@ -221,8 +221,9 @@ along the same outline, with jags and dry-brush breaks (2.6 times our corners pe
 | clear geometric | **62** | 2.6 [0-5.1] | 105 [10-179] |
 
 Reading: our tree is drawn like a poster tree (crisp, many small clumps; the straight edges in its crop are the trunk
-and the wall behind it) but sits in a frame whose other natural pieces are painted: "a weird looking tree ... doesn't fit the style there" (the owner, on
-v6). The painted trees are a few medium masses with soft, lost edges and half the edge density.
+and the wall behind it) but sits in a frame whose other natural pieces are painted: "it is weird looking tree we have
+on the forefront like it doesn’t fit the style there" (the owner, on v6). The painted trees are a few medium masses
+with soft, lost edges and half the edge density.
 
 ### 2.4 Building
 
@@ -243,9 +244,9 @@ v6). The painted trees are a few medium masses with soft, lost edges and half th
 
 Reading: the facade is, with the paving and the low sky, among the most geometric of the 54 crops: a frontal
 elevation (62 % of its edges on the axes), a grid of near-identical rectangles (mirror IoU 0.78), ruler edges as one
-clean step. Its curvature comes in spikes (rounded rectangle corners) and zeros (rulers): the 5.5 variance. The references' buildings are just as man-made and still
-read hand-made: their straight edges are shorter (6 % ruler), broken along their length (58 % broken), seen at an
-angle, and nothing repeats.
+clean step. Its curvature comes in spikes (rounded rectangle corners) and zeros (rulers): the 5.5 variance. The
+references' buildings are just as man-made and still read hand-made: their straight edges are shorter (6 % ruler),
+broken along their length (58 % broken), seen at an angle, and nothing repeats.
 
 ### 2.5 Ground
 

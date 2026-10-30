@@ -89,6 +89,18 @@ export const EdPerson: React.FC<PersonProps> = ({x, y, h, person, pose, flip = f
   const defs: React.ReactNode[] = [];
   const clipNeeded = new Set<string>();
   parts.forEach((p) => p.clip && clipNeeded.add(p.clip));
+  // union clips: a garment's outline plus everything below a line (sleeve caps inside their shoulders)
+  parts.forEach((p) => {
+    if (!p.clipBelow) return;
+    const q = byK.get(p.clipBelow.k);
+    if (!q) return;
+    defs.push(
+      <clipPath key={`cb-${p.k}`} id={pid(`clipb-${p.k}`)}>
+        <path d={pathOf(q.pts, true, q.tension ?? 0.5)} />
+        <rect x={-4000} y={p.clipBelow.y} width={8000} height={8000} />
+      </clipPath>,
+    );
+  });
   clipNeeded.forEach((k) => {
     const q = byK.get(k);
     if (q) defs.push(<clipPath key={`c-${k}`} id={pid(`clip-${k}`)}><path d={pathOf(q.pts, true, q.tension ?? 0.5)} /></clipPath>);
@@ -106,7 +118,7 @@ export const EdPerson: React.FC<PersonProps> = ({x, y, h, person, pose, flip = f
   for (const p of parts) {
     const r = ramps[p.mat] ?? ramp('#FF00FF');
     const d = pathOf(p.pts, !p.line, p.tension ?? 0.5);
-    const clip = p.clip ? `url(#${pid(`clip-${p.clip}`)})` : undefined;
+    const clip = p.clip ? `url(#${pid(`clip-${p.clip}`)})` : p.clipBelow && byK.has(p.clipBelow.k) ? `url(#${pid(`clipb-${p.k}`)})` : undefined;
     if (p.line) {
       const col = fillAll ?? r[p.tone === 'form' || !p.tone ? 'base' : p.tone];
       body.push(<path key={p.k} d={d} fill="none" stroke={col} strokeWidth={p.line} strokeLinecap="round" strokeLinejoin="round" clipPath={clip} />);

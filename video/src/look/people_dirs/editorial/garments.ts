@@ -3,7 +3,7 @@
 // design_research C3), ONE roomy piece per figure against compact ones (C2), dropped shoulders on coats, knits and
 // shirts (C4), current lengths (C5) and cuts (C6), and one finish detail each (C9): the open coat's lapels, the
 // cardigan's ribbed hem, the shirt's half-tuck, the jacket's open front, the jeans' clean hem on the shoe.
-import {type PP, type Sec, type SecKey, type V2, type V3, type View, add3, clamp, lerp, loftOutline, pchip, proj, region, ringExtent, sections, surf, tubeOutline} from './core';
+import {type PP, type Sec, type SecKey, type V2, type V3, type View, add3, clamp, lerp, loftOutline, pchip, proj, region, ringExtent, sections, spindle, surf, tubeOutline} from './core';
 import type {Build, Side, Skeleton} from './body';
 import {legRadius} from './body';
 import {type Part, Z} from './parts';
@@ -199,6 +199,16 @@ export function coat(sk: Skeleton, v: View, mat = 'coat', hemY = 268): Part[] {
   // the back vent: a slim shade sliver from the hem up the centre back
   const vent = region(secs, v, 380 - sk.bob, hemY + 2 - sk.bob, (y) => [268, 272 + (1 - (y + sk.bob - hemY) / (380 - hemY)) * 3], sk.leanXf, 1, 6);
   if (vent) parts.push({k: 'vent', pts: vent, mat, tone: 'deep', z: Z.outerDetail, clip: 'coat', tension: 0.2});
+  // two drop folds hanging from the shoulder blades to the hem (C7: wool keeps few, long folds), seen from behind
+  for (const [phi, y0, w] of [
+    [236, 690, 13],
+    [306, 650, 11],
+  ] as [number, number, number][]) {
+    const a = surf(secs, y0 - sk.bob, phi, v, sk.leanXf, 0.5);
+    const e = surf(secs, hemY + 8 - sk.bob, phi + (phi < 270 ? -4 : 4), v, sk.leanXf, 0.5);
+    if (!a.vis || !e.vis) continue;
+    parts.push({k: `coatFold${phi}`, pts: spindle(a.p, e.p, w, 0.72, 2), mat, tone: 'shade', z: Z.outerDetail - 0.2, clip: 'coat', tension: 0.5, op: 0.55});
+  }
   return parts;
 }
 
@@ -364,7 +374,32 @@ export function trousers(sk: Skeleton, v: View, mat: string, cut: 'straight' | '
     const ru = pchip([0, 0.1, 0.45, 0.6, 1], [R[0] * 1.03, R[0], (R[0] + R[1]) / 2, R[1], R[2]]);
     const pts = tubeOutline([top, K, hem], (u) => ({ru: ru(u), rv: ru(u) * 1.04}), v, [0, 0, 1], {m: 34, capEnd: false});
     const d = proj(K, v).d - proj(sk.leanXf([sk.cx(b.chestY), b.chestY, 0]), v).d;
-    parts.push({k: `${mat}Leg_${s}`, pts: crisp2(pts), mat, z: d < 0 ? Z.farLeg + 2 : Z.lower - 1, tension: 0.45, grp});
+    const zl = d < 0 ? Z.farLeg + 2 : Z.lower - 1;
+    parts.push({k: `${mat}Leg_${s}`, pts: crisp2(pts), mat, z: zl, tension: 0.45, grp});
+    // one fold per leg (C7): a long drop fold down a wide leg, a pressed crease down a tailored one; in a stride, the
+    // pull from the crotch to the forward knee
+    const P = (q: V3): V2 => {
+      const r = proj(q, v);
+      return [r.x, r.y];
+    };
+    const kS = P(K);
+    const hS = P(hem);
+    const tS = P(top);
+    const walking = sk.pose.walk !== undefined;
+    const fwd = walking && K[2] > 30;
+    if (fwd) {
+      const c = P([lerp(top[0], sk.cx(yTop), 0.8), yTop - 10, top[2] + 8]);
+      parts.push({k: `${mat}Pull_${s}`, pts: spindle(c, [lerp(c[0], kS[0], 0.92), lerp(c[1], kS[1], 0.92)], 10, 0.35, 3), mat, tone: 'shade', z: zl + 0.2, clip: `${mat}Leg_${s}`, tension: 0.5, op: 0.65});
+    } else if (cut !== 'straight' || b.sex === 'm') {
+      // along the leg, a third of the way in from its shade side
+      const ax: V2 = [hS[0] - kS[0], hS[1] - kS[1]];
+      const L = Math.hypot(ax[0], ax[1]) || 1;
+      const nn: V2 = [-ax[1] / L, ax[0] / L];
+      const off = (cut === 'wide' ? 0.35 : 0.18) * ru(0.6) * (nn[0] > 0 ? 1 : -1);
+      const a: V2 = [lerp(tS[0], kS[0], cut === 'wide' ? 0.55 : 0.3) + nn[0] * off, lerp(tS[1], kS[1], cut === 'wide' ? 0.55 : 0.3) + nn[1] * off];
+      const e: V2 = [hS[0] + nn[0] * off * 1.2, hS[1] - 6 + nn[1] * off * 1.2];
+      parts.push({k: `${mat}Fold_${s}`, pts: spindle(a, e, cut === 'wide' ? 11 : 6, 0.62, cut === 'wide' ? 2 : 0), mat, tone: 'shade', z: zl + 0.2, clip: `${mat}Leg_${s}`, tension: 0.5, op: cut === 'wide' ? 0.6 : 0.5});
+    }
   }
   return parts;
 }

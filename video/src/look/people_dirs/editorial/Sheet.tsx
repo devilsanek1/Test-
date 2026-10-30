@@ -15,7 +15,7 @@ import type {Pose} from './body';
 import plate from './door_v6_plate.png';
 
 export const SHEET_W = 2400;
-export const SHEET_H = 2760;
+export const SHEET_H = 2800;
 
 const INK = '#3A2E2C';
 const SOFT = '#8A7670';
@@ -52,7 +52,7 @@ const HER_SERENE: Person = {...HER_EVENING, face: {lash: 'closed', planes: true}
 const FACES: (Fig & {span?: number})[] = [
   {p: HER_EVENING, pose: POSES.herEveningProfile, label: 'profile line', sub: '+ one lash, open'},
   {p: HER_SERENE, pose: {...POSES.herEveningFront, head: {turn: -8, nod: 14, roll: 3}}, label: '3/4, eyes lowered', sub: 'two lashes, a nose shade, a lip tone'},
-  {p: HER_EVENING, pose: POSES.herEveningBack, label: 'lost profile', sub: 'the cheek, a lash flick'},
+  {p: HER_EVENING, pose: POSES.herEveningBack, label: 'lost profile', sub: 'the cheek between the hair'},
   {p: HER_WEEKEND, pose: POSES.herWeekendFront, label: '3/4, sunglasses', sub: 'oversized, one glint'},
   {p: HER_WEEKEND, pose: POSES.herWeekendProfile, label: 'profile, sunglasses', sub: 'the ear free'},
   {p: HER_WEEKEND, pose: POSES.herWeekendBack, label: 'from behind', sub: 'hair is the face'},
@@ -136,7 +136,7 @@ export const EdSheet: React.FC = () => {
   const colA = [190, 560, 900, 1340, 1700, 2070];
   const yB = 1080;
   const feetB = yB + hA + 44;
-  const yC = 1880;
+  const yC = 1924;
   return (
     <AbsoluteFill style={{background: PAPER}}>
       <svg width={SHEET_W} height={SHEET_H} viewBox={`0 0 ${SHEET_W} ${SHEET_H}`}>
@@ -208,27 +208,20 @@ export const EdSheet: React.FC = () => {
         {/* B: her in the painted still v6's doorway */}
         <g>
           <T x={1730} y={yB + 4} s={24} w={700}>
-            In the painted still v6, the doorway (x1.43)
+            In the painted still v6, at the doorway (x2)
           </T>
-          <svg x={1724} y={yB + 24} width={658} height={472} viewBox="0 0 460 330">
+          <svg x={1724} y={yB + 24} width={660} height={620} viewBox="40 20 330 310">
             <image href={plate} x={0} y={0} width={460} height={330} />
             <EdPerson x={246} y={288.5} h={156} person={HER_EVENING} pose={POSES.herDoor} flip shadow="#B49582" />
           </svg>
-          <T x={1730} y={yB + 532} s={19} c={SOFT}>
-            She steps out in profile, 156 px tall in the frame
+          <T x={1730} y={yB + 676} s={19} c={SOFT}>
+            She steps out in profile, 156 px tall in the 1080 x 1920 frame
           </T>
-          <T x={1730} y={yB + 558} s={19} c={SOFT}>
-            (the still's own her painted out of the plate).
+          <T x={1730} y={yB + 700} s={19} c={SOFT}>
+            (the still's own her painted out of the plate). Hero colour: teal
           </T>
-          <rect x={1730} y={yB + 590} width={640} height={1} fill="#DDD2C8" />
-          <T x={1730} y={yB + 626} s={19} c={SOFT}>
-            Hero colour: teal {TEAL} on her only, on one piece
-          </T>
-          <T x={1730} y={yB + 652} s={19} c={SOFT}>
-            per outfit (never the biggest mass). Everyone else:
-          </T>
-          <T x={1730} y={yB + 678} s={19} c={SOFT}>
-            tonal neutrals + at most one accent.
+          <T x={1730} y={yB + 724} s={19} c={SOFT}>
+            {TEAL} on her only, one piece per outfit, never the biggest mass.
           </T>
         </g>
 

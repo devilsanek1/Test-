@@ -723,3 +723,23 @@ export function scallop(pts: PP[], o: {period: number; amp: number; where: (p: V
     return [p[0] + N[i][0] * d, p[1] + N[i][1] * d] as PP;
   });
 }
+
+/** A fold: a tapered spindle from a to b (screen units), widest at `peak` (0..1 along it), its middle bowed sideways
+ *  by `bow` (design_research C7: folds are value slivers, never lines). */
+export function spindle(a: V2, b: V2, w: number, peak = 0.4, bow = 0): PP[] {
+  const d: V2 = [b[0] - a[0], b[1] - a[1]];
+  const L = Math.hypot(d[0], d[1]) || 1;
+  const t: V2 = [d[0] / L, d[1] / L];
+  const n: V2 = [-t[1], t[0]];
+  const side = (sgn: number): PP[] => {
+    const out: PP[] = [];
+    for (let i = 1; i < 8; i++) {
+      const u = i / 8;
+      const prof = u < peak ? Math.sin((Math.PI / 2) * (u / peak)) : Math.cos((Math.PI / 2) * ((u - peak) / (1 - peak)));
+      const off = sgn * (w / 2) * prof + bow * Math.sin(Math.PI * u);
+      out.push([a[0] + d[0] * u + n[0] * off, a[1] + d[1] * u + n[1] * off]);
+    }
+    return out;
+  };
+  return [[a[0], a[1]], ...side(1), [b[0], b[1]], ...side(-1).reverse()];
+}
