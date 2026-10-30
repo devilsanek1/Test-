@@ -271,7 +271,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   think I like it really it's more detailed yes but it's incoherent like it's not a proper haircut and more like a
   person woke up and that's what we see like not stylish and not clean compare it deeper with our references if they
   look more clean and stylish" -> the forward neck reverted (the head stacked over the shoulders); the hair rebuilt as a
-  proper, clean cut with one flow and a touch of looseness, measured against the references; people iteration 3.
+  proper, clean cut with one flow and a touch of looseness, measured against the references; people iteration 3
+  (`hair_v2/V3.md`: v2 had no real cut, locks waving their own ways, random tips, ~14 inner marks, the head at ~58 deg;
+  v3: 2-5 big shapes in one flow, alike tips, one loose bit at most, the neck ~73 deg); the page updated (version 2).
   -> rule: playbook, Visual style (hair inside a proper, stylish, clean haircut; the upright neck).
 - 2026-10-30 ~17:10 UTC: "Another next point is the fade profile should be cute and like super appealing by modern
   standards / Do the research if what makes the faces beautiful and cute and appealing like general face features and
