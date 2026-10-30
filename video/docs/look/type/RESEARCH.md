@@ -138,7 +138,8 @@ references, measured (`refs/README.md`).
 **How:** every candidate was rendered with Pillow from the `@fontsource` woff2 files (`scripts/type/.fonts/`, OFL or
 Apache) against the reference crops, at the reference's x-height and tracked to its spacing, then measured with the same
 code on both (stroke = the median of the shorter run through each ink pixel; x-height and cap from the letters of
-"Sometimes"). Sheets: `stills/` gets the in-scene versions; the working sheets were scratch.
+"Sometimes"). The working comparison sheets were scratch; the in-scene versions are job 2's stills (`stills/`, listed in
+`TYPE_GUIDE.md` §h).
 
 **The references, measured (crop px):** ref 1 "Sometimes": cap (S) 130, x-height 53.5, stroke 9.0 = **6.9 % of the cap**,
 x-height **0.41 of the cap** (low: tall caps and ascenders), round o (0.94 x-height wide), gaps 0.45 x-height. Ref 2:
@@ -188,11 +189,13 @@ Sedgwick Ave read as street or grunge, and Yellowtail, Damion and Satisfy as ret
 1. **The hand:** Gaegu Light (warm, hand-made) or Mali Light (cleaner)? Still 3 shows both on one moment, beside Zen
    Kurenaido (the closest feel, ruled out by its "Al").
 2. **The landing word in the brush:** yes for the film's 3-5 key words and numbers (WANTS, 40, 70,000), or keep every word
-   in the hand and mark stress by colour only? Still 7 shows the same moment both ways.
+   in the hand and mark stress by colour only? Stills 2 and 7 show the same moment both ways.
 3. **The brush write-on** (the landing word painted on in 10-16 frames, led by the brush tip, the way frame 0 paints the
    scene): it shows part-letters for a few frames. Is that "painted", or too close to the clipped reveal you ruled out?
    (Proposal: allowed only for the landing word and the lettered phrase; every other word pops whole.)
 4. **Placement:** words follow the beat's open space (above the subject by default, beside it in close shots), or stay
    in one band with only the stagger varying? Stills 1 and 2 show the before and the after on one moment.
-5. **The cover:** the core line in the hand with its key word in the brush (no peach box), or the brush title + hand
-   subline lockup of ref 2? Still 12.
+5. **The cover:** the core line in the hand with its key word in the brush, no peach box (still 11), or in the posters'
+   thin geometric caps (still 12)? (Ref 2's brush-title-over-hand lockup is kept for a series title, once there is one.)
+6. **Three steps of size** (the hook and the payoff's last group at 136 px, everyday 116 px, the brush 200-260 px): enough
+   contrast to feel dynamic, or should the everyday words be bigger still (fewer words per line, more two-row groups)?
