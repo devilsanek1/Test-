@@ -78,6 +78,12 @@ Maintenance at the end).
   v2 take 1, 2026-10-26).
 
 ## Music and sound
+- **Sync picture to sound ON PURPOSE.** Cuts, camera moves and key actions land on the sound's beats, hits and the
+  voice's stresses where that adds energy or meaning, and NOT everywhere: we already do it "decently okay", now it is a
+  researched, named practice with a rule for where it fits (`docs/look/refs_sound_sync/`; the research is queued). —
+  ("the research distill and practice of syncing the video and shots with with sounds ... We already do this and I think
+  decently okay we just need to be more intentional and educated about this effect and where it make sense to use",
+  2026-10-30.)
 - **Music: cinematic but subtle, especially at the start.** The voice and the hook carry the opening. — (v1).
 - **Mix to -14 LUFS / -1 dBTP, voice always on top**; SFX land on visual hits. — (v1).
 - **More sound effects, especially ones people link with something good on their phone** (like pop, notification ding,

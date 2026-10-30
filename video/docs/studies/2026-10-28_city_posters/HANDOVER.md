@@ -6,6 +6,14 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-30 ~12:50 UTC: organic synthesis + composition research running; sound sync queued
+- organic-look (run `wf_238386b4-a11`): every part and both proofs DONE; only ORGANIC.md (the synthesizer) re-running.
+- composition-shots (run `wf_de6ab90a-e93`): research (the owner's reels, cinema and animation layout, vertical) ->
+  `video/docs/look/COMPOSITION_SHOTS.md` (the shot library) -> `docs/look/composition/shots_sheet.png` (value thumbnails).
+- QUEUED next (owner): the sound-sync research, distill and practice (`video/docs/look/refs_sound_sync/`, two reels with
+  audio; playbook "Sync picture to sound ON PURPOSE").
+- Then: painter v7 from ORGANIC.md + composition + people C (LASH) on scene 1.
+
 ## Status 2026-10-30 ~10:10 UTC: QUEUED next (owner): research + distill the composition shots
 - Owner: "After we are done with this I want you to do another research and distill of the composition shots to use /
   Take a look at this folder I collected some initial references but do the deeper research" (Drive folder, 5 reels,
