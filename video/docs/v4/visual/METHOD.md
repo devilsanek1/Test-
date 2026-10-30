@@ -212,3 +212,9 @@ For the orchestrator to apply and commit (this agent edits no other doc). Each O
   `docs/v4/visual/METHOD.md`), and G3 plays it." `HANDOFF.md`: the same step in its queue.
 - This page is generic: once the owner approves v4's visual script, it may move to `docs/VISUAL_SCRIPT_METHOD.md`
   (beside `G3_ANIMATIC.md`), with the pointers above updated.
+
+**Delivery (2026-10-30):** the owner reads the visual script on a phone page with the locked voice built in, one card
+per shot (its one-line read from "At a glance", its words, the full shot folded), built by
+`python3 video/scripts/docs/visual_script_page.py docs/vN/visual/VISUAL_SCRIPT.md page.html --title "<Film> Visual
+Script" --stage "Video N · G2.5 visual script" --headline "<core line>"` and published with the Artifact tool (the take as
+files `take.mp4` + `take.mp3`); v4's: https://claude.ai/artifact/S19LGg8LL9Ut63wAnYHRAb

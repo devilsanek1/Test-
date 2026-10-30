@@ -27,7 +27,9 @@ evolving), workflow `v4-visual-script` -> `docs/v4/visual/` (research, method, c
 **G2.5 VISUAL SCRIPT SENT (2026-10-30 ~00:45 UTC), waiting on the owner:** `docs/v4/visual/VISUAL_SCRIPT.md` (v2, after
 the cold read and the critic: 12 shots on the take's clock, concept B "the designed view" with grafts from A and C; the
 judges split, story C, craft B; B written on the combined score: `METHOD.md` step 2); 2 owner questions (the un-draw
-after the hook; the computer's size). The new step is in PIPELINE_V2 (G2.5), G3_ANIMATIC §5, DIRECTION, CLAUDE.md.
+after the hook; the computer's size). The new step is in PIPELINE_V2 (G2.5), G3_ANIMATIC §5, DIRECTION, CLAUDE.md. The owner reads it on the page
+https://claude.ai/artifact/S19LGg8LL9Ut63wAnYHRAb (`scripts/docs/visual_script_page.py`: one card per shot, the voice
+built in, each shot playable).
 
 Earlier: **G1 LOCKED (owner, 18:40 UTC: "i think this is a much better yes"). G2 TAKE SENT (2026-10-29 ~19:20 UTC), waiting on the
 owner:** `assets/v4/voice/take.wav` (Lady1, eleven_v4 at stability 0.35, the livelier-tag paste, whole read, shaped by
