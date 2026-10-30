@@ -7,7 +7,9 @@ points and conclusions into the main repo"). The brief is `README.md` here; the 
 `video/docs/look/poster_refs/README.md`.
 
 ## Status 2026-10-30 ~12:50 UTC: organic synthesis + composition research running; sound sync queued
-- organic-look (run `wf_238386b4-a11`): every part and both proofs DONE; only ORGANIC.md (the synthesizer) re-running.
+- organic-look DONE: `video/docs/look/ORGANIC.md` (the v7 roadmap §6; 27 doc clashes §8; 3 owner questions at the end
+  of §8: the dark key T1/T3, turning the Google wing, the paint/paper doses, asked WITH the v7 sheet). A docs agent is
+  reconciling the clashes now (except D3, the darks, which waits for the owner's key pick).
 - composition-shots (run `wf_de6ab90a-e93`): research (the owner's reels, cinema and animation layout, vertical) ->
   `video/docs/look/COMPOSITION_SHOTS.md` (the shot library) -> `docs/look/composition/shots_sheet.png` (value thumbnails).
 - QUEUED next (owner): the sound-sync research, distill and practice (`video/docs/look/refs_sound_sync/`, two reels with
