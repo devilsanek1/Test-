@@ -666,6 +666,12 @@ Maintenance at the end).
   into; drifting toward the reference's style reads cheap. — ("I don’t like this we are going away in style i think
   it’s too cheap looking ... So I think our initial angle snd the view frankly wasn’t bad", on the scene-1 still v2,
   2026-10-29).
+- **A distillation accounts for EVERY reference item.** When we distil the owner's references (reels, pictures, a
+  folder), the result carries a coverage table: each item the references show is either USED (where, visibly), ADAPTED
+  (how, for 9:16 and our rules) or REJECTED (why), and every used item is visible in the output, not buried as a side
+  note. — ("Wait how many of the ones mentioned in the references you actually took ? I don’t see leading lines or
+  vanishing point or frankly most of the references are not there?", on the composition shot library, 2026-10-30:
+  it named only 25 of the reels' 41 ideas, most as side notes under story-beat recipes.)
 - **Research the recipe before building a look element.** When a reference shows a look we can't yet make (a painted
   sky, layered clouds, water, foliage), first study it closely (crops, measured values, palette, edges, stroke sizes,
   layer order, softness by depth) and research how professional painters do it, then write a CONCRETE, numbered recipe
