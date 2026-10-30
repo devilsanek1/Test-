@@ -145,10 +145,13 @@ nearly as written; the hand file differs where judgement beat the rules).
 
 ## Checks and tests
 
-- `node scripts/captions2/render_test.mjs [--times=..] [--src=..] [--bg=..|none] [--capcheck] [--debug]`: bundles only
-  `demo/entry.tsx` (composition `Captions2Test`, 60 fps) with a scratch public dir (the fonts, the file, the
+- `node scripts/captions2/render_test.mjs [--times=..] [--src=..] [--bg=..|none] [--capcheck] [--debug]
+  [--comp=Captions2Cover]`: bundles only `demo/entry.tsx` (60 fps) with a scratch public dir (the fonts, the file, the
   background: `scripts/type/bg/bg_night.png` by default), renders the times to `out/v4/captions2_test_<t>.png` (+
-  `_phone.jpg`), and with `--capcheck` the mask and bare passes and the list for capcheck. ~10 s for ten frames.
+  `_phone.jpg`), and with `--capcheck` the mask and bare passes and the list for capcheck; ~10 s for ten frames.
+  `--comp=Captions2Cover --bg=scripts/type/bg/bg_night_cover.png` draws R10 (matches the type still 11 to a sub-pixel)
+  and the R7 word on a plain tag. The 2026-10-30 run: `out/v4/captions2_test_*.png`, `captions2_test_sheet.jpg` (ten
+  moments at the 0.25 glance scale), `captions2_cover_27_700.png`.
 - `python3 scripts/capcheck.py <list> --words [--min=4.5] [--captions=<file>]`: every word's colour against the BARE
   frame's pixels 2-20 px from its own glyphs (the type stills' method); FAIL when more than 5 % is under 4.5:1. It
   switches to this mode by itself on a captions2 mask; the old SkyCaptions mode (3:1) is unchanged.
@@ -206,7 +209,7 @@ held to frame 2515). The cover: R10. Calls and flags, for the G3 watch (each in 
 | `types.ts` | the caption file and the layout types |
 | `recipes.json` | the guide's numbers: tones, styles, seats, the type frame, motion, recipes R1-R10 |
 | `index.ts` | the exports |
-| `demo/entry.tsx` | `Captions2Test`: the file over a still background (render_test.mjs) |
+| `demo/entry.tsx` | `Captions2Test` (the file over a still background) and `Captions2Cover` (R10 and R7), for render_test.mjs |
 | `scripts/captions2/build_captions.py` | the builder (groups file -> caption file, the checks) and the proposer |
 | `scripts/captions2/v4_groups.txt`, `v4_hints.txt` | video 4's groups (hand-reviewed) and the proposer's hints |
 | `scripts/captions2/measure.mjs` | Chromium ink metrics for the builder (cached in `node_modules/.cache/captions2/`) |
