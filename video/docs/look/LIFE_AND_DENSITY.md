@@ -165,8 +165,10 @@ references and primitives, never the film's people.
   video"; reference 1's cat and v1's Pip were in every shot, which is no longer the rule). Default: the channel's mascot **Pip**
   (another character only if the story asks for it, named in the W1 world bible and seen by the owner at G3),
   drawn new in the film's design (playbook: no reusable assets; `src/lib/mascot` and `docs/mascot.md` are the reference
-  and the API), in a colourway for the video's palette that stays its own hue (ΔE76 >= 20 from
-  every ground it sits on, never the hero or the pop colour) and in tier B (`CRAFT.md` §b: C* <= 25, no outline: its
+  and the API), in a colourway for the video's palette that stays its own hue (never the hero or the pop colour; ONE
+  rule with `ORGANIC.md` R12: ΔE76 >= 20 from the field it is seen against, so a second look finds it, while its value
+  stays close to the seat it sits in, so at a squint it joins that mass and makes no call; video 4: lavender, L* 56,
+  on its balcony's snow, L* 60, ΔE ~15, seen against the slate facade, ΔE ~39: `docs/v4/WORLD_BIBLE.md` §1.1, §7) and in tier B (`CRAFT.md` §b: C* <= 25, no outline: its
   lit and shade faces part its shapes, as on everything since 2026-10-29) unless the line is about it. A non-character anchor may join it (snow, the weather; the sun is light, never a
   character: `CRAFT.md` §d.1).
 - **Jobs (since 2026-10-28: hidden, not a guide):** (1) hide in a spot that belongs to the world (in a window, on a
