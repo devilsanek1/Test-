@@ -6,6 +6,8 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-30 17:45 UTC: both runs re-launched after the 17:40 reset (the 17:25 launch hit the limit at once; same run IDs, RESUMING notes added)
+
 ## Status 2026-10-30 17:25 UTC: resumed after the 5-hour reset (owner: "restart when the limit is reset")
 - RUNNING: workflow `composition-library-v2` (run `wf_6be51888-82f`, script
   `/root/.claude/projects/-home-user-Test-/fe339b66-57f0-5b47-bb6a-872d2f15f4c0/workflows/scripts/composition-library-v2-wf_6be51888-82f.js`):
