@@ -231,7 +231,9 @@ Everything that agent knew is in this repo. This file is the map; the details li
   (hair as authored shapes on a spring rig `src/look/people_dirs/hair_v4/`, faces redrawn `people_v4/`, assembled
   `entry-look-people-v4.tsx`; stills `people_design/hair_v4/final/`) sent on the same page (version 3) with the bodies
   marked not done; the bodies round runs (`people_design/bodies_v4/`). Waiting on the owner: hair on track? LASH or
-  open eyes? Then PEOPLE_DESIGN gets the picked system.
+  open eyes? Then PEOPLE_DESIGN gets the picked system. **Picked (2026-10-30):** hair v4 kept, open eyes, the bodies
+  round kept ("let's go with that for now"): PEOPLE_DESIGN's status block names the code; wiring it into the film
+  engine is the tooling lane's, before v4's G3 draws its person.
 
 ### Earlier: video 5 as the heat story
 - **Video 5 is produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt since 2026-10-29 ~07:55 UTC**

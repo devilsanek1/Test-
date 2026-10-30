@@ -430,7 +430,12 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   LASH (closed-eye lash lines and a small soft nose; the contour only under ~200 px; sunglasses and caps as some
   people's accessories; her often turned away), kept for now and to be iterated later ("It’s better let’s keep it for
   now / We will iterate more later on"; "Let’s keep lash", 2026-10-30; `docs/look/PEOPLE_DESIGN.md`). Superseded the
-  same day by the redrawn faces with OPEN EYES looking away ("Let's do open eyes", on the overhaul's stills). — ("Yes then people I think we should target 20-30 yo today with styles that are just cool and
+  same day by the redrawn faces with OPEN EYES looking away ("Let's do open eyes", on the overhaul's stills). THE
+  PEOPLE IN USE FOR NOW (2026-10-30): hair v4 (authored shapes on a spring rig), the redrawn faces with open eyes, and
+  the rebuilt bodies (poses with weight, simple real hands, clothes with fit and folds, slim modern proportions;
+  `docs/look/PEOPLE_DESIGN.md` status block) — ("I think it is a bit better overall I think yes let's go with that for
+  now"); to iterate later (her stance's attitude, the coat's far panel, the rail grip, the ground pose, the head
+  turn's face swap). — ("Yes then people I think we should target 20-30 yo today with styles that are just cool and
   appealing to look at so think instagram infkuebcers, New York, Los Angeles, including hair clothing and perhaps less
   of faces like faces we need to find a way to draw in a more generic way"; "Let’s land version 6 first", 2026-10-30.) — ("Another bit is humans we paint - they should be better /
   These are the references especially the video / On the video the person is not substantially different than yours

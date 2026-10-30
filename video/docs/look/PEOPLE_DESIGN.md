@@ -1,5 +1,13 @@
 # PEOPLE_DESIGN: how we draw people (direction C with the LASH face, in use for now)
 
+**IN USE FOR NOW (owner, 2026-10-30: "I think it is a bit better overall I think yes let's go with that for now"):
+the people of the overhaul: hair v4 + the redrawn faces with OPEN EYES + the rebuilt bodies** (assembled in
+`src/entry-look-people-bodies4.tsx`: `people_dirs/people_v4/` (heads, faces, `skel5.ts`, `hand5.ts`, `body5.ts`) and
+`people_dirs/hair_v4/` (the hair rig, `asm_*.ts`); stills `people_design/bodies_v4/stills/` and `hair_v4/final/`). To
+iterate later: her standing stance's attitude, the coat's far panel, the rail grip, the ground pose, the head turn's
+face swap, her bag. They are look-study code: wiring them into the film engine (the figure component a film imports)
+is the tooling lane's, before a film draws anyone with them. The details below, as they were written:
+
 **UPDATE (2026-10-30, the people overhaul): the HAIR in use for now is hair v4** ("Hair is a bit cleaner let's keep it
 for now"): each cut authored as a few smooth shapes (back, cap, front, 0-2 strands; one shadow shape, one highlight,
 soft shading) on a 2D rig (the cap rigid on the head, the hanging pieces skinned to 4-6-bone spring chains), six cuts

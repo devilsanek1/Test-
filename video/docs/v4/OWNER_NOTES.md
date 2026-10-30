@@ -315,3 +315,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   link): natural poses (contrapposto, walk, lean, ledge, ground), authored hands, six looks with fit and folds, the
   open eyes in; rough spots named (her calm stance, the coat's far panel, the rail grip, the ground pose, the turn's
   face swap, the bag) (`docs/look/people_design/bodies_v4/`).
+- 2026-10-30 ~20:15 UTC, on page version 4: "I think it is a bit better overall I think yes let's go with that for now"
+  -> the people in use for now: hair v4 + the redrawn faces with open eyes + the rebuilt bodies (PEOPLE_DESIGN status
+  block; the playbook); the rough spots stay on the list for later; video 4's person near the camera (S1, S11, S12)
+  is drawn with them. -> rule: playbook, Visual style (the people in use for now).
