@@ -17,6 +17,7 @@ import {rimOf, tone, skinTone, hairTone, lch, fromLch, type Tone} from '../graph
 import type {Built, Part} from '../graphic/part';
 import {hairV2, type HairView} from './hair';
 import {CUTS, type Cut} from './cuts';
+import {CUTS3} from './cuts3';
 import {CALM, type HairState} from './states';
 import {WOMAN_V2, MAN_V2, build as buildOf, skelV2, standV2, walkV2, backV2, armAt, shoulderOf, heightNumbers, yMap, type PoseV2, type SkelV2, type BuildName} from './stance';
 
@@ -136,13 +137,17 @@ function herArms(view: View, b: Build): (chest: Frame) => PoseV2['arms'] {
   };
 }
 
-export type HerOpts = {view: View; state?: HairState; px?: number; cut?: Cut; face?: FaceOpt; tone?: Tone; headYaw?: number};
+/** ver: 2 = the v2 stills as rendered (the cut library cuts.ts, the head forward); 3 = after the owner's note (the
+ *  clean cuts of cuts3.ts, the head stacked on an upright neck). The default stays 2 so HvS1-HvS7 reproduce. */
+export type Ver = 2 | 3;
+export type HerOpts = {view: View; state?: HairState; px?: number; cut?: Cut; face?: FaceOpt; tone?: Tone; headYaw?: number; ver?: Ver};
 
 export function herV2(o: HerOpts): Built {
   const view = o.view;
   const b = WOMAN_V2;
   const arms = herArms(view, b);
-  const pose = view === 'q' ? standV2(b, arms, {headYaw: o.headYaw ?? 20}) : view === 'p' ? walkV2(b, arms) : backV2(b, arms, o.headYaw ?? 30);
+  const up = o.ver === 3;
+  const pose = view === 'q' ? standV2(b, arms, {headYaw: o.headYaw ?? 20, upright: up}) : view === 'p' ? walkV2(b, arms, {upright: up}) : backV2(b, arms, o.headYaw ?? 30, up);
   const sk = skelV2(pose);
   const c = cam(YAW_V2[view]);
   const parts: Part[] = [];
@@ -177,15 +182,16 @@ export function herV2(o: HerOpts): Built {
   }
   const H = headV2(sk, c, SKIN.s2, {face: o.face ?? 'lash', hair: HAIR.copper});
   parts.push(...H.parts);
-  parts.push(...hairOn(H, o.cut ?? CUTS.W3, o.tone ?? HAIR.copper, {state: o.state, px: o.px, rim: true}));
+  parts.push(...hairOn(H, o.cut ?? (up ? CUTS3.W3 : CUTS.W3), o.tone ?? HAIR.copper, {state: o.state, px: o.px, rim: true}));
   return finish(withRim(parts), H.hf.c);
 }
 
 export {skelV2, type SkelV2, YAW_V2 as YAW};
-export const herSkel = (view: View): SkelV2 => {
+export const herSkel = (view: View, ver: Ver = 2): SkelV2 => {
   const b = WOMAN_V2;
   const arms = herArms(view, b);
-  return skelV2(view === 'q' ? standV2(b, arms) : view === 'p' ? walkV2(b, arms) : backV2(b, arms));
+  const up = ver === 3;
+  return skelV2(view === 'q' ? standV2(b, arms, {upright: up}) : view === 'p' ? walkV2(b, arms, {upright: up}) : backV2(b, arms, 34, up));
 };
 export {ear, framePt};
 
@@ -210,7 +216,9 @@ export type Look = {
   c: {top: Tone; outer?: Tone; bottom: Tone; shoe?: Tone; facing?: Tone};
   face?: FaceOpt;
 };
-export type PersonOpts = {view: View; state?: HairState; px?: number; headYaw?: number; walk?: boolean; face?: FaceOpt; cm?: number; build?: BuildName; bodyYaw?: number};
+export type PersonOpts = {view: View; state?: HairState; px?: number; headYaw?: number; walk?: boolean; face?: FaceOpt; cm?: number; build?: BuildName; bodyYaw?: number; ver?: Ver};
+/** A look's cut in a version (v3: the same id in cuts3.ts, the clean cut). */
+export const cutOf = (lk: Look, ver: Ver = 2): Cut => (ver === 3 ? CUTS3[lk.cut.id] ?? lk.cut : lk.cut);
 
 // ---------------------------------------------------------------- heights: the body warped, the head drawn at its size
 /** Map every y of a path (figure-local, y down from the crown) through a body-height map (y up from the sole). Our
@@ -262,7 +270,9 @@ export function personV2(lk: Look, o: PersonOpts): Built {
   const bn = o.build ?? lk.build;
   const b = bn ? buildOf(lk.sex, bn) : base;
   const arms = castArms(b, view, lk.outfit);
-  const pose = view === 'q' ? standV2(b, arms, {headYaw: o.headYaw ?? 20, roll: lk.sex === 'm' ? 5 : 7}) : view === 'p' ? walkV2(b, arms) : backV2(b, arms, o.headYaw ?? 30);
+  const up = o.ver === 3;
+  const cut = cutOf(lk, o.ver);
+  const pose = view === 'q' ? standV2(b, arms, {headYaw: o.headYaw ?? 20, roll: lk.sex === 'm' ? 5 : 7, upright: up}) : view === 'p' ? walkV2(b, arms, {upright: up}) : backV2(b, arms, o.headYaw ?? 30, up);
   const sk = skelV2(pose);
   const c = cam(o.bodyYaw ?? YAW_V2[view]);
   const parts: Part[] = [];
@@ -355,11 +365,11 @@ export function personV2(lk: Look, o: PersonOpts): Built {
   const H = headV2(skH, c, lk.skin, {face: o.face ?? lk.face ?? ((o.px ?? 640) < 200 ? 'edge' : 'lash'), hair: lk.hair});
   parts.push(...H.parts);
   // short cuts show the ears (the cut's data leaves them clear)
-  if (['W7', 'M1', 'M3', 'M4', 'M5'].includes(lk.cut.id) || (lk.cut.id === 'W1' && H.lm.view === 'q')) {
+  if (['W7', 'M1', 'M3', 'M4', 'M5'].includes(cut.id) || (cut.id === 'W1' && H.lm.view === 'q') || (cut.ears && cut.ears.includes(H.lm.view as View))) {
     if (H.lm.view === 'b') parts.push(...ear(H.hf, 'b', lk.skin, -1), ...ear(H.hf, 'b', lk.skin, 1));
     else parts.push(...ear(H.hf, H.lm.view, lk.skin));
   }
-  parts.push(...hairOn(H, lk.cut, lk.hair, {state: o.state, px: o.px, sheen2: lk.light ? sheen2Of(lk.hair) : undefined}));
+  parts.push(...hairOn(H, cut, lk.hair, {state: o.state, px: o.px, sheen2: lk.light ? sheen2Of(lk.hair) : undefined}));
   return finish(parts, H.hf.c);
 }
 

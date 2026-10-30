@@ -1,7 +1,9 @@
 # Hair, proportions, stature: the recipe (a DRAFT for the owner, 2026-10-30)
 
-**Status: a draft until the owner picks from job 2's stills** (rendered: `stills/`, read `stills/STILLS.md`; what they
-changed in this recipe: its last section, "Changes from the stills"). Once picked it replaces `../../PEOPLE_DESIGN.md` §5.1
+**Status: a draft until the owner picks from the stills. v3 (after the owner's note on the v2 stills, 2026-10-30) is
+the last section, "v3 (after the owner's note)": where it and anything above disagree, v3 wins** (rendered:
+`stills/*_v3.png`, read `stills/STILLS.md`; the comparison with the references: `V3.md`; what the v2 stills changed: the
+section "Changes from the stills"). Once picked it replaces `../../PEOPLE_DESIGN.md` §5.1
 (proportions) and §5.4 (the hair library), and the stance and motion parts of §5.7 and §5.9. A look doc: it ranks
 below the playbook, `DIRECTION.md` and `CRAFT.md`, and inside the people lane it adds to direction C with the LASH face
 (`../dir_graphic.md`, `../faces_graphic.md`), changing only what is written here. The evidence is `RESEARCH.md` (next
@@ -538,3 +540,92 @@ and a line above disagree, this one wins until the owner rules.
 **Level of detail:** the hair's tiers (a.6) follow the figure's drawn height; at 130-200 px the faces drop to EDGE
 (PEOPLE_DESIGN's status), her LASH kept (the brief). The magnified views on the stills are drawn with the film-size
 detail unless they say close.
+
+## v3 (after the owner's note)
+
+**The owner, verbatim, on the v2 stills (2026-10-30):** "I don't get why you changed the neck posture like now it looks
+like this person was sitting at computer the whole day / Also I don't think I like it really it's more detailed yes but
+it's incoherent like it's not a proper haircut and more like a person woke up and that's what we see like not stylish
+and not clean compare it deeper with our references if they look more clean and stylish". The playbook now: the hair is
+alive "INSIDE A PROPER, STYLISH, CLEAN HAIRCUT"; the head "stacked over the shoulders on a long, upright neck".
+
+**Why v2 read "like a person woke up"** (measured against the references, `V3.md` and `stills/08_refs_vs_v2.png`): no
+cut (ribbons on a dome made the outline), a broken flow (each lock waving on its own, one crossing on purpose), a frayed
+hem (6-7 tips spread up to 0.8 u, curling different ways), ~14 marks inside one head, random loose bits, crimped waves,
+and a head pushed forward. This section replaces 0.3, 0.8 and 0.10 above, a.3's "silhouette, broken", gaps and mess
+levels 2-3, a.5's dashes on every lock, a.6's slivers and splits, b's table where a row changes below, c's lock-by-lock
+bend for the states, and d.1-d.3's forward head.
+
+### v3.a The head of hair: the cut first
+
+1. **The silhouette is a cut a stylist would name** (a flipped jaw bob, a long fall with a soft V, a swept-back crop):
+   the base mass carries it whole, with its hem designed, before any lock is drawn. Filled black at phone size, the cut
+   reads.
+2. **2-5 big shapes** fill it (B and M panels, 0.24-0.5 u wide); small locks only where the cut's hem needs a tip.
+   Never 6-10 medium locks.
+3. **One flow from the parting and the crown:** every shape follows it; neighbours run within ~10-15 degrees of each
+   other (a long fall 7 degrees, a crop's fan 40 degrees from one origin, curls radial from one centre); no crossing
+   lock.
+4. **A clean hem:** 2-5 tips, ALIKE per cut (all flipping out, mirrored side to side; or all tapering down into one V)
+   at designed heights; blunt-ish tips (taper k 2.2, m 0.72); the mass's own hem 0.1-0.15 u above the tips, so the
+   notches between them stay shallow. A bob's back hem may be one smooth line with the flips at the sides only.
+5. **Inner detail, few and coherent:** the head's one shadow shape (the terminator, as before); the crown's sheen band
+   (2 stepped pieces) as the light; 1-3 **grooves** (thin tapered shade lines along the flow between two big shapes,
+   0.055-0.066 u wide, >= 1.5 px at film size, ending in a notch of the hem: ref 02's parallel lines). No shade edge on
+   every lock, no sheen dash mid-lock (they read as scratches and little leaves), no slivers or splits at close size.
+   A sheen dash only where the data places one on purpose.
+6. **The life as a touch:** at rest 0-1 placed loose bit (the flyaway hugging the crown on the key side, or one small
+   curl), never more; 1-2 wisps in the air; a few more only in close shots.
+7. **Broad waves in phase:** under one wave per length (wavelength 1.5-2.0 u at the root, 1.2-1.5 u at the ends;
+   amplitude 0.012-0.05 u), every shape's wave starting at the same height, so their edges stay parallel; straight cuts
+   keep a whisper (amplitude <= 0.02 u).
+8. **Mess level 1 for every cut** (curls and coils carry their texture in the clumps and lobes, not in disorder).
+9. **The renderer:** a v3 lit shape is drawn in the shade tone with its lit side as a region, so the renderer's
+   anti-aliased edge leaves at most a faint dark separation (like a groove), never a light outline in the shade plane.
+10. **Never:** a smooth dome with ribbons hung on it; tips at random heights or curling different ways; spikes or tufts
+    pointing every way (they read as dark flames or horns); a row of equal blocks; rolled snail-shell curls (a curl's
+    hook is ~55-60 degrees, pointed); a long thin tail behind the neck; an antenna flyaway.
+
+### v3.b The cut table (the stylist's lines; rows that changed)
+
+| | cut (v3 name) | the defining silhouette and lines | big shapes | tips and hem | loose bit at rest |
+|---|---|---|---|---|---|
+| W1 | **the flipped jaw bob** (ref 03's girl) | a deep side part; the sides fall straight, then every end flips OUT at the jaw; the light side tucked behind the ear | the crown, two side flips, the back | the back one smooth line; the flips mirrored | the crown flyaway |
+| W2 | **the lob** | to the shoulders, a soft middle part, one broad wave; the ends flick out a little at the shoulder line; one length forward in 3/4 | two back panels, two outer lengths | 4 tips: two soft points, two flicks out | the crown flyaway |
+| W3 | **long layers with curtain bangs** (her) | a long fall to the shoulder blades, fuller toward the ends; curtain bangs from a centre part sweeping back to the cheekbones; one broad 2A wave | 3 panels + 2 outer lengths (back); the curtain-to-collarbone length and the shoulder length (3/4); the cap and the fall (profile) | a soft V of 5 tips all tapering down, the middle lowest, a touch off-centre | the crown flyaway |
+| W4 | **the butterfly cut** | long with a V; short face-framing layers that all flick AWAY from the face (the wings) | 3 panels, 2 outer lengths, 2 wings | a V of 5 alike tips; wings flick out, mirrored | the crown flyaway |
+| W5 | **the soft shag** | a round crown of short layers (a halo) whose ends all flick out at the ear line; the lengths narrowing to the nape and flicking out | the halo (2), the lengths (2-3) | every tip turns out, mirrored | the crown flyaway |
+| W6 | **natural coils, the round cloud** | a round, shaped cloud, wider at the top; lobes nearly even (1.3 : 1), none popping out | one cloud | an even lobed edge | one small curl |
+| W7 | **the soft pixie** | the top swept from a side part across the crown; the fringe ONE wide piece across the brow to the far temple; the nape tapered; the ears out | 2 swept shapes + the side | the nape in soft alike points | the crown flyaway |
+| M1 | **the swept-back crop** (REDESIGNED; refs 03's boy and 04) | the top's locks all sweep BACK from the hairline in one fan, lying on the head 0.06-0.12 u above it, leaf-shaped; the sides short | 4 leaf locks (3/4); 4 panels down the back of the head (behind) | the leaf tips trail back alike past the crown | none |
+| M2 | **the curtains** | a centre part; two curtains to the cheekbones kicking back toward the ears; the back to the collar | 2 back panels, 2 outer flicks | the ends flick out, mirrored | the crown flyaway |
+| M3 | **the soft mullet** | the top short and swept back; the sides close above the ears; the back one shape to the collar | the swept top (2), the back (1-2) | the back tapers down; the top's tips trail back | none |
+| M4 | **the curly top** (ref 03's sheet) | curls on top on a low taper; 6 clumps RADIAL from the crown make the whole top silhouette; each hooks ~58 degrees, the face side curling down and under, the back curling back (mirrored) | 6 clumps + the mass | pointed hooks, mirrored | one small curl near the crown |
+| M5 | **the short coils** (REDESIGNED; v2's twists read as blocks) | a compact cushion of small, even coils on top; the sides faded close; a crisp hairline | one cushion | an even softly lobed edge | none |
+
+No cut was dropped: each could be made clean. The weakest in v3 (for the owner's eye): W7 and M2 from behind (round
+and plain), M3 in 3/4 (the swept top a little tall).
+
+### v3.c Hair in the air: the whole shape leans
+
+The big shapes ride the mass: their points go through the mass's own swing (the bend rule about the pivot, the
+downwind reach, the turn's fan), with only a small own response (0.12 of the size's). The ACCENTS (the outer lengths, a
+bob's flips, the wisps) add their own bend on top (0.8 of the size's response). So a breeze leans the whole cut and
+lifts its accents; it never scatters it into strands. The class ranges of "Changes from the stills" are kept.
+
+### v3.d The neck: upright, the head stacked
+
+v2 put the head 30-36 body units forward of the chest on a neck leaning 20-22 degrees (a craniovertebral angle ~58,
+from F16's relaxed students); on our slim figures that read as a desk slump. v3: the head 6-8 forward (the old engine:
+0), the neck leaning 6-8 degrees from its base at -14 (the old engine's; v2 -19): **an angle of ~73-75 degrees**, the
+head stacked over the shoulders, the chin level, the neck long and upright. F16 stays true of real people; our people
+are drawn for elegance, so d.1's "55-60 degrees", d.2's "the ear 0.02-0.035 H in front" and d.3's first row are
+retired. Kept from v2: the elliptical neck (~1.4x deeper than wide), the relaxed sloping shoulders, the back's S, the
+hip shift through the clothes, one arm off the body.
+
+### v3.e Build
+
+The v3 cuts are `cuts3.ts` (`CUTS3`, each `gen: 3`; the same ids as `cuts.ts`); `hair.ts` applies v3.a and v3.c only to
+`gen: 3` cuts; `stance.ts` `UPRIGHT` (and the pose field `nbz`); `people.ts` takes `ver: 2 | 3` (default 2, so the v2
+stills reproduce exactly); the v3 stills are `SheetsV3.tsx` (`HvS1v3`-`HvS4v3`, `HvS8`, `HvS9`); the reference crops for
+S8/S9 are `refs.ts`, made by `refs_crops.py` (next to this file).

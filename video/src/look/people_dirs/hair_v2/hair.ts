@@ -39,6 +39,8 @@ export type HairOpts = {
 export const SIZE_W: Record<LockDef['size'], number> = {B: 0.4, M: 0.21, S: 0.1, W: 0.026};
 const SIZE_LOD: Record<LockDef['size'], number> = {B: 0, M: 1, S: 2, W: 2};
 const SIZE_AIR: Record<LockDef['size'], number> = {B: 0.75, M: 0.9, S: 1.05, W: 1.8};
+/** graphic/Figure.tsx's rim offset (local units, H = 1000; not exported there): the lit fill shifts by it */
+const FIG_RIM: V2 = [5.5, 4];
 
 /** The level of detail from the figure's drawn height (a.6): 3 close (>= 300 px), 2 film (160-300), 1 small
  *  (130-160), 0 tiny (60-130). */
@@ -155,15 +157,17 @@ export function hairV2(o: HairOpts): Part[] {
     return {...w, a0: w.a0 * k * sz, a1: w.a1 * k * sz, ph: (w.ph ?? 0) + (d.ph ?? 0) + coh};
   };
   const built: Built[] = [];
+  const g3 = cut.gen === 3;
   vd.locks.forEach((d, i) => {
     if (!shown(d)) return;
-    // a lock rooted on the lengths (below the pivot) rides the mass's own swing and fall, so it never comes loose
-    const onLengths = d.pts[0][1] > vd.pivot[1] + 0.05;
+    // a lock rooted on the lengths (below the pivot) rides the mass's own swing and fall, so it never comes loose; in a
+    // v3 cut every lock rides the mass (the whole shape leans) unless it is free, and only the accents lift on top
+    const onLengths = g3 ? !d.free : d.pts[0][1] > vd.pivot[1] + 0.05;
     const pts = d.pts.map((p) => (onLengths ? bendMass(p) : cheek(p)));
     const root = pts[0];
     const tipP = pts[pts.length - 1];
     const dir: V2 = [tipP[0] - root[0], tipP[1] - root[1]];
-    const resp = (d.air ?? SIZE_AIR[d.size]) * (onLengths ? 0.5 : 1);
+    const resp = g3 ? (d.air ?? (d.accent || d.size === 'W' ? SIZE_AIR[d.size] * 0.8 : 0.12)) : (d.air ?? SIZE_AIR[d.size]) * (onLengths ? 0.5 : 1);
     let bend = 0;
     if (st.name === 'breeze' || st.name === 'walk') {
       const outer = d.outer ?? 0.6;
@@ -189,10 +193,10 @@ export function hairV2(o: HairOpts): Part[] {
       wave: waveOf(d, pts),
       hook: d.hook,
       hookFrom: d.hookFrom,
-      asym: d.asym ?? (i % 2 ? -0.8 : 0.8),
+      asym: d.asym ?? (g3 ? 0 : i % 2 ? -0.8 : 0.8),
       bend,
       grav,
-      twist: d.twist ?? (cut.wave ? 0.1 : 0),
+      twist: d.twist ?? (cut.wave && !g3 ? 0.1 : 0),
       root: d.root ?? (d.size === 'W' ? 0.45 : 1),
       swell: d.swell,
       k: d.k,
@@ -240,6 +244,14 @@ export function hairV2(o: HairOpts): Part[] {
   })();
   const termPts: V2[] = [[termU[0][0], termU[0][1] - 1.5], ...termU, [termU[termU.length - 1][0], termU[termU.length - 1][1] + 1.5]];
   const termRegion = smoothPath(PP([...termPts, [termPts[termPts.length - 1][0] + 4, termPts[termPts.length - 1][1]], [termPts[0][0] + 4, termPts[0][1]]]), (i) => i === 0 || i >= termPts.length - 1);
+  /** v3: the LIT side of the terminator as a region (a v3 lock is drawn in the shade tone with its lit side on top,
+   *  so the renderer's anti-aliased edge leaves at most a faint dark separation, never a light outline in the shade
+   *  plane); shifted by the renderer's rim offset (graphic/Figure.tsx RIM, local units) when the lock takes the rim. */
+  const litRegion = (shift: V2 = [0, 0]) =>
+    smoothPath(
+      PP([...termPts, [termPts[termPts.length - 1][0] - 4, termPts[termPts.length - 1][1]], [termPts[0][0] - 4, termPts[0][1]]]).map((q) => [q[0] + shift[0], q[1] + shift[1]] as V2),
+      (i) => i === 0 || i >= termPts.length - 1,
+    );
   const termX = (y: number) => {
     if (y <= termU[0][1]) return termU[0][0];
     for (let i = 1; i < termU.length; i++) {
@@ -255,7 +267,7 @@ export function hairV2(o: HairOpts): Part[] {
   const sliverOf = (b: Built) => polyPath(PP(b.L.outline.map((q) => [q[0] + SLV[0], q[1] + SLV[1]] as V2)));
   const overlaps = (a: [number, number, number, number], b: [number, number, number, number]) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
   const sliversOn = (z: number, box: [number, number, number, number] | null, shadeFill: string, self?: Built): Region[] => {
-    if (lod < 2) return [];
+    if (lod < 2 || g3) return [];
     const out: Region[] = [];
     for (const b of built) {
       if (b === self || b.z <= z || b.def.size === 'W' || b.tone !== 'lit' || b.def.sliver === false) continue;
@@ -304,10 +316,13 @@ export function hairV2(o: HairOpts): Part[] {
     const mid = Math.floor(L.spine.length * 0.4);
     const litA = L.nrm[mid][0] * LU[0] + L.nrm[mid][1] * LU[1] > 0;
     const regs: Region[] = [];
+    const flip = g3 && b.tone === 'lit' && b.def.size !== 'W';
     if (b.tone === 'lit') {
-      // the head's terminator through the lock, then the lock's own thin shade edge where it turns away
-      if (b.def.shade !== 0 && b.def.size !== 'W') regs.push({d: termRegion, fill: t.shade});
-      const base = b.def.shade ?? (b.def.size === 'W' ? 0 : b.def.size === 'S' ? (lod >= 3 ? 0.2 : 0) : 0.15);
+      // the head's terminator through the lock, then the lock's own thin shade edge where it turns away (v3: the lock's
+      // base is the shade tone and its lit side the region)
+      if (flip) regs.push({d: litRegion(o.rim && /^hair/.test(b.name) ? FIG_RIM : [0, 0]), fill: t.lit});
+      else if (b.def.shade !== 0 && b.def.size !== 'W') regs.push({d: termRegion, fill: t.shade});
+      const base = b.def.shade ?? (g3 || b.def.size === 'W' ? 0 : b.def.size === 'S' ? (lod >= 3 ? 0.2 : 0) : 0.15);
       if (base > 0) {
         const fr = (s: number, i: number) => {
           const p = L.spine[i];
@@ -322,7 +337,8 @@ export function hairV2(o: HairOpts): Part[] {
         let at: number[] = Array.isArray(b.def.sheen) ? b.def.sheen : crestsLit(L, litA);
         if (!at.length) at = [0.28 + 0.06 * ((j * 7) % 3)];
         at = at.filter((s) => s > 0.12 && s < 0.86);
-        const maxN = b.def.size === 'S' ? 0 : b.def.size === 'M' ? (lod >= 3 ? 1 : 0) : lod >= 3 ? 3 : lod >= 2 ? 2 : 1;
+        // v3: one sheen per big shape (B, or any lock whose data places it), never a dash on every lock
+        const maxN = g3 ? (Array.isArray(b.def.sheen) ? 1 : 0) : b.def.size === 'S' ? 0 : b.def.size === 'M' ? (lod >= 3 ? 1 : 0) : lod >= 3 ? 3 : lod >= 2 ? 2 : 1;
         let k = 0;
         for (const s0 of at) {
           if (k >= maxN) break;
@@ -338,13 +354,13 @@ export function hairV2(o: HairOpts): Part[] {
       }
       regs.push(...sliversOn(b.z, b.box, t.shade, b));
       // close size: a big lock shows its sub-locks (one split each, two on the widest), in the shade tone
-      if (lod >= 3 && (b.def.size === 'B' || (b.def.size === 'M' && (b.def.w ?? SIZE_W.M) >= 0.17)) && L.len > 0.45) {
+      if (!g3 && lod >= 3 && (b.def.size === 'B' || (b.def.size === 'M' && (b.def.w ?? SIZE_W.M) >= 0.17)) && L.len > 0.45) {
         const th = Math.max(0.03, 1.6 / pxU);
         regs.push({d: polyPath(PP(splitSliver(L, litA, 0.42 + 0.06 * ((j % 2) - 0.5), 0.22, 0.9, th))), fill: t.shade});
         if (b.def.size === 'B' && (b.def.w ?? SIZE_W.B) >= 0.3) regs.push({d: polyPath(PP(splitSliver(L, litA, 0.72, 0.4, 0.95, th * 0.85))), fill: t.shade});
       }
     }
-    const part: Part = {name: b.name, d: smoothPath(PP(L.outline), (i) => i === L.tipAt), fill: b.fill, regions: regs, z: b.z};
+    const part: Part = {name: b.name, d: smoothPath(PP(L.outline), (i) => i === L.tipAt), fill: flip ? t.shade : b.fill, regions: regs, z: b.z};
     parts.push(part);
   });
   return o.rim ? parts.map((p) => (/^hair/.test(p.name) && !p.line ? {...p, rim: o.rim} : p)) : parts;
@@ -441,7 +457,9 @@ function cloudHair(o: HairOpts, cd: CloudDef): Part[] {
   regs.push({d: smoothPath(PP([...tp, [tp[tp.length - 1][0] + 4, tp[tp.length - 1][1]], [tp[0][0] + 4, tp[0][1]]]), (i) => i === 0 || i >= tp.length - 1), fill: t.shade});
   // slivers between the big lobes (a lobe's own crescent of shade on its lower-right) and sheen arcs on the key side
   const big = lobes.map((l, j) => ({...l, j})).sort((a2, b2) => b2.r - a2.r);
-  const nSl = lod >= 3 ? 5 : lod >= 2 ? 3 : 0;
+  const g3 = o.cut.gen === 3;
+  // v3: the head's one shadow shape carries the form; a few slivers only close, three sheen arcs at most
+  const nSl = g3 ? (lod >= 3 ? 2 : 0) : lod >= 3 ? 5 : lod >= 2 ? 3 : 0;
   big.slice(0, nSl).forEach((l) => {
     const cx = c[0] + l.rc * Math.cos(l.a);
     const cy = c[1] + l.rc * Math.sin(l.a);
@@ -455,7 +473,7 @@ function cloudHair(o: HairOpts, cd: CloudDef): Part[] {
     }
     regs.push({d: polyPath(PP([...arc, ...inn.reverse()])), fill: t.shade});
   });
-  const nSh = lod >= 3 ? 7 : lod >= 2 ? 5 : lod >= 1 ? 3 : 0;
+  const nSh = g3 ? (lod >= 2 ? 3 : lod >= 1 ? 2 : 0) : lod >= 3 ? 7 : lod >= 2 ? 5 : lod >= 1 ? 3 : 0;
   lobes
     .map((l, j) => ({...l, j, face: Math.cos(l.a) * -0.88 + Math.sin(l.a) * -0.47}))
     .filter((l) => l.face > 0.15)
@@ -479,7 +497,7 @@ function cloudHair(o: HairOpts, cd: CloudDef): Part[] {
   parts.push({name: `${name}-cloud`, d: cloudD, fill: t.lit, regions: regs, z: cd.z + dz, cut: cd.hairline ? smoothPath(PP(cd.hairline.map((m) => [m[0], m[1]] as V2)), (i) => !!cd.hairline![i][2]) : undefined});
   // single small curls off the edge (spirals: a short lock that turns ~300 degrees), streaming downwind in a breeze
   if (lod >= 2) {
-    const n = st.name === 'calm' ? Math.min(2, cd.curls.length) : cd.curls.length;
+    const n = st.name === 'calm' ? Math.min(g3 ? 1 : 2, cd.curls.length) : cd.curls.length;
     cd.curls.slice(0, n).forEach((cu, i) => {
       const a = (cu[0] * Math.PI) / 180;
       const r0 = cu[1];

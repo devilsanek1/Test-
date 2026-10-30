@@ -55,6 +55,11 @@ export type LockDef = {
   edge?: boolean;
   /** casts no sliver on the hair behind (a crossing lock) */
   sliver?: boolean;
+  /** v3 (gen 3 cuts): an ACCENT lifts in the air on top of the mass's lean (an outer flip, a wisp); every other lock
+   *  rides the mass (it leans with the whole shape, never scattering into strands) */
+  accent?: boolean;
+  /** v3: does not ride the mass (a wisp rooted at the crown, a front piece on the face) */
+  free?: boolean;
 };
 
 export type Extra = {
@@ -109,6 +114,11 @@ export type CloudDef = {
 export type Cut = {
   id: string;
   name: string;
+  /** 3 = a v3 cut (cuts3.ts, RECIPE "v3 (after the owner's note)"): the cut's silhouette first, 2-5 big shapes riding
+   *  the mass, one flow, alike tips, no per-lock shade edges or sheen unless the data asks; absent = v2 */
+  gen?: 2 | 3;
+  /** the views in which the ears show (a cut tucked behind the ear, a crop) */
+  ears?: HView[];
   texture: 'straight' | 'wavy' | 'curly' | 'coily';
   wave?: Wave;
   motion: Motion;

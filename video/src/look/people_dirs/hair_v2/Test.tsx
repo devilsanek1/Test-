@@ -9,7 +9,7 @@ import {STATES, type StateName} from './states';
 
 export const HT_W = 2000;
 export const HT_H = 1100;
-export type HtItem = {who: string; view: View; state?: StateName; px?: number};
+export type HtItem = {who: string; view: View; state?: StateName; px?: number; ver?: 2 | 3};
 export type HtProps = {h: number; items: HtItem[]; heads?: number; bg?: string; mono?: boolean};
 
 export const HvTest: React.FC<HtProps> = ({h, items, heads, bg, mono}) => {
@@ -21,7 +21,7 @@ export const HvTest: React.FC<HtProps> = ({h, items, heads, bg, mono}) => {
         {items.map((it, i) => {
           const H = heads ? h * heads : h;
           const px = it.px ?? h;
-          const fig = it.who === 'old' ? buildOld('herEvening', it.view, 'lash') : it.who === 'her' ? herV2({view: it.view, state: STATES[it.state ?? 'calm'], px}) : personV2(lookOf(it.who), {view: it.view, state: STATES[it.state ?? 'calm'], px});
+          const fig = it.who === 'old' ? buildOld('herEvening', it.view, 'lash') : it.who === 'her' ? herV2({view: it.view, state: STATES[it.state ?? 'calm'], px, ver: it.ver}) : personV2(lookOf(it.who), {view: it.view, state: STATES[it.state ?? 'calm'], px, ver: it.ver});
           const x = colW * (i + 0.5);
           if (heads) {
             const s = H / 1000;

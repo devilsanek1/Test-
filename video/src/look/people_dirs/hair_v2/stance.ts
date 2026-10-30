@@ -104,6 +104,8 @@ export type PoseV2 = {
   fwd?: number;
   /** the neck's lean from its base (degrees forward of vertical) */
   lean?: number;
+  /** the neck's base front to back from the chest's centre (body units; v2 -19, the old engine and v3 -14) */
+  nbz?: number;
   /** the shoulder joints lowered (d.1: 0.005-0.01 H) */
   drop?: number;
   legs: {l: {knee: V3; ankle: V3; fy: number; fp: number}; r: {knee: V3; ankle: V3; fy: number; fp: number}};
@@ -123,7 +125,7 @@ export function skelV2(p: PoseV2): SkelV2 {
   const fwd = p.fwd ?? 34;
   const lean = p.lean ?? 20;
   // the neck: its base a little back, its axis leaning forward; the head forward of it with the face plane vertical
-  const neckBase: V3 = [p.chest.x, b.shoulderY + 8, p.chest.z - 19];
+  const neckBase: V3 = [p.chest.x, b.shoulderY + 8, p.chest.z + (p.nbz ?? -19)];
   const topY = 1000 - b.skull - 4;
   const dzLean = (topY - neckBase[1]) * Math.tan((lean * Math.PI) / 180);
   const neckTop: V3 = [p.chest.x + (p.head.dx ?? 0) * 0.6, topY, neckBase[2] + dzLean];
@@ -176,10 +178,15 @@ export function shoulderOf(b: Build, chest: Frame, side: 'l' | 'r', drop = 7): V
 
 // ---------------------------------------------------------------- the stances (d.2)
 type ArmsIn = PoseV2['arms'];
+/** v3 (RECIPE "v3 (after the owner's note)"): the head STACKED over the shoulders on a long, upright neck, the chin
+ *  level. v2 pushed the head 30-36 units forward on a neck leaning 20-22 degrees (a craniovertebral angle ~58), which
+ *  the owner read as "sitting at computer the whole day". v3: the head 6-8 forward of the chest (the old engine 0), the
+ *  neck leaning 6-8 degrees from a base back at -14 (the old engine's): an angle of ~73-75 degrees. */
+export const UPRIGHT = {stand: {fwd: 6, lean: 6, nbz: -14}, walk: {fwd: 8, lean: 8, nbz: -14}, back: {fwd: 6, lean: 6, nbz: -14}};
 /** Standing, relaxed and confident: the weight on her right leg, the hip shifted 0.02 H over it and the pelvis tilted 7
  *  degrees (the weight hip up), the shoulders 4.5 the other way, the free knee bent and its foot forward and turned
  *  out; the seat back, the lower back forward; the head forward on a leaning neck, tilted and turned off the torso. */
-export function standV2(b: Build, arms: (chest: Frame) => ArmsIn, o: {headYaw?: number; roll?: number; tilt?: number; mirror?: boolean} = {}): PoseV2 {
+export function standV2(b: Build, arms: (chest: Frame) => ArmsIn, o: {headYaw?: number; roll?: number; tilt?: number; mirror?: boolean; upright?: boolean} = {}): PoseV2 {
   const r = o.roll ?? 7;
   const chest: Frame = {x: -4, z: -3, roll: r * 0.64, tw: -6};
   const pelvis: Frame = {x: -20, z: -8, roll: -r, tw: 6};
@@ -191,6 +198,7 @@ export function standV2(b: Build, arms: (chest: Frame) => ArmsIn, o: {headYaw?: 
     head: {yaw: o.headYaw ?? 18, roll: o.tilt ?? 6, pitch: 2, dx: 3},
     fwd: 30,
     lean: 20,
+    ...(o.upright ? UPRIGHT.stand : {}),
     legs: {
       r: {knee: [-50, 296, 2], ankle: [-30, 40, -8], fy: -14, fp: 0},
       l: {knee: [44, 306, 40], ankle: [62, 42, 70], fy: 28, fp: 0},
@@ -200,7 +208,7 @@ export function standV2(b: Build, arms: (chest: Frame) => ArmsIn, o: {headYaw?: 
 }
 /** The walk's contact pose (profile): the near (left) leg forward, the right pushing off, a 3-degree lean, the hips
  *  turned 8 degrees and the shoulders against them; the head forward on the leaning neck. */
-export function walkV2(b: Build, arms: (chest: Frame) => ArmsIn): PoseV2 {
+export function walkV2(b: Build, arms: (chest: Frame) => ArmsIn, o: {upright?: boolean} = {}): PoseV2 {
   const chest: Frame = {x: 0, z: 8, roll: 0, tw: 7};
   const pelvis: Frame = {x: 0, z: -4, roll: 0, tw: -8};
   return {
@@ -211,6 +219,7 @@ export function walkV2(b: Build, arms: (chest: Frame) => ArmsIn): PoseV2 {
     head: {yaw: 0, roll: 0, pitch: 0},
     fwd: 36,
     lean: 22,
+    ...(o.upright ? UPRIGHT.walk : {}),
     legs: {
       l: {knee: [48, 300, 82], ankle: [46, 40, 162], fy: 4, fp: 0},
       r: {knee: [-46, 298, -52], ankle: [-44, 74, -150], fy: -4, fp: 32},
@@ -219,7 +228,7 @@ export function walkV2(b: Build, arms: (chest: Frame) => ArmsIn): PoseV2 {
   };
 }
 /** From behind, the weight on her left leg, looking back over her left shoulder (the lost profile). */
-export function backV2(b: Build, arms: (chest: Frame) => ArmsIn, headYaw = 34): PoseV2 {
+export function backV2(b: Build, arms: (chest: Frame) => ArmsIn, headYaw = 34, upright = false): PoseV2 {
   const chest: Frame = {x: 3, z: -3, roll: -4.5, tw: 5};
   const pelvis: Frame = {x: 20, z: -8, roll: 7, tw: -5};
   return {
@@ -230,6 +239,7 @@ export function backV2(b: Build, arms: (chest: Frame) => ArmsIn, headYaw = 34): 
     head: {yaw: headYaw, roll: 6, pitch: 1, dx: -2},
     fwd: 34,
     lean: 20,
+    ...(upright ? UPRIGHT.back : {}),
     legs: {
       l: {knee: [50, 296, 2], ankle: [30, 40, -8], fy: 14, fp: 0},
       r: {knee: [-46, 306, 36], ankle: [-66, 42, 60], fy: -28, fp: 0},
