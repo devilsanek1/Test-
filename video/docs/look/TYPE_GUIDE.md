@@ -207,8 +207,9 @@ Each example uses video 4's real words and times; a frame number is t x 60.
 
 ### R9 · The payoff line
 - **For:** the film's last sentence, the core line in the voice; it lands, then the loop.
-- **Spec:** two lockups: first, R4's three rows (the hand 116 px, the brush 200 px in the accent with the swell, +0.02
-  em, the halo) with the core line's key word in the brush; then the last group in the hand (Gaegu 300, **136 px**: the
+- **Spec:** two lockups: first, three rows like R4's (the hand 116 px, the brush 200 px in the accent with the swell,
+  +0.02 em, the halo) with the core line's key word in the brush on the LAST row, so the rows sit at baselines 365 /
+  470 / 600 (the brush's tall letters need the room), stepped down-right; then the last group in the hand (Gaegu 300, **136 px**: the
   hook's size, so the film's bookends match), two baselines at seat C, holding 36 frames past the last word, then
   cutting out in 1 frame before the loop's un-draw reaches the band.
 - **Video 4:** S12 (38.48-42.24, WIDE POV: the home view again, your gloved hand and phone at the bottom right; on
@@ -312,8 +313,8 @@ placement; never invent a new picture beyond what a note asks. Sizes, seats and 
    (umber, figures ~120 px tall); above in the band the caption "starting / next year." (R1, seat C) · `{{BG_NIGHT}}` ·
    Look at: the year belongs to the place; the caption and the tag share the frame without repeating each other.
 10. **R9 the payoff.** S12 at 40.00 s: "So your chatbot" (hand 116, baseline 365, from x 130) / "could soon" (baseline
-    495) / **"heat"** (brush 200 px, amber, baseline 598, right-aligned near x 900) · `{{BG_NIGHT}}` · Look at: the
-    core line landing on its one warm word.
+    470, from x ~220) / **"heat"** (brush 200 px, amber, baseline 600, right-aligned near x 900) · `{{BG_NIGHT}}` ·
+    Look at: the core line landing on its one warm word.
 11. **R10 the cover.** The cover: "Your chatbot / could **heat** / an apartment / in Helsinki." (hand 300, 120 px;
     "heat" brush 260 px amber; ragged, stepped, left edge x ~110) on `{{BG_NIGHT}}` shifted down ~180 px (the sky
     extended at the top in its own colour, so the open sky reaches y ~780, standing in for a cover frame composed with
