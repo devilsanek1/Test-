@@ -33,6 +33,13 @@ the delegated calls + `camera_plan_g3.md`; A2 the W1 world bible `WORLD_BIBLE.md
 `production/BRIEF.md`. Then phase B: the G3 panels in lanes, the motion pass, lint, cold reads, one fix round, the
 540p60 reel to the owner.
 
+**THE LOOP CHANGED (owner, 2026-10-30 ~22:55 UTC: THE THREE RULES, playbook top; PIPELINE_V2 "THE LOOP NOW"):** the four
+G3 board lanes and the density revision were STOPPED (sparse frames to be filled later is "wrong"); their files stay as
+reference (`production/lanes/`, `public/v4/lanes/` if any, `production/DENSITY_REVISION.md` superseded). Now: the
+IDEAS round (`ideas/`: two imaginations, A the city, B the machine, 2 whole-frame ideas per beat) and the ink-line look
+test (`docs/look/ink_test/`) run in parallel; then KEY FRAMES made whole in the picked look; then the animatic plays the
+key frames; then animation. The visual script v3 stays the timing's and the camera's contract.
+
 **PHASE A (docs) DONE (2026-10-30 ~21:25 UTC):** `visual/VISUAL_SCRIPT.md` v3 LOCKED for G3 (the folds; 10 delegated calls
 in its "Open questions for the owner"; v2 in `visual/archive/`), `camera_plan_g3.md`, `WORLD_BIBLE.md` (8 sets, light
 rigs, the Frost & Honey palette `world/palette_v4.json`, the colour script `world/colour_script.png`, tiers, the
