@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Gaegu:wght@300;400&family=Nanum+Brush+Script&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Gaegu:wght@300;400;700&display=swap">
 <style>
 /* Layout: one phone-width column, like scrolling the feed; stills at phone size, the picks before the detail. */
 :root {
@@ -15,8 +15,8 @@
   --accent-soft: #f3dcc4;
   --night: #252c50;        /* the stills' night sky, for frames */
   --hand: 'Gaegu', 'Comic Sans MS', cursive;
-  --brush: 'Nanum Brush Script', 'Brush Script MT', cursive;
   --ui: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --glow: rgba(255, 196, 120, 0.55);  /* the lit word's halo */
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -38,7 +38,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .wrap { max-width: 660px; margin: 0 auto; display: grid; gap: 40px; }
 header { display: grid; gap: 14px; padding-top: 28px; }
 h1 { font-family: var(--hand); font-weight: 400; font-size: clamp(44px, 12vw, 64px); line-height: 1; margin: 0; letter-spacing: 0.01em; text-wrap: balance; }
-h1 .b { font-family: var(--brush); color: var(--accent); font-size: 1.15em; }
+h1 .b { font-weight: 700; text-shadow: 0 0 0.22em var(--glow), 0 0 0.06em var(--glow); }
 h2 { font-family: var(--hand); font-weight: 400; font-size: 34px; line-height: 1.1; margin: 0; text-wrap: balance; }
 h3 { font-family: var(--hand); font-weight: 400; font-size: 27px; line-height: 1.1; margin: 0; }
 p { margin: 0; }
@@ -48,7 +48,11 @@ p { margin: 0; }
 .system li { display: grid; grid-template-columns: 92px 1fr; gap: 12px; align-items: baseline; }
 .system .k { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 .sample-hand { font-family: var(--hand); font-weight: 300; font-size: 26px; }
-.sample-brush { font-family: var(--brush); font-size: 32px; color: var(--accent); }
+.sample-lit { font-family: var(--hand); font-weight: 700; font-size: 30px; text-shadow: 0 0 0.24em var(--glow), 0 0 0.07em var(--glow); }
+.note { display: grid; gap: 14px; padding: 18px; border-radius: 16px; background: var(--accent-soft); }
+.note .why { display: grid; gap: 4px; margin: 0; padding-left: 18px; font-size: 15px; }
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 560px) { .trio { grid-template-columns: 1fr 1fr; } .trio figure:last-child { grid-column: 1 / -1; max-width: 50%; justify-self: center; } }
 .bar {
   position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
   display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line);
@@ -132,13 +136,13 @@ section { display: grid; gap: 16px; }
 <div class="wrap">
   <header>
     <h1>Words on <span class="b">Screen</span></h1>
-    <p class="lede">How the words in our films could look, sit and move: 14 stills on video 4's real words at their real times. The research is distilled into a guide with 10 recipes; six picks for you are below.</p>
+    <p class="lede">How the words in our films could look, sit and move: stills on video 4's real words at their real times. The research is distilled into a guide with 10 recipes; six picks for you are below. Updated after your note: the stressed word is now soft and lit.</p>
     <p class="quote">"there is so much more we can do to make it look premium, more interesting, dynamic and more engaging"</p>
     <ul class="system" aria-label="The proposed type system">
       <li><span class="k">The hand</span><span><span class="sample-hand">every spoken word, light and airy</span><br><small>Gaegu Light, about 1.2x our captions now. The nearest free match to your cat reel's lettering.</small></span></li>
-      <li><span class="k">The brush</span><span><span class="sample-brush">WANTS · 70,000 · heat</span><br><small>Nanum Brush Script, for the 3-5 words the voice leans on, the big numbers and the cover. A brush, not a pen, like the new painted look.</small></span></li>
+      <li><span class="k">The stress</span><span><span class="sample-lit">wants · 70,000 · heat</span><br><small>The same hand in Bold, bigger and lowercase, lit like the windows: honey with a soft glow on night skies, a gentle warm halo on light skies. No brush, no red, no capitals.</small></span></li>
       <li><span class="k">Placement</span><span>Set into the open sky or wall by the subject, never a box. Each group moves a little (80-220 px) so the frame stays alive while the eye never hunts.</span></li>
-      <li><span class="k">Motion</span><span>Every spoken word, 2-4 at a time, in the voice's order. Words pop in place or build word by word with the voice, and are never clipped. One landing word may swell or be painted on.</span></li>
+      <li><span class="k">Motion</span><span>Every spoken word, 2-4 at a time, in the voice's order. Words pop in place or build word by word with the voice, and are never clipped. A stressed word pops in whole and its light comes on over a few frames.</span></li>
     </ul>
   </header>
 
@@ -146,6 +150,26 @@ section { display: grid; gap: 16px; }
     <span class="t">Stills are stand-ins: our latest look frame, at dusk and as a snowy night.</span>
     <label class="switch" for="uiToggle"><input type="checkbox" id="uiToggle"><span class="track" aria-hidden="true"></span>App buttons</label>
   </div>
+
+  <section aria-labelledby="nt">
+    <h2 id="nt">Your note, re-evaluated</h2>
+    <div class="note">
+      <p class="quote" style="color:var(--fg)">"The text should be pleasant to look at like it shouldn't look like a blood message on the wall"</p>
+      <p>Why the old "WANTS" looked like that:</p>
+      <ul class="why">
+        <li>a dark rust red, the colour of dried blood, the darkest thing in a pale frame</li>
+        <li>a rough dry brush whose tails ran below the line like drips</li>
+        <li>all capitals, one big word set apart on a pale wall</li>
+      </ul>
+      <p>Now the stressed word is the same hand in Bold, bigger, lowercase, and lit like the windows. Seven ways to stress a word, on the same two moments; the recommended one is marked in each.</p>
+    </div>
+    <div class="trio">
+      <figure><div class="frame"><img src="s/15.jpg" alt="Seven ways to stress wants on the dusk sky, option C recommended" loading="lazy"></div><figcaption><b>Dusk:</b> C recommended (a soft warm halo)</figcaption></figure>
+      <figure><div class="frame"><img src="s/16.jpg" alt="Seven ways to stress heat on the night sky, option B recommended" loading="lazy"></div><figcaption><b>Night:</b> B recommended (honey with a golden glow)</figcaption></figure>
+      <figure><div class="frame"><img src="s/17.jpg" alt="Four ways to set 70,000, option B recommended" loading="lazy"></div><figcaption><b>The number:</b> B recommended</figcaption></figure>
+    </div>
+    <p class="intro">Each panel is labelled with its letter at the top left. The others are there to compare: A plain bold, D a painted wash, E a smooth script, F a soft serif italic, G capitals. If one of those feels better, name its letter.</p>
+  </section>
 
   <section aria-labelledby="ba">
     <h2 id="ba">Before and after, the same moment</h2>
@@ -155,8 +179,8 @@ section { display: grid; gap: 16px; }
         <figcaption><b>Now.</b> One font, one size, a fixed band, the peach box.</figcaption>
       </figure>
       <figure>
-        <div class="frame"><img src="s/02.jpg" alt="The proposal: But Helsinki in the light hand, WANTS painted in the brush, that heat stepped below" loading="eager"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
-        <figcaption><b>Proposed.</b> The hand, with one painted landing word.</figcaption>
+        <div class="frame"><img src="s/02.jpg" alt="The proposal: But Helsinki in the light hand, wants bigger and bold with a soft warm halo, that heat stepped below" loading="eager"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
+        <figcaption><b>Proposed.</b> The hand, the stressed word bolder, bigger and softly lit.</figcaption>
       </figure>
     </div>
   </section>
@@ -172,18 +196,18 @@ section { display: grid; gap: 16px; }
         <p class="rec">Recommended: <b>A</b>.</p>
       </div>
       <div class="pick">
-        <p class="q"><span class="n">2</span>How do we mark the word the voice leans on?</p>
+        <p class="q"><span class="n">2</span>How much do we lift the word the voice leans on?</p>
         <div class="pair">
-          <figure><div class="frame"><img src="s/02.jpg" alt="WANTS painted big in the brush" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div><figcaption><b>A.</b> The brush (3-5 words a film)</figcaption></figure>
-          <figure><div class="frame"><img src="s/07.jpg" alt="WANTS in the same hand, tinted burnt orange" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div><figcaption><b>B.</b> The same hand, coloured only</figcaption></figure>
+          <figure><div class="frame"><img src="s/02.jpg" alt="wants bigger and bold with a soft warm halo" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div><figcaption><b>A.</b> Bigger and lit (3-5 words a film)</figcaption></figure>
+          <figure><div class="frame"><img src="s/07.jpg" alt="wants at the running size, bold with the same halo" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div><figcaption><b>B.</b> Same size, only bold and lit</figcaption></figure>
         </div>
-        <p class="rec">Recommended: <b>both</b>. The brush for the few landing words and numbers, the colour for everyday stress.</p>
+        <p class="rec">Recommended: <b>both</b>. A for the few landing words and numbers, B for everyday stress.</p>
       </div>
       <div class="pick">
-        <p class="q"><span class="n">3</span>May a landing word be painted on, stroke by stroke?</p>
-        <div class="frame" style="max-width:420px"><img src="s/14.jpg" alt="WANTS caught mid-write: WAN and the first stroke of T painted" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
-        <div class="opts"><span>About 0.2 s, led by a brush tip, the way frame 0 paints the scene. For a few frames you see part of a letter.</span><span><b>A. Yes</b>, for landing words and the lettered phrase only. <b>B. No</b>, every word pops in whole.</span></div>
-        <p class="rec">Recommended: <b>A</b>, shown first in the G4 look clip so you can judge it moving.</p>
+        <p class="q"><span class="n">3</span>On light skies, a soft warm halo behind the stressed word, or none?</p>
+        <div class="frame" style="max-width:420px"><img src="s/15.jpg" alt="The dusk options: B plain plum bold, C the same with a soft warm halo" loading="lazy"></div>
+        <div class="opts"><span><b>C. The halo</b>: the word glows softly, as if the dusk light caught it.</span><span><b>B. No halo</b>: the same bold plum word, plain.</span><span>On night skies the word is always lit (honey with a glow), like the windows.</span></div>
+        <p class="rec">Recommended: <b>C</b>, unless it reads as a smudge to you.</p>
       </div>
       <div class="pick">
         <p class="q"><span class="n">4</span>Where do the words sit?</p>
@@ -194,7 +218,7 @@ section { display: grid; gap: 16px; }
       <div class="pick">
         <p class="q"><span class="n">5</span>Which cover title?</p>
         <div class="pair">
-          <figure><div class="frame"><img src="s/11.jpg" alt="Cover in the hand with heat in the brush" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div><figcaption><b>A.</b> The hand + one brush word</figcaption></figure>
+          <figure><div class="frame"><img src="s/11.jpg" alt="Cover in the hand with heat bold and lit" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div><figcaption><b>A.</b> The hand + one lit word</figcaption></figure>
           <figure><div class="frame"><img src="s/12.jpg" alt="Cover in thin geometric capitals like the city posters" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div><figcaption><b>B.</b> The posters' thin capitals</figcaption></figure>
         </div>
         <p class="rec">Recommended: <b>A</b>, the same hand as the film so the grid reads as one series.</p>
@@ -203,13 +227,13 @@ section { display: grid; gap: 16px; }
         <p class="q"><span class="n">6</span>Is the size contrast enough?</p>
         <div class="pair">
           <figure><div class="frame"><img src="s/04.jpg" alt="Everyday caption: on giant computers, in the light hand" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div><figcaption>Everyday words</figcaption></figure>
-          <figure><div class="frame"><img src="s/06.jpg" alt="The big number 70,000 in the brush over homes" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div><figcaption>A big number</figcaption></figure>
+          <figure><div class="frame"><img src="s/06.jpg" alt="The big number 70,000, bold and glowing honey, over homes" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div><figcaption>A big number</figcaption></figure>
         </div>
-        <div class="opts"><span>Three steps: everyday 116 px, hook and payoff 136 px, brush 184-300 px.</span><span><b>A. Keep it.</b> <b>B. Bigger everyday words</b> (fewer words per line, more two-line groups).</span></div>
+        <div class="opts"><span>Steps: everyday 116 px, hook and payoff 136 px, a stressed word about 160 px, a big number 250 px.</span><span><b>A. Keep it.</b> <b>B. Bigger everyday words</b> (fewer words per line, more two-line groups).</span></div>
         <p class="rec">Recommended: <b>A</b>. It's your call by eye.</p>
       </div>
     </div>
-    <p class="reply">Answer in chat, for example: <code>1A 2both 3A 4A 5A 6A</code>, plus anything that feels off.</p>
+    <p class="reply">Answer in chat, for example: <code>1A 2both 3C 4A 5A 6A</code>, plus anything that feels off.</p>
   </section>
 
   <section aria-labelledby="rc">
@@ -222,10 +246,10 @@ section { display: grid; gap: 16px; }
           <p class="look"><b>Look at:</b> a step bigger to stop a thumb, still calm. Frame 0 shows line one alone, in the same place.</p></div>
       </div>
       <div class="recipe">
-        <div class="frame"><img src="s/06.jpg" alt="70,000 in amber brush over homes" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
+        <div class="frame"><img src="s/06.jpg" alt="70,000 bold in glowing honey over homes" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
         <div class="meta"><span class="tag">R3 · The big number · still 06</span><h3>The number reads first</h3>
           <p class="words">"70,000 / homes?" <span class="tm">2.30 → 3.38 s</span></p>
-          <p class="look"><b>Look at:</b> amber like the lit windows, so the number feels part of the city. Numerals, not words.</p></div>
+          <p class="look"><b>Look at:</b> the hand's Bold in honey with a soft glow, like the lit windows below, so the number feels part of the city. Numerals, not words.</p></div>
       </div>
       <div class="recipe">
         <div class="frame"><img src="s/04.jpg" alt="on giant / computers in the light hand, staggered" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
@@ -243,10 +267,16 @@ section { display: grid; gap: 16px; }
         <div class="frame"><img src="s/09.jpg" alt="A paper tag reading 2027 on the building, the caption starting next year above" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
         <div class="meta"><span class="tag">R7 · The word in the world · still 09</span><h3>A word that lives on a thing</h3>
           <p class="words">Tag "2027", caption "starting / next year." <span class="tm">27.03 → 28.30 s</span></p>
-          <p class="look"><b>Look at:</b> the year belongs to the place and moves with the camera. The caption and the tag never repeat a word.</p></div>
+          <p class="look"><b>Look at:</b> the year belongs to the place, written in the same hand, and moves with the camera. The caption and the tag never repeat a word.</p></div>
       </div>
       <div class="recipe">
-        <div class="frame"><img src="s/10.jpg" alt="So your chatbot / could soon heat, heat in amber brush" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
+        <div class="frame"><img src="s/14.jpg" alt="wants just popped in, its warm halo half on" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
+        <div class="meta"><span class="tag">R4 entrance · still 14</span><h3>The stressed word arrives as light</h3>
+          <p class="words">"But Helsinki / wants" <span class="tm">24.00 s, 2 of 8 frames in</span></p>
+          <p class="look"><b>Look at:</b> the word pops in whole and its glow comes on over 8 frames, like a lamp, never like paint going on. The brush write-on is gone with the brush.</p></div>
+      </div>
+      <div class="recipe">
+        <div class="frame"><img src="s/10.jpg" alt="So your chatbot / could soon heat, heat bold in glowing honey" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
         <div class="meta"><span class="tag">R9 · The payoff · still 10</span><h3>The core line lands on one warm word</h3>
           <p class="words">"So your chatbot / could soon heat" <span class="tm">38.43 → 39.93 s</span></p>
           <p class="look"><b>Look at:</b> "heat" is the only accent on screen, at the end of the sentence. The last group then comes in at the hook's size, so the film's ends match.</p></div>
@@ -262,7 +292,7 @@ section { display: grid; gap: 16px; }
 
   <footer class="foot">
     <p>Built on the owner's two references, 15 sourced findings (platform safe zones, caption reading speed, emphasis, contrast without boxes) and 85 free fonts tested against your reel's lettering. Every font here is free for commercial use.</p>
-    <p>The full guide, with exact sizes, positions and timings for each recipe: <a href="https://github.com/devilsanek1/Test-/blob/claude/kind-pascal-lvgsza/video/docs/look/TYPE_GUIDE.md" target="_blank" rel="noopener">TYPE_GUIDE.md</a>. The research: <a href="https://github.com/devilsanek1/Test-/blob/claude/kind-pascal-lvgsza/video/docs/look/type/RESEARCH.md" target="_blank" rel="noopener">RESEARCH.md</a>.</p>
+    <p>The full guide, with exact sizes, positions and timings for each recipe: <a href="https://github.com/devilsanek1/Test-/blob/claude/kind-pascal-lvgsza/video/docs/look/TYPE_GUIDE.md" target="_blank" rel="noopener">TYPE_GUIDE.md</a>. The research: <a href="https://github.com/devilsanek1/Test-/blob/claude/kind-pascal-lvgsza/video/docs/look/type/RESEARCH.md" target="_blank" rel="noopener">RESEARCH.md</a>. The re-evaluation after your note: <a href="https://github.com/devilsanek1/Test-/blob/claude/kind-pascal-lvgsza/video/docs/look/type/PLEASANT.md" target="_blank" rel="noopener">PLEASANT.md</a>.</p>
   </footer>
 </div>
 

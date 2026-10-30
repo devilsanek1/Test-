@@ -240,4 +240,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   Brush Script, burnt #8E3A12, all capitals, on the dusk sky): "One immediate note / The text should be pleasant to look
   at like it shouldn't look like a blood message on the wall / Reevaluate" -> the brush in dark burnt red retired; the
   emphasis re-evaluated for pleasantness (colour, stroke, case), options compared on the same moment, the stills and the
-  page updated. -> rule: playbook, Visual style (the words are PLEASANT to look at).
+  page updated: the lit hand (the stressed word in the hand's Bold, bigger, lowercase; honey with a golden glow on night
+  skies, a soft warm halo on light skies; plum running ink on light skies), the brush and its write-on retired; options in
+  stills 15-17; `docs/look/type/PLEASANT.md`; page version 2 (same link). -> rule: playbook, Visual style (the words
+  are PLEASANT to look at).
