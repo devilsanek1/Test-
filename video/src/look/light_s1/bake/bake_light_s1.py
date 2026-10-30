@@ -130,6 +130,8 @@ def main():
             SV.write_png(os.path.join(out_dir, 'grain.lmap.png'), tile)
             live['grain'] = dict(file='grain.lmap.png', size=size)
         manifest[look] = {'slots': rows, 'live': live}
+        with open(os.path.join(out_dir, 'manifest.json'), 'w') as fh:
+            json.dump(manifest[look], fh, indent=1, sort_keys=True)
         err = np.abs(comp - T)
         cover = np.zeros((H, W), bool)
         for m in SV.slot_pixels(car, L).values():
@@ -147,6 +149,11 @@ def main():
             prev = comp * (1 - mv) + ball * mv
             save_srgb(os.path.join(a.preview, f'preview_{look}.png'), prev)
             save_srgb(os.path.join(a.preview, f'target_{look}.png'), T)
+    # maps.ts carries every look baked so far (a look not rebaked keeps its own manifest on disk)
+    for look in ('light', 'full'):
+        mf = os.path.join(MAPS_DIR, look, 'manifest.json')
+        if look not in manifest and os.path.exists(mf):
+            manifest[look] = json.load(open(mf))
     write_maps_ts(manifest)
     report['total_s'] = round(time.time() - t0, 2)
     report['sun'] = parts['sun']

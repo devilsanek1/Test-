@@ -20,16 +20,16 @@ const FONT = 'Inter, DejaVu Sans, sans-serif';
 
 type Row = {face: FaceOpt; name: string; lines: string[]; views?: {view: View; label: string}[]; castView?: View; rec?: boolean};
 export const ROWS: Row[] = [
-  {face: 'now', name: 'now', lines: ['the current mark: the brow', "ridge's shade running into", 'the nose (a "7")']},
-  {face: 'edge', name: '1  EDGE', lines: ['the far contour is the face:', 'brow, nose, lips, chin;', 'nothing inside, light only']},
-  {face: 'lash', name: '2  LASH', lines: ['closed-eye lash lines (one', 'flick each) and a short,', 'soft nose plane']},
-  {face: 'glow', name: '3  GLOW', lines: ['ONE warm tone on the', "cheek's apple and the lips;", 'no lines']},
-  {face: 'shades', name: '4  SHADES', lines: ['oversized sunglasses as the', 'default face, one streak;', 'the nose plane below']},
-  {face: 'brim', name: '5  BRIM', lines: ["a cap: its brim's crisp", 'shadow over the eyes,', 'the nose plane below']},
+  {face: 'now', name: 'now', lines: ['the current mark: the', "brow ridge's shade", 'running into the nose', '(a "7"): the reference']},
+  {face: 'edge', name: '1  EDGE', lines: ['the far contour is the', 'face: brow, nose, lips,', 'chin; nothing inside,', 'the light planes only']},
+  {face: 'lash', name: '2  LASH', lines: ['closed-eye lash lines,', 'one flick each, and a', 'short, soft nose hook;', 'in profile the curtain', 'tucked behind the eye']},
+  {face: 'glow', name: '3  GLOW', lines: ['ONE warm tone: a plane', 'along the cheekbone', 'and the lips; no lines']},
+  {face: 'shades', name: '4  SHADES', lines: ['oversized sunglasses as', 'the default face (one', 'streak); the nose hook', 'below them']},
+  {face: 'brim', name: '5  BRIM', lines: ["a cap: its brim's crisp", 'shadow over the eyes,', 'the nose hook below']},
   {
     face: 'turn',
     name: '6  TURN',
-    lines: ['the face turned away: the', 'lost profile; the nose tip', 'and one lash flick peek;', 'in profile hair over the eye'],
+    lines: ['the face turned away:', 'the lost profile, the', 'nose tip and one lash', 'flick peek; in profile', 'hair over the eye.', 'The man and the woman', 'have no back view yet:', 'shown here as EDGE'],
     views: [
       {view: 'b', label: 'rear 3/4 (yaw -138)'},
       {view: 'p', label: 'profile, hair forward'},
@@ -56,8 +56,9 @@ const ROW_H = 460;
 const ROW_GAP = 46;
 const Y0 = 300;
 export const FACES_H = Y0 + ROWS.length * (ROW_H + ROW_GAP) + 30;
-/** the compare sheet's doorway crop (frame px of the 1080 x 1920 still), 50 px off its top, shown 2x */
-const DOOR_VIEW = {x: 545, y: 880, w: 280, h: 230};
+/** the compare sheet's doorway crop (frame px of the 1080 x 1920 still), trimmed to her height (62 px off its top,
+ *  5 off its bottom), shown 2x */
+const DOOR_VIEW = {x: 545, y: 892, w: 280, h: 213};
 const DOOR_Z = 2;
 
 const T: React.FC<{x: number; y: number; s?: number; w?: number; c?: string; a?: 'start' | 'middle' | 'end'; children: React.ReactNode}> = ({
@@ -120,7 +121,7 @@ const RowView: React.FC<{r: Row; i: number}> = ({r, i}) => {
         </g>
       ) : null}
       {r.lines.map((l, k) => (
-        <T key={k} x={X_LABEL} y={y + (r.rec ? 140 : 96) + k * 28} s={21}>
+        <T key={k} x={X_LABEL} y={y + (r.rec ? 136 : 92) + k * 27} s={20}>
           {l}
         </T>
       ))}
