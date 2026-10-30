@@ -12,7 +12,7 @@ const torsoDepth = (sk: Skeleton, v: View) => proj(sk.leanXf([sk.cx(sk.b.chestY)
 export function leg(sk: Skeleton, s: Side, v: View, mat = 'skin'): Part {
   const b = sk.b;
   const chain: V3[] = [sk.hip[s], sk.knee[s], sk.ankle[s]];
-  const pts = tubeOutline(chain, (u) => legRadius(b, u), v, [0, 0, 1], {m: 34});
+  const pts = tubeOutline(chain, (u) => legRadius(b, u, s === 'l' ? 1 : -1), v, [0, 0, 1], {m: 40});
   const d = proj(sk.knee[s], v).d - torsoDepth(sk, v);
   return {k: `leg_${s}`, pts, mat, z: d < 0 ? Z.farLeg : Z.leg, tension: 0.5};
 }
@@ -57,14 +57,14 @@ export type SleeveSpec = {
  *  garment's own shoulder (the torso loft carries the shoulder's smooth arc, the dropped seam), so no cap stands above
  *  the shoulder. */
 export function sleeve(sk: Skeleton, s: Side, v: View, mat: string, spec: SleeveSpec, grp?: string): Part[] {
-  const ss = s === 'l' ? 1 : -1;
   const drop = spec.drop ?? 0;
   const S0 = sk.sh[s];
   const E = sk.elbow[s];
   const W = sk.wrist[s];
-  // the sleeve's top: down the upper arm by the drop, a little outside the joint
+  // the sleeve's top: its cap's dome rises to the shoulder line, its outer edge on the garment's shoulder (the garment
+  // rows put the shoulder at shX + r0 + 2), so the arm leaves the shoulder in one line, never a puffed cap
   const ua: V3 = norm3(sub3(E, S0));
-  const S = add3(add3(S0, mul3(ua, 10 + drop * 0.9)), [ss * (2 + drop * 0.15), 0, 0]);
+  const S = add3(S0, mul3(ua, spec.r[0] * 0.5 + drop * 0.5));
   const end = spec.end ?? 1;
   const Wend: V3 = [lerp(E[0], W[0], end), lerp(E[1], W[1], end), lerp(E[2], W[2], end)];
   const [r0, r1, r2] = spec.r;

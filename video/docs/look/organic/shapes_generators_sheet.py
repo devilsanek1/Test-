@@ -30,8 +30,8 @@ from shapes_measure import measure_crop, overlay, _clean  # noqa: E402
 
 PW, PH = 460, 330          # one panel, px of the frame
 SKY = (214, 205, 230)
-CLOUD_LIT = (248, 222, 200); CLOUD_SHADE = (178, 160, 204)
-LEAF_LIT = (126, 150, 84); LEAF_SHADE = (70, 98, 72)
+CLOUD_LIT = (248, 222, 200); CLOUD_BODY = (208, 182, 208); CLOUD_SHADE = (170, 150, 198)
+LEAF_LIT = (140, 160, 88); LEAF_MID = (98, 124, 78); LEAF_SHADE = (66, 90, 70); TRUNK = (96, 74, 70)
 WALL_LIT = (226, 178, 150); WALL_SHADE = (184, 136, 128); GLASS = (64, 78, 96); LIT_WIN = (250, 214, 140)
 PAVE = (180, 128, 110); JOINT = (140, 94, 86)
 
@@ -87,16 +87,15 @@ def cloud_before():
 
 def cloud_after():
     img = canvas()
-    P, R = G.cumulus('sheet/cloud', 232, 272, 330, 230)
+    P, R = G.cumulus('sheet/cloud/v5', 232, 272, 370, 205)
     cov = G.fill_outline(P, (PH, PW))
-    a = G.edge_alpha(cov, 'sheet/cloud/e', light=(-0.75, -0.65), found=0.4, lost=0.3, teeth_dir_deg=-8)
-    put(img, a, CLOUD_SHADE)
-    # the lit mass: the same outline, moved toward the light, cut by a wavy terminator (never a crescent)
-    cov2 = G.fill_outline(P - [4, 6], (PH, PW))
-    yy, xx = np.mgrid[0:PH, 0:PW]
-    term = 226 + 0.45 * (xx - 232) + 14 * G.noise2d((PH, PW), 55, 'sheet/cloud/t', 3)
-    litm = np.minimum(cov2, np.clip((term - yy) / 3.0 + 0.5, 0, 1))
-    put(img, np.minimum(litm, a), CLOUD_LIT)
+    a = G.edge_alpha(cov, 'sheet/cloud/e', light=(-0.75, -0.65), found=0.4, lost=0.3, crisp_w=1.4, soft_w=(4.0, 9.0),
+                     lost_w=(14.0, 24.0), teeth_dir_deg=0, slow_px=110)
+    lit, shade = G.shade3(cov, 'sheet/cloud/l', light=(-0.75, -0.65), scale=R / 20, big=R / 4, big_w=0.35,
+                          lit_t=0.06, shade_t=-0.14, wander=0.08, wander_px=40)
+    put(img, a, CLOUD_BODY)
+    put(img, np.minimum(lit, a), CLOUD_LIT)
+    put(img, np.minimum(shade, a), CLOUD_SHADE)
     return img
 
 
@@ -112,13 +111,16 @@ def bank_before():
 
 def bank_after():
     img = canvas()
-    P, R = G.bank('sheet/bank', 238, 112, 400, 46)
-    put(img, G.edge_alpha(G.fill_outline(P, (PH, PW)), 'sheet/bank/e', light=(0.2, 1.0), found=0.35, lost=0.35,
-                          teeth_dir_deg=0), CLOUD_SHADE)
-    for i, (x0, x1, y, t) in enumerate([(70, 360, 175, 11), (20, 250, 232, 8), (190, 450, 268, 7)]):
+    for i, (cx, base, L, h) in enumerate([(250, 92, 420, 40), (190, 176, 300, 22)]):
+        for j, (P, R) in enumerate(G.bank(f'sheet/bank{i}', cx, base, L, h)):
+            put(img, G.edge_alpha(G.fill_outline(P, (PH, PW)), f'sheet/bank{i}/{j}/e', light=(0.2, 1.0), found=0.35,
+                                  lost=0.35, crisp_w=1.4, soft_w=(3.0, 6.0), lost_w=(10.0, 16.0), teeth_dir_deg=0,
+                                  slow_px=90), CLOUD_SHADE)
+    for i, (x0, x1, y, t) in enumerate([(20, 260, 236, 8), (210, 450, 272, 7), (60, 330, 300, 5)]):
         Q = G.streak(f'sheet/streak{i}', x0, x1, y, t, sag=G.seeded(i).uniform(-3, 3))
         put(img, G.edge_alpha(G.fill_outline(Q, (PH, PW)), f'sheet/streak{i}/e', light=(0.2, 1.0), found=0.3,
-                              lost=0.4, teeth_dir_deg=0, slow_px=90), CLOUD_SHADE)
+                              lost=0.4, crisp_w=1.2, soft_w=(2.5, 5.0), lost_w=(8.0, 12.0), teeth_dir_deg=0, slow_px=90),
+            CLOUD_SHADE)
     return img
 
 
@@ -165,24 +167,26 @@ def tree_before():
 
 def tree_after():
     img = canvas()
+    cov, (x0, y0), P = G.crown('sheet/tree', 232, 120, 280, 200)
+    full = _paste(cov, x0, y0)
+    cols = np.where(full[:, 200:260].max(1) > 0.5)[0]
+    yb = int(cols.max()) if len(cols) else 220          # the crown's underside over the trunk
+    ty = yb - 22                                         # the fork sits inside the crown, never under it
 
     def trunk(m, ss):
-        pts = np.array([[220, 330], [238, 330], [236, 268], [252, 236], [246, 232], [230, 258], [214, 232], [208, 236],
-                        [224, 268]], float)
+        pts = np.array([[221, 330], [241, 330], [238, ty + 70], [250, ty + 40], [266, ty + 6], [257, ty + 2],
+                        [242, ty + 36], [232, ty + 56], [226, ty + 30], [210, ty + 4], [202, ty + 9], [221, ty + 48],
+                        [224, ty + 74]], float)
         cv2.fillPoly(m, [np.round(pts * ss * 16).astype(np.int32)], 255, cv2.LINE_AA, shift=4)
-    put(img, ss_fill(trunk), (96, 74, 70))
-    cov, (x0, y0), P = G.crown('sheet/tree', 232, 178, 175, 120, masses=5)
-    full = np.zeros((PH, PW), np.float32)
-    h, w = cov.shape
-    ya, xa = max(y0, 0), max(x0, 0); yb, xb = min(y0 + h, PH), min(x0 + w, PW)
-    full[ya:yb, xa:xb] = cov[ya - y0:yb - y0, xa - x0:xb - x0]
+    put(img, ss_fill(trunk), TRUNK)
     a = G.edge_alpha(full, 'sheet/tree/e', light=(-0.7, -0.7), found=0.55, lost=0.15, crisp_w=1.0, soft_w=(2.0, 4.0),
-                     lost_w=(6.0, 10.0), teeth_px=(2.0, 4.0), teeth_dir_deg=-60, slow_px=60)
-    put(img, a, LEAF_SHADE)
-    # the lit side: masses lit from the upper left, an organic terminator
-    yy, xx = np.mgrid[0:PH, 0:PW]
-    term = (xx - 236) * 0.8 + (yy - 150) * 1.0 + 26 * G.noise2d((PH, PW), 40, 'sheet/tree/t', 3)
-    put(img, np.minimum(a, np.clip((-term) / 4.0 + 0.5, 0, 1)), LEAF_LIT)
+                     lost_w=(5.0, 8.0), teeth_px=(2.0, 3.0), teeth_dir_deg=-60, slow_px=60, broken=0.12)
+    R = math.sqrt(full.sum() / math.pi)
+    lit, shade = G.shade3(full, 'sheet/tree/l', light=(-0.7, -0.7), scale=R / 12, big=R / 3, big_w=0.4, lit_t=0.08,
+                          shade_t=-0.12, wander=0.06, wander_px=30)
+    put(img, a, LEAF_MID)
+    put(img, np.minimum(lit, a), LEAF_LIT)
+    put(img, np.minimum(shade, a), LEAF_SHADE)
     return img
 
 
@@ -203,30 +207,47 @@ def facade_before():
     return img
 
 
-def facade_after():
-    img = canvas()
-    P = G.hand_cut(np.array([[60, 40], [400, 40], [400, 330], [60, 330]], float), 'sheet/facade')
-    wall = G.fill_outline(P, (PH, PW))
-    # the shade side (right) loses its edge into the evening air: a lost stretch, not a ruler edge
-    a = G.edge_alpha(wall, 'sheet/facade/e', light=(-1.0, -0.2), found=0.6, lost=0.2, crisp_w=1.4, soft_w=(3.0, 5.0),
-                     lost_w=(10.0, 16.0), teeth_px=(2.0, 3.0), teeth_dir_deg=90, slow_px=160, broken=0.15)
-    put(img, a, WALL_LIT)
-    yy, xx = np.mgrid[0:PH, 0:PW]
-    shade = np.clip((xx - 330 - 10 * G.noise2d((PH, PW), 90, 'sheet/facade/s', 2)) / 6.0, 0, 1)
-    put(img, np.minimum(a, shade), WALL_SHADE)
-    rects = [(84 + i * 80, 64 + j * 88, 84 + i * 80 + 48, 64 + j * 88 + 62) for j in range(3) for i in range(4)]
-    for k, (x0, y0, x1, y1, st) in enumerate(G.vary_rects('sheet/facade/w', rects, states=('lit', 'dark', 'dark', 'sky'))):
-        Q = G.hand_cut(np.array([[x0, y0], [x1, y0], [x1, y1], [x0, y1]], float), f'sheet/facade/w{k}',
-                       side_turn=(0.5, 1.5), bow=(0.002, 0.006), round_px=(0.8, 1.6))
-        col = {'lit': LIT_WIN, 'dark': GLASS, 'sky': (150, 160, 190)}[st]
-        put(img, G.fill_outline(Q, (PH, PW)) * (0.92 if st == 'sky' else 1.0), col)
-    # an overlap breaks the silhouette: a branch of the near tree crosses the corner (never tangent to it)
-    cov, (x0, y0), _ = G.crown('sheet/facade/branch', 452, 70, 80, 56, masses=3, holes=1)
+def _paste(cov, x0, y0):
     full = np.zeros((PH, PW), np.float32)
     h, w = cov.shape
     ya, xa = max(y0, 0), max(x0, 0); yb, xb = min(y0 + h, PH), min(x0 + w, PW)
     full[ya:yb, xa:xb] = cov[ya - y0:yb - y0, xa - x0:xb - x0]
-    put(img, full, LEAF_SHADE)
+    return full
+
+
+def facade_after():
+    img = canvas()
+    # two faces in a slight two-point view (no corner of the picture at 90 deg +- 7), each side hand-cut
+    front = G.hand_cut(np.array([[54, 48], [316, 40], [318, 330], [52, 330]], float), 'sheet/facade/f')
+    side = G.hand_cut(np.array([[316, 40], [402, 62], [404, 330], [318, 330]], float), 'sheet/facade/s')
+    fa = G.edge_alpha(G.fill_outline(front, (PH, PW)), 'sheet/facade/fe', light=(-1.0, -0.3), found=0.7, lost=0.05,
+                      crisp_w=1.3, soft_w=(2.0, 3.5), lost_w=(6.0, 10.0), teeth_px=(2.0, 3.0), teeth_dir_deg=90,
+                      slow_px=160, broken=0.1)
+    # the shade face meets the evening air at a close value: its far edge is LOST over a third of its length
+    sa = G.edge_alpha(G.fill_outline(side, (PH, PW)), 'sheet/facade/se', light=(-1.0, -0.3), found=0.25, lost=0.35,
+                      crisp_w=1.3, soft_w=(3.0, 6.0), lost_w=(10.0, 18.0), teeth_px=(2.0, 3.0), teeth_dir_deg=90,
+                      slow_px=120, broken=0.15)
+    put(img, sa, WALL_SHADE)
+    put(img, fa, WALL_LIT)
+    # windows: no template (sizes +-5-12 %, states lit / dark / sky, never the same state twice running), hand-cut
+    rects = []
+    for j, (y0, hgt) in enumerate([(70, 62), (160, 60), (250, 58)]):
+        for i, (x0, wid) in enumerate([(78, 50), (152, 46), (230, 52)]):
+            rects.append((x0, y0 - 1.5 * i, x0 + wid, y0 - 1.5 * i + hgt))
+    for k, (x0, y0, x1, y1, st) in enumerate(G.vary_rects('sheet/facade/w', rects, states=('lit', 'dark', 'dark', 'sky'))):
+        Q = G.hand_cut(np.array([[x0, y0], [x1, y0], [x1, y1], [x0, y1]], float), f'sheet/facade/w{k}',
+                       side_turn=(0.5, 1.5), bow=(0.002, 0.006), round_px=(0.8, 1.6))
+        col = {'lit': LIT_WIN, 'dark': GLASS, 'sky': (150, 160, 190)}[st]
+        put(img, G.fill_outline(Q, (PH, PW)), col)
+    for k, (y0, hgt) in enumerate([(84, 54), (172, 52), (258, 50)]):     # the side face's windows, foreshortened
+        Q = G.hand_cut(np.array([[338, y0 + 4], [366, y0 + 10], [366, y0 + hgt + 6], [338, y0 + hgt]], float),
+                       f'sheet/facade/sw{k}', side_turn=(0.5, 1.2))
+        put(img, G.fill_outline(Q, (PH, PW)) * 0.85, GLASS)
+    # overlaps break the silhouette: a branch over the top corner, a shrub over the base (never tangent to either)
+    cov, (x0, y0), _ = G.crown('sheet/facade/branch', 404, 58, 92, 64, holes=1)
+    put(img, _paste(cov, x0, y0), LEAF_SHADE)
+    cov, (x0, y0), _ = G.crown('sheet/facade/shrub', 104, 322, 120, 52, holes=0)
+    put(img, _paste(cov, x0, y0), LEAF_MID)
     return img
 
 
@@ -268,12 +289,13 @@ def paving_after():
         for (pts, op) in G.broken_line(f'sheet/paving/j{k}', (x0, y0), (x0 + r.uniform(60, 130), y0 + r.uniform(8, 20)),
                                        width=1.6, gaps=0.3, bow=0.01):
             put(img, G.fill_outline(pts, (PH, PW)) * op * 0.8, JOINT)
-    # a tree's cast shadow lies across the ground: leafy lobes, lost on the far side
-    base = np.stack([250 + 170 * np.cos(np.linspace(0, 2 * math.pi, 200, endpoint=False)),
-                     205 + 62 * np.sin(np.linspace(0, 2 * math.pi, 200, endpoint=False))], 1)
-    shadow = G.displace(base, G.spectrum_for(100, 'foliage'), 'sheet/paving/sh', billow=1)
-    a = G.edge_alpha(G.fill_outline(shadow, (PH, PW)), 'sheet/paving/she', light=(-1, -0.3), found=0.35, lost=0.35,
-                     soft_w=(4, 8), lost_w=(14, 22), slow_px=90, teeth_dir_deg=10)
+    # a tree's cast shadow lies across the ground: the crown's own lobes, flattened by the low sun, with sun gaps;
+    # its near edge found, its far edge lost
+    cov, (x0, y0), _ = G.crown('sheet/paving/sh', 250, 150, 300, 210, holes=2)
+    flat = cv2.resize(cov, (cov.shape[1], max(1, int(cov.shape[0] * 0.38))), interpolation=cv2.INTER_AREA)
+    sh = _paste(flat, x0, 228 - flat.shape[0] // 2)
+    a = G.edge_alpha(sh, 'sheet/paving/she', light=(0.0, 1.0), found=0.4, lost=0.3, crisp_w=1.4, soft_w=(3.0, 6.0),
+                     lost_w=(10.0, 16.0), teeth_px=(2.0, 3.0), slow_px=90, teeth_dir_deg=10, broken=0.1)
     img[:] = img * (1 - 0.2 * a[..., None])
     return img
 
@@ -282,9 +304,102 @@ PANELS = [('cloud', cloud_before, cloud_after), ('bank', bank_before, bank_after
           ('facade', facade_before, facade_after), ('paving', paving_before, paving_after)]
 
 
+def _crown_cov(seed):
+    cov, (x0, y0), _ = G.crown(seed, 232, 150, 280, 200)
+    return _paste(cov, x0, y0)
+
+
+SEED_CHECK = [  # every seed, not a picked one: the generator's own silhouettes, one flat value on the sky
+    ('cumulus', lambda k: G.fill_outline(G.cumulus(f'check/cu{k}', 232, 272, 370, 205)[0], (PH, PW))),
+    ('crown', lambda k: _crown_cov(f'check/cr{k}')),
+    ('bank', lambda k: np.clip(sum(G.fill_outline(P, (PH, PW)) for P, _ in G.bank(f'check/bk{k}', 232, 165, 420, 46)), 0, 1)),
+]
+CHECK_KEYS = [('straight', 'edges.straight'), ('ruler', 'edges.long'), ('arc', 'edges.arc'), ('free', 'edges.free'),
+              ('right', 'edges.right_angle'), ('sym', 'symmetry.median'), ('D', 'divider_D')]
+
+
+def _get(d, path):
+    for k in path.split('.'):
+        d = d.get(k) if isinstance(d, dict) else None
+    return d
+
+
+def seed_check(n=6):
+    out = {}
+    for name, fn in SEED_CHECK:
+        rows = []
+        for k in range(n):
+            img = canvas()
+            put(img, fn(k), (120, 100, 150))
+            m, _ = measure_crop(jpeg(img))
+            rows.append({key: _get(m, path) for key, path in CHECK_KEYS})
+        out[name] = {key: [r[key] for r in rows] for key, _ in CHECK_KEYS}
+        print(name, {key: (round(float(np.nanmin(np.array(v, float))), 3), round(float(np.nanmax(np.array(v, float))), 3))
+                     for key, v in out[name].items()}, flush=True)
+    return out
+
+
+def compose(res, out_dir, path):
+    """The proof sheet: per row, before and after with their edge-class overlays and the measured numbers."""
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    INK = '#1d1c1a'; INK2 = '#52514e'; SURF = '#fcfcfb'; C_OURS = '#eb6834'; C_REF = '#2a78d6'
+    rows = [n for n, _, _ in PANELS]
+    W_IN, DPI = 24, 100
+    ROW_IN = 4.25
+    H_IN = 1.6 + ROW_IN * len(rows) + 1.1
+    fig = plt.figure(figsize=(W_IN, H_IN), dpi=DPI, facecolor=SURF)
+    fig.text(0.012, 1 - 0.3 / H_IN, 'Shapes: the generators, before and after, measured with the references\' code',
+             fontsize=24, color=INK, weight='bold', va='top')
+    fig.text(0.012, 1 - 0.85 / H_IN, 'Left: our current way (a union of circles, constant-width bars, a scalloped crown, '
+             'a rectangle grid, ruler joints). Right: shapes_gen.py (flat values only: the measures are about shape and '
+             'edge, not paint). Overlays as on shapes_sheet.png: straight (red), compass arc (amber), free (green), '
+             'corners (dots; red = a right angle). Thick = clearly seen.', fontsize=12.5, color=INK2, va='top', wrap=True)
+    labels = {'cloud': 'Cumulus', 'bank': 'Banks and streaks', 'tree': 'Tree crown', 'facade': 'Facade', 'paving': 'Paving'}
+    KEYS = [('clear geometric', 'clear.geometric_density', '{:.0f}'), ('straight', 'edges.straight', '{:.0%}'),
+            ('ruler lines', 'edges.long', '{:.0%}'), ('compass arcs', 'edges.arc', '{:.0%}'),
+            ('right angles', 'edges.right_angle', '{:.0%}'), ('parallels', 'edges.parallel', '{:.0%}'),
+            ('lost (mass edges)', 'mass_edges.lost_of_clean', '{:.0%}'), ('broken', 'mass_edges.busy', '{:.0%}'),
+            ('crisp (visible edges)', 'edge_width.crisp_of_clean', '{:.0%}'), ('symmetry', 'symmetry.median', '{:.2f}'),
+            ('divider D', 'divider_D', '{:.3f}')]
+    for ri, name in enumerate(rows):
+        top = 1.6 + ri * ROW_IN
+        fig.text(0.012, 1 - top / H_IN, labels[name], fontsize=18, weight='bold', color=INK, va='top')
+        for ci, (tag, sub) in enumerate((('before', ''), ('before', '_ov'), ('after', ''), ('after', '_ov'))):
+            im = cv2.cvtColor(cv2.imread(os.path.join(out_dir, f'{name}_{tag}{sub}.png')), cv2.COLOR_BGR2RGB)
+            w_in = 3.85; h_in = w_in * im.shape[0] / im.shape[1]
+            left = 0.012 + (1.9 + ci * (w_in + 0.12) + (0.25 if ci >= 2 else 0)) / W_IN
+            ax = fig.add_axes([left, 1 - (top + 0.15 + h_in) / H_IN, w_in / W_IN, h_in / H_IN])
+            ax.imshow(im); ax.set_xticks([]); ax.set_yticks([])
+            for s_ in ax.spines.values():
+                s_.set_color(C_OURS if tag == 'before' else C_REF); s_.set_linewidth(2.5)
+            if sub == '':
+                ax.set_title('before (our way)' if tag == 'before' else 'after (shapes_gen.py)', fontsize=12,
+                             color=C_OURS if tag == 'before' else C_REF, loc='left')
+        # the numbers
+        b = res[f'{name}_before']; a_ = res[f'{name}_after']
+        lines = []
+        for lab, path, fmt in KEYS:
+            vb, va = _get(b, path), _get(a_, path)
+            f = lambda v: '-' if v is None else fmt.format(v)
+            lines.append(f'{lab:22s} {f(vb):>6s} -> {f(va):>6s}')
+        fig.text(0.012 + (1.9 + 4 * 3.97 + 0.45) / W_IN, 1 - (top + 0.2) / H_IN, '\n'.join(lines), fontsize=11.5,
+                 family='monospace', color=INK2, va='top', linespacing=1.35)
+    fig.text(0.012, 0.75 / H_IN, 'Every panel through the same JPEG q85 codec as the references; numbers from '
+             'shapes_measure.measure_crop. Seeds are fixed (the same bytes on every run); the seed check in '
+             'shapes_generators.json measures six unpicked seeds of each natural generator. Rerun: '
+             'python3 docs/look/organic/shapes_generators_sheet.py --sheet (from video/).', fontsize=11.5, color=INK2,
+             va='top')
+    fig.savefig(path, dpi=DPI, facecolor=SURF)
+    print('wrote', path)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--out', default='/tmp/organic/shapes/gen_run')
+    ap.add_argument('--sheet', action='store_true', help='also compose docs/look/organic/shapes_generators.png')
+    ap.add_argument('--no-seeds', action='store_true')
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
     res = {}
@@ -302,7 +417,11 @@ def main():
                   f"crisp {me.get('crisp_of_clean', float('nan')):.2f} broken {me.get('busy', float('nan')):.2f} | "
                   f"sym {m['symmetry']['median']:.2f} rep {m['repetition']['median_sim']:.2f} D {m['divider_D']:.3f}",
                   flush=True)
+    if not args.no_seeds:
+        res['seed_check'] = _clean(seed_check())
     json.dump(res, open(os.path.join(args.out, 'shapes_generators.json'), 'w'), indent=1)
+    if args.sheet:
+        compose(res, args.out, os.path.join(HERE, 'shapes_generators.png'))
 
 
 if __name__ == '__main__':

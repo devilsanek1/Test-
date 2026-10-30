@@ -163,8 +163,8 @@ export function sunglasses(r: HeadRig, v: View): {lenses: PP[][]; bridge: PP[] |
   const fy = faceYaw(r);
   const lenses: PP[][] = [];
   const glints: PP[][] = [];
-  const t0 = 0.395;
-  const t1 = 0.585;
+  const t0 = 0.385;
+  const t1 = 0.612;
   for (const side of [1, -1]) {
     // a soft-cornered oversize square: phi from the bridge (8) to past the eye's outer corner (52)
     const reg = headRegion(
@@ -174,9 +174,9 @@ export function sunglasses(r: HeadRig, v: View): {lenses: PP[][]; bridge: PP[] |
       t1,
       (t) => {
         const u = (t - t0) / (t1 - t0);
-        const round = 1 - Math.sqrt(Math.max(0, 1 - (2 * u - 1) ** 6)) * 0.0;
-        const inner = 7 + 5 * Math.abs(2 * u - 1) ** 3 + round;
-        const outer = 54 - 9 * Math.abs(2 * u - 1) ** 4 - (u > 0.6 ? 6 * (u - 0.6) : 0);
+        const e = Math.abs(2 * u - 1);
+        const inner = 6 + 8 * e ** 3 + (u > 0.55 ? 10 * (u - 0.55) : 0);
+        const outer = 57 - 12 * e ** 3 - (u > 0.6 ? 10 * (u - 0.6) : 0);
         return side === 1 ? [90 - outer, 90 - inner] : [90 + inner, 90 + outer];
       },
       0.055 * r.h,

@@ -141,7 +141,16 @@ export function torsoGarment(sk: Skeleton, g: TorsoGarment, res: number): Surfac
         p += g.drop * w;
         m += g.drop * w;
       }
-      // the neckline: near the top the ring closes in toward the neck (a soft roll of cloth)
+      // the neckline: near the top the ring closes in around the neck's base (cloth lies on the trapezius and hugs
+      // the neck), so a neckline never gapes open and the shoulder line slopes cleanly into the neck
+      const nk = b.neckR + 3 + Math.min(e, 10) * 0.35;
+      const wn = smooth(820, top + 2, y);
+      if (wn > 0) {
+        f = mix(f, Math.min(f, nk + 2), wn);
+        bk = mix(bk, Math.min(bk, nk + 3), wn);
+        p = mix(p, Math.min(p, nk + 4), wn);
+        m = mix(m, Math.min(m, nk + 4), wn);
+      }
       const q: Q4 = {f, b: bk, p, m, nf: nF, nb: nB};
       const c = Math.cos(phi);
       const s = Math.sin(phi);
@@ -208,8 +217,8 @@ export function sleeveSurface(sk: Skeleton, side: 'L' | 'R', sl: Sleeve, res: nu
   const sh = sk.shoulder[side];
   const el = sk.elbow[side];
   const wr = sk.wrist[side];
-  // the sleeve's head: a dome over the shoulder joint, standing off the arm's own cap by the ease
-  const CAP = 30;
+  // the sleeve's head: a low dome over the shoulder joint (it tucks under the garment's shoulder line)
+  const CAP = 16;
   const upv = nrm(sub(sh, el));
   const ext = add(sh, scl(upv, CAP));
   const chain = [ext, sh, el, wr];
@@ -322,15 +331,13 @@ export function skirtSurface(sk: Skeleton, sl: Skirt, res: number): Surface {
       az = h.az;
       const fz0 = mix(ref.f, ref.f + (sl.hemHalf - ref.a) * 0.7, k);
       const bz0 = mix(ref.b, ref.b + (sl.hemHalf - ref.a) * 0.6, k);
-      // never inside the legs' hull
-      q = {
-        f: Math.max(fz0, h.q.f + dot(sub(h.o, o), az)),
-        b: Math.max(bz0, h.q.b - dot(sub(h.o, o), az)),
-        p: Math.max(half, h.q.p + dot(sub(h.o, o), ax)),
-        m: Math.max(half, h.q.m - dot(sub(h.o, o), ax)),
-        nf: 2.15,
-        nb: 2.15,
-      };
+      // never inside the legs' hull (blended in below the hips, so the outline has no step at the seam)
+      const hw = smooth(470, 400, y);
+      const hf = mix(fz0, Math.max(fz0, h.q.f + dot(sub(h.o, o), az)), hw);
+      const hb = mix(bz0, Math.max(bz0, h.q.b - dot(sub(h.o, o), az)), hw);
+      const hp = mix(half, Math.max(half, h.q.p + dot(sub(h.o, o), ax)), hw);
+      const hm = mix(half, Math.max(half, h.q.m - dot(sub(h.o, o), ax)), hw);
+      q = {f: hf, b: hb, p: hp, m: hm, nf: 2.15, nb: 2.15};
     }
     let disp: ((phi: number) => number) | undefined;
     if (sl.folds) {
@@ -446,8 +453,8 @@ export function shoeSurfaces(sk: Skeleton, side: 'L' | 'R', sh: Shoe, res: numbe
   const s = side === 'L' ? 1 : -1;
   const lat = nrm(cross(fc.up, fc.dir));
   const latS: V3 = dot(lat, mulMV(rotY(0), [s, 0, 0])) < 0 ? scl(lat, -1) : lat;
-  const H = sh.style === 'flat' ? 30 : sh.style === 'loafer' ? 40 : 46;
-  const W = sh.style === 'flat' ? 26 : 30;
+  const H = sh.style === 'flat' ? 30 : 38;
+  const W = sh.style === 'flat' ? 26 : 27;
   const nr = rowsFor(22, res, 8);
   const nc = rowsFor(22, res, 10);
   const grid: V3[][] = [];

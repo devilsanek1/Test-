@@ -56,8 +56,8 @@ export const WOMAN: Build = {
   neckR: 21,
   neckD: 23,
   shY: 806,
-  shX: 92,
-  shOuter: 112,
+  shX: 88,
+  shOuter: 114,
   armpitY: 760,
   chestY: 738,
   chestA: 88,
@@ -80,8 +80,8 @@ export const WOMAN: Build = {
   foreArm: 146,
   hand: 96,
   foot: 148,
-  legR: [62, 44, 31, 35, 16],
-  armR: [30, 23, 25, 16],
+  legR: [50, 34, 26, 30, 14.5],
+  armR: [25, 19, 20.5, 14],
 };
 
 /** A man: 8.3 heads (skull 0.121 H), broader shoulders (0.27 H outer), a straighter waist and hip. */
@@ -94,8 +94,8 @@ export const MAN: Build = {
   neckR: 27,
   neckD: 29,
   shY: 800,
-  shX: 110,
-  shOuter: 134,
+  shX: 106,
+  shOuter: 136,
   armpitY: 750,
   chestY: 728,
   chestA: 110,
@@ -118,8 +118,8 @@ export const MAN: Build = {
   foreArm: 152,
   hand: 104,
   foot: 158,
-  legR: [66, 50, 36, 40, 19],
-  armR: [36, 28, 30, 20],
+  legR: [56, 40, 30, 34, 17.5],
+  armR: [29, 23, 24.5, 17],
 };
 
 // ---------------------------------------------------------------- the pose
@@ -296,9 +296,10 @@ export function skeleton(b: Build, pose: Pose): Skeleton {
     let hd: 'relaxed' | 'grip' | 'hidden' | 'thumb' = 'relaxed';
     switch (ap.kind) {
       case 'pocket': {
-        // a coat or trouser side pocket at the hip's front: the hand gone, the elbow out and back
-        target = [cx(b.hipY) + ss * (b.hipA + 12), b.hipY + 34 - bob, 34];
-        pole = [ss * 1, 0.2, -1];
+        // a coat or trouser side pocket at the hip's front: the hand gone, the arm nearly straight, the elbow soft and
+        // turned back (never a chicken wing: design_research A5, the forearm 20-40 degrees off the body)
+        target = [cx(b.hipY) + ss * (b.hipA + 16), b.hipY - 6 - bob, 40];
+        pole = [ss * 0.35, 0, -1];
         hd = 'hidden';
         break;
       }
@@ -366,15 +367,18 @@ export function skeleton(b: Build, pose: Pose): Skeleton {
   return {b, pose, cx, cz, tilt, leanXf, hip, knee, ankle, footYaw, footPitch, sh, elbow, wrist, neckBase, pivot, hand, bob};
 }
 
-/** The leg's radius profile (lateral, depth, the calf's offset back) at the bone fraction s (0 hip .. 1 ankle). */
-export function legRadius(b: Build, s: number): {ru: number; rv: number; off: number} {
+/** The leg's radius profile (lateral, depth, the calf's offset back, its offset toward the inner side) at the bone
+ *  fraction s (0 hip .. 1 ankle): a slim knee, the calf's peak high and behind (its inner bulge a little lower), a long
+ *  concave sweep down to a slim ankle (design_research S2, S6: thigh : ankle ~3.4 : 1). `medial` = +1 for the left leg
+ *  (the tube's +u axis points to the figure's right), -1 for the right. */
+export function legRadius(b: Build, s: number, medial = 0): {ru: number; rv: number; off: number; offU: number} {
   const [th, ak, kn, cf, an] = b.legR;
-  // hip 0, above the knee 0.42, knee 0.5, calf peak 0.62 (outer higher), ankle 1 (the thigh : ankle ~ 3.6 : 1)
-  const xs = [0, 0.2, 0.42, 0.5, 0.6, 0.66, 0.84, 0.97, 1];
-  const ru = pchip(xs, [th, th * 0.9, ak, kn, cf, cf * 0.96, an * 1.25, an, an * 1.02])(s);
-  const rv = pchip(xs, [th * 1.05, th * 0.92, ak * 1.05, kn * 1.12, cf * 1.14, cf * 1.08, an * 1.3, an * 1.12, an * 1.1])(s);
-  const off = pchip([0, 0.44, 0.5, 0.6, 0.7, 0.88, 1], [0, 0, -2, -7, -6, -2, 0])(s);
-  return {ru, rv, off};
+  const xs = [0, 0.2, 0.42, 0.5, 0.6, 0.7, 0.8, 0.9, 0.97, 1];
+  const ru = pchip(xs, [th, th * 0.86, ak, kn, cf, cf * 0.93, cf * 0.72, an * 1.12, an, an * 1.04])(s);
+  const rv = pchip(xs, [th * 1.05, th * 0.9, ak * 1.05, kn * 1.1, cf * 1.2, cf * 1.1, cf * 0.8, an * 1.2, an * 1.1, an * 1.1])(s);
+  const off = pchip(xs, [0, 0, 0, -1, -7, -6.5, -3.5, -1, 0, 0])(s);
+  const offU = medial * pchip(xs, [0, 0, 0, 0.5, 2.6, 3.0, 1.6, 0.3, 0, 0])(s);
+  return {ru, rv, off, offU};
 }
 export function armRadius(b: Build, s: number): {ru: number; rv: number; off: number} {
   const [ua, el, fa, wr] = b.armR;

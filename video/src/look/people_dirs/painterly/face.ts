@@ -129,16 +129,18 @@ export function faceMarks(sk: Skeleton, fm: FaceMarks, res: number, fs: FaceShap
     if (fm.lips) {
       const top: [number, number][] = [];
       const bot: [number, number][] = [];
-      for (let k = 0; k <= 8; k++) {
-        const t = k / 8;
-        const ang = mix(-0.2, 0.2, t);
-        const bow = Math.sin(Math.PI * t);
-        top.push(project(cam, at(sk, fs, 0.178 + 0.03 * bow, ang, 0.003).p));
-        bot.push(project(cam, at(sk, fs, 0.178 - 0.032 * bow, ang, 0.003).p));
+      for (let k = 0; k <= 10; k++) {
+        const t = k / 10;
+        const ang = mix(-0.34, 0.34, t);
+        // the upper lip's bow (a soft M) and the fuller lower lip
+        const bow = Math.pow(Math.sin(Math.PI * t), 0.8);
+        const m = 1 - 0.25 * Math.exp(-((t - 0.5) ** 2) / 0.006);
+        top.push(project(cam, at(sk, fs, 0.18 + 0.026 * bow * m, ang, 0.003).p));
+        bot.push(project(cam, at(sk, fs, 0.18 - 0.036 * bow, ang, 0.003).p));
       }
       const cm = at(sk, fs, 0.18, 0);
       const vl = Math.max(vis(cam, cm.p, cm.n), 0);
-      if (vl > 0.01) out.push({key: 'lips', target: 'head', d: smoothD([...top, ...bot.reverse()]), fill: fm.lips, blur: 1.6, opacity: 0.5 * vl * mid});
+      if (vl > 0.01) out.push({key: 'lips', target: 'head', d: smoothD([...top, ...bot.reverse()]), fill: fm.lips, blur: 1.4, opacity: 0.62 * vl * mid});
     }
     return out;
   };

@@ -11,7 +11,7 @@ selection"); this page is the light.
 compositors build light that reads (§2, 15 sources), what the owner's references do with light, measured (§1), how to
 do each technique in OUR engine with its cost and determinism (§4, §7), the light plan for scene 1 (the low October sun
 on the left as the key, the lit Google doorway as the story light on her: §5), and a proof: the v6 still relit by the
-engine's own renders and masks, at two doses, plus a cost bench in the real render path (§6, §7). **Rank:** research
+engine's own renders and masks, at two doses, in motion, plus a cost bench in the real render path (§6, §7). **Rank:** research
 notes, the lowest rank (DIRECTION's ladder); nothing here is a rule until it is integrated into `CRAFT.md` §d,
 `src/lib/LIGHT.md` and the playbook's PROPER LIGHT. We learn methods; no reference is copied, traced or used as input
 (they are only measured), and no living artist is a style target. Paths are from `video/`.
@@ -23,6 +23,8 @@ notes, the lowest rank (DIRECTION's ladder); nothing here is a rule until it is 
 | `light_motion.mp4` | the motion proof: 1.0-2.4 s at 30 fps, v6 beside the relit frames (her rim, wrap and door shadow follow her; the static light rides each plane's float) |
 | `light_demo.py` | the seeded proof script: every pass of §4 on the engine's renders (`python3 light_demo.py <renders> <out> --times=1.0,1.6 --doses=1.0,1.6 --repeat=2`) |
 | `light_sheet.py` | builds the sheet from the renders and the proof's outputs |
+| `light_motion.py` | builds the MP4 and measures the light over time: does the static light hold still, does her light change smoothly, does anything flicker (§6.4) |
+| `light_blendspace.py` | the blend-space check: each way of shipping the light as two images against the linear result (§4.11) |
 | `light_proto/` | the engine bench: `entry.tsx` + `LightBench.tsx` (v6's scene with one kind of light layer over it), `make_assets.py` (its inputs, written outside the repo), `run_bench.py` (the cost and determinism table, §7) |
 
 ## 0. Bottom line
@@ -39,17 +41,27 @@ notes, the lowest rank (DIRECTION's ladder); nothing here is a rule until it is 
 - **Yes, our engine can do proper light, and cheaply, in three homes** (§4.0): (1) **the colours**: what is simply lit
   or in shade becomes the fill (0 ms); (2) **baked light maps per plane**: one multiply map (the shade masses and the
   falloff) and one screen map (pools, spills, static rims, blooms, shafts), placed like a painted piece so they ride the
-  float; a full-frame blended image costs ~45-50 ms per frame (measured: 3 maps +133 ms, 12 maps +600 ms), so maps are
-  cropped, merged and folded into the colours where they can be; (3) **live layers for movers**: her rim (lib/light's
+  float; a full-frame blended image costs ~40-70 ms per frame (measured: 3 maps +130-160 ms, 12 maps +600 ms), so maps
+  are cropped, merged and folded into the colours where they can be; (3) **live layers for movers**: her rim (lib/light's
   `Rim`, the distance-field band as a vector mask), her light wrap (one small SVG filter), her shadows by projective
   construction, a bloom on a changing source: each within the measuring noise (§7).
+- **And cheaper than v6 is today** (§7): v6's own lib/light layers cost ~340 ms of its ~550 ms frame; with them off and
+  ONE cropped multiply map (the new shade with v6's static shadows folded in), ONE cropped screen map and her live
+  layers, the relit frame renders in 256 ms: -290 ms, with all of §5's light in it.
+- **Ship the light the browser's way** (§4.11): the browser blends sRGB values while light adds in linear light. The
+  shade ships as an sRGB-encoded multiply map; the light as a screen map SOLVED per pixel against the plane's own
+  render. End to end in Chrome, the solved maps reproduce the linear bake within 0.48 L* (mean; p99 1.7); the naive
+  map misses by 1.14 (p99 8.2: shafts and pool visibly too bright, worst on dark ground).
 - **Scene 1, relit** (§5, §6, `light_sheet.jpg`): the doorway is the story light (the lobby 88 -> 91, its pool on the
   towpath 77 -> 84, her wrap and rims, her shadow from the lobby's lamps in the pool); the sun is the key (its glow and
   in-scatter veil, gold rims on the skyline, a sliver up the wing's corner, a warm edge on her front as she walks into
   it); the backlit facade sits in the dusk's rose-plum shade (63 -> 55); our bank lies under the shadow of a canopy
   off-screen left, one big quiet mass with a leafy edge and two warm dapples (55 -> 42). The darks (L* < 40) go from
   6.8 to 14.8 % of the frame (23.9 % at dose 1.6); the brightest 5 % below the sky sits 0.07 H from her; the caption
-  band is untouched (max change 0/255). The bake is 6-8 s per frame on one core, the same bytes on every run.
+  band is untouched (max change 0/255). The bake is 6-8 s per frame on one core, the same bytes on every run. In motion
+  (§6.4, `light_motion.mp4`) the static light holds still (0.02-0.05 L* over 1.4 s), her light falls smoothly from +7.3
+  to +3.5 L* as she leaves the door, and nothing flickers (p99 0.3 L* frame to frame). Not yet right (§6.3): v6's day
+  shadows still drawn inside the new shade, the leafy edge too even, the dapples read as discs, no light on the jambs.
 - **The light floods in with the colour**: S1's colour flood already starts at the sun (SUN0); the light maps can be
   masked by the same growing circle, so the light spreads from its source on frame 0's beat (§5.3).
 - **Taste rules, from the sources and the references** (§2): bloom only AT emitters and their reflections, three
@@ -206,9 +218,10 @@ towpath in front of the door 77, the median 67, the darks (L* < 40) 6.8 % of the
 
 ### 4.2 The light map (falloff and shade masses, per plane)
 - **Placement:** per plane, `shade_<plane>.png` (multiply, RGB <= 1) and `light_<plane>.png` (screen, RGB), each cropped
-  to its box, drawn in the plane's group exactly like a painted piece (`lib/paint` `PaintedLayer` with a `blend`), so it
-  rides the float. Smooth maps (shade, falloff, glow) bake at 1/4 resolution and are upscaled by the browser (the bench
-  draws them so); rims stay at full resolution.
+  to its box, drawn in the plane's group exactly like a painted piece (`lib/paint` `PaintedLayer` plus a proposed
+  `blend` prop: §9 D-L6), so it rides the float, lands with the flood (`from`, the reveal) and sits under whatever the
+  scene draws in front. Smooth maps (shade, falloff) may bake at 1/4 resolution and be upscaled by the browser; rims
+  and any SOLVED light map stay at full resolution (§4.11).
 - **The bake:** from each plane's flat render alone (a `LightFlat` composition, like `PaintFlatS1`) and masks that are
   differences of two renders of the same frame with one layer switched (exact to the pixel: §6); in linear light; the
   curves of §2.2; the shade tint per pixel by the surface's warmth (§4.9); dithered +-0.5 code, triangular, sha256-seeded,
@@ -305,6 +318,30 @@ the chroma kept; the gold on her teal coat reads as a pale warm edge, a compleme
   boils).
 - The bake gives the same bytes on every run (md5, §6); the live layers the same PNG bytes across fresh renders (§7).
 
+### 4.11 Blend space: the browser blends sRGB values, the light model is linear
+Light adds in linear light (the bake, §4.2); `mix-blend-mode` multiplies and screens the sRGB-ENCODED values (source 8;
+SVG's linearRGB setting reaches filters only, through `color-interpolation-filters`). Measured on the proof at 1.6 s
+(dose 1.0; 14.6 % of the frame lit, 48 % shaded): each way of shipping the light as two 8-bit images, against the
+linear result (`blend space` check in §11):
+
+| Way | abs dL*, mean | p99 |
+|---|---|---|
+| Multiply map = the linear shade encoded with the sRGB curve | 0.51 | 1.16 |
+| Screen map = the linear light encoded with the sRGB curve (the naive way) | 2.19 | 8.8 (too bright, worst on darks) |
+| Screen map = the linear light's values, no curve | 0.93 | 8.4 (max 16) |
+| Screen map SOLVED against the plane's own render: m = 1 - (1 - target) / (1 - base) | 0.04 | 0.25 |
+| `plus-lighter` map solved: m = target - base | 0.08 | 0.25 |
+| The solved screen map over the base 0.1 s later (her and the water moved under it) | 0.16 | 2.8 |
+
+- **The shade map ships as the sRGB-encoded linear multiply** (a power law commutes with a product, so multiply is
+  almost gamma-free).
+- **The light map is SOLVED per pixel against the plane's flat render**, which the bake has: exact for static light on
+  a static plane. A naive light map is 2-4x too bright on dark ground.
+- **Checked end to end in Chrome** (the bench's `solved` frame, §7): its own multiply and screen of the two shipped
+  8-bit PNGs land within 0.48 L* of the linear bake (mean; p99 1.7, max 2.7; 0.08 % of the pixels over 2 L*) outside
+  her, the row and the band; the naive maps: 1.14 (p99 8.2; 11.5 % over 2 L*).
+- **Light on a mover stays a live layer** whose dose is set as L* lifts measured in the render (§4.3): blend-space-free.
+
 ## 5. Scene 1: the light plan (the low sun + the lit doorway)
 
 ### 5.1 The rig "canal dusk"
@@ -333,7 +370,7 @@ the chroma kept; the gold on her teal coat reads as a pale warm edge, a compleme
 | The door's bloom (2.5 / 8 / 22 px) | 0 | baked, two states | +5 L* at the frame, ~0 by 60 px |
 | The door's pool on the towpath and the coping | 0 | baked per state; her shadow cut live | 77 -> 84 / 86 L* at the threshold |
 | Her shadow from the lobby's lamps (homography), clipped at the coping | 0 | live | toward us and right |
-| Her sun rim (front, 4 px), her wrap (3.6 px) and back rim (2.4 px) from the door | 0 (her group) | live (`Rim` steps 2, `Wrap`) | her mean 45.7 -> 50.9 / 53.0 L*, the edges +12-18 |
+| Her sun rim (front, 4 px), her wrap (3.6 px) and back rim (2.4 px) from the door | 0 (her group) | live (`Rim` steps 2, `Wrap`) | her mean 45.7 -> 50.9 / 52.9 L*; her lit edges +11 (median) to +17 (p90), +16 to +23 at dose 1.6 |
 | The ghosts' rims (B, 2 px, half) and Pip's (B, 2 px) | 0, -1 | live | +6 L* |
 | Our bank under the canopy: one leafy-edged mass, holes of light near its edge, two warm dapples | -1 (0.85) | baked shade map | 55 -> 42 / 39 L* |
 | The door's column and the sun's glint bloom in the water | -0.5 (0.725) | baked with the water | +1-3 L* |
@@ -359,11 +396,131 @@ the chroma kept; the gold on her teal coat reads as a pale warm edge, a compleme
 
 ## 6. The proof (an iteration; numbers in `light_demo.py`'s metrics)
 
-PROOF_PENDING
+**What it is.** `light_demo.py` relights still v6's scene 1 with the rig of §5. The engine renders each frame six ways
+(render-frames.mjs on `src/entry-look-paint.tsx`, `PaintS1` set `v6`: captions off and on, the row hidden, the painted
+sky swapped for v2's flat one, the sky alone, Pip hidden), and every mask is the difference of two of them, exact to
+the pixel (only the doorway's source is picked by colour, inside the door's rect). The light is applied in linear light,
+out = base x E + G (E the multiply map: shade < 1, light > 1; G the additive glow), each map moved by its plane's float;
+the caption band and the captions are pasted back from v6. It relights the composited frame, so a light cannot pass
+behind a thing drawn later: production bakes per plane (§4.2). Two doses: 1.0 (the spec's values) and 1.6 (every light
+layer x1.6). The sheet: `light_sheet.jpg`; the motion: `light_motion.mp4` (§6.4).
+
+### 6.1 Measured (CIE L*, region means; v6 -> dose 1.0 / dose 1.6)
+| | 1.0 s (the doors open, she steps out) | 1.6 s (in the doorway) | 2.4 s (G1 beside her) |
+|---|---|---|---|
+| The lobby (the story light's source) | 88.9 -> 92.0 / 93.3 | 88.2 -> 91.4 / 92.8 | 87.1 -> 90.2 / 91.6 |
+| The pool on the towpath before the door | 82.5 -> 90.2 / 92.3 | 77.3 -> 83.8 / 85.7 | 69.5 -> 74.7 / 76.7 |
+| Her | 46.8 -> 54.2 / 57.1 | 45.7 -> 50.9 / 52.9 | 42.1 -> 46.0 / 47.5 |
+| The backlit facade | 63.2 -> 54.9 / 48.6 | 62.9 -> 54.6 / 48.3 | 62.9 -> 54.7 / 48.4 |
+| The lobby above the facade | +25.7 -> +37.1 / +44.7 | +25.3 -> +36.8 / +44.5 | +24.2 -> +35.5 / +43.2 |
+| Our near bank | 55.0 -> 42.3 / 39.0 | 55.0 -> 42.3 / 39.0 | 55.1 -> 42.3 / 39.0 |
+| The sky by the sun | 89.6 -> 91.5 / 92.3 | 89.6 -> 91.5 / 92.3 | 89.5 -> 91.5 / 92.3 |
+| Darks (L* < 40), % of the frame | 6.7 -> 14.7 / 23.8 | 6.8 -> 14.8 / 23.9 | 6.8 -> 14.7 / 23.9 |
+| Median L* | 66.9 -> 61.4 / 59.9 | 66.9 -> 61.2 / 59.8 | 66.9 -> 61.1 / 59.7 |
+| The brightest 5 % below the sky, to her (H) | 0.155 / 0.147 (far planes out: 0.071 / 0.071) | 0.160 / 0.153 (0.071 / 0.071) | 0.135 / 0.130 (0.068 / 0.067) |
+| The caption band, max change (codes) | 0 | 0 | 0 |
+| The bake, one core (s) | 7.5 / 5.7 | 7.0 / 7.0 | 7.5 / 7.2 |
+
+Determinism: every frame baked twice gives the same md5, and the same md5 as the earlier session's run on a restarted
+machine (1.0 s at dose 1.0: `f3f870b9...`). The bake is per frame here only because the proof relights whole frames;
+production bakes each plane's maps once per state (S1: ~6 planes x 2 door states), so nothing is baked per frame.
+
+### 6.2 What reads (the sheet, at phone width)
+- **The doorway is the place to look**: the one warm-white opening in a facade now in rose-plum shade, +37 L* above it
+  (+45 at dose 1.6, against +25 in v6), with its pool on the towpath, her wrap, and the dark bank below framing it.
+- **Three value zones, as the references have**: the pale sky and far city, the mid facade and water, the dark near
+  bank. The darks go from 7 % of the frame to 15 % (24 % at 1.6), the median from 67 to 61.
+- **The light on her follows her with no keys**: her lift is +7.4 L* as she steps out (1.0 s), +5.2 in the doorway
+  (1.6 s), +3.9 by G1 (2.4 s), because the wrap is weighted by the opening's blurred light at her edge (§4.7).
+- **The sun is the key without stealing the eye**: a gentle glow low at the left (+2-3 L* by the disc), gold edges on
+  the skyline; the brightest 5 % below the sky sits 0.07 H from her once the far planes are left out (§9 D-L5).
+- **Dose**: 1.0 is the safe step; 1.6 is closer to the references' contrast (01's fronts sit at L* 37; our facade at
+  1.6 is 48). The owner picks at G4.
+
+### 6.3 What does not work yet (the honest list)
+1. **v6's day shadows are still drawn inside the new shade.** RIG_CANAL's casts (the cafe table's, the chairs', the
+   posts', all to the right) stay under the near bank's shade mass, and a thing in shade casts no sun shadow.
+   Production turns those casts off inside a shade mass and keeps the contact shadows (§4.6); it is the rig bug of §3.
+2. **The near bank's leafy edge is one procedural edge across the frame**: it reads as a hedge's shadow, its rhythm a
+   little even. The production edge is the canopy's shadow designed as a shape (the shapes lane's generator,
+   `shapes.md`): clumps of three sizes in an uneven rhythm, holes of light near the edge, a 10-30 px penumbra.
+3. **The two warm dapples read as soft discs** at phone width. A dapple is the sun's image through a gap in the leaves:
+   an ellipse stretched along the light, in a cluster of uneven sizes. Production breaks each into such a cluster or
+   drops it.
+4. **No light on the jambs and soffit**: the door's white surround sits in the facade's shade; §2.7 wants the lobby's
+   light on the jambs' inner faces (a 6-10 px lift in the light's colour).
+5. **A frame relight cannot put light behind a thing drawn later** (the pool passing behind Pip's bollard, the boats);
+   per-plane maps can (§4.2).
+
+### 6.4 The motion proof (`light_motion.mp4`, `light_motion.py`)
+1.0-2.4 s at 30 fps (she steps out and walks west; G1 arrives), v6 beside dose 1.0. The static light rides each plane's
+float; her rim, wrap and door shadow are recomputed from her mask on every frame (43 frames, ~8 s each on one core,
+two processes). Measured on the 43 frames:
+- **The static light holds still**: the light's mean lift varies by 0.02 L* on our bank, 0.04 on the facade and 0.05
+  by the sun across the 1.4 s.
+- **Her light changes smoothly**: 7.3 -> 3.5 L* as she leaves the opening's light, the largest step between two frames
+  0.97 L* (at 30 fps; half that at 60).
+- **Nothing flickers**: the frame-to-frame change of the light, away from what moves, is 0.30 L* at p99 (median frame;
+  0.52 at most) once the proof's per-frame dither is averaged out (with it: 0.79 / 1.0, the dither's own +-0.5 code).
+  Production bakes the dither into the static maps once, so the light adds no grain that changes per frame.
+- The MP4 encodes to the same bytes twice (md5 `5c3018bd...`).
 
 ## 7. Cost and determinism (the bench, in the real render path)
 
-BENCH_PENDING
+**The bench.** `light_proto/LightBench.tsx` draws v6's scene 1 (`PaintS1` set `v6`) with ONE kind of light layer over
+it (`n` copies), and `run_bench.py` renders the same frames through `scripts/render-frames.mjs` at concurrency 1 (GL
+`angle`, as the paint bakes render) and reads its ms per frame; each kind's frame at 1.6 s is then rendered twice in
+fresh renders and compared by md5. Her live layers follow her silhouette walked west at her pace. The maps are the
+proof's own at 1.6 s, dose 1.6 (`make_assets.py`, written outside the repo); all but the `solved` one are encoded the
+naive way (§4.11), which changes their look, not their cost. Four runs (30, 60, 60 and 60 frames); the box is shared
+with another workflow, so the baseline moves by 25-50 ms between runs (the `none` rows): a difference under ~40 ms is
+noise.
+
+| Kind (drawn over v6) | Run 1 (30 frames) | Run 2 (60 frames) | Runs 3-4 (60 frames) | Against `none` |
+|---|---|---|---|---|
+| `none` (v6 alone) | 577, 608 | 566, 564, 540 | 553, 541, 550 | the baseline |
+| `lightOff` (v6 with lib/light's layers off) | | 209 | 213 | **-340 ms** |
+| `svgEmpty` (an empty overlay svg) | 605 | | | noise |
+| `gradPool` (vector falloff: the pool, the sun's glow, the door's bloom as gradients) | 606 | | | noise |
+| `bloomLive` (3 blurs on the door's rect, the region cropped) | 566 | | | noise |
+| `bloomLiveFull` (the same, the filter region the whole frame) | 592 | | | noise |
+| `bloomLive` x4 | 690 | 541 | | noise to +100 |
+| `rimMask` (her two-step rim: the silhouette minus its shifted copy) | 590 | | | noise |
+| `rimMask` x4 | 598 | 571 | | noise |
+| `rimFilter` (the same rim as one SVG filter) | 560 | | | noise |
+| `wrap` (the light wrap: one small filter with an `feImage`) | 596 | | | noise |
+| `shadowProj` (her door shadow, 101 points projected per frame) | 603 | | | noise |
+| `shafts` (two gradient wedges) | 596 | | | noise |
+| `dither` (a 128 px `feTurbulence` tile, soft-light, 1300 px tall) | 627 | | | +35 |
+| `screenOnly` (ONE screen map, cropped to 1080 x 819) | | 559 | | noise |
+| `shadeOnly` (ONE full-frame multiply map, 1/4 res) | | 626 | | +69 |
+| `mapCrop` (the three maps, each cropped to its box) | | 601 | | +44 |
+| `mapMerged` (the shade + ONE merged screen map, cropped) | | 658 (load 5.2) | | +40-100 |
+| `mapImg` (three full-frame maps: multiply, screen, screen) | 723 | 714 | | +130-160 |
+| `mapImg` x4 (12 full-frame blended images) | 1191 | | | +600 (~50 each) |
+| `all` (`mapImg` + `gradPool` + `bloomLive` + `rimMask` + `wrap` + `shadowProj` + `shafts`) | 762 | 725 | 731 | +170-185 |
+| **`proposal`** (`lightOff` + ONE multiply map holding the new shade AND v6's static shadows + ONE screen map, both cropped + her live rim, wrap and shadow) | | | 256 | **-290 ms** (+43 over `lightOff`) |
+| **`solved`** (`lightOff` + the same multiply map + the screen map SOLVED for the browser's blend, §4.11; her live layers left out) | | | 225 | **-325 ms** (+12 over `lightOff`) |
+
+What it says:
+- **Light on movers is free at our sizes**: every live vector layer (the rims, the wrap, the projected shadow, shafts,
+  gradient pools, a bloom on a cropped region) is within the noise, alone and four at a time.
+- **The cost is the full-frame blended image**: ~40-70 ms each (an `<image>` over 1080 x 1920 with `mix-blend-mode`),
+  +600 ms for twelve. Crop every map to its box, merge what can be merged (one multiply and one screen map per plane at
+  most), and fold a shade that never changes into the colours (home 1, 0 ms).
+- **v6's own light is today's expensive part**: with lib/light's layers off, v6 renders in 209-213 ms instead of ~550
+  (-340 ms, about 60 % of the frame). lib/light draws each mask and tint over its REGION (2280 x 3120 px, 3.4x the
+  frame: `src/lib/light.tsx`) in many separate multiply groups, the likely cause (not profiled here: flagged in §9).
+- **Proper light can make the frame cheaper than v6 is today**: the proposal (v6 with lib/light's live layers off; ONE
+  cropped multiply map holding the new shade and v6's static shadows; ONE cropped screen map; her live rim, wrap and
+  shadow) renders in 256 ms per frame against v6's ~550: -290 ms, with all of §5's light in it; the two maps alone
+  (`solved`) cost 12 ms over `lightOff`. (Her own form shade, live in lib/light today, would stay live: one mover's
+  layer, within the noise once its mask is cropped to her box.)
+- **The spec's maps give the proof's light in the real browser**: with the screen map solved (§4.11), Chrome's own
+  blends reproduce the linear bake within 0.48 L* (mean; p99 1.7, max 2.7; 0.08 % of the pixels over 2 L*) outside
+  her, the row and the band, where the bench's naive maps miss by 1.14 (p99 8.2; 11.5 % over 2 L*: the shafts and the
+  pool visibly too bright).
+- **Deterministic**: every kind's 1.6 s frame, rendered twice in fresh renders, gives the same bytes (all 36 rows).
 
 ## 8. Libraries and licences
 | Library | Use here | Licence | Status |
@@ -372,10 +529,12 @@ BENCH_PENDING
 | OpenCV (cv2 5.0.0) | the exact distance transform, the blurs, the homography warp, the radial accumulation | Apache-2.0 | in use (already a QA dependency) |
 | SciPy 1.18.1 | an alternative exact EDT (`ndimage.distance_transform_edt`) | BSD-3-Clause | not needed |
 | Remotion 4.0.538 + the Chromium headless shell 1243 | the render; SVG blend modes, gradients, masks and filters (W3C Compositing and Blending, SVG filter effects: source 8) | Remotion's licence (the project's existing stack); Chromium BSD-3 | in use |
-| pixi-filters (GodrayFilter, AdvancedBloomFilter) | WebGL god rays and bloom | MIT | rejected: a second renderer, and WebGL runs on SwiftShader here (techniques.md §3.12: 0.2-0.3 s per frame for a simple shader) |
+| pixi-filters (GodrayFilter, AdvancedBloomFilter) | WebGL god rays and bloom | MIT | rejected: a second renderer, and WebGL runs on SwiftShader here (techniques.md §3.12: a full-frame copy 47-62 ms, a domain-warp shader 0.2-0.3 s per frame), where our baked maps cost ~12 ms (§7) |
 | pmndrs postprocessing (BloomEffect, GodRaysEffect) | three.js post effects | Zlib (on three.js, MIT) | rejected: same reasons |
 | LYGIA (shader functions) | GLSL bloom, light, SDF helpers | Prosperity (non-commercial) + Patron (sponsors); its mixBox files are separately non-commercial | **banned in production** unless a commercial licence is bought |
 | Mixbox | pigment mixing | CC BY-NC 4.0 | **banned** (repo rule) |
+| ffmpeg 6.1.1 (the system's build, with libx264) | encodes the motion proof | GPL-2.0+ in this build | a tool run here, never shipped; its licence does not reach the videos it encodes |
+
 No new dependency is proposed: everything here is numpy, OpenCV and the SVG we already render.
 
 ## 9. Doc clashes found (flagged for the orchestrator, not edited here)
@@ -397,8 +556,14 @@ No new dependency is proposed: everything here is numpy, OpenCV and the SVG we a
 - **D-L5.** CRAFT §d.2's check ("the brightest 5 % ... (the sky and the caption band left out)") fails by design in a
   shot whose sun is in frame over a pale far city (S1 relit: 0.15-0.16 H with the far planes in, 0.07 without).
   Proposed: leave out the far planes (+3 and beyond) too: they are the sky's air.
+- **D-L6.** §4.2 places a light map "like a painted piece", but `lib/paint` `PaintedLayer` has no blend mode today:
+  the map needs a `blend` prop (multiply | screen) on it, or a small `LightMap` beside it that reuses its slot, its
+  `from` and its reveal (the flood). Shared code: flagged, not edited.
 - **Not a doc clash, a rig bug:** v2's `RIG_CANAL` (el 36 deg, toward 15) lights S1 as a day scene under a sunset sky
   whose sun sits at 8.9 deg (§3).
+- **Not a doc clash, a cost flag:** v6's lib/light layers cost ~340 ms of its ~550 ms frame (§7). `src/lib/light.tsx`
+  draws masks and big tints over its REGION (2280 x 3120 px, 3.4x the frame), in many separate multiply groups; cropping
+  each mask to its shape's box (plus its blur or offset) is the likely fix, to be profiled by whoever owns lib/light.
 
 ## 10. Sources (methods only)
 The session's network blocked direct page fetches (only search summaries were readable), so each source is cited for
@@ -421,4 +586,35 @@ what its search summary and our own knowledge of the method agree on; nothing is
 Licences: npmjs.com/package/lygia, unpkg.com/resolve-lygia@1.0.4/LICENSE.md (LYGIA); jsdelivr.com/package/npm/@pixi/filter-advanced-bloom (pixi-filters); pmndrs.github.io/postprocessing (postprocessing).
 
 ## 11. Rerun
-RERUN_PENDING
+From `video/`; outputs go to `/tmp/organic/light/` (nothing big is committed but the sheet and the MP4). The bake is
+seeded (sha256) and gives the same bytes on every run.
+```bash
+L=docs/look/organic; R=/tmp/organic/light/renders
+# 1. the engine's renders of v6, seven ways (1.0, 1.6, 2.4 s; the motion proof: 1.0-2.4 s every 1/30 s into renders_m)
+for v in base:'{"set":"v6","captions":false}' cap:'{"set":"v6"}' \
+         norow:'{"set":"v6","captions":false,"rowHidden":true}' \
+         nosky:'{"set":"v6","captions":false,"pieces":["tree","water","flock","farroofs","fartower"]}' \
+         skyonly:'{"set":"v6","captions":false,"pieces":["sky","clouds_p1","clouds_p2","clouds_p3","flock"]}' \
+         nopip:'{"set":"v6","captions":false,"pipHidden":true}' lightoff:'{"set":"v6","captions":false,"lightOff":true}'; do
+  GL=angle node scripts/render-frames.mjs PaintS1 $R/${v%%:*} 1.0,1.6,2.4 --entry=src/entry-look-paint.tsx \
+       --concurrency=2 --props="${v#*:}"
+done
+# 2. the proof (§6.1) and its sheet
+python3 $L/light_demo.py $R /tmp/organic/light/out --times=1.0,1.6,2.4 --doses=1.0,1.6 --repeat=2
+python3 $L/light_sheet.py $R /tmp/organic/light/out $L/light_sheet.jpg
+# 3. the motion proof (§6.4): the loop of 1 (all but lightoff) again, into /tmp/organic/light/renders_m at these
+#    43 times instead of 1.0,1.6,2.4, then
+T=$(python3 -c "print(','.join(f'{1.0 + i/30:.5f}' for i in range(43)))")
+python3 $L/light_demo.py /tmp/organic/light/renders_m /tmp/organic/light/out_m --times=$T --doses=1.0
+python3 $L/light_motion.py /tmp/organic/light/renders_m /tmp/organic/light/out_m --out=$L/light_motion.mp4
+# 4. the blend-space check (§4.11)
+python3 $L/light_blendspace.py /tmp/organic/light/renders_m 96 1.0
+# 5. the bench (§7)
+python3 $L/light_proto/make_assets.py $R /tmp/organic/light/proto_gen --t 1.6
+NF=60 python3 $L/light_proto/run_bench.py /tmp/organic/light/bench3 none=1 lightOff=1 proposal=1 all=1 solved=1 none=1
+# 6. the solved maps end to end in Chrome (§4.11, §7)
+GL=angle node scripts/render-frames.mjs LightBench /tmp/organic/light/solved 1.6 --entry=$L/light_proto/entry.tsx \
+     --concurrency=1 --props='{"kind":"solved","n":1,"lightOff":true}'
+python3 $L/light_blendspace.py $R 96 --browser=/tmp/organic/light/solved/f00096.png \
+     --target=/tmp/organic/light/proto_gen/solved_target.npy
+```

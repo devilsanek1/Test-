@@ -684,3 +684,40 @@ export function contourBand(pts: PP[], o: BandOpts): PP[] | null {
   });
   return [...outer, ...inner.reverse()];
 }
+
+/** Scallop a closed outline: displace the samples that pass `where` outward by rounded lobes (curls, coils, twists,
+ *  foliage-like hems). Lobes vary in size (hash), their valleys stay on the original contour. */
+export function scallop(pts: PP[], o: {period: number; amp: number; where: (p: V2) => boolean; seed?: number; samples?: number; sharp?: number}): PP[] {
+  const n = o.samples ?? 220;
+  const P = resampleClosed(pts, n);
+  const cw = areaOf(P) > 0;
+  const N: V2[] = P.map((_, i) => {
+    const a = P[(i - 2 + n) % n];
+    const b = P[(i + 2) % n];
+    const t: V2 = [b[0] - a[0], b[1] - a[1]];
+    const l = Math.hypot(t[0], t[1]) || 1;
+    return cw ? [t[1] / l, -t[0] / l] : [-t[1] / l, t[0] / l];
+  });
+  let tot = 0;
+  const S: number[] = [0];
+  for (let i = 1; i < n; i++) {
+    tot += Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]);
+    S.push(tot);
+  }
+  // a smooth on/off mask so the lobes fade in and out at the region's ends
+  const on = P.map((p) => (o.where(p) ? 1 : 0));
+  const mask = on.map((_, i) => {
+    let s = 0;
+    for (let k = -4; k <= 4; k++) s += on[(i + k + n) % n];
+    return s / 9;
+  });
+  return P.map((p, i) => {
+    const u = S[i] / o.period;
+    const j = Math.floor(u);
+    const f = u - j;
+    const a = o.amp * (0.55 + 0.45 * hash(j * 3.71 + (o.seed ?? 0)));
+    const lobe = Math.sin(Math.PI * f) ** (o.sharp ?? 0.55);
+    const d = a * lobe * mask[i];
+    return [p[0] + N[i][0] * d, p[1] + N[i][1] * d] as PP;
+  });
+}

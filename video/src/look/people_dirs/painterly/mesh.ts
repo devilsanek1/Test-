@@ -483,6 +483,9 @@ export function regionsOf(ps: PS, c: Cam, opt: {extPx: number; small: boolean}):
   const open = !!ps.sf.open;
   // the outline: the visible (front-facing) surface; its edge on the contour is the silhouette
   const oFront = ps.hasFront ? extract(ps, [front, ...mk]) : [];
+  // a closed form's silhouette has no holes: a fold (the inside of a bent elbow) leaves back-facing islands inside the
+  // visible region; orient every loop the same way so the nonzero fill (and the clip) covers them
+  if (!open) for (const l of oFront) if (area(l) < 0) l.reverse();
   const outline = pathOf(oFront);
   const under = open && ps.hasBack ? pathOf(extract(ps, [back, ...mk])) : '';
   if (ps.sf.flat || !ps.hasFront) return {outline, under, shade: '', hi: '', rim: '', glow: '', deep: ''};

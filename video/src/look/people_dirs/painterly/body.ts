@@ -97,10 +97,11 @@ export const WOMAN: Build = {
     [740, 93],
     [775, 97],
     [800, 99],
-    [816, 97],
-    [828, 88],
-    [838, 70],
-    [846, 47],
+    [812, 97],
+    [821, 89],
+    [829, 73],
+    [837, 54],
+    [845, 38],
     [852, 27],
   ],
   tF: [
@@ -292,10 +293,11 @@ export const MAN: Build = {
     [740, 108],
     [775, 112],
     [800, 112],
-    [815, 108],
-    [828, 96],
-    [840, 74],
-    [848, 52],
+    [813, 109],
+    [824, 99],
+    [834, 80],
+    [843, 58],
+    [850, 42],
     [856, 32],
   ],
   tF: [
@@ -480,6 +482,8 @@ export type ArmPose = {
   curl?: number;
   /** The hand is hidden (in a pocket): not drawn. */
   hidden?: boolean;
+  /** Key prefixes of what the hand holds (a strap, a cup): always painted before the hand. */
+  holds?: string[];
 };
 export type Pose = {
   /** The pelvis: its shift (x, y, z) from the default and its rotation (deg). */
@@ -697,7 +701,7 @@ export type FaceShape = {
   /** Brow ridge. */
   brow: number;
 };
-export const FACE_F: FaceShape = {nose: 0.085, lips: 1, jaw: 0.92, chin: 1, cheek: 1, brow: 0.8};
+export const FACE_F: FaceShape = {nose: 0.08, lips: 1, jaw: 0.97, chin: 0.9, cheek: 1.15, brow: 0.7};
 export const FACE_M: FaceShape = {nose: 0.1, lips: 0.85, jaw: 1.08, chin: 1.15, cheek: 0.9, brow: 1.2};
 
 // u = 0 at the chin's underside, 1 at the crown (units of h; z forward of the skull's axis through the ears)
@@ -768,12 +772,12 @@ const HZB: K = [
   [1.0, 0.0],
 ];
 const HA: K = [
-  [0.0, 0.06],
-  [0.03, 0.125],
-  [0.08, 0.2],
-  [0.14, 0.27],
-  [0.2, 0.302],
-  [0.3, 0.325],
+  [0.0, 0.07],
+  [0.03, 0.148],
+  [0.08, 0.228],
+  [0.14, 0.288],
+  [0.2, 0.314],
+  [0.3, 0.33],
   [0.42, 0.345],
   [0.55, 0.358],
   [0.68, 0.36],
@@ -866,7 +870,7 @@ export function headSurface(sk: Skeleton, res: number, fs: FaceShape): Surface {
     plain.push(row2);
     axis.push(toWorld(sk.head, [0, (u - 0.42) * h, 0]));
   }
-  return {key: 'head', mat: 'skin', grid, axis, wrap: true, shadeGrid: plain, simplify: 0.55, look: {glow: true, hi: 2, blur: 3.4}};
+  return {key: 'head', mat: 'skin', grid, axis, wrap: true, shadeGrid: plain, simplify: 0.78, look: {glow: true, hi: 2, blur: 2.8}};
 }
 
 /** Head-local point (units of h) to model space. */
@@ -950,8 +954,8 @@ export function armSurface(sk: Skeleton, side: 'L' | 'R', res: number, from = -2
   const el = sk.elbow[side];
   const wr = sk.wrist[side];
   const s = side === 'L' ? 1 : -1;
-  // the shoulder's cap: a dome over the joint (the deltoid), so the arm rounds into the torso with no stump
-  const CAP = 26;
+  // the shoulder's cap: a low dome over the joint (the deltoid), so the arm rounds into the torso with no stump
+  const CAP = 18;
   const upv = nrm(sub(sh, el));
   const ext = add(sh, scl(upv, CAP));
   const chain = [ext, sh, el, wr];
@@ -1011,8 +1015,8 @@ export function handSurfaces(sk: Skeleton, side: 'L' | 'R', res: number, mat = '
   const f2 = bend(dir, curl * 1.15);
   const tip = add(mid, scl(f2, hl * 0.22));
   const chain = [sub(wr, scl(dir, 6)), kn, mid, tip];
-  const width = b.sex === 'f' ? 22 : 25;
-  const thick = b.sex === 'f' ? 10.5 : 12;
+  const width = b.sex === 'f' ? 19.5 : 23;
+  const thick = b.sex === 'f' ? 9.5 : 11.5;
   // the thumb's side: s * (palm x direction) (the left hand, palm in, fingers down: the thumb points forward)
   const tS = nrm(scl(cross(palm, dir), s));
   const rows = rowsFor(16, res, 6);
@@ -1026,12 +1030,12 @@ export function handSurfaces(sk: Skeleton, side: 'L' | 'R', res: number, mat = '
     const x = t * L;
     const w = spline(
       [
-        [0, 0.62],
-        [0.22, 0.92],
-        [0.5, 1.0],
-        [0.62, 0.94],
-        [0.8, 0.8],
-        [0.93, 0.56],
+        [0, 0.66],
+        [0.22, 0.94],
+        [0.48, 1.0],
+        [0.6, 0.9],
+        [0.8, 0.7],
+        [0.93, 0.48],
         [1, 0.1],
       ],
       x / L,
@@ -1067,10 +1071,10 @@ export function handSurfaces(sk: Skeleton, side: 'L' | 'R', res: number, mat = '
     (t) => {
       const r = spline(
         [
-          [0, 11],
-          [0.4, 9],
-          [0.8, 7.2],
-          [1, 5.5],
+          [0, 9.5],
+          [0.4, 7.8],
+          [0.8, 6.4],
+          [1, 5],
         ],
         t,
       ) * (b.sex === 'f' ? 1 : 1.1);
@@ -1080,8 +1084,8 @@ export function handSurfaces(sk: Skeleton, side: 'L' | 'R', res: number, mat = '
     {capEnd: true},
   );
   return [
-    {key: `hand${side}`, mat, grid, axis, wrap: true, bias: 6, look: {glow: true}},
-    {key: `thumb${side}`, mat, grid: th.grid, axis: th.axis, wrap: true, bias: 7, look: {glow: true}},
+    {key: `hand${side}`, mat, grid, axis, wrap: true, bias: 6, look: {glow: true}, covers: ap.holds},
+    {key: `thumb${side}`, mat, grid: th.grid, axis: th.axis, wrap: true, bias: 7, look: {glow: true}, covers: ap.holds},
   ];
 }
 

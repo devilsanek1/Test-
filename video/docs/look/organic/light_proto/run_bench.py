@@ -30,8 +30,8 @@ def render(kind, n, times, sub, gl='angle'):
     pr = {'kind': kind, 'n': int(n)}
     if kind == 'lightOff':                       # v6 with lib/light's layers off (its own input prop)
         pr = {'kind': 'none', 'n': 1, 'lightOff': True}
-    if kind == 'proposal':                       # lib/light's live layers off, the baked maps + her live layers on
-        pr = {'kind': 'proposal', 'n': 1, 'lightOff': True}
+    if kind in ('proposal', 'solved'):           # lib/light's live layers off, the baked maps (+ her live layers) on
+        pr = {'kind': kind, 'n': 1, 'lightOff': True}
     props = json.dumps(pr)
     p = subprocess.run(['node', 'scripts/render-frames.mjs', 'LightBench', d, times, f'--entry={ENTRY}', '--concurrency=1',
                         f'--props={props}'], cwd=ROOT, env=env, capture_output=True, text=True)

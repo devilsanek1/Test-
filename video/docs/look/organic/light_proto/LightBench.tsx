@@ -110,6 +110,20 @@ const Layer: React.FC<{kind: string; i: number; t: number}> = ({kind, i, t}) => 
         </>
       );
     }
+    case 'solved': {
+      // light.md §4.11 end to end: v6 with lib/light's layers off (input prop lightOff), the multiply map (the new
+      // shade x v6's static shadows) and the screen map SOLVED against what lies under it, so the browser's own blends
+      // give the proof's linear result (checked against make_assets.py's solved_target.npy outside her and the band)
+      const im = (href: string, b: number[], blend: 'multiply' | 'screen') => (
+        <image href={href} x={b[0]} y={b[1]} width={b[2]} height={b[3]} preserveAspectRatio="none" style={{mixBlendMode: blend}} />
+      );
+      return (
+        <>
+          {im(A.SHADE_ALL, A.SHADE_ALL_BOX, 'multiply')}
+          {im(A.LG_SOLVED, A.LG_SOLVED_BOX, 'screen')}
+        </>
+      );
+    }
     case 'screenOnly': {
       const b = A.LG_C_BOX as number[];
       return <image href={A.LG_C} x={b[0]} y={b[1]} width={b[2]} height={b[3]} preserveAspectRatio="none" style={{mixBlendMode: 'screen'}} />;

@@ -35,44 +35,47 @@ export function collarSurface(sk: Skeleton, c: {key: string; mat: string; h: num
 
 // ---------------------------------------------------------------- a slouchy shoulder bag under the arm, on a strap
 
-export function bagSurfaces(sk: Skeleton, side: 'L' | 'R', bg: {mat: string; strap: string; at?: V3; size?: number}, res: number): Part {
+/** A slouchy shoulder bag tucked under the arm (fashion.md A4: it shows behind the arm, never across the front), on a
+ *  thin strap over the shoulder. The strap is two real thin surfaces (its front run and its back run), so it sorts with
+ *  the body: in front of the jacket, behind the hand that holds it. */
+export function bagSurfaces(sk: Skeleton, side: 'L' | 'R', bg: {mat: string; strap: string; at?: V3; size?: number; ease?: number}, res: number): Part {
   const s = side === 'L' ? 1 : -1;
   const k = bg.size ?? 1;
-  const c = toWorld(sk.pelvis, bg.at ?? [s * 132, 4, -4]);
+  const c = toWorld(sk.pelvis, bg.at ?? [s * 128, 18, -14]);
   const fwd = nrm(fz(sk.pelvis));
   const up = nrm(fy(sk.pelvis));
+  const out = nrm(fx(sk.pelvis));
   // a soft crescent: a tube along a shallow arc (front-back), its rings tall and thin, the bottom fuller
-  const L = 78 * k;
-  const chain: V3[] = [add(add(c, scl(fwd, L)), scl(up, 22 * k)), add(c, scl(up, -6 * k)), add(add(c, scl(fwd, -L)), scl(up, 20 * k))];
+  const L = 74 * k;
+  const chain: V3[] = [add(add(c, scl(fwd, L)), scl(up, 20 * k)), add(c, scl(up, -8 * k)), add(add(c, scl(fwd, -L)), scl(up, 18 * k))];
   const t = tube(
     chain,
     rowsFor(18, res, 8),
     rowsFor(20, res, 10),
     (tt) => {
       const w = Math.sin(Math.PI * Math.min(1, Math.max(0, tt))) ** 0.6;
-      return {f: 44 * k * w + 3, b: 34 * k * w + 3, p: 16 * k * w + 2, m: 14 * k * w + 2, nf: 2.4, nb: 2.0};
+      return {f: 40 * k * w + 3, b: 30 * k * w + 3, p: 14 * k * w + 2, m: 12 * k * w + 2, nf: 2.4, nb: 2.0};
     },
     () => [s, 0, 0],
     {capStart: true, capEnd: true},
   );
-  // the tube's ring "front" axis is perpendicular to the chain: make it point up (the bag's height)
-  const bag: Surface = {key: 'bag', mat: bg.mat, grid: t.grid, axis: t.axis, wrap: true, bias: 36, look: {spec: {p: 20, t: 0.45}, blur: 5}};
-  // the strap: from the bag's two ends up to the shoulder's top (a true line); only the run on the camera's side
-  const shTop = add(sk.shoulder[side], [s * -12, 32, -4]);
-  const strap: DecalFn = (cam: Cam) => {
-    const zS = toCam(cam, sk.shoulder[side])[2];
-    const out: ReturnType<DecalFn> = [];
-    for (const [k, end, via] of [
-      ['strapF', chain[0], add(shTop, [0, -60, 34])],
-      ['strapB', chain[2], add(shTop, [0, -60, -34])],
-    ] as [string, V3, V3][]) {
-      const mid = lerp(end, via, 0.5);
-      if (toCam(cam, mid)[2] < zS - 30) continue;
-      out.push({key: k, d: smoothD([project(cam, end), project(cam, via), project(cam, shTop)], false), stroke: bg.strap, sw: 5, top: true});
-    }
-    return out;
+  const bag: Surface = {key: 'bag', mat: bg.mat, grid: t.grid, axis: t.axis, wrap: true, bias: 24, look: {spec: {p: 16, t: 0.5}, blur: 5}};
+  // the strap: from the bag's front end up in front of the shoulder, over its top, down behind it to the bag's back end
+  const e = bg.ease ?? 12;
+  const sh = sk.shoulder[side];
+  const cf = fz(sk.chest);
+  const cu = fy(sk.chest);
+  const top = add(add(sh, scl(cu, 30 + e)), scl(out, -s * 10));
+  const frontMid = add(add(sh, scl(cf, 44 + e)), scl(cu, -60));
+  const backMid = add(add(sh, scl(cf, -46 - e)), scl(cu, -60));
+  const r = 3.4;
+  const strapT = (pts: V3[], key: string, bias: number): Surface => {
+    const tt = tube(pts, rowsFor(16, res, 6), rowsFor(8, res, 6), () => ({f: r * 0.6, b: r * 0.6, p: r, m: r}), () => out);
+    return {key, mat: bg.strap, grid: tt.grid, axis: tt.axis, wrap: true, bias, noRim: true, look: {blur: 1.5, hi: 0.9}};
   };
-  return {surfaces: [bag], decals: [strap]};
+  const strapF = strapT([chain[0], lerp(chain[0], frontMid, 0.5), frontMid, lerp(frontMid, top, 0.6), top], 'strapF', 40);
+  const strapB = strapT([top, lerp(backMid, top, 0.6), backMid, lerp(backMid, chain[2], 0.5), chain[2]], 'strapB', -10);
+  return {surfaces: [bag, strapF, strapB], decals: []};
 }
 
 // ---------------------------------------------------------------- a cap: the dome and the brim
@@ -132,7 +135,20 @@ export function capSurfaces(sk: Skeleton, cp: {mat: string; brimMat?: string}, r
     ba.push(toWorld(sk.head, [0, 0.4 * h, 0.2 * h]));
   }
   const brim: Surface = {key: 'brim', mat: cp.brimMat ?? cp.mat, grid: bg, axis: ba, wrap: false, open: true, bias: 52, look: {blur: 3, hi: 0.85, rim: 0.4}};
-  return {surfaces: [dome, brim], decals: []};
+  // the brim's shadow across the brow and the eyes: a soft cool band on the face (the cap hides the eyes: a generic,
+  // cool face for free)
+  const plain: FaceShape = {nose: 0, lips: 0, jaw: 1, chin: 0, cheek: 0, brow: 0};
+  const shadow: DecalFn = (cam) => {
+    const up: [number, number][] = [];
+    const dn: [number, number][] = [];
+    for (let k = 0; k <= 14; k++) {
+      const a = mix(-1.25, 1.25, k / 14);
+      up.push(project(cam, toWorld(sk.head, scl(headPoint(0.76, a, plain, true), h * 1.06))));
+      dn.push(project(cam, toWorld(sk.head, scl(headPoint(0.47 + 0.05 * Math.abs(a), a, plain, true), h * 1.06))));
+    }
+    return [{key: 'brimShadow', target: 'head', d: smoothD([...up, ...dn.reverse()]), fill: '#8A5A57', blur: 3, opacity: 0.5, blend: 'multiply'}];
+  };
+  return {surfaces: [dome, brim], decals: [shadow]};
 }
 
 // ---------------------------------------------------------------- an iced coffee in the hand

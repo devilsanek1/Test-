@@ -51,8 +51,8 @@ zones = {
 series = {k: [] for k in zones}
 series['her'] = []
 series['t'] = []
-prev_delta = None
-flicker = []
+prev_delta = prev_b = None
+flicker, flicker_b = [], []
 for f in frames:
     v6 = LD.load(f'{R}/cap/f{f:05d}.png')
     li = LD.load(lit[f])
@@ -72,13 +72,16 @@ for f in frames:
     series['t'].append(round(f / 60.0, 3))
     # flicker: the frame-to-frame change of the light's delta, away from what moves (her box, the water, the flock/sky)
     still = (yy > 1330) | ((yy > 640) & (yy < 1080) & (np.abs(xx - hx) > 90))
+    dLb = cv2.blur(dL.astype(np.float32), (5, 5))            # the proof's per-frame dither (+-0.5 code) averaged out
     if prev_delta is not None:
         flicker.append(float(np.percentile(np.abs(dL - prev_delta)[still], 99)))
-    prev_delta = dL
+        flicker_b.append(float(np.percentile(np.abs(dLb - prev_b)[still], 99)))
+    prev_delta, prev_b = dL, dLb
 res = {'frames': len(frames), 't0': series['t'][0], 't1': series['t'][-1], 'series': series,
        'zone_range_L': {k: round(max(series[k]) - min(series[k]), 2) for k in zones},
        'her_max_step_L': round(max(abs(a - b) for a, b in zip(series['her'][1:], series['her'][:-1]) if a is not None and b is not None), 2),
-       'flicker_p99_max_L': round(max(flicker), 2), 'flicker_p99_median_L': round(float(np.median(flicker)), 2)}
+       'flicker_p99_max_L': round(max(flicker), 2), 'flicker_p99_median_L': round(float(np.median(flicker)), 2),
+       'flicker_blur5_p99_max_L': round(max(flicker_b), 2), 'flicker_blur5_p99_median_L': round(float(np.median(flicker_b)), 2)}
 if 'metrics' in opt:
     with open(opt['metrics'], 'w') as fh:
         json.dump(res, fh, indent=1)

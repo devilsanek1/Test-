@@ -75,7 +75,7 @@ function gradAxis(pts: PP[], key: V2, forced?: V2): {a: V2; b: V2} {
 
 export const EdPerson: React.FC<PersonProps> = ({x, y, h, person, pose, flip = false, finish = 'gradient', shadow = '#C9B2A6', only, fillAll}) => {
   const uid = useId().replace(/:/g, '');
-  const built = buildPerson(person, pose);
+  const built = buildPerson(person, pose, flip);
   const ramps: Record<string, Ramp> = {};
   for (const [k, m] of Object.entries(person.mats)) ramps[k] = ramp(m.c, m.kind);
   const s = h / 1000;

@@ -114,11 +114,12 @@ export function planes(base: string, kind: Kind, rig: Rig = DUSK): Tones {
   const hi = hexOf(Math.min(97, q.L + hiDL), q.C * (kind === 'satin' ? 0.92 : 1.02) + (kind === 'leather' ? 3 : 1), turn(q.h, rig.keyHue, q.C < 8 ? 40 : 9));
   // RIM: the cool sky catching the edge away from the key; strongest on dark materials, a soft cool lift on light ones
   // (never a saturated lilac stripe: the hue turns toward the sky by at most ~75 degrees and the chroma stays low)
-  const rimDL = dark ? 18 : light ? 2 : kind === 'skin' ? 7 : 10;
-  const rimC = q.C < 10 ? 7 : Math.min(q.C * 0.55 + 4, 18);
-  const rim = hexOf(Math.min(95, q.L + rimDL), rimC, q.C < 10 ? rig.skyHue : turn(q.h, rig.skyHue, 120 * rig.rimTint));
+  const rimDL = dark ? 17 : light ? 2 : kind === 'skin' ? 7 : 11;
+  const rimC = q.C < 10 ? 7 : Math.min(q.C * 0.3 + 5, kind === 'skin' ? 16 : 12);
+  const rim = hexOf(Math.min(95, q.L + rimDL), rimC, q.C < 10 ? rig.skyHue : turn(q.h, rig.skyHue, kind === 'skin' ? 40 : 160 * rig.rimTint));
   // GLOW (skin): the terminator's saturated warm band (light scattering in skin)
   const glow = kind === 'skin' ? hexOf(q.L * 0.9, q.C * 1.35 + 3, turn(q.h, 32, 10)) : lit;
-  const under = hexOf(Math.max(4, q.L + (dark ? -8 : -24)), Math.max(3, q.C * 0.85), turn(q.h, rig.skyHue, 18));
+  // UNDER: the inside of a shell (a collar's back, a coat's lining side) sits in its own shadow
+  const under = hexOf(Math.max(4, dark ? q.L - 8 : q.L * 0.7), Math.max(4, q.C * 1.05 + 3), turn(q.h, rig.skyHue, 10));
   return {lit, shade, deep, hi, rim, glow, under};
 }

@@ -33,6 +33,9 @@ export type HairLong = {
   part: number;
   /** Curtain bangs: how far they come down the face (0 = none). */
   bangs: number;
+  /** The curtain below the jaw (chest frame): half-width at the jaw and at the ends, depth behind the back, the centre's
+   *  offset behind the chest's centre, how fast it widens (units below the jaw), the ends' lobes and their flip. */
+  curtain?: {halfW?: [number, number]; back?: [number, number]; front?: number; zOff?: number; ramp?: number; lobes?: number; lobeAmp?: number; flip?: number; window?: number};
 };
 export type HairPony = {kind: 'pony'; length: number; part?: number};
 export type HairCurls = {kind: 'curls'; vol: number; seed: number};
@@ -109,13 +112,25 @@ function longHair(sk: Skeleton, hs: HairLong, res: number): Built {
   };
   // the curtain below the head, in the chest's frame
   const ch = sk.chest;
+  const c0 = hs.curtain ?? {};
+  const cu = {
+    halfW: c0.halfW ?? [56, 68],
+    back: c0.back ?? [54, 46],
+    front: c0.front ?? 32,
+    zOff: c0.zOff ?? 36,
+    ramp: c0.ramp ?? 80,
+    lobes: c0.lobes ?? 3.1,
+    lobeAmp: c0.lobeAmp ?? 15,
+    flip: c0.flip ?? 7,
+    window: c0.window ?? 1.42,
+  };
   const endAt = (ang: number) => {
     const a = Math.abs(ang); // 0 front .. pi back
     // the layers: face-framing pieces end higher (at the collarbone), the back longest
     const k = smooth(1.2, 2.3, a);
     let y = mix(hs.endFront, hs.endBack, k);
     // bouncy ends: a few round lobes hanging down, small notches between them (never a zigzag)
-    y += 15 * (1 - Math.pow(Math.abs(Math.cos(3.1 * ang + 0.5)), 0.55)) - 4 * Math.sin(ang * 1.7);
+    y += cu.lobeAmp * (1 - Math.pow(Math.abs(Math.cos(cu.lobes * ang + 0.5)), 0.55)) - 4 * Math.sin(ang * 1.7);
     return y;
   };
   const jawY = toWorld(sk.head, [0, (uJaw - 0.42) * h, 0])[1];
@@ -136,19 +151,19 @@ function longHair(sk: Skeleton, hs: HairLong, res: number): Built {
         const yEnd = endAt(ang);
         const y = mix(jawY, yEnd, t);
         const p0 = toWorld(sk.head, scl(shellPoint(uJaw, phi, vol(uJaw, ang)), h));
-        const sh = smooth(jawY, jawY - 80, y); // 0 at the jaw -> 1 at the shoulders
+        const sh = smooth(jawY, jawY - cu.ramp, y); // 0 at the jaw -> 1 at the shoulders
         // the curtain lies ON the upper back (a hair's depth behind it) and falls behind the shoulders
-        const halfW = mix(56, 68, sh) + 5 * smooth(jawY - 60, yEnd, y);
-        const back = mix(54, 46, sh);
-        const front = mix(30, 34, sh);
+        const halfW = mix(cu.halfW[0], cu.halfW[1], sh) + 5 * smooth(jawY - 60, yEnd, y);
+        const back = mix(cu.back[0], cu.back[1], sh);
+        const front = cu.front;
         const c = Math.cos(phi);
         const s = Math.sin(phi);
         const zz = c >= 0 ? c * front : c * back;
         const xx = s * halfW;
         // bouncy ends: the last ~40 units swell outward, then round under
-        const flip = 7 * smooth(yEnd + 46, yEnd + 12, y) - 7 * smooth(yEnd + 12, yEnd, y);
+        const flip = cu.flip * smooth(yEnd + 46, yEnd + 12, y) - cu.flip * smooth(yEnd + 12, yEnd, y);
         const l = Math.hypot(xx, zz) || 1;
-        const target = toWorld(ch, [xx + (xx / l) * flip, 0, zz + (zz / l) * flip - 36]);
+        const target = toWorld(ch, [xx + (xx / l) * flip, 0, zz + (zz / l) * flip - cu.zOff]);
         p = lerp([p0[0], y, p0[2]], [target[0], y, target[2]], sh);
       }
       row.push(p);
@@ -161,7 +176,7 @@ function longHair(sk: Skeleton, hs: HairLong, res: number): Built {
     if (i < rowsS) return (a - spline(wF, uOf(i))) * 2;
     const t = (i - rowsS + 1) / rowsC;
     // below the jaw the hair falls behind the shoulders: the front window widens
-    const w = mix(1.05, 1.42, smooth(0, 0.35, t));
+    const w = mix(1.05, cu.window, smooth(0, 0.35, t));
     return (a - w) * 2;
   };
   // two surfaces sharing a few rows: the skull's shell (it encloses the head) and the curtain (depth-sorted on its own:

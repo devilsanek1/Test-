@@ -1,6 +1,6 @@
 // Editorial people: one person = a build, a hairstyle, an outfit, materials and a face treatment, drawn in any pose and
 // view (dir_editorial.md). Returns the parts back to front; Person.tsx paints them.
-import {type PP, type SecKey, type V3, type View, add3, lerp, loftOutline, mul3, norm3, proj, sections, sub3, tubeOutline} from './core';
+import {type PP, type SecKey, type V2, type V3, type View, add3, lerp, loftOutline, mul3, norm3, proj, sections, sub3, tubeOutline} from './core';
 import {type Build, type Pose, type Side, type Skeleton, skeleton} from './body';
 import {type HeadRig, faceYaw, headRig, lashLine, lipTone, lostFlick, noseShade, sunglasses} from './head';
 import {type HairStyle, hair} from './hair';
@@ -30,12 +30,21 @@ export type Person = {
 
 const neckPart = (sk: Skeleton, v: View, r: HeadRig): Part => {
   const b = sk.b;
-  // from inside the collar up under the jaw, slanting forward ~13 degrees (design_research §11.4)
-  const base = add3(sk.neckBase, [0, -16, 2]);
-  const top = r.xf([0, b.pivotY + 0.05 * b.skull, 0.03 * b.skull]);
-  const mid: V3 = [lerp(base[0], top[0], 0.5), lerp(base[1], top[1], 0.5), lerp(base[2], top[2], 0.5) + 1];
-  const pts = tubeOutline([base, mid, top], (u) => ({ru: b.neckR * (1.08 - 0.1 * u), rv: b.neckD * (1.06 - 0.08 * u)}), v, [0, 0, 1], {m: 14});
+  // from inside the collar up under the jaw, slanting forward ~13 degrees (design_research §11.4): the throat meets the
+  // jaw ~0.3 h behind the chin, the nape leaves the skull's base far back
+  const base = add3(sk.neckBase, [0, -16, -2]);
+  const top = r.xf([0, b.pivotY + 0.08 * b.skull, -0.1 * b.skull]);
+  const mid: V3 = [lerp(base[0], top[0], 0.5), lerp(base[1], top[1], 0.5), lerp(base[2], top[2], 0.5) + 2];
+  const pts = tubeOutline([base, mid, top], (u) => ({ru: b.neckR * (1.1 - 0.12 * u), rv: b.neckD * (1.08 - 0.06 * u)}), v, [0, 0, 1], {m: 14});
   return {k: 'neck', pts, mat: 'skin', z: Z.neck, tension: 0.5};
+};
+
+/** The head's cast shadow on the neck: the head's outline shifted away from the key, clipped to the neck (a crisp shape
+ *  under the jaw: the classic editorial device that turns a neck from a pipe into a form). */
+const jawShadow = (head: PP[], key: V2, h: number): Part => {
+  const dx = -key[0] * 0.05 * h;
+  const dy = 0.13 * h;
+  return {k: 'jawShadow', pts: head.map((p) => [p[0] + dx, p[1] + dy] as PP), mat: 'skin', tone: 'shade', z: Z.neck + 0.5, clip: 'neck', tension: 0.42};
 };
 
 /** The ear (short hair only): a small skin shape at the side, t 0.43-0.63, where that side faces the camera. */
@@ -102,7 +111,7 @@ function outfit(p: Person, sk: Skeleton, v: View): Part[] {
       out.push(...slipSkirt(sk, v, 'skirt'));
       out.push(...knit(sk, v, 'knit'));
       out.push(...coat(sk, v, 'coat'));
-      out.push(...sleeves(sk, v, 'coat', {r: [38, 35, 33], drop: 12}));
+      out.push(...sleeves(sk, v, 'coat', {r: [34, 31, 29], drop: 8}));
       out.push(...hands(sk, v));
       break;
     }
@@ -111,7 +120,7 @@ function outfit(p: Person, sk: Skeleton, v: View): Part[] {
       out.push(...trousers(sk, v, 'jeans', 'straight', 646, {hemDrop: 16}));
       out.push(...tee(sk, v, 'tee', 846, 632));
       out.push(...cardigan(sk, v, 'cardigan'));
-      out.push(...sleeves(sk, v, 'cardigan', {r: [35, 31, 24], drop: 10, cuff: 16}));
+      out.push(...sleeves(sk, v, 'cardigan', {r: [29, 25, 19], drop: 6, cuff: 16}));
       out.push(...hands(sk, v));
       out.push(...tote(sk, v));
       break;
@@ -122,7 +131,7 @@ function outfit(p: Person, sk: Skeleton, v: View): Part[] {
       out.push(...trousers(sk, v, 'trousers', 'relaxed', 612, {hemDrop: -16}));
       out.push(...tee(sk, v, 'tee', 840, 560, 1.12));
       out.push(...choreJacket(sk, v, 'jacket'));
-      out.push(...sleeves(sk, v, 'jacket', {r: [46, 42, 40], drop: 14}));
+      out.push(...sleeves(sk, v, 'jacket', {r: [38, 35, 33], drop: 10}));
       out.push(...hands(sk, v));
       out.push(...phone(sk, v));
       break;
@@ -132,7 +141,7 @@ function outfit(p: Person, sk: Skeleton, v: View): Part[] {
       out.push(...trousers(sk, v, 'jeans', 'wide', 644, {hemDrop: 30}));
       out.push(forearm(sk, 'l', v), forearm(sk, 'r', v));
       out.push(...bigShirt(sk, v, 'shirt', 644));
-      out.push(...sleeves(sk, v, 'shirt', {r: [42, 40, 37], drop: 16, end: 0.42, cuff: 20}));
+      out.push(...sleeves(sk, v, 'shirt', {r: [38, 35, 31], drop: 12, end: 0.42, cuff: 20}));
       out.push(...hands(sk, v));
       break;
     }
@@ -207,18 +216,21 @@ function phone(sk: Skeleton, v: View): Part[] {
 
 export type Built = {parts: Part[]; ground: {x: number; w: number}; sk: Skeleton};
 
-export function buildPerson(p: Person, pose: Pose): Built {
+export function buildPerson(p: Person, pose: Pose, flip = false): Built {
   const v: View = {yaw: pose.yaw};
+  const key: V2 = [flip ? 0.82 : -0.82, -0.57];
   const sk = skeleton(p.build, pose);
   const r = headRig(p.build, sk, v);
   const parts: Part[] = [];
   parts.push(...outfit(p, sk, v));
   const neck = neckPart(sk, v, r);
   parts.push(neck);
-  parts.push({k: 'head', pts: loftOutline(r.secs, v, r.xf), mat: 'skin', z: Z.head, tension: 0.42});
-  const hr = hair(p.hair, p.build, sk, r, v, 'hair', neck.pts);
+  const headPts = loftOutline(r.secs, v, r.xf);
+  parts.push({k: 'head', pts: headPts, mat: 'skin', z: Z.head, tension: 0.42});
+  parts.push(jawShadow(headPts, key, p.build.skull));
+  const hr = hair(p.hair, p.build, sk, r, v, 'hair', neck.pts, {key});
   parts.push(...hr.parts);
-  if (p.hair === 'twists') {
+  if (p.hair === 'twists' || p.hair === 'pony') {
     const e = earPart(sk, v, r);
     if (e) parts.push(e);
   }

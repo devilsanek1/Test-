@@ -9,7 +9,14 @@ import React from 'react';
 import {Composition, registerRoot} from 'remotion';
 import {PtTest, TEST_W, TEST_H, type TestProps} from './look/people_dirs/painterly/Test';
 
-const testDefaults: TestProps = {who: 'herEvening', h: 640, views: ['front34', 'profileL', 'back']};
+const testDefaults: TestProps = {
+  h: 640,
+  items: [
+    {who: 'herEvening', view: 'front34'},
+    {who: 'herEvening', view: 'profileL'},
+    {who: 'herEvening', view: 'back'},
+  ],
+};
 
 const Root: React.FC = () => (
   <>

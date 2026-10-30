@@ -149,17 +149,19 @@ export function coat(sk: Skeleton, v: View, mat = 'coat', hemY = 268): Part[] {
   const rows: GRow[] = [
     {y: 872, a: 30, bf: 22, bb: 32, dz: -12},
     {y: 852, a: 44, bf: 30, bb: 42, dz: -10},
-    {y: 832, a: 86, bf: 46, bb: 58, dz: -6},
-    {y: 812, a: 112, bf: 62, bb: 64, n: 2.2, dz: -4},
-    {y: 790, a: 117, bf: 78, bb: 68, n: 2.3},
-    {y: 755, a: 117, bf: 88, bb: 70, n: 2.3},
-    {y: 735, a: 117, bf: 92, bb: 70, n: 2.3},
-    {y: 680, a: 118, bf: 90, bb: 70, n: 2.3},
-    {y: 620, a: 120, bf: 87, bb: 74, n: 2.3},
-    {y: 540, a: 125, bf: 86, bb: 84, n: 2.3},
-    {y: 500, a: 128, bf: 86, bb: 88, n: 2.3},
-    {y: 400, a: 131, bf: 88, bb: 88, n: 2.3},
-    {y: hemY, a: 135, bf: 90, bb: 88, n: 2.3},
+    {y: 838, a: 76, bf: 40, bb: 52, dz: -7},
+    {y: 826, a: 104, bf: 54, bb: 60, n: 2.1, dz: -5},
+    {y: 814, a: 119, bf: 64, bb: 64, n: 2.2, dz: -3},
+    {y: 800, a: 124, bf: 72, bb: 67, n: 2.25},
+    {y: 782, a: 123, bf: 80, bb: 69, n: 2.3},
+    {y: 762, a: 118, bf: 87, bb: 70, n: 2.3},
+    {y: 735, a: 115, bf: 91, bb: 70, n: 2.3},
+    {y: 680, a: 115, bf: 89, bb: 70, n: 2.3},
+    {y: 620, a: 117, bf: 87, bb: 74, n: 2.3},
+    {y: 540, a: 123, bf: 86, bb: 84, n: 2.3},
+    {y: 500, a: 126, bf: 86, bb: 88, n: 2.3},
+    {y: 400, a: 130, bf: 88, bb: 88, n: 2.3},
+    {y: hemY, a: 134, bf: 90, bb: 88, n: 2.3},
   ];
   const secs = garmentSecs(sk, rows, {tiltK: tiltHang(b.hipJY), envelope: {below: b.crotchY + 30, ease: 26, back: 6}});
   const out = loftOutline(secs, v, sk.leanXf, {cornerBottom: true});
@@ -281,14 +283,16 @@ export function keyPhi(v: View): number {
 export function cardigan(sk: Skeleton, v: View, mat = 'cardigan', hemY = 606): Part[] {
   const rows: GRow[] = [
     {y: 858, a: 34, bf: 25, bb: 36, dz: -10},
-    {y: 838, a: 56, bf: 36, bb: 46, dz: -8},
-    {y: 812, a: 106, bf: 58, bb: 60, n: 2.2},
-    {y: 790, a: 112, bf: 72, bb: 64, n: 2.25},
-    {y: 760, a: 112, bf: 80, bb: 64, n: 2.25},
-    {y: 736, a: 111, bf: 82, bb: 64, n: 2.25},
-    {y: 690, a: 108, bf: 76, bb: 62, n: 2.25},
-    {y: 640, a: 105, bf: 70, bb: 62, n: 2.25},
-    {y: hemY, a: 102, bf: 67, bb: 62, n: 2.25},
+    {y: 846, a: 52, bf: 33, bb: 43, dz: -8},
+    {y: 830, a: 88, bf: 46, bb: 54, n: 2.1, dz: -5},
+    {y: 818, a: 110, bf: 57, bb: 60, n: 2.15, dz: -3},
+    {y: 804, a: 119, bf: 66, bb: 63, n: 2.2},
+    {y: 786, a: 117, bf: 74, bb: 64, n: 2.2},
+    {y: 766, a: 109, bf: 79, bb: 63, n: 2.2},
+    {y: 740, a: 105, bf: 80, bb: 62, n: 2.2},
+    {y: 690, a: 101, bf: 74, bb: 60, n: 2.2},
+    {y: 640, a: 99, bf: 69, bb: 60, n: 2.2},
+    {y: hemY, a: 98, bf: 66, bb: 60, n: 2.2},
   ];
   const secs = garmentSecs(sk, rows);
   const out = loftOutline(secs, v, sk.leanXf, {cornerBottom: true});
@@ -381,10 +385,12 @@ export function choreJacket(sk: Skeleton, v: View, mat = 'jacket', hemY = 470): 
   const b = sk.b;
   const rows: GRow[] = [
     {y: 852, a: 40, bf: 32, bb: 42, dz: -10},
-    {y: 832, a: 76, bf: 46, bb: 56, dz: -6},
-    {y: 806, a: 146, bf: 66, bb: 70, n: 2.35},
-    {y: 780, a: 148, bf: 80, bb: 74, n: 2.4},
-    {y: 740, a: 142, bf: 82, bb: 72, n: 2.4},
+    {y: 838, a: 70, bf: 42, bb: 52, dz: -7},
+    {y: 824, a: 112, bf: 56, bb: 62, n: 2.2, dz: -4},
+    {y: 810, a: 136, bf: 66, bb: 68, n: 2.3},
+    {y: 796, a: 146, bf: 74, bb: 72, n: 2.35},
+    {y: 776, a: 145, bf: 80, bb: 74, n: 2.4},
+    {y: 750, a: 139, bf: 82, bb: 72, n: 2.4},
     {y: 680, a: 136, bf: 79, bb: 70, n: 2.4},
     {y: 600, a: 132, bf: 77, bb: 71, n: 2.4},
     {y: 520, a: 133, bf: 77, bb: 75, n: 2.4},
@@ -419,11 +425,13 @@ export function bigShirt(sk: Skeleton, v: View, mat = 'shirt', waistY = 642): Pa
   const b = sk.b;
   const upper: GRow[] = [
     {y: 852, a: 34, bf: 26, bb: 36, dz: -10},
-    {y: 834, a: 66, bf: 40, bb: 50, dz: -7},
-    {y: 806, a: 136, bf: 62, bb: 64, n: 2.2},
-    {y: 780, a: 138, bf: 80, bb: 68, n: 2.2},
-    {y: 740, a: 134, bf: 88, bb: 70, n: 2.2},
-    {y: 690, a: 128, bf: 84, bb: 72, n: 2.2},
+    {y: 838, a: 62, bf: 38, bb: 48, dz: -7},
+    {y: 824, a: 100, bf: 52, bb: 58, n: 2.1, dz: -4},
+    {y: 810, a: 122, bf: 62, bb: 63, n: 2.2},
+    {y: 794, a: 129, bf: 72, bb: 67, n: 2.2},
+    {y: 772, a: 129, bf: 82, bb: 69, n: 2.2},
+    {y: 740, a: 126, bf: 86, bb: 70, n: 2.2},
+    {y: 690, a: 122, bf: 84, bb: 72, n: 2.2},
     {y: waistY + 22, a: 118, bf: 76, bb: 74, n: 2.2},
     {y: waistY + 2, a: b.waistA + 12, bf: b.waistBf + 10, bb: b.waistBb + 10, n: 2.1},
   ];

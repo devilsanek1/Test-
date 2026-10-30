@@ -7,10 +7,14 @@ Lengths are px of the 1080 x 1920 frame; a shape's size is its equivalent radius
   displace(P, octaves, seed, ...)   push a closed outline along its normals: the noise-displaced outline; billow=True
                                     turns one octave into convex bumps with sharp inward cusps (a cumulus)
   ellipse_cluster(...)              a union of jittered ellipses on a size ladder: a cloud or a foliage mass
-  crown(...)                        a tree crown: 3-5 masses of clumps, asymmetric, with sky holes
+  billows(...), raster_union(...)   ellipses along a skyline (sizes from a function, overlapping, never kissing)
+  cumulus(...)                      towers on a ladder over a tapering skirt, billows in three levels, a flat base
+  crown(...)                        a tree crown in three levels (lobes, clumps, small clumps), flat underside, sky gaps
+  bank(...)                         a flat cloud bank: humps on a ladder, ends dragged at two rates, sometimes pinched
   hand_cut(corners, seed, ...)      a man-made outline: off-square corners, bowed and broken sides, never parallel
   edge_alpha(mask, seed, ...)       lost-and-found edges for a raster piece: found / broken / lost stretches along the
                                     outline by the light and a slow noise; dry-brush teeth along the brush direction
+  shade3(cov, seed, ...)            flat lit / body / shade values read from the silhouette itself (a wandering terminator)
   size_ladder(n, seed, ...)         big / medium / small sizes, never two alike
   place(...)                        Poisson-disk placement that never makes tangents, never repeats an interval
   checks: tangents(), parallels(), interval_cv()
@@ -332,175 +336,229 @@ def raster_union(ells, box, ss: int = 4, base_cut: float | None = None, poly: np
     return cv2.resize(m, (W, H), interpolation=cv2.INTER_AREA) > 127
 
 
-def cumulus(seed, cx: float, base: float, width: float, height: float, lean: float | None = None,
-            edge: bool = True):
-    """A cumulus silhouette: billows on a size ladder along a rising-and-falling skyline (the biggest near the top,
-    40-45 % of the height across; the shoulders step down in smaller ones, a different count on each side), small
-    billows on the upper arcs (level 2), the body filled under the skyline, a flat base; then the cloud spectrum's
-    small octaves displace the outline (quiet on the base) so no billow stays a compass arc.
-    Returns (outline N x 2, R)."""
+def _dome(x, c, w, h, p=0.62):
+    q = np.clip(np.abs((x - c) / w), 0, 1)
+    return h * (1 - q * q) ** p
+
+
+def cumulus(seed, cx, base, width, height, lean=None, edge=True, towers=None):
+    """A cumulus: 2-3 towers of different height and width (a ladder) set off-centre, over a low skirt that runs the
+    full width and tapers to the base at two different rates; billows along that skyline (radius ~ local height,
+    level-2 billows on the upper arcs, a few level-3 ones toward the light); the body filled under the skyline; a flat
+    base tilted <= 1.5 deg; then the cloud spectrum's short octaves (quiet on the base) so no billow stays a compass
+    arc. Returns (outline N x 2, R)."""
     r = seeded(seed)
     if lean is None:
-        lean = r.uniform(0.08, 0.22) * r.choice([-1, 1])
-    # the skyline: a tall tower and a lower, wider shoulder on one side (max of two domes): the classic profile
+        lean = r.uniform(0.02, 0.08) * r.choice([-1, 1])
     side = 1 if lean >= 0 else -1
-    xs = np.linspace(cx - width * 0.42, cx + width * 0.42, 240)
-    tower_c = cx + side * width * r.uniform(0.04, 0.14); tower_w = width * r.uniform(0.26, 0.34)
-    sh_c = cx - side * width * r.uniform(0.14, 0.24); sh_w = width * r.uniform(0.30, 0.40)
-    sh_h = height * r.uniform(0.38, 0.55)
-    def dome(x, c, w, h):
-        q = np.clip(np.abs((x - c) / w), 0, 1)
-        return h * (0.5 + 0.5 * np.cos(np.pi * q)) ** 0.55      # full shoulders, but no vertical wall at the foot
-    prof = np.maximum(dome(xs, tower_c, tower_w, height * 0.66), dome(xs, sh_c, sh_w, sh_h))
-    prof = np.maximum(prof, height * 0.08 * np.clip(1 - np.abs(xs - cx) / (width * 0.42), 0, 1))
+    nt = towers or int(r.integers(2, 5))
+    xs = np.linspace(cx - width * 0.5, cx + width * 0.5, 400)
+    hs = size_ladder(nt, f'{seed}/th', ratio=(0.62, 0.9))
+    ws = size_ladder(nt, f'{seed}/tw', ratio=(0.62, 0.85))
+    prof = np.zeros_like(xs)
+    # the main tower off-centre toward the lean, the others alternate sides, never evenly spaced
+    pos = [cx + side * width * r.uniform(0.02, 0.1)]
+    for i in range(1, nt):
+        s_ = -side if i % 2 else side
+        pos.append(pos[0] + s_ * width * r.uniform(0.12, 0.22) * (1 + 0.35 * ((i - 1) // 2)))
+    for i in range(nt):
+        tw = width * 0.3 * ws[i] * r.uniform(0.9, 1.12)
+        lim = width * 0.5 - tw * 1.05
+        pc = float(np.clip(pos[i], cx - lim, cx + lim))
+        prof = np.maximum(prof, _dome(xs, pc, tw, height * 0.78 * hs[i], p=r.uniform(0.45, 0.7)))
+    # the skirt: low, the full width, its two ends tapering at different rates
+    ta, tb = r.uniform(0.06, 0.14), r.uniform(0.1, 0.22)
+    if side < 0:
+        ta, tb = tb, ta
+    u = (xs - xs[0]) / (xs[-1] - xs[0])
+    skirt = height * r.uniform(0.12, 0.2) * np.clip(u / ta, 0, 1) ** 0.6 * np.clip((1 - u) / tb, 0, 1) ** 0.8
+    prof = np.maximum(prof, skirt)
+    prof = ndi.gaussian_filter1d(prof, 6, mode='nearest')
     g = np.stack([xs, base - prof], 1)
-    top_r = height * 0.34
+    pmax = prof.max()
 
-    def r_of(u, rr):
-        i = min(int(u * (len(prof) - 1)), len(prof) - 1)
-        h = prof[i] / max(prof.max(), 1e-6)                       # bigger where the skyline is high
-        return max(top_r * (0.2 + 0.8 * h ** 1.2) * rr.uniform(0.75, 1.1), 4.0)
+    def r_of(uu, rr):
+        i = min(int(uu * (len(prof) - 1)), len(prof) - 1)
+        h = prof[i] / pmax
+        return max(height * 0.2 * (0.38 + 0.62 * h ** 0.9) * rr.uniform(0.75, 1.12), 3.0)
 
-    ells = billows(f'{seed}/b', g, r_of, inset=(0.25, 0.45), spacing=(0.55, 0.78), child=(0.32, 0.55),
-                   n_child=(0, 2), arc=(215, 325))
+    ells = billows(f'{seed}/b', g, r_of, inset=(0.35, 0.55), spacing=(0.5, 0.72), aspect=(0.75, 0.98),
+                     child=(0.28, 0.5), n_child=(0, 2), arc=(210, 330))
+    # level 3: a few small billows on the side toward the light (upper arcs), never on the base
+    l3 = []
+    for (x, y, rx, ry, rot) in ells:
+        if rx < height * 0.06 or r.uniform() > 0.45:
+            continue
+        a = math.radians(r.uniform(215, 325)) + (0.25 if side > 0 else -0.25)
+        cr = rx * r.uniform(0.18, 0.3)
+        l3.append((x + math.cos(a) * rx * 0.92, y + math.sin(a) * ry * 0.92, cr, cr * r.uniform(0.75, 0.95), 0.0))
+    ells = ells + l3
     box = (cx - width, base - height * 1.6, cx + width, base + 4)
     body = np.vstack([g, [[g[-1, 0], base], [g[0, 0], base]]])
-    m = raster_union(ells, box, base_cut=base, poly=body)
+    tilt = math.tan(math.radians(r.uniform(-1.2, 1.2)))
+    m = raster_union(ells, box, base_cut=None, poly=body)
+    yy, xx = np.mgrid[0:m.shape[0], 0:m.shape[1]]
+    m &= (yy + box[1]) <= (base + (xx + box[0] - cx) * tilt)
+    m = ndi.binary_opening(m, iterations=1)
+    lab_, n = ndi.label(m)
+    if n > 1:
+        sizes = ndi.sum(m, lab_, range(1, n + 1)); m = lab_ == (1 + int(np.argmax(sizes)))
     P = mask_outline(m) + [box[0], box[1]]
     R = math.sqrt(m.sum() / math.pi)
     if edge:
-        oct_ = [o for o in spectrum_for(R, 'cloud') if o[0] <= 0.5 * R]
-        quiet_base = lambda Q, N: np.where(N[:, 1] > 0.75, 0.3, 1.0)
+        oct_ = [(lam, amp) for (lam, amp) in spectrum_for(R, 'cloud') if lam <= 0.5 * R]
+        quiet_base = lambda Q, N: np.where(N[:, 1] > 0.7, 0.25, 1.0)
         P = displace(P, oct_, f'{seed}/edge', amp_at=quiet_base)
     return P, R
 
 
-def crown_billow(seed, cx: float, cy: float, width: float, height: float, lean: float | None = None,
-                 edge: bool = True, holes: int = 3):
-    """A tree crown from clumps: an egg-shaped guide leaning to one side, leaf clumps along it on a ladder (biggest
-    on the lit upper side), a notched underside where the trunk enters, level-2 clumps, sky holes inside; then the
-    foliage spectrum's small octaves. Returns (outline N x 2, R, holes [outline])."""
+def crown(seed, cx, cy, width, height, lean=None, holes=None):
+    """A tree crown in three levels, big / medium / small: a body (a dome wider than tall, its underside flattened);
+    3-5 big LOBES on a size ladder around its upper three-quarters (never evenly spaced, the biggest toward the lean);
+    2-4 medium CLUMPS on each lobe's outer arc, half sunk in; small clumps on a third of those; the underside left flat
+    with 1-3 shallow bites; 1-3 sky holes where lobes meet; then the foliage spectrum's short octaves (quieter under).
+    Returns (coverage float H x W of the box, (x0, y0), outline)."""
     r = seeded(seed)
     if lean is None:
-        lean = r.uniform(0.06, 0.16) * r.choice([-1, 1])
-    n = 240
-    t = np.linspace(0, 2 * math.pi, n, endpoint=False)
-    egg = 1 + 0.12 * np.sin(t)              # fuller at the top (y up = -sin)
-    gx = cx + np.cos(t) * width * 0.36 * egg + lean * width * (1 - np.sin(t)) * 0.35
-    gy = cy - np.sin(t) * height * 0.33
-    guide = np.stack([gx, gy], 1)
-    # walk the whole loop, starting at the bottom (where the trunk enters)
-    start = int(np.argmax(gy))
-    loop = np.vstack([guide[start:], guide[:start + 1]])
-    R0 = min(width, height) * 0.24
-
-    def r_of(u, rr):
-        up = 0.5 - 0.5 * math.cos(2 * math.pi * u)           # 0 at the bottom, 1 at the top
-        return max(R0 * (0.35 + 0.65 * up) * rr.uniform(0.7, 1.15), 3.0)
-
-    def inset_of(u, rr):
-        up = 0.5 - 0.5 * math.cos(2 * math.pi * u)
-        return rr.uniform(0.62, 0.85) if up < 0.3 else rr.uniform(0.3, 0.55)
-
-    ells = billows(f'{seed}/b', loop, r_of, spacing=(0.5, 0.8), aspect=(0.68, 0.95), child=(0.3, 0.5),
-                   n_child=(0, 2), inset_of=inset_of, outward=(cx, cy))
-    # drop the clumps at the bottom centre: the underside is notched, the trunk shows
-    ells = [e for e in ells if not (e[1] > cy + height * 0.2 and abs(e[0] - cx - lean * width * 0.2) < width * 0.14)]
-    box = (cx - width, cy - height, cx + width, cy + height)
-    body = np.stack([cx + (gx - cx) * 0.8, cy + (gy - cy) * 0.8], 1)
-    m = raster_union(ells, box, poly=body)
-    m = ndi.binary_fill_holes(m)
-    P = mask_outline(m) + [box[0], box[1]]
-    R = math.sqrt(m.sum() / math.pi)
-    if edge:
-        P = displace(P, [o for o in spectrum_for(R, 'foliage') if o[0] <= 0.45 * R], f'{seed}/edge')
-    hs = []
-    inside = ndi.distance_transform_edt(m)
-    for k in range(holes):
-        for _ in range(60):
-            hx = r.uniform(0.2, 0.8) * (box[2] - box[0]); hy = r.uniform(0.2, 0.62) * (box[3] - box[1])
-            if inside[int(hy), int(hx)] > R * 0.22:
-                hr = R * r.uniform(0.035, 0.075)
-                a = np.linspace(0, 2 * math.pi, 64, endpoint=False)
-                circ = np.stack([box[0] + hx + hr * np.cos(a), box[1] + hy + hr * 0.78 * np.sin(a)], 1)
-                hs.append(displace(circ, [(hr * 1.4, hr * 0.16), (hr * 0.6, hr * 0.07)], f'{seed}/hole{k}'))
-                break
-    return P, R, hs
-
-
-def bank(seed, cx: float, base: float, length: float, height: float, edge: bool = True):
-    """A flat cloud bank (stratocumulus / a dusk deck): a long low lens, its top in low, flattened billows of varied
-    size, a flat base, the two ends dragged thin (they taper into streaks over 15-25 % of the length)."""
-    r = seeded(seed)
-    n = 200
-    t = np.linspace(0, 1, n)
-    skew = r.uniform(0.35, 0.65)
-    hgt = np.where(t < skew, (t / skew), ((1 - t) / (1 - skew))) ** 0.6
-    taper = np.clip(np.minimum(t, 1 - t) / r.uniform(0.15, 0.25), 0, 1) ** 1.5
-    top = np.stack([cx - length / 2 + t * length, base - height * hgt * (0.4 + 0.6 * taper)], 1)
-
-    def r_of(u, rr):
-        h = (min(u, 1 - u) * 2) ** 0.5
-        return max(height * 0.5 * (0.35 + 0.65 * h) * rr.uniform(0.7, 1.15), 3.0)
-
-    ells = billows(f'{seed}/b', top, r_of, inset=(0.55, 0.75), spacing=(0.6, 1.0), aspect=(0.42, 0.65), levels=1)
-    box = (cx - length * 0.6, base - height * 2.2, cx + length * 0.6, base + 4)
-    body = np.vstack([top, [[top[-1, 0], base], [top[0, 0], base]]])
-    m = raster_union(ells, box, base_cut=base, poly=body)
-    P = mask_outline(m) + [box[0], box[1]]
-    R = math.sqrt(m.sum() / math.pi)
-    if edge:
-        oct_ = [o for o in spectrum_for(R, 'cloud') if o[0] <= 0.6 * R]
-        P = displace(P, oct_, f'{seed}/edge')
-    return P, R
-
-
-def crown(seed, cx: float, cy: float, width: float, height: float, masses: int = 4, lean: float | None = None,
-          holes: int = 3):
-    """A tree crown as the references build one: 3-5 foliage MASSES on a size ladder (one main mass, medium ones at
-    different heights on the two sides, a small one poking out), each an egg of leaf clumps (crown_billow), the masses
-    overlapping 20-45 % (never kissing), the whole leaning to one side; notches where masses meet, sky holes inside.
-    Returns (coverage mask float H x W of the box, (x0, y0), outline of the union)."""
-    r = seeded(seed)
-    if lean is None:
-        lean = r.uniform(0.06, 0.15) * r.choice([-1, 1])
+        lean = r.uniform(0.04, 0.14) * r.choice([-1, 1])
     side = 1 if lean >= 0 else -1
-    sizes = size_ladder(masses, f'{seed}/m', ratio=(0.55, 0.78))
     x0, y0 = int(cx - width), int(cy - height)
     W, H = int(2 * width), int(2 * height)
-    cov = np.zeros((H, W), np.float32)
-    placed = []
-    for i, s in enumerate(sizes):
-        mw, mh = width * 1.15 * s, height * 1.0 * s
-        if i == 0:
-            mx, my = cx + side * width * 0.08, cy - height * 0.02
-        else:
-            for _ in range(80):
-                ang = r.uniform(math.radians(160), math.radians(380))
-                px, py, pw, ph = placed[int(r.integers(0, len(placed)))]
-                ov = r.uniform(0.2, 0.45)
-                dist = (pw + mw) * 0.36 * (1 - ov)
-                mx = px + math.cos(ang) * dist; my = py + math.sin(ang) * dist * 0.7
-                if my < cy + height * 0.25 and abs(mx - cx) < width * 0.75:
-                    break
-        placed.append((mx, my, mw, mh))
-        P, R, hs = crown_billow(f'{seed}/mass{i}', mx, my, mw, mh, lean=lean * 0.5, holes=0)
-        cov = np.maximum(cov, fill_outline(P - [x0, y0], (H, W)))
-    m = cov > 0.5
+    Rw, Rh = width * 0.42, height * 0.36
+    bx, by = cx + lean * width * 0.25, cy + height * 0.05
+    ells = [(bx, by, Rw * 0.62, Rh * 0.6, r.uniform(-6, 6))]
+    nl = int(r.integers(3, 6))
+    sizes = size_ladder(nl, f'{seed}/lobes', ratio=(0.6, 0.85))
+    # lobe angles over the upper 3/4 (-200 .. 20 deg, 0 = right, -90 = up), uneven gaps, the biggest toward the lean
+    span = np.sort(r.uniform(0, 1, nl))
+    span = 0.08 + 0.84 * (span - span.min()) / max(span.max() - span.min(), 1e-6) if nl > 1 else np.array([0.5])
+    angs = np.radians(-195 + 210 * span)
+    order = np.argsort(np.abs(angs - math.radians(-90 + 35 * side)))     # the lobe nearest the leaning top gets the biggest
+    lobes = []
+    for rank, i in enumerate(order):
+        lr = min(Rw, Rh * 1.3) * 0.62 * sizes[rank] * r.uniform(0.9, 1.1)
+        a = angs[i] + r.uniform(-0.1, 0.1)
+        d = r.uniform(0.62, 0.9)
+        lx = bx + math.cos(a) * Rw * d; ly = by + math.sin(a) * Rh * d
+        lobes.append((lx, ly, lr, lr * r.uniform(0.72, 0.9), math.degrees(a) + 90 + r.uniform(-10, 10)))
+    ells += lobes
+    # medium clumps on each lobe's outer arc; small ones on some of those
+    for (lx, ly, lr, lry, rot) in lobes:
+        out_a = math.atan2(ly - by, lx - bx)
+        nm = int(r.integers(2, 5))
+        offs = np.sort(r.uniform(-1.0, 1.0, nm))
+        for o in offs:
+            a = out_a + o * r.uniform(0.7, 1.0)
+            mr = lr * r.uniform(0.32, 0.52)
+            sink = r.uniform(0.45, 0.75)
+            mx = lx + math.cos(a) * (lr - mr * sink); my = ly + math.sin(a) * (lry - mr * sink)
+            if my > by + Rh * 0.45:
+                continue
+            ells.append((mx, my, mr, mr * r.uniform(0.72, 0.92), r.uniform(-20, 20)))
+            if r.uniform() < 0.33:
+                sa = a + r.uniform(-0.6, 0.6); sr = mr * r.uniform(0.28, 0.42)
+                ells.append((mx + math.cos(sa) * (mr - sr * 0.4), my + math.sin(sa) * (mr - sr * 0.4), sr, sr * 0.85, 0.0))
+    m = raster_union(ells, (x0, y0, x0 + W, y0 + H))
+    # the underside: flattened, a slight lens, with shallow bites
+    yy, xx = np.mgrid[0:H, 0:W]
+    flat_y = by + Rh * r.uniform(0.42, 0.55) - y0
+    lens = flat_y + Rh * 0.12 * (1 - ((xx - (bx - x0)) / (Rw * 1.1)) ** 2).clip(0, 1)
+    m &= yy <= lens
+    for k in range(int(r.integers(1, 4))):
+        bxk = bx - x0 + r.uniform(-0.6, 0.6) * Rw; brk = Rw * r.uniform(0.06, 0.12)
+        m &= ~(((xx - bxk) / brk) ** 2 + ((yy - flat_y - brk * 0.3) / (brk * 0.7)) ** 2 <= 1)
+    m = ndi.binary_fill_holes(m)
+    lab_, n = ndi.label(m)
+    if n > 1:
+        sizes_ = ndi.sum(m, lab_, range(1, n + 1)); m = lab_ == (1 + int(np.argmax(sizes_)))
     P = mask_outline(m) + [x0, y0]
     R = math.sqrt(m.sum() / math.pi)
-    inside = ndi.distance_transform_edt(m)
-    for k in range(holes):
-        for _ in range(80):
-            hx = r.uniform(0.15, 0.85) * W; hy = r.uniform(0.2, 0.65) * H
-            if inside[int(hy), int(hx)] > R * 0.16:
-                hr = R * r.uniform(0.03, 0.065)
-                a = np.linspace(0, 2 * math.pi, 64, endpoint=False)
-                circ = np.stack([hx + hr * np.cos(a), hy + hr * 0.78 * np.sin(a)], 1)
-                hole = displace(circ, [(hr * 1.4, hr * 0.16), (hr * 0.6, hr * 0.07)], f'{seed}/hole{k}')
-                cov = np.minimum(cov, 1 - fill_outline(hole, (H, W)))
-                break
+    P = displace(P, [o for o in spectrum_for(R, 'foliage') if o[0] <= 0.25 * R], f'{seed}/edge',
+                   amp_at=lambda Q, N: np.where(N[:, 1] > 0.6, 0.4, 1.0))
+    cov = fill_outline(P - [x0, y0], (H, W))
+    # sky holes where two lobes meet, inside the silhouette near its edge
+    inside = ndi.distance_transform_edt(cov > 0.5)
+    nh = holes if holes is not None else int(r.integers(1, 4))
+    pairs = [(lobes[i], lobes[j]) for i in range(len(lobes)) for j in range(i + 1, len(lobes))]
+    r.shuffle(pairs)
+    made = 0
+    for (a_, b_) in pairs:
+        if made >= nh:
+            break
+        hx = (a_[0] + b_[0]) / 2 - x0; hy = (a_[1] + b_[1]) / 2 - y0
+        if not (0 <= int(hy) < H and 0 <= int(hx) < W) or not (R * 0.06 < inside[int(hy), int(hx)] < R * 0.3):
+            continue
+        hr = R * r.uniform(0.05, 0.1)
+        aa = np.linspace(0, 2 * math.pi, 96, endpoint=False)
+        circ = np.stack([hx + hr * np.cos(aa), hy + hr * r.uniform(0.6, 0.85) * np.sin(aa)], 1)
+        hole = displace(circ, [(hr * 1.6, hr * 0.14), (hr * 0.7, hr * 0.07)], f'{seed}/hole{made}')
+        cov = np.minimum(cov, 1 - fill_outline(hole, (H, W)))
+        made += 1
     return cov, (x0, y0), P
+
+
+def bank(seed, cx, base, length, height, edge=True, split=None):
+    """A flat cloud bank (a dusk deck, stratocumulus): a long thin body whose thickness swells in 2-4 humps on a ladder
+    (never one symmetric hump), the two ends dragged thin at different lengths (one 10-30 %, the other 25-50 %), the
+    top a row of low billows of varied size, the base nearly level (<= 1 px wobble); sometimes split in two at a thin
+    point. Returns (outline N x 2, R) or, when split, the larger piece (the other in .extra)."""
+    r = seeded(seed)
+    n = 600
+    u = np.linspace(0, 1, n)
+    xs = cx - length / 2 + u * length
+    nh = int(r.integers(2, 5))
+    hh = size_ladder(nh, f'{seed}/h', ratio=(0.45, 0.8))
+    th = np.zeros(n)
+    centres = np.sort(r.uniform(0.15, 0.85, nh))
+    for i, c in enumerate(r.permutation(centres)):
+        wdt = r.uniform(0.08, 0.2)
+        th = np.maximum(th, hh[i] * np.exp(-0.5 * ((u - c) / wdt) ** 2))
+    th = 0.25 + 0.75 * th
+    ta, tb = r.uniform(0.1, 0.3), r.uniform(0.25, 0.5)
+    if r.uniform() < 0.5:
+        ta, tb = tb, ta
+    env = np.clip(u / ta, 0, 1) ** 1.6 * np.clip((1 - u) / tb, 0, 1) ** 1.2
+    th = height * th * env
+    if split is None:
+        split = r.uniform() < 0.35
+    if split:
+        uk = r.uniform(0.3, 0.7); wk = r.uniform(0.02, 0.05)
+        th = th * (1 - np.exp(-0.5 * ((u - uk) / wk) ** 2)) ** 1.5
+    th += height * 0.06 * line_noise(n, [(length * 0.12, 1.0), (length * 0.04, 0.5)], f'{seed}/tn', length=length)
+    th = np.where(th < 2.0, 0.0, th)      # a tail ends at 2 px, never as a hairline that twinkles
+    below = r.uniform(0.12, 0.22)
+    top = np.stack([xs, base - th * (1 - below)], 1)
+    bot = np.stack([xs, base + th * below + 0.6 * line_noise(n, [(length * 0.1, 1.0)], f'{seed}/bn', length=length)], 1)
+    poly = np.vstack([top, bot[::-1]])
+
+    def r_of(uu, rr):
+        k = min(int(uu * (n - 1)), n - 1)
+        return max(th[k] * 0.55 * rr.uniform(0.7, 1.2), 1.5)
+
+    ok = th > height * 0.18
+    ells = []
+    if ok.any():
+        i0, i1 = np.where(ok)[0][[0, -1]]
+        ells = billows(f'{seed}/b', top[i0:i1 + 1], r_of, inset=(0.55, 0.8), spacing=(0.55, 0.95), aspect=(0.45, 0.7),
+                         levels=2, child=(0.25, 0.45), n_child=(0, 1), arc=(220, 320))
+    box = (cx - length * 0.6, base - height * 2.2, cx + length * 0.6, base + height)
+    m = raster_union(ells, box, poly=poly)
+    yy = np.arange(m.shape[0])[:, None] + box[1]
+    m &= yy <= base + th.max() * below + 1.5
+    lab_, k = ndi.label(m)
+    pieces = []
+    for i in range(1, k + 1):
+        mi = lab_ == i
+        if mi.sum() < 30:
+            continue
+        P = mask_outline(mi) + [box[0], box[1]]
+        R = math.sqrt(mi.sum() / math.pi)
+        if edge:
+            P = displace(P, [o for o in spectrum_for(R, 'cloud') if o[0] <= 0.6 * R],
+                           f'{seed}/edge{i}', amp_at=lambda Q, N: np.where(N[:, 1] > 0.6, 0.2, 1.0))
+        pieces.append((P, R))
+    pieces.sort(key=lambda t: -t[1])
+    return pieces
 
 
 def hand_cut(corners: np.ndarray, seed, side_turn=(0.8, 2.2), bow=(0.003, 0.009), cuts=(1, 3), jog=(0.3, 1.0),
@@ -576,9 +634,9 @@ def edge_alpha(cov: np.ndarray, seed, light=(-0.7, -0.7), found=0.45, lost=0.25,
     gy, gx = np.gradient(ndi.gaussian_filter(sd, 3.0))
     nx, ny = -gx, -gy
     nl = np.maximum(np.hypot(nx, ny), 1e-6)
-    lx, ly = light
+    lx, ly = light                                              # the direction toward the light (image y down)
     ll = math.hypot(lx, ly)
-    facing = (nx * (-lx / ll) + ny * (-ly / ll)) / nl          # +1 = faces the light
+    facing = (nx * lx / ll + ny * ly / ll) / nl                 # +1 = the outline faces the light
     slow = noise2d((H, W), slow_px, f'{seed}/slow', octaves=2)
     score = 0.65 * facing + 0.55 * slow                         # high = found, low = lost
     # thresholds by quantile along the outline band so the shares are what was asked
@@ -602,6 +660,36 @@ def edge_alpha(cov: np.ndarray, seed, light=(-0.7, -0.7), found=0.45, lost=0.25,
     from scipy.special import erf
     a = 0.5 * (1 + erf(sd2 / sig / math.sqrt(2)))
     return a.astype(np.float32)
+
+
+def shade3(cov: np.ndarray, seed, light=(-0.7, -0.7), lz: float = 0.55, scale: float = 8.0, lit_t: float = 0.35,
+           shade_t: float = -0.05, wander: float = 0.12, wander_px: float = 60.0, big: float = 0.0, big_w: float = 0.4):
+    """Flat light on a silhouette, in values the clean pen can draw: the shape read as a dome (height = sqrt of the
+    distance inside), its normals at the billow scale (`scale` px), Lambert toward `light` (x, y toward the light,
+    image y down) lifted by lz; LIT where it faces the light over lit_t, SHADE under shade_t, the body between. A slow
+    noise moves both thresholds (+-wander) so the terminator follows the billows and wanders, never a ruler and never a
+    crescent along the outline. Returns (lit, shade) coverages (float 0-1, anti-aliased)."""
+    inside = (cov > 0.5).astype(np.uint8)
+    d = cv2.distanceTransform(inside, cv2.DIST_L2, 5).astype(np.float32)
+    L = np.array([light[0], light[1], lz], float); L /= np.linalg.norm(L)
+
+    def lambert(sc, local=0.0):
+        h = ndi.gaussian_filter(np.sqrt(d), sc)
+        if local > 0:      # the billows' own relief: the height minus its own blur at the mass scale
+            h = h - ndi.gaussian_filter(np.sqrt(d), local)
+        gy, gx = np.gradient(h)
+        k = 1.0 / max(float(np.percentile(np.hypot(gx, gy)[inside > 0], 90)), 1e-6)
+        nx, ny, nz = -gx * k, -gy * k, np.ones_like(gx)
+        nl = np.sqrt(nx * nx + ny * ny + nz * nz)
+        lam_ = (nx * L[0] + ny * L[1] + nz * L[2]) / nl
+        return lam_ - float(np.median(lam_[inside > 0]))
+    # the billows' own light (`scale`), optionally over the whole mass's light (`big`): each billow its own lit cap
+    lam = lambert(scale) if big <= 0 else (1 - big_w) * lambert(scale, local=big) + big_w * lambert(big)
+    wob = wander * noise2d(cov.shape, wander_px, f'{seed}/wander', octaves=2)
+    lit = np.clip((lam - lit_t - wob) / 0.02 + 0.5, 0, 1).astype(np.float32)
+    shade = np.clip((shade_t - wob - lam) / 0.02 + 0.5, 0, 1).astype(np.float32)
+    lit = ndi.gaussian_filter(lit, 0.6) * cov; shade = ndi.gaussian_filter(shade, 0.6) * cov
+    return lit, shade
 
 
 def _aniso_noise(shape, seed, theta: float, along: float, across: float) -> np.ndarray:
