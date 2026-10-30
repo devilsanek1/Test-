@@ -40,7 +40,7 @@ ideas; frames planned and created whole from the get-go, never filled for densit
 4. **KEY FRAMES, made whole:** each beat's frame (its landing frame, and its start where a move changes the picture)
    built complete in the film's look: the idea, the full world, the light, the people, the words. The owner approves the
    board of key frames: this IS the film's look and content (it replaces W1's density keys, G3's grey placeholders and
-   G4's separate look clip).
+   G4's separate look clip). The world kit and the hero frame come first ("A RICH, BEAUTIFUL WORLD" below).
 5. **THE SHOT PLAN (the visual script, written now):** the camera moves and the joins that travel between the approved
    key frames on the voice's clock (the composition library's moves and joins, the sync plan): the camera serves the
    frames, never the other way round.
@@ -50,8 +50,8 @@ ideas; frames planned and created whole from the get-go, never filled for densit
 8. **Sound and final** (G7-G8, as below).
 **ONE FILM, NEVER A HODGE-PODGE (owner, 2026-10-30): coherence is held above the frame, at every step.**
 1. **One film concept above the beats:** before or with the ideas, ONE imaginative idea for the whole film (its world,
-   its central device, the thread's journey, the arc of feeling from the first frame to the payoff), like video 1's one
-   world of buildings with browser windows. Every beat's idea is a chapter of it; an idea that belongs to another film is
+   its central device, the thread's journey, the arc of feeling from the first frame to the payoff), invented for this
+   story (never a past film's). Every beat's idea is a chapter of it; an idea that belongs to another film is
    out, however good.
 2. **Pick sequences, not single beats:** the ideas come as whole sequences (one imagination per sequence, every beat
    flowing into the next); the pick is one sequence as the base, then individual beats improved inside it, never a
@@ -68,10 +68,32 @@ ideas; frames planned and created whole from the get-go, never filled for densit
    joins between them, and the art director lands the seams; the shot plan and the animatic are the last coherence
    checks (the whole film, played once, judged as one story).
 
+**A RICH, BEAUTIFUL WORLD (owner, 2026-10-30): designed before the frames, held by one finished frame, never added later.**
+1. **The world first, from the real place:** after the sequence pick, the art director designs the film's world whole
+   from real photos of its real places and things (on video 4: Helsinki's harbour streets in winter, their facades,
+   trams, snow and light; a real data hall, real pipes), its shape language, palette and light, and the story's own
+   marks on it (on video 4: the heat, as steam, melted snow, warm windows). Its pieces are built ONCE at finished
+   quality (the buildings, windows, props, trees, snow, vehicles, the people and their life: the world kit), so every
+   frame is composed from beautiful, specific parts: richness and beauty are inherited, never filled in.
+2. **The hero frame first:** before the other key frames, the art director paints ONE frame to full finish (the one
+   that shows the most of the world) through THE FRAME LOOP, and the owner approves it. It is the film's own bar: every
+   later frame must sit beside it at its richness and finish. It comes after the ideas are picked and shows this film's
+   own world, so it guides the craft, never the ideas.
+3. **Rich means specific, layered and alive, never "more stuff":** three scales of detail (big shapes that read in a
+   second, middle shapes that describe the place, small details that reward a pause), each detail saying something
+   about this place or this story, the world going on past the frame's edges, life in its calm tier.
+4. **Pleasing is judged as a painter judges, at finished quality and at phone size:** the values first (squint: big
+   quiet masses, one light, one focus), a few colours in harmony around the one accent, a rhythm of big, medium and
+   small shapes, edges varied (crisp at the focus, lost elsewhere), the finish (the paint, the texture, the line). THE
+   FRAME LOOP's evaluator judges every frame on these beside the hero frame; an ALMOST comes back as a paint-over (the
+   frame itself marked up: circled, arrowed, a value or colour correction painted on), never as new rules.
+5. **The owner's eye twice before animation:** the hero frame, then the whole board of key frames.
+
 **THE FRAME LOOP (owner, 2026-10-30; every built idea, key frame, scene and shot, before the owner sees it):**
 1. **Build:** the builder makes the frame whole from its card (the beat's feeling and idea; `docs/look/FRAME_CARD.md`).
 2. **Evaluate:** a FRESH evaluator (never the builder; one, not a panel) looks at the frame at full and phone size
-   beside video 1's frame and the owner's references, and answers one question first: does it give the viewer the
+   beside the hero frame (once it exists) and the owner's references, never a past film of ours, and answers one
+   question first: does it give the viewer the
    beat's FEELING and idea in a second, and is it worth pausing on? Then the card's questions. The verdict is one of:
    - **THERE:** it achieves the feeling; small polish notes only -> move on.
    - **ALMOST:** the feeling is there but specific things hold it back -> ADJUST: the builder fixes exactly those

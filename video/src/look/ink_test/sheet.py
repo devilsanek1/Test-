@@ -31,9 +31,9 @@ def main(scr):
     for T, P in TREATMENTS.items():
         cols.append((P['title'], Image.open(os.path.join(OUT, f'ink_{T}.png')).convert('RGB')))
     crops = [((440, 1180, 800, 1580), (470, 760, 830, 1160)),  # v1's doors / v7a's doorway, her, the lamp
-             ((640, 1440, 1000, 1840), (760, 940, 1080, 1180))]  # v1's near plaza / v7a's boat and Pip
+             ((640, 1440, 1000, 1840), (720, 940, 1080, 1180))]  # v1's near plaza / v7a's boat and Pip
     crop2 = (720, 1560, 1080, 1880)  # v7a's near table and chair
-    f_t, f_s = font(20), font(15)
+    f_t, f_s = font(17), font(15)
     rows_h = [640, 400, 240, 320]
     Wd = PAD * 2 + len(cols) * CW + (len(cols) - 1) * GAP
     Hd = PAD + 34 + sum(rows_h) + 3 * GAP + 30 + PAD

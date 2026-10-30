@@ -22,14 +22,32 @@ the sixth pass, 2026-10-27: a cold read as if starting video 4, every conflict i
 budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance at the end).
 
 ## THE THREE RULES ABOVE ALL (owner, 2026-10-30)
-1. **Every frame is worth pausing on.** Judged at a glance beside video 1 (`docs/look/ref_v1_governments_frame.png`)
-   and the owner's references, before any numeric check.
-2. **Readable imaginative ideas.** Each beat gets an imaginative picture a viewer reads in a second (video 1's
-   government buildings with browser windows, its power-button sun): never a dry diagram, never an abstraction that
-   needs explaining.
+1. **Every frame is worth pausing on.** Judged at a glance, as a picture, before any numeric check: would a viewer stop
+   scrolling to look at it longer?
+2. **Readable imaginative ideas.** Each beat gets an imaginative picture a viewer reads in a second, invented for this
+   story: never a dry diagram, never an abstraction that needs explaining, never an idea taken from a past film.
 3. **Frames planned and created WHOLE, from the get-go.** Each frame is designed as one complete picture (its idea, its
    world, its light, its people, its words) before it is built or animated. Never a frame built thin and filled later
    "for the sake of density": density comes from the imagination and the world, never from a filling pass.
+
+**No past film as the bar or the example:** no brief, card, review or guide points an agent at video 1 (or any other
+film of ours) as the bar, a reference or an example of an idea: it boxes the imagination in. The bar is the three rules
+and the beat's feeling; where an older guide still names v1, that is a measured number, never a picture to look at,
+copy or upgrade. — ("don't reference video 1 - i think this would put agents in a box again", 2026-10-30.)
+
+**A RICH, BEAUTIFUL WORLD is designed before the frames and held by one finished frame, never added later:** the art
+director designs the film's world whole first, from real photos of its real places and things (their buildings,
+streets, materials, weather, light and everyday life) with the story's own marks on it, and builds its pieces once at
+finished quality (the world kit), so every frame is composed from beautiful, specific parts. The first key frame (the
+HERO FRAME) is painted to full finish and approved by the owner: it is the film's own bar for richness and finish, and
+it comes after the ideas are picked, so it guides the craft, never the ideas. Rich means specific, layered and alive,
+never "more stuff": three scales of detail (big shapes that read in a second, middle shapes that describe the place,
+small details that reward a pause), each detail saying something about this place or this story, the world going on
+past the frame's edges. Pleasing is judged as a painter judges, at finished quality and at phone size: the values
+first (squint: big quiet masses, one light, one focus), a few colours in harmony around the one accent, a rhythm of
+big, medium and small shapes, varied edges, the finish; an ALMOST comes back as a paint-over (the frame itself marked
+up), never as new rules (PIPELINE_V2, "A RICH, BEAUTIFUL WORLD"). — ("what would ultimately ensure that the world is
+build rich, visaully and aestethically pleasing?", 2026-10-30.)
 
 **ONE FILM, NEVER A HODGE-PODGE:** one imaginative concept for the whole film above the beats (its world, its central
 device, the thread's journey, the arc of feeling); ideas come and are picked as whole sequences, never a collage of the
@@ -41,7 +59,7 @@ process that ensures this doesn't happen and the whole video and the narrative i
 "too busy, too incoherent; no story ... just a bunch of shots put together".)
 
 **THE FRAME LOOP (every built frame, before the owner sees it):** build it whole -> a fresh evaluator judges the FEELING
-first (does it give the beat's feeling and idea in a second, worth pausing on, beside video 1 and the references) ->
+first (does it give the beat's feeling and idea in a second; is it worth pausing on, beside the hero frame) ->
 THERE (move on), ALMOST (adjust exactly what holds it back, at most 2 rounds) or NOT THERE (rework from the idea, a new
 approach, at most once; then the owner gets the options); encoded in every workflow (PIPELINE_V2, "THE FRAME LOOP"). —
 ("make sure we have the loops setup correctly where the agents bulid the proposed scenes and we evaluate and perhaps
@@ -67,8 +85,7 @@ BUILDING HERE", but more abstarct like "layers and feel of distance" and the fee
 our overal process, i want to make it more loose, more imaginative. i like the main important rule is every frame is
 worth pausing on yes + readable imaginative ideas + frames planned and created whole. We shouldn't be in a situation
 where we have our video and then we just fill up space for the sake of density this is wrong we need to be imaginative
-and plan the whole frame from the get go", 2026-10-30, after video 1's frame: "so many details and so coherent and so
-imaginative".)
+and plan the whole frame from the get go", 2026-10-30.)
 
 ## Audience and goal
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24).
@@ -250,7 +267,7 @@ imaginative".)
   city posters' 19 do. — ("i agree that a coherent style across all videos sharing one look, one brand would be
   absolutely the key here"; "the importnat part about one look is our look is evolving - we are finding out style i
   don't think we can overfixate on this", 2026-10-28).
-- **Hand-drawn flat colour like reference video 1, drawn CLEAN, REFINED, GENTLE, PREMIUM: never rough or messy.**
+- **Hand-drawn flat colour like the owner's reference 1 (France), drawn CLEAN, REFINED, GENTLE, PREMIUM: never rough or messy.**
   Reference 1 gives the composition, the flat colour and the small people; the line is the clean pen: clean, confident
   lines (smooth, consistent weights, few of them, no jitter, no sketchy overshoot or double strokes), refined shapes,
   no outlines (edges from light and shade, thin lines only on small things: Texture and lines below); hand-drawn
@@ -397,9 +414,8 @@ imaginative".)
   lights switching). A dense world makes a frame
   full even when little moves (Arcane's rooftop; the owner's riverside reference "doesn't feel empty at all"). The
   density sits mostly in the calm environment tier at low contrast, so full never means busy (`docs/look/CRAFT.md` §b).
-  The bar: reference 1 (France) and v1 (PHP: `docs/look/ref_v1_governments_frame.png`, "so many details and so
-  coherent and so imaginative ... Claude just made this all up in bisucally one shot", 2026-10-30), then each film's own
-  G3 density key; `scripts/qa/density.py` is a warning
+  The bar: alive and full at the level of the owner's reference 1 (France), designed into each frame whole (THE THREE
+  RULES; never a past film of ours); `scripts/qa/density.py` is a warning
   signal, never a quota; how-to `docs/look/LIFE_AND_DENSITY.md`. Big empty fields (nothing in them; flat colour itself
   is right) and an object alone on a blank wall are failures even in a draft. **A place, never buildings standing
   alone:** a street is blocks shoulder to shoulder, rows and rooftops layered back to the horizon, the street's own
@@ -410,7 +426,7 @@ imaginative".)
   loooing at this oicture and each house is so alone like the scene is empty / I mean is there any step that will make
   it coherent?", 2026-10-30).
 - **Scale moments, occasionally: make the viewer feel small**, using Arcane's camera work and staging, never its footage.
-  Keep it nuanced (it's still TikTok). The owner liked v1's scale scenes. — (v1, 2026-10-24/25).
+  Keep it nuanced (it's still TikTok). — (v1, 2026-10-24/25).
   **When a scale shot comes, the scale must feel GREAT**, like Arcane's rooftop end frame: a world that keeps going
   (hundreds of buildings shrinking into haze), a landmark that is huge yet far, tiny anchors (figures, birds, airships),
   the drop below the camera, a big sky with huge clouds, many depth layers. Recipe: `docs/look/CINEMATIC_GUIDE.md`
@@ -593,8 +609,8 @@ imaginative".)
   of using AI tactically like for certain elements or layers that move to achieve parallax or post processing kind of to
   add more style right?", 2026-10-30.)
 - **INK LINES, A BIT ROUGH BUT CLEAN (to try, 2026-10-30):** a bit of hand-drawn messiness in the lines, combined with
-  the painting, the styles and the texture, coherent and premium; video 1's line was "too rough, not looking clean or
-  premium". A look iteration (stills first); until the owner picks a treatment, the "no outlines" rule below stands. —
+  the painting, the styles and the texture, coherent and premium; never as rough as the old ink line ("too rough, not
+  looking clean or premium"). A look iteration (stills first); until the owner picks a treatment, the "no outlines" rule below stands. —
   ("so i like a bit of rougher ink style but our video 1 was too rough not looking clean or premium. If you can come up
   with a clean way to incorporate a bit of messiness in the lines combined with all the painting and styles and texture
   we added with it looking coherent - sure lets try", 2026-10-30.)
@@ -745,8 +761,7 @@ imaginative".)
   stories that have nothing to do with a real city. **Neither extreme: not content ABOUT real cities, and not made-up
   content (myths, fables, what-ifs as the story). The middle: true stories (real events, people, things) whose action
   happens in a big world we can show** (streets, buildings, landscapes, the sky); a metaphor world only when a true
-  story needs it and the facts map one-to-one (v1's town of websites, the best performer so far). The owner's examples are v1 and v2
-  (the look they like; its story was the weak part). Which stories fit is studied in
+  story needs it and the facts map one-to-one. Which stories fit is studied in
   `docs/studies/2026-10-28_city_posters/` (the content track; the live discussion is its `content_discussion.md`) before
   it changes `docs/TOPIC_CRITERIA.md`. **The search is open to any subject, not only tech and AI: what people would
   love to hear about** (the owner's seeds: history, news from cities, stories); **news from a real city is positive.**

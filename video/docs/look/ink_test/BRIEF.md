@@ -1,10 +1,14 @@
+> **History of a look iteration.** Its comparison with video 1's line is the owner's own limit ("too rough"), kept
+> as a measurement only: never a picture to look at or copy (owner, 2026-10-30: "don't reference video 1 - i think
+> this would put agents in a box again"). When a treatment is picked, its recipe goes into the look docs without it.
+
 # Ink lines, a bit rough but clean: the look test (iteration, 2026-10-30)
 
 **The owner:** "so i like a bit of rougher ink style but our video 1 was too rough not looking clean or premium. If you
 can come up with a clean way to incorporate a bit of messiness in the lines combined with all the painting and styles
 and texture we added with it looking coherent - sure lets try". The playbook (Visual style): "INK LINES, A BIT ROUGH
 BUT CLEAN (to try)"; until the owner picks, "no outlines" stands. Video 1's line, for what was too rough:
-`video/docs/style_bible.md` §0 and `video/docs/look/ref_v1_governments_frame.png` (loose architectural ink, overshoot,
+`video/docs/style_bible.md` §0 and `context/uploads/2026-10-30_v1_governments_frame.png` (loose architectural ink, overshoot,
 doubled strokes). The look we combine with: painter v7a (`video/docs/studies/2026-10-28_city_posters/paint_test/`
 `paint_still_v7a.png`, its NOTES and code `video/src/look/v7_s1/`), ORGANIC.md, PAINT_RECIPES.md, CRAFT.md §c (lines),
 the owner's references (`video/docs/look/refs_human_scale/`, `refs_paint/`, `poster_refs/` and the people refs) for

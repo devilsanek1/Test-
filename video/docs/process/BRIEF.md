@@ -10,8 +10,11 @@ BUILDING HERE", but more abstarct like "layers and feel of distance" and the fee
 **Context:** the owner's three rules above all (`video/docs/OWNER_PLAYBOOK.md`, top: every frame worth pausing on;
 readable imaginative ideas; frames planned and created whole from the get-go) and the new loop
 (`video/docs/PIPELINE_V2.md`, "THE LOOP NOW": beats -> ideas -> key frames made whole -> the shot plan -> the animatic ->
-animation; "our recipes are the toolbox at every step, never a cage"). The bar: video 1's frame
-`video/docs/look/ref_v1_governments_frame.png`. In the last two days the owner had to point out, one by one: the empty
+animation; "our recipes are the toolbox at every step, never a cage"). The owner, later the same day: "don't reference
+video 1 - i think this would put agents in a box again": nothing you write (the design language, the frame card, the
+rework) points at video 1 or any other film of ours, as the bar, an example or a question; where your prompt mentions
+video 1's frame, drop it: the bar is the three rules and the feeling, then the film's own hero frame (PIPELINE_V2, "A
+RICH, BEAUTIFUL WORLD"). In the last two days the owner had to point out, one by one: the empty
 scenes ("each house is so alone"), the composition library missing from a brief, the style recipes missing, the visual
 script restricting the ideas, bed-head hair, a menacing caption, a computer neck. The pattern: our guides mix feelings,
 tools, concrete placements and numbers; each brief carries a different subset; agents copy placements (no imagination) or

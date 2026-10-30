@@ -1,10 +1,9 @@
 # Video 4: the ideas round (2026-10-30, relaunched free)
 
 **The owner's three rules above all** (playbook top): every frame is worth pausing on; READABLE IMAGINATIVE IDEAS;
-frames planned and created WHOLE from the get-go (never a frame built thin and filled later for density). The bar:
-video 1's frame `video/docs/look/ref_v1_governments_frame.png` ("so many details and so coherent and so imaginative":
-government buildings whose windows are browser windows, the sun as a power button, a plaza full of people with phones,
-Pip on a post), and the owner's references. The loop: `video/docs/PIPELINE_V2.md` "THE LOOP NOW": beats -> IDEAS (this)
+frames planned and created WHOLE from the get-go (never a frame built thin and filled later for density). The bar is
+those rules and each beat's feeling, never a past film (owner, 2026-10-30: "don't reference video 1 - i think this
+would put agents in a box again": invent for this story). The loop: `video/docs/PIPELINE_V2.md` "THE LOOP NOW": beats -> IDEAS (this)
 -> key frames made whole -> the shot plan (camera and joins written FROM the key frames) -> the animatic.
 
 **What is fixed (only this):** the voice: its words and their times (`video/public/v4/voice_words.json`, 42.24 s); the
@@ -46,13 +45,18 @@ among yours, never a limit; ignore its camera.
   can be painted this way):** painter v7 (`video/docs/studies/2026-10-28_city_posters/paint_test/paint_still_v7a.png`),
   `ORGANIC.md` and `PAINT_RECIPES.md` (painted pieces, organic shapes, one story light), the dark night key with one
   warm accent (`WORLD_BIBLE.md` §2-3: the palette and the light; ignore its density keys), the people in use, the
-  words on screen, and the ink line under test (`video/docs/look/ink_test/`).
+  words on screen.
 - **Later steps use the rest:** the shot plan takes the library's moves and joins and `SOUND_SYNC.md`.
 
 **The job:** for each beat, imaginative picture ideas a regular viewer reads in a second, each drawn as ONE WHOLE FRAME
 thumbnail (1080 x 1920 drawn small: the idea, the full world around it, the light, the people, where the words sit),
-never a lone object on an empty field. Imaginative like video 1: the true mechanism shown through a playful, readable
-picture, never a metaphor that needs explaining or bends the facts. The film is one flowing story: say in a line how
+never a lone object on an empty field. Imaginative: the true mechanism shown through a playful, readable picture,
+never a metaphor that needs explaining or bends the facts. Where a frame shows the home place, it is the real Helsinki,
+specific (real photos of its harbour streets in winter, if you can fetch them, give the buildings, the street's things
+and the life; never a generic city), and the story's own marks are on it (the heat).
+**One film, never a hodge-podge (`video/docs/PIPELINE_V2.md`):** your sequence starts from ONE FILM CONCEPT (one
+imaginative idea for the whole film: its world, its central device, the thread's journey, the arc of feeling from the
+first frame to the payoff); every beat's idea is a chapter of it, and each beat's two ideas are two takes inside it. The film is one flowing story: say in a line how
 each idea could flow into the next beat's (the camera comes later, from the frames). Each idea: a title, one line (what
 the viewer sees and gets), the thumbnail.
 
