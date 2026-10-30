@@ -263,4 +263,6 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   static or like one firm it's always a little messy, unstructured wavy / Research the haircuts and the physics of hair
   and let's make sure it's the most pleasant and modern recipe we have" -> a people iteration (hair, proportions,
   stature) on direction C with the LASH face, stills first; it feeds video 4's person near the camera (S1, S11, S12).
+  Sent: https://claude.ai/artifact/1Xerf8RzpVF8WnH2PYEN8b (her before and after, twelve cuts, calm/breeze/walk/turn,
+  the cast at film size, heights and builds, seated and leaning, close and far; `docs/look/people_design/hair_v2/`).
   -> rule: playbook, Visual style (hair is never static or one firm shape).

@@ -1,0 +1,153 @@
+<title>Hair and Stature</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Gaegu:wght@300;400;700&display=swap">
+<style>
+/* Layout: one phone-width column; the before/after first, then each sheet in a sideways-swipe frame at a readable size. */
+:root {
+  --bg: #efeae6;
+  --card: #f8f5f2;
+  --fg: #22201f;
+  --muted: #5f5853;
+  --line: #d9d1ca;
+  --accent: #9a5636;      /* copper, from the hair library */
+  --accent-soft: #ecd9cc;
+  --plate: #a99592;       /* the sheets' film-size plate */
+  --hand: 'Gaegu', 'Comic Sans MS', cursive;
+  --ui: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161414; --card: #1f1c1b; --fg: #eee8e3; --muted: #aca39c; --line: #35302d;
+    --accent: #e7a07b; --accent-soft: #3b2d26; --plate: #6b5d5b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161414; --card: #1f1c1b; --fg: #eee8e3; --muted: #aca39c; --line: #35302d;
+  --accent: #e7a07b; --accent-soft: #3b2d26; --plate: #6b5d5b; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--ui); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+.wrap { max-width: 680px; margin: 0 auto; display: grid; gap: 40px; }
+header { display: grid; gap: 14px; padding-top: 28px; }
+h1 { font-family: var(--hand); font-weight: 400; font-size: clamp(44px, 12vw, 62px); line-height: 1; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--hand); font-weight: 400; font-size: 32px; line-height: 1.1; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.lede { font-size: 17px; max-width: 60ch; }
+.quote { border-left: 3px solid var(--accent); padding: 2px 0 2px 12px; color: var(--muted); font-size: 15px; }
+.changes { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.changes li { display: grid; grid-template-columns: 96px 1fr; gap: 12px; align-items: baseline; }
+.changes .k { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+section { display: grid; gap: 14px; }
+figure { margin: 0; display: grid; gap: 6px; min-width: 0; }
+figcaption, .hint { font-size: 14px; color: var(--muted); }
+figcaption b { color: var(--fg); }
+.panel { border-radius: 14px; overflow: hidden; background: var(--card); border: 1px solid var(--line); }
+.panel img { display: block; width: 100%; height: auto; }
+.wide { overflow-x: auto; border-radius: 14px; border: 1px solid var(--line); background: var(--card); -webkit-overflow-scrolling: touch; }
+.wide img { display: block; width: 1250px; max-width: none; height: auto; }
+.phone { max-width: 400px; justify-self: center; width: 100%; }
+.look { font-size: 15px; }
+.look b { color: var(--accent); }
+.rough { display: grid; gap: 6px; margin: 0; padding-left: 18px; font-size: 15px; }
+.ask { display: grid; gap: 12px; padding: 18px; border-radius: 16px; background: var(--accent-soft); }
+.ask ol { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+.ask code { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 14px; }
+.foot { display: grid; gap: 8px; font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 18px; }
+.foot a { color: var(--accent); }
+@media (max-width: 560px) {
+  .changes li { grid-template-columns: 1fr; gap: 2px; }
+  .wide img { width: 1050px; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Hair and Stature</h1>
+    <p class="lede">People, round two: hair that's never one firm shape, slim modern proportions, and a relaxed stance. All on our current figures (direction C, the LASH face). Stills only; hair in motion comes after your OK.</p>
+    <p class="quote">"it's never really static or like one firm it's always a little messy, unstructured wavy"</p>
+    <ul class="changes" aria-label="What changed">
+      <li><span class="k">Hair</span><span>A base shape for the cut, then 2-7 locks in three sizes with tapered tips, a few wisps and gaps, so the edge breaks and the ends fall unevenly. The shine follows the waves.</span></li>
+      <li><span class="k">Cuts</span><span>Twelve that 20-30-year-olds in New York and Los Angeles wear now, from straight to coily: seven for women, five for men.</span></li>
+      <li><span class="k">Physics</span><span>Every head shows its state: calm, a breeze, a walk, a turn. The roots stay put, the tips move most, long hair swings, curls keep their curl, and every head in a shot feels the same wind.</span></li>
+      <li><span class="k">Stature</span><span>Adult and long-legged (about 7.8 heads). The neck leans forward a little instead of standing straight up, the back has its gentle S, the weight sits on one leg, and one arm hangs off the body.</span></li>
+    </ul>
+  </header>
+
+  <section aria-labelledby="ba">
+    <h2 id="ba">Her, before and after</h2>
+    <figure class="panel"><img src="s/s1_before.jpg" alt="Before: her hair one straight flat shape, standing upright and stiff" loading="eager"></figure>
+    <figure class="panel"><img src="s/s1_after.jpg" alt="After: wavy hair in tapered locks with a flyaway, a relaxed stance with the bag in her hand" loading="eager"></figure>
+    <p class="look"><b>Look at:</b> is the hair alive and never one firm shape, yet clean? Does she stand relaxed and confident, neither stiff nor slumped? Is she still the same person? The strip under each shows her at the size she appears in the film.</p>
+  </section>
+
+  <section aria-labelledby="lib">
+    <h2 id="lib">Twelve cuts</h2>
+    <div class="wide"><img src="s/s2.jpg" alt="Twelve haircuts, each from behind and in three-quarter view, then at film size in colour and as a black silhouette" loading="lazy"></div>
+    <p class="hint">Swipe sideways. Top row women: soft swing bob, lazy wavy lob, long layers with curtain bangs, butterfly cut, shag, natural curls. Bottom row: bixie, then men: textured crop, middle-part flow, modern mullet, curly mop, twists.</p>
+    <p class="look"><b>Look at:</b> which cuts feel modern and pleasant, and whether each reads from behind at phone size (the black figures).</p>
+  </section>
+
+  <section aria-labelledby="wind">
+    <h2 id="wind">Calm, a breeze, a walk, a turn</h2>
+    <div class="wide"><img src="s/s3.jpg" alt="Three cuts in four states: calm, a breeze from the left, walking, a turn of the head" loading="lazy"></div>
+    <p class="look"><b>Look at:</b> do the states read as wind, a walk and a turn? Roots pinned, tips moving most, curls keeping their curl?</p>
+  </section>
+
+  <section aria-labelledby="cast">
+    <h2 id="cast">The cast in a film frame</h2>
+    <figure class="panel phone"><img src="s/s4_frame.jpg" alt="Her and five strangers at film size on the quay in the dusk look still, one breeze through all" loading="lazy"></figure>
+    <p class="hint">Her and five strangers at the size they appear in a film, in our latest look still, one breeze through every head. (The caption in this still is the old style baked into the background; the new captions are separate.)</p>
+    <div class="wide"><img src="s/s4.jpg" alt="The same frame with two enlarged crops of the quay and the promenade" loading="lazy"></div>
+    <p class="look"><b>Look at:</b> at phone size, does the hair read alive and designed rather than noisy? Do they read as cool 20-30-year-olds?</p>
+  </section>
+
+  <section aria-labelledby="h">
+    <h2 id="h">Heights and builds</h2>
+    <div class="wide"><img src="s/s5.jpg" alt="Eight people from 152 to 188 cm beside 150, 170 and 190 cm marks, different builds and cuts" loading="lazy"></div>
+    <p class="look"><b>Look at:</b> adult and pleasant at every height; legs long but never stretched; heads small but not tiny with their hair; real variety.</p>
+  </section>
+
+  <section aria-labelledby="sit">
+    <h2 id="sit">Sitting and leaning</h2>
+    <div class="wide"><img src="s/s6.jpg" alt="Her on a ledge with her head bowed; two people sitting back to back in a breeze; a woman leaning on a rail" loading="lazy"></div>
+    <p class="look"><b>Look at:</b> a relaxed stature like your hilltop and ledge references: the back's soft curve, the legs hanging naturally, hair falling with gravity from a bowed head.</p>
+  </section>
+
+  <section aria-labelledby="cf">
+    <h2 id="cf">Close up and far away</h2>
+    <div class="wide"><img src="s/s7.jpg" alt="Four heads with close-up detail, the same at film-size detail, and at film size" loading="lazy"></div>
+    <p class="look"><b>Look at:</b> close shots get finer locks and more shine; at film size it simplifies cleanly, with nothing that reads as a scratch or a crack.</p>
+  </section>
+
+  <section aria-labelledby="rg">
+    <h2 id="rg">Where it's still rough</h2>
+    <ul class="rough">
+      <li>The strangers share one standing pose here; a real scene gives each their own.</li>
+      <li>Short and curly cuts barely move in a breeze (true to the physics), so at phone size the wind shows mostly on long hair.</li>
+      <li>The seated poses are first builds; the folded legs are a little stiff.</li>
+      <li>Two cuts to watch: the textured crop's spikes can read like dark flames, and the twists look a bit blocky.</li>
+      <li>The clothes are the existing wardrobe on the new body.</li>
+    </ul>
+  </section>
+
+  <section class="ask" aria-labelledby="q">
+    <h2 id="q">What I need from you</h2>
+    <ol>
+      <li>Is the amount of mess right: more, less, or as is?</li>
+      <li>Which cuts to keep, and any to drop?</li>
+      <li>Do the proportions and the relaxed stance feel right?</li>
+    </ol>
+    <p>For example: <code>mess right · drop M1 M5 · stance good</code>. Send the extra hair references whenever you have them; they go straight into the recipe. After your OK, the next step is a short clip of the hair moving.</p>
+  </section>
+
+  <footer class="foot">
+    <p>Built from your five references, 16 sourced findings (what people wear now, hair physics from studio and physics papers, real heights, posture) and our people design.</p>
+    <p>The recipe with every number: <a href="https://github.com/devilsanek1/Test-/blob/claude/kind-pascal-lvgsza/video/docs/look/people_design/hair_v2/RECIPE.md" target="_blank" rel="noopener">RECIPE.md</a>. The research: <a href="https://github.com/devilsanek1/Test-/blob/claude/kind-pascal-lvgsza/video/docs/look/people_design/hair_v2/RESEARCH.md" target="_blank" rel="noopener">RESEARCH.md</a>.</p>
+  </footer>
+</div>

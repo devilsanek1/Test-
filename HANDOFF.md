@@ -222,7 +222,11 @@ Everything that agent knew is in this repo. This file is the map; the details li
   handed the pick over ("you pick your best option for maximum engagement and pleasantry and user attention
   retention"): **PICKED and applied** (TYPE_GUIDE status; LAYOUT, DIRECTION rule 10, G5_BLOCKING, the playbook). Still to
   do: the code (font.ts, theme.ts, Captions.tsx, capcheck: LAYOUT "The code must match") with the tooling lane before
-  v4's G3; the motion judged in v4's G4 look clip.
+  v4's G3; the motion judged in v4's G4 look clip. **People, iteration 2** (owner: hair "never really static or like
+  one firm ... a little messy, unstructured wavy", better proportions and stature): research, `RECIPE.md` and stills in
+  `video/docs/look/people_design/hair_v2/`, code `video/src/look/people_dirs/hair_v2/` + `src/entry-look-people-hair.tsx`,
+  sent on https://claude.ai/artifact/1Xerf8RzpVF8WnH2PYEN8b; waiting on the owner (the mess, the cuts, the stance) and
+  more hair references; on a yes, fold RECIPE.md into PEOPLE_DESIGN §5.1/§5.4/§5.9, then a hair motion clip.
 
 ### Earlier: video 5 as the heat story
 - **Video 5 is produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt since 2026-10-29 ~07:55 UTC**
