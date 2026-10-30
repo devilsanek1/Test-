@@ -227,6 +227,11 @@ Everything that agent knew is in this repo. This file is the map; the details li
   `video/docs/look/people_design/hair_v2/`, code `video/src/look/people_dirs/hair_v2/` + `src/entry-look-people-hair.tsx`,
   sent on https://claude.ai/artifact/1Xerf8RzpVF8WnH2PYEN8b; waiting on the owner (the mess, the cuts, the stance) and
   more hair references; on a yes, fold RECIPE.md into PEOPLE_DESIGN §5.1/§5.4/§5.9, then a hair motion clip.
+  Then the owner rejected v2/v3 ("incoherent", "garbage"): the evaluation `people_design/EVALUATION.md`, the overhaul v4
+  (hair as authored shapes on a spring rig `src/look/people_dirs/hair_v4/`, faces redrawn `people_v4/`, assembled
+  `entry-look-people-v4.tsx`; stills `people_design/hair_v4/final/`) sent on the same page (version 3) with the bodies
+  marked not done; the bodies round runs (`people_design/bodies_v4/`). Waiting on the owner: hair on track? LASH or
+  open eyes? Then PEOPLE_DESIGN gets the picked system.
 
 ### Earlier: video 5 as the heat story
 - **Video 5 is produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt since 2026-10-29 ~07:55 UTC**

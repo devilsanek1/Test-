@@ -299,3 +299,8 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   face 46 / sky 33 vs ours 19 / 83 / 90), the cut, edges, proportion and gesture, colour) and the eight changes; the
   overhaul already combines hair with the faces work, and its assembler applies the evaluation. -> rule: playbook,
   Visual style (hair, face, light and values designed together, judged overall).
+- 2026-10-30 ~19:10 UTC (orchestrator): the overhaul v4 looked at beside the references before sending: the hair (authored
+  shapes on a spring rig, soft shading, six cuts) and the redrawn faces clear the bar and the motion strips prove it
+  animates; the bodies (stand-ins: stiff, mitten hands, tees) do not, so the page (version 3, same link) shows the heads,
+  the motion strips and film size, with the bodies marked not done; a bodies round (poses, hands, clothes,
+  proportions) started beside the owner's review (`docs/look/people_design/bodies_v4/`).
