@@ -48,6 +48,26 @@ ideas; frames planned and created whole from the get-go, never filled for densit
    actions played; the owner locks it.
 7. **ANIMATION** (G5-G6): each shot animated from its own key frame (life, motion, the transitions), never re-filled.
 8. **Sound and final** (G7-G8, as below).
+**ONE FILM, NEVER A HODGE-PODGE (owner, 2026-10-30): coherence is held above the frame, at every step.**
+1. **One film concept above the beats:** before or with the ideas, ONE imaginative idea for the whole film (its world,
+   its central device, the thread's journey, the arc of feeling from the first frame to the payoff), like video 1's one
+   world of buildings with browser windows. Every beat's idea is a chapter of it; an idea that belongs to another film is
+   out, however good.
+2. **Pick sequences, not single beats:** the ideas come as whole sequences (one imagination per sequence, every beat
+   flowing into the next); the pick is one sequence as the base, then individual beats improved inside it, never a
+   collage of the best single ideas from different sequences.
+3. **One art director holds the vision:** one agent per film (or the orchestrator) owns the film's vision note (the
+   concept, the world, the arc, the thread, the look) and approves every frame against the whole; builders work from that
+   note and the same world kit (one place, one light, one palette, one cast, one type), so every frame is a view of one
+   world, never a separately invented place.
+4. **Evaluate in sequence:** THE FRAME LOOP's evaluator sees each frame IN the board (all frames in order) and asks, beside
+   the frame's own questions: does it belong to this film's world and concept; does it continue the thread; does it move
+   the arc of feeling one step; does it hand on to the next frame? After every round, one BOARD READ: the whole board in
+   order, sound off, as a viewer: does the story read from the frames alone, as one world, one thread, one arc?
+5. **Lanes by sequence, never by isolated beat:** parallel builders take contiguous stretches of the film with the
+   joins between them, and the art director lands the seams; the shot plan and the animatic are the last coherence
+   checks (the whole film, played once, judged as one story).
+
 **THE FRAME LOOP (owner, 2026-10-30; every built idea, key frame, scene and shot, before the owner sees it):**
 1. **Build:** the builder makes the frame whole from its card (the beat's feeling and idea; `docs/look/FRAME_CARD.md`).
 2. **Evaluate:** a FRESH evaluator (never the builder; one, not a panel) looks at the frame at full and phone size

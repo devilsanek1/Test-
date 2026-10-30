@@ -398,3 +398,10 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   FRAME LOOP (build -> a fresh evaluator judges the feeling first -> THERE / ALMOST: adjust, at most 2 rounds / NOT
   THERE: rework from the idea, at most once), encoded in every workflow from the key frames on. -> rules: playbook THE
   THREE RULES (the frame loop); PIPELINE_V2 "THE FRAME LOOP"; the two-modes rule (iterations keep one evaluator round).
+- 2026-10-30 ~23:45 UTC: "another possible problem is if every agent bulid a scene in isolation, the whole thing comes up
+  like a complete mess of hudge pudge ideas - is that a risk here? Anything in the process that ensures this doesn't
+  happen and the whole video and the narrative idea is clear?" -> yes (v3 failed this way); set up explicitly: one film
+  concept above the beats, sequences picked whole (the running ideas round already gives two whole sequences, A and B:
+  one becomes the base), one art director holding the vision, one shared world kit, every frame evaluated in the board
+  and a board read after each round, lanes by sequence. -> rules: playbook THE THREE RULES (one film, never a
+  hodge-podge); PIPELINE_V2 "ONE FILM, NEVER A HODGE-PODGE".

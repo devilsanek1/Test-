@@ -97,6 +97,24 @@ def keep(st, T):
     return L >= 18
 
 
+def no_doubles(cands, radius=6, share=0.55):
+    """Never two strokes along one edge (v1's doubled strokes): a thin thing's centre line ('bar') first, then the
+    silhouettes, then the interior steps, longest first; a stroke whose points lie mostly within `radius` px of a
+    stroke already kept is dropped (a pillar's two edges, further apart, both stay)."""
+    prio = {'bar': 0, 'sil': 1, 'int': 2}
+    occ = np.zeros((H, W), np.uint8)
+    out = []
+    for i, st in sorted(cands, key=lambda c: (prio[c[1]['kind']], -c[1]['len'])):
+        p = np.asarray(st['pts'])
+        x = np.clip(np.round(p[:, 0]).astype(int), 0, W - 1)
+        y = np.clip(np.round(p[:, 1]).astype(int), 0, H - 1)
+        if occ[y, x].mean() / 255 > share:
+            continue
+        cv2.polylines(occ, [np.round(p).astype(np.int32)], False, 255, 2 * radius + 1)
+        out.append((i, st))
+    return sorted(out)
+
+
 # ------------------------------------------------------------------------------------------------ helpers
 
 def seed(*parts):
@@ -282,7 +300,7 @@ def construction_marks(strokes, T, P, rng):
 
 def render(T, strokes, base, cap, capmask, Lstar):
     P = TREATMENTS[T]
-    chosen = [(i, st) for i, st in enumerate(strokes) if keep(st, T)]
+    chosen = no_doubles([(i, st) for i, st in enumerate(strokes) if keep(st, T)])
     layers = {}  # opacity -> SS layer
     for i, st in chosen:
         pieces = ink_stroke(st, i, T, P, Lstar)

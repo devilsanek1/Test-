@@ -31,6 +31,15 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
    world, its light, its people, its words) before it is built or animated. Never a frame built thin and filled later
    "for the sake of density": density comes from the imagination and the world, never from a filling pass.
 
+**ONE FILM, NEVER A HODGE-PODGE:** one imaginative concept for the whole film above the beats (its world, its central
+device, the thread's journey, the arc of feeling); ideas come and are picked as whole sequences, never a collage of the
+best single ideas; one art director owns the vision and approves every frame against the whole; every frame is a view of
+one shared world (one place, light, palette, cast, type); every frame is evaluated IN the board, and the whole board is
+read in order after every round (PIPELINE_V2). — ("another possible problem is if every agent bulid a scene in
+isolation, the whole thing comes up like a complete mess of hudge pudge ideas - is that a risk here? Anything in the
+process that ensures this doesn't happen and the whole video and the narrative idea is clear?", 2026-10-30; v3's lesson:
+"too busy, too incoherent; no story ... just a bunch of shots put together".)
+
 **THE FRAME LOOP (every built frame, before the owner sees it):** build it whole -> a fresh evaluator judges the FEELING
 first (does it give the beat's feeling and idea in a second, worth pausing on, beside video 1 and the references) ->
 THERE (move on), ALMOST (adjust exactly what holds it back, at most 2 rounds) or NOT THERE (rework from the idea, a new
