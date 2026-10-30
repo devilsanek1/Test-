@@ -1,0 +1,197 @@
+<!doctype html>
+<!-- techniques_chrome_bench.html: the live-filter and vector cost tests behind docs/look/organic/techniques.md
+     §3.7 and §3.12 (research, 2026-10-30). Run through techniques_chrome_bench.js (Playwright, the render's headless
+     shell, SwiftShader as Remotion's 'swangle'). Measures: an image drawn through SVG filters; WebGL2 shaders (copy,
+     a nested domain warp, the anisotropic Kuwahara with polynomial sector weights after Kyprianidis et al.); plain vs
+     hand-cut vector outlines. Timings only: nothing here is production code. -->
+<html><head><meta charset="utf-8"></head><body>
+<canvas id="gl" width="1080" height="1920"></canvas>
+<canvas id="c2" width="1080" height="1920"></canvas>
+<script>
+const W = 1080, H = 1920;
+const VS = `#version 300 es
+in vec2 p; out vec2 uv; void main(){ uv = p*0.5+0.5; gl_Position = vec4(p,0.,1.); }`;
+const FS_COPY = `#version 300 es
+precision highp float; uniform sampler2D t; in vec2 uv; out vec4 o; void main(){ o = texture(t, uv); }`;
+const FS_WARP = `#version 300 es
+precision highp float; uniform sampler2D t; uniform vec2 res; uniform float amp, cell, seed; in vec2 uv; out vec4 o;
+float hash(vec2 p){ p = fract(p*vec2(123.34, 456.21) + seed); p += dot(p, p + 45.32); return fract(p.x*p.y); }
+float vn(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.-2.*f);
+  return mix(mix(hash(i), hash(i+vec2(1,0)), u.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), u.x), u.y)*2.-1.; }
+float fbm(vec2 p){ float a = .5, s = 0.; for (int i = 0; i < 4; i++){ s += a*vn(p); p *= 2.; a *= .5; } return s; }
+void main(){ vec2 px = uv*res; vec2 p = px/cell;
+  vec2 q = vec2(fbm(p), fbm(p + vec2(5.2, 1.3)));
+  vec2 r = vec2(fbm(p + 4.*q + vec2(1.7, 9.2)), fbm(p + 4.*q + vec2(8.3, 2.8)));
+  o = texture(t, (px + amp*r)/res); }`;
+const FS_SST = `#version 300 es
+precision highp float; uniform sampler2D t; uniform vec2 res; in vec2 uv; out vec4 o;
+float l(vec2 d){ return dot(texture(t, uv + d/res).rgb, vec3(.299,.587,.114)); }
+void main(){
+  float gx = (-l(vec2(-1,-1)) - 2.*l(vec2(-1,0)) - l(vec2(-1,1)) + l(vec2(1,-1)) + 2.*l(vec2(1,0)) + l(vec2(1,1)))/4.;
+  float gy = (-l(vec2(-1,-1)) - 2.*l(vec2(0,-1)) - l(vec2(1,-1)) + l(vec2(-1,1)) + 2.*l(vec2(0,1)) + l(vec2(1,1)))/4.;
+  o = vec4(gx*gx, gy*gy, gx*gy, 1.); }`;
+const FS_GAUSS = `#version 300 es
+precision highp float; uniform sampler2D t; uniform vec2 res; uniform vec2 dir; uniform float sigma; in vec2 uv; out vec4 o;
+void main(){ float tw = 0.; vec4 acc = vec4(0); int R = int(ceil(2.*sigma));
+  for (int i = -R; i <= R; i++){ float w = exp(-float(i*i)/(2.*sigma*sigma)); acc += w*texture(t, uv + dir*float(i)/res); tw += w; }
+  o = acc/tw; }`;
+const FS_TFM = `#version 300 es
+precision highp float; uniform sampler2D t; in vec2 uv; out vec4 o;
+void main(){ vec3 g = texture(t, uv).xyz; float E = g.x, G = g.y, F = g.z;
+  float D = sqrt((E-G)*(E-G) + 4.*F*F); float l1 = .5*(E+G+D), l2 = .5*(E+G-D);
+  vec2 v = vec2(l1 - E, -F); v = length(v) > 0. ? normalize(v) : vec2(0., 1.);
+  float A = (l1 + l2 > 0.) ? (l1 - l2)/(l1 + l2) : 0.;
+  o = vec4(v, atan(v.y, v.x), A); }`;
+const FS_AKF = `#version 300 es
+precision highp float; uniform sampler2D src; uniform sampler2D tfm; uniform vec2 res; uniform float radius, q, alpha;
+in vec2 uv; out vec4 o;
+void main(){
+  const float PI = 3.14159265; const int N = 8;
+  vec4 m[8]; vec3 s[8];
+  for (int k = 0; k < N; ++k){ m[k] = vec4(0.); s[k] = vec3(0.); }
+  vec4 tf = texture(tfm, uv); float phi = tf.z; float A = tf.w;
+  float a = radius*clamp((alpha + A)/alpha, .1, 2.); float b = radius*clamp(alpha/(alpha + A), .1, 2.);
+  float cp = cos(phi), sp = sin(phi);
+  mat2 R = mat2(cp, -sp, sp, cp); mat2 S = mat2(.5/a, 0., 0., .5/b); mat2 SR = S*R;
+  int mx = int(sqrt(a*a*cp*cp + b*b*sp*sp)); int my = int(sqrt(a*a*sp*sp + b*b*cp*cp));
+  float zeta = 2./radius; float sinz = sin(PI/float(N)); float eta = (zeta + cos(PI/float(N)))/(sinz*sinz);
+  for (int j = -my; j <= my; ++j) for (int i = -mx; i <= mx; ++i){
+    vec2 v = SR*vec2(float(i), float(j));
+    if (dot(v, v) <= .25){
+      vec3 c = texture(src, uv + vec2(float(i), float(j))/res).rgb;
+      float w[8]; float sum = 0.; float z, vxx, vyy;
+      vxx = zeta - eta*v.x*v.x; vyy = zeta - eta*v.y*v.y;
+      z = max(0., v.y + vxx); w[0] = z*z; sum += w[0];
+      z = max(0., -v.x + vyy); w[2] = z*z; sum += w[2];
+      z = max(0., -v.y + vxx); w[4] = z*z; sum += w[4];
+      z = max(0., v.x + vyy); w[6] = z*z; sum += w[6];
+      vec2 v2 = .70710678*vec2(v.x - v.y, v.x + v.y);
+      vxx = zeta - eta*v2.x*v2.x; vyy = zeta - eta*v2.y*v2.y;
+      z = max(0., v2.y + vxx); w[1] = z*z; sum += w[1];
+      z = max(0., -v2.x + vyy); w[3] = z*z; sum += w[3];
+      z = max(0., -v2.y + vxx); w[5] = z*z; sum += w[5];
+      z = max(0., v2.x + vyy); w[7] = z*z; sum += w[7];
+      float g = exp(-3.125*dot(v, v))/max(sum, 1e-6);
+      for (int k = 0; k < N; ++k){ float wk = w[k]*g; m[k] += vec4(c*wk, wk); s[k] += c*c*wk; }
+    }
+  }
+  vec4 acc = vec4(0.);
+  for (int k = 0; k < N; ++k){
+    if (m[k].w <= 0.) continue;
+    vec3 mu = m[k].rgb/m[k].w; vec3 sk = abs(s[k]/m[k].w - mu*mu);
+    float sig2 = sk.r + sk.g + sk.b; float wk = 1./(1. + pow(255.*sig2, .5*q));
+    acc += vec4(mu*wk, wk);
+  }
+  o = vec4(acc.rgb/acc.w, 1.); }`;
+
+function sh(gl, type, src){ const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; }
+function prog(gl, fs){ const p = gl.createProgram(); gl.attachShader(p, sh(gl, gl.VERTEX_SHADER, VS));
+  gl.attachShader(p, sh(gl, gl.FRAGMENT_SHADER, fs)); gl.bindAttribLocation(p, 0, 'p'); gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p)); return p; }
+function tex(gl, w, h, fmt){ const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
+  if (fmt === 'f') gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null);
+  else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, v);
+  return t; }
+function fbo(gl, t){ const f = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, f);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0); return f; }
+
+async function loadImg(src){ const im = new Image(); im.src = src; await im.decode(); return im; }
+function sync(gl){ const px = new Uint8Array(4); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); }
+
+async function runGL(imgSrc){
+  const out = {};
+  const cv = document.getElementById('gl');
+  const gl = cv.getContext('webgl2', {preserveDrawingBuffer: true});
+  out.renderer = gl.getParameter(gl.RENDERER); const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+  if (dbg) out.unmasked = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL);
+  out.float_fbo = !!gl.getExtension('EXT_color_buffer_float');
+  const vb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vb);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+  const im = await loadImg(imgSrc);
+  const src = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, src);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, im);
+  for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, v);
+  const P = {copy: prog(gl, FS_COPY), warp: prog(gl, FS_WARP), sst: prog(gl, FS_SST), gauss: prog(gl, FS_GAUSS), tfm: prog(gl, FS_TFM), akf: prog(gl, FS_AKF)};
+  const ff = out.float_fbo ? 'f' : 'u';
+  const tA = tex(gl, W, H, ff), tB = tex(gl, W, H, ff), tT = tex(gl, W, H, ff);
+  const fA = fbo(gl, tA), fB = fbo(gl, tB), fT = fbo(gl, tT);
+  gl.viewport(0, 0, W, H);
+  function draw(p, target, texes, uni){ gl.useProgram(p); gl.bindFramebuffer(gl.FRAMEBUFFER, target);
+    texes.forEach(([name, t], i) => { gl.activeTexture(gl.TEXTURE0 + i); gl.bindTexture(gl.TEXTURE_2D, t); gl.uniform1i(gl.getUniformLocation(p, name), i); });
+    for (const [k, v] of Object.entries(uni || {})) { const loc = gl.getUniformLocation(p, k); if (Array.isArray(v)) gl.uniform2f(loc, v[0], v[1]); else gl.uniform1f(loc, v); }
+    gl.drawArrays(gl.TRIANGLES, 0, 3); }
+  async function time(name, fn, reps){ fn(); sync(gl); let best = 1e9;
+    for (let r = 0; r < reps; r++){ const t0 = performance.now(); fn(); sync(gl); best = Math.min(best, performance.now() - t0); }
+    out[name] = Math.round(best); }
+  await time('gl_copy_ms', () => draw(P.copy, null, [['t', src]]), 3);
+  await time('gl_domain_warp_ms', () => draw(P.warp, null, [['t', src]], {res: [W, H], amp: 6, cell: 60, seed: 0.37}), 3);
+  const akf = (r) => { draw(P.sst, fA, [['t', src]], {res: [W, H]});
+    draw(P.gauss, fB, [['t', tA]], {res: [W, H], dir: [1, 0], sigma: 2});
+    draw(P.gauss, fA, [['t', tB]], {res: [W, H], dir: [0, 1], sigma: 2});
+    draw(P.tfm, fT, [['t', tA]]);
+    draw(P.akf, null, [['src', src], ['tfm', tT]], {res: [W, H], radius: r, q: 8, alpha: 1}); };
+  await time('gl_akf_r4_ms', () => akf(4), 2);
+  await time('gl_akf_r6_ms', () => akf(6), 2);
+  out.akf_png = cv.toDataURL('image/png');
+  return out;
+}
+
+async function runSVG(pngB64){
+  const out = {};
+  const c = document.getElementById('c2').getContext('2d');
+  const mk = (filter) => `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}"><defs>${filter}</defs><image xlink:href="data:image/png;base64,${pngB64}" width="${W}" height="${H}" ${filter ? 'filter="url(#f)"' : ''}/></svg>`;
+  const F = {
+    none: '',
+    turb_disp: `<filter id="f" x="0" y="0" width="${W}" height="${H}" filterUnits="userSpaceOnUse"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="SEED" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="10" xChannelSelector="R" yChannelSelector="G"/></filter>`,
+    turb_disp_fine: `<filter id="f" x="0" y="0" width="${W}" height="${H}" filterUnits="userSpaceOnUse"><feTurbulence type="fractalNoise" baseFrequency="0.25 0.04" numOctaves="2" seed="SEED" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/></filter>`,
+    blur3: `<filter id="f" x="0" y="0" width="${W}" height="${H}" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="3" /></filter>`,
+    grain: `<filter id="f" x="0" y="0" width="${W}" height="${H}" filterUnits="userSpaceOnUse"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="SEED" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .06 0" result="g"/><feBlend in="SourceGraphic" in2="g" mode="overlay"/></filter>`,
+  };
+  for (const [name, f] of Object.entries(F)) {
+    let best = 1e9;
+    for (let r = 0; r < 4; r++) {
+      const svg = mk(f.replace('SEED', String(r + 1)));
+      const url = URL.createObjectURL(new Blob([svg], {type: 'image/svg+xml'}));
+      const t0 = performance.now();
+      const im = await loadImg(url);
+      c.clearRect(0, 0, W, H); c.drawImage(im, 0, 0);
+      c.getImageData(0, 0, 1, 1);
+      const dt = performance.now() - t0; if (r > 0) best = Math.min(best, dt);
+      URL.revokeObjectURL(url);
+    }
+    out['svg_' + name + '_ms'] = Math.round(best);
+  }
+  return out;
+}
+
+function rng(s){ return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+function svgOf(kind, n){
+  const r = rng(7); let body = '';
+  for (let i = 0; i < n; i++){
+    const x = r()*W, y = r()*H, w = 20 + r()*60, h = 20 + r()*80, col = `rgb(${(r()*255)|0},${(r()*255)|0},${(r()*255)|0})`;
+    if (kind === 'rect') body += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="${col}"/>`;
+    else { // a hand-cut / organic outline: 48 points pushed along the normal by a smooth wobble
+      let d = ''; const N = 48;
+      for (let k = 0; k < N; k++){ const t = k / N; let px, py;
+        if (t < .25){ px = x + w*t*4; py = y; } else if (t < .5){ px = x + w; py = y + h*(t-.25)*4; } else if (t < .75){ px = x + w - w*(t-.5)*4; py = y + h; } else { px = x; py = y + h - h*(t-.75)*4; }
+        const wob = 1.2*Math.sin(t*2*Math.PI*3 + i) + 0.6*Math.sin(t*2*Math.PI*7 + 2*i);
+        px += wob; py += wob*0.7; d += (k ? 'L' : 'M') + px.toFixed(1) + ' ' + py.toFixed(1); }
+      body += `<path d="${d}Z" fill="${col}"/>`; }
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">${body}</svg>`;
+}
+window.runVec = async () => { const c = document.getElementById('c2').getContext('2d', {willReadFrequently: true}); const out = {};
+  for (const [kind, n] of [['rect', 1500], ['organic48', 1500], ['rect', 300], ['organic48', 300]]){
+    let best = 1e9; const svg = svgOf(kind, n);
+    for (let r = 0; r < 4; r++){ const url = URL.createObjectURL(new Blob([svg], {type: 'image/svg+xml'}));
+      const t0 = performance.now(); const im = new Image(); im.src = url; await im.decode(); c.clearRect(0,0,W,H); c.drawImage(im, 0, 0); c.getImageData(0,0,1,1);
+      const dt = performance.now() - t0; if (r) best = Math.min(best, dt); URL.revokeObjectURL(url); }
+    out[kind + '_' + n + '_ms'] = Math.round(best); }
+  return out; };
+
+window.runGL = runGL; window.runSVG = runSVG;
+</script></body></html>
