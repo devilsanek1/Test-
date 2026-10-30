@@ -160,7 +160,7 @@ def design(seed, ss=2):
     zz = np.sqrt(np.clip(1 - lu ** 2 - lv ** 2, 0.03, 1)) * 1.2
     nn = np.sqrt(lu ** 2 + lv ** 2 + zz ** 2)
     s_clump = (lu * l[0] + lv * l[1] + zz * l[2]) / nn
-    s = 0.5 * s_mass + 0.5 * s_clump
+    s = 0.34 * s_mass + 0.66 * s_clump                                  # each clump's cap lit: the structure reads
     s = s - 0.9 * np.clip(1 - (lens - Y) / 30.0, 0, 1)                    # the flat underside: dark
     s = s - 0.35 * np.clip((X - bx) / (Rw * 1.2), 0, 1)                   # the side away from the light
     s = s + 0.25 * np.clip((by - Y) / (Rh * 1.4), -1, 1)                  # the top catches the light
@@ -187,7 +187,10 @@ def design(seed, ss=2):
     rgb1 = pre1 / np.maximum(a1[..., None], 1e-6)
     zone1 = cv2.resize(zone.astype(np.float32), (W, H), interpolation=cv2.INTER_NEAREST).astype(np.int32)
     s1 = cv2.resize(s.astype(np.float32), (W, H), interpolation=cv2.INTER_AREA)
-    info = dict(n_ells=len(ells), levels={k: sum(1 for e in ells if e[5] == k) for k in (0, 1, 2, 3)}, R=R, s=s1)
+    own1 = cv2.resize(own.astype(np.float32), (W, H), interpolation=cv2.INTER_NEAREST).astype(np.int32)
+    ells_px = [(cx - X0, cy - Y0, rx, ry, deg, lvl) for (cx, cy, rx, ry, deg, lvl) in ells]
+    info = dict(n_ells=len(ells), levels={k: sum(1 for e in ells if e[5] == k) for k in (0, 1, 2, 3)}, R=R, s=s1,
+                ells=ells_px, own=own1)
     return np.dstack([rgb1, a1]), zone1, cols, info
 
 
@@ -242,22 +245,51 @@ def plan_strokes(zone, cols, info, inside, seed, dose=1.0):
         pts = L.trace(x, y, FX, FY, rng.uniform(26, 60), keep=(zone == z) if z >= 2 else inside, leak=3)
         plan.add('wash', 'ramon/wet_round', pts, L.ok2rgb(ok[min(z, 3)] + np.array([rng.normal(0, 0.012), 0, rng.normal(0, 0.006)])),
                  rng.uniform(12, 22), rng.uniform(0.28, 0.42))
-    # P2: leaf dabs where the light catches a clump's top: short flat strokes, a step over their zone (fewer, bigger)
-    zb = L.boundaries(np.where(inside, zone, -1)) & inside
-    zdist = ndi.distance_transform_edt(~zb)
-    litz = (zone >= 2)
-    prob = np.clip(0.15 + 0.85 * np.exp(-zdist / 6.0), 0, 1) * np.where(litz, 1.0, 0.25)
-    for (x, y) in seeds(11, inside & (d_in > 1), prob * dose):
-        z = zc(x, y)
-        if z < 0:
+    # P2: each clump's lit cap painted as short strokes ALONG its upper arc (the form, not a scatter of spots); a mid
+    # stroke just under it where the form turns; a dark stroke under the front clumps (they separate)
+    own = info['own']
+    for k, (cx, cy, rx, ry, deg, lvl) in enumerate(info['ells']):
+        if lvl == 0:
             continue
-        up = z >= 2 and rng.random() < 0.7
-        c = ok[min(z + 1, 4)] if up else ok[z]
-        c = 0.5 * c + 0.5 * ok[z] + np.array([rng.normal(0, 0.008), rng.normal(0, 0.003), rng.normal(0, 0.005)])
-        ang = math.atan2(-0.62, 0.78) + rng.normal(0, 0.5)           # leaves' marks lean up toward the light
-        Ls = rng.uniform(8, 15)
-        pts = [(x - math.cos(ang) * Ls / 2, y - math.sin(ang) * Ls / 2), (x + math.cos(ang) * Ls / 2, y + math.sin(ang) * Ls / 2)]
-        plan.add('dab', 'tanda/acrylic-04-paint', pts, L.ok2rgb(c), rng.uniform(6.0, 10.0), rng.uniform(0.75, 0.95), ds=1.0)
+        a0 = math.radians(deg)
+        n_caps = int(rng.integers(3, 7)) if lvl <= 2 else int(rng.integers(1, 3))
+        for t in np.sort(rng.uniform(math.radians(-205), math.radians(-25), n_caps)):
+            for depth, kind in ((0.9, 'cap'), (0.68, 'turn')):
+                if kind == 'turn' and rng.random() < 0.45:
+                    continue
+                ex, ey = rx * depth * math.cos(t), ry * depth * math.sin(t)
+                x = cx + ex * math.cos(a0) - ey * math.sin(a0)
+                y = cy + ex * math.sin(a0) + ey * math.cos(a0)
+                xi, yi = int(np.clip(x, 0, W - 1)), int(np.clip(y, 0, H - 1))
+                if not inside[yi, xi] or own[yi, xi] != k:
+                    continue
+                # the tangent of the ellipse there: the stroke follows the clump's outline
+                tx, ty = -rx * math.sin(t), ry * math.cos(t)
+                tx, ty = tx * math.cos(a0) - ty * math.sin(a0), tx * math.sin(a0) + ty * math.cos(a0)
+                tn = math.hypot(tx, ty) + 1e-9
+                tx, ty = tx / tn, ty / tn
+                Ls = rng.uniform(9, 20) * (0.7 if lvl == 3 else 1.0)
+                facing = -(math.cos(t) * 0.75 + math.sin(t) * 0.66)          # the arc's facing toward the light
+                z = zc(x, y)
+                if kind == 'cap':
+                    c = ok[4] if (facing > 0.55 and z >= 2) else ok[min(max(z, 1) + 1, 4)]
+                else:
+                    c = ok[max(min(z, 3), 1)]
+                c = c + np.array([rng.normal(0, 0.008), rng.normal(0, 0.003), rng.normal(0, 0.005)])
+                pts = [(x - tx * Ls / 2, y - ty * Ls / 2), (x + rng.normal(0, 0.6), y + rng.normal(0, 0.6)), (x + tx * Ls / 2, y + ty * Ls / 2)]
+                plan.add('cap' if kind == 'cap' else 'form', 'tanda/acrylic-04-paint', pts, L.ok2rgb(c), rng.uniform(4.0, 7.5),
+                         rng.uniform(0.75, 0.95), ds=1.0)
+        if lvl >= 1 and rng.random() < 0.7:
+            # the dark under the clump (it sits on the one behind it)
+            t = math.radians(rng.uniform(40, 120))
+            ex, ey = rx * 0.92 * math.cos(t), ry * 0.92 * math.sin(t)
+            x = cx + ex * math.cos(a0) - ey * math.sin(a0)
+            y = cy + ex * math.sin(a0) + ey * math.cos(a0)
+            xi, yi = int(np.clip(x, 0, W - 1)), int(np.clip(y, 0, H - 1))
+            if inside[yi, xi]:
+                Ls = rng.uniform(14, 28)
+                plan.add('under', 'tanda/acrylic-04-paint', [(x - Ls / 2, y + rng.normal(0, 1)), (x + Ls / 2, y + rng.normal(0, 1))],
+                         L.ok2rgb(ok[max(zc(x, y) - 1, 0)]), rng.uniform(4, 7), rng.uniform(0.6, 0.85), ds=1.0)
     # the leafy found edge: dabs across the lit silhouette, pointing out (the outline breaks into leaves)
     nxo, nyo = L.outward_normal(inside, 2.5)
     facing = nxo * LIGHT[0] + nyo * LIGHT[1]
@@ -282,7 +314,7 @@ def plan_strokes(zone, cols, info, inside, seed, dose=1.0):
         plan.add('edge', 'tanda/acrylic-04-paint', pts, L.ok2rgb(c), rng.uniform(3.5, 6.0), rng.uniform(0.55, 0.85), ds=1.0)
     # a few dark dabs into the shade side (the shade mass is still leaves, quietly)
     sh = inside & (zone <= 1) & (d_in > 3)
-    for (x, y) in seeds(18, sh):
+    for (x, y) in seeds(26, sh):
         Ls = rng.uniform(6, 12)
         ang = rng.uniform(0, math.pi)
         pts = [(x - math.cos(ang) * Ls / 2, y - math.sin(ang) * Ls / 2), (x + math.cos(ang) * Ls / 2, y + math.sin(ang) * Ls / 2)]

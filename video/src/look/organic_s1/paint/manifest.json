@@ -1,5 +1,5 @@
 {
- "about": "placeholder: run scripts/look/organic/organic_proof.py",
+ "about": "the organic proof's four pieces (scripts/look/organic/organic_proof.py; docs/look/organic/organic_proof.md)",
  "pieces": {
   "cloud": {
    "box": [
@@ -7,31 +7,35 @@
     0,
     520,
     345
-   ]
+   ],
+   "md5": "f5374e2cab697399519bea6ae7491ec1"
   },
   "tree": {
    "box": [
     -60,
-    1250,
-    420,
-    300
-   ]
+    1226,
+    440,
+    324
+   ],
+   "md5": "b6deb48e010181b6454193786c283a11"
   },
   "facade": {
    "box": [
     300,
-    560,
+    575,
     780,
-    540
-   ]
+    525
+   ],
+   "md5": "b2e54e3deb234f3da2fc74745f14b25a"
   },
   "paving": {
    "box": [
     0,
-    1200,
+    1140,
     1080,
-    720
-   ]
+    780
+   ],
+   "md5": "a1f701b726071eb996e6a2629a2367dc"
   }
  }
 }

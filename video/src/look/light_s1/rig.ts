@@ -20,21 +20,23 @@ export const DOOR = {
   hot: '#FFD08A',
 } as const;
 
-/** The live doses on the movers (light.md §4.3: the subject 4-6 px +12-18 L*, B 2 px +6-8; §4.7 the wrap 3-4 px). */
+/** The live doses on the movers (light.md §4.3's 4-6 px for the subject is for a ~300 px figure; she is 153 px with limbs ~6 px wide, so her
+ *  bands are scaled to her: a 1.5-1.7 px edge, +10-15 L* measured on her edge). */
 export const HER_LIGHT = {
   /** Her front toward the low sun: a gold band, n . l weighted. */
-  sun: {width: 4.2, opacity: 0.78, soft: 0.34},
+  sun: {width: 1.7, opacity: 0.62, soft: 0.4},
   /** The lit opening behind her: the wrap all round her edge, weighted by the blurred opening's light. */
-  wrap: {width: 3.6, opacity: 0.95},
+  wrap: {width: 1.3, opacity: 0.3},
   /** The lobby's lamps from above and behind: a thin band on her top edges (head, shoulders). */
-  lamps: {width: 2.0, opacity: 0.55},
+  lamps: {width: 1.1, opacity: 0.4},
   /** Her body backlit: the camera sees her shade side (a cool violet multiply, light.md §2.8). */
-  shade: {tint: '#C9C0E6', opacity: 0.85},
-  /** Her shadows from the three lamps cut out of the door's pool (penumbra px). */
-  shadowBlur: 2.2,
+  shade: {tint: '#A99DD2', opacity: 0.92},
+  /** Her shadows from the three lamps cut out of the door's pool (penumbra px), each lamp's share of the pool's light. */
+  shadowBlur: 1.8,
+  shadowShare: 0.5,
 } as const;
 
 export const PIP_LIGHT = {
-  sun: {width: 2.2, opacity: 0.62, soft: 0.3},
-  shade: {tint: '#D6CCEA', opacity: 0.7},
+  sun: {width: 1.6, opacity: 0.6, soft: 0.35},
+  shade: {tint: '#CFC4E8', opacity: 0.75},
 } as const;

@@ -29,8 +29,8 @@ SHADE_C = lin_hex('#A49BD6')    # shade on cool surfaces: violet (toward the sky
 DOSE = dict(
     facade=0.88,        # the backlit facade's shade strength (light.md 0.52)
     towpath=0.66,       # the far towpath in the far roofs' shadow (light.md 0.36)
-    far=(0.46, 0.46, 0.58),  # far roofs, tower, bridge: backlit (their fronts face us, away from the sun)
-    litwin=0.80,        # the lit office panes: a step under the story light (light.md §2.1)
+    far=(0.62, 0.6, 0.66),  # far roofs, tower, bridge: backlit (their fronts face us, away from the sun)
+    litwin=0.72,        # the lit office panes: a step under the story light (light.md §2.1)
     boats=0.55,
     bank=1.0,           # our bank under the canopy (light.md 0.80)
     sun_bloom=1.0,
@@ -186,7 +186,7 @@ def light(base, L, vis, A, dose=DOSE, return_parts=False):
     """The lit static picture (linear light) and its parts. base: sRGB float (the static base render)."""
     B = to_lin(base)
     lab = srgb_to_lab(base)
-    warmth = smoothstep(-6, 18, lab[..., 2] + 0.4 * lab[..., 1])
+    warmth = smoothstep(-12, 10, lab[..., 2] + 0.4 * lab[..., 1])
     tint = SHADE_C[None, None] * (1 - warmth[..., None]) + SHADE_W[None, None] * warmth[..., None]
     fade = band_fade()
     (sx, sy, sr), disc = find_sun(base, L)
@@ -201,7 +201,7 @@ def light(base, L, vis, A, dose=DOSE, return_parts=False):
     S += L['planting'] * 0.25 * dose['facade']
     gap = 1 - smoothstep(120, 420, XX)                                    # the west gap's sunlit stretch of the far towpath
     S += L['towpath'] * dose['towpath'] * (1 - gap)
-    lamp_shade = dose['facade'] * 0.9 * (1 - 0.6 * gap) * smoothstep(800, 840, YY)   # the posts below the heads, in the far roofs' shadow
+    lamp_shade = dose['facade'] * (0.45 + 0.45 * smoothstep(800, 840, YY)) * (1 - 0.6 * gap)   # the heads half, the posts below fully, in the far roofs' shadow
     S += L['lamps'] * lamp_shade
     r_s = np.hypot((XX - sx) / 1.6, YY - sy)
     veil = np.exp(-r_s / 300.0)
@@ -223,9 +223,9 @@ def light(base, L, vis, A, dose=DOSE, return_parts=False):
 
     # ---------------------------------------------------------------- 2. the key's light where it reaches
     sunlit_tp = L['towpath'] * gap
-    E += sunlit_tp[..., None] * KEY * 0.22
+    E += sunlit_tp[..., None] * KEY * 0.45
     strip = (L['bank'] + L['near']) * (1 - canopy)
-    E += strip[..., None] * KEY * 0.18
+    E += strip[..., None] * KEY * 0.36
     E += ((L['bank'] + L['near']) * dap)[..., None] * KEY * 0.42           # the flecks: the sun itself, warm
 
     # ---------------------------------------------------------------- 3. rims on what the sun touches (static)
@@ -251,7 +251,9 @@ def light(base, L, vis, A, dose=DOSE, return_parts=False):
           + 0.06 * cv2.GaussianBlur(core, (0, 0), sigmaX=230, sigmaY=105, borderType=cv2.BORDER_REPLICATE))
     bl = bl / max(1e-6, bl.max()) * dose['sun_bloom']
     air = L['sky'] + L['cloud'] + L['farroofs'] + L['fartower'] + 0.8 * L['bridge'] + 0.5 * L['water'] + 0.6 * L['spray']
-    G += (bl * 0.42 * fade * air)[..., None] * KEY
+    G += (bl * 0.7 * fade * air)[..., None] * KEY
+    wide = np.exp(-np.hypot((XX - sx) / 2.2, YY - sy) / 170.0)           # the warm air round the low sun (falls off)
+    G += (wide * 0.06 * fade * air * dose['sun_bloom'])[..., None] * KEY
     E += (disc * 0.06)[..., None] * KEY                                    # the disc lifted, never fogged
     vfar = (L['farroofs'] + L['fartower'] + 0.7 * L['bridge'] + 0.6 * (L['sky'] + L['cloud']) * smoothstep(640, 760, YY))
     G += (veil * vfar * 0.10 * dose['veil'] * fade)[..., None] * KEY
@@ -286,8 +288,8 @@ def light(base, L, vis, A, dose=DOSE, return_parts=False):
     med = np.median(Ls[wl > 0.5])
     col = wl * smoothstep(med + 6, med + 18, Ls) * smoothstep(520, 560, XX) * (1 - smoothstep(700, 740, XX))
     glit = wl * smoothstep(med + 6, med + 18, Ls) * (1 - smoothstep(110, 290, np.abs(XX - sx) + 110))
-    G += (gblur(col, 5) * 0.07 * dose['water'])[..., None] * DOOR
-    E += (gblur(col, 2) * 0.25 * dose['water'])[..., None] * DOOR
+    G += (gblur(col, 5) * 0.12 * dose['water'])[..., None] * DOOR
+    E += (gblur(col, 2) * 0.55 * dose['water'])[..., None] * HOT
     G += (gblur(glit, 4) * 0.05 * dose['water'])[..., None] * KEY
 
     # ---------------------------------------------------------------- 7. the pool (its own layer: her shadows cut it live)
@@ -300,7 +302,7 @@ def light(base, L, vis, A, dose=DOSE, return_parts=False):
     if not return_parts:
         return lit, lit_pool
     return lit, lit_pool, dict(S=S, E=E, G=G, canopy=canopy, dapples=dap, rims=rims, sun=(sx, sy, sr), pool=pf * ground,
-                               bloom_sun=bl, bloom_door=bloom_d * outside, edge=edge)
+                               bloom_sun=bl, bloom_door=bloom_d * outside, edge=edge, column=gblur(col, 4))
 
 
 def knee(lin, k=0.9):

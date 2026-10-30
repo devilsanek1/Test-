@@ -93,6 +93,8 @@ def main():
     car = carriers(A)
     t_in = time.time() - t0
     lit, lit_pool, parts = LT.light(base, L, vis, A, return_parts=True)
+    # the key's one hot accent: where the door's light is (the lobby, its bloom, its pool, its column in the canal)
+    KY.set_accent(np.clip(L['lobby'] + 1.4 * parts['bloom_door'] + 1.2 * parts['pool'] + 1.5 * parts['column'], 0, 1))
     T_light = to_srgb(LT.knee(lit))
     T_light_pool = to_srgb(LT.knee(lit_pool))
     t_light = time.time() - t0 - t_in

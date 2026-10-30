@@ -45,7 +45,7 @@ export const HerLit: React.FC = () => {
     <>
       {pool ? (
         live ? (
-          <ShadowCut of={her} region={pool.box} casts={herCasts(t)} blur={HER_LIGHT.shadowBlur}>
+          <ShadowCut of={her} region={pool.box} casts={herCasts(t)} share={DOOR.lamps.map(() => HER_LIGHT.shadowShare)} blur={HER_LIGHT.shadowBlur}>
             <LightMap {...pool} blend="normal" label="pool" />
           </ShadowCut>
         ) : (

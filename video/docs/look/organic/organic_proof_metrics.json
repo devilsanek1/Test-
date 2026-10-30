@@ -1,0 +1,346 @@
+{
+ "frame": {
+  "v6": {
+   "crisp": 0.2201,
+   "soft": 0.3678,
+   "straight": 0.265,
+   "flat31": 0.353,
+   "edge_density": 0.0517
+  },
+  "organic": {
+   "crisp": 0.1838,
+   "soft": 0.359,
+   "straight": 0.1496,
+   "flat31": 0.3074,
+   "edge_density": 0.0491
+  }
+ },
+ "pieces": {
+  "cloud": {
+   "three": {
+    "v6": {
+     "crisp": 0.0097,
+     "soft": 0.7308,
+     "straight": 0.0,
+     "flat31": 0.1256,
+     "edge_density": 0.0144
+    },
+    "organic": {
+     "crisp": 0.0018,
+     "soft": 0.6218,
+     "straight": 0.0,
+     "flat31": 0.1571,
+     "edge_density": 0.0282
+    }
+   },
+   "shapes": {
+    "v6": {
+     "arcs": 0.2654,
+     "straight": 0.0,
+     "ruler": 0.0,
+     "free": 0.7346,
+     "right_angles": 0.0714,
+     "corners_per_100px": 0.7147,
+     "crisp_visible": 0.0077,
+     "median_width_px": 7.8029,
+     "lost_mass": 0.1363,
+     "broken_mass": 0.0708,
+     "symmetry": 0.4204,
+     "clear_geometric": 25.8264,
+     "divider_D": 1.1018
+    },
+    "organic": {
+     "arcs": 0.0112,
+     "straight": 0.0424,
+     "ruler": 0.0,
+     "free": 0.9464,
+     "right_angles": 0.0484,
+     "corners_per_100px": 1.9904,
+     "crisp_visible": 0.0844,
+     "median_width_px": 5.7577,
+     "lost_mass": 0.1137,
+     "broken_mass": 0.1298,
+     "symmetry": 0.5172,
+     "clear_geometric": 0.2066,
+     "divider_D": 1.0765
+    }
+   },
+   "display_box": [
+    560,
+    0,
+    1080,
+    345
+   ],
+   "shapes_box": [
+    640,
+    0,
+    1080,
+    330
+   ]
+  },
+  "tree": {
+   "three": {
+    "v6": {
+     "crisp": 0.031,
+     "soft": 0.6734,
+     "straight": 0.0846,
+     "flat31": 0.1147,
+     "edge_density": 0.1273
+    },
+    "organic": {
+     "crisp": 0.0514,
+     "soft": 0.4155,
+     "straight": 0.1149,
+     "flat31": 0.0185,
+     "edge_density": 0.0643
+    }
+   },
+   "shapes": {
+    "v6": {
+     "arcs": 0.0194,
+     "straight": 0.1513,
+     "ruler": 0.0886,
+     "free": 0.8292,
+     "right_angles": 0.0783,
+     "corners_per_100px": 3.1016,
+     "crisp_visible": 0.362,
+     "median_width_px": 1.8089,
+     "lost_mass": 0.0081,
+     "broken_mass": 0.4405,
+     "symmetry": 0.4564,
+     "clear_geometric": 61.5207,
+     "divider_D": 1.2169
+    },
+    "organic": {
+     "arcs": 0.0425,
+     "straight": 0.173,
+     "ruler": 0.1101,
+     "free": 0.7844,
+     "right_angles": 0.1149,
+     "corners_per_100px": 1.9079,
+     "crisp_visible": 0.46,
+     "median_width_px": 1.7035,
+     "lost_mass": 0.0201,
+     "broken_mass": 0.2406,
+     "symmetry": 0.6483,
+     "clear_geometric": 76.3825,
+     "divider_D": 1.1207
+    }
+   },
+   "display_box": [
+    0,
+    1226,
+    380,
+    1550
+   ],
+   "shapes_box": [
+    0,
+    1250,
+    310,
+    1530
+   ]
+  },
+  "facade": {
+   "three": {
+    "v6": {
+     "crisp": 0.4044,
+     "soft": 0.2548,
+     "straight": 0.439,
+     "flat31": 0.1994,
+     "edge_density": 0.0868
+    },
+    "organic": {
+     "crisp": 0.2683,
+     "soft": 0.3413,
+     "straight": 0.1988,
+     "flat31": 0.105,
+     "edge_density": 0.0925
+    }
+   },
+   "shapes": {
+    "v6": {
+     "arcs": 0.0062,
+     "straight": 0.7585,
+     "ruler": 0.5403,
+     "free": 0.2353,
+     "right_angles": 0.4007,
+     "corners_per_100px": 1.0562,
+     "crisp_visible": 0.5467,
+     "median_width_px": 1.5508,
+     "lost_mass": 0.0073,
+     "broken_mass": 0.2213,
+     "symmetry": 0.7814,
+     "clear_geometric": 62.6939,
+     "divider_D": 1.0478
+    },
+    "organic": {
+     "arcs": 0.0053,
+     "straight": 0.4889,
+     "ruler": 0.2341,
+     "free": 0.5058,
+     "right_angles": 0.3251,
+     "corners_per_100px": 1.1611,
+     "crisp_visible": 0.5167,
+     "median_width_px": 1.4159,
+     "lost_mass": 0.0107,
+     "broken_mass": 0.2373,
+     "symmetry": 0.722,
+     "clear_geometric": 43.5918,
+     "divider_D": 1.0503
+    }
+   },
+   "display_box": [
+    300,
+    580,
+    900,
+    1100
+   ],
+   "shapes_box": [
+    330,
+    590,
+    1080,
+    1080
+   ]
+  },
+  "paving": {
+   "three": {
+    "v6": {
+     "crisp": 0.0841,
+     "soft": 0.4274,
+     "straight": 0.2818,
+     "flat31": 0.3469,
+     "edge_density": 0.0472
+    },
+    "organic": {
+     "crisp": 0.1033,
+     "soft": 0.2872,
+     "straight": 0.2146,
+     "flat31": 0.1922,
+     "edge_density": 0.0354
+    }
+   },
+   "shapes": {
+    "v6": {
+     "arcs": 0.0242,
+     "straight": 0.7995,
+     "ruler": 0.6758,
+     "free": 0.1763,
+     "right_angles": 0.1053,
+     "corners_per_100px": 0.3678,
+     "crisp_visible": 0.7027,
+     "median_width_px": 1.5049,
+     "lost_mass": 0.008,
+     "broken_mass": 0.1413,
+     "symmetry": 0.8657,
+     "clear_geometric": 49.4083,
+     "divider_D": 1.1252
+    },
+    "organic": {
+     "arcs": 0.0259,
+     "straight": 0.346,
+     "ruler": 0.1468,
+     "free": 0.6282,
+     "right_angles": 0.0909,
+     "corners_per_100px": 0.4006,
+     "crisp_visible": 0.6507,
+     "median_width_px": 1.4173,
+     "lost_mass": 0.03,
+     "broken_mass": 0.2133,
+     "symmetry": 0.8642,
+     "clear_geometric": 43.9349,
+     "divider_D": 1.1263
+    }
+   },
+   "display_box": [
+    100,
+    1300,
+    1000,
+    1900
+   ],
+   "shapes_box": [
+    300,
+    1280,
+    1080,
+    1540
+   ]
+  }
+ },
+ "bake": {
+  "cloud": {
+   "box": [
+    560,
+    0,
+    520,
+    345
+   ],
+   "strokes": {
+    "form": 153,
+    "blend": 34,
+    "accent": 10,
+    "lost": 4
+   },
+   "mypaint_s": 0.63,
+   "warp_rms_px": 7.15,
+   "bake_s": 2.22,
+   "md5": "f5374e2cab697399519bea6ae7491ec1"
+  },
+  "tree": {
+   "box": [
+    -60,
+    1226,
+    440,
+    324
+   ],
+   "strokes": {
+    "wash": 59,
+    "dab": 193,
+    "edge": 49
+   },
+   "mypaint_s": 0.45,
+   "shapes": {
+    "0": 1,
+    "1": 4,
+    "2": 9,
+    "3": 3
+   },
+   "R": 120.3,
+   "bake_s": 1.87,
+   "md5": "1f4fecab654cb702c96d7c7a980cb7fb"
+  },
+  "facade": {
+   "box": [
+    300,
+    575,
+    780,
+    525
+   ],
+   "faces": 1227,
+   "strokes": {
+    "face": 224,
+    "edge": 55,
+    "tuft": 140
+   },
+   "mypaint_s": 0.97,
+   "clips": 52,
+   "bake_s": 6.61,
+   "md5": "b2e54e3deb234f3da2fc74745f14b25a"
+  },
+  "paving": {
+   "box": [
+    0,
+    1140,
+    1080,
+    780
+   ],
+   "regions": 90,
+   "strokes": {
+    "flag": 800,
+    "lost": 190
+   },
+   "mypaint_s": 2.63,
+   "shadow_px": 113618,
+   "bake_s": 14.96,
+   "md5": "a1f701b726071eb996e6a2629a2367dc"
+  }
+ }
+}
