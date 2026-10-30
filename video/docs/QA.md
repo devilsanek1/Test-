@@ -58,8 +58,9 @@ Options: `--t0= --t1=` (a time range), `--keep-frames` (keep the PNGs in `<out>/
 ```
 python3 scripts/qa/deadframes.py <frames_dir_or_video> [--fps 30] [--scenes src/data/scenes.json|auto|cuts|none]
        [--t0 0] [--only S05] [--out dir] [--caption-band 280,600] [--dead-limit 0.40] [--allow scripts/qa/holds.json]
+# --scenes auto read v1's src/data/scenes.json, archived since 2026-10-29 in archive/v1/src/data/: pass
+# --scenes src/<film>/film/scenes.json
 ```
-`--scenes auto` read v1's `src/data/scenes.json`, archived since 2026-10-29: pass `--scenes src/<film>/film/scenes.json`.
 
 **How a frame is measured** (the user's rule: *a frame is dead if nothing on screen moves*, and *camera drift alone
 does NOT count as life*):
@@ -85,9 +86,9 @@ does NOT count as life*):
    slow slide). A one-off pop followed by stillness, idle jitter or a 10-30 px/s drift do not qualify.
 6. **Dead run** = consecutive dead frames inside one scene; **flagged** when longer than **0.40 s** (12 frames), the
    reference's own maximum, unless allow-listed or inside a transition window (camera-continuous, push-through,
-   foreground-wipe and un-build windows from `src/data/scenes.json` (v1's, archived since 2026-10-29: pass
-   `--scenes src/<film>/film/scenes.json`), mirroring `src/lib/Film.tsx`: a transition counts as one long event, as in
-   motion_spec 9). Dead frames inside a transition are drawn blue ("excused").
+   foreground-wipe and un-build windows from `src/data/scenes.json` (v1's, archived since 2026-10-29 in
+   `archive/v1/src/data/`: pass `--scenes src/<film>/film/scenes.json`), mirroring `src/lib/Film.tsx`: a transition
+   counts as one long event, as in motion_spec 9). Dead frames inside a transition are drawn blue ("excused").
 7. **Events** = space-time change blobs: each frame, changed pixels within 12 px of each other form a blob; a blob
    continues the chain whose footprint of the last 2 frames it overlaps (within 4 px), otherwise it starts a new chain;
    chains never merge (a new pop next to an ongoing motion is its own event; a walk cycle's 1-frame pause is not).
@@ -109,8 +110,8 @@ So 4 events/s, no dead run and every gap under a second scores 9.1; one 1-second
 **Scenes.** `--scenes auto` (default) uses `src/data/scenes.json` when the clip is the film (or `--t0` places a
 per-scene composition on the film timeline), otherwise the cuts detected in the pixels (edge newness after camera
 compensation >= 0.5 and >= 12 % of the frame changed, merged within 0.4 s; segments under 1 s join a neighbour).
-`--scenes auto` read v1's `src/data/scenes.json`, archived since 2026-10-29: pass `--scenes src/<film>/film/scenes.json`
-(deadframes, framecheck).
+`--scenes auto` read v1's `src/data/scenes.json`, archived since 2026-10-29 in `archive/v1/src/data/`: pass
+`--scenes src/<film>/film/scenes.json` (deadframes, framecheck).
 `--only S05 --t0 23.671` scores one scene composition. Reference scene lists live in `scripts/qa/calib/`.
 
 **Allow-list** (`scripts/qa/holds.json`, read by run_all): deliberate holds, e.g. the beat after "switched themselves
@@ -183,8 +184,8 @@ python3 scripts/qa/beatsync.py --fit-tempo [--anchor auto|beat|downbeat] [--max-
   foreground wipe, the end of an un-build), **quantised to the first frame that shows the new scene**
   (`ceil(start x 30) / 30`, up to 33 ms after the nominal start; `--no-quantize` to turn off). `frames:` runs the cut
   detector of deadframes on rendered frames; `json:` takes a `deadframes.json` (its detected cuts) or a list.
-  `--cuts scenes` read v1's `src/data/scenes.json`, archived since 2026-10-29: pass `--cuts json:...` or
-  `--cuts scenes:<path>`.
+  `--cuts scenes` read v1's `src/data/scenes.json`, archived since 2026-10-29 in `archive/v1/src/data/`: pass
+  `--cuts json:...` or `--cuts scenes:<path>`.
 - **Warp.** If the cut list is still on the v1 voice timeline (70.69 s) and the music on v2 (78 s), `--warp auto` maps
   it through `assets/timewarp_v1_to_v2.json`. Today scenes.json is already v2, so no warp.
 - **Grid.** From the MIDI's tempo map and time signatures (95.38 BPM, bars of 4/4, 5/4 and 6/4: 124 beats, 28 bars,

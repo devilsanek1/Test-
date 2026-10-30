@@ -89,7 +89,7 @@ work already built on top of the layer that changes. Our own run shows the curve
 | Owner saw a playable film only at the end | first full-film preview 25 Oct 08:21 (40 %), about 18.7 h in; before that, 30-min still strips | animatic before production |
 | Build before script lock | engine v1/v2, cinematic kit (3 rounds), mascot (10 poses), motion spec, sound, voice v1/v2 all before script final (18:55) | script and VO lock first |
 | Polish before story | edge lab (2 rounds, 6 variants, judges) from 19:18, shared kit (5 review / 2 AD rounds), QA tooling (dead-frame detector, calibration) before any scene existed | polish last |
-| Storyboard was text, not timed pictures | storyboard_v3.md: 815 lines with px/s cut-speed matching; JSON 10k lines | boards to animatic; numbers belong to layout |
+| Storyboard was text, not timed pictures | v1/storyboard_v3.md: 815 lines with px/s cut-speed matching; JSON 10k lines | boards to animatic; numbers belong to layout |
 | Depth-first scenes | per-scene ">= 8/10 from independent critics" from the first build; scenes reached polish while others were still placeholders | breadth-first: whole film per stage |
 | Hook last | hook build / pass 2 after the posting kit | hook first, as its own unit |
 | Overhead per cycle | 30-min check-ins rendering strips of every composition plus QA charts plus commits; 3 usage-limit stops | one deliverable per gate |

@@ -1,0 +1,44 @@
+# linkcheck.py's known list: references to an old path that stay on purpose (keep) or wait for a planned fix (todo).
+# One rule per line, tab-separated: file glob, old path or folder (repo-relative), keep|todo, why. A rule matches only
+# that old path (or what was under that folder), so it never hides a later move; linkcheck.py prints the todo rules on
+# every run and lists rules that match nothing any more (remove those).
+#
+# The 2026-10-29 move (streamlining Phase 1: v1, v2's first production and v3's unused panels to video/archive/,
+# v1's history docs to video/docs/v1/; docs/retro/2026-10-28_streamline/phase1_codebase.md, phase1_docs.md):
+video/docs/v2/BUILD.md	video/src/scenes	keep	a never-import rule: it names the dropped code on purpose (true at any commit)
+video/docs/v2/BUILD.md	video/src/v2	keep	a never-import rule: it names the dropped code on purpose (true at any commit)
+video/docs/v2/STYLE.md	video/src/scenes	keep	a never-import rule: it names the dropped code on purpose (true at any commit)
+video/docs/v2/STYLE.md	video/src/v2	keep	a never-import rule: it names the dropped code on purpose (true at any commit)
+video/docs/v2/direction/toolkit.md	video/src/v2	keep	a never-import rule: it names the dropped code on purpose (true at any commit)
+video/docs/v2/direction/treatments/T1_camera-journey.md	video/src/v2	keep	a never-import rule: it names the dropped code on purpose (true at any commit)
+video/docs/v2/lanes/COMMON.md	video/src/scenes	keep	a never-import rule: it names the dropped code on purpose (true at any commit)
+video/docs/v2/lanes/COMMON.md	video/src/v2	keep	a never-import rule: it names the dropped code on purpose (true at any commit)
+video/docs/v2/lanes/L4_spec.md	video/src/v2	keep	a never-import rule: it names the dropped code on purpose (true at any commit)
+video/docs/v2/lanes/plan_L3.md	video/src/scenes	keep	a never-import rule: it names the dropped code on purpose (true at any commit)
+video/docs/v2/lanes/plan_L3.md	video/src/v2	keep	a never-import rule: it names the dropped code on purpose (true at any commit)
+video/docs/v2/lanes/l5_tools/wf2_s6s7.js	video/src/scenes	keep	a never-import rule: it names the dropped code on purpose (true at any commit)
+video/docs/v2/lanes/l5_tools/wf2_s6s7.js	video/src/v2	keep	a never-import rule: it names the dropped code on purpose (true at any commit)
+video/src/v2r/kit/pip/README.md	video/src/v2	keep	a never-import rule: it names the dropped code on purpose (true at any commit)
+video/docs/studies/2026-10-28_city_posters/test/ENGINE_PT.md	video/src/v2	keep	a never-import rule: it names the dropped code on purpose (true at any commit)
+video/assets/timewarp_v1_to_v2.json	video/scripts/timewarp.py	keep	data provenance: the file this data was made from, as it was then
+video/assets/timing_est_v3.json	video/docs/script	keep	data provenance: the file this data was made from, as it was then
+video/assets/timing_est_v3.json	video/docs/storyboard_v3.json	keep	data provenance: the file this data was made from, as it was then
+video/audio/tempo_map_proposal.json	video/src/data	keep	data provenance: the file this data was made from, as it was then
+video/scripts/qa/calib/*.json	video/docs/motion_spec.md	keep	data provenance: the file this data was made from, as it was then (calibrate.py writes docs/v1/ on its next run)
+video/scripts/qa/calib/*.json	video/docs/style_bible_ref2.md	keep	data provenance: the file this data was made from, as it was then (calibrate.py writes docs/v1/ on its next run)
+video/scripts/render-frames.mjs	video/src/index.ts	keep	lane R's render tools name v1's old entries on purpose: --entry=full and its error, the history of --entry=auto
+video/scripts/render-frames.mjs	video/src/dev/registry.ts	keep	lane R's render tools name v1's old entries on purpose: --entry=full and its error, the history of --entry=auto
+video/scripts/render-frames.mjs	video/src/entry-film.ts	keep	lane R's render tools name v1's old entries on purpose: --entry=full and its error, the history of --entry=auto
+video/scripts/render/lib.mjs	video/src/index.ts	keep	lane R's render tools name v1's old entries on purpose: --entry=full and its error, the history of --entry=auto
+video/src/lib/*	video/docs/motion_spec.md	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
+video/src/lib/*	video/docs/motion_evidence	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
+video/src/lib/*	video/docs/style_bible.md	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
+video/src/lib/*	video/docs/style_bible_ref2.md	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
+video/src/lib/*	video/docs/theme_proposal.json	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
+video/src/lib/*	video/docs/BRIEF.md	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
+video/src/lib/*	video/docs/CINE.md	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
+video/src/lib/*	video/src/data	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
+video/src/lib/*	video/src/dev	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
+video/src/lib/*	video/scripts/engine-numbers.mjs	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
+video/src/v3/film/*	video/src/v3/film/scenes/g5b_panels.tsx	todo	outside the Phase 1 docs lane (video/src): add "archived in archive/v3/src/v3/film/scenes/" (phase1_codebase.md) and remove these lines
+video/src/v3/film/*	video/src/v3/film/scenes/S9.tsx	todo	outside the Phase 1 docs lane (video/src): add "archived in archive/v3/src/v3/film/scenes/" (phase1_codebase.md) and remove these lines

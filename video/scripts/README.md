@@ -7,7 +7,7 @@ re-run it after adding, moving or re-describing a tool (`--check` exits 1 when t
 toolkit"), `docs/G5_BLOCKING.md` §4 (previews) and §7 (the gate check). v1-only tools are archived in
 `archive/v1/scripts/` (the `v1-final` tag has them in place).
 
-105 tools in 18 folders; 9 without a header (add a docstring or a first comment line).
+106 tools in 18 folders; 9 without a header (add a docstring or a first comment line).
 
 ## `scripts/`
 
@@ -79,6 +79,7 @@ toolkit"), `docs/G5_BLOCKING.md` §4 (previews) and §7 (the gate check). v1-onl
 | tool | what it does |
 |---|---|
 | `scripts/ops/disk_janitor.sh` | Prune stale Remotion webpack cache entries when free disk drops under a threshold. |
+| `scripts/ops/linkcheck.py` | After files move, list every reference to their old paths in the repo's docs and code, so none dangles. |
 | `scripts/ops/status.py` | One-screen status of a film, for a hand-off or the hourly status: no agent, no reading in the session. |
 
 ## `scripts/qa/`
@@ -87,7 +88,7 @@ toolkit"), `docs/G5_BLOCKING.md` §4 (previews) and §7 (the gate check). v1-onl
 |---|---|
 | `scripts/qa/av_lag.py` | Where a reference track (the locked voice, the mix) sits inside a render's audio: the lag of the best cross-correlation per window (mono, 8 kHz) and its normalised peak r. Lag 0 ms in every window = the track plays in sync and does not drift; r ~1.0 = the … |
 | `scripts/qa/beatsync.py` | How far is every cut from the music's beat grid, and a tempo map that puts beats ON the cuts. |
-| `scripts/qa/calibrate.py` | Run deadframes (and framecheck) on the two reference videos and compare with the numbers the analysis streams measured by hand (docs/motion_spec.md section 9, docs/style_bible_ref2.md section 6.4). |
+| `scripts/qa/calibrate.py` | Run deadframes (and framecheck) on the two reference videos and compare with the numbers the analysis streams measured by hand (docs/v1/motion_spec.md section 9, docs/v1/style_bible_ref2.md section 6.4). |
 | `scripts/qa/check_banding.py` | BANDING in a sky (docs/look/CRAFT.md §g "Check"; lib/sky.tsx), on a rendered frame (PNG) or a video (mp4: decoded at 16 bits with its own colour tags, so the measurement adds no rounding of its own), before and after any encode. |
 | `scripts/qa/check_depth.py` | The DEPTH AND SEPARATION check (docs/look/CRAFT.md §f "Check"; the owner on v2's G4 look clip, 2026-10-27: "the foreground and the main focus still blurs with the background ... no distance effect nor perspective ... the bottom part ... little to no … |
 | `scripts/qa/check_light.py` | The LIGHT AND SHADOW gate (docs/look/CRAFT.md §d "Check"), on an A/B pair of the SAME frame: the light layers OFF (A) and ON (B). |
