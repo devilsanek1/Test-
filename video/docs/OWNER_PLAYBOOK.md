@@ -369,7 +369,12 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   stills, 2026-10-30). It moves with the air and the body (hair physics: weight, wind, follow-through), cut in today's
   real haircuts; checked against the references for how clean and stylish they are. With it, people's proportions and
   stature get better: slim, elegant adults with a relaxed, confident posture, the head stacked over the shoulders on a
-  long, upright neck, never pushed forward ("looks like this person was sitting at computer the whole day"). The recipe must be the most pleasant and modern we have
+  long, upright neck, never pushed forward ("looks like this person was sitting at computer the whole day").
+  **Hair is BUILT TO ANIMATE and drawn CLEAN:** a few smooth, designed shapes (no facets, no jagged tips, no scatter
+  of small locks), layered back / cap / front like a 2D cut-out rig, the hanging pieces on bone chains with spring
+  physics, so the same clean shapes bend and settle in motion; proven with motion strips (frames of a turn, a walk,
+  a breeze) beside the stills before the owner sees it. A procedural scatter of polygon locks read as "garbage", "not
+  appealing or clean" (v2 and v3, 2026-10-30). The recipe must be the most pleasant and modern we have
   (`docs/look/PEOPLE_DESIGN.md`, the hair and proportions iteration; references `docs/look/people_design/
   refs_hair_2026-10-30/`). — ("So we previously made a recipe and a detailed research and the update to people figures /
   We need to iterate on it more and improve the hair and the proportions and stature / I will send you more references
@@ -380,7 +385,9 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   stills: "I don't get why you changed the neck posture like now it looks like this person was sitting at computer the
   whole day / Also I don't think I like it really it's more detailed yes but it's incoherent like it's not a proper
   haircut and more like a person woke up and that's what we see like not stylish and not clean compare it deeper with
-  our references if they look more clean and stylish", 2026-10-30.)
+  our references if they look more clean and stylish", 2026-10-30; on v3: "Nope not good enough we need to overhaul
+  the hair I'm not convinced it's going to be animated properly it's not looking clean at all looks like garbage and
+  not appealing or clean", 2026-10-30.)
 - **Faces, above all the profile, are cute and super appealing by modern standards; women read feminine and men
   manly.** What makes a face beautiful, cute and appealing is researched and built into the face recipe (the general
   features: the nose, the brow and forehead, the lips, the chin and jaw, where the closed eyes sit, the cheek), with the
@@ -716,6 +723,10 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   (12-24 drawings/s) while the camera glides; the G3 reel also renders at 60 (`G3_ANIMATIC.md`, 2026-10-26). — (v3, 2026-10-26).
 
 ## Process and communication
+- **Before an iteration's stills go to the owner, the orchestrator looks at them beside the owner's references:**
+  if they are not clearly at the references' level (clean, appealing, the thing asked for), iterate first; the owner
+  never spends a look on work we could see was not there yet. A quick look, never a panel. — (two people rounds sent
+  that the owner called "incoherent" and "garbage", 2026-10-30.)
 - **When the owner hands a pick over ("you pick"), pick by the owner's three criteria: engagement, pleasantness and
   attention retention.** Name each pick and its one-line why in one place, apply it to the docs in the same turn, and
   move on; the owner can overrule any of it later. — ("Okay you pick your best option for maximum engagement and

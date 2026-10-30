@@ -282,3 +282,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   profile) -> a face-and-body appeal round: the research and a profile design sheet now, beside the hair rebuild; built
   into the figures once the hair round lands. -> rule: playbook, Visual style (faces cute and appealing; women
   feminine, men manly).
+- 2026-10-30 ~17:40 UTC, on people page version 2 (round 3): "Nope not good enough we need to overhaul the hair I'm not
+  convinced it's going to be animated properly it's not looking clean at all looks like garbage and not appealing or
+  clean" -> the hair approach replaced, not tuned: clean designed shapes on a 2D rig (back / cap / front pieces, bone
+  chains with spring physics), proven with motion strips; research on how pro 2D pipelines draw and rig hair runs
+  beside the design-and-build agent. -> rule: playbook, Visual style (hair built to animate, drawn clean); Process
+  (the orchestrator looks before sending).
