@@ -1,41 +1,274 @@
 {
  "film": "v2s1_v6",
- "about": "v2's S1, painter v6 (iteration 2026-10-30): built from the recipe book (docs/look/PAINT_RECIPES.md §4): the sky recipe's gradient, streaks and disc; three cloud planes (far deck +3, mid bank +2, near cumulus 0); the canal by water.md E7 on OUR design frame, fed from the one light table, with the brief's real darks (the ladder deepened); the near tree by foliage.md; the far city by built_ground.md's layered haze within CRAFT §f.2's caps. Calls: §3 C1-C18; recipe clashes D2-D5 fixed in paint.py's v6 block. The scene side (set 'v6'): src/look/paint_s1 (the darks switch, the refined her from src/lib/figure, the film's sun disc hidden).",
+ "about": "v2's S1, painter v6 (iteration 2026-10-30): built from the recipe book (docs/look/PAINT_RECIPES.md \u00a74): the sky recipe's gradient, streaks and disc; three cloud planes (far deck +3, mid bank +2, near cumulus 0); the canal by water.md E7 on OUR design frame, fed from the one light table, with the brief's real darks (the ladder deepened); the near tree by foliage.md; the far city by built_ground.md's layered haze within CRAFT \u00a7f.2's caps. Calls: \u00a73 C1-C18; recipe clashes D2-D5 fixed in paint.py's v6 block. The scene side (set 'v6'): src/look/paint_s1 (the darks switch, the refined her from src/lib/figure, the film's sun disc hidden).",
  "out": "public/paint/v2s1_v6",
  "out_design": "public/paint/v2s1_v6design",
- "frame": [1080, 1920],
- "band": [290, 600],
- "key": [-0.70, -0.62, 0.36],
+ "frame": [
+  1080,
+  1920
+ ],
+ "band": [
+  290,
+  600
+ ],
+ "key": [
+  -0.7,
+  -0.62,
+  0.36
+ ],
  "light": {
   "sky": {},
-  "local": {"window": "#f7cf86", "door": "#fbe6c2", "facade": "#cd9985", "facade_cream": "#d5c5bb", "dark_window": "#412f45",
-            "paving": "#e2d0c1", "sand": "#d8b9a2", "stone": "#6d6680", "haze": "#cdb3bf"},
+  "local": {
+   "window": "#f7cf86",
+   "door": "#fbe6c2",
+   "facade": "#cd9985",
+   "facade_cream": "#d5c5bb",
+   "dark_window": "#412f45",
+   "paving": "#e2d0c1",
+   "sand": "#d8b9a2",
+   "stone": "#6d6680",
+   "haze": "#cdb3bf"
+  },
   "sun_colour": "#ee6a2e"
  },
  "pieces": [
-  {"id": "v2s1/sky", "style": "sky_recipe", "seed": 61, "size": [1080, 1100], "band": [317, 556],
-   "sun": {"xy": [196, 779], "r": 20, "glow": 0.55}, "streaks": 4},
-  {"id": "v2s1/clouds", "style": "cloud_planes", "seed": 62, "planes": [
-    {"name": "p1", "depth": "far", "plane": 3, "zdepth": 0.7, "box": [0, 610, 780, 706], "base_y": 686, "design": "FAR"},
-    {"name": "p2", "depth": "mid", "plane": 2, "zdepth": 0.4, "box": [0, 100, 580, 290], "base_y": 240, "design": "MID"},
-    {"name": "p3", "depth": "near", "plane": 0, "zdepth": 0.0, "box": [560, 0, 1080, 345], "base_y": 300, "design": "NEAR"}
-  ]},
-  {"id": "v2s1/tree", "style": "tree_recipe", "seed": 63, "box": [-60, 1250, 360, 1550], "trunk_foot": [128, 1529],
-   "crown": {"c": [125, 1392], "W": 330, "H": 215}, "plane": -1, "value_step": 5},
-  {"id": "v2s1/farcity", "style": "far_city_recipe", "seed": 64, "air": "sky_horizon", "planes": [
-    {"name": "farroofs", "flat": "out/paint/v2s1/flat/farroofs.png", "plane": 4},
-    {"name": "fartower", "flat": "out/paint/v2s1/flat/fartower.png", "plane": 3}
-  ]},
-  {"id": "v2s1/water", "style": "water_recipe", "seed": 65, "design": "out/paint/v2s1_v6/design_frame.png",
-   "rows": [1030, 1310], "waterline": [[0, 1068], [460, 1111]], "near_edge": {"y0": 1143, "slope": 0.1311},
-   "s_range": [0.55, 0.95], "dose": {"mid": 0.6, "near": 0.6}, "accents": 4,
-   "objects": [[785, 1040, 1080, 1210], [355, 1080, 445, 1142], [650, 1112, 750, 1300]], "gold_skip": {"2": [1122, 1156]},
-   "lights": [{"box": [545, 850, 712, 1062], "length": 0.75}],
-   "reflection": {"solid": 0.6, "face": 7, "quay_top": 10, "simplify": [7, 21], "k": 0.3, "fresnel": [-4, -8],
-                  "wobble": [0.5, 2.7, 120], "top_limit": 600},
-   "glint": {"x": 196, "D": 96, "strength": 0.5, "slivers": [2, 4]},
-   "rings": {"xy": [400, 1137], "r0": 46, "grow": 1.5, "ratio": 7},
-   "contact": {"px": 1.2, "dL": -12, "op": 0.5},
-   "ladder_dL": {"w_mid": -12, "w_near": -16, "w_deep": -18, "w_deeper": -18}}
+  {
+   "id": "v2s1/sky",
+   "style": "sky_recipe",
+   "seed": 61,
+   "size": [
+    1080,
+    1100
+   ],
+   "band": [
+    317,
+    556
+   ],
+   "sun": {
+    "xy": [
+     196,
+     752
+    ],
+    "r": 20,
+    "glow": 0.55
+   },
+   "streaks": 4
+  },
+  {
+   "id": "v2s1/clouds",
+   "style": "cloud_planes",
+   "seed": 62,
+   "planes": [
+    {
+     "name": "p1",
+     "depth": "far",
+     "plane": 3,
+     "zdepth": 0.7,
+     "box": [
+      0,
+      610,
+      780,
+      706
+     ],
+     "base_y": 686,
+     "design": "FAR"
+    },
+    {
+     "name": "p2",
+     "depth": "mid",
+     "plane": 2,
+     "zdepth": 0.4,
+     "box": [
+      0,
+      100,
+      580,
+      290
+     ],
+     "base_y": 240,
+     "design": "MID"
+    },
+    {
+     "name": "p3",
+     "depth": "near",
+     "plane": 0,
+     "zdepth": 0.0,
+     "box": [
+      560,
+      0,
+      1080,
+      345
+     ],
+     "base_y": 300,
+     "design": "NEAR",
+     "prm": {
+      "n_block": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "v2s1/tree",
+   "style": "tree_recipe",
+   "seed": 63,
+   "box": [
+    -60,
+    1250,
+    360,
+    1550
+   ],
+   "trunk_foot": [
+    128,
+    1529
+   ],
+   "crown": {
+    "c": [
+     125,
+     1392
+    ],
+    "W": 330,
+    "H": 215
+   },
+   "plane": -1,
+   "value_step": 5
+  },
+  {
+   "id": "v2s1/farcity",
+   "style": "far_city_recipe",
+   "seed": 64,
+   "air": "sky_horizon",
+   "planes": [
+    {
+     "name": "farroofs",
+     "flat": "out/paint/v2s1/flat/farroofs.png",
+     "plane": 4,
+     "window_area": 400
+    },
+    {
+     "name": "fartower",
+     "flat": "out/paint/v2s1/flat/fartower.png",
+     "plane": 3,
+     "window_area": 30
+    }
+   ]
+  },
+  {
+   "id": "v2s1/water",
+   "style": "water_recipe",
+   "seed": 65,
+   "design": "out/paint/v2s1_v6/design_frame.png",
+   "rows": [
+    1030,
+    1310
+   ],
+   "waterline": [
+    [
+     0,
+     1068
+    ],
+    [
+     460,
+     1111
+    ]
+   ],
+   "near_edge": {
+    "y0": 1143,
+    "slope": 0.1311
+   },
+   "s_range": [
+    0.55,
+    0.95
+   ],
+   "dose": {
+    "mid": 0.6,
+    "near": 0.6
+   },
+   "accents": 4,
+   "objects": [
+    [
+     785,
+     1040,
+     1080,
+     1210
+    ],
+    [
+     355,
+     1080,
+     445,
+     1142
+    ],
+    [
+     650,
+     1112,
+     750,
+     1300
+    ]
+   ],
+   "gold_skip": {
+    "2": [
+     1122,
+     1156
+    ]
+   },
+   "lights": [
+    {
+     "box": [
+      545,
+      850,
+      712,
+      1062
+     ],
+     "length": 0.75
+    }
+   ],
+   "reflection": {
+    "solid": 0.6,
+    "face": 7,
+    "quay_top": 10,
+    "simplify": [
+     7,
+     21
+    ],
+    "k": 0.3,
+    "fresnel": [
+     -4,
+     -8
+    ],
+    "wobble": [
+     0.5,
+     2.7,
+     120
+    ],
+    "top_limit": 600
+   },
+   "glint": {
+    "x": 196,
+    "D": 96,
+    "strength": 0.5,
+    "slivers": [
+     2,
+     4
+    ]
+   },
+   "rings": {
+    "xy": [
+     400,
+     1137
+    ],
+    "r0": 46,
+    "grow": 1.5,
+    "ratio": 7
+   },
+   "contact": {
+    "px": 1.2,
+    "dL": -12,
+    "op": 0.5
+   },
+   "ladder_dL": {
+    "w_mid": -12,
+    "w_near": -18,
+    "w_deep": -24,
+    "w_deeper": -24
+   }
+  }
  ]
 }

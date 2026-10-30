@@ -1726,7 +1726,7 @@ def style_far_city_recipe(piece, spec):
         h, w = a.shape
         plane = int(pl['plane'])
         rng = rng_for(piece['seed'], pl['name'], 'P0')
-        lbl, n, major, idx, small = _blocks(rgbf, a)
+        lbl, n, major, idx, small = _blocks(rgbf, a, min_area=int(pl.get('window_area', 30)))
         # windows (small blocks): +4 none (the wall's colour), +3 tone-on-tone (dE <= 6 from the wall)
         wall = ndi.grey_dilation(np.where(small, 0, lbl), size=(9, 9))
         base = np.zeros((h, w, 3))

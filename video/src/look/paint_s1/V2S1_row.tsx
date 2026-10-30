@@ -184,7 +184,7 @@ export const V6_HER_POSE: Omit<FigurePose, 'step' | 'wind'> = {
 };
 export const V6_HER_LIGHT: FigureLight = {
   key: [-0.94, -0.34],
-  local: {color: '#FFC98A', dL: 13, dir: [1, -0.1], width: 26},
+  local: {color: '#FFC07A', dL: 18, dir: [1, -0.1], width: 36},
 };
 const S1HerV6: React.FC<{x: number; y: number; h: number; step: number; t: number}> = ({x, y, h, step, t}) => (
   <Figure
