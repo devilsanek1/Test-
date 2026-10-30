@@ -74,7 +74,9 @@ def crown_ellipses(seed):
             if r.uniform() < 0.33:
                 sa = a + r.uniform(-0.6, 0.6)
                 sr = mr * r.uniform(0.3, 0.42)
-                ells.append((mx + math.cos(sa) * (mr - sr * 0.4), my + math.sin(sa) * (mr - sr * 0.4), sr, sr * 0.85, 0.0, 3))
+                sx, sy = mx + math.cos(sa) * (mr - sr * 0.9), my + math.sin(sa) * (mr - sr * 0.9)
+                # a small clump sits ON its clump's outline, half sunk: never a knob standing off the crown
+                ells.append((sx, sy, sr, sr * 0.85, 0.0, 3))
     return ells, (bx, by, Rw, Rh)
 
 
@@ -245,17 +247,17 @@ def plan_strokes(zone, cols, info, inside, seed, dose=1.0):
     zdist = ndi.distance_transform_edt(~zb)
     litz = (zone >= 2)
     prob = np.clip(0.15 + 0.85 * np.exp(-zdist / 6.0), 0, 1) * np.where(litz, 1.0, 0.25)
-    for (x, y) in seeds(8, inside & (d_in > 1), prob * dose):
+    for (x, y) in seeds(11, inside & (d_in > 1), prob * dose):
         z = zc(x, y)
         if z < 0:
             continue
         up = z >= 2 and rng.random() < 0.7
         c = ok[min(z + 1, 4)] if up else ok[z]
-        c = 0.6 * c + 0.4 * ok[z] + np.array([rng.normal(0, 0.01), rng.normal(0, 0.004), rng.normal(0, 0.006)])
+        c = 0.5 * c + 0.5 * ok[z] + np.array([rng.normal(0, 0.008), rng.normal(0, 0.003), rng.normal(0, 0.005)])
         ang = math.atan2(-0.62, 0.78) + rng.normal(0, 0.5)           # leaves' marks lean up toward the light
-        Ls = rng.uniform(6, 13)
+        Ls = rng.uniform(8, 15)
         pts = [(x - math.cos(ang) * Ls / 2, y - math.sin(ang) * Ls / 2), (x + math.cos(ang) * Ls / 2, y + math.sin(ang) * Ls / 2)]
-        plan.add('dab', 'tanda/acrylic-04-paint', pts, L.ok2rgb(c), rng.uniform(4.5, 8.0), rng.uniform(0.8, 1.0), ds=1.0)
+        plan.add('dab', 'tanda/acrylic-04-paint', pts, L.ok2rgb(c), rng.uniform(6.0, 10.0), rng.uniform(0.75, 0.95), ds=1.0)
     # the leafy found edge: dabs across the lit silhouette, pointing out (the outline breaks into leaves)
     nxo, nyo = L.outward_normal(inside, 2.5)
     facing = nxo * LIGHT[0] + nyo * LIGHT[1]
@@ -269,6 +271,15 @@ def plan_strokes(zone, cols, info, inside, seed, dose=1.0):
         c = ok[min(z + (1 if facing[yi, xi] > 0.5 else 0), 4)]
         plan.add('edge', 'tanda/acrylic-04-paint', pts, L.ok2rgb(c + np.array([rng.normal(0, 0.008), 0, 0])), rng.uniform(4.0, 7.0),
                  rng.uniform(0.85, 1.0), ds=1.0)
+    # the shade side's lost edge: dark leaf dabs across it, in the shade's own values (it breaks, it does not blur)
+    away = inside & (d_in < 4) & (facing <= 0.1)
+    for (x, y) in seeds(9, away):
+        xi, yi = int(np.clip(x, 0, W - 1)), int(np.clip(y, 0, H - 1))
+        ox, oy = nxo[yi, xi], nyo[yi, xi]
+        Ls = rng.uniform(5, 11)
+        pts = [(x - ox * Ls * 0.4, y - oy * Ls * 0.4), (x + ox * Ls * 0.6 + rng.normal(0, 2.0), y + oy * Ls * 0.6 + rng.normal(0, 2.0))]
+        c = ok[max(min(zone[yi, xi], 1), 0)] + np.array([rng.normal(0, 0.01), 0, 0])
+        plan.add('edge', 'tanda/acrylic-04-paint', pts, L.ok2rgb(c), rng.uniform(3.5, 6.0), rng.uniform(0.55, 0.85), ds=1.0)
     # a few dark dabs into the shade side (the shade mass is still leaves, quietly)
     sh = inside & (zone <= 1) & (d_in > 3)
     for (x, y) in seeds(18, sh):
@@ -280,7 +291,7 @@ def plan_strokes(zone, cols, info, inside, seed, dose=1.0):
     return plan
 
 
-def lost_edges(rgba, seed, lost_px=7.0):
+def lost_edges(rgba, seed, lost_px=3.0):
     """Lost on the shade side and the underside (6-9 px), found and leafy on the lit side."""
     H, W = rgba.shape[:2]
     a = rgba[..., 3]

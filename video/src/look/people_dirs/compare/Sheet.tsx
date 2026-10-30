@@ -478,10 +478,10 @@ export const CompareSheet: React.FC = () => (
         Recommended, a DRAFT until the owner picks: A, CLEAN EDITORIAL, drawn at 7.8-8.0 heads.
       </T>
       <T x={44} y={Y_D + 222} s={22}>
-        Grafted from C: two flat tones under ~130 px, the shape budget by size, the black-silhouette test, the rim on the subject only. From B: the scene's own
+        From C: two flat tones for people under ~130 px, a shape budget by size, the black-silhouette test, the rim on the subject only, the cap's brim as a face option.
       </T>
       <T x={44} y={Y_D + 254} s={22}>
-        light rig (a warm key, the sky's cool edge), warm skin at the terminator in close shots, hair that hangs, far crowds as soft dabs. The system: PEOPLE_DESIGN.md.
+        From B: light from the scene's own rig, kept when a figure turns or is mirrored; warm skin at the terminator up close; long hair that hangs. The system: PEOPLE_DESIGN.md.
       </T>
     </svg>
   </AbsoluteFill>
