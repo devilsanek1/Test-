@@ -4,6 +4,9 @@
 
 # Ink lines, a bit rough but clean: notes (iteration, 2026-10-30)
 
+**Shown to the owner:** https://claude.ai/artifact/NVsh6GUY5NoyGwLY4yJ7QF (no lines, A, B, C at phone size and up close;
+the pick B; the open calls: A, B or C, and whether the person gets a line).
+
 **The ask** (`BRIEF.md`; the owner: "so i like a bit of rougher ink style but our video 1 was too rough not looking
 clean or premium. If you can come up with a clean way to incorporate a bit of messiness in the lines combined with all
 the painting and styles and texture we added with it looking coherent - sure lets try"). An ITERATION: one agent, stills
