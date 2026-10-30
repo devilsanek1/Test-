@@ -116,3 +116,10 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   5, rejected as too wide, re-scoped to the bunker).
 - 2026-10-29 ~09:30 UTC: "Helsinki is actually pretty good too / Let's do both as story 4 and 5" -> video 4 = Helsinki's AI-heated homes, produced by session
   https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt; the writer started.
+
+## 2026-10-30: the visual script, asked about style (to the city-poster study session)
+- 2026-10-30 ~01:10 UTC, sending `Helsinki_Visual_Script.zip` (G2.5, 12 shots, the 42.24 s take): "What do you think about
+  this script / Would it fit into our style?" -> the study session's read: `STYLE_FIT_2026-10-30.md` (the story fits; the
+  picture needs a translation into the new look: a brush not a pen, an organic cut-away, a person near the camera, one
+  colour key and the window as the story light, a simpler composition).
+
