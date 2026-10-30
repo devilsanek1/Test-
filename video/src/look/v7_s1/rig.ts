@@ -38,3 +38,16 @@ export const PIP_LIGHT = {
   sun: {width: 1.2, opacity: 0.45, soft: 0.3},
   shade: {tint: '#7A70A6', opacity: 0.95},
 } as const;
+
+/** Her live light in look 'v7' (the people overhaul's her: her own soft modelling, a near-black coat over the light
+ *  column): the same rig as v7a's, her backlit shade a touch lighter (the column and the copper hair keep their read
+ *  inside it; R4 wants her the darkest call against the door, never a black cut-out), the lit opening's wrap and the
+ *  lamps' rim a touch stronger (the story light reaching round her). */
+export const HER_LIGHT_V7 = {
+  sun: {width: 1.7, opacity: 0.7, soft: 0.4},
+  wrap: {width: 1.4, opacity: 0.42},
+  lamps: {width: 1.1, opacity: 0.46},
+  shade: {tint: '#8476B8', opacity: 0.9},
+  shadowBlur: 1.8,
+  shadowShare: 0.5,
+} as const;

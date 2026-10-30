@@ -8,6 +8,8 @@
 //   node scripts/capcheck.mjs S07                         # one scene composition (same sampling, scene-local)
 //   node scripts/capcheck.mjs KitDemo --t0=0 --t1=12 --n=48
 //   node scripts/capcheck.mjs CineDemo --times=5.8,5.9,6.0
+//   node scripts/capcheck.mjs V4Film --times=3.6,24.7 --words --captions=public/v4/captions2.json
+//        # captions2 (src/lib/captions2): every word >= 4.5:1 against the BARE frame ({capcheck: 'bg'}), at scale 1
 // Options: --scale=0.5 (render scale) --thresh=0.05 --keep=<dir> (keep the renders) --verbose --viz=<dir> (band crops
 //          with the failing background pixels in magenta)
 import path from 'node:path';
@@ -27,7 +29,8 @@ const opt = Object.fromEntries(rest.filter((a) => a.startsWith('--')).map((a) =>
   const i = k.indexOf('=');
   return i < 0 ? [k, 'true'] : [k.slice(0, i), k.slice(i + 1)];
 }));
-const scale = Number(opt.scale ?? 0.5);
+const words = opt.words === 'true';
+const scale = Number(opt.scale ?? (words ? 1 : 0.5));
 const fps = 30;
 const per = Number(opt['per-scene'] ?? 4);
 const step = Number(opt.step ?? 2) / fps;
@@ -83,13 +86,13 @@ const render = (dir, extra) =>
     .split('\n')
     .map((l) => l.split(' '));
 console.error(`[capcheck] ${comp}: ${times.length} frames at scale ${scale}`);
-const a = render('frame', []);
+const a = render('frame', words ? ['--props={"capcheck":"bg"}'] : []);
 const b = render('mask', ['--props={"capcheck":"mask"}']);
 const list = a.map(([s, fr, f], i) => `${s} ${fr} ${f} ${b[i][2]}`).join('\n');
 fs.writeFileSync(path.join(tmp, 'list.txt'), list + '\n');
 let code = 0;
 try {
-  execFileSync('python3', [path.join(root, 'scripts/capcheck.py'), path.join(tmp, 'list.txt'), `--scale=${scale}`, `--thresh=${opt.thresh ?? 0.05}`, ...(opt.verbose ? [] : ['--quiet']), ...(opt.viz ? [`--viz=${path.resolve(opt.viz)}`] : [])], {stdio: 'inherit'});
+  execFileSync('python3', [path.join(root, 'scripts/capcheck.py'), path.join(tmp, 'list.txt'), `--scale=${scale}`, `--thresh=${opt.thresh ?? 0.05}`, ...(opt.verbose ? [] : ['--quiet']), ...(opt.viz ? [`--viz=${path.resolve(opt.viz)}`] : []), ...(words ? ['--words', ...(opt.captions ? [`--captions=${path.resolve(opt.captions)}`] : [])] : [])], {stdio: 'inherit'});
 } catch (e) {
   code = e.status ?? 1;
 }

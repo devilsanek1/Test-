@@ -270,8 +270,10 @@ G4 frame), halos as opaque discs, no cast or contact shadow in any kit file, no 
    0.07-0.15 H of the subject; every other light at least a step under the story light (lit panes +6-8 L* over their
    facade, never a saturated yellow; far lamps off or tone-on-tone). Night interior (L*): bulb or screen 95-98 (<= 1 % of
    the frame); pool core 92-94 (4 above any lit surface); pool ring and lamp wash 88-91; ambient wall 80-84 (caption band
-   78+, ink 8:1+); desk 58-62; shade steps; contact strips 45+. Night exterior: lit windows and bulbs 85-92; pools 88-91 on
-   ground snow at 83-85; sky-facing snow caps 87-89, thin, never above the pool core (a sky at ~45 lights them); sky ~45.
+   78+, ink 8:1+); desk 58-62; shade steps; contact strips 45+. Night exterior, the high-key snowy night (video 3's
+   rework): lit windows and bulbs 85-92; pools 88-91 on ground snow at 83-85; sky-facing snow caps 87-89, thin, never
+   above the pool core (a sky at ~45 lights them); sky ~45. A dark-key night (T3, `ORGANIC.md` §8) takes its night
+   values from its film's world bible, inside this section's rules (video 4: `docs/v4/WORLD_BIBLE.md` §2-§3).
    Day: sun 45-65° high, lit tones lean yellow, the sky the lightest field. Dusk: the low sun is the key, a local light
    (a lit door, a lamp, a screen) the story light. Nothing under L* 35 but ink, anchor-dark surfaces and §f.8's dark
    pieces (their shadows take one step below) (owner's pick pending: `ORGANIC.md` §8 D3).
@@ -552,7 +554,10 @@ Measured on the S1 demo (`research/2026-10-27_sky_gradients.md` §5):
    dL* <= ~1.3 by default and deeper (up to ~6 L*) only with `check_banding.py` PASS on a master encode, since deeper
    reads richer but contours after a platform's re-encode (v7 takes sky top B, #afb3d8, L* 75.9 over a field of ~82:
    the owner saw no difference between A and B, so the call was ours, 2026-10-30, by the playbook's "Never ask the
-   owner to choose between options they can't tell apart"), the caption field FLAT through the caption band
+   owner to choose between options they can't tell apart"; a dark key's zenith: video 4's night keeps 5.6 L* under its
+   band, inside the cap, `docs/v4/WORLD_BIBLE.md` §3, while v7a's T3 still went 17 deeper, 60 against 77, with
+   `check_banding.py` PASS on the still and the master encode still due, flagged in
+   `docs/studies/2026-10-28_city_posters/paint_test/NOTES.md` v7a), the caption field FLAT through the caption band
    (dL* <= 1.5 across the caption block, y 317-556: `LAYOUT.md` §1; ink >= 7:1), then lighter through a pale warm light band (the sky's lightest, a step
    over both neighbours) into the warm horizon. The cool-to-warm crossing happens in that light band at C* <= 7, and so
    does the sun's warmth where it meets the mint (a 2-stop sRGB mint -> peach goes through khaki #DCDBC5; a 2-key OKLab

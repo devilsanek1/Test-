@@ -1,0 +1,100 @@
+<title>Ink Line Test</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Gaegu:wght@400;700&display=swap">
+<style>
+/* Layout: one phone-width column; the four frames at phone size first, then the same spots up close, then the pick. */
+:root {
+  --bg: #eef0f4;
+  --card: #f8f9fb;
+  --fg: #1d2132;
+  --muted: #5a6075;
+  --line: #d4d8e2;
+  --accent: #8a4a6a;      /* the plum of treatment B's ink */
+  --accent-soft: #f1e3ea;
+  --hand: 'Gaegu', 'Comic Sans MS', cursive;
+  --ui: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11152a; --card: #181d36; --fg: #ece8e1; --muted: #a3a8c0; --line: #2b3257;
+    --accent: #e3a6c4; --accent-soft: #33283a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11152a; --card: #181d36; --fg: #ece8e1; --muted: #a3a8c0; --line: #2b3257;
+  --accent: #e3a6c4; --accent-soft: #33283a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--ui); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+.wrap { max-width: 720px; margin: 0 auto; display: grid; gap: 30px; }
+header { display: grid; gap: 10px; padding-top: 28px; }
+h1 { font-family: var(--hand); font-weight: 400; font-size: clamp(44px, 12vw, 62px); line-height: 1; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--hand); font-weight: 400; font-size: 30px; line-height: 1.1; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.lede { font-size: 17px; max-width: 62ch; }
+section { display: grid; gap: 12px; }
+.grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+figure { margin: 0; display: grid; gap: 4px; min-width: 0; }
+figure img { display: block; width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); background: var(--card); }
+figcaption { font-size: 13px; color: var(--muted); }
+figcaption b { color: var(--fg); }
+.pick figcaption b, .pick figcaption { color: var(--accent); }
+.pick img { border: 2px solid var(--accent); }
+.sheet { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+.sheet img { display: block; width: 100%; height: auto; }
+.rec { display: grid; gap: 8px; padding: 16px; border-radius: 14px; background: var(--accent-soft); }
+.rec b { color: var(--accent); }
+ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.note { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+@media (max-width: 560px) { .grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Ink Line Test</h1>
+    <p class="lede">A bit of rough ink, kept clean and premium: three line treatments drawn over the painted v7a frame, beside the same frame with no lines. Stills only.</p>
+  </header>
+
+  <section aria-labelledby="phone">
+    <h2 id="phone">At phone size</h2>
+    <div class="grid4">
+      <figure><img src="s/control_v7a_360.jpg" alt="The v7a frame with no lines"><figcaption><b>No lines</b> (today)</figcaption></figure>
+      <figure><img src="s/ink_A_360.jpg" alt="Treatment A: a fine liner in each object's own colour"><figcaption><b>A</b> fine liner</figcaption></figure>
+      <figure class="pick"><img src="s/ink_B_360.jpg" alt="Treatment B: a brush pen in warm plum ink, glazed into the paint"><figcaption><b>B</b> brush pen (my pick)</figcaption></figure>
+      <figure><img src="s/ink_C_360.jpg" alt="Treatment C: sketch ink with light construction marks"><figcaption><b>C</b> sketch ink</figcaption></figure>
+    </div>
+    <p>At this size the change is gentle: A almost disappears, B and C read as ink.</p>
+  </section>
+
+  <section aria-labelledby="close">
+    <h2 id="close">Up close</h2>
+    <div class="grid2">
+      <figure><img src="s/control_v7a_detail.jpg" alt="The doorway, lamps and boat with no lines" loading="lazy"><figcaption><b>No lines</b></figcaption></figure>
+      <figure class="pick"><img src="s/ink_B_detail.jpg" alt="The same spot with B's brush-pen line" loading="lazy"><figcaption><b>B</b> brush pen</figcaption></figure>
+      <figure><img src="s/ink_A_detail.jpg" alt="The same spot with A's fine liner" loading="lazy"><figcaption><b>A</b> fine liner</figcaption></figure>
+      <figure><img src="s/ink_C_detail.jpg" alt="The same spot with C's sketch ink" loading="lazy"><figcaption><b>C</b> sketch ink</figcaption></figure>
+    </div>
+    <p>The full sheet, at 1:1: the doorway, the boat and Pip, the table and chair.</p>
+    <div class="sheet"><img src="s/ink_sheet.jpg" alt="The comparison sheet: phone size on top, three 1:1 crops below, for no lines, A, B and C" loading="lazy"></div>
+  </section>
+
+  <section class="rec" aria-labelledby="pick">
+    <h2 id="pick">My pick: B</h2>
+    <ul>
+      <li><b>One warm plum ink</b>, glazed into the paint, so each line takes the colour of the thing it draws and sits inside the painting.</li>
+      <li><b>The messiness is in how each stroke is drawn</b> (tapered ends, small lifts, corners that just miss), never in more strokes: no doubled lines, no black, nothing over-shooting.</li>
+      <li><b>Thin where the light hits, fuller in shadow</b>, so the line also shows the light.</li>
+      <li>C's construction marks only for the opening, while the first frame draws itself on.</li>
+    </ul>
+    <p>Two calls are yours: <b>A, B or C</b> (or B a little bolder), and whether <b>the person</b> in the frame gets a line too.</p>
+  </section>
+
+  <p class="note">Until you pick, the films keep the clean pen with no outlines. Notes and code: docs/look/ink_test/.</p>
+</div>

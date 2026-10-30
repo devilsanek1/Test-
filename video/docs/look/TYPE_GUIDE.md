@@ -62,11 +62,11 @@ its unit word at 578. All ink in the band stays at y <= 585: the subject's top (
 at 598 sat on the roof in the stills.
 
 **Where words sit, by shot type:**
-- **WIDE and the home view (S1, S7, S12):** the open sky above the subject, in the band. The far city starts just
-  under it, so ink stays at y <= 585.
-- **MEDIUM (S2's end, S4, S8, S11):** the same seats; the subject's top stays at y >= 600 (`LAYOUT.md`), so the words
+- **WIDE and the home view (S1, S7, S11, S12):** the open sky above the subject, in the band. The roofs start just
+  under it (video 4's tops stop at y >= 614), so ink stays at y <= 585.
+- **MEDIUM (S2's end, S4, S8, S9, S10):** the same seats; the subject's top stays at y >= 600 (`LAYOUT.md`), so the words
   read straight above it, close to the eye (F5).
-- **CLOSE (S3, S5, S9, S10):** above the subject's top while the band is clear (video 4's closes are all centred). When
+- **CLOSE (S3, S5):** above the subject's top while the band is clear (video 4's closes are all centred). When
   a later film frames its subject off-centre and the open side is a calm field >= 360 px wide, the group goes BESIDE it:
   its near edge 60-300 px from the silhouette, its baselines at the subject's upper third (y 600-1000), never over it.
 - **EXTREME WIDE, the one big move (S6):** seat C only; one word or one line may stand alone in the big sky.
@@ -125,7 +125,7 @@ Each example uses video 4's real words and times; a frame number is t x 60.
   stepped right; the first two groups only, then R3 for the number.
 - **Sync:** line 1 is on screen at frame 0 (never an empty frame, never a title); line 2 builds on its word; group 2
   pops whole; the hook's number lands per R3.
-- **Video 4:** S1 (0.00-4.28, WIDE, locked: the home view paints itself, the pipe first): **"Did you know"** (778 px,
+- **Video 4:** S1 (0.00-4.28, WIDE, locked: the home view paints itself, the run first): **"Did you know"** (778 px,
   from x 120) at frame 0 · **"Helsinki"** (450 px, line 2 from x 400) pops at 0.600 s (frame 36) · group 2 "wants AI /
   to heat" (511 / 420 px, seat R) 1.067-2.300 s (frames 64-138) · then R3.
 - **Checks:** frame 0 shows "Did you know" (in the voice's order); the payoff ("heat seventy thousand homes") is in
@@ -158,9 +158,10 @@ Each example uses video 4's real words and times; a frame number is t x 60.
   Inside y 292-585 (rows >= 23 px apart). The bloom (8 frames) on the word.
 - **Sync:** row 1 pops on its first word; the landing word on its own word; row 3 on its first word; all leave together
   when the next group pops. The lockup is one group (<= 5 words).
-- **Video 4:** S7 (23.46-25.54, the turn: WIDE, the dive lands on "WANTS" and holds while the pen draws the plan's pipe
-  out toward the computer): **"But Helsinki"** pops at 23.417 s (frame 1405) · **"wants"** at 23.967 s (frame 1438, 2
-  frames before its word) · **"that heat."** at 24.583 s (frame 1475) · all until 25.500 s (frame 1530).
+- **Video 4:** S7 (23.46-25.54, the turn: WIDE, after the film's one plain cut, a small settle in lands on "WANTS" and
+  holds while the plan's stretch is drawn out toward the computer): **"But Helsinki"** pops on the cut at 23.367 s
+  (frame 1402: the group changes within 2 frames of it) · **"wants"** at 24.000 s (frame 1440, 2 frames before its
+  word) · **"that heat."** at 24.583 s (frame 1475) · all until 25.500 s (frame 1530).
 - **Checks:** one landing word on screen; it reads first at a squint; calm and friendly at a glance (never capitals, never
   red or brown); rows never touch (>= 20 px between a row's lowest ink and the next row's highest); >= 4.5:1 (measured
   8.0:1 plum on dusk, 6.0:1 honey on night).
@@ -187,7 +188,8 @@ Each example uses video 4's real words and times; a frame number is t x 60.
   the first line may leave first.
 - **Video 4:** S5 (17.76-19.26, CLOSE: the computer's top in all that steam; a mug pops onto it on "tea"): **"That's a
   lot"** (757 px, from x 110) pops at 17.717 s (frame 1063) · **"of"** at 18.417 (frame 1105) · **"tea."** (190 px,
-  322 px wide, ending near x 890) at 18.583 s (frame 1115), landing with the mug · until 19.217 s (the start of S6's move).
+  322 px wide, ending near x 890) at 18.583 s (frame 1115), landing with the mug · until 19.217 s (when S6's first
+  group pops; S6's move starts at the end of "tea.", 18.84).
 - **Checks:** <= 5 words; row 2's big word never wider than row 1; the phrase stays clear of the mug and its steam curl.
 
 ### R7 · The word placed in the world
@@ -195,13 +197,15 @@ Each example uses video 4's real words and times; a frame number is t x 60.
   moves with it. At most one per film (the visual script's "one word in the picture").
 - **Spec:** the hand's Bold (Gaegu 700), fitted to its object (the figures' ink = the object's width - 44 px; at 122 px
   "2027" is 236 px wide, figures ~72 px tall, on a ~280 x 170 tag, and reads at phone size), tracking 0, in the object's
-  ink (deep plum #3A2B48 on cream paper), straight-on and level on its object (`LAYOUT.md`: words in the world), no halo (the
+  ink (the stills: deep plum #3A2B48 on cream paper; a film keys the paper and its ink to its palette, video 4: W1's
+  deep indigo #1F2B4B on pale lilac-white #D5D6E7, 9.7:1), straight-on and level on its object (`LAYOUT.md`: words in the world), no halo (the
   paper is its ground); on the world layer with the camera's parallax, entering with its object; the captions keep their
   screen seats above it and never say the same words.
-- **Video 4:** S8 (25.54-28.34, MEDIUM: the plan, walls only marked out; the slow push lands on "plan" 26.18): on "next"
-  (27.40, frame 1644) a paper tag swings on, pinned to the plan's front wall on the subject axis below the computer's
-  middle: **"2027"**, until S9's push takes it out of the frame's bottom (by "would", 29.02). The caption above says
-  **"starting / next year."** (R1, seat C, 27.033-28.300 s): the paper says the year, the voice says "next year".
+- **Video 4:** S8 (25.54-28.34, MEDIUM: the plan, walls only marked out; the push lands on "has" 25.80, the walls stand
+  out on "plan" 26.18): on "next" (27.40, frame 1644) a paper tag swings on, pinned to the plan's front wall on the
+  subject axis at the computer's middle: **"2027"**, until S9's dolly takes it out of the frame's bottom (by "how",
+  28.70). The caption above says **"starting / next year."** (R1, seat C, 27.033-28.300 s): the paper says the year,
+  the voice says "next year".
 - **Checks:** the tag's words read at 0.25 scale; nothing passes in front of the tag while it is the beat; it never
   enters the band; the caption and the tag never repeat a word.
 
@@ -222,12 +226,12 @@ Each example uses video 4's real words and times; a frame number is t x 60.
   from x ~110, row 2 from x ~120 (three rows put the key word on the roofline in the stills); then the last group in the hand (Gaegu 300,
   **136 px**: the hook's size, so the film's bookends match), two baselines at seat C, holding 36 frames past the last word, then
   cutting out in 1 frame before the loop's un-draw reaches the band.
-- **Video 4:** S12 (38.48-42.24, WIDE POV: the home view again, your gloved hand and phone at the bottom right; on
+- **Video 4:** S12 (38.48-42.24, WIDE POV: the home view again, your gloved hand and phone at the bottom left; on
   "could" the computer's lights blink back and a pulse of warm water runs home): **"So your chatbot"** pops at 38.433 s
-  (frame 2306) · **"could soon"** at 39.367 (frame 2362) · **"heat"** in the lit hand, honey, at 39.900 s (frame 2394,
+  (frame 2306) · **"could soon"** at 39.367 (frame 2362) · **"heat"** in the lit hand, honey, at 39.933 s (frame 2396,
   2 frames before its word), blooming as the pulse runs under the street · then **"an apartment / in Helsinki."** (136 px) at 40.217 s (frame 2413), held to
   41.92 s (frame 2515).
-- **Checks:** the words stay clear of the phone (bottom right) and the run; "heat" is the only accent on screen.
+- **Checks:** the words stay clear of the phone (bottom left) and the run; "heat" is the only accent on screen.
 
 ### R10 · The cover title
 - **For:** the cover (and the grid): the core line as a title, never over the film's captions.
@@ -361,6 +365,9 @@ placement; never invent a new picture beyond what a note asks. Sizes, seats and 
     (recommended) · C Caveat · D Fraunces italic · `{{BG_NIGHT}}`.
 
 ## i. Changes from the stills (2026-10-30, job 2: looked at on the phone preview and under the UI)
+The bullets before the owner's note (the last) are the brush era, kept as history: the pleasantness pass then retired
+the brush, and §b-§e hold the numbers now (R3 250 px, figures ~130 px, near x 466; R4 at 362 / 482 / 578, the lit word
+160 / 156 px; R7's "2027" at 122 px, figures ~72 px; R10's lit word ~200 px).
 - **The brush's comma** (the orchestrator, after the run): Nanum Brush Script's comma is wide with a long tail, so
   "70,000" read "70 , 000" at a glance; R3 sets a number's comma in the brush at ~0.63 of the figures' size, tucked
   8-14 px from the figures on each side (still 06).

@@ -7,17 +7,21 @@
 //   look 'key'     + step 1: the ONE colour key at the source (palette_v7.ts through lib/tod's map; the v7 painted set:
 //                  T3's sky, the dark cloud, the canal painted on v7's own design frame)
 //   look 'v7a'     + step 2: the story light (the dusk rig, the baked per-plane maps solved against the keyed picture,
-//                  her and Pip's live light): the delivered still
+//                  her and Pip's live light): the first half's still (maps/v7a, maps.ts)
+//   look 'v7'      + step 3 and step 5, the second half (NOTES.md "v7"): the painted pieces in their slots (the quay,
+//                  the facade, the near leaves), her in people direction C with the LASH face, the light solved again
+//                  against them (maps/v7, maps_v7.ts) with the one paper folded into each plane's maps and a grain tile
+//                  locked to her and Pip
 //   parts [...]    the bake's input: only these segments on a black or white slab (no Film, no captions), the movers
 //                  off unless named
 //   design         the canal's design frame for the painter (look 'key' with the vector water, unkeyed: the painter
 //                  repaints the canal from it, v6's C10)
 // Slots for step 3 and step 5 (the second half): `PieceSlot` names where each organic piece goes (the cloud planes,
-// the far city, the facade, the water, the paving, the kept prop), empty until the painter v7 writes them.
+// the far city, the facade, the water, the paving, the kept prop); they draw only in look 'v7' (./pieces.tsx).
 import React, {createContext, useContext} from 'react';
 import {LightMaps, type LightMapSpec} from '../../lib/light2';
 
-export type LookName = 'cut' | 'key' | 'v7a';
+export type LookName = 'cut' | 'key' | 'v7a' | 'v7';
 /** The light slots, in drawing order (their plane in S1_PLANE; the bake writes maps per slot). */
 export const SLOTS = ['sky', 'farroofs', 'fartower', 'bridge', 'water', 'subject', 'boats', 'bank', 'near'] as const;
 export type SlotName = (typeof SLOTS)[number];
@@ -40,6 +44,8 @@ export type LiveInputs = {
   pool?: LightMapSpec;
   /** The lit opening blurred, in the door light's colour (her wrap's light). */
   doorBlur?: {src: string; box: readonly [number, number, number, number]};
+  /** Step 5: the paper's tile (mid-grey + the frame's grain), soft-light, locked to each mover (lib/light2 GrainOn). */
+  grain?: {src: string; size: number};
 };
 export type MapSet = {slots: SlotMaps; live: LiveInputs};
 
@@ -60,10 +66,14 @@ const EMPTY: MapSet = {slots: {}, live: {}};
 const Ctx = createContext<V7CtxV>({look: 'v7a', parts: null, movers: true, design: false, marker: false, maps: EMPTY});
 export const V7CtxProvider: React.FC<{value: V7CtxV; children?: React.ReactNode}> = ({value, children}) => <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 export const useV7 = () => useContext(Ctx);
-/** Step 1 (the key) in force (looks 'key' and 'v7a'). */
+/** Step 1 (the key) in force (looks 'key', 'v7a' and 'v7'). */
 export const useKeyed = () => useContext(Ctx).look !== 'cut';
+/** Is a look lit (step 2 in force: 'v7a' and 'v7')? */
+export const litLook = (look: LookName) => look === 'v7a' || look === 'v7';
 /** Step 2 (the light) in force. */
-export const useLit = () => useContext(Ctx).look === 'v7a';
+export const useLit = () => litLook(useContext(Ctx).look);
+/** Steps 3 and 5 in force (look 'v7': the painted pieces, her in direction C, the paper). */
+export const useSecondHalf = () => useContext(Ctx).look === 'v7';
 
 /** Is this segment drawn here? */
 export function useSegOn(name: SegName): boolean {
@@ -71,15 +81,16 @@ export function useSegOn(name: SegName): boolean {
   if (c.parts) return c.parts.includes(name);
   if (MASK_ONLY.includes(name)) return false;
   if (MOVERS.includes(name)) return c.movers;
-  if (name === 'wingshades') return c.look !== 'v7a';
+  if (name === 'wingshades') return !litLook(c.look);
   return true;
 }
 
 export const Seg: React.FC<{name: SegName; children?: React.ReactNode}> = ({name, children}) => (useSegOn(name) ? <>{children}</> : null);
 
-/** A slot: this plane's baked maps (look 'v7a' only, never in parts renders). INSIDE the plane's float group. */
+/** A slot: this plane's baked maps (the lit looks 'v7a' and 'v7', each its own map set; never in parts renders). INSIDE
+ *  the plane's float group. */
 export const Slot: React.FC<{name: SlotName}> = ({name}) => {
   const c = useContext(Ctx);
-  if (c.parts || c.look !== 'v7a') return null;
+  if (c.parts || !litLook(c.look)) return null;
   return <LightMaps maps={c.maps.slots[name]} label={name} />;
 };

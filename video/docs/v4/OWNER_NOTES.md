@@ -319,3 +319,111 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   -> the people in use for now: hair v4 + the redrawn faces with open eyes + the rebuilt bodies (PEOPLE_DESIGN status
   block; the playbook); the rough spots stay on the list for later; video 4's person near the camera (S1, S11, S12)
   is drawn with them. -> rule: playbook, Visual style (the people in use for now).
+- 2026-10-30 ~20:50 UTC, to the study session: "Make sure to commit all your changes so that we can start working on
+  production video 4 in parallel while you are showing the results" -> everything committed and merged both ways: video
+  4's branch, the study branch and video-production carry one state (HANDOFF 2e; the composition library, SOUND_SYNC,
+  the Helsinki composition pass draft, the people overhaul in use); production of video 4 continues in parallel with
+  the study's results.
+
+## 2026-10-30: production starts
+- 2026-10-30 ~20:35 UTC: "Okay I think we have everything we need to actually start production of the video 4 / I think we
+  have a voice sound , visual script, we have made a collection and a guideline on the composition of scenes and
+  transitions, we made a lot of guidelines and recipes on visual part and style, etc / Go ahead and start working on the
+  video 4, make sure to refresh the repo to take the latest context and the guidelines and recipes and references / Make
+  sure to parallelize the work between subagents and subthreads if you need / Make sure to give me periodic updates with
+  what's been cooked - visuals, videos if done" -> video-production merged in (the composition library, sound sync, painter
+  v7, the Helsinki pass draft); phase A in two parallel workflows (the visual script v3 lock with the folds and the
+  delegated calls + the camera plan; the W1 world bible; the G3 kit with the tier-1 deltas; the production captions);
+  then G3. Periodic updates with visuals and videos as they land.
+- 2026-10-30 ~21:00 UTC: "Give me here the recipes and guides you are going to be using - like the brand new ones I like
+  how they visually structured" -> the list in chat (words, composition, sound, look, people, flow and the animatic);
+  then "Yeah if they are saved as visuals only do not recreate it if they don't snd instead continue with video 4" ->
+  one page from the existing sheets only, nothing redrawn: https://claude.ai/artifact/AUT5fiRBdwhk8RzV6QxLz3; video 4's
+  production continues.
+- 2026-10-30 ~21:45 UTC, on the colour script strip: "I mean I am loooing at this oicture and each house is so alone like
+  the scene is empty / I mean is there any step that will make it coherent?" -> true of the plan, not only the strip:
+  the world bible's home view left ~45-50 % sky and ~35 % open snow, a thin belt of lone blocks. The world plan is
+  revised to a full neighbourhood (blocks shoulder to shoulder, layered rows and rooftops, the street's things, lit
+  homes everywhere; the computer and the plan site inside the city), the colour script redrawn, and the G3 density pass
+  fills the lanes' sets from it. -> rule: playbook, Visual style (a place, never buildings standing alone).
+- 2026-10-30 ~21:52 UTC, with a frame of video 1 ("Governments all over Europe just shut down": classical government
+  buildings with browser-window panes, a power-button sun, crowds with phones, Pip on a post;
+  `context/uploads/2026-10-30_v1_governments_frame.png`, history only): "One thing I'm wondering is our first video / Like it had so many details and
+  so coherent and so imaginative / Like I didn't give pretty much any visual instructions Claude just made this all up
+  in bisucally one shot / How did we get to this ?" -> the answer from v1's own brief and scene notes: one proven
+  reference style measured to the pixel (a loose architectural ink sketch, where detail is cheap and forgiving), the
+  bar "every frame should be worth pausing on", readable imaginative ideas from the script, each scene built whole by
+  one builder with many props; since then the look moved to clean, then no outlines, then painted (harder to make
+  dense), restraint rules piled up and the process fragmented. Proposed for v4: v1's bar at the top, one readable
+  imaginative idea per beat, density planned from the world bible (running), key frames painted whole before the
+  build; asked the owner whether fine ink line work may come back for detail. -> rule: playbook, Visual style (v1's
+  frame named as the bar for detail, coherence and imagination).
+- 2026-10-30 ~21:57 UTC: "how do we adjust our overal process, i want to make it more loose, more imaginative. i like the
+  main important rule is every frame is worth pausing on yes + readable imaginative ideas + frames planned and created
+  whole. We shouldn't be in a situation where we have our video and then we just fill up space for the sake of density
+  this is wrong we need to be imaginative and plan the whole frame from the get go" -> the four G3 board lanes (sparse
+  frames from the camera plan) and the density revision (a fill brief for the assembly) STOPPED; their files kept as
+  reference for the camera and the timing. The process changed (playbook THE THREE RULES; PIPELINE_V2's new loop):
+  ideas, then key frames designed whole, then the animatic plays the key frames. Video 4 restarts from an ideas round.
+  Then, on the line question: "so i like a bit of rougher ink style but our video 1 was too rough not looking clean or
+  premium. If you can come up with a clean way to incorporate a bit of messiness in the lines combined with all the
+  painting and styles and texture we added with it looking coherent - sure lets try" -> an ink-line look iteration
+  (stills) beside the ideas round. -> rules: playbook THE THREE RULES ABOVE ALL; Visual style (ink lines, a bit rough
+  but clean, to try).
+- 2026-10-30 ~22:03 UTC: "so how are visual script and ideas and key frames generation fit together? wouldn't the visual
+  script restrict the steps 3 and 4?" -> yes: v4's visual script v3 (written before any ideas) fixed the pictures, the
+  staging and the camera, and the ideas brief had called its 12 shots and camera fixed. The ideas round was STOPPED and
+  relaunched free: fixed are only the voice (words, times), the facts and the card's story-level choices; v3's pictures
+  are one candidate. The order now: beats -> ideas -> key frames made whole -> the shot plan (the visual script written
+  FROM the key frames) -> the animatic. -> rules: PIPELINE_V2 "THE LOOP NOW"; playbook, Storyboard (G3) and flow.
+- 2026-10-30 ~22:06 UTC: "are the composition recommendation included in here? Are the stylistic recipes included here?
+  is it completley free flowing or what we've done previously in terms of building up the visual recipes would be
+  included?" -> not enough: the relaunched brief named only the people and the type. The ideas round was stopped and
+  relaunched once more with the toolbox: the composition library (the grammar in every frame, one lead device per
+  frame by its code), LAYOUT's bands, DIRECTION, COZY_AND_SCALE, LIFE_AND_DENSITY; the look recipes named for the key
+  frames. -> rules: playbook THE THREE RULES (imagination first, inside the toolbox); PIPELINE_V2 THE LOOP NOW.
+- 2026-10-30 ~22:10 UTC: "okay im tired of pointing every single piece im sure we missed some more / so how do we make sure
+  that our toolbox carry but imagination and full scene planning is done completely - like one example here is
+  composition ... not the concrete steps "PUT A BUILDING HERE", but more abstarct like "layers and feel of distance" and
+  the feel of distance is achieved with a "visual" tool of layers. Are you able to analyze and see how we can rework our
+  process to get to this stage" -> workflow `process-design-language`: an audit of every guide (intents, tools,
+  prescriptions, checks; the gaps), research on pro art direction (Block's visual components, Bacher, Mateu-Mestre,
+  colour scripts, art bibles), then `docs/look/DESIGN_LANGUAGE.md` (the toolbox as feelings -> tools -> labelled examples
+  -> checks), `docs/look/FRAME_CARD.md` (every aspect of a frame as a question) and `docs/process/REWORK.md`. -> rule:
+  playbook THE THREE RULES (the toolbox as feelings and tools, never placements; one card per frame).
+- 2026-10-30 ~22:12 UTC: "make sure we have the loops setup correctly where the agents bulid the proposed scenes and we
+  evaluate and perhaps adjust it if its almost there or rework completely if it doesn't achieve the feeling we need - is
+  that something you would already do or we should explicitly setup?" -> it existed only in part (production critics
+  judged checklists; iterations had no review; the orchestrator's look was ad hoc), so it is set up explicitly: THE
+  FRAME LOOP (build -> a fresh evaluator judges the feeling first -> THERE / ALMOST: adjust, at most 2 rounds / NOT
+  THERE: rework from the idea, at most once), encoded in every workflow from the key frames on. -> rules: playbook THE
+  THREE RULES (the frame loop); PIPELINE_V2 "THE FRAME LOOP"; the two-modes rule (iterations keep one evaluator round).
+- 2026-10-30 ~22:15 UTC: "another possible problem is if every agent bulid a scene in isolation, the whole thing comes up
+  like a complete mess of hudge pudge ideas - is that a risk here? Anything in the process that ensures this doesn't
+  happen and the whole video and the narrative idea is clear?" -> yes (v3 failed this way); set up explicitly: one film
+  concept above the beats, sequences picked whole (the running ideas round already gives two whole sequences, A and B:
+  one becomes the base), one art director holding the vision, one shared world kit, every frame evaluated in the board
+  and a board read after each round, lanes by sequence. -> rules: playbook THE THREE RULES (one film, never a
+  hodge-podge); PIPELINE_V2 "ONE FILM, NEVER A HODGE-PODGE".
+- 2026-10-30 ~22:20 UTC: "don't reference video 1 - i think this would put agents in a box again" -> video 1 (its frame
+  and its ideas) is out of every brief, rule and guide the agents read: the playbook (the three rules, the frame loop,
+  the fullness bar, the scale and metaphor lines), PIPELINE_V2 (one film, the frame loop), DIRECTION's intro (a v1
+  number left in an older guide is a measurement, never a picture to look at), LIFE_AND_DENSITY, CINEMATIC_GUIDE (its
+  shot types are recipes, never upgrades of v1 shots), the ideas brief and the process brief; the frame moved to
+  `context/uploads/` (history); the ideas round relaunched without it. This supersedes the 21:52 line's "v1's bar at
+  the top". -> rule: playbook THE THREE RULES (no past film as the bar or the example).
+- 2026-10-30 ~22:20 UTC: "what would ultimately ensure that the world is build rich, visaully and aestethically
+  pleasing?" -> answered and set up: the world designed first from real photos of the real place (Helsinki's harbour
+  streets in winter; a real data hall, real pipes), its pieces built once at finished quality (the world kit); the hero
+  frame painted to full finish first and approved by the owner as the film's own bar; rich = specific, layered, alive
+  (three scales of detail, each detail about this place or this story); pleasing judged as a painter judges (values,
+  colour harmony, shape rhythm, edges, the finish), an ALMOST answered with a paint-over; the owner's eye on the hero
+  frame and on the board. -> rules: playbook THE THREE RULES (a rich, beautiful world); PIPELINE_V2 "A RICH, BEAUTIFUL
+  WORLD".
+- 2026-10-30 ~22:40 UTC, after the ink-line test page (https://claude.ai/artifact/NVsh6GUY5NoyGwLY4yJ7QF; the pick B, the
+  brush pen): "lets build without ink first and then we will test the final product with ink if its makes it any better"
+  -> video 4 is built with NO ink (the clean pen, no outlines); after the final cut, B is laid over it and the two cuts
+  are shown side by side; the owner decides. -> rules: playbook, Visual style (INK LINES: tested on the finished film);
+  PIPELINE_V2 THE LOOP NOW step 8.
+- 2026-10-30 ~22:45 UTC: "we are about to hit 5hour limit - don't lose anything" -> everything committed and pushed; the
+  running rounds' state and how to resume them written to `context/RESUME_2026-10-30.md` (and HANDOFF's top points to it).

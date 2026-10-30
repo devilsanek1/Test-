@@ -20,13 +20,17 @@ key here"; "our look is evolving - we are finding out style i don't think we can
    two look docs, each wins on its own topic (`LAYOUT.md` where things sit in the frame: the zones, each shot type's
    framing, the cover; `STORYBOARD_STYLE.md` the board's drawing, `CINEMATIC_GUIDE.md` shot recipes and camera moves,
    `COZY_AND_SCALE.md` cozy framing, `LIFE_AND_DENSITY.md` fullness and life, `PALETTE.md` colour, `SOUND_SYNC.md`
-   which sound lands on which picture, when and how often), and a measured
+   which sound lands on which picture, when and how often, `COMPOSITION_SHOTS.md` the shot library: which frame, move
+   and join a shot uses, ranked, with the guidelines), and a measured
    number beats a proposal.
 3. **Beside the ladder, each on its own topic and under the owner's words:** `docs/CREATIVE_BRIEF.md` (the channel,
    story selection, writing; the playbook's later rules win where they differ, as its banner lists), `docs/ELEVENLABS.md`
    with `docs/voice/` (the narration), `docs/POSTING_KIT.md` (posting). `CLAUDE.md` and `HANDOFF.md` summarise and map
    these: a clash there is a stale summary.
 A clash is a bug: fix the lower doc in the same turn.
+**Never a past film as the bar or the example** (owner, 2026-10-30, the playbook's THE THREE RULES: "don't reference
+video 1 - i think this would put agents in a box again"): where a guide still names v1 (or another film of ours), it is
+a measured number, never a picture to look at, copy or upgrade.
 
 **The city-poster study (owner, 2026-10-28; done 2026-10-29):** the owner likes the style of seven illustrated city
 posters (`docs/look/poster_refs/`) and wants to experiment with it, starting from v2's look ("i really like the style

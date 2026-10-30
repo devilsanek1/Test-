@@ -381,7 +381,8 @@ size decides. Sources: `shapes.md` §3 and §6, `techniques.md` §3.6 and §6, `
   % in two).
 - **R11 The hot accent only at the focal;** everything else tone-on-tone in its mass (dE <= 6-8); a lit window off the
   beat +6-8 L* inside its facade.
-- **R12 Pip** hides inside a mass of the busy belt, tone-on-tone, >= 250 px from the focal, never between the words and
+- **R12 Pip** hides inside a mass of the busy belt, tone-on-tone with the seat it sits in (its own hue still dE76 >= 20
+  off the field behind it: `LIFE_AND_DENSITY.md` §5's one rule), >= 250 px from the focal, never between the words and
   the focal or on a leading line into it (v6's post under the door sits on the door's light column).
 - **The focal moves only with the story:** the value plan prepares the next subject a step under the current one (W's
   pane under the door), and the old focal calms as the new one lights.

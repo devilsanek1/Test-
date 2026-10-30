@@ -5,7 +5,10 @@
 //   look 'key'   + step 1: the ONE colour key at the source (T3's sky and cloud from the painter, the world through
 //                palette_v7's map, the lobby the one hot accent)
 //   look 'v7a'   + step 2: the story light (T3's low key: the backlit facade and our bank in deep shade masses with named
-//                casters, the dusk water, the lit doorway the one place to look): the delivered still
+//                casters, the dusk water, the lit doorway the one place to look): the first half's still
+//   look 'v7'    + steps 3 and 5, the second half (NOTES.md "v7"): the painted quay, facade and near leaves in their slots,
+//                her as the people overhaul draws her (people_v4 + hair_v4, open eyes), the light solved again against
+//                them (maps/v7, maps_v7.ts), the paper in every plane's maps and on the movers: the delivered still
 // The bake's inputs: `parts` (named segments alone on the `slab` colour, no Film, no captions), `movers` (her, Pip, the
 // particles), `design` (the canal's design frame for the painter: the vector water, unkeyed, no painted water).
 import React from 'react';
@@ -25,6 +28,7 @@ import {V7Scene} from './V7Scene';
 import {ACCENT_V7, V7_BG} from './palette_v7';
 import {PAINT_V6_CUT, PAINT_V7} from './paint_set';
 import {MAPS} from './maps';
+import {MAPS_V7} from './maps_v7';
 
 export const V7_S1_FPS = POSTER_S1_FPS;
 export const V7_S1_FRAMES = POSTER_S1_FRAMES;
@@ -70,7 +74,7 @@ export const V7S1: React.FC<V7S1Props> = ({look = 'v7a', captions = true, parts,
     <PaintProvider on set={set} only={design ? DESIGN_PIECES : undefined}>
       <V6Provider on>
         <PosterSwitchProvider value={sw}>
-          <V7CtxProvider value={{look: design ? 'key' : look, parts: parts ?? null, movers, design, marker, maps: MAPS}}>
+          <V7CtxProvider value={{look: design ? 'key' : look, parts: parts ?? null, movers, design, marker, maps: look === 'v7' ? MAPS_V7 : MAPS}}>
             {parts ? (
               <AbsoluteFill>
                 <V7Scene slab={slab ?? '#000000'} />

@@ -1,5 +1,8 @@
 # HANDOFF: start here if you are a new agent picking up this project
 
+> **NEWEST, 2026-10-30 ~22:45 UTC (video 4, Helsinki heat, under the new loop): read `context/RESUME_2026-10-30.md`
+> first**: what the owner decided today, the two rounds that were running and how to resume them, and what is next.
+
 > **Status 2026-10-28 19:55 UTC (video 2, "One Small Window"):** the G7 master v1 (`video/deliverables/v2/v2r_G7_master_v1.mp4`), the
 > cover and `video/docs/v2/POSTING_KIT.md` are done and with the owner; the week's budget is at ~97 %. The story of how it got here:
 > `video/docs/v2/PROGRESS.md` (newest first), the owner's notes `video/docs/v2/OWNER_NOTES.md`, open items `video/docs/v2/ASSEMBLY_TODO.md`.
@@ -234,6 +237,17 @@ Everything that agent knew is in this repo. This file is the map; the details li
   open eyes? Then PEOPLE_DESIGN gets the picked system. **Picked (2026-10-30):** hair v4 kept, open eyes, the bodies
   round kept ("let's go with that for now"): PEOPLE_DESIGN's status block names the code; wiring it into the film
   engine is the tooling lane's, before v4's G3 draws its person.
+- **2026-10-30 ~20:55 UTC: one state for video 4's production** (owner: "Make sure to commit all your changes so that we
+  can start working on production video 4 in parallel while you are showing the results"). The study session merged
+  video 4's branch with its own work; `claude/kind-pascal-lvgsza`, `claude/compassionate-hopper-5iqguj` and
+  `video-production` carry the same docs (typecheck clean). What video 4's G3 picks up from the study:
+  the ranked composition library `video/docs/look/COMPOSITION_SHOTS.md` (Part 0 tiers, 0b guidelines and the motion and
+  transition grammar; its critic's fix pass still runs, so re-pull before G3 locks); `video/docs/look/SOUND_SYNC.md`
+  (the sync plan written at G1/G2, played at G3; wired into PIPELINE_V2 and the gates); the Helsinki
+  composition-and-motion pass `video/docs/v4/visual/COMPOSITION_PASS.md` (a FIRST DRAFT: its critic and fix pass run in
+  the study session and land on this branch); `STYLE_ADJUSTMENTS.md`; the look's first integrated still (painter v7,
+  scene 1 of the Google film: `video/docs/studies/2026-10-28_city_posters/paint_test/`, v7a done, v7 running), which
+  sets G4's look; the dark key is T3 (ORGANIC.md §8 end, decided under the owner's hand-over).
 
 ### Earlier: video 5 as the heat story
 - **Video 5 is produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt since 2026-10-29 ~07:55 UTC**
