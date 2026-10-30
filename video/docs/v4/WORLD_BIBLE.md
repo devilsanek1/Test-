@@ -572,7 +572,7 @@ Never two A calls of equal weight at once: the focal moves only with the story, 
   decided; CRAFT's pending note still stands).
 - The dark share: ~60-70 % of a home-view frame under L* 40 (T3's scene-1 target 45 %; ref 02 83 %): a night.
 
-**Flags for the orchestrator (not edited here):**
+**Flags for the orchestrator (not edited here; answered 2026-10-30 in `production/RECONCILE.md`):**
 - **CRAFT §d.2's night-exterior numbers** (lit windows 85-92, ground snow 83-85, sky ~45) are v3's high-key snowy night (the
   video-3 rework); they predate T3 and the type guide's night band (31). This film's night is §2-§3 here; CRAFT could mark
   that row as the high-key night.

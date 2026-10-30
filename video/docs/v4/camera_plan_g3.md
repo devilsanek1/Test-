@@ -18,10 +18,12 @@ px/f, big simple masses and leaving edges may pass faster (a WARN, settled at th
 
 ## 1. The one camera and the home view in numbers
 
-**The camera (W1 §1.0, kept):** a standing eye, ~1.6 m, at the street's near edge, level; horizon **y 1170**, one-point,
-VP (540, 1170); focal ~1160 px, so a thing H m tall at d m is 1160·H/d px, its foot at y 1170 + 1856/d. One camera per set
+**The camera (W1 §1.0, kept):** a standing eye, ~1.6 m, at the street's near edge, level; horizon **y 1150**, one-point,
+VP (540, 1150); focal ~1160 px, so a thing H m tall at d m is 1160·H/d px, its foot at y 1150 + 1856/d. One camera per set
 (setup A): every home-place shot keeps this height and horizon; only S6 leaves it (inside its hand-off, where nothing
-reads). Flag: y 1170 is 0.61 H, 18 px under `LAYOUT.md` §2's street range (to y 1152); y 1150 would meet both (W1's call).
+reads). W1 made the call (§7 call 6): y 1150, 0.60 H, meets `LAYOUT.md` §2's street range (to y 1152) and setup A (from
+y 1150); this plan's other px were laid on y 1170 (2026-10-30 reconcile: only the horizon changed here), so its 1x
+positions sit about 20 px under W1 §1.0-§1.1's: G3's thumbnails (step 3) move them, as the status line says.
 
 **One fix to the composition pass and to W1 (the computer's place):** the closes need the computer's top >= 650 px wide
 (N9) after two pushes of at most 2x (S1 -> S2 1.56x, S2 -> S3 2x), so the home view's computer must be >= ~210 px wide.
@@ -435,7 +437,7 @@ events (S1's window and its wave, S8's walls, S12's warm step). Neighbours diffe
 
 - **Per panel:** `device` and `carrier` as §2 (RJ4/C x10, RJ2/F at S6 -> S7, RJ3/B the loop); the camera's five values as
   §3; `tier` on every element as §3's tier maps; `rig: 'H'` on every home-place panel, `'P'` on S6; `planes` and `vp:
-  [540, 1170]` from W1 §1.0 (the closes' horizon under the frame's foot, the VP kept); `life:` as §3, each with one
+  [540, 1150]` from W1 §1.0 (the closes' horizon under the frame's foot, the VP kept); `life:` as §3, each with one
   placeholder element; `promise` as §3; 2-3 ambient loops per set panel from the kit (snow, steam, a window light, a
   cloud's drift).
 - **The density key:** the home view (S1's landed frame) fully dressed in scribble at its tiers (W1 §1.1's list), approved
