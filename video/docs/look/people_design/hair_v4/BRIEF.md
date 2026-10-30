@@ -45,3 +45,16 @@ must reach that level of appeal in our own clean style; the assembled stills put
 orchestrator judges them side by side before the owner sees anything. (Her face there has open eyes looking away; our
 faces keep the closed-eye LASH unless the owner says otherwise: show one "open eyes, looking away, never at us" variant
 of her head beside LASH in the final stills so the owner can choose.)
+
+## READ FIRST, assembler: the orchestrator's evaluation (2026-10-30 ~18:30 UTC)
+The owner: "compare it overall and evaluate what makes the left to be modern and natural and appealing and right us
+absolute garbage / I think we do need to combine it with the faces research". The evaluation:
+`../EVALUATION.md` (ref 03 beside our v3; measured). Its root cause: the faceless flat "corporate" figure family reads
+cheap and dated; the reference is today's stylised 2D animation (a face, built in 3D, lit). When you assemble, apply
+its eight changes on top of what the hair and face agents built: faces with features as an option shown beside LASH
+(eyes looking away, never at the camera; brows; a small nose; a mouth as a tone; the ear in place); the head turned in
+space; one key light with soft gradients and a RIM light on the hair and shoulders; a value plan (the hair frames the
+face; the face >= 25 L* from the ground; no pale-on-pale: put the figures on a mid or dark ground or the dusk/night
+plates); hair with volume, gloss and a few flow lines; thin accents only where forms overlap; a slender tapered neck,
+sloping shoulders, a turned and tilted head; a harmonious palette with a real value range. Put ref 03 beside our bob
+and ref 05 beside her profile in the final stills.
