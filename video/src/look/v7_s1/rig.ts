@@ -27,7 +27,7 @@ export const HER_LIGHT = {
   sun: {width: 1.7, opacity: 0.66, soft: 0.4},
   wrap: {width: 1.3, opacity: 0.34},
   lamps: {width: 1.1, opacity: 0.42},
-  shade: {tint: '#8E80BE', opacity: 0.94},
+  shade: {tint: '#7A6CB0', opacity: 0.96},
   shadowBlur: 1.8,
   shadowShare: 0.5,
 } as const;

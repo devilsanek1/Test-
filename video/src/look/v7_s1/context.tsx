@@ -83,9 +83,3 @@ export const Slot: React.FC<{name: SlotName}> = ({name}) => {
   if (c.parts || c.look !== 'v7a') return null;
   return <LightMaps maps={c.maps.slots[name]} label={name} />;
 };
-
-/** STEP 3's slots (the second half: ORGANIC.md §6 step 3, the organic shapes and brushwork through MyPaint): where each
- *  piece goes, inside its plane's group, over the shapes it repaints and under the light slot that lights it. Empty
- *  now: the next agent's painter writes `src/look/v7_s1/paint/<name>.v7paint.png` + its manifest and fills PIECES in
- *  ./pieces.ts (see NOTES.md v7a "Handoff"). */
-export type PieceName = 'clouds' | 'farcity' | 'facade' | 'water' | 'paving' | 'prop';

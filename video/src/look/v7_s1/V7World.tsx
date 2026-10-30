@@ -29,6 +29,7 @@ import {BANDS, Coping, StoneBand, edgePath} from '../paint_s1/V2S1_steps_stone';
 import {accentV7, identityV7} from './palette_v7';
 import {Seg, Slot, useKeyed, useV7} from './context';
 import {V7Boat, V7NearProps} from './V7Props';
+import {PieceSlot} from './pieces';
 
 export type V7WorldProps = {
   /** Her (and her live light) in the subject plane's towpath slot. */
@@ -48,6 +49,7 @@ const SkyThings: React.FC = () => (
     <PaintedGroup group="clouds">
       <PaintedLayer piece={'cloud'} />
     </PaintedGroup>
+    <PieceSlot name="clouds" />
   </S1Plane>
 );
 
@@ -99,6 +101,9 @@ export const V7World: React.FC<V7WorldProps> = ({towpath, pip}) => (
       <Slot name="sky" />
       <Seg name="westgap">
         <S1WestGap />
+        <S1Plane plane={S1_PLANE.farTower} texture={false}>
+          <PieceSlot name="farcity" />
+        </S1Plane>
       </Seg>
       {/* mask-only (the bake's split of the west gap): the far roofs and the calm tower alone */}
       <Seg name="farroofs">
@@ -132,6 +137,7 @@ export const V7World: React.FC<V7WorldProps> = ({towpath, pip}) => (
       <S1Plane plane={S1_PLANE.water} over={<Slot name="water" />}>
         <Seg name="water">
           <Canal />
+          <PieceSlot name="water" />
         </Seg>
       </S1Plane>
     </Env>
@@ -149,6 +155,9 @@ export const V7World: React.FC<V7WorldProps> = ({towpath, pip}) => (
               </Seg>
               <Seg name="lobby">
                 <Lobby />
+              </Seg>
+              <Seg name="wing">
+                <PieceSlot name="facade" />
               </Seg>
               <Seg name="doorleaves">
                 <S1DoorLeaves />
@@ -244,11 +253,13 @@ export const V7Steps: React.FC = () => (
             <Shade d={edgePath(b.k)} at={floodAt(540, b.y0)} />
           </React.Fragment>
         ))}
+        <PieceSlot name="paving" />
       </Seg>
     </S1Plane>
     <S1Plane plane={S1_PLANE.near} over={<Slot name="near" />}>
       <Seg name="near">
         <V7NearProps />
+        <PieceSlot name="prop" />
       </Seg>
     </S1Plane>
   </>

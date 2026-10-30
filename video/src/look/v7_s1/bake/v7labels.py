@@ -58,7 +58,8 @@ def labels(parts_dir, A, base):
     opening = inR(OPENING) | (vis['lobby'] > 0.5)
     frame = inR(DOOR_FRAME) & ~opening & (Ls < 32)
     fascia = inR(FASCIA) & (Ls > 80)
-    win_W = inR(W_RECT)
+    # W's dark pane only (its limestone frame is the wall's): the plum glass and its dim room, under L* 45 as keyed
+    win_W = inR(W_RECT) & (Ls < 45)
     litwin = lit_panes(parts_dir, vis['wing']) & ~win_W & ~inR(DOOR_FRAME)
     planting = (yy < 660) & (((a < -4) & (b > 3)) | ((a > 8) & (b > 6) & (Ls < 62)))
     # the glass: the keyed slate-violet (cool: b* under -3) and its sky reflections, outside the lights

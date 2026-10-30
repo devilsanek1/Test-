@@ -23,7 +23,8 @@ import {neverBand} from '../../lib/water';
 import {tierFill} from '../../lib/pen';
 import {CM_V2} from '../paint_s1/palette_10b';
 import {DARK, forTier} from '../paint_s1/darks';
-import {S1_IRON} from '../paint_s1/V2S1_set_core';
+/** S1's lamp-post iron (paint_s1 V2S1_set_core S1_IRON: kept as its hex so this module stays pure data). */
+const S1_IRON = '#939AAD';
 
 const hx = (L: number, C: number, h: number) => fromLch(L, C, h);
 
@@ -37,7 +38,7 @@ export const V7_BG = '#CBB8CD';
 export const V7_ROLES: Readonly<Record<string, string>> = {
   // ---- the cools, turned to the family's violet end with their chroma kept (C* >= 8 as shown)
   [CM_V2.glass]: hx(86, 11, 296), // the wing's glass: a pale slate-violet (the proof's #A6A5AC at C* 4 read grey)
-  [CM_V2.skyHigh]: hx(89, 9, 302), // the glass's sky reflection, the lanterns' highlight
+  [CM_V2.skyHigh]: hx(89, 11, 302), // the glass's sky reflection, the lanterns' highlight
   [CM_V2.sky]: V7_BG, // the vector sky (behind the painted one) and anything drawn in the sky's colour
   [CM_V2.bandDusk]: hx(81, 11, 302),
   [CM_V2.water]: hx(72, 16, 296), // the vector canal (the painted canal covers it in the picture)
@@ -48,12 +49,16 @@ export const V7_ROLES: Readonly<Record<string, string>> = {
   [S1_IRON]: hx(60, 12, 294), // the lamp posts' iron (S1_IRON #939AAD: C* 9 h 275)
   '#868FA4': hx(58, 12, 292), // the wing's glass foot band
   // ---- the lights: the lit panes calm into the facade's mass (R11), never a saturated yellow
-  [CM_V2.lamp]: hx(80, 19, 72), // a quiet warm cream (v6's #F7CF86: C* 41, the colour formula's #1 call)
+  [CM_V2.lamp]: hx(80, 23, 70), // a quiet warm cream, C* ~19 as shown (v6's #F7CF86: C* 41, the colour formula's #1
+  //                                 call; under C* 18 it would fall in the beige band)
   [CM_V2.lampCore]: hx(88, 13, 76),
   // ---- the warm confetti a little calmer, out of the beige band
   [CM_V2.coatMustard]: hx(70, 28, 68),
   [CM_V2.leafGold]: hx(71, 32, 70),
-  [CM_V2.coatOat]: hx(84, 19, 62),
+  [CM_V2.coatOat]: hx(84, 23, 58),
+  // ---- the light stones a touch richer (as shown: C* >= 8, out of the beige band under L* 86)
+  [CM_V2.paving]: hx(87, 17, 52),
+  [CM_V2.limestone]: hx(90, 11, 76),
   // ---- the living greens: ONE family (the roof planting, the lobby's plant)
   [CM_V2.sage]: hx(74, 15, 146),
 };
@@ -61,8 +66,9 @@ export const V7_ROLES: Readonly<Record<string, string>> = {
 /** THE ONE HOT ACCENT: the lobby's light (the story light's source; the playbook's "one hot accent", R11): its warm
  *  wall and its back wall. Drawn by the scene through `accentV7` (the lobby's own map), never anywhere else. */
 export const ACCENT_V7 = {
-  lamp: hx(85, 50, 74), // the lobby's warm wall: apricot gold (C* 50; h 74 keeps it off the sickly green-yellow)
-  lampCore: hx(91, 30, 76), // its back wall, under the lamps
+  lamp: hx(83, 54, 72), // the lobby's warm wall: an apricot gold, L* 83 C* ~52 h 72 (the story light lifts it a step:
+  //                        authored a little orange, so the lifted wall lands gold, never lemon)
+  lampCore: hx(90, 26, 68), // its back wall, under the lamps (a warm cream that the light lifts toward its core)
 } as const;
 
 /** The 10b darks (darks.ts DARK, authored for tier C through `forTier`) re-hued into the family, their value kept:

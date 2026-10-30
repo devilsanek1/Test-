@@ -1,6 +1,6 @@
 {
  "film": "v2s1_v7",
- "about": "v2's S1, painter v7a (iteration 2026-10-30, ORGANIC.md \u00a76 steps 1, 2, 4; notes paint_test/NOTES.md 'v7a'): v6's recipe-book pieces re-keyed at the SOURCE for T3, the references' low key (composition.md \u00a75): the sky deepens to L* 60 at its top (violet), flat at L* 77 in the caption band (a warm rose-lilac, ink 9:1), the light band and the peach horizon as v6; the hero cumulus a dark violet mass (body L* 52, deep 44) lit on the sun's side (peach-gold L* 81, rim 88); the mid bank and the far deck calmed toward the sky (k 0.62 / 0.74: within +-4-6 L* of it); the streaks a step off the light band; the far city stays the scene's own hazed flat, keyed by the scene (as v6 shipped it: v6's painted far city was dropped from its manifest by paint.py's --only merge, and painting it is step 3c's); the canal (E7) painted on v7's OWN design frame (the prop cut, one boat, Pip on its cabin roof) with the keyed local colours. The tree is cut (R6). The scene side: src/look/v7_s1 (palette_v7.ts keys the vector world at the source; the light bake adds the darks).",
+ "about": "v2's S1, painter v7a (iteration 2026-10-30, ORGANIC.md \u00a76 steps 1, 2, 4; notes paint_test/NOTES.md 'v7a'): v6's recipe-book pieces re-keyed at the SOURCE for T3, the references' low key (composition.md \u00a75): the sky deepens to L* 60 at its top (violet), flat at L* 77 through y 270-590 (the caption band; the recipe's field stops widened from 317-556 so its big soft strokes, sampled on the steep zenith ramp above, leave the words' block flat) (a warm rose-lilac, ink 9:1), the light band and the peach horizon as v6; the hero cumulus a dark violet mass (body L* 52, deep 44) lit on the sun's side (peach-gold L* 81, rim 88); the mid bank and the far deck calmed toward the sky (k 0.62 / 0.74: within +-4-6 L* of it); the streaks a step off the light band; the far city stays the scene's own hazed flat, keyed by the scene (as v6 shipped it: v6's painted far city was dropped from its manifest by paint.py's --only merge, and painting it is step 3c's); the canal (E7) painted on v7's OWN design frame (the prop cut, one boat, Pip on its cabin roof) with the keyed local colours. The tree is cut (R6). The scene side: src/look/v7_s1 (palette_v7.ts keys the vector world at the source; the light bake adds the darks).",
  "out": "public/paint/v2s1_v7",
  "out_design": "public/paint/v2s1_v7design",
  "frame": [
@@ -57,8 +57,8 @@
     1100
    ],
    "band": [
-    317,
-    556
+    270,
+    590
    ],
    "sun": {
     "xy": [

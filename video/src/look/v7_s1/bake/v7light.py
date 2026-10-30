@@ -27,23 +27,26 @@ KEY = LT.KEY            # the low sun: gold-peach #FFC27A
 DOOR = LT.DOOR          # the lobby (~2900 K): cream-gold #FFE2AE
 HOT = LT.HOT            # the story light's core #FFD08A
 LOBBY = lin_hex('#FFC27F')  # the lobby's lift: apricot-gold (h 70), so the lifted lobby stays warm, never lemon
+W_SKY = lin_hex('#77709F')  # the violet dusk sky behind the camera, as W's glass reflects it (L* 49)
 # T3's shade family (CIE LCh; chroma kept, toward the sky's violet): deeper than the light proof's (#C79AB4, #A49BD6)
 SH_FW = lin_hex('#8C5E86')   # the facade's warm surfaces: rose-plum (L* 46 C* 30 h 330)
-SH_FC = lin_hex('#686694')   # the facade's cool ones (the glass): violet (L* 45 C* 28 h 296)
-SH_B = lin_hex('#6A5E92')    # our bank in open-sky shade: violet (L* 43 C* 32 h 302)
+SH_FC = lin_hex('#76729F')   # the facade's cool ones (the glass): violet (L* 50 C* 26 h 296)
+SH_B = lin_hex('#6F6698')    # our bank in open-sky shade: violet (L* 46 C* 30 h 300)
 SH_T = lin_hex('#A088AC')    # the far towpath in the far roofs' shadow (L* 60 C* 22 h 315)
 
 #: the doses (1.0 = the tint itself): T3 by default; `lift_to_t1` moves them toward T1's gentler key (NOTES.md v7a)
 DOSE = dict(
     facade=1.0,          # the backlit facade, at the tint (wall ~34-45 L*: T3's 37)
-    litwin=0.78,         # the lit panes: a step over the facade (+6-8 L*)
+    litwin=0.86,         # the lit panes: a step over the facade (+6-8 L*)
+    W=0.2,               # W, her dark office pane (the plum anchor): barely shaded, so it stays a dark pane, never a hole
+    W_sky=0.22,          # and the dusk sky's reflection in its glass
     sign=0.85,
     planting=0.6,
     towpath=0.85,        # the far towpath in the far roofs' shadow
     far=(0.62, 0.6, 0.7),
     boats=0.85,
     bank=1.0,            # our bank under the canopy (T3's 25)
-    water=0.6,           # the facade's reflection takes 60 % of its shade (Fresnel: the canal a step over the quay)
+    water=0.45,          # the facade's reflection takes 45 % of its shade (Fresnel: the dusk canal ~50, a step over the quay)
     glaze_bank=0.55,     # the quay's shade colour: the sky's violet-plum at its value (the dusk family's shade end)
     glaze_facade=0.25,   # the backlit facade's shade a little toward it too (one mass, its two faces kept)
     sun_bloom=1.0, veil=1.0, rims=1.0, lobby=1.0, door_bloom=1.0, pool=1.0, jambs=1.0, column=1.0,
@@ -68,7 +71,7 @@ def canopy_v7(bank_top):
     # the edge runs at the coping's top at the left, 0-22 px under it at the right (the light reaches the far lip there)
     base_off = -16 + 22 * (x / W) ** 1.4
     clumps = np.zeros(W, np.float32)
-    for size, amp, n in ((170, 14, 7), (64, 7, 17), (22, 3.5, 44)):
+    for size, amp, n in ((170, 18, 7), (64, 9, 17), (22, 4.5, 44)):
         cs = np.sort(r.uniform(-size, W + size, n))
         for c in cs:
             w = size * r.uniform(0.5, 1.3)
@@ -82,7 +85,7 @@ def canopy_v7(bank_top):
     # the light (from the sun's ground point toward us), dim (the low sun's light through leaves)
     holes = np.zeros((H, W), np.float32)
     brk = value_noise('v7_s1/canopy/holes', (H, W), 14, octaves=2)
-    for cx0 in (330.0, 610.0, 905.0):
+    for cx0 in (640.0, 930.0):
         cx0 = cx0 + r.uniform(-40, 40)
         cy0 = edge[int(cx0)] + r.uniform(10, 26)
         for j in range(int(r.integers(2, 4))):
@@ -95,7 +98,7 @@ def canopy_v7(bank_top):
             u = (XX - cx) * c + (YY - cy) * s_
             v = -(XX - cx) * s_ + (YY - cy) * c
             e = (u / ry) ** 2 + (v / rx) ** 2 + 0.35 * brk
-            holes = np.maximum(holes, (1 - smoothstep(0.45, 1.3, e)) * r.uniform(0.3, 0.5))
+            holes = np.maximum(holes, (1 - smoothstep(0.45, 1.3, e)) * r.uniform(0.25, 0.4))
     return np.clip(m * (1 - holes), 0, 1).astype(np.float32), edge, holes
 
 
@@ -125,12 +128,14 @@ def light_v7(base, L, vis, A, dose=DOSE):
         E = E * (1 - S[..., None] * (1 - tint))
 
     fac = dose['facade'] * (0.9 + 0.1 * smoothstep(620, 1080, YY))           # a touch deeper toward the ground
-    wingS = sum(L[k] for k in ('wall', 'glass', 'doorframe', 'W', 'leaves', 'pigeons')) * fac
+    wingS = sum(L[k] for k in ('wall', 'glass', 'doorframe', 'leaves', 'pigeons')) * fac + L['W'] * dose['W']
     wingS = wingS + L['sign'] * dose['sign'] + L['planting'] * dose['planting'] + L['litwin'] * dose['litwin']
     gap = 1 - smoothstep(120, 420, XX)                                        # the far towpath's sunlit stretch (west gap)
-    lampS = L['lamps'] * dose['facade'] * (0.8 + 0.2 * smoothstep(800, 840, YY)) * (1 - 0.6 * gap)
+    lampS = L['lamps'] * dose['facade'] * (0.9 + 0.1 * smoothstep(800, 840, YY)) * (1 - 0.5 * gap)
     shade(np.clip(wingS + lampS, 0, 1), tint_f)
-    shade(L['towpath'] * dose['towpath'] * (1 - gap), SH_T[None, None])
+    # the far towpath in the far roofs' shadow; its west stretch only half in it (the sun reaches it through the gap,
+    # low and dim: a step under the door's light, never a rival: R4)
+    shade(L['towpath'] * dose['towpath'] * (1 - 0.5 * gap), SH_T[None, None])
     r_s = np.hypot((XX - sx) / 1.6, YY - sy)
     veil = np.exp(-r_s / 300.0)
     fr, ft, fb = dose['far']
@@ -140,13 +145,23 @@ def light_v7(base, L, vis, A, dose=DOSE):
     btop = LT.bank_top_line(L)
     canopy, edge, holes = canopy_v7(btop)
     bankL = L['bank'] + L['near']
-    shade(bankL * dose['bank'] * canopy, SH_B[None, None])
+    # the canopy's shade deepens away from the open water (the sky dome lights the quay's far edge more; the frame's
+    # bottom lies deepest under the leaves): a ramp INSIDE the one mass (CRAFT §d.4: colour and light moving in a shape)
+    skylit = 1 - 0.16 * (1 - smoothstep(1240, 1880, YY))
+    # two small clusters of sun flecks through the leaves (light.md §4.2: the sun's image through gaps, ellipses
+    # stretched along the light, uneven sizes; the light proof's clusters, dim here: the quiet field patterned, never lit)
+    dap = LT.dapples(canopy, edge)
+    shade(bankL * dose['bank'] * canopy * skylit * (1 - 0.6 * dap), SH_B[None, None])
     G = np.zeros((H, W, 3), np.float32)
+    # W, her dark office pane (its lamp off since 0.40): its glass reflects the violet dusk sky behind the camera, a
+    # quarter of it (light.md §2.8), so it reads as a dark pane, never a black hole calling the eye (R3)
+    G += (L['W'] * dose['W_sky'])[..., None] * W_SKY
 
     # ---------------------------------------------------------------- 2. the key's light where it reaches
-    E += (L['towpath'] * gap)[..., None] * KEY * 0.45                         # the far towpath's sunlit gap
-    E += (bankL * (1 - canopy) * (1 - holes))[..., None] * KEY * 0.22          # the lit lip beyond the canopy's edge
-    E += (bankL * holes)[..., None] * KEY * 0.16                               # the dim gaps of light near the edge
+    E += (L['towpath'] * gap)[..., None] * KEY * 0.18                         # the far towpath's sunlit gap
+    E += (bankL * (1 - canopy) * (1 - holes))[..., None] * KEY * 0.15          # the lit lip beyond the canopy's edge
+    E += (bankL * holes)[..., None] * KEY * 0.12                               # the dim gaps of light near the edge
+    E += (bankL * dap)[..., None] * KEY * 0.22                                 # the flecks: the sun itself, dim and warm
 
     # ---------------------------------------------------------------- 3. rims on what the sun touches (static)
     sil = lambda *ks: sum(vis[k] for k in ks)
@@ -178,7 +193,7 @@ def light_v7(base, L, vis, A, dose=DOSE):
 
     # ---------------------------------------------------------------- 5. the story light: the lobby, its lamps, its bloom
     lob = L['lobby']
-    E += (lob * 0.24 * dose['lobby'])[..., None] * LOBBY
+    E += (lob * 0.30 * dose['lobby'])[..., None] * LOBBY
     Ls = lab[..., 0]
     x0, y0, x1, y1 = OPENING
     inop = ((XX >= x0) & (XX <= x1) & (YY >= y0) & (YY <= y1)).astype(np.float32)
@@ -234,5 +249,5 @@ def light_v7(base, L, vis, A, dose=DOSE):
         lab_l[..., 2] += (rb - lab_l[..., 2]) * wgl[..., 0]
         lit = np.where(wgl > 0, np.clip(lab_to_lin(lab_l), 0, None), lit)
     lit_pool = lit + B * pool_E
-    return lit, lit_pool, dict(E=E, G=G, canopy=canopy, holes=holes, rims=rims, sun=(sx, sy, sr), pool=pf * ground,
+    return lit, lit_pool, dict(E=E, G=G, canopy=canopy, holes=holes, dapples=dap, rims=rims, sun=(sx, sy, sr), pool=pf * ground,
                                bloom_sun=bl, bloom_door=bloom_d * outside, edge=edge, column=gblur(col, 4))

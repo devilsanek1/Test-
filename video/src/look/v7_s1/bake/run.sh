@@ -56,6 +56,13 @@ for look in ('cut', 'key', 'v7a'):
 json.dump(jobs, open(f'{scr}/stills/jobs.json', 'w'))
 EOF
   GL=angle node $B/render_many.mjs "$SCR/stills/jobs.json" "$SCR/stills"
+  # v6 to compare: the still as sent (paint_still_v6.png) and the light proof's look 'v6' without captions (the same
+  # frame, pixel for pixel: light_proof.md §1)
+  cp docs/studies/2026-10-28_city_posters/paint_test/paint_still_v6.png "$SCR/stills/v6.png"
+  if [ ! -f "$SCR/stills/v6_nocap.png" ]; then
+    echo '[{"name": "v6_nocap", "t": 1.0, "props": {"look": "v6", "captions": false}}]' > "$SCR/stills/jobs_v6.json"
+    GL=angle node src/look/light_s1/bake/render_many.mjs "$SCR/stills/jobs_v6.json" "$SCR/stills"
+  fi
 fi
 if step check; then
   python3 -B $B/check_v7.py "$SCR" > "$SCR/check.json"

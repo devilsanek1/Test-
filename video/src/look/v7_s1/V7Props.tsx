@@ -24,7 +24,7 @@ import {PipTrack} from '../../v2r/kit/pip';
 import {POSES} from '../../v2r/kit/pip/poses';
 import {CellPaint} from '../paint_s1/V2S1_set_core';
 import {BOAT_A, BOAT_B} from '../paint_s1/V2S1_set_life';
-import {BANK_LIT, BANK_PAVE, edgeSlope} from '../paint_s1/V2S1_steps_stone';
+import {edgeSlope} from '../paint_s1/V2S1_steps_stone';
 import {C, S1_PIP, floodAt} from '../paint_s1/V2S1_clock';
 import {dark, recolourBatch} from '../paint_s1/darks';
 import {useSwitches} from '../paint_s1/switches';
@@ -61,6 +61,10 @@ const groundEll = (cx: number, cy: number, rx: number, ry: number) => {
  *  step nearer and lower than v6's cafe set (so the edge cuts the table and the pair sits in the canopy's shade). */
 export const V7_TABLE = {x: 1050, top: 1648, foot: 1786, chairX: 930, seatY: 1712, k: 1.08} as const;
 const RATTAN = '#C9876A';
+/** The table's top: a rose stone in the mid-tones (v6's marble top was the bank's lit cream, L* 89: in the canopy's
+ *  shade it stayed +17 L* over the quay; R6 asks a near prop within 8 L* of its shade mass). */
+const TABLE_TOP = '#A97F80';
+const TABLE_EDGE = '#977174';
 
 const Chair: React.FC<{x: number; seatY: number; k: number}> = ({x, seatY, k: z}) => {
   const k = z;
@@ -77,7 +81,34 @@ const Chair: React.FC<{x: number; seatY: number; k: number}> = ({x, seatY, k: z}
   );
 };
 
-/** The table (a marble top on a dark pedestal, a flat foot) and the chair, with their contact shadows. */
+/** A fallen leaf lying on the quay (V2S1_fore's leaf: flat, bigger the nearer). */
+function leaf(x: number, y: number, L: number, a: number): string {
+  const r = (a * Math.PI) / 180;
+  const ux = Math.cos(r) * L;
+  const uy = Math.sin(r) * L * 0.5;
+  return `M${r1(x - ux)} ${r1(y - uy)}Q${r1(x - uy)} ${r1(y + ux * 0.25)} ${r1(x + ux)} ${r1(y + uy)}Q${r1(x + uy)} ${r1(y - ux * 0.25)} ${r1(x - ux)} ${r1(y - uy)}Z`;
+}
+/** A few leaves fallen from the plane tree whose canopy shades the quay (T1/T3: the quiet field patterned at +-3-6 L*,
+ *  never empty: composition.md R5), in uneven clusters, none near the table; in the canopy's shade they sit
+ *  tone-on-tone (step 2). v6 had seventeen; nine stay. */
+const LEAVES: [number, number, number, number, 'gold' | 'rust' | 'dark'][] = [
+  [318, 1652, 14, 60, 'gold'], [352, 1676, 12, -25, 'dark'], [590, 1786, 19, -10, 'rust'], [552, 1812, 15, 40, 'dark'],
+  [168, 1834, 25, 30, 'rust'], [214, 1760, 17, 70, 'dark'], [96, 1892, 22, 25, 'gold'], [452, 1890, 26, -60, 'dark'],
+  [760, 1560, 11, 15, 'rust'],
+];
+const FallenLeaves: React.FC = () => {
+  const col = {gold: CM.leafGold, rust: RATTAN, dark: dark('wood')};
+  return (
+    <>
+      {(['gold', 'rust', 'dark'] as const).map((k) => (
+        <Fill key={k} d={LEAVES.filter((l) => l[4] === k).map(([x, y, L, a]) => leaf(x, y, L, a)).join('')} color={col[k]} seed={`v7/leaves/${k}`} offset={false} />
+      ))}
+    </>
+  );
+};
+
+/** The table (a marble top on a dark pedestal, a flat foot) and the chair, with their contact shadows; the fallen
+ *  leaves. */
 export const V7NearProps: React.FC = () => {
   const {x, top, foot, chairX, seatY, k} = V7_TABLE;
   const z = k;
@@ -88,11 +119,12 @@ export const V7NearProps: React.FC = () => {
         <ContactShadow x={chairX} y={seatY + 76 * z} w={96 * z} d={groundEll(chairX, seatY + 79 * z, 52 * z, 9 * z)} at={floodAt(chairX, seatY + 76)} />
       </ShadowLayer>
       <Tier tier="environment">
+        <FallenLeaves />
         <Chair x={chairX} seatY={seatY} k={z} />
         <Fill d={groundEll(x, foot, 48 * z, 9 * z)} color={dark('iron')} seed="v7/table/foot" offset={false} />
         <Fill d={poly([[x - 7 * z, top + 10], [x + 7 * z, top + 10], [x + 7 * z, foot], [x - 7 * z, foot]])} color={dark('iron')} seed="v7/table/ped" offset={false} />
-        <Fill d={ell(x, top + 7 * z, 94 * z, 20 * z)} color={BANK_PAVE} seed="v7/table/edge" offset={false} />
-        <Fill d={ell(x, top, 94 * z, 20 * z)} color={BANK_LIT} seed="v7/table/top" offset={false} />
+        <Fill d={ell(x, top + 7 * z, 94 * z, 20 * z)} color={TABLE_EDGE} seed="v7/table/edge" offset={false} />
+        <Fill d={ell(x, top, 94 * z, 20 * z)} color={TABLE_TOP} seed="v7/table/top" offset={false} />
       </Tier>
     </>
   );
