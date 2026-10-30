@@ -9,9 +9,10 @@ from PIL import Image, ImageDraw, ImageFont
 HERE = os.path.dirname(os.path.abspath(__file__))
 DOC = os.path.join(HERE, '..', '..', 'docs', 'look', 'type', 'stills')
 LABELS = {'01': '01 BEFORE (now)', '02': '02 R4 landing word', '03': '03 the hand, 3 ways', '04': '04 R1 everyday',
-          '05': '05 R2 hook', '06': '06 R3 big number', '07': '07 R5 tint', '08': '08 R6 lettered phrase',
+          '05': '05 R2 hook', '06': '06 R3 big number', '07': '07 R5 quiet stress', '08': '08 R6 lettered phrase',
           '09': '09 R7 word in the world', '10': '10 R9 payoff', '11': '11 R10 cover', '12': '12 R10 caps (posters)',
-          '13': '13 seats walking', '14': '14 R4 write-on (mid)'}
+          '13': '13 seats walking', '14': '14 R4 bloom (mid)', '15': '15 stress options: dusk',
+          '16': '16 stress options: night', '17': '17 number options'}
 
 
 def font(size):

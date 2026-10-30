@@ -1,0 +1,10 @@
+<!doctype html><html><head><meta charset="utf-8"><script src="../lib/type.js"></script>
+<script src="emphasis_options.js"></script><script src="grid.js"></script>
+<style>html,body{margin:0;padding:0}#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#17161C}</style></head>
+<body><div id="stage"></div>
+<script>
+// The pleasantness pass (docs/look/type/PLEASANT.md §3): the options for the stressed word / the big number, all at one
+// moment, each a full frame cropped to the band. S1 at 3.60 s: 70,000 / homes? (the night sky)
+window.__ready = TYPE.run(() => GRID.render({bg: '{{BG_NIGHT}}', options: EMPH.number, cropY: 250, cropH: 400, scale: 1.0, labelH: 80,
+  labelSize: 26, mark: 'B'})).then(() => { window.__typeLog = null; return true; });
+</script></body></html>

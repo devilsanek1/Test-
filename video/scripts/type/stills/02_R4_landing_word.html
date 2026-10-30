@@ -1,13 +1,15 @@
 <!doctype html><html><head><meta charset="utf-8"><script src="../lib/type.js"></script>
-<style>html,body{margin:0;padding:0}#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:url('{{BG_DUSK}}') center/cover no-repeat}
-.lab{position:absolute;font-family:'Jost';font-weight:400;font-size:30px;letter-spacing:0.04em;color:rgba(255,240,222,0.78)}</style></head>
+<style>html,body{margin:0;padding:0}#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:url('{{BG_DUSK}}') center/cover no-repeat}</style></head>
 <body><div id="stage"></div>
 <script>
-// R4 (after the stills' fix: rows 362 / 484 / 578, the brush 184 px): "But Helsinki" pops 23.417 s, "WANTS" 24.000 s, "that heat." 24.583 s; at 24.70 s all three are on, settled.
+// R4 the landing word, after the owner's note (2026-10-30, "shouldn't look like a blood message on the wall"; PLEASANT.md):
+// THE LIT HAND. "But Helsinki" pops 23.417 s, "wants" 23.967 s (2 frames before its word, 24.000 s), "that heat." 24.583 s;
+// at 24.70 s all three are on and "wants" has bloomed (8 frames). The hand everywhere: rows 1 and 3 Gaegu 400 116 px, deep
+// plum; "wants" the hand's Bold (700) 160 px (1.38x), lowercase, plum, with the gentle peach-gold halo behind it.
 window.__ready = TYPE.run(() => {
   const S = TYPE.stage(), tone = 'light';
   TYPE.text(S, {t: 'But Helsinki', x: 130, y: 362, role: 'hand', size: 116, tone});
-  TYPE.text(S, {t: 'WANTS', x: 260, y: 484, role: 'brush', size: 184, tone, accent: true});
+  TYPE.text(S, {t: 'wants', x: 236, y: 482, role: 'hand', size: 160, tone, stress: true});
   TYPE.text(S, {t: 'that heat.', x: 920, y: 578, anchor: 'end', role: 'hand', size: 116, tone});
 });
 </script></body></html>

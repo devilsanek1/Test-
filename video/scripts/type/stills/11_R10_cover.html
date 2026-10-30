@@ -1,16 +1,15 @@
 <!doctype html><html><head><meta charset="utf-8"><script src="../lib/type.js"></script>
-<style>html,body{margin:0;padding:0}#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:url('{{BG_NIGHT_COVER}}') center/cover no-repeat}
-.lab{position:absolute;font-family:'Jost';font-weight:400;font-size:30px;letter-spacing:0.04em;color:rgba(255,240,222,0.78)}</style></head>
+<style>html,body{margin:0;padding:0}#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:url('{{BG_NIGHT_COVER}}') center/cover no-repeat}</style></head>
 <body><div id="stage"></div>
 <script>
-// the core line as the cover title: hand 300 120 px, "heat" brush 260 px amber; 4 rows, ragged and stepped, left edge ~110
+// R10 the cover as THE LIT HAND (PLEASANT.md): the core line in the hand (300, 112 px, warm white), its key word "heat" in
+// the hand's Bold (700, 200 px) in honey with the golden glow; 4 rows, ragged and stepped, left edge ~110 (ink in the sky).
 window.__ready = TYPE.run(() => {
   const S = TYPE.stage(), tone = 'night';
-  // after the stills' fix: hand 112 px, brush 250 px, rows 365 / 530 / 624 / 733 (ink y 300-740, clear of the roofs)
   TYPE.text(S, {t: 'Your chatbot', x: 110, y: 365, role: 'hand', size: 112, tone});
   const c = TYPE.text(S, {t: 'could', x: 180, y: 530, role: 'hand', size: 112, tone});
-  TYPE.text(S, {t: 'heat', x: c.x1 + 38, y: 530, role: 'brush', size: 250, tone, accent: true});
-  TYPE.text(S, {t: 'an apartment', x: 130, y: 624, role: 'hand', size: 112, tone});
-  TYPE.text(S, {t: 'in Helsinki.', x: 290, y: 733, role: 'hand', size: 112, tone});
+  TYPE.text(S, {t: 'heat', x: c.x1 + 36, y: 530, role: 'hand', size: 200, tone, stress: true});
+  TYPE.text(S, {t: 'an apartment', x: 130, y: 628, role: 'hand', size: 112, tone});
+  TYPE.text(S, {t: 'in Helsinki.', x: 290, y: 737, role: 'hand', size: 112, tone});
 });
 </script></body></html>

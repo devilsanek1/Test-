@@ -170,7 +170,12 @@ with dry edges; its own lowercase is a near twin of the ref's "Sketched animated
 more connected) is second; Caveat Brush, Mansalva and Kaushan Script are heavier markers; Rock Salt, Permanent Marker and
 Sedgwick Ave read as street or grunge, and Yellowtail, Damion and Satisfy as retro signage.
 
-**The pick (one system, two families, three roles):**
+**Superseded in part (the owner, 2026-10-30: "shouldn't look like a blood message on the wall", on the brush WANTS in
+burnt red capitals):** the brush and the burnt accent are retired; the stress is now THE LIT HAND (the hand's own Bold,
+bigger, lowercase, lit by the film's warm light), so the system is one family. The diagnosis, findings P1-P8 and the
+options: `PLEASANT.md`. The pick below is kept as the record of the first pass.
+
+**The pick (one system, two families, three roles; first pass):**
 - **The hand, for every running word: Gaegu Light 300** (400 for dark ink on light skies, which reads thinner), +2 %
   tracking. Why: the nearest free match to ref 1's felt-tip hand (stroke 7.4 % vs 6.9 %, round, airy), an upright PRINT
   that reads in one pass (finding 9), a barred I, warm and hand-made beside a painted world, and light where Patrick Hand
@@ -188,11 +193,10 @@ Sedgwick Ave read as street or grunge, and Yellowtail, Damion and Satisfy as ret
 
 1. **The hand:** Gaegu Light (warm, hand-made) or Mali Light (cleaner)? Still 3 shows both on one moment, beside Zen
    Kurenaido (the closest feel, ruled out by its "Al").
-2. **The landing word in the brush:** yes for the film's 3-5 key words and numbers (WANTS, 40, 70,000), or keep every word
-   in the hand and mark stress by colour only? Stills 2 and 7 show the same moment both ways.
-3. **The brush write-on** (the landing word painted on in 10-16 frames, led by the brush tip, the way frame 0 paints the
-   scene): it shows part-letters for a few frames. Is that "painted", or too close to the clipped reveal you ruled out?
-   (Proposal: allowed only for the landing word and the lettered phrase; every other word pops whole.)
+2. ~~**The landing word in the brush**~~ (answered 2026-10-30: the brush read as "a blood message on the wall"; the
+   stress is now the lit hand, `PLEASANT.md`): stills 2 and 7 now show the bigger lit word and the quiet lift.
+3. ~~**The brush write-on**~~ (retired with the brush, 2026-10-30): the stressed word pops whole and its light blooms
+   in 8 frames (still 14).
 4. **Placement:** words follow the beat's open space (above the subject by default, beside it in close shots), or stay
    in one band with only the stagger varying? Stills 1 and 2 show the before and the after on one moment.
 5. **The cover:** the core line in the hand with its key word in the brush, no peach box (still 11), or in the posters'

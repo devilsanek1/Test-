@@ -21,8 +21,10 @@ window.__ready = TYPE.run(() => {
     <rect class="noink" x="${cx - W / 2}" y="${top}" width="${W}" height="${H}" rx="6" fill="url(#lit)" filter="url(#paper)"/>
     <circle class="noink" cx="${cx}" cy="${top + 14}" r="7" fill="#3a2a1c"/><circle class="noink" cx="${cx - 2}" cy="${top + 12}" r="2.2" fill="#c9b79a"/>`;
   S.appendChild(g);
-  // the year, figures fitted to the tag (ink <= W - 40), umber, tracking 0, no halo, riding the tag
-  const size = Math.floor(189 * (W - 40) / 306);
-  TYPE.text(S, {t: '2027', x: cx, y: top + H / 2 + 0.444 * size / 2 + 8, anchor: 'middle', role: 'brush', size, track: 0, fill: '#2B1B0A', halo: false, parent: g});
+  // the year in the hand's Bold (PLEASANT.md: the brush retired), deep plum ink on the cream paper, tracking 0, no halo,
+  // riding the tag; the size fitted so the figures' ink is W - 44 wide, centred on the tag's middle
+  const m = TYPE.measure('2027', {role: 'hand', weight: 700, size: 100, track: 0});
+  const size = Math.floor(100 * (W - 44) / (m.right - m.left)), mh = TYPE.measure('2027', {role: 'hand', weight: 700, size, track: 0});
+  TYPE.text(S, {t: '2027', x: cx, y: Math.round(top + H / 2 + mh.asc / 2 + 6), anchor: 'middle', role: 'hand', weight: 700, size, track: 0, fill: TYPE.C.plum, halo: false, parent: g});
 });
 </script></body></html>

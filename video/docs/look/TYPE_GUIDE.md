@@ -3,45 +3,54 @@
 **Status: DRAFT (2026-10-30, the type iteration).** Nothing here is a rule until the owner picks from the stills
 (`docs/look/type/stills/`); until then `LAYOUT.md` (the band, Patrick Hand 98 px, the peach box) stays the default
 (playbook: "The words on screen are DESIGNED"). The research behind every number: `docs/look/type/RESEARCH.md` (findings
-F1-F15, with sources). Px at 1080 x 1920, y down, 60 fps; times are video 4's take (`public/v4/voice_words.json`, 42.24 s,
+F1-F15, with sources); the pleasantness pass after the owner's note of 2026-10-30 ("shouldn't look like a blood message
+on the wall"): `docs/look/type/PLEASANT.md` (findings P1-P8, the options, the pick: THE LIT HAND). The owner's playbook
+rule wins over this guide: the words are PLEASANT to look at, soft, warm and calm, never menacing. Px at 1080 x 1920, y down, 60 fps; times are video 4's take (`public/v4/voice_words.json`, 42.24 s,
 177.7 words/min); a "pop" happens 2 frames before its word's start (text a hair ahead of the sound reads as in sync).
 
 ## a. Principles (what makes our words premium, dynamic and engaging; the owner's rules never change)
 1. Every spoken word, in the voice's order, few at once and big: groups of 2-4 words; frame 0 shows the first spoken words, never a title; the payoff in words by ~2 s. (owner; F3)
-2. One look, one brand: ONE HAND (a light hand-print) for every spoken word, ONE BRUSH for the few landing words, numbers and titles; recipes vary, the system never does. (owner; F1, F9)
+2. One look, one brand: ONE HAND for every word on screen: its light weights for the running words, its Bold, bigger and LIT, for the few stressed words, numbers and titles (the brush retired, 2026-10-30); recipes vary, the system never does. (owner; F1, F9; P2, P8)
 3. Set into the picture: words sit in the open sky or wall by the beat's subject, on one steady anchor per shot, moving at most 220 px between groups. (F5, F6)
-4. Light and airy, never boxed: thin strokes, open spacing, a soft halo in the sky's own tone; dark ink on light skies, warm white on dusk and night; the film's one warm accent marks the stressed word. (F10, F11)
-5. Calm motion that never clips: pop in place, or build word by word on the voice; one swell or brush write-on for a landing word; cut out whole. (owner; F7, F15)
+4. Light and airy, never boxed: thin strokes, open spacing, a soft halo in the sky's own tone; deep plum ink on light skies, warm white on dusk and night; the stressed word is LIT by the film's warm light (honey on night skies, a gentle warm halo on light ones), never dark red or brown. (F10, F11; P3, P4, P7)
+5. Calm motion that never clips: pop in place, or build word by word on the voice; a stressed word pops whole and its light blooms; cut out whole. (owner; F7, F15)
 6. Read at a glance on a phone: every word at 0.25 scale, >= 4.5:1, >= 0.8 s a group, <= 20 characters a second, "AI" never "Al". (owner; F4)
-7. Never the template: no outlines, boxes, heavy or all-caps running words, rainbow keywords, emoji, bounce, slides or typewriters. (F2)
+7. Never the template, never menacing: no outlines, boxes, heavy or all-caps words (a stressed word stays lowercase, as spoken), rainbow keywords, emoji, bounce, slides or typewriters; no rough, scratchy, dripping or tapering letters, no red or brown words; every word calm and friendly at a glance. (owner, 2026-10-30; F2; P1, P5, P6)
 8. Never twice, never covered: no words twice on screen at once; nothing passes in front of words while they are the beat; no paper edge beside them. (owner)
 
-## b. The type system (two families, three roles; all OFL, from `scripts/type/.fonts/`)
+## b. The type system (ONE family, three roles; OFL, from `scripts/type/.fonts/`; the brush retired 2026-10-30, PLEASANT.md)
 
 | role | face (CSS family) | weight | size (font-size) | measured at that size | tracking | lines |
 |---|---|---|---|---|---|---|
 | **The hand:** every running word | **Gaegu** | 300 on dusk and night skies; 400 on light skies (dark ink reads thinner) | **116 px** everyday; **136 px** for the hook's first two groups and the payoff's last group | 116 px: cap 71, x-height ~45, stroke ~6 px (8 % of its S; Patrick Hand 98 px: cap 65, stroke 9 px) | +0.02 em | baselines 120 px apart (1.03 em); a line <= 830 px (prefer <= 760, ~13 characters); <= 2 baselines (3 in a landing-word lockup) |
-| **The brush:** the landing word | **Nanum Brush Script** | 400 | **184 px** (1.6x the hand; 200 px did not fit three rows in the band: stills) | cap ~89, stroke ~11 px; "WANTS" 487 px wide (ink) | +0.02 em | its own row, stepped right of the line before |
-| **The brush:** big numbers | Nanum Brush Script | 400 | **300 px** | figures ~136 px tall (this brush's figures are 0.45 em: 260 px gave 118 px, not 165); "70,000" 666 px, "40" ~246 px (ink) | +0.02 em | its own row; the unit word beside or under it in the hand |
-| **The brush:** a world word (on a thing) | Nanum Brush Script | 400 | 140-160 px (`LAYOUT.md`: one number 120-160 px, a font size), fitted to its object | figures ~0.44 em (62-71 px tall); "2027" at 148 px: 234 px wide | 0 | on the object, in the object's ink |
-| **The title:** the cover's core line | the hand + the brush key word | hand 400 | hand 112-128 px; the key word 240-280 px | | +0.02 em | 3-4 rows, ragged, stepped |
-| **The title:** a series title (later) | the brush over the hand (ref 2's lockup) | 400 / 300 | brush 2.5-3x the hand | | +0.02 / +0.04 em | left-aligned lockup |
+| **The lit hand:** the landing word | **Gaegu**, lowercase | **700** | **160 px** on light skies, **156 px** on night (1.35-1.4x the hand) | x-height ~55, stroke ~14 px with round ends, an even width (CV 0.07; the retired brush's 0.26); "wants" 365 px wide (ink) | +0.02 em | its own row, stepped right of the line before; lit (below) |
+| **The lit hand:** big numbers | Gaegu | 700 | **250 px** | figures ~130 px tall (0.52 em); "70,000" 668 px with the comma tucked in ("70", the comma 0.02 em after, "000" 0.05 em after: the hand's own comma sits loose) | -0.02 em | its own row; the unit word under it in the hand |
+| **The lit hand, quiet:** the everyday stress (R5) | Gaegu | 700 | the running size (116 px) | | +0.02 em | in its line; lit |
+| **The hand:** a world word (on a thing) | Gaegu | 700 | fitted to its object: the figures' ink = the object's width - 44 px | "2027" at 122 px: 236 px wide, figures ~72 px tall on a ~280 x 170 tag | 0 | on the object, in the object's ink (plum on cream paper), no glow |
+| **The title:** the cover's core line | the hand + the lit key word | 300 on dark (400 on light) + 700 | hand 112-128 px; the key word ~200 px (1.6-1.8x) | | +0.02 em | 3-4 rows, ragged, stepped |
+| **The title:** a series title (later) | the lit hand over the hand (ref 2's lockup, in our one family) | 700 / 300 | 2.5-3x the hand | | +0.02 / +0.04 em | left-aligned lockup |
 
 **Colours per tone** (contrast measured on `scripts/type/bg/`, band y 290-600; F11):
 
-| sky | running words (the hand) | accent: stressed word, landing word, numbers | halo (contrast without a box) |
+| sky | running words (the hand) | the lit hand: stressed word, landing word, numbers | halo (contrast without a box) |
 |---|---|---|---|
-| dusk and night (dark: video 4's whole film) | warm white **#FFF0DE** (7.9:1 on the night band) | amber **#FFB868** (5.2:1); a lighter amber #FFC98A (5.9:1) where the sky is deeper | `text-shadow: 0 0 0.22em` the sky darkened (#141A3A) at 40 % + `0 0 0.06em` at 25 %; no offset, never a hard edge |
-| day and light dusk (light) | umber ink **#2B1B0A** (10.3:1 on the dusk band) | burnt orange **#8E3A12** (4.7:1) | only if the field varies: the sky lightened (#FFFFFF) at 30 %, blur 0.22 em |
+| dusk and night (dark: video 4's whole film) | warm white **#FFF0DE** (7.9:1 on the night band) | the windows' **honey light #FFD58C** (L* 87, C* 42, hue 82°; 6.4:1 on the night band) with the **golden glow**: rgb(255,184,92) at 42 %, blur 0.34 em around the letters (dilated 0.04 em), over the dark halo at 30 % | running words: `text-shadow: 0 0 0.22em` the sky darkened (#141A3A) at 40 % + `0 0 0.06em` at 25 %; no offset, never a hard edge |
+| day and light dusk (light) | deep plum ink **#3A2B48** (L* 20, C* 21, hue 311°, the dusk sky's own hue; 8.1:1 on the dusk band) | the same plum (no colour: a light colour cannot carry a word on a light sky, honey there is 1.2:1, and every dark warm is a brown or a red) with the **gentle warm halo**: rgb(255,214,160) at 95 %, blur 0.34 em | only if the field varies: the sky lightened (#FFFFFF) at 30 %, blur 0.22 em |
 | a sky that crosses from light to dark within a film | flips ink on a join (a shot change), never inside a group | | |
 
-**The accent** is the film's one warm story colour (video 4: the heat, the lit windows' amber), used only for the
-stressed word, the landing words and the numbers; never a second accent, never on a whole line.
+**The accent is light, not paint:** the film's one warm story light (video 4: the heat, the lit windows' honey,
+measured on the night frame at #F7C16F, hue 78°), used only for the stressed word, the landing words and the numbers;
+never a second accent, never on a whole line. **Never in words:** dark red, burnt orange, rust, brown or any colour that
+reads as blood (the retired burnt #8E3A12 sat at L* 36, C* 52, hue 50°, beside rust and dried blood); a rough, scratchy,
+dripping or tapering face; capitals for stress (the take's "WANTS" is a direction to the voice; the picture says "wants").
 
 **Why, against what we had:** Patrick Hand is heavy (stroke 12.8 % of the cap against ref 1's 6.9 %), comic, and its
 capital I is a bare stroke ("AI" reads "Al"); the peach box is a highlighter, not paint. Gaegu Light is the nearest free
-match to ref 1's felt-tip hand (7.4 %), an upright print with a barred I; Nanum Brush Script is the nearest to ref 2 and
-is "a brush, not a pen". The posters' Futura-like caps (Jost) stay on posters: geometric and cool against the organic,
+match to ref 1's felt-tip hand (7.4 %), an upright print with a barred I, and its Bold is the same round hand, so the
+stress needs no second family. Nanum Brush Script (the nearest to ref 2) was the landing word's face until the owner's
+note: in burnt red capitals on a light sky it read as "a blood message on the wall" (its tapering, dripping tails and
+nicked edges; `PLEASANT.md` §1), and the gentler second faces tried instead (Caveat, a smooth script; Fraunces italic, a
+soft serif) each read as a second speaker (`PLEASANT.md` §3). The posters' Futura-like caps (Jost) stay on posters: geometric and cool against the organic,
 painted look, slow as running words, and lost on a 360-px grid tile (RESEARCH "The fonts"). Fallback hand if the owner
 finds Gaegu too young: Mali 300 / 400, same sizes minus 16 % (Mali runs larger).
 
@@ -53,7 +62,7 @@ right rail is x > 950 at y 900-1500). A cut made for ads: x 120-888, y 288-1248,
 
 **The anchor and the seats:** the home anchor is the band (y 290-600: the one calm flat field, `LAYOUT.md`): baselines
 **395 / 515** (one line 455), group centre on one of three seats, **L x 440 · C x 520 · R x 600**. A landing-word
-lockup uses three rows at baselines **362 / 484 / 578** (the middle one the brush). A big number sits at baseline 480,
+lockup uses three rows at baselines **362 / 482 / 578** (the middle one the lit hand). A big number sits at baseline 482,
 its unit word at 578. All ink in the band stays at y <= 585: the subject's top (a roof) starts at ~590-600, and a row
 at 598 sat on the roof in the stills.
 
@@ -85,26 +94,24 @@ at 598 sat on the roof in the stills.
 | **Enter: the pop** (default) | 1 | none | the group appears whole, in place, 2 frames before its first word |
 | Enter: the soft pop (calm beats) | 3 (opacity) + 6 (scale 0.98 -> 1.00) | ease-out cubic, `cubic-bezier(0.22, 1, 0.36, 1)` | never a slide, never from scale 0 |
 | **Build** (word by word) | 1 per word | none | each word pops into a slot laid out for the whole group at the group's start: nothing reflows or shifts; earlier words stay (F7) |
-| Emphasis: the tint | 0 | none | the stressed word pops already in the accent colour |
-| **Emphasis: the swell** (a landing word) | 5 up (0.94 -> 1.04) + 9 back (-> 1.00) | ease-out cubic, then ease-in-out sine | origin: the word's baseline centre; its neighbours never move |
-| Emphasis: the brush write-on (if the owner approves; RESEARCH Q3) | 10-16 (12 default) | ease-in-out over the strokes | the landing word painted on along its strokes, left to right, led by a soft brush tip, starting 4 frames before its word; never cut by a frame edge or a window; every other word pops whole |
-| Settle (after a write-on) | 6 | ease-out | the halo fades 0 -> 40 % |
+| **Emphasis: the bloom** (the lit hand: R3, R4, R5, R9) | 8 | ease-out cubic, `cubic-bezier(0.22, 1, 0.36, 1)` | the stressed word pops WHOLE in place (2 frames before its word) and its light comes on: the glow / halo 0 -> full while it settles 0.96 -> 1.00 (origin: its baseline centre; no overshoot; its neighbours never move): a warm light coming on, never paint going on |
+| ~~Emphasis: the brush write-on~~ | | | retired with the brush (2026-10-30, `PLEASANT.md` §4): part-letters behind a dragged dry edge read as a word being daubed on, and a reveal that cuts letters is ruled out |
 | **Leave** | 1 | none | the group cuts out whole when the next group pops (0-2 empty frames between), or holds up to 36 frames past its last word into a pause, then cuts out |
 | Leave: the first line first (R6 only) | 1 | none | ref 1's "we just" -> "just": the lead-in line cuts out, the landing word stays until the next group |
 | Leave: the soft out (a sentence end before a pause >= 0.4 s) | 3 | ease-in | opacity only |
 | **A world word** (R7) | with its object | the object's | on the world layer, moving with the camera at its object's depth (parallax); enters with its object, leaves with the camera |
 
-**Never:** a slide, roll, rise through a mask, bounce, wobble, rotate-in, typewriter, blur-in over 3 frames, a clip
-window or wipe mask, animated letter-spacing or jiggling baselines (F8), anything that moves while it is being read.
+**Never:** a slide, roll, rise through a mask, bounce, wobble, rotate-in, typewriter, a write-on, blur-in over 3 frames,
+a clip window or wipe mask, animated letter-spacing or jiggling baselines (F8), anything that moves while it is being read.
 
 ## e. The recipes
 
-Common to all: the hand and the brush of §b, the type frame and seats of §c, the motion of §d, the checks of §f.
+Common to all: the hand and the lit hand of §b, the type frame and seats of §c, the motion of §d, the checks of §f.
 Each example uses video 4's real words and times; a frame number is t x 60.
 
 ### R1 · The everyday caption (the default for most of the film)
 - **For:** every group that is not a hook, a number, a landing word, a lettered phrase or the payoff (~70 % of the film).
-- **Spec:** the hand, 116 px, weight 300 (night) / 400 (light), +0.02 em, warm white #FFF0DE (or umber #2B1B0A), the
+- **Spec:** the hand, 116 px, weight 300 (night) / 400 (light), +0.02 em, warm white #FFF0DE (or deep plum #3A2B48), the
   halo. One line if <= 760 px (830 max), else two baselines (395 / 515), the second stepped 80-140 px right of the
   first (a gentle stagger, never centred stacks), broken by Netflix's rules (never an article from its noun, nor a verb
   from its pronoun) into a bottom-heavy pair. Group centre on a seat (L/C/R), walking per §c.
@@ -131,52 +138,54 @@ Each example uses video 4's real words and times; a frame number is t x 60.
 
 ### R3 · The big number
 - **For:** a number the story turns on (the hook's claim, a comparison's punch); 1-2 per film.
-- **Spec:** the brush (Nanum Brush Script 400), **300 px** (figures ~136 px tall), +0.02 em, accent amber #FFB868 (burnt
-  #8E3A12 on light skies), the halo; figures on their own row at baseline 480, centred near x 440; the unit word in the
-  hand (Gaegu 300, 116 px, +0.02 em, warm white) on the row below (baseline 578), its right edge stepped to x ~930, clear
-  of the brush comma's long tail. Numerals, not words
-  ("70,000", "40": 6 characters instead of 16). The swell on landing (5 + 9 frames).
-- **Sync:** the figures pop (and swell) 2 frames before the number's first word; the unit word builds on its word.
+- **Spec:** the lit hand: Gaegu 700, **250 px** (figures ~130 px tall), -0.02 em, in the honey light #FFD58C with the
+  golden glow (on light skies: plum with the warm halo); the comma tucked in ("70", the comma 0.02 em after, "000" 0.05 em
+  after); figures on their own row at baseline 482, centred near x 466; the unit word in the hand (Gaegu 300, 116 px,
+  +0.02 em, warm white) on the row below (baseline 578), its right edge stepped to x ~930. Numerals, not words
+  ("70,000", "40": 6 characters instead of 16). The bloom on landing (8 frames).
+- **Sync:** the figures pop whole (and bloom) 2 frames before the number's first word; the unit word builds on its word.
 - **Video 4 (two):** S1, from "seventy" (2.34) to the end of "homes?" (3.92), as the windows light one by one, so the
-  amber figures land with the warm windows: **"70,000"** (666 px) pops at 2.300 s (frame 138), **"homes?"** at 3.383 s
+  honey figures light up with the warm windows: **"70,000"** (668 px) pops at 2.300 s (frame 138), **"homes?"** at 3.383 s
   (frame 203), both until 4.233 s. And S4, "40" with "kettles," at 15.017 s (frame 901), the 40 drawn kettles popping
   on at the computer's foot on the same word (S4 keeps no "≈ 40" tag in the picture, so the caption's 40 is the only
   one: never twice).
-- **Checks:** the figures read at 0.25 scale in < 0.5 s; >= 3:1 (the brush) and >= 4.5:1 (the hand); the figures never
-  collide with the far city (ink <= 585).
+- **Checks:** the figures read at 0.25 scale in < 0.5 s, as ONE number (the comma tucked); >= 4.5:1 (measured 6.2:1);
+  the figures never collide with the far city (ink <= 585).
 
-### R4 · The landing word (the brush)
-- **For:** the film's 3-5 key words, the ones the voice stresses (the take writes them in capitals: "FORTY", "WANTS")
-  and the core line's key word; at most one per sentence.
+### R4 · The landing word (the lit hand)
+- **For:** the film's 3-5 key words, the ones the voice stresses (the take writes them in capitals: "FORTY", "WANTS";
+  the picture sets them in lowercase, as spoken) and the core line's key word; at most one per sentence.
 - **Spec:** a three-row lockup in the band, like hand lettering: row 1, the lead-in words in the hand (Gaegu 300 / 400,
-  116 px, +0.02 em, warm white or umber, baseline 362, from x ~130); row 2, **the word in the brush (Nanum Brush Script
-  400), 184 px, +0.02 em, in the accent**, baseline 484, stepped right (from x ~260); row 3, the words after it in the
-  hand, baseline 578, right-aligned near x 920; the halo on all (on light skies only where the field varies). Inside
-  y 292-585 (the brush's T reaches up to ~18 px under row 1 and down beside row 3: an interlock, never a touch). The swell (5 + 9 frames) or, if
-  approved, the brush write-on (12 frames) on the word.
+  116 px, +0.02 em, warm white or plum, baseline 362, from x ~130); row 2, **the word in the lit hand: Gaegu 700, 160 px
+  (156 on night), lowercase, +0.02 em; on light skies in the plum ink with the gentle warm halo, on night skies in the
+  honey light with the golden glow**, baseline 482, stepped right (from x ~236); row 3, the words after it in the hand,
+  baseline 578, right-aligned near x 920; the halo on the running rows (on light skies only where the field varies).
+  Inside y 292-585 (rows >= 23 px apart). The bloom (8 frames) on the word.
 - **Sync:** row 1 pops on its first word; the landing word on its own word; row 3 on its first word; all leave together
   when the next group pops. The lockup is one group (<= 5 words).
 - **Video 4:** S7 (23.46-25.54, the turn: WIDE, the dive lands on "WANTS" and holds while the pen draws the plan's pipe
-  out toward the computer): **"But Helsinki"** pops at 23.417 s (frame 1405) · **"WANTS"** at 24.000 s (frame 1440) ·
-  **"that heat."** at 24.583 s (frame 1475) · all until 25.500 s (frame 1530).
-- **Checks:** one landing word on screen; it reads first at a squint; rows never touch (>= 20 px between a row's lowest
-  ink and the next row's highest); the brush >= 3:1.
+  out toward the computer): **"But Helsinki"** pops at 23.417 s (frame 1405) · **"wants"** at 23.967 s (frame 1438, 2
+  frames before its word) · **"that heat."** at 24.583 s (frame 1475) · all until 25.500 s (frame 1530).
+- **Checks:** one landing word on screen; it reads first at a squint; calm and friendly at a glance (never capitals, never
+  red or brown); rows never touch (>= 20 px between a row's lowest ink and the next row's highest); >= 4.5:1 (measured
+  8.0:1 plum on dusk, 6.0:1 honey on night).
 
-### R5 · The stressed word (the tint)
+### R5 · The stressed word (the quiet lift; was the tint)
 - **For:** the everyday stress: a word the voice leans on that is not a landing word; at most one per group, not in
   every group (about one group in three).
-- **Spec:** R1, with that one word in the accent colour (amber / burnt), same face, weight and size; no animation.
-- **Sync:** a build, so the tinted word arrives on its own word.
+- **Spec:** R1, with that one word in the lit hand at the running size: Gaegu 700, 116 px, honey with the golden glow
+  (night) or plum with the gentle warm halo (light); the bloom (8 frames).
+- **Sync:** a build, so the lifted word arrives on its own word.
 - **Video 4:** S3 (8.76-10.96, CLOSE: snow melts on the computer's top, then steam pours off on "hot"): "Those
   computers" (824 px, one line, seat C) pops at 8.717 s (frame 523); line 2 builds "get" 9.367 (frame 562), "really"
-  9.700 (frame 582), **"hot."** in amber at 10.167 s (frame 610), as the steam pours off; all until 10.917 s. (The same
-  moment as R4's example, set with the tint instead of the brush, is still 7.)
-- **Checks:** one tinted word per group; never a tinted word and a landing word in the same group.
+  9.700 (frame 582), **"hot."** lifted (Bold, honey, the glow) at 10.167 s (frame 610), as the steam pours off; all until
+  10.917 s. (The same moment as R4's example, set with the quiet lift instead of the bigger word, is still 7.)
+- **Checks:** one lifted word per group; never a lifted word and a landing word in the same group.
 
 ### R6 · The phrase lettered into the open space (ref 1's manner)
 - **For:** a slow, warm or funny beat with few words: the joke, a breath, a line meant to be felt. Once or twice per
   film.
-- **Spec:** the hand (Gaegu 300 / 400), bigger: **150 px**, +0.02 em, warm white or umber, the halo; row 1 the
+- **Spec:** the hand (Gaegu 300 / 400), bigger: **150 px**, +0.02 em, warm white or plum, the halo; row 1 the
   lead-in, row 2 lower right with its last word **1.3x bigger (190 px)**, the ref's "our / day", a 0.48 em space before it (the
   crossbars of "f" and "t" reach toward each other); set in the open space
   above the subject's top, inside the band (baselines 400 / 570). Pops by phrase (1 frame); the last word may land alone;
@@ -189,9 +198,9 @@ Each example uses video 4's real words and times; a frame number is t x 60.
 ### R7 · The word placed in the world
 - **For:** a word that belongs to a thing in the picture (a year on a tag, a name on a sign): it lives on the thing and
   moves with it. At most one per film (the visual script's "one word in the picture").
-- **Spec:** the brush (Nanum Brush Script 400), 140-160 px, tracking 0 (figures ~0.44 em; at 148 px "2027" is 234 px
-  wide on a ~280 x 170 tag and reads at phone size), in the object's ink
-  (umber #2B1B0A on cream paper), straight-on and level on its object (`LAYOUT.md`: words in the world), no halo (the
+- **Spec:** the hand's Bold (Gaegu 700), fitted to its object (the figures' ink = the object's width - 44 px; at 122 px
+  "2027" is 236 px wide, figures ~72 px tall, on a ~280 x 170 tag, and reads at phone size), tracking 0, in the object's
+  ink (deep plum #3A2B48 on cream paper), straight-on and level on its object (`LAYOUT.md`: words in the world), no halo (the
   paper is its ground); on the world layer with the camera's parallax, entering with its object; the captions keep their
   screen seats above it and never say the same words.
 - **Video 4:** S8 (25.54-28.34, MEDIUM: the plan, walls only marked out; the slow push lands on "plan" 26.18): on "next"
@@ -213,73 +222,78 @@ Each example uses video 4's real words and times; a frame number is t x 60.
 
 ### R9 · The payoff line
 - **For:** the film's last sentence, the core line in the voice; it lands, then the loop.
-- **Spec:** two lockups: first, two rows (the hand 116 px; the core line's key word in the brush, 184 px, in the accent
-  with the swell, +0.02 em, the halo, LAST on row 2 after a 50 px space), baselines 390 / 545, row 1 from x ~110, row 2
-  from x ~120 (three rows put the brush word on the roofline in the stills); then the last group in the hand (Gaegu 300,
+- **Spec:** two lockups: first, two rows (the hand 116 px; the core line's key word in the lit hand, Gaegu 700 156 px,
+  honey with the golden glow and the bloom, +0.02 em, LAST on row 2 after a 40 px space), baselines 390 / 545, row 1
+  from x ~110, row 2 from x ~120 (three rows put the key word on the roofline in the stills); then the last group in the hand (Gaegu 300,
   **136 px**: the hook's size, so the film's bookends match), two baselines at seat C, holding 36 frames past the last word, then
   cutting out in 1 frame before the loop's un-draw reaches the band.
 - **Video 4:** S12 (38.48-42.24, WIDE POV: the home view again, your gloved hand and phone at the bottom right; on
   "could" the computer's lights blink back and a pulse of warm water runs home): **"So your chatbot"** pops at 38.433 s
-  (frame 2306) · **"could soon"** at 39.367 (frame 2362) · **"heat"** in the brush, amber, at 39.933 s (frame 2396), as
-  the pulse runs under the street · then **"an apartment / in Helsinki."** (136 px) at 40.217 s (frame 2413), held to
+  (frame 2306) · **"could soon"** at 39.367 (frame 2362) · **"heat"** in the lit hand, honey, at 39.900 s (frame 2394,
+  2 frames before its word), blooming as the pulse runs under the street · then **"an apartment / in Helsinki."** (136 px) at 40.217 s (frame 2413), held to
   41.92 s (frame 2515).
 - **Checks:** the words stay clear of the phone (bottom right) and the run; "heat" is the only accent on screen.
 
 ### R10 · The cover title
 - **For:** the cover (and the grid): the core line as a title, never over the film's captions.
 - **Spec:** a frame of the film's own scene without captions; the core line in the hand (weight 400 on light skies, 300
-  on dark; 112-128 px), its key word in the brush (240-280 px, the accent); 3-4 rows, ragged and stepped, on the sky's
+  on dark; 112-128 px), its key word in the lit hand (Gaegu 700, ~200 px, lowercase, honey with the golden glow on dark
+  skies, plum with the warm halo on light ones); 3-4 rows, ragged and stepped, on the sky's
   flat field, inside the 4:5 crop (y 285-1635) and the 3:4 crop (y 240-1680), x 96-944; read at 360 px wide (the grid
-  tile); Pip hidden as in the film; no box, no source line. The still: the hand 112 px, the brush 250 px, baselines 365 /
-  530 / 624 / 733, rows from x 110 / 180 / 130 / 290 (ink y 300-740, inside the open sky).
+  tile); Pip hidden as in the film; no box, no source line. The still: the hand 112 px, the lit word 200 px, baselines
+  365 / 530 / 628 / 737, rows from x 110 / 180 / 130 / 290 (ink y 300-743, inside the open sky).
 - **Video 4:** "Your chatbot / could **heat** / an apartment / in Helsinki." over the home view's night sky, "heat" in
-  amber (the core line: `docs/v4/THROUGHLINE.md`).
+  the honey light (the core line: `docs/v4/THROUGHLINE.md`).
 - **Checks:** reads at 360 px wide in one glance; inside both crops; the same words as the core line, nothing added.
 
 ## f. The checks (every still and every cut, before the owner sees it)
 1. **Phone glance:** every word read at 0.25 scale (270 x 480) in one glance; the render's `_phone.jpg` at 100 %.
 2. **The type frame:** all ink in y 290-1250, x 96-944 (x 96-860 below y 840); ads x 120-888, y 288-1248, x <= 780
    below y 840 (`render.mjs --ui --zones`).
-3. **Contrast:** running words >= 4.5:1 against the pixels within 20 px of the glyphs (the house's 7:1 where the sky
-   allows); landing words and numbers >= 3:1; no box, no outline (`capcheck`).
+3. **Contrast:** every word >= 4.5:1 against the pixels within 20 px of the glyphs (the house's 7:1 where the sky
+   allows; the lit hand measures 6.0-8.0:1); no box, no outline (`capcheck`).
 4. **How many:** a group 2-4 words; <= 5 in a landing-word lockup; <= 7 words on screen at once; <= 2 baselines (3 in a
-   lockup); one landing word and one tinted word at most on screen.
+   lockup); one lit word (landing or lifted) at most on screen.
 5. **How long:** a group >= 0.8 s (48 frames); <= 20 characters per second; a built word on screen >= 0.35 s before
    its group leaves. Video 4 after merging its short phrases into builds ("Those computers" + "get really hot.", "The
    city has a plan" + "to use it,", "Then pipes" + "under the streets") runs 6.6-20.0 cps, except S10's "would take / the
    heat" (21.6) and "out of its / computers" (21.5): the voice's fastest stretch, flagged and kept (F4: viewers cope
    with ~20 cps); never three over-20 groups in a row.
-6. **Never clipped:** every letter whole in every frame (the brush write-on alone excepted, if approved); no mask, clip
-   window, slide or roll.
+6. **Never clipped:** every letter whole in every frame; no mask, clip window, write-on, slide or roll.
 7. **Frame 0 and the order:** frame 0 shows the first spoken words; every word in the voice's order; never a title over
    the captions; the payoff in words by ~2 s.
 8. **AI, not Al:** the capital I has bars; a new face is tested on "AI", "Il", "1l" before use.
 9. **Never twice, never covered:** no word twice on screen; nothing passes in front of words while they are the beat;
    no paper edge beside them; weather in the band at half density, flakes <= 6 px.
+10. **Pleasant (the owner, 2026-10-30):** every word calm and friendly at a glance, as a regular viewer would see it: no
+   red, burnt, rust or brown words; no rough, scratchy, dripping or tapering letters; no capitals for stress; the stress
+   by size, weight and warm light only (`PLEASANT.md`).
 
 ## g. What changes in our docs if the owner picks this (the exact edits; NOT applied now)
 - **`LAYOUT.md` §1, the "caption block (the ink)" row:** replace "Patrick Hand 98 px, baselines 387 / 510 (one line
   448), centred on x 520 (left of centre: clear of the rail), <= 850 px wide, <= 2 lines of ~20 characters; highlight
   boxes reach y 299" with "the words (`TYPE_GUIDE.md`): the hand (Gaegu 300 / 400) 116 px, baselines 395 / 515 (one
   line 455), group centre on a seat x 440 / 520 / 600, a line <= 830 px, <= 2 baselines; a landing-word lockup at 362 /
-  484 / 578 (the brush, Nanum Brush Script 184 px); a number at 480 (300 px) over its unit at 578; no boxes; ink
-  inside y 290-585 in the band". Add a row **"type frame | y 290-1250; x 96-944 above y 840, x 96-860 below; ads x
-  120-888, y 288-1248, x <= 780 below y 840"**. In the row's rules, "ink >= 7:1 on its field" becomes ">= 4.5:1 for
-  running words (7:1 where the sky allows), >= 3:1 for the brush". §5 (the cover): "the title in the caption type with
-  the peach box on its key words" becomes "the core line in the hand with its key word in the brush, in the film's
-  accent (R10), no box". §6 (checks): add `TYPE_GUIDE.md` §f. "The code must match": `theme.ts` `skyCaption` and
-  `captionTones` (the hand, the seats, the tones, the accent), `font.ts` (`captionFontStack` -> Gaegu, plus the brush),
-  `scripts/capcheck.py` (4.5:1 / 3:1).
+  482 / 578 (the lit hand, Gaegu 700 160 px, lowercase, lit); a number at 482 (the lit hand 250 px) over its unit at
+  578; no boxes; ink inside y 290-585 in the band". Add a row **"type frame | y 290-1250; x 96-944 above y 840, x 96-860
+  below; ads x 120-888, y 288-1248, x <= 780 below y 840"**. In the row's rules, "ink >= 7:1 on its field" becomes
+  ">= 4.5:1 for every word (7:1 where the sky allows)"; "ink on light" becomes "deep plum #3A2B48 on light". §5 (the
+  cover): "the title in the caption type with the peach box on its key words" becomes "the core line in the hand with
+  its key word in the lit hand (R10), no box". §6 (checks): add `TYPE_GUIDE.md` §f. "The code must match": `theme.ts`
+  `skyCaption` and `captionTones` (the hand, the seats, the tones: plum on light, warm white on dark; the lit hand:
+  honey #FFD58C + the golden glow, the warm halo on light; the bloom), `font.ts` (`captionFontStack` -> Gaegu 300 /
+  400 / 700), `scripts/capcheck.py` (4.5:1 for every word).
 - **`DIRECTION.md` rule 10:** replace "Captions pop in place, burned in, never a roll-in that clips letters; the caption
   band is one calm flat field (no lines, detail or shadow edge across it); ink on light, white on dark." with "The
-  words on screen follow `TYPE_GUIDE.md`: one hand for every spoken word, one brush for the few landing words, numbers
-  and titles; set in the open space by the subject, on one steady anchor per shot; popping in place or built word by
-  word on the voice, never clipped; dark ink on light skies, warm white on dusk and night, the film's one warm accent
-  for the stressed word. The caption band is one calm flat field (no lines, detail or shadow edge across it)." and add
-  `TYPE_GUIDE.md` to its "->" list.
+  words on screen follow `TYPE_GUIDE.md`: one hand for every word, its Bold, bigger and lit, for the few stressed
+  words, numbers and titles; pleasant to look at (soft, warm, calm: never red or brown, never rough or dripping, never
+  capitals for stress); set in the open space by the subject, on one steady anchor per shot; popping in place or built
+  word by word on the voice, never clipped; deep plum ink on light skies, warm white on dusk and night, the stressed
+  word lit by the film's warm light. The caption band is one calm flat field (no lines, detail or shadow edge across
+  it)." and add `TYPE_GUIDE.md` to its "->" list.
 - **`OWNER_PLAYBOOK.md`, Visual style, "The words on screen are DESIGNED":** replace "the owner picks from still
   examples before a film uses one; until a pick, the current caption rules (`docs/look/LAYOUT.md`) stay the default"
-  with "picked (<date>): the guide's system (the hand + the brush) and its recipes R1-R10 (the owner's picks:
+  with "picked (<date>): the guide's system (the hand + the lit hand) and its recipes R1-R10 (the owner's picks:
   <list>); positions in `LAYOUT.md`", and add the owner's verdict quote. If the cover pick changes, the cover's "title
   in the caption type" lines in `LAYOUT.md` §5 and `docs/POSTING_KIT.md` follow. The "Captions are burned in and pop in
   place" bullet stays as it is (it holds for every recipe).
@@ -295,9 +309,10 @@ placement; never invent a new picture beyond what a note asks. Sizes, seats and 
 1. **BEFORE (our captions now).** S7 at 24.10 s: "But Helsinki / WANTS that heat." · Patrick Hand 98 px, umber
    #2B1B0A, two centred lines on x 520 at baselines 387 / 510, the peach box #F6B892 behind "WANTS" (square, 0.19 em
    padding, the word ink on peach) · `{{BG_DUSK}}` · Look at: how heavy and boxed it is, and the fixed band.
-2. **AFTER, the same moment: R4 the landing word.** S7 at 24.70 s (all three rows on): "But Helsinki" (hand 400, 116
-   px, umber, baseline 362, from x 130) / **"WANTS"** (brush 184 px, burnt #8E3A12, baseline 484, from x 260) / "that
-   heat." (hand, baseline 578, right-aligned near x 920) · `{{BG_DUSK}}` · Look at: one painted word carrying the turn; compare with still 1.
+2. **AFTER, the same moment: R4 the landing word (the lit hand).** S7 at 24.70 s (all three rows on): "But Helsinki"
+   (hand 400, 116 px, plum, baseline 362, from x 130) / **"wants"** (Gaegu 700 160 px, plum, the warm halo, baseline
+   482, from x 236) / "that heat." (hand, baseline 578, right-aligned near x 920) · `{{BG_DUSK}}` · Look at: one bigger,
+   warmer word carrying the turn, still calm; compare with still 1.
 3. **THE HAND, three ways.** S2 at 4.50 s: "AI actually runs" in three bands of one still (each a 1080 x 600 crop of the
    band region, labelled small at the bottom-left), at one x-height (~45 px): Gaegu 300 116 px · Mali 300 90 px · Zen
    Kurenaido 400 106 px; warm white with the halo · `{{BG_NIGHT}}` · Look at: which hand feels like ours, and "AI"
@@ -308,39 +323,44 @@ placement; never invent a new picture beyond what a note asks. Sizes, seats and 
 5. **R2 the hook.** S1 at 0.70 s: "Did you know" (line 1, from x 120, baseline 395) / "Helsinki" (line 2, from x
    400, baseline 525), Gaegu 300 136 px, #FFF0DE (frame 0 shows line 1 alone in the same place) · `{{BG_NIGHT}}` · Look
    at: big enough to stop a thumb, still calm.
-6. **R3 the big number.** S1 at 3.60 s: **"70,000"** (brush 300 px, amber #FFB868, baseline 480, centred near x 440)
-   over "homes?" (hand 116 px, baseline 578, right edge x ~930) · `{{BG_NIGHT}}` (its amber windows echo the figures)
-   · Look at: the number reads first and feels part of the lit city.
-7. **R5 the tint, the same moment as still 2.** S7 at 24.70 s: the same three rows and positions as still 2, but
-   "WANTS" in the hand (400, 116 px) tinted burnt #8E3A12 instead of the brush · `{{BG_DUSK}}` · Look at: stills 2 and
-   7 side by side: the brush landing word or the quiet tint?
+6. **R3 the big number.** S1 at 3.60 s: **"70,000"** (the lit hand 250 px, honey with the golden glow, the comma tucked,
+   baseline 482, centred near x 466) over "homes?" (hand 116 px, baseline 578, right edge x ~930) · `{{BG_NIGHT}}` (its
+   lit windows echo the figures) · Look at: the number reads first and glows like the lit city.
+7. **R5 the quiet lift, the same moment as still 2.** S7 at 24.70 s: the same three rows as still 2, but "wants" at
+   the running size (Gaegu 700, 116 px, plum, the warm halo) · `{{BG_DUSK}}` · Look at: stills 2 and 7 side by side:
+   the bigger lit word or the quiet one?
 8. **R6 the lettered phrase.** S5 at 18.70 s: "That's a lot" (hand 300, 150 px, baseline 400, from x 110) / "of"
    (150 px) + **"tea."** (hand 190 px), row 2 baseline 570, ending near x 890 · `{{BG_NIGHT}}` · Look at: ref 1's
    manner, words lettered into the open sky, the big last word.
 9. **R7 the word in the world.** S8 at 27.70 s: a small cream paper tag (~280 x 170 px, a slight swing angle of 3-4°,
-   a pin, a soft contact shadow) on the lit building's facade near the doorway's top, on it **"2027"** in the brush
-   (umber, 148 px: figures ~66 px tall, fitted to the tag); above in the band the caption "starting / next year." (R1, seat C) · `{{BG_NIGHT}}` ·
+   a pin, a soft contact shadow) on the lit building's facade near the doorway's top, on it **"2027"** in the hand's
+   Bold (plum, 122 px: figures ~72 px tall, fitted to the tag); above in the band the caption "starting / next year." (R1, seat C) · `{{BG_NIGHT}}` ·
    Look at: the year belongs to the place; the caption and the tag share the frame without repeating each other.
 10. **R9 the payoff.** S12 at 40.00 s: "So your chatbot" (hand 116, baseline 390, from x 110) / "could soon" + **"heat"**
-    (row 2, baseline 545, from x 120; "heat" brush 184 px, amber, 50 px after "soon", at its swell's peak 1.04) · `{{BG_NIGHT}}` ·
+    (row 2, baseline 545, from x 120; "heat" the lit hand 156 px, honey, the golden glow, 40 px after "soon", 6 of its 8 bloom frames in) · `{{BG_NIGHT}}` ·
     Look at: the core line landing on its one warm word.
 11. **R10 the cover.** The cover: "Your chatbot / could **heat** / an apartment / in Helsinki." (hand 300, 112 px;
-    "heat" brush 250 px amber; ragged, stepped, left edge x ~110, baselines 365 / 530 / 624 / 733) on `{{BG_NIGHT}}` shifted down ~180 px (the sky
+    "heat" the lit hand 200 px, honey; ragged, stepped, left edge x ~110, baselines 365 / 530 / 628 / 737) on `{{BG_NIGHT}}` shifted down ~180 px (the sky
     extended at the top in its own colour, so the open sky reaches y ~780, standing in for a cover frame composed with
     more sky); no captions · also judge it at 360 px wide · Look at: one series look on the grid; read at tile size.
 12. **R10 in the posters' caps (the comparison).** The same cover in Jost 300 96 px ALL CAPS, +12 % tracking, warm white
     #FFF0DE, centred rows (baselines 375 / 500 / 625 / 750) inside x 96-944 ("YOUR CHATBOT / COULD HEAT / AN APARTMENT / IN HELSINKI."),
-    "HEAT" in amber · the same shifted `{{BG_NIGHT}}` · Look at: stills 11 and 12: the painted hand or the posters'
-    geometric caps.
+    "HEAT" in honey with the golden glow (made gentle) · the same shifted `{{BG_NIGHT}}` · Look at: stills 11 and 12:
+    the hand or the posters' thin geometric caps.
 13. **Three groups in a row (the seats walking).** S2, 4.50 / 6.00 / 7.00 / 8.00 s as four 540 x 960 frames in a 2 x 2
     grid on one still: "AI actually runs" (seat C: at 789 px it fits no other) · "on giant / computers," (seat L) ·
     "in buildings / called" (seat R) · "data centers." (seat C), R1 throughout · `{{BG_NIGHT}}` · Look at: alive but
     steady: the words move less than 220 px, so the eye never hunts.
-14. **R4's brush write-on, mid-stroke (added by the stills, for RESEARCH open question 3).** S7 at 24.10 s: "But
-    Helsinki" (row 1, as still 2) and **"WANTS"** 7.6 of its 12 frames in (70 % painted after ease-in-out: "WAN" and the
-    T's first stroke), the paint advancing left to right behind a dry brush edge (an approximation: the real write-on
-    follows each letter's strokes); "that heat." not yet on · `{{BG_DUSK}}` · Look at: painted, or the clipped reveal
-    the owner ruled out?
+14. **R4's entrance: the bloom, mid-way (was the brush write-on, retired 2026-10-30).** S7 at 24.00 s: "But Helsinki"
+    (row 1, as still 2) and **"wants"** popped whole at 23.967 s, 2 of its 8 bloom frames in (halo 58 %, scale 0.983);
+    "that heat." not yet on · `{{BG_DUSK}}` · Look at: the word arrives whole, as a warm light coming on.
+15. **The stress options, dusk (the pleasantness pass).** S7 at 24.70 s, seven options as band crops at 0.8 scale,
+    labelled: A the hand Bold in umber · B in plum · C B + the warm halo (recommended) · D a pale honey painted wash · E
+    Caveat · F Fraunces italic · G capitals · `{{BG_DUSK}}` · Look at: calm and friendly, and does the word stand out?
+16. **The stress options, night.** S12 at 40.00 s, seven options: A warm white Bold · B honey + the golden glow
+    (recommended) · C honey, no glow · D a lamplight wash · E Caveat · F Fraunces italic · G capitals · `{{BG_NIGHT}}`.
+17. **The number options.** S1 at 3.60 s, four options: A the hand Bold, warm white · B honey + the golden glow
+    (recommended) · C Caveat · D Fraunces italic · `{{BG_NIGHT}}`.
 
 ## i. Changes from the stills (2026-10-30, job 2: looked at on the phone preview and under the UI)
 - **The brush's comma** (the orchestrator, after the run): Nanum Brush Script's comma is wide with a long tail, so
@@ -362,3 +382,12 @@ placement; never invent a new picture beyond what a note asks. Sizes, seats and 
 - **R10:** the cover stack shrank a step (the hand 112 px, the brush 250 px; the caps 96 px) so all four rows sit in the
   open sky above the roofs (y ~780 on the shifted frame).
 - **Still 14 added:** the brush write-on mid-stroke, so open question 3 is judged on a picture.
+- **The owner, 2026-10-30: "The text should be pleasant to look at like it shouldn't look like a blood message on the
+  wall / Reevaluate"** (on still 02: "WANTS" in Nanum Brush Script, burnt #8E3A12, all capitals, on the light dusk sky):
+  the brush in burnt red retired; THE LIT HAND replaced it: every stressed word, landing word and number is the hand's
+  own Bold (Gaegu 700), 1.35-1.4x (the number ~2.15x), lowercase, lit: in the windows' honey light #FFD58C with a soft
+  golden glow on night skies, in the running ink with a gentle peach-gold halo on light skies; the running ink on light
+  skies became a deep plum #3A2B48 (the dusk sky's own hue); the write-on gave way to the bloom (pops whole, the light
+  comes on in 8 frames); R5's tint became the quiet lift; the "2027" tag is in the hand. The diagnosis, research (P1-P8),
+  options (stills 15-17) and the measurements: `docs/look/type/PLEASANT.md`; the stills that used the brush or the burnt
+  colour re-rendered (02, 06, 07, 09, 10, 11, 14; 12's accent made gentle).

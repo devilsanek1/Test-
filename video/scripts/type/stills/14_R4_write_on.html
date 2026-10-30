@@ -2,27 +2,14 @@
 <style>html,body{margin:0;padding:0}#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:url('{{BG_DUSK}}') center/cover no-repeat}</style></head>
 <body><div id="stage"></div>
 <script>
-// R4's brush write-on (RESEARCH open question 3), caught mid-stroke: S7 at 24.10 s. "But Helsinki" popped at 23.417 s;
-// "WANTS" is painted on in 12 frames from 23.973 s (4 frames before its word, 24.04 s): at 24.10 s it is 7.6 of 12 frames
-// in, 70 % along (ease-in-out); "that heat." pops later (24.583 s). An approximation: the paint advances left to right
-// behind a dry, streaky brush edge; the real write-on follows each letter's strokes.
+// R4's entrance after PLEASANT.md: the brush write-on is retired (part-letters behind a dragged dry edge read as a word
+// being daubed on, and a reveal that cuts letters is ruled out). The stressed word pops WHOLE in place and its light
+// BLOOMS: halo 0 -> full and scale 0.96 -> 1.00 in 8 frames (ease-out cubic). S7 at 24.00 s (frame 1440): "But
+// Helsinki" on since 23.417 s; "wants" popped at 23.967 s (frame 1438), 2 of 8 frames in (ease-out: 58 %); "that heat." later.
 window.__ready = TYPE.run(() => {
-  const S = TYPE.stage(), tone = 'light', NS = 'http://www.w3.org/2000/svg';
+  const S = TYPE.stage(), tone = 'light', k = 1 - Math.pow(1 - 2 / 8, 3);
   TYPE.text(S, {t: 'But Helsinki', x: 130, y: 362, role: 'hand', size: 116, tone});
-  const m = TYPE.measure('WANTS', {role: 'brush', size: 184});
-  const x0 = 260, w = m.right - m.left, p = 0.5 - 0.5 * Math.cos(Math.PI * (7.6 / 12)), xc = x0 + p * w;
-  const defs = S.querySelector('defs');
-  defs.insertAdjacentHTML('beforeend', `
-    <linearGradient id="feather" gradientUnits="userSpaceOnUse" x1="${xc - 12}" y1="0" x2="${xc + 6}" y2="0">
-      <stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient>
-    <filter id="dry" x="-10%" y="-10%" width="120%" height="120%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.006 0.32" numOctaves="2" seed="9" result="n"/>
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="30" xChannelSelector="R" yChannelSelector="G"/></filter>
-    <mask id="wo" maskUnits="userSpaceOnUse" x="0" y="0" width="1080" height="1920">
-      <rect x="0" y="0" width="1080" height="1920" fill="#000"/>
-      <rect x="0" y="330" width="${xc + 30}" height="230" fill="url(#feather)" filter="url(#dry)"/></mask>`);
-  const g = document.createElementNS(NS, 'g'); g.setAttribute('mask', 'url(#wo)'); S.appendChild(g);
-  TYPE.text(S, {t: 'WANTS', x: x0, y: 484, role: 'brush', size: 184, tone, accent: true, parent: g});
-  window.__writeOn = {progress: p, xCut: xc};
+  TYPE.text(S, {t: 'wants', x: 236, y: 482, role: 'hand', size: 160, tone, stress: true, bloom: k, scale: 0.96 + 0.04 * k});
+  window.__bloom = {progress: k};
 });
 </script></body></html>
