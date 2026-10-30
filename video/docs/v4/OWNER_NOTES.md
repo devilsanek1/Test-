@@ -391,3 +391,10 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   colour scripts, art bibles), then `docs/look/DESIGN_LANGUAGE.md` (the toolbox as feelings -> tools -> labelled examples
   -> checks), `docs/look/FRAME_CARD.md` (every aspect of a frame as a question) and `docs/process/REWORK.md`. -> rule:
   playbook THE THREE RULES (the toolbox as feelings and tools, never placements; one card per frame).
+- 2026-10-30 ~23:35 UTC: "make sure we have the loops setup correctly where the agents bulid the proposed scenes and we
+  evaluate and perhaps adjust it if its almost there or rework completely if it doesn't achieve the feeling we need - is
+  that something you would already do or we should explicitly setup?" -> it existed only in part (production critics
+  judged checklists; iterations had no review; the orchestrator's look was ad hoc), so it is set up explicitly: THE
+  FRAME LOOP (build -> a fresh evaluator judges the feeling first -> THERE / ALMOST: adjust, at most 2 rounds / NOT
+  THERE: rework from the idea, at most once), encoded in every workflow from the key frames on. -> rules: playbook THE
+  THREE RULES (the frame loop); PIPELINE_V2 "THE FRAME LOOP"; the two-modes rule (iterations keep one evaluator round).

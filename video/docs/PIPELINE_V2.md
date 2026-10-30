@@ -48,6 +48,20 @@ ideas; frames planned and created whole from the get-go, never filled for densit
    actions played; the owner locks it.
 7. **ANIMATION** (G5-G6): each shot animated from its own key frame (life, motion, the transitions), never re-filled.
 8. **Sound and final** (G7-G8, as below).
+**THE FRAME LOOP (owner, 2026-10-30; every built idea, key frame, scene and shot, before the owner sees it):**
+1. **Build:** the builder makes the frame whole from its card (the beat's feeling and idea; `docs/look/FRAME_CARD.md`).
+2. **Evaluate:** a FRESH evaluator (never the builder; one, not a panel) looks at the frame at full and phone size
+   beside video 1's frame and the owner's references, and answers one question first: does it give the viewer the
+   beat's FEELING and idea in a second, and is it worth pausing on? Then the card's questions. The verdict is one of:
+   - **THERE:** it achieves the feeling; small polish notes only -> move on.
+   - **ALMOST:** the feeling is there but specific things hold it back -> ADJUST: the builder fixes exactly those
+     (each note names what and why), re-render, re-evaluate. At most 2 adjust rounds.
+   - **NOT THERE:** the frame doesn't achieve the feeling -> REWORK from the idea: a new approach to the frame (a
+     different idea, staging or device), never a patch. At most 1 rework; if it still fails, the owner gets the frame
+     with two options and what each lacks.
+3. **The orchestrator's look**, beside the references, then the owner. Workflows encode the loop (build -> evaluate ->
+   adjust or rework, capped), so it never depends on someone remembering it. Look ITERATIONS keep one evaluator round.
+
 **Our recipes are the toolbox at every step, never a cage (owner, 2026-10-30: "are the composition recommendation
 included in here? Are the stylistic recipes included here? is it completley free flowing ..."):** the ideas are
 composed with `docs/look/COMPOSITION_SHOTS.md` (the frame's grammar in every frame, one lead device per frame named by

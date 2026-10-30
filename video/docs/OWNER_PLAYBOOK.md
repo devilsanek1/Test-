@@ -31,6 +31,14 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
    world, its light, its people, its words) before it is built or animated. Never a frame built thin and filled later
    "for the sake of density": density comes from the imagination and the world, never from a filling pass.
 
+**THE FRAME LOOP (every built frame, before the owner sees it):** build it whole -> a fresh evaluator judges the FEELING
+first (does it give the beat's feeling and idea in a second, worth pausing on, beside video 1 and the references) ->
+THERE (move on), ALMOST (adjust exactly what holds it back, at most 2 rounds) or NOT THERE (rework from the idea, a new
+approach, at most once; then the owner gets the options); encoded in every workflow (PIPELINE_V2, "THE FRAME LOOP"). —
+("make sure we have the loops setup correctly where the agents bulid the proposed scenes and we evaluate and perhaps
+adjust it if its almost there or rework completely if it doesn't achieve the feeling we need - is that something you
+would already do or we should explicitly setup?", 2026-10-30.)
+
 **The process is loose and imaginative around these three:** pictures before documents, ideas before rules. Every
 other rule in this playbook serves them as guidance from the owner's past notes, never as a checklist that designs the
 frame; checks catch mistakes (captions, safe zones, timing), they never stand in for the picture. **Imagination first,
@@ -956,7 +964,8 @@ imaginative".)
   think is right and make the videos better", 2026-10-30, answering the sound-sync and look questions.)
 - **Two modes: PRODUCTION and ITERATION.** Production is a film going through the gates (G0-G8): full checks, review
   panels, QA suites, fix passes, as the quality needs. Iteration is a quick experiment for the owner to judge (a look
-  test, a rethought scene, a style probe, a "what if"): one or two agents, no panels, no critics, no QA suites, rough
+  test, a rethought scene, a style probe, a "what if"): one or two agents, no panels, no QA suites (one fresh evaluator
+  round of THE FRAME LOOP, 2026-10-30), rough
   where rough is enough (a still, a few stages, a short clip), the result in about an hour and shown at once; the
   owner's verdict is the review. A look iteration starts with STILLS: motion only once the owner has approved the
   still. Ask "is this a film or a question?" before planning: a question is an iteration, and
