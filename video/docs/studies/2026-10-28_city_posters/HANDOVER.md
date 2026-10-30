@@ -6,6 +6,21 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-30 17:25 UTC: resumed after the 5-hour reset (owner: "restart when the limit is reset")
+- RUNNING: workflow `composition-library-v2` (run `wf_6be51888-82f`, script
+  `/root/.claude/projects/-home-user-Test-/fe339b66-57f0-5b47-bb6a-872d2f15f4c0/workflows/scripts/composition-library-v2-wf_6be51888-82f.js`):
+  catalogue (`composition/catalogue.json`, `catalogue_notes.md`, `catalogue_prior.json`, `principles.json`) -> 3 BLIND
+  judges (`composition/judges/{attention,story,fit}.json`) -> the library (`COMPOSITION_SHOTS.md` Part 0 tiers + 0b
+  guidelines and the motion grammar; `composition/library_sheet.png`) -> in parallel: library critic
+  (`composition/critique_library.md`) + Helsinki pass -> library fix + Helsinki critic -> Helsinki fix.
+- The Helsinki files are written in a detached worktree of `claude/kind-pascal-lvgsza` at
+  `/tmp/claude-0/-home-user-Test-/fe339b66-57f0-5b47-bb6a-872d2f15f4c0/scratchpad/v4wt`:
+  `video/docs/v4/visual/COMPOSITION_PASS.md`, `composition_pass_sheet.png/.py`, `review_composition.md`; a second loop
+  (task bwbto3v3q, `scratchpad/v4_checkpoint.sh`, 2 h cap) commits them there and pushes to that branch.
+- RUNNING: sound-sync-research resumed (same run `wf_74169695-356`, with a RESUMING note; scratch /tmp/sync/).
+- Main checkpoint loop: task bn7xeu1zy, caps ~18:20 (restart then). Backup resumes still scheduled 17:45, 18:30, 20:00
+  (they check the loop only, if this status exists).
+
 ## Status 2026-10-30 16:20 UTC: near the 5-hour limit (owner: "Yeah we are close to the 5h limit")
 - sound-sync-research (run `wf_74169695-356`) STOPPED ON PURPOSE (it had only just started; nothing in
   `video/docs/look/sound_sync/` yet, scratch in /tmp/sync/) so the window finishes composition's research first.
