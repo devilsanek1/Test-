@@ -15,7 +15,8 @@ export type Eyes = 'lash' | 'open';
 export type HeadOptsV4 = {
   skin: Tone;
   hair: Tone;
-  /** the closed-eye LASH (default) or the variant: open eyes looking away, never at us */
+  /** open eyes looking away, never at us (the default: the owner's pick, 2026-10-30, "Let's do open eyes"), or the
+   *  closed-eye LASH (downcast, serene moments) */
   eyes?: Eyes;
   /** a soft brow over the eye (default: on with open eyes and on men, off on her lash face) */
   brow?: boolean;
@@ -125,7 +126,7 @@ function viewParts(sex: Sex, V: ViewDesign, T: FaceTones, o: HeadOptsV4): PartV4
   const parts: PartV4[] = [];
   const px = o.px ?? 200;
   const soft = o.soft ?? true;
-  const eyes = o.eyes ?? 'lash';
+  const eyes = o.eyes ?? 'open';
   const brow = o.brow ?? (eyes === 'open' || sex === 'm');
   const man = sex === 'm';
   const marks = px >= 12;
@@ -191,7 +192,7 @@ function viewParts(sex: Sex, V: ViewDesign, T: FaceTones, o: HeadOptsV4): PartV4
     });
   }
 
-  // ---- the eyes: the closed lash (default) or the open eye looking away; the brow
+  // ---- the eyes: the open eye looking away (default) or the closed lash; the brow
   if (px >= 18) {
     if (eyes === 'lash') {
       V.lashes.forEach((s, i) => parts.push({name: `lash${i}`, segs: stroke(s), fill: T.lash, z: 53.5, free: true}));

@@ -408,8 +408,8 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
 - **People: small and simple in the frame, contemporary and refined in design** (small full figures, often seen from
   behind or in rear 3/4; adult proportions of about 7.8 heads in direction C, below, which replaces reference 1's
   round-headed crowd as the drawing model; near heads <= ~140 px), never big character models: they act with their pose
-  (reach, shrug, slump, look up); faces stay generic (the LASH face of the people design below, never eyes looking at us
-  or a mouth). **In the foreground only the film's one "you" or the
+  (reach, shrug, slump, look up); faces have OPEN EYES that look away, never at us (the owner's pick, 2026-10-30: "Let's do open eyes";
+  simple features: a soft brow, a small nose, the lips as a tone; the closed-eye LASH only for downcast, serene moments). **In the foreground only the film's one "you" or the
   mascot;** the "you" near the camera stands at a real size, about v2's original (~130-220 px tall), still simple and
   from behind or in silhouette (DEPTH AND SCALE FROM A HUMAN VIEWPOINT above; owner, 2026-10-29); strangers stay small in the mid and far ground (a row of strangers' backs in front reads as "you"). Simple, but REFINED,
   CLEAN and FLUID like the girl in the owner's 9:16 motion reference (`docs/look/refs_human_scale/04_cloud_beast_girl_strip.jpg`):
@@ -429,7 +429,8 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   actually kind of like the last one modern graphic except the face that looks messed up", 2026-10-30.) The face now:
   LASH (closed-eye lash lines and a small soft nose; the contour only under ~200 px; sunglasses and caps as some
   people's accessories; her often turned away), kept for now and to be iterated later ("It’s better let’s keep it for
-  now / We will iterate more later on"; "Let’s keep lash", 2026-10-30; `docs/look/PEOPLE_DESIGN.md`). — ("Yes then people I think we should target 20-30 yo today with styles that are just cool and
+  now / We will iterate more later on"; "Let’s keep lash", 2026-10-30; `docs/look/PEOPLE_DESIGN.md`). Superseded the
+  same day by the redrawn faces with OPEN EYES looking away ("Let's do open eyes", on the overhaul's stills). — ("Yes then people I think we should target 20-30 yo today with styles that are just cool and
   appealing to look at so think instagram infkuebcers, New York, Los Angeles, including hair clothing and perhaps less
   of faces like faces we need to find a way to draw in a more generic way"; "Let’s land version 6 first", 2026-10-30.) — ("Another bit is humans we paint - they should be better /
   These are the references especially the video / On the video the person is not substantially different than yours

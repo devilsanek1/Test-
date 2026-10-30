@@ -6,7 +6,8 @@ soft shading) on a 2D rig (the cap rigid on the head, the hanging pieces skinned
 in three views (`people_design/hair_v4/V4.md`, code `src/look/people_dirs/hair_v4/`; the assembled figures
 `src/entry-look-people-v4.tsx`, stills `people_design/hair_v4/final/`). It replaces §5.4's hair library and v2/v3
 (`people_design/hair_v2/`, rejected: "incoherent", "garbage"). The faces were redrawn beside it (`people_design/
-faces_v2/V4.md`, code `people_v4/`: her cute, him manly; LASH as now, an open-eye variant awaiting the owner's pick);
+faces_v2/V4.md`, code `people_v4/`: her cute, him manly; OPEN EYES looking away, never at us, the default by the
+owner's pick ("Let's do open eyes", 2026-10-30); the closed LASH only for downcast, serene moments);
 the bodies are being rebuilt (`people_design/bodies_v4/`). Why the old figures read cheap: `people_design/EVALUATION.md`.
 
 **IN USE FOR NOW (owner, 2026-10-30): direction C, MODERN GRAPHIC, with the LASH face.** The owner picked C "except

@@ -308,3 +308,6 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   a spring rig, soft shading) is the hair in use for now (PEOPLE_DESIGN status, the playbook); to iterate later. The
   eyes (LASH or open) and the cut-by-cut notes stay open; the bodies round continues. -> rule: playbook, Visual style
   (hair v4 kept for now).
+- 2026-10-30 ~19:30 UTC: "Let's do open eyes" -> the redrawn faces' open eyes (looking away, never at us; a soft brow, a
+  small nose, the lips as a tone) are the default (`src/look/people_dirs/people_v4/head.ts`: eyes 'open'); the closed
+  LASH stays for downcast, serene moments. -> rule: playbook, Visual style (People: open eyes that look away).
