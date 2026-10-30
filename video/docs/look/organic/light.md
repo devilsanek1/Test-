@@ -8,7 +8,7 @@ story lights. Darks, contrast and the one colour key are palette work (the owner
 selection"); this page is the light.
 
 **What this is.** The LIGHT lane of the organic research: how 2D illustrators, background painters and 2D animation
-compositors build light that reads (§2, 20 sources), what the owner's references do with light, measured (§1), how to
+compositors build light that reads (§2, 15 sources), what the owner's references do with light, measured (§1), how to
 do each technique in OUR engine with its cost and determinism (§4, §7), the light plan for scene 1 (the low October sun
 on the left as the key, the lit Google doorway as the story light on her: §5), and a proof: the v6 still relit by the
 engine's own renders and masks, at two doses, plus a cost bench in the real render path (§6, §7). **Rank:** research
@@ -79,7 +79,7 @@ CIE L* C* h of the phone screenshots (UI masked), at their own size (1206 px wid
 - The 2D feature that took light furthest kept the vocabulary tiny: Klaus's light-and-shadow tool reduced light to key,
   bounce, ambient, occlusion and rim, so the artists could "paint directly with light" (source 1). Fortiche's series
   overrode automated lighting with hand-designed light and "hero lighting": the light on a character need not match
-  the room when the story needs it (source 16).
+  the room when the story needs it (source 13).
 - In the owner's references the one source IS the story (02's shelter lamp, 03's phone, 01's sunset, 04's cloud), and
   everything else sits in a few shade masses (§1).
 - **For us:** one KEY per set (the direction for everything) and ONE STORY LIGHT on the subject per scene: the
@@ -92,14 +92,14 @@ CIE L* C* h of the phone screenshots (UI masked), at their own size (1206 px wid
   then a slow tail. An area source (a doorway, a window, a screen) falls off more slowly near it and like a point far
   away.
 - Painters compress the curve (a bright core, a quick drop, a long gentle tail) and let the tail TINT what it reaches
-  (source 17; 02's reeds and posts, §1).
+  (source 14; 02's reeds and posts, §1).
 - **For us:** falloff follows a real curve, applied as a smooth, dithered ramp in a baked light map or a short gradient
   fill, never as concentric rings; CRAFT §d.7's two flat steps stay for a pool that is meant to be hard.
 
 ### 2.3 Rim light and light wrap
 - A rim is the thin bright edge where a form turns away from us toward a light behind or beside it: brightest where
   the surface faces the light, thicker on soft or thin parts (hair, a scarf, cloth), thinner on hard edges, in the
-  light's own colour; an even rim all round reads as an effect and pulls focus (source 18). 01's slivers (§1) are the
+  light's own colour; an even rim all round reads as an effect and pulls focus (source 14). 01's slivers (§1) are the
   same thing on buildings: 3-10 px, uneven.
 - Light wrap is the compositor's version for a subject before a bright background: blur the background until only its
   light is left, keep it to a band just inside the subject's edge, add it (screen or plus), with controls for the band's
@@ -117,7 +117,7 @@ CIE L* C* h of the phone screenshots (UI masked), at their own size (1206 px wid
   (coloured paraffin paper) for bleed and colour; at ufotable the light "propagates through the shot", bouncing and
   leaking into the lens as bloom, and gradients are added in compositing (source 2).
 - A painter's glow is a core plus an aura that tints what it touches, and it reads only against darker values: on a
-  light field it is invisible, overdone it reads as fog or a spotlight (source 17). The references keep it tight (02's
+  light field it is invisible, overdone it reads as fog or a spotlight (source 14). The references keep it tight (02's
   air +9 L*; 03's sun +1-3 along its line).
 - **For us:** bloom only AT emitters (the sun, a lit opening, a lamp, a screen) and at their mirror images in water,
   never on lit surfaces; three sigmas of ~0.1, 0.4 and 1.2 x the source's size; at most +6-8 L* at its edge, +2 at one
@@ -141,7 +141,7 @@ CIE L* C* h of the phone screenshots (UI masked), at their own size (1206 px wid
   CanvasModulate) plus lights added over it (Add, Mix or Subtract), shadows cast by occluder polygons; Unity's 2D
   renderer blends light textures by style (multiply and additive, at most four and usually two per scene, because each
   style costs a pass) (source 7). Ori's sequel painted a light mask on every surface so the world reacts to moving
-  lights (source 20).
+  lights (source 15).
 - **For us:** shadows by projective construction (exact in our perspective); pools as the source's opening projected
   onto the ground with its falloff; a caster's shadow from the story light cut out of that pool (§4.6).
 
@@ -155,7 +155,7 @@ CIE L* C* h of the phone screenshots (UI masked), at their own size (1206 px wid
 ### 2.8 The colour of light and shadow at dusk
 - A low sun's light crosses more air, so the short wavelengths scatter out and it turns gold to orange (golden hour,
   roughly 2000-3500 K); the shadows are lit by the blue sky, so they lean cool and violet, unless warm bounce dominates
-  and the sky is blocked, when they turn warm (sources 4, 19). After sunset the world is lit by the sky (cool) and every
+  and the sky is blocked, when they turn warm (source 4). After sunset the world is lit by the sky (cool) and every
   lamp reads warm. The references hold it: 02's red against blue-violet, 01's cream-gold slivers against plum fronts.
 - **For us:** gold light; shade toward the sky's violet with its chroma kept (CRAFT §d.3: warm surfaces turn toward
   rose and plum, cool ones toward violet); warm bounce under things near a warm ground; the story light as the one hot
@@ -163,7 +163,7 @@ CIE L* C* h of the phone screenshots (UI masked), at their own size (1206 px wid
 
 ### 2.9 How light moves in animation
 - Klaus tracked its light and shadow shapes to every drawing and in-betweened them, so the light rides the character
-  and never boils (source 1). Ori's painted light masks let the world answer a moving light (source 20). Anime pulses
+  and never boils (source 1). Ori's painted light masks let the world answer a moving light (source 15). Anime pulses
   and flickers transmitted light on story beats (source 2).
 - **For us:** a source never moves between cuts (CRAFT §d.1); static light is baked per plane and rides its plane;
   light on a mover is computed from its pose every frame (a function of t only); a light switching is a one-frame pop
@@ -371,7 +371,7 @@ BENCH_PENDING
 | NumPy 2.5.3 | the bake | BSD-3-Clause | in use (already a QA dependency) |
 | OpenCV (cv2 5.0.0) | the exact distance transform, the blurs, the homography warp, the radial accumulation | Apache-2.0 | in use (already a QA dependency) |
 | SciPy 1.18.1 | an alternative exact EDT (`ndimage.distance_transform_edt`) | BSD-3-Clause | not needed |
-| Remotion 4.0.538 + the Chromium headless shell 1243 | the render; SVG blend modes, gradients, masks and filters (W3C Compositing and Blending, SVG filter effects: sources 8) | Remotion's licence (the project's existing stack); Chromium BSD-3 | in use |
+| Remotion 4.0.538 + the Chromium headless shell 1243 | the render; SVG blend modes, gradients, masks and filters (W3C Compositing and Blending, SVG filter effects: source 8) | Remotion's licence (the project's existing stack); Chromium BSD-3 | in use |
 | pixi-filters (GodrayFilter, AdvancedBloomFilter) | WebGL god rays and bloom | MIT | rejected: a second renderer, and WebGL runs on SwiftShader here (techniques.md §3.12: 0.2-0.3 s per frame for a simple shader) |
 | pmndrs postprocessing (BloomEffect, GodRaysEffect) | three.js post effects | Zlib (on three.js, MIT) | rejected: same reasons |
 | LYGIA (shader functions) | GLSL bloom, light, SDF helpers | Prosperity (non-commercial) + Patron (sponsors); its mixBox files are separately non-commercial | **banned in production** unless a commercial licence is bought |
@@ -406,7 +406,7 @@ what its search summary and our own knowledge of the method agree on; nothing is
 1. Klaus's light-and-shadow tool (KLaS; key, bounce, ambient, occlusion, rim; tracking and in-betweening): animatorsguild.com/?p=5287; cartoonbrew.com/feature-film/how-klaus-draws-on-centuries-old-artistic-principles-to-push-2d-animation-forward-182325.html
 2. Anime compositing (撮影; 透過光 transmitted light; パラ coloured paraffin; ufotable's light and bloom in compositing): animenewsnetwork.com/feature/2018-01-10/interview-yuichi-terao-chief-of-ufotable-digital-team/.125658; neec.ac.jp/tuitionfreedat/syllabusdat/pdf/2021/hac/21LA038.pdf
 3. Light wrap: learn.foundry.com/nuke/14.1/content/reference_guide/draw_nodes/lightwrap.html; natron.readthedocs.io/en/v2.4.2/plugins/fr.inria.LightWrap.html
-4. Golden hour, complementary shadows: gurneyjourney.blogspot.com/2008/01/golden-hour.html; gurneyjourney.blogspot.com/2014/09/complementary-shadows.html
+4. Golden hour (a low sun's light gold to orange, roughly 2000-3500 K) and complementary shadows: gurneyjourney.blogspot.com/2008/01/golden-hour.html; gurneyjourney.blogspot.com/2014/09/complementary-shadows.html; en.wikipedia.org/wiki/Golden_hour_(photography)
 5. Bloom (SIGGRAPH 2014, Advances in Real-Time Rendering): iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare/
 6. Light shafts (GPU Gems 3 ch. 13): developer.nvidia.com/gpugems/gpugems3/part-ii-light-and-shadows/chapter-13-volumetric-light-scattering-post-process
 7. 2D light layers: docs.unity3d.com/Packages/com.unity.render-pipelines.universal@15.0/manual/LightBlendStyles.html; docs.godotengine.org/en/4.5/tutorials/2d/2d_lights_and_shadows.html
@@ -415,11 +415,9 @@ what its search summary and our own knowledge of the method agree on; nothing is
 10. Falloff on a plane (the cosine-cubed law): schorsch.com/en/kbase/glossary/point-by-point.html
 11. Crepuscular rays and shadows in perspective: scientificamerican.com/article/what-are-crepuscular-rays; atoptics.co.uk/atoptics/rayim8.htm; studiochalkboard.evansville.edu/lp-shadow.html
 12. Lighting for story (SIGGRAPH 96 course 30, Pixel Cinematography: "Storytelling Through Lighting"): history.siggraph.org/wp-content/uploads/2021/08/1996-30-Contents-Pixel-Cinematography-A-Lighting-Approach-for-Computer-Graphics.pdf
-16. Fortiche's hand-designed light: redsharknews.com/why-netflixs-arcane-looks-so-good-how-fortiche-ramped-up-the-animation-pipeline
-17. Painting a glow (core and aura; screen and add layers): instructables.com/How-to-Draw-Light; tips.clip-studio.com/en-us/articles/1178
-18. Rim light (an uneven rim on a form, not an effect): muddycolors.com/?p=43890; glass.photo/photography-terms/rim-light
-19. Golden hour's colour temperature: en.wikipedia.org/wiki/Golden_hour_(photography)
-20. Painted light masks reacting to moving lights (Ori and the Will of the Wisps): wccftech.com/ori-and-the-will-of-the-wisps-dynamic-lighting/
+13. Fortiche's hand-designed light: redsharknews.com/why-netflixs-arcane-looks-so-good-how-fortiche-ramped-up-the-animation-pipeline
+14. Painting light: a glow as a core plus an aura that tints what it reaches (screen and add layers), and a rim as light on a turning form, uneven, never an even outline: instructables.com/How-to-Draw-Light; tips.clip-studio.com/en-us/articles/1178; muddycolors.com/?p=43890; glass.photo/photography-terms/rim-light
+15. Painted light masks reacting to moving lights (Ori and the Will of the Wisps): wccftech.com/ori-and-the-will-of-the-wisps-dynamic-lighting/
 Licences: npmjs.com/package/lygia, unpkg.com/resolve-lygia@1.0.4/LICENSE.md (LYGIA); jsdelivr.com/package/npm/@pixi/filter-advanced-bloom (pixi-filters); pmndrs.github.io/postprocessing (postprocessing).
 
 ## 11. Rerun

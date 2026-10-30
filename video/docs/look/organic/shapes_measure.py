@@ -140,6 +140,8 @@ def measure_crop(rgb: np.ndarray) -> tuple[dict, dict]:
         out['roughness'][cls] = {'n': len(L), 'req_median': float(np.median(R)),
                                  'band_rms_px': [None if not np.isfinite(v) else round(float(v), 3) for v in np.nanmedian(A, 0)],
                                  'band_rms_rel': [None if not np.isfinite(v) else round(float(v), 4) for v in np.nanmedian(A / R[:, None], 0)]}
+    # ---------------- lost and found ALONG the notan's boundaries (where the masses meet, even where the edge is lost)
+    out['along'] = S.along_boundaries(lab)
     draw = {'geos': geos, 'mgeos': mgeos, 'labels': labels, 'mprof': mprof, 'clear_pts': clear_pts}
     return out, draw
 
@@ -191,8 +193,23 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--only', default='')
     ap.add_argument('--out', default='/tmp/organic/shapes/run')
+    ap.add_argument('--add-along', action='store_true', help='only add the along-boundary numbers to DIR/shapes_data.json')
     args = ap.parse_args()
     only = set(filter(None, args.only.split(',')))
+    if args.add_along:
+        path = os.path.join(args.out, 'shapes_data.json')
+        data = json.load(open(path))
+        for (cid, elem, src, x0, y0, x1, y1, what) in CROPS:
+            if (only and cid not in only) or cid not in data:
+                continue
+            t0 = time.time()
+            crop = np.ascontiguousarray(norm_src(src)[y0:y1, x0:x1])
+            data[cid]['along'] = _clean(S.along_boundaries(S.to_lab(crop)))
+            a = data[cid]['along']
+            print(f"{cid:16s} along found {a.get('found', 0):.2f} soft+lost {a.get('soft_or_lost', 0):.2f} broken {a.get('broken', 0):.2f} "
+                  f"alternating {a.get('alternating', 0):.2f} switches/1000px {a.get('switch_per_1000px', 0):.1f} ({time.time() - t0:.1f}s)", flush=True)
+            json.dump(data, open(path, 'w'), indent=1)
+        return
     os.makedirs(os.path.join(args.out, 'overlays'), exist_ok=True)
     os.makedirs(os.path.join(args.out, 'crops'), exist_ok=True)
     path = os.path.join(args.out, 'shapes_data.json')

@@ -7,13 +7,14 @@ it, a few soft shafts low over the water) and the lit Google doorway as the STOR
 gentle bloom at the opening, its pool on the towpath with her shadow in it, light wrap and a rim on her). The facade
 facing us is backlit, so it sits in the dusk's lilac shade; our near bank lies in the shade of trees off-screen left
 (one big quiet mass with a leafy edge). Everything is computed from the engine's own renders of the scene and their
-layer masks (render-frames.mjs on src/entry-look-paint.tsx; the commands are in light.md §8), in LINEAR light:
+layer masks (render-frames.mjs on src/entry-look-paint.tsx; the commands are in light.md §11), in LINEAR light:
     out = base * E + G        E = the multiply light map (shade < 1, light > 1), G = the additive glow (bloom, shafts)
 Captions are pasted back unlit. Deterministic: no unseeded randomness (the leafy edge and the dither are sha256-seeded).
 
-    python3 light_demo.py <renders_dir> <out_dir> [--times 1.0,1.6] [--repeat 2]
-renders_dir holds base/ cap/ norow/ nosky/ skyonly/ (f%05d.png at 60 fps). Writes lit_fXXXXX.png, maps_fXXXXX.jpg,
-metrics.json and the sheet. --repeat 2 runs twice and checks the md5s match.
+    python3 light_demo.py <renders_dir> <out_dir> [--times=1.0,1.6] [--doses=1.0,1.6] [--repeat=2]
+renders_dir holds base/ cap/ norow/ nosky/ skyonly/ nopip/ (f%05d.png, named by the 60 fps frame). Writes
+lit_fXXXXX_dD.png, maps_fXXXXX_dD.jpg and metrics.json (the sheet: light_sheet.py). --repeat 2 runs twice and checks
+the md5s match.
 """
 import hashlib
 import json
@@ -35,7 +36,7 @@ COPING_Y = 1110.0             # the far coping's front edge (the water starts)
 BAND = (290, 610)             # the caption band rows the light never touches (CRAFT: one value across the band)
 WING = np.array([[330, 640], [1080, 600], [1080, 1084], [330, 1084]], np.int32)   # S1_SHEET.wing + parapet
 
-# The rig's colours (the dusk light table: PAINT_RECIPES §3 C5; light.md §6.1).
+# The rig's colours (the dusk light table: PAINT_RECIPES §3 C5; light.md §4.9).
 SUN_LIGHT = '#FFC27A'         # the low sun's light (gold-peach; the glint's #ee6a2e is its saturated core)
 SHADE_WARM = '#C79AB4'        # the shade family on warm surfaces (rose-plum: CRAFT §d.3 keeps their chroma, 5-20 deg to rose)
 SHADE_COOL = '#A49BD6'        # the same family on cool surfaces (violet: 10-16 deg toward violet)
@@ -135,7 +136,7 @@ def band_mask():
 
 # ------------------------------------------------------------------------------------------------ masks
 def masks(R, f, t=None):
-    """Layer masks from the engine's own renders (light.md §8): every mask is a difference of two renders of the SAME
+    """Layer masks from the engine's own renders (light.md §11): every mask is a difference of two renders of the SAME
     frame with one layer switched, so it is exact to the pixel (no colour segmentation except the doorway's source)."""
     sdx, sdy = offset(f / 60.0 if t is None else t, 'subject')   # the subject plane's float at this frame
     base = load(f'{R}/base/f{f:05d}.png')
@@ -250,7 +251,7 @@ def shafts(emit, center, n=72, decay=0.965, length=0.55):
 
 
 def leafy_edge_shade(seed, y_mid=1338, amp=40, soft=12):
-    """The near bank in the shade of trees off-screen left (light.md §6.3): one big quiet mass whose top edge is the
+    """The near bank in the shade of trees off-screen left (light.md §4.2, §5.1): one big quiet mass whose top edge is the
     canopy's own outline thrown on the ground: clumps of three sizes (never a ruler line, never a sine), a few holes of
     light near the edge, soft by the penumbra of a distant canopy (~12 px here), two warm dapples inside."""
     rng = rng_for(seed, 'leafy-edge', 0)
@@ -284,7 +285,7 @@ def leafy_edge_shade(seed, y_mid=1338, amp=40, soft=12):
 
 
 def door_pool(her_shadow):
-    """The doorway's spill on the towpath (light.md §6.2): the opening projected forward from the lobby's lamps: a
+    """The doorway's spill on the towpath (light.md §4.6): the opening projected forward from the lobby's lamps: a
     trapezoid from the door's foot widening 1.45x by the coping, falling off with distance (cos^3 law), soft at its
     sides (an area light's penumbra), with her shadow cut out of it."""
     x0, _, x1, y1 = DOOR
@@ -352,7 +353,7 @@ def light_frame(R, f, seed=1, dose=1.0):
     keep_src = (M['door_src'] | M['panes']).astype(np.float32)
 
     # 1. THE SHADE (what the key doesn't reach): the backlit facade, the towpath under the far roofs' shadow, our bank
-    #    under the trees: ONE family at three strengths (light.md §6.1), rose-plum on warm surfaces and violet on cool
+    #    under the trees: ONE family at three strengths (light.md §5.1), rose-plum on warm surfaces and violet on cool
     #    ones (CRAFT §d.3: chroma kept, never grey). Sources, the sky and the water (a mirror) stay unshaded.
     t0 = time.perf_counter()
     warmth = smoothstep(-0.03, 0.08, base[..., 0] - base[..., 2])[..., None]

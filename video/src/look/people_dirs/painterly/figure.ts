@@ -72,9 +72,8 @@ export function buildModel(p: Person, pose: Pose, res = 1): Model {
     surfaces.push(legSurface(sk, 'L', res, legsFrom), legSurface(sk, 'R', res, legsFrom));
   }
   if (arms) {
-    for (const s of ['L', 'R'] as const) {
-      if (armsTo < 300) surfaces.push(armSurface(sk, s, res, armsTo > -30 ? armsTo - 20 : -30));
-    }
+    // under a sleeve only the part near the cuff is built (it shows inside the open cuff)
+    for (const s of ['L', 'R'] as const) surfaces.push(armSurface(sk, s, res, armsTo > -26 ? Math.min(armsTo - 40, 300) : -26));
   }
   for (const s of ['L', 'R'] as const) surfaces.push(...handSurfaces(sk, s, res));
   if (p.faceMarks) built.push(p.faceMarks(sk, res, p.face));

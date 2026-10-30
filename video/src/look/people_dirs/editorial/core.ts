@@ -548,3 +548,139 @@ export function ringExtent(secs: Sec[], y: number, v: View, xf: Xf = ID): [numbe
   }
   return [lo, hi];
 }
+
+// ---------------------------------------------------------------- contour bands (sheens, rims)
+
+/** Resample a closed outline to `n` points evenly spaced by arc length (corners are smoothed away: for bands only). */
+export function resampleClosed(pts: PP[], n: number): V2[] {
+  const P: V2[] = pts.map((p) => [p[0], p[1]]);
+  const m = P.length;
+  const seg: number[] = [];
+  let tot = 0;
+  for (let i = 0; i < m; i++) {
+    const a = P[i];
+    const b = P[(i + 1) % m];
+    const l = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    seg.push(l);
+    tot += l;
+  }
+  const out: V2[] = [];
+  let j = 0;
+  let acc = 0;
+  for (let k = 0; k < n; k++) {
+    const s = (tot * k) / n;
+    while (j < m - 1 && acc + seg[j] < s) {
+      acc += seg[j];
+      j++;
+    }
+    const u = seg[j] ? (s - acc) / seg[j] : 0;
+    const a = P[j];
+    const b = P[(j + 1) % m];
+    out.push([a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u]);
+  }
+  return out;
+}
+
+/** The signed area of a closed polygon (screen coords: > 0 = clockwise on screen, y down). */
+export function areaOf(P: V2[]): number {
+  let s = 0;
+  for (let i = 0; i < P.length; i++) {
+    const a = P[i];
+    const b = P[(i + 1) % P.length];
+    s += a[0] * b[1] - b[0] * a[1];
+  }
+  return s / 2;
+}
+
+export type BandOpts = {
+  /** The light's direction on screen (toward the light), unit. */
+  key: V2;
+  /** Where the band may sit: the outward normal's dot with `key` must exceed this. */
+  minDot?: number;
+  /** The band's gap from the contour and its thickness (screen units) at its middle. */
+  gap: number;
+  width: number;
+  /** Only the part of the run nearest this point (screen units), max this arc length. */
+  near?: V2;
+  maxLen?: number;
+  /** Extra screen-space restriction (a point must pass to be in the run). */
+  where?: (p: V2) => boolean;
+  /** How many samples around the contour. */
+  samples?: number;
+  /** How the thickness tapers along the run (u 0..1): default a sine. */
+  taper?: (u: number) => number;
+};
+
+/** A crescent band set just inside a closed outline where it faces the light: a hair sheen, a satin highlight, a rim.
+ *  Returns a closed outline (the outer edge along the contour, the inner edge offset inward), or null. */
+export function contourBand(pts: PP[], o: BandOpts): PP[] | null {
+  const n = o.samples ?? 160;
+  const P = resampleClosed(pts, n);
+  if (P.length < 8) return null;
+  const cw = areaOf(P) > 0;
+  // smoothed outward normals
+  const N: V2[] = P.map((_, i) => {
+    const a = P[(i - 3 + n) % n];
+    const b = P[(i + 3) % n];
+    const t: V2 = [b[0] - a[0], b[1] - a[1]];
+    const l = Math.hypot(t[0], t[1]) || 1;
+    // positive signed area (x right, y down): the outward normal of the tangent t is (t.y, -t.x)
+    return cw ? [t[1] / l, -t[0] / l] : [-t[1] / l, t[0] / l];
+  });
+  const minDot = o.minDot ?? 0.35;
+  const ok = P.map((p, i) => N[i][0] * o.key[0] + N[i][1] * o.key[1] > minDot && (!o.where || o.where(p)));
+  // the runs of consecutive ok samples (circular)
+  const runs: number[][] = [];
+  let start = ok.findIndex((v) => !v);
+  if (start < 0) start = 0;
+  let cur: number[] = [];
+  for (let k = 1; k <= n; k++) {
+    const i = (start + k) % n;
+    if (ok[i]) cur.push(i);
+    else if (cur.length) {
+      runs.push(cur);
+      cur = [];
+    }
+  }
+  if (cur.length) runs.push(cur);
+  if (!runs.length) return null;
+  let run: number[];
+  if (o.near) {
+    const d = (r: number[]) => Math.min(...r.map((i) => Math.hypot(P[i][0] - o.near![0], P[i][1] - o.near![1])));
+    run = runs.reduce((a, b) => (d(a) <= d(b) ? a : b));
+  } else run = runs.reduce((a, b) => (a.length >= b.length ? a : b));
+  // limit the arc length (centred on the sample nearest `near`, or the middle)
+  if (o.maxLen) {
+    const step = Math.hypot(P[1][0] - P[0][0], P[1][1] - P[0][1]) || 1;
+    const maxN = Math.max(4, Math.round(o.maxLen / step));
+    if (run.length > maxN) {
+      let c = Math.floor(run.length / 2);
+      if (o.near) {
+        let bd = Infinity;
+        run.forEach((i, k) => {
+          const dd = Math.hypot(P[i][0] - o.near![0], P[i][1] - o.near![1]);
+          if (dd < bd) {
+            bd = dd;
+            c = k;
+          }
+        });
+      }
+      const a = clamp(c - Math.floor(maxN / 2), 0, run.length - maxN);
+      run = run.slice(a, a + maxN);
+    }
+  }
+  if (run.length < 4) return null;
+  const tp = o.taper ?? ((u: number) => Math.sin(Math.PI * u) ** 0.8);
+  const outer: PP[] = [];
+  const inner: PP[] = [];
+  run.forEach((i, k) => {
+    const u = k / (run.length - 1);
+    const w = o.width * tp(u);
+    const g = o.gap * (0.6 + 0.4 * tp(u));
+    const p = P[i];
+    const nn = N[i];
+    outer.push([p[0] - nn[0] * g, p[1] - nn[1] * g]);
+    inner.push([p[0] - nn[0] * (g + w), p[1] - nn[1] * (g + w)]);
+  });
+  return [...outer, ...inner.reverse()];
+}

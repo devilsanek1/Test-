@@ -58,6 +58,8 @@ export type TorsoGarment = {
   folds?: {n: number; amp: number; from: number; seed?: number};
   look?: SurfLook;
   bias?: number;
+  /** What it encloses (Surface.covers); default the torso and the neck. */
+  covers?: string[];
   /** Rows and columns at res 1. */
   rows?: number;
   cols?: number;
@@ -179,7 +181,7 @@ export function torsoGarment(sk: Skeleton, g: TorsoGarment, res: number): Surfac
     }
     return v;
   };
-  return {key: g.key, mat: g.mat, grid, axis, wrap: true, open: !!g.open || !!g.neck, mask: g.open || g.neck ? mask : undefined, look: g.look, bias: g.bias};
+  return {key: g.key, mat: g.mat, grid, axis, wrap: true, open: !!g.open || !!g.neck, mask: g.open || g.neck ? mask : undefined, look: g.look, bias: g.bias, covers: g.covers ?? ['torso', 'neck']};
 }
 
 // ---------------------------------------------------------------- sleeves
@@ -206,14 +208,16 @@ export function sleeveSurface(sk: Skeleton, side: 'L' | 'R', sl: Sleeve, res: nu
   const sh = sk.shoulder[side];
   const el = sk.elbow[side];
   const wr = sk.wrist[side];
+  // the sleeve's head: a dome over the shoulder joint, standing off the arm's own cap by the ease
+  const CAP = 30;
   const upv = nrm(sub(sh, el));
-  const ext = add(sh, scl(upv, 34));
+  const ext = add(sh, scl(upv, CAP));
   const chain = [ext, sh, el, wr];
-  const len0 = b.upperArm + b.foreArm + 34;
-  const from = sl.from ?? -34;
-  const tA = clamp((from + 34) / len0, 0, 0.98);
-  const tB = clamp((sl.to + 34) / len0, tA + 0.02, 1);
-  const rows = rowsFor(Math.round(34 * (tB - tA)) + 8, res, 6);
+  const len0 = b.upperArm + b.foreArm + CAP;
+  const from = sl.from ?? -CAP;
+  const tA = clamp((from + CAP) / len0, 0, 0.98);
+  const tB = clamp((sl.to + CAP) / len0, tA + 0.02, 1);
+  const rows = rowsFor(Math.round(40 * (tB - tA)) + 8, res, 7);
   const cols = rowsFor(26, res, 10);
   const grid: V3[][] = [];
   const axis: V3[] = [];
@@ -224,10 +228,12 @@ export function sleeveSurface(sk: Skeleton, side: 'L' | 'R', sl: Sleeve, res: nu
     for (let i = 1; i < chain.length; i++) l += Math.hypot(...(sub(chain[i], chain[i - 1]) as [number, number, number]));
     return l;
   })();
+  const withCap = tA < 0.01;
   for (let i = 0; i < rows; i++) {
-    const t = mix(tA, tB, i / (rows - 1));
+    const x = i / (rows - 1);
+    const t = mix(tA, tB, withCap ? Math.pow(x, 1.35) : x);
     const {p, d} = chainAt(chain, t);
-    const dist = t * Lc - 34;
+    const dist = t * Lc - CAP;
     const tw = smooth(b.upperArm * 0.7, b.upperArm + b.foreArm, dist);
     const thumb = nrm(scl(cross(palm, d), s));
     const lat = nrm(lerp([s, 0, 0], thumb, tw * 0.6));
@@ -235,21 +241,33 @@ export function sleeveSurface(sk: Skeleton, side: 'L' | 'R', sl: Sleeve, res: nu
     let az = nrm(cross(d, ax));
     const back = nrm(lerp([0, 0, 1], scl(palm, -1), tw * 0.6));
     if (dot(az, back) < 0) az = scl(az, -1);
-    const e = valOf(sl.ease, dist);
-    const dropW = sl.drop ? smooth(-34, sl.drop, dist) : 1;
-    const top = sl.drop ? (1 - dropW) * 10 : 0;
+    const dd = Math.max(0, dist);
+    const e = valOf(sl.ease, dd);
+    // a dropped shoulder: the head is wider and sits lower (the seam slides down the arm)
+    const dropK = sl.drop ? 1 - smooth(0, sl.drop, dd) : 0;
+    const cap = dist < 0 ? Math.sqrt(Math.max(0.0025, 1 - (dist / CAP) ** 2)) : 1;
     // cloth rounds the arm: equal-ish radii, a little more ease at the back of the elbow
-    const rf = spline(b.aF, Math.max(-30, dist)) + e + top;
-    const rb = spline(b.aB, Math.max(-30, dist)) + e * 1.15 + top;
-    const rl = spline(b.aL, Math.max(-30, dist)) + e + top;
-    const rm = spline(b.aM, Math.max(-30, dist)) + e * 0.9 + top;
+    const rf = (spline(b.aF, dd) + e + 6 * dropK) * cap;
+    const rb = (spline(b.aB, dd) + e * 1.15 + 6 * dropK) * cap;
+    const rl = (spline(b.aL, dd) + e + 10 * dropK) * cap;
+    const rm = (spline(b.aM, dd) + e * 0.9 + 4 * dropK) * cap;
     const bunch = sl.bunch ? sl.bunch * smooth(sl.to - 70, sl.to - 5, dist) : 0;
     const q: Q4 = {f: rf + bunch, b: rb + bunch, p: rl + bunch, m: rm + bunch, nf: 2.1, nb: 2.1};
     const disp = sl.bunch ? (phi: number) => bunch * 0.35 * Math.sin(phi * 3 + dist * 0.25) : undefined;
     grid.push(ring4(p, ax, az, q, cols, 0, disp));
     axis.push(p);
   }
-  return {key: sl.key + side, mat: sl.mat, grid, axis, wrap: true, look: sl.look, bias: sl.bias};
+  return {
+    key: sl.key + side,
+    mat: sl.mat,
+    grid,
+    axis,
+    wrap: true,
+    open: true,
+    covers: [`arm${side}`, `hand${side}`, `thumb${side}`],
+    look: sl.look,
+    bias: sl.bias,
+  };
 }
 
 // ---------------------------------------------------------------- skirts
@@ -265,6 +283,7 @@ export type Skirt = {
   folds?: {n: number; amp: number; seed?: number};
   look?: SurfLook;
   bias?: number;
+  covers?: string[];
 };
 
 export function skirtSurface(sk: Skeleton, sl: Skirt, res: number): Surface {
@@ -323,7 +342,7 @@ export function skirtSurface(sk: Skeleton, sl: Skirt, res: number): Surface {
     grid.push(ring4(o, ax, az, q, cols, 0, disp));
     axis.push(o);
   }
-  return {key: sl.key, mat: sl.mat, grid, axis, wrap: true, look: sl.look, bias: sl.bias};
+  return {key: sl.key, mat: sl.mat, grid, axis, wrap: true, look: sl.look, bias: sl.bias, covers: sl.covers ?? ['leg', 'torso', 'top']};
 }
 
 // ---------------------------------------------------------------- trousers
@@ -342,6 +361,7 @@ export type Trousers = {
   stack?: number;
   look?: SurfLook;
   bias?: number;
+  covers?: string[];
 };
 
 export function trouserSurfaces(sk: Skeleton, tr: Trousers, res: number): Surface[] {
@@ -360,7 +380,7 @@ export function trouserSurfaces(sk: Skeleton, tr: Trousers, res: number): Surfac
     grid.push(ring4(f.o, fx(f), fz(f), q, cols));
     axis.push(f.o);
   }
-  out.push({key: tr.key + 'Seat', mat: tr.mat, grid, axis, wrap: true, look: tr.look, bias: (tr.bias ?? 0) - 2});
+  out.push({key: tr.key + 'Seat', mat: tr.mat, grid, axis, wrap: true, look: tr.look, bias: (tr.bias ?? 0) - 2, covers: tr.covers ?? ['leg', 'torso']});
   for (const side of ['L', 'R'] as const) {
     const s = side === 'L' ? 1 : -1;
     const hip = sk.hip[side];
@@ -402,7 +422,7 @@ export function trouserSurfaces(sk: Skeleton, tr: Trousers, res: number): Surfac
       g2.push(ring4(p, ax, az, q, nc, 0, disp));
       a2.push(p);
     }
-    out.push({key: tr.key + side, mat: tr.mat, grid: g2, axis: a2, wrap: true, look: tr.look, bias: tr.bias});
+    out.push({key: tr.key + side, mat: tr.mat, grid: g2, axis: a2, wrap: true, look: tr.look, bias: tr.bias, covers: tr.covers ?? [`leg${side}`, 'torso', `sock${side}`]});
   }
   return out;
 }
@@ -496,7 +516,7 @@ export function shoeSurfaces(sk: Skeleton, side: 'L' | 'R', sh: Shoe, res: numbe
       return Math.max((t - opening) * 10, (topline - up) * 3);
     };
   }
-  const out: Surface[] = [{key: sh.key + side, mat: sh.mat, grid, axis, wrap: true, open: !!mask, mask, look: sh.look ?? {hi: 0.8, rim: 0.45}, bias: 8}];
+  const out: Surface[] = [{key: sh.key + side, mat: sh.mat, grid, axis, wrap: true, open: !!mask, mask, look: sh.look ?? {hi: 0.8, rim: 0.45}, bias: 8, covers: [`foot${side}`, `sock${side}`]}];
   if (sh.sole) {
     const g2: V3[][] = [];
     const a2: V3[] = [];
@@ -575,7 +595,7 @@ export function sockSurface(sk: Skeleton, side: 'L' | 'R', mat: string, top: num
     },
     () => [side === 'L' ? 1 : -1, 0, 0],
   );
-  return {key: 'sock' + side, mat, grid: t.grid, axis: t.axis, wrap: true, bias: 6};
+  return {key: 'sock' + side, mat, grid: t.grid, axis: t.axis, wrap: true, bias: 6, covers: [`leg${side}`, `foot${side}`]};
 }
 
 export {hash};

@@ -944,30 +944,34 @@ export function legSurface(sk: Skeleton, side: 'L' | 'R', res: number, from = 61
 
 // ---- arms and hands
 
-export function armSurface(sk: Skeleton, side: 'L' | 'R', res: number, from = -30, to?: number, mat = 'skin', key?: string, scale = 1): Surface {
+export function armSurface(sk: Skeleton, side: 'L' | 'R', res: number, from = -26, to?: number, mat = 'skin', key?: string, scale = 1): Surface {
   const b = sk.b;
-  const s = side === 'L' ? 1 : -1;
   const sh = sk.shoulder[side];
   const el = sk.elbow[side];
   const wr = sk.wrist[side];
+  const s = side === 'L' ? 1 : -1;
+  // the shoulder's cap: a dome over the joint (the deltoid), so the arm rounds into the torso with no stump
+  const CAP = 26;
   const upv = nrm(sub(sh, el));
-  const ext = add(sh, scl(upv, 30));
+  const ext = add(sh, scl(upv, CAP));
   const chain = [ext, sh, el, wr];
   const L = chainLength(chain);
-  const len0 = b.upperArm + b.foreArm + 30;
-  const tA = clamp((from + 30) / len0, 0, 0.98);
-  const tB = to === undefined ? 1 : clamp((to + 30) / len0, tA + 0.02, 1);
-  const rows = rowsFor(Math.round(36 * (tB - tA)) + 6, res, 6);
+  const len0 = b.upperArm + b.foreArm + CAP;
+  const tA = clamp((from + CAP) / len0, 0, 0.98);
+  const tB = to === undefined ? 1 : clamp((to + CAP) / len0, tA + 0.02, 1);
+  const rows = rowsFor(Math.round(40 * (tB - tA)) + 8, res, 7);
   const cols = rowsFor(24, res, 10);
   const grid: V3[][] = [];
   const axis: V3[] = [];
   const ap = sk.pose.arms[side];
   // the forearm's twist: at the wrist the + (wide) axis points to the thumb: thumb = s * (palm x hand direction)
   const palm = ap.palm ? nrm(ap.palm) : ([-s, 0, 0] as V3);
+  const withCap = tA < 0.01;
   for (let i = 0; i < rows; i++) {
-    const t = mix(tA, tB, i / (rows - 1));
+    const x = i / (rows - 1);
+    const t = mix(tA, tB, withCap ? Math.pow(x, 1.35) : x);
     const {p, d} = chainAt(chain, t);
-    const dist = t * L - 30;
+    const dist = t * L - CAP;
     const tw = smooth(b.upperArm * 0.7, b.upperArm + b.foreArm, dist);
     const lat0: V3 = [s, 0, 0];
     const thumb = nrm(scl(cross(palm, d), s));
@@ -977,8 +981,10 @@ export function armSurface(sk: Skeleton, side: 'L' | 'R', res: number, from = -3
     // the arm's front (biceps; at the wrist the back of the hand) faces away from the palm
     const back = nrm(lerp([0, 0, 1], scl(palm, -1), tw));
     if (dot(az, back) < 0) az = scl(az, -1);
-    const k = scale;
-    const q: Q4 = {f: spline(b.aF, dist) * k, b: spline(b.aB, dist) * k, p: spline(b.aL, dist) * k, m: spline(b.aM, dist) * k, nf: 2.05, nb: 2.05};
+    const dd = Math.max(0, dist);
+    const cap = dist < 0 ? Math.sqrt(Math.max(0.0025, 1 - (dist / CAP) ** 2)) : 1;
+    const k = scale * cap;
+    const q: Q4 = {f: spline(b.aF, dd) * k, b: spline(b.aB, dd) * k, p: spline(b.aL, dd) * k, m: spline(b.aM, dd) * k, nf: 2.05, nb: 2.05};
     grid.push(ring4(p, ax, az, q, cols));
     axis.push(p);
   }

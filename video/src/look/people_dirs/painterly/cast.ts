@@ -36,17 +36,17 @@ export const HER_EVENING: Person = {
     {
       hides: {torso: true},
       build: (sk, res) => ({
-        surfaces: [torsoGarment(sk, {key: 'top', mat: 'top', hem: 610, ease: 3, neck: {dip: 46, width: 0.95}, n: {front: 2.2, back: 2.4}, bias: 4, look: {blur: 6}}, res)],
+        surfaces: [torsoGarment(sk, {key: 'top', mat: 'top', hem: 610, ease: 3, neck: {dip: 46, width: 0.95}, n: {front: 2.2, back: 2.4}, bias: 4, look: {blur: 6}, covers: ['torso']}, res)],
       }),
     },
     {
       hides: {legsFrom: 330},
       build: (sk, res) => ({
-        surfaces: [skirtSurface(sk, {key: 'skirt', mat: 'skirt', waist: 648, hem: 208, ease: 5, hemHalf: 126, folds: {n: 7, amp: 7, seed: 1.1}, look: {spec: {p: 14, t: 0.42}, blur: 6.5}, bias: 12}, res)],
+        surfaces: [skirtSurface(sk, {key: 'skirt', mat: 'skirt', waist: 648, hem: 208, ease: 5, hemHalf: 122, folds: {n: 5, amp: 6, seed: 1.1}, look: {sheen: {t: 0.62, p: 3}, blur: 7}, bias: 12}, res)],
       }),
     },
     {
-      hides: {arms: true},
+      hides: {armsTo: 322},
       build: (sk, res) => ({
         surfaces: [
           torsoGarment(
@@ -60,14 +60,14 @@ export const HER_EVENING: Person = {
               hang: {from: 752, k: 1.0},
               n: {front: 2.5, back: 2.9},
               open: (y) => 0.34 + 0.2 * smooth(830, 640, y),
-              look: {spec: {p: 26, t: 0.4}, blur: 5},
+              look: {spec: {p: 22, t: 0.42}, blur: 5},
               bias: 30,
+              covers: ['top', 'torso', 'neck', 'skirt'],
             },
             res,
           ),
-          collarSurface(sk, {key: 'collar', mat: 'jacket', h: 34, gap: 0.5, ease: 13}, res),
-          sleeveSurface(sk, 'L', {key: 'sleeve', mat: 'jacket', to: 322, ease: (d) => 9 + 3 * smooth(150, 300, d), look: {spec: {p: 26, t: 0.4}, blur: 5}, bias: 31}, res),
-          sleeveSurface(sk, 'R', {key: 'sleeve', mat: 'jacket', to: 322, ease: (d) => 9 + 3 * smooth(150, 300, d), look: {spec: {p: 26, t: 0.4}, blur: 5}, bias: 31}, res),
+          sleeveSurface(sk, 'L', {key: 'sleeve', mat: 'jacket', to: 318, ease: (d) => 8 + 4 * smooth(150, 300, d), look: {spec: {p: 22, t: 0.42}, blur: 5}, bias: 31}, res),
+          sleeveSurface(sk, 'R', {key: 'sleeve', mat: 'jacket', to: 318, ease: (d) => 8 + 4 * smooth(150, 300, d), look: {spec: {p: 22, t: 0.42}, blur: 5}, bias: 31}, res),
         ],
       }),
     },
@@ -94,7 +94,7 @@ export const POSE_STAND: Pose = {
     L: {ankle: [50, 42, 46], footYaw: 26},
   },
   arms: {
-    R: {wrist: [-122, 478, 20], elbowHint: [-0.4, 0, -1], palm: [1, 0, 0.15], curl: 28},
+    R: {wrist: [-138, 488, 34], elbowHint: [-0.4, 0, -1], palm: [1, 0, 0.15], curl: 28},
     L: {wrist: [118, 548, 38], elbowHint: [0.6, 0, -1], palm: [-1, 0, 0.2], curl: 40},
   },
 };
@@ -132,3 +132,6 @@ export const POSE_BACK: Pose = {
 };
 
 export {FACE_M, MAN, WOMAN, footChain, armSurface, sockSurface, trouserSurfaces, bagSurfaces, capSurfaces, cupSurfaces, sunglassesMarks};
+
+export const CAST: Record<string, Person> = {herEvening: HER_EVENING};
+export const POSES: Record<string, Pose> = {stand: POSE_STAND, walk: POSE_WALK, back: POSE_BACK};

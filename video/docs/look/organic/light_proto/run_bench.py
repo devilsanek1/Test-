@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""run_bench.py: the light bench's cost table (light.md §7). For each kind, renders the same 30 frames (1.0-1.98 s,
-every other frame) of LightBench at concurrency 1 through scripts/render-frames.mjs and reads its ms/frame; then checks
-determinism (the same frame rendered twice gives the same bytes). From video/:
-    python3 docs/look/organic/light_proto/run_bench.py /tmp/organic/light/bench [kind=n ...]
+"""run_bench.py: the light bench's cost table (light.md §7). For each kind, renders the same NF frames (env NF,
+default 30: 1.0 s on, every other 60 fps frame) of LightBench at concurrency 1 through scripts/render-frames.mjs and
+reads its ms/frame; then checks determinism (the frame at 1.6 s rendered twice, in fresh renders, gives the same
+bytes). From video/:
+    NF=60 python3 docs/look/organic/light_proto/run_bench.py /tmp/organic/light/bench [kind=n ...]
 """
 import hashlib
 import json

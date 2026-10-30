@@ -86,6 +86,7 @@ export function paintFigure(model: Model, cam: Cam, opt: PaintOpts): React.React
     if (reg.outline) entries.push({sf, reg, under: false, key: ps.zFront + bias});
   }
   entries.sort((a, b) => (a.sf.order ?? 0) - (b.sf.order ?? 0) || a.key - b.key);
+  enforceCovers(entries);
   const pad = 60 * s + 20;
   const fx = minX - pad;
   const fy = minY - pad;
@@ -104,7 +105,7 @@ export function paintFigure(model: Model, cam: Cam, opt: PaintOpts): React.React
       )}
     </filter>
   );
-  const brush = opt.brush ?? (small ? 0 : 7);
+  const brush = opt.brush ?? (small ? 0 : 3.2);
   const defs: React.ReactNode[] = [
     flt('bR', blurS(1.6)),
     flt('bD1', blurS(2)),
@@ -230,6 +231,39 @@ export function paintFigure(model: Model, cam: Cam, opt: PaintOpts): React.React
 }
 
 const fmt3 = (x: number) => (Math.round(x * 10000) / 10000).toString();
+
+/** The enclosure rule (Surface.covers): an enclosed surface is never painted after its encloser, and the encloser's
+ *  inside (UNDER) goes right before the first surface it encloses. Minimal moves, two passes (nested enclosures). */
+function enforceCovers(list: Entry[]) {
+  const match = (e: Entry, pre: string[]) => pre.some((p) => e.sf.key.startsWith(p));
+  for (let pass = 0; pass < 3; pass++) {
+    const enclosers = list.filter((e) => !e.under && e.sf.covers && e.sf.covers.length);
+    for (const E of enclosers) {
+      const pre = E.sf.covers!;
+      // move every enclosed outline/under that sits after E's outline to just before it (keeping their order)
+      let iO = list.indexOf(E);
+      const late = list.filter((x, i) => i > iO && x.sf !== E.sf && match(x, pre));
+      if (late.length) {
+        for (const x of late) list.splice(list.indexOf(x), 1);
+        iO = list.indexOf(E);
+        list.splice(iO, 0, ...late);
+      }
+      // the inside: right before the first enclosed surface (or right before E if it encloses nothing drawn)
+      const U = list.find((x) => x.under && x.sf === E.sf);
+      if (U) {
+        list.splice(list.indexOf(U), 1);
+        iO = list.indexOf(E);
+        let first = iO;
+        for (let i = 0; i < iO; i++)
+          if (list[i].sf !== E.sf && match(list[i], pre)) {
+            first = i;
+            break;
+          }
+        list.splice(first, 0, U);
+      }
+    }
+  }
+}
 
 // ---------------------------------------------------------------- path helpers for decals
 

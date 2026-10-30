@@ -664,8 +664,8 @@ def edge_profiles(lab: np.ndarray, contours, every: float = 4.0, reach: float = 
     kind 0 = step edge, 1 = busy (not one clean step: texture, or no room between edges), 2 = no edge (step <
     min_step and no ridge), 3 = a thin line (no step, a ridge of >= 6 dE: a joint, a bar, a wire)."""
     H, W = lab.shape[:2]
-    pts = []; nrm = []
-    for c in contours:
+    pts = []; nrm = []; cid = []
+    for ci, c in enumerate(contours):
         P = smooth_pts(resample(c['pts'], c['closed'], 1.0), c['closed'], 1.5)
         if len(P) < 8:
             continue
@@ -674,13 +674,13 @@ def edge_profiles(lab: np.ndarray, contours, every: float = 4.0, reach: float = 
         nn /= np.maximum(np.hypot(nn[:, 0], nn[:, 1]), 1e-9)[:, None]
         k = max(int(every), 1)
         sel = np.arange(k // 2, len(P), k)
-        pts.append(P[sel]); nrm.append(nn[sel])
+        pts.append(P[sel]); nrm.append(nn[sel]); cid.append(np.full(len(sel), ci))
     if not pts:
         return None
-    pts = np.concatenate(pts); nrm = np.concatenate(nrm)
+    pts = np.concatenate(pts); nrm = np.concatenate(nrm); cid = np.concatenate(cid)
     if len(pts) > max_points:
         sel = np.linspace(0, len(pts) - 1, max_points).astype(int)
-        pts = pts[sel]; nrm = nrm[sel]
+        pts = pts[sel]; nrm = nrm[sel]; cid = cid[sel]
     # room on each side: up to the crop's border and to the next edge
     ks = np.arange(1, int(reach) + 1, dtype=float)
     room = np.full((len(pts), 2), reach)
@@ -732,7 +732,7 @@ def edge_profiles(lab: np.ndarray, contours, every: float = 4.0, reach: float = 
         if r > 0.12 or pp.max() > 1.6 or pp.min() < -0.6:
             kind[i] = 1
     return {'x': pts[:, 0], 'y': pts[:, 1], 'step': step, 'width': widths, 'rms': rms, 'kind': kind, 'ridge': ridge,
-            'room': room}
+            'room': room, 'cid': cid}
 
 
 def _fit_erf(t, p):
@@ -1044,3 +1044,65 @@ def parallel_share(runs, max_dist: float = 30.0, min_dist: float = 3.0, ang_tol:
                 has[i] = True
                 break
     return float((L * has).sum() / L.sum())
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# lost and found ALONG the big masses' boundaries (the notan's outlines, defined even where the edge is lost)
+
+
+def notan_boundaries(mask: np.ndarray, min_len: int = 40):
+    """The 2-value masses' boundaries as sub-pixel contours (marching squares on the lightly blurred mask), the crop's
+    border dropped. Unlike a Canny chain, the boundary runs on where its edge is lost, so lost stretches can be seen."""
+    H, W = mask.shape
+    mb = ndi.gaussian_filter(mask.astype(np.float32), 0.7, mode='nearest')
+    out = []
+    for c in measure.find_contours(mb, 0.5):
+        pts = np.stack([c[:, 1], c[:, 0]], 1)
+        closed = bool(np.allclose(c[0], c[-1]))
+        for part, cl in _drop_border(pts, closed, W, H):
+            if len(part) >= min_len:
+                out.append({'pts': part, 'closed': cl})
+    return out
+
+
+def along_boundaries(lab: np.ndarray, every: float = 3.0, reach: float = 28.0, run_min: int = 5):
+    """Walk the notan's boundaries and read the edge every `every` px (edge_profiles at the mass scale): FOUND (a clean
+    step >= 8 dE whose 10-90 % width is <= 6 px, or a drawn line), SOFT (width 6-16), LOST (width > 16, or a step under
+    4 dE: the masses melt), BROKEN (no clean step: dry brush, texture). Returns the shares of boundary length, the share
+    of boundary length on outlines that ALTERNATE (a found run and a soft-or-lost run of >= run_min samples each, i.e.
+    >= 15 px), and the found <-> soft/lost switches per 1000 px of boundary (runs of >= 3 samples)."""
+    mask = notan(lab)
+    cons = notan_boundaries(mask)
+    if not cons:
+        return {}
+    prof = edge_profiles(lab, cons, every=every, reach=reach, max_points=10 ** 7)
+    if prof is None:
+        return {}
+    k = prof['kind']; w = np.nan_to_num(prof['width'], nan=99.0); st = prof['step']
+    found = ((k == 0) & (w <= 6.0) & (st >= 8.0)) | (k == 3)
+    lost = (k == 2) | ((k == 0) & (w > 16.0))
+    soft = (k == 0) & ~found & ~lost
+    broken = k == 1
+    n = len(k)
+    total_len = n * every
+    alt_len = 0.0; switches = 0
+    for ci in np.unique(prof['cid']):
+        idx = np.where(prof['cid'] == ci)[0]
+        f = found[idx]; sl = (soft | lost)[idx]
+        lab_ = np.where(f, 1, np.where(sl, 2, 0))
+        runs = []
+        cur, ln = lab_[0], 1
+        for v in lab_[1:]:
+            if v == cur:
+                ln += 1
+            else:
+                runs.append((cur, ln)); cur, ln = v, 1
+        runs.append((cur, ln))
+        if any(c == 1 and l >= run_min for c, l in runs) and any(c == 2 and l >= run_min for c, l in runs):
+            alt_len += len(idx) * every
+        sig = [c for c, l in runs if c in (1, 2) and l >= 3]
+        switches += sum(1 for a_, b_ in zip(sig, sig[1:]) if a_ != b_)
+    return {'found': float(found.mean()), 'soft': float(soft.mean()), 'lost': float(lost.mean()),
+            'broken': float(broken.mean()), 'soft_or_lost': float((soft | lost).mean()),
+            'alternating': float(alt_len / max(total_len, 1.0)), 'switch_per_1000px': float(switches / max(total_len, 1.0) * 1000),
+            'length': float(total_len), 'n_outlines': int(len(cons)), 'mask_light_share': float(mask.mean())}

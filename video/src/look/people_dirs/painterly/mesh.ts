@@ -30,6 +30,9 @@ export type Surface = {
   bias?: number;
   /** Coarse order class, drawn in ascending order before the depth sort (default 0). */
   order?: number;
+  /** Key prefixes of the surfaces this one encloses (a skirt the legs, a jacket the top, hair the head): they are
+   *  always painted before it, and its inside (UNDER) right before them. The depth sort decides the rest. */
+  covers?: string[];
   look?: SurfLook;
   /** Draw only the outline in one colour (lit), no light (a lens, a cable). */
   flat?: boolean;
