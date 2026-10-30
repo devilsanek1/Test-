@@ -273,3 +273,10 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   look more clean and stylish" -> the forward neck reverted (the head stacked over the shoulders); the hair rebuilt as a
   proper, clean cut with one flow and a touch of looseness, measured against the references; people iteration 3.
   -> rule: playbook, Visual style (hair inside a proper, stylish, clean haircut; the upright neck).
+- 2026-10-30 ~17:10 UTC: "Another next point is the fade profile should be cute and like super appealing by modern
+  standards / Do the research if what makes the faces beautiful and cute and appealing like general face features and
+  make it / Like the woman sitting on the blue cliff reference obviously has appealing features like cuteness nose hair
+  female body composition and our man refreshed similarly has manly features" ("fade profile" read as the face's
+  profile) -> a face-and-body appeal round: the research and a profile design sheet now, beside the hair rebuild; built
+  into the figures once the hair round lands. -> rule: playbook, Visual style (faces cute and appealing; women
+  feminine, men manly).

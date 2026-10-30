@@ -381,6 +381,17 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   whole day / Also I don't think I like it really it's more detailed yes but it's incoherent like it's not a proper
   haircut and more like a person woke up and that's what we see like not stylish and not clean compare it deeper with
   our references if they look more clean and stylish", 2026-10-30.)
+- **Faces, above all the profile, are cute and super appealing by modern standards; women read feminine and men
+  manly.** What makes a face beautiful, cute and appealing is researched and built into the face recipe (the general
+  features: the nose, the brow and forehead, the lips, the chin and jaw, where the closed eyes sit, the cheek), with the
+  body to match: women's body composition feminine and appealing, like the woman sitting on the blue cliff in the
+  references (her cute nose, her hair, her slim female build), men refreshed with manly features (the jaw, the brow, the
+  neck and shoulders). Tasteful and generic, never caricature or sexualised; the LASH face is the starting point.
+  — ("Another next point is the fade profile should be cute and like super appealing by modern standards / Do the
+  research if what makes the faces beautiful and cute and appealing like general face features and make it / Like the
+  woman sitting on the blue cliff reference obviously has appealing features like cuteness nose hair female body
+  composition and our man refreshed similarly has manly features", 2026-10-30; "fade profile" read as the face's
+  profile.)
 - **People: small and simple in the frame, contemporary and refined in design** (small full figures, often seen from
   behind or in rear 3/4; adult proportions of about 7.8 heads in direction C, below, which replaces reference 1's
   round-headed crowd as the drawing model; near heads <= ~140 px), never big character models: they act with their pose
