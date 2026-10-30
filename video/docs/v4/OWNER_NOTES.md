@@ -266,3 +266,10 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   Sent: https://claude.ai/artifact/1Xerf8RzpVF8WnH2PYEN8b (her before and after, twelve cuts, calm/breeze/walk/turn,
   the cast at film size, heights and builds, seated and leaning, close and far; `docs/look/people_design/hair_v2/`).
   -> rule: playbook, Visual style (hair is never static or one firm shape).
+- 2026-10-30 ~16:50 UTC, on the people page (a crop of S1's AFTER, plus three of the references again): "I don't get why
+  you changed the neck posture like now it looks like this person was sitting at computer the whole day / Also I don't
+  think I like it really it's more detailed yes but it's incoherent like it's not a proper haircut and more like a
+  person woke up and that's what we see like not stylish and not clean compare it deeper with our references if they
+  look more clean and stylish" -> the forward neck reverted (the head stacked over the shoulders); the hair rebuilt as a
+  proper, clean cut with one flow and a touch of looseness, measured against the references; people iteration 3.
+  -> rule: playbook, Visual style (hair inside a proper, stylish, clean haircut; the upright neck).
