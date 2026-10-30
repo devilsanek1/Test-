@@ -290,7 +290,8 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
    farther (4-6 in a shot, 5-7 on a vista), its AIR (the sky's lowest colour right behind them: rule 6's one sky,
    `horizonColor(sky, x)` of §g.3, never the mint above it; v2 S1 `S1_AIR`) and its camera (horizon, vanishing point(s)).
 2. **One flat step per plane toward the air**, k = 0 / .12 / .22 / .40 / .65 on every fill of the plane (never a
-   gradient, fog or blur): L* toward the air's; a hue on the air's side converges on it, one across from it keeps its
+   gradient, fog or blur on the flat world; a PAINTED piece softens by its plane, the owner's "a bit more blurry each
+   time": `PAINT_RECIPES.md` §1, §3 C3): L* toward the air's; a hue on the air's side converges on it, one across from it keeps its
    hue at chroma x (1 - 0.8 k) (a straight mix would cross grey), never under C* 8, never into the olive band. This is
    DIRECTION's "lighter, cooler, less saturated" in a day or dusk air; under a warm sunset air the far planes take its
    warmth and still read far by value, contrast and simplicity (v1 @25.5: the far city more saturated than the near, its
