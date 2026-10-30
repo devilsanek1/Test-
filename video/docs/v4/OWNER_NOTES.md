@@ -340,3 +340,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   then "Yeah if they are saved as visuals only do not recreate it if they don't snd instead continue with video 4" ->
   one page from the existing sheets only, nothing redrawn: https://claude.ai/artifact/AUT5fiRBdwhk8RzV6QxLz3; video 4's
   production continues.
+- 2026-10-30 ~22:20 UTC, on the colour script strip: "I mean I am loooing at this oicture and each house is so alone like
+  the scene is empty / I mean is there any step that will make it coherent?" -> true of the plan, not only the strip:
+  the world bible's home view left ~45-50 % sky and ~35 % open snow, a thin belt of lone blocks. The world plan is
+  revised to a full neighbourhood (blocks shoulder to shoulder, layered rows and rooftops, the street's things, lit
+  homes everywhere; the computer and the plan site inside the city), the colour script redrawn, and the G3 density pass
+  fills the lanes' sets from it. -> rule: playbook, Visual style (a place, never buildings standing alone).

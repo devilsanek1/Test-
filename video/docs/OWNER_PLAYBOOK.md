@@ -350,9 +350,14 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   density sits mostly in the calm environment tier at low contrast, so full never means busy (`docs/look/CRAFT.md` §b).
   The bar: reference 1 (France) and v1 (PHP), then each film's own G3 density key; `scripts/qa/density.py` is a warning
   signal, never a quota; how-to `docs/look/LIFE_AND_DENSITY.md`. Big empty fields (nothing in them; flat colour itself
-  is right) and an object alone on a blank wall are failures even in a draft. — ("way too empty", "feeling alive is
-  absolutely the key", "less prescriptive on the amount of objects", v3 G5, 2026-10-26; "too busy ... too many moving
-  parts", v3 G5b, 2026-10-27).
+  is right) and an object alone on a blank wall are failures even in a draft. **A place, never buildings standing
+  alone:** a street is blocks shoulder to shoulder, rows and rooftops layered back to the horizon, the street's own
+  things (lamps, trees, parked cars, bikes, people) between them; the open space is the sky the words need and one calm
+  ground, never a field round a lone house. Plan it so from the world bible and the colour script on, never leave it to
+  a later pass. — ("way too empty", "feeling alive is absolutely the key", "less prescriptive on the amount of objects",
+  v3 G5, 2026-10-26; "too busy ... too many moving parts", v3 G5b, 2026-10-27; on video 4's colour script: "I mean I am
+  loooing at this oicture and each house is so alone like the scene is empty / I mean is there any step that will make
+  it coherent?", 2026-10-30).
 - **Scale moments, occasionally: make the viewer feel small**, using Arcane's camera work and staging, never its footage.
   Keep it nuanced (it's still TikTok). The owner liked v1's scale scenes. — (v1, 2026-10-24/25).
   **When a scale shot comes, the scale must feel GREAT**, like Arcane's rooftop end frame: a world that keeps going
