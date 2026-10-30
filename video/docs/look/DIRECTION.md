@@ -19,7 +19,8 @@ key here"; "our look is evolving - we are finding out style i don't think we can
    values only: it never restates or overrides a rule) > the v1-era docs (API and measurements, never style). Between
    two look docs, each wins on its own topic (`LAYOUT.md` where things sit in the frame: the zones, each shot type's
    framing, the cover; `STORYBOARD_STYLE.md` the board's drawing, `CINEMATIC_GUIDE.md` shot recipes and camera moves,
-   `COZY_AND_SCALE.md` cozy framing, `LIFE_AND_DENSITY.md` fullness and life, `PALETTE.md` colour), and a measured
+   `COZY_AND_SCALE.md` cozy framing, `LIFE_AND_DENSITY.md` fullness and life, `PALETTE.md` colour, `SOUND_SYNC.md`
+   which sound lands on which picture, when and how often), and a measured
    number beats a proposal.
 3. **Beside the ladder, each on its own topic and under the owner's words:** `docs/CREATIVE_BRIEF.md` (the channel,
    story selection, writing; the playbook's later rules win where they differ, as its banner lists), `docs/ELEVENLABS.md`
@@ -201,12 +202,13 @@ dark mass) or T3 (the references' low key) (`ORGANIC.md` §8 D3; rule 6).
   or a slow float, never a zoom; a float is a gentle PARALLAX float (owner, 2026-10-28: planes move by depth, the
   near ground most, far planes little, the sky and the caption band not at all; back at rest by every join and on
   every map-critical frame; `lib/depth.ts` parallax helper); a zoom is a visible story move or a carrier; no roll, no compound moves; visuals
-  lead their word by ~0.1 s. -> `G3_ANIMATIC.md` §4; `PIPELINE_V2.md` "Frame rate"; `COZY_AND_SCALE.md` 3b.5.
+  lead their word by ~0.1 s, while a sound effect never leads its picture (on the event's first visible frame or up to
+  2 f after: `SOUND_SYNC.md` §1c). -> `G3_ANIMATIC.md` §4; `PIPELINE_V2.md` "Frame rate"; `COZY_AND_SCALE.md` 3b.5.
 - **9. The opening is a banger.** Frame 0 is the scene being drawn, in the clean pen: the subject's line draws on, C
   lands as flat pale shapes and colour floods in over the line (it goes under its fill: no outline stays, rule 4), the
   painted pieces painting on stroke by stroke over their flat design, never popping up (playbook PAINTED PIECES), and
   the light flooding in with the colour from its source (`ORGANIC.md` §4.2), as a bold event a scrolling viewer can't miss (~0.3 s was
-  invisible: owner, 2026-10-28; every opening effect large, long enough to register, with its own sound), with the captions in the voice's order (frame 0 shows the first spoken line, the
+  invisible: owner, 2026-10-28; every opening effect large, long enough to register, with its own sound, heard over a quiet floor; the build a count of three sounded changes and a fourth a little late: `SOUND_SYNC.md` S1, S3-S5), with the captions in the voice's order (frame 0 shows the first spoken line, the
   payoff in words by ~2 s; no title over them: playbook Hook and pacing),
   the voice from the first frames (the first word at ~0.12 s, the locked voice file's lead) and a positive phone sound
   in the first second; the hook made physical in ONE continuous shot (the expected thing, then reality overtaking it

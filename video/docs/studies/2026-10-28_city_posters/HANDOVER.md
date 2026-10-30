@@ -6,6 +6,13 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-30 ~19:00 UTC: sound sync DONE; composition library runs
+- `video/docs/look/SOUND_SYNC.md` + `sound_sync/` (reels.md + two timelines, craft.md, audit.md); 23 doc edits applied
+  (`sound_sync/PROPOSED_DOC_EDITS.md` header); A13 and two questions go to the owner. TODO after the composition run:
+  MR20's sound window (0 to +2 f, never early) into the library.
+- The 10-minute loop hit its 2 h background cap at 18:18 and is NOT restarted (harness rule); scheduled checkpoint
+  commits instead (19:05, 19:35, 20:00) plus a commit at each run's end.
+
 ## Status 2026-10-30 17:45 UTC: both runs re-launched after the 17:40 reset (the 17:25 launch hit the limit at once; same run IDs, RESUMING notes added)
 
 ## Status 2026-10-30 17:25 UTC: resumed after the 5-hour reset (owner: "restart when the limit is reset")

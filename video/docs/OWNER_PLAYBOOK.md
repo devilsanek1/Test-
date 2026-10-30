@@ -80,14 +80,25 @@ Maintenance at the end).
 ## Music and sound
 - **Sync picture to sound ON PURPOSE.** Cuts, camera moves and key actions land on the sound's beats, hits and the
   voice's stresses where that adds energy or meaning, and NOT everywhere: we already do it "decently okay", now it is a
-  researched, named practice with a rule for where it fits (`docs/look/refs_sound_sync/`; the research is queued). —
+  researched, named practice with a rule for where it fits: `docs/look/SOUND_SYNC.md` (distilled from the owner's two
+  reels, `docs/look/refs_sound_sync/`). In short: spend it, don't sprinkle it (a count of three sounded changes in the
+  hook, rest while the voice explains, ONE release at the payoff in a written voice pause); every hit lands on the first
+  visible frame of one change of the beat's subject, never before it, and is heard; nothing on continuous motion,
+  background life, captions or the music's beats. —
   ("the research distill and practice of syncing the video and shots with with sounds ... We already do this and I think
   decently okay we just need to be more intentional and educated about this effect and where it make sense to use",
   2026-10-30.)
-- **Music: cinematic but subtle, especially at the start.** The voice and the hook carry the opening. — (v1).
-- **Mix to -14 LUFS / -1 dBTP, voice always on top**; SFX land on visual hits. — (v1).
+- **Music: cinematic but subtle, especially at the start.** The voice and the hook carry the opening: the hook's sounds
+  sit on a quiet floor (air, no bed); the bed enters after the hook as a small step and rises once, at the payoff, in a
+  written voice pause (`docs/look/SOUND_SYNC.md` S1, S6, S7; both of the owner's sound reels open on near silence). —
+  (v1; 2026-10-30).
+- **Mix to -14 LUFS / -1 dBTP, voice always on top**; SFX land on visual hits: on the hit's first visible frame or up to
+  2 frames after it, never before, and heard (in a voice gap, or the loudest thing in its band): `docs/look/SOUND_SYNC.md`
+  §1c. — (v1; 2026-10-30).
 - **More sound effects, especially ones people link with something good on their phone** (like pop, notification ding,
-  message-sent swoosh), **with one in the first second.** Our own sounds that evoke them, never Apple's or Instagram's. — (2026-10-25).
+  message-sent swoosh), **with one in the first second.** Our own sounds that evoke them, never Apple's or Instagram's.
+  Which events get one, and how many: `docs/look/SOUND_SYNC.md` (story events of the beat's subject, each heard; never
+  continuous motion or background life). — (2026-10-25; where: 2026-10-30).
 
 ## Visual style (one page: `docs/look/DIRECTION.md`; numbers and checks: `docs/look/CRAFT.md`)
 - **ONE LOOK, ONE BRAND, still evolving: every video shares one coherent style, and we are still finding it.** The

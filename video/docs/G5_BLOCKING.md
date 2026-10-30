@@ -51,7 +51,8 @@ un-building into the FIRST panel's `t < 0` drawing state, so the film loops back
 **G5 entry and exit checks** (`G3_ANIMATIC.md` §2: G4+ may only ADD, never a mover, a place or a tier promotion —
 these checks are where that promise is enforced; owner-approved 2026-10-27):
 - **Entry, before lanes fan out:** (1) a scripted diff of scenes.json and each built scene against the locked board
-  JSON — every camera move, element move, transition device and carrier, and `life:`/promise item matches, and no
+  JSON — every camera move, element move, transition device and carrier, `life:`/promise item and sound cue (its type
+  and frame: `look/SOUND_SYNC.md`) matches, and no
   motion exists that G3 did not play; a mismatch is a FAIL or an explicit, owner-visible G3 reopen. (2) A sound-off
   cold read of the first fully dressed set (the home set, the density key, as built for the G4 look clip): map each
   board `promise` line to what a cold reader names (v3: streams read as birds). (3) CRAFT's measures (`CRAFT.md` §e:

@@ -1,5 +1,10 @@
 # Sound sync: the doc edits the distill needs (2026-10-30; the orchestrator applies them)
 
+**Applied 2026-10-30 ~19:00 UTC by the orchestrator:** A1-A12 and B1-B11 (23 edits, by script, each `old` found once).
+**Held:** A13 ("joins on the beat" read as the voice's beat): it changes the meaning of an owner rule, so it goes to the
+owner first, with Part C's two questions. **Still to do:** MR20's window in the composition library (Part C), after the
+composition-library run lands.
+
 `docs/look/SOUND_SYNC.md` is the distilled practice. These edits point the owning docs at it and fix the lines that now
 clash with it (CLAUDE.md: "A clash is a bug: fix the lower doc in the same turn"). Each edit gives the file (paths from
 the repo root), why, and the exact text: `old` occurs once in the file today (checked 2026-10-30); `new` replaces it.

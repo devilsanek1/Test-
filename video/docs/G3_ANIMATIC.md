@@ -60,6 +60,7 @@ edit, never silently inside a build (`animatic_mograph.md`).
 | Scale + cozy moments | near-final composition | home-base room tone, the one big move, the scale ladder, haze-band/shrinking-rows as grey dress | STORYBOARD_STYLE §7 checks |
 | Hook / frame 0 | near-final | frame 0 = the scene being drawn: the subject's lines draw on (B's mid-grey lines with them), then the tones land (C as pale flat tone), the captions in the voice's order (the payoff in words by ~2 s; no title over them), voice from the first frames (the first word at ~0.12 s), expectation-then-reality played through the subject's own build | first-3s watch; playbook Hook rules; `DIRECTION.md` rule 9 |
 | Captions / timing | final | locked VO, pop captions, word-anchored cuts; reel at full runtime, 60 fps | gate check; full-reel watch |
+| Sound sync | near-final (FROZEN) | the sync plan PLAYED with placeholder sounds: the hook's count (three sounded changes, a fourth a little late), the trigger in the first second, the hold and the release in its written pause, the thread's sound; each board `sfx` cue with a `type` and its event, on the event's first visible frame (`look/SOUND_SYNC.md`) | the sync check list (`look/SOUND_SYNC.md` §4); the sound-on read at 1x, on a phone's own speaker |
 | Colour, texture, final line, easing feel | ABSENT | — | deferred to G4/G5/G6 by design; the hand-off says so |
 
 ## 3. Placeholder vocabulary: loose never means empty
@@ -201,7 +202,9 @@ contract column (cuts, framing, moves, transitions and carriers, the thread, tie
   this place feel inhabited — what's missing from the room?" and "is your eye still on the subject — what competes
   with it?" (fullness never at the subject's expense: `CRAFT.md` §b).
 - **Motion check, sound on, at 1x**: every move readable (no strobe; this pass resolves the §4 speed WARNs), every cut
-  lands on its word, cuts judged in PAIRS with their neighbours, pacing varies. The reader also answers "where is your
+  lands on its word, cuts judged in PAIRS with their neighbours, pacing varies; every sync point lands on its event and
+  is heard, the hook's count reads as three and a late fourth, the release is felt (`look/SOUND_SYNC.md` §4). The reader
+  also answers "where is your
   eye, every 2 s?" (it is on that beat's tier-A subject) and "what carried you across each cut?" (the declared carrier;
   `CRAFT.md` §a-b). Each pass runs ONCE, then one batched fix round (§5 step 7); remaining ambers ship named in the
   hand-off, never a second internal loop.

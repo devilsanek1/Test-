@@ -191,6 +191,9 @@ Measured offsets (visual onset minus word onset; plot: `sync_offsets.png`) [M]:
 
 Grammar rules [I, from the measurements above]:
 1. **Lead, don't follow.** Picture onsets come 1-4 frames before the sound. Nothing in the reference starts more than 70 ms after its word.
+   This is the PICTURE against the VOICE (2-8 f at 60 fps). A sound effect against its own picture is the other case: on
+   the event's first visible frame or up to 2 f after it, never before (`docs/look/SOUND_SYNC.md` §1c; video 2's cue
+   sheet merged the two and put 17 effects 2 f early: `docs/look/sound_sync/audit.md` §4.3).
 2. **Read-in tail.** The highlight finishes ≈ 120 ms after its word starts, so the eye arrives as the word is heard.
 3. **Marks hit, colours anticipate.** The colour field arrives ≈ 0.25 s early. The hand-drawn mark (✓/✗) strokes on the word.
 4. **Transitions live in pauses.** T1, T3, T4 and T5 each start inside a ≥ 0.3 s pause (see the bold pauses in `timing.md`). The transition starts
