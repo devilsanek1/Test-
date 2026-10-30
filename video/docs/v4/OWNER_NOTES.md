@@ -335,3 +335,8 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   v7, the Helsinki pass draft); phase A in two parallel workflows (the visual script v3 lock with the folds and the
   delegated calls + the camera plan; the W1 world bible; the G3 kit with the tier-1 deltas; the production captions);
   then G3. Periodic updates with visuals and videos as they land.
+- 2026-10-30 ~21:00 UTC: "Give me here the recipes and guides you are going to be using - like the brand new ones I like
+  how they visually structured" -> the list in chat (words, composition, sound, look, people, flow and the animatic);
+  then "Yeah if they are saved as visuals only do not recreate it if they don't snd instead continue with video 4" ->
+  one page from the existing sheets only, nothing redrawn: https://claude.ai/artifact/AUT5fiRBdwhk8RzV6QxLz3; video 4's
+  production continues.

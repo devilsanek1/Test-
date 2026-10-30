@@ -1,0 +1,151 @@
+<title>Video 4 Guides</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Gaegu:wght@400;700&display=swap">
+<style>
+/* Layout: one phone-width column, one card per guide: what it decides, the recipes used on video 4, its saved sheet. */
+:root {
+  --bg: #eef0f4;
+  --card: #f8f9fb;
+  --fg: #1d2132;
+  --muted: #5a6075;
+  --line: #d4d8e2;
+  --accent: #c0702a;      /* the film's warm accent */
+  --accent-soft: #f4e2cf;
+  --hand: 'Gaegu', 'Comic Sans MS', cursive;
+  --ui: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11152a; --card: #181d36; --fg: #ece8e1; --muted: #a3a8c0; --line: #2b3257;
+    --accent: #ffbe72; --accent-soft: #3a2f2a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11152a; --card: #181d36; --fg: #ece8e1; --muted: #a3a8c0; --line: #2b3257;
+  --accent: #ffbe72; --accent-soft: #3a2f2a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--ui); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+.wrap { max-width: 680px; margin: 0 auto; display: grid; gap: 34px; }
+header { display: grid; gap: 12px; padding-top: 28px; }
+h1 { font-family: var(--hand); font-weight: 400; font-size: clamp(44px, 12vw, 62px); line-height: 1; margin: 0; }
+h2 { font-family: var(--hand); font-weight: 400; font-size: 31px; line-height: 1.1; margin: 0; }
+p { margin: 0; }
+.lede { font-size: 17px; max-width: 60ch; }
+.order { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; font-size: 14px; }
+.order li { padding: 4px 10px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); }
+.order li b { color: var(--accent); }
+.guide { display: grid; gap: 12px; padding: 18px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
+.file { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 13px; color: var(--muted); }
+.what { font-size: 16px; }
+.pts { display: grid; gap: 6px; margin: 0; padding-left: 18px; font-size: 15px; }
+.pts b { color: var(--fg); }
+.v4 { font-size: 15px; padding: 10px 12px; border-radius: 10px; background: var(--accent-soft); }
+.v4 b { color: var(--accent); }
+.sheet { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--bg); }
+.sheet img { display: block; width: 100%; height: auto; }
+.tall { max-height: 70vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.cap { font-size: 13px; color: var(--muted); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.two figure { margin: 0; display: grid; gap: 4px; min-width: 0; }
+.note { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+@media (max-width: 560px) { .two { grid-template-columns: 1fr; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Video 4 Guides</h1>
+    <p class="lede">The guides and recipes video 4 is built with, each with the sheet it already has. Your playbook overrides all of them.</p>
+    <ul class="order" aria-label="The gates">
+      <li><b>G2.5</b> visual script lock</li><li><b>G3</b> animatic</li><li><b>G4</b> look clip</li><li><b>G5</b> build</li>
+    </ul>
+  </header>
+
+  <section class="guide" aria-labelledby="g1">
+    <h2 id="g1">Words on screen</h2>
+    <p class="file">TYPE_GUIDE · picked</p>
+    <ul class="pts">
+      <li><b>One hand</b> (Gaegu) for every spoken word, 2-4 words at a time, set in the open space by the subject; pops or builds with the voice, never clipped.</li>
+      <li><b>The lit stress:</b> the same hand, bolder, bigger, lowercase, softly lit. Never red, boxes or capitals.</li>
+    </ul>
+    <p class="v4"><b>On video 4:</b> R2 the hook "Did you know" at frame 0 · R3 "70,000" · R4 "wants", "heat" · R6 "That's a lot of tea." · R7 the "2027" tag · R9 the payoff.</p>
+    <div class="sheet"><img src="s/type.jpg" alt="The type stills on a contact sheet" loading="eager"></div>
+  </section>
+
+  <section class="guide" aria-labelledby="g2">
+    <h2 id="g2">Composition and motion</h2>
+    <p class="file">COMPOSITION_SHOTS · video 4's COMPOSITION_PASS</p>
+    <ul class="pts">
+      <li><b>103 entries:</b> 67 frames, 17 moves, 19 joins; your 41 reel ideas first; ranked CORE, situational or rare by three judges.</li>
+      <li><b>In every shot:</b> the rule of thirds, a soft near layer, atmospheric layers, one colour accent.</li>
+      <li><b>Rhythm:</b> shots average 3.5 s or more, 6-9 lead framings per film, a change on the subject every 1.5-3 s.</li>
+    </ul>
+    <p class="v4"><b>On video 4:</b> each of the 12 shots leads with one device (leading lines along the warm pipe, the vanishing point in the planned hall); 10 of 11 joins one continuous camera, one plain cut on "But".</p>
+    <div class="sheet tall"><img src="s/comp_library.jpg" alt="The composition library sheet, ranked" loading="lazy"></div>
+    <p class="cap">The library sheet (scroll inside). Below: video 4's pass, one value thumbnail per shot.</p>
+    <div class="sheet tall"><img src="s/comp_pass.jpg" alt="Video 4's composition pass: twelve planning thumbnails" loading="lazy"></div>
+  </section>
+
+  <section class="guide" aria-labelledby="g3">
+    <h2 id="g3">Sound sync</h2>
+    <p class="file">SOUND_SYNC</p>
+    <ul class="pts">
+      <li><b>Spend sync, don't sprinkle it:</b> a quiet floor; three sounded changes and a late fourth in the first ~2-4 s; rest while the voice explains; ONE release at the payoff, in a pause of 0.8 s or more.</li>
+      <li><b>A hard sync</b> is one short sound on one visible change, never before it; the picture leads its word by about 0.1 s.</li>
+    </ul>
+    <div class="sheet"><img src="s/sound1.jpg" alt="Your first sound reference measured on a timeline" loading="lazy"></div>
+    <p class="cap">Your first sound reel, measured: where its syncs land.</p>
+  </section>
+
+  <section class="guide" aria-labelledby="g4">
+    <h2 id="g4">The look</h2>
+    <p class="file">DIRECTION · ORGANIC · PAINT_RECIPES · painter v7 · PALETTE</p>
+    <ul class="pts">
+      <li><b>Organic, not geometric:</b> organic shapes from the design stage, edges sharp in places and soft in others, light and colour moving inside shapes, brush marks with intent, near crisp and far painterly.</li>
+      <li><b>Painted pieces:</b> sky, clouds, water, trees, buildings and ground brushed in layers, each a little softer.</li>
+      <li><b>Light:</b> one colour key and one story light, big quiet masses.</li>
+    </ul>
+    <p class="v4"><b>On video 4:</b> a cold blue snowy night in the low key, one warm accent (the heat), the lit window as the story light; painter v7 sets the look clip's look.</p>
+    <div class="two">
+      <figure><div class="sheet tall"><img src="s/organic.jpg" alt="ORGANIC's index sheet" loading="lazy"></div><span class="cap">ORGANIC: the index</span></figure>
+      <figure><div class="sheet"><img src="s/paint.jpg" alt="The paint recipes index" loading="lazy"></div><span class="cap">PAINT_RECIPES: the pieces</span></figure>
+    </div>
+    <div class="sheet tall"><img src="s/v7a.jpg" alt="Painter v7a compared with the references" loading="lazy"></div>
+    <p class="cap">Painter v7a on scene 1, beside the references: the look the look clip follows.</p>
+    <div class="sheet tall"><img src="s/organic_proof.jpg" alt="The organic proof: before and after on the engine" loading="lazy"></div>
+    <div class="sheet tall"><img src="s/palette.jpg" alt="The house palette family" loading="lazy"></div>
+    <p class="cap">The palette family: warm, never sickly; one sister palette per film.</p>
+  </section>
+
+  <section class="guide" aria-labelledby="g5">
+    <h2 id="g5">People</h2>
+    <p class="file">PEOPLE_DESIGN · in use · EVALUATION</p>
+    <ul class="pts">
+      <li><b>The hair you kept:</b> designed shapes on a spring rig. <b>Open eyes</b> looking away. <b>Bodies</b> with weight, real hands, modern clothes.</li>
+      <li>Judged as one whole character: hair, face, light and values together.</li>
+    </ul>
+    <p class="v4"><b>On video 4:</b> the person walking home near the camera in shots 1, 11 and 12.</p>
+    <div class="sheet"><img src="s/people_bodies.jpg" alt="The bodies round: the cast, poses and hands" loading="lazy"></div>
+    <div class="sheet"><img src="s/people_hair.jpg" alt="The hair overhaul: heads, cast and motion" loading="lazy"></div>
+  </section>
+
+  <section class="guide" aria-labelledby="g6">
+    <h2 id="g6">Story flow and the animatic</h2>
+    <p class="file">CRAFT · LAYOUT · G3_ANIMATIC · STORYBOARD_STYLE · the visual script METHOD</p>
+    <ul class="pts">
+      <li><b>One flowing story:</b> something carries the eye across every join, at most 2 plain cuts; the warm-water thread on screen 80 % of the time, never gone more than 3 s; one subject at a time.</li>
+      <li><b>The frame:</b> a band for the words, a zone for the action, the app's buttons kept clear.</li>
+      <li><b>The animatic:</b> an animated sketchbook, monochrome at 60 fps, every move, join and key action played with real timing; one sound-off and one sound-on watch, one fix round, then to you.</li>
+    </ul>
+    <div class="sheet" style="max-width:360px"><img src="s/sketchbook.jpg" alt="The animated sketchbook reference" loading="lazy"></div>
+    <p class="cap">The animated-sketchbook reference the animatic follows.</p>
+  </section>
+
+  <p class="note">Also in use, text only: COZY_AND_SCALE (the home place and the scale moment), LIFE_AND_DENSITY (alive but calm), CINEMATIC_GUIDE (the opening, shot recipes). Video 4's colour strip lands here once the world bible finishes.</p>
+</div>
