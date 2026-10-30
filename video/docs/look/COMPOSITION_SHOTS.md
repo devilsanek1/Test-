@@ -194,6 +194,11 @@ Each rule is numbers for our frame, then where it comes from. "Proposal" marks w
 
 ## 2. The library at a glance
 
+**Thumbnails:** `composition/shots_sheet.png`, one value thumbnail per recipe (our frame at 1/4, 270 x 480: five flat
+values, white kept for the story light; the caption band and the app's interface on the owner's Reels tab marked
+faintly; the composition idea in red), each in scene 1 or video 4 as its example says, drawn from the recipe's numbers
+by `composition/shots_sheet.py` (seeded; no image copied or traced).
+
 Pick by the beat (§4 has the checklist). **By beat:** the hook SR1 · establishing the home place SR2-SR5 · the subject's
 moment SR6-SR11 · a reveal SR6 (through the opening), SR10 (the tilt), SR15 (the tilt-up), SR17 (the big move), SR4 (out
 through the window) · the turn SR18, SR19 · scale SR14-SR17 · intimacy SR12, SR13 · a comparison SR20, SR19, SR11 · a

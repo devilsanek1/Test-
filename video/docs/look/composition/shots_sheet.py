@@ -159,7 +159,7 @@ class Frame:
         self.dr = ImageDraw.Draw(self.im)
         self.rng = np.random.default_rng(seed)
         self.guides = []
-        self.inset = None          # (Frame, (x, y)): a second frame shown at 1/4 inside this one (SR19)
+        self.inset = None          # (Frame, (x, y), scale): a second frame shown small inside this one (SR19)
         self.focal = None          # the beat's focal centre (checks)
 
     # -- fills --------------------------------------------------------------------------------------------------------
@@ -431,9 +431,10 @@ def thumbnail(fr):
     band_dark = GREY_TO_L.get(int(np.median(band)), 50) < 55
     rgba = furniture(rgba, band_dark)
     if fr.inset is not None:
-        sub, (ix, iy) = fr.inset
-        sg = sub.im.resize((TW, TH), Image.BOX)
-        rgba.paste(Image.merge('RGBA', (sg, sg, sg, Image.new('L', (TW, TH), 255))), (ix, iy))
+        sub, (ix, iy), k = fr.inset
+        size = (int(FW * k), int(FH * k))
+        sg = sub.im.resize(size, Image.LANCZOS)
+        rgba.paste(Image.merge('RGBA', (sg, sg, sg, Image.new('L', size, 255))), (ix, iy))
     rgba = draw_guides(rgba, fr.guides)
     return rgba.convert('RGB').resize((TW, TH), Image.BOX)
 
@@ -486,6 +487,7 @@ def s1_home(fr, office=None, door='W', horizon=1124):
     fr.cloud(170, 150, 660, 236, 'M')                                   # the hero cloud, cut by the left edge
     fr.skyline(0, 330, 1150, (1004, 1066), 'M', wmin=36, wmax=86, gable=0.25)   # the far city by the sun, low
     fr.rect(0, 1082, 334, 1136, 'M', amp=2)                             # the bridge's deck
+    fr.rect(0, 1130, 334, 1232, 'M', amp=1.5)                           # its body
     fr.poly([(56 + 210 * t, 1232 - 92 * math.sin(math.pi * t)) for t in np.linspace(0, 1, 30)], 'D')  # its arch
     roof = [(300, 794), (300, 774), (410, 770), (414, 754), (600, 750), (604, 764), (790, 762), (794, 744),
             (1080, 742)]
@@ -555,8 +557,11 @@ def sr3():
     while x < 560:
         w = 70 + 60 * (1 - x / 560.0) * fr.rng.uniform(0.7, 1.2)
         xe = min(560.0, x + w)
-        t = top(x) + fr.rng.uniform(-16, 10)
-        pts += [(x, t), (xe, t)]
+        t = top(x) + fr.rng.uniform(-44, 22) * (1 - x / 700.0)
+        if fr.rng.random() < 0.35 and xe - x > 50:
+            pts += [(x, t), ((x + xe) / 2, t - fr.rng.uniform(14, 30) * (1 - x / 700.0)), (xe, t)]
+        else:
+            pts += [(x, t), (xe, t + fr.rng.uniform(-6, 6))]
         x = xe
     pts += [(560, 1090)]
     fr.poly(pts, 'M')
@@ -599,21 +604,21 @@ def sr4():
     """The nook inside the flat behind the one window: refuge on two edges and the top, one opening, the low lamp's
     pool on the sill and the radiator (the subject) under it; the snowy street a cool step darker in the glass."""
     fr = Frame(4, 'L')                                                  # the room's wall: the band lies on it
-    fr.rect(118, 618, 912, 1022, 'K', amp=2)                            # the window's frame
-    fr.rect(136, 636, 894, 1004, 'D', amp=1.5)                          # the glass: the night outside
-    fr.skyline(136, 894, 1004, (900, 948), 'K', wmin=56, wmax=130, gable=0.3)
-    fr.rect(136, 966, 894, 1004, 'M')                                   # the street's snow, a cool step down
-    fr.rect(206, 752, 334, 990, 'K', amp=1.5)                           # the giant computer by the harbour
+    fr.rect(118, 618, 912, 1022, 'D', amp=2)                            # the window's frame
+    fr.rect(136, 636, 894, 1004, 'M', amp=1.5)                          # the glass: the night, a cool step down
+    fr.skyline(136, 894, 1004, (900, 948), 'D', wmin=56, wmax=130, gable=0.3)   # the far roofs
+    fr.rect(136, 966, 894, 1004, 'M')                                   # the street's snow
+    fr.rect(206, 752, 334, 990, 'D', amp=1.5)                           # the giant computer by the harbour
     fr.dots(np.arange(226, 320, 22), np.arange(780, 960, 26), 4, 'M', skip=0.3, jit=1)
-    fr.rect(686, 636, 698, 1004, 'K')                                   # one mullion, clear of the landmark
+    fr.rect(686, 636, 698, 1004, 'D')                                   # one mullion, clear of the landmark
     fr.rect(96, 1022, 934, 1054, 'M', amp=1.5)                          # the sill
     fr.hpoly([(0, 0), (780, 0), (780, 150), (720, 192), (0, 196)], 'D', amp=2)   # the soffit over the top-left
     fr.rect(0, 190, 86, 1920, 'D', amp=2)                               # the bookcase, cut by the left edge
     for y in (420, 640, 860, 1080, 1300):
         fr.rect(0, y, 82, y + 14, 'K')
     fr.rect(0, 1560, 1080, 1920, 'M')                                   # the floor
-    fr.ell(548, 1040, 236, 24, 'L')                                     # the lamp's pool, falling off
-    fr.ell(548, 1036, 150, 15, 'W')
+    fr.ell(548, 1040, 260, 26, 'L')                                     # the lamp's pool, falling off
+    fr.ell(548, 1036, 176, 17, 'W')
     fr.rect(372, 1070, 708, 1196, 'D', amp=1.5)                         # the radiator: the subject
     for x in range(394, 700, 26):
         fr.rect(x, 1084, x + 7, 1186, 'K')
@@ -640,12 +645,13 @@ def sr5():
     centre = [(-80, 690), (160, 742), (360, 860), (560, 990), (760, 1010), (920, 966), (1120, 912)]
     fr.poly(ribbon(centre, 74), 'D')                                    # the street: one C-curve
     kerb = [(x, y + 112) for x, y in centre]
-    fr.blob(560, 1104, 92, 30, 'L', 0.06)                               # the front's glow on the snow
+    fr.blob(560, 1104, 132, 46, 'L', 0.06)                              # the front's glow on the snow
     melt = [p for p in catmull(kerb, 10) if p[0] <= 540]
     fr.line(melt, 'K', 15)                                              # the melt line behind the front
-    fr.ell(560, 1103, 30, 15, 'W')                                      # the warm water's front: the story light
-    fr.poly([(0, 640), (-10, 1300), (60, 1360), (150, 1250), (196, 1030), (150, 820), (90, 690)], 'K')  # side mass
-    fr.hpoly([(990, 760), (1080, 740), (1080, 1520), (1000, 1560), (968, 1100)], 'K', amp=3)  # the mouth's mass
+    fr.ell(560, 1103, 46, 23, 'W')                                      # the warm water's front: the story light
+    for bx, by, r in ((30, 800, 116), (96, 940, 138), (24, 1090, 120), (110, 1200, 84)):
+        fr.blob(bx, by, r, r * 0.9, 'K', 0.14)                          # a tree's crown from above, cut by the edge
+    fr.hpoly([(970, 812), (1080, 800), (1080, 1530), (982, 1540)], 'K', amp=2)   # the corner the street dives under
     # the tram on the curve, going the other way
     a = math.radians(-14)
     cx, cy = 830, 975
@@ -659,7 +665,7 @@ def sr5():
         fr.person(x, y, P, 'K')                                         # walkers, small, in twos and threes
     fr.hpoly([(720, 1920), (780, 1730), (1080, 1650), (1080, 1920)], 'K', amp=3)  # our balcony's corner, cut twice
     fr.g('curve', [(40, 716), (230, 772), (400, 888), (560, 990), (760, 1010), (900, 970), (1010, 930)], arrow=True)
-    fr.g('ring', 560, 1103, 70)
+    fr.g('ring', 560, 1103, 86)
     fr.focal = (560, 1103)
     return fr
 
@@ -750,13 +756,14 @@ def sr9():
     for x in (130, 318, 600, 836, 990):
         fr.rect(x, yh - 14, x + fr.rng.uniform(10, 24), yh + 12, 'K')
     fr.rect(0, yh + 12, 1080, 1272, 'K')                                # the harbour
-    for _ in range(16):
+    for _ in range(9):
         x, y = fr.rng.uniform(0, 1000), fr.rng.uniform(yh + 20, 1262)
         fr.ell(x, y, fr.rng.uniform(26, 70), 3.5, 'L')                  # the line, broken in the water
     fr.rect(0, 1272, 1080, 1920, 'M')                                   # the quay's snow
-    fr.person(480, 1322, 180, 'K', view='side')                         # the walker, ~180 px, its lead room ahead
+    fr.person(470, 1362, 240, 'K', view='side')                         # the walker, ~240 px, its lead room ahead
     fr.g('line', [(30, yh + 40), (1050, yh + 40)])                      # the cross: the lit line (just under it) ...
-    fr.g('line', [(480, 1078), (480, 1376)])                            # ... and the one upright on it
+    fr.g('line', [(478, 1026), (478, 1100)])                            # ... and the one upright on it
+    fr.g('line', [(478, 1386), (478, 1460)])
     fr.focal = (480, yh)
     return fr
 
@@ -773,13 +780,13 @@ def sr10():
     fr.rect(0, 1004, 1080, 1060, 'M')                                   # the street's snow
     fr.rect(0, 1034, 396, 1050, 'D')                                    # the melt just behind the front
     fr.poly([(0, 1060), (1080, 1060)] + wobble((1080, 1092), (0, 1096), 8, fr.rng, 28), 'M')   # the cut's soft edge
-    fr.blob(404, 1160, 78, 52, 'L', 0.08)                               # the front's glow in the ground
+    fr.blob(404, 1160, 104, 70, 'L', 0.08)                              # the front's glow in the ground
     fr.rect(0, 1140, 1080, 1182, 'K', amp=1)                            # the pipe
     fr.rect(0, 1150, 384, 1172, 'L')                                    # the hot water behind its front
-    fr.ell(398, 1161, 26, 18, 'W')                                      # the front: the story light
+    fr.ell(400, 1161, 38, 26, 'W')                                      # the front: the story light
     fr.g('line', [(400, 660), (400, 1500)], dash=True)                  # held at x 400 on screen
     fr.g('arrow', [(450, 1216), (820, 1216)])                           # its travel, and its lead room
-    fr.g('ring', 400, 1161, 62)
+    fr.g('ring', 400, 1161, 84)
     fr.focal = (400, 1161)
     return fr
 
@@ -800,7 +807,7 @@ def sr11():
     fr.rrect(596, 872, 684, 988, 20, 'L')
     fr.rect(612, 886, 668, 974, 'W')                                    # the one window
     fr.ell(640, 1030, 96, 13, 'L')                                      # its pool on the snow
-    fr.poly([(420, 1122), (1080, 1122), (1080, 1300), (300, 1440)], 'K')  # the retaining wall between the levels
+    fr.poly([(420, 1122), (1080, 1122), (1080, 1300), (300, 1440)], 'D')  # the retaining wall between the levels
     # the steps down to the harbour front, the melt line climbing them
     ramp = ribbon([(560, 1060), (360, 1230), (160, 1410)], 62)
     fr.poly(ramp, 'M')
@@ -826,8 +833,9 @@ def sr12():
     below the band, the snowy night one quiet dark field behind."""
     fr = Frame(12, 'D')
     fr.rect(36, 640, 62, 1920, 'K')                                     # a post, cut by the left edge
-    fr.steam(540, 930, 640, 520, 'M', sway=40)                          # the steam, thinning below the band
-    fr.steam(540, 930, 820, 300, 'L', sway=20)
+    fr.steam(500, 930, 650, 300, 'M', sway=46)                          # the steam, thinning below the band
+    fr.steam(610, 930, 700, 250, 'M', sway=-30)
+    fr.steam(545, 930, 830, 230, 'L', sway=16)
     fr.poly([(214, 912), (866, 912), (890, 952), (190, 952)], 'L')      # its top, catching the light
     fr.poly([(400, 916), (680, 916), (690, 948), (390, 948)], 'W')      # the melt, lit: the story light
     fr.rect(190, 952, 890, 1920, 'K')                                   # its face, the deepest
@@ -928,7 +936,7 @@ def sr16():
     """The big sky (S3): a low horizon (y ~1400); one cloud bank in planes below the band; the sun half behind its
     edge; the bridge's arch the one landmark on the left third."""
     fr = Frame(16, 'L')
-    fr.ell(372, 1106, 44, 44, 'W')                                      # the sun, half behind the bank's edge
+    fr.ell(372, 1112, 56, 56, 'W')                                      # the sun, half behind the bank's edge
     fr.cloud(760, 905, 940, 390, 'M', lobes=6, base=1094)               # the bank: the near plane, cut by the right
     fr.poly(wobble((330, 1093), (1080, 1090), 4, fr.rng, 40) + [(1080, 1074), (360, 1080)], 'D')   # its shade underside
     fr.cloud(110, 1236, 380, 120, 'M', lobes=4)                         # a far, smaller cloud, cut by the left edge
@@ -954,7 +962,8 @@ def sr17():
     fr.poly([(x, arc(x) - 130 - 10 * abs(x - 540) / 540) for x in xs] + [(x, arc(x)) for x in xs[::-1]], 'D')
     fr.poly([(x, arc(x)) for x in xs] + [(1080, 1920), (0, 1920)], 'D')     # the Earth at dusk
     fr.poly([(x, arc(x) - 7) for x in xs] + [(x, arc(x) + 9) for x in xs[::-1]], 'L')   # the limb's light
-    fr.poly([(760, arc(760) + 9), (1080, arc(1080) + 9), (1080, 1920), (930, 1920), (860, 1400), (790, 1080)], 'M')
+    term = catmull([(720, arc(720) + 9), (790, 1160), (870, 1450), (930, 1920)], 12)
+    fr.poly([(x, arc(x) + 9) for x in np.linspace(720, 1080, 20)] + [(1080, 1920)] + term[::-1], 'M')   # dusk side
     fr.blob(330, 1086, 420, 42, 'K', 0.10)                              # the gulf
     fr.blob(140, 1180, 260, 60, 'K', 0.12)
     fr.blob(820, 1240, 180, 40, 'D', 0.15)                              # cloud over the dusk side, a step down
@@ -974,17 +983,17 @@ def sr18():
     fr = Frame(18, 'D')
     fr.skyline(0, 1080, 1092, (1052, 1076), 'K', wmin=40, wmax=110, gable=0.1)
     fr.rect(0, 1150, 1080, 1920, 'M')                                   # the plan's snowy floor
-    fr.steam(330, 712, 630, 240, 'M', sway=24)
-    fr.hpoly([(150, 706), (510, 700), (512, 1334), (148, 1334)], 'K', amp=2)   # the giant computer: the heavy mass
-    fr.rect(484, 712, 512, 1324, 'W')                                   # the raking key on its edge: the story light
-    fr.rect(152, 694, 510, 712, 'L', amp=1)
-    fr.dots(np.arange(186, 470, 36), np.arange(760, 1300, 44), 5, 'M', skip=0.3)
-    fr.ell(330, 1344, 220, 20, 'D')                                     # its shadow on the snow
+    fr.steam(330, 712, 630, 220, 'M', sway=24)
+    fr.hpoly([(190, 706), (470, 700), (472, 1334), (188, 1334)], 'K', amp=2)   # the giant computer: the heavy mass
+    fr.rect(442, 712, 472, 1324, 'W')                                   # the raking key on its edge: the story light
+    fr.rect(192, 694, 470, 712, 'L', amp=1)
+    fr.dots(np.arange(222, 430, 36), np.arange(760, 1300, 44), 5, 'M', skip=0.3)
+    fr.ell(330, 1344, 200, 20, 'D')                                     # its shadow on the snow
     fr.rect(716, 1428, 1080, 1458, 'K')                                 # the city's pipe, ending short
-    fr.line([(716, 1443), (514, 1443)], 'K', 7)                         # the stretch the pen draws: empty
+    fr.line([(716, 1443), (474, 1443)], 'K', 7)                         # the stretch the pen draws: empty
     fr.g('line', [(540, 640), (540, 1500)], dash=True)                  # the axis it left
-    fr.g('arrow', [(1040, 1396), (548, 1396)])                          # the reach across the open half
-    fr.g('ring', 330, 1010, 120)
+    fr.g('arrow', [(1040, 1396), (500, 1396)])                          # the reach across the open half
+    fr.g('ring', 330, 1010, 110)
     fr.focal = (330, 1010)
     return fr
 
@@ -996,9 +1005,9 @@ def sr19():
     s1_home(fr, office='lit', door='D')
     after = Frame(19, 'L')
     s1_home(after, office='dark', door='D')
-    fr.inset = (after, (40, 1404))
-    fr.g('box', 40, 1404, 40 + TW, 1404 + TH)
-    fr.g('arrow', [(470, 990), (232, 1380)], dash=True)
+    fr.inset = (after, (36, 1256), 1 / 3)
+    fr.g('box', 36, 1256, 36 + 360, 1256 + 640)
+    fr.g('arrow', [(486, 990), (320, 1236)], dash=True)
     fr.g('ring', 540, 906, 84)
     fr.focal = (540, 906)
     return fr
@@ -1013,12 +1022,12 @@ def sr20():
     fr.poly(seam + [(1080, 1920), (0, 1920)], 'L')                      # untouched snow
     lit = [p for p in seam if p[0] <= 540]
     fr.line(lit, 'M', 18)
-    fr.blob(540, 1150, 84, 40, 'M', 0.06)
-    fr.ell(540, 1150, 34, 20, 'W')                                      # the front: the story light
+    fr.blob(540, 1150, 116, 56, 'L', 0.06)
+    fr.ell(540, 1150, 46, 27, 'W')                                      # the front: the story light
     for x, y in ((760, 1200), (800, 1236), (842, 1270)):                # footprints across the untouched side
         fr.ell(x, y, 9, 5, 'M')
     fr.g('line', [(40, 1474), (1060, 813)])                             # the seam
-    fr.g('ring', 540, 1150, 70)
+    fr.g('ring', 540, 1150, 92)
     fr.focal = (540, 1150)
     return fr
 
