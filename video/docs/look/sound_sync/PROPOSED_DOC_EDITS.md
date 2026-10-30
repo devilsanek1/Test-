@@ -1,8 +1,10 @@
 # Sound sync: the doc edits the distill needs (2026-10-30; the orchestrator applies them)
 
 **Applied 2026-10-30 ~19:00 UTC by the orchestrator:** A1-A12 and B1-B11 (23 edits, by script, each `old` found once).
-**Held:** A13 ("joins on the beat" read as the voice's beat): it changes the meaning of an owner rule, so it goes to the
-owner first, with Part C's two questions. **Still to do:** MR20's window in the composition library (Part C), after the
+**A13 applied too (2026-10-30 ~19:20 UTC)** after the owner's hand-over ("Do what you think is right and make the videos
+better"). Part C decided the same way: 1. "more effects" = more NOTICEABLE story sounds, each heard, not more cues;
+2. no separate A/B iteration: the four comparisons are played in Helsinki's G3 sound pass, where the owner hears them
+in a real film. **Still to do:** MR20's window in the composition library (Part C), after the
 composition-library run lands.
 
 `docs/look/SOUND_SYNC.md` is the distilled practice. These edits point the owning docs at it and fix the lines that now

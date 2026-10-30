@@ -321,9 +321,10 @@ Everything that agent knew is in this repo. This file is the map; the details li
      Instagram's actual sounds.
    - **DONE 2026-10-30, where and how often (owner: "be more intentional and educated about this effect and where it
      make sense to use"):** `video/docs/look/SOUND_SYNC.md` (the owner's two sound reels measured as the spine; the craft
-     and our audit in `video/docs/look/sound_sync/`), wired into the playbook, PIPELINE_V2, G3/G5 and the sound docs. Open
-     with the owner: "more effects" read as more NOTICEABLE story sounds, not more cues; "joins on the beat" read as the
-     voice's beat (edit A13 in `sound_sync/PROPOSED_DOC_EDITS.md`, held for the owner).
+     and our audit in `video/docs/look/sound_sync/`), wired into the playbook, PIPELINE_V2, G3/G5 and the sound docs. Decided
+     under the owner's hand-over ("Do what you think is right and make the videos better"): "more effects" = more
+     NOTICEABLE story sounds, not more cues; "joins on the beat" = the voice's beat (playbook); the A/B comparisons are
+     played in Helsinki's G3 sound pass.
 6. **Tooling (PIPELINE_V2, "Tooling planned before video 2" and "Craft tooling lane"):** the draft flag, the SketchReel
    comp and the scripted gate check exist; `npm run preview` and the hook segment were never built. The G3 tier-1
    tooling (item 6 there) and the craft tooling lane are part of the pipeline the owner approved on 2026-10-27 ("Yes"):

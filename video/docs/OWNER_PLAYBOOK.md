@@ -437,8 +437,9 @@ Maintenance at the end).
 - **Personal framings must feel natural, not over the top.** Never cast the viewer as a loser in a contest they don't
   feel; test "you" claims with a viewer panel. — (v3 G2, 2026-10-25).
 - **Target 30-45 s and end close to the payoff** (viewers left once the story felt resolved, ~40 s). — (v1 insights).
-- **Every frame at least 8/10, no dead frames, joins on the beat** (every join carries something: `docs/look/CRAFT.md`
-  §a). — (v1; joins, v3 G5b, 2026-10-27).
+- **Every frame at least 8/10, no dead frames, joins on the beat** (the voice's beat: each join's midpoint on the next
+  sentence's first word, every join carrying something: `docs/look/CRAFT.md` §a; the music bends to a join only where it
+  is heard, never a beat grid: `docs/look/SOUND_SYNC.md`). — (v1; joins, v3 G5b, 2026-10-27; "the beat" read as the voice's beat under the owner's hand-over, 2026-10-30).
 
 ## Storyboard (G3) and flow
 - **The pipeline after v3 (owner APPROVED, 2026-10-27: "Yes"):** a DESIGNED sketch. From the core line comes a
@@ -709,6 +710,11 @@ Maintenance at the end).
   only when the options differ visibly at a glance (side by side at 400 px wide); a smaller difference is ours to
   decide, by the rules, and we note the call. — ("I don’t really see the difference between a snd b", on two sky tops
   ~5 L* apart, 2026-10-30.)
+- **When the owner hands a call over, make it: decide by the evidence and his references, say what was decided and
+  why in one line each, and show the RESULT (a still, a clip, a doc), not the options.** Open questions queued for him
+  are decided the same way once he has said so (each decision noted where the question was, so he can overrule it in
+  one line); an owner rule's MEANING is changed only under such a hand-over, and the change says so. — ("Do what you
+  think is right and make the videos better", 2026-10-30, answering the sound-sync and look questions.)
 - **Two modes: PRODUCTION and ITERATION.** Production is a film going through the gates (G0-G8): full checks, review
   panels, QA suites, fix passes, as the quality needs. Iteration is a quick experiment for the owner to judge (a look
   test, a rethought scene, a style probe, a "what if"): one or two agents, no panels, no critics, no QA suites, rough
