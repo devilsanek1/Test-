@@ -42,11 +42,13 @@ living artist as a style target. Paths are from `video/`. Px at 1080 x 1920, y d
    standing figure on the camera's ground at (camera height / figure height) of its height, near or far; at eye level
    (1.6 m) every standing head sits on the horizon. The owner's human-scale references all use a LOW eye: horizon
    0.57-0.85 H, the camera at or below the people's eyes, their heads at or above the horizon against the far world,
-   the sky the big quiet mass. Our default horizon (0.40 H, y 768) with an eye-level camera stands the "you" at y
-   757-937, right under the captions and between the words and the focal (which R7 forbids); a "you" low in the frame
-   under a 0.40 H horizon means a camera 4-7 m up, v6's raised view. Two setups follow, each with its figure
-   placement in pixels: **A, the low eye** (horizon 0.60-0.70 H, the references) and **B, the raised eye** (horizon
-   0.36-0.47 H, v2 and v6). W1 declares one per set.
+   the sky the big quiet mass. Still v6 keeps v2's low camera (~1 m) but its quay lines meet at y ~995, the frame's
+   half; our documented default horizon (0.40 H, y 768) with an eye-level camera stands a 180 px "you" at y 757-937,
+   right under the captions and between the words and the focal (which R7 forbids). A near "you" low in the frame at
+   eye level needs a LOW horizon; with a mid or high horizon it needs a camera 4-7 m up. Hence two setups, each with
+   its figure placement in pixels: **A, the low eye** (camera 0.9-1.6 m, horizon 0.60-0.68 H: the references) and
+   **B, the raised eye** (camera 3-7 m, horizon 0.36-0.45 H). W1 declares one per set; the horizon at the half (v6)
+   is neither.
 5. **Sizes and angles** (§2-3): the scale ladder steps 2-3x per size (2D layout's 6 to 12 field [S16]); eye level is
    the default ("we are equal" [S13]); a low angle only for the monumental quantity, a high angle for pattern, crowds
    and maps; never a Dutch tilt (no roll: DIRECTION rule 8); no human close-ups: CU and insert go to objects.
@@ -60,8 +62,8 @@ living artist as a style target. Paths are from `video/`. Px at 1080 x 1920, y d
 8. **A camera move is a sequence of compositions** (§8): the start, the middle and the end frame each pass the frame
    rules; one variable per move; the subject is the pivot that holds its screen spot while the world moves past it,
    the still point among moving planes being the strongest call [S6].
-9. **Distilled rules C1-C14 with their target docs: §10. Clashes: §11** (the main one: "eye level by default" and a
-   0.40 H horizon cannot both hold for a standing "you" low in the frame).
+9. **Distilled rules C1-C14 with their target docs: §10. Clashes: §11** (the main one: an eye-level camera, a 0.40 H
+   default horizon and a near "you" low in the frame cannot all hold at once).
 
 ## 1. The frame we compose in (9:16, with our zones)
 
@@ -88,10 +90,11 @@ and the reciprocal by their constructions [S4]):
 - **The focal's home** is the stage square's golden box: x 413-667, y 951-1187 (its eyes x 454-626, y 987-1133 at its
   heart). It agrees with three independent things: the centre bias of the eye [S7, S10], R7's drop from the words (y
   860-1200), and LAYOUT's subject axis.
-- **The horizon goes on a third or a golden line of the full frame, never near the half:** y 640-768 (sky a third:
-  ground-led, setup B) or y 1187-1280 (sky two thirds: sky-led, setup A); never y 900-1020 (0.47-0.53 H), Smith's
+- **The horizon goes near a third or a golden line of the full frame, never near the half:** y 640-860 (sky a third
+  or so: ground-led, setup B, §3.3) or y 1150-1300 (sky two thirds: sky-led, setup A); never y 900-1020 (0.47-0.53 H), Smith's
   "precise formal half" [S3] and the composition guides' "The horizon line should not divide the art work in two
-  equal parts" [S3]. v6's horizon sits at ~0.47 H (y ~900, by eye), at the half's edge.
+  equal parts" [S3]. v6's horizon is at the half: its paving lines meet at (-1124, 995), 0.52 H (`/tmp/comp/cinema/
+  tools/v6_vp.py`, Hough lines on our quay, 131 pairs, interquartile y 988-1003).
 - **A spiral or a golden triangle needs the stage square, or the left-third hero spot** (x ~200-450, LAYOUT §8.2's
   open question): in the full frame their eyes fall in the band or the UI.
 
@@ -190,24 +193,30 @@ The owner's four human-scale references, read by eye (`docs/look/refs_human_scal
 ~0.57 H, the camera at the standing man's chest, his head above the horizon against the lit city; the beach, horizon
 ~0.70 H, the camera at ~0.9 m (the horizon crosses the couple at about half their height), their heads against the
 sky; the 9:16 motion piece, the ground line at ~0.85 H with the girl standing on it, the sky ~85 %; the bus stop, the
-ground at ~0.85 H, the camera about a seated man's height. Still v6 (and v2's view, which the owner liked: "our initial
-angle snd the view frankly wasn’t bad") looks down from a raised camera: horizon ~0.47 H, her head in the door below it,
-our paving receding.
+ground at ~0.85 H, the camera about a seated man's height. Still v6, built on v2's view (the owner: "our initial angle
+snd the view frankly wasn’t bad"), has a low camera too, but a mid horizon: our quay's paving lines meet at y ~995
+(0.52 H, measured: §1), and the horizon crosses her in the door at ~56 % of her height (head y ~928, feet ~1080, so a
+camera ~1 m above the quays); the frame holds no "you". A 180 px "you" on our quay in that view would stand at y
+~921-1101, beside her on the line of heads: a second call in the middle of the read zone.
 
-| | **A, the low eye** (the references) | **B, the raised eye** (v2, v6) |
-|---|---|---|
-| camera | 0.9-1.6 m on the "you"'s ground (standing or a little lower) | 3-7 m (a raised quay, a bridge, steps, a first floor) |
-| horizon | y 1150-1300 (0.60-0.68 H): sky two thirds | y 690-900 (0.36-0.47 H): sky a third or so |
-| the "you" (180 px) | head at or just above the horizon, against the far belt or the sky; feet y 1356-1449 (camera 1.6 m) or 1282-1375 (0.9 m) | below the horizon, seen from behind and a little above: e.g. head 1117, feet 1297 (horizon 768, camera 5 m) |
-| the sky | 60-68 % of the frame, the caption band high in it: R5's quiet sky is automatic | 36-47 %, the band inside it; the ground and water take 53-64 % and need R5's quiet near mass |
-| the far world | one dense belt on the horizon, rising into the sky where it is tall: detail inside one band (R2, R6) | a deep receding field: more room for the far side's density, more pieces to keep quiet |
-| the subject | on the horizon belt or rising above it (a lit facade, a tower): y ~900-1300 | in the middle distance at y ~850-1150, below the line of heads |
-| scale | a near human figure against a far, big world: the playbook's DEPTH AND SCALE | the world spread out below: a map-like note; the person small |
-| risk | the "you" and the subject share the line of heads: two calls; keep the "you" soft (tier B), from behind, at one side (x 120-380 facing right, or x 700-900 facing left), its gaze on the subject | busier (more ground, more things); the horizon drifts toward the half (v6 ~0.47 H) |
+So a human-scale "you" near the camera fixes the horizon, and the horizon fixes the frame. Three ways to frame an
+exterior home view:
+
+| | **A, the low eye, low horizon** (the references) | **B, the raised eye** | v6 as built (for comparison) |
+|---|---|---|---|
+| camera | 0.9-1.6 m on the "you"'s ground (standing, or lower) | 3-7 m (a raised quay, a bridge, steps, a first floor) | ~1 m |
+| horizon | y 1150-1300 (0.60-0.68 H): sky two thirds | y 690-860 (0.36-0.45 H): sky a third or so | y ~995 (0.52 H): the half |
+| the "you" (180 px) | head at or just above the horizon, against the far belt or the sky: feet y 1356-1449 (camera 1.6 m) or 1282-1375 (0.9 m) | below the horizon, seen from behind and a little above: e.g. head 1117, feet 1297 (horizon 768, camera 5 m) | none; if added, y ~921-1101, level with the focal |
+| the sky | 60-68 % of the frame, the caption band high in it: R5's quiet sky comes free | 36-45 %, the band inside it; ground and water take 55-64 % and need R5's quiet near mass | ~50 %; the band at its top |
+| the far world | one dense belt on the horizon, rising into the sky where it is tall: detail inside one band (R2, R6) | a deep field spread below the horizon: room for the far side's density, more pieces to keep quiet | the far side across the middle |
+| the subject | on the horizon belt or rising above it (a lit facade, a tower): y ~900-1300 | in the middle distance, below the horizon: y ~850-1150 | the lit door at y ~850-1080 |
+| scale | a near human figure against a far, big world: the playbook's DEPTH AND SCALE | the world spread out below; the person small, a mild high angle | the world level with us |
+| risk | the "you" and the subject share the line of heads: two calls; keep the "you" soft (tier B), from behind, at one side (x 120-380 facing right, or x 700-900 facing left), its gaze on the subject | busier (more ground, more things); a high angle makes the "you" small and watched | the horizon at the half [S3]; no room for a near "you" |
 
 **Proposal (C3):** W1 declares A or B per set, with its camera height and horizon; every figure is placed by the
-horizon-cut rule. The scene-1 look test shows A beside B (composition.md's T3, "the camera tilted up 140 px" for a
-bigger sky, is a step from B toward A); the owner picks.
+horizon-cut rule; the half is avoided. The scene-1 look test shows A beside v6's view: composition.md's T3 ("the camera
+tilted up 140 px" for a bigger sky) is already a step toward A; the owner picks, and v2's view keeps its camera height
+either way.
 
 **Vertical placement by nature** [S11]: things that live above us (birds, a lamp, the sun, a sign) are liked above the
 centre, things that live below us (a cup, a laptop on a table, a boat on the water) below it: in 9:16 the top square
@@ -355,3 +364,147 @@ symmetry [S2]; in Block's terms rhythm runs from slow to fast [S17]. **Rule:** a
 boats, umbrellas, bollards) is ONE texture inside one mass, its pieces within +-6 L* (R2, R6); the one break in the
 pattern is the call (the lit window in a row of dark ones, the open door in a row of shut ones); a pattern never breaks
 twice in one shot.
+
+## 5. Staging and silhouette (animation's own composition)
+
+Staging is "the presentation of any idea so that it is completely and unmistakably clear", whether action,
+personality, expression or mood, by "the placement of a character in the frame, the use of light and shadow, or the
+angle and position of the camera"; its essence is "keeping focus on what is relevant, and avoiding unnecessary detail"
+[S5]. Its working rules: "lead the viewers eye to where the action will occur"; "only one idea at a time occur, or else
+the viewers may be looking at the wrong thing"; "the main object should be contrasted in some way with the rest of the
+scene". Early Disney drew all action in silhouette because a black arm vanished against a black body, and kept the
+habit because "action was more clearly visible in silhouette": a character scratching its side reads, scratching its
+stomach does not [S6]. Eye tracking shows staging steering many viewers at once: faces, hands and the sudden
+appearance of things take the gaze, a gesture sends it along the sightline, a turned back frees it, and a long shot
+holds attention "by minimising background distractions and staging the scene in a clear sequential manner" [S9]. In
+production layout, a character's 3 s scene gives the background about a quarter second of looking [S16].
+
+**Rules (ours; numbers marked est. are our estimates at phone size, 1 px of 1080 = ~0.7 arcmin on a 68 mm wide screen
+at 30 cm):**
+- **One idea per beat, in turns.** The beat's subject acts while everything else waits; when the beat passes to
+  another subject, the first one settles before the second starts, as speakers take turns [S9]; supporting movers
+  keep DIRECTION 3's budget (3-4 at most, taking turns) and never share the subject's channel (value, colour, motion)
+  at the same moment.
+- **The silhouette test.** Fill the subject and the "you" solid on their field and look at 0.25 scale (270 px wide):
+  what the thing is and what it does must read. Act in profile or 3/4 back; the acting limb, tool or object stands
+  OUTSIDE the body's silhouette by a gap of >= ~12 px (est.: ~8 arcmin); never an action in front of the body
+  ("frontal action" [S6]); a figure turning shows it in the shoulders and head, since we draw no faces.
+- **Contrast the subject in one channel more than anything else has:** value (R4), colour (R11), motion (>= 60 % of the
+  motion: DIRECTION 2), size or isolation [S1]. A still subject among moving things also wins [S6] (the pivot of §8).
+- **Overlap or air, never a kiss.** Two contours overlap by >= ~10 px or stay >= ~20 px apart (est.); an edge that just
+  touches another fuses them into one shape and flattens the depth (CRAFT §f.3: "overlap, never a tangent").
+- **The gaze cue.** The "you" looks at the subject: its head and shoulders turned so the sightline passes through the
+  focal's box; it never looks out of the frame while the subject is in it.
+- **The background budget.** In a 3.5 s shot the background gets about a quarter second [S16]: it says where we are
+  (place, time of day, mood) in three masses; any detail that needs a longer look is either the subject or noise (R2,
+  R6). Detail goes where the eye will be: "Only the visual information at the centre of attention can be perceived in
+  detail" [S9].
+- **The stage around the act:** the action happens inside the stage square's golden box, with a calm ring of one value
+  30-60 px round the subject (LAYOUT §3; the board: 80 px clear).
+
+## 6. Background layout in 2D studios, and our G3
+
+**6.1 What a layout is.** "Layouts are the stage between storyboarding and animation ... the full planning stage that
+translates the information from the storyboard panels into the full size art that both the animator and the
+background artist will work from." A layout holds "not just the background drawing but also the posing of the
+character within the scene, and the technical information needed for shooting the scene such as field size and any
+camera moves"; the layout artist works from the location and prop designs for proportions and from the board for
+placement, action and angle; a rough is approved before clean-up; "a tonal rendering may be done to give the
+background artist a better sense of the lighting"; then layouts and poses are shot and timed into the story reel in
+place of the board panels [S16]. Our map: W1's sets are the location designs, the G3 panel is the layout (its greys
+are the tonal rendering), the G4 look clip is the background key, G5 paints to the layout.
+
+**6.2 The layout artist's working rules** (one practitioner's teaching notes [S16]; methods only):
+- "the whole purpose of your layout is to support the actions and placement of the characters within the scene";
+- most production layouts are one-point perspective; the horizon is set at the character (one example: "The horizon
+  line is at the character's chest level", which is §3.2's rule: a camera at chest height);
+- pathways: "Spiral and radiating pathways are the most common types used in layout compositions", drawn in the
+  thumbnail before the drawing (one example traces a spiral from a broken strut, along the path, round a bucket and up
+  a pump to the doorway, the focal);
+- clutter: "I don't like to clutter up the backgrounds with a lot of meaningless information unless it's actually
+  going to help put across a specific message about the location ... Too much detail can distract from the characters";
+- time: in a 3 s scene "You catch the background for about 1/4 of a second"; "Sort out what the priority of the scene
+  is"; a lone object in the field draws the eye straight to it; a cheated perspective passes in a scene under ~4 s;
+- continuity: every layout is drawn as if "there is a scene before and a scene after".
+
+**6.3 The camera on the layout.** Field sizes run 6 field for close-ups to 12 field for long shots [S16]; a camera move
+is drawn on the background as its frames; the multiplane shot moved layers at speeds set by their distance, and
+moving the background and the foreground in opposite directions makes a rotation (an orbit) [S15]: our S5 pull-back's
+foreground pot running the other way (-7) is that effect, and our parallax float is the multiplane at rest. Screen
+direction carries between scenes: keep the camera on one side of the line between the "you" and the subject, and a
+thing that leaves frame right enters the next shot frame left [S20] (LAYOUT §4's D carrier).
+
+**6.4 Our G3 panel as a layout (proposal C10).** Each exterior panel declares, on top of the board's existing fields
+(the subject box and planes, `STORYBOARD_STYLE.md` §3; G3's `planes`):
+1. the shot size (§2) and the setup: camera height and horizon y (§3.3);
+2. the vanishing point(s), the one device (§4) and its pathway, drawn as an arrow from the entry to the focal;
+3. the focal box (default inside x 413-667, y 951-1187) and the counterweight (its side and size, §4.4);
+4. the planes (4-6), each with its top's y and its float factor (LAYOUT §8.2's 1/z);
+5. a 3-value notan thumbnail (R1) with the two quiet masses marked (R5);
+6. the "you" (pose, facing, height in px, feet y from §3.2) and Pip's hiding spot (R12);
+7. a camera move as its start, middle and end frames drawn as rectangles on the panel's world (§8);
+8. the hook-up: where the thread object and the focal sit on the first and the last frame (LAYOUT §4).
+
+## 7. Colour scripts (and the value script under them)
+
+**What studios do.** "Color scripts map out the emotional beats of a story, helping all involved in the animation
+process understand the vision as a whole"; the first at Pixar "planned out scenes on long stripes of black paper with
+chalk pastel, [as] a kind of 'stream of consciousness' map of color, value, and visual drama"; that first one stays soft
+(blues, pinks, warm yellows), "only turning bleak and muddy when something sinister occurs"; colour scripts were not
+invented there, but that studio made one for every film [S18]. Block's frame for planning it: every visual component
+(space, line, shape, tone, colour, movement, rhythm) runs between contrast and affinity; "Contrast increases visual
+intensity, but affinity decreases visual intensity", so a film's visual intensity can be built to follow its story's
+[S17]. Dow's subordination "governs the distribution of masses in Dark-and-Light composition, and of hues in Color
+schemes" [S2]: one dominant per frame, and over the film one dominant key per scene.
+
+**Ours (proposal C11).**
+- **One strip per film, value first.** At W1 (it already writes "a colour-script line per beat": DIRECTION, the
+  pipeline) and G3, a value script: one 9:16 thumbnail per beat (a 30-45 s film has ~8-14), 108 x 192 px (1/10
+  scale), side by side in one strip; each in 3 values (R1), its focal marked, its key's side marked (one rig per set:
+  DIRECTION 5). At G4 the same strip in the film's palette becomes the colour script: per beat the colour key (one
+  strong family and one hot accent: playbook PROPER LIGHT), the story light, the sky's hue.
+- **The intensity curve.** Affinity (one key, close values, level lines, slow rhythm) in the cozy beats; contrast in
+  the first 3 s (DIRECTION 9), on the "But" turn and on the payoff. The payoff beat holds the film's hardest value step at
+  its focal (R4's >= 65 L*) and its one hot accent; the scale reveal's in-shot script (a bright slot in a dark frame,
+  the darkest moment, a burst of light before the landing, the settle: CINEMATIC_GUIDE S5) is the model inside a shot.
+- **The key changes only on a story turn,** once or twice a film, as the first script's colour changes only for the
+  sinister turn [S18]; the change is carried by the light (a lamp switching, the sun sinking through a move), never cut
+  in, and an ordinary join keeps LAYOUT §4's colour shift <= 15.
+- **Check the strip at its own size:** every thumbnail's focal found in under a second, no two neighbours with the
+  same intensity when the story changes between them, one hot accent per thumbnail.
+
+## 8. Moving frames: how a camera move changes a composition
+
+A layout draws a move as its frames on the background [S16]; a multiplane move slides each layer at the speed its
+distance sets [S15]; a zoom changes the headroom, so "the camera must simultaneously tilt up or down to keep the center
+of interest approximately one-third of the way down from the top of the frame" [S14]; continuity of movement across
+cuts is a craft of its own ("decide to avoid abrupt editing by mastering continuum of movement" [S17]). A moving shot
+is a sequence of compositions, and every frame of it is seen.
+
+**Principles (proposal C12).**
+- **Three frames are designed:** the start and the end frame each pass §1-4 and R1-R7 as stills; the middle (p 0.5)
+  passes the band and tangent checks. The move changes ONE thing (size, height, or what is revealed) on one ease
+  (CINEMATIC_GUIDE rules 1 and 3; DIRECTION 8: no roll, no compound moves).
+- **The pivot.** The subject holds its screen spot within +-40 px while the world moves past it (S5's figures at x 0.45
+  W), or travels one smooth path between two points of the golden box; it never wanders. In a frame where everything
+  moves the still thing is the call [S6]: the screen-locked subject wins the move.
+- **Motion contrast.** During a move every plane moves, so the eye goes to whatever moves differently [S6, S9]; only
+  the subject (or nothing) may move against the flow.
+- **Lead room in the direction of travel:** a pan or truck leads its subject, the room in front growing, never
+  shrinking (§4.7).
+- **The band and the words are a fixed mat:** the band stays one flat field at every frame of a move (CINEMATIC_GUIDE
+  rule 2), the focal never passes through it, and a plane edge that sweeps across it does so in the gutters only.
+- **Tangents pass, never rest:** parallax re-draws every overlap; two edges may meet in passing but never sit on each
+  other for more than ~0.1 s (est.), and never at the start or end frame.
+
+**Each move, composed.**
+
+| move | what it says | start frame | end frame | rule |
+|---|---|---|---|---|
+| push-in (A carrier, a story push) | attention, "this matters" | the subject in its place (WS or MS) | the subject owns the stage (CU) | scale about the target's own centre, so it stays put while the world spreads away from it; <= 2x per panel (LAYOUT §2); the target's top stays under the band; its centre ends in the golden box or on x 520-540 |
+| pull-back reveal (S5) | isolation, then scale: "it is bigger than you thought" | enclosed: a slot or a frame within a frame, 3-5 % of the frame (CINEMATIC_GUIDE S5) | open: the world past every edge | the subject is the pivot, shrinking in place; the landmark lands in the last 20-30 % of the move, before the hold |
+| rise-over, crane (S1) | arrival, "here it all is" | the near wall and the "you" fill the bottom 25 % | the city in the lower 60 % | the near mass leaves by the bottom edge; the horizon moves only 0.37 -> 0.40 H; layers drawn ~500 px taller (CINEMATIC_GUIDE S1) |
+| tilt-up (K2) | height, "it keeps going" | horizon 0.40 H | horizon 0.70 H | verticals stay parallel (a shift, not a turn: §3.1); flat across the band (COZY_AND_SCALE K2) |
+| pan or truck | follow, survey | the subject entering with lead room | the subject with lead room ahead | background length = the view plus the travel; planes by 1/z |
+| the float (holds) | life in a still frame | home | home | planes by depth, back at rest by every join (DIRECTION 8) |
+| dolly zoom | "disorientation and discomfort" [S20] | | | never (it is a compound move and a feeling we never want) |
