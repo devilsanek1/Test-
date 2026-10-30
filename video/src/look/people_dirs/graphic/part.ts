@@ -16,6 +16,8 @@ export type Part = {
   opacity?: number;
   /** excluded from the black silhouette test (a cast shadow on the ground) */
   ground?: boolean;
+  /** a region cut out of the part (an open coat's front): a closed path, any size */
+  cut?: string;
 };
 
 export const region = (pts: V2[] | string, fill: string, opacity?: number): Region => ({

@@ -13,6 +13,7 @@ screenshots is masked (inpainted) and our captions are taken out (the picture is
   python3 -B composition_study.py thumbs    # the recomposed value thumbnails of scene 1 (540 x 960)
   python3 -B composition_study.py sheet     # composition_sheet.png
   python3 -B composition_study.py all
+  python3 -B composition_study.py frame STILL.png [--caption] [--subject x0,y0,x1,y1]   # check one still (§6)
 
 Deterministic (no randomness; numpy, scipy, scikit-image, OpenCV, Pillow: BSD/MIT/Apache/HPND licences).
 """
@@ -254,36 +255,7 @@ def salience_calls(S):
     return out
 
 
-def salience_blobs(S, rel=0.5):
-    """Blobs of the salience map above median + rel * (p99.5 - median); each blob's weight = its salience mass above
-    the median. Returns blobs sorted by weight: (weight, peak, cy, cx, area, label) and the label map."""
-    med = np.median(S); p = np.percentile(S, 99.5)
-    t = med + rel * (p - med)
-    cc, n = ndi.label(S > t, structure=np.ones((3, 3)))
-    blobs = []
-    for i in range(1, n + 1):
-        m = cc == i
-        w = float((S[m] - med).sum())
-        pk = float(S[m].max())
-        cy, cx = ndi.center_of_mass(np.where(m, S - med, 0))
-        blobs.append((w, pk, cy, cx, int(m.sum()), i))
-    blobs.sort(key=lambda t: -t[0])
-    return blobs, cc, t
-
-
 NOTAN = 4.0       # px at 400 wide (1 % W): the notan's squint, where texture merges into its mass and props stay
-PEAK_DIST = 12    # px (3 % W): two salience peaks closer than this are one element
-
-
-def salience_peaks(S, floor_rel=0.25):
-    """Local maxima of the salience map (each a thing that calls the eye), heights above the frame's median,
-    normalised by the highest: [(h, x, y)] sorted high to low."""
-    from skimage.feature import peak_local_max
-    med = float(np.median(S)); top = float(S.max())
-    pk = peak_local_max(S, min_distance=PEAK_DIST, threshold_abs=med + floor_rel * (top - med), exclude_border=False)
-    out = [((S[y, x] - med) / (top - med), int(x), int(y)) for y, x in pk]
-    out.sort(key=lambda t: -t[0])
-    return out
 
 
 def in_box(x, y, box, W, H, pad=0.03):
@@ -377,7 +349,6 @@ def measure_one(name, save_maps=True):
     res['bright1_spread'] = round(float(np.hypot(xx.std() / W, yy.std() / H)), 3)
     if save_maps:
         np.save(os.path.join(SCRATCH, 'maps', '%s_quiet.npy' % name), quiet)
-        np.save(os.path.join(SCRATCH, 'maps', '%s_sal.npy' % name), S.astype(np.float32))
         Image.fromarray(rgb).save(os.path.join(SCRATCH, 'maps', '%s_400.png' % name))
     return res
 
@@ -601,7 +572,7 @@ def draw_thumb(plan):
     # our near quay: the coping lit by the sky, then the canopy's shade (ONE quiet mass with a leafy edge and a few
     # dapples), its paving joints and fallen leaves tone-on-tone (quiet is never empty)
     c.shape([e0, e1, (540, 960), (0, 960)], P['quay_lit'], soft=0.4)
-    leafy = [(x, Y(y)) for x, y in _wobble(0, 540, 598, 684, 7.0, 23, n=40)]
+    leafy = [(x, Y(y)) for x, y in _wobble(0, 540, 612, 698, 7.0, 23, n=40)]
     c.shape(leafy + [(540, 960), (0, 960)], P['quay'], soft=1.8)
     for (cx, cy, rx, ry) in ((118, 650, 22, 6), (236, 684, 30, 7), (402, 728, 18, 5), (60, 742, 14, 4)):
         c.blobs([(cx, Y(cy), rx, ry)], P['dapple'], soft=2.2)
@@ -842,13 +813,14 @@ RULES_AT_A_GLANCE = [
                     'silhouette in it'),
     ('5 Big quiet', '>= 65 % quiet at a squint in 2 connected masses: the sky (>= 30 %, the band in it) and the near '
                     'ground (>= 15 %)'),
-    ('6 Props', '<= 5 named things read at phone size; the near frame <= 2 props, cut by an edge, inside the shade'),
+    ('6 Props', '<= 6 named objects read at phone size (refs 4-6, v6 about 40); the near frame <= 2 props, cut by an '
+                'edge, inside the shade'),
     ('7 Under the band', 'the focal at y 860-1200, x 380-700, <= 0.15 W off the caption\'s centre line; nothing '
                          'calls between them'),
     ('8 One counterweight', 'one big soft secondary mass (the hero cloud) opposite the focal, its pull < 50 % of it'),
     ('9 Edges', 'found (crisp, hardest step) only at the focal; lost where two masses are within ~10 L*'),
-    ('10 A real dark mass', '15-40 % of the frame in 1-2 masses below the band, L* <= 45 (refs 8-35; v6\'s '
-                            'dark group is scattered pieces)'),
+    ('10 A real dark mass', 'the darkest group 15-40 % of the frame, L* <= 45, >= 80 % of it in 2 masses below '
+                            'the band (refs 89-100 %; v6 64 %)'),
 ]
 
 
@@ -866,7 +838,7 @@ def cmd_sheet():
         blocks.append((name, r, tiles))
     rows_h = sum(t[2][0].shape[0] + 34 + 58 + 26 for t in blocks)
     TH_B = 960
-    H = 200 + 40 + rows_h + 120 + TH_B + 290 + 46 + 5 * 62 + 70
+    H = 200 + 40 + rows_h + 120 + TH_B + 290 + 46 + 5 * 62 + 100
     sh = Image.new('RGB', (SW, H), BG)
     d = ImageDraw.Draw(sh)
     d.text((M, 26), 'Composition: notan and value grouping, still v6 against the references, and scene 1 '
@@ -937,7 +909,7 @@ def cmd_sheet():
                                                                     r['s4_k3']['pieces']),
             'quiet %d %% (largest %d %%)' % (round(100 * r['quiet_share']), round(100 * r['quiet_largest'])),
             'L* median %d; under L* 40: %d %%' % (round(r['L_median']), round(100 * r['dark_share_L40'])),
-            'about 36 named things (by eye), 9 on our quay']:
+            'about 40 named things (by eye), 12 on our quay']:
         d.text((xs[0], ly), line, font=f20, fill=INK); ly += 26
     for i, plan in enumerate(PLANS):
         P = PLANS[plan]; r = res[plan]; x = xs[i + 1]
@@ -998,9 +970,9 @@ CHECKS = [  # (rule, what, test(r) -> bool, how it is shown)
     ('R7', 'the focal at y 860-1200, x 380-700 (9:16)',
      lambda r: r['focal'] is None or (0.448 <= r['focal'][1] <= 0.625 and 0.352 <= r['focal'][0] <= 0.648),
      lambda r: 'at (%d, %d)' % (round(r['focal'][0] * 1080), round(r['focal'][1] * 1920)) if r['focal'] else '-'),
-    ('R10', 'a dark mass: the dark group 15-40 %, L* <= 45, >= 60 % of it in 2 masses',
+    ('R10', 'a dark mass: the dark group 15-40 %, L* <= 45, >= 80 % of it in 2 masses',
      lambda r: (0.15 <= r['s4_k3']['share'][0] <= 0.40 and (r['s4_k3']['meanL'][0] or 99) <= 45 and
-                r['s4_k3']['dark_top2'] >= 0.6 * r['s4_k3']['share'][0]),
+                r['s4_k3']['dark_top2'] >= 0.8 * r['s4_k3']['share'][0]),
      lambda r: '%d %% at L* %d, %d %% in its 2 largest' % (
          round(100 * r['s4_k3']['share'][0]), round(r['s4_k3']['meanL'][0] or 0),
          round(100 * r['s4_k3']['dark_top2'] / max(r['s4_k3']['share'][0], 1e-6)))),

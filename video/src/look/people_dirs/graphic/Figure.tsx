@@ -49,8 +49,14 @@ export const Figure: React.FC<FigProps> = ({fig, x, y, h, flip, mono, uid, shado
         }
         const regs = mono ? [] : (p.regions ?? []).filter((r) => r.d);
         const cid = `${id}-${i}`;
+        const cut = p.cut ? `${id}-${i}c` : '';
         return (
-          <g key={i} opacity={p.opacity ?? 1}>
+          <g key={i} opacity={p.opacity ?? 1} clipPath={cut ? `url(#${cut})` : undefined}>
+            {cut ? (
+              <clipPath id={cut}>
+                <path d={`M-6000 -6000H6000V8000H-6000Z${p.cut}`} clipRule="evenodd" />
+              </clipPath>
+            ) : null}
             <path d={p.d} fill={mono ?? p.fill} />
             {regs.length ? (
               <>
