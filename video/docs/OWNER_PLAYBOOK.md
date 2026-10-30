@@ -612,6 +612,10 @@ Maintenance at the end).
   iterate a scene blind on a vague brief. The recipes live in `docs/look/PAINT_RECIPES.md` (+ `docs/look/paint_recipes/`).
   — ("Why can’t you do the research yourself and come up with a concrete detailed recipes to reproduce certain
   elements? Seems like you should be able to really clearly define a recipe", 2026-10-29, after four painted stills).
+  On the result, the recipe book and its swatches: "I mean it is an improvement certainly / I am sure we can start with
+  that - this is an incremental improvement from the previous videos" (2026-10-30): the recipes are the starting point
+  for the next film's look; further refinement is a measured difference-analysis loop (owner's question: "if we invest
+  more time analysing the differences would we get even closer?"), each round aimed at the largest measured gap.
 - **Two modes: PRODUCTION and ITERATION.** Production is a film going through the gates (G0-G8): full checks, review
   panels, QA suites, fix passes, as the quality needs. Iteration is a quick experiment for the owner to judge (a look
   test, a rethought scene, a style probe, a "what if"): one or two agents, no panels, no critics, no QA suites, rough
