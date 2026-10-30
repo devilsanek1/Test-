@@ -31,18 +31,23 @@ whole context, and every rendered frame an agent looks at stays in that context.
 The owner's three rules lead (playbook, THE THREE RULES ABOVE ALL): every frame worth pausing on; readable imaginative
 ideas; frames planned and created whole from the get-go, never filled for density later. Pictures before documents.
 1. **Script and voice** (G0-G2, as below).
-2. **The visual script, short** (G2.5): the shots on the take's clock with the camera and the joins; it stays the
-   timing's and the camera's contract, never a substitute for pictures.
+2. **The story beats** (from the locked voice): one line per beat: what the viewer must understand and feel there, on
+   the take's clock, with the card's story-level choices (one thread, one home place, one "you"). No pictures, no
+   staging, no camera: nothing that restricts the ideas.
 3. **IDEAS:** for every beat, a few imaginative, readable picture ideas drawn as whole-frame thumbnails (the idea, the
-   world, the light, the people, the words in one picture); the best picked per beat (the owner sees the board).
-4. **KEY FRAMES, made whole:** each shot's frame (its landing frame, and its start where a move changes the picture)
+   world, the light, the people, the words in one picture); the best picked per beat (the owner sees the board). Any
+   earlier picture plan (a visual script written before the ideas) is one candidate among them, never a limit.
+4. **KEY FRAMES, made whole:** each beat's frame (its landing frame, and its start where a move changes the picture)
    built complete in the film's look: the idea, the full world, the light, the people, the words. The owner approves the
    board of key frames: this IS the film's look and content (it replaces W1's density keys, G3's grey placeholders and
    G4's separate look clip).
-5. **THE ANIMATIC FROM THE KEY FRAMES** (G3): the key frames on the voice with the camera moves, the joins and the key
+5. **THE SHOT PLAN (the visual script, written now):** the camera moves and the joins that travel between the approved
+   key frames on the voice's clock (the composition library's moves and joins, the sync plan): the camera serves the
+   frames, never the other way round.
+6. **THE ANIMATIC FROM THE KEY FRAMES** (G3): the key frames on the voice with the shot plan's moves, joins and key
    actions played; the owner locks it.
-6. **ANIMATION** (G5-G6): each shot animated from its own key frame (life, motion, the transitions), never re-filled.
-7. **Sound and final** (G7-G8, as below).
+7. **ANIMATION** (G5-G6): each shot animated from its own key frame (life, motion, the transitions), never re-filled.
+8. **Sound and final** (G7-G8, as below).
 Checks catch mistakes (captions, safe zones, timing, contrast); they never design a frame. Where a gate below asks for
 grey placeholders, density keys or a fill pass, this loop replaces it.
 

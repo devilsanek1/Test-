@@ -370,3 +370,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   painting and styles and texture we added with it looking coherent - sure lets try" -> an ink-line look iteration
   (stills) beside the ideas round. -> rules: playbook THE THREE RULES ABOVE ALL; Visual style (ink lines, a bit rough
   but clean, to try).
+- 2026-10-30 ~23:10 UTC: "so how are visual script and ideas and key frames generation fit together? wouldn't the visual
+  script restrict the steps 3 and 4?" -> yes: v4's visual script v3 (written before any ideas) fixed the pictures, the
+  staging and the camera, and the ideas brief had called its 12 shots and camera fixed. The ideas round was STOPPED and
+  relaunched free: fixed are only the voice (words, times), the facts and the card's story-level choices; v3's pictures
+  are one candidate. The order now: beats -> ideas -> key frames made whole -> the shot plan (the visual script written
+  FROM the key frames) -> the animatic. -> rules: PIPELINE_V2 "THE LOOP NOW"; playbook, Storyboard (G3) and flow.

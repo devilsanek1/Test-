@@ -636,7 +636,11 @@ imaginative".)
   is heard, never a beat grid: `docs/look/SOUND_SYNC.md`). — (v1; joins, v3 G5b, 2026-10-27; "the beat" read as the voice's beat under the owner's hand-over, 2026-10-30).
 
 ## Storyboard (G3) and flow
-- **The film's visual story is written first, as a VISUAL SCRIPT, between the voice lock and the G3 animatic:** shot
+- **(Changed 2026-10-30: the order is beats -> ideas -> key frames made whole -> the shot plan (this visual script,
+  now written FROM the key frames) -> the animatic. A visual script written before the ideas fixes pictures, staging and
+  camera and restricts the ideas: "so how are visual script and ideas and key frames generation fit together? wouldn't
+  the visual script restrict the steps 3 and 4?", 2026-10-30. Before the ideas only the story beats are written.)**
+  **The film's visual story is written first, as a VISUAL SCRIPT, between the voice lock and the G3 animatic:** shot
   by shot and timed to the locked voice, what is on screen (subject, place, action), the camera (shot size, angle,
   move), how each shot joins the next (its carrier), the few words in the picture and the sound cues; brainstormed
   as a few visual concepts judged internally, one script to the owner, and written the way professional studios write
