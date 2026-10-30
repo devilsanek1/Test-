@@ -656,6 +656,10 @@ Maintenance at the end).
   that - this is an incremental improvement from the previous videos" (2026-10-30): the recipes are the starting point
   for the next film's look; further refinement is a measured difference-analysis loop (owner's question: "if we invest
   more time analysing the differences would we get even closer?"), each round aimed at the largest measured gap.
+- **Never ask the owner to choose between options they can't tell apart at phone size.** A choice goes to the owner
+  only when the options differ visibly at a glance (side by side at 400 px wide); a smaller difference is ours to
+  decide, by the rules, and we note the call. — ("I don’t really see the difference between a snd b", on two sky tops
+  ~5 L* apart, 2026-10-30.)
 - **Two modes: PRODUCTION and ITERATION.** Production is a film going through the gates (G0-G8): full checks, review
   panels, QA suites, fix passes, as the quality needs. Iteration is a quick experiment for the owner to judge (a look
   test, a rethought scene, a style probe, a "what if"): one or two agents, no panels, no critics, no QA suites, rough

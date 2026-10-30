@@ -255,3 +255,7 @@ scene is very busy".
 whole frame, near pieces sharper but in the SAME language, never one painted object in a flat world. The AI cloud's
 finish is the bar for clouds. Scene 1 is too busy: fewer props, a few value masses, one focal point (ORGANIC.md and the
 composition study, in progress, feed v7).
+
+## The sky-top choice (2026-10-30)
+The owner, on skytop_v6_choice.jpg: "I don’t really see the difference between a snd b" -> we decide: B (v4's deeper
+zenith, #afb3d8, L* 75.9), in line with the richer darks; v7 uses it.
