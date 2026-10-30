@@ -37,7 +37,16 @@ frame; checks catch mistakes (captions, safe zones, timing), they never stand in
 inside the toolbox we built:** the composition library composes the ideas, the style recipes make the key frames, the
 moves, joins and sound sync make the shot plan (PIPELINE_V2, "THE LOOP NOW") — ("are the composition recommendation
 included in here? Are the stylistic recipes included here? is it completley free flowing or what we've done previously
-in terms of building up the visual recipes would be included?", 2026-10-30). — ("how do we adjust
+in terms of building up the visual recipes would be included?", 2026-10-30). **The toolbox is written as FEELINGS and
+the visual TOOLS that create them, never as placements:** "a feel of distance" is the intent, layers (near, mid, far),
+overlap and atmosphere are the tools, and the artist invents the frame; concrete positions and numbers are labelled
+examples, never the way; every frame is planned on one card that asks about every aspect, so no piece is ever left for
+the owner to point at. — ("okay im tired of pointing every single piece im sure we missed some more / so how do we make
+sure that our toolbox carry but imagination and full scene planning is done completely - like one example here is
+composition. Like there are million ways to build a scene with vanishing point composition. Like BILLION ways to compose
+a scene like this. But in all these i think the key recommendations applied right like not the concrete steps "PUT A
+BUILDING HERE", but more abstarct like "layers and feel of distance" and the feel of distance is achieved with a
+"visual" tool of layers", 2026-10-30; the rework: `docs/process/`.) — ("how do we adjust
 our overal process, i want to make it more loose, more imaginative. i like the main important rule is every frame is
 worth pausing on yes + readable imaginative ideas + frames planned and created whole. We shouldn't be in a situation
 where we have our video and then we just fill up space for the sake of density this is wrong we need to be imaginative

@@ -382,3 +382,12 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   relaunched once more with the toolbox: the composition library (the grammar in every frame, one lead device per
   frame by its code), LAYOUT's bands, DIRECTION, COZY_AND_SCALE, LIFE_AND_DENSITY; the look recipes named for the key
   frames. -> rules: playbook THE THREE RULES (imagination first, inside the toolbox); PIPELINE_V2 THE LOOP NOW.
+- 2026-10-30 ~23:30 UTC: "okay im tired of pointing every single piece im sure we missed some more / so how do we make sure
+  that our toolbox carry but imagination and full scene planning is done completely - like one example here is
+  composition ... not the concrete steps "PUT A BUILDING HERE", but more abstarct like "layers and feel of distance" and
+  the feel of distance is achieved with a "visual" tool of layers. Are you able to analyze and see how we can rework our
+  process to get to this stage" -> workflow `process-design-language`: an audit of every guide (intents, tools,
+  prescriptions, checks; the gaps), research on pro art direction (Block's visual components, Bacher, Mateu-Mestre,
+  colour scripts, art bibles), then `docs/look/DESIGN_LANGUAGE.md` (the toolbox as feelings -> tools -> labelled examples
+  -> checks), `docs/look/FRAME_CARD.md` (every aspect of a frame as a question) and `docs/process/REWORK.md`. -> rule:
+  playbook THE THREE RULES (the toolbox as feelings and tools, never placements; one card per frame).
