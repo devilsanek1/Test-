@@ -191,6 +191,26 @@ def flat_labels(rgba, min_px=24, alpha_min=0.999):
     return lab, cols
 
 
+def clean_labels(lab, min_area=30):
+    """Drop every connected bit of a label smaller than min_area px (anti-aliasing slivers): it takes its nearest
+    neighbour's label."""
+    out = lab.copy()
+    for l in np.unique(lab[lab >= 0]):
+        cc, k = ndi.label(lab == l)
+        if k <= 1:
+            continue
+        sz = ndi.sum(np.ones_like(cc), cc, index=np.arange(1, k + 1))
+        small = np.nonzero(sz < min_area)[0] + 1
+        if len(small):
+            out[np.isin(cc, small)] = -2
+    hole = out == -2
+    if hole.any():
+        idx = ndi.distance_transform_edt(out < 0, return_distances=False, return_indices=True)
+        out = np.where(hole, out[tuple(idx)], out)
+    out[lab < 0] = -1
+    return out
+
+
 def recolour(lab, cols, outside=(0, 0, 0)):
     out = np.zeros(lab.shape + (3,))
     m = lab >= 0

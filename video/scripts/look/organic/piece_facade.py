@@ -97,10 +97,13 @@ def make(out_dir, seed=('organic', 'facade', 1), dose=1.0, flat_path=None):
     alpha0 = flat[..., 3]
     lab, cols = L.flat_labels(flat)
     # 1. hand-ruled: a smooth, long-wave displacement of the region map, then every corner worn 2 px
-    dx = sum(a * L.fnl((H, W), L.seed_int(seed, 'hx', i), 1.0 / lam, octaves=1) / 0.35 for i, (lam, a) in enumerate([(110, 0.6), (40, 0.3)]))
-    dy = sum(a * L.fnl((H, W), L.seed_int(seed, 'hy', i), 1.0 / lam, octaves=1) / 0.35 for i, (lam, a) in enumerate([(110, 0.6), (40, 0.3)]))
-    lab = L.warp_labels(lab, dx.astype(np.float32), dy.astype(np.float32))
-    lab = L.round_corners(lab, r=2)
+    def bow(tag):
+        out = np.zeros((H, W))
+        for i, (lam, a) in enumerate([(140, 0.55), (50, 0.25)]):
+            nz = L.fnl((H, W), L.seed_int(seed, tag, i), 1.0 / lam, octaves=1)
+            out += a * nz / (nz.std() + 1e-9)
+        return out
+    lab = L.warp_labels(lab, bow('hx').astype(np.float32), bow('hy').astype(np.float32))
     comp, colour_of = components(lab)
     n = len(colour_of)
     props = face_props(comp, n)
@@ -131,11 +134,11 @@ def make(out_dir, seed=('organic', 'facade', 1), dose=1.0, flat_path=None):
         chroma = math.hypot(hue[1], hue[2])
         glass = (0.04 < chroma < 0.09) and hue[2] < 0 and hue[0] > 0.5      # the teal glass family
         interior = hue[2] > 0.06 and hue[0] > 0.8                            # the lit (yellow) interiors
-        dL = 0.018 * np.clip(proj, -1, 1) + 0.006 * mott[m]
+        dL = 0.026 * np.clip(proj, -1, 1) + 0.008 * mott[m]
         db = 0.004 * np.clip(proj, -1, 1)
         if glass and p['area'] > 300:
             # the sky in the glass: lighter at its top, at this pane's own strength; some panes a diagonal sheen
-            k = rng.uniform(0.012, 0.03)
+            k = rng.uniform(0.02, 0.045)
             dL = dL + k * np.clip(1 - (yy[m] - y0) / max(y1 - y0, 1), 0, 1)
             if rng.random() < 0.45:
                 a = math.radians(rng.uniform(55, 75))
@@ -158,6 +161,7 @@ def make(out_dir, seed=('organic', 'facade', 1), dose=1.0, flat_path=None):
     Lbig = cv2.dilate(Lb.astype(np.float32), np.ones((5, 5), np.uint8)) - cv2.erode(Lb.astype(np.float32), np.ones((5, 5), np.uint8))
     step[bnd] = Lbig[bnd]
     face_n = 0
+    used = set()
     for i, p in enumerate(props):
         if p is None or p['area'] < 500 or p['thick'] < 10:
             continue
@@ -166,7 +170,7 @@ def make(out_dir, seed=('organic', 'facade', 1), dose=1.0, flat_path=None):
             continue
         x0, y0, x1, y1 = p['bbox']
         vertical = (y1 - y0) > (x1 - x0) * 1.15
-        k = int(np.clip(p['area'] / 1400.0, 1, 26) * dose * (1 - 0.6 * near_focus[int(p['cy']) , int(np.clip(p['cx'], 0, W - 1))]))
+        k = int(np.clip(p['area'] / 500.0, 1, 56) * dose * (1 - 0.7 * near_focus[int(np.clip(p['cy'], 0, H - 1)), int(np.clip(p['cx'], 0, W - 1))]))
         ys, xs = np.nonzero(m)
         din = ndi.distance_transform_edt(np.pad(comp == i, 1))[1:-1, 1:-1]
         for _ in range(k):
@@ -174,80 +178,83 @@ def make(out_dir, seed=('organic', 'facade', 1), dose=1.0, flat_path=None):
             x, y = xs[j], ys[j]
             if din[y, x] < 3:
                 continue
-            Ls = min(r.uniform(14, 42), (y1 - y0 if vertical else x1 - x0) * 0.8)
-            if Ls < 8:
+            Ls = min(r.uniform(18, 60), (y1 - y0 if vertical else x1 - x0) * 0.85)
+            if Ls < 10:
                 continue
-            ang = (math.pi / 2 if vertical else 0.0) + r.normal(0, 0.03)
+            ang = (math.pi / 2 if vertical else 0.0) + r.normal(0, 0.02)
             dxs, dys = math.cos(ang) * Ls / 2, math.sin(ang) * Ls / 2
-            c = L.rgb2ok(target[y, x]) + np.array([r.choice([-1, 1]) * r.uniform(0.008, 0.018), 0, 0])
-            wdt = min(r.uniform(4, 9), p['thick'] * 0.6)
+            hue = L.rgb2ok(cols[colour_of[i]])
+            glass = 0.04 < math.hypot(hue[1], hue[2]) < 0.09 and hue[2] < 0 and hue[0] > 0.5
+            sgn = 1 if glass else r.choice([-1, 1])                      # glass takes light marks only (its sheen)
+            c = L.rgb2ok(target[y, x]) + np.array([sgn * r.uniform(0.012, 0.03), 0, r.normal(0, 0.004)])
+            wdt = min(r.uniform(7, 14), p['thick'] * 0.7)
+            ck = 'c%d' % colour_of[i]                                     # a mark stays on its own face's colour
+            used.add(ck)
             plan.add('face', 'tanda/acrylic-04-paint', [(x - dxs, y - dys), (x + dxs, y + dys)], L.ok2rgb(c), wdt, r.uniform(0.45, 0.75),
-                     clip='face', ds=1.0)
+                     clip=ck, ds=1.0)
             face_n += 1
-    # edge strokes on LOST edges (close values): brushed over from one side or the other, alternating along the edge
-    lost = bnd & (step < 14.0) & (step > 1.0) & (near_focus < 0.6)
-    along = L.fnl((H, W), L.seed_int(seed, 'side'), 1 / 45.0, octaves=1)
+    # edge strokes on LOST edges: only where two BIG faces meet at a close value (< 10 L*): a straight blocky stroke
+    # along the edge's axis, from one side or the other (a slow noise along it picks), the edge broken in stretches
+    thick_face = np.zeros(n + 1, bool)
+    for i, p in enumerate(props):
+        thick_face[i] = p is not None and p['thick'] >= 10 and p['area'] >= 500
+    tf = np.where(comp >= 0, thick_face[np.clip(comp, 0, n)], False)
+    both = tf & (cv2.erode(tf.astype(np.uint8), np.ones((5, 5), np.uint8)) == 0) & (cv2.dilate(tf.astype(np.uint8), np.ones((5, 5), np.uint8)) > 0)
+    lost = bnd & both & (step < 10.0) & (step > 1.0) & (near_focus < 0.5)
+    # the edge's axis: vertical where the region map changes left-right, level where it changes up-down
+    dv = np.zeros((H, W), bool); dv[:, 1:] = comp[:, 1:] != comp[:, :-1]
+    along = L.fnl((H, W), L.seed_int(seed, 'side'), 1 / 60.0, octaves=1)
     ys, xs = np.nonzero(lost)
     order = r.permutation(len(xs))
     taken = np.zeros((H, W), bool)
-    gL = np.hypot(ndi.sobel(ndi.gaussian_filter(Lb, 1.0), 1), ndi.sobel(ndi.gaussian_filter(Lb, 1.0), 0)) + 1e-6
-    tx_, ty_ = -ndi.sobel(ndi.gaussian_filter(Lb, 1.0), 0) / gL, ndi.sobel(ndi.gaussian_filter(Lb, 1.0), 1) / gL
     for j in order:
         x, y = xs[j], ys[j]
-        if taken[max(0, y - 8):y + 9, max(0, x - 8):x + 9].any():
+        if taken[max(0, y - 22):y + 23, max(0, x - 22):x + 23].any() or r.random() > 0.6 * dose:
             continue
         taken[y, x] = True
-        ex, ey = tx_[y, x], ty_[y, x]
-        # the side: the face across the edge or this one, by a slow noise along it
-        nx_, ny_ = -ey, ex
+        vert = dv[y, x]
         sgn = 1 if along[y, x] > 0 else -1
-        sx, sy = int(np.clip(x + sgn * nx_ * 3, 0, W - 1)), int(np.clip(y + sgn * ny_ * 3, 0, H - 1))
-        c = target[sy, sx]
-        Ls = r.uniform(12, 26)
-        off = sgn * r.uniform(0.2, 0.5) * 4
-        cx_, cy_ = x + nx_ * off, y + ny_ * off
-        plan.add('edge', 'tanda/acrylic-04-paint', [(cx_ - ex * Ls / 2, cy_ - ey * Ls / 2), (cx_ + ex * Ls / 2, cy_ + ey * Ls / 2)],
-                 c, r.uniform(3.0, 5.5), r.uniform(0.6, 0.9), clip='face', ds=1.0)
-    # long found frame bars away from the door: a lost stretch (a stroke of the face beside them across the bar)
-    bars = 0
-    for i, p in enumerate(props):
-        if p is None or p['thick'] > 9 or p['elong'] < 6 or p['area'] < 120:
-            continue
-        if near_focus[int(np.clip(p['cy'], 0, H - 1)), int(np.clip(p['cx'], 0, W - 1))] > 0.3 or r.random() > 0.55:
-            continue
-        m = comp == i
-        ys, xs = np.nonzero(m)
-        j = r.integers(len(xs))
-        x, y = xs[j], ys[j]
-        vertical = (p['bbox'][3] - p['bbox'][1]) > (p['bbox'][2] - p['bbox'][0])
-        # the face beside the bar
-        sx, sy = (int(np.clip(x + 6, 0, W - 1)), y) if vertical else (x, int(np.clip(y - 6, 0, H - 1)))
-        c = target[sy, sx]
-        Ls = r.uniform(8, 18)
-        if vertical:
-            pts = [(x + r.normal(0, 0.5), y - Ls / 2), (x, y + Ls / 2)]
+        Ls = r.uniform(20, 46)
+        off = sgn * r.uniform(1.0, 3.0)
+        if vert:
+            sx = int(np.clip(x + sgn * 5, 0, W - 1)); sy = y
+            ox_, oy_ = int(np.clip(x - sgn * 5, 0, W - 1)), y
+            pts = [(x + off, y - Ls / 2), (x + off + r.normal(0, 0.4), y + Ls / 2)]
         else:
-            pts = [(x - Ls / 2, y + r.normal(0, 0.5)), (x + Ls / 2, y)]
-        plan.add('bar', 'tanda/acrylic-04-paint', pts, c, p['thick'] + r.uniform(1.0, 2.5), r.uniform(0.5, 0.8), clip='face', ds=1.0)
-        bars += 1
+            sy = int(np.clip(y + sgn * 5, 0, H - 1)); sx = x
+            ox_, oy_ = x, int(np.clip(y - sgn * 5, 0, H - 1))
+            pts = [(x - Ls / 2, y + off), (x + Ls / 2, y + off + r.normal(0, 0.4))]
+        la, lb = lab[sy, sx], lab[oy_, ox_]
+        if la < 0 or lb < 0 or la == lb:
+            continue
+        ck = 'e%d_%d' % (min(la, lb), max(la, lb))                     # it laps only between these two faces
+        used.add(ck)
+        plan.add('edge', 'tanda/acrylic-04-paint', pts, target[sy, sx], r.uniform(4.0, 7.0), r.uniform(0.6, 0.85), clip=ck, ds=1.0)
     # the roof planting: soft tufts (the planting's own colours, short dabs up and out)
     plant = inside & (fy < 612) & (L.rgb2ok(base)[..., 1] < -0.01)
     ys, xs = np.nonzero(plant)
-    for _ in range(int(min(len(xs) / 25, 160))):
+    for _ in range(int(min(len(xs) / 18, 240))):
         j = r.integers(len(xs))
         x, y = xs[j], ys[j]
-        a = -math.pi / 2 + r.normal(0, 0.6)
-        Ls = r.uniform(4, 9)
-        c = L.rgb2ok(target[y, x]) + np.array([r.normal(0, 0.02), 0, 0])
-        plan.add('tuft', 'tanda/acrylic-04-paint', [(x, y), (x + math.cos(a) * Ls, y + math.sin(a) * Ls)], L.ok2rgb(c), r.uniform(3, 5),
-                 r.uniform(0.7, 0.95), ds=1.0)
+        a = -math.pi / 2 + r.normal(0, 0.7)
+        Ls = r.uniform(5, 12)
+        c = L.rgb2ok(target[y, x]) + np.array([r.normal(0, 0.025), 0, 0])
+        plan.add('tuft', 'tanda/acrylic-04-paint', [(x, y + 2), (x + math.cos(a) * Ls, y + math.sin(a) * Ls)], L.ok2rgb(c),
+                 r.uniform(3.5, 6.5), r.uniform(0.7, 0.95), ds=1.0)
     base_rgba = np.dstack([target, np.where(hole, 0.0, alpha0)])
-    clipm = (inside | ndi.binary_dilation(inside, iterations=1)) & ~hole
-    painted, sec = L.mypaint(base_rgba, plan.strokes, clips={'face': clipm.astype(np.float64)}, tag='facade')
+    clips = {}
+    for ck in sorted(used):
+        if ck[0] == 'c':
+            m = lab == int(ck[1:])
+        else:
+            a_, b_ = (int(v) for v in ck[1:].split('_'))
+            m = (lab == a_) | (lab == b_)
+        clips[ck] = (ndi.binary_dilation(m, iterations=1) & ~hole).astype(np.float64)
+    painted, sec = L.mypaint(base_rgba, plan.strokes, clips=clips, tag='facade')
     painted[..., 3] = np.where(hole, 0.0, painted[..., 3])
     L.save_rgba(os.path.join(out_dir, 'facade_base.png'), base_rgba)
     L.save_rgba(os.path.join(out_dir, 'facade.png'), painted)
-    stats = dict(box=list(BOX), faces=n, strokes=plan.count(), mypaint_s=round(sec, 2), bars_broken=bars)
+    stats = dict(box=list(BOX), faces=n, strokes=plan.count(), mypaint_s=round(sec, 2), clips=len(clips))
     return painted, stats
 
 

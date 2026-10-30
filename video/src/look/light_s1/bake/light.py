@@ -27,10 +27,10 @@ SHADE_C = lin_hex('#A49BD6')    # shade on cool surfaces: violet (toward the sky
 
 #: the light's doses (light_proof.md §3): 1.0 = light.md's spec; the owner asked for proper light with real darks
 DOSE = dict(
-    facade=0.78,        # the backlit facade's shade strength (light.md 0.52)
-    towpath=0.55,       # the far towpath in the far roofs' shadow (light.md 0.36)
+    facade=0.88,        # the backlit facade's shade strength (light.md 0.52)
+    towpath=0.66,       # the far towpath in the far roofs' shadow (light.md 0.36)
     far=(0.46, 0.46, 0.58),  # far roofs, tower, bridge: backlit (their fronts face us, away from the sun)
-    litwin=0.86,        # the lit office panes: a step under the story light (light.md §2.1)
+    litwin=0.80,        # the lit office panes: a step under the story light (light.md §2.1)
     boats=0.55,
     bank=1.0,           # our bank under the canopy (light.md 0.80)
     sun_bloom=1.0,
@@ -118,9 +118,9 @@ def canopy_mask(bank_top):
     # broken by noise, a little stretched along the light (from the sun's ground point toward us)
     holes = np.zeros((H, W), np.float32)
     brk = value_noise('light_s1/canopy/holes', (H, W), 14, octaves=2)
-    for i in range(7):
-        cx0 = r.uniform(60, W - 60)
-        cy0 = edge[int(cx0)] + r.uniform(10, 46)
+    for i in range(4):
+        cx0 = r.uniform(80, W - 80)
+        cy0 = edge[int(cx0)] + r.uniform(6, 24)
         for j in range(int(r.integers(2, 4))):
             cx = cx0 + r.normal(0, 9)
             cy = cy0 + r.normal(0, 5)
@@ -131,7 +131,7 @@ def canopy_mask(bank_top):
             u = (XX - cx) * c + (yy - cy) * s_
             v = -(XX - cx) * s_ + (yy - cy) * c
             e = (u / ry) ** 2 + (v / rx) ** 2 + 0.35 * brk
-            holes = np.maximum(holes, (1 - smoothstep(0.6, 1.1, e)) * r.uniform(0.5, 0.85))
+            holes = np.maximum(holes, (1 - smoothstep(0.5, 1.2, e)) * r.uniform(0.35, 0.55))
     m = m * (1 - holes)
     return np.clip(m, 0, 1).astype(np.float32), edge
 
@@ -153,7 +153,7 @@ def dapples(canopy, edge):
             u = (XX - cx) * c + (YY - cy) * s
             v = -(XX - cx) * s + (YY - cy) * c
             e = (u / ry) ** 2 + (v / rx) ** 2 + 0.3 * brk
-            out = np.maximum(out, (1 - smoothstep(0.6, 1.1, e)) * r.uniform(0.4, 0.75))
+            out = np.maximum(out, (1 - smoothstep(0.5, 1.2, e)) * r.uniform(0.3, 0.5))
     return out * canopy
 
 
@@ -214,6 +214,9 @@ def light(base, L, vis, A, dose=DOSE, return_parts=False):
     shade_bank = canopy * (1 - dap)
     S += (L['bank'] + L['near']) * dose['bank'] * shade_bank
     S = np.clip(S, 0, 1.2)
+    # our bank lies in open shade under the sky (no warm bounce reaches it): its tint leans further toward the violet
+    wb = warmth * (1 - 0.55 * (L['bank'] + L['near']))
+    tint = SHADE_C[None, None] * (1 - wb[..., None]) + SHADE_W[None, None] * wb[..., None]
     E = 1 - S[..., None] * (1 - tint)
     E *= (1 - L['litwin'] * (1 - dose['litwin']))[..., None]
     G = np.zeros((H, W, 3), np.float32)
@@ -236,10 +239,10 @@ def light(base, L, vis, A, dose=DOSE, return_parts=False):
     r_boats = rim_band(L['boats'], 1.6, l_sun, p=1.2) * 0.45
     r_cope = rim_band(L['bank'] + L['near'], 3.0, l_sun, p=0.8) * (1 - canopy)
     r_spray = rim_band(L['spray'], 2.0, l_sun, p=1.0)
-    rims = np.maximum.reduce([r_far * 0.9, r_tower, r_wing, r_lamps, r_boats, r_cope, r_spray])
-    rims *= dose['rims'] * fade
-    E += rims[..., None] * KEY * 1.7
-    G += rims[..., None] * KEY * 0.10
+    rims = np.maximum.reduce([r_far * 0.22, r_tower * 0.32, r_wing * 0.62, r_lamps * 0.5, r_boats * 0.5, r_cope * 0.7, r_spray * 0.6])
+    rims = gblur(rims, 0.6) * dose['rims'] * fade
+    E += rims[..., None] * KEY * 1.5
+    G += rims[..., None] * KEY * 0.05
 
     # ---------------------------------------------------------------- 4. the key's glow: the bloom AT the sun, the veil
     core = disc.copy()
@@ -300,10 +303,10 @@ def light(base, L, vis, A, dose=DOSE, return_parts=False):
                                bloom_sun=bl, bloom_door=bloom_d * outside, edge=edge)
 
 
-def knee(lin, k=0.92):
-    """A soft shoulder above k (linear), so a lift never clips flat."""
+def knee(lin, k=0.9):
+    """A soft shoulder above k (linear) that approaches 1.0, so a lift never clips flat."""
     over = np.clip(lin - k, 0, None)
-    return np.where(lin > k, k + over / (1 + over / (1.0 - k + 0.06)), lin)
+    return np.where(lin > k, k + over / (1 + over / (1.0 - k)), lin)
 
 
 def door_blur(lit_lin, L, sigma=7.0, gain=1.0):
