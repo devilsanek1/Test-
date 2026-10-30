@@ -100,7 +100,8 @@ texture and how simple it is:
   (a); first judged in the look test, `STUDY.md` §10; the spec: `STUDY.md` §2a, §5.2): the near ground and the mid and
   far city as fewer, bigger, simpler shapes with fewer values (the posters' "a bit more low poly", owner, 2026-10-28),
   in the hero's colours (within CIEDE2000 <= 8 of the hero's, under the same rig and texture: one style at two
-  resolutions), one value per facet by its angle to the key, neighbours dL* 4-10, blocks >= 8 px (3.5-7.5 % W, far
+  resolutions), one value per facet by its angle to the key, neighbours dL* 4-10 (within +-4-6 L* where the near ground
+  is a quiet field: DIRECTION rule 3), blocks >= 8 px (3.5-7.5 % W, far
   6-10 %), locked to their plane and taking its step (§f.2). Never square and proper (owner, 2026-10-30, ORGANIC, NOT
   GEOMETRIC: "I can see shapes and angles very clearly"): each facet hand-cut (§c's shapes), never a ruler grid; the
   edge between neighbours within ~4-6 L* is lost (edge strokes near, dry-brush teeth far: §c), so a patch of facets
@@ -133,7 +134,7 @@ a big glowing mass lifting the median); environment local contrast <= 7 (6.6 / 6
 local contrast >= 2 (2.1 / 2.6 / 1.1); the subject's share of the motion >= 60 % (60 / 34 / 22). Eye check at phone
 size: squint and say where your eye is every 2 s; it is on that beat's named subject.
 
-## c. The clean line: premium, gentle
+## c. The clean line, organic shapes and one painted language: premium, gentle
 v3's weight was fine (2.3-3.0 px, like ref 1 and v1); the count, the ends and the contrast were not: 3.4-6.2x the approved G4
 frame's strokes, 10-27x its near-miss ends, every crumb at the hero's contrast (dL* 52-63 on every tier; cozy 24-28). The
 G4 frame had the same pen and passed with a quarter of the strokes: the fix is a new pen, not fewer props.
@@ -142,8 +143,8 @@ G4 frame had the same pen and passed with a quarter of the strokes: the fix is a
   §10). No tier draws an outline: an edge is a value step, a lit face against a shade face (§d.3-4: the subject's
   shade face -20 to -25 L*, B's and C's -7 to -12) or neighbouring fills at least dL* 12 apart; where close values
   touch (round the mascot, a figure on a wall), a shade face or a counterchanged field parts them, never a line
-  (without its shade faces B goes flat: the picture's inset). C: flat shapes in 2 tones (lit, shade), at most dL* 15
-  inside one plane. **Thin lines only where the thing IS a line** (window and glazing bars, railings, rigging, wires,
+  (without its shade faces B goes flat: the picture's inset). C: flat shapes in 2 tones (lit, shade) in the design, at
+  most dL* 15 inside one plane, painted on top at its plane's dose (below). **Thin lines only where the thing IS a line** (window and glazing bars, railings, rigging, wires,
   a bird's V: the posters draw lines only there): dark ones in the object's own deep shade (its fill L* -35, hue kept,
   never under L* 16, never near-black: the owner's "black outlines, VERY subtle, in key places", 2026-10-25, now
   lives only here), light ones (lit rails, glints, light window bars) a light tint, L* +10 to +20; on tier C within
@@ -273,8 +274,7 @@ G4 frame), halos as opaque discs, no cast or contact shadow in any kit file, no 
    ground snow at 83-85; sky-facing snow caps 87-89, thin, never above the pool core (a sky at ~45 lights them); sky ~45.
    Day: sun 45-65° high, lit tones lean yellow, the sky the lightest field. Dusk: the low sun is the key, a local light
    (a lit door, a lamp, a screen) the story light. Nothing under L* 35 but ink, anchor-dark surfaces and §f.8's dark
-   pieces (their shadows take one step below); a big shade mass under it (proof 2's bank at L* 30-39, T3's quay at 25)
-   waits for the owner's pick of the dark key (`ORGANIC.md` §8 D3).
+   pieces (their shadows take one step below) (owner's pick pending: `ORGANIC.md` §8 D3).
 3. **A shadow is its surface times the set's ONE tint family** (multiply; form, cast and contact are three strengths of
    one hue): never grey, never a hand-picked fill. Warm surfaces keep at least 0.95x their chroma and turn 5-20° toward
    rose or plum; cool ones 10-16° toward violet. On the main surfaces the tints give form dL* -7 to -12 (tier A deeper:
@@ -331,8 +331,8 @@ G4 frame), halos as opaque discs, no cast or contact shadow in any kit file, no 
    point, +2-4 L*, against darker air only, never across the caption band or the focal. Show light on what it hits; no
    symbolic glow (a glow away from a source). Room falloff: planes (window reveal, desk underside, corners) plus ONE lamp
    wash. Until 2026-10-30 a halo was at most 1.7x the lantern, one step on the sky, or none: history.
-8. **Rims on what the key and the story light touch, by tier** (playbook PROPER LIGHT: "lit edges (rim light) on what it
-   touches", owner, 2026-10-30; `ORGANIC.md` §4.2): a band inside the silhouette from the shape's distance field x
+8. **Rims on what the key and the story light touch, by tier** (playbook PROPER LIGHT, 2026-10-30: "lit edges (rim
+   light) on what it touches"; `ORGANIC.md` §4.2): a band inside the silhouette from the shape's distance field x
    max(0, n . l)^p (p 0.8-1.2), so uneven by construction, on the light's side only, in the light's colour; never an
    even outline or an offset copy of the edge. The subject 4-6 px on a ~300 px figure, scaled with its height (1.7 px
    plus a 3.4 px band at 0.4 on a 153 px figure), +12-18 L*, strongest when the key is behind or beside it or it stands
@@ -366,8 +366,8 @@ G4 frame), halos as opaque discs, no cast or contact shadow in any kit file, no 
 **Check** (the G4 look clip and every render): every pool at least +4 L* over its ground; a bloom only at a source, inside
 its three sizes and <= +6-8 L* at the source's edge, none on a lit surface or in the band; the brightest 5 % (the sky,
 the caption band and the far planes out) centred within 0.07-0.15 H of the subject; rims by tier, none an even outline;
-no shadow pixel under C* 8, nor under L* 35 except on an anchor-dark surface or a dark piece (§f.8; a shade mass under
-it waits for the dark key, §d.2); the subject's shade face -20 to -25 L* under
+no shadow pixel under C* 8, nor under L* 35 except on an anchor-dark surface or a dark piece (§f.8; owner's pick
+pending: `ORGANIC.md` §8 D3); the subject's shade face -20 to -25 L* under
 its lit face (an eye check until `check_light.py` gets its tier-A step); one value in the caption band; the G4 look clip already shows the rig
 with form, cast and contact shadows. `scripts/qa/check_light.py` (built in the v3 rework: an A/B of the same frame with
 the light layers off and on) checks the pools, the brightest 5 %, the shadow colour and the caption band (pass the far

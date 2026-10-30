@@ -138,7 +138,7 @@ pull-out; the big scale move belongs to the reveal later in the film (S1 or S5).
   by p 0.96 as the camera slows. Birds (not airships) lead the life in the hold (Scale cues 11).
 - **Start (u = 0):** sky y 0-840; horizon 0.44 H, seen only through a slot at x 240-600, y 780-900 (low skyline, one
   spire to y 720). Dormer x 600-1080 (finial y 640) down to the bottom edge; boiler x 0-240; parapet top y 1280. The two
-  figures, 3/4 from behind, heads turned right (no faces), centre x 470, heads at most ~140 px (playbook; the source's
+  figures, 3/4 from behind, heads turned right (lost profiles: the cheek's sliver at most, `PEOPLE_DESIGN.md`), centre x 470, heads at most ~140 px (playbook; the source's
   ~180 px is too big) from y 1060, cut at the hips; the lead room hits a wall.
 - **End (u = 1):** sky y 0-890, horizon 0.46 H. Landmark (a hill city) x 540-1010, spire top at y >= 620, centre (760,
   760) on the right third, ~1.4x the figures' height; sea strip and far roofs (y 900-1150) step up to it. A lit street
@@ -176,14 +176,17 @@ quota. Breathers (S3, S4) take theirs from the sky (9-10).
 2. **The size gradient:** 5-7 planes, each 2.2-3x smaller than the one in front (never two neighbours within 2x). Building
    widths near : mid : far = 17 : 3 : 1 (near 120-520 px, mid 21-35, far 7-17 x 6-8 tall); windows shrink with them (near
    7-11 px on a 21-30 px period, near-mid 4-6 on 12, mid 2-3 px tone-on-tone squares on 5 (within dL* 15 of the wall,
-   never dark specks: `CRAFT.md` §c), far none).
+   never dark specks: `CRAFT.md` §c), far none), each never a template: sizes varied 5-12 %, places +-1.5 px, states
+   mixed (lit, dark, sky-reflecting), twins <= 5 % of the shapes (`ORGANIC.md` §4.1; owner, 2026-10-30, ORGANIC, NOT
+   GEOMETRIC).
 3. **Most of the city is in the thinnest band:** the far field (0-11 % of the horizon-to-feet span) plus the hill town
    hold ~60 % of Arcane's ~400 roofs: 5-7 rows every 9-10 px, each hiding half the row behind, no sky gaps, a chimney (a
    flat shape, never a tick) per 3-4 roofs. Generate the rows from seeded motifs (+-15 % width, 3-4 roof colours), never
    a few hand-placed blocks.
 4. **Detail rises toward the horizon:** shapes per building fall (near 30-60, mid 5-8, far 2), so shapes per 100 px tile
    (flat shapes, not lines) stay level or rise 1.0-1.5x and PEAK just under the horizon (Arcane edge density 23-25 %
-   there, 8-11 % near). Motifs repeat in runs of 4-6 at a fixed period. Calm zones only: the landmark (0.4x the city),
+   there, 8-11 % near). Motifs repeat in runs of 4-6, their gaps uneven (CV >= 0.3) and each repeat carrying one
+   difference, never at a fixed period (`ORGANIC.md` §4.1: no template). Calm zones only: the landmark (0.4x the city),
    the deck (0.65x), the sky.
 5. **Atmospheric steps, one per plane (never a haze gradient over the frame; the sun's in-scatter veil and the light's
    falloff, baked per plane, are light, not the step: `CRAFT.md` §f.2, §d):** each plane is one fixed mix toward the sky

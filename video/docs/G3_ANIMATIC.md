@@ -31,7 +31,8 @@ one grey shadow value). The reel is staged in one world space (the home place an
 board's PEN is thrown away: the film is drawn with the clean pen (`CRAFT.md` §c), never the sketch pen.
 
 G3 **IS NOT**: colour, final line, texture, easing micro-tuning, overshoot/settle/secondary motion, faces (people have
-none at any gate, playbook: the pose acts; the mascot's face is part of its drawing), real detail anywhere (windows, signage, crowds are marks, never drawings — identity-critical elements
+none on the board: the pose acts; the film's generic LASH face comes with the kit from G4, `docs/look/PEOPLE_DESIGN.md`,
+owner 2026-10-30; the mascot's face is part of its drawing), real detail anywhere (windows, signage, crowds are marks, never drawings — identity-critical elements
 excepted, §3). Loose in precision, dense in
 suggestion: the backbone (big shapes, framing, timing, counts) is exact; the skin is scribble (`animatic_sketchlook.md` §0).
 
@@ -116,7 +117,8 @@ G5 adds no new motion — only colour, line, easing polish, secondary motion (`a
   frames (snap()/pops exempt). Both end frames pass the STORYBOARD_STYLE §5 checklist as stills.
 - **Drawn actions are a pose test, not tweens**: 2-4 held key poses per shot, popping on their words (held 0.3-1.5 s),
   stepped — never an eased body slide. A fast transit is ONE smear drawing (silhouette stretched along the path) held
-  2-3 frames between the keys. People carry no faces (playbook: like reference 1's, the pose acts); mitten hands
+  2-3 frames between the keys. People carry no face marks on the board (the pose acts; the film's generic LASH face
+  comes with the kit: `docs/look/PEOPLE_DESIGN.md`, owner 2026-10-30); mitten hands
   always, dropped in motion poses. No volume lint (precision the owner waived): the cold read checks that the subject stays
   the same size and on its ground line across a shot's poses unless the change is the idea.
 - **Ambient life**: every set panel carries 2-3 ambient micro-moves (`loop: true`: weather, a cloud, steam, a window

@@ -460,6 +460,12 @@ hands on the hips. An acting beat (a reach, a shrug, a slump, a look up) is one 
 
 ## 7. What this asks of the docs above it (proposals, not applied: the orchestrator's, after the owner's pick)
 
+**After the pick (2026-10-30):** the coherence pass applied items 2 and 3 for direction C with the LASH face
+(DIRECTION rule 3 and its Retired list; `paint_recipes/people.md`, its superseded parts marked), and the people
+lines of `LIFE_AND_DENSITY.md`, `LAYOUT.md`, `CINEMATIC_GUIDE.md`, `COZY_AND_SCALE.md`, `STORYBOARD_STYLE.md` and the
+gate specs; item 2's soft gradient lapsed with the pick (C draws two flat tones). Item 1 is the playbook's own words;
+items 4-6 stay with the people lane (written for A, read them for C).
+
 1. **The playbook's people bullet:** "round heads" (from reference 1) becomes small egg heads with designed hair at
    7.8-8.0 heads for the "you" and near strangers (round heads only for far crowds under ~40 px); "only the mascot has
    a face" meets the face budget of §5.3 (the owner asked for "a more generic way" to draw faces). Its "few shapes lit

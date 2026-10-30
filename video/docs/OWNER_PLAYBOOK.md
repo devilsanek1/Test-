@@ -146,8 +146,8 @@ Maintenance at the end).
   one hot accent, never a mix of unrelated pastels) are palette work, done in every scene ("dark and contrast are great
   but that’s very doable that’s just color palette and selection? Similarly point 2").
 - **Light and shadow: gentle, but always there.** One consistent light direction per scene, soft form and cast shadows,
-  gentle light pools that make sense; never absent and never "weirdly put". Every volume reads in 2-3 flat tones, a lit
-  face and a shade face, as the city posters' buildings do; with no outlines these faces make the edges, so the
+  gentle light pools that make sense; never absent and never "weirdly put". Every volume reads in 2-3 tones, a lit
+  face and a shade face, with colour and light moving gently inside them (never dead-flat: ORGANIC, NOT GEOMETRIC), as the city posters' buildings do; with no outlines these faces make the edges, so the
   subject's shade face goes clearly deeper (-20 to -25 L*) while supporting life and the world stay gentle (-7 to
   -12). System: `docs/look/CRAFT.md` §d. — (v3 G5b, 2026-10-27;
   "the shadows added are better", v2 G4, 2026-10-27; on the posters' lit and shaded faces: "4 is a good point and goes
@@ -264,9 +264,11 @@ Maintenance at the end).
   captions and QA tools are tools, not assets; the kit pieces in `src/lib` (cine, kit, mascot) are references to learn
   from, never a film's sets, and a film never imports another film's folder (`src/vN/`). — ("Don't rely on reusable
   assets", v2 restart, 2026-10-27).
-- **People small and simple like reference 1** (crowds, small full figures seen from behind or in rear 3/4, round
-  heads; near heads <= ~140 px), never big character models or faces: they act with their pose (reach, shrug, slump,
-  look up), as reference 1's do; only the mascot has a face. **In the foreground only the film's one "you" or the
+- **People: small and simple in the frame, contemporary and refined in design** (small full figures, often seen from
+  behind or in rear 3/4; adult proportions of about 7.8 heads in direction C, below, which replaces reference 1's
+  round-headed crowd as the drawing model; near heads <= ~140 px), never big character models: they act with their pose
+  (reach, shrug, slump, look up); faces stay generic (the LASH face of the people design below, never eyes looking at us
+  or a mouth). **In the foreground only the film's one "you" or the
   mascot;** the "you" near the camera stands at a real size, about v2's original (~130-220 px tall), still simple and
   from behind or in silhouette (DEPTH AND SCALE FROM A HUMAN VIEWPOINT above; owner, 2026-10-29); strangers stay small in the mid and far ground (a row of strangers' backs in front reads as "you"). Simple, but REFINED,
   CLEAN and FLUID like the girl in the owner's 9:16 motion reference (`docs/look/refs_human_scale/04_cloud_beast_girl_strip.jpg`):
@@ -308,8 +310,9 @@ Maintenance at the end).
   never one dark mass or a narrow band of light pastels (one reason v2 reads cheap next to the city posters). Numbers:
   `docs/look/CRAFT.md` §f.8, from the city-poster study. — (our observation on the posters; "5 - good point too!",
   2026-10-28; the darks in many small pieces: "Go with your suggestions", 2026-10-29).
-- **PAINTED PIECES: the sky and its clouds, and a few chosen environment pieces (some foreground buildings, trees and
-  greenery), are uniquely painted, as in the owner's references** (`docs/look/refs_human_scale/`, the city posters'
+- **PAINTED PIECES: the sky and its clouds and the whole environment (buildings, trees and greenery, ground, water) are
+  uniquely painted in ONE painted language, as in the owner's references** (first asked for the sky, clouds and chosen
+  pieces; then "one painted language" for the whole frame, below) (`docs/look/refs_human_scale/`, the city posters'
   skies and proteas): visible brush and paint texture, soft painted edges, colour moving within a shape, each piece
   painted for its place (never one stamp repeated). The painting is SUBTLE AND BEAUTIFUL, in the drawing style of the
   owner's two favourites (`refs_human_scale/02_bus_stop_night.jpg`, `03_beach_dusk.jpg`): big, simple painted masses
@@ -747,7 +750,7 @@ Maintenance at the end).
 - ~~Density and life added after the sketch ("blocking: staging only; next: density, life, polish")~~ → designed into
   G3 with their tiers; G5 fills G3's plan (v3 G5b, 2026-10-27).
 - ~~A face for the protagonist's emotion beat (v3's waist-up "you" facing us)~~ → people have no faces, like reference
-  1; the pose acts; only the mascot has a face (v2 restart rule, 2026-10-27).
+  1; the pose acts; only the mascot has a face (v2 restart rule, 2026-10-27); faces now: generic LASH faces (2026-10-30).
 - ~~The G4 look as stills made in parallel with G3~~ → a playable look clip after the G3 lock, approved before G5
   (the approved pipeline, 2026-10-27).
 - ~~Pip at tier B in every shot and on both sides of every join~~ → Pip stays, hidden on purpose (2026-10-28).

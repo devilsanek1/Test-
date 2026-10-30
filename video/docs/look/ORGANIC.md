@@ -26,9 +26,10 @@ techniques and libraries chosen and rejected with their licences (§3), the rule
 **Rank.** A look doc on DIRECTION's ladder: the owner's words, DIRECTION and CRAFT win over it. Its topic is how a frame
 stops reading geometric: shapes and edges, the paint's dose by plane, the light's method, the composition numbers, the
 paper. `PAINT_RECIPES.md` keeps each painted element's recipe, `LAYOUT.md` where things sit, `PALETTE.md` the palettes.
-Where a higher doc predates the owner's 2026-10-30 words and disagrees with them, §8 flags it for the orchestrator (a
-clash is a bug); until it is integrated, CRAFT's numbers stand in production, and v7 (an iteration, stills only) is where
-this doc's numbers are tried and the owner's eye decides. The research reports below are notes under this doc. We learn
+Where a higher doc predated the owner's 2026-10-30 words and disagreed with them, §8 flagged it (a clash is a bug); the
+coherence pass of 2026-10-30 integrated them all but the dark key (D3, the owner's pick), so DIRECTION and CRAFT now
+carry this doc's rules and numbers as first values, and v7 (an iteration, stills only) is where they are tried and the
+owner's eye decides. The research reports below are notes under this doc. We learn
 methods: every reference is only measured, never copied, traced or used as an input to a picture of ours, and no living
 artist is a style target. Paths are from `video/`.
 
@@ -407,8 +408,8 @@ brushes and painting"), never a far plane that is only blurred. ONE painted lang
 a boat, a lamp post) takes its plane's row, because one flat vector piece among painted ones reads pasted in; the
 subject and people are the exception, crisp by tier. "Near" is the subject's plane and the near world, not the frame's
 edge: the nearest framing objects are out of focus (as ref 02's reeds). First doses for the v7 look test
-(`techniques.md` §5.4 with `PAINT_RECIPES.md` §1's depth ladder and `shapes.md` §3.3); show two strengths, the owner
-picks.
+(`techniques.md` §5.4 with `PAINT_RECIPES.md` §1's depth ladder and `shapes.md` §3.3); show the owner two strengths
+only where they differ at a glance at 400 px (playbook: never a choice he can't tell apart), else the call is ours.
 
 | Plane (scene 1) | Found edges | Lost edges, and how they are made | Marks (the brush ladder) | Shape detail | Light inside a face; rims | The air: k; values; blur solids / vapour | Paper |
 |---|---|---|---|---|---|---|---|
@@ -579,12 +580,15 @@ cost, the md5s. With it, ask the owner §8's three questions.
 9. **A near tree,** where a later shot keeps one: proof 1's crown is simpler but its edge is cleaner than the
    references' (lost 4 % against >= 7 %, broken 18 % against >= 35 %). The owner's eye decides.
 
-## 8. Doc clashes found (flagged for the orchestrator; DIRECTION, CRAFT and PAINT_RECIPES are not edited here)
+## 8. Doc clashes found (flagged for the orchestrator; integrated on 2026-10-30, each marked FIXED or OPEN)
 
 The owner's 2026-10-30 words (the playbook's ORGANIC, NOT GEOMETRIC, PROPER LIGHT, SCENE COMPOSITION and the new
 balance in PAINTED PIECES) outrank every rule below that predates them; each needs a reconciling edit in its own doc.
 About half repeat the research lanes' flags (`light.md` §9, `composition.md` §7, `techniques.md` §8, `shapes.md` §8,
-`light_proof.md` §9), gathered here with one proposal each; D1, D5, C1, C9, C10, C12, P1-P3 and P6 are new here.
+`light_proof.md` §9), gathered here with one proposal each; D1, D5, C1, C9, C10, C12, P1-P3 and P6 are new here. A
+coherence pass on 2026-10-30 made each lower doc agree (the edits name the owner's words they follow); every item is
+marked **FIXED** (where) or **OPEN** (why), and X1-X14 at the end are the clashes that pass found besides. Only the dark
+key (D3, with C7's L* 35 floor and C8) waits, for the owner's pick.
 
 **DIRECTION**
 - **D1. Rule 4, "big areas flat", and the painted pieces as "a few chosen environment pieces" (elsewhere "texture stays
@@ -693,6 +697,47 @@ About half repeat the research lanes' flags (`light.md` §9, `composition.md` §
 - **Not a doc clash, a fix to proof 2:** its colour key broke C8 (the tree turned olive) and CRAFT §f.2's C* >= 8 floor
   (the glass at C* 4, the lantern glass at 2): §4.3 and step 1 correct it.
 
+**Found in the coherence pass (2026-10-30; the research reports' flags not gathered above, the people pick, and the
+lower docs' own echoes), fixed in the same pass**
+- **X1. "12+ distinct props" in a wide** (`LIFE_AND_DENSITY.md` §1; `composition.md` §7.2) against R6. **FIXED**
+  (LIFE_AND_DENSITY §1: the props as texture inside the belt's masses, <= 6 named objects; DIRECTION rules 2-3).
+- **X2. `LAYOUT.md` §8.2's "calm below the skyline <= 5 %" and "open ground <= 15 %"** (`composition.md` §7.4) against
+  R5. **FIXED** (retired in LAYOUT §8.2; §8.4 to match).
+- **X3. `LAYOUT.md` §8.2's near frame as "dark, detailed masses"** (`composition.md` §7.5) against R5-R6. **FIXED**
+  (LAYOUT §8.2: dark and quiet, <= 2 props; Pip's spot by R12; the patchwork hand-cut, as D5).
+- **X4. DIRECTION without the 2026-10-30 rules** (no SCENE COMPOSITION numbers, no organic shapes, "big areas flat").
+  **FIXED** (DIRECTION's intro lists the decisions; rule 2 "one place to look"; rule 4 organic shapes and the one
+  painted language; rule 6 the one colour key; five Retired lines).
+- **X5. People: "no faces", "only the mascot has a face", the pictogram person** (DIRECTION rule 3 and Retired;
+  `LIFE_AND_DENSITY.md` §4's "tombstone torso"; `LAYOUT.md` §3; `CINEMATIC_GUIDE.md` "Not for us"; `COZY_AND_SCALE.md`
+  3b.2; `STORYBOARD_STYLE.md` §3 and §5; `G3_ANIMATIC.md`'s "IS NOT" line and §4; `G5_BLOCKING.md` §2) against the
+  pick, direction C with the LASH face (2026-10-30). **FIXED** (each to C and LASH; the board draws no face marks;
+  `paint_recipes/people.md`: its proportions, face, wardrobe and soft gradient marked superseded, its motion and local
+  light kept; `PEOPLE_DESIGN.md` §7 notes what was applied).
+- **X6. Rims "on the subject only" in the people docs** (`PEOPLE_DESIGN.md`'s in-use block, §4 and §5.2;
+  `paint_recipes/people.md` §g) against PROPER LIGHT. **FIXED** (rims by tier, CRAFT §d.8).
+- **X7. `CINEMATIC_GUIDE.md`: "No bloom, haze, glow or gradients", S2's 1.7x halo, "Clouds are 2-3 flat shapes"**
+  against PROPER LIGHT and PAINTED PIECES. **FIXED** (S1-S4, cues 5 and 9, rules 1 and 4, "Not for us").
+- **X8. `COZY_AND_SCALE.md`: flat pools with "no gradient or blur", shadows "never a blur or a gradient", K8's 1.7x
+  halo, 3b.7's "flat shapes only" and "Nothing on people, props"** against PROPER LIGHT, the one painted language and
+  the paper. **FIXED** (§3, 3b.6, 3b.7, K8).
+- **X9. Saturation "across many hue families"** (`COZY_AND_SCALE.md` 3b.6) against PROPER LIGHT's ONE COLOUR KEY.
+  **FIXED** (COZY 3b.6 and 3b.8; DIRECTION rule 6; `PALETTE.md`'s house DNA, which also drops "props flat").
+- **X10. Props "our crisp flat"** (`paint_recipes/water.md` E7) and far solids "crisp" (`paint_recipes/built_ground.md`
+  §4.1) against the one painted language and the balance. **FIXED** (pointers to `PAINT_RECIPES.md` §3 C3 and §4.1).
+- **X11. `light_proof.md` §9: the rim widths assume a ~300 px figure.** **FIXED** (CRAFT §d.8 scales them by height).
+- **X12. `G5_BLOCKING.md` §2: "flat (no blur, filters, gradients)", and the light from `lib/light.tsx` only,** against
+  PROPER LIGHT. **FIXED** (§2: the sky's gradient, a changing source's cropped bloom and the baked paint and light maps
+  allowed; `lib/light2` named).
+- **X13. This doc's §5 ("show two strengths, the owner picks") and question 3 below (the paper's strength at 400 px)**
+  against the playbook's "Never ask the owner to choose between options they can't tell apart at phone size": the
+  paper is meant to be invisible at 400 px (§6 step 5's eye check). **FIXED** (§5 and question 3: a dose goes to the
+  owner only as two strengths that differ at a glance at 400 px; the paper's strength is ours, by §4.5, and noted).
+- **X14. Templates and fixed periods** (`CINEMATIC_GUIDE.md` Scale cues 2 and 4: windows on a period, "motifs repeat
+  ... at a fixed period"; S4's "evenly spaced posts"; `PAINT_RECIPES.md` §2.4's far-city window grids) against ORGANIC,
+  NOT GEOMETRIC ("nothing repeats a template"). **FIXED** (each varied by §4.1: sizes 5-12 %, gaps' CV >= 0.3, twins
+  <= 5 %; `COZY_AND_SCALE.md` §3's dressing as painted fills).
+
 **Shared code** (flagged for whoever owns it; nothing edited): `src/lib/clouds.tsx` (a union of circles, soft edges as
 2 flat steps); `src/lib/edges/rough.ts` `organic()` (3-21 harmonics resampled every 26 px measure as locally straight:
 add a short octave, or use §4.1's value-noise octaves); `src/lib/light.tsx` and `src/lib/LIGHT.md`'s headers ("never a
@@ -700,13 +745,16 @@ glow disc ... no blur, gradient or opacity fade": `light.md` D-L3), and its mask
 region in many multiply groups (~340 ms of v6's ~550 ms frame; not profiled); `src/lib/paint/PaintedLayer.tsx` loads
 pieces through `staticFile` only (pieces must live under `public/`) and has no `blend` prop (`light.md` D-L6;
 `lib/light2` `LightMap` answers it without touching `lib/paint`); `paint_test/NOTES.md`'s library paragraph is history,
-superseded by `libraries.md`.
+superseded by `libraries.md`; `scripts/qa/check_banding.py --texture` still FAILs any texture in the caption band,
+where CRAFT §c's paper now allows <= 15 % of its strength (the band's spread <= 1.5 L*).
 
 **Three questions for the owner, with the v7 sheet:**
 1. The key: T1 (one gentle dark mass, L* ~40-45, our quay in a canopy's shade) or T3 (the references' low key: 45 % of
    the frame under L* 40, a darker sky top)? (D3, C8)
 2. The Google wing: keep v2's frontal view and break its corners with overlaps, or turn it 15-30 degrees? (§7.4)
-3. The doses: the paint's and the paper's strength, shown at two strengths side by side at 400 px.
+3. The paint's dose, shown at two strengths side by side at 400 px, only if they differ at a glance there (the
+   playbook's "Never ask the owner to choose between options they can't tell apart"); the paper's strength is ours
+   (§4.5: invisible at 400 px by design), noted on the sheet.
 
 ## 9. Sources and reruns
 

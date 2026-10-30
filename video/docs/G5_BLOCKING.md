@@ -82,8 +82,9 @@ export const captionTone: ToneKey[] = [{t: 0, tone: 'light'}];   // optional: ov
 ```
 
 - **Time**: `useTime()` = panel-local seconds; a voice word at VO time w lands at `t = w - start`. Lead the voice
-  (ENGINE §1 rule 5). Everything in seconds, deterministic (`rng`, never `Math.random`), flat (no blur, filters,
-  gradients), **no opacity fades** (pop, grow, wipe or slide; a draw-on at frame 0 and where the drawing is the beat:
+  (ENGINE §1 rule 5). Everything in seconds, deterministic (`rng`, never `Math.random`), flat (no blur, filters or
+  gradients drawn live, but the sky's gradient and a changing source's cropped bloom; the paint and the light maps come
+  baked: `docs/look/CRAFT.md` §c-§d, §g), **no opacity fades** (pop, grow, wipe or slide; a draw-on at frame 0 and where the drawing is the beat:
   `docs/look/DIRECTION.md` rule 8). From `ENGINE.md`: §1 rules 1-5, 7 and 10
   (rules 6, 8 and 9 are retired: `docs/look/DIRECTION.md`), §4-§6 (stage, transitions, captions) and §7 (primitives,
   with the clean pen); its §3 template and §10 kit show the API, never the look (v1's sketch pen, drifting sun,
@@ -133,9 +134,11 @@ exception from the G3 hand-off.
   STYLE.md (v3: LOOK.md) and palette roles (one hero colour, one dark anchor, at most one pop), inside
   `docs/look/DIRECTION.md` and `CRAFT.md`; then `docs/look/LAYOUT.md`, `docs/look/COZY_AND_SCALE.md`,
   `docs/look/CINEMATIC_GUIDE.md`. Every
-  set, person, prop and Pip is the film's own kit (playbook: no reusable assets; people have no faces); `lib/cine`'s
+  set, person, prop and Pip is the film's own kit (playbook: no reusable assets; people in direction C with the generic
+  LASH face, owner 2026-10-30: `docs/look/PEOPLE_DESIGN.md`); `lib/cine`'s
   drawing pieces are references, never film code, until the craft tooling lane ports them to the clean pen
-  (`CRAFT.md` §c; its camera and utilities are fine). The light and shadow layers come from `lib/light.tsx`, depth from
+  (`CRAFT.md` §c; its camera and utilities are fine). The light and shadow layers come from `lib/light.tsx`, and the
+  proper light's baked maps and live layers from `lib/light2` where the film takes them (`CRAFT.md` §d), depth from
   `lib/depth.ts` (the set's atmosphere, planes and ONE camera from W1, plus the far stage where W1 declares a designed
   view: `CRAFT.md` §f, §f.5; how-to `lib/DEPTH.md`), particles
   from `lib/particles.tsx`; a film never imports another film's folder (`src/vN/`).

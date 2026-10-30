@@ -5,7 +5,8 @@ must not be "confused with conflicting instructions"). Read it before any visual
 (`docs/OWNER_PLAYBOOK.md`) and `docs/PIPELINE_V2.md`; the film's one style page (`docs/vN/STYLE.md`) picks its values
 inside these rules. Each rule links the section with its numbers, code and checks (paths from `video/`; bare names are
 in `docs/look/` or `docs/`). **In short:** one flowing story about one thing, in a full, calm, cozy world of hand-drawn
-flat colour, drawn clean and lit gently, in ONE look that every video shares and that keeps evolving as we find our style
+colour (a clean flat design, painted in ONE language by plane), with organic shapes, one place to look and one story
+light, gentle and always there, in ONE look that every video shares and that keeps evolving as we find our style
 (one brand: owner, 2026-10-28, "a coherent style across all videos sharing one look, one brand would be absolutely the
 key here"; "our look is evolving - we are finding out style i don't think we can overfixate on this").
 
@@ -31,7 +32,7 @@ posters (`docs/look/poster_refs/`) and wants to experiment with it, starting fro
 and i want us to experiment more with the style and the focus on our videos"). Its conclusions are
 `docs/studies/2026-10-28_city_posters/STUDY.md` (each marked owner or proposal; its §9 calls are all decided) and
 `SUMMARY.md` (one screen); its numbers for what is decided are in `CRAFT.md` (§b the patchwork, §c the edges, the thin
-lines and the texture test, §d the shade faces by tier, §f.5 the designed view, §f.8 the value range and the darks,
+lines and the texture test, now the one paper, §d the shade faces by tier, §f.5 the designed view, §f.8 the value range and the darks,
 §g.2 the sun), its palettes are proposals in `PALETTE.md`, and our earlier layout rules, consolidated and reconciled
 with the posters, are `LAYOUT.md` (the owner: "layout is a big aspect"). **Decided by the owner (2026-10-28), in the
 rules below:** one look for every video, still evolving (the intro; rule 3); Pip stays, hidden on purpose (rules 1-2);
@@ -83,16 +84,18 @@ dark mass) or T3 (the references' low key) (`ORGANIC.md` §8 D3; rule 6).
   subject never melts into what is behind it (its own value against a calmer field); distance shows in colour (far
   planes converge on the air behind them: lighter, softer in contrast, simpler, cooler under a blue sky and warmer under a
   sunset: atmospheric perspective in flat colour) and in perspective (a ground
-  that recedes: converging edges, foreshortening, things smaller and texture finer with distance, overlaps), never a
+  that recedes: converging edges, foreshortening, things smaller and paving and joints finer with distance, overlaps;
+  the paint's marks, by contrast, coarsen with distance: rule 4), never a
   flat elevation of stacked bands; a few subtle particles (motes, a leaf, glints) make it natural. -> `CRAFT.md` §b, §f;
   `ORGANIC.md` §4.4; `LIFE_AND_DENSITY.md` §5.
 - **3. Alive but calm: full, never empty, never busy.** Every paused frame is full: a world made of things, people,
-  layered depth, things cut by the edges. Full is never busy (owner, 2026-10-30, SCENE COMPOSITION: "big quiet areas"):
-  the many small things live as texture inside the belt's masses (tone-on-tone, no silhouette of their own at a
-  squint), never as many named objects (rule 2); the frame keeps up to two big quiet fields, the sky with the caption
-  band at the top and the near ground at the bottom (most of the frame quiet at a squint: `ORGANIC.md` §4.4 R5), each
-  patterned in value (+-4-6 L*: painted variation, dapples, joints, tone-on-tone things), so a quiet field is never a
-  hole; elsewhere no hole bigger than the caption band. **People** (owner, 2026-10-30: "beautiful and pleasant",
+  layered depth, things cut by the edges. Full is never busy (playbook SCENE COMPOSITION, owner, 2026-10-30: big quiet
+  areas and one place to look): the many small things live as texture inside the belt's masses (tone-on-tone, no
+  silhouette of their own at a squint), never as many named objects (rule 2); the frame keeps up to two big quiet
+  fields, the sky with the caption band at the top and the near ground at the bottom (most of the frame quiet at a
+  squint: `ORGANIC.md` §4.4 R5), each patterned in value (+-4-6 L*: painted variation, dapples, joints, tone-on-tone
+  things; the near ground's facets kept within that range), so a quiet field is never a hole; elsewhere no hole bigger
+  than the caption band. **People** (owner, 2026-10-30: "beautiful and pleasant",
   styled like today's 20-30-year-olds in New York and Los Angeles, faces drawn "in a more generic way";
   `PEOPLE_DESIGN.md`): direction C, MODERN GRAPHIC (about 7.8 heads, rounded polygons in two flat tones, crisp, no
   outlines, the styling carried by clothes and hair) with the LASH face (closed-eye lash lines and a small soft nose;
@@ -125,7 +128,7 @@ dark mass) or T3 (the references' low key) (`ORGANIC.md` §8 D3; rule 6).
   never an even streaky texture), at its plane's dose: near and at the focal sharper (found edges, the finest marks,
   the most detail), far "more like brushes and painting" (lost edges, fewer values, the coarsest marks, few, broad and
   visible, never only blurred); the subject and the people crisp and clean; big areas quiet in value, never dead
-  flat; the film still works with the paint off. Texture beyond the paint: ONE paper per film, VERY subtle and the
+  flat (the caption band calm within 1.5 L*: rules 6, 10); the film still works with the paint off. Texture beyond the paint: ONE paper per film, VERY subtle and the
   last step the film must work without (owner, 2026-10-28: "start playing with it, very subtly especially if its
   adding to the premium look"; 2026-10-30, on an overall texture: "that seems solvable too?"): a fine tooth, a little
   fibre and a gentle mottle on every plane and mover, locked to them, never to the screen, about 1 L* on a mid-tone and
@@ -145,10 +148,11 @@ dark mass) or T3 (the references' low key) (`ORGANIC.md` §8 D3; rule 6).
   light. Shadows are colour, never grey, gentle in value: contact under all that touches a surface, form away from
   the key, cast along the light (long and converging under a low sun); a shade mass has a named caster, never a
   vignette. Every volume reads in 2-3 tones, a lit face and a shade face (the city posters; owner, 2026-10-28), colour
-  and light moving gently inside each (PAINTED PIECES), and with no outlines (rule 4) these faces make the edges: the
-  subject's shade face goes clearly deeper, B's and C's stay gentle (owner, 2026-10-29). No blur, fog or gradient laid
-  over the world: the sky's gradient (rule 6), the paint's softness (rule 4) and the light's own falloff and bloom are
-  the soft things. Night is temperature, not darkness. -> `CRAFT.md` §d; `ORGANIC.md` §4.2;
+  and light moving gently inside each (PAINTED PIECES) without blurring the step between them, and with no outlines
+  (rule 4) these faces make the edges: the subject's shade face goes clearly deeper, B's and C's stay gentle (owner,
+  2026-10-29). No blur, fog or gradient laid over the world: the sky's gradient (rule 6), the paint's softness by
+  plane (rule 4; a near framing object may take one optical blur) and the light's own falloff and bloom are the soft
+  things. Night is temperature, not darkness. -> `CRAFT.md` §d; `ORGANIC.md` §4.2;
   `scripts/qa/check_light.py`.
 - **6. Warm, soft colour, never sickly.** One sister palette per film, proposed in the W1 world bible (its rigs and
   colour script are written in its terms) and approved with the G4 look clip: a soft light page of many fills (warm by
@@ -199,7 +203,9 @@ dark mass) or T3 (the references' low key) (`ORGANIC.md` §8 D3; rule 6).
   every map-critical frame; `lib/depth.ts` parallax helper); a zoom is a visible story move or a carrier; no roll, no compound moves; visuals
   lead their word by ~0.1 s. -> `G3_ANIMATIC.md` §4; `PIPELINE_V2.md` "Frame rate"; `COZY_AND_SCALE.md` 3b.5.
 - **9. The opening is a banger.** Frame 0 is the scene being drawn, in the clean pen: the subject's line draws on, C
-  lands as flat pale shapes and colour floods in over the line (it goes under its fill: no outline stays, rule 4), as a bold event a scrolling viewer can't miss (~0.3 s was
+  lands as flat pale shapes and colour floods in over the line (it goes under its fill: no outline stays, rule 4), the
+  painted pieces painting on stroke by stroke over their flat design, never popping up (playbook PAINTED PIECES), and
+  the light flooding in with the colour from its source (`ORGANIC.md` §4.2), as a bold event a scrolling viewer can't miss (~0.3 s was
   invisible: owner, 2026-10-28; every opening effect large, long enough to register, with its own sound), with the captions in the voice's order (frame 0 shows the first spoken line, the
   payoff in words by ~2 s; no title over them: playbook Hook and pacing),
   the voice from the first frames (the first word at ~0.12 s, the locked voice file's lead) and a positive phone sound

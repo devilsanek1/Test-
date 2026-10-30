@@ -35,8 +35,8 @@ scene needs. Every rule below works inside those tiers.
     information until it is re-measured on a G4 look clip (it reads lines, and the clean pen keeps the props but drops
     their lines).
   - **No hole bigger than the caption band:** outside the caption band and the quiet fields, no empty patch over ~200 px
-    across (largest empty disc: C3 393 px, the sky; v3 G5 910 px). Up to two quiet fields (owner, 2026-10-30, SCENE
-    COMPOSITION: "big quiet areas"; `ORGANIC.md` §4.4 R5): one touching the top edge (the sky, with the caption band)
+    across (largest empty disc: C3 393 px, the sky; v3 G5 910 px). Up to two quiet fields (playbook SCENE
+    COMPOSITION, owner, 2026-10-30: big quiet areas; `ORGANIC.md` §4.4 R5): one touching the top edge (the sky, with the caption band)
     and one touching the bottom (the near ground, water or a floor), the things loaded into the belt between; each is
     patterned (+-4-6 L* of painted variation, dapples, joints, tone-on-tone things), so it is never a hole.
   - **A field MADE of things, never things ON a field:** the biggest single flat region <= 20 % of the frame apart from the
@@ -48,7 +48,7 @@ scene needs. Every rule below works inside those tiers.
   the `COZY_AND_SCALE.md` References log):
   - many small things, each size step down holding more (C3 ~3x per step);
   - stacked, not spread: depth by overlap, a new surface every few dozen px down a column (C3 42 px, v1 90, v3 G5 143),
-    drawn detail in most 240 px bands (C3 7 of 8, v3 G5 0-3);
+    drawn detail in most of the belt's 240 px bands, the quiet fields patterned instead (C3 7 of 8 bands, v3 G5 0-3);
   - local colour variety: several colours in every small patch (per 96 px: C3 4.25, v1 2.41, v3 G5 1.77), and repeats
     vary in colour (each house, awning, shirt);
   - things that ARE lines, the cheapest fullness: wires, poles, antennas, rails, mullions, as hairlines within dL* 15 of
