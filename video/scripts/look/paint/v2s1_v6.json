@@ -17,7 +17,10 @@
   0.36
  ],
  "light": {
-  "sky": {},
+  "sky": {
+   "shade": "#9d8fb9",
+   "deep": "#806d9e"
+  },
   "local": {
    "window": "#f7cf86",
    "door": "#fbe6c2",
@@ -271,6 +274,27 @@
     "w_deep": -24,
     "w_deeper": -24
    }
+  },
+  {
+   "id": "v2s1/flock",
+   "style": "flock_sprite",
+   "seed": 66,
+   "path": [
+    [
+     34,
+     704
+    ],
+    [
+     150,
+     664
+    ],
+    [
+     292,
+     684
+    ]
+   ],
+   "n": 28,
+   "far_k": 0.55
   }
  ]
 }

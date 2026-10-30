@@ -12,6 +12,7 @@ import {CM} from '../../v2r/palette';
 import * as MAP from '../../v2r/world/map';
 import {S1Plane, S1_PLANE} from './V2S1_float';
 import {useSwitches} from './switches';
+import {PaintedLayer} from '../../lib/paint';
 
 /** THE PARTICLES, SEEN at phone size (the owner on v4, 2026-10-28: "I don't see any changes in the particles anywhere";
  *  CRAFT §f.6, lib/particles' presets): calm tier-C life a viewer can point at in a 360 px wide frame. Nothing is born
@@ -116,6 +117,11 @@ const LeafGlints: React.FC<{f: ParticlesProps}> = ({f}) => {
 
 export const S1Particles: React.FC = () => (
   <>
+    {/* (paint v6) the far flock: the sky recipe's two-stroke birds as the particle layer's DRAWING, never baked into the
+        sky (PAINT_RECIPES §3 C12); low in the west gap by the sun, pale (55 % toward the sky); a set without it: none */}
+    <S1Plane plane={S1_PLANE.sky} texture={false}>
+      <PaintedLayer piece="flock" />
+    </S1Plane>
     {s1ParticleFields(useSwitches().foliage).map(({plane, f}) => (
       // (the look test: a particle is a mover, not a surface: never mottled, and its own small group stays unfiltered)
       <S1Plane key={f.seed} plane={plane} texture={false}>

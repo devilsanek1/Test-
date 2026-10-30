@@ -18,7 +18,9 @@
  ],
  "light": {
   "sky": {
-   "zenith": "#afb3d8"
+   "zenith": "#afb3d8",
+   "shade": "#9d8fb9",
+   "deep": "#806d9e"
   },
   "local": {
    "window": "#f7cf86",

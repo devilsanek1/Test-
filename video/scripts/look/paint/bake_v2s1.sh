@@ -23,3 +23,12 @@ python3 scripts/look/paint/paint.py scripts/look/paint/v2s1_v4.json --design   #
 python3 scripts/look/paint/paint.py scripts/look/paint/v2s1_v4.json            # v4 painted
 python3 scripts/look/paint/paint.py scripts/look/paint/v2s1_v5.json --design   # v5's flat design stage
 python3 scripts/look/paint/paint.py scripts/look/paint/v2s1_v5.json            # v5: the layered brush
+# v6: the recipe book (docs/look/PAINT_RECIPES.md §4). The canal mirrors OUR design frame (C10): the set rendered
+# without its water first (out/paint/v2s1_v6/design_frame.png), then the water painted on it; v6b = the C14 sky-top A/B.
+python3 scripts/look/paint/paint.py scripts/look/paint/v2s1_v6.json --only sky,clouds,tree,farcity,flock
+python3 scripts/look/paint/paint.py scripts/look/paint/v2s1_v6b.json
+tmp=$(mktemp -d)
+GL=angle node scripts/render-frames.mjs PaintS1 "$tmp" 1.0 --entry=src/entry-look-paint.tsx \
+  --props='{"set":"v6","pieces":["sky","clouds_p1","clouds_p2","clouds_p3","tree","farroofs","fartower","flock"]}' >/dev/null
+mkdir -p out/paint/v2s1_v6 && mv "$tmp"/f00060.png out/paint/v2s1_v6/design_frame.png && rm -rf "$tmp"
+python3 scripts/look/paint/paint.py scripts/look/paint/v2s1_v6.json --only water
