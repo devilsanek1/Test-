@@ -8,7 +8,8 @@ in three views (`people_design/hair_v4/V4.md`, code `src/look/people_dirs/hair_v
 (`people_design/hair_v2/`, rejected: "incoherent", "garbage"). The faces were redrawn beside it (`people_design/
 faces_v2/V4.md`, code `people_v4/`: her cute, him manly; OPEN EYES looking away, never at us, the default by the
 owner's pick ("Let's do open eyes", 2026-10-30); the closed LASH only for downcast, serene moments);
-the bodies are being rebuilt (`people_design/bodies_v4/`). Why the old figures read cheap: `people_design/EVALUATION.md`.
+the bodies rebuilt (`people_design/bodies_v4/`: poses with weight, authored hands, clothes with fit and folds;
+code `people_v4/skel5.ts`, `hand5.ts`, `body5.ts`, entry `src/entry-look-people-bodies4.tsx`), sent to the owner. Why the old figures read cheap: `people_design/EVALUATION.md`.
 
 **IN USE FOR NOW (owner, 2026-10-30): direction C, MODERN GRAPHIC, with the LASH face.** The owner picked C "except
 the face that looks messed up", then, on six new faces (`people_design/faces_graphic.png`, `faces_graphic.md`): "It’s

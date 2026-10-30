@@ -311,3 +311,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-30 ~19:30 UTC: "Let's do open eyes" -> the redrawn faces' open eyes (looking away, never at us; a soft brow, a
   small nose, the lips as a tone) are the default (`src/look/people_dirs/people_v4/head.ts`: eyes 'open'); the closed
   LASH stays for downcast, serene moments. -> rule: playbook, Visual style (People: open eyes that look away).
+- 2026-10-30 ~20:05 UTC (orchestrator): the bodies round looked at beside the references and sent (page version 4, same
+  link): natural poses (contrapposto, walk, lean, ledge, ground), authored hands, six looks with fit and folds, the
+  open eyes in; rough spots named (her calm stance, the coat's far panel, the rail grip, the ground pose, the turn's
+  face swap, the bag) (`docs/look/people_design/bodies_v4/`).
