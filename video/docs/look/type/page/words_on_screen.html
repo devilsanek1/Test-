@@ -1,0 +1,280 @@
+<title>Words on Screen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Gaegu:wght@300;400&family=Nanum+Brush+Script&display=swap">
+<style>
+/* Layout: one phone-width column, like scrolling the feed; stills at phone size, the picks before the detail. */
+:root {
+  --bg: #eceff4;
+  --card: #f8f9fb;
+  --fg: #1b2030;
+  --muted: #586079;
+  --line: #d3d8e2;
+  --accent: #b9601a;       /* the film's warm accent, deepened for a light page */
+  --accent-soft: #f3dcc4;
+  --night: #252c50;        /* the stills' night sky, for frames */
+  --hand: 'Gaegu', 'Comic Sans MS', cursive;
+  --brush: 'Nanum Brush Script', 'Brush Script MT', cursive;
+  --ui: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10142a; --card: #171c36; --fg: #ece7de; --muted: #a3a8c0; --line: #2a3156;
+    --accent: #ffb868; --accent-soft: #3a2f2a; --night: #0b0f22; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10142a; --card: #171c36; --fg: #ece7de; --muted: #a3a8c0; --line: #2a3156;
+  --accent: #ffb868; --accent-soft: #3a2f2a; --night: #0b0f22; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--ui); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 660px; margin: 0 auto; display: grid; gap: 40px; }
+header { display: grid; gap: 14px; padding-top: 28px; }
+h1 { font-family: var(--hand); font-weight: 400; font-size: clamp(44px, 12vw, 64px); line-height: 1; margin: 0; letter-spacing: 0.01em; text-wrap: balance; }
+h1 .b { font-family: var(--brush); color: var(--accent); font-size: 1.15em; }
+h2 { font-family: var(--hand); font-weight: 400; font-size: 34px; line-height: 1.1; margin: 0; text-wrap: balance; }
+h3 { font-family: var(--hand); font-weight: 400; font-size: 27px; line-height: 1.1; margin: 0; }
+p { margin: 0; }
+.lede { font-size: 17px; color: var(--fg); max-width: 60ch; }
+.quote { border-left: 3px solid var(--accent); padding: 2px 0 2px 12px; color: var(--muted); font-size: 15px; }
+.system { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.system li { display: grid; grid-template-columns: 92px 1fr; gap: 12px; align-items: baseline; }
+.system .k { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.sample-hand { font-family: var(--hand); font-weight: 300; font-size: 26px; }
+.sample-brush { font-family: var(--brush); font-size: 32px; color: var(--accent); }
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line);
+}
+.bar .t { font-size: 14px; color: var(--muted); }
+.switch { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; cursor: pointer; user-select: none; }
+.switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.switch .track { width: 46px; height: 28px; border-radius: 14px; background: var(--line); position: relative; transition: background 0.15s; flex: none; }
+.switch .track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--card); box-shadow: 0 1px 2px rgba(0,0,0,0.25); transition: transform 0.15s; }
+.switch input:checked + .track { background: var(--accent); }
+.switch input:checked + .track::after { transform: translateX(18px); }
+.switch input:focus-visible + .track { outline: 2px solid var(--accent); outline-offset: 2px; }
+.frame { position: relative; aspect-ratio: 9 / 16; width: 100%; border-radius: 14px; overflow: hidden; background: var(--night); box-shadow: 0 1px 0 var(--line); }
+.frame img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.frame svg.ui { position: absolute; inset: 0; width: 100%; height: 100%; display: none; pointer-events: none; }
+body.show-ui .frame svg.ui { display: block; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pair figure, .trio figure { margin: 0; display: grid; gap: 6px; min-width: 0; }
+figcaption { font-size: 14px; color: var(--muted); }
+figcaption b { color: var(--fg); font-weight: 600; }
+section { display: grid; gap: 16px; }
+.intro { color: var(--muted); font-size: 15px; }
+.picks { display: grid; gap: 28px; counter-reset: pick; }
+.pick { display: grid; gap: 12px; padding: 18px; background: var(--card); border-radius: 16px; border: 1px solid var(--line); }
+.pick .q { font-size: 17px; font-weight: 600; }
+.pick .q .n { font-family: var(--hand); font-weight: 400; color: var(--accent); font-size: 26px; margin-right: 6px; }
+.pick .opts { display: grid; gap: 4px; font-size: 15px; color: var(--muted); }
+.pick .opts b { color: var(--fg); }
+.pick .rec { font-size: 14px; color: var(--muted); }
+.pick .rec b { color: var(--accent); font-weight: 700; }
+.reply { padding: 14px 16px; border-radius: 12px; background: var(--accent-soft); font-size: 15px; }
+.reply code { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 14px; }
+.recipes { display: grid; gap: 34px; }
+.recipe { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.recipe .meta { display: grid; gap: 8px; min-width: 0; }
+.tag { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.words { font-size: 15px; }
+.words .tm { font-variant-numeric: tabular-nums; color: var(--muted); }
+.look { font-size: 15px; }
+.look b { color: var(--accent); }
+.foot { display: grid; gap: 8px; font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 18px; }
+.foot a { color: var(--accent); }
+@media (max-width: 560px) {
+  .recipe { grid-template-columns: 1fr; }
+  .recipe .frame { max-width: 420px; }
+  .system li { grid-template-columns: 1fr; gap: 2px; }
+}
+@media (prefers-reduced-motion: reduce) { .switch .track, .switch .track::after { transition: none; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="uiFade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.45"/></linearGradient>
+    <linearGradient id="uiFadeTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0.35"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+    <symbol id="ui" viewBox="0 0 1080 1920">
+      <rect x="0" y="0" width="1080" height="230" fill="url(#uiFadeTop)"/>
+      <rect x="0" y="1380" width="1080" height="540" fill="url(#uiFade)"/>
+      <g fill="#fff" font-family="Helvetica, Arial, sans-serif">
+        <text x="30" y="58" font-size="34" font-weight="600">9:41</text>
+        <text x="540" y="135" font-size="38" font-weight="700" text-anchor="middle">Following   For You</text>
+        <rect x="610" y="150" width="90" height="5" rx="2"/>
+        <circle cx="1005" cy="960" r="44" fill="#ddd"/>
+        <path transform="translate(1005 1100)" d="M0 26 C-40 -4 -26 -34 0 -16 C26 -34 40 -4 0 26Z"/>
+        <text x="1005" y="1160" font-size="26" text-anchor="middle">12.4K</text>
+        <ellipse cx="1005" cy="1240" rx="34" ry="28"/>
+        <text x="1005" y="1300" font-size="26" text-anchor="middle">318</text>
+        <path transform="translate(1005 1370)" d="M-30 -10 L30 -30 L18 30Z"/>
+        <text x="1005" y="1430" font-size="26" text-anchor="middle">Share</text>
+        <circle cx="1005" cy="1520" r="38" fill="#333" stroke="#fff" stroke-width="6"/>
+        <text x="40" y="1600" font-size="36" font-weight="700">@whatsallthefuss</text>
+        <text x="40" y="1650" font-size="32">Helsinki wants AI to heat 70,000 homes. Here's how</text>
+        <text x="40" y="1695" font-size="32">it would work... more</text>
+        <text x="40" y="1748" font-size="30">♫ original sound</text>
+        <rect x="0" y="1790" width="1080" height="130" fill="#000" opacity="0.88"/>
+        <g opacity="0.9"><rect x="80" y="1830" width="44" height="40" rx="6"/><rect x="290" y="1830" width="44" height="40" rx="22"/><rect x="490" y="1822" width="100" height="56" rx="14"/><rect x="740" y="1830" width="44" height="40" rx="6"/><circle cx="975" cy="1850" r="22"/></g>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header>
+    <h1>Words on <span class="b">Screen</span></h1>
+    <p class="lede">How the words in our films could look, sit and move: 14 stills on video 4's real words at their real times. The research is distilled into a guide with 10 recipes; six picks for you are below.</p>
+    <p class="quote">"there is so much more we can do to make it look premium, more interesting, dynamic and more engaging"</p>
+    <ul class="system" aria-label="The proposed type system">
+      <li><span class="k">The hand</span><span><span class="sample-hand">every spoken word, light and airy</span><br><small>Gaegu Light, about 1.2x our captions now. The nearest free match to your cat reel's lettering.</small></span></li>
+      <li><span class="k">The brush</span><span><span class="sample-brush">WANTS · 70,000 · heat</span><br><small>Nanum Brush Script, for the 3-5 words the voice leans on, the big numbers and the cover. A brush, not a pen, like the new painted look.</small></span></li>
+      <li><span class="k">Placement</span><span>Set into the open sky or wall by the subject, never a box. Each group moves a little (80-220 px) so the frame stays alive while the eye never hunts.</span></li>
+      <li><span class="k">Motion</span><span>Every spoken word, 2-4 at a time, in the voice's order. Words pop in place or build word by word with the voice, and are never clipped. One landing word may swell or be painted on.</span></li>
+    </ul>
+  </header>
+
+  <div class="bar">
+    <span class="t">Stills are stand-ins: our latest look frame, at dusk and as a snowy night.</span>
+    <label class="switch" for="uiToggle"><input type="checkbox" id="uiToggle"><span class="track" aria-hidden="true"></span>App buttons</label>
+  </div>
+
+  <section aria-labelledby="ba">
+    <h2 id="ba">Before and after, the same moment</h2>
+    <div class="pair">
+      <figure>
+        <div class="frame"><img src="s/01.jpg" alt="Our captions now: Patrick Hand in a fixed centred band, a peach box on WANTS" loading="eager"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
+        <figcaption><b>Now.</b> One font, one size, a fixed band, the peach box.</figcaption>
+      </figure>
+      <figure>
+        <div class="frame"><img src="s/02.jpg" alt="The proposal: But Helsinki in the light hand, WANTS painted in the brush, that heat stepped below" loading="eager"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
+        <figcaption><b>Proposed.</b> The hand, with one painted landing word.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="pk">
+    <h2 id="pk">Your six picks</h2>
+    <p class="intro">Each one changes the guide. My recommendation is under each question.</p>
+    <div class="picks">
+      <div class="pick">
+        <p class="q"><span class="n">1</span>Which hand writes every spoken word?</p>
+        <div class="frame" style="max-width:420px"><img src="s/03.jpg" alt="AI actually runs in three hand fonts: Gaegu Light, Mali Light, Zen Kurenaido" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
+        <div class="opts"><span><b>A. Gaegu Light</b> (top): warm and hand-made, closest to your cat reel.</span><span><b>B. Mali Light</b> (middle): cleaner and rounder.</span><span>Zen Kurenaido (bottom) is out: its "AI" reads as "Al".</span></div>
+        <p class="rec">Recommended: <b>A</b>.</p>
+      </div>
+      <div class="pick">
+        <p class="q"><span class="n">2</span>How do we mark the word the voice leans on?</p>
+        <div class="pair">
+          <figure><div class="frame"><img src="s/02.jpg" alt="WANTS painted big in the brush" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div><figcaption><b>A.</b> The brush (3-5 words a film)</figcaption></figure>
+          <figure><div class="frame"><img src="s/07.jpg" alt="WANTS in the same hand, tinted burnt orange" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div><figcaption><b>B.</b> The same hand, coloured only</figcaption></figure>
+        </div>
+        <p class="rec">Recommended: <b>both</b>. The brush for the few landing words and numbers, the colour for everyday stress.</p>
+      </div>
+      <div class="pick">
+        <p class="q"><span class="n">3</span>May a landing word be painted on, stroke by stroke?</p>
+        <div class="frame" style="max-width:420px"><img src="s/14.jpg" alt="WANTS caught mid-write: WAN and the first stroke of T painted" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
+        <div class="opts"><span>About 0.2 s, led by a brush tip, the way frame 0 paints the scene. For a few frames you see part of a letter.</span><span><b>A. Yes</b>, for landing words and the lettered phrase only. <b>B. No</b>, every word pops in whole.</span></div>
+        <p class="rec">Recommended: <b>A</b>, shown first in the G4 look clip so you can judge it moving.</p>
+      </div>
+      <div class="pick">
+        <p class="q"><span class="n">4</span>Where do the words sit?</p>
+        <div class="frame" style="max-width:420px"><img src="s/13.jpg" alt="Four moments from one shot: each word group sits a little left, centre or right" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
+        <div class="opts"><span><b>A. Follow the open space</b> by the subject: above it by default, beside it in close shots, moving a little between groups (four moments of one shot above).</span><span><b>B. One fixed band</b>, only the line stagger varies.</span></div>
+        <p class="rec">Recommended: <b>A</b>.</p>
+      </div>
+      <div class="pick">
+        <p class="q"><span class="n">5</span>Which cover title?</p>
+        <div class="pair">
+          <figure><div class="frame"><img src="s/11.jpg" alt="Cover in the hand with heat in the brush" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div><figcaption><b>A.</b> The hand + one brush word</figcaption></figure>
+          <figure><div class="frame"><img src="s/12.jpg" alt="Cover in thin geometric capitals like the city posters" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div><figcaption><b>B.</b> The posters' thin capitals</figcaption></figure>
+        </div>
+        <p class="rec">Recommended: <b>A</b>, the same hand as the film so the grid reads as one series.</p>
+      </div>
+      <div class="pick">
+        <p class="q"><span class="n">6</span>Is the size contrast enough?</p>
+        <div class="pair">
+          <figure><div class="frame"><img src="s/04.jpg" alt="Everyday caption: on giant computers, in the light hand" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div><figcaption>Everyday words</figcaption></figure>
+          <figure><div class="frame"><img src="s/06.jpg" alt="The big number 70,000 in the brush over homes" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div><figcaption>A big number</figcaption></figure>
+        </div>
+        <div class="opts"><span>Three steps: everyday 116 px, hook and payoff 136 px, brush 184-300 px.</span><span><b>A. Keep it.</b> <b>B. Bigger everyday words</b> (fewer words per line, more two-line groups).</span></div>
+        <p class="rec">Recommended: <b>A</b>. It's your call by eye.</p>
+      </div>
+    </div>
+    <p class="reply">Answer in chat, for example: <code>1A 2both 3A 4A 5A 6A</code>, plus anything that feels off.</p>
+  </section>
+
+  <section aria-labelledby="rc">
+    <h2 id="rc">Every recipe, on video 4</h2>
+    <div class="recipes">
+      <div class="recipe">
+        <div class="frame"><img src="s/05.jpg" alt="Did you know / Helsinki in the hand, a step bigger" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
+        <div class="meta"><span class="tag">R2 · The hook · still 05</span><h3>Frame 0 shows the first words</h3>
+          <p class="words">"Did you know / Helsinki" <span class="tm">0.00 → 0.60 s</span></p>
+          <p class="look"><b>Look at:</b> a step bigger to stop a thumb, still calm. Frame 0 shows line one alone, in the same place.</p></div>
+      </div>
+      <div class="recipe">
+        <div class="frame"><img src="s/06.jpg" alt="70,000 in amber brush over homes" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
+        <div class="meta"><span class="tag">R3 · The big number · still 06</span><h3>The number reads first</h3>
+          <p class="words">"70,000 / homes?" <span class="tm">2.30 → 3.38 s</span></p>
+          <p class="look"><b>Look at:</b> amber like the lit windows, so the number feels part of the city. Numerals, not words.</p></div>
+      </div>
+      <div class="recipe">
+        <div class="frame"><img src="s/04.jpg" alt="on giant / computers in the light hand, staggered" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
+        <div class="meta"><span class="tag">R1 · The everyday caption · still 04</span><h3>About 70 % of the film</h3>
+          <p class="words">"on giant / computers," <span class="tm">5.28 → 6.47 s</span></p>
+          <p class="look"><b>Look at:</b> light and airy, yet it reads at a glance. Two lines stepped like hand lettering, never a centred stack.</p></div>
+      </div>
+      <div class="recipe">
+        <div class="frame"><img src="s/08.jpg" alt="That's a lot / of tea, the last word bigger" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
+        <div class="meta"><span class="tag">R6 · The lettered phrase · still 08</span><h3>Your cat reel's manner</h3>
+          <p class="words">"That's a lot / of tea." <span class="tm">17.72 → 18.58 s</span></p>
+          <p class="look"><b>Look at:</b> words lettered into the open sky, the last word bigger and lower, landing with the mug. Once or twice a film, on a light beat.</p></div>
+      </div>
+      <div class="recipe">
+        <div class="frame"><img src="s/09.jpg" alt="A paper tag reading 2027 on the building, the caption starting next year above" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
+        <div class="meta"><span class="tag">R7 · The word in the world · still 09</span><h3>A word that lives on a thing</h3>
+          <p class="words">Tag "2027", caption "starting / next year." <span class="tm">27.03 → 28.30 s</span></p>
+          <p class="look"><b>Look at:</b> the year belongs to the place and moves with the camera. The caption and the tag never repeat a word.</p></div>
+      </div>
+      <div class="recipe">
+        <div class="frame"><img src="s/10.jpg" alt="So your chatbot / could soon heat, heat in amber brush" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
+        <div class="meta"><span class="tag">R9 · The payoff · still 10</span><h3>The core line lands on one warm word</h3>
+          <p class="words">"So your chatbot / could soon heat" <span class="tm">38.43 → 39.93 s</span></p>
+          <p class="look"><b>Look at:</b> "heat" is the only accent on screen, at the end of the sentence. The last group then comes in at the hook's size, so the film's ends match.</p></div>
+      </div>
+      <div class="recipe">
+        <div class="frame"><img src="s/13.jpg" alt="Four moments of one shot, groups at slightly different seats" loading="lazy"><svg class="ui" viewBox="0 0 1080 1920"><use href="#ui"/></svg></div>
+        <div class="meta"><span class="tag">R1 in motion · still 13</span><h3>The words walk a little</h3>
+          <p class="words">Four groups of one shot <span class="tm">4.50 · 6.00 · 7.00 · 8.00 s</span></p>
+          <p class="look"><b>Look at:</b> each move is 80-160 px, so the frame feels alive and the eye never hunts.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p>Built on the owner's two references, 15 sourced findings (platform safe zones, caption reading speed, emphasis, contrast without boxes) and 85 free fonts tested against your reel's lettering. Every font here is free for commercial use.</p>
+    <p>The full guide, with exact sizes, positions and timings for each recipe: <a href="https://github.com/devilsanek1/Test-/blob/claude/kind-pascal-lvgsza/video/docs/look/TYPE_GUIDE.md" target="_blank" rel="noopener">TYPE_GUIDE.md</a>. The research: <a href="https://github.com/devilsanek1/Test-/blob/claude/kind-pascal-lvgsza/video/docs/look/type/RESEARCH.md" target="_blank" rel="noopener">RESEARCH.md</a>.</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var box = document.getElementById('uiToggle');
+  function apply() { document.body.classList.toggle('show-ui', box.checked); }
+  try { box.checked = localStorage.getItem('wos-ui') === '1'; } catch (e) {}
+  apply();
+  box.addEventListener('change', function () {
+    apply();
+    try { localStorage.setItem('wos-ui', box.checked ? '1' : '0'); } catch (e) {}
+  });
+})();
+</script>

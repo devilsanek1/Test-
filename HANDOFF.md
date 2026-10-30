@@ -213,6 +213,12 @@ Everything that agent knew is in this repo. This file is the map; the details li
   like a visual script with what happens on the screen and camera movements"; `video/docs/v4/visual/`, method
   `METHOD.md`) sent to the owner; next G3. New tools: `scripts/voice/{textnorm,shape_take,measure_take,take_page,
   check_clarity}.py`. Live state: `video/docs/v4/README.md`. Video 5 still waits at G1 (`video/docs/v5/script/WRITER_BRIEF.md`).
+  2026-10-30: video-production merged into the branch (the painted look, the production/iteration modes); the style
+  adjustments to the visual script (`video/docs/v4/visual/STYLE_ADJUSTMENTS.md`) wait to be folded in before G3. **The
+  words on screen** (owner, 2026-10-30: fonts and caption placement "premium, more interesting, dynamic and more
+  engaging"): an iteration (research, the guide `video/docs/look/TYPE_GUIDE.md` DRAFT with 10 recipes, 14 stills in
+  `video/docs/look/type/stills/`, tooling `video/scripts/type/`), sent on https://claude.ai/artifact/1magumGxnA4TGdeEQPc1Hv
+  with six picks; on the owner's picks, apply the guide's §g doc edits (LAYOUT, DIRECTION rule 10, the playbook).
 
 ### Earlier: video 5 as the heat story
 - **Video 5 is produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt since 2026-10-29 ~07:55 UTC**

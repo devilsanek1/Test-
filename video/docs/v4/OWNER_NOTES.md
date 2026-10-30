@@ -232,5 +232,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   much more we can do to make it look premium, more interesting, dynamic and more engaging / Research —-> distill it in
   the guidebook and recipes to use —-> give me still examples" -> an iteration (two max-effort agents: the research,
   then the guide with its recipes and the stills, rendered on v4's words over our latest look frames), sent on a
-  private page; the references measured in `docs/look/type/refs/README.md`. -> rule: playbook, Visual style (the words
+  private page: https://claude.ai/artifact/1magumGxnA4TGdeEQPc1Hv (14 stills, before and after, six picks; the guide
+  `docs/look/TYPE_GUIDE.md` DRAFT, the research `docs/look/type/RESEARCH.md`); the references measured in
+  `docs/look/type/refs/README.md`. -> rule: playbook, Visual style (the words
   on screen are designed, never one static block).
