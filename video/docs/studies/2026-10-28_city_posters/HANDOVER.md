@@ -6,6 +6,13 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-30 ~20:55 UTC: one state with video 4 (owner: production of video 4 in parallel)
+- Merged `claude/kind-pascal-lvgsza` into ours (one conflict, PIPELINE_V2's table rows, merged word by word; DIRECTION's
+  stale LASH lines -> the open-eye pick; typecheck clean) and pushed the same commit to all three branches. The v7 step B
+  agent was told to draw her with the overhaul's people (hair v4, open eyes, bodies5), not LASH.
+- The Helsinki pass's first draft is on video 4's branch (WIP commit); its critic + fix still run in
+  composition-library-v2, writing in the worktree `scratchpad/v4wt` (pull --no-rebase there before committing).
+
 ## Status 2026-10-30 ~20:35 UTC: v7a DONE and sent; v7 step B runs
 - v7a (`paint_test/paint_still_v7a.png`, `compare_v7a.jpg`): the door is the one place to look, one key, props cut;
   under L* 40 7 % -> 47 %, off-family 16 % -> 0.5 %. Our read: the top half works; the bottom 40 % is an empty purple
