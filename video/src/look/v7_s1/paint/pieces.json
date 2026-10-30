@@ -11,8 +11,8 @@
   "faces": 1671,
   "lost_lines": 101,
   "md5": "6d8d25d2b34e6dd4fa53fd95993e2e21",
-  "mypaint_s": 0.7,
-  "seconds": 5.84,
+  "mypaint_s": 0.66,
+  "seconds": 5.1,
   "slot": "facade",
   "states": {
    "blind": 8,
@@ -37,8 +37,8 @@
   ],
   "bytes": 63154,
   "md5": "f09b390b03fab8a3a2087669391eff2d",
-  "mypaint_s": 0.37,
-  "seconds": 5.17,
+  "mypaint_s": 0.41,
+  "seconds": 5.2,
   "slot": "farcity",
   "strokes": {
    "far": 36
@@ -55,8 +55,8 @@
   "bytes": 17600,
   "faces": 91,
   "md5": "74fa36771a1e6096ce7b5ac1859e5e15",
-  "mypaint_s": 0.16,
-  "seconds": 1.22,
+  "mypaint_s": 0.17,
+  "seconds": 0.47,
   "slot": "prop",
   "strokes": {
    "form": 12
@@ -73,7 +73,7 @@
   "md5": "0d2acff5942f08a72c8da2367f215583",
   "mypaint_s": 5.11,
   "puddle_px": 95170,
-  "seconds": 14.9,
+  "seconds": 13.67,
   "slot": "paving",
   "strokes": {
    "accent": 22,

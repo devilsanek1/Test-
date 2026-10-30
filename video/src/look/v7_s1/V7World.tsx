@@ -238,7 +238,8 @@ export const V7World: React.FC<V7WorldProps> = ({towpath, pip}) => (
 
 /** OUR BANK (light_s1's LightS1Steps, cut): the coping, the landing and the treads with their lips' shades (the bench
  *  is cut); the near plane holds the one table and chair (./V7Props). In look 'v7' the painted quay REPLACES the stone
- *  bands (painted from their flat render: the same coping, landing, treads and lips), so they are not drawn under it. */
+ *  bands (painted from their flat render: the same coping, landing, treads and lips), so they are not drawn under it,
+ *  and the painted table and chair replace the vector pair (their contact shadows and the fallen leaves stay). */
 export const V7Steps: React.FC = () => {
   const paving = usePiece('paving');
   const prop = usePiece('prop');
