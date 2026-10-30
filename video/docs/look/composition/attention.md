@@ -12,7 +12,8 @@ and hold the eye, from visual-attention and eye-tracking research (salience, fac
 centre, the first fixation), the first second after a swipe, and what short-form and film research say about hooks,
 pattern interrupts, change rate and the cost of clutter. Each finding is ranked by its evidence and the size of its
 effect (§3) and turned into a usable rule with numbers for our 1080 x 1920 frame (§6), with how animations and
-transitions fit (§8).
+transitions fit (§8). The other lanes of this round cover modern cinematography (`modern.md`, M1-M29) and motion and
+transitions in full; this page gives only their attention side (§3's note on modern film, §8).
 
 **The owner's references stay the spine.** His 41 ideas (`reels.md` A1-E11: 30 named in his five reels, 11 the
 examples make) are scored one by one for attention in §7, with the evidence for why each pulls the eye or does not.
@@ -21,7 +22,8 @@ Everything else on this page is our research, an ADDITION to his references, nev
 
 **Rank.** Research notes, the lowest rank on DIRECTION's ladder: nothing here is a rule until it is integrated into the
 doc named in §6's last column. Methods only: no footage copied or traced, no creator named, no living artist as a style
-target. Paths are from `video/`; sibling notes are cited by their tags: `cinema.md` [S1]-[S20] and C1-C14, `vertical.md`
+target. Paths are from `video/`; bare file names are this folder's siblings (`docs/look/composition/`) or docs in
+`docs/look/` and `docs/`. Sibling notes are cited by their tags: `cinema.md` [S1]-[S20] and C1-C14, `vertical.md`
 [V1]-[V15] and V1-V14, `reels.md` A1-E11, `organic/composition.md` R1-R12, `COMPOSITION_SHOTS.md` rules 1-13 and
 SR1-SR24.
 
@@ -77,10 +79,11 @@ reach from this session; "est." our own estimate. Sources [AT1]-[AT62] are in §
    steady), and the "you" is turned so its own pull routes into the focal (COMPOSITION_SHOTS rule 7).
 6. **The first second after a swipe, in numbers** (§4): the page settles at ~0.4 s (measured, `vertical.md` §4); the
    gist of a scene comes from 19-67 ms of looking [AT1]; the first saccade follows ~0.15-0.3 s after the picture is
-   there, aimed by the centre and by salience; the subject and the first caption line are read by ~1-1.2 s; the stay-or-swipe decision falls at
-   ~1.5-2 s (1.7 s per mobile feed item [V4]; ~1.5-2 s of active attention on fast feeds [AT55]). So the subject's bold
-   onset peaks at 0.4-0.7 s in the golden box with its sound, the subject changes again at ~1.2-1.7 s (rewarding the
-   eye's return from the caption), and reality overtakes the expectation at ~2 s (DIRECTION rule 9).
+   there, aimed by the centre and by salience; the subject and the first caption line are read by ~1-1.2 s; the
+   stay-or-swipe decision falls at ~1.5-2 s (1.7 s per mobile feed item [V4]; ~1.5-2 s of active attention on fast
+   feeds [AT55]). So the subject's bold onset peaks at 0.4-0.7 s in the golden box with its sound, the subject changes
+   again at ~1.2-1.7 s (rewarding the eye's return from the caption), and reality overtakes the expectation at ~2 s
+   (DIRECTION rule 9).
 7. **Clutter has a measured price; fullness does not.** Dense perceptual features (edges, colours, luminance
    variation) cut attention to the key element and liking, while an elaborate design of objects raises both (249 ads
    eye-tracked [AT26]); feelings on smaller faces are read more slowly, more so in clutter, and films hold such shots
@@ -325,6 +328,18 @@ already in force says so; the rest are new.
 | AR17 | **Coherence.** Nothing interesting but off-story pulls at >= 50 % of the focal, sits in the drop or on a line into the focal (Pip's hiding rule is this rule); one idea per shot | L8; [AT35] (S+) | DIRECTION rule 2 (in force) |
 | AR18 | **Measure attention cheaply** (tooling proposals). (a) The flash test: each key frame shown for 0.25 s at feed size to a fresh viewer, or to a vision-model panel, asking "what is it and where did you look?"; (b) an onset map: per 0.5 s window, the share of pixels that START moving that belong to tier A (>= 60 %, the onset form of `CRAFT.md` §b's motion share); (c) a glyph check: no rows of letter-like marks outside the band; (d) a clutter meter around the focal (Feature Congestion or Subband Entropy, which tracks a JPEG's file size [AT24]), compared with the owner's references. Spectral-residual saliency is not reliable enough to gate on [AT62] | [AT24], [AT62]; est. | `CRAFT.md` checks; `scripts/qa/` |
 
+**The attention check for one shot (ours; ten questions for a G3 panel or a still, at feed size).**
+1. Flashed for 0.25 s, does the eye land on the subject (AR1)?
+2. Is the focal within ~150 px of the visible centre, or within ~220 px of the last shot's focal (AR2)?
+3. Is the subject big enough for its beat, or the singleton of a calm field (AR3)?
+4. Is everything within ~370 px of it tone-on-tone, with nothing named within ~150-220 px (AR4)?
+5. What is the beat's ONE onset, and is it the subject's, inside the golden box, with its sound (AR5, AR12)?
+6. Are there any words or letter-like marks outside the band and the one number (AR7)?
+7. Where do the people, birds and Pip pull, and does each person face the subject (AR8, AR9)?
+8. Do the lines, the vanishing point, the finest detail and the light all end on the subject (AR9-AR11)?
+9. Does the join in and out land where the eye already is, on a motion (AR13)?
+10. What changes on the subject every ~1.5-3 s, and does each change stay on screen >= 0.5 s (AR6, AR14)?
+
 ## 7. The owner's 41 ideas through attention (his references are the spine)
 
 Each idea from `reels.md` §3 (its 9:16 verdict stays there), scored for **attention only**: how strongly the device by
@@ -369,7 +384,7 @@ must carry the eye instead: the light, the onset and the singleton (L1, L5, L6).
 | D4 | Unbalanced (the steelyard) | one strong call and one big soft mass: one singleton | S, indirect | **3** | the counterweight soft, high or on the left (R8, V11) |
 | D5 | Pyramid | a convergence at the apex; stable | none | **2** | the apex under the band, lit |
 | D6 | Juxtaposition | two fields and their seam | indirect | **2** | the subject at the seam, one field quiet |
-| D7 | Patterns / repetition with one break | the textbook singleton: uniform distractors make the odd one pop out [AT22]; the window-row example was the cleanest reel frame (1 call, 73 % quiet: `reels.md` §6) | S+ | **5** | the pattern tone-on-tone inside one mass; the one break lit, with the person in it |
+| D7 | Patterns / repetition with one break | the textbook singleton: uniform distractors make the odd one pop out [AT22]; the window-row example had the fewest calls of all the reel frames (1 value call, 73 % quiet: `reels.md` §6) | S+ | **5** | the pattern tone-on-tone inside one mass; the one break lit, with the person in it |
 | E1 | One small figure where the lines meet | a person, a convergence and (usually) the centre on one point | S+ | **5** | the figure 130-220 px at the convergence, on the axis, in the light |
 | E2 | The lit opening | the brightest area, an enclosure, a figure and the centre on one point | S+ | **5** | R4: the subject, the story light and the hardest step in one place |
 | E3 | Stillness against motion | in a uniform flow the still thing is the motion singleton (animation practice [S6]); but motion predicts gaze [AT13], so ONE mover passing behind pulls the eye off | P, S indirect | **4** | life passes as one even flow (one band, one direction, one speed, low contrast) while the subject holds; never a single mover behind it |
@@ -453,8 +468,9 @@ column is where each belongs.
 6. **COMPOSITION_SHOTS rule 13 and V9 ("read as one gist at 0.25 s").** Supported: the gist comes from 19-67 ms of
    looking [AT1], the first saccade ~0.2 s after the page settles. **Proposal:** add the second change on the subject at
    ~1.2-1.7 s (AR15).
-7. **The playbook's "words in the picture are few and big".** Strengthened: even unreadable, upside-down or unknown-script
-   text pulls the eye [AT17]. **Proposal:** "no rows of glyph-like marks outside the band" in `LAYOUT.md` §3 (AR7).
+7. **The playbook's "words in the picture are few and big".** Strengthened: even unreadable, upside-down or
+   unknown-script text pulls the eye [AT17]. **Proposal:** "no rows of glyph-like marks outside the band" in
+   `LAYOUT.md` §3 (AR7).
 8. **DIRECTION rule 2's Pip ("found on a second look, never on the subject's eye path").** Consistent with the evidence
    on seductive details [AT35] and animate motion [AT14]; **refinement:** Pip never moves with animate starts or turns
    within 370 px of the focal.
