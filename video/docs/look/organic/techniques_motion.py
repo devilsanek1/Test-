@@ -2,7 +2,7 @@
 
 A 540 x 540 crop of the v6 still under the parallax float (3 x 1.5 px sine, 4 s, 60 fps, bilinear like the browser's
 image draw), encoded with x264 CRF 18; prints kbit/s per variant: v6 as is, the techniques by intent (baked, locked),
-an LIC texture everywhere, and the same edges re-seeded every frame (boil). From video/:
+the light edge strokes (baked), an LIC texture everywhere, and the same edges re-seeded every frame (boil). From video/:
   python3 docs/look/organic/techniques_motion.py [--out /tmp/organic_motion]
 """
 import argparse, json, os, subprocess, sys
@@ -38,7 +38,7 @@ if __name__ == '__main__':
     near = still[y0:y1, x0:x1].copy()
     lbl = D.clean_regions(near, k=20, seed=3)
     fx, fy = D.flow_field(near, 17.0)
-    variants = {'a_v6': near, 'b_by_intent': D.near_by_intent(near),
+    variants = {'a_v6': near, 'b_by_intent': D.near_by_intent(near), 'e_edge_strokes': D.near_strokes(near, 14),
                 'c_lic_everywhere': D.brush_texture(D.colour_oscillation(near, 9, 0.02, 0.008, 70), 11, fx, fy,
                                                     amp=0.03, length=14, lbl=lbl)}
     res = {}

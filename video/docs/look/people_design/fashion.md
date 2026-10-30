@@ -38,14 +38,14 @@ style target.
    (suede, fringe, butter yellow, burgundy, red accents, wired headphones) are at most ONE accent per figure. Never
    the one-season items (fawn print, pillbox hats, fur coats, cummerbund belts, bag charms). (§2.8)
 2. **The 2026 line is long, clean and balanced.** After five years of oversized everything, autumn 2026 swings back:
-   slim-straight jeans are "quietly taking the place of baggy jeans" [1]; fitted and cropped jackets, polished knits
-   and streamlined denim replace the oversized blazer over baggy jeans [4]. Drawn: ONE roomy piece per figure (a long
-   coat, wide trousers, a full skirt, a big shirt) against compact pieces, and an unbroken leg line down to a slim,
-   low shoe. That is also what reads elegant (`design_research.md` §3).
-3. **The feet are the tell.** Chunky sneakers and platforms read 2018-2022 [4]; 2026 feet are slim and low: ballet
-   flats (in colour, in mesh), slim retro sneakers with a contrasting stripe, loafers (men with white socks), kitten
-   heels [11]. Drawn: a long, low wedge, 0.13-0.15 H long and 0.025-0.035 H tall. Our people's round blob feet are
-   one of their oldest tells.
+   slim-straight jeans are "quietly taking the place of baggy jeans" [1]; fitted jackets, slim cardigans, polished
+   knits and streamlined denim replace the oversized blazer over baggy jeans [4]. Drawn: ONE roomy piece per figure (a
+   long coat, wide trousers, a full skirt, a big shirt) against compact pieces, and an unbroken leg line down to a
+   slim, low shoe. That is also what reads elegant (`design_research.md` §3).
+3. **The feet are the tell.** Chunky sneakers and platforms are on 2026's dated lists [4], replaced by slim,
+   low-profile sneakers [11]; 2026 feet are slim and low: ballet flats (in colour, in mesh), slim retro sneakers with
+   a contrasting stripe, loafers (men with white socks), kitten heels [11]. Drawn: a long, low wedge, 0.15-0.16 H long
+   and 0.025-0.05 H tall. In our observation, our people's round blob feet are one of their oldest tells.
 4. **New York = structure and darks; Los Angeles = ease and light** [5][6]. New York: tailored, dark neutrals (black,
    navy, chocolate, burgundy), layered outerwear (the long coat, the trench, leather; a puffer in deep winter),
    polished low shoes, a tote or a shoulder bag, headphones. Los Angeles: relaxed and loose, light and varied colours
@@ -71,7 +71,8 @@ style target.
    the big soft tote [13]; over-ear wired headphones (the band, the cup, a thin cable) [13]; a cap (warm coast); an
    iced coffee or a phone in the hand. Jewellery only at 300 px and up (one gold hoop's glint).
 9. **Fourteen looks and ten hairstyles** (§4, §5), each as 3-6 shapes, a colour pair, the one detail that sells it
-   and what is left of it at 50 px. The board draws them all at 520 px and again at film size.
+   and what is left of it at 50 px. The board draws them all at 520 px and again at film size (180 and 60 px, 1:1),
+   and §4.3 says honestly what survives there.
 10. **Never** (§8): skinny jeans with ankle boots; the belted A-line coat with tights, ankle boots and a blanket scarf
     (the 2014-2017 autumn uniform, and our refined her's current outfit); chunky sneakers; tiny oval sunglasses;
     micro bags; the oversized blazer over baggy jeans; head-to-toe beige; light-wash mom jeans; pompom beanies; the
@@ -102,7 +103,8 @@ style target.
 **Women.** Structured and considered: the long, structured, often oversized wool coat in earthy shades; the trench;
 the cropped or high-collared leather jacket; suede jackets; boxy sweater vests and sleeveless knits over shirts;
 button-up shirts untucked or half-tucked with loafers; sheer and statement skirts; black wide trousers; navy beside
-black as the neutral; red shoes and bags as the accent [1][2][6]. A March 2026 cool-girl look in Midtown: a sheer
+black as the neutral; red shoes and bags as the accent; camo and a leopard coat as this season's louder notes (we
+skip them) [1][2][6]. A March 2026 cool-girl look in Midtown: a sheer
 lace midi skirt, a high-collared leather jacket and slingback pumps [5]. Jeans are worn with polished separates:
 blazers and pumps rather than sneakers [5]. Shoes: loafers (suede), ballet flats, Mary Janes, kitten heels [11].
 
@@ -124,7 +126,7 @@ and sneakers [5].
 
 **Men.** Boxy, cropped short-sleeve camp-collar shirts (solid, retro stripes, knitted or open-weave), worn untucked;
 longer, roomier shorts (knee-length jorts or chinos); suede or woven loafers with white crew socks; relaxed or barrel
-trousers; oversized tees; a cap; a warm palette (burnt orange, ochre, crimson; forest green, camel, slate blue)
+trousers; oversized tees; a cap; a warm palette (one L.A. retailer names forest green, burgundy, camel and slate blue)
 [6][15].
 
 ### 2.4 Hair
@@ -225,9 +227,12 @@ From the "dated" lists of autumn 2026 [4] and our own reading of what ages a dra
 | 50-80 px (mid ground) | a top-bottom value split, the coat's length, the hair mass, two foot dots | 3-5 |
 | 20-40 px (far crowd) | a column with a top-bottom split and a head | 2 |
 
-A detail survives at phone size only if it is at least 0.02 H across (4 px on a 200 px figure) with a 15 L* step, or
-a true line (a strap, a cable, piping) of 0.006 H (1 px) or more with a strong step. Logos, prints, buttons,
-stitching and jewellery are never drawn under 300 px.
+[ours] A detail survives at phone size only if it is at least 0.02 H across (4 px on a 200 px figure) with a 15 L*
+step, or a true line (a strap, a cable, piping) of 0.006 H (1 px) or more with a strong step. Logos, prints,
+buttons, stitching and jewellery are never drawn under 300 px. **A detail made of skin against a garment** (an open
+collar's V, a bare ankle above a flat, a pushed-up sleeve) needs the same 15 L* step between that skin and that
+garment: on deep skin pick a light garment, on light skin a mid or dark one. (The board's first camp shirt, rust on
+skin S4, lost its V at every size; in baby pink it reads.)
 
 ### 3.2 Lengths and widths (in H, measured up from the sole)
 
@@ -240,8 +245,10 @@ stitching and jewellery are never drawn under 300 px.
   0.26-0.28; wide trouser leg 0.13-0.14 each; straight 0.10-0.11; slim-straight 0.085-0.09.
 - **Shoulders:** dropped (the seam 0.02-0.035 H outside and below the shoulder point, one soft arc) for coats,
   shirts, tees and knits; natural for the leather jacket and the blazer.
-- **Shoes** (profile): ballet flat 0.13 long x 0.025 tall, the vamp low (a skin sliver over the foot); slim sneaker
-  0.15 x 0.035, a light sole band 0.008; loafer 0.14 x 0.035; kitten heel a 0.02 heel under a pointed toe.
+- **Shoes** (profile, as drawn on the board): ballet flat 0.16 long x 0.023 tall, the vamp low (a skin sliver over
+  the instep); slim sneaker 0.16 x 0.05 at the tongue, a light sole band 0.009; loafer 0.16 x 0.04 with a saddle
+  band; kitten slingback a 0.022 heel under a pointed toe, the strap a line. Dated, for contrast: the chunky sneaker
+  0.19 x 0.075 with a 0.026 sole; the round blob foot.
 
 ### 3.3 Materials in two or three flat planes
 
@@ -271,7 +278,7 @@ the accent is optional and goes on at most one person in four in a crowd (`desig
 | | look | shapes | colour pair (+ accent) | the one detail | at 50 px |
 |---|---|---|---|---|---|
 | N1 | **The long open coat** (W) [1][14] | 1. a long wool coat from dropped shoulders to 0.18 H, unbelted, hanging straight from the shoulder blades (0.04-0.05 H off the body at the hem); 2. the dark column (a fine knit and wide trousers in ONE tone) showing in the open front; 3. wide trouser legs below the hem, full length; 4. low loafers or pointed flats; 5. a slouchy shoulder bag tucked under the arm | chocolate `#664334` + near-black `#2E2426` | the coat **open and unbelted**, its two front edges hanging straight with the dark column between them | a long warm column, a dark strip, two dark feet |
-| N2 | **The trench, belt untied** (W) [2][14] | 1. a trench to just below the knee (0.24-0.28 H), worn open, a wide collar; 2. the belt untied: two tails hanging from the waist loops (0.012 H wide, 0.18 and 0.12 H long); 3. slim-straight dark jeans to the ankle; 4. ballet flats; 5. an east-west bag under the arm | caramel `#B58058` + indigo `#2F4566` (+ red flats `#C7463F`); or butter `#F4E2A5` + navy | the **loose belt tails**: they are the look's flowing element, thinner and lighter than a wool scarf (`people.md` §4.1 asked for exactly this) | a warm knee-length shape over dark legs, two red dots |
+| N2 | **The trench, belt untied** (W) [2][14] | 1. a trench to just below the knee (0.24-0.28 H), worn open, a wide collar; 2. the belt untied: two tails hanging from the side loops and streaming back (0.016 H wide, 0.18 and 0.12 H long); 3. slim-straight dark jeans to the ankle; 4. ballet flats; 5. (optional) a bag in the far hand, never an east-west bag pressed under the near arm: at film size it reads as a belt across the open coat (the board tried it and dropped it) | caramel `#B58058` + indigo `#2F4566` (+ red flats `#C7463F`); or butter `#F4E2A5` + navy | the **loose belt tails**: they are the look's flowing element, thinner and lighter than a wool scarf (`people.md` §4.1 asked for exactly this) | a warm knee-length shape over dark legs, two red dots |
 | N3 | **The leather jacket and the statement skirt** (W) [1][2] | 1. a cropped leather jacket ending at the waist (0.60 H), boxy, a high or funnel collar to the jaw; 2. a midi skirt to 0.18-0.20 H, A-line or bias; 3. slim bare legs with an ankle; 4. slingback kitten heels or pointed flats | near-black `#2E2426` + tomato `#C8503E`; or burgundy `#743137` + cream `#E9DBCA` | the **waist where a short dark jacket meets a long full skirt** (at 300 px and up: one crisp highlight on the leather) | a dark top on a coloured bell, two thin legs |
 | N4 | **The commuter knit** (W) [1][4][13] | 1. a polished fine knit or a boxy sweater vest to the hip, compact; 2. the white shirt showing at the collar, the hem and the cuffs (0.012-0.02 H bands); 3. wide black trousers, full length; 4. loafers; 5. over-ear wired headphones; 6. a big soft tote on the shoulder | navy `#254161` + near-black `#2E2426`, the cloud-white `#F0EAE1` shirt as the light at the neck | the **over-ear headphones**: a band over the crown and a cup over the ear change the head's silhouette | a navy top, a white neck dot, black legs, a big bag |
 | N5 | **Suede and white socks** (M) [15][11] | 1. a boxy suede jacket or chore coat to the hip, dropped shoulders; 2. a cream tee at the neck; 3. relaxed pleated trousers, straight, a slight break; 4. white crew socks showing 0.02-0.03 H above the shoe; 5. dark loafers; 6. a crossbody strap | caramel `#B58058` + navy `#254161`; or chocolate + cream | the **white sock flash** between the dark trouser and the dark loafer | a warm box on dark legs, two white dots |
@@ -285,13 +292,32 @@ bands, a high collar); N1's coat stays.
 
 | | look | shapes | colour pair (+ accent) | the one detail | at 50 px |
 |---|---|---|---|---|---|
-| L1 | **The big shirt and coloured flats** (W) [5] | 1. an oversized button-down, dropped shoulders, sleeves pushed up to the forearm, half-tucked; 2. relaxed wide-leg jeans, full length; 3. ballet flats in a colour; 4. big sunglasses; 5. a slouchy shoulder bag | cloud `#F0EAE1` + denim `#5781A0` (+ baby-pink flats `#E9B9B3`) | the **half tuck**: tucked at the front, loose at the back (the back hem 0.08 H lower) | a white top on a blue column, two pink dots |
+| L1 | **The big shirt and coloured flats** (W) [5] | 1. an oversized button-down, dropped shoulders, sleeves pushed up to the forearm, half-tucked; 2. relaxed wide-leg jeans, full length; 3. ballet flats in a colour; 4. big sunglasses; 5. (optional) a slouchy shoulder bag | cloud `#F0EAE1` + denim `#5781A0` (+ baby-pink flats `#E9B9B3`) | the **half tuck**: tucked at the front, loose at the back (the back hem 0.08 H lower). It is the library's one double-roomy look, and the tuck is what gives it a waist: untucked, a big shirt over wide jeans reads 2022 (§2.7) | a white top on a blue column, two pink dots |
 | L2 | **Baby tee, jeans, cap and ponytail** (W) [5][12] | 1. a fitted baby tee or ribbed tank, ending at the waist; 2. relaxed straight jeans with a slight stack at the ankle; 3. slim sneakers; 4. a cap, the ponytail pulled through its back; 5. wrap sunglasses | cloud `#F0EAE1` + indigo `#2F4566` (+ a red cap `#C7463F`) | the **ponytail through the cap**: the head's silhouette and the flowing element | a light short top, long dark legs, a red dot on the head |
 | L3 | **The slip skirt and the big knit** (W) [2][5] | 1. a bias-cut satin midi slip skirt, clinging at the hip, swinging below the knee; 2. an oversized knit, dropped shoulders, sleeves to the knuckles (or a fitted tank on a hot day); 3. bare slim legs; 4. flat sandals or ballet flats; 5. a big soft tote | butter `#F4E2A5` + chocolate `#664334`; or cocoa + cloud | the satin's **sheen band** along the hip and the hem's swing (the flowing element) | a dark top over a light bell |
 | L4 | **The athleisure set** (W) [5] | 1. matching fitted leggings and top (the only fitted leg in the library); 2. an oversized crewneck sweatshirt or zip jacket over it, to the hip (or a trench over the set); 3. white crew socks; 4. slim runners; 5. big sunglasses; 6. an iced coffee (a tall clear cup, a lid and a straw) | sage `#94A68C` + cloud `#F0EAE1`; or near-black with white piping | the **white piping** down the legging's outer seam (a true line, from 160 px); smaller: the iced coffee | a light roomy top on two slim legs |
-| L5 | **The boxy camp shirt and knee shorts** (M) [15] | 1. a boxy short-sleeve camp-collar shirt, untucked, a straight hem at 0.48 H, wide sleeves to the elbow; 2. relaxed shorts to the knee; 3. bare calves; 4. suede loafers with white crew socks, or slim sneakers; 5. sunglasses | rust `#AF5A3E` + cream `#E9DBCA`; or butter + navy | the lay-flat collar's **open V** at the neck, over the boxy, square hem | a rust box over light shorts, two white dots |
+| L5 | **The boxy camp shirt and knee shorts** (M) [15] | 1. a boxy short-sleeve camp-collar shirt, untucked, a straight hem at 0.48 H, wide sleeves to the elbow; 2. relaxed shorts to the knee; 3. bare calves; 4. suede loafers with white crew socks, or slim sneakers; 5. sunglasses | baby pink `#E9B9B3` + navy `#254161`; or butter + navy; rust + cream only on light skin (the shirt sits 15 L* or more from the skin, §3.1) | the lay-flat collar's **open V** at the neck, over the boxy, square hem | a pink box over dark shorts, two white dots |
 | L6 | **The washed tee, cargos and a cap** (M) [15] | 1. an oversized washed tee, dropped shoulders, sleeves to the elbow; 2. relaxed tapered cargos or carpenter trousers with a pocket on the outer thigh; 3. slim sneakers; 4. a cap, forward or backward; 5. headphones round the neck or a tote | near-black `#3D2C2D` + cream `#E9DBCA` | the **cap** (its brim forward, or backward with the strap over the brow) | a dark loose top on light trousers |
 | L7 | **The light blazer over a tee** (M or W, warm autumn) [6] | 1. a light unstructured blazer, open, to the hip, soft shoulders; 2. the white tee's triangle in the open front; 3. relaxed straight trousers; 4. loafers or slim sneakers; 5. the hands in the pockets | sage `#94A68C` + chocolate `#664334`, the tee cloud `#F0EAE1` | the **white triangle** at the chest (the light at the chest, `design_research.md` V1) | a light top, dark legs, a white dot |
+
+### 4.3 What the board shows at film size (1:1, looked at, not measured)
+
+The board draws every look again at 180 px and 60 px tall on a calm street ground (`fashion_board.png`, the strips
+under rows A and B).
+- **At 180 px everything that is a silhouette or a length reads:** the long coat against the trench against the
+  overcoat, the full skirt, wide against slim-straight against relaxed legs, the knee shorts, the cap, the hood over
+  the collar, the tote, the iced coffee, every hairstyle's outline (bob, ponytail, braids, curls, twists, claw clip).
+  The feet read as slim slivers in their colour (the red flats, the white sneakers, the black loafers), and the white
+  socks as two bright dots: the feet carry "now" even at this size.
+- **What only just reads at 180 px:** N2's belt tails (thin; keep them clear of the swinging arm), N4's headphones (a
+  dark lump at the ear: the band over the crown is what names it), L5's open V (only with the 15 L* step of §3.1),
+  L4's piping, the leather highlight, the knit's rib band. These are right for the "you", whom the camera sees larger
+  and longer; a stranger should not depend on them.
+- **At 60 px each look is a top-bottom value split, a hair colour and two foot dots;** what still separates them is
+  the hem length (coat, trench, skirt), the trouser width and one colour (the tomato skirt, the red cap). So in a
+  mid-ground crowd the lengths and the values do the styling, and the accent goes on one person in four.
+- **Faces are not missed:** at 180 px the profile edge and the sunglasses are all a face needs; hair, clothes and the
+  pose carry the person.
 
 ## 5. The hair library: ten styles
 
@@ -303,10 +329,10 @@ skin tones S1-S6 (`design_research.md` V5); the hair colours are V6's plus a tor
 |---|---|---|---|---|---|---|
 | H1 | **textured ("ripped") bob** [9] | W | one mass, slightly wider at the jaw, ending 1.0-1.1 h below the crown in 3-4 shallow tapered notches; a side-part notch; in profile the front piece falls to the cheek | espresso `#3A2B27`, sheen `#5B4D48` | the **notched, separated hem** | the smooth helmet bob with a straight, tucked-under hem (ours) |
 | H2 | **long layers, curtain bangs, bouncy ends** [9] | W | a long mass to 1.9-2.3 h, narrow at the crown, fuller at the bottom, ending in 2-3 big rounded curls; in profile the bang sweeps from the parting to the cheekbone, open around the eye | chestnut `#774D3A` or muted copper `#A25E3B` | the **rounded, bouncy ends** (fullness at the bottom) | flat, straight-ironed lengths with a heavy straight fringe |
-| H3 | **claw-clip twist** [9] | W | the hair twisted up the back of the head (a 0.5 h twist), a clip 0.2 h wide, 3-4 ends fanning above it; the nape shows; in profile a bump on the back of the head and one face-framing piece | honey blonde `#CBA577`, clip `#6B4630` | the **fanned ends above the clip** | the top-knot ball bun |
-| H4 | **soft low bun with tendrils** [9] | W | a centre part, smooth to a low bun at the nape (an oval 0.35 x 0.28 h), two loose tendrils falling in front of the ears | black-brown `#3A2B27` | the **loose tendrils** framing the face | the severe slick bun; the high ball bun |
+| H3 | **claw-clip twist** [9] | W | the hair twisted up the back of the head (a 0.7 h twist), a clip 0.5 h wide across it (it must read as a bar), 4-5 ends fanning up above the crown; the nape shows; in profile a bump on the back of the head and one face-framing piece | honey blonde `#CBA577`, clip `#6B4630` | the **fanned ends above the clip** | the top-knot ball bun |
+| H4 | **soft low bun with tendrils** [9] | W | a centre part, smooth to a low bun at the nape (an oval 0.45 x 0.35 h), two loose tendrils falling in front of the ears | black-brown `#3A2B27` | the **loose tendrils** framing the face | the severe slick bun; the high ball bun |
 | H5 | **sleek low ponytail** [9] | W | the hair tight to the skull (+0.01 h), a strong sheen band, a tie at the nape, a long tapering tail 1.2-1.6 h | black `#2B2324`, sheen `#6A5D5A` | the **high-gloss sheen** and the swinging tail (the flowing element) | the high, teased pony |
-| H6 | **boho knotless braids** [9] | W | one long mass to the waist (2.5-3 h) with 4-6 darker vertical grooves (the partings), often half-up; the bottom 0.4 h breaks into small loose curls, lighter | black `#2B2324`, ends honey `#A8784F` | the **loose curly ends** | uniform box braids drawn as stripes to the tips |
+| H6 | **boho knotless braids** [9] | W | one long mass to the shoulder blades or the waist (2-3.3 h) with 4-7 darker vertical grooves (the partings), often half-up (a small bun at the crown); the bottom 0.3-0.4 h breaks into small loose curls, lighter | black `#2B2324`, ends honey `#A8784F` | the **loose curly ends** | uniform box braids drawn as stripes to the tips |
 | H7 | **natural curls** [9] | W or M | a cloud 0.25-0.40 h beyond the skull, longer at the back than at the crown, its contour 6-9 lobes of unequal size, 3-5 sheen arcs | dark brown `#533A30` | the **unequal lobes** | a perfect-circle "afro ball" |
 | H8 | **textured or French crop, low taper** [10] | M | a top mass 0.06-0.12 h above the skull with 3-4 small notches; the sides and nape a step lighter in the lowest 0.25 h (the taper), a clean neckline; in profile a short fringe ending 0.25 h above the brow | dark brown `#533A30` | the **low taper** at the nape and the choppy fringe | the high skin fade with a slicked quiff |
 | H9 | **twists or curls on a taper** [10] | M | a top of 6-10 short twists or coils (0.15-0.25 h tall, small rounded points with sheen dots), the sides faded close | black `#2B2324` | the **textured top against the clean sides** | a flat, even dome |
@@ -319,13 +345,13 @@ Hair colour follows the skin's range: never every head the same brown.
 
 | | item | the shape (at 180-220 px) | note |
 |---|---|---|---|
-| A1 | **oversized sunglasses** [12] | in profile a lens 0.30 h long x 0.20 h tall from the brow to the cheekbone, the arm a line to the ear; from behind the arms show at the temples; pushed up, two dark ovals on the hair | the generic face; the tiny oval reads old |
+| A1 | **oversized sunglasses** [12] | in profile a lens 0.27 h long x 0.28 h tall from the brow to the cheekbone, one light reflection, the arm a line to the ear; from behind the arms show at the temples; pushed up, two dark ovals on the hair | the generic face; the tiny oval (0.14 h) reads old |
 | A2 | **wrap shield** [12] | one curved lens following the head's curve, 0.15 h tall | sporty; warm coast |
 | A3 | **over-ear headphones** [13] | the band 0.03 h thick over the crown; the cup 0.40 x 0.45 h over the ear; the cable a hairline to the pocket | autumn city |
-| A4 | **slouchy shoulder bag** [13] | a soft crescent 0.10 x 0.06 H tucked tight under the arm, a short strap | both cities |
-| A5 | **east-west bag** [13] | a long low shape 0.13 x 0.05 H, rounded ends, under the arm | autumn city |
-| A6 | **big soft tote** [13] | a soft trapezoid 0.20 x 0.18 H, its bottom sagging, a strap over the shoulder | both |
-| A7 | **cap** | the crown 1.0 h wide, a curved brim 0.45 h forward (or backward, the strap over the brow) | warm coast |
+| A4 | **slouchy shoulder bag** [13] | a soft crescent 0.10 x 0.08 H tucked under the arm, showing behind it (never across the front), a short strap | both cities |
+| A5 | **east-west bag** [13] | a long low shape 0.15 x 0.06 H with round ends, carried in the hand or on a short strap; pressed under the near arm it reads as a belt (N2) | autumn city |
+| A6 | **big soft tote** [13] | a soft trapezoid 0.20 x 0.18 H face-on (about 0.12 H wide seen edge-on in a profile), its bottom sagging, a strap over the shoulder | both |
+| A7 | **cap** | the crown 0.85 h long in a profile, a curved brim 0.5 h forward (or backward, past the nape); a ponytail can come out of its back | warm coast |
 | A8 | **iced coffee / phone** | a tall clear cup 0.06 x 0.10 H with a straw; a phone 0.03 x 0.06 H, lit by its own glow (`people.md` §b.5) | the hand's reason |
 | A9 | **gold hoop** | a 0.12 h ring at the earlobe | 300 px and up only |
 
@@ -372,8 +398,13 @@ Hair colour follows the skin's range: never every head the same brown.
 Read through search-engine summaries (§ intro). Dates are the articles' own.
 
 1. Who What Wear, "5 Trends Everyone Wore at New York Fashion Week F/W 26" (February 2026): printed coats,
-   slim-straight jeans replacing baggy, the non-basic leather jacket, oversize eyewear, black trousers.
-   https://www.whowhatwear.com/fashion/street-style/new-york-fashion-week-street-style-fall-winter-2026
+   slim-straight jeans replacing baggy, the non-basic leather jacket, oversize eyewear, black trousers; and New York
+   street-spotting for autumn 2026 (Who What Wear on the Upper East Side and on stylish New Yorkers; Late Bloomer's
+   NYC notes): structured coats, sweater vests, suede, camo, red shoes, half-tucked shirts with loafers, navy.
+   https://www.whowhatwear.com/fashion/street-style/new-york-fashion-week-street-style-fall-winter-2026 ;
+   https://www.whowhatwear.com/fashion/trends/upper-east-side-autumn-style-2026 ;
+   https://www.whowhatwear.com/fashion/celebrity-style/autumn-street-style-celebrity-trends-new-york-fashion-week-2026 ;
+   https://lateblooomer.substack.com/p/nyc-fall-fashion-trends-2026
 2. Marie Claire, "NYFW SS27 Street Style Declared It's Statement Skirt Season" (September 2026), and "The Most Wearable
    NYFW Spring 2027 Runway Looks" (a suede midi skirt with a butter-yellow trench).
    https://www.marieclaire.com/fashion/fall-fashion/new-york-fashion-week-street-style-trend-spring-summer-2027-statement-skirts/ ;
@@ -389,6 +420,7 @@ Read through search-engine summaries (§ intro). Dates are the articles' own.
    https://www.glam.com/2239354/formerly-buzzy-fall-trends-firmly-outdated-in-2026/ ;
    https://www.women.com/2256692/styles-that-are-officially-outdated-for-fall-2026/ ;
    https://www.whowhatwear.com/fashion/denim/fall-denim-trends-2026 ;
+   https://www.women.com/2244175/fall-2026-biggest-denim-trends/ ;
    https://eyeondesign.aiga.org/what-the-think-pieces-about-corporate-memphis-tell-us-about-the-state-of-illustration/
 5. Los Angeles and the city contrast: Who What Wear, "I Just Got Back From Living in L.A. for a Month—These Are the 5
    Trends I Saw Everywhere" (summer 2026), "NYC and L.A. Girls Wear These 5 Pieces Very Differently", "7 Ways My Style
@@ -421,7 +453,8 @@ Read through search-engine summaries (§ intro). Dates are the articles' own.
    https://www.refinery29.com/en-us/fall-haircut-trends-2026 ; https://coveteur.com/fall-2026-haircut-trends ;
    https://www.newbeauty.com/view/fall-haircuts-2026 ; https://www.marieclaire.com/beauty/hair/best-fall-2026-haircuts/ ;
    https://www.marieclaire.com/beauty/hair/hair-color-trends-fall-2026/ ;
-   https://www.autumlove.com/blog/2026-hair-style-trends
+   https://www.autumlove.com/blog/2026-hair-style-trends ;
+   https://www.ywigs.com/blogs/global/what-braid-style-is-trending-now-in-2026 (a braid retailer: weaker)
 10. Men's hair 2026: MR PORTER, "What Is Going On With Men's Hair?" (April 2026); barbers' 2026 reports (Blumaan, Modern
     Cuts).
     https://www.mrporter.com/en-gr/journal/grooming/hair-microtrends-men-25467668 ;
@@ -442,12 +475,15 @@ Read through search-engine summaries (§ intro). Dates are the articles' own.
     https://www.purseblog.com/trends/like-it-or-not-east-west-bags-are-here-to-stay/ ;
     https://www.whowhatwear.com/fashion/trends/outdated-bag-trends-2026 ;
     https://www.hellomagazine.com/hfm/fashion-trends/893123/why-wired-headphones-are-the-coolest-accessory/ ;
+    https://heyupnow.com/blogs/news/wired-headphones-are-back-why-a-20-sales-surge-is-fueled-by-fashion-and-gen-zs-reverse-upgrade
+    (a retailer citing Circana's sales data) ;
     https://www.womanandhome.com/fashion/jewellery-trends-2026/
 14. Outerwear autumn 2026: Bustle, "Fall 2026's Top Coat Trends"; Marie Claire, "Fall 2026 Runway-to-Street Outerwear
     Trends"; Who What Wear and Layers of Beauty (October 2026) on fringe.
     https://www.bustle.com/style/fall-2026-coat-trends ;
     https://www.marieclaire.com/fashion/fall-fashion/runway-to-street-outerwear/ ;
-    https://www.whowhatwear.com/fashion/fringe-fashion-trend-winter-2026
+    https://www.whowhatwear.com/fashion/fringe-fashion-trend-winter-2026 ;
+    https://layersofbeauty.com/?p=6619
 15. Menswear 2026: StyleRave, "10 Men's Fall Fashion Trends for 2026"; Real Men Real Style, "Men's Fall 2026 Trend
     Forecast"; Hypebeast, "The SS26 Fashion Trends"; Ape to Gentleman, "10 Trending Pieces For Summer 2026"; State of
     Flux and Monfrere on men's 2026 street style.

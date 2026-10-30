@@ -1,0 +1,41 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0">
+<script src="/npm/node_modules/regl/dist/regl.min.js"></script>
+<script>
+// regl (MIT) in the same headless Chrome Remotion renders with: a LIVE per-frame organic pass on a painted piece
+// (a value-noise fbm domain warp that can churn with time + lost-and-found edges by the light), full 1080 x 1920.
+// Measures ms per frame in SwiftShader (CPU WebGL); deterministic: the noise is a pure hash of position and time.
+(async () => {
+  try {
+    const W = 1080, H = 1920;
+    const canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H; document.body.appendChild(canvas);
+    const regl = createREGL({ canvas, attributes: { preserveDrawingBuffer: true, premultipliedAlpha: true } });
+    const img = new Image(); img.src = '/inputs/still_v6.png'; await img.decode();
+    const tex = regl.texture({ data: img, flipY: true, min: 'linear', mag: 'linear' });
+    const draw = regl({
+      frag: `precision highp float; uniform sampler2D t; uniform float time; uniform vec2 res; varying vec2 uv;
+      float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
+        return mix(mix(h(i), h(i+vec2(1,0)), f.x), mix(h(i+vec2(0,1)), h(i+vec2(1,1)), f.x), f.y); }
+      float fbm(vec2 p){ float s = 0.0, a = 0.5; for (int k = 0; k < 4; k++){ s += a*vn(p); p = p*2.03 + 17.1; a *= 0.5; } return s; }
+      void main(){
+        vec2 px = uv * res;
+        // only the sky's cloud box (top right) churns; the rest passes through
+        float inBox = step(560.0, px.x) * step(res.y - 345.0, px.y);
+        vec2 q = px / 70.0 + vec2(time * 0.15, 0.0);
+        vec2 w = vec2(fbm(q), fbm(q + 31.7)) - 0.5;
+        vec2 p2 = px + inBox * w * 2.0 * 6.0;
+        gl_FragColor = texture2D(t, p2 / res);
+      }`,
+      vert: `attribute vec2 p; varying vec2 uv; void main(){ uv = 0.5*(p+1.0); gl_Position = vec4(p, 0, 1); }`,
+      attributes: { p: [[-1, -1], [1, -1], [-1, 1], [1, 1]] }, primitive: 'triangle strip', count: 4,
+      uniforms: { t: tex, time: regl.prop('time'), res: [W, H] },
+    });
+    const px = new Uint8Array(4);
+    draw({ time: 0 }); regl.read({ x: 0, y: 0, width: 1, height: 1, data: px });
+    const t0 = performance.now(); const N = 20;
+    for (let i = 0; i < N; i++) { draw({ time: i / 60 }); regl.read({ x: 0, y: 0, width: 1, height: 1, data: px }); }
+    const ms = (performance.now() - t0) / N;
+    window.__done = { png: canvas.toDataURL('image/png'), info: { ms_per_frame: Math.round(ms), gl: regl._gl.getParameter(regl._gl.RENDERER) } };
+  } catch (e) { window.__done = { error: String(e && e.stack || e) }; }
+})();
+</script>

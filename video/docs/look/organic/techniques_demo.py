@@ -308,6 +308,90 @@ def paper_grain(rgb, seed, amp=0.012, cell=1.6):
 
 
 
+
+def make_stamp(rng, L, W, dry=(0.25, 0.6), soft=1.2):
+    """A flat-brush stamp (alpha, W x L px): an even core with soft long sides, a square-ish head and a dry tail whose
+    bristle gaps run ALONG the stroke over its last 25-60 % (PAINT_RECIPES §1.8)."""
+    L, W = int(max(6, L)), int(max(3, W))
+    x = np.linspace(0, 1, L)[None, :]
+    y = np.linspace(-1, 1, W)[:, None]
+    side = np.clip((1 - np.abs(y)) * W / (2 * soft), 0, 1)
+    head = np.clip(x * L / 2.0, 0, 1)
+    bristle = cv2.resize(rng.random((W, max(2, L // 10))).astype(np.float32), (L, W), interpolation=cv2.INTER_LINEAR)
+    d0 = rng.uniform(*dry)
+    t = np.clip((x - (1 - d0)) / d0, 0, 1)
+    keep = cv2.GaussianBlur((bristle > t * 1.05).astype(np.float32), (0, 0), 0.6)
+    return np.clip(side * head * (1 - t * 0.35) * keep, 0, 1).astype(np.float32)
+
+
+def stamp_into(canvas, stamp, cx, cy, ang, col, op):
+    """Composite one rotated stamp of colour `col` at opacity `op`, centred at (cx, cy)."""
+    h, w = stamp.shape
+    r = int(np.ceil(np.hypot(w, h) / 2)) + 2
+    M = cv2.getRotationMatrix2D((w / 2, h / 2), -np.degrees(ang), 1.0)
+    M[0, 2] += r - w / 2
+    M[1, 2] += r - h / 2
+    rot = cv2.warpAffine(stamp, M, (2 * r, 2 * r), flags=cv2.INTER_LINEAR, borderValue=0)
+    x0, y0 = int(round(cx)) - r, int(round(cy)) - r
+    H, Wc = canvas.shape[:2]
+    xa, ya, xb, yb = max(0, x0), max(0, y0), min(Wc, x0 + 2 * r), min(H, y0 + 2 * r)
+    if xa >= xb or ya >= yb:
+        return
+    a = rot[ya - y0:yb - y0, xa - x0:xb - x0, None] * op
+    canvas[ya:yb, xa:xb] = canvas[ya:yb, xa:xb] * (1 - a) + col[None, None, :] * a
+
+
+def edge_strokes(rgb, seed, brush_deg=0.0, protect=None, c_found=14.0, c_min=1.5, spacing=14, length=(14, 26),
+                 width=(3, 6), lap=0.35, op=(0.6, 0.85), ss=2):
+    """EDGE STROKES, the quality route for lost edges: one flat-brush stamp every ~`spacing` px along every edge whose
+    value step is under `c_found` (L*), in the colour of one side or the other (a slow noise along the contour: the
+    lost / found rhythm), oriented along the edge where it runs with the brush and along the brush where it crosses it,
+    lapping 0.35 of its width over the edge; none where `protect` (the subject, props, people) is set. 2x supersampled,
+    seeded, deterministic."""
+    rng = rng_for(seed, 'edge_strokes')
+    h, w = rgb.shape[:2]
+    L = luminance_L(rgb) * 100
+    c = cv2.dilate(L, np.ones((5, 5), np.uint8)) - cv2.erode(L, np.ones((5, 5), np.uint8))
+    Lb = cv2.GaussianBlur(L, (0, 0), 1.0)
+    tx, ty, _, _ = structure_tensor(Lb / 100.0, 2.0)
+    gx = cv2.Sobel(Lb, cv2.CV_32F, 1, 0, ksize=3)
+    gy = cv2.Sobel(Lb, cv2.CV_32F, 0, 1, ksize=3)
+    gm = np.hypot(gx, gy)
+    can = cv2.Canny(np.clip(L * 2.55, 0, 255).astype(np.uint8), 8, 20, L2gradient=True) > 0
+    cand = can & (c >= c_min) & (c < c_found)
+    if protect is not None:
+        cand &= protect < 0.5
+    ys, xs = np.nonzero(cand)
+    taken, pts = set(), []
+    for k in rng.permutation(len(xs)):
+        key = (int(ys[k]) // spacing, int(xs[k]) // spacing)
+        if key not in taken:
+            taken.add(key)
+            pts.append((int(xs[k]), int(ys[k])))
+    rhythm = fbm(rng_for(seed, 'edge_rhythm'), h, w, 60.0, 3)
+    big = cv2.resize(rgb, (w * ss, h * ss), interpolation=cv2.INTER_LINEAR)
+    bd = np.deg2rad(brush_deg)
+    bdir = np.array([np.cos(bd), np.sin(bd)])
+    stamps = [make_stamp(rng, rng.uniform(*length) * ss, rng.uniform(*width) * ss) for _ in range(24)]
+    for (x, y) in pts:
+        t = np.array([tx[y, x], ty[y, x]])
+        nrm = np.array([gx[y, x], gy[y, x]]) / (gm[y, x] + 1e-6)
+        pa = (int(np.clip(x - 3 * nrm[0], 0, w - 1)), int(np.clip(y - 3 * nrm[1], 0, h - 1)))
+        pb = (int(np.clip(x + 3 * nrm[0], 0, w - 1)), int(np.clip(y + 3 * nrm[1], 0, h - 1)))
+        side = 1 if rhythm[y, x] + rng.normal(0, 0.25) > 0 else -1
+        col = rgb[pb[1], pb[0]] if side > 0 else rgb[pa[1], pa[0]]
+        lab = srgb_to_oklab(col[None, None, :]) + (rng.normal(0, 0.006, 3) * np.array([1, .5, .5]))
+        col = oklab_to_srgb(lab.astype(np.float32))[0, 0]
+        d = t if abs(float(t @ bdir)) > 0.5 else bdir
+        ang = np.arctan2(d[1], d[0]) + rng.normal(0, 0.06)
+        st = stamps[int(rng.integers(len(stamps)))]
+        off = -side * lap * st.shape[0] / ss
+        if rng.random() < 0.5:
+            st = st[:, ::-1]
+        stamp_into(big, st, (x + off * nrm[0]) * ss, (y + off * nrm[1]) * ss, ang, col.astype(np.float32),
+                   rng.uniform(*op))
+    return cv2.resize(big, (w, h), interpolation=cv2.INTER_AREA), len(pts)
+
 # ---------------------------------------------------------------------------------------------- RANKED LOW: filters
 
 
@@ -636,13 +720,30 @@ def far_by_intent(img):
     return shape_light(out, lbl, gL=0.024, gb=0.009, mottle=0.006, mask=1 - 0.5 * subj)
 
 
+def near_props(h, w):
+    """The near crop's props (table, chairs, crate, bin, bench, fern): they keep found edges."""
+    return rect_map(h, w, [(208, 190, 540, 340, 1.0), (0, 210, 190, 460, 1.0), (485, 20, 540, 540, 1.0),
+                           (530, 25, 540, 105, 1.0), (0, 310, 300, 540, 1.0)])
+
+
+def near_strokes(img, spacing):
+    """Edge strokes on the near ground (along the paving's lines, 17 deg), then the light per tile."""
+    h, w = img.shape[:2]
+    if spacing <= 14:
+        out, _ = edge_strokes(img, 5, 17.0, protect=near_props(h, w), spacing=14, length=(14, 26), width=(3, 6),
+                              op=(0.6, 0.85))
+    else:
+        out, _ = edge_strokes(img, 5, 17.0, protect=near_props(h, w), spacing=20, length=(20, 34), width=(4, 7),
+                              op=(0.7, 0.9))
+    return shape_light(out, clean_regions(img, k=20, seed=3), gL=0.028, gb=0.010, mottle=0.008)
+
+
 def near_by_intent(img):
     """The near ground by intent: the props (table, chairs, crate, bin, bench, fern) keep found edges; the paving's
     joints and the cast shadows (low value steps) lose and break along the paving's lines (17 deg); each tile and
     shadow gets the light moving across it."""
     h, w = img.shape[:2]
-    props = rect_map(h, w, [(208, 190, 540, 340, 1.0), (0, 210, 190, 460, 1.0), (485, 20, 540, 540, 1.0),
-                            (530, 25, 540, 105, 1.0), (0, 310, 300, 540, 1.0)])
+    props = near_props(h, w)
     lost = 8.0 * (1 - props)
     found = 0.8 * (1 - props) + 0.2 * props
     rule = 0.5 * (1 - props) + 0.3 * props
@@ -686,6 +787,15 @@ def make_sheet(out_path):
         label(to8(watercolour(near, 5, lbl_near)), '3 watercolour edge darkening', 'outlines + stains: off-brand'),
         label(to8(near_by_intent(near)), '4 BY INTENT: lost joints, crisp props', 'value-grouped edges break; light per tile'),
     ])
+    subj = rect_map(*far.shape[:2], [(314, 50, 540, 540, 1.0), (0, 485, 540, 540, 1.0)], blur=0)
+    rows.append([
+        label(to8(near_strokes(near, 14)), '5 EDGE STROKES, light (near)', 'flat stamps along lost edges; props crisp'),
+        label(to8(near_strokes(near, 20)), '6 EDGE STROKES, bolder (near)', 'longer, fewer strokes: the joints brushed'),
+        label(to8(edge_strokes(far, 6, 0.0, protect=subj, spacing=18, length=(16, 28), width=(3, 5), op=(0.5, 0.75),
+                               c_min=3.0, c_found=10.0)[0]), '7 EDGE STROKES, light (far)', 'horizontal marks on the far planes'),
+        label(to8(edge_strokes(far, 6, 0.0, protect=subj, spacing=26, length=(24, 40), width=(4, 7), op=(0.6, 0.8),
+                               c_min=3.0, c_found=12.0)[0]), '8 EDGE STROKES, bolder (far)', '"more like brushes": dose for the owner'),
+    ])
     rows.append([
         label(to8(facade('A')), '1 design: perfect grid', 'one template, flat fills, ruler lines'),
         label(to8(facade('B')), '2 + variation, hand-ruled', 'each window its own; mullions drawn'),
@@ -713,6 +823,7 @@ def bench():
     tm('apply warp (remap)', lambda: apply_warp(img, dx, dy), 2)
     tm('flow field (structure tensor)', lambda: flow_field(img, 0.0), 2)
     tm('edge_teeth_maps (2x supersampled)', lambda: edge_teeth_maps(img, 3, 0.0), 2)
+    out, n = tm('edge strokes (2x supersampled)', lambda: edge_strokes(img, 3, 0.0)); res['edge strokes count'] = n
     lbl = tm('regions from a composite (k-means)', lambda: clean_regions(img, 24, 3))
     tm('shape_light (given regions)', lambda: shape_light(img, lbl), 2)
     tm('colour oscillation', lambda: colour_oscillation(img, 3), 2)

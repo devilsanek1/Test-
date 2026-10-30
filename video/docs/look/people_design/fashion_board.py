@@ -768,8 +768,10 @@ def hair_profile(style, col, skin, cap=False):
                (52, 996), (62, 970), (64, 942), (58, 916), (46, 898), (32, 890), (20, 908), (12, 932), (-2, 940),
                (-8, 918), (-16, 914), (-22, 942), (-34, 962), (-46, 970)]
         over.append(P(catmull(pts, n=6, corners=(0, 3, 4, 5)), col, sh, shade=10, rim=3, name='hair'))
-        over.append(P(catmull([(-30, 932), (10, 940), (40, 944), (70, 950), (74, 870), (-30, 870)], n=4,
-                              corners=(3, 4, 5)), mix(col, skin, 0.5), flat=True, clip='hair'))
+        over.append(P(catmull([(-30, 936), (10, 944), (40, 948), (70, 954), (74, 870), (-30, 870)], n=4,
+                              corners=(3, 4, 5)), mix(col, skin, 0.3), flat=True, clip='hair'))
+        over.append(P(catmull([(-30, 918), (10, 924), (40, 926), (70, 930), (74, 870), (-30, 870)], n=4,
+                              corners=(3, 4, 5)), mix(col, skin, 0.6), flat=True, clip='hair'))
         over.append(sheen(catmull([(-36, 1004), (-4, 1014), (34, 1006), (18, 1000), (-30, 998)], n=5), col, 'hair'))
     elif style == 'twists':  # H9 twists on a taper
         pts = [(-46, 982), (-36, 996), (0, 1004), (40, 996), (58, 966), (60, 930), (48, 900), (32, 890), (20, 910),
@@ -844,13 +846,26 @@ def cap(col, backward=False, pony=None):
 
 
 def bag_tucked(col):
-    pts = [(-28, 712), (48, 718), (78, 692), (68, 646), (12, 630), (-26, 654)]
+    pts = [(-6, 718), (72, 722), (102, 694), (92, 646), (34, 634), (-4, 660)]
     return [P(catmull(pts, n=6), col, shade=10, rim=3)]
 
 
+def stadium(cx, cy, w, h, sag=0.0, n=14):
+    """A long, low bag body: straight top and bottom, round ends (the bottom may sag)."""
+    r = h / 2
+    out = []
+    for k in range(n + 1):   # the right end
+        a = math.radians(90 - 180 * k / n)
+        out.append((cx + w / 2 - r + r * math.cos(a), cy + r * math.sin(a)))
+    out.append((cx, cy - r - sag))
+    for k in range(n + 1):   # the left end
+        a = math.radians(-90 - 180 * k / n)
+        out.append((cx - w / 2 + r + r * math.cos(a), cy + r * math.sin(a)))
+    return out
+
+
 def bag_eastwest(col):
-    pts = [(-46, 668), (70, 668), (80, 652), (70, 634), (-46, 634), (-56, 652)]
-    return [P(catmull(pts, n=5, corners=()), col, shade=8, rim=3)]
+    return [P(stadium(50, 694, 132, 54, sag=4), col, shade=8, rim=3)]
 
 
 def tote(col, x0=8):
@@ -987,7 +1002,7 @@ def look_N1():   # the long open coat
 
 
 def look_N2(coat=C['caramel']):   # the trench, belt untied
-    f = Fig('w', 'walk', 'S1', arm_n='tuck', arm_f='swingf')
+    f = Fig('w', 'walk', 'S1', arm_n='swingb', arm_f='swingf')
     f.legs('slim', C['indigo'], fade=7)
     f.feet('flat', C['red'])
     f.head('bob', 'espresso')
@@ -995,12 +1010,9 @@ def look_N2(coat=C['caramel']):   # the trench, belt untied
     f.add('top', P(top_loop(f.b, 250, ease_f=10, ease_b=14, hang=True, flare_f=16, flare_b=34, collar=12,
                             open_front=28), coat, shade=24, rim=5, name='top'))
     f.add('top_det', lapel(tone(coat, dL=3), open_x=28))
-    t1 = tube([(44, 624), (76, 566), (106, 506), (126, 470)], [8, 8, 7, 7], [8, 8, 7, 7])
-    t2 = tube([(50, 620), (84, 580), (112, 552)], [8, 8, 7], [8, 8, 7])
+    t1 = tube([(44, 624), (86, 572), (124, 518), (150, 486)], [8, 8, 7, 7], [8, 8, 7, 7])
+    t2 = tube([(50, 620), (92, 588), (126, 566)], [8, 8, 7], [8, 8, 7])
     f.add('top_det', [P(t2, tone(coat, dL=-6), shade=4, rim=2, far=True), P(t1, tone(coat, dL=-6), shade=5, rim=3)])
-    f.add('top_det', P([(f.bx(632, 14) - 34, 632), (f.bx(632, 14), 632), (f.bx(616, 14), 616),
-                        (f.bx(616, 14) - 34, 616)], tone(coat, dL=-8), flat=True, clip='top'))
-    f.add('bag', bag_eastwest(C['chocolate']))
     f.arms(coat, end=0.96, ease=4, w=(36, 31, 27))
     return f
 
@@ -1145,11 +1157,11 @@ def look_L4():   # the athleisure set and an iced coffee
 
 def look_L5():   # the boxy camp shirt and knee shorts
     f = Fig('m', 'walk', 'S4', arm_n='swingb', arm_f='swingf')
-    f.legs('short', C['cream'], hem_y=300)
+    f.legs('short', C['navy'], hem_y=300)
     f.feet('loafer', C['chocolate'], sock=C['white'])
     f.head('buzz', 'darkbrown', ear_on=True)
     f.add('head_acc', sunglasses('big'))
-    sh = C['rust']
+    sh = C['pink']
     f.add('top', P(top_loop(f.b, 482, ease_f=26, ease_b=30, hang=True), sh, shade=14, rim=4, name='top'))
     f.add('top_det', P(catmull([(30, 860), (6, 868), (-30, 850), (-56, 790), (-46, 778), (-22, 834), (22, 848)], n=4,
                                corners=(3, 4)), tone(sh, dL=6), shade=4, rim=2))
@@ -1183,9 +1195,9 @@ def look_L7():   # the light blazer over a tee
     f.head('curls', 'black')
     f.add('inner', P(top_loop(f.b, 470, ease_f=3, ease_b=-6), C['cloud'], shade=8))
     bz = C['sage']
-    f.add('top', P(top_loop(f.b, 468, ease_f=12, ease_b=16, collar=4, open_front=30), bz, shade=14, rim=4,
+    f.add('top', P(top_loop(f.b, 468, ease_f=12, ease_b=16, collar=4, open_front=46), bz, shade=14, rim=4,
                    name='top'))
-    f.add('top_det', lapel(tone(bz, dL=4), open_x=30))
+    f.add('top_det', lapel(tone(bz, dL=4), open_x=40))
     f.arms(bz, end=0.93, ease=6, hand_n=False, hand_f=False)
     return f
 
@@ -1200,20 +1212,594 @@ LOOKS = [('N1', 'The long open coat', look_N1), ('N2', 'The trench, belt untied'
          ('L7', 'The light blazer over a tee', look_L7)]
 
 
-if __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] == '--test':
-    out = sys.argv[2]
-    names = sys.argv[3].split(',')
-    fns = dict((k, fn) for k, _, fn in LOOKS)
-    imgs = []
-    for n in names:
-        img, g = render(fns[n]().parts(), 520)
-        imgs.append((img, g))
-    W = sum(i.width for i, _ in imgs) + 40 * (len(imgs) + 1)
-    Hh = max(i.height for i, _ in imgs) + 80
-    board = Image.new('RGB', (W, Hh), '#EFE6DD')
-    x = 40
-    for img, (gx, gy) in imgs:
-        board.paste(img, (x, Hh - 40 - int(gy)), img)
-        x += img.width + 40
-    board.save(out)
-    print('saved', out, board.size)
+# ============================================================== hair from behind (the bust cards, section C)
+
+def hair_back(style, col, skin, sex='w'):
+    """Back view, centre x = 0, the crown at y = 1000. Returns (parts before the ears, parts after)."""
+    a, b = [], []
+    sh = 'hair'
+    M = lambda half: half + [(-x, y) for x, y in half[::-1]]
+    if style == 'bob':
+        half = [(0, 1013), (36, 1005), (58, 976), (64, 932), (67, 892), (70, 866), (58, 872), (47, 859), (34, 870),
+                (20, 858), (7, 868)]
+        a.append(P(catmull(M(half), n=6, corners=(5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17)), col, sh,
+                   shade=16, rim=3, name='hair'))
+        a.append(sheen(catmull([(-46, 986), (-20, 1004), (14, 1004), (-4, 994), (-36, 978)], n=5), col, 'hair'))
+    elif style == 'layers':
+        right = [(0, 1012), (36, 1004), (54, 976), (58, 932), (60, 884), (64, 836), (70, 800), (75, 790)]
+        bottom = lobes(0, 790, 76, 52, 6, 0.20, 180, 360, seed=12)[::-1]
+        pts = right + bottom + [(-x, y) for x, y in right[::-1]][:-1]
+        a.append(P(catmull(pts, n=3), col, sh, shade=16, rim=3, name='hair'))
+        for s in (-1, 1):
+            a.append(P(catmull([(s * 24, 930), (s * 34, 860), (s * 44, 790), (s * 46, 760)], closed=False, n=5),
+                       tone(col, dL=-9), line=3, clip='hair'))
+        a.append(sheen(catmull([(-46, 986), (-20, 1004), (14, 1004), (-4, 994), (-36, 978)], n=5), col, 'hair'))
+    elif style == 'clip':
+        half = [(0, 1010), (40, 1000), (57, 968), (57, 930), (48, 902), (26, 888), (0, 886)]
+        a.append(P(catmull(M(half), n=6), col, sh, shade=14, rim=3, name='hair'))
+        a.append(P(catmull([(-16, 990), (16, 994), (20, 950), (14, 906), (0, 898), (-14, 906), (-20, 950)], n=5),
+                   tone(col, dL=-5), sh, shade=6, rim=2))
+        for ang, L, bend in ((52, 58, -10), (70, 66, -6), (90, 70, 0), (110, 64, 6), (128, 54, 10)):
+            r = math.radians(ang)
+            base = (0, 982)
+            mid = (base[0] + 0.55 * L * math.cos(r) + bend * 0.5, base[1] + 0.55 * L * math.sin(r))
+            tip = (base[0] + L * math.cos(r) + bend, base[1] + L * math.sin(r))
+            s2 = (math.cos(r + 1.57) * 8, math.sin(r + 1.57) * 8)
+            a.append(P(catmull([(base[0] - s2[0], base[1] - s2[1]), (mid[0] - s2[0] * 0.6, mid[1] - s2[1] * 0.6), tip,
+                                (mid[0] + s2[0] * 0.6, mid[1] + s2[1] * 0.6), (base[0] + s2[0], base[1] + s2[1])], n=4,
+                               corners=(2,)), col, sh, shade=3, rim=2))
+        a.append(P(catmull([(-34, 966), (0, 974), (34, 966), (38, 952), (32, 940), (0, 946), (-32, 940), (-38, 952)],
+                           n=4), C['tortoise'], shade=5, rim=2))
+        a.append(P(catmull([(-30, 962), (0, 968), (30, 962), (0, 964)], n=3), tone(C['tortoise'], dL=14), flat=True))
+    elif style == 'bun':
+        half = [(0, 1008), (40, 998), (56, 966), (56, 930), (46, 902), (26, 888), (0, 886)]
+        a.append(P(catmull(M(half), n=6), col, sh, shade=14, rim=3, name='hair'))
+        a.append(P(ellipse(0, 886, 30, 23), col, sh, shade=8, rim=3))
+        for s in (-1, 1):
+            b.append(P(catmull([(s * 52, 944), (s * 58, 920), (s * 54, 896), (s * 58, 874)], closed=False, n=5), col,
+                       line=4))
+        a.append(sheen(catmull([(-44, 984), (-18, 1000), (14, 1000), (-4, 990), (-34, 976)], n=5), col, 'hair'))
+    elif style == 'pony':
+        half = [(0, 1005), (40, 996), (54, 966), (54, 930), (45, 902), (22, 892), (0, 890)]
+        a.append(P(catmull(M(half), n=6), col, sh, shade=12, rim=3, name='hair'))
+        a.append(P(tube([(0, 896), (4, 850), (8, 790), (8, 745)], [15, 14, 9, 2], [15, 14, 9, 2], cap_a=True), col, sh,
+                   shade=8, rim=2, name='tail'))
+        a.append(P(ellipse(0, 897, 12, 8), tone(col, dL=-6), flat=True))
+        a.append(sheen(catmull([(-46, 980), (-20, 1000), (16, 1000), (-2, 988), (-36, 972)], n=5), col, 'hair', dl=24))
+        a.append(sheen(catmull([(-6, 880), (-2, 830), (2, 790), (-6, 820), (-10, 860)], n=4), col, 'tail', dl=20))
+    elif style == 'braids':
+        half = [(0, 1012), (40, 1002), (58, 970), (66, 920), (74, 850), (80, 790), (82, 760)]
+        a.append(P(catmull(M(half), n=6), col, sh, shade=14, rim=3, name='hair'))
+        for k in range(-3, 4):
+            a.append(P(catmull([(k * 15, 990 - abs(k) * 8), (k * 19, 900), (k * 21, 820), (k * 22, 770)],
+                               closed=False, n=5), tone(col, dL=-8), line=3, clip='hair'))
+        a.append(P(lobes(0, 762, 86, 30, 9, 0.40, 180, 360, seed=21) + [(86, 776), (-86, 776)],
+                   mix(col, '#B5875C', 0.85), sh, shade=6, rim=2))
+        a.append(P(ellipse(0, 1014, 24, 20), col, sh, shade=6, rim=2))
+    elif style == 'curls':
+        a.append(P(lobes(0, 948, 92, 86, 12, 0.13, -30, 330, seed=31), col, sh, shade=18, rim=4, name='hair'))
+        for (x, y, r) in ((-40, 1000, 16), (-6, 1018, 18), (30, 1004, 15), (-58, 960, 13), (52, 970, 12), (-20, 900, 14)):
+            a.append(P(ellipse(x, y, r, r * 0.55, a0=200, a1=340, n=10) + [(x, y - r * 0.2)],
+                       tone(col, dL=16, toward=KEY_HUE, dh=6), flat=True, clip='hair'))
+    elif style in ('crop', 'twists', 'buzz'):
+        half = [(0, 1020 if style == 'crop' else 1008), (40, 1012 if style == 'crop' else 1000), (58, 982), (60, 950),
+                (57, 920), (50, 900), (30, 892), (0, 890)]
+        base = col if style == 'crop' else mix(col, skin, 0.45 if style == 'twists' else 0.25)
+        a.append(P(catmull(M(half), n=6, corners=(5, 6, 7, 8, 9)), base, sh, shade=12, rim=3, name='hair'))
+        if style == 'crop':
+            a.append(P([(-80, 936), (80, 936), (80, 870), (-80, 870)], mix(col, skin, 0.3), flat=True, clip='hair'))
+            a.append(P([(-80, 914), (80, 914), (80, 870), (-80, 870)], mix(col, skin, 0.6), flat=True, clip='hair'))
+            for x in (-30, -10, 12, 32):
+                a.append(P([(x - 8, 1004), (x, 1024), (x + 8, 1004)], col, sh, shade=0))
+            a.append(sheen(catmull([(-46, 990), (-20, 1010), (16, 1010), (-4, 1000), (-36, 982)], n=5), col, 'hair'))
+        if style == 'twists':
+            for k, (x, y) in enumerate(((-44, 996), (-26, 1008), (-8, 1014), (10, 1014), (28, 1008), (44, 996),
+                                        (-36, 1022), (-16, 1030), (6, 1032), (26, 1026), (-56, 980), (54, 980))):
+                a.append(P(ellipse(x, y, 12, 15, rot=-x * 0.6), col, sh, shade=5, rim=3))
+        for s in (-1, 1):
+            b.append(P(ellipse(s * 54, 925, 8, 14, rot=s * 8), skin, 'skin', shade=4))
+    elif style == 'curtains':
+        half = [(0, 1016), (40, 1006), (60, 972), (64, 930), (65, 884), (60, 856), (48, 862), (38, 846), (26, 858),
+                (14, 842), (0, 852)]
+        a.append(P(catmull(M(half), n=6, corners=(5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)), col, sh, shade=14,
+                   rim=3, name='hair'))
+        a.append(sheen(catmull([(-46, 986), (-20, 1004), (14, 1004), (-4, 994), (-36, 978)], n=5), col, 'hair'))
+    return a, b
+
+
+def bust_back(style, col, skin, sex='w', top=C['cream']):
+    m = sex == 'm'
+    W = 132 if m else 118
+    shoulders = [(-W, 690), (-W - 4, 776), (-W + 12, 806), (-62, 826), (-30, 842), (30, 842), (62, 826),
+                 (W - 12, 806), (W + 4, 776), (W, 690)]
+    nw = 28 if m else 23
+    parts = [P(catmull([(-nw, 820), (-nw + 2, 892), (nw - 2, 892), (nw, 820)], n=4, corners=(0, 3)), skin, 'skin',
+               shade=10),
+             P(catmull(shoulders, n=6, corners=(0, 9)), top, shade=16, rim=4),
+             P(ellipse(0, 938, 53 if m else 51, 67), skin, 'skin', shade=8)]
+    a, b = hair_back(style, col, skin, sex)
+    if style not in ('crop', 'twists', 'buzz', 'curls'):
+        parts += [P(ellipse(s * 50, 925, 7, 13, rot=s * 8), skin, 'skin', shade=4) for s in (-1, 1)]
+    return parts + a + b
+
+
+def bust_profile(sex, skin, hair, hair_col, top=C['cream'], acc=(), ear_on=False):
+    f = Fig(sex, 'stand', skin)
+    f.add('top', P(top_loop(f.b, 600, ease_f=8, ease_b=10, collar=0), top, shade=16, rim=4))
+    f.add('near_arm', arm_parts(f.b.arm_n, f.skin, top, 0.97, ease=4, hand_on=False))
+    f.head(hair, hair_col, ear_on=ear_on)
+    for a in acc:
+        f.add('head_acc', a)
+    return f.parts()
+
+
+def crop_top(img, g, hpx, y_local):
+    row = int(round(g[1] - y_local * hpx / 1000.0))
+    return img.crop((0, 0, img.width, max(1, min(img.height, row))))
+
+
+# ============================================================== the dated figures (section F)
+
+def dated_old_flat():
+    """Our own 2015-style flat figure (diagnose.md): a ball head on the collar, a box coat, stick legs, blob feet."""
+    skin, coat, legs, hair = '#D9A27E', C['teal'], '#4A3242', '#36223A'
+    parts = []
+    for x0, far in ((22, True), (-14, False)):
+        parts.append(P(tube([(x0, 380), (x0 - 4, 200), (x0 - 2, 40)], [19, 19, 19], [19, 19, 19]), legs, shade=0,
+                       far=far))
+        parts.append(P(ellipse(x0 - 40, 24, 64, 26), '#2E2026', shade=0, far=far))
+    parts.append(P(catmull([(-72, 800), (-78, 362), (88, 362), (84, 800)], n=4, corners=(0, 1, 2, 3)), coat, flat=True,
+                   name='coat'))
+    parts.append(P([(8, 820), (100, 820), (100, 340), (8, 340)], shade_of(coat), flat=True, clip='coat'))
+    parts.append(P(ellipse(0, 896, 104, 104), skin, 'skin', flat=True, name='head'))
+    parts.append(P(ellipse(10, 912, 112, 104, a0=-30, a1=200, n=40) + [(-96, 860), (110, 856)], hair, flat=True))
+    parts.append(P(ellipse(80, 996, 42, 40), hair, flat=True))
+    parts.append(P(tube([(-60, 760), (-66, 600), (-60, 470)], [24, 24, 24], [24, 24, 24], cap_a=True), coat,
+                   flat=True))
+    return parts
+
+
+def dated_2015():
+    """The 2014-2017 autumn uniform: a belted A-line coat, tights, ankle booties, a blanket scarf, a top-knot bun."""
+    f = Fig('w', 'stand', 'S2')
+    f.legs('legging', '#4A3242')
+    f.feet('bootie', '#2E2026')
+    f.head('bun', 'blackbrown')
+    f.L['hair'] = [p for p in f.L['hair'] if not (len(p.poly) == 48 and abs(p.poly[0][1] - 892) < 40)]
+    f.add('hair', P(ellipse(10, 1030, 30, 28), HAIR['blackbrown'], 'hair', shade=8, rim=2))
+    coat = C['teal']
+    f.add('top', P(top_loop(f.b, 300, ease_f=8, ease_b=10, flare_f=50, flare_b=64, collar=4), coat, shade=24, rim=5,
+                   name='top'))
+    f.add('top_det', band(f, 640, 612, 9, 11, tone(coat, dL=-10), clip='top'))
+    f.add('top_det', P(ellipse(-60, 622, 16, 12), tone(coat, dL=-10), shade=4))
+    scarf = '#B8613F'
+    f.add('top_det', P(lobes(0, 838, 74, 46, 7, 0.12, 0, 360, seed=5), scarf, shade=14, rim=4))
+    f.add('top_det', P(tube([(-46, 820), (-58, 720), (-62, 640)], [28, 30, 30], [28, 30, 30]), scarf, shade=8, rim=3))
+    f.arms(coat, end=0.97, ease=4)
+    return f.parts()
+
+
+def dated_2022():
+    """The 2021-2024 uniform: an oversized blazer over baggy light jeans, chunky sneakers, tiny oval glasses, a micro bag."""
+    f = Fig('w', 'standb', 'S3')
+    f.legs('relaxed', '#9DB6C8')
+    f.feet('chunky', '#F1ECE4')
+    f.head('pony', 'blackbrown')
+    f.L['hair_back'] = []
+    f.add('hair', P(ellipse(40, 1000, 22, 18), HAIR['blackbrown'], 'hair', shade=6, rim=2))
+    f.add('head_acc', sunglasses('oval'))
+    bz = '#CDBFAE'
+    f.add('top', P(top_loop(f.b, 410, ease_f=40, ease_b=46, hang=True, collar=4), bz, shade=16, rim=3, name='top'))
+    f.add('top_det', lapel(tone(bz, dL=3)))
+    f.add('bag', [P([(-6, 840), (-30, 560)], '#B9A27A', line=3), P(catmull([(-48, 562), (-14, 562), (-12, 532),
+                                                                            (-50, 532)], n=3, corners=(0, 1, 2, 3)),
+                                                                   '#E6D9C6', shade=3)])
+    f.arms(bz, end=0.97, ease=12, w=(44, 38, 32))
+    return f.parts()
+
+
+def dated_memphis():
+    """Corporate Memphis (2017-2022): a tiny head, huge bendy limbs, purple skin, flat primaries, mid-leap."""
+    skin, top, legs, shoes, hair = '#8C7CF0', '#FFC845', '#3B5BDB', '#1E1E2E', '#1E1E2E'
+    parts = []
+    parts.append(P(tube([(28, 610), (150, 420), (250, 200)], [36, 34, 30], [36, 34, 30], cap_a=True), legs, flat=True))
+    parts.append(P(ellipse(276, 170, 86, 36, rot=-30), shoes, flat=True))
+    parts.append(P(tube([(-4, 620), (-150, 390), (-150, 90)], [38, 36, 32], [38, 36, 32], cap_a=True), legs, flat=True))
+    parts.append(P(ellipse(-186, 50, 98, 40), shoes, flat=True))
+    parts.append(P(tube([(30, 860), (150, 700), (230, 600)], [24, 22, 20], [24, 22, 20], cap_a=True), skin, flat=True))
+    parts.append(P(catmull([(-52, 900), (-70, 640), (70, 620), (52, 900)], n=5, corners=(1, 2)), top, flat=True))
+    parts.append(P(ellipse(-6, 950, 46, 50), skin, flat=True))
+    parts.append(P(ellipse(6, 966, 50, 42, a0=-10, a1=190, n=24), hair, flat=True))
+    parts.append(P(tube([(-30, 870), (-140, 960), (-250, 1020)], [24, 22, 20], [24, 22, 20], cap_a=True), skin,
+                   flat=True))
+    parts.append(P(ellipse(-276, 1030, 40, 30, rot=20), skin, flat=True))
+    return parts
+
+
+# ============================================================== accessories (section D)
+
+def shoe_card(kind, col, skin='S2', accent=None, sock=None, leg='skin', leg_col=None, heel=0):
+    s = SKIN[skin]
+    parts = []
+    ay = 45 + heel
+    if leg == 'skin':
+        parts.append(P(tube([(2, 190), (0, 120), (0, ay)], [21, 18, 15], [26, 20, 16]), s, 'skin', shade=8, rim=2))
+    else:
+        parts.append(P(tube([(2, 190), (0, 120), (0, ay)], [44, 44, 44], [46, 46, 46], cap_b=False), leg_col,
+                       shade=12, rim=3))
+    sh = shoe(kind, (0.0, ay), 0.0, col, s, accent=accent, sock=sock, heel=heel)
+    if leg != 'skin':
+        hem = 82 if sock else 22
+        parts[0] = P([(x, max(y, hem)) for x, y in parts[0].poly], leg_col, shade=12, rim=3)
+        return sh[:1] + parts + sh[1:] if sock else parts + sh
+    return parts + sh
+
+
+def bag_card(kind):
+    """A bag on its own, the strap above it (local units; a card renders it large)."""
+    if kind == 'shoulder':
+        body = [(-70, 20), (0, 0), (70, 20), (86, 64), (70, 104), (-70, 104), (-86, 64)]
+        return [P(catmull([(-48, 98), (-30, 190), (30, 190), (48, 98)], closed=False, n=6), C['burgundy'], line=12),
+                P(catmull(body, n=6), C['burgundy'], shade=14, rim=4)]
+    if kind == 'eastwest':
+        return [P(catmull([(-60, 56), (-40, 130), (40, 130), (60, 56)], closed=False, n=6), C['chocolate'], line=10),
+                P(stadium(0, 30, 230, 64, sag=5), C['chocolate'], shade=10, rim=4)]
+    if kind == 'tote':
+        body = [(-78, 0), (78, 0), (90, 150), (-90, 150)]
+        return [P(catmull([(-46, 146), (-30, 250), (30, 250), (46, 146)], closed=False, n=6), tone(C['cocoa'], dL=-8),
+                  line=10), P(catmull(body, n=5, corners=(2, 3)), C['cocoa'], shade=14, rim=4)]
+    if kind == 'micro':
+        body = [(-26, 0), (26, 0), (28, 34), (-28, 34)]
+        return [P([(-20, 32), (-60, 260)], '#B9A27A', line=4), P([(20, 32), (60, 260)], '#B9A27A', line=4),
+                P(catmull(body, n=3, corners=(0, 1, 2, 3)), '#E6D9C6', shade=4, rim=2)]
+
+
+# ============================================================== the board
+
+FONT_DIR = '/usr/share/fonts/opentype/inter/'
+
+
+def font(w, size):
+    name = {'b': 'Inter-SemiBold.otf', 'r': 'Inter-Regular.otf', 'm': 'Inter-Medium.otf', 'x': 'Inter-Bold.otf'}[w]
+    try:
+        return ImageFont.truetype(os.path.join(FONT_DIR, name), size)
+    except OSError:
+        return ImageFont.load_default()
+
+
+INK, INK2, BG, CARD = '#3D2C2D', '#7A6460', '#F1E9E1', '#E6DBD0'
+
+
+def wrap(draw, text, fnt, width):
+    words, lines, cur = text.split(), [], ''
+    for w in words:
+        t = (cur + ' ' + w).strip()
+        if draw.textlength(t, font=fnt) <= width:
+            cur = t
+        else:
+            lines.append(cur)
+            cur = w
+    if cur:
+        lines.append(cur)
+    return lines
+
+
+def text(draw, xy, s, fnt, fill=INK, width=None, lh=1.3):
+    x, y = xy
+    lines = wrap(draw, s, fnt, width) if width else [s]
+    for ln in lines:
+        draw.text((x, y), ln, font=fnt, fill=fill)
+        y += int(fnt.size * lh)
+    return y
+
+
+def shadow(board, cx, cy, rx, ry, col='#000000', a=0.16):
+    """A soft contact shadow (multiplied ellipse)."""
+    S = 3
+    im = Image.new('L', (int(rx * 2 * S) + 4, int(ry * 2 * S) + 4), 0)
+    ImageDraw.Draw(im).ellipse([2, 2, im.width - 2, im.height - 2], fill=int(255 * a))
+    im = im.reduce(S)
+    x0, y0 = int(cx - im.width / 2), int(cy - im.height / 2)
+    region = board.crop((x0, y0, x0 + im.width, y0 + im.height))
+    arr = np.asarray(region).astype(np.float32)
+    m = np.asarray(im).astype(np.float32)[..., None] / 255.0
+    tint = np.array(hex2rgb('#6B4A44'), np.float32)
+    arr = arr * (1 - m) + (arr * tint / 255.0) * m
+    board.paste(Image.fromarray(arr.clip(0, 255).astype(np.uint8)), (x0, y0))
+
+
+def paste_fig(board, img, g, x_center, ground_y, hpx, shadow_on=True):
+    if shadow_on:
+        shadow(board, x_center + 0.02 * hpx, ground_y, 0.16 * hpx, 0.016 * hpx)
+    board.paste(img, (int(round(x_center - g[0])), int(round(ground_y - g[1]))), img)
+
+
+def rounded(draw, box, r, fill):
+    draw.rounded_rectangle(box, r, fill=fill)
+
+
+def swatch_row(draw, x, y, cols, fnt, size=24):
+    for c in cols:
+        draw.rounded_rectangle([x, y, x + size, y + size], 5, fill=c, outline='#00000022')
+        draw.text((x + size + 6, y + size / 2 - fnt.size * 0.62), c.upper(), font=fnt, fill=INK2)
+        x += size + 12 + draw.textlength(c.upper(), font=fnt) + 10
+    return x
+
+
+LOOK_META = {   # city / who / pair (+ accent) / the one detail (fashion.md 4.1-4.2)
+    'N1': ('W · New York · autumn', ['#664334', '#2E2426'], 'Open and unbelted: the two front edges hang straight, the dark column between them.'),
+    'N2': ('W · New York · autumn', ['#B58058', '#2F4566', '#C7463F'], 'The belt untied: two tails stream back (the flowing element).'),
+    'N3': ('W · New York · early autumn', ['#2E2426', '#C8503E'], 'A short dark jacket meets a long full skirt at the waist.'),
+    'N4': ('W · New York · autumn', ['#254161', '#2E2426', '#F0EAE1'], 'Over-ear headphones change the head\'s silhouette.'),
+    'N5': ('M · New York · autumn', ['#B58058', '#254161', '#F6F1EA'], 'The white sock flash between dark trouser and loafer.'),
+    'N6': ('M · New York · autumn', ['#2E2426', '#2F4566', '#C7463F'], 'The slim, low sneaker with a contrasting stripe.'),
+    'N7': ('M · New York · winter', ['#B58058', '#E9DBCA'], 'The hood lying over the coat\'s collar: reads from behind.'),
+    'L1': ('W · Los Angeles · warm', ['#F0EAE1', '#5781A0', '#E9B9B3'], 'The half tuck: tucked in front, loose at the back.'),
+    'L2': ('W · Los Angeles · warm', ['#F0EAE1', '#2F4566', '#C7463F'], 'The ponytail pulled through the cap.'),
+    'L3': ('W · Los Angeles · warm evening', ['#F4E2A5', '#664334'], 'The satin\'s sheen at the hip; the hem swings.'),
+    'L4': ('W · Los Angeles · any season', ['#94A68C', '#F0EAE1'], 'White piping down the legging (or the iced coffee).'),
+    'L5': ('M · Los Angeles · warm', ['#E9B9B3', '#254161', '#F6F1EA'], 'The camp collar\'s open V over a boxy, square hem.'),
+    'L6': ('M · Los Angeles · warm', ['#3D2C2D', '#E9DBCA', '#254161'], 'The cap: backward, the brim over the nape.'),
+    'L7': ('M or W · Los Angeles · warm autumn', ['#94A68C', '#664334', '#F0EAE1'], 'The white tee\'s triangle in the open blazer.'),
+}
+
+HAIRS = [   # (code, name, style, colour, skin, sex, detail)
+    ('H1', 'Textured ("ripped") bob', 'bob', 'espresso', 'S1', 'w', 'the notched, separated hem'),
+    ('H2', 'Long layers, bouncy ends', 'layers', 'copper', 'S2', 'w', 'the rounded ends; the bang to the cheekbone'),
+    ('H3', 'Claw-clip twist', 'clip', 'honey', 'S2', 'w', 'the ends fanning above the clip'),
+    ('H4', 'Soft low bun, tendrils', 'bun', 'blackbrown', 'S5', 'w', 'the loose tendrils by the face'),
+    ('H5', 'Sleek low ponytail', 'pony', 'black', 'S3', 'w', 'the high-gloss sheen; the tail swings'),
+    ('H6', 'Boho knotless braids', 'braids', 'black', 'S6', 'w', 'the loose curly ends, half-up'),
+    ('H7', 'Natural curls', 'curls', 'darkbrown', 'S4', 'w', 'unequal lobes, never a perfect ball'),
+    ('H8', 'Textured crop, low taper', 'crop', 'darkbrown', 'S1', 'm', 'the light taper at the nape'),
+    ('H9', 'Twists on a taper', 'twists', 'black', 'S6', 'm', 'a textured top on clean sides'),
+    ('H10', 'Soft curtains, longer nape', 'curtains', 'chestnut', 'S2', 'm', 'the curtain\'s curve; hair to the collar'),
+]
+
+
+def build_board(out):
+    Wb, M = 2400, 50
+    board = Image.new('RGB', (Wb, 9000), BG)
+    d = ImageDraw.Draw(board, 'RGBA')
+    fT, fS, fH = font('x', 54), font('r', 25), font('x', 34)
+    fh, fb, fr, fs = font('b', 23), font('b', 21), font('r', 18), font('r', 16)
+    ACC, NOW = '#A1563F', '#3F7A5E'
+    fns = dict((k, (n, fn)) for k, n, fn in LOOKS)
+    y = 44
+    d.text((M, y), 'People: what cool 20-30s wear in New York and Los Angeles, made drawable', font=fT, fill=INK)
+    y += 76
+    y = text(d, (M, y), 'Shape thumbnails drawn for fashion.md (autumn 2026): no photo traced, no artist copied. Profile, '
+             'facing left, key light from the upper left, flat planes with a shade crescent and a thin rim, no '
+             'outlines; 7.8 heads. Each look at 520 px, then at film size (180 px and 60 px). Hair from behind and in '
+             'profile. Colours from our house palette (no beige, olive or grey).', fS, INK2, width=Wb - 2 * M)
+    y += 26
+
+    def look_section(y, title, sub, keys, strip_bg):
+        d.text((M, y), title, font=fH, fill=INK)
+        y += 46
+        y = text(d, (M, y), sub, fr, INK2, width=Wb - 2 * M)
+        y += 12
+        top = y
+        card_h = 830
+        rounded(d, [M, top, Wb - M, top + card_h], 22, CARD)
+        colw = (Wb - 2 * M) / len(keys)
+        ground = top + 590
+        for i, k in enumerate(keys):
+            name, fn = fns[k]
+            cx = M + colw * (i + 0.5)
+            img, g = render(fn().parts(), 520)
+            paste_fig(board, img, g, cx, ground, 520)
+            meta = LOOK_META[k]
+            tx, ty = M + colw * i + 20, ground + 30
+            d.text((tx, ty), k, font=fh, fill=ACC)
+            d.text((tx + d.textlength(k, font=fh) + 12, ty + 4), meta[0], font=fs, fill=INK2)
+            ty += 32
+            ty = text(d, (tx, ty), name, fh, INK, width=colw - 34, lh=1.22)
+            ty += 6
+            sx = tx
+            for c in meta[1]:
+                d.rounded_rectangle([sx, ty, sx + 26, ty + 26], 6, fill=c, outline=(0, 0, 0, 40))
+                sx += 34
+            ty += 38
+            text(d, (tx, ty), meta[2], fr, INK, width=colw - 34, lh=1.32)
+        sy = top + card_h + 16
+        sh_ = 300
+        rounded(d, [M, sy, Wb - M, sy + sh_], 22, strip_bg[0])
+        d.rectangle([M, sy + sh_ - 86, Wb - M, sy + sh_ - 22], fill=strip_bg[1])
+        d.rounded_rectangle([M, sy + sh_ - 30, Wb - M, sy + sh_], 22, fill=strip_bg[1])
+        d.text((M + 22, sy + 16), 'At film size, 1:1 in the 1080 x 1920 frame (squint: the silhouette, the lengths, the '
+               'feet and the one detail must still read)', font=fb, fill=INK)
+        gy = sy + sh_ - 46
+        x = M + 120
+        for k in keys:
+            img, g = render(fns[k][1]().parts(), 180, S=4)
+            paste_fig(board, img, g, x, gy, 180)
+            x += 172
+        d.text((M + 30, sy + 62), '180 px', font=fb, fill=INK2)
+        x += 70
+        x2 = x - 40
+        gy2 = sy + sh_ - 70
+        for k in keys:
+            img, g = render(fns[k][1]().parts(), 60, S=6)
+            paste_fig(board, img, g, x, gy2, 60)
+            x += 64
+        d.text((x2, sy + 62), '60 px (mid ground)', font=fb, fill=INK2)
+        return sy + sh_ + 44
+
+    y = look_section(y, 'A.  New York, the autumn city: structure, darks, layers',
+                     'Long coats and trenches worn open, a cropped leather jacket over a statement skirt, polished knits, '
+                     'wide black trousers; loafers, flats, slim sneakers; a tote or a slouchy bag; headphones. One roomy '
+                     'piece per figure, a long unbroken leg line to a slim, low shoe.',
+                     ['N1', 'N2', 'N3', 'N4', 'N5', 'N6', 'N7'], ('#E2D2C4', '#CDB6A3'))
+    y = look_section(y, 'B.  Los Angeles, the warm coast: ease, light colour, light layers',
+                     'The big shirt half-tucked over relaxed jeans, the baby tee and the cap, the slip skirt with a big '
+                     'knit, the athleisure set; coloured flats, slim sneakers, loafers with white socks; big sunglasses. '
+                     'Light and varied colour, one accent.',
+                     ['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7'], ('#EAD8C3', '#D8BFA6'))
+
+    # ---------------- C. hair
+    d.text((M, y), 'C.  Hair is the face: ten current styles, from behind and in profile', font=fH, fill=INK)
+    y += 46
+    y = text(d, (M, y), 'One main mass, 0-2 secondary masses, one sheen band (or 3-5 sheen arcs on curls); the outline '
+             'carries the identity because the face is generic. Across skin tones S1-S6 and hair colours.', fr, INK2,
+             width=Wb - 2 * M)
+    y += 12
+    top, ch = y, 850
+    rounded(d, [M, top, Wb - M, top + ch], 22, '#DCCABB')
+    colw = (Wb - 2 * M) / len(HAIRS)
+    hp = 740
+    for i, (code, name, style, hc, sk, sex, det) in enumerate(HAIRS):
+        cx = M + colw * (i + 0.5)
+        col = HAIR[hc]
+        img, g = render(bust_back(style, col, SKIN[sk], sex), hp)
+        img = crop_top(img, g, hp, 690)
+        board.paste(img, (int(cx - g[0]), int(top + 330 - img.height)), img)
+        img2, g2 = render(bust_profile(sex, sk, style, hc, ear_on=style in ('crop', 'twists', 'buzz')), hp)
+        img2 = crop_top(img2, g2, hp, 690)
+        board.paste(img2, (int(cx - g2[0] + 8), int(top + 640 - img2.height)), img2)
+        tx, ty = M + colw * i + 14, top + 660
+        d.text((tx, ty), code, font=fh, fill=ACC)
+        ty = text(d, (tx, ty + 30), name, fb, INK, width=colw - 22, lh=1.2)
+        text(d, (tx, ty + 4), det, fs, INK2, width=colw - 22)
+    y = top + ch + 44
+
+    # ---------------- D. accessories and shoes
+    d.text((M, y), 'D.  What reads at our size: eyewear, headwear, bags and the feet', font=fH, fill=INK)
+    y += 46
+    y = text(d, (M, y), 'Oversized or wrap sunglasses are the 2026 accessory and the most current generic face; the tiny '
+             'oval reads 2018-2024. The feet are the tell: slim and low now, chunky and round then.', fr, INK2,
+             width=Wb - 2 * M)
+    y += 12
+    top, ch = y, 790
+    rounded(d, [M, top, Wb - M, top + ch], 22, CARD)
+    heads = [('Oversized sunglasses', bust_profile('w', 'S1', 'bob', 'espresso', acc=sunglasses('big')), False),
+             ('Wrap shield', bust_profile('w', 'S3', 'pony', 'black', acc=sunglasses('wrap')), False),
+             ('Tiny oval: dated', bust_profile('w', 'S2', 'bun', 'chestnut', acc=sunglasses('oval')), True),
+             ('Over-ear headphones', bust_profile('m', 'S5', 'crop', 'black', acc=headphones()), False),
+             ('Cap, ponytail through', bust_profile('w', 'S4', 'capony', 'darkbrown', acc=cap(C['red'])), False),
+             ('Cap, backward', bust_profile('m', 'S1', 'crop', 'darkbrown', acc=cap(C['navy'], backward=True),
+                                            ear_on=True), False)]
+    colw = (Wb - 2 * M) / 9
+    row1 = top + 300
+    for i, (name, parts, dated) in enumerate(heads):
+        cx = M + colw * (i + 0.5)
+        img, g = render(parts, 1150)
+        img = crop_top(img, g, 1150, 790)
+        board.paste(img, (int(cx - g[0] + 26), int(row1 - img.height)), img)
+        text(d, (M + colw * i + 16, row1 + 14), name, fb, ACC if dated else INK, width=colw - 24)
+    bags = [('Slouchy shoulder bag', bag_card('shoulder'), False), ('East-west bag', bag_card('eastwest'), False),
+            ('Micro bag: dated', bag_card('micro'), True)]
+    for j, (name, parts, dated) in enumerate(bags):
+        i = 6 + j
+        cx = M + colw * (i + 0.5)
+        img, g = render(parts, 760)
+        board.paste(img, (int(cx - img.width / 2), int(row1 - 40 - img.height)), img)
+        text(d, (M + colw * i + 16, row1 + 14), name, fb, ACC if dated else INK, width=colw - 24)
+    shoes = [('Ballet flat, a colour', shoe_card('flat', C['pink']), False),
+             ('Slim sneaker, a stripe', shoe_card('sneaker', C['cloud'], leg='trouser', leg_col=C['indigo'],
+                                                  accent=C['red']), False),
+             ('Loafer, white sock', shoe_card('loafer', C['leather'], leg='trouser', leg_col=C['navy'],
+                                              sock=C['white']), False),
+             ('Kitten slingback', shoe_card('kitten', C['leather'], heel=22), False),
+             ('Flat sandal', shoe_card('sandal', C['cloud'], skin='S5'), False),
+             ('Runner, white sock', shoe_card('runner', C['cloud'], leg='trouser', leg_col=C['sage'], accent=C['sage'],
+                                              sock=C['white']), False),
+             ('Chunky sneaker: dated', shoe_card('chunky', '#F1ECE4', leg='trouser', leg_col='#9DB6C8'), True),
+             ('Ankle bootie: dated', shoe_card('bootie', '#2E2026', leg='trouser', leg_col='#4A3242'), True),
+             ('Round blob foot: dated', shoe_card('blob', '#2E2026', leg='trouser', leg_col='#4A3242'), True)]
+    row2 = top + 680
+    for i, (name, parts, dated) in enumerate(shoes):
+        cx = M + colw * (i + 0.5)
+        img, g = render(parts, 1150)
+        paste_fig(board, img, g, cx + 44, row2, 1150, shadow_on=False)
+        text(d, (M + colw * i + 16, row2 + 18), name, fb, ACC if dated else INK, width=colw - 24)
+    y = top + ch + 44
+
+    # ---------------- E. palette
+    d.text((M, y), 'E.  The wardrobe palette, inside our house (fashion.md 2.5)', font=fH, fill=INK)
+    y += 50
+    top, ch = y, 300
+    rounded(d, [M, top, Wb - M, top + ch], 22, CARD)
+    pal = [('cloud', '#F0EAE1'), ('cream', '#E9DBCA'), ('butter', '#F4E2A5'), ('baby pink', '#E9B9B3'),
+           ('sage', '#94A68C'), ('caramel', '#B58058'), ('rust', '#AF5A3E'), ('red', '#C7463F'),
+           ('denim', '#5781A0'), ('cocoa', '#8B6B5A'), ('chocolate', '#664334'), ('burgundy', '#743137'),
+           ('indigo', '#2F4566'), ('navy', '#254161'), ('near-black', '#2E2426'), ('teal (hero)', '#0B8577')]
+    sw = (Wb - 2 * M - 40) / len(pal)
+    for i, (n, c) in enumerate(pal):
+        x0 = M + 20 + i * sw
+        d.rounded_rectangle([x0, top + 24, x0 + sw - 14, top + 110], 10, fill=c, outline=(0, 0, 0, 30))
+        d.text((x0, top + 118), n, font=fb, fill=INK)
+        d.text((x0, top + 144), c, font=fs, fill=INK2)
+    hairs = [('black', '#2B2324'), ('espresso', '#3A2B27'), ('dark brown', '#533A30'), ('chestnut', '#774D3A'),
+             ('copper', '#A25E3B'), ('dark blonde', '#A88257'), ('honey', '#CBA577')]
+    x0 = M + 20
+    d.text((x0, top + 196), 'skin S1-S6', font=fb, fill=INK)
+    for i, (n, c) in enumerate(SKIN.items()):
+        d.rounded_rectangle([x0 + 150 + i * 92, top + 186, x0 + 230 + i * 92, top + 238], 10, fill=c)
+        d.text((x0 + 150 + i * 92, top + 246), n, font=fs, fill=INK2)
+    x1 = x0 + 150 + 6 * 92 + 70
+    d.text((x1, top + 196), 'hair', font=fb, fill=INK)
+    for i, (n, c) in enumerate(hairs):
+        d.rounded_rectangle([x1 + 70 + i * 132, top + 186, x1 + 190 + i * 132, top + 238], 10, fill=c)
+        d.text((x1 + 70 + i * 132, top + 246), n, font=fs, fill=INK2)
+    y = top + ch + 44
+
+    # ---------------- F. dated -> now
+    d.text((M, y), 'F.  What reads dated, and the 2026 answer', font=fH, fill=INK)
+    y += 50
+    top, ch = y, 760
+    rounded(d, [M, top, Wb - M, top + ch], 22, CARD)
+    pairs = [(dated_old_flat(), 'Our own flat figure', 'a ball head on the collar, a box coat, stick legs, blob feet',
+              look_N1().parts(), 'N1: 7.8 heads, a neck, one long open coat'),
+             (dated_2015(), '2014-2017 autumn uniform', 'a belted A-line coat, tights, booties, a blanket scarf, a top knot',
+              look_N2(C['teal']).parts(), 'N2 in the film\'s teal: our proposal for the next "you"'),
+             (dated_2022(), '2021-2024 oversize', 'an oversized blazer over baggy light jeans, chunky sneakers, tiny ovals',
+              look_N3().parts(), 'N3: a cropped jacket over a full skirt, slim low shoes'),
+             (dated_memphis(), 'Corporate Memphis', 'a tiny head, huge bendy limbs, purple skin, flat primaries',
+              look_L2().parts(), 'L2: real proportions, real skin, a calm pose')]
+    colw = (Wb - 2 * M) / 8
+    ground = top + 520
+    for i, (dp, dn, dd, np_, nn) in enumerate(pairs):
+        cx = M + colw * (2 * i + 0.5)
+        img, g = render(dp, 430)
+        paste_fig(board, img, g, cx, ground, 430)
+        cx2 = M + colw * (2 * i + 1.5)
+        img2, g2 = render(np_, 430)
+        paste_fig(board, img2, g2, cx2, ground, 430)
+        tx = M + colw * 2 * i + 18
+        d.text((tx, ground + 30), 'dated', font=fb, fill=ACC)
+        ty = text(d, (tx, ground + 58), dn, fb, INK, width=colw - 26, lh=1.2)
+        text(d, (tx, ty + 4), dd, fs, INK2, width=colw - 26)
+        tx2 = M + colw * (2 * i + 1) + 18
+        d.text((tx2, ground + 30), 'now', font=fb, fill=NOW)
+        text(d, (tx2, ground + 58), nn, fr, INK, width=colw - 26)
+        if i < 3:
+            xx = M + colw * (2 * i + 2)
+            d.line([(xx, top + 30), (xx, top + ch - 30)], fill=(61, 44, 45, 40), width=2)
+    y = top + ch + 30
+    d.text((M, y), 'Generator: fashion_board.py (next to this file) draws every shape from the numbers in fashion.md; '
+           'the figures are ours, built from closed loops.', font=fs, fill=INK2)
+    y += 44
+    board = board.crop((0, 0, Wb, y))
+    board.save(out, optimize=True)
+    return board.size
+
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1 and sys.argv[1] == '--test':
+        out, names = sys.argv[2], sys.argv[3].split(',')
+        fns = dict((k, fn) for k, _, fn in LOOKS)
+        imgs = [render(fns[n]().parts(), 520) for n in names]
+        W = sum(i.width for i, _ in imgs) + 40 * (len(imgs) + 1)
+        Hh = max(i.height for i, _ in imgs) + 80
+        bd = Image.new('RGB', (W, Hh), BG)
+        x = 40
+        for img, (gx, gy) in imgs:
+            bd.paste(img, (x, Hh - 40 - int(gy)), img)
+            x += img.width + 40
+        bd.save(out)
+        print('saved', out, bd.size)
+    else:
+        out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                                 'fashion_board.png')
+        print('saved', out, build_board(out))

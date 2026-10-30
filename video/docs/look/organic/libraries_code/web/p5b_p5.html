@@ -1,0 +1,61 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0;background:#fff">
+<script src="/npm/node_modules/p5/lib/p5.min.js"></script>
+<script src="/npm/node_modules/p5.brush/dist/p5.brush.js"></script>
+<script>
+// p5.brush on p5 2.x (LGPL; the p5 build has image() for the opaque underlay): the zones as watercolour fills over
+// the piece's own background, then the shared stroke plan with custom brushes. Seeded with randomSeed/noiseSeed.
+const q = new URLSearchParams(location.search);
+const name = q.get('name') || 'cloud', mode = q.get('mode') || 'full';
+const fillOp = +(q.get('op') || 220), bleed = +(q.get('bleed') || 0.15), texS = +(q.get('tex') || 0.35), border = +(q.get('border') || 0.25);
+const strokeScale = +(q.get('ss') || 1), paintOp = +(q.get('pop') || 170);
+let plan, bg, under;
+new p5((p) => {
+  brush.instance(p);
+  p.setup = async () => {
+    try {
+      plan = await (await fetch(`/plans/${name}.json`)).json();
+      const [W, H] = plan.size;
+      bg = await p.loadImage(name === 'cloud' ? '/inputs/cloud_sky_v6.png' : '/inputs/tree_bg.png');
+      under = q.get('under') ? await p.loadImage(plan.design.replace('/tmp/organic/libraries', '')) : null;
+      p.createCanvas(W, H, p.WEBGL); p.pixelDensity(1);
+      p.randomSeed(7); p.noiseSeed(7);
+      p.image(bg, -W / 2, -H / 2, W, H);
+      if (under) p.image(under, -W / 2, -H / 2, W, H);
+      p.translate(-W / 2, -H / 2);
+      brush.add('wash', { type: 'default', weight: 1, scatter: 0.35, sharpness: 0.2, grain: 8, opacity: 60, spacing: 0.2, pressure: [1.1, 0.6], rotate: 'natural' });
+      if (q.get('ptype') === 'default') brush.add('paint', { type: 'default', weight: 1, scatter: 0.25, sharpness: +(q.get('sharp') || 0.35), grain: +(q.get('grain') || 14), opacity: paintOp, spacing: 0.15, pressure: [0.8, 1.15, 0.45], rotate: 'natural', noise: 0.3 });
+      else brush.add('paint', { type: 'marker', weight: 1, scatter: 0.1, opacity: paintOp, spacing: 0.25, pressure: [0.8, 1.15, 0.45], rotate: 'natural', noise: 0.3, markerTip: false });
+      brush.add('dab', { type: 'marker', weight: 1, scatter: 0.2, opacity: 220, spacing: 0.3, pressure: [1.0, 0.7], rotate: 'natural', markerTip: false, noise: 0.2 });
+      brush.add('fine', { type: 'marker', weight: 1, scatter: 0.05, opacity: 235, spacing: 0.2, pressure: [0.6, 1.1, 0.3], rotate: 'natural', markerTip: false });
+      const t0 = performance.now();
+      if (mode !== 'strokes') {
+        brush.noStroke();
+        for (const z of plan.zones) {
+          brush.fill(z.color, fillOp); brush.fillBleed(bleed, 'out'); brush.fillTexture(texS, border);
+          for (const poly of z.polys) if (poly.length >= 3) brush.polygon(poly);
+        }
+        brush.noFill();
+      }
+      if (mode !== 'fills') {
+        const by = { wash: 'wash', form: 'paint', accent: 'fine', blend: 'wash', edge: 'paint', dab: q.get('dabp') ? 'paint' : 'dab', leafy: q.get('dabp') ? 'paint' : 'dab' };
+        for (const kind of ['wash', 'form', 'blend', 'edge', 'dab', 'leafy', 'accent']) {
+          for (const s of plan.strokes) {
+            if (s.kind !== kind) continue;
+            if (kind === 'edge' && s.lost) continue;
+            brush.set(by[kind], s.color, s.width * strokeScale);
+            const pts = s.pts.map(pt => [pt[0], pt[1]]);
+            if (pts.length === 2) brush.line(pts[0][0], pts[0][1], pts[1][0], pts[1][1]);
+            else brush.spline(pts.filter((pt, i) => i % 2 === 0 || i === pts.length - 1), 0.5);
+          }
+        }
+      }
+      p.noLoop();
+      setTimeout(() => {
+        const c = document.querySelector('canvas');
+        window.__done = { png: c.toDataURL('image/png'), info: { ms: Math.round(performance.now() - t0) } };
+      }, 50);
+    } catch (e) { window.__done = { error: String(e && e.stack || e) }; }
+  };
+  p.draw = () => {};
+});
+</script>

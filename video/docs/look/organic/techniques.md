@@ -19,7 +19,7 @@ traced or used as input (they are only measured), and no living artist is a styl
 | File | What |
 |---|---|
 | `techniques.md` | this report |
-| `techniques_sheet.jpg` | 12 panels on our own v6 still and a test facade: four filters against the techniques by intent (§3) |
+| `techniques_sheet.jpg` | 16 panels on our own v6 still and a test facade: four filters against the techniques by intent, edge strokes at two doses, the design steps (§3) |
 | `techniques_demo.py` | the seeded proof script: the sheet (default), `--bench` (cost per operator on a full frame, one core), `--measure` (the §1 numbers) |
 | `techniques_chrome_bench.html`, `.js` | the live-filter, WebGL and vector cost tests in the render's headless Chrome (§3.7, §3.12) |
 | `techniques_motion.py` | the motion check of §3.13 (the float, x264; the same numbers on a rerun) |
@@ -39,14 +39,16 @@ traced or used as input (they are only measured), and no living artist is a styl
   and our design is already abstract. A studio that got a painterly look said it plainly: "if you want a painterly
   bush, paint the bush" rather than filter a realistic one (source 20). The libraries lane finds the same for every
   stock filter it tried (`libraries.md`, in progress at the time of writing).
-- **What works is by intent, per layer, decided by the design** (sheet, panel 4 of each row): (1) organic geometry at
-  design time (no two windows alike, hand-cut straight edges, natural silhouettes, overlaps); (2) edges by intent:
-  each edge's hardness from its value step, its tier, its plane and the light, lost edges broken by dry-brush teeth
-  along the brush direction; (3) colour and light moving inside each shape (a falloff from the story light, warm and
-  cool, a dappled shade); (4) brush marks by intent with a brush ladder stopped early on far planes (far = coarse
-  marks = "more like brushes"); (5) a texture locked to each plane (CRAFT §c's Mottle, already built). On the demo
-  crops these move the numbers the right way: crisp edges 28 -> 9 % (far crop) and 10.5 -> 3.3 % (near crop),
-  dead-flat 29 -> 15 % (near), with the subject and the props still crisp.
+- **What works is by intent, per layer, decided by the design** (sheet: panel 4 of rows 1-2, rows 3-4): (1) organic
+  geometry at design time (no two windows alike, hand-cut straight edges, natural silhouettes, overlaps); (2) edges by
+  intent: each edge's hardness from its value step, its tier, its plane and the light, lost edges laid over with
+  flat-brush strokes (near) or broken by dry-brush teeth along the brush direction (far, vapour); (3) colour and light
+  moving inside each shape (a falloff from the story light, warm and cool, a dappled shade); (4) brush marks by intent
+  with a brush ladder stopped early on far planes (far = coarse marks = "more like brushes"); (5) a texture locked to
+  each plane (CRAFT §c's Mottle, already built). On the demo crops these move the numbers the right way: crisp edges 28
+  -> 9 % (far crop) and 10.5 -> 3.3 % (near crop), dead-flat 29 -> 15 % (near), with the subject and the props still
+  crisp; EDGE STROKES (flat-brush stamps laid along the lost edges) also break the ruler lines: the near crop's straight
+  share 33 -> 17 %, crisp 10.5 -> 2.8 %.
 - **The owner's balance (point 4) has a name and a method:** stylized focus (sources 16, 17): detail and found edges
   where the viewer should look and near; lost edges and coarse marks elsewhere and far. One dose table by plane and tier
   drives every technique (§5.4).
@@ -55,14 +57,15 @@ traced or used as input (they are only measured), and no living artist is a styl
   2.8-13.6 s), so 0 ms at render. Live SVG filters cost +40-100 ms per filtered full-frame layer per frame; WebGL runs
   on SwiftShader here (no GPU; `remotion.config.ts` uses `swangle`): a simple warp shader 0.2-0.3 s per frame, the
   anisotropic Kuwahara 15-17 s per frame. Nothing ranked runs per frame.
-- **Motion:** a baked, plane-locked treatment costs +6 % H.264 bitrate under the float (measured); a texture everywhere
-  +108 %; re-seeding each frame (boil) +112 % and visibly boils: never.
+- **Motion:** a baked, plane-locked treatment costs +6-11 % H.264 bitrate under the float (measured: edge teeth, edge
+  strokes); a texture everywhere +108 %; re-seeding each frame (boil) +112 % and visibly boils: never.
 - **Licences:** everything ranked runs on numpy, OpenCV (Apache-2.0), SciPy (BSD-3) and our own code; the optional JS
   pieces are MIT. Never: Mixbox (CC BY-NC 4.0), LYGIA (Prosperity licence: non-commercial unless a paying patron),
   Shadertoy snippets (CC BY-NC-SA 3.0 unless stated otherwise); pykuwahara is GPL-3.0 (usable as a tool, not needed).
 - **Next step:** an ITERATION still v7 (one agent, about an hour): v6 + design variation on the facade and the paving +
-  edges by intent on the ground, the far city and the clouds + light ramps and one dappled shade; judged by the owner at
-  phone size beside v6; the three numbers measured (§6).
+  edges by intent (edge strokes on the near ground, teeth on the far city and the clouds) + light ramps and one dappled
+  shade; judged by the owner at phone size beside v6, with the stroke dose shown at two strengths (sheet row 3); the
+  three numbers measured (§6).
 
 ## 1. The gap in three numbers (measured)
 
@@ -70,8 +73,9 @@ traced or used as input (they are only measured), and no living artist is a styl
 screenshots carry the same codec; the UI (mute buttons, counters, the lighthouse post's phone chrome and palette) is
 masked or cropped out. **Edge width** is the step across the edge (L*, 9 x 9 window) over the gradient, calibrated on
 synthetic edges: crisp = a 10-90 % width under ~1.5 px, soft = over ~3.8 px; only edges with a step of 8 L* or more are
-counted (lost edges wider than ~10 px are not detected at all). **Straight** = the share of edge pixels on Hough
-segments of 60 px or more (gap 3 px). **Flat31** = the share of non-edge pixels whose L* varies by under 0.35 over
+counted (lost edges wider than ~10 px are not detected at all; texture along an edge widens the estimate, so the
+references' soft share is an upper bound, while the crisp share is robust). **Straight** = the share of edge pixels on
+Hough segments of 60 px or more (gap 3 px). **Flat31** = the share of non-edge pixels whose L* varies by under 0.35 over
 31 x 31 px.
 
 | Image | crisp edges | soft edges | straight | flat31 |
@@ -85,12 +89,12 @@ segments of 60 px or more (gap 3 px). **Flat31** = the share of non-edge pixels 
 | paint 02 lighthouse | 1.8 % | 60.9 % | 2.6 % | 18.1 % |
 | posters 01-07 | 1.2-4.5 % | 65.5-76.3 % | 2.8-12.7 % | 0.1-39.9 % |
 
-**Reading.** The razor-edge share is the clearest gap: ours is 5 to 70 times every reference's, the "geometric"
-city posters included (they read clean, yet only 1-5 % of their edges are razor-sharp: their edges are firm, broken by
-texture). Straightness is partly content (a canal city has long lines, the beach has its horizon), but the posters, full
-of buildings, stay at 3-13 % because their long lines are broken and varied. Flatness: the references' big quiet areas
-are not dead flat; colour moves in them. Caveats: the references are phone screenshots (rescaled, re-compressed), which
-softens them a little; the gap in razor edges is too large for that to explain.
+**Reading.** The razor-edge share is the clearest gap: ours is 5 to 70 times every reference's, the "geometric" city
+posters included (they read clean, yet only 1-5 % of their edges are razor-sharp: texture and a hand-made edge break and
+soften the rest). Straightness is partly content (a canal city has long lines, the beach has its horizon), but the
+posters, full of buildings, stay at 3-13 % because their long lines are broken and varied. Flatness: the references' big
+quiet areas are not dead flat; colour moves in them. Caveats: the references are phone screenshots (rescaled,
+re-compressed), which softens them a little; the gap in razor edges is too large for that to explain.
 
 **On the demo crops (§3's sheet), before -> after the techniques by intent:**
 
@@ -98,10 +102,12 @@ softens them a little; the gap in razor edges is too large for that to explain.
 |---|---|---|---|
 | far crop (sky, far city, tower, bridge; the facade crisp) | 28.1 -> 9.3 % | 33.8 -> 24.8 % | 15.3 -> 12.2 % |
 | near crop (paving and props; the props crisp) | 10.5 -> 3.3 % | 33.0 -> 29.1 % | 29.2 -> 14.6 % |
+| near crop, edge strokes light / bolder (+ light per tile) | 10.5 -> 2.8 / 2.9 % | 33.0 -> 17.2 / 19.9 % | 29.2 -> 14.2 / 14.6 % |
+| far crop, edge strokes light / bolder | 28.1 -> 12.4 / 12.6 % | 33.8 -> 28.1 / 27.3 % | 15.3 -> 15.6 / 15.2 % |
 | test facade, design A (perfect grid) -> D (varied, lit, edges by value) | 92.5 -> 41.8 % | 55.7 -> 34.3 % | 39.6 -> 28.7 % |
 
-The straight share barely moves under a raster treatment: long ruler lines are a DESIGN property (the paving's joints
-cross the whole frame). Only the design can break them (§3.9).
+The straight share barely moves under a displacement: long ruler lines are a DESIGN property (the paving's joints cross
+the whole frame). Strokes laid along them break them (33 -> 17 %), and the design can avoid them (§3.9).
 
 ## 2. What the references do (methods, learned, not copied)
 
@@ -124,17 +130,19 @@ cross the whole frame). Only the design can break them (§3.9).
 
 ## 3. The techniques, one by one
 
-The sheet (`techniques_sheet.jpg`, 2160 x 1752; rerun: `python3 docs/look/organic/techniques_demo.py`, same bytes every
-run): row 1 = v6's far crop (frame x 0-540, y 560-1100), row 2 = v6's near crop (x 360-900, y 1340-1880), row 3 = a
-test facade. Panels 1 = as is, 2-3 = filters, 4 = by intent. Costs: one core, a full 1080 x 1920 frame, best of 1-2
-runs (`--bench`); Chrome numbers from the render machine's headless shell with SwiftShader (§3.12).
+The sheet (`techniques_sheet.jpg`, 2160 x 2336; rerun: `python3 docs/look/organic/techniques_demo.py`, same bytes every
+run): row 1 = v6's far crop (frame x 0-540, y 560-1100), row 2 = v6's near crop (x 360-900, y 1340-1880), in each
+panel 1 = as is, 2-3 = filters, 4 = by intent (edge teeth + light); row 3 = edge strokes at two doses on both crops;
+row 4 = a test facade, the design steps. Costs: one core, a full 1080 x 1920 frame, best of 1-2 runs (`--bench`);
+Chrome numbers from the render machine's headless shell with SwiftShader (§3.12).
 
 ### 3.1 Stroke-based rendering (Hertzmann curved strokes, Litwinowicz, Meier, Hays and Essa)
 - **What it is.** Paint the picture with discrete strokes from a reference: coarse brushes first, finer brushes only
   where the canvas still differs from the reference by more than a threshold; each stroke follows the isophote (normal
   to the gradient), bends with a curvature filter, and takes the reference's colour (source 1; survey: source 2).
-  Litwinowicz clips strokes at edges and moves them by optical flow (3); Meier sticks strokes to surfaces as particles so
-  they never slide over the image, the "shower door" (4); Hays and Essa constrain every stroke property over time (5).
+  Litwinowicz clips strokes at edges and moves them by optical flow (3); Meier sticks strokes to surfaces as particles
+  so they never slide over the image, the "shower door" (4); Hays and Essa constrain every stroke property over time
+  (5).
 - **Look on our design** (row 1, panel 3: a compact Hertzmann, radii 12/6/3): round dabs everywhere, an "oil paint
   filter". On a flat, pale design the coarse passes erase the low-contrast far city, and the fine passes rebuild the
   vector shapes as blobs. It never adds intent: the strokes go wherever the reference has an edge.
@@ -157,9 +165,9 @@ runs (`--bench`); Chrome numbers from the render machine's headless shell with S
 
 ### 3.3 The Kuwahara family (generalized, anisotropic)
 - **What it is.** Each pixel takes the mean of the least-varying sector of its neighbourhood: flat patches with
-  brush-like boundaries. Papari's generalized version uses smooth sectors and is stable on noise (7); the anisotropic one
-  stretches the sectors along the local flow, so the patches follow the form (6; real time on a GPU, polynomial weights
-  in the 2010 follow-up; oil-paint systems build on it, 10).
+  brush-like boundaries. Papari's generalized version uses smooth sectors and is stable on noise (7); the anisotropic
+  one stretches the sectors along the local flow, so the patches follow the form (6; real time on a GPU, polynomial
+  weights in the 2010 follow-up; oil-paint systems build on it, 10).
 - **Look on our design** (row 1, panel 2, r 7, 8 sectors, 8 orientation bins): it softens everything a little and
   deletes small detail (the flock, railing posts, window panes merge); it adds no strokes, because our fills are already
   flat. On a textured or photographic plate it does make painterly patches.
@@ -217,17 +225,26 @@ runs (`--bench`); Chrome numbers from the render machine's headless shell with S
   silhouettes, the facade stays crisp; row 2 panel 4: the paving's joints and the cast shadows break and melt along the
   paving's lines while the table, chairs, crate and planter keep their found edges). Measured: crisp edges 28 -> 9 %
   and 10.5 -> 3.3 %.
+- **Edge strokes** (`edge_strokes`, row 3): one flat-brush stamp (3-7 px wide, 14-40 px long, a dry tail) every
+  14-26 px along each lost edge, in one side's colour or the other's by a slow noise along the contour, lapping over
+  the edge. On the near ground the joints and shadow edges become brushed marks (much like the lighthouse post's
+  marks) while the props stay crisp: crisp 10.5 -> 2.8 %, straight 33 -> 17 %, the best of all the treatments. On the
+  far crop the light dose reads as horizontal brushing; the bolder one is "more like brushes" and starts to look
+  busy: the dose is the owner's call. Full frame: 4,690 stamps in 1.1-2.0 s, deterministic; +11 % bitrate under the
+  float.
 - **Its limits, honestly.** Displacement is a proxy for strokes: long teeth on thin features (a chair leg, a lamp
   post) look torn, so thin props get small doses; an earlier version that displaced pixels in random directions read
   as a glitch, and a Gaussian softening read as out of focus (both dropped). At 1:1 the far crop shows a second limit:
   on a regular pattern (the far terrace's row of windows, the tower's straight sides) horizontal teeth read as a wavy
   distortion rather than paint; at phone size it is nearly invisible, but the right order is to simplify the far
-  design first (windows merged and tone-on-tone, CRAFT §f.2) and tooth only what is left. The quality route for near
-  and mid painted pieces is **edge strokes** (§5.2): flat stamps laid along the edge, their dry tails across it.
-- **Cost:** 0.55 s per full-frame layer (2x supersampled), deterministic (md5 checked). **Motion:** baked and locked
-  to its plane: +6 % bitrate, no boil. Teeth must stay >= 2 px wide: thinner flecks twinkle in the float (CRAFT §c,
-  "Thin lines twinkle").
-- **Verdict: rank 2.** It is the direct answer to point 7 and to "naturally blend".
+  design first (windows merged and tone-on-tone, CRAFT §f.2) and tooth only what is left. Edge strokes read more like
+  paint than teeth on the near ground; their own limit: a dry tail's bristle gaps must stay >= 2 px across at 1x, or
+  they twinkle in the float (the proof's gaps are finer: fix before production).
+- **Cost:** teeth 0.5-0.55 s, strokes 1.1-2.0 s per full-frame layer (2x supersampled), deterministic (md5 checked).
+  **Motion:** baked and locked to its plane: +6 % (teeth) and +11 % (strokes) bitrate, no boil. Teeth and gaps must
+  stay >= 2 px wide: thinner flecks twinkle in the float (CRAFT §c, "Thin lines twinkle").
+- **Verdict: rank 2:** edge strokes on near and mid planes, teeth on far planes and vapour. It is the direct answer
+  to point 7 and to "naturally blend", and with strokes it also breaks the ruler lines (point 6).
 
 ### 3.7 Noise-displaced and eroded silhouettes
 - **What it is.** Push an outline along its normals by fractal noise; a domain warp (noise sampled at a point already
@@ -235,15 +252,15 @@ runs (`--bench`); Chrome numbers from the render machine's headless shell with S
   fractal; people rate mid-range fractal dimensions (about 1.3-1.5) highest in natural images (23; with individual
   differences and exceptions for exact fractals, 25), while a ruler line is dimension 1.0.
 - **Two rules by material.** **Natural shapes** (foliage, clouds, rocks, shadows, water edges, reeds): a multi-scale
-  warp, 3-4 octaves, amplitude about 3-6 % of the shape's size, big, medium and small lobes. **Man-made shapes:** never a
-  noise wobble; a HAND-CUT contour instead: each side a few straight
-  cuts with small angle changes, corners slightly off 90 degrees (our early tests: a noise wobble on furniture and
-  railings read melted). Our engine has both already, for the frame edge:
-  `src/lib/edges/rough.ts` `cutPoly` (hand-cut) and `organic` (a smooth normal wobble), plus `smoothClosed`.
-- **Cost:** vector: 300 shapes with 48-point hand-cut outlines rasterize in 14-20 ms against 7 ms as plain rects
-  (Chrome, two runs; 1,500 shapes: 56-61 against 22-24 ms), so +0.01-0.04 s per frame. Raster (a baked piece's mask): a nested
-  warp field 0.17 s + 0.02 s remap. Seeded per object. **Motion:** the outline is fixed per object and rides its layer;
-  re-seeding it per frame is boil (CRAFT: "no boil").
+  warp, 3-4 octaves, amplitude about 3-6 % of the shape's size, big, medium and small lobes. **Man-made shapes:** never
+  a noise wobble (our early tests: a noise wobble on furniture and railings read melted); a HAND-CUT contour instead:
+  each side a few straight cuts with small angle changes, corners slightly off 90 degrees. Our engine has both already,
+  for the frame edge: `src/lib/edges/rough.ts` `cutPoly` (hand-cut) and `organic` (a smooth normal wobble), plus
+  `smoothClosed`.
+- **Cost:** vector: 300 shapes with 48-point wobbled outlines (the cost of any organic or hand-cut outline) rasterize in
+  14-20 ms against 7 ms as plain rects (Chrome, two runs; 1,500 shapes: 56-61 against 22-24 ms), so +0.01-0.04 s per
+  frame. Raster (a baked piece's mask): a nested warp field 0.17 s + 0.02 s remap. Seeded per object. **Motion:** the
+  outline is fixed per object and rides its layer; re-seeding it per frame is boil (CRAFT: "no boil").
 - **Verdict: rank 1 (as part of the design), rank 7 as a raster pass on a baked piece.**
 
 ### 3.8 Colour and light moving inside a shape
@@ -251,7 +268,7 @@ runs (`--bench`); Chrome numbers from the render machine's headless shell with S
   side warmer and lighter, away cooler), and a few broad strokes vary it. Our operator `shape_light`: each region gets a
   ramp toward the key light (+-2.2-2.8 L*), a warm/cool shift (+-0.8-1.0 on OKLab b) and a very soft mottle; and the
   strongest organic cue for a big flat: **a dappled shade** (a tree's leaf shadow, window light) laid over it, which
-  breaks the geometry with a natural shape (row 3, panel 3).
+  breaks the geometry with a natural shape (row 4, panel 3).
 - **Our stack.** Vector first: an SVG `linearGradient` per face oriented to the key (the sky already uses one,
   `lib/sky.tsx`), dithered per CRAFT §g.4 so it never bands; a dappled shade as one static shadow shape per plane
   through `lib/light.tsx`'s multiply tint family. Bake for painted pieces (`shape_light`, 0.43 s given the regions; the
@@ -267,7 +284,7 @@ runs (`--bench`); Chrome numbers from the render machine's headless shell with S
   overlaps that break silhouettes (a branch, a person, reeds); joints and seams that stop, vary and break instead of
   crossing the frame. Production painterly films did the same at the source: shapes modelled as strokes and
   splatters rather than filtered geometry (20, 21: "edge breakup" designed into the look).
-- **Look** (row 3: panel 1 a perfect grid; panel 2 the same grid with seeded variation and hand-ruled mullions). The
+- **Look** (row 4: panel 1 a perfect grid; panel 2 the same grid with seeded variation and hand-ruled mullions). The
   biggest single step on the sheet, and the only technique that moves the straight-line share (55.7 -> 40.2 %).
 - **Our stack.** Vector, in the engine, seeded per object (`lib/rng.ts`), reusing `edges/rough.ts` and `sketch.ts`
   (`blob`, `smooth`, `crown`). **Cost:** +0.01-0.04 s per frame (§3.7). **Motion:** perfect.
@@ -316,6 +333,7 @@ x264 CRF 18:
 |---|---|---|
 | v6 as is | 387 | - |
 | by intent, baked and locked (row 2 panel 4) | 410 | +6 % |
+| edge strokes, light, baked (row 3 panel 1) | 429 | +11 % |
 | LIC texture everywhere (row 2 panel 2) | 807 | +108 % |
 | the same edges re-seeded every frame (boil) | 821 | +112 %, and it boils |
 
@@ -330,7 +348,7 @@ x264 CRF 18:
 | Rank | Technique | Owner's points | Runs in | Render cost / frame | Bake cost (one core) | Seeded | Motion | Risk |
 |---|---|---|---|---|---|---|---|---|
 | 1 | Organic geometry by design: variety, no template, hand-cut man-made edges, natural silhouettes, overlaps (§3.9, §3.7) | 6, 5-7 | vector (engine) | +0.01-0.04 s | - | yes | perfect | melted man-made shapes if noise-wobbled; use hand-cut |
-| 2 | Edges by intent: lost and found by value, tier, plane, light; dry teeth along the brush (§3.6) | 7, 4 | bake per layer | 0 | 0.55 s per layer | yes | +6 % bitrate | torn thin features; teeth < 2 px twinkle |
+| 2 | Edges by intent: lost and found by value, tier, plane, light; edge strokes (near, mid) or dry teeth (far, vapour) along the brush (§3.6) | 7, 4, 6 | bake per layer | 0 | strokes 1.1-2.0 s, teeth 0.5 s per layer | yes | +6-11 % bitrate | busy if overdosed; torn thin features; gaps < 2 px twinkle |
 | 3 | Colour and light inside shapes: ramps to the key, warm/cool, a dappled shade (§3.8) | 5, 8-9, PROPER LIGHT | vector gradients; bake for painted pieces | ~0 | 0.43 s | yes | perfect | banding (dither), crescents; doc clash §8 |
 | 4 | Marks by intent + the brush ladder stopped by plane (far = coarse) (§3.1, §3.10) | 5, 4 | bake (paint.py) | 0 | 2.8-13.6 s per full frame | yes | perfect | the filter look if image-driven and everywhere |
 | 5 | Texture locked to each plane (Mottle) (§3.11) | 9 | live SVG filter (built) | ~+55-65 ms per layer | - | yes | +27 % (CRAFT) | shimmer and bitrate if grain is added |
@@ -356,15 +374,16 @@ x264 CRF 18:
 ### 5.2 Bake, in `scripts/look/paint/paint.py` (ranks 2, 4, 6, 7)
 - An `edges` pass per piece after P0-P3: `edge_teeth_maps` with the piece's dose (§5.4), the brush direction from the
   piece's style (wind, perspective line, vertical, growth), its seed from `rng_for(seed, piece, 'edges')` (PAINT_RECIPES
-  §3 C16). On near and mid pieces, prefer edge STROKES where the teeth tear thin features or meet a regular pattern.
-- **Edge strokes, the spec (to build; not demonstrated here):** (1) from the piece's design regions, take each boundary
-  between two regions A and B whose value step is under the found threshold (14 L*); (2) resample it every ~0.6 of a
-  stroke length; (3) at each sample lay one flat-brush stamp (paint.py's `make_flat_stamps`, a dry tail over its last
-  25-60 %, PAINT_RECIPES §1.8) of A's or B's colour, chosen by a slow noise along the contour (the lost / found
-  rhythm), oriented along the edge where the edge runs with the brush and along the brush where it crosses it, centred
-  0.2-0.5 of its width over the edge so it laps onto the neighbour; length 18-40 px and width 4-10 px by plane (§5.4);
-  (4) A's strokes, then B's, so the two colours interleave; none on found edges; seeded per (piece, 'edges', A, B).
-  Estimated 1-3 s per layer (est.: a few thousand stamps at paint.py's measured stroke rates).
+  §3 C16). On near and mid pieces, prefer edge STROKES (`edge_strokes`, proven on row 3) over teeth.
+- **Edge strokes, the production spec** (the proof samples Canny edges on a composite; production takes them from the
+  design's regions): (1) from the piece's design regions, take each boundary between two regions A and B whose value
+  step is under the found threshold (14 L*); (2) resample it every ~0.6 of a stroke length; (3) at each sample lay one
+  flat-brush stamp (paint.py's `make_flat_stamps`, a dry tail over its last 25-60 %, PAINT_RECIPES §1.8) of A's or B's
+  colour, chosen by a slow noise along the contour (the lost / found rhythm), oriented along the edge where the edge
+  runs with the brush and along the brush where it crosses it, centred 0.2-0.5 of its width over the edge so it laps
+  onto the neighbour; spacing, length and width by plane (§5.4: 14-40 px long, 3-7 px wide); (4) A's strokes, then
+  B's, so the two colours interleave; none on found edges; seeded per (piece, 'edges', A, B); (5) bristle gaps >= 2 px
+  across at 1x. The proof: 4,690 stamps in 1.1-2.0 s on a full frame (two runs on the shared machine).
 - The brush ladder's finest radius by plane (§5.4); `shape_light` on painted fills; Hobbs-style layered polygons for a
   glow or a mist bank; a raster warp on natural masks.
 - Output unchanged: one RGBA PNG per piece, placed by `<PaintedLayer>`, riding its plane; the reveal (`reveal.tsx`)
@@ -374,20 +393,21 @@ x264 CRF 18:
 - `<Mottle>` per plane as built (CRAFT §c). A cloud's slow churn later (NOTES' `churn`). Nothing else per frame.
 
 ### 5.4 The dose table by plane and tier (PROPOSAL: first doses for the look test)
-Teeth lengths in px at the frame's scale; "found" applies to value steps >= 14 L*, "lost" to steps <= 4 L* (blended
-between); teeth are always >= 2 px wide; directions as in §5.2.
+Lengths in px at the frame's scale; "found" applies to value steps >= 14 L*, "lost" to steps <= 4 L* (blended
+between); teeth and bristle gaps are always >= 2 px wide; directions as in §5.2. Edge strokes where a plane lists
+them, teeth elsewhere (far planes and vapour).
 
-| Plane / tier | Found teeth | Lost teeth | Hand-ruled wobble | Brush ladder (radii) | Light ramp in a face | Natural-silhouette warp |
-|---|---|---|---|---|---|---|
-| The subject (tier A, plane 0) | 0.3 | 0 (<= 2 on its shade side only) | 0.3-0.45 | design + <= 7 crisp accents | +-3-4 L* toward the story light | designed, none added |
-| People, Pip | 0 | 0 | 0 | none (their own recipe) | their recipe | none |
-| Near world and props (tiers B, C at plane 0 / -1) | 0.2 (thin props) to 0.8 | 6-8 (joints, cast-shadow edges) | 0.5 | design + marks by intent | +-2.5-3 | foliage 6-12 px (cell 40-80) |
-| Near frame (-1, -2) | 0.5 | 4 | 0.5 | out-of-focus framing only (blur 2.2-3, PAINT_RECIPES C3) | +-2 | leaves 4-8 |
-| +1 | 0.6 | 4 | 0.6 | 10 / 5 / 3 | +-2 | 4-8 |
-| +2 | 0.6 | solids 2.5; vapour 8 | 0.7 | 12 / 6 | +-1.5 | 3-6 |
-| +3 | 1.0 | solids 2 (tops lost by the sun); vapour 8-10 | 0.9 | 14 / 8 | +-1 | 2-4 |
-| +4 | 1.0 | 6 (roof tops); vapour 10 | 1.0 | 14 | +-0.5 | 2-3 |
-| Sky clouds | - | the sky recipe's edges (lit 1.8, away 16, base 22 px) + teeth 8-10 along the wind on the away side | - | the sky recipe | the sky recipe | the sky recipe |
+| Plane / tier | Edge strokes on lost edges (every / long / wide, px) | Found teeth | Lost teeth | Hand-ruled wobble | Brush ladder (radii) | Light ramp in a face | Natural-silhouette warp |
+|---|---|---|---|---|---|---|---|
+| The subject (tier A, plane 0) | none | 0.3 | 0 (<= 2 on its shade side only) | 0.3-0.45 | design + <= 7 crisp accents | +-3-4 L* toward the story light | designed, none added |
+| People, Pip | none | 0 | 0 | 0 | none (their own recipe) | their recipe | none |
+| Near world and props (tiers B, C at plane 0 / -1) | 14-20 / 14-34 / 3-7 (props: none) | 0.2 (thin props) to 0.8 | 6-8 (joints, cast-shadow edges) | 0.5 | design + marks by intent | +-2.5-3 | foliage 6-12 px (cell 40-80) |
+| Near frame (-1, -2) | none (out of focus) | 0.5 | 4 | 0.5 | out-of-focus framing only (blur 2.2-3, PAINT_RECIPES C3) | +-2 | leaves 4-8 |
+| +1 | 16 / 16-28 / 3-6 | 0.6 | 4 | 0.6 | 10 / 5 / 3 | +-2 | 4-8 |
+| +2 | 18 / 16-28 / 3-5 (solids: few) | 0.6 | solids 2.5; vapour 8 | 0.7 | 12 / 6 | +-1.5 | 3-6 |
+| +3 | vapour only: 24 / 24-40 / 4-7 | 1.0 | solids 2 (tops lost by the sun); vapour 8-10 | 0.9 | 14 / 8 | +-1 | 2-4 |
+| +4 | none (teeth) | 1.0 | 6 (roof tops); vapour 10 | 1.0 | 14 | +-0.5 | 2-3 |
+| Sky clouds | the sky recipe's strokes | - | the sky recipe's edges (lit 1.8, away 16, base 22 px) + teeth 8-10 along the wind on the away side | - | the sky recipe | the sky recipe | the sky recipe |
 
 ### 5.5 Never
 A filter over the whole frame; a per-frame Kuwahara, LIC or stroke pass; a texture fixed to the screen or re-seeded
