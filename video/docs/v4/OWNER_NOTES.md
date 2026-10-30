@@ -257,3 +257,10 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   playbook (the DESIGNED rule picked; the old captions retired). The code (font.ts, theme.ts, Captions.tsx, capcheck)
   follows with the tooling lane; the motion (builds, the bloom) is judged moving in v4's G4 look clip. -> rule:
   playbook, Process (a pick handed over: engagement, pleasantness, retention).
+- 2026-10-30 ~14:30 UTC, with five people references (`docs/look/people_design/refs_hair_2026-10-30/`): "So we previously
+  made a recipe and a detailed research and the update to people figures / We need to iterate on it more and improve
+  the hair and the proportions and stature / I will send you more references when it come to hair it's never really
+  static or like one firm it's always a little messy, unstructured wavy / Research the haircuts and the physics of hair
+  and let's make sure it's the most pleasant and modern recipe we have" -> a people iteration (hair, proportions,
+  stature) on direction C with the LASH face, stills first; it feeds video 4's person near the camera (S1, S11, S12).
+  -> rule: playbook, Visual style (hair is never static or one firm shape).

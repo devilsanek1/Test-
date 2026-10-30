@@ -362,6 +362,17 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   captions and QA tools are tools, not assets; the kit pieces in `src/lib` (cine, kit, mascot) are references to learn
   from, never a film's sets, and a film never imports another film's folder (`src/vN/`). — ("Don't rely on reusable
   assets", v2 restart, 2026-10-27).
+- **Hair is never static or one firm shape: always a little messy, unstructured and wavy,** a designed mass that
+  breaks into a few locks and wisps at its edge, moving with the air and the body (hair physics: weight, wind,
+  follow-through), cut in today's real haircuts; with it, people's proportions and stature get better: slim, elegant
+  adults who stand and sit with a relaxed, confident posture. The recipe must be the most pleasant and modern we have
+  (`docs/look/PEOPLE_DESIGN.md`, the hair and proportions iteration; references `docs/look/people_design/
+  refs_hair_2026-10-30/`). — ("So we previously made a recipe and a detailed research and the update to people figures /
+  We need to iterate on it more and improve the hair and the proportions and stature / I will send you more references
+  when it come to hair it's never really static or like one firm it's always a little messy, unstructured wavy /
+  Research the haircuts and the physics of hair and let's make sure it's the most pleasant and modern recipe we have",
+  2026-10-30, with five references: wind-lifted long hair seen from behind, a messy copper mop and a wavy bob with
+  flyaways on a height sheet, a tousled spiky crop, long hair falling unevenly, slim long-legged figures.)
 - **People: small and simple in the frame, contemporary and refined in design** (small full figures, often seen from
   behind or in rear 3/4; adult proportions of about 7.8 heads in direction C, below, which replaces reference 1's
   round-headed crowd as the drawing model; near heads <= ~140 px), never big character models: they act with their pose
