@@ -6,6 +6,16 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-30 ~19:30 UTC: the owner handed the calls over; painter v7 runs
+- Owner: "Do what you think is right and make the videos better" -> playbook rule (Process: when the owner hands a call
+  over, make it); sound-sync A13 applied, its questions decided; ORGANIC.md's three look questions decided (T3 key,
+  frontal wing, our paint dose; ORGANIC.md §8 end).
+- RUNNING: painter v7 step A (agent a92b7a83a8f957196; ORGANIC.md §6 steps 1, 2, 4 in `src/look/v7_s1/`) ->
+  `paint_test/paint_still_v7a.png`, `compare_v7a.jpg`, NOTES.md v7a with a HANDOFF for step B (step 3 brushwork + step 5
+  paper + people C with LASH). Then: show v7a, reconcile D3 (darks) in DIRECTION 6, CRAFT §d.2/§f.8, LAYOUT, the
+  playbook's value-range bullet; launch step B.
+- Check-ins commit the loop's whole path list (scratchpad study_checkpoint4.sh P=...), not only composition.
+
 ## Status 2026-10-30 ~19:00 UTC: sound sync DONE; composition library runs
 - `video/docs/look/SOUND_SYNC.md` + `sound_sync/` (reels.md + two timelines, craft.md, audit.md); 23 doc edits applied
   (`sound_sync/PROPOSED_DOC_EDITS.md` header); A13 and two questions go to the owner. TODO after the composition run:

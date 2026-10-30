@@ -748,6 +748,13 @@ pieces through `staticFile` only (pieces must live under `public/`) and has no `
 superseded by `libraries.md`; `scripts/qa/check_banding.py --texture` still FAILs any texture in the caption band,
 where CRAFT §c's paper now allows <= 15 % of its strength (the band's spread <= 1.5 L*).
 
+**Decided 2026-10-30 ~19:30 UTC under the owner's hand-over** ("Do what you think is right and make the videos better";
+playbook: when the owner hands a call over, make it): 1. the key is T3, the references' low key, the caption band kept
+light (about L* 77) and lifted toward T1 only if it reads gloomy at 400 px beside refs 02 and 03; 2. the wing stays
+frontal (his "our initial angle snd the view frankly wasn't bad"), its corners broken by overlaps and painted edges;
+3. the paint's dose is ours: painted at 400 px, subtle at 1:1, the paper invisible at 400 px. D3's wording follows v7a.
+v7 builds to these (`paint_test/NOTES.md` v7a). The questions as they were:
+
 **Three questions for the owner, with the v7 sheet:**
 1. The key: T1 (one gentle dark mass, L* ~40-45, our quay in a canopy's shade) or T3 (the references' low key: 45 % of
    the frame under L* 40, a darker sky top)? (D3, C8)
