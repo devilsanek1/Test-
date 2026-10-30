@@ -193,11 +193,15 @@ export function hair(style: HairStyle, b: Build, sk: Skeleton, r: HeadRig, v: Vi
     const fsecs = sections(capKeys(b, rows), 6);
     const yJaw = b.crownY - 0.95 * h;
     const bodyXf = (p: V3): V3 => sk.leanXf([p[0] + sk.cx(p[1] - sk.bob), p[1] - sk.bob, p[2]]);
+    const yV = b.crownY - 2.0 * h;
     const xf = (p: V3): V3 => {
       const w = clamp((yJaw - p[1]) / (0.45 * h), 0, 1);
       const k = w * w * (3 - 2 * w);
-      const a = r.xf(p);
-      const c = bodyXf(p);
+      // the ends: a soft V (the middle longest), the sides lifting
+      const kv = clamp((yV - p[1]) / (0.46 * h), 0, 1);
+      const q: V3 = [p[0], p[1] + kv * 0.2 * h * Math.min(1, Math.abs(p[0]) / (0.5 * h)) ** 1.6, p[2]];
+      const a = r.xf(q);
+      const c = bodyXf(q);
       return [lerp(a[0], c[0], k), lerp(a[1], c[1], k), lerp(a[2], c[2], k)];
     };
     const fall = loftOutline(fsecs, v, xf, {cornerBottom: false});
@@ -212,7 +216,14 @@ export function hair(style: HairStyle, b: Build, sk: Skeleton, r: HeadRig, v: Vi
         notches.push([[e.x - w, e.y + 0.14 * h], [e.x - w * 0.12, e.y - 0.06 * h], [e.x + w * 0.12, e.y - 0.06 * h], [e.x + w, e.y + 0.14 * h]]);
       }
     }
-    parts.push({k: 'hairFall', pts: fall, mat, z: c > 0.17 ? Z.backHair : Z.frontHair, tension: 0.5, cut: notches.length ? notches : undefined, grp});
+    const zf = c > 0.17 ? Z.backHair : Z.frontHair;
+    parts.push({k: 'hairFall', pts: fall, mat, z: zf, tension: 0.5, cut: notches.length ? notches : undefined, grp});
+    if (c < 0.2) {
+      // glossy length: one long sheen down the key side of the fall (seen from the side and behind)
+      const yTop = proj(r.xf([0, b.crownY, 0]), v).y;
+      const sh = contourBand(fall, {key: ctx.key, gap: 0.05 * h, width: 0.06 * h, minDot: 0.45, maxLen: 1.1 * h, where: (p) => p[1] > yTop + 0.8 * h && p[1] < yTop + 2.1 * h});
+      if (sh) parts.push({k: 'fallSheen', pts: sh, mat, tone: 'sheen', z: zf + 0.1, clip: 'hairFall', tension: 0.5, op: 0.7});
+    }
   }
   if (style === 'pony') {
     // the tie high at the back of the crown, the tail falling from it with a soft S: the figure's one flowing element
@@ -259,22 +270,19 @@ export function hair(style: HairStyle, b: Build, sk: Skeleton, r: HeadRig, v: Vi
   }
   if (style === 'bob') {
     // the "ripped" hem: shallow tapered notches cut up into the bottom edge where it is visible
-    const yH = b.crownY - 1.0 * h;
-    for (const [phi, dep] of [
-      [205, 0.07],
-      [236, 0.09],
-      [266, 0.06],
-      [296, 0.085],
-      [326, 0.065],
-      [354, 0.075],
-      [24, 0.065],
-      [150, 0.07],
-      [176, 0.06],
-    ] as [number, number][]) {
+    // a few soft, uneven, shallow notches (separated ends, never a comb)
+    const yH = b.crownY - 1.02 * h;
+    for (const [phi, dep, wd] of [
+      [214, 0.05, 0.05],
+      [262, 0.07, 0.06],
+      [318, 0.045, 0.045],
+      [8, 0.06, 0.055],
+      [160, 0.05, 0.05],
+    ] as [number, number, number][]) {
       const s = surf(secs, yH, phi, v, capXf, 1.5);
       if (!s.vis) continue;
-      const w = 0.03 * h;
-      cuts.push([[s.p[0] - w, s.p[1] + 0.2 * h], [s.p[0] - w * 0.1, s.p[1] - dep * h], [s.p[0] + w * 0.1, s.p[1] - dep * h], [s.p[0] + w, s.p[1] + 0.2 * h]]);
+      const w = wd * h;
+      cuts.push([[s.p[0] - w, s.p[1] + 0.2 * h], [s.p[0] - w * 0.25, s.p[1] - dep * h * 0.6], [s.p[0], s.p[1] - dep * h], [s.p[0] + w * 0.2, s.p[1] - dep * h * 0.7], [s.p[0] + w, s.p[1] + 0.2 * h]]);
     }
   }
   if (style === 'twists') {

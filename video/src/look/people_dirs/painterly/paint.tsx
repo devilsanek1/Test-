@@ -96,7 +96,7 @@ export function paintFigure(model: Model, cam: Cam, opt: PaintOpts): React.React
     <filter key={id} id={`${P}-${id}`} filterUnits="userSpaceOnUse" x={fx} y={fy} width={fw} height={fh} colorInterpolationFilters="sRGB">
       {brush > 0 ? (
         <>
-          <feTurbulence type="fractalNoise" baseFrequency={`${fmt3(1 / (16 * s))} ${fmt3(1 / (5.5 * s))}`} numOctaves={2} seed={7} result="n" />
+          <feTurbulence type="fractalNoise" baseFrequency={`${fmt3(1 / (6 * s))} ${fmt3(1 / (20 * s))}`} numOctaves={2} seed={7} result="n" />
           <feDisplacementMap in="SourceGraphic" in2="n" scale={brush * s} xChannelSelector="R" yChannelSelector="G" result="d" />
           <feGaussianBlur in="d" stdDeviation={sd} />
         </>
@@ -105,7 +105,8 @@ export function paintFigure(model: Model, cam: Cam, opt: PaintOpts): React.React
       )}
     </filter>
   );
-  const brush = opt.brush ?? (small ? 0 : 3.2);
+  // the dry-brush break of the soft edges: in model units, so it scales with the figure (invisible below ~260 px)
+  const brush = opt.brush ?? (small ? 0 : 5.5);
   const defs: React.ReactNode[] = [
     flt('bR', blurS(1.6)),
     flt('bD1', blurS(2)),

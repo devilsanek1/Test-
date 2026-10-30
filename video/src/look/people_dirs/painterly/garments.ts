@@ -4,7 +4,7 @@
 // drape folds (vertical lobes, deeper toward the hem: the light turns them into soft value bands), an open front (a
 // mask, so the layer under shows), and hems that may vary around the body (a half tuck).
 import {type Skeleton, type Q4, fx, fz, ring4, rowsFor, footChain, tube} from './body';
-import {type V3, add, chainAt, clamp, cross, dot, hash, lerp, mix, mulMV, nrm, rotY, scl, smooth, spline, sub} from './math';
+import {type V3, add, chainAt, clamp, cross, dot, fillet, hash, lerp, mix, mulMV, nrm, rotY, scl, smooth, spline, sub} from './math';
 import type {Surface, SurfLook} from './mesh';
 
 // ---------------------------------------------------------------- the legs at a height (for skirts and coats)
@@ -103,8 +103,14 @@ export function torsoGarment(sk: Skeleton, g: TorsoGarment, res: number): Surfac
       const a = spline(b.tA, yy) * b.slim;
       return {o: f.o, ax: fx(f), az: fz(f), f: spline(b.tF, yy), bk: spline(b.tB, yy), p: a, m: a};
     }
+    // below the hips: the legs' hull, blended in from the hip ring so a long coat's outline has no step at the seam
     const h = hullRing(sk, y, 0);
-    return {o: h.o, ax: h.ax, az: h.az, f: h.q.f, bk: h.q.b, p: h.q.p, m: h.q.m};
+    const k = smooth(470, 400, y);
+    const f0 = sk.ring(470);
+    const a0 = spline(b.tA, 470) * b.slim;
+    const q0 = {f: spline(b.tF, 470), bk: spline(b.tB, 470), p: a0, m: a0};
+    const o: V3 = [mix(f0.o[0], h.o[0], k), y, mix(f0.o[2], h.o[2], k)];
+    return {o, ax: h.ax, az: h.az, f: mix(q0.f, h.q.f, k), bk: mix(q0.bk, h.q.b, k), p: mix(q0.p, h.q.p, k), m: mix(q0.m, h.q.m, k)};
   };
   const hangRef = g.hang ? radiiAt(g.hang.from) : null;
   for (let i = 0; i < rows; i++) {
@@ -221,7 +227,7 @@ export function sleeveSurface(sk: Skeleton, side: 'L' | 'R', sl: Sleeve, res: nu
   const CAP = 16;
   const upv = nrm(sub(sh, el));
   const ext = add(sh, scl(upv, CAP));
-  const chain = [ext, sh, el, wr];
+  const chain = fillet([ext, sh, el, wr], 58);
   const len0 = b.upperArm + b.foreArm + CAP;
   const from = sl.from ?? -CAP;
   const tA = clamp((from + CAP) / len0, 0, 0.98);
@@ -341,7 +347,8 @@ export function skirtSurface(sk: Skeleton, sl: Skirt, res: number): Surface {
     }
     let disp: ((phi: number) => number) | undefined;
     if (sl.folds) {
-      const depth = smooth(500, sl.hem, y);
+      // bias-cut cloth: the folds start at the hip and keep their depth down to the hem (long, even pipes)
+      const depth = smooth(580, 430, y);
       const sd = sl.folds.seed ?? 1.3;
       const amp = sl.folds.amp * depth;
       disp = (phi: number) => amp * (Math.sin(sl.folds!.n * phi + sd) * 0.62 + Math.sin(sl.folds!.n * 1.6 * phi + sd * 2.7) * 0.38) * (0.6 + 0.4 * (1 - Math.max(0, Math.cos(phi))));

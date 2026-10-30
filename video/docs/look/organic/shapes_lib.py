@@ -10,6 +10,8 @@ The measures (each a function below, the definitions in shapes.md §1):
   edge_profiles()     the 10-90 % width and the step of the edge across each boundary (an erf fit)
   region_stats()      symmetry, repetition, spacing, size ladder, divider dimension, the roughness spectrum
   notan()             the 2-value mass map and its lost / soft / found boundary shares
+  along_boundaries()  lost and found ALONG the notan's outlines (they run on where the edge is lost): found / soft /
+                      lost / broken shares, and how often one outline alternates between found and lost
 """
 from __future__ import annotations
 

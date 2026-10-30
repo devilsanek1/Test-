@@ -227,7 +227,8 @@ export function noseShade(r: HeadRig, v: View): PP[] | null {
 }
 export function lipTone(r: HeadRig, v: View): PP[] | null {
   const fy = Math.abs(faceYaw(r));
-  if (fy > 75) return null;
+  // only near the front: turned further, the lips sit on the contour and read as a blemish
+  if (fy > 30) return null;
   return headRegion(r, v, 0.775, 0.875, (t) => {
     const u = (t - 0.775) / 0.1;
     const w = 15 + 4 * Math.sin(Math.PI * u) - (u > 0.45 && u < 0.55 ? 1 : 0);

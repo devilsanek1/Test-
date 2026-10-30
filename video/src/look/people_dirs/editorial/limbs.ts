@@ -14,7 +14,7 @@ export function leg(sk: Skeleton, s: Side, v: View, mat = 'skin'): Part {
   const chain: V3[] = [sk.hip[s], sk.knee[s], sk.ankle[s]];
   const pts = tubeOutline(chain, (u) => legRadius(b, u, s === 'l' ? 1 : -1), v, [0, 0, 1], {m: 40});
   const d = proj(sk.knee[s], v).d - torsoDepth(sk, v);
-  return {k: `leg_${s}`, pts, mat, z: d < 0 ? Z.farLeg : Z.leg, tension: 0.5};
+  return {k: `leg_${s}`, pts, mat, z: d < 0 ? Z.farLeg : Z.leg, tension: 0.5, grp: `legG_${s}`};
 }
 
 /** A bare arm (skin) from the shoulder to the wrist. */
@@ -104,67 +104,85 @@ function crispEnd(pts: PP[]): PP[] {
 
 type HandShape = V2[];
 /** The relaxed hand seen from its thumb side (local: the wrist at the origin, the hand toward +y, the thumb on -x),
- *  in hand lengths: the back of the hand a long straight, the palm side curved, the fingers grouped and curled 20-35
- *  degrees, the thumb a separate lobe split by a notch 40 % down (design_research H1-H3). */
+ *  in hand lengths: slender (fashion hands are long and narrow), the back of the hand a long near-straight line, the
+ *  palm side curved, the fingers grouped and curling in at the tips, the thumb its own small lobe split by a notch
+ *  ~40 % down the hand (design_research H1-H3). */
 const HAND_SIDE: HandShape = [
-  [0.15, -0.04],
-  [0.17, 0.2],
-  [0.165, 0.46],
-  [0.14, 0.66],
-  [0.09, 0.86],
-  [0.03, 0.99],
-  [-0.03, 1.0],
-  [-0.07, 0.9],
-  [-0.08, 0.74],
-  [-0.1, 0.6],
-  [-0.155, 0.56],
-  [-0.2, 0.48],
-  [-0.215, 0.36],
-  [-0.19, 0.22],
-  [-0.15, 0.1],
-  [-0.14, -0.04],
+  [0.12, -0.06],
+  [0.135, 0.12],
+  [0.14, 0.32],
+  [0.13, 0.5],
+  [0.11, 0.64],
+  [0.08, 0.78],
+  [0.045, 0.9],
+  [0.0, 0.985],
+  [-0.045, 0.975],
+  [-0.065, 0.9],
+  [-0.07, 0.78],
+  [-0.075, 0.66],
+  [-0.105, 0.6],
+  [-0.145, 0.56],
+  [-0.165, 0.5],
+  [-0.16, 0.42],
+  [-0.14, 0.3],
+  [-0.12, 0.16],
+  [-0.105, 0.04],
+  [-0.1, -0.06],
 ];
-/** The back of the hand (the thumb tucked behind): a long tapered paddle, the fingers' tips softly squared. */
+/** The back of the hand (the thumb tucked along the side): a slim tapered paddle, the fingertips softly pointed. */
 const HAND_BACK: HandShape = [
-  [0.15, -0.04],
-  [0.18, 0.22],
-  [0.18, 0.46],
-  [0.155, 0.7],
-  [0.11, 0.9],
-  [0.04, 1.0],
-  [-0.05, 0.99],
-  [-0.12, 0.86],
-  [-0.155, 0.66],
-  [-0.175, 0.44],
-  [-0.16, 0.2],
-  [-0.14, -0.04],
-];
-/** A hand gripping (a phone, a strap): the fingers wrapped forward as one mass, the thumb along the top. */
-const HAND_GRIP: HandShape = [
-  [0.16, -0.04],
-  [0.19, 0.18],
-  [0.2, 0.38],
-  [0.17, 0.56],
-  [0.08, 0.68],
-  [-0.04, 0.7],
+  [0.115, -0.06],
+  [0.14, 0.14],
+  [0.155, 0.34],
+  [0.155, 0.5],
+  [0.14, 0.64],
+  [0.115, 0.78],
+  [0.08, 0.9],
+  [0.035, 0.975],
+  [-0.01, 0.99],
+  [-0.055, 0.96],
+  [-0.09, 0.88],
+  [-0.12, 0.76],
   [-0.14, 0.62],
-  [-0.2, 0.46],
-  [-0.24, 0.3],
-  [-0.22, 0.16],
-  [-0.15, 0.06],
-  [-0.14, -0.04],
+  [-0.16, 0.5],
+  [-0.165, 0.38],
+  [-0.15, 0.22],
+  [-0.125, 0.08],
+  [-0.105, -0.06],
 ];
-/** The thumb hooked over a pocket's edge: only the thumb and the top of the hand's back show. */
+/** A hand gripping (a phone, a strap), seen from its back: the fingers curled round as one compact mass, the thumb
+ *  wrapping the other side. */
+const HAND_GRIP: HandShape = [
+  [0.12, -0.06],
+  [0.15, 0.12],
+  [0.165, 0.3],
+  [0.16, 0.46],
+  [0.13, 0.58],
+  [0.07, 0.66],
+  [-0.01, 0.69],
+  [-0.08, 0.66],
+  [-0.13, 0.58],
+  [-0.16, 0.48],
+  [-0.2, 0.42],
+  [-0.21, 0.32],
+  [-0.17, 0.18],
+  [-0.13, 0.06],
+  [-0.1, -0.06],
+];
+/** The thumb hooked over a pocket's edge: only the top of the hand's back and the thumb show. */
 const HAND_THUMB: HandShape = [
-  [0.15, -0.04],
-  [0.17, 0.16],
-  [0.12, 0.3],
-  [-0.02, 0.33],
-  [-0.12, 0.42],
-  [-0.2, 0.4],
-  [-0.2, 0.26],
-  [-0.15, 0.08],
-  [-0.14, -0.04],
+  [0.12, -0.06],
+  [0.14, 0.1],
+  [0.13, 0.22],
+  [0.04, 0.26],
+  [-0.06, 0.27],
+  [-0.1, 0.32],
+  [-0.13, 0.42],
+  [-0.17, 0.44],
+  [-0.19, 0.38],
+  [-0.17, 0.24],
+  [-0.13, 0.08],
+  [-0.1, -0.06],
 ];
 
 /** The hand at the wrist, along the projected forearm with a soft wrist break; mirrored so the thumb faces the side
@@ -217,7 +235,7 @@ const SHOES: Record<ShoeKind, ShoeSpec> = {
   // a slim pointed flat: a low vamp (the instep shows), a long pointed toe, a whisper of a heel
   pump: {len: 1.1, s: [0, 0.06, 0.2, 0.4, 0.6, 0.75, 0.88, 0.96, 1], hw: [0.07, 0.1, 0.11, 0.12, 0.14, 0.135, 0.09, 0.04, 0.01], ht: [0.17, 0.16, 0.1, 0.075, 0.1, 0.11, 0.08, 0.045, 0.02], heel: 4, sole: 0},
   // a slim low-profile sneaker: a rounded toe, the tongue up the instep, a light sole band ~0.01 H
-  sneaker: {len: 1.07, s: [0, 0.06, 0.25, 0.42, 0.6, 0.78, 0.9, 0.97, 1], hw: [0.09, 0.115, 0.125, 0.13, 0.15, 0.15, 0.13, 0.09, 0.05], ht: [0.22, 0.25, 0.27, 0.3, 0.2, 0.16, 0.13, 0.09, 0.05], heel: 0, sole: 0.065},
+  sneaker: {len: 1.07, s: [0, 0.05, 0.16, 0.3, 0.42, 0.56, 0.7, 0.84, 0.94, 1], hw: [0.08, 0.105, 0.115, 0.122, 0.13, 0.142, 0.146, 0.134, 0.1, 0.045], ht: [0.2, 0.25, 0.21, 0.27, 0.3, 0.23, 0.165, 0.13, 0.095, 0.05], heel: 0, sole: 0.062},
   // a loafer: low and long, a soft square toe, a low sole
   loafer: {len: 1.07, s: [0, 0.06, 0.25, 0.45, 0.62, 0.78, 0.9, 0.97, 1], hw: [0.085, 0.11, 0.12, 0.13, 0.145, 0.145, 0.125, 0.08, 0.04], ht: [0.18, 0.19, 0.16, 0.2, 0.17, 0.14, 0.11, 0.08, 0.04], heel: 6, sole: 0.035},
   // a ballet flat: very low, a soft almond toe, the instep bare
@@ -225,7 +243,7 @@ const SHOES: Record<ShoeKind, ShoeSpec> = {
 };
 
 /** The foot's frame: the heel's ground point, the forward axis (yawed), the up axis (pitched by the heel's lift). */
-function footFrame(sk: Skeleton, s: Side, spec: ShoeSpec): {o: V3; u: V3; up: V3; w: V3} {
+function footFrame(sk: Skeleton, s: Side): {o: V3; u: V3; up: V3; w: V3} {
   const b = sk.b;
   const A = sk.ankle[s];
   const yawD = sk.footYaw[s];
@@ -243,74 +261,103 @@ function footFrame(sk: Skeleton, s: Side, spec: ShoeSpec): {o: V3; u: V3; up: V3
   return {o, u, up: upF, w};
 }
 
-/** A shoe as rings along the foot, projected; its outline by the axis method (profile-ish views) or the hull (front,
- *  back). Returns the shoe, its sole band (sneakers, loafers), and the instep skin above a low vamp. */
-export function shoe(sk: Skeleton, s: Side, v: View, kind: ShoeKind, mats: {shoe: string; sole?: string; skin?: string}): Part[] {
+/** Rings along the foot (heel at u 0 .. toe at u 1, `len` foot lengths), profiles in foot lengths; their outline by
+ *  the axis method (profile-ish views) or the hull (seen from the front or behind). */
+function alongFoot(sk: Skeleton, s: Side, v: View, len: number, us: number[], hws: number[], hts: number[], o: {bottom?: number; cap?: (u: number) => number; u0?: number; u1?: number} = {}): PP[] {
+  const b = sk.b;
+  const F = footFrame(sk, s);
+  const L = b.foot * len;
+  const hwF = pchip(us, hws.map((x) => x * b.foot));
+  const htF = pchip(us, hts.map((x) => x * b.foot));
+  const u0 = o.u0 ?? 0;
+  const u1 = o.u1 ?? 1;
+  const bottom = o.bottom ?? 0;
+  const rings: V3[][] = [];
+  const N = 24;
+  for (let i = 0; i <= N; i++) {
+    const u = lerp(u0, u1, i / N);
+    const hw = hwF(u);
+    let ht = htF(u);
+    if (o.cap) ht = Math.min(ht, o.cap(u));
+    const c = add3(F.o, mul3(F.u, u * L));
+    const ring: V3[] = [];
+    for (let j = 0; j <= 12; j++) {
+      const a = (Math.PI * j) / 12;
+      // a flat sole, rounded sides and top
+      const x = Math.cos(a) * hw;
+      const y = bottom + Math.sin(a) ** 0.7 * Math.max(0, ht - bottom);
+      ring.push(add3(c, add3(mul3(F.w, x), mul3(F.up, y))));
+    }
+    rings.push(ring);
+  }
+  const P = rings.map((r) => r.map((p) => proj(p, v)));
+  const a0 = proj(F.o, v);
+  const a1 = proj(add3(F.o, mul3(F.u, L)), v);
+  const ax: V2 = [a1.x - a0.x, a1.y - a0.y];
+  if (len2(ax) > L * 0.5) {
+    const d = norm2(ax);
+    const n: V2 = [-d[1], d[0]];
+    const top: PP[] = [];
+    const bot: PP[] = [];
+    P.forEach((ring) => {
+      let hi = ring[0];
+      let lo = ring[0];
+      ring.forEach((p) => {
+        if (p.x * n[0] + p.y * n[1] < hi.x * n[0] + hi.y * n[1]) hi = p;
+        if (p.x * n[0] + p.y * n[1] > lo.x * n[0] + lo.y * n[1]) lo = p;
+      });
+      top.push([hi.x, hi.y]);
+      bot.push([lo.x, lo.y]);
+    });
+    return [...top, ...bot.reverse()];
+  }
+  return hull(P.flat().map((p) => [p.x, p.y] as V2));
+}
+
+/** The bare foot inside a low shoe (a flat, a pump): the heel, the instep rising to the ankle (it overlaps the leg's
+ *  end, in the leg's gradient group, so the leg runs into the foot with no seam), the toes low. */
+export function foot(sk: Skeleton, s: Side, v: View, mat = 'skin'): Part {
+  const pts = alongFoot(sk, s, v, 1.0, [0, 0.06, 0.16, 0.24, 0.36, 0.5, 0.64, 0.78, 0.9, 0.97, 1], [0.065, 0.085, 0.095, 0.1, 0.105, 0.115, 0.125, 0.13, 0.11, 0.07, 0.03], [0.13, 0.2, 0.28, 0.34, 0.27, 0.19, 0.13, 0.095, 0.075, 0.05, 0.025]);
+  const d = proj(sk.knee[s], v).d - torsoDepth(sk, v);
+  return {k: `foot_${s}`, pts, mat, z: (d < 0 ? Z.farLeg : Z.leg) + 0.3, tension: 0.5, grp: `legG_${s}`};
+}
+
+/** A shoe: one shape plus its sole band (sneakers, loafers), a side stripe (the slim sneaker's contrast detail) and a
+ *  kitten heel where it has one (fashion §3.2: shoes are the style statement at our sizes). */
+export function shoe(sk: Skeleton, s: Side, v: View, kind: ShoeKind, mats: {shoe: string; sole?: string; stripe?: string}): Part[] {
   const b = sk.b;
   const spec = SHOES[kind];
-  const F = footFrame(sk, s, spec);
-  const L = b.foot * spec.len;
-  const hwF = pchip(spec.s, spec.hw.map((x) => x * b.foot));
-  const htF = pchip(spec.s, spec.ht.map((x) => x * b.foot));
-  const ringsAt = (hScale: (u: number) => number, bottom = 0, heightCap?: (u: number) => number) => {
-    const rings: V3[][] = [];
-    const N = 22;
-    for (let i = 0; i <= N; i++) {
-      const u = i / N;
-      const hw = hwF(u);
-      let ht = htF(u) * hScale(u);
-      if (heightCap) ht = Math.min(ht, heightCap(u));
-      const c = add3(F.o, mul3(F.u, u * L));
-      const ring: V3[] = [];
-      for (let j = 0; j <= 12; j++) {
-        const a = (Math.PI * j) / 12;
-        // a flat sole, rounded sides and top
-        const x = Math.cos(a) * hw;
-        const y = bottom + Math.sin(a) ** 0.7 * (ht - bottom);
-        ring.push(add3(c, add3(mul3(F.w, x), mul3(F.up, y))));
-      }
-      rings.push(ring);
-    }
-    return rings;
-  };
-  const outlineOf = (rings: V3[][]): PP[] => {
-    const P = rings.map((r) => r.map((p) => proj(p, v)));
-    const a0 = proj(F.o, v);
-    const a1 = proj(add3(F.o, mul3(F.u, L)), v);
-    const ax: V2 = [a1.x - a0.x, a1.y - a0.y];
-    const axl = len2(ax);
-    if (axl > L * 0.5) {
-      const d = norm2(ax);
-      const n: V2 = [-d[1], d[0]];
-      const top: PP[] = [];
-      const bot: PP[] = [];
-      P.forEach((ring) => {
-        let hi = ring[0];
-        let lo = ring[0];
-        ring.forEach((p) => {
-          if (p.x * n[0] + p.y * n[1] < hi.x * n[0] + hi.y * n[1]) hi = p;
-          if (p.x * n[0] + p.y * n[1] > lo.x * n[0] + lo.y * n[1]) lo = p;
-        });
-        top.push([hi.x, hi.y]);
-        bot.push([lo.x, lo.y]);
-      });
-      return [...top, ...bot.reverse()];
-    }
-    return hull(P.flat().map((p) => [p.x, p.y] as V2));
-  };
   const zs = proj(sk.ankle[s], v).d - torsoDepth(sk, v) < 0 ? Z.farLeg + 1 : Z.shoe;
   const out: Part[] = [];
-  out.push({k: `shoe_${s}`, pts: outlineOf(ringsAt(() => 1)), mat: mats.shoe, z: zs, tension: 0.35});
+  out.push({k: `shoe_${s}`, pts: alongFoot(sk, s, v, spec.len, spec.s, spec.hw, spec.ht), mat: mats.shoe, z: zs, tension: 0.35});
   if (spec.sole && mats.sole) {
-    out.push({k: `sole_${s}`, pts: outlineOf(ringsAt(() => 1, 0, () => spec.sole * b.foot)), mat: mats.sole, tone: 'base', z: zs + 0.2, clip: `shoe_${s}`, tension: 0.3});
+    out.push({k: `sole_${s}`, pts: alongFoot(sk, s, v, spec.len, spec.s, spec.hw.map((x) => x + 0.006), spec.ht, {cap: () => spec.sole}), mat: mats.sole, tone: 'base', z: zs + 0.2, clip: `shoe_${s}`, tension: 0.3});
+  }
+  if (mats.stripe) {
+    // the contrast stripe: a slim band slanting from the lacing down and back to the sole, on the side that faces us
+    const F = footFrame(sk, s);
+    const L = b.foot * spec.len;
+    const htF = pchip(spec.s, spec.ht.map((x) => x * b.foot));
+    const hwF = pchip(spec.s, spec.hw.map((x) => x * b.foot));
+    const toward = proj(add3(F.o, F.w), v).d - proj(F.o, v).d;
+    const side = toward >= 0 ? 1 : -1;
+    const pt = (u: number, k: number): PP => {
+      const c = add3(F.o, mul3(F.u, u * L));
+      const y = spec.sole * b.foot + k * (htF(u) - spec.sole * b.foot);
+      const q = proj(add3(c, add3(mul3(F.w, side * hwF(u) * 1.02), mul3(F.up, y))), v);
+      return [q.x, q.y];
+    };
+    const stripe: PP[] = [pt(0.42, 0.82), pt(0.5, 0.78), pt(0.36, 0.06), pt(0.26, 0.06)];
+    if (Math.abs(toward) > 0.25) out.push({k: `stripe_${s}`, pts: stripe, mat: mats.stripe, tone: 'base', z: zs + 0.3, clip: `shoe_${s}`, tension: 0.15});
   }
   if (spec.heel > 10) {
-    // the kitten heel: a slim block under the heel's back
+    const F = footFrame(sk, s);
+    const L = b.foot * spec.len;
     const h0 = add3(F.o, mul3(F.u, 0.03 * L));
     const h1 = add3(F.o, mul3(F.u, 0.12 * L));
     const gnd = (p: V3): V3 => [p[0], 0, p[2]];
-    const pts = [proj(h0, v), proj(h1, v), proj(add3(gnd(h1), [0, 0, 0]), v), proj(gnd(add3(h0, mul3(F.u, 0.04 * L))), v)].map((p) => [p.x, p.y] as PP);
-    out.push({k: `heel_${s}`, pts: pts.map((p) => [p[0], p[1], 1] as PP), mat: mats.shoe, tone: 'deep', z: zs - 0.1, tension: 0});
+    const pts = [proj(h0, v), proj(h1, v), proj(gnd(h1), v), proj(gnd(add3(h0, mul3(F.u, 0.04 * L))), v)].map((p) => [p.x, p.y, 1] as PP);
+    out.push({k: `heel_${s}`, pts, mat: mats.shoe, tone: 'deep', z: zs - 0.1, tension: 0});
   }
   return out;
 }

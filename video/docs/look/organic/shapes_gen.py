@@ -12,6 +12,7 @@ Lengths are px of the 1080 x 1920 frame; a shape's size is its equivalent radius
   crown(...)                        a tree crown in three levels (lobes, clumps, small clumps), flat underside, sky gaps
   bank(...)                         a flat cloud bank: humps on a ladder, ends dragged at two rates, sometimes pinched
   hand_cut(corners, seed, ...)      a man-made outline: off-square corners, bowed and broken sides, never parallel
+  limb(seed, p0, p1, w0, w1)        a trunk, branch or stem: a bowed centre line, a taper with a root flare, a wobble
   edge_alpha(mask, seed, ...)       lost-and-found edges for a raster piece: found / broken / lost stretches along the
                                     outline by the light and a slow noise; dry-brush teeth along the brush direction
   shade3(cov, seed, ...)            flat lit / body / shade values read from the silhouette itself (a wandering terminator)
@@ -160,7 +161,8 @@ def spectrum_for(R: float, element: str) -> list[tuple[float, float]]:
 
 # per element: (wavelength / R, amplitude / R, min wavelength px, min amplitude px); see shapes.md §3.2
 SPECTRA = {
-    'cloud': [(1.6, 0.060, 40, 2.0), (0.8, 0.035, 20, 1.2), (0.4, 0.018, 10, 0.8), (0.2, 0.010, 6, 0.6)],
+    'cloud': [(1.6, 0.060, 40, 2.0), (0.8, 0.035, 20, 1.2), (0.4, 0.022, 10, 1.0), (0.2, 0.013, 6, 0.8),
+              (0.1, 0.007, 4, 0.6)],
     'foliage': [(1.4, 0.070, 30, 2.0), (0.6, 0.045, 14, 1.4), (0.25, 0.025, 7, 1.0), (0.1, 0.012, 4, 0.7)],
     'rock': [(1.8, 0.050, 40, 1.5), (0.7, 0.020, 16, 0.8), (0.25, 0.008, 8, 0.4)],
     'shadow': [(2.0, 0.040, 60, 1.5), (0.8, 0.015, 24, 0.7)],
@@ -561,6 +563,30 @@ def bank(seed, cx, base, length, height, edge=True, split=None):
     return pieces
 
 
+def limb(seed, p0, p1, w0: float, w1: float, bend: float = 0.06, wobble: float = 0.8) -> np.ndarray:
+    """A trunk, branch, stem or post drawn by hand: the centre line bows by `bend` of its length (random side), the
+    width tapers from w0 at p0 to w1 at p1 with a swell near the base, and both sides wobble +-`wobble` px at
+    wavelengths of 12-60 px (a bow alone of radius >= ~300 px still measures straight in 21 px windows: the short
+    wobble is what keeps a trunk off the ruler). Natural things only; a man-made post takes wobble 0 and bend <= 0.004.
+    Returns a closed outline."""
+    r = seeded(seed)
+    p0 = np.asarray(p0, float); p1 = np.asarray(p1, float)
+    L = float(np.hypot(*(p1 - p0)))
+    u_ = (p1 - p0) / max(L, 1e-9); nrm = np.array([-u_[1], u_[0]])
+    n = max(int(L / 1.5), 24)
+    t = np.linspace(0, 1, n)
+    off = bend * L * 4 * t * (1 - t) * r.choice([-1, 1]) + bend * L * 0.6 * np.sin(np.pi * t * r.uniform(1.2, 2.2)) * r.uniform(-1, 1)
+    w = w0 + (w1 - w0) * t ** 0.8
+    w *= 1 + 0.25 * np.exp(-t / 0.08)                     # the root flare
+    c = p0[None] + (t * L)[:, None] * u_[None] + off[:, None] * nrm[None]
+    oc = [(max(L * 0.3, 60), 1.0), (24, 0.55), (12, 0.35)]       # knobbly at the short end, never a ruler
+    wl = wobble * line_noise(n, oc, f'{seed}/l', length=L) if wobble > 0 else 0
+    wr = wobble * line_noise(n, oc, f'{seed}/r', length=L) if wobble > 0 else 0
+    left = c + nrm[None] * (w / 2 + wl)[:, None]
+    right = c - nrm[None] * (w / 2 + wr)[:, None]
+    return np.vstack([left, right[::-1]])
+
+
 def hand_cut(corners: np.ndarray, seed, side_turn=(0.8, 2.2), bow=(0.003, 0.009), cuts=(1, 3), jog=(0.3, 1.0),
              round_px=(0.6, 2.0)) -> np.ndarray:
     """A man-made outline drawn by hand (closed polygon in, dense polyline out). Every side turns 0.8-2.2 deg about
@@ -663,7 +689,8 @@ def edge_alpha(cov: np.ndarray, seed, light=(-0.7, -0.7), found=0.45, lost=0.25,
 
 
 def shade3(cov: np.ndarray, seed, light=(-0.7, -0.7), lz: float = 0.55, scale: float = 8.0, lit_t: float = 0.35,
-           shade_t: float = -0.05, wander: float = 0.12, wander_px: float = 60.0, big: float = 0.0, big_w: float = 0.4):
+           shade_t: float = -0.05, wander: float = 0.12, wander_px: float = 60.0, big: float = 0.0, big_w: float = 0.4,
+           min_island: float = 0.006):
     """Flat light on a silhouette, in values the clean pen can draw: the shape read as a dome (height = sqrt of the
     distance inside), its normals at the billow scale (`scale` px), Lambert toward `light` (x, y toward the light,
     image y down) lifted by lz; LIT where it faces the light over lit_t, SHADE under shade_t, the body between. A slow
@@ -688,6 +715,21 @@ def shade3(cov: np.ndarray, seed, light=(-0.7, -0.7), lz: float = 0.55, scale: f
     wob = wander * noise2d(cov.shape, wander_px, f'{seed}/wander', octaves=2)
     lit = np.clip((lam - lit_t - wob) / 0.02 + 0.5, 0, 1).astype(np.float32)
     shade = np.clip((shade_t - wob - lam) / 0.02 + 0.5, 0, 1).astype(np.float32)
+    # no specks: islands of light or shade under min_island of the piece's area are dropped (a spot reads as a
+    # mistake, not as form), and pinholes in them filled
+    area = max(float(inside.sum()), 1.0)
+    for m_ in (lit, shade):
+        b = (m_ > 0.5) & (inside > 0)
+        lab_, n_ = ndi.label(b)
+        if n_:
+            sizes = ndi.sum(b, lab_, np.arange(1, n_ + 1))
+            small = np.isin(lab_, 1 + np.where(sizes < min_island * area)[0])
+            m_[small] = 0.0
+        holes = ndi.binary_fill_holes(m_ > 0.5) & ~(m_ > 0.5)
+        lab_, n_ = ndi.label(holes)
+        if n_:
+            sizes = ndi.sum(holes, lab_, np.arange(1, n_ + 1))
+            m_[np.isin(lab_, 1 + np.where(sizes < min_island * area)[0])] = 1.0
     lit = ndi.gaussian_filter(lit, 0.6) * cov; shade = ndi.gaussian_filter(shade, 0.6) * cov
     return lit, shade
 

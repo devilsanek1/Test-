@@ -90,7 +90,7 @@ def cloud_after():
     P, R = G.cumulus('sheet/cloud/v5', 232, 272, 370, 205)
     cov = G.fill_outline(P, (PH, PW))
     a = G.edge_alpha(cov, 'sheet/cloud/e', light=(-0.75, -0.65), found=0.4, lost=0.3, crisp_w=1.4, soft_w=(4.0, 9.0),
-                     lost_w=(14.0, 24.0), teeth_dir_deg=0, slow_px=110)
+                     lost_w=(14.0, 24.0), teeth_px=(2.0, 4.0), teeth_dir_deg=0, slow_px=110, broken=0.15)
     lit, shade = G.shade3(cov, 'sheet/cloud/l', light=(-0.75, -0.65), scale=R / 20, big=R / 4, big_w=0.35,
                           lit_t=0.06, shade_t=-0.14, wander=0.08, wander_px=40)
     put(img, a, CLOUD_BODY)
@@ -173,12 +173,10 @@ def tree_after():
     yb = int(cols.max()) if len(cols) else 220          # the crown's underside over the trunk
     ty = yb - 22                                         # the fork sits inside the crown, never under it
 
-    def trunk(m, ss):
-        pts = np.array([[221, 330], [241, 330], [238, ty + 70], [250, ty + 40], [266, ty + 6], [257, ty + 2],
-                        [242, ty + 36], [232, ty + 56], [226, ty + 30], [210, ty + 4], [202, ty + 9], [221, ty + 48],
-                        [224, ty + 74]], float)
-        cv2.fillPoly(m, [np.round(pts * ss * 16).astype(np.int32)], 255, cv2.LINE_AA, shift=4)
-    put(img, ss_fill(trunk), TRUNK)
+    # the trunk and two limbs: tapered, bowed, rooted, entering the crown (never a ruler-straight post)
+    for k, (p0, p1, w0, w1) in enumerate([((231, 334), (229, ty + 40), 19, 11), ((229, ty + 52), (258, ty), 10, 4),
+                                           ((230, ty + 56), (205, ty + 6), 9, 4)]):
+        put(img, G.fill_outline(G.limb(f'sheet/tree/limb{k}', p0, p1, w0, w1, bend=0.05), (PH, PW)), TRUNK)
     a = G.edge_alpha(full, 'sheet/tree/e', light=(-0.7, -0.7), found=0.55, lost=0.15, crisp_w=1.0, soft_w=(2.0, 4.0),
                      lost_w=(5.0, 8.0), teeth_px=(2.0, 3.0), teeth_dir_deg=-60, slow_px=60, broken=0.12)
     R = math.sqrt(full.sum() / math.pi)
@@ -236,9 +234,30 @@ def facade_after():
             rects.append((x0, y0 - 1.5 * i, x0 + wid, y0 - 1.5 * i + hgt))
     for k, (x0, y0, x1, y1, st) in enumerate(G.vary_rects('sheet/facade/w', rects, states=('lit', 'dark', 'dark', 'sky'))):
         Q = G.hand_cut(np.array([[x0, y0], [x1, y0], [x1, y1], [x0, y1]], float), f'sheet/facade/w{k}',
-                       side_turn=(0.5, 1.5), bow=(0.002, 0.006), round_px=(0.8, 1.6))
+                       side_turn=(0.5, 1.5), bow=(0.002, 0.006), round_px=(2.0, 3.5))
         col = {'lit': LIT_WIN, 'dark': GLASS, 'sky': (150, 160, 190)}[st]
-        put(img, G.fill_outline(Q, (PH, PW)), col)
+        win = G.fill_outline(Q, (PH, PW))
+        put(img, win, col)
+        rr = G.seeded(f'sheet/facade/wa{k}')
+        w_, h_ = x1 - x0, y1 - y0
+        if st == 'lit':      # a curtain drawn to one side, its edge hanging in a soft curve
+            side_ = rr.choice([-1, 1]); cw = w_ * rr.uniform(0.22, 0.38)
+            xe = x0 + cw if side_ < 0 else x1 - cw
+            yy_ = np.linspace(y0, y1, 40)
+            edge = xe + side_ * 3 * np.sin(np.linspace(0, np.pi, 40)) * rr.uniform(0.5, 1.0)
+            cur = np.vstack([np.stack([np.full(40, x0 if side_ < 0 else x1), yy_], 1), np.stack([edge, yy_], 1)[::-1]])
+            put(img, np.minimum(G.fill_outline(cur, (PH, PW)), win), (214, 150, 110))
+        elif st == 'dark':   # the sky's reflection across one upper corner
+            a0 = rr.uniform(0.3, 0.55)
+            gl = np.array([[x0, y0 + h_ * a0], [x0 + w_ * a0 * 0.8, y0], [x0 + w_ * (a0 * 0.8 + 0.18), y0],
+                           [x0, y0 + h_ * (a0 + 0.22)]]) if rr.uniform() < 0.5 else \
+                np.array([[x1, y0 + h_ * a0], [x1 - w_ * a0 * 0.8, y0], [x1 - w_ * (a0 * 0.8 + 0.18), y0],
+                          [x1, y0 + h_ * (a0 + 0.22)]])
+            put(img, np.minimum(G.fill_outline(gl, (PH, PW)), win) * 0.55, (120, 132, 160))
+        else:                # a blind pulled down to a different height in each
+            bh = h_ * rr.uniform(0.18, 0.45)
+            put(img, np.minimum(G.fill_outline(np.array([[x0, y0], [x1, y0], [x1, y0 + bh + rr.uniform(-2, 2)],
+                                                          [x0, y0 + bh]]), (PH, PW)), win), (196, 170, 150))
     for k, (y0, hgt) in enumerate([(84, 54), (172, 52), (258, 50)]):     # the side face's windows, foreshortened
         Q = G.hand_cut(np.array([[338, y0 + 4], [366, y0 + 10], [366, y0 + hgt + 6], [338, y0 + hgt]], float),
                        f'sheet/facade/sw{k}', side_turn=(0.5, 1.2))
@@ -339,7 +358,7 @@ def seed_check(n=6):
     return out
 
 
-def compose(res, out_dir, path):
+def compose(res, out_dir, out_png):
     """The proof sheet: per row, before and after with their edge-class overlays and the measured numbers."""
     import matplotlib
     matplotlib.use('Agg')
@@ -347,7 +366,7 @@ def compose(res, out_dir, path):
     INK = '#1d1c1a'; INK2 = '#52514e'; SURF = '#fcfcfb'; C_OURS = '#eb6834'; C_REF = '#2a78d6'
     rows = [n for n, _, _ in PANELS]
     W_IN, DPI = 24, 100
-    ROW_IN = 4.25
+    ROW_IN = 3.3
     H_IN = 1.6 + ROW_IN * len(rows) + 1.1
     fig = plt.figure(figsize=(W_IN, H_IN), dpi=DPI, facecolor=SURF)
     fig.text(0.012, 1 - 0.3 / H_IN, 'Shapes: the generators, before and after, measured with the references\' code',
@@ -361,7 +380,8 @@ def compose(res, out_dir, path):
             ('ruler lines', 'edges.long', '{:.0%}'), ('compass arcs', 'edges.arc', '{:.0%}'),
             ('right angles', 'edges.right_angle', '{:.0%}'), ('parallels', 'edges.parallel', '{:.0%}'),
             ('lost (mass edges)', 'mass_edges.lost_of_clean', '{:.0%}'), ('broken', 'mass_edges.busy', '{:.0%}'),
-            ('crisp (visible edges)', 'edge_width.crisp_of_clean', '{:.0%}'), ('symmetry', 'symmetry.median', '{:.2f}'),
+            ('crisp (visible edges)', 'edge_width.crisp_of_clean', '{:.0%}'),
+            ('outline alternates', 'along.alternating', '{:.0%}'), ('symmetry', 'symmetry.median', '{:.2f}'),
             ('divider D', 'divider_D', '{:.3f}')]
     for ri, name in enumerate(rows):
         top = 1.6 + ri * ROW_IN
@@ -369,7 +389,7 @@ def compose(res, out_dir, path):
         for ci, (tag, sub) in enumerate((('before', ''), ('before', '_ov'), ('after', ''), ('after', '_ov'))):
             im = cv2.cvtColor(cv2.imread(os.path.join(out_dir, f'{name}_{tag}{sub}.png')), cv2.COLOR_BGR2RGB)
             w_in = 3.85; h_in = w_in * im.shape[0] / im.shape[1]
-            left = 0.012 + (1.9 + ci * (w_in + 0.12) + (0.25 if ci >= 2 else 0)) / W_IN
+            left = 0.012 + (2.3 + ci * (w_in + 0.12) + (0.25 if ci >= 2 else 0)) / W_IN
             ax = fig.add_axes([left, 1 - (top + 0.15 + h_in) / H_IN, w_in / W_IN, h_in / H_IN])
             ax.imshow(im); ax.set_xticks([]); ax.set_yticks([])
             for s_ in ax.spines.values():
@@ -384,15 +404,15 @@ def compose(res, out_dir, path):
             vb, va = _get(b, path), _get(a_, path)
             f = lambda v: '-' if v is None else fmt.format(v)
             lines.append(f'{lab:22s} {f(vb):>6s} -> {f(va):>6s}')
-        fig.text(0.012 + (1.9 + 4 * 3.97 + 0.45) / W_IN, 1 - (top + 0.2) / H_IN, '\n'.join(lines), fontsize=11.5,
+        fig.text(0.012 + (2.3 + 4 * 3.97 + 0.45) / W_IN, 1 - (top + 0.2) / H_IN, '\n'.join(lines), fontsize=11.5,
                  family='monospace', color=INK2, va='top', linespacing=1.35)
-    fig.text(0.012, 0.75 / H_IN, 'Every panel through the same JPEG q85 codec as the references; numbers from '
+    fig.text(0.012, 0.85 / H_IN, 'Every panel through the same JPEG q85 codec as the references; numbers from '
              'shapes_measure.measure_crop. Seeds are fixed (the same bytes on every run); the seed check in '
-             'shapes_generators.json measures six unpicked seeds of each natural generator. Rerun: '
-             'python3 docs/look/organic/shapes_generators_sheet.py --sheet (from video/).', fontsize=11.5, color=INK2,
-             va='top')
-    fig.savefig(path, dpi=DPI, facecolor=SURF)
-    print('wrote', path)
+             'shapes_generators.json measures six unpicked seeds of each natural generator.\nRerun (from video/): '
+             'python3 docs/look/organic/shapes_generators_sheet.py --sheet', fontsize=11.5, color=INK2, va='top',
+             linespacing=1.45)
+    fig.savefig(out_png, dpi=DPI, facecolor=SURF)
+    print('wrote', out_png)
 
 
 def main():
@@ -400,8 +420,13 @@ def main():
     ap.add_argument('--out', default='/tmp/organic/shapes/gen_run')
     ap.add_argument('--sheet', action='store_true', help='also compose docs/look/organic/shapes_generators.png')
     ap.add_argument('--no-seeds', action='store_true')
+    ap.add_argument('--compose-only', action='store_true', help='redraw the sheet from DIR/shapes_generators.json')
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
+    if args.compose_only:
+        compose(json.load(open(os.path.join(args.out, 'shapes_generators.json'))), args.out,
+                os.path.join(HERE, 'shapes_generators.png'))
+        return
     res = {}
     for name, fb, fa in PANELS:
         for tag, fn in (('before', fb), ('after', fa)):

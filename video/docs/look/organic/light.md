@@ -8,11 +8,11 @@ story lights. Darks, contrast and the one colour key are palette work (the owner
 selection"); this page is the light.
 
 **What this is.** The LIGHT lane of the organic research: how 2D illustrators, background painters and 2D animation
-compositors build light that reads (§2, 15 sources), what the owner's references do with light, measured (§1), how to
-do each technique in OUR engine with its cost and determinism (§4, §7), the light plan for scene 1 (the low October sun
-on the left as the key, the lit Google doorway as the story light on her: §5), and a proof: the v6 still relit by the
-engine's own renders and masks, at two doses, in motion, plus a cost bench in the real render path (§6, §7). **Rank:** research
-notes, the lowest rank (DIRECTION's ladder); nothing here is a rule until it is integrated into `CRAFT.md` §d,
+compositors build light that reads (§2, 15 sources), what the owner's references do with light, measured (§1), how to do
+each technique in OUR engine with its cost and determinism (§4, §7), the light plan for scene 1 (the low October sun on
+the left as the key, the lit Google doorway as the story light on her: §5), and a proof: the v6 still relit by the
+engine's own renders and masks, at two doses, in motion, plus a cost bench in the real render path (§6, §7). **Rank:**
+research notes, the lowest rank (DIRECTION's ladder); nothing here is a rule until it is integrated into `CRAFT.md` §d,
 `src/lib/LIGHT.md` and the playbook's PROPER LIGHT. We learn methods; no reference is copied, traced or used as input
 (they are only measured), and no living artist is a style target. Paths are from `video/`.
 
@@ -31,10 +31,10 @@ notes, the lowest rank (DIRECTION's ladder); nothing here is a rule until it is 
 
 - **"Proper light" in the references is one source the eye goes to, and everything else arranged around it**
   (measured, §1): in the bus-stop night the brightest 0.5 % of the picture sits on the shelter, 0.11 H from the man;
-  its pool lifts the ground +15-20 L* over the night and falls off within ~50 px of the shelter's posts; its air glows
-  only +9 L*; its red light (hue 22-35 deg) sits against a blue-violet shade (285-320 deg). In the sunset city the
-  sun-facing slivers are L* 95 against fronts at 37 (+58 L*), about 7 px wide at our scale. The beach's sun is a thin
-  horizon line, its glow tight. In the cloud frame the glow colours the whole air the light's colour.
+  its pool lifts the ground strip to L* 24 against 7-10 outside (+14-17) and falls off within 20-40 px past the posts;
+  its air glows only +9 L*; its red light (hue 22-35 deg) sits against a blue-violet shade (285-320 deg). In the sunset
+  city the sun-facing slivers are L* 95 against fronts at 37 (+58 L*), about 7 px wide at our scale. The beach's sun is
+  a thin horizon line, its glow tight. In the cloud frame the glow colours the whole air the light's colour.
 - **Our v6 has sources but no light.** The lobby (L* 88) sits in a high-key frame (median L* 67) where our bank (55)
   matches the water (55); there is no shade mass, no glow at the sun or the door, rims only on her, and v2's rig casts
   the short shadows of a high sun (elevation 36 deg) under a sunset sky whose sun sits on the roofline (8.9 deg).
@@ -42,9 +42,9 @@ notes, the lowest rank (DIRECTION's ladder); nothing here is a rule until it is 
   or in shade becomes the fill (0 ms); (2) **baked light maps per plane**: one multiply map (the shade masses and the
   falloff) and one screen map (pools, spills, static rims, blooms, shafts), placed like a painted piece so they ride the
   float; a full-frame blended image costs ~40-70 ms per frame (measured: 3 maps +130-160 ms, 12 maps +600 ms), so maps
-  are cropped, merged and folded into the colours where they can be; (3) **live layers for movers**: her rim (lib/light's
-  `Rim`, the distance-field band as a vector mask), her light wrap (one small SVG filter), her shadows by projective
-  construction, a bloom on a changing source: each within the measuring noise (§7).
+  are cropped, merged and folded into the colours where they can be; (3) **live layers for movers**: her rim
+  (lib/light's `Rim`, the distance-field band as a vector mask), her light wrap (one small SVG filter), her shadows by
+  projective construction, a bloom on a changing source: each within the measuring noise (§7).
 - **And cheaper than v6 is today** (§7): v6's own lib/light layers cost ~340 ms of its ~550 ms frame; with them off and
   ONE cropped multiply map (the new shade with v6's static shadows folded in), ONE cropped screen map and her live
   layers, the relit frame renders in 256 ms: -290 ms, with all of §5's light in it.
@@ -77,7 +77,7 @@ CIE L* C* h of the phone screenshots (UI masked), at their own size (1206 px wid
 
 | Ref | The story light | Measured | What we learn |
 |---|---|---|---|
-| `refs_human_scale/02_bus_stop_night.jpg` | the red tube under the shelter's roof | the brightest 0.5 % (L* >= 57) centred at (662, 379), the man at about (645, 445): 0.11 H; the tube L* 49, hue 35; the ground strip under the shelter L* 21-28 against 5-8 outside; its edge falls 26 -> 13 within 50 px of the post, 7.5 by 50 px past the other; the reeds' tips by the shelter 18 (hue 23) against 6-10 (hue 285-320) beyond; the air above the roof by the tube 48 against 39 far | one source, ON the subject; a pool +15-20 L* with a quick falloff at its sides; the light colours what it touches (the reeds' tips, the posts' inner faces, the man's top); a tight glow (+9 L*); the shade complementary to the light (red against blue-violet) |
+| `refs_human_scale/02_bus_stop_night.jpg` | the red tube under the shelter's roof | the brightest 0.5 % (L* >= 57) centred at (662, 379), the man at about (645, 445): 0.11 H; the tube L* 49, hue 35; the ground strip under the shelter (rows 522-542) L* 20-27, median 24, against 7-10 outside, down to ~10 within 20-40 px past the posts; the reeds' tips by the shelter 18 (hue 23) against 6-10 (hue 285-320) beyond; the air above the roof by the tube 48 against 39 far | one source, ON the subject; a pool +14-17 L* with a quick falloff at its sides; the light colours what it touches (the reeds' tips, the posts' inner faces, the man's top); a tight glow (+9 L*); the shade complementary to the light (red against blue-violet) |
 | `refs_human_scale/03_beach_dusk.jpg` (+ the couple zoom) | the sun on the horizon; the phone on the girl | the horizon line L* 70-75 across the frame, 88 at the sun, the disc 91; the sky above it 31-37 (+35-40 under it); along the line the sun lifts only +1-3 L* within ~120 px; the couple L* 13, the near sand 17 | the sun's light is a LINE, its glow tight; the people are silhouettes; the phone is the only cool light, so the eye goes to it |
 | `refs_human_scale/01_city_hill_sunset.jpg` | the sunset behind the towers | the sun-facing slivers L* 95, hue 99 (cream-gold); the fronts L* 37, hue 343 (plum): +58 L*; the slivers 8 px median at 1206 (p25 3.8, p75 10) = 7.2 px at 1080 | backlight: the fronts in shade, a bright sliver on every edge facing the sun, uneven widths (3-10 px) |
 | `refs_human_scale/04_cloud_beast_frame.jpg` | the glowing cloud | the cloud's lit core L* 79, hue 73 (gold); its far side 66, hue 44; the sky field 56, hue 315; the girl 58, hue 352 | the glow colours the air: the subject sits in the light's colour field |
@@ -137,8 +137,8 @@ CIE L* C* h of the phone screenshots (UI masked), at their own size (1206 px wid
 
 ### 2.5 Light shafts
 - The real-time recipe accumulates, for each pixel, samples along the ray toward the light's screen position over an
-  occlusion image, with a decay and a weight (Mitchell, GPU Gems 3 ch. 13, source 6): the 2D form of a painter's lighter,
-  soft-edged wedges in hazy air, seen only against darker things.
+  occlusion image, with a decay and a weight (Mitchell, GPU Gems 3 ch. 13, source 6): the 2D form of a painter's
+  lighter, soft-edged wedges in hazy air, seen only against darker things.
 - Crepuscular rays are parallel; perspective makes them fan from the sun's image (and meet again at the antisolar
   point), so in a picture they radiate from the sun (source 11).
 - **For us:** two or three soft wedges from the source's image at most, +2-4 L*, fading along their length, never
@@ -201,7 +201,7 @@ towpath in front of the door 77, the median 67, the darks (L* < 40) 6.8 % of the
 | Home | What goes there | How | Render cost (§7) | Moves |
 |---|---|---|---|---|
 | 1. **The colours** | what is simply lit or in shade and never changes: a backlit facade's front, a shade face, a lit sliver on a static edge, a falloff inside one face | the rig computes the fill (`relit`, `formTint`, the per-surface family), or a `linearGradient` fill along the light (dithered, short ramps) | 0 (a fill is a fill; a vector gradient measured within noise) | with its shape |
-| 2. **Baked light maps** (per plane) | static light: shade masses (our bank under the trees), the falloff of static sources, pools and spills, static rims, blooms at static sources, shafts, the in-scatter veil | `scripts/look/light/bake_light.py` (proposed: this proof's passes, production-grade) writes per plane a `shade` PNG (multiply) and ONE `light` PNG (screen), placed like a painted piece inside the plane's group | ~45-50 ms per full-frame blended image: crop each map to its box, merge light and glow, fold shade into the colours where possible | rides its plane: never slides |
+| 2. **Baked light maps** (per plane) | static light: shade masses (our bank under the trees), the falloff of static sources, pools and spills, static rims, blooms at static sources, shafts, the in-scatter veil | `scripts/look/light/bake_light.py` (proposed: this proof's passes, production-grade) writes per plane a `shade` PNG (multiply) and ONE `light` PNG (screen), placed like a painted piece inside the plane's group | ~40-70 ms per full-frame blended image; two cropped maps measured +12 ms (§7): crop each map to its box, merge light and glow, fold shade into the colours where possible; the light map solved for the browser's blend (§4.11) | rides its plane: never slides |
 | 3. **Live layers** (vector, or a small SVG filter) | light on movers: the subject's rim and wrap, her shadows in the pool, a spill while a door opens, a bloom on a source that changes | `lib/light` components computed from the pose at t | within the noise when the region is small (her box, the door's box) | per frame, deterministic |
 
 ### 4.1 The rig: one key, one story light, one shade family (data, `lib/light` `makeRig`)
@@ -224,8 +224,8 @@ towpath in front of the door 77, the median 67, the darks (L* < 40) 6.8 % of the
   and any SOLVED light map stay at full resolution (§4.11).
 - **The bake:** from each plane's flat render alone (a `LightFlat` composition, like `PaintFlatS1`) and masks that are
   differences of two renders of the same frame with one layer switched (exact to the pixel: §6); in linear light; the
-  curves of §2.2; the shade tint per pixel by the surface's warmth (§4.9); dithered +-0.5 code, triangular, sha256-seeded,
-  so no ramp bands on a phone (CRAFT §g.4).
+  curves of §2.2; the shade tint per pixel by the surface's warmth (§4.9); dithered +-0.5 code, triangular,
+  sha256-seeded, so no ramp bands on a phone (CRAFT §g.4).
 - **Vector alternative:** a `radialGradient` or `linearGradient` (5-8 stops on the real curve) in a screen or multiply
   group, within the noise (§7). Gradient stops band in 8 bits over long, gentle ramps: keep vector ramps short or
   steep, bake the long ones.
@@ -262,7 +262,7 @@ towpath in front of the door 77, the median 67, the darks (L* < 40) 6.8 % of the
 - **Vector:** wedges from the source's image point with a radial gradient (0 until they leave the occluder, a peak, a
   long tail), screened at +2-4 L*, in the group of the plane whose air they cross (the bench's `shafts`).
 - **Baked, occlusion-true:** Mitchell's radial accumulation over the plane's occluders at half resolution
-  (`light_demo.py` `shafts()`: 64 samples, decay 0.97, ~2-3 s per frame of bake).
+  (`light_demo.py` `shafts()`: 72 samples toward the source, decay 0.965: 0.25 s per bake, the same bytes twice).
 - **Rules:** never across the caption band or the focal point, only against darker air, one fan from one point.
 
 ### 4.6 Cast shadows and pools, by projective construction
@@ -456,7 +456,7 @@ production bakes each plane's maps once per state (S1: ~6 planes x 2 door states
 1.0-2.4 s at 30 fps (she steps out and walks west; G1 arrives), v6 beside dose 1.0. The static light rides each plane's
 float; her rim, wrap and door shadow are recomputed from her mask on every frame (43 frames, ~8 s each on one core,
 two processes). Measured on the 43 frames:
-- **The static light holds still**: the light's mean lift varies by 0.02 L* on our bank, 0.04 on the facade and 0.05
+- **The static light holds still**: the light's mean effect varies by 0.02 L* on our bank, 0.04 on the facade and 0.05
   by the sun across the 1.4 s.
 - **Her light changes smoothly**: 7.3 -> 3.5 L* as she leaves the opening's light, the largest step between two frames
   0.97 L* (at 30 fps; half that at 60).
@@ -568,22 +568,41 @@ No new dependency is proposed: everything here is numpy, OpenCV and the SVG we a
 ## 10. Sources (methods only)
 The session's network blocked direct page fetches (only search summaries were readable), so each source is cited for
 what its search summary and our own knowledge of the method agree on; nothing is quoted beyond a few words.
-1. Klaus's light-and-shadow tool (KLaS; key, bounce, ambient, occlusion, rim; tracking and in-betweening): animatorsguild.com/?p=5287; cartoonbrew.com/feature-film/how-klaus-draws-on-centuries-old-artistic-principles-to-push-2d-animation-forward-182325.html
-2. Anime compositing (撮影; 透過光 transmitted light; パラ coloured paraffin; ufotable's light and bloom in compositing): animenewsnetwork.com/feature/2018-01-10/interview-yuichi-terao-chief-of-ufotable-digital-team/.125658; neec.ac.jp/tuitionfreedat/syllabusdat/pdf/2021/hac/21LA038.pdf
-3. Light wrap: learn.foundry.com/nuke/14.1/content/reference_guide/draw_nodes/lightwrap.html; natron.readthedocs.io/en/v2.4.2/plugins/fr.inria.LightWrap.html
-4. Golden hour (a low sun's light gold to orange, roughly 2000-3500 K) and complementary shadows: gurneyjourney.blogspot.com/2008/01/golden-hour.html; gurneyjourney.blogspot.com/2014/09/complementary-shadows.html; en.wikipedia.org/wiki/Golden_hour_(photography)
-5. Bloom (SIGGRAPH 2014, Advances in Real-Time Rendering): iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare/
-6. Light shafts (GPU Gems 3 ch. 13): developer.nvidia.com/gpugems/gpugems3/part-ii-light-and-shadows/chapter-13-volumetric-light-scattering-post-process
-7. 2D light layers: docs.unity3d.com/Packages/com.unity.render-pipelines.universal@15.0/manual/LightBlendStyles.html; docs.godotengine.org/en/4.5/tutorials/2d/2d_lights_and_shadows.html
-8. Blending and SVG filters: w3.org/TR/compositing-1/; developer.mozilla.org/en-US/docs/Web/CSS/mix-blend-mode; developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/feDiffuseLighting
-9. Distance transforms: theoryofcomputing.org/articles/v008a019 (Felzenszwalb and Huttenlocher, Theory of Computing 8, 2012)
+1. Klaus's light-and-shadow tool (KLaS; key, bounce, ambient, occlusion, rim; tracking and in-betweening):
+   animatorsguild.com/?p=5287;
+   cartoonbrew.com/feature-film/how-klaus-draws-on-centuries-old-artistic-principles-to-push-2d-animation-forward-182325.html
+2. Anime compositing (撮影; 透過光 transmitted light; パラ coloured paraffin; ufotable's light and bloom in compositing):
+   animenewsnetwork.com/feature/2018-01-10/interview-yuichi-terao-chief-of-ufotable-digital-team/.125658;
+   neec.ac.jp/tuitionfreedat/syllabusdat/pdf/2021/hac/21LA038.pdf
+3. Light wrap: learn.foundry.com/nuke/14.1/content/reference_guide/draw_nodes/lightwrap.html;
+   natron.readthedocs.io/en/v2.4.2/plugins/fr.inria.LightWrap.html
+4. Golden hour (a low sun's light gold to orange, roughly 2000-3500 K) and complementary shadows:
+   gurneyjourney.blogspot.com/2008/01/golden-hour.html; gurneyjourney.blogspot.com/2014/09/complementary-shadows.html;
+   en.wikipedia.org/wiki/Golden_hour_(photography)
+5. Bloom (SIGGRAPH 2014, Advances in Real-Time Rendering):
+   iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare/
+6. Light shafts (GPU Gems 3 ch. 13):
+   developer.nvidia.com/gpugems/gpugems3/part-ii-light-and-shadows/chapter-13-volumetric-light-scattering-post-process
+7. 2D light layers: docs.unity3d.com/Packages/com.unity.render-pipelines.universal@15.0/manual/LightBlendStyles.html;
+   docs.godotengine.org/en/4.5/tutorials/2d/2d_lights_and_shadows.html
+8. Blending and SVG filters: w3.org/TR/compositing-1/; developer.mozilla.org/en-US/docs/Web/CSS/mix-blend-mode;
+   developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/feDiffuseLighting
+9. Distance transforms: theoryofcomputing.org/articles/v008a019 (Felzenszwalb and Huttenlocher, Theory of Computing 8,
+   2012)
 10. Falloff on a plane (the cosine-cubed law): schorsch.com/en/kbase/glossary/point-by-point.html
-11. Crepuscular rays and shadows in perspective: scientificamerican.com/article/what-are-crepuscular-rays; atoptics.co.uk/atoptics/rayim8.htm; studiochalkboard.evansville.edu/lp-shadow.html
-12. Lighting for story (SIGGRAPH 96 course 30, Pixel Cinematography: "Storytelling Through Lighting"): history.siggraph.org/wp-content/uploads/2021/08/1996-30-Contents-Pixel-Cinematography-A-Lighting-Approach-for-Computer-Graphics.pdf
-13. Fortiche's hand-designed light: redsharknews.com/why-netflixs-arcane-looks-so-good-how-fortiche-ramped-up-the-animation-pipeline
-14. Painting light: a glow as a core plus an aura that tints what it reaches (screen and add layers), and a rim as light on a turning form, uneven, never an even outline: instructables.com/How-to-Draw-Light; tips.clip-studio.com/en-us/articles/1178; muddycolors.com/?p=43890; glass.photo/photography-terms/rim-light
-15. Painted light masks reacting to moving lights (Ori and the Will of the Wisps): wccftech.com/ori-and-the-will-of-the-wisps-dynamic-lighting/
-Licences: npmjs.com/package/lygia, unpkg.com/resolve-lygia@1.0.4/LICENSE.md (LYGIA); jsdelivr.com/package/npm/@pixi/filter-advanced-bloom (pixi-filters); pmndrs.github.io/postprocessing (postprocessing).
+11. Crepuscular rays and shadows in perspective: scientificamerican.com/article/what-are-crepuscular-rays;
+    atoptics.co.uk/atoptics/rayim8.htm; studiochalkboard.evansville.edu/lp-shadow.html
+12. Lighting for story (SIGGRAPH 96 course 30, Pixel Cinematography: "Storytelling Through Lighting"):
+    history.siggraph.org/wp-content/uploads/2021/08/1996-30-Contents-Pixel-Cinematography-A-Lighting-Approach-for-Computer-Graphics.pdf
+13. Fortiche's hand-designed light:
+    redsharknews.com/why-netflixs-arcane-looks-so-good-how-fortiche-ramped-up-the-animation-pipeline
+14. Painting light: a glow as a core plus an aura that tints what it reaches (screen and add layers), and a rim as light
+    on a turning form, uneven, never an even outline: instructables.com/How-to-Draw-Light;
+    tips.clip-studio.com/en-us/articles/1178; muddycolors.com/?p=43890; glass.photo/photography-terms/rim-light
+15. Painted light masks reacting to moving lights (Ori and the Will of the Wisps):
+    wccftech.com/ori-and-the-will-of-the-wisps-dynamic-lighting/ Licences: npmjs.com/package/lygia,
+    unpkg.com/resolve-lygia@1.0.4/LICENSE.md (LYGIA); jsdelivr.com/package/npm/@pixi/filter-advanced-bloom
+    (pixi-filters); pmndrs.github.io/postprocessing (postprocessing).
 
 ## 11. Rerun
 From `video/`; outputs go to `/tmp/organic/light/` (nothing big is committed but the sheet and the MP4). The bake is

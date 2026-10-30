@@ -177,3 +177,35 @@ export const hash = (n: number) => {
   const s = Math.sin(n * 127.1 + 311.7) * 43758.5453123;
   return s - Math.floor(s);
 };
+
+/** Round a polyline's corners: each interior vertex becomes a short quadratic arc of about radius r (a knee, an elbow),
+ *  so the rings of a tube built along it never fold through each other on the inside of the bend. */
+export function fillet(chain: V3[], r: number, n = 7): V3[] {
+  if (chain.length < 3) return chain;
+  const out: V3[] = [chain[0]];
+  for (let i = 1; i < chain.length - 1; i++) {
+    const P = chain[i];
+    const a = sub(P, chain[i - 1]);
+    const b = sub(chain[i + 1], P);
+    const la = len(a);
+    const lb = len(b);
+    const u1 = nrm(a);
+    const u2 = nrm(b);
+    const th = Math.acos(clamp(dot(u1, u2), -1, 1));
+    const d = Math.min(r * Math.tan(th / 2), la * 0.45, lb * 0.45);
+    if (d < 0.5) {
+      out.push(P);
+      continue;
+    }
+    const A = sub(P, scl(u1, d));
+    const B = add(P, scl(u2, d));
+    for (let k = 0; k <= n; k++) {
+      const t = k / n;
+      const q1 = lerp(A, P, t);
+      const q2 = lerp(P, B, t);
+      out.push(lerp(q1, q2, t));
+    }
+  }
+  out.push(chain[chain.length - 1]);
+  return out;
+}

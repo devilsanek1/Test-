@@ -15,6 +15,7 @@ import {
   D2R,
   dot,
   euler,
+  fillet,
   ik3,
   lerp,
   mix,
@@ -718,11 +719,11 @@ const HZM: K = [
   [0.197, 0.376],
   [0.225, 0.366],
   [0.25, 0.372],
-  [0.272, 0.418],
-  [0.292, 0.452],
-  [0.31, 0.461],
-  [0.335, 0.452],
-  [0.4, 0.43],
+  [0.27, 0.412],
+  [0.29, 0.44],
+  [0.308, 0.449],
+  [0.33, 0.446],
+  [0.4, 0.427],
   [0.46, 0.406],
   [0.5, 0.393],
   [0.535, 0.396],
@@ -958,7 +959,7 @@ export function armSurface(sk: Skeleton, side: 'L' | 'R', res: number, from = -2
   const CAP = 18;
   const upv = nrm(sub(sh, el));
   const ext = add(sh, scl(upv, CAP));
-  const chain = [ext, sh, el, wr];
+  const chain = fillet([ext, sh, el, wr], 46);
   const L = chainLength(chain);
   const len0 = b.upperArm + b.foreArm + CAP;
   const tA = clamp((from + CAP) / len0, 0, 0.98);

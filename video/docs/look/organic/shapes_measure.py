@@ -10,8 +10,9 @@ For every crop of shapes_crops.py (ours and the references, at the phone's width
   regions the visible shapes (Felzenszwalb + a 6 dE merge): mirror symmetry, repetition (how alike neighbouring shapes
           are), spacing regularity, the size ladder (big / medium / small), the divider dimension and the roughness
           spectrum of their outlines (wiggle per octave)
+  along   the notan's outlines read every 3 px: found / soft / lost / broken, and whether one outline alternates
 
-Usage (from video/):  python3 docs/look/organic/shapes_measure.py [--only id,id] [--out DIR]
+Usage (from video/):  python3 docs/look/organic/shapes_measure.py [--only id,id] [--out DIR] [--add-along]
 Writes DIR/shapes_data.json (all numbers) and DIR/overlays/<crop>.png (the edge classes drawn on the crop).
 Deterministic: the same numbers on every run. numpy, SciPy, OpenCV, scikit-image only (BSD-3 / Apache-2.0).
 """

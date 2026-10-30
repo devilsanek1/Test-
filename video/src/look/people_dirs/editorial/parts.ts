@@ -39,7 +39,8 @@ export const Z = {
   top: 40,
   outer: 50,
   outerDetail: 52,
-  neck: 58,
+  /** The neck sits under the tops (a crew or mock neck covers its base; an open collar shows the chest under it). */
+  neck: 35,
   tail: 62,
   head: 66,
   face: 68,

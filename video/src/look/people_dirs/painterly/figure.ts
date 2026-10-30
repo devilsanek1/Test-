@@ -64,7 +64,9 @@ export function buildModel(p: Person, pose: Pose, res = 1): Model {
     if (h.ears === false) ears = false;
     built.push(pc.build(sk, res));
   }
+  // under a garment, the upper chest and the trapezius stay (they fill a neckline; the garment covers the rest)
   if (torso) surfaces.push(torsoSurface(sk, res));
+  else surfaces.push(torsoSurface(sk, res, 'torso', 'skin', 772));
   if (neck) surfaces.push(neckSurface(sk, res));
   surfaces.push(headSurface(sk, res, p.face));
   if (ears) surfaces.push(earSurface(sk, 1, res), earSurface(sk, -1, res));

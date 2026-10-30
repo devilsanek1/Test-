@@ -168,7 +168,11 @@ export function coat(sk: Skeleton, v: View, mat = 'coat', hemY = 268): Part[] {
   const alpha = pchip([-872, -852, -820, -790, -735, -700, -620, -500, -hemY], [62, 52, 40, 33, 25, 22, 21, 23, 27].map((x) => x));
   const op: Opening = {alpha: (y) => alpha(-y), y0: 872, y1: hemY};
   const cut = openingCut(sk, secs, v, op);
-  const parts: Part[] = [{k: 'coat', pts: out, mat, z: Z.outer, cut: cut.length ? [cut] : undefined, tension: 0.45}];
+  const parts: Part[] = [
+    {k: 'coat', pts: out, mat, z: Z.outer, cut: cut.length ? [cut] : undefined, tension: 0.45},
+    // the coat's inside (its back panel's lining, in shade), seen through the open front around the inner layers
+    {k: 'coatInside', pts: out, mat, tone: 'deep', z: Z.lower - 1.5, tension: 0.45},
+  ];
   // the lapels: a notch lapel on each front, from the collar down to the break point above the bust
   for (const side of [1, -1]) {
     const reg = region(
@@ -190,7 +194,7 @@ export function coat(sk: Skeleton, v: View, mat = 'coat', hemY = 268): Part[] {
     if (reg) parts.push({k: `lapel_${side}`, pts: reg.map((p, i) => (i === 0 || i === reg.length - 1 ? ([p[0], p[1], 1] as PP) : p)), mat, z: Z.outerDetail, tension: 0.3, gk: 1.15});
   }
   // the collar band at the back of the neck
-  const col = region(secs, v, 872 - sk.bob, 836 - sk.bob, () => [100, 440], sk.leanXf, 1.5, 6, true);
+  const col = region(secs, v, 872 - sk.bob, 846 - sk.bob, () => [150, 390], sk.leanXf, 1.5, 6, true);
   if (col) parts.push({k: 'collar', pts: col, mat, tone: 'shade', z: Z.outer - 0.5, tension: 0.4});
   // the back vent: a slim shade sliver from the hem up the centre back
   const vent = region(secs, v, 380 - sk.bob, hemY + 2 - sk.bob, (y) => [268, 272 + (1 - (y + sk.bob - hemY) / (380 - hemY)) * 3], sk.leanXf, 1, 6);
@@ -198,12 +202,13 @@ export function coat(sk: Skeleton, v: View, mat = 'coat', hemY = 268): Part[] {
   return parts;
 }
 
-/** The cream fine knit under the coat: a mock neck, fitted (compact), tucked into the skirt. Visible in the opening. */
+/** The cream fine knit under the coat: a close crew neck, fitted (compact), tucked into the skirt. Visible in the
+ *  opening; the neck rises out of its collar. */
 export function knit(sk: Skeleton, v: View, mat = 'knit', bottom = 626): Part[] {
   const rows: GRow[] = [
-    {y: 866, a: 24, bf: 23, bb: 26, dz: -3},
-    {y: 846, a: 26, bf: 25, bb: 28, dz: -6},
-    {y: 830, a: 46, bf: 32, bb: 42, dz: -8},
+    {y: 856, a: 24.5, bf: 23, bb: 27, dz: -5},
+    {y: 846, a: 34, bf: 28, bb: 36, dz: -7},
+    {y: 830, a: 62, bf: 38, bb: 46, dz: -8},
     {y: 810, a: 102, bf: 52, bb: 56, n: 2.1},
     {y: 788, a: 102, bf: 64, bb: 58},
     {y: 758, a: 94, bf: 72, bb: 58},
@@ -237,21 +242,21 @@ export function slipSkirt(sk: Skeleton, v: View, mat = 'skirt', hemY = 168): Par
   const sh = region(
     secs,
     v,
-    560 - sk.bob,
-    hemY + 30 - sk.bob,
+    574 - sk.bob,
+    330 - sk.bob,
     (y) => {
-      // the band sits where the surface turns toward the key (screen-left): choose the visible phi arc per view
+      // the satin's sheen: a soft spindle where the cloth turns over the hip toward the key, fading down the thigh
       const ys = y + sk.bob;
-      const u = clamp((560 - ys) / (560 - hemY), 0, 1);
-      const c = keyPhi(v) + 6 * Math.sin(u * 3);
-      const w = 9 - 5 * u;
+      const u = clamp((574 - ys) / (574 - 330), 0, 1);
+      const c = keyPhi(v) + 4 * Math.sin(u * 3);
+      const w = 7 * Math.sin(Math.PI * Math.min(1, u * 1.15 + 0.06)) + 0.5;
       return [c - w, c + w];
     },
     sk.leanXf,
     1,
-    10,
+    12,
   );
-  if (sh) parts.push({k: 'skirtSheen', pts: sh, mat, tone: 'sheen', z: Z.lower + 0.5, clip: 'skirt', tension: 0.5});
+  if (sh) parts.push({k: 'skirtSheen', pts: sh, mat, tone: 'sheen', z: Z.lower + 0.5, clip: 'skirt', tension: 0.5, op: 0.55});
   return parts;
 }
 
@@ -298,7 +303,10 @@ export function cardigan(sk: Skeleton, v: View, mat = 'cardigan', hemY = 606): P
   const out = loftOutline(secs, v, sk.leanXf, {cornerBottom: true});
   const alpha = pchip([-858, -838, -800, -760, -728, -720], [44, 36, 24, 11, 1.5, 0]);
   const cut = openingCut(sk, secs, v, {alpha: (y) => alpha(-y), y0: 858, y1: 722}, 0);
-  const parts: Part[] = [{k: 'cardigan', pts: out, mat, z: Z.outer, cut: cut.length ? [cut] : undefined, tension: 0.45}];
+  const parts: Part[] = [
+    {k: 'cardigan', pts: out, mat, z: Z.outer, cut: cut.length ? [cut] : undefined, tension: 0.45},
+    {k: 'cardiganInside', pts: out, mat, tone: 'deep', z: Z.top - 1, tension: 0.45},
+  ];
   // the ribbed hem band: a 0.018 H value step
   const band = region(secs, v, hemY + 19 - sk.bob, hemY - sk.bob, () => [0, 359.9], sk.leanXf, 0.8, 3, true);
   if (band) parts.push({k: 'rib', pts: band, mat, tone: 'shade', z: Z.outerDetail, clip: 'cardigan', tension: 0.4});
@@ -400,7 +408,10 @@ export function choreJacket(sk: Skeleton, v: View, mat = 'jacket', hemY = 470): 
   const out = loftOutline(secs, v, sk.leanXf, {cornerBottom: true});
   const alpha = pchip([-852, -832, -800, -760, -700, -600, -hemY], [56, 46, 33, 26, 22, 20, 22]);
   const cut = openingCut(sk, secs, v, {alpha: (y) => alpha(-y), y0: 852, y1: hemY});
-  const parts: Part[] = [{k: 'jacket', pts: out, mat, z: Z.outer, cut: cut.length ? [cut] : undefined, tension: 0.45}];
+  const parts: Part[] = [
+    {k: 'jacket', pts: out, mat, z: Z.outer, cut: cut.length ? [cut] : undefined, tension: 0.45},
+    {k: 'jacketInside', pts: out, mat, tone: 'deep', z: Z.lower - 1.5, tension: 0.45},
+  ];
   for (const side of [1, -1]) {
     const reg = region(secs, v, 846 - sk.bob, 770 - sk.bob, (y) => {
       const ys = y + sk.bob;
@@ -427,10 +438,10 @@ export function bigShirt(sk: Skeleton, v: View, mat = 'shirt', waistY = 642): Pa
     {y: 852, a: 34, bf: 26, bb: 36, dz: -10},
     {y: 838, a: 62, bf: 38, bb: 48, dz: -7},
     {y: 824, a: 100, bf: 52, bb: 58, n: 2.1, dz: -4},
-    {y: 810, a: 122, bf: 62, bb: 63, n: 2.2},
-    {y: 794, a: 129, bf: 72, bb: 67, n: 2.2},
-    {y: 772, a: 129, bf: 82, bb: 69, n: 2.2},
-    {y: 740, a: 126, bf: 86, bb: 70, n: 2.2},
+    {y: 810, a: 119, bf: 62, bb: 63, n: 2.2},
+    {y: 794, a: 125, bf: 72, bb: 67, n: 2.2},
+    {y: 772, a: 125, bf: 82, bb: 69, n: 2.2},
+    {y: 740, a: 123, bf: 86, bb: 70, n: 2.2},
     {y: 690, a: 122, bf: 84, bb: 72, n: 2.2},
     {y: waistY + 22, a: 118, bf: 76, bb: 74, n: 2.2},
     {y: waistY + 2, a: b.waistA + 12, bf: b.waistBf + 10, bb: b.waistBb + 10, n: 2.1},
@@ -450,6 +461,17 @@ export function bigShirt(sk: Skeleton, v: View, mat = 'shirt', waistY = 642): Pa
   const tOut = loftOutline(tsecs, v, sk.leanXf, {cornerBottom: true, arc: () => [168, 372]});
   const dT = proj(sk.leanXf([sk.cx(560), 560, -80]), v).d - proj(sk.leanXf([sk.cx(560), 560, 0]), v).d;
   parts.push({k: 'shirtTail', pts: tOut, mat, z: dT > 0 ? Z.outer - 1 : Z.farLeg - 1, tension: 0.45});
+  // the button placket: one slim shade sliver down the centre front, from the V to the tuck
+  const plk = region(secs, v, 772 - sk.bob, waistY + 6 - sk.bob, () => [88.6, 91.4], sk.leanXf, 1.2, 10);
+  if (plk) parts.push({k: 'placket', pts: plk, mat, tone: 'shade', z: Z.outerDetail - 0.5, clip: 'shirt', tension: 0.3, op: 0.75});
+  // the skin of the chest in the open V (under the shirt)
+  const chest = garmentSecs(sk, [
+    {y: 852, a: 24, bf: 21, bb: 25, dz: -6},
+    {y: 828, a: 58, bf: 36, bb: 44, dz: -7},
+    {y: 800, a: 84, bf: 52, bb: 52},
+    {y: 762, a: 86, bf: 62, bb: 54},
+  ]);
+  parts.push({k: 'chest', pts: loftOutline(chest, v, sk.leanXf), mat: 'skin', z: Z.neck - 0.5, tension: 0.45});
   // the collar's two points lying on the chest either side of the open V
   for (const side of [1, -1]) {
     const reg = region(secs, v, 846 - sk.bob, 792 - sk.bob, (y) => {

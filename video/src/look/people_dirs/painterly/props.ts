@@ -46,15 +46,16 @@ export function bagSurfaces(sk: Skeleton, side: 'L' | 'R', bg: {mat: string; str
   const up = nrm(fy(sk.pelvis));
   const out = nrm(fx(sk.pelvis));
   // a soft crescent: a tube along a shallow arc (front-back), its rings tall and thin, the bottom fuller
-  const L = 74 * k;
-  const chain: V3[] = [add(add(c, scl(fwd, L)), scl(up, 20 * k)), add(c, scl(up, -8 * k)), add(add(c, scl(fwd, -L)), scl(up, 18 * k))];
+  const L = 62 * k;
+  const chain: V3[] = [add(add(c, scl(fwd, L)), scl(up, 7 * k)), add(c, scl(up, -4 * k)), add(add(c, scl(fwd, -L)), scl(up, 6 * k))];
   const t = tube(
     chain,
     rowsFor(18, res, 8),
     rowsFor(20, res, 10),
     (tt) => {
-      const w = Math.sin(Math.PI * Math.min(1, Math.max(0, tt))) ** 0.6;
-      return {f: 40 * k * w + 3, b: 30 * k * w + 3, p: 14 * k * w + 2, m: 12 * k * w + 2, nf: 2.4, nb: 2.0};
+      const w = Math.sin(Math.PI * Math.min(1, Math.max(0, tt))) ** 0.45;
+      // a soft pouch: taller than it is thick, its bottom fuller than its top
+      return {f: 40 * k * w + 3, b: 46 * k * w + 3, p: 15 * k * w + 2, m: 13 * k * w + 2, nf: 2.6, nb: 2.2};
     },
     () => [s, 0, 0],
     {capStart: true, capEnd: true},
@@ -115,26 +116,34 @@ export function capSurfaces(sk: Skeleton, cp: {mat: string; brimMat?: string}, r
     return Math.max(Math.PI - Math.abs(ang) - 0.32, (0.62 - t) * 3);
   };
   const dome: Surface = {key: 'cap', mat: cp.mat, grid, axis, wrap: true, open: true, mask, bias: 50, look: {blur: 4.5, hi: 0.8, rim: 0.45}};
-  // the brim: an open plate from the band (front) forward and a little down, curved across
-  const bR = rowsFor(10, res, 5);
-  const bC = rowsFor(30, res, 12);
+  // the brim: a thin closed slab (its top in the light, its underside and its front edge in shade), forward and a little
+  // down from the band, its sides curving down
+  const bR = rowsFor(16, res, 7);
+  const bC = rowsFor(28, res, 14);
   const bg: V3[][] = [];
   const ba: V3[] = [];
+  const TH = 0.03;
   for (let i = 0; i < bR; i++) {
-    const r = i / (bR - 1);
+    const a = mix(-1.18, 1.18, i / (bR - 1));
+    const base = shellPoint(0.735, a, 0.058);
+    const L0 = 0.6 * Math.pow(Math.max(0, Math.cos(a * 1.25)), 0.75) + 0.02;
     const row: V3[] = [];
     for (let k = 0; k < bC; k++) {
-      const a = mix(-1.05, 1.05, k / (bC - 1));
-      const base = shellPoint(0.735, a, 0.06);
-      // forward along the head's front, longest at the centre; the sides curve down
-      const len = 0.58 * Math.cos(a * 0.82) ** 0.7;
-      const p: V3 = [base[0] * (1 - 0.18 * r), base[1] - r * len * Math.sin(14 * D2R) - 0.06 * r * Math.abs(a) ** 2, base[2] + r * len * Math.cos(14 * D2R)];
+      const ph = (k / bC) * Math.PI * 2;
+      const cc = Math.cos(ph);
+      const ss = Math.sin(ph);
+      const r = 0.5 + 0.5 * Math.sign(cc) * Math.pow(Math.abs(cc), 2 / 5);
+      const off = (TH / 2) * Math.sign(ss) * Math.pow(Math.abs(ss), 2 / 5);
+      const len = r * L0;
+      const p: V3 = [base[0] * (1 - 0.16 * r), base[1] - len * Math.sin(17 * D2R) - 0.13 * r * a * a + off, base[2] + len * Math.cos(17 * D2R)];
       row.push(toWorld(sk.head, scl(p, h)));
     }
     bg.push(row);
-    ba.push(toWorld(sk.head, [0, 0.4 * h, 0.2 * h]));
+    // the cross-section's own centre (outward normals point away from it: the top up, the underside down)
+    const lm = 0.5 * L0;
+    ba.push(toWorld(sk.head, scl([base[0] * (1 - 0.08), base[1] - lm * Math.sin(17 * D2R) - 0.065 * a * a, base[2] + lm * Math.cos(17 * D2R)], h)));
   }
-  const brim: Surface = {key: 'brim', mat: cp.brimMat ?? cp.mat, grid: bg, axis: ba, wrap: false, open: true, bias: 52, look: {blur: 3, hi: 0.85, rim: 0.4}};
+  const brim: Surface = {key: 'brim', mat: cp.brimMat ?? cp.mat, grid: bg, axis: ba, wrap: true, bias: 52, look: {blur: 3, hi: 0.85, rim: 0.4}};
   // the brim's shadow across the brow and the eyes: a soft cool band on the face (the cap hides the eyes: a generic,
   // cool face for free)
   const plain: FaceShape = {nose: 0, lips: 0, jaw: 1, chin: 0, cheek: 0, brow: 0};

@@ -8,6 +8,7 @@
 import React from 'react';
 import {Composition, registerRoot} from 'remotion';
 import {PtTest, TEST_W, TEST_H, type TestProps} from './look/people_dirs/painterly/Test';
+import {PtSheet, SHEET_W, SHEET_H} from './look/people_dirs/painterly/Sheet';
 
 const testDefaults: TestProps = {
   h: 640,
@@ -20,6 +21,7 @@ const testDefaults: TestProps = {
 
 const Root: React.FC = () => (
   <>
+    <Composition id="PtSheet" component={PtSheet} durationInFrames={1} fps={60} width={SHEET_W} height={SHEET_H} />
     <Composition id="PtTest" component={PtTest} durationInFrames={1} fps={60} width={TEST_W} height={TEST_H} defaultProps={testDefaults} />
   </>
 );

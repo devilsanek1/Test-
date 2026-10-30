@@ -1,10 +1,10 @@
 // Editorial people: one person = a build, a hairstyle, an outfit, materials and a face treatment, drawn in any pose and
 // view (dir_editorial.md). Returns the parts back to front; Person.tsx paints them.
-import {type PP, type SecKey, type V2, type V3, type View, add3, lerp, loftOutline, mul3, norm3, proj, sections, sub3, tubeOutline} from './core';
+import {type PP, type SecKey, type V2, type V3, type View, add3, lerp, lerp3, loftOutline, mul3, norm3, proj, sections, sub3, tubeOutline} from './core';
 import {type Build, type Pose, type Side, type Skeleton, skeleton} from './body';
 import {type HeadRig, faceYaw, headRig, lashLine, lipTone, lostFlick, noseShade, sunglasses} from './head';
 import {type HairStyle, hair} from './hair';
-import {arm, armZ, forearm, hand, leg, shoe, sleeve, type ShoeKind, type SleeveSpec} from './limbs';
+import {arm, armZ, foot, forearm, hand, leg, shoe, sleeve, type ShoeKind, type SleeveSpec} from './limbs';
 import {bigShirt, cardigan, choreJacket, coat, knit, slipSkirt, tee, trousers} from './garments';
 import type {Kind} from './color';
 import {type Part, Z} from './parts';
@@ -100,13 +100,14 @@ function faceParts(p: Person, sk: Skeleton, v: View, r: HeadRig): Part[] {
 
 const sleeves = (sk: Skeleton, v: View, mat: string, spec: SleeveSpec): Part[] => [...sleeve(sk, 'l', v, mat, spec), ...sleeve(sk, 'r', v, mat, spec)];
 const hands = (sk: Skeleton, v: View): Part[] => (['l', 'r'] as Side[]).map((s) => hand(sk, s, v, 'skin')).filter((x): x is Part => !!x);
-const shoes = (sk: Skeleton, v: View, kind: ShoeKind, mats: {shoe: string; sole?: string}): Part[] => [...shoe(sk, 'l', v, kind, mats), ...shoe(sk, 'r', v, kind, mats)];
+const shoes = (sk: Skeleton, v: View, kind: ShoeKind, mats: {shoe: string; sole?: string; stripe?: string}): Part[] => [...shoe(sk, 'l', v, kind, mats), ...shoe(sk, 'r', v, kind, mats)];
+const feet = (sk: Skeleton, v: View): Part[] => [foot(sk, 'l', v), foot(sk, 'r', v)];
 
 function outfit(p: Person, sk: Skeleton, v: View): Part[] {
   const out: Part[] = [];
   switch (p.outfit) {
     case 'herEvening': {
-      out.push(leg(sk, 'l', v), leg(sk, 'r', v));
+      out.push(leg(sk, 'l', v), leg(sk, 'r', v), ...feet(sk, v));
       out.push(...shoes(sk, v, 'pump', {shoe: 'shoe'}));
       out.push(...slipSkirt(sk, v, 'skirt'));
       out.push(...knit(sk, v, 'knit'));
@@ -116,7 +117,7 @@ function outfit(p: Person, sk: Skeleton, v: View): Part[] {
       break;
     }
     case 'herWeekend': {
-      out.push(...shoes(sk, v, 'sneaker', {shoe: 'sneaker', sole: 'sole'}));
+      out.push(...shoes(sk, v, 'sneaker', {shoe: 'sneaker', sole: 'sole', stripe: 'stripe'}));
       out.push(...trousers(sk, v, 'jeans', 'straight', 646, {hemDrop: 16}));
       out.push(...tee(sk, v, 'tee', 846, 632));
       out.push(...cardigan(sk, v, 'cardigan'));
@@ -137,11 +138,12 @@ function outfit(p: Person, sk: Skeleton, v: View): Part[] {
       break;
     }
     case 'womanShirt': {
+      out.push(...feet(sk, v));
       out.push(...shoes(sk, v, 'flat', {shoe: 'flat'}));
       out.push(...trousers(sk, v, 'jeans', 'wide', 644, {hemDrop: 30}));
       out.push(forearm(sk, 'l', v), forearm(sk, 'r', v));
       out.push(...bigShirt(sk, v, 'shirt', 644));
-      out.push(...sleeves(sk, v, 'shirt', {r: [38, 35, 31], drop: 12, end: 0.42, cuff: 20}));
+      out.push(...sleeves(sk, v, 'shirt', {r: [35, 32, 29], drop: 12, end: 0.42, cuff: 20}));
       out.push(...hands(sk, v));
       break;
     }
@@ -180,10 +182,19 @@ function tote(sk: Skeleton, v: View): Part[] {
   const z = d < -30 ? Z.farArm - 1 : armZ(sk, s, v) - 0.5;
   // the strap: from the bag's top front and back corners up over the shoulder (a true line, ~0.008 H)
   const sh = sk.sh[s];
-  const strapF: PP[] = [proj([x0, top, 56], v), proj(add3(sh, [ss * 6, 22, 24]), v), proj(add3(sh, [ss * 4, 30, -10]), v), proj([x0, top, -60], v)].map((q) => [q.x, q.y]);
+  // over the shoulder's front, its top and its back (dense, low tension: the strap lies ON the shoulder, no loop)
+  const strapF: PP[] = [
+    proj([x0, top, 56], v),
+    proj(lerp3([x0, top, 56], add3(sh, [ss * 2, 6, 30]), 0.55), v),
+    proj(add3(sh, [ss * 2, 6, 30]), v),
+    proj(add3(sh, [ss * 4, 24, 8]), v),
+    proj(add3(sh, [ss * 3, 14, -24]), v),
+    proj(lerp3([x0, top, -60], add3(sh, [ss * 3, 14, -24]), 0.55), v),
+    proj([x0, top, -60], v),
+  ].map((q) => [q.x, q.y]);
   return [
     {k: 'tote', pts, mat: 'tote', z, tension: 0.4},
-    {k: 'strap', pts: strapF, mat: 'tote', tone: 'shade', z: Math.max(z, Z.outer) + 0.6, line: 9, tension: 0.5},
+    {k: 'strap', pts: strapF, mat: 'tote', tone: 'shade', z: Math.max(z, Z.outer) + 0.6, line: 7.5, tension: 0.3},
   ];
 }
 
@@ -193,15 +204,15 @@ function phone(sk: Skeleton, v: View): Part[] {
   if (!s) return [];
   const W = sk.wrist[s];
   const fore = norm3(sub3(W, sk.elbow[s]));
-  const c = add3(W, mul3(fore, 44));
+  const c = add3(W, mul3(fore, 52));
   // the screen faces the eyes: its normal from the phone toward the face
   const eye: V3 = add3(sk.pivot, [0, 40, 60]);
   const nrm = norm3(sub3(eye, c));
   const upW: V3 = [0, 1, 0];
   const side = norm3([nrm[1] * upW[2] - nrm[2] * upW[1], nrm[2] * upW[0] - nrm[0] * upW[2], nrm[0] * upW[1] - nrm[1] * upW[0]]);
   const up = norm3([side[1] * nrm[2] - side[2] * nrm[1], side[2] * nrm[0] - side[0] * nrm[2], side[0] * nrm[1] - side[1] * nrm[0]]);
-  const hh = 64;
-  const hw = 31;
+  const hh = 44;
+  const hw = 20.5;
   const back = mul3(nrm, -6);
   const corners = [
     add3(add3(add3(c, mul3(up, hh)), mul3(side, hw)), back),
@@ -209,7 +220,7 @@ function phone(sk: Skeleton, v: View): Part[] {
     add3(add3(add3(c, mul3(up, -hh)), mul3(side, -hw)), back),
     add3(add3(add3(c, mul3(up, -hh)), mul3(side, hw)), back),
   ].map((p) => proj(p, v));
-  return [{k: 'phone', pts: corners.map((q) => [q.x, q.y] as PP), mat: 'phone', tone: 'base', z: armZ(sk, s, v) + 1.5, tension: 0.12}];
+  return [{k: 'phone', pts: corners.map((q) => [q.x, q.y] as PP), mat: 'phone', tone: 'base', z: armZ(sk, s, v) + 1.5, tension: 0.08}];
 }
 
 // ---------------------------------------------------------------- the person
