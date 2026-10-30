@@ -2,12 +2,24 @@
 // masses, ONE crisp sheen band (+16 L*), partings as crisp notches, the back view as the showcase (design_research.md
 // R1-R7). Everything in head units (u = the skull's height; the crown at y -0.5, the chin at 0.5, the shoulders at
 // ~0.92, the bust at ~1.57).
-import {V2, RV, poly} from '../graphic/geo';
+import {V2, RV, poly, clamp} from '../graphic/geo';
 import type {HeadFrame} from './head';
 import type {Tone} from '../graphic/color';
 import type {Part, Region} from '../graphic/part';
 
-export type HairCtx = {hf: HeadFrame; view: 'q' | 'p' | 'b'; faceX: number; t: Tone; /** walking: the fall swings back */ swing?: number; turn?: number};
+export type HairCtx = {
+  hf: HeadFrame;
+  view: 'q' | 'p' | 'b';
+  faceX: number;
+  t: Tone;
+  /** walking: the fall swings back */
+  swing?: number;
+  turn?: number;
+  /** face option 'turn' (faces_graphic.md): in profile a long side-swept lock comes forward over the brow and the eye */
+  veil?: boolean;
+  /** face option 'lash': in profile the curtain is tucked back behind the eye, so the lash line shows */
+  tuck?: boolean;
+};
 
 const R = (c: HairCtx, pts: RV[]) => c.hf.R(pts);
 const PG = (c: HairCtx, pts: V2[]) => poly(c.hf.PP(pts));
@@ -83,6 +95,14 @@ export function hairLong(c: HairCtx, o: {len?: number} = {}): Part[] {
       [-0.04, -0.33, 0.08],
       [-0.1, -0.44, 0.06],
     ];
+    // a head turned nearer the front (|yaw| under ~30) shows more of its near cheek: the near curtain's inner edge
+    // moves out with it (0 at the 3/4 the direction was drawn for, 0.1 u at a slight turn of 16 degrees)
+    const open = clamp((0.45 + fx / 0.47) / 0.17, 0, 1) * 0.1;
+    for (let i = 16; i < near.length; i++) {
+      const y = near[i][1];
+      const w = clamp((y + 0.5) / 0.3, 0, 1);
+      near[i] = [near[i][0] + open * w, y, near[i][2]];
+    }
     const nearRegs: Region[] = [
       // the side of the head and the lock's outer half in the shade plane
       {d: rightOf(c, [[0.2, -0.75], [0.4, 0.1], [0.44, 0.9], [0.46, L + 0.2]]), fill: t.shade},
@@ -154,23 +174,53 @@ export function hairLong(c: HairCtx, o: {len?: number} = {}): Part[] {
       z: 18,
     });
     // the cap over the head, the hairline in front of the ear and the curtain bang to the cheekbone
-    const cap: RV[] = [
-      [-0.34, -0.44, 0.08],
-      [0.0, -0.585, 0.2],
-      [0.42, -0.48, 0.16],
-      [0.6, -0.2, 0.14],
-      [0.6, 0.14, 0.12],
-      [0.52, 0.42, 0.1],
-      [0.34, 0.53, 0.06],
-      [0.12, 0.47, 0.06],
-      [0.03, 0.33, 0.08],
-      [-0.05, 0.17, 0.06],
-      [-0.15, 0.085, 0.04],
-      [-0.27, 0.085, 0.06],
-      [-0.355, 0.0, 0.08],
-      [-0.405, -0.13, 0.1],
-      [-0.4, -0.31, 0.1],
-    ];
+    const cap: RV[] = c.veil
+      ? [
+          // option 'turn': the side part's long lock swept forward over the brow and the eye, its tip at the
+          // cheekbone; the nose, the lips and the chin are the face
+          [-0.36, -0.44, 0.08],
+          [0.0, -0.6, 0.2],
+          [0.42, -0.48, 0.16],
+          [0.6, -0.2, 0.14],
+          [0.6, 0.14, 0.12],
+          [0.52, 0.42, 0.1],
+          [0.34, 0.53, 0.06],
+          [0.12, 0.47, 0.06],
+          [0.03, 0.33, 0.08],
+          [-0.06, 0.2, 0.06],
+          [-0.2, 0.135, 0.05],
+          [-0.34, 0.1, 0.05],
+          [-0.405, 0.06, 0.02],
+          [-0.43, -0.04, 0.05],
+          [-0.445, -0.2, 0.1],
+          [-0.42, -0.34, 0.1],
+        ]
+      : [
+          [-0.34, -0.44, 0.08],
+          [0.0, -0.585, 0.2],
+          [0.42, -0.48, 0.16],
+          [0.6, -0.2, 0.14],
+          [0.6, 0.14, 0.12],
+          [0.52, 0.42, 0.1],
+          [0.34, 0.53, 0.06],
+          [0.12, 0.47, 0.06],
+          [0.03, 0.33, 0.08],
+          [-0.05, 0.17, 0.06],
+          [-0.15, 0.085, 0.04],
+          ...((c.tuck
+            ? [
+                [-0.24, 0.1, 0.05],
+                [-0.29, 0.03, 0.06],
+                [-0.36, -0.09, 0.08],
+                [-0.4, -0.31, 0.1],
+              ]
+            : [
+                [-0.27, 0.085, 0.06],
+                [-0.355, 0.0, 0.08],
+                [-0.405, -0.13, 0.1],
+                [-0.4, -0.31, 0.1],
+              ]) as RV[]),
+        ];
 
     parts.push({
       name: 'hairCap',
@@ -430,7 +480,7 @@ export function hairCurtains(c: HairCtx): Part[] {
 }
 
 // ---------------------------------------------------------------- H6: boho knotless braids, half-up, curly ends
-export function hairBraids(c: HairCtx, ends: Tone, o: {len?: number} = {}): Part[] {
+export function hairBraids(c: HairCtx, ends: Tone, o: {len?: number; noKnot?: boolean} = {}): Part[] {
   const t = c.t;
   const L = o.len ?? 2.3;
   if (c.view !== 'q') return [];
@@ -457,7 +507,7 @@ export function hairBraids(c: HairCtx, ends: Tone, o: {len?: number} = {}): Part
     pts.push([cx + w / 2, cy - 0.06, 0.02]);
     return R(c, pts);
   };
-  return [
+  const all: Part[] = [
     // the length behind the shoulders, framing the neck
     {
       name: 'braidsBack',
@@ -502,7 +552,7 @@ export function hairBraids(c: HairCtx, ends: Tone, o: {len?: number} = {}): Part
       z: 56,
     },
     {
-      name: 'topKnot',
+      name: o.noKnot ? 'topKnotHidden' : 'topKnot',
       d: R(c, [[0.02, -0.62, 0.1], [0.18, -0.78, 0.12], [0.38, -0.7, 0.1], [0.36, -0.5, 0.08], [0.16, -0.48, 0.08]]),
       fill: t.lit,
       regions: [{d: rightOf(c, [[0.22, -0.9], [0.26, -0.4]]), fill: t.shade}, {d: crescent(c, 0.2, -0.6, 0.15, 0.12, 200, 280, 0.035), fill: t.sheen}],
@@ -528,4 +578,5 @@ export function hairBraids(c: HairCtx, ends: Tone, o: {len?: number} = {}): Part
     },
     {name: 'braidsEnds', d: curls(0.45, L - 0.02, 0.36), fill: ends.lit, regions: [{d: rightOf(c, [[0.5, L - 0.3], [0.52, L + 0.3]]), fill: ends.shade}], z: 74.9},
   ];
+  return all.filter((p) => p.name !== 'topKnotHidden');
 }

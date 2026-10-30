@@ -165,7 +165,7 @@ def make(out_dir, seed=('organic', 'paving', 1), dose=1.0, renders=None):
         wd = r.uniform(7, 14) * gs
         if Ls < 8 or wd < 2.5:
             continue
-        c = L.rgb2ok(target[y, x]) + np.array([r.choice([-1, 1]) * r.uniform(0.006, 0.016), 0, r.normal(0, 0.003)])
+        c = L.rgb2ok(target[y, x]) + np.array([r.choice([-1, 1]) * r.uniform(0.005, 0.013), 0, r.normal(0, 0.003)])
         ck = 'c%d' % colour_of[i]
         used.add(ck)
         near_lost = ldist[y, x] < 6 * gs and r.random() < 0.3
@@ -179,7 +179,7 @@ def make(out_dir, seed=('organic', 'paving', 1), dose=1.0, renders=None):
         x, y = lxs[j], lys[j]
         gs = float(ground_scale(x + X0, y + Y0))
         sp = int(max(14, 60 * gs))
-        if taken[max(0, y - sp // 3):y + sp // 3 + 1, max(0, x - sp):x + sp + 1].any() or r.random() > 0.5 * dose:
+        if taken[max(0, y - sp // 3):y + sp // 3 + 1, max(0, x - sp):x + sp + 1].any() or r.random() > 0.35 * dose:
             continue
         taken[y, x] = True
         dx_, dy_ = VP[0] - (x + X0), VP[1] - (y + Y0)

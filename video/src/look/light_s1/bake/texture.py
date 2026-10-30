@@ -6,7 +6,7 @@ for the whole frame, so the vector flats, the painted pieces and the people read
   mottle    a gentle blotch (40-90 px), the "paint density" of a wash
 applied as SOFT-LIGHT around mid-grey (neutral at 50 %: a lift and a darkening of equal weight, strongest in the
 mid-tones, so the darks keep their depth and the lights never grey), at ~0.9 L* std on a mid-tone; in the caption band
-at 30 % (the words' ground stays calm: light_proof.md §4 measures it). Static plane by plane: baked into each slot's
+at 12 % (the words' ground stays calm: light_proof.md §4 measures it). Static plane by plane: baked into each slot's
 maps (it rides its plane's float: never a screen-fixed "shower door", never re-seeded per frame); on the movers a tile
 of the same material, locked to them (lib/light2 GrainOn). Seeded (sha256 of a name): the same bytes on every run."""
 import numpy as np
@@ -15,7 +15,7 @@ import cv2
 from common import BAND, H, W, rng, smoothstep, value_noise
 
 AMP = 0.022           # the soft-light offset per unit of the field (std 1): ~0.9 L* on a mid-tone
-BAND_K = 0.3          # its share in the caption band
+BAND_K = 0.12         # its share in the caption band (the band's ground stays within CRAFT's 1.5 L* spread)
 
 
 def field(name, shape, aniso_deg=-24.0):

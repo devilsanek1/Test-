@@ -1,13 +1,18 @@
-// MODERN GRAPHIC people: the cast. HER (27, the film's lead; the film's teal is her accent) in two outfits, each in
+// MODERN GRAPHIC people, FACE OPTIONS (a copy of graphic/cast.ts): the same cast, poses and outfits, with the face
+// option threaded through (head.ts FaceOpt) and two more views of her head: 's', a slight turn (the 3/4 stance with the
+// head turned to yaw -16), and 't', the lost profile at yaw -118 (option 'turn'). Accessories by option: 'shades' puts
+// sunglasses on everyone, 'brim' a cap (hers black, lifted over her long hair; his indigo instead of the headphones;
+// the woman's black over her braids, the top knot left out); the woman's own sunglasses stay only in 'now'.
+// The original header: the cast. HER (27, the film's lead; the film's teal is her accent) in two outfits, each in
 // three views; a man and a woman who support her (different looks, builds and skins). Each figure is built from its
 // skeleton (a pose) and its outfit, in z order: the ground, the hair behind, the far limbs, the legs, the torso
 // pieces, the near limbs, the neck and head, the hair in front, the props.
 import {V2, V3, add, mul} from '../graphic/geo';
 import {Cam, cam, toCam} from '../graphic/rig';
 import {WOMAN, MAN, Skel, Frame, framePt, Build} from '../graphic/body';
-import {headParts} from './head';
+import {headParts, type FaceOpt, type HeadOut} from './head';
 import {hairLong, hairPonytail, hairCurtains, hairBraids} from './hair';
-import {cap, ear, sunglasses, headphones} from './headwear';
+import {cap, ear, sunglasses, sunglassesProfile, headphones} from './headwear';
 import {coat, top, trousers, sleeve, cuffOf, bareArm, shortSleeve, bareLegs, bomber, ribSleeve, leatherJacket, leatherSleeve, slipSkirt} from '../graphic/wear';
 import {shoe, contact} from '../graphic/feet';
 import {hand, bag, icedCoffee, gripCup} from '../graphic/props';
@@ -15,7 +20,7 @@ import {SKIN, HAIR, T, BG} from '../graphic/palette';
 import {rimOf, type Tone} from '../graphic/color';
 import type {Built, Part} from '../graphic/part';
 
-export type View = 'q' | 'p' | 'b';
+export type View = 'q' | 'p' | 'b' | 's' | 't';
 export type Who = 'herEvening' | 'herWeekend' | 'man' | 'woman';
 
 // ---------------------------------------------------------------- skeletons
@@ -82,11 +87,11 @@ const walk = (b: Build, arms: PoseIn['arms']): PoseIn => ({
   arms,
 });
 /** From behind, standing, the weight on the left leg, looking back over the left shoulder (the lost profile). */
-const back = (b: Build, arms: PoseIn['arms']): PoseIn => ({
+const back = (b: Build, arms: PoseIn['arms'], headYaw = 26): PoseIn => ({
   b,
   pelvis: {x: 10, z: 0, roll: 6, tw: -4},
   chest: {x: 2, z: -2, roll: -4, tw: 4},
-  head: {yaw: 26, roll: 4, pitch: 2},
+  head: {yaw: headYaw, roll: 4, pitch: 2},
   legs: {
     l: {knee: [46, 295, 2], ankle: [28, 40, -6], fy: 14, fp: 0},
     r: {knee: [-52, 302, 30], ankle: [-74, 42, 52], fy: -26, fp: 0},
@@ -94,14 +99,14 @@ const back = (b: Build, arms: PoseIn['arms']): PoseIn => ({
   arms,
 });
 
-const YAW: Record<View, number> = {q: -40, p: -90, b: 196};
-const ARMS_COAT: Record<View, PoseIn['arms']> = {
+const YAW: Record<View, number> = {q: -40, p: -90, b: 196, s: -40, t: 196};
+const ARMS_COAT: Record<'q' | 'p' | 'b', PoseIn['arms']> = {
   // the right hand in the coat's pocket (the elbow out), the left arm clamping the bag
   q: {r: {el: [-150, 632, -20], wr: [-112, 520, 46]}, l: {el: [134, 628, -14], wr: [124, 482, 12]}},
   p: {l: {el: [128, 630, -30], wr: [122, 486, -6]}, r: {el: [-122, 632, 28], wr: [-114, 494, 82]}},
   b: {l: {el: [134, 628, -14], wr: [124, 482, 12]}, r: {el: [-150, 634, -12], wr: [-128, 528, 22]}},
 };
-const ARMS_COFFEE: Record<View, PoseIn['arms']> = {
+const ARMS_COFFEE: Record<'q' | 'p' | 'b', PoseIn['arms']> = {
   // the left hand holds the iced coffee (the forearm up, A5), the right arm loose
   q: {l: {el: [128, 640, 6], wr: [74, 676, 146]}, r: {el: [-130, 630, -6], wr: [-124, 488, 16]}},
   p: {l: {el: [122, 642, -4], wr: [108, 690, 138]}, r: {el: [-120, 634, 28], wr: [-112, 494, 80]}},
@@ -138,9 +143,31 @@ function coffeeIn(sk: Skel, side: 'l' | 'r', c: Cam, skin: Tone, z: number, hang
 const RIMMED = /^(coat|sleeve|hair|ponytail|cap|bag|seat|leg-)/;
 const withRim = (parts: Part[]): Part[] => parts.map((p) => (RIMMED.test(p.name) && !p.line ? {...p, rim: rimOf(p.fill)} : p));
 
+/** What the face option puts on the head: sunglasses ('shades') or a cap ('brim'). */
+function faceKit(H: HeadOut, face: FaceOpt, o: {skinShade: string; capTone?: Tone; longHair?: boolean; glasses?: [string, string]}): Part[] {
+  const v = H.lm.view;
+  if (face === 'shades') {
+    const [fr, gl] = o.glasses ?? ['#241B1F', '#6E5C62'];
+    if (v === 'q') return sunglasses(H.hf, H.lm.faceX, fr, gl);
+    if (v === 'p') return sunglassesProfile(H.hf, H.lm.faceX, fr, gl);
+  }
+  if (face === 'brim' && o.capTone && v !== 'b') {
+    return cap(H.hf, v, o.capTone, o.skinShade, 0, {shadow: false, zLift: o.longHair ? 8 : 0, blend: H.lm.blend, faceX: H.lm.faceX});
+  }
+  return [];
+}
+const turnOf = (H: HeadOut) => (H.lm.view === 'b' ? Math.min(1, Math.max(0, (180 - Math.abs(H.hf.yaw)) / 50)) : 0);
+
 // ---------------------------------------------------------------- her, autumn city evening (N1: the long open coat)
-function herEvening(view: View): Built {
-  const pose = view === 'q' ? stand(WOMAN, ARMS_COAT.q) : view === 'p' ? walk(WOMAN, ARMS_COAT.p) : back(WOMAN, ARMS_COAT.b);
+function herEvening(view: View, face: FaceOpt): Built {
+  const pose =
+    view === 'q'
+      ? stand(WOMAN, ARMS_COAT.q)
+      : view === 's'
+        ? stand(WOMAN, ARMS_COAT.q, {headYaw: 24})
+        : view === 'p'
+          ? walk(WOMAN, ARMS_COAT.p)
+          : back(WOMAN, ARMS_COAT.b, view === 't' ? 46 : 26);
   const sk = skel(pose);
   const c = cam(YAW[view]);
   const parts: Part[] = [];
@@ -166,21 +193,21 @@ function herEvening(view: View): Built {
     const near = armNear(sk, s, c);
     const z = near ? 60 : 22;
     parts.push(sleeve(sk, s, c, {tone: T.coat, r: [44, 39, 37], len: 0.97, z}));
-    const pocket = (view === 'q' || view === 'b') && s === 'r';
+    const pocket = view !== 'p' && s === 'r';
     if (!pocket) parts.push(handAt(sk, s, c, SKIN.s2, z + 0.5, 0.97));
   }
   const bagAt = framePt(sk.chest, 118, 652, -66);
   parts.push(...bag(sk, 'l', bagAt, c, T.teal, armNear(sk, 'l', c) ? 59 : 21, {yaw: -26, len: 128, h: 86, th: 34}));
-  const H = headParts(sk, c, SKIN.s2);
+  const H = headParts(sk, c, SKIN.s2, {face, hair: HAIR.copper});
   parts.push(...H.parts);
-  const turn = view === 'b' ? Math.min(1, Math.max(0, (180 - Math.abs(H.hf.yaw)) / 50)) : 0;
-  parts.push(...hairLong({hf: H.hf, view: H.lm.view, faceX: H.lm.faceX, t: HAIR.copper, swing: walking ? 0.06 : 0, turn}));
+  parts.push(...hairLong({hf: H.hf, view: H.lm.view, faceX: H.lm.faceX, t: HAIR.copper, swing: walking ? 0.06 : 0, turn: turnOf(H), veil: face === 'turn', tuck: face === 'lash'}));
+  parts.push(...faceKit(H, face, {skinShade: SKIN.s2.shade, capTone: T.coat, longHair: true}));
   return finish(withRim(parts), H.hf.c);
 }
 
 // ---------------------------------------------------------------- her, casual weekend (L2: baby tee, jeans, cap, ponytail)
-function herWeekend(view: View): Built {
-  const pose = view === 'q' ? stand(WOMAN, ARMS_COFFEE.q) : view === 'p' ? walk(WOMAN, ARMS_COFFEE.p) : back(WOMAN, ARMS_COFFEE.b);
+function herWeekend(view: View, face: FaceOpt): Built {
+  const pose = view === 'q' || view === 's' ? stand(WOMAN, ARMS_COFFEE.q, view === 's' ? {headYaw: 24} : {}) : view === 'p' ? walk(WOMAN, ARMS_COFFEE.p) : back(WOMAN, ARMS_COFFEE.b, view === 't' ? 46 : 26);
   const sk = skel(pose);
   const c = cam(YAW[view]);
   const parts: Part[] = [];
@@ -196,18 +223,19 @@ function herWeekend(view: View): Built {
     if (s === 'l') parts.push(...coffeeIn(sk, s, c, SKIN.s2, z + 0.5, view === 'b'));
     else parts.push(handAt(sk, s, c, SKIN.s2, z + 0.5));
   }
-  const H = headParts(sk, c, SKIN.s2);
+  const H = headParts(sk, c, SKIN.s2, {face: face === 'brim' ? 'brim' : face, hair: HAIR.copper});
   parts.push(...H.parts);
-  const turn = view === 'b' ? Math.min(1, Math.max(0, (180 - Math.abs(H.hf.yaw)) / 50)) : 0;
+  const turn = turnOf(H);
   if (H.lm.view === 'b') parts.push(...ear(H.hf, 'b', SKIN.s2, -1), ...ear(H.hf, 'b', SKIN.s2, 1));
   else parts.push(...ear(H.hf, H.lm.view, SKIN.s2));
   parts.push(...hairPonytail({hf: H.hf, view: H.lm.view, faceX: H.lm.faceX, t: HAIR.copper, swing: view === 'p' ? 0.08 : 0, turn}));
-  parts.push(...cap(H.hf, H.lm.view, T.teal, SKIN.s2.shade, turn));
+  parts.push(...cap(H.hf, H.lm.view, T.teal, SKIN.s2.shade, turn, {shadow: face === 'now', blend: H.lm.blend, faceX: H.lm.faceX}));
+  if (face === 'shades') parts.push(...faceKit(H, face, {skinShade: SKIN.s2.shade}));
   return finish(withRim(parts), H.hf.c);
 }
 
 // ---------------------------------------------------------------- the man (N6: the suede bomber, headphones)
-function man(view: View): Built {
+function man(view: View, face: FaceOpt): Built {
   const arms: PoseIn['arms'] = {
     // the left hand in the jeans' front pocket (the elbow out), the right arm loose
     l: {el: [168, 612, -18], wr: [118, 506, 46]},
@@ -229,15 +257,16 @@ function man(view: View): Built {
     parts.push(...ribSleeve(sk, s, c, T.cognac, rib, [42, 37, 34], z));
     if (s === 'r') parts.push(handAt(sk, s, c, SKIN.s3, z + 0.5, 0.98));
   }
-  const H = headParts(sk, c, SKIN.s3);
+  const H = headParts(sk, c, SKIN.s3, {face, hair: HAIR.blackBrown});
   parts.push(...H.parts);
   parts.push(...hairCurtains({hf: H.hf, view: H.lm.view, faceX: H.lm.faceX, t: HAIR.blackBrown}));
-  parts.push(...headphones(H.hf, T.phones, '#8E7F78'));
+  if (face !== 'brim') parts.push(...headphones(H.hf, T.phones, '#8E7F78'));
+  parts.push(...faceKit(H, face, {skinShade: SKIN.s3.shade, capTone: T.indigo}));
   return finish(parts, H.hf.c);
 }
 
 // ---------------------------------------------------------------- the woman (N3: the cropped leather jacket, the satin skirt)
-function woman(view: View): Built {
+function woman(view: View, face: FaceOpt): Built {
   const arms: PoseIn['arms'] = {
     // the left hand in the jacket's pocket, the right arm loose
     l: {el: [150, 628, -22], wr: [118, 540, 40]},
@@ -258,10 +287,11 @@ function woman(view: View): Built {
     parts.push(leatherSleeve(sk, s, c, T.burgundy, [36, 32, 30], z));
     if (s === 'r') parts.push(handAt(sk, s, c, SKIN.s5, z + 0.5, 0.97));
   }
-  const H = headParts(sk, c, SKIN.s5);
+  const H = headParts(sk, c, SKIN.s5, {face, hair: HAIR.black});
   parts.push(...H.parts);
-  parts.push(...hairBraids({hf: H.hf, view: H.lm.view, faceX: H.lm.faceX, t: HAIR.black}, HAIR.honey));
-  parts.push(...sunglasses(H.hf, H.lm.faceX, '#241B1F', '#6E5C62'));
+  parts.push(...hairBraids({hf: H.hf, view: H.lm.view, faceX: H.lm.faceX, t: HAIR.black}, HAIR.honey, {noKnot: face === 'brim'}));
+  if (face === 'now') parts.push(...sunglasses(H.hf, H.lm.faceX, '#241B1F', '#6E5C62'));
+  parts.push(...faceKit(H, face, {skinShade: SKIN.s5.shade, capTone: T.coat}));
   return finish(parts, H.hf.c);
 }
 
@@ -269,15 +299,15 @@ function finish(parts: Part[], head: V2): Built {
   return {parts, box: {x0: -400, x1: 400, y0: -20, y1: 1010}, head: [head[0], head[1]]};
 }
 
-export function build(who: Who, view: View): Built {
+export function build(who: Who, view: View, face: FaceOpt = 'now'): Built {
   switch (who) {
     case 'herEvening':
-      return herEvening(view);
+      return herEvening(view, face);
     case 'herWeekend':
-      return herWeekend(view);
+      return herWeekend(view, face);
     case 'man':
-      return man(view);
+      return man(view, face);
     case 'woman':
-      return woman(view);
+      return woman(view, face);
   }
 }

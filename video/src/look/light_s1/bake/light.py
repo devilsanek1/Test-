@@ -124,14 +124,14 @@ def canopy_mask(bank_top):
         for j in range(int(r.integers(2, 4))):
             cx = cx0 + r.normal(0, 9)
             cy = cy0 + r.normal(0, 5)
-            rx = r.uniform(4, 13)
-            ry = rx * r.uniform(1.2, 1.8)
+            rx = r.uniform(4, 10)
+            ry = rx * r.uniform(1.2, 1.7)
             ang = np.arctan2(cy - 965, cx - 195)
             c, s_ = np.cos(ang), np.sin(ang)
             u = (XX - cx) * c + (yy - cy) * s_
             v = -(XX - cx) * s_ + (yy - cy) * c
             e = (u / ry) ** 2 + (v / rx) ** 2 + 0.35 * brk
-            holes = np.maximum(holes, (1 - smoothstep(0.5, 1.2, e)) * r.uniform(0.35, 0.55))
+            holes = np.maximum(holes, (1 - smoothstep(0.45, 1.3, e)) * r.uniform(0.22, 0.4))
     m = m * (1 - holes)
     return np.clip(m, 0, 1).astype(np.float32), edge
 
@@ -153,7 +153,7 @@ def dapples(canopy, edge):
             u = (XX - cx) * c + (YY - cy) * s
             v = -(XX - cx) * s + (YY - cy) * c
             e = (u / ry) ** 2 + (v / rx) ** 2 + 0.3 * brk
-            out = np.maximum(out, (1 - smoothstep(0.5, 1.2, e)) * r.uniform(0.3, 0.5))
+            out = np.maximum(out, (1 - smoothstep(0.45, 1.3, e)) * r.uniform(0.25, 0.42))
     return out * canopy
 
 

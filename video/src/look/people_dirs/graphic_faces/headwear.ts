@@ -1,4 +1,7 @@
-// MODERN GRAPHIC people: what sits on the head. A cap (its brim's crisp shadow hides the eyes), oversized sunglasses
+// MODERN GRAPHIC people, FACE OPTIONS (a copy of graphic/headwear.ts): what sits on the head. Added here: the cap
+// seen near the front (a slight turn), the cap without its own brim shadow (option 'brim' draws it as a region of the
+// face, clipped to it) and lifted above long hair, and sunglasses in profile (option 'shades').
+// The original header: A cap (its brim's crisp shadow hides the eyes), oversized sunglasses
 // (the most current generic face: fashion.md §1.7), over-ear headphones (they change the head's silhouette), and the
 // ear when the hair is pulled back. Head units as in head.ts (u = the skull's height, the crown at y -0.5).
 import {V2, RV, poly} from '../graphic/geo';
@@ -11,8 +14,11 @@ const rightOf = (hf: HeadFrame, line: V2[]) => poly(hf.PP([...line, [3, line[lin
 
 /** A baseball cap: the crown, the brim (its underside a darker band), the brim's shadow on the face, and from behind
  *  the back opening with its strap (the ponytail comes through it). */
-export function cap(hf: HeadFrame, view: V, t: Tone, skinShade: string, turn = 0): Part[] {
+export function cap(hf: HeadFrame, view: V, t: Tone, skinShade: string, turn = 0, o: {shadow?: boolean; zLift?: number; blend?: number; faceX?: number} = {}): Part[] {
   const parts: Part[] = [];
+  const zl = o.zLift ?? 0;
+  const lift = (ps: Part[]) => ps.filter((p) => o.shadow !== false || p.name !== 'brimShadow').map((p) => (zl && p.name !== 'brimShadow' ? {...p, z: p.z + zl} : p));
+  if (view === 'q' && (o.blend ?? 1) < 0.5) return lift(capFront(hf, t, o.faceX ?? -0.13));
   if (view === 'q') {
     const crown: RV[] = [
       [-0.44, -0.17, 0.02],
@@ -37,7 +43,7 @@ export function cap(hf: HeadFrame, view: V, t: Tone, skinShade: string, turn = 0
       ],
       z: 70,
     });
-    parts.push({name: 'capButton', d: hf.R([[-0.24, -0.66, 0.02], [-0.16, -0.67, 0.02], [-0.17, -0.63, 0.02], [-0.24, -0.62, 0.02]]), fill: t.shade, z: 70.1});
+    parts.push({name: 'capButton', d: hf.R([[-0.24, -0.645, 0.02], [-0.16, -0.655, 0.02], [-0.17, -0.618, 0.02], [-0.24, -0.608, 0.02]]), fill: t.shade, z: 70.1});
     // the brim: forward and a little down, its top lit, its underside a band along the front edge
     const brim: RV[] = [
       [-0.16, -0.19, 0.02],
@@ -76,9 +82,9 @@ export function cap(hf: HeadFrame, view: V, t: Tone, skinShade: string, turn = 0
     });
     const brim: RV[] = [
       [-0.3, -0.185, 0.02],
-      [-0.72, -0.21, 0.12],
-      [-0.98, -0.13, 0.03],
-      [-0.7, -0.115, 0.06],
+      [-0.66, -0.205, 0.12],
+      [-0.86, -0.135, 0.03],
+      [-0.64, -0.112, 0.06],
       [-0.4, -0.145, 0.02],
     ];
     parts.push({
@@ -116,7 +122,7 @@ export function cap(hf: HeadFrame, view: V, t: Tone, skinShade: string, turn = 0
       parts.push({name: 'capBrim', d: hf.R([[-0.44, -0.12, 0.02], [-0.62, -0.1, 0.04], [-0.64, -0.06, 0.02], [-0.46, -0.06, 0.02]]), fill: t.deep, z: 76.9});
     }
   }
-  return parts;
+  return lift(parts);
 }
 
 /** The ear, when the hair is pulled back: one small shape with the inner shade (design_research.md R6). */
@@ -180,15 +186,15 @@ export function sunglasses(hf: HeadFrame, faceX: number, frame: string, glint: s
     [fx + 0.05, 0.115, 0.07],
   ];
   return [
-    {name: 'lensFar', d: hf.R(far), fill: frame, z: 55},
+    {name: 'lensFar', d: hf.R(far), fill: frame, z: 57},
     {
       name: 'lensNear',
       d: hf.R(near),
       fill: frame,
       regions: [{d: poly(hf.PP([[fx + 0.12, -0.13], [fx + 0.17, -0.13], [fx + 0.09, 0.13], [fx + 0.04, 0.13]])), fill: glint}],
-      z: 55,
+      z: 57,
     },
-    {name: 'bridge', d: hf.R([[fx - 0.03, -0.085, 0.01], [fx + 0.04, -0.09, 0.01], [fx + 0.04, -0.06, 0.01], [fx - 0.03, -0.055, 0.01]]), fill: frame, z: 55.1},
+    {name: 'bridge', d: hf.R([[fx - 0.03, -0.085, 0.01], [fx + 0.04, -0.09, 0.01], [fx + 0.04, -0.06, 0.01], [fx - 0.03, -0.055, 0.01]]), fill: frame, z: 57.1},
     {name: 'temple', d: hf.R([[fx + 0.33, -0.1, 0.01], [0.3, -0.07, 0.01], [0.3, -0.045, 0.01], [fx + 0.33, -0.065, 0.01]]), fill: frame, z: 54.9},
   ];
 }
@@ -224,5 +230,73 @@ export function headphones(hf: HeadFrame, t: Tone, cushion: string): Part[] {
       regions: [{d: rightOf(hf, [[0.33, -0.3], [0.34, 0.1], [0.3, 0.4]]), fill: t.shade}],
       z: 73,
     },
+  ];
+}
+
+/** The cap at a slight turn (yaw about -16, option 'brim'): the crown, the band, and the brim seen nearly edge-on from
+ *  the front, its underside a crescent of the deep tone that dips at the face line (a curved brim). */
+function capFront(hf: HeadFrame, t: Tone, fx: number): Part[] {
+  const crown: RV[] = [
+    [-0.47, -0.15, 0.02],
+    [-0.5, -0.37, 0.12],
+    [-0.24, -0.66, 0.22],
+    [0.2, -0.665, 0.22],
+    [0.48, -0.41, 0.16],
+    [0.51, -0.12, 0.05],
+    [0.43, -0.05, 0.03],
+    [0.22, -0.13, 0.1],
+    [fx, -0.175, 0.08],
+  ];
+  const brim: RV[] = [
+    [-0.5, -0.19, 0.02],
+    [fx - 0.1, -0.195, 0.08],
+    [0.28, -0.17, 0.06],
+    [0.4, -0.12, 0.03],
+    [0.3, -0.095, 0.06],
+    [fx + 0.02, -0.07, 0.12],
+    [-0.42, -0.1, 0.08],
+    [-0.62, -0.13, 0.03],
+  ];
+  return [
+    {
+      name: 'capCrown',
+      d: hf.R(crown),
+      fill: t.lit,
+      regions: [
+        {d: rightOf(hf, [[0.1, -0.8], [0.18, -0.3], [0.24, 0.1]]), fill: t.shade},
+        {d: poly(hf.PP([[fx - 0.02, -0.665], [fx + 0.0, -0.665], [fx - 0.02, -0.17], [fx - 0.045, -0.17]])), fill: t.shade},
+      ],
+      z: 70,
+    },
+    {name: 'capButton', d: hf.R([[fx - 0.05, -0.66, 0.02], [fx + 0.03, -0.665, 0.02], [fx + 0.02, -0.628, 0.02], [fx - 0.05, -0.623, 0.02]]), fill: t.shade, z: 70.1},
+    {
+      name: 'capBrim',
+      d: hf.R(brim),
+      fill: t.lit,
+      regions: [{d: poly(hf.PP([[-0.7, -0.165], [fx - 0.1, -0.17], [0.3, -0.15], [0.5, -0.13], [0.5, 0.0], [-0.7, 0.0]])), fill: t.deep}],
+      z: 71,
+    },
+  ];
+}
+
+/** Oversized sunglasses in profile (facing screen-left, option 'shades'): the lens's side as one dark rounded shape
+ *  just in front of the eye line, ONE reflection streak, and the temple arm as a straight band back to the hair. */
+export function sunglassesProfile(hf: HeadFrame, ff: number, frame: string, glint: string): Part[] {
+  const lens: RV[] = [
+    [ff - 0.035, -0.112, 0.03],
+    [ff + 0.1, -0.104, 0.03],
+    [ff + 0.118, -0.02, 0.05],
+    [ff + 0.075, 0.082, 0.05],
+    [ff - 0.025, 0.088, 0.04],
+  ];
+  return [
+    {
+      name: 'lensSide',
+      d: hf.R(lens),
+      fill: frame,
+      regions: [{d: poly(hf.PP([[ff - 0.005, -0.13], [ff + 0.03, -0.13], [ff - 0.005, 0.11], [ff - 0.04, 0.11]])), fill: glint}],
+      z: 57,
+    },
+    {name: 'temple', d: hf.R([[ff + 0.1, -0.098, 0.01], [0.15, -0.078, 0.01], [0.15, -0.05, 0.01], [ff + 0.1, -0.064, 0.01]]), fill: frame, z: 54.9},
   ];
 }

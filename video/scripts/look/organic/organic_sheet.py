@@ -42,7 +42,7 @@ PIECES = [
      "v6's exact wing (the engine's flat render): a sub-pixel hand-ruled bow, each pane its own reflection and glow (no "
      "template), light moving inside every face, blocky flat-brush marks along the piers and bands, lost edges brushed "
      "over between faces of close value; the door, the fascia and W left as holes (the scene's own, crisp: the focus)"),
-    ('paving', 'The paving of our bank', (100, 1300, 1000, 1900), (300, 1280, 1080, 1540),
+    ('paving', 'The paving of our bank', (160, 1300, 920, 1900), (300, 1280, 1080, 1540),
      "v6's treads and flags with the scene's colours: joints broken into pieces with lost gaps and faded ends, each flag its "
      "own value, the bank lit toward the sun, MyPaint strokes along the treads sized by perspective, the nosings brushed "
      "across where the values meet; the props' shadows recovered from the engine and given natural outlines"),
@@ -227,9 +227,9 @@ def make_sheet(v6, after, res, out_path=OUT_PNG):
         d.text((xs, top), '400 px wide (phone)', font=f_s, fill=DIM)
         row.paste(Image.fromarray(sa), (xs, top + 24))
         row.paste(Image.fromarray(sb), (xs, top + 24 + sa.shape[0] + gap))
-        d.text((xs + sa.shape[1] + 6, top + 24), 'v6', font=f_s, fill=DIM)
-        d.text((xs + sa.shape[1] + 6, top + 24 + sa.shape[0] + gap), 'organic', font=f_s, fill=DIM)
-        xn = max(xs + sa.shape[1] + 90, W - 2 * pad - num.width)
+        d.text((xs + sa.shape[1] + 8, top + 24), 'v6', font=f_s, fill=DIM)
+        d.text((xs + sa.shape[1] + 8, top + 24 + sa.shape[0] + gap), 'organic', font=f_s, fill=DIM)
+        xn = max(xs + sa.shape[1] + 100, W - 2 * pad - num.width)
         row.paste(num, (xn, top + 24))
         rows.append(row)
     # the whole frame, before and after: at 540 px (half size) and at the phone's 400 px
