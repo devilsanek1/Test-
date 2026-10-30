@@ -1,0 +1,108 @@
+{
+ "film": "v2s1_v7",
+ "spec": "scripts/look/paint/v2s1_v7.json",
+ "pieces": [
+  {
+   "id": "v2s1/sky",
+   "src": "paint/v2s1_v7/sky.png",
+   "box": [
+    0,
+    0,
+    1080,
+    1100
+   ],
+   "style": "sky_recipe",
+   "seed": 61,
+   "from": "v2s1/sky",
+   "hides": [
+    "sun"
+   ]
+  },
+  {
+   "id": "v2s1/clouds_p1",
+   "src": "paint/v2s1_v7/clouds_p1.png",
+   "box": [
+    0,
+    610,
+    780,
+    96
+   ],
+   "style": "cloud_planes",
+   "seed": 62,
+   "from": "v2s1/clouds",
+   "group": "clouds",
+   "depth": 0.7
+  },
+  {
+   "id": "v2s1/clouds_p2",
+   "src": "paint/v2s1_v7/clouds_p2.png",
+   "box": [
+    0,
+    100,
+    580,
+    190
+   ],
+   "style": "cloud_planes",
+   "seed": 62,
+   "from": "v2s1/clouds",
+   "group": "clouds",
+   "depth": 0.4
+  },
+  {
+   "id": "v2s1/clouds_p3",
+   "src": "paint/v2s1_v7/clouds_p3.png",
+   "box": [
+    560,
+    0,
+    520,
+    345
+   ],
+   "style": "cloud_planes",
+   "seed": 62,
+   "from": "v2s1/clouds",
+   "group": "clouds",
+   "depth": 0.0
+  },
+  {
+   "id": "v2s1/farroofs",
+   "src": "paint/v2s1_v7/farroofs.png",
+   "box": [
+    0,
+    742,
+    378,
+    208
+   ],
+   "style": "far_city_recipe",
+   "seed": 64,
+   "from": "v2s1/farroofs",
+   "plane": 4
+  },
+  {
+   "id": "v2s1/fartower",
+   "src": "paint/v2s1_v7/fartower.png",
+   "box": [
+    252,
+    584,
+    100,
+    366
+   ],
+   "style": "far_city_recipe",
+   "seed": 64,
+   "from": "v2s1/fartower",
+   "plane": 3
+  },
+  {
+   "id": "v2s1/flock",
+   "src": "paint/v2s1_v7/flock.png",
+   "box": [
+    46,
+    654,
+    205,
+    88
+   ],
+   "style": "flock_sprite",
+   "seed": 66,
+   "from": "v2s1/flock"
+  }
+ ]
+}
