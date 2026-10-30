@@ -294,18 +294,20 @@ def plan_strokes(zone, cols, info, inside, seed, dose=1.0):
     nxo, nyo = L.outward_normal(inside, 2.5)
     facing = nxo * LIGHT[0] + nyo * LIGHT[1]
     rim = inside & (d_in < 4) & (facing > 0.1)
-    for (x, y) in seeds(7, rim):
+    for (x, y) in seeds(5, rim):
         xi, yi = int(np.clip(x, 0, W - 1)), int(np.clip(y, 0, H - 1))
         z = max(zone[yi, xi], 1)
         ox, oy = nxo[yi, xi], nyo[yi, xi]
-        Ls = rng.uniform(6, 12)
-        pts = [(x - ox * Ls * 0.5, y - oy * Ls * 0.5), (x + ox * Ls * 0.5 + rng.normal(0, 1.5), y + oy * Ls * 0.5 + rng.normal(0, 1.5))]
+        Ls = rng.uniform(6, 13)
+        reach = rng.uniform(0.35, 0.75)                     # how far past the outline the leaf reaches
+        pts = [(x - ox * Ls * (1 - reach), y - oy * Ls * (1 - reach)),
+               (x + ox * Ls * reach + rng.normal(0, 1.8), y + oy * Ls * reach + rng.normal(0, 1.8))]
         c = ok[min(z + (1 if facing[yi, xi] > 0.5 else 0), 4)]
         plan.add('edge', 'tanda/acrylic-04-paint', pts, L.ok2rgb(c + np.array([rng.normal(0, 0.008), 0, 0])), rng.uniform(4.0, 7.0),
                  rng.uniform(0.85, 1.0), ds=1.0)
     # the shade side's lost edge: dark leaf dabs across it, in the shade's own values (it breaks, it does not blur)
     away = inside & (d_in < 4) & (facing <= 0.1)
-    for (x, y) in seeds(9, away):
+    for (x, y) in seeds(6, away):
         xi, yi = int(np.clip(x, 0, W - 1)), int(np.clip(y, 0, H - 1))
         ox, oy = nxo[yi, xi], nyo[yi, xi]
         Ls = rng.uniform(5, 11)

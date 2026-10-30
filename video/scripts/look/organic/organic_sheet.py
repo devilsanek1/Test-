@@ -42,7 +42,7 @@ PIECES = [
      "v6's exact wing (the engine's flat render): a sub-pixel hand-ruled bow, each pane its own reflection and glow (no "
      "template), light moving inside every face, blocky flat-brush marks along the piers and bands, lost edges brushed "
      "over between faces of close value; the door, the fascia and W left as holes (the scene's own, crisp: the focus)"),
-    ('paving', 'The paving of our bank', (160, 1300, 920, 1900), (300, 1280, 1080, 1540),
+    ('paving', 'The paving of our bank', (200, 1300, 840, 1900), (300, 1280, 1080, 1540),
      "v6's treads and flags with the scene's colours: joints broken into pieces with lost gaps and faded ends, each flag its "
      "own value, the bank lit toward the sun, MyPaint strokes along the treads sized by perspective, the nosings brushed "
      "across where the values meet; the props' shadows recovered from the engine and given natural outlines"),

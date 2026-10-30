@@ -30,9 +30,9 @@ def main():
     S, M, out = sys.argv[1], sys.argv[2], sys.argv[3]
     meas = json.load(open(M))
     stills = [Image.open(os.path.join(S, f'{n}.png')).convert('RGB') for n in ('s1_v6', 's2_light', 's3_full')]
-    big_labels = ['1. v6 as sent (paint_still_v6)',
-                  '2. + PROPER LIGHT: the low October sun the key, the lit doorway the story light',
-                  '3. + ONE PAPER GRAIN and ONE COLOUR KEY (a dusk family; the doorway’s gold the hot accent)']
+    big_labels = [('1. v6 as sent (paint_still_v6)', ''),
+                  ('2. + PROPER LIGHT', 'the low October sun the key, the lit doorway the story light'),
+                  ('3. + ONE PAPER GRAIN + ONE COLOUR KEY', 'a dusk family, the door’s gold the hot accent')]
     small_labels = ['1. v6', '2. + light', '3. + grain + key']
     m = 28
     gap = 28
@@ -47,7 +47,9 @@ def main():
     y = m + title_h
     for i, im in enumerate(stills):
         x = m + i * (Wb + gap)
-        d.text((x, y + 6), big_labels[i], font=font(27, True), fill=INK)
+        d.text((x, y + 2), big_labels[i][0], font=font(28, True), fill=INK)
+        if big_labels[i][1]:
+            d.text((x + 6 + d.textlength(big_labels[i][0], font=font(28, True)), y + 6), '\u00b7 ' + big_labels[i][1], font=font(23), fill=GREY)
         sheet.paste(im, (x, y + lab_h))
     y += lab_h + Hb + 18
     d.text((m, y + 8), 'At phone width (400 px), beside the owner’s two painting-style models (400 px wide)', font=font(34, True), fill=INK)
@@ -83,7 +85,7 @@ def main():
              '   float + live light on her and Pip',
              '• 3: the same maps also carry the colour key and',
              '   the paper grain; the movers carry the grain live',
-             '• the caption band: no light, the grain at 30 %']
+             '• the caption band: no light; the grain at 12 %']
     for j, t in enumerate(notes):
         d.text((xn, y + lab_h + j * 30), t, font=font(21, j == 0), fill=INK if j == 0 else GREY)
     os.makedirs(os.path.dirname(out) or '.', exist_ok=True)

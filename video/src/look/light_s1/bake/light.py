@@ -201,7 +201,7 @@ def light(base, L, vis, A, dose=DOSE, return_parts=False):
     S += L['planting'] * 0.25 * dose['facade']
     gap = 1 - smoothstep(120, 420, XX)                                    # the west gap's sunlit stretch of the far towpath
     S += L['towpath'] * dose['towpath'] * (1 - gap)
-    lamp_shade = dose['facade'] * (0.45 + 0.45 * smoothstep(800, 840, YY)) * (1 - 0.6 * gap)   # the heads half, the posts below fully, in the far roofs' shadow
+    lamp_shade = dose['facade'] * (0.72 + 0.2 * smoothstep(800, 840, YY)) * (1 - 0.6 * gap)   # the unlit lanterns toned down (never a rival to the door), the posts below fully, in the far roofs' shadow
     S += L['lamps'] * lamp_shade
     r_s = np.hypot((XX - sx) / 1.6, YY - sy)
     veil = np.exp(-r_s / 300.0)
@@ -305,10 +305,14 @@ def light(base, L, vis, A, dose=DOSE, return_parts=False):
                                bloom_sun=bl, bloom_door=bloom_d * outside, edge=edge, column=gblur(col, 4))
 
 
-def knee(lin, k=0.9):
-    """A soft shoulder above k (linear) that approaches 1.0, so a lift never clips flat."""
+def knee(lin, k=0.9, base=None):
+    """A soft shoulder above k (linear) that approaches 1.0, so a lift never clips flat. With `base` (the unlit linear
+    picture), only what the light LIFTED is shouldered, never below the base: an unlit pixel stays exactly itself."""
     over = np.clip(lin - k, 0, None)
-    return np.where(lin > k, k + over / (1 + over / (1.0 - k)), lin)
+    out = np.where(lin > k, k + over / (1 + over / (1.0 - k)), lin)
+    if base is None:
+        return out
+    return np.where(lin > base + 1e-6, np.maximum(out, np.minimum(base, lin)), lin)
 
 
 def door_blur(lit_lin, L, sigma=7.0, gain=1.0):
