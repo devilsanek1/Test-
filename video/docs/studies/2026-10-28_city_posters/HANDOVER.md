@@ -6,6 +6,13 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-30 ~10:10 UTC: QUEUED next (owner): research + distill the composition shots
+- Owner: "After we are done with this I want you to do another research and distill of the composition shots to use /
+  Take a look at this folder I collected some initial references but do the deeper research" (Drive folder, 5 reels,
+  saved in `video/docs/look/refs_composition/` with contact sheets and a README).
+- Start it when organic-look's ORGANIC.md lands: a research workflow -> a distilled shot library for 9:16 (each shot
+  type with its composition, our scene-1/Helsinki example as a value thumbnail), merged with LAYOUT.md / CINEMATIC_GUIDE.
+
 ## Status 2026-10-30 ~07:20 UTC: both research runs resumed after the 5-hour limit
 - people-design (run `wf_2f7a2fc2-354`): research DONE (`people_design/diagnose.md` + sheet, `design_research.md`,
   `fashion.md` + `fashion_board.png`); the 3 directions + the system re-running (resume notes added to the script).
