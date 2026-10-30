@@ -348,7 +348,9 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   lights switching). A dense world makes a frame
   full even when little moves (Arcane's rooftop; the owner's riverside reference "doesn't feel empty at all"). The
   density sits mostly in the calm environment tier at low contrast, so full never means busy (`docs/look/CRAFT.md` §b).
-  The bar: reference 1 (France) and v1 (PHP), then each film's own G3 density key; `scripts/qa/density.py` is a warning
+  The bar: reference 1 (France) and v1 (PHP: `docs/look/ref_v1_governments_frame.png`, "so many details and so
+  coherent and so imaginative ... Claude just made this all up in bisucally one shot", 2026-10-30), then each film's own
+  G3 density key; `scripts/qa/density.py` is a warning
   signal, never a quota; how-to `docs/look/LIFE_AND_DENSITY.md`. Big empty fields (nothing in them; flat colour itself
   is right) and an object alone on a blank wall are failures even in a draft. **A place, never buildings standing
   alone:** a street is blocks shoulder to shoulder, rows and rooftops layered back to the horizon, the street's own

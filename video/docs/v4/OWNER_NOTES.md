@@ -346,3 +346,15 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   revised to a full neighbourhood (blocks shoulder to shoulder, layered rows and rooftops, the street's things, lit
   homes everywhere; the computer and the plan site inside the city), the colour script redrawn, and the G3 density pass
   fills the lanes' sets from it. -> rule: playbook, Visual style (a place, never buildings standing alone).
+- 2026-10-30 ~22:40 UTC, with a frame of video 1 ("Governments all over Europe just shut down": classical government
+  buildings with browser-window panes, a power-button sun, crowds with phones, Pip on a post;
+  `docs/look/ref_v1_governments_frame.png`): "One thing I'm wondering is our first video / Like it had so many details and
+  so coherent and so imaginative / Like I didn't give pretty much any visual instructions Claude just made this all up
+  in bisucally one shot / How did we get to this ?" -> the answer from v1's own brief and scene notes: one proven
+  reference style measured to the pixel (a loose architectural ink sketch, where detail is cheap and forgiving), the
+  bar "every frame should be worth pausing on", readable imaginative ideas from the script, each scene built whole by
+  one builder with many props; since then the look moved to clean, then no outlines, then painted (harder to make
+  dense), restraint rules piled up and the process fragmented. Proposed for v4: v1's bar at the top, one readable
+  imaginative idea per beat, density planned from the world bible (running), key frames painted whole before the
+  build; asked the owner whether fine ink line work may come back for detail. -> rule: playbook, Visual style (v1's
+  frame named as the bar for detail, coherence and imagination).
