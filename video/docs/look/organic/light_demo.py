@@ -137,6 +137,7 @@ def band_mask():
 def masks(R, f, t=None):
     """Layer masks from the engine's own renders (light.md §8): every mask is a difference of two renders of the SAME
     frame with one layer switched, so it is exact to the pixel (no colour segmentation except the doorway's source)."""
+    sdx, sdy = offset(f / 60.0 if t is None else t, 'subject')   # the subject plane's float at this frame
     base = load(f'{R}/base/f{f:05d}.png')
     cap = load(f'{R}/cap/f{f:05d}.png')
     norow = load(f'{R}/norow/f{f:05d}.png')
@@ -151,8 +152,18 @@ def masks(R, f, t=None):
     ratio = (lstar(base) + 1) / (lstar(norow) + 1)
     yy = np.arange(H)[:, None] * np.ones((1, W))
     shadow_like = darker & (ratio > 0.45) & (ratio < 0.985) & (yy > FEET_Y - 14)
-    her = row & ~shadow_like
-    her = cv2.morphologyEx(her.astype(np.uint8), cv2.MORPH_OPEN, np.ones((2, 2), np.uint8)) > 0
+    body = row & ~shadow_like
+    body = cv2.morphologyEx(body.astype(np.uint8), cv2.MORPH_OPEN, np.ones((2, 2), np.uint8)) > 0
+    # her alone (the subject) vs the rest of the row (the ghosts: B): the components centred near her x at t
+    tt = f / 60.0 if t is None else t
+    hx = (692 - 12 * min(1, max(0, (tt - 0.55) / 0.42))) if tt < 0.97 else 680 - 40.06 * (min(tt, 4.54) - 0.97)
+    hx += offset(tt, 'subject')[0]
+    nl, lab_, st, cen = cv2.connectedComponentsWithStats(body.astype(np.uint8), 8)
+    her = np.zeros((H, W), bool)
+    for i in range(1, nl):
+        if hx - 34 <= cen[i][0] <= hx + 62:
+            her |= lab_ == i
+    others = body & ~her
     # the sky (the painted sky and its clouds against v2's flat sky: identical wherever something stands in front)
     sky = d(base, nosky) & (yy < 800)
     sky = cv2.morphologyEx(sky.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8)) > 0
@@ -173,13 +184,12 @@ def masks(R, f, t=None):
     door_src = cv2.morphologyEx(door_src.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8)) > 0
     # lit panes on the facade (warm and light: the interiors are light sources, never shaded)
     wing = np.zeros((H, W), np.uint8)
-    sdx, sdy = offset(f / 60.0 if t is None else t, 'subject')
     cv2.fillPoly(wing, [np.round(WING + np.array([sdx, sdy])).astype(np.int32)], 1)
     wing = wing > 0
     panes = wing & ~inside & (L > 78) & (r > b + 0.12) & (yy < 1080)
     panes = cv2.morphologyEx(panes.astype(np.uint8), cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)) > 0
     pip = d(base, nopip, 3 / 255) & (yy > 1100) & (yy < 1300) & (xx > 600) & (xx < 800)
-    return dict(base=base, cap=cap, cap_m=cap_m, her=her, row=row, sky=sky, tree=tree, water=water,
+    return dict(base=base, cap=cap, cap_m=cap_m, her=her, others=others, row=row, sky=sky, tree=tree, water=water,
                 door_src=door_src, inside=inside, wing=wing, panes=panes, pip=pip, L=L)
 
 
@@ -348,7 +358,7 @@ def light_frame(R, f, seed=1, dose=1.0):
     warmth = smoothstep(-0.03, 0.08, base[..., 0] - base[..., 2])[..., None]
     tint = warmth * lin_hex(SHADE_WARM) + (1 - warmth) * lin_hex(SHADE_COOL)
     fascia = ((xx >= 520 + sdx) & (xx <= 740 + sdx) & (yy >= 800 + sdy) & (yy <= 846 + sdy)).astype(np.float32)
-    facade = M['wing'].astype(np.float32) * (1 - keep_src) * (1 - her) * (1 - fascia)
+    facade = M['wing'].astype(np.float32) * (1 - keep_src) * (1 - her) * (1 - M['others'].astype(np.float32)) * (1 - fascia)
     facade = gblur(facade, 0.8) * (1 - her)
     towpath = ((yy >= 1083 + sdy) & (yy < 1113 + sdy)).astype(np.float32) * smoothstep(120, 420, xx - sdx) * (1 - her)
     near = shift(leafy_edge_shade(seed), bdx, bdy) * (yy > 1180) * (1 - M['water'].astype(np.float32))
@@ -390,8 +400,10 @@ def light_frame(R, f, seed=1, dose=1.0):
     # her: the sun on her front (she walks west, into it), the subject's dose; Pip: B's dose
     rim_her_sun = rim_band(M['her'], light_xy=SUN, width=4.2, power=0.8) * her
     rim_pip = rim_band(M['pip'], light_xy=SUN, width=2.0, power=1.2) * pip
+    oth = M['others'].astype(np.float32)
+    rim_oth = rim_band(M['others'], light_xy=SUN, width=2.0, power=1.0) * oth if M['others'].any() else np.zeros((H, W), np.float32)
     E += (dose * (0.55 * rim_sky + 0.45 * corner))[..., None] * (sun_c - 0.12)
-    E += (dose * (1.25 * rim_her_sun + 0.55 * rim_pip))[..., None] * (sun_c - 0.05)
+    E += (dose * (1.25 * rim_her_sun + 0.55 * rim_pip + 0.5 * rim_oth))[..., None] * (sun_c - 0.05)
     T['key'] = time.perf_counter() - t0
 
     # 3. THE STORY LIGHT: the lit doorway.

@@ -106,14 +106,22 @@ export function paintFigure(model: Model, cam: Cam, opt: PaintOpts): React.React
   );
   const brush = opt.brush ?? (small ? 0 : 7);
   const defs: React.ReactNode[] = [
-    flt('bS', blurS(7), brush),
-    flt('bH', blurS(5.5), brush * 0.7),
     flt('bR', blurS(1.6)),
-    flt('bG', blurS(6)),
     flt('bD1', blurS(2)),
     flt('bD2', blurS(5)),
     flt('bD3', blurS(10)),
   ];
+  // the soft planes' filters, one per blur size in use (a surface may ask for a tighter one: the face)
+  const made = new Set<string>();
+  const soft = (kind: 'S' | 'H' | 'G', u: number) => {
+    const k = `b${kind}${Math.round(u * 10)}`;
+    if (!made.has(k)) {
+      made.add(k);
+      const br = kind === 'G' ? 0 : kind === 'H' ? brush * 0.7 : brush;
+      defs.push(flt(k, blurS(u), u < 4 ? br * 0.4 : br));
+    }
+    return `url(#${P}-${k})`;
+  };
   const blurId = (u?: number) => (u === undefined || u <= 0 ? undefined : u <= 3 ? 'bD1' : u <= 7 ? 'bD2' : 'bD3');
   const decals: Decal[] = model.decals.flatMap((f) => f(cam));
   const byTarget = new Map<string, Decal[]>();
@@ -171,9 +179,9 @@ export function paintFigure(model: Model, cam: Cam, opt: PaintOpts): React.React
       <g key={id}>
         <path d={r.outline} fill={t.lit} />
         <g clipPath={`url(#${id})`}>
-          {r.glow ? <path d={r.glow} fill={t.glow} filter={`url(#${P}-bG)`} opacity={0.85} /> : null}
-          {r.shade ? <path d={r.shade} fill={t.shade} filter={`url(#${P}-bS)`} /> : null}
-          {r.hi ? <path d={r.hi} fill={t.hi} filter={`url(#${P}-bH)`} opacity={0.9} /> : null}
+          {r.glow ? <path d={r.glow} fill={t.glow} filter={soft('G', (e.sf.look?.blur ?? 7) * 0.85)} opacity={0.85} /> : null}
+          {r.shade ? <path d={r.shade} fill={t.shade} filter={soft('S', e.sf.look?.blur ?? 7)} /> : null}
+          {r.hi ? <path d={r.hi} fill={t.hi} filter={soft('H', (e.sf.look?.blur ?? 7) * 0.8)} opacity={0.9} /> : null}
           {r.rim ? <path d={r.rim} fill={t.rim} filter={`url(#${P}-bR)`} /> : null}
           {ds ? ds.map(decalEl) : null}
         </g>

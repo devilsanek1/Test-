@@ -56,13 +56,14 @@ def measure_crop(rgb: np.ndarray) -> tuple[dict, dict]:
     out: dict = {'w': W, 'h': H}
     # ---------------- edges (sigma 1): the visible edges' geometry and sharpness
     chains, _ = S.edge_chains(lab, sigma=1.0, high=2.0, low=1.0)
+    emap = S.edge_chains.last_map.copy()
     geos = [S.curve_geometry(c['pts'], c['closed']) for c in chains]
     geos = [g for g in geos if g is not None]
     tot, angles = S.geometry_totals(geos)
     out['edges'] = tot
     out['edge_density'] = tot['length'] / (W * H) * 1000.0        # px of visible edge per 1000 px^2
     out['corner_angles'] = [round(float(a), 1) for a in angles]
-    prof = S.edge_profiles(lab, chains, every=3.0)
+    prof = S.edge_profiles(lab, chains, every=3.0, edge_map=emap)
     out['edge_width'] = S.lost_found(prof)
     # clear geometry: edge samples that are straight or compass-arc AND clearly seen (a clean step of >= 12 dE whose
     # 10-90 % width is <= 6 px): "I can see shapes and angles very clearly", as one number
@@ -75,7 +76,8 @@ def measure_crop(rgb: np.ndarray) -> tuple[dict, dict]:
         d, idx = tree.query(np.stack([prof['x'], prof['y']], 1))
         ok = d <= 2.5
         geo = GC[idx] & ok; stg = GS[idx] & ok
-        clear = (prof['kind'] == 0) & (np.nan_to_num(prof['width'], nan=99) <= 6.0) & (prof['step'] >= 12.0)
+        clear = (((prof['kind'] == 0) & (np.nan_to_num(prof['width'], nan=99) <= 6.0) & (prof['step'] >= 12.0)) |
+                 ((prof['kind'] == 3) & (prof['ridge'] >= 12.0)))
         n = len(clear)
         out['clear'] = {'share': float(clear.mean()), 'geometric_share': float((clear & geo).mean()),
                         'straight_share': float((clear & stg).mean()),
@@ -90,7 +92,8 @@ def measure_crop(rgb: np.ndarray) -> tuple[dict, dict]:
         out['clear'] = {}
     # ---------------- masses (sigma 3): found and lost along the big shapes' boundaries
     mchains, _ = S.edge_chains(lab, sigma=3.0, high=0.75, low=0.4, min_len=24)
-    mprof = S.edge_profiles(lab, mchains, every=3.0, reach=24.0, side=10.0)
+    mmap = S.edge_chains.last_map.copy()
+    mprof = S.edge_profiles(lab, mchains, every=3.0, reach=28.0, edge_map=mmap)
     out['mass_edges'] = S.lost_found(mprof)
     mgeos = [S.curve_geometry(c['pts'], c['closed']) for c in mchains]
     mgeos = [g for g in mgeos if g is not None]

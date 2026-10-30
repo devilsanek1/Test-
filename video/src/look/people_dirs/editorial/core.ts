@@ -250,6 +250,7 @@ export type LoftOpts = {
 /** The screen outline of a loft: the left extremes top to bottom, the near arc of the bottom ring, the right extremes
  *  bottom to top, the far arc of the top ring. Dense (every section); smoothed by pathOf. */
 export function loftOutline(secs: Sec[], v: View, xf: Xf = ID, o: LoftOpts = {}): PP[] {
+  const closed: boolean[] = [];
   const rings: P[][] = secs.map((s) => {
     const ar = o.arc?.(s.y);
     const out: P[] = [];
@@ -258,7 +259,11 @@ export function loftOutline(secs: Sec[], v: View, xf: Xf = ID, o: LoftOpts = {})
       while (a1 < a0) a1 += 360;
       const m = Math.max(4, Math.round(((a1 - a0) / 360) * RING));
       for (let i = 0; i <= m; i++) out.push(proj(xf(secPt(s, a0 + ((a1 - a0) * i) / m)), v));
-    } else for (let i = 0; i < RING; i++) out.push(proj(xf(secPt(s, (360 * i) / RING)), v));
+      closed.push(false);
+    } else {
+      for (let i = 0; i < RING; i++) out.push(proj(xf(secPt(s, (360 * i) / RING)), v));
+      closed.push(true);
+    }
     return out;
   });
   const L: PP[] = [];
@@ -288,7 +293,7 @@ export function loftOutline(secs: Sec[], v: View, xf: Xf = ID, o: LoftOpts = {})
   const arcBetween = (ring: P[], from: number, to: number, near: boolean, closedRing: boolean): PP[] => {
     const n = ring.length;
     if (!closedRing) {
-      // an open arc: walk the indices directly
+      // an open arc: the run between the two extremes that stays on the arc (walk the indices directly)
       const out: PP[] = [];
       const st = from <= to ? 1 : -1;
       for (let i = from; i !== to + st; i += st) out.push([ring[i].x, ring[i].y]);
@@ -312,9 +317,8 @@ export function loftOutline(secs: Sec[], v: View, xf: Xf = ID, o: LoftOpts = {})
   };
   const last = rings[rings.length - 1];
   const first = rings[0];
-  const closedRing = !o.arc;
-  const bottom = arcBetween(last, iLn, iRn, true, closedRing).slice(1, -1);
-  const top = arcBetween(first, iR0, iL0, false, closedRing).slice(1, -1);
+  const bottom = arcBetween(last, iLn, iRn, true, closed[closed.length - 1]).slice(1, -1);
+  const top = arcBetween(first, iR0, iL0, false, closed[0]).slice(1, -1);
   const Lc = L.map((p, i) => (o.cornerBottom && i === L.length - 1 ? ([p[0], p[1], 1] as PP) : o.cornerTop && i === 0 ? ([p[0], p[1], 1] as PP) : p));
   const Rc = [...R].reverse().map((p, i, arr) => (o.cornerBottom && i === 0 ? ([p[0], p[1], 1] as PP) : o.cornerTop && i === arr.length - 1 ? ([p[0], p[1], 1] as PP) : p));
   return thin([...Lc, ...bottom, ...Rc, ...top], 2.5);

@@ -15,7 +15,8 @@ import time
 OUT = sys.argv[1]
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../..'))
 ENTRY = 'docs/look/organic/light_proto/entry.tsx'
-TIMES = ','.join(f'{1.0 + i * 2 / 60:.4f}' for i in range(30))
+NF = int(os.environ.get('NF', '30'))
+TIMES = ','.join(f'{1.0 + i * 2 / 60:.4f}' for i in range(NF))
 RUNS = [a.split('=') for a in sys.argv[2:]] or [
     ['none', '1'], ['svgEmpty', '1'], ['mapImg', '1'], ['gradPool', '1'], ['bloomLive', '1'], ['bloomLiveFull', '1'],
     ['rimMask', '1'], ['rimFilter', '1'], ['wrap', '1'], ['shadowProj', '1'], ['shafts', '1'], ['dither', '1'],
@@ -25,7 +26,12 @@ RUNS = [a.split('=') for a in sys.argv[2:]] or [
 def render(kind, n, times, sub, gl='angle'):
     d = os.path.join(OUT, sub)
     env = dict(os.environ, GL=gl)
-    props = json.dumps({'kind': kind, 'n': int(n)})
+    pr = {'kind': kind, 'n': int(n)}
+    if kind == 'lightOff':                       # v6 with lib/light's layers off (its own input prop)
+        pr = {'kind': 'none', 'n': 1, 'lightOff': True}
+    if kind == 'proposal':                       # lib/light's live layers off, the baked maps + her live layers on
+        pr = {'kind': 'proposal', 'n': 1, 'lightOff': True}
+    props = json.dumps(pr)
     p = subprocess.run(['node', 'scripts/render-frames.mjs', 'LightBench', d, times, f'--entry={ENTRY}', '--concurrency=1',
                         f'--props={props}'], cwd=ROOT, env=env, capture_output=True, text=True)
     m = re.search(r'(\d+) frames in ([\d.]+)s \((\d+) ms/frame', p.stderr)

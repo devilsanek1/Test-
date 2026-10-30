@@ -689,3 +689,89 @@ def interval_cv(xs) -> float:
     x = np.sort(np.asarray(xs, float))
     g = np.diff(x)
     return float(g.std() / g.mean()) if len(g) >= 2 and g.mean() > 0 else float('nan')
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# lines: sky streaks, joints, hand-ruled edges
+
+
+def streak(seed, x0: float, x1: float, y: float, thick: float, taper=(0.15, 0.3), sag: float = 0.0,
+           waviness: float = 0.25) -> np.ndarray:
+    """A sky streak (a thin cloud, a dusk band): a long thin shape whose thickness swells and pinches along it
+    (+-35 %), whose two ends taper over 15-30 % of the length at DIFFERENT rates (one end dragged longer), whose
+    centre line bows gently (sag px) and wanders (waviness x thick). Never a constant-width ruler bar.
+    Returns a closed outline."""
+    r = seeded(seed)
+    L = x1 - x0
+    n = max(int(L), 40)
+    u = np.linspace(0, 1, n)
+    ta, tb = r.uniform(*taper), r.uniform(*taper) * r.uniform(1.0, 1.8)
+    env = np.clip(u / ta, 0, 1) ** 0.8 * np.clip((1 - u) / min(tb, 0.6), 0, 1) ** 1.3
+    th = thick * env * (1 + 0.35 * line_noise(n, [(L * 0.25, 1.0), (L * 0.08, 0.5)], f'{seed}/th', length=L) / 1.12)
+    th = np.maximum(th, 0)
+    cy = y + sag * 4 * u * (1 - u) + thick * waviness * line_noise(n, [(L * 0.4, 1.0)], f'{seed}/c', length=L)
+    asym = r.uniform(0.35, 0.65)                           # more of the thickness above or below the centre line
+    top = np.stack([x0 + u * L, cy - th * asym], 1)
+    bot = np.stack([x0 + u * L, cy + th * (1 - asym)], 1)
+    return np.vstack([top, bot[::-1]])
+
+
+def broken_line(seed, p0, p1, width: float, gaps: float = 0.15, width_var: float = 0.3, bow: float = 0.004,
+                fade_ends=(0.05, 0.2)):
+    """A drawn line (a paving joint, a mullion, a rail): its width varies +-30 % along it, it bows 0.4 % of its
+    length, it breaks into 2-5 pieces with lost gaps (gaps = share of the length lost: 10-25 %), its ends fade over
+    5-20 % instead of stopping square. Returns a list of closed outlines (the visible pieces) and their opacities."""
+    r = seeded(seed)
+    p0 = np.asarray(p0, float); p1 = np.asarray(p1, float)
+    L = float(np.hypot(*(p1 - p0)))
+    u_ = (p1 - p0) / max(L, 1e-9); nrm = np.array([-u_[1], u_[0]])
+    n = max(int(L / 1.5), 20)
+    s = np.linspace(0, 1, n)
+    off = bow * L * 4 * s * (1 - s) * r.choice([-1, 1])
+    w = width * (1 + width_var * line_noise(n, [(max(L * 0.2, 20), 1.0)], f'{seed}/w', length=L) / 1.0)
+    w = np.maximum(w, width * 0.35)
+    # the gaps: a slow noise thresholded at the requested share
+    g = line_noise(n, [(max(L * 0.18, 24), 1.0), (max(L * 0.06, 10), 0.4)], f'{seed}/g', length=L)
+    vis = g > np.quantile(g, gaps)
+    fa, fb = r.uniform(*fade_ends), r.uniform(*fade_ends)
+    alpha = np.clip(s / fa, 0, 1) * np.clip((1 - s) / fb, 0, 1)
+    pieces = []
+    lab_, k = ndi.label(vis)
+    for i in range(1, k + 1):
+        idx = np.where(lab_ == i)[0]
+        if len(idx) < 3:
+            continue
+        c = p0[None] + (s[idx, None] * L) * u_[None] + (off[idx, None]) * nrm[None]
+        top = c + nrm[None] * (w[idx, None] / 2)
+        bot = c - nrm[None] * (w[idx, None] / 2)
+        pieces.append((np.vstack([top, bot[::-1]]), float(alpha[idx].mean())))
+    return pieces
+
+
+def vary_rects(seed, rects, size_var=(0.05, 0.12), pos_px=1.5, states=('lit', 'dark', 'sky', 'curtain'),
+               max_twin_iou: float = 0.85):
+    """Windows (or any repeated man-made element) without a template: each rect's width and height vary by 5-12 %
+    (never two alike: a later one that would be a twin of a neighbour is nudged), positions jitter 1.5 px, and each
+    takes a state from `states` with no two neighbours in the same state twice running. Returns
+    [(x0, y0, x1, y1, state)]."""
+    r = seeded(seed)
+    out = []
+    prev_state = None
+    for i, (x0, y0, x1, y1) in enumerate(rects):
+        w, h = x1 - x0, y1 - y0
+        for _ in range(20):
+            sw = 1 + r.uniform(*size_var) * r.choice([-1, 1]); sh = 1 + r.uniform(*size_var) * r.choice([-1, 1])
+            nw, nh = w * sw, h * sh
+            cx = (x0 + x1) / 2 + r.uniform(-pos_px, pos_px); cy = (y0 + y1) / 2 + r.uniform(-pos_px, pos_px)
+            twin = False
+            for (a0, b0, a1, b1, _) in out[-3:]:
+                ow, oh = a1 - a0, b1 - b0
+                iou = min(nw, ow) * min(nh, oh) / max(nw * nh + ow * oh - min(nw, ow) * min(nh, oh), 1e-9)
+                if iou > max_twin_iou + 0.1:
+                    twin = True
+            if not twin:
+                break
+        st = r.choice([s for s in states if s != prev_state]) if prev_state else r.choice(states)
+        prev_state = st
+        out.append((cx - nw / 2, cy - nh / 2, cx + nw / 2, cy + nh / 2, st))
+    return out

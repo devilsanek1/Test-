@@ -99,9 +99,18 @@ export type Opening = {
 /** The screen polygon of a front opening (the region between the two front edges), extended past hidden edges and
  *  below the hem: cut out of the garment so the layers under it show. */
 export function openingCut(sk: Skeleton, secs: Sec[], v: View, op: Opening, below = 40): PP[] {
+  // decide per view, once, which front edge faces the camera (at mid-height), so the polygon never zig-zags row by row
+  const yMid = lerp(op.y0, op.y1, 0.45) - sk.bob;
+  const aMid = op.alpha(yMid + sk.bob);
+  const m1 = surf(secs, yMid, 90 - aMid, v, sk.leanXf);
+  const m2 = surf(secs, yMid, 90 + aMid, v, sk.leanXf);
+  if (!m1.vis && !m2.vis) return [];
+  // facing screen-left (the front is screen-left) for yaw in (0, 180)
+  const yw = ((v.yaw % 360) + 360) % 360;
+  const frontLeft = yw > 0 && yw < 180;
   const L: V2[] = [];
   const R: V2[] = [];
-  const n = 24;
+  const n = 28;
   for (let i = 0; i <= n; i++) {
     const ys = lerp(op.y0, op.y1, i / n);
     const y = ys - sk.bob;
@@ -109,21 +118,20 @@ export function openingCut(sk: Skeleton, secs: Sec[], v: View, op: Opening, belo
     const e1 = surf(secs, y, 90 - a, v, sk.leanXf);
     const e2 = surf(secs, y, 90 + a, v, sk.leanXf);
     const [lo, hi] = ringExtent(secs, y, v, sk.leanXf);
-    // which edge is screen-left
-    const [sl, sr] = e1.p[0] <= e2.p[0] ? [e1, e2] : [e2, e1];
-    let pl: V2 = sl.p;
-    let pr: V2 = sr.p;
-    if (!sl.vis) pl = [lo - 40, sl.p[1]];
-    if (!sr.vis) pr = [hi + 40, sr.p[1]];
-    if (!sl.vis && !sr.vis) continue;
+    let p1: V2 = e1.p;
+    let p2: V2 = e2.p;
+    // a hidden edge is replaced by a point past the silhouette on the front's side
+    const far: V2 = frontLeft ? [lo - 40, 0] : [hi + 40, 0];
+    if (!m1.vis) p1 = [far[0], e1.p[1]];
+    if (!m2.vis) p2 = [far[0], e2.p[1]];
     if (a < 0.5) {
-      pl = sl.p;
-      pr = sl.p;
+      p1 = e1.p;
+      p2 = e1.p;
     }
+    const [pl, pr] = p1[0] <= p2[0] ? [p1, p2] : [p2, p1];
     L.push(pl);
     R.push(pr);
   }
-  if (L.length < 2) return [];
   const lastL = L[L.length - 1];
   const lastR = R[R.length - 1];
   return [...L, [lastL[0], lastL[1] + below], [lastR[0], lastR[1] + below], ...R.reverse()];
@@ -327,7 +335,8 @@ export function trousers(sk: Skeleton, v: View, mat: string, cut: 'straight' | '
     {y: b.crotchY - 6, a: b.hipA + 4, bf: b.hipBf + 2, bb: b.hipBb + 2},
   ];
   const secs = garmentSecs(sk, seat);
-  const parts: Part[] = [{k: `${mat}Seat`, pts: loftOutline(secs, v, sk.leanXf, {cornerTop: true}), mat, z: Z.lower, tension: 0.45}];
+  const grp = `${mat}Grp`;
+  const parts: Part[] = [{k: `${mat}Seat`, pts: loftOutline(secs, v, sk.leanXf, {cornerTop: true}), mat, z: Z.lower, tension: 0.45, grp}];
   const R = cut === 'wide' ? [70, 68, 72] : cut === 'relaxed' ? (m ? [70, 60, 57] : [66, 57, 55]) : m ? [66, 54, 51] : [62, 51, 49];
   for (const s of ['l', 'r'] as Side[]) {
     const ss = s === 'l' ? 1 : -1;
@@ -342,7 +351,7 @@ export function trousers(sk: Skeleton, v: View, mat: string, cut: 'straight' | '
     const ru = pchip([0, 0.12, 0.5, 0.62, 1], [R[0] * 1.02, R[0], (R[0] + R[1]) / 2 + 2, R[1], R[2]]);
     const pts = tubeOutline([top, K, hem], (u) => ({ru: ru(u), rv: ru(u) * 1.04}), v, [0, 0, 1], {m: 34, capEnd: false});
     const d = proj(K, v).d - proj(sk.leanXf([sk.cx(b.chestY), b.chestY, 0]), v).d;
-    parts.push({k: `${mat}Leg_${s}`, pts: crisp2(pts), mat, z: d < 0 ? Z.farLeg + 2 : Z.lower - 1, tension: 0.45});
+    parts.push({k: `${mat}Leg_${s}`, pts: crisp2(pts), mat, z: d < 0 ? Z.farLeg + 2 : Z.lower - 1, tension: 0.45, grp});
   }
   return parts;
 }

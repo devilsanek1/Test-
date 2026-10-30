@@ -663,18 +663,25 @@ export function torsoSurface(sk: Skeleton, res: number, key = 'torso', mat = 'sk
 
 export function neckSurface(sk: Skeleton, res: number): Surface {
   const b = sk.b;
-  const top = toWorld(sk.head, [0, -0.2 * b.head, -0.1 * b.head]);
-  const base = sub(sk.neckBase, [0, 14, 0]);
+  const h = b.head;
+  // the neck leans forward (10-15 degrees) into the skull's base; its back meets the occiput (no notch at the nape)
+  const top = toWorld(sk.head, [0, -0.17 * h, -0.07 * h]);
+  const base = add(sk.neckBase, [0, -16, -4]);
   const chain = [base, lerp(base, top, 0.5), top];
   const r = b.neckR;
   const t = tube(
     chain,
-    rowsFor(10, res, 5),
+    rowsFor(12, res, 5),
     rowsFor(24, res, 12),
-    (tt) => ({f: r * (1.02 + 0.06 * (1 - tt)), b: r * (1.06 + 0.18 * (1 - tt)), p: r * (1 + 0.25 * (1 - tt) * (1 - tt)), m: r * (1 + 0.25 * (1 - tt) * (1 - tt))}),
+    (tt) => ({
+      f: r * (0.98 + 0.08 * (1 - tt)),
+      b: r * (1.05 + 0.2 * (1 - tt) + 0.42 * smooth(0.55, 1, tt)),
+      p: r * (1 + 0.28 * (1 - tt) * (1 - tt) + 0.12 * smooth(0.6, 1, tt)),
+      m: r * (1 + 0.28 * (1 - tt) * (1 - tt) + 0.12 * smooth(0.6, 1, tt)),
+    }),
     () => fx(sk.chest),
   );
-  return {key: 'neck', mat: 'skin', grid: t.grid, axis: t.axis, wrap: true, bias: -30, look: {glow: true}};
+  return {key: 'neck', mat: 'skin', grid: t.grid, axis: t.axis, wrap: true, bias: -30, look: {glow: true, blur: 4}};
 }
 
 // ---- the head: rings from under the chin to the crown, a designed face profile, sockets and cheekbones
@@ -693,69 +700,115 @@ export type FaceShape = {
 export const FACE_F: FaceShape = {nose: 0.085, lips: 1, jaw: 0.92, chin: 1, cheek: 1, brow: 0.8};
 export const FACE_M: FaceShape = {nose: 0.1, lips: 0.85, jaw: 1.08, chin: 1.15, cheek: 0.9, brow: 1.2};
 
-// u = 0 at the chin's underside, 1 at the crown (units of h; z forward of the skull's axis, h = 1)
+// u = 0 at the chin's underside, 1 at the crown (units of h; z forward of the skull's axis through the ears)
+/** The mid-line profile (brow, nose, lips, chin): what a profile shows. */
+const HZM: K = [
+  [0.0, 0.2],
+  [0.015, 0.3],
+  [0.04, 0.35],
+  [0.07, 0.362],
+  [0.105, 0.343],
+  [0.135, 0.357],
+  [0.155, 0.37],
+  [0.176, 0.358],
+  [0.197, 0.376],
+  [0.225, 0.366],
+  [0.25, 0.372],
+  [0.272, 0.418],
+  [0.292, 0.452],
+  [0.31, 0.461],
+  [0.335, 0.452],
+  [0.4, 0.43],
+  [0.46, 0.406],
+  [0.5, 0.393],
+  [0.535, 0.396],
+  [0.565, 0.405],
+  [0.62, 0.405],
+  [0.7, 0.396],
+  [0.78, 0.372],
+  [0.85, 0.325],
+  [0.91, 0.255],
+  [0.96, 0.155],
+  [1.0, 0.02],
+];
+/** The face plane beside the mid-line (cheeks, the mouth's corners, the forehead's sides). */
 const HZF: K = [
-  [0.0, 0.25],
-  [0.03, 0.33],
-  [0.08, 0.345],
-  [0.16, 0.335],
-  [0.25, 0.335],
-  [0.35, 0.34],
-  [0.45, 0.35],
-  [0.52, 0.37],
-  [0.57, 0.392],
-  [0.63, 0.392],
-  [0.72, 0.37],
-  [0.8, 0.325],
-  [0.87, 0.26],
-  [0.93, 0.18],
-  [0.97, 0.1],
-  [1.0, 0.0],
+  [0.0, 0.18],
+  [0.04, 0.29],
+  [0.07, 0.305],
+  [0.15, 0.322],
+  [0.25, 0.33],
+  [0.31, 0.334],
+  [0.4, 0.34],
+  [0.5, 0.352],
+  [0.565, 0.388],
+  [0.62, 0.394],
+  [0.7, 0.389],
+  [0.78, 0.365],
+  [0.85, 0.318],
+  [0.91, 0.25],
+  [0.96, 0.152],
+  [1.0, 0.02],
 ];
 const HZB: K = [
-  [0.0, -0.18],
-  [0.05, -0.1],
-  [0.1, -0.06],
-  [0.15, -0.14],
-  [0.2, -0.27],
-  [0.26, -0.36],
-  [0.34, -0.43],
-  [0.44, -0.475],
-  [0.56, -0.49],
-  [0.68, -0.465],
-  [0.8, -0.39],
-  [0.9, -0.27],
-  [0.96, -0.15],
+  [0.0, -0.14],
+  [0.06, -0.08],
+  [0.12, -0.12],
+  [0.17, -0.21],
+  [0.22, -0.31],
+  [0.28, -0.385],
+  [0.36, -0.445],
+  [0.46, -0.483],
+  [0.58, -0.494],
+  [0.7, -0.47],
+  [0.8, -0.412],
+  [0.88, -0.335],
+  [0.94, -0.225],
+  [0.98, -0.11],
   [1.0, 0.0],
 ];
 const HA: K = [
   [0.0, 0.06],
-  [0.03, 0.12],
+  [0.03, 0.125],
   [0.08, 0.2],
   [0.14, 0.27],
-  [0.2, 0.3],
+  [0.2, 0.302],
   [0.3, 0.325],
   [0.42, 0.345],
-  [0.55, 0.36],
-  [0.68, 0.362],
+  [0.55, 0.358],
+  [0.68, 0.36],
   [0.8, 0.335],
-  [0.9, 0.27],
-  [0.96, 0.17],
-  [1.0, 0.0],
+  [0.9, 0.272],
+  [0.96, 0.175],
+  [1.0, 0.03],
 ];
 const HNF: K = [
-  [0.0, 1.5],
+  [0.0, 1.45],
   [0.08, 1.45],
-  [0.16, 1.6],
+  [0.16, 1.65],
   [0.3, 2.1],
-  [0.45, 2.35],
+  [0.45, 2.3],
   [0.6, 2.3],
-  [0.8, 2.2],
+  [0.8, 2.25],
   [1.0, 2.0],
+];
+/** The mid-line window's width (radians) by height: narrow on the nose, wider on the lips and the chin. */
+const HSIG: K = [
+  [0.0, 0.34],
+  [0.08, 0.33],
+  [0.15, 0.28],
+  [0.21, 0.26],
+  [0.25, 0.2],
+  [0.3, 0.17],
+  [0.36, 0.12],
+  [0.46, 0.13],
+  [0.53, 0.3],
+  [0.6, 0.6],
+  [1.0, 0.8],
 ];
 
 /** The head's local point at (u, phi), h = 1 (x right, y up from the ear point at u = 0.42, z forward). */
-export function headPoint(u: number, phi: number, fs: FaceShape): V3 {
+export function headPoint(u: number, phi: number, fs: FaceShape, plain = false): V3 {
   const a = spline(HA, u) * (u < 0.3 ? mix(fs.jaw, 1, smooth(0.1, 0.3, u)) : 1);
   const zf = spline(HZF, u);
   const zb = spline(HZB, u);
@@ -765,26 +818,23 @@ export function headPoint(u: number, phi: number, fs: FaceShape): V3 {
   const n = c >= 0 ? nf : 2.15;
   const z0 = sp(c, n) * (c >= 0 ? zf : -zb);
   const x0 = sp(s, n) * a;
-  // the mid-line features: a narrow window around the front (phi = 0)
   const ang = Math.atan2(s, c); // -pi..pi, 0 = front
-  const w = (sig: number) => Math.exp(-(ang * ang) / (2 * sig * sig));
-  let d = 0;
-  // the nose: a ridge from the root (u 0.5) to the tip (u 0.31), its underside back to the lip (u 0.25)
-  const noseAmp = fs.nose / 0.085;
-  const ridge = u > 0.31 ? 0.135 * mix(1, 0.1, smooth(0.31, 0.5, u)) : 0.135 * smooth(0.235, 0.31, u) * (0.75 + 0.25 * smooth(0.27, 0.31, u));
-  d += ridge * noseAmp * w(u > 0.33 ? 0.11 : 0.16) * (u > 0.22 && u < 0.53 ? 1 : 0);
-  // lips: the upper (u 0.205) and the lower (u 0.15), the mouth line between them a little in
-  d += fs.lips * (0.04 * bump(u, 0.205, 0.022) + 0.035 * bump(u, 0.15, 0.02) - 0.008 * bump(u, 0.178, 0.008)) * w(0.3);
-  // the chin's button
-  d += fs.chin * 0.028 * bump(u, 0.06, 0.035) * w(0.36);
+  // the mid-line features: the profile minus the face plane, in a window around the front
+  const sig = spline(HSIG, u);
+  let m = plain ? 0 : spline(HZM, u) - zf;
+  // a person's own nose, lips and chin
+  if (u > 0.24 && u < 0.52) m *= 1 + (fs.nose / 0.085 - 1) * smooth(0.24, 0.31, u) * (1 - smooth(0.42, 0.52, u));
+  if (u > 0.12 && u < 0.24) m *= fs.lips;
+  if (u < 0.12) m *= fs.chin;
+  let d = m * Math.exp(-(ang * ang) / (2 * sig * sig)) * Math.max(0, c);
   // the brow ridge
-  d += fs.brow * 0.014 * bump(u, 0.56, 0.035) * w(0.6);
-  // the eye sockets: a soft dip either side of the nose's root
-  const sock = (sg: number) => Math.exp(-((ang - sg * 0.52) ** 2) / (2 * 0.2 * 0.2));
-  d -= 0.034 * bump(u, 0.495, 0.045) * (sock(1) + sock(-1));
+  d += fs.brow * 0.012 * bump(u, 0.56, 0.035) * Math.exp(-(ang * ang) / (2 * 0.65 * 0.65));
+  // the eye sockets: a soft dip either side of the nose's root, under the brow
+  const sock = (sg: number) => Math.exp(-((ang - sg * 0.52) ** 2) / (2 * 0.3 * 0.3));
+  if (!plain) d -= 0.03 * bump(u, 0.5, 0.05) * Math.min(1.25, sock(1) + sock(-1));
   // the cheekbones
-  const chk = (sg: number) => Math.exp(-((ang - sg * 0.98) ** 2) / (2 * 0.28 * 0.28));
-  d += fs.cheek * 0.02 * bump(u, 0.41, 0.06) * (chk(1) + chk(-1));
+  const chk = (sg: number) => Math.exp(-((ang - sg * 0.95) ** 2) / (2 * 0.28 * 0.28));
+  d += fs.cheek * 0.022 * bump(u, 0.41, 0.06) * (chk(1) + chk(-1));
   // displace along the ring's outward direction
   const l = Math.hypot(x0, z0) || 1;
   const x = x0 + (x0 / l) * d;
@@ -792,26 +842,31 @@ export function headPoint(u: number, phi: number, fs: FaceShape): V3 {
   return [x, u - 0.42, z];
 }
 
+/** The head without its features (for the painter's simplified light). */
+const PLAIN: FaceShape = {nose: 0, lips: 0, jaw: 1, chin: 0, cheek: 0, brow: 0};
+
 export function headSurface(sk: Skeleton, res: number, fs: FaceShape): Surface {
   const h = sk.b.head;
   const rows = rowsFor(54, res, 14);
   const cols = rowsFor(72, res, 20);
   const grid: V3[][] = [];
+  const plain: V3[][] = [];
   const axis: V3[] = [];
+  const plainFs: FaceShape = {...PLAIN, jaw: fs.jaw};
   for (let i = 0; i < rows; i++) {
-    // denser rows around the face's features (u 0.1-0.6)
-    const t = i / (rows - 1);
-    const u = t;
+    const u = i / (rows - 1);
     const row: V3[] = [];
+    const row2: V3[] = [];
     for (let k = 0; k < cols; k++) {
       const phi = (k / cols) * Math.PI * 2;
-      const p = headPoint(u, phi, fs);
-      row.push(toWorld(sk.head, scl(p, h)));
+      row.push(toWorld(sk.head, scl(headPoint(u, phi, fs), h)));
+      row2.push(toWorld(sk.head, scl(headPoint(u, phi, plainFs, true), h)));
     }
     grid.push(row);
+    plain.push(row2);
     axis.push(toWorld(sk.head, [0, (u - 0.42) * h, 0]));
   }
-  return {key: 'head', mat: 'skin', grid, axis, wrap: true, look: {glow: true, hi: 0.9}};
+  return {key: 'head', mat: 'skin', grid, axis, wrap: true, shadeGrid: plain, simplify: 0.55, look: {glow: true, hi: 2, blur: 3.4}};
 }
 
 /** Head-local point (units of h) to model space. */

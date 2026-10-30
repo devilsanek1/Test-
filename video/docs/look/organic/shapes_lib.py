@@ -367,7 +367,9 @@ def edge_chains(lab: np.ndarray, sigma: float = 1.0, high: float = 2.0, low: flo
     e = thin(e)
     e[:2, :] = e[-2:, :] = False; e[:, :2] = e[:, -2:] = False
     e = _clean_skeleton(e)
-    return _link(e, sx, sy, min_len), mag
+    chains = _link(e, sx, sy, min_len)
+    edge_chains.last_map = e
+    return chains, mag
 
 
 def _nbcount(e):
@@ -651,12 +653,16 @@ def _bilinear(img: np.ndarray, x: np.ndarray, y: np.ndarray) -> np.ndarray:
     return a * (1 - fx) * (1 - fy) + b * fx * (1 - fy) + c * (1 - fx) * fy + d * fx * fy
 
 
-def edge_profiles(lab: np.ndarray, contours, every: float = 4.0, reach: float = 20.0, side: float = 8.0,
-                  min_step: float = 4.0, max_points: int = 1500):
-    """For points every `every` px along the boundaries: sample the CIELAB profile across the edge (+-reach px, three
-    parallel lines averaged), project it on the colour difference between the two sides (means over side..reach),
-    and fit an erf: the 10-90 % width = 2.563 sigma. Returns arrays (x, y, step dE, width px, fit rms, kind) where
-    kind 0 = step edge, 1 = ridge/line (a thin shape: the profile goes and comes back), 2 = no edge (step < min_step)."""
+def edge_profiles(lab: np.ndarray, contours, every: float = 4.0, reach: float = 20.0, side_frac: float = 0.4,
+                  min_step: float = 4.0, max_points: int = 1500, edge_map: np.ndarray | None = None):
+    """For points every `every` px along the curves: sample the CIELAB profile across the edge, out to `reach` px on
+    each side or to 85 % of the way to the next edge of `edge_map` on that side (whichever is nearer: in a dense
+    drawing, windows and mullions, the profile never runs into the neighbouring edge), three parallel lines averaged.
+    The two sides' colours are the means over the outer `side_frac` of each half; the profile is projected on their
+    difference (on lightness alone where the step is mostly value: the codec halves chroma resolution) and fitted
+    with an erf: the 10-90 % width = 2.563 sigma. Returns arrays (x, y, step dE, width px, fit rms, kind, ridge):
+    kind 0 = step edge, 1 = busy (not one clean step: texture, or no room between edges), 2 = no edge (step <
+    min_step and no ridge), 3 = a thin line (no step, a ridge of >= 6 dE: a joint, a bar, a wire)."""
     H, W = lab.shape[:2]
     pts = []; nrm = []
     for c in contours:
@@ -672,42 +678,61 @@ def edge_profiles(lab: np.ndarray, contours, every: float = 4.0, reach: float = 
     if not pts:
         return None
     pts = np.concatenate(pts); nrm = np.concatenate(nrm)
-    # keep points whose profile stays inside the crop
-    inside = ((pts[:, 0] - reach * np.abs(nrm[:, 0]) > 1) & (pts[:, 0] + reach * np.abs(nrm[:, 0]) < W - 2) &
-              (pts[:, 1] - reach * np.abs(nrm[:, 1]) > 1) & (pts[:, 1] + reach * np.abs(nrm[:, 1]) < H - 2))
-    pts = pts[inside]; nrm = nrm[inside]
     if len(pts) > max_points:
         sel = np.linspace(0, len(pts) - 1, max_points).astype(int)
         pts = pts[sel]; nrm = nrm[sel]
+    # room on each side: up to the crop's border and to the next edge
+    ks = np.arange(1, int(reach) + 1, dtype=float)
+    room = np.full((len(pts), 2), reach)
+    for si, sgn in enumerate((-1.0, 1.0)):
+        X = pts[:, 0:1] + sgn * nrm[:, 0:1] * ks[None]
+        Y = pts[:, 1:2] + sgn * nrm[:, 1:2] * ks[None]
+        out_ = (X < 1) | (X > W - 2) | (Y < 1) | (Y > H - 2)
+        hit = out_.copy()
+        if edge_map is not None:
+            xi = np.clip(np.round(X).astype(int), 0, W - 1); yi = np.clip(np.round(Y).astype(int), 0, H - 1)
+            em = edge_map[yi, xi] & (ks[None] >= 2.5)
+            hit |= em
+        first = np.where(hit.any(1), np.argmax(hit, 1), len(ks))
+        room[:, si] = np.minimum(reach, np.where(hit.any(1), ks[np.minimum(first, len(ks) - 1)] * np.where(out_[np.arange(len(pts)), np.minimum(first, len(ks) - 1)], 1.0, 0.85), reach))
     t = np.arange(-reach, reach + 0.01, 0.5)
     tan = np.stack([nrm[:, 1], -nrm[:, 0]], 1)
     prof = 0
     for off in (-1.0, 0.0, 1.0):
-        X = pts[:, 0:1] + nrm[:, 0:1] * t[None] + tan[:, 0:1] * off
-        Y = pts[:, 1:2] + nrm[:, 1:2] * t[None] + tan[:, 1:2] * off
+        X = np.clip(pts[:, 0:1] + nrm[:, 0:1] * t[None] + tan[:, 0:1] * off, 0, W - 1.001)
+        Y = np.clip(pts[:, 1:2] + nrm[:, 1:2] * t[None] + tan[:, 1:2] * off, 0, H - 1.001)
         prof = prof + _bilinear(lab, X, Y)
     prof = prof / 3.0   # (N, T, 3)
-    left = prof[:, t <= -side].mean(1); right = prof[:, t >= side].mean(1)
-    dv = right - left
-    step = np.linalg.norm(dv, axis=1)
-    # read the width on lightness wherever the step is mostly value (the codec halves chroma resolution, which would
-    # make a chroma-only reading look ~2 px softer than it is); on a chroma edge, on the full CIELAB projection
-    value_led = np.abs(dv[:, 0]) >= 0.5 * step
-    dv = np.where(value_led[:, None], dv * np.array([1.0, 0.0, 0.0]), dv)
-    u = dv / np.maximum(np.linalg.norm(dv, axis=1), 1e-9)[:, None]
-    step_proj = np.linalg.norm(dv, axis=1)
-    p = ((prof - left[:, None]) * u[:, None]).sum(-1) / np.maximum(step_proj, 1e-9)[:, None]   # ~0 -> 1
-    widths = np.full(len(pts), np.nan); rms = np.full(len(pts), np.nan); kind = np.zeros(len(pts), int)
-    for i in range(len(pts)):
-        if step[i] < min_step:
-            kind[i] = 2
-            continue
-        w, r = _fit_erf(t, p[i])
-        widths[i] = w; rms[i] = r
-        # a ridge: the profile overshoots well past both sides (a thin line / a sliver between two edges)
-        if r > 0.12 or p[i].max() > 1.6 or p[i].min() < -0.6:
+    N = len(pts)
+    widths = np.full(N, np.nan); rms = np.full(N, np.nan); kind = np.zeros(N, int)
+    step = np.zeros(N); ridge = np.zeros(N)
+    for i in range(N):
+        lo, hi = room[i, 0], room[i, 1]
+        if min(lo, hi) < 3.0:
             kind[i] = 1
-    return {'x': pts[:, 0], 'y': pts[:, 1], 'step': step, 'width': widths, 'rms': rms, 'kind': kind}
+            continue
+        m = (t >= -lo) & (t <= hi)
+        tt = t[m]; pr = prof[i, m]
+        left = pr[tt <= -lo * (1 - side_frac)].mean(0); right = pr[tt >= hi * (1 - side_frac)].mean(0)
+        dv = right - left
+        st = float(np.linalg.norm(dv))
+        sides = 0.5 * (left + right)
+        rd = float(np.linalg.norm(pr[np.abs(tt) <= 1.5] - sides, axis=-1).max())
+        step[i] = st; ridge[i] = rd
+        if st < min_step:
+            kind[i] = 3 if rd >= 6.0 else 2
+            continue
+        if abs(dv[0]) >= 0.5 * st:
+            dv = np.array([dv[0], 0.0, 0.0])
+        u = dv / max(np.linalg.norm(dv), 1e-9)
+        pp = ((pr - left) @ u) / max(np.linalg.norm(dv), 1e-9)
+        w, r = _fit_erf(tt, pp)
+        widths[i] = min(w, 2.0 * min(lo, hi) * 1.28) if np.isfinite(w) else w
+        rms[i] = r
+        if r > 0.12 or pp.max() > 1.6 or pp.min() < -0.6:
+            kind[i] = 1
+    return {'x': pts[:, 0], 'y': pts[:, 1], 'step': step, 'width': widths, 'rms': rms, 'kind': kind, 'ridge': ridge,
+            'room': room}
 
 
 def _fit_erf(t, p):
@@ -967,22 +992,23 @@ def notan(lab: np.ndarray, blur: float = 2.0, min_frac: float = 0.002):
 
 
 def lost_found(prof, crisp: float = 2.0, firm: float = 6.0, soft: float = 16.0):
-    """Shares of boundary samples: crisp (10-90 % width <= 2 px), firm (2-6), soft (6-16), lost (wider than 16 px,
-    or a step under 4 dE), busy (the profile is not one step: texture, a thin line or two edges close together).
+    """Shares of boundary samples: crisp (10-90 % width <= 2 px, and thin drawn lines), firm (2-6), soft (6-16), lost
+    (wider than 16 px, or a step under 4 dE with no line), busy (the profile is not one step: texture, two edges close
+    together).
     The width shares are also given among the clean steps alone (crisp_of_steps ...)."""
     if prof is None or len(prof['kind']) == 0:
         return {}
     k = prof['kind']; w = prof['width']
     step_ok = k == 0
     lost = (k == 2) | (step_ok & (w > soft))
-    crisp_m = step_ok & (w <= crisp)
+    crisp_m = (step_ok & (w <= crisp)) | (k == 3)
     firm_m = step_ok & (w > crisp) & (w <= firm)
     soft_m = step_ok & (w > firm) & (w <= soft)
     busy = k == 1
     clean = crisp_m | firm_m | soft_m | lost
     nc = max(int(clean.sum()), 1)
     return {'crisp': float(crisp_m.mean()), 'firm': float(firm_m.mean()), 'soft': float(soft_m.mean()),
-            'lost': float(lost.mean()), 'busy': float(busy.mean()), 'n': int(len(k)),
+            'lost': float(lost.mean()), 'busy': float(busy.mean()), 'line': float((k == 3).mean()), 'n': int(len(k)),
             'crisp_of_clean': float(crisp_m.sum() / nc), 'firm_of_clean': float(firm_m.sum() / nc),
             'soft_of_clean': float(soft_m.sum() / nc), 'lost_of_clean': float(lost.sum() / nc),
             'median_width': float(np.nanmedian(np.where(step_ok, w, np.nan))) if step_ok.any() else float('nan')}

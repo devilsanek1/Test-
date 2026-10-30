@@ -42,23 +42,29 @@ export type SleeveSpec = {
   cuff?: number;
 };
 
-/** A sleeve along the arm chain: a tube with a crisp cuff edge, the cap rounded into the body. */
-export function sleeve(sk: Skeleton, s: Side, v: View, mat: string, spec: SleeveSpec): Part[] {
+/** A sleeve along the arm chain: a tube with a crisp cuff edge. It starts just below the shoulder line, inside the
+ *  garment's own shoulder (the torso loft carries the shoulder's smooth arc, the dropped seam), so no cap stands above
+ *  the shoulder. */
+export function sleeve(sk: Skeleton, s: Side, v: View, mat: string, spec: SleeveSpec, grp?: string): Part[] {
   const ss = s === 'l' ? 1 : -1;
   const drop = spec.drop ?? 0;
-  const S = add3(sk.sh[s], [ss * drop * 0.9, -drop * 0.5, 0]);
+  const S0 = sk.sh[s];
   const E = sk.elbow[s];
   const W = sk.wrist[s];
+  // the sleeve's top: down the upper arm by the drop, a little outside the joint
+  const ua: V3 = norm3(sub3(E, S0));
+  const S = add3(add3(S0, mul3(ua, 10 + drop * 0.9)), [ss * (2 + drop * 0.15), 0, 0]);
   const end = spec.end ?? 1;
   const Wend: V3 = [lerp(E[0], W[0], end), lerp(E[1], W[1], end), lerp(E[2], W[2], end)];
   const [r0, r1, r2] = spec.r;
-  const ru = pchip([0, 0.12, 0.5, 1], [r0 * 1.06, r0, r1, r2]);
-  const pts = tubeOutline([S, E, Wend], (u) => ({ru: ru(u), rv: ru(u) * 1.05}), v, [0, 0, 1], {m: 30, capEnd: false});
-  // mark the cuff's two corners crisp
-  const out: Part[] = [{k: `sleeve_${s}`, pts: crispEnd(pts), mat, z: armZ(sk, s, v), tension: 0.5}];
+  const ru = pchip([0, 0.12, 0.5, 1], [r0 * 1.02, r0, r1, r2]);
+  const pts = tubeOutline([S, E, Wend], (u) => ({ru: ru(u), rv: ru(u) * 1.04}), v, [0, 0, 1], {m: 30, capEnd: false});
+  const out: Part[] = [{k: `sleeve_${s}`, pts: crispEnd(pts), mat, z: armZ(sk, s, v), tension: 0.5, grp: grp ? `${grp}_${s}` : undefined}];
   if (spec.cuff) {
-    const c0: V3 = [lerp(E[0], Wend[0], 1 - spec.cuff / Math.hypot(...sub3(Wend, E))), lerp(E[1], Wend[1], 1 - spec.cuff / Math.hypot(...sub3(Wend, E))), lerp(E[2], Wend[2], 1 - spec.cuff / Math.hypot(...sub3(Wend, E)))];
-    const cp = tubeOutline([c0, Wend], () => ({ru: r2 * 1.04, rv: r2 * 1.08}), v, [0, 0, 1], {m: 4, capEnd: false, capStart: false});
+    const L = Math.hypot(...sub3(Wend, E));
+    const k = 1 - spec.cuff / L;
+    const c0: V3 = [lerp(E[0], Wend[0], k), lerp(E[1], Wend[1], k), lerp(E[2], Wend[2], k)];
+    const cp = tubeOutline([c0, Wend], () => ({ru: r2 * 1.06, rv: r2 * 1.1}), v, [0, 0, 1], {m: 4, capEnd: false, capStart: false});
     out.push({k: `cuff_${s}`, pts: cp, mat, tone: 'shade', z: armZ(sk, s, v) + 0.5, clip: `sleeve_${s}`, tension: 0.3});
   }
   return out;

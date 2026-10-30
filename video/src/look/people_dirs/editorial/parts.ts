@@ -23,6 +23,9 @@ export type Part = {
   gAxis?: V2;
   /** Gradient strength (1 = the full ramp, 0 = flat base). */
   gk?: number;
+  /** A gradient group: parts of one garment (a seat and its two legs, a hair mass split in two layers) share ONE
+   *  gradient computed over all their points, so no seam shows where they overlap. */
+  grp?: string;
 };
 
 /** The painter's layers. */

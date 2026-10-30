@@ -35,6 +35,11 @@ export type Surface = {
   flat?: boolean;
   /** Skip the RIM on this surface. */
   noRim?: boolean;
+  /** A simplified twin of the grid (the same rows and columns): the light reads its normals, mixed with the real
+   *  ones by `simplify` (0 = real forms only, 1 = the simplified forms only). A painter's simplification: the face's
+   *  features shade softly instead of as hard holes. */
+  shadeGrid?: V3[][];
+  simplify?: number;
 };
 
 export type SurfLook = {
@@ -148,6 +153,39 @@ export function projectSurface(sf: Surface, c: Cam): PS {
     else jj = Math.max(0, Math.min(cols - 1, j));
     return Q[ii * cols + jj];
   };
+  // pole rows (a ring shrunk to a point: the crown, a fingertip): their normal is the axis's own direction
+  const ringR: number[] = [];
+  for (let i = 0; i < rows; i++) {
+    let r = 0;
+    for (let j = 0; j < cols; j++) {
+      const q = Q[i * cols + j];
+      r += Math.hypot(q[0] - ax[i][0], q[1] - ax[i][1], q[2] - ax[i][2]);
+    }
+    ringR.push(r / cols);
+  }
+  const rMax = Math.max(...ringR, 1e-6);
+  const pole = (i: number) => ringR[i] < rMax * 0.14 && (i === 0 || i === rows - 1 || ringR[i] < rMax * 0.06);
+  // the simplified twin's normals (camera space), if any
+  let N2: V3[] | null = null;
+  if (sf.shadeGrid) {
+    N2 = new Array(n);
+    const Q2: V3[] = new Array(n);
+    for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) Q2[i * cols + j] = toCam(c, sf.shadeGrid[i][j]);
+    const P2 = (i: number, j: number) => {
+      const ii = Math.max(0, Math.min(rows - 1, i));
+      const jj = sf.wrap ? ((j % cols) + cols) % cols : Math.max(0, Math.min(cols - 1, j));
+      return Q2[ii * cols + jj];
+    };
+    for (let i = 0; i < rows; i++)
+      for (let j = 0; j < cols; j++) {
+        let nn = cross(sub(P2(i, j + 1), P2(i, j - 1)), sub(P2(i + 1, j), P2(i - 1, j)));
+        const radial = sub(Q2[i * cols + j], ax[i]);
+        if (Math.hypot(nn[0], nn[1], nn[2]) < 1e-6) nn = radial;
+        if (dot(nn, radial) < 0) nn = scl(nn, -1);
+        N2[i * cols + j] = nrm(nn);
+      }
+  }
+  const mixK = sf.simplify ?? 0.5;
   let zf = 0;
   let nf = 0;
   let zb = 0;
@@ -162,14 +200,21 @@ export function projectSurface(sf: Surface, c: Cam): PS {
       const radial = sub(q, ax[i]);
       if (Math.hypot(nn[0], nn[1], nn[2]) < 1e-6) nn = radial;
       if (dot(nn, radial) < 0) nn = scl(nn, -1);
-      const N0 = nrm(nn);
+      let N0 = nrm(nn);
+      if (pole(i) && rows > 2) {
+        const out = i < rows / 2 ? sub(ax[i], ax[Math.min(rows - 1, i + 2)]) : sub(ax[i], ax[Math.max(0, i - 2)]);
+        const w = ringR[i] / (rMax * 0.14);
+        N0 = nrm(add(scl(nrm(out), 1 - w), scl(N0, w)));
+      }
       N[k] = N0;
       const v = nrm(sub(cam, q));
       ndv[k] = dot(N0, v);
-      ndl[k] = dot(N0, c.L);
-      ndr[k] = dot(N0, c.R);
+      // the light reads the simplified forms where a twin is given (the silhouette keeps the real ones)
+      const NL = N2 && !pole(i) ? nrm(add(scl(N2[k], mixK), scl(N0, 1 - mixK))) : N0;
+      ndl[k] = dot(NL, c.L);
+      ndr[k] = dot(NL, c.R);
       const H = nrm(add(c.L, v));
-      ndh[k] = dot(N0, H);
+      ndh[k] = dot(NL, H);
       // the strands run along the rows: the sheen is where they are perpendicular to the half vector
       const T = nrm(dv);
       const th = dot(T, H);

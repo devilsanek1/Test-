@@ -65,6 +65,55 @@ const Layer: React.FC<{kind: string; i: number; t: number}> = ({kind, i, t}) => 
           <image href={A.GLOW} x={0} y={0} width={1080} height={1920} preserveAspectRatio="none" style={{mixBlendMode: 'screen'}} />
         </>
       );
+    case 'shadeOnly':
+      // one full-frame multiply image (the shade map, 1/4 res, upscaled by the browser)
+      return <image href={A.SHADE} x={0} y={0} width={1080} height={1920} preserveAspectRatio="none" style={{mixBlendMode: 'multiply'}} />;
+    case 'mapCrop': {
+      // the three maps, each cropped to the box where it does anything
+      const im = (href: string, b: number[], blend: 'multiply' | 'screen') => (
+        <image href={href} x={b[0]} y={b[1]} width={b[2]} height={b[3]} preserveAspectRatio="none" style={{mixBlendMode: blend}} />
+      );
+      return (
+        <>
+          {im(A.SHADE_C, A.SHADE_C_BOX, 'multiply')}
+          {im(A.LIGHT_C, A.LIGHT_C_BOX, 'screen')}
+          {im(A.GLOW_C, A.GLOW_C_BOX, 'screen')}
+        </>
+      );
+    }
+    case 'mapMerged': {
+      // two layers per frame: the shade (multiply, cropped) and ONE screen map (light + glow merged, cropped)
+      const im = (href: string, b: number[], blend: 'multiply' | 'screen') => (
+        <image href={href} x={b[0]} y={b[1]} width={b[2]} height={b[3]} preserveAspectRatio="none" style={{mixBlendMode: blend}} />
+      );
+      return (
+        <>
+          {im(A.SHADE_C, A.SHADE_C_BOX, 'multiply')}
+          {im(A.LG_C, A.LG_C_BOX, 'screen')}
+        </>
+      );
+    }
+    case 'proposal': {
+      // the production proposal (light.md §4.0, §7): v6 with lib/light's live layers OFF (input prop lightOff), ONE
+      // multiply map per frame (the new shade x v6's static shadows, cropped) + ONE screen map (light + glow, cropped),
+      // and the live layers for her only: the two-step rim, the wrap, her shadow from the lobby's lamps
+      const im = (href: string, b: number[], blend: 'multiply' | 'screen') => (
+        <image href={href} x={b[0]} y={b[1]} width={b[2]} height={b[3]} preserveAspectRatio="none" style={{mixBlendMode: blend}} />
+      );
+      return (
+        <>
+          {im(A.SHADE_ALL, A.SHADE_ALL_BOX, 'multiply')}
+          {im(A.LG_C, A.LG_C_BOX, 'screen')}
+          <Layer kind="rimMask" i={i} t={t} />
+          <Layer kind="wrap" i={i} t={t} />
+          <Layer kind="shadowProj" i={i} t={t} />
+        </>
+      );
+    }
+    case 'screenOnly': {
+      const b = A.LG_C_BOX as number[];
+      return <image href={A.LG_C} x={b[0]} y={b[1]} width={b[2]} height={b[3]} preserveAspectRatio="none" style={{mixBlendMode: 'screen'}} />;
+    }
     case 'gradPool':
       // vector falloff: the door's pool (a trapezoid, a vertical gradient), the sun's glow and the door's bloom
       return (
