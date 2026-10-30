@@ -6,6 +6,14 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-30 ~00:50 UTC: v6 sent (sky top A/B asked); the people design research runs
+- v6 DONE and sent (`paint_test/paint_still_v6.png`, `compare_v6.jpg`, `skytop_v6_choice.jpg`; owner to pick sky top A/B).
+- RUNNING: workflow `people-design` (run `wf_2f7a2fc2-354`; owner: people "beautiful and pleasant", "20-30 yo today ...
+  instagram influencers, New York, Los Angeles ... faces ... more generic"): research (diagnose, design, fashion) ->
+  three directions (editorial, painterly, graphic) as still sheets -> `video/docs/look/PEOPLE_DESIGN.md` (DRAFT system) +
+  `people_design/directions_compare.png`. Resume: `Workflow({scriptPath, resumeFromRunId: "wf_2f7a2fc2-354"})`.
+- NEXT: send the compare sheet + the three direction sheets; the owner picks a direction; then the system goes final.
+
 ## Status 2026-10-30 ~00:15 UTC: the recipe book is DONE; painter v6 runs
 - DONE: `video/docs/look/PAINT_RECIPES.md` (+ `paint_recipes/{sky_clouds,water,foliage,built_ground,people}.md`, swatches,
   `index.jpg`; scripts `video/scripts/look/paint/recipes/`). Doc clash D1 fixed in CRAFT §f.2 (painted pieces soften by
