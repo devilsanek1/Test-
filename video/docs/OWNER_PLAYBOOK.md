@@ -247,7 +247,13 @@ Maintenance at the end).
   CLEAN and FLUID like the girl in the owner's 9:16 motion reference (`docs/look/refs_human_scale/04_cloud_beast_girl_strip.jpg`):
   elegant proportions, a clear silhouette and line of action, few shapes lit warm on one side with soft gradients, no
   outlines, one flowing element (a scarf, ribbon, coat hem or hair) that moves with follow-through while the body stays
-  calm; the recipe: `docs/look/paint_recipes/people.md`. — ("Another bit is humans we paint - they should be better /
+  calm; the recipe: `docs/look/paint_recipes/people.md`. And BEAUTIFUL: people are attractive and pleasant to
+  look at, their clothing contemporary and appealing (styled like today's best illustration, never dated); our
+  current people read "very old style and frankly ugly", so people get their own deep design research (a design system:
+  proportions, faces-by-pose, hair, wardrobe by context, palette) before the next film draws anyone. — ("One thing we I
+  don’t like about people on our design is there is a lot style involved like we need to draw people that are beautiful
+  and pleasant and the clothing is appealing. Our. Current design is very old style and frankly ugly so it’s tricky I
+  think it will require its own deep research", 2026-10-30.) — ("Another bit is humans we paint - they should be better /
   These are the references especially the video / On the video the person is not substantially different than yours
   but certainly more refined and clean and more fluid", 2026-10-29.) —
   ("don't use big models of people; the people in the first example video are the right direction", v2 restart,
