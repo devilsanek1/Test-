@@ -1,17 +1,19 @@
 # The shot recipes SR1-SR25 (the composition library's Part 2 §3)
 
 **What this is.** The recipes of `COMPOSITION_SHOTS.md` Part 2, moved here on 2026-10-30 to keep the library page
-short (the library critique's cut, `composition/critique_library.md` §7; nothing lost). The one-line table of all
-recipes, the frame in numbers (Part 2 §0) and the rules (Part 0b §4) stay on `COMPOSITION_SHOTS.md`. Paths are from `video/docs/look/` unless they start with `video/` (as in `COMPOSITION_SHOTS.md`); codes, tiers and the A·S·F scores are `COMPOSITION_SHOTS.md` Part 0's; px at 1080 x 1920, y down; 60 fps.
-
+short (the library critique's cut, `composition/critique_library.md` §7; nothing lost); SR25 added from video 4's
+composition pass. The one-line index of all recipes, the frame in numbers (Part 2 §0) and the rules (Part 0b §4) stay on
+`COMPOSITION_SHOTS.md`. Paths are from `video/docs/look/` unless they start with `video/` (as there); codes, tiers and
+A·S·F are its Part 0's; px at 1080 x 1920, y down; 60 fps.
 
 Each recipe: **Beat** (when to use it); **Layout** (the horizon, the subject's place and size, the value masses, the
 quiet areas, the story light, where the eye lands first, what sits behind the captions); **Device** (the composition
 idea and where it comes from); **Camera and joins** (the move it pairs with and how it leaves); **Never**; and one line
-on how it looks in scene 1 or video 4. Every recipe also keeps the 22 rules (Part 0b §4): the band one flat field, key
+on how it looks in scene 1 or video 4. Every recipe also keeps the 22 rules (`COMPOSITION_SHOTS.md` Part 0b §4) and
+the every-shot grammar (its §0.3a): the band one flat field, key
 reads in the feed's clear window, one focal with the story light, two quiet fields, the near frame a hint.
 
-### The hook
+## The hook
 
 **SR1 THE DRAWN SUBJECT**
 - **Beat:** the hook, 0-3 s, in one continuous shot (DIRECTION rule 9); the same frame is the loop's last (the film
@@ -28,7 +30,7 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
   where the first look lands (N1), and the reels' own teaching move (T), "the line first, then the world under it": a
   line held 0.5-1.5 s reads at phone size (`composition/reels.md` §5); the one colour accent at the focal (E8), in the
   golden box (A2).
-- **Camera and joins:** locked, or one visible story move >= 3 % in <= 2 s; never the reference's slow invisible
+- **Camera and joins:** locked, or one visible story move (rule 18); never the reference's slow invisible
   pull-out; nothing scale before 3 s. The expected thing, then reality overtaking it at ~2 s through the real mechanism;
   the bold event lasts >= 1 s and peaks after 0.4 s (rule 13). Out by C (a push toward the mechanism) or A (into the
   subject).
@@ -40,7 +42,7 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
   the windows that follow light as one spreading wave a step dimmer (+6-8 L* inside their facades), so the one window
   stays the call.
 
-### Establishing the home place
+## Establishing the home place
 
 **SR2 HOME ACROSS THE WATER**
 - **Beat:** the home place's establishing view; the quiet beat's return; the callback's place.
@@ -86,8 +88,8 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
 - **Device:** one-point perspective to a closed vista (B2, E7): the walls' feet and the coping are the leading lines
   (B1), the facade's courses radiate from the vanishing point (B3); the L of one tall side and the ground (B10); the
   canyon's V (B11); the tunnel's light at the end (B4); the one small figure in the lit door where the lines meet (E1).
-- **Camera and joins:** locked or the float; a push to the vista (K5) as a story move, visible (>= 3 % in <= 2 s, e.g. 6
-  % in 3 s, on its word), anchored on the far vanishing point; walkers pass both ways on the walks. Out by A (into the
+- **Camera and joins:** locked or the float; a push to the vista (K5) as a story move, visible (rule 18: e.g. 6 % in
+  2 s, on its word), anchored on the far vanishing point; walkers pass both ways on the walks. Out by A (into the
   lit end) or C.
 - **Never:** an open vanishing point into empty sky (the eye leaves through it); both walls tall through the band (a
   symmetric 1:1 lane can't hold the captions); a line across the band; the vanishing point under the rail (x > 870); a
@@ -139,7 +141,7 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
   band toward the harbour, the melt line along it the subject's path, a tram on the curve, the snow floor the calm
   field.
 
-### The subject's moment
+## The subject's moment
 
 **SR6 THE LIT OPENING**
 - **Beat:** the subject's moment: one person or one thing in its place; the start of a push-through reveal.
@@ -180,7 +182,7 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
   camera holds (E9); the near quay a soft hint (C2, E5). The S variant (B8): the tall ground holds one more bend than a
   landscape frame.
 - **Camera and joins:** locked while the subject travels the line (into the vanishing point, along the path: the reels'
-  runner went 305 -> 92 px in 1 s down a pier's axis); or a push to the vista (>= 3 % in <= 2 s, on its word). Out by A
+  runner went 305 -> 92 px in 1 s down a pier's axis); or a push to the vista (rule 18, on its word). Out by A
   (into the end) or C (on along the line).
 - **Never:** lines ending on nothing (an empty vanishing point in the sky); a brighter patch on the path than at its end
   (reel 04a's sunlit patch beat the man the lines pointed at); a line across the band or corner to corner unbroken; a
@@ -245,9 +247,9 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
   opposite edge at the same speed).
 - **Never:** the subject wandering in the frame; a compound move (a truck plus a zoom, a tilt plus a zoom); a source's
   speed (retime it); the subject riding into the rail at the right edge; two follows in a row (Part 0b §2).
-- **Video 4 (S10, S11):** S10 tilts down with the cool water from the computer's top to its foot while the steam above
-  it thins; S11 trucks right with the hot water's front held at x ~400, its lead room to the right, the street sliding
-  past, landing with the block's foot, its wall and the one window in the golden box.
+- **Video 4 (S11):** the camera trucks right with the hot water's front held as the pivot at x ~410 (its lead room to
+  the right, the street sliding past at <= ~6 px/f), landing at 1.15x of the home view with the one window in the golden
+  box. S10 before it holds while the water runs down the pipe (two follows in a row are out: Part 0b §2).
 
 **SR11 THE LEVEL CHANGE**
 - **Beat:** cause and effect in one frame (the street above, the pipe below); two places joined (a square above, a
@@ -268,7 +270,7 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
   at y ~1250-1450 below, the melt line in the snow joining the two; or no cut at all, the melt line alone showing the
   pipe's path.
 
-### Intimacy
+## Intimacy
 
 **SR12 THE CLOSE**
 - **Beat:** intimacy with the object the story turns on; the personal beat; a mechanism's detail.
@@ -284,14 +286,15 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
   cut-in on its axis on a "But" turn (F); then locked or the float. Out by C (a pull back) or A.
 - **Never:** a face, or a person as the subject; a 4x zoom of the wide drawing; the object inside a screen rectangle (it
   reads as a picture on a display); steam, a glow or the object's top in the band.
-- **Video 4 (S3):** the computer's top ~700 px wide on the axis, its flakes melting to steam on "really" that rises and
-  thins out below y 600, the snow beyond one quiet dark-blue field.
+- **Video 4 (S3):** the computer's top ~670 px wide on the axis, its flakes melting to steam on "really" that rises and
+  thins out under the band (a short column bends sideways at y 620-700: rule 2), the snow beyond one quiet dark field.
 
 **SR13 THE HANDS**
 - **Beat:** intimacy with the "you": the effect in the viewer's own hand; the "for you" of the payoff.
 - **Layout:** POV: the "you"'s hand and forearm rise from the bottom left (the wrist runs under the bottom UI as a
-  mass); the thing in hand (a phone, a cup, a key) centred at (300-600, 1000-1250), its face or screen inside x <= 870
-  and y <= 1480. Behind it the world keeps the set's setup, the cause in it on the axis above the hand (y ~700-1000),
+  mass); the thing in hand (a phone, a cup, a key) centred at (300-600, 1000-1250), or lower (y 1310-1480) where the
+  thread's run crosses that box (the thread wins: the hand never covers its run or home spot), its face or screen inside
+  x <= 870 and y <= 1480. Behind it the world keeps the set's setup, the cause in it on the axis above the hand (y ~700-1000),
   changing on the same word as the thing in hand (one subject group). Masses: the hand and sleeve dark-mid (the near
   mass), the world mid, the sky light with the band. Light: the thing in hand lit (a screen's glow is a local story
   light); the cause a step under it until the payoff word. Eye: the words, the cause, then down to the hand (300-500
@@ -303,11 +306,11 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
   pull back out of a window or a screen) or B; out by A (into the screen) or B.
 - **Never:** the screen under the rail (x > 870 below y 860) or the name block (y >= 1519); a logo or readable fine
   print on the screen; a big near body; the hand coming in from the right edge (it lands under the rail).
-- **Video 4 (S12):** the gloved hand and phone come in from the bottom LEFT (x ~150-500), not the bottom right, where
-  Instagram's rail (x 877-954 from y 1032) and the name block (y >= 1519) sit; the phone's screen at ~(380, 1150), the
-  chat bubble on it, the warm run and the one window above and right of it.
+- **Video 4 (S12):** the gloved hand and phone come in from the bottom LEFT, not the bottom right, where Instagram's
+  rail (x 877-954 from y 1032) and the name block (y >= 1519) sit; the screen ~140 x 170 at x 330-470, y 1310-1480,
+  under the run's street leg, the chat bubble on it; the warm run and the one window above and right of it.
 
-### Scale
+## Scale
 
 **SR14 THE YOU AND THE WORLD**
 - **Beat:** scale from a human viewpoint (the film's lesser scale moment, not the big move); the establishing view of a
@@ -327,7 +330,7 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
   horizon near the lower third (A1, N3); the far belt paler with distance (E6, N6). Variant: a tower with the lit window
   small at its foot (A3). The owner's human-scale references (`refs_human_scale/`: the city hill, the beach) are this
   frame.
-- **Camera and joins:** locked or the float; or a push to the vista (>= 3 % in <= 2 s, anchored on the far point); life
+- **Camera and joins:** locked or the float; or a push to the vista (rule 18, anchored on the far point); life
   in the sky (birds, clouds) and far away (a ferry, a tram), never by the "you". In by C (a rise or pull back from the
   home view); out by A (into the far point) or C.
 - **Never:** the "you" on the axis covering the focal; the "you" facing us, or as bright as the focal; a far,
@@ -340,8 +343,8 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
 - **Beat:** scale: the quantity, the machine, the system beside one person.
 - **Layout:** a worm's-eye (K7: camera 0.3 m, horizon y 1114-1229) or eye height (horizon y 1020-1133, off the half).
   The giant >= 0.7 H tall (>= 1344 px) and >= 10:1 over the figure, cut by the top edge, its face across the band one
-  flat field (L* >= 70), its top in a gutter or cut off. The figure (the "you" 130-220 px, or an anchor 60-150 px in a K
-  wide) low near the axis (x 420-660), feet above y 1250 (K7) and always above y 1480, on plain ground in front of the
+  flat field (L* >= 70), its top in a gutter or cut off. The figure (the "you" 130-220 px near the camera; strangers
+  15-60 px as the tiny anchors, never the "you" made small) low near the axis (x 420-660), feet above y 1250 (K7) and always above y 1480, on plain ground in front of the
   giant (against a busy giant it vanishes). Masses: the giant one mass (mid), the ground light and plain, slivers of
   sky. Quiet: the giant's face (patterned +-4-6 L*) and the ground. Light: at the figure's spot (a pool, or the giant's
   lit door at its foot): the figure is the stage's only high-contrast mark. Eye: the words on the giant's flat face,
@@ -394,15 +397,17 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
   moves past it); a frame within a frame opening into the world (C1; S5's slot is the tunnel's light at the end, B4);
   Guo Xi's deep distance in 6 planes (N6), paler with distance (E6).
 - **Camera and joins:** one continuous move on one ease (S5: a dolly back, a crane up and a 70-80 degree arc; S1: a
-  rise), retimed to the reel (S5's default a 2.6 s move + a 0.7 s hold), the landmark landing on the payoff word. It
+  rise), retimed to the reel (S5's default a 2.6 s move + a 0.7 s hold), the landmark landing on the payoff word;
+  beyond a continuous ~2.3x, the nested pull (`COMPOSITION_SHOTS.md` Part 0b §3: each step drawn inside the next, the
+  pivot handed over at one spot, one S5_EASE over the chain). It
   leaves from the thread (the declared scale reveal may run without it) and the next join returns to the thread, by A
-  (the dive back in) or C.
+  (the dive back in), C, or a plain cut on a "But" from the landed frame after its hold.
 - **Never:** a zoom instead of a dolly; a second big move; roll; the landmark in the band; Pip as the anchor.
 - **Video 4 (S6):** out from the mug to the Earth's curve: hold the pivot (the mug, then Helsinki's lit spot) within
   +-40 px of one point on the axis all the way out, and land with the curve's horizon off the half (y <= 860 or >=
   1150), the band in the sky above it one flat field.
 
-### The turn
+## The turn
 
 **SR18 THE OFF-BALANCE**
 - **Beat:** the turn ("But ..."): the one place in the film where the composition leans.
@@ -418,13 +423,15 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
   contrast against the home beats' affinity (level lines, close values, slow), as a film's intensity curve is planned
   (cinema S17). Variant, once: short-siding or the low quadrant (M3).
 - **Camera and joins:** a plain cut (F: at most 2 a film, only on a "But" turn, the thread on both sides, a size
-  change >= 20 % (>= 1.5-2x proposed: §5 row 14) or an angle change >= 30 degrees), or a push that lands off-centre;
-  then a hold of 0.5-1.0 s (the pause after the heaviest line) before the next move.
+  change >= 20 % (>= 1.5-2x proposed: `composition/library_clashes.md` row 14) or an angle change >= 30 degrees), or a
+  push that lands off-centre; the focal's jump the turn's declared exception (rule 19: past 220 px, within ~370); then a
+  hold of 0.5-1.0 s (the pause after the heaviest line) before the next move.
 - **Never:** in a cozy or home beat; twice in a row; the focal under the rail (x > 870 below y 860) or in the cut
   strips; a tilted horizon.
-- **Video 4 (S7, "But Helsinki WANTS that heat"):** the dive lands with the computer at x ~330, off the axis, the city's
-  pipe coming in from the right, so the empty stretch the pen draws on "WANTS" crosses the open half toward it; S8's
-  push re-centres on the plan.
+- **Video 4 (S7, "But Helsinki WANTS that heat"):** a plain cut on "But" (the pass's pick; or one push-through) lands
+  on the computer at x ~215-445, off the axis (its focal ~(330, 880), ~225 px from the planet's pivot), the city's pipe
+  ending in the open half at the right, so the empty stretch the pen draws on "WANTS" crosses the open half toward it;
+  S8's push re-centres on the plan.
 
 **SR19 THE MATCHED PAIR**
 - **Beat:** the turn told by light (a window goes dark, a lamp comes on); before and after; the callback.
@@ -436,14 +443,14 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
   (`CRAFT.md` §a). Eye: straight to the change.
 - **Device:** the deliberate match (N14: "the same chart again, the same place later, the callback to the opening's end
   frame", `STORYBOARD_STYLE.md` §7); the colour script's one key change per story turn (cinema §7).
-- **Camera and joins:** locked on both; the change lands on its word. The join between the two is B, or the change
-  happens inside one held shot.
+- **Camera and joins:** locked on both; the change lands on its word. The join between the two is B (J3, J4, or J11
+  for a light change), or the change happens inside one held shot (then RM6 or I11, no join).
 - **Never:** a drift between the two frames (it reads as a mistake); two changes at once; a light source that moves
   between them.
 - **Scene 1:** the home view with her office window on the axis the one warm pane, then the same frame with it dark on
   "She quit": the other panes unchanged, so the one dark pane is the story.
 
-### A comparison or a list
+## A comparison or a list
 
 **SR20 THE SEAM**
 - **Beat:** a comparison inside one frame: two states (cold and warm, before and after, thrown away and kept).
@@ -475,12 +482,12 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
   `STORYBOARD_STYLE.md` §3); the pyramid (D5; cinema §4.10: the apex on the focal, sides 50-70 degrees), its rows
   receding toward the apex (B3), seen a little from above (N12), the apex in the golden box (A2). Variant: the units in
   a ring round the cause, the cause inside the circuit (B13).
-- **Camera and joins:** locked; the units pop by rows on their word, never one by one for forty; out by C.
+- **Camera and joins:** locked; the units pop by rows on their word (RM8b), never one by one for forty; out by C.
 - **Never:** units of different sizes or colours (it becomes a tour); units as strong in value as the cause; a unit
   under the rail or in the bottom UI; a number tag beside the caption's number.
-- **Video 4 (S4):** the 40 kettles in 5 rows of 8 on the snowy floor at the computer's foot (the front row ~650-700 px
-  wide at y ~1400, the back row ~500 px at y ~1180), one mid texture of lids and spouts whose steam joins the
-  computer's; the computer the apex with the hardest step.
+- **Video 4 (S4):** the 40 kettles in 5 rows of 8 on the snowy floor at the computer's foot (the back row ~480 px wide
+  at y ~1360, the front row ~660 px at y ~1480, x 200-860), one mid texture of lids and spouts whose steam joins the
+  computer's; the computer the apex with the hardest step, its grille lit at ~(540, 960).
 
 **SR22 THE PAPER**
 - **Beat:** the proof: a chart, a number, a date, a plan; information as paper in the place.
@@ -496,10 +503,11 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
   allowed where the drawing is the beat); held >= 1 s after its number lands.
 - **Never:** a new place made for the chart (a billboard, a noticeboard); small words, sources or fine print (they go in
   the post's text); the paper at an angle (it bends the number); the same words as the caption.
-- **Video 4 (S8):** the paper tag swinging onto the plan's front wall on the axis, below the computer's middle, "2027"
-  at 120-160 px: the only word in the film's picture.
+- **Video 4 (S8):** the paper tag swinging onto the plan's front wall on the axis at the computer's middle, centre
+  (540, 1150) (lower would put it ~690 px under the captions; the drop allows 650), "2027" at ~122 px: the only word in
+  the film's picture.
 
-### The payoff
+## The payoff
 
 **SR23 THE MIRROR**
 - **Beat:** stillness: a formal, settled beat (an answer, the quiet before the payoff, the loop's end); once a film.
@@ -528,14 +536,41 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
 - **Device:** the matched frame (N14) and one sweep ("triangulate in, with a series of zigzags", Poore 1903, via cinema
   §4.5: B8's zigzag form): the thread's run is the leading line (B1), ending on the one hot accent (E8). Variant: a
   spiral pathway curling in to it (B12); the golden-spiral sweep (A4) only if the owner overrules (Part 0.1).
-- **Camera and joins:** a pull back (A) out of the last close onto the matched frame, then locked; the last frame
-  un-draws to frame 0 (B).
+- **Camera and joins:** a story pull (I4, not the big move; C, anchored on the focal) out of the last close onto the
+  matched frame, then locked; the last frame un-draws to frame 0 (RJ3).
 - **Never:** anything new the film has not shown; a title; a second focal.
 - **Video 4 (S12):** the home view with the warm run lit from the giant computer under the street to the one window; the
   pulse travelling the run on "could ... heat ... apartment" is the sweep, ending on the one window lighting a step
   warmer; the phone from the bottom left (SR13).
 
-### Not in the library (Part 0's NOT FOR US rows)
+## The side-on place (added from video 4's composition pass)
+
+**SR25 THE SECTION**
+- **Beat:** a side-on home place with its mechanism running through it (the street and the pipe under it, the computer
+  and the homes it heats): the setup, the explain beats and the payoff's whole run in one view.
+- **Layout:** setup A (camera ~1.6 m, the horizon y 1150-1300) seen square-on, nothing receding but the far belt. The
+  source (the cause) on a third, cut by no edge (x 66-282 in video 4: the left third); the place on the axis (the block,
+  x 378-812, its roof y >= 620); the run, the thread's path, in 2-3 legs alternating direction (along, then up: rule 8's
+  level and vertical legs), each >= 150 px: along the ground at y 1214-1330 (under the golden box, above the name block),
+  then up a narrow riser to the focal; its end within 40 px of the focal's box, at the story light (the one lit window
+  in the golden box). The run is the frame's one line and the one kept cut (a soft, irregular painted edge, never a
+  ruler line); the near street is the near quiet field. Masses: the sky with the band, one dark mass (the place, the
+  source, the far belt), the snow or the ground; the focal the hardest step. Scale: a side-on set scales at most to fill
+  y 620-1480 from its top to its lowest key read (`COMPOSITION_SHOTS.md` Part 2 §0: video 4's home view <= 1.48x).
+- **Device:** the camera holds while the thread travels the run (E9 with RM1: the run is the path); the run's legs lead
+  only because the thread travels them and they end at the light (B1's job, B8's angular shape at 0 and 90 degrees);
+  the place's windows one texture with ONE lit break, the focal (D7, E2), carrying the one hot accent (E8); the source on
+  a third (A1) and one soft counterweight high on the far side (D4).
+- **Camera and joins:** locked or the float; the thread's travel is the beat's one mover (~6-9 px/f along a leg, ~7 px/f
+  up the riser in video 4); out by C (a push or a pull anchored on the window, a follow of the thread's front) or A (into
+  the window). A hand in the near frame (SR13) moves below the run (y 1310-1480), never over it.
+- **Never:** a leg crossing the band or running on past the focal; two lit ends; the run under the name block (y >=
+  1519) or the rail; a diagram's straight cut through the ground; the source and the focal at the same brightness.
+- **Video 4 (S1, S11, S12):** the computer on the left third, the block on the axis, the one window (598, 985) in the
+  golden box; the run from the computer's foot (250, 1230) along the street at y 1272 past a manhole to the door, then
+  up the riser to the radiator (598, 1060); the resident at the window (rule 7's person near the camera, seen at home).
+
+## Not in the library (Part 0's NOT FOR US rows)
 Each with its reason and what we use instead: Part 0 (§0.3-§0.5), and the owner's override, Part 0.1. From his reels:
 the blur (X1; a near framing object's one optical blur of 2.2-3 px aside), the title over the shot (X2), the black line
 card between ideas (RJ1), the fade (X3; a declared time-passing dissolve aside), the handheld pass (RM9), the golden

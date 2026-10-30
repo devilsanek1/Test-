@@ -1,9 +1,10 @@
 # The composition library in detail: every entry with its reference and its numbers
 
 **What this is.** Part 1 of `COMPOSITION_SHOTS.md`, moved here on 2026-10-30 to keep the library page short (the
-library critique's cut, `composition/critique_library.md` §7; nothing lost). The ranking, the guidelines and the
-rules stay on `COMPOSITION_SHOTS.md`; this page is the reference behind them. Paths are from `video/docs/look/` unless they start with `video/` (as in `COMPOSITION_SHOTS.md`); codes, tiers and the A·S·F scores are `COMPOSITION_SHOTS.md` Part 0's; px at 1080 x 1920, y down; 60 fps.
-
+library critique's cut, `composition/critique_library.md` §7; nothing lost), with the judges' splits (its old Part 0.6).
+The ranking, the every-shot grammar, the guidelines and the rules stay on `COMPOSITION_SHOTS.md`; this page is the
+reference behind them. Part, § and rule numbers are that page's; paths are from `video/docs/look/` unless they start
+with `video/`; px at 1080 x 1920, y down; 60 fps.
 
 Every entry of Part 0 with its reference and its numbers in our frame. **§D1 is the spine:** the 41 ideas of the
 owner's five reels, in `composition/reels.md`'s order and with the reels' own names (A placement, B lines, C frames and
@@ -12,14 +13,15 @@ header gives the tier, the three scores (attention·story·fit) and whether we u
 the reference (the reel and the time in it: `composition/reels.md` §3, its tile on `composition/reels_sheet.jpg`), what
 it is, where it sits in our 1080 x 1920 frame, the beats and recipes it serves and, when adapted, the change in numbers.
 §D2 holds our frame additions (merged ones point to the owner's entry they joined), §D3 the moves and joins, §D4 the
-coverage. Where a device is also a rule for every shot (A1, A2, C2, D4, E5, E6, N2, N3, N5, N6, N7: rules 2-10), its
-*Serves* line names the rule; its tier is for building a shot around it. The numbers used are Part 2 §0's.
+coverage. Where an entry is also the frame's grammar in every shot (§0.3a: A1, A2, C2, D4, E5, E6, E8; N1, N2, N3, N5,
+N6, N7), its header says EVERY SHOT with the rule, and its tier is for leading a shot with it. The numbers used are
+Part 2 §0's.
 
-### D1. The owner's 41 ideas (the reels' order and names)
+## D1. The owner's 41 ideas (the reels' order and names)
 
-#### A. Where the subject sits
+### A. Where the subject sits
 
-**A1 Rule of thirds** · RARE · 1·3·3 · adapted. *Reference:* 02 at 4.75 s (a photographer on a boat, her face on the
+**A1 Rule of thirds** · EVERY SHOT (rule 6) · as a lead: RARE · 1·3·3 · adapted. *Reference:* 02 at 4.75 s (a photographer on a boat, her face on the
 right line), 03 at 0 s (a palm on the left line, a boat circled on a crossing), 04a at 7.5 s (a face on the right line,
 from low in the grass), 04b at 28.25 s (a near profile on the left line).
 - *What:* the frame cut 3 x 3; the subject on a line, the horizon on a third, never on the half.
@@ -32,7 +34,7 @@ from low in the grass), 04b at 28.25 s (a near profile on the left line).
 - *Change:* the lines are proportions and the axis's edges; the four crossings are never placement points (the upper two
   sit 40 px under the band, the lower two 30 px under the read zone's floor).
 
-**A2 Golden section (the phi grid)** · SITUATIONAL · 3·4·4 · used as it is. *Reference:* 03 at 8.0 s (a lone tree on the
+**A2 Golden section (the phi grid)** · EVERY SHOT (rule 3) · as a lead: SITUATIONAL · 3·4·4 · used as it is. *Reference:* 03 at 8.0 s (a lone tree on the
 right line at the upper line, a river winding in front).
 - *What:* lines at 0.382 / 0.618 of the frame, nearer the centre than the thirds.
 - *9:16:* x 413 / 667 (inside the subject axis), y 733 (setup B's horizon band) and y 1187 (the floor of the focal box);
@@ -53,8 +55,8 @@ house, with a path to it, in the nested cell at its foot).
 treehouse at the spiral's eye), 04a at frame 0 (the walker toward the villa at the eye as the title appears), 04b at
 22.25 s (a firework burst at the eye), 05 at 3.25 s (a hiker on a ledge at the eye).
 - *What:* a spiral built on golden rectangles; the eye travels the curve into its pole, where the subject is.
-- *9:16:* fitted to the frame (a 1080 x 1747 golden rectangle) its pole lands at x 298 / 782 and y 483-656 or 1265-1437:
-  in the band or under the read zone. Scaled so its pole is the subject (x 540-700, y 1000-1200), its outer arcs leave
+- *9:16:* fitted to the frame (a 1080 x 1747 golden rectangle) its pole lands at x 298 / 782 and y 482 / 655 or
+  1265 / 1438: at or just under the band, or under the read zone (y 600-1250). Scaled so its pole is the subject (x 540-700, y 1000-1200), its outer arcs leave
   the frame: in the tall frame the outer arc runs from the hero cloud in a top gutter down the side mass and in to the
   subject, tying the counterweight (rule 9) to the focal (rule 4).
 - *Serves:* none while it is NOT FOR US; overruled, it returns as SR6's and SR24's variant (the subject's moment
@@ -92,7 +94,7 @@ s (a carriage's two doors round the centre pole).
 - *Merged:* M4, symmetry then the break (`composition/modern.md`): at most two such frames a film; the break,
   if any, is ONE change at the axis on the turn's word.
 
-#### B. Lines that carry the eye
+### B. Lines that carry the eye
 
 **B1 Leading lines** · CORE · 3·4·5 · used as it is. *Reference:* 02 at 10.0 s (a path through tea fields from the
 bottom edge to a lone tree), 04a at 12.0 s (a sunlit path and a stair's rails converging on a man).
@@ -100,8 +102,9 @@ bottom edge to a lone tree), 04a at 12.0 s (a sunlit path and a stair's rails co
 - *9:16:* the ground fills the lower half, so the lines rise from the bottom edge (they may start under the bottom UI as
   mass edges) at 40-60 degrees, in 2-3 legs of >= 150 px, and end within 40 px of the focal's box at (480-640,
   950-1150), at the story light and the hardest value step (the lines lead, the light decides: rule 4). Never across the
-  band, never on past the focal down to the name block.
-- *Serves:* arrival, the thing at the end of the way, the payoff's sweep. **SR7, SR3, SR24.**
+  band, never on past the focal down to the name block. Seen side-on (no depth to recede into) the legs may be level and
+  vertical, B8's angular form, leading by what travels them (rule 8; SR25).
+- *Serves:* arrival, the thing at the end of the way, the payoff's sweep, a side-on run. **SR7, SR3, SR24, SR25.**
 
 **B2 Vanishing point / one point** · CORE · 4·4·4 · used as it is. *Reference:* 01 at 13.0 s (a street of mansion
 blocks, parked cars on both sides, closed by a house and trees), 04b at 25.25 s (a pier straight out into a misty lake,
@@ -214,7 +217,7 @@ its pale floor at the centre, people dotted along the ramps).
 - *Serves:* the nook's opening; the lineup in a ring. **SR4 (variant), SR21 (variant).**
 - *Change:* a round opening, or a ring seen from a raised camera.
 
-#### C. Frames, layers and levels
+### C. Frames, layers and levels
 
 **C1 Frame within a frame** · CORE · 4·5·5 · used as it is. *Reference:* 01 at 10.0 s (a platform's dark roof and two
 pillars framing a train), 02 at 0 s (a round moon gate in a sunlit wall, a walker crossing it), 04a at 5.25 s (the gap
@@ -224,7 +227,7 @@ between two flights of a stairwell, a man on the stairs in it), the titles (two 
   top at y >= 620, the aperture >= 10 L* off its rim; a figure 150-300 px dark inside it.
 - *Serves:* the subject's moment; the start of a push-through (A). **SR6, SR4, SR2, SR8, SR17.**
 
-**C2 Foreground** · RARE · 1·2·4 · used as it is. *Reference:* 02 at 2.25 s (a lotus pond in the bottom 35 %, a pagoda
+**C2 Foreground** · EVERY SHOT (rule 10) · as a lead: RARE · 1·2·4 · used as it is. *Reference:* 02 at 2.25 s (a lotus pond in the bottom 35 %, a pagoda
 beyond it), 05 at 9.0 s (the corner of a white house's roof and terrace over the lower-left half, the sea beyond).
 - *What:* a near layer at the frame's edge that gives depth and a place to stand.
 - *9:16:* the near band (y 1250-1920) is its home, one mass that may run under the bottom UI; a hint: <= 2 props cut by
@@ -240,7 +243,7 @@ walker high on it, three people waiting on the platform below).
   of 30-45 degrees; the subject on one level in the golden box, the life or the effect on the other.
 - *Serves:* cause and effect; two places joined. **SR11.**
 
-#### D. Masses, balance and contrast
+### D. Masses, balance and contrast
 
 **D1 Negative space** · CORE · 3·5·5 · used as it is. *Reference:* 04a at 9.75 s (a boy low on the left third facing a
 stepped stream in a forest).
@@ -252,9 +255,10 @@ stepped stream in a forest).
 **D2 Scale** · CORE · 4·4·4 · used as it is. *Reference:* 04a at 16.5 s (a man at a bridge railing beside a weathered
 red-and-white tower that fills half the picture).
 - *What:* a small known thing (a person) beside a huge one, so the eye reads the size.
-- *9:16:* the tall thing >= 0.7 H (>= 1344 px) and >= 10:1 over the figure, rising past the top edge (its face across
-  the band one flat field, or its top in a gutter); the figure 130-220 px (60-150 px in a K wide) low near the axis (x
-  420-660), its feet above y 1250.
+- *9:16:* the tall thing >= 0.7 H (>= 1344 px) and >= 10:1 over the figure (its full height, cut by the top:
+  `LAYOUT.md` §2 K7), rising past the top edge (its face across the band one flat field, or its top in a gutter); the
+  "you" 130-220 px near the camera (strangers 15-60 px as the tiny anchors) low near the axis (x 420-660), its feet
+  above y 1250.
 - *Serves:* the scale beats. **SR15, SR14, SR17.**
 
 **D3 Balance** · NOT FOR US · 1·2·2 · the owner's override: Part 0.1. *Reference:* 03 at 11.0 s (two trees of the same
@@ -267,7 +271,7 @@ size, one each side of a valley).
   equal masses are two equal calls. Instead: D4's one soft counterweight.
 - *Change:* the two masses are the frame, never the subjects.
 
-**D4 Unbalanced (the steelyard)** · SITUATIONAL · 2·3·4 · adapted. *Reference:* 03 at 9.5 s (a big tree at the left, a
+**D4 Unbalanced (the steelyard)** · EVERY SHOT (rule 9) · as a lead: SITUATIONAL · 2·3·4 · adapted. *Reference:* 03 at 9.5 s (a big tree at the left, a
 small house far right).
 - *What:* unequal masses in balance: the farther out a mass sits, the more it weighs, so a small strong one near the
   centre is balanced by a big soft one far out (or the reverse).
@@ -301,7 +305,7 @@ along a warm wall, a man leaning out of the fifth).
   %), one break, the call, at (413-667, 860-1100); never two breaks.
 - *Serves:* the one among many; how many. **SR8, SR21.**
 
-#### E. Moves the examples make without naming them
+### E. Moves the examples make without naming them
 
 **E1 One small figure where the lines meet** · SITUATIONAL · 4·3·4 · used as it is. *Reference:* 11 of the 24 photo
 examples, among them 04a at 0 s (the walker toward the villa), 04b at 25.25 s (the man on the pier), 04a at 5.25 s (the
@@ -339,7 +343,7 @@ light).
 - *Serves:* a person's moment; the "you"; a follow's lead room. **SR9, SR14, SR10.**
 - *Change:* the rail moves the right edge to x 870; from behind, the room is up the frame.
 
-**E5 A soft near layer** · RARE · 2·2·4 · adapted. *Reference:* 02 at 2.25 s (the lotus, out of focus), 04a at 7.5 s
+**E5 A soft near layer** · EVERY SHOT (rule 10) · as a lead: RARE · 2·2·4 · adapted. *Reference:* 02 at 2.25 s (the lotus, out of focus), 04a at 7.5 s
 (grass blades soft at the left), 04b at 28.25 s (a blurred near profile).
 - *What:* a near thing at an edge, out of focus.
 - *9:16:* the near layer simpler and lower in contrast instead: within 8 L* of the near shade mass, its edges lost, cut
@@ -348,7 +352,7 @@ light).
 - *Change:* no focus blur (DIRECTION rule 5): softness by value, not by focus; DIRECTION 5's one exception, a near
   framing object's single optical blur (2.2-3 px: `CRAFT.md` §f), stays allowed.
 
-**E6 Atmospheric layers** · SITUATIONAL · 3·3·5 · used as it is. *Reference:* 02 at 7.5 s (two ridges in a peach haze
+**E6 Atmospheric layers** · EVERY SHOT (`CRAFT.md` §f.2, rule 2) · as a lead: SITUATIONAL · 3·3·5 · used as it is. *Reference:* 02 at 7.5 s (two ridges in a peach haze
 behind the pavilion), 04a at 16.5 s (hazy hills behind the tower), 05 at 3.25 s (mist among the peaks).
 - *What:* ridges, far shores and far rows paler with distance.
 - *9:16:* 3-5 layers stacked up the frame, each farther one higher and a step nearer the sky's value (the farthest
@@ -363,7 +367,7 @@ ended by the man).
   into the sky (the eye leaves through it).
 - *Serves:* the lane, the path. **SR3, SR7.**
 
-**E8 One colour accent on the subject** · CORE · 4·5·5 · used as it is. *Reference:* 05 at 3.25 s (the hiker's blue
+**E8 One colour accent on the subject** · EVERY SHOT (rule 4) · as a lead: CORE · 4·5·5 · used as it is. *Reference:* 05 at 3.25 s (the hiker's blue
 shirt, the one saturated colour among grey peaks), 01 at 10.0 s (the red train behind the walkers), 04a at 16.5 s (the
 tower's red top).
 - *What:* one saturated colour, on the subject.
@@ -393,22 +397,25 @@ near profile on the left third, looking at a sunset and a lit tram).
 gimbal up into the frame over the spiral stair, the title beside it).
 - *What:* the maker's hand and tool in the near frame.
 - *9:16:* the hand and forearm from the bottom LEFT (the wrist runs under the bottom UI as a mass), the thing in hand at
-  (300-600, 1000-1250), its face inside x <= 870 and y <= 1480; the cause above it on the axis.
+  (300-600, 1000-1250), or lower (y 1310-1480) where the thread's run crosses that box (the thread wins), its face inside
+  x <= 870 and y <= 1480; the cause above it on the axis.
 - *Serves:* "for you"; a hook whose effect lands in the hand. **SR13.**
 
-#### T. The reels' own teaching device
+### T. The reels' own teaching device
 
 **T The line first, then the world under it** · CORE · 5·5·5 · adapted. *Reference:* all five reels (01 at 4.25 s, the
 red lines on black before the escalator; 03 throughout, a pen tracing a red armature over a grey value thumbnail).
 - *What:* an abstract line (the idea) on black; the shot appears under it, and the line turns out to trace the shot.
-- *9:16:* our opening's draw-on (DIRECTION rule 9): the subject's line in the clean pen, the world flooding in under it,
-  the bold event >= 1 s, peaking after 0.4 s; once per idea (a mechanism drawn as a line first, a chart in step with the
-  voice); for the G3 board, the red armature over a grey value thumbnail (these sheets).
+- *9:16:* our opening's draw-on (DIRECTION rules 4, 9): the subject's line draws on in the clean pen, then the colour
+  floods in over it and the line ends under its fill (no outline stays); the painted pieces paint on stroke by stroke and
+  the light floods in from its source; the bold event >= 1 s, peaking after 0.4 s; after frame 0 only where the drawing
+  is the beat (a chart line in step with the voice: DIRECTION 8); for the G3 board, the red armature over a grey value
+  thumbnail (these sheets). It draws frame 0 in every film and never counts as a shot's lead (Part 0b §2).
 - *Serves:* the hook; the proof. **SR1, SR22.**
-- *Change:* the line draws on and the colour floods in; never the reels' opacity cross-fade, never a title over the shot
-  (X2, X3: NOT FOR US, Part 0).
+- *Change:* the line draws on and the colour floods in over it; never the reels' opacity cross-fade, never a title over
+  the shot (X2, X3: NOT FOR US, Part 0).
 
-### D2. Our frame additions (not in the owner's reels)
+## D2. Our frame additions (not in the owner's reels)
 
 Frames our research adds (`composition/cinema.md`, `composition/vertical.md`, `composition/modern.md`,
 `CINEMATIC_GUIDE.md`, `COZY_AND_SCALE.md`), the three the first library used without a reel behind them (N13-N15) and
@@ -417,14 +424,14 @@ the size ladder (Z1-Z4: the close is N9). They come after the owner's ideas and 
 *Merged into the owner's entries* (`composition/catalogue_notes.md` §3): N4 the repoussoir is B10's one framing wing, N8
 the zigzag way in is B8's angular form, N10 the pivot is E3 with the camera moving (its motion I12).
 
-**N1 The centre, the first look** · CORE · 5·5·4 · used as it is. *Source:* `composition/cinema.md` §1, §4.3 [S7, S10];
+**N1 The centre, the first look** · EVERY SHOT (rule 3) · as a lead: CORE · 5·5·4 · used as it is. *Source:* `composition/cinema.md` §1, §4.3 [S7, S10];
 `composition/vertical.md` §3.1, V8 [V5].
 - *What:* a new shot's first look lands at the screen's centre, whatever the picture holds.
 - *9:16:* (540, 960): a focal there costs no search, one 300 px away (~4 degrees) costs a saccade; a centred subject in
   vertical video held the eye better than a moving one.
 - *Serves:* the hook, the close, the proof. **SR1, SR12, SR22.**
 
-**N2 The stage square (rabatment)** · CORE · 3·4·5 · used as it is. *Source:* `composition/cinema.md` §1 [S3];
+**N2 The stage square (rabatment)** · EVERY SHOT (rule 2) · a rule, not ranked (3·4·5) · used as it is. *Source:* `composition/cinema.md` §1 [S3];
 `composition/vertical.md` §2.
 - *What:* the tall frame's implied squares: the top one (y 0-1080) holds the words and the sky, the bottom one (y
   840-1920) the stage and the near ground; the stage square (y 600-1520) is the picture under the words.
@@ -433,14 +440,14 @@ the zigzag way in is B8's angular form, N10 the pivot is E3 with the camera movi
   edge: keep that edge clean.
 - *Serves:* every shot's placement (rules 2-3); A3 and A5 are built on it. **All recipes.**
 
-**N3 The horizon off the half, and the line of heads** · SITUATIONAL · 2·3·4 · used as it is. *Source:*
+**N3 The horizon off the half, and the line of heads** · EVERY exterior (rule 6) · as a lead: SITUATIONAL · 2·3·4 · used as it is. *Source:*
 `composition/cinema.md` §3.2-3.3, §4.1 (C2-C3; J. T. Smith 1797 via [S3]).
 - *What:* the horizon's height is the master decision of an exterior; with a level camera every standing head is on it.
 - *9:16:* setup A y 1150-1300 (camera 0.9-1.6 m), setup B y 690-860 (camera 3-7 m), never y 900-1020; a figure's feet at
   y_h + P·c/h, its head at y_h - P·(h - c)/h (Part 2 §0).
 - *Serves:* every exterior (rule 6). **SR2, SR9, SR14.**
 
-**N5 Headroom: the drop** · CORE · 4·4·4 · adapted. *Source:* `composition/cinema.md` §4.7 [S14];
+**N5 Headroom: the drop** · EVERY SHOT (rule 3) · a rule, not ranked (4·4·4) · adapted. *Source:* `composition/cinema.md` §4.7 [S14];
 `composition/vertical.md` §3.3, §7.1.
 - *What:* the room above the subject.
 - *9:16:* the caption band is the headroom: tops at y >= 620; the focal's centre 300-450 px under the block's foot (y
@@ -448,7 +455,7 @@ the zigzag way in is B8's angular form, N10 the pivot is E3 with the camera movi
 - *Serves:* every shot (rule 3). **SR6 (named).**
 - *Change:* the band is the headroom, and its depth is a number.
 
-**N6 Depth stacked up the frame (and the three distances)** · SITUATIONAL · 2·3·5 · used as it is. *Source:*
+**N6 Depth stacked up the frame (and the three distances)** · EVERY exterior (rule 2) · as a lead: SITUATIONAL · 2·3·5 · used as it is. *Source:*
 `composition/cinema.md` §4.8 [S15, S19]; `composition/vertical.md` §2.
 - *What:* near, middle and far planes; in 9:16 they stack UP the frame, each farther one higher (the hanging scroll),
   and Guo Xi's three distances: high (looking up), deep (into the distance), level (out over a low land).
@@ -456,7 +463,7 @@ the zigzag way in is B8's angular form, N10 the pivot is E3 with the camera movi
   the worm's-eye, deep = the S1 and S5 moves, level = S4's thin land under a huge sky.
 - *Serves:* every wide. **SR2, SR14, SR15, SR16, SR17.**
 
-**N7 Figure and ground: notan and counterchange** · CORE · 5·5·5 · used as it is. *Source:* `composition/cinema.md`
+**N7 Figure and ground: notan and counterchange** · EVERY SHOT (rule 5) · as a lead: CORE · 5·5·5 · used as it is. *Source:* `composition/cinema.md`
 §4.13-4.14 [S1, S2].
 - *What:* at two values the subject is one closed shape on a field of the other value; at the focal, light against dark.
 - *9:16:* at a 2-value cut the subject is one shape a viewer can name at 0.25 scale; the focal's step >= 65 L*; its
@@ -465,7 +472,8 @@ the zigzag way in is B8's angular form, N10 the pivot is E3 with the camera movi
 
 **N9 Isolation** · CORE · 5·4·4 · used as it is. *Source:* `composition/cinema.md` §2 [S1, S16].
 - *What:* size on screen and space round it make the subject important.
-- *9:16:* one object >= 60 % W (>= 650 px), its own backing one quiet field, a calm ring of 30-60 px round it.
+- *9:16:* one object >= 60 % W (>= 650 px), its own backing one quiet field, a calm ring of 30-60 px round it; an
+  object (a mug, a radiator, a phone), never a building or a wall up close (the playbook's "suffocating").
 - *Serves:* the close, the proof. **SR12, SR22.**
 
 **N11 The low angle (worm's-eye)** · SITUATIONAL · 3·3·3 · adapted. *Source:* `composition/cinema.md` §3.1 [S12, S13].
@@ -495,7 +503,8 @@ own).
 **N15 The off-balance** · RARE · 2·3·3 · used as it is. *Source:* `composition/cinema.md` §9 (its reading of reel 03's
 "unbalanced"; contrast and affinity [S17]).
 - *What:* one heavy side and nothing against it: tension.
-- *9:16:* the focal at x 250-380 or 700-830 (inside the clear window), no counterweight, the other side open.
+- *9:16:* the focal at x 250-380 or 700-830 (inside the clear window), no counterweight, the other side open; its
+  jump from the last focal the turn's declared exception (rule 19: past 220 px, within ~370).
 - *Serves:* the "But" turn. **SR18.**
 
 **M3 Short-siding and the low quadrant** · RARE · 2·2·2 · adapted. *Source:* `composition/modern.md` M3 [N36; cinema
@@ -512,8 +521,10 @@ S10].
 **Z1 The extreme wide** · SITUATIONAL · 3·3·3 · used as it is. *Source:* `composition/cinema.md` §2 [S12, S13];
 `LAYOUT.md` §2 (the K wides).
 - *What:* the place and its scale: the world past every edge, the subject or the "you" tiny.
-- *9:16:* 5-7 planes, one landmark huge yet far; the "you" 60-150 px (a K wide) or 170-200 px (S5's end); the masses the
-  simplest of all (three masses and one call at a glance); ~1.5-4 s.
+- *9:16:* 5-7 planes, one landmark huge yet far; the "you" 130-220 px near the camera (S5's end 170-200 px), never a
+  far panorama: the scale from the world past every edge and tiny strangers 15-60 px (the playbook's DEPTH AND SCALE
+  over `LAYOUT.md` §2's 60-150 px K-wide observer: `composition/library_clashes.md` row 30); the masses the simplest of
+  all (three masses and one call at a glance); ~1.5-4 s.
 - *Serves:* the scale beat, 1-2 a film. **SR15, SR17.**
 
 **Z2 The wide** · SITUATIONAL · 2·4·4 · used as it is. *Source:* `composition/cinema.md` §2 [S12, S13].
@@ -553,9 +564,10 @@ S10].
   grid, is D7.
 - *Serves:* one small life singled out by light in an indifferent vastness, once. **SR15 (variant).**
 
-### D3. The moves and the joins (the owner's reels' first)
+## D3. The moves and the joins (the owner's reels' first)
 
-What each move and join is, where it comes from and what the engine has for it; its tier and when to use it are Part 0
+What each move and join is, where it comes from and what the engine has for it (RM8b, the build, shares RM8's row and
+engine); its tier and when to use it are Part 0
 (§0.4, §0.5), its timing, easing and carrier Part 0b §3. The owner's reels were measured frame by frame for motion
 (`composition/motion.md` §1): 17 of their 23 example shots are locked or nearly, the life being the subject travelling
 the device's line; every idea is joined by a hard cut through a black line card; reel 03 is one continuous take. Engine
@@ -570,9 +582,9 @@ paths are from `video/src/` (`lib/`) and `video/scripts/`.
 | RM5 | A slow pan, the drift (the parallax float) | SITUATIONAL | 2·2·5 | 05 at 3.9 s (a pan of 1.7 %W/s over the hiker); small drifts in 04a and 04b | ours: every plane drifts by its depth (the owner, 2026-10-28: "planes move by depth") | exists: floatCam (`lib/idle.ts`), PARALLAX_K (`lib/depth.ts`) |
 | RM6 | A burst at the focal (the light event) | CORE | 5·4·4 | 04b at 23.1 s (fireworks at the spiral's eye) | light flares or switches on at the focal of a held frame | partly: windowLit, LitWindows, Glow; new: a lightPull helper (shared with I11) |
 | RM7 | The locked frame (the hold) | CORE | 3·4·5 | 01 at 14.1 s, 02 at 11.3 s, 04a at 10.4 s, 05 at 9.8 s: nothing moves, held 1.3-2.6 s | the camera does not move; the subject's own events carry the time | exists: CineCamera or ShotCam with no keys; `scripts/qa/deadframes.py` |
-| RM8 | The line drawn live, then the world under it (T in motion) | CORE | 5·5·5 | 03 throughout (a pen traces each armature live, ~1 s a panel); 04a at 0 s (a spiral drawn over frame 0, gone by 0.75 s) | the subject's line draws on with a pen tip, the colour floods in; later the build (pops, ticks, growth) | exists: Ink, Fill, Pop, Rise (`lib/Ink.tsx`, `lib/Fill.tsx`, `lib/motion.tsx`); the un-build in `lib/exit.tsx` |
+| RM8 | The line drawn live, then the world under it (T in motion) | CORE | 5·5·5 | 03 throughout (a pen traces each armature live, ~1 s a panel); 04a at 0 s (a spiral drawn over frame 0, gone by 0.75 s) | the subject's line draws on with a pen tip, then the colour floods in over it (no outline stays); its second half, RM8b, is the build (pops, ticks, growth; never a draw-on) | exists: Ink, Fill, Pop, Rise (`lib/Ink.tsx`, `lib/Fill.tsx`, `lib/motion.tsx`); the un-build in `lib/exit.tsx` |
 | RM9 | The handheld pass | NOT FOR US | 1·1·1 | 03, 0-19.2 s (a handheld phone drifting 1.5-7.7 %W/s over the sheet) | a hand-held camera wanders and wobbles | a parameter kept at 0 (CineCamera handheld) |
-| I4 | The pull-back, the one big move (S5) | CORE | 4·4·5 | ours: `CINEMATIC_GUIDE.md` S5 (the owner's favourite Arcane shot), `COZY_AND_SCALE.md` K4 | the camera pulls back until the world opens round the pivot | exists: `lib/pullback.tsx` (S5_EASE, PullPlane) |
+| I4 | The pull-back: a story pull; at scale the one big move (S5) | CORE | 4·4·5 | ours: `CINEMATIC_GUIDE.md` S5 (the owner's favourite Arcane shot), `COZY_AND_SCALE.md` K4 | the camera pulls back: a story pull (<= ~2.3x continuous, carrying its own event), or at full scale until the world opens round the pivot (the nested pull beyond ~2.3x: Part 0b §3) | exists: `lib/pullback.tsx` (S5_EASE, PullPlane) |
 | I5 | The reveal tilt (and pan) | SITUATIONAL | 3·4·3 | ours: `COZY_AND_SCALE.md` K2; Arcane P7 (`research/cine_motion.md`) | the camera tilts up or down over a tall thing | exists: CineCamera tilt and pan keys; partly: the `unveil` ease only on the board (`video/src/v3/SketchReel.tsx`) |
 | I6 | The crane: the rise-over (S1) | SITUATIONAL | 3·3·4 | ours: `CINEMATIC_GUIDE.md` S1, `COZY_AND_SCALE.md` K3 | the camera rises over a near wall and the world opens past it | exists: CineCamera y keys; Ledge, Balustrade (`lib/cine/props.tsx`, references) |
 | I11 | The light pull (our focus pull) | CORE | 5·5·4 | ours: `composition/motion.md` I11 (no blur in our look, so the light moves instead of the focus) | in a held frame the light moves from one thing to the next | partly: windowLit, the World sky's keys, `lib/light2`; new: lightPull |
@@ -584,8 +596,8 @@ paths are from `video/src/` (`lib/`) and `video/scripts/`.
 | X3 | The fade-in under the lines (the cross-fade) | NOT FOR US | 1·1·1 | 01 (the shot fades in under the lines in 0.17-0.37 s), 04b (a 0.5 s fade-in); the overlays fade out in 0.1-0.6 s | one picture fades into the next | none: nothing in `lib/motion.tsx` animates opacity |
 | RJ2 | The hard cut | RARE | 3·3·2 | 02, 04a, 05: a one-frame cut from the card to the shot; every idea-to-idea join | a plain cut, nothing carried | exists: Film cut; `scripts/qa/gate_check.py` counts the F joins |
 | RJ3 | The loop back to the opening frame | CORE | 3·4·5 | 01 at 16.0 s, 05 at 12.3 s: a hard cut back to the opening | the end returns to the first frame, so the rewatch starts seamlessly | exists: Film transitionOut 'unbuild', `lib/exit.tsx` |
-| RJ4 | One continuous take, no cut | CORE | 4·5·5 | 03, 0-19.2 s: one continuous shot over the drawn sheet, 18 ideas, no cut | no cut is seen: the camera moves on from one view of the place to the next | exists: Film camera-continuous; the matchcut seam (seam: true) |
-| J2 | The push-through, and the pull-out of an opening | CORE | 5·5·5 | ours: `CRAFT.md` §a carrier A; `COZY_AND_SCALE.md` K9; Arcane T7, P8 | the camera pushes into an opening in this shot and comes out of the next shot's own opening | exists: Film push-through; partly: K9's Portal (to build) |
+| RJ4 | One continuous take, no cut | CORE | 4·5·5 | 03, 0-19.2 s: one continuous shot over the drawn sheet, 18 ideas, no cut | no cut is seen: the camera moves on from one view of the place to the next (at a seam <= 1.15x or 150 px; a larger change is a move inside one panel) | exists: Film camera-continuous; the matchcut seam (seam: true) |
+| J2 | The push-through, and the pull-out of an opening | CORE | 5·5·5 | ours: `CRAFT.md` §a carrier A; `COZY_AND_SCALE.md` K9; Arcane T7, P8 | the camera pushes into an opening in this shot and comes out of the next shot's own opening (that pull-out is its second leg, never a pull-back on its own) | exists: Film push-through; partly: K9's Portal (to build) |
 | J3 | The match cut on shape | CORE | 4·5·5 | ours: `CRAFT.md` §a carrier B; `composition/modern.md` M20 | a hard cut where one shape keeps its spot (a circle, a vertical, an apex, an opening) | exists: Film matchcut; new: an anchor check at the boundary frames |
 | T2 | Pinned-anchor jump cuts | RARE | 3·3·2 | ours: Arcane T2 (`research/cine_light.md` §4) | a short run of quick cuts round one bright anchor pinned at its spot | exists: Film cut and matchcut; new: the anchor check |
 | J4 | The match cut on light and colour | CORE | 5·4·4 | ours: Arcane T1 (the layout correlated 0.81-0.90 across such cuts) | a hard cut where a bright shape or the hot accent keeps its spot | exists: Film matchcut; the colour-shift and eye-jump metrics (`scripts/qa/retro_tools/story/carry.py`) |
@@ -595,12 +607,12 @@ paths are from `video/src/` (`lib/`) and `video/scripts/`.
 | J8 | The wipe by a near mass | SITUATIONAL | 3·3·3 | ours: `CRAFT.md` §a carrier D; Arcane T3, T5; S5's chimney pot | a near mass of the world passes the lens and hides the change | partly: Film foreground-wipe with element 'scene'; new: a clean-pen near-mass wiper per film |
 | J9 | The whip | NOT FOR US | 2·2·1 | ours: `composition/motion.md` J9 [MO21, MO22] | a very fast pan that smears one shot into the next | none built |
 | J10 | The morph: one thing becomes the next | CORE | 5·5·3 | ours: `composition/modern.md` M24 | an object transforms into the next scene's object, staged | partly: interpolatePath (`@remotion/paths`, installed, unused); new: a staged-morph helper |
-| J11 | The light change: time passes in place | CORE | 4·4·4 | ours: `composition/motion.md` J11; Arcane T6 | the same frame, its light changed (a lamp, a window, the sky) | partly: the World sky's keys, windowLit, `lib/light2` |
+| J11 | The light change: time passes in place | CORE | 4·4·4 | ours: `composition/motion.md` J11; Arcane T6 | the same frame across a cut, its light changed (a lamp, a window, the sky); inside one panel the change is RM6 or I11, no join | partly: the World sky's keys, windowLit, `lib/light2` |
 | J13 | The card flip or swipe of the same paper | SITUATIONAL | 3·3·3 | ours: `CRAFT.md` §a carrier E; v1's flip | the paper turns or swipes to its next page in place | partly: flipOut, flipIn (`lib/Card.tsx`); new: an E type in Film |
 | J15 | The sound bridge (the J-cut and the L-cut) | SITUATIONAL | 3·4·4 | ours: `composition/motion.md` §4.4 [MO19, MO20]; `SOUND_SYNC.md` O6 | the next place's sound starts before its picture, or the last one's trails under the new picture | partly: Film sfx; `scripts/qa/av_lag.py`, `scripts/qa/beatsync.py` |
 | X11 | Effect transitions: spins, glitches, RGB splits, flashes | NOT FOR US | 1·1·1 | ours: `composition/modern.md` §7; Arcane T4 | a designed transition effect | none (`scripts/qa/framecheck.py` flags 1-2 frame flashes) |
 
-### D4. Coverage: every reference item has a place and a tier
+## D4. Coverage: every reference item has a place and a tier
 
 - **The owner's 41 ideas and T are all entries,** in his reels' order and names (§D1), each with its tier: 12 CORE, 16
   SITUATIONAL, 12 RARE, 2 NOT FOR US (A4 the golden spiral, D3 balance; Part 0.1 to overrule). The first library had
@@ -612,18 +624,21 @@ paths are from `video/src/` (`lib/`) and `video/scripts/`.
 - **Where each is used:** the recipes that name each frame are Part 0's last column, and Part 2 §2 lists each recipe's
   devices by tier. Every device code a recipe names exists in Part 0; no device needed a recipe of its own beyond
   SR1-SR24 (the ones without one are named variants of the recipe whose camera they share).
-- **Ours (45):** 15 CORE, 16 SITUATIONAL, 5 RARE, 9 NOT FOR US; none replaces an idea of his: where one of ours covered
-  the same choice it was merged into his entry under his name (B8, B10, E3 above; `composition/catalogue_notes.md` §3).
-- **Thumbnails:** each frame device of the first library has a value thumbnail on `composition/devices_sheet.png` (the
-  owner's 41 first); `composition/library_sheet.png` shows the frames by tier, CORE big, with the move and the join each
-  pairs with.
+- **Ours (45):** 13 CORE, 16 SITUATIONAL, 5 RARE, 9 NOT FOR US, and N2 and N5 as rules of every shot (not ranked);
+  none replaces an idea of his: where one of ours covered the same choice it was merged into his entry under his name
+  (B8, B10, E3 above; `composition/catalogue_notes.md` §3).
+- **Every shot:** six of his ideas (A1, A2, C2, D4, E5, E6) and E8 are the frame's grammar in every shot, shown first on
+  the library page (§0.3a) and on the sheet, whatever their tier as a lead.
+- **Thumbnails:** `composition/library_sheet.png` shows the every-shot grammar first, then the frames by tier, CORE big,
+  with the move and the join out each pairs with. `composition/devices_sheet.png` keeps one value thumbnail per device of
+  the first library (the owner's 41 first); its YES and ADAPT labels are that library's verdicts, superseded by the
+  tiers.
 
-## The judges' splits (moved from `COMPOSITION_SHOTS.md` Part 0.6)
-
+## The judges' splits (moved from `COMPOSITION_SHOTS.md` Part 0.6): where they differ by 2 or more (24 entries)
 
 The three lenses measure different things, so they split where a tool is quiet but free (a structure our frame already
 has: high fit, low attention) or loud but costly (high attention, low fit). **How settled:** by the rule, never by hand:
-the mean decides the tier. 22 of the 24 would change tier if their outlying lens were dropped (all but D1 and J10), so
+the mean decides the tier. 22 of the 24 would change tier if either extreme lens were dropped (all but D1 and J10), so
 for those the split decides the CONDITION of use: the low lens names the risk, and the entry's condition in Part 0
 guards against it. The judges' own reasons are in `composition/judges/`.
 
@@ -643,7 +658,7 @@ guards against it. The judges' own reasons are in `composition/judges/`.
 | E5 | 2·2·4 | attention and story: a restraint with no job, under the name block; fit: softness by value at no cost | RARE as the shot's device; softness by value in every near thing (rule 10) |
 | E6 | 3·3·5 | attention and story: a quieting tool; fit: `CRAFT.md` §f.2 as written | SITUATIONAL as the shot's device; every exterior keeps §f.2's steps |
 | E10 | 2·4·5 | attention: a body is a magnet that can take the first look; story and fit: DIRECTION 7's "you" exactly | SITUATIONAL; attention's risk becomes the check: tier B, its pull < 50 % of the focal's, its sightline through the focal's box |
-| N2 | 3·4·5 | attention: structure, not a pull; fit: the frame's own grammar | CORE (every shot) |
+| N2 | 3·4·5 | attention: structure, not a pull; fit: the frame's own grammar | not ranked: a rule of every shot (§0.3a) |
 | N3 | 2·3·4 | attention: no effect of its own; fit: the master decision of every exterior, only partly built (no setup helper) | SITUATIONAL as the shot's device; rule 6 in every exterior |
 | N6 | 2·3·5 | attention: the pull belongs to E6, I12 and I4; fit: the tall frame's own depth | SITUATIONAL as the shot's device; rule 2 in every exterior |
 | N13 | 3·3·5 | attention and story: the person and the opening are two calls, its job is mood; fit: LAYOUT §2's cozy home in one device | SITUATIONAL; the cozy home's frame, with B10 and C1 (>= 50 % of the runtime) |
