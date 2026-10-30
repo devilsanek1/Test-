@@ -13,6 +13,11 @@ points and conclusions into the main repo"). The brief is `README.md` here; the 
   three directions (editorial, painterly, graphic) as still sheets -> `video/docs/look/PEOPLE_DESIGN.md` (DRAFT system) +
   `people_design/directions_compare.png`. Resume: `Workflow({scriptPath, resumeFromRunId: "wf_2f7a2fc2-354"})`.
 - NEXT: send the compare sheet + the three direction sheets; the owner picks a direction; then the system goes final.
+- ALSO RUNNING: workflow `organic-look` (run `wf_238386b4-a11`; owner on the difference list: proper light, one colour key,
+  near sharp / far painterly, "too square and proper ... Do deep research into techniques libraries etc", composition,
+  texture): research (techniques, libraries tried, shapes measured, light, composition) -> proofs on v6 (organic pieces;
+  story light + texture + colour key) -> `video/docs/look/ORGANIC.md` (painter v7 roadmap) + `docs/look/organic/index.jpg`.
+  Resume: `Workflow({scriptPath, resumeFromRunId: "wf_238386b4-a11"})`.
 
 ## Status 2026-10-30 ~00:15 UTC: the recipe book is DONE; painter v6 runs
 - DONE: `video/docs/look/PAINT_RECIPES.md` (+ `paint_recipes/{sky_clouds,water,foliage,built_ground,people}.md`, swatches,
