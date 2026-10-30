@@ -36,5 +36,5 @@ export const HER_LIGHT = {
  *  Pip, a thin sun rim (tier B, scaled to its 70). */
 export const PIP_LIGHT = {
   sun: {width: 1.2, opacity: 0.45, soft: 0.3},
-  shade: {tint: '#8F86B8', opacity: 0.92},
+  shade: {tint: '#7A70A6', opacity: 0.95},
 } as const;

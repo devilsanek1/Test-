@@ -51,10 +51,13 @@ export type V7CtxV = {
   movers: boolean;
   /** The canal's design frame (the vector water, unkeyed). */
   design: boolean;
+  /** The bake's marker render: v2's lamp role (the lit panes) drawn as pure green, so the bake finds every lit pane
+   *  exactly (the keyed cream sits too close to the limestone piers to pick by colour). */
+  marker: boolean;
   maps: MapSet;
 };
 const EMPTY: MapSet = {slots: {}, live: {}};
-const Ctx = createContext<V7CtxV>({look: 'v7a', parts: null, movers: true, design: false, maps: EMPTY});
+const Ctx = createContext<V7CtxV>({look: 'v7a', parts: null, movers: true, design: false, marker: false, maps: EMPTY});
 export const V7CtxProvider: React.FC<{value: V7CtxV; children?: React.ReactNode}> = ({value, children}) => <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 export const useV7 = () => useContext(Ctx);
 /** Step 1 (the key) in force (looks 'key' and 'v7a'). */

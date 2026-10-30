@@ -36,7 +36,7 @@ import {useSwitches} from '../paint_s1/switches';
  *  before any frame renders: the vector canal (the painter's design frame) then mirrors boat A alone. A scene-level
  *  override in v7's own bundle only (the entry imports nothing else that draws BOAT_B); a film would give its water
  *  spec its own boats list. */
-// DEBUG Object.assign(BOAT_B as BoatOpts, {x: 2600});
+Object.assign(BOAT_B as BoatOpts, {x: 2600});
 
 type Pt = [number, number];
 const r1 = (n: number) => Math.round(n * 10) / 10;

@@ -17,20 +17,29 @@ import {RIG_CANAL} from '../../v2r/world/rigs';
 import {CM} from '../../v2r/palette';
 import {FLOOD, FLOOD_ORIGIN, S1_PALE} from '../paint_s1/V2S1_clock';
 import {SkyFlood} from '../paint_s1/V2S1_sky';
-import {S1Particles} from '../paint_s1/V2S1_particles';
 import {useSwitches} from '../paint_s1/switches';
 import {shadeRig, TextureSlot} from '../paint_s1/engine';
 import {useTime} from '../../lib/time';
 import {PARALLAX_SKY} from '../../lib/depth';
 import {v6Rig} from '../paint_s1/v6';
 import {duskS1Rig} from '../light_s1/LightV2S1';
+import {CM_V2} from '../paint_s1/palette_10b';
 import {keyV7} from './palette_v7';
 import {Seg, useKeyed, useV7} from './context';
 import {V7World} from './V7World';
 import {HerLit, PipLit} from './movers';
+import {V7Particles} from './V7Particles';
+
+/** The bake's marker: the lit panes (v2's lamp role) pure green, the rest keyed. */
+const MARK = CM_V2.lamp.toUpperCase();
+const markerV7 = (c: string) => (c && c.toUpperCase() === MARK ? '#00FF00' : keyV7(c));
 
 /** The key around a subtree (looks 'key' and 'v7a'); look 'cut' draws v6's colours. */
-const Keyed: React.FC<{children?: React.ReactNode}> = ({children}) => (useKeyed() ? <Tod map={keyV7}>{children}</Tod> : <>{children}</>);
+const Keyed: React.FC<{children?: React.ReactNode}> = ({children}) => {
+  const keyed = useKeyed();
+  const {marker} = useV7();
+  return keyed ? <Tod map={marker ? markerV7 : keyV7}>{children}</Tod> : <>{children}</>;
+};
 
 export const V7Scene: React.FC<{slab?: string}> = ({slab}) => {
   const sw = useSwitches();
@@ -53,7 +62,7 @@ export const V7Scene: React.FC<{slab?: string}> = ({slab}) => {
         </Look>
         <Seg name="particles">
           <Keyed>
-            <S1Particles />
+            <V7Particles />
           </Keyed>
         </Seg>
       </Lit>

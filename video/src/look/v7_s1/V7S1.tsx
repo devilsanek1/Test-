@@ -22,7 +22,7 @@ import {applyFloat, applyPalette, applyPen} from '../paint_s1/engine';
 import {POSTER_S1_FPS, POSTER_S1_FRAMES} from '../paint_s1/PosterS1';
 import {V7CtxProvider, type LookName, type SegName} from './context';
 import {V7Scene} from './V7Scene';
-import {V7_BG} from './palette_v7';
+import {ACCENT_V7, V7_BG} from './palette_v7';
 import {PAINT_V6_CUT, PAINT_V7} from './paint_set';
 import {MAPS} from './maps';
 
@@ -39,6 +39,8 @@ export type V7S1Props = {
   movers?: boolean;
   /** The canal's design frame for the painter (look 'key', the vector water unkeyed, no painted water). */
   design?: boolean;
+  /** The bake's marker render (the lit panes pure green). */
+  marker?: boolean;
 };
 
 const SCENES = scenesJson as FilmScene[];
@@ -48,21 +50,27 @@ const COMPONENTS: Record<string, React.FC> = {V2S1: () => <V7Scene />};
 /** The design frame's painted pieces: every piece but the canal (the painter repaints it from this frame). */
 const DESIGN_PIECES = ['sky', 'clouds_p1', 'clouds_p2', 'clouds_p3', 'farroofs', 'fartower', 'flock'];
 
-export const V7S1: React.FC<V7S1Props> = ({look = 'v7a', captions = true, parts, slab, movers = true, design = false}) => {
+export const V7S1: React.FC<V7S1Props> = ({look = 'v7a', captions = true, parts, slab, movers = true, design = false, marker = false}) => {
   // v6's switches (PaintS1 set 'v6': preset 'v2' + the darks switch) and its module state, every frame
   const sw = resolveSwitches({preset: 'v2', darks: true});
   const t = useCurrentFrame() / V7_S1_FPS;
   applyPalette(sw);
   applyPen(sw, t);
   applyFloat(sw);
-  // step 1: the clean pen's page is v7's caption field (the calm tiers pull toward the sky they sit under)
-  if (look !== 'cut') PEN.bg = V7_BG;
+  // step 1: the clean pen's page is v7's caption field (the calm tiers pull toward the sky they sit under), and the
+  // one hot accent is a LIGHT SOURCE to the pen (emissive: never calmed by a tier, as v2's lamp role was)
+  if (look !== 'cut') {
+    PEN.bg = V7_BG;
+    PEN.emissive.add(ACCENT_V7.lamp.toUpperCase());
+    PEN.emissive.add(ACCENT_V7.lampCore.toUpperCase());
+    if (marker) PEN.emissive.add('#00FF00');
+  }
   const set = look === 'cut' ? PAINT_V6_CUT : PAINT_V7;
   return (
     <PaintProvider on set={set} only={design ? DESIGN_PIECES : undefined}>
       <V6Provider on>
         <PosterSwitchProvider value={sw}>
-          <V7CtxProvider value={{look: design ? 'key' : look, parts: parts ?? null, movers, design, maps: MAPS}}>
+          <V7CtxProvider value={{look: design ? 'key' : look, parts: parts ?? null, movers, design, marker, maps: MAPS}}>
             {parts ? (
               <AbsoluteFill>
                 <V7Scene slab={slab ?? '#000000'} />

@@ -62,7 +62,7 @@ export const V7_ROLES: Readonly<Record<string, string>> = {
  *  wall and its back wall. Drawn by the scene through `accentV7` (the lobby's own map), never anywhere else. */
 export const ACCENT_V7 = {
   lamp: hx(85, 50, 74), // the lobby's warm wall: apricot gold (C* 50; h 74 keeps it off the sickly green-yellow)
-  lampCore: hx(92, 24, 78), // its back wall, under the lamps
+  lampCore: hx(91, 30, 76), // its back wall, under the lamps
 } as const;
 
 /** The 10b darks (darks.ts DARK, authored for tier C through `forTier`) re-hued into the family, their value kept:
