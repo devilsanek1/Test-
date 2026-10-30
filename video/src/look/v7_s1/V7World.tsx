@@ -241,6 +241,7 @@ export const V7World: React.FC<V7WorldProps> = ({towpath, pip}) => (
  *  bands (painted from their flat render: the same coping, landing, treads and lips), so they are not drawn under it. */
 export const V7Steps: React.FC = () => {
   const paving = usePiece('paving');
+  const prop = usePiece('prop');
   return (
     <>
       <S1Plane plane={S1_PLANE.bank} over={<Slot name="bank" />}>
@@ -266,7 +267,7 @@ export const V7Steps: React.FC = () => {
       </S1Plane>
       <S1Plane plane={S1_PLANE.near} over={<Slot name="near" />}>
         <Seg name="near">
-          <V7NearProps />
+          <V7NearProps props={!prop} />
           <PieceSlot name="prop" />
           <PieceSlot name="leaves" />
         </Seg>

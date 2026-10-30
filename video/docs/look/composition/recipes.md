@@ -492,7 +492,7 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
 **SR22 THE PAPER**
 - **Beat:** the proof: a chart, a number, a date, a plan; information as paper in the place.
 - **Layout:** paper in the place the camera is already in (a printout, a phone, a board, a tag), straight-on and level;
-  as the beat's subject (a chart) it is >= 60 % of the stage wide (>= 456 px), with axes an L, one line or 3-5 bars
+  as the beat's subject (a chart) it is >= 60 % of the stage wide (>= 648 px), with axes an L, one line or 3-5 bars
   and <= 2 axis words at 56 px; as a tag on the subject (a date, a price) it carries one number or word, 120-160 px, on
   or touching what it measures; the paper's face one quiet light field with its top under the band (y >= 620), its place
   visible at the edges (a hand, a wall, the snow). Light: the paper lit, the place a step under it. Eye: the words, then

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""check_v7.py: the numbers ORGANIC.md §6's checks give for steps 1, 2 and 4, on still v6 and on v7's stills (NOTES.md
-"v7a"). From video/:
-    python3 -B src/look/v7_s1/bake/check_v7.py <scratch dir>  > <scratch>/check.json
+"""check_v7.py: the numbers ORGANIC.md §6's checks give, on still v6 and on v7's stills (NOTES.md "v7a", "v7"). From video/:
+    python3 -B src/look/v7_s1/bake/check_v7.py <scratch dir>  > <scratch>/check.json          (the first half)
+    python3 -B src/look/v7_s1/bake/check_v7.py <scratch> --parts <v7 parts> --labels <v7a parts> --stills v6,v7a,v7
+        (the second half: the surface labels from the flat parts; each still measured with its own her: v7a's figure for
+        v6 and v7a, the people overhaul's for v7)
 <scratch> holds parts/ (v7's parts renders: the labels and her mask) and stills/ (cut, key, v7a, each with _nocap, and
 v6 / v6_nocap: the light proof's look 'v6', pixel-identical to paint_still_v6.png). Measured, per still:
   darks       the share under L* 40, the median and p2-p98 (the T3 plan: 45 % under 40)
@@ -137,21 +139,40 @@ def measure(still_cap, still_nocap, L, her_c, her_box):
     return q
 
 
+def her_of(parts_dir):
+    """Her centroid and box (frame px) from a parts folder's 'her' segment."""
+    A = all_alphas(parts_dir)
+    ys, xs = np.nonzero(A['her'] > 0.5)
+    return (float(xs.mean()), float(ys.mean())), (int(xs.min()) - 6, int(ys.min()) - 6, int(xs.max()) + 7, int(ys.max()) + 7)
+
+
 def main():
-    scr = sys.argv[1]
-    P, S = os.path.join(scr, 'parts'), os.path.join(scr, 'stills')
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument('scr')
+    ap.add_argument('--parts', default='', help="the parts of look v7 (her: the overhaul's figure)")
+    ap.add_argument('--labels', default='', help="the flat parts (look v7a): the surface labels and v6/v7a's her")
+    ap.add_argument('--stills', default='v6,cut,key,v7a')
+    a = ap.parse_args()
+    scr = a.scr
+    P = a.labels or os.path.join(scr, 'parts')
+    S = os.path.join(scr, 'stills')
     A = all_alphas(P)
     base = load_srgb(f'{P}/base_static.png')
     L, _ = labels(P, A, base)
-    hm = A['her'] > 0.5
-    ys, xs = np.nonzero(hm)
-    her_c = (float(xs.mean()), float(ys.mean()))
-    her_box = (int(xs.min()) - 6, int(ys.min()) - 6, int(xs.max()) + 7, int(ys.max()) + 7)
+    her_c, her_box = her_of(P)
+    hers = {}
+    if a.parts:
+        hers['v7'] = her_of(a.parts)
     res = {'her_centroid': [round(v) for v in her_c], 'her_box': her_box, 'stills': {}}
-    for name in ('v6', 'cut', 'key', 'v7a'):
+    if 'v7' in hers:
+        res['her_v7_centroid'] = [round(v) for v in hers['v7'][0]]
+        res['her_v7_box'] = hers['v7'][1]
+    for name in a.stills.split(','):
         cap, nocap = os.path.join(S, f'{name}.png'), os.path.join(S, f'{name}_nocap.png')
         if os.path.exists(cap) and os.path.exists(nocap):
-            res['stills'][name] = measure(cap, nocap, L, her_c, her_box)
+            hc, hb = hers.get(name, (her_c, her_box))
+            res['stills'][name] = measure(cap, nocap, L, hc, hb)
     try:
         pc = palette_problems(scr)
         res['palette_v7'] = {'problems': pc['problems'], 'accent': pc['accent']}

@@ -30,7 +30,7 @@ from low in the grass), 04b at 28.25 s (a near profile on the left line).
   the band high in it).
 - *Serves:* every exterior as a 2:1 proportion; the horizon on the lower third (SR9, SR14), the sky a third (SR2's
   raised variant), a landmark on the left third (SR16), a figure on x 360-420 or 660-720 facing in. **SR2, SR9, SR14,
-  SR16.**
+  SR16, SR25.**
 - *Change:* the lines are proportions and the axis's edges; the four crossings are never placement points (the upper two
   sit 40 px under the band, the lower two 30 px under the read zone's floor).
 
@@ -39,7 +39,7 @@ right line at the upper line, a river winding in front).
 - *What:* lines at 0.382 / 0.618 of the frame, nearer the centre than the thirds.
 - *9:16:* x 413 / 667 (inside the subject axis), y 733 (setup B's horizon band) and y 1187 (the floor of the focal box);
   the stage square's y 951 / 1169. The golden box x 413-667, y 951-1187 is the focal's home.
-- *Serves:* every beat's focal (rule 3); named in SR1, SR6, SR8, SR12, SR20, SR21. **All recipes (rule 3).**
+- *Serves:* every beat's focal (rule 3); named in SR1, SR6, SR8, SR12, SR20, SR21, SR25. **All recipes (rule 3).**
 
 **A3 Golden section, nested** · RARE · 1·3·3 · adapted. *Reference:* 03 at 16.5 s (a big tree on the main line; a small
 house, with a path to it, in the nested cell at its foot).
@@ -167,10 +167,10 @@ distance).
 - *9:16:* the tall ground holds one more bend than a landscape frame: 2-3 bends entering at the bottom edge (x 250-830),
   each 25-40 % W wide and about half the width of the bend below it, ending on or behind the focal at (480-640,
   950-1150); never through the band.
-- *Serves:* a calm way in; arrival by water or path. **SR7 (the S variant).**
+- *Serves:* a calm way in; arrival by water or path; a side-on run's legs. **SR7 (the S variant), SR11, SR24, SR25.**
 - *Merged:* N8 the zigzag way in (Poore: "triangulate in, with a series of zigzags"): where there is no line,
   2-3 legs of >= 150 px alternating sides, or a row of receding accents, ending within 40 px of the focal's box;
-  this angular form serves SR7, SR11 and SR24's sweep.
+  this angular form serves SR7, SR11 and SR24's sweep; side-on, its legs level and vertical (rule 8), SR25's run.
 
 **B9 C-shape** · SITUATIONAL · 2·3·4 · used as it is. *Reference:* 03 at 7.0 s (a big tree arching its trunk and canopy
 over a valley).
@@ -278,7 +278,7 @@ small house far right).
 - *9:16:* rule 9: the subject stays on the axis (0-130 px off x 540) and the big soft mass goes >= 300 px out on the
   other side (x < 240 or > 840), its pull < 50 % of the focal's: by default the hero cloud in a top gutter (y 0-290),
   cut by a side edge; never in the lower right (x > 830 below y 790), where the rail and the name block already weigh.
-- *Serves:* every frame's balance; named in **SR2, SR9, SR16.**
+- *Serves:* every frame's balance; named in **SR2, SR9, SR16, SR25.**
 - *Change:* the reel's small thing sits far out; ours, the subject, stays on the axis and the big soft mass goes out.
   (Its opposite, one heavy side with nothing against it, is our addition N15, for the turn.)
 
@@ -303,7 +303,7 @@ along a warm wall, a man leaning out of the fifth).
 - *What:* a repeated element reads as one texture; one break in it becomes the subject.
 - *9:16:* a facade's windows stack in rows: one texture inside one mass (its pieces within +-6 L*, sizes varied 5-12
   %), one break, the call, at (413-667, 860-1100); never two breaks.
-- *Serves:* the one among many; how many. **SR8, SR21.**
+- *Serves:* the one among many; how many. **SR8, SR21, SR25.**
 
 ### E. Moves the examples make without naming them
 
@@ -320,7 +320,7 @@ s (the stairwell's lit wall), 03 at 14.0 s (the light at the tunnel's end), 04a 
 - *What:* the inner frame is the brightest area, and the figure is dark inside it.
 - *9:16:* the aperture the lightest area below the sky (L* >= 95), the figure inside it at L* <= 28 (a step >= 65 L*),
   in the golden box: the subject, the story light and the hardest value step in one place (rule 4).
-- *Serves:* every opening. **SR6, SR2, SR8, SR7.**
+- *Serves:* every opening. **SR6, SR2, SR8, SR7, SR25.**
 
 **E3 Stillness against motion** · SITUATIONAL · 3·3·4 · adapted. *Reference:* 01 at 10.0 s (two walkers sharp in front
 of a train streaking past), the titles 01 at 0 s and 04b at 19.25 s (a still carriage frame, the platform streaking past
@@ -373,7 +373,7 @@ tower's red top).
 - *What:* one saturated colour, on the subject.
 - *9:16:* the scene's one hot accent only at the focal, in the golden box; everything else tone-on-tone in its mass (dE
   <= 6-8); no saturated yellow anywhere else (still v6's four yellow windows out-shouted the lit door).
-- *Serves:* every shot (rule 4); named in **SR8, SR24, SR1.**
+- *Serves:* every shot (rule 4); named in **SR8, SR24, SR1, SR25.**
 
 **E9 The camera holds; the subject travels the device's line** · CORE · 5·5·5 · used as it is. *Reference:* 04a at 3.0 s
 (a man running away down the pier's axis, 305 -> 92 px in 1 s), 04a at 0 s (the walker into the spiral's eye), 02 at 0 s
@@ -382,7 +382,8 @@ nearly.
 - *What:* the shot locked; its life is the subject moving along the device's line.
 - *9:16:* locked or the parallax float (8-15 px/s); the subject travels one path between two points of the golden box,
   or down a line into the vanishing point (shrinking as it goes), or across an opening.
-- *Serves:* arrival, a crossing, a front travelling a seam. **SR7, SR9, SR6, SR20, SR23.**
+- *Serves:* arrival, a crossing, a front travelling a seam, the thread travelling a side-on run. **SR7, SR9, SR6,
+  SR20, SR23, SR25.**
 
 **E10 The near "you" over the shoulder** · SITUATIONAL · 2·4·5 · adapted. *Reference:* 04b at 28.25 s (a big blurred
 near profile on the left third, looking at a sunset and a lit tram).
@@ -541,7 +542,7 @@ S10].
 
 **Z4 The insert (the paper)** · CORE · 4·4·4 · used as it is. *Source:* `composition/cinema.md` §2, §3.1 [S12, S13].
 - *What:* one detail filling the stage, "look at exactly this": a number, a date, a chart, the paper straight-on.
-- *9:16:* the paper straight-on and level, >= 60 % of the stage wide (>= 456 px); one number 120-160 px on what it
+- *9:16:* the paper straight-on and level, >= 60 % of the stage wide (>= 648 px); one number 120-160 px on what it
   measures; words >= 56 px; an overhead view only as paper (a chart or a map is a flat thing in the place, seen
   straight-on).
 - *Serves:* the proof, the payoff number. **SR22.**
@@ -623,7 +624,8 @@ paths are from `video/src/` (`lib/`) and `video/scripts/`.
   join (RJ1-RJ4 and X3: RJ3 and RJ4 CORE, RJ2 RARE, RJ1 and X3 NOT FOR US).
 - **Where each is used:** the recipes that name each frame are Part 0's last column, and Part 2 §2 lists each recipe's
   devices by tier. Every device code a recipe names exists in Part 0; no device needed a recipe of its own beyond
-  SR1-SR24 (the ones without one are named variants of the recipe whose camera they share).
+  SR1-SR25 (the ones without one are named variants of the recipe whose camera they share; SR25 came from video 4's
+  pass, for a side-on place).
 - **Ours (45):** 13 CORE, 16 SITUATIONAL, 5 RARE, 9 NOT FOR US, and N2 and N5 as rules of every shot (not ranked);
   none replaces an idea of his: where one of ours covered the same choice it was merged into his entry under his name
   (B8, B10, E3 above; `composition/catalogue_notes.md` §3).

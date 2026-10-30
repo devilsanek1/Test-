@@ -27,9 +27,10 @@ import oc_lib as L  # noqa: E402  (organic proof 1's library: OKLab, noise, the 
 
 #: the pieces in drawing order: name -> (the slot it fills (pieces.tsx PieceName), the module that paints it)
 PIECES = {
+    'farcity': ('farcity', 'piece_farcity'),
     'quay': ('paving', 'piece_quay'),
-    'facade': ('facade', 'piece_facade'),
-    'leaves': ('leaves', 'piece_leaves'),
+    'facade': ('facade', 'piece_wing'),
+    'prop': ('prop', 'piece_prop'),
 }
 
 

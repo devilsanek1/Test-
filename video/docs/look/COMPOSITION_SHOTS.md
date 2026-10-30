@@ -162,12 +162,12 @@ rank each one only as a shot's LEAD device. Each row: USED, every shot, by the r
 | C1 | Frame within a frame | 4·5·5 | 4.67 | "look in here", a threshold: one opening 15-30 % of the frame on the axis, its aperture >= 10 L* off the rim, a 150-300 px figure dark inside | RM7 + RM1, RM4, I11 -> J2, J3 | SR2, SR4, SR6, SR8, SR17 |
 | D1 | Negative space | 3·5·5† | 4.33 | a breather, a key line, time passing: the subject 130-220 px at the foot of a 60-80 % patterned field (the sky with the band); never the hook's frame | RM7, RM5 -> J11, RJ4 | SR16, SR18 |
 | D2 | Scale | 4·4·4† | 4.00 | awe, 1-2 a film: the giant >= 0.7 H (its full height cut by the top: `LAYOUT.md` §2 K7) and >= 10:1 over a 130-220 px figure low near the axis | I5, I4 -> J2 back (in by RJ2 only on a "But") | SR14, SR15, SR17 |
-| D7 | Patterns / repetition | 5·5·4 | 4.67 | "this one" or "how many": one texture (+-6 L*) with ONE break, the call, at (413-667, 860-1100), lighting on its word | RM6, RM8b, I11 -> J4, J2 | SR8, SR21 |
-| E2 | The lit opening | 5·5·5 | 5.00 | the subject's moment, home, a destination: the aperture L* >= 95, the figure L* <= 28 (a step >= 65 L*), no other light within 10 L* | RM7, I11 -> J2, J4 | SR2, SR6, SR7, SR8 |
+| D7 | Patterns / repetition | 5·5·4 | 4.67 | "this one" or "how many": one texture (+-6 L*) with ONE break, the call, at (413-667, 860-1100), lighting on its word | RM6, RM8b, I11 -> J4, J2 | SR8, SR21, SR25 |
+| E2 | The lit opening | 5·5·5 | 5.00 | the subject's moment, home, a destination: the aperture L* >= 95, the figure L* <= 28 (a step >= 65 L*), no other light within 10 L* | RM7, I11 -> J2, J4 | SR2, SR6, SR7, SR8, SR25 |
 | E7 | The closed vista | 4·4·4† | 4.00 | a destination: the sight line's vanishing point on the one object that ends it (x 540-700, y 950-1150), never open sky | RM4 -> J2, J3 | SR3, SR7 |
-| E8 | One colour accent on the subject | 4·5·5 | 4.67 | every focal (§0.3a): one hot accent (C* >= 50, ~3-5 % of the frame) only on the subject, travelling with the thread | RM8b, RM6 -> J4 | SR1, SR8, SR24 |
+| E8 | One colour accent on the subject | 4·5·5 | 4.67 | every focal (§0.3a): one hot accent (C* >= 50, ~3-5 % of the frame) only on the subject, travelling with the thread | RM8b, RM6 -> J4 | SR1, SR8, SR24, SR25 |
 | E9 | The camera holds; the subject travels the device's line | 5·5·5 | 5.00 | the default held shot: the frame built as a path whose end is in the golden box | RM1 -> J7, J2 | SR6, SR7, SR9, SR20, SR23, SR25 |
-| T | The line first, then the world under it | 5·5·5 | 5.00 | frame 0 of every film, its drawing (never counted as a lead: Part 0b §2): the subject's line draws on in the clean pen, then the colour floods in over it, >= 1 s; after frame 0 only where the drawing is the beat (DIRECTION 8, 9) | RM8 -> RJ3 | SR1, SR22 |
+| T | The line first, then the world under it | 5·5·5 | 5.00 | frame 0 of every film, its drawing (never counted as a lead: Part 0b §2): the subject's line draws on in the clean pen, then the colour floods in over it and the line ends under its fill (no outline stays), the light flooding in from its source, >= 1 s; after frame 0 only where the drawing is the beat (DIRECTION 4, 8, 9) | RM8 -> RJ3 | SR1, SR22 |
 | *ours* | | | | | | |
 | N7 | Figure and ground: notan and counterchange [c] | 5·5·5 | 5.00 | every shot's notan (§0.3a, rule 5); as the lead, the hook and the proof: the subject one closed shape a viewer names at 0.25 scale, its step >= 65 L* | RM8, I11 -> J4 | SR1, SR2, SR6, SR9, SR22 |
 | N1 | The centre, the first look [c, v] | 5·5·4 | 4.67 | re-found after every cut (§0.3a, rule 3); as the lead, the hook, the close, the proof: the focal within 130 px of x 540 at y 951-1006 | RM7, RM4 -> RJ4, J2, J3 | SR1, SR12, SR22 |
@@ -179,16 +179,16 @@ rank each one only as a shot's LEAD device. Each row: USED, every shot, by the r
 
 | # | name | A·S·F | mean | use it when (the condition, the dose) | move -> join | recipes |
 |---|---|---|---|---|---|---|
-| A2 | Golden section (the phi grid) | 3·4·4† | 3.67 | EVERY SHOT as rule 3, the golden box (§0.3a); as the lead, a lone thing on a phi line where the dead centre would read formal | any (it lands in the box) -> J3, J4 | SR1, SR6, SR8, SR12, SR20, SR21 |
+| A2 | Golden section (the phi grid) | 3·4·4† | 3.67 | EVERY SHOT as rule 3, the golden box (§0.3a); as the lead, a lone thing on a phi line where the dead centre would read formal | any (it lands in the box) -> J3, J4 | SR1, SR6, SR8, SR12, SR20, SR21, SR25 |
 | A6 | Cross | 3·4·3 | 3.33 | an upright standing its ground: one vertical crossing the horizon at x 413-667, no other vertical near it | I5, RM7 -> J3, J11 | SR9, SR15 |
 | A7 | Symmetry | 4·4·3† | 3.67 | a formal, settled beat (an answer, the end): the axis x 540, halves within +-5 %; once a film, two at most; broken once at the axis on the turn | RM7, RM4 on the axis -> J3, RJ3 | SR23 |
 | B3 | Radiating | 3·3·3† | 3.00 | everything points at one cause: 5-9 rays tone-on-tone meeting on the subject in the golden box; no ray across the band | RM7, I11 -> J11, J4 | SR3, SR15, SR21 |
 | B8 | S-curve | 2·3·4† | 3.00 | a calm way in by water or path: 2-3 bends, or zigzag legs >= 150 px (side-on, level and vertical: rule 8), ending on the focal, the thread travelling it | RM1, I6 -> J7 | SR7 (v), SR11, SR24, SR25 |
 | B9 | C-shape | 2·3·4† | 3.00 | shelter from a raised view: the BALCONY curve in at y 600-700, out at y 860-1060, the subject inside it | RM7, RM5 -> J3, RJ4 | SR5 |
 | B10 | L-shape | 2·3·4† | 3.00 | the cozy frame: one tall side <= 216 px cut by the top, flat through the band, plus the ground line; the focal toward its inner corner | RM7, RM5 -> J2, J8 | SR2, SR3, SR4 |
-| B11 | V-shape | 3·3·3† | 3.00 | a canyon funnelling to one point (the arms below y 600, meeting within 60 px of the focal); inverted, the turn | I5 -> RJ2, J2 | SR3, SR18 |
+| B11 | V-shape | 3·3·3† | 3.00 | a canyon funnelling to one point (the arms below y 600, meeting within 60 px of the focal); inverted, the turn | I5 -> RJ4, J2 (inverted, in by RJ2 on the turn) | SR3, SR18 |
 | C3 | Level change | 2·4·4† | 3.33 | cause and effect in one view: the upper level y 700-950, the lower y 1150-1450, a 30-45 degree stair between; the light hands the focal over (I11) | I5, I6, I11 -> RJ4 | SR11 |
-| D4 | Unbalanced (the steelyard) | 2·3·4† | 3.00 | EVERY SHOT as rule 9 (§0.3a); as the lead, the subject on the axis and one soft mass >= 300 px out, high (the hero cloud), never lower right | RM5 -> any | SR2, SR9, SR16 |
+| D4 | Unbalanced (the steelyard) | 2·3·4† | 3.00 | EVERY SHOT as rule 9 (§0.3a); as the lead, the subject on the axis and one soft mass >= 300 px out, high (the hero cloud), never lower right | RM5 -> any | SR2, SR9, SR16, SR25 |
 | E1 | One small figure where the lines meet | 4·3·4† | 3.67 | a human anchor: one 130-220 px figure from behind at the device's focal, its feet above y 1480 | RM1 -> J2, J6 | SR3, SR7, SR9, SR14, SR15 |
 | E3 | Stillness against motion | 3·3·4 | 3.33 | isolation, time passing: the subject held within +-40 px while a flow (never one mover) passes in one band behind it | RM2, I12 -> RJ4 | SR9, SR10, SR17 |
 | E4 | Looking room | 3·4·4† | 3.67 | a facing or moving figure: 1.5-2x room in front (right-facing at x <= 410 below y 860); from behind, the room is up the frame | RM3 -> J6 | SR9, SR10, SR14 |
@@ -201,19 +201,19 @@ rank each one only as a shot's LEAD device. Each row: USED, every shot, by the r
 | N6 | Depth stacked up the frame (the three distances) [c, v] | 2·3·5† | 3.33 | EVERY exterior as rule 2 (§0.3a); as the lead, the vista and the scale beats | RM5, I4, I6 -> RJ4 | SR2, SR14, SR15, SR16, SR17 |
 | Z2 | The wide [c] | 2·4·4† | 3.33 | the home view: the subject 15-35 % of the height (290-670 px) in its place, the "you" near the camera | RM7, RM5, RM1 -> J2, J3, RJ4 | SR2, SR3, SR9, SR14 |
 | N3 | The horizon off the half, and the line of heads [c] | 2·3·4† | 3.00 | EVERY exterior as rule 6, one setup per set (§0.3a); as the lead, the line of heads | RM7, RM5, I5 -> J3 | SR2, SR9, SR14 |
-| N11 | The low angle (worm's-eye) [c, d] | 3·3·3† | 3.00 | power on the quantity, never on the thing under critique: camera ~0.3 m, horizon y 1114-1229, verticals parallel | I5 -> RJ2, J2 | SR15 |
-| Z1 | The extreme wide [c, d] | 3·3·3† | 3.00 | the place and its scale, 1-2 a film, ~1.5-4 s: 5-7 planes, the "you" 130-220 px near the camera (S5's end 170-200), the scale from the world past every edge and tiny strangers 15-60 px | I4, I6 -> RJ4, RJ2 | SR15, SR17 |
+| N11 | The low angle (worm's-eye) [c, d] | 3·3·3† | 3.00 | power on the quantity, never on the thing under critique: camera ~0.3 m, horizon y 1114-1229, verticals parallel | I5 -> RJ4, J2 (in by RJ2 only on a "But") | SR15 |
+| Z1 | The extreme wide [c, d] | 3·3·3† | 3.00 | the place and its scale, 1-2 a film, ~1.5-4 s: 5-7 planes, the "you" 130-220 px near the camera (S5's end 170-200), the scale from the world past every edge and tiny strangers 15-60 px | I4, I6 -> RJ4, RJ2 (on a "But", from the landed frame) | SR15, SR17 |
 | S2 | The sun behind the roofline [d] | 4·2·3† | 3.00 | time passing or an ending held 2.5-3 s, once a film: a ~650 px disc at (580, 1060), the roofline from y ~1500, 3 values | RM7 -> J11, J4 | SR16 (v) |
 
 **RARE** (16: the owner's 12, ours 4)
 
 | # | name | A·S·F | mean | use it when (the condition, the dose) | move -> join | recipes |
 |---|---|---|---|---|---|---|
-| A1 | Rule of thirds | 1·3·3 | 2.33 | EVERY SHOT as rule 6, 2:1 proportions (§0.3a); as the lead, a subject placed ON a third: only the left-third landmark (S3, x 220-420) or a figure on x 360-420 / 660-720 facing in | RM7, RM3 -> J3, J7 | SR2, SR9, SR14, SR16 |
+| A1 | Rule of thirds | 1·3·3 | 2.33 | EVERY SHOT as rule 6, 2:1 proportions (§0.3a); as the lead, a subject placed ON a third: only the left-third landmark (S3, x 220-420) or a figure on x 360-420 / 660-720 facing in | RM7, RM3 -> J3, J7 | SR2, SR9, SR14, SR16, SR25 |
 | A3 | Golden section, nested | 1·3·3 | 2.33 | a big form with the small subject at its foot, at (570, 1086) on the stage square, only when the small subject carries the light and the onset | RM4 -> J2 | SR14 (v), SR15 |
-| A5 | Golden triangle | 1·2·3† | 2.00 | a slope with two related points on the stage square's 40.4-degree diagonal (feet (626, 987) and (454, 1133)); once, on a climb or the turn | RM1 -> RJ2 | SR11, SR18 |
+| A5 | Golden triangle | 1·2·3† | 2.00 | a slope with two related points on the stage square's 40.4-degree diagonal (feet (626, 987) and (454, 1133)); once, on a climb or the turn | RM1 -> J3, RJ4 home (in by RJ2 on the turn) | SR11, SR18 |
 | B5 | Parallel lines | 2·3·3† | 2.67 | travel along parallels (steps, rails, a quay): 3-5 lines at 30-60 degrees below y 600, the camera riding them | RM3 -> J7 | SR10, SR11 |
-| B6 | Diagonal | 2·3·3† | 2.67 | the turn or a climb: one 30-45 degree line rising to the focal and broken by it; never in a cozy beat | RM1, I5 -> RJ2, J7 | SR11, SR18, SR20 |
+| B6 | Diagonal | 2·3·3† | 2.67 | the turn or a climb: one 30-45 degree line rising to the focal and broken by it; never in a cozy beat | RM1, I5 -> J7, RJ4 (in by RJ2 on the turn) | SR11, SR18, SR20 |
 | B7 | Double diagonal | 2·2·2† | 2.00 | a crossing seen from the balcony (35-55 degrees down), the X on the focal; once a film, in the high angle's one slot | RM7 -> RJ4 | SR5 (v) |
 | B12 | Spiral composition | 3·2·2 | 2.33 | a stair or a roundabout curling in, from the balcony (once a film, the high angle's slot), or a spiral pathway at eye level | RM7, RM1 -> J2 | SR5 (v), SR24 (v) |
 | B13 | Circular | 3·3·2† | 2.67 | a round opening 300-500 px across (then it works as C1), or a ring round the cause from a raised camera | RM7, RM4 -> J2, J3 | SR4 (v), SR21 (v) |
@@ -223,9 +223,9 @@ rank each one only as a shot's LEAD device. Each row: USED, every shot, by the r
 | E5 | A soft near layer | 2·2·4† | 2.67 | EVERY SHOT as rule 10, softness by value (§0.3a); as the lead, the near layer as the device | RM5 -> J8 | SR2, SR4, SR7 |
 | *ours* | | | | | | |
 | N12 | The high angle [c, d] | 2·3·3† | 2.67 | once a film, on a crowd, a pattern or a crossing, never one person: 35-55 degrees down, the lid's flat facade behind the band | RM7 -> RJ4 | SR5, SR21 |
-| N15 | The off-balance [c] | 2·3·3† | 2.67 | the "But" turn only, once or twice a film: the focal at x 250-380 or 700-830, no counterweight (its jump the turn's declared exception: rule 19); the next beat back home | RM7 -> in by RJ2 | SR18 |
+| N15 | The off-balance [c] | 2·3·3† | 2.67 | the "But" turn only, once or twice a film: the focal at x 250-380 or 700-830, no counterweight (its jump the turn's declared exception: rule 19); the next beat back home | RM7 -> RJ4 or J3 home (in by RJ2) | SR18 |
 | K8 | The light shaft and its pool [d] | 3·2·2 | 2.33 | one small life singled out by light in a vast interior, once: a shaft 108-151 px wide on the axis widening into a pool | RM7, RM6 -> J4 | SR15 (v) |
-| M3 | Short-siding and the low quadrant [m] | 2·2·2† | 2.00 | once a film, on the turn, never cozy: the subject at x 130-300 facing out of the frame, or its head below y 1150 under >= 60 % quiet field | RM7 -> in by RJ2 | SR18 (v) |
+| M3 | Short-siding and the low quadrant [m] | 2·2·2† | 2.00 | once a film, on the turn, never cozy: the subject at x 130-300 facing out of the frame, or its head below y 1150 under >= 60 % quiet field | RM7 -> J3 or RJ4 home (in by RJ2) | SR18 (v) |
 
 **NOT FOR US** (8: the owner's 4, ours 4)
 
@@ -761,8 +761,8 @@ B = J3 or J4, C = RJ4, D = J7 or J8, E = J13, F = RJ2; the loop RJ3).
 | SR3 | THE LANE | the home place: a street | 1020-1150 | the closed vista at the vanishing point, (540-700, 950-1150) | CORE B2, E7, B1, B4 · SIT B3, B10, B11, E1, Z2 | RM7, RM5, or RM4 to the vista | out J2 or RJ4 |
 | SR4 | THE NOOK | the home place: indoors | none (the window's own) | the lamp-lit subject, head y 864-1152 | CORE C1 · SIT N13, B10 · RARE C2, E5, B13 (v) | RM7 or RM5 | out J2 through the window |
 | SR5 | THE BALCONY | the home place from above; a crowd | none (35-55 degrees down) | on the curve, y 860-1060 | SIT B9 · RARE N12, B7 (v), B12 (v) | RM7 | J2 or RJ4 |
-| SR6 | THE LIT OPENING | the subject's moment | the set's | the lit aperture in the golden box; 15-30 % of the frame | CORE C1, E2, N7, N5, E9 · SIT A2 | RM7 (RM1 crosses it), then J2's push | out J2 |
-| SR7 | THE PATH IN | arrival; the thing at the end of the way | A or B | the line's end, (480-640, 950-1150) | CORE B1, B2, E7, E2, E9 · SIT E1, B8 · RARE C2, E5 | RM1 the subject travels, or RM4 to the vista | out J2 or RJ4 |
+| SR6 | THE LIT OPENING | the subject's moment | the set's | the lit aperture in the golden box; 15-30 % of the frame | CORE C1, E2, N7, E9 · SIT A2 | RM7 (RM1 crosses it), then J2's push | out J2 |
+| SR7 | THE PATH IN | arrival; the thing at the end of the way | A or B | the line's end, (480-640, 950-1150) | CORE B1, B2, E7, E2, E9 · SIT E1, B8 (v) · RARE C2, E5 | RM1 the subject travels, or RM4 to the vista | out J2 or RJ4 |
 | SR8 | THE BREAK IN THE ROW | the one among many | the set's | the one lit window, (413-667, 860-1100) | CORE D7, C1, E2, E8 · SIT A2 | RM7; RM6 the break lights | out J2 |
 | SR9 | ON THE LINE OF LIGHT | a person's moment | A, camera 0.9-1.2 m, 1150-1300 | a figure straddling the lit horizon, x 413-667; 150-300 px | CORE N7, E9 · SIT A6, N3, E1, E4, E3, D4, Z2 · RARE A1 | RM7; RM1 the figure walks the line | out RJ4 or J7 |
 | SR10 | THE FOLLOW | travel; the mechanism on its way | the set's | held at x 410-560 (truck) or on the axis (tilt) | SIT E3, E4, Z3 · RARE B5 | RM3 (a truck) or I5 (a tilt), with I12 | out RJ4 or J7 |

@@ -1,0 +1,86 @@
+{
+ "facade": {
+  "box": [
+   300,
+   575,
+   780,
+   525
+  ],
+  "bytes": 170431,
+  "creeper_px": 10249,
+  "faces": 1671,
+  "lost_lines": 101,
+  "md5": "6d8d25d2b34e6dd4fa53fd95993e2e21",
+  "mypaint_s": 0.7,
+  "seconds": 5.84,
+  "slot": "facade",
+  "states": {
+   "blind": 8,
+   "glass": 28,
+   "lit_blind": 1,
+   "lit_curtain": 5,
+   "lit_dim": 2,
+   "sheen": 9
+  },
+  "strokes": {
+   "edge": 67,
+   "face": 115,
+   "leaf": 50
+  }
+ },
+ "farcity": {
+  "box": [
+   0,
+   585,
+   384,
+   475
+  ],
+  "bytes": 63154,
+  "md5": "f09b390b03fab8a3a2087669391eff2d",
+  "mypaint_s": 0.37,
+  "seconds": 5.17,
+  "slot": "farcity",
+  "strokes": {
+   "far": 36
+  },
+  "windows_toned": 121
+ },
+ "prop": {
+  "box": [
+   740,
+   1500,
+   340,
+   420
+  ],
+  "bytes": 17600,
+  "faces": 91,
+  "md5": "74fa36771a1e6096ce7b5ac1859e5e15",
+  "mypaint_s": 0.16,
+  "seconds": 1.22,
+  "slot": "prop",
+  "strokes": {
+   "form": 12
+  }
+ },
+ "quay": {
+  "box": [
+   0,
+   1140,
+   1080,
+   780
+  ],
+  "bytes": 232753,
+  "md5": "0d2acff5942f08a72c8da2367f215583",
+  "mypaint_s": 5.11,
+  "puddle_px": 95170,
+  "seconds": 14.9,
+  "slot": "paving",
+  "strokes": {
+   "accent": 22,
+   "form": 153,
+   "lipmark": 46,
+   "lost": 55,
+   "wash": 36
+  }
+ }
+}

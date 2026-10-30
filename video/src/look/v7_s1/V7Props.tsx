@@ -108,8 +108,9 @@ const FallenLeaves: React.FC = () => {
 };
 
 /** The table (a marble top on a dark pedestal, a flat foot) and the chair, with their contact shadows; the fallen
- *  leaves. */
-export const V7NearProps: React.FC = () => {
+ *  leaves. `props` false: the shadows and the leaves only (look 'v7' paints the table and the chair as a piece over
+ *  their place: ./pieces.tsx 'prop'). */
+export const V7NearProps: React.FC<{props?: boolean}> = ({props = true}) => {
   const {x, top, foot, chairX, seatY, k} = V7_TABLE;
   const z = k;
   return (
@@ -120,11 +121,15 @@ export const V7NearProps: React.FC = () => {
       </ShadowLayer>
       <Tier tier="environment">
         <FallenLeaves />
-        <Chair x={chairX} seatY={seatY} k={z} />
-        <Fill d={groundEll(x, foot, 48 * z, 9 * z)} color={dark('iron')} seed="v7/table/foot" offset={false} />
-        <Fill d={poly([[x - 7 * z, top + 10], [x + 7 * z, top + 10], [x + 7 * z, foot], [x - 7 * z, foot]])} color={dark('iron')} seed="v7/table/ped" offset={false} />
-        <Fill d={ell(x, top + 7 * z, 94 * z, 20 * z)} color={TABLE_EDGE} seed="v7/table/edge" offset={false} />
-        <Fill d={ell(x, top, 94 * z, 20 * z)} color={TABLE_TOP} seed="v7/table/top" offset={false} />
+        {props ? (
+          <>
+            <Chair x={chairX} seatY={seatY} k={z} />
+            <Fill d={groundEll(x, foot, 48 * z, 9 * z)} color={dark('iron')} seed="v7/table/foot" offset={false} />
+            <Fill d={poly([[x - 7 * z, top + 10], [x + 7 * z, top + 10], [x + 7 * z, foot], [x - 7 * z, foot]])} color={dark('iron')} seed="v7/table/ped" offset={false} />
+            <Fill d={ell(x, top + 7 * z, 94 * z, 20 * z)} color={TABLE_EDGE} seed="v7/table/edge" offset={false} />
+            <Fill d={ell(x, top, 94 * z, 20 * z)} color={TABLE_TOP} seed="v7/table/top" offset={false} />
+          </>
+        ) : null}
       </Tier>
     </>
   );

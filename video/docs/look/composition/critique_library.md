@@ -349,3 +349,76 @@ The page is 1920 lines, 199 KB (~50k tokens per read, and every agent of the Hel
 
 The main page becomes ~650 lines, ~80 KB: Part 0, 0b, Part 2 §0, §2, §4; nothing is lost and his 41 stay visible
 on it.
+
+## Fix pass (2026-10-30)
+
+Applied to `COMPOSITION_SHOTS.md`, its three new sub-files and `library_sheet.py` / `.png`; then re-checked from the
+judges' files: the tier, A·S·F and † of all 101 ranked entries (0 mismatches; 55 edges, 30 of his 41), every Part 0
+recipe column against the recipe index (0) and every recipe's device tiers (0).
+
+**MUST-FIX: all 10 done.**
+- **M1** §0.3a "Used in every shot" (his seven first: A1, A2, C2 with E5, D4, E6, E8; then N1, N2, N3, N5, N6, N7);
+  0.1, 0.3 and the Part 1 headers read "EVERY SHOT (rule n) · as a lead: <tier>"; N2 and N5 left the tier tables (CORE
+  32, frames 17); "In five lines" and §D4 recounted; the sheet opens with an IN EVERY SHOT band.
+- **M2** one golden box everywhere: x 413-667, y 951-1187 (on the feed its heart x 436-644, y 951-1168).
+- **M3** rule 19: 220 px at most (`CRAFT.md` §a, §e), past it only on the declared turn, within ~370; the turn row, the
+  planning card; clash row 29.
+- **M4** T, RM8 and SR1: the colour floods in over the line, the line ends under its fill; "once per idea" is now
+  "after frame 0 only where the drawing is the beat" (DIRECTION 8).
+- **M5** RM8b the build: its own row and dose; §1's explain and list rows, §3's pattern row, rule 17, SR21.
+- **M6** I4 a story pull (<= ~2.3x, 0-2 a film, never next to the big move); "the one big move: exactly 1, S5 (I4 at
+  scale) or S1 (I6)"; SR24 and the payoff row "a story pull, not the big move"; J2's pull-out only as its second leg.
+- **M7** RJ4 a seam only (<= 1.15x or 150 px); Part 0b §2 item 7, a film on one continuous camera (each stop a shot,
+  the move's midpoint on the next sentence's first word, landing >= 30 f before the stop's onset).
+- **M8** the sheet takes every name from Part 0's tables: D4 "Unbalanced (the steelyard)", D7 "Patterns /
+  repetition", E1, E9 and E10 in full, wrapped (S22 with it).
+- **M9** §2 item 3 counts LEAD devices only (6-9 different in 10-12 shots, >= 7 in 10 CORE, <= 2 RARE once each);
+  T and the every-shot grammar never count; the hook row names one lead.
+- **M10** Z1, rule 11, D2, SR15: the "you" 130-220 px near the camera, strangers 15-60 px; clash row 30 (LAYOUT §2 to
+  fix: not edited from here).
+
+**SHOULD-FIX: 20 done, S21 half, S15 not here.**
+- **S1** the four tier rows rewritten (no result changed). **S2** "blind" restated. **S3** "either extreme lens".
+- **S4** † on every entry one judge-point in one lens from another tier, by the sum or by the lowest-lens guard: 55 of
+  the 101 ranked, 30 of his 41 (the critique's 52 / 28 counted sums only); 0.2: an edge is the owner's in one line.
+- **S5** 0.1's header. **S6** strand tags [c] [v] [m] [d] on ours; 0.2 says why `modern.md`'s scores are no lens.
+- **S7** §1's recipes column. **S8** "The join, by what changes" in the planning card, in Part 0's codes.
+- **S9** §2 item 6. **S10** one target y 951-1006, allowed 860-1200. **S11** Part 0b §0, the planning card.
+- **S12** a proposal: rule 18 keeps 3 % in force and proposes >= 5 % in <= 2 s; clash row 31.
+- **S13** rule 20, §3. **S14** J11 is B across a cut; inside a panel RM6 or I11, no join. **S16** rule 6's deferral.
+- **S17** the read zone defined (y 600-1250); A4 "at or just under the band". **S18** J8 0-2; D2's 10:1 with K7.
+- **S19, S20, S22** on the sheet: each tile shows its join OUT, and a chip "in: RJ2" where a plain cut on a "But"
+  brings it in (D2 J2; B11, N11, N15 RJ4; A5, M3 J3; B6 J7); Part 0's rows for B11, N11, A5, B6, N15 and M3 now list
+  their joins out the same way, and Z1's RJ2 says "on a 'But', from the landed frame". Redrawn to their own rules: Z4
+  (the plan as paper, 740 px = 69 % of the stage, "2027" 140 px), B5 and B6 (every line under the band; B6's diagonal
+  ends at the lit door, broken by the climber), N9 (a tea mug ~690 px, no wall) and N1 (the home view, its window
+  within 130 px of the centre). N9's condition: an object, never a face, a building or a wall.
+- **S21** half: the text says `devices_sheet.png`'s YES / ADAPT are superseded (Part 2 §2, §D4); the PNG is not in
+  this pass's files: restamp it when next rendered.
+- **S15** not done here: a grey 60 fps clip of the CORE moves and joins is an ITERATION job (a render, about an hour),
+  for the orchestrator's queue.
+
+**Bloat: cut as marked.** Part 1 -> `composition/catalogue_detail.md` (with 0.6, the splits); Part 2 §3 ->
+`composition/recipes.md`; Part 2 §5 -> `composition/library_clashes.md`; §3's shared timing merged into rules 12, 19-21.
+The page: 1920 lines, 199 KB -> 819 lines, 96 KB (the card, §0.3a and the gaps' answers take ~16 KB over the ~80
+estimated). Clash rows 1-14 go to HANDOFF's queue (the orchestrator's file).
+
+**Video 4's 15 library gaps (`COMPOSITION_PASS.md`): all settled.** 1 SR25 THE SECTION, a side-on place with its
+mechanism. 2 Part 2 §0, the side-on set's scale ceiling (k = 860 / h; video 4's home view <= 1.48x), rule 11. 3 rule 7,
+one tier-B person near the camera when the "you" is POV. 4 Part 0b §3, the nested pull (hand-offs at exact size, each
+step <= ~2.3x over >= 30 f, one S5_EASE over the chain). 5 rule 12, §2 item 7: a straight dolly to an off-axis target
+is one move. 6 RM8's un-draw counts in its dose; the loop's does not. 7 "RJ4 at rest" where the voice runs on. 8 E11,
+SR13: the hand drops to y 1310-1480 under a thread's run. 9 rule 2: steam near the band bends sideways at y 620-700.
+10 Part 0b §3, I12's hand-off (+-40 px, within 1.5x). 11 rule 8, B1, B8: side-on legs level and vertical. 12 §2 item
+3 and the dose table: a one-place film keeps the counts; every join but the turn's is C. 13 §1, §3: a scale shot left by
+RJ2 only on a "But", from the landed frame after its hold. 14 J11 and the dose table: a light change in a held frame is
+RM6 or I11. 15 rule 21, clash row 32: the release stays on its word; the locked take's pause is SOUND_SYNC's.
+
+**Found while checking:** SR25 was missing from six recipe columns (A1, A2, D4, D7, E2, E8) and their Part 1 *Serves*
+lines; SR6 still listed N5 (now a rule) as a CORE device; T's row lacked "the line ends under its fill"; Z4 and SR22
+gave the paper's 60 % as ">= 456 px" (60 % of the 1080 px stage is 648). Fixed.
+
+**The sheet** (`library_sheet.png`, 1080 x 11933, from the judges' files and Part 0's names): the IN EVERY SHOT band
+first (his seven at the larger size, then ours six, each with its rule and its tier as a lead), then the 65 ranked
+frames by tier, † on the edges, the every-shot chip on the eleven of them that are also grammar; phone-checked in 1:1
+crops (no label runs into the next column, the footer wrapped).

@@ -38,8 +38,8 @@ import quay as Q  # noqa: E402
 from v7common import value_noise  # noqa: E402
 
 BOX = (0, 1140, 1080, 780)             # frame px: x, y, w, h (our bank: y 1143-1920)
-DOSE = dict(flag=0.045, mott=0.02, joint=0.55, lip_lost=0.62, wet=0.06, puddle_rich=0.14, wash=150, form=760, lost=150,
-            lipmark=110, chip=46)
+DOSE = dict(flag=0.045, mott=0.02, joint=0.55, lip_lost=0.6, wet=0.06, puddle_rich=0.14, wash=36, form=90, form_far=70,
+            lost=70, lipmark=50, chip=30)
 
 
 def flat_bank(parts):
@@ -185,10 +185,10 @@ def make(parts, seed='v7/quay', dose=None):
         near = treadcol.get(k, treadcol.get(k - 1, lc))
         far = treadcol.get(k - 1, near)
         nb = 0.5 * (near + far)
-        n1 = value_noise(f'{seed}/lip/{k}', (1, W + 400), 110, octaves=2, gain=0.5)[0, 200:200 + W]
-        n2 = value_noise(f'{seed}/lip2/{k}', (1, W + 400), 34, octaves=2, gain=0.5)[0, 200:200 + W]
-        lost = np.clip(0.5 + 0.9 * n1 + 0.25 * n2, 0, 1)
-        lost = L.smoothstep(0.35, 0.85, lost) * D['lip_lost']
+        n1 = value_noise(f'{seed}/lip/{k}', (1, W + 400), 70, octaves=2, gain=0.5)[0, 200:200 + W]
+        n2 = value_noise(f'{seed}/lip2/{k}', (1, W + 400), 26, octaves=2, gain=0.5)[0, 200:200 + W]
+        lost = np.clip(0.5 + 0.9 * n1 + 0.3 * n2, 0, 1)
+        lost = L.smoothstep(0.42, 0.82, lost) * D['lip_lost']
         lv = np.broadcast_to(lost[None, :], (H, W))
         c = lc[None, :] * (1 - lv[lm, None]) + nb[None, :] * lv[lm, None]
         c[:, 0] += rng.normal(0, 0.004)
@@ -224,6 +224,20 @@ def make(parts, seed='v7/quay', dose=None):
     if cl.any():
         cs = L.rgb2ok(modes(col, coping & (cop_l > 50), 1)[0])
         tgt[cl] = tgt[cl] * 0.45 + cs[None, :] * 0.55
+    # the coping's waterside edge (the canal's kerb: v7a's longest straight line after the lips): its wet dark lip broken
+    # into pieces with lost stretches (lerped to the coping's stone) and a few chips; the kerb itself hand-cut
+    if coping.any():
+        cop_stone = L.rgb2ok(modes(col, coping & (cop_l > 50), 1)[0])
+        lipw = coping & (Y540 < Q.COPING[0] + 6)
+        # the edge row's seam: the flat's light top face peeks out under its dark wet lip in the anti-aliased row (a
+        # 1 px bright line along the whole canal once the matte is divided out); that row takes the lip's own colour
+        lip_dark = L.rgb2ok(modes(col, lipw & (cop_l < 45), 1)[0])
+        seam = (alpha > 0.01) & (Q.y540_of(fx, fy) < Q.COPING[0] + 1.6)
+        tgt[seam] = lip_dark
+        nk = value_noise(f'{seed}/kerb', (1, W + 400), 70, octaves=2, gain=0.55)[0, 200:200 + W]
+        lostk = L.smoothstep(0.1, 0.6, nk) * 0.7
+        lk = np.broadcast_to(lostk[None, :], (H, W))
+        tgt[lipw] = tgt[lipw] * (1 - lk[lipw, None]) + cop_stone[None, :] * lk[lipw, None]
     base = L.ok2rgb(tgt)
     # ---- 4. the marks (MyPaint)
     plan = L.StrokePlan((seed, 'plan'))
@@ -252,38 +266,62 @@ def make(parts, seed='v7/quay', dose=None):
         tk_of[tread[k]] = k
     ys_, xs_ = np.nonzero(tk_of >= 0)
     order = r.permutation(len(xs_))
-    # (a) washes: big soft strokes along the treads, low opacity: the stone's slow colour
+    # the near half carries the bold marks (they read at 400 px); the far half by the canal only a few fine ones: a shade
+    # zone stays <= ~35 % covered (PAINT_RECIPES §1.4: calm stays calm), never an even texture
+    dist_lip = cv2.distanceTransform((~np.any([lip[k] for k in lip], axis=0)).astype(np.uint8), cv2.DIST_L2, 3)
+    cover = np.zeros((H, W), np.float32)
+
+    def footprint(pts, wd):
+        c8 = np.zeros((H, W), np.uint8)
+        (ax_, ay_), (bx_, by_) = pts
+        cv2.line(c8, (int(ax_), int(ay_)), (int(bx_), int(by_)), 1, max(1, int(wd)))
+        return c8.astype(bool)
+
+    # (a) washes: a few big soft strokes along the treads, very low opacity: the stone's slow colour
     n = 0
     for j in order:
         if n >= D['wash']:
             break
         x, y = xs_[j], ys_[j]
         gs = float(Q.ground_scale(x + X0, y + Y0))
-        if r.random() > 0.0009 / max(gs, 0.3):
+        if r.random() > 0.00025 / max(gs, 0.3):
             continue
         k = int(tk_of[y, x])
-        plan.add('wash', 'ramon/wet_round', along(x, y, r.uniform(140, 320) * gs), colour_at(x, y, r.choice([-1, 1]) * r.uniform(0.015, 0.035), r.normal(0, 0.006)),
-                 r.uniform(36, 90) * gs, r.uniform(0.1, 0.2), clip=f't{k}', ds=2.0)
+        plan.add('wash', 'ramon/wet_round', along(x, y, r.uniform(180, 380) * gs), colour_at(x, y, r.choice([-1, 1]) * r.uniform(0.012, 0.028)),
+                 r.uniform(40, 90) * gs, r.uniform(0.08, 0.14), clip=f't{k}', ds=2.0)
         n += 1
-    # (b) the flat blocky strokes along the perspective, bold near, fine by the canal; never inside a puddle
-    n = 0
+    # (b) the flat blocky strokes along the perspective: broad and few near the camera, fine and fewer by the canal; never
+    # inside a puddle, never on a lip (the steps stay legible), each a value step off its own flag (no hue jitter)
+    n_near = n_far = 0
     for j in order:
-        if n >= D['form']:
+        if n_near >= D['form'] and n_far >= D['form_far']:
             break
         x, y = xs_[j], ys_[j]
-        if pud[y, x] > 0.45:
+        if pud[y, x] > 0.3 or dist_lip[y, x] < 5:
             continue
         gs = float(Q.ground_scale(x + X0, y + Y0))
-        if r.random() > 0.0075 / max(gs, 0.3) ** 1.4:
+        near = gs > 0.75
+        if (near and n_near >= D['form']) or (not near and n_far >= D['form_far']):
+            continue
+        if r.random() > (0.0011 if near else 0.0009):
             continue
         k = int(tk_of[y, x])
-        Ls = r.uniform(40, 130) * gs
-        wd = r.uniform(9, 22) * gs
-        if Ls < 10 or wd < 2.6:
+        Ls = r.uniform(70, 190) * gs
+        wd = r.uniform(12, 28) * gs
+        if wd < 3.0:
             continue
-        dl = r.choice([-1, 1]) * r.uniform(0.03, 0.065) * (0.8 + 0.4 * min(gs, 1.5) / 1.5)
-        plan.add('form', 'tanda/acrylic-04-paint', along(x, y, Ls), colour_at(x, y, dl, r.normal(0, 0.007)), wd, r.uniform(0.45, 0.78), clip=f't{k}', ds=1.0)
-        n += 1
+        pts = along(x, y, Ls)
+        fp = footprint(pts, wd)
+        if cover[fp].mean() > 0.35:
+            continue
+        cover[fp] = 1.0
+        dl = r.choice([-1, 1]) * r.uniform(0.022, 0.045)
+        plan.add('form', 'tanda/acrylic-04-paint', pts, colour_at(x, y, dl), wd, r.uniform(0.35, 0.6), clip=f't{k}', ds=1.0)
+        if near:
+            n_near += 1
+        else:
+            n_far += 1
+    n = n_near + n_far
     # (c) strokes lapping across the nosings where a lip is lost: the long line breaks into pieces
     n = 0
     for k in range(1, 7):
@@ -314,10 +352,10 @@ def make(parts, seed='v7/quay', dose=None):
         while x < W and n < D['lipmark']:
             yl = Q.edge_y(Q.BAND_Y0[k] + 0.5 * Q.LIPS[k], x + X0) - Y0
             gs = float(Q.ground_scale(x + X0, yl + Y0))
-            plan.add('lipmark', 'tanda/acrylic-04-paint', along(x, yl, r.uniform(40, 110) * gs), colour_at(x, yl, r.choice([-1, 1]) * r.uniform(0.02, 0.045)),
+            plan.add('lipmark', 'tanda/acrylic-04-paint', along(x, yl, r.uniform(40, 110) * gs), colour_at(x, yl, r.choice([-1, 1]) * r.uniform(0.012, 0.028)),
                      max(2.8, Q.LIPS[k] * gs * r.uniform(0.7, 1.1)), r.uniform(0.5, 0.8), clip=f'l{k}', ds=1.0)
             n += 1
-            x += r.uniform(50, 120) * max(gs, 0.4)
+            x += r.uniform(110, 240) * max(gs, 0.4)
     # (e) a few worn chips on the nosings: short crisp marks of a lighter stone (the edge the feet wore)
     n = 0
     for k in range(1, 7):
@@ -332,7 +370,7 @@ def make(parts, seed='v7/quay', dose=None):
             x += r.uniform(120, 260) * max(gs, 0.4)
     # the coping: a few level strokes along its top in its own stone
     ys_c, xs_c = np.nonzero(coping & (L.Lstar(base) > 45))
-    for j in r.permutation(len(xs_c))[:40]:
+    for j in r.permutation(len(xs_c))[:14]:
         x, y = xs_c[j], ys_c[j]
         gs = float(Q.ground_scale(x + X0, y + Y0))
         plan.add('form', 'tanda/acrylic-04-paint', along(x, y, r.uniform(30, 80) * gs), colour_at(x, y, r.choice([-1, 1]) * r.uniform(0.015, 0.03)), max(2.6, r.uniform(4, 8) * gs),
@@ -345,5 +383,12 @@ def make(parts, seed='v7/quay', dose=None):
     out = painted.copy()
     out[..., :3] = painted[..., :3] * (1 - pw) + smooth * pw
     out[..., 3] = alpha
+    # the kerb's wet lip reaches 2 px over the canal's last rows (the painted canal mirrors the light coping there: a
+    # bright seam along the whole kerb): solid, in the lip's own dark stone
+    if coping.any():
+        yk = Q.edge_y(Q.COPING[0], fx)
+        over = (fy >= yk - 2.6) & (fy < yk + 1.5)
+        out[over, :3] = L.ok2rgb(lip_dark)
+        out[over, 3] = np.maximum(out[over, 3], np.clip((fy[over] - (yk[over] - 2.6)) / 0.8, 0, 1))
     stats = dict(box=list(BOX), strokes=plan.count(), mypaint_s=round(sec, 2), puddle_px=int((pud > 0.5).sum()))
     return out, stats

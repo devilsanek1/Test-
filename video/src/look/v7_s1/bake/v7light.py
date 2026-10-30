@@ -52,7 +52,80 @@ DOSE = dict(
     sun_bloom=1.0, veil=1.0, rims=1.0, lobby=1.0, door_bloom=1.0, pool=1.0, jambs=1.0, column=1.0,
 )
 
+#: look v7 (NOTES.md "v7"): v7a's doses plus the quay's light (quay_light): the sky's sheen in the wet stone and the door's
+#: light coming across the quay toward the camera (the story light reaching the viewer; refs 03 and 02: a quiet dark mass
+#: alive with what it mirrors)
+DOSE_V7 = dict(DOSE, quay=1.0, path=1.0, sheen=1.0, gleams=1.0, kerb_broken=1.0, kerb_reflection=1.0)
+
 YY, XX = np.mgrid[0:H, 0:W].astype(np.float32)
+
+# the quay's light (look v7): the door's reflection streak and the sky in the wet
+SKY_HI = lin_hex('#B7A8CB')   # the low sky behind the camera, as the far wet stone mirrors it at a grazing angle (L* 71)
+SKY_LO = lin_hex('#8A82B5')   # the higher sky, as the near puddles mirror it (L* 56)
+PATH_X = 629.0                # the door's opening's centre (OPENING 553-705)
+PATH_GOLD = lin_hex('#FFC874')  # the door's light as the dark wet stone mirrors it: its cream-gold, a little deeper (the
+                                # wet film keeps the source's colour but only a part of its light: a dim warm gold)
+
+
+def quay_light(L, dose):
+    """The quay's light (linear, additive: a reflection is light the stone's colour does not filter), on our bank's
+    pixels: (1) the SKY'S SHEEN in the wet: the damp film and the puddles mirror the dusk sky, strongest at the grazing
+    far end by the canal (Fresnel), a violet lift near the camera; (2) THE DOOR'S PATH: the lit opening mirrored by the
+    rough wet stone as one soft vertical streak below the door, from the coping down to the frame's bottom (the story
+    light coming to the viewer: the eye travels up it to the door), brightest by the canal, broken into level dashes by
+    the stone's grain, strong in the puddles, weak on the dry stone and the lips (a riser mirrors nothing of the door);
+    (3) a few small GLEAMS where puddle edges in the path catch the door. Shares quay.py's wet field with the painted
+    piece, so the reflections sit on the painted puddles."""
+    import quay as Q
+    wet, pud, _ = Q.wet_field()
+    R = Q.regions()
+    bank = np.clip(L['bank'], 0, 1)
+    lips = np.zeros((H, W), np.float32)
+    for k in range(1, 7):
+        lips = np.maximum(lips, R['lip'][k].astype(np.float32))
+    lips = gblur(lips, 0.6)
+    level = 1.0 - 0.85 * lips                                       # treads, landing and coping are level; lips are not
+    damp = np.clip(wet - pud, 0, 1)
+    # (1) the sky's sheen
+    far = smoothstep(1720.0, 1230.0, YY)                            # 1 by the canal, 0 near the camera
+    fres = 0.035 + 0.11 * far
+    sky = SKY_LO[None, None] * (1 - far[..., None]) + SKY_HI[None, None] * far[..., None]
+    sheen_w = (0.3 * damp + 1.0 * pud) * fres * level * bank * dose['sheen']
+    G = sheen_w[..., None] * sky
+    # (2) the door's path
+    y_cop = Q.edge_y(Q.COPING[1], PATH_X)
+    t = np.clip((YY - y_cop) / (H - y_cop), 0, 1)                   # 0 at the coping, 1 at the frame's bottom
+    half = 70.0 + 55.0 * t                                          # the opening's half-width, spreading toward us
+    lat = 1 - smoothstep(0.55 * half, 1.35 * half, np.abs(XX - PATH_X))
+    along = 0.17 + 0.83 * np.exp(-(YY - y_cop) / 420.0)
+    along = np.where(YY < y_cop - 3, 0.0, along)
+    grain = value_noise('v7/quay/path_grain', (H, W), 12, octaves=2, gain=0.5, aniso=(7.0, 1.0))
+    dashes = np.clip(0.62 + 0.55 * grain, 0.15, 1.0)
+    # by the canal the puddles carry it (bright dashes); toward the camera the wet film carries it as one soft glow (a
+    # puddle there must not become a bright island in the dark quay: composition R2)
+    surf_far = 0.24 + 0.76 * np.clip(pud * 1.1 + 0.6 * damp, 0, 1)
+    surf_near = 0.5 + 0.3 * np.clip(pud + 0.6 * damp, 0, 1)
+    surf = surf_far * (1 - t ** 0.8) + surf_near * t ** 0.8
+    path = lat * along * dashes * surf * level * bank * dose['path']
+    # inside the path the door's gold outshines the sky's violet (the sheen gives way to it)
+    G *= (1 - 0.65 * lat * smoothstep(y_cop, y_cop + 30, YY))[..., None]
+    G += (gblur(path, 1.2) * 0.3)[..., None] * PATH_GOLD
+    # (3) gleams: a few puddle edges in the path's core catch the door (small level glints, 2-6 px)
+    r = rng('v7/quay/gleams')
+    edge = np.clip(gblur(pud, 1.0) - gblur(pud, 3.0), 0, 1) * (1 - smoothstep(0.4 * 70, 1.0 * 70, np.abs(XX - PATH_X)))
+    edge *= smoothstep(y_cop, y_cop + 20, YY) * (1 - smoothstep(1380, 1560, YY)) * bank
+    ys, xs = np.nonzero(edge > 0.05)
+    gl = np.zeros((H, W), np.float32)
+    if len(xs):
+        for j in r.choice(len(xs), size=min(10, len(xs)), replace=False):
+            cx, cy = float(xs[j]), float(ys[j])
+            rx, ry = r.uniform(1.6, 3.4), r.uniform(0.6, 1.0)
+            e = ((XX[int(cy) - 4:int(cy) + 5, int(cx) - 6:int(cx) + 7] - cx) / rx) ** 2 + ((YY[int(cy) - 4:int(cy) + 5, int(cx) - 6:int(cx) + 7] - cy) / ry) ** 2
+            g = np.exp(-e) * r.uniform(0.5, 1.0)
+            sl = gl[int(cy) - 4:int(cy) + 5, int(cx) - 6:int(cx) + 7]
+            np.maximum(sl, g.astype(np.float32), out=sl)
+    G += (gl * 0.32 * dose['gleams'] * bank)[..., None] * HOT
+    return G * dose['quay'], dict(path=path, sheen=sheen_w, gleams=gl)
 
 
 def waterline(x):
@@ -170,6 +243,11 @@ def light_v7(base, L, vis, A, dose=DOSE):
     r_lamps = LT.rim_band(L['lamps'], 1.6, l_sun, p=0.9) * np.maximum(smoothstep(960, 780, YY), gap)
     r_boats = LT.rim_band(L['boats'], 1.6, l_sun, p=1.2) * 0.5
     r_cope = LT.rim_band(bankL, 3.0, l_sun, p=0.8) * (1 - canopy)
+    if dose.get('kerb_broken'):
+        # look v7: the canopy's leafy edge throws its clumps across the kerb too: the sunlit lip lit in pieces (lost over
+        # ~half its length), never one ruled line of light along the whole canal
+        kb = value_noise('v7_s1/kerb_light', (1, W + 400), 46, octaves=2, gain=0.5)[0, 200:200 + W]
+        r_cope = r_cope * smoothstep(-0.05, 0.3, kb)[None, :]
     rims = np.maximum.reduce([r_far * 0.22, r_tower * 0.32, r_wing * 0.62, r_lamps * 0.5, r_boats * 0.55, r_cope * 0.7])
     rims = gblur(rims, 0.6) * dose['rims'] * fade
     E += rims[..., None] * KEY * 1.6
@@ -221,6 +299,16 @@ def light_v7(base, L, vis, A, dose=DOSE):
     below = (YY > yw[None, :] + 6).astype(np.float32)
     wS = np.clip(mirror_src, 0, 1) * below * wl * dose['water']
     E = E * (1 - wS[..., None] * (1 - Em))
+    if dose.get('kerb_reflection'):
+        # look v7: the canal mirrors our kerb's dark wet face just beyond it: a band 3-10 px deep over the water at the
+        # kerb, its far edge rippled (the water's own small waves), so the kerb's edge is LOST into its reflection and
+        # the visible step moves to a broken, wavering line (ORGANIC §4.1: a long edge lost where it meets a close value)
+        kb_top = btop[None, :]
+        depth = 6.5 + 3.5 * value_noise('v7_s1/kerb_refl', (1, W + 400), 40, octaves=2)[0, 200:200 + W][None, :]
+        ripple = 1.6 * value_noise('v7_s1/kerb_ripple', (H, W), 5, octaves=2, aniso=(4.0, 1.0))
+        dd = kb_top - YY + ripple
+        refl = smoothstep(depth + 1.5, depth - 1.5, dd) * (dd > -1.5) * wl
+        E = E * (1 - (0.62 * refl)[..., None] * (1 - lin_hex('#5E5378')[None, None]))
     # the door's column (the light on water: water E2) and the sun's glitter
     med = np.median(Ls[wl > 0.5])
     col = wl * smoothstep(med + 4, med + 16, Ls) * smoothstep(520, 560, XX) * (1 - smoothstep(700, 740, XX))
@@ -246,6 +334,12 @@ def light_v7(base, L, vis, A, dose=DOSE):
         lab_l[..., 1] += (ra - lab_l[..., 1]) * wgl[..., 0]
         lab_l[..., 2] += (rb - lab_l[..., 2]) * wgl[..., 0]
         lit = np.where(wgl > 0, np.clip(lab_to_lin(lab_l), 0, None), lit)
+    quay = None
+    if dose.get('quay'):
+        # look v7: the quay's light, after the glaze (a reflection keeps its source's colour: the door's gold, the sky's
+        # violet), on the bank's pixels only
+        Gq, quay = quay_light(L, dose)
+        lit = lit + Gq
     lit_pool = lit + B * pool_E
-    return lit, lit_pool, dict(E=E, G=G, canopy=canopy, holes=holes, rims=rims, sun=(sx, sy, sr), pool=pf * ground,
+    return lit, lit_pool, dict(quay=quay, E=E, G=G, canopy=canopy, holes=holes, rims=rims, sun=(sx, sy, sr), pool=pf * ground,
                                bloom_sun=bl, bloom_door=bloom_d * outside, edge=edge, column=gblur(col, 4))
