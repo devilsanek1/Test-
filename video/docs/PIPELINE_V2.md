@@ -48,6 +48,12 @@ ideas; frames planned and created whole from the get-go, never filled for densit
    actions played; the owner locks it.
 7. **ANIMATION** (G5-G6): each shot animated from its own key frame (life, motion, the transitions), never re-filled.
 8. **Sound and final** (G7-G8, as below).
+**Our recipes are the toolbox at every step, never a cage (owner, 2026-10-30: "are the composition recommendation
+included in here? Are the stylistic recipes included here? is it completley free flowing ..."):** the ideas are
+composed with `docs/look/COMPOSITION_SHOTS.md` (the frame's grammar in every frame, one lead device per frame named by
+its code), `LAYOUT.md`'s bands and the world's rules (DIRECTION, COZY_AND_SCALE, LIFE_AND_DENSITY: a full world designed
+in); the key frames apply the style recipes in full (painter v7, ORGANIC, PAINT_RECIPES, the film's palette and light,
+PEOPLE_DESIGN, TYPE_GUIDE, the picked ink line); the shot plan takes the library's moves and joins and `SOUND_SYNC.md`.
 Checks catch mistakes (captions, safe zones, timing, contrast); they never design a frame. Where a gate below asks for
 grey placeholders, density keys or a fill pass, this loop replaces it.
 

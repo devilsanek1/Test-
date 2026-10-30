@@ -31,6 +31,24 @@ among yours, never a limit; ignore its camera.
 | B11 | "Then pipes under the streets carry that heat into people's homes." | the pipes bring it under the city into homes |
 | B12 | "So your chatbot could soon heat an apartment in Helsinki." | your own chatbot could warm a home: the payoff, and the loop back to B1 |
 
+**Our recipes: the toolbox, never a cage (imagination first, inside what we have built).** Read before drawing:
+- **Composition (every thumbnail):** `video/docs/look/COMPOSITION_SHOTS.md` Part 0 (the ranked library: CORE first, the
+  owner's 41 ideas first) and Part 0b (the guidelines: the frame's grammar kept in EVERY frame, such as the thirds, the
+  soft near layer, the atmospheric layers, the one colour accent; one lead device per frame; the rhythm: 6-9 different
+  lead devices across the film), with `composition/library_sheet.png`. Each idea names its lead device by the
+  library's code. The frame itself: `video/docs/look/LAYOUT.md` §1 (the caption band y 290-600 is the open sky or wall
+  the words sit in; the read zone y 600-1250 where the idea plays; the app's UI zones kept clear).
+- **The world and the story's staging:** `video/docs/look/DIRECTION.md` (one subject at a time; depth and scale from a
+  human viewpoint; the home place), `COZY_AND_SCALE.md` (the home place held on 2-3 sides; at most one big scale
+  moment), `LIFE_AND_DENSITY.md` (the world full and alive in its calm tier, designed into the frame, never added later),
+  the playbook's fullness rule ("a place, never buildings standing alone").
+- **The look (applied in full at the KEY FRAMES; your thumbnails stay value sketches, but each idea must be one that
+  can be painted this way):** painter v7 (`video/docs/studies/2026-10-28_city_posters/paint_test/paint_still_v7a.png`),
+  `ORGANIC.md` and `PAINT_RECIPES.md` (painted pieces, organic shapes, one story light), the dark night key with one
+  warm accent (`WORLD_BIBLE.md` §2-3: the palette and the light; ignore its density keys), the people in use, the
+  words on screen, and the ink line under test (`video/docs/look/ink_test/`).
+- **Later steps use the rest:** the shot plan takes the library's moves and joins and `SOUND_SYNC.md`.
+
 **The job:** for each beat, imaginative picture ideas a regular viewer reads in a second, each drawn as ONE WHOLE FRAME
 thumbnail (1080 x 1920 drawn small: the idea, the full world around it, the light, the people, where the words sit),
 never a lone object on an empty field. Imaginative like video 1: the true mechanism shown through a playful, readable

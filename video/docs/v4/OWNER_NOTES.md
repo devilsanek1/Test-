@@ -376,3 +376,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   relaunched free: fixed are only the voice (words, times), the facts and the card's story-level choices; v3's pictures
   are one candidate. The order now: beats -> ideas -> key frames made whole -> the shot plan (the visual script written
   FROM the key frames) -> the animatic. -> rules: PIPELINE_V2 "THE LOOP NOW"; playbook, Storyboard (G3) and flow.
+- 2026-10-30 ~23:20 UTC: "are the composition recommendation included in here? Are the stylistic recipes included here?
+  is it completley free flowing or what we've done previously in terms of building up the visual recipes would be
+  included?" -> not enough: the relaunched brief named only the people and the type. The ideas round was stopped and
+  relaunched once more with the toolbox: the composition library (the grammar in every frame, one lead device per
+  frame by its code), LAYOUT's bands, DIRECTION, COZY_AND_SCALE, LIFE_AND_DENSITY; the look recipes named for the key
+  frames. -> rules: playbook THE THREE RULES (imagination first, inside the toolbox); PIPELINE_V2 THE LOOP NOW.

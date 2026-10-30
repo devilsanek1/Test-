@@ -33,7 +33,11 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
 
 **The process is loose and imaginative around these three:** pictures before documents, ideas before rules. Every
 other rule in this playbook serves them as guidance from the owner's past notes, never as a checklist that designs the
-frame; checks catch mistakes (captions, safe zones, timing), they never stand in for the picture. — ("how do we adjust
+frame; checks catch mistakes (captions, safe zones, timing), they never stand in for the picture. **Imagination first,
+inside the toolbox we built:** the composition library composes the ideas, the style recipes make the key frames, the
+moves, joins and sound sync make the shot plan (PIPELINE_V2, "THE LOOP NOW") — ("are the composition recommendation
+included in here? Are the stylistic recipes included here? is it completley free flowing or what we've done previously
+in terms of building up the visual recipes would be included?", 2026-10-30). — ("how do we adjust
 our overal process, i want to make it more loose, more imaginative. i like the main important rule is every frame is
 worth pausing on yes + readable imaginative ideas + frames planned and created whole. We shouldn't be in a situation
 where we have our video and then we just fill up space for the sake of density this is wrong we need to be imaginative
