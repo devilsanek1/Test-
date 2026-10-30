@@ -304,3 +304,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   animates; the bodies (stand-ins: stiff, mitten hands, tees) do not, so the page (version 3, same link) shows the heads,
   the motion strips and film size, with the bodies marked not done; a bodies round (poses, hands, clothes,
   proportions) started beside the owner's review (`docs/look/people_design/bodies_v4/`).
+- 2026-10-30 ~19:20 UTC, on page version 3: "Hair is a bit cleaner let's keep it for now" -> hair v4 (authored shapes on
+  a spring rig, soft shading) is the hair in use for now (PEOPLE_DESIGN status, the playbook); to iterate later. The
+  eyes (LASH or open) and the cut-by-cut notes stay open; the bodies round continues. -> rule: playbook, Visual style
+  (hair v4 kept for now).

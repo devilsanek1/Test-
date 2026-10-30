@@ -374,7 +374,9 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   of small locks), layered back / cap / front like a 2D cut-out rig, the hanging pieces on bone chains with spring
   physics, so the same clean shapes bend and settle in motion; proven with motion strips (frames of a turn, a walk,
   a breeze) beside the stills before the owner sees it. A procedural scatter of polygon locks read as "garbage", "not
-  appealing or clean" (v2 and v3, 2026-10-30). The recipe must be the most pleasant and modern we have
+  appealing or clean" (v2 and v3, 2026-10-30). KEPT FOR NOW (2026-10-30): hair v4, authored shapes on a 2D spring rig
+  with soft shading (`docs/look/people_design/hair_v4/`; "Hair is a bit cleaner let's keep it for now"); to iterate
+  later. The recipe must be the most pleasant and modern we have
   (`docs/look/PEOPLE_DESIGN.md`, the hair and proportions iteration; references `docs/look/people_design/
   refs_hair_2026-10-30/`). — ("So we previously made a recipe and a detailed research and the update to people figures /
   We need to iterate on it more and improve the hair and the proportions and stature / I will send you more references
