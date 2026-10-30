@@ -19,7 +19,7 @@ export type PaintS1Props = Omit<PosterS1Props, 'preset'> & {
   paint?: boolean;
   /** Which painted pieces (default all): a subset for A/Bs. */
   pieces?: string[];
-  /** Which bake (paint_set.ts): 'v1' (default), 'v2' (the bolder dose), 'v3' (the broad brush, a layered sky), 'v4design' (v4's flat designed shapes), 'v4' (them painted), 'v5' (v4 redesigned, one evening light for the whole scene). */
+  /** Which bake (paint_set.ts): 'v1' (default), 'v2' (the bolder dose), 'v3' (the broad brush, a layered sky), 'v4design' (v4's flat designed shapes), 'v4' (them painted), 'v5' (v4 redesigned, one evening light for the whole scene), 'v6' (painter v6 from the recipe book, with the darks switch, the refined her and a deeper lilac shadow family: v6.tsx). */
   set?: PaintSetName;
   /** The opening's PAINT-ON as a still (lib/paint reveal.tsx; owner: "would it literally just popup?"): the overall
    *  progress 0..1, 0 = our flat design, 1 = painted, each piece in S1_REVEAL_WINDOWS's order ('ai1': ai_paint/NOTES.md).

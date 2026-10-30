@@ -4,6 +4,8 @@
 // The film's sun disc goes quiet wherever the painted sky draws CRAFT §g.2's own (its manifest row `hides: ['sun']`).
 import React, {createContext, useContext} from 'react';
 import {usePaintOn, usePiece} from '../../lib/paint';
+import {tintFamily, type LightRig} from '../../lib/light';
+import {TINT_CANAL} from '../../v2r/world/rigs';
 
 const V6Ctx = createContext(false);
 export const V6Provider: React.FC<{on: boolean; children?: React.ReactNode}> = ({on, children}) => <V6Ctx.Provider value={on}>{children}</V6Ctx.Provider>;
@@ -16,3 +18,11 @@ export function usePaintHides(pieceName: string, thing: string): boolean {
   const on = usePaintOn(pieceName);
   return on && !!piece?.hides?.includes(thing);
 }
+
+/** (v6, the phone-size fix) the rig's shadow family turned to the dusk's lilac-plum and a step deeper, so every near
+ *  thing's cast and contact shadow is one of the real darks in many small pieces (CRAFT §f.8), cool on the warm ground
+ *  (v5's duskRig family, deeper: cast 0.44, contact 0.62); the water keeps its own step. */
+export const v6Rig = (rig: LightRig): LightRig => ({
+  ...rig,
+  tints: {...tintFamily('#86719F', {form: 0.24, cast: 0.44, contact: 0.62}, '#FFFFFF'), water: TINT_CANAL.water} as LightRig['tints'],
+});

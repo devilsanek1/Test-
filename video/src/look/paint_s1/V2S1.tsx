@@ -38,6 +38,7 @@ import {shadeRig, TextureSlot} from './engine';
 import {useTime} from '../../lib/time';
 import {PARALLAX_SKY} from '../../lib/depth';
 import {duskRig, useDusk} from './dusk';
+import {useV6, v6Rig} from './v6';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
@@ -47,9 +48,12 @@ const V2S1: React.FC = () => {
   const t = useTime();
   // (paint v5) one evening light: the lilac shadow family under the dusk sky
   const dusk = useDusk();
+  // (paint v6) the lilac-plum shadow family, a step deeper (v6.tsx)
+  const v6 = useV6();
+  const rig = shadeRig(sw, RIG_CANAL, CM.shadeWarm);
   return (
   <World sky={CM.white} horizon={1000}>
-    <Lit rig={dusk ? duskRig(shadeRig(sw, RIG_CANAL, CM.shadeWarm)) : shadeRig(sw, RIG_CANAL, CM.shadeWarm)}>
+    <Lit rig={dusk ? duskRig(rig) : v6 ? v6Rig(rig) : rig}>
       {/* (the look test's texture: the sky's mottle, the sky plane's seed, no float) */}
       <TextureSlot sw={sw} t={t} plane={PARALLAX_SKY} sky>
         <SkyFlood />
