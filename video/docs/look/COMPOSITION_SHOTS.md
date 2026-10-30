@@ -1,5 +1,11 @@
 # COMPOSITION_SHOTS: the shot library (composition recipes for our 9:16 films)
 
+> **Summary.** Part 1 is the device catalogue: every composition idea in the owner's five reels, in his reels' order and names.
+> **The owner's 41: 24 used as they are, 17 adapted (each change in numbers), 0 rejected**, plus the reels' own device T (adapted).
+> Our research adds 15 devices (11 YES, 4 ADAPT), listed apart (§D2); 6 treatments the references show are rejected (§D3). In all, 63 entries: 35 YES, 22 ADAPT, 6 REJECT.
+> Every YES and ADAPT device is named by its code in the recipes it serves (Part 2, the coverage table §D4); none needed a new recipe.
+> Two sheets: `composition/devices_sheet.png` (one value thumbnail per device, the owner's 41 first) and `composition/shots_sheet.png` (one per recipe, SR1-SR24).
+
 The owner (2026-10-30): "After we are done with this I want you to do another research and distill of the composition
 shots to use / Take a look at this folder I collected some initial references but do the deeper research"
 (`refs_composition/`). Earlier the same day: "8 agreed this is an important point about scene composition"; on still v6:
@@ -7,7 +13,9 @@ shots to use / Take a look at this folder I collected some initial references bu
 need to evaluate our visual script for Helsinki story to figure out how to compose each scene and how we animate and
 move within a scene and from scene to scene".
 
-**What this is.** The distill: the 13 composition rules that matter most in our frame (§1), a table of the 24 shot
+**What this is.** Part 1, the device catalogue: each composition idea of the owner's reels (A1-E11, T) and of our
+research (N1-N15) with its verdict and its numbers in our frame, what we reject (X1-X6) and the coverage table (§D1-D4).
+Part 2, the distill: the 13 composition rules that matter most in our frame (§1), a table of the 24 shot
 recipes (§2), the recipes themselves, each by story beat, with its layout in numbers, its device, its camera move and
 joins, what it must never do and how it looks in our two test places (§3), how to pick shots for a film (§4) and the
 clashes with the docs in force (§5). It sums up four research notes, which keep the evidence and the sources:
@@ -39,6 +47,559 @@ squint; counterchange = dark against light at the one spot; the steelyard = a bi
 farther out; a repoussoir = a framing mass at one side edge; affinity and contrast = calm (level lines, close values,
 slow) against intense (diagonals, hard steps, jumps in size); the drop = the eye's way down from the captions to the
 focal; the pivot = the subject held still while the world moves past it.
+
+## PART 1. THE DEVICE CATALOGUE
+
+The owner (2026-10-30), on the first version of this library: "Wait how many of the ones mentioned in the references
+you actually took ? I don’t see leading lines or vanishing point or frankly most of the references are not there?"; then
+"I didn’t get once again why you ignored all my references and came up with yours?". The playbook's rule since: "A
+distillation accounts for EVERY reference item: used (where, visibly), adapted (how), or rejected (why)".
+
+**How to read it.** §D1 is the spine: the 41 ideas of the owner's five reels, in `composition/reels.md`'s order and with
+the reels' own names (A placement, B lines, C frames and levels, D masses, E the moves the examples make without naming
+them), then the reels' own teaching device (T). Under each name is its reference: the reel and the time in it
+(`composition/reels.md` §3, its tile on `composition/reels_sheet.jpg`) and what the example shows. Then: what it is (one
+line), where it sits in our 1080 x 1920 frame (numbers), the beats and recipes it serves, and the verdict: **YES** (used
+as it is), **ADAPT** (used with the change named, in numbers) or **REJECT** (why). §D2 holds the devices our own research
+adds (not in the reels), §D3 what we reject, §D4 the coverage table. Every YES and ADAPT device is named, by its code, in
+the Device line of each recipe it serves (§3). Each has a value thumbnail on `composition/devices_sheet.png` (drawn by
+`composition/devices_sheet.py`): the owner's 41 first, in this order.
+
+**The numbers used** (§0 defines them): the caption band y 290-600 (its block y 317-556, centred on x 520); nothing to
+read above y 240, at y >= 1519 (the app's text) or at x > 870 below y 860 (the rail); x < 98 and x > 982 are cut on the
+owner's feed; the stage square y 600-1520; the focal home x 380-700, y 860-1200, its heart the golden box x 413-667, y
+951-1187; the horizon in setup A at y 1150-1300, in setup B at y 690-860, never y 900-1020; the "you" 130-220 px tall.
+
+### D1. The owner's 41 ideas (the reels' order and names)
+
+#### A. Where the subject sits
+
+**A1 Rule of thirds · ADAPT.** *Reference:* 02 at 4.75 s (a photographer on a boat, her face on the right line), 03 at 0 s
+(a palm on the left line, a boat circled on a crossing), 04a at 7.5 s (a face on the right line, from low in the grass),
+04b at 28.25 s (a near profile on the left line).
+- *What:* the frame cut 3 x 3; the subject on a line, the horizon on a third, never on the half.
+- *9:16:* the verticals x 360 / 720 are the subject axis's edges (on the owner's feed his visible thirds fall at x 393 /
+  687, inside the axis); the horizontals y 640 (40 px under the band) and y 1280 (setup A's horizon: the sky two thirds,
+  the band high in it).
+- *Serves:* every exterior as a 2:1 proportion; the horizon on the lower third (SR9, SR14), the sky a third (SR2's raised
+  variant), a landmark on the left third (SR16), a figure on x 360-420 or 660-720 facing in. **SR2, SR9, SR14, SR16.**
+- *Change:* the lines are proportions and the axis's edges; the four crossings are never placement points (the upper two
+  sit 40 px under the band, the lower two 30 px under the read zone's floor).
+
+**A2 Golden section (the phi grid) · YES.** *Reference:* 03 at 8.0 s (a lone tree on the right line at the upper line,
+a river winding in front).
+- *What:* lines at 0.382 / 0.618 of the frame, nearer the centre than the thirds.
+- *9:16:* x 413 / 667 (inside the subject axis), y 733 (setup B's horizon band) and y 1187 (the floor of the focal box);
+  the stage square's y 951 / 1169. The golden box x 413-667, y 951-1187 is the focal's home.
+- *Serves:* every beat's focal (rule 3); named in SR1, SR6, SR8, SR12, SR20, SR21. **All recipes (rule 3).**
+
+**A3 Golden section, nested · ADAPT.** *Reference:* 03 at 16.5 s (a big tree on the main line; a small house, with a path
+to it, in the nested cell at its foot).
+- *What:* the frame cut at phi and the smaller part cut again, homing in on one point.
+- *9:16:* built on the full frame, the nested point falls at y 1190-1380 (at or under the read zone's floor). Built on the
+  stage square: the big thing on x 667 (its top under the band, y >= 620), the ground on y 1169; the cell x 413-667, y
+  951-1169 cut again at x 510 / 570, y 1034 / 1086; the small subject at (570, 1086), at the big thing's foot.
+- *Serves:* a big thing with the subject small at its foot: a tower or a tree and the lit window under it, the giant and
+  the figure. **SR15, SR14.**
+- *Change:* built on the stage square, not the frame.
+
+**A4 Golden spiral / golden ratio · ADAPT.** *Reference:* 03 at 2.5 s (a treehouse at the spiral's eye), 04a at frame 0
+(the walker toward the villa at the eye as the title appears), 04b at 22.25 s (a firework burst at the eye), 05 at
+3.25 s (a hiker on a ledge at the eye).
+- *What:* a spiral built on golden rectangles; the eye travels the curve into its pole, where the subject is.
+- *9:16:* fitted to the frame (a 1080 x 1747 golden rectangle) its pole lands at x 298 / 782 and y 483-656 or 1265-1437:
+  in the band or under the read zone. Scaled so its pole is the subject (x 540-700, y 1000-1200), its outer arcs leave
+  the frame: in the tall frame the outer arc runs from the hero cloud in a top gutter down the side mass and in to the
+  subject, tying the counterweight (rule 9) to the focal (rule 4).
+- *Serves:* the subject's moment and the payoff's sweep. **SR6 (variant), SR24 (variant).**
+- *Change:* scaled to its pole on the subject; never fitted to the frame.
+
+**A5 Golden triangle · ADAPT.** *Reference:* 03 at 14.5 s (a mountain slope on the long diagonal, two smoke plumes on the
+perpendiculars).
+- *What:* one diagonal and the perpendiculars to it from the other two corners: three similar triangles, the subjects at
+  the two feet.
+- *9:16:* on the full frame the diagonal is 61 degrees and its feet fall at (820, 461) and (260, 1459): in the band and by
+  the bottom UI. On the stage square (y 600-1520) the diagonal is 40.4 degrees and its feet fall at (626, 987) and (454,
+  1133) (rising to the right; mirrored (454, 987) and (626, 1133)): both inside the golden box. The slope (a hill, a ramp,
+  the steps, a roof line) lies on the stage's diagonal, broken by the subject at one foot, a tier-B thing at the other;
+  its high end in the gutter at y >= 620.
+- *Serves:* a slope, the level change, the turn's one diagonal. **SR11, SR18.**
+- *Change:* drawn on the stage square, never on the frame.
+
+**A6 Cross · YES.** *Reference:* 03 at 18.0 s (a bare tree's trunk crossing the horizon, a moon at the upper left).
+- *What:* one strong vertical crossing one strong horizontal.
+- *9:16:* the tall frame gives the vertical its full height: a lamp post, a mast, a trunk, a standing figure or the giant's
+  edge crossing the horizon at x 413-667 (setup A y 1150-1300; setup B y 690-860), its top under the band (y >= 620) or
+  in a gutter.
+- *Serves:* a person's moment, an upright subject, the giant on its ground line. **SR9, SR15.**
+
+**A7 Symmetry · YES (once a film).** *Reference:* 02 at 7.5 s (a pavilion on a bridge mirrored in a still lake at dusk),
+04a at 3.0 s (a pier straight out to a red-and-white tower), the titles 01 at 0 s and 04b at 19.25 s (a carriage's two
+doors round the centre pole).
+- *What:* a mirror axis down the centre, or the water's mirror; the subject on the axis.
+- *9:16:* the axis x 540, 20 px from the captions' centre line (x 520), so the words sit on it; the landmark at y
+  850-1040, the waterline at 1040-1100 (off the half), the reflection to y ~1300 a step darker; the halves within +-5 %
+  in mass.
+- *Serves:* a stillness or formal beat, the loop's end. **SR23.**
+
+#### B. Lines that carry the eye
+
+**B1 Leading lines · YES.** *Reference:* 02 at 10.0 s (a path through tea fields from the bottom edge to a lone tree), 04a
+at 12.0 s (a sunlit path and a stair's rails converging on a man).
+- *What:* lines in the scene (a path's edges, kerbs, rails, a coping, a stair, a melt line) that run to the subject.
+- *9:16:* the ground fills the lower half, so the lines rise from the bottom edge (they may start under the bottom UI as
+  mass edges) at 40-60 degrees, in 2-3 legs of >= 150 px, and end within 40 px of the focal's box at (480-640,
+  950-1150), at the story light and the hardest value step (the lines lead, the light decides: rule 4). Never across the
+  band, never on past the focal down to the name block.
+- *Serves:* arrival, the thing at the end of the way, the payoff's sweep. **SR7, SR3, SR24.**
+
+**B2 Vanishing point / one point · YES.** *Reference:* 01 at 13.0 s (a street of mansion blocks, parked cars on both
+sides, closed by a house and trees), 04b at 25.25 s (a pier straight out into a misty lake, a man where the lines cross).
+- *What:* one-point perspective: every receding line meets at one point on the horizon, the subject at or in front of it.
+- *9:16:* the vanishing point on the subject (within 60 px) or hidden behind it, at x 540-700, y 950-1150 (a lane's
+  horizon y 1020-1150, off the half); the receding lines on the ground and the facades, ending under the band (the
+  reels' X from the four corners is 61 degrees steep and its upper arms would cross it); the sight line closed by one
+  object (E7).
+- *Serves:* a street or a quay as the home place; the walk; arrival. **SR3, SR7.**
+
+**B3 Radiating · YES.** *Reference:* 03 at 13.0 s (railway tracks, wires and poles fanning out from a vanishing point).
+- *What:* lines spreading from one point like a starburst.
+- *9:16:* the point on the subject (within 60 px of its box) in the golden box; the rays on the ground (tracks, paving
+  joints, tyre tracks in the snow) and on the walls (courses, a hall's rows), 5-9 of them, tone-on-tone except where they
+  meet; no ray across the band (wires only above y 290 or below y 600).
+- *Serves:* a hall or a yard where everything points at one thing. **SR15, SR3, SR21.**
+
+**B4 Tunnel · ADAPT.** *Reference:* 03 at 14.0 s (a railway tunnel's mouth in a rock face, the small light at its end
+centred).
+- *What:* a frame inside a frame, joined at the corners (a one-point box): the eye goes through to the small lit opening.
+- *9:16:* a tunnel's ceiling would cross the band, so a tall portal instead (an arch under a bridge, a gateway, a
+  passage): its sides in the gutters (x < 95, x > 945) through the band's height, its lintel above y 290 or cut by the
+  top edge, so the band lies in the lit far field; the far opening at (540, 950-1100), its corners joined to the
+  portal's by the receding walls.
+- *Serves:* the start of a reveal (a push-through, carrier A); arrival. **SR3, SR17.**
+- *Change:* a tall portal with the band in its far field, never a ceiling through the band.
+
+**B5 Parallel lines · ADAPT.** *Reference:* 01 at 4.25 s (an escalator's handrails, the wall's edge and a row of ad panels
+at ~40 degrees, the camera riding it).
+- *What:* several lines in one direction: rhythm and a direction of travel.
+- *9:16:* steps, railings, a ramp's courses or roof ridges at 30-60 degrees (the reel's 40 is the stage square's
+  diagonal), 3-5 lines, kept below y 600 and inside the stage; in motion the lines hold and the things on them pass.
+- *Serves:* travel and the mechanism on its way; the steps between two levels. **SR10, SR11.**
+- *Change:* the lines kept below y 600 and in the stage.
+
+**B6 Diagonal · YES.** *Reference:* 03 at 3.5 s (a hillside falling from the upper left to the lower right).
+- *What:* one dominant line across the frame: a slope, energy.
+- *9:16:* the full frame's diagonal is 60.6 degrees (a climb), the stage square's 40.4: one dominant diagonal of 30-45
+  degrees inside the stage, rising toward the focal and broken by it (no unbroken corner-to-corner line: rule 8); never
+  across the band; never in a cozy beat.
+- *Serves:* contrast: the turn, the slope a figure climbs, the seam on a diagonal. **SR18, SR11, SR20.**
+
+**B7 Double diagonal · ADAPT.** *Reference:* 03 at 11.5 s (two roads crossing, seen from above, lamps along them).
+- *What:* two diagonals crossing (an X, not from the corners).
+- *9:16:* straight from above, the X's arms would cross the band. From SR5's balcony (35-55 degrees down, the lid's flat
+  facade behind the band) a crossroads seen corner-on makes the X: the crossing in the golden box at (540, 1000-1100), the
+  arms 30-50 degrees from level leaving by the side edges below y 620, the lamps along them as texture.
+- *Serves:* the home place from above; two flows meeting at one place (two streets, two pipes). **SR5 (variant).**
+- *Change:* SR5's raised angle, the crossing on the focal, once a film.
+
+**B8 S-curve · YES.** *Reference:* 03 at 5.5 s (a river curving between trees into the distance).
+- *What:* a winding line from the near frame to the far, leading the eye slowly through the depth.
+- *9:16:* the tall ground holds one more bend than a landscape frame: 2-3 bends entering at the bottom edge (x 250-830),
+  each 25-40 % W wide and about half the width of the bend below it, ending on or behind the focal at (480-640,
+  950-1150); never through the band.
+- *Serves:* a calm way in; arrival by water or path. **SR7 (the S variant).**
+
+**B9 C-shape · YES.** *Reference:* 03 at 7.0 s (a big tree arching its trunk and canopy over a valley).
+- *What:* a curve that wraps the subject on one side, its opening facing the subject.
+- *9:16:* LAYOUT's BALCONY curve: it enters just under the band (y 600-700), wraps the focal, leaves the other side at y
+  860-1060 and dives under a mass through a mouth <= 150 px; the subject inside the curve or at its end, never outside it.
+- *Serves:* the home place from above; a crowd's flow. **SR5.**
+
+**B10 L-shape · YES.** *Reference:* 03 at 6.0 s (a tall cypress at the left edge standing on the horizon line, a low sun
+at the right).
+- *What:* one tall vertical at one side plus the ground line: a frame on two sides, open on the others.
+- *9:16:* our cozy asymmetric frame (LAYOUT §2): one tall side cut by the top edge, its face one flat field through the
+  band (L* >= 70) or kept in the gutter (x < 95 / > 945) there; the ground line at y 1250-1450; the other side tops out
+  below y 600; the focal toward the L's inner corner, in the golden box.
+- *Serves:* the home place's cozy frame; refuge on two edges. **SR3, SR4.**
+
+**B11 V-shape · ADAPT.** *Reference:* 03 at 9.0 s (two rows of tall buildings on a street, converging).
+- *What:* two masses sloping in to one point.
+- *9:16:* the V's open top is the sky with the band in it: the slopes stay in the gutters (x < 95, x > 945) through y
+  290-600, come in below it at 50-70 degrees from level and meet within 60 px of the focal (540, 950-1100).
+- *Serves:* the lane's canyon; the turn's inverted triangle with its point at the focal. **SR3, SR18.**
+- *Change:* the V opens round the band; its arms come in only below y 600.
+
+**B12 Spiral composition · ADAPT.** *Reference:* 05 at 0 s (a spiral stair seen from straight above, its pale floor at
+the centre, people dotted along the ramps).
+- *What:* the subject's own spiral leads the eye round and in to its centre.
+- *9:16:* straight from above, its rails would cross the band. From SR5's balcony (a high angle, once a film) the spiral
+  sits under the lid: its centre at (540, 1000-1100), its outer turn <= 880 px wide inside x 98-982, people on the ramps
+  as texture in twos and threes. At eye level the same idea is layout practice's spiral pathway: things placed round one
+  curl that ends on the focal (`composition/cinema.md` §6.2).
+- *Serves:* the home place from above; the payoff's sweep curling in. **SR5 (variant), SR24 (variant).**
+- *Change:* SR5's raised angle under the lid, or a spiral pathway at eye level.
+
+**B13 Circular · ADAPT.** *Reference:* 03 at 15.5 s (a round pond ringed by rocks and reeds).
+- *What:* things in a ring that hold the eye inside it.
+- *9:16:* seen from eye level a ring flattens to an ellipse, so two versions: a round window (an oculus, a porthole)
+  300-500 px across as the one opening, its centre in the golden box, the view and the subject inside it (C1's round
+  form); or a ring of things round the subject (units round the cause, lamps round a square) from a raised view, the
+  subject inside the circuit, never outside it (Poore, via `composition/cinema.md` §4.11).
+- *Serves:* the nook's opening; the lineup in a ring. **SR4 (variant), SR21 (variant).**
+- *Change:* a round opening, or a ring seen from a raised camera.
+
+#### C. Frames, layers and levels
+
+**C1 Frame within a frame · YES.** *Reference:* 01 at 10.0 s (a platform's dark roof and two pillars framing a train), 02
+at 0 s (a round moon gate in a sunlit wall, a walker crossing it), 04a at 5.25 s (the gap between two flights of a
+stairwell, a man on the stairs in it), the titles (two carriage windows).
+- *What:* an opening inside the frame (a gate, a door, a window, a stairwell's gap) that frames the subject.
+- *9:16:* tall openings fit: one opening on the axis, 15-30 % of the frame, its aperture's centre in the golden box, its
+  top at y >= 620, the aperture >= 10 L* off its rim; a figure 150-300 px dark inside it.
+- *Serves:* the subject's moment; the start of a push-through (A). **SR6, SR4, SR2, SR8, SR17.**
+
+**C2 Foreground · YES.** *Reference:* 02 at 2.25 s (a lotus pond in the bottom 35 %, a pagoda beyond it), 05 at 9.0 s
+(the corner of a white house's roof and terrace over the lower-left half, the sea beyond).
+- *What:* a near layer at the frame's edge that gives depth and a place to stand.
+- *9:16:* the near band (y 1250-1920) is its home, one mass that may run under the bottom UI; a hint: <= 2 props cut by an
+  edge, inside the near shade mass (within 8 L*), its top at y 1450-1650.
+- *Serves:* every exterior; the nook's near frame. **SR2, SR7, SR4.** (05's terrace, half the frame, is the big near
+  mass the owner rejected; the blur is E5's.)
+
+**C3 Level change · YES.** *Reference:* 01 at 7.25 s (a station footbridge's stair, a walker high on it, three people
+waiting on the platform below).
+- *What:* two levels in one frame, joined by a stair or a slope, with people on both.
+- *9:16:* the height is made for it: the upper level at y 700-950, the lower at y 1150-1450, joined by steps or a slope
+  of 30-45 degrees; the subject on one level in the golden box, the life or the effect on the other.
+- *Serves:* cause and effect; two places joined. **SR11.**
+
+#### D. Masses, balance and contrast
+
+**D1 Negative space · YES.** *Reference:* 04a at 9.75 s (a boy low on the left third facing a stepped stream in a forest).
+- *What:* a small subject in a big field; the space gives it weight.
+- *9:16:* the field is the sky with the band in it (or water, or snow): 60-80 % of the frame, patterned (+-4-6 L*, clouds
+  in planes), never a hole; the subject small (130-220 px) at the field's foot, x 220-660, above y 1480.
+- *Serves:* a breather; the turn's open side. **SR16, SR18.**
+
+**D2 Scale · YES.** *Reference:* 04a at 16.5 s (a man at a bridge railing beside a weathered red-and-white tower that fills
+half the picture).
+- *What:* a small known thing (a person) beside a huge one, so the eye reads the size.
+- *9:16:* the tall thing >= 0.7 H (>= 1344 px) and >= 10:1 over the figure, rising past the top edge (its face across the
+  band one flat field, or its top in a gutter); the figure 130-220 px (60-150 px in a K wide) low near the axis (x
+  420-660), its feet above y 1250.
+- *Serves:* the scale beats. **SR15, SR14, SR17.**
+
+**D3 Balance · ADAPT.** *Reference:* 03 at 11.0 s (two trees of the same size, one each side of a valley).
+- *What:* two masses of equal weight, one on each side.
+- *9:16:* in 884 visible px two equal masses become two equal calls (rule 4 allows one); used only as the symmetric frame
+  of a centred subject: two soft dark masses cut by the side edges (each <= 216 px of visible width), mirrored within +-5
+  %, quieter than the one subject between them on x 540.
+- *Serves:* the formal beat, once a film. **SR23.**
+- *Change:* the two masses are the frame, never the subjects.
+
+**D4 Unbalanced (the steelyard) · ADAPT.** *Reference:* 03 at 9.5 s (a big tree at the left, a small house far right).
+- *What:* unequal masses in balance: the farther out a mass sits, the more it weighs, so a small strong one near the
+  centre is balanced by a big soft one far out (or the reverse).
+- *9:16:* rule 9: the subject stays on the axis (0-130 px off x 540) and the big soft mass goes >= 300 px out on the
+  other side (x < 240 or > 840), its pull < 50 % of the focal's: by default the hero cloud in a top gutter (y 0-290),
+  cut by a side edge; never in the lower right (x > 830 below y 790), where the rail and the name block already weigh.
+- *Serves:* every frame's balance; named in **SR2, SR9, SR16.**
+- *Change:* the reel's small thing sits far out; ours, the subject, stays on the axis and the big soft mass goes out.
+  (Its opposite, one heavy side with nothing against it, is our addition N15, for the turn.)
+
+**D5 Pyramid · YES.** *Reference:* 03 at 4.5 s (a snowy peak, the triangle traced on its slopes).
+- *What:* a triangular mass, broad base and apex up: stable and calm.
+- *9:16:* the base on the near ground (y 1350-1520, >= 540 px wide), the apex on the focal in the golden box with its top
+  under the band (y >= 620), the sides 50-70 degrees, scalene, three spots at unequal distances.
+- *Serves:* stable beats; how many (the cause at the apex, the units below). **SR21.**
+
+**D6 Juxtaposition · ADAPT.** *Reference:* 05 at 6.0 s (a beach from straight above: the sea with swimmers, rows of
+umbrellas, split by the diagonal shoreline).
+- *What:* two contrasting things side by side, with one line between them.
+- *9:16:* the seam runs across the stage (one state above, one below) or on a 30-45 degree diagonal; each field one value
+  and one texture (means >= 13 L* apart); the subject at the seam in the golden box; seen at eye level or from a raised
+  quay, not from straight above; never two stages stacked (§D3 X4).
+- *Serves:* a comparison in one frame; before and after. **SR20.**
+- *Change:* eye level, one seam, the subject on it.
+
+**D7 Patterns / repetition · YES.** *Reference:* 04a at 14.25 s (a row of six dark windows along a warm wall, a man
+leaning out of the fifth).
+- *What:* a repeated element reads as one texture; one break in it becomes the subject.
+- *9:16:* a facade's windows stack in rows: one texture inside one mass (its pieces within +-6 L*, sizes varied 5-12
+  %), one break, the call, at (413-667, 860-1100); never two breaks.
+- *Serves:* the one among many; how many. **SR8, SR21.**
+
+#### E. Moves the examples make without naming them
+
+**E1 One small figure where the lines meet · YES.** *Reference:* 11 of the 24 photo examples, among them 04a at 0 s (the
+walker toward the villa), 04b at 25.25 s (the man on the pier), 04a at 5.25 s (the man in the stairwell), 05 at 3.25 s
+(the hiker).
+- *What:* one small figure at the device's focal point, from behind or in silhouette.
+- *9:16:* 130-220 px (DIRECTION rule 7; the reels' figures measure 150-226 px at full phone width), where the lines meet,
+  in the golden box, from behind or in silhouette, its feet above y 1480.
+- *Serves:* any line device's end. **SR7, SR9, SR14, SR15, SR3.**
+
+**E2 The lit opening · YES.** *Reference:* 02 at 0 s (the moon gate's lit garden), 04a at 5.25 s (the stairwell's lit
+wall), 03 at 14.0 s (the light at the tunnel's end), 04a at 14.25 s (the one occupied window).
+- *What:* the inner frame is the brightest area, and the figure is dark inside it.
+- *9:16:* the aperture the lightest area below the sky (L* >= 95), the figure inside it at L* <= 28 (a step >= 65 L*), in
+  the golden box: the subject, the story light and the hardest value step in one place (rule 4).
+- *Serves:* every opening. **SR6, SR2, SR8, SR7.**
+
+**E3 Stillness against motion · ADAPT.** *Reference:* 01 at 10.0 s (two walkers sharp in front of a train streaking past),
+the titles 01 at 0 s and 04b at 19.25 s (a still carriage frame, the platform streaking past through its windows).
+- *What:* a still subject in front of a moving world.
+- *9:16:* the subject held still in the golden box while life passes sideways behind it in one band (a tram, a boat,
+  walkers, both ways), slow and low in contrast (within the band's value), never towards the lens.
+- *Serves:* a pause; the pivot of a follow. **SR10, SR9.**
+- *Change:* no motion blur (DIRECTION rule 5): the world moves, drawn sharp.
+
+**E4 Looking room · ADAPT.** *Reference:* 02 at 4.75 s (the photographer aims up-left into the forest), 04b at 28.25 s (a
+near profile looks right toward a lit tram), 04a at 9.75 s (the boy faces the stair into the light).
+- *What:* the subject faces into the open part of the frame.
+- *9:16:* 1.5-2x more room in front than behind: a right-facing figure at x <= 410 below y 860 (the rail makes x 870 the
+  right edge), a left-facing one at x >= 560; a figure seen from behind has its room up the frame, into the depth; its
+  sightline crosses the focal's box (the gaze cue, `composition/cinema.md` §1).
+- *Serves:* a person's moment; the "you"; a follow's lead room. **SR9, SR14, SR10.**
+- *Change:* the rail moves the right edge to x 870; from behind, the room is up the frame.
+
+**E5 A soft near layer · ADAPT.** *Reference:* 02 at 2.25 s (the lotus, out of focus), 04a at 7.5 s (grass blades soft at
+the left), 04b at 28.25 s (a blurred near profile).
+- *What:* a near thing at an edge, out of focus.
+- *9:16:* the near layer simpler and lower in contrast instead: within 8 L* of the near shade mass, its edges lost, cut by
+  the frame's edge, <= 2 props, its top at y 1450-1650.
+- *Serves:* every near band. **SR2, SR7, SR4.**
+- *Change:* no focus blur (DIRECTION rule 5): softness by value, not by focus.
+
+**E6 Atmospheric layers · YES.** *Reference:* 02 at 7.5 s (two ridges in a peach haze behind the pavilion), 04a at 16.5 s
+(hazy hills behind the tower), 05 at 3.25 s (mist among the peaks).
+- *What:* ridges, far shores and far rows paler with distance.
+- *9:16:* 3-5 layers stacked up the frame, each farther one higher and a step nearer the sky's value (the farthest within
+  ~10-15 L* of the sky, the nearest darkest), their tops >= 40 px apart, overlapping >= 10 px.
+- *Serves:* depth in every wide. **SR14, SR16, SR17, SR2.**
+
+**E7 The closed vista · YES.** *Reference:* 01 at 13.0 s (the street ended by a house and trees), 02 at 10.0 s (the path
+ended by the tree), 04a at 3.0 s (the pier ended by the tower), 04b at 25.25 s (the pier ended by the man).
+- *What:* one sight line, ended by one object.
+- *9:16:* the vanishing point on the object or hidden behind it, x 540-700, y 950-1150; never an open vanishing point into
+  the sky (the eye leaves through it).
+- *Serves:* the lane, the path. **SR3, SR7.**
+
+**E8 One colour accent on the subject · YES.** *Reference:* 05 at 3.25 s (the hiker's blue shirt, the one saturated colour
+among grey peaks), 01 at 10.0 s (the red train behind the walkers), 04a at 16.5 s (the tower's red top).
+- *What:* one saturated colour, on the subject.
+- *9:16:* the scene's one hot accent only at the focal, in the golden box; everything else tone-on-tone in its mass (dE <=
+  6-8); no saturated yellow anywhere else (still v6's four yellow windows out-shouted the lit door).
+- *Serves:* every shot (rule 4); named in **SR8, SR24, SR1.**
+
+**E9 The camera holds; the subject travels the device's line · YES.** *Reference:* 04a at 3.0 s (a man running away down
+the pier's axis, 305 -> 92 px in 1 s), 04a at 0 s (the walker into the spiral's eye), 02 at 0 s (a walker crossing the
+moon gate), 02 at 7.5 s (an egret crossing the mirror); 17 of the 23 example shots are locked or nearly.
+- *What:* the shot locked; its life is the subject moving along the device's line.
+- *9:16:* locked or the parallax float (8-15 px/s); the subject travels one path between two points of the golden box, or
+  down a line into the vanishing point (shrinking as it goes), or across an opening.
+- *Serves:* arrival, a crossing, a front travelling a seam. **SR7, SR9, SR6, SR20, SR23.**
+
+**E10 The near "you" over the shoulder · ADAPT.** *Reference:* 04b at 28.25 s (a big blurred near profile on the left
+third, looking at a sunset and a lit tram).
+- *What:* the viewer's stand-in big in the near frame, looking at the subject.
+- *9:16:* never a big near head: the "you" is one whole figure of 130-220 px (DIRECTION rule 7), from behind at x
+  130-380 facing right (or x 700-830 facing left), softer than the subject, its sightline crossing the focal's box; the
+  near "you" cut by the bottom edge only as POV hands (SR13).
+- *Serves:* scale from a human viewpoint; "for you". **SR14, SR13.**
+- *Change:* the whole small figure at one side, or the hands; never the big head, never blurred.
+
+**E11 The POV hook · YES.** *Reference:* 05 at 12.25 s (a hand holding a camera on a gimbal up into the frame over the
+spiral stair, the title beside it).
+- *What:* the maker's hand and tool in the near frame.
+- *9:16:* the hand and forearm from the bottom LEFT (the wrist runs under the bottom UI as a mass), the thing in hand at
+  (300-600, 1000-1250), its face inside x <= 870 and y <= 1480; the cause above it on the axis.
+- *Serves:* "for you"; a hook whose effect lands in the hand. **SR13.**
+
+#### T. The reels' own teaching device
+
+**T The line first, then the world under it · ADAPT.** *Reference:* all five reels (01 at 4.25 s, the red lines on black
+before the escalator; 03 throughout, a pen tracing a red armature over a grey value thumbnail).
+- *What:* an abstract line (the idea) on black; the shot appears under it, and the line turns out to trace the shot.
+- *9:16:* our opening's draw-on (DIRECTION rule 9): the subject's line in the clean pen, the world flooding in under it,
+  the bold event >= 1 s, peaking after 0.4 s; once per idea (a mechanism drawn as a line first, a chart in step with the
+  voice); for the G3 board, the red armature over a grey value thumbnail (these sheets).
+- *Serves:* the hook; the proof. **SR1, SR22.**
+- *Change:* the line draws on and the colour floods in; never the reels' opacity cross-fade, never a title over the shot
+  (§D3 X2, X3).
+
+### D2. Our additions (not in the owner's reels)
+
+Devices our own research adds (`composition/cinema.md`, `composition/vertical.md`) and three the library already used
+without a reel behind them (N13-N15). They come after the owner's ideas and never replace one.
+
+**N1 The centre, the first look · YES.** *Source:* `composition/cinema.md` §1, §4.3 [S7, S10]; `composition/vertical.md`
+§3.1, V8 [V5].
+- *What:* a new shot's first look lands at the screen's centre, whatever the picture holds.
+- *9:16:* (540, 960): a focal there costs no search, one 300 px away (~4 degrees) costs a saccade; a centred subject in
+  vertical video held the eye better than a moving one.
+- *Serves:* the hook, the close, the proof. **SR1, SR12, SR22.**
+
+**N2 The stage square (rabatment) · YES.** *Source:* `composition/cinema.md` §1 [S3]; `composition/vertical.md` §2.
+- *What:* the tall frame's implied squares: the top one (y 0-1080) holds the words and the sky, the bottom one (y
+  840-1920) the stage and the near ground; the stage square (y 600-1520) is the picture under the words.
+- *9:16:* the stage square's thirds y 907 / 1213, its golden lines y 951 / 1169, its diagonal 40.4 degrees, its eyes
+  (454, 987) and (626, 1133); the frame's reciprocal from a top corner meets the far edge at y 608, the band's lower
+  edge: keep that edge clean.
+- *Serves:* every shot's placement (rules 2-3); A3 and A5 are built on it. **All recipes.**
+
+**N3 The horizon off the half, and the line of heads · YES.** *Source:* `composition/cinema.md` §3.2-3.3, §4.1 (C2-C3;
+J. T. Smith 1797 via [S3]).
+- *What:* the horizon's height is the master decision of an exterior; with a level camera every standing head is on it.
+- *9:16:* setup A y 1150-1300 (camera 0.9-1.6 m), setup B y 690-860 (camera 3-7 m), never y 900-1020; a figure's feet at
+  y_h + P·c/h, its head at y_h - P·(h - c)/h (§0).
+- *Serves:* every exterior (rule 6). **SR2, SR9, SR14.**
+
+**N4 The repoussoir (one framing wing) · ADAPT.** *Source:* `composition/cinema.md` §4.6 [S1, S14].
+- *What:* a dark mass at one side edge that brackets the view and pushes it back.
+- *9:16:* width is scarce: ONE side only, cut by that edge, <= 216 px (20 % W) wide, one mass quieter than the focal;
+  never two equal wings (D3's symmetric frame in SR23 is the one exception).
+- *Serves:* the home view, the nook. **SR2, SR4.**
+- *Change:* one side, <= 216 px.
+
+**N5 Headroom: the drop · ADAPT.** *Source:* `composition/cinema.md` §4.7 [S14]; `composition/vertical.md` §3.3, §7.1.
+- *What:* the room above the subject.
+- *9:16:* the caption band is the headroom: tops at y >= 620; the focal's centre 300-450 px under the block's foot (y
+  556: so y ~856-1006), 650 px at most; nothing calls in the drop.
+- *Serves:* every shot (rule 3). **SR6 (named).**
+- *Change:* the band is the headroom, and its depth is a number.
+
+**N6 Depth stacked up the frame (and the three distances) · YES.** *Source:* `composition/cinema.md` §4.8 [S15, S19];
+`composition/vertical.md` §2.
+- *What:* near, middle and far planes; in 9:16 they stack UP the frame, each farther one higher (the hanging scroll), and
+  Guo Xi's three distances: high (looking up), deep (into the distance), level (out over a low land).
+- *9:16:* 4-6 planes, the near at the bottom, overlapping >= ~10 px, their tops >= ~40 px apart; high = the tilt-up and
+  the worm's-eye, deep = the S1 and S5 moves, level = S4's thin land under a huge sky.
+- *Serves:* every wide. **SR2, SR14, SR15, SR16, SR17.**
+
+**N7 Figure and ground: notan and counterchange · YES.** *Source:* `composition/cinema.md` §4.13-4.14 [S1, S2].
+- *What:* at two values the subject is one closed shape on a field of the other value; at the focal, light against dark.
+- *9:16:* at a 2-value cut the subject is one shape a viewer can name at 0.25 scale; the focal's step >= 65 L*; its light
+  reached by a bank of darker masses round it or by one long gradation toward it, never both.
+- *Serves:* the hook, the opening, the line of light, the proof. **SR1, SR6, SR9, SR22.**
+
+**N8 The zigzag way in · YES.** *Source:* `composition/cinema.md` §4.5 (Poore: "triangulate in, with a series of
+zigzags" [S1]).
+- *What:* in a deep picture the eye enters by zigzags, each leg handing it to the next, ending on the focal.
+- *9:16:* 2-3 legs of >= 150 px alternating sides, from the near band to within 40 px of the focal's box; where there are
+  no lines, a row of receding accents does it.
+- *Serves:* the payoff's sweep, the path in, the steps. **SR24, SR7, SR11.**
+
+**N9 Isolation · YES.** *Source:* `composition/cinema.md` §2 [S1, S16].
+- *What:* size on screen and space round it make the subject important.
+- *9:16:* one object >= 60 % W (>= 650 px), its own backing one quiet field, a calm ring of 30-60 px round it.
+- *Serves:* the close, the proof. **SR12, SR22.**
+
+**N10 The pivot · YES.** *Source:* `composition/cinema.md` §8 [S6] (C12).
+- *What:* in a frame where everything moves, the still thing is the call.
+- *9:16:* the subject holds its screen spot within +-40 px while the world moves past it.
+- *Serves:* the follow, the big move. **SR10, SR17.**
+
+**N11 The low angle (worm's-eye) · ADAPT.** *Source:* `composition/cinema.md` §3.1 [S12, S13].
+- *What:* seen from below, the subject reads as powerful.
+- *9:16:* K7: camera ~0.3 m, horizon y 1114-1229, verticals parallel (a shift, not a tilt).
+- *Serves:* the quantity, the machine. **SR15.**
+- *Change:* only on the quantity, never on the thing under critique.
+
+**N12 The high angle · ADAPT.** *Source:* `composition/cinema.md` §3.1 [S12, S13].
+- *What:* seen from above: an overview; on one person it reads as being looked down on.
+- *9:16:* 35-55 degrees down from a 3rd-5th floor, the lid's flat facade behind the band; overhead only as paper.
+- *Serves:* a crowd, a pattern, a crossing (B7, B12). **SR5, SR21.**
+- *Change:* once a film, never on one person.
+
+**N13 Refuge and prospect · YES.** *Source:* `COZY_AND_SCALE.md` §2-3 (the library's own).
+- *What:* an enclosing mass with one opening onto the view: held, not shut.
+- *9:16:* refuge 35-55 % of the frame on >= 2 edges, one opening of 15-30 %, read in y 600-1250.
+- *Serves:* the interior home place. **SR4.**
+
+**N14 The deliberate match · YES.** *Source:* `STORYBOARD_STYLE.md` §7; `composition/cinema.md` §7.
+- *What:* the same frame again, with one change.
+- *9:16:* the exact frame (or the thread within +-8 % of its spot and +-20 % of its size), one change at the focal.
+- *Serves:* the turn told by light; the callback. **SR19, SR24.**
+
+**N15 The off-balance · YES (the turn only).** *Source:* `composition/cinema.md` §9 (its reading of reel 03's
+"unbalanced"; contrast and affinity [S17]).
+- *What:* one heavy side and nothing against it: tension.
+- *9:16:* the focal at x 250-380 or 700-830 (inside the clear window), no counterweight, the other side open.
+- *Serves:* the "But" turn. **SR18.**
+
+### D3. Rejected (what the references show that we do not take)
+
+None of the owner's 41 ideas is rejected: each has a version that works in the tall frame (§D1). What we leave out are
+six treatments the references show, each fighting the vertical frame or a rule in force:
+
+| # | rejected | seen in | why (one line to check) |
+|---|---|---|---|
+| X1 | **Focus and motion blur** | the reels' examples for E3, E5, E10 (02 at 2.25 s, 04a at 7.5 s, 04b at 28.25 s, 01 at 10.0 s) | DIRECTION rule 5: our look has no blur; E3 and E5 are used without it |
+| X2 | **A title over the shot** | the reels' titles: 01 at 0 s, 04a at 0 s, 04b at 19.25 s | the playbook: no title over the captions; the core line goes on the cover |
+| X3 | **The opacity cross-fade between the line and the shot** | all five reels (T) | DIRECTION rule 8: no opacity fades; our line draws on and the colour floods in |
+| X4 | **The split screen** (two stages stacked) | `composition/vertical.md` §2 [V5, V6] | in a tall frame two stacked stages split the eye ("segmented" attention); a comparison is one seam (D6) or a sequence |
+| X5 | **The Dutch tilt** | `composition/cinema.md` §3.1 | no roll (DIRECTION rule 8): a tilted horizon in a tall frame reads as a mistake |
+| X6 | **The dolly zoom** | `composition/cinema.md` §8 [S20] | a compound move (DIRECTION rule 8) and a feeling of "disorientation" we never want |
+
+### D4. Coverage: every reference item, its verdict and where it is used
+
+**The owner's 41: 24 used as they are, 17 adapted, 0 rejected** (plus T, adapted). Our additions: 15 (11 YES, 4 ADAPT).
+Rejected: 6 treatments (§D3). "Recipes" are the Device lines in §3 that name the code; "(v)" marks a recipe's named
+variant. Every row has a tile on `composition/devices_sheet.png`.
+
+| # | the reels' name | verdict | used in (recipes) |
+|---|---|---|---|
+| A1 | Rule of thirds | ADAPT | SR2, SR9, SR14, SR16 |
+| A2 | Golden section | YES | every focal (rule 3); named in SR1, SR6, SR8, SR12, SR20, SR21 |
+| A3 | Golden section, nested | ADAPT | SR14, SR15 |
+| A4 | Golden spiral / golden ratio | ADAPT | SR6 (v), SR24 (v) |
+| A5 | Golden triangle | ADAPT | SR11, SR18 |
+| A6 | Cross | YES | SR9, SR15 |
+| A7 | Symmetry | YES (once) | SR23 |
+| B1 | Leading lines | YES | SR3, SR7, SR24 |
+| B2 | Vanishing point / one point | YES | SR3, SR7 |
+| B3 | Radiating | YES | SR3, SR15, SR21 |
+| B4 | Tunnel | ADAPT | SR3, SR17 |
+| B5 | Parallel lines | ADAPT | SR10, SR11 |
+| B6 | Diagonal | YES | SR11, SR18, SR20 |
+| B7 | Double diagonal | ADAPT | SR5 (v) |
+| B8 | S-curve | YES | SR7 (v) |
+| B9 | C-shape | YES | SR5 |
+| B10 | L-shape | YES | SR3, SR4 |
+| B11 | V-shape | ADAPT | SR3, SR18 |
+| B12 | Spiral composition | ADAPT | SR5 (v), SR24 (v) |
+| B13 | Circular | ADAPT | SR4 (v), SR21 (v) |
+| C1 | Frame within a frame | YES | SR2, SR4, SR6, SR8, SR17 |
+| C2 | Foreground | YES | SR2, SR4, SR7 |
+| C3 | Level change | YES | SR11 |
+| D1 | Negative space | YES | SR16, SR18 |
+| D2 | Scale | YES | SR14, SR15, SR17 |
+| D3 | Balance | ADAPT | SR23 |
+| D4 | Unbalanced (the steelyard) | ADAPT | every frame (rule 9); named in SR2, SR9, SR16 |
+| D5 | Pyramid | YES | SR21 |
+| D6 | Juxtaposition | ADAPT | SR20 |
+| D7 | Patterns / repetition | YES | SR8, SR21 |
+| E1 | One small figure where the lines meet | YES | SR3, SR7, SR9, SR14, SR15 |
+| E2 | The lit opening | YES | SR2, SR6, SR7, SR8 |
+| E3 | Stillness against motion | ADAPT | SR9, SR10 |
+| E4 | Looking room | ADAPT | SR9, SR10, SR14 |
+| E5 | A soft near layer | ADAPT | SR2, SR4, SR7 |
+| E6 | Atmospheric layers | YES | SR2, SR14, SR16, SR17 |
+| E7 | The closed vista | YES | SR3, SR7 |
+| E8 | One colour accent on the subject | YES | every focal (rule 4); named in SR1, SR8, SR24 |
+| E9 | The camera holds; the subject travels the line | YES | SR6, SR7, SR9, SR20, SR23 |
+| E10 | The near "you" over the shoulder | ADAPT | SR13, SR14 |
+| E11 | The POV hook | YES | SR13 |
+| T | The line first, then the world under it | ADAPT | SR1, SR22 |
+| N1-N15 | our additions (§D2) | 11 YES, 4 ADAPT | N1 SR1, SR12, SR22 · N2 all · N3 SR2, SR9, SR14 · N4 SR2, SR4 · N5 SR6 · N6 SR2, SR14-SR17 · N7 SR1, SR6, SR9, SR22 · N8 SR7, SR11, SR24 · N9 SR12, SR22 · N10 SR10, SR17 · N11 SR15 · N12 SR5, SR21 · N13 SR4 · N14 SR19, SR24 · N15 SR18 |
+| X1-X6 | rejected (§D3) | REJECT | nowhere |
+
+No device needed a new recipe: the ones without a recipe of their own (B7, B12, B13, A4) are named variants of the
+recipe whose camera they share.
+
+## PART 2. THE SHOT LIBRARY
 
 ## 0. The frame in numbers
 
@@ -205,32 +766,32 @@ through the window) · the turn SR18, SR19 · scale SR14-SR17 · intimacy SR12, 
 list SR21, SR22 · the payoff SR24, SR23, SR13. "The set's" = the set's own setup (A or B) and horizon from W1. The focal
 is the centre of the beat's subject; its size is on screen.
 
-| # | recipe | the beat | setup, horizon y | the focal: centre; size | device | camera | joins |
+| # | recipe | the beat | setup, horizon y | the focal: centre; size | device (its codes, Part 1) | camera | joins |
 |---|---|---|---|---|---|---|---|
-| SR1 | THE DRAWN SUBJECT | the hook, 0-3 s; the loop's frame | the set's | the focal home, near (540, 960); >= 400 px wide | figure and ground; the line first | locked, or one story move >= 3 % in <= 2 s | out C or A; the loop B |
-| SR2 | HOME ACROSS THE WATER | the home place | A 1100-1250, or B 690-860 | the lit opening, (540-670, 950-1180); 150-230 px wide | stacked bands + one opening | locked or the float | in A or B; out A |
-| SR3 | THE LANE | the home place: a street | 1020-1150 | the closed vista at the vanishing point, (540-700, 950-1150) | one point; the canyon's V | locked, the float, or a push to the vista | out A or C |
-| SR4 | THE NOOK | the home place: indoors | none (the window's own) | the lamp-lit subject, head y 864-1152 | refuge and one opening | locked or the float | out A through the window |
-| SR5 | THE BALCONY | the home place from above; a crowd | none (35-55 degrees down) | on the curve, y 860-1060 | the C-curve under a lid | locked | A or C |
-| SR6 | THE LIT OPENING | the subject's moment | the set's | the lit aperture in the golden box; 15-30 % of the frame | frame within a frame | locked, then a push-through | out A |
-| SR7 | THE PATH IN | arrival; the thing at the end of the way | A or B | the line's end, (480-640, 950-1150) | leading lines, one point, S-curve | locked while the subject travels, or a push to the vista | out A or C |
-| SR8 | THE BREAK IN THE ROW | the one among many | the set's | the one lit window, (413-667, 860-1100) | a pattern with one break | locked | out A |
-| SR9 | ON THE LINE OF LIGHT | a person's moment | A, camera 0.9-1.2 m, 1150-1300 | a figure straddling the lit horizon, x 413-667; 150-300 px | the cross; counterchange | locked; the figure walks the line | out C or D |
-| SR10 | THE FOLLOW | travel; the mechanism on its way | the set's | held at x 410-560 (truck) or on the axis (tilt) | the pivot | a truck or a tilt | out C or D |
-| SR11 | THE LEVEL CHANGE | cause and effect; two places in one frame | B | the subject's level in the golden box | two levels and the steps | locked, or a tilt between them | out C |
-| SR12 | THE CLOSE | intimacy: the object | none | the object in the golden box; >= 650 px wide | isolation | a push <= 2x in, then locked | in A, C or F; out C or A |
-| SR13 | THE HANDS | intimacy: the "you"; "for you" | the window's | the thing in hand, (300-600, 1000-1250) | POV; cause above, effect in hand | locked or the float | in A or B; out A or B |
-| SR14 | THE YOU AND THE WORLD | scale from a human viewpoint | A 1150-1300 | the far lit point on the axis; the "you" at x 130-380, 130-220 px | scale from a known size; the gaze | locked, the float, or a push to the vista | in C; out A or C |
-| SR15 | TINY UNDER GIANT | scale: the quantity, the machine | 1114-1229 (worm's-eye) or 1020-1133 | a figure 60-220 px at x 420-660; the giant >= 0.7 H | scale; the cross | locked, or a tilt-up | in F on a "But", or inside the big move; out A |
-| SR16 | THE BIG SKY | a breather | ~1402 (S3) or ~1574 (S4) | a landmark on the left third, or a small "you" | negative space | locked or the float | never next to SR17 |
-| SR17 | THE ONE BIG MOVE | the scale reveal, once | S1 710 -> 768; S5 845 -> 883 | the pivot (S5's figures x 420-560, feet y 1490); the landmark (760, 760) | scale; the pivot | S1 rise-over or S5 pull-back | leaves from the thread; back by A or C |
-| SR18 | THE OFF-BALANCE | the turn ("But") | the set's | off home: x 250-380 or 700-830, no counterweight; or one 30-45 degree diagonal | unbalanced, the diagonal, the V | a plain cut F, or a push landing off-centre; then a hold | in F or C |
-| SR19 | THE MATCHED PAIR | the turn told by light; before and after | the earlier shot's | the same focal, one change | the deliberate match | locked, both | B |
-| SR20 | THE SEAM | a comparison in one frame | the set's | at the seam, in the golden box | juxtaposition | locked; the seam's front may travel | C |
-| SR21 | THE LINEUP | how many; a list of like things | the set's, a little from above | the cause at the apex in the golden box; units >= 60 px | repetition; the pyramid | locked; units pop by rows on their word | C |
-| SR22 | THE PAPER | the proof: a chart, a number, a date | none (straight-on) | the paper >= 60 % of the stage wide; one number 120-160 px | figure and ground | in by a push A or a flip E | A or E |
-| SR23 | THE MIRROR | stillness; a formal beat; once | waterline 1040-1100 | the landmark on x 540, y 850-1040 | symmetry | locked | B |
-| SR24 | THE WHOLE RUN | the payoff; the callback | the opening's | the thread at its home spot; the film's hardest step | the matched frame; one sweep | a pull back A, then locked | the loop B to frame 0 |
+| SR1 | THE DRAWN SUBJECT | the hook, 0-3 s; the loop's frame | the set's | the focal home, near (540, 960); >= 400 px wide | figure and ground; the line first (T, N7, N1, E8) | locked, or one story move >= 3 % in <= 2 s | out C or A; the loop B |
+| SR2 | HOME ACROSS THE WATER | the home place | A 1100-1250, or B 690-860 | the lit opening, (540-670, 950-1180); 150-230 px wide | stacked bands + one opening (N6, E6, C1, E2, N7, D4, C2, E5, A1, N3, N4) | locked or the float | in A or B; out A |
+| SR3 | THE LANE | the home place: a street | 1020-1150 | the closed vista at the vanishing point, (540-700, 950-1150) | one point; the canyon's V (B2, E7, B1, B3, B10, B11, B4, E1) | locked, the float, or a push to the vista | out A or C |
+| SR4 | THE NOOK | the home place: indoors | none (the window's own) | the lamp-lit subject, head y 864-1152 | refuge and one opening (N13, C1, B10, N4, C2, E5; B13 (v)) | locked or the float | out A through the window |
+| SR5 | THE BALCONY | the home place from above; a crowd | none (35-55 degrees down) | on the curve, y 860-1060 | the C-curve under a lid (B9, N12; B7, B12 (v)) | locked | A or C |
+| SR6 | THE LIT OPENING | the subject's moment | the set's | the lit aperture in the golden box; 15-30 % of the frame | frame within a frame (C1, E2, N7, N5, E9; A4 (v)) | locked, then a push-through | out A |
+| SR7 | THE PATH IN | arrival; the thing at the end of the way | A or B | the line's end, (480-640, 950-1150) | leading lines, one point, S-curve (B1, B2, E7, N8, E1, E2, E9, C2, E5; B8 (v)) | locked while the subject travels, or a push to the vista | out A or C |
+| SR8 | THE BREAK IN THE ROW | the one among many | the set's | the one lit window, (413-667, 860-1100) | a pattern with one break (D7, E2, E8) | locked | out A |
+| SR9 | ON THE LINE OF LIGHT | a person's moment | A, camera 0.9-1.2 m, 1150-1300 | a figure straddling the lit horizon, x 413-667; 150-300 px | the cross; counterchange (A6, N7, A1, N3, E1, E4, E9, E3, D4) | locked; the figure walks the line | out C or D |
+| SR10 | THE FOLLOW | travel; the mechanism on its way | the set's | held at x 410-560 (truck) or on the axis (tilt) | the pivot (N10, E3, B5, E4) | a truck or a tilt | out C or D |
+| SR11 | THE LEVEL CHANGE | cause and effect; two places in one frame | B | the subject's level in the golden box | two levels and the steps (C3, B6, A5, B5, N8) | locked, or a tilt between them | out C |
+| SR12 | THE CLOSE | intimacy: the object | none | the object in the golden box; >= 650 px wide | isolation (N9, N1) | a push <= 2x in, then locked | in A, C or F; out C or A |
+| SR13 | THE HANDS | intimacy: the "you"; "for you" | the window's | the thing in hand, (300-600, 1000-1250) | POV; cause above, effect in hand (E11, E10) | locked or the float | in A or B; out A or B |
+| SR14 | THE YOU AND THE WORLD | scale from a human viewpoint | A 1150-1300 | the far lit point on the axis; the "you" at x 130-380, 130-220 px | scale from a known size; the gaze (D2, E1, E10, E4, A1, N3, E6; A3 (v)) | locked, the float, or a push to the vista | in C; out A or C |
+| SR15 | TINY UNDER GIANT | scale: the quantity, the machine | 1114-1229 (worm's-eye) or 1020-1133 | a figure 60-220 px at x 420-660; the giant >= 0.7 H | scale; the cross (D2, E1, A6, A3, B3, N11) | locked, or a tilt-up | in F on a "But", or inside the big move; out A |
+| SR16 | THE BIG SKY | a breather | ~1402 (S3) or ~1574 (S4) | a landmark on the left third, or a small "you" | negative space (D1, N6, A1, D4, E6) | locked or the float | never next to SR17 |
+| SR17 | THE ONE BIG MOVE | the scale reveal, once | S1 710 -> 768; S5 845 -> 883 | the pivot (S5's figures x 420-560, feet y 1490); the landmark (760, 760) | scale; the pivot (D2, N10, C1, B4, N6, E6) | S1 rise-over or S5 pull-back | leaves from the thread; back by A or C |
+| SR18 | THE OFF-BALANCE | the turn ("But") | the set's | off home: x 250-380 or 700-830, no counterweight; or one 30-45 degree diagonal | unbalanced, the diagonal, the V (N15, D1, B6, A5, B11) | a plain cut F, or a push landing off-centre; then a hold | in F or C |
+| SR19 | THE MATCHED PAIR | the turn told by light; before and after | the earlier shot's | the same focal, one change | the deliberate match (N14) | locked, both | B |
+| SR20 | THE SEAM | a comparison in one frame | the set's | at the seam, in the golden box | juxtaposition (D6, B6, E9) | locked; the seam's front may travel | C |
+| SR21 | THE LINEUP | how many; a list of like things | the set's, a little from above | the cause at the apex in the golden box; units >= 60 px | repetition; the pyramid (D7, D5, B3, N12; B13 (v)) | locked; units pop by rows on their word | C |
+| SR22 | THE PAPER | the proof: a chart, a number, a date | none (straight-on) | the paper >= 60 % of the stage wide; one number 120-160 px | figure and ground (N7, N9, N1, T) | in by a push A or a flip E | A or E |
+| SR23 | THE MIRROR | stillness; a formal beat; once | waterline 1040-1100 | the landmark on x 540, y 850-1040 | symmetry (A7, D3, E9) | locked | B |
+| SR24 | THE WHOLE RUN | the payoff; the callback | the opening's | the thread at its home spot; the film's hardest step | the matched frame; one sweep (N14, N8, B1, E8; A4, B12 (v)) | a pull back A, then locked | the loop B to frame 0 |
 
 ## 3. The recipes
 
@@ -253,9 +814,10 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   from frame 0; the near band is one tone. The story light reaches the subject on the payoff word (~2 s) and makes the
   frame's hardest step there. Eye: the centre and the pen tip at once, the caption above, then the hook's change at ~2
   s.
-- **Device:** figure and ground at two values (the subject one shape a viewer can name at 0.25 scale) and the reels' own
-  teaching move, "the line first, then the world under it": a line held 0.5-1.5 s reads at phone size
-  (`composition/reels.md` §5).
+- **Device:** figure and ground at two values (N7: the subject one shape a viewer can name at 0.25 scale), on the centre
+  where the first look lands (N1), and the reels' own teaching move (T), "the line first, then the world under it": a
+  line held 0.5-1.5 s reads at phone size (`composition/reels.md` §5); the one colour accent at the focal (E8), in the
+  golden box (A2).
 - **Camera and joins:** locked, or one visible story move >= 3 % in <= 2 s; never the reference's slow invisible
   pull-out; nothing scale before 3 s. The expected thing, then reality overtaking it at ~2 s through the real mechanism;
   the bold event lasts >= 1 s and peaks after 0.4 s (rule 13). Out by C (a push toward the mechanism) or A (into the
@@ -287,8 +849,10 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   light, its broken column on the water pointing at it; the low sun one step off its sky on the side away from the
   focal; the hero cloud high as the counterweight. Eye: the words, one drop to the lit opening, the light column below
   it confirming.
-- **Device:** horizontal bands stacked up the frame (level lines: the calm of affinity), one opening on the far bank
-  (SR6 inside a wide), counterchange at the focal, the steelyard.
+- **Device:** horizontal bands stacked up the frame (N6; level lines: the calm of affinity), paler with distance (E6),
+  the horizon a third, off the half (A1, N3); one opening on the far bank (C1, E2: SR6 inside a wide); counterchange at
+  the focal (N7); the steelyard (D4: the hero cloud high on the far side); the near quay a soft hint (C2, E5), with at
+  most one framing wing (N4).
 - **Camera and joins:** locked, or the parallax float (our bank most, the far belt little, the sky and band not at all);
   life passes sideways in one lane, both ways, nothing comes at the lens. In by A (a pull back out of the opening) or B
   (the thread at its home spot); out by A (a push into the opening).
@@ -309,8 +873,9 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   walls in shade (mid to dark), the sky slot light, the street floor mid with the lit lane down its middle. Quiet: the
   sky slot and the near floor. Light: at the end (the vista lit, the walls in shade). Eye: the words, then down the
   walls' converging lines to the lit end.
-- **Device:** one-point perspective to a closed vista (`composition/reels.md` B2, E7); the canyon's V (B11); the
-  tunnel's light at the end (B4).
+- **Device:** one-point perspective to a closed vista (B2, E7): the walls' feet and the coping are the leading lines (B1),
+  the facade's courses radiate from the vanishing point (B3); the L of one tall side and the ground (B10); the canyon's V
+  (B11); the tunnel's light at the end (B4); the one small figure in the lit door where the lines meet (E1).
 - **Camera and joins:** locked or the float; a push to the vista (K5) as a story move, visible (>= 3 % in <= 2 s, e.g. 6
   % in 3 s, on its word), anchored on the far vanishing point; walkers pass both ways on the walks. Out by A (into the
   lit end) or C.
@@ -332,7 +897,9 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   floor or desk (the two quiet fields indoors). Light: one low lamp, the story light, and at most one secondary (a
   screen); its pool on the desk with real falloff; cold only in the window. Eye: the words on the wall, then the
   lamp-lit subject; the window one step under it. Band: a flat light wall (L* >= 70), never the window.
-- **Device:** refuge and prospect: one opening in an enclosing mass (held, not shut).
+- **Device:** refuge and prospect (N13): one opening in an enclosing mass, held, not shut (C1); the room's two held edges
+  an L (B10), the bookcase the one framing wing (N4), the armchair a soft near hint cut by the edge (C2, E5). Variant: a
+  round window as the opening (B13).
 - **Camera and joins:** locked or the float; small loops inside (steam, a page, breath). Out by A through the window
   (K9: the window 15-25 %, a push 0 -> 0.85 in 1.2-2 s); back in by A out of it.
 - **Never:** a ceiling light; the window and the lamp at the same brightness (two calls); a mullion across the view's
@@ -351,7 +918,9 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   other side at y 860-1060 and dives under a mass through a mouth <= 150 px. The subject sits on the curve in the golden
   box. Light: a lit shopfront or the object's own light on the curve. Eye: the words on the lid's flat facade, then down
   to the subject; the curve carries the eye round it.
-- **Device:** the C-curve (`composition/reels.md` B9) under a lid that frames the band instead of crossing it.
+- **Device:** the C-curve (B9) under a lid that frames the band instead of crossing it, from a high angle (N12).
+  Variants from the same balcony, once a film: a crossroads seen corner-on, its two streets crossing as an X on the focal
+  (B7); a spiral stair or a roundabout curling in to its centre at (540, 1000-1100) (B12).
 - **Camera and joins:** locked; the traffic follows the curve; movers enter and leave only through the open sides or the
   mouth. In and out by A (the window we look from) or C.
 - **Never:** the canopy or a roof edge in the band; one lone person as the subject from this height (a high angle on one
@@ -371,9 +940,11 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   aperture, with <= 2 props. Quiet: the sky with the band above the wall; the ground below. Light: the opening is the
   story light, a soft glow and gentle bloom at it that end >= 10 px outside the band, a pool on the ground in front.
   Eye: the words, then straight down into the lit aperture and the silhouette in it.
-- **Device:** frame within a frame with the lit opening (`composition/reels.md` C1, E2): the inner frame the brightest
-  area, the figure dark inside it. The two calmest reel examples are this (a stairwell's lit gap with one man in it: 2
-  calls, 83 % quiet; a row of windows with one man in one: 1 call, 73 % quiet).
+- **Device:** frame within a frame with the lit opening (C1, E2): the inner frame the brightest area, the figure dark
+  inside it (counterchange, N7). The two calmest reel examples are this (a stairwell's lit gap with one man in it: 2
+  calls, 83 % quiet; a row of windows with one man in one: 1 call, 73 % quiet). The aperture in the golden box (A2), the
+  drop from the words 300-450 px (N5); the figure may cross the opening while the camera holds (E9). Variant: a golden
+  spiral (A4) from the hero cloud down the wall, its pole on the figure.
 - **Camera and joins:** locked while the figure stands in the opening or crosses it; then a push-through (A, K9): 0 ->
   0.85 into the aperture in 1.2-2 s, and the aperture IS the next shot; or a C push of <= 2x to a closer view of it.
 - **Never:** two openings lit alike; the opening under the rail (x > 870 below y 860); the figure touching the opening's
@@ -394,8 +965,10 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   bend below it, ending on or behind the focal. Masses: the ground mid with its lines tone-on-tone, except the lit lane;
   the sky light with the band; the far end lit. Quiet: the sky; the ground between the lines. Light: the lines end at
   the story light (a lit end, a light's column). Eye: the words, then the lit end; the lines confirm it from below.
-- **Device:** leading lines and one-point perspective (`composition/reels.md` B1, B2) to a closed vista (E7); the
-  S-curve (B8): the tall ground holds one more bend than a landscape frame.
+- **Device:** leading lines and one-point perspective (B1, B2) to a closed vista (E7), entering in 2-3 zigzag legs (N8);
+  the small figure or the lit opening where they meet (E1, E2); the subject travelling the line while the camera holds
+  (E9); the near quay a soft hint (C2, E5). The S variant (B8): the tall ground holds one more bend than a landscape
+  frame.
 - **Camera and joins:** locked while the subject travels the line (into the vanishing point, along the path: the reels'
   runner went 305 -> 92 px in 1 s down a pier's axis); or a push to the vista (>= 3 % in <= 2 s, on its word). Out by A
   (into the end) or C (on along the line).
@@ -414,8 +987,9 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   facade one mid mass, the sky with the band above, the street or water below. Quiet: the sky; the wall below the
   windows. Light: the one lit pane is the story light and carries the scene's one hot accent; the other panes dark or
   lit a step under it, inside the facade's value. Eye: the words, then the one break.
-- **Device:** a pattern with one break (`composition/reels.md` D7: a row of six windows with a man leaning out of the
-  fifth, 1 call, 73 % quiet; cinema §4.15).
+- **Device:** a pattern with one break (D7: a row of six windows with a man leaning out of the fifth, 1 call, 73 %
+  quiet; cinema §4.15); the break a lit opening (C1, E2) carrying the scene's one hot accent (E8), in the golden box
+  (A2).
 - **Camera and joins:** locked; the break may happen on its word (the one window lights: a light change in place); out
   by A (a push-through into the window).
 - **Never:** two breaks; a saturated colour in any other window (still v6's four yellow upper windows were the colour
@@ -433,8 +1007,10 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   step where the figure crosses it), the ground below dark. Quiet: the sky and the dark ground. Light: the lit line is
   the story light (a sun on it one step off its sky unless it is the shot's "look here"). Eye: the words, down to the
   brightest line, then its one break: the figure.
-- **Device:** the cross (`composition/reels.md` A6): one strong vertical across one strong horizontal, at the subject;
-  counterchange (the owner's beach reference: the couple dark ON the lit horizon line, its one call).
+- **Device:** the cross (A6): one strong vertical across one strong horizontal, at the subject; counterchange (N7; the
+  owner's beach reference: the couple dark ON the lit horizon line, its one call); the horizon near the lower third
+  (A1, N3: setup A); the one small figure (E1) walking the line with its looking room ahead (E4, E9), or standing still
+  while the far life passes (E3); the big cloud high on the far side as the steelyard (D4).
 - **Camera and joins:** locked; the figure walks along the line with its lead room ahead, or stands; clouds drift 3-6
   px/s. Out by C, or D (the figure leaves one edge and enters the next shot from the opposite edge at the same speed).
 - **Never:** two uprights of equal weight on the line; the line at the half; the figure's head in the band or its feet
@@ -451,8 +1027,9 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   camera shifting 600-900 px in 2.5-3.2 s with the verticals parallel (K2's shape), the subject on the axis, the band
   one flat field at every frame. In both, the subject is the one thing moving against the flow and carries the focal's
   value step with it.
-- **Device:** the pivot (rule 12): the screen-locked subject among moving planes wins the eye [cinema S6]; height, not
-  width, is the tall frame's travel (`composition/vertical.md` §6).
+- **Device:** the pivot (N10, rule 12): the screen-locked subject among moving planes wins the eye [cinema S6];
+  stillness against motion, drawn sharp (E3); the kerbs and rails as parallel lines that hold while things pass on them
+  (B5); lead room ahead (E4); height, not width, is the tall frame's travel (`composition/vertical.md` §6).
 - **Camera and joins:** one move on one ease: it catches the subject up, holds it, then lands with the next beat's frame
   in the golden box. Out by C (the camera goes on), or D (the subject leaves one edge and enters the next shot from the
   opposite edge at the same speed).
@@ -470,8 +1047,9 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   subject on one level, in the golden box; the life or the effect on the other. Each level is one mass; the subject's
   holds the story light. Quiet: the sky with the band above the upper level; the lower level's ground. Eye: the words,
   the subject's level, then along the steps to the other.
-- **Device:** the level change (`composition/reels.md` C3: a walker high on a station stair, people waiting below); only
-  the tall frame holds both stages.
+- **Device:** the level change (C3: a walker high on a station stair, people waiting below); only the tall frame holds
+  both stages. The steps are the shot's one diagonal (B6) on the stage square's 40.4 degrees, the subject at a foot of
+  its golden triangle (A5: (626, 987) or (454, 1133)); their nosings are parallel lines (B5) the eye climbs in legs (N8).
 - **Camera and joins:** locked, or a tilt from one level to the other (SR10); out by C.
 - **Never:** two levels with equal calls; a ruler-straight cut through the ground (it reads as a diagram: the cut is a
   soft, irregular painted edge, or there is none); the lower level's key read under the bottom UI (y >= 1519).
@@ -488,8 +1066,9 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   colour, flat behind the captions; <= 2 other things, cut by the edges. The detail (found edges, the finest marks) on
   the object only. Light: the story light on the object: its lit face, a rim on the key's side, its shade face the
   deepest of the frame. Eye: the words, then the object's one feature that names it.
-- **Device:** isolation: size on screen makes the subject important, and the background is read in about a quarter of a
-  second while the eye stays on the subject (2D layout practice, cinema S16).
+- **Device:** isolation (N9): size on screen makes the subject important, and the background is read in about a quarter
+  of a second while the eye stays on the subject (2D layout practice, cinema S16); the object on the centre (N1), in the
+  golden box (A2).
 - **Camera and joins:** reached by a push of <= 2x per panel (A or C), the close drawn at its own size, or by a plain
   cut-in on its axis on a "But" turn (F); then locked or the float. Out by C (a pull back) or A.
 - **Never:** a face, or a person as the subject; a 4x zoom of the wide drawing; the object inside a screen rectangle (it
@@ -506,8 +1085,9 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   mass), the world mid, the sky light with the band. Light: the thing in hand lit (a screen's glow is a local story
   light); the cause a step under it until the payoff word. Eye: the words, the cause, then down to the hand (300-500
   px).
-- **Device:** POV with the cause above and the effect in hand (`CINEMATIC_GUIDE.md` "The opening": the cause outside the
-  home window, the effect in the hand, both changing on the payoff word); `composition/reels.md` E11.
+- **Device:** the POV hook (E11) with the cause above and the effect in hand (`CINEMATIC_GUIDE.md` "The opening": the
+  cause outside the home window, the effect in the hand, both changing on the payoff word); the near "you" only as hands
+  (E10).
 - **Camera and joins:** locked or the float (the hand breathes <= 2 % W/s); the hand acts once, on its word. In by A (a
   pull back out of a window or a screen) or B; out by A (into the screen) or B.
 - **Never:** the screen under the rail (x > 870 below y 860) or the name block (y >= 1519); a logo or readable fine
@@ -530,9 +1110,12 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   one connected dark mass rising into the light at the line of heads. Quiet: the sky; the near ground. Light: the far
   lit point is the story light, the key behind the far world (the "you" a soft silhouette). Eye: the words, the far lit
   point, then the "you" looking at it.
-- **Device:** scale from a known size ("We feel the vastness of a scene by the presence of a lone figure", Poore 1903,
-  via cinema S1); the gaze cue (the "you"'s sightline sends the eye to the focal [cinema S9]); the owner's human-scale
-  references (`refs_human_scale/`: the city hill, the beach) are this frame.
+- **Device:** scale from a known size (D2: "We feel the vastness of a scene by the presence of a lone figure", Poore
+  1903, via cinema S1): the one small figure (E1), the reels' near "you" made one whole 130-220 px figure at one side
+  (E10); its looking room and the gaze cue (E4: the "you"'s sightline sends the eye to the focal [cinema S9]); setup A's
+  horizon near the lower third (A1, N3); the far belt paler with distance (E6, N6). Variant: a tower with the lit window
+  small at its foot (A3). The owner's human-scale references (`refs_human_scale/`: the city hill, the beach) are this
+  frame.
 - **Camera and joins:** locked or the float; or a push to the vista (>= 3 % in <= 2 s, anchored on the far point); life
   in the sky (birds, clouds) and far away (a ferry, a tram), never by the "you". In by C (a rise or pull back from the
   home view); out by A (into the far point) or C.
@@ -552,8 +1135,10 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   sky. Quiet: the giant's face (patterned +-4-6 L*) and the ground. Light: at the figure's spot (a pool, or the giant's
   lit door at its foot): the figure is the stage's only high-contrast mark. Eye: the words on the giant's flat face,
   down its verticals to the figure at its foot.
-- **Device:** scale (`composition/reels.md` D2: a man at a railing, 214 px at full width, under a tower that fills half
-  the picture); the cross (the giant's vertical on the ground line).
+- **Device:** scale (D2: a man at a railing, 214 px at full width, under a tower that fills half the picture), the one
+  small figure at the giant's foot (E1); the cross (A6: the giant's vertical on the ground line); the nested golden
+  section (A3: the giant's edge on x 667, the figure in the nested cell near (570, 1086)); the hall's rows and floor
+  joints radiating from the figure's spot (B3); the worm's-eye (N11), Guo Xi's high distance (N6).
 - **Camera and joins:** locked (K6, 2-3.5 s), or a tilt-up reveal (K2's shape: 600-900 px in 2.5-3.2 s, the top landing
   at 0.08-0.15 H or cut). In by a plain cut F only on a "But" turn (K1: the wide's figure <= 1/8 of the close's size),
   or inside the big move; out by A.
@@ -571,8 +1156,9 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   nobody. Masses: the sky light (one big quiet field, patterned), the land strip dark. Light: the sun half behind a
   cloud's edge (S3) or a half disc on the horizon (S4's closer variant), at the subject's side. Eye: the words, then the
   landmark or the figure at the field's foot.
-- **Device:** negative space (`composition/reels.md` D1: the space gives the small subject weight); Guo Xi's "level
-  distance", a thin band of land under a huge sky (cinema S19).
+- **Device:** negative space (D1: the space gives the small subject weight); Guo Xi's "level distance", a thin band of
+  land under a huge sky (N6, cinema S19); the landmark on the left third (A1); the hero cloud as the steelyard's far
+  weight (D4); the far city paler with distance (E6).
 - **Camera and joins:** locked or the float; clouds drift 3-6 px/s, birds cross the top. S2 and S4 at most once each a
   film; never next to SR17.
 - **Never:** an empty sky (it is patterned: clouds in planes, birds, a gentle variation in tone); a cloud or a top in
@@ -591,8 +1177,9 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   lower 60 %. The band stays in the flat sky at every frame (S5's start: sky y 0-840). Over the move: the bright slot in
   a dark frame, the darkest moment at the dormer, a light burst before the landmark lands, the settle. Eye: on the pivot
   (the figures) through the move, then the landmark as it lands.
-- **Device:** scale; the pivot (the subject holds still while the world moves past it); a frame within a frame opening
-  into the world.
+- **Device:** scale (D2); the pivot (N10: the subject holds still while the world moves past it); a frame within a frame
+  opening into the world (C1; S5's slot is the tunnel's light at the end, B4); Guo Xi's deep distance in 6 planes (N6),
+  paler with distance (E6).
 - **Camera and joins:** one continuous move on one ease (S5: a dolly back, a crane up and a 70-80 degree arc; S1: a
   rise), retimed to the reel (S5's default a 2.6 s move + a 0.7 s hold), the landmark landing on the payoff word. It
   leaves from the thread (the declared scale reveal may run without it) and the next join returns to the thread, by A
@@ -612,9 +1199,10 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   focal. Masses: one heavy dark mass on the focal's side, the open side light, the band in the set's flat sky or wall
   above both; the step at the focal the film's hardest so far. Light: the story light hard on the focal (a raking key, a
   lamp switching on). Eye: the words, then a longer jump to the off-centre focal: the turn is felt.
-- **Device:** the unbalanced frame ("deliberate tension: one heavy side and nothing against it", cinema §9), the
-  diagonal and the V: contrast against the home beats' affinity (level lines, close values, slow), as a film's intensity
-  curve is planned (cinema S17).
+- **Device:** the off-balance (N15: "deliberate tension: one heavy side and nothing against it", cinema §9; not the
+  reels' "unbalanced", D4, which is the steelyard), its open side negative space (D1); or one diagonal (B6), laid on the
+  stage square's golden triangle with the focal at a foot (A5); or the V (B11), its point at the focal: contrast against
+  the home beats' affinity (level lines, close values, slow), as a film's intensity curve is planned (cinema S17).
 - **Camera and joins:** a plain cut (F: at most 2 a film, only on a "But" turn, the thread on both sides, a size
   change >= 20 % (>= 1.5-2x proposed: §5 row 14) or an angle change >= 30 degrees), or a push that lands off-centre;
   then a hold of 0.5-1.0 s (the pause after the heaviest line) before the next move.
@@ -632,7 +1220,7 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   Light: the key changes only on a story turn, once or twice a film, carried by the light changing in place (a lamp or a
   window switching, a cloud crossing the sun), never cut in; a colour shift over 15 at the join is then declared
   (`CRAFT.md` §a). Eye: straight to the change.
-- **Device:** the deliberate match ("the same chart again, the same place later, the callback to the opening's end
+- **Device:** the deliberate match (N14: "the same chart again, the same place later, the callback to the opening's end
   frame", `STORYBOARD_STYLE.md` §7); the colour script's one key change per story turn (cinema §7).
 - **Camera and joins:** locked on both; the change lands on its word. The join between the two is B, or the change
   happens inside one held shot.
@@ -650,8 +1238,9 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   means >= 13 L* apart; the subject sits at the seam, in the golden box. Quiet: each field calm inside itself. Light:
   the story light on the subject at the seam (the hardest step is the seam at the focal). Eye: the words, then the seam
   where the subject sits; the two fields read in one glance as "this against that".
-- **Device:** juxtaposition (`composition/reels.md` D6: a beach split from the sea by its shoreline); two opposites side
-  by side read as intense (cinema S17).
+- **Device:** juxtaposition (D6: a beach split from the sea by its shoreline), the seam often one diagonal (B6); two
+  opposites side by side read as intense (cinema S17); the camera holds while the seam's front travels (E9); the subject
+  in the golden box (A2).
 - **Camera and joins:** locked; the seam's front may travel (a melt spreading, water rising, a shadow moving with the
   light) as the beat's one mover. Out by C.
 - **Never:** two stages stacked as a split screen (the eye switches between streams: `composition/vertical.md` §2); the
@@ -668,9 +1257,10 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   Masses: the units one mid texture, the cause one strong mass (its top at y >= 620, under the band), the floor light.
   Light: on the cause (or the one unit broken out). Eye: the words, the cause at the apex, then the spread of units
   below it.
-- **Device:** repetition ("'How many' is a row of equal small icons (Isotype), not one bigger icon",
-  `STORYBOARD_STYLE.md` §3); the pyramid (`composition/reels.md` D5; cinema §4.10: the apex on the focal, sides 50-70
-  degrees).
+- **Device:** repetition (D7: "'How many' is a row of equal small icons (Isotype), not one bigger icon",
+  `STORYBOARD_STYLE.md` §3); the pyramid (D5; cinema §4.10: the apex on the focal, sides 50-70 degrees), its rows
+  receding toward the apex (B3), seen a little from above (N12), the apex in the golden box (A2). Variant: the units in a
+  ring round the cause, the cause inside the circuit (B13).
 - **Camera and joins:** locked; the units pop by rows on their word, never one by one for forty; out by C.
 - **Never:** units of different sizes or colours (it becomes a tour); units as strong in value as the cause; a unit
   under the rail or in the bottom UI; a number tag beside the caption's number.
@@ -686,7 +1276,8 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   or touching what it measures; the paper's face one quiet light field with its top under the band (y >= 620), its place
   visible at the edges (a hand, a wall, the snow). Light: the paper lit, the place a step under it. Eye: the words, then
   the number or the line's end.
-- **Device:** figure and ground: one light rectangle, one dark mark on it (`LAYOUT.md` §2 chart row).
+- **Device:** figure and ground (N7): one light rectangle, one dark mark on it (`LAYOUT.md` §2 chart row), isolated (N9)
+  on the centre (N1); the line drawn first, in step with the voice (T).
 - **Camera and joins:** entered by a push (A) or a card flip (E); the line draws on in step with the voice (a draw-on is
   allowed where the drawing is the beat); held >= 1 s after its number lands.
 - **Never:** a new place made for the chart (a billboard, a noticeboard); small words, sources or fine print (they go in
@@ -703,8 +1294,9 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   half; the reflection below it to y ~1300, calmer and a step darker; the banks' masses at both sides as the symmetric
   frame. Masses: the sky light with the band; the landmark and its reflection the one call; the dark banks. Light: the
   landmark's light and its reflected column. Eye: the words, then straight down the axis to the landmark.
-- **Device:** symmetry (`composition/reels.md` A7: a pavilion mirrored in a still lake at dusk); the axis x 540 sits 20
-  px from the captions' centre line, so the words sit on the mirror's axis.
+- **Device:** symmetry (A7: a pavilion mirrored in a still lake at dusk); the axis x 540 sits 20 px from the captions'
+  centre line, so the words sit on the mirror's axis; the two banks are balance's two equal masses, as the frame only
+  (D3); one slow mover crosses while the camera holds (E9).
 - **Camera and joins:** locked; one slow mover (a bird, a boat) crosses and breaks the mirror once. In or out by B (a
   matched frame), or as the loop's frame.
 - **Never:** more than one a film (two at most); the horizon at the half; three wides in a row sharing a centred
@@ -719,7 +1311,9 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   in the story's order, and ends at the focal (the thread at its home spot, in the golden box). The film's hardest value
   step (>= 65 L*) and its one hot accent at the focal; the light at its warmest; Pip back on its first spot. Eye: the
   words, the path's start, the sweep, the focal.
-- **Device:** the matched frame and one sweep ("triangulate in, with a series of zigzags", Poore 1903, via cinema §4.5).
+- **Device:** the matched frame (N14) and one sweep ("triangulate in, with a series of zigzags", Poore 1903, via cinema
+  §4.5: N8): the thread's run is the leading line (B1), ending on the one hot accent (E8). Variants: the sweep shaped as
+  a golden spiral whose pole is the focal (A4), or a spiral pathway curling in to it (B12).
 - **Camera and joins:** a pull back (A) out of the last close onto the matched frame, then locked; the last frame
   un-draws to frame 0 (B).
 - **Never:** anything new the film has not shown; a title; a second focal.
@@ -727,18 +1321,21 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   pulse travelling the run on "could ... heat ... apartment" is the sweep, ending on the one window lighting a step
   warmer; the phone from the bottom left (SR13).
 
-### Not in the library (what the references show that we don't take)
-- Focus blur and motion blur, a big blurred near head, a soft near layer filling half the frame: our look has no blur
-  (DIRECTION rules 4-5); the near frame is a hint at the edges (rule 10).
-- Grids that place the subject by the full frame: the thirds' crossings (y 640 under the band, y 1280 under the read
-  zone), the golden triangle's and the dynamic-symmetry eyes (in the band or by the bottom UI), the full-frame golden
-  spiral's pole (x 298 or 782).
-- Balance of two equal masses, the double diagonal, top-down views (a high angle once a film on a crowd, K10; overhead
-  only as paper), a tilted horizon, a dolly zoom.
+### Not in the library (what the references show that we don't take; Part 1 §D3)
+Every one of the owner's 41 ideas is in the library (§D4). What stays out are treatments and full-frame uses:
+- Focus blur and motion blur (X1), a big blurred near head, a soft near layer filling half the frame: our look has no
+  blur (DIRECTION rules 4-5); the near frame is a hint at the edges (rule 10; C2, E5 and E10 say how).
+- The grids placed on the full frame (the devices stay, built on the stage square or scaled): the thirds' crossings (y
+  640 under the band, y 1280 under the read zone; A1 keeps the lines as proportions), the full-frame golden triangle's
+  and dynamic-symmetry eyes (in the band or by the bottom UI; A5 uses the stage square's, in the golden box), the
+  full-frame golden spiral's pole (x 298 or 782; A4 puts the pole on the subject).
+- Two equal masses as two subjects (D3 keeps them as SR23's frame only); straight top-down views (B7, B12 and D6 move
+  to SR5's raised angle or to eye level; a high angle once a film on a crowd, K10; overhead only as paper); a tilted
+  horizon (X5); a dolly zoom (X6); a split screen (X4).
 - The photographs' density (1-14 value calls, median 6, against the owner's painted models' 1-2): we take their
   armatures, never their clutter.
-- A title over the shot, and the reels' opacity cross-fade between their line and their picture (DIRECTION rule 8: no
-  opacity fades; our line draws on and the colour floods in under it).
+- A title over the shot (X2), and the reels' opacity cross-fade between their line and their picture (X3; DIRECTION
+  rule 8: no opacity fades; our line draws on and the colour floods in under it).
 
 ## 4. Picking shots for a film (the composition-and-motion pass)
 
