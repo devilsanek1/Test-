@@ -332,7 +332,8 @@ Maintenance at the end).
   separate service / But you are AI why can’t you do it", 2026-10-29). On the local SDXL sky trials: "Yeah 0.7 looks
   reasonable" (img2img strength 0.70 from our design); and the priority stays OUR CODE: "Let’s see what’s the best we
   can do with code after research", 2026-10-29: the painter rebuilt from the researched recipes is the main path, the
-  AI plate the comparison.
+  AI plate the comparison. Then, after the recipe book and v6: "Let’s try to do in engine first without AI painted
+  pieces" (2026-10-30): the next look rounds use our engine only; AI plates stay an explained option, not in use.
 - **Texture and lines: VERY subtle.** No outlines: as on the city posters, shapes are separated by light and shade (a
   lit and a shade face on every volume, the subject's the deepest) and by value, never by a line drawn round them
   (the A vs B picture's B). Thin lines only on small things that are lines (window bars, railings, rigging): dark,
