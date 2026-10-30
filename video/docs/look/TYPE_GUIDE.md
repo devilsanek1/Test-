@@ -261,9 +261,9 @@ Each example uses video 4's real words and times; a frame number is t x 60.
 - **`LAYOUT.md` §1, the "caption block (the ink)" row:** replace "Patrick Hand 98 px, baselines 387 / 510 (one line
   448), centred on x 520 (left of centre: clear of the rail), <= 850 px wide, <= 2 lines of ~20 characters; highlight
   boxes reach y 299" with "the words (`TYPE_GUIDE.md`): the hand (Gaegu 300 / 400) 116 px, baselines 395 / 515 (one
-  line 455), group centre on a seat x 440 / 520 / 600, a line <= 830 px, <= 2 baselines; a landing-word lockup at 365 /
-  495 / 598 (the brush, Nanum Brush Script 200 px); a number at 500 (260 px) over its unit at 600; no boxes; ink
-  inside y 290-610 in the band". Add a row **"type frame | y 290-1250; x 96-944 above y 840, x 96-860 below; ads x
+  line 455), group centre on a seat x 440 / 520 / 600, a line <= 830 px, <= 2 baselines; a landing-word lockup at 362 /
+  484 / 578 (the brush, Nanum Brush Script 184 px); a number at 480 (300 px) over its unit at 578; no boxes; ink
+  inside y 290-585 in the band". Add a row **"type frame | y 290-1250; x 96-944 above y 840, x 96-860 below; ads x
   120-888, y 288-1248, x <= 780 below y 840"**. In the row's rules, "ink >= 7:1 on its field" becomes ">= 4.5:1 for
   running words (7:1 where the sky allows), >= 3:1 for the brush". §5 (the cover): "the title in the caption type with
   the peach box on its key words" becomes "the core line in the hand with its key word in the brush, in the film's
@@ -288,26 +288,28 @@ Each example uses video 4's real words and times; a frame number is t x 60.
 ## h. THE STILL LIST (for job 2)
 All 1080 x 1920 with `scripts/type/render.mjs` (`--phone --ui`), backgrounds `{{BG_NIGHT}}` (video 4's key) and
 `{{BG_DUSK}}` (the light sky, for dark ink). The backgrounds are wides, so every still stands in for its shot's
-placement; never invent a new picture beyond what a note asks. Sizes, seats and times are §b-§e's.
+placement; never invent a new picture beyond what a note asks. Sizes, seats and times are §b-§e's. Rendered: the pages
+`scripts/type/stills/NN_*.html` (`bash scripts/type/stills/render_all.sh`), the results in `docs/look/type/stills/`
+(`STILLS.md`, `contact_sheet.jpg`).
 
 1. **BEFORE (our captions now).** S7 at 24.10 s: "But Helsinki / WANTS that heat." · Patrick Hand 98 px, umber
    #2B1B0A, two centred lines on x 520 at baselines 387 / 510, the peach box #F6B892 behind "WANTS" (square, 0.19 em
    padding, the word ink on peach) · `{{BG_DUSK}}` · Look at: how heavy and boxed it is, and the fixed band.
-2. **AFTER, the same moment: R4 the landing word.** "But Helsinki" (hand 400, 116 px, umber, baseline 365, from x
-   130) / **"WANTS"** (brush 200 px, burnt #8E3A12, baseline 495, from x 260) / "that heat." (hand, baseline 598,
-   right-aligned near x 920) · `{{BG_DUSK}}` · Look at: one painted word carrying the turn; compare with still 1.
+2. **AFTER, the same moment: R4 the landing word.** S7 at 24.70 s (all three rows on): "But Helsinki" (hand 400, 116
+   px, umber, baseline 362, from x 130) / **"WANTS"** (brush 184 px, burnt #8E3A12, baseline 484, from x 260) / "that
+   heat." (hand, baseline 578, right-aligned near x 920) · `{{BG_DUSK}}` · Look at: one painted word carrying the turn; compare with still 1.
 3. **THE HAND, three ways.** S2 at 4.50 s: "AI actually runs" in three bands of one still (each a 1080 x 600 crop of the
    band region, labelled small at the bottom-left), at one x-height (~45 px): Gaegu 300 116 px · Mali 300 90 px · Zen
    Kurenaido 400 106 px; warm white with the halo · `{{BG_NIGHT}}` · Look at: which hand feels like ours, and "AI"
    reading as "Al" in Zen Kurenaido.
-4. **R1 the everyday caption.** S2 at 6.00 s: "on giant / computers," (two baselines 395 / 515, line 1 from x 300,
-   line 2 from x 400, seat C), Gaegu 300 116 px, #FFF0DE, halo · `{{BG_NIGHT}}` · Look at: light and airy, yet read at a
+4. **R1 the everyday caption.** S2 at 6.00 s: "on giant / computers," (two baselines 395 / 515, line 1 from x 131,
+   line 2 from x 231, seat L), Gaegu 300 116 px, #FFF0DE, halo · `{{BG_NIGHT}}` · Look at: light and airy, yet read at a
    glance on the phone preview; the default look of most of the film.
 5. **R2 the hook.** S1 at 0.70 s: "Did you know" (line 1, from x 120, baseline 395) / "Helsinki" (line 2, from x
    400, baseline 525), Gaegu 300 136 px, #FFF0DE (frame 0 shows line 1 alone in the same place) · `{{BG_NIGHT}}` · Look
    at: big enough to stop a thumb, still calm.
-6. **R3 the big number.** S1 at 3.60 s: **"70,000"** (brush 260 px, amber #FFB868, baseline 500, centred near x 470)
-   over "homes?" (hand 116 px, baseline 600, right edge x ~900) · `{{BG_NIGHT}}` (its amber windows echo the figures)
+6. **R3 the big number.** S1 at 3.60 s: **"70,000"** (brush 300 px, amber #FFB868, baseline 480, centred near x 440)
+   over "homes?" (hand 116 px, baseline 578, right edge x ~930) · `{{BG_NIGHT}}` (its amber windows echo the figures)
    · Look at: the number reads first and feels part of the lit city.
 7. **R5 the tint, the same moment as still 2.** S7 at 24.70 s: the same three rows and positions as still 2, but
    "WANTS" in the hand (400, 116 px) tinted burnt #8E3A12 instead of the brush · `{{BG_DUSK}}` · Look at: stills 2 and
@@ -317,20 +319,46 @@ placement; never invent a new picture beyond what a note asks. Sizes, seats and 
    manner, words lettered into the open sky, the big last word.
 9. **R7 the word in the world.** S8 at 27.70 s: a small cream paper tag (~280 x 170 px, a slight swing angle of 3-4°,
    a pin, a soft contact shadow) on the lit building's facade near the doorway's top, on it **"2027"** in the brush
-   (umber, figures ~120 px tall); above in the band the caption "starting / next year." (R1, seat C) · `{{BG_NIGHT}}` ·
+   (umber, 148 px: figures ~66 px tall, fitted to the tag); above in the band the caption "starting / next year." (R1, seat C) · `{{BG_NIGHT}}` ·
    Look at: the year belongs to the place; the caption and the tag share the frame without repeating each other.
-10. **R9 the payoff.** S12 at 40.00 s: "So your chatbot" (hand 116, baseline 365, from x 130) / "could soon" (baseline
-    470, from x ~220) / **"heat"** (brush 200 px, amber, baseline 600, right-aligned near x 900) · `{{BG_NIGHT}}` ·
+10. **R9 the payoff.** S12 at 40.00 s: "So your chatbot" (hand 116, baseline 390, from x 110) / "could soon" + **"heat"**
+    (row 2, baseline 545, from x 120; "heat" brush 184 px, amber, 50 px after "soon", at its swell's peak 1.04) · `{{BG_NIGHT}}` ·
     Look at: the core line landing on its one warm word.
-11. **R10 the cover.** The cover: "Your chatbot / could **heat** / an apartment / in Helsinki." (hand 300, 120 px;
-    "heat" brush 260 px amber; ragged, stepped, left edge x ~110) on `{{BG_NIGHT}}` shifted down ~180 px (the sky
+11. **R10 the cover.** The cover: "Your chatbot / could **heat** / an apartment / in Helsinki." (hand 300, 112 px;
+    "heat" brush 250 px amber; ragged, stepped, left edge x ~110, baselines 365 / 530 / 624 / 733) on `{{BG_NIGHT}}` shifted down ~180 px (the sky
     extended at the top in its own colour, so the open sky reaches y ~780, standing in for a cover frame composed with
     more sky); no captions · also judge it at 360 px wide · Look at: one series look on the grid; read at tile size.
-12. **R10 in the posters' caps (the comparison).** The same cover in Jost 300 ALL CAPS, +12 % tracking, warm white
-    #FFF0DE, centred rows sized to fit x 96-944 ("YOUR CHATBOT / COULD HEAT / AN APARTMENT / IN HELSINKI."),
+12. **R10 in the posters' caps (the comparison).** The same cover in Jost 300 96 px ALL CAPS, +12 % tracking, warm white
+    #FFF0DE, centred rows (baselines 375 / 500 / 625 / 750) inside x 96-944 ("YOUR CHATBOT / COULD HEAT / AN APARTMENT / IN HELSINKI."),
     "HEAT" in amber · the same shifted `{{BG_NIGHT}}` · Look at: stills 11 and 12: the painted hand or the posters'
     geometric caps.
 13. **Three groups in a row (the seats walking).** S2, 4.50 / 6.00 / 7.00 / 8.00 s as four 540 x 960 frames in a 2 x 2
-    grid on one still: "AI actually runs" (seat L) · "on giant / computers," (seat C) · "in buildings / called" (seat
-    R) · "data centers." (seat C), R1 throughout · `{{BG_NIGHT}}` · Look at: alive but steady: the words move less than
-    220 px, so the eye never hunts.
+    grid on one still: "AI actually runs" (seat C: at 789 px it fits no other) · "on giant / computers," (seat L) ·
+    "in buildings / called" (seat R) · "data centers." (seat C), R1 throughout · `{{BG_NIGHT}}` · Look at: alive but
+    steady: the words move less than 220 px, so the eye never hunts.
+14. **R4's brush write-on, mid-stroke (added by the stills, for RESEARCH open question 3).** S7 at 24.10 s: "But
+    Helsinki" (row 1, as still 2) and **"WANTS"** 7.6 of its 12 frames in (70 % painted after ease-in-out: "WAN" and the
+    T's first stroke), the paint advancing left to right behind a dry brush edge (an approximation: the real write-on
+    follows each letter's strokes); "that heat." not yet on · `{{BG_DUSK}}` · Look at: painted, or the clipped reveal
+    the owner ruled out?
+
+## i. Changes from the stills (2026-10-30, job 2: looked at on the phone preview and under the UI)
+- **The brush's comma** (the orchestrator, after the run): Nanum Brush Script's comma is wide with a long tail, so
+  "70,000" read "70 , 000" at a glance; R3 sets a number's comma in the brush at ~0.63 of the figures' size, tucked
+  8-14 px from the figures on each side (still 06).
+- **The band's floor:** ink stays at y <= 585, not 610: the third rows at 598-600 (R3, R4, R9) sat on the roofline
+  (~590-600) at phone size. R4's lockup moved to baselines 362 / 484 / 578 and its brush to 184 px (1.6x the hand;
+  three rows with a 200-px brush need ~330 px, the band has ~295); R3's figures to 480, its unit word to 578.
+- **The brush's real size:** its figures are 0.45 em, so 260 px gave 118-px figures (not ~165) and the number did not
+  read first: R3 is now 300 px (figures ~136 px), centred near x 440 with the unit word's edge at x ~930, so the
+  brush comma's long tail stays clear of "homes?". A world word is 140-160 px (LAYOUT's "one number 120-160 px" is a
+  font size): "2027" at 148 px (figures ~66 px) fits the ~280 x 170 tag and reads at phone size.
+- **R9 is two rows** (390 / 545, "heat" last on row 2): with three rows the brush word sat on the roof, and lifting it
+  ran its tall "h" into "soon".
+- **Seats:** "AI actually runs" (789 px) fits only seat C inside x 96-944 (at seat L its ink began at x 46), so the walk
+  is C, L, R, C and R1's example ("on giant / computers,") sits on seat L, from x 131 / 231; the old "from x 300 / 400"
+  centred the group at x ~610, not seat C.
+- **R6:** a 0.48 em space before "tea." (at 0.3 em, "of" and "tea." ran together on the phone).
+- **R10:** the cover stack shrank a step (the hand 112 px, the brush 250 px; the caps 96 px) so all four rows sit in the
+  open sky above the roofs (y ~780 on the shifted frame).
+- **Still 14 added:** the brush write-on mid-stroke, so open question 3 is judged on a picture.

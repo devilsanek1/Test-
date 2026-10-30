@@ -6,7 +6,11 @@
 // "70,000" pops 2.300 s (frame 138), "homes?" builds 3.383 s (frame 203), both on to 4.233 s
 window.__ready = TYPE.run(() => {
   const S = TYPE.stage(), tone = 'night';
-  TYPE.text(S, {t: '70,000', x: 440, y: 480, anchor: 'middle', role: 'brush', size: 300, tone, accent: true});
+  // the brush's own comma is wide with a long tail ("70 , 000" at a glance): the figures set as "70", a smaller comma
+  // tucked against them, then "000", the whole number centred near x 440 as before
+  const a = TYPE.text(S, {t: '70', x: 150, y: 480, anchor: 'start', role: 'brush', size: 300, tone, accent: true});
+  const c = TYPE.text(S, {t: ',', x: a.x1 + 8, y: 480, anchor: 'start', role: 'brush', size: 190, tone, accent: true});
+  TYPE.text(S, {t: '000', x: c.x1 + 14, y: 480, anchor: 'start', role: 'brush', size: 300, tone, accent: true});
   TYPE.text(S, {t: 'homes?', x: 930, y: 578, anchor: 'end', role: 'hand', size: 116, tone});
 });
 </script></body></html>
