@@ -1570,7 +1570,7 @@ def build_board(out):
     y += 76
     y = text(d, (M, y), 'Shape thumbnails drawn for fashion.md (autumn 2026): no photo traced, no artist copied. Profile, '
              'facing left, key light from the upper left, flat planes with a shade crescent and a thin rim, no '
-             'outlines; 7.8 heads. Each look at 520 px, then at film size (180 px and 60 px). Hair from behind and in '
+             'outlines; about 7.6 heads. Each look at 520 px, then at film size (180 px and 60 px). Hair from behind and in '
              'profile. Colours from our house palette (no beige, olive or grey).', fS, INK2, width=Wb - 2 * M)
     y += 26
 
@@ -1667,7 +1667,7 @@ def build_board(out):
     d.text((M, y), 'D.  What reads at our size: eyewear, headwear, bags and the feet', font=fH, fill=INK)
     y += 46
     y = text(d, (M, y), 'Oversized or wrap sunglasses are the 2026 accessory and the most current generic face; the tiny '
-             'oval reads 2018-2024. The feet are the tell: slim and low now, chunky and round then.', fr, INK2,
+             'oval of the last few seasons reads old. The feet are the tell: slim and low now, chunky and round then.', fr, INK2,
              width=Wb - 2 * M)
     y += 12
     top, ch = y, 790
@@ -1750,7 +1750,7 @@ def build_board(out):
     top, ch = y, 760
     rounded(d, [M, top, Wb - M, top + ch], 22, CARD)
     pairs = [(dated_old_flat(), 'Our own flat figure', 'a ball head on the collar, a box coat, stick legs, blob feet',
-              look_N1().parts(), 'N1: 7.8 heads, a neck, one long open coat'),
+              look_N1().parts(), 'N1: a small head on a neck (about 7.6 heads), one long open coat'),
              (dated_2015(), '2014-2017 autumn uniform', 'a belted A-line coat, tights, booties, a blanket scarf, a top knot',
               look_N2(C['teal']).parts(), 'N2 in the film\'s teal: our proposal for the next "you"'),
              (dated_2022(), '2021-2024 oversize', 'an oversized blazer over baggy light jeans, chunky sneakers, tiny ovals',

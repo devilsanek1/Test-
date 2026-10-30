@@ -9,7 +9,7 @@ shapes at our sizes. The board `fashion_board.png` (next to this file; its gener
 look and hairstyle as shape thumbnails we drew ourselves: no photo was traced or copied.
 
 **Units** (as in `design_research.md`): H = the figure's height, crown to sole; h = the skull's height, crown to
-chin (0.128 H on our adult figure, so 7.8 heads). px = pixels in our 1080 x 1920 frame. Our people are mostly
+chin (`design_research.md` proposes 0.128 H, 7.8 heads; the board's adults are 0.13-0.135 H, 7.4-7.7 heads). px = pixels in our 1080 x 1920 frame. Our people are mostly
 130-220 px tall (the "you"), smaller in the mid and far ground, and seen from behind, in profile or in 3/4.
 
 **How the sources were read.** Page fetches were blocked in this session (whowhatwear.com, fashionista.com and
@@ -65,7 +65,7 @@ style target.
    curtains with a longer nape, the overgrown buzz. Colours: glossy espresso brunette, muted copper, soft warm blonde,
    black. "Healthy-looking hair" is the season's word [9]: one sheen band makes it. (§5)
 7. **Sunglasses solve the face and say 2026.** Oversized "bug-eye" frames and wraparound shields are THE street-style
-   accessory of 2026 [1][12]; the tiny oval frames of 2018-2024 now read old. A lens shape over the eye is the most
+   accessory of 2026 [1][12]; the tiny oval frames of the last few seasons now read old [12]. A lens shape over the eye is the most
    current generic face we have (`design_research.md` §11.6).
 8. **Accessories that read at our size:** the slouchy shoulder bag tucked tight under the arm, the east-west bag,
    the big soft tote [13]; over-ear wired headphones (the band, the cup, a thin cable) [13]; a cap (warm coast); an
@@ -104,8 +104,8 @@ style target.
 the cropped or high-collared leather jacket; suede jackets; boxy sweater vests and sleeveless knits over shirts;
 button-up shirts untucked or half-tucked with loafers; sheer and statement skirts; black wide trousers; navy beside
 black as the neutral; red shoes and bags as the accent; camo and a leopard coat as this season's louder notes (we
-skip them) [1][2][6]. A March 2026 cool-girl look in Midtown: a sheer
-lace midi skirt, a high-collared leather jacket and slingback pumps [5]. Jeans are worn with polished separates:
+skip them) [1][2][6]. A March 2026 cool-girl look in Midtown: a sheer lace midi skirt, a high-collared leather
+jacket and slingback pumps [5]. Jeans are worn with polished separates:
 blazers and pumps rather than sneakers [5]. Shoes: loafers (suede), ballet flats, Mary Janes, kitten heels [11].
 
 **Men.** Cleaner, less logo: relaxed but tailored; straight trousers replacing ultra-wide ones; refined, tapered
@@ -282,7 +282,7 @@ the accent is optional and goes on at most one person in four in a crowd (`desig
 | N3 | **The leather jacket and the statement skirt** (W) [1][2] | 1. a cropped leather jacket ending at the waist (0.60 H), boxy, a high or funnel collar to the jaw; 2. a midi skirt to 0.18-0.20 H, A-line or bias; 3. slim bare legs with an ankle; 4. slingback kitten heels or pointed flats | near-black `#2E2426` + tomato `#C8503E`; or burgundy `#743137` + cream `#E9DBCA` | the **waist where a short dark jacket meets a long full skirt** (at 300 px and up: one crisp highlight on the leather) | a dark top on a coloured bell, two thin legs |
 | N4 | **The commuter knit** (W) [1][4][13] | 1. a polished fine knit or a boxy sweater vest to the hip, compact; 2. the white shirt showing at the collar, the hem and the cuffs (0.012-0.02 H bands); 3. wide black trousers, full length; 4. loafers; 5. over-ear wired headphones; 6. a big soft tote on the shoulder | navy `#254161` + near-black `#2E2426`, the cloud-white `#F0EAE1` shirt as the light at the neck | the **over-ear headphones**: a band over the crown and a cup over the ear change the head's silhouette | a navy top, a white neck dot, black legs, a big bag |
 | N5 | **Suede and white socks** (M) [15][11] | 1. a boxy suede jacket or chore coat to the hip, dropped shoulders; 2. a cream tee at the neck; 3. relaxed pleated trousers, straight, a slight break; 4. white crew socks showing 0.02-0.03 H above the shoe; 5. dark loafers; 6. a crossbody strap | caramel `#B58058` + navy `#254161`; or chocolate + cream | the **white sock flash** between the dark trouser and the dark loafer | a warm box on dark legs, two white dots |
-| N6 | **The bomber and slim sneakers** (M) [1][11][15] | 1. a leather or suede bomber cropped at the waist, roomy body, a tight ribbed hem band; 2. a white tee at the neck; 3. slim-straight dark jeans; 4. slim low sneakers with a contrasting stripe | near-black `#2E2426` + indigo `#2F4566` (+ the sneaker's red stripe) | the **slim, low sneaker** with its stripe (the chunky one reads 2018-2022) | a dark top pinched at the waist, long legs, light feet |
+| N6 | **The bomber and slim sneakers** (M) [1][11][15] | 1. a leather or suede bomber cropped at the waist, roomy body, a tight ribbed hem band; 2. a white tee at the neck; 3. slim-straight dark jeans; 4. slim low sneakers with a contrasting stripe | near-black `#2E2426` + indigo `#2F4566` (+ the sneaker's red stripe) | the **slim, low sneaker** with its stripe (the chunky one is on 2026's dated lists [4]) | a dark top pinched at the waist, long legs, light feet |
 | N7 | **The long overcoat, hood out** (M, winter) [6][14] | 1. a long overcoat to the knee (0.26-0.30 H), straight; 2. a hoodie's hood lying over the coat's collar at the back; 3. straight trousers; 4. slim sneakers or Chelsea boots; 5. (optional) a short fisherman beanie, no pompom | caramel `#B58058` + cream `#E9DBCA`; or near-black + cream | the **hood over the collar**: the best detail from behind | a warm column with a light blob at the nape |
 
 **Deep-winter variant:** N6's bomber becomes a cropped puffer (to the waist, three horizontal channels as value
