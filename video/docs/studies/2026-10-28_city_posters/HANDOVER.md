@@ -6,6 +6,14 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-30 ~20:35 UTC: v7a DONE and sent; v7 step B runs
+- v7a (`paint_test/paint_still_v7a.png`, `compare_v7a.jpg`): the door is the one place to look, one key, props cut;
+  under L* 40 7 % -> 47 %, off-family 16 % -> 0.5 %. Our read: the top half works; the bottom 40 % is an empty purple
+  slab with ruler joints (fix in B: a painted wet quay with the door's light reaching the viewer).
+- RUNNING: v7 step B (agent aa74c53934541d244): step 3 brushwork, step 5 paper, her in people C + LASH ->
+  `paint_test/paint_still_v7.png`, `compare_v7.jpg`, NOTES v7. Then D3's wording (darks) across DIRECTION 6, CRAFT
+  §d.2/§f.8, LAYOUT, the playbook's value-range bullet, from v7's numbers.
+
 ## Status 2026-10-30 ~19:05 UTC: the owner handed the calls over; painter v7 runs
 - Owner: "Do what you think is right and make the videos better" -> playbook rule (Process: when the owner hands a call
   over, make it); sound-sync A13 applied, its questions decided; ORGANIC.md's three look questions decided (T3 key,
