@@ -149,9 +149,14 @@ audio stream bit-identical to the master's, its seams within 0.06 dB of the mast
    2-3 variants of some frames (up to 0.08 % of the pixels, max 25 levels), also at concurrency 1 and with one tab per
    frame. The differences start on pixel row 255, a 256-px raster tile seam (Chrome rasterises in tiles). Full-size
    master frames were stable here (the master re-renders byte for byte on an idle box).
-2. **Outside load can change a master.** LOAD_TEST_RESULT
-   So a frame diff or an MD5 test (PLAN's test bed: "a re-render of the delivered master is byte-identical") needs an
-   idle box and, for the noisy frames, two runs of the old code as the baseline.
+2. **One master run did not reproduce; cause unknown.** The new one-step path, run at 19:01 while other sessions were
+   busy on the box (lane C finishing, a checkpoint commit), took 7:35 instead of ~6:25 and gave a different video
+   stream (same audio stream; file `04c4cd50...`; the file was lost in a container restart before it could be
+   diffed). Both runs used the same cached bundle key, so the same code. Not reproduced since: the new path on the
+   idle box (`cfe247ee...`, byte-identical), today's script on the idle box (`cfe247ee`), today's script under two
+   busy loops (8:23, `cfe247ee`), NEW_UNDER_LOAD. Plain CPU load does not move pixels. Until the cause is known, an MD5
+   test against the delivered master (PLAN's test bed) should run on an otherwise idle box, and a mismatch should be
+   re-run once before it counts; for the noisy frames of finding 1, two runs of the old code are the baseline.
 
 ## Files changed (all in lane R's list)
 `video/remotion.config.ts`; `video/scripts/render-frames.mjs`, `render-media.mjs`, `sheet.sh`, `still.sh`,
