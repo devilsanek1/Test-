@@ -608,12 +608,16 @@ and plan the whole frame from the get go", 2026-10-30.)
   layout at low strength), always once per layer per shot, never per frame (per-frame AI flickers). — ("I like the idea
   of using AI tactically like for certain elements or layers that move to achieve parallax or post processing kind of to
   add more style right?", 2026-10-30.)
-- **INK LINES, A BIT ROUGH BUT CLEAN (to try, 2026-10-30):** a bit of hand-drawn messiness in the lines, combined with
-  the painting, the styles and the texture, coherent and premium; never as rough as the old ink line ("too rough, not
-  looking clean or premium"). A look iteration (stills first); until the owner picks a treatment, the "no outlines" rule below stands. —
-  ("so i like a bit of rougher ink style but our video 1 was too rough not looking clean or premium. If you can come up
+- **INK LINES, A BIT ROUGH BUT CLEAN: tested on the FINISHED film, never built in first:** a bit of hand-drawn
+  messiness in the lines, combined with the painting, the styles and the texture, coherent and premium; never as rough
+  as the old ink line ("too rough, not looking clean or premium"). The film is built WITHOUT ink (the "no outlines" rule
+  below stands); when the final product exists, the ink line (the test's pick: B, the brush pen in one warm plum ink
+  glazed into the paint, `docs/look/ink_test/`) is laid over it and shown beside the no-ink cut, and it stays only if it
+  makes the film better. The same for any optional finishing treatment: judged on the finished product, with and
+  without. — ("so i like a bit of rougher ink style but our video 1 was too rough not looking clean or premium. If you can come up
   with a clean way to incorporate a bit of messiness in the lines combined with all the painting and styles and texture
-  we added with it looking coherent - sure lets try", 2026-10-30.)
+  we added with it looking coherent - sure lets try", 2026-10-30; after the ink test: "lets build without ink first and
+  then we will test the final product with ink if its makes it any better", 2026-10-30.)
 - **Texture and lines: VERY subtle.** No outlines: as on the city posters, shapes are separated by light and shade (a
   lit and a shade face on every volume, the subject's the deepest) and by value, never by a line drawn round them
   (the A vs B picture's B). Thin lines only on small things that are lines (window bars, railings, rigging): dark,

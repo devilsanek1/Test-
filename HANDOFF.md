@@ -1,5 +1,8 @@
 # HANDOFF: start here if you are a new agent picking up this project
 
+> **NEWEST, 2026-10-30 ~22:45 UTC (video 4, Helsinki heat, under the new loop): read `context/RESUME_2026-10-30.md`
+> first**: what the owner decided today, the two rounds that were running and how to resume them, and what is next.
+
 > **Status 2026-10-28 19:55 UTC (video 2, "One Small Window"):** the G7 master v1 (`video/deliverables/v2/v2r_G7_master_v1.mp4`), the
 > cover and `video/docs/v2/POSTING_KIT.md` are done and with the owner; the week's budget is at ~97 %. The story of how it got here:
 > `video/docs/v2/PROGRESS.md` (newest first), the owner's notes `video/docs/v2/OWNER_NOTES.md`, open items `video/docs/v2/ASSEMBLY_TODO.md`.

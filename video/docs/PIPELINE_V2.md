@@ -47,7 +47,9 @@ ideas; frames planned and created whole from the get-go, never filled for densit
 6. **THE ANIMATIC FROM THE KEY FRAMES** (G3): the key frames on the voice with the shot plan's moves, joins and key
    actions played; the owner locks it.
 7. **ANIMATION** (G5-G6): each shot animated from its own key frame (life, motion, the transitions), never re-filled.
-8. **Sound and final** (G7-G8, as below).
+8. **Sound and final** (G7-G8, as below). Then the optional finishing tests on the final product (on video 4: the ink
+   line, B), the cut with and without, side by side for the owner; kept only if it makes the film better (owner,
+   2026-10-30: "lets build without ink first and then we will test the final product with ink if its makes it any better").
 **ONE FILM, NEVER A HODGE-PODGE (owner, 2026-10-30): coherence is held above the frame, at every step.**
 1. **One film concept above the beats:** before or with the ideas, ONE imaginative idea for the whole film (its world,
    its central device, the thread's journey, the arc of feeling from the first frame to the payoff), invented for this
@@ -84,7 +86,7 @@ ideas; frames planned and created whole from the get-go, never filled for densit
    about this place or this story, the world going on past the frame's edges, life in its calm tier.
 4. **Pleasing is judged as a painter judges, at finished quality and at phone size:** the values first (squint: big
    quiet masses, one light, one focus), a few colours in harmony around the one accent, a rhythm of big, medium and
-   small shapes, edges varied (crisp at the focus, lost elsewhere), the finish (the paint, the texture, the line). THE
+   small shapes, edges varied (crisp at the focus, lost elsewhere), the finish (the paint, the texture, the clean pen). THE
    FRAME LOOP's evaluator judges every frame on these beside the hero frame; an ALMOST comes back as a paint-over (the
    frame itself marked up: circled, arrowed, a value or colour correction painted on), never as new rules.
 5. **The owner's eye twice before animation:** the hero frame, then the whole board of key frames.

@@ -420,3 +420,10 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   colour harmony, shape rhythm, edges, the finish), an ALMOST answered with a paint-over; the owner's eye on the hero
   frame and on the board. -> rules: playbook THE THREE RULES (a rich, beautiful world); PIPELINE_V2 "A RICH, BEAUTIFUL
   WORLD".
+- 2026-10-30 ~22:40 UTC, after the ink-line test page (https://claude.ai/artifact/NVsh6GUY5NoyGwLY4yJ7QF; the pick B, the
+  brush pen): "lets build without ink first and then we will test the final product with ink if its makes it any better"
+  -> video 4 is built with NO ink (the clean pen, no outlines); after the final cut, B is laid over it and the two cuts
+  are shown side by side; the owner decides. -> rules: playbook, Visual style (INK LINES: tested on the finished film);
+  PIPELINE_V2 THE LOOP NOW step 8.
+- 2026-10-30 ~22:45 UTC: "we are about to hit 5hour limit - don't lose anything" -> everything committed and pushed; the
+  running rounds' state and how to resume them written to `context/RESUME_2026-10-30.md` (and HANDOFF's top points to it).

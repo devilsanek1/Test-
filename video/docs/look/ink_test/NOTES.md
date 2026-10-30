@@ -4,7 +4,9 @@
 
 # Ink lines, a bit rough but clean: notes (iteration, 2026-10-30)
 
-**Shown to the owner:** https://claude.ai/artifact/NVsh6GUY5NoyGwLY4yJ7QF (no lines, A, B, C at phone size and up close;
+**Owner, 2026-10-30: "lets build without ink first and then we will test the final product with ink if its makes it
+any better"**: no ink in the build; B is tested on the final cut, with and without. **Shown to the owner:**
+https://claude.ai/artifact/NVsh6GUY5NoyGwLY4yJ7QF (no lines, A, B, C at phone size and up close;
 the pick B; the open calls: A, B or C, and whether the person gets a line).
 
 **The ask** (`BRIEF.md`; the owner: "so i like a bit of rougher ink style but our video 1 was too rough not looking
