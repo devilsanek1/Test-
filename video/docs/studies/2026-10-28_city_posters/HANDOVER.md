@@ -6,6 +6,23 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-30 ~15:40 UTC: composition v2 runs (owner: "Yeah this plan sounds good remember to parallelize work")
+- The owner on the first library: "why you ignored all my references and came up with yours?"; the expected shape: break
+  down ALL his references + research (other strategies, what makes a frame engaging, super-modern cinematography) ->
+  RANK -> a library + guidelines on when to use which + how animation and transitions fit (playbook: the owner's
+  references are the SPINE).
+- RUNNING: agent "device catalogue" (a316070f205625263): the owner's 41 reel ideas first, in reel order with frames, our
+  additions labelled, a coverage table, `composition/devices_sheet.png`. If lost: re-brief from playbook's spine rule.
+- RUNNING: workflow `composition-research-v2` (run `wf_badfba6c-543`, script
+  `/root/.claude/projects/-home-user-Test-/fe339b66-57f0-5b47-bb6a-872d2f15f4c0/workflows/scripts/composition-research-v2-wf_badfba6c-543.js`):
+  3 parallel tracks -> `composition/attention.md`, `modern.md`, `motion.md`. Resume: `Workflow({scriptPath,
+  resumeFromRunId: "wf_badfba6c-543"})`.
+- NEXT when both land: the unified catalogue (owner's 41 first) -> 3 parallel judges (attention; story clarity; 9:16 +
+  engine + look fit) -> core / situational / rare tiers (owner override) -> guidelines (by beat and emotion; sequencing
+  and rhythm; the motion and transition grammar) -> the Helsinki pass on its 12 shots (commit on
+  `claude/kind-pascal-lvgsza` beside its visual script). Then COMPOSITION_SHOTS' 14 clashes after the owner settles it.
+- Still queued: sound sync (refs in `video/docs/look/refs_sound_sync/`); painter v7 (ORGANIC.md §6).
+
 ## Status 2026-10-30 ~12:50 UTC: organic synthesis + composition research running; sound sync queued
 - organic-look DONE: `video/docs/look/ORGANIC.md` (the v7 roadmap §6; 27 doc clashes §8; 3 owner questions at the end
   of §8: the dark key T1/T3, turning the Google wing, the paint/paper doses, asked WITH the v7 sheet). A docs agent is
