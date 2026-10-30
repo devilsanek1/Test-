@@ -8,9 +8,10 @@ same day, on the composition study: "I didn’t get once again why you ignored a
 **What this is.** The spine of the sound-sync research: every sync moment in the owner's two reels
 (`docs/look/refs_sound_sync/`), named and measured, in reel order (Parts 1-2); what is deliberately NOT synced, the
 density, how the sound layers share the work and where the strongest moment is (in each part); the two side by side
-(Part 3); then what the reels teach, in 8 rules (Part 4). Every rule starts from a measured reel moment; what we add
-from research or from our own films is labelled **(ours)**. The craft lane (`craft.md`, Part A) measured the same
-moments independently; the numbers agree to 1-2 ms, and where they differ this file's numbers are the full measurement.
+(Part 3); then what the reels teach, in 8 rules (Part 4; numbered Rule 1-8, since `craft.md` already uses R1-R10 for
+its device names). Every rule starts from a measured reel moment; what we add from research or from our own films is
+labelled **(ours)**. The craft lane (`craft.md`, Part A) measured the same moments independently; the numbers agree to
+1-2 ms, and where they differ this file's numbers are the full measurement.
 
 **Rank.** Research notes, the lowest rank on DIRECTION's ladder: nothing here is a rule until the sound-sync distill
 integrates it into the docs that own each topic. Methods only: no footage or audio copied (the sheets show small
@@ -36,11 +37,11 @@ seen directly), **SOURCE** (cited at the end).
 |---|---|---|
 | Recording | 10.1 s, 540 x 1174, 60 fps, AAC 44.1 kHz | 13.6 s, same format |
 | The reel inside it | a landscape band 540 x 315 px at y 379 (about 16:9.3) | the same band |
-| Source frame rate (MEASURED) | ~30 fps: every picture is held for 2 recording frames | ~25 fps: pictures held 2,2,2,2,4 recording frames |
+| Source frame rate (MEASURED) | 30.1 fps: every picture is held for 2 recording frames | 24-25 fps: pictures held 2 or 4 recording frames (mostly 2,2,2,4) |
 | What is usable | 0-9.52 s (f0-f571); then the phone's control centre is pulled down and the sound stops | all 13.6 s |
 | Voice | none | none |
 
-A picture event is therefore known to one source frame: 33 ms in reel 01, 40 ms in reel 02 (MEASURED).
+A picture event is therefore known to one source frame: 33 ms in reel 01, 40-42 ms in reel 02 (MEASURED).
 
 ### 0.2 Methods (scripts in `/tmp/sync/reels/`, scratch)
 
@@ -65,8 +66,9 @@ editor's choice: 168 ms of sound-before-picture is past the 45 ms point where vi
 point where broadcast standards call it unacceptable [S1], and an editor who slipped by hand would not slip by the same
 amount four times. The phone's status bar at the end of reel 01 shows a **headphone glyph**: the reel was played to
 Bluetooth headphones. The player then holds the picture back by the headphones' latency so that sound and picture meet
-at the ears, [S2], while the screen recorder takes the app's sound before that latency (INFERRED from the glyph and the constant;
-we found no source on how the recorder timestamps the sound). So the file's sound is early by the Bluetooth latency.
+at the ears [S2], while the screen recorder takes the app's sound before that latency (INFERRED from the glyph and the
+constant; we found no source on how the recorder timestamps the sound). So the file's sound is early by the
+Bluetooth latency.
 
 - **Reel 01: corrected.** All sound times below are file time + 0.168 s. Corrected, the four events land on the same
   frame as their sound (-5, +8, -2, -1 ms).
@@ -95,12 +97,12 @@ end while the ice drifts.
 |---|---|---|---|---|---|
 | 01-0 | 0.000-0.267 s (f0-f15) | the quiet floor, -40 to -45 dBFS | the mug of milk, held | - | the setup (no event in the recording; the reel's own first ~0.3-0.6 s is missing) |
 | 01-1 | **0.267 s (f16)** | a dry knock at 0.272 s: sample peak -0.6 dBFS, centroid 1.04 kHz, a pitched body near 940 Hz, down 20 dB in 40 ms | **hard cut**, same framing: milk becomes espresso crema (the brightest-to-darkest change of the reel: band difference 32.7, more than 20 times any frame-to-frame change inside a shot) | **-5 ms (-0.3 f)** | **hit-cut**, a state change in a locked frame |
-| 01-1b | 0.86 s and 0.95 s (no picture event) | two faint ticks, ~25 dB under the knocks | nothing | - | sound texture only (not synced) |
+| 01-1b | 0.86 s and 0.95 s (f52, f57; no picture event) | two faint ticks, ~25 dB under the knocks | nothing | - | sound texture only (not synced) |
 | 01-2 | **0.800 s (f48)** | the same knock at 0.792 s (peak 0.0 dBFS, 1.13 kHz) | **hard cut**, same framing: crema becomes foam (a change inside the cup only: 4.5 in the cup box, 2.9 over the band) | **+8 ms (+0.5 f)** | **hit-cut**, state change; the pulse is set: 32 f after the first |
 | 01-3 | **1.333 s (f80)** | the same knock at 1.335 s (peak -0.5 dBFS, 1.19 kHz) | **hard cut**, same framing: foam becomes coffee with ice | **-2 ms (-0.1 f)** | **hit-cut**, state change; third on the pulse (32 f again) |
 | 01-4 | **1.967 s (f118)** | a click at 1.968 s: a bright tick (centroid 8.6 kHz, peak 0.0 dBFS, gone in 10 ms), its twin 84 ms later (2.052 s, f123) | **hard cut to the reveal**: a wider frame, the mug now left of centre with wired earphones and a music-player card (title, play bar, a pause button) | **-1 ms (-0.1 f)** | **the late fourth + a cause**: it comes 38 f after the third knock, 6 f later than the pulse predicts (f112); an interface click is the trigger |
 | 01-5 | 2.449 s (f147), no picture event | **the song enters**: an acoustic guitar intro, 87.5 BPM; the level steps from -44.9 to -18.5 dBFS (**+26 dB**) | the wide frame holds; the ice keeps drifting | 0.481 s (29 f) after the click | **cause, then effect** (the press, then the music it starts); a release with no picture change |
-| 01-6 | 2.45-9.52 s (f147-f571) | the song: strums every 0.34-1.4 s, the strongest at 4.52, 5.87 and 8.63 s; level median -21.6 dBFS (-26 to -16) | ONE held frame for 7.6 s (whole reel: no cut after f118); only the ice drifts and slows (cup-box motion 3.4 at 2.4 s, 1.3 at 9 s); the player card never moves | none | **the rest**: the music carries, the picture asks for nothing |
+| 01-6 | 2.45-9.52 s (f147-f571) | the song: strums every 0.34-1.4 s, the strongest at 4.52, 5.87 and 8.63 s (f271, f352, f518); level median -21.6 dBFS (-26 to -16) | ONE held frame for 7.6 s (whole reel: no cut after f118); only the ice drifts and slows (cup-box motion 3.4 at 2.4 s, 1.3 at 9 s); the player card never moves | none | **the rest**: the music carries, the picture asks for nothing |
 
 ### 1.2 What is deliberately NOT synced (MEASURED)
 
@@ -134,11 +136,12 @@ The hand-over IS the story: the knocks are the barista's beat, the click starts 
 ### 1.5 The strongest moment
 
 **The reveal and the song, 1.97-2.45 s (f118-f147).** It is the largest change in both channels within half a second:
-the frame opens from a tight overhead to the full still life (band difference 13.8, the reel's second-largest after the
-milk-to-crema flash), the click is the brightest sound of the reel (8.6 kHz, 0 dBFS), and the level then rises 26 dB,
-the reel's largest lasting step (each knock jumps more, but is gone in 40 ms) (MEASURED). It is strong because it is **set up**: three equal knocks teach the ear a pulse,
-the fourth event arrives 6 f late (a held breath; an expectation bent, then paid [S5]), and it is the first moment the
-picture explains itself (earphones + player = "a cinematic frame of a timeless track"). After it, nothing competes.
+the frame opens from a tight overhead to the full still life (band difference 13.8, the reel's second-largest after
+the milk-to-crema flash), the click is the brightest sound of the reel (8.6 kHz, 0 dBFS), and the level then rises 26
+dB, the reel's largest lasting step (each knock jumps more, but is gone in 40 ms) (MEASURED). It is strong because it
+is **set up**: three equal knocks teach the ear a pulse, the fourth event arrives 6 f late (a held breath; an
+expectation bent, then paid [S5]), and it is the first moment the picture explains itself (earphones + a player card:
+coffee with its song). After it, nothing competes.
 
 ---
 
@@ -160,16 +163,16 @@ on cornflowers, each with a slow handheld sway.
 | 02-3 | **3.150 s (f189)** | the hit at 3.170 s: the **lowest and loudest** of the three (centroid 388 Hz, body 167 Hz, -5.3 dBFS, a 0.20 s tail) | **"NOTICING" pops on**, the biggest word (large capitals, a second line) | **-20 ms (-1.2 f)** (raw +148) | **word-on-hit**: the biggest word gets the biggest, lowest hit |
 | 02-4 | 3.15-4.38 s (74 f) | nothing new: the hit decays to **-41.8 dBFS in the last 0.1 s before the drop, the quietest moment of the reel**; no riser | nothing new in the title; the drift becomes a sideways pan that **speeds up 4x** (from ~2 px/s at 2.7 s to ~8 px/s at 4.3 s) | - | **the hold**: silence falls while the picture leans forward |
 | 02-5 | **4.383 s (f263)** | **the drop** at 4.431 s: bass (body 97 Hz) and keys enter together, sample peak -4.0 dBFS; the level jumps from -41.8 to -10.0 dBFS (**+32 dB**) | **hard cut** to a low-angle shot of wildflowers against the sky (band difference 62.8, the largest of the reel; the title is cut away, not animated out); the new shot moves at once (handheld, up to 34 px/s) | **-48 ms (-2.9 f)** (raw +120) | **drop-cut** (the release) |
-| 02-5b | 6.35 s (in-shot) | a bright chime-like accent (> 6 kHz), the reel's brightest after the drop | the handheld sway turns back (the pan crosses zero at ~6.05 s, then runs left up to 33 px/s) | the turn is 0.13-0.30 s before it | **not a sync point** (a handheld turn near an accent: chance-level) |
+| 02-5b | 6.35 s (f381, in-shot) | a bright chime-like accent (> 6 kHz), the reel's brightest after the drop | the handheld sway turns back (the pan crosses zero at ~6.05 s, then runs left up to 33 px/s) | the turn is 0.13-0.30 s before it | **not a sync point** (a handheld turn near an accent: chance-level) |
 | 02-6 | **7.617 s (f457)** | the keys' 8th-note pulse (~0.21 s); the next chord change (bass, body 108 Hz) comes at 8.048 s | **hard cut** to one sunflower, medium, centred on deep blue sky; the frame slides sideways (up to 40 px/s) and settles by ~7.95 s | to the chord change: **-431 ms (-26 f)** (raw -263) | **cut with the flow**: it comes a quarter to half a second BEFORE the change; the slide settles near it (INFERRED) |
 | 02-7 | **9.450 s (f567)** | mid-phrase: an 8th-note onset at 9.546 s, no chord change | **punch-in**: the same sunflower, much closer (same subject, same axis) | to the 8th: -96 ms (-5.8 f) (raw +72) | **cut with the flow** (an 8th falls every 0.21 s, so any cut is within 0.1 s of one; chance-level) |
 | 02-8 | **11.383 s (f683)** | the next **chord change** at 11.465 s: the strongest low accent after the drop | **hard cut** to a butterfly on cornflowers, warmer and darker | **-82 ms (-4.9 f)** (raw +86, inside the title hits' 51-148 ms) | **cut on the change** (as synced as the title hits) |
-| 02-9 | 11.38-13.6 s | the music settles (median -17.9 dBFS from 7.6 s, -14.2 in the drop's shot) | a slow pan left with a slight push-in (10-20 px/s) | none | **the rest** |
+| 02-9 | 11.38-13.6 s (f683-f816) | the music settles (median -17.9 dBFS from 7.6 s, -14.2 in the drop's shot) | a slow pan left with a slight push-in (10-20 px/s) | none | **the rest** |
 
-The title hits' spacing grows a little: **1.110, 1.193, 1.261 s** (66.6, 71.6, 75.7 f) of sound; a slight
-ritardando, the longest gap leading into the drop (MEASURED). The music after the drop: keys and bass, an 8th-note
-pulse of 0.21-0.22 s (quarter ≈ 140 BPM), the chord changing every two bars (4.43, 8.05, 11.47 s: 3.62 and 3.42 s
-apart). No vocals.
+The title hits' spacing grows a little: **1.110, 1.193, 1.261 s** (66.6, 71.6, 75.7 f) of sound; a slight ritardando,
+the longest gap leading into the drop (MEASURED). The music after the drop: keys and bass, an 8th-note pulse of
+0.21-0.22 s (quarter ≈ 140 BPM), the chord changing every two bars (4.43, 8.05, 11.47 s = f266, f483, f688: 3.62 and
+3.42 s apart). No vocals.
 
 ### 2.2 What is deliberately NOT synced (MEASURED)
 
@@ -183,7 +186,7 @@ apart). No vocals.
 ### 2.3 Density
 
 - **Hard sync points: 4 recorded** (three words, the drop) plus the unrecorded "The": **all in the first 4.38 s**,
-  0.9 per second there. After the drop: **one** probable (02-8, on a chord change) in 9.2 s, 0.11 per second.
+  0.9 per second there. After the drop: **one** probable (02-8, on a chord change) in 9.2 s (552 f), 0.11 per second.
   Whole recording: 5 in 13.6 s, 0.37 per second.
 - Sound onsets detected: 40. Synced to a picture event: 5 (13 %).
 
@@ -237,55 +240,61 @@ then a **rest** where the music carries and the picture holds or cuts loosely. A
 Each rule: the measured basis in the reels, then what it means for our films. "For us" lines are **(ours)**: our
 films always carry a voice, which neither reel has, so the voice's place in each rule is our inference.
 
-**R1. Sync is a spend, not a texture: put it where the film asks for attention, then stop.** Both reels spend every
-hard sync point in the first 2-4.4 s (2.0 and 0.9 per second there) and almost none after (0 and 0.11 per second); of
-63 detected sound onsets, 9 meet a picture event (14 %). *For us (ours):* hard sync belongs to the hook (frame 0 to
-~3 s) and to the one payoff; the middle of the film is carried by the voice and a bed that asks for nothing. Our v5
-locked 10 of 11 cuts to beats across the whole film (`docs/sound_plan.md`); the reels say that is too much sync in
-the middle. A cut can sit inside the music's flow without landing on a beat.
+**Rule 1. Sync is a spend, not a texture: put it where the film asks for attention, then stop.** Both reels spend
+every hard sync point in the first 2-4.4 s (2.0 and 0.9 per second there) and almost none after (0 and 0.11 per
+second); of 63 detected sound onsets, 9 meet a picture event (14 %). *For us (ours):* hard sync belongs to the hook
+(f0 to ~3 s, f180) and to the one payoff; the middle of the film is carried by the voice and a bed that asks for
+nothing. Our sound plan's v5 bent its bed so that 10 of 11 cuts land on beats across the whole film
+(`docs/sound_plan.md`); the reels say that is too much sync in the middle. A cut can sit inside the music's flow
+without landing on a beat.
 
-**R2. Teach a pulse with three, then bend the fourth.** Reel 01: three hit-cuts 32 f apart, the fourth event 6 f
-late; reel 02: three word-hits 1.11-1.26 s apart, the gaps growing, the drop after the longest. Three equal events make
-the ear predict; a small delay on the fourth makes the arrival feel bigger [S5]. *For us (ours):* a count-in of 3
-picture changes on 3 sound events (e.g. three quick state changes of the thread object), each 0.5-1.2 s apart, then
-the payoff 4-8 f late (0.07-0.13 s) or on the longest gap. Never a fourth equal hit: it turns the count into a loop.
+**Rule 2. Teach a pulse with three, then bend the fourth.** Reel 01: three hit-cuts 32 f apart, the fourth event 6 f
+late; reel 02: three word-hits 1.11-1.26 s apart, the gaps growing, the drop after the longest. Three equal events
+make the ear predict; a small delay on the fourth makes the arrival feel bigger [S5]. *For us (ours):* a count-in of 3
+picture changes on 3 sound events (e.g. three quick state changes of the thread object), each 0.5-1.2 s (30-72 f)
+apart, then the payoff 4-6 f late (0.07-0.10 s, the measured range) or after the longest gap. Never a fourth equal
+hit: it turns the count into a loop.
 
-**R3. One sound, one discrete change, on the same frame.** Every hard sync in both reels (Chion's "synch point" [S3])
-pairs one short sound with one discrete picture change (a cut, a state swap, a word appearing whole), never with a gradual move: in reel 01 within
-±0.5 f, in reel 02 within ±3 f of one common offset. *For us (ours):* sync the FIRST FRAME of a change to the sound's
-onset (the half-rise, not the peak); the picture may come up to 1-2 f early, never late (late sound is the forgiving
-side [S1]; editors often cut a frame or two early so a cut feels on time [S7]). Gradual moves do not get hits; their start or landing can sit inside the phrase.
+**Rule 3. One sound, one discrete change, on the same frame.** Every hard sync in both reels (Chion's "synch point"
+[S3]) pairs one short sound with one discrete picture change (a cut, a state swap, a word appearing whole), never
+with a gradual move: in reel 01 within ±0.5 f, in reel 02 within ±3 f of one common offset (if reel 02's offset is
+reel 01's, all four of its sounds come 1-7 f after their pictures). *For us (ours):* put the sound's onset (the
+half-rise, not the peak) on the FIRST FRAME of the change, or 1-2 f after it; never more than ~2 f ahead of it. Late
+sound is the forgiving side [S1], and editors often cut a frame or two early so a cut feels on time [S7]. The
+composition study's MR20 (`../composition/motion.md`) sets the same window; reel 01 confirms its "on the frame".
+Gradual moves get no hits; their start or landing can sit inside the phrase.
 
-**R4. Silence is the riser.** Neither reel uses a whoosh or a riser. Before each release the sound gets quieter: reel
-01's floor sits ~33 dB under its knocks; reel 02 falls to its quietest moment (-41.8 dBFS) right before the drop,
+**Rule 4. Silence is the riser.** Neither reel uses a whoosh or a riser. Before each release the sound gets quieter:
+reel 01's floor sits ~33 dB under its knocks; reel 02 falls to its quietest moment (-41.8 dBFS) right before the drop,
 while its picture drifts faster. The release is then a +26 to +32 dB step. *For us (ours):* before the payoff, take
-something away (pull the bed down, leave a 0.2-0.5 s gap in the voice) instead of adding a swell; the contrast is the
-impact, and it keeps "cinematic but subtle" (playbook).
+something away (pull the bed down, leave a 0.2-0.5 s, 12-30 f, gap in the voice) instead of adding a swell; the
+contrast is the impact, and it keeps "cinematic but subtle" (playbook).
 
-**R5. The release changes picture and sound together, then the music carries.** Reel 02's drop: the largest picture
-change and the largest level step on one frame. Reel 01: the reveal, then the song as its effect 29 f later. After
-it: one held frame for 7.6 s (01), or cuts every 1.8-3.2 s that follow the music's flow and its chord changes, not its
-beats (02). *For us (ours):* one release per film, at the payoff line; after it, fewer events, longer holds, and the
-bed (not SFX) carries the energy. If a cut after the release is synced, sync it to a change in the music's harmony or
-phrase (once), not to the pulse.
+**Rule 5. The release changes picture and sound together, then the music carries.** Reel 02's drop: the largest
+picture change and the largest level step on one frame. Reel 01: the reveal, then the song as its effect 29 f later.
+After it: one held frame for 7.6 s (01), or cuts every 1.8-3.2 s (110-194 f) that follow the music's flow and its
+chord changes, not its beats (02). *For us (ours):* one release per film, at the payoff line; after it, fewer events,
+longer holds, and the bed (not SFX) carries the energy. If a cut after the release is synced, sync it to a change in
+the music's harmony or phrase (once), not to the pulse.
 
-**R6. The hits match the subject and are mixed above the music.** Reel 01 (a quick, playful process): dry 1 kHz
+**Rule 6. The hits match the subject and are mixed above the music.** Reel 01 (a quick, playful process): dry 1 kHz
 knocks, 40 ms long, mixed 11 dB above its song. Reel 02 (a calm title): soft low hits, 0.11-0.2 s tails, -5 to -7
 dBFS. The biggest word gets the lowest, loudest hit (167 Hz body vs ~200; -5.3 vs -6.8 dBFS). *For us (ours):* choose
 each hit's colour from the thing it marks (light object: short and bright; a weighty idea: low and soft); scale the
 hit with the importance of the change; in the hook, a sync hit is a foreground event, never buried in the bed (our
 voice stays on top; a hit sits between the voice's words).
 
-**R7. Words land whole, one at a time, on hits.** Reel 02's title is the reel's only "voice": each word pops on in one
+**Rule 7. Words land whole, one at a time, on hits.** Reel 02's title is the reel's only "voice": each word pops on in one
 frame (no fade, no motion), on its own hit. *For us (ours):* our voice already says the words; on-screen words in the
 hook pop whole on the voice's stressed syllable (our captions already pop in place: CLAUDE.md), and a separate hit is
 only for the one word that carries the core line. Never a hit on every caption.
 
-**R8. A sound can be the cause of what we see.** Reel 01's click is an interface sound (8.6 kHz, two ticks 84 ms
+**Rule 8. A sound can be the cause of what we see.** Reel 01's click is an interface sound (8.6 kHz, two ticks 84 ms
 apart) on the cut that reveals the player; the song follows 0.48 s later as its effect. The sound tells the story (a
-button pressed, the music starts) without a word. *For us (ours):* a phone-like sound as the trigger of the next
-state (a tap, a toggle, a send) is exactly the playbook's "sounds people link with something good on their phone"; put
-it on the reveal's first frame and let its consequence (music in, light on, the next scene) follow 0.3-0.5 s later.
+button pressed, the music starts) without a word. *For us (ours):* a phone-like sound as the trigger of the next state
+(a tap, a toggle, a send) is exactly the playbook's "sounds people link with something good on their phone"; put it on
+the reveal's first frame and let its consequence (music in, light on, the next scene) follow 0.3-0.5 s (18-30 f)
+later.
 
 **What the reels do NOT do (as instructive as what they do):** no whooshes, no risers, no sound on in-shot motion, no
 hit after the release that is not also a change of shot, no beat-locked montage, no mickey-mousing [S8].
@@ -328,3 +337,4 @@ Most page fetches are blocked from this sandbox, so these were read through sear
 - Scratch (not committed): `/tmp/sync/reels/` (`audio_an.py`, `refine.py`, `onsets2.py`, `tempo.py`, `pic_an.py`,
   `r3/glob_motion.py`, `r3/levels.py`, `r3/beatgrid.py`, `r3/hitchar.py`, `r3/pairs.py`, `r3/zoom.py`), notes in
   `/tmp/sync/reels/notes/`.
+

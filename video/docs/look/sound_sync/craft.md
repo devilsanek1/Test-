@@ -171,9 +171,9 @@ found most sensitive to timing errors: our sync must be tighter than live-action
 
 ### B2. The sync window: how close, in seconds and frames
 
-**From the reels.** Reel 01's knocks, click and reveal are frame-exact once the recording's constant 0.17 s (10 f)
-shift is removed (A0). Reel 02's word hits sit within ~0.1 s (6 f) of their words; its source runs at ~30 fps and its
-hits are soft (centroid 390-530 Hz, ~0.38 s to fall 20 dB). **The sharper the sound, the tighter the reel's sync.**
+**From the reels.** Reel 01's knocks, click and reveal are frame-exact once the recording's constant 0.17 s (10 f) shift
+is removed (A0). Reel 02's word hits sit within ~0.1 s (6 f) of their words; its source runs at ~30 fps and its hits are
+soft (centroid 390-530 Hz, ~0.38 s, 23 f, to fall 20 dB). **The sharper the sound, the tighter the reel's sync.**
 
 **The research: thresholds** ("early" = the sound comes before its picture; ITU writes it as positive).
 
@@ -207,20 +207,20 @@ a creative choice has to sit well inside the window, not at its edge.
 - **Practice**: animators open the mouth 1-2 frames before the sound at 24 fps (42-83 ms, 2.5-5 f at 60 fps; "a late
   mouth reads out of sync") [C21]; editors cut "a frame or two" before the beat, one tutorial says 2-4 f, all unsourced
   [C28]; our own v1 measurement of reference 1 found its visuals leading the voice by ~3 f at 30 fps (illustration
-  elements ~100 ms = 6 f at 60 fps, caption pages ~40 ms = 2.4 f; character beats on the word, -5 ms) (`docs/motion_spec.md`
-  §7, MEASURED).
+  elements ~100 ms = 6 f at 60 fps, caption pages ~40 ms = 2.4 f; character beats on the word, -5 ms)
+  (`docs/motion_spec.md` §7, MEASURED).
 
-**And the opposite risk, the delivery chain** (A0, MEASURED; [C40]): Bluetooth earbuds delay the sound ~0.1-0.2 s
-(6-12 f); Apple's players delay the picture to match, other players may not, and a screen recording can take the sound
-before that delay (reel 01's recording put it 0.17 s early). Whatever we build, the viewer's chain can only shift it;
-a hit built 0 f to +1 f late keeps the most margin both ways.
+**And the opposite risk, the delivery chain** (A0, MEASURED; [C40]): Bluetooth earbuds delay the sound ~0.1-0.2 s (6-12
+f); Apple's players delay the picture to match, other players may not, and a screen recording can take the sound before
+that delay (reel 01's recording put it 0.17 s, 10 f, early). Whatever we build, the viewer's chain can only shift it; a
+hit built 0 f to +1 f late keeps the most margin both ways.
 
 **Helps:** a hard transient on a hard picture event at 0 f to +2 f (sound on or just after the first changed frame).
 **Hurts:** a sound EARLY by 3 f (50 ms) or more on a sharp event (past ITU's 45 ms detection threshold and the
 speech-fusion study's 30 ms, on the narrow, fixed side; only the 1980 hammer study tolerates 75 ms); a sound LATE by
 8 f (125 ms) or more on a sharp event (ITU's detection threshold); a soft sound placed by its file start when its peak
 comes later (a whoosh with 0.2 s of air before it lands 12 f late).
-**The numbers (EST, from the table and the reels):**
+**The numbers (EST, from the table and the reels; minus = the sound early, plus = the sound late):**
 
 | Pair | Target | Tolerance |
 |---|---|---|
@@ -229,9 +229,9 @@ comes later (a whoosh with 0.2 s of air before it lands 12 f late).
 | a picture on its WORD (the voice) | the picture 0.1 s (6 f) first (DIRECTION rule 8) | 0 to 0.3 s (0-18 f) first (`composition/motion.md` §4.4) |
 | a sound file's reference point | its TRANSIENT (or a whoosh's or riser's PEAK), never the file's first sample [C34] | |
 
-At 60 fps one frame (16.7 ms) is under every threshold in the table, so a 1 f error is free and the rule is about
-never drifting by 3 f or more. A picture leading its word by 0.1-0.3 s is not lip sync (the picture is not the voice's
-source): it is "the picture shows, the voice names", and it reads as anticipation, not as an error.
+At 60 fps one frame (16.7 ms) is under every threshold in the table, so a 1 f error is free and the rule is about never
+drifting by 3 f or more. A picture leading its word by 0.1-0.3 s (6-18 f) is not lip sync (the picture is not the
+voice's source): it is "the picture shows, the voice names", and it reads as anticipation, not as an error.
 
 **How to check it** (ours): never judge sync from a screen recording or over Bluetooth earbuds (A0). Judge the render
 file (`scripts/qa/av_lag.py`: the voice or the mix at 0 ms lag in every window) and watch once on the phone's own
@@ -242,8 +242,8 @@ speaker.
 **From the reels.** Every hit in both reels lands on a DISCRETE picture change: a cut (01-1..3, 02-5), a word
 appearing (02-1..3), a reveal (01-4). Continuous motion gets no sound at all: the ice drifting for 7.6 s (01-6), the
 flowers swaying and the camera drifting (02-6..8). The hits are spent early and then stop: reel 01 has 5 sync events
-in its first 2.45 s (~2 a second) and none in the next 7.6 s; reel 02 has 4 in its first 4.4 s (~1 a second), then
-only cuts every 1.8-3.2 s.
+in its first 2.45 s (147 f; ~2 a second) and none in the next 7.6 s (456 f); reel 02 has 4 in its first 4.4 s (264 f;
+~1 a second), then only cuts every 1.8-3.2 s (110-194 f).
 
 **The research.**
 - **Hit points** (PRACTICE, [C23]): film composers mark the frames where the music must land on a picture event.
@@ -262,14 +262,13 @@ only cuts every 1.8-3.2 s.
   the viewer can predict pays off when it lands (the reward of a confirmed prediction), and a surprise works because it
   is rare.
 
-**Helps:** the event is discrete and countable (a cut, a word, a number, a click, a thing landing, the turn); the
-genre allows it (cartoon, UI feedback, a list being counted); the hit is predictable (a pulse, a streamer, a count-in)
-or rare enough to surprise. **Hurts:** sounding every move (fatigue; the film reads as a cartoon or a template);
-sounding a serious beat with a playful sound; sounding continuous motion (drift, sway, idle life, a parallax float);
-sounding what the music already does (our own v1 rule, `docs/sound_plan.md` §7.6).
-**The numbers:** the reels spend ~1-2 sync events a second for 2.5-4.4 s (150-264 f) and then ~0; our v1 spotting
-rule is "one sound per idea, at most about one every 2-3 s" (`docs/sound_plan.md` §7.2) and Material's is "limit
-decorative sounds" (no number).
+**Helps:** the event is discrete and countable (a cut, a word, a number, a click, a thing landing, the turn); the genre
+allows it (cartoon, UI feedback, a list being counted); the hit is predictable (a pulse, a streamer, a count-in) or rare
+enough to surprise. **Hurts:** sounding every move (fatigue; the film reads as a cartoon or a template); sounding a
+serious beat with a playful sound; sounding continuous motion (drift, sway, idle life, a parallax float); sounding what
+the music already does (our own v1 rule, `docs/sound_plan.md` §7.6). **The numbers:** the reels spend ~1-2 sync events a
+second for 2.5-4.4 s (150-264 f) and then ~0; our v1 spotting rule is "one sound per idea, at most about one every 2-3
+s" (`docs/sound_plan.md` §7.2: 120-180 f) and Material's is "limit decorative sounds" (no number).
 
 **For us (EST).** An explainer sits between UI feedback and cinema: a sound CONFIRMS a story event (the number lands,
 the switch flips, the thing breaks), it never narrates motion. The risk is real for us because in motion graphics
@@ -280,8 +279,9 @@ turning into mickey-mousing.
 
 **From the reels.** Reel 01 cuts ON the beat because its hits ARE the beat (three knocks 32 f apart), then puts the
 fourth change 6 f past the pulse (R3, the late fourth) and holds one shot for the whole song. Reel 02 cuts ON the drop
-(the phrase's first downbeat, R8), then cuts with the music's flow, about every 1-2 bars (3.23, 1.83, 1.93 s; a 4/4 bar
-at ~142 BPM is 1.69 s), never on a fixed count and never on every accent. Neither reel cuts on every beat.
+(the phrase's first downbeat, R8), then cuts with the music's flow, about every 1-2 bars (3.23, 1.83, 1.93 s = 194, 110,
+116 f; a 4/4 bar at ~142 BPM is 1.69 s, 101 f), never on a fixed count and never on every accent. Neither reel cuts on
+every beat.
 
 **The research.**
 - **What music videos do** (STUDY, 329 clips, arXiv 2108.00970 [C29]): in about two thirds the dominant shot length
@@ -365,8 +365,8 @@ stingers, or any sound on motion inside a shot (A3).
   release limp; near-silence just before the hit makes it feel louder.
 - **UI ticks** (PRACTICE, Material Design [C36]): feedback sounds are short and quiet and confirm an action; decorative
   ones are limited; "hero sounds" mark celebratory moments only.
-- **Stingers and hero sounds**: a short musical accent (~1-3 s) on a title or a payoff, once (our v1 rule: "story
-  beats get the special sounds, once", `docs/sound_plan.md` §7.5).
+- **Stingers and hero sounds**: a short musical accent (~1-3 s, 60-180 f) on a title or a payoff, once (our v1 rule:
+  "story beats get the special sounds, once", `docs/sound_plan.md` §7.5).
 - **The drop** (STUDY, Solberg 2014 [C45]): breakdown (bass and kick out), build-up (layers return, tension), drop
   (the peak); listeners put the strongest feeling at the drop. Later EEG work: tension climbs through the build-up, but
   more tension did not make the drop more pleasurable, so a longer riser does not buy a bigger payoff.
@@ -409,8 +409,8 @@ the word, inside a soft sound's tolerance (B2). The reels suggest the better def
 ### B7. Music under a voice-led film: ducking, and the bed stepping up on the turn
 
 **From the reels.** Neither reel has a voice, so the music carries everything: the floor stays near silent until the
-release, then steps up +21-23 dB RMS at once (01-5, 02-5). Our films are voice-led (the voice from ~0.12 s, always on
-top), so the reels' step cannot be copied as a level: it has to be translated into arrangement and into the voice's
+release, then steps up +21-23 dB RMS at once (01-5, 02-5). Our films are voice-led (the voice from ~0.12 s, 7 f, always
+on top), so the reels' step cannot be copied as a level: it has to be translated into arrangement and into the voice's
 pauses.
 
 **The research.**
@@ -428,12 +428,12 @@ pauses.
   phrase), keep 4-5 beats of handle.
 
 **What our v1 mix does** (MEASURED, `docs/sound_plan.md` §4 and "CURRENT STATE"; history, at 30 fps): the bed 8.5 LU
-under the voice, then a side-chain duck of -14 dB (20 ms look-ahead, 30 ms attack, 200 ms hold, 250 ms release) and a
-margin guard of 12 dB; in speech the music sits a median 27 dB under the voice (minimum 12.8). Its arc moves by
-SECTION, not by level alone: air only for the hook (37.6 dB under), the piano pulse entering on the first story line
-(27.3), a creep at the leak (23.8), one soft accent in a pause (21.0), a hush, a breath (28.1), the rebuild on "Plus"
-(22.6) and an air-only close (32.9). Its steps are ~3-6 dB between sections and ~10 dB from the hook's air to the
-pulse's entrance.
+under the voice, then a side-chain duck of -14 dB (20 ms look-ahead, 30 ms attack, 200 ms hold, 250 ms release: ~1, 2,
+12 and 15 f) and a margin guard of 12 dB; in speech the music sits a median 27 dB under the voice (minimum 12.8). Its
+arc moves by SECTION, not by level alone: air only for the hook (37.6 dB under), the piano pulse entering on the first
+story line (27.3), a creep at the leak (23.8), one soft accent in a pause (21.0), a hush, a breath (28.1), the rebuild
+on "Plus" (22.6) and an air-only close (32.9). Its steps are ~3-6 dB between sections and ~10 dB from the hook's air to
+the pulse's entrance.
 
 **The arithmetic of a pause** (EST, from those duck times): the bed reaches full level only ~0.45 s (27 f) after the
 voice stops (200 ms hold + 250 ms release) and starts ducking again ~0.05 s (3 f) before the next word (look-ahead +
@@ -446,7 +446,7 @@ while its level under the voice barely moves; a written pause of ~0.8-1.0 s (48-
 the step plays in the clear (the reel's hold and release, translated); the opening carried by the voice and a few
 hits over air (the playbook's "cinematic but subtle, especially at the start", and the reels' quiet floor).
 **Hurts:** a level step under a speaking voice (it fights the words); pumping from a deep duck on every line; a long
-crossfade across a downbeat; a step up in a 0.4 s sentence break (inaudible, wasted).
+crossfade across a downbeat; a step up in a 0.4 s (24 f) sentence break (inaudible, wasted).
 **The numbers:** duck 6-14 dB (ours 14), attack 30-80 ms (2-5 f), release 250-700 ms (15-42 f); the bed under the
 voice in speech has no research number (it is personal, and non-experts want ~4 LU more gap than experts), ours is a
 median 27 dB; a section step of ~3-6 dB, the hook-to-entrance step ~10 dB (v1, MEASURED); a pause of >= 0.8 s (48 f)
@@ -455,8 +455,8 @@ for the step to be heard.
 ### B8. Short-form trends, 2023-2026, and what the retention data says
 
 **From the reels.** Both are sound-led hooks of the current kind: the first sync hit at 0.27 s (16 f, reel 01) and
-0.70-0.75 s (42-45 f, reel 02); all their hard sync inside the first 2-5 s; a near-silent floor as the setup (R7);
-the release at 1.97-2.45 s (01) and 4.38 s (02); and then rest. Neither uses a speed ramp, a flash or a whoosh.
+0.70-0.75 s (42-45 f, reel 02); all their hard sync inside the first 2-5 s (120-300 f); a near-silent floor as the setup
+(R7); the release at 1.97-2.45 s (01) and 4.38 s (02); and then rest. Neither uses a speed ramp, a flash or a whoosh.
 
 **The trends** (PRACTICE and PLATFORM; dates are when the sources describe them).
 - **Beat-sync became one tap.** Editors have long had beat detection (Final Cut Pro [C51]); CapCut's beat markers and
@@ -517,7 +517,7 @@ transient (or crest) on the picture's first changed frame; "-1/+2 f" = from 1 fr
 | **R6 word-on-hit** | 02-1..3 | a title or a few big words built one by one (the cover line, a number) | every caption under the voice (captions pop silent: `docs/sound_plan.md` §7.7); fatigue | a soft hit at 0 f, -3/+6 f tolerated; the biggest word, the lowest and loudest hit | MEASURED; PRACTICE |
 | **R7 quiet floor** | 01 (-44 dBFS RMS), 02 (-33 dBFS RMS) | before the release and under the opening's hits | dead air with no purpose | the floor 21-23 dB under the release | MEASURED; PRACTICE [C35] [C39] |
 | **R8 the release (drop)** | 01-4/5, 02-5 | ONCE: the turn or the payoff, a picture change and the music's step together | twice or more; as a level step under a speaking voice (B7); with no floor or count before it | +21-23 dB in the reels; for us an arrangement step in a >= 0.8 s (48 f) pause | MEASURED; STUDY [C45] |
-| **R9 the rest** | 01-6 (7.6 s, one shot), 02-6..8 (cuts 1.8-3.2 s apart) | after the release; while the voice explains | (only if rest turns into a dead frame: life never stops, DIRECTION rule 3) | no sync after the release in either reel | MEASURED |
+| **R9 the rest** | 01-6 (7.6 s, one shot), 02-6..8 (cuts 1.8-3.2 s, 110-194 f, apart) | after the release; while the voice explains | (only if rest turns into a dead frame: life never stops, DIRECTION rule 3) | no sync after the release in either reel | MEASURED |
 | **R10 punch-in** | 02-7 | the same subject closer, on an accent or a stressed word | on every accent; a push on nothing | a soft accent: 0 f, -3/+6 f | MEASURED |
 | **Impact** | (01's dry knocks are its soft cousin) | a contact at the end of an ease-IN: a landing, a slam that accelerates (our stamp settles today: B6) | at the end of an ease-OUT or an in-out settle (it lands on nothing) | the contact frame, 0 f (-1/+2 f) | PRACTICE [C33] [C34]; STUDY [C30] |
 | **Whoosh** | none | a fast move or a wipe whose speed must be sold | on every move; peaking on a word; outlasting its move | peak on the fastest frame; no longer than the move | PRACTICE [C33] |
@@ -543,9 +543,9 @@ leading and the music moving by section.
 | Playbook "Sync picture to sound ON PURPOSE" (owner's words) | cuts, moves and key actions land on beats, hits and voice stresses "where that adds energy or meaning, and NOT everywhere" | the reels spend all hard sync in the first 2-5 s and at one release, then rest (A3); B9 is the "where" | B9's table and its closing rule are the candidate answer |
 | Playbook "Music: cinematic but subtle, especially at the start" (v1) | the voice and the hook carry the opening | agrees: both reels open on a near-silent floor with hits, and the music enters only at the release (R7, R8) | keep; B7 gives the translation for a voice-led film |
 | Playbook "Mix to -14 LUFS / -1 dBTP, voice always on top; SFX land on visual hits" (v1) | effects on visual hits | agrees; B2 makes "on" a number: the transient on the first changed frame, at most 2 f late | add the number |
-| Playbook "More sound effects ... positive phone sounds ... one in the first second" (owner, 2026-10-25) | phone-like sounds, one in the first second | agrees: reel 01's trigger is an interface click (R4); the reels' first hits come at 0.27 s and 0.70 s | "more" means more DISCRETE story events sounded, never sound on continuous motion (B3) |
+| Playbook "More sound effects ... positive phone sounds ... one in the first second" (owner, 2026-10-25) | phone-like sounds, one in the first second | agrees: reel 01's trigger is an interface click (R4); the reels' first hits come at 0.27 s and 0.70 s (16 and 42 f) | "more" means more DISCRETE story events sounded, never sound on continuous motion (B3) |
 | DIRECTION rule 8 | "visuals lead their word by ~0.1 s" | agrees (B2): a picture may lead its WORD by 0-0.3 s (0-18 f) | say that a sound EFFECT is the other case: 0 f, never early |
-| DIRECTION rule 9 | the opening's effects big, "with its own sound"; a positive phone sound in the first second; the first word at ~0.12 s | agrees; the reels add the count-in (R2) and the late fourth (R3) as opening shapes | see C2.1: a count-in must live with a voice that starts at 0.12 s |
+| DIRECTION rule 9 | the opening's effects big, "with its own sound"; a positive phone sound in the first second; the first word at ~0.12 s (7 f) | agrees; the reels add the count-in (R2) and the late fourth (R3) as opening shapes | see C2.1: a count-in must live with a voice that starts at 0.12 s |
 | DIRECTION rule 1; `G3_ANIMATIC.md` §2 | each join's midpoint on the next sentence's first word; cuts on the locked words, in the voice's breaths | agrees with the film-scoring approach (B4): the voice decides, the music bends | keep |
 | `docs/motion_spec.md` §7 (v1 history, 30 fps; reference 1 had NO music or effects) | "Lead, don't follow": picture onsets 1-4 f at 30 fps (2-8 f at 60) before the word; marks on the word; effects follow the VISUAL onsets ("whooshes on flip midpoints, ticks on pops") | agrees with B2 (picture vs word) and B6 (whoosh at the midpoint, tick on the pop's first frame) | measurements only; nothing to change |
 | `docs/sound_plan.md` §7 spotting (v1-era, values only) | one sound per idea, about one every 2-3 s; as small as the gesture; story beats' special sounds once; never sound what the music does; captions silent; "nudge each cue to its visual event (usually within ±100 ms)" | agrees on every point but the last: ±100 ms (±6 f) is a soft sound's tolerance; a sharp one needs 0 f (-1/+2 f) (B2) | clash C2.2 |
@@ -555,14 +555,14 @@ leading and the music moving by section.
 
 ### C2. Clashes and adaptations (each a proposal; the distill decides and fixes the owning doc)
 
-1. **A count-in under a voice.** The reels count in over silence; our voice starts at ~0.12 s (DIRECTION rule 9).
-   Three hits in the first ~1.3 s would collide with the first line's words. Two ways that keep the voice on top (EST):
+1. **A count-in under a voice.** The reels count in over silence; our voice starts at ~0.12 s (DIRECTION rule 9). Three
+   hits in the first ~1.3 s (80 f) would collide with the first line's words. Two ways that keep the voice on top (EST):
    put the hits on the picture's build AND on the first line's stressed syllables (the voice's stresses become the
    count; the v1 pipeline ranked them, `docs/timing.md`'s `stress` and `hits`, while today's
-   `public/vN/voice_words.json` carries word times only, `{w, s, e}`), or use the reel-02 kind of hit (soft, low: centroid
-   ~400-500 Hz, long decay), which leaves the consonants' 2-8 kHz band clearer than a bright knock, held >= 8 dB under
-   the speaking voice (`audio/mix.py`'s SFX guard). Either way the hits sit on the subject's opening build, which already
-   has "its own sound" (rule 9).
+   `public/vN/voice_words.json` carries word times only, `{w, s, e}`), or use the reel-02 kind of hit (soft, low:
+   centroid ~400-500 Hz, long decay), which leaves the consonants' 2-8 kHz band clearer than a bright knock, held >= 8
+   dB under the speaking voice (`audio/mix.py`'s SFX guard). Either way the hits sit on the subject's opening build,
+   which already has "its own sound" (rule 9).
 2. **Cue tolerance.** `docs/sound_plan.md` §7's "within ±100 ms" is right for soft sounds and too loose for sharp
    ones. Proposed (B2): a sharp transient 0 f (-1/+2 f, -17 to +33 ms); a soft sound 0 f (-3/+6 f, -50 to +100 ms);
    always measured from the transient or the crest, never the file start.
@@ -640,8 +640,8 @@ repo docs named in Part C.
   2005 chapter) on accent alignment in simple and complex audiovisual stimuli. STUDY.
   [sonicfield library](https://labs.sonicfield.org/library/cross-modal-integration-synchronization-of-auditory-and-visual-components-in-sim),
   [dissertation index](https://www.mtosmt.org/docs/diss-index.php?id=137), [OUP chapter](https://academic.oup.com/book/3160/chapter/381273964).
-- **[C10]** A. J. Cohen, the congruence-association model (OUP 2013 chapter; *Music and the Moving Image* 8(2), 2015). BOOK/STUDY.
-  [OUP](https://academic.oup.com/book/3160/chapter/144031257), [JCAA PDF](https://jcaa.caa-aca.ca/index.php/jcaa/article/download/1812/1559).
+- **[C10]** A. J. Cohen, the congruence-association model (OUP 2013 chapter; *Music and the Moving Image* 8(2),
+  2015). BOOK/STUDY. [OUP](https://academic.oup.com/book/3160/chapter/144031257), [JCAA PDF](https://jcaa.caa-aca.ca/index.php/jcaa/article/download/1812/1559).
 - **[C11]** J. E. Miller, L. A. Carlson, J. D. McAuley (2013), "When what you hear influences when you see",
   *Psychological Science* 24(1):11-18. STUDY. [PMC3650712](https://pmc.ncbi.nlm.nih.gov/articles/PMC3650712),
   [SWOV summary](https://swov.nl/en/publicatie/when-what-you-hear-influences-when-you-see-listening-auditory-rhythm-influences-temporal).
