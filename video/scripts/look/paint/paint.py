@@ -1445,9 +1445,565 @@ def style_designed(piece, spec, rng, stamps):
     return outs
 
 
+# ================================================================== v6: the recipe book's styles (PAINT_RECIPES.md §4)
+# Painter v6 (iteration, 2026-10-30; the owner: "Let's see what's the best we can do with code after research"). Five
+# styles that IMPORT the proven recipe scripts (scripts/look/paint/recipes/*.py; never copied), with the book's §3 calls:
+#   sky_recipe       SC.paint_sky + SC.paint_streaks + SC.paint_sun (C6: only the sky draws the disc; C13: PCHIP)
+#   cloud_planes     SC.paint_mass per plane, far to near, with CRAFT's k (C1); one RGBA PNG per plane, group 'clouds'
+#   water_recipe     paint_canal: WA.e7_canal's method with its constants as keys, on OUR design frame (C10), the water
+#                    palette fed from the ONE light table (C5: the sky recipe's set; #ee6a2e only as the glint's light)
+#   tree_recipe      FO.paint_tree in a box past the frame's left edge (the frame cuts the crown)
+#   far_city_recipe  the flat's blocks, one value each, converged with atmos_np (C2) and the sky's warmth field (C18),
+#                    within CRAFT §f.2's caps (C11: slivers <= +12 dE on +3, windows tone-on-tone, none on +4)
+# The recipe-level clashes are fixed HERE, never in the proof scripts: D2 the flock is never baked (`flock_sprite`
+# writes the recipe's drawing as its own transparent layer for the particle slot); D3 the far city keeps CRAFT's caps;
+# D4 the water takes the sky recipe's light set and disc; D5 foliage converges with `atmos_np`, never FO.converge.
+import hashlib  # noqa: E402
+from scipy import ndimage as ndi  # noqa: E402
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'recipes'))
+import sky_clouds as SC  # noqa: E402  the proven code: imported, never copied
+import water as WA  # noqa: E402
+import foliage as FO  # noqa: E402
+import built_ground as BG  # noqa: E402
+
+PLANE_K = (0.0, 0.12, 0.22, 0.40, 0.65, 0.87)  # planes 0 .. +5 (CRAFT §f.2; lib/depth.ts PLANE_STEPS, GHOST_K)
+
+
+def rng_for(seed, piece, pas):
+    """§3 C16: one generator per (seed, piece, pass): stopping early never changes the earlier passes."""
+    return np.random.default_rng(int(hashlib.sha256(f'{seed}:{piece}:{pas}'.encode()).hexdigest()[:8], 16))
+
+
+# ---- CIELAB D65, exactly lib/light.tsx's (measure and quote in L* C* h: §3 C4)
+_XYZ = np.array([[0.4124564, 0.3575761, 0.1804375], [0.2126729, 0.7151522, 0.0721750], [0.0193339, 0.1191920, 0.9503041]])
+_RGB = np.array([[3.2404542, -1.5371385, -0.4985314], [-0.9692660, 1.8760108, 0.0415560], [0.0556434, -0.2040259, 1.0572252]])
+_WN = np.array([0.95047, 1.0, 1.08883])
+_EPS, _KAP = 216 / 24389, 24389 / 27
+
+
+def cielab(rgb):
+    c = srgb_to_lin(np.clip(np.asarray(rgb, np.float64), 0, 1))
+    xyz = (c @ _XYZ.T) / _WN
+    f = np.where(xyz > _EPS, np.cbrt(xyz), (_KAP * xyz + 16) / 116)
+    return np.stack([116 * f[..., 1] - 16, 500 * (f[..., 0] - f[..., 1]), 200 * (f[..., 1] - f[..., 2])], -1)
+
+
+def cielab_rgb_raw(lab):
+    lab = np.asarray(lab, np.float64)
+    fy = (lab[..., 0] + 16) / 116
+    f = np.stack([fy + lab[..., 1] / 500, fy, fy - lab[..., 2] / 200], -1)
+    xyz = np.where(f ** 3 > _EPS, f ** 3, (116 * f - 16) / _KAP) * _WN
+    lin = xyz @ _RGB.T
+    return np.where(lin <= 0.0031308, 12.92 * lin, 1.055 * np.power(np.clip(lin, 0, None), 1 / 2.4) - 0.055)
+
+
+def from_lch(L, C, h):
+    """lib/light.tsx fromLch per pixel: out-of-gamut colours keep L* and hue and lose chroma until they fit."""
+    L, C, h = np.broadcast_arrays(np.asarray(L, np.float64), np.asarray(C, np.float64), np.asarray(h, np.float64))
+    C = np.maximum(C, 0).copy()
+    hr = np.radians(h)
+    for _ in range(60):
+        rgb = cielab_rgb_raw(np.stack([L, C * np.cos(hr), C * np.sin(hr)], -1))
+        bad = ~np.all((rgb >= -0.001) & (rgb <= 1.001), -1) & (C >= 0.5)
+        if not bad.any():
+            break
+        C = np.where(bad, C * 0.95, C)
+    return np.clip(cielab_rgb_raw(np.stack([L, C * np.cos(hr), C * np.sin(hr)], -1)), 0, 1)
+
+
+def hex01(h):
+    return hex_rgb(h)
+
+
+def to_hex(rgb):
+    c = np.clip(np.round(np.asarray(rgb, np.float64) * 255), 0, 255).astype(int)
+    return '#%02X%02X%02X' % tuple(c)
+
+
+def atmos_np(rgb, k, air_hex, chroma=0.8, floor=8.0, olive=(88.0, 118.0)):
+    """lib/depth.ts atmos() per pixel in CIELCh (§3 C2); k may be a per-pixel map (in-scatter, mist). rgb (..., 3)."""
+    rgb = np.asarray(rgb, np.float64)
+    k = np.clip(np.broadcast_to(np.asarray(k, np.float64), rgb.shape[:-1]), 0, 1)
+    p = cielab(rgb)
+    q = cielab(hex01(air_hex))
+    cC = np.hypot(p[..., 1], p[..., 2])
+    ch = np.degrees(np.arctan2(p[..., 2], p[..., 1])) % 360
+    aC = float(np.hypot(q[1], q[2]))
+    ah = float(np.degrees(np.arctan2(q[2], q[1])) % 360)
+    L = p[..., 0] + (q[0] - p[..., 0]) * k
+    d = ((ah - ch + 540) % 360) - 180
+    near = (np.abs(d) <= 90) | (cC < 4)
+    A = p[..., 1] + (q[1] - p[..., 1]) * k
+    B = p[..., 2] + (q[2] - p[..., 2]) * k
+    fl = np.minimum(np.minimum(cC, aC), floor)
+    Cn = np.maximum(fl, np.hypot(A, B))
+    hn = np.degrees(np.arctan2(B, A)) % 360
+    into = (Cn < 30) & (hn > olive[0]) & (hn < olive[1]) & ~((ch > olive[0]) & (ch < olive[1]))
+    hn = np.where(into, np.where((ch >= olive[1]) & (ch < 300), olive[1], olive[0]), hn)
+    Cf = np.maximum(np.minimum(cC, floor), cC * (1 - chroma * k))
+    C = np.where(near, Cn, Cf)
+    h = np.where(near, hn, ch)
+    out = from_lch(L, C, h)
+    return np.where((k > 0)[..., None], out, rgb)
+
+
+def dE(a, b):
+    return np.linalg.norm(cielab(a) - cielab(b), axis=-1)
+
+
+def ok_hex(c):
+    """An OKLab swatch (SC's palette) as hex."""
+    return to_hex(SC.ok2rgb(np.asarray(c, np.float64)[None, :])[0])
+
+
+def scene_light(spec):
+    """The ONE light table (§3 C5): SC.DUSK (+ spec['light']['sky'] overrides), the scene's local colours and the sun's
+    LIGHT colour (the glint's amber, never a disc). Returns (sky palette in OKLab, a hex table for the water)."""
+    lt = spec.get('light', {})
+    pal = dict(SC.DUSK)
+    for k_, v in (lt.get('sky') or {}).items():
+        pal[k_] = SC.hx(v)
+    hx_ = {k_: ok_hex(v) for k_, v in pal.items()}
+    table = {'sky_top': hx_['zenith'], 'sky_upper': hx_['field'], 'sky_band': hx_['band'], 'sky_low': hx_['rose'],
+             'sky_horizon': hx_['horizon'], 'sun': lt.get('sun_colour', '#ee6a2e'), 'cloud_shade': hx_['shade']}
+    table.update(lt.get('local') or {})
+    return pal, table
+
+
+def sun_veil(x0, y0, w, h, sun=(196, 779)):
+    """The one warmth field (§3 C18) in a piece's box: the sky recipe's ellipse."""
+    return SC.sun_warmth(h, w, (sun[0] - x0, sun[1] - y0), 0.44 * 1080, 0.198 * 1080, 556 - y0)
+
+
+def write_rgba(piece, spec, rgb01, alpha, box, t0, n=0, suffix=None, depth=None, group=None, extra=None):
+    """One RGBA PNG + its manifest row (the same row as write_png). rgb01 float 0..1 or uint8."""
+    H, W = alpha.shape
+    if rgb01.dtype != np.uint8:
+        rgb8 = np.clip(np.round(rgb01 * 255), 0, 255).astype(np.uint8)
+    else:
+        rgb8 = rgb01
+    a8 = np.clip(np.round(alpha * 255), 0, 255).astype(np.uint8)
+    img = Image.fromarray(np.dstack([rgb8, a8]), 'RGBA')
+    name = piece['id'].split('/')[-1]
+    rid = piece['id'] + (f'_{suffix}' if suffix else '')
+    rel = os.path.join(spec['out'], f"{name}{'_' + suffix if suffix else ''}.png")
+    img.save(os.path.join(ROOT, rel), optimize=True)
+    src = os.path.relpath(rel, 'public') if rel.startswith('public/') else rel
+    row = {'id': rid, 'src': src, 'box': [int(box[0]), int(box[1]), int(W), int(H)], 'style': piece['style'],
+           'seed': int(piece['seed']), 'from': piece['id']}
+    if group:
+        row['group'] = group
+        row['depth'] = float(depth)
+    if extra:
+        row.update(extra)
+    print(f"{rid:18s} {piece['style']:16s} seed {int(piece['seed']):4d}  box {row['box']}  {n:6d} marks  {time.time() - t0:5.1f}s")
+    return row
+
+
+_SKY_CACHE = {}
+
+
+def v6_sky(spec, sp):
+    """The sky piece's Layer (OKLab), painted from its seed: the cloud planes paint on the same bytes (§4.3 item 2)."""
+    key = (int(sp['seed']), json.dumps(spec.get('light', {}), sort_keys=True), tuple(sp['size']))
+    if key in _SKY_CACHE:
+        return _SKY_CACHE[key]
+    pal, _ = scene_light(spec)
+    W, H = sp['size']
+    SC.CAPTION = tuple(sp.get('band', [317, 556]))
+    SC.SUN = tuple(float(v) for v in sp['sun']['xy'])
+    stages = {}
+    sky = SC.paint_sky(H, W, pal, 'dusk', rng_for(sp['seed'], 'sky', 'P0-P3'), sun=SC.SUN, glow=sp['sun'].get('glow', 0.55),
+                       stages=stages)
+    _SKY_CACHE[key] = (sky, pal, stages['sky_design'])
+    return _SKY_CACHE[key]
+
+
+def sky_piece_of(spec):
+    return next(p for p in spec['pieces'] if p['style'] == 'sky_recipe')
+
+
+def style_sky_recipe(piece, spec):
+    """§4.3 item 1: the gradient + warmth (P0), P1-P3 (the sky recipe), the horizon streaks, CRAFT §g.2's disc."""
+    t0 = time.time()
+    sky, pal, design = v6_sky(spec, piece)
+    lay = (design if DESIGN else sky).copy()
+    sun = tuple(float(v) for v in piece['sun']['xy'])
+    if not DESIGN:
+        SC.paint_streaks(lay, pal, rng_for(piece['seed'], 'sky', 'streaks'), sun, n_rows=int(piece.get('streaks', 4)))
+    SC.paint_sun(lay, pal, sun, float(piece['sun'].get('r', 20)))
+    rgb8 = lay.rgb(dither_seed=int(piece['seed']))   # CRAFT §g.4's dither
+    return [write_rgba(piece, spec, rgb8, np.ones((lay.h, lay.w), np.float32), (0, 0), t0,
+                       extra={'hides': ['sun']})]
+
+
+def style_cloud_planes(piece, spec):
+    """§4.3 item 2: SC.paint_mass per plane, far to near, on the sky piece's own bytes; k from CRAFT's ladder (C1)."""
+    sky, pal, _ = v6_sky(spec, sky_piece_of(spec))
+    rows = []
+    for pl in piece['planes']:
+        t0 = time.time()
+        prm = dict(SC.DEPTH[pl['depth']], base_y=float(pl['base_y']), k=PLANE_K[int(pl['plane'])])
+        prm.update(pl.get('prm') or {})
+        bill = pl.get('billows') or getattr(SC, pl['design'])
+        box = tuple(int(v) for v in pl['box'])
+        lay, flat, M = SC.paint_mass(box, [tuple(b) for b in bill], pal, sky, rng_for(piece['seed'], pl['name'], 'paint'),
+                                     prm, sun=SC.SUN)
+        if DESIGN:
+            rgb = np.clip(SC.ok2rgb(flat.reshape(-1, 3).astype(np.float64)).reshape(flat.shape), 0, 1)
+            rows.append(write_rgba(piece, spec, rgb, M.astype(np.float32), box[:2], t0, suffix=pl['name'],
+                                   depth=pl['zdepth'], group='clouds'))
+            continue
+        rgb8 = lay.rgb(dither_seed=int(piece['seed']) + int(pl['plane']) + 1)
+        rows.append(write_rgba(piece, spec, rgb8, lay.a, box[:2], t0, suffix=pl['name'], depth=pl['zdepth'], group='clouds'))
+    return rows
+
+
+def style_tree_recipe(piece, spec):
+    """§4.3 item 4: FO.paint_tree in its box (past the frame's left edge); D5: the near plane needs no convergence (k 0),
+    so FO.converge never runs; the near plane's value step (-1 / -2: 5 / 10 L*) is applied with atmos-free L* only."""
+    t0 = time.time()
+    x0, y0, x1, y1 = piece['box']
+    w, h = x1 - x0, y1 - y0
+    fx, fy = piece['trunk_foot']
+    cr = piece['crown']
+    FO.LIGHT = np.array(spec.get('key', [-0.70, -0.62, 0.36]), np.float64)
+    lay = FO.paint_tree(w, h, (fx - x0, fy - y0), (cr['c'][0] - x0, cr['c'][1] - y0), float(cr['W']), float(cr['H']),
+                        np.random.default_rng(int(hashlib.sha256(f"{piece['seed']}:tree:paint".encode()).hexdigest()[:8], 16)),
+                        plane='near', air=None)
+    a = lay.alpha()
+    rgb = lay.rgb()
+    dl = float(piece.get('value_step', 0.0))   # the near plane's step darker (CRAFT §f.2 NEAR_STEPS), L* units
+    if dl:
+        lab_ = cielab(rgb)
+        lab_[..., 0] = lab_[..., 0] - dl * (a > 0)
+        rgb = np.clip(cielab_rgb_raw(lab_), 0, 1)
+    return [write_rgba(piece, spec, rgb, a, (x0, y0), t0, extra={'plane': piece.get('plane', -1)})]
+
+
+def _blocks(flat_rgb, alpha, min_count=250, min_area=30):
+    """The flat's blocks: each pixel snapped to the nearest major colour, then connected regions per colour."""
+    inside = alpha > 0.5
+    cols = (flat_rgb[inside] * 255 + 0.5).astype(np.int32)
+    u, c = np.unique(cols, axis=0, return_counts=True)
+    major = u[c >= min_count].astype(np.float64) / 255
+    if len(major) == 0:
+        major = u[np.argsort(-c)[:4]].astype(np.float64) / 255
+    d = np.linalg.norm(flat_rgb[..., None, :] - major[None, None], axis=-1)
+    idx = np.argmin(d, -1)
+    lbl = np.zeros(alpha.shape, np.int32)
+    n = 0
+    small = np.zeros(alpha.shape, bool)
+    for j in range(len(major)):
+        l_, k_ = ndi.label(inside & (idx == j))
+        for i in range(1, k_ + 1):
+            m = l_ == i
+            n += 1
+            lbl[m] = n
+            if m.sum() < min_area:
+                small |= m
+    return lbl, n, major, idx, small
+
+
+def style_far_city_recipe(piece, spec):
+    """§4.3 item 5: per plane, from its flat: one value per block, then atmos_np with a per-pixel k (the plane's step +
+    the sun's in-scatter + mist low), a mottle; on +3 the sun-side face, slivers capped at +12 dE and tone-on-tone
+    windows; on +4 no windows; the plane blurred 1.0 / 1.6 px with its tops lost by the sun (C3, C11, C18)."""
+    rows = []
+    _, table = scene_light(spec)
+    air = table.get(piece.get('air', 'sky_horizon'), table['sky_horizon'])
+    sun = tuple(sky_piece_of(spec)['sun']['xy'])
+    for pl in piece['planes']:
+        t0 = time.time()
+        sub = dict(piece, id=piece['id'].rsplit('/', 1)[0] + '/' + pl['name'])
+        im = np.asarray(Image.open(os.path.join(ROOT, pl['flat'])).convert('RGBA')).astype(np.float64) / 255
+        a_full = im[..., 3]
+        ys, xs = np.nonzero(a_full > 0.02)
+        bx0, by0, bx1, by1 = max(xs.min() - 6, 0), max(ys.min() - 6, 0), xs.max() + 7, ys.max() + 7
+        rgbf = im[by0:by1, bx0:bx1, :3]
+        a = a_full[by0:by1, bx0:bx1]
+        h, w = a.shape
+        plane = int(pl['plane'])
+        rng = rng_for(piece['seed'], pl['name'], 'P0')
+        lbl, n, major, idx, small = _blocks(rgbf, a)
+        # windows (small blocks): +4 none (the wall's colour), +3 tone-on-tone (dE <= 6 from the wall)
+        wall = ndi.grey_dilation(np.where(small, 0, lbl), size=(9, 9))
+        base = np.zeros((h, w, 3))
+        Lj = {}
+        for b in range(1, n + 1):
+            m = lbl == b
+            if not m.any():
+                continue
+            Lj[b] = rng.normal(0, 0.010 if plane >= 4 else 0.012)
+        for b in range(1, n + 1):
+            m = (lbl == b) & ~small
+            if m.any():
+                base[m] = major[idx[m][0]]
+        if small.any():
+            wl = np.where(small, wall, 0)
+            for b in np.unique(wl[wl > 0]):
+                m = (wl == b)
+                src = (lbl == b) & ~small
+                wcol = base[src].mean(0) if src.any() else rgbf[m].mean(0)
+                if plane >= 4:
+                    base[m] = wcol
+                else:   # tone-on-tone: the window's own direction, at most 6 dE from its wall
+                    wc = rgbf[m].mean(0)
+                    t = min(1.0, 5.5 / max(1e-3, float(dE(wc, wcol))))
+                    base[m] = np.clip(cielab_rgb_raw(cielab(wcol) + (cielab(wc) - cielab(wcol)) * t), 0, 1)
+            # any small block that touched no wall keeps the nearest major colour
+        left = (base.sum(-1) == 0) & (a > 0.02)
+        base[left] = major[idx[left]]
+        # the value per block (OKLab L jitter)
+        ok = rgb_to_lab(np.clip(base, 0, 1))
+        for b, j in Lj.items():
+            ok[lbl == b, 0] += j
+        base = np.clip(lab_to_rgb(ok), 0, 1)
+        # P2 (+3): the face toward the sun's x, 20-36 % of each block's width, one step lighter
+        n_marks = 0
+        if plane == 3:
+            for b in range(1, n + 1):
+                m = (lbl == b) & ~small
+                if m.sum() < 400:
+                    continue
+                yy, xx = np.nonzero(m)
+                bw_ = xx.max() - xx.min() + 1
+                face = m & (np.arange(w)[None, :] < xx.min() + rng.uniform(0.20, 0.36) * bw_) if sun[0] < bx0 + xx.mean() \
+                    else m & (np.arange(w)[None, :] > xx.max() - rng.uniform(0.20, 0.36) * bw_)
+                lab_ = cielab(base[face])
+                lab_[:, 0] += 4.0
+                base[face] = np.clip(cielab_rgb_raw(lab_), 0, 1)
+                n_marks += 1
+        # P0's conversion: k = k0 + (1 - k0) x scatter x veil, then mist low
+        Y = np.arange(by0, by1, dtype=np.float64)[:, None] + np.zeros((1, w))
+        veil = sun_veil(bx0, by0, w, h, sun).astype(np.float64)
+        k0 = PLANE_K[plane]
+        sc_ = pl.get('scatter', 0.45 if plane >= 4 else 0.40)
+        mist = pl.get('mist', 0.12 if plane >= 4 else 0.10)
+        k = k0 + (1 - k0) * sc_ * veil
+        k = k + (1 - k) * mist * np.clip((Y - 762) / 170, 0, 1) ** 2 * (3 - 2 * np.clip((Y - 762) / 170, 0, 1))
+        k = k + (1 - k) * float(pl.get('k_extra', 0.0))
+        out = atmos_np(base, k, air)
+        # the mottle: +-0.5 / 0.6 L* at a 46 px cell
+        mot = BG.value_noise(h, w, 46.0, rng_for(piece['seed'], pl['name'], 'mottle'))
+        lab_ = cielab(out)
+        lab_[..., 0] += (mot - mot.mean()) / max(1e-6, mot.std()) * (0.5 if plane >= 4 else 0.6)
+        out = np.clip(cielab_rgb_raw(lab_), 0, 1)
+        # P3 (+3): slivers 2.4 px on 80 % of the sun-facing edges, in the glow converted, <= +12 dE over their body
+        if plane == 3:
+            glow = atmos_np(hex01(ok_hex(SC.DUSK['glow'])), k0, air)
+            body_in = (a > 0.5)
+            for b in range(1, n + 1):
+                m = (lbl == b) & ~small
+                if m.sum() < 400 or rng.random() > 0.8:
+                    continue
+                edge = m & ~np.roll(m, 1, axis=1) if sun[0] < bx0 + w / 2 else m & ~np.roll(m, -1, axis=1)
+                sl = ndi.binary_dilation(edge, structure=np.ones((1, 3))) & body_in
+                cov = ndi.gaussian_filter(sl.astype(np.float64), 0.45) * (sl | edge)
+                body = out[m].mean(0)
+                cap = 12.0
+                gl = glow
+                dd = float(dE(gl, body))
+                if dd > cap:
+                    gl = np.clip(cielab_rgb_raw(cielab(body) + (cielab(gl) - cielab(body)) * cap / dd), 0, 1)
+                out = out * (1 - cov[..., None] * 0.9) + gl * cov[..., None] * 0.9
+                n_marks += 1
+        # the plane: blur 1.0 / 1.6 px, the tops lost by the sun (toward 2.5 / 3.5 by min(1, 1.15 veil))
+        s0, s1 = (1.6, 3.5) if plane >= 4 else (1.0, 2.5)
+        pre = out * a[..., None]
+
+        def bl(s):
+            return np.dstack([ndi.gaussian_filter(pre[..., c], s) for c in range(3)]), ndi.gaussian_filter(a, s)
+        p0_, a0_ = bl(s0)
+        p1_, a1_ = bl(s1)
+        tt = np.clip(1.15 * veil, 0, 1)[..., None]
+        pre2 = p0_ * (1 - tt) + p1_ * tt
+        a2 = a0_ * (1 - tt[..., 0]) + a1_ * tt[..., 0]
+        rgb = np.where(a2[..., None] > 1e-4, pre2 / np.maximum(a2, 1e-4)[..., None], 0)
+        rows.append(write_rgba(sub, spec, np.clip(rgb, 0, 1), a2, (bx0, by0), t0, n=n_marks,
+                               extra={'plane': plane}))
+        # the check (§4.4): +4 within dE 10 of its air and <= 5 dE inside; +3 <= 12 dE inside
+        inner = a2 > 0.9
+        cin = rgb[inner]
+        lab_in = cielab(cin)
+        spread = float(np.linalg.norm(np.percentile(lab_in, 98, 0) - np.percentile(lab_in, 2, 0)))
+        to_air = float(np.median(dE(cin, hex01(air))))
+        print(f'   far city {pl["name"]} (+{plane}): median dE to the air {to_air:.1f}, p2-p98 spread {spread:.1f} dE')
+    return rows
+
+
+# ---- the canal (§4.3 item 3): WA.e7_canal's method with its constants as keys, on OUR design frame (C10)
+def canal_palette(spec, piece):
+    """WA.water_palette fed from the ONE light table (C5), then w_far = the air - 15 L* (C* >= 15) and the brief's REAL
+    DARKS: each ladder step darkened by `ladder_dL` (the refs' sea sits at L* 22-41: 03)."""
+    _, table = scene_light(spec)
+    P = dict(WA.KX_LIGHT)
+    P.update(table)
+    W = WA.water_palette(P)
+    air = cielab(hex01(table['sky_horizon']))
+    far = cielab(W['w_far'])
+    C = max(15.0, float(np.hypot(far[1], far[2])))
+    hh = math.atan2(far[2], far[1])
+    W['w_far'] = np.clip(cielab_rgb_raw(np.array([air[0] - 15.0, C * math.cos(hh), C * math.sin(hh)])), 0, 1)
+    for k_, dl in (piece.get('ladder_dL') or {}).items():
+        W[k_] = WA.shift(W[k_], dL=float(dl), cmul=float((piece.get('ladder_cmul') or {}).get(k_, 1.0)))
+    return W
+
+
+def paint_canal(des, piece, W, seed):
+    """e7_canal with keys (water.md §6 E7): the design above the water mirrored into the canal, the body painted round
+    it at a low dose, the sun's sparse glint, the boats' and the duck's reflections, rings round the duck; the objects
+    in the water stay our crisp flat (the alpha leaves them out)."""
+    y0, y1 = piece['rows']
+    band = des[y0:y1].copy()
+    H, Wd = band.shape[:2]
+    xs = np.arange(Wd)
+    (wx0, wy0), (wx1, wy1) = piece['waterline']
+    yw = (wy0 + (wy1 - wy0) * np.clip((xs - wx0) / max(1, wx1 - wx0), 0, 1)) - y0
+    ne = piece['near_edge']
+    yn = (ne['y0'] + ne['slope'] * xs) - y0
+    yy = np.arange(H)[:, None]
+    water = np.clip(yy - yw[None, :] + 0.5, 0, 1) * np.clip(yn[None, :] - yy + 0.5, 0, 1)
+    l = WA.lab(band)
+    hue = np.degrees(np.arctan2(l[..., 2], l[..., 1])) % 360
+    chroma = np.hypot(l[..., 1], l[..., 2])
+    waterish = (hue > 140) & (hue < 230) & (chroma > 4)
+    obj = np.zeros((H, Wd), bool)
+    for i, (xa, ya, xb, yb) in enumerate(piece['objects']):
+        sub = ~waterish[ya - y0:yb - y0, xa:xb]
+        gr = (piece.get('gold_skip') or {}).get(str(i))
+        if gr:   # the flat's own gold door reflection crosses this box: not an object (e7)
+            gold = (hue[ya - y0:yb - y0, xa:xb] > 50) & (hue[ya - y0:yb - y0, xa:xb] < 100)
+            rows = (np.arange(ya, yb) >= gr[0]) & (np.arange(ya, yb) <= gr[1])
+            sub &= ~(gold & rows[:, None])
+        obj[ya - y0:yb - y0, xa:xb] |= sub
+    obj &= water > 0
+    obj = ndi.binary_opening(obj, iterations=1)
+    objf = ndi.gaussian_filter(obj.astype(np.float32), 0.5)
+    cv = band.copy()
+    s0_, s1_ = piece['s_range']
+    s_of = lambda y: WA.lerp(s0_, s1_, np.clip((y - 40) / (H - 40), 0, 1))
+    stats, _ = WA.water_body(cv, water, W, seed, 'v6w', 40, H, (s0_, s1_), accents=int(piece.get('accents', 4)), far_n=None,
+                             dose=piece.get('dose', dict(mid=0.6, near=0.6)))
+    rf = piece['reflection']
+    face = int(rf['face'])
+    dd = np.arange(H)[:, None] - yw[None, :]
+    face_rows = (dd >= 0) & (dd < face)
+    src = des.copy()
+    for li in piece.get('lights', []):
+        xa, ya, xb, yb = li['box']
+        ring = np.concatenate([des[ya:yb, xa - 14:xa - 4].reshape(-1, 3), des[ya:yb, xb + 4:xb + 14].reshape(-1, 3)])
+        src[ya:yb, xa:xb] = np.median(ring, 0)
+    ys = np.round(yw[None, :] + y0 - int(rf['quay_top']) - (dd - face)).astype(int)
+    scene_rows = (dd >= face) & (ys >= int(rf.get('top_limit', 600)))
+    tgt = src[np.clip(ys, 0, src.shape[0] - 1), xs[None, :]].astype(np.float32)
+    tgt[face_rows] = WA.shift(W['stone'], dL=6)
+    cover = (face_rows | scene_rows).astype(np.float32)
+    srow = s_of(np.arange(H))
+    tgt = WA.simplify(tgt, cover, W, srow, size=tuple(rf['simplify']))
+    wcol = WA.base_of(W, srow)[:, None, :]
+    f0, f1 = rf['fresnel']
+    tgt = WA.reflect(tgt, wcol, k=float(rf['k']), dL=(f0 + f1 * srow)[:, None]).astype(np.float32)
+    rr = WA.rng_for(seed, 'v6', 'wob')
+    wa0, wa1, wspan = rf['wobble']
+    d = np.arange(H) - 75
+    amp = wa0 + (wa1 - wa0) * np.clip(d / wspan, 0, 1)
+    tgt = WA.wobble_rows(tgt, rr, amp)
+    cover = WA.wobble_rows(cover[..., None], rr, amp)[..., 0]
+    for (xa, ya, xb, yb) in piece['objects'][:2]:   # the boats and the duck: mirrored about their own bottoms
+        sub = obj[ya - y0:yb - y0, xa:xb]
+        if not sub.any():
+            continue
+        lbl, nl = ndi.label(sub)
+        for j in range(1, nl + 1):
+            m = lbl == j
+            if m.sum() < 120:
+                continue
+            ys_, xs_ = np.where(m)
+            ty = 2 * ys_.max() - ys_ + 1 + (ya - y0)
+            tx = xs_ + xa
+            keep = (ty >= 0) & (ty < H)
+            ty, tx, sy_ = ty[keep], tx[keep], ys_[keep] + (ya - y0)
+            keep = (water[ty, tx] > 0.5) & ~obj[ty, tx]
+            ty, tx, sy_ = ty[keep], tx[keep], sy_[keep]
+            tgt[ty, tx] = WA.reflect(band[sy_, tx], wcol[ty, 0])
+            cover[ty, tx] = 1
+    lights = []
+    for li in piece.get('lights', []):
+        xa, ya, xb, yb = li['box']
+        yfoot = int(np.round(yw[(xa + xb) // 2])) + face + 10 - 1
+        lights.append((xa + 15, xb - 15, yfoot, float(li['length']) * (yb - ya),
+                       WA.reflect(W['door'], wcol[min(yfoot, H - 1), 0], k=0.15, dL=-3)))
+    n = WA.reflection(cv, water * (1 - objf), W, seed, 'v6r', tgt, cover, yw, s_of, lights, solid=float(rf['solid']))
+    gl = piece['glint']
+    gx = int(gl['x'])
+    n += WA.glint(cv, water * (1 - objf), W, seed, 'v6g', float(gx), float(gl['D']), int(yw[gx]) + 1, int(yn[gx]),
+                  strength=float(gl['strength']), slivers=tuple(gl['slivers']))
+    nz = WA.Noise(WA.rng_for(seed, 'v6', 'noise'))
+    rings = WA.Layer(H, Wd)
+    rg = piece['rings']
+    n += WA.ring_marks(rings, nz, WA.rng_for(seed, 'v6', 'rings'), W, rg['xy'][0], rg['xy'][1] - y0, rg['r0'], 0.75,
+                       ratio=float(rg['ratio']), grow=float(rg['grow']))
+    rings.blur(0.35).onto(cv, water * (1 - objf))
+    ct = piece['contact']
+    cl = np.clip(1 - np.abs(yy - yw[None, :] - 0.8) / float(ct['px']), 0, 1) * (water > 0)
+    cv[:] = cv * (1 - ct['op'] * cl[..., None]) + WA.shift(W['stone'], dL=float(ct['dL'])) * ct['op'] * cl[..., None]
+    cv[:] = cv * (1 - objf[..., None]) + band * objf[..., None]          # the objects stay our crisp flat (e7)
+    alpha = water
+    return cv, alpha, stats, n, (np.clip(yw, 0, H), np.clip(yn, 0, H))
+
+
+def style_water_recipe(piece, spec):
+    t0 = time.time()
+    seed = int(piece['seed'])
+    W = canal_palette(spec, piece)
+    dpath = os.path.join(ROOT, piece['design'])
+    if not os.path.exists(dpath):
+        dpath = os.path.join(ROOT, 'docs/studies/2026-10-28_city_posters/paint_test/stage_v4_design.png')
+        print('   (water) no design frame yet: v4 stage used')
+    des = np.asarray(Image.open(dpath).convert('RGB')).astype(np.float32) / 255
+    cv, alpha, stats, n, (yw, yn) = paint_canal(des, piece, W, seed)
+    y0 = piece['rows'][0]
+    # the check (§4.4): calm >= 75 %, marks 3-9 %, tooth 0.6-2.0 (on the open water: x 0-780, between the edges)
+    xs_ = np.arange(cv.shape[1])
+    top, bot = int(np.ceil(yw[:780].max())) + 12, int(np.floor(yn[:780].min())) - 4
+    lt, dk, calm, tooth = WA.mark_metric(cv, (0, top, 780, bot))
+    print(f'   canal marks: light {lt:.1f} % dark {dk:.1f} % (= {lt + dk:.1f} %), calm {calm:.0f} %, tooth {tooth:.2f}')
+    Lw = cielab(cv[alpha > 0.9])[..., 0]
+    print(f'   canal L*: p5 {np.percentile(Lw, 5):.1f}  median {np.median(Lw):.1f}  p95 {np.percentile(Lw, 95):.1f}')
+    return [write_rgba(piece, spec, np.clip(cv, 0, 1), alpha.astype(np.float32), (0, y0), t0, n=int(n))]
+
+
+def style_flock_sprite(piece, spec):
+    """D2 / C12: the recipe's flock drawing as its OWN transparent layer for the particle slot (lib/particles), never
+    baked into the sky: the whole flock at the recipe's pale far end (55 % toward the sky)."""
+    t0 = time.time()
+    sky, pal, _ = v6_sky(spec, sky_piece_of(spec))
+    tmp = sky.copy()
+    before = tmp.c.copy()
+    SC.paint_flock(tmp, pal, rng_for(piece['seed'], 'flock', 'draw'), path=tuple(tuple(p) for p in piece['path']),
+                   n=int(piece.get('n', 46)), far_k=float(piece.get('far_k', 0.55)))
+    diff = np.linalg.norm(tmp.c - before, axis=-1)
+    ys, xs = np.nonzero(diff > 1e-5)
+    x0, y0, x1, y1 = xs.min() - 2, ys.min() - 2, xs.max() + 3, ys.max() + 3
+    # unmix the bird colour from the sky: alpha from the drawing's coverage, colour = the bird's
+    col = tmp.c[y0:y1, x0:x1]
+    bird = SC.mix(before[y0:y1, x0:x1], pal['bird'], 1.0 - float(piece.get('far_k', 0.55)))
+    a = np.clip(diff[y0:y1, x0:x1] / np.maximum(1e-6, np.linalg.norm(bird - before[y0:y1, x0:x1], axis=-1)), 0, 1).astype(np.float32)
+    rgb = np.clip(SC.ok2rgb(bird.reshape(-1, 3).astype(np.float64)).reshape(col.shape), 0, 1)
+    return [write_rgba(piece, spec, rgb, a, (x0, y0), t0, n=int(piece.get('n', 46)))]
+
+
+V6_STYLES = {'sky_recipe': style_sky_recipe, 'cloud_planes': style_cloud_planes, 'water_recipe': style_water_recipe,
+             'tree_recipe': style_tree_recipe, 'far_city_recipe': style_far_city_recipe, 'flock_sprite': style_flock_sprite}
+
+
 # ------------------------------------------------------------------ main
 
 def paint_piece(piece, spec, preview=None):
+    if piece['style'] in V6_STYLES:   # v6: the recipe book's styles (PAINT_RECIPES.md §4)
+        return V6_STYLES[piece['style']](piece, spec)
     seed = int(piece['seed'])
     rng = np.random.default_rng(seed)
     stamps = make_stamps(np.random.default_rng(seed * 7 + 1))

@@ -1,0 +1,60 @@
+{
+ "film": "v2s1_v6b",
+ "about": "The C14 sky-top A/B: v6's sky with v4's zenith (#afb3d8), for the owner to choose; every other piece is v6's (PaintS1 skyFrom 'v6b').",
+ "out": "public/paint/v2s1_v6b",
+ "out_design": "public/paint/v2s1_v6bdesign",
+ "frame": [
+  1080,
+  1920
+ ],
+ "band": [
+  290,
+  600
+ ],
+ "key": [
+  -0.7,
+  -0.62,
+  0.36
+ ],
+ "light": {
+  "sky": {
+   "zenith": "#afb3d8"
+  },
+  "local": {
+   "window": "#f7cf86",
+   "door": "#fbe6c2",
+   "facade": "#cd9985",
+   "facade_cream": "#d5c5bb",
+   "dark_window": "#412f45",
+   "paving": "#e2d0c1",
+   "sand": "#d8b9a2",
+   "stone": "#6d6680",
+   "haze": "#cdb3bf"
+  },
+  "sun_colour": "#ee6a2e"
+ },
+ "pieces": [
+  {
+   "id": "v2s1/sky",
+   "style": "sky_recipe",
+   "seed": 61,
+   "size": [
+    1080,
+    1100
+   ],
+   "band": [
+    317,
+    556
+   ],
+   "sun": {
+    "xy": [
+     196,
+     779
+    ],
+    "r": 20,
+    "glow": 0.55
+   },
+   "streaks": 4
+  }
+ ]
+}
