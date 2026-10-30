@@ -48,7 +48,7 @@ import full_grain from './maps/full/grain.lmap.png';
 export const MAPS: Record<'light' | 'full', MapSet> = {
   light: {
     slots: {
-      sky: [{src: light_sky_mul, box: [0, 0, 1017, 775], blend: 'multiply'}, {src: light_sky_scr, box: [0, 0, 1017, 959], blend: 'screen'}],
+      sky: [{src: light_sky_mul, box: [0, 618, 682, 157], blend: 'multiply'}, {src: light_sky_scr, box: [0, 617, 731, 342], blend: 'screen'}],
       farroofs: [{src: light_farroofs_mul, box: [0, 752, 259, 193], blend: 'multiply'}, {src: light_farroofs_scr, box: [0, 750, 259, 195], blend: 'screen'}],
       fartower: [{src: light_fartower_mul, box: [257, 589, 90, 356], blend: 'multiply'}, {src: light_fartower_scr, box: [257, 589, 90, 356], blend: 'screen'}],
       bridge: [{src: light_bridge_mul, box: [0, 871, 315, 183], blend: 'multiply'}, {src: light_bridge_scr, box: [0, 871, 315, 183], blend: 'screen'}],
