@@ -131,6 +131,14 @@ Maintenance at the end).
   - they feel very vibrant and coherently fit together. I like the colors of our last video about Google, but our
   video still feels cheap and lazy as if these pictures give a very premium feel to it"; "let me know if i am missing
   anything you observed too", 2026-10-28).
+- **PROPER LIGHT: one story light per scene, done properly** (owner, 2026-10-30, on the difference list: "I noticed this
+  too the light source yes - can we do the proper lights?"). Like the references (the sunset line, the red bus-stop
+  lamp, the phone's glow): one dominant source the eye goes to, real falloff from it, lit edges (rim light) on what it
+  touches, a soft glow and gentle bloom around the source itself, cast shadows and light pools that follow it, and
+  local lights (a lit door, a lamp, a screen) as story lights. This replaces the old "no glow, no gradient" caution for
+  light: a glow is right where a source is. Darks, contrast and ONE COLOUR KEY per scene (one strong colour family with
+  one hot accent, never a mix of unrelated pastels) are palette work, done in every scene ("dark and contrast are great
+  but that’s very doable that’s just color palette and selection? Similarly point 2").
 - **Light and shadow: gentle, but always there.** One consistent light direction per scene, soft form and cast shadows,
   gentle light pools that make sense; never absent and never "weirdly put". Every volume reads in 2-3 flat tones, a lit
   face and a shade face, as the city posters' buildings do; with no outlines these faces make the edges, so the
@@ -196,6 +204,17 @@ Maintenance at the end).
   like why is it blue sky and then suddenly abruptly orange, weird"; "maybe when it comes to sky we can find a beautiful
   way to do a gentle gradient", v2 G4, 2026-10-27; the calm sun: "Go with your suggestions", 2026-10-29; on the
   scene-1 still v1: "Also the sky is not entirely single color there are more things happening", 2026-10-29).
+- **ORGANIC, NOT GEOMETRIC: shapes blend naturally, never square and proper.** The biggest gap to the references (the
+  owner, on brushwork, shape variety and edges): our design shows its shapes and angles clearly; theirs are irregular
+  and blend naturally. Silhouettes are irregular and varied (big, medium, small), edges are lost and found, nothing
+  repeats a template, and shapes overlap and melt into each other. It gets its own deep research into techniques and
+  libraries (`docs/look/ORGANIC.md` when done). — ("5 and 6 and 7 think that’s the biggest difference we need to find a
+  way to solve properly. It feels like a lot of our design is too square and proper like I can see shapes and angles
+  very clearly while references are obviously not like that. They are more regular more naturally blend Do deep
+  research into techniques libraries etc", 2026-10-30.)
+- **SCENE COMPOSITION: big quiet areas and one place to look** (owner agreed, 2026-10-30: "8 agreed this is an important
+  point about scene composition"): few elements of equal weight, values grouped into a few big masses, one focal point
+  with the most contrast and the story light, negative space; a busy frame of many mid-tone props is the failure.
 - **ATTENTION HIERARCHY: one main arc, one focus at a time.** The story's subject gets the contrast, the deepest
   light-and-shade step, saturation and the clear motion; supporting life (a bird, walkers, snow, steam) stays subtle
   (smaller, lower contrast, gentler shade, softer colour, calmer motion): alive, but never competing. Supporting environment may be drawn in
@@ -286,7 +305,9 @@ Maintenance at the end).
   colour family per sky lit by one light, fine strokes only where a thing is fine (reeds, a flock), atmosphere over
   detail; the sky has DEPTH too: clouds in 2-4 overlapping planes, the near mass biggest and strongest, the far banks
   paler, cooler, softer and simpler, flattening into thin streaks toward the horizon; never an even streaky texture over everything, which reads as a filter and as lower drawing quality. The subject (tier A) and the faces and people stay crisp and clean,
-  so the paint is the world's, not the story's; the film still works with the paint off. In the engine the painted
+  so the paint is the world's, not the story's; and by DEPTH, a balance: near objects sharper, far objects more like
+  brushwork and paint, as in the references ("I think we need to find a balance I think even in the references the close
+  objects are more sharp while further objects are more like brushes and painting", 2026-10-30); the film still works with the paint off. In the engine the painted
   pieces are layers made by our own deterministic paint pass (seeded, locked to their layer so nothing swims in the
   float; a cloud may churn slowly), never a filter smeared over the whole frame. The dose is
   judged on a look test first. — ("Another piece of feedback is I really like the “painted” pieces like the sky and the clouds the references or some foreground buildings and trees / greenery are uniquely painted / Is it possible to modify our engine to match the story? Style"; "Yeah the painted message look above I said about modifying our

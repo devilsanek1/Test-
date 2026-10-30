@@ -96,7 +96,7 @@ the owner approves it; the look test shows it.
   the sketch pen and the scribble mass stay on the G3 board. -> `CRAFT.md` §c.
 - **5. Gentle light and shadow, always there.** One light rig per set (a key on one side, one shadow tint family, the
   pool colours), kept in all its shots; a source never moves between cuts; the brightest area sits on the subject;
-  light is lighter than what it lights, shown on what it hits (never glow discs, blur or gradients, the sky's gentle gradient and the painted pieces' soft paint aside: rules 4, 6; a halo is one step
+  light is lighter than what it lights, shown on what it hits; ONE story light per scene done properly (owner, 2026-10-30: "can we do the proper lights?"): real falloff, rim light on what it touches, a soft glow and gentle bloom AT a source (a sun, a lamp, a lit door, a screen), cast shadows and pools that follow it (playbook PROPER LIGHT); otherwise never glow discs, blur or gradients (the sky's gentle gradient and the painted pieces' soft paint aside: rules 4, 6; a halo is one step
   of at most 1.7x, or none). Shadows are colour, never grey, gentle in value, flat in shape: contact under all that
   touches a surface, form away from the key, cast along the light; every volume reads in 2-3 flat tones, a lit face and
   a shade face (the city posters; owner, 2026-10-28), and with no outlines (rule 4) these faces make the edges: the
