@@ -445,16 +445,16 @@ export function hairBraids(c: HairCtx, ends: Tone, o: {len?: number} = {}): Part
       fill: i % 2 ? t.deep : t.shade,
     }));
   const curls = (cx: number, cy: number, w: number): string => {
-    // a row of small loose curls: unequal lobes
+    // a row of small loose curls: unequal round lobes along the braids' ends
     const pts: RV[] = [];
-    const n = 5;
-    pts.push([cx - w / 2, cy - 0.12, 0.02]);
+    const n = 6;
+    pts.push([cx - w / 2, cy - 0.06, 0.02]);
     for (let i = 0; i <= n; i++) {
       const x = cx - w / 2 + (w * i) / n;
-      const dy = i % 2 ? 0.05 : 0.0;
-      pts.push([x, cy + 0.12 + dy, 0.04]);
+      pts.push([x, cy + 0.07 + (i % 2 ? 0.035 : 0.0) + (i % 3 === 0 ? 0.015 : 0), 0.03]);
+      if (i < n) pts.push([x + w / n / 2, cy + 0.03, 0.005]);
     }
-    pts.push([cx + w / 2, cy - 0.12, 0.02]);
+    pts.push([cx + w / 2, cy - 0.06, 0.02]);
     return R(c, pts);
   };
   return [

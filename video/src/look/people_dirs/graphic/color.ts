@@ -97,3 +97,9 @@ export function mixLab(a: string, b: string, t: number): string {
   const B = lab(b);
   return fromLab(A[0] + (B[0] - A[0]) * t, A[1] + (B[1] - A[1]) * t, A[2] + (B[2] - A[2]) * t);
 }
+
+/** The rim light's colour on a material: +12 L*, a touch warmer (toward the key's gold). */
+export function rimOf(hex: string): string {
+  const q = lch(hex);
+  return fromLch(Math.min(95, q.L + 12), q.C * 1.05 + 2, turn(q.h, 70, 12));
+}

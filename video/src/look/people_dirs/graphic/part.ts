@@ -18,6 +18,8 @@ export type Part = {
   ground?: boolean;
   /** a region cut out of the part (an open coat's front): a closed path, any size */
   cut?: string;
+  /** a crisp rim of light on the key-facing (upper-left) edges: the subject only (DIRECTION rule 5) */
+  rim?: string;
 };
 
 export const region = (pts: V2[] | string, fill: string, opacity?: number): Region => ({
@@ -26,4 +28,10 @@ export const region = (pts: V2[] | string, fill: string, opacity?: number): Regi
   opacity,
 });
 
-export type Built = {parts: Part[]; /** the figure's bounding box in local units */ box: {x0: number; x1: number; y0: number; y1: number}};
+export type Built = {
+  parts: Part[];
+  /** the figure's bounding box in local units */
+  box: {x0: number; x1: number; y0: number; y1: number};
+  /** the head's centre (local units), to frame a close-up */
+  head: [number, number];
+};

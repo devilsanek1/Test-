@@ -8,6 +8,7 @@
 import React from 'react';
 import {Composition, registerRoot} from 'remotion';
 import {GrTest, TEST_W, TEST_H, type TestProps} from './look/people_dirs/graphic/Test';
+import {GrSheet, SHEET_W, SHEET_H} from './look/people_dirs/graphic/Sheet';
 
 const testDefaults: TestProps = {
   h: 960,
@@ -20,6 +21,7 @@ const testDefaults: TestProps = {
 
 const Root: React.FC = () => (
   <>
+    <Composition id="GrSheet" component={GrSheet} durationInFrames={1} fps={60} width={SHEET_W} height={SHEET_H} />
     <Composition id="GrTest" component={GrTest} durationInFrames={1} fps={60} width={TEST_W} height={TEST_H} defaultProps={testDefaults} />
   </>
 );

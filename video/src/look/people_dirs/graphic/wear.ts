@@ -285,26 +285,29 @@ export function trousers(sk: Skel, c: Cam, s: TrouserSpec): Part[] {
   const parts: Part[] = [];
   const pv = sk.pelvis;
   const b = sk.b;
-  // the seat: a loft from the waistband to below the crotch
+  // the seat fills only the middle (the crotch); the two legs themselves make the hips, so nothing sticks out
   const seat: Ring[] = [
-    fr(pv, s.riseY, b.waistW / 2 + 10, b.waistD + 8, 0),
-    fr(pv, b.hipY + 20, b.hipW / 2 + 6, b.hipD + 6, 0),
-    fr(pv, b.crotch + 10, b.hipW / 2 + 2, b.hipD + 2, 2),
+    fr(pv, s.riseY, b.waistW / 2 + 2, b.waistD + 6, 0),
+    fr(pv, b.hipY + 20, b.hipW / 2 - 18, b.hipD + 4, 0),
+    fr(pv, b.crotch + 6, b.hipW / 2 - 40, b.hipD - 6, 2),
   ];
-  parts.push(loftPart('seat', seat, c, s.tone, s.z, {r: 8, hemR: 8}));
+  parts.push(loftPart('seat', seat, c, s.tone, s.z, {r: 10, hemR: 14, noShade: true}));
   for (const side of ['l', 'r'] as const) {
     const L = sk.leg[side];
     const out = side === 'l' ? 1 : -1;
-    // the leg hangs from the hip's widest point: push the top of the tube out a little
-    const top: V3 = [L.hip[0] + out * 8, L.hip[1] + 25, L.hip[2]];
+    // the leg from the waistband: its outer edge is the hip's curve, then it hangs from the hip's widest point
+    const wx = L.hip[0] * 0.78;
+    const top: V3 = [wx, s.riseY - 6, L.hip[2]];
+    const hipOut: V3 = [L.hip[0] + out * 6, L.hip[1] - 10, L.hip[2]];
+    const r0 = Math.max(30, b.waistW / 2 + 6 - Math.abs(wx));
     const ankle = L.ankle;
     const dir = norm3v(sub3v(ankle, L.knee));
     // the hem lands on the shoe: at hemY for a planted foot, just under the ankle for a raised heel
     const hy = Math.max(s.hemY, ankle[1] - 46);
     const k = (ankle[1] - hy) / Math.max(0.2, -dir[1]);
     const hemP: V3 = [ankle[0] + dir[0] * k, hy, ankle[2] + dir[2] * k];
-    const chain: V3[] = [top, L.hip, L.knee, hemP];
-    const radii = [s.thigh + 4, s.thigh, s.knee, s.hem];
+    const chain: V3[] = [top, hipOut, L.knee, hemP];
+    const radii = [r0, s.thigh, s.knee, s.hem];
     const tb = tube(chain, radii, c);
     const ring: Ring = {y: hy, a: s.hem, b: s.hem * 0.92, x: hemP[0], z: hemP[2]};
     const pts = tubeOutline(tb, radii, c, {start: 'flat', end: 'flat', r: 10, endR: 2, hemRing: ring});
@@ -326,14 +329,21 @@ export function sleeve(sk: Skel, side: 'l' | 'r', c: Cam, s: SleeveSpec): Part &
   const A = sk.arm[side];
   const k = s.len ?? 1;
   const cuff: V3 = [A.el[0] + (A.wr[0] - A.el[0]) * k, A.el[1] + (A.wr[1] - A.el[1]) * k, A.el[2] + (A.wr[2] - A.el[2]) * k];
-  // start inside the shoulder so the dropped seam reads as one soft arc
-  const top: V3 = [A.sh[0] * 0.92, A.sh[1] + 14, A.sh[2]];
-  return tubePart(`sleeve-${side}`, [top, A.sh, A.el, cuff], [s.r[0] - 2, s.r[0], s.r[1], s.r[2]], c, s.tone, s.z ?? null, {
+  // the sleeve's round head sits so its top meets the shoulder line: never a puff above it
+  const top = capTop(sk, A.sh, A.el, s.r[0]);
+  return tubePart(`sleeve-${side}`, [top, A.el, cuff], [s.r[0], s.r[1], s.r[2]], c, s.tone, s.z ?? null, {
     start: 'round',
     end: 'flat',
     endR: 3,
     r: 14,
   });
+}
+/** The start of a sleeve: on the upper arm, just low enough that its round head's top meets the shoulder line. */
+function capTop(sk: Skel, sh: V3, el: V3, r: number): V3 {
+  const want = sk.b.shoulderY + 4 - r;
+  if (sh[1] <= want) return sh;
+  const t = Math.min(0.6, (sh[1] - want) / Math.max(1, sh[1] - el[1]));
+  return lerp3v(sh, el, t);
 }
 /** The cuff's screen points (the hand comes out of it). */
 export function cuffOf(sk: Skel, side: 'l' | 'r', c: Cam, len = 1): {p: V2; dir: V2} {
@@ -356,9 +366,9 @@ export function bareArm(sk: Skel, side: 'l' | 'r', c: Cam, t: Tone, z: number | 
 /** A short sleeve: from the shoulder to a fraction k of the upper arm. */
 export function shortSleeve(sk: Skel, side: 'l' | 'r', c: Cam, t: Tone, r0: number, r1: number, k: number, z: number | null): Part & {tube: Tube} {
   const A = sk.arm[side];
-  const top: V3 = [A.sh[0] * 0.9, A.sh[1] + 12, A.sh[2]];
+  const top = capTop(sk, A.sh, A.el, r0);
   const end: V3 = lerp3v(A.sh, A.el, k);
-  return tubePart(`ssleeve-${side}`, [top, A.sh, end], [r0 - 2, r0, r1], c, t, z, {start: 'round', end: 'flat', endR: 2, r: 12});
+  return tubePart(`ssleeve-${side}`, [top, end], [r0, r1], c, t, z, {start: 'round', end: 'flat', endR: 2, r: 12});
 }
 /** Bare lower legs (below a skirt): knee, calf, ankle. */
 export function bareLegs(sk: Skel, c: Cam, t: Tone, z: number): Part[] {
@@ -380,14 +390,14 @@ export function bomber(sk: Skel, c: Cam, s: BomberSpec): Part[] {
   const pv = sk.pelvis;
   const b = sk.b;
   const wa = blend(pv, ch, 0.55);
-  const sh = b.shoulderW / 2 + 14;
+  const sh = b.shoulderW / 2 - 4;
   const rings: Ring[] = [
     fr(ch, 846, 46, 48, -12),
-    fr(ch, 814, sh - 16, 74, -10),
-    fr(ch, 790, sh, 86, -6),
-    fr(ch, 730, sh - 6, 94, -2),
-    fr(wa, 650, sh - 10, 94, 2),
-    fr(wa, 616, sh - 16, 90, 2),
+    fr(ch, 814, sh - 18, 70, -10),
+    fr(ch, 790, sh, 82, -6),
+    fr(ch, 730, sh - 8, 90, -2),
+    fr(wa, 650, sh - 12, 90, 2),
+    fr(wa, 616, sh - 18, 86, 2),
     fr(pv, 604, b.waistW / 2 + 16, b.waistD + 16, 2),
   ];
   const band: Ring[] = [fr(pv, 606, b.waistW / 2 + 16, b.waistD + 16, 2), fr(pv, 568, b.waistW / 2 + 18, b.waistD + 16, 2)];
@@ -406,10 +416,10 @@ export function bomber(sk: Skel, c: Cam, s: BomberSpec): Part[] {
 /** A sleeve with a rib cuff (a narrower band at the wrist). */
 export function ribSleeve(sk: Skel, side: 'l' | 'r', c: Cam, t: Tone, rib: Tone, r: [number, number, number], z: number): Part[] {
   const A = sk.arm[side];
-  const top: V3 = [A.sh[0] * 0.92, A.sh[1] + 14, A.sh[2]];
+  const top = capTop(sk, A.sh, A.el, r[0]);
   const cuffStart: V3 = lerp3v(A.el, A.wr, 0.8);
   const cuffEnd: V3 = lerp3v(A.el, A.wr, 0.98);
-  const body = tubePart(`sleeve-${side}`, [top, A.sh, A.el, cuffStart], [r[0] - 2, r[0], r[1], r[2]], c, t, z, {start: 'round', end: 'flat', endR: 4, r: 14});
+  const body = tubePart(`sleeve-${side}`, [top, A.el, cuffStart], [r[0], r[1], r[2]], c, t, z, {start: 'round', end: 'flat', endR: 4, r: 14});
   const cuff = tubePart(`cuff-${side}`, [lerp3v(A.el, A.wr, 0.76), cuffEnd], [r[2] * 0.78, r[2] * 0.74], c, rib, z + 0.1, {start: 'flat', end: 'flat', endR: 2, r: 4});
   return [body, cuff];
 }
@@ -482,14 +492,18 @@ export function slipSkirt(sk: Skel, c: Cam, s: SkirtSpec): Part {
     fr(pv, s.hemY, s.hemA, b.hipD + 30, 8, sw),
   ];
   const L = loft(rings, c);
-  // the satin's sheen: one soft band across the hip on the key side, running down the bias
+  // the satin's sheen: one soft crescent along the key-side hip, thinning as it runs down the bias
   const p0 = L.left[1];
-  const p1 = L.left[3];
+  const p1 = L.left[2];
+  const p2 = L.left[3];
+  const p3 = L.left[4];
   const sheen: V2[] = [
-    [p0[0] + 18, p0[1] + 6],
-    [p0[0] + 46, p0[1] - 2],
-    [p1[0] + 60, p1[1] + 40],
-    [p1[0] + 26, p1[1] + 60],
+    [p0[0] + 16, p0[1] + 4],
+    [p1[0] + 30, p1[1]],
+    [p2[0] + 40, p2[1]],
+    [p3[0] + 64, p3[1] + 30],
+    [p2[0] + 28, p2[1] + 6],
+    [p1[0] + 18, p1[1] + 4],
   ];
   return loftPart('skirt', rings, c, s.tone, s.z, {r: [3, 30, 24, 30, 30, 2], hemR: 3, regions: [{d: poly(sheen), fill: s.tone.sheen}]});
 }

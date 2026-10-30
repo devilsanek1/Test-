@@ -169,3 +169,48 @@ export const perpV = perp;
 export const normV = norm;
 export const subV = sub;
 export const mulV = mul;
+
+/** A hand round a cup: the back of the hand from the wrist, the fingers as one band across the cup (its lower third
+ *  when held up, its top when carried hanging), the thumb a small lobe above. */
+export function gripCup(name: string, wrist: V2, cupC: V2, cupW: number, cupH: number, len: number, t: Tone, z: number, hanging: boolean): Part[] {
+  const bandY = hanging ? cupC[1] - cupH * 0.3 : cupC[1] + cupH * 0.08;
+  const bh = len * 0.34;
+  const side = wrist[0] >= cupC[0] ? 1 : -1; // the forearm comes from this side
+  const x0 = cupC[0] - cupW * 0.56;
+  const x1 = cupC[0] + cupW * 0.56;
+  const band: RV[] = [
+    [x0, bandY - bh / 2, bh * 0.4],
+    [x1, bandY - bh / 2, bh * 0.4],
+    [x1, bandY + bh / 2, bh * 0.45],
+    [x0, bandY + bh / 2, bh * 0.45],
+  ];
+  // the back of the hand: from the wrist to the band's near end
+  const near: V2 = [side > 0 ? x1 : x0, bandY];
+  const dir = norm(sub(near, wrist));
+  const nr: V2 = [-dir[1], dir[0]];
+  const w0 = len * 0.17;
+  const w1 = bh * 0.5;
+  const back: RV[] = [
+    [wrist[0] + nr[0] * w0, wrist[1] + nr[1] * w0, 2],
+    [near[0] + nr[0] * w1, near[1] + nr[1] * w1, w1 * 0.6],
+    [near[0] - nr[0] * w1, near[1] - nr[1] * w1, w1 * 0.6],
+    [wrist[0] - nr[0] * w0, wrist[1] - nr[1] * w0, 2],
+  ];
+  const thumb: RV[] = [
+    [near[0] - side * cupW * 0.12, bandY - bh * 0.45, 3],
+    [near[0] - side * cupW * 0.32, bandY - bh * 0.95, bh * 0.25],
+    [near[0] - side * cupW * 0.18, bandY - bh * 1.05, bh * 0.25],
+    [near[0] + side * cupW * 0.02, bandY - bh * 0.5, 3],
+  ];
+  const sh = poly([
+    [cupC[0] + cupW * 0.15, bandY - len],
+    [cupC[0] + cupW * 3, bandY - len],
+    [cupC[0] + cupW * 3, bandY + len],
+    [cupC[0] + cupW * 0.15, bandY + len],
+  ]);
+  return [
+    {name: `${name}-back`, d: rpath(back), fill: t.lit, regions: [{d: sh, fill: t.shade}], z},
+    {name: `${name}-fingers`, d: rpath(band), fill: t.lit, regions: [{d: sh, fill: t.shade}], z: z + 0.05},
+    {name: `${name}-thumb`, d: rpath(thumb), fill: t.lit, regions: [{d: sh, fill: t.shade}], z: z + 0.1},
+  ];
+}

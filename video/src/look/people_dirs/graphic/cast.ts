@@ -10,9 +10,9 @@ import {hairLong, hairPonytail, hairCurtains, hairBraids} from './hair';
 import {cap, ear, sunglasses, headphones} from './headwear';
 import {coat, top, trousers, sleeve, cuffOf, bareArm, shortSleeve, bareLegs, bomber, ribSleeve, leatherJacket, leatherSleeve, slipSkirt} from './wear';
 import {shoe, contact} from './feet';
-import {hand, bag, icedCoffee} from './props';
+import {hand, bag, icedCoffee, gripCup} from './props';
 import {SKIN, HAIR, T, BG} from './palette';
-import type {Tone} from './color';
+import {rimOf, type Tone} from './color';
 import type {Built, Part} from './part';
 
 export type View = 'q' | 'p' | 'b';
@@ -60,8 +60,8 @@ function skel(p: PoseIn): Skel {
  *  shoulders 4 the other way, the head tilted off the shoulders' line). */
 const stand = (b: Build, arms: PoseIn['arms'], o: {headYaw?: number; roll?: number} = {}): PoseIn => ({
   b,
-  pelvis: {x: -10, z: 0, roll: -(o.roll ?? 6), tw: 4},
-  chest: {x: -2, z: -2, roll: (o.roll ?? 6) * 0.66, tw: -4},
+  pelvis: {x: -12, z: 0, roll: -(o.roll ?? 8), tw: 4},
+  chest: {x: -2, z: -2, roll: (o.roll ?? 8) * 0.62, tw: -4},
   head: {yaw: o.headYaw ?? 6, roll: -5, pitch: 3, dx: 2},
   legs: {
     r: {knee: [-46, 295, 2], ankle: [-28, 40, -6], fy: -14, fp: 0},
@@ -103,8 +103,8 @@ const ARMS_COAT: Record<View, PoseIn['arms']> = {
 };
 const ARMS_COFFEE: Record<View, PoseIn['arms']> = {
   // the left hand holds the iced coffee (the forearm up, A5), the right arm loose
-  q: {l: {el: [126, 640, 8], wr: [96, 712, 118]}, r: {el: [-130, 630, -6], wr: [-124, 488, 16]}},
-  p: {l: {el: [122, 642, -4], wr: [112, 716, 112]}, r: {el: [-120, 634, 28], wr: [-112, 494, 80]}},
+  q: {l: {el: [128, 640, 6], wr: [74, 676, 146]}, r: {el: [-130, 630, -6], wr: [-124, 488, 16]}},
+  p: {l: {el: [122, 642, -4], wr: [108, 690, 138]}, r: {el: [-120, 634, 28], wr: [-112, 494, 80]}},
   b: {l: {el: [134, 628, -10], wr: [126, 488, 18]}, r: {el: [-136, 628, -12], wr: [-128, 486, 6]}},
 };
 
@@ -127,15 +127,16 @@ function coffeeIn(sk: Skel, side: 'l' | 'r', c: Cam, skin: Tone, z: number, hang
   const cf = cuffOf(sk, side, c, 1);
   const len = sk.b.hand;
   const hgt = 118;
-  const parts: Part[] = [];
-  const cupC: V2 = hanging ? (add(cf.p, [0, len * 0.9]) as V2) : (add(cf.p, mul(cf.dir, len * 0.42)) as V2);
-  const cupAt: V2 = hanging ? cupC : (add(cupC, [0, -hgt * 0.12]) as V2);
-  parts.push(...icedCoffee(cupAt, hgt, 0, z - 0.2, {coffee: T.latte, clear: '#E7DED6', lid: '#F4EFE8', straw: '#F4EFE8'}));
-  const g = hanging ? (add(cf.p, [0, len * 0.08]) as V2) : (add(cf.p, mul(cf.dir, -2)) as V2);
-  const dir: V2 = hanging ? [0, 1] : cf.dir;
-  parts.push(hand(`grip-${side}`, g, dir, len * 0.95, -1, skin, z + 0.3, 'grip', 0));
-  return parts;
+  const cupW = hgt * 0.6;
+  const cupC: V2 = hanging ? (add(cf.p, [0, len * 0.72]) as V2) : (add(add(cf.p, mul(cf.dir, len * 0.55)) as V2, [0, -hgt * 0.06]) as V2);
+  return [
+    ...icedCoffee(cupC, hgt, 0, z - 0.2, {coffee: T.latte, clear: '#E7DED6', lid: '#F4EFE8', straw: '#F4EFE8'}),
+    ...gripCup(`grip-${side}`, cf.p, cupC, cupW, hgt, len, skin, z + 0.3, hanging),
+  ];
 }
+/** Her parts that catch the rim light (the subject's key-side edge): never skin. */
+const RIMMED = /^(coat|sleeve|hair|ponytail|cap|bag|seat|leg-)/;
+const withRim = (parts: Part[]): Part[] => parts.map((p) => (RIMMED.test(p.name) && !p.line ? {...p, rim: rimOf(p.fill)} : p));
 
 // ---------------------------------------------------------------- her, autumn city evening (N1: the long open coat)
 function herEvening(view: View): Built {
@@ -168,13 +169,13 @@ function herEvening(view: View): Built {
     const pocket = (view === 'q' || view === 'b') && s === 'r';
     if (!pocket) parts.push(handAt(sk, s, c, SKIN.s2, z + 0.5, 0.97));
   }
-  const bagAt = framePt(sk.chest, 116, 662, -44);
-  parts.push(...bag(sk, 'l', bagAt, c, T.teal, armNear(sk, 'l', c) ? 59 : 21, {yaw: -26}));
+  const bagAt = framePt(sk.chest, 118, 652, -66);
+  parts.push(...bag(sk, 'l', bagAt, c, T.teal, armNear(sk, 'l', c) ? 59 : 21, {yaw: -26, len: 128, h: 86, th: 34}));
   const H = headParts(sk, c, SKIN.s2);
   parts.push(...H.parts);
   const turn = view === 'b' ? Math.min(1, Math.max(0, (180 - Math.abs(H.hf.yaw)) / 50)) : 0;
   parts.push(...hairLong({hf: H.hf, view: H.lm.view, faceX: H.lm.faceX, t: HAIR.copper, swing: walking ? 0.06 : 0, turn}));
-  return finish(parts);
+  return finish(withRim(parts), H.hf.c);
 }
 
 // ---------------------------------------------------------------- her, casual weekend (L2: baby tee, jeans, cap, ponytail)
@@ -184,9 +185,9 @@ function herWeekend(view: View): Built {
   const c = cam(YAW[view]);
   const parts: Part[] = [];
   parts.push(contact(sk, c, BG.ground));
-  parts.push(...trousers(sk, c, {tone: T.denim, thigh: 56, knee: 50, hem: 52, hemY: 16, riseY: 612, z: 32}));
+  parts.push(...trousers(sk, c, {tone: T.denim, thigh: 52, knee: 45, hem: 47, hemY: 16, riseY: 616, z: 32}));
   for (const s of ['l', 'r'] as const) parts.push(...shoe(sk, s, c, {kind: 'sneaker', tone: T.sneaker, sole: '#F7F2EA', stripe: '#664334'}));
-  parts.push(top(sk, c, {tone: T.tee, hemY: 598, neckA: 34, fit: 3, z: 40}));
+  parts.push(top(sk, c, {tone: T.tee, hemY: 608, neckA: 34, fit: 2, z: 40, hemA: WOMAN.waistW / 2 + 9}));
   for (const s of ['l', 'r'] as const) {
     const near = armNear(sk, s, c);
     const z = near ? 60 : 22;
@@ -202,7 +203,7 @@ function herWeekend(view: View): Built {
   else parts.push(...ear(H.hf, H.lm.view, SKIN.s2));
   parts.push(...hairPonytail({hf: H.hf, view: H.lm.view, faceX: H.lm.faceX, t: HAIR.copper, swing: view === 'p' ? 0.08 : 0, turn}));
   parts.push(...cap(H.hf, H.lm.view, T.teal, SKIN.s2.shade, turn));
-  return finish(parts);
+  return finish(withRim(parts), H.hf.c);
 }
 
 // ---------------------------------------------------------------- the man (N6: the suede bomber, headphones)
@@ -217,7 +218,7 @@ function man(view: View): Built {
   const c = cam(view === 'q' ? -34 : YAW[view]);
   const parts: Part[] = [];
   parts.push(contact(sk, c, BG.ground));
-  parts.push(...trousers(sk, c, {tone: T.indigo, thigh: 58, knee: 52, hem: 50, hemY: 20, riseY: 600, z: 32}));
+  parts.push(...trousers(sk, c, {tone: T.indigo, thigh: 54, knee: 47, hem: 46, hemY: 20, riseY: 600, z: 32}));
   for (const s of ['l', 'r'] as const) parts.push(...shoe(sk, s, c, {kind: 'sneaker', tone: T.sneaker, sole: '#F7F2EA', stripe: '#2F4566'}));
   parts.push(top(sk, c, {tone: T.tee, hemY: 560, neckA: 36, fit: 6, z: 40}));
   const rib: Tone = {...T.cognac, lit: T.cognac.shade, shade: T.cognac.deep};
@@ -225,14 +226,14 @@ function man(view: View): Built {
   for (const s of ['l', 'r'] as const) {
     const near = armNear(sk, s, c);
     const z = near ? 60 : 22;
-    parts.push(...ribSleeve(sk, s, c, T.cognac, rib, [48, 42, 38], z));
+    parts.push(...ribSleeve(sk, s, c, T.cognac, rib, [42, 37, 34], z));
     if (s === 'r') parts.push(handAt(sk, s, c, SKIN.s3, z + 0.5, 0.98));
   }
   const H = headParts(sk, c, SKIN.s3);
   parts.push(...H.parts);
   parts.push(...hairCurtains({hf: H.hf, view: H.lm.view, faceX: H.lm.faceX, t: HAIR.blackBrown}));
   parts.push(...headphones(H.hf, T.phones, '#8E7F78'));
-  return finish(parts);
+  return finish(parts, H.hf.c);
 }
 
 // ---------------------------------------------------------------- the woman (N3: the cropped leather jacket, the satin skirt)
@@ -261,11 +262,11 @@ function woman(view: View): Built {
   parts.push(...H.parts);
   parts.push(...hairBraids({hf: H.hf, view: H.lm.view, faceX: H.lm.faceX, t: HAIR.black}, HAIR.honey));
   parts.push(...sunglasses(H.hf, H.lm.faceX, '#241B1F', '#6E5C62'));
-  return finish(parts);
+  return finish(parts, H.hf.c);
 }
 
-function finish(parts: Part[]): Built {
-  return {parts, box: {x0: -400, x1: 400, y0: -20, y1: 1010}};
+function finish(parts: Part[], head: V2): Built {
+  return {parts, box: {x0: -400, x1: 400, y0: -20, y1: 1010}, head: [head[0], head[1]]};
 }
 
 export function build(who: Who, view: View): Built {

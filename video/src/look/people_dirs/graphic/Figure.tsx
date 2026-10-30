@@ -4,6 +4,8 @@ import React from 'react';
 import type {Built, Part} from './part';
 
 let SEQ = 0;
+/** the rim's width: the lit fill is shifted down and right by this much (local units, H = 1000) */
+const RIM: [number, number] = [5.5, 4];
 
 export type FigProps = {
   fig: Built;
@@ -48,6 +50,7 @@ export const Figure: React.FC<FigProps> = ({fig, x, y, h, flip, mono, uid, shado
           );
         }
         const regs = mono ? [] : (p.regions ?? []).filter((r) => r.d);
+        const rim = !mono && p.rim ? p.rim : '';
         const cid = `${id}-${i}`;
         const cut = p.cut ? `${id}-${i}c` : '';
         return (
@@ -57,13 +60,14 @@ export const Figure: React.FC<FigProps> = ({fig, x, y, h, flip, mono, uid, shado
                 <path d={`M-6000 -6000H6000V8000H-6000Z${p.cut}`} clipRule="evenodd" />
               </clipPath>
             ) : null}
-            <path d={p.d} fill={mono ?? p.fill} />
-            {regs.length ? (
+            <path d={p.d} fill={rim || (mono ?? p.fill)} />
+            {regs.length || rim ? (
               <>
                 <clipPath id={cid}>
                   <path d={p.d} />
                 </clipPath>
                 <g clipPath={`url(#${cid})`}>
+                  {rim ? <path d={p.d} fill={p.fill} transform={`translate(${RIM[0]},${RIM[1]})`} /> : null}
                   {regs.map((r, j) => (
                     <path key={j} d={r.d} fill={r.fill} opacity={r.opacity ?? 1} />
                   ))}

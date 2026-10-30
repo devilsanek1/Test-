@@ -75,9 +75,9 @@ function head34(f: Face, yaw: number): {skin: RV[]; mark: RV[]; faceX: number; j
     [fx + 0.02 - 0.01 * k, 0.483 + 0.012 * k, 0.03],
     // the far contour, up: the chin, the lips just proud of the cheek, the nose breaking the contour, the cheekbone,
     // the eye socket's dip, the brow, the temple
-    [fx - 0.045 - 0.01 * k, 0.435, 0.04],
-    [fx - 0.045, 0.398, 0.02],
-    [fx - 0.067 + 0.012 * k, 0.354, 0.012],
+    [fx - 0.026 - 0.025 * k, 0.435, 0.04],
+    [fx - 0.03 - 0.012 * k, 0.398, 0.02],
+    [fx - 0.062 + 0.008 * k, 0.354, 0.012],
     [fx - 0.055, 0.327, 0.005],
     [fx - 0.074 + 0.01 * k, 0.3, 0.012],
     [tipX + 0.036, tipY + 0.042, 0.01],
