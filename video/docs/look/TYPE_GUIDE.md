@@ -125,7 +125,7 @@ Each example uses video 4's real words and times; a frame number is t x 60.
   stepped right; the first two groups only, then R3 for the number.
 - **Sync:** line 1 is on screen at frame 0 (never an empty frame, never a title); line 2 builds on its word; group 2
   pops whole; the hook's number lands per R3.
-- **Video 4:** S1 (0.00-4.28, WIDE, locked: the home view paints itself, the pipe first): **"Did you know"** (778 px,
+- **Video 4:** S1 (0.00-4.28, WIDE, locked: the home view paints itself, the run first): **"Did you know"** (778 px,
   from x 120) at frame 0 · **"Helsinki"** (450 px, line 2 from x 400) pops at 0.600 s (frame 36) · group 2 "wants AI /
   to heat" (511 / 420 px, seat R) 1.067-2.300 s (frames 64-138) · then R3.
 - **Checks:** frame 0 shows "Did you know" (in the voice's order); the payoff ("heat seventy thousand homes") is in

@@ -4,6 +4,15 @@
 "Draft 3 after the owner's notes on draft 2", "Draft 3, fix round 1" and "Draft 3, fix round 2"). Draft 2's card is
 archived unchanged in `archive/g1_draft2/THROUGHLINE.md` (draft 1's in `archive/g1_draft1/`).
 
+**Since the visual script v3** (`visual/VISUAL_SCRIPT.md`, LOCKED for G3 2026-10-30; its "Departures from the card"
+names each): the picture is v3's where it departs from this card, and the lines marked "v3:" below say so. The carriers
+are C x10, F x1 (the plain cut on "But") and B x1 (the loop); the heat shows as the melt over a pipe under the snow,
+steam from the manhole and the window's frost clearing (no cut-open ground; one soft cut up the block's wall); a snowy
+night under one camera (no designed view); the resident near the camera (S1 walking home, S11-S12 in the one lit
+window), never "you"; the giant computer about 2 storeys; no "≈ 40" tag; the plan marked out (W1: pale chalk lines);
+the times, the thread's coverage and Pip's spots are v3's and W1's. The core line, the thread (the heat as warm water),
+its home spot, the home place and the one comparison shot stand.
+
 **What fix round 2 changed here:** three lines changed words, and no carrier moved. L8 "The city has a plan to use it,
 starting next year." (its first word is still "The"; the 2027 tag now swings on with "next year", ~27.3 s); L10 "A big
 new data center would take the heat out of its computers with water in pipes." (the blue-in, orange-out beat: the
@@ -42,12 +51,14 @@ a second, the 0.12 s lead included) until the G2 take sets the clock; screen spo
    payoff; "soon" points back at the plan, starting next year, L8; "a flat" is the alternative). Frame 0: the first
    spoken line as the captions ("Did you know Helsinki wants AI to heat seventy thousand homes?"), no title over them;
    the core line is the cover's title.
-2. **Thread: the heat, carried as the warm water,** a drawn thing (CRAFT §a.1: one thread OBJECT): an orange ribbon of
-   water in the cut-open pipe (cold blue where it runs cool, gold after the small box on the pipe) and a curl of steam
-   where the heat meets the cold air, in flat lit and shade tones. Its warmth shows on what it reaches (the radiator's
-   fins, the lit window pane: lit panes are sources, CRAFT §d.9), never as a glow (DIRECTION rule 5; CRAFT §d.7: "No
-   symbolic glow"). The voice names it "heat" (L4, L6, L7, L10, L11). On screen from ~0.4 s (frame 0's "ding"). **Home
-   spot: the one warm window and the radiator under its sill,** where the water arrives, in the read zone below the
+2. **Thread: the heat, carried as the warm water,** a drawn thing (CRAFT §a.1: one thread OBJECT): v3: warm water in
+   a pipe under the snow, its signs the snow melting over it wherever it runs, steam puffing from the manhole as it
+   passes and the frost clearing on the window it reaches, and steam where the heat is let go into the cold air (G1 had
+   an orange ribbon of water in a cut-open pipe, cold blue where it ran cool, gold after the small box, and a curl of
+   steam, in flat lit and shade tones). Its warmth shows on what it reaches (the radiator's fins, the lit window pane:
+   lit panes are sources, CRAFT §d.9), never as a glow (DIRECTION rule 5; CRAFT §d.7: "No symbolic glow"). The voice
+   names it "heat" (L4, L6, L7, L10, L11). On screen from ~0.4 s (frame 0's "ding"). **Home spot: the one warm window
+   and the radiator under its sill,** where the water arrives, in the read zone below the
    caption band (`docs/look/LAYOUT.md` §1: the band is y 290-600, the stage y 600-1250), on the subject axis (x
    380-700), where every B match puts it; G3 sets the exact spot. **It reacts at the end of each cause beat:** the
    still blue water at the pipe's far end turns orange and runs under the snow into the one window's radiator, the
@@ -64,26 +75,32 @@ a second, the 0.12 s lead included) until the G2 take sets the clock; screen spo
    plan's own pencil stretch of pipe into the city's, orange to gold at the small box on the pipe, then up into the
    radiator, whose fins warm as the window lights (L11); it runs up into the radiator of the one window
    above your phone, which lights a step warmer when your chat bubble pops (L12): frame 0's window (the loop).
-3. **Home place: a snowy Helsinki street at dusk with one warm window,** as ONE designed view (DIRECTION rule 7): the
-   block with the window in front; the street cut open below the snow like a poster's cross-section (the pipe); the
-   harbour below; at the city's edge by the harbour, the giant computer (one tall machine) inside the new data center's
-   pale pencil plan; a tram line; falling snow; far across the water, the city's lights and, if G3 keeps it, the
-   red-brick cathedral with gold domes on its rock, a landmark of the view only (never a beat, never opened, never
-   named, never panned to). Every beat but one happens here, above the snow or cut open below it. **Information is
-   paper in this place:** ≈ 40 on a tag by the kettles (L4), 2027 on a tag pinned to the new data center's pencil plan
-   (L8, on "next year": the voice says when, the paper says the year). Words in the picture stay few and big; sources
-   go in the post's text.
-4. **The ONE comparison (and scale) shot: L6,** the rise with the steam up to the Earth's curve at dusk, the line said
-   in the picture ("Normally, data centers just use big fans to blow that heat outside."): data centers far from
-   Helsinki, plain boxes with big fans on their roofs, blow their heat up into the sky as plumes that thin away, and
-   one spot stays warm: Helsinki's lights by its harbour (lit windows as flat lit points, never a glow). Entered by C
-   (the rise, the film's one big move, DIRECTION rule 7), left by A (the push down into Helsinki's lit windows). A
-   designed view: generic boxes, no country singled out (FL 7.1 is one man's view; FL 8.2 lists the exceptions); no
-   sea.
+3. **Home place: a snowy Helsinki street at dusk with one warm window,** as ONE designed view (DIRECTION rule 7) (v3: at
+   night, under one camera at a standing eye, since DIRECTION rule 7's designed view is on hold): the block with the
+   window in front; the street cut open below the snow like a poster's cross-section (the pipe) (v3: no cut-open ground,
+   the pipe unseen under the snow but where the heat shows); the harbour below; at the city's edge by the harbour, the
+   giant computer (one tall machine) inside the new data center's pale pencil plan; a tram line; falling snow; far
+   across the water, the city's lights and, if G3 keeps it, the red-brick cathedral with gold domes on its rock, a
+   landmark of the view only (never a beat, never opened, never
+   named, never panned to). Every beat but one happens here, above the snow or cut open below it (v3: above the
+   snow). **Information is paper in this place:** ≈ 40 on a tag by the kettles (L4; v3: no tag, the 40 drawn kettles
+   are the number), 2027 on a tag pinned to the new data center's pencil plan (L8, on "next year": the voice says when,
+   the paper says the year). Words in the picture stay few and big; sources go in the post's text.
+4. **The ONE comparison (and scale) shot: L6,** the rise with the steam up to the Earth's curve at dusk (v3: at night),
+   the line said in the picture ("Normally, data centers just use big fans to blow that heat outside."): data centers
+   far from Helsinki, plain boxes with big fans on their roofs, blow their heat up into the sky as plumes that thin
+   away, and one spot stays warm: Helsinki's lights by its harbour (lit windows as flat lit points, never a glow).
+   Entered by C (the rise, the film's one big move, DIRECTION rule 7), left by A (the push down into Helsinki's lit
+   windows; v3: by the film's one plain cut, F, on "But", the heat on both sides). A designed view: generic boxes, no
+   country singled out (FL 7.1 is one man's view; FL 8.2 lists the exceptions); no sea.
 5. **The one "you": POV only** (since fix round 2 the voice's last line says "a chatbot", so the "you" is the picture's
-   alone). Your gloved hand and your phone in the snowy street at L12, cut by the bottom edge (`LAYOUT.md` §1, the
+   alone; v3: the locked take says "So your chatbot ...", the core line restored, §1.1, and the picture's "you" stays POV
+   only). Your gloved hand and your phone in the snowy street at L12, cut by the bottom edge (`LAYOUT.md` §1, the
    "you" row), a chat bubble popping. No strangers' backs in any foreground: the city's people stay small silhouettes
-   in lit windows, in the mid and far ground. No one fetches the mug (L5).
+   in lit windows, in the mid and far ground. v3: one person near the camera, the resident (`visual/STYLE_ADJUSTMENTS.md`
+   4, owner-approved; v3's delegated call 4): walking home on the near snow in S1, in rear three-quarter (never square
+   from behind), and at home in the one lit window in S11-S12; never "you", never a stranger's back (W1 §6). No one
+   fetches the mug (L5).
 6. **Pip** (hidden on purpose, owner 2026-10-28; tier B, at most 1 % of the frame, drawn new; never a join's carrier,
    never on the eye path; none in the closes, inside the cut-open pipe or on the curve, none on the cover; never in the
    caption band or a right rail): on a snowy balcony of the next block, at the one window's height in frame 0's wide
@@ -91,9 +108,10 @@ a second, the 0.12 s lead included) until the G2 take sets the clock; screen spo
    water's path (draft 2's window on the crane went with the crane). G3 plans the exact spots; W1 names them.
 7. **Truth in the picture:** the new data center is a pale pencil plan with no name and no real site, never a finished
    building (FL 6.7), even as its walls draw on big (L10) and its own stretch of pipe runs (L11, pencil), with the 2027
-   tag pinned to the plan (L8); the giant computer is a generic AI rack with no logo, about a person's height (its
-   height isn't checked: FL 2.2); the small box on the pipe is the heat pump, never labelled (FL 6.3); the cooling water
-   stays inside its pipe through the giant computer, never loose around the machine (L10, "in pipes": two of
+   tag pinned to the plan (L8); the giant computer is a generic AI rack with no logo, about a person's height (v3:
+   about 2 storeys, its delegated call 2; its height isn't checked: FL 2.2); the small box on the pipe is the heat
+   pump, never labelled (FL 6.3); the cooling water stays inside its pipe through the giant computer, never loose
+   around the machine (L10, "in pipes": two of
    `panel_d3/`'s three first thought water breaks computers); the heat goes into a radiator, never a tap or a shower
    (every cold panel on draft 2 wondered); the data centers on the curve are generic boxes with fans; if the cathedral
    stays as a landmark, it is Uspenski, red brick with gold domes, never the white Helsinki Cathedral (FL 6.10), with
@@ -120,7 +138,7 @@ orange, the truck along the pipe, the radiator and the window). S4 is ~4.0 s (fi
 written: ~3.6 s; CRAFT: at least 3.5 s per shot), so G3 still keeps the A pull back into it quick and the 0.5 s hold
 whole.
 
-## 3. Joins (one carrier per join, from the script's joins; 0 plain cuts)
+## 3. Joins (one carrier per join, from the script's joins; 0 plain cuts; v3: one, on "But")
 The transition's midpoint lands on the new sentence's first word, in the voice's pause; during it only the carrier
 moves, while slow life (snow, steam, a far tram) keeps its pace (CRAFT §a, timing).
 
@@ -131,15 +149,15 @@ moves, while slow life (snow, steam, a far tram) keeps its pace (CRAFT §a, timi
 | L3 -> L4 | "To" 9.53 | how hot: "To put it into perspective," (the owner's connector) | C, inside S1 | a small pull back on the lead-in (~9.5-11.3 s), making room around the giant computer; on "FORTY kettles" (~14.8 s) forty kettles draw on in rows around it (paper in place, not a new place) |
 | L4 -> L5 | "That's" 16.50 | and (the joke) | C, inside S1 | a slow parallax float up the steam to the one mug on the giant computer's top |
 | L5 -> L6 | "Normally" 18.24 | but (the usual case, opened by "Normally,") | C continuous camera: the film's one big move | the rise with the steam, out over the roofs and up to the Earth's curve; one data center's big roof fans pass close on "big fans" (~20.0 s) |
-| L6 -> L7 | "But" 22.42 | but (THE TURN) | A push-through | into Helsinki's lit windows on the curve (on screen ~4.2 s), out into the snowy street, where the giant computer's steam bends down into the pipe. A plain cut (F) would be allowed on this "But"; the lit windows carry it instead |
+| L6 -> L7 | "But" 22.42 | but (THE TURN) | A push-through (v3: F, the plain cut at 23.37 s, the heat on both sides) | into Helsinki's lit windows on the curve (on screen ~4.2 s), out into the snowy street, where the giant computer's steam bends down into the pipe. A plain cut (F) would be allowed on this "But"; the lit windows carry it instead |
 | L7 -> L8 | "The" 24.16 | so, unspoken (the plan: THE HONEST FLOOR, said where the plan is first named: "The city has a plan to use it, starting next year.") | C, inside S3 | the orange water leads the camera along the pipe under the snow to the giant computer inside the new data center's pale pencil plan by the harbour; the 2027 tag swings on, pinned to the plan, on "next year" (~27.3 s) |
 | L8 -> L9 | "So" 27.99 | the viewer's question, said aloud, with the El Niño line's "So" ("So how would that work?") | C, inside S3 | a slow push in on the pencil plan and a drop into the street's cutaway at the giant computer's foot, arriving at the pipe's still, cool blue water as the question ends |
 | L9 -> L10 | "A" 29.74 | the answer | C, inside S3 | on "big new data center" (~30.1 s) the plan's pencil walls draw on wide around the giant computer; on "take the heat out" (~31.8 s) the blue water runs in its pipe in at the giant computer's foot, and the camera tilts up with it to the hot orange water running out of the pipe at its top on "with water in pipes" (~34.6 s): the water never touches the machine's insides ("in pipes") |
 | L10 -> L11 | "Then" 35.66 | then | C, inside S3 | a truck along the pipe, led by the hot water: the plan's pencil stretch into the city's pipes, the small box, under the street, up into the radiator under the one window, which lights on "people's homes" (~38.8 s) |
-| L11 -> L12 | "So" 39.49 | so (THE PAYOFF) | A push-through (pulled back out) | out of the one warm window L11 showed lighting, tilting down to the snowy street at its foot: your hand and phone in front |
+| L11 -> L12 | "So" 39.49 | so (THE PAYOFF) | A push-through (pulled back out; v3: C, a continuous 1.15x pull anchored on the one window) | out of the one warm window L11 showed lighting, tilting down to the snowy street at its foot: your hand and phone in front |
 | L12 -> L1 (loop) | "Did" 0.12, next loop | the loop | B thread match + an un-build | the one lit window and the radiator under it = frame 0's window, same spot and size; S4 un-builds into frame 0's drawing state |
 
-Carriers: A x2, B x1, C x9, no D, E or F.
+Carriers: A x2, B x1, C x9, no D, E or F. v3: C x10, F x1 (on "But"), B x1 (the loop), no A.
 
 ## 4. If the owner picks hook option 2 or 3
 The card stays as it is; only frame 0's captions change, and every option names Helsinki in line 1, so no join changes.
@@ -164,8 +182,8 @@ does Helsinki want AI to heat seventy thousand homes?", 10 words): every time fr
    (the site isn't public). The cathedral is optional: if G3 keeps it, it is a small far landmark (tier C), below the
    caption band (its domes' tops at y >= 600, `LAYOUT.md` §1), never lit or framed as a beat, never opened; G3 may drop
    it if it pulls the eye.
-4. **The kettles:** forty, in rows, small enough to read as a crowd around the one giant computer, with the "≈ 40" tag;
-   the kettle is 3 kW in the post's text.
+4. **The kettles:** forty, in rows, small enough to read as a crowd around the one giant computer, with the "≈ 40" tag
+   (v3: no tag; 5 rows of 8 in front of it); the kettle is 3 kW in the post's text.
 5. **The mug (L5):** one small mug on the giant computer's top, the smile of "That's a lot of tea." and nothing more
    (no second gag, no one fetches it). If the owner cuts the tea line (the first reserve cut), the mug goes with it and
    L4 -> L6 becomes one C move (the rise starts from the kettles' steam).

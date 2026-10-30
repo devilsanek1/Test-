@@ -128,3 +128,50 @@ Status: IN PROGRESS (this file is written as the work goes).
   the write-on; §i's earlier bullets contradicted §b-§e's picked numbers. Checked: no recipe (R1-R10), no check in §f and
   no motion row in §d carries brush or burnt wording ("burned in" in §g is the captions being in the picture, not the
   colour); §h is job 2's still list, a record of what each still showed, left as it is.
+
+**2e. `docs/v4/THROUGHLINE.md` (the G1 card) against v3: the carriers, the person, the thread's signs.** The card keeps
+its G1 words (owner-approved with the script) and each stale line gets a "v3:" note beside it; v3's "Departures from
+the card" names every change, and the card now points to it.
+- Line 7-15, a head note added: "Since the visual script v3 (`visual/VISUAL_SCRIPT.md`, LOCKED for G3 2026-10-30; its
+  "Departures from the card" names each): the picture is v3's where it departs from this card, and the lines marked
+  "v3:" below say so. The carriers are C x10, F x1 (the plain cut on "But") and B x1 (the loop); the heat shows as the
+  melt over a pipe under the snow, steam from the manhole and the window's frost clearing (no cut-open ground; one soft
+  cut up the block's wall); a snowy night under one camera (no designed view); the resident near the camera (S1 walking
+  home, S11-S12 in the one lit window), never "you"; the giant computer about 2 storeys; no "≈ 40" tag; the plan marked
+  out (W1: pale chalk lines); the times, the thread's coverage and Pip's spots are v3's and W1's. The core line, the
+  thread (the heat as warm water), its home spot, the home place and the one comparison shot stand."
+- The thread's signs, §1.2 (line 54-58). Before: "an orange ribbon of water in the cut-open pipe (cold blue where it
+  runs cool, gold after the small box on the pipe) and a curl of steam where the heat meets the cold air, in flat lit
+  and shade tones." After: "v3: warm water in a pipe under the snow, its signs the snow melting over it wherever it
+  runs, steam puffing from the manhole as it passes and the frost clearing on the window it reaches, and steam where
+  the heat is let go into the cold air (G1 had an orange ribbon of water in a cut-open pipe, cold blue where it ran
+  cool, gold after the small box, and a curl of steam, in flat lit and shade tones)." Why: v3's "The thread" and
+  STYLE_ADJUSTMENTS 2 (owner-approved: no diagram cut-away); "never as a glow" stays, as v3's delegated call 7 keeps it.
+- The home place, §1.3 (line 78-87). Added beside the G1 words: "(v3: at night, under one camera at a standing
+  eye, since DIRECTION rule 7's designed view is on hold)", "(v3: no cut-open ground, the pipe unseen under the snow but
+  where the heat shows)", "(v3: above the snow)", and on the "≈ 40" tag "(L4; v3: no tag, the 40 drawn kettles are the
+  number)". Why: "as ONE designed view (DIRECTION rule 7)" contradicts DIRECTION rule 7 itself (the designed view on
+  hold since 2026-10-29: every frame keeps one camera) and the owner-approved STYLE_ADJUSTMENTS (a cold blue snowy night;
+  no cut-away; the designed view ON HOLD); the tag is v3's departure (S4: the drawn kettles are the number).
+- The comparison shot, §1.4 (line 89, 93-94): "at dusk (v3: at night)"; "left by A (the push down into Helsinki's lit
+  windows; v3: by the film's one plain cut, F, on "But", the heat on both sides)". Why: the carrier (v3 S6 -> S7, RJ2).
+- The person, §1.5 (line 96-103). Before: "(since fix round 2 the voice's last line says "a chatbot", so the
+  "you" is the picture's alone)" and "No strangers' backs in any foreground: the city's people stay small silhouettes in
+  lit windows, in the mid and far ground." After: the first gains "; v3: the locked take says "So your chatbot ...", the
+  core line restored, §1.1, and the picture's "you" stays POV only"; the second gains "v3: one person near the camera,
+  the resident (`visual/STYLE_ADJUSTMENTS.md` 4, owner-approved; v3's delegated call 4): walking home on the near snow in
+  S1, in rear three-quarter (never square from behind), and at home in the one lit window in S11-S12; never "you",
+  never a stranger's back (W1 §6)." Why: the locked take (`public/v4/voice_words.json`: "So your chatbot could soon heat
+  an apartment in Helsinki.") and the owner-approved person near the camera.
+- Truth in the picture, §1.7 (line 111-112): "about a person's height (v3: about 2 storeys, its delegated call 2; its
+  height isn't checked: FL 2.2)". Why: v3's delegated call 2, under the owner's hand-over.
+- The joins, §3: the head (line 141) "0 plain cuts" -> "0 plain cuts; v3: one, on "But""; L6 -> L7 (152) "A
+  push-through" -> "A push-through (v3: F, the plain cut at 23.37 s, the heat on both sides)"; L11 -> L12 (157) "A
+  push-through (pulled back out)" -> "(pulled back out; v3: C, a continuous 1.15x pull anchored on the one window)"; the
+  count (160) "Carriers: A x2, B x1, C x9, no D, E or F." + " v3: C x10, F x1 (on "But"), B x1 (the loop), no A." Why:
+  v3's counts (C x10, F x1, B x1) and its departures (L6 -> L7 the plain cut the card allowed; L11 -> L12 a continuous
+  pull, since a 1.15x pull back through no opening is no push-through). The "what leads" cells stay G1's; v3's blocks
+  say what leads each join now (the head note).
+- Open for G3, §5 item 4 (line 185-186): "with the "≈ 40" tag (v3: no tag; 5 rows of 8 in front of it)".
+- Not changed: the history paragraphs ("What fix round 2 / fix round 1 / draft 3 changed here", their carrier counts
+  included), §2's G1 estimates, §1.6 Pip and the "what leads" cells (all under the head note), the card's rank line.
