@@ -113,6 +113,25 @@ def shapes_numbers(rgb8, box):
                 clear_geometric=nan(out['clear'].get('geometric_density')), divider_D=nan(out['divider_D']))
 
 
+def tree_alone():
+    """The two trees ALONE over a flat stone (#b07e6c), so the planter's rim and the paving's lines in the shapes lane's
+    crop do not speak for them: shapes_measure on x 0-330, y 1240-1540."""
+    import shapes_lib as S
+    import shapes_measure as M
+    bg = np.array([0xb0, 0x7e, 0x6c]) / 255.0
+    out = {}
+    for name, png, (bx, by) in (('v6', os.path.join(L.VIDEO, 'public', 'paint', 'v2s1_v6', 'tree.png'), (-60, 1250)),
+                                ('organic', os.path.join(L.SCRATCH, 'pieces', 'tree.png'), (-60, 1226))):
+        f = L.over(np.ones((1920, 1080, 3)) * bg, L.load_rgba(png), bx, by)
+        rgb = S.normalize_image(cv2.cvtColor(np.round(f * 255).astype(np.uint8), cv2.COLOR_RGB2BGR))
+        o, _ = M.measure_crop(rgb[1240:1540, 0:330])
+        out[name] = dict(arcs=round(float(o['edges']['arc']), 4), crisp_visible=round(float(o['edge_width']['crisp']), 4),
+                         lost_mass=round(float(o['mass_edges']['lost']), 4), broken_mass=round(float(o['mass_edges']['busy']), 4),
+                         small_area=round(float(o['sizes']['small']), 4), medium_area=round(float(o['sizes']['medium']), 4),
+                         shapes=int(o['sizes']['n']))
+    return out
+
+
 def measure(v6, after):
     res = {'frame': {'v6': three_numbers(v6), 'organic': three_numbers(after)}, 'pieces': {}}
     for key, title, disp, sbox, _ in PIECES:
@@ -145,6 +164,9 @@ def make_sheet(v6, after, res, out_path=OUT_PNG):
         d = ImageDraw.Draw(img)
         out = []
         for ln in lines:
+            if d.textlength(ln, font=fnt) <= width:        # a line that fits keeps its spacing (the aligned tables)
+                out.append(ln)
+                continue
             words, cur = ln.split(' '), ''
             for wd in words:
                 t = (cur + ' ' + wd).strip()
@@ -197,12 +219,19 @@ def make_sheet(v6, after, res, out_path=OUT_PNG):
                  f"{'razor edges':18s}{pct(T6['crisp']):>8s}{pct(TO['crisp']):>10s}",
                  f"{'straight (Hough)':18s}{pct(T6['straight']):>8s}{pct(TO['straight']):>10s}",
                  f"{'dead-flat area':18s}{pct(T6['flat31']):>8s}{pct(TO['flat31']):>10s}"]
+        if key == 'tree' and res.get('tree_alone'):
+            A6, AO = res['tree_alone']['v6'], res['tree_alone']['organic']
+            lines += ['', 'the tree ALONE (flat ground):',
+                      f"{'small shapes':18s}{pct(A6['small_area']):>8s}{pct(AO['small_area']):>10s}  34 %",
+                      f"{'shapes':18s}{A6['shapes']:>8d}{AO['shapes']:>10d}",
+                      f"{'crisp visible':18s}{pct(A6['crisp_visible']):>8s}{pct(AO['crisp_visible']):>10s}  <= 30",
+                      f"{'lost / broken':18s}{pct(A6['lost_mass']):>4s}{pct(A6['broken_mass']):>5s}{pct(AO['lost_mass']):>5s}{pct(AO['broken_mass']):>5s}"]
         mono = font(19, 'Medium')
         try:
             mono = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf', 18)
         except OSError:
             pass
-        num = text_block(lines, 470, mono, INK, 1.32)
+        num = text_block(lines, 540, mono, INK, 1.32)
         gap = 14
         big_w = a.shape[1] * 2 + gap
         # 1:1 pair, then the 400 px pair stacked, then the numbers
@@ -267,7 +296,13 @@ def make_sheet(v6, after, res, out_path=OUT_PNG):
 def main():
     v6 = load_rgb8(os.path.join(R, 'v6_cap.png'))
     after = load_rgb8(os.path.join(R, 'after_cap.png'))
+    if '--reuse' in sys.argv and os.path.exists(OUT_JSON):           # redraw the sheet from the last numbers
+        res = json.load(open(OUT_JSON))
+        print('sheet', make_sheet(v6, after, res), '->', OUT_PNG)
+        return
     res = measure(v6, after)
+    res['tree_alone'] = tree_alone()
+    print('tree alone', res['tree_alone'])
     bake = os.path.join(L.SCRATCH, 'pieces', 'bake_stats.json')
     if os.path.exists(bake):
         res['bake'] = json.load(open(bake))

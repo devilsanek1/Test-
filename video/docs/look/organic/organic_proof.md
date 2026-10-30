@@ -26,13 +26,13 @@ input to any picture here, and no living artist is a style target.
 ## 0. Bottom line
 
 - **The whole still moves toward the references on two of the three numbers** (`techniques.md` section 1's method, the
-  same code): long straight edges 26.5 -> 16.7 % (references 1-13 %), dead-flat area 35.3 -> 30.8 % (references
-  0-20 %); razor edges only 22.0 -> 18.5 % (references 0.3-4.6 %), because most of the frame's razor edges are in what
+  same code): long straight edges 26.5 -> 16.2 % (references 1-13 %), dead-flat area 35.3 -> 30.7 % (references
+  0-20 %); razor edges only 22.0 -> 18.6 % (references 0.3-4.6 %), because most of the frame's razor edges are in what
   was not touched (her, the props, the far city, the boats, the water's marks, the captions).
 - **Per piece, on the shapes lane's own crops** (section 2): the cloud's compass arcs 27 -> 1 % and its clear
   geometry 26 -> 0 px per 100 x 100; the facade's ruler lines 54 -> 23 % and straight edges 76 -> 49 %; the paving's
   ruler lines 68 -> 15 % (the target) and straight 80 -> 35 %, its dead-flat area 29 -> 11 %. The tree is simpler (small
-  shapes 38 -> 18 % of its area, 182 -> 58 shapes in its crop) but its edges are now cleaner than v6's confetti, not
+  shapes 38 -> 17 % of its area, 182 -> 56 shapes in its crop) but its edges are now cleaner than v6's confetti, not
   softer (section 2.2): it needs the owner's eye more than the others.
 - **The owner's balance is built in:** the cloud (the farthest painted piece) gets the most brush, lost edges and the
   softest marks; the facade (the subject's plane) keeps its frames, the door and W found and crisp (the door, the fascia
@@ -44,7 +44,7 @@ input to any picture here, and no living artist is a style target.
 - **The honest new problem it shows:** once the ground and the tree are painted, the props that stay flat vector (the
   planter, the crates, the café set, the bench, the pier, the fern pot) read pasted on it; the playbook's "one painted
   language for the whole frame" now points at them (design-time organic props, or fewer props: `composition.md` R6).
-- **Cost:** the bake is 26-28 s on one core for the four pieces (MyPaint 0.5-2.7 s each); at render, +30-70 ms per
+- **Cost:** the bake is ~26 s on one core for the four pieces (MyPaint 0.5-2.4 s each); at render, +30-70 ms per
   frame (+5-12 % over v6's 544-588 ms) on this shared machine, two images new (the facade, the paving), two replacing
   v6's own (the cloud, the tree); nothing runs per frame but the images (section 4).
 - **Deterministic:** two bakes give the same bytes for all four pieces (md5), and the engine's frame renders to the
@@ -99,15 +99,16 @@ past the outline all round (light on the lit side, dark on the shade side); a bo
 
 | The tree alone on a flat ground (no planter, no paving lines) | v6 | organic | painted refs |
 |---|---|---|---|
-| small shapes, share of the area | 38 % | **18 %** | 34 % (the posters' trees 76 %) |
-| shapes in the crop | 182 | **58** | few medium masses |
-| compass arcs | 2 % | 6 % | <= 5 % |
-| crisp visible edges | 31 % | 40 % | <= 30 % |
-| lost mass edges | 1 % | 2 % | >= 7 % |
-| broken mass edges | 53 % | 21 % | >= 35 % |
+| small shapes, share of the area | 38 % | **17 %** | 34 % (the posters' trees 76 %) |
+| medium shapes, share of the area | 11 % | 28 % | 44 % |
+| shapes in the crop | 182 | **56** | few medium masses |
+| compass arcs | 2 % | 9 % | <= 5 % |
+| crisp visible edges | 31 % | 31 % | <= 30 % |
+| lost mass edges | 1 % | 4 % | >= 7 % |
+| broken mass edges | 53 % | 18 % | >= 35 % |
 
-On the shapes lane's crop `ours_tree` (it holds the planter's straight rim and the paving's lines too) the numbers are
-in the json; they move the same way. How close: the crown is now a few medium masses in the painted language (the
+On the shapes lane's crop `ours_tree` (it holds the planter's straight rim and the paving's lines too): crisp 36 -> 37 %,
+broken 44 -> 22 %, lost 1 -> 2 %, clear geometry 62 -> 85 (the json); the same story. How close: the crown is now a few medium masses in the painted language (the
 shapes lane's main point), but v6's confetti measured as "broken" and this crown's leafy edge is cleaner than the painted
 references' soft trees; it also lost some of v6's crafted clump detail. The owner's balance asks a near thing to be
 sharper, so a cleaner edge than the cloud's is by intent; whether it now "fits the style" is the owner's call.
@@ -166,9 +167,9 @@ flat props now read pasted (section 0).
 
 | Whole still, `techniques.md` 1 | v6 | organic | references |
 |---|---|---|---|
-| razor edges | 22.0 % | 18.5 % | 0.3-4.6 % |
-| straight (Hough >= 60 px) | 26.5 % | 16.7 % | 1-13 % (the beach's horizon 27 %) |
-| dead-flat (31 px) | 35.3 % | 30.8 % | 0-20 % |
+| razor edges | 22.0 % | 18.6 % | 0.3-4.6 % |
+| straight (Hough >= 60 px) | 26.5 % | 16.2 % | 1-13 % (the beach's horizon 27 %) |
+| dead-flat (31 px) | 35.3 % | 30.7 % | 0-20 % |
 
 The v6 column reproduces `techniques.md`'s numbers exactly (the same code on the same still). The four pieces cover
 roughly half the frame; inside them the gaps close by half or more (section 2); the rest of the still (the far city,
@@ -182,10 +183,10 @@ next lane), the light (`light.md`), people.
 
 | | Measured (this machine: 4 shared cores, no GPU) |
 |---|---|
-| bake, one core | the cloud 2.3 s, the tree 1.7 s, the facade 6.7 s, the paving 16.4 s (its Python: region cleaning, the joints, the shadow inpaint); MyPaint's share 0.5-2.7 s per piece |
+| bake, one core | the cloud 2.1 s (201 marks), the tree 1.6 s (247), the facade 6.3 s (419), the paving 15.6 s (989; its Python: region cleaning, the joints, the shadow inpaint); MyPaint's share 0.5-2.4 s per piece |
 | render, per frame | v6 544 / 579 ms, organic 609 / 647 ms (two alternating runs of 40 frames, `render-frames.mjs`, GL=angle, concurrency 1): +65 ms; a third pair 553 / 588 against 574 / 634 (the machine's load 2-3): within the noise. So **+30-70 ms per frame, +5-12 %**. Split per piece (`bench_render.py --split`): every single piece within the ~40 ms noise |
 | why | two images are new (the facade 780 x 525 over the wing, the paving 1080 x 780 replacing the vector treads); the cloud and the tree replace v6's own images; nothing is filtered or re-baked per frame. `light.md` 7 measured a full-frame image at ~40-70 ms on this renderer; v6's own lib/light layers cost ~340 ms |
-| size | 0.52 MB of PNGs (the cloud 92 KB, the tree 47 KB, the facade 116 KB, the paving 262 KB) |
+| size | 0.52 MB of PNGs (the cloud 92 KB, the tree 51 KB, the facade 116 KB, the paving 262 KB) |
 | motion | not rendered (stills only); every piece rides its own plane's group (see 5) |
 
 ## 5. Determinism, and what motion would need (stills only here)
