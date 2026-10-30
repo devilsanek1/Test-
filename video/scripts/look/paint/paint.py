@@ -1809,6 +1809,16 @@ def style_far_city_recipe(piece, spec):
                     gl = np.clip(cielab_rgb_raw(cielab(body) + (cielab(gl) - cielab(body)) * cap / dd), 0, 1)
                 out = out * (1 - cov[..., None] * 0.9) + gl * cov[..., None] * 0.9
                 n_marks += 1
+        # CRAFT §f.2's cap (C11): the plane's values within `caps` dE (+3: 12, +4: 5): deviations from the plane's median
+        # compressed until the p2-p98 spread fits (the flat's own far colours may sit wider apart)
+        cap = float((piece.get('caps') or {}).get(str(plane), 12.0 if plane == 3 else 5.0))
+        inner0 = a > 0.9
+        lab_ = cielab(out)
+        med = np.median(lab_[inner0], 0)
+        sp0 = float(np.linalg.norm(np.percentile(lab_[inner0], 98, 0) - np.percentile(lab_[inner0], 2, 0)))
+        if sp0 > cap * 0.92:
+            lab_ = med + (lab_ - med) * (cap * 0.92 / sp0)
+            out = np.clip(cielab_rgb_raw(lab_), 0, 1)
         # the plane: blur 1.0 / 1.6 px, the tops lost by the sun (toward 2.5 / 3.5 by min(1, 1.15 veil))
         s0, s1 = (1.6, 3.5) if plane >= 4 else (1.0, 2.5)
         pre = out * a[..., None]

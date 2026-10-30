@@ -147,7 +147,9 @@
      "name": "fartower",
      "flat": "out/paint/v2s1/flat/fartower.png",
      "plane": 3,
-     "window_area": 30
+     "window_area": 30,
+     "scatter": 0.28,
+     "mist": 0.05
     }
    ]
   },

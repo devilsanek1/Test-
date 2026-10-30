@@ -78,6 +78,34 @@
    "plane": -1
   },
   {
+   "id": "v2s1/farroofs",
+   "src": "paint/v2s1_v6/farroofs.png",
+   "box": [
+    0,
+    742,
+    378,
+    208
+   ],
+   "style": "far_city_recipe",
+   "seed": 64,
+   "from": "v2s1/farroofs",
+   "plane": 4
+  },
+  {
+   "id": "v2s1/fartower",
+   "src": "paint/v2s1_v6/fartower.png",
+   "box": [
+    252,
+    584,
+    100,
+    366
+   ],
+   "style": "far_city_recipe",
+   "seed": 64,
+   "from": "v2s1/fartower",
+   "plane": 3
+  },
+  {
    "id": "v2s1/water",
    "src": "paint/v2s1_v6/water.png",
    "box": [
