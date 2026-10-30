@@ -14,7 +14,7 @@ key here"; "our look is evolving - we are finding out style i don't think we can
    words; the "-> what we did" half of a line is our log, with no owner rank). The newest owner note wins over an
    older one.
 2. **Then, in order:** this page > `CRAFT.md` (numbers, code, checks) > `docs/PIPELINE_V2.md` (gates) >
-   `docs/G3_ANIMATIC.md`, `docs/G5_BLOCKING.md` (gate specs) > the look docs in `docs/look/` > the film's STYLE.md (its
+   `docs/G3_ANIMATIC.md`, `docs/G5_BLOCKING.md`, `docs/v4/visual/METHOD.md` (gate specs) > the look docs in `docs/look/` > the film's STYLE.md (its
    values only: it never restates or overrides a rule) > the v1-era docs (API and measurements, never style). Between
    two look docs, each wins on its own topic (`LAYOUT.md` where things sit in the frame: the zones, each shot type's
    framing, the cover; `STORYBOARD_STYLE.md` the board's drawing, `CINEMATIC_GUIDE.md` shot recipes and camera moves,
@@ -153,7 +153,8 @@ the owner approves it; the look test shows it.
 A DESIGNED sketch: G0 topic (then the fact lock) -> G0.5 core line (and the draft of its through-line card) -> G1
 story-first script (the card completed from the script's joins, approved with it) -> G2 voice (the owner's voice through
 the API), with W1, a text world bible (sets, one light rig per set, the proposed palette and a colour-script line per
-beat, tiers per shot) -> **G3** the animated sketchbook at 60 fps, deciding story, joins and carriers, camera, thread,
+beat, tiers per shot) -> **G2.5** the visual script (the visual story in words, shot by shot on the take's clock,
+style-neutral; three concepts judged internally, the owner reads one; `docs/v4/visual/METHOD.md`) -> **G3** the animated sketchbook at 60 fps, deciding story, joins and carriers, camera, thread,
 tiers (grey), rig (shapes) and mover budget (`G3_ANIMATIC.md`) -> **G4**, after the G3 lock: a 6-8 s look clip of the
 home set in the final style (it opens with frame 0 being drawn), approved before the G5 lanes -> **G5** fills the G3
 tier masks in colour: one lane per sequence, one owner for every transition, nothing new (`G5_BLOCKING.md`) -> G6

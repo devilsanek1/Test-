@@ -24,6 +24,11 @@ The earlier v4 session (https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt)
 (owner: "brainstorm a story and like a visual script with what happens on the screen and camera movements"; style still
 evolving), workflow `v4-visual-script` -> `docs/v4/visual/` (research, method, concepts, `VISUAL_SCRIPT.md`); then G3.**
 
+**G2.5 VISUAL SCRIPT SENT (2026-10-30 ~00:45 UTC), waiting on the owner:** `docs/v4/visual/VISUAL_SCRIPT.md` (v2, after
+the cold read and the critic: 12 shots on the take's clock, concept B "the designed view" with grafts from A and C; the
+judges split, story C, craft B; B written on the combined score: `METHOD.md` step 2); 2 owner questions (the un-draw
+after the hook; the computer's size). The new step is in PIPELINE_V2 (G2.5), G3_ANIMATIC §5, DIRECTION, CLAUDE.md.
+
 Earlier: **G1 LOCKED (owner, 18:40 UTC: "i think this is a much better yes"). G2 TAKE SENT (2026-10-29 ~19:20 UTC), waiting on the
 owner:** `assets/v4/voice/take.wav` (Lady1, eleven_v4 at stability 0.35, the livelier-tag paste, whole read, shaped by
 `scripts/voice/shape_take.py`, take 4: the owner's own website read of the take-3 paste (ours sounded "like in some

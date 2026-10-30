@@ -15,7 +15,7 @@ The video project lives in `video/` (Remotion). Before starting or continuing an
 COHERENT and CLEAR, with no size budget (owner, 2026-10-27): integrate every note (rewrite or retire what it contradicts), and review it per its Maintenance section.
 
 Top rules (details in the playbook):
-- From the sketch animatic (G3) on, show one playable video per gate, never only stills; before that, text/audio only (no MP4s). Lock the story (sketch animatic) before building; polish last.
+- From the sketch animatic (G3) on, show one playable video per gate, never only stills; before that, text/audio only (no MP4s). Lock the story (sketch animatic) before building; polish last. Between the voice lock and G3, the film's visual story is written as a VISUAL SCRIPT (G2.5: shot by shot on the take's word times, the camera and every join, style-neutral; 3 concepts judged internally, the owner reads one; `video/docs/v4/visual/METHOD.md`), and G3 plays it.
 - The G3 animatic is an ANIMATED SKETCHBOOK (stage spec `video/docs/G3_ANIMATIC.md`, drawing spec
   `video/docs/look/STORYBOARD_STYLE.md`): the film's rough pass at 60 fps — story, joins, framing, every camera move,
   transition and key action PLAYED with real shape and timing, density and life as grey placeholders (loose never means

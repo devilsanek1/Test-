@@ -200,8 +200,11 @@ Everything that agent knew is in this repo. This file is the map; the details li
   `claude/compassionate-hopper-5iqguj`, not yet merged into `video-production`.
 
 - **2026-10-29 ~10:05 UTC: video 4 is produced by session https://claude.ai/code/session_01VwsUCnkJXFuq3YwEYFUg7o** (owner: "lets
-  work on the video 4 - pick up where its been left off"), branch `claude/kind-pascal-lvgsza`; G1 running. Live state:
-  `video/docs/v4/README.md`. Video 5 still waits at G1 (`video/docs/v5/script/WRITER_BRIEF.md`).
+  work on the video 4 - pick up where its been left off"), branch `claude/kind-pascal-lvgsza`. 2026-10-30: G1 and G2 locked
+  (the voice: the owner's own ElevenLabs read, pauses shaped); the new G2.5 VISUAL SCRIPT (owner: "brainstorm a story and
+  like a visual script with what happens on the screen and camera movements"; `video/docs/v4/visual/`, method
+  `METHOD.md`) sent to the owner; next G3. New tools: `scripts/voice/{textnorm,shape_take,measure_take,take_page,
+  check_clarity}.py`. Live state: `video/docs/v4/README.md`. Video 5 still waits at G1 (`video/docs/v5/script/WRITER_BRIEF.md`).
 
 ### Earlier: video 5 as the heat story
 - **Video 5 is produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt since 2026-10-29 ~07:55 UTC**

@@ -82,7 +82,9 @@ Every agent writes its file from its first step, reports in at most 3 lines and 
    "you" kept, any departure from the card named (F10).
 2. **Judge** (a story judge and a craft judge; `judge_story.md`, `judge_craft.md`): all three scored on one list, the
    checks below plus the owner's taste (a banger opening, one flowing story, a scale moment that feels great); one
-   pick, its grafts from the others named; where they split, the story verdict leads.
+   pick, its grafts from the others named; where they split, the better combined score leads, unless a judge names a structural, rule or fact risk in a pick
+   (v4: story picked C, craft picked B; C's phone dive in the hook read close to an ad and implied "your chatbot runs
+   here", so B, the better total, was written, with C's chat-to-heat link grafted on).
 3. **Write** (one writer; `VISUAL_SCRIPT.md`): the pick in the four parts; the mechanical checks; then a walk of the
    blocks against the timing sheet at the take's pace (each picture on its word; each pause has a job, or is a breath
    held on purpose).

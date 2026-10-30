@@ -158,16 +158,17 @@ only as a declared exception for time passing (0.2-0.4 s, up to 1-2 s), named in
 
 ## 5. Build order and time budget (first full animatic ~3 h, ASSUMING §7 tier-1 tooling is built: not yet on 2026-10-27; rounds 30 min)
 
-With script + voice locked (word timings = the clock), the through-line card approved with the script and the W1 world
-bible written (`PIPELINE_V2.md`); per-step budgets sum to the ~3 h (was 2; the hour goes to tiers, carriers and the
+With script + voice locked (word timings = the clock), the through-line card approved with the script, the W1 world
+bible written and the visual script locked (G2.5, `PIPELINE_V2.md`; method `docs/v4/visual/METHOD.md`); per-step budgets sum to the ~3 h (was 2; the hour goes to tiers, carriers and the
 light marks):
-1. **Story/beat pass** (~10 min, orchestrator): starts from the through-line card (the thread and its home spot, the
-   home place, the one "you", the mascot rule, a carrier per join). One sentence per panel, cut words chosen in the VO's
-   breaths, metaphor per scene locked in text BEFORE drawing (a dozen script drafts is normal, a dozen re-boards is
-   not). Vary cut rhythm: fast around the conflict, one breathing shot after the payoff; three near-equal durations in a
+1. **From the visual script** (~10 min, orchestrator): one panel per locked block of the visual script (G2.5), with
+   its cut words, key actions, moves, joins, carriers and each scene's picture already locked in text; a change
+   reopens the visual script (starred, dated). Before G2.5 existed this was the story/beat pass from the through-line
+   card: one sentence per panel, cut words in the VO's breaths, metaphor per scene locked in text BEFORE drawing (a
+   dozen script drafts is normal, a dozen re-boards is not). Vary cut rhythm: fast around the conflict, one breathing shot after the payoff; three near-equal durations in a
    row is a pacing smell; shots average >= 3.5 s (`CRAFT.md` §a timing).
-2. **Camera plan** (~30 min; `docs/vN/camera_plan_g3.md`, one row per panel): shot type, framing, cozy/scale, move with
-   its five values, transition device and its carrier, the tier map (what is A, B and C), the set's rig (key side,
+2. **Camera plan** (~30 min; `docs/vN/camera_plan_g3.md`, one row per visual-script block, adding only the numbers:
+   offsets, scale %, px): shot type, framing, cozy/scale, move with its five values, transition device and its carrier, the tier map (what is A, B and C), the set's rig (key side,
    pools: from the world bible), `life:` list, promise line. This is the contract draft.
 3. **Thumbnails** (~30 min): 3 variants per beat at 270x480 on one contact sheet, picked by checklist (two-pass:
    scribble for energy, volume pass only on survivors — discard at pass 1), plus one drawn midpoint frame per join.
