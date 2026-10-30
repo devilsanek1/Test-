@@ -21,6 +21,25 @@ voice and the Taste signals' "Lines", checked against Audience and goal and Hook
 the sixth pass, 2026-10-27: a cold read as if starting video 4, every conflict it found fixed at its source) · no size
 budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance at the end).
 
+## THE THREE RULES ABOVE ALL (owner, 2026-10-30)
+1. **Every frame is worth pausing on.** Judged at a glance beside video 1 (`docs/look/ref_v1_governments_frame.png`)
+   and the owner's references, before any numeric check.
+2. **Readable imaginative ideas.** Each beat gets an imaginative picture a viewer reads in a second (video 1's
+   government buildings with browser windows, its power-button sun): never a dry diagram, never an abstraction that
+   needs explaining.
+3. **Frames planned and created WHOLE, from the get-go.** Each frame is designed as one complete picture (its idea, its
+   world, its light, its people, its words) before it is built or animated. Never a frame built thin and filled later
+   "for the sake of density": density comes from the imagination and the world, never from a filling pass.
+
+**The process is loose and imaginative around these three:** pictures before documents, ideas before rules. Every
+other rule in this playbook serves them as guidance from the owner's past notes, never as a checklist that designs the
+frame; checks catch mistakes (captions, safe zones, timing), they never stand in for the picture. — ("how do we adjust
+our overal process, i want to make it more loose, more imaginative. i like the main important rule is every frame is
+worth pausing on yes + readable imaginative ideas + frames planned and created whole. We shouldn't be in a situation
+where we have our video and then we just fill up space for the sake of density this is wrong we need to be imaginative
+and plan the whole frame from the get go", 2026-10-30, after video 1's frame: "so many details and so coherent and so
+imaginative".)
+
 ## Audience and goal
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24).
 - **Growth matters: maximise engagement with subtle, defensible hooks**, e.g. "the language everyone loves".
@@ -543,6 +562,12 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   layout at low strength), always once per layer per shot, never per frame (per-frame AI flickers). — ("I like the idea
   of using AI tactically like for certain elements or layers that move to achieve parallax or post processing kind of to
   add more style right?", 2026-10-30.)
+- **INK LINES, A BIT ROUGH BUT CLEAN (to try, 2026-10-30):** a bit of hand-drawn messiness in the lines, combined with
+  the painting, the styles and the texture, coherent and premium; video 1's line was "too rough, not looking clean or
+  premium". A look iteration (stills first); until the owner picks a treatment, the "no outlines" rule below stands. —
+  ("so i like a bit of rougher ink style but our video 1 was too rough not looking clean or premium. If you can come up
+  with a clean way to incorporate a bit of messiness in the lines combined with all the painting and styles and texture
+  we added with it looking coherent - sure lets try", 2026-10-30.)
 - **Texture and lines: VERY subtle.** No outlines: as on the city posters, shapes are separated by light and shade (a
   lit and a shade face on every volume, the subject's the deepest) and by value, never by a line drawn round them
   (the A vs B picture's B). Thin lines only on small things that are lines (window bars, railings, rigging): dark,
@@ -633,7 +658,9 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   make it feel alive, which is wrong"). Through-line and transition grammar: `docs/look/CRAFT.md` §a. Sketch-first
   stays, as the designed sketch above (owner yes, 2026-10-27). — ("too busy, too incoherent; no story, no clean
   transitions, just a bunch of shots put together", v3 G5b, 2026-10-27).
-- **G3 is the most important gate: an ANIMATED SKETCHBOOK of the final film, optimised for SIGNAL, not quality.** With
+- **(Changed 2026-10-30 by THE THREE RULES: the frames are designed whole FIRST, as key frames; the animatic then plays
+  those key frames with the voice, the camera moves and the joins. The grey "scribble-mass placeholders" below are
+  retired: never a frame built thin to be filled later.)** **G3 is the most important gate: an ANIMATED SKETCHBOOK of the final film, optimised for SIGNAL, not quality.** With
   script and voice locked, the animatic gives the director the closest signal to the final story in the least drawing
   and review time: story, transitions, animations and camera moves already very close to final — PLAYED, not only
   marked (their shape and timing real, never their polish); detail deliberately loose scribble-mass placeholders (the
@@ -969,6 +996,8 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   `context/uploads/inline/2026-10-28_v3_insights_*`. — 2026-10-28.
 
 ## Retired rules
+- ~~G3's detail as grey scribble-mass placeholders, density and life filled in at G5 ("loose never means empty")~~ ->
+  THE THREE RULES: frames designed whole first, as key frames; never a fill pass for density (2026-10-30).
 - ~~Captions in Patrick Hand with a peach box on the key word, one fixed band, one size~~ → the type guide's hand
   (Gaegu) and its lit stress, set in the open space by the subject (`docs/look/TYPE_GUIDE.md`, 2026-10-30). The brush
   for landing words, tried in the same iteration, read as "a blood message on the wall" and is out.

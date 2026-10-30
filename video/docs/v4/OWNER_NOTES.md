@@ -358,3 +358,15 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   imaginative idea per beat, density planned from the world bible (running), key frames painted whole before the
   build; asked the owner whether fine ink line work may come back for detail. -> rule: playbook, Visual style (v1's
   frame named as the bar for detail, coherence and imagination).
+- 2026-10-30 ~22:55 UTC: "how do we adjust our overal process, i want to make it more loose, more imaginative. i like the
+  main important rule is every frame is worth pausing on yes + readable imaginative ideas + frames planned and created
+  whole. We shouldn't be in a situation where we have our video and then we just fill up space for the sake of density
+  this is wrong we need to be imaginative and plan the whole frame from the get go" -> the four G3 board lanes (sparse
+  frames from the camera plan) and the density revision (a fill brief for the assembly) STOPPED; their files kept as
+  reference for the camera and the timing. The process changed (playbook THE THREE RULES; PIPELINE_V2's new loop):
+  ideas, then key frames designed whole, then the animatic plays the key frames. Video 4 restarts from an ideas round.
+  Then, on the line question: "so i like a bit of rougher ink style but our video 1 was too rough not looking clean or
+  premium. If you can come up with a clean way to incorporate a bit of messiness in the lines combined with all the
+  painting and styles and texture we added with it looking coherent - sure lets try" -> an ink-line look iteration
+  (stills) beside the ideas round. -> rules: playbook THE THREE RULES ABOVE ALL; Visual style (ink lines, a bit rough
+  but clean, to try).
