@@ -246,3 +246,12 @@ evening light (water and paving tinted by the dusk); paint a little more visible
 - **Water:** the ladder deepened per plane (`ladder_dL`: mid -12, near -18, deep -24): the horizon step is now 23 L* (sky 89 -> the canal's far water 66) and 34 to the near canal (the recipe's 15; the refs 30-50); marks 8.4 % (light 3.7, dark 4.7), calm 79 %, tooth 1.71 (`mark_metric`, all in range).
 - **Her:** `src/lib/figure` in profile walking west at her place in the doorway, with the new optional `FigurePose.tune` (slim 0.88; the hem at -335, above the knee, so the legs act; a 300-unit scarf end tapering 13 -> 3.5); the low sun as the key (a warm rim on her front) and the lit door as a local light on her back (a light-teal edge against the door's dark frame). The door, the sign, Pip and the captions are untouched; the tree's silhouette edge measures ~1.6 px.
 - **Weak spots:** the paving is one big flat terracotta field at phone size (the book's next recipe, §4.5); the pale disc barely reads at 400 px (CRAFT §g.2, by rule); the cumulus is smaller than v5's and keeps a few level-block rectangles at 1:1; the mid bank is one slab; the far flats were already hazed by the film, so +4 lands near its air; her back edge is lit teal-on-teal, warm only in hue; the water's left third mirrors a little busy.
+
+## The owner's verdict on paint_still_v6 and the difference list (2026-10-30)
+"All you hit all your points correctly / I see what you mean by point 4 - it is weird looking tree we have on the
+forefront like it doesn’t fit the style there, while AI generated cloud certainly fits / Our point 8 I’d also true - our
+scene is very busy".
+-> The foreground tree (a lone painted object among flat vector pieces) reads pasted in: one painted language for the
+whole frame, near pieces sharper but in the SAME language, never one painted object in a flat world. The AI cloud's
+finish is the bar for clouds. Scene 1 is too busy: fewer props, a few value masses, one focal point (ORGANIC.md and the
+composition study, in progress, feed v7).

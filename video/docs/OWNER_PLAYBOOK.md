@@ -213,7 +213,7 @@ Maintenance at the end).
   very clearly while references are obviously not like that. They are more regular more naturally blend Do deep
   research into techniques libraries etc", 2026-10-30.)
 - **SCENE COMPOSITION: big quiet areas and one place to look** (owner agreed, 2026-10-30: "8 agreed this is an important
-  point about scene composition"): few elements of equal weight, values grouped into a few big masses, one focal point
+  point about scene composition"; on still v6: "our scene is very busy"): few elements of equal weight, values grouped into a few big masses, one focal point
   with the most contrast and the story light, negative space; a busy frame of many mid-tone props is the failure.
 - **ATTENTION HIERARCHY: one main arc, one focus at a time.** The story's subject gets the contrast, the deepest
   light-and-shade step, saturation and the clear motion; supporting life (a bird, walkers, snow, steam) stays subtle
@@ -307,7 +307,10 @@ Maintenance at the end).
   paler, cooler, softer and simpler, flattening into thin streaks toward the horizon; never an even streaky texture over everything, which reads as a filter and as lower drawing quality. The subject (tier A) and the faces and people stay crisp and clean,
   so the paint is the world's, not the story's; and by DEPTH, a balance: near objects sharper, far objects more like
   brushwork and paint, as in the references ("I think we need to find a balance I think even in the references the close
-  objects are more sharp while further objects are more like brushes and painting", 2026-10-30); the film still works with the paint off. In the engine the painted
+  objects are more sharp while further objects are more like brushes and painting", 2026-10-30); but always ONE
+  painted language for the whole frame: a lone painted object among flat vector pieces reads pasted in ("it is weird
+  looking tree we have on the forefront like it doesn’t fit the style there, while AI generated cloud certainly
+  fits", on still v6, 2026-10-30); the film still works with the paint off. In the engine the painted
   pieces are layers made by our own deterministic paint pass (seeded, locked to their layer so nothing swims in the
   float; a cloud may churn slowly), never a filter smeared over the whole frame. The dose is
   judged on a look test first. — ("Another piece of feedback is I really like the “painted” pieces like the sky and the clouds the references or some foreground buildings and trees / greenery are uniquely painted / Is it possible to modify our engine to match the story? Style"; "Yeah the painted message look above I said about modifying our
