@@ -398,7 +398,11 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   research if what makes the faces beautiful and cute and appealing like general face features and make it / Like the
   woman sitting on the blue cliff reference obviously has appealing features like cuteness nose hair female body
   composition and our man refreshed similarly has manly features", 2026-10-30; "fade profile" read as the face's
-  profile.)
+  profile.) **Hair, face, light and values are designed together, as one character,** and judged OVERALL beside the
+  references, never one feature at a time (`docs/look/people_design/EVALUATION.md`: the faceless flat figure family
+  reads cheap and dated next to today's stylised 2D characters: a face, built in 3D, lit, the face framed by value).
+  — ("Like this is one exsmple just compare it overall and evaluate what makes the left to be modern and natural and
+  appealing and right us absolute garbage / I think we do need to combine it with the faces research", 2026-10-30.)
 - **People: small and simple in the frame, contemporary and refined in design** (small full figures, often seen from
   behind or in rear 3/4; adult proportions of about 7.8 heads in direction C, below, which replaces reference 1's
   round-headed crowd as the drawing model; near heads <= ~140 px), never big character models: they act with their pose

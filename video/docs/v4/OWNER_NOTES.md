@@ -292,3 +292,10 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   and the gap (her volume, the hem's outward flips, two placed flyaways, the gloss and rim light, a delicate appealing
   face; ours small, flat, plain, a blank face); written into the overhaul's briefs (the assembler reads it), the final
   stills put ref 03 beside our bob again and show an "open eyes, looking away" head beside LASH for the owner to choose.
+- 2026-10-30 ~18:25 UTC: "Like this is one exsmple just compare it overall and evaluate what makes the left to be modern
+  and natural and appealing and right us absolute garbage / I think we do need to combine it with the faces research"
+  -> `docs/look/people_design/EVALUATION.md` (the root cause: our faceless flat "corporate" figure family vs today's
+  stylised 2D; eight measured differences: a face, 3D construction, light and rim, the value plan (ref hair L* 5 /
+  face 46 / sky 33 vs ours 19 / 83 / 90), the cut, edges, proportion and gesture, colour) and the eight changes; the
+  overhaul already combines hair with the faces work, and its assembler applies the evaluation. -> rule: playbook,
+  Visual style (hair, face, light and values designed together, judged overall).
