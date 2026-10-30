@@ -39,9 +39,9 @@ grades:** **STUDY** (a controlled experiment or a corpus measurement), **CONSENS
 more independent practitioner or platform sources), **ONE SOURCE**, **MEASURED** (ours: the owner's reels, here; Arcane,
 in `../research/`), **est.** (our arithmetic: §5.6). **How the sources were read:** web search summaries; a direct fetch
 of `ncbi.nlm.nih.gov` failed (the host is outside this session's network), so papers hosted there were read through
-their search summaries, and any figure seen only in a summary is marked "(summary)". Paths are relative to this file
-(`video/docs/look/composition/`). Scratch (the measuring scripts, their JSON, the contact strips):
-`/tmp/comp2/motion/`, not committed.
+their search summaries, and any figure seen only in a summary is marked "(summary)". Doc paths are relative to this file
+(`video/docs/look/composition/`); code paths (`lib/...`, `v3/...`) are from `video/src/`, `scripts/...` from `video/`.
+Scratch (the measuring scripts, their JSON, the contact strips): `/tmp/comp2/motion/`, not committed.
 
 ## 0. Bottom line
 
@@ -49,7 +49,7 @@ their search summaries, and any figure seen only in a summary is marked "(summar
    CUT to a black line card (0.6-1.3 s), then a hard cut or a short fade (0.17-0.5 s) into the shot, whose overlay of
    lines leaves within 0.1-0.6 s; each idea lasts 2.0-3.2 s. Inside the shots, 17 of 23 are locked or nearly
    (`reels.md` E9); the life is the SUBJECT travelling the device's line at ~5-14 %W/s (55-150 px/s in our frame), or
-   the WORLD passing behind a still frame at ~15-40 %W/s, or the camera riding the lines while things pass along them
+   the WORLD passing behind a still frame at ~8-40 %W/s, or the camera riding the lines while things pass along them
    (the escalator, 23-25 %W/s). The one continuous move is reel 03's slow handheld pass over a sheet while a pen draws
    each armature in ~1 s. **So our default in-shot motion is the owner's E9 (the camera holds, the subject travels
    the line) and his device T (the line first, then the world) is our draw-on.**
@@ -90,16 +90,17 @@ their search summaries, and any figure seen only in a summary is marked "(summar
    speed check, `floatCam`, the parallax tables, the S5 rig, the World sky's time-of-day wipe, Pop / Rise / Move /
    Walk, the draw-on and the un-build. **New:** a clean-pen near-mass wiper (the built-in figure and passer wipers are
    strangers' backs in an outlined style, both retired), a light-pull helper, a staged morph on `@remotion/paths`'
-   `interpolatePaths`, an E card flip as a Film type (v1's `Card.tsx` has the flip maths), the reveal ease `unveil` in
-   the lib camera, a join checker (carry speed and direction, the midpoint on the word, the anchor's spot), and sound
-   offsets per join.
-10. **The ranking** (§8): CORE: the hold with the subject travelling (I1 + I8), the parallax float (I2), the
-    continuous camera (J1), the push-through (J2), the match cut on shape and on light (J3, J4), the build (I10).
-    USE: the story push (I3), the one big pull or rise (I4, I6), the tilt (I5), the light pull (I11), the light change
-    (J11), the carry (J7), the wipe by a near mass (J8), the un-build loop (J12), the J- and L-cut (J15). SPARINGLY:
-    the follow (I7), the world passing (I9), the cut on action (J5), the eyeline (J6), the morph (J10), the card flip
-    (J13), the plain cut (J14). NEVER: handheld shake, a zoom in a hold, roll, the dolly zoom, rack focus and every
-    blur, the whip pan with blur (J9's smear version only as a declared exception), the dissolve as a join.
+   `interpolatePath` (installed, unused), an E card flip as a Film type (v1's `Card.tsx` has the flip maths), the
+   reveal ease `unveil` in the lib camera (it lives on the board only), join checks (the carry's speed and direction,
+   the anchor's spot, the aperture), and sound bridges per join.
+10. **The ranking** (§8; evidence, fit, story value and readiness, 0-3 each, with a dose per film): **12/12** the
+    subject travelling a held frame (I8), the build (I10), the one big pull (I4, once); **11** the hold (I1), the
+    float (I2), the story push (I3), the continuous camera (J1), the shape match (J3); **10** the pivot (I12), the
+    push-through (J2), the un-build loop and draw-on (J12); **9** the crane (I6), the world passing (I9), the light
+    match (J4), the eyeline (J6); **8** the tilt (I5), the follow (I7), the light pull (I11), the cut on action (J5),
+    the morph (J10), the light change (J11), the plain cut (J14, at most 2), the sound bridge (J15); **7** the carry
+    (J7); **6** the wipe (J8); **5** the card flip (J13); **2** the whip (J9). Out: handheld shake, a zoom in a hold,
+    roll, the dolly zoom, rack focus and every blur, the dissolve as a join, the crash zoom.
 11. **Clashes** (§10): the figure and passer wipers, the World and ShotCam push defaults (a per-shot zoom from reference
     2's era), two speed limits (15 and 18 px/f), K2's and K9's numbers that Arcane's measurements already changed, no
     doc for the sound side of a join, two numbers for the B match's tolerance.
@@ -121,7 +122,7 @@ each join by eye. Compression noise puts a floor of ~3.5-4.5 %W/s under every fl
 | **01** London (4 ideas + title) | 0.60-0.67 s, still: the red lines and the yellow label appear whole, never drawn on | the shot FADES IN under the lines in 0.17-0.37 s (10-22 f) | the red lines leave in ~0.6 s, the label in ~0.4 s, both fading while the shot plays | 1.93-2.20 s (title 4.23 s) | a hard cut to the next black card | a hard cut back to the title at 16.0 s |
 | **02** China (5 ideas) | 0.93-1.30 s, still | a HARD CUT (one frame) to the shot, with the hairline and its label laid over it | gone within ~0.15-0.3 s | 1.27-1.93 s | hard cut | (the recording ends) |
 | **04a** (title + 7 ideas) | 0.67-0.73 s, still | a hard cut, with the overlay | fades out in ~0.4-0.5 s (by eye on the strip) | 1.37-2.10 s (title 2.90 s) | hard cut | (runs into 04b) |
-| **04b** (title + 3 ideas) | 0.67-0.70 s | a fade-in of 0.5 s (30 f) | (as 01) | 1.80-2.87 s | hard cut | (cut off by the recording) |
+| **04b** (title + 3 ideas) | 0.67-0.70 s | a fade-in of 0.5 s (30 f) | (not measured) | 1.80-2.87 s | hard cut | (cut off by the recording) |
 | **05** Italy (hook + 4 ideas) | 0.70-0.77 s | a hard cut, with the overlay | ~0.4 s | 2.10-2.93 s | hard cut | a hard cut back to the hook at 12.3 s |
 | **03** the sheet (18 panels) | none | one continuous handheld shot over the drawn sheet: the phone drifts 1.5-7.7 %W/s and zooms +-0.3-6 %/s, never still | a pen draws each red armature live, ~1 s a panel | ~1 s a panel | no cut | — |
 
@@ -135,13 +136,13 @@ drawn live: an animated sketchbook.
 
 | what moves | where (reel, time) | camera | speed (%W/s; px/s in our frame) | share of the picture moving |
 |---|---|---|---|---|
-| **the subject travels the device's line** (E9) | 02 1.0 s: a walker crosses the moon gate (C1); 04a 3.6 s: a runner down the pier toward the tower (A7); 02 8.7 s: an egret crosses the mirrored lake (A7); 04a 14.8 s: a man leans from the fifth window (D7); 04a 0 s: a walker toward the villa, into the spiral's eye (A4) | locked | walker ~5-7 %W/s (55-75 px/s); runner 6-11 (65-120) and, into depth, 305 -> 92 px tall in 1 s (`reels.md` E9); egret 10-14 (105-150); the man in the window 5-11 | 0.5-2.2 % (one small mover) |
+| **the subject travels the device's line** (E9) | 02 1.0 s: a walker crosses the moon gate (C1); 04a 3.6 s: a runner down the pier toward the tower (A7); 02 8.7 s: an egret crosses the mirrored lake (A7); 04a 14.8 s: a man leans from the fifth window (D7); 04a 0 s: a walker toward the villa, into the spiral's eye (A4) | locked | walker ~5-7 %W/s (55-75 px/s); runner 6-11 (65-120) and, into depth, 305 -> 92 px tall in 1 s (`reels.md` E9); egret 10-14 (105-150); the man in the window 5-11 | 0.1-2.2 % (one small mover) |
 | **the world passes a still frame** (E3) | 01 0 s: the platform streaking past two carriage windows (the title); 01 10.9 s: two walkers before a train passing behind (C1); 04b 19.5 s: the station streaking past the train-door windows (the title) | locked | median 8-15 %W/s, the fastest tenth 23-39 %W/s (90-420 px/s), motion-blurred | 8-30 % (a band, not one mover) |
 | **the camera rides the lines** (B5) | 01 5.0 s: the escalator, its handrails held fixed while the ad panels slide along them | moving with the lines | the panels 23-25 %W/s (250-270 px/s) along a ~30-40 degree diagonal | 57 % (everything but the rails) |
 | **a slow push** | 02 6.1 s: the photographer on the boat (A1); 04a 14.8 s: the window row (D7) | push 2.6 and 1.4 %/s (`reels.md` E9) | the frame edge at 1.4-2.6 %/s | — |
 | **a slow pan** | 05 3.9 s: the hiker under the peaks (A4) | pan 1.7 %W/s (`reels.md` E9) | 18 px/s | — |
 | **a burst** | 04b 23.1 s: fireworks at the spiral's eye (A4) | locked, a small drift | 6-9 %W/s | 6 % |
-| **nothing** | 01 14.1 s: the street to its vanishing point (B2); 02 11.3 s: the path to the tree (B1); 04a 10.4 s: the boy in the forest (D1); 05 9.8 s: the terrace over the sea (C2) | locked | under the noise floor | ~0 % |
+| **nothing** (4 of the 10) | 01 14.1 s: the street to its vanishing point (B2); 02 11.3 s: the path to the tree (B1); 04a 10.4 s: the boy in the forest (D1); 05 9.8 s: the terrace over the sea (C2) | locked | under the noise floor | ~0 % |
 
 **What it says.**
 - **The camera holds and something travels** in 11 of the 25 shots measured: one small subject along the device's line
@@ -169,7 +170,7 @@ drawn live: an animated sketchbook.
 | hold the camera; one subject travels the device's line (E9) | **take it as the default** (I1 + I8) | the commonest case (11 of 25 shots); one mover is where everyone looks (STUDY [MO7]) |
 | a still frame with the world passing (E3, the titles) | take it, sharp and slow (I9) | the still thing among movers wins the eye (`cinema.md` [S6]) |
 | ride the lines: the frame holds, the things on the lines pass (B5) | take it as a follow along parallels (I7) | the composition's lines never move, so the eye is never lost |
-| one slow push or pan (1.4-2.6 %/s) | a push only as a story move, >= 3 % in <= 2 s (I3) | 1.4 % per second reads frozen on our flat drawings (`../COZY_AND_SCALE.md` 3b.5) |
+| one slow push or pan (1.4-2.6 %/s, 2-3.5 % over a shot) | a push only as a story move, >= 3 % in <= 2 s (I3): the reels' faster push meets it, the slower one does not | under that floor a push reads as nothing happening: v3's 1.4 % over a whole shot moved the frame's edge ~2 px/s and read frozen (`../COZY_AND_SCALE.md` 3b.5) |
 | the line first, then the world (T: a still card 0.6-1.3 s, the shot under it) | **take it as our draw-on** (I10, J12): the subject's line draws on with a moving pen tip, the colour floods in under it | reel 03's live pen shows the line being made; watching the drawing hand helps (STUDY [MO25]) |
 | a hard cut through black between ideas | **don't**: our joins carry (J1-J13); F only on a "But" | the reels are lists; ours is one story (DIRECTION rule 1) |
 | the overlay and the shot fade (0.17-0.6 s) | **don't**: the line un-draws (`exit.tsx`) or the world wipes in | no opacity fades (DIRECTION rule 8; `../COMPOSITION_SHOTS.md` X3) |
@@ -295,8 +296,8 @@ designed frames (start, middle, end: `cinema.md` C12); the caption band is a fix
 - *Pairs:* C2, D1, D4, E5, E6, B9, B10.
 - *Timing:* translation only, 8-15 px/s path speed at the near plane (0.13-0.25 px/f), peak <= 25 px/s, straight legs
   turning every 0.6-1.5 s and turning back, net offset within +-12 px of home, >= 40 px of overscan, sub-pixel
-  transforms; planes by depth (`PARALLAX_K`: near 1, subject's plane 0.6, mid 0.35, far 0.15, farthest 0.05; or the 1/z
-  table `PARALLAX_Z`), the sky and the band 0; home again on every join and every map-critical frame
+  transforms; planes by depth (`PARALLAX_K` by plane -2 ... +4: 1, 0.85, 0.6 (the subject's plane), 0.45, 0.35, 0.15,
+  0.05; or the 1/z table `PARALLAX_Z`), the sky and the band 0; home again on every join and every map-critical frame
   (`../COZY_AND_SCALE.md` 3b.5). Linear legs, eased turns (the velocity blends over ~0.34 s). In a mirrored frame the
   legs run vertical only (est., A7).
 - *Tolerated:* it sits under the capture threshold on purpose: steady motion does not capture attention, an onset does
@@ -320,7 +321,8 @@ designed frames (start, middle, end: `cinema.md` C12); the caption band is a fix
   accelerates and peaks late (65-80 % of its length) and may be cut while still moving (P4b; Arcane's big pushes are all
   back-loaded, median 1.5 s). 2 s = 120 f.
 - *Tolerated:* one push on its word, yes; "punch-ins on every key word" is a current editing tic we do not take
-  (`modern.md` §7); a push slower than ~1.5 %/s reads as nothing happening (3b.5).
+  (`modern.md` §7); a push under the floor (~1.5 % a second) reads as nothing happening: v3's 1.4 % over a whole
+  shot read frozen (3b.5).
 - *Engine:* EXISTS: `ShotCam push={{to, dur, at, anchor, ease}}`, `CineCamera` `push` / `anchor` keys, World `push`
   (its default is a clash: §10.2).
 - *Evidence:* STUDY (looming captures; receding does not [MO8]); MEASURED (Arcane rates, the reels' 1.4-2.6 %/s);
@@ -518,8 +520,9 @@ Brooks; Woods, read through summaries [MO13]).
   colour held ~0.1 s (6 f) when the opening's light IS the next shot's sky. The opening is 15-30 % of the frame at the
   start, on the axis, its aperture the lightest area below the sky, brightening a step as it nears (Arcane T7: the
   opening blooms a step per cut); the next focal where the aperture's centre was (within 150 px). **The zoom outruns ~3 %
-  a frame after 0.19 s (at 1.12x)** and reaches 1.22x a frame at the cut (est., §5.6): by then the screen must be the
-  aperture's flat light field and its rim, never detail. Arcane's measured version is two accelerating cuts of +7-9 %
+  a frame after 0.19 s (at 1.12x)** and reaches 1.22x a frame at the cut (est., §5.6), past S5's "<= ~3 %/f at the
+  subject (flat masses may exceed it)" (`../CINEMATIC_GUIDE.md`): by then the screen must be the aperture's flat light
+  field and its rim, never detail. Arcane's measured version is two accelerating cuts of +7-9 %
   in 0.8 s each, then a landing shot already moving (P8, `../research/cine_motion.md` §4: it changes K9's single push).
 - *Tolerated:* one of short form's staple joins (the "zoom transition"); ours is one push into a real opening, never a
   zoom into a random point.
@@ -537,7 +540,7 @@ Brooks; Woods, read through summaries [MO13]).
 - *Pairs:* A1, A2, A6, A7, B1, B9, B13, C1, D3, D5, D6, E7.
 - *Timing:* a hard cut (0 f) at the anchor's fastest movement or on the word ([MO31]); the anchor within +-8 % of its
   spot and +-20 % of its size (`../CRAFT.md` §a B), at most 150 px and 1.5x (`modern.md` M20: the two tolerances are
-  §10.10); ONE change across the cut (temperature, scale or world: Arcane T1). The match zoom: a flat shape zooms to
+  §10.9); ONE change across the cut (temperature, scale or world: Arcane T1). The match zoom: a flat shape zooms to
   fill the frame, holds, and shrinks into its counterpart (`MOTION.matchZoom`: 8 f in, 6 f hold, 12 f out at 60 fps).
 - *Tolerated:* very well, sound helping (the cut was noticed far more when the soundtrack was removed: STUDY [MO4]).
 - *Engine:* EXISTS: `matchcut` (both scenes draw the anchor at the join's numbers); NEW: a matched-anchor check at the
@@ -599,11 +602,11 @@ Brooks; Woods, read through summaries [MO13]).
   the L's tall side (B10), the foreground (C2, E5); and as D6's seam, its edge revealing the "after".
 - *Pairs:* B10, C1, C2, D6, E5.
 - *Timing:* Film's `foreground-wipe` default 0.8 s, the edge on an in-out sine from off one side to off the other (a
-  peak of ~50 px/f for a 230 px column, ~80 px/f for a 680 px mass: est.); Arcane's eclipse wipe: a mass covering >= 70 %
-  of the frame on the cut frame, on screen <= 0.5 s (T5); S5's chimney pot: its own window of >= 8 / 10 / 12 f at up to
-  ~90 px/f; it moves the way the camera travels; the captions stay in screen space over it (their tone follows the
-  wiper's regions). Change blindness explains why it works: a change hidden behind a disruption goes unseen
-  (STUDY [MO23]).
+  peak of ~50 px/f for the column, half-width 230 px, and ~80 px/f for the passer, half-width 680 px: est.); Arcane's
+  eclipse wipe: a mass covering >= 70 % of the frame on the cut frame, on screen <= 0.5 s (T5); S5's chimney pot: its
+  own window of >= 8 / 10 / 12 f at up to ~90 px/f; it moves the way the camera travels; the captions stay in screen
+  space over it (their tone follows the wiper's regions). Change blindness explains why it works: a change hidden
+  behind a disruption goes unseen (STUDY [MO23]).
 - *Tolerated:* the object wipe is a short-form staple (CONSENSUS, `modern.md` M22); once or twice a film.
 - *Engine:* EXISTS: `foreground-wipe` with `element: 'scene'` (the outgoing scene's own `Wiper`), `captionRegions`,
   `half`; **the built-in `figure` and `passer` wipers are strangers' backs at the lens drawn with ink outlines, both
@@ -820,8 +823,8 @@ The arcs principle holds for everything that travels: the thread object moves on
   leg (0.19 s in, at 1.12x). The frame's edge moves ~210 px/f at the cut.
 - **The continuous camera** (default 1.4 s, the incoming zoom 1.12x): the log-zoom rate at the cut is 0.24 a second;
   the frame's top edge moves ~3.9 px/f there: a gentle push, well inside the budget.
-- **The wipes:** an in-out sine edge crossing 1080 + 2 x half + 60 px in 0.8 s peaks at pi/2 x distance / 0.8 s: 49
-  px/f for the 180 px figure, 52 for the column, 82 for the 680 px passer.
+- **The wipes:** an in-out sine edge crossing 1080 + 2 x half + 60 px in 0.8 s peaks at pi/2 x distance / 0.8 s: ~49
+  px/f for a mass of half-width ~180 px, 52 for the column (half 230), 82 for the passer (half 680).
 - **The 7-second rule:** 1080 px / 7 s = 154 px/s = 6.4 px/f at 24 fps; the same per-frame step at 60 fps = a width in
   2.8 s (386 px/s).
 - **Smooth pursuit:** 30 degrees/s x 74 px/degree = 2,220 px/s = 37 px/f on the owner's feed.
@@ -865,6 +868,280 @@ lost ~80 % of viewers by 3 s (the playbook's Performance log).
   movers at once split the look.
 - **Flashes:** never more than 3 a second, at any size (`../COZY_AND_SCALE.md` §5).
 - **Shaky or big sideways moves** in 9:16: "Avoid shaky hand held, quick pans or big movements" (ONE SOURCE [MO26]).
-- **Slow, invisible moves:** a push under ~1.5 % a second reads frozen (3b.5); a 0.3 s draw-on was invisible on a phone
-  (the owner, 2026-10-28).
+- **Slow, invisible moves:** a push under the floor (>= 3 % in <= 2 s) reads frozen (3b.5); a 0.3 s draw-on was
+  invisible on a phone (the owner, 2026-10-28).
 
+## 7. The engine map: what exists, what is new
+
+Paths from `video/src/`. EXISTS = usable now (each film still draws its own pieces: `lib/cine` drawings are references,
+its camera and maths are fine: `../../G5_BLOCKING.md` §2). PARTLY = the maths exist, the film-ready form does not. NEW =
+to build, with a size (S <= 2 h, M ~ half a day, L more), for the craft tooling lane (`../../PIPELINE_V2.md`).
+
+| move or join | engine form | status | to build |
+|---|---|---|---|
+| I1 hold | `CineCamera` / `ShotCam` with no keys; the life from `lib/idle.ts` (`events`, `windowLit`, `crossing`, `loopPos`, `shuttle`, `puffs`, `twinkle`) | EXISTS | — |
+| I2 parallax float | `floatCam()` (`lib/idle.ts`); `parallaxOffset`, `parallaxK`, `PARALLAX_K`, the 1/z `PARALLAX_Z` (`lib/depth.ts`) | EXISTS | — |
+| I3 story push | `ShotCam push={{to, dur, at, anchor, ease, inkComp}}`; `CineCamera` `push` / `anchor` keys; World `push` | EXISTS | defaults off (§10.2) |
+| I4 pull, the big move | `lib/pullback.tsx` (`PullPlane`, `PullBox`, `PullLayer`, `S5_EASE`, `planeSpeed`); `CineCamera` push to 0 | EXISTS | — |
+| I5 tilt and pan | `CineCamera` `tilt` / `pan` keys (a pan-head shift), `CAM.reveal` | EXISTS; `unveil` PARTLY (in `v3/SketchReel.tsx` only) | `CAM.unveil` = trapezoid(0.1, 0.6) in `lib/cine/camera.tsx` and `MOTION.camera` (S) |
+| I6 crane | `CineCamera` `y` keys (CineDemo B) | EXISTS | — |
+| I7 follow | `CineCamera` `x` / `y` / `anchor`; `Walk`, `Move`; `camSpeed`, `camSpeedAt` | EXISTS | — |
+| I8 subject travels | `Walk` (bob, sway), `Move` (with `arc`), `crossing`, `loopPos`, `stepped`; a path's points by `getPointAtLength` (`@remotion/paths`) | EXISTS | — |
+| I9 world passes | `crossing`, `loopPos`, `shuttle`, `lib/particles.tsx` | EXISTS | — |
+| I10 build | `Ink` (draw-on, with the opt-in pen `tip`), `Fill`, `Pop`, `Rise`, `Sink`, `Move`, `Appear` (`lib/motion.tsx`), `MOTION` (`lib/spec.ts`), `evolvePath` [MO18]; the un-build `lib/exit.tsx` | EXISTS | — |
+| I11 light pull | `windowLit`; World sky keys `{t, tod, wipe, dur}`; `lib/light2` maps | PARTLY | `lightPull(t, from, to)`: two story lights cross-ramped with one held step, the bloom at each source; a check that the brightest area lands on the new focal (M) |
+| I12 pivot | `anchor` / `anchorTo` keys (`lib/cine/camera.tsx`); `PullPlane`'s pivot | EXISTS | — |
+| J1 continuous camera | Film `camera-continuous`; the `matchcut` seam (`seam: true`) with its probe; a sequence's camera on film time (`lib/sequence.tsx`) | EXISTS | — |
+| J2 push-through | Film `push-through` (`from`, `to`, `zoom`, `bridge`, `hold`, `inkComp`) | EXISTS; K9's `Portal` and room holes PARTLY | a check that the aperture fills the frame before the zoom passes ~3 % a frame (S); `Portal` (M) |
+| J3, J4 match cuts | Film `matchcut` (both scenes draw the anchor at the join's numbers); the board's eye-jump and colour-shift metrics (`scripts/qa/retro_tools/story/carry.py`) | EXISTS | an anchor check at the boundary frames (spot, size, hue) (S) |
+| J5 cut on action | `cut` / `matchcut`, the mover keyed on film time on both sides | EXISTS | — |
+| J6 eyeline | poses and the camera | EXISTS | — |
+| J7 carry | a carry across a `cut` | EXISTS | a carry check: direction and speed across the cut (S) |
+| J8 wipe by a near mass | Film `foreground-wipe` (`element: 'scene'` with the outgoing scene's `Wiper`, `captionRegions`, `half`); the built-in `figure`, `passer`, `column` wipers | PARTLY (the built-ins are in a retired look: §10.1) | a clean-pen, outline-free near-mass wiper per film, tier C (M) |
+| J9 whip | — | NEW (not planned) | only if declared: a 2-3 f smear drawing at the peak (M) |
+| J10 morph | `interpolatePath`, `interpolatePaths`, `warpPath` (`@remotion/paths`, installed, unused in `lib`) [MO18] | PARTLY | a staged morph: position, then shape and colour, then the world; point counts matched (M) |
+| J11 light change | World sky `tod` keys with a moving edge; `windowLit`; `lib/light2` | PARTLY | with I11's helper (S once I11 exists) |
+| J12 un-build, draw-on | Film `transitionOut: {type: 'unbuild'}`; `lib/exit.tsx` (`UnBuild`, `ExitShrink`, `EraseDown`); the loop underlay at t < 0 | EXISTS | — |
+| J13 card flip | `flipOut`, `flipIn`, `swipeOut`, `swipeIn` (`lib/Card.tsx`, the v1 card) | PARTLY | an E type in Film for a paper object (M) |
+| J14 plain cut | Film `cut`; `gate_check.py` counts F | EXISTS | — |
+| J15 sound | Film `sfx` `[{src, t, gain}]`; `scripts/qa/av_lag.py` (sync of the voice in a render); `scripts/qa/beatsync.py` (cuts against a beat grid) | PARTLY | per-join sound bridges (lead and trail) in scenes.json; a check that every effect sits 0 to +2 f after its visual event (S) |
+| the checks | `scripts/camspeed.py` (on-screen speed and its frame-to-frame change), `scripts/qa/deadframes.py` (dead runs > 0.4 s, events), `scripts/qa/gate_check.py` (cuts per transition type, seams, carriers, F count) | EXISTS | a lateral pan limit in `camspeed.py` (~6 px/f, a WARN, est.) (S); promote `carry.py` from the retro tools into the gate (S) |
+
+Not installed: `@remotion/transitions` (Remotion's own fade, slide, wipe, flip and iris presentations); our Film carries
+its own grammar, which is the one our rules need (no opacity fades), so nothing is missing for want of it.
+
+## 8. The ranking (this lane's view)
+
+Each move and join scored 0-3 on four things: **E**vidence (3 = STUDY or our measurement agrees with it; 2 = MEASURED
+or CONSENSUS; 1 = one source); **F**it with the owner's references and our rules (3 = the reels do it or the owner asked
+for it, and no rule limits it); **S**tory value in a voice-led explainer (3 = it carries meaning: arrival, cause,
+"this matters", "this is like that"); **R**eadiness in the engine (3 = exists, 2 = exists with a small check to build, 1
+= partly, 0 = new). The **dose** is separate: how often a film may use it. The merge of the three lanes ranks the whole
+library with its own judges; this table is our input to it.
+
+| rank | move or join | E | F | S | R | total | dose per film |
+|---|---|---|---|---|---|---|---|
+| 1 | I8 the subject travels a held frame (E9) | 3 | 3 | 3 | 3 | 12 | the default inside a shot |
+| 1 | I10 the build (draw-on, pop, tick; T) | 3 | 3 | 3 | 3 | 12 | frame 0, then wherever the drawing is the beat |
+| 1 | I4 the pull-back, the one big move (S5) | 3 | 3 | 3 | 3 | 12 | once (S1 or S5) |
+| 4 | I1 the hold | 3 | 3 | 2 | 3 | 11 | most shots, with a mover |
+| 4 | I2 the parallax float | 3 | 3 | 2 | 3 | 11 | every hold that does not lock |
+| 4 | I3 the story push | 3 | 2 | 3 | 3 | 11 | one per beat at most, on its word |
+| 4 | J1 the continuous camera (C) | 3 | 2 | 3 | 3 | 11 | most joins inside one place |
+| 4 | J3 the match cut on shape (B) | 3 | 3 | 3 | 2 | 11 | the thread's joins |
+| 9 | I12 the pivot | 2 | 3 | 2 | 3 | 10 | every camera move |
+| 9 | J2 the push-through (A) | 2 | 3 | 3 | 2 | 10 | every opening into another place |
+| 9 | J12 the un-build loop and the draw-on | 2 | 3 | 2 | 3 | 10 | the open and the loop |
+| 12 | I6 the crane, the rise-over | 2 | 2 | 2 | 3 | 9 | the one big move when it is S1 |
+| 12 | I9 the world passes (E3) | 2 | 3 | 1 | 3 | 9 | as texture, in one band |
+| 12 | J4 the match cut on light and colour | 2 | 3 | 2 | 2 | 9 | with J3 |
+| 12 | J6 the eyeline | 2 | 2 | 2 | 3 | 9 | where a "you" looks |
+| 16 | I5 the reveal tilt | 2 | 2 | 2 | 2 | 8 | 1-2 (the scale moments) |
+| 16 | I7 the follow | 1 | 2 | 2 | 3 | 8 | when the thread travels; never two in a row |
+| 16 | I11 the light pull | 2 | 3 | 2 | 1 | 8 | on a two-subject frame or a turn |
+| 16 | J5 the cut on action | 3 | 1 | 1 | 3 | 8 | rare (it counts as F unless the thread crosses) |
+| 16 | J10 the morph | 3 | 1 | 3 | 1 | 8 | 0-2, never two in a row |
+| 16 | J11 the light change | 2 | 3 | 2 | 1 | 8 | the time-passing joins; the key's one change |
+| 16 | J14 the plain cut (F) | 2 | 1 | 2 | 3 | 8 | at most 2, on a "But" |
+| 16 | J15 the sound bridge (J- and L-cut) | 3 | 2 | 2 | 1 | 8 | one per join, where the place has a sound |
+| 24 | J7 the carry (D) | 1 | 2 | 2 | 2 | 7 | when a traveller leaves |
+| 25 | J8 the wipe by a near mass (D) | 3 | 1 | 1 | 1 | 6 | 1-2, for a jump that must not show |
+| 26 | J13 the card flip (E) | 1 | 1 | 2 | 1 | 5 | paper only |
+| 27 | J9 the whip | 1 | 0 | 1 | 0 | 2 | never, unless declared |
+| — | handheld, a zoom in a hold, roll, the dolly zoom, rack focus and blur, the dissolve as a join, the crash zoom | — | — | — | — | out | never (§3, §4.2) |
+
+**Reading it.** The top is the owner's own motion (E9, T, the S5 he picked) and the moves our rules already ask for (the
+hold, the float, the story push, the continuous camera, the shape match). The middle is good grammar with a dose. At the
+bottom, the wipe and the card flip lose on fit and readiness, not on evidence: they work, but our near frame is "a
+small, subtle hint" (the playbook) and our wipers need redrawing.
+
+## 9. The rules, distilled (each a proposal, with the doc it would go into)
+
+| # | rule (numbers at 1080 x 1920, 60 fps) | why | target |
+|---|---|---|---|
+| MR1 | **One story motion at a time.** Either the camera moves and the subject is the still pivot (within +-40 px), or the camera holds and the subject moves; never both freely. The world's life stays slow, even, low in contrast and takes turns (<= 3-4 noticeable movers, none entering in the 0.4 s round a join) | onset capture; one mover takes every eye [MO7, MO8]; `cinema.md` [S6] | `../CINEMATIC_GUIDE.md` rules; `../CRAFT.md` §b |
+| MR2 | **A move is three designed frames** (start, middle, end), each passing the composition rules as a still; the caption band a fixed mat at every frame; anything crossing the band during a move is flat or in the gutters | `cinema.md` C12 | `../CINEMATIC_GUIDE.md` rules (with C12) |
+| MR3 | **Pick the move and the join from the composition's device** (§2): an opening -> J2; one shape or light at one spot -> J3 / J4; lines into depth -> I8 or I3; a tall thing -> I5; two levels -> I6 or I5; a near layer -> I2 and J8; negative space -> I1 or I2, never a push; a pattern's break -> I10 or I11 | the owner's 41 ideas each carry their motion (§2) | `../COMPOSITION_SHOTS.md` §3 (each recipe's camera and joins) and §4 (the pass) |
+| MR4 | **The default motion is the owner's E9:** the camera holds while the subject travels the device's line at its scale's speed (~0.8 x its height in px per second), its onset on its word, crossing an OPENING (~1-2 s) or entering or leaving, never the whole frame | MEASURED (§1.2); STUDY [MO8] | `../CINEMATIC_GUIDE.md` (a held-shot type); `../COMPOSITION_SHOTS.md` rule 12 |
+| MR5 | **The float** as in force (8-15 px/s at the near plane, by depth, home by every join); in a mirrored frame its legs run vertical only | `../COZY_AND_SCALE.md` 3b.5; A7 | `../COZY_AND_SCALE.md` 3b.5 (the mirror line new) |
+| MR6 | **The story push:** >= 3 % per 2 s, <= 2x per panel, scaled about the target's centre, at most one per beat, on its word; a lean-in lands on a settle, a drawn-in push peaks at 65-80 % of its length | STUDY (looming) [MO8]; MEASURED (Arcane P4a, P4b) | `../CINEMATIC_GUIDE.md` rule 3; `../COZY_AND_SCALE.md` K5 (its slow end raised) |
+| MR7 | **A pull carries its own event** (a light burst, the landmark rising on its word, birds crossing toward it), or it is not used | receding motion does not capture [MO8] | `../CINEMATIC_GUIDE.md` S5, rules |
+| MR8 | **Reveal tilts:** 600-900 px in 3.5-4.5 s, front-loaded (`unveil` = trapezoid(0.1, 0.6)) or linear, a pan-head shift, no zoom-out with it | MEASURED (Arcane) | `../COZY_AND_SCALE.md` K2; `lib/cine/camera.tsx` `CAM` |
+| MR9 | **Sideways is expensive in 9:16:** a full-frame sideways pan of a detailed frame <= ~6 px/f (est., to test); prefer the tilt, the push and the pull; a sideways mover at about half the px per frame of a vertical one | [MO1]; [MO26]; `modern.md` M18 | `../../PIPELINE_V2.md` "Frame rate" (a lateral line); `scripts/camspeed.py` |
+| MR10 | **Easing:** arrivals decelerate over 15-27 f, exits accelerate over 9-15 f, camera moves ease in AND out, long moves cruise (trapezoid), a join's two legs meet at one velocity; never a linear camera start or stop, never a camera bounce, never staggered starts across many movers | STUDY [MO14, MO15]; CONSENSUS [MO30] | `../CINEMATIC_GUIDE.md` rules; `lib/spec.ts` `MOTION` |
+| MR11 | **The light pull is our focus pull:** the new focal takes the hardest step (>= 65 L*) while the old drops >= 10-15 L*; a lamp 0.1-0.3 s, the sky ~1 s; one light change at a time, >= 0.5 s from any other onset, with something new at the new focal; never > 3 flashes a second | STUDY [MO9]; `attention.md` [AT36]; no blur (DIRECTION rule 5) | `../CRAFT.md` §d; `../CINEMATIC_GUIDE.md` |
+| MR12 | **Choose the join by what changes** (§4.3's table) | §4 | `../CRAFT.md` §a |
+| MR13 | **Join numbers:** the next focal within 150 px of the last (370 px at most) except on F; J2's opening 15-30 % of the frame, shown >= 0.5 s, a flat light field before the zoom passes ~3 % a frame; J3's anchor within 150 px and its size within 1.5x (1.2x for the thread itself), J4's light within 190 px; ONE change across a match | `modern.md` M19-M21; Arcane T1, T7; §5.6 | `../CRAFT.md` §a; `../../G3_ANIMATIC.md` §4 |
+| MR14 | **The cut on action:** the motion runs >= 0.3 s after the cut in the same screen direction; it counts as an F unless the thread crosses the cut | STUDY [MO4] | `../../G3_ANIMATIC.md` §4 |
+| MR15 | **The carry:** the same speed (within ~10 %) and direction on both sides, entering within 0-2 f; a vertical carry suits 9:16 | CONSENSUS; `cinema.md` §6.3 | `../../G3_ANIMATIC.md` §4; a carry check |
+| MR16 | **The wipe:** a tier-C near mass already in the outgoing shot, our own organic shape in the clean pen, never a stranger's back; >= 70 % of the stage covered on the cut frame, <= 0.5 s on screen, its own 8-12 f window; once or twice a film | STUDY [MO23]; MEASURED (Arcane T5, S5); DIRECTION rules 3-4 | `../../G5_BLOCKING.md` §2; `lib/Film.tsx` wipers |
+| MR17 | **The morph:** staged (position, then shape and colour, then the world), 0.4-0.8 s, the object the brightest and hottest thing throughout; never two in a row | STUDY [MO16, MO17] | `../../G3_ANIMATIC.md` §4 |
+| MR18 | **Time passes by light, in place** (J11: a lamp, the sky's moving edge, a cloud); the dissolve stays a declared exception | STUDY [MO11]; DIRECTION rules 5, 8 | `../../G3_ANIMATIC.md` §4; `../CRAFT.md` §a |
+| MR19 | **No whip;** if one is ever declared: the same direction and speed both sides, ~0.33 s, one smear drawing held 2-3 f, no blur | [MO21, MO22]; DIRECTION rule 5 | `../CINEMATIC_GUIDE.md` "Not for us" |
+| MR20 | **Sound across a join:** the picture leads its word by 0.1-0.3 s; a place's ambience may lead its picture by 0.2-0.5 s (J-cut) and trail 0.3-1.0 s under the next, ducked (L-cut), one bridge per join; an effect on its event's frame or 1-2 f after, never > 2 f before | ITU [MO19]; STUDY [MO4]; [MO20] | the sound-sync distill (`../sound_sync/`); `../../G5_BLOCKING.md` (`sfx`) |
+| MR21 | **Joins sit at the breakpoint:** the end of a sentence or an action, where viewers blink; the midpoint on the next sentence's first word (in force), never mid-action except a cut on action | STUDY [MO10]; [MO6] | `../CRAFT.md` §a (the evidence line) |
+| MR22 | **Life's speed by its scale:** a walker ~0.8 x its height in px per second; huge means slow; the near mover the fastest | §5.4; Scale cues 10 | `../LIFE_AND_DENSITY.md`; `../CINEMATIC_GUIDE.md` Scale cues |
+| MR23 | **The build:** one pen tip leading (`Ink tip`) at ~12-25 px/f; the opening's draw-on >= 1 s with its peak after 0.4 s; pieces of one build every 0.1-0.2 s (in seconds, not frames); separate reads >= 0.5 s apart | STUDY ([MO25]; `attention.md` [AT40], [AT61]); MEASURED (reel 03) | `../CINEMATIC_GUIDE.md` "The opening" |
+| MR24 | **Check it:** `camspeed.py` (with a lateral WARN), `deadframes.py`, `gate_check.py`, the carry and eye-jump tool promoted from the retro tools, and the new join checks (the anchor, the carry, the aperture, the sound offsets) | §7 | `../../PIPELINE_V2.md` studio toolkit; the G3 lint (`../../G3_ANIMATIC.md` §7) |
+
+Numbers marked est. are ours: the 1x look test at phone size decides.
+
+## 10. Clashes and gaps (flagged for the orchestrator; not edited here)
+
+1. **The built-in wipers.** `lib/FigureWiper.tsx` ("a hooded passer-by right in front of the lens, seen from behind",
+   with an ink outline and fills "misregistered 5 px from the ink") is Film's default `foreground-wipe` element, and
+   `lib/cine/wipers.tsx`'s `passer` is "a giant back-view passer-by right at the lens": strangers' backs in the
+   foreground, which DIRECTION rule 3 and `../CRAFT.md` §a.3 retired, drawn with outlines, which DIRECTION rule 4
+   retired; the `column` wiper draws its mouldings "in doubled ink". **Proposal (MR16):** the D wipe uses each film's
+   own near mass (`element: 'scene'`), clean pen and outline-free; `figure` stops being the default; `../../G5_BLOCKING.md`
+   §2's D row says so.
+2. **The push defaults.** World `push` (`true` = 1.00 -> 1.06 over 2 s from t 0, "the per-shot gentle zoom reference 2
+   gives every shot": `lib/World.tsx`) and `ShotCam push: true` (`MOTION.camera.push`) encode a push on every shot, which
+   DIRECTION's Retired list names ("A zoom, push or 'breathe' in any hold (ref 2's per-shot zoom ...)"). 6 % in 2 s is
+   visible, so it is legal as a story move. **Proposal:** the defaults off; a push only where the camera plan names it.
+3. **Two speed limits.** `../../PIPELINE_V2.md` "Frame rate": ~15 px/f, "the one speed budget"; `MOTION.camera
+   .peakPxPerFrame` = 18 (`lib/spec.ts`), `scripts/camspeed.py`'s default `--limit` 18 and the `ShotCam` comment "(18)".
+   **Proposal:** one number in code (15), plus MR9's lateral figure as a WARN to test.
+4. **K2's tilt** (`../COZY_AND_SCALE.md` K2: 600-900 px in 2.5-3.2 s, "+ 3-5 % zoom-out") against Arcane's measured
+   3.5-4.5 s, front-loaded (`../research/cine_motion.md` §4) and the compound-move ban (`../COMPOSITION_SHOTS.md` §5
+   row 10). **Proposal:** MR8.
+5. **K9's push-through** (`../COZY_AND_SCALE.md` K9: one push 0 -> 0.85 in 1.2-2 s) against Arcane's measured chain of
+   two +7-9 % cuts in 0.8 s each, then a moving landing (P8; `../research/cine_motion.md` §4 says "changed"), not yet
+   folded in. **Proposal:** J2 names both forms; Film's `push-through` is the single-push one.
+6. **`unveil` lives only on the board.** `v3/SketchReel.tsx` has it (and v2's P8 copies it); `lib/cine/camera.tsx` `CAM`
+   and `MOTION.camera` do not, so a G3 move cannot be rebuilt by name at G5. **Proposal:** add it (§7).
+7. **The time-passing join.** `../../G3_ANIMATIC.md` §4 allows a declared dissolve (0.2-0.4 s, up to 1-2 s) for time
+   passing; J11 does the same job with light in place and no fade. **Proposal:** J11 is the default; the dissolve stays
+   the declared exception.
+8. **The sound side of a join** has no doc: DIRECTION rules 1 and 9 give the midpoint on the word and the opening's "own
+   sound"; nothing says how a place's sound crosses a join or how close an effect sits to its event. **Proposal:** MR20,
+   for the sound-sync lane to confirm with its measurements.
+9. **The B match's tolerance:** `../CRAFT.md` §a "the same screen spot (±8 %) and size (±20 %)" (which 8 %: of the width,
+   86 px, or of the height, 154 px?) against `modern.md` M20's 150 px and 1.5x and Arcane T1's 190 px and 1.5x.
+   **Proposal (MR13):** in px: 150 for a shape, 190 for a light; the thread's own size within 1.2x (it is the same object),
+   two matched objects within 1.5x.
+10. **"A new element every 3-6 frames"** (`../CINEMATIC_GUIDE.md` "The opening") gives no frame rate (`modern.md` §8.3
+    flagged it): MR23 states it in seconds (every 0.1-0.2 s, inside one build).
+11. **Not a clash, a gap:** no doc gives a sideways speed of its own (MR9), a speed for life by its scale (MR22), or a
+    light pull (MR11).
+
+## 11. Sources (methods and findings only; no picture copied)
+
+Read through search summaries (a direct fetch of `ncbi.nlm.nih.gov` failed from this session); "(summary)" marks a
+figure seen only in a summary. Sources the sibling lanes already cite are referred to by their tags: `modern.md` [N1]-
+[N43], `attention.md` [AT1]-[AT62], `cinema.md` [S1]-[S20], `vertical.md` [V1]-[V15].
+
+**Perception, attention and film editing**
+- **[MO1]** RED Digital Cinema, "Camera panning speed" (the 7-second rule: "pan no faster than a full image width every
+  seven seconds, otherwise judder will become too detrimental", for 24 fps with a 180-degree shutter, a soft boundary),
+  [red.com](https://www.red.com/red-101/camera-panning-speed). ONE SOURCE (a camera maker's guide; forum practice agrees
+  that verticals judder first).
+- **[MO2]** Smooth pursuit: accurate pursuit to ~30 degrees/s, catch-up saccades beyond, up to ~90 degrees/s for large
+  ramps, [Wikipedia, Smooth pursuit](https://en.wikipedia.org/wiki/Smooth_pursuit); with `attention.md` [AT61].
+- **[MO3]** T. J. Smith and J. M. Henderson (2008), "Edit Blindness: the relationship between attention and global
+  change blindness in dynamic scenes", *Journal of Eye Movement Research* 2(2):6,
+  [doi:10.16910/jemr.2.2.6](https://doi.org/10.16910/jemr.2.2.6) (match-action cuts missed 32 %, cuts between scenes 9 %,
+  as reported in `modern.md` [N6]).
+- **[MO4]** T. J. Smith and J. Martin-Portugues Santacreu (2017), "Match-action: the role of motion and audio in creating
+  global change blindness in film", *Media Psychology*; abstract at [CORE](https://core.ac.uk/display/42135575) (removing
+  the motion after the cut shortened detection and cut the misses; the motion before it mattered less; the soundtrack
+  helped hide the cuts) (summary).
+- **[MO5]** T. J. Smith (2012), "The Attentional Theory of Cinematic Continuity", *Projections* 6(1), 1-27,
+  [UAL](https://ualresearchonline.arts.ac.uk/id/eprint/21187/).
+- **[MO6]** J. P. Magliano and J. M. Zacks (2011), "The impact of continuity editing in narrative film on event
+  segmentation", *Cognitive Science* 35(8), 1489-1517,
+  [WashU](https://profiles.wustl.edu/en/publications/the-impact-of-continuity-editing-in-narrative-film-on-event-segme/)
+  (discontinuities of action drive event segmentation; of space and time, little) (summary).
+- **[MO7]** P. K. Mital, T. J. Smith, R. L. Hill and J. M. Henderson (2011), "Clustering of gaze during dynamic scene
+  viewing is predicted by motion", *Cognitive Computation* 3, 5-24 (as `attention.md` [AT13]).
+- **[MO8]** R. A. Abrams and S. E. Christ (2003), "Motion onset captures attention", *Psychological Science* 14,
+  427-432; S. L. Franconeri and D. J. Simons (2003), "Moving and looming stimuli capture attention", *Perception &
+  Psychophysics* 65, 999-1010 (as `attention.md` [AT10], [AT11]).
+- **[MO9]** S. Yantis and A. P. Hillstrom (1994), "Stimulus-driven attentional capture: evidence from equiluminant
+  visual objects", *J. Exp. Psychol.: Human Perception and Performance* 20(1), 95-107 (a new object captures attention;
+  a luminance change alone does far less), as reviewed in J. M. Wolfe et al., *Sensation & Perception*,
+  [essay 7.3](https://learninglink.oup.com/public/files/cdn/wolfe4e/essay07.03.html) (summary).
+- **[MO10]** T. Nakano, Y. Yamamoto, K. Kitajo, T. Takahashi and S. Kitazawa (2009), "Synchronization of spontaneous
+  eyeblinks while viewing video stories", *Proc. R. Soc. B* 276, doi:10.1098/rspb.2009.0828 (blinks synchronise at
+  implicit breakpoints: the conclusion of an action, the main character's absence, a long shot; not with a background
+  video or a story read aloud), [PMC2817301](https://pmc.ncbi.nlm.nih.gov/articles/PMC2817301) (summary).
+- **[MO11]** K. L. Brunick, J. E. Cutting and J. E. DeLong (2011), "The changing poetics of the dissolve in Hollywood
+  film", *Empirical Studies of the Arts* 29, 149-169 (150 films, 1935-2005: dissolves declined, then came back in
+  clusters); Cutting's later note that since the 1970s almost 99 % of transitions are cuts; K. L. Armstrong and J. E.
+  Cutting, "Viewer comprehension and temporal shifts in Hollywood film", *Elephant & Castle*,
+  [unibg.it](https://elephantandcastle.unibg.it/index.php/eac/article/view/180) (the dissolve as a "time machine")
+  (summary).
+- **[MO12]** J. E. Cutting et al. (2011), "Quicker, faster, darker" (as `modern.md` [N1]).
+- **[MO13]** J. Hochberg and V. Brooks (1978), "Film cutting and visual momentum", in J. W. Senders, D. F. Fisher and R.
+  A. Monty (eds.), *Eye Movements and the Higher Psychological Functions*, 293-313; D. D. Woods (1984), visual
+  momentum in display design ("analogous to a good cut from one scene or view to another in film editing"), as
+  summarised at [ferd.ca](https://ferd.ca/notes/paper-visual-momentum.html) (summary).
+
+**Animation, transitions and easing**
+- **[MO14]** P. Dragicevic, A. Bezerianos, W. Javed, N. Elmqvist and J.-D. Fekete (2011), "Temporal distortion for
+  animated transitions", CHI 2011, 2009-2018, doi:10.1145/1978942.1979233,
+  [HAL](https://hal.archives-ouvertes.fr/inria-00556177v2) (slow-in/slow-out outperformed constant speed and the other
+  pacings for tracking objects through a transition; the differences depended on the transition) (summary).
+- **[MO15]** F. Chevalier, P. Dragicevic and S. Franconeri (2014), "The not-so-staggering effect of staggered animated
+  transitions on visual tracking", *IEEE TVCG* 20(12), 2241-2250, doi:10.1109/TVCG.2014.2346424,
+  [Northwestern PDF](https://visualcognition.psych.northwestern.edu/publications/ChevalierDragicevicFranconeri2014.pdf)
+  (staggering had a negligible or negative effect on tracking; it loses common-motion grouping).
+- **[MO16]** J. Heer and G. Robertson (2007), "Animated transitions in statistical data graphics" (as `modern.md`
+  [N23]): animated beat static, staged was preferred; "as long as needed, but no longer".
+- **[MO17]** B. Tversky, J. B. Morrison and M. Betrancourt (2002), "Animation: can it facilitate?" (as `modern.md`
+  [N22]).
+- **[MO18]** Remotion, `@remotion/paths` (`interpolatePath`, `interpolatePaths`, `evolvePath`, `warpPath`), installed in
+  our engine, [remotion.dev/docs/paths](https://www.remotion.dev/docs/paths).
+- **[MO21]** The whip pan: [No Film School](https://nofilmschool.com/how-to-do-a-whip-pan) (the same direction and the
+  same speed on both shots), [PremiumBeat](https://www.premiumbeat.com/blog/3-effects-whip-pan-transition), and one
+  tutorial's 8 f at 24 fps / 20 f at 60 fps ([FlexClip](https://www.flexclip.com/learn/whip-pan-transition.html)).
+  CONSENSUS on direction and speed; ONE SOURCE on duration.
+- **[MO22]** Smear frames, the drawn substitute for motion blur since the 1940s:
+  [Wikipedia, Smear frame](https://en.wikipedia.org/wiki/Smear_frame); [CG Wire](https://blog.cg-wire.com/smear-frames/).
+- **[MO23]** J. K. O'Regan, R. A. Rensink and J. J. Clark (1999), "Change-blindness as a result of 'mudsplashes'",
+  *Nature* 398, 34, [UBC abstract](https://www2.psych.ubc.ca/~rensink/publications/abs.99.5.html);
+  [Wikipedia, Change blindness](https://en.wikipedia.org/wiki/Change_blindness).
+- **[MO24]** The match cut and the graphic match: [Wikipedia, Match cut](https://en.wikipedia.org/wiki/Match_cut) (a
+  graphic match "calls attention to pictorial elements"); [StudioBinder](https://www.studiobinder.com/blog/match-cut/).
+- **[MO25]** L. Fiorella and R. E. Mayer (2016), watching the instructor draw (as `modern.md` [N20]).
+- **[MO26]** Vertical making: the Vertical Film Festival's
+  [9:16 tips](https://www.adamsebire.info/vertical-film-festival/9-16-tips-and-tricks/) ("tends to exaggerate horizontal
+  (left-right) movement"); [Genero](https://genero.com/insights/vertical-filmmaking-nespresso) ("camera movement is
+  exaggerated in vertical formats, and should be subtle and natural. Avoid shaky hand held, quick pans or big
+  movements"). ONE SOURCE each.
+- **[MO27]** What camera moves say: practitioner guides (a push builds intimacy or tension, a pull-back isolation or
+  scale; a dolly moves through space, a zoom only magnifies), [No Film School](https://nofilmschool.com/2017/02/visual-and-emotional-effects-using-dolly-and-zoom-shots-your-film),
+  [fiveable](https://fiveable.me/lists/camera-movement-types); and one experiment: C. Yilmaz, E. Lotman, A. Karjus and
+  P. Tikka (2023), "An embodiment of the cinematographer: emotional and perceptual responses to different camera
+  movement techniques", *Frontiers in Neuroscience* 17:1160843 (Steadicam, dolly, handheld and static versions of three
+  scenes, 44 viewers; movement affected involvement more than emotion) (summary). CONSENSUS for the meanings.
+- **[MO28]** Light as a transition: [Litepanels](https://www.litepanels.com/en/applications/mastering-cinematic-transitions-that-tell-stories/),
+  [Aputure](https://medium.com/aputure/creative-lighting-transitions-ad70b4479f2c), stage transitions
+  ([cursa](https://cursa.app/en/page/staging-transitions-and-scene-changes-keeping-the-audience-oriented-and-engaged)).
+  ONE SOURCE each (practice).
+- **[MO29]** Short-form pace and transitions (weak sources, methods unpublished): [ClipFlip](https://clipflip.io/resources/how-to-make-viral-clips)
+  (44,000 clips, "cut every 2-3 s"), [Vidpros](https://vidpros.com/video-clip-length/) (a 2.5 s average shot in 2024's
+  top Shorts), [Sendshort](https://sendshort.ai/guides/transitions-tiktok-reels-shorts/); TikTok's own
+  [creative best practices](https://ads.tiktok.com/help/article/creative-best-practices?lang=en) (`modern.md` [N25]).
+- **[MO30]** Easing a camera in animatics: Toon Boom, [Adding ease-in and ease-out to a camera animation](https://docs.toonboom.com/help/storyboard-pro-20/storyboard/camera/add-ease.html);
+  a course's "without easing, the camera just stops, like someone hits the camera" (summary). ONE SOURCE.
+- **[MO31]** School of Motion, [six essential motion design transitions](https://schoolofmotion.com/blog/six-essential-motion-design-transitions-tutorial)
+  (cut at the element's fastest movement; the morph "the most complicated"), as read in `../research/animatic_mograph.md`
+  §3.
+
+**Sound**
+- **[MO19]** ITU-R BT.1359-1 (1998), "Relative timing of sound and vision for broadcasting": detectability from +45 ms
+  (sound ahead) to -125 ms (sound behind), acceptability +90 to -185 ms, as given by
+  [Wikipedia, Audio-to-video synchronization](https://en.wikipedia.org/wiki/Audio-to-video_synchronization) (one paper
+  states the signs the other way round; the magnitudes agree) (summary).
+- **[MO20]** The J-cut and the L-cut: [Wikipedia, J cut](https://en.wikipedia.org/wiki/J_cut);
+  [Filmdaft](https://filmdaft.com/the-l-cut-and-j-cut-how-film-editors-use-audio-to-control-time/);
+  [Soundstripe](https://www.soundstripe.com/blogs/a-video-editors-guide-to-j-cuts-and-l-cuts). CONSENSUS on the
+  definitions; no standard length found.
+
+**Ours** (scratch, `/tmp/comp2/motion/`): (M1) the reels' joins, frame by frame (`scripts/measure_reels.py`,
+`segments.py`, `overlay.py`); (M2) the movers in the held shots, by dense optical flow (`subject_speed.py`); (M3) contact
+strips at 10 a second of the joins (`strips/`); (M4) the engine's transition arithmetic (§5.6). The repo's own measured
+sources: `../research/cine_motion.md` (Arcane's camera, P1-P10), `../research/cine_light.md` (its joins, T1-T10),
+`../research/animatic_mograph.md` (motion-design joins), `../CINEMATIC_GUIDE.md` (S1-S5), `../COZY_AND_SCALE.md` (K1-K10,
+3b.5). No reel frame was used as an input to a picture of ours; the recordings were only measured.

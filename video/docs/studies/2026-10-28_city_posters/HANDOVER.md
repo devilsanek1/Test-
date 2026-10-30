@@ -10,7 +10,8 @@ points and conclusions into the main repo"). The brief is `README.md` here; the 
 - sound-sync-research (run `wf_74169695-356`) STOPPED ON PURPOSE (it had only just started; nothing in
   `video/docs/look/sound_sync/` yet, scratch in /tmp/sync/) so the window finishes composition's research first.
   Re-launch: `Workflow({scriptPath: "/root/.claude/projects/-home-user-Test-/fe339b66-57f0-5b47-bb6a-872d2f15f4c0/workflows/scripts/sound-sync-research-wf_74169695-356.js", resumeFromRunId: "wf_74169695-356"})`.
-- composition-research-v2 (run `wf_badfba6c-543`) keeps running: attention.md + modern.md written (partial or done),
+- composition-research-v2 (run `wf_badfba6c-543`) DONE 16:2x: attention.md, modern.md, motion.md. NEXT (at the resume):
+  the unified catalogue -> 3 judges -> guidelines -> Helsinki pass (see the 15:40 block). Old note:
   motion.md not yet. If it dies at the limit: read its journal.jsonl, add a RESUMING note to the unfinished tracks'
   prompts, resume.
 - Checkpoint loop restarted 16:20 (task bn7xeu1zy, 2 h cap -> ~18:20). Scheduled resumes: 17:15 and 17:45 UTC
