@@ -1,4 +1,4 @@
-# PEOPLE_DESIGN: how we draw people (direction C with the LASH face, in use for now)
+# PEOPLE_DESIGN: how we draw people (the people of the overhaul in use for now: hair v4, open eyes, rebuilt bodies)
 
 **IN USE FOR NOW (owner, 2026-10-30: "I think it is a bit better overall I think yes let's go with that for now"):
 the people of the overhaul: hair v4 + the redrawn faces with OPEN EYES + the rebuilt bodies** (assembled in
