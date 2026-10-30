@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {renderFrames} from '@remotion/renderer';
-import {root, rel} from './lib.mjs';
+import {BROWSER_EXECUTABLE, root, rel} from './lib.mjs';
 import {aacFromPcm, aacPrimingArgs, ffmpeg, ffprobe, premixPcm} from './audio.mjs';
 
 const filmOf = (entryPoint) => path.basename(entryPoint).match(/^entry-(.+)-film\.[jt]sx?$/)?.[1] ?? null;
@@ -58,7 +58,7 @@ function partition(a, b, K, cuts) {
 }
 
 /** premix when the cues say so AND Remotion's asset list at the range's ends shows exactly that one file playing. */
-async function audioPlan({opt, entryPoint, serveUrl, composition, browser, inputProps, a, b}) {
+async function audioPlan({opt, entryPoint, serveUrl, composition, chromiumOptions, inputProps, a, b}) {
   if (opt.muted === 'true' || opt.audio === 'none') return {mode: 'none', why: opt.muted === 'true' ? '--muted' : '--audio=none'};
   if (opt.audio === 'render') return {mode: 'render', why: '--audio=render'};
   const film = filmOf(entryPoint);
@@ -70,7 +70,7 @@ async function audioPlan({opt, entryPoint, serveUrl, composition, browser, input
   }
   const {assetsInfo} = await renderFrames({
     composition, serveUrl, inputProps, frames: [...new Set([a, b])], imageFormat: 'none', outputDir: null, concurrency: 1,
-    puppeteerInstance: browser, browserExecutable: null, logLevel: 'error', onStart: () => undefined, onFrameUpdate: () => undefined,
+    browserExecutable: BROWSER_EXECUTABLE, chromiumOptions, logLevel: 'error', onStart: () => undefined, onFrameUpdate: () => undefined,
   });
   const at = assetsInfo.assets.map((f) => ({frame: f.frame, av: f.audioAndVideoAssets ?? [], inline: f.inlineAudioAssets ?? []}));
   const one = at.every((f) => f.av.length === 1 && f.inline.length === 0 && f.av[0].type === 'audio');
@@ -106,7 +106,7 @@ function child({label, args, onLine}) {
   return {p, done};
 }
 
-export async function renderParallel({compId, out, opt, entryPoint, serveUrl, composition, browser, inputProps, scale, concurrency, frameRange, parallel: K, master, masterNote, t0}) {
+export async function renderParallel({compId, out, opt, entryPoint, serveUrl, composition, chromiumOptions, inputProps, scale, concurrency, frameRange, parallel: K, master, masterNote, t0}) {
   const fps = composition.fps;
   const [a, b] = frameRange ?? [0, composition.durationInFrames - 1];
   const n = b - a + 1;
@@ -114,7 +114,7 @@ export async function renderParallel({compId, out, opt, entryPoint, serveUrl, co
   const tP = Date.now();
   const {cuts, why: cutsWhy, file: scenesFile} = filmCuts({opt, entryPoint, fps, durationInFrames: composition.durationInFrames});
   const {parts, how} = partition(a, b, K, cuts);
-  const plan = await audioPlan({opt, entryPoint, serveUrl, composition, browser, inputProps, a, b});
+  const plan = await audioPlan({opt, entryPoint, serveUrl, composition, chromiumOptions, inputProps, a, b});
   const work = opt.work ? path.resolve(opt.work) : fs.mkdtempSync(path.join(os.tmpdir(), 'render-parallel-'));
   fs.mkdirSync(work, {recursive: true});
   console.error(`[render-media] ${compId}: --parallel=${K}: ${parts.map(([lo, hi]) => `f${lo}-${hi}`).join(', ')} (${how}${scenesFile ? `, ${rel(scenesFile)}` : cutsWhy ? `; ${cutsWhy}` : ''}); audio: ${plan.mode} (${plan.why}); concurrency ${concurrency} each`);

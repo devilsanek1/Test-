@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 // render-media.mjs — render a composition (or a frame range of it) to a video / audio file with @remotion/renderer's
-// renderMedia, in ONE bundle (cached while src/ and public/ are unchanged) and ONE browser (scripts/render/lib.mjs).
+// renderMedia, in ONE bundle (cached while src/ and public/ are unchanged: scripts/render/lib.mjs); selectComposition
+// and the render launch their own browsers as they always did, so a master renders exactly as before (byte-identical
+// to the delivered v2r G7 master: docs/retro/2026-10-28_streamline/phase1_render.md).
 // Chrome's default GL (Skia CPU raster) is the default here and in the CLI since 2026-10-29 (remotion.config.ts no
 // longer sets 'swangle', which was ~45x slower and moved pixels); GL=swangle|angle|... still picks one.
 //   node scripts/render-media.mjs <CompId> <out> [--entry=src/entry-v3-film.tsx] [--scale=1] [--concurrency=3]
@@ -41,7 +43,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import {renderMedia, selectComposition} from '@remotion/renderer';
-import {chromiumOptionsFromEnv, getBundle, openRenderBrowser, parseOpts, rel, resolveEntry} from './render/lib.mjs';
+import {BROWSER_EXECUTABLE, chromiumOptionsFromEnv, getBundle, parseOpts, rel, resolveEntry} from './render/lib.mjs';
 
 const [compId, outArg, ...rest] = process.argv.slice(2);
 if (!compId || !outArg) {
@@ -82,25 +84,20 @@ fs.mkdirSync(path.dirname(out), {recursive: true});
 const t0 = Date.now();
 const b = await getBundle({entryPoint, serve: opt.serve ?? null, noCache: opt['no-cache'] === 'true'});
 const serveUrl = b.serveUrl;
-let browser = await openRenderBrowser({scale, chromiumOptions});
 let code = 0;
 try {
-  const composition = await selectComposition({serveUrl, id: compId, inputProps, puppeteerInstance: browser, browserExecutable: null, chromiumOptions, logLevel: 'error'});
+  // selectComposition and renderMedia launch their own browsers, exactly as before (a master renders as it always did)
+  const composition = await selectComposition({serveUrl, id: compId, inputProps, browserExecutable: BROWSER_EXECUTABLE, chromiumOptions, logLevel: 'error'});
   if (!Number.isInteger(composition.height * scale) || !Number.isInteger(composition.width * scale)) {
     const snap = Math.round(composition.height * scale) / composition.height;
-    if (Math.abs(snap - scale) < 1e-3 && Number.isInteger(composition.width * snap)) {
-      scale = snap;
-      // renderMedia launches its browser with --force-device-scale-factor = the scale: relaunch ours the same way
-      await browser.close({silent: true}).catch(() => undefined);
-      browser = await openRenderBrowser({scale, chromiumOptions});
-    }
+    if (Math.abs(snap - scale) < 1e-3 && Number.isInteger(composition.width * snap)) scale = snap;
   }
   const t1 = Date.now();
   const total = frameRange ? frameRange[1] - frameRange[0] + 1 : composition.durationInFrames;
   const masterNote = master ? ', MASTER: png frames, bt709, x264 crf ' + (opt.crf ?? MASTER.crf) + ' slow aq-mode 3' : '';
   if (parallel > 1) {
     const {renderParallel} = await import('./render/parallel.mjs');
-    await renderParallel({compId, out, opt, entryPoint, serveUrl, composition, browser, inputProps, scale, concurrency, frameRange, parallel, master, masterNote, t0});
+    await renderParallel({compId, out, opt, entryPoint, serveUrl, composition, chromiumOptions, inputProps, scale, concurrency, frameRange, parallel, master, masterNote, t0});
   } else {
     let shown = 0;
     await renderMedia({
@@ -111,8 +108,7 @@ try {
       inputProps,
       scale,
       concurrency,
-      puppeteerInstance: browser,
-      browserExecutable: null,
+      browserExecutable: BROWSER_EXECUTABLE,
       chromiumOptions,
       logLevel: 'error',
       timeoutInMilliseconds: opt.timeout ? Number(opt.timeout) : 120000,
@@ -133,7 +129,6 @@ try {
   console.error(e);
   code = 1;
 } finally {
-  await browser.close({silent: true}).catch(() => undefined);
   b.release();
 }
 process.exitCode = code;
