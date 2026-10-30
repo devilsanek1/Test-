@@ -20,7 +20,8 @@ key here"; "our look is evolving - we are finding out style i don't think we can
    two look docs, each wins on its own topic (`LAYOUT.md` where things sit in the frame: the zones, each shot type's
    framing, the cover; `STORYBOARD_STYLE.md` the board's drawing, `CINEMATIC_GUIDE.md` shot recipes and camera moves,
    `COZY_AND_SCALE.md` cozy framing, `LIFE_AND_DENSITY.md` fullness and life, `PALETTE.md` colour, `SOUND_SYNC.md`
-   which sound lands on which picture, when and how often), and a measured
+   which sound lands on which picture, when and how often, `COMPOSITION_SHOTS.md` the shot library: which frame, move
+   and join a shot uses, ranked, with the guidelines), and a measured
    number beats a proposal.
 3. **Beside the ladder, each on its own topic and under the owner's words:** `docs/CREATIVE_BRIEF.md` (the channel,
    story selection, writing; the playbook's later rules win where they differ, as its banner lists), `docs/ELEVENLABS.md`

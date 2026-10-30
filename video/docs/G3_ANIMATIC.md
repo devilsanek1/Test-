@@ -165,7 +165,9 @@ With script + voice locked (word timings = the clock), the through-line card app
 bible written and the visual script locked (G2.5, `PIPELINE_V2.md`; method `docs/v4/visual/METHOD.md`); per-step budgets sum to the ~3 h (was 2; the hour goes to tiers, carriers and the
 light marks):
 1. **From the visual script** (~10 min, orchestrator): one panel per locked block of the visual script (G2.5), with
-   its cut words, key actions, moves, joins, carriers and each scene's picture already locked in text; a change
+   its cut words, key actions, moves, joins, carriers and each scene's picture already locked in text (each block
+   carrying its composition-and-motion pass: the frame device, the move within and the join by their
+   `COMPOSITION_SHOTS.md` codes, `docs/vN/visual/COMPOSITION_PASS.md`; and its sync points, `SOUND_SYNC.md` §4); a change
    reopens the visual script (starred, dated). Before G2.5 existed this was the story/beat pass from the through-line
    card: one sentence per panel, cut words in the VO's breaths, metaphor per scene locked in text BEFORE drawing (a
    dozen script drafts is normal, a dozen re-boards is not). Vary cut rhythm: fast around the conflict, one breathing shot after the payoff; three near-equal durations in a
