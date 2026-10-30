@@ -6,6 +6,17 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-30 ~07:20 UTC: both research runs resumed after the 5-hour limit
+- people-design (run `wf_2f7a2fc2-354`): research DONE (`people_design/diagnose.md` + sheet, `design_research.md`,
+  `fashion.md` + `fashion_board.png`); the 3 directions + the system re-running (resume notes added to the script).
+- organic-look (run `wf_238386b4-a11`): techniques + libraries DONE (`organic/techniques.md`, `techniques_sheet.jpg`,
+  `libraries.md`, `libraries_sheet.png`: top pick MyPaint's brush engine via the peinten port); shapes, light,
+  composition, the two proofs and ORGANIC.md re-running.
+- Video 4: the owner-approved style adjustments committed beside its visual script on `claude/kind-pascal-lvgsza`
+  (`video/docs/v4/visual/STYLE_ADJUSTMENTS.md`). Sky top: B (owner couldn't tell A and B apart).
+- If stopped again: `Workflow({scriptPath, resumeFromRunId})` for each run (scripts under
+  /root/.claude/projects/-home-user-Test-/fe339b66-57f0-5b47-bb6a-872d2f15f4c0/workflows/scripts/).
+
 ## Status 2026-10-30 ~00:50 UTC: v6 sent (sky top A/B asked); the people design research runs
 - v6 DONE and sent (`paint_test/paint_still_v6.png`, `compare_v6.jpg`, `skytop_v6_choice.jpg`; owner to pick sky top A/B).
 - RUNNING: workflow `people-design` (run `wf_2f7a2fc2-354`; owner: people "beautiful and pleasant", "20-30 yo today ...
