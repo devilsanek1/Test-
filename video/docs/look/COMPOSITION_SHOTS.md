@@ -2,7 +2,7 @@
 
 > **Summary.** Part 1 is the device catalogue: every composition idea in the owner's five reels, in his reels' order and names.
 > **The owner's 41: 24 used as they are, 17 adapted (each change in numbers), 0 rejected**, plus the reels' own device T (adapted).
-> Our research adds 15 devices (11 YES, 4 ADAPT), listed apart (§D2); 6 treatments the references show are rejected (§D3). In all, 63 entries: 35 YES, 22 ADAPT, 6 REJECT.
+> Our research adds 15 devices (11 YES, 4 ADAPT), listed apart (§D2); 6 treatments are rejected (§D3: 3 seen in the reels, 3 from our research). In all, 63 entries: 35 YES, 22 ADAPT, 6 REJECT.
 > Every YES and ADAPT device is named by its code in the recipes it serves (Part 2, the coverage table §D4); none needed a new recipe.
 > Two sheets: `composition/devices_sheet.png` (one value thumbnail per device, the owner's 41 first) and `composition/shots_sheet.png` (one per recipe, SR1-SR24).
 
@@ -482,7 +482,7 @@ J. T. Smith 1797 via [S3]).
 - *What:* at two values the subject is one closed shape on a field of the other value; at the focal, light against dark.
 - *9:16:* at a 2-value cut the subject is one shape a viewer can name at 0.25 scale; the focal's step >= 65 L*; its light
   reached by a bank of darker masses round it or by one long gradation toward it, never both.
-- *Serves:* the hook, the opening, the line of light, the proof. **SR1, SR6, SR9, SR22.**
+- *Serves:* the hook, the home view, the opening, the line of light, the proof. **SR1, SR2, SR6, SR9, SR22.**
 
 **N8 The zigzag way in · YES.** *Source:* `composition/cinema.md` §4.5 (Poore: "triangulate in, with a series of
 zigzags" [S1]).
@@ -532,7 +532,8 @@ zigzags" [S1]).
 ### D3. Rejected (what the references show that we do not take)
 
 None of the owner's 41 ideas is rejected: each has a version that works in the tall frame (§D1). What we leave out are
-six treatments the references show, each fighting the vertical frame or a rule in force:
+six treatments, three seen in the reels' examples (X1-X3) and three from our research (X4-X6), each fighting the tall
+frame or a rule in force:
 
 | # | rejected | seen in | why (one line to check) |
 |---|---|---|---|
@@ -546,7 +547,7 @@ six treatments the references show, each fighting the vertical frame or a rule i
 ### D4. Coverage: every reference item, its verdict and where it is used
 
 **The owner's 41: 24 used as they are, 17 adapted, 0 rejected** (plus T, adapted). Our additions: 15 (11 YES, 4 ADAPT).
-Rejected: 6 treatments (§D3). "Recipes" are the Device lines in §3 that name the code; "(v)" marks a recipe's named
+Rejected: 6 treatments (§D3: 3 seen in the reels, 3 from our research). "Recipes" are the Device lines in §3 that name the code; "(v)" marks a recipe's named
 variant. Every row has a tile on `composition/devices_sheet.png`.
 
 | # | the reels' name | verdict | used in (recipes) |
@@ -593,7 +594,7 @@ variant. Every row has a tile on `composition/devices_sheet.png`.
 | E10 | The near "you" over the shoulder | ADAPT | SR13, SR14 |
 | E11 | The POV hook | YES | SR13 |
 | T | The line first, then the world under it | ADAPT | SR1, SR22 |
-| N1-N15 | our additions (§D2) | 11 YES, 4 ADAPT | N1 SR1, SR12, SR22 · N2 all · N3 SR2, SR9, SR14 · N4 SR2, SR4 · N5 SR6 · N6 SR2, SR14-SR17 · N7 SR1, SR6, SR9, SR22 · N8 SR7, SR11, SR24 · N9 SR12, SR22 · N10 SR10, SR17 · N11 SR15 · N12 SR5, SR21 · N13 SR4 · N14 SR19, SR24 · N15 SR18 |
+| N1-N15 | our additions (§D2) | 11 YES, 4 ADAPT | N1 SR1, SR12, SR22 · N2 all · N3 SR2, SR9, SR14 · N4 SR2, SR4 · N5 SR6 · N6 SR2, SR14-SR17 · N7 SR1, SR2, SR6, SR9, SR22 · N8 SR7, SR11, SR24 · N9 SR12, SR22 · N10 SR10, SR17 · N11 SR15 · N12 SR5, SR21 · N13 SR4 · N14 SR19, SR24 · N15 SR18 |
 | X1-X6 | rejected (§D3) | REJECT | nowhere |
 
 No device needed a new recipe: the ones without a recipe of their own (B7, B12, B13, A4) are named variants of the
@@ -707,8 +708,8 @@ Each rule is numbers for our frame, then where it comes from. "Proposal" marks w
    walkers 110-260 px, far 15-60 px), in twos and threes, as texture in their band; never a stranger's back in the
    foreground. *Cinema §3.2, C9; vertical §7.1; `LAYOUT.md` §3 people; the reels put one small figure where the lines
    meet in 11 of 24 examples, 8 of 12 measured at 150-226 px at full width (`composition/reels.md` E1).*
-8. **One device per shot, and it delivers the eye to the focal.** Name one device (an opening, leading lines, one point,
-   an S or C curve, a pattern with one break, the cross, scale, symmetry, the pyramid, one diagonal); a second only when
+8. **One device per shot, and it delivers the eye to the focal.** Name one device by its Part 1 code (an opening, leading
+   lines, one point, an S or C curve, a pattern with one break, the cross, scale, symmetry, the pyramid, one diagonal); a second only when
    it points at the same focal (a doorway whose sill is the leading line). Lines rise from the near band (or drop from
    the words) in 2-3 legs of >= 150 px that alternate sides, at ~40-60 degrees on the ground, and the last leg ends
    within 40 px of the focal's box; no line runs corner to corner unbroken, crosses the band or runs past the focal into
@@ -758,7 +759,8 @@ Each rule is numbers for our frame, then where it comes from. "Proposal" marks w
 **Thumbnails:** `composition/shots_sheet.png`, one value thumbnail per recipe (our frame at 1/4, 270 x 480: five flat
 values, white kept for the story light; the caption band and the app's interface on the owner's Reels tab marked
 faintly; the composition idea in red), each in scene 1 or video 4 as its example says, drawn from the recipe's numbers
-by `composition/shots_sheet.py` (seeded; no image copied or traced).
+by `composition/shots_sheet.py` (seeded; no image copied or traced). The devices of Part 1 have their own sheet,
+`composition/devices_sheet.png` (one thumbnail per device, the owner's 41 first; `composition/devices_sheet.py`).
 
 Pick by the beat (§4 has the checklist). **By beat:** the hook SR1 · establishing the home place SR2-SR5 · the subject's
 moment SR6-SR11 · a reveal SR6 (through the opening), SR10 (the tilt), SR15 (the tilt-up), SR17 (the big move), SR4 (out
@@ -1200,7 +1202,7 @@ feed's clear window, one focal with the story light, two quiet fields, the near 
   above both; the step at the focal the film's hardest so far. Light: the story light hard on the focal (a raking key, a
   lamp switching on). Eye: the words, then a longer jump to the off-centre focal: the turn is felt.
 - **Device:** the off-balance (N15: "deliberate tension: one heavy side and nothing against it", cinema §9; not the
-  reels' "unbalanced", D4, which is the steelyard), its open side negative space (D1); or one diagonal (B6), laid on the
+  reels' "unbalanced", which is the steelyard of every frame), its open side negative space (D1); or one diagonal (B6), laid on the
   stage square's golden triangle with the focal at a foot (A5); or the V (B11), its point at the focal: contrast against
   the home beats' affinity (level lines, close values, slow), as a film's intensity curve is planned (cinema S17).
 - **Camera and joins:** a plain cut (F: at most 2 a film, only on a "But" turn, the thread on both sides, a size
