@@ -122,4 +122,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   this script / Would it fit into our style?" -> the study session's read: `STYLE_FIT_2026-10-30.md` (the story fits; the
   picture needs a translation into the new look: a brush not a pen, an organic cut-away, a person near the camera, one
   colour key and the window as the story light, a simpler composition).
+- 2026-10-30 ~01:30 UTC: "Commit the adjacentment to the story script to the story 4" -> the adjustments committed beside
+  the visual script on video 4's branch (`claude/kind-pascal-lvgsza`): `video/docs/v4/visual/STYLE_ADJUSTMENTS.md`
+  (fold into VISUAL_SCRIPT.md before G3).
 
