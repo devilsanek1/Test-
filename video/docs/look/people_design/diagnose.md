@@ -277,7 +277,7 @@ From behind, the hair is the main thing that says who someone is, and it is the 
 
   The hi-vis is the caption highlight box (`EMBER.hl`).
 - **The result: busy dusty patchworks, not one value shape.**
-  - Each 150 px figure has 5-8 colour patches, all mid-tones (L\* 36-90).
+  - Each 150 px figure has 5-8 colour patches, the big ones mid-tones (coats L\* 36-90).
   - There is no neutral base: no black, white, grey, denim or camel, which every street outfit is built on.
   - The references' people are one value shape:
     - a near-black silhouette with one lit edge: ref 01's man, median L\* 6 against L\* 50 around him; ref 03's
