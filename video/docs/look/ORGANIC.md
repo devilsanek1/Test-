@@ -57,13 +57,14 @@ artist is a style target. Paths are from `video/`.
   levers the owner called doable: one colour key and the darks (palette work), one story light (the lit doorway, with
   the low sun as the key), and one call with big quiet masses (composition). Every stock painterly filter we tried
   (Kuwahara, LIC, generic stroke painters, watercolour edges) reads as a filter on our flat design and is rejected (§3).
-- **Proved in the engine on v6** (two proofs, deterministic, captions and her untouched): the cloud's compass arcs
-  27 -> 1 %, the facade's ruler lines 54 -> 23 %, the paving's 68 -> 15 %; the lit doorway became the one place to look
-  (+37 L* over its facade, v6 +25), darks 6.7 -> 33-38 % of the frame in two masses, off-family colour 16.3 -> 2.5 %,
-  dead-flat area 39 -> 22.5 % with the paper; the composition check 9 WARNs -> 5, and the recomposed thumbnail T1
-  passes all 10. What did not move enough: razor edges in the whole frame (22 -> 18.6 %: the untouched layers hold
-  them), the facade's right angles and symmetry, the brushwork's visibility at 400 px on the facade and the tree, and
-  the flat props, which now read pasted on the painted ground.
+- **Proved in the engine on v6** (two proofs, deterministic; her drawing and the captions untouched): the cloud's
+  compass arcs 27 -> 1 %, the facade's ruler lines 54 -> 23 %, the paving's 68 -> 15 %; the lit doorway became the one
+  place to look (the facade into shade 68 -> 56 L*, the lobby lifted 77 -> 82, its pool 83 -> 93); darks 6.7 -> 33-38 %
+  of the frame in two masses; off-family colour 16.3 -> 2.5 %; dead-flat area 39 -> 22.5 % with the paper; the
+  composition check 9 WARNs -> 5 (and the recomposed value thumbnail T1 passes all 10). What did not move enough: razor
+  edges in the whole frame (22 -> 18.6 %: the untouched layers hold them), the facade's right angles and symmetry, the
+  brushwork's visibility at 400 px on the facade and the tree, and the flat props, which now read pasted on the painted
+  ground.
 - **Cost.** Nothing chosen runs per frame. Bakes: ~26 s for four organic pieces, ~66 s for the light, key and paper
   maps (one core, per state). Render: the light's production path measured 256 ms a frame against v6's ~550, because
   v6's own `lib/light` layers cost ~340 ms and the maps replace them; the organic pieces add 30-70 ms. Video: baked,
@@ -81,7 +82,7 @@ or panels, or open on the dose at phone width or in motion; **low** = researched
 
 | # | The point (his words) | What it takes | Confidence | Cost |
 |---|---|---|---|---|
-| 1 | Darks and contrast: "dark and contrast are great but that’s very doable that’s just color palette and selection?" | Yes: palette and light, no new drawing. Shade masses with named casters (the backlit facade, our bank under a canopy off-screen) and the key's deeper darks; R10's real dark mass (§4.4). Proof 2: darks (L* < 40) 6.7 -> 33-38 % of the frame, 94-97 % of the dark group in two masses; median L* 67 -> 61; the caption band unchanged (0 codes) | **High** for the still; the dose (T1's gentle key or T3's, the references' own) is the owner's pick, and CRAFT §f.8 disagrees (§8 C8) | 0 ms in the palette; the shade is part of item 3's maps |
+| 1 | Darks and contrast: "dark and contrast are great but that’s very doable that’s just color palette and selection?" | Yes: palette and light, no new drawing. Shade masses with named casters (the backlit facade, our bank under a canopy off-screen) and the key's deeper darks; R10's real dark mass (§4.4). Proof 2: darks (L* < 40) 6.7 -> 33-38 % of the frame, 94-97 % of the dark group in two masses; median L* 67 -> 61-62; the caption band unchanged (0 codes) | **High** for the still; the dose (T1's gentle key or T3's, the references' own) is the owner's pick, and CRAFT §f.8 disagrees (§8 C8) | 0 ms in the palette; the shade is part of point 3's maps |
 | 2 | One colour key: "Similarly point 2" | Palette work, at the source: ONE family (the sky's dusk family: violet shade, rose-plum, rose, peach, cream-gold light), ONE hot accent (the doorway's gold), every other colour tone-on-tone in its mass (§4.3). Proof 2: off-family colour below the band 16.3 -> 2.5 %; the 1 % most saturated warm light at the door 24 -> 100 %; colour rivals 4 -> 1 | **High** for the method. The proof's per-pixel function greyed the glass (C* 11 -> 4) and the lanterns (6 -> 2) and turned the tree olive: v7 keeps C* >= 8 and one green family | 0 ms (palette roles) |
 | 3 | One story light: "I noticed this too the light source yes - can we do the proper lights?" | Yes, in three homes (§4.2): the colours (what is simply lit or shaded), baked maps per plane (one multiply + one solved screen map, cropped, per state), live layers on movers (rim, wrap, shade, shadow cut, from the mover's own drawing). Proof 2: the doorway is the one place to look, with its pool (83 -> 93 L*), her shadows cut out of it live, her rim and wrap; in `light.md`'s relit still the brightest 5 % below the sky sits within 0.07 H of her (far planes out). Motion proof: the static light holds (0.02-0.05 L* drift), her light falls smoothly 7.3 -> 3.5 L*, nothing flickers (p99 0.3 L*) | **High** for the still; **medium** for a film: maps are one state of the scene (by 1.10 s the shut glass took a green cast), and solved maps slip up to p99 2.8 L* as planes float | As built +170-270 ms a frame; the production path measured 256 ms against v6's ~550 (-290 ms) |
 | 4 | One painted language, near sharper: "I think we need to find a balance ... close objects are more sharp while further objects are more like brushes and painting" | One language for the whole frame at a dose by plane (§5): found edges, fine marks and detail near and at the focal; lost edges, fewer values and coarser, visible marks far; the subject and people crisp. Proof 1: the cloud (the farthest piece) got the most brush, the facade kept the door, the fascia and W found, the paving's marks grow with perspective. It also showed the next step: once the ground is painted, the flat props read pasted, so whatever stays in the frame joins the language at its plane's dose, or goes (R6) | **Medium**: the dose table is first doses; the far city, the water's edges and the props are not yet in the language | Bakes only (0 ms a frame); +30-70 ms for two new full-size images |
@@ -155,7 +156,7 @@ layer: 0 ms at render.
 | Library | Version | Licence | Use | How it enters |
 |---|---|---|---|---|
 | **MyPaint's brush engine via `peinten`** (a TypeScript port of libmypaint) | 1.3.0 | MIT; its NOTICE carries libmypaint's ISC | the brush under our painter: the only tested code whose marks melt one zone into the next (smudge and wet brushes pick up the colour under them) and break the circles | pin the exact version and vendor its `dist/domain/brush` + `dist/domain/tiles` (18 JS files) with the NOTICE; `valibot` (MIT) or a 20-line reader for `.myb`; two bakes must give one md5 (it is 10 days old with one maintainer). Gotcha: a size override sets the BASE radius, so divide the width by e^curve(p_max) (`sizeFor`) |
-| **mypaint-brushes** | 2.0.2 | CC0 1.0 | the presets, by pass: `ramon/wet_round` (wash), `tanda/acrylic-04-paint` (the flat blocky stroke along the form; short, for near leaves), `classic/blending_knife` (across a lost zone edge), `deevad/brush` (crisp accent), `tanda/acrylic-03-with-water` (dry level stroke), `deevad/large_watercolor_fringe` then `classic/smudge` (a vapour's lost edge), `deevad/chalk` (a tree's lost edge) | a vendored subset (data); brushes with offsets and jitter scatter dabs (`classic/impressionism`, `Dieterle/WateryFlatbrush`): not used |
+| **mypaint-brushes** | 2.0.2 | CC0 1.0 | the presets (file names in the CC0 set: tool presets, never style targets), by pass: `ramon/wet_round` (wash), `tanda/acrylic-04-paint` (the flat blocky stroke along the form; short, for near leaves), `classic/blending_knife` (across a lost zone edge), `deevad/brush` (crisp accent), `tanda/acrylic-03-with-water` (dry level stroke), `deevad/large_watercolor_fringe` then `classic/smudge` (a vapour's lost edge), `deevad/chalk` (a tree's lost edge) | a vendored subset (data); brushes with offsets and jitter scatter dabs (`classic/impressionism`, `Dieterle/WateryFlatbrush`): not used |
 | **libmypaint** (C, the reference) | 1.6.1 | ISC | reads the same `.myb` brushes | replaces the port wherever compiling is allowed (refused in this sandbox) |
 | **FastNoiseLite** | `pyfastnoiselite` 0.0.7; npm `fastnoise-lite` 1.1.1 (+ a GLSL port) | MIT | the design warp, the lost-and-found rhythm along an edge, terminators, mottle; the same noise in the bake and in a live churn | pip / npm, pinned; 0.2-0.3 s a piece, byte-identical |
 | **perfect-freehand** | npm 1.2.3 (a Python port 1.2.0) | MIT | variable-width, tapered stroke outlines as SVG paths (a hand-made stroke in the vector engine) | when `lib/organic` is built (§6 step 3) |
@@ -254,7 +255,7 @@ size decides. Sources: `shapes.md` §3 and §6, `techniques.md` §3.6 and §6, `
   over a base, a person over a kerb).
 
 **Edges, lost and found:**
-- **Found** (crisp, 1-1.5 px) where the light hits a form, at the focal, and wherever the value step is >= 14 L*.
+- **Found** (crisp, 0.5-1.5 px) where the light hits a form, at the focal, and wherever the value step is >= 14 L*.
   **Lost** (10-24 px, or broken by teeth) where two values within 4 L* meet: a shade face against the dusk air, a
   cloud's base, a shadow's far edge. Between 4 and 14 L*, blended.
 - **They alternate:** every natural outline over 300 px carries at least one found and one lost stretch of >= 15 px,
@@ -389,7 +390,7 @@ size decides. Sources: `shapes.md` §3 and §6, `techniques.md` §3.6 and §6, `
   1 px read as brushed linen: never) and a gentle mottle (40-90 px blotches), soft-light round mid-grey (an equal lift
   and darkening, strongest in the mid-tones: the darks keep their depth, the lights never grey). On a plane that floats
   its finest feature is >= 2 px across (the twinkle rule).
-- **Strength:** ~0.9 L* std on a mid-tone, +0.4-0.9 L* added on the flats; by plane as `lib/texture` `MOTTLE_K`: tiers
+- **Strength:** ~0.9 L* std on a mid-tone, +0.4-0.8 L* added on the flats; by plane as `lib/texture` `MOTTLE_K`: tiers
   A and B 1.0, tier C up to +1 0.7, +2 and farther 0.4, the sky 0.6; in the caption band <= 15 % (its spread <= 1.5 L*,
   the ink's contrast unchanged).
 - **Locked:** baked into each plane's painted pieces and its one multiply map (it rides the plane's float); a tile
@@ -413,39 +414,141 @@ picks.
 |---|---|---|---|---|---|---|---|
 | **Tier A, the subject** (her; the lit doorway, its frame, the fascia), plane 0 | all round on the lit side and at the focal, 0.5-1.5 px; the frame's hardest step | none (her shade side <= 2 px) | none on her (never painted); the doorway its design + <= 7 crisp accents | her outline free curves; the door hand-cut (0.3-0.45 px hand-ruled) | +-3-4 L* toward the story light; rim 4-6 px at ~300 px tall, scaled (1.7 px at 153 px), +12-18 L* | k 0; 4 values + rim; 0 / 0 | 1.0 (a tile locked to her) |
 | **Tier B** (Pip; people near the story) | all round | none | none (their own recipe) | free curves, asymmetric poses | rim 2 px, +6-8 L* | their plane's k | 1.0 (locked) |
-| **Near frame**, -1 / -2 (<= 2 props cut by an edge, inside the near shade mass) | teeth 0.5 px | teeth 4 px; the out-of-focus framing blur 2.2-3 px (the one optical blur) | none (out of focus) | leaves warped 4-8 px | +-2 L*; within 8 L* of its shade mass | no air: a value step darker each (5 / 10 L*); 4 values + accents | 0.7 |
-| **The near world**, 0 / -1 (our bank: paving, coping, the canopy's shade) | on the kept prop and at steps >= 14 L*, 0.5-1.5 px (thin props: 0.2 px teeth) | where <= 4 L* meet (joints, nosings, a shadow's far edge): edge strokes every 14-20 px, 14-34 long, 3-7 wide; lost teeth 6-8 px | the full ladder, the finest in the frame: a wash, flat blocky strokes along the perspective sized by distance, crisp accents on lit lips | natural: 3 lobe levels, the full octaves (foliage 6-12 px); man-made: hand-cut (0.5 px), joints <= 25 % of the width in 2-5 pieces | +-2.5-3 L* toward the key; C rims 1.5-2.5 px, +4-8 (a sunlit coping edge) | k 0, a step darker than the subject's plane; 4-5 values; 0 | 0.7 |
-| **The subject's plane around the focal**, 0 (the facade, the towpath, the boats) | at the door, the fascia and W and at steps >= 14 L*, 0.5-1.5 px | between faces closer than 10 L*: short flat strokes clipped to the two faces; a shade face's far edge lost over 25-40 % | blocky flat-brush marks along the piers (vertical) and bands (level); light marks only on the glass, each pane its own reflection | hand-cut, bowed 0.25-0.55 px; ruler lines broken, windows varied, an overlap per long edge | +-2.5-3 L* toward the key; backlit shade in rose-plum; rims 1.5-2.5 px where the key touches (parapet, planting, a ~3 px corner sliver) | k 0; 4 values + rim; 0 | 0.7 |
-| **+1** (none in scene 1) | teeth 0.6 px; 0.7-1 px | teeth 4 px; strokes every 16 px, 16-28 long, 3-6 wide | radii 10 / 5 / 3 | 2-3 lobe levels; warp 4-8 px; wobble 0.6 px | +-2 L* | k .12, chroma x0.90; 5 values; 0.3 / - | 0.7 |
-| **+2** (the mid cloud bank; the bridge) | teeth 0.6 px; 1-1.5 px (a cloud's lit side 2.6) | solids: teeth 2.5 px, few strokes; vapour: teeth 8 px, strokes every 18 px, 16-28 long, 3-5 wide | radii 12 / 6: two coarse passes, then stop | 2 lobe levels; warp 3-6 px; wobble 0.7 px | +-1.5 L*; rims lost | k .22, chroma x0.82; 4 values within 24 dE; 0.4-0.6 / 1.3 | 0.4 |
+| **The subject's plane around the focal**, 0 to -0.5 (the facade, the far towpath, the water, the boats) | at the door, the fascia and W and at steps >= 14 L*, 0.5-1.5 px | between faces closer than 10 L*: short flat strokes clipped to the two faces; a shade face's far edge lost over 25-40 % | blocky flat-brush marks along the piers (vertical) and bands (level); light marks only on the glass, each pane its own reflection | hand-cut, bowed 0.25-0.55 px; ruler lines broken, windows varied, an overlap per long edge | +-2.5-3 L* toward the key; backlit shade in rose-plum; rims 1.5-2.5 px where the key touches (parapet, planting, a ~3 px corner sliver) | k 0; 4 values + rim; 0 | 0.7 |
+| **The near world**, -1 (our bank: its paving and coping, the canopy's shade) | at steps >= 14 L* (the coping's sunlit lip, a thing's contact edge), 0.5-1.5 px; thin things only 0.2 px teeth | where <= 4 L* meet (joints, nosings, a shadow's far edge): edge strokes every 14-20 px, 14-34 long, 3-7 wide; lost teeth 6-8 px | the full ladder, the finest in the frame: a wash, flat blocky strokes along the perspective sized by distance, crisp accents on lit lips | natural: 3 lobe levels, the full octaves (foliage 6-12 px); man-made: hand-cut (0.5 px), joints <= 25 % of the width in 2-5 pieces | +-2.5-3 L* toward the key; C rims 1.5-2.5 px, +4-8 (a sunlit coping edge) | no air: a value step darker (5 L*); 4-5 values; 0 | 0.7 |
+| **The near frame**, -2 (<= 2 props cut by an edge, inside the near shade mass) | few: found teeth 0.5 px, the rest quiet in its shade mass | teeth 4 px; a framing object meant out of focus takes the one optical blur, 2.2-3 px | few (it stays within 8 L* of its shade mass); none on an out-of-focus one | leaves warped 4-8 px; man-made hand-cut | +-2 L* | no air: a value step darker (10 L*); 4 values + accents | 0.7 |
+| **+1** (none in scene 1) | 0.7-1 px wide; found teeth 0.6 px | teeth 4 px; strokes every 16 px, 16-28 long, 3-6 wide | radii 10 / 5 / 3 | 2-3 lobe levels; warp 4-8 px; wobble 0.6 px | +-2 L* | k .12, chroma x0.90; 5 values; 0.3 / - | 0.7 |
+| **+2** (the mid cloud bank; the bridge) | 1-1.5 px wide (a cloud's lit side 2.6); found teeth 0.6 px | solids: teeth 2.5 px, few strokes; vapour: teeth 8 px, strokes every 18 px, 16-28 long, 3-5 wide | radii 12 / 6: two coarse passes, then stop | 2 lobe levels; warp 3-6 px; wobble 0.7 px | +-1.5 L*; rims lost | k .22, chroma x0.82; 4 values within 24 dE; 0.4-0.6 / 1.3 | 0.4 |
 | **+3** (the far tower; the far cloud deck) | only where the sun touches: a sliver <= +12 dE over its body, 1.5 px | solids: teeth 2 px, the tops lost by the sun; vapour: teeth 8-10 px, strokes every 24 px, 24-40 long, 4-7 wide | radii 14 / 8: few, broad and visible | 1 lobe level, displacement at the floors (0.6-0.8 px); warp 2-4 px; wobble 0.9 px | +-1 L*; the sun's in-scatter veil | k .40, chroma x0.68; 3 values within 12 dE, windows tone-on-tone (dE <= 6); 0.5-1.0 / 2.4 | 0.4 |
 | **+4** (the far roofs; the horizon streaks) | none but the sun's rim; 2-3 px | roof tops lost by the sun (teeth 6 px); vapour teeth 10 px along the wind | radius 14 only (the coarsest pass), or the silhouette alone | the silhouette only; warp 2-3 px; streaks swell and pinch (§4.1) | +-0.5 L* | k .65, chroma x0.48; 2 values within 5 dE, within dE 10 of the air; no windows; 1.6 (streaks 0.6-1.6) | 0.4 |
 | **The sky and its clouds** (the sky never floats; each cloud plane takes its own k) | a cloud's lit side, crisp and ragged toward the sun (1.8 px near, 2.6 on +2) | the base 22 px and the side away from the light 16 px, with dry teeth 8-10 px along the wind; each outline alternating on >= 70 % of its length | the sky recipe's passes laid with MyPaint: a wash, flat strokes along the billows where the form turns, a knife across old arcs, crisp accents on the lit edge, dry strokes in the base; the open sky calm | ellipse unions + the cloud octaves: three levels near, two on +2, one on +3 | the sky's one warmth field; a cloud lit as one form (light per billow <= 0.45) | near cumulus k 0, mid bank .22, far deck .40; the band flat (spread <= 1.5 L*) | 0.6; <= 0.15 in the band |
+
+"Found teeth" are the short dry-brush breaks a found edge keeps (px long); "warp" is a natural silhouette's
+displacement (px); "wobble" is the hand-ruled bow of a man-made edge (px); k is CRAFT §f.2's step toward the air, the
+chroma factor a hue across the air's keeps.
 
 ## 6. The roadmap: painter v7 on scene 1
 
 **v7 is an iteration** (the owner: "Again let’s start with stills"): v2's scene 1 at 1.0 s, in v2's view (the owner:
 "our initial angle snd the view frankly wasn't bad"), built in five checkpointed steps in order of impact per effort.
-Each step ends in a still (v6 | v7 so far, at full size and at 400 px beside refs 03 and 02) and its check: a usage
+Each step ends in a still (v6 | v7 so far, at full size and at 400 px beside refs 03 and 02) and its check, so a usage
 limit loses at most one step. The checks are the scripts the research already wrote (minutes each, no panels).
 - **Where it lives:** one NEW scene folder that merges the two proofs, e.g. `src/look/v7_s1/` with its own entry and
   composition (`V7S1`), built from `src/look/light_s1/` (its 26 named segments, the plane slots, the bake that solves
   each plane's maps against the exact composite under them) plus `src/look/organic_s1/`'s piece slots. Never `src/v2r`,
   `src/look/paint_s1` or a `src/lib` default; a new `lib` module is fine. The painter's spec is
-  `scripts/look/paint/v2s1_v7.json` with `bake_v2s1.sh`'s v7 lines; the notes go in `paint_test/NOTES.md` under v7.
-- **One dependency:** step 4's prop cut is a deletion. Run it at the START of step 3, so nothing is painted and then
+  `scripts/look/paint/v2s1_v7.json` with `bake_v2s1.sh`'s v7 lines; the notes go in
+  `docs/studies/2026-10-28_city_posters/paint_test/NOTES.md` under v7.
+- **One dependency:** step 4's prop cut is a deletion: run it at the START of step 3, so nothing is painted and then
   removed. Steps 1 and 2 share one bake (the light maps are solved against the keyed colours); step 5 folds into step
   2's maps and step 3's pieces.
-- **Show the owner twice:** after step 2 with step 4's cut (both cheap, and they change the still most), and after
-  step 5.
+- **Show the owner twice:** at step 3.0 (steps 1 and 2 with step 4's cut: cheap, and they change the still the most),
+  and after step 5.
 
-| Step | What | Files to change | The check that proves it | Effort; cost |
-|---|---|---|---|---|
-| **1. The palette and one colour key** (points 1, 2) | The scene's palette roles take `light_proof.md` §3.3's keyed values with two fixes: C* >= 8 on every role but a designed neutral (the glass a slate-violet at C* ~10, not 4; the lantern glass and the lamp posts likewise), living greens in one green family (`PAINT_RECIPES.md` C8), never olive or beige. ONE accent: the doorway's gold (the lobby's warm wall C* ~56). The lit upper panes a quiet warm cream inside the facade's mass (+6-8 L*, C* <= 20); the yellow side panel into the facade; the hulls, lamps and the far towpath's life toward the family's violet end. The darks below the band a step deeper. The sky top B (v4's deeper zenith #afb3d8, the choice made on 2026-10-30). The painter's light table (`paint.py` `scene_light()`) fed from the same keyed roles, so the painted sky, clouds, water and far city share the key | NEW `src/look/v7_s1/palette_v7.ts` (the keyed role map over `paint_s1/palette_10b.ts`'s roles, with a `problems()` check: C* >= 8, the olive band, one accent); the v7 scene's modules that pick roles; `scripts/look/paint/v2s1_v7.json` (`palette`, `local`, the zenith); `src/look/light_s1/bake/key.py` kept as a measure, never a grade | `src/look/light_s1/bake/measure.py` (or its v7 copy), captions off: off-family colour below the band <= 3 % (v6 16.3 %); the 1 % most saturated warm light 100 % at the door (v6 24 %); `palette_v7` `problems()` empty; the band's spread <= 1.5 L* and the words' contrast unchanged (68.9 L*); `composition_study.py frame`: colour calls <= 3 with one rival; `scripts/qa/check_banding.py` on a master encode of the deeper zenith. Eye at 400 px: one family, the door the only gold | Small (palette data, about an hour); 0 ms a frame |
-| **2. The story light** (points 3, 1) | `light.md` §5's rig as data: the key, the sun in frame at (195, 745), r 20, horizon y 965, focal 1400 (elevation 8.9 degrees, vanishing point (195, 965)); the story light, the doorway (x 540-720, y 848-1082) with its lobby lamps through the opening, #FFE2AE; the shade family #C79AB4 / #A49BD6; the far towpath's lamps off. The dusk rig: v6's day casts off, contact shadows and form shades kept. Per plane ONE multiply + ONE solved screen map, cropped, solved against step 1's colours: the backlit facade in shade (dose 0.52-0.88), our bank under a canopy off-screen left (0.8-1.0) whose edge is a designed shape (§4.1: clumps of three sizes, holes of light, a 10-30 px penumbra), dapples as clusters of stretched ellipses or none, light on the jambs, the door's pool, its column in the water, the sun's bloom (+2-3 L*) and veil, rims by tier. A map set per STATE (doors shut / open, W's lamp, the pane at 3.90 s), mixed by the cause. Her: `RimOf` toward the sun (1.7 px + 3.4 px at 0.4), `WrapOf` on her back edge only, `ShadeOf`, `ShadowCut` from the lobby's lamps; Pip: shade + a 1.6 px rim. The `lib/light` layers the maps replace: OFF | `src/look/light_s1/bake/` (`light.py`, `labels.py`, `solve.py`, `texture.py`, `render_many.mjs`, `run.sh`) -> the v7 scene's `bake/` (later production-grade as `scripts/look/light/bake_light.py`, `light.md` §4.0); `src/look/light_s1/rig.ts`, `movers.tsx`, `context.tsx` -> `src/look/v7_s1/`; `src/lib/light2/` reused as is | `measure.py`: the brightest 5 % below the sky (far planes out) within 0.07-0.15 H of her; the lobby >= +35 L* over the facade (proof +37, v6 +25); darks (L* < 40) 15-40 % with >= 80 % in two masses below the band (R10); the caption band 0 codes changed; the engine within ~0.1 L* (mean) of the bake away from the movers; two bakes, one md5. Motion: a 1.0-2.4 s clip at 30 fps measured as `light_motion.py` does (static light drift <= 0.05 L*; her light's largest step <= 1 L* a frame; frame-to-frame p99 <= 0.3 L* away from the movers; no green cast in the shut state). Render <= v6's ~550 ms a frame (the measured path: 256 ms). Eye: for every shadow, point at its caster; at 400 px the eye lands on the door | Medium (the bake exists; states, the canopy's edge and `lib/light` off: about a day); render cheaper than v6 |
-| **3. Organic shapes and brushwork** (points 5, 6, 7, 4) | **3.0** step 4's cut first. **3a, the design, in the engine:** port `shapes_gen.py`'s generators to a new `src/lib/organic/` (seeded by `lib/rng.ts`): ellipse unions + the value-noise octaves, `cumulus`, `bank`, `streak`, `crown`, `limb`, `handCut`, `varyRects`, `brokenLine`, a dithered `lightRamp`, `dapple`; perfect-freehand for tapered strokes; polygon-clipping or d3-contour for a union's outline. In the scene: the cloud planes and streaks from the generators; the facade's windows varied, each with one asymmetric element, frames hand-cut, an overlap over each long edge; the paving's joints broken. **3b, the painter:** `scripts/look/organic/` and `docs/look/organic/shapes_gen.py` move into `scripts/look/paint/` as v7 styles (imported, never copied); `paint.py` stays the planner (design, light table, zones, depth ladder, `rng_for` seeds, §5's doses) and writes each piece's marks as a strokes JSON `{brush, pts:[x, y, pressure], color, width, opacity, seed}`; the Node bake paints them with MyPaint over the piece's flat; then the edge pass (found and lost by value, light, tier and plane; strokes near, teeth far, >= 2 px) and the plane's blur; one RGBA PNG per piece, as now. **3c, the pieces, far to near, one checkpoint each:** the sky and three cloud planes (v6's own cloud, which the owner liked, warped and marked, then bolder and fewer marks on its lit side and a ragged found top; the mid bank a real bank, never a slab); the far city +3 / +4 (lost tops, teeth, coarse marks, tone-on-tone windows); the facade round the door (proof 1's piece with the new windows; the door, the fascia and W stay holes for the crisp layers); the water (its left third calmer); our bank and the canopy's shade (proof 1's paving with marks bold enough for 400 px; the props' shadows owned by step 2's multiply map, never baked twice); the kept prop at the near dose (hand-cut, a light ramp, edge strokes), so nothing reads pasted | NEW `src/lib/organic/`; `scripts/look/paint/paint.py` (v7 styles calling a moved `scripts/look/paint/organic/` package: `oc_lib.py`, `piece_*.py`, `mypaint_bake.mjs`); `scripts/look/paint/shapes_gen.py` (moved as is); `scripts/look/paint/recipes/sky_clouds.py` (billows -> ellipses + octaves), `recipes/foliage.py` (a crown by `shapes_gen.crown`, if a tree stays); the vendored brush, e.g. `scripts/look/paint/mypaint/` (peinten 1.3.0's `dist/domain/brush` + `dist/domain/tiles`, its NOTICE, the CC0 `.myb` subset); `scripts/look/paint/v2s1_v7.json`; the piece slots in `src/look/v7_s1/` (from `src/look/organic_s1/OrganicScene.tsx`) | `python3 docs/look/organic/techniques_demo.py --measure` on the still: razor edges <= 8 % (the subject's box measured apart, still crisp), straight runs <= 15 %, dead-flat <= 20 % (with step 5); `shapes_measure.py` on the same crop boxes (`SRC['ours_v6']` -> the v7 still) against §4.1's table; two bakes, one md5 per piece; `techniques_motion.py` on the full still: <= +30 % bitrate against v6, no tooth, gap or fleck under 2 px on a floating plane. Eye at 400 px beside v6 and refs 03 and 02: the marks read on a phone (proof 1's facade and tree did not), nothing reads pasted | Large (the biggest step: the port, the painter and about eight pieces); bake ~2-16 s a piece on one core; render +30-70 ms for new full-size images (crop each to its box), else 0 |
-| **4. Composition** (point 8) | T1's plan (`composition.md` §5): remove the bay tree and its grass, the planter with its pennants, the flower crates, the potted plant, the bench, the post box, the stone pier and low wall, the fern pot, and the top-left leaf branch; keep one café table and one chair at the right edge, cut by it, inside the canopy's shade; the far towpath's life tone-on-tone within +-6 L*; one boat hull; at most one of the man, the duck and the cat, tone-on-tone; Pip off the bollard under the door, onto the boat's cabin roof, tone-on-tone, >= 250 px from the door; one hero cloud top right as the counterweight, the far deck and streaks within +-4 L* of the sky. Show T3's key beside it (a darker sky top, the quay one deep mass) for the owner's pick | the v7 scene's copies of `src/look/paint_s1/V2S1_fore.tsx` (the near props), `near.ts`, `V2S1_set_life.tsx` (the towpath's life, the boats, the cat, the branch), `V2S1_pip.tsx`, `V2S1_set_wing.tsx` (the panes), or switches in its own `switches.tsx` | `python3 -B docs/look/organic/composition_study.py frame <v7.png> --caption --subject 0.495,0.435,0.675,0.567`: all ten ok (v6 9 WARNs, proof 2 5, T1 0); R5's quiet threshold recalibrated on this first painted frame (flat thumbnails read 86-88 %, a painted frame falls toward 67-91 %). Eye: squint at 400 px: one place to look; Pip found on a second look | Small (deletions and moves, about an hour); the frame renders faster |
-| **5. The paper** (point 9) | `light_proof.md` §3.2's paper, folded into step 2's per-plane multiply maps and step 3's painted pieces (one material, `MOTTLE_K`'s strengths, <= 15 % in the band), `GrainOn` on her and Pip; its finest feature >= 2 px on a floating plane | `src/look/light_s1/bake/texture.py` -> the v7 bake; `src/lib/light2/live.tsx` `GrainOn` (reused); the painter's per-piece grain (`paint.py` `grain`) replaced by the one material | dead-flat (31 px) <= 20 % of the frame; the band's spread <= 1.5 L*, the ink unchanged; +0.4-0.9 L* added on the flats; in the float, `techniques_motion.py` on the full frame: <= +30 % bitrate over v6 for steps 3 and 5 together, and no shimmer at 720p (`check_banding.py`'s texture mode, the platform rungs): the gate before a film takes it. Eye: no texture visible at 400 px, the frame reads as one surface | Small (built); 0 ms baked; its cost is bitrate |
+### Step 1. The palette and one colour key (points 1, 2). Effort: small (palette data, about an hour). Cost: 0 ms.
+- **What:** the scene's palette roles take `light_proof.md` §3.3's keyed values, with two fixes: C* >= 8 on every role
+  but a designed neutral (the glass a slate-violet at C* ~10, not 4; the lantern glass and the lamp posts likewise), and
+  living greens in one green family (`PAINT_RECIPES.md` C8), never olive or beige. ONE accent: the doorway's gold (the
+  lobby's warm wall, C* ~56). The lit upper panes a quiet warm cream inside the facade's mass (+6-8 L*, C* <= 20); the
+  yellow side panel into the facade; the hulls, the lamps and the far towpath's life toward the family's violet end; the
+  darks below the band a step deeper. The sky top B (v4's deeper zenith #afb3d8: the owner saw no difference between A
+  and B, so we took B on 2026-10-30). The painter's light table (`paint.py` `scene_light()`) is fed from the same keyed
+  roles, so the painted sky, clouds, water and far city share the key.
+- **Files:** NEW `src/look/v7_s1/palette_v7.ts` (the keyed role map over `src/look/paint_s1/palette_10b.ts`'s roles,
+  with a `problems()` check: C* >= 8, the olive band, one accent); the v7 scene's modules that pick roles;
+  `scripts/look/paint/v2s1_v7.json` (`palette`, `local`, the zenith); `src/look/light_s1/bake/key.py` kept as a
+  measure, never a grade over the frame.
+- **Check:** `src/look/light_s1/bake/measure.py` (or its v7 copy), captions off: off-family colour below the band <= 3 %
+  (v6 16.3 %); the 1 % most saturated warm light 100 % at the door (v6 24 %); `palette_v7` `problems()` empty; the band's
+  spread <= 1.5 L* and the words' contrast unchanged (68.9 L*); `composition_study.py frame`: colour calls <= 3 with one
+  rival; `scripts/qa/check_banding.py` on a master encode of the deeper zenith. Eye at 400 px: one family, the door the
+  only gold.
+
+### Step 2. The story light (points 3, 1). Effort: medium (about a day). Cost: the frame gets cheaper than v6.
+- **What:** `light.md` §5's rig as data. The key: the sun in frame at (195, 745), r 20, the horizon at y 965, focal 1400
+  (elevation 8.9 degrees, vanishing point (195, 965)). The story light: the doorway (x 540-720, y 848-1082) with the
+  lobby's lamps through the opening, #FFE2AE. The shade family #C79AB4 / #A49BD6; the far towpath's lamps off. The dusk
+  rig: v6's day casts off, contact shadows and form shades kept. Per plane ONE multiply + ONE solved screen map, cropped,
+  solved against step 1's colours: the backlit facade in shade (dose 0.52-0.88); our bank under a canopy off-screen left
+  (0.8-1.0), its edge a designed shape (§4.1: clumps of three sizes, holes of light, a 10-30 px penumbra); dapples as
+  clusters of stretched ellipses, or none; light on the jambs; the door's pool and its column in the water; the sun's
+  bloom (+2-3 L*) and veil; rims by tier. A map set per STATE (the doors shut and open, W's lamp, the pane at 3.90 s),
+  mixed by the cause. Her: `RimOf` toward the sun (1.7 px + 3.4 px at 0.4), `WrapOf` on her back edge only, `ShadeOf`,
+  `ShadowCut` from the lobby's lamps; Pip: shade + a 1.6 px rim. The `lib/light` layers that the maps replace: OFF.
+- **Files:** `src/look/light_s1/bake/` (`light.py`, `labels.py`, `solve.py`, `render_many.mjs`, `run.sh`) -> the v7
+  scene's `bake/` (later production-grade as `scripts/look/light/bake_light.py`, `light.md` §4.0);
+  `src/look/light_s1/rig.ts`, `movers.tsx`, `context.tsx` -> `src/look/v7_s1/`; `src/lib/light2/` reused as is.
+- **Check:** `measure.py`: the brightest 5 % below the sky (far planes out) within 0.07-0.15 H of her; the lobby >= +25
+  L* over the facade in its regions (proof 2 +26, v6 +9); darks (L* < 40) 15-40 % of the frame with >= 80 % in two
+  masses below the band (R10); the caption band 0 codes changed; the engine within ~0.1 L* (mean) of the bake away from
+  the movers; two bakes, one md5.
+  Motion: a 1.0-2.4 s clip at 30 fps measured as `light_motion.py` does (static light drift <= 0.05 L*; her light's
+  largest step <= 1 L* a frame; frame-to-frame p99 <= 0.3 L* away from the movers; no green cast in the shut state).
+  Render <= v6's ~550 ms a frame (the measured path: 256 ms). Eye: for every shadow, point at its caster; at 400 px the
+  eye lands on the door.
+
+### Step 3. Organic shapes and brushwork (points 5, 6, 7, 4). Effort: large (the biggest step). Cost: bakes; +30-70 ms.
+- **3.0** Step 4's cut first.
+- **3a, the design, in the engine:** port `shapes_gen.py`'s generators to a NEW `src/lib/organic/` (seeded by
+  `lib/rng.ts`): ellipse unions with the value-noise octaves, `cumulus`, `bank`, `streak`, `crown`, `limb`, `handCut`,
+  `varyRects`, `brokenLine`, a dithered `lightRamp`, `dapple`; perfect-freehand for tapered strokes; polygon-clipping or
+  d3-contour for a union's outline. In the scene: the cloud planes and streaks from the generators; the facade's windows
+  varied, each with one asymmetric element, their frames hand-cut, an overlap over each long edge; the paving's joints
+  broken.
+- **3b, the painter:** `scripts/look/organic/` and `docs/look/organic/shapes_gen.py` move into `scripts/look/paint/` as
+  v7 styles (imported, never copied). `paint.py` stays the planner (the design, the light table, the zones, the depth
+  ladder, `rng_for` seeds, §5's doses) and writes each piece's marks as a strokes JSON `{brush, pts:[x, y, pressure],
+  color, width, opacity, seed}`; the Node bake paints them with MyPaint over the piece's flat; then the edge pass (found
+  and lost by value, light, tier and plane; strokes near, teeth far, >= 2 px) and the plane's blur; one RGBA PNG per
+  piece, as now.
+- **3c, the pieces, far to near, one checkpoint each:** the sky and three cloud planes (v6's own cloud, which the owner
+  liked, warped and marked as in proof 1, then fewer and bolder marks on its lit side and a ragged found top; the mid
+  bank a real bank, never a slab); the far city +3 / +4 (lost tops, teeth, coarse marks, tone-on-tone windows); the
+  facade round the door (proof 1's piece with the new windows; the door, the fascia and W stay holes for the crisp
+  layers); the water (its left third calmer); our bank and the canopy's shade (proof 1's paving, its marks bold enough
+  for 400 px; the props' shadows owned by step 2's multiply map, never baked twice); the kept prop at the near dose
+  (hand-cut, a light ramp, edge strokes), so nothing reads pasted.
+- **Files:** NEW `src/lib/organic/`; `scripts/look/paint/paint.py` (v7 styles calling a moved
+  `scripts/look/paint/organic/` package: `oc_lib.py`, `piece_*.py`, `mypaint_bake.mjs`); `scripts/look/paint/shapes_gen.py`
+  (moved as is); `scripts/look/paint/recipes/sky_clouds.py` (billows -> ellipses + octaves) and `recipes/foliage.py`
+  (a crown by `shapes_gen.crown`, if a tree stays); the vendored brush, e.g. `scripts/look/paint/mypaint/` (peinten
+  1.3.0's `dist/domain/brush` + `dist/domain/tiles`, its NOTICE, the CC0 `.myb` subset); `scripts/look/paint/v2s1_v7.json`;
+  the piece slots in `src/look/v7_s1/` (from `src/look/organic_s1/OrganicScene.tsx`).
+- **Check:** `python3 docs/look/organic/techniques_demo.py --measure` on the still: razor edges <= 8 % (the subject's box
+  measured apart, still crisp), straight runs <= 15 %, dead-flat <= 20 % (with step 5); `shapes_measure.py` on the same
+  crop boxes (`SRC['ours_v6']` -> the v7 still) against §4.1's table; two bakes, one md5 per piece;
+  `techniques_motion.py` on the full still: <= +30 % bitrate against v6, no tooth, gap or fleck under 2 px on a floating
+  plane. Eye at 400 px beside v6 and refs 03 and 02: the marks read on a phone (proof 1's facade and tree did not), and
+  nothing reads pasted.
+- **Cost:** a bake of ~2-16 s a piece on one core (about eight pieces); +30-70 ms a frame for new full-size images (crop
+  each to its box); 0 ms otherwise.
+
+### Step 4. Composition (point 8). Effort: small (deletions and moves, about an hour). Cost: none; renders faster.
+- **What:** T1's plan (`composition.md` §5). Remove the bay tree and its grass, the planter with its pennants, the
+  flower crates, the potted plant, the bench, the post box, the low wall, the fern pot, and the top-left leaf
+  branch. Keep one café table and one chair at the right edge, cut by it, inside the canopy's shade. The
+  far towpath's life tone-on-tone within +-6 L*; one boat hull; at most one of the man, the duck and the cat,
+  tone-on-tone; Pip off the bollard under the door, onto the boat's cabin roof, tone-on-tone, >= 250 px from the door;
+  one hero cloud top right as the counterweight, the far deck and streaks within +-4 L* of the sky. Show T3's key beside
+  it (a darker sky top, the quay one deep mass) for the owner's pick.
+- **Files:** the v7 scene's own copies of `src/look/paint_s1/V2S1_fore.tsx` (the near props), `near.ts`,
+  `V2S1_set_life.tsx` (the towpath's life, the boats, the cat, the leaf branch), `V2S1_pip.tsx` and `V2S1_set_wing.tsx`
+  (the panes), or switches in its own `switches.tsx`.
+- **Check:** `python3 -B docs/look/organic/composition_study.py frame <v7.png> --caption --subject
+  0.495,0.435,0.675,0.567`: all ten ok (v6 9 WARNs, proof 2 5, T1 0), with R5's quiet threshold recalibrated on this
+  first painted frame (flat thumbnails read 86-88 %; a painted frame falls toward 67-91 %). Eye: squint at 400 px, one
+  place to look; Pip found on a second look.
+
+### Step 5. The paper (point 9). Effort: small (built). Cost: 0 ms baked; its cost is bitrate.
+- **What:** `light_proof.md` §3.2's paper, folded into step 2's per-plane multiply maps and step 3's painted pieces (one
+  material, `MOTTLE_K`'s strengths, <= 15 % in the band), `GrainOn` on her and Pip; its finest feature >= 2 px on a
+  floating plane.
+- **Files:** `src/look/light_s1/bake/texture.py` -> the v7 bake; `src/lib/light2/live.tsx` `GrainOn` (reused); the
+  painter's per-piece grain (`paint.py` `grain`) replaced by the one material.
+- **Check:** dead-flat (31 px) <= 20 % of the frame; the band's spread <= 1.5 L*, the ink unchanged; +0.4-0.8 L* added
+  on the flats; in the float, `techniques_motion.py` on the full frame: <= +30 % bitrate over v6 for steps 3 and 5
+  together, and no shimmer at 720p (`check_banding.py`'s texture mode, the platform rungs): the gate before a film takes
+  it. Eye: no texture visible at 400 px, the frame reads as one surface.
 
 **The v7 sheet:** v6 | v7 at full size and at 400 px beside refs 03 and 02, with T3's key as the second option, and one
 table: the three numbers (§4.1), the composition check, the light measure, the float's bitrate, the bake and render
@@ -479,9 +582,9 @@ cost, the md5s. With it, ask the owner §8's three questions.
 ## 8. Doc clashes found (flagged for the orchestrator; DIRECTION, CRAFT and PAINT_RECIPES are not edited here)
 
 The owner's 2026-10-30 words (the playbook's ORGANIC, NOT GEOMETRIC, PROPER LIGHT, SCENE COMPOSITION and the new
-balance in PAINTED PIECES) outrank every rule below that predates them; each needs a reconciling edit in its own doc. Three
-of them repeat the research lanes' flags (`light.md` §9, `composition.md` §7, `techniques.md` §8, `shapes.md` §8,
-`light_proof.md` §9), gathered here with one proposal each.
+balance in PAINTED PIECES) outrank every rule below that predates them; each needs a reconciling edit in its own doc.
+About half repeat the research lanes' flags (`light.md` §9, `composition.md` §7, `techniques.md` §8, `shapes.md` §8,
+`light_proof.md` §9), gathered here with one proposal each; D1, D5, C1, C9, C10, C12, P1-P3 and P6 are new here.
 
 **DIRECTION**
 - **D1. Rule 4, "big areas flat", and the painted pieces as "a few chosen environment pieces" (elsewhere "texture stays
@@ -544,7 +647,7 @@ of them repeat the research lanes' flags (`light.md` §9, `composition.md` §7, 
   not the plane's air step)".
 
 **PAINT_RECIPES**
-- **P1. §1.5-1.6, §3 C3 and the depth ladder: "solid silhouettes" crisp to +3; +3 "P0" with slivers; +4 "the silhouette
+- **P1. §1 items 5-6, §3 C3 and the depth ladder: "solid silhouettes" crisp to +3; +3 "P0" with slivers; +4 "the silhouette
   only"** against the owner's balance ("further objects are more like brushes and painting"). Proposed: far planes keep
   fewer values and fewer marks, but the marks they keep are the coarsest passes, broad and visible, and their solid
   edges lose by plane (teeth, tops lost by the sun): §5's rows +2 to +4.
@@ -592,5 +695,5 @@ Reruns, from `video/`: `python3 docs/look/organic/techniques_demo.py [--measure 
 docs/look/organic/shapes_measure.py --out <dir>` then `shapes_sheet.py --run <dir>`; `python3 -B
 docs/look/organic/composition_study.py all | frame <still> --caption --subject x0,y0,x1,y1`; `light.md` §11; `bash
 src/look/light_s1/bake/run.sh` (proof 2); `python3 -B scripts/look/organic/organic_proof.py [--check]` (proof 1, with
-its scratch tools: `organic_proof.md` §9); the contact sheet: `python3 -I <make_index.py> docs/look/organic
-docs/look/organic/index.jpg` (the script sits in the orchestrator's scratchpad; any rerun gives the same bytes).
+its scratch tools: `organic_proof.md` §9). `index.jpg` is the nine sheets downsized and labelled by a one-off Pillow
+script kept outside the repo (this run's scratchpad, `organic_index/make_index.py`); the sheet is the record.
