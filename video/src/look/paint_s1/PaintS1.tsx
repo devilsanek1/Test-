@@ -10,6 +10,7 @@ import {PaintProvider} from '../../lib/paint';
 import {PosterS1, type PosterS1Props} from './PosterS1';
 import {PAINT_SETS, type PaintSetName} from './paint_set';
 import {DuskProvider} from './dusk';
+import {V6Provider} from './v6';
 
 export {POSTER_S1_FPS as PAINT_S1_FPS, POSTER_S1_FRAMES as PAINT_S1_FRAMES} from './PosterS1';
 
@@ -26,6 +27,8 @@ export type PaintS1Props = Omit<PosterS1Props, 'preset'> & {
   reveal?: number;
   /** What lies under a piece while it paints on (default 'v4design': our flat design). */
   revealUnder?: PaintSetName;
+  /** The sky piece from another set (the C14 sky-top A/B: set 'v6' + skyFrom 'v6b' = v6 with v4's zenith). */
+  skyFrom?: PaintSetName;
 };
 
 /** S1's painting order for the reveal: the sky washes first (the sky, then the cloud planes far to near), then the far
@@ -35,16 +38,23 @@ export const S1_REVEAL_WINDOWS = {
   farroofs: [0.5, 0.74], fartower: [0.54, 0.78], tree: [0.58, 1],
 } as const;
 
-export const PaintS1: React.FC<PaintS1Props> = ({paint = true, pieces, set = 'v1', reveal, revealUnder = 'v4design', ...rest}) => (
-  <PaintProvider
-    on={paint}
-    only={pieces}
-    set={PAINT_SETS[set]}
-    reveal={reveal === undefined ? undefined : {progress: reveal, windows: S1_REVEAL_WINDOWS, under: PAINT_SETS[revealUnder]}}
-  >
-    {/* (v5) one evening light for the whole scene: water, paving, facade (dusk.tsx) */}
-    <DuskProvider on={paint && set === 'v5'}>
-      <PosterS1 preset="v2" audio="none" {...rest} />
-    </DuskProvider>
-  </PaintProvider>
-);
+export const PaintS1: React.FC<PaintS1Props> = ({paint = true, pieces, set = 'v1', reveal, revealUnder = 'v4design', skyFrom, ...rest}) => {
+  // (v6) the recipe book's set: the darks switch on (real darks outside the caption band) and the refined her (v6.tsx)
+  const v6 = paint && (set === 'v6' || set === 'v6b');
+  const pset = skyFrom ? {...PAINT_SETS[set], sky: PAINT_SETS[skyFrom].sky} : PAINT_SETS[set];
+  return (
+    <PaintProvider
+      on={paint}
+      only={pieces}
+      set={pset}
+      reveal={reveal === undefined ? undefined : {progress: reveal, windows: S1_REVEAL_WINDOWS, under: PAINT_SETS[revealUnder]}}
+    >
+      {/* (v5) one evening light for the whole scene: water, paving, facade (dusk.tsx) */}
+      <DuskProvider on={paint && set === 'v5'}>
+        <V6Provider on={v6}>
+          <PosterS1 preset="v2" audio="none" {...(v6 ? {darks: true} : {})} {...rest} />
+        </V6Provider>
+      </DuskProvider>
+    </PaintProvider>
+  );
+};

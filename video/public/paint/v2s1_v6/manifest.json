@@ -3,32 +3,92 @@
  "spec": "scripts/look/paint/v2s1_v6.json",
  "pieces": [
   {
-   "id": "v2s1/farroofs",
-   "src": "paint/v2s1_v6/farroofs.png",
+   "id": "v2s1/sky",
+   "src": "paint/v2s1_v6/sky.png",
    "box": [
     0,
-    742,
-    378,
-    208
+    0,
+    1080,
+    1100
    ],
-   "style": "far_city_recipe",
-   "seed": 64,
-   "from": "v2s1/farroofs",
-   "plane": 4
+   "style": "sky_recipe",
+   "seed": 61,
+   "from": "v2s1/sky",
+   "hides": [
+    "sun"
+   ]
   },
   {
-   "id": "v2s1/fartower",
-   "src": "paint/v2s1_v6/fartower.png",
+   "id": "v2s1/clouds_p1",
+   "src": "paint/v2s1_v6/clouds_p1.png",
    "box": [
-    252,
-    584,
-    100,
-    366
+    0,
+    610,
+    780,
+    96
    ],
-   "style": "far_city_recipe",
-   "seed": 64,
-   "from": "v2s1/fartower",
-   "plane": 3
+   "style": "cloud_planes",
+   "seed": 62,
+   "from": "v2s1/clouds",
+   "group": "clouds",
+   "depth": 0.7
+  },
+  {
+   "id": "v2s1/clouds_p2",
+   "src": "paint/v2s1_v6/clouds_p2.png",
+   "box": [
+    0,
+    100,
+    580,
+    190
+   ],
+   "style": "cloud_planes",
+   "seed": 62,
+   "from": "v2s1/clouds",
+   "group": "clouds",
+   "depth": 0.4
+  },
+  {
+   "id": "v2s1/clouds_p3",
+   "src": "paint/v2s1_v6/clouds_p3.png",
+   "box": [
+    560,
+    0,
+    520,
+    345
+   ],
+   "style": "cloud_planes",
+   "seed": 62,
+   "from": "v2s1/clouds",
+   "group": "clouds",
+   "depth": 0.0
+  },
+  {
+   "id": "v2s1/tree",
+   "src": "paint/v2s1_v6/tree.png",
+   "box": [
+    -60,
+    1250,
+    420,
+    300
+   ],
+   "style": "tree_recipe",
+   "seed": 63,
+   "from": "v2s1/tree",
+   "plane": -1
+  },
+  {
+   "id": "v2s1/water",
+   "src": "paint/v2s1_v6/water.png",
+   "box": [
+    0,
+    1030,
+    1080,
+    280
+   ],
+   "style": "water_recipe",
+   "seed": 65,
+   "from": "v2s1/water"
   }
  ]
 }

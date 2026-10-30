@@ -6,6 +6,7 @@
 // lift at 1.40 and wheel west ACROSS THE SUN. Tier C (V2S1_set wraps it in <Tier tier="environment">): flat 2-tone
 // shapes, no line; frame 0 shows them as pale shapes (the Look cascade's `pale`), no underdrawing.
 import {PaintedLayer} from '../../lib/paint';
+import {usePaintHides} from './v6';
 import React, {useMemo} from 'react';
 import {CM, INK_PX} from '../../v2r/palette';
 import {useTime} from '../../lib/time';
@@ -362,6 +363,9 @@ const SunDisc: React.FC = () => {
   const {x, y, r} = S.sun;
   const disc = ovalPath(x, y, r, r);
   const sun = toned ? sunToned(CM.sun) : CM.sun;
+  // (paint v6) the painted sky draws CRAFT §g.2's disc itself (PAINT_RECIPES §3 C6): the film's saturated one goes quiet
+  const paintedSun = usePaintHides('sky', 'sun');
+  if (paintedSun && t >= MAP.S1_CLOCK.flood.t0) return null;
   if (t < MAP.S1_CLOCK.flood.t0) {
     const a0 = (200 * Math.PI) / 180;
     const half = `M${x + r * Math.cos(a0 - Math.PI)} ${y + r * Math.sin(a0 - Math.PI)}A${r} ${r} 0 0 1 ${x + r * Math.cos(a0)} ${y + r * Math.sin(a0)}Z`;

@@ -20,6 +20,8 @@ import {S1LobbyContact} from './V2S1_light';
 import {HER} from '../../v2r/kit/cast/Her';
 import {drawn} from '../../v2r/kit/cast/gait';
 import {C, s1Step, s1HerXAt, HER_COAT_AT, S1_DRAW, s1Bold} from './V2S1_clock';
+import {Figure, type FigureLight, type FigurePose} from '../../lib/figure';
+import {useV6} from './v6';
 import {InkScale} from '../../lib/inkComp';
 import {FigSpec, FigValues, FigPart, RowFigure, figParts, FIG_H, HEAD_PARTS, TOTE_PARTS} from './V2S1_row_fig';
 import {XG, mat} from '../../lib/xf';
@@ -168,6 +170,34 @@ const lookBack = (t: number) => {
   return u * u * (3 - 2 * u);
 };
 
+// ---------------------------------------------------------------- (paint v6) the refined her
+
+/** Painter v6's her (iteration, 2026-10-30): src/lib/figure's refined "you" in her place at the door, with the people
+ *  recipe's next steps (people.md "Still short of ref 04"): slimmer (0.88), a shorter coat that shows her legs (the hem
+ *  just above the knee), a thin tapered scarf end (the one flowing element), the low sun as a WARM FRONT light (she
+ *  walks west, into it: its rim on her face and coat front) and the lit door behind her as a warm lit edge on her back,
+ *  so she never melts into the wall or the door's dark frame. In profile, walking west (the film's stroll). */
+export const V6_HER_POSE: Omit<FigurePose, 'step' | 'wind'> = {
+  view: 'profile',
+  stride: 0.9,
+  tune: {slim: 0.88, hem: -335, scarf: {length: 300, w0: 13, w1: 3.5}},
+};
+export const V6_HER_LIGHT: FigureLight = {
+  key: [-0.94, -0.34],
+  local: {color: '#FFC98A', dL: 13, dir: [1, -0.1], width: 26},
+};
+const S1HerV6: React.FC<{x: number; y: number; h: number; step: number; t: number}> = ({x, y, h, step, t}) => (
+  <Figure
+    x={x}
+    y={y}
+    h={h}
+    pose={{...V6_HER_POSE, step, wind: {t, strength: 0.8}}}
+    light={V6_HER_LIGHT}
+    look={{scarf: '#D9785F', scarfTip: '#A24A42'}}
+    shadow="#B79C95"
+  />
+);
+
 // ---------------------------------------------------------------- the slots
 
 /** Her on the far towpath (from the step-out, 0.97) and the ghost row (from 2.00). The `towpath` slot. */
@@ -175,6 +205,7 @@ export const S1Row: React.FC = () => {
   const t = useTime();
   const {legs} = useContext(RowDevCtx);
   const sw = useSwitches();
+  const v6 = useV6();
   if (t < C.steppingOut || sw.rowHidden) return null;
   const poses = MAP.s1RowAt(t);
   const step = s1Step(t);
@@ -239,13 +270,13 @@ export const S1Row: React.FC = () => {
             </React.Fragment>
           );
         })}
-        {herFig}
-        <FormShade of={herMask} c={herC} size={herSize} {...band} {...herShade} />
-        {toteFig}
-        {toteFig && vals ? <FormShade of={toteFig} c={[hx + 21.5 * sc0, her.feetY - 82.5 * sc0]} size={[20.8 * sc0, 24 * sc0]} frac={0.35} strength={vals.tote.strength} base={vals.tote.base} /> : null}
+        {v6 ? null : herFig}
+        {v6 ? null : <FormShade of={herMask} c={herC} size={herSize} {...band} {...herShade} />}
+        {v6 ? null : toteFig}
+        {!v6 && toteFig && vals ? <FormShade of={toteFig} c={[hx + 21.5 * sc0, her.feetY - 82.5 * sc0]} size={[20.8 * sc0, 24 * sc0]} frac={0.35} strength={vals.tote.strength} base={vals.tote.base} /> : null}
       </Look>
-      <Rim of={coatEl} c={[hx, her.feetY - her.h * 0.45]} size={[her.h * 0.34, her.h * 0.6]} width={3.5} cover={0.35} />
-      {vals ? (
+      {v6 ? <S1HerV6 x={hx} y={her.feetY} h={her.h} step={herStep} t={t} /> : <Rim of={coatEl} c={[hx, her.feetY - her.h * 0.45]} size={[her.h * 0.34, her.h * 0.6]} width={3.5} cover={0.35} />}
+      {!v6 && vals ? (
         // her hair's rim on the key side, only where it crosses the door's dark members (REVIEW MUST 1; CRAFT §d.8)
         <>
           <defs>

@@ -82,6 +82,11 @@ export type FigurePose = {
   eye?: boolean;
   /** Stride factor (1 = the recipe's 0.5 H span at contact). */
   stride?: number;
+  /** The people recipe's next steps (people.md "Still short of ref 04"; painter v6, 2026-10-30), all optional (absent =
+   *  the recipe's drawing, unchanged): `slim` scales the body's widths about its centre line (the head keeps its own),
+   *  `hem` lifts the coat's hem to this height (local units, e.g. -330: just above the knee, so the legs act), `scarf`
+   *  the flowing end's length and its tapered widths (root w0 -> tip w1). */
+  tune?: {slim?: number; hem?: number; scarf?: {length?: number; w0?: number; w1?: number}};
 };
 
 // ---------------------------------------------------------------- the walk (profile; Williams' contact-down-pass-up)
@@ -405,7 +410,8 @@ function profile(p: FigurePose): Build {
     ] as Pt[]
   ).map(([x, y]) => [x - lean * 2.4, y + bob * 0.85] as Pt);
   const rootPt: Pt = [36 - lean * 2.4, -826 + bob * 0.85];
-  const ends = scarfEnd(rootPt, walking ? 16 : 30, wind, 1);
+  const sc = p.tune?.scarf;
+  const ends = scarfEnd(rootPt, walking ? 16 : 30, wind, 1, sc?.length ?? 270, sc?.w0 ?? 19, sc?.w1 ?? 11);
   parts.push(...ends);
   if (carry !== 'box') {
     const fe = tube([[-36 - lean * 2.4, -806 + bob * 0.85], [-42 - lean * 2.2, -756 + bob * 0.85], [-45 - lean * 1.8, -712 + bob * 0.85]], [18, 17, 16]);
@@ -630,7 +636,8 @@ function behind(p: FigurePose): Build {
       rim: 6,
     });
   }
-  const ends = scarfEnd([ax(54), -836], 24, wind, 1, 270, 19, 11);
+  const sc = p.tune?.scarf;
+  const ends = scarfEnd([ax(54), -836], 24, wind, 1, sc?.length ?? 270, sc?.w0 ?? 19, sc?.w1 ?? 11);
   parts.push(...ends);
   parts.push({k: 'scarfWrap', pts: wrap, tension: 0.5, mat: 'scarf', shade: 34, rim: 7});
   parts.push({k: 'hair', pts: head, tension: 0.5, mat: 'hair', shade: 46, rim: 8});
@@ -642,7 +649,36 @@ function behind(p: FigurePose): Build {
   return {parts, lines, ground: [gx, 150]};
 }
 
+/** The head's own parts: `tune.slim` leaves them as drawn (the face hint keeps its shape). */
+const HEAD_KEYS = new Set(['skin', 'hair', 'bun', 'bunUnder', 'cheek']);
+/** The coat's skirt parts that `tune.hem` shortens. */
+const SKIRT_KEYS = new Set(['coat', 'fold', 'vent', 'tails']);
+const SKIRT_TOP = -560;
+
+/** The tune (FigurePose.tune): slimmer widths and a shorter hem, as a pure remap of the built parts. */
+function tuned(b: Build, t: NonNullable<FigurePose['tune']>): Build {
+  const slim = t.slim ?? 1;
+  let hemOld = -190;
+  for (const q of b.parts) if (q.k === 'coat') hemOld = Math.max(...q.pts.map((pt) => pt[1]));
+  const hem = t.hem ?? hemOld;
+  const kY = (hem - SKIRT_TOP) / (hemOld - SKIRT_TOP);
+  const parts = b.parts.map((q) => {
+    let pts = q.pts;
+    if (SKIRT_KEYS.has(q.k) && hem !== hemOld) {
+      pts = pts.map(([x, y]) => {
+        if (y <= SKIRT_TOP) return [x, y] as Pt;
+        const u = (y - SKIRT_TOP) / (hemOld - SKIRT_TOP);
+        return [x * (1 - 0.22 * Math.min(1, u)), SKIRT_TOP + (y - SKIRT_TOP) * kY] as Pt;
+      });
+    }
+    if (slim !== 1 && !HEAD_KEYS.has(q.k)) pts = pts.map(([x, y]) => [x * slim, y] as Pt);
+    return {...q, pts};
+  });
+  return {...b, parts, ground: [b.ground[0] * slim, b.ground[1] * slim]};
+}
+
 /** The figure's parts for a pose (local units, H = 1000; profile faces screen-left). */
 export function buildFigure(p: FigurePose): Build {
-  return p.view === 'profile' ? profile(p) : behind(p);
+  const b = p.view === 'profile' ? profile(p) : behind(p);
+  return p.tune ? tuned(b, p.tune) : b;
 }
