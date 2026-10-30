@@ -4,6 +4,8 @@
 // jobs.json = [{"props": {...}, "frames": [0, 149], "out": "x.mp4"}            -> an H.264 clip
 //              {"props": {...}, "frames": [0, 149], "bench": 24}               -> render 24 spread frames (PNG, discarded)]
 // Prints ms/frame per job (incl. encoding for clips; frames only for bench).
+// A v1 tool: EdgeLab (src/dev/) is archived since 2026-10-29 in archive/v1/src/dev/, so run it at the v1-final
+// commit (76c166c1).
 import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';

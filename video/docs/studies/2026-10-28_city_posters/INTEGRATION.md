@@ -128,7 +128,7 @@ restated number replaced by a link to its one definition). Paths from `video/doc
   fix with no owner call, STUDY.md §7) and `planeLod`'s `minFeature` 0 px on plane 0 (`details.md` §3: twinkle). One
   constant the checks read is the tooling lane's.
 - **The v1-era docs** (`ENGINE.md`'s table of the code's constants, `CINE_KIT.md`, `v1/BRIEF.md`, `v1/style_bible*.md`,
-  `scenes/`): API and measurements under their banner; `LAYOUT.md` never cites them for layout (row 18).
+  `v1/scenes/`): API and measurements under their banner; `LAYOUT.md` never cites them for layout (row 18).
 - **`look/research/` (e.g. `vertical.md`):** the evidence, cited, not edited.
 - **`G3_ANIMATIC.md`:** its "3 planes" is the board's staging, as STORYBOARD_STYLE now says (row 5): no clash.
 - **`EDGES.md`:** it already says the code paints past the top since 2026-10-25 (row 17).

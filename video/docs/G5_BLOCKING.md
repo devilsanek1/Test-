@@ -200,9 +200,9 @@ node scripts/render-frames.mjs Film3-SQD /tmp/sqd 0.2,1.0,1.8 $E --scale=0.5
 scripts/sheet.sh Film3-SQD 0 1.9 8 /tmp/sqd_sheet.png $E --scale=0.35
 # the props form (Film3Shot {id}); sheet.sh's caption check passes its own --props, so add --no-capcheck here
 node scripts/render-frames.mjs Film3Shot /tmp/sqd 0.5 $E --props='{"id":"SQD"}' --scale=0.25
-# every frame of a motion at 60 fps (or scripts/strip.sh with $E: since 2026-10-29 it renders every frame at the
-# composition's own fps, tiled with frame numbers)
-node scripts/render-frames.mjs Film3-SQD /tmp/sqdf $(python3 -c "print(','.join(f'{f/60:.4f}' for f in range(30, 60)))") $E --scale=0.33
+# every frame of a motion at 60 fps: a range t0:t1[:step] (scripts/strip.sh tiles it with frame numbers)
+node scripts/render-frames.mjs Film3-SQD /tmp/sqdf 0.5:1.0 $E --scale=0.33
+scripts/strip.sh Film3-SQD 0.5 1.0 /tmp/sqd_strip.png $E --scale=0.33
 # a join in context (the film around a scene start: VO seconds), and a seam's two builders alone (§2b)
 node scripts/render-frames.mjs Film3 /tmp/cut 19.383,19.4,19.417 $E --scale=0.5
 node scripts/render-frames.mjs Film3Seams /tmp/seams $(python3 -c "print(','.join(f'{k/60:.4f}' for k in range(16)))") $E --scale=0.25

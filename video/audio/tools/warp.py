@@ -2,7 +2,8 @@
 
 Anchors = words that match in both ASR word lists (difflib on normalised tokens). Times in between are
 interpolated linearly; the loop ends map onto each other (70.7 -> VIDEO_DUR). Temporary stand-in until the
-timing stream's scripts/timewarp.py exists (then use that: same idea, refined word times).
+timing stream's scripts/timewarp.py exists (then use that: same idea, refined word times; it is v1's, archived since
+2026-10-29 in archive/v1/scripts/).
 
     python3 audio/tools/warp.py 30.64 35.6          # print mapped times
 """

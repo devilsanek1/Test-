@@ -3,6 +3,8 @@
 //   node review/edges/tools/render-lab.mjs jobs.json [--scale=1] [--concurrency=2]
 // jobs.json = [{"props": {...EdgeLab props}, "t": 0, "out": "path.png"}, ...]
 // Prints "<ms> <out>" per still, and the mean ms/frame per variant at the end.
+// A v1 tool: EdgeLab (src/dev/) is archived since 2026-10-29 in archive/v1/src/dev/, so run it at the v1-final
+// commit (76c166c1).
 import path from 'node:path';
 import fs from 'node:fs';
 import {fileURLToPath} from 'node:url';

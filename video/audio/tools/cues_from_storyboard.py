@@ -1,6 +1,7 @@
-"""Build audio/cues.json from the storyboard's per-scene sfx lists (docs/storyboard_v3_resolved.json scenes[].sfx).
+"""Build audio/cues.json from the storyboard's per-scene sfx lists (docs/v1/storyboard_v3_resolved.json scenes[].sfx).
 
-The storyboard times are already resolved on the recorded voice (assets/timing.json) by scripts/anchor/resolve.py.
+The storyboard times are already resolved on the recorded voice (assets/timing.json) by scripts/anchor/resolve.py (v1's,
+archived since 2026-10-29 in archive/v1/scripts/anchor/).
 This converts its free-text notes into mixer cues:
   "-18 dB, ..."                  -> gain_db (else a per-sound default, in the kit's usual range)
   "x3", "x7, 0.08 s apart"       -> that many hits (default 0.08 s apart, each 1.5 dB softer)
@@ -12,7 +13,7 @@ This converts its free-text notes into mixer cues:
 Cues "on the cut" (or at a scene start) are final; everything else is "provisional": true (it follows animation
 beats that can still move). Each cue keeps its scene, the storyboard note and its source time.
 
-    python3 audio/tools/cues_from_storyboard.py [--storyboard docs/storyboard_v3_resolved.json] [--out audio/cues.json]
+    python3 audio/tools/cues_from_storyboard.py [--storyboard docs/v1/storyboard_v3_resolved.json] [--out audio/cues.json]
 """
 from __future__ import annotations
 
@@ -74,7 +75,7 @@ def convert(sb):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--storyboard", default=str(ROOT / "docs" / "storyboard_v3_resolved.json"))
+    ap.add_argument("--storyboard", default=str(ROOT / "docs" / "v1" / "storyboard_v3_resolved.json"))
     ap.add_argument("--out", default=str(AUDIO / "cues.json"))
     a = ap.parse_args()
     sb = json.loads(Path(a.storyboard).read_text())

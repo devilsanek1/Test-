@@ -244,7 +244,7 @@ misregistration offsets, sizes). `<ScreenSpace>` resets it to 1 (no camera zooms
 thinner than nominal at rest (measured: keys 1 -> 3x flagged, hold, -> 1x UNflagged: a 4 px line renders 2.0 px with
 the camera back at zoom 1; with the return key flagged too it is 4.0 px again). A `<World push>` / transition factor
 and your own `inkCompFactor(zoomNow, k, from)` follow the zoom live instead (back to 1 when the zoom is back at `from`).
-`useScreenWidth(depth)(px)` (CINE.md) is no longer screen-constant inside a flagged camera when fed to `<Ink>` (Ink
+`useScreenWidth(depth)(px)` (CINE_KIT.md) is no longer screen-constant inside a flagged camera when fed to `<Ink>` (Ink
 multiplies by the layer factor): divide it by `useInkScale()` there.
 
 **Coverage gaps (raw strokes).** Only the pieces listed above read the factor. A raw `<path strokeWidth>` stays

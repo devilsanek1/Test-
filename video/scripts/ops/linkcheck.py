@@ -28,8 +28,8 @@ Each reference is then:
              film's docs (video/docs/v1/, video/docs/v3/), anything under an archive/ folder, and --history PREFIX.
   annotated  its block (the paragraph; a list item with its parents' and the list's lead-in lines; a table row; a code
              block; in code, the run of non-blank lines) or the file's banner (a blockquote at the top of a doc, a code
-             file's header) names where the file went (its new path or a folder holding it, e.g. `archive/v1/`) or a
-             commit or tag at which the old path exists (e.g. `76c166c1`).
+             file's header) names where the file went (its new path or a folder holding it, e.g. `archive/v1/`), or
+             its block names a commit or tag at which the old path exists (e.g. `76c166c1`).
   kept       in the known list as `keep`: deliberate (a never-import rule, data provenance, a tool's history note).
   deferred   in the known list as `todo`: a fix planned for later, printed on every run as a reminder.
   stale      none of the above: fix the path, add a note that says where the file went, or list it as known.
@@ -197,6 +197,8 @@ def moves_from_list(path):
                     rel = os.path.relpath(os.path.join(d, f), ROOT)
                     files[old + rel[len(new):]] = rel
         else:
+            if not exists(new):
+                print(f'linkcheck: warning: {new} does not exist (moves list)', file=sys.stderr)
             files[old] = new
     return files, dirs
 
@@ -279,8 +281,9 @@ def resolve(w, tok, fdir, link, cdir=None):
         cands = w.by_base.get(os.path.basename(lit.rstrip('/')), set())
         if len(cands) == 1:
             (only,) = cands
-            if only in w.files and os.path.dirname(w.files[only]) != (fdir if cdir is None else cdir):
-                return only, w.files[only], 'bare'  # unless both files moved together (still siblings)
+            here = fdir if cdir is None else cdir  # the name still works where it is cited (both moved together)?
+            if only in w.files and w.files[only] != (here + '/' if here else '') + os.path.basename(lit.rstrip('/')):
+                return only, w.files[only], 'bare'
         return None
     for b in bases(fdir, explicit):
         c = norm(b + lit)
@@ -489,11 +492,11 @@ class Pointers:
                                            capture_output=True).returncode == 0
         return self.cache[k]
 
-    def named(self, toks, fdir, old, new):
+    def named(self, toks, fdir, old, new, revs=True):
         for tok in toks:
             t = clean(tok)
             if HEX.match(t) or t in self.tags:
-                if self.at_rev(t, old):
+                if revs and self.at_rev(t, old):
                     return True
                 continue
             for p in now_paths(tok, fdir):
@@ -544,8 +547,9 @@ def scan(w, args, known):
                 refs.append(ref)
                 continue
             sc = scopes[i] | ban
-            if sc not in toks_of:
-                toks_of[sc] = [t for k in sorted(sc) for t in tokens(lines[k])]
+            for key in (sc, scopes[i], ban):
+                if key not in toks_of:
+                    toks_of[key] = [t for k in sorted(key) for t in tokens(lines[k])]
             st = toks_of[sc]
             if kind in ('bare', 'suffix'):  # "in `docs/look/`: `CRAFT.md`": a folder cited in the block holds it
                 lit = clean(tok)
@@ -557,7 +561,8 @@ def scan(w, args, known):
                     continue
             rule = next((k for k in known if fnmatch.fnmatch(rel, k['glob'])
                          and (old == k['old'] or old.startswith(k['old'] + '/'))), None)
-            if ptr.named(st, fdir, old, new):
+            # a commit counts in the reference's own block only: a banner's commit holds every pre-move path
+            if ptr.named(toks_of[scopes[i]], fdir, old, new) or ptr.named(toks_of[ban], fdir, old, new, revs=False):
                 ref['cat'] = 'annotated'
             elif rule:
                 rule['hits'] += 1
