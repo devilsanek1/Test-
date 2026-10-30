@@ -34,17 +34,17 @@ one, and no artist is a style target.
 1. **Design first:** flat shapes before any stroke, 3-5 values per mass (lit, half, shade, deep; accents <= 5 %), one
    colour family, one light; check the flat (`--design`) beside the refs. P0 is the film's flat: paint never moves it.
 2. **One light, one limited palette:** the shot's rig lights every piece (§3 C7); 10-15 swatches per piece from the
-   scene's one light table (C5); a stroke is one swatch or an OKLab mix of two neighbours (jitter <= 2.5 L*), never grey.
+   scene's one light table (C5); a stroke is one swatch or an OKLab mix of two neighbours (jitter <= 2.5 L*), no grey.
 3. **Passes, soft to crisp, each blurred less than the last:** P0 the design (sigma 0-4 px) -> P1 3-14 big soft strokes
    per mass, +-1-5 L* (sigma 3-8; the open sky 24) -> P2 blocky flat-brush marks along the form (sigma 0.3-0.6) -> P3 a
    few crisp accents at the light edges (sigma 0) -> P4 texture, near masses only.
 4. **Marks by intent, at a dose that reads:** where the form turns, along the light edge, where weather runs, 4-15 L*
-   off their zone; calm stays calm (water >= 75 % unmarked, a shade zone <= 40 % covered); v4's 2.6 % read as no paint.
+   off their zone; calm stays calm (water >= 75 % unmarked, a shade zone <= 40 % covered); v4's 2.6 % was too faint.
 5. **Depth by plane** (the table): farther = closer to its air by CRAFT §f.2's k, fewer values and marks, a bit softer.
 6. **Edges by the light:** crisp 0.5-1.5 px (solid silhouettes to +3, marks, slivers), firm 2-6 (a cloud's lit edge),
    soft 7-16 (a cloud turning away), lost 20-35 (a cloud's base, far vapour); broken = clumps and notches, never a comb.
 7. **Texture only where the paint is near:** open sky +-0.3-1.2 L* in patches (caption band <= 1.5 L*), water tooth
-   +-0.5, near solids grain ~1.6 + mottle ~2.0 L* std, speckle on near masses only; sky pieces carry CRAFT §g.4's dither.
+   +-0.5, near solids grain ~1.6 + mottle ~2.0 L* std, speckle on near masses only; sky pieces get CRAFT §g.4's dither.
 8. **Real strokes:** a profile swept along a path (chained stamps bead) or a polygon at 4x, box-reduced; dry breaks run
    along the stroke's last 25-60 %, never across it (reed plumes and dome brushing excepted).
 9. **One layer per plane, deterministic:** one generator per (seed, piece, pass); one RGBA PNG per plane, in its group.
@@ -75,22 +75,23 @@ one, and no artist is a style target.
 
 ## 2. Every element: the recipe in one line, and how close it gets
 
-"How close" is how far a swatch gets toward the references, judged at phone width (400 px). The figure is the family
-agent's own; where this book reads it differently, both are given. Swatch rows are the numbered rows of each family's
-swatch.
+"How close" is how far a swatch gets toward the references, judged at phone width (400 px). The fraction is the family
+agent's own where it gave one (trees, buildings, the cumulus); elsewhere it is this book's reading of the agent's
+verdict, from the swatch beside its refs; where the two differ, both are given. The rows are the numbered rows of each
+family's swatch.
 
 ### 2.1 Sky and clouds (`paint_recipes/sky_clouds.md`, swatch `sky_clouds_swatch.png`)
 | Element | Recipe in one line | § | Row | How close (honest) |
 |---|---|---|---|---|
-| Sky gradient (dusk, day) | One PCHIP curve in OKLab through zenith L* 80.9, field 82.0 (flat over y 317-556), rose 84.4, band 88.9 (the lightest) and horizon 87.5 (the air). The sun's warmth is an ellipse (rx 475, ry 214, 0.55) cut above y 556. P1: 14 soft strokes 160-320 px, sigma 24. P2: 70 strokes 40-90 px, sigma 6. P3: a 35 deg hatch (2-3 px lines 9 px apart, +-0.7-1.2 L*) on 55 % of the sky, x0.25 in the band | 3.1 | 1 | Right by CRAFT §g: the band spreads 1.08 L*. Its texture is 0.35 L* against the refs' 0.45-0.60, and it has none of 03's lighter gaps. **About 1/2** of the refs' life; it is calm by rule. |
-| Near cumulus | 10-14 hand-placed billows on a size ladder (1 : 0.75 : 0.55 : 0.4 : 0.25 : 0.15), drawn back to front away from the light, on one base line. One big form is lit as a whole (light per billow <= 0.45), with caps on top: 4 values + a 5 px rim, L* 58-90 on a field of 82. P1: soft strokes, sigma 7. P2: scoops with a crisp convex edge, plus 7 level blocks, sigma 0.6. P3: <= 7 rims. P4: <= 70 specks on the far base. Edges: lit 1.8, away 16, base 22 px | 3.2 | 2, 2b | **About 2/3** by its own review. This book reads **1/2-2/3** at 400 px: the design and the light are right, but the inside is smoother than 02 and p02 and the base reads airbrushed. Still the strongest sky piece. |
+| Sky gradient (dusk, day) | One PCHIP curve in OKLab through zenith L* 80.9, field 82.0 (flat over y 317-556), rose 84.4, band 88.9 (the lightest) and horizon 87.5 (the air). The sun's warmth is an ellipse (rx 475, ry 214, 0.55) cut above y 556. P1: 14 soft strokes 160-320 px, sigma 24. P2: 70 strokes 40-90 px, sigma 6. P3: a 35 deg hatch (2-3 px lines 9 px apart, +-0.7-1.2 L*) on 55 % of the sky, x0.25 in the band (by day, a +-0.35 L* paper tooth instead) | 3.1 | 1 | Right by CRAFT §g: the band spreads 1.08 L*. Its texture is 0.35 L* against the refs' 0.45-0.60, and it has none of 03's lighter gaps. **About 1/2** of the refs' life; it is calm by rule. |
+| Near cumulus | 10-14 hand-placed billows on a size ladder (1 : 0.75 : 0.55 : 0.4 : 0.25 : 0.15), those farther from the light drawn in front, on one base line. One big form is lit as a whole (light per billow <= 0.45), with caps on top: 4 values + a 5 px rim, L* 58-90 on a field of 82. P1: soft strokes, sigma 7. P2: scoops with a crisp convex edge, plus 7 level blocks, sigma 0.6. P3: <= 7 rims. P4: <= 70 specks on the far base. Edges: lit 1.8, away 16, base 22 px | 3.2 | 2, 2b | **About 2/3** by its own review. This book reads **1/2-2/3** at 400 px: the design and the light are right, but the inside is smoother than 02 and p02 and the base reads airbrushed. Still the strongest sky piece. |
 | Banks and decks | 6-8 flattened humps (flat 0.36-0.52 mid, 0.26-0.33 far) on a level base, lit from below by the low sun, the top in `shade_top`. P2: 8-11 level strokes per hump, crisp toward the light. P3: a lit underside in 70-220 px segments, warmest by the sun. k .22 / .38, blur 1.3 / 2.4 | 3.3 | 3, 3b | **About 1/2**: the depth reads, but each plane is one slab where 03 stacks several, with lighter gaps and dragged ends. |
 | Horizon streaks | 4 rows, 16-74 px above the horizon, 3-12 px tall and 70-520 px long (log-uniform). Each is a rose body ~6-8 L* under the band with a lit underside 0.42 w wide, brightest within ~340 px of the sun | 3.4 | 4 | **About 1/2**: nearly invisible at 400 px, by design (the far stays calmest). |
 | Sun and glow | A flat disc, r 20: the band above it mixed 85 % toward `sun` #fff0db, so one step over its band; edge 1.2 px, no halo; cut by the far roofs. The glow is the sky's warmth plus the lit undersides nearest the sun | 3.5 | 5 | Right by CRAFT §g.2 (a rule here, not a reference to match). |
 | Far flock | 46 two-stroke birds (V, gull, level), 82 % of them in 9 clumps along an arc; the wingspan grows 3.5-9.5 px toward the near end; drawn at 4x | 3.6 | 6 | **About 3/4** as a drawing. In a film the flock is a mover, never baked (§3 C12). |
 
 ### 2.2 Water (`paint_recipes/water.md`, swatch `water_swatch.png`)
-| Element | Recipe in one line | § | Row | How close (honest; the fractions are this book's reading of the agent's §9 verdicts) |
+| Element | Recipe in one line | § | Row | How close (honest) |
 |---|---|---|---|---|
 | E1 Calm mirror of a dusk sky | P0: a ladder by depth (L* 74 -> 51, rose-peach -> blue-violet), with a horizon step >= 15 L* and mirrored cloud bands. P1: 5-8 soft strokes, +-1.5-3.5 L*, sigma 6 -> 3. P2: bold flat dashes, ONE light and ONE dark colour per plane (+-7-15 L*), in chains along the swell and only on windy patches, covering 4 / 7 / 9 %. P3: 2-8 crisp accents and the broken waterline. P4: tooth +-0.5 L* | 5, 6 E1 | 1 | **About 1/2**: calm, painted, a clear horizon. Its marks cover 3.1 % of the water (the painted refs 6.7-8.1 %); its horizon step is 15 L* (theirs 30-50). |
 | E2 Lit-window reflections | Mirror the thing about its own waterline, simplify it (a 7 x 21 median), tone it 25-30 % toward the water (-4 L*, C* x0.9, Fresnel -8 L* x depth). One solid block down to 60 % of its length, then level bars, crossed by thin sky-break lines. A light is a glow column + a block over 35 % of its length + <= 3 slivers + cores | 6 E2 | 2 | **About 2/3**, the closest water piece: a mirror, with lights that read as light on water. |
@@ -113,7 +114,7 @@ swatch.
 ### 2.4 Buildings, ground, far city (`paint_recipes/built_ground.md`, swatch `built_ground_swatch.png`)
 | Element | Recipe in one line | § | Row | How close (honest) |
 |---|---|---|---|---|
-| Far city as layered haze | 4 planes of flat blocks (widths 1 : 4, heights 1 : 3, a dip by the sun), one value per block (+-1-2.5 L*). Each plane converts toward the air, with in-scatter by the sun and mist low. A sun-side face and slivers go on the edges that face the sun, window grids on the near planes. Blur 0.3 -> 1.6 px, tops lost by the sun; L* 49 > 59 > 68 > 78, then the air at 88 | 4.1 | 1 | **About 2/3**: a calm, pale, layered city, plainer than ref 01. Measured, its +3 slivers sit 23.5 dE over their body and its lamp windows 33 dE over theirs: over CRAFT §f.2 for a film (§3 C11). |
+| Far city as layered haze | 4 planes of flat blocks (widths 1 : 4, heights 1 : 3, a dip by the sun), one value per block (+-1-2.5 L*). Each plane converts toward the air, with in-scatter by the sun and mist low. A sun-side face and slivers go on the edges that face the sun, window grids on the near planes. Blur 0.3 -> 1.6 px, tops lost by the sun; L* 49 > 59 > 68 > 78, then the air at 88 | 4.1 | 1 | **About 2/3**: a calm, pale, layered city, plainer than ref 01. Measured, its p3 slivers sit 23.5 dE over their body and its p2 lamp windows 33 dE over theirs: over CRAFT §f.2 for a film (§3 C11). |
 | Painted facade | Each face valued by its orientation to one sun: sun side L* 75, front 55 / 53, soffits 36, glass 22 / 63, lamps 84, reveals 77. P1: soft strokes, +-4-6 L*. P2: one panel stroke per pier and spandrel (+-4-9 L*), cool patches, warm repairs, brick in patches. P3: slivers on every sun-facing edge, 1.2-2 px. P4: stains, soot, drips, splash, chips, speckle | 4.2 | 2 | **About 2/3** by its own review, at 1:1. This book reads **about 1/2** at 400 px, where the brushwork disappears and the window grid is too regular. |
 | Brick and stone | Brick only suggested, in patches (coverage 0.5-0.62, faded edges): course lines on receding faces, dabs on frontal ones. Stone as big flat blocks with lit lips; chips, drips and speckle where water and wear run | 4.3 | 3 | **About 2/3**: at 2x the brick reads more drawn than painted. |
 | Paving in perspective | Flags laid out in ground coordinates (0.62 m rows, 0.55-1.25 m long), +-2.6 L* each, fading between 4 and 20 m. Joints thin and fade with distance; the sun's sheen lies along its line; long lilac shadows run toward us (19 x the caster's height, the penumbra growing). Level soft bands, dry strokes clipped per flag, lit lips, grit near | 4.4 | 4 | **About 3/4** of the owner's calm-ground models (02, 03); its strokes are invisible at 400 px. |
@@ -134,14 +135,14 @@ the designs. Each family lists them: `sky_clouds.md` §6, `water.md` §9, `folia
 | # | Topic | What the recipes say | The call |
 |---|---|---|---|
 | C1 | The depth ladder's k | Clouds use 0 / .22 / .38. Trees use 0 / .28 / .55. The far city uses .12 / .34 / .56 / .78. Paving uses .07-.30 | **CRAFT §f.2's steps for every family: 0 / .12 / .22 / .40 / .65 (+5: .87).** The clouds near / mid / far map to 0 / +2 / +3. The trees near / mid / far map to -1 / +2 / +3. The city's p1-p4 map to +1 to +4. CRAFT outranks the recipes, and one ladder makes two families at one distance read as one distance. |
-| C2 | How a plane converges | Sky: a straight OKLab mix. Foliage: a CIELAB lerp, which sends far greens toward khaki. Built: an OKLab mix plus a chroma scale. Water: its own LCh ladder | **One function: a numpy port of `lib/depth.ts` `atmos()`** (the rule under the table in §1). |
+| C2 | How a plane converges | Sky: a straight OKLab mix. Foliage: a CIELAB lerp, which sends far greens into the olive band (measured: at k .55 all four leaf swatches land at h 91-113, C* 3-24). Built: an OKLab mix plus a chroma scale. Water: its own LCh ladder | **One function: a numpy port of `lib/depth.ts` `atmos()`** (the rule under the table in §1). |
 | C3 | Blur by depth | The playbook: "each plane painted softer and blurrier the farther it is". CRAFT §f.2: "never a gradient, fog or blur". Sky: 1.3 / 2.4 px. The far city: 0.3-1.6 px. Foliage keeps every plane crisp (0.4 / 0.5 px), because the refs' trees keep 1.1-1.5 px silhouettes | **Farther is always softer (the playbook outranks CRAFT), by material.** Vapour (clouds, haze, glow) steps 0 / 1.3 / 2.4 px. Solids (trees, buildings, rocks, ground) step 0 / 0.3 / 0.4-0.6 / 0.5-1.0 / 1.6 px over planes 0 to +4, keeping crisp silhouettes to +3, with tops lost only by the sun on +3 and +4. The one big blur on a solid is the near out-of-focus framing (2.2-3 px). CRAFT's wording is doc clash D1. |
 | C4 | The colour space | Sky, built and paint.py mix in OKLab (CRAFT §g.1). Foliage and water mix in CIELAB | **Mix and grade in OKLab; measure and quote in CIELAB L* C* h.** A recipe's LCh rules build its hex swatches once. |
 | C5 | Where a palette comes from | Water's `KX_LIGHT` is sampled from `paint_still_v4.png` (zenith L* 75, sun #ee6a2e). Foliage and built use the sky recipe's dusk set (zenith 80.9, CRAFT §g.1) | **One light table per scene: the sky recipe's set plus the scene's own local colours.** Water re-derives its ladder from that table. Done as-is, the step at the horizon falls to 10.2 L* and w_far to C* 13 (measured), below the water recipe's own floors. So `w_far` is then set to the air -15 L*, C* >= 15. #ee6a2e stays only as the sun's LIGHT colour, for the glint's amber (CRAFT §f.7 e). |
 | C6 | The sun disc | Water E3 / E7: a saturated 96 px #ee6a2e disc. Built's backdrop: r 31. Sky: r 20, one step over its band | **The sky recipe's disc (CRAFT §g.2, DIRECTION rule 6), and only the sky piece draws it.** The glint's width is set in px (E7's `D` 96 gives a column 106 -> 192 px wide), never from the disc. |
 | C7 | The light vector | Sky: per plane, toward the sun's image, with lz 0.3. Foliage: L = (-0.70, -0.62, 0.36). Water's rock: (-0.72, -0.42, 0.55). Built: a 3-D sun (az -20 deg, el 3 deg) in the frame, so the fronts are in shade and the slivers go on the edges that face the sun's x | **One sun per set, applied in three ways.** Near and mid solids take the rig's key, L = normalize(-0.70, -0.62, 0.36): the film's crisp layers beside them are lit that way, and built's face values agree with it (sun face 75, front 53-55). Clouds keep the sky recipe's per-plane rule, because a low sun lights their undersides. Far planes (+2 to +4) take built's in-frame rule. Built's fronts-in-shade table is for a shot whose rig says so. |
 | C8 | The gamut | Sky and built: three hue families (peach-gold, rose, lilac) and "nothing outside them". Foliage: greens from h 94 to 218 | **Per scene: the sky's three families plus ONE green family for living things.** Its lit end sits at h 100-110, pulled 6-10 deg toward the key; its deep end at h 210-230, toward the sky's cool. The story layers' hero and pop stay crisp, never painted. |
-| C9 | The water's mark dose | The water recipe covers 4-9 % of open water. CRAFT §f.7 (f) once allowed 6-14 ripple lines | **Settled in CRAFT §f.7 (commit 1f9cd50b): a FEW deliberate strokes on a calm base, 75 %+ untouched.** The canal has only the mid and near planes (depth 0.55-0.95) and runs them at dose 0.6 (4.2 / 5.4 %). `mark_metric` checks it: calm >= 75 %, marks 3-9 %. |
+| C9 | The water's mark dose | The water recipe covers 4-9 % of open water. CRAFT §f.7 (f) gives the flat water 6-14 ripple lines | **Settled in CRAFT §f.7 (commit 1f9cd50b): a FEW deliberate strokes on a calm base, 75 %+ untouched.** The canal has only the mid and near planes (depth 0.55-0.95) and runs them at dose 0.6 (4.2 / 5.4 %). `mark_metric` checks it: calm >= 75 %, marks 3-9 %. |
 | C10 | The water's P0 | E7 re-mirrors the design image, though `water.md` says it "paints ON that design and never replaces it" (`lib/water.tsx`) | **In production, P0 is the film's flat water from `lib/water.tsx`** (CRAFT §f.7's mirror, Fresnel ladder and cool field), passed as `water_body(base=...)`; P1-P4 paint on it. **A still (v6) may use E7's method,** but must pass `master_check.py`'s cool share (>= 83 %) before production: E7's warm facade mirrors at k 0.3 may fail it. |
 | C11 | How rich the far city is | Built: slivers +23.5 dE over the body on p3, lamp windows +33 dE on p2 (ref 01's look). CRAFT §f.2: behind a pale subject the far city starts at +3, with <= 3 values within 12 dE on +3 and <= 2 within 5 dE on +4; windows tone-on-tone (dE <= 6, never the lamp colour) from +2, none at +4 | **CRAFT, in scene 1.** The tower is +3: slivers <= +12 dE, windows tone-on-tone. The far roofs are +4: no slivers, no windows, tops lost by the sun. A ref-01 city of lit windows is a CRAFT change and needs the owner's word. |
 | C12 | The flock | Sky §3.6 bakes 46 birds into the sky plate, 20 L* under the sky. CRAFT §f.6: birds are tier-C movers, "far birds pale and small" | **Never baked: a baked flock is frozen.** The recipe's two-stroke bird is the drawing for the particle layer (`lib/particles`), the whole flock at the recipe's pale far end (55 % toward the sky). |
@@ -169,8 +170,9 @@ the designs. Each family lists them: `sky_clouds.md` §6, `water.md` §9, `folia
 
 The handover's next step (`docs/studies/2026-10-28_city_posters/HANDOVER.md`): one agent, an iteration of stills
 only, builds painter v6 from this book (the sky and its layered clouds, the water, the tree, the far city), with real
-darks and the refined her. It is compared beside `ai_paint/ai_still_v1.png` and v5. The painter is `scripts/look/paint/paint.py`; the placing half is `src/lib/paint/`;
-the scene is `src/look/paint_s1/` (`PaintS1`). Paths below are from `video/`.
+darks and the refined her. It is compared beside `ai_paint/ai_still_v1.png` and v5. The painter is
+`scripts/look/paint/paint.py`, the placing half `src/lib/paint/`, the scene `src/look/paint_s1/` (`PaintS1`). Paths
+below are from `video/`.
 
 ### 4.1 What v6 paints, and what stays crisp
 - **Painted:** the sky (with its streaks and the sun disc), three cloud planes, the canal, the near tree (bottom left)
@@ -255,9 +257,9 @@ def sun_veil(x0, y0, w, h, sun=(196, 779)):             # the one warmth field (
    - **Output:** one RGBA PNG with its sky holes cut (alpha 0), in the near plane's group. About 2.5 s.
 5. **`style: "far_city_recipe"` -> `style_far_city_recipe(piece, spec)`.**
    - **Per plane, from its flat.** The blocks are the flat's colour regions (`ndi.label` per quantised colour).
-   - **P0:** one value per block (OKLab L jitter sd 0.010 / 0.012 on +4 / +3), then `atmos_np` with a per-pixel k =
-     PLANE_K + (1 - k) x scatter x veil + mist (scatter .45 / .40; mist .12 / .10 x smoothstep((y - 762) / 170)), plus
-     a mottle of +-0.5 / 0.6 L* at a 46 px cell (`BG.value_noise`).
+   - **P0:** one value per block (OKLab L jitter sd 0.010 / 0.012 on +4 / +3), then `atmos_np` with a per-pixel k:
+     k = k0 + (1 - k0) x scatter x veil, then k + (1 - k) x mist x smoothstep((y - 762) / 170), with k0 = PLANE_K,
+     scatter .45 / .40 and mist .12 / .10. Plus a mottle of +-0.5 / 0.6 L* at a 46 px cell (`BG.value_noise`).
    - **P2 (+3 only):** the face toward the sun's x, 20-36 % of the block, one step lighter.
    - **P3 (+3 only):** slivers 2.4 px wide on 80 % of the sun-facing edges (`BG.Brush.line`, crisp 0.45, taper 0.6,
      dry 0.2), in `glow` converted, capped at +12 dE over their body.
