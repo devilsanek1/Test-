@@ -319,3 +319,8 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   -> the people in use for now: hair v4 + the redrawn faces with open eyes + the rebuilt bodies (PEOPLE_DESIGN status
   block; the playbook); the rough spots stay on the list for later; video 4's person near the camera (S1, S11, S12)
   is drawn with them. -> rule: playbook, Visual style (the people in use for now).
+- 2026-10-30 ~20:50 UTC, to the study session: "Make sure to commit all your changes so that we can start working on
+  production video 4 in parallel while you are showing the results" -> everything committed and merged both ways: video
+  4's branch, the study branch and video-production carry one state (HANDOFF 2e; the composition library, SOUND_SYNC,
+  the Helsinki composition pass draft, the people overhaul in use); production of video 4 continues in parallel with
+  the study's results.

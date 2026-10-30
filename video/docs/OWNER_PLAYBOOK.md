@@ -172,14 +172,25 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
 ## Music and sound
 - **Sync picture to sound ON PURPOSE.** Cuts, camera moves and key actions land on the sound's beats, hits and the
   voice's stresses where that adds energy or meaning, and NOT everywhere: we already do it "decently okay", now it is a
-  researched, named practice with a rule for where it fits (`docs/look/refs_sound_sync/`; the research is queued). —
+  researched, named practice with a rule for where it fits: `docs/look/SOUND_SYNC.md` (distilled from the owner's two
+  reels, `docs/look/refs_sound_sync/`). In short: spend it, don't sprinkle it (a count of three sounded changes in the
+  hook, rest while the voice explains, ONE release at the payoff in a written voice pause); every hit lands on the first
+  visible frame of one change of the beat's subject, never before it, and is heard; nothing on continuous motion,
+  background life, captions or the music's beats. —
   ("the research distill and practice of syncing the video and shots with with sounds ... We already do this and I think
   decently okay we just need to be more intentional and educated about this effect and where it make sense to use",
   2026-10-30.)
-- **Music: cinematic but subtle, especially at the start.** The voice and the hook carry the opening. — (v1).
-- **Mix to -14 LUFS / -1 dBTP, voice always on top**; SFX land on visual hits. — (v1).
+- **Music: cinematic but subtle, especially at the start.** The voice and the hook carry the opening: the hook's sounds
+  sit on a quiet floor (air, no bed); the bed enters after the hook as a small step and rises once, at the payoff, in a
+  written voice pause (`docs/look/SOUND_SYNC.md` S1, S6, S7; both of the owner's sound reels open on near silence). —
+  (v1; 2026-10-30).
+- **Mix to -14 LUFS / -1 dBTP, voice always on top**; SFX land on visual hits: on the hit's first visible frame or up to
+  2 frames after it, never before, and heard (in a voice gap, or the loudest thing in its band): `docs/look/SOUND_SYNC.md`
+  §1c. — (v1; 2026-10-30).
 - **More sound effects, especially ones people link with something good on their phone** (like pop, notification ding,
-  message-sent swoosh), **with one in the first second.** Our own sounds that evoke them, never Apple's or Instagram's. — (2026-10-25).
+  message-sent swoosh), **with one in the first second.** Our own sounds that evoke them, never Apple's or Instagram's.
+  Which events get one, and how many: `docs/look/SOUND_SYNC.md` (story events of the beat's subject, each heard; never
+  continuous motion or background life). — (2026-10-25; where: 2026-10-30).
 
 ## Visual style (one page: `docs/look/DIRECTION.md`; numbers and checks: `docs/look/CRAFT.md`)
 - **ONE LOOK, ONE BRAND, still evolving: every video shares one coherent style, and we are still finding it.** The
@@ -310,8 +321,9 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   way to solve properly. It feels like a lot of our design is too square and proper like I can see shapes and angles
   very clearly while references are obviously not like that. They are more regular more naturally blend Do deep
   research into techniques libraries etc", 2026-10-30.)
-- **Every film's visual script gets a composition-and-motion pass from the shot library** (once the library and the
-  approach are settled): for each shot, which composition recipe it uses, how the camera and the action move WITHIN the
+- **Every film's visual script gets a composition-and-motion pass from the shot library** (the library, ranked, with its
+  guidelines: `docs/look/COMPOSITION_SHOTS.md`; the pass: `docs/vN/visual/COMPOSITION_PASS.md`, folded into the visual
+  script before it locks): for each shot, which composition recipe it uses, how the camera and the action move WITHIN the
   shot, and how it moves to the next (the join); done before G3 builds it. First on video 4 (Helsinki). — ("When we
   settle on the composition library recipes and overall approach we need to evaluate our visual script for Helsinki
   story to figure out how to compose each scene and how we animate and move within a scene and from scene to scene",
@@ -587,8 +599,9 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
 - **Personal framings must feel natural, not over the top.** Never cast the viewer as a loser in a contest they don't
   feel; test "you" claims with a viewer panel. — (v3 G2, 2026-10-25).
 - **Target 30-45 s and end close to the payoff** (viewers left once the story felt resolved, ~40 s). — (v1 insights).
-- **Every frame at least 8/10, no dead frames, joins on the beat** (every join carries something: `docs/look/CRAFT.md`
-  §a). — (v1; joins, v3 G5b, 2026-10-27).
+- **Every frame at least 8/10, no dead frames, joins on the beat** (the voice's beat: each join's midpoint on the next
+  sentence's first word, every join carrying something: `docs/look/CRAFT.md` §a; the music bends to a join only where it
+  is heard, never a beat grid: `docs/look/SOUND_SYNC.md`). — (v1; joins, v3 G5b, 2026-10-27; "the beat" read as the voice's beat under the owner's hand-over, 2026-10-30).
 
 ## Storyboard (G3) and flow
 - **The film's visual story is written first, as a VISUAL SCRIPT, between the voice lock and the G3 animatic:** shot
@@ -853,6 +866,23 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   into; drifting toward the reference's style reads cheap. — ("I don’t like this we are going away in style i think
   it’s too cheap looking ... So I think our initial angle snd the view frankly wasn’t bad", on the scene-1 still v2,
   2026-10-29).
+- **The owner's references are the SPINE of a distillation; ours come second, labelled.** When we distil the owner's
+  references (reels, pictures, a folder), the output is organised around THEIR items, in their order and names, and our
+  own frameworks and research additions follow in a separate, labelled part; the brief we give agents says so. Every
+  reference item is accounted for in a coverage table: each item the references show is either USED (where, visibly), ADAPTED
+  (how, for 9:16 and our rules) or REJECTED (why), and every used item is visible in the output, not buried as a side
+  note. — ("Wait how many of the ones mentioned in the references you actually took ? I don’t see leading lines or
+  vanishing point or frankly most of the references are not there?", on the composition shot library, 2026-10-30:
+  it named only 25 of the reels' 41 ideas, most as side notes under story-beat recipes; then "I didn’t get once again
+  why you ignored all my references and came up with yours?": the cause was our brief, which put our own story-beat
+  structure first and the reels as one input among three, with no coverage check before sending.)
+  The owner's expected shape for such a study: break down ALL his references; research the wider field (other
+  strategies, what makes a frame engaging and attention-capturing, the most modern cinematography); RANK everything;
+  then a library with guidelines on when to use which, and how animation and transitions fit into it. — ("I think
+  overall I would expect you to break down all mine references and whatever you research on other composition
+  strategies and on what makes a composition to be engaging and capturing attention and like a a super moden modern
+  cinematography / And then we would rank them and have a library and a set of guidelines on when to use one or other
+  and how animations and transitions fit into this", 2026-10-30.)
 - **Research the recipe before building a look element.** When a reference shows a look we can't yet make (a painted
   sky, layered clouds, water, foliage), first study it closely (crops, measured values, palette, edges, stroke sizes,
   layer order, softness by depth) and research how professional painters do it, then write a CONCRETE, numbered recipe
@@ -868,6 +898,11 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   only when the options differ visibly at a glance (side by side at 400 px wide); a smaller difference is ours to
   decide, by the rules, and we note the call. — ("I don’t really see the difference between a snd b", on two sky tops
   ~5 L* apart, 2026-10-30.)
+- **When the owner hands a call over, make it: decide by the evidence and his references, say what was decided and
+  why in one line each, and show the RESULT (a still, a clip, a doc), not the options.** Open questions queued for him
+  are decided the same way once he has said so (each decision noted where the question was, so he can overrule it in
+  one line); an owner rule's MEANING is changed only under such a hand-over, and the change says so. — ("Do what you
+  think is right and make the videos better", 2026-10-30, answering the sound-sync and look questions.)
 - **Two modes: PRODUCTION and ITERATION.** Production is a film going through the gates (G0-G8): full checks, review
   panels, QA suites, fix passes, as the quality needs. Iteration is a quick experiment for the owner to judge (a look
   test, a rethought scene, a style probe, a "what if"): one or two agents, no panels, no critics, no QA suites, rough
@@ -946,7 +981,7 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
 - ~~Density and life added after the sketch ("blocking: staging only; next: density, life, polish")~~ → designed into
   G3 with their tiers; G5 fills G3's plan (v3 G5b, 2026-10-27).
 - ~~A face for the protagonist's emotion beat (v3's waist-up "you" facing us)~~ → people have no faces, like reference
-  1; the pose acts; only the mascot has a face (v2 restart rule, 2026-10-27); faces now: generic LASH faces (2026-10-30).
+  1; the pose acts; only the mascot has a face (v2 restart rule, 2026-10-27); faces now: generic faces, open eyes looking away (2026-10-30).
 - ~~The G4 look as stills made in parallel with G3~~ → a playable look clip after the G3 lock, approved before G5
   (the approved pipeline, 2026-10-27).
 - ~~Pip at tier B in every shot and on both sides of every join~~ → Pip stays, hidden on purpose (2026-10-28).

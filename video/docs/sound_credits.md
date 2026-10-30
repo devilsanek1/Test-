@@ -2,6 +2,8 @@
 
 Owner: sound stream. Every audio source used in `audio/**` is listed here. Only CC0, public-domain
 or permissive material is used. Nothing needs on-screen credit. The credit line at the end is a courtesy.
+The owner's sound-sync reference reels (`docs/look/refs_sound_sync/`) are studied for timing only: no audio from them
+is used or sampled anywhere.
 
 ## Original material (made for this project)
 

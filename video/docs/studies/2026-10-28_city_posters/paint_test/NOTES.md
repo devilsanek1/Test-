@@ -259,3 +259,172 @@ composition study, in progress, feed v7).
 ## The sky-top choice (2026-10-30)
 The owner, on skytop_v6_choice.jpg: "I don’t really see the difference between a snd b" -> we decide: B (v4's deeper
 zenith, #afb3d8, L* 75.9), in line with the richer darks; v7 uses it.
+
+## v7a: painter v7's first half: the cut, one colour key, the story light (iteration, 2026-10-30; ORGANIC.md §6 steps 4, 1, 2)
+**The ask.** The owner (2026-10-30): "Do what you think is right and make the videos better", handing over the three open
+look questions; decided by the orchestrator, built here: (1) **the key: T3**, the references' low key
+(`docs/look/organic/composition.md` §5), lifted toward T1 only where it read gloomy or dirty beside refs 02 and 03; (2)
+**the Google wing keeps v2's frontal view** (the owner: "our initial angle snd the view frankly wasn't bad"): its right
+angles are step 3's, broken by overlaps, varied windows and painted edges, never by turning it; (3) **the paint's dose is
+ours** (step 3: painted at 400 px, subtle and beautiful at 1:1, the paper invisible at 400 px). An ITERATION (stills only,
+one agent, no panels). Steps 3 and 5 and people C with the LASH face are the second half (Handoff below).
+
+| File | What |
+|---|---|
+| `paint_still_v7a.png` (= `deliverables/tests/painted_scene1_still_v7a.png` = `v7a_step2.png`) | v7a: scene 1 at 1.0 s after steps 4, 1, 2 |
+| `v7a_step1.png` | the checkpoint after steps 4 and 1 (the cut and the key, no light yet) |
+| `compare_v7a.jpg` | v6 and v7a at full size, then both at 400 px beside refs 03 and 02, with the numbers |
+| `v7a_checks.json` | every number below (v6, the cut alone, + the key, v7a), from `src/look/v7_s1/bake/check_v7.py` |
+
+Code: `src/look/v7_s1/` (composition `V7S1`, entry `src/look/v7_s1/entry.tsx`; looks `cut`, `key`, `v7a`), built from
+`src/look/light_s1/` (segments, per-plane light slots, the solved maps) and `src/look/organic_s1/` (the piece slots, now
+`pieces.tsx`); the painter's spec `scripts/look/paint/v2s1_v7.json` -> `public/paint/v2s1_v7/`. Nothing in `src/v2r`,
+`src/look/paint_s1`, `src/look/light_s1` or a `src/lib` default was edited. One run, end to end (~3 min, seeded: the
+same bytes twice, checked for the maps and the painted pieces): `bash src/look/v7_s1/bake/run.sh <scratch>`
+(`--from=parts|bake|stills|check` to resume). One still:
+`GL=angle node scripts/render-frames.mjs V7S1 <dir> 1.0 --entry=src/look/v7_s1/entry.tsx --props='{"look":"v7a"}'`.
+
+**Step 4 first, the cut (composition.md §5, R6; nothing keyed, lit or painted and then removed).** Gone: the bay tree and
+its grass, the planter and its ivy, the flower crates, the pier with its potted thyme, the bench and its backpack, the
+fern pot, the top-left leaf spray, the cloud bar, the duck, boat B, the boater, the cat, the near motes (they floated past
+the tree: one read as a lone pale speck), Pip's bollard. Kept: one table (cut by the right edge, its top a rose stone in
+the mid-tones) and one chair, inside the canopy's shade; boat A (its cabin a dusky rose: v6's sage read green); Pip on
+boat A's roof where the boater sat (size 70: the boat's distance; 328 px right of the door, off the door's light column);
+nine of v6's seventeen fallen leaves, re-placed in uneven clusters, tone-on-tone (T1/T3: "a few fallen leaves at +-3-6
+L*"); the far towpath's life as
+it was. The shared canal mirrors boat B by its exported options, so `V7Props.tsx` moves `BOAT_B` off the frame at module
+load (v7's bundle only; a film gives its water spec its own boats list).
+
+**Step 1, ONE colour key at the source (ORGANIC §4.3).** `palette_v7.ts`: one colour map applied to every vector fill of
+the world through `lib/tod`'s `<Tod map>` (each `<Fill>` and kit Batch passes its colour through it before the clean
+pen's tier calm): a designed role table (v2's role hex -> v7's: the glass a slate-violet at C* ~10, the lit panes a quiet
+warm cream at C* ~19, slate, iron and mint to the violet end, the light stones out of the beige band, the living greens
+one family at h ~146) and, for derived colours, the family function (a hue outside the dusk arc turns to its nearer end,
+chroma kept, C* >= 8, never olive or beige). Colour -> colour, memoised: 0 ms a frame, it rides every shape. Her teal is
+not keyed (the identity map on her). THE ONE ACCENT is the lobby's gold (`ACCENT_V7`), drawn through its own map: the wing
+drawn a second time inside the door's opening (the lobby and the lit panes share v2's lamp role) and registered as a light
+source to the pen (`PEN.emissive`; else the tier calm greys it to C* ~36). The pen's page (`PEN.bg`) is v7's caption
+field, so the calm tiers pull toward the sky they sit under. The painted pieces take the same key from the painter's light
+table (`v2s1_v7.json`): T3's sky (L* 60 violet at the top, the caption field flat at 77, a warm rose-lilac, ink 9:1; the
+recipe's field stops widened to y 270-590 so its big soft strokes leave the words' block flat), the hero cumulus a dark
+violet mass lit peach-gold on the sun's side (body 52, deep 44, lit 81), the mid bank and the far deck calmed toward the
+sky (k 0.62 / 0.74), the streaks a step off the light band, the canal painted again on v7's OWN design frame (the cut,
+boat A, Pip on its roof). `palette_v7` `problems()` is empty (checked through `bake/palette_check.ts`); key.py stays a
+measure.
+
+**Step 2, the story light (light.md §5's rig, T3's depth).** The light proof's method on the keyed, cut scene
+(`bake/bake_light_v7.py`, its operators imported from `src/look/light_s1/bake/`): per plane ONE multiply + ONE screen map
+solved against the keyed picture (18 maps + the pool + the door's blur, 2.0 MB, cropped), the dusk rig (no day casts),
+her and Pip lit live. The masses, each with a named caster and its own tint (chroma kept, never a grey multiply): the
+backlit facade rose-plum (wall ~42) with violet glass, the lit panes a step over it, W a dark plum pane (its glass
+reflects a quarter of the violet sky behind the camera: at near-black it was a rival call), the far towpath in the far
+roofs' shadow with its sunlit west stretch dimmed (a rival at v6's value), the boat backlit, the canal mirroring the
+facade's shade about its waterline (the painter's own mapping) with the door's gold column; our quay under the canopy of
+the plane tree off-frame left (the leaves that blow in from 1.2 s come from it): one deep violet-plum mass whose colour is
+the dusk family's shade end at its value (a warm stone times a violet read maroon), its leafy edge along the canal with
+two dim gaps of light. The story light: the lobby lifted with an apricot light (a lemon drift at a stronger lift), its
+lamps, its bloom, the light on the jambs, the pool on the towpath with her lamp shadows cut live. The sun: its bloom
+(+2-3 L*), the veil, gold rims by tier.
+
+**What changed from T3, and why** (judged at 400 px beside refs 02 and 03; nowhere gloomy or dirty, but two things read
+heavy):
+- **Our quay is a ramp, ~37 by the water to ~23 at the frame's bottom (mean 29.7), not T3's flat 25.** At a flat 25 the
+  quay was a dead dark slab over 36 % of the frame (near-maroon before the shade colour was set), and with v2's camera (T3
+  tilted the camera up 140 px, which made its quay smaller) the dark group reached 43-46 % of the frame, over R10's 40 %.
+  The ramp is the sky lighting the open far edge and the canopy deepest nearest us: colour and light moving inside one
+  quiet mass (R5 holds: 75 % quiet, 35 % + 29 %).
+- **The facade's wall ~42 and its glass ~37 (medians 41 and 37), not 37; the canal 48, not 52; her ~32, not 14** (the
+  median of her own pixels; her teal coat ~31, her darkest quarter under 15). The facade's two faces kept their read (rose
+  wall, violet glass) and the lit panes' fill sits ~+6 over the wall (median 47 against 41); the canal reflects a dark
+  facade; her teal stays a teal silhouette with the gold rim and the opening's wrap (R4's ranking holds: the strongest
+  call on her, in value and colour; its numbers miss narrowly, see the weak spots).
+- **v2's camera, not T3's 140 px tilt** (the owner's view; the darker sky top carries the low key without it). The sky
+  keeps T3's 60 -> 77 -> 91.
+
+**The numbers** (`v7a_checks.json`; captions out where ORGANIC's checks say so):
+| Check (ORGANIC §6) | v6 | v7a | Target |
+|---|---|---|---|
+| Darks: under L* 40 / median / p2-p98 | 6.7 % / 66.9 / 29-90 | 47.2 % / 43.2 / 18-89 | T3: 45 % |
+| R10 the dark group (in its 2 largest masses) | 16 % at L* 45 (64 %) | 27 % at L* 27 (93 %) | 15-40 %, <= 45, >= 80 % |
+| Colour: off-family below the band | 16.2 % | 0.5 % | <= 3 % |
+| The 1 % most saturated warm light at the door | 17 % | 100 % | 100 % |
+| Calls (rivals): value / colour | 10 (3) / 11 (4) | 1 (1) / 2 (1) | <= 3, one rival |
+| Focal: the brightest 5 % below the band (far planes out) to her | 0.083 H (36 % within 0.1 H) | 0.114 H (61 %) | 0.07-0.15 H |
+| The lobby over the facade / the door's p95 | +0.3 / 92 | +36 / 94 | >= +25 / >= 95 |
+| Quiet at a squint (largest + 2nd) | 61 % (29 + 24) | 75 % (35 + 29) | >= 65 %, >= 30 + 15 |
+| Composition check WARNs (of 10) | 9 | 1 (R2: 16 pieces, <= 10) | 0 |
+| Razor edges / straight runs / dead-flat (with captions) | 22.0 / 26.5 / 35.3 % | 20.2 / 22.1 / 33.1 % | <= 8 / 15 / 20 % (step 3, 5) |
+| The same, her box and the caption block left out | 20.4 / 27.6 / 27.1 % | 17.9 / 23.5 / 25.9 % | |
+| The band: L* / spread / the words' contrast | 81.9 / 1.29 / 68.9 | 76.8 / 1.34 / 63.7 | spread <= 1.5; ink >= 7:1 (9.0:1) |
+| `check_banding.py` on the still: the deeper zenith (0, 0, 560, 100) / the band (0, 296, 540, 580) | PASS / PASS | PASS / PASS | a master encode before a film |
+| The engine against the bake's target (the movers out): mean dL* (mean abs, p99 abs) | | +0.12 (0.16, 0.42) | ~0.1 |
+The cut alone (look `cut`) takes the WARNs 9 -> 5 and lifts the straight runs to 38 % (the props hid the paving's long
+joints); the key adds R4 (the door the #1 colour call); the light does the rest. The razor, straight and flat numbers are
+the shapes' and the paper's (steps 3 and 5): the steps here move them only by removing things and softening steps in shade.
+
+**Cost.** Render 523-528 ms a frame against v6's 553-563 (20 frames from 1.0 s, concurrency 1, GL angle, two runs each):
+the cut pays for 18 cropped maps, the pool, the live layers and the lobby's second wing draw. Bake: the painter ~16 s
+(the sky 11.5 s) + the canal's design frame; 45 parts renders ~45 s; the light ~30 s (labels 7, light 6, solve 17);
+deterministic (maps and painted pieces md5-identical on a rerun). The maps are ONE state (1.0 s, the doors open): motion,
+the shut doors, W's lamp and the 3.90 s pane need their own states (light_proof.md §7.1), not done here (stills).
+
+**Weak spots (honest).** The quay's long paving joints are now the straightest, longest lines in the frame (ruler lines
+across the quiet dark mass: step 3's first job). R2 holds 16 value pieces (the far towpath's iron bollards, dark dots on
+its lit stretch; the boat's portholes; small far details). The lit lip of our coping beyond the canopy's edge reads as a
+broken peach glow at 1:1 (calm at 400 px). The lobby's back wall sits at L* 94-96 with a slight yellow lean (h ~88: a
+stronger lift drifted lemon). R4's numbers miss narrowly: the door's p95 94 (>= 95), her ~32 (<= 28), a step of ~62 L*
+(>= 65); her values are people C's (the second half), the door's last point is the lemon drift above. Her rim and wrap
+read at 1:1 only (light_proof §7.3). Pip's scarf and ears are a touch
+lighter than its boat. The words' contrast falls 68.9 -> 63.7 L* (T3's band at 77; still 9:1). A vector canal under the
+key keeps v2's mint (lib/water draws its own paths, not `<Fill>`): the painted canal covers it; a film keys lib/water's
+own palette. Nothing here is checked in motion.
+
+**Flags for the orchestrator (found here, not edited).**
+- **D3 is now decided (T3)**: DIRECTION rule 6 ("real darks ... in many small pieces, never one dark mass"), CRAFT §f.8
+  (6-10 % in >= 120 pieces, the near world in mid-tones), CRAFT §d.2's L* 35 floor and the playbook's "A full value
+  range" bullet still carry their pending notes; v7a holds 47 % under L* 40, most of it one quay mass.
+- **CRAFT §g.1** allows a zenith up to ~6 L* deeper than the field; T3's is 17 (60 against 77): the still passes
+  `check_banding.py`; a master encode is the gate before a film takes it.
+- **ORGANIC §6 step 1's check "the words' contrast unchanged (68.9 L*)"** cannot hold with T3's band at 77 (63.7, 9:1).
+- **ORGANIC §6 step 2's check "darks (L* < 40) 15-40 % of the frame"** is R10's dark group, a different measure from
+  T3's "45 % under L* 40" (T3 itself: R10 31 %, 45 % of the pixels); v7a: 27 % and 47 %.
+- **`scripts/look/paint/paint.py`'s `--only` merge drops a piece whose rows carry another `from`** (the far city's rows
+  are `v2s1/farroofs`, `v2s1/fartower`): v6's manifest lost its painted far city when bake_v2s1.sh ran `--only water`
+  second, so v6 (and v7a) show the scene's own hazed far city. v7a keeps it that way (painting it is step 3c's).
+- **`bake_v2s1.sh` has no v7 lines** (not edited: this run's `src/look/v7_s1/bake/run.sh` is the v7 bake).
+- **light_s1's colour-picked labels** (the lit panes as yellow, the glass as teal) break once the key calms them: v7 marks
+  the lit panes in a render instead (`marker` prop). **R5's and R2's thresholds** were set on flat thumbnails (ORGANIC §6
+  step 4): on this first lit frame R5 reads 75 % (fine) and R2 16 pieces (the far towpath's furniture).
+
+### Handoff: the second half (steps 3 and 5, people C with the LASH face)
+For the agent after this one (an iteration too: stills, the owner judges at 400 px first). Start from `src/look/v7_s1/`
+and `bash src/look/v7_s1/bake/run.sh <scratch>`; read this section, ORGANIC.md §5-§7, `organic/organic_proof.md`,
+`organic/shapes.md`, `organic/techniques.md`, `organic/libraries.md`, `PEOPLE_DESIGN.md`.
+1. **Where the pieces go:** `src/look/v7_s1/pieces.tsx` has six empty slots, each inside its plane's group and its
+   segment, BEFORE that plane's light slot (`clouds`, `farcity`, `facade`, `water`, `paving`, `prop`). Bake a piece to
+   `src/look/v7_s1/paint/<name>.v7piece.png` (declare the suffix like `assets.d.ts` does), add its row to `PIECES`
+   (box in its layer's px), then rerun `run.sh <scratch> --from=parts`: the light maps are solved against what the slots
+   draw, so every piece is lit by the same rig, never painted lit. A piece that replaces what it covers must hide it (the
+   paving replaces the stone bands: give `V7Steps` a switch, as organic_s1's `OrganicSteps` does).
+2. **What to fix first, by area and by measure:** the QUAY (36 % of the frame): its long paving joints are the
+   straightest edges left; paint it as organic proof 1's paving did (joints broken in 2-5 pieces, flags as value patches
+   +-3-6 L*, marks along the perspective bold enough for 400 px), tone-on-tone inside the shade (it must stay ONE quiet
+   mass: R5) and keep the near-to-far ramp; the shade stays the light's (never bake it twice). Then the FACADE (decision
+   2: v2's frontal view; overlaps over each long edge, the windows varied in size and state with one asymmetric thing
+   each, hand-cut frames, painted edges, lost where its faces meet at a close value; the door, the fascia and W stay
+   holes for the crisp layers). Then the CLOUDS (v6's cloud, now T3's dark one: warped, fewer and bolder marks on its lit
+   side, a ragged found top), the FAR CITY (+3, +4: lost tops, coarse marks, tone-on-tone windows), the WATER (its left
+   third calmer), the kept PROP at the near dose. Targets: razor <= 8 %, straight <= 15 %, dead-flat <= 20 % (now 20.2 /
+   22.1 / 33.1), R2 <= 10 pieces (now 16: calm the far towpath's bollards into their band).
+3. **Decision 3, the paint's dose, is ours:** the strength that reads as painted at 400 px and stays subtle and beautiful
+   at 1:1 (proof 1's facade and tree did not read at 400 px; v2's bold dose was "not the same ... needs to be a bit more
+   subtle and more beautiful"). Judge at 400 px beside refs 02 and 03 first, then 1:1. Show the owner two strengths only
+   if they differ at a glance at 400 px.
+4. **Step 5, the paper:** light_proof.md §3.2's material folded into each plane's ONE multiply map
+   (`bake_light_v7.py`'s target, after the light) and into the pieces; `GrainOn` on her and Pip (`movers.tsx`); <= 15 % in
+   the band (its spread is 1.34 now: keep <= 1.5); invisible at 400 px.
+5. **People C with the LASH face:** her (and the far towpath's life) redrawn in direction C; she stays crisp, unkeyed
+   (the identity map in `movers.tsx`), lit live; her teal against the door's gold.
+6. **Keep:** the key at the source (`palette_v7.ts`: extend its table, never grade the frame), T3's values with the quay's
+   ramp, the cut, the light's doses (`v7light.py` DOSE), the 400 px judgement first; rerun `check_v7.py` (its numbers
+   against v7a's above) and `sheet_v7.py` (it writes v7b's sheet once its names move on).

@@ -24,6 +24,13 @@ The earlier v4 session (https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt)
 (owner: "brainstorm a story and like a visual script with what happens on the screen and camera movements"; style still
 evolving), workflow `v4-visual-script` -> `docs/v4/visual/` (research, method, concepts, `VISUAL_SCRIPT.md`); then G3.**
 
+**BEFORE G3 (2026-10-30, from the look and composition study; HANDOFF 2e):** fold into `visual/VISUAL_SCRIPT.md` (1) the
+owner-approved `visual/STYLE_ADJUSTMENTS.md`; (2) the composition-and-motion pass `visual/COMPOSITION_PASS.md` (per shot
+the frame, the move within, the join, by `docs/look/COMPOSITION_SHOTS.md` codes; a FIRST DRAFT now, final after its
+critic and fix pass, which run in the study session and land on this branch); (3) the sync plan on the take
+(`docs/look/SOUND_SYNC.md` §4). Draw the person near the camera (S1, S11, S12) with the people in use (PEOPLE_DESIGN top);
+G4's look follows painter v7 (`docs/studies/2026-10-28_city_posters/paint_test/`; the dark key T3).
+
 **G2.5 VISUAL SCRIPT SENT (2026-10-30 ~00:45 UTC), waiting on the owner:** `docs/v4/visual/VISUAL_SCRIPT.md` (v2, after
 the cold read and the critic: 12 shots on the take's clock, concept B "the designed view" with grafts from A and C; the
 judges split, story C, craft B; B written on the combined score: `METHOD.md` step 2); 2 owner questions (the un-draw

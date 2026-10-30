@@ -6,6 +6,90 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-30 ~20:55 UTC: one state with video 4 (owner: production of video 4 in parallel)
+- Merged `claude/kind-pascal-lvgsza` into ours (one conflict, PIPELINE_V2's table rows, merged word by word; DIRECTION's
+  stale LASH lines -> the open-eye pick; typecheck clean) and pushed the same commit to all three branches. The v7 step B
+  agent was told to draw her with the overhaul's people (hair v4, open eyes, bodies5), not LASH.
+- The Helsinki pass's first draft is on video 4's branch (WIP commit); its critic + fix still run in
+  composition-library-v2, writing in the worktree `scratchpad/v4wt` (pull --no-rebase there before committing).
+
+## Status 2026-10-30 ~20:35 UTC: v7a DONE and sent; v7 step B runs
+- v7a (`paint_test/paint_still_v7a.png`, `compare_v7a.jpg`): the door is the one place to look, one key, props cut;
+  under L* 40 7 % -> 47 %, off-family 16 % -> 0.5 %. Our read: the top half works; the bottom 40 % is an empty purple
+  slab with ruler joints (fix in B: a painted wet quay with the door's light reaching the viewer).
+- RUNNING: v7 step B (agent aa74c53934541d244): step 3 brushwork, step 5 paper, her in people C + LASH ->
+  `paint_test/paint_still_v7.png`, `compare_v7.jpg`, NOTES v7. Then D3's wording (darks) across DIRECTION 6, CRAFT
+  §d.2/§f.8, LAYOUT, the playbook's value-range bullet, from v7's numbers.
+
+## Status 2026-10-30 ~19:05 UTC: the owner handed the calls over; painter v7 runs
+- Owner: "Do what you think is right and make the videos better" -> playbook rule (Process: when the owner hands a call
+  over, make it); sound-sync A13 applied, its questions decided; ORGANIC.md's three look questions decided (T3 key,
+  frontal wing, our paint dose; ORGANIC.md §8 end).
+- RUNNING: painter v7 step A (agent a92b7a83a8f957196; ORGANIC.md §6 steps 1, 2, 4 in `src/look/v7_s1/`) ->
+  `paint_test/paint_still_v7a.png`, `compare_v7a.jpg`, NOTES.md v7a with a HANDOFF for step B (step 3 brushwork + step 5
+  paper + people C with LASH). Then: show v7a, reconcile D3 (darks) in DIRECTION 6, CRAFT §d.2/§f.8, LAYOUT, the
+  playbook's value-range bullet; launch step B.
+- Check-ins commit the loop's whole path list (scratchpad study_checkpoint4.sh P=...), not only composition.
+
+## Status 2026-10-30 ~18:50 UTC: sound sync DONE; composition library runs
+- `video/docs/look/SOUND_SYNC.md` + `sound_sync/` (reels.md + two timelines, craft.md, audit.md); 23 doc edits applied
+  (`sound_sync/PROPOSED_DOC_EDITS.md` header); A13 and two questions go to the owner. TODO after the composition run:
+  MR20's sound window (0 to +2 f, never early) into the library.
+- The 10-minute loop hit its 2 h background cap at 18:18 and is NOT restarted (harness rule); scheduled checkpoint
+  commits instead (19:05, 19:35, 20:00) plus a commit at each run's end.
+
+## Status 2026-10-30 17:45 UTC: both runs re-launched after the 17:40 reset (the 17:25 launch hit the limit at once; same run IDs, RESUMING notes added)
+
+## Status 2026-10-30 17:25 UTC: resumed after the 5-hour reset (owner: "restart when the limit is reset")
+- RUNNING: workflow `composition-library-v2` (run `wf_6be51888-82f`, script
+  `/root/.claude/projects/-home-user-Test-/fe339b66-57f0-5b47-bb6a-872d2f15f4c0/workflows/scripts/composition-library-v2-wf_6be51888-82f.js`):
+  catalogue (`composition/catalogue.json`, `catalogue_notes.md`, `catalogue_prior.json`, `principles.json`) -> 3 BLIND
+  judges (`composition/judges/{attention,story,fit}.json`) -> the library (`COMPOSITION_SHOTS.md` Part 0 tiers + 0b
+  guidelines and the motion grammar; `composition/library_sheet.png`) -> in parallel: library critic
+  (`composition/critique_library.md`) + Helsinki pass -> library fix + Helsinki critic -> Helsinki fix.
+- The Helsinki files are written in a detached worktree of `claude/kind-pascal-lvgsza` at
+  `/tmp/claude-0/-home-user-Test-/fe339b66-57f0-5b47-bb6a-872d2f15f4c0/scratchpad/v4wt`:
+  `video/docs/v4/visual/COMPOSITION_PASS.md`, `composition_pass_sheet.png/.py`, `review_composition.md`; a second loop
+  (task bwbto3v3q, `scratchpad/v4_checkpoint.sh`, 2 h cap) commits them there and pushes to that branch.
+- RUNNING: sound-sync-research resumed (same run `wf_74169695-356`, with a RESUMING note; scratch /tmp/sync/).
+- Main checkpoint loop: task bn7xeu1zy, caps ~18:20 (restart then). Backup resumes still scheduled 17:45, 18:30, 20:00
+  (they check the loop only, if this status exists).
+
+## Status 2026-10-30 16:20 UTC: near the 5-hour limit (owner: "Yeah we are close to the 5h limit")
+- sound-sync-research (run `wf_74169695-356`) STOPPED ON PURPOSE (it had only just started; nothing in
+  `video/docs/look/sound_sync/` yet, scratch in /tmp/sync/) so the window finishes composition's research first.
+  Re-launch: `Workflow({scriptPath: "/root/.claude/projects/-home-user-Test-/fe339b66-57f0-5b47-bb6a-872d2f15f4c0/workflows/scripts/sound-sync-research-wf_74169695-356.js", resumeFromRunId: "wf_74169695-356"})`.
+- composition-research-v2 (run `wf_badfba6c-543`) DONE 16:2x: attention.md, modern.md, motion.md. NEXT (at the resume):
+  the unified catalogue -> 3 judges -> guidelines -> Helsinki pass (see the 15:40 block). Old note:
+  motion.md not yet. If it dies at the limit: read its journal.jsonl, add a RESUMING note to the unfinished tracks'
+  prompts, resume.
+- Checkpoint loop restarted 16:20 (task bn7xeu1zy, 2 h cap -> ~18:20). Scheduled resumes: 17:15 and 17:45 UTC
+  (send_later; trig_01EYMFqhXDjtZEEKEKywDpxh, trig_01C9zrqVQ9T4voLDhqVynYTz).
+
+## Status 2026-10-30 ~15:40 UTC: composition v2 runs (owner: "Yeah this plan sounds good remember to parallelize work")
+- The owner on the first library: "why you ignored all my references and came up with yours?"; the expected shape: break
+  down ALL his references + research (other strategies, what makes a frame engaging, super-modern cinematography) ->
+  RANK -> a library + guidelines on when to use which + how animation and transitions fit (playbook: the owner's
+  references are the SPINE).
+- RUNNING: agent "device catalogue" (a316070f205625263): the owner's 41 reel ideas first, in reel order with frames, our
+  additions labelled, a coverage table, `composition/devices_sheet.png`. If lost: re-brief from playbook's spine rule.
+- RUNNING: workflow `composition-research-v2` (run `wf_badfba6c-543`, script
+  `/root/.claude/projects/-home-user-Test-/fe339b66-57f0-5b47-bb6a-872d2f15f4c0/workflows/scripts/composition-research-v2-wf_badfba6c-543.js`):
+  3 parallel tracks -> `composition/attention.md`, `modern.md`, `motion.md`. Resume: `Workflow({scriptPath,
+  resumeFromRunId: "wf_badfba6c-543"})`.
+- NEXT when both land: the unified catalogue (owner's 41 first) -> 3 parallel judges (attention; story clarity; 9:16 +
+  engine + look fit) -> core / situational / rare tiers (owner override) -> guidelines (by beat and emotion; sequencing
+  and rhythm; the motion and transition grammar) -> the Helsinki pass on its 12 shots (commit on
+  `claude/kind-pascal-lvgsza` beside its visual script). Then COMPOSITION_SHOTS' 14 clashes after the owner settles it.
+- DONE: the device catalogue (owner's 41: 24 used, 17 adapted, 0 rejected; `COMPOSITION_SHOTS.md` Part 1;
+  `composition/devices_sheet.png`, sent to the owner).
+- RUNNING in parallel (owner: "remember to parallelize work"): workflow `sound-sync-research` (run `wf_74169695-356`,
+  script `.../workflows/scripts/sound-sync-research-wf_74169695-356.js`): the owner's 2 reels measured (the spine), the
+  craft, our audit -> `video/docs/look/sound_sync/` -> the distill `video/docs/look/SOUND_SYNC.md` +
+  `sound_sync/PROPOSED_DOC_EDITS.md` (the orchestrator applies). Its PRACTICE: the Helsinki cue plan, with the
+  composition pass (text only before G3).
+- Still queued: painter v7 (ORGANIC.md §6).
+
 ## Status 2026-10-30 ~12:50 UTC: organic synthesis + composition research running; sound sync queued
 - organic-look DONE: `video/docs/look/ORGANIC.md` (the v7 roadmap §6; 27 doc clashes §8; 3 owner questions at the end
   of §8: the dark key T1/T3, turning the Google wing, the paint/paper doses, asked WITH the v7 sheet). A docs agent is

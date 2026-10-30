@@ -19,7 +19,9 @@ key here"; "our look is evolving - we are finding out style i don't think we can
    values only: it never restates or overrides a rule) > the v1-era docs (API and measurements, never style). Between
    two look docs, each wins on its own topic (`LAYOUT.md` where things sit in the frame: the zones, each shot type's
    framing, the cover; `STORYBOARD_STYLE.md` the board's drawing, `CINEMATIC_GUIDE.md` shot recipes and camera moves,
-   `COZY_AND_SCALE.md` cozy framing, `LIFE_AND_DENSITY.md` fullness and life, `PALETTE.md` colour), and a measured
+   `COZY_AND_SCALE.md` cozy framing, `LIFE_AND_DENSITY.md` fullness and life, `PALETTE.md` colour, `SOUND_SYNC.md`
+   which sound lands on which picture, when and how often, `COMPOSITION_SHOTS.md` the shot library: which frame, move
+   and join a shot uses, ranked, with the guidelines), and a measured
    number beats a proposal.
 3. **Beside the ladder, each on its own topic and under the owner's words:** `docs/CREATIVE_BRIEF.md` (the channel,
    story selection, writing; the playbook's later rules win where they differ, as its banner lists), `docs/ELEVENLABS.md`
@@ -50,8 +52,8 @@ the owner approves it; the look test shows it.
 references, in the rules below:** shapes that blend naturally, never square and proper (playbook ORGANIC, NOT
 GEOMETRIC: rules 2, 4); ONE painted language for the whole frame, near sharper and far more like brushwork (PAINTED
 PIECES: rule 4); one story light per scene done properly, with darks, contrast and one colour key as palette work
-(PROPER LIGHT: rules 5-6); big quiet areas and one place to look (SCENE COMPOSITION: rules 2-3); people in direction C
-with the LASH face (rule 3). Their numbers are `ORGANIC.md` (shapes and edges, the light's method, the composition
+(PROPER LIGHT: rules 5-6); big quiet areas and one place to look (SCENE COMPOSITION: rules 2-3); people of the overhaul
+in use for now: hair v4, open eyes looking away, the rebuilt bodies (rule 3). Their numbers are `ORGANIC.md` (shapes and edges, the light's method, the composition
 rules R1-R12, the dose by plane, the paper), carried into `CRAFT.md` as first values for the v7 look test (WARNs; the
 owner's eye at phone size decides), and `PEOPLE_DESIGN.md`. One call is still the owner's: the dark key, T1 (one gentle
 dark mass) or T3 (the references' low key) (`ORGANIC.md` §8 D3; rule 6).
@@ -98,8 +100,9 @@ dark mass) or T3 (the references' low key) (`ORGANIC.md` §8 D3; rule 6).
   than the caption band. **People** (owner, 2026-10-30: "beautiful and pleasant",
   styled like today's 20-30-year-olds in New York and Los Angeles, faces drawn "in a more generic way";
   `PEOPLE_DESIGN.md`): direction C, MODERN GRAPHIC (about 7.8 heads, rounded polygons in two flat tones, crisp, no
-  outlines, the styling carried by clothes and hair) with the LASH face (closed-eye lash lines and a small soft nose;
-  only the contour under ~200 px tall; sunglasses and caps as some people's accessories; never looking at the camera);
+  outlines, the styling carried by clothes and hair); IN USE FOR NOW the people of the overhaul (owner, 2026-10-30:
+  hair v4, the redrawn faces with OPEN EYES looking away, the rebuilt bodies; the closed-eye LASH only for downcast,
+  serene moments; `PEOPLE_DESIGN.md` top); only the contour under ~200 px tall; sunglasses and caps as some people's accessories; never looking at the camera);
   simple, seen mostly from behind, in profile or turned away, acting with their pose; near heads <= ~140 px, many at
   rest; in the foreground only the one "you" (often turned away) or the mascot, strangers small in the mid and far
   ground. Life never stops (clouds,
@@ -201,12 +204,13 @@ dark mass) or T3 (the references' low key) (`ORGANIC.md` §8 D3; rule 6).
   or a slow float, never a zoom; a float is a gentle PARALLAX float (owner, 2026-10-28: planes move by depth, the
   near ground most, far planes little, the sky and the caption band not at all; back at rest by every join and on
   every map-critical frame; `lib/depth.ts` parallax helper); a zoom is a visible story move or a carrier; no roll, no compound moves; visuals
-  lead their word by ~0.1 s. -> `G3_ANIMATIC.md` §4; `PIPELINE_V2.md` "Frame rate"; `COZY_AND_SCALE.md` 3b.5.
+  lead their word by ~0.1 s, while a sound effect never leads its picture (on the event's first visible frame or up to
+  2 f after: `SOUND_SYNC.md` §1c). -> `G3_ANIMATIC.md` §4; `PIPELINE_V2.md` "Frame rate"; `COZY_AND_SCALE.md` 3b.5.
 - **9. The opening is a banger.** Frame 0 is the scene being drawn, in the clean pen: the subject's line draws on, C
   lands as flat pale shapes and colour floods in over the line (it goes under its fill: no outline stays, rule 4), the
   painted pieces painting on stroke by stroke over their flat design, never popping up (playbook PAINTED PIECES), and
   the light flooding in with the colour from its source (`ORGANIC.md` §4.2), as a bold event a scrolling viewer can't miss (~0.3 s was
-  invisible: owner, 2026-10-28; every opening effect large, long enough to register, with its own sound), with the captions in the voice's order (frame 0 shows the first spoken line, the
+  invisible: owner, 2026-10-28; every opening effect large, long enough to register, with its own sound, heard over a quiet floor; the build a count of three sounded changes and a fourth a little late: `SOUND_SYNC.md` S1, S3-S5), with the captions in the voice's order (frame 0 shows the first spoken line, the
   payoff in words by ~2 s; no title over them: playbook Hook and pacing),
   the voice from the first frames (the first word at ~0.12 s, the locked voice file's lead) and a positive phone sound
   in the first second; the hook made physical in ONE continuous shot (the expected thing, then reality overtaking it
@@ -276,8 +280,8 @@ stage; the owner may skip gates by name. The clean pen's first test is the v3 re
   a visible presence in every shot: Pip hides on purpose (rule 2; owner, 2026-10-28); strangers' backs in the
   foreground, in any film.
 - A face as a beat (a protagonist's "face beat", v3's waist-up "you" facing us) or a face with features (dot eyes, a
-  mouth, brows): people act with their pose, and their face is the generic LASH, never looking at the camera (rule 3;
-  owner, 2026-10-30). "No faces at all" (people before 2026-10-30) is history too.
+  mouth, brows): people act with their pose, and their face is the generic open-eyed face looking away, never at the camera
+  (rule 3; owner, 2026-10-30: "Let's do open eyes"). "No faces at all" (people before 2026-10-30) is history too.
 - The pictogram person (a ball head with no neck on a tombstone torso, 3.7-4.9 heads, a sack coat; the owner: "very
   old style and frankly ugly", 2026-10-30): direction C (rule 3; `PEOPLE_DESIGN.md`).
 - The G4 look made in parallel with G3 (stills, or a clip before the lock): the look clip follows the G3 lock.

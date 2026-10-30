@@ -33,16 +33,19 @@ templates): `/tmp/comp/vertical/`; not committed.
    video sits above an opaque bar and 52 px are cut per side (MEASURED, §1.1). Everything therefore looks **1.22x
    bigger** on his feed than in a review MP4 played fit-to-screen.
 2. **Instagram's interface over our frame, measured to the pixel** (Reels tab): status bar and header to y 218; the
-   right rail of icons at **x 877-954, y 1032-1660**; the name block from **y 1519** (the avatar's top), then the
-   caption line, the progress bar and the floating tab bar (x 210-870, y 1752-1860); a scrim darkens the top ~240 px
-   by ~10 % and the bottom by up to ~20 % (§1.2-1.3). `LAYOUT.md`'s bottom (y 1520) is exact; its rail (x > 950 at y
-   900-1500) sits 73 px too far right; its top (y < 180) stops 38-55 px short of the header's bottom (§8).
+   right rail of icons at **x 877-954, y 1032-1660** (one ~170 px slot higher when a repost button shows); the name
+   block from **y 1519** (the avatar's top), then the caption line, the progress bar and the floating tab bar (x
+   210-870, y 1752-1860); a scrim darkens the top ~240 px by ~10 % and the bottom by up to ~20 % (§1.2-1.3).
+   **TikTok's**, from our engine maker's calibrated iOS capture [V14]: no side crop, a top bar to y 138, the rail **x
+   948-1059 from y 797** (the avatar y 918-1043) down to y 1910, the text from y 1738. `LAYOUT.md`'s bottom (y 1520) is
+   exact for Instagram's main feed; its rail (x > 950 at y 900-1500) fits TikTok but sits 73 px right of Instagram's;
+   its top (y < 180) stops 38-55 px short of Instagram's header (§8).
 3. **The ad safe zones are now verified from the platforms' own files** (OFFICIAL, measured on their pixels): TikTok
    In-Feed x 120-960 / y 240-840, then x 120-780 to y 1260 (38 % of the frame); YouTube vertical x 48-887 / y
    288-1247 (39 %); Meta's Reels figure (14 % top, 35 % bottom, 6 % sides) is REPORTED. Their intersection is x
    120-887, y 288-1247, with x <= 780 below y 840: 33 % of the frame (§1.4). `LAYOUT.md`'s ad row holds.
-4. **The centre column is our subject axis.** Clear in every measured view: x 130-870 from the band down to y 1519 (to
-   x 950 above y 1020). The feed's visible thirds fall at x 393 and 687, so the subject axis (x 380-700) IS the phone's
+4. **The centre column is our subject axis.** Clear in every measured view: x 130-870 from y 860 down to y 1519, x
+   130-945 above it. The feed's visible thirds fall at x 393 and 687, so the subject axis (x 380-700) IS the phone's
    middle third; the visible stage under the words (x 98-982, y 600-1519, a near square) has its golden box at x
    436-644, y 951-1168, inside `cinema.md` C1's focal home (§2, §7).
 5. **The eye starts at the centre and is pulled to words.** A centred subject in vertical video gave longer fixations
@@ -55,7 +58,7 @@ templates): `/tmp/comp/vertical/`; not committed.
    "focus on your main subject" [V1]. The ~0.3 s draw-on the owner found barely visible (playbook Hook) was over before
    the page had settled: an opening's big event must peak after 0.4 s and last >= 1 s.
 7. **Words, in angle:** our 98 px caption has a 46 px x-height = 0.55-0.62 degrees, about 3x the floor of fluent
-   reading (0.2 degrees [V11] = 15-17 px x-height, a ~32-36 px Patrick Hand); the 56 px floor for words is 0.31-0.36
+   reading (0.2 degrees [V10] = 15-17 px x-height, a ~32-36 px Patrick Hand); the 56 px floor for words is 0.31-0.36
    degrees. The crop makes a full 850 px caption line lose its first 3 px on the owner's phone (13 px on a 20:9
    phone): lines <= 780 px. Reading speed: <= 20 characters a second [V8], 160-180 words a minute [V7] (§5).
 8. **What stops reading on a phone:** under 0.2 degrees of text or ~2 px of line; the crop, rail, header or name block;
@@ -94,12 +97,12 @@ ppi [V15]); his five reference recordings are the same screen at 540 x 1174. Two
 The visible frame in the Reels tab is 66.6 x 144.8 mm, 11.9 x 25.9 degrees at 32 cm: about a hand at arm's length.
 The Reels tab shows our frame 1.22x larger than a fit-to-screen review of the same MP4, and cuts 9 % off each side.
 
-### 1.2 Instagram's interface over our frame (MEASURED, our px)
+### 1.2 The apps' interfaces over our frame (Instagram MEASURED; TikTok from a calibrated capture; our px)
 
-Reels tab: the temporal median and spread of the three recordings at 4 frames a second (the interface is what stays
-bright and still while the reel moves); the layout is the same in all three, three days and two creators apart (the
-name row within ~8 px). Profile view: the pixels where the recording differs from our registered v1 by more than 40
-grey levels in at least 3 of 4 frames.
+Instagram's Reels tab: the temporal median and spread of the three recordings at 4 frames a second (the interface is
+what stays bright and still while the reel moves); the layout is the same in all three, three days and two creators
+apart (the name row within ~8 px). Profile view: the pixels where the recording differs from our registered v1 by more
+than 40 grey levels in at least 3 of 4 frames.
 
 | element | Reels tab (fill) | profile / shared view |
 |---|---|---|
@@ -113,6 +116,21 @@ grey levels in at least 3 of 4 frames.
 
 A post's own rows (a caption opened with "more", a music line, a translation or AI label) may add a text row to the
 name block; our own post in the Reels tab is the one view not yet recorded (§9).
+
+**A second source, and TikTok.** Remotion, the engine we build in, ships a "Social Safe Zones" overlay whose interface
+images were "measured at 9:16 from representative iOS captures of full-green videos in TikTok and Instagram Reels" and
+extracted, not redrawn, at 1080 x 1920; it warns that "Live interfaces can vary by device, app version, locale, account
+state, caption length, and placement" [V14]. Measured on its two transparent images (alpha > 40, boxes of the glyphs):
+- **Instagram (an opened reel, like our profile view):** rail x 916-997, avatar x 85-176 y 1721-1812, caption y
+  1830-1873, header icons y 159-221: within 3 px of our measurement in x and 10-30 px in y. Its rail starts at y 1107,
+  not 1303, because that post shows one more button (repost) and more counts: the rail is anchored at its bottom and
+  grows upward by one slot per extra button. A slot in the Reels tab is 154-167 px (like to comment to share to more),
+  so a repost button there would put the like icon at y ~865 (est.; 860 below as the planning number).
+- **TikTok (a video opened from search; the For You feed shows its tabs in that top band instead, not measured):** no
+  side crop (text from x 23, icons to x 1059); top bar y 36-138; right rail x 948-1059 with an icon y 797-864, the
+  avatar with its follow badge y 918-1043, like y 1121-1196, comment 1284-1366, bookmark 1454-1526, share 1617-1696,
+  the sound disc 1825-1910, counts under each; name, caption and hashtags x 23-394, y 1738-1894; the opaque tab bar
+  below the video.
 
 ### 1.3 The scrims (MEASURED, profile view)
 
@@ -137,7 +155,8 @@ additional formats used", and its ad preview "is not specific to a device" [V2].
 and buttons may appear in different places depending on the format, campaign type, and screen", and "YouTube
 dynamically adjusts your video to fit the viewer's device without stretching or cutting off your content" [V1]. These
 are ad layouts (a call-to-action button, an ad label, a longer caption); organic posts cover less, as §1.2 shows for
-Instagram. TikTok's and YouTube's organic interfaces were not measured (no recording; §9 is the five-minute procedure).
+Instagram and Remotion's capture shows for TikTok (§1.2). YouTube's organic interface was not measured (no recording;
+§9 is the five-minute procedure).
 
 ### 1.5 Other phones (arithmetic)
 
@@ -153,7 +172,8 @@ When an app fills a screen of width/height ratio a with our 9:16 frame, it cuts 
 | an app filling the area above an 83-pt bar on the owner's phone (Instagram's profile view, measured) | 52 |
 
 So x 0-108 and x 972-1080 are cut on most current phones where the app fills the screen (up to 129 px on 21:9);
-key reads inside x 130-950 survive all of them (est., for apps that fill; YouTube says it fits instead [V1]).
+key reads inside x 130-945 survive all of them (est., for apps that fill; TikTok shows the full width [V14] and YouTube
+says it fits [V1]).
 
 ### 1.6 Against LAYOUT §1
 
@@ -161,10 +181,10 @@ key reads inside x 130-950 survive all of them (est., for apps that fill; YouTub
 |---|---|---|
 | organic top UI y < 180 | header to y 218 (Reels tab) or 235 (profile), a top scrim to ~240 | the band (y 290) stays clear by 55-72 px; the number moves to 240 (§8 row 2) |
 | organic bottom UI y > 1520 | the name block starts at y 1519 (Reels tab), 1711 (profile) | **exact** |
-| organic right rail x > 950 at y 900-1500 | x 877-954 at y 1032-1660 (Reels tab); x 919-988 at y 1303-1868 (profile) | **x > 870 at y 1020-1520** (below that, everything is bottom UI) (§8 row 1) |
+| organic right rail x > 950 at y 900-1500 | Instagram x 877-954 at y 1032-1660 (Reels tab; from ~860 with a repost button), x 919-988 at y 1303-1868 (profile); TikTok x 948-1059 from y 797 [V14] | **x > 945 from y 790, x > 870 from y 860, to y 1520** (below that, everything is bottom UI) (§8 row 1) |
 | side margins: nothing key within 120 px of a side edge; the gutters x < 95, x > 945 may hold quiet detail | x < 98 and x > 982 are not on the owner's feed at all | 120 holds (22 px inside the crop); the gutters are partly never seen (§8 row 4) |
 | caption block x 95-945, <= 850 px, centred on x 520 | a full 850 px line starts 3 px outside the crop | lines <= 780 px (§8 row 3) |
-| key-read box x 120-950, y 600-1480 | the rail covers x 877-950 from y 1032; the crop x > 982 | x 130-870 below y 1020 (§8 row 5) |
+| key-read box x 120-950, y 600-1480 | the rails cover x 877-950 from y 1032 (~860) and x 948-950 from y 797; the crop x > 982 | x 130-945 to y 860, x 130-870 below (§8 row 5) |
 | ad overlay: top 240-288, bottom 35 %, rail x > 780 from y 840, sides 48-192 (REPORTED) | the same numbers in the platforms' own files | now OFFICIAL (§1.4) |
 
 The zone sheet (scratch, `/tmp/comp/vertical/zones_sheet.png`) draws these over still v6: in the Reels tab v6's fourth
@@ -179,20 +199,20 @@ strip and under the rail, and its near tree loses its left third.
 |---|---|---|---|
 | status and header | 0-240 | the clock, the island, "Reels", a 10 % scrim | framing only: the sky's top, a lid, the hero cloud (LAYOUT's top gutter) |
 | words | 240-600 (the band 290-600) | clear across x 98-982 | the caption on one flat field of sky or wall |
-| the stage | 600-1519 | clear across x 98-982 to y 1032, then x 98-870 beside the rail | the beat: the subject on the axis, the "you", the opening |
-| the app's text and the hand | 1519-1920 | the name block, caption, progress bar, tab bar, a 10-20 % scrim; the thumb, in one-handed use (49 % of 780 people seen touching their phones held them in one hand [V14]) | the near ground as one quiet mass cut by the bottom edge, nothing to read |
+| the stage | 600-1519 | clear across x 98-982 above the rails (TikTok's from y 797, Instagram's from 1032, ~860 with a repost button), then x 98-870 | the beat: the subject on the axis, the "you", the opening |
+| the app's text and the hand | 1519-1920 | the name block, caption, progress bar, tab bar, a 10-20 % scrim; the thumb, in one-handed use (49 % of 780 people seen touching their phones held them in one hand [V13]) | the near ground as one quiet mass cut by the bottom edge, nothing to read |
 
 **The stage square.** Under the words the visible stage is x 98-982 by y 600-1519, 884 x 919 px: a square, the same
 "stage square" `cinema.md` §1 finds at full width (y 600-1520). Its grid on the owner's feed: thirds x 393 / 687 and y
 906 / 1213; golden lines x 436 / 644 and y 951 / 1168; centre (540, 1060); diagonal 46 degrees. In a square the
 diagonal method's "eyes" close in on the centre: the stage itself asks for a centred subject.
 
-**The centre column** is what every measured view leaves clear: x 130-870 from the band down to y 1519 (the right edge
-950 above y 1020, where no rail reaches). Our subject axis (x 380-700) is its middle third, and the feed's own thirds (x
-393, 687) fall inside the axis, 13 px from its edges: on the phone, "on a third" and "on the axis" are the same place.
-The caption's centre line (x 520) is 20 px left of the visible centre (540), a margin reference 2 kept for the rail
-(`docs/style_bible_ref2.md` §3.1); the crop is symmetric and no rail reaches the band, so nothing needs the offset, and
-with lines <= 780 px (V5) nothing is lost by keeping it.
+**The centre column** is what every measured view leaves clear: x 130-870 from y 860 down to y 1519, x 130-945 above it
+(TikTok's rail starts at y 797, Instagram's at 1032, or ~860 with a repost button). Our subject axis (x 380-700) is its
+middle third, and the feed's own thirds (x 393, 687) fall inside the axis, 13 px from its edges: on the phone, "on a
+third" and "on the axis" are the same place. The caption's centre line (x 520) is 20 px left of the visible centre
+(540), a margin reference 2 kept for the rail (`docs/style_bible_ref2.md` §3.1); the crop is symmetric and no rail
+reaches the band, so nothing needs the offset, and with lines <= 780 px (V5) nothing is lost by keeping it.
 
 **Depth stacks up the frame, never across it.** Width is scarce (884 visible px), height is not: the near ground at the
 bottom under the app's text, the subject on the stage, the far world and the sky climbing behind and above it. This is
@@ -222,9 +242,9 @@ the seam (`reels.md` D6), never two stages stacked.
 - **Words near the action cost less.** Titles placed near the focus of attention brought viewers back to the focal
   points sooner and left more time to explore the image; and in short vertical videos, subtitles placed at the top drew
   far fewer fixations than ones in the middle, with no difference in comprehension (both REPORTED, the second a
-  master's thesis [V10]).
+  master's thesis [V9]).
 - **The vertical format itself reads easily.** Vertical mobile video ads were processed more fluently than horizontal
-  ones, because watching them takes less effort (no turning the phone), more so for younger viewers [V12].
+  ones, because watching them takes less effort (no turning the phone), more so for younger viewers [V11].
 
 ### 3.2 The eye on our frame, in angles (owner's phone, Reels tab, 32 cm)
 
@@ -245,17 +265,17 @@ the seam (`reels.md` D6), never two stages stacked.
   drop.
 - **The interface is part of the picture.** The rail and the name block are bright white glyphs on a scrim: calls the
   viewer always has in view at the lower right and the bottom. Our own pulls stay out of their way: no call of ours at
-  x > 830 below y 1000 or below y 1480; R8's counterweight high (the top gutters, y < 600) or on the left, never in the
+  x > 830 below y 790 or below y 1480; R8's counterweight high (the top gutters, y < 600) or on the left, never in the
   lower right, where it would merge with the rail.
 
 ### 3.4 What stops reading on a phone
 
 | cause | the number on the owner's phone | where it comes from |
 |---|---|---|
-| text too small | x-height under 0.2 degrees = 15 px (32 cm) to 17 px (36 cm): Patrick Hand under ~32-36 px | the fluent range of reading, 0.2-2 degrees of x-height [V11] |
+| text too small | x-height under 0.2 degrees = 15 px (32 cm) to 17 px (36 cm): Patrick Hand under ~32-36 px | the fluent range of reading, 0.2-2 degrees of x-height [V10] |
 | a line too thin | 1 arcminute = 1.2-1.4 px: a 1 px line vanishes, 2 px is the floor, 3 px reads | acuity (`docs/look/research/vertical.md` §3) |
 | a figure too small | "a person" from ~25 px, "a person doing what" from ~40 px, reliably 60-80 px | Johnson's criteria (`docs/look/research/vertical.md` §3) |
-| out of view | x < 98 or > 982 (Reels tab); the header y < 218-235; the rail x >= 877 at y 1032-1660; y >= 1519 | §1 |
+| out of view | x < 98 or > 982 (Reels tab); the header y < 218-235; the rails x >= 877 at y 1032-1660 (Instagram; ~860 with a repost button) and x >= 948 from y 797 (TikTok); y >= 1519 | §1 |
 | too short | a caption page shorter than its characters / 20 s; a detail needing more than ~0.25 s while the eye is on the subject | [V8]; `cinema.md` §5 (the background's quarter second); the 1.7 s a mobile item gets [V4] |
 | colour only | an edge between two hues of equal value, or a thin coloured line: colour is stored at half resolution (4:2:0, a 540 x 960 colour image) and blurs over 2+ px, more after the platform's re-encode | [V15]; our 3.5 Mbps Reels-like encode test (`docs/look/research/vertical.md` §3) |
 | two calls | the eye splits; gaze fragments with several movers | [V5, V6]; R3 |
@@ -278,7 +298,7 @@ awareness"; "Prioritize your hook in the first 6 seconds" [V2]. YouTube Shorts: 
 ease of viewing", "Announce yourself with audio", "Focus on your main subject" [V1]. A publisher on TikTok: "the first
 sentence (first few seconds) is definitely the most important ... If we have images and a person on the first frame then
 people are like 'OK this is catching my attention'"; an animated science explainer there, "always packing as big a punch
-as possible in the first three seconds" [V13].
+as possible in the first three seconds" [V12].
 
 **Frame 0 in vertical, with numbers** (on top of DIRECTION rule 9 and `CINEMATIC_GUIDE.md` "The opening", which stand):
 - **Peak after the page settles.** The opening's bold event (the subject's line drawing on, the colour flood) runs >= 1
@@ -293,15 +313,15 @@ as possible in the first three seconds" [V13].
 
 **The cover in the grids.** On the profile grid and in Explore (11 % of v1's views) a reel is a tile about a third of
 the screen wide: 1 px of ours is ~0.2 arcminutes there, so our 98 px caption type has an x-height of 0.15-0.17
-degrees, just under the 0.2-degree floor [V11]. A cover title meant to be read in a tile needs an x-height of >= 54-61
+degrees, just under the 0.2-degree floor [V10]. A cover title meant to be read in a tile needs an x-height of >= 54-61
 px: Patrick Hand at ~115-130 px (`LAYOUT.md` §5 checks the cover "at 360 px wide", the same third; est.).
 
 ## 5. Captions and words on screen
 
 | question | the evidence | ours now | proposal |
 |---|---|---|---|
-| where | the bottom 21-35 % is the app's (§1.2, §1.4); BBC, for 9:16 in its own player: "it is common to position subtitles a little higher up, though still generally in the lower third", because faces sit in the top half [V7]; top-placed subtitles drew fewer fixations than middle ones in short vertical video, with equal comprehension (REPORTED [V10]) | the band y 290-600, in the sky | keep: the only text zone clear in every view; the focal close under it (§3.3) |
-| how big | the fluent range 0.2-2 degrees of x-height [V11]; BBC for 9:16: a line height of 3.9-4.5 % of the video's height (75-86 px) [V7] | 98 px, x-height 46 px (MEASURED from the font: 0.47 em) = 0.55-0.62 degrees; baselines 123 px apart (6.4 % of the height, 1.5x BBC's) | keep: the large end suits a 1.7 s glance |
+| where | the bottom 21-35 % is the app's (§1.2, §1.4); BBC, for 9:16 in its own player: "it is common to position subtitles a little higher up, though still generally in the lower third", because faces sit in the top half [V7]; top-placed subtitles drew fewer fixations than middle ones in short vertical video, with equal comprehension (REPORTED [V9]) | the band y 290-600, in the sky | keep: the only text zone clear in every view; the focal close under it (§3.3) |
+| how big | the fluent range 0.2-2 degrees of x-height [V10]; BBC for 9:16: a line height of 3.9-4.5 % of the video's height (75-86 px) [V7] | 98 px, x-height 46 px (MEASURED from the font: 0.47 em) = 0.55-0.62 degrees; baselines 123 px apart (6.4 % of the height, 1.5x BBC's) | keep: the large end suits a 1.7 s glance |
 | how wide | BBC: 90 % of a 9:16 video's width [V7]; the Reels tab shows 884 px | <= 850 px centred on x 520: x 95-945, its left end 3 px outside the crop | **<= 780 px** (x 130-910, 88 % of the visible width): ~23 characters at 98 px (34 px a character) |
 | how many lines | BBC: up to three in 9:16 [V7] | <= 2 | keep 2: the band stays one 310 px field |
 | how fast | Netflix: up to 20 characters a second for adults [V8]; BBC: 160-180 words a minute, ~0.3 s a word [V7]; TikTok's ad advice, "5-10 words per second" [V2], is far above both | a change at least every 1.5 s; reference 2: an event every 1.13 s, pages 0.8-4.0 s | **a page's characters <= 20 x its seconds** (a 40-character page stays >= 2.0 s; a 1.1 s event holds <= 22 characters) |
@@ -319,7 +339,7 @@ figures cut by the bottom and side edges; a caption event every 1.13 s. The 9:16
 figure (~145 px) at a junction of light, ~5 % of its pixels moving (`docs/look/organic/composition.md` §2;
 `docs/look/refs_human_scale/README.md`).
 
-**What the platforms and publishers say** [V1, V2, V13]: the proposition in 3 s; tight framing; be unavoidable; focus
+**What the platforms and publishers say** [V1, V2, V12]: the proposition in 3 s; tight framing; be unavoidable; focus
 on the main subject; anchor the story with on-screen words; announce it with sound; complex ideas explained visually
 in a strong graphic style, the punch in the first three seconds; 30-60 s long.
 
@@ -349,9 +369,9 @@ in a strong graphic style, the punch in the first three seconds; 30-60 s long.
 | golden section | lines at 0.382 / 0.618 | the visible stage's x 436 / 644, y 951 / 1168 | the focal's home x 436-644, y 951-1168, inside `cinema.md` C1's x 413-667, y 951-1187 |
 | centre, symmetry | formal balance | the visible centre x 540 (the crop is symmetric); a centred subject holds the eye better in vertical [V5] | centred is the default, not a formal exception; a side-facing subject still sits off centre, on its back side |
 | headroom | space above the subject | the band is the headroom: tops at y >= 620; the drop from the block 300-450 px | R7, its short end |
-| lead room | space in front of a facing or moving subject | in the rail's band (y 1032-1660) the right edge is x 870, not 982: for 1.5:1 room a right-facing subject sits at x <= 410, a left-facing one at x >= 560 | `cinema.md` C9 with 870 as the right edge below y 1020 |
+| lead room | space in front of a facing or moving subject | beside the rail (from y 860-1032 down) the right edge is x 870, not 982: for 1.5:1 room a right-facing subject sits at x <= 410, a left-facing one at x >= 560 | `cinema.md` C9 with 870 as the right edge below y 860 |
 | balance (the steelyard) | a big soft mass near the centre balances a small strong one far out | the interface is a fixed weight at the lower right (the rail) and along the bottom (the name block) | the counterweight high (y < 600) or left; never lower right (R8) |
-| leading lines | lines that carry the eye to the subject | seen from y 1519 up; inside x 98-870 below y 1020; the visible frame's diagonal is 65 degrees, the stage's 46 | the lines rise from the bottom edge to the focal and stop there (`cinema.md` C7); none into the rail, the band or the name block |
+| leading lines | lines that carry the eye to the subject | seen from y 1519 up; inside x 98-870 below y 860; the visible frame's diagonal is 65 degrees, the stage's 46 | the lines rise from the bottom edge to the focal and stop there (`cinema.md` C7); none into the rail, the band or the name block |
 | negative space | the quiet field round the subject | the two bands the app covers (the words' sky, the near ground) are the frame's two quiet masses | R5's two quiet masses sit under the app's own text: quiet there costs nothing |
 | figure and ground, notan | the subject one clear shape | the gist in ~0.1 s; the subject's silhouette >= 3 degrees (~220 px); edges as value steps, not hue alone | R1, R4; DIRECTION 4's edges from light and shade survive 4:2:0 colour |
 | scale, the human figure | a known-size person beside a big world | the "you" at 130-220 px = 1.6-3.0 degrees = 15-25 % of the visible width; the references' people (8-16 % of the screen's width) are 71-141 px of ours on this feed | §8 row 6 |
@@ -364,27 +384,29 @@ in a strong graphic style, the punch in the first three seconds; 30-60 s long.
 
 | # | rule (our px, 1080 x 1920) | why | target |
 |---|---|---|---|
-| V1 | **Design to the feed's visible frame.** On the owner's feed only x 98-982 is seen (52 px a side on a profile, up to 108 on 20:9 phones): key reads inside x 130-950; anything that must read as cut by the frame edge is cut at x 98 / 982, so it must still read with its outer 98 px gone | §1.1, §1.5 | `LAYOUT.md` §1 (canvas, side margins rows) |
-| V2 | **The rail, measured.** Organic right rail x > 870 at y 1020-1520 (Reels tab: icons x 877-954, y 1032-1660; profile: x 919-988, y 1303-1868); the key-read box's right edge 870 below y 1020 | §1.2 | `LAYOUT.md` §1 (platform UI, key-read box); `src/lib/theme.ts` `safe.rail`; `scripts/qa/framecheck.py` (tooling) |
+| V1 | **Design to the feed's visible frame.** On the owner's feed only x 98-982 is seen (52 px a side on a profile, up to 108 on 20:9 phones): key reads inside x 130-945; anything that must read as cut by the frame edge is cut at x 98 / 982, so it must still read with its outer 98 px gone | §1.1, §1.5 | `LAYOUT.md` §1 (canvas, side margins rows) |
+| V2 | **The rails, measured.** Organic right rail x > 945 from y 790 (TikTok: x 948-1059 from y 797) and x > 870 from y 860 (Instagram's Reels tab: x 877-954 from y 1032, ~860 with a repost button; profile x 919-988, y 1303-1868), down to the bottom UI at y 1520; the key-read box's right edge 870 below y 860 | §1.2; [V14] | `LAYOUT.md` §1 (platform UI, key-read box); `src/lib/theme.ts` `safe.rail`; `scripts/qa/framecheck.py` (tooling) |
 | V3 | **The top, measured.** Nothing to read above y 240 (the header to y 218-235, a 10 % scrim to ~240); the band from y 290 stays as it is | §1.2-1.3 | `LAYOUT.md` §1; `theme.ts` `safe.top` 180 -> 240 (tooling) |
 | V4 | **The bottom, measured.** The app's text from y 1519 (LAYOUT's 1520 confirmed); under it one quiet dark-mid mass, no light detail and no call: the scrim darkens it a further 10-20 % | §1.2-1.3; R5, R10 | `LAYOUT.md` §1 (bottom third row) |
 | V5 | **Caption lines <= 780 px** (x 130-910 on the x 520 centre line, ~23 characters at 98 px), still <= 2 lines | §1.5, §5; [V7] | `LAYOUT.md` §1 (caption block); `theme.ts` `skyCaption.maxWidth` 850 -> 780; `scripts/capcheck.py` (tooling) |
 | V6 | **Caption pace:** a page's characters <= 20 x its seconds on screen | [V8], [V7] | `LAYOUT.md` §1 (caption block); the caption builder |
-| V7 | **Sizes by angle:** words' x-height >= 0.2 degrees on the feed (>= 17 px; our 56 px floor keeps 1.5x over it); lines >= 2 px; a cover title meant for a grid tile ~115-130 px | [V11]; §3.4, §4 | `LAYOUT.md` §3 (words), §5 (the cover) |
-| V8 | **The centre column and the focal's home:** key reads in x 130-870 from the band to y 1519 (x 130-950 above y 1020); the focal centred in the visible stage's golden box (x 436-644, y 951-1168); the drop from the caption block to the focal 300-450 px preferred, 650 at most | §2, §3; [V5, V6, V9, V10] | `LAYOUT.md` §1 (subject axis), §3; R7 |
-| V9 | **Frame 0 in the swipe:** the opening's bold event lasts >= 1 s and peaks after 0.4 s; the subject (tier A) >= 400 px wide on the axis with the hardest value step; the first spoken line in the band from frame 0 | §4 (the measured swipe); [V1, V2, V4, V13] | `CINEMATIC_GUIDE.md` "The opening"; DIRECTION 9 and the playbook's Hook and pacing (evidence) |
+| V7 | **Sizes by angle:** words' x-height >= 0.2 degrees on the feed (>= 17 px; our 56 px floor keeps 1.5x over it); lines >= 2 px; a cover title meant for a grid tile ~115-130 px | [V10]; §3.4, §4 | `LAYOUT.md` §3 (words), §5 (the cover) |
+| V8 | **The centre column and the focal's home:** key reads in x 130-945 from the band to y 860 and x 130-870 from y 860 to 1519; the focal centred in the visible stage's golden box (x 436-644, y 951-1168); the drop from the caption block to the focal 300-450 px preferred, 650 at most | §2, §3; [V5, V6, V9] | `LAYOUT.md` §1 (subject axis), §3; R7 |
+| V9 | **Frame 0 in the swipe:** the opening's bold event lasts >= 1 s and peaks after 0.4 s; the subject (tier A) >= 400 px wide on the axis with the hardest value step; the first spoken line in the band from frame 0 | §4 (the measured swipe); [V1, V2, V4, V12] | `CINEMATIC_GUIDE.md` "The opening"; DIRECTION 9 and the playbook's Hook and pacing (evidence) |
 | V10 | **One stage, no split screens;** a comparison is a sequence, or one frame with the subject at the seam | [V5, V6] | `LAYOUT.md` §3 |
-| V11 | **The interface is in the picture:** no call of ours at x > 830 below y 1000 or below y 1480; the counterweight high or left; leading lines end at the focal, never at the name block | §3.3 | `LAYOUT.md` §3; R8 |
-| V12 | **Review as the feed shows it:** every review MP4 also checked at the Reels tab's crop and scale (x 98-982, our frame 1.22x its fit-to-screen size) with §1.2's interface drawn over it; sizes judged there | §1.1 | `LAYOUT.md` §6 (checks); `scripts/qa/framecheck.py` (a Reels-tab overlay, tooling) |
+| V11 | **The interface is in the picture:** no call of ours at x > 830 below y 790 or below y 1480; the counterweight high or left; leading lines end at the focal, never at the name block | §3.3 | `LAYOUT.md` §3; R8 |
+| V12 | **Review as the feed shows it:** every review MP4 also checked at the Reels tab's crop and scale (x 98-982, our frame 1.22x its fit-to-screen size) with §1.2's interface drawn over it; sizes judged there | §1.1; [V14] | `LAYOUT.md` §6 (checks); `scripts/qa/framecheck.py` (a Reels-tab overlay, tooling); Remotion's Social Safe Zones Element already draws TikTok's and Instagram's opened-reel interface in our engine [V14], to which the Reels-tab crop and rail would be added |
 | V13 | **Reference sizes through the feed:** a landscape reference shown at full phone width maps its width to 883 of our px on the owner's feed, not 1080 | §1.1 | the owner's call (§8 row 6): DIRECTION 7, playbook DEPTH AND SCALE, `docs/look/refs_human_scale/README.md` |
 | V14 | **Ads:** the three platforms' official safe areas intersect at x 120-887, y 288-1247, with x <= 780 below y 840 | §1.4; [V1, V2, V3] | `LAYOUT.md` §1 (ad overlay: REPORTED -> OFFICIAL) |
 
 ## 8. Doc clashes found (flagged for the orchestrator; not edited here)
 
 1. **The rail.** `LAYOUT.md` §1 (platform UI, organic: "right rail x > 950 at y 900-1500"), `src/lib/theme.ts`
-   `safe.rail` ({x 950, y0 900, y1 1500}) and `scripts/qa/framecheck.py`'s organic zones, against the measured rail: x
-   877-954 at y 1032-1660 (Reels tab), x 919-988 at y 1303-1868 (profile). **Proposal:** V2: x > 870 at y 1020-1520; the
-   key-read box (x 120-950, y 600-1480) becomes x 120-870 below y 1020.
+   `safe.rail` ({x 950, y0 900, y1 1500}) and `scripts/qa/framecheck.py`'s organic zones, against the measured rails:
+   Instagram x 877-954 at y 1032-1660 (Reels tab; ~860 with a repost button), x 919-988 at y 1303-1868 (profile);
+   TikTok x 948-1059 from y 797 [V14]. LAYOUT's number fits TikTok, not Instagram's main feed. **Proposal:** V2: x >
+   945 from y 790 and x > 870 from y 860, to y 1520; the key-read box (x 120-950, y 600-1480) becomes x 120-870 below y
+   860.
 2. **The top.** `LAYOUT.md` §1 "top y < 180" and `theme.ts` `safe.top` 180, against the header measured to y 218
    (Reels tab) and 235 (profile). **Proposal:** V3: 240. Nothing we draw changes: the band starts at 290.
 3. **The caption's width.** `LAYOUT.md` §1 (the block x 95-945, <= 850 px) and `theme.ts` `skyCaption.maxWidth` 850,
@@ -393,8 +415,8 @@ in a strong graphic style, the punch in the first three seconds; 30-60 s long.
    and may rise through the band's height": x < 98 and x > 982 are not on the owner's feed. **Proposal:** keep the
    words and add "x < 98 and x > 982 are cut in most phones' main feed: nothing there is surely seen".
 5. **The key-read box** (`LAYOUT.md` §1, x 120-950, y 600-1480; `theme.ts` `safe.action` x 90-990, y 200-1480): the
-   rail covers x 877-950 from y 1032, and the crop x > 982. **Proposal:** x 130-950 to y 1020, x 130-870 from y 1020
-   to 1480.
+   rails cover x 877-950 from y 1032 (~860 with a repost button) and x 948-950 from y 797, and the crop x > 982.
+   **Proposal:** x 130-945 to y 860, x 130-870 from y 860 to 1480.
 6. **The human-scale size as the owner sees it.** `docs/look/refs_human_scale/README.md` ("the landscape pictures fill the
    phone's width, so their people read at ~8-16 % of the screen's WIDTH: ~90-170 px tall in our 1080-wide frame"),
    DIRECTION rule 7 and the playbook's DEPTH AND SCALE ("~130-220 px tall in our 1080 x 1920 frame (the references'
@@ -413,8 +435,9 @@ in a strong graphic style, the punch in the first three seconds; 30-60 s long.
 
 ## 9. Measuring TikTok and YouTube Shorts the same way (procedure; ~5 minutes of the owner's time)
 
-1. The owner plays one of our posted films in TikTok (in the For You feed if it comes up, otherwise from the profile)
-   and in YouTube's Shorts player, and screen-records 5 s of each, as he did for v1 in Instagram.
+1. The owner plays one of our posted films in TikTok (in the For You feed if it comes up, otherwise from the profile),
+   in YouTube's Shorts player and in Instagram's Reels tab (the one Instagram view of our own post not yet recorded),
+   and screen-records 5 s of each, as he did for v1 in Instagram.
 2. Register the recording against our render: SIFT features on a recorded frame (masking the top 330, the bottom 320
    and the right 200 native px), matched against nearby frames of the render, then a RANSAC similarity
    (`cv2.estimateAffinePartial2D`, a 2-3 px threshold) on the best match: scale and offset, hence the crop.
@@ -462,27 +485,29 @@ The scratch scripts for these steps are in `/tmp/comp/vertical/scripts/` (`regis
 - **[V8]** Netflix, "English (USA) Timed Text Style Guide": 42 characters a line; up to 20 characters a second for
   adults, 17 for children.
   [partnerhelp.netflixstudios.com](https://partnerhelp.netflixstudios.com/hc/en-us/articles/217350977-English-USA-Timed-Text-Style-Guide).
-- **[V9]** G. d'Ydewalle, C. Praet, K. Verfaillie and J. Van Rensbergen (1991), "Watching Subtitled Television:
-  Automatic Reading Behavior", *Communication Research* 18(5), 650-666,
-  [doi:10.1177/009365091018005005](https://doi.org/10.1177/009365091018005005).
-- **[V10]** Subtitle placement: W. Fox (2016), "Integrated titles: An improved viewing experience?", in *Eyetracking
-  and Applied Linguistics* (Language Science Press), as summarised in its abstract record
-  ([MAP, UAB](https://mapaccess.uab.cat/node/3667)); and a Utrecht University master's thesis, "The influence of
-  subtitle design of short videos on people's comprehension and visual attention distribution"
+- **[V9]** Subtitles and the eye. G. d'Ydewalle, C. Praet, K. Verfaillie and J. Van Rensbergen (1991), "Watching
+  Subtitled Television: Automatic Reading Behavior", *Communication Research* 18(5), 650-666,
+  [doi:10.1177/009365091018005005](https://doi.org/10.1177/009365091018005005). W. Fox (2016), "Integrated titles: An
+  improved viewing experience?", in *Eyetracking and Applied Linguistics* (Language Science Press), as summarised in
+  its abstract record ([MAP, UAB](https://mapaccess.uab.cat/node/3667)). And a Utrecht University master's thesis, "The
+  influence of subtitle design of short videos on people's comprehension and visual attention distribution"
   ([studenttheses.uu.nl](https://studenttheses.uu.nl/handle/20.500.12932/46814)), its finding as reported by the
-  search index (the repository did not load from here). REPORTED; the thesis preliminary.
-- **[V11]** G. E. Legge and C. A. Bigelow (2011), "Does print size matter for reading? A review of findings from vision
+  search index (the repository did not load from here). Fox and the thesis REPORTED; the thesis preliminary.
+- **[V10]** G. E. Legge and C. A. Bigelow (2011), "Does print size matter for reading? A review of findings from vision
   science and typography", *Journal of Vision* 11(5):8: "the fluent range ... from approximately 0.2 deg to 2 deg" of
   x-height. [PMC3428264](https://pmc.ncbi.nlm.nih.gov/articles/PMC3428264).
-- **[V12]** L. Mulier, H. Slabbinck and I. Vermeir (2021), "This Way Up: The Effectiveness of Mobile Vertical Video
+- **[V11]** L. Mulier, H. Slabbinck and I. Vermeir (2021), "This Way Up: The Effectiveness of Mobile Vertical Video
   Marketing", *Journal of Interactive Marketing* 55, 1-15,
   [doi:10.1016/j.intmar.2020.12.002](https://doi.org/10.1016/j.intmar.2020.12.002).
-- **[V13]** N. Newman (2022), "How publishers are learning to create and distribute news on TikTok", Reuters Institute
+- **[V12]** N. Newman (2022), "How publishers are learning to create and distribute news on TikTok", Reuters Institute
   for the Study of Journalism.
   [reutersinstitute.politics.ox.ac.uk](https://reutersinstitute.politics.ox.ac.uk/how-publishers-are-learning-create-and-distribute-news-tiktok).
-- **[V14]** S. Hoober (2013), "How Do Users Really Hold Mobile Devices?", UXmatters: 1,333 observations, of the 780
-  people touching their phones 49 % one-handed, 36 % cradled, 15 % two-handed.
+- **[V13]** S. Hoober (2013), "How Do Users Really Hold Mobile Devices?", UXmatters: 1,333 observations; of the 780
+  people touching their phones, 49 % one-handed, 36 % cradled, 15 % two-handed.
   [uxmatters.com](https://www.uxmatters.com/mt/archives/2013/02/how-do-users-really-hold-mobile-devices.php).
+- **[V14]** Remotion, "Social Safe Zones" (an Element for the engine we build in), with its two transparent interface
+  images, `tiktok-interface.png` and `instagram-reels-interface-v3.png` (1080 x 1920), measured on their pixels:
+  [remotion.dev/elements/overlays/social-safe-zones](https://www.remotion.dev/elements/overlays/social-safe-zones/).
 - **[V15]** Device and codec facts: Apple, "iPhone 16 Pro - Tech Specs" (6.3 inch, 2622 x 1206 px at 460 ppi),
   [support.apple.com/en-us/121031](https://support.apple.com/en-us/121031); Wikipedia,
   [Chroma subsampling](https://en.wikipedia.org/wiki/Chroma_subsampling) (4:2:0: both colour channels at half the
@@ -490,7 +515,7 @@ The scratch scripts for these steps are in `/tmp/comp/vertical/scripts/` (`regis
 
 **Our measurements** (scratch, `/tmp/comp/vertical/`): (M1) Instagram's profile view over our v1, by registration
 (§1.1-1.2); (M2) Instagram's Reels tab, by temporal median and spread over three recordings (§1.1-1.2); (M3) the scrims
-(§1.3); (M4) the official templates' pixels (§1.4); (M5) the swipe, by phase correlation (§4); (M6) Patrick Hand's
-x-height, rendered at 98 px from `public/fonts/CaptionHand.woff2` (46 px; cap height 65 px). Angles and crops are
-arithmetic from these and [V15]. No reference frame was used as an input to a picture of ours; the owner's recordings
-were only measured.
+(§1.3); (M4) the official templates' pixels (§1.4) and Remotion's two interface images (§1.2); (M5) the swipe, by phase
+correlation (§4); (M6) Patrick Hand's x-height, rendered at 98 px from `public/fonts/CaptionHand.woff2` (46 px; cap
+height 65 px). Angles and crops are arithmetic from these and [V15]. No reference frame was used as an input to a
+picture of ours; the owner's recordings were only measured.
