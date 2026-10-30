@@ -222,3 +222,15 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   the visual script on video 4's branch (`claude/kind-pascal-lvgsza`): `video/docs/v4/visual/STYLE_ADJUSTMENTS.md`
   (fold into VISUAL_SCRIPT.md before G3).
 
+
+## 2026-10-30: the words on screen (fonts and caption placement)
+- 2026-10-30 ~10:55 UTC, with two references (a screenshot of a reel titled "Scratchy — Sketched animated stories": a
+  white brush-script title and a hand-lettered subtitle, top left over a photo; and a screen recording of a reel whose
+  thin white hand-lettered words, one or two at a time, sit in the open wall above a drawn cat, placed and staggered
+  per phrase, about 1 s each): "One aspect I want you to evaluate and research is the fonts and the text caption
+  positioning I'll give you a few references / We previously would have the text to be pretty static but there is so
+  much more we can do to make it look premium, more interesting, dynamic and more engaging / Research —-> distill it in
+  the guidebook and recipes to use —-> give me still examples" -> an iteration (two max-effort agents: the research,
+  then the guide with its recipes and the stills, rendered on v4's words over our latest look frames), sent on a
+  private page; the references measured in `docs/look/type/refs/README.md`. -> rule: playbook, Visual style (the words
+  on screen are designed, never one static block).

@@ -381,6 +381,17 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   2026-10-27; v3 retro, 2026-10-27).
 - **Captions are burned in and pop in place (or rise without clipping);** a reveal that cuts letters looks like a glitch;
   platform auto-captions stay off. — (v1 reel, 2026-10-25).
+- **The words on screen are DESIGNED, never one static block: the fonts, the size, where the words sit and how they
+  move are chosen beat by beat to look premium, interesting, dynamic and engaging.** One font, one size and one fixed
+  band for the whole film was the old default ("pretty static"). The recipes come from the type guide
+  (`docs/look/TYPE_GUIDE.md`, researched), and the owner picks from still examples before a film uses one; until a
+  pick, the current caption rules (`docs/look/LAYOUT.md`) stay the default. The captions keep their duties: burned in,
+  never clipped, read at phone size at a glance, in the voice's order, frame 0 showing the first spoken line. — ("One
+  aspect I want you to evaluate and research is the fonts and the text caption positioning I'll give you a few
+  references / We previously would have the text to be pretty static but there is so much more we can do to make it
+  look premium, more interesting, dynamic and more engaging / Research —-> distill it in the guidebook and recipes to
+  use —-> give me still examples", 2026-10-30; the references: a reel's thin hand-lettered words, one or two at a
+  time, placed in the open space above the subject, and a sketched-stories reel's brush-script title.)
 - **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
   as a screen recording under the status bar). Each film decides them with its G4 look clip, 'paint-subtle' at most
   (`docs/EDGES.md`). — (v1 posted reel, 2026-10-25).
