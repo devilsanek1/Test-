@@ -207,6 +207,34 @@ Everything that agent knew is in this repo. This file is the map; the details li
   `video/docs/v5/script/WRITER_BRIEF.md` (one writer each, then a critic and a fix pass). All of it is on branch
   `claude/compassionate-hopper-5iqguj`, not yet merged into `video-production`.
 
+- **2026-10-29 ~10:05 UTC: video 4 is produced by session https://claude.ai/code/session_01VwsUCnkJXFuq3YwEYFUg7o** (owner: "lets
+  work on the video 4 - pick up where its been left off"), branch `claude/kind-pascal-lvgsza`. 2026-10-30: G1 and G2 locked
+  (the voice: the owner's own ElevenLabs read, pauses shaped); the new G2.5 VISUAL SCRIPT (owner: "brainstorm a story and
+  like a visual script with what happens on the screen and camera movements"; `video/docs/v4/visual/`, method
+  `METHOD.md`) sent to the owner; next G3. New tools: `scripts/voice/{textnorm,shape_take,measure_take,take_page,
+  check_clarity}.py`. Live state: `video/docs/v4/README.md`. Video 5 still waits at G1 (`video/docs/v5/script/WRITER_BRIEF.md`).
+  2026-10-30: video-production merged into the branch (the painted look, the production/iteration modes); the style
+  adjustments to the visual script (`video/docs/v4/visual/STYLE_ADJUSTMENTS.md`) wait to be folded in before G3. **The
+  words on screen** (owner, 2026-10-30: fonts and caption placement "premium, more interesting, dynamic and more
+  engaging"): an iteration (research, the guide `video/docs/look/TYPE_GUIDE.md` DRAFT with 10 recipes, 14 stills in
+  `video/docs/look/type/stills/`, tooling `video/scripts/type/`), sent on https://claude.ai/artifact/1magumGxnA4TGdeEQPc1Hv;
+  after the owner's "blood message on the wall" note the stress became the lit hand (`type/PLEASANT.md`); the owner
+  handed the pick over ("you pick your best option for maximum engagement and pleasantry and user attention
+  retention"): **PICKED and applied** (TYPE_GUIDE status; LAYOUT, DIRECTION rule 10, G5_BLOCKING, the playbook). Still to
+  do: the code (font.ts, theme.ts, Captions.tsx, capcheck: LAYOUT "The code must match") with the tooling lane before
+  v4's G3; the motion judged in v4's G4 look clip. **People, iteration 2** (owner: hair "never really static or like
+  one firm ... a little messy, unstructured wavy", better proportions and stature): research, `RECIPE.md` and stills in
+  `video/docs/look/people_design/hair_v2/`, code `video/src/look/people_dirs/hair_v2/` + `src/entry-look-people-hair.tsx`,
+  sent on https://claude.ai/artifact/1Xerf8RzpVF8WnH2PYEN8b; waiting on the owner (the mess, the cuts, the stance) and
+  more hair references; on a yes, fold RECIPE.md into PEOPLE_DESIGN §5.1/§5.4/§5.9, then a hair motion clip.
+  Then the owner rejected v2/v3 ("incoherent", "garbage"): the evaluation `people_design/EVALUATION.md`, the overhaul v4
+  (hair as authored shapes on a spring rig `src/look/people_dirs/hair_v4/`, faces redrawn `people_v4/`, assembled
+  `entry-look-people-v4.tsx`; stills `people_design/hair_v4/final/`) sent on the same page (version 3) with the bodies
+  marked not done; the bodies round runs (`people_design/bodies_v4/`). Waiting on the owner: hair on track? LASH or
+  open eyes? Then PEOPLE_DESIGN gets the picked system. **Picked (2026-10-30):** hair v4 kept, open eyes, the bodies
+  round kept ("let's go with that for now"): PEOPLE_DESIGN's status block names the code; wiring it into the film
+  engine is the tooling lane's, before v4's G3 draws its person.
+
 ### Earlier: video 5 as the heat story
 - **Video 5 is produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt since 2026-10-29 ~07:55 UTC**
   (owner: "Okay let's try heat story let's generate the script"), on branch `claude/compassionate-hopper-5iqguj`. The

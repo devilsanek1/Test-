@@ -16,10 +16,10 @@ paste), the later rule wins, as the brief's banner lists.
 
 Format: **rule** — why / evidence (video, date).
 
-**Last reviewed for coherence: 2026-10-27 (sixth pass: a cold read as if starting video 4, every conflict it found fixed
-at its source: the card's timing, one version, people without faces, Pip in every shot, the line's colour, parallel
-work and the budget, the brief) · no size budget: coherent and clear wins over short** (owner, 2026-10-27; see
-Maintenance at the end).
+**Last reviewed for coherence: 2026-10-29 (seventh pass, scoped to the script-clarity note: integrated into Script and
+voice and the Taste signals' "Lines", checked against Audience and goal and Hook and pacing; the other sections as of
+the sixth pass, 2026-10-27: a cold read as if starting video 4, every conflict it found fixed at its source) · no size
+budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance at the end).
 
 ## Audience and goal
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24).
@@ -51,7 +51,16 @@ Maintenance at the end).
   towers, not from visiting them. Our v5 draft 1 broke it: orbit, a mountain in Italy, the sea off Shanghai, Stockholm,
   then Helsinki in 43 s, one line each and nothing deepened (a list wearing a story's clothes). **Test, at G0 and G1:**
   name the film's one thing in 3 words; count the places (one home place, at most one comparison shot); every line
-  must be about the one thing. This tightens CRAFT §a's "at most 3 places". — ("I what I don't like about the current story is we are too wide and unfocused again like we talked about a bunch of topics all within 30 seconds - we started with space then mountain then  Stockholm then Helsinki / Compare it with big bend story and create a new rule for storytelling", v5 G1, 2026-10-29).
+  must be about the one thing. This tightens CRAFT §a's "at most 3 places". **No side quests, and only the information
+  the story needs:** a beat that doesn't carry the one story toward its payoff goes, however true, weird or fun (v4's
+  2010 data center under a cathedral, a "twist" since G0: "the sidequest that doesn't really add much to the story").
+  Test every beat at G0 and G1: cut it in your head; if the viewer still gets the story and the payoff, it stays cut.
+  A sentence may grow when the words make it more natural or clearer; the film never carries more facts than its
+  story needs. — ("I what I don't like about the current story is we are too wide and unfocused again like we talked about a bunch of topics all within 30 seconds - we started with space then mountain then  Stockholm then Helsinki / Compare it with big bend story and create a new rule for storytelling", v5 G1, 2026-10-29;
+  "you are again packing more information than needed in the short update - its actually okay to keep the text
+  longer if needed, but you are having again too much of a sidequest - like specifically this 'Computers have heated
+  Helsinki before. In twenty ten, a small data center under a cathedral started heating homes.' is the sidequest that
+  doesn't really add much to the story", v4 G1, 2026-10-29).
 - **The first line sounds like a friend starting a story, and still pulls: curious, never pushy. "Did you know that
   ..." is the owner's model opener.** The Big Bend reel: "Did you know that New York once got a proposal to build this
   giant 2,000-foot tall bending skyscraper? It's called the Big Bend." A friend's question with a surprising fact in it
@@ -61,20 +70,103 @@ Maintenance at the end).
   first hook sentence is extremely natural like a conversation yet captures the attention and curiosity without being
   too pushy and the script has a rhythm we discussed before"; then "Oh I also meant that a video has an opening as "did you know that .." like that what I meant by great opening"; "Even with did you know the core line is instantly more interesting", 2026-10-29; saved: the study's
   `refs/bigbend_reel/`).
-- **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24). **Rhythm: never a run of
-  long sentences; put a short one (5 words or fewer, e.g. "Let's find out." "But there was a problem.") after every 1-2
-  long ones, at the turns,** gated by `scripts/voice/check_rhythm.py` OK at G1. — (owner's reference reel, 2026-10-27).
+- **CLEAR TO A REGULAR PERSON ON ONE HEARING: every sentence is understood the first time, at feed speed, by regular
+  people worldwide (many learned English at school; they read the captions as it plays and can't rewind), never only
+  by us.** Ask of every sentence the owner's question, "is that sentence good and will be received well by regular
+  people?", and write it as news you'd pass to a friend (v4's line 1, "Did you know Helsinki wants AI to heat seventy
+  thousand homes?": "great thats what i would like to tell my friends"). How (the principles, their research and the
+  failures of v1-v5: `docs/retro/2026-10-29_script_clarity/PRINCIPLES.md`):
+  - **Everyday names, one per thing:** call each thing what regular people call it and keep that one name all film;
+    no trade words, and no common word in its trade sense ("the chips", "a cabinet of them": to most people chips are
+    food). A term the story needs is described once, plainly, where it first appears ("buildings called data
+    centers"). Rounding a thing to its everyday form is the licence "generalizing is fine" gives (a 72-chip rack is
+    "one stack of these computers").
+  - **Introduce, then point:** "the X", "those X", "that hot" only for what the script already said; every "it",
+    "they", "this" or "that" points at ONE obvious thing in the line before, or say the noun again ("But Helsinki
+    WANTS it": the heat, the air or the sea? -> "But Helsinki wants that heat."). A short line keeps its noun (Rhythm,
+    below).
+  - **The plain thought, as the typical case:** say who does what, where, in physical words; never a compressed or
+    clever hint at a deeper thought, and no vague scope ("almost everywhere": say what happens, e.g. "in a typical
+    data center, here is what happens"). Test: write "What I mean is: ___" under the line; if that is clearer, it
+    becomes the line.
+  - **One new idea per sentence, hooked onto the last:** each sentence starts from what the listener just heard and
+    ends on its new part; the joins are said and true ("but", "so", "because"); the line right after the hook and its
+    payoff gives the plain base (what makes the claim possible) at once, so the viewer wonders about the story
+    ("how?"), never about a word ("which chips?"). The beat order: PRINCIPLES.md, "How a 40-second script is structured".
+  - **Literal words for a worldwide ear:** no idioms, slang or wordplay to decode ("first dibs", "by the mountain").
+  - **The one joke is the plain situation, said kindly:** one step, in simple, gentle, everyday words, never weird,
+    cheeky or scandalous ("nobody's even ..."); after one hearing a viewer smiles AND can say the point, or it goes.
+  - **Numbers and comparisons by ear:** one number per sentence, round, tied to an everyday thing; a comparison says
+    what is alike ("as much heat as forty kettles", never only "like forty kettles").
+  - **A comment line is clear first:** people argue with what they understood, and swipe past what they didn't
+    (Audience and goal: comments are a massive plus).
+  - **Checked, never assumed:** `scripts/voice/check_clarity.py` OK at G1 (no error, every warning fixed or answered
+    in the script doc's "Checks"; OK never means clear), then the G1 critic's cold viewer panel (`docs/PIPELINE_V2.md`,
+    G1): three regular people hear the narration once, sentence by sentence, and every line that snags one of them
+    (heard wrong, missed, re-linked to an earlier line, an unsure or swiping thumb) is rewritten. A readability score
+    proves nothing ("The chips get that hot." scores as the easiest line), and neither does our own ear: we know what
+    we meant.
+  Ambiguous or weird loses the biggest audience, the one we write for. — ("so what i don;t like about these scripts we
+  write lately is we are being too ambiguous and weird at times"; "We are talking about reaching the biggest audience
+  and getting the engagement - but we would lose people on this sentence. Like we need to ask ourselves - is that
+  sentence good and will be received well by regular people? Chips is a word not a lot of people would understand";
+  "this is directionally okay, but still weird we need a simpler less scandalous language"; "I think you are having
+  some deeper thought here and you choose to be obscure about it. So i think you want to say that in a typical
+  datacenter here is what happens. When you say "almost everywhere" - this is very ambigous"; "When you say IT - what
+  exactly is it - heat or air or sea?", v4 G1, 2026-10-29; earlier, "Who even knows WordPress now?", v1, October 2026.)
+- **Sound like a real person talking, never like AI (the creative brief's RULE #1): check every sentence for
+  AI-sounding wording;** the everyday words it asks for are the clarity rule's, above. — (v1, 2026-10-24).
+- **Human connectors, placed TACTICALLY: a few spoken words a person telling a friend would use, at the moments that
+  need a hand:** "To put that into perspective," before a comparison or a big number; "Actually," before the part that
+  surprises; "So," at a consequence; "Now," when the story moves on; and the El Niño reference's (`docs/voice/refs/
+  2026-10-29_el_nino/`): "So how does it work?" (the viewer's own question said aloud, then answered at length),
+  "Or in other words," (the plain restatement right after a term's definition), "Normally," (the usual case before
+  the change), "The result is that" (the consequence). A few in a film (about two to four), never on
+  every line, each one true to the sentence it opens. They make the voice a person's and tell the listener what kind
+  of sentence comes next (listeners follow and recall better with such markers: Chaudron and Richards 1985,
+  `docs/retro/2026-10-29_script_clarity/research_ear.md` finding 11). They are not RULE #1's stock reveal phrases
+  ("Here's the thing", "The catch?", "Turns out", "Let that sink in"), which promise drama and name nothing and stay
+  banned (a question answered at length and "in other words" before a plain restatement are connectors; "The
+  result? X." and "In other words, [zinger]" stay RULE #1's tells). — ("i would add more human / conversation like sentences TACTICALLY like before this 'Just one of them makes
+  as much heat as FORTY kettles, boiling non-stop.' i want to say something like 'to put it into perspective' or
+  something like this. or something like 'Actually' / 'so' that just adds a bit more human to it, figure out what to
+  add", v4 G1, 2026-10-29; the El Niño voice line, "it sounds directionally good to me", 2026-10-29).
+- **Rhythm: never a monotone run of long sentences; put a short one (5 words or fewer, e.g. "Let's find out." "So how
+  does it work?") at the turns, after at most three long ones, three only when each is one flowing spoken thought
+  joined by a connector (the El Niño reference runs 15, 24 and 24 words and the owner likes it; a run of short
+  clipped lines sounds as written as a run of long ones), and the short line keeps its noun** ("But Helsinki wants that
+  heat.", never a bare "it" after three things it could mean: five of v4 draft 1's six short lines had shed their
+  noun), gated by `scripts/voice/check_rhythm.py` OK at G1 (a run of up to 3 since 2026-10-29); rhythm OK is never
+  evidence of clarity. — (owner's reference reel, 2026-10-27; v4 G1, 2026-10-29; the El Niño voice line, "it sounds
+  directionally good to me", 2026-10-29).
 - **Scripts come with detailed emotional / delivery cues; the owner always gets the full script text with any take.**
   — (v1; "give me the full text to paste, not one line", v3, 2026-10-26).
 - **We generate the narration with the owner's ElevenLabs voice through the API, for every video** (voice id and model
   in `docs/voice/VOICE.md`, procedure `docs/voice/API_QUICKSTART.md`, details `docs/ELEVENLABS.md`): paste format v2
   (few short tags, only at a paragraph start) with `check_paste.py` OK (it blocks every pattern that ever broke a take;
   only its `--handoff` text reaches the owner); `generate_take.py` (whole script first, auto-checked, auto-regenerated)
-  with `report.json` `all_clean`; `check_take.py` MATCH on every take; send take.wav as an attachment; lock it into
+  with `report.json` `all_clean`; `check_take.py` MATCH on every take; deliver the take on a private claude.ai page with an audio player (the Artifact tool; the
+  page `scripts/voice/take_page.py` builds: a player, the cadence strip with its beats, the script to tap through):
+  attachments don't play in the Claude app on the owner's phone (a .wav: "Can't open play it here"; an .m4a and an
+  .mp3: "None are available", v4 G2, 2026-10-29); the .wav stays in the repo for the mix; lock it into
   `public/vN/`; log it in `ELEVENLABS.md` section 5; commit and push after each step (pull first). **One full paste
   must narrate cleanly: a voice failure is our process bug, never the owner's problem** — fix it in the process. The
   key is the secret `ELEVENLABS_API_KEY`: never print, file, prompt or commit it. Only without the key does the owner
-  paste it (then always the full paste text). Never a voice other than the owner's. — (owner's standing instruction +
+  paste it (then always the full paste text). **The delivery is explored and shaped for attention, one take sent**
+  (owner, v4 G2, 2026-10-29: "play with the cadence and emotions to get to the best possible outcome capturing people
+  attention and keep them engaged"; "are you able to do some post processing on the voice to play with cadence and
+  controls?"): a few whole-script reads (model, stability, tags) measured against the owner's reference read
+  (`docs/voice/refs/`; `scripts/voice/measure_take.py`), the best one shaped in post (`scripts/voice/shape_take.py`:
+  brisk gaps, a beat before the turn and the payoff, a light polish), checked word for word again; the variants stay
+  ours. **Never process the voice itself: no time-stretch, no compressor, no dynamic loudness;** only its pauses are cut
+  and a single gain sets its level. A 10 % Rubber Band speed-up made v4's take "extremely robotic like there is some
+  weird background", all but its one unstretched line; our compressor and dynamic loudness made it "more like in some
+  chamber" next to the same voice from the ElevenLabs website, "as if someone speaking in the microphone" (owner,
+  2026-10-29); a take the owner makes on the website can be the base, shaped by its pauses only; pace comes from the generation (the
+  read, pace words in the tags such as "brisk": Eleven v4 has no speed setting; a model's own speed setting where it
+  has one) and from the pauses (v4's take 3: "brisk" tags, +5 %, the voice unchanged). Never a voice the owner didn't pick: their cloned narrator voice by
+  default, or the voice they name for a film (`docs/voice/VOICE.md`; v4, 2026-10-29: "lets try another voice - with
+  this id MQnUCZUAQLYMCY1Ztz6d"). — (owner's standing instruction +
   v2 take 1, 2026-10-26).
 
 ## Music and sound
@@ -281,11 +373,54 @@ Maintenance at the end).
   captions and QA tools are tools, not assets; the kit pieces in `src/lib` (cine, kit, mascot) are references to learn
   from, never a film's sets, and a film never imports another film's folder (`src/vN/`). — ("Don't rely on reusable
   assets", v2 restart, 2026-10-27).
+- **Hair is never static or one firm shape: always a little messy, unstructured and wavy, INSIDE A PROPER, STYLISH,
+  CLEAN HAIRCUT.** The cut comes first: a designed silhouette with one coherent flow (every lock follows the parting
+  and the crown), a few big shapes, a clean hem; the life is a touch (a soft wave, one or two deliberate loose locks or
+  flyaways), never bed-head: many small random locks read as "a person woke up", "not stylish and not clean" (the v2
+  stills, 2026-10-30). It moves with the air and the body (hair physics: weight, wind, follow-through), cut in today's
+  real haircuts; checked against the references for how clean and stylish they are. With it, people's proportions and
+  stature get better: slim, elegant adults with a relaxed, confident posture, the head stacked over the shoulders on a
+  long, upright neck, never pushed forward ("looks like this person was sitting at computer the whole day").
+  **Hair is BUILT TO ANIMATE and drawn CLEAN:** a few smooth, designed shapes (no facets, no jagged tips, no scatter
+  of small locks), layered back / cap / front like a 2D cut-out rig, the hanging pieces on bone chains with spring
+  physics, so the same clean shapes bend and settle in motion; proven with motion strips (frames of a turn, a walk,
+  a breeze) beside the stills before the owner sees it. A procedural scatter of polygon locks read as "garbage", "not
+  appealing or clean" (v2 and v3, 2026-10-30). KEPT FOR NOW (2026-10-30): hair v4, authored shapes on a 2D spring rig
+  with soft shading (`docs/look/people_design/hair_v4/`; "Hair is a bit cleaner let's keep it for now"); to iterate
+  later. The recipe must be the most pleasant and modern we have
+  (`docs/look/PEOPLE_DESIGN.md`, the hair and proportions iteration; references `docs/look/people_design/
+  refs_hair_2026-10-30/`). — ("So we previously made a recipe and a detailed research and the update to people figures /
+  We need to iterate on it more and improve the hair and the proportions and stature / I will send you more references
+  when it come to hair it's never really static or like one firm it's always a little messy, unstructured wavy /
+  Research the haircuts and the physics of hair and let's make sure it's the most pleasant and modern recipe we have",
+  2026-10-30, with five references: wind-lifted long hair seen from behind, a messy copper mop and a wavy bob with
+  flyaways on a height sheet, a tousled spiky crop, long hair falling unevenly, slim long-legged figures; on the v2
+  stills: "I don't get why you changed the neck posture like now it looks like this person was sitting at computer the
+  whole day / Also I don't think I like it really it's more detailed yes but it's incoherent like it's not a proper
+  haircut and more like a person woke up and that's what we see like not stylish and not clean compare it deeper with
+  our references if they look more clean and stylish", 2026-10-30; on v3: "Nope not good enough we need to overhaul
+  the hair I'm not convinced it's going to be animated properly it's not looking clean at all looks like garbage and
+  not appealing or clean", 2026-10-30.)
+- **Faces, above all the profile, are cute and super appealing by modern standards; women read feminine and men
+  manly.** What makes a face beautiful, cute and appealing is researched and built into the face recipe (the general
+  features: the nose, the brow and forehead, the lips, the chin and jaw, where the closed eyes sit, the cheek), with the
+  body to match: women's body composition feminine and appealing, like the woman sitting on the blue cliff in the
+  references (her cute nose, her hair, her slim female build), men refreshed with manly features (the jaw, the brow, the
+  neck and shoulders). Tasteful and generic, never caricature or sexualised; the LASH face is the starting point.
+  — ("Another next point is the fade profile should be cute and like super appealing by modern standards / Do the
+  research if what makes the faces beautiful and cute and appealing like general face features and make it / Like the
+  woman sitting on the blue cliff reference obviously has appealing features like cuteness nose hair female body
+  composition and our man refreshed similarly has manly features", 2026-10-30; "fade profile" read as the face's
+  profile.) **Hair, face, light and values are designed together, as one character,** and judged OVERALL beside the
+  references, never one feature at a time (`docs/look/people_design/EVALUATION.md`: the faceless flat figure family
+  reads cheap and dated next to today's stylised 2D characters: a face, built in 3D, lit, the face framed by value).
+  — ("Like this is one exsmple just compare it overall and evaluate what makes the left to be modern and natural and
+  appealing and right us absolute garbage / I think we do need to combine it with the faces research", 2026-10-30.)
 - **People: small and simple in the frame, contemporary and refined in design** (small full figures, often seen from
   behind or in rear 3/4; adult proportions of about 7.8 heads in direction C, below, which replaces reference 1's
   round-headed crowd as the drawing model; near heads <= ~140 px), never big character models: they act with their pose
-  (reach, shrug, slump, look up); faces stay generic (the LASH face of the people design below, never eyes looking at us
-  or a mouth). **In the foreground only the film's one "you" or the
+  (reach, shrug, slump, look up); faces have OPEN EYES that look away, never at us (the owner's pick, 2026-10-30: "Let's do open eyes";
+  simple features: a soft brow, a small nose, the lips as a tone; the closed-eye LASH only for downcast, serene moments). **In the foreground only the film's one "you" or the
   mascot;** the "you" near the camera stands at a real size, about v2's original (~130-220 px tall), still simple and
   from behind or in silhouette (DEPTH AND SCALE FROM A HUMAN VIEWPOINT above; owner, 2026-10-29); strangers stay small in the mid and far ground (a row of strangers' backs in front reads as "you"). Simple, but REFINED,
   CLEAN and FLUID like the girl in the owner's 9:16 motion reference (`docs/look/refs_human_scale/04_cloud_beast_girl_strip.jpg`):
@@ -305,7 +440,13 @@ Maintenance at the end).
   actually kind of like the last one modern graphic except the face that looks messed up", 2026-10-30.) The face now:
   LASH (closed-eye lash lines and a small soft nose; the contour only under ~200 px; sunglasses and caps as some
   people's accessories; her often turned away), kept for now and to be iterated later ("It’s better let’s keep it for
-  now / We will iterate more later on"; "Let’s keep lash", 2026-10-30; `docs/look/PEOPLE_DESIGN.md`). — ("Yes then people I think we should target 20-30 yo today with styles that are just cool and
+  now / We will iterate more later on"; "Let’s keep lash", 2026-10-30; `docs/look/PEOPLE_DESIGN.md`). Superseded the
+  same day by the redrawn faces with OPEN EYES looking away ("Let's do open eyes", on the overhaul's stills). THE
+  PEOPLE IN USE FOR NOW (2026-10-30): hair v4 (authored shapes on a spring rig), the redrawn faces with open eyes, and
+  the rebuilt bodies (poses with weight, simple real hands, clothes with fit and folds, slim modern proportions;
+  `docs/look/PEOPLE_DESIGN.md` status block) — ("I think it is a bit better overall I think yes let's go with that for
+  now"); to iterate later (her stance's attitude, the coat's far panel, the rail grip, the ground pose, the head
+  turn's face swap). — ("Yes then people I think we should target 20-30 yo today with styles that are just cool and
   appealing to look at so think instagram infkuebcers, New York, Los Angeles, including hair clothing and perhaps less
   of faces like faces we need to find a way to draw in a more generic way"; "Let’s land version 6 first", 2026-10-30.) — ("Another bit is humans we paint - they should be better /
   These are the references especially the video / On the video the person is not substantially different than yours
@@ -314,6 +455,26 @@ Maintenance at the end).
   2026-10-27; v3 retro, 2026-10-27).
 - **Captions are burned in and pop in place (or rise without clipping);** a reveal that cuts letters looks like a glitch;
   platform auto-captions stay off. — (v1 reel, 2026-10-25).
+- **The words on screen are DESIGNED, never one static block: the fonts, the size, where the words sit and how they
+  move are chosen beat by beat to look premium, interesting, dynamic and engaging.** One font, one size and one fixed
+  band for the whole film was the old default ("pretty static"). The system and its recipes are the type guide's
+  (`docs/look/TYPE_GUIDE.md`, researched; picked 2026-10-30 for engagement, pleasantness and attention retention): one
+  hand (Gaegu) for every spoken word; its Bold, bigger and lit, for the film's few stressed words and its numbers;
+  words set in the open space by the subject, moving a little between groups on one steady anchor; the cover in the
+  same hand; positions in `docs/look/LAYOUT.md`. The captions keep their duties: burned in,
+  never clipped, read at phone size at a glance, in the voice's order, frame 0 showing the first spoken line. — ("One
+  aspect I want you to evaluate and research is the fonts and the text caption positioning I'll give you a few
+  references / We previously would have the text to be pretty static but there is so much more we can do to make it
+  look premium, more interesting, dynamic and more engaging / Research —-> distill it in the guidebook and recipes to
+  use —-> give me still examples", 2026-10-30; the references: a reel's thin hand-lettered words, one or two at a
+  time, placed in the open space above the subject, and a sketched-stories reel's brush-script title; on the stills:
+  "Okay you pick your best option for maximum engagement and pleasantry and user attention retention", 2026-10-30.)
+- **The words are PLEASANT to look at: soft, warm and calm, never menacing.** No dark red or blood-like colours, no
+  rough, scratchy or dripping letters, no shouting capitals; a stressed word stands out by size, weight, light or a
+  gentle warm colour, never by looking aggressive. Judge every word on screen as a regular viewer would at a glance:
+  would they call it calm and friendly? — ("The text should be pleasant to look at like it shouldn't look like a
+  blood message on the wall / Reevaluate", on the type stills' landing word: "WANTS" in a rough dry brush, dark
+  burnt red, all capitals, on a light sky, 2026-10-30.)
 - **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
   as a screen recording under the status bar). Each film decides them with its G4 look clip, 'paint-subtle' at most
   (`docs/EDGES.md`). — (v1 posted reel, 2026-10-25).
@@ -442,6 +603,14 @@ Maintenance at the end).
   is heard, never a beat grid: `docs/look/SOUND_SYNC.md`). — (v1; joins, v3 G5b, 2026-10-27; "the beat" read as the voice's beat under the owner's hand-over, 2026-10-30).
 
 ## Storyboard (G3) and flow
+- **The film's visual story is written first, as a VISUAL SCRIPT, between the voice lock and the G3 animatic:** shot
+  by shot and timed to the locked voice, what is on screen (subject, place, action), the camera (shot size, angle,
+  move), how each shot joins the next (its carrier), the few words in the picture and the sound cues; brainstormed
+  as a few visual concepts judged internally, one script to the owner, and written the way professional studios write
+  theirs (researched: `docs/v4/visual/`). It describes content, staging, camera and timing, never the rendering
+  style, so it stands while the look is still being found; the G3 animatic then plays it. — ("We are still iterating
+  on the style tho. Instead brainstorm a story and like a visual script with what happens on the screen and camera
+  movements and etc / Again research his professional studios go through this step", v4, 2026-10-29).
 - **The pipeline after v3 (owner APPROVED, 2026-10-27: "Yes"):** a DESIGNED sketch. From the core line comes a
   through-line card (one thread object, one home place, one "you"), completed with the script (a carrier for every
   join); a text world bible (sets, one light rig per set, the proposed palette and a colour-script line per beat,
@@ -544,14 +713,24 @@ Maintenance at the end).
   a number and a name within 6 s; the twist past the title, "the strange part isn't how high"; a scale lineup; 11K
   likes, 1,378 shares with no freshness at all). Our evaluation and its lessons: the study's `content_discussion.md`,
   exchange 10. — ("I'm thinking it's actually really good on both", 2026-10-29).
+- **A voice line the owner rates "directionally good": the El Niño explainer** (`docs/voice/refs/2026-10-29_el_nino/`;
+  its first word is cut off, a flaw of the clip): stakes up front with a human consequence ("a 69% chance of breaking
+  every climate record in human history, and people aren't really ready for it"), the viewer's question said aloud
+  ("So how does it work?"), the term then its plain words ("Or in other words, ..."), the usual case ("Normally,
+  ..."), long flowing sentences carried by those connectors, and a brisk, lively read (about 214 words a minute, short
+  pauses, a wide pitch range). — ("I'll give you another point of reference - listen there is first word cut off
+  about El nino but it sounds directionally good to me", v4 G1, 2026-10-29).
 - **Every shortlist story shows what keeps people watching past its title:** its turn and its "oh" in a line or
   two (the beats after the headline), never the headline alone; a story that is one beat gets said to be one beat. A
   "top 3" or "weirdest places" idea is welcome, carried on one thread so it stays a story, not a list. — (on London's
   hospital drones: "interesting too but I'm not sure what you can pack in it beyond the title? Why would the people
   want to keep watching?"; "Maybe another story is the 'weirdest / coolest places where datacenters are built' like 3
   weirdest places", 2026-10-29).
-- **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
-  frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
+- **Lines: plain, direct and personal over clever** (how: Script and voice, CLEAR TO A REGULAR PERSON ON ONE
+  HEARING); a friend's question works as a hook ("Did you know ..."), a sales question doesn't (Audience and goal:
+  never baity). A plain line needs the frame-0 image, the first-second sound and the payoff in words by ~2 s (Hook
+  and pacing) to bring the jolt; the line after the payoff is the plain base (what makes the claim possible), never a
+  compressed punch ("The chips get that hot."). — (v3 G0.5-G2; v3 insights, 2026-10-28; v4 G1, 2026-10-29).
 - **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).
 - **Palettes: the warm, everyday one for a money / everyday-life story** (#9 Autumn Ember; #7 Autumn Ochre read sick).
   — (v3 G4).
@@ -568,6 +747,14 @@ Maintenance at the end).
   (12-24 drawings/s) while the camera glides; the G3 reel also renders at 60 (`G3_ANIMATIC.md`, 2026-10-26). — (v3, 2026-10-26).
 
 ## Process and communication
+- **Before an iteration's stills go to the owner, the orchestrator looks at them beside the owner's references:**
+  if they are not clearly at the references' level (clean, appealing, the thing asked for), iterate first; the owner
+  never spends a look on work we could see was not there yet. A quick look, never a panel. — (two people rounds sent
+  that the owner called "incoherent" and "garbage", 2026-10-30.)
+- **When the owner hands a pick over ("you pick"), pick by the owner's three criteria: engagement, pleasantness and
+  attention retention.** Name each pick and its one-line why in one place, apply it to the docs in the same turn, and
+  move on; the owner can overrule any of it later. — ("Okay you pick your best option for maximum engagement and
+  pleasantry and user attention retention", on the type stills, 2026-10-30.)
 - **EFFORT IS ALWAYS MAX, for ALL delegated work:** every workflow and sub-workflow agent (`effort: 'max'` in each
   `agent()` call), every subagent (the Agent tool's `effort: "max"`; only a "fork" inherits the session's effort), every
   agent an agent starts (each brief says that anything its agent starts runs at max too) and every helper session (first
@@ -774,6 +961,9 @@ Maintenance at the end).
   `context/uploads/inline/2026-10-28_v3_insights_*`. — 2026-10-28.
 
 ## Retired rules
+- ~~Captions in Patrick Hand with a peach box on the key word, one fixed band, one size~~ → the type guide's hand
+  (Gaegu) and its lit stress, set in the open space by the subject (`docs/look/TYPE_GUIDE.md`, 2026-10-30). The brush
+  for landing words, tried in the same iteration, read as "a blood message on the wall" and is out.
 - ~~Topics in the order relevant, TRUE, visual, mood ...; a story that isn't true is out whatever it scores; never
   misleading~~ → truth moved down (relevant, visual, mood, true enough, fresh, shareable); exaggeration fine; only a
   made-up core event is out (2026-10-29).
@@ -790,7 +980,7 @@ Maintenance at the end).
 - ~~Density and life added after the sketch ("blocking: staging only; next: density, life, polish")~~ → designed into
   G3 with their tiers; G5 fills G3's plan (v3 G5b, 2026-10-27).
 - ~~A face for the protagonist's emotion beat (v3's waist-up "you" facing us)~~ → people have no faces, like reference
-  1; the pose acts; only the mascot has a face (v2 restart rule, 2026-10-27); faces now: generic LASH faces (2026-10-30).
+  1; the pose acts; only the mascot has a face (v2 restart rule, 2026-10-27); faces now: generic faces, open eyes looking away (2026-10-30).
 - ~~The G4 look as stills made in parallel with G3~~ → a playable look clip after the G3 lock, approved before G5
   (the approved pipeline, 2026-10-27).
 - ~~Pip at tier B in every shot and on both sides of every join~~ → Pip stays, hidden on purpose (2026-10-28).

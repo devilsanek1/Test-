@@ -43,7 +43,8 @@ recorded from some other video?" (v1, 2026-10-25); "check out the text capture. 
 | ad overlay (a boosted post) | top 240-288; bottom 35 % (y > ~1250); rail x > 780 from y 840; sides 48-192 (REPORTED) | a cut made for ads keeps its key reads above y 1250 and, below y 840, left of x 780 | VT §2; G5 §2 |
 | top gutter | y 0-290 | framing only: a top-edge object (a lamp, branches, a beam; a whole lid from a high angle), wires (only here and below y 600), the jagged skyline and its sky, the hero cloud (v2 S1: y 120-280); a credit tab y ~185-288 (v2); never a paper edge | CS §2, 3b.2-3b.3; VT §1; v2S §5; G5 §5; PB |
 | caption band (keep clear) | y 290-600; its flat field spans at least x 95-945 (full width where the sky fills it) | ONE calm flat field: outdoors the one sky (DIR 6), elsewhere a flat light wall or facade (L* >= 70; a cozy lid or far row L* >= 75); no lines, detail, roof tops, heads, props, shadow edge or paint marks across it (the one paper at most faint: <= 15 % of its strength, the band's spread <= 1.5 L*, CR §c); weather at half density at most (flakes <= 6 px); tops of towers, discs and clouds at y >= 600 unless the film declares an exception (v2 S1: its planting to y 575) | DIR 6, 10; CR §c, §d.9; CS 3b.2, §2; LD §8; CG rule 2; `particles.tsx` |
-| caption block (the ink) | y 317-556, x 95-945: Patrick Hand 98 px, baselines 387 / 510 (one line 448), centred on x 520 (left of centre: clear of the rail), <= 850 px wide, <= 2 lines of ~20 characters; highlight boxes reach y 299 | pops in place in screen space, never on a camera layer, never clipped; a change at least every 1.5 s; ink >= 7:1 on its field; the sky flat to dL* <= 1.5 across it; frame 0 shows the first spoken line as a normal caption, never a title over it | theme.ts `skyCaption`; CR §g.1; `sky.tsx`; CS §5; G5 §5; PB Hook; capcheck |
+| caption block (the ink) | y 290-585, x 96-944: the words (`TYPE_GUIDE.md`, picked 2026-10-30): the hand (Gaegu 300 on dusk and night, 400 on light skies) 116 px (136 px for the hook's first groups and the payoff's last), baselines 395 / 515 (one line 455), the group centred on a seat x 440 / 520 / 600, a line <= 830 px, <= 2 baselines, 2-4 words a group; a landing-word lockup at 362 / 482 / 578 (the lit hand: Gaegu 700, ~160 px, lowercase, lit); a number at 482 (the lit hand, ~250 px) over its unit at 578; no boxes | pops in place (or builds word by word on the voice) in screen space, never on a camera layer, never clipped; a group on screen >= 0.8 s, a change at least every 1.5 s; every word >= 4.5:1 on its field (7:1 where the sky allows), with its soft halo in the sky's tone, never a box or an outline; the tones and the lit stress: `TYPE_GUIDE.md` §b; the sky flat to dL* <= 1.5 across it; frame 0 shows the first spoken line as a normal caption, never a title over it | `TYPE_GUIDE.md`; theme.ts `skyCaption`; CR §g.1; `sky.tsx`; CS §5; G5 §5; PB Hook; capcheck |
+| type frame (every word's ink) | y 290-1250; x 96-944 above y 840, x 96-860 below it; a cut made for ads x 120-888, y 288-1248, x <= 780 below y 840 | words sit in the open space by the beat's subject: the band above it by default, beside it in a close shot whose open side is a calm field >= 360 px wide, low only on a calm floor in y 950-1250; one steady anchor per shot, the group's centre moving <= 220 px between groups; never over the subject, a face, a key read or the right rail | `TYPE_GUIDE.md` §c; PB Visual style (the words are DESIGNED) |
 | read zone ("the stage") | y 600-1250, x 120-880 | the beat's subject and its action, staged here (the board: SB §3); a cozy shot's one opening; on a cut made for ads, every key read | SB §3; CS §2; VT §0-2 |
 | key-read box (organic) | x 120-950, y 600-1480 | the outer limit for any key read on an organic post (a label, a number, a contact point beside the subject) | G5 §2 (moved here) |
 | subject axis and box | x 380-700; the subject 270-460 px wide (35-60 % of the 760 px stage; a standing figure 300-650 px tall), 80 px clear round it; <= 2 points of interest in a scale shot, inside x 380-700 | the beat's subject (tier A); a scale panel inverts it (>= 60 % of the frame, or cut by both sides) | SB §3 and its lint; CS §5 (moved here); VT §0, §3 |
@@ -57,7 +58,7 @@ recorded from some other video?" (v1, 2026-10-25); "check out the text capture. 
 | the "you" | one drawing or POV for the whole film; head 90-140 px; cut by the bottom edge: its body may run under the bottom UI (it reads by mass), its head stays above it (head top y <= ~1380); POV: hands cut by the bottom | in the foreground only it (or Pip, hidden); never strangers' backs | LD §4; CR §a.3; VT §1 (§7 row 10) |
 | the cover | the grid's 4:5 centre crop y 285-1635 (1080 x 1350); the newer 3:4 crop y 240-1680 (1080 x 1440) | the title and the subject inside the 4:5 crop (§5) | PK; v3P |
 
-**The code must match** (tooling, flagged, not yet changed): theme.ts `safe` (the UI zones and rail as above; its
+**The code must match** (tooling, flagged, not yet changed): the type system (`TYPE_GUIDE.md`, picked 2026-10-30): `font.ts` `captionFontStack` -> Gaegu 300 / 400 / 700 (OFL; `scripts/type/fetch_fonts.py`), `theme.ts` `skyCaption` and `captionTones` (the seats, plum on light, warm white on dark, the lit stress: honey + the golden glow on dark, the warm halo on light, the bloom), `Captions.tsx` (seats, builds, lockups, the halo), `scripts/capcheck.py` (4.5:1 for every word); theme.ts `safe` (the UI zones and rail as above; its
 `action` box x 90-990, y 200-1480 is looser than the key-read box), `skyCaption` (the block; its clip window y 280-570
 predates pop captions, which need no clip), `scripts/capcheck.py` (x 90-990, y 280-570) and `scripts/qa/framecheck.py`
 (the organic UI zones; `--caption-band 280,600`) differ from the band; `particles.tsx` (x 95-945, y 290-600) and
@@ -152,20 +153,22 @@ everything: suspense, sense of scale, fantastic environment and composition" (v3
 - **Decided:** the core line as a title belongs on the cover, never over the film's captions (PB Hook; the owner: "Wait
   why do we have the text repeat itself?", v3); our covers read as one series on the grid ("the cover's layout" is part
   of the one look: PB ONE LOOK, ONE BRAND); the cover is a frame of the film's own scene code without captions, draft
-  label or paper edge (PK: v2 S1 frame 312; v3P: frame 192); the title in the caption type with the peach box on its
-  key words, inside the 4:5 centre crop y 285-1635 (and the newer 3:4 crop y 240-1680), read at 360 px wide; no source
+  label or paper edge (PK: v2 S1 frame 312; v3P: frame 192); the core line in the hand with its key word in the lit hand (`TYPE_GUIDE.md` R10:
+  3-4 ragged rows, no box), inside the 4:5 centre crop y 285-1635 (and the newer 3:4 crop y 240-1680), read at 360 px wide; no source
   line (PK); Pip hidden on the cover too, as in the film (owner, 2026-10-29: ST §9 decision 5).
 - **Measured** (`layout.py --measure`): all three covers put the title on the band's flat field with the world below:
   v1 two lines y 311-538, x 85-925, sentence case, box y 420-531; v2 three lines y 312-559, x 124-953, ALL CAPS, box y
   477-576, in the sky above the roofline (first non-sky row y 590: PK); v3 two lines y 333-552, x 163-878, sentence
   case, box y 428-615, on the room's wall above the window. Each title starts 26-48 px inside the 4:5 crop's top. Pip is
   plain to see on all three (v1 bottom right, v2 on its post mid-frame, v3 at the window).
-- **Open (the owner's call):** the case (v2's capitals or v1's and v3's sentence case; one template either way:
-  "a coherent style across all videos sharing one look, one brand"). Pip on the cover was the other call: decided
+- **Decided (2026-10-30, the type pick):** sentence case in the hand (R10), never capitals for stress (PB: the words
+  are PLEASANT); one template for every cover ("a coherent style across all videos sharing one look, one brand"). Pip on the cover was the other call: decided
   above (2026-10-29). The cover frame the posters suggest is a proposal (§8).
 
 ## 6. Checks (each number lives in §1-5)
 - `scripts/qa/framecheck.py`: the organic UI zones (WARN); a WARN on the ad rail too is tooling (§7 row 4).
+- `TYPE_GUIDE.md` §f: the words' checks (the phone glance, the type frame, contrast, how many, how long, never clipped,
+  frame 0 and the voice's order, "AI" not "Al", pleasant); `python3 scripts/type/check_stills.py` on type stills.
 - `scripts/capcheck.py`: the caption block's contrast (FAIL when > 5 % of the near background is under 3:1);
   `lib/sky.tsx` `skyProblems`: the sky's flatness behind the block (CR §g).
 - The board lint (`G3_ANIMATIC.md` §7; SB §5-6): the subject box, the band, words >= 48 px.

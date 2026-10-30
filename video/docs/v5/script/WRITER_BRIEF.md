@@ -3,7 +3,8 @@
 Status 2026-10-29 ~09:40 UTC: the writer was started, then stopped when the owner moved the work to a new session
 ("Can you commit these topic as 4 and 5 and I will continue in another session"). Nothing of the rewrite was written
 yet; draft 1 (the wide five-place version the owner rejected) is in `archive/draft1_wide/`. Start ONE writer (Agent
-tool, `effort: "max"`) with this brief, then one critic (a cold retell first, at most 6 findings), then one fix pass.
+tool, `effort: "max"`) with this brief, then one critic (the cold viewer panel first, then a cold retell:
+`video/docs/PIPELINE_V2.md`, G1), then one fix pass.
 
 **The film: ONE subject, the nuclear bunker under a Stockholm park that is full of computers and heats its
 neighbours** (Pionen, run by Bahnhof). The owner: "I like bunker" (after rejecting draft 1: "too wide and unfocused ...
@@ -33,6 +34,20 @@ sentences; throughline; turn; one joke; a delivery cue per line; 3 hook options 
 ...", "There's a ...", "Why does this ...?", e.g. "Thirty meters under this park in Stockholm, there's a nuclear bunker
 full of computers." / "And it gets hot down there."; comment lines tagged; a fact table), `script/script_elevenlabs.md`
 (paste v2, hook 1 voiced; `check_paste.py` OK and `check_rhythm.py` OK), `THROUGHLINE.md` (home place: the park and the
-bunker under it; thread: the heat as one warm glow; one "you"; Pip hidden; a carrier per join). Rules: 30-45 s (95-125
+bunker under it; thread: the heat as one drawn warm thing (warm air or warm water as a flat shape, never a glow: DIRECTION rule 5,
+CRAFT §d.7; fixed 2026-10-29 by v4's G1, which met the same clash); one "you"; Pip hidden; a carrier per join). Rules: 30-45 s (95-125
 words); real short sentences, never fragments; no AI tells; one or two comment lines; exaggeration fine within the fact
 lock's floor; no em-dashes; never touch `video/src`, `video/public`, `video/out`.
+
+**Clarity (owner, 2026-10-29, on video 4's draft 1: "too ambiguous and weird"):** every line clear to a regular person
+on one hearing (the playbook, Script and voice, "CLEAR TO A REGULAR PERSON ON ONE HEARING"; the method:
+`video/docs/retro/2026-10-29_script_clarity/PRINCIPLES.md`): the writer's clarity pass with the film's word list
+`script/clarity.json` and `video/scripts/voice/check_clarity.py` OK beside the other two checks, then the critic's cold
+viewer panel (`video/docs/PIPELINE_V2.md`, G1).
+
+**No side quests, and human connectors (owner, 2026-10-29, on video 4's draft 2):** the beats under "Go deep" are
+candidates, not a checklist: keep only what the bunker story needs to reach its payoff (cut each beat in your head; if
+the viewer still gets the story and the payoff, it stays cut: the playbook's "No side quests"; PRINCIPLES P10), and
+place about two to four human connectors where a join needs a hand ("To put that into perspective," "Actually,"
+"So," "Now," and the El Niño reference's "So how does it work?" and "Or in other words,": the playbook's "Human
+connectors, placed TACTICALLY"; P11), never a RULE #1 stock reveal.

@@ -5,7 +5,9 @@ sentences of 5 words or fewer between the long ones ("Let's find out." "But ther
 docs/OWNER_PLAYBOOK.md, "Script and voice".
 
 Input: a plain text or markdown file of spoken lines (an ElevenLabs paste file works: [tags] and blank lines are ignored).
-Usage: python3 scripts/voice/check_rhythm.py SCRIPT.md [--max-run 2] [--long 9]
+Usage: python3 scripts/voice/check_rhythm.py SCRIPT.md [--max-run 3] [--long 9]
+The run limit was 2 until 2026-10-29: the owner's El Niño reference (docs/voice/refs/2026-10-29_el_nino/, "it sounds
+directionally good to me") runs three long, flowing sentences in a row (15, 24, 24 words) and failed it.
 Exit 0 = OK, 1 = FAIL. Prints every sentence with its word count and marks the runs that break the rule.
 """
 import re
@@ -33,7 +35,7 @@ def main():
     if not args:
         print(__doc__)
         return 2
-    max_run, long_ = 2, 9
+    max_run, long_ = 3, 9
     if "--max-run" in args:
         max_run = int(args[args.index("--max-run") + 1])
     if "--long" in args:

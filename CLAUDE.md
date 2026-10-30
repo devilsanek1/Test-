@@ -15,7 +15,7 @@ The video project lives in `video/` (Remotion). Before starting or continuing an
 COHERENT and CLEAR, with no size budget (owner, 2026-10-27): integrate every note (rewrite or retire what it contradicts), and review it per its Maintenance section.
 
 Top rules (details in the playbook):
-- From the sketch animatic (G3) on, show one playable video per gate, never only stills; before that, text/audio only (no MP4s). Lock the story (sketch animatic) before building; polish last.
+- From the sketch animatic (G3) on, show one playable video per gate, never only stills; before that, text/audio only (no MP4s). Lock the story (sketch animatic) before building; polish last. Between the voice lock and G3, the film's visual story is written as a VISUAL SCRIPT (G2.5: shot by shot on the take's word times, the camera and every join, style-neutral; 3 concepts judged internally, the owner reads one; `video/docs/v4/visual/METHOD.md`), and G3 plays it.
 - The G3 animatic is an ANIMATED SKETCHBOOK (stage spec `video/docs/G3_ANIMATIC.md`, drawing spec
   `video/docs/look/STORYBOARD_STYLE.md`): the film's rough pass at 60 fps — story, joins, framing, every camera move,
   transition and key action PLAYED with real shape and timing, density and life as grey placeholders (loose never means
@@ -35,9 +35,11 @@ Top rules (details in the playbook):
   line as a title goes on the cover). Words in the picture are few and big
   (each reads at phone size, or it is not drawn; sources go in the post's text). Target 30-45 s.
 - A script is one coherent story (spine first; every line follows from the last), never a list of facts. Everyday spoken
-  language, no AI-sounding phrasing; detailed emotional cues. The narration is generated with the owner's ElevenLabs voice through the API
-  (owner, 2026-10-26): follow `video/docs/voice/API_QUICKSTART.md` (paste format v2, `check_paste.py` OK, `generate_take.py`
-  `all_clean`, `check_take.py` MATCH; send take.wav, lock it into `public/vN/`, log it in `ELEVENLABS.md` section 5). Only
+  language a regular person gets on ONE hearing (everyday names, never a trade word like "chips"; every "it" with one
+  obvious target; the plain thought, never a hint; `check_clarity.py` OK and the critic's cold viewer panel at G1), no
+  AI-sounding phrasing; detailed emotional cues. The narration is generated through the API with the ElevenLabs voice the owner picks
+  (`video/docs/voice/VOICE.md`; their cloned narrator by default) (owner, 2026-10-26): follow `video/docs/voice/API_QUICKSTART.md` (paste format v2, `check_paste.py` OK, `generate_take.py`
+  `all_clean`, `check_take.py` MATCH; deliver the take on a private claude.ai player page (`scripts/voice/take_page.py`; attachments don't play in the phone app), lock it into `public/vN/`, log it in `ELEVENLABS.md` section 5). Only
   without the key does the owner paste it (then always hand over the full paste text).
 - Every lesson goes into the generic process (playbook, pipeline gate, studio toolkit) and is committed, so the next
   video doesn't repeat it.

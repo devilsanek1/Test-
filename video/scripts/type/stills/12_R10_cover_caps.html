@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><script src="../lib/type.js"></script>
+<style>html,body{margin:0;padding:0}#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:url('{{BG_NIGHT_COVER}}') center/cover no-repeat}
+.lab{position:absolute;font-family:'Jost';font-weight:400;font-size:30px;letter-spacing:0.04em;color:rgba(255,240,222,0.78)}</style></head>
+<body><div id="stage"></div>
+<script>
+window.__ready = TYPE.run(() => {
+  const S = TYPE.stage(), tone = 'night';
+  const o = {font: 'Jost', weight: 300, size: 96, track: 0.12, tone};
+  const rows = ['YOUR CHATBOT', null, 'AN APARTMENT', 'IN HELSINKI.'], ys = [375, 500, 625, 750];
+  rows.forEach((t, i) => { if (t) TYPE.text(S, {...o, t, x: 520, y: ys[i], anchor: 'middle'}); });
+  // row 2: "COULD " in warm white + "HEAT" in amber, centred as one row
+  const w1 = TYPE.measure('COULD ', o).adv, w2 = TYPE.measure('HEAT', o).right;
+  const x0 = 520 - (w1 + w2) / 2;
+  TYPE.text(S, {...o, t: 'COULD', x: x0, y: ys[1]});
+  // the accent made gentle (PLEASANT.md): the windows' honey light with the golden glow, as in still 11
+  TYPE.text(S, {...o, t: 'HEAT', x: x0 + w1, y: ys[1], accent: true, glow: true});
+});
+</script></body></html>

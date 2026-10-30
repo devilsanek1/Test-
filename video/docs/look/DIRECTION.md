@@ -15,7 +15,7 @@ key here"; "our look is evolving - we are finding out style i don't think we can
    words; the "-> what we did" half of a line is our log, with no owner rank). The newest owner note wins over an
    older one.
 2. **Then, in order:** this page > `CRAFT.md` (numbers, code, checks) > `docs/PIPELINE_V2.md` (gates) >
-   `docs/G3_ANIMATIC.md`, `docs/G5_BLOCKING.md` (gate specs) > the look docs in `docs/look/` > the film's STYLE.md (its
+   `docs/G3_ANIMATIC.md`, `docs/G5_BLOCKING.md`, `docs/v4/visual/METHOD.md` (gate specs) > the look docs in `docs/look/` > the film's STYLE.md (its
    values only: it never restates or overrides a rule) > the v1-era docs (API and measurements, never style). Between
    two look docs, each wins on its own topic (`LAYOUT.md` where things sit in the frame: the zones, each shot type's
    framing, the cover; `STORYBOARD_STYLE.md` the board's drawing, `CINEMATIC_GUIDE.md` shot recipes and camera moves,
@@ -51,8 +51,8 @@ the owner approves it; the look test shows it.
 references, in the rules below:** shapes that blend naturally, never square and proper (playbook ORGANIC, NOT
 GEOMETRIC: rules 2, 4); ONE painted language for the whole frame, near sharper and far more like brushwork (PAINTED
 PIECES: rule 4); one story light per scene done properly, with darks, contrast and one colour key as palette work
-(PROPER LIGHT: rules 5-6); big quiet areas and one place to look (SCENE COMPOSITION: rules 2-3); people in direction C
-with the LASH face (rule 3). Their numbers are `ORGANIC.md` (shapes and edges, the light's method, the composition
+(PROPER LIGHT: rules 5-6); big quiet areas and one place to look (SCENE COMPOSITION: rules 2-3); people of the overhaul
+in use for now: hair v4, open eyes looking away, the rebuilt bodies (rule 3). Their numbers are `ORGANIC.md` (shapes and edges, the light's method, the composition
 rules R1-R12, the dose by plane, the paper), carried into `CRAFT.md` as first values for the v7 look test (WARNs; the
 owner's eye at phone size decides), and `PEOPLE_DESIGN.md`. One call is still the owner's: the dark key, T1 (one gentle
 dark mass) or T3 (the references' low key) (`ORGANIC.md` §8 D3; rule 6).
@@ -99,8 +99,9 @@ dark mass) or T3 (the references' low key) (`ORGANIC.md` §8 D3; rule 6).
   than the caption band. **People** (owner, 2026-10-30: "beautiful and pleasant",
   styled like today's 20-30-year-olds in New York and Los Angeles, faces drawn "in a more generic way";
   `PEOPLE_DESIGN.md`): direction C, MODERN GRAPHIC (about 7.8 heads, rounded polygons in two flat tones, crisp, no
-  outlines, the styling carried by clothes and hair) with the LASH face (closed-eye lash lines and a small soft nose;
-  only the contour under ~200 px tall; sunglasses and caps as some people's accessories; never looking at the camera);
+  outlines, the styling carried by clothes and hair); IN USE FOR NOW the people of the overhaul (owner, 2026-10-30:
+  hair v4, the redrawn faces with OPEN EYES looking away, the rebuilt bodies; the closed-eye LASH only for downcast,
+  serene moments; `PEOPLE_DESIGN.md` top); only the contour under ~200 px tall; sunglasses and caps as some people's accessories; never looking at the camera);
   simple, seen mostly from behind, in profile or turned away, acting with their pose; near heads <= ~140 px, many at
   rest; in the foreground only the one "you" (often turned away) or the mascot, strangers small in the mid and far
   ground. Life never stops (clouds,
@@ -217,16 +218,22 @@ dark mass) or T3 (the references' low key) (`ORGANIC.md` §8 D3; rule 6).
   line first (a bare-line frame 0); the owner sees this clean-pen version in the next G4 look clip. ->
   `CINEMATIC_GUIDE.md` "The opening"; playbook Hook and pacing.
 - **10. Captions and the frame** (where everything sits: `LAYOUT.md`, the one definition of the zones, shot framing,
-  composition and the cover). Captions pop in place, burned in, never a roll-in that clips letters; the caption band is
-  one calm flat field (no lines, detail or shadow edge across it); ink on light, white on dark. No key read in the
+  composition and the cover). The words on screen follow `TYPE_GUIDE.md` (owner, 2026-10-30; picked for engagement,
+  pleasantness and retention): one hand (Gaegu) for every word, its Bold, bigger and lit, for the few stressed words,
+  numbers and titles; pleasant to look at (soft, warm, calm: never red or brown, never rough or dripping, never
+  capitals for stress); set in the open space by the subject on one steady anchor per shot (the band is home);
+  popping in place or built word by word on the voice, never clipped; deep plum on light skies, warm white on dusk and
+  night, the stressed word lit by the film's warm light. The caption band is one calm flat field (no lines, detail or
+  shadow edge across it). No key read in the
   platform UI zones (top, bottom, right rail). No paper edge at the top or beside the band (edges: opt-in per film,
-  decided with the G4 look clip, 'paint-subtle' at most). -> `LAYOUT.md` §1, §5; `G5_BLOCKING.md` §5; `EDGES.md`.
+  decided with the G4 look clip, 'paint-subtle' at most). -> `LAYOUT.md` §1, §5; `TYPE_GUIDE.md`; `G5_BLOCKING.md` §5; `EDGES.md`.
 
 ## The approved pipeline (owner, 2026-10-27: "Yes"; gates and budgets in `docs/PIPELINE_V2.md`)
 A DESIGNED sketch: G0 topic (then the fact lock) -> G0.5 core line (and the draft of its through-line card) -> G1
 story-first script (the card completed from the script's joins, approved with it) -> G2 voice (the owner's voice through
 the API), with W1, a text world bible (sets, one light rig per set, the proposed palette and a colour-script line per
-beat, tiers per shot) -> **G3** the animated sketchbook at 60 fps, deciding story, joins and carriers, camera, thread,
+beat, tiers per shot) -> **G2.5** the visual script (the visual story in words, shot by shot on the take's clock,
+style-neutral; three concepts judged internally, the owner reads one; `docs/v4/visual/METHOD.md`) -> **G3** the animated sketchbook at 60 fps, deciding story, joins and carriers, camera, thread,
 tiers (grey), rig (shapes) and mover budget (`G3_ANIMATIC.md`) -> **G4**, after the G3 lock: a 6-8 s look clip of the
 home set in the final style (it opens with frame 0 being drawn), approved before the G5 lanes -> **G5** fills the G3
 tier masks in colour: one lane per sequence, one owner for every transition, nothing new (`G5_BLOCKING.md`) -> G6
@@ -272,8 +279,8 @@ stage; the owner may skip gates by name. The clean pen's first test is the v3 re
   a visible presence in every shot: Pip hides on purpose (rule 2; owner, 2026-10-28); strangers' backs in the
   foreground, in any film.
 - A face as a beat (a protagonist's "face beat", v3's waist-up "you" facing us) or a face with features (dot eyes, a
-  mouth, brows): people act with their pose, and their face is the generic LASH, never looking at the camera (rule 3;
-  owner, 2026-10-30). "No faces at all" (people before 2026-10-30) is history too.
+  mouth, brows): people act with their pose, and their face is the generic open-eyed face looking away, never at the camera
+  (rule 3; owner, 2026-10-30: "Let's do open eyes"). "No faces at all" (people before 2026-10-30) is history too.
 - The pictogram person (a ball head with no neck on a tombstone torso, 3.7-4.9 heads, a sack coat; the owner: "very
   old style and frankly ugly", 2026-10-30): direction C (rule 3; `PEOPLE_DESIGN.md`).
 - The G4 look made in parallel with G3 (stills, or a clip before the lock): the look clip follows the G3 lock.

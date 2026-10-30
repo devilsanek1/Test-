@@ -12,10 +12,60 @@ The earlier v4 session (https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt)
 |---|---|---|
 | G0 topic + core line | topic LOCKED: Helsinki (one city); core line proposed by the writer (default: "Your chatbot could heat a flat in Helsinki.") | `G0_TOPIC.md` |
 | Fact lock | shared with video 5 (one fact file): `video/docs/v5/research/factlock.md` sections 2, 6, 7.1-7.4, 8 | |
-| G1 script | NEXT: one writer from `script/WRITER_BRIEF.md`, then one critic and one fix pass | `script/script_g1.md`, `script/script_elevenlabs.md`, `THROUGHLINE.md` |
-| G2 voice | after the owner approves the script; the API key is missing in this container | `public/v4/` |
+| G1 script | LOCKED (2026-10-29 ~18:40 UTC): draft 3, 123 words | `script/script_g1.md`, `script/script_elevenlabs.md`, `THROUGHLINE.md` |
+| G2 voice | LOCKED 2026-10-29: take 4 (`public/v4/voice.wav`, 42.24 s) |
+| (was) G2 voice | after the owner approves the script; voice `MQnUCZUAQLYMCY1Ztz6d` ("Lady1", the owner's try, 2026-10-29: `docs/voice/VOICE.md`); a valid key works in THIS session only (pasted in the chat, used inline, never filed), so G2 runs here; the voice tools are set up in the scratchpad | `public/v4/` |
 
-**Next step:** G1 from `script/WRITER_BRIEF.md`.
+**Video 4 is produced by session https://claude.ai/code/session_01VwsUCnkJXFuq3YwEYFUg7o since 2026-10-29 ~10:05 UTC**
+(owner: "lets work on the video 4 - pick up where its been left off"), on branch `claude/kind-pascal-lvgsza` (from
+`video-production` at ce5270f; merged into `video-production` at the owner's yes).
+
+**G2 LOCKED (2026-10-29 ~20:20 UTC, owner: "Okay good"): `public/v4/voice.wav` + `voice_words.json`. NEXT: the VISUAL SCRIPT
+(owner: "brainstorm a story and like a visual script with what happens on the screen and camera movements"; style still
+evolving), workflow `v4-visual-script` -> `docs/v4/visual/` (research, method, concepts, `VISUAL_SCRIPT.md`); then G3.**
+
+**G2.5 VISUAL SCRIPT SENT (2026-10-30 ~00:45 UTC), waiting on the owner:** `docs/v4/visual/VISUAL_SCRIPT.md` (v2, after
+the cold read and the critic: 12 shots on the take's clock, concept B "the designed view" with grafts from A and C; the
+judges split, story C, craft B; B written on the combined score: `METHOD.md` step 2); 2 owner questions (the un-draw
+after the hook; the computer's size). The new step is in PIPELINE_V2 (G2.5), G3_ANIMATIC §5, DIRECTION, CLAUDE.md. The owner reads it on the page
+https://claude.ai/artifact/S19LGg8LL9Ut63wAnYHRAb (`scripts/docs/visual_script_page.py`: one card per shot, the voice
+built in, each shot playable).
+
+Earlier: **G1 LOCKED (owner, 18:40 UTC: "i think this is a much better yes"). G2 TAKE SENT (2026-10-29 ~19:20 UTC), waiting on the
+owner:** `assets/v4/voice/take.wav` (Lady1, eleven_v4 at stability 0.35, the livelier-tag paste, whole read, shaped by
+`scripts/voice/shape_take.py`, take 4: the owner's own website read of the take-3 paste (ours sounded "like in some
+chamber": our compressor), pauses tightened and the two beats added, one static gain, the voice untouched: 42.2 s,
+177 words/min, MATCH); the raw
+read and the shaping report beside it; log in `docs/ELEVENLABS.md` section 5. The owner listens on the player page
+https://claude.ai/artifact/Gn8KCPfZ6uh1AXos2koE8N (attachments don't play in their phone app; `scripts/voice/take_page.py`). After the yes: lock it into `public/v4/`
+(voice.wav + voice_words.json, the 0.12 s lead is in), then W1 and G3.
+
+Earlier: **G1 DRAFT 3 SENT TO THE OWNER (2026-10-29 ~18:30 UTC), waiting on their yes:** the owner's notes on draft 2 (no side quest:
+the 2010 cathedral cut; human connectors, tactically) and their El Niño voice reference (`docs/voice/refs/2026-10-29_el_nino/`)
+-> draft 3 (workflow `v4-g1-draft3b`: writer, cold panel + critic, two fix rounds with re-hears), then the orchestrator
+restored "your chatbot" (`script/script_g1.md`, "Orchestrator note: the core line"): 123 words, ~44 s at 2.87 words/s,
+all three checks OK. Re-check at G8: "starting next year" (line 8) is true while the post goes out in 2026.
+
+Earlier: **G1 DRAFT 2 SENT TO THE OWNER (2026-10-29 ~16:00 UTC), waiting on their yes:** after the owner's notes on draft 1 ("too
+ambiguous and weird", `OWNER_NOTES.md`), the script-clarity work (`docs/retro/2026-10-29_script_clarity/`: research,
+PRINCIPLES.md, the rules integrated, `check_clarity.py`) reworked it: draft 2, its critic and fix pass, then fix rounds
+1-3 on five cold three-viewer panels (`script/panel/`, `panel_r2/` to `panel_r5/`): 124 words, ~44 s, all three checks
+OK; the last panel: 3 of 3 would send it, one single-viewer snag left (the jump back to 2010 after the 2027 plan), so a
+time-ordered variant is being heard by a sixth panel (`script/panel_timeorder/`).
+
+Earlier: **G1 SCRIPT SENT TO THE OWNER (2026-10-29 ~11:20 UTC), waiting on their yes:** the script (117 words, ~41 s; both checks
+OK), the hook pick (option 1 voiced), the core line ("an apartment" or "a flat") and the card: `script/script_g1.md`,
+`script/script_elevenlabs.md`, `THROUGHLINE.md`; the critique `script/critique_g1.md` (FIX AND SEND, 0 blockers; all
+5 findings applied). Workflow `context/workflows/v4-g1-script-lean-wf_c7c0628a-726.js` (3 agents, ~0.95 M tokens).
+Next after the yes: G2 here (voice Lady1), W1 beside it.
+
+Was: **G1 RUNNING (2026-10-29 ~10:10 UTC):** one workflow, three max-effort agents in a row: the writer (`script/WRITER_BRIEF.md`),
+the critic (`script/CRITIC_BRIEF.md` part A: a cold retell first, at most 6 findings, into `script/critique_g1.md`) and
+the fix pass (part B; a fresh agent that continues from the writer's notes). Then the owner gets the script, the 3 hook
+options and the card on one screen. G2 runs in this session (the owner pasted a valid key in the chat at ~10:45 UTC;
+it is used inline only and is in no file); a later session needs `ELEVENLABS_API_KEY` as the network secret.
+
+**Next step:** the owner's yes on the script, the hook, the core line and the card; then G2.
 **HANDED OVER 2026-10-29 ~09:45 UTC** (owner: "Can you commit these topic as 4 and 5 and I will continue in another
 session"). Both writers were stopped before writing; the next session starts G1 from `script/WRITER_BRIEF.md` (one writer,
 then a critic, then a fix pass), on branch `claude/compassionate-hopper-5iqguj` (not merged into `video-production`).
