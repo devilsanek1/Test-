@@ -33,6 +33,13 @@ the delegated calls + `camera_plan_g3.md`; A2 the W1 world bible `WORLD_BIBLE.md
 `production/BRIEF.md`. Then phase B: the G3 panels in lanes, the motion pass, lint, cold reads, one fix round, the
 540p60 reel to the owner.
 
+**PHASE A (docs) DONE (2026-10-30 ~21:25 UTC):** `visual/VISUAL_SCRIPT.md` v3 LOCKED for G3 (the folds; 10 delegated calls
+in its "Open questions for the owner"; v2 in `visual/archive/`), `camera_plan_g3.md`, `WORLD_BIBLE.md` (8 sets, light
+rigs, the Frost & Honey palette `world/palette_v4.json`, the colour script `world/colour_script.png`, tiers, the
+resident); the v3 phone page https://claude.ai/artifact/Hf1K3euFrCwUoKShD7qLn4; the guides page
+https://claude.ai/artifact/AUT5fiRBdwhk8RzV6QxLz3. The flagged doc clashes: workflow `v4-doc-reconcile`
+(`production/RECONCILE.md`). Phase A (tooling) still running.
+
 **BEFORE G3 (2026-10-30, from the look and composition study; HANDOFF 2e):** fold into `visual/VISUAL_SCRIPT.md` (1) the
 owner-approved `visual/STYLE_ADJUSTMENTS.md`; (2) the composition-and-motion pass `visual/COMPOSITION_PASS.md` (per shot
 the frame, the move within, the join, by `docs/look/COMPOSITION_SHOTS.md` codes; a FIRST DRAFT now, final after its
