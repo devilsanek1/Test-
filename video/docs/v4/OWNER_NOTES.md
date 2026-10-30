@@ -125,4 +125,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-30 ~01:30 UTC: "Commit the adjacentment to the story script to the story 4" -> the adjustments committed beside
   the visual script on video 4's branch (`claude/kind-pascal-lvgsza`): `video/docs/v4/visual/STYLE_ADJUSTMENTS.md`
   (fold into VISUAL_SCRIPT.md before G3).
+- 2026-10-30 ~14:10 UTC: "When we settle on the composition library recipes and overall approach we need to evaluate our
+  visual script for Helsinki story to figure out how to compose each scene and how we animate and move within a scene
+  and from scene to scene" -> queued: a composition-and-motion pass over the 12 shots once
+  `video/docs/look/COMPOSITION_SHOTS.md` is settled (playbook: "Every film's visual script gets a composition-and-motion
+  pass").
 

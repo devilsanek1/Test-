@@ -218,6 +218,12 @@ Maintenance at the end).
   way to solve properly. It feels like a lot of our design is too square and proper like I can see shapes and angles
   very clearly while references are obviously not like that. They are more regular more naturally blend Do deep
   research into techniques libraries etc", 2026-10-30.)
+- **Every film's visual script gets a composition-and-motion pass from the shot library** (once the library and the
+  approach are settled): for each shot, which composition recipe it uses, how the camera and the action move WITHIN the
+  shot, and how it moves to the next (the join); done before G3 builds it. First on video 4 (Helsinki). — ("When we
+  settle on the composition library recipes and overall approach we need to evaluate our visual script for Helsinki
+  story to figure out how to compose each scene and how we animate and move within a scene and from scene to scene",
+  2026-10-30.)
 - **SCENE COMPOSITION: big quiet areas and one place to look** (owner agreed, 2026-10-30: "8 agreed this is an important
   point about scene composition"; on still v6: "our scene is very busy"): few elements of equal weight, values grouped into a few big masses, one focal point
   with the most contrast and the story light, negative space; a busy frame of many mid-tone props is the failure.

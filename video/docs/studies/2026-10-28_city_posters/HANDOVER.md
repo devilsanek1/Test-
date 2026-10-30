@@ -15,6 +15,9 @@ points and conclusions into the main repo"). The brief is `README.md` here; the 
 - QUEUED next (owner): the sound-sync research, distill and practice (`video/docs/look/refs_sound_sync/`, two reels with
   audio; playbook "Sync picture to sound ON PURPOSE").
 - Then: painter v7 from ORGANIC.md + composition + people C (LASH) on scene 1.
+- QUEUED (owner), after the composition library is settled: the Helsinki (video 4) visual script's composition-and-
+  motion pass: per shot the recipe, the motion within, the join to the next (commit beside its visual script, as
+  STYLE_ADJUSTMENTS.md was).
 
 ## Status 2026-10-30 ~10:10 UTC: QUEUED next (owner): research + distill the composition shots
 - Owner: "After we are done with this I want you to do another research and distill of the composition shots to use /
