@@ -6,7 +6,8 @@ PIPELINE_V2 > G3_ANIMATIC, G5_BLOCKING > look/*.md > the film's own docs' values
 script decide the film's own values). Every edit minimal. Not touched: code and data, `visual/COMPOSITION_PASS.md`,
 `look/COMPOSITION_SHOTS.md` (the study session's), the camera plan's numbers beyond the horizon.
 
-Status: IN PROGRESS (this file is written as the work goes).
+Status: DONE (2026-10-30). Sections 1-2 answer the flags; section 3 fixes what plainly contradicted a higher doc on
+the way (each in the lower doc); section 4 lists what is not ours to fix here, for the orchestrator.
 
 ## Edits (doc, line, before -> after, why)
 
@@ -175,3 +176,62 @@ the card" names every change, and the card now points to it.
 - Open for G3, §5 item 4 (line 185-186): "with the "≈ 40" tag (v3: no tag; 5 rows of 8 in front of it)".
 - Not changed: the history paragraphs ("What fix round 2 / fix round 1 / draft 3 changed here", their carrier counts
   included), §2's G1 estimates, §1.6 Pip and the "what leads" cells (all under the head note), the card's rank line.
+
+### 3. Found on the way, fixed in the lower doc
+
+**3a. `docs/look/TYPE_GUIDE.md` §c, line 65-69 (where words sit, by shot type).**
+- Before: "WIDE and the home view (S1, S7, S12) ... The far city starts just under it, so ink stays at y <= 585." ·
+  "MEDIUM (S2's end, S4, S8, S11)" · "CLOSE (S3, S5, S9, S10)".
+- After: "WIDE and the home view (S1, S7, S11, S12) ... The roofs start just under it (video 4's tops stop at y >=
+  614), so ink stays at y <= 585." · "MEDIUM (S2's end, S4, S8, S9, S10)" · "CLOSE (S3, S5)".
+- Why: these are v2's shot types (`visual/archive/VISUAL_SCRIPT_v2.md`: S9 and S10 CLOSE, S11 MEDIUM); v3 makes S9
+  and S10 MEDIUM (S9's frame held) and S11 WIDE (the home view a step closer). Under v3 and W1 §1.0 the far city sits
+  on the horizon (~y 1090-1150), far under the band; what starts under it are the roofs and the tops (all at y >= 614).
+  The placement rules themselves are unchanged.
+
+**3b. `docs/look/TYPE_GUIDE.md` R2, line 128:** "the home view paints itself, the pipe first" -> "the run first". Why:
+v3 S1 lays the run (the heat's path; the pipe stays unseen under the snow: STYLE_ADJUSTMENTS 2).
+
+**3c. `docs/look/TYPE_GUIDE.md` R6, line 190-192:** "until 19.217 s (the start of S6's move)" -> "until 19.217 s (when
+S6's first group pops; S6's move starts at the end of "tea.", 18.84)". Why: v3 S5's join and S6's camera start the big
+move at the end of "tea." (18.84); 19.217 is when "Normally," pops (R8).
+
+**3d. `docs/look/TYPE_GUIDE.md` R7's spec, line 200-201.**
+- Before: "in the object's ink (deep plum #3A2B48 on cream paper)".
+- After: "in the object's ink (the stills: deep plum #3A2B48 on cream paper; a film keys the paper and its ink to its
+  palette, video 4: W1's deep indigo #1F2B4B on pale lilac-white #D5D6E7, 9.7:1)".
+- Why: read as the spec, cream paper in a night keyed cold breaks DIRECTION rule 6's ONE colour key (W1's colour story:
+  the warm is the heat and nothing else; §1.5: the tag "never warm"); the rule is "in the object's ink", and the film's
+  values are its world bible's. 9.7:1 measured here (WCAG) on `world/palette_v4.json`'s two hexes.
+
+**3e. `docs/v4/THROUGHLINE.md` §1.3 and §1.5** (with 2e): "as ONE designed view (DIRECTION rule 7)" against DIRECTION
+rule 7 (the designed view on hold since 2026-10-29), and "the voice's last line says "a chatbot"" against the locked take
+("So your chatbot ..."): each gets its "v3:" note (2e).
+
+## 4. Found, not fixed here (for the orchestrator)
+
+1. **The dark key's rewording (`ORGANIC.md` §8 D3, C7, C8), owed since v7a.** T3 was decided 2026-10-30 ~19:00 UTC
+   under the owner's hand-over (`ORGANIC.md` §8, "Decided ...": "D3's wording follows v7a"), and v7a is done
+   (`paint_test/NOTES.md` v7a, its first flag). Still saying "pending", or still the gentle key: `DIRECTION.md`'s intro
+   (line 58, "One call is still the owner's: the dark key"), rule 5 (line 158, "Night is temperature, not darkness",
+   against T3's dark night: W1 §0, 60-70 % of a home-view frame under L* 40), rule 6 (line 160-181: "never one dark
+   mass", line 169-170; "owner's pick pending"); `CRAFT.md`'s intro (line 24-25), §d.2's L* 35 floor (line 279) and its check, §f.8
+   (line 509); `LAYOUT.md` §1 (52), §6 (179), §8.2 (247); the playbook's "A full value range" bullet (line 492). These
+   are the higher docs here (and the playbook holds the owner's words), and the change rewords rules in three docs
+   together, so it is not a minimal reconcile: one pass, as D3 planned (DIRECTION rule 6, CRAFT §f.8 and the playbook
+   bullet together, from v7a's numbers). Until then W1's declared exceptions (§7) carry video 4.
+2. **The production captions' world word** (`public/v4/captions2.json`, `world` w1, data, not edited): "ink": "#3A2B48"
+   (the stills' plum) where W1 keys the tag to indigo #1F2B4B on #D5D6E7 (3d). Nothing changes at G3 (monochrome);
+   the tooling lane or G4 rekeys it.
+3. **The camera plan's 1x px are on y 1170** (`camera_plan_g3.md` §1's table and the shots' 1x numbers; e.g. the
+   computer y 878-1256, the harbour y 1170-1205, the far city's tops y 1110-1150, her feet ~1340): the plan now says
+   so (1d). W1 §1.0-§1.1 has them on 1150 (the computer 858-1236, the harbour ~1152-1181, the far city's tops
+   ~1090-1148, her feet ~1319); the G3 lanes, who read the plan as the contract, move them at their thumbnails.
+4. **`visual/COMPOSITION_PASS.md` still says y 1170** (its §1 and its clash list): the study session's; v3's fold (i)
+   joins its fixes (a)-(h) for the pass's fix pass.
+5. **W1 §1.1's Pip line** reads "seated against the slate facade (lavender on slate: tone-on-tone at a squint ...)":
+   by the one rule (1c) the slate is the field it is seen against (ΔE ~39: the second look) and the balcony's snow its
+   seat (ΔE ~15: the squint join), as W1's own §7 says. W1 is the density revision's file now (not edited here beyond
+   the §7 head's pointer, 1d); its revision may move Pip's seat, and the rule holds wherever it goes.
+6. **Seen, not a clash:** `LAYOUT.md` §8.2's Pip spot (line 257) "x 140-760" (marked a proposal there) against W1's balcony at x
+   ~830-845 (inside the busy belt, clear of the rail, >= 250 px from the focal: R12 holds); the G3 lane L1 keeps W1's.
