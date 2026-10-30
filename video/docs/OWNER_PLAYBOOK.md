@@ -676,6 +676,13 @@ Maintenance at the end).
   it named only 25 of the reels' 41 ideas, most as side notes under story-beat recipes; then "I didn’t get once again
   why you ignored all my references and came up with yours?": the cause was our brief, which put our own story-beat
   structure first and the reels as one input among three, with no coverage check before sending.)
+  The owner's expected shape for such a study: break down ALL his references; research the wider field (other
+  strategies, what makes a frame engaging and attention-capturing, the most modern cinematography); RANK everything;
+  then a library with guidelines on when to use which, and how animation and transitions fit into it. — ("I think
+  overall I would expect you to break down all mine references and whatever you research on other composition
+  strategies and on what makes a composition to be engaging and capturing attention and like a a super moden modern
+  cinematography / And then we would rank them and have a library and a set of guidelines on when to use one or other
+  and how animations and transitions fit into this", 2026-10-30.)
 - **Research the recipe before building a look element.** When a reference shows a look we can't yet make (a painted
   sky, layered clouds, water, foliage), first study it closely (crops, measured values, palette, edges, stroke sizes,
   layer order, softness by depth) and research how professional painters do it, then write a CONCRETE, numbered recipe
