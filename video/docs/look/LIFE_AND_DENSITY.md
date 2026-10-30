@@ -168,7 +168,8 @@ references and primitives, never the film's people.
   and the API), in a colourway for the video's palette that stays its own hue (never the hero or the pop colour; ONE
   rule with `ORGANIC.md` R12: ΔE76 >= 20 from the field it is seen against, so a second look finds it, while its value
   stays close to the seat it sits in, so at a squint it joins that mass and makes no call; video 4: lavender, L* 56,
-  on its balcony's snow, L* 60, ΔE ~15, seen against the slate facade, ΔE ~39: `docs/v4/WORLD_BIBLE.md` §1.1, §7) and in tier B (`CRAFT.md` §b: C* <= 25, no outline: its
+  on its balcony's snow, L* 60, ΔE ~15, seen against the slate facade, ΔE ~39: `docs/v4/WORLD_BIBLE.md` §1.1, §7)
+  and in tier B (`CRAFT.md` §b: C* <= 25, no outline: its
   lit and shade faces part its shapes, as on everything since 2026-10-29) unless the line is about it. A non-character anchor may join it (snow, the weather; the sun is light, never a
   character: `CRAFT.md` §d.1).
 - **Jobs (since 2026-10-28: hidden, not a guide):** (1) hide in a spot that belongs to the world (in a window, on a

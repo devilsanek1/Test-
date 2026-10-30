@@ -36,7 +36,7 @@ the way (each in the lower doc); section 4 lists what is not ours to fix here, f
 - Why: W1's flag (this film keeps 5.6, inside "up to ~6 L*"; v7a's T3 went 17 and stays flagged there). The note says
   where both dark-key cases stand without moving the cap: v4 needs no exception, v7a's still is not a film yet.
 
-**1c. Pip's colour: one rule for `docs/look/LIFE_AND_DENSITY.md` §5 (line 168-171) and `docs/look/ORGANIC.md` R12 (line
+**1c. Pip's colour: one rule for `docs/look/LIFE_AND_DENSITY.md` §5 (line 168-172) and `docs/look/ORGANIC.md` R12 (line
 384-385).**
 - Before (LIFE §5): "a colourway ... that stays its own hue (ΔE76 >= 20 from every ground it sits on, never the hero or
   the pop colour)". Before (R12): "Pip hides inside a mass of the busy belt, tone-on-tone, >= 250 px from the focal".
@@ -79,8 +79,8 @@ the way (each in the lower doc); section 4 lists what is not ours to fix here, f
   study session's; its 1170 is governed by v3's line (i), which joins v3's fixes (a)-(h) for its fix pass) and every
   camera-plan number but the horizon (its 1x table, e.g. the computer y 878-1256, the harbour y 1170-1205, the
   resident's feet ~1340, is G3's to move; W1 §1.0-§1.1 gives them on 1150: the computer 858-1236, the harbour
-  ~1152-1181, her feet ~1319). Checked: no code or data carries a horizon yet (`public/v4/animatic.json`,
-  `scripts/v4/`).
+  ~1152-1181, her feet ~1319). Checked (before the G3 lanes' builders exist): no code or data carries a horizon
+  yet (`public/v4/animatic.json`, `public/v4/lanes/`, `scripts/v4/`).
 
 ### 2. The visual script agent's flags (`VISUAL_SCRIPT.md`, "For the orchestrator")
 
@@ -92,8 +92,9 @@ the way (each in the lower doc); section 4 lists what is not ours to fix here, f
   while the plan's stretch is drawn out toward the computer): "But Helsinki" pops on the cut at 23.367 s (frame 1402:
   the group changes within 2 frames of it) · "wants" at 24.000 s (frame 1440, 2 frames before its word) · "that heat."
   at 24.583 s (frame 1475) · all until 25.500 s (frame 1530)."
-- Why: v3 S7 has no dive (the plain cut at 23.37, f1402, then a 1.04x settle landing on "WANTS"), a brush and "the
-  plan's stretch" (no pen, no pipe drawn) and asks "the group changes within 2 frames of the cut"; f1405 is 3 after.
+- Why: v3 S7 has no dive (the plain cut at 23.37, f1402, then a 1.04x settle landing on "WANTS"), what is drawn is
+  "the plan's stretch" (by the brush, never a pen), and v3 asks "the group changes within 2 frames of the cut"; f1405
+  is 3 after.
   "WANTS" starts at 24.04 in the locked take (f1442), so 2 frames before is f1440, the guide's own rule; the production
   captions (`public/v4/captions2.json` g18) already play exactly these frames. The picture's action is named without
   "brush" here, since in this guide "the brush" is the retired type face.
@@ -148,7 +149,7 @@ the card" names every change, and the card now points to it.
   the heat is let go into the cold air (G1 had an orange ribbon of water in a cut-open pipe, cold blue where it ran
   cool, gold after the small box, and a curl of steam, in flat lit and shade tones)." Why: v3's "The thread" and
   STYLE_ADJUSTMENTS 2 (owner-approved: no diagram cut-away); "never as a glow" stays, as v3's delegated call 7 keeps it.
-- The home place, §1.3 (line 78-87). Added beside the G1 words: "(v3: at night, under one camera at a standing
+- The home place, §1.3 (line 78-88). Added beside the G1 words: "(v3: at night, under one camera at a standing
   eye, since DIRECTION rule 7's designed view is on hold)", "(v3: no cut-open ground, the pipe unseen under the snow but
   where the heat shows)", "(v3: above the snow)", and on the "≈ 40" tag "(L4; v3: no tag, the 40 drawn kettles are the
   number)". Why: "as ONE designed view (DIRECTION rule 7)" contradicts DIRECTION rule 7 itself (the designed view on
@@ -215,11 +216,11 @@ rule 7 (the designed view on hold since 2026-10-29), and "the voice's last line 
    (`paint_test/NOTES.md` v7a, its first flag). Still saying "pending", or still the gentle key: `DIRECTION.md`'s intro
    (line 58, "One call is still the owner's: the dark key"), rule 5 (line 158, "Night is temperature, not darkness",
    against T3's dark night: W1 §0, 60-70 % of a home-view frame under L* 40), rule 6 (line 160-181: "never one dark
-   mass", line 169-170; "owner's pick pending"); `CRAFT.md`'s intro (line 24-25), §d.2's L* 35 floor (line 279) and its check, §f.8
-   (line 509); `LAYOUT.md` §1 (52), §6 (179), §8.2 (247); the playbook's "A full value range" bullet (line 492). These
-   are the higher docs here (and the playbook holds the owner's words), and the change rewords rules in three docs
-   together, so it is not a minimal reconcile: one pass, as D3 planned (DIRECTION rule 6, CRAFT §f.8 and the playbook
-   bullet together, from v7a's numbers). Until then W1's declared exceptions (§7) carry video 4.
+   mass", line 169-170; "owner's pick pending"); `CRAFT.md`'s intro (line 24-25), §d.2's L* 35 floor (line 279) and
+   its check, §f.8 (line 509); `LAYOUT.md` §1 (52), §6 (179), §8.2 (247); the playbook's "A full value range" bullet
+   (line 492). These are the higher docs here (and the playbook holds the owner's words), and the change rewords rules
+   in three docs together, so it is not a minimal reconcile: one pass, as D3 planned (DIRECTION rule 6, CRAFT §f.8 and
+   the playbook bullet together, from v7a's numbers). Until then W1's declared exceptions (§7) carry video 4.
 2. **The production captions' world word** (`public/v4/captions2.json`, `world` w1, data, not edited): "ink": "#3A2B48"
    (the stills' plum) where W1 keys the tag to indigo #1F2B4B on #D5D6E7 (3d). Nothing changes at G3 (monochrome);
    the tooling lane or G4 rekeys it.
@@ -233,5 +234,6 @@ rule 7 (the designed view on hold since 2026-10-29), and "the voice's last line 
    by the one rule (1c) the slate is the field it is seen against (ΔE ~39: the second look) and the balcony's snow its
    seat (ΔE ~15: the squint join), as W1's own §7 says. W1 is the density revision's file now (not edited here beyond
    the §7 head's pointer, 1d); its revision may move Pip's seat, and the rule holds wherever it goes.
-6. **Seen, not a clash:** `LAYOUT.md` §8.2's Pip spot (line 257) "x 140-760" (marked a proposal there) against W1's balcony at x
-   ~830-845 (inside the busy belt, clear of the rail, >= 250 px from the focal: R12 holds); the G3 lane L1 keeps W1's.
+6. **Seen, not a clash:** `LAYOUT.md` §8.2's Pip spot (line 257) "x 140-760" (marked a proposal there) against W1's
+   balcony at x ~830-845 (inside the busy belt, clear of the rail, >= 250 px from the focal: R12 holds), so W1's seat
+   stands.

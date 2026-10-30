@@ -58,8 +58,8 @@ a second, the 0.12 s lead included) until the G2 take sets the clock; screen spo
    steam, in flat lit and shade tones). Its warmth shows on what it reaches (the radiator's fins, the lit window pane:
    lit panes are sources, CRAFT §d.9), never as a glow (DIRECTION rule 5; CRAFT §d.7: "No symbolic glow"). The voice
    names it "heat" (L4, L6, L7, L10, L11). On screen from ~0.4 s (frame 0's "ding"). **Home spot: the one warm window
-   and the radiator under its sill,** where the water arrives, in the read zone below the
-   caption band (`docs/look/LAYOUT.md` §1: the band is y 290-600, the stage y 600-1250), on the subject axis (x
+   and the radiator under its sill,** where the water arrives, in the read zone below the caption band
+   (`docs/look/LAYOUT.md` §1: the band is y 290-600, the stage y 600-1250), on the subject axis (x
    380-700), where every B match puts it; G3 sets the exact spot. **It reacts at the end of each cause beat:** the
    still blue water at the pipe's far end turns orange and runs under the snow into the one window's radiator, the
    window lights, then the city's windows ripple on (L1); the orange water leads the glide back to its source, the
@@ -81,11 +81,11 @@ a second, the 0.12 s lead included) until the G2 take sets the clock; screen spo
    the pipe unseen under the snow but where the heat shows); the harbour below; at the city's edge by the harbour, the
    giant computer (one tall machine) inside the new data center's pale pencil plan; a tram line; falling snow; far
    across the water, the city's lights and, if G3 keeps it, the red-brick cathedral with gold domes on its rock, a
-   landmark of the view only (never a beat, never opened, never
-   named, never panned to). Every beat but one happens here, above the snow or cut open below it (v3: above the
-   snow). **Information is paper in this place:** ≈ 40 on a tag by the kettles (L4; v3: no tag, the 40 drawn kettles
-   are the number), 2027 on a tag pinned to the new data center's pencil plan (L8, on "next year": the voice says when,
-   the paper says the year). Words in the picture stay few and big; sources go in the post's text.
+   landmark of the view only (never a beat, never opened, never named, never panned to). Every beat but one happens
+   here, above the snow or cut open below it (v3: above the snow). **Information is paper in this place:** ≈ 40 on a
+   tag by the kettles (L4; v3: no tag, the 40 drawn kettles are the number), 2027 on a tag pinned to the new data
+   center's pencil plan (L8, on "next year": the voice says when, the paper says the year). Words in the picture stay
+   few and big; sources go in the post's text.
 4. **The ONE comparison (and scale) shot: L6,** the rise with the steam up to the Earth's curve at dusk (v3: at night),
    the line said in the picture ("Normally, data centers just use big fans to blow that heat outside."): data centers
    far from Helsinki, plain boxes with big fans on their roofs, blow their heat up into the sky as plumes that thin
@@ -111,8 +111,8 @@ a second, the 0.12 s lead included) until the G2 take sets the clock; screen spo
    tag pinned to the plan (L8); the giant computer is a generic AI rack with no logo, about a person's height (v3:
    about 2 storeys, its delegated call 2; its height isn't checked: FL 2.2); the small box on the pipe is the heat
    pump, never labelled (FL 6.3); the cooling water stays inside its pipe through the giant computer, never loose
-   around the machine (L10, "in pipes": two of
-   `panel_d3/`'s three first thought water breaks computers); the heat goes into a radiator, never a tap or a shower
+   around the machine (L10, "in pipes": two of `panel_d3/`'s three first thought water breaks computers); the heat
+   goes into a radiator, never a tap or a shower
    (every cold panel on draft 2 wondered); the data centers on the curve are generic boxes with fans; if the cathedral
    stays as a landmark, it is Uspenski, red brick with gold domes, never the white Helsinki Cathedral (FL 6.10), with
    nothing under it drawn (no room in the rock, no old computers, no 2010, no shelter: video 5's picture); no company
