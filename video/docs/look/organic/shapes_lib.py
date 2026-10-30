@@ -967,19 +967,25 @@ def notan(lab: np.ndarray, blur: float = 2.0, min_frac: float = 0.002):
 
 
 def lost_found(prof, crisp: float = 2.0, firm: float = 6.0, soft: float = 16.0):
-    """Shares of boundary samples: crisp (10-90 % <= 2 px), firm (2-6), soft (6-16), lost (wider than 16 px, or a
-    step under 4 dE); thin lines are counted as found (crisp)."""
+    """Shares of boundary samples: crisp (10-90 % width <= 2 px), firm (2-6), soft (6-16), lost (wider than 16 px,
+    or a step under 4 dE), busy (the profile is not one step: texture, a thin line or two edges close together).
+    The width shares are also given among the clean steps alone (crisp_of_steps ...)."""
     if prof is None or len(prof['kind']) == 0:
         return {}
     k = prof['kind']; w = prof['width']
-    n = len(k)
-    lost = (k == 2) | ((k == 0) & (w > soft))
-    crisp_m = ((k == 0) & (w <= crisp)) | (k == 1)
-    firm_m = (k == 0) & (w > crisp) & (w <= firm)
-    soft_m = (k == 0) & (w > firm) & (w <= soft)
+    step_ok = k == 0
+    lost = (k == 2) | (step_ok & (w > soft))
+    crisp_m = step_ok & (w <= crisp)
+    firm_m = step_ok & (w > crisp) & (w <= firm)
+    soft_m = step_ok & (w > firm) & (w <= soft)
+    busy = k == 1
+    clean = crisp_m | firm_m | soft_m | lost
+    nc = max(int(clean.sum()), 1)
     return {'crisp': float(crisp_m.mean()), 'firm': float(firm_m.mean()), 'soft': float(soft_m.mean()),
-            'lost': float(lost.mean()), 'n': n,
-            'median_width': float(np.nanmedian(np.where(k == 0, w, np.nan))) if (k == 0).any() else float('nan')}
+            'lost': float(lost.mean()), 'busy': float(busy.mean()), 'n': int(len(k)),
+            'crisp_of_clean': float(crisp_m.sum() / nc), 'firm_of_clean': float(firm_m.sum() / nc),
+            'soft_of_clean': float(soft_m.sum() / nc), 'lost_of_clean': float(lost.sum() / nc),
+            'median_width': float(np.nanmedian(np.where(step_ok, w, np.nan))) if step_ok.any() else float('nan')}
 
 
 def parallel_share(runs, max_dist: float = 30.0, min_dist: float = 3.0, ang_tol: float = 3.0) -> float:

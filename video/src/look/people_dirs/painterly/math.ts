@@ -110,7 +110,8 @@ export const frameFrom = (o: V3, y: V3, zHint: V3): Frame => {
 };
 
 /** Catmull-Rom through (u, value) knots sorted by u; clamped at the ends. */
-export function spline(k: ReadonlyArray<readonly [number, number]>, u: number): number {
+export function spline(k0: ReadonlyArray<readonly [number, number]>, u: number): number {
+  const k = k0.length > 1 && k0[0][0] > k0[k0.length - 1][0] ? [...k0].reverse() : k0;
   const n = k.length;
   if (u <= k[0][0]) return k[0][1];
   if (u >= k[n - 1][0]) return k[n - 1][1];

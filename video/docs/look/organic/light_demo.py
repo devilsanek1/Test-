@@ -43,6 +43,40 @@ DOOR_LIGHT = '#FFE2AE'        # the lobby's light (a warm 2700-3000 K interior, 
 ROSE_BOUNCE = '#F2B8A8'       # warm bounce from the terracotta ground into the undersides
 
 
+# The float (src/look/paint_s1/V2S1_float.tsx S1_FLOAT_LEGS, lib/depth floatAt with ease 0.25, PARALLAX_K shares): every
+# light layer rides the group of the plane it lies on, so the proof moves each one by its plane's share.
+FLOAT_LEGS = [(1.1, 2.3, (-8.0, -3.0)), (2.3, 3.4, (-4.0, -9.0)), (3.4, 4.6, (4.0, -7.0)), (4.6, 5.8, (0.0, 0.0))]
+SHARE = {'near': 1.0, 'bank': 0.85, 'water': 0.725, 'subject': 0.6, 'sky': 0.0}
+
+
+def float_at(t, ease=0.25):
+    fr = (0.0, 0.0)
+    for t0, t1, to in FLOAT_LEGS:
+        if t < t0:
+            return fr
+        if t <= t1:
+            s_ = min(1.0, max(0.0, (t - t0) / max(1e-6, t1 - t0)))
+            a = ease
+            u = (0.5 * s_ * s_) / (a * (1 - a)) if s_ < a else (1 - (0.5 * (1 - s_) * (1 - s_)) / (a * (1 - a)) if s_ > 1 - a else (s_ - a / 2) / (1 - a))
+            return (fr[0] + (to[0] - fr[0]) * u, fr[1] + (to[1] - fr[1]) * u)
+        fr = to
+    return fr
+
+
+def offset(t, plane):
+    fx, fy = float_at(t)
+    k = SHARE[plane]
+    return fx * k, fy * k
+
+
+def shift(img, dx, dy):
+    """A map moved by its plane's float (sub-pixel, bilinear, as the browser draws a translated group)."""
+    if abs(dx) < 1e-4 and abs(dy) < 1e-4:
+        return img
+    M = np.float32([[1, 0, dx], [0, 1, dy]])
+    return cv2.warpAffine(img, M, (img.shape[1], img.shape[0]), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+
+
 # ------------------------------------------------------------------------------------------------ colour helpers
 def hex_rgb(h):
     h = h.lstrip('#')
@@ -100,7 +134,7 @@ def band_mask():
 
 
 # ------------------------------------------------------------------------------------------------ masks
-def masks(R, f):
+def masks(R, f, t=None):
     """Layer masks from the engine's own renders (light.md §8): every mask is a difference of two renders of the SAME
     frame with one layer switched, so it is exact to the pixel (no colour segmentation except the doorway's source)."""
     base = load(f'{R}/base/f{f:05d}.png')
@@ -131,14 +165,16 @@ def masks(R, f):
     L = lstar(base)
     x0, y0, x1, y1 = DOOR
     inside = np.zeros((H, W), bool)
-    inside[y0 + 8:y1 - 2, x0 + 8:x1 - 8] = True
+    ox, oy = int(round(sdx)), int(round(sdy))
+    inside[y0 + 8 + oy:y1 - 2 + oy, x0 + 8 + ox:x1 - 8 + ox] = True
     r, g, b = base[..., 0], base[..., 1], base[..., 2]
     warm = (r > b + 0.06)
     door_src = inside & (L > 74) & warm & ~her
     door_src = cv2.morphologyEx(door_src.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8)) > 0
     # lit panes on the facade (warm and light: the interiors are light sources, never shaded)
     wing = np.zeros((H, W), np.uint8)
-    cv2.fillPoly(wing, [WING], 1)
+    sdx, sdy = offset(f / 60.0 if t is None else t, 'subject')
+    cv2.fillPoly(wing, [np.round(WING + np.array([sdx, sdy])).astype(np.int32)], 1)
     wing = wing > 0
     panes = wing & ~inside & (L > 78) & (r > b + 0.12) & (yy < 1080)
     panes = cv2.morphologyEx(panes.astype(np.uint8), cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)) > 0
@@ -300,6 +336,9 @@ def light_frame(R, f, seed=1, dose=1.0):
     G = np.zeros((H, W, 3), np.float32)                      # the additive glow (linear)
     her = M['her'].astype(np.float32)
     pip = M['pip'].astype(np.float32)
+    t = f / 60.0
+    sdx, sdy = offset(t, 'subject')                          # the subject plane's float (the wing, the door, her)
+    bdx, bdy = offset(t, 'bank')                             # our bank's float (the big near shade)
     keep_src = (M['door_src'] | M['panes']).astype(np.float32)
 
     # 1. THE SHADE (what the key doesn't reach): the backlit facade, the towpath under the far roofs' shadow, our bank
@@ -308,15 +347,16 @@ def light_frame(R, f, seed=1, dose=1.0):
     t0 = time.perf_counter()
     warmth = smoothstep(-0.03, 0.08, base[..., 0] - base[..., 2])[..., None]
     tint = warmth * lin_hex(SHADE_WARM) + (1 - warmth) * lin_hex(SHADE_COOL)
-    fascia = ((xx >= 520) & (xx <= 740) & (yy >= 800) & (yy <= 846)).astype(np.float32)
+    fascia = ((xx >= 520 + sdx) & (xx <= 740 + sdx) & (yy >= 800 + sdy) & (yy <= 846 + sdy)).astype(np.float32)
     facade = M['wing'].astype(np.float32) * (1 - keep_src) * (1 - her) * (1 - fascia)
     facade = gblur(facade, 0.8) * (1 - her)
-    towpath = ((yy >= 1083) & (yy < 1113)).astype(np.float32) * smoothstep(120, 420, xx) * (1 - her)
-    near = leafy_edge_shade(seed) * (yy > 1180) * (1 - M['water'].astype(np.float32))
+    towpath = ((yy >= 1083 + sdy) & (yy < 1113 + sdy)).astype(np.float32) * smoothstep(120, 420, xx - sdx) * (1 - her)
+    near = shift(leafy_edge_shade(seed), bdx, bdy) * (yy > 1180) * (1 - M['water'].astype(np.float32))
     k_map = 0.52 * facade + 0.36 * towpath + 0.80 * near
     k_map = np.maximum(k_map, 0.22 * her + 0.30 * pip)       # her front and Pip: a light shade, so their rims read
     k_map = np.clip(k_map * free * dose, 0, 0.95)
     E *= (1 - k_map[..., None]) + k_map[..., None] * tint
+    S = E.copy()                                             # the multiply half (<= 1): the engine's shade layer
     T['shade'] = time.perf_counter() - t0
 
     # 2. THE KEY: the low sun, half behind the far roofs.
@@ -346,7 +386,7 @@ def light_frame(R, f, seed=1, dose=1.0):
     rim_sky = rim_band(obj, light_xy=SUN, width=2.4, power=1.2) * (yy > BAND[1] + 20)
     rim_sky *= np.where(xx < 330, 0.35, 1.0)                # the far tower (+3): calm (CRAFT §f: far planes quiet)
     # the wing's west corner: a 3 px sliver up its edge (its hidden west face takes the sun)
-    corner = ((xx >= 330) & (xx < 333.5) & (yy > 640) & (yy < 1080)).astype(np.float32) * (1 - her)
+    corner = ((xx >= 330 + sdx) & (xx < 333.5 + sdx) & (yy > 640 + sdy) & (yy < 1080 + sdy)).astype(np.float32) * (1 - her)
     # her: the sun on her front (she walks west, into it), the subject's dose; Pip: B's dose
     rim_her_sun = rim_band(M['her'], light_xy=SUN, width=4.2, power=0.8) * her
     rim_pip = rim_band(M['pip'], light_xy=SUN, width=2.0, power=1.2) * pip
@@ -358,20 +398,20 @@ def light_frame(R, f, seed=1, dose=1.0):
     t0 = time.perf_counter()
     door_c = lin_hex(DOOR_LIGHT)
     src = M['door_src'].astype(np.float32)
-    lamp_img = ((DOOR[0] + DOOR[2]) / 2, DOOR[1] + 26)           # the lobby's lamps seen through the opening
-    lamp_foot = ((DOOR[0] + DOOR[2]) / 2, DOOR[3] - 6)            # the floor under them (behind the facade line)
+    lamp_img = ((DOOR[0] + DOOR[2]) / 2 + sdx, DOOR[1] + 26 + sdy)   # the lobby's lamps seen through the opening
+    lamp_foot = ((DOOR[0] + DOOR[2]) / 2 + sdx, DOOR[3] - 6 + sdy)    # the floor under them (behind the facade line)
     # 3a. the source: lifted a step (CRAFT §d.2: a lit interior 88-92, the lamps 95-98), most under the lamps
     lift = src * (0.10 + 0.16 * smoothstep(1060, 880, yy))
     E += (dose * lift)[..., None] * (door_c - 0.2)
     lamps = np.zeros((H, W), np.float32)
     for lx in (575.0, 675.0):
-        lamps += np.exp(-(((xx - lx) / 9) ** 2 + ((yy - 879) / 5) ** 2))
+        lamps += np.exp(-(((xx - lx - sdx) / 9) ** 2 + ((yy - 879 - sdy) / 5) ** 2))
     G += (dose * bloom(lamps, [3, 10], [0.5, 0.25]) * src * 0.35)[..., None] * door_c
     # 3b. her shadow from the door light (behind her, high): cast toward us, on the towpath and the coping only
-    her_sh = project_shadow(M['her'], lamp_img, lamp_foot, FEET_Y) * (yy <= COPING_Y + 3)
+    her_sh = project_shadow(M['her'], lamp_img, lamp_foot, FEET_Y + sdy) * (yy <= COPING_Y + 3 + sdy)
     her_sh = gblur(her_sh, 1.4, 2.2)
     # 3c. the pool on the towpath (and the coping's face), her shadow cut out of it
-    pool = door_pool(np.clip(her_sh * 1.15, 0, 1))
+    pool = shift(door_pool(shift(np.clip(her_sh * 1.15, 0, 1), -sdx, -sdy)), sdx, sdy)
     E += (dose * pool * 1.15)[..., None] * (door_c - 0.08)
     # 3d. bloom at the opening (the glow AT the source: ~+5 L* at the frame, gone by ~60 px)
     dglow = bloom(src, sigmas=[2.5, 8, 22], weights=[0.30, 0.20, 0.10]) * (1 - src)
@@ -407,7 +447,7 @@ def light_frame(R, f, seed=1, dose=1.0):
     srgb[M['cap_m']] = M['cap'][M['cap_m']]                    # the captions: unlit, on top
     out8 = np.round(srgb * 255).astype(np.uint8)
     T['composite'] = time.perf_counter() - t0
-    maps = dict(E=E, G=G, k=k_map, pool=pool, rim=np.clip(rim_sky + corner + rim_her_sun + rim_pip + wrap + rim_her_door, 0, 1),
+    maps = dict(E=E, S=S, A=E - S, src=src, G=G, k=k_map, pool=pool, rim=np.clip(rim_sky + corner + rim_her_sun + rim_pip + wrap + rim_her_door, 0, 1),
                 her_sh=her_sh, glow=glow, shafts=sh)
     return out8, M, maps, T
 

@@ -1,0 +1,691 @@
+"""shapes_gen.py: generators for organic silhouettes (shapes.md §4). The reference implementation: numpy, SciPy and
+OpenCV only (BSD-3 / BSD-3 / Apache-2.0), every function a pure function of its seed (the same bytes on every run).
+Lengths are px of the 1080 x 1920 frame; a shape's size is its equivalent radius R = sqrt(area / pi).
+
+  seeded(seed)                      a numpy Generator from a string seed (sha256, as the paint recipes do)
+  loop_noise(n, octaves, seed)      periodic 1-D value noise along a closed outline: octaves = [(wavelength px, amp px)]
+  displace(P, octaves, seed, ...)   push a closed outline along its normals: the noise-displaced outline; billow=True
+                                    turns one octave into convex bumps with sharp inward cusps (a cumulus)
+  ellipse_cluster(...)              a union of jittered ellipses on a size ladder: a cloud or a foliage mass
+  crown(...)                        a tree crown: 3-5 masses of clumps, asymmetric, with sky holes
+  hand_cut(corners, seed, ...)      a man-made outline: off-square corners, bowed and broken sides, never parallel
+  edge_alpha(mask, seed, ...)       lost-and-found edges for a raster piece: found / broken / lost stretches along the
+                                    outline by the light and a slow noise; dry-brush teeth along the brush direction
+  size_ladder(n, seed, ...)         big / medium / small sizes, never two alike
+  place(...)                        Poisson-disk placement that never makes tangents, never repeats an interval
+  checks: tangents(), parallels(), interval_cv()
+
+Every numeric default comes from the reference measurements (shapes.md §2-3) and is re-measured by
+shapes_generators_sheet.py with the same code as the references (shapes_measure.py)."""
+from __future__ import annotations
+
+import hashlib
+import math
+
+import cv2
+import numpy as np
+from scipy import ndimage as ndi
+
+# ----------------------------------------------------------------------------------------------------------------
+# seeds and noise
+
+
+def seeded(seed) -> np.random.Generator:
+    h = hashlib.sha256(str(seed).encode()).digest()
+    return np.random.default_rng(int.from_bytes(h[:8], 'little'))
+
+
+def _periodic_cubic(vals: np.ndarray, n: int) -> np.ndarray:
+    """Catmull-Rom interpolation of k periodic control values to n samples."""
+    k = len(vals)
+    t = np.arange(n) * k / n
+    i = np.floor(t).astype(int)
+    f = t - i
+    p0 = vals[(i - 1) % k]; p1 = vals[i % k]; p2 = vals[(i + 1) % k]; p3 = vals[(i + 2) % k]
+    return 0.5 * ((2 * p1) + (-p0 + p2) * f + (2 * p0 - 5 * p1 + 4 * p2 - p3) * f * f + (-p0 + 3 * p1 - 3 * p2 + p3) * f ** 3)
+
+
+def loop_noise(n: int, octaves, seed, length: float | None = None) -> np.ndarray:
+    """Periodic 1-D value noise on n samples of a loop `length` px long (default n): the sum of octaves, each a
+    wavelength (px) and an amplitude (px, the octave's RMS). Value noise, not sines: no octave repeats exactly."""
+    L = float(length if length is not None else n)
+    r = seeded(seed)
+    out = np.zeros(n)
+    for (lam, amp) in octaves:
+        k = max(3, int(round(L / lam)))
+        v = r.uniform(-1, 1, k)
+        v -= v.mean()
+        o = _periodic_cubic(v, n)
+        s = o.std()
+        out += (o / s * amp) if s > 1e-9 else 0
+    return out
+
+
+def line_noise(n: int, octaves, seed, length: float | None = None) -> np.ndarray:
+    """The same along an open line (no wrap)."""
+    L = float(length if length is not None else n)
+    r = seeded(seed)
+    out = np.zeros(n)
+    for (lam, amp) in octaves:
+        k = max(3, int(round(L / lam))) + 3
+        v = r.uniform(-1, 1, k)
+        o = np.interp(np.linspace(1, k - 2, n), np.arange(k), v)
+        o = ndi.gaussian_filter1d(o, max(lam * n / L / 4.0, 0.5), mode='nearest')
+        o -= o.mean()
+        s = o.std()
+        out += (o / s * amp) if s > 1e-9 else 0
+    return out
+
+
+def noise2d(shape, cell: float, seed, octaves: int = 3, gain: float = 0.5) -> np.ndarray:
+    """Smooth 2-D value noise (bicubic upsampled random grids), fractal over `octaves`, ~unit RMS."""
+    H, W = shape
+    r = seeded(seed)
+    out = np.zeros((H, W), np.float32)
+    amp = 1.0; c = cell
+    for _ in range(octaves):
+        gh = int(math.ceil(H / c)) + 3; gw = int(math.ceil(W / c)) + 3
+        g = r.uniform(-1, 1, (gh, gw)).astype(np.float32)
+        up = cv2.resize(g, (int(gw * c), int(gh * c)), interpolation=cv2.INTER_CUBIC)
+        oy, ox = int(c), int(c)
+        out += amp * up[oy:oy + H, ox:ox + W]
+        amp *= gain; c /= 2.0
+        if c < 1.5:
+            break
+    return out / max(float(out.std()), 1e-6)
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# outlines
+
+
+def resample_closed(P: np.ndarray, step: float = 1.0) -> np.ndarray:
+    Q = np.vstack([P, P[:1]])
+    d = np.hypot(*np.diff(Q, axis=0).T)
+    s = np.r_[0, np.cumsum(d)]
+    n = max(int(s[-1] / step), 8)
+    t = np.linspace(0, s[-1], n, endpoint=False)
+    return np.stack([np.interp(t, s, Q[:, 0]), np.interp(t, s, Q[:, 1])], 1)
+
+
+def normals_closed(P: np.ndarray) -> np.ndarray:
+    d = (np.roll(P, -1, 0) - np.roll(P, 1, 0)) / 2
+    n = np.stack([d[:, 1], -d[:, 0]], 1)
+    n /= np.maximum(np.hypot(n[:, 0], n[:, 1]), 1e-9)[:, None]
+    # outward: the signed area tells the winding
+    area = 0.5 * np.sum(P[:, 0] * np.roll(P[:, 1], -1) - np.roll(P[:, 0], -1) * P[:, 1])
+    return n if area > 0 else -n
+
+
+def displace(P: np.ndarray, octaves, seed, billow: int | None = None, smooth: float = 0.0,
+             amp_at=None) -> np.ndarray:
+    """The noise-displaced outline: resample every 1 px, push along the outward normal by loop_noise(octaves).
+    billow = index of one octave that becomes |noise| (convex bumps, sharp inward cusps: the cumulus edge).
+    amp_at(P, normals) -> per-point factor (e.g. more raggedness on the side away from the light)."""
+    Q = resample_closed(P, 1.0)
+    n = len(Q)
+    N = normals_closed(Q)
+    d = np.zeros(n)
+    for i, (lam, amp) in enumerate(octaves):
+        o = loop_noise(n, [(lam, 1.0)], f'{seed}/o{i}')
+        if billow is not None and i == billow:
+            o = np.abs(o)
+            o = (o - o.mean()) / max(o.std(), 1e-9)
+        d += amp * o
+    if amp_at is not None:
+        d *= amp_at(Q, N)
+    out = Q + N * d[:, None]
+    if smooth > 0:
+        out = np.stack([ndi.gaussian_filter1d(out[:, 0], smooth, mode='wrap'),
+                        ndi.gaussian_filter1d(out[:, 1], smooth, mode='wrap')], 1)
+    return out
+
+
+def spectrum_for(R: float, element: str) -> list[tuple[float, float]]:
+    """The displacement octaves for a shape of equivalent radius R px, by element (shapes.md §3.2's table, from the
+    references' measured outline spectra). Returns [(wavelength px, amplitude px)]."""
+    T = SPECTRA[element]
+    out = []
+    for (lam_rel, amp_rel, lam_min, amp_min) in T:
+        lam = max(lam_rel * R, lam_min)
+        amp = max(amp_rel * R, amp_min)
+        if lam < 2 * math.pi * R:          # an octave longer than the whole outline is not a wiggle
+            out.append((lam, amp))
+    return out
+
+
+# per element: (wavelength / R, amplitude / R, min wavelength px, min amplitude px); see shapes.md §3.2
+SPECTRA = {
+    'cloud': [(1.6, 0.060, 40, 2.0), (0.8, 0.035, 20, 1.2), (0.4, 0.018, 10, 0.8), (0.2, 0.010, 6, 0.6)],
+    'foliage': [(1.4, 0.070, 30, 2.0), (0.6, 0.045, 14, 1.4), (0.25, 0.025, 7, 1.0), (0.1, 0.012, 4, 0.7)],
+    'rock': [(1.8, 0.050, 40, 1.5), (0.7, 0.020, 16, 0.8), (0.25, 0.008, 8, 0.4)],
+    'shadow': [(2.0, 0.040, 60, 1.5), (0.8, 0.015, 24, 0.7)],
+    'water_edge': [(2.5, 0.030, 80, 1.2), (0.6, 0.010, 20, 0.5)],
+}
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# ladders, clusters, crowns
+
+
+def size_ladder(n: int, seed, top: float = 1.0, ratio=(0.55, 0.8), min_step: float = 0.1) -> np.ndarray:
+    """n sizes, biggest first: each the last times U(ratio); two sizes are never within min_step (10 %) of each
+    other. Default ratios give the references' measured ladder (neighbouring sizes 0.6-0.75 on average)."""
+    r = seeded(seed)
+    s = [top]
+    while len(s) < n:
+        s.append(s[-1] * r.uniform(*ratio))
+    s = np.array(s)
+    return s
+
+
+def ellipse_cluster(seed, cx: float, cy: float, width: float, height: float, n: int = 9, kind: str = 'cumulus',
+                    aspect=(0.62, 0.9), rot_deg: float = 16.0, overlap=(0.25, 0.45), ss: int = 4):
+    """A union of jittered ellipses on a size ladder (a cumulus, a bank, a foliage mass). The biggest ellipse sits
+    off-centre (never in the middle: asymmetry), the rest climb its shoulders on a jittered dome; each overlaps its
+    neighbour by 25-45 % of the smaller radius (never tangent); widths follow the ladder, aspects and tilts vary.
+    kind: 'cumulus' (flat base, billows up), 'bank' (wide, flat, low), 'foliage' (round, notched underside).
+    Returns (mask bool H x W of the box [cx-w/2 .. cx+w/2] at 1x, its offset (x0, y0), the ellipses)."""
+    r = seeded(seed)
+    sizes = size_ladder(n, f'{seed}/ladder', top=1.0, ratio=(0.6, 0.82))
+    W, H = width, height
+    base = cy + H * 0.5
+    ells = []
+    # the anchor: the biggest, off-centre by 8-22 % of the width
+    side = r.choice([-1, 1])
+    ax = cx + side * W * r.uniform(0.08, 0.22)
+    if kind == 'bank':
+        R0 = H * 0.55
+    elif kind == 'foliage':
+        R0 = min(W, H) * 0.36
+    else:
+        R0 = min(W * 0.32, H * 0.55)
+    a0 = r.uniform(*aspect)
+    ells.append((ax, base - R0 * a0 * (0.85 if kind != 'foliage' else 1.6), R0, R0 * a0, r.uniform(-rot_deg, rot_deg)))
+    # the rest: alternate shoulders, climbing toward the top on the anchor's far side less
+    for i, s in enumerate(sizes[1:], 1):
+        Ri = R0 * s
+        ai = r.uniform(*aspect)
+        for _ in range(60):
+            j = int(r.integers(0, len(ells)))
+            px, py, pr, pry, _ = ells[j]
+            ang = r.uniform(math.radians(200), math.radians(340)) if kind != 'foliage' else r.uniform(0, 2 * math.pi)
+            ov = r.uniform(*overlap)
+            dist = pr + Ri - ov * min(pr, Ri)
+            x = px + math.cos(ang) * dist * (1.0 if kind != 'bank' else 1.6)
+            y = py + math.sin(ang) * dist * (pry / pr)
+            if kind in ('cumulus', 'bank') and y + Ri * ai * 0.6 > base:
+                y = base - Ri * ai * 0.6
+            if abs(x - cx) > W * 0.52 or y < cy - H * 0.55:
+                continue
+            ells.append((x, y, Ri, Ri * ai, r.uniform(-rot_deg, rot_deg)))
+            break
+    # raster union at ss x
+    x0 = int(math.floor(cx - W * 0.75)); y0 = int(math.floor(cy - H * 0.9))
+    w = int(W * 1.5) + 2; h = int(H * 1.6) + 2
+    m = np.zeros((h * ss, w * ss), np.uint8)
+    for (x, y, rx, ry, rot) in ells:
+        cv2.ellipse(m, (int(round((x - x0) * ss)), int(round((y - y0) * ss))),
+                    (max(1, int(round(rx * ss))), max(1, int(round(ry * ss)))), rot, 0, 360, 255, -1, cv2.LINE_AA)
+    if kind in ('cumulus', 'bank'):
+        # a flat base, tilted <= 1.5 deg, cut through the union
+        tilt = math.tan(math.radians(r.uniform(-1.5, 1.5)))
+        yy, xx = np.mgrid[0:h * ss, 0:w * ss]
+        cut = (yy / ss + y0) > (base + (xx / ss + x0 - cx) * tilt)
+        m[cut] = 0
+    m = cv2.resize(m, (w, h), interpolation=cv2.INTER_AREA) > 127
+    return m, (x0, y0), ells
+
+
+def mask_outline(mask: np.ndarray) -> np.ndarray:
+    """The outer outline of the largest component (sub-pixel-ish: cv2 contour of the mask)."""
+    cs, _ = cv2.findContours(mask.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    c = max(cs, key=cv2.contourArea)[:, 0, :].astype(np.float64)
+    return c
+
+
+def fill_outline(P: np.ndarray, shape, ss: int = 4) -> np.ndarray:
+    H, W = shape
+    m = np.zeros((H * ss, W * ss), np.uint8)
+    pts = np.round(P * ss * 16).astype(np.int32)
+    cv2.fillPoly(m, [pts], 255, cv2.LINE_AA, shift=4)
+    return cv2.resize(m, (W, H), interpolation=cv2.INTER_AREA).astype(np.float32) / 255.0
+
+
+def guide_dome(cx: float, base: float, width: float, height: float, lean: float = 0.15, squash: float = 2.4,
+               n: int = 240) -> np.ndarray:
+    """The big shape of a cumulus: a dome on a flat base, its top `lean` of the width off-centre (never symmetric),
+    the shoulders a super-ellipse (squash > 2 = fuller shoulders). Closed polygon, base included."""
+    t = np.linspace(0, math.pi, n)
+    xs = -np.cos(t)
+    ys = np.sin(t) ** (2.0 / squash)
+    # lean: move the top sideways, more at the top
+    xs = xs + lean * 2 * ys ** 2 * (1 - np.abs(xs)) ** 0.5
+    top = np.stack([cx + xs * width / 2, base - ys * height], 1)
+    return top
+
+
+def billows(seed, path: np.ndarray, r_of, inset=(0.38, 0.6), spacing=(0.5, 0.82), aspect=(0.72, 0.98),
+            levels: int = 2, child=(0.3, 0.55), n_child=(0, 3), arc=(200, 340), inset_of=None, outward=None):
+    """Billows along an open path (left to right along the top of a guide): each an ellipse whose size comes from
+    r_of(u, rng) (u = 0..1 along the path), set inside the path by `inset` of its radius so its top bulges out,
+    the next one a jittered `spacing` of the two radii further on (overlapping, never kissing); adjacent radii are
+    never within 10 %. Level 2 puts 0-3 smaller billows on each one's outer arc. Returns [(x, y, rx, ry, rot deg)]."""
+    r = seeded(seed)
+    d = np.hypot(*np.diff(path, axis=0).T)
+    s = np.r_[0, np.cumsum(d)]
+    Ltot = s[-1]
+    out = []
+    pos = 0.0
+    last = None
+    while pos <= Ltot:
+        u = pos / Ltot
+        rad = r_of(u, r)
+        if last is not None and abs(rad - last) < 0.1 * last:
+            rad = last * (1.12 if r.uniform() < 0.5 else 0.88)
+        i = min(int(np.searchsorted(s, pos)), len(path) - 1)
+        p = path[i]
+        tg = path[min(i + 1, len(path) - 1)] - path[max(i - 1, 0)]
+        tg = tg / max(np.hypot(*tg), 1e-9)
+        nrm = np.array([tg[1], -tg[0]])          # outward (path runs left -> right over the top)
+        if outward is not None:
+            o = p - np.asarray(outward)
+            if nrm @ o < 0:
+                nrm = -nrm
+        elif nrm[1] > 0:
+            nrm = -nrm
+        ins = inset_of(u, r) if inset_of is not None else r.uniform(*inset)
+        c = p - nrm * rad * ins
+        asp = r.uniform(*aspect)
+        rot = math.degrees(math.atan2(tg[1], tg[0])) + r.uniform(-12, 12)
+        out.append((c[0], c[1], rad, rad * asp, rot))
+        if levels >= 2:
+            for k in range(int(r.integers(n_child[0], n_child[1] + 1))):
+                if outward is not None:
+                    base_a = math.atan2(nrm[1], nrm[0])
+                    a = base_a + math.radians(r.uniform(-55, 55))
+                else:
+                    a = math.radians(r.uniform(*arc))
+                cr = rad * r.uniform(*child)
+                q = c + np.array([math.cos(a) * rad, math.sin(a) * rad * asp]) * r.uniform(0.75, 0.95)
+                out.append((q[0], q[1], cr, cr * r.uniform(*aspect), r.uniform(-20, 20)))
+        nxt = r_of(min(u + 0.05, 1.0), r)
+        pos += (rad + nxt) * r.uniform(*spacing)
+        last = rad
+    return out
+
+
+def raster_union(ells, box, ss: int = 4, base_cut: float | None = None, poly: np.ndarray | None = None):
+    """Fill ellipses (and an optional body polygon) into a mask of box (x0, y0, x1, y1) at ss x, cut below base."""
+    x0, y0, x1, y1 = box
+    W, H = int(x1 - x0), int(y1 - y0)
+    m = np.zeros((H * ss, W * ss), np.uint8)
+    if poly is not None:
+        pts = np.round((poly - [x0, y0]) * ss * 16).astype(np.int32)
+        cv2.fillPoly(m, [pts], 255, cv2.LINE_AA, shift=4)
+    for (x, y, rx, ry, rot) in ells:
+        cv2.ellipse(m, (int(round((x - x0) * ss * 16)), int(round((y - y0) * ss * 16))),
+                    (max(1, int(round(rx * ss * 16))), max(1, int(round(ry * ss * 16)))), rot, 0, 360, 255, -1,
+                    cv2.LINE_AA, shift=4)
+    if base_cut is not None:
+        m[int(round((base_cut - y0) * ss)):, :] = 0
+    return cv2.resize(m, (W, H), interpolation=cv2.INTER_AREA) > 127
+
+
+def cumulus(seed, cx: float, base: float, width: float, height: float, lean: float | None = None,
+            edge: bool = True):
+    """A cumulus silhouette: billows on a size ladder along a rising-and-falling skyline (the biggest near the top,
+    40-45 % of the height across; the shoulders step down in smaller ones, a different count on each side), small
+    billows on the upper arcs (level 2), the body filled under the skyline, a flat base; then the cloud spectrum's
+    small octaves displace the outline (quiet on the base) so no billow stays a compass arc.
+    Returns (outline N x 2, R)."""
+    r = seeded(seed)
+    if lean is None:
+        lean = r.uniform(0.08, 0.22) * r.choice([-1, 1])
+    # the skyline: a tall tower and a lower, wider shoulder on one side (max of two domes): the classic profile
+    side = 1 if lean >= 0 else -1
+    xs = np.linspace(cx - width * 0.42, cx + width * 0.42, 240)
+    tower_c = cx + side * width * r.uniform(0.04, 0.14); tower_w = width * r.uniform(0.26, 0.34)
+    sh_c = cx - side * width * r.uniform(0.14, 0.24); sh_w = width * r.uniform(0.30, 0.40)
+    sh_h = height * r.uniform(0.38, 0.55)
+    def dome(x, c, w, h):
+        q = np.clip(np.abs((x - c) / w), 0, 1)
+        return h * (0.5 + 0.5 * np.cos(np.pi * q)) ** 0.55      # full shoulders, but no vertical wall at the foot
+    prof = np.maximum(dome(xs, tower_c, tower_w, height * 0.66), dome(xs, sh_c, sh_w, sh_h))
+    prof = np.maximum(prof, height * 0.08 * np.clip(1 - np.abs(xs - cx) / (width * 0.42), 0, 1))
+    g = np.stack([xs, base - prof], 1)
+    top_r = height * 0.34
+
+    def r_of(u, rr):
+        i = min(int(u * (len(prof) - 1)), len(prof) - 1)
+        h = prof[i] / max(prof.max(), 1e-6)                       # bigger where the skyline is high
+        return max(top_r * (0.2 + 0.8 * h ** 1.2) * rr.uniform(0.75, 1.1), 4.0)
+
+    ells = billows(f'{seed}/b', g, r_of, inset=(0.25, 0.45), spacing=(0.55, 0.78), child=(0.32, 0.55),
+                   n_child=(0, 2), arc=(215, 325))
+    box = (cx - width, base - height * 1.6, cx + width, base + 4)
+    body = np.vstack([g, [[g[-1, 0], base], [g[0, 0], base]]])
+    m = raster_union(ells, box, base_cut=base, poly=body)
+    P = mask_outline(m) + [box[0], box[1]]
+    R = math.sqrt(m.sum() / math.pi)
+    if edge:
+        oct_ = [o for o in spectrum_for(R, 'cloud') if o[0] <= 0.5 * R]
+        quiet_base = lambda Q, N: np.where(N[:, 1] > 0.75, 0.3, 1.0)
+        P = displace(P, oct_, f'{seed}/edge', amp_at=quiet_base)
+    return P, R
+
+
+def crown_billow(seed, cx: float, cy: float, width: float, height: float, lean: float | None = None,
+                 edge: bool = True, holes: int = 3):
+    """A tree crown from clumps: an egg-shaped guide leaning to one side, leaf clumps along it on a ladder (biggest
+    on the lit upper side), a notched underside where the trunk enters, level-2 clumps, sky holes inside; then the
+    foliage spectrum's small octaves. Returns (outline N x 2, R, holes [outline])."""
+    r = seeded(seed)
+    if lean is None:
+        lean = r.uniform(0.06, 0.16) * r.choice([-1, 1])
+    n = 240
+    t = np.linspace(0, 2 * math.pi, n, endpoint=False)
+    egg = 1 + 0.12 * np.sin(t)              # fuller at the top (y up = -sin)
+    gx = cx + np.cos(t) * width * 0.36 * egg + lean * width * (1 - np.sin(t)) * 0.35
+    gy = cy - np.sin(t) * height * 0.33
+    guide = np.stack([gx, gy], 1)
+    # walk the whole loop, starting at the bottom (where the trunk enters)
+    start = int(np.argmax(gy))
+    loop = np.vstack([guide[start:], guide[:start + 1]])
+    R0 = min(width, height) * 0.24
+
+    def r_of(u, rr):
+        up = 0.5 - 0.5 * math.cos(2 * math.pi * u)           # 0 at the bottom, 1 at the top
+        return max(R0 * (0.35 + 0.65 * up) * rr.uniform(0.7, 1.15), 3.0)
+
+    def inset_of(u, rr):
+        up = 0.5 - 0.5 * math.cos(2 * math.pi * u)
+        return rr.uniform(0.62, 0.85) if up < 0.3 else rr.uniform(0.3, 0.55)
+
+    ells = billows(f'{seed}/b', loop, r_of, spacing=(0.5, 0.8), aspect=(0.68, 0.95), child=(0.3, 0.5),
+                   n_child=(0, 2), inset_of=inset_of, outward=(cx, cy))
+    # drop the clumps at the bottom centre: the underside is notched, the trunk shows
+    ells = [e for e in ells if not (e[1] > cy + height * 0.2 and abs(e[0] - cx - lean * width * 0.2) < width * 0.14)]
+    box = (cx - width, cy - height, cx + width, cy + height)
+    body = np.stack([cx + (gx - cx) * 0.8, cy + (gy - cy) * 0.8], 1)
+    m = raster_union(ells, box, poly=body)
+    m = ndi.binary_fill_holes(m)
+    P = mask_outline(m) + [box[0], box[1]]
+    R = math.sqrt(m.sum() / math.pi)
+    if edge:
+        P = displace(P, [o for o in spectrum_for(R, 'foliage') if o[0] <= 0.45 * R], f'{seed}/edge')
+    hs = []
+    inside = ndi.distance_transform_edt(m)
+    for k in range(holes):
+        for _ in range(60):
+            hx = r.uniform(0.2, 0.8) * (box[2] - box[0]); hy = r.uniform(0.2, 0.62) * (box[3] - box[1])
+            if inside[int(hy), int(hx)] > R * 0.22:
+                hr = R * r.uniform(0.035, 0.075)
+                a = np.linspace(0, 2 * math.pi, 64, endpoint=False)
+                circ = np.stack([box[0] + hx + hr * np.cos(a), box[1] + hy + hr * 0.78 * np.sin(a)], 1)
+                hs.append(displace(circ, [(hr * 1.4, hr * 0.16), (hr * 0.6, hr * 0.07)], f'{seed}/hole{k}'))
+                break
+    return P, R, hs
+
+
+def bank(seed, cx: float, base: float, length: float, height: float, edge: bool = True):
+    """A flat cloud bank (stratocumulus / a dusk deck): a long low lens, its top in low, flattened billows of varied
+    size, a flat base, the two ends dragged thin (they taper into streaks over 15-25 % of the length)."""
+    r = seeded(seed)
+    n = 200
+    t = np.linspace(0, 1, n)
+    skew = r.uniform(0.35, 0.65)
+    hgt = np.where(t < skew, (t / skew), ((1 - t) / (1 - skew))) ** 0.6
+    taper = np.clip(np.minimum(t, 1 - t) / r.uniform(0.15, 0.25), 0, 1) ** 1.5
+    top = np.stack([cx - length / 2 + t * length, base - height * hgt * (0.4 + 0.6 * taper)], 1)
+
+    def r_of(u, rr):
+        h = (min(u, 1 - u) * 2) ** 0.5
+        return max(height * 0.5 * (0.35 + 0.65 * h) * rr.uniform(0.7, 1.15), 3.0)
+
+    ells = billows(f'{seed}/b', top, r_of, inset=(0.55, 0.75), spacing=(0.6, 1.0), aspect=(0.42, 0.65), levels=1)
+    box = (cx - length * 0.6, base - height * 2.2, cx + length * 0.6, base + 4)
+    body = np.vstack([top, [[top[-1, 0], base], [top[0, 0], base]]])
+    m = raster_union(ells, box, base_cut=base, poly=body)
+    P = mask_outline(m) + [box[0], box[1]]
+    R = math.sqrt(m.sum() / math.pi)
+    if edge:
+        oct_ = [o for o in spectrum_for(R, 'cloud') if o[0] <= 0.6 * R]
+        P = displace(P, oct_, f'{seed}/edge')
+    return P, R
+
+
+def crown(seed, cx: float, cy: float, width: float, height: float, masses: int = 4, lean: float | None = None,
+          holes: int = 3):
+    """A tree crown as the references build one: 3-5 foliage MASSES on a size ladder (one main mass, medium ones at
+    different heights on the two sides, a small one poking out), each an egg of leaf clumps (crown_billow), the masses
+    overlapping 20-45 % (never kissing), the whole leaning to one side; notches where masses meet, sky holes inside.
+    Returns (coverage mask float H x W of the box, (x0, y0), outline of the union)."""
+    r = seeded(seed)
+    if lean is None:
+        lean = r.uniform(0.06, 0.15) * r.choice([-1, 1])
+    side = 1 if lean >= 0 else -1
+    sizes = size_ladder(masses, f'{seed}/m', ratio=(0.55, 0.78))
+    x0, y0 = int(cx - width), int(cy - height)
+    W, H = int(2 * width), int(2 * height)
+    cov = np.zeros((H, W), np.float32)
+    placed = []
+    for i, s in enumerate(sizes):
+        mw, mh = width * 1.15 * s, height * 1.0 * s
+        if i == 0:
+            mx, my = cx + side * width * 0.08, cy - height * 0.02
+        else:
+            for _ in range(80):
+                ang = r.uniform(math.radians(160), math.radians(380))
+                px, py, pw, ph = placed[int(r.integers(0, len(placed)))]
+                ov = r.uniform(0.2, 0.45)
+                dist = (pw + mw) * 0.36 * (1 - ov)
+                mx = px + math.cos(ang) * dist; my = py + math.sin(ang) * dist * 0.7
+                if my < cy + height * 0.25 and abs(mx - cx) < width * 0.75:
+                    break
+        placed.append((mx, my, mw, mh))
+        P, R, hs = crown_billow(f'{seed}/mass{i}', mx, my, mw, mh, lean=lean * 0.5, holes=0)
+        cov = np.maximum(cov, fill_outline(P - [x0, y0], (H, W)))
+    m = cov > 0.5
+    P = mask_outline(m) + [x0, y0]
+    R = math.sqrt(m.sum() / math.pi)
+    inside = ndi.distance_transform_edt(m)
+    for k in range(holes):
+        for _ in range(80):
+            hx = r.uniform(0.15, 0.85) * W; hy = r.uniform(0.2, 0.65) * H
+            if inside[int(hy), int(hx)] > R * 0.16:
+                hr = R * r.uniform(0.03, 0.065)
+                a = np.linspace(0, 2 * math.pi, 64, endpoint=False)
+                circ = np.stack([hx + hr * np.cos(a), hy + hr * 0.78 * np.sin(a)], 1)
+                hole = displace(circ, [(hr * 1.4, hr * 0.16), (hr * 0.6, hr * 0.07)], f'{seed}/hole{k}')
+                cov = np.minimum(cov, 1 - fill_outline(hole, (H, W)))
+                break
+    return cov, (x0, y0), P
+
+
+def hand_cut(corners: np.ndarray, seed, side_turn=(0.8, 2.2), bow=(0.003, 0.009), cuts=(1, 3), jog=(0.3, 1.0),
+             round_px=(0.6, 2.0)) -> np.ndarray:
+    """A man-made outline drawn by hand (closed polygon in, dense polyline out). Every side turns 0.8-2.2 deg about
+    its middle (signs chosen so no two sides of the shape end up parallel by accident: opposite sides differ by
+    >= 1 deg), so each corner lands 1.5-4 deg off the template; every side bows 0.3-0.9 % of its length and is cut
+    into 1-3 straight pieces whose joints jog 0.3-1 px; corners are rounded 0.6-2 px (no razor corner). Never a noise
+    wobble: on man-made things a wobble reads melted (techniques.md §3.7)."""
+    r = seeded(seed)
+    C = np.asarray(corners, float)
+    k = len(C)
+    mids = [(C[i] + C[(i + 1) % k]) / 2 for i in range(k)]
+    dirs = []
+    turns = []
+    for i in range(k):
+        d = C[(i + 1) % k] - C[i]
+        sgn = 1 if i % 2 == 0 else -1          # alternate: opposite sides of a quad turn opposite ways
+        t = math.radians(r.uniform(*side_turn)) * sgn * r.choice([1, 1, -1])
+        if i >= 2 and k == 4 and abs(t - turns[i - 2]) < math.radians(1.0):
+            t = turns[i - 2] + math.radians(1.0) * (1 if t >= turns[i - 2] else -1)
+        turns.append(t)
+        c, s = math.cos(t), math.sin(t)
+        dirs.append(np.array([d[0] * c - d[1] * s, d[0] * s + d[1] * c]))
+
+    def meet(p1, d1, p2, d2):
+        A = np.array([d1, -d2]).T
+        if abs(np.linalg.det(A)) < 1e-9:
+            return (p1 + p2) / 2
+        t = np.linalg.solve(A, p2 - p1)
+        return p1 + d1 * t[0]
+
+    N = np.array([meet(mids[i - 1], dirs[i - 1], mids[i], dirs[i]) for i in range(k)])
+    out = []
+    for i in range(k):
+        a, b = N[i], N[(i + 1) % k]
+        L = float(np.hypot(*(b - a)))
+        u = (b - a) / max(L, 1e-9); nrm = np.array([-u[1], u[0]])
+        bw = r.uniform(*bow) * L * r.choice([-1, 1])
+        nc = int(r.integers(cuts[0], cuts[1] + 1))
+        ts = np.r_[0.0, np.sort(r.uniform(0.18, 0.82, nc - 1)), 1.0]
+        offs = bw * 4 * ts * (1 - ts)
+        offs[1:-1] += r.uniform(*jog, nc - 1) * r.choice([-1, 1], nc - 1)
+        joints = [a + (b - a) * t + nrm * o for t, o in zip(ts, offs)]
+        for j in range(len(joints) - 1):
+            p, q = joints[j], joints[j + 1]
+            m_ = max(int(np.hypot(*(q - p)) / 1.0), 2)
+            for s in np.linspace(0, 1, m_, endpoint=False):
+                out.append(p + (q - p) * s)
+    P = resample_closed(np.array(out), 0.5)
+    sg = r.uniform(*round_px) * 2          # px of arc at 0.5 px spacing
+    return np.stack([ndi.gaussian_filter1d(P[:, 0], sg, mode='wrap'), ndi.gaussian_filter1d(P[:, 1], sg, mode='wrap')], 1)
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# lost-and-found edges for a raster piece
+
+
+def edge_alpha(cov: np.ndarray, seed, light=(-0.7, -0.7), found=0.45, lost=0.25, crisp_w=1.2, soft_w=(4.0, 9.0),
+               lost_w=(16.0, 28.0), teeth_px=(2.0, 6.0), teeth_dir_deg: float = 0.0, slow_px: float = 120.0,
+               broken=0.3) -> np.ndarray:
+    """Re-edge a coverage mask: along its outline, stretches are FOUND (crisp, 10-90 % ~crisp_w px: where the outline
+    faces the light), BROKEN (dry-brush teeth 2-6 px deep, >= 2 px wide, stretched along the brush direction) or LOST
+    (a 16-28 px fade: away from the light, at the base), chosen by the light and a slow noise along the outline
+    (wavelength ~slow_px) so found and lost alternate. Shares: found / lost of the outline; the rest soft or broken.
+    Returns alpha float 0-1."""
+    H, W = cov.shape
+    inside = cov > 0.5
+    din = cv2.distanceTransform(inside.astype(np.uint8), cv2.DIST_L2, 5)
+    dout = cv2.distanceTransform((~inside).astype(np.uint8), cv2.DIST_L2, 5)
+    sd = np.where(inside, din, -dout).astype(np.float32)     # + inside
+    # facing: the outward normal from the gradient of the signed distance
+    gy, gx = np.gradient(ndi.gaussian_filter(sd, 3.0))
+    nx, ny = -gx, -gy
+    nl = np.maximum(np.hypot(nx, ny), 1e-6)
+    lx, ly = light
+    ll = math.hypot(lx, ly)
+    facing = (nx * (-lx / ll) + ny * (-ly / ll)) / nl          # +1 = faces the light
+    slow = noise2d((H, W), slow_px, f'{seed}/slow', octaves=2)
+    score = 0.65 * facing + 0.55 * slow                         # high = found, low = lost
+    # thresholds by quantile along the outline band so the shares are what was asked
+    band = np.abs(sd) < 2.0
+    q_lost = np.quantile(score[band], lost) if band.any() else -1
+    q_found = np.quantile(score[band], 1 - found) if band.any() else 1
+    # width per pixel: found -> crisp, lost -> wide, between -> soft
+    t = np.clip((score - q_lost) / max(q_found - q_lost, 1e-6), 0, 1)
+    soft = soft_w[0] + (soft_w[1] - soft_w[0]) * (0.5 + 0.5 * noise2d((H, W), slow_px * 0.5, f'{seed}/sw', 1))
+    lostw = lost_w[0] + (lost_w[1] - lost_w[0]) * (0.5 + 0.5 * noise2d((H, W), slow_px * 0.5, f'{seed}/lw', 1))
+    w = np.where(score <= q_lost, lostw, np.where(score >= q_found, crisp_w, soft))
+    w = ndi.gaussian_filter(w, 4.0)
+    # dry-brush teeth in the broken stretches: anisotropic noise along the brush direction
+    th = math.radians(teeth_dir_deg)
+    tn = _aniso_noise((H, W), f'{seed}/teeth', th, along=14.0, across=2.4)
+    brk = (np.abs(t - 0.5) < broken) & (score < q_found)
+    depth = teeth_px[0] + (teeth_px[1] - teeth_px[0]) * (0.5 + 0.5 * noise2d((H, W), 40, f'{seed}/td', 1))
+    sd2 = sd + np.where(brk, np.clip(tn, -1.2, 1.2) * depth, 0.0)
+    # erf-like ramp of width w (10-90 %): alpha = Phi(sd2 / sigma), sigma = w / 2.563
+    sig = np.maximum(w / 2.563, 0.35)
+    from scipy.special import erf
+    a = 0.5 * (1 + erf(sd2 / sig / math.sqrt(2)))
+    return a.astype(np.float32)
+
+
+def _aniso_noise(shape, seed, theta: float, along: float, across: float) -> np.ndarray:
+    """Noise stretched along direction theta (teeth that follow the brush, never a random wobble)."""
+    H, W = shape
+    D = int(math.ceil(math.hypot(H, W))) + 4
+    base = noise2d((D, D), 1.0, seed, octaves=1)
+    r = seeded(seed)
+    g = r.uniform(-1, 1, (int(D / across) + 4, int(D / along) + 4)).astype(np.float32)
+    up = cv2.resize(g, (int(g.shape[1] * along), int(g.shape[0] * across)), interpolation=cv2.INTER_CUBIC)[:D, :D]
+    M = cv2.getRotationMatrix2D((D / 2, D / 2), -math.degrees(theta), 1.0)
+    rot = cv2.warpAffine(up, M, (D, D), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+    y0 = (D - H) // 2; x0 = (D - W) // 2
+    out = rot[y0:y0 + H, x0:x0 + W]
+    return out / max(float(out.std()), 1e-6)
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# placement and checks
+
+
+def place(seed, box, sizes, gap=(0.12, 0.5), overlap=(0.18, 0.4), p_overlap: float = 0.35, tries: int = 400):
+    """Place round-ish shapes of the given radii in box (x0, y0, x1, y1): each new one either OVERLAPS an existing one
+    by 18-40 % of the smaller radius or keeps a gap of >= 12 % of the smaller radius to all: never the kissing band in
+    between (a tangent). Returns [(x, y, r)]."""
+    r = seeded(seed)
+    x0, y0, x1, y1 = box
+    out = []
+    for s in sizes:
+        for _ in range(tries):
+            x = r.uniform(x0 + s, x1 - s); y = r.uniform(y0 + s, y1 - s)
+            ok = True; touching = False
+            for (px, py, ps) in out:
+                d = math.hypot(x - px, y - py) - (s + ps)        # < 0 overlap, > 0 gap
+                m = min(s, ps)
+                if -overlap[0] * m < d < gap[0] * m:              # the tangent band
+                    ok = False; break
+                if d < -overlap[1] * m:
+                    ok = False; break
+                if d <= 0:
+                    touching = True
+            if ok and (touching or not out or r.uniform() > p_overlap):
+                out.append((x, y, s)); break
+    return out
+
+
+def tangents(circles, band=(-0.15, 0.10)) -> list:
+    """Pairs whose outlines kiss: the signed gap between them within band x the smaller radius."""
+    bad = []
+    for i in range(len(circles)):
+        for j in range(i + 1, len(circles)):
+            (x1, y1, r1), (x2, y2, r2) = circles[i], circles[j]
+            d = math.hypot(x1 - x2, y1 - y2) - (r1 + r2)
+            if band[0] * min(r1, r2) < d < band[1] * min(r1, r2):
+                bad.append((i, j, round(d, 1)))
+    return bad
+
+
+def parallels(segs, ang_tol: float = 3.0, max_dist: float = 40.0, min_overlap: float = 0.5) -> list:
+    """Pairs of straight segments (x0, y0, x1, y1) within ang_tol deg of each other, closer than max_dist px and
+    overlapping by half the shorter: accidental parallels (designed ones, a window's two jambs, are allowed)."""
+    bad = []
+    for i in range(len(segs)):
+        a = np.array(segs[i], float)
+        ua = (a[2:] - a[:2]); La = np.hypot(*ua); ua = ua / max(La, 1e-9)
+        for j in range(i + 1, len(segs)):
+            b = np.array(segs[j], float)
+            ub = (b[2:] - b[:2]); Lb = np.hypot(*ub); ub = ub / max(Lb, 1e-9)
+            ang = math.degrees(math.acos(min(1.0, abs(float(ua @ ub)))))
+            if ang > ang_tol:
+                continue
+            nrm = np.array([-ua[1], ua[0]])
+            dist = abs(float(((b[:2] + b[2:]) / 2 - a[:2]) @ nrm))
+            if dist > max_dist:
+                continue
+            p = sorted([float((b[:2] - a[:2]) @ ua), float((b[2:] - a[:2]) @ ua)])
+            ov = min(La, p[1]) - max(0.0, p[0])
+            if ov >= min_overlap * min(La, Lb):
+                bad.append((i, j, round(ang, 2), round(dist, 1)))
+    return bad
+
+
+def interval_cv(xs) -> float:
+    """CV of the gaps between sorted positions (0 = evenly spaced, a picket fence; the references' rows >= 0.3)."""
+    x = np.sort(np.asarray(xs, float))
+    g = np.diff(x)
+    return float(g.std() / g.mean()) if len(g) >= 2 and g.mean() > 0 else float('nan')

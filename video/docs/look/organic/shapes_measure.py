@@ -64,10 +64,39 @@ def measure_crop(rgb: np.ndarray) -> tuple[dict, dict]:
     out['corner_angles'] = [round(float(a), 1) for a in angles]
     prof = S.edge_profiles(lab, chains, every=3.0)
     out['edge_width'] = S.lost_found(prof)
+    # clear geometry: edge samples that are straight or compass-arc AND clearly seen (a clean step of >= 12 dE whose
+    # 10-90 % width is <= 6 px): "I can see shapes and angles very clearly", as one number
+    clear_pts = None
+    if prof is not None and len(prof['x']) and geos:
+        from scipy.spatial import cKDTree
+        GP = np.concatenate([g['P'] for g in geos]); GC = np.concatenate([g['straight'] | g['arc'] for g in geos])
+        GS = np.concatenate([g['straight'] for g in geos])
+        tree = cKDTree(GP)
+        d, idx = tree.query(np.stack([prof['x'], prof['y']], 1))
+        ok = d <= 2.5
+        geo = GC[idx] & ok; stg = GS[idx] & ok
+        clear = (prof['kind'] == 0) & (np.nan_to_num(prof['width'], nan=99) <= 6.0) & (prof['step'] >= 12.0)
+        n = len(clear)
+        out['clear'] = {'share': float(clear.mean()), 'geometric_share': float((clear & geo).mean()),
+                        'straight_share': float((clear & stg).mean()),
+                        'geometric_density': float((clear & geo).sum() * 3.0 / (W * H) * 1e4),
+                        'clear_density': float(clear.sum() * 3.0 / (W * H) * 1e4),
+                        'of_geometric_clear': float((clear & geo).sum() / max(geo.sum(), 1))}
+        # per geometry point: is the nearest profile sample clear? (for the overlay's line weight)
+        ptree = cKDTree(np.stack([prof['x'], prof['y']], 1))
+        dd, pi_ = ptree.query(GP)
+        clear_pts = clear[pi_] & (dd <= 3.0)
+    else:
+        out['clear'] = {}
     # ---------------- masses (sigma 3): found and lost along the big shapes' boundaries
     mchains, _ = S.edge_chains(lab, sigma=3.0, high=0.75, low=0.4, min_len=24)
     mprof = S.edge_profiles(lab, mchains, every=3.0, reach=24.0, side=10.0)
     out['mass_edges'] = S.lost_found(mprof)
+    mgeos = [S.curve_geometry(c['pts'], c['closed']) for c in mchains]
+    mgeos = [g for g in mgeos if g is not None]
+    mtot, mang = S.geometry_totals(mgeos)
+    out['mass_geometry'] = mtot
+    out['mass_corner_angles'] = [round(float(a), 1) for a in mang]
     out['mass_edge_len'] = float(sum(len(S.resample(c['pts'], c['closed'], 1.0)) for c in mchains))
     # ---------------- regions: the visible shapes
     labels = S.segment(lab)
@@ -108,7 +137,7 @@ def measure_crop(rgb: np.ndarray) -> tuple[dict, dict]:
         out['roughness'][cls] = {'n': len(L), 'req_median': float(np.median(R)),
                                  'band_rms_px': [None if not np.isfinite(v) else round(float(v), 3) for v in np.nanmedian(A, 0)],
                                  'band_rms_rel': [None if not np.isfinite(v) else round(float(v), 4) for v in np.nanmedian(A / R[:, None], 0)]}
-    draw = {'geos': geos, 'labels': labels, 'mprof': mprof}
+    draw = {'geos': geos, 'mgeos': mgeos, 'labels': labels, 'mprof': mprof, 'clear_pts': clear_pts}
     return out, draw
 
 
@@ -118,17 +147,21 @@ def overlay(rgb: np.ndarray, draw: dict, scale: int = 2) -> np.ndarray:
     g = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY).astype(np.float32)
     base = (g[..., None] * 0.35 + 255 * 0.65).clip(0, 255).astype(np.uint8).repeat(3, 2)
     big = cv2.resize(base, (W * scale, H * scale), interpolation=cv2.INTER_CUBIC)
+    cp = draw.get('clear_pts')
+    off = 0
     for gg in draw['geos']:
         P = gg['P'] * scale
         cls = np.where(gg['straight'], 0, np.where(gg['arc'], 1, 2))
         cols = [COL_STRAIGHT, COL_ARC, COL_FREE]
         n = len(P)
+        clr = cp[off:off + n] if cp is not None else np.ones(n, bool)
+        off += n
         idx = range(n) if gg['closed'] else range(n - 1)
         for i in idx:
             j = (i + 1) % n
             c = cols[cls[i]]
             cv2.line(big, (int(round(P[i, 0])), int(round(P[i, 1]))), (int(round(P[j, 0])), int(round(P[j, 1]))), c,
-                     2, cv2.LINE_AA)
+                     3 if clr[i] else 1, cv2.LINE_AA)
         for (x, y, a) in gg['corners']:
             col = COL_RIGHT if 83 <= a <= 97 else COL_CORNER
             cv2.circle(big, (int(round(x * scale)), int(round(y * scale))), 4, col, -1, cv2.LINE_AA)
@@ -175,8 +208,9 @@ def main():
         e = m['edges']; w = m['edge_width']; me = m['mass_edges']
         print(f"{cid:16s} {elem:8s} str {e['straight']:.2f} long {e['long']:.2f} arc {e['arc']:.2f} free {e['free']:.2f} "
               f"axis {e['axis']:.2f} c/100 {e['corners_per_100px']:.2f} rt {e['right_angle']:.2f} par {e['parallel']:.2f} "
-              f"| w50 {w.get('median_width', float('nan')):.1f} crisp {w.get('crisp', float('nan')):.2f} "
-              f"| mass crisp {me.get('crisp', float('nan')):.2f} lost {me.get('lost', float('nan')):.2f} "
+              f"| w50 {w.get('median_width', float('nan')):.1f} crisp {w.get('crisp_of_clean', float('nan')):.2f} busy {w.get('busy', float('nan')):.2f} "
+              f"| mass crisp {me.get('crisp_of_clean', float('nan')):.2f} lost {me.get('lost_of_clean', float('nan')):.2f} "
+              f"mstr {m['mass_geometry']['straight']:.2f} marc {m['mass_geometry']['arc']:.2f} "
               f"| sym {m['symmetry']['median']:.2f} rep {m['repetition']['median_sim']:.2f}/{m['repetition']['twins']:.2f} "
               f"sp {m['spacing_cv']:.2f} ladder {m['sizes'].get('ladder', float('nan')):.2f} D {m['divider_D']:.3f} "
               f"({time.time() - t0:.1f}s)", flush=True)

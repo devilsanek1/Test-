@@ -346,7 +346,7 @@ export function surf(secs: Sec[], y: number, phi: number, v: View, xf: Xf = ID, 
   const w0 = secPt(s, phi - 2);
   const tang = sub3(w1, w0);
   const up: V3 = [0, 1, 0];
-  const nrm = norm3(cross3(tang, up));
+  const nrm = norm3(cross3(up, tang));
   if (push) w = add3(w, mul3(nrm, push));
   const W = xf(w);
   const Wn = xf(add3(w, mul3(nrm, 10)));
@@ -505,3 +505,42 @@ export const hash = (n: number) => {
   const s = Math.sin(n * 127.1 + 311.7) * 43758.5453;
   return s - Math.floor(s);
 };
+
+/** A region on a loft's surface: rows y0..y1, a phi interval per row; its visible part's screen outline. */
+export function region(secs: Sec[], v: View, y0: number, y1: number, phiAt: (y: number) => [number, number], xf: Xf = ID, push = 0, rows = 10, visOnly = true): PP[] | null {
+  const left: PP[] = [];
+  const right: PP[] = [];
+  for (let i = 0; i <= rows; i++) {
+    const y = lerp(y0, y1, i / rows);
+    const [a0, a1] = phiAt(y);
+    const m = 12;
+    const seg: {p: V2; vis: boolean}[] = [];
+    for (let j = 0; j <= m; j++) {
+      const s = surf(secs, y, lerp(a0, a1, j / m), v, xf, push);
+      seg.push({p: s.p, vis: s.vis});
+    }
+    const vs = visOnly ? seg.filter((q) => q.vis) : seg;
+    if (vs.length < 2) continue;
+    let li = 0;
+    let ri = 0;
+    vs.forEach((q, k) => {
+      if (q.p[0] < vs[li].p[0]) li = k;
+      if (q.p[0] > vs[ri].p[0]) ri = k;
+    });
+    left.push(vs[li].p);
+    right.push(vs[ri].p);
+  }
+  if (left.length < 2) return null;
+  return [...left, ...right.reverse()];
+}
+/** The screen x-extent of a loft's ring at height y (for clamping hidden edges). */
+export function ringExtent(secs: Sec[], y: number, v: View, xf: Xf = ID): [number, number] {
+  let lo = Infinity;
+  let hi = -Infinity;
+  for (let a = 0; a < 360; a += 7.5) {
+    const s = surf(secs, y, a, v, xf);
+    lo = Math.min(lo, s.p[0]);
+    hi = Math.max(hi, s.p[0]);
+  }
+  return [lo, hi];
+}
