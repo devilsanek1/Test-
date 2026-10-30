@@ -38,7 +38,7 @@ the golden box of the visible stage x 436-644 / y 951-1168, the focal's default 
 - **1**: one source (one study, one report, one correlational platform figure).
 
 "(summary)" marks a number read only from a secondary summary of the paper; "(recalled)" a number we know but could not
-reach from this session; "est." our own estimate. Sources [AT1]-[AT61] are in §10.
+reach from this session; "est." our own estimate. Sources [AT1]-[AT62] are in §10.
 
 ## 0. Bottom line
 
@@ -76,8 +76,8 @@ reach from this session; "est." our own estimate. Sources [AT1]-[AT61] are in §
    (a face looking out) off the screen; a body still pulls. So a person is the subject or stays tier B (soft, small,
    steady), and the "you" is turned so its own pull routes into the focal (COMPOSITION_SHOTS rule 7).
 6. **The first second after a swipe, in numbers** (§4): the page settles at ~0.4 s (measured, `vertical.md` §4); the
-   gist of a scene comes from 19-67 ms of looking [AT1]; the first saccade leaves ~0.2 s later, aimed by the centre and
-   by salience; the subject and the first caption line are read by ~1-1.2 s; the stay-or-swipe decision falls at
+   gist of a scene comes from 19-67 ms of looking [AT1]; the first saccade follows ~0.15-0.3 s after the picture is
+   there, aimed by the centre and by salience; the subject and the first caption line are read by ~1-1.2 s; the stay-or-swipe decision falls at
    ~1.5-2 s (1.7 s per mobile feed item [V4]; ~1.5-2 s of active attention on fast feeds [AT55]). So the subject's bold
    onset peaks at 0.4-0.7 s in the golden box with its sound, the subject changes again at ~1.2-1.7 s (rewarding the
    eye's return from the caption), and reality overtakes the expectation at ~2 s (DIRECTION rule 9).
@@ -102,10 +102,10 @@ reach from this session; "est." our own estimate. Sources [AT1]-[AT61] are in §
    story event every ~1.5-3 s from the subject's own build, a join every >= 3.5 s on average (DIRECTION rule 1); never
    an interrupt for its own sake.
 10. **Past the hook, engagement is emotional.** Surprise concentrates attention and joy keeps viewers from clicking
-    away (eye tracking and face reading in 250 ms steps on 28 ads [AT47]); awe, a high-arousal positive feeling, is the
-    most shared emotion in news articles [AT48]; curiosity buys attention and memory for the answer [AT60]. Our hook
-    (the expected thing, then reality overtaking it) is the surprise; the warm world holds; the one scale moment is the
-    awe.
+    away (eye tracking and face reading in 250 ms steps on 28 ads [AT47]); content that evokes awe, a high-arousal
+    positive feeling, is shared more, and sad content less [AT48]; curiosity buys attention and memory for the answer
+    [AT60]. Our hook (the expected thing, then reality overtaking it) is the surprise; the warm world holds; the one
+    scale moment is the awe.
 11. **The owner's 41 ideas, scored for attention** (§7): the strongest (5 of 5) are the lit opening with the figure in
     it (C1 with E2), the figure where the lines meet (E1), the pattern with one break (D7) and the camera holding while
     the subject travels the line (E9): each stacks two or more proven levers on one point. Nine more score 4. The
@@ -116,7 +116,7 @@ reach from this session; "est." our own estimate. Sources [AT1]-[AT61] are in §
 ## 1. Method
 
 - **Sources.** Web searches on 2026-10-30 of journals, research repositories, platforms' help and business pages and
-  industry reports: 61 sources in §10. Page fetches were blocked from this session for `sciencedaily.com` and
+  industry reports: 62 sources in §10. Page fetches were blocked from this session for `sciencedaily.com` and
   `pmc.ncbi.nlm.nih.gov` (their hosts are outside the allowed network), so every source was read through search-engine
   summaries of its abstract, repository record, publisher page or press release. Where a number came only from a
   secondary summary it is marked "(summary)"; check it in the paper before it becomes a rule.
@@ -171,9 +171,9 @@ our frame in numbers; the distilled rules are §6.
 
 | # | lever | what the evidence says | grade, size | in our frame |
 |---|---|---|---|---|
-| **L1** | **Motion onset**: a start, an entry, a pop, a growth toward us; animate motion | motion onset captures attention, and a target that starts moving is found regardless of how many distractors there are; ongoing motion and motion stopping do not capture [AT10]; looming and translating capture, receding does not [AT11] (contested: onset may explain both); self-propelled, direction-changing motion captures more than mechanical motion [AT14]; right after a scene onset dynamic features predict saccades up to 3.6x better than static ones [AT12]; flicker and motion predict the moments when every viewer looks at the same place [AT13]; with one point of motion, all viewers look at it [S9] | S+, large | the beat's one onset is the subject's change, started inside the golden box (x 436-644, y 951-1168) 0.1-0.4 s after the cut or the settle; tier A enters by drawing on, growing or popping (looming); B and C enter only by drifting in at constant speed from an edge or from behind a mass, >= 370 px (5 degrees) from the focal, never within 0.5 s of A's onset; exits shrink or slide out (they do not capture) |
+| **L1** | **Motion onset**: a start, an entry, a pop, a growth toward us; animate motion | motion onset captures attention, and a target that starts moving is found regardless of how many distractors there are; ongoing motion and motion stopping do not capture [AT10]; looming and translating capture, receding does not [AT11] (contested: onset may explain both); self-propelled, direction-changing motion captures more than mechanical motion [AT14]; right after a scene onset dynamic features predict saccades up to 3.6x better than static ones [AT12]; flicker and motion predict the moments when every viewer looks at the same place [AT13]; with one point of motion, all viewers look at it [S9] | S+, large | the beat's one onset is the subject's change, started inside the golden box (x 436-644, y 951-1168) within ~0.1-0.4 s of a cut (in the opening, peaking at 0.4-0.7 s, once the page has settled); tier A enters by drawing on, growing or popping (looming); B and C enter only by drifting in at constant speed from an edge or from behind a mass, >= 370 px (5 degrees) from the focal, never within 0.5 s of A's onset; exits shrink or slide out (they do not capture) |
 | **L2** | **Words** | faces and text draw 16.6x and 11.1x the fixations of size- and position-matched regions, even when looking costs the viewer [AT16]; text beats regions matched for salience too, is fixated sooner, and upside-down or unknown-script text pulls about as much [AT17]; attention to text grows in proportion to its surface size [AT27]; subtitles are read automatically, ~30 % of viewing time [AT21], [V9]; a text onset triggers an orienting response, like a cut [AT46] | S+, large | words only in the band and in the one number or label per shot (>= 56 px: LAYOUT §3); nothing letter-like elsewhere (signs, screens, posters, book spines as flat colour or tone-on-tone marks, no rows of glyphs), never within 370 px of the focal; the caption page's change is an onset, so the picture's event leads its word by 0.1-0.3 s |
-| **L3** | **People and animals** (faces > bodies > animals > things) | saccades to faces from 100-110 ms [AT4]; faces 16.6x [AT16]; human silhouettes and hands are noticed when nothing is expected [AT18], upright ones more than inverted ones with identical pixels (13,539 people, a preprint) [AT18]; added people and animals missed 11 % of the time, added objects 34 % [AT19]; body and head orientation steer where viewers think a person looks [AT20] | S+, large | a person is the subject or stays tier B (soft, small, steady: `CRAFT.md` §b); the "you" (130-220 px) at one side, turned so its head and shoulders point into the focal's box; strangers >= 220 px from the subject's silhouette and out of the drop; birds fly straight at an even speed (no flap bursts or turns) away from the focal; a face (the LASH contour) only on a person who is the beat's subject |
+| **L3** | **People and animals** (faces > bodies > animals > things) | saccades to faces from 100-110 ms [AT4]; faces 16.6x [AT16]; human silhouettes and hands are noticed when nothing is expected [AT18], upright ones more than inverted ones with identical pixels (13,539 people, a preprint) [AT18]; added people and animals missed 11 % of the time, added objects 34 % [AT19]; body and head orientation steer where viewers think a person looks [AT20] | S+, large | a person is the subject or stays tier B (soft, small, steady: `CRAFT.md` §b); the "you" (130-220 px) at one side, turned so its head and shoulders point into the focal's box; strangers >= 220 px from the subject's silhouette and out of the drop; birds fly straight at an even speed (no flap bursts or turns) away from the focal; a face with its features (the LASH lashes, drawn only on figures over ~200 px) only on a person who is the beat's subject |
 | **L4** | **The screen centre**, re-found at every cut | the first look goes to the screen centre, whatever the picture [S7]; centre bias follows the content's own centring and a reorienting strategy at every scene onset (17 viewers, 40 clips of unrelated cut scenes) [AT15]; in vertical video a centred subject gave longer fixations and fewer saccades than a moving one [V5] | S+, large for the first fixation | the focal within ~150 px (2 degrees) of the visible centre (540, 960) after every cut, by default x 410-670, y 950-1050 (COMPOSITION_SHOTS rule 3); a focal farther out costs an extra saccade (~0.2-0.3 s) unless an onset marks it |
 | **L5** | **Value contrast and the brightest area** (early salience) | the earliest saccades go to the higher-contrast half of a scene, later ones spread evenly [AT6]; salience predicts the first fixations best [AT5]; local contrast in luminance, colour and orientation builds the salience map [AT8]; in the owner's reels a brighter patch off the subject won the strongest value call in 12 of 20 one-subject examples (`reels.md` §0, §6) | S+, medium-large early, small after ~0.5 s | the hardest value step and the brightest area below the band on the subject (a step >= 65 L*, no other light within 10 L*: COMPOSITION_SHOTS rule 4); no skylit gap, white prop or highlight in the stage brighter than the focal's light |
 | **L6** | **One unique thing in a uniform field** (the singleton) and the cost of clutter | search gets harder as the target resembles the rest, easier as the rest resemble each other [AT22]; a salient colour singleton captures attention even when irrelevant (15-25 ms slower search; how far depends on what the viewer is looking for) [AT23]; clutter predicts search time and eye movements [AT24]; dense perceptual features cut attention to the key element and liking of the ad, an elaborate design of objects raises both (249 ads) [AT26]; feelings on smaller faces are read more slowly, more so in clutter, and 24 films (1940-2010) hold such shots longer [AT28]; neighbours within ~half the eccentricity crowd an object out of recognition [AT25] | S+, large | the subject differs from its field in >= 2 channels (value, colour, motion, edge sharpness); its field within ~370 px is tone-on-tone (+-4-6 L*, dE <= 6-8) with one hot accent only, at the focal; a clear ring of ~150-220 px around the subject's silhouette: no other named object or crisp detail (low-contrast texture inside a mass may come closer) |
@@ -184,7 +184,7 @@ our frame in numbers; the distilled rules are §6.
 | **L11** | **Pointers that converge**: the vanishing point, sightlines, leading lines | fixations gather at a scene's vanishing point beyond what salience predicts (AUC 0.85 with it against 0.80 without; search faster and more accurate in the vanishing point's cell) [AT29]; body and head orientation steer attention [AT20]; a figure's gaze sends attention along its sightline [S9]; leading lines raised attention to key elements when a prominent subject was there (34 viewers) [AT30]; but the eye does not travel along composition lines: it jumps between key elements [AT31] | S (vanishing point, gaze), 1 (lines); medium | the vanishing point within 60 px of the subject or hidden behind it; lines end at the focal (they mark the place, they do not carry the eye); the "you" and any figure near the story face the subject |
 | **L12** | **Selective detail**: found edges where the eye should go | portraits with fine detail only around the eyes: the gaze reached the eyes sooner, stayed longer and moved more calmly, and viewers preferred them to evenly detailed ones [AT33]; gaze is drawn to and held by finer detail [AT33] | S (small studies), medium | the finest marks and the crisp found edges within ~150-300 px of the focal; lost edges and coarser marks elsewhere (DIRECTION rule 4; `CRAFT.md` §b: A's small-feature coverage >= 2.5x C's) |
 | **L13** | **The light as the cue** (signaling) | cues: median d ≈ 0.41 / 0.46 [AT34]; a spotlight cue in an animation improved comprehension and transfer, also for the parts it did not cue [AT36]; cues inside the animation's own flow (a spreading colour) beat arrows, when they come with the relevant event's onset [AT37] | S+, small-medium | the story light's pool on the subject, its surround 10-20 L* lower; when the beat changes, the light changes with the event (a lamp comes on with the action); no arrows, rings or pointing labels |
-| **L14** | **Emotion**: surprise, joy, awe, curiosity | surprise concentrates attention and joy holds viewers (fewer click-aways); alternating peaks beat sustained joy (28 ads, 250 ms steps) [AT47]; high-arousal positive content (awe) is shared most [AT48]; saturation drives arousal and brightness pleasure (arousal = 0.60 S - 0.31 B) [AT49]; curiosity raises effort and memory for the answer [AT60] | S, medium | the hook's surprise at ~2 s; small joys in the life (a window lighting, steam); the one scale moment (awe) once; saturation spent only at the focal (one hot accent) |
+| **L14** | **Emotion**: surprise, joy, awe, curiosity | surprise concentrates attention and joy holds viewers (fewer click-aways); alternating peaks beat sustained joy (28 ads, 250 ms steps) [AT47]; high-arousal content is shared more, awe the positive case, sadness less [AT48]; saturation drives arousal and brightness pleasure (arousal = 0.60 S - 0.31 B) [AT49]; curiosity raises effort and memory for the answer [AT60] | S, medium | the hook's surprise at ~2 s; small joys in the life (a window lighting, steam); the one scale moment (awe) once; saturation spent only at the focal (one hot accent) |
 | **L15** | **Pacing**: the event rate | more camera changes inside one scene raised arousal and memory from slow to very fast rates [AT46]; fast pace plus arousing content overloads viewers, and memory drops [AT46]; cuts and text onsets trigger involuntary orienting [AT46]; a tightly made film synchronises viewers [AT43], [AT44]; Hollywood's shots got shorter and fuller of motion over 75 years, read by their measurers as more control of attention [AT45]; short-form practice: a refresh every ~2-5 s [AT58] | S (television era) + P, medium | caption pages ~1.1-1.5 s; a story event every ~1.5-3 s from the subject's own build; joins average >= 3.5 s; the hook's arousing beat never stacked with fast cuts |
 
 **What modern film teaches about attention (ours).** The trend the owner calls "super modern cinematography" is,
@@ -313,7 +313,7 @@ already in force says so; the rest are new.
 | AR5 | **The subject owns the onsets.** In each beat only the subject (or the thread object it hands on) starts, enters, pops, grows or turns, first inside the golden box (x 436-644, y 951-1168); tiers B and C move at a constant speed or not at all, and enter only from an edge or from behind a mass, >= 370 px from the focal and never within 0.5 s of A's onset | L1; [AT10], [AT11], [AT14] (S+) | `CRAFT.md` §b (B: "no pops", in force); `G3_ANIMATIC.md` §4; `LIFE_AND_DENSITY.md` §5 |
 | AR6 | **Persistent changes, spaced events.** Every story change leaves its new state on screen >= 0.5 s (better >= 1 s); transient events the viewer must catch start >= 0.5 s apart; the pieces of one build (one object drawing on) count as one event | [AT40] (S+); L15 | `G3_ANIMATIC.md` §4; `CINEMATIC_GUIDE.md` "The opening" (§9 row 1) |
 | AR7 | **Words only where they are read.** The band, plus one number or label per shot at >= 56 px; nothing letter-like anywhere else (signs, screens, posters and books as flat colour or tone-on-tone marks with no glyph rows), never within 370 px of the focal; the picture's event leads its caption page by 0.1-0.3 s, never trails it | L2, L7; [AT16], [AT17], [AT34] (S+) | `LAYOUT.md` §1, §3 (words); DIRECTION rules 8, 10 |
-| AR8 | **People and animals are magnets: give each one a job.** A person is the subject or tier B; the "you" turns its head and shoulders into the focal's box; strangers stay >= 220 px from the subject's silhouette and out of the drop; birds and Pip move evenly, with no animate turns or flap bursts within 370 px of the focal; a face shows only on the beat's subject | L3, L11; [AT18]-[AT20] (S+) | `LAYOUT.md` §3 (people); DIRECTION rules 2-3; `PEOPLE_DESIGN.md` |
+| AR8 | **People and animals are magnets: give each one a job.** A person is the subject or tier B; the "you" turns its head and shoulders into the focal's box; strangers stay >= 220 px from the subject's silhouette and out of the drop; birds and Pip move evenly, with no animate turns or flap bursts within 370 px of the focal; a face with its features (figures over ~200 px) only on the beat's subject | L3, L11; [AT18]-[AT20] (S+) | `LAYOUT.md` §3 (people); DIRECTION rules 2-3; `PEOPLE_DESIGN.md` |
 | AR9 | **Pointers converge on the subject.** The vanishing point within 60 px of the subject or behind it; every leading line ends within 40 px of the focal's box; sightlines cross it | L11; [AT29] (S), [AT30] (1) | COMPOSITION_SHOTS rules 7-8 (in force as proposals there) |
 | AR10 | **Detail where the eye goes.** The finest marks and the crisp found edges within ~150-300 px of the focal; lost edges and coarser marks elsewhere | L12; [AT33] (S) | DIRECTION rule 4 (in force); `CRAFT.md` §b, §e |
 | AR11 | **The light is the cue, and it moves with the event.** The story light's pool on the subject with its surround 10-20 L* lower; a light change starts with the event it marks; no arrows, rings or pointing labels | L13; [AT36], [AT37] (S+) | DIRECTION rule 5; `CRAFT.md` §d |
@@ -364,7 +364,7 @@ must carry the eye instead: the light, the onset and the singleton (L1, L5, L6).
 | C2 | Foreground | near layers are big and high in contrast by nature: salience off the subject; the reels quiet them with blur, we with low contrast (`reels.md` E5) | against when busy [AT26] | **1** | a hint at the edges, inside the near shade mass (R6) |
 | C3 | Level change | two levels are two places: attention splits unless one is quiet | S, indirect [AT22] | **2** | the subject on one level, the other level tone-on-tone life |
 | D1 | Negative space | the subject becomes the singleton of a uniform field: the least clutter [AT22], [AT24] | S+ | **4** | the field patterned but quiet (R5), the subject small at its foot, no other call within 370 px |
-| D2 | Scale | a person (a magnet [AT18]) against a huge thing; awe, the most shared emotion [AT48] | S | **4** | the figure 150-220 px on the axis, the structure past the top edge; once or twice a film |
+| D2 | Scale | a person (a magnet [AT18]) against a huge thing; awe, which raises sharing [AT48] | S | **4** | the figure 150-220 px on the axis, the structure past the top edge; once or twice a film |
 | D3 | Balance | two equal masses are two equal calls: the first saccade splits | S, against [AT22], [AT23] | **1** | only as the frame of a centred subject |
 | D4 | Unbalanced (the steelyard) | one strong call and one big soft mass: one singleton | S, indirect | **3** | the counterweight soft, high or on the left (R8, V11) |
 | D5 | Pyramid | a convergence at the apex; stable | none | **2** | the apex under the band, lit |
@@ -461,3 +461,242 @@ column is where each belongs.
 9. **Not a clash, a missing number:** no doc says how far apart two calls must sit to stay two calls rather than one
    texture. Crowding gives one (§2: ~0.5 x the distance from where the eye rests). **Proposal:** use it in R3's call
    count (`organic/composition.md`) as the merge distance for small pieces.
+
+## 10. Sources (methods and findings only; no picture copied)
+
+Read through search summaries (page fetches to `sciencedaily.com` and `pmc.ncbi.nlm.nih.gov` were blocked from this
+session). "(summary)" marks a source whose numbers we saw only in a secondary summary.
+
+**Scene gist and the time course of looking**
+- **[AT1]** M. R. Greene and A. Oliva (2009), "The briefest of glances: the time course of natural scene
+  understanding", *Psychological Science* 20(4), 464-472, doi:10.1111/j.1467-9280.2009.02316.x.
+  [MIT DSpace](https://dspace.mit.edu/handle/1721.1/54623).
+- **[AT2]** M. C. Potter, B. Wyble, C. E. Hagmann and E. S. McCourt (2014), "Detecting meaning in RSVP at 13 ms per
+  picture", *Attention, Perception, & Psychophysics* 76(2), 270-279, doi:10.3758/s13414-013-0605-z.
+  [PubMed 24374558](https://pubmed.ncbi.nlm.nih.gov/24374558/).
+- **[AT3]** A. M. Larson and L. C. Loschky (2009), "The contributions of central versus peripheral vision to scene gist
+  recognition", *Journal of Vision* 9(10):6.
+  [K-State PDF](https://www.k-state.edu/psych/vcl/documents/Larson_Loschky_2009_Contributions%20of%20central%20vs%20peripheral%20vision.pdf).
+- **[AT4]** S. M. Crouzet, H. Kirchner and S. J. Thorpe (2010), "Fast saccades toward faces: face detection in just 100
+  ms", *Journal of Vision* 10(4):16, doi:10.1167/10.4.16. [HAL](https://hal-univ-tlse3.archives-ouvertes.fr/hal-00477618v1).
+- **[AT5]** D. Parkhurst, K. Law and E. Niebur (2002), "Modeling the role of salience in the allocation of overt visual
+  attention", *Vision Research* 42(1), 107-123 (summary).
+  [BibBase record](https://bibbase.org/network/publication/parkhurst-law-niebur-modellingtheroleofsalienceintheallocationofvisualselectiveattention-2002).
+- **[AT6]** N. C. Anderson, E. Ort, W. Kruijne, M. Meeter and M. Donk (2015), "It depends on when you look at it:
+  salience influences eye movements in natural scene viewing and search early in time", *Journal of Vision* 15(5):9,
+  doi:10.1167/15.5.9.
+  [VU Amsterdam](https://research.vu.nl/en/publications/it-depends-on-when-you-look-at-it-salience-influences-eye-movemen/).
+- **[AT7]** J. M. Henderson and T. R. Hayes (2017), "Meaning-based guidance of attention in scenes as revealed by
+  meaning maps", *Nature Human Behaviour* 1(10), 743-747, doi:10.1038/s41562-017-0208-0.
+  [RePEc](https://ideas.repec.org/a/nat/nathum/v1y2017i10d10.1038_s41562-017-0208-0.html).
+- **[AT8]** L. Itti and C. Koch (2001), "Computational modelling of visual attention", *Nature Reviews Neuroscience*
+  2(3), 194-203, doi:10.1038/35058500 ([iLab](https://ilab.usc.edu/publications/Itti_Koch01nrn.html)); the feature
+  channels (intensity, colour, orientation) in Itti and Koch (2001), *Journal of Electronic Imaging* 10(1), 161-169.
+- **[AT9]** K. Rayner (2009), "Eye movements and attention in reading, scene perception, and visual search", *Quarterly
+  Journal of Experimental Psychology* 62, 1457-1506, doi:10.1080/17470210902816461 (its fixation and saccade figures
+  recalled); K. Rayner, T. J. Smith, G. L. Malcolm and J. M. Henderson (2009), "Eye movements and visual encoding during
+  scene perception", *Psychological Science* 20.
+  [UEA](https://research-portal.uea.ac.uk/en/publications/eye-movements-and-visual-encoding-during-scene-perception/).
+
+**Motion and the centre**
+- **[AT10]** R. A. Abrams and S. E. Christ (2003), "Motion onset captures attention", *Psychological Science* 14(5),
+  427-432, doi:10.1111/1467-9280.01458 ([PubMed 12930472](https://pubmed.ncbi.nlm.nih.gov/12930472/)); with R. M. Guo,
+  R. A. Abrams, M. Moscovitch and J. Pratt (2010), "Isoluminant motion onset captures attention", *Attention,
+  Perception, & Psychophysics* 72(5) ([WashU](https://profiles.wustl.edu/en/publications/isoluminant-motion-onset-captures-attention/)).
+- **[AT11]** S. L. Franconeri and D. J. Simons (2003), "Moving and looming stimuli capture attention", *Perception &
+  Psychophysics* 65(7), 999-1010
+  ([PDF](https://visualcognition.psych.northwestern.edu/publications/FranconeriSimons_Motion.pdf)); the receding result
+  contested by Abrams and Christ (2005) (summary).
+- **[AT12]** R. Carmi and L. Itti (2006), "Visual causes versus correlates of attentional selection in dynamic scenes",
+  *Vision Research* 46(26), 4333-4345 ([iLab](https://ilab.usc.edu/publications/Carmi_Itti06vr.html)); and "Causal
+  saliency effects during natural vision", ETRA 2006 (dynamic models up to 3.6x more predictive than static ones)
+  ([iLab](https://ilab.usc.edu/publications/Carmi_Itti06etra.html)).
+- **[AT13]** P. K. Mital, T. J. Smith, R. L. Hill and J. M. Henderson (2011), "Clustering of gaze during dynamic scene
+  viewing is predicted by motion", *Cognitive Computation* 3, 5-24, doi:10.1007/s12559-010-9074-z.
+  [Edinburgh PDF](https://homepages.inf.ed.ac.uk/rhill2/pubs/Mital_%282011%29_Clustering_of_gaze_during_dynamic_scene_viewing.pdf).
+- **[AT14]** J. Pratt, P. V. Radulescu, R. M. Guo and R. A. Abrams (2010), "It's alive! Animate motion captures visual
+  attention", *Psychological Science* 21(11), 1724-1730, doi:10.1177/0956797610387440.
+  [PubMed 20974713](https://pubmed.ncbi.nlm.nih.gov/20974713/).
+- **[AT15]** P.-H. Tseng, R. Carmi, I. G. M. Cameron, D. P. Munoz and L. Itti (2009), "Quantifying center bias of
+  observers in free viewing of dynamic natural scenes", *Journal of Vision* 9(7):4, doi:10.1167/9.7.4.
+  [iLab](https://ilab.usc.edu/publications/Tseng_etal09jov.html).
+
+**Faces, bodies, animals, words**
+- **[AT16]** M. Cerf, E. P. Frady and C. Koch (2009), "Faces and text attract gaze independent of the task: experimental
+  data and computer model", *Journal of Vision* 9(12):10, doi:10.1167/9.12.10.
+  [Caltech](https://resolver.caltech.edu/CaltechAUTHORS:20130816-103355264).
+- **[AT17]** H.-C. Wang and M. Pomplun (2012), "The attraction of visual attention to texts in real-world scenes",
+  *Journal of Vision* 12(6):26, doi:10.1167/12.6.26. [UMass Boston PDF](https://www.cs.umb.edu/~marc/pubs/wang_pomplun_jov2012.pdf).
+- **[AT18]** P. E. Downing, D. Bray, J. Rogers and C. Childs (2004), "Bodies capture attention when nothing is
+  expected", *Cognition* 93(1), B27-B38, doi:10.1016/j.cognition.2003.10.010
+  ([Bangor](https://research.bangor.ac.uk/portal/en/researchoutputs/bodies-capture-attention-when-nothing-is-expected%28e6b7e5a8-1e6f-4660-a897-de07f476fd95%29.html));
+  M. Gandolfo and M. V. Peelen (2025), "A body detection inversion effect revealed by a large-scale inattentional
+  blindness experiment", bioRxiv preprint, 13,539 participants
+  ([record](https://harvester.ues.edu.sv/vufind/ProQuestFSGRecord/3171518484/Details)) (summary; not yet peer reviewed).
+- **[AT19]** J. New, L. Cosmides and J. Tooby (2007), "Category-specific attention for animals reflects ancestral
+  priorities, not expertise", *PNAS* 104(42), 16598-16603
+  ([PDF](https://cep.ucsb.edu/wp-content/uploads/2023/05/NewCosmidesTooby2007_wSI.pdf)); the 11 % / 34 % figures from
+  A. Öhman's commentary in the same issue, the minivan and elephant figures (summary).
+- **[AT20]** Head and body orientation as attention cues: J. K. Hietanen (2002) and later work, as summarised in a 2015
+  *Frontiers in Psychology* study of body orientation, doi:10.3389/fpsyg.2015.00909
+  ([PDF](https://www.frontiersin.org/articles/10.3389/fpsyg.2015.00909/pdf)) (summary). No study of figures seen from
+  behind was found.
+- **[AT21]** Time spent reading subtitles: d'Ydewalle's studies (~30 % of a subtitle's display time in the subtitle
+  area) and a later 26 % against 41 % (with a caveat about control groups), as summarised from the subtitle
+  eye-tracking literature ([UCL PDF](https://discovery.ucl.ac.uk/10054421/3/Szarkowska_Two%20or%20three%20lines_a%20mixed-methods%20study%20on%20subtitle%20processing%20and%20preferences_plain_FINAL.pdf),
+  [John Benjamins](https://www.jbe-platform.com/content/journals/10.1075/tcb.00057.sza)) (summary).
+
+**Search, singletons and clutter**
+- **[AT22]** J. Duncan and G. W. Humphreys (1989), "Visual search and stimulus similarity", *Psychological Review* 96,
+  433-458. [MRC CBU](https://www.mrc-cbu.cam.ac.uk/bibliography/articles/2331).
+- **[AT23]** J. Theeuwes (1992), "Perceptual selectivity for color and form", *Perception & Psychophysics* 51, 599-606
+  ([Springer](https://link.springer.com/article/10.3758/BF03211656)); its limits: Bacon and Egeth (1994), Folk and
+  Remington (1998) (summary).
+- **[AT24]** R. Rosenholtz, Y. Li and L. Nakano (2007), "Measuring visual clutter", *Journal of Vision* 7(2):17,
+  doi:10.1167/7.2.17 ([MIT DSpace](https://dspace.mit.edu/handle/1721.1/37287)); J. M. Henderson, M. Chanceaux and T.
+  J. Smith (2009), "The influence of clutter on real-world scene search", *Journal of Vision* 9(1):32
+  ([PDF](https://ualresearchonline.arts.ac.uk/id/eprint/21102/1/jov-9-1-32.cleaned.pdf)).
+- **[AT25]** D. G. Pelli and K. A. Tillman (2008), "The uncrowded window of object recognition", *Nature Neuroscience*
+  11(10), 1129-1135, doi:10.1038/nn.2187 (Bouma's law: the critical spacing is about half the eccentricity).
+  [NYU PDF](https://www.cns.nyu.edu/~msl/courses/2223/Readings/Pelli-NatNeurosci2008.pdf).
+- **[AT26]** R. Pieters, M. Wedel and R. Batra (2010), "The stopping power of advertising: measures and effects of
+  visual complexity", *Journal of Marketing* 74(5), 48-60, doi:10.1509/jmkg.74.5.48.
+  [Tilburg](https://repository.tilburguniversity.edu/items/3fddf97a-469e-4d38-9c26-8dbd00c750b2).
+- **[AT27]** R. Pieters and M. Wedel (2004), "Attention capture and transfer in advertising: brand, pictorial, and
+  text-size effects", *Journal of Marketing* 68(2), 36-50.
+  [University of Michigan news](https://news.umich.edu/print-ad-pictures-less-is-more).
+- **[AT28]** J. E. Cutting and K. L. Armstrong (2016), "Facial expression, size, and clutter: inferences from movie
+  structure to emotion judgments and back", *Attention, Perception, & Psychophysics*, doi:10.3758/s13414-015-1003-5.
+  [Cornell](https://as.cornell.edu/news/heres-looking-you-kid-filmmakers-know-how-we-read-emotions).
+
+**Composition devices tested by eye tracking**
+- **[AT29]** A. Borji, M. Feng and H. Lu (2016), "Vanishing point attracts gaze in free-viewing and visual search
+  tasks", *Journal of Vision* 16(14):18, doi:10.1167/16.14.18. [arXiv](https://arxiv.org/abs/1512.01722v2).
+- **[AT30]** H.-C. Chuang, H.-Y. Tseng and C.-Y. Chiang (2024), "Impact of leading line composition on visual
+  cognition: an eye-tracking study", *Journal of Eye Movement Research* 17(5), doi:10.16910/jemr.17.5.2.
+  [JEMR](https://bop.unibe.ch/JEMR/article/view/11513).
+- **[AT31]** Composition lines and the thirds under eye tracking: Garbutt and Spehar (2014) and Kirtley (2018) found no
+  path along compositional lines, which later work finds only as repeated saccades between key elements (summary, via
+  [JEMR 13(2)](https://bop.unibe.ch/JEMR/article/download/JEMR.13.2.7/10079/26653) and
+  [Frontiers in Human Neuroscience](https://www.frontiersin.org/articles/10.3389/fnhum.2015.00704/full)); a 2021 study
+  of 15 experts and 15 novices on the rule of thirds
+  ([KMUTT](https://kirim.kmutt.ac.th/converis/portal/detail/Publication/779592449?lang=en_GB)); Amirshahi et al. (2014)
+  via `cinema.md` [S3].
+- **[AT32]** P. J. Locher and C. F. Nodine (1987), "Symmetry catches the eye", in *Eye Movements: From Physiology to
+  Cognition* (Elsevier) ([record](https://scilit.com/publications/cc72ee269bd64bf4f1181a0488054b6d)); its finding as
+  cited at [BMVC 2008](https://bmva-archive.org.uk/bmvc/2008/papers/281.pdf) (summary).
+- **[AT33]** S. DiPaola, C. Riebe and J. T. Enns (2010), "Rembrandt's textural agency: a shared perspective in visual
+  art and science", *Leonardo* 43(2), 145-151 ([PDF](https://core.ac.uk/download/56365864.pdf);
+  [UBC](https://science.ubc.ca/news/decoding-rembrandt%E2%80%99s-magic-0)); and (2013), "Following the masters:
+  portrait viewing and appreciation is guided by selective detail", *Perception*.
+
+**Explainers, cues and animation**
+- **[AT34]** R. E. Mayer and colleagues, the principles for reducing extraneous processing (coherence, signaling,
+  spatial and temporal contiguity), median effect sizes in *The Cambridge Handbook of Multimedia Learning* (2014
+  chapter: [Cambridge](https://resolve-he.cambridge.org/core/books/cambridge-handbook-of-multimedia-learning/principles-for-reducing-extraneous-processing-in-multimedia-learning-coherence-signaling-redundancy-spatial-contiguity-and-temporal-contiguity-principles/CD5B7AE1279A9AB81F8EEBB53DBEC86E))
+  and R. E. Mayer (2017), "Using multimedia for e-learning", *Journal of Computer Assisted Learning*,
+  doi:10.1111/jcal.12197 (summary: the two give slightly different medians; both are listed in §3).
+- **[AT35]** G. D. Rey (2012), "A review of research and a meta-analysis of the seductive detail effect", *Educational
+  Research Review* 7(3), 216-237, doi:10.1016/j.edurev.2012.05.003; N. Sundararajan and O. Adesope (2020), "Keep it
+  coherent: a meta-analysis of the seductive details effect", *Educational Psychology Review* 32, 707-734,
+  doi:10.1007/s10648-020-09522-4. [WSU](https://news.wsu.edu/2020/03/19/seductive-details-inhibit-learning/) (summary).
+- **[AT36]** B. B. de Koning, H. K. Tabbers, R. M. J. P. Rikers and F. Paas (2007), "Attention cueing as a means to
+  enhance learning from an animation", *Applied Cognitive Psychology* 21(6), 731-746
+  ([EUR](https://repub.eur.nl/pub/12095/)); the 2010 eye-tracking follow-up ([EUR](https://repub.eur.nl/pub/15347)).
+- **[AT37]** J.-M. Boucheix and R. K. Lowe (2010), "An eye tracking comparison of external pointing cues and internal
+  continuous cues in learning with complex animations", *Learning and Instruction* 20(2), 123-135,
+  doi:10.1016/j.learninstruc.2009.02.015.
+  [PDF](https://lead.ube.fr/wp-content/uploads/2023/09/000191-an-eye-tracking-comparison-of-external-pointing-cues-and-internal-continuous-cues-in-learning-with-complex-animations.pdf).
+- **[AT38]** T. N. Höffler and D. Leutner (2007), "Instructional animation versus static pictures: a meta-analysis",
+  *Learning and Instruction* 17(6), 722-738, doi:10.1016/j.learninstruc.2007.09.013.
+  [IPN](https://www.leibniz-ipn.de/en/research/publications/instructional-animation-versus-static-pictures-a-meta-analysis).
+- **[AT39]** E. Van der Burg, C. N. L. Olivers, A. W. Bronkhorst and J. Theeuwes (2008), "Pip and pop: nonspatial
+  auditory signals improve spatial visual search", *Journal of Experimental Psychology: Human Perception and
+  Performance* 34(5), 1053, doi:10.1037/0096-1523.34.5.1053 ([doi](https://doi.org/10.1037/0096-1523.34.5.1053)); the
+  2012 follow-up in *PLoS ONE* ([DOAJ](https://doaj.org/article/f28916be677e44b79d74b74ab6efd752)).
+- **[AT40]** J. E. Raymond, K. L. Shapiro and K. M. Arnell (1992), "Temporary suppression of visual processing in an
+  RSVP task: an attentional blink?", *Journal of Experimental Psychology: Human Perception and Performance* 18,
+  849-860; overview: [Wikipedia, Attentional blink](https://en.wikipedia.org/wiki/Attentional_blink).
+
+**Film, editing and pacing**
+- **[AT41]** T. J. Smith (2012), "The attentional theory of cinematic continuity", *Projections* 6(1), 1-27,
+  doi:10.3167/proj.2012.060102. [UAL](https://ualresearchonline.arts.ac.uk/id/eprint/21187/).
+- **[AT42]** T. J. Smith and J. M. Henderson (2008), "Edit blindness: the relationship between attention and global
+  change blindness in dynamic scenes", *Journal of Eye Movement Research* 2(2), doi:10.16910/jemr.2.2.6.
+  [JEMR](https://bop.unibe.ch/JEMR/article/view/2264).
+- **[AT43]** U. Hasson and colleagues (2008), "Neurocinematics: the neuroscience of film", *Projections* 2(1).
+  [EurekAlert](https://www.eurekalert.org/news-releases/645189) (summary).
+- **[AT44]** L. C. Loschky, A. M. Larson, J. P. Magliano and T. J. Smith (2015), "What would Jaws do? The tyranny of
+  film and the relationship between gaze and higher-level narrative film comprehension", *PLoS ONE* 10(11): e0142474,
+  doi:10.1371/journal.pone.0142474. [RePEc](https://econpapers.repec.org/RePEc:plo:pone00:0142474).
+- **[AT45]** J. E. Cutting, K. L. Brunick, J. E. DeLong, C. Iricinschi and A. Candan (2011), "Quicker, faster, darker:
+  changes in Hollywood film over 75 years", *i-Perception* 2, 569-576, doi:10.1068/i0441aap.
+  [SAGE](https://journals.sagepub.com/doi/10.1068/i0441aap).
+- **[AT46]** A. Lang (1990), "Involuntary attention and physiological arousal evoked by structural features and
+  emotional content in TV commercials", *Communication Research* 17(3), 275-299; A. Lang, P. Bolls, R. F. Potter and K.
+  Kawahara (1999), "The effects of production pacing and arousing content on the information processing of television
+  messages", *Journal of Broadcasting & Electronic Media* 43(4), 451-475, doi:10.1080/08838159909364504; A. Lang, S.
+  Zhou, N. Schwartz, P. D. Bolls and R. F. Potter (2000), "The effects of edits on arousal, attention, and memory for
+  television messages: when an edit is an edit can an edit be too much?", *Journal of Broadcasting & Electronic Media*
+  44(1), 94-109 ([CityU record](https://scholars.cityu.edu.hk/en/publications/the-effects-of-edits-on-arousal-attention-and-memory-for-televisi/));
+  text onsets: Thorson and Lang (1992), as cited by later work (summary).
+
+**Emotion and engagement**
+- **[AT47]** T. Teixeira, M. Wedel and R. Pieters (2012), "Emotion-induced engagement in internet video
+  advertisements", *Journal of Marketing Research* 49(2), 144-159, doi:10.1509/jmr.10.0207.
+  [HBS Working Knowledge](https://www.library.hbs.edu/working-knowledge/creating-online-ads-we-want-to-watch) (summary).
+- **[AT48]** J. Berger and K. L. Milkman (2012), "What makes online content viral?", *Journal of Marketing Research*
+  49(2), 192-205. [Wharton PDF](https://faculty.wharton.upenn.edu/wp-content/uploads/2011/11/Virality.pdf).
+- **[AT49]** P. Valdez and A. Mehrabian (1994), "Effects of color on emotions", *Journal of Experimental Psychology:
+  General* 123(4), 394-409. [PubMed 7996122](https://pubmed.ncbi.nlm.nih.gov/7996122/).
+- **[AT50]** B. H. Detenber and B. Reeves (1996), "A bio-informational theory of emotion: motion and image size effects
+  on viewers", *Journal of Communication* 46(3), 66-84, doi:10.1111/j.1460-2466.1996.tb01489.x
+  ([NTU record](https://nanyangtechnologicaluniv.demo.elsevierpure.com/en/publications/a-bio-informational-theory-of-emotion-motion-and-image-size-effec));
+  with Detenber, Simons and Bennett (1998), "Roll 'em!: the effects of picture motion on emotional responses", and
+  Simons et al. (1999): picture motion raised arousal and captured and held attention (summary).
+- **[AT59]** R. Reber, N. Schwarz and P. Winkielman (2004), "Processing fluency and aesthetic pleasure: is beauty in
+  the perceiver's processing experience?", *Personality and Social Psychology Review* 8(4), 364-382.
+  [UCSD PDF](https://pages.ucsd.edu/~pwinkielman/reber-schwarz-winkielman-beauty-PSPR-2004.pdf).
+- **[AT60]** M. J. Kang, M. Hsu, I. M. Krajbich, G. Loewenstein, S. M. McClure, J. T. Wang and C. F. Camerer (2009),
+  "The wick in the candle of learning: epistemic curiosity activates reward circuitry and enhances memory",
+  *Psychological Science* 20(8), 963-973. [PubMed 19619181](https://pubmed.ncbi.nlm.nih.gov/19619181/).
+
+**Platforms and industry (P and 1)**
+- **[AT51]** TikTok for Business, "9 creative tips to drive auction ad performance".
+  [ads.tiktok.com](https://ads.tiktok.com/business/en-US/blog/9-creative-tips-to-drive-auction-ad-performance).
+- **[AT52]** Facebook IQ with Nielsen (2016): up to 47 % of a video campaign's value in the first 3 s and 74 % in the
+  first 10 s, as reported by [Marketing Dive](https://www.marketingdive.com/news/facebook-offers-tips-for-converting-tv-ads-to-mobile/448510/)
+  and in Facebook's own [newsroom post (Spanish)](https://about.fb.com/es/news/2016/02/capta-la-atencion-con-nuevas-funcionalidades-para-anuncios-de-video/).
+- **[AT53]** Facebook (February 2016), automatic captions for video ads: +12 % view time in internal tests; 41 % of
+  video ads "basically meaningless without sound".
+  [Engadget](https://www.engadget.com/2016-02-11-facebook-captions-for-video-ads.html),
+  [Social Media Today](https://www.socialmediatoday.com/social-business/facebook-adds-automated-captions-video-ads-offers-tips-improve-video-performance).
+- **[AT54]** Google and Kantar, the ABCDs of effective creative: +30 % short-term sales likelihood, +17 % long-term
+  brand contribution (11,000 ads, 180 creative features).
+  [Kantar](https://www.kantar.com/industries/technology-and-telecoms/validating-googles-abcd-framework-with-the-power-of-artificial-intelligence),
+  [Think with Google](https://thinkwithgoogle.com/future-of-marketing/creativity/youtube-video-ad-creative).
+- **[AT55]** Amplified Intelligence with VCCP Media: outcomes from ~1.5 s of attention with distinctive brand assets;
+  85 % of digital ads receive under 2.5 s of active attention; ~1.5-2 s on fast-decay platforms (industry measurement).
+  [AdNews](https://www.adnews.com.au/news/fast-forward-may-i-have-your-attention-please),
+  [The Drum (2025)](https://www.thedrum.com/news/2025/05/07/the-next-attention-revolution-here-says-dr-karen-nelson-field).
+- **[AT56]** S. Zannettou and colleagues (2024), "Analyzing user engagement with TikTok's short format video
+  recommendations using data donations", CHI 2024. [arXiv 2301.04945](https://arxiv.org/abs/2301.04945).
+- **[AT57]** YouTube Shorts' "stayed to watch" (viewed against swiped away), as defined in creator glossaries; YouTube's
+  own help page was not found from here.
+  [Creator Essentials](https://www.creatoressentials.com/glossary/viewed-vs-swiped-away/) (secondary).
+- **[AT58]** Short-form "pattern interrupt" guidance (practitioner; no published method):
+  [Socialync](https://www.socialync.io/blog/retention-techniques-keep-viewers-watching-2026),
+  [CapCut](https://www.capcut.com/create/pattern-interrupt-technique-short-form-video),
+  [Fluxnote](https://fluxnote.io/guides/faceless-shorts-retention-tips-2026).
+
+**Tools and vision facts**
+- **[AT61]** The limit of smooth pursuit (catch-up saccades above ~30 degrees a second):
+  [Wikipedia, Smooth pursuit](https://en.wikipedia.org/wiki/Smooth_pursuit) (an overview; check a primary source before
+  the number goes into a rule).
+- **[AT62]** X. Hou and L. Zhang (2007), "Saliency detection: a spectral residual approach", CVPR,
+  doi:10.1109/CVPR.2007.383267 ([record](https://mlanthology.org/cvpr/2007/hou2007cvpr-saliency)); its limits shown at
+  [BMVC 2011](https://www.bmva-archive.org.uk/bmvc/2011/proceedings/paper86/paper86.pdf).
+
+**Ours, from the sibling notes:** the swipe's timing and the feed's crop and interface (`vertical.md` §1, §4, measured
+on the owner's phone); the reels' value and colour calls per example (`reels.md` §6); v1's and v3's retention at 2 s
+(playbook Performance log).

@@ -1,4 +1,4 @@
-# MODERN: framing, camera and joins in current film, TV, music videos, ads, animation and motion design, as rules for our 9:16 frame (research, 2026-10-30)
+# MODERN: current cinematography and motion design (2022-2026) as rules for our 9:16 frame (research, 2026-10-30)
 
 The owner (2026-10-30, as relayed with this task): "I think overall I would expect you to break down all mine references
 and whatever you research on other composition strategies and on what makes a composition to be engaging and capturing
@@ -201,15 +201,15 @@ composition.
   240-1680), TikTok's full width, the ad templates (`vertical.md` §1, `../LAYOUT.md` §1; measured and official): the
   centre is the only region all of them keep; (3) a subject near the centre in every shot lands where the eye already
   is after each join (M19). The talk of a centring "trend" in film and on Instagram is opinion (ONE SOURCE each [N38]);
-  two qualitative studies of vertical short films and music videos report centred compositions with medium shots to
-  close-ups as the norm (ONE SOURCE each, from summaries [N40]).
-- *In current work:* vertical makers' guides tell you to centre the subject and to compose for 9:16 from the start rather
-  than crop a landscape frame [N38].
-- *Ours:* the focal's centre within 130 px of x 540 (x 410-670) and at y 860-1200 by default (R7; `../COMPOSITION_SHOTS.md`
-  rule 3); every key read inside the **crop-safe stage, x 130-870 by y 600-1519** (est.: inside every organic view
-  measured, and inside the cover's 4:5 crop); for a boosted post, above y 1247 and left of x 780 below y 840
-  (`vertical.md` V14). Off the centre only for a declared reason (a scale shot's landmark, the left-third hero spot,
-  the turn: M3). Extends A1, A2, B2.
+  a qualitative study of vertical short films reports centred compositions and mostly medium shots to close-ups (ONE
+  SOURCE, from a summary [N40]).
+- *In current work:* vertical makers' guides tell you to centre the subject and to compose for 9:16 from the start
+  rather than crop a landscape frame [N38].
+- *Ours:* the focal's centre within 130 px of x 540 (x 410-670) and at y 860-1200 by default (R7;
+  `../COMPOSITION_SHOTS.md` rule 3); every key read inside the **crop-safe stage, x 130-870 by y 600-1519** (est.:
+  inside every organic view measured, and inside the cover's 4:5 crop); for a boosted post, above y 1247 and left of x
+  780 below y 840 (`vertical.md` V14). Off the centre only for a declared reason (a scale shot's landmark, the
+  left-third hero spot, the turn: M3). Extends A1, A2, B2.
 
 **M2 Negative space that gives the one thing its weight.** YES.
 - *What:* a large calm field with one small subject in it; the emptiness is the composition.
@@ -229,8 +229,8 @@ composition.
 **M3 Short-siding and the low quadrant: the rule broken for unease.** ADAPT (once a film, on the turn).
 - *What:* the subject pushed to the frame's edge looking out of it (no lead room), or set low in a corner under a heavy
   weight of empty frame.
-- *Why now:* viewers prefer a side-facing subject to face into the frame [cinema S10] (STUDY), so breaking it is felt;
-  a 2015-2019 TV drama made the low-quadrant frame its signature, its makers setting out "to break as many rules of image
+- *Why now:* viewers prefer a side-facing subject to face into the frame [cinema S10] (STUDY), so breaking it is felt; a
+  2015-2019 TV drama made the low-quadrant frame its signature, its makers setting out "to break as many rules of image
   composition as they could", with characters "beneath an oppressive amount of headroom" (ONE SOURCE, from summaries
   [N36]); widely imitated in the 2020s.
 - *Ours:* only on the "But" turn (SR18), at most once a film, never in a cozy beat. Short-sided: the subject at x
@@ -243,7 +243,7 @@ composition.
   symmetry on the story's turn.
 - *Why now:* symmetry is among the variables that make a picture fluent and liked [N15] (STUDY review); analyses of a
   2022-2025 drama read its symmetric frames as the company's control and their break as disruption (ONE SOURCE,
-  secondary [N35]); a 2025 animated musical framed its numbers like music videos [N29].
+  secondary [N35]).
 - *Ours:* the axis x 540 (the caption's centre line, x 520, is 20 px off it); the two halves within +-5 % in mass; at
   most two such frames a film (cinema C14; SR23). The break is ONE change at the axis on the turn's word: the story
   light or the thread moves off the axis, one window lights on one side, or the next shot's subject lands off the axis
@@ -390,13 +390,13 @@ composition.
   8). A push may aim at a spiral's eye, a vanishing point or a closed vista (A4, B2, E7). Extends A4, B1, D2, E7.
 
 **M15 Asymmetric easing: decelerate in, accelerate out, move on arcs.** YES.
-- *What:* current motion systems bring things in with a fast start and a long settle, and send them out with a slow start
-  and a fast exit; paths curve.
+- *What:* current motion systems bring things in with a fast start and a long settle, and send them out with a slow
+  start and a fast exit; paths curve.
 - *Why now:* Material Design 3's emphasized curves, as its published token sets give them: decelerate cubic-bezier(0.05,
   0.7, 0.1, 1.0) for what enters, accelerate cubic-bezier(0.3, 0.0, 0.8, 0.15) for what leaves, durations in tiers from
   50 ms to about 1 s (~400 ms for a large entrance) (ONE SOURCE, official, via third-party token sets [N24]); Arcane's
   measured vertical reveals start fast and settle (`../research/cine_motion.md` §1 rule 5); arcs are one of the classic
-  animation principles (CONSENSUS).
+  animation principles [cinema S5] (CONSENSUS).
 - *Ours:* things that grow, slide or arrive (captions excepted: they pop in place) use a decelerating curve over
   0.25-0.45 s (15-27 frames at 60 fps); exits accelerate over 0.15-0.25 s (9-15 frames) (est.); the thread object
   travels on an arc or an S (B8), never on a ruler line; camera story moves keep their own measured shapes (S5's curve).
@@ -405,9 +405,9 @@ composition.
 **M16 Stepped drawings, smooth camera.** YES (already ours).
 - *What:* characters and drawn effects held for 2-4 frames (on twos or threes) while the camera, the parallax and any
   simulation move on every frame.
-- *Why now:* a 2018 feature animated its characters mainly on twos for a graphic, punchy look, while its camera moves were
-  often on ones; its 2023 sequel set a character on twos against another on ones to tell them apart (ONE SOURCE, from
-  summaries [N32]); a 2022 feature stepped its action on twos, threes and fours (ONE SOURCE [N30]).
+- *Why now:* a 2018 feature animated its characters mainly on twos for a graphic, punchy look, while its camera moves
+  were often on ones; its 2023 sequel set a character on twos against another on ones to tell them apart (ONE SOURCE,
+  from summaries [N32]); a 2022 feature stepped its action on twos, threes and fours (ONE SOURCE [N30]).
 - *Ours:* DIRECTION 8 ("drawn poses may step while the camera glides"). At 60 fps, "twos" at 24 fps is a hold of 5
   frames (83 ms) and "threes" 7-8 frames (est.); the camera, the parallax float, the light and the captions move on
   every frame. New to the reels (none of their ideas is about timing).
@@ -428,12 +428,12 @@ composition.
 
 **M18 Sideways motion reads faster in 9:16.** ADAPT.
 - *What:* in a tall frame a sideways move crosses the picture quickly; a vertical move has room.
-- *Why now:* the guide of the first vertical film festival warns that the 9:16 frame's taller lines and narrower field of
-  view "tends to exaggerate horizontal (left-right) movement" (ONE SOURCE, from a summary [N38]); arithmetic: the owner's
-  feed shows 884 px across and 1920 up, so a mover at the same px per frame crosses the width 2.2x sooner than the
-  height (est.).
-- *Ours:* for the same felt calm, give sideways movers (a truck, a walker crossing, clouds) about half the px per frame of
-  a vertical move (est.); life passing sideways stays slow and low in contrast (DIRECTION 3); travel by tilt or rise
+- *Why now:* the guide of the first vertical film festival warns that the 9:16 frame's taller lines and narrower field
+  of view "tends to exaggerate horizontal (left-right) movement" (ONE SOURCE, from a summary [N38]); arithmetic: the
+  owner's feed shows 884 px across and 1920 up, so a mover at the same px per frame crosses the width 2.2x sooner than
+  the height (est.).
+- *Ours:* for the same felt calm, give sideways movers (a truck, a walker crossing, clouds) about half the px per frame
+  of a vertical move (est.); life passing sideways stays slow and low in contrast (DIRECTION 3); travel by tilt or rise
   where the story allows (SR10's tilt). Extends B5.
 
 ### D. Joins: how the eye crosses from shot to shot
@@ -460,9 +460,9 @@ evidence and the numbers under them.
 **M20 The feature match: colour, light and shape carried across the join.** YES.
 - *What:* the outgoing and incoming shots share a feature at the attended spot: the same colour, the same bright shape,
   the same silhouette.
-- *Why now:* features repeated across a cut speed the first saccade to the scene's continuation, colour among them, though
-  even a high similarity guides the eye rather than grabbing it (STUDY [N9]); repetition is processed fluently [N15];
-  Arcane's light-match cuts correlate 0.81-0.90 in their layout (`../research/cine_light.md` T1).
+- *Why now:* features repeated across a cut speed the first saccade to the scene's continuation, colour among them,
+  though even a high similarity guides the eye rather than grabbing it (STUDY [N9]); repetition is processed fluently
+  [N15]; Arcane's light-match cuts correlate 0.81-0.90 in their layout (`../research/cine_light.md` T1).
 - *Ours:* the B carrier (thread match): the anchor's centre within 150 px (190 px at most), its size within 1.5x, the
   same hue family (the scene's hot accent on the thread object), ONE change across the join (temperature, scale or
   world); the cut on the anchor's fastest movement or on the next sentence's first word (M23). Extends D6, E8.
@@ -491,8 +491,8 @@ evidence and the numbers under them.
 - *What:* the next shot's sound (for us the voice's next sentence) starts at or just before the picture changes.
 - *Why now:* when the audio was removed from match-action cuts, viewers noticed the cuts far more: sound played a large
   part in hiding them (STUDY [N6]); sound is one of the cues that carry attention over a cut (STUDY and theory [N5]).
-- *Ours:* DIRECTION 1 already puts a join's midpoint on the next sentence's first word, and the picture leads its word by
-  ~0.1 s (DIRECTION 8); a join never falls in a pause of the voice longer than ~0.3 s (est.); a soft sound may mark a
+- *Ours:* DIRECTION 1 already puts a join's midpoint on the next sentence's first word, and the picture leads its word
+  by ~0.1 s (DIRECTION 8); a join never falls in a pause of the voice longer than ~0.3 s (est.); a soft sound may mark a
   portal or a wipe (the playbook's "with its own sound" for opening effects). Extends every join.
 
 **M24 The morph: one thing becomes the next, in stages.** ADAPT (sparingly: costly).
@@ -534,10 +534,10 @@ evidence and the numbers under them.
   Whiteboard animations raised engagement, enjoyment and retention, and short course videos with hand-drawn tablet
   sketches were among the most engaging (STUDY, from summaries [N21]). The owner's reels teach "the line first, then
   the world under it" (`reels.md` §5).
-- *Ours:* frame 0's draw-on keeps the playbook's moving pen tip, at full contrast, the line the darkest mark in the frame,
-  lasting >= 1 s and peaking after 0.4 s (`vertical.md` V9); after frame 0 a draw-on only where the drawing is the beat
-  (DIRECTION 8), with its pen tip in view. The tip is our visible agent; whether a tip alone carries the hand's effect is
-  untested (est.). Extends the reels' own device.
+- *Ours:* frame 0's draw-on keeps the playbook's moving pen tip, at full contrast, the line the darkest mark in the
+  frame, lasting >= 1 s and peaking after 0.4 s (`vertical.md` V9); after frame 0 a draw-on only where the drawing is
+  the beat (DIRECTION 8), with its pen tip in view. The tip is our visible agent; whether a tip alone carries the hand's
+  effect is untested (est.). Extends the reels' own device.
 
 **M28 Congruence and apprehension: animate the real mechanism, slowly enough to see.** YES.
 - *What:* the motion shows the structure of what it explains (cause, then effect, one tick per unit) at a speed the eye
@@ -545,8 +545,8 @@ evidence and the numbers under them.
 - *Why now:* animation beats still pictures only when it matches the structure of the concept (congruence) and can be
   perceived accurately (apprehension); many animations are too fast or too complex (STUDY review [N22]); staged
   transitions improved tracking (STUDY [N23]).
-- *Ours:* `../CINEMATIC_GUIDE.md`'s "Show the real mechanism": each unit of cause is one visible tick of the effect; each
-  step of a mechanism holds ~0.4 s or more unless it is one of many that read together as a flow (est.); one causal
+- *Ours:* `../CINEMATIC_GUIDE.md`'s "Show the real mechanism": each unit of cause is one visible tick of the effect;
+  each step of a mechanism holds ~0.4 s or more unless it is one of many that read together as a flow (est.); one causal
   chain at a time; cause and effect in one frame where they can be (SR11, SR13). New to the reels.
 
 **M29 Words few and big, in one home.** YES (already ours).
@@ -554,17 +554,17 @@ evidence and the numbers under them.
 - *Why now:* text pulls the eye almost as hard as a face (11.1x a control region) and is hard to ignore (STUDY [N14]);
   text draws attention in proportion to its size (STUDY [N17]); kinetic typography heads every 2025-2026 trend roundup
   (ONE SOURCE each, blogs [N41]).
-- *Ours:* captions only in the band (98 px, <= 2 lines, lines <= 780 px: `vertical.md` V5), popping in place on the voice;
-  in the world at most one label or one number (>= 56 px; a number 120-160 px), on the subject; no title over the
-  picture (the playbook); no kinetic type flying through the stage: it would be a second subject. Extends the
-  playbook's "words in the picture are few and big".
+- *Ours:* captions only in the band (98 px, <= 2 lines, lines <= 780 px: `vertical.md` V5), popping in place on the
+  voice; in the world at most one label or one number (>= 56 px; a number 120-160 px), on the subject; no title over the
+  picture (the playbook); no kinetic type flying through the stage: it would be a second subject. Extends the playbook's
+  "words in the picture are few and big".
 
 ## 4. Vertical-native genres (2022-2026): what they teach
 
 | genre | what it does with the frame | strength | for us |
 |---|---|---|---|
 | **vertical micro-dramas** (serial drama apps, the 2023-2025 boom) | close-ups dominate because a face fills the tall frame and a wide "wastes" it; a wide, a mid and a close covered at once; two people stacked rather than side by side [N39] | CONSENSUS (weak sources: production blogs, vendor guides, one cinematographer's account) | the close (SR12) is the vertical's natural size; every wide must be designed around one figure and its world (SR14); people stacked by depth (M5) |
-| **vertical short films and music videos** | centred compositions, medium shots to close-ups, colour and framing carrying the emotion; stories built round the phone's own screen [N40]; vertical video argued as a legitimate form tied to how the phone is held, not a flaw [N40] | ONE SOURCE each (qualitative studies, from summaries) | M1, M8; the phone's screen as a frame within a frame (SR13) |
+| **vertical short films and music videos** | short films: centred compositions, mostly medium shots to close-ups, colour and framing carrying the emotion; music videos: stories built round what happens on the phone's own screen, the elements rearranged for the tall frame [N40]; vertical video argued as a legitimate form tied to how the phone is held, not a flaw [N40] | ONE SOURCE each (qualitative studies, from summaries) | M1, M8; the phone's screen as a frame within a frame (SR13) |
 | **vertical ads** | the proposition in 3 s; transitions to hold attention [N25]; the thumb-stop measured in `vertical.md` §4 | ONE SOURCE (official) | the opening (DIRECTION 9); M12 |
 | **vertical makers' guides** (a vertical film festival's tips, an agency's vertical guide, a camera maker's tips) | compose for 9:16 from the start; move toward and away from the camera; sideways motion is exaggerated; centre the subject [N38] | CONSENSUS | M1, M5, M18 |
 | **illustrated explainers on the feed** | `vertical.md` §6: a stage under a sky of words; one leading illustrated science studio plans each scene's visual metaphor in sketches before drawing ~200 panels a video [N43] | ONE SOURCE (from a summary) | our G3 decides the same, before the build |
@@ -612,11 +612,11 @@ ties broken by evidence, then impact.
 | 28 | M16 | stepped drawings, smooth camera | 1 | 3 | 2 | 2 | 9 | yes | DIRECTION 8 (already) |
 | 29 | M18 | sideways motion reads faster in 9:16 | 1 | 3 | 1 | 3 | 9 | adapt | `../CRAFT.md` (the motion budget); PIPELINE_V2 "Frame rate" |
 
-**Merging with the owner's ideas** (a proposal for the distill): an owner idea takes the best rank of the principles that
-carry it (§2), so the owner's references and this research rank on one scale. On that rule the owner's ideas carried by
-this lane's top ten are A1, A2 and B2 (M1), E3 (M19), D7 (M11), the reels' line-first device (M27), D1, A6 and E1
-(M2), B1, C3 and E10 (M5) and E8 (M8); C1 (the frame within a frame, the reels' best fit) ranks through M21 (17th
-here) and M6, and the sibling lanes' evidence may lift it.
+**Merging with the owner's ideas** (a proposal for the distill): an owner idea takes the best rank of the principles
+that carry it (§2), so the owner's references and this research rank on one scale. On that rule the owner's ideas
+carried by this lane's top ten are A1, A2 and B2 (M1), E3 (M19), D7 (M11), the reels' line-first device (M27), D1, A6
+and E1 (M2), B1, C3 and E10 (M5) and E8 (M8); C1 (the frame within a frame, the reels' best fit) ranks through M21
+(17th here) and M6, and the sibling lanes' evidence may lift it.
 
 ## 6. Guidelines: when to use which, and how animation and transitions fit
 
@@ -652,8 +652,8 @@ Recipes SR1-SR24 are `../COMPOSITION_SHOTS.md` §3; the owner's ideas are `reels
 
 ### 6.3 How animation fits inside a composition
 
-1. **One capture lever at a time, at the subject** (§1): its onset, its push, its light and its accent arrive together on
-   its word; nothing else starts then.
+1. **One capture lever at a time, at the subject** (§1): its onset, its push, its light and its accent arrive together
+   on its word; nothing else starts then.
 2. **Either the camera holds and the subject travels the device's line** (E9), **or the camera moves and the subject is
    the still pivot** (E3); never both moving freely.
 3. **Ration the onsets:** one noticeable onset at a time; supporting life slow, low in contrast, taking turns; nothing
@@ -662,8 +662,8 @@ Recipes SR1-SR24 are `../COMPOSITION_SHOTS.md` §3; the owner's ideas are `reels
    opacity.
 5. **Drawn things step, the camera glides** (M16): drawn poses held ~5 frames at 60 fps, the camera, the parallax, the
    light and the captions on every frame.
-6. **Draw on only where the drawing is the beat** (frame 0, a chart line in step with the voice), with the pen tip in view
-   (M27).
+6. **Draw on only where the drawing is the beat** (frame 0, a chart line in step with the voice), with the pen tip in
+   view (M27).
 7. **Novelty from the subject's own build** every ~1-2 s, never from extra life (the playbook; M12).
 8. **Every move is three designed frames** (start, middle, end), each passing the composition rules as a still; the
    caption band a fixed mat throughout (C12; CINEMATIC_GUIDE rule 2).
@@ -712,6 +712,9 @@ Recipes SR1-SR24 are `../COMPOSITION_SHOTS.md` §3; the owner's ideas are `reels
    estimate from one source and the frame's proportions. Test it in a look clip before any rule.
 7. **The F cut's size change** (`../COMPOSITION_SHOTS.md` §5 row 14: G3_ANIMATIC >= 20 % against `cinema.md` C4 >=
    1.5-2x): nothing found here moves it; it stays the owner's call.
+8. **Overlap with this round's other tracks** (attention, motion): §1 and M12, M14, M15 and M19-M24 cover ground those
+   tracks may cover too. For the merge: one entry per principle, keeping the strongest evidence and the owner's idea it
+   extends (§2), so nothing is counted twice in the ranking.
 
 ## 9. Our arithmetic (est.)
 
