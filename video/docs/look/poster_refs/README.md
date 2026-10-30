@@ -40,6 +40,21 @@
   overfixate on this / the pip i mean would be good to keep it, but we can perhaps make it way more subtle perhaps hide
   it deliberately in the video, like keep it, but not as obvious"
 
+**Later, on what we built from them** (2026-10-29):
+- On the look test v1 (`video/deliverables/tests/poster_look_test_v1.mp4`): "So what bugs me about it is yes good, but
+  we spent the entire day tweaking the style that is frankly barely noticeable like we focus all our attention on
+  details and missed the forest for the trees / So take a look again at our references I sent earlier / Rethink this
+  first scene with Google in the style that with our references rethink how you would construct the scene from ground
+  up / Still image no animation just the first scene image"
+- "So like we have the “production” process and we have “iteration” process that needs to be more lightweight"
+- On the scene-1 still v1 (`video/deliverables/tests/poster_scene1_still_v1.png`): "So there is no sense of depth here
+  like the building is right here and there us really no scale depth I’m really suffocating with the view / Some bits
+  are good tho like the style of separation of foreground vs background / Also the reference do have more details and
+  density like the the street along the canal ours is pretty empty while their have density m / Also the sky is not
+  entirely single color there are more things happening / Also dont overindex on adding labdmarks or putting weird
+  camera angles on existing real views thats nit as important / The closest leafs and nature on the left are way too
+  big and not as subtle as they need be"
+
 **The files:** seven of a 19-poster Instagram carousel, as screenshots from the owner's phone (the account isn't named in
 them). The carousel index is in brackets.
 

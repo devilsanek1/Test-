@@ -1,0 +1,1006 @@
+{
+ "film": "v2s1_v5",
+ "about": "v2's S1, paint v5: v4's design-first method, the dusk family and the layered planes kept; the crescents redesigned as TRUE billows (light_mode 'cap': rounder overlapping lobes back to front, a lit top over a curved terminator, a shade underside), a few hand-placed broad strokes inside the near cumulus, the shade edges a little more broken. The scene's one evening light (water, paving, facade) is the paint_s1 copy's (dusk.tsx), set 'v5'. The LAYERED BRUSH (the owner's recipe, refs_paint/): a limited palette of 14 swatches, three passes per mass (blurred big soft strokes, mid chisel strokes along the form, small crisp strokes at the light edges), each plane blurred by its depth; the water as horizontal dashes from the palette.",
+ "out": "public/paint/v2s1_v5",
+ "out_design": "public/paint/v2s1_v5design",
+ "frame": [
+  1080,
+  1920
+ ],
+ "band": [
+  290,
+  600
+ ],
+ "light": {
+  "dir": [
+   -0.7,
+   -0.7
+  ]
+ },
+ "pieces": [
+  {
+   "id": "v2s1/sky",
+   "style": "sky",
+   "seed": 14,
+   "size": [
+    1100,
+    1080
+   ],
+   "gradient": {
+    "stops": [
+     [
+      0,
+      "#AFB3D8"
+     ],
+     [
+      200,
+      "#C3BFE0"
+     ],
+     [
+      290,
+      "#D2C8E3"
+     ],
+     [
+      600,
+      "#E5CEDB"
+     ],
+     [
+      680,
+      "#F4D2CF"
+     ],
+     [
+      760,
+      "#FBD8BC"
+     ],
+     [
+      820,
+      "#FDDBB0"
+     ],
+     [
+      1100,
+      "#FDDBB0"
+     ]
+    ],
+    "sun": {
+     "xy": [
+      196,
+      772
+     ],
+     "r": 520,
+     "hex": "#FFE3A8",
+     "k": 0.55,
+     "sx": 1.6
+    }
+   },
+   "broad": {
+    "vary": 0.006,
+    "vary_cell": 260,
+    "hatch": 0.007,
+    "hatch_angle": -24,
+    "hatch_along": 170,
+    "hatch_across": 1.6,
+    "grain": 0.004
+   }
+  },
+  {
+   "id": "v2s1/clouds",
+   "style": "designed",
+   "seed": 92,
+   "sky_gradient": {
+    "stops": [
+     [
+      0,
+      "#AFB3D8"
+     ],
+     [
+      200,
+      "#C3BFE0"
+     ],
+     [
+      290,
+      "#D2C8E3"
+     ],
+     [
+      600,
+      "#E5CEDB"
+     ],
+     [
+      680,
+      "#F4D2CF"
+     ],
+     [
+      760,
+      "#FBD8BC"
+     ],
+     [
+      820,
+      "#FDDBB0"
+     ],
+     [
+      1100,
+      "#FDDBB0"
+     ]
+    ],
+    "sun": {
+     "xy": [
+      196,
+      772
+     ],
+     "r": 520,
+     "hex": "#FFE3A8",
+     "k": 0.55,
+     "sx": 1.6
+    }
+   },
+   "light": [
+    -0.7,
+    -0.7
+   ],
+   "air_px": 12,
+   "air_dL": 0.04,
+   "palette": {
+    "shade": "#B89BBA",
+    "mid": "#F0BEA8",
+    "lit": "#FCE0AE"
+   },
+   "planes": [
+    {
+     "depth": 0.9,
+     "box": [
+      0,
+      672,
+      470,
+      96
+     ],
+     "conv": 0.18,
+     "air": false,
+     "lit_cap": 0.5,
+     "mid_band": 0.9,
+     "palette": {
+      "shade": "#FBD5B8",
+      "mid": "#FFE0BC",
+      "lit": "#FFEDCB"
+     },
+     "billows": [
+      [
+       130,
+       700,
+       120,
+       0.05
+      ],
+      [
+       262,
+       712,
+       150,
+       0.035
+      ],
+      [
+       90,
+       727,
+       90,
+       0.05
+      ],
+      [
+       322,
+       690,
+       80,
+       0.05
+      ],
+      [
+       205,
+       739,
+       130,
+       0.035
+      ]
+     ],
+     "paint": {
+      "width": [
+       6,
+       10
+      ],
+      "strokes": 0.0,
+      "soft_px": 1.2,
+      "break_k": 0.4,
+      "break_cell": 9,
+      "dry_edge": 0.0,
+      "blur_k": 3.2,
+      "under_width": [
+       8,
+       12
+      ],
+      "under_strokes": 0.0,
+      "mid_strokes": 0.0
+     },
+     "light_mode": "billow",
+     "blur": 1.0
+    },
+    {
+     "depth": 0.7,
+     "box": [
+      -40,
+      596,
+      470,
+      84
+     ],
+     "conv": 0.6,
+     "flat": 0.38,
+     "base": [
+      -40,
+      664,
+      430,
+      660
+     ],
+     "under_px": 12,
+     "billows": [
+      [
+       10,
+       650,
+       46,
+       0,
+       0
+      ],
+      [
+       110,
+       640,
+       58,
+       0,
+       0
+      ],
+      [
+       220,
+       642,
+       52,
+       0,
+       0
+      ],
+      [
+       310,
+       648,
+       40,
+       0,
+       0
+      ],
+      [
+       370,
+       654,
+       26,
+       0,
+       0
+      ]
+     ],
+     "paint": {
+      "width": [
+       16,
+       30
+      ],
+      "strokes": 0.35,
+      "soft_px": 3.5,
+      "break_cell": 10,
+      "break_k": 0.6,
+      "dry_edge": 0.006,
+      "dry_width": [
+       8,
+       14
+      ],
+      "jitter_L": 0.014,
+      "op": [
+       0.35,
+       0.55
+      ],
+      "blur_k": 3.2,
+      "under_width": [
+       30,
+       60
+      ],
+      "mid_width": [
+       10,
+       18
+      ],
+      "mid_strokes": 0.35
+     },
+     "lit_px": 9,
+     "mid_px": 20,
+     "light_mode": "cap",
+     "t_lit": -0.05,
+     "t_mid": 0.4,
+     "tilt": 0.18,
+     "curv": 0.1
+    },
+    {
+     "depth": 0.4,
+     "box": [
+      40,
+      120,
+      640,
+      140
+     ],
+     "conv": 0.42,
+     "flat": 0.55,
+     "base": [
+      40,
+      252,
+      680,
+      246
+     ],
+     "under_px": 22,
+     "billows": [
+      [
+       250,
+       190,
+       40
+      ],
+      [
+       360,
+       182,
+       44
+      ],
+      [
+       460,
+       188,
+       36
+      ],
+      [
+       110,
+       236,
+       36
+      ],
+      [
+       190,
+       222,
+       50
+      ],
+      [
+       290,
+       210,
+       60
+      ],
+      [
+       400,
+       206,
+       58
+      ],
+      [
+       500,
+       212,
+       50
+      ],
+      [
+       580,
+       224,
+       40
+      ],
+      [
+       640,
+       234,
+       28
+      ]
+     ],
+     "paint": {
+      "width": [
+       22,
+       44
+      ],
+      "strokes": 0.45,
+      "soft_px": 4.0,
+      "break_cell": 12,
+      "break_k": 0.8,
+      "dry_edge": 0.014,
+      "dry_width": [
+       10,
+       18
+      ],
+      "specks": 30,
+      "jitter_L": 0.014,
+      "op": [
+       0.35,
+       0.55
+      ],
+      "blur_k": 3.2,
+      "under_width": [
+       50,
+       90
+      ],
+      "mid_width": [
+       14,
+       26
+      ],
+      "mid_strokes": 0.45
+     },
+     "lit_px": 24,
+     "mid_px": 56,
+     "light_mode": "cap",
+     "t_lit": -0.15,
+     "t_mid": 0.3,
+     "tilt": 0.22,
+     "curv": 0.12
+    },
+    {
+     "depth": 0.0,
+     "box": [
+      380,
+      0,
+      700,
+      300
+     ],
+     "conv": 0.0,
+     "base": [
+      380,
+      292,
+      1080,
+      280
+     ],
+     "under_px": 40,
+     "billows": [
+      [
+       1020,
+       40,
+       104
+      ],
+      [
+       900,
+       36,
+       92
+      ],
+      [
+       780,
+       70,
+       76
+      ],
+      [
+       960,
+       120,
+       92
+      ],
+      [
+       850,
+       128,
+       84
+      ],
+      [
+       735,
+       146,
+       70
+      ],
+      [
+       1070,
+       150,
+       84
+      ],
+      [
+       1015,
+       212,
+       86
+      ],
+      [
+       905,
+       206,
+       80
+      ],
+      [
+       800,
+       214,
+       70
+      ],
+      [
+       700,
+       214,
+       60
+      ],
+      [
+       612,
+       230,
+       50
+      ],
+      [
+       538,
+       248,
+       40
+      ],
+      [
+       478,
+       264,
+       28
+      ]
+     ],
+     "paint": {
+      "width": [
+       34,
+       64
+      ],
+      "strokes": 0.45,
+      "soft_px": 6.0,
+      "break_cell": 14,
+      "break_k": 0.88,
+      "dry_edge": 0.022,
+      "dry_width": [
+       12,
+       26
+      ],
+      "specks": 60,
+      "jitter_L": 0.024,
+      "op": [
+       0.4,
+       0.6
+      ],
+      "designed_op": 0.8,
+      "designed_strokes": [
+       [
+        760,
+        128,
+        230,
+        30,
+        -14,
+        3,
+        0.03
+       ],
+       [
+        905,
+        100,
+        200,
+        28,
+        8,
+        3,
+        0.025
+       ],
+       [
+        850,
+        246,
+        260,
+        26,
+        -4,
+        1,
+        -0.03
+       ],
+       [
+        660,
+        232,
+        170,
+        22,
+        -10,
+        2,
+        0.02
+       ]
+      ],
+      "blur_k": 3.2,
+      "under_width": [
+       70,
+       120
+      ],
+      "under_strokes": 1.0,
+      "mid_width": [
+       18,
+       36
+      ],
+      "mid_strokes": 0.55,
+      "crisp_strokes": 0.07,
+      "crisp_width": [
+       5,
+       9
+      ]
+     },
+     "lit_px": 46,
+     "mid_px": 112,
+     "lit_cap": 0.46,
+     "mid_band": 0.62,
+     "light_mode": "cap",
+     "t_lit": -0.22,
+     "t_mid": 0.22,
+     "tilt": 0.28,
+     "curv": 0.16
+    }
+   ],
+   "brush": "layered"
+  },
+  {
+   "id": "v2s1/tree",
+   "style": "designed",
+   "seed": 45,
+   "sky_gradient": {
+    "stops": [
+     [
+      0,
+      "#AFB3D8"
+     ],
+     [
+      200,
+      "#C3BFE0"
+     ],
+     [
+      290,
+      "#D2C8E3"
+     ],
+     [
+      600,
+      "#E5CEDB"
+     ],
+     [
+      680,
+      "#F4D2CF"
+     ],
+     [
+      760,
+      "#FBD8BC"
+     ],
+     [
+      820,
+      "#FDDBB0"
+     ],
+     [
+      1100,
+      "#FDDBB0"
+     ]
+    ],
+    "sun": {
+     "xy": [
+      196,
+      772
+     ],
+     "r": 520,
+     "hex": "#FFE3A8",
+     "k": 0.55,
+     "sx": 1.6
+    }
+   },
+   "light": [
+    -0.75,
+    -0.66
+   ],
+   "keep_flat": {
+    "flat": "out/paint/v2s1/flat/tree.png",
+    "colors": [
+     "#AF7263"
+    ]
+   },
+   "planes": [
+    {
+     "depth": 0.0,
+     "box": [
+      0,
+      1276,
+      312,
+      220
+     ],
+     "conv": 0.0,
+     "lit_cap": 0.42,
+     "mid_band": 0.72,
+     "base": [
+      0,
+      1492,
+      312,
+      1492
+     ],
+     "under_px": 30,
+     "palette": {
+      "shade": "#6E9178",
+      "mid": "#9EBB8E",
+      "lit": "#CBD89C"
+     },
+     "billows": [
+      [
+       96,
+       1334,
+       34,
+       0.8
+      ],
+      [
+       176,
+       1352,
+       44,
+       0.8
+      ],
+      [
+       128,
+       1348,
+       70,
+       0.57
+      ],
+      [
+       62,
+       1372,
+       40,
+       0.8
+      ],
+      [
+       118,
+       1388,
+       104,
+       0.67
+      ],
+      [
+       244,
+       1404,
+       38,
+       0.85
+      ],
+      [
+       36,
+       1420,
+       84,
+       0.69
+      ],
+      [
+       206,
+       1430,
+       80,
+       0.68
+      ],
+      [
+       150,
+       1448,
+       52,
+       0.6
+      ]
+     ],
+     "paint": {
+      "width": [
+       16,
+       30
+      ],
+      "strokes": 0.6,
+      "soft_px": 2.5,
+      "break_cell": 7,
+      "break_k": 0.75,
+      "dry_edge": 0.025,
+      "dry_width": [
+       6,
+       14
+      ],
+      "jitter_L": 0.02,
+      "op": [
+       0.35,
+       0.55
+      ],
+      "under_width": [
+       34,
+       60
+      ],
+      "under_strokes": 1.2,
+      "under_blur": 4.0,
+      "mid_width": [
+       10,
+       20
+      ],
+      "mid_strokes": 0.7,
+      "crisp_strokes": 0.08,
+      "crisp_width": [
+       4,
+       7
+      ],
+      "specks": 50,
+      "wind": -25
+     },
+     "lit_px": 40,
+     "mid_px": 41,
+     "light_mode": "cap",
+     "t_lit": -0.2,
+     "t_mid": 0.26,
+     "tilt": 0.3,
+     "curv": 0.14
+    }
+   ],
+   "brush": "layered"
+  },
+  {
+   "id": "v2s1/pier",
+   "style": "surface",
+   "brush": "broad",
+   "seed": 55,
+   "flat": "out/paint/v2s1/flat/pier.png",
+   "light": [
+    -0.9,
+    -0.35
+   ],
+   "cuts": [
+    0.4,
+    0.7
+   ],
+   "warm": [
+    0.03,
+    0.006,
+    0.02
+   ],
+   "cool": [
+    -0.04,
+    -0.002,
+    -0.016
+   ],
+   "broad": {
+    "angle": 62,
+    "width": [
+     26,
+     50
+    ],
+    "len": [
+     1.4,
+     2.4
+    ],
+    "strokes": 0.5,
+    "op": [
+     0.3,
+     0.5
+    ],
+    "jitter_L": 0.012,
+    "tau": 0.09,
+    "edge_px": 2.5,
+    "edge_soft": 1.4,
+    "edge_cell": 40,
+    "edge_wobble": 1.2,
+    "drag_along": 30,
+    "drag_across": 1.8,
+    "edge_strokes": 0.15,
+    "edge_width": [
+     12,
+     22
+    ],
+    "specks": 0,
+    "grain": 0.008,
+    "side": [
+     0.12,
+     0.22
+    ],
+    "chisel": 0.03
+   }
+  },
+  {
+   "id": "v2s1/farroofs",
+   "style": "surface",
+   "brush": "broad",
+   "seed": 62,
+   "flat": "out/paint/v2s1/flat/farroofs.png",
+   "light": [
+    -0.95,
+    -0.2
+   ],
+   "cuts": [
+    0.45,
+    0.7
+   ],
+   "warm": [
+    0.025,
+    0.008,
+    0.02
+   ],
+   "cool": [
+    -0.03,
+    0.006,
+    -0.016
+   ],
+   "haze": {
+    "color": "#FBD9BB",
+    "k": 0.3,
+    "top": 0.5
+   },
+   "broad": {
+    "angle": 0,
+    "width": [
+     14,
+     28
+    ],
+    "len": [
+     1.6,
+     3.0
+    ],
+    "strokes": 0.4,
+    "op": [
+     0.3,
+     0.5
+    ],
+    "jitter_L": 0.01,
+    "tau": 0.14,
+    "edge_px": 2.2,
+    "edge_soft": 2.6,
+    "edge_cell": 24,
+    "edge_wobble": 1.2,
+    "drag_along": 26,
+    "drag_across": 1.6,
+    "edge_strokes": 0.1,
+    "edge_width": [
+     8,
+     16
+    ],
+    "specks": 0,
+    "grain": 0.006,
+    "side": [
+     0.12,
+     0.22
+    ],
+    "chisel": 0.03
+   },
+   "blur": 2.2
+  },
+  {
+   "id": "v2s1/fartower",
+   "style": "surface",
+   "brush": "broad",
+   "seed": 68,
+   "flat": "out/paint/v2s1/flat/fartower.png",
+   "light": [
+    -0.95,
+    -0.2
+   ],
+   "cuts": [
+    0.45,
+    0.7
+   ],
+   "warm": [
+    0.025,
+    0.008,
+    0.02
+   ],
+   "cool": [
+    -0.03,
+    0.006,
+    -0.016
+   ],
+   "haze": {
+    "color": "#F6E0D0",
+    "k": 0.25,
+    "top": 0.4
+   },
+   "broad": {
+    "angle": 90,
+    "width": [
+     14,
+     26
+    ],
+    "len": [
+     1.6,
+     3.0
+    ],
+    "strokes": 0.4,
+    "op": [
+     0.3,
+     0.5
+    ],
+    "jitter_L": 0.01,
+    "tau": 0.12,
+    "edge_px": 1.4,
+    "edge_soft": 1.6,
+    "edge_cell": 30,
+    "edge_wobble": 0.6,
+    "drag_along": 40,
+    "drag_across": 1.6,
+    "edge_strokes": 0.05,
+    "edge_width": [
+     8,
+     16
+    ],
+    "specks": 0,
+    "grain": 0.006,
+    "side": [
+     0.12,
+     0.22
+    ],
+    "chisel": 0.03
+   },
+   "blur": 1.6
+  },
+  {
+   "id": "v2s1/water",
+   "style": "water",
+   "seed": 77,
+   "flat": "out/paint/v2s1/flat/water.png",
+   "sun_x": 196,
+   "glint_w": 60,
+   "glint": 1.0,
+   "dashes": 1.0,
+   "under_blur": 2.0
+  }
+ ],
+ "palette": [
+  "#FFF3DC",
+  "#FCE0AE",
+  "#FDDBB0",
+  "#F7C9A6",
+  "#F0BEA8",
+  "#E5CEDB",
+  "#D2C8E3",
+  "#AFB3D8",
+  "#B89BBA",
+  "#9A88BC",
+  "#7F78A8",
+  "#CBD89C",
+  "#9EBB8E",
+  "#6E9178"
+ ]
+}

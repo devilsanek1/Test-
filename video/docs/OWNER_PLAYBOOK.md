@@ -211,7 +211,9 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   your suggestions", so these are decided, first judged in the 7 s look test of v2's canal opening: no outlines (edges
   from light and shade, the subject's shade face -20 to -25 L*); real darks 6-10 % of the frame in many small pieces;
   the "low poly" patchwork world for the ground and the far city (never on the subject, never in the sky); the designed
-  view (a second horizon for the far city) for the establishing view and the scale landing only; a quiet "find Pip" in
+  view (a second horizon for the far city) for the establishing view and the scale landing only (ON HOLD since
+  2026-10-29: two stills built on it failed, and the owner prefers v2's own eye-level view: DEPTH AND SCALE FROM A
+  HUMAN VIEWPOINT); a quiet "find Pip" in
   most exterior shots, none in closes and charts, hidden on the cover too; the sun toned one step off its sky or
   behind a ridge unless it is the shot's "look here"; thin lines 2 px on the layers that float. — ("i really like the style
   and i want us to experiment more with the style and the focus on our videos"; "i want to see how we can learn from
@@ -221,6 +223,14 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   - they feel very vibrant and coherently fit together. I like the colors of our last video about Google, but our
   video still feels cheap and lazy as if these pictures give a very premium feel to it"; "let me know if i am missing
   anything you observed too", 2026-10-28).
+- **PROPER LIGHT: one story light per scene, done properly** (owner, 2026-10-30, on the difference list: "I noticed this
+  too the light source yes - can we do the proper lights?"). Like the references (the sunset line, the red bus-stop
+  lamp, the phone's glow): one dominant source the eye goes to, real falloff from it, lit edges (rim light) on what it
+  touches, a soft glow and gentle bloom around the source itself, cast shadows and light pools that follow it, and
+  local lights (a lit door, a lamp, a screen) as story lights. This replaces the old "no glow, no gradient" caution for
+  light: a glow is right where a source is. Darks, contrast and ONE COLOUR KEY per scene (one strong colour family with
+  one hot accent, never a mix of unrelated pastels) are palette work, done in every scene ("dark and contrast are great
+  but that’s very doable that’s just color palette and selection? Similarly point 2").
 - **Light and shadow: gentle, but always there.** One consistent light direction per scene, soft form and cast shadows,
   gentle light pools that make sense; never absent and never "weirdly put". Every volume reads in 2-3 flat tones, a lit
   face and a shade face, as the city posters' buildings do; with no outlines these faces make the edges, so the
@@ -248,19 +258,55 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   column, still glitter, calm ripple lines): "Yeah this is better", v2 G4,
   2026-10-27/28; the city posters: "some buildings are obviously closer to me, some further out and there is
   something WAY further out that gives me a sense of scale", 2026-10-28).
+- **DEPTH AND SCALE FROM A HUMAN VIEWPOINT: the camera stands where a person would stand, near a person at a real
+  size, with the vast world beyond; never a wall in your face, never a far panorama.** Two stills of v2's opening
+  failed both ways: the building filling the frame up close reads as no depth and no scale ("suffocating"), and the
+  camera pulled far back into a poster-like panorama reads cheap, drifts from our style and gives a video little to
+  do. The owner's references (`docs/look/refs_human_scale/`) put the person at a real size near the camera's side of
+  the scene, about v2's original size or a little more, ~130-220 px tall in our 1080 x 1920 frame (the references' people as the owner sees them on the phone, full width: 8-16 % of the screen's width; the 9:16 motion reference's girl ~145 px) (from behind or in silhouette, no face: the people bullet below) before a vast world (a city, a huge sky, the
+  sea) that gives the scale; our own v2 eye-level angle and view of the canal "wasn't bad". So the scale comes from a
+  near human figure against a far, big world, not from moving the camera away. Keep what worked: the
+  foreground/background separation (a darker near frame, a lighter far world); the near frame a small, subtle hint at
+  the edges (a few real leaf shapes or one branch in a corner, calm in colour and contrast), never big chunky masses;
+  the street or quay across the water full, as in the posters (people, awnings and café tables, bikes, boats, trees,
+  lamps, many small things in the calm tier), never an empty strip. In a real place, its landmarks and an exact or
+  unusual camera angle matter far less than depth, density and light: never over-index on them. — (on the scene-1
+  still v1: "there is no sense of depth here like the building is right here and there us really no scale depth I’m
+  really suffocating with the view / Some bits are good tho like the style of separation of foreground vs background
+  / Also the reference do have more details and density like the the street along the canal ours is pretty empty
+  while their have density ... Also dont overindex on adding labdmarks or putting weird camera angles on existing real
+  views thats nit as important / The closest leafs and nature on the left are way too big and not as subtle as they
+  need be"; on still v2, with three references: "I don’t like this we are going away in style i think it’s too cheap
+  looking / And I’m not sure you can do much about it in terms of actual video / I think our references point should
+  be closer to the original like where a person would be about this size / So I think our initial angle snd the view
+  frankly wasn’t bad", 2026-10-29).
 - **A gentle PARALLAX float, never a flat card.** When a held shot floats, its planes move by depth (Disney's multiplane
   idea): the near ground most, far planes little, the sky and the caption band not at all; slow, small, back at rest
   by every join; it adds depth in motion without adding movers. — ("switch it on if you think it will make the videos
   better and improve engagement", v2 G4, 2026-10-28).
-- **ONE CONTINUOUS SKY, a gentle gradient, no abrupt colour seams.** The sky is one sky from the top of the frame to
-  the horizon: ONE gentle, smooth gradient (the sky is the one place a gradient is welcome), warmest around the sun and
+- **ONE CONTINUOUS SKY, a gentle gradient, no abrupt colour seams, and never an empty field.** The sky is one sky from
+  the top of the frame to the horizon, and things happen in it, as in the posters: soft clouds, a gentle paint-like
+  variation in its tone, pale far towers rising into it, birds; all calm, none of them abstract rectangles, and the
+  caption band stays clear. Its base is ONE gentle, smooth gradient (the sky is the one place a gradient is welcome), warmest around the sun and
   toward the horizon, dithered so it never bands on a phone, nearly flat inside the caption band so captions keep their
   contrast; the caption field is part of that sky, never a separate slab of another colour; the sun sits in sky that
   agrees with it, and the far city takes the sky's lowest colour as its haze. Generally: two big fields of unrelated colour never
   meet in a hard seam unless an object edge explains it. The sun stays calm: one step off its sky, or behind a ridge,
   unless it is the shot's "look here", so the far is the calmest part of the frame. — ("what bothered me is different color of the space and sun,
   like why is it blue sky and then suddenly abruptly orange, weird"; "maybe when it comes to sky we can find a beautiful
-  way to do a gentle gradient", v2 G4, 2026-10-27; the calm sun: "Go with your suggestions", 2026-10-29).
+  way to do a gentle gradient", v2 G4, 2026-10-27; the calm sun: "Go with your suggestions", 2026-10-29; on the
+  scene-1 still v1: "Also the sky is not entirely single color there are more things happening", 2026-10-29).
+- **ORGANIC, NOT GEOMETRIC: shapes blend naturally, never square and proper.** The biggest gap to the references (the
+  owner, on brushwork, shape variety and edges): our design shows its shapes and angles clearly; theirs are irregular
+  and blend naturally. Silhouettes are irregular and varied (big, medium, small), edges are lost and found, nothing
+  repeats a template, and shapes overlap and melt into each other. It gets its own deep research into techniques and
+  libraries (`docs/look/ORGANIC.md` when done). — ("5 and 6 and 7 think that’s the biggest difference we need to find a
+  way to solve properly. It feels like a lot of our design is too square and proper like I can see shapes and angles
+  very clearly while references are obviously not like that. They are more regular more naturally blend Do deep
+  research into techniques libraries etc", 2026-10-30.)
+- **SCENE COMPOSITION: big quiet areas and one place to look** (owner agreed, 2026-10-30: "8 agreed this is an important
+  point about scene composition"; on still v6: "our scene is very busy"): few elements of equal weight, values grouped into a few big masses, one focal point
+  with the most contrast and the story light, negative space; a busy frame of many mid-tone props is the failure.
 - **ATTENTION HIERARCHY: one main arc, one focus at a time.** The story's subject gets the contrast, the deepest
   light-and-shade step, saturation and the clear motion; supporting life (a bird, walkers, snow, steam) stays subtle
   (smaller, lower contrast, gentler shade, softer colour, calmer motion): alive, but never competing. Supporting environment may be drawn in
@@ -307,7 +353,30 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
 - **People small and simple like reference 1** (crowds, small full figures seen from behind or in rear 3/4, round
   heads; near heads <= ~140 px), never big character models or faces: they act with their pose (reach, shrug, slump,
   look up), as reference 1's do; only the mascot has a face. **In the foreground only the film's one "you" or the
-  mascot;** strangers stay small in the mid and far ground (a row of strangers' backs in front reads as "you"). —
+  mascot;** the "you" near the camera stands at a real size, about v2's original (~130-220 px tall), still simple and
+  from behind or in silhouette (DEPTH AND SCALE FROM A HUMAN VIEWPOINT above; owner, 2026-10-29); strangers stay small in the mid and far ground (a row of strangers' backs in front reads as "you"). Simple, but REFINED,
+  CLEAN and FLUID like the girl in the owner's 9:16 motion reference (`docs/look/refs_human_scale/04_cloud_beast_girl_strip.jpg`):
+  elegant proportions, a clear silhouette and line of action, few shapes lit warm on one side with soft gradients, no
+  outlines, one flowing element (a scarf, ribbon, coat hem or hair) that moves with follow-through while the body stays
+  calm; the recipe: `docs/look/paint_recipes/people.md`. And BEAUTIFUL: people are attractive and pleasant to
+  look at, their clothing contemporary and appealing (styled like today's best illustration, never dated); our
+  current people read "very old style and frankly ugly", so people get their own deep design research (a design system:
+  proportions, faces-by-pose, hair, wardrobe by context, palette) before the next film draws anyone. — ("One thing we I
+  don’t like about people on our design is there is a lot style involved like we need to draw people that are beautiful
+  and pleasant and the clothing is appealing. Our. Current design is very old style and frankly ugly so it’s tricky I
+  think it will require its own deep research", 2026-10-30.) The target: people aged 20-30 today, styled cool and appealing,
+  like Instagram influencers in New York and Los Angeles (hair and clothing), with faces drawn in a more generic,
+  simplified way. THE PICK (2026-10-30): direction C, MODERN GRAPHIC (`docs/look/people_design/dir_graphic.md`: about
+  7.8 heads, rounded polygons in two flat tones, crisp, no outlines, the styling carried by clothes and hair), but NOT its
+  face (one brow-into-nose mark), which "looks messed up": the face is redesigned before the system is final. — ("I
+  actually kind of like the last one modern graphic except the face that looks messed up", 2026-10-30.) The face now:
+  LASH (closed-eye lash lines and a small soft nose; the contour only under ~200 px; sunglasses and caps as some
+  people's accessories; her often turned away), kept for now and to be iterated later ("It’s better let’s keep it for
+  now / We will iterate more later on"; "Let’s keep lash", 2026-10-30; `docs/look/PEOPLE_DESIGN.md`). — ("Yes then people I think we should target 20-30 yo today with styles that are just cool and
+  appealing to look at so think instagram infkuebcers, New York, Los Angeles, including hair clothing and perhaps less
+  of faces like faces we need to find a way to draw in a more generic way"; "Let’s land version 6 first", 2026-10-30.) — ("Another bit is humans we paint - they should be better /
+  These are the references especially the video / On the video the person is not substantially different than yours
+  but certainly more refined and clean and more fluid", 2026-10-29.) —
   ("don't use big models of people; the people in the first example video are the right direction", v2 restart,
   2026-10-27; v3 retro, 2026-10-27).
 - **Captions are burned in and pop in place (or rise without clipping);** a reveal that cuts letters looks like a glitch;
@@ -325,13 +394,60 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   never one dark mass or a narrow band of light pastels (one reason v2 reads cheap next to the city posters). Numbers:
   `docs/look/CRAFT.md` §f.8, from the city-poster study. — (our observation on the posters; "5 - good point too!",
   2026-10-28; the darks in many small pieces: "Go with your suggestions", 2026-10-29).
+- **PAINTED PIECES: the sky and its clouds, and a few chosen environment pieces (some foreground buildings, trees and
+  greenery), are uniquely painted, as in the owner's references** (`docs/look/refs_human_scale/`, the city posters'
+  skies and proteas): visible brush and paint texture, soft painted edges, colour moving within a shape, each piece
+  painted for its place (never one stamp repeated). The painting is SUBTLE AND BEAUTIFUL, in the drawing style of the
+  owner's two favourites (`refs_human_scale/02_bus_stop_night.jpg`, `03_beach_dusk.jpg`): big, simple painted masses
+  made of a few broad, deliberate strokes, soft dry-brush edges, gentle variation inside calm areas, one harmonious
+  colour family per sky lit by one light, fine strokes only where a thing is fine (reeds, a flock), atmosphere over
+  detail; the sky has DEPTH too: clouds in 2-4 overlapping planes, the near mass biggest and strongest, the far banks
+  paler, cooler, softer and simpler, flattening into thin streaks toward the horizon; never an even streaky texture over everything, which reads as a filter and as lower drawing quality. The subject (tier A) and the faces and people stay crisp and clean,
+  so the paint is the world's, not the story's; and by DEPTH, a balance: near objects sharper, far objects more like
+  brushwork and paint, as in the references ("I think we need to find a balance I think even in the references the close
+  objects are more sharp while further objects are more like brushes and painting", 2026-10-30); but always ONE
+  painted language for the whole frame: a lone painted object among flat vector pieces reads pasted in ("it is weird
+  looking tree we have on the forefront like it doesn’t fit the style there, while AI generated cloud certainly
+  fits", on still v6, 2026-10-30); the film still works with the paint off. In the engine the painted
+  pieces are layers made by our own deterministic paint pass (seeded, locked to their layer so nothing swims in the
+  float; a cloud may churn slowly), never a filter smeared over the whole frame. The dose is
+  judged on a look test first. — ("Another piece of feedback is I really like the “painted” pieces like the sky and the clouds the references or some foreground buildings and trees / greenery are uniquely painted / Is it possible to modify our engine to match the story? Style"; "Yeah the painted message look above I said about modifying our
+  engine to be able to do that", 2026-10-29: so the ENGINE gains the paint pass, `src/lib/paint/`, reusable by every film;
+  on the painted still v2, with refs 02 and 03: "The drawing quality is not the same it needs to be a bit more subtle
+  and more beautiful / Also I like the drawing style in these two more"; "And again even clouds have layers that give a
+  sense of depth but yours do not", 2026-10-29). The method that is "getting there" is DESIGN FIRST: the sky and
+  clouds designed as flat shapes in one colour family and planes first, then painted (our painter's v4, `--design`):
+  "Wait but this is actually not bad like it’s not there but we are getting there", 2026-10-29. Then BRUSH the design
+  in layers, the owner's recipe (`docs/look/refs_paint/`): a limited palette sampled from the scene (~10-14 colours);
+  each mass brushed in passes, big soft blurred strokes first, then blocky flat-brush strokes along the form, then a few
+  crisp strokes at the light edges; each plane painted softer and blurrier the farther it is; water as a calm designed
+  base mirroring its sky with a few deliberate horizontal strokes (never uniform scattered dashes or stacked rows, which
+  read cheap: CRAFT §f.7); speckle only on near masses. — ("I think we just need to brush it and perhaps draw them in layers a bit more
+  blurry each time like look how this is done or this", 2026-10-29.) AI-painted background plates (a model repaints only our background
+  pieces from our own layout; the story layers stay ours) are approved as a TEST, judged against our own painter:
+  "I mean let’s try and see if it gets us there", 2026-10-29 (`docs/studies/2026-10-28_city_posters/ai_paint/BRIEF.md`).
+  A painted plate must be able to PAINT ON in the opening like the rest of frame 0 (our flat design drawn first, the
+  painted plate revealed stroke by stroke through brush-shaped masks), never pop up; and the owner prefers no extra
+  service where we can run it ourselves (an open model in our own container first). — ("If we do that would we be able
+  to then animate its process like the very first few seconds or would it literally just popup?"; "Oh damn we need a
+  separate service / But you are AI why can’t you do it", 2026-10-29). On the local SDXL sky trials: "Yeah 0.7 looks
+  reasonable" (img2img strength 0.70 from our design); and the priority stays OUR CODE: "Let’s see what’s the best we
+  can do with code after research", 2026-10-29: the painter rebuilt from the researched recipes is the main path, the
+  AI plate the comparison. Then, after the recipe book and v6: "Let’s try to do in engine first without AI painted
+  pieces" (2026-10-30): the next look rounds use our engine only; AI plates stay an explained option, not in use.
+  Later, AI is welcome TACTICALLY, never as the picture: for chosen elements or background layers that the engine moves
+  (parallax, sway, drift), and as a post-processing style pass on our own baked layers (adding brushwork over our
+  layout at low strength), always once per layer per shot, never per frame (per-frame AI flickers). — ("I like the idea
+  of using AI tactically like for certain elements or layers that move to achieve parallax or post processing kind of to
+  add more style right?", 2026-10-30.)
 - **Texture and lines: VERY subtle.** No outlines: as on the city posters, shapes are separated by light and shade (a
   lit and a shade face on every volume, the subject's the deepest) and by value, never by a line drawn round them
   (the A vs B picture's B). Thin lines only on small things that are lines (window bars, railings, rigging): dark,
   warm lines in the object's own deep shade, never one near-black ink on everything (v3 G5b's was "too rough"), 2 px
   on the layers that float so they never twinkle; the owner's "black outlines" now live only in these; captions keep
   the dark ink. Spec: `docs/look/CRAFT.md` §c. Texture: start playing with a VERY subtle paper-and-paint
-  texture (a fine grain and gentle mottling in the big flats, like the city posters) where it adds to the premium look,
+  texture (a fine grain and gentle mottling in the big flats, like the city posters) where it adds to the premium look
+  (the painted pieces, the bullet above, are the one place paint shows openly),
   tried in a look clip and kept only if it does; the halftone stays an option on a few elements; the film must work
   flat. — ("very subtle texture
   pieces and the black outlines, VERY subtle but in key places", texture test, 2026-10-25; "cleaner, more refined,
@@ -632,6 +748,45 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   and tools to do it the best way you can", v2 G4, 2026-10-27; "Search for any libraries or supporting code on GitHub if
   you need for any piece of functionality - we don't necessarily want to be reinventing the wheels if something was
   already built and available"; "But only if it's genuinely better than built yourself", 2026-10-29).
+- **The forest before the trees: when a reference is far from our picture, rebuild the frame from the ground up; never
+  tune details on the old one.** The gap between our film and a reference like the city posters is in the
+  construction (the viewpoint and the designed view, the big shapes and their values, the hero against the sky, the dark
+  framing near ground, the far pale stage), not in the paint. So a look step starts from a blank frame built in that
+  order: a value thumbnail first (judged beside the reference at phone size), then colour, then detail, texture last.
+  Every look change must be visible at phone size at a glance, or it is not worth its time; a day of barely visible
+  tweaks is a process failure. — ("yes good, but we spent the entire day tweaking the style that is frankly barely
+  noticeable like we focus all our attention on details and missed the forest for the trees ... rethink how you would
+  construct the scene from ground up", on the look test v1, 2026-10-29). A rebuild keeps our own look and what the
+  owner already liked (the v2 angle and view, its colours): a reference teaches principles, never a style to move
+  into; drifting toward the reference's style reads cheap. — ("I don’t like this we are going away in style i think
+  it’s too cheap looking ... So I think our initial angle snd the view frankly wasn’t bad", on the scene-1 still v2,
+  2026-10-29).
+- **Research the recipe before building a look element.** When a reference shows a look we can't yet make (a painted
+  sky, layered clouds, water, foliage), first study it closely (crops, measured values, palette, edges, stroke sizes,
+  layer order, softness by depth) and research how professional painters do it, then write a CONCRETE, numbered recipe
+  per element and prove it on a swatch beside the reference; only then build it into the engine and the scene. Never
+  iterate a scene blind on a vague brief. The recipes live in `docs/look/PAINT_RECIPES.md` (+ `docs/look/paint_recipes/`).
+  — ("Why can’t you do the research yourself and come up with a concrete detailed recipes to reproduce certain
+  elements? Seems like you should be able to really clearly define a recipe", 2026-10-29, after four painted stills).
+  On the result, the recipe book and its swatches: "I mean it is an improvement certainly / I am sure we can start with
+  that - this is an incremental improvement from the previous videos" (2026-10-30): the recipes are the starting point
+  for the next film's look; further refinement is a measured difference-analysis loop (owner's question: "if we invest
+  more time analysing the differences would we get even closer?"), each round aimed at the largest measured gap.
+- **Never ask the owner to choose between options they can't tell apart at phone size.** A choice goes to the owner
+  only when the options differ visibly at a glance (side by side at 400 px wide); a smaller difference is ours to
+  decide, by the rules, and we note the call. — ("I don’t really see the difference between a snd b", on two sky tops
+  ~5 L* apart, 2026-10-30.)
+- **Two modes: PRODUCTION and ITERATION.** Production is a film going through the gates (G0-G8): full checks, review
+  panels, QA suites, fix passes, as the quality needs. Iteration is a quick experiment for the owner to judge (a look
+  test, a rethought scene, a style probe, a "what if"): one or two agents, no panels, no critics, no QA suites, rough
+  where rough is enough (a still, a few stages, a short clip), the result in about an hour and shown at once; the
+  owner's verdict is the review. A look iteration starts with STILLS: motion only once the owner has approved the
+  still. Ask "is this a film or a question?" before planning: a question is an iteration, and
+  only what the owner picks from it goes into production (then with the full gates). The no-limit rule on creative
+  tokens is about quality in production; in iteration, speed of feedback is the quality. — ("So like we have the
+  'production' process and we have 'iteration' process that needs to be more lightweight", 2026-10-29, after a day-long
+  look test with lanes, panels and fix passes that the owner judged in one glance; "Again let’s start with stills";
+  "No video yet", 2026-10-29, on a painted-look test briefed as a still plus a clip).
 - **Every lesson goes into the generic process, committed** (playbook, a PIPELINE gate, the studio toolkit). — ("we gradually get better", v3, 2026-10-26).
 - **A rejected cut restarts clean.** When the owner says "I don't like it, start from scratch", drop the old visual
   work (archive it), skip the gates the owner names (e.g. no sketch) and make the finished film directly with full
@@ -642,6 +797,20 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
 ## Platforms and posting
 - **Accounts: Instagram `what.the.fuss.is.about`** (Creator, Education); TikTok and YouTube Shorts under the same name,
   handle and avatar. Posting texts per video: `docs/POSTING_KIT.md`. — (2026-10-25).
+- **The studio logo is a modern, premium symbol: one idea in a few bold shapes, usable everywhere; no text, no
+  elephant, no scene full of details** (no wordmark, no lettered monogram; not a character: no Pip, no elephant at all;
+  not an illustration: a dusk city full of windows has "too many details"; yet not so abstract that its meaning is lost: it reads at a
+  glance as what it is, e.g. a speech bubble being unfolded): it must read alone as the avatar circle at 40-110 px, in the
+  videos' corner and on banners. The logo's rounds, sources and the owner's verdicts: `docs/brand/LOGO.md`. — ("The
+  logo should not contain any text btw", on logo round 1; "More premium!!" and "No, more abstract more premium", on
+  round 2, with two Pip marks and a spiral "?"; "The fold is directionally good but way too abstract", on round 3, then "Nope from scratch I don't like none of
+  them" and "More premium", 2026-10-29: flat geometric icons read as stock; premium is craft, light and depth; on
+  round 4's emblems: "I like the city view but it's too generic like why is it relevant to us", so the mark must say
+  what we do, the talk, the fuss, the question, not just look good; on round 5's city scenes: "I said no elephant" /
+  "Too many details who would use this logo" / "No from scratch pick up the modern logos and do it again"; the pick,
+  round 6: The Peel, a speech bubble with its corner peeled back: "I like the peel yes"; then "Maybe just play with
+  color schemes", "Okay pick one and give me the final one" and "Logo is done", 2026-10-29: FINAL, the pack in
+  `deliverables/brand/peel/`, the spec in `docs/brand/LOGO.md`).
 - **Upload at the highest quality and natively on each platform** (checklist in `docs/POSTING_KIT.md`). — (2026-10-25).
 - **AI label ON everywhere; no paid boost until 3-5 posts exist,** then boost the best organic performer. — (2026-10-25).
 

@@ -125,6 +125,17 @@ export const S1PathFurniture: React.FC = () => {
         b.fill(dark('iron'), `M${P(x - w / 2, y)}L${P(x - w * 0.3, y - h)}L${P(x + w * 0.3, y - h)}L${P(x + w / 2, y)}Z`);
       }
     }
+    // (REVIEW MUST 3.4: the darks the panes gave up, at her feet) iron mooring rings hanging on the coping's face in front
+    // of the door, clear of the wet line under its lip
+    if (darks) {
+      for (const x of [300, 384, 468, 516, 604, 668, 742, 822]) {
+        const k = MAP.s1FigureHAt(x) / S.herH;
+        const y = edge - coping * 0.78 + s1Bend(x);
+        const w = 7 * k;
+        const h = 6 * k;
+        b.fill(dark('iron'), `M${P(x - w / 2, y)}L${P(x + w / 2, y)}L${P(x + w * 0.42, y + h * 0.55)}Q${P(x, y + h * 1.15)} ${P(x - w * 0.42, y + h * 0.55)}Z`);
+      }
+    }
     // lamp posts (heritage: plinth, fluted column, lantern), sized by the bend's scale
     for (const L of S1_FAR_LAMPS) {
       const k = MAP.s1FigureHAt(L.x) / S.herH;

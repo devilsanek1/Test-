@@ -1,0 +1,156 @@
+{
+ "v6/cloud": {
+  "edges": {
+   "n": 230,
+   "crisp": 42.2,
+   "soft": 12.2,
+   "lost": 45.7,
+   "median_px": 6.5
+  },
+  "arc_share_pct": 35.6,
+  "sharp_internal_pct": 0.41
+ },
+ "v6/tree": {
+  "edges": {
+   "n": 307,
+   "crisp": 70.4,
+   "soft": 29.6,
+   "lost": 0.0,
+   "median_px": 2.0
+  },
+  "arc_share_pct": 4.1,
+  "sharp_internal_pct": 37.92
+ },
+ "mypaint/cloud": {
+  "edges": {
+   "n": 217,
+   "crisp": 41.0,
+   "soft": 31.3,
+   "lost": 27.6,
+   "median_px": 3.0
+  },
+  "arc_share_pct": 49.3,
+  "sharp_internal_pct": 8.82
+ },
+ "mypaint/tree": {
+  "edges": {
+   "n": 274,
+   "crisp": 74.8,
+   "soft": 25.2,
+   "lost": 0.0,
+   "median_px": 1.5
+  },
+  "arc_share_pct": 4.8,
+  "sharp_internal_pct": 24.27
+ },
+ "stack/cloud": {
+  "edges": {
+   "n": 227,
+   "crisp": 12.8,
+   "soft": 50.2,
+   "lost": 37.0,
+   "median_px": 6.0
+  },
+  "arc_share_pct": 27.0,
+  "sharp_internal_pct": 8.05
+ },
+ "stack/tree": {
+  "edges": {
+   "n": 281,
+   "crisp": 71.2,
+   "soft": 28.8,
+   "lost": 0.0,
+   "median_px": 1.5
+  },
+  "arc_share_pct": 1.3,
+  "sharp_internal_pct": 25.12
+ },
+ "skia/cloud": {
+  "edges": {
+   "n": 221,
+   "crisp": 14.9,
+   "soft": 36.2,
+   "lost": 48.9,
+   "median_px": 8.0
+  },
+  "arc_share_pct": 16.2,
+  "sharp_internal_pct": 4.33
+ },
+ "skia/tree": {
+  "edges": {
+   "n": 258,
+   "crisp": 37.6,
+   "soft": 55.4,
+   "lost": 7.0,
+   "median_px": 2.5
+  },
+  "arc_share_pct": 6.1,
+  "sharp_internal_pct": 14.68
+ },
+ "noise/cloud": {
+  "edges": {
+   "n": 236,
+   "crisp": 11.9,
+   "soft": 39.4,
+   "lost": 48.7,
+   "median_px": 8.0
+  },
+  "arc_share_pct": 6.5,
+  "sharp_internal_pct": 0.33
+ },
+ "noise/tree": {
+  "edges": {
+   "n": 425,
+   "crisp": 41.2,
+   "soft": 56.7,
+   "lost": 2.1,
+   "median_px": 2.5
+  },
+  "arc_share_pct": 0.2,
+  "sharp_internal_pct": 38.16
+ },
+ "p5/cloud": {
+  "edges": {
+   "n": 217,
+   "crisp": 53.5,
+   "soft": 41.0,
+   "lost": 5.5,
+   "median_px": 2.0
+  },
+  "arc_share_pct": 20.2,
+  "sharp_internal_pct": 25.17
+ },
+ "p5/tree": {
+  "edges": {
+   "n": 280,
+   "crisp": 81.8,
+   "soft": 16.8,
+   "lost": 1.4,
+   "median_px": 1.5
+  },
+  "arc_share_pct": 2.9,
+  "sharp_internal_pct": 46.61
+ },
+ "opencv/cloud": {
+  "edges": {
+   "n": 230,
+   "crisp": 42.2,
+   "soft": 12.2,
+   "lost": 45.7,
+   "median_px": 6.5
+  },
+  "arc_share_pct": 35.6,
+  "sharp_internal_pct": 3.64
+ },
+ "opencv/tree": {
+  "edges": {
+   "n": 307,
+   "crisp": 70.4,
+   "soft": 29.6,
+   "lost": 0.0,
+   "median_px": 2.0
+  },
+  "arc_share_pct": 4.1,
+  "sharp_internal_pct": 15.84
+ }
+}

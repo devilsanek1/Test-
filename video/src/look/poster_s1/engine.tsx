@@ -1,13 +1,13 @@
 // The look test's hook-ups to the lanes' engine pieces (notes: test/SCENE.md "the switches"). ONE place where the
 // scene meets lib code that is new for the test, so a lane's API change is fixed here:
-//   lane E (done, test/ENGINE.md): the line flags (lib/pen PEN.outlines, PEN.lineMin), FormShade per tier (lib/light
+//   lane E (test/ENGINE.md): the line flags (lib/pen PEN.outlines, PEN.lineMin), FormShade per tier (lib/light
 //          withTierForm, tierFormFor), the float by 1/z (lib/depth PARALLAX_Z), the far anchor (lib/depth
 //          anchorTones, used in V2S1_far_stage), the near floor (lib/depth nearPalette, used in near.ts), the 10b
 //          palette (./palette_10b CM10B)
-//   lane PT (patchwork done, texture in progress: test/ENGINE_PT.md): the patchwork (lib/patchwork, used in
-//          V2S1_patch.tsx); the mottle: <TextureSlot> below, a PLACEHOLDER until lib/texture's <Mottle> lands
-//   lane N (in progress: test/ENGINE_NATURE.md): <TreeSlot>, <SpraySlot>, <CloudSlot> below, PLACEHOLDERS that
-//          draw v2's own piece until lib/foliage's <Crown> / <LeafSpray> and lib/clouds's <Cumulus> land
+//   lane PT (test/ENGINE_PT.md): the patchwork (lib/patchwork, used in V2S1_patch.tsx); the mottle (lib/texture
+//          <Mottle>) in <TextureSlot> below, one per plane group
+//   lane N (test/ENGINE_NATURE.md): lib/foliage's London plane and lib/wind's one wind (<TreeSlot>, <SpraySlot>),
+//          lib/clouds' hero cumulus (<CloudSlot>); the specs are V2S1_nature.tsx
 // Module state (the pen, the palette roles) is set by the composition's root before its children render, every frame,
 // from the props and the time (one value per frame; frames render in any order): deterministic.
 import React from 'react';
@@ -15,8 +15,10 @@ import {PEN} from '../../lib/pen';
 import {PARALLAX_Z} from '../../lib/depth';
 import {withTierForm, tierFormFor, type LightRig} from '../../lib/light';
 import {CM} from '../../v2r/palette';
+import {Mottle, mottleK, mottleSeed} from '../../lib/texture';
 import {CM10B, CM_V2} from './palette_10b';
 import {textureOn, type PosterSwitches} from './switches';
+import {S1Cloud, S1Spray, S1Tree} from './V2S1_nature';
 
 // ---------------------------------------------------------------- the pen: no outlines, 2 px lines (lane E)
 
@@ -94,23 +96,39 @@ export function applyFloat(sw: PosterSwitches) {
 /** The share table in effect this frame (undefined = v2's PARALLAX_K). */
 export const currentFloatTable = () => FLOAT_TABLE;
 
-// ---------------------------------------------------------------- PLACEHOLDERS (lanes PT and N, in progress)
+// ---------------------------------------------------------------- the mottle (lane PT)
 
-/** The mottle of one parallax plane (lane PT's lib/texture <Mottle>, in progress): static, locked to the plane's group
- *  (it rides the float with it), strength by plane (MOTTLE_K: A/B 1, near C 0.7, far C 0.4, the sky 0.6), none in the
- *  caption band. PLACEHOLDER: draws its children as they are. The integration: `<Mottle k={mottleK({plane})} seed
- *  on={on}>{children}</Mottle>`. */
-export const TextureSlot: React.FC<{sw: PosterSwitches; t: number; plane: number; sky?: boolean; children?: React.ReactNode}> = ({children}) => <>{children}</>;
+/** The mottle of one parallax plane (lib/texture <Mottle>, CRAFT §c): static, locked to the plane's group (it rides
+ *  the group's float transform), one seed per plane (`mottleSeed`: two groups of one plane read as one surface, two
+ *  planes never slide as one sheet), the strength by plane (`mottleK`: the sky 0.6, near C 0.7, far C (+2 and farther)
+ *  0.4), none in the caption band (cut out in SCREEN rows through the group's float `offset`). Off (or before its
+ *  switch's second): the children as they are (v2's tree, no wrapper). A mottled group is ISOLATED: a multiply layer
+ *  that falls on ANOTHER group goes in S1Plane's `under` / `over` (outside the filter), never inside. */
+export const TextureSlot: React.FC<{sw: PosterSwitches; t: number; plane: number; sky?: boolean; offset?: [number, number]; region?: [number, number, number, number]; k?: number; children?: React.ReactNode}> = ({sw, t, plane, sky, offset = [0, 0], region, k, children}) => {
+  if (!textureAt(sw, t)) return <>{children}</>;
+  const isSky = sky ?? !Number.isFinite(plane);
+  return (
+    <Mottle k={(k ?? mottleK({plane, sky: isSky})) * (sw.textureK ?? 1)} seed={mottleSeed(plane)} scale={isSky ? SKY_MOTTLE_SCALE : 1} offset={offset} region={region}>
+      {children}
+    </Mottle>
+  );
+};
+/** The sky plane's blotch scale: at lib/texture's 1.0 S1's open sky measured a 1/e radius of 36-37 px (check_banding
+ *  --texture, 2026-10-29; the spec 15-35, the posters 20-36, median 30, PT's demo sky 33); 0.9 brings it into the spec
+ *  (every group of the sky plane the same, so they stay one surface). */
+export const SKY_MOTTLE_SCALE = 0.9;
 /** Is the texture on at t (the switch's number = on from that second: STUDY §10 pass 1's 3.5 s). */
 export const textureAt = (sw: PosterSwitches, t: number) => textureOn(sw, t);
 
-/** One species tree for the near bay (lane N's lib/foliage <Crown> in lib/wind's gentle wind, in progress): its box
- *  (the crown's screen bounds), trunk foot, plane (-2) and the light (RIG_CANAL's low western sun). PLACEHOLDER: v2's
- *  own crown (`fallback`). */
-export const TreeSlot: React.FC<{sw: PosterSwitches; box: [number, number, number, number]; foot: [number, number]; plane: number; fallback: React.ReactNode}> = ({fallback}) => <>{fallback}</>;
-/** The near leaf spray in the top-left gutter (lane N's <LeafSpray>: the London plane's palmate leaves, in progress).
- *  PLACEHOLDER: v2's own branch. */
-export const SpraySlot: React.FC<{sw: PosterSwitches; box: [number, number, number, number]; fallback: React.ReactNode}> = ({fallback}) => <>{fallback}</>;
-/** The hero cumulus (lane N's lib/clouds <Cumulus>, in progress): its box above the caption band (y < 290) and drift.
- *  PLACEHOLDER: the kit's cloud. */
-export const CloudSlot: React.FC<{sw: PosterSwitches; box: [number, number, number, number]; speed: number; fallback: React.ReactNode}> = ({fallback}) => <>{fallback}</>;
+// ---------------------------------------------------------------- nature (lane N)
+
+/** The planter's tree: lane N's London plane in the one wind (V2S1_nature S1Tree), Pip inside it under `pipHidden`
+ *  (`pip`: drawn between the crown's front clusters); off, v2's bay crown (`fallback`, with the darks and its own
+ *  hiding spot). */
+export const TreeSlot: React.FC<{sw: PosterSwitches; pip?: React.ReactNode; fallback: React.ReactNode}> = ({sw, pip, fallback}) =>
+  sw.foliage ? <S1Tree pip={sw.pipHidden ? pip : undefined} /> : <>{fallback}</>;
+/** The near leaf spray in the top-left gutter: the London plane's own leaves (V2S1_nature S1Spray); off, v2's twig. */
+export const SpraySlot: React.FC<{sw: PosterSwitches; fallback: React.ReactNode}> = ({sw, fallback}) => (sw.foliage ? <S1Spray /> : <>{fallback}</>);
+/** The hero cumulus in v2's hero-cloud spot (V2S1_nature S1Cloud, above the caption band over its drift); off, the
+ *  kit's cloud. */
+export const CloudSlot: React.FC<{sw: PosterSwitches; fallback: React.ReactNode}> = ({sw, fallback}) => (sw.cloud ? <S1Cloud palette10b={!!sw.palette10b} /> : <>{fallback}</>);

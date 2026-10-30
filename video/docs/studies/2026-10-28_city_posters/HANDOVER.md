@@ -6,6 +6,130 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-30 ~10:10 UTC: QUEUED next (owner): research + distill the composition shots
+- Owner: "After we are done with this I want you to do another research and distill of the composition shots to use /
+  Take a look at this folder I collected some initial references but do the deeper research" (Drive folder, 5 reels,
+  saved in `video/docs/look/refs_composition/` with contact sheets and a README).
+- Start it when organic-look's ORGANIC.md lands: a research workflow -> a distilled shot library for 9:16 (each shot
+  type with its composition, our scene-1/Helsinki example as a value thumbnail), merged with LAYOUT.md / CINEMATIC_GUIDE.
+
+## Status 2026-10-30 ~07:20 UTC: both research runs resumed after the 5-hour limit
+- people-design (run `wf_2f7a2fc2-354`): research DONE (`people_design/diagnose.md` + sheet, `design_research.md`,
+  `fashion.md` + `fashion_board.png`); the 3 directions + the system re-running (resume notes added to the script).
+- organic-look (run `wf_238386b4-a11`): techniques + libraries DONE (`organic/techniques.md`, `techniques_sheet.jpg`,
+  `libraries.md`, `libraries_sheet.png`: top pick MyPaint's brush engine via the peinten port); shapes, light,
+  composition, the two proofs and ORGANIC.md re-running.
+- Video 4: the owner-approved style adjustments committed beside its visual script on `claude/kind-pascal-lvgsza`
+  (`video/docs/v4/visual/STYLE_ADJUSTMENTS.md`). Sky top: B (owner couldn't tell A and B apart).
+- If stopped again: `Workflow({scriptPath, resumeFromRunId})` for each run (scripts under
+  /root/.claude/projects/-home-user-Test-/fe339b66-57f0-5b47-bb6a-872d2f15f4c0/workflows/scripts/).
+
+## Status 2026-10-30 ~00:50 UTC: v6 sent (sky top A/B asked); the people design research runs
+- v6 DONE and sent (`paint_test/paint_still_v6.png`, `compare_v6.jpg`, `skytop_v6_choice.jpg`; owner to pick sky top A/B).
+- RUNNING: workflow `people-design` (run `wf_2f7a2fc2-354`; owner: people "beautiful and pleasant", "20-30 yo today ...
+  instagram influencers, New York, Los Angeles ... faces ... more generic"): research (diagnose, design, fashion) ->
+  three directions (editorial, painterly, graphic) as still sheets -> `video/docs/look/PEOPLE_DESIGN.md` (DRAFT system) +
+  `people_design/directions_compare.png`. Resume: `Workflow({scriptPath, resumeFromRunId: "wf_2f7a2fc2-354"})`.
+- NEXT: send the compare sheet + the three direction sheets; the owner picks a direction; then the system goes final.
+- ALSO RUNNING: workflow `organic-look` (run `wf_238386b4-a11`; owner on the difference list: proper light, one colour key,
+  near sharp / far painterly, "too square and proper ... Do deep research into techniques libraries etc", composition,
+  texture): research (techniques, libraries tried, shapes measured, light, composition) -> proofs on v6 (organic pieces;
+  story light + texture + colour key) -> `video/docs/look/ORGANIC.md` (painter v7 roadmap) + `docs/look/organic/index.jpg`.
+  Resume: `Workflow({scriptPath, resumeFromRunId: "wf_238386b4-a11"})`.
+
+## Status 2026-10-30 ~00:15 UTC: the recipe book is DONE; painter v6 runs
+- DONE: `video/docs/look/PAINT_RECIPES.md` (+ `paint_recipes/{sky_clouds,water,foliage,built_ground,people}.md`, swatches,
+  `index.jpg`; scripts `video/scripts/look/paint/recipes/`). Doc clash D1 fixed in CRAFT §f.2 (painted pieces soften by
+  plane); the dashes clash closed in CRAFT §f.7; D2-D5 are recipe-level, fixed in v6's code.
+- RUNNING: one agent builds painter v6 from the book §4 (+ real darks outside the caption band + the refined her):
+  `paint_test/paint_still_v6.png`, `skytop_v6_choice.jpg`, `compare_v6.jpg` (v5, v6, ai_still_v1, refs 03/02). If it stops:
+  resume the agent, or rerun the same brief from its partial files.
+- NEXT: send v6 + the sky-top choice; capture the verdict.
+
+## Status 2026-10-29 ~22:30 UTC: PAUSED for the token limit (owner: "You are about to be paused due to token limits")
+Everything is committed and pushed to `claude/compassionate-hopper-5iqguj` and `video-production`. RESUME HERE:
+1. `git pull` both branches; `git status` (commit any leftover agent files with the usual trailers).
+2. The paint-recipes workflow (run `wf_493c40ba-54a`): sky_clouds and water DONE (`video/docs/look/paint_recipes/
+   sky_clouds.md`, `water.md` + swatches); foliage and built_ground were running (their .md files exist, swatches may
+   be missing); the synthesizer (`video/docs/look/PAINT_RECIPES.md`, `paint_recipes/index.jpg`) not started. Resume:
+   `Workflow({scriptPath: "/root/.claude/projects/-home-user-Test-/fe339b66-57f0-5b47-bb6a-872d2f15f4c0/workflows/
+   scripts/paint-recipes-wf_bde6f405-055.js", resumeFromRunId: "wf_493c40ba-54a"})` (the prompts tell agents to continue
+   from partial files). If the run id is gone, run the script fresh.
+3. DONE and sent: people recipe (`paint_recipes/people.md`, `people_sheet.png`, `src/lib/figure/`: ~2/3 of the way;
+   next: slimmer, shorter coat, thin tapered scarf, warm front light, a lit edge against the water); the AI test
+   (`ai_paint/`: SDXL local 0.70 sky has the depth and mood but an airbrush finish; owner: "Yeah 0.7 looks reasonable",
+   then "Let’s see what’s the best we can do with code after research"); `src/lib/paint/reveal.tsx` paints a plate on.
+4. NEXT (one agent, iteration, stills only): painter v6 from the recipe book (sky and layered clouds, water, the tree,
+   the far city) + real darks + the refined her, on the v3 composition or v2's S1; compare beside ai_still_v1 and v5.
+5. Restart the checkpoint loop (scratchpad `study_checkpoint4.sh`, paths incl. `video/public/paint`, `public/figure`).
+
+## Status 2026-10-29 ~21:25 UTC: painted look, people, AI test, logo (restart recovered)
+- LOGO: FINAL, The Peel in coral and ink (`video/deliverables/brand/peel/`, `video/docs/brand/LOGO.md`); helper archived.
+- PAINT (our engine painter, `src/lib/paint/`, `scripts/look/paint/paint.py`, demo `src/look/paint_s1/`): v1-v5 stills in
+  `paint_test/`; owner: v4 (design first) "getting there"; v5 = the owner's layered-brush recipe + one evening light.
+- RUNNING after a container restart (~21:20 UTC):
+  - workflow `paint-recipes` (run `wf_493c40ba-54a`): 4 researchers (sky_clouds, water, foliage, built_ground) write
+    `video/docs/look/paint_recipes/<family>.md` + swatches + `scripts/look/paint/recipes/<family>.py`, then a synthesizer
+    writes `video/docs/look/PAINT_RECIPES.md` + `paint_recipes/index.jpg` (owner: "come up with a concrete detailed
+    recipes"). Resume: `Workflow({scriptPath, resumeFromRunId})`.
+  - agent (people recipe): `docs/look/paint_recipes/people.md` + `people_sheet.png`; code `src/lib/figure/`,
+    `src/look/people/` (owner: people "more refined and clean and more fluid", refs 04 girl strip, 03 couple zoom).
+  - agent (local AI test, SDXL on CPU, weights in /tmp/hf-cache): `ai_paint/ai_still_v1.png`, `compare.jpg`,
+    `reveal_strip.jpg`, `NOTES.md`.
+- NEXT: send each result; then v6 of the painter from the recipe book (+ real darks), people into the scene.
+
+## Status 2026-10-29 ~19:45 UTC: still_v2 rejected ("too cheap looking", "going away in style"); still_v3 in our engine
+- The owner, with three new references (`video/docs/look/refs_human_scale/`): back to v2's own angle and view, the
+  person near the camera at a real size. Captured: playbook "DEPTH AND SCALE FROM A HUMAN VIEWPOINT" (replaces DEPTH IS
+  AIR), the people and forest bullets, DIRECTION rule 7, the designed view ON HOLD (playbook, DIRECTION, CRAFT §f.5,
+  LAYOUT), `scene_rethink/NOTES.md`.
+- RUNNING: one max-effort agent builds still_v3 in Remotion (`src/look/scene1_v3/`, entry
+  `src/entry-look-scene1v3.tsx`) -> `scene_rethink/still_v3.png`, `compare_v3.jpg`,
+  `video/deliverables/tests/poster_scene1_still_v3.png`. NEXT: send it, capture the verdict. The logo thread runs too.
+
+## Status 2026-10-29 ~19:10 UTC: still_v1 judged ("suffocating"); still_v2 runs as an iteration
+- still_v1 sent; the owner: no depth or scale (the building "right here"), the quay empty, the sky one colour, the near
+  leaves too big; the near/far separation good; landmarks and camera angles not important. Captured: playbook "DEPTH IS
+  AIR AND DISTANCE" + the sky bullet, DIRECTION rules 6-7, LAYOUT §8.2, `poster_refs/README.md`, `scene_rethink/NOTES.md`.
+- RUNNING: one max-effort agent builds `scene_rethink/still_v2.png` (also `video/deliverables/tests/`) +
+  `compare_v2.jpg` from `video/scripts/look/scene1/`. NEXT: send it, capture the verdict.
+- PARALLEL THREAD (owner: "spin up a thread to generate me the modern beautiful logo to put on the studio"): helper
+  session https://claude.ai/code/session_01YGLGMoJRWPfUug9D5jmx6A (iteration: 3 directions on one sheet,
+  `video/deliverables/brand/logo_options_v1.png`, `video/docs/brand/LOGO.md`, sources `video/brand/logo/`); it
+  messages the orchestrator when pushed; send the sheet to the owner; archive the helper once the logo is final.
+
+## Status 2026-10-29 ~18:30 UTC: the owner on the look test: "missed the forest for the trees"; scene 1 rebuilt as a still
+- The owner: the test is "good, but ... barely noticeable"; rethink the first scene "from ground up" as ONE still in
+  the posters' construction (playbook: "The forest before the trees"). Brief: `scene_rethink/README.md`.
+- The owner then: "we have the 'production' process and we have 'iteration' process that needs to be more
+  lightweight" (now a playbook rule). So the heavy workflow was STOPPED (nothing had completed) and ONE max-effort
+  agent runs the rethink as an iteration: 2-3 value thumbnails -> its own pick (`NOTES.md`) -> the build in stages
+  (`stage_1_values`, `stage_2_colour`, `stage_3_detail`, `still_v1.png`, also
+  `video/deliverables/tests/poster_scene1_still_v1.png`), `compare.jpg`; source in `video/scripts/look/scene1/`. No
+  critic, no fix pass. If it stops: resume the agent, or restart the same brief from its partial files.
+- NEXT: send still_v1 (with the build stages and the side-by-side) to the owner; capture the verdict.
+
+## Status 2026-10-29 ~15:30 UTC: review FIX_FIRST; lane S runs fix pass 1
+- `test/REVIEW.md`: 6 must-fixes (her and the copies' drawing as value shapes; the paving off milk-tea; the dark
+  panes vs W; the autumn spray and tree; a palette10b:false A/B pair; the far tower toned from its sky), 10 cheap
+  fixes, §7 the re-check gate. Lane S (the "Build lane S" agent) fixes, re-renders `poster_look_test_v1.mp4` and
+  `ab_switches.jpg`, reruns §7 + the QA, writes REPORT.md "Fix pass 1". Resume it with SendMessage if it stops.
+- THEN: check §7's gate on the new clip (a short verify), send the clip, the sheet and a note to the owner (what is
+  decided vs the 10b palette proposal; the mottle is near-invisible by design; the far stage is small; the halves
+  differ in length), merge into `video-production`, announce the new `src/lib` modules in the streamline CHANGES.md.
+
+## Status 2026-10-29 ~13:35 UTC: the clip is rendered; the review panel runs
+- `video/deliverables/tests/poster_look_test_v1.mp4` (15.5 s: Before card, v2's S1, After card, pass 2; master
+  encode, -14 LUFS), `test/ab_switches.jpg`, `test/REPORT.md` (after row vs v2, QA, waivers; §5 the owner flags:
+  the copies' row separation without outlines 7.9 L* vs 15, the calm paving, the chroma spread, the open sky).
+- RUNNING: workflow `look-test-review` (run `wf_c940970f-596`, script under the session's workflows/scripts): three
+  reviewers (art director, cold phone viewer, technical verifier) -> `test/REVIEW_{art,cold,tech}.md`, then a chair
+  -> `test/REVIEW.md` (verdict + at most 6 must-fixes). Resume: `Workflow({scriptPath, resumeFromRunId})`.
+- NEXT: lane S's agent ("Build lane S: the S1 test scene") does one fix pass on REVIEW.md's must-fixes and re-renders
+  `poster_look_test_v1.mp4`; then the clip, the sheet and a short note go to the owner; then merge into
+  `video-production` (the look-test code is opt-in and pixel-neutral for shipped films) and announce the new
+  `src/lib` modules in `docs/retro/2026-10-28_streamline/CHANGES.md` for the production sessions.
+
 ## Status 2026-10-29 09:20 UTC: before the 5-hour limit (it resets 12:40 UTC; a scheduled message resumes this
 ## session at 12:45 UTC)
 - Done and committed: lanes E (`test/ENGINE.md`), PT (`test/ENGINE_PT.md`), N (`test/ENGINE_NATURE.md`), S steps 1-4

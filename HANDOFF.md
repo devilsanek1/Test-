@@ -85,7 +85,10 @@ Everything that agent knew is in this repo. This file is the map; the details li
   `video/docs/script/sources.md` / `fact_sheet.md`, and the timing is in `video/docs/timing.md`.
 - **The film:** **`video/deliverables/v1/php2shell_final.mp4`** (1080x1920, 30 fps, 55.37 s, loops seamlessly, -14 LUFS).
   The cover is `video/deliverables/cover.png`, the posting texts are in `video/docs/POSTING_KIT.md`, and the profile
-  pictures (mascot Pip) are in `video/deliverables/profile/` (the avatar in use is `pip_power_button.png`).
+  pictures (mascot Pip) are in `video/deliverables/profile/` (the avatar in use is `pip_power_button.png`). **The studio logo is FINAL (owner, 2026-10-29: "Logo is done"): The Peel** (a speech bubble with its corner peeled back,
+  coral and ink, no text, no elephant): the pack to upload is `video/deliverables/brand/peel/` (`peel_avatar_1080.png`
+  replaces the Pip avatar), the sheet `video/deliverables/brand/logo_final.png`, the SVGs and generator
+  `video/brand/logo/`, the spec and every round's verdict `video/docs/brand/LOGO.md`.
 - **Built from:**
   - Remotion composition `Main`, entry `video/src/entry-film.ts`, scenes S01-S12 in `video/src/scenes/` (notes per
     scene in `video/docs/scenes/`).
@@ -185,6 +188,11 @@ Everything that agent knew is in this repo. This file is the map; the details li
   2 px lines on floating layers; `docs/look/LAYOUT.md` is the one layout guide (DIRECTION, CRAFT, LAYOUT, the playbook;
   `INTEGRATION.md` §2). All are first judged in the 7 s look test of v2's canal opening, built in four parallel lanes
   (the study's `HANDOVER.md`).
+- **The look test v1 (2026-10-29 ~17:00 UTC), sent to the owner:** `video/deliverables/tests/poster_look_test_v1.mp4`
+  (Before: v2's S1; After: every decision) + `test/ab_switches.jpg` (each switch alone; the 10b palette as the one
+  proposal), after an independent review panel (FIX_FIRST, one fix pass: `test/REVIEW.md`, `test/REPORT.md` §8-9).
+  Still short: the copies' row separation without outlines (~8 L* vs 15: the owner's call). New opt-in engine pieces
+  for the production sessions: `video/docs/studies/2026-10-28_city_posters/test/FOR_PRODUCTION.md`.
 - **Then (2026-10-28 ~22:30 UTC):** "our look is evolving - we are finding out style i don't think we can overfixate on
   this" (ONE LOOK, ONE BRAND is a direction, not a freeze) and Pip "would be good to keep it, but ... way more subtle
   perhaps hide it deliberately in the video": Pip stays, hidden on purpose, no longer on both sides of every join

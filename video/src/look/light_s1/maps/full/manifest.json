@@ -1,0 +1,250 @@
+{
+ "live": {
+  "doorBlur": {
+   "box": [
+    507,
+    810,
+    244,
+    296
+   ],
+   "file": "doorblur.lmap.png"
+  },
+  "grain": {
+   "file": "grain.lmap.png",
+   "size": 256
+  },
+  "pool": {
+   "blend": "screen",
+   "box": [
+    499,
+    1073,
+    260,
+    47
+   ],
+   "bytes": 11383,
+   "file": "pool_scr.lmap.png"
+  }
+ },
+ "slots": {
+  "bank": [
+   {
+    "blend": "multiply",
+    "box": [
+     0,
+     1144,
+     1080,
+     776
+    ],
+    "file": "bank_mul.lmap.png"
+   },
+   {
+    "blend": "screen",
+    "box": [
+     0,
+     1143,
+     1080,
+     777
+    ],
+    "file": "bank_scr.lmap.png"
+   }
+  ],
+  "boats": [
+   {
+    "blend": "multiply",
+    "box": [
+     366,
+     941,
+     714,
+     262
+    ],
+    "file": "boats_mul.lmap.png"
+   },
+   {
+    "blend": "screen",
+    "box": [
+     366,
+     941,
+     714,
+     262
+    ],
+    "file": "boats_scr.lmap.png"
+   }
+  ],
+  "bridge": [
+   {
+    "blend": "multiply",
+    "box": [
+     0,
+     871,
+     315,
+     183
+    ],
+    "file": "bridge_mul.lmap.png"
+   },
+   {
+    "blend": "screen",
+    "box": [
+     0,
+     871,
+     315,
+     183
+    ],
+    "file": "bridge_scr.lmap.png"
+   }
+  ],
+  "farroofs": [
+   {
+    "blend": "multiply",
+    "box": [
+     0,
+     750,
+     259,
+     195
+    ],
+    "file": "farroofs_mul.lmap.png"
+   },
+   {
+    "blend": "screen",
+    "box": [
+     0,
+     750,
+     259,
+     195
+    ],
+    "file": "farroofs_scr.lmap.png"
+   }
+  ],
+  "fartower": [
+   {
+    "blend": "multiply",
+    "box": [
+     257,
+     589,
+     90,
+     356
+    ],
+    "file": "fartower_mul.lmap.png"
+   },
+   {
+    "blend": "screen",
+    "box": [
+     257,
+     589,
+     90,
+     356
+    ],
+    "file": "fartower_scr.lmap.png"
+   }
+  ],
+  "near": [
+   {
+    "blend": "multiply",
+    "box": [
+     0,
+     1249,
+     1080,
+     671
+    ],
+    "file": "near_mul.lmap.png"
+   },
+   {
+    "blend": "screen",
+    "box": [
+     0,
+     1249,
+     1080,
+     671
+    ],
+    "file": "near_scr.lmap.png"
+   }
+  ],
+  "sky": [
+   {
+    "blend": "multiply",
+    "box": [
+     0,
+     0,
+     1080,
+     959
+    ],
+    "file": "sky_mul.lmap.png"
+   },
+   {
+    "blend": "screen",
+    "box": [
+     0,
+     0,
+     1080,
+     959
+    ],
+    "file": "sky_scr.lmap.png"
+   }
+  ],
+  "spray": [
+   {
+    "blend": "multiply",
+    "box": [
+     0,
+     0,
+     260,
+     221
+    ],
+    "file": "spray_mul.lmap.png"
+   },
+   {
+    "blend": "screen",
+    "box": [
+     0,
+     0,
+     260,
+     221
+    ],
+    "file": "spray_scr.lmap.png"
+   }
+  ],
+  "subject": [
+   {
+    "blend": "multiply",
+    "box": [
+     0,
+     588,
+     1080,
+     532
+    ],
+    "file": "subject_mul.lmap.png"
+   },
+   {
+    "blend": "screen",
+    "box": [
+     0,
+     588,
+     1080,
+     532
+    ],
+    "file": "subject_scr.lmap.png"
+   }
+  ],
+  "water": [
+   {
+    "blend": "multiply",
+    "box": [
+     0,
+     1075,
+     1080,
+     211
+    ],
+    "file": "water_mul.lmap.png"
+   },
+   {
+    "blend": "screen",
+    "box": [
+     0,
+     1075,
+     1080,
+     211
+    ],
+    "file": "water_scr.lmap.png"
+   }
+  ]
+ }
+}

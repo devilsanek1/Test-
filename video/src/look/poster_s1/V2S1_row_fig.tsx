@@ -17,6 +17,7 @@ import {Fill} from '../../lib/Fill';
 import {Ink, parseInk} from '../../lib/Ink';
 import {ExitSync} from '../../lib/exit';
 import {mat, XG} from '../../lib/xf';
+import {FormShade, Rim} from '../../lib/light';
 import {ease, useTime} from '../../lib/time';
 import {rng} from '../../lib/rng';
 import {CM} from '../../v2r/palette';
@@ -94,6 +95,23 @@ function limb(P: Pt[], w: number[]): string {
   const we = w[n - 1];
   const w0 = w[0];
   return `M${PT(left[0])}${crSegs(left, 0.4)}A${fx(we)} ${fx(we)} 0 0 0 ${PT(right[0])}${crSegs(right, 0.4)}A${fx(w0)} ${fx(w0)} 0 0 0 ${PT(left[0])}Z`;
+}
+
+/** (values) A sleeve's shade sliver: a band ~3 local px wide along the limb's edge away from the key (its right edge,
+ *  toward the body: the sleeve parts from the coat by a value step, never a line); clip it to the limb. */
+function sleeveSliver(P: Pt[], w: number[], s = 3.2): string {
+  const n = P.length;
+  const Q: Pt[] = [];
+  for (let i = 0; i < n; i++) {
+    const a = P[Math.max(0, i - 1)];
+    const b = P[Math.min(n - 1, i + 1)];
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const l = Math.hypot(dx, dy) || 1;
+    // limb()'s "right" edge is p - nrm * w (nrm = [-dy, dx] / l): for a hanging arm, screen right
+    Q.push([P[i][0] + (dy / l) * (w[i] - s / 2 + 0.6), P[i][1] - (dx / l) * (w[i] - s / 2 + 0.6)]);
+  }
+  return limb(Q, Q.map(() => s / 2 + 0.6));
 }
 
 /** The part of circle b that lies outside circle c, as one open curve (the bun's line: never a line inside the head). */
@@ -184,7 +202,16 @@ export type FigSpec = {
   tote?: string;
   /** Her potted desk plant tucked under her left arm (pot, leaves). */
   plant?: {pot: string; leaf: string};
+  /** (the look test, no outlines) The coat's drawing as value shapes: FigValues. Absent = v2's drawing. */
+  values?: FigValues;
 };
+
+/** (the look test, no outlines: test/REVIEW.md MUST 1) The coat's drawing as VALUE shapes, never lines (DIRECTION rule
+ *  4: "an edge is a step of light and shade or of value"): the belt a band in `deep` with its bow filled `deep`, the
+ *  collar a `lit` / `shade` pair split at the body's terminator (`split`, local px: where the row's FormShade band
+ *  starts), the near sleeve's shade sliver in `deep` on its side away from the key; her tote's strap one 2.0 px line in
+ *  `strap` (a strap IS a line: rule 4; decision 7's 2.0 px). */
+export type FigValues = {deep: string; lit: string; shade: string; split: number; strap?: string};
 export type FigPose = {
   /** Step count (s1Step: the row's ONE lockstep number). */
   step: number;
@@ -205,7 +232,19 @@ export type FigPart = {
   exact?: boolean;
   /** Taper the stroke ends (her long open strokes). */
   taper?: boolean;
+  /** (values) Clip the fill to this local path: a value shape inside its part (the belt inside the coat). */
+  clipTo?: string;
+  /** (values) A plain line ON SCREEN (`px` wide, round caps) in `color`, drawn with the fills instead of `ink`: the
+   *  tote's strap. */
+  line?: {d: string; color: string; px: number};
 };
+
+/** The parts that make the head (the hair from behind, the bun, her cheek when she looks back). */
+export const HEAD_PARTS = ['head', 'bun', 'cheek'];
+/** Her tote and its strap (drawn as one object of its own in the look test: its own warm shade). */
+export const TOTE_PARTS = ['tote', 'toteStraps'];
+/** A rect as a local path (the collar's halves are rects clipped to the collar). */
+const rectD = (x: number, y: number, w: number, h: number) => `M${fx(x)} ${fx(y)}h${fx(w)}v${fx(h)}h${fx(-w)}Z`;
 
 const R = 0.102 * FIG_H; // head radius 17.3
 /** The torso's width factor: shoulders 0.225 H (38.3 px at 170; with the 2.2 px ink, anti-aliasing and the small fill
@@ -223,6 +262,7 @@ export function figParts(spec: FigSpec, pose: FigPose): FigPart[] {
   const turn = Math.max(0, Math.min(1, pose.turn ?? 0));
   const closed = spec.kind !== 'her';
   const soft = spec.soft ?? 0;
+  const V = spec.values;
 
   // ---- gait: both legs, the bob, the spread
   const gN = legGait(pose.step, d, liftMax);
@@ -287,10 +327,12 @@ export function figParts(spec: FigSpec, pose: FigPose): FigPart[] {
     const ux = (C[0] - E[0]) / L;
     const uy = (C[1] - E[1]) / L;
     const c0: Pt = [C[0] - ux * 4.4, C[1] - uy * 4.4];
-    return [
+    const parts: FigPart[] = [
       {k: 'armN', d: dd, fill: spec.coat, ink: dd},
       {k: 'cuffN', ink: `M${PT([c0[0] - uy * 5.4, c0[1] + ux * 5.4])}L${PT([c0[0] + uy * 5.4, c0[1] - ux * 5.4])}`, w: 0.6},
     ];
+    if (V) parts.push({k: 'armShade', d: sleeveSliver([P, E, C], [X(5.7), X(5.2), X(5.3)]), fill: V.deep, clipTo: dd, exact: true});
+    return parts;
   };
   const farSeam: FigPart = {
     k: 'seamF',
@@ -314,7 +356,8 @@ export function figParts(spec: FigSpec, pose: FigPose): FigPart[] {
     tote = {k: 'tote', d: bd, fill: spec.tote, ink: bd, w: 0.85};
     const s1: Pt = rotP([15.2, -94.3 + bob * 0.8], piv, sw);
     const s2: Pt = rotP([27.0, -94.1 + bob * 0.8], piv, sw);
-    toteStraps = {k: 'toteStraps', ink: `M${PT(s1)}Q${PT([13.0, sY + 14])} ${PT([12.6, sY + 0.6])}M${PT(s2)}Q${PT([21.5, sY + 12])} ${PT([17.4, sY + 1.4])}`, w: 0.8};
+    const strapD = `M${PT(s1)}Q${PT([13.0, sY + 14])} ${PT([12.6, sY + 0.6])}M${PT(s2)}Q${PT([21.5, sY + 12])} ${PT([17.4, sY + 1.4])}`;
+    toteStraps = {k: 'toteStraps', ink: strapD, w: 0.8, line: V?.strap ? {d: strapD, color: V.strap, px: 2} : undefined};
   }
 
   // ---- the coat: slim shoulders, a belted waist, a gently flared hem below the knee with a centre back vent; every
@@ -363,6 +406,11 @@ export function figParts(spec: FigSpec, pose: FigPose): FigPart[] {
   out.push({k: 'vent', ink: `M${PT([vx, hY + 2.1 - vn])}L${PT([vx + 0.3, hY - 17])}`, w: 0.62});
   const belt = `M${PT([X(-18.1), bY - 2.6])}Q${PT([0, bY - 1.2])} ${PT([X(18.1), bY - 2.6])}M${PT([X(-18.3), bY + 2.7])}Q${PT([0, bY + 4.1])} ${PT([X(18.3), bY + 2.7])}`;
   out.push({k: 'belt', ink: belt, w: 0.62});
+  if (V) {
+    // the belt as a band (~4.6 local px: 3.5-4.6 px on screen down the row), clipped to the coat's silhouette
+    const band = `M${PT([X(-21), bY - 2.3])}Q${PT([0, bY - 0.9])} ${PT([X(21), bY - 2.3])}L${PT([X(21), bY + 2.3])}Q${PT([0, bY + 3.7])} ${PT([X(-21), bY + 2.3])}Z`;
+    out.push({k: 'beltBand', d: band, fill: V.deep, clipTo: coatD, exact: true});
+  }
   const kx = vx + 1.0;
   const ky = bY + 0.9;
   const t1 = polyPath([
@@ -377,10 +425,10 @@ export function figParts(spec: FigSpec, pose: FigPose): FigPart[] {
     [kx + 6.0, ky + 9.4],
     [kx + 3.9, ky + 10.2],
   ]);
-  out.push({k: 'tail1', d: t1, fill: spec.coat, ink: t1, w: 0.58});
-  out.push({k: 'tail2', d: t2, fill: spec.coat, ink: t2, w: 0.58});
+  out.push({k: 'tail1', d: t1, fill: V ? V.deep : spec.coat, ink: t1, w: 0.58});
+  out.push({k: 'tail2', d: t2, fill: V ? V.deep : spec.coat, ink: t2, w: 0.58});
   const knot = ellipsePath(kx, ky, 2.9, 2.5);
-  out.push({k: 'knot', d: knot, fill: spec.coat, ink: knot, w: 0.6});
+  out.push({k: 'knot', d: knot, fill: V ? V.deep : spec.coat, ink: knot, w: 0.6});
 
   // ---- the near arm: swinging (ghosts, outlines) or carrying her desk plant against her left hip
   if (spec.plant) {
@@ -392,6 +440,7 @@ export function figParts(spec: FigSpec, pose: FigPose): FigPart[] {
     const cuff: Pt = [X(-18.8), -81.5 + pb];
     const ad = limb([piv, elbow, cuff], [X(5.7), X(5.2), X(5.2)]);
     out.push({k: 'armN', d: ad, fill: spec.coat, ink: ad});
+    if (V) out.push({k: 'armShade', d: sleeveSliver([piv, elbow, cuff], [X(5.7), X(5.2), X(5.2)]), fill: V.deep, clipTo: ad, exact: true});
     const PX = 2.6; // the plant sits 2.6 px in from the first sheet: its leaves set G1's gap
     const pot = polyPath([
       [-24.2 + PX, -90.4 + pb],
@@ -447,6 +496,11 @@ export function figParts(spec: FigSpec, pose: FigPose): FigPart[] {
     0.32,
   );
   out.push({k: 'collar', d: collar, fill: spec.coat, ink: collar, w: 0.9});
+  if (V) {
+    // the turned-up collar as a lit / shade pair, split where the body's shade band starts
+    out.push({k: 'collarLit', d: rectD(-40, sY - 20, 40 + V.split, 40), fill: V.lit, clipTo: collar, exact: true});
+    out.push({k: 'collarShade', d: rectD(V.split, sY - 20, 40, 40), fill: V.shade, clipTo: collar, exact: true});
+  }
 
   // ---- G4+: the scarf over the collar, one end thrown back over the right shoulder
   if (spec.scarf) {
@@ -511,6 +565,9 @@ export type FigDrawProps = {
   /** Line tone per fill colour (the subject's line in its FINAL colour's shade while its fill is still paper: her coat
    *  draws on in the teal's deep shade, at full contrast, before the flood colours it). */
   lineTone?: Record<string, string>;
+  /** (a mask's silhouette) These parts drawn plain black, so a FormShade's mask leaves them out (the head under the
+   *  body's band). */
+  holes?: string[];
 };
 
 /** Each part's [start, dur] inside a one-pen draw from `at` over `dur` (the window = its share of the ink length). */
@@ -526,7 +583,7 @@ function penWindows(parts: FigPart[], at: number, dur: number): Map<string, [num
   return out;
 }
 
-export const FigDraw: React.FC<FigDrawProps> = ({parts, inkPx, scale, at, inkDur = 0.1, fillAt, knockout, offset, seed, pen, lineTone}) => {
+export const FigDraw: React.FC<FigDrawProps> = ({parts, inkPx, scale, at, inkDur = 0.1, fillAt, knockout, offset, seed, pen, lineTone, holes}) => {
   const win = pen !== undefined && at !== undefined ? penWindows(parts, at, inkDur) : null;
   const uid = 'rk' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const out: React.ReactNode[] = [];
@@ -539,10 +596,29 @@ export const FigDraw: React.FC<FigDrawProps> = ({parts, inkPx, scale, at, inkDur
     const tone0 = p.fill ?? lastFill;
     const tone = lineTone?.[tone0] ?? tone0;
     if (p.fill) lastFill = p.fill;
-    if (!knockout && p.d && p.fill) {
-      out.push(<Fill key={`f${p.k}`} d={p.d} color={p.fill} at={fillAt} mode="snap" offset={p.exact || off === false ? false : off} seed={`${seed}/${p.k}`} />);
+    if (holes?.includes(p.k)) {
+      if (p.d) out.push(<path key={`h${p.k}`} d={p.d} fill="#000000" />);
+      return;
     }
-    if (p.ink && inkPx > 0) {
+    if (!knockout && p.d && p.fill) {
+      const f = <Fill key={`f${p.k}`} d={p.d} color={p.fill} at={fillAt} mode="snap" offset={p.exact || off === false ? false : off} seed={`${seed}/${p.k}`} />;
+      if (p.clipTo) {
+        const cid = `${uid}c${i}`;
+        defs.push(
+          <clipPath key={cid} id={cid} clipPathUnits="userSpaceOnUse">
+            <path d={p.clipTo} />
+          </clipPath>,
+        );
+        out.push(
+          <g key={`c${p.k}`} clipPath={`url(#${cid})`}>
+            {f}
+          </g>,
+        );
+      } else out.push(f);
+    }
+    if (p.line && !knockout) {
+      out.push(<path key={`l${p.k}`} d={p.line.d} fill="none" stroke={p.line.color} strokeWidth={p.line.px / scale} strokeLinecap="round" strokeLinejoin="round" />);
+    } else if (p.ink && inkPx > 0) {
       const ink = (
         <Ink
           key={`i${p.k}`}
@@ -629,11 +705,22 @@ export type RowFigureProps = {
   seed: string;
   /** Inside a parent's ExitSync already. */
   noSync?: boolean;
+  /** (the look test) Draw only these parts (her tote as an object of its own). */
+  partsFilter?: (p: FigPart) => boolean;
+  /** FigDraw `holes` (a FormShade mask's silhouette: the head left out of the body's band). */
+  holes?: string[];
+  /** (the look test, no outlines) The head's light as value shapes, after its fills land: a shade crescent away from the
+   *  key (`shade`: `strength` of `base` over `frac` of the head and bun) and a lit cap on the key side (`cap`: a Rim in
+   *  `color`, `px` wide on screen, over `cover` of the contour). */
+  head?: {shade?: {strength: number; base: string; frac: number}; cap?: {color?: string; px: number; cover: number}};
+  /** (the look test, no outlines) The coat's lit edge on the key side (CRAFT §d.8): a Rim on the coat, its sleeve and
+   *  collar, `px` wide on screen, in the rig's rim (or `color`), after the fills land. */
+  rim?: {px: number; cover?: number; color?: string};
 };
 
 export const POP = {outlineS: 0.1, fillDelayS: 2 / 60, settleS: 4 / 60, settleFrom: 1.06} as const;
 
-export const RowFigure: React.FC<RowFigureProps> = ({spec, x, y, h, step, stride = 1, turn = 0, inkPx, at, knockout, offset, misregX = 1, draw, lineTone, seed, noSync}) => {
+export const RowFigure: React.FC<RowFigureProps> = ({spec, x, y, h, step, stride = 1, turn = 0, inkPx, at, knockout, offset, misregX = 1, draw, lineTone, seed, noSync, partsFilter, holes, head, rim}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const sq = Math.round(step * 100) / 100;
@@ -647,9 +734,33 @@ export const RowFigure: React.FC<RowFigureProps> = ({spec, x, y, h, step, stride
     s *= 1 + (POP.settleFrom - 1) * (1 - k) * (1 - k);
   }
   const off = offset ?? misreg(h, seed, misregX);
+  const shown = partsFilter ? parts.filter(partsFilter) : parts;
+  let headLight: React.ReactNode = null;
+  if (head && !knockout) {
+    const hd = parts
+      .filter((q) => q.d && (q.k === 'head' || q.k === 'bun'))
+      .map((q) => q.d)
+      .join('');
+    headLight = (
+      <>
+        {head.shade ? <FormShade d={hd} kind="crescent" frac={head.shade.frac} strength={head.shade.strength} base={head.shade.base} at={fillAt} /> : null}
+        {head.cap ? <Rim d={hd} width={head.cap.px / s} cover={head.cap.cover} color={head.cap.color} at={fillAt} /> : null}
+      </>
+    );
+  }
+  let coatRim: React.ReactNode = null;
+  if (rim && !knockout) {
+    const cd = parts
+      .filter((q) => q.d && ['coat', 'armN', 'collar'].includes(q.k))
+      .map((q) => q.d)
+      .join('');
+    coatRim = <Rim d={cd} width={rim.px / s} cover={rim.cover} color={rim.color} at={fillAt} />;
+  }
   const g = (
     <XG m={mat.compose(mat.translate(x, y), mat.scale(s, s))}>
-      <FigDraw parts={parts} inkPx={inkPx} scale={s} at={draw ? draw.at : at} inkDur={draw ? draw.dur : POP.outlineS} fillAt={fillAt} knockout={knockout} offset={off} seed={seed} pen={draw?.tip} lineTone={lineTone} />
+      <FigDraw parts={shown} inkPx={inkPx} scale={s} at={draw ? draw.at : at} inkDur={draw ? draw.dur : POP.outlineS} fillAt={fillAt} knockout={knockout} offset={off} seed={seed} pen={draw?.tip} lineTone={lineTone} holes={holes} />
+      {coatRim}
+      {headLight}
     </XG>
   );
   return noSync ? g : <ExitSync seed={`fig/${seed}`}>{g}</ExitSync>;

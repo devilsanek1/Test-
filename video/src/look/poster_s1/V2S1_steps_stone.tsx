@@ -49,7 +49,8 @@ const bankEntries = (): [string, number][] => [[BANK_PAVE, 0.42], [BANK_LIT, 0.3
 export function useBankTone(): (c: string) => string {
   const {darks, nearMid: nm} = useSwitches();
   if (!(nm ?? darks)) return (c) => c;
-  const m = nearMid(bankEntries(), -1);
+  // every stone of our bank is one of its big fields (REVIEW MUST 2: the beige band read wide)
+  const m = nearMid(bankEntries(), -1, {big: 0});
   return (c) => m[c] ?? c;
 }
 
@@ -134,15 +135,15 @@ export const StoneBand: React.FC<{k: number; seed?: string}> = ({k, seed = 'v2s1
     return {base, slabs, joints: joints.join(''), lip: lipPath(k)};
   }, [k, seed]);
   const tone = useBankTone();
-  const {patchwork} = useSwitches();
+  const {patchwork, paving} = useSwitches();
   if (patchwork) {
     // (the look test's "low poly" paving: lane PT's patchwork through the bank's one camera, then v2's step lip)
     const y1 = Math.min(b.y1, 2400) + 1;
-    const pw = treadPatch(k, [[X0, edgeY(b.y0 - 1, X0)], [X1, edgeY(b.y0 - 1, X1)], [X1, edgeY(y1, X1)], [X0, edgeY(y1, X0)]], tone(b.top));
+    const pw = treadPatch(k, [[X0, edgeY(b.y0 - 1, X0)], [X1, edgeY(b.y0 - 1, X1)], [X1, edgeY(y1, X1)], [X0, edgeY(y1, X0)]], tone(b.top), paving ?? 'stone');
     if (pw)
       return (
         <>
-          <PatchFill pw={pw} seed={`${seed}/patch${k}`} />
+          <PatchFill pw={pw} seed={`${seed}/patch${k}`} front={(paving ?? 'stone') === 'stone'} />
           {g.lip ? <Fill d={g.lip} color={tone(BANK_PAVE)} seed={`${seed}/edge${k}`} offset={false} /> : null}
         </>
       );

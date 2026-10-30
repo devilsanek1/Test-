@@ -57,3 +57,6 @@ Top rules (details in the playbook):
   its line, one fact lock, a writer + a critic for the script); agents write files and report in 3 lines; the
   orchestrator stays small (a fresh session per gate). Cut waste: rework, repeated checks, reviews of things that will
   still change, polish before the story lock, and lost work (small checkpointed tasks).
+- **Two modes (owner, 2026-10-29): PRODUCTION** (a film through the gates, full checks) **and ITERATION** (a look test or
+  experiment for the owner to judge: one or two agents, no panels, critics or QA suites, rough, about an hour, shown at
+  once). Ask "a film or a question?" first; only what the owner picks from an iteration enters production.

@@ -290,7 +290,8 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
    farther (4-6 in a shot, 5-7 on a vista), its AIR (the sky's lowest colour right behind them: rule 6's one sky,
    `horizonColor(sky, x)` of §g.3, never the mint above it; v2 S1 `S1_AIR`) and its camera (horizon, vanishing point(s)).
 2. **One flat step per plane toward the air**, k = 0 / .12 / .22 / .40 / .65 on every fill of the plane (never a
-   gradient, fog or blur): L* toward the air's; a hue on the air's side converges on it, one across from it keeps its
+   gradient, fog or blur on the flat world; a PAINTED piece softens by its plane, the owner's "a bit more blurry each
+   time": `PAINT_RECIPES.md` §1, §3 C3): L* toward the air's; a hue on the air's side converges on it, one across from it keeps its
    hue at chroma x (1 - 0.8 k) (a straight mix would cross grey), never under C* 8, never into the olive band. This is
    DIRECTION's "lighter, cooler, less saturated" in a day or dusk air; under a warm sunset air the far planes take its
    warmth and still read far by value, contrast and simplicity (v1 @25.5: the far city more saturated than the near, its
@@ -322,7 +323,9 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
 5. **Size: one camera.** Never a nearer thing smaller per metre than a farther one (G4: the ducks and our landing's
    public 41-63 px/m, her across the water 100); people on one level keep one eye ratio within +-15 %. Calm a figure with
    colour (tier B), never by shrinking it; a camera too low for the foreground's things is raised, not cheated.
-   **The designed view, two frames a film** (owner, 2026-10-29: "Go with your suggestions", `STUDY.md` §9 decision 4
+   **The designed view, two frames a film** (ON HOLD since 2026-10-29: two stills of v2's opening built on it failed,
+   one "suffocating", one "too cheap looking", and the owner prefers v2's own eye-level view; `DIRECTION.md` rule 7;
+   the spec below stays for reference) (owner, 2026-10-29: "Go with your suggestions", `STUDY.md` §9 decision 4
    (a), the posters' "unique camera angle and composition of objects"; first judged in the look test; the spec:
    `STUDY.md` §5.7, `perspective.md` L2): the home place's establishing view and the scale landing's end frame may lift
    the far city and its water onto its own horizon, ONE declared far stage (where it sits: `LAYOUT.md` §8.2
@@ -372,7 +375,9 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
    flat bands, flecks, current lines). **Check:** `waterProblems(spec)` is empty, and
    `docs/v2/water/judge_metrics.py` against the last approved water (cool %, piece-end edges, thin light marks, glitter
    gold, quick toggles), and `docs/v2/water/master_check.py` on the master (the colour numbers above); eye check at
-   phone size: a calm, glassy canal with its reflections, never boxes, dashes, stars or a stack of pancakes.
+   phone size: a calm, glassy canal with its reflections, never boxes, scattered or uniform dashes, stars or a stack of
+   pancakes; a painted plate may carry a FEW deliberate horizontal strokes on that calm base (75 %+ untouched; the
+   recipe: `paint_recipes/water.md`).
 8. **A full value range: a calm light sky, a mid-tone world and real darks where the eye should go, in many small
    pieces** (DIRECTION
    rule 6; owner, 2026-10-28: "good point too!"; numbers: city-poster study, 2026-10-28, `STUDY.md` §1a, §5.5, §7, from

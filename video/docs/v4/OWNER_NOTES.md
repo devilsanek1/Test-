@@ -212,3 +212,13 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   `v4-visual-script`: research (pro pre-production formats; visual storytelling for a 40 s vertical explainer), our
   method, three visual concepts, two judges, one visual script, a cold read and a critic, a fix pass; style-neutral.
   -> rule: playbook, Storyboard (G3) and flow (the visual script before G3).
+
+## 2026-10-30: the visual script, asked about style (to the city-poster study session)
+- 2026-10-30 ~01:10 UTC, sending `Helsinki_Visual_Script.zip` (G2.5, 12 shots, the 42.24 s take): "What do you think about
+  this script / Would it fit into our style?" -> the study session's read: `STYLE_FIT_2026-10-30.md` (the story fits; the
+  picture needs a translation into the new look: a brush not a pen, an organic cut-away, a person near the camera, one
+  colour key and the window as the story light, a simpler composition).
+- 2026-10-30 ~01:30 UTC: "Commit the adjacentment to the story script to the story 4" -> the adjustments committed beside
+  the visual script on video 4's branch (`claude/kind-pascal-lvgsza`): `video/docs/v4/visual/STYLE_ADJUSTMENTS.md`
+  (fold into VISUAL_SCRIPT.md before G3).
+
