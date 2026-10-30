@@ -4,7 +4,7 @@ import {type PP, type SecKey, type V3, type View, add3, lerp, loftOutline, mul3,
 import {type Build, type Pose, type Side, type Skeleton, skeleton} from './body';
 import {type HeadRig, faceYaw, headRig, lashLine, lipTone, lostFlick, noseShade, sunglasses} from './head';
 import {type HairStyle, hair} from './hair';
-import {arm, armZ, hand, leg, shoe, sleeve, type ShoeKind, type SleeveSpec} from './limbs';
+import {arm, armZ, forearm, hand, leg, shoe, sleeve, type ShoeKind, type SleeveSpec} from './limbs';
 import {bigShirt, cardigan, choreJacket, coat, knit, slipSkirt, tee, trousers} from './garments';
 import type {Kind} from './color';
 import {type Part, Z} from './parts';
@@ -102,7 +102,7 @@ function outfit(p: Person, sk: Skeleton, v: View): Part[] {
       out.push(...slipSkirt(sk, v, 'skirt'));
       out.push(...knit(sk, v, 'knit'));
       out.push(...coat(sk, v, 'coat'));
-      out.push(...sleeves(sk, v, 'coat', {r: [41, 37, 35], drop: 14}));
+      out.push(...sleeves(sk, v, 'coat', {r: [38, 35, 33], drop: 12}));
       out.push(...hands(sk, v));
       break;
     }
@@ -111,7 +111,7 @@ function outfit(p: Person, sk: Skeleton, v: View): Part[] {
       out.push(...trousers(sk, v, 'jeans', 'straight', 646, {hemDrop: 16}));
       out.push(...tee(sk, v, 'tee', 846, 632));
       out.push(...cardigan(sk, v, 'cardigan'));
-      out.push(...sleeves(sk, v, 'cardigan', {r: [37, 33, 25], drop: 12, cuff: 16}));
+      out.push(...sleeves(sk, v, 'cardigan', {r: [35, 31, 24], drop: 10, cuff: 16}));
       out.push(...hands(sk, v));
       out.push(...tote(sk, v));
       break;
@@ -119,7 +119,7 @@ function outfit(p: Person, sk: Skeleton, v: View): Part[] {
     case 'manSuede': {
       out.push(...socks(sk, v));
       out.push(...shoes(sk, v, 'loafer', {shoe: 'shoe', sole: 'soleDark'}));
-      out.push(...trousers(sk, v, 'trousers', 'relaxed', 612, {hemDrop: -30}));
+      out.push(...trousers(sk, v, 'trousers', 'relaxed', 612, {hemDrop: -16}));
       out.push(...tee(sk, v, 'tee', 840, 560, 1.12));
       out.push(...choreJacket(sk, v, 'jacket'));
       out.push(...sleeves(sk, v, 'jacket', {r: [46, 42, 40], drop: 14}));
@@ -130,9 +130,9 @@ function outfit(p: Person, sk: Skeleton, v: View): Part[] {
     case 'womanShirt': {
       out.push(...shoes(sk, v, 'flat', {shoe: 'flat'}));
       out.push(...trousers(sk, v, 'jeans', 'wide', 644, {hemDrop: 30}));
-      out.push(arm(sk, 'l', v), arm(sk, 'r', v));
+      out.push(forearm(sk, 'l', v), forearm(sk, 'r', v));
       out.push(...bigShirt(sk, v, 'shirt', 644));
-      out.push(...sleeves(sk, v, 'shirt', {r: [45, 42, 39], drop: 20, end: 0.42, cuff: 22}));
+      out.push(...sleeves(sk, v, 'shirt', {r: [42, 40, 37], drop: 16, end: 0.42, cuff: 20}));
       out.push(...hands(sk, v));
       break;
     }
@@ -182,19 +182,23 @@ function tote(sk: Skeleton, v: View): Part[] {
 function phone(sk: Skeleton, v: View): Part[] {
   const s: Side | null = sk.hand.l === 'grip' ? 'l' : sk.hand.r === 'grip' ? 'r' : null;
   if (!s) return [];
-  const ss = s === 'l' ? 1 : -1;
   const W = sk.wrist[s];
   const fore = norm3(sub3(W, sk.elbow[s]));
-  const c = add3(W, mul3(fore, 52));
-  const up: V3 = norm3([-ss * 0.25, 1, 0.35]);
-  const side = norm3([fore[2], 0, -fore[0]]);
-  const hh = 66;
-  const hw = 32;
+  const c = add3(W, mul3(fore, 44));
+  // the screen faces the eyes: its normal from the phone toward the face
+  const eye: V3 = add3(sk.pivot, [0, 40, 60]);
+  const nrm = norm3(sub3(eye, c));
+  const upW: V3 = [0, 1, 0];
+  const side = norm3([nrm[1] * upW[2] - nrm[2] * upW[1], nrm[2] * upW[0] - nrm[0] * upW[2], nrm[0] * upW[1] - nrm[1] * upW[0]]);
+  const up = norm3([side[1] * nrm[2] - side[2] * nrm[1], side[2] * nrm[0] - side[0] * nrm[2], side[0] * nrm[1] - side[1] * nrm[0]]);
+  const hh = 64;
+  const hw = 31;
+  const back = mul3(nrm, -6);
   const corners = [
-    add3(add3(c, mul3(up, hh)), mul3(side, hw)),
-    add3(add3(c, mul3(up, hh)), mul3(side, -hw)),
-    add3(add3(c, mul3(up, -hh)), mul3(side, -hw)),
-    add3(add3(c, mul3(up, -hh)), mul3(side, hw)),
+    add3(add3(add3(c, mul3(up, hh)), mul3(side, hw)), back),
+    add3(add3(add3(c, mul3(up, hh)), mul3(side, -hw)), back),
+    add3(add3(add3(c, mul3(up, -hh)), mul3(side, -hw)), back),
+    add3(add3(add3(c, mul3(up, -hh)), mul3(side, hw)), back),
   ].map((p) => proj(p, v));
   return [{k: 'phone', pts: corners.map((q) => [q.x, q.y] as PP), mat: 'phone', tone: 'base', z: armZ(sk, s, v) + 1.5, tension: 0.12}];
 }
@@ -209,9 +213,10 @@ export function buildPerson(p: Person, pose: Pose): Built {
   const r = headRig(p.build, sk, v);
   const parts: Part[] = [];
   parts.push(...outfit(p, sk, v));
-  parts.push(neckPart(sk, v, r));
+  const neck = neckPart(sk, v, r);
+  parts.push(neck);
   parts.push({k: 'head', pts: loftOutline(r.secs, v, r.xf), mat: 'skin', z: Z.head, tension: 0.42});
-  const hr = hair(p.hair, p.build, sk, r, v, 'hair');
+  const hr = hair(p.hair, p.build, sk, r, v, 'hair', neck.pts);
   parts.push(...hr.parts);
   if (p.hair === 'twists') {
     const e = earPart(sk, v, r);

@@ -25,6 +25,17 @@ export function arm(sk: Skeleton, s: Side, v: View, mat = 'skin'): Part {
   return {k: `arm_${s}`, pts, mat, z: armZ(sk, s, v), tension: 0.5};
 }
 
+/** A bare forearm (skin) from just below the elbow to the wrist: under a pushed-up sleeve. */
+export function forearm(sk: Skeleton, s: Side, v: View, mat = 'skin'): Part {
+  const b = sk.b;
+  const E = sk.elbow[s];
+  const W = sk.wrist[s];
+  const S = sk.sh[s];
+  const top: V3 = [lerp(E[0], S[0], 0.12), lerp(E[1], S[1], 0.12), lerp(E[2], S[2], 0.12)];
+  const pts = tubeOutline([top, E, W], (u) => armRadius(b, 0.44 + 0.56 * u), v, [0, 0, 1], {m: 20});
+  return {k: `forearm_${s}`, pts, mat, z: armZ(sk, s, v) - 0.5, tension: 0.5};
+}
+
 /** Near or far arm: by the elbow's depth against the torso's centre (design: an arm beside the body draws over it). */
 export function armZ(sk: Skeleton, s: Side, v: View): number {
   const d = (proj(sk.elbow[s], v).d + proj(sk.sh[s], v).d) / 2 - torsoDepth(sk, v);

@@ -134,10 +134,17 @@ export const EdPerson: React.FC<PersonProps> = ({x, y, h, person, pose, flip = f
     } else fill = r[p.tone];
     let el: React.ReactNode = <path key={p.k} d={d} fill={fill} opacity={p.op} />;
     if (p.cut && p.cut.length) {
+      // cuts as a mask (overlapping cut regions stay cut: an even-odd clip would refill their overlap)
       const cid = pid(`cut-${p.k}`);
-      const big = 'M-3000 -3000H3000V3000H-3000Z';
-      defs.push(<clipPath key={cid} id={cid}><path clipRule="evenodd" d={big + p.cut.map((c) => polyOf(c.map((q) => [q[0], q[1]]))).join('')} /></clipPath>);
-      el = <g key={p.k} clipPath={`url(#${cid})`}>{el}</g>;
+      defs.push(
+        <mask key={cid} id={cid} maskUnits="userSpaceOnUse" x={-3000} y={-3000} width={6000} height={6000}>
+          <rect x={-3000} y={-3000} width={6000} height={6000} fill="#FFFFFF" />
+          {p.cut.map((c, i) => (
+            <path key={i} d={polyOf(c.map((q) => [q[0], q[1]]))} fill="#000000" />
+          ))}
+        </mask>,
+      );
+      el = <g key={p.k} mask={`url(#${cid})`}>{el}</g>;
     }
     body.push(clip ? <g key={p.k + '-c'} clipPath={clip}>{el}</g> : el);
   }

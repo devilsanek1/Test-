@@ -36,7 +36,7 @@ export type Person = {
   mats: Record<string, {base: string; kind: Kind}>;
   pieces: Piece[];
   /** Face decals (lashes, brows, lips, sunglasses), given the skeleton. */
-  faceMarks?: (sk: Skeleton, res: number) => Part;
+  faceMarks?: (sk: Skeleton, res: number, fs: FaceShape) => Part;
 };
 
 export function buildModel(p: Person, pose: Pose, res = 1): Model {
@@ -77,7 +77,7 @@ export function buildModel(p: Person, pose: Pose, res = 1): Model {
     }
   }
   for (const s of ['L', 'R'] as const) surfaces.push(...handSurfaces(sk, s, res));
-  if (p.faceMarks) built.push(p.faceMarks(sk, res));
+  if (p.faceMarks) built.push(p.faceMarks(sk, res, p.face));
   for (const b of built) {
     surfaces.push(...b.surfaces);
     if (b.decals) decals.push(...b.decals);

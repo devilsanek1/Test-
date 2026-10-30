@@ -149,13 +149,13 @@ export function coat(sk: Skeleton, v: View, mat = 'coat', hemY = 268): Part[] {
   const rows: GRow[] = [
     {y: 872, a: 30, bf: 22, bb: 32, dz: -12},
     {y: 852, a: 44, bf: 30, bb: 42, dz: -10},
-    {y: 830, a: 92, bf: 46, bb: 58, dz: -6},
-    {y: 810, a: 124, bf: 62, bb: 64, n: 2.2, dz: -4},
-    {y: 790, a: 128, bf: 78, bb: 68, n: 2.3},
-    {y: 755, a: 126, bf: 88, bb: 70, n: 2.3},
-    {y: 735, a: 124, bf: 92, bb: 70, n: 2.3},
-    {y: 680, a: 122, bf: 90, bb: 70, n: 2.3},
-    {y: 620, a: 122, bf: 87, bb: 74, n: 2.3},
+    {y: 832, a: 86, bf: 46, bb: 58, dz: -6},
+    {y: 812, a: 112, bf: 62, bb: 64, n: 2.2, dz: -4},
+    {y: 790, a: 117, bf: 78, bb: 68, n: 2.3},
+    {y: 755, a: 117, bf: 88, bb: 70, n: 2.3},
+    {y: 735, a: 117, bf: 92, bb: 70, n: 2.3},
+    {y: 680, a: 118, bf: 90, bb: 70, n: 2.3},
+    {y: 620, a: 120, bf: 87, bb: 74, n: 2.3},
     {y: 540, a: 125, bf: 86, bb: 84, n: 2.3},
     {y: 500, a: 128, bf: 86, bb: 88, n: 2.3},
     {y: 400, a: 131, bf: 88, bb: 88, n: 2.3},
@@ -264,8 +264,8 @@ export function keyPhi(v: View): number {
     const yr = (v.yaw * Math.PI) / 180;
     const nx = Math.cos(r) * Math.cos(yr) - Math.sin(r) * Math.sin(yr);
     const nd = Math.cos(r) * Math.sin(yr) + Math.sin(r) * Math.cos(yr);
-    if (nd < 0.25) continue;
-    const s = nx - 0.15 * nd;
+    if (nd < 0.2) continue;
+    const s = nx * 0.75 - 0.66 * nd;
     if (s < bs) {
       bs = s;
       best = a;
@@ -281,14 +281,14 @@ export function keyPhi(v: View): number {
 export function cardigan(sk: Skeleton, v: View, mat = 'cardigan', hemY = 606): Part[] {
   const rows: GRow[] = [
     {y: 858, a: 34, bf: 25, bb: 36, dz: -10},
-    {y: 838, a: 58, bf: 36, bb: 46, dz: -8},
-    {y: 812, a: 116, bf: 58, bb: 60, n: 2.2},
-    {y: 790, a: 120, bf: 72, bb: 64, n: 2.25},
-    {y: 760, a: 118, bf: 80, bb: 64, n: 2.25},
-    {y: 736, a: 116, bf: 82, bb: 64, n: 2.25},
-    {y: 690, a: 112, bf: 76, bb: 62, n: 2.25},
-    {y: 640, a: 108, bf: 70, bb: 62, n: 2.25},
-    {y: hemY, a: 104, bf: 67, bb: 62, n: 2.25},
+    {y: 838, a: 56, bf: 36, bb: 46, dz: -8},
+    {y: 812, a: 106, bf: 58, bb: 60, n: 2.2},
+    {y: 790, a: 112, bf: 72, bb: 64, n: 2.25},
+    {y: 760, a: 112, bf: 80, bb: 64, n: 2.25},
+    {y: 736, a: 111, bf: 82, bb: 64, n: 2.25},
+    {y: 690, a: 108, bf: 76, bb: 62, n: 2.25},
+    {y: 640, a: 105, bf: 70, bb: 62, n: 2.25},
+    {y: hemY, a: 102, bf: 67, bb: 62, n: 2.25},
   ];
   const secs = garmentSecs(sk, rows);
   const out = loftOutline(secs, v, sk.leanXf, {cornerBottom: true});
@@ -337,18 +337,19 @@ export function trousers(sk: Skeleton, v: View, mat: string, cut: 'straight' | '
   const secs = garmentSecs(sk, seat);
   const grp = `${mat}Grp`;
   const parts: Part[] = [{k: `${mat}Seat`, pts: loftOutline(secs, v, sk.leanXf, {cornerTop: true}), mat, z: Z.lower, tension: 0.45, grp}];
-  const R = cut === 'wide' ? [70, 68, 72] : cut === 'relaxed' ? (m ? [70, 60, 57] : [66, 57, 55]) : m ? [66, 54, 51] : [62, 51, 49];
+  // the leg's top at the thigh's centre below the seat (not the hip joint: a wide leg would bulge past the hip)
+  const R = cut === 'wide' ? [58, 64, 70] : cut === 'relaxed' ? (m ? [62, 55, 53] : [60, 53, 51]) : m ? [58, 50, 48] : [55, 48, 46];
   for (const s of ['l', 'r'] as Side[]) {
-    const ss = s === 'l' ? 1 : -1;
     const H = sk.hip[s];
     const K = sk.knee[s];
     const A = sk.ankle[s];
-    // the hem: a little below and behind the ankle (it breaks on the shoe); wide legs hang straight down from the knee
     const drop = o.hemDrop ?? 20;
     const hang = cut === 'wide' ? 0.55 : cut === 'relaxed' ? 0.3 : 0.15;
     const hem: V3 = [lerp(A[0], K[0], hang * 0.35), A[1] - drop, lerp(A[2], K[2], hang * 0.6) - 4];
-    const top: V3 = add3(H, [ss * -4, 30, 0]);
-    const ru = pchip([0, 0.12, 0.5, 0.62, 1], [R[0] * 1.02, R[0], (R[0] + R[1]) / 2 + 2, R[1], R[2]]);
+    const yTop = b.crotchY + 30 - sk.bob;
+    const cxT = sk.cx(yTop);
+    const top: V3 = [cxT + (H[0] - cxT) * 0.66, yTop, H[2] * 0.6 + K[2] * 0.08];
+    const ru = pchip([0, 0.1, 0.45, 0.6, 1], [R[0] * 1.03, R[0], (R[0] + R[1]) / 2, R[1], R[2]]);
     const pts = tubeOutline([top, K, hem], (u) => ({ru: ru(u), rv: ru(u) * 1.04}), v, [0, 0, 1], {m: 34, capEnd: false});
     const d = proj(K, v).d - proj(sk.leanXf([sk.cx(b.chestY), b.chestY, 0]), v).d;
     parts.push({k: `${mat}Leg_${s}`, pts: crisp2(pts), mat, z: d < 0 ? Z.farLeg + 2 : Z.lower - 1, tension: 0.45, grp});
@@ -440,7 +441,7 @@ export function bigShirt(sk: Skeleton, v: View, mat = 'shirt', waistY = 642): Pa
   const tsecs = garmentSecs(sk, tail, {tiltK: tiltHang(b.hipJY)});
   const tOut = loftOutline(tsecs, v, sk.leanXf, {cornerBottom: true, arc: () => [168, 372]});
   const dT = proj(sk.leanXf([sk.cx(560), 560, -80]), v).d - proj(sk.leanXf([sk.cx(560), 560, 0]), v).d;
-  parts.push({k: 'shirtTail', pts: tOut, mat, z: dT > 0 ? Z.outer - 1 : Z.lower - 2, tension: 0.45});
+  parts.push({k: 'shirtTail', pts: tOut, mat, z: dT > 0 ? Z.outer - 1 : Z.farLeg - 1, tension: 0.45});
   // the collar's two points lying on the chest either side of the open V
   for (const side of [1, -1]) {
     const reg = region(secs, v, 846 - sk.bob, 792 - sk.bob, (y) => {

@@ -55,9 +55,9 @@ export const WOMAN: Build = {
   neckBaseY: 832,
   neckR: 21,
   neckD: 23,
-  shY: 808,
-  shX: 96,
-  shOuter: 114,
+  shY: 806,
+  shX: 92,
+  shOuter: 112,
   armpitY: 760,
   chestY: 738,
   chestA: 88,
@@ -194,7 +194,7 @@ function walkFeet(b: Build, phase: number): {ankle: Record<Side, V3>; pitch: Rec
   ankle[lead] = [0, b.ankleY, front];
   pitch[lead] = -12 * (1 - smoothStep(k * 3));
   // the back foot: its toe on the ground, the heel lifted ~30 degrees
-  const heelUp = 30 + 10 * k;
+  const heelUp = 24 + 10 * k;
   const toeLen = b.foot * 0.72;
   ankle[trail] = [0, b.ankleY + Math.sin((heelUp * Math.PI) / 180) * toeLen * 0.55, back];
   pitch[trail] = heelUp;
