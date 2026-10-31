@@ -465,8 +465,10 @@ function kettleCabinet(x, y, w, h, opts = {}) {
   return s;
 }
 FRAMES.B4 = () => {
-  // closer and lower: one giant computer's door swung wide toward us; inside, forty kettles in eight rows of five, all
-  // boiling, their forty plumes rolling out over the top into one big cloud; she steps back, a hand up
+  // closer and lower: one giant computer's door swung wide toward us, its inside BLAZING honey with the boiling: forty
+  // kettles in eight rows of five catching the light, a jet of steam curling up off every spout and all of it rolling
+  // out over the top in one cloud; the row around it and the floor stay cool. She steps back from it, both hands up, her
+  // face tipped up to the top of the wall (round 2)
   seed(41);
   const cam = Cam(800, 520, 1387, 0.8);
   const zc = 2.9, Xl = -0.75, Xr = 0.85, Ht = 3.0;
@@ -478,21 +480,27 @@ FRAMES.B4 = () => {
   s += P(polyD([[0, 1600], [W, 1600], [W, H], [0, H]]), V[7], 'opacity="0.5"');
   for (const z of [1.6, 2.1, 2.9, 4.2, 6.4]) s += S(lineD([cam.p(-4, 0, z), cam.p(6, 0, z)]), V[6], 1.6, 'opacity="0.7"');
   for (const X of [-1.2, -0.4, 0.4, 1.2, 2.0, 2.8]) s += S(lineD([cam.p(X, 0, 1.2), cam.p(X, 0, 9)]), V[6], 1.4, 'opacity="0.6"');
-  // the open computer: its body, its dim inside, eight shelves of five kettles, their water gauges glowing
+  // the open computer: its body, and its inside blazing honey with the boiling (a bloom only at the opening)
   const tl = cam.p(Xl, Ht, zc), br = cam.p(Xr, 0, zc), w = br[0] - tl[0], h = br[1] - tl[1];
+  s += rect(tl[0] - 22, tl[1] - 26, w + 44, h + 36, C.honey, 'opacity="0.4" filter="url(#b24)"');
   s += hrect(tl[0] - 16, tl[1] - 18, w + 32, h + 22, V[0], 1);
-  s += hrect(tl[0], tl[1], w, h, V[2], 0.8) + rect(tl[0], tl[1], w, h, C.honey, 'opacity="0.1"');
+  s += `<radialGradient id="k4in" gradientUnits="userSpaceOnUse" cx="${f1(tl[0] + w / 2)}" cy="${f1(tl[1] + h * 0.42)}" r="${f1(h * 0.66)}"><stop offset="0" stop-color="${C.honeyC}"/><stop offset="0.45" stop-color="${C.honeyL}"/><stop offset="1" stop-color="${C.honey}"/></radialGradient>`;
+  s += hrect(tl[0], tl[1], w, h, 'url(#k4in)', 0.8);
+  // eight shelves of five kettles, the shelves and the kettles catching the blaze, their water gauges glowing
   const rows = 8, cols = 5, ch = h / rows, cw = w / cols;
   const spouts = [];
   for (let r = 0; r < rows; r++) {
     const sy = tl[1] + (r + 1) * ch;
-    s += rect(tl[0] + 4, sy - 8, w - 8, 8, V[4]) + rect(tl[0] + 4, sy - 8, w - 8, 2, V[6]);
+    s += rect(tl[0] + 4, sy - 8, w - 8, 9, C.honeyW) + rect(tl[0] + 4, sy - 8, w - 8, 2.4, C.honeyC, 'opacity="0.9"');
     for (let c = 0; c < cols; c++) {
       const kx = tl[0] + (c + 0.56) * cw + rr(-2, 2), ks = ch * 0.74;
-      s += kettle(kx, sy - 8, ks, {steamOn: false, body: V[10], shade: V[8], dark: V[4], gauge: C.honeyL});
-      spouts.push([kx - 0.46 * ks, sy - 8 - 0.8 * ks, r]);
+      s += ell(kx + ks * 0.05, sy - 9, ks * 0.4, ks * 0.06, C.honeyW, 'opacity="0.6" filter="url(#b2)"');
+      s += kettleLit(kx, sy - 8, ks);
+      spouts.push([kx - 0.47 * ks, sy - 8 - 0.79 * ks, r, c]);
     }
   }
+  // the boil: a jet of steam curling up off every spout (up the gaps between the kettles, the bodies crisp)
+  for (const [sx, sy, r, c] of spouts) s += steamJet(sx, sy, ch * (r === 0 ? 1.15 : 0.95), {dir: -1, ph: r * 1.7 + c * 2.3, op: 0.9, w: ch * 0.075});
   s += ell(tl[0] + w / 2, br[1] + 10, w * 0.8, 40, C.honey, 'opacity="0.28" filter="url(#b14)"');
   // the door swung wide toward us on its left hinge: its inner face dark, perforated, its lights dead
   const ang = 115 * Math.PI / 180, dw = 1.6;
@@ -505,21 +513,17 @@ FRAMES.B4 = () => {
   for (let i = 1; i < 18; i++) for (let k = 1; k < 16; k++) { const t = i / 18, Y = k * Dh / 16, p = dq(t, Y), zz = zc + (fe[1] - zc) * t; s += ell(p[0], p[1], Math.max(1, cam.sz(0.012, zz)), Math.max(1, cam.sz(0.012, zz)), V[2], 'opacity="0.8"'); }
   s += S(lineD([dq(0, Dh), dq(1, Dh)]), V[6], 4, 'opacity="0.9"') + S(lineD([dq(0, 0), dq(1, 0)]), V[1], 3);
   { const hA = dq(0.86, 1.15), hB = dq(0.86, 1.55); s += S(lineD([hA, hB]), V[8], Math.max(4, cam.sz(0.03, 1.8)), 'opacity="0.9"'); }
-  // forty kettles boiling: a plume out of every spout, curling up the front of the computer, the rows' steam rising
-  // into one sheet and rolling out over its top into one big cloud
-  for (const [sx, sy, r] of spouts) s += steam(sx - 6, sy, ch * 0.62, ch * 1.25, {n: 5, col: '#f6f7f8', op: 0.92, lean: -0.08, sharp: true});
-  for (let r = 0; r < rows; r++) s += P(blobD(tl[0] + w / 2, tl[1] + r * ch + ch * 0.12, w * 0.5, ch * 0.22, 9, 0.2), '#f3f4f6', `opacity="${f1(0.1 + 0.025 * (rows - r))}" filter="url(#b14)"`);
-  s += steam(tl[0] + w * 0.5, tl[1] - 10, w * 1.6, 230, {n: 10, col: '#f4f5f7', op: 0.97, root: 0.16, warm: true});
-  s += steam(tl[0] + w * 0.12, tl[1] - 4, w * 0.8, 190, {n: 7, col: '#f2f3f5', op: 0.85, lean: -0.15});
-  s += steam(tl[0] + w * 0.9, tl[1] - 4, w * 0.8, 200, {n: 7, col: '#f2f3f5', op: 0.85, lean: 0.12});
-  // her, a step back from it, a hand up (astonished), the forty's warm light on her
-  const fz = 3.45, f = cam.p(1.38, 0, fz), hp = cam.sz(1.7, fz);
-  s += ell(f[0], f[1] + 3, hp * 0.2, hp * 0.035, V[4], 'opacity="0.6"');
-  s += her(f[0], f[1], hp, {view: 'side', dir: -1, lean: -5, step: [7, 2], arms: [[-14, 8], [54, 108]], coat: V[2], coatL: V[3], hair: V[1], skin: V[8], scarf: V[8], rim: C.honeyL});
+  // the forty jets gather into ONE cloud rolling out over the computer's top, lit warm from below by the blaze
+  s += rollCloud(tl[0] + w / 2, tl[1] - 4, w * 1.7, 290);
+  // her, a step back from it, both hands up, her face tipped up to the top of the wall; the blaze's light on her front
+  const fz = 3.3, f = cam.p(1.5, 0, fz), hp = cam.sz(1.7, fz);
+  s += ell(f[0] + hp * 0.03, f[1] + 3, hp * 0.24, hp * 0.035, V[4], 'opacity="0.6"');
+  s += herRecoil(f[0], f[1], hp, {dir: -1, coat: V[2], coatL: V[3], hair: V[1], skin: mixHex(V[8], C.honeyL, 0.3), hand: mixHex(V[8], C.honeyL, 0.4), scarf: V[8], rim: C.honeyL});
   // the high hall's light over it all (the band stays calm)
   s += `<linearGradient id="b4up" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="700"><stop offset="0" stop-color="${C.paperT}" stop-opacity="1"/><stop offset="0.86" stop-color="${C.paper}" stop-opacity="1"/><stop offset="1" stop-color="${C.paper}" stop-opacity="0"/></linearGradient><rect x="0" y="0" width="${W}" height="700" fill="url(#b4up)"/>`;
   s += caption([{t: '40', x: 470, y: 500, lit: true, size: 250}, {t: 'kettles,', x: 760, y: 572, size: 112}]);
-  return svgPage(s);
+  const jetDefs = `<linearGradient id="jetg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset="0.45" stop-color="#d8d8d8"/><stop offset="1" stop-color="#000000"/></linearGradient><mask id="jetfade" maskContentUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" fill="url(#jetg)"/></mask>`;
+  return svgPage(s, jetDefs);
 };
 
 // ======================================================================================
