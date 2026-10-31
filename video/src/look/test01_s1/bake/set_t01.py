@@ -36,20 +36,20 @@ SPAN2 = BR['span'] / 2
 # is cream, ivory, sepia and umber; the one hot accent (candle gold) belongs to the light, never to a material.
 K = {
     # the bridge
-    'brick': '#9B5B4B', 'brick2': '#8C5044', 'brick3': '#A86A57', 'stone': '#C8B39B', 'stone2': '#B9A38C',
+    'brick': '#9B5B4B', 'brick2': '#8C5044', 'brick3': '#A86A57', 'stone': '#B4ABA0', 'stone2': '#A69C90',
     'coping': '#B4AAA0', 'vault': '#7F4C42', 'iron': '#243231', 'lamp_post': '#1E2A29', 'lantern': '#FFE3AE',
     'bike': '#2A2F33', 'bike2': '#3A3034', 'bike_red': '#7E3B36',
     # the far street
     'h_brick': '#8E4F43', 'h_brown': '#5B3B34', 'h_char': '#3B3B44', 'h_green': '#304B44', 'h_cream': '#D5C6AF',
     'h_ochre': '#A5634B', 'h_plum': '#5E3C47', 'h_grey': '#6E6A70', 'frame': '#E6DFD2', 'glass': '#2B2F3E',
     'glass_mid': '#4A4A5E', 'win_lit': '#FFD9A2', 'win_warm': '#F5C68A', 'roof': '#45434F', 'roof2': '#3B3A47',
-    'beam': '#2C2A30', 'quay': '#7C5A50', 'quay_top': '#8F7A70', 'tower': '#5A5466', 'tower_lit': '#6D6577',
+    'beam': '#2C2A30', 'stone_t': '#D9D2C6', 'h_ox': '#6B3133', 'door': '#2A2A31', 'quay': '#7C5A50', 'quay_top': '#8F7A70', 'tower': '#5A5466', 'tower_lit': '#6D6577',
     'elm': '#2D4743', 'elm2': '#36524B', 'elm3': '#26403C', 'elm_y': '#D9A646', 'elm_y2': '#C98B3C',
     'trunk': '#2E2A2E', 'sloop': '#30383A', 'sloop2': '#5A4038', 'cover': '#3C4A55',
     # the houseboat and our boat
-    'hull': '#28363A', 'cabin': '#4F5C6C', 'cabin2': '#5C4E46', 'cabin_trim': '#D8D0C2', 'boat_roof': '#3A3C46',
+    'hull': '#28363A', 'cabin': '#33423B', 'cabin2': '#4E3E37', 'cabin_trim': '#D8D0C2', 'boat_roof': '#3A3C46',
     'pot': '#A35A3E', 'pot2': '#8C4A36', 'plant': '#2E4A40', 'plant2': '#3D5A48', 'boat_win': '#FFD29A',
-    'bow': '#1F2A2E', 'bow_rim': '#3A4448', 'bow_wood': '#4A3A36',
+    'bow': '#2E2420', 'bow_rim': '#6A4A36', 'bow_wood': '#3A2C26',
     # the water and the paper twin
     'water': '#1D2236',
     'paper': '#E9DBBB', 'paper2': '#F1E6CC', 'paper3': '#DCC8A2', 'sepia': '#C9AA7C', 'sepia2': '#B8956A',
@@ -163,73 +163,137 @@ def jitter_hex(h, rng, dv=0.05, dh=0.02):
 
 
 # ---------------------------------------------------------------- the far street (beyond the bridge)
-GABLES = ['step', 'neck', 'bell', 'cornice', 'spout', 'neck', 'cornice', 'step', 'bell', 'cornice']
+# Amsterdam's own gables (from photos of the Jordaan's canals: Bloemgracht, Egelantiersgracht, Prinsengracht): narrow
+# brick houses of four or five storeys, shoulder to shoulder, each crowned by its gable: the STEP gable (stepped edges up
+# to a small top), the NECK gable (a tall central neck with curved shoulder pieces, a small pediment on top), the BELL
+# gable (a bell's outline with a rounded top), the SPOUT gable (a plain point) and the flat CORNICE of the 18th century
+# (a horizontal entablature with a raised centre). The gables' edges and the cornices are pale sandstone (a material,
+# never a drawn line); the window frames white; a hoist beam under the apex.
+GABLES = ['neck', 'step', 'cornice', 'bell', 'neck', 'spout', 'cornice', 'step', 'bell', 'neck', 'cornice']
 
 
 def gable_outline(kind, w, rng):
-    """The top outline above the eave in facade-local (u across 0..w, v up from the eave)."""
+    """The top outline above the eave in facade-local (u across 0..w, v up from the eave), left to right, starting at
+    (0, 0) and ending at (w, 0). Heights in metres, proportioned as the real gables (a neck about 0.55 w tall over a
+    neck 0.4 w wide; a step gable about 0.6 w; a bell about 0.55 w)."""
     if kind == 'step':
         n = 3
-        pts = [(0.0, 0.0)]
-        sw = w * 0.5 / (n + 0.6)
+        top = 0.64 * w
+        tw = 0.84
+        sw = (w / 2 - tw / 2) / n
+        sh = (top - 0.25) / (n + 0.55)
+        left = []
+        u, v = 0.0, 0.0
         for i in range(n):
-            u = sw * i
-            v = 1.05 * (i + 1)
-            pts += [(u + sw * 0.05, v - 1.05), (u + sw * 0.05, v), (u + sw, v)]
-        top = 1.05 * n + 0.8
-        half = [(u, v) for (u, v) in pts[1:]]
-        right = [(w - u, v) for (u, v) in reversed(half)]
-        return [(0.0, 0.0)] + half + [(w / 2 - 0.35, top - 0.3), (w / 2, top), (w / 2 + 0.35, top - 0.3)] + right + [(w, 0.0)]
+            v += sh
+            left.append((u, v))
+            u += sw
+            left.append((u, v))
+        left.append((u, top))
+        right = [(w - uu, vv) for (uu, vv) in reversed(left)]
+        return [(0.0, 0.0)] + left + [(w / 2 - 0.18, top + 0.18), (w / 2 + 0.18, top + 0.18)] + right + [(w, 0.0)]
     if kind == 'neck':
-        nw = w * 0.44
+        nw = w * 0.42
         a = (w - nw) / 2
-        return [(0.0, 0.0), (w * 0.08, 0.45), (a - 0.25, 0.9), (a, 1.25), (a, 3.6), (a + 0.2, 4.2), (w / 2, 4.75),
-                (w - a - 0.2, 4.2), (w - a, 3.6), (w - a, 1.25), (w - a + 0.25, 0.9), (w * 0.92, 0.45), (w, 0.0)]
+        hn = 0.62 * w
+        sh = []
+        # the curved shoulder (a claw piece) from the eave's corner up to the neck's side
+        for t in np.linspace(0, 1, 7)[1:-1]:
+            sh.append((a * t, 1.05 * math.sin(t * math.pi / 2) ** 0.8))
+        left = [(0.0, 0.25)] + sh + [(a, 1.05), (a, hn - 0.55)]
+        ped = [(a - 0.12, hn - 0.55), (w / 2, hn + 0.25), (w - a + 0.12, hn - 0.55)]
+        right = [(w - u, v) for (u, v) in reversed(left)]
+        return [(0.0, 0.0)] + left + ped + right + [(w, 0.0)]
     if kind == 'bell':
-        pts = [(0.0, 0.0)]
-        for i in range(1, 13):
-            t = i / 13
-            u = w * 0.5 * t
-            v = 4.3 * math.sin(t * math.pi / 2) ** 1.5 + 0.35 * math.sin(t * math.pi * 2.2) * (1 - t)
-            pts.append((u * 0.92 + w * 0.04 * t, v))
-        pts.append((w / 2, 4.85))
-        right = [(w - u, v) for (u, v) in reversed(pts[1:-1])]
-        return pts + right + [(w, 0.0)]
+        hb = 0.6 * w
+        prof = [(0.00, 0.12), (0.05, 0.26), (0.11, 0.38), (0.15, 0.50), (0.17, 0.62), (0.21, 0.75), (0.28, 0.86), (0.36, 0.94), (0.44, 0.985)]
+        left = [(w * u, hb * v) for (u, v) in prof]
+        right = [(w - uu, vv) for (uu, vv) in reversed(left)]
+        return [(0.0, 0.0)] + left + [(w / 2, hb + 0.12)] + right + [(w, 0.0)]
     if kind == 'spout':
-        return [(0.0, 0.0), (w * 0.18, 0.8), (w * 0.32, 2.2), (w / 2 - 0.3, 3.7), (w / 2, 4.1), (w / 2 + 0.3, 3.7), (w * 0.68, 2.2), (w * 0.82, 0.8), (w, 0.0)]
-    # a cornice top: a straight entablature, a little crest in the middle
-    return [(0.0, 0.0), (0.0, 0.85), (w * 0.38, 0.85), (w * 0.5, 1.35), (w * 0.62, 0.85), (w, 0.85), (w, 0.0)]
+        ht = 0.5 * w
+        return [(0.0, 0.0), (w * 0.22, ht * 0.42), (w / 2 - 0.35, ht - 0.1), (w / 2 - 0.35, ht + 0.25), (w / 2 + 0.35, ht + 0.25),
+                (w / 2 + 0.35, ht - 0.1), (w * 0.78, ht * 0.42), (w, 0.0)]
+    # a cornice: the entablature, a raised centre (the attic) with a small crest
+    return [(0.0, 0.0), (0.0, 0.75), (w * 0.33, 0.75), (w * 0.36, 1.25), (w * 0.47, 1.45), (w * 0.5, 1.6), (w * 0.53, 1.45), (w * 0.64, 1.25),
+            (w * 0.67, 0.75), (w, 0.75), (w, 0.0)]
 
 
-FACADE_COLS = ['h_brick', 'h_brown', 'h_char', 'h_brick', 'h_green', 'h_cream', 'h_ochre', 'h_plum', 'h_brown', 'h_grey', 'h_brick', 'h_char']
+def offset_inward(pts, d):
+    """A closed outline offset inward by d (a rough miter: each vertex moved along the bisector of its two inner
+    normals). For the pale stone band inside a gable's edge."""
+    P = np.asarray(pts, np.float64)
+    n = len(P)
+    area = 0.5 * np.sum(P[:, 0] * np.roll(P[:, 1], -1) - np.roll(P[:, 0], -1) * P[:, 1])
+    sgn = 1.0 if area > 0 else -1.0
+    out = []
+    for i in range(n):
+        a, b, c = P[i - 1], P[i], P[(i + 1) % n]
+        e1 = b - a
+        e2 = c - b
+        n1 = np.array([-e1[1], e1[0]]) * sgn
+        n2 = np.array([-e2[1], e2[0]]) * sgn
+        n1 /= np.linalg.norm(n1) + 1e-9
+        n2 /= np.linalg.norm(n2) + 1e-9
+        bis = n1 + n2
+        nb = np.linalg.norm(bis)
+        if nb < 1e-6:
+            bis = n1
+            k = d
+        else:
+            bis /= nb
+            k = d / max(0.35, float(np.dot(bis, n1)))
+        out.append(b + bis * min(k, 3 * d))
+    return [tuple(q) for q in out]
+
+
+FACADE_COLS = ['h_brick', 'h_brown', 'h_char', 'h_brick', 'h_cream', 'h_brown', 'h_ox', 'h_brick', 'h_grey', 'h_char', 'h_brick', 'h_green']
+
+
+def band_top_ok(side, z0, w, top_y_world):
+    """Does a house (its facade plane at X = side * XF from z0 to z0 + w, its top at world Y) stay out of the caption
+    band (y 290-600, x 95-945) with a margin? Its inner corner is the one nearest the frame's middle."""
+    for z in (z0, z0 + w):
+        x = CX + F * side * XF / z
+        y = CY - F * (top_y_world - HC) / z
+        if 95 - 20 < x < 945 + 20 and y < 616:
+            return False
+    return True
 
 
 def make_houses():
     """Both quays beyond the bridge: narrow canal houses shoulder to shoulder, each its own width, height, gable,
-    colour and lit windows (a few lit: kitchens, reading lamps), a hoist beam under the gable."""
+    colour and lit windows (a few lit: kitchens, reading lamps), a hoist beam under the gable. A house whose top would
+    reach into the caption band is made a storey lower (the real rows vary that much)."""
     houses = []
     for side in (-1, 1):
-        r = seeded('houses', side)
+        r = seeded('houses2', side)
         z = ZB + 1.6
-        k = 0 if side < 0 else 4
+        k = 0 if side < 0 else 5
         while z < 260:
-            w = float(r.uniform(4.6, 7.6))
-            eave = float(r.uniform(10.5, 13.2)) if z < 70 else float(r.uniform(10.5, 14.5))
+            w = float(r.uniform(4.8, 7.4))
+            floors = int(r.choice([4, 4, 5, 5, 3]))
+            eave = 1.2 + floors * float(r.uniform(2.65, 2.95))
             kind = GABLES[(k + int(r.integers(0, 3))) % len(GABLES)]
+            out = gable_outline(kind, w, r)
+            apex = max(v for (_, v) in out)
+            while floors > 2 and not band_top_ok(side, z, w, QY + eave + apex + 0.3):
+                floors -= 1
+                eave = 1.2 + floors * 2.8
             col = K[FACADE_COLS[(k * 7 + int(r.integers(0, 5))) % len(FACADE_COLS)]]
-            floors = max(3, int((eave - 1.0) // 2.9))
-            bays = 3 if w > 5.8 else 2
-            lit = [[r.random() < (0.30 if j < floors - 1 else 0.18) for _ in range(bays)] for j in range(floors)]
-            houses.append(dict(side=side, z0=z, w=w, eave=eave, kind=kind, col=jitter_hex(col, r, 0.06, 0.012), floors=floors, bays=bays,
-                               lit=lit, out=gable_outline(kind, w, r), seed=k))
-            z += w + float(r.uniform(0.0, 0.12))
+            bays = 3 if w > 5.6 else 2
+            lit = [[r.random() < (0.32 if j < floors - 1 else 0.2) for _ in range(bays)] for j in range(floors)]
+            houses.append(dict(side=side, z0=z, w=w, eave=eave, kind=kind, col=jitter_hex(col, r, 0.05, 0.01), floors=floors, bays=bays,
+                               lit=lit, out=out, seed=k, apex=apex))
+            z += w + float(r.uniform(0.0, 0.1))
             k += 1
     return houses
 
 
 def house_faces(h, plane='far'):
-    """One house's facade (with its gable), its windows (frame, glass: lit or dark), its hoist beam and the roof mass
-    behind it. The facade lies in X = side * XF, facing the canal."""
+    """One house's facade (with its gable), the pale stone band inside the gable's edge (or the cornice), its windows
+    (white frame, glass: lit warm or dark), its door, its hoist beam and the roof mass behind it. The facade lies in
+    X = side * XF, facing the canal."""
     s = h['side']
     x = s * XF
     n_sign = -s
@@ -238,33 +302,55 @@ def house_faces(h, plane='far'):
     def P(u, v):
         return (h['z0'] + u, QY + v)
 
-    out = [(0.0, 0.0), (0.0, e)] + [(u, e + v) for (u, v) in h['out'][1:-1]] + [(w, e), (w, 0.0)]
+    gl = h['out']
+    out = [(0.0, 0.0), (0.0, e)] + [(u, e + v) for (u, v) in gl[1:-1]] + [(w, e), (w, 0.0)]
     faces = []
-    apex = e + max(v for (_, v) in h['out'])
+    apex = e + h['apex']
     # the roof mass behind: a pitched block seen past the gable (fills the jagged gaps between gables with roofs)
     rx = s * (XF + 7.0)
-    roof = [(h['z0'] - 0.05, QY + e - 0.5), (h['z0'] - 0.05, QY + apex - 0.6), (h['z0'] + w + 0.05, QY + apex - 0.6), (h['z0'] + w + 0.05, QY + e - 0.5)]
-    faces.append(wall_x(plane, 'roof', K['roof'] if h['seed'] % 2 else K['roof2'], rx, roof, n_sign, name=f'roof{s}_{h["seed"]}', extra={'house': h['seed']}))
-    faces.append(wall_x(plane, 'facade', h['col'], x, [P(u, v) for (u, v) in out], n_sign, name=f'house{s}_{h["seed"]}', extra={'house': h['seed']}))
-    # windows: big ground floor (a shop or a high front room), then the floors; white frames, glass inside
+    roof = [(h['z0'] - 0.05, QY + e - 0.5), (h['z0'] - 0.05, QY + apex - 0.9), (h['z0'] + w + 0.05, QY + apex - 0.9), (h['z0'] + w + 0.05, QY + e - 0.5)]
+    zc = h['z0'] + w / 2
+    faces.append(wall_x(plane, 'roof', K['roof'] if h['seed'] % 2 else K['roof2'], rx, roof, n_sign, name=f'roof{s}_{h["seed"]}', extra={'house': h['seed']}, z=zc + 0.6))
+    faces.append(wall_x(plane, 'facade', h['col'], x, [P(u, v) for (u, v) in out], n_sign, name=f'house{s}_{h["seed"]}', extra={'house': h['seed']}, z=zc))
+    # the stone: the gable's edge band (a ring between the gable's outline and its inward offset), or the cornice
+    if h['kind'] == 'cornice':
+        cor = [P(-0.05, e + 0.45), P(-0.05, e + 0.78), P(w + 0.05, e + 0.78), P(w + 0.05, e + 0.45)]
+        faces.append(wall_x(plane, 'trim', K['stone_t'], x - s * 0.02, cor, n_sign, name=f'cornice{s}_{h["seed"]}', z=zc - 0.04))
+        att = [(u, e + v) for (u, v) in gl[3:-3]]
+        if len(att) >= 3:
+            faces.append(wall_x(plane, 'trim', K['stone_t'], x - s * 0.02, [P(u, v) for (u, v) in [(att[0][0], e + 0.75)] + att + [(att[-1][0], e + 0.75)]], n_sign, name=f'attic{s}_{h["seed"]}', z=zc - 0.04))
+    else:
+        top = [(u, e + v) for (u, v) in gl[1:-1]]
+        inner = offset_inward([(0.0, e)] + top + [(w, e)], 0.26)
+        ring = top + [inner[-2]] + list(reversed(inner[1:-1]))
+        faces.append(wall_x(plane, 'trim', K['stone_t'], x - s * 0.02, [P(u, v) for (u, v) in ring], n_sign, name=f'gtrim{s}_{h["seed"]}', z=zc - 0.04))
+        # the band at the eave line across the facade (where the gable starts)
+        sb = [P(0.0, e - 0.12), P(0.0, e + 0.1), P(w, e + 0.1), P(w, e - 0.12)]
+        faces.append(wall_x(plane, 'trim', K['stone_t'], x - s * 0.021, sb, n_sign, name=f'eave{s}_{h["seed"]}', z=zc - 0.04))
+    # windows: the ground floor tall (a front room, or a shop), then the floors; white frames, glass inside
     floor_h = (e - 1.2) / h['floors']
     for j in range(h['floors']):
-        v0 = 0.55 if j == 0 else 1.2 + j * floor_h * 0.98
-        wh = (2.3 if j == 0 else min(1.95, floor_h * 0.66)) * (0.92 if j == h['floors'] - 1 else 1.0)
+        v0 = 0.65 if j == 0 else 1.2 + j * floor_h + 0.35
+        wh = (2.2 if j == 0 else min(1.9, floor_h * 0.64)) * (0.9 if j == h['floors'] - 1 else 1.0)
         for b in range(h['bays']):
             uc = w * (b + 1) / (h['bays'] + 1)
-            ww = 1.12 if j else 1.25
-            fr = 0.12
+            ww = 1.02 if j else 1.18
+            fr = 0.11
+            if j == 0 and b == 0:
+                # the door: dark, panelled, a fanlight over it (lit if the hall is)
+                dr = [P(uc - 0.55, 0.0), P(uc - 0.55, 2.3), P(uc + 0.55, 2.3), P(uc + 0.55, 0.0)]
+                faces.append(wall_x(plane, 'door', K['door'], x - s * 0.02, dr, n_sign, name=f'door{s}_{h["seed"]}', z=zc - 0.05))
+                continue
             frame = [P(uc - ww / 2, v0), P(uc - ww / 2, v0 + wh), P(uc + ww / 2, v0 + wh), P(uc + ww / 2, v0)]
-            faces.append(wall_x(plane, 'frame', K['frame'], x - s * 0.02, frame, n_sign, name=f'fr{s}_{h["seed"]}_{j}_{b}'))
+            faces.append(wall_x(plane, 'frame', K['frame'], x - s * 0.02, frame, n_sign, name=f'fr{s}_{h["seed"]}_{j}_{b}', z=zc - 0.05))
             lit = h['lit'][j][b]
-            gl = [P(uc - ww / 2 + fr, v0 + fr), P(uc - ww / 2 + fr, v0 + wh - fr), P(uc + ww / 2 - fr, v0 + wh - fr), P(uc + ww / 2 - fr, v0 + fr)]
+            gp = [P(uc - ww / 2 + fr, v0 + fr), P(uc - ww / 2 + fr, v0 + wh - fr), P(uc + ww / 2 - fr, v0 + wh - fr), P(uc + ww / 2 - fr, v0 + fr)]
             col = (K['win_lit'] if (h['seed'] + j + b) % 3 else K['win_warm']) if lit else (K['glass_mid'] if (j + b + h['seed']) % 4 == 0 else K['glass'])
-            faces.append(wall_x(plane, 'window', col, x - s * 0.03, gl, n_sign, emit=1.0 if lit else 0.0, name=f'gl{s}_{h["seed"]}_{j}_{b}'))
-    # the hoist beam under the apex (a short dark bar)
+            faces.append(wall_x(plane, 'window', col, x - s * 0.03, gp, n_sign, emit=1.0 if lit else 0.0, name=f'gl{s}_{h["seed"]}_{j}_{b}', z=zc - 0.06))
+    # the hoist beam under the apex (a short dark bar with its hook)
     if h['kind'] != 'cornice':
-        hb = [P(w / 2 - 0.12, e + 2.0), P(w / 2 - 0.12, e + 2.35), P(w / 2 + 0.12, e + 2.35), P(w / 2 + 0.12, e + 2.0)]
-        faces.append(wall_x(plane, 'beam', K['beam'], x - s * 0.04, hb, n_sign, name=f'beam{s}_{h["seed"]}'))
+        hb = [P(w / 2 - 0.1, e + h['apex'] - 1.25), P(w / 2 - 0.1, e + h['apex'] - 0.95), P(w / 2 + 0.1, e + h['apex'] - 0.95), P(w / 2 + 0.1, e + h['apex'] - 1.25)]
+        faces.append(wall_x(plane, 'beam', K['beam'], x - s * 0.04, hb, n_sign, name=f'beam{s}_{h["seed"]}', z=zc - 0.07))
     return faces
 
 
@@ -293,26 +379,46 @@ def set_far():
                     cov = [(z + 0.8, 0.55), (z + 1.2, 0.95), (z + L - 1.0, 0.95), (z + L - 0.6, 0.55)]
                     faces.append(wall_x('far', 'cover', K['cover'], x_in - s * 0.02, cov, -s, name=f'cover{s}_{z:.0f}'))
             z += L + r.uniform(1.0, 6.0)
-    # the young elms on the quays (crowns as soft balls, trunks), from 46 m on: they frame the low sky behind her
-    r = seeded('far_elms')
-    for s in (-1, 1):
-        z = (62.0 if s < 0 else 96.0) + r.uniform(0, 3)
+    # the elms on the quays (Amsterdam's canal elms, late October: thinning crowns, a few yellow), a row on each quay
+    # near the water's edge from just past the bridge; a crown whose top would reach the caption band sits lower
+    r = seeded('far_elms3')
+    for s_ in (-1, 1):
+        z = (41.0 if s_ < 0 else 47.0) + r.uniform(0, 2)
         i = 0
-        while z < 200:
-            X = s * (XW + 2.2)
-            ht = r.uniform(11.5, 13.2)
-            rad = r.uniform(2.6, 3.4)
+        while z < 230:
+            X = s_ * (XW + 1.5)
+            rad = r.uniform(2.0, 2.6)
+            ht = r.uniform(10.0, 11.8)
             cz = z
-            c = proj([X, ht - rad * 0.95, cz])
-            rr = F * rad / cz
-            crown = blob(float(c[0]), float(c[1]), rr * r.uniform(0.95, 1.15), rr * r.uniform(0.85, 1.0), r, rough=0.22)
-            faces.append(Face('far', 'crown', [K['elm'], K['elm2'], K['elm3']][i % 3], scr=crown, z=cz - 0.5, name=f'farelm{s}_{i}'))
+            # keep the crown's top below the band (y >= 622) wherever it is inside x 95-945
+            for _ in range(12):
+                c = proj([X, ht - rad * 0.95, cz])
+                rr = F * rad / cz
+                if not (95 - 30 < c[0] < 945 + 30) or c[1] - rr >= 622:
+                    break
+                ht -= 0.4
+            # the crown as a few leafy clumps with sky between them (late October: thinning), never one ball
+            nclump = int(r.integers(4, 7))
+            for j in range(nclump):
+                ang = r.uniform(0, 2 * math.pi)
+                dist = r.uniform(0.15, 0.62)
+                cx_ = float(c[0]) + math.cos(ang) * dist * rr * 1.05
+                cy_ = float(c[1]) + math.sin(ang) * dist * rr * 0.75 - 0.08 * rr
+                sr = rr * r.uniform(0.34, 0.56)
+                clump = blob(cx_, cy_, sr * r.uniform(1.0, 1.25), sr * r.uniform(0.75, 0.95), r, rough=0.3)
+                faces.append(Face('far', 'crown', [K['elm'], K['elm2'], K['elm3']][(i + j) % 3], scr=clump, z=cz - 0.5 - 0.01 * j, name=f'farelm{s_}_{i}_{j}'))
             tb = proj([X, QY, cz])
-            tt = proj([X, ht - 2 * rad + 0.6, cz])
-            tw = max(1.2, F * 0.35 / cz)
+            tt = proj([X, ht - 1.6 * rad, cz])
+            tw = max(1.2, F * 0.3 / cz)
             trunk = np.array([[tb[0] - tw / 2, tb[1]], [tt[0] - tw / 3, tt[1]], [tt[0] + tw / 3, tt[1]], [tb[0] + tw / 2, tb[1]]])
-            faces.append(Face('far', 'trunk', K['trunk'], scr=trunk, z=cz - 0.4, name=f'farelmtrunk{s}_{i}'))
-            z += r.uniform(10.0, 14.0)
+            faces.append(Face('far', 'trunk', K['trunk'], scr=trunk, z=cz - 0.4, name=f'farelmtrunk{s_}_{i}'))
+            # two limbs up into the crown (thin, where the tree IS thin)
+            for k_, lean in enumerate((-0.55, 0.5)):
+                top_ = (float(tt[0]) + lean * rr * 0.7, float(tt[1]) - rr * 0.55)
+                lw = max(0.8, tw * 0.45)
+                limb = np.array([[tt[0] - lw / 2, tt[1] + 2], [top_[0] - lw / 3, top_[1]], [top_[0] + lw / 3, top_[1]], [tt[0] + lw / 2, tt[1] + 2]])
+                faces.append(Face('far', 'trunk', K['trunk'], scr=limb, z=cz - 0.45, name=f'farelmlimb{s_}_{i}_{k_}'))
+            z += r.uniform(10.5, 14.5)
             i += 1
     # the far bridge (a smaller humped bridge across the canal, far down: a small ring in the haze)
     zf2 = 132.0
@@ -504,11 +610,11 @@ def set_boat():
     ch = 2.15
     faces.append(wall_x('boat', 'cabin', K['cabin'], cx0, [(cz0, 0.75), (cz0, ch), (cz1, ch), (cz1, 0.75)], -1, name='cabin.side'))
     faces.append(wall_z('boat', 'cabin', K['cabin2'], cz0, [(cx0, 0.75), (cx0, ch), (x1 - 0.3, ch), (x1 - 0.3, 0.75)], name='cabin.end'))
-    faces.append(wall_x('boat', 'trim', K['cabin_trim'], cx0 - 0.01, [(cz0, ch - 0.12), (cz0, ch), (cz1, ch), (cz1, ch - 0.12)], -1, name='cabin.trim'))
+    faces.append(wall_x('boat', 'trim', K['cabin_trim'], cx0 - 0.01, [(cz0, ch - 0.12), (cz0, ch), (cz1, ch), (cz1, ch - 0.12)], -1, name='cabin.trim', z=cz0 - 0.05))
     # the windows on the canal side: one lit warm (the counterweight), one dim
     for i, (za, zb2, lit) in enumerate([(cz0 + 0.5, cz0 + 1.3, False), (cz0 + 1.9, cz0 + 2.7, False), (cz1 - 1.15, cz1 - 0.35, True)]):
         win = [(za, 1.2), (za, 1.78), (zb2, 1.78), (zb2, 1.2)]
-        faces.append(wall_x('boat', 'window', K['boat_win'] if lit else K['glass'], cx0 - 0.02, win, -1, emit=1.0 if lit else 0.0, name=f'boatwin{i}'))
+        faces.append(wall_x('boat', 'window', K['boat_win'] if lit else K['glass'], cx0 - 0.02, win, -1, emit=1.0 if lit else 0.0, name=f'boatwin{i}', z=cz0 - 0.1))
     # pots and plants on the roof's edge (Pip hides among them: the engine's)
     for i, zz in enumerate(np.linspace(cz0 + 0.3, cz1 - 0.4, 6)):
         c = proj([cx0 + 0.25, ch + 0.15, zz])
@@ -522,36 +628,36 @@ def set_boat():
 
 # ---------------------------------------------------------------- the near elms (the old trees on the near quays, at the edges)
 def set_trees():
-    faces = []
-    for s, X, Z, key, n in [(-1, -10.6, 15.5, 'L', 7), (1, 11.2, 14.4, 'R', 6)]:
-        r = seeded('near_elm', key)
-        # the crown: clumps of leaves reaching in over the frame's top corner, gaps between them (October: thinning)
-        for j in range(n):
-            cx_w = X - s * r.uniform(3.0, 5.6) - s * (0.5 if j > 3 else 0.0)
-            cy_w = r.uniform(12.5, 16.5) if j < 4 else r.uniform(15.0, 19.0)
-            c = proj([cx_w, cy_w, Z])
-            rr = F * r.uniform(1.3, 2.3) / Z
-            crown = blob(float(c[0]), float(c[1]), rr * r.uniform(1.0, 1.35), rr * r.uniform(0.7, 0.95), r, rough=0.3)
-            faces.append(Face('trees', 'crown', [K['elm3'], K['elm'], K['elm2']][j % 3], scr=crown, z=Z - 0.1 * j, name=f'nearelm{key}{j}'))
-        tb = proj([X, QY, Z])
-        tt = proj([X, 12.0, Z])
-        tw = F * 0.5 / Z
-        trunk = np.array([[tb[0] - tw / 2, tb[1]], [tt[0] - tw / 3, tt[1]], [tt[0] + tw / 3, tt[1]], [tb[0] + tw / 2, tb[1]]])
-        faces.append(Face('trees', 'trunk', K['trunk'], scr=trunk, z=Z + 0.2, name=f'nearelmtrunk{key}'))
-    return faces
+    """No near elms: the sky above the street stays one calm field that holds the words (CARD.md §4)."""
+    return []
 
 
 # ---------------------------------------------------------------- our boat's bow (the near hint, cut by the bottom edge)
 def set_near():
+    """Our own small boat's bow, seen from its middle bench: the varnished foredeck between two gunwales that curve in
+    to the stem post, pointing into the ring; cut by the bottom edge, dark and soft (the near hint)."""
     faces = []
-    # a small open boat's bow pointing into the ring, seen from inside the boat: the two gunwales converging to the stem
-    tip = (0.05, 0.64, 1.2)
-    left = [(-0.34, 0.58, 0.8), (-0.17, 0.62, 1.0), tip]
-    right = [tip, (0.21, 0.62, 1.0), (0.38, 0.58, 0.8)]
-    deck = [(-0.34, 0.58, 0.8), (-0.17, 0.62, 1.0), tip, (0.21, 0.62, 1.0), (0.38, 0.58, 0.8)]
+    n = 14
+    gl, gr = [], []
+    for t in np.linspace(0.0, 1.0, n):
+        z = 0.8 + 0.62 * t
+        half = 0.4 * (1 - t) ** 0.62 + 0.01
+        y = 0.52 + 0.07 * t ** 1.6
+        gl.append((-half + 0.03 * t, y, z))
+        gr.append((half + 0.03 * t, y, z))
+    deck = [(x, y - 0.01, z) for (x, y, z) in gl] + [(x, y - 0.01, z) for (x, y, z) in reversed(gr)]
     faces.append(Face('near', 'bow', K['bow'], pts=deck, n=(0, 1, 0), name='bow.deck'))
-    for nm, pts in (('bow.rimL', left), ('bow.rimR', right)):
-        rim = [(x, y + 0.07, z) for (x, y, z) in pts] + [(x, y - 0.02, z) for (x, y, z) in pts[::-1]]
+    # the deck's planks: two seams running to the stem (a value, never a line: thin strips a touch lighter)
+    for k, off in enumerate((-0.14, 0.14)):
+        seam = []
+        for t in np.linspace(0.0, 0.9, 10):
+            z = 0.8 + 0.62 * t
+            half = 0.4 * (1 - t) ** 0.62
+            seam.append((off * half / 0.4 + 0.03 * t, 0.52 + 0.07 * t ** 1.6 - 0.008, z))
+        strip = [(x - 0.008, y, z) for (x, y, z) in seam] + [(x + 0.008, y, z) for (x, y, z) in reversed(seam)]
+        faces.append(Face('near', 'bow_seam', K['bow_wood'], pts=strip, n=(0, 1, 0), name=f'bow.seam{k}'))
+    for nm, side in (('bow.rimL', gl), ('bow.rimR', gr)):
+        rim = [(x, y + 0.035, z) for (x, y, z) in side] + [(x, y - 0.03, z) for (x, y, z) in reversed(side)]
         faces.append(Face('near', 'bow_rim', K['bow_rim'], pts=rim, n=(0, 1, 0), name=nm))
     return faces
 
@@ -642,9 +748,22 @@ def set_twin(far_faces, bridge_faces, rail_faces, boat_faces, houses):
                                       extra={'writing': int(r.integers(1, 1 << 30)), 'rows': int(r.integers(3, 6))}, twin=True))
                     x += L - r.uniform(0.02, 0.12)
         elif f.kind == 'voussoir' and f.name.startswith('vous'):
-            # a ledger standing spine-out: the voussoir's shape, a leather spine with raised bands
-            col = jitter_hex([K['leather'], K['leather2'], K['leather3'], K['umber'], K['sepia2']][int(r.integers(0, 5))], r, 0.08, 0.02)
-            faces.append(mirror(f, col=col, kind='t_spine', extra={'bands': int(r.integers(2, 5)), 'vi': f.extra.get('vi', 0)}))
+            vi = f.extra.get('vi', 0)
+            nv = f.extra.get('nv', 27)
+            t0 = math.pi * (1 - vi / nv) - 0.012
+            t1 = math.pi * (1 - (vi + 1) / nv) + 0.012
+            pages = vi % 3 == 1
+            ro = BR['ring'] * (1.0 + (r.uniform(0.0, 0.3) if pages else r.uniform(0.15, 0.75)))
+            lean = r.uniform(-0.05, 0.05)
+            inner = [(SPAN2 * math.cos(t), -(BR['spring'] + BR['rise'] * math.sin(t))) for t in np.linspace(t0, t1, 4)]
+            outer = [((SPAN2 + ro) * math.cos(t + lean), -(BR['spring'] + (BR['rise'] + ro) * math.sin(t + lean))) for t in np.linspace(t1, t0, 4)]
+            pts = [(x, y, ZF - 0.03 - 0.002 * (vi % 4)) for (x, y) in inner + outer]
+            if pages:
+                col = jitter_hex([K['paper'], K['paper3'], K['vellum'], K['letter']][int(r.integers(0, 4))], r, 0.05, 0.012)
+                faces.append(Face('twin', 't_pages', col, pts=pts, n=(0, 0, -1), name=f'twin.ledger{vi}', extra={'vi': vi}, twin=True))
+            else:
+                col = jitter_hex([K['leather'], K['leather2'], K['leather3'], K['umber'], '#7A4636', '#5E3A3A', '#4E3B33', '#5A3F38'][int(r.integers(0, 8))], r, 0.08, 0.02)
+                faces.append(Face('twin', 't_spine', col, pts=pts, n=(0, 0, -1), name=f'twin.ledger{vi}', extra={'bands': int(r.integers(2, 5)), 'vi': vi}, twin=True))
         elif f.kind == 'voussoir':
             faces.append(mirror(f, col=K['leather2'], kind='t_spine', extra={'bands': 2}))
         elif f.kind == 'vault':
@@ -672,8 +791,10 @@ def set_twin(far_faces, bridge_faces, rail_faces, boat_faces, houses):
             faces += twin_sheets_on_quad(mirror(f), rows, cols, r, kinds=('t_sheet',))
         elif f.kind == 'window':
             faces.append(mirror(f, col=jitter_hex(K['leather2'] if not f.emit else K['umber'], r, 0.08, 0.02), kind='t_letter'))
-        elif f.kind == 'frame':
-            faces.append(mirror(f, col=K['paper3'], kind='t_ledger'))
+        elif f.kind in ('frame', 'trim'):
+            faces.append(mirror(f, col=K['paper3'] if f.kind == 'frame' else K['vellum'], kind='t_ledger'))
+        elif f.kind == 'door':
+            faces.append(mirror(f, col=K['leather2'], kind='t_letter'))
         elif f.kind == 'roof':
             faces.append(mirror(f, col=K['leather2'], kind='t_back'))
         elif f.kind in ('crown',):
@@ -707,12 +828,20 @@ def set_glow():
     r = seeded('glow')
     # (x, y, z, w, h, tilt (deg, about X: 90 = facing us upright), roll (deg), curl)
     sheets = [
-        (-0.35, 0.08, 17.30, 0.72, 0.46, 34, -6, 0.08),
-        (0.38, 0.20, 17.10, 0.58, 0.42, 60, 12, 0.10),
-        (-0.88, 0.44, 17.00, 0.50, 0.36, 76, -18, 0.08),
-        (0.06, 0.86, 17.05, 0.44, 0.32, 84, 22, 0.12),
-        (-0.46, 1.36, 17.15, 0.36, 0.27, 88, -28, 0.10),
-        (0.14, 1.86, 17.30, 0.27, 0.21, 88, 30, 0.10),
+        # lying on the water round the source, just lifting (the reflection turning to paper from the centre out)
+        (-0.30, 0.03, 17.05, 0.78, 0.52, 14, -4, 0.06),
+        (0.52, 0.03, 16.80, 0.66, 0.46, 18, 9, 0.07),
+        (-1.08, 0.04, 16.95, 0.58, 0.40, 16, -12, 0.05),
+        (0.10, 0.05, 16.45, 0.62, 0.44, 22, 5, 0.08),
+        (-0.62, 0.06, 16.55, 0.50, 0.36, 26, -20, 0.08),
+        # peeling up and rising along the stream, smaller as they climb
+        (-0.38, 0.22, 17.25, 0.70, 0.46, 46, -6, 0.10),
+        (0.40, 0.42, 17.10, 0.56, 0.40, 64, 12, 0.10),
+        (-0.86, 0.66, 17.00, 0.46, 0.33, 76, -18, 0.08),
+        (0.10, 1.02, 17.05, 0.40, 0.29, 84, 22, 0.12),
+        (-0.46, 1.42, 17.15, 0.33, 0.24, 88, -28, 0.10),
+        (0.16, 1.86, 17.30, 0.26, 0.19, 88, 30, 0.10),
+        (-0.30, 2.30, 17.40, 0.19, 0.14, 88, -16, 0.08),
     ]
     for i, (x, y, z, w, h, tilt, roll, curl) in enumerate(sheets):
         x += S['X'] + 0.25

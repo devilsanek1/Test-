@@ -1,0 +1,34 @@
+{
+  "format": "captions2/1",
+  "film": "test01",
+  "fps": 60,
+  "lead": 2,
+  "durationSec": 6.1,
+  "words": "none (process test 01: no voice yet; the core line's last group, docs/tests/process_test_01_amsterdam/CORE.md)",
+  "groups": [
+    {
+      "id": "g01",
+      "recipe": "R4",
+      "shot": "S1",
+      "tone": "dark",
+      "text": "now / answer / your questions",
+      "stress": {"kind": "landing", "t": "answer", "piece": [1, 0]},
+      "rows": [
+        {"baseline": 362, "x": 130, "anchor": "start", "pieces": [
+          {"t": "now", "words": [], "s": 0, "e": 0, "at": 0, "style": "hand", "size": 116, "weight": 300, "track": 0.02, "lit": false}
+        ]},
+        {"baseline": 482, "x": 236, "anchor": "start", "pieces": [
+          {"t": "answer", "words": [], "s": 0, "e": 0, "at": 0, "style": "landing", "size": 156, "weight": 700, "track": 0.02, "lit": true}
+        ]},
+        {"baseline": 578, "x": 920, "anchor": "end", "pieces": [
+          {"t": "your", "words": [], "s": 0, "e": 0, "at": 0, "style": "hand", "size": 116, "weight": 300, "track": 0.02, "lit": false},
+          {"t": "questions", "words": [], "s": 0, "e": 0, "at": 0, "style": "hand", "size": 116, "weight": 300, "track": 0.02, "lit": false}
+        ]}
+      ],
+      "start": 0,
+      "end": 6.1,
+      "enter": "pop",
+      "leave": "cut"
+    }
+  ]
+}

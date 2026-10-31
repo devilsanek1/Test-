@@ -113,3 +113,27 @@ Filled before the build, in words; §11 is answered again on the built frame.
 - **Mistakes only:** the caption in its band and readable (warm white and the honey word at 4.5:1 or more on the
   bare sky); nothing that must read under the app's bars (the source above the bottom bar, her clear of the rail
   zone); no paper edge at the top; no ink lines; no banding in the sky.
+
+## 11, again: on the built frame (`hero_r1.png`; the builder's own read, before the fresh evaluator)
+- **In three words at phone size:** "a hushed, glowing doorway": a blue evening on her canal, and under the bridge the
+  reflection is a ring of old books, paper waking at its heart, a thread of light rising to the woman at the rail. It
+  matches §1. Weakest part of the read: she is small (about 125 px tall), so "it is answering her" rests on the thread
+  of light reaching her phone, which is thin at phone size.
+- **Worth pausing on:** the shelf of ledgers (spines with gilt bands, page-blocks, each its own length and lean), the
+  pages lifting with their handwriting showing through, the parchment of written pages at the source, the paper houses
+  hanging down the dark water, the lit windows and gables down both quays, the lamp's pool on the bridge, the
+  houseboat's warm window, Pip on the coping among the bikes.
+- **One whole picture:** yes: one light (the waking pages) for the whole frame; the street, the bridge, her and the
+  twin all lit by it or stepping back from it.
+- **Mistakes only:** the caption sits in its band and every word reads (capcheck --words: "now" 6.8:1, "answer" 5.5:1,
+  "your" 6.7:1, "questions" 6.8:1); the band's sky is one calm field (dL* 0.77); nothing that must read sits under the
+  app's bars (the houseboat runs under the right rail as a mass; Pip is off it); no paper edge; no ink lines. The
+  banding check still FAILs the top gutter and three strips in the band region: its strong steps sit exactly on the
+  four painted high wisps (y 58-237, about 3 L*) and its other "steps" are the sky's soft stroke edges (at most 0.46
+  L*); the painted sky piece alone shows the same, so they are the painting, not bands.
+- **What the build changed from this card (decided while building, by the phone read):** her in three-quarter view
+  (a forward lean toward the camera does not read from the front) with one forearm on the rail and the near arm
+  reaching out with the phone; the twin's ring a ragged shelf of ledgers (spines and page-blocks of different lengths)
+  and the real arch's stone a cooler grey, so the paper half reads as a different, warm material; the twin of the sky
+  a parchment of written pages, so the light lands on paper at its source; the water clearing to paper round the
+  source; the elms leafy clumps further down the quays (as balls they hid the street); no near elms at the top.

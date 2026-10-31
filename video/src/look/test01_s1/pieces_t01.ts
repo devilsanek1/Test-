@@ -9,18 +9,16 @@ import p_bridge from './paint/bridge.t01piece.png';
 import p_boat from './paint/boat.t01piece.png';
 import p_rail from './paint/rail.t01piece.png';
 import p_glow from './paint/glow.t01piece.png';
-import p_trees from './paint/trees.t01piece.png';
 import p_near from './paint/near.t01piece.png';
 
 export const PIECES_T01: PieceSet = {
   sky: {src: p_sky, box: [0, 0, 1080, 1240]},
-  twin: {src: p_twin, box: [0, 1151, 1080, 769]},
+  twin: {src: p_twin, box: [0, 1149, 1080, 771]},
   water: {src: p_water, box: [0, 1150, 1080, 770]},
-  far: {src: p_far, box: [0, 449, 1080, 774]},
+  far: {src: p_far, box: [0, 432, 1080, 791]},
   bridge: {src: p_bridge, box: [0, 875, 1080, 375]},
   boat: {src: p_boat, box: [879, 912, 201, 388]},
   rail: {src: p_rail, box: [0, 632, 1080, 436]},
-  glow: {src: p_glow, box: [433, 1071, 173, 190]},
-  trees: {src: p_trees, box: [0, 0, 45, 99]},
-  near: {src: p_near, box: [156, 1692, 834, 228]},
+  glow: {src: p_glow, box: [411, 1040, 212, 225]},
+  near: {src: p_near, box: [193, 1698, 736, 222]},
 };

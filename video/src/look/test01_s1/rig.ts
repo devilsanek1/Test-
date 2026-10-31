@@ -35,14 +35,25 @@ export function streamScreen(): [number, number][] {
   return (scene.stream as number[][]).map(([X, Y, Z]) => proj(X, Y, Z));
 }
 
+/** The story light's heart on screen: the waking pages at the waterline under her. */
+export const SRC_IMG: [number, number] = proj(scene.source.X, scene.source.Y, scene.source.Z);
+
+/** Pip's spot: on the houseboat's roof among its pots (scene.json pip), its size in px. */
+export function pipScreen(): {x: number; y: number; size: number} {
+  const P = scene.pip;
+  const [x, y] = proj(P.X, P.Y, P.Z);
+  return {x, y, size: (f * P.size_m) / P.Z};
+}
+
 /** The story light's colours: the hot core, the gold, the warm halo. */
 export const GOLD = {core: '#FFF4D8', hot: '#FFE2A0', gold: '#FFC35E', ember: '#F2A04A'} as const;
 
-/** Her live light (widths in px at her ~130 px): the gold from below (the stream and the pages) on the edges that face
- *  down (chin, forearms, the coat's front, the hair's ends), a soft uplight over her front, the blue hour's cool shade
- *  over all of her (never black), and the low sky's thin wrap on the edges against it. */
+/** Her live light (widths in px at her ~135 px): the blue hour's cool shade over all of her (never black), the gold
+ *  from below on the edges that face the waking pages (chin, forearms, the coat's front, the hair's ends), a pool of
+ *  the phone's and the stream's gold over her hands, face and chest (radius in her heights), the low sky's thin wrap. */
 export const HER_LIGHT = {
   shade: {tint: '#7C7AA6', opacity: 0.62},
-  up: {width: 2.6, opacity: 1.0, soft: 0.55, color: '#FFC877'},
+  up: {width: 1.7, opacity: 0.9, soft: 0.5, color: '#FFC877'},
+  pool: {r: 0.34, opacity: 0.85},
   wrap: {width: 1.4, opacity: 0.35},
 } as const;

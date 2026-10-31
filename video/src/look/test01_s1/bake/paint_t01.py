@@ -163,6 +163,20 @@ def paint_sky():
         body = SC.lift(SC.mix(base, pal['deep'], 0.5), -0.012)
         SC.paint_line(sky, (x0, y0), (x0 + Ln, y0 - 6), wd, body, 0.55, round_=True, t_in=0.35, t_out=0.4)
         SC.paint_line(sky, (x0 + 30, y0 + wd * 0.3), (x0 + Ln - 40, y0 + wd * 0.3 - 6), wd * 0.35, SC.lift(body, 0.022, 0.004, 0.0), 0.35, round_=True, t_in=0.35, t_out=0.4)
+    # the caption band: one calm field (LAYOUT §1: the words sit on a flat sky): each row's lightness pulled to a
+    # nearly level ramp across the band, eased in and out at its edges so the sky stays one gradient
+    ok = sky.c.astype(np.float64)          # the recipe's layers hold OKLab (sky_clouds.Layer)
+    y0b, y1b = BAND[0] - 30, BAND[1] + 30
+    n = y1b - y0b
+    ease = np.ones(n)
+    ease[:30] = np.linspace(0, 1, 30)
+    ease[-30:] = np.linspace(1, 0, 30)
+    for ch, keep in ((0, 0.004), (1, 0.0), (2, 0.0)):
+        big = cv2.GaussianBlur(np.ascontiguousarray(ok[y0b:y1b, :, ch]).astype(np.float32), (0, 0), 40).astype(np.float64)
+        ref = float(big[30:50, 100:ww - 100].mean())
+        tgt = ref + keep * np.linspace(0, 1, n)[:, None]
+        ok[y0b:y1b, :, ch] += (tgt - big) * ease[:, None]
+    sky.c[...] = ok.astype(sky.c.dtype)
     rgb8 = sky.rgb(dither_seed=101)
     rgb = rgb8.astype(np.float64) / 255.0 if rgb8.dtype == np.uint8 else np.clip(rgb8, 0, 1)
     return np.dstack([rgb, np.ones((hh, ww))]), (0, 0)
@@ -497,7 +511,23 @@ def paper_material(rgb, a, lab, faces_by_id, plane='twin'):
                 c = (bi + 1) / (nb + 1)
                 band += np.exp(-((along - c) / 0.035) ** 2) * 0.05 - np.exp(-((along - c - 0.05) / 0.03) ** 2) * 0.035
             label = ((np.abs(along - 0.5) < 0.12) & (np.abs(across) < 0.55)) * (0.05 if (fid % 3 == 0) else 0.0)
-            ok[ys, xs, 0] += sh + band + label
+            gilt = np.zeros_like(along)
+            for bi in range(nb):
+                c = (bi + 1) / (nb + 1)
+                gilt += ((np.abs(along - c - 0.03) < 0.012) & (np.abs(across) < 0.62)).astype(np.float64)
+            gilt = np.clip(gilt, 0, 1)
+            ok[ys, xs, 0] += sh + band + label + gilt * 0.16
+            ok[ys, xs, 1] += gilt * 0.006
+            ok[ys, xs, 2] += gilt * 0.05
+        elif k == 't_pages':
+            ys, xs = np.nonzero(sub)
+            ys = ys + y0
+            xs = xs + x0
+            ang = np.arctan2(ys - RING_C[1], xs - RING_C[0])
+            a0, a1 = ang.min(), ang.max()
+            across = (ang - (a0 + a1) / 2) / max((a1 - a0) / 2, 1e-4)
+            # the page edges: fine lines along the book (radial), a soft round at the block's two sides
+            ok[ys, xs, 0] += 0.022 * np.sin(across * 15.0 + fid) - 0.05 * across ** 4
         elif k == 't_letter':
             ys, xs = np.nonzero(sub)
             d = xs / max(np.ptp(xs), 1) - ys / max(np.ptp(ys), 1)
@@ -519,6 +549,87 @@ def paper_material(rgb, a, lab, faces_by_id, plane='twin'):
     ok[..., 0] -= np.clip(shadow * 0.55, 0, 0.05)
     out = np.clip(L.ok2rgb(ok), 0, 1)
     return out, inkf
+
+
+def cursive_rows(ink, q, seed, rows, ss=3, margin=0.09):
+    """Handwriting as a TEXTURE on a page: rows of words made of small connected loops (the pen moving along while it
+    loops), each word its own length, a ragged right edge; drawn thin at ss x into `ink`. Never letters."""
+    r = np.random.default_rng(seed)
+    du = np.linalg.norm(q[1] - q[0])
+    dv = np.linalg.norm(q[3] - q[0])
+    if du < 20 or dv < 10:
+        return
+    nrows = int(min(rows, max(1, dv / 7.5)))
+    lh = (1 - 2 * margin) / nrows
+    for i in range(nrows):
+        v = margin + lh * (i + 0.62)
+        u = margin + (0.07 if i == 0 else 0.0)
+        u_end = 1 - margin - r.uniform(0, 0.25)
+        while u < u_end:
+            nl = int(r.integers(3, 9))
+            step = 3.3 / du
+            n = nl * 10
+            t = np.linspace(0, nl, n)
+            loop_r = 0.34 * lh * r.uniform(0.8, 1.1)
+            us = u + t * step + 0.45 * step * np.sin(t * 2 * np.pi)
+            vs = v - loop_r * (1 - np.cos(t * 2 * np.pi)) * (0.55 + 0.45 * np.abs(np.sin(t * 1.7 + i)))
+            us = np.clip(us, 0, u_end)
+            pts = np.array([bilerp(q, a, b) for a, b in zip(us, vs)]) * ss
+            cv2.polylines(ink, [np.round(pts * 4).astype(np.int32)], False, 255, max(1, int(round(ss * 0.42))), cv2.LINE_AA, shift=2)
+            u += nl * step + r.uniform(0.03, 0.06)
+
+
+def parchment_ground(h, w, y_top):
+    """The twin of the sky (what the water would mirror between the twin's houses and through the ring): old pages laid
+    edge to edge, each its own tone and age stains, a soft shadow under each page's upper edge, and rows of handwriting
+    as a TEXTURE (soft sepia marks, never letters). Returns rgb, alpha (1 below y_top) and its ink map."""
+    r = seeded('parchment')
+    yy, xx = np.mgrid[0:h, 0:w].astype(np.float64)
+    base = np.array(S.hexrgb('#DCCBA4'))
+    ok = L.rgb2ok(np.broadcast_to(base, (h, w, 3)).copy())
+    ok[..., 0] += vnoise('parch/stain', (h, w), 70, 3) * 0.035 + vnoise('parch/fine', (h, w), 9, 2) * 0.012
+    ss = 3
+    ink = np.zeros((h * ss, w * ss), np.uint8)
+    edge = np.zeros((h, w), np.float32)
+    row_h = 86.0
+    y = y_top - r.uniform(0, 40)
+    i = 0
+    while y < h:
+        ph = row_h * r.uniform(0.85, 1.15)
+        x = -r.uniform(0, 160)
+        while x < w:
+            pw = r.uniform(100, 150)
+            sk = r.uniform(-4, 4)
+            q = np.array([[x, y + sk], [x + pw, y - sk], [x + pw, y + ph - sk], [x, y + ph + sk]], np.float64)
+            tone = r.uniform(-0.03, 0.03)
+            m = np.zeros((h, w), np.uint8)
+            cv2.fillPoly(m, [np.round(q * 4).astype(np.int32)], 1, cv2.LINE_AA, shift=2)
+            mm = m.astype(bool)
+            ok[..., 0] += np.where(mm, tone, 0)
+            ok[..., 2] += np.where(mm, r.uniform(-0.006, 0.01), 0)
+            # the page's upper edge: a soft shadow just under it (the page above overlaps it)
+            top_y = y + sk
+            edge += (mm * np.exp(-np.clip(yy - top_y, 0, None) / 3.0) * (yy >= top_y)).astype(np.float32)
+            cursive_rows(ink, q, int(r.integers(1, 1 << 30)), int(ph / 7.5), ss=ss, margin=0.09)
+            # now and then a corner lifts (a lighter fold catching the light)
+            if r.random() < 0.35:
+                cx_, cy_ = (q[1] if r.random() < 0.5 else q[2])
+                sz = r.uniform(10, 18)
+                sx_ = -1 if cx_ > x + pw / 2 else 1
+                sy_ = 1 if cy_ < y + ph / 2 else -1
+                tri = np.array([[cx_, cy_], [cx_ + sx_ * sz, cy_], [cx_, cy_ + sy_ * sz]])
+                tm = np.zeros((h, w), np.uint8)
+                cv2.fillPoly(tm, [np.round(tri * 4).astype(np.int32)], 1, cv2.LINE_AA, shift=2)
+                ok[..., 0] += tm * 0.06
+            x += pw - r.uniform(2, 14)
+        y += ph - r.uniform(2, 10)
+        i += 1
+    inkf = cv2.resize(cv2.GaussianBlur(ink.astype(np.float32) / 255.0, (0, 0), ss * 0.35), (w, h), interpolation=cv2.INTER_AREA)
+    ok[..., 0] -= inkf * 0.24 + np.clip(edge, 0, 1) * 0.08
+    ok[..., 2] += inkf * 0.012
+    rgb = np.clip(L.ok2rgb(ok), 0, 1)
+    alpha = (yy >= y_top).astype(np.float64)
+    return rgb, alpha, inkf * alpha
 
 
 # ---------------------------------------------------------------- the water
@@ -556,22 +667,6 @@ def water_material(rgb, a, lab):
     diff = np.abs(painted[..., :3] - out).sum(-1)
     marks = np.clip(diff * 6, 0, 1)
     alpha = np.clip(alpha + marks * 0.25 * (a > 0), 0, 1)
-    # a few faint pages afloat (flat, seen edge-on near the waterline, rounder near us): tone only
-    rr = seeded('afloat')
-    pm = np.zeros((h, w), np.uint8)
-    for i in range(7):
-        X = rr.uniform(-5.5, 5.5)
-        Z = rr.uniform(4.0, 11.0)
-        c = proj([X, 0.0, Z])
-        sx = F * rr.uniform(0.3, 0.45) / Z
-        sy = sx * (HC / Z) * 1.4
-        if not (0 < c[0] < w and CY < c[1] < h):
-            continue
-        cv2.ellipse(pm, (int(c[0]), int(c[1])), (int(sx), max(1, int(sy))), float(rr.uniform(-8, 8)), 0, 360, 255, -1, cv2.LINE_AA)
-    pmf = pm.astype(np.float64) / 255.0
-    pcol = S.hexrgb('#5E5868') * 0.9
-    painted[..., :3] = painted[..., :3] * (1 - pmf[..., None]) + pcol * pmf[..., None]
-    alpha = np.maximum(alpha, pmf * 0.9 * (a > 0))
     painted[..., 3] = alpha
     return painted, dict(strokes=plan.count(), mypaint_s=round(sec, 2))
 
@@ -664,7 +759,7 @@ def main():
                 continue
             if name == 'far':
                 lit = np.isin(lab, [fid for fid, f in faces_by_id.items() if f.emit > 0]).astype(np.float64)
-                rgba, stats = paint_generic('far', rgb, al, lab, faces_by_id, DOSES['far'], skip_kinds=('window', 'frame', 'beam'),
+                rgba, stats = paint_generic('far', rgb, al, lab, faces_by_id, DOSES['far'], skip_kinds=('window', 'frame', 'beam', 'trim', 'door'),
                                             extra_marks=lambda pl, rg, aa, lb, cl, us: leaf_marks(pl, rg, lb, cl, us, faces_by_id, size=(2.5, 6), width=(2.0, 3.6), density=110),
                                             keep=lit * 0.8)
             elif name == 'bridge':
@@ -686,6 +781,10 @@ def main():
                 rgba, stats = painted, dict(strokes=plan.count(), mypaint_s=round(sec, 2))
             elif name == 'twin':
                 mat, inkf = paper_material(rgb, al, lab, faces_by_id)
+                prgb, pal, pink = parchment_ground(H, W, int(CY) + 1)
+                mat = mat * al[..., None] + prgb * (1 - al[..., None])
+                inkf = inkf * al + pink * (1 - al)
+                al = np.maximum(al, pal)
                 np.save(os.path.join(a.out, 'twin_ink.npy'), inkf.astype(np.float16))
                 # the far twin (beyond the bridge's twin) a little softer; the near twin crisp
                 far = np.isin(lab, [fid for fid, f in faces_by_id.items() if f.twin and f.z > BR['zb'] + 2]).astype(np.float64)
