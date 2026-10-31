@@ -35,6 +35,15 @@ first, 10 minutes); the evidence: `AUDIT.md` §7 "The v7 lesson".
 | 9 | **Review leads with the feeling** | THE FRAME LOOP's evaluator writes "the feeling it gives" first | **DONE 2026-10-31** (study session): PIPELINE_V2 THE FRAME LOOP step 2: the report opens with "The feeling it gives: ..." (written from the picture before reading the brief), the intended feeling beside it; measurements only explain a gap the eye found; a reference lends its craft, not its mood | small |
 | 10 | **The proof** | scene 1 again, feeling first, beside v7 | **DONE 2026-10-31** (study session), waiting on the owner's eye: `paint_test/paint_still_v8.png`, `compare_v8.jpg`, the card `v8_card.md` written before building, NOTES "v8"; code `video/src/look/v8_s1/`. The feeling it gives (the evaluator's line): "a warm golden evening opening up by the water; a young woman striding out of a glass office into the light ... free, a little brave, alive" (v7: "a dark, empty quay ... where I look, nothing happens"). Open call for the owner: her size (about 600 px tall, near the camera) against his earlier "about this size" (~150 px) | small-medium |
 
+| 11 | **The brief check also requires a feeling** | `.claude/hooks/feeling_brief.py`: a look or frame brief (Agent, Workflow, helper message) that names no story moment and no feeling is stopped, like one carrying look numbers; the message shows the standard brief header | a look brief without a feeling is stopped; a feeling-led one passes; code and non-look briefs pass | small (code) |
+| 12 | **A frame-loop workflow template** | `context/workflows/frame_loop_template.js`: the brief's moment and feeling -> the card -> imagine whole -> build -> a fresh evaluator ("The feeling it gives" first) -> THERE / ALMOST (adjust, at most twice) / NOT THERE (rework once) -> the owner; orchestrators copy it and swap the moment, never rebuild the loop; PIPELINE_V2's FRAME LOOP points at it | the next frame task runs from the template | small-medium |
+| 13 | **The card is a required output** | every build step writes its filled-in FRAME_CARD before rendering; the evaluator first checks the card exists and the picture matches it (the card's feeling against "the feeling it gives") | the evaluator's report opens with the card check | small |
+
+Steps 11-13 (owner, 2026-10-31: "Would an agent go through these steps" -> today only CLAUDE.md, the hooks and the build
+are guaranteed; the brief's feeling, the card, "imagine first" and the frame loop depend on the orchestrator; "Yes" to
+adding these): CONFIRM or adjust them against process test 01's `PROCESS_LOG.md`
+(`video/docs/tests/process_test_01_amsterdam/`) before building them, so we fix what the test actually shows.
+
 Steps 2-4 are the cheap, high-leverage ones; 5 and 9 make the new way usable; 6-7 shrink the words; 10 shows the owner
 the result. After step 4 and after step 10, show the owner before going on.
 
@@ -90,3 +99,4 @@ the result. After step 4 and after step 10, show the owner before going on.
 - **Freshness is part of the review:** the evaluator also asks whether the frame repeats a layout or a set the film
   (or the library's own examples) already used.
 - **Owner picks are captured as the feeling and why it worked,** never as the layout to repeat.
+- 2026-10-31, study session: steps 11-13 added (the brief must carry a feeling; a frame-loop template; the card as a required output), to confirm against process test 01's log.
