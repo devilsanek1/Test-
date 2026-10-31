@@ -1,3 +1,6 @@
+> **2026-10-31 ~02:20 UTC, video 4's session:** back after the usage limit; PLAN.md steps 1-9 merged as the study
+> session left them; video 4's session takes none of PLAN's steps (they stay with the study session) and keeps video 4
+> (`video/docs/v4/`, its ideas round next).
 > **2026-10-31 ~00:30-00:40 UTC: briefly taken over by the study session, then HANDED BACK** (owner: "You are going to
 > run out of tokens for the week soon so let's just do a few incremental improvents not big redesign leave it to the
 > other session started it"). The study run (wf_6517fb67-52c, stopped) only extended AUDIT.md (still IN PROGRESS: the

@@ -6,6 +6,10 @@ those rules and each beat's feeling, never a past film (owner, 2026-10-30: "don'
 would put agents in a box again": invent for this story). The loop: `video/docs/PIPELINE_V2.md` "THE LOOP NOW": beats -> IDEAS (this)
 -> key frames made whole -> the shot plan (camera and joins written FROM the key frames) -> the animatic.
 
+**Start from the feeling, never from a number** (CLAUDE.md rule 4): each beat's story moment and what the viewer
+should FEEL are in the table below; plan every idea on `video/docs/look/FRAME_CARD.md` (the questions, feeling first)
+and take its tools from `video/docs/look/DESIGN_LANGUAGE.md`.
+
 **What is fixed (only this):** the voice: its words and their times (`video/public/v4/voice_words.json`, 42.24 s); the
 facts (`video/docs/v5/research/factlock.md`: the plant is a plan, starting next year; no company names or logos); the
 card's story-level choices (`video/docs/v4/THROUGHLINE.md`: one thread (the heat), one home place (Helsinki, a snowy
@@ -15,20 +19,20 @@ joins. `video/docs/v4/visual/VISUAL_SCRIPT.md` (v3) was written before any ideas
 among yours, never a limit; ignore its camera.
 
 **The beats** (one per line of the voice; what the viewer must understand and feel there):
-| beat | the words (times in voice_words.json) | the viewer must get |
-|---|---|---|
-| B1 | "Did you know Helsinki wants AI to heat seventy thousand homes?" | a surprising true claim about a real city: AI heating homes |
-| B2 | "AI actually runs on giant computers, in buildings called data centers." | AI is physical: giant computers in big buildings |
-| B3 | "Those computers get really hot." | they make heat |
-| B4 | "To put it into perspective, just one of these computers makes as much heat as FORTY kettles, boiling non-stop." | how much: one computer = 40 boiling kettles |
-| B5 | "That's a lot of tea." | the joke lands |
-| B6 | "Normally, data centers just use big fans to blow that heat outside." | the waste: everywhere, the heat is thrown away |
-| B7 | "But Helsinki WANTS that heat." | the turn: this city wants it |
-| B8 | "The city has a plan to use it, starting next year." | it's a real plan, soon (a plan, not built) |
-| B9 | "So how would that work?" | the question: a door opens on the mechanism |
-| B10 | "A big new data center would take the heat out of its computers with water in pipes." | water carries the heat away from the computers |
-| B11 | "Then pipes under the streets carry that heat into people's homes." | the pipes bring it under the city into homes |
-| B12 | "So your chatbot could soon heat an apartment in Helsinki." | your own chatbot could warm a home: the payoff, and the loop back to B1 |
+| beat | the words (times in voice_words.json) | the viewer must get | what they feel |
+|---|---|---|---|
+| B1 | "Did you know Helsinki wants AI to heat seventy thousand homes?" | a surprising true claim about a real city: AI heating homes | surprise and curiosity: a cozy snowy city and an odd true idea ("wait, what?") |
+| B2 | "AI actually runs on giant computers, in buildings called data centers." | AI is physical: giant computers in big buildings | a little awe: AI is a real, physical, huge thing, not a cloud |
+| B3 | "Those computers get really hot." | they make heat | the heat rising: warm, a touch of alarm |
+| B4 | "To put it into perspective, just one of these computers makes as much heat as FORTY kettles, boiling non-stop." | how much: one computer = 40 boiling kettles | playful astonishment at the size of it |
+| B5 | "That's a lot of tea." | the joke lands | a smile and a breath: the joke lands |
+| B6 | "Normally, data centers just use big fans to blow that heat outside." | the waste: everywhere, the heat is thrown away | a small pang: all that warmth thrown into the cold night |
+| B7 | "But Helsinki WANTS that heat." | the turn: this city wants it | the turn: a spark of delight, the city reaching for it |
+| B8 | "The city has a plan to use it, starting next year." | it's a real plan, soon (a plan, not built) | hope and anticipation: real, and coming soon |
+| B9 | "So how would that work?" | the question: a door opens on the mechanism | leaning in: a door opens |
+| B10 | "A big new data center would take the heat out of its computers with water in pipes." | water carries the heat away from the computers | clarity and satisfaction: "oh, that's how" |
+| B11 | "Then pipes under the streets carry that heat into people's homes." | the pipes bring it under the city into homes | cozy relief: warmth travelling under the snow to homes |
+| B12 | "So your chatbot could soon heat an apartment in Helsinki." | your own chatbot could warm a home: the payoff, and the loop back to B1 | personal warmth and a wink: your own chat warms a home; back to the start |
 
 **Our recipes: the toolbox, never a cage (imagination first, inside what we have built).** Read before drawing:
 - **Composition (every thumbnail):** `video/docs/look/COMPOSITION_SHOTS.md` Part 0 (the ranked library: CORE first, the
@@ -42,10 +46,11 @@ among yours, never a limit; ignore its camera.
   moment), `LIFE_AND_DENSITY.md` (the world full and alive in its calm tier, designed into the frame, never added later),
   the playbook's fullness rule ("a place, never buildings standing alone").
 - **The look (applied in full at the KEY FRAMES; your thumbnails stay value sketches, but each idea must be one that
-  can be painted this way):** painter v7 (`video/docs/studies/2026-10-28_city_posters/paint_test/paint_still_v7a.png`),
-  `ORGANIC.md` and `PAINT_RECIPES.md` (painted pieces, organic shapes, one story light), the dark night key with one
-  warm accent (`WORLD_BIBLE.md` §2-3: the palette and the light; ignore its density keys), the people in use, the
-  words on screen.
+  can be painted this way):** painter v7's tools (`video/docs/studies/2026-10-28_city_posters/paint_test/`: take its
+  craft, not its mood; owner, 2026-10-31: v7 "lost the feeling"), `ORGANIC.md` and `PAINT_RECIPES.md` (painted pieces,
+  organic shapes, one story light), the winter night with one warm accent (`WORLD_BIBLE.md` §2-3: the palette and the
+  light; ignore its density keys), each frame's darkness and contrast following its own feeling (owner, 2026-10-31: "a
+  number is never a target the frame is built to"), the people in use, the words on screen.
 - **Later steps use the rest:** the shot plan takes the library's moves and joins and `SOUND_SYNC.md`.
 
 **The job:** for each beat, imaginative picture ideas a regular viewer reads in a second, each drawn as ONE WHOLE FRAME

@@ -32,6 +32,10 @@ Every brief and every frame review uses `docs/look/FRAME_CARD.md` (the questions
 and created whole. We shouldn't be in a situation where we have our video and then we just fill up space for the sake
 of density this is wrong", 2026-10-30.)
 
+**Settled for every video:** this section and CLAUDE.md are how every film is made from now on: apply them, never
+re-ask them. — ("we need to make sure this playbook follows into the next videos ... so that we don't talk about it
+again for future videos", 2026-10-30.)
+
 **No past film as the bar or the example:** no brief, card, review or guide points an agent at video 1 or any other
 film of ours as the bar, a reference or an example: it boxes the imagination in. The bar is the three rules and the
 beat's feeling; where an older guide still names a past film, that is a measured number, never a picture to look at,

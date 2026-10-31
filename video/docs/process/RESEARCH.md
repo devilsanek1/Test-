@@ -7,8 +7,10 @@ rule until the design language, the frame card or the rework integrates it.
 placements (no imagination) or miss whole areas (incomplete frames). How do professionals state "a feel of distance"
 and its tools (layers) so every artist invents the frame, and still nothing is forgotten?
 
-**Strength key:** A = the author's own book or a studio's own account; B = a course or a talk by the practitioner;
-C = a practitioner's article, interview or a secondary write-up.
+**Strength key:** A = the author's own book or document, or a studio's own published account (its guide, its site);
+B = the practitioner's own words in a talk, course, workshop or interview; C = a secondary write-up (a review, a
+summary, notes taken by someone else, a quote passed on). "A (quoted in C)" = the author's own words, read through a
+secondary page.
 
 ## Findings
 
@@ -56,28 +58,38 @@ C = a practitioner's article, interview or a secondary write-up.
   out-of-focus levels or more contrast in color in the foreground and more subdued in the background". The style also
   chooses WHICH depth tools it uses: "avoid excessive use of perspective - there is no perspective in Chinese Art.
   Create depth by defining the focus levels." Intents are written as feelings ("it should look light and fresh", "Show
-  a wealthy environment, a bit like a boudoir", "Try to create emotion in your compositions. Like fear - someone is
+  a wealthy environment, a bit like a boudoir", "Try to create emotion in your compositions. Like fear- someone is
   trapped", "Intimidating guardians - make the look dramatic by using light from below ... clear size-difference"), and
   the choice of tools follows the emotion and the neighbours: "It all depends on what kind of emotion you have to
   create following the story and if your scene works in connection with the preceeding and following shots." The
   pictures in the guide are examples (layouts corrected with the reason, "The following scenes from 'Cinderella' will
   show you how well planned every single composition was"), never templates. And it plans in small, cheap pictures
   first: "You get the best feeling for composition and contrast-values in small thumbnail-sketches. Try to use a
-  limited amount of Grey's or Blue's - not more than 4."
+  limited amount of Grey's or Blue's - not more than 4." His book *Dream Worlds* (2008) teaches the same layers with
+  their values chosen by the feeling, not by nature: "We reduce these middle tones to only three ... Define the
+  foreground, one or two middle ground areas, and then the background. In case you want to arrange the values
+  realistically, your foreground might be the darkest, and your background the lightest tone. But even in nature you
+  will find a situation where the sky is the darkest value and a middle-ground the lightest. You should know what you
+  want to design without following the rules of nature. To achieve the desired result, a scary moment or a romantic
+  scene, you choose the best arrangement of values"; and, for film's few seconds a shot: "Nothing is accidental. We
+  lead the eyes of the audience."
 - **Source and strength.** A: the guides themselves, scanned on the Internet Archive
   ([1995](https://archive.org/details/mulan-style-guide-1995), [1997](https://archive.org/details/mulan-style-guide-1997_202405);
   quotes from their OCR text, spelling as printed), and the 1997 text on the
-  [Disney Index Project](https://www.dix-project.net/document/misc-documents_1997-04-05_mulan-style-guide). B/C: the
-  history in [Animation Obsessive, "Setting the Stage for 'Mulan'" (2024)](https://animationobsessive.substack.com/p/setting-the-stage-for-mulan),
+  [Disney Index Project](https://www.dix-project.net/document/misc-documents_1997-04-05_mulan-style-guide). A (quoted
+  in C): *Dream Worlds: Production Design for Animation* (Focal Press, 2008), quoted at length by
+  [World of Level Design, "11 Things I Learned from Dream Worlds" (2014)](https://www.worldofleveldesign.com/categories/game_environments_design/11-things-i-learned-from-dream-worlds.php).
+  B/C: the history in [Animation Obsessive, "Setting the Stage for 'Mulan'" (2024)](https://animationobsessive.substack.com/p/setting-the-stage-for-mulan),
   which also reports that Bacher "corrected hundreds of layouts and backgrounds" and that the film used the rules more
   softly than the guide.
 - **What it means for us.** This is the format the owner is asking for, already proven on a feature: a few balances
   (each a dial with two poles), the feeling of each place in plain words, the tools a feeling can use, and the style's
   own choice of which tools it allows (Mulan: depth by detail and focus levels and mist, not by perspective). For us
-  "a feel of distance" is the same sentence, and the style decides its tools (in our painted look: paler, cooler, less
-  detailed and lower-contrast layers, never blur alone). Two working habits come with it: tiny value thumbnails (at
-  most 4 values) before any frame is built, and a production designer who corrects frames by naming the broken
-  principle, which is a role our process lacks (F11).
+  "a feel of distance" is the same sentence, and the style decides its tools (in our painted look: layers that step
+  toward the air's colour, simpler and softer in contrast with distance, never a plane that is only blurred). The
+  value arrangement of the layers is itself a choice made for the feeling, never a law of nature. Two working habits
+  come with it: tiny value thumbnails (3-4 values) before any frame is built, and a production designer who corrects
+  frames by naming the broken principle, which is a role our process lacks (F12).
 
 **F3. The same elements can say opposite things; the camera and the light carry the message (Mateu-Mestre, *Framed Ink*).**
 - **The practice.** Marcos Mateu-Mestre (on *Balto*, *The Prince of Egypt* and *Surf's Up*, per the publisher, "frame
@@ -163,8 +175,10 @@ C = a practitioner's article, interview or a secondary write-up.
 - **What it means for us.** "A feel of distance" is right for some beats and wrong for others: wide, deep space for
   wonder, scale and breathing room; limited space (a near wall, a shallow room, one plane) for closeness, confinement or
   focus. Our guides treat depth as a must for every shot (`look/CRAFT.md` §f: "every shot reads in distance"); the
-  research says depth reads always, but its AMOUNT is set by the beat, and a film can climb from limited to deep space
-  as its story opens (Block's progression, F1). Where a film has two sides (the system and the person, the problem and
+  research keeps separation in every frame (the subject never melts into what is behind it), but lets the beat set the
+  AMOUNT of depth, and a film can climb from limited to deep space as its story opens (Block's progression, F1).
+  Limited space is a choice a beat makes on purpose and names on its card, never a frame that reads flat by accident
+  (the owner's v2 note behind CRAFT §f stands). Where a film has two sides (the system and the person, the problem and
   the home), it declares them once as two settings of the same dials (shape, line, colour, space, light), and every
   frame takes its side's setting.
 
@@ -246,8 +260,9 @@ C = a practitioner's article, interview or a secondary write-up.
   world".
 - **Source and strength.** B: A.-L. Baudry, [80.lv (2023)](https://80.lv/articles/riot-games-on-designing-arcane-s-piltover-zaun).
   A: Bacher's [1997 guide](https://archive.org/details/mulan-style-guide-1997_202405).
-- **What it means for us.** A world bible should be a kit, never a layout: the place's parts (its homes, its street
-  things, its people, its signs of life) drawn as a library, plus its shape language and its dial settings. Each key
+- **What it means for us.** A world bible should be a kit, never a layout (the playbook's "world kit", A RICH,
+  BEAUTIFUL WORLD): the place's parts (its homes, its street things, its people, its signs of life) drawn as a library,
+  plus its shape language and its dial settings. Each key
   frame then composes its own street from the kit. That is how "each house is so alone" is prevented by design: the kit
   makes a crowded, lived place cheap to compose, and the shape language keeps it one world.
 
@@ -322,7 +337,7 @@ C = a practitioner's article, interview or a secondary write-up.
 - **The practice.** The *Mulan* guides teach with captioned pictures, never templates: frames of another film chosen
   for one principle each ("Interesting use of perspective to show that Cinderella is lost in that huge palace, - but all
   the composition lines lead you to her"; "Use of big foreground element for framing and placement of character in the
-  middle of pool of light"), and wrong/right pairs with the reason ("here you can compare how boring the >Right< drawn
+  middle of pool of light"), and wrong/right pairs with the reason ("here you can compare how boring the > Right < drawn
   version looks"; a "Detail Arrangement" sequence from "monotone, no variety, too flat" to "that's it - it creates a
   center of interest"). The film then applied its own guide more softly than written (F2). On *Wolfwalkers* "each
   artist is putting their stamp on it" (Pareja), and the guide kept them coherent with "something similar but also
@@ -335,24 +350,12 @@ C = a practitioner's article, interview or a secondary write-up.
   nobody mistakes one layout for the rule. Numbers stay, but in the CHECKS level (to catch a mistake) or labelled as one
   measured example; never as the instruction.
 
-## Gaps and limits of this research
-
-- Not readable here: the O'Reilly previews of Block (HTTP 403; two lines came through the search index), Block's USC
-  syllabus (host unreachable), a thesis on art bibles (diva-portal, HTTP 503), Fowkes's blog (HTTP 503), an IndieWire
-  interview behind a bot paywall (not followed). Block's structure graph is therefore described only from the book's
-  contents and course titles (F13).
-- No published art bible of Pixar, Cartoon Saloon, Laika or Fortiche is public in full; their practice here comes from
-  the artists' own interviews (B). The *Mulan* guides are the one full studio guide read end to end (A).
-- Every quote was checked word for word against the raw page cited (by a script, 2026-10-30), except the few marked as
-  read through the search index; none is from memory. The *Mulan* quotes are from the scans' OCR text, spelling as
-  printed.
-
 ## The model we should use
 
-Every source above writes its guidance on four levels and keeps placements and numbers out of the top two. A rule of
-ours belongs to exactly one level; a guide paragraph that mixes them (CRAFT §f puts the feeling "every shot reads in
-distance", its tools and twenty plane numbers in one block; the cinema research turned each device into "placement
-rules in pixels") is what agents copy or skip.
+Read together, the sources write their guidance on four levels and keep placements and numbers out of the top two. A
+rule of ours belongs to exactly one level; a guide paragraph that mixes them (CRAFT §f puts the feeling "every shot
+reads in distance", its tools and dozens of plane numbers in one block; the cinema research turned each device into
+"placement rules in pixels") is what agents copy or skip.
 
 ### The four levels
 
@@ -364,9 +367,12 @@ rules in pixels") is what agents copy or skip.
 | **4. CHECKS** | did the intent land, and is anything missing; then the mistakes | questions first (the frame card); then the measurements (captions, safe zones, contrast, CRAFT's numbers, the lints) | a design decision | the reviewer, then the QA scripts |
 
 Beside the levels sit **the constants**: the few visual facts every frame of a film shares, stated once (F9): today
-the painted fills and the line (as the ink iteration settles it), the palette family, the light rig family, the
-people's design, the type and the caption band, the 9:16 frame at 60 fps. Everything that is not a constant or a
-feeling's translation is the artist's to invent (F9, F14).
+the painted fills with no outlines (an ink line is tried only on the finished film: playbook INK LINES), the palette
+family, the light rig family, the people's design, the type and the caption band, the 9:16 frame at 60 fps, and the
+film's one world (playbook ONE FILM). Everything that is not a constant or a feeling's translation is the artist's to
+invent (F9, F14). Film references (all of the above) teach a principle and stay in research; the examples in our
+toolbox are drawn for the tool, never taken from a film, and no film of ours is ever the bar or the example (playbook,
+"No past film as the bar or the example").
 
 ### How nothing is forgotten (without placing anything)
 
@@ -374,18 +380,24 @@ feeling's translation is the artist's to invent (F9, F14).
    each a chosen tool and its dial in words, never a coordinate. SPACE (deep, flat or limited; which depth tools) -
    LINE (the dominant direction; straight or curved; calm or active) - SHAPE (the shape language; whose side of the
    film) - TONE (the 3-4 value masses; where the lightest light meets the darkest dark) - COLOUR (the key; warm and
-   cool; the side's palette) - MOVEMENT (the one mover; the camera's move and what it does to space) - RHYTHM (busy
-   against quiet; repetition and its break) - LIGHT (the six jobs: where the eye goes, the mood, the depth, the hour,
-   what it reveals about the person, how it serves the composition) - THE WORLD (which parts of the place are in view;
-   is it lived) - THE PEOPLE (who, doing what, feeling what; their design checks) - THE WORDS (the caption's tone and
-   size; the voice's word at this moment) - THE JOINS (what carries in, what carries out). A question with no answer
-   is an area not yet designed; the card is filled while the thumbnail is chosen, not after the build.
+   cool; a few colours in harmony around the one accent; the side's palette) - MOVEMENT (the one mover; the camera's
+   move and what it does to space) - RHYTHM (busy against quiet; big, medium and small shapes; repetition and its
+   break) - EDGES (where they are crisp, where they soften or are lost) - LIGHT (the six jobs: where the eye goes, the
+   mood, the depth, the hour, what it reveals about the person, how it serves the composition) - THE WORLD (which parts
+   of the place are in view; is it lived; the three scales of detail and the world going on past the edges, playbook
+   A RICH, BEAUTIFUL WORLD) - THE PEOPLE (who, doing what, feeling what; their design checks) - THE WORDS (the
+   caption's tone and size; the voice's word at this moment) - THE JOINS (what carries in, what carries out). A
+   question with no answer is an area not yet designed; the card is filled while the thumbnail is chosen, not after
+   the build.
 2. **The FILM STRIP** (one per film, F4, F13): one row per beat, columns for the feeling, the intensity (affinity to
    contrast), the space dial, the key (value, then colour), the lead device and the side; drawn as the value script,
-   then the colour script. It designs the curve across the film before any frame is built.
-3. **One reviewer for the look** (F2, F12): a production-designer role per film reviews every key frame by the card's
-   questions and names the broken principle or the missing area ("no focus level: the subject gets lost"), never the
-   fix and never a pixel. Owner notes are stored the same way: the principle, plus the frame that showed it.
+   then the colour script, under the film's one concept. It designs the curve across the film before any frame is
+   built, and every frame is judged in it (playbook ONE FILM: the board read in order).
+3. **The art director** (F2, F12; playbook ONE FILM): one role per film owns the look and approves every key frame
+   against the whole, by the card's questions, naming the broken principle or the missing area ("no focus level: the
+   subject gets lost"), never a pixel; an ALMOST comes back as a paint-over on the frame itself with the principle
+   written beside it (as Bacher's "Layout-Correction" pages did), and the artist still chooses the fix. Owner notes
+   are stored the same way: the principle, plus the frame that showed it.
 4. **Briefs carry the whole toolbox by reference** (the design language, the film's constants, the frame card), never a
    hand-picked subset; a brief adds only the beat's story point and feeling. The artist chooses the content and the
    tools (F3, F11).
@@ -394,8 +406,10 @@ feeling's translation is the artist's to invent (F9, F14).
 
 The story point and the feeling (two lines, from the beats) -> the tools chosen from the design language, with their
 dials, named on the card -> several thumbnails in 3-4 values, variations of the same intent (F2, F8) -> the pick, by
-the card's questions -> the key frame built whole in the film's look, keeping its two lines and its card -> the
-reviewer's questions -> then, and only then, the measurements.
+the card's questions, as part of a whole sequence -> the key frame built whole in the film's look from the world kit,
+keeping its two lines and its card (the film's first one is the hero frame, the owner's bar for finish: playbook A
+RICH, BEAUTIFUL WORLD) -> the frame loop (playbook): a fresh evaluator judges the feeling first, then the card's
+questions; THERE, ALMOST (a paint-over) or NOT THERE (back to the idea) -> then, and only then, the measurements.
 
 ### Our example, at all four levels: "a feel of distance"
 
@@ -426,7 +440,7 @@ frame; the dial is how many and how strong. Our style's translation is in bracke
   pan, a tilt or a zoom keeps space flat (F1).
 
 **3. EXAMPLES** (each one of many, never the layout; nothing here says where a building goes).
-- *EXAMPLE A, a vista:* a snowy town at dusk seen from a rise: a dark fence and a lamp cut by one edge; the subject's
+- *EXAMPLE A, a vista:* a hill town at dusk seen from a rise: a dark fence and a lamp cut by one edge; the subject's
   lit street with its people and shop fronts; three rows of roofs behind, each paler and bluer, their windows smaller
   and fewer, the last row one flat shape against the sky. Why it works: overlap, planes of light, the air and size
   change all say "far" at once, and every plane is still part of a lived town.
@@ -443,3 +457,16 @@ subject busier than the subject's plane, and is there one focus level where the 
 part of the place, never a backdrop or an empty field? In a move, do the planes keep their parallax order and land at
 rest? And does this beat need distance at all? Then the measurements, which catch mistakes and never design: CRAFT §f's
 plane steps and `scripts/qa/check_depth.py`.
+
+## Gaps and limits of this research
+
+- Not readable here: the O'Reilly previews of Block (HTTP 403; two lines came through the search index), Block's USC
+  syllabus (host unreachable), a thesis on art bibles (diva-portal, HTTP 503), Fowkes's blog (HTTP 503), an IndieWire
+  interview behind a bot paywall (not followed). Block's structure graph is therefore described only from the book's
+  contents and course titles (F13).
+- No published art bible of Pixar, Cartoon Saloon, Laika or Fortiche is public in full; their practice here comes from
+  the artists' own interviews (B). The *Mulan* guides are the one full studio guide read end to end (A); *Dream
+  Worlds* and *Framed Ink* were read only through quotes, reviews and their contents.
+- Every quote was checked word for word against the raw page cited (by a script, 2026-10-30), except the few marked as
+  read through the search index; none is from memory. The *Mulan* quotes are from the scans' OCR text, spelling as
+  printed.
