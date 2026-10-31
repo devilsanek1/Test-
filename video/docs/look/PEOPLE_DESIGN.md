@@ -2,8 +2,14 @@
 
 **STUDY IN PROGRESS (owner, 2026-10-31): FLOW, the people reworked from his new references** (`refs_people_flow/`:
 "simpler, more flowy, slightly more cartoonish, the clothing is more fluid, less details and more flow, similarly with
-hair"; the playbook's people and hair rules). The v4 people below stay in use until the owner picks; where FLOW's
-result differs from the rules below, this page is rewritten around it, not appended to.
+hair"; the playbook's people and hair rules). Built 2026-10-31 as two variants of one grammar
+(`people_design/flow_v5/`: `compare.png`, `compare_phone.png`, each variant's sheets, clip, NOTES and fresh EVAL):
+**GUST** (closest to the references: one long outer piece is the figure, a strong wind, the coat's back half a flag)
+and **BREEZE** (the same grammar calmer, a top and a bottom allowed); both ALMOST, adjusted once. The orchestrator's
+pick to propose: GUST's grammar with BREEZE's face, coat read (a V neck, one sleeve, a small hand) and calm bun; still
+rough: GUST's flag a hard triangle, the men's spiky cuts, the standing men stiff, a vector finish beside the painted
+references. The v4 people below stay in use until the owner picks; then this page is rewritten around FLOW, not
+appended to.
 
 **IN USE FOR NOW (owner, 2026-10-30: "I think it is a bit better overall I think yes let's go with that for now"):
 the people of the overhaul: hair v4 + the redrawn faces with OPEN EYES + the rebuilt bodies** (assembled in
