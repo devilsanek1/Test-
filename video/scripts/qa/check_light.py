@@ -96,6 +96,7 @@ def main() -> int:
     res: dict = {}
     lines: list[str] = []
     fails = 0
+    notes = 0  # look numbers: diagnostics, never a fail (only real mistakes, like the caption band, fail)
 
     # (1) the brightest 5 % (sky, caption band, excluded out): centred near the subject
     m = ~sky & ~band & ~ex
@@ -104,9 +105,9 @@ def main() -> int:
     cy, cx = float(ys.mean()), float(xs.mean())
     dist = float(np.hypot(max(sx0 - cx, 0, cx - sx1), max(sy0 - cy, 0, cy - sy1)) / H)
     ok = dist <= 0.15
-    fails += not ok
+    notes += not ok  # a look number: reported, never failing (owner, 2026-10-31: "A number is never a target")
     res['brightest'] = {'threshold': thr, 'centroid': [cx / k, cy / k], 'dist_H': dist, 'ok': ok}
-    lines.append(f'brightest 5 % (L* >= {thr:.1f}): centred ({cx / k:.0f}, {cy / k:.0f}), {dist:.3f} H from the subject  [{"OK" if ok else "FAIL"} <= 0.15]')
+    lines.append(f'brightest 5 % (L* >= {thr:.1f}): centred ({cx / k:.0f}, {cy / k:.0f}), {dist:.3f} H from the subject  [report: {"near" if ok else "far"}; an example once: <= 0.15]')
 
     # light shapes (pools, spills, panes) with whatever lies inside them filled in: a shadow ON a light shape is judged
     # against that light (A has bare ground there)
@@ -133,10 +134,10 @@ def main() -> int:
     dark = int((under35 & ~dm).sum())
     in_mass = int((under35 & dm).sum())
     ok = grey <= 0.0005 * H * W and dark <= 0.0005 * H * W
-    fails += not ok
+    notes += not ok  # a look number: reported, never failing
     res['shadow_px'] = {'share': float(sh.mean()), 'greyed': grey, 'too_dark': dark, 'in_dark_mass': in_mass, 'ok': ok}
     mass_note = f' ({in_mass} px more inside the declared dark masses: allowed, CRAFT §f.8)' if dm.any() else ''
-    lines.append(f'shadow pixels {sh.mean() * 100:.1f} %: greyed {grey} px, under L* 35 off anchor-dark {dark} px{mass_note}  [{"OK" if ok else "FAIL"}]')
+    lines.append(f'shadow pixels {sh.mean() * 100:.1f} %: greyed {grey} px, under L* 35 off anchor-dark {dark} px{mass_note}  [report{"" if ok else ": look at the shadows"}]')
 
     # (3) the caption band: one light value
     bm = band & ~text
@@ -160,9 +161,9 @@ def main() -> int:
         x, y, w, h = (int(v) for v in stats[i, :4])
         pools.append({'box': [x / k, y / k, (x + w) / k, (y + h) / k], 'L': inside, 'ground': ground, 'ok': inside >= ground + 4})
     bad = [p for p in pools if not p['ok']]
-    fails += bool(bad)
+    notes += bool(bad)  # a look number: reported, never failing
     res['light_shapes'] = pools
-    lines.append(f'light shapes: {len(pools)} (' + ', '.join(f'L* {p["L"]:.0f} on {p["ground"]:.0f}' for p in pools) + f')  [{"OK" if not bad else "FAIL"} each >= ground + 4]')
+    lines.append(f'light shapes: {len(pools)} (' + ', '.join(f'L* {p["L"]:.0f} on {p["ground"]:.0f}' for p in pools) + f')  [report: {"each lighter than its ground" if not bad else "some barely lighter than their ground"}; an example once: >= ground + 4]')
 
     # shares (CRAFT §d.10, reported)
     keep = ~ex
@@ -192,7 +193,7 @@ def main() -> int:
         with open(a.json, 'w') as f:
             json.dump(res, f, indent=1)
     print('\n'.join(lines))
-    print('LIGHT: ' + ('OK' if not fails else f'{fails} FAIL'))
+    print('LIGHT: ' + ('OK' if not fails else f'{fails} FAIL') + (f' ({notes} look notes to read, never a fail)' if notes else ''))
     return 1 if fails else 0
 
 
