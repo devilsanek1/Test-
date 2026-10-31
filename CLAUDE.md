@@ -67,4 +67,6 @@ guides is absolutely bananas"). Every lesson goes into the process (playbook, pi
 - **Spend on the film, not on overhead,** inside the weekly limit (finishing the films in flight comes first): no limit
   on creative quality, but small checkpointed tasks, agents that write files and report in 3 lines, a small
   orchestrator, no rework, no reviews of things that will still change, no polish before the story is locked.
+- **A look or frame brief opens with the beat's feeling and story moment in words** (PIPELINE_V2, "The standard brief
+  header"); the hook `.claude/hooks/feeling_brief.py` stops a brief that hands an agent a look number as a target.
 - Commit only your own paths; never `git add -A`.

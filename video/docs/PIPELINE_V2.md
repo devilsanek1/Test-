@@ -374,6 +374,13 @@ the through-line card (G0.5 drafts it from the pick, G1 completes it from the sc
   call, `effort: "max"` on every Agent tool call, `/effort max` as a helper session's first prompt, and every brief says
   that anything its agent starts runs at max too. The hook in `.claude/settings.json` enforces it;
   `python3 .claude/hooks/max_effort.py --lint|--fix <workflow.js>` checks or repairs a script.
+- **The standard brief header** (owner, 2026-10-31: "start from the feeling, never from a number"): every look or
+  frame brief opens with (1) the beat: its story moment and what the viewer should FEEL, in words, and where its life
+  and action are; (2) the tools to consult for that feeling, named by guide (never a guide's numbers copied in);
+  (3) only the hard constraints that apply (CLAUDE.md). A look number in a brief is a target the frame gets forced to:
+  the hook `.claude/hooks/feeling_brief.py` stops a brief that carries one (a share of the frame, an L* target, a
+  placement) unless the brief says "Numbers here are examples or checks, not targets." (for a hard constraint, a
+  mistake check or a labelled example); `python3 .claude/hooks/feeling_brief.py --lint <file>` checks a script.
 - Context: the gate's brief plus the scene's own data. **Point to sections, never "read all docs fully".**
 - An agent writes its result into a file and its chat report is at most 3 lines (rule 9). Cross-lane requests go in one
   block, in an exact format.

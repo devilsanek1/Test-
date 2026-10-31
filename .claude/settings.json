@@ -11,6 +11,17 @@
             "statusMessage": "Checking max effort (owner rule)"
           }
         ]
+      },
+      {
+        "matcher": "Agent|Task|Workflow|mcp__claude-code-remote__send_message",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/feeling_brief.py\"",
+            "timeout": 30,
+            "statusMessage": "Checking the brief starts from the feeling (owner rule)"
+          }
+        ]
       }
     ]
   }
