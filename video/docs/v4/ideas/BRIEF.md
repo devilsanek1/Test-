@@ -34,36 +34,29 @@ among yours, never a limit; ignore its camera.
 | B11 | "Then pipes under the streets carry that heat into people's homes." | the pipes bring it under the city into homes | cozy relief: warmth travelling under the snow to homes |
 | B12 | "So your chatbot could soon heat an apartment in Helsinki." | your own chatbot could warm a home: the payoff, and the loop back to B1 | personal warmth and a wink: your own chat warms a home; back to the start |
 
-**Our recipes: the toolbox, never a cage (imagination first, inside what we have built).** Read before drawing:
-- **Composition (every thumbnail):** `video/docs/look/COMPOSITION_SHOTS.md` Part 0 (the ranked library: CORE first, the
-  owner's 41 ideas first) and Part 0b (the guidelines: the frame's grammar kept in EVERY frame, such as the thirds, the
-  soft near layer, the atmospheric layers, the one colour accent; one lead device per frame; the rhythm: 6-9 different
-  lead devices across the film), with `composition/library_sheet.png`. Each idea names its lead device by the
-  library's code. The frame itself: `video/docs/look/LAYOUT.md` §1 (the caption band y 290-600 is the open sky or wall
-  the words sit in; the read zone y 600-1250 where the idea plays; the app's UI zones kept clear).
-- **The world and the story's staging:** `video/docs/look/DIRECTION.md` (one subject at a time; depth and scale from a
-  human viewpoint; the home place), `COZY_AND_SCALE.md` (the home place held on 2-3 sides; at most one big scale
-  moment), `LIFE_AND_DENSITY.md` (the world full and alive in its calm tier, designed into the frame, never added later),
-  the playbook's fullness rule ("a place, never buildings standing alone").
-- **The look (applied in full at the KEY FRAMES; your thumbnails stay value sketches, but each idea must be one that
-  can be painted this way):** painter v7's tools (`video/docs/studies/2026-10-28_city_posters/paint_test/`: take its
-  craft, not its mood; owner, 2026-10-31: v7 "lost the feeling"), `ORGANIC.md` and `PAINT_RECIPES.md` (painted pieces,
-  organic shapes, one story light), the winter night with one warm accent (`WORLD_BIBLE.md` §2-3: the palette and the
-  light; ignore its density keys), each frame's darkness and contrast following its own feeling (owner, 2026-10-31: "a
-  number is never a target the frame is built to"), the people in use, the words on screen.
-- **Later steps use the rest:** the shot plan takes the library's moves and joins and `SOUND_SYNC.md`.
+**The toolbox: consult it, never a cage; imagine first.** Plan each frame on `video/docs/look/FRAME_CARD.md` (feeling
+first) and find its tools in `video/docs/look/DESIGN_LANGUAGE.md`. Imagine the frame first; THEN check it against the
+composition library (`video/docs/look/COMPOSITION_SHOTS.md`, the owner's own reel ideas first) as a vocabulary, never a
+menu to pick from first (owner, 2026-10-31): name any device you use and why it serves this beat's feeling. The world
+and its staging: `video/docs/look/DIRECTION.md` (one subject at a time; depth and scale from a human viewpoint),
+`COZY_AND_SCALE.md` (the home place held close; one big scale moment at most), `LIFE_AND_DENSITY.md` (a world alive,
+designed into the frame, never added later), the playbook's "a place, never buildings standing alone". The look comes in
+full at the key frames; your thumbnails stay value sketches, but each idea must be one our tools can paint: painter v7's
+craft (`video/docs/studies/2026-10-28_city_posters/paint_test/`: its craft, not its mood; owner, 2026-10-31: v7 "lost
+the feeling"), `ORGANIC.md`, `PAINT_RECIPES.md`, the winter night with one warm accent (`WORLD_BIBLE.md` §2-3), each
+frame's darkness and contrast following its own feeling, the people in use, the words on screen. Hard constraints only:
+the caption band (`LAYOUT.md` §1) is open sky or wall for the words; the app's buttons kept clear.
 
-**The job:** for each beat, imaginative picture ideas a regular viewer reads in a second, each drawn as ONE WHOLE FRAME
-thumbnail (1080 x 1920 drawn small: the idea, the full world around it, the light, the people, where the words sit),
-never a lone object on an empty field. Imaginative: the true mechanism shown through a playful, readable picture,
-never a metaphor that needs explaining or bends the facts. Where a frame shows the home place, it is the real Helsinki,
-specific (real photos of its harbour streets in winter, if you can fetch them, give the buildings, the street's things
-and the life; never a generic city), and the story's own marks are on it (the heat).
-**One film, never a hodge-podge (`video/docs/PIPELINE_V2.md`):** your sequence starts from ONE FILM CONCEPT (one
-imaginative idea for the whole film: its world, its central device, the thread's journey, the arc of feeling from the
-first frame to the payoff); every beat's idea is a chapter of it, and each beat's two ideas are two takes inside it. The film is one flowing story: say in a line how
-each idea could flow into the next beat's (the camera comes later, from the frames). Each idea: a title, one line (what
-the viewer sees and gets), the thumbnail.
+**The job (the full round, owner 2026-10-31: "not lean, do it properly"; four independent imaginations, each one
+whole sequence, each through THE FRAME LOOP; then one judge across them):** your sequence's ONE FILM CONCEPT first (one imaginative idea for the whole film: its world, its
+central device, the thread's journey, the arc of feeling from the first frame to the payoff); then for each beat ONE
+idea inside it, a chapter of it, and for the beats you are least sure of (at most four) one alternate. Each idea: a
+title; one line (what the viewer sees, gets and feels); how it flows into the next beat (the camera comes later, from
+the frames); a thumbnail drawn as ONE WHOLE FRAME (the 9:16 frame drawn small: the idea, the full world around it, the
+light, the people, where the words sit), never a lone object on an empty field. Imaginative: the true mechanism shown
+through a playful, readable picture, never a metaphor that needs explaining or bends the facts. Where a frame shows the
+home place, it is the real Helsinki, specific (real photos of its harbour streets in winter, if you can fetch them: the
+buildings, the street's things, the life; never a generic city), with the story's own marks on it (the heat).
 
 **Every agent:** writes its files from its first step; returns at most 3 lines; no git index changes; no edits to
 `video/src`, `video/public`; draws thumbnails as SVG/HTML rendered with `video/scripts/type/render.mjs` (any HTML page
