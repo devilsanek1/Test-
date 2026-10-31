@@ -17,7 +17,7 @@ shot recipes and camera moves (S1-S5, the scale cues), `COZY_AND_SCALE.md` the c
 them matches them; a mismatch is a bug, fixed in the same turn. This page records the look as it stands, never a freeze
 (the owner: "our look is evolving - we are finding out style i don't think we can overfixate on this"): each film may
 carry its next step. **Status:** §1-7 are in force, except what they mark as open or proposed. §8 marks each line
-**[owner]** or **[owner-decided (2026-10-29)]** (in force), **[open]** (the owner's call) or **[proposal]** (ours, to be seen in a look clip): a proposal
+**[owner]**, **[owner-decided (2026-10-29)]** or decided under the owner's hand-over of 2026-10-30 (in force), **[open]** (the owner's call) or **[proposal]** (ours, to be seen in a look clip): a proposal
 is never a rule until the owner approves it.
 
 Px at 1080 x 1920, y down, screen space; H = 1920, W = 1080. Diagram: `docs/studies/2026-10-28_city_posters/img/layout_zones.jpg`
@@ -49,7 +49,7 @@ recorded from some other video?" (v1, 2026-10-25); "check out the text capture. 
 | key-read box (organic) | x 120-950, y 600-1480 | the outer limit for any key read on an organic post (a label, a number, a contact point beside the subject) | G5 §2 (moved here) |
 | subject axis and box | x 380-700; the subject 270-460 px wide (35-60 % of the 760 px stage; a standing figure 300-650 px tall), 80 px clear round it; <= 2 points of interest in a scale shot, inside x 380-700 | the beat's subject (tier A); a scale panel inverts it (>= 60 % of the frame, or cut by both sides) | SB §3 and its lint; CS §5 (moved here); VT §0, §3 |
 | side margins | nothing key within 120 px of a side edge; the gutters beside the block (x < 95, x > 945) may hold quiet detail and may rise through the band's height | | CS §2, 3b.2; SB §3 |
-| bottom third | y 1250-1920 | the near ground as one quiet mass, patterned (the second quiet field, next row), with at most 2 props in it, cut by the frame edges (R6), and a big near "you" that reads by mass; the foreground cut by the bottom edge, in mid-tones with its small darks (CR §f.8; owner's pick pending: `ORGANIC.md` §8 D3) | LD §0; VT §1; CS 3b.2; `ORGANIC.md` §4.4 R5-R6 (§7 row 14) |
+| bottom third | y 1250-1920 | the near ground as one quiet mass, patterned (the second quiet field, next row), with at most 2 props in it, cut by the frame edges (R6), and a big near "you" that reads by mass; the foreground cut by the bottom edge; in the references' low key the near ground is usually the frame's big quiet dark mass, a shade with a named caster, painted and alive inside (v7's wet quay carrying the door's light), the small darks at the focal above it (CR §f.8, R10; decided under the owner's hand-over, 2026-10-30: `ORGANIC.md` §8 D3) | LD §0; VT §1; CS 3b.2; `ORGANIC.md` §4.4 R5-R6 (§7 row 14) |
 | the quiet fields | up to two (playbook SCENE COMPOSITION, owner, 2026-10-30: big quiet areas; "our scene is very busy"): the sky with the caption band, touching the top edge (>= 30 % of the frame), and the near ground, water or a floor, touching the bottom (>= 15 %; a bounded floor seen from a balcony up to 50-60 %); most of the frame quiet at a squint (R5: ~65 %, the painted models 67-91 %); each patterned in value (+-4-6 L*), so never a hole; the things live in the belt between | elsewhere no hole over ~200 px and no flat region over 20 %; drawn detail in most of the belt's 240 px bands | LD §0, §2, §8; CS 3b.1, 3b.3; `ORGANIC.md` §4.4 R5 |
 | labels and marks | world labels at y 600-1480, never in the band; the draft label bottom-left, y > 1850 (drafts only); the G3 notes strip y 1680-1920 (the board only) | | G5 §2 (moved here); SB §3 |
 | paper edge (opt-in) | the sides from y >= 640 and the bottom, inset 12-40 px, 'paint-subtle' at most | never at the top of the frame or beside the band; each film decides with its G4 look clip | PB; DIR 10; CS 3b.7; EDGES (its code paints past the top since 2026-10-25) |
@@ -176,7 +176,8 @@ everything: suspense, sense of scale, fantastic environment and composition" (v3
 - `docs/look/organic/composition_study.py frame <still> --caption --subject x0,y0,x1,y1` (from `video/`, run with
   `python3 -B`): the composition rules R1-R12 (`ORGANIC.md` §4.4; CR §b's check): the notan, the calls (<= 3 regions at
   >= 50 % of the strongest, one rival, the strongest on the subject in value and colour), the two quiet masses, <= 6
-  named objects, the focal under the band, the real dark mass (owner's pick pending: `ORGANIC.md` §8 D3).
+  named objects, the focal under the band, the real dark mass (R10), and as information the share under L* 40 (up to
+  ~45 %: CR §f.8, the references' low key, `ORGANIC.md` §8 D3).
 - By eye: every word at 0.25 scale; the cover at 360 px wide; the frame at phone size, sound off, squinting (the eye
   is on the beat's subject).
 - Proposed: `scripts/look/posters/composition.py frame` (the overlay and numbers on any 1080 x 1920 still) promoted to
@@ -243,8 +244,9 @@ frame, rebuilt beside v2's own). A line moves into §1-5 only when the owner app
   L* 45, the bottom fifth 59 % masses; v2 74, 9 %); bottom corners L* <= ~55 (CO L1: posters 44 / 53, v2 ~72 / 74).
   Masses may already run under the UI (§1). Retired 2026-10-30: "detailed" near masses and the posters' "open ground
   <= 15 %" (the near ground is now the second quiet field: §1). [>= 30 L* from the near group to the air: owner, DIR 6
-  (CR §f.8); the near world in mid-tones, its darks in many small pieces: owner-decided (2026-10-29), ST §9 decision 2
-  (CR §f.8; owner's pick pending: `ORGANIC.md` §8 D3); quiet, <= 2 props: owner (SCENE COMPOSITION,
+  (CR §f.8); the near frame inside the near ground's quiet dark mass, the references' low key: decided under the
+  owner's hand-over (2026-10-30), `ORGANIC.md` §8 D3 (CR §f.8; the near world in mid-tones with its darks in many small
+  pieces, owner-decided 2026-10-29, ST §9 decision 2, is history); quiet, <= 2 props: owner (SCENE COMPOSITION,
   2026-10-30); the rest: proposal]
 - **Retired (2026-10-30): the one quiet field, measured.** The posters' "calm below the skyline <= 5 %", "no edge-free
   field over 2 % below the sky", "73-90 % of the detail in the lower half" and "open ground <= 15 %" (CO §1, §7; P4

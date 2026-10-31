@@ -43,8 +43,9 @@ range (rule 6). **Decided by the owner (2026-10-29: "Go with your suggestions", 
 the float), in the rules below, each first judged in the 7 s look test of v2's canal opening (STUDY.md §10):** no
 outlines, edges from light and shade, thin lines only on small things and steady in the float (rule 4); the subject's
 shade face the deepest (rule 5); the "low poly" patchwork as tier C's build and a quiet "find Pip" (rule 2); real
-darks in many small pieces and a calm sun (rule 6); the designed view (a second horizon for the far city: "unique
-camera angle and composition of objects", which the owner finds fascinating) in two frames a film (rule 7; on hold since 2026-10-29). The
+darks in many small pieces (settled anew on 2026-10-30 under the owner's hand-over: small darks at the focal plus one
+or two big quiet dark masses, rule 6) and a calm sun (rule 6); the designed view (a second horizon for the far city:
+"unique camera angle and composition of objects", which the owner finds fascinating) in two frames a film (rule 7; on hold since 2026-10-29). The
 specific local objects of a place are content, not style (owner). Everything else in the study is a proposal until
 the owner approves it; the look test shows it.
 
@@ -55,8 +56,9 @@ PIECES: rule 4); one story light per scene done properly, with darks, contrast a
 (PROPER LIGHT: rules 5-6); big quiet areas and one place to look (SCENE COMPOSITION: rules 2-3); people of the overhaul
 in use for now: hair v4, open eyes looking away, the rebuilt bodies (rule 3). Their numbers are `ORGANIC.md` (shapes and edges, the light's method, the composition
 rules R1-R12, the dose by plane, the paper), carried into `CRAFT.md` as first values for the v7 look test (WARNs; the
-owner's eye at phone size decides), and `PEOPLE_DESIGN.md`. One call is still the owner's: the dark key, T1 (one gentle
-dark mass) or T3 (the references' low key) (`ORGANIC.md` §8 D3; rule 6).
+owner's eye at phone size decides), and `PEOPLE_DESIGN.md`. The dark key, the one call left to the owner, was handed
+over by him ("Do what you think is right and make the videos better", 2026-10-30) and decided: T3, the references' low
+key, the caption band kept light, built in painter v7 (rule 6; `ORGANIC.md` §8 D3).
 
 ## The rules
 - **1. One flowing story, never shots stitched together.** One story on ONE core line (spine first, each line following
@@ -165,10 +167,13 @@ dark mass) or T3 (the references' low key) (`ORGANIC.md` §8 D3; rule 6).
   (the story light's), every other colour tone-on-tone in its mass, never a mix of unrelated pastels (`ORGANIC.md`
   §4.3). Peach creams, terracotta, rose, leaf sage, golden light, plum and red-brown shadows; never beige, muddy tan,
   olive or grey; a warm world held by one cool field; saturation as confetti inside the key, never fields; a full
-  value range: a calm light sky, a mid-tone world and real darks where the eye should go, drawn in many small pieces
-  (windows, doorways, eave undersides, the shade under trees: owner, 2026-10-29), never one dark mass or a narrow band
-  of light pastels (owner, 2026-10-28; numbers: `CRAFT.md` §f.8, from the city-poster study; owner's pick pending:
-  `ORGANIC.md` §8 D3). Money and everyday life: #9 Autumn
+  value range (owner, 2026-10-28) in the references' low key (decided 2026-10-30 under the owner's hand-over, "Do what
+  you think is right and make the videos better", and built in painter v7: `ORGANIC.md` §8 D3): a calm light sky, a
+  mid-tone world and real darks where the eye should go: small darks at the focal (the subject's silhouette, a doorway,
+  a window, a hull) plus one or two big quiet dark masses below the caption band (a shade with a named caster, painted
+  and alive inside, in the key's shade colour, never black, grey or a dead slab), up to ~45 % of the frame under L* 40
+  (v7 43 %), the band kept light for the ink captions (a night sky's band: rule 10); never darks scattered as
+  confetti or a narrow band of light pastels (numbers: `CRAFT.md` §f.8). Money and everyday life: #9 Autumn
   Ember (#7 Autumn Ochre read sick). **One continuous sky** (owner, v2 G4), never an empty field (owner, 2026-10-29: soft
   clouds, a gentle paint-like variation in its tone, pale far towers rising into it, birds; calm, no abstract
   rectangles, the caption band clear; its clouds painted: rule 4's PAINTED PIECES): from the frame top to the horizon the sky's base
@@ -258,6 +263,9 @@ stage; the owner may skip gates by name. The clean pen's first test is the v3 re
   §d until 2026-10-30): rims by tier, a soft glow and bloom at a source, real falloff (rule 5; playbook PROPER LIGHT).
 - One quiet field per frame and "12+ distinct props" in a wide (`LIFE_AND_DENSITY.md`, `LAYOUT.md` until 2026-10-30):
   up to two quiet fields, <= 6 named objects, the rest texture inside a mass (rules 2-3; SCENE COMPOSITION).
+- Real darks only in many small pieces, 6-10 % of the frame under L* 40, never one dark mass, the near world in
+  mid-tones (`CRAFT.md` §f.8 from 2026-10-29 until 2026-10-30): small darks at the focal plus one or two big quiet dark
+  masses below the band, the references' low key (rule 6; decided under the owner's hand-over, built in painter v7).
 - Tier A's closed 3.0 px outline in its own deep shade (our reading of "black outlines, VERY subtle, in key places")
   and B's thin same-hue line on Pip and line-drawn figures (v2's line, the A vs B picture's A): edges from light and
   shade, thin lines only on small things (rule 4; owner, 2026-10-29).

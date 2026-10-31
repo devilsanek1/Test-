@@ -990,8 +990,9 @@ def cmd_frame(argv):
         except (TypeError, KeyError):
             ok = True
         print('  %-4s %-4s %-52s %s' % ('ok' if ok else 'WARN', rule, what, show(r)))
-    print('  info      under L* 40: %d %% (CRAFT §f.8 asks 6-10 %%); L* median %d' % (
-        round(100 * r['dark_share_L40']), round(r['L_median'])))
+    # CRAFT §f.8 (the references' low key, 2026-10-30): R10 above is the dark mass; the share under L* 40 up to ~45 %
+    print('  info      under L* 40: %d %% (CRAFT §f.8: up to ~45 %%, R10 the mass%s); L* median %d' % (
+        round(100 * r['dark_share_L40']), ', OVER' if r['dark_share_L40'] > 0.455 else '', round(r['L_median'])))
     return r
 
 

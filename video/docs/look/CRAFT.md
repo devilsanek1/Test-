@@ -21,8 +21,10 @@ its signal, and they keep their FAIL. Px at 1080 x 1920, CIE L* and C*, %W/s = %
 **The owner's words of 2026-10-30 are integrated here** (playbook ORGANIC, NOT GEOMETRIC; PROPER LIGHT; SCENE
 COMPOSITION; PAINTED PIECES' balance and its ONE painted language): §b's patchwork and its calls, §c's shapes, edges,
 paint and paper, §d's light, §f.2's painted planes and §g's sky take `ORGANIC.md`'s numbers (§4-5 there), first values
-for the v7 look test and WARNs like the rest of this page; the owner's eye at phone size decides. One call waits for
-the owner: the dark key (§d.2, §f.8; `ORGANIC.md` §8 D3).
+for the v7 look test and WARNs like the rest of this page; the owner's eye at phone size decides. The dark key, the
+one call left to the owner, was handed over by him ("Do what you think is right and make the videos better") and
+decided on 2026-10-30: the references' low key (T3), built in painter v7, whose numbers set §d.2's floor and §f.8's
+darks (`ORGANIC.md` §8 D3).
 
 ## a. One flowing story
 **The through-line** (written down beside the core line, before any drawing):
@@ -273,8 +275,9 @@ G4 frame), halos as opaque discs, no cast or contact shadow in any kit file, no 
    78+, ink 8:1+); desk 58-62; shade steps; contact strips 45+. Night exterior: lit windows and bulbs 85-92; pools 88-91 on
    ground snow at 83-85; sky-facing snow caps 87-89, thin, never above the pool core (a sky at ~45 lights them); sky ~45.
    Day: sun 45-65° high, lit tones lean yellow, the sky the lightest field. Dusk: the low sun is the key, a local light
-   (a lit door, a lamp, a screen) the story light. Nothing under L* 35 but ink, anchor-dark surfaces and §f.8's dark
-   pieces (their shadows take one step below) (owner's pick pending: `ORGANIC.md` §8 D3).
+   (a lit door, a lamp, a screen) the story light. Nothing under L* 35 but ink, anchor-dark surfaces and §f.8's darks:
+   the small darks at the focal and the big quiet dark masses below the band, each a shade with a named caster (§d.5)
+   (their shadows take one step below; the references' low key, 2026-10-30: `ORGANIC.md` §8 D3, C7).
 3. **A shadow is its surface times the set's ONE tint family** (multiply; form, cast and contact are three strengths of
    one hue): never grey, never a hand-picked fill. Warm surfaces keep at least 0.95x their chroma and turn 5-20° toward
    rose or plum; cool ones 10-16° toward violet. On the main surfaces the tints give form dL* -7 to -12 (tier A deeper:
@@ -366,13 +369,13 @@ G4 frame), halos as opaque discs, no cast or contact shadow in any kit file, no 
 **Check** (the G4 look clip and every render): every pool at least +4 L* over its ground; a bloom only at a source, inside
 its three sizes and <= +6-8 L* at the source's edge, none on a lit surface or in the band; the brightest 5 % (the sky,
 the caption band and the far planes out) centred within 0.07-0.15 H of the subject; rims by tier, none an even outline;
-no shadow pixel under C* 8, nor under L* 35 except on an anchor-dark surface or a dark piece (§f.8; owner's pick
-pending: `ORGANIC.md` §8 D3); the subject's shade face -20 to -25 L* under
+no shadow pixel under C* 8, nor under L* 35 except on an anchor-dark surface, a small dark or inside a dark mass
+(§f.8); the subject's shade face -20 to -25 L* under
 its lit face (an eye check until `check_light.py` gets its tier-A step); one value in the caption band; the G4 look clip already shows the rig
 with form, cast and contact shadows. `scripts/qa/check_light.py` (built in the v3 rework: an A/B of the same frame with
 the light layers off and on) checks the pools, the brightest 5 %, the shadow colour and the caption band (pass the far
-planes' boxes as `--exclude`); a scene on baked maps runs `src/look/light_s1/bake/measure.py`
-(`ORGANIC.md` §6 step 2's check); the bloom, the rims and the three shadow kinds are an eye check. Eye check: for every
+planes' boxes as `--exclude` and the dark masses' as `--dark-mass`); a scene on baked maps runs
+`src/look/light_s1/bake/measure.py` (`ORGANIC.md` §6 step 2's check); the bloom, the rims and the three shadow kinds are an eye check. Eye check: for every
 shadow, point at its light and its caster; for every object in the light, point at its shadow.
 
 ## e. How to measure (until `scripts/qa` has these: the retro's tooling lane)
@@ -492,22 +495,35 @@ like our pen) is the model for the plane numbers; reference 1 for streets and se
    phone size: a calm, glassy canal with its reflections, never boxes, scattered or uniform dashes, stars or a stack of
    pancakes; a painted plate may carry a FEW deliberate horizontal strokes on that calm base (75 %+ untouched; the
    recipe: `paint_recipes/water.md`).
-8. **A full value range: a calm light sky, a mid-tone world and real darks where the eye should go, in many small
-   pieces** (DIRECTION
+8. **A full value range: a calm light sky, a mid-tone world and real darks where the eye should go, in the
+   references' low key: small darks at the focal and one or two big quiet dark masses below the band** (DIRECTION
    rule 6; owner, 2026-10-28: "good point too!"; numbers: city-poster study, 2026-10-28, `STUDY.md` §1a, §5.5, §7, from
-   `pro_1_depth.md` and `pro_4_colour.md`). Per frame, the caption band out: the darkest 5 % of the pixels at L* <= 32
-   (p5; posters 23, v2 48), on the dark pieces below (§d.2); >= 30 L* from the near group (planes -2, -1) to the air
-   (posters 27-46, v2 10-15); L* < 65 on >= 25 % of the frame and 65-80 on <= 20 % (the posters 27-48 % and 8-14 %;
-   v2 21-47 % in between); a jump of >= 15 L* from the subject's group to the far group (posters 19-36). Keep the hues,
-   move the values: a grade closes only 16 % of the posters' gap, the rest is drawing (the darks, the filled ground, the
-   colour count). No darks in the caption band or on far planes. **The dark share** (owner, 2026-10-29: "Go with your
-   suggestions", `STUDY.md` §9 decision 2 (b); first judged in the look test): 6-10 % of the frame under L* 40 in >=
-   120 pieces of >= 4 x 4 px across >= 9 of 16 grid cells (windows, doorways, eave undersides, the shade under trees,
-   hulls; the posters 13.8 % in 259 pieces, v2 1.9 % in 41), in the palette's tinted dark hue (`PALETTE.md`'s
-   anchor), the near world in mid-tones (owner's pick pending: `ORGANIC.md` §8 D3); (a), about 5 % as rule 6's one
-   tinted anchor, is history. These are
-   WARNs, like this page's other thresholds; a still is measured with `scripts/look/posters/pro_4_colour.py` until
-   `check_depth.py` gets its value parts (to build: `STUDY.md` §1a).
+   `pro_1_depth.md` and `pro_4_colour.md`; the darks: below). Per frame, the caption band out: the darkest 5 % of the
+   pixels at L* <= 32 (p5; posters 23, v2 48, v7 22), on the darks below (§d.2); >= 30 L* from the near group (planes
+   -2, -1) to the air (posters 27-46, v2 10-15); L* < 65 on >= 25 % of the frame and 65-80 on <= 20 % (the posters
+   27-48 % and 8-14 %; v2 21-47 % in between); a jump of >= 15 L* from the subject's group to the far group (posters
+   19-36). Keep the hues, move the values: a grade closes only 16 % of the posters' gap, the rest is drawing (the darks,
+   the filled ground, the colour count). No darks in the caption band or on far planes. **The darks: the references'
+   low key** (decided 2026-10-30 under the owner's hand-over, "Do what you think is right and make the videos better",
+   playbook Process; T3 of `ORGANIC.md` §8, built in painter v7: `docs/studies/2026-10-28_city_posters/paint_test/`
+   `NOTES.md` v7 and `v7_checks.json`): small darks at the focal, where the eye should go (the subject's silhouette, a
+   doorway, a window, a hull), in the palette's tinted dark hue (`PALETTE.md`'s anchor), plus one or two big quiet dark
+   masses below the band, each a shade with a named caster (§d.5), painted and alive inside (a ramp, a wet sheen, the
+   story light's path across it: v7's quay runs from ~37 L* by the water to ~23 at the frame's bottom and carries the
+   door's light), in the key's shade end with its chroma kept (C* >= 8: never black, grey or muddy), quiet at a squint
+   (R5), never a dead flat slab. The darkest value group at a squint 15-40 % of the frame at mean L* <= 45, >= 80 % of
+   it in one or two connected masses below the band (R10; v7 28 % at L* 27, 92 %; the references 17-36 % at L* 8-35);
+   up to ~45 % of the whole frame under L* 40 (v7 43 %, T3 45 %, v6 7 %; v7a's 47 %, its quay still unpainted, read
+   as an empty purple slab; refs 02 and 03 reach 84 % and 67 % under their dark skies, which our caption band rules
+   out); the caption band stays the light quiet mass for the ink captions (v7 L* 77, the words 9:1; a night sky:
+   DIRECTION rule 10). A frame is lifted toward T1's gentler key (its mass at L* ~43) only where it reads gloomy at
+   400 px beside refs 02 and 03. Darks scattered over the frame in many small pieces are confetti (R2: <= 10 value
+   pieces). Until 2026-10-30 the share was 6-10 % under L* 40 in >= 120 pieces across >= 9 of 16 grid cells, the near
+   world in mid-tones (owner, 2026-10-29: "Go with your suggestions", `STUDY.md` §9 decision 2 (b)), and before it (a),
+   about 5 % as rule 6's one tinted anchor: both history. These are WARNs, like this page's other thresholds; a still
+   is measured with `docs/look/organic/composition_study.py frame` (R10, and the share under L* 40 as its info row) and
+   `scripts/look/posters/pro_4_colour.py` (the value bands, p5) until `check_depth.py` gets its value parts (to build:
+   `STUDY.md` §1a).
 - **Code:** `lib/water.tsx` (§7: `<Water>`, `waterProblems`, `waterPalette`; how-to `lib/WATER.md`, demo
   `src/entry-v2r-water.tsx`), `lib/depth.ts` (`makeAtmosphere`, `recede`, `planePalette`, `toneOnTone`, `backing`, `groundCam`, `flight`,
   `band`, `quadForPlane`, `poissonDisk`, `depthProblems`, `sizeProblems`; the parallax float `parallaxOffset`,

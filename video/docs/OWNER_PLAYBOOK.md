@@ -226,7 +226,8 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   (a protea, a cyclo) belong to the content, not the style ("hard to imagine if its going to trasnalte and generalize
   well"); one look, one brand (its own bullet). The owner's answer to the study's open calls (2026-10-29): "Go with
   your suggestions", so these are decided, first judged in the 7 s look test of v2's canal opening: no outlines (edges
-  from light and shade, the subject's shade face -20 to -25 L*); real darks 6-10 % of the frame in many small pieces;
+  from light and shade, the subject's shade face -20 to -25 L*); real darks 6-10 % of the frame in many small pieces
+  (superseded on 2026-10-30, under his hand-over, by the references' low key: A full value range, below);
   the "low poly" patchwork world for the ground and the far city (never on the subject, never in the sky); the designed
   view (a second horizon for the far city) for the establishing view and the scale landing only (ON HOLD since
   2026-10-29: two stills built on it failed, and the owner prefers v2's own eye-level view: DEPTH AND SCALE FROM A
@@ -484,11 +485,15 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   reads as one brand (ONE LOOK, ONE BRAND above). Rules: `docs/look/PALETTE.md`. — (2026-10-25; one brand, 2026-10-28).
 - **Warm, never sickly:** no beige, muddy tan, olive or grey; peach creams, terracotta, red-brown lines, golden light,
   warm shadows. — ("we need to have a warm feeling, not sick", v3 G4, 2026-10-26).
-- **A full value range: a calm light sky, a mid-tone world and real darks where the eye should go, drawn in many
-  small pieces** (windows, doorways, eave undersides, a hull, the shade under trees: 6-10 % of the frame under L* 40),
-  never one dark mass or a narrow band of light pastels (one reason v2 reads cheap next to the city posters). Numbers:
-  `docs/look/CRAFT.md` §f.8, from the city-poster study. — (our observation on the posters; "5 - good point too!",
-  2026-10-28; the darks in many small pieces: "Go with your suggestions", 2026-10-29).
+- **A full value range: a calm light sky, a mid-tone world and real darks where the eye should go, in the references'
+  low key: small darks at the focal and one or two big quiet dark masses below the caption band** (the subject's
+  silhouette, a doorway, a window, a hull; a shade with a named caster, painted and alive inside, never black, grey or
+  a dead slab; the caption band kept light), never darks scattered as confetti or a narrow band of light pastels (one
+  reason v2 reads cheap next to the city posters). Numbers: `docs/look/CRAFT.md` §f.8. — (our observation on the
+  posters; "5 - good point too!", 2026-10-28; the darks then in many small pieces: "Go with your suggestions",
+  2026-10-29; the darks rule settled under his hand-over, "Do what you think is right and make the videos better",
+  2026-10-30, with painter v7: the near quay one quiet dark mass that carries the door's light, 43 % of the frame
+  under L* 40, SCENE COMPOSITION's few big masses kept).
 - **PAINTED PIECES: the sky and its clouds and the whole environment (buildings, trees and greenery, ground, water) are
   uniquely painted in ONE painted language, as in the owner's references** (first asked for the sky, clouds and chosen
   pieces; then "one painted language" for the whole frame, below) (`docs/look/refs_human_scale/`, the city posters'
@@ -989,7 +994,10 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   the mascot's thin same-hue line, with one gentle shade step on every volume~~ → no outlines: edges from light and
   shade, the subject's shade face deeper; thin lines only on small things, 2 px where they float (2026-10-29).
 - ~~A few real darks (one tinted dark anchor, about 5 % of the frame)~~ → real darks in many small pieces, 6-10 %
-  (2026-10-29).
+  (2026-10-29; retired in turn, next line).
+- ~~Real darks only in many small pieces, 6-10 % of the frame under L* 40, never one dark mass~~ → the references' low
+  key: small darks at the focal plus one or two big quiet dark masses below the caption band (decided under the
+  owner's hand-over, built in painter v7, 2026-10-30).
 
 ## Maintenance (keep this file coherent and clear)
 No size budget (owner, 2026-10-27: "let's not focus on the playbook being a certain size; keep it as coherent and clear as

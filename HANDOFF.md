@@ -183,7 +183,8 @@ Everything that agent knew is in this repo. This file is the map; the details li
   conclusions into the main repo": this study is merged into `video-production` as it goes, and its conclusions are
   integrated into the main docs when the synthesis lands.
 - **Decided (2026-10-29 ~04:20 UTC, the owner: "Go with your suggestions"):** every open call of the study: no outlines
-  (edges from light and shade, the subject's shade face the deepest), real darks 6-10 % in many small pieces, the
+  (edges from light and shade, the subject's shade face the deepest), real darks 6-10 % in many small pieces (superseded 2026-10-30 by the references' low key, built in painter
+  v7: `docs/look/DIRECTION.md` rule 6), the
   "low poly" patchwork as tier C's build, the designed view in two frames a film, a quiet "find Pip", the sun toned,
   2 px lines on floating layers; `docs/look/LAYOUT.md` is the one layout guide (DIRECTION, CRAFT, LAYOUT, the playbook;
   `INTEGRATION.md` §2). All are first judged in the 7 s look test of v2's canal opening, built in four parallel lanes

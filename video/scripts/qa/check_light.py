@@ -12,8 +12,10 @@ similar ratios; a pixel that changed into another colour is not a shadow).
 
 Checks (FAIL = exit 1): (1) the brightest 5 % of the frame, the sky (its exact colour in A), the caption band and any
 --exclude rect left out, is centred within 0.15 H of the --subject box; (2) no shadow pixel greyed (C* < 8 where A had
->= 8) or under L* 35 off an anchor-dark surface (A >= 45), beyond 0.05 % of the frame; a shadow lying on a light shape (a
-pool, a spill: A has bare ground there) is greyed when under C* 8 and under 0.9x that light's own chroma; (3) the light layer adds ONE
+>= 8) or under L* 35 off an anchor-dark surface (A >= 45) outside a declared --dark-mass, beyond 0.05 % of the frame (a
+dark mass is CRAFT §f.8's big quiet dark mass below the caption band, a shade with a named caster: the references' low key,
+decided 2026-10-30; its pixels under L* 35 are reported, never failed, and still fail when greyed); a shadow lying on a
+light shape (a pool, a spill: A has bare ground there) is greyed when under C* 8 and under 0.9x that light's own chroma; (3) the light layer adds ONE
 value across the caption band (its dL* spread p5-p95 <= 1.5: no light or shadow edge crosses it); (4) every light
 shape (a connected lighter region >= 0.2 % of the frame: a pool, a spill) sits >= 4 L* over the ground just round it.
 Reported (CRAFT §d.10 ranges, never a quota): the shares of lit, ambient (one step down) and shadow shapes (deeper than
@@ -44,6 +46,8 @@ def main() -> int:
     ap.add_argument('--crop', default='', help='x0,y0,x1,y1 of one frame inside a sheet (image px)')
     ap.add_argument('--band', default='95,290,945,600', help='the caption band x0,y0,x1,y1 (canvas px)')
     ap.add_argument('--exclude', default='', help='x0,y0,x1,y1[;...] left out of the brightest 5 %% and the shares (a window view)')
+    ap.add_argument('--dark-mass', default='', help='x0,y0,x1,y1[;...] the declared dark masses (CRAFT §f.8: a shade with '
+                    'a named caster below the caption band), where shadow pixels may sit under L* 35 (canvas px)')
     ap.add_argument('--sky', default='#5B6A94', help='the sky colour (exact, in A) left out of the brightest 5 %%')
     ap.add_argument('--interior', action='store_true', help='report the night-interior shares')
     ap.add_argument('--exterior', action='store_true', help='report the night-exterior shares')
@@ -81,6 +85,10 @@ def main() -> int:
     for r in filter(None, a.exclude.split(';')):
         x0, y0, x1, y1 = rect(r, k)
         ex[y0:y1, x0:x1] = True
+    dm = np.zeros((H, W), bool)
+    for r in filter(None, a.dark_mass.split(';')):
+        x0, y0, x1, y1 = rect(r, k)
+        dm[y0:y1, x0:x1] = True
     sk = np.array([int(a.sky.lstrip('#')[i:i + 2], 16) for i in (0, 2, 4)])
     sky = np.all(np.abs(off.astype(int) - sk) <= 3, axis=2)
     text = band & ((Ln < 40) | (Ln > 97))
@@ -121,11 +129,14 @@ def main() -> int:
     on_light = full & ~lit
     sh = sh | (on_light & (dL < 1.5))
     grey = int((sh & ~full & (Cn < 8) & (Co >= 8)).sum() + (sh & on_light & (Cn < 8) & (Cn < 0.9 * c_lit)).sum())
-    dark = int((sh & (Ln < 35) & (Lo >= 45)).sum())
+    under35 = sh & (Ln < 35) & (Lo >= 45)
+    dark = int((under35 & ~dm).sum())
+    in_mass = int((under35 & dm).sum())
     ok = grey <= 0.0005 * H * W and dark <= 0.0005 * H * W
     fails += not ok
-    res['shadow_px'] = {'share': float(sh.mean()), 'greyed': grey, 'too_dark': dark, 'ok': ok}
-    lines.append(f'shadow pixels {sh.mean() * 100:.1f} %: greyed {grey} px, under L* 35 off anchor-dark {dark} px  [{"OK" if ok else "FAIL"}]')
+    res['shadow_px'] = {'share': float(sh.mean()), 'greyed': grey, 'too_dark': dark, 'in_dark_mass': in_mass, 'ok': ok}
+    mass_note = f' ({in_mass} px more inside the declared dark masses: allowed, CRAFT §f.8)' if dm.any() else ''
+    lines.append(f'shadow pixels {sh.mean() * 100:.1f} %: greyed {grey} px, under L* 35 off anchor-dark {dark} px{mass_note}  [{"OK" if ok else "FAIL"}]')
 
     # (3) the caption band: one light value
     bm = band & ~text

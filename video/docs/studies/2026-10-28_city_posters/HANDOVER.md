@@ -6,6 +6,15 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-31 ~00:10 UTC: v7 DONE and sent; the darks rule (D3) settled
+- v7 (`paint_test/paint_still_v7.png`, `compare_v7.jpg`, NOTES v7): the painted wet quay with the door's light coming to
+  us; razor 7 %, straight 12 %, flat 17 % (targets met); her in the overhaul's people. Still off: vector pieces left
+  (boat, lamps, far railings), the grid shows, the key lighter than the refs, no motion check. v8 when G4 needs it.
+- D3 settled (35 edits in 9 files; `paint_test/D3_RECONCILE.md`): small darks at the focal + one or two big quiet dark
+  masses below the band (up to ~45 % under L* 40); D3, C7, C8 FIXED in ORGANIC §8. Open check before a film uses T3's
+  sky: CRAFT §g.1 allows a zenith ~6 L* deeper than the field, T3's is 17 deeper: run the banding check on a master
+  encode (G4).
+
 ## Status 2026-10-30 22:50 UTC: resumed after the 22:40 reset (the limit hit ~21:50; the worker restarted)
 - composition-library-v2 (run `wf_6be51888-82f`) resumed: catalogue, 3 judges, library, library critic and the Helsinki
   first draft are cached; library-fix, helsinki-critic and helsinki-fix run live with RESUMING notes.

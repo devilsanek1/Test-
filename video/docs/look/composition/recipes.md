@@ -71,8 +71,9 @@ reads in the feed's clear window, one focal with the story light, two quiet fiel
 - **Never:** the horizon at the half; the far belt in the band, or so near it fills the frame ("I'm really
   suffocating"); the far side as an empty strip; a saturated far window competing with the focal; Pip on the light
   column under the door; more than 2 props on our bank.
-- **Scene 1:** T1's values in v2's view, the frame moved up 140-190 px so the horizon leaves the half (y ~995 ->
-  1135-1187; T3 moved it +140): the lit door lands at ~(630, 1105-1155), 550-600 px under the block; the sun one step
+- **Scene 1:** as BUILT in painter v7 (2026-10-30; `docs/studies/2026-10-28_city_posters/paint_test/` v7): T3's values
+  (the references' low key) in v2's own view and camera, the frame NOT moved. The plan before it: T1's values, the frame
+  moved up 140-190 px so the horizon leaves the half (y ~995 -> 1135-1187; T3 moved it +140): the lit door lands at ~(630, 1105-1155), 550-600 px under the block; the sun one step
   off its sky at the left; our quay one shade mass with one table and chair cut by the right edge.
 
 **SR3 THE LANE**
