@@ -730,3 +730,11 @@ Code: `src/look/v8_s1/` (composition `V8S1`, entry `entry.tsx`; looks `v8` and `
   it and records its coverage apart, so the light can reflect in it; worth carrying into any glass a film draws.
 - The hair v4 rig's breeze in profile is still the people lane's; `her_v8.tsx` sweeps the drawing as a stop-gap.
 - MyPaint's job files run to ~230 MB per full paint in the scratch; `run.sh` deletes them.
+
+## The owner on v8 (2026-10-31)
+"I think the feeling is more promising yes", then: "Did you use any composition shot from the library?"
+-> Honest answer: not by name. v8's card (`v8_card.md` §4-5) reached classic devices on its own (the canal edge, the
+kerb and the glass lines running to the low sun: leading lines B1 to a vanishing point B2; the office's glass wall as a
+near layer at the left edge, C2; her on the right third, walking into the light), but the brief only pointed at
+DESIGN_LANGUAGE, and the card never asked for the library. Fixed: FRAME_CARD §4 now asks which library devices carry
+the feeling, the owner's reel ideas first, by code and why.

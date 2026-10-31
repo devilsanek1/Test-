@@ -24,6 +24,10 @@ are in `DESIGN_LANGUAGE.md`. A card that leaves an answer blank leaves a piece f
 - Where does the eye land first, then second, then third? What leads it there (light, contrast, a line, a colour accent,
   a figure, motion)?
 - Is there one place to look, and is everything else quieter than it?
+- **Which composition devices carry this feeling?** Pick them from the library, the owner's own reel ideas first
+  (`COMPOSITION_SHOTS.md`: leading lines, a vanishing point, a frame within a frame, negative space, a foreground layer
+  ...), name them by their code, and say why each serves THIS feeling; then invent the frame (a device is a tool, never
+  a placement).
 
 ## 5. Space and scale
 - Where does the camera stand (a person's viewpoint, high, low)? How far are we from her, from the world?
