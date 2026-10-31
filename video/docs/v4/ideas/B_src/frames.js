@@ -500,7 +500,7 @@ FRAMES.B4 = () => {
     }
   }
   // the boil: a jet of steam curling up off every spout (up the gaps between the kettles, the bodies crisp)
-  for (const [sx, sy, r, c] of spouts) s += steamJet(sx, sy, ch * (r === 0 ? 1.15 : 0.95), {dir: -1, ph: r * 1.7 + c * 2.3, op: 0.9, w: ch * 0.075});
+  for (const [sx, sy, r, c] of spouts) s += steamJet(sx, sy, ch * (r === 0 ? 1.15 : 0.95), {dir: -1, ph: r * 1.7 + c * 2.3, op: 0.95, w: ch * 0.1});
   s += ell(tl[0] + w / 2, br[1] + 10, w * 0.8, 40, C.honey, 'opacity="0.28" filter="url(#b14)"');
   // the door swung wide toward us on its left hinge: its inner face dark, perforated, its lights dead
   const ang = 115 * Math.PI / 180, dw = 1.6;
@@ -513,16 +513,17 @@ FRAMES.B4 = () => {
   for (let i = 1; i < 18; i++) for (let k = 1; k < 16; k++) { const t = i / 18, Y = k * Dh / 16, p = dq(t, Y), zz = zc + (fe[1] - zc) * t; s += ell(p[0], p[1], Math.max(1, cam.sz(0.012, zz)), Math.max(1, cam.sz(0.012, zz)), V[2], 'opacity="0.8"'); }
   s += S(lineD([dq(0, Dh), dq(1, Dh)]), V[6], 4, 'opacity="0.9"') + S(lineD([dq(0, 0), dq(1, 0)]), V[1], 3);
   { const hA = dq(0.86, 1.15), hB = dq(0.86, 1.55); s += S(lineD([hA, hB]), V[8], Math.max(4, cam.sz(0.03, 1.8)), 'opacity="0.9"'); }
-  // the forty jets gather into ONE cloud rolling out over the computer's top, lit warm from below by the blaze
-  s += rollCloud(tl[0] + w / 2, tl[1] - 4, w * 1.7, 290);
   // her, a step back from it, both hands up, her face tipped up to the top of the wall; the blaze's light on her front
-  const fz = 3.3, f = cam.p(1.5, 0, fz), hp = cam.sz(1.7, fz);
+  const fz = 3.3, f = cam.p(1.36, 0, fz), hp = cam.sz(1.7, fz);
   s += ell(f[0] + hp * 0.03, f[1] + 3, hp * 0.24, hp * 0.035, V[4], 'opacity="0.6"');
   s += herRecoil(f[0], f[1], hp, {dir: -1, coat: V[2], coatL: V[3], hair: V[1], skin: mixHex(V[8], C.honeyL, 0.3), hand: mixHex(V[8], C.honeyL, 0.4), scarf: V[8], rim: C.honeyL});
   // the high hall's light over it all (the band stays calm)
   s += `<linearGradient id="b4up" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="700"><stop offset="0" stop-color="${C.paperT}" stop-opacity="1"/><stop offset="0.86" stop-color="${C.paper}" stop-opacity="1"/><stop offset="1" stop-color="${C.paper}" stop-opacity="0"/></linearGradient><rect x="0" y="0" width="${W}" height="700" fill="url(#b4up)"/>`;
+  // the forty jets gather into ONE cloud rolling out over the computer's top, lit warm from below by the blaze, its
+  // crown melting into the high hall's light under the words
+  s += G(rollCloud(tl[0] + w / 2, tl[1] - 26, w * 0.98, 230), 'mask="url(#cloudfade)"');
   s += caption([{t: '40', x: 470, y: 500, lit: true, size: 250}, {t: 'kettles,', x: 760, y: 572, size: 112}]);
-  const jetDefs = `<linearGradient id="jetg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset="0.45" stop-color="#d8d8d8"/><stop offset="1" stop-color="#000000"/></linearGradient><mask id="jetfade" maskContentUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" fill="url(#jetg)"/></mask>`;
+  const jetDefs = `<linearGradient id="cfg" gradientUnits="userSpaceOnUse" x1="0" y1="505" x2="0" y2="615"><stop offset="0" stop-color="#000000"/><stop offset="1" stop-color="#ffffff"/></linearGradient><mask id="cloudfade" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><rect x="0" y="0" width="${W}" height="${H}" fill="url(#cfg)"/></mask>` + `<linearGradient id="jetg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset="0.45" stop-color="#d8d8d8"/><stop offset="1" stop-color="#000000"/></linearGradient><mask id="jetfade" maskContentUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" fill="url(#jetg)"/></mask>`;
   return svgPage(s, jetDefs);
 };
 

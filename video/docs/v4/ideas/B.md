@@ -31,7 +31,8 @@ night shows through its line walls.
 **The thread's journey (the heat):**
 1. Born in the giant computers: their backs go honey-hot.
 2. Measured: one cabinet opens on forty boiling kettles.
-3. Thrown out the wrong way: roof fans blow it up into the snowing night, where it lifts the snowflakes and is gone.
+3. Thrown out the wrong way: the hall's big fans breathe it out over the snow, which melts into a patch that leads
+   nowhere; only a fox gets it (B6alt, the pick; B6's roof fan blowing it up into the night is kept on the sheet).
 4. Wanted: the city's own warm line races to the edge of the empty lot and stops, reaching for the plume across the ice.
 5. Drawn in: a pencil hall and a dashed pencil pipe across the gap, with a 2027 tag.
 6. Carried: a drawn door opens; inside, cool water runs in and honey water runs out.
@@ -41,10 +42,10 @@ night shows through its line walls.
 **The arc of feeling:**
 - Curiosity: a cozy snowy quay lit by an odd building made of computer lights.
 - Awe: a cathedral of giant computers.
-- Warm, a touch of alarm: the heat pouring off them.
-- Playful astonishment: forty kettles inside one.
+- Too hot, a touch of alarm: their backs glowing like an oven, the far aisle shimmering, her fanning herself.
+- Playful astonishment: one opens on forty kettles, blazing, and she steps back.
 - A smile: one cup of tea raised to them.
-- A pang: warmth blown into the night, the snow falling upward.
+- A pang with a wry smile: the warmth blown out over the snow, and only a fox gets it.
 - A spark of delight: the city's warm line racing to the gap.
 - Hope: the missing piece drawn in pale pencil.
 - Leaning in: a drawn door opening on warm light.
@@ -53,8 +54,8 @@ night shows through its line walls.
 - A wink: your chat, and her toast from the warm window. Back to frame 0.
 
 **One cast:** the one person near the camera is her, a young woman who tends the machines on the night shift and lives in
-the old house at the quay. She walks home in B1, works in the hall in B2-B6 (small in B2, B3 and B6, beside the open
-computer in B4, only her hand and her mug in B5), reaches toward the plume in B7, stands by the plan in B8, leans in at
+the old house at the quay. She walks home in B1, works in the hall in B2-B5 (small in B2, near us in B3, stepping back
+from the open computer in B4, only her hand and her mug in B5; the fox has B6alt to itself), reaches toward the plume in B7, stands by the plan in B8, leans in at
 the drawn door in B9, turns its valve in B10, and is in her warm window in B11-B12. Her mug (dark, a pale band) is the
 toast in B5 and comes back raised in her window in B12: the wink. The city's people lean out of their windows in B7
 (and B7alt). The one "you" is POV only: your gloved hand and phone in B12. Pip (hidden, for G3) could be on the
@@ -70,7 +71,7 @@ The machine's inside (B2-B5, B9-B10) is always reached through a door, so the sn
 - B1 and B12 show the wish, under the voice's "wants" and "could soon".
 - B7-B8 show the lot empty, then a drawing with a year on it.
 - B9-B10 show how it WOULD work, inside pencil walls.
-- B2-B6 are data centers in general. Their roof fans are the usual way to throw the heat out.
+- B2-B6 are data centers in general. Their big fans are the usual way to throw the heat out.
 - One cabinet = forty kettles (FL 2.2).
 - The heat goes into a radiator, never a tap.
 - No company name or logo anywhere. The plan's site is a generic empty lot, never a real one.
@@ -107,25 +108,29 @@ light, the eye, the library devices it already uses, and the words.
 - Card: awe; a cool, even light, a long tunnel of value. Eye: the far door, then her. Devices: B2 one point, D2 scale,
   D7 repetition, E7 the closed vista. Words: "giant computers," / "data centers."
 
-**B-B3 · Too hot for snow** (8.76-10.64) "Those computers get really hot."
-- Sees: the hot aisle behind the machines: both walls of grilles glow, deep amber near us, white-hot where the aisle
-  meets, and a warm shimmer lifts off them to the vents. She stands in the middle facing us, coat open, her beanie
-  pulled off in one hand, the other at her collar, her hair lifting in the hot draught; flakes blown in behind us shrink
-  and turn to drops before they reach the machines.
-- Gets: they make heat, a lot. Feels: warm, a touch of alarm.
+**B-B3 · Too hot for snow** (8.76-10.64) "Those computers get really hot." (adjusted in rounds 1 and 2)
+- Sees: the hot aisle behind the machines: both walls are their backs, dark faces whose grille slits glow like an
+  oven's, deep honey near us to white-hot where the aisle meets; the glow spills along the dark floor and onto her, and
+  far down the aisle the air bends (the far machines' edges shiver against the white heat). She stands near us in the
+  middle, facing us, her coat flung open (its lining lit warm), one hand holding its edge out, the other fanning her face
+  with her beanie, her hair lifting in the hot draught; flakes blown in behind us shrink and turn to drops before they
+  reach the machines.
+- Gets: they make heat, a lot. Feels: too hot, a touch of alarm.
 - Hands on: she turns to one computer's front door (B4).
-- Card: heat rising; the warmest frame of the film. Eye: her, between the glowing walls. Devices: B4 tunnel, E1 the
-  figure where the lines meet. Words: "really / hot." (R4, "hot" lit).
+- Card: too hot; an oven's light in a dark aisle. Eye: her against the white-hot core, then the glowing walls. Devices:
+  B4 tunnel, E1 the figure where the lines meet. Words: "really / hot." (R4, "hot" lit).
 
 **B-B4 · Forty kettles in one** (10.96-17.34) "To put it into perspective, just one of these computers makes as much heat
 as FORTY kettles, boiling non-stop."
-- Sees: close and low, one giant computer, its perforated door swung wide toward us. Inside, where its trays should be,
-  stand forty electric kettles in eight rows of five, their water gauges glowing, all boiling, a plume from every spout
-  rising up its front into one cloud rolling out over its top. The kettle wall stands twice her height; she steps back,
-  a hand up. On "To put it into perspective," the door swings; on "FORTY" the kettles are counted on, row by row.
+- Sees: close and low, one giant computer, its perforated door swung wide toward us, its inside blazing honey with the
+  boiling. Where its trays should be stand forty electric kettles in eight rows of five, catching that light, their
+  water gauges glowing, all boiling: a jet of steam curls up off every spout, and the forty gather into one cloud
+  rolling out over its top, lit warm from below. The row around it and the floor stay cool. The kettle wall stands twice
+  her height; she steps back, both hands up, her face tipped up to the top of the wall. On "To put it into
+  perspective," the door swings; on "FORTY" the kettles are counted on, row by row.
 - Gets: one computer = forty boiling kettles. Feels: playful astonishment.
 - Hands on: the steam rolls down to her one mug (B5).
-- Card: astonishment; the cabinet a lit, steaming opening in a dark row. Eye: the kettle wall, then her. Devices: C1
+- Card: astonishment; the cabinet the blazing opening in a cool dark row. Eye: the kettle wall, then her. Devices: C1
   frame in a frame, D7 "how many", D2 her scale. Words: "40" (R3) / "kettles," then "boiling non-stop."
 
 **B-B5 · One cup** (17.76-18.84) "That's a lot of tea." (reworked in round 1)
@@ -133,11 +138,13 @@ as FORTY kettles, boiling non-stop."
   behind, their steam rolling up into one cloud. In front, her hand comes in from the right and raises ONE big mug to
   them, tilted a little: cheers. Her mug: dark, a pale band, warm tea, its tag hanging.
 - Gets: forty kettles' worth, one cup. Feels: a smile and a breath.
-- Hands on: the kettles' cloud rises out of the top of the frame, up through the roof (B6). Her mug comes back in B12.
+- Hands on: the kettles' cloud rises out of the top of the frame, and the hall's fans breathe it out into the night
+  (B6alt). Her mug comes back in B12.
 - Card: a smile; light and airy, the mug the one dark crisp shape. Eye: the mug, then the many kettles. Devices: D7
   with its ONE break (the mug), N9 isolation. Words: "That's a lot / of tea."
 
 **B-B6 · Snow falling up** (19.26-22.88) "Normally, data centers just use big fans to blow that heat outside."
+(Round 2: B6alt, "Only the fox gets it", is the pick for this beat; B6 stays on the sheet as drawn.)
 - Sees: on the hall's roof at night, one big fan near us (a ribbed drum, dark blades turning, its guard grille, the
   hall's warm light coming up between the blades) blows the warm air straight up into a big dark sky, where it thins to
   nothing. Inside that warm column the snow rises, little bright stars lifted back UP; everywhere else it falls. She
@@ -224,7 +231,7 @@ in pipes."
   wall of forty steaming kettles.
 - Why: the cleanest read in 1.08 s (N9 isolation, D7's one break). It trades her charm for that clarity.
 
-**B-B6alt · Only the fox gets it** (for B6; reworked in round 1)
+**B-B6alt · Only the fox gets it** (for B6; reworked in round 1; THE PICK for this beat from round 2)
 - Sees: at night, the long blank wall of a data center: its big fans breathe the hall's warmth straight out over the
   snow, which melts into a dark wet patch of earth and puddles that leads nowhere, steaming into the cold. Asleep in the
   middle of it, curled tight with its tail over its nose, a fox: the only one who gets the warmth. Far across the empty
@@ -232,6 +239,7 @@ in pipes."
 - Why: the waste made concrete and a little funny: the heat writes its own route (the melt) and it goes nowhere. It
   names the fans close up, as B6 does from the roof, and the fox sets up B7's turn (only a fox gets it; Helsinki wants
   it). It trades B6's "snow falling up" for a wry smile inside the pang.
+- Hands on: the plain cut on "But" to the quay, where the city's own warm line races to the gap (B7).
 
 **B-B7alt · The city leans out** (for B7)
 - Sees: a Jugendstil facade front-on, window after window flung open, its people leaning out on their sills (bodies
@@ -369,8 +377,27 @@ one-point aisle; the window people in B7-B8 are small at phone size; B5's hand r
 
 ## Round 2 changes (THE FRAME LOOP, from `B_EVAL_r2.md`)
 
-(in progress) Kept exactly as judged (THERE): B1, B2, B5, B7, B8, B9, B10, B11, B12, B6alt, B7alt, B12alt (their
-polish notes go to the key frames).
-- B6 (ALMOST, "B6alt is the stronger frame; if it is taken, B6 needs no further round"): taken. B6alt is the pick for
-  this beat; B6 stays on the sheet as drawn, its last round not spent.
-- B5alt (ALMOST, "not needed: B5's toast does the same with a person in it"): B5 stays the pick; B5alt kept as drawn.
+Kept exactly as judged (THERE, renders byte-identical): B1, B2, B5, B7-B12, B6alt, B7alt, B12alt; their polish notes go
+to the key frames. Rebuilt: B3 and B4 only, with new tools appended to `B_src/lib.js` (nothing existing changed).
+- B3 "heat OUT of the machines": the walls are their dark backs, grille slits glowing honey near us to white-hot at the
+  core; the glow pools on a dark floor along both walls and rims her.
+- B3 "her nearer, fanning herself with the beanie, coat flung open": she stands near (2.4x her old height), coat flung
+  wide with one hand, fanning her face with the beanie in the other (a ghost of the last stroke, the swept air).
+- B3 "let the air bend": a heat haze that grows with distance makes the far machines' edges, slits and vents shiver
+  against the white-hot core; the faint squiggles are gone.
+- B4 "the kettle wall the blazing opening, the row and floor kept cool": the inside glows honey, white at its heart, the
+  kettles catching it; a bloom only at the opening; the door, the row and the floor unchanged.
+- B4 "forty jets into one cloud, the bodies crisp": a thin jet curls up off every spout in the gaps between kettles;
+  they gather into one cloud of billows rolling over the top, lit warm from below, melting into the hall's light.
+- B4 "a step back, both hands up, face tipped up": she recoils onto her back foot, both open hands up in the clear air
+  above the next cabinet, face tipped up to the top of the wall, clear of the app's right rail.
+- B6 "take B6alt; then B6 needs no further round": taken; B6alt is the pick (the thread, arc and cast above now go
+  through the fox); B6 stays on the sheet as drawn.
+- B5alt "not needed": B5 stays the pick; B5alt kept as drawn.
+- Board read "the first half rises once, then flattens to the turn": mended at the source by a too-hot B3, a blazing
+  B4 and the fox.
+
+**My look at the new sheet** (phone size, in order, B6alt in B6's place): curious > cold awe > really hot >
+astonished > a smile and a breath > a wry pang > the turn > hope > leaning in > "oh" > cozy > a wink; the first half
+now climbs cold, hot, blazing, then breathes. For the key frames: B5's kettles (kept as drawn) are pale through the steam while
+B4's now glow honey, so B5's key frame carries B4's warm light into its close-up.

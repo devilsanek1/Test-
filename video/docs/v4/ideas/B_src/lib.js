@@ -1304,7 +1304,7 @@ function herHot(x, y, h, o = {}) {
 // with open palms, her face tipped up to the top of the wall; the blaze's warm light on her front.
 function herRecoil(x, y, h, o = {}) {
   const {dir = -1, coat = V[2], coatL = V[3], hair = V[1], hairL = V[3], skin = V[8], hand = V[8], leg = V[1], boot = V[0],
-    scarf = V[8], rim = C.honeyL, lean = -7, tilt = 26, step = [-9, 4]} = o;
+    scarf = V[8], rim = C.honeyL, lean = -8, tilt = 32, step = [-11, 6]} = o;
   const u = h / 100, sx = (v) => x + v * u * dir, Y = (v) => y - v * u, pt = (a, b) => [sx(a), Y(b)];
   let back = '', body = '', front = '', hd = '';
   // legs: the back one planted far behind (the weight on it), the front one forward, its knee soft
@@ -1329,8 +1329,8 @@ function herRecoil(x, y, h, o = {}) {
     g += openHand(q[1], q[2], 7.4 * u, i === 0 ? mixHex(hand, V[0], 0.35) : hand, {spread: 1.1, thumbSide: i === 0 ? -dir : dir});
     return g;
   };
-  back += arm(0, 152, 4);
-  front += arm(1, 128, 26);
+  back += arm(0, 118, 40);
+  front += arm(1, 100, 55);
   // the scarf (side)
   const sc = P(smoothD([pt(-4.6, 80.6), pt(4.4, 81), pt(4.8, 86), pt(-4.2, 86.4)], true), scarf) + P(smoothD([pt(-3.4, 81), pt(-7.4, 71.6), pt(-5.4, 70.6), pt(-1.6, 80)], true), scarf);
   // the head, tipped up: the face open (eye wide, mouth an "o"), the bob swinging back
@@ -1378,18 +1378,31 @@ function steamJet(x, y, L, o = {}) {
   return limb(pts, ws, col, `opacity="${f1(op)}" filter="url(#b1)" mask="url(#jetfade)"`);
 }
 
-// the rolling cloud over the boiling computer: one mass of crisp-edged lobes, lit warm from below by the blaze
+// the rolling cloud over the boiling computer: ONE mass of billows (each lit on top, cool in its folds below, lumpy at
+// its edge like a cauliflower), a big one rising into the hall's light, one rolling over the edge toward her, small
+// curls tipping over the front; the blaze's warm light on its underside. (cx, by) = the base's centre on the computer's
+// top; w = the base's width; h = the height it billows to
 function rollCloud(cx, by, w, h, o = {}) {
-  const {col = '#f5f6f8', shade = V[12], warm = C.honeyL} = o;
+  const {col = '#f7f8f9', shade = V[12], deep = V[11], warm = C.honeyL} = o;
+  // back (high) to front (low): each later billow overlaps the one before, its shaded underside making the fold
+  const bil = [[-0.05, 0.8, 0.2], [-0.2, 0.52, 0.32], [0.2, 0.22, 0.24], [0.42, 0.3, 0.14], [-0.4, 0.2, 0.2], [0.44, 0.15, 0.19], [0.04, 0.16, 0.26]];
   let g = '';
-  const lobes = [];
-  for (let i = 0; i < 7; i++) lobes.push([cx + (i - 3) * w * 0.15 + rr(-8, 8), by - rr(10, 40), w * rr(0.12, 0.16)]);
-  for (let i = 0; i < 6; i++) lobes.push([cx + (i - 2.5) * w * 0.15 + rr(-10, 10), by - h * 0.32 - rr(0, 30), w * rr(0.13, 0.17)]);
-  for (let i = 0; i < 5; i++) lobes.push([cx + (i - 2) * w * 0.16 + rr(-12, 12), by - h * 0.62 - rr(0, 30), w * rr(0.12, 0.16)]);
-  for (let i = 0; i < 3; i++) lobes.push([cx + (i - 1) * w * 0.2 + rr(-12, 12), by - h * 0.9 - rr(0, 20), w * rr(0.11, 0.15)]);
-  // the shaded underside first, then the lit lobes, then the warm glow from the blaze on the lowest ones
-  for (const [lx, ly, r] of lobes) g += P(blobD(lx + r * 0.12, ly + r * 0.14, r, r * 0.82, 9, 0.1), shade, 'opacity="0.55" filter="url(#b2)"');
-  for (const [lx, ly, r] of lobes) g += P(blobD(lx, ly, r * 0.94, r * 0.76, 9, 0.1), col, 'opacity="0.97" filter="url(#b1)"');
-  for (const [lx, ly, r] of lobes.slice(0, 7)) g += P(blobD(lx, ly + r * 0.38, r * 0.8, r * 0.36, 8, 0.12), warm, 'opacity="0.55" filter="url(#b4)"');
+  bil.forEach(([kx, ky, kr], i) => {
+    const x = cx + kx * w, y = by - ky * h, r = kr * w;
+    let sh = P(blobD(x, y, r, r * 0.84, 10, 0.08), shade);
+    let lt = P(blobD(x - r * 0.1, y - r * 0.16, r * 0.84, r * 0.66, 10, 0.08), col);
+    for (let j = 0; j < 6; j++) {
+      const a = Math.PI * (1.05 + j * 0.18), br = r * (0.28 + 0.12 * Math.sin(i * 2.3 + j * 1.9) ** 2);
+      const bx = x + Math.cos(a) * r * 0.84, byy = y + Math.sin(a) * r * 0.7;
+      sh += P(blobD(bx, byy, br, br * 0.86, 8, 0.1), shade);
+      lt += P(blobD(bx - br * 0.12, byy - br * 0.16, br * 0.8, br * 0.66, 8, 0.1), col);
+    }
+    g += G(sh, 'filter="url(#b1)"') + G(lt, 'filter="url(#b4)"');
+    g += P(blobD(x + r * 0.15, y + r * 0.62, r * 0.7, r * 0.2, 8, 0.1), deep, 'opacity="0.55" filter="url(#b4)"');
+  });
+  // curls tipping over the front edge, and the blaze's warm light on the underside
+  for (const [kx, kr] of [[-0.47, 0.065], [0.49, 0.06], [-0.12, 0.05]]) g += P(blobD(cx + kx * w, by + w * 0.02, w * kr, w * kr * 0.8, 8, 0.1), col, 'filter="url(#b1)"');
+  g += P(blobD(cx, by - 0.05 * h, w * 0.5, h * 0.12, 9, 0.12), warm, 'opacity="0.75" filter="url(#b8)"');
+  for (const [kx, kr] of [[-0.47, 0.065], [0.49, 0.06], [-0.12, 0.05]]) g += P(blobD(cx + kx * w, by + w * 0.035, w * kr, w * kr * 0.45, 8, 0.1), warm, 'opacity="0.6" filter="url(#b4)"');
   return G(g);
 }
