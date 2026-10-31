@@ -1,0 +1,60 @@
+{
+  "_doc": "The type guide's numbers in one place (docs/look/TYPE_GUIDE.md, PICKED 2026-10-30; docs/look/type/PLEASANT.md; docs/look/LAYOUT.md section 1). Read by src/lib/captions2 (the drawing: tones, halo, glow, motion) and by scripts/captions2/build_captions.py (the recipes: sizes, rows, seats; the checks). Px at 1080 x 1920, y down; times at 60 fps. Change a number here, never in the code; the guide wins over this file.",
+  "family": "Gaegu",
+  "fonts": {"300": "fonts/Gaegu-300.woff2", "400": "fonts/Gaegu-400.woff2", "700": "fonts/Gaegu-700.woff2"},
+  "fps": 60,
+  "lead": 2,
+  "_lead": "a word pops this many frames (at fps) before its start: text a hair ahead of the sound reads as in sync (guide header)",
+  "seats": {"L": 440, "C": 520, "R": 600},
+  "step": {"default": 100, "min": 80, "max": 140, "_": "a two-line group's second line starts this far right of the first (R1: 80-140; tightened only when the frame forces it)"},
+  "frame": {"x0": 96, "x1": 944, "x1Low": 860, "yLow": 840, "y0": 290, "y1": 1250, "bandFloor": 585, "_": "the type frame (guide c): all ink inside; x 96-860 below y 840; ink in the band stays at y <= 585"},
+  "ads": {"x0": 120, "x1": 888, "y0": 288, "y1": 1248, "x1Low": 780, "yLow": 840},
+  "line": {"prefer": 760, "max": 830},
+  "group": {"minWords": 2, "maxWords": 4, "maxWordsLockup": 5, "maxOnScreen": 7, "minSec": 0.8, "maxCps": 20, "builtMinSec": 0.35, "hold": 36, "rowGap": 20},
+  "tones": {
+    "dark": {
+      "_": "dusk and night skies (video 4's whole film): warm white running words with the dark halo; the lit hand in the windows' honey light with the golden glow over a thin dark halo",
+      "ink": "#FFF0DE", "weight": 300, "lit": "#FFD58C",
+      "halo": [{"color": "#141A3A", "a": 0.40, "r": 0.22}, {"color": "#141A3A", "a": 0.25, "r": 0.06}],
+      "glow": {"color": "#FFB85C", "a": 0.42, "r": 0.34, "dilate": 0.04, "under": {"color": "#141A3A", "a": 0.30, "r": 0.06}}
+    },
+    "light": {
+      "_": "day and light dusk skies: deep plum ink, no halo unless the field varies (haloOnLight); the lit hand keeps the plum with the gentle warm halo",
+      "ink": "#3A2B48", "weight": 400, "lit": "#3A2B48",
+      "halo": [{"color": "#FFFFFF", "a": 0.30, "r": 0.22}],
+      "glow": {"color": "#FFD6A0", "a": 0.95, "r": 0.34, "dilate": 0.04}
+    }
+  },
+  "styles": {
+    "_": "size px, weight (null = the tone's running weight: 300 dark, 400 light), track em, lit (the lit hand: the tone's accent with its glow, and the bloom), tuck (a number's comma: [gap after the figures, gap after the comma] in em, ink to ink)",
+    "hand": {"size": 116, "weight": null, "track": 0.02, "lit": false},
+    "hook": {"size": 136, "weight": null, "track": 0.02, "lit": false},
+    "phrase": {"size": 150, "weight": null, "track": 0.02, "lit": false},
+    "phraseBig": {"size": 190, "weight": null, "track": 0.02, "lit": false},
+    "landing": {"size": {"light": 160, "dark": 156}, "weight": 700, "track": 0.02, "lit": true},
+    "lift": {"size": 116, "weight": 700, "track": 0.02, "lit": true},
+    "number": {"size": 250, "weight": 700, "track": -0.02, "lit": true, "tuck": [0.02, 0.05]},
+    "world": {"size": null, "weight": 700, "track": 0, "lit": false, "ink": "#3A2B48", "fitPad": 44},
+    "title": {"size": 112, "weight": null, "track": 0.02, "lit": false},
+    "titleKey": {"size": 200, "weight": 700, "track": 0.02, "lit": true}
+  },
+  "motion": {
+    "_": "frames at 60 fps (guide d). pop: 1 frame, none. soft pop (calm beats): opacity over 3, scale 0.98 -> 1 over 6, ease-out cubic. bloom (the lit hand): the glow 0 -> full and the swell 0.96 -> 1 over 8, ease-out cubic (the stills' 1 - (1 - f/8)^3: 2 of 8 frames = 58 %), about the word's baseline centre. soft out (a sentence end before a pause >= 0.4 s): opacity over 3, ease-in.",
+    "softPop": {"opacityFrames": 3, "scaleFrames": 6, "from": 0.98},
+    "bloom": {"frames": 8, "from": 0.96},
+    "softOut": {"frames": 3, "minPause": 0.4}
+  },
+  "recipes": {
+    "_": "rows: baseline, place (anchor start / end / middle at x, or the group's seat), style; a seat recipe sets 1 row at 455 or 2 at its pair. The builder writes every group's rows resolved from here.",
+    "R1": {"name": "the everyday caption", "style": "hand", "place": "seat", "one": [455], "two": [395, 515]},
+    "R2": {"name": "the hook at frame 0", "style": "hook", "place": "seat", "one": [455], "two": [395, 525], "firstRows": [{"x": 120, "anchor": "start"}, {"x": 400, "anchor": "start"}]},
+    "R3": {"name": "the big number", "rows": [{"baseline": 482, "x": 466, "anchor": "middle", "style": "number"}, {"baseline": 578, "x": 930, "anchor": "end", "style": "hand"}]},
+    "R4": {"name": "the landing word", "stress": "landing", "rows": [{"baseline": 362, "x": 130, "anchor": "start", "style": "hand"}, {"baseline": 482, "x": 236, "anchor": "start", "style": "landing"}, {"baseline": 578, "x": 920, "anchor": "end", "style": "hand"}]},
+    "R5": {"name": "the stressed word (the quiet lift)", "style": "hand", "place": "seat", "one": [455], "two": [395, 515], "stress": "lift"},
+    "R6": {"name": "the phrase lettered into the open space", "rows": [{"baseline": 400, "x": 110, "anchor": "start", "style": "phrase"}, {"baseline": 570, "x": 890, "anchor": "end", "style": "phrase", "last": "phraseBig", "lastGap": 0.48}]},
+    "R7": {"name": "the word placed in the world", "style": "world"},
+    "R8": {"name": "through the big move", "style": "hand", "place": "seat", "seat": "C", "one": [455], "two": [395, 515]},
+    "R9": {"name": "the payoff line", "stress": "landing", "rows": [{"baseline": 390, "x": 110, "anchor": "start", "style": "hand"}, {"baseline": 545, "x": 120, "anchor": "start", "style": "hand", "keyGap": 40}], "last": {"style": "hook", "place": "seat", "seat": "C", "two": [395, 525], "hold": 36}},
+    "R10": {"name": "the cover title", "rows": [{"baseline": 365, "x": 110}, {"baseline": 530, "x": 180, "keyGap": 36}, {"baseline": 628, "x": 130}, {"baseline": 737, "x": 290}], "style": "title", "key": "titleKey"}
+  }
+}

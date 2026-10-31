@@ -15,6 +15,16 @@ Prints one line per frame and a summary; exit code 1 if any frame failed.
 
   python3 scripts/capcheck.py list.txt [--scale=0.5] [--thresh=0.05] [--quiet] [--viz=dir]
   --viz writes the band of each frame with failing background pixels painted magenta (pale: band only).
+
+PER WORD (--words; src/lib/captions2, docs/look/TYPE_GUIDE.md section f.3: every word >= 4.5:1): the mask is the
+captions2 mask ({"capcheck": "mask"}: each piece drawn in rgb(255, id x 8, tone code x 40); the codes: 1 warm white
+#FFF0DE, 2 honey #FFD58C, 3-5 plum #3A2B48; only fully covered pixels, R 255, are decoded) and the list's frame must be
+the BARE render ({"capcheck": "bg"}, the words hidden); each word's colour
+is measured against the bare frame's pixels 2-20 px from its own glyphs (scripts/type/check_stills.py's ring), reported as
+the 5th percentile and the share under --min (default 4.5); a word FAILS when more than --thresh of its ring is under.
+scripts/captions2/render_test.mjs --capcheck writes such a list.
+  python3 scripts/capcheck.py list.txt --words [--min=4.5] [--thresh=0.05] [--captions=public/v4/captions2.json]
+  --captions names each word (the caption file the frames were rendered from).
 """
 import sys
 
@@ -86,12 +96,107 @@ def check(frame_path, mask_path, scale, viz=None):
     return fn, fb, tones
 
 
+# captions2 masks (src/lib/captions2/Captions2.tsx CAPTIONS2_MASK): R 255, G the piece id, B the tone code
+WORD_COLOURS = {1: (0xFF, 0xF0, 0xDE), 2: (0xFF, 0xD5, 0x8C), 3: (0x3A, 0x2B, 0x48), 4: (0x3A, 0x2B, 0x48), 5: (0x3A, 0x2B, 0x48)}
+WORD_KIND = {1: 'running', 2: 'lit', 3: 'running', 4: 'lit', 5: 'world'}
+
+
+def caption_words(captions, sec):
+    """The pieces of the group on screen at `sec` (in the component's id order), or None."""
+    if not captions:
+        return None
+    fps = captions.get('fps', 60)
+    fr = int(round(sec * fps))
+    for g in captions['groups']:
+        if int(round(g['start'] * fps)) <= fr < int(round(g['end'] * fps)):
+            return [p['t'] for r in g['rows'] for p in r['pieces']]
+    return None
+
+
+def check_words(frame_path, mask_path, need, thresh, names=None):
+    """Per word: (id, text, kind, colour, p5, share under `need`) against the bare frame's pixels 2-20 px from its glyphs."""
+    f = np.asarray(Image.open(frame_path).convert('RGB')).astype(np.float64)
+    m = np.asarray(Image.open(mask_path).convert('RGB')).astype(np.int16)
+    h, w = f.shape[:2]
+    if m.shape[:2] != (h, w):
+        m = np.asarray(Image.open(mask_path).convert('RGB').resize((w, h), Image.NEAREST)).astype(np.int16)
+    R, G, B = m[..., 0], m[..., 1], m[..., 2]
+    ids = np.rint(G / 8.0).astype(np.int16)
+    codes = np.rint(B / 40.0).astype(np.int16)
+    solid = (R == 255) & (ids >= 1) & (ids <= 31) & (codes >= 1) & (codes <= 5)
+    out = []
+    for wid in sorted(set(ids[solid].tolist())):
+        core = solid & (ids == wid)
+        code = int(np.bincount(codes[core].ravel()).argmax())
+        ys, xs = np.nonzero(core)
+        y0, y1, x0, x1 = max(0, ys.min() - 24), min(h, ys.max() + 25), max(0, xs.min() - 24), min(w, xs.max() + 25)
+        mk = core[y0:y1, x0:x1]
+        ring = ndimage.binary_dilation(mk, iterations=20) & ~ndimage.binary_dilation(mk, iterations=3)
+        px = f[y0:y1, x0:x1][ring]
+        lt = lum1(WORD_COLOURS[code])
+        lb = lum(px)
+        cr = (np.maximum(lt, lb) + 0.05) / (np.minimum(lt, lb) + 0.05)
+        p5 = float(np.percentile(cr, 5)) if len(cr) else float('nan')
+        under = float((cr < need).mean()) if len(cr) else 0.0
+        text = names[wid - 1] if names and 0 < wid <= len(names) else f'id {wid}'
+        out.append((wid, text, WORD_KIND[code], '#%02X%02X%02X' % WORD_COLOURS[code], p5, under, (int(xs.min()), int(xs.max()), int(ys.min()), int(ys.max()))))
+    return out
+
+
+def is_captions2_list(list_path):
+    """True when the list's first mask with glyphs is a captions2 mask (exact rgb(255, 8k, 40c) codes; the old
+    SkyCaptions mask is pure #FF0000 / #00FF00 / #0000FF)."""
+    for line in open(list_path):
+        parts = line.split()
+        if len(parts) < 4:
+            continue
+        m = np.asarray(Image.open(parts[3]).convert('RGB')).astype(np.int16)
+        full = m[..., 0] == 255
+        if not full.any():
+            continue
+        G, B = m[..., 1][full], m[..., 2][full]
+        coded = (G > 0) & (G % 8 == 0) & (G <= 248) & (B > 0) & (B % 40 == 0) & (B <= 200)
+        return bool(coded.mean() > 0.5)
+    return False
+
+
+def main_words(args, opt):
+    need = float(opt.get('min', 4.5))
+    thresh = float(opt.get('thresh', 0.05))
+    quiet = 'quiet' in opt
+    captions = None
+    if 'captions' in opt:
+        import json
+        captions = json.load(open(opt['captions']))
+    fails, n = [], 0
+    for line in open(args[0]):
+        parts = line.split()
+        if len(parts) < 4:
+            continue
+        sec, fr, fp, mp = float(parts[0]), parts[1], parts[2], parts[3]
+        for wid, text, kind, col, p5, under, box in check_words(fp, mp, need, thresh, caption_words(captions, sec)):
+            n += 1
+            tag = 'FAIL' if under > thresh else 'ok'
+            if tag == 'FAIL':
+                fails.append(f'{sec:.2f}s "{text}"')
+            if not quiet or tag != 'ok':
+                print(f'[capcheck] {sec:7.3f}s f{fr:>5} {tag:4}  "{text}" ({kind} {col})  p5 {p5:4.1f}:1  under {need}:1 {under * 100:5.1f}%  ink x {box[0]}-{box[1]} y {box[2]}-{box[3]}')
+    print(f'[capcheck] {n} words: {len(fails)} FAIL (more than {thresh * 100:.0f}% of the ring 2-20 px from the glyphs under {need}:1)'
+          + (f'  FAIL: {", ".join(fails)}' if fails else ''))
+    sys.exit(1 if fails else 0)
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
     opt = dict(a[2:].split('=', 1) if '=' in a else (a[2:], '1') for a in sys.argv[1:] if a.startswith('--'))
     if not args:
         print(__doc__)
         sys.exit(2)
+    if 'words' in opt:
+        return main_words(args, opt)
+    if is_captions2_list(args[0]):
+        print('[capcheck] a captions2 mask (src/lib/captions2): checking every word at 4.5:1 (--words)')
+        return main_words(args, opt)
     scale = float(opt['scale']) if 'scale' in opt else None
     thresh = float(opt.get('thresh', 0.05))
     quiet = 'quiet' in opt

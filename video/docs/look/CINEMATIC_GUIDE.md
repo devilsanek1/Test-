@@ -1,11 +1,13 @@
-# CINEMATIC_GUIDE: Arcane environment shots as small upgrades to v1
+# CINEMATIC_GUIDE: Arcane environment shots (shot recipes and camera moves)
 
 ## Why
 The owner (2026-10-26): from Arcane we take only environments, buildings and bigger shots, with no close-ups, people or
 faces. Start simple, with a few high-confidence references that fit our flat ink style naturally.
-v1 (`deliverables/v1/php2shell_final.mp4`) is the baseline for composition and camera only; the look (the clean pen by
-tier, one light rig per set, warm palettes) is `DIRECTION.md` and `CRAFT.md`, which win where this guide differs. Each
-shot type below is ONE targeted upgrade of a v1 shot (a better move, light or composition).
+The look (the clean pen by tier, one light rig per set, warm palettes) is `DIRECTION.md` and `CRAFT.md`, which win where
+this guide differs. Each shot type below is ONE recipe (a move, a light or a composition): a tool to invent a frame with,
+never a frame to copy. Its "Upgrades v1 @..." line is history (the past shot it was first written against), never a
+shot to look at or remake (owner, 2026-10-30: "don't reference video 1 - i think this would put agents in a box
+again").
 
 Notation: frame 1080 x 1920, H = 1920 px; the screen zones (the caption band and block, the read zone, the platform UI)
 and each shot type's framing numbers in one table: `LAYOUT.md` (it wins on where things sit, this guide on the moves).
@@ -229,10 +231,10 @@ quota. Breathers (S3, S4) take theirs from the sky (9-10).
 hero cloud behind it | 3 tiers of life, never 1 s still. Then, at phone size: does the world keep going, and is it alive?
 
 ## Rules (all types)
-1. **One change per shot.** Each type changes ONE thing in a v1 shot (the move, the light or the composition). The
-   palette (`PALETTE.md`), small people (seen mostly from behind: `PEOPLE_DESIGN.md`) and the caption style stay as in
-   v1; the look is today's (`DIRECTION.md` rules 4-6: the clean pen with no outlines, edges from light and shade, ONE
-   painted language, the proper light), never v1's ink line.
+1. **One change per shot.** Each type brings ONE thing to a shot (the move, the light or the composition). The palette
+   (`PALETTE.md`), the people (`PEOPLE_DESIGN.md`) and the words on screen (`TYPE_GUIDE.md`) are the film's own; the look
+   is today's (`DIRECTION.md` rules 4-6: the clean pen with no outlines, edges from light and shade, ONE painted
+   language, the proper light).
 2. **Captions sit on one calm flat field.** The caption band (`LAYOUT.md` §1) stays one calm flat field in every frame,
    from the start to the end of a move: outdoors the one sky (`DIRECTION.md` rules 6, 10), a flat light wall or facade
    where there is none; no tower top, disc, cloud or roof in it (tops at y >= 600).

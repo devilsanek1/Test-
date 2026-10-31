@@ -172,26 +172,25 @@ shot `scale?: true` for a scale panel (the lint then wants its subject BIG: >= 6
 figure `pose?: 'stand'|'walk'|'point'|'reach'|'hold'|'shrug'|'slump'|'lookup'|'sit'`, `facing?: 'l'|'r'`,
 `face?: 'none'|'happy'|'sad'|'shock'|'worried'` (people stay `'none'`: no face marks on the board, §3); text `strike?: boolean`; a new element `{t: 'mark', kind: 'circle'|'arrow'|'underline'|'frame',
 …, word?}` on the red annotation layer (5 px; `frame` = a dashed end-frame box with corner arrows), with `in` and `out` like any other element.
-**To build (tier 1, `G3_ANIMATIC.md` §7; owner-approved 2026-10-27):** `tier?: 'A'|'B'|'C'` on every element (stroke and fill by story
-role, §2: it replaces `role` for the weight), `carrier` on every transition, `rig` per set panel, and the thread object's screen time.
-**Until `tier` lands, set `role` by TIER, never by depth:** A = `role: 'subject'` (9 px ink); B = `role: 'far'` with paper or no
+**Built (tier 1, `G3_ANIMATIC.md` §7; owner-approved 2026-10-27; built 2026-10-30 as the shared kit `src/lib/g3/`, schema
+`src/lib/g3/types.ts`, how-to `src/lib/g3/README.md`):** `tier: 'A'|'B'|'C'` on every element (stroke and fill by story
+role, §2: it replaces `role` for the weight), `device` + `carrier` on every transition, `rig` per set, `planes` + `vp`,
+the thread object's screen time, the dress layer, the ambient kit, the smear pose, the multi-key camera.
+**On v3's own kit (`src/v3/`, v3's data only), set `role` by TIER, never by depth:** A = `role: 'subject'` (9 px ink); B = `role: 'far'` with paper or no
 fill (its 3 px mid-grey line; a filled B shape adds `sw: 3`); C = `role: 'far'` with a light fill (drawn flat, no line). Never
 `'mid'` (a 5 px INK line, darker than B may be) and never the `f` default (it picks the role by depth).
-**`board-lint` runs before every render.** Built today (`scripts/v3/board_lint.py`), per shot: at most 25 elements (a WARN; over 30 an ERROR: split the panel); one subject group; at most 1 label and 1
+**`board-lint` runs before every render** (`scripts/g3/board_lint.py`, the shared lint; v3's data keeps `scripts/v3/board_lint.py`). The house rules, per shot: at most 25 elements (a WARN; over 30 an ERROR: split the panel); one subject group; at most 1 label and 1
 mark; text at least 48 px; fills from the palette only; nothing crossing y 290-600 except a `far` flat fill; the subject's box centred
 in x 380-700 and 270-460 px wide (a tall subject such as a standing figure is measured by its height, 300-650 px; a `scale` panel's
 subject at least 648 px or cut by both side edges); a bare year ("2005") counts as an axis word, not the number; the camera's zoom
-changing by at most 2x within a shot. NOT built yet (2026-10-27; the tier-1 lane before the next G3, `G3_ANIMATIC.md`
-§7): the tier-1 checks: dress-layer exemption, move
-five-values, speed WARN (~15 px/frame at the render rate, measured only over moves >= 2 frames, whip/carry shots
-exempt), the carrier check, the camera-plan cross-check (every plan row's move / transition device and carrier / tier
-map / rig / `life:` item exists in the board JSON), `life:` coverage, unaccounted emptiness (subject breathing ring and
-edge margins exempt; FAIL = >= 4 contiguous undeclared bare cells), zero-ambient FAIL on set panels, red-mark cases
-(1)/(3) FAIL on owner-facing renders, a tier per element and a rig per set panel; plus CRAFT's board-readable checks
-(`PIPELINE_V2.md` anti-waste rule 6: a carrier per join and at most 2 plain cuts, thread coverage, the mover budget, eye
-jump, colour shift). Boxes are measured on screen (clipped to the frame and the stage above the notes strip); a subject cut by a frame edge
+changing by at most 2x within a shot. The tier-1 checks are BUILT (2026-10-30) in the shared lint `scripts/g3/board_lint.py`
+(its docstring lists them): the dress-layer exemption, the move five-values, the speed WARN (~15 px/frame at the render
+rate, moves >= 2 frames, whip/carry joins exempt), the carrier check, the camera-plan cross-check, `life:` coverage,
+unaccounted emptiness (FAIL = >= 4 contiguous undeclared bare cells), zero-ambient FAIL on set panels, red-mark cases
+(1)/(3) FAIL on owner-facing renders, a tier per element and a rig, planes and vp per set panel, CRAFT's thread
+coverage and the mover budget (eye jump and colour shift are measured on the render: the craft tooling lane). Boxes are measured on screen (clipped to the frame and the stage above the notes strip); a subject cut by a frame edge
 (a waist-up figure) is measured by its visible width. Element moves take `ease` (default `inout`; `outSine` for a
-rise-over's ledge). The built checks: `scripts/v3/board_lint.py` (props and defaults: the header of `src/v3/SketchReel.tsx`);
+rise-over's ledge; `peak` = the move's fastest moment). The props and defaults: `src/lib/g3/types.ts` (v3's: the header of `src/v3/SketchReel.tsx`); a model board with every tier-1 delta, lint-clean: `scripts/g3/build_selftest.py`;
 a worked board with every pattern (home base as 1-element window, icon ticker, element reuse, two-layer rise-over):
 `scripts/v3/build_board_cine.py`.
 

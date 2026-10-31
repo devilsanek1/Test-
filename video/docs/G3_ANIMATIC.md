@@ -124,8 +124,8 @@ G5 adds no new motion — only colour, line, easing polish, secondary motion (`a
   the same size and on its ground line across a shot's poses unless the change is the idea.
 - **Ambient life**: every set panel carries 2-3 ambient micro-moves (`loop: true`: weather, a cloud, steam, a window
   lighting, a bird; at most one of them a periodic prop such as a swinging sign, `LIFE_AND_DENSITY.md` §6), placed and
-  scaled from a **shared kit of 3-5 presets** (cloud drift, steam, window-light switch, bird tick) — never authored fresh per panel (building
-  the kit is the `loop: true` item in §7). Zero ambient elements on a set panel is a lint FAIL (§2 freezes 2-3 as contract).
+  scaled from a **shared kit of 3-5 presets** (cloud drift, steam, window-light switch, bird tick) — never authored fresh per panel (built
+  2026-10-30: `src/lib/g3/ambient.tsx`, snow, steam, window lights, cloud, water in a pipe, birds). Zero ambient elements on a set panel is a lint FAIL (§2 freezes 2-3 as contract).
   They are supporting life at their tier and at FINAL size and speed (B near the story, C for weather and far life:
   `CRAFT.md` §b), so the mover budget (§2) shows on the board; they take turns (~0.6 entries/s), and none enters in the
   0.4 s around a cut (what already moves keeps its pace).
@@ -159,7 +159,7 @@ only as a declared exception for time passing (0.2-0.4 s, up to 1-2 s), named in
 | wipe (object-wipe) | the wiping element already exists in panel A, with its travel direction |
 | dissolve / dip / flash (a declared exception, never a carrier) | the relationship named ("time passes"); duration per the rule above |
 
-## 5. Build order and time budget (first full animatic ~3 h, ASSUMING §7 tier-1 tooling is built: not yet on 2026-10-27; rounds 30 min)
+## 5. Build order and time budget (first full animatic ~3 h, ASSUMING §7 tier-1 tooling is built: built 2026-10-30 as the shared kit `src/lib/g3/`; rounds 30 min)
 
 With script + voice locked (word timings = the clock), the through-line card approved with the script, the W1 world
 bible written and the visual script locked (G2.5, `PIPELINE_V2.md`; method `docs/v4/visual/METHOD.md`); per-step budgets sum to the ~3 h (was 2; the hour goes to tiers, carriers and the
@@ -230,9 +230,10 @@ contract column (cuts, framing, moves, transitions and carriers, the thread, tie
 **Already exists**: 7 transition types played; element moves + eases; one camera segment; 9 poses; draw-on/fillIn; notes
 strip; red marks; box/band/count/zoom lint; contact sheets; g5 scaffold; **`{t:'scribble'}` masses (built 2026-10-27,
 owner-approved texture)**. Scribble masses, flat mid-grey rects + figure rows cover the first reel's placeholders (§3). **Tier 1 is a ONE-TIME checkpointed tooling lane, landed before the next video's G3
-and outside the gate budget (not built yet on 2026-10-27: SketchReel, `board_lint.py` and `g5_scaffold.py` have no
-dress, loop, life, carrier, tier, rig or thread handling; who and when: `PIPELINE_V2.md` "Craft tooling lane"); the §5
-~3 h first cut assumes only tier 1 exists. Tier 2 is built lazily, the first time a
+and outside the gate budget (BUILT 2026-10-30 for video 4 as the SHARED kit: `src/lib/g3/` (the reel, its schema
+`types.ts`, the ambient kit) + `scripts/g3/board_lint.py` + `scripts/g3/g3kit.py`, how-to `src/lib/g3/README.md`, every
+row below but two, still to build: `g5_scaffold.py`'s carry-through and the eye-jump / colour-shift measures; who and
+when: `PIPELINE_V2.md` "Craft tooling lane"); the §5 ~3 h first cut assumes only tier 1 exists. Tier 2 is built lazily, the first time a
 reel needs it — never ahead of a reel.** Nobody builds tooling before drawing panels the existing kit can draw.
 
 | Tier 1 — required before the next G3 (all fix the v3 failure directly) | Where | Effort |
@@ -256,7 +257,7 @@ reel needs it — never ahead of a reel.** Nobody builds tooling before drawing 
 | Tier 2 — build when a reel first needs it | Where | Effort |
 |---|---|---|
 | `crowd-row` / `facade-row` / `window-ticks` / `foliage-blob` when a reel's density key demands them (`scribble-mass`: BUILT 2026-10-27, owner yes) | SketchReel | M |
-| `camera.keys?: Cam[]` (multi-key camera) + board-mode parallax behind `shot.parallax: true` | SketchReel | M |
+| `camera.keys?: Cam[]` (multi-key camera: BUILT 2026-10-30 with each segment's peak and pivot, video 4's moves having starts, peaks and landings) + board-mode parallax behind `shot.parallax: true` | SketchReel | M |
 | Per-device transition checks (§4 table), one device at a time, when a camera plan first uses it (a 10-12-shot reel uses 2-4 of the 8) | board_lint | S each |
 
 **Dropped**: the volume/contact lint (polices precision the owner waived; the cold read covers it, §4). **Line boil**:

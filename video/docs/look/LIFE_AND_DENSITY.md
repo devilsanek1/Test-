@@ -1,8 +1,7 @@
 # Life and density: every frame full and alive (generic, every video)
 
 **The owner's rule** (OWNER_PLAYBOOK, Visual style; v3 G5, 2026-10-26: "way too empty ... those feel a lot more alive"):
-every frame feels ALIVE at the level of reference 1 (France, `assets/ref/reference.mp4`) and v1 (PHP,
-`deliverables/v1/php2shell_final.mp4`): a dense, specific world, people near and far, layered depth, a recurring living
+every frame feels ALIVE at the level of reference 1 (France, `assets/ref/reference.mp4`): a dense, specific world, people near and far, layered depth, a recurring living
 character and ambient life that never stops. Feeling alive is the goal; the numbers are a warning signal, never a quota.
 A big empty field (nothing in it; a quiet field of colour patterned in value is right: §0, `CRAFT.md` §c), or an
 object alone on a blank wall, is a failure even in a draft. Full is never busy (owner, 2026-10-30, SCENE COMPOSITION:
@@ -42,7 +41,7 @@ scene needs. Every rule below works inside those tiers.
   - **A field MADE of things, never things ON a field:** the biggest single flat region <= 20 % of the frame apart from the
     quiet fields (C3 8-15 %, v3 G5 23-45 %).
   - **The paused frame at phone size beside the reference** (a cozy hold beside C3 or C2, a story-led shot beside
-    reference 1 and v1) reads as full as it does. The hole and field checks are not in density.py yet (the void, TO
+    reference 1) reads as full as it does. The hole and field checks are not in density.py yet (the void, TO
     BUILD: the craft tooling lane, `PIPELINE_V2.md`): the paused-frame look decides them.
 - **What fills a frame** (how the references get there; examples for the eye, never targets; their counts per frame are in
   the `COZY_AND_SCALE.md` References log):
@@ -165,8 +164,11 @@ references and primitives, never the film's people.
   video"; reference 1's cat and v1's Pip were in every shot, which is no longer the rule). Default: the channel's mascot **Pip**
   (another character only if the story asks for it, named in the W1 world bible and seen by the owner at G3),
   drawn new in the film's design (playbook: no reusable assets; `src/lib/mascot` and `docs/mascot.md` are the reference
-  and the API), in a colourway for the video's palette that stays its own hue (ΔE76 >= 20 from
-  every ground it sits on, never the hero or the pop colour) and in tier B (`CRAFT.md` §b: C* <= 25, no outline: its
+  and the API), in a colourway for the video's palette that stays its own hue (never the hero or the pop colour; ONE
+  rule with `ORGANIC.md` R12: ΔE76 >= 20 from the field it is seen against, so a second look finds it, while its value
+  stays close to the seat it sits in, so at a squint it joins that mass and makes no call; video 4: lavender, L* 56,
+  on its balcony's snow, L* 60, ΔE ~15, seen against the slate facade, ΔE ~39: `docs/v4/WORLD_BIBLE.md` §1.1, §7)
+  and in tier B (`CRAFT.md` §b: C* <= 25, no outline: its
   lit and shade faces part its shapes, as on everything since 2026-10-29) unless the line is about it. A non-character anchor may join it (snow, the weather; the sun is light, never a
   character: `CRAFT.md` §d.1).
 - **Jobs (since 2026-10-28: hidden, not a guide):** (1) hide in a spot that belongs to the world (in a window, on a
@@ -242,7 +244,7 @@ python3 -I scripts/qa/density.py <cut.mp4> --scenes src/vN/film/scenes.json [--o
 python3 -I scripts/qa/gate_check.py ... --density     # WARN per shot; its film-average FAIL counts as a WARN (§0)
 ```
 - Measure renders at half scale or more (fullness reads edges at 540 px wide); keep the default `--rate 30`. Look as
-  well as measure: a side-by-side sheet at phone size (row 1 reference 1 from `assets/ref/`, row 2 v1, row 3 the cut) and
+  well as measure: a side-by-side sheet at phone size (row 1 reference 1 from `assets/ref/`, row 2 the cut) and
   the sound-off cold read (density must never bury the subject).
 - The owner's cut renders at full size (1080 x 1920): at 0.5 scale the fine dressing lines blur (v3 G5's 540 x 960
   render added to "the quality and smoothness is not there").
@@ -266,7 +268,7 @@ python3 -I scripts/qa/gate_check.py ... --density     # WARN per shot; its film-
 | gate | what |
 |---|---|
 | G3 board | signal only, but designed: the camera plan gets a "world" note per panel (the place, who watches, the character's spot) and every life item its tier and `life:` entry, so density is designed in with its hierarchy, never bolted on; the home set's density key is the film's bar (`G3_ANIMATIC.md` §3) |
-| G4 look | the 6-8 s look clip (`PIPELINE_V2.md` G4): the home set dressed at final density and at its tiers, judged beside reference 1 and v1 (a cozy frame also against §0's DENSE-CALM row and `COZY_AND_SCALE.md` 3b.8) |
+| G4 look | the 6-8 s look clip (`PIPELINE_V2.md` G4): the home set dressed at final density and at its tiers, judged beside reference 1 (a cozy frame also against §0's DENSE-CALM row and `COZY_AND_SCALE.md` 3b.8) |
 | kit (before the G5 lanes) | the film's own dressing for its settings, its people kit and the character's colourway, drawn new; every piece on the kit sheet at each size a panel uses, checked at 0.25 scale |
 | G5 blocking | fills G3's plan: every placeholder and `life:` item made real at its tier, people placed, the character in every shot with key poses, no new movers, places or tier promotions; each set judged paused first (§0); density.py before the owner sees it (information), cozy holds by `--cozy` (§9) with a locked or floating camera |
 | G6 polish | motion life refined inside the tiers, on movers that exist: secondary motion, reactions on the voice's words, the attention check (`CRAFT.md` §b; cozy holds: `--cozy`, §9); then edges (if the G4 clip approved them) and the optional halftone |

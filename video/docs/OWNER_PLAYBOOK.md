@@ -21,6 +21,72 @@ voice and the Taste signals' "Lines", checked against Audience and goal and Hook
 the sixth pass, 2026-10-27: a cold read as if starting video 4, every conflict it found fixed at its source) · no size
 budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance at the end).
 
+## THE THREE RULES ABOVE ALL (owner, 2026-10-30)
+1. **Every frame is worth pausing on.** Judged at a glance, as a picture, before any numeric check: would a viewer stop
+   scrolling to look at it longer?
+2. **Readable imaginative ideas.** Each beat gets an imaginative picture a viewer reads in a second, invented for this
+   story: never a dry diagram, never an abstraction that needs explaining, never an idea taken from a past film.
+3. **Frames planned and created WHOLE, from the get-go.** Each frame is designed as one complete picture (its idea, its
+   world, its light, its people, its words) before it is built or animated. Never a frame built thin and filled later
+   "for the sake of density": density comes from the imagination and the world, never from a filling pass.
+
+**No past film as the bar or the example:** no brief, card, review or guide points an agent at video 1 (or any other
+film of ours) as the bar, a reference or an example of an idea: it boxes the imagination in. The bar is the three rules
+and the beat's feeling; where an older guide still names v1, that is a measured number, never a picture to look at,
+copy or upgrade. — ("don't reference video 1 - i think this would put agents in a box again", 2026-10-30.)
+
+**A RICH, BEAUTIFUL WORLD is designed before the frames and held by one finished frame, never added later:** the art
+director designs the film's world whole first, from real photos of its real places and things (their buildings,
+streets, materials, weather, light and everyday life) with the story's own marks on it, and builds its pieces once at
+finished quality (the world kit), so every frame is composed from beautiful, specific parts. The first key frame (the
+HERO FRAME) is painted to full finish and approved by the owner: it is the film's own bar for richness and finish, and
+it comes after the ideas are picked, so it guides the craft, never the ideas. Rich means specific, layered and alive,
+never "more stuff": three scales of detail (big shapes that read in a second, middle shapes that describe the place,
+small details that reward a pause), each detail saying something about this place or this story, the world going on
+past the frame's edges. Pleasing is judged as a painter judges, at finished quality and at phone size: the values
+first (squint: big quiet masses, one light, one focus), a few colours in harmony around the one accent, a rhythm of
+big, medium and small shapes, varied edges, the finish; an ALMOST comes back as a paint-over (the frame itself marked
+up), never as new rules (PIPELINE_V2, "A RICH, BEAUTIFUL WORLD"). — ("what would ultimately ensure that the world is
+build rich, visaully and aestethically pleasing?", 2026-10-30.)
+
+**ONE FILM, NEVER A HODGE-PODGE:** one imaginative concept for the whole film above the beats (its world, its central
+device, the thread's journey, the arc of feeling); ideas come and are picked as whole sequences, never a collage of the
+best single ideas; one art director owns the vision and approves every frame against the whole; every frame is a view of
+one shared world (one place, light, palette, cast, type); every frame is evaluated IN the board, and the whole board is
+read in order after every round (PIPELINE_V2). — ("another possible problem is if every agent bulid a scene in
+isolation, the whole thing comes up like a complete mess of hudge pudge ideas - is that a risk here? Anything in the
+process that ensures this doesn't happen and the whole video and the narrative idea is clear?", 2026-10-30; v3's lesson:
+"too busy, too incoherent; no story ... just a bunch of shots put together".)
+
+**THE FRAME LOOP (every built frame, before the owner sees it):** build it whole -> a fresh evaluator judges the FEELING
+first (does it give the beat's feeling and idea in a second; is it worth pausing on, beside the hero frame) ->
+THERE (move on), ALMOST (adjust exactly what holds it back, at most 2 rounds) or NOT THERE (rework from the idea, a new
+approach, at most once; then the owner gets the options); encoded in every workflow (PIPELINE_V2, "THE FRAME LOOP"). —
+("make sure we have the loops setup correctly where the agents bulid the proposed scenes and we evaluate and perhaps
+adjust it if its almost there or rework completely if it doesn't achieve the feeling we need - is that something you
+would already do or we should explicitly setup?", 2026-10-30.)
+
+**The process is loose and imaginative around these three:** pictures before documents, ideas before rules. Every
+other rule in this playbook serves them as guidance from the owner's past notes, never as a checklist that designs the
+frame; checks catch mistakes (captions, safe zones, timing), they never stand in for the picture. **Imagination first,
+inside the toolbox we built:** the composition library composes the ideas, the style recipes make the key frames, the
+moves, joins and sound sync make the shot plan (PIPELINE_V2, "THE LOOP NOW") — ("are the composition recommendation
+included in here? Are the stylistic recipes included here? is it completley free flowing or what we've done previously
+in terms of building up the visual recipes would be included?", 2026-10-30). **The toolbox is written as FEELINGS and
+the visual TOOLS that create them, never as placements:** "a feel of distance" is the intent, layers (near, mid, far),
+overlap and atmosphere are the tools, and the artist invents the frame; concrete positions and numbers are labelled
+examples, never the way; every frame is planned on one card that asks about every aspect, so no piece is ever left for
+the owner to point at. — ("okay im tired of pointing every single piece im sure we missed some more / so how do we make
+sure that our toolbox carry but imagination and full scene planning is done completely - like one example here is
+composition. Like there are million ways to build a scene with vanishing point composition. Like BILLION ways to compose
+a scene like this. But in all these i think the key recommendations applied right like not the concrete steps "PUT A
+BUILDING HERE", but more abstarct like "layers and feel of distance" and the feel of distance is achieved with a
+"visual" tool of layers", 2026-10-30; the rework: `docs/process/`.) — ("how do we adjust
+our overal process, i want to make it more loose, more imaginative. i like the main important rule is every frame is
+worth pausing on yes + readable imaginative ideas + frames planned and created whole. We shouldn't be in a situation
+where we have our video and then we just fill up space for the sake of density this is wrong we need to be imaginative
+and plan the whole frame from the get go", 2026-10-30.)
+
 ## Audience and goal
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24).
 - **Growth matters: maximise engagement with subtle, defensible hooks**, e.g. "the language everyone loves".
@@ -201,7 +267,7 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   city posters' 19 do. — ("i agree that a coherent style across all videos sharing one look, one brand would be
   absolutely the key here"; "the importnat part about one look is our look is evolving - we are finding out style i
   don't think we can overfixate on this", 2026-10-28).
-- **Hand-drawn flat colour like reference video 1, drawn CLEAN, REFINED, GENTLE, PREMIUM: never rough or messy.**
+- **Hand-drawn flat colour like the owner's reference 1 (France), drawn CLEAN, REFINED, GENTLE, PREMIUM: never rough or messy.**
   Reference 1 gives the composition, the flat colour and the small people; the line is the clean pen: clean, confident
   lines (smooth, consistent weights, few of them, no jitter, no sketchy overshoot or double strokes), refined shapes,
   no outlines (edges from light and shade, thin lines only on small things: Texture and lines below); hand-drawn
@@ -349,13 +415,19 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   lights switching). A dense world makes a frame
   full even when little moves (Arcane's rooftop; the owner's riverside reference "doesn't feel empty at all"). The
   density sits mostly in the calm environment tier at low contrast, so full never means busy (`docs/look/CRAFT.md` §b).
-  The bar: reference 1 (France) and v1 (PHP), then each film's own G3 density key; `scripts/qa/density.py` is a warning
+  The bar: alive and full at the level of the owner's reference 1 (France), designed into each frame whole (THE THREE
+  RULES; never a past film of ours); `scripts/qa/density.py` is a warning
   signal, never a quota; how-to `docs/look/LIFE_AND_DENSITY.md`. Big empty fields (nothing in them; flat colour itself
-  is right) and an object alone on a blank wall are failures even in a draft. — ("way too empty", "feeling alive is
-  absolutely the key", "less prescriptive on the amount of objects", v3 G5, 2026-10-26; "too busy ... too many moving
-  parts", v3 G5b, 2026-10-27).
+  is right) and an object alone on a blank wall are failures even in a draft. **A place, never buildings standing
+  alone:** a street is blocks shoulder to shoulder, rows and rooftops layered back to the horizon, the street's own
+  things (lamps, trees, parked cars, bikes, people) between them; the open space is the sky the words need and one calm
+  ground, never a field round a lone house. Plan it so from the world bible and the colour script on, never leave it to
+  a later pass. — ("way too empty", "feeling alive is absolutely the key", "less prescriptive on the amount of objects",
+  v3 G5, 2026-10-26; "too busy ... too many moving parts", v3 G5b, 2026-10-27; on video 4's colour script: "I mean I am
+  loooing at this oicture and each house is so alone like the scene is empty / I mean is there any step that will make
+  it coherent?", 2026-10-30).
 - **Scale moments, occasionally: make the viewer feel small**, using Arcane's camera work and staging, never its footage.
-  Keep it nuanced (it's still TikTok). The owner liked v1's scale scenes. — (v1, 2026-10-24/25).
+  Keep it nuanced (it's still TikTok). — (v1, 2026-10-24/25).
   **When a scale shot comes, the scale must feel GREAT**, like Arcane's rooftop end frame: a world that keeps going
   (hundreds of buildings shrinking into haze), a landmark that is huge yet far, tiny anchors (figures, birds, airships),
   the drop below the camera, a big sky with huge clouds, many depth layers. Recipe: `docs/look/CINEMATIC_GUIDE.md`
@@ -541,6 +613,16 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   layout at low strength), always once per layer per shot, never per frame (per-frame AI flickers). — ("I like the idea
   of using AI tactically like for certain elements or layers that move to achieve parallax or post processing kind of to
   add more style right?", 2026-10-30.)
+- **INK LINES, A BIT ROUGH BUT CLEAN: tested on the FINISHED film, never built in first:** a bit of hand-drawn
+  messiness in the lines, combined with the painting, the styles and the texture, coherent and premium; never as rough
+  as the old ink line ("too rough, not looking clean or premium"). The film is built WITHOUT ink (the "no outlines" rule
+  below stands); when the final product exists, the ink line (the test's pick: B, the brush pen in one warm plum ink
+  glazed into the paint, `docs/look/ink_test/`) is laid over it and shown beside the no-ink cut, and it stays only if it
+  makes the film better. The same for any optional finishing treatment: judged on the finished product, with and
+  without. — ("so i like a bit of rougher ink style but our video 1 was too rough not looking clean or premium. If you can come up
+  with a clean way to incorporate a bit of messiness in the lines combined with all the painting and styles and texture
+  we added with it looking coherent - sure lets try", 2026-10-30; after the ink test: "lets build without ink first and
+  then we will test the final product with ink if its makes it any better", 2026-10-30.)
 - **Texture and lines: VERY subtle.** No outlines: as on the city posters, shapes are separated by light and shade (a
   lit and a shade face on every volume, the subject's the deepest) and by value, never by a line drawn round them
   (the A vs B picture's B). Thin lines only on small things that are lines (window bars, railings, rigging): dark,
@@ -609,7 +691,11 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   is heard, never a beat grid: `docs/look/SOUND_SYNC.md`). — (v1; joins, v3 G5b, 2026-10-27; "the beat" read as the voice's beat under the owner's hand-over, 2026-10-30).
 
 ## Storyboard (G3) and flow
-- **The film's visual story is written first, as a VISUAL SCRIPT, between the voice lock and the G3 animatic:** shot
+- **(Changed 2026-10-30: the order is beats -> ideas -> key frames made whole -> the shot plan (this visual script,
+  now written FROM the key frames) -> the animatic. A visual script written before the ideas fixes pictures, staging and
+  camera and restricts the ideas: "so how are visual script and ideas and key frames generation fit together? wouldn't
+  the visual script restrict the steps 3 and 4?", 2026-10-30. Before the ideas only the story beats are written.)**
+  **The film's visual story is written first, as a VISUAL SCRIPT, between the voice lock and the G3 animatic:** shot
   by shot and timed to the locked voice, what is on screen (subject, place, action), the camera (shot size, angle,
   move), how each shot joins the next (its carrier), the few words in the picture and the sound cues; brainstormed
   as a few visual concepts judged internally, one script to the owner, and written the way professional studios write
@@ -631,7 +717,9 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   make it feel alive, which is wrong"). Through-line and transition grammar: `docs/look/CRAFT.md` §a. Sketch-first
   stays, as the designed sketch above (owner yes, 2026-10-27). — ("too busy, too incoherent; no story, no clean
   transitions, just a bunch of shots put together", v3 G5b, 2026-10-27).
-- **G3 is the most important gate: an ANIMATED SKETCHBOOK of the final film, optimised for SIGNAL, not quality.** With
+- **(Changed 2026-10-30 by THE THREE RULES: the frames are designed whole FIRST, as key frames; the animatic then plays
+  those key frames with the voice, the camera moves and the joins. The grey "scribble-mass placeholders" below are
+  retired: never a frame built thin to be filled later.)** **G3 is the most important gate: an ANIMATED SKETCHBOOK of the final film, optimised for SIGNAL, not quality.** With
   script and voice locked, the animatic gives the director the closest signal to the final story in the least drawing
   and review time: story, transitions, animations and camera moves already very close to final — PLAYED, not only
   marked (their shape and timing real, never their polish); detail deliberately loose scribble-mass placeholders (the
@@ -682,8 +770,7 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   stories that have nothing to do with a real city. **Neither extreme: not content ABOUT real cities, and not made-up
   content (myths, fables, what-ifs as the story). The middle: true stories (real events, people, things) whose action
   happens in a big world we can show** (streets, buildings, landscapes, the sky); a metaphor world only when a true
-  story needs it and the facts map one-to-one (v1's town of websites, the best performer so far). The owner's examples are v1 and v2
-  (the look they like; its story was the weak part). Which stories fit is studied in
+  story needs it and the facts map one-to-one. Which stories fit is studied in
   `docs/studies/2026-10-28_city_posters/` (the content track; the live discussion is its `content_discussion.md`) before
   it changes `docs/TOPIC_CRITERIA.md`. **The search is open to any subject, not only tech and AI: what people would
   love to hear about** (the owner's seeds: history, news from cities, stories); **news from a real city is positive.**
@@ -910,7 +997,8 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   think is right and make the videos better", 2026-10-30, answering the sound-sync and look questions.)
 - **Two modes: PRODUCTION and ITERATION.** Production is a film going through the gates (G0-G8): full checks, review
   panels, QA suites, fix passes, as the quality needs. Iteration is a quick experiment for the owner to judge (a look
-  test, a rethought scene, a style probe, a "what if"): one or two agents, no panels, no critics, no QA suites, rough
+  test, a rethought scene, a style probe, a "what if"): one or two agents, no panels, no QA suites (one fresh evaluator
+  round of THE FRAME LOOP, 2026-10-30), rough
   where rough is enough (a still, a few stages, a short clip), the result in about an hour and shown at once; the
   owner's verdict is the review. A look iteration starts with STILLS: motion only once the owner has approved the
   still. Ask "is this a film or a question?" before planning: a question is an iteration, and
@@ -967,6 +1055,8 @@ budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance
   `context/uploads/inline/2026-10-28_v3_insights_*`. — 2026-10-28.
 
 ## Retired rules
+- ~~G3's detail as grey scribble-mass placeholders, density and life filled in at G5 ("loose never means empty")~~ ->
+  THE THREE RULES: frames designed whole first, as key frames; never a fill pass for density (2026-10-30).
 - ~~Captions in Patrick Hand with a peach box on the key word, one fixed band, one size~~ → the type guide's hand
   (Gaegu) and its lit stress, set in the open space by the subject (`docs/look/TYPE_GUIDE.md`, 2026-10-30). The brush
   for landing words, tried in the same iteration, read as "a blood message on the wall" and is out.

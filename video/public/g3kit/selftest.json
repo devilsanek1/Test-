@@ -1,0 +1,592 @@
+{
+ "film": "g3kit",
+ "style": "board",
+ "label": "G3 kit self-test",
+ "audio": "g3demo/silence.wav",
+ "durationSec": 10.2,
+ "fps": 60,
+ "words": [
+  {
+   "w": "The",
+   "s": 0.12,
+   "e": 0.3
+  },
+  {
+   "w": "kit",
+   "s": 0.3,
+   "e": 0.6
+  },
+  {
+   "w": "self-test.",
+   "s": 0.6,
+   "e": 1.2
+  },
+  {
+   "w": "Tiers,",
+   "s": 1.6,
+   "e": 2.0
+  },
+  {
+   "w": "planes,",
+   "s": 2.0,
+   "e": 2.4
+  },
+  {
+   "w": "rig.",
+   "s": 2.4,
+   "e": 2.9
+  },
+  {
+   "w": "Then",
+   "s": 4.0,
+   "e": 4.3
+  },
+  {
+   "w": "the",
+   "s": 4.3,
+   "e": 4.4
+  },
+  {
+   "w": "tag.",
+   "s": 4.4,
+   "e": 4.9
+  },
+  {
+   "w": "The",
+   "s": 8.4,
+   "e": 8.6
+  },
+  {
+   "w": "pen",
+   "s": 8.6,
+   "e": 8.9
+  },
+  {
+   "w": "lifts.",
+   "s": 8.9,
+   "e": 9.5
+  }
+ ],
+ "sfx": [],
+ "shots": [
+  {
+   "id": "K1",
+   "s": 0.0,
+   "e": 4.0,
+   "note": "WIDE, the home view \u00b7 SET street\ntiers, planes, rig, ambient kit, pipe drawn on",
+   "transition": {
+    "type": "cut",
+    "carrier": "B",
+    "device": "thread-match",
+    "what": "the pipe at frame 0"
+   },
+   "camera": {
+    "keys": [
+     {
+      "t": 0.0,
+      "x": 540,
+      "y": 960,
+      "z": 1.0
+     },
+     {
+      "t": 1.5,
+      "x": 540,
+      "y": 960,
+      "z": 1.0
+     },
+     {
+      "t": 3.6,
+      "x": 560,
+      "y": 1000,
+      "z": 1.2,
+      "peak": 2.1,
+      "word": "PUSH IN",
+      "anchor": "the one window",
+      "pivot": [
+       600,
+       1008
+      ]
+     }
+    ]
+   },
+   "els": [
+    {
+     "t": "icon",
+     "name": "server",
+     "x": 110,
+     "y": 900,
+     "w": 190,
+     "tier": "B",
+     "shadow": true,
+     "id": "computer"
+    },
+    {
+     "t": "ambient",
+     "kit": "steam",
+     "loop": true,
+     "x": 205,
+     "y": 900,
+     "w": 160,
+     "h": 160,
+     "rate": 3,
+     "tier": "B",
+     "level": [
+      [
+       0,
+       0.3
+      ],
+      [
+       1.5,
+       0.3
+      ],
+      [
+       2.3,
+       1.0
+      ]
+     ],
+     "life": "steam",
+     "id": "steam"
+    },
+    {
+     "t": "figure",
+     "x": 820,
+     "y": 1330,
+     "h": 170,
+     "pose": "walk",
+     "facing": "l",
+     "tier": "B",
+     "shadow": true,
+     "out": 1.0042,
+     "id": "walker@walk0.00"
+    },
+    {
+     "t": "figure",
+     "x": 790,
+     "y": 1330,
+     "h": 170,
+     "pose": "smear",
+     "facing": "l",
+     "tier": "B",
+     "shadow": true,
+     "in": 1.0042,
+     "out": 1.0542,
+     "id": "walker@smear1.00"
+    },
+    {
+     "t": "figure",
+     "x": 760,
+     "y": 1330,
+     "h": 170,
+     "pose": "stand",
+     "facing": "l",
+     "tier": "B",
+     "shadow": true,
+     "in": 1.1042,
+     "out": 2.2042,
+     "id": "walker@stand1.10"
+    },
+    {
+     "t": "figure",
+     "x": 760,
+     "y": 1330,
+     "h": 170,
+     "pose": "point",
+     "facing": "l",
+     "tier": "B",
+     "shadow": true,
+     "in": 2.2042,
+     "id": "walker@point2.20"
+    }
+   ],
+   "set": "street",
+   "type": "WIDE",
+   "home": true,
+   "life": [
+    "snow",
+    "ferry",
+    "block windows",
+    "steam",
+    "clouds"
+   ],
+   "movers": 3,
+   "comp": {
+    "frame": "T",
+    "move": "RM4",
+    "join": "RJ4"
+   }
+  },
+  {
+   "id": "K2",
+   "s": 4.0,
+   "e": 10.2,
+   "note": "MEDIUM on the window \u00b7 SET street\nthe tag; birds; the pen un-draws the run",
+   "transition": {
+    "type": "cut",
+    "carrier": "C",
+    "device": "continuous",
+    "what": "the push on the window"
+   },
+   "camera": {
+    "keys": [
+     {
+      "t": 4.0,
+      "x": 560,
+      "y": 1000,
+      "z": 1.2,
+      "word": "HOLD",
+      "anchor": "the one window"
+     }
+    ]
+   },
+   "els": [
+    {
+     "t": "ambient",
+     "kit": "bird",
+     "loop": true,
+     "x": -40,
+     "y": 760,
+     "w": 1160,
+     "h": 120,
+     "n": 3,
+     "speed": 90,
+     "tier": "C",
+     "plane": 1,
+     "life": "birds",
+     "id": "birds"
+    },
+    {
+     "t": "text",
+     "x": 600,
+     "y": 1300,
+     "text": "2027",
+     "size": 120,
+     "tier": "A",
+     "in": 1.2,
+     "enter": "grow",
+     "id": "tag"
+    }
+   ],
+   "set": "street",
+   "type": "MEDIUM",
+   "life": [
+    "snow",
+    "ferry",
+    "block windows",
+    "birds",
+    "clouds"
+   ],
+   "tiers": {
+    "pipe": "B"
+   },
+   "comp": {
+    "frame": "E2",
+    "move": "RM7",
+    "join": "RJ4"
+   }
+  }
+ ],
+ "sets": {
+  "street": {
+   "name": "the street (home view)",
+   "els": [
+    {
+     "t": "rect",
+     "x": -60,
+     "y": -60,
+     "w": 1200,
+     "h": 760,
+     "fill": "paper",
+     "tier": "C",
+     "negative": true,
+     "id": "sky",
+     "name": "the sky (a quiet field)"
+    },
+    {
+     "t": "ambient",
+     "kit": "cloud",
+     "loop": true,
+     "x": -200,
+     "y": 90,
+     "w": 1480,
+     "h": 150,
+     "rw": 320,
+     "rh": 110,
+     "speed": 14,
+     "tier": "C",
+     "plane": 3,
+     "id": "cloud",
+     "life": "clouds"
+    },
+    {
+     "t": "rect",
+     "x": -60,
+     "y": 1000,
+     "w": 1200,
+     "h": 130,
+     "fill": "light",
+     "tier": "C",
+     "plane": 3,
+     "id": "far",
+     "name": "far city",
+     "promise": "far city roofs, lights tone-on-tone"
+    },
+    {
+     "t": "rect",
+     "x": -60,
+     "y": 1130,
+     "w": 1200,
+     "h": 60,
+     "fill": "light",
+     "tier": "C",
+     "plane": 2,
+     "id": "harbour",
+     "name": "harbour"
+    },
+    {
+     "t": "rect",
+     "x": -200,
+     "y": 1140,
+     "w": 120,
+     "h": 30,
+     "fill": "paper",
+     "tier": "B",
+     "plane": 2,
+     "id": "ferry",
+     "life": "ferry",
+     "promise": "the ferry crossing"
+    },
+    {
+     "t": "rect",
+     "x": -60,
+     "y": 1190,
+     "w": 1200,
+     "h": 220,
+     "fill": "light",
+     "tier": "C",
+     "id": "street",
+     "name": "the snowy street"
+    },
+    {
+     "t": "ground",
+     "x0": -40,
+     "x1": 1120,
+     "y0": 1190,
+     "y1": 1410,
+     "n": 7,
+     "tier": "C",
+     "id": "street-lines"
+    },
+    {
+     "t": "rect",
+     "x": -60,
+     "y": 1410,
+     "w": 1200,
+     "h": 300,
+     "fill": "light",
+     "tier": "C",
+     "plane": -1,
+     "id": "cut",
+     "name": "the cut ground"
+    },
+    {
+     "t": "scribble",
+     "x": 640,
+     "y": 1430,
+     "w": 400,
+     "h": 220,
+     "id": "dress-cut",
+     "promise": "cut earth texture",
+     "role": "dress",
+     "tier": "C"
+    },
+    {
+     "t": "rect",
+     "x": 380,
+     "y": 700,
+     "w": 420,
+     "h": 490,
+     "fill": "light",
+     "tier": "B",
+     "id": "block",
+     "name": "the block"
+    },
+    {
+     "t": "ambient",
+     "kit": "window",
+     "loop": true,
+     "x": 400,
+     "y": 720,
+     "w": 380,
+     "h": 380,
+     "cols": 4,
+     "rows": 4,
+     "pane": [
+      46,
+      56
+     ],
+     "wave": [
+      0.6,
+      2.6
+     ],
+     "tier": "B",
+     "id": "blocklights",
+     "life": "block windows"
+    },
+    {
+     "t": "rect",
+     "x": 860,
+     "y": 760,
+     "w": 260,
+     "h": 430,
+     "fill": "light",
+     "tier": "C",
+     "plane": 1,
+     "id": "block2",
+     "shadow": true,
+     "name": "the next block"
+    },
+    {
+     "t": "rect",
+     "x": 560,
+     "y": 960,
+     "w": 80,
+     "h": 96,
+     "fill": "paper",
+     "tier": "B",
+     "id": "window",
+     "name": "the one window"
+    },
+    {
+     "t": "pool",
+     "cx": 600,
+     "cy": 1205,
+     "rx": 120,
+     "ry": 22,
+     "id": "spill",
+     "name": "window spill",
+     "tier": "C"
+    },
+    {
+     "t": "pipe",
+     "pts": [
+      [
+       -40,
+       1520
+      ],
+      [
+       300,
+       1520
+      ],
+      [
+       470,
+       1520
+      ],
+      [
+       470,
+       1330
+      ],
+      [
+       520,
+       1330
+      ]
+     ],
+     "bore": 24,
+     "tier": "A",
+     "thread": true,
+     "id": "pipe",
+     "draw": [
+      0.2,
+      1.4
+     ],
+     "tip": true,
+     "water": [
+      [
+       1.0,
+       0
+      ],
+      [
+       3.4,
+       1
+      ]
+     ],
+     "flow": 70,
+     "undraw": [
+      8.4,
+      1.3
+     ],
+     "name": "the warm run"
+    },
+    {
+     "t": "ambient",
+     "kit": "snow",
+     "loop": true,
+     "x": -40,
+     "y": 700,
+     "w": 1160,
+     "h": 720,
+     "n": 36,
+     "r": 5,
+     "speed": 55,
+     "tier": "C",
+     "id": "snow",
+     "life": "snow"
+    }
+   ],
+   "moves": [
+    {
+     "el": "ferry",
+     "dx": 1400,
+     "dy": 0,
+     "at": 0,
+     "dur": 16,
+     "loop": true,
+     "ease": "linear"
+    }
+   ],
+   "rig": {
+    "key": "left",
+    "source": "the low sun, left",
+    "shadow": "mid",
+    "pools": [
+     "window spill"
+    ]
+   },
+   "planes": [
+    {
+     "n": -1,
+     "name": "the cut ground"
+    },
+    {
+     "n": 0,
+     "name": "street + block"
+    },
+    {
+     "n": 1,
+     "name": "the next block"
+    },
+    {
+     "n": 2,
+     "name": "harbour"
+    },
+    {
+     "n": 3,
+     "name": "far city + sky"
+    }
+   ],
+   "vp": {
+    "y": 1010,
+    "x": 600
+   }
+  }
+ },
+ "throughline": {
+  "thread": "the heat: warm water in the pipe",
+  "home": "the one window"
+ },
+ "loopJoin": {
+  "type": "cut",
+  "carrier": "B",
+  "device": "thread-match",
+  "what": "the pipe at frame 0"
+ }
+}
