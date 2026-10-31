@@ -28,3 +28,11 @@ args: {"ids": ["A","B"]}, resumeFromRunId: "wf_9965bb6c-4f7"}) and the same with
 "wf_d61e1346-21b": finished agents replay from cache, the cut ones rerun (delete a partial X_EVAL_r2.md first so the
 fresh evaluator starts clean). From another session: per sequence, rerun from the first unfinished step with the
 script's prompts. Then the judge (`context/workflows/v4-ideas-judge.js`), the orchestrator's look, the owner's board.
+
+## DONE 2026-10-31 ~16:30 UTC: the round, the judges, the owner's board
+- A "The Frosted City" THERE; B "The Open Machine" 10/12 THERE; C "The Warm Current" THERE; D "The Warmth Comes Home"
+  10/12 THERE. Judges (`JUDGE_viewer.md`, `JUDGE_art.md`, `JUDGE_story.md`; synthesis `JUDGE.md`, `JUDGE_board.png`):
+  base B (ranks: viewer B>D>C>A, art director A>C>D>B, story editor B>C>D>A). The orchestrator's look:
+  `ORCHESTRATOR_LOOK.md`. The owner's board: https://claude.ai/artifact/MqgJEVBKmGjitMqpayiLwM (source `context/pages/video4_ideas.html`).
+- Next, on the owner's pick: the vision note for the base; the world first (real photos of Katajanokka's quay in winter;
+  the world kit at finished quality, no ink); the hero frame (B1, the quay) through THE FRAME LOOP to the owner.

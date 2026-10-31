@@ -1,0 +1,162 @@
+<title>Video 4 Ideas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Gaegu:wght@400;700&display=swap">
+<style>
+/* Layout: one phone-width column. The pick first, then the four films as swipeable strips (the base first), the split,
+   your calls, what happens next, and the full sheets folded at the end. */
+:root {
+  --bg: #eef0f4;
+  --card: #f8f9fb;
+  --fg: #1d2132;
+  --muted: #5a6075;
+  --line: #d4d8e2;
+  --honey: #b8691f;        /* the film's warm accent: the heat */
+  --honey-soft: #f6e6d3;
+  --night: #15171c;        /* the strips' own ground */
+  --hand: 'Gaegu', 'Comic Sans MS', cursive;
+  --ui: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11152a; --card: #181d36; --fg: #ece8e1; --muted: #a3a8c0; --line: #2b3257;
+    --honey: #ffbe72; --honey-soft: #3a2f2a; --night: #0c0e13; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11152a; --card: #181d36; --fg: #ece8e1; --muted: #a3a8c0; --line: #2b3257;
+  --honey: #ffbe72; --honey-soft: #3a2f2a; --night: #0c0e13; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--ui); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+.wrap { max-width: 720px; margin: 0 auto; display: grid; gap: 30px; }
+header { display: grid; gap: 10px; padding-top: 28px; }
+h1 { font-family: var(--hand); font-weight: 400; font-size: clamp(46px, 12vw, 64px); line-height: 1; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--hand); font-weight: 400; font-size: 31px; line-height: 1.1; margin: 0; text-wrap: balance; }
+h3 { font-family: var(--hand); font-weight: 700; font-size: 26px; line-height: 1.1; margin: 0; }
+p { margin: 0; }
+.lede { font-size: 17px; max-width: 62ch; }
+section { display: grid; gap: 12px; }
+ul, ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.pick { padding: 18px; border-radius: 16px; background: var(--honey-soft); display: grid; gap: 10px; }
+.pick h2 { color: var(--honey); }
+.film { display: grid; gap: 10px; padding: 16px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); }
+.film.base { border: 2px solid var(--honey); }
+.top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; }
+.ranks { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; color: var(--muted); }
+.ranks span { padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.base .tag { font-size: 13px; font-weight: 700; color: var(--honey); letter-spacing: .04em; text-transform: uppercase; }
+.tell { font-size: 16px; }
+.strip { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; background: var(--night); scrollbar-width: thin; }
+.strip img { display: block; height: 260px; width: auto; max-width: none; }
+.hint { font-size: 13px; color: var(--muted); }
+.kv { display: grid; gap: 6px; font-size: 15px; }
+.kv b { color: var(--fg); }
+.sheet { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+.sheet img { display: block; width: 100%; height: auto; }
+details { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+summary { cursor: pointer; font-weight: 600; }
+details[open] summary { margin-bottom: 10px; }
+.calls { display: grid; gap: 10px; }
+.note { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Video 4 Ideas</h1>
+    <p class="lede">Four whole films drawn for your Helsinki voice, each from its own idea. Every frame went through the review loop: a fresh reviewer named the feeling it gives, then up to two rounds of fixes. Three judges then read them as films.</p>
+  </header>
+
+  <section class="pick" aria-labelledby="pick">
+    <h2 id="pick">The pick: B, The Open Machine</h2>
+    <p>A warm crack glows in the snow of a Helsinki quay. We follow it into the AI machine, door by door, find the one stretch of pipe still missing, watch it drawn in for next year, and follow the warm line home to her window and your phone.</p>
+    <ul>
+      <li><b>It reads with the sound off.</b> It's the only one of the four the judges could follow frame by frame without the voice.</li>
+      <li><b>The idea is the fact.</b> The pipes under the snow are real and the computers' heat is real; the plan is the missing piece, drawn in pencil. So "a plan, starting next year" stays true in every frame.</li>
+      <li><b>One thread:</b> the warm seam in the snow carries your eye from the first frame to the last.</li>
+    </ul>
+    <p><b>What it still needs:</b> a heart. One woman we follow through the whole film (D's warmth, told in B's world), plus three thin frames reworked: the tea, the plan and the door.</p>
+  </section>
+
+  <section aria-labelledby="films">
+    <h2 id="films">The four films</h2>
+    <p class="hint">Swipe each strip sideways: its 12 frames in the voice's order.</p>
+
+    <article class="film base">
+      <div class="top"><h3>B · The Open Machine</h3><span class="tag">the base</span></div>
+      <div class="ranks"><span>viewer 1st</span><span>art director 4th</span><span>story editor 1st</span></div>
+      <div class="strip"><img src="s/strip_B.jpg" alt="Film B's twelve frames: the warm seam in the snow, the hall of computers, the hot hall, forty kettles in one cabinet, one cup, the fox on the warm vent, the city reaching, the plan drawn in, the drawn door, cool in and honey out, the line under the snow, her warm window and your phone"></div>
+      <div class="kv">
+        <p><b>Best:</b> the warm seam in the snow; the coat coming off in the hot hall; 40 kettles in one cabinet; the fox curled on the warm vent; the line stopping at the "2027" gap.</p>
+        <p><b>Weakest:</b> the mug at "That's a lot of tea" sits in a pale void; the plan frame reads like the one before it; the door frame looks like a bar chart.</p>
+      </div>
+    </article>
+
+    <article class="film">
+      <div class="top"><h3>C · The Warm Current</h3></div>
+      <div class="ranks"><span>viewer 3rd</span><span>art director 2nd</span><span>story editor 2nd</span></div>
+      <div class="strip"><img src="s/strip_C.jpg" alt="Film C's twelve frames: a little stream of heat crossing a blue night, from a computer to a warm window" loading="lazy"></div>
+      <div class="kv">
+        <p><b>Best:</b> the cleanest single thread; the computer wearing a tea cosy (the round's best laugh); 40 kettles stacked inside the computer.</p>
+        <p><b>Weakest:</b> most frames are one glowing object on an empty dark field, and its turn ("But Helsinki WANTS that heat") is quiet.</p>
+      </div>
+    </article>
+
+    <article class="film">
+      <div class="top"><h3>D · The Warmth Comes Home</h3></div>
+      <div class="ranks"><span>viewer 2nd</span><span>art director 3rd</span><span>story editor 3rd</span></div>
+      <div class="strip"><img src="s/strip_D.jpg" alt="Film D's twelve frames: one woman's evening in her flat, from frost on her window to her socks on a warm radiator" loading="lazy"></div>
+      <div class="kv">
+        <p><b>Best:</b> the most heart: her armchair among the giant computers, her kitchen of steaming kettles, the block leaning out for the warm air, her socks on the warm radiator.</p>
+        <p><b>Weakest:</b> it opens in a dark room, and its machine frames are grey.</p>
+      </div>
+    </article>
+
+    <article class="film">
+      <div class="top"><h3>A · The Frosted City</h3></div>
+      <div class="ranks"><span>viewer 4th</span><span>art director 1st</span><span>story editor 4th</span></div>
+      <div class="strip"><img src="s/strip_A.jpg" alt="Film A's twelve frames: a frosted Helsinki where the plan is drawn by a finger in a window's frost" loading="lazy"></div>
+      <div class="kv">
+        <p><b>Best:</b> the richest, most specific Helsinki, and the round's most tender picture: "2027" and the pipe drawn by a finger in a frosted window.</p>
+        <p><b>Weakest:</b> the frost doesn't read before frame 8, so the idea needs explaining. It plays as calm views more than events.</p>
+      </div>
+    </article>
+  </section>
+
+  <section aria-labelledby="split">
+    <h2 id="split">Where the judges split</h2>
+    <p>Only on A. The art director ranked it first for the world it could become; the viewer and the story editor ranked it last because its frost idea needs decoding. A painted world can be made rich later; an idea a viewer can't read can't be fixed later. So B is the base, and the art director's notes become its to-do list: every frame one whole picture, top to bottom, in a real place.</p>
+    <p>Before the judges, my own read leaned to C for its clean thread. Their case for B is stronger for this voice: B is the one you can follow with the sound off.</p>
+  </section>
+
+  <section class="calls" aria-labelledby="calls">
+    <h2 id="calls">Your calls</h2>
+    <ol>
+      <li><b>The base:</b> B as recommended, or another film.</li>
+      <li><b>Her:</b> one woman through the whole film (she walks home on the quay, fans herself in the hot hall, sips her tea before the 40 kettles, raises the same mug in her warm window at the end).</li>
+      <li><b>The sky for the words:</b> the pale field above every B frame becomes the night's own sky when painted.</li>
+      <li><b>The plan:</b> drawn as a soft pencil sketch over the empty lot, never an ink line or a wireframe.</li>
+      <li><b>Anything you love from the others</b> (C's tea cosy, D's socks, A's frost drawing). It comes in only if it fits B's world, retold in its terms.</li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="next">
+    <h2 id="next">What happens next</h2>
+    <p>The world first: Helsinki's real Katajanokka quay in winter, from photos, its pieces built once at finished quality. Then the hero frame, B's first frame on the quay, painted to full finish, for you to approve. Then the other key frames.</p>
+  </section>
+
+  <section aria-labelledby="sheets">
+    <h2 id="sheets">The full sheets</h2>
+    <details><summary>B · The Open Machine (with its alternates)</summary><div class="sheet"><img src="s/sheet_B.jpg" alt="Film B's full sheet with titles and alternates" loading="lazy"></div></details>
+    <details><summary>C · The Warm Current</summary><div class="sheet"><img src="s/sheet_C.jpg" alt="Film C's full sheet" loading="lazy"></div></details>
+    <details><summary>D · The Warmth Comes Home</summary><div class="sheet"><img src="s/sheet_D.jpg" alt="Film D's full sheet" loading="lazy"></div></details>
+    <details><summary>A · The Frosted City</summary><div class="sheet"><img src="s/sheet_A.jpg" alt="Film A's full sheet" loading="lazy"></div></details>
+  </section>
+
+  <p class="note">Value sketches, not the final look: the painted style comes at the key frames, with no ink lines. The judges' full notes: docs/v4/ideas/JUDGE.md.</p>
+</div>
