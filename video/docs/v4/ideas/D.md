@@ -19,12 +19,12 @@ tea), always seen from behind or in profile at a real size, acting with her pose
 big system always stands next to her one small, cozy life.
 
 **The central device: her evening acts it out first.** Every big thing is met in one of her small things: her chat is
-the AI (B1-B2), her kettle measures the heat (B4-B5), her open window lets it out like the fans do (B6), her block's open
-windows reach for it, her hand first (B7), her window frames the plan (B8), her street carries the pipes (B11), her radiator receives it
-(B12). The camera leaves her home only to follow the heat, and every beat is either seen from her window or keeps her home in
-the frame (the far warm city in the hall's door, her window at the foot of the big rise, her own block's facade, her window
-at the end of the hot pipe). Her window is the film's gate: we look out through it, leave through it, come back in through
-it (B7 to B8), and the heat comes home to the radiator under it.
+the AI (B1-B2), her kettle measures the heat (B4-B5), her open window lets it out like the fans do (B6), her block's
+open windows reach for it, her hand first (B7), her window frames the plan (B8), her street carries the pipes (B11), her
+radiator receives it (B12). The camera leaves her home only to follow the heat, and every beat is either seen from her
+window or keeps her home in the frame (the far warm city in the hall's door, her window at the foot of the big rise, her
+own block's facade, her window at the end of the hot pipe). Her window is the film's gate: we look out through it, leave
+through it, come back in through it (B7 to B8), and the heat comes home to the radiator under it.
 
 **The thread's journey (the heat).** Born in a giant computer (white vapour off its bare wet roof, the snow turning to
 rain above it), shown in her kitchen as forty kettles boiling hard, let out of her window and blown into the night by data
@@ -33,11 +33,11 @@ centres' fans everywhere, reached for by her whole block (it comes to her hand f
 away to her city's windows), carried up her street under the snow (the melt strip, a manhole's warm puff, windows warming
 one by one), arriving in the radiator under her socked feet.
 
-**The arc of feeling.** A frosted window that clears onto a warming city ("wait, what?") -> awe over a city of machines ->
-alarm at a building the snow can't touch -> a laugh in a kitchen of forty kettles -> a sip, a breath -> the pang of warmth
-floating away past her window -> delight as her whole block leans out for it -> hope across the bay -> leaning in -> "oh, that's how"
--> relief as the warmth comes up her street -> her socks on a warm radiator, her chat in her hand: the wink. Then the
-frost again: the loop.
+**The arc of feeling.** A frosted window that clears onto a warming city ("wait, what?") -> awe over a city of machines
+-> alarm at a building the snow can't touch -> a laugh in a kitchen of forty kettles -> a sip, a breath -> the pang of
+warmth floating away past her window -> delight as her whole block leans out for it -> hope across the bay -> leaning in
+-> "oh, that's how" -> relief as the warmth comes up her street -> her socks on a warm radiator, her chat in her hand:
+the wink. Then the frost again: the loop.
 
 **Light and colour.** The night is cold (blue-grey values); the one warm accent is the heat and the home, and it travels
 with the thread: the city's windows warming through the clearing frost (B1; her radiator still cold but for its first fin,
@@ -249,15 +249,55 @@ one is hers; personal warmth and a wink.
   claimed route; Uspenski only a far silhouette (red brick with gold onions when coloured, never the white cathedral).
 
 ## The look (my pass over the sheet at phone size, in order, as one film)
-Redrawn before this sheet: B1's figure three times (she now reads as a young woman from behind, her bun the signature)
-and its radiator (warming fin by fin instead of one loud orange slab); B2 reworked from the idea twice (a corridor of dots
-read as nothing: now a city of machines from above, with the rhyme to B11); B6 rebuilt so the fans read (it looked like
-smoke from fires); B7 restaged (the steam sat on her head like a fire: now one clear reach); B8's plan made big enough to
-read; B10's cold pipe made as present as the hot one; B11's black void filled with her side of the street; B12 made
-closer and unmistakably warm; stress set in the lit hand, never in capitals. Still the weakest, honestly: B7's delight is
-mild (the pose reads as reaching more than joy); B12's socks are lumpy; B2's warm door is small at phone size; the hook's
-events (the frost melting, the wave of windows) live in motion, and the still only hints at them.
+**Round 0.** Redrawn before the first sheet: B1's figure three times (she now reads as a young woman from behind, her bun
+the signature) and its radiator; B2 reworked from the idea twice (a corridor of dots read as nothing); B6 rebuilt so the fans
+read; the old B7 restaged once; B8's plan made big enough to read; B10's cold pipe made as present as the hot one; B11's
+black void filled with her side of the street; B12 made closer and unmistakably warm; stress set in the lit hand, never in
+capitals.
+
+**Round 1.** Looked at in order, sound off, at phone size: one snowy night reads from the frames alone: a frost clearing
+onto a warming city, a hall of machines that looks like a city with her city in its door, a hot building with rain where the
+snow should be, a hot lamp-lit kitchen of boiling kettles, her sip, the plume, her whole block reaching (her hand first),
+the chalk plan with its warm line coming to her, the plan's door of warm light, the giant with its worker and the hot pipe
+running off to her window, the melt strip arriving at her door, her socks on the radiator under a city of warm windows.
+Every middle frame now carries its bit of the heat at its focal, and B12 stays the warmest step (measured only to check
+the evaluator's map: the middle's honey was a speck, now visible in each frame; B12's is the highest of the twelve).
+Still the weakest, honestly: B10's hot pipe on its posts is thin at phone size (a pipe on the second look, a warm beam on
+the first); B7's neighbours are silhouettes, so their variety reads by shape more than by person; B5's fogged window
+reads a little like rain on glass; B7alt's figure is a stand-in that reaches more than it delights; B8alt and B11alt are
+the most diagram-like frames on the sheet.
 
 ## Round 1 changes (THE FRAME LOOP, adjust round 1, from `D_EVAL_r1.md`)
-In progress: the builder is working through the notes (ALMOST: exactly what each note names; NOT THERE: reworked from
-the idea; THERE: kept; the board read's breaks mended at their source).
+Each line: the note, then what I did. ALMOST: exactly what the note names; NOT THERE: reworked from the idea; THERE: kept;
+the board read's breaks mended at their source.
+- **B1, note 1 (the hook's event is not in the picture):** the lower panes now frosted over, caught mid-clear: the frost melting back from the middle (a lacy crystal edge, a wet band, drops running down) onto the city.
+- **B1, note 2 (seventy thousand homes a thin line of specks):** the far city brought up and wide in the glass, two rows of blocks, each a grid of windows: a sea of windows, warm right of the wave, still cold left of it.
+- **B1, note 3 (her radiator already hot):** the radiator cold, only its first fin waking (the "ding"); the warm glow on the floor gone.
+- **B2, note 1 (the eye has nowhere to land):** the far door made big and the frame's one light (the lit snow outside, its light running down the main aisle), her city's warm windows across the bay inside it.
+- **B2, note 2 (the stock picture):** rebuilt as a city of machines seen from above, rhyming with B11: rows like blocks of flats with roof-like tops and units, aisles like streets with walkers, a cart coming up the main aisle like the tram, lights in rows like windows.
+- **B3, note 1 (the heat reads as smoke):** the film's one vapour paint (white, thinning fast, warm only at the vents' mouths), a shimmer over the roof, water running off the bare wet roof, the icicles dripping into rings of meltwater.
+- **B3, note 2 ("the snow can't touch it" is only the title):** the falling flakes turn to drops, then rain, in the warm air over the building; the banks slump wet at its walls.
+- **B3, polish (the plumes rise into the band):** the vapour is gone before the caption band.
+- **B4, note 1 (the room reads cold):** the pendant lamp's warm light falls through the steam (the steam lit warm), the kettles' lights bloom, the window streams.
+- **B4, note 2 (it reads as daytime):** the window shows the night behind its fog, the city's lights blurred through it.
+- **B4, note 3 (nothing carries the astonishment):** the kettles boil hard (lids lifting on puffs, spouts jetting), a whole floor of them (forty in all), and she is up on the table, feet pulled up off the floor, the mug held close under her chin.
+- **B5 (THERE), kept;** only the board read's one-night break mended at its source: the same fogged night window behind her (the night and the city's lights behind the fog, heaviest behind her head so her profile still reads dark on light) and the lamp's warm light in the shared kitchen steam; its polish notes are left for the key frame.
+- **B6 (THERE), kept;** only the board read's "heat reads as smoke" mended at its source, the one vapour paint: its plumes now white vapour, warm only at the fans' mouths (places and sizes unchanged); its polish notes are left for the key frame.
+- **B7 (NOT THERE), reworked from the idea:** the old B7's idea restaged as the evaluator described (close, over her shoulder, leaning out into the snow, one arm out, a wisp of the plume curling into her open fingers, warm only there); seen in order at phone size it repeated B8's picture (her back at the same window), so the turn takes the board read's call: the whole block reaching (the old B7alt with its four notes) is now the sequence's B7, and the close catch is B7alt.
+- **B7alt (ALMOST, now B7), its four notes:** (1) open hands and bodies leaning out, never sticks; (2) real, varied neighbours (an old man in a cap, a child on tiptoe, a woman with her mug, a bearded man, a couple, a cat on a sill); (3) her window the one difference (top floor at the corner, her bun, the furthest lean, the warmth reaching her hand first); (4) the windows lit but muted, the drifting vapour carrying the warmth (now below the payoff's), the facade turned for depth.
+- **B8, note 1 (the plan barely reads):** the plan drawn bigger and nearer across the narrow end of the bay, the window open so no bar crosses it.
+- **B8, note 2 (its warm line runs away to the right):** the warm chalk line now runs along the far shore and comes across the ice toward her window, widening as it nears.
+- **B8, note 3 (it repeats B7's picture):** answered by the new B7 (the block, from outside): B8 is the first return to her window; the board read's one night: the kitchen dim and lamp-warm at night, no pale fog.
+- **B9, note 1 (thin: lines on a blank snowfield):** the camera at the threshold, low, the chalk door towering, the real lot around it (banks, stakes with warm flags, footprints), the frozen bay and her city's windows through the chalk walls; the chalk grainy, drawn on the night.
+- **B9, note 2 (nothing inside to lean toward):** the warm light from inside is the frame's one light, the chalk giants glimpsed lit in it, spilling over the snow to our feet.
+- **B10, note 1 (the honey pipe leaves the frame and ends nowhere):** the hot pipe runs from the giant's top away on its posts, out through the chalk wall and across the shore, tapering to her city's warm windows, the last one hers, inside the frame.
+- **B10, note 2 (a diagram on blank snow):** a worker in a hard hat at the giant's foot looking up at it (the human measure), the chalk room drawn round us in perspective, the lot and the bay at night.
+- **B11, note 1 (the stripe reads as a road marking):** now a melt strip: a dark wet ribbon with ragged edges, the lit windows shining in it, the banks slumping beside it, the manhole's warm puff bigger.
+- **B11, note 2 (the warmth should arrive at her):** the strip turns in to her door below the window, its front arriving home; the nearest windows just turning warm.
+- **B11, polish (her head in the bottom bar; windows through the band):** her head lifted clear of the app's bottom bar; no window or balcony behind the caption band.
+- **B12 (THERE), kept;** only its view follows B1's (the same far city, all of it warm) so the bookend match holds; its polish note (the socks) is left for the key frame.
+- **B2alt (NOT THERE), reworked from the idea:** "Her armchair among the giants" (her corner of home set down in the aisle of the hall).
+- **B8alt (NOT THERE), reworked from the idea:** "Her window, seen from the plan" (the reverse shot from the chalk plan, its warm line pointing at her window).
+- **B11alt (NOT THERE), reworked from the idea:** "The house opened like a doll's house" (the warm pipe under the street, up the wall, into every flat's radiator, hers the last); its rooms muted so B12 stays the warmest step.
+- **The board read, mended at the source:** the thread through the middle (each middle frame's focal now carries its bit of the heat: the door's city, the vents' mouths, the kettles and the lamp, the warmth at her hand, the chalk line, the door's warm light); one night (the kitchens lamplit at night, the night in their windows); the heat as smoke (one vapour paint in the kit, used by B3, B6, B7 and the alternates); the bookends (B1 cold, B12 the one warm change); the flat spots (the hook's event in the picture, the turn restaged, B9 and B10 made places).
+- **Source:** `kit.py` gained the vapour paint, the chalk filter, the fogged night window, the boiling kettle and two poses; `frames.py` the sea of windows and the reworked frames; `render_all.sh` keeps its page list in a private temp file.
