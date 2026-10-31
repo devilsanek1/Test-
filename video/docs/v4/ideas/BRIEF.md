@@ -58,6 +58,7 @@ through a playful, readable picture, never a metaphor that needs explaining or b
 home place, it is the real Helsinki, specific (real photos of its harbour streets in winter, if you can fetch them: the
 buildings, the street's things, the life; never a generic city), with the story's own marks on it (the heat).
 
-**Every agent:** writes its files from its first step; returns at most 3 lines; no git index changes; no edits to
+**Every agent:** never sends the owner's email, name or handle to any web service (a generic User-Agent such as
+"video-research/1.0"; skip a site that insists on a personal contact); writes its files from its first step; returns at most 3 lines; no git index changes; no edits to
 `video/src`, `video/public`; draws thumbnails as SVG/HTML rendered with `video/scripts/type/render.mjs` (any HTML page
 to PNG; see `video/scripts/type/README.md`) or with Python; one render at a time; starts no agents.

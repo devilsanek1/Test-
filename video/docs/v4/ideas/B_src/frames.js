@@ -359,9 +359,10 @@ FRAMES.B2 = () => {
   return svgPage(s);
 };
 
-// ---------- B3: too hot for snow. The hot aisle behind the machines: both walls of grilles glowing, deep amber near
-// us, white-hot where the aisle meets; the heat lifting off them in a shimmering haze up to the vents; she stands in
-// the middle, coat open, her beanie pulled off in her hand, her hair lifting in the hot draught; the flakes blown in
+// ---------- B3: too hot for snow (round 2). The hot aisle behind the machines: both walls are their backs, dark faces
+// whose grille slits glow with the heat inside like an oven's, deep honey near us to white-hot where the aisle meets; the
+// glow spills onto the floor and onto her; far down the aisle the air bends in the haze. She stands near us in the
+// middle, her coat flung open, fanning herself with her beanie, her hair lifting in the hot draught; the flakes blown in
 // behind us shrink and turn to drops before they reach the machines ----------
 FRAMES.B3 = () => {
   seed(23);
@@ -369,45 +370,56 @@ FRAMES.B3 = () => {
   const ax = 1.5, rh = 2.9, z0 = 1.25, z1 = 30;
   let s = '';
   s += `<linearGradient id="b3g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1100"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.28" stop-color="${C.paper}"/><stop offset="0.55" stop-color="${C.paper}"/><stop offset="0.66" stop-color="#e3c9a3"/><stop offset="1" stop-color="${V[6]}"/></linearGradient><rect x="0" y="0" width="${W}" height="${H}" fill="url(#b3g)"/>`;
-  // the upper walls over the racks, warm-dark; the ceiling's vents (all below the band)
+  // the upper walls over the racks, warm-dark (all below the band)
   s += `<linearGradient id="b3w" gradientUnits="userSpaceOnUse" x1="0" y1="560" x2="0" y2="1000"><stop offset="0" stop-color="${C.paper}"/><stop offset="0.3" stop-color="#d9c3a2"/><stop offset="1" stop-color="${V[5]}"/></linearGradient>`;
   for (const sx of [-1, 1]) s += P(polyD([cam.p(sx * ax, rh, z0), cam.p(sx * ax, rh, z1), cam.p(sx * ax, 7, z1), cam.p(sx * ax, 7, z0)], 1), 'url(#b3w)', 'opacity="0.9"');
-  const vents = [];
-  for (let z = 9; z < 28; z += 3.6) { const a = cam.p(-0.7, 6.9, z), b = cam.p(0.7, 6.9, z + 1.0); if (b[1] < 650) continue; vents.push([(a[0] + b[0]) / 2, b[1]]); s += hrect(a[0], b[1], b[0] - a[0], Math.max(5, a[1] - b[1]), V[2], 0.5) + rect(a[0] + 3, b[1] + 1, b[0] - a[0] - 6, 2, C.honeyL, 'opacity="0.5"'); }
+  // far away everything sits in the bending air (the haze filters bend the straight lines more with distance)
+  const hz = {hz1: '', hz2: '', hz3: '', hz4: '', hz5: ''};
+  const cuts = [[5.5, 8, 'hz1'], [8, 11, 'hz2'], [11, 15, 'hz3'], [15, 20, 'hz4'], [20, z1, 'hz5']];
+  const hzOf = (z) => { for (const [a, b, k] of cuts) if (z >= a && z < b) return k; return ''; };
+  let vents = '';
+  const ventPts = [];
+  for (let z = 9; z < 28; z += 3.6) { const a = cam.p(-0.7, 6.9, z), b = cam.p(0.7, 6.9, z + 1.0); if (b[1] < 650) continue; ventPts.push([(a[0] + b[0]) / 2, b[1]]); vents += hrect(a[0], b[1], b[0] - a[0], Math.max(5, a[1] - b[1]), V[2], 0.5) + rect(a[0] + 3, b[1] + 1, b[0] - a[0] - 6, 2, C.honeyL, 'opacity="0.5"'); }
   // the core: where the aisle meets, white-hot
   const vp = cam.p(0, 1.3, z1);
-  s += faceZ(cam, z1, -ax - 0.1, ax + 0.1, 0, 7, C.honeyL);
-  s += ell(vp[0], vp[1], 170, 220, C.honeyC, 'opacity="0.9" filter="url(#b40)"') + ell(vp[0], vp[1], 70, 110, '#fffaf0', 'opacity="0.95" filter="url(#b14)"');
-  // the floor: warm, its sheen brightest toward the core
-  s += P(polyD([cam.p(-ax, 0, z0), cam.p(-ax, 0, z1), cam.p(ax, 0, z1), cam.p(ax, 0, z0)]), V[6]);
-  s += P(polyD([cam.p(-0.9, 0, z1), cam.p(0.9, 0, z1), cam.p(1.2, 0, z0), cam.p(-1.2, 0, z0)]), C.honey, 'opacity="0.3" filter="url(#b14)"');
-  for (let z = z0; z < z1; z *= 1.16) s += S(lineD([cam.p(-ax, 0, z), cam.p(ax, 0, z)]), V[4], 1.4, 'opacity="0.6"');
-  // the two walls of glowing grilles: deep amber near, paler and whiter toward the core
+  const farWall = G(faceZ(cam, z1, -ax - 0.1, ax + 0.1, 0, 7, C.honeyC), 'filter="url(#hz5)"');
+  // the floor: dark tiles, the core's light running down the middle of it
+  s += P(polyD([cam.p(-ax, 0, z0), cam.p(-ax, 0, z1), cam.p(ax, 0, z1), cam.p(ax, 0, z0)]), V[3]);
+  s += P(polyD([cam.p(-0.5, 0, z1), cam.p(0.5, 0, z1), cam.p(0.7, 0, z0), cam.p(-0.7, 0, z0)]), C.honey, 'opacity="0.2" filter="url(#b24)"');
+  for (let z = z0; z < z1; z *= 1.16) { const ln = S(lineD([cam.p(-ax, 0, z), cam.p(ax, 0, z)]), V[1], 1.6, 'opacity="0.7"'); const k = z > 11 ? hzOf(z) : ''; if (k) hz[k] += ln; else s += ln; }
+  for (const x of [-ax / 2, 0, ax / 2]) { s += S(lineD([cam.p(x, 0, z0), cam.p(x, 0, 11)]), V[1], 1.4, 'opacity="0.6"'); for (const [a, b, k] of cuts.slice(2)) hz[k] += S(lineD([cam.p(x, 0, a), cam.p(x, 0, b)]), V[1], 1.3, 'opacity="0.6"'); }
+  // the glow the walls throw on the floor along their feet (honey near us, paler toward the core)
+  for (const side of [-1, 1]) {
+    s += P(polyD(q3(cam, [[side * ax * 0.99, 0, z0], [side * ax * 0.99, 0, z1], [side * ax * 0.62, 0, z1], [side * ax * 0.62, 0, z0]])), C.honeyD, 'opacity="0.3" filter="url(#b14)"');
+    s += P(polyD(q3(cam, [[side * ax * 0.99, 0, z0], [side * ax * 0.99, 0, z1], [side * ax * 0.84, 0, z1], [side * ax * 0.84, 0, z0]])), C.honey, 'opacity="0.42" filter="url(#b8)"');
+  }
+  // the two walls: the machines' backs, dark, their slits glowing (near, mid, far: the far ones in the bending air)
+  const slices = cuts.slice().reverse().map(([a, b, k]) => [a, b, k, a < 11 ? 'b4' : 'b2']).concat([[z0, 5.5, '', 'b8']]);
+  hz.hz3 += vents;
+  let nearWalls = '';
+  for (const [za, zb, k, bl] of slices) {
+    let g = '';
+    for (const side of [-1, 1]) { const w = slitWall(cam, side * ax, rh, za, zb, z0, z1); g += w.base + G(w.glow, `filter="url(#${bl})"`) + w.core; }
+    if (k) hz[k] += g; else nearWalls += g;
+  }
+  // the white-hot core behind the far machines, so their dark edges shiver against it; a veil of hot air over them
+  s += farWall + ell(vp[0], vp[1], 170, 220, C.honeyC, 'opacity="0.9" filter="url(#b40)"') + ell(vp[0], vp[1], 70, 110, '#fffaf0', 'opacity="0.95" filter="url(#b14)"');
+  for (const k of ['hz5', 'hz4', 'hz3', 'hz2', 'hz1']) s += G(hz[k], `filter="url(#${k})"`);
+  s += ell(vp[0], vp[1], 120, 150, '#fffaf0', 'opacity="0.42" filter="url(#b40)"');
+  s += nearWalls;
+  // the heat lifting off the backs in soft warm veils, up toward the vents
   for (const side of [-1, 1]) {
     const X = side * ax;
-    for (let z = z0; z < z1 - 0.6; z += 0.72) {
-      const zz = z + 0.66, t = clamp((z - z0) / (z1 - z0), 0, 1);
-      s += poly3(cam, [[X, 0, z], [X, 0, zz], [X, rh, zz], [X, rh, z]], V[2], '', 0.3);
-      const col = t < 0.25 ? C.honeyD : t < 0.55 ? C.honey : t < 0.8 ? C.honeyL : C.honeyC;
-      s += poly3(cam, [[X, 0.12, z + 0.05], [X, 0.12, zz - 0.05], [X, rh - 0.1, zz - 0.05], [X, rh - 0.1, z + 0.05]], col, `opacity="${f1(0.85 + 0.15 * t)}"`, 0.3);
-      for (let yy = 0.3; yy < rh - 0.2; yy += 0.22) s += S(lineD([cam.p(X, yy, z + 0.06), cam.p(X, yy, zz - 0.06)]), t < 0.4 ? V[2] : C.honeyD, cam.sz(0.05, z), `opacity="${f1(0.75 - 0.4 * t)}"`);
-      s += S(lineD([cam.p(X, 0, z), cam.p(X, rh, z)]), V[1], Math.max(0.8, cam.sz(0.03, z)), 'opacity="0.8"');
-    }
-    s += P(polyD(q3(cam, [[side * ax * 0.98, 0, z0], [side * ax * 0.98, 0, z1], [side * ax * 0.5, 0, z1], [side * ax * 0.5, 0, z0]])), C.honey, 'opacity="0.3" filter="url(#b8)"');
-    // the heat lifting off the grilles: shimmering warm veils climbing from the racks' tops up toward the vents
     for (let i = 0; i < 9; i++) {
       const z = z0 + 1 + i * 2.2, base = cam.p(X * 0.92, rh, z), up = cam.sz(3.6, z);
-      const pts = []; for (let j = 0; j <= 7; j++) pts.push([base[0] - side * j * up * 0.035 + Math.sin(j * 1.5 + i) * cam.sz(0.14, z), base[1] - j * up / 7]);
-      s += S(smoothD(pts, false), C.honeyC, Math.max(2, cam.sz(0.06, z)), `opacity="${f1(0.42)}" filter="url(#b2)"`);
       s += P(blobD(base[0] - side * up * 0.08, base[1] - up * 0.45, cam.sz(0.5, z), up * 0.5, 9, 0.25), C.honeyC, 'opacity="0.2" filter="url(#b14)"');
     }
   }
-  for (const [vx, vy] of vents) s += steam(vx, vy + 34, 90, 70, {n: 4, col: C.honeyC, op: 0.35, warm: false});
-  // her, in the middle, facing us: coat open, her beanie pulled off in one hand, the other at her collar, her hair
-  // lifting in the hot draught
-  const zf = 6.2, f = cam.p(0.05, 0, zf), hp = cam.sz(1.7, zf);
-  s += ell(f[0], f[1] + 3, hp * 0.24, hp * 0.04, C.honeyD, 'opacity="0.5"');
-  s += her(f[0], f[1], hp, {view: 'front', open: true, lift: 1.0, arms: [[16, 14], [22, 194]], hold: {0: 'beanie'}, hatCol: V[7], coat: V[2], coatL: C.honeyD, knit: V[10], hair: V[1], skin: V[8], scarf: V[8], rim: C.honeyL, rimSide: 1, smile: -1, look: 0, step: [3.4, 3.4]});
+  for (const [vx, vy] of ventPts) s += steam(vx, vy + 34, 90, 70, {n: 4, col: C.honeyC, op: 0.35, warm: false});
+  // her, near, in the middle of the aisle: coat flung open, fanning herself with her beanie, the walls' heat on her
+  const zf = 2.6, f = cam.p(-0.28, 0, zf), hp = cam.sz(1.7, zf);
+  s += ell(f[0], f[1] + 4, hp * 0.26, hp * 0.04, C.honeyD, 'opacity="0.45" filter="url(#b4)"') + ell(f[0], f[1] + 3, hp * 0.16, hp * 0.025, V[0], 'opacity="0.6"');
+  s += herHot(f[0], f[1], hp, {coat: V[2], knit: V[10], hair: V[1], skin: V[8], hatCol: V[6]});
   // the flakes blown in behind us: big and white at the edges, shrinking and wet as they go in, drops and little
   // puffs before they reach the machines
   for (let i = 0; i < 46; i++) {
@@ -420,7 +432,7 @@ FRAMES.B3 = () => {
   // the hall's top dissolves into the band's calm light (nothing in the band but the words)
   s += `<linearGradient id="b3up" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="720"><stop offset="0" stop-color="${C.paperT}" stop-opacity="1"/><stop offset="0.82" stop-color="${C.paper}" stop-opacity="1"/><stop offset="1" stop-color="${C.paper}" stop-opacity="0"/></linearGradient><rect x="0" y="0" width="${W}" height="720" fill="url(#b3up)"/>`;
   s += caption([{t: 'really', x: 340, y: 380, size: 112}, {t: 'hot.', x: 600, y: 520, lit: true, size: 170}]);
-  return svgPage(s);
+  return svgPage(s, hazeDefs());
 };
 
 // ---------- B4: forty kettles in one ----------
@@ -453,8 +465,10 @@ function kettleCabinet(x, y, w, h, opts = {}) {
   return s;
 }
 FRAMES.B4 = () => {
-  // closer and lower: one giant computer's door swung wide toward us; inside, forty kettles in eight rows of five, all
-  // boiling, their forty plumes rolling out over the top into one big cloud; she steps back, a hand up
+  // closer and lower: one giant computer's door swung wide toward us, its inside BLAZING honey with the boiling: forty
+  // kettles in eight rows of five catching the light, a jet of steam curling up off every spout and all of it rolling
+  // out over the top in one cloud; the row around it and the floor stay cool. She steps back from it, both hands up, her
+  // face tipped up to the top of the wall (round 2)
   seed(41);
   const cam = Cam(800, 520, 1387, 0.8);
   const zc = 2.9, Xl = -0.75, Xr = 0.85, Ht = 3.0;
@@ -466,21 +480,27 @@ FRAMES.B4 = () => {
   s += P(polyD([[0, 1600], [W, 1600], [W, H], [0, H]]), V[7], 'opacity="0.5"');
   for (const z of [1.6, 2.1, 2.9, 4.2, 6.4]) s += S(lineD([cam.p(-4, 0, z), cam.p(6, 0, z)]), V[6], 1.6, 'opacity="0.7"');
   for (const X of [-1.2, -0.4, 0.4, 1.2, 2.0, 2.8]) s += S(lineD([cam.p(X, 0, 1.2), cam.p(X, 0, 9)]), V[6], 1.4, 'opacity="0.6"');
-  // the open computer: its body, its dim inside, eight shelves of five kettles, their water gauges glowing
+  // the open computer: its body, and its inside blazing honey with the boiling (a bloom only at the opening)
   const tl = cam.p(Xl, Ht, zc), br = cam.p(Xr, 0, zc), w = br[0] - tl[0], h = br[1] - tl[1];
+  s += rect(tl[0] - 22, tl[1] - 26, w + 44, h + 36, C.honey, 'opacity="0.4" filter="url(#b24)"');
   s += hrect(tl[0] - 16, tl[1] - 18, w + 32, h + 22, V[0], 1);
-  s += hrect(tl[0], tl[1], w, h, V[2], 0.8) + rect(tl[0], tl[1], w, h, C.honey, 'opacity="0.1"');
+  s += `<radialGradient id="k4in" gradientUnits="userSpaceOnUse" cx="${f1(tl[0] + w / 2)}" cy="${f1(tl[1] + h * 0.42)}" r="${f1(h * 0.66)}"><stop offset="0" stop-color="${C.honeyC}"/><stop offset="0.45" stop-color="${C.honeyL}"/><stop offset="1" stop-color="${C.honey}"/></radialGradient>`;
+  s += hrect(tl[0], tl[1], w, h, 'url(#k4in)', 0.8);
+  // eight shelves of five kettles, the shelves and the kettles catching the blaze, their water gauges glowing
   const rows = 8, cols = 5, ch = h / rows, cw = w / cols;
   const spouts = [];
   for (let r = 0; r < rows; r++) {
     const sy = tl[1] + (r + 1) * ch;
-    s += rect(tl[0] + 4, sy - 8, w - 8, 8, V[4]) + rect(tl[0] + 4, sy - 8, w - 8, 2, V[6]);
+    s += rect(tl[0] + 4, sy - 8, w - 8, 9, C.honeyW) + rect(tl[0] + 4, sy - 8, w - 8, 2.4, C.honeyC, 'opacity="0.9"');
     for (let c = 0; c < cols; c++) {
       const kx = tl[0] + (c + 0.56) * cw + rr(-2, 2), ks = ch * 0.74;
-      s += kettle(kx, sy - 8, ks, {steamOn: false, body: V[10], shade: V[8], dark: V[4], gauge: C.honeyL});
-      spouts.push([kx - 0.46 * ks, sy - 8 - 0.8 * ks, r]);
+      s += ell(kx + ks * 0.05, sy - 9, ks * 0.4, ks * 0.06, C.honeyW, 'opacity="0.6" filter="url(#b2)"');
+      s += kettleLit(kx, sy - 8, ks);
+      spouts.push([kx - 0.47 * ks, sy - 8 - 0.79 * ks, r, c]);
     }
   }
+  // the boil: a jet of steam curling up off every spout (up the gaps between the kettles, the bodies crisp)
+  for (const [sx, sy, r, c] of spouts) s += steamJet(sx, sy, ch * (r === 0 ? 1.15 : 0.95), {dir: -1, ph: r * 1.7 + c * 2.3, op: 0.95, w: ch * 0.1});
   s += ell(tl[0] + w / 2, br[1] + 10, w * 0.8, 40, C.honey, 'opacity="0.28" filter="url(#b14)"');
   // the door swung wide toward us on its left hinge: its inner face dark, perforated, its lights dead
   const ang = 115 * Math.PI / 180, dw = 1.6;
@@ -493,21 +513,18 @@ FRAMES.B4 = () => {
   for (let i = 1; i < 18; i++) for (let k = 1; k < 16; k++) { const t = i / 18, Y = k * Dh / 16, p = dq(t, Y), zz = zc + (fe[1] - zc) * t; s += ell(p[0], p[1], Math.max(1, cam.sz(0.012, zz)), Math.max(1, cam.sz(0.012, zz)), V[2], 'opacity="0.8"'); }
   s += S(lineD([dq(0, Dh), dq(1, Dh)]), V[6], 4, 'opacity="0.9"') + S(lineD([dq(0, 0), dq(1, 0)]), V[1], 3);
   { const hA = dq(0.86, 1.15), hB = dq(0.86, 1.55); s += S(lineD([hA, hB]), V[8], Math.max(4, cam.sz(0.03, 1.8)), 'opacity="0.9"'); }
-  // forty kettles boiling: a plume out of every spout, curling up the front of the computer, the rows' steam rising
-  // into one sheet and rolling out over its top into one big cloud
-  for (const [sx, sy, r] of spouts) s += steam(sx - 6, sy, ch * 0.62, ch * 1.25, {n: 5, col: '#f6f7f8', op: 0.92, lean: -0.08, sharp: true});
-  for (let r = 0; r < rows; r++) s += P(blobD(tl[0] + w / 2, tl[1] + r * ch + ch * 0.12, w * 0.5, ch * 0.22, 9, 0.2), '#f3f4f6', `opacity="${f1(0.1 + 0.025 * (rows - r))}" filter="url(#b14)"`);
-  s += steam(tl[0] + w * 0.5, tl[1] - 10, w * 1.6, 230, {n: 10, col: '#f4f5f7', op: 0.97, root: 0.16, warm: true});
-  s += steam(tl[0] + w * 0.12, tl[1] - 4, w * 0.8, 190, {n: 7, col: '#f2f3f5', op: 0.85, lean: -0.15});
-  s += steam(tl[0] + w * 0.9, tl[1] - 4, w * 0.8, 200, {n: 7, col: '#f2f3f5', op: 0.85, lean: 0.12});
-  // her, a step back from it, a hand up (astonished), the forty's warm light on her
-  const fz = 3.45, f = cam.p(1.38, 0, fz), hp = cam.sz(1.7, fz);
-  s += ell(f[0], f[1] + 3, hp * 0.2, hp * 0.035, V[4], 'opacity="0.6"');
-  s += her(f[0], f[1], hp, {view: 'side', dir: -1, lean: -5, step: [7, 2], arms: [[-14, 8], [54, 108]], coat: V[2], coatL: V[3], hair: V[1], skin: V[8], scarf: V[8], rim: C.honeyL});
+  // her, a step back from it, both hands up, her face tipped up to the top of the wall; the blaze's light on her front
+  const fz = 3.3, f = cam.p(1.36, 0, fz), hp = cam.sz(1.7, fz);
+  s += ell(f[0] + hp * 0.03, f[1] + 3, hp * 0.24, hp * 0.035, V[4], 'opacity="0.6"');
+  s += herRecoil(f[0], f[1], hp, {dir: -1, coat: V[2], coatL: V[3], hair: V[1], skin: mixHex(V[8], C.honeyL, 0.3), hand: mixHex(V[8], C.honeyL, 0.4), scarf: V[8], rim: C.honeyL});
   // the high hall's light over it all (the band stays calm)
   s += `<linearGradient id="b4up" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="700"><stop offset="0" stop-color="${C.paperT}" stop-opacity="1"/><stop offset="0.86" stop-color="${C.paper}" stop-opacity="1"/><stop offset="1" stop-color="${C.paper}" stop-opacity="0"/></linearGradient><rect x="0" y="0" width="${W}" height="700" fill="url(#b4up)"/>`;
+  // the forty jets gather into ONE cloud rolling out over the computer's top, lit warm from below by the blaze, its
+  // crown melting into the high hall's light under the words
+  s += G(rollCloud(tl[0] + w / 2, tl[1] - 26, w * 0.98, 230), 'mask="url(#cloudfade)"');
   s += caption([{t: '40', x: 470, y: 500, lit: true, size: 250}, {t: 'kettles,', x: 760, y: 572, size: 112}]);
-  return svgPage(s);
+  const jetDefs = `<linearGradient id="cfg" gradientUnits="userSpaceOnUse" x1="0" y1="505" x2="0" y2="615"><stop offset="0" stop-color="#000000"/><stop offset="1" stop-color="#ffffff"/></linearGradient><mask id="cloudfade" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><rect x="0" y="0" width="${W}" height="${H}" fill="url(#cfg)"/></mask>` + `<linearGradient id="jetg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset="0.45" stop-color="#d8d8d8"/><stop offset="1" stop-color="#000000"/></linearGradient><mask id="jetfade" maskContentUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" fill="url(#jetg)"/></mask>`;
+  return svgPage(s, jetDefs);
 };
 
 // ======================================================================================

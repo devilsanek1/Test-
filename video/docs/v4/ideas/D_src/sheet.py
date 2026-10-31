@@ -11,7 +11,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 BEATS = ['D-B%d' % i for i in range(1, 13)]
 TITLES = {
     'D-B1': 'The frost clears onto 70,000 windows',
-    'D-B2': "Her chat's other end: a city of machines",
+    'D-B2': 'Her armchair among the giants',
     'D-B3': "The building the snow can't touch",
     'D-B4': 'Forty kettles in her kitchen',
     'D-B5': 'Tea for one',
@@ -22,7 +22,7 @@ TITLES = {
     'D-B10': 'Blue in, honey out',
     'D-B11': 'Up her street, under the snow',
     'D-B12': 'Socks on a warm radiator',
-    'D-B2alt': 'Her armchair among the giants',
+    'D-B2alt': "Her chat's other end: a city of machines",
     'D-B7alt': 'She leans out and catches it',
     'D-B8alt': 'Her window, seen from the plan',
     'D-B11alt': "The house opened like a doll's house",
