@@ -79,3 +79,4 @@
 | 2026-10-28 | `v3-final-lanes-wf_8fd70ab8-895.js` | 3 | 0 | (running) |
 | 2026-10-31 | `people-flow-breakdown-wf_a5c2fa85-d11.js` | 2 | 0 | FLOW people: the references' breakdown -> `video/docs/look/refs_people_flow/BREAKDOWN.md`; the code map -> `video/docs/look/people_design/flow_v5/TECH.md` |
 | 2026-10-31 | `people-flow-build-wf_7c2294ea-d1c.js` | 0 | 4 (the monthly spend limit) | FLOW people: GUST and BREEZE, evaluate, adjust, compare; nothing written; resume: `context/RESUME_2026-10-31_people_flow.md` |
+| 2026-10-31 | `people-flow-build-wf_7c2294ea-d1c.js` (rerun `wf_99720470-84e`) | 8 | 0 | FLOW people: GUST and BREEZE (both ALMOST, adjusted once) -> `video/docs/look/people_design/flow_v5/compare.png` |
