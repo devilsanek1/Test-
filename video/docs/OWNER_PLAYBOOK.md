@@ -23,6 +23,7 @@ clear and SMALL** (owner, 2026-10-31: "170k words of guides is absolutely banana
 budget"; see Maintenance at the end; the plan: `docs/process/PLAN.md`).
 
 ## THE THREE RULES ABOVE ALL (owner, 2026-10-30)
+Every brief and every frame review uses `docs/look/FRAME_CARD.md` (the questions, feeling first) and `docs/look/DESIGN_LANGUAGE.md` (the tools for each feeling).
 1. **Every frame is worth pausing on.** Judged at a glance, as a picture, before any numeric check: would a viewer stop
    scrolling to look at it longer?
 2. **Readable imaginative ideas.** Each beat gets an imaginative picture a viewer reads in a second, invented for this

@@ -44,6 +44,8 @@ on the final cut). The people in use: `video/docs/look/PEOPLE_DESIGN.md` (top). 
 no banding on the master: these are the mistakes the checks catch.
 
 ## The toolbox (consult when you need a tool; never pre-load it all)
+Plan a frame on `video/docs/look/FRAME_CARD.md` (the questions, feeling first); find its tools in
+`video/docs/look/DESIGN_LANGUAGE.md` (each aspect: the feelings wanted, the tools and where their recipes live).
 The look's one page: `video/docs/look/DIRECTION.md`. The owner's own words: `video/docs/OWNER_PLAYBOOK.md` (they win
 over every doc; a clash is a bug: fix the lower doc in the same turn; the full order of the docs: DIRECTION's intro).
 The tools and their recipes live in `video/docs/look/` (composition library, painting recipes, light, palette, people,
