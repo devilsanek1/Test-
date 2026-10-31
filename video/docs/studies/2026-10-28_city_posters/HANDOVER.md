@@ -6,6 +6,46 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-31 ~01:00 UTC: the study session stops here; next: `video/docs/process/PLAN.md`
+- Owner: "let's go about it step by step 170k words of guides is absolutely bananas / ... make sure we have this plan
+  captured so that I can delegate it". PLAN.md (10 steps, step 1 done: CLAUDE.md's capture rule and "small").
+- Done and pushed (all three branches in sync): painter v7 (+ the owner's verdict), the composition library (fixed),
+  the Helsinki composition pass (reviewed, on video 4's branch), sound sync, the evaluation. Nothing running, nothing
+  scheduled.
+
+## Status 2026-10-31 ~00:45 UTC: weekly tokens nearly out: small steps only; the rework handed back
+- Owner: "let's just do a few incremental improvents not big redesign leave it to the other session started it".
+  feeling-first-rework STOPPED (only AUDIT.md was extended); `video/docs/process/BRIEF.md` hands it back to video 4's
+  session. One small fix kept: DIRECTION rule 6's darks no longer a percentage (the mood decides; v7's 43 % one example).
+- Last task still finishing: the Helsinki fix (composition-library-v2, run `wf_6be51888-82f`) -> push its files to
+  video 4's branch when it lands. Scheduled checkpoint messages cancelled to save tokens.
+
+## Status 2026-10-31 ~00:35 UTC: the owner: feeling first, numbers never targets; the rework runs
+- Owner on v7: better overall, but "we lost the feeling ... a dark alley whete nothing happens"; "Saying 65% contrast
+  makes the agent force a design"; keep all the tooling and recipes, reframe the guides around feelings. Captured:
+  playbook toolbox bullet ("A number is never a target"), paint_test/NOTES.md (owner on v7).
+- RUNNING: workflow `feeling-first-rework` (run `wf_6517fb67-52c`, script
+  `.../workflows/scripts/feeling-first-rework-wf_6517fb67-52c.js`): finish AUDIT (`video/docs/process/`, taken over
+  from video 4's session, whose run stopped at the limit; BRIEF.md says so) -> DESIGN_LANGUAGE.md + FRAME_CARD.md +
+  REWORK.md -> five lanes reframe the guides (L1 DIRECTION/CRAFT/LAYOUT, L2 composition, L3 paint/organic/palette,
+  L4 sound/people/type/gates, L5 the checkers -> reports) -> cold review -> fix -> v8 of scene 1, feeling first.
+- Still RUNNING too: composition-library-v2's Helsinki fix (run `wf_6be51888-82f`), writing in scratchpad/v4wt.
+
+## Status 2026-10-31 ~00:10 UTC: v7 DONE and sent; the darks rule (D3) settled
+- v7 (`paint_test/paint_still_v7.png`, `compare_v7.jpg`, NOTES v7): the painted wet quay with the door's light coming to
+  us; razor 7 %, straight 12 %, flat 17 % (targets met); her in the overhaul's people. Still off: vector pieces left
+  (boat, lamps, far railings), the grid shows, the key lighter than the refs, no motion check. v8 when G4 needs it.
+- D3 settled (35 edits in 9 files; `paint_test/D3_RECONCILE.md`): small darks at the focal + one or two big quiet dark
+  masses below the band (up to ~45 % under L* 40); D3, C7, C8 FIXED in ORGANIC §8. Open check before a film uses T3's
+  sky: CRAFT §g.1 allows a zenith ~6 L* deeper than the field, T3's is 17 deeper: run the banding check on a master
+  encode (G4).
+
+## Status 2026-10-30 22:50 UTC: resumed after the 22:40 reset (the limit hit ~21:50; the worker restarted)
+- composition-library-v2 (run `wf_6be51888-82f`) resumed: catalogue, 3 judges, library, library critic and the Helsinki
+  first draft are cached; library-fix, helsinki-critic and helsinki-fix run live with RESUMING notes.
+- v7 step B (agent aa74c53934541d244) resumed by message (it was starting the quay painter).
+- Checkpoint commits by send_later at 23:40 and 00:30 (WIP never to video 4's branch; the Helsinki files from v4wt are).
+
 ## Status 2026-10-30 ~20:55 UTC: one state with video 4 (owner: production of video 4 in parallel)
 - Merged `claude/kind-pascal-lvgsza` into ours (one conflict, PIPELINE_V2's table rows, merged word by word; DIRECTION's
   stale LASH lines -> the open-eye pick; typecheck clean) and pushed the same commit to all three branches. The v7 step B

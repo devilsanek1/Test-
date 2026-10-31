@@ -27,8 +27,9 @@ techniques and libraries chosen and rejected with their licences (§3), the rule
 stops reading geometric: shapes and edges, the paint's dose by plane, the light's method, the composition numbers, the
 paper. `PAINT_RECIPES.md` keeps each painted element's recipe, `LAYOUT.md` where things sit, `PALETTE.md` the palettes.
 Where a higher doc predated the owner's 2026-10-30 words and disagreed with them, §8 flagged it (a clash is a bug); the
-coherence pass of 2026-10-30 integrated them all but the dark key (D3, the owner's pick), so DIRECTION and CRAFT now
-carry this doc's rules and numbers as first values, and v7 (an iteration, stills only) is where they are tried and the
+coherence pass of 2026-10-30 integrated them all, and the dark key (D3), handed over by the owner and decided as T3, was
+settled with painter v7's numbers the same day, so DIRECTION and CRAFT now carry this doc's rules and numbers as first
+values, and v7 (an iteration, stills only) is where they are tried and the
 owner's eye decides. The research reports below are notes under this doc. We learn
 methods: every reference is only measured, never copied, traced or used as an input to a picture of ours, and no living
 artist is a style target. Paths are from `video/`.
@@ -83,7 +84,7 @@ or panels, or open on the dose at phone width or in motion; **low** = researched
 
 | # | The point (his words) | What it takes | Confidence | Cost |
 |---|---|---|---|---|
-| 1 | Darks and contrast: "dark and contrast are great but that’s very doable that’s just color palette and selection?" | Yes: palette and light, no new drawing. Shade masses with named casters (the backlit facade, our bank under a canopy off-screen) and the key's deeper darks; R10's real dark mass (§4.4). Proof 2: darks (L* < 40) 6.7 -> 33-38 % of the frame, 94-97 % of the dark group in two masses; median L* 67 -> 61-62; the caption band unchanged (0 codes) | **High** for the still; the dose (T1's gentle key or T3's, the references' own) is the owner's pick, and CRAFT §f.8 disagrees (§8 C8) | 0 ms in the palette; the shade is part of point 3's maps |
+| 1 | Darks and contrast: "dark and contrast are great but that’s very doable that’s just color palette and selection?" | Yes: palette and light, no new drawing. Shade masses with named casters (the backlit facade, our bank under a canopy off-screen) and the key's deeper darks; R10's real dark mass (§4.4). Proof 2: darks (L* < 40) 6.7 -> 33-38 % of the frame, 94-97 % of the dark group in two masses; median L* 67 -> 61-62; the caption band unchanged (0 codes) | **High** for the still; the dose is T3's, the references' low key, decided under the owner's hand-over and built in v7 (43 % under L* 40; the dark group 28 % at L* 27), now CRAFT §f.8's (§8 D3, C8) | 0 ms in the palette; the shade is part of point 3's maps |
 | 2 | One colour key: "Similarly point 2" | Palette work, at the source: ONE family (the sky's dusk family: violet shade, rose-plum, rose, peach, cream-gold light), ONE hot accent (the doorway's gold), every other colour tone-on-tone in its mass (§4.3). Proof 2: off-family colour below the band 16.3 -> 2.5 %; the 1 % most saturated warm light at the door 24 -> 100 %; colour rivals 4 -> 1 | **High** for the method. The proof's per-pixel function greyed the glass (C* 11 -> 4) and the lanterns (6 -> 2) and turned the tree olive: v7 keeps C* >= 8 and one green family | 0 ms (palette roles) |
 | 3 | One story light: "I noticed this too the light source yes - can we do the proper lights?" | Yes, in three homes (§4.2): the colours (what is simply lit or shaded), baked maps per plane (one multiply + one solved screen map, cropped, per state), live layers on movers (rim, wrap, shade, shadow cut, from the mover's own drawing). Proof 2: the doorway is the one place to look, with its pool (83 -> 93 L*), her shadows cut out of it live, her rim and wrap; in `light.md`'s relit still the brightest 5 % below the sky sits within 0.07 H of her (far planes out). Motion proof: the static light holds (0.02-0.05 L* drift), her light falls smoothly 7.3 -> 3.5 L*, nothing flickers (p99 0.3 L*) | **High** for the still; **medium** for a film: maps are one state of the scene (by 1.10 s the shut glass took a green cast), and solved maps slip up to p99 2.8 L* as planes float | As built +170-270 ms a frame; the production path measured 256 ms against v6's ~550 (-290 ms) |
 | 4 | One painted language, near sharper: "I think we need to find a balance ... close objects are more sharp while further objects are more like brushes and painting" | One language for the whole frame at a dose by plane (§5): found edges, fine marks and detail near and at the focal; lost edges, fewer values and coarser, visible marks far; the subject and people crisp. Proof 1: the cloud (the farthest piece) got the most brush, the facade kept the door, the fascia and W found, the paving's marks grow with perspective. It also showed the next step: once the ground is painted, the flat props read pasted, so whatever stays in the frame joins the language at its plane's dose, or goes (R6) | **Medium**: the dose table is first doses; the far city, the water's edges and the props are not yet in the language | Bakes only (0 ms a frame); +30-70 ms for two new full-size images |
@@ -378,7 +379,8 @@ size decides. Sources: `shapes.md` §3 and §6, `techniques.md` §3.6 and §6, `
   lost (§4.1).
 - **R10 A real dark mass:** the darkest value group 15-40 % of the frame at mean L* <= 45, >= 80 % of it in one or two
   connected masses below the band (references 17-36 % at L* 8-35; v6 16 % at 45 in pieces; proof 2 38 % at 30-36, 94-97
-  % in two).
+  % in two; v7 28 % at 27, 92 % in two), with up to ~45 % of the whole frame under L* 40 (T3 45 %, v7 43 %): CRAFT
+  §f.8's low key (§8 D3).
 - **R11 The hot accent only at the focal;** everything else tone-on-tone in its mass (dE <= 6-8); a lit window off the
   beat +6-8 L* inside its facade.
 - **R12 Pip** hides inside a mass of the busy belt, tone-on-tone with the seat it sits in (its own hue still dE76 >= 20
@@ -462,8 +464,8 @@ limit loses at most one step. The checks are the scripts the research already wr
   measure, never a grade over the frame.
 - **Check:** `src/look/light_s1/bake/measure.py` (or its v7 copy), captions off: off-family colour below the band <= 3 %
   (v6 16.3 %); the 1 % most saturated warm light 100 % at the door (v6 24 %); `palette_v7` `problems()` empty; the band's
-  spread <= 1.5 L* and the words' contrast unchanged (68.9 L*); `composition_study.py frame`: colour calls <= 3 with one
-  rival; `scripts/qa/check_banding.py` on a master encode of the deeper zenith. Eye at 400 px: one family, the door the
+  spread <= 1.5 L* and the words >= 7:1 (T3's band at ~77: 63.7 L*, 9:1; v6's lighter band gave 68.9);
+  `composition_study.py frame`: colour calls <= 3 with one rival; `scripts/qa/check_banding.py` on a master encode of the deeper zenith. Eye at 400 px: one family, the door the
   only gold.
 
 ### Step 2. The story light (points 3, 1). Effort: medium (about a day). Cost: the frame gets cheaper than v6.
@@ -481,8 +483,9 @@ limit loses at most one step. The checks are the scripts the research already wr
   scene's `bake/` (later production-grade as `scripts/look/light/bake_light.py`, `light.md` §4.0);
   `src/look/light_s1/rig.ts`, `movers.tsx`, `context.tsx` -> `src/look/v7_s1/`; `src/lib/light2/` reused as is.
 - **Check:** `measure.py`: the brightest 5 % below the sky (far planes out) within 0.07-0.15 H of her; the lobby >= +25
-  L* over the facade in its regions (proof 2 +26, v6 +9); darks (L* < 40) 15-40 % of the frame with >= 80 % in two
-  masses below the band (R10); the caption band 0 codes changed; the engine within ~0.1 L* (mean) of the bake away from
+  L* over the facade in its regions (proof 2 +26, v6 +9); R10's dark group 15-40 % of the frame at mean L* <= 45 with
+  >= 80 % in two masses below the band, and up to ~45 % of the frame under L* 40 (T3; two measures: v7a 27 % and 47 %,
+  v7 28 % and 43 %); the caption band 0 codes changed; the engine within ~0.1 L* (mean) of the bake away from
   the movers; two bakes, one md5.
   Motion: a 1.0-2.4 s clip at 30 fps measured as `light_motion.py` does (static light drift <= 0.05 L*; her light's
   largest step <= 1 L* a frame; frame-to-frame p99 <= 0.3 L* away from the movers; no green cast in the shut state).
@@ -531,8 +534,8 @@ limit loses at most one step. The checks are the scripts the research already wr
   branch. Keep one café table and one chair at the right edge, cut by it, inside the canopy's shade. The
   far towpath's life tone-on-tone within +-6 L*; one boat hull; at most one of the man, the duck and the cat,
   tone-on-tone; Pip off the bollard under the door, onto the boat's cabin roof, tone-on-tone, >= 250 px from the door;
-  one hero cloud top right as the counterweight, the far deck and streaks within +-4 L* of the sky. Show T3's key beside
-  it (a darker sky top, the quay one deep mass) for the owner's pick.
+  one hero cloud top right as the counterweight, the far deck and streaks within +-4 L* of the sky. T3's key (a darker
+  sky top, the quay one deep mass) was decided under the owner's hand-over (§8 end), and v7 built it.
 - **Files:** the v7 scene's own copies of `src/look/paint_s1/V2S1_fore.tsx` (the near props), `near.ts`,
   `V2S1_set_life.tsx` (the towpath's life, the boats, the cat, the leaf branch), `V2S1_pip.tsx` and `V2S1_set_wing.tsx`
   (the panes), or switches in its own `switches.tsx`.
@@ -552,9 +555,10 @@ limit loses at most one step. The checks are the scripts the research already wr
   together, and no shimmer at 720p (`check_banding.py`'s texture mode, the platform rungs): the gate before a film takes
   it. Eye: no texture visible at 400 px, the frame reads as one surface.
 
-**The v7 sheet:** v6 | v7 at full size and at 400 px beside refs 03 and 02, with T3's key as the second option, and one
-table: the three numbers (§4.1), the composition check, the light measure, the float's bitrate, the bake and render
-cost, the md5s. With it, ask the owner §8's three questions.
+**The v7 sheet:** v6 | v7 at full size and at 400 px beside refs 03 and 02, and one table: the three numbers (§4.1), the
+composition check, the light measure, the float's bitrate, the bake and render cost, the md5s
+(`docs/studies/2026-10-28_city_posters/paint_test/compare_v7.jpg`, `v7_checks.json`). §8's three questions were to go
+with it; the owner handed them over and they were decided (§8 end), so the sheet shows the result.
 
 ## 7. What we do not know yet (honest)
 
@@ -565,9 +569,9 @@ cost, the md5s. With it, ask the owner §8's three questions.
    step 2's check; a film needs every state baked.
 2. **The phone's width.** Marks that read at 1:1 fade at 400 px: proof 1's facade and tree, the far city's gold rims,
    her rim and wrap (1-2 px). v7's marks are fewer, bigger and bolder, and every step is judged at 400 px first.
-3. **The high-key top.** The caption sky stays light by rule (a flat band, ink on light): our median stays ~61 against
-   the references' 21-34. T3's darker top is the owner's call; a dark sky with white captions is a separate decision
-   (DIRECTION rule 10).
+3. **The high-key top.** The caption sky stays light by rule (a flat band, ink on light), so our median stays over the
+   references' 21-34 (proof 2 ~61, v7 44). T3's darker top was taken under the owner's hand-over (§8 end; v7's sky 60
+   -> 77 in the band, the words 9:1); a dark sky with white captions stays a separate decision (DIRECTION rule 10).
 4. **The frontal facade.** Its right angles (33 %) and symmetry (0.72) stay over target without a turned view, and the
    owner liked v2's frontal view. Overlaps and varied windows may be enough at 400 px; if not, the wing turns 15-30
    degrees (a G3 decision for a film).
@@ -588,8 +592,9 @@ balance in PAINTED PIECES) outrank every rule below that predates them; each nee
 About half repeat the research lanes' flags (`light.md` §9, `composition.md` §7, `techniques.md` §8, `shapes.md` §8,
 `light_proof.md` §9), gathered here with one proposal each; D1, D5, C1, C9, C10, C12, P1-P3 and P6 are new here. A
 coherence pass on 2026-10-30 made each lower doc agree (the edits name the owner's words they follow); every item is
-marked **FIXED** (where) or **OPEN** (why), and X1-X14 at the end are the clashes that pass found besides. Only the dark
-key (D3, with C7's L* 35 floor and C8) waits, for the owner's pick.
+marked **FIXED** (where) or **OPEN** (why), and X1-X14 at the end are the clashes that pass found besides. The dark key
+(D3, with C7's L* 35 floor and C8), the one item that waited for the owner's pick, was decided under his hand-over and
+settled with painter v7's numbers on 2026-10-30, so every item is now FIXED (the shared code at the end stays flagged).
 
 **DIRECTION**
 - **D1. Rule 4, "big areas flat", and the painted pieces as "a few chosen environment pieces" (elsewhere "texture stays
@@ -609,8 +614,20 @@ key (D3, with C7's L* 35 floor and C8) waits, for the owner's pick.
   proof 2's 33-38 % in two masses. The owner's two notes pull different ways: ask him with T1 (the gentle key) beside T3
   (the references' key), then reword rule 6, CRAFT §f.8 and the playbook bullet together. Proposed: "small darks at the
   focal (windows, a hull, her silhouette) plus one or two big quiet dark masses below the band (15-40 % of the frame)".
-  **OPEN** (waits for the owner's pick of the key; the rules stand, each with a one-line pending note: DIRECTION rule
-  6, CRAFT §d.2 and §f.8, LAYOUT §1's bottom third).
+  **FIXED** (2026-10-30: the owner handed the pick over, "Do what you think is right and make the videos better"; T3
+  was decided (§8 end) and painter v7 built it: 43 % of the frame under L* 40, median L* 44, the dark group 28 % at L*
+  27 with 92 % in its two largest masses, the quay one quiet dark mass that carries the door's light, her L* 25 at the
+  focal, the band L* 77 with the words at 9:1, 1 composition WARN (R2); T3 measured 45 %, refs 02 and 03 84 % and 67 %
+  under their dark skies; `docs/studies/2026-10-28_city_posters/paint_test/NOTES.md` v7, `v7_checks.json`). The
+  proposal stands, its number made two measures: R10's dark group 15-40 % of the frame at mean L* <= 45, >= 80 % of it
+  in one or two masses below the band, and up to ~45 % of the whole frame under L* 40; each mass a shade with a named
+  caster, painted and alive inside, in the key's shade colour (never black, grey or a dead slab); the band kept light
+  for the ink captions; darks scattered as confetti out (R2). Where: DIRECTION's intro (both notes), rule 6 and a
+  Retired line; CRAFT's intro, §d.2 and its check, §f.8; LAYOUT's status legend, §1's bottom third, §6 and §8.2; the
+  playbook's "A full value range" (the owner's words kept), its city-poster bullet and Retired; PALETTE's DNA and 10b;
+  `COZY_AND_SCALE.md` 3b.6 (L* < 25 on <= ~12 %, v7 11 %) and the dusk ladder; here the intro, §1 row 1, R10, §6
+  (steps 1, 2 and 4, the v7 sheet), §7.3 and this section; `scripts/qa/check_light.py --dark-mass`; `composition_study.py`'s info row; the log:
+  `docs/studies/2026-10-28_city_posters/paint_test/D3_RECONCILE.md`).
 - **D4. Rule 3's "no hole bigger than the caption band"** (with `LIFE_AND_DENSITY.md`'s "one quiet field" and
   `LAYOUT.md` §1's quiet-field row) against R5's two big quiet masses. Proposed (`composition.md` §7.1): up to two quiet
   fields, the sky with the band at the top and the near ground at the bottom, each patterned within +-4-6 L*, so never a
@@ -653,9 +670,13 @@ key (D3, with C7's L* 35 floor and C8) waits, for the owner's pick.
   sun in frame over a pale far city (`light.md` D-L5: leave out +3 and beyond); and §d.2's "Nothing under L* 35 but ink,
   anchor-dark surfaces and §f.8's dark pieces" (with its check line) against a shade mass at L* 30-39 (proof 2's bank) or
   T3's quay at 25. **FIXED** for the far planes (CRAFT §d.2 and its check: +3 and beyond left out, 0.07-0.15 H;
-  `check_light.py --exclude`); **OPEN** for the L* 35 floor (it waits for D3; a pending note in §d.2 and the check).
+  `check_light.py --exclude`) and, with D3, for the L* 35 floor (CRAFT §d.2 and its check admit §f.8's darks, the
+  small darks at the focal and the dark masses; `check_light.py --dark-mass` exempts a declared mass from the floor and
+  still fails a greyed shadow there).
 - **C8. §f.8, darks "6-10 % of the frame under L* 40 in >= 120 pieces ... the near world in mid-tones"** against R10: D3
-  above (`composition.md` §7.3, `light_proof.md` §9). **OPEN** (waits for D3; CRAFT §f.8 carries the pending note).
+  above (`composition.md` §7.3, `light_proof.md` §9). **FIXED** with D3 (CRAFT §f.8: the references' low key, R10's
+  dark group and up to ~45 % under L* 40; the 6-10 % in >= 120 pieces and the near world in mid-tones are history;
+  `composition_study.py`'s info row reads the new share).
 - **C9. §g.1, a zenith "a touch deeper ... dL* <= ~1.3"** against v7's sky top B (#afb3d8, L* 75.9 under a field of ~82)
   and the key's -5 L* at the top: `check_banding.py` on a master before it ships (`PAINT_RECIPES.md` C14). **FIXED**
   (CRAFT §g.1: <= ~1.3 by default, up to ~6 L* deeper only with `check_banding.py` PASS on a master; top B as our call
@@ -753,7 +774,8 @@ where CRAFT §c's paper now allows <= 15 % of its strength (the band's spread <=
 playbook: when the owner hands a call over, make it): 1. the key is T3, the references' low key, the caption band kept
 light (about L* 77) and lifted toward T1 only if it reads gloomy at 400 px beside refs 02 and 03; 2. the wing stays
 frontal (his "our initial angle snd the view frankly wasn't bad"), its corners broken by overlaps and painted edges;
-3. the paint's dose is ours: painted at 400 px, subtle at 1:1, the paper invisible at 400 px. D3's wording follows v7a.
+3. the paint's dose is ours: painted at 400 px, subtle at 1:1, the paper invisible at 400 px. D3's wording followed v7
+(FIXED above).
 v7 builds to these (`paint_test/NOTES.md` v7a). The questions as they were:
 
 **Three questions for the owner, with the v7 sheet:**

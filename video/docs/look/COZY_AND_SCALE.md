@@ -283,8 +283,10 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
   under eaves (L* ~29); cast shadows on the ground take the darker tone of the cool field. On a warm palette: red-brown and
   plum, never grey or olive.
 - **Tinted extremes, both rare:** whites carry the scene's tint (C 7-15: a cream on a warm set, pale cyan on water); pure
-  white only as glints (<= 5 % of one object); darks warm and rare (L* < 25 on <= 6 % of the frame) in the palette's anchor
-  (red-brown, aubergine). The references' olive darks and lines are NOT copied (playbook: "Warm, never sickly").
+  white only as glints (<= 5 % of one object); darks warm, the deepest rare (L* < 25 only at the focal and in a dark mass's
+  deepest end, on <= ~12 % of the frame: v7 11 %; <= 6 % until the references' low key, `CRAFT.md` §f.8, 2026-10-30) in
+  the palette's anchor (red-brown, aubergine) or the key's shade end. The references' olive darks and lines are NOT copied
+  (playbook: "Warm, never sickly").
 - **Value framing by content:** the perimeter 5-8 L* darker than the centre through the masses (C2), or the light-dark-light
   sandwich (C3); never a vignette gradient, never a dark band in front of a cozy backdrop.
 
@@ -357,8 +359,10 @@ big sky with huge slow clouds, life in the hold). Where the planes, haze or life
 A7: 12 / 25 / 32 / 36 on a 0-255 scale, ~5 / 10 / 13 / 14 L* [AR §3, our measure]; on a vista the mix toward the sky doubles
 per plane going AWAY, 0 / 12 / 22 / 40 / 65 %, #55 measured: Scale cues 5); no outlines, never lines by depth
 (`CRAFT.md` §c): no tier draws an outline (owner, 2026-10-29), thin lines only for things that ARE lines. Dusk ladder: sky `#D9DEE5` (L* 88) -> `#BAC3CE` (78) -> `#8A9AA8` (63)
--> `#545F6D` (40) -> anchor `#1F2433` (14) on the observer; L* <= 40 is anchor-dark, so those two come only in small pieces (`CRAFT.md` §f.8: 6-10 % of a held frame)
-and big foregrounds are `#8A9AA8` with a `#545F6D` lip (PALETTE). *Parallax* f = 1 - depth: sky 0, far 0.1, city 0.3, near
+-> `#545F6D` (40) -> anchor `#1F2433` (14) on the observer; L* <= 40 is anchor-dark, so those two make the small darks at the focal
+and the one or two big quiet dark masses below the band (`CRAFT.md` §f.8, the references' low key: the dark group 15-40 % of a held
+frame, up to ~45 % under L* 40); a big foreground is that dark mass (`#545F6D` deepening toward the anchor in a shade ramp, chroma
+kept) or, lifted where it reads gloomy, `#8A9AA8` with a `#545F6D` lip (PALETTE). *Parallax* f = 1 - depth: sky 0, far 0.1, city 0.3, near
 0.55, subject 1, foreground frame 1.3-1.5; neighbours >= 1.8x apart (the frame separates by value). *Speed:* the one
 budget, `PIPELINE_V2.md` "Frame rate" (~15 px/frame at the render rate, a WARN; readable at 1x is the test;
 `scripts/camspeed.py`). Worked at 30 fps, with `CAM.reveal` that meant >= 1 s per 315 px of the fastest layer's travel:

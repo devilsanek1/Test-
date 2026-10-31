@@ -94,9 +94,12 @@ ideas; frames planned and created whole from the get-go, never filled for densit
 **THE FRAME LOOP (owner, 2026-10-30; every built idea, key frame, scene and shot, before the owner sees it):**
 1. **Build:** the builder makes the frame whole from its card (the beat's feeling and idea; `docs/look/FRAME_CARD.md`).
 2. **Evaluate:** a FRESH evaluator (never the builder; one, not a panel) looks at the frame at full and phone size
-   beside the hero frame (once it exists) and the owner's references, never a past film of ours, and answers one
-   question first: does it give the viewer the
-   beat's FEELING and idea in a second, and is it worth pausing on? Then the card's questions. The verdict is one of:
+   beside the hero frame (once it exists) and the owner's references, never a past film of ours. Its report OPENS with
+   one line, "The feeling it gives: ...", written from looking at the picture before reading the brief, then the
+   beat's intended feeling beside it, and answers: does it give the viewer the beat's FEELING and idea in a second, and
+   is it worth pausing on? Then the card's questions and the craft. Measurements only explain a gap the eye found
+   ("it feels gloomy: 43 % of it is under L* 40"); they never make a verdict on their own, and a reference lends its
+   craft, not its mood (owner, 2026-10-31: "we lost the feeling"). The verdict is one of:
    - **THERE:** it achieves the feeling; small polish notes only -> move on.
    - **ALMOST:** the feeling is there but specific things hold it back -> ADJUST: the builder fixes exactly those
      (each note names what and why), re-render, re-evaluate. At most 2 adjust rounds.
@@ -374,6 +377,13 @@ the through-line card (G0.5 drafts it from the pick, G1 completes it from the sc
   call, `effort: "max"` on every Agent tool call, `/effort max` as a helper session's first prompt, and every brief says
   that anything its agent starts runs at max too. The hook in `.claude/settings.json` enforces it;
   `python3 .claude/hooks/max_effort.py --lint|--fix <workflow.js>` checks or repairs a script.
+- **The standard brief header** (owner, 2026-10-31: "start from the feeling, never from a number"): every look or
+  frame brief opens with (1) the beat: its story moment and what the viewer should FEEL, in words, and where its life
+  and action are; (2) the tools to consult for that feeling, named by guide (never a guide's numbers copied in);
+  (3) only the hard constraints that apply (CLAUDE.md). A look number in a brief is a target the frame gets forced to:
+  the hook `.claude/hooks/feeling_brief.py` stops a brief that carries one (a share of the frame, an L* target, a
+  placement) unless the brief says "Numbers here are examples or checks, not targets." (for a hard constraint, a
+  mistake check or a labelled example); `python3 .claude/hooks/feeling_brief.py --lint <file>` checks a script.
 - Context: the gate's brief plus the scene's own data. **Point to sections, never "read all docs fully".**
 - An agent writes its result into a file and its chat report is at most 3 lines (rule 9). Cross-lane requests go in one
   block, in an exact format.

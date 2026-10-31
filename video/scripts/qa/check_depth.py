@@ -8,8 +8,9 @@ in scripts/qa/depth_sheets/, README there), measured in CIE Lab (OpenCV float RG
   python3 -I scripts/qa/check_depth.py frame.png --sheet scripts/qa/depth_sheets/v2_g4_look_s1.json
   python3 -I scripts/qa/check_depth.py frame.png --sheet sheet.json --json out.json --map debug.png
 
-FAIL (exit 1) on the three signatures of the owner's note, everything else a WARN with its number (CRAFT's thresholds
-come from a few films: warnings with a declared exception):
+Reports the three signatures of the owner's "no depth" note, and everything else, as NOTES with their numbers: look
+numbers are diagnostics that help explain why a frame feels flat, never a fail (owner, 2026-10-31: "A number is never a
+target"). Only an incomplete sheet FAILs (exit 1), since a check that did not run never passes. The signatures:
   "no air"      the farthest plane is no closer to its air than the subject's plane (distance shows no colour at all)
   "melts"       a silhouette's median fill step under |dL*| 6, or >= 50 % of it at one value along an unlined run > 100 px,
                 or a step that exists only in a thin ring round it (a halo, an outline band or a sliver 2-10 px wide:
@@ -575,22 +576,23 @@ def main() -> int:
     report: list[tuple[str, str]] = []
     res: dict = {'sheet': sheet.get('name', a.sheet), 'image': a.image}
     fails = completeness(sheet, report)
-    fails += check_planes(im, sheet, u, res, report)
-    fails += check_separation(im, sheet, u, res, lines, report)
+    notes = check_planes(im, sheet, u, res, report)  # look numbers: notes, never a fail
+    notes += check_separation(im, sheet, u, res, lines, report)
     maps = [] if a.map else None
     gf, gres = check_ground(a.image, sheet, report, maps)
-    fails += gf
+    notes += gf
     res['ground'] = [{k: v for k, v in g.items() if k != 'segs'} for g in gres]
     res['things'] = check_size(sheet, report)
-    warns = sum(1 for k, _ in report if k == 'WARN')
-    res['fails'], res['warns'] = fails, warns
+    report = [(('NOTE' if k in ('FAIL', 'WARN') and not line.startswith('sheet:') else k), line) for k, line in report]
+    warns = sum(1 for k, _ in report if k == 'NOTE')
+    res['fails'], res['notes'] = fails, warns
     print(f"DEPTH check: {res['sheet']}")
     for kind, line in report:
-        if a.quiet and kind not in ('FAIL', 'WARN', 'WAIVE'):
+        if a.quiet and kind not in ('FAIL', 'NOTE', 'WAIVE'):
             continue
         print(line if kind == 'INFO' else f"{kind:4s} {line}")
-    verdict = 'FAIL' if fails else 'WARN' if warns else 'PASS'
-    print(f"DEPTH: {verdict}" + (f" ({fails} FAIL, {warns} WARN)" if verdict != 'PASS' else ''))
+    verdict = 'FAIL' if fails else 'PASS'
+    print(f"DEPTH: {verdict}" + (f" ({fails} FAIL: the sheet)" if fails else '') + (f" ({warns} notes to read beside the picture, never a fail)" if warns else ''))
     if a.json:
         with open(a.json, 'w') as f:
             json.dump(res, f, indent=1)

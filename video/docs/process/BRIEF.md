@@ -1,3 +1,14 @@
+> **2026-10-31 ~00:30-00:40 UTC: briefly taken over by the study session, then HANDED BACK** (owner: "You are going to
+> run out of tokens for the week soon so let's just do a few incremental improvents not big redesign leave it to the
+> other session started it"). The study run (wf_6517fb67-52c, stopped) only extended AUDIT.md (still IN PROGRESS: the
+> study docs, D3_RECONCILE's darks numbers, the gating checkers and "The v7 lesson" added to its scope). The rework
+> (DESIGN_LANGUAGE, FRAME_CARD, REWORK, the reframe of the guides) stays with video 4's session. New owner input for it
+> (2026-10-31, playbook toolbox bullet: "A number is never a target the frame is built to"; v7's lesson in
+> `video/docs/studies/2026-10-28_city_posters/paint_test/NOTES.md`).
+> **The plan to execute, step by step: `PLAN.md`** (owner, 2026-10-31: "let's go about it step by step"; step 1 done).
+> **Read `EVALUATION.md` first** (owner, 2026-10-31: "evaluate how the rules and guides and instructions to agents should
+> change holistically"): the mechanism and the changes in priority order; the rework follows it.
+
 # Reworking the process: the toolbox as feelings and tools, frames planned whole (2026-10-30)
 
 **The owner, verbatim:** "okay im tired of pointing every single piece im sure we missed some more / so how do we make

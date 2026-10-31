@@ -1,15 +1,15 @@
 # The composition library's clashes with other docs (each with the doc that wins; none edited from here)
 
 **What this is.** `COMPOSITION_SHOTS.md` Part 2 §5, moved here on 2026-10-30 to keep the library page short (the
-library critique's cut, `composition/critique_library.md` §7). Paths are from `video/docs/look/` unless they start with `video/` (as in `COMPOSITION_SHOTS.md`); codes, tiers and the A·S·F scores are `COMPOSITION_SHOTS.md` Part 0's; px at 1080 x 1920, y down; 60 fps.
-
+library critique's cut, `composition/critique_library.md` §7); rows 29-32 added by its Fix pass. Rule, Part and SR
+numbers are `COMPOSITION_SHOTS.md`'s; paths are from `video/docs/look/` unless they start with `video/`.
 
 The order is `CLAUDE.md`'s (in full: DIRECTION's intro): the owner's words (the playbook, `docs/vN/OWNER_NOTES.md`, the
 newest note first) > DIRECTION > CRAFT > PIPELINE_V2 > G3_ANIMATIC, G5_BLOCKING > the look docs, each on its own topic
 (a measured number beats a proposal) > a film's STYLE.md > the v1-era docs; the research notes under `composition/`
 inform this page and rank below it. Until the owner approves a change, the doc that wins stands, and this library
-follows it in practice ("here" says how). Rows 1-14 were flagged by the first library and are still open; 15-28 are
-new.
+follows it in practice ("here" says how). Rows 1-14 were flagged by the first library and are still open: they are the
+owner's to settle (for HANDOFF's queue); 15-32 are newer.
 
 | # | the clash | wins | here, until then |
 |---|---|---|---|
@@ -41,3 +41,7 @@ new.
 | 26 | **"Exists" in the catalogue's engine field.** E1, E10, E11 and J6 cite `lib/figure`, which draws v6's her, not direction C (`PEOPLE_DESIGN.md` §5.10); the `lib/cine` drawing pieces (towers, monuments, windows, props) are references only (DIRECTION's Retired list; `CRAFT.md` §c) | PEOPLE_DESIGN, DIRECTION | for a film these count as "partly": each film draws its own (the fit judge's note) |
 | 27 | **The first library's verdicts.** `composition/reels.md` §4 and this page's first version (24 used, 17 adapted, 0 rejected) against this ranking (12 RARE, A4 and D3 NOT FOR US) | this page (it supersedes its own first version and its research notes) | the tiers stand; the owner's override decides (Part 0.1) |
 | 28 | **The picture's lead on its word.** DIRECTION 8: "visuals lead their word by ~0.1 s"; `composition/attention.md` §9.2: 0.1-0.3 s | DIRECTION | ~0.1 s (6 f), never more than 0.3 s, never after (rule 15) |
+| 29 | **The eye jump across a join.** This library allowed 370 px (`composition/attention.md`'s 5-degree preview) on any carried join; `CRAFT.md` §a, §e: the eye jump <= 0.10 of the 2203 px diagonal, 220 px (`G3_ANIMATIC.md` §6: a warning with a declared exception) | CRAFT | 220 px at most (rule 19); farther only on the declared turn, within ~370 px |
+| 30 | **The K wides' "you".** `LAYOUT.md` §2's tiny anchors: the K wides' observer 60-150 px, "always the 'you'"; the playbook's DEPTH AND SCALE FROM A HUMAN VIEWPOINT (2026-10-29, DIRECTION 7): the "you" ~130-220 px near the camera, "never a far panorama", the scale from a near figure against a big world | the owner's words | the "you" 130-220 px in every size, strangers 15-60 px as the tiny anchors (rule 11, Z1, D2, SR15); LAYOUT §2's row to fix in the same turn (CLAUDE.md: a clash is a bug; not edited from here) |
+| 31 | **The push floor.** `COZY_AND_SCALE.md` 3b.5 and `composition/motion.md` I3: a story zoom is visible at >= 3 % in <= 2 s (1.5 %/s); his reels measured: a 1.4 %/s push reads frozen, a 2.6 %/s one visible (`composition/catalogue_detail.md` §D3 RM4); the playbook: a subtle effect counts as none | COZY_AND_SCALE | >= 3 % in <= 2 s stands; this library proposes >= 5 % in <= 2 s (>= 2.5 %/s), to settle at G3's 1x phone watch (rule 18) |
+| 32 | **The release's pause on a locked take.** `SOUND_SYNC.md` S7: the release in a written voice pause >= 0.8 s (48 f), the gap lengthened before the take's lock; nothing says what to do once the take is locked (video 4: 0.72 s, 43 f, before "So") | SOUND_SYNC (sound) | the picture's release stays on its word; the sound side (a soft step, or the split form) is SOUND_SYNC's to settle |

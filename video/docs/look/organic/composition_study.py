@@ -984,13 +984,15 @@ def cmd_frame(argv):
         SUBJECT['_frame'] = tuple(float(v) for v in argv[argv.index('--subject') + 1].split(','))
     r = measure_one('_frame', save_maps=False)
     print('%s at 400 px wide%s' % (path, ', captions taken out' if '--caption' in argv else ''))
+    print('  (diagnostics, never targets: they help explain how the frame feels; the frame is judged by its feeling first)')
     for rule, what, test, show in CHECKS:
         try:
             ok = bool(test(r))
         except (TypeError, KeyError):
             ok = True
-        print('  %-4s %-4s %-52s %s' % ('ok' if ok else 'WARN', rule, what, show(r)))
-    print('  info      under L* 40: %d %% (CRAFT §f.8 asks 6-10 %%); L* median %d' % (
+        print('  %-4s %-4s %-52s %s' % ('' if ok else 'note', rule, what, show(r)))
+    # how dark a frame is follows its mood (DIRECTION rule 6; owner, 2026-10-31): reported, never judged here
+    print('  info      under L* 40: %d %% (v7 measured 43 %%, refs 02/03 84 %% and 67 %%: examples); L* median %d' % (
         round(100 * r['dark_share_L40']), round(r['L_median'])))
     return r
 

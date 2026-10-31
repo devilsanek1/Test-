@@ -1,5 +1,10 @@
 # HANDOFF: start here if you are a new agent picking up this project
 
+> **NEWEST, 2026-10-31 ~01:00 UTC: the guides go feeling first and get SMALL, step by step: `video/docs/process/PLAN.md`**
+> (owner: "170k words of guides is absolutely bananas / ... make sure we have this plan captured so that I can delegate it to
+> the next agent"). Step 1 is done; start at step 2. Why: `video/docs/process/EVALUATION.md`. The look study's last
+> state (painter v7, the composition library, sound sync): `video/docs/studies/2026-10-28_city_posters/HANDOVER.md`.
+
 > **NEWEST, 2026-10-30 ~22:45 UTC (video 4, Helsinki heat, under the new loop): read `context/RESUME_2026-10-30.md`
 > first**: what the owner decided today, the two rounds that were running and how to resume them, and what is next.
 
@@ -186,7 +191,8 @@ Everything that agent knew is in this repo. This file is the map; the details li
   conclusions into the main repo": this study is merged into `video-production` as it goes, and its conclusions are
   integrated into the main docs when the synthesis lands.
 - **Decided (2026-10-29 ~04:20 UTC, the owner: "Go with your suggestions"):** every open call of the study: no outlines
-  (edges from light and shade, the subject's shade face the deepest), real darks 6-10 % in many small pieces, the
+  (edges from light and shade, the subject's shade face the deepest), real darks 6-10 % in many small pieces (superseded 2026-10-30 by the references' low key, built in painter
+  v7: `docs/look/DIRECTION.md` rule 6), the
   "low poly" patchwork as tier C's build, the designed view in two frames a film, a quiet "find Pip", the sun toned,
   2 px lines on floating layers; `docs/look/LAYOUT.md` is the one layout guide (DIRECTION, CRAFT, LAYOUT, the playbook;
   `INTEGRATION.md` §2). All are first judged in the 7 s look test of v2's canal opening, built in four parallel lanes

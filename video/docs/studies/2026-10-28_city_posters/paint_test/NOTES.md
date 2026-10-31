@@ -428,3 +428,171 @@ and `bash src/look/v7_s1/bake/run.sh <scratch>`; read this section, ORGANIC.md �
 6. **Keep:** the key at the source (`palette_v7.ts`: extend its table, never grade the frame), T3's values with the quay's
    ramp, the cut, the light's doses (`v7light.py` DOSE), the 400 px judgement first; rerun `check_v7.py` (its numbers
    against v7a's above) and `sheet_v7.py` (it writes v7b's sheet once its names move on).
+
+## The owner on v7 (2026-10-31): better overall, but the feeling is lost
+"I do like the approach overall like it does look better overall but we lost the feeling and I feel like the scene now
+is about a dark alley whete nothing happens but the life and action is rather on the background"; and on why: "we are
+putting agents into too restrictive of a box by giving very specific instruction like the exact percentage of contrast
+... Saying 65% contrast makes the agent force a design actually sacrificing the feeling".
+-> What went wrong, honestly: v7a and v7 were built to numbers (T3's 45 % under L* 40, a prop count, quiet masses,
+edge shares) and every number was met, while the scene's feeling ("She quit Google.": a person stepping out of the
+building into her own evening) went unasked: the near 40 % became a dark empty quay, her moment shrank to the
+background, the life left the frame. Kept: the tools (the painter, the light solve, the colour key, the paper, the
+people). Next: the guides reframed as feelings and the tools that create them (playbook, "A number is never a target";
+`video/docs/process/`), then scene 1 again, feeling first.
+
+## v7: painter v7's second half: the painted quay and facade, the paper, her in the people overhaul (iteration, 2026-10-30; ORGANIC.md §6 steps 3 and 5)
+**The ask.** The owner (2026-10-30): "Do what you think is right and make the videos better". The orchestrator's read of
+v7a (judged at 400 px beside refs 03 and 02): keep the top half (the lit door the one place to look, one key, a dusk
+sky); the bottom 40 % read as an empty purple slab with ruler-straight joints, where the references' quiet dark masses
+are ALIVE and painted (ref 03's wet sand mirroring the sky and the sun's path, ref 02's dark textured reeds); break the
+facade's frontal grid and keep its plum warm and clean; near nature only if it helps the depth; rerun the light solve
+on the new shapes. Her: the people of the overhaul the owner put in use (hair v4, the redrawn faces with OPEN EYES, the
+rebuilt bodies: `PEOPLE_DESIGN.md`'s top; the orchestrator's update replaced the brief's direction C with the LASH face)
+at about v2's size at the door, lit by the door's story light, crisp. An ITERATION (stills, one agent, no panels).
+
+| File | What |
+|---|---|
+| `paint_still_v7.png` (= `deliverables/tests/painted_scene1_still_v7.png` = `v7b_step5.png`) | v7: scene 1 at 1.0 s after steps 3 and 5 |
+| `v7b_step3.png` | the checkpoint after step 3 (the pieces, her, the light solved again; no paper) |
+| `compare_v7.jpg` | v6, v7a and v7 at full size, then the three at 400 px beside refs 03 and 02, with the numbers |
+| `v7_checks.json` | every number below (v6, v7a, v7), from `check_v7.py` |
+
+Code: `src/look/v7_s1/`, a fourth look `v7` beside `cut`, `key` and `v7a` (v7a renders byte for byte as committed: its
+maps `maps/v7a` + `maps.ts` untouched). New: the painter `bake/paint_v7.py` with its pieces `bake/piece_quay.py`,
+`piece_wing.py`, `piece_farcity.py`, `piece_prop.py` (MyPaint through the vendored peinten, organic proof 1's `oc_lib`
+and face helpers imported, never copied) and `bake/quay.py` (the quay's geometry and its wet field, shared by the
+painter and the light); the pieces `paint/*.v7piece.png` + the generated `paint_v7.ts`; her `her_v7.tsx`; the maps
+`maps/v7/` + the generated `maps_v7.ts`. Changed: `context.tsx` (look `v7`, its own map set), `pieces.tsx` (the slots
+draw in look `v7` only), `V7World.tsx` (the painted quay and prop replace the stone bands and the vector pair),
+`V7Props.tsx` (`props` switch), `movers.tsx` (her drawing by look, GrainOn), `rig.ts` (`HER_LIGHT_V7`), `v7light.py`
+(`DOSE_V7`, `quay_light`, the kerb), `bake_light_v7.py` (`--look`, `--labels`, `--paper`), `run.sh` (`--look=v7`,
+`--paper`), `check_v7.py` (`--parts`, `--labels`, `--stills`), `sheet_v7.py` (`--v7`). End to end:
+`bash src/look/v7_s1/bake/run.sh <scratch> --look=v7 --paper` (the painter needs organic proof 1's scratch tools:
+`docs/look/organic/organic_proof.md` §9); one still:
+`GL=angle node scripts/render-frames.mjs V7S1 <dir> 1.0 --entry=src/look/v7_s1/entry.tsx --props='{"look":"v7"}'`.
+
+**Step 3, the pieces** (each the MATERIAL in the keyed colours over v7a's flat parts; the light is solved onto it, never
+painted lit; every piece judged at 400 px first, then 1:1):
+- **The quay** (`piece_quay.py`, the `paving` slot: it REPLACES the stone bands). Flags laid by hand along each tread
+  (a ground length of ~1.0-1.6 m, finer toward the canal), each its own value (+-2-5 L* in the material) and lean, v2's
+  two stones mixed with no strict alternation; the cross joints faint, a third lost, the rest in 2-4 pieces with faded
+  ends. The lips, v7a's straightest lines, tone-on-tone along their length and LOST over long stretches (lerped to the
+  treads' value), chipped at the nosings, bowed by a sub-pixel hand-ruled wobble. The wet: a damp glossy film and 18
+  puddles (ellipses in the ground's own coordinates, outlines displaced by noise), darker and richer, smooth (no marks
+  in the water). Marks through MyPaint, by intent and few (a shade zone stays under ~35 % covered; the first pass, an
+  even ~1100-stroke confetti that erased the steps, was thrown out): 36 washes, 153 flat strokes along the perspective
+  (broad near the camera for 400 px, fine by the canal, never on a lip or in a puddle), 55 strokes lapping across the
+  lost nosings, 46 along the lips, 22 worn chips. The kerb's wet lip covers the painted canal's last 2 px (that canal
+  mirrors the light coping there: a bright 1 px seam along the whole kerb, partly v7a's "broken peach glow").
+- **The quay's light** (`v7light.quay_light`, look v7, after the glaze so a reflection keeps its source's colour): the
+  SKY'S SHEEN in the wet (strongest by the canal, Fresnel; a violet lift near the camera); THE DOOR'S PATH, the lit
+  opening mirrored by the rough wet stone as one soft streak from the coping to the frame's bottom (bright dashes in
+  the puddles by the canal, one soft warm glow toward the camera, nothing on the lips): the story light coming to the
+  viewer, the eye travels up it to the door; 10 small gleams on puddle edges in its core. With it, the canopy's sunlit
+  lip on the kerb lit in pieces (its leafy edge across it) and the canal mirroring the kerb's dark wet face (a rippled
+  band 3-10 px deep: the kerb's edge lost into its reflection).
+- **The facade** (`piece_wing.py`, the `facade` slot; v2's frontal view kept, decision 2). Every face its own colour
+  movement (a ramp toward the low sun, +-2.5 L*, warmer toward it; a mottle); every window its own state (28 glass
+  panes: 9 with a diagonal sheen at their own angle, 8 with a blind at their own height, each its own sky; the lit
+  rooms: 5 with a curtain to one side, 2 dimmer, 1 with a blind); lost stretches along 101 frame bars, mullions and
+  piers; the dark sill bands lifted into their glass (R2: detail inside the mass); an autumn creeper (Boston ivy turning
+  crimson: inside the dusk family, so the plum stays clean, never an olive) spilling from two roof planters over the
+  parapet, a pier and two upper windows: one overlap per long top edge; 115 blocky flat strokes (vertical on piers,
+  level on bands, light only on glass), 67 lapping strokes on lost edges, 50 leaf dabs; the colour softened by a
+  premultiplied 1.2 px blur away from the door (found within ~150 px of it). The door, the fascia and W are holes: the
+  scene's own crisp layers.
+- **The far city** (`piece_farcity.py`, the `farcity` slot; the painter's far-city pieces were lost to v6's manifest
+  merge): the plane's blur (+4 1.6 px, +3 0.9, +2 0.5), the tops lost by the sun within ~190 px of the disc, 121 windows
+  tone-on-tone (the tower's grid was a template), 36 broad dry strokes.
+- **The kept prop** (`piece_prop.py`, the `prop` slot: it replaces the vector table and chair; their soft contact
+  shadows and the fallen leaves stay): a light ramp per face, 12 marks along the forms, the outline softened where it
+  meets the dark quay. At 1:1 the pair no longer reads pasted on the painted stone.
+- **Near nature: not added.** At 400 px the depth already reads (a textured dark near quay, the path, the lit door, the
+  hazed far city); a leaf mass at an edge would have been one more value piece (R2) for no gain in depth.
+- **Not repainted (kept):** the sky, the clouds and the canal (the top half the orchestrator kept), the boat, the lamp
+  posts, the far towpath and its furniture (the subject's plane's crisp vector).
+
+**Her** (`her_v7.tsx`): the overhaul's her as `src/entry-look-people-bodies4.tsx` assembles her (`hair_v4/asm_bodies.ts`
+person6 on `people_v4` skel5/hand5/body5): her evening look (the long open coat over the light column, copper long
+layers), walking west out of the door in profile (the walk's contact), OPEN EYES looking away, 152 px tall (v2's
+size), her hair settled into the evening breeze plus her headwind. Crisp, never keyed; lit live by the same layers as
+v7a (`HER_LIGHT_V7`: her backlit shade a touch lighter, the sun's rim on her front, the lit opening's wrap round her, the
+lamps' rim, her shadows cut from the pool). The SVG is built per instance (lib/light2 draws her several times: shade,
+grain, rims, wrap, shadow cut; unique ids). She now holds R4: her L* 25 (v7a's figure 33; <= 28).
+
+**Step 5, the paper** (light_proof §3.2's material: tooth, fibre, mottle, soft-light round mid-grey, the band at 12 %):
+folded into the target before the solve, so every plane's maps carry it and it rides each plane's float; a 256 px grain
+tile soft-lit on her and Pip (lib/light2 GrainOn). Invisible at 400 px (`v7b_step3.png` and `v7b_step5.png` cannot be
+told apart there), a tooth at 1:1; the band's spread stays 1.34 L* (<= 1.5), the words' contrast 63.7 L* (9:1).
+
+**The numbers** (`v7_checks.json`; each still measured with its own her: v7a's figure for v6 and v7a, the overhaul's for
+v7; the surface labels from the flat parts):
+| Check (ORGANIC §6) | v6 | v7a | v7 step 3 | v7 | Target |
+|---|---|---|---|---|---|
+| Razor / straight / dead-flat edges (with captions) | 22.0 / 26.5 / 35.3 % | 20.2 / 22.1 / 33.1 % | 12.7 / 17.5 / 20.4 % | **7.3 / 11.7 / 17.2 %** | <= 8 / 15 / 20 % |
+| The same, her box and the caption block left out | 20.4 / 27.6 / 27.1 % | 17.9 / 23.5 / 25.9 % | 9.7 / 18.2 / 10.9 % | 4.6 / 12.0 / 6.3 % | |
+| The same in pixels (crisp / straight edge px) | | 14.3k / 15.7k | 9.3k / 12.9k | 6.7k / 10.7k | |
+| Darks: under L* 40 / median / p2-p98 | 6.7 % / 66.9 / 29-90 | 47.2 % / 43.2 / 18-89 | 43.1 % / 43.8 / 19-89 | 43.0 % / 43.9 / 19-89 | T3: 45 % |
+| R10 the dark group (in its 2 largest masses) | 16 % at L* 45 (64 %) | 27 % at L* 27 (93 %) | 28 % at 27 (93 %) | 28 % at L* 27 (92 %) | 15-40 %, <= 45, >= 80 % |
+| Colour: off-family below the band / hot light at the door | 16.2 % / 17 % | 0.5 % / 100 % | 0.5 % / 100 % | 0.5 % / 100 % | <= 3 % / 100 % |
+| Calls (rivals): value / colour | 10 (3) / 11 (4) | 1 (1) / 2 (1) | 2 (1) / 2 (1) | 2 (1) / 2 (1) | <= 3, one rival |
+| Focal: the brightest 5 % to her | 0.083 H (36 %) | 0.114 H (61 %) | 0.119 H (61 %) | 0.120 H (61 %) | 0.07-0.15 H |
+| The lobby over the facade / the door's p95 | +0.3 / 92 | +36 / 94 | +33 / 94 | +32 / 94 | >= +25 / >= 95 |
+| Quiet at a squint (largest + 2nd) | 61 % (29 + 24) | 75 % (35 + 29) | 74 % (34 + 29) | 74 % (33 + 29) | >= 65 %, >= 30 + 15 |
+| Composition WARNs (of 10) | 9 | 1 (R2: 16) | 1 (R2: 17) | 1 (R2: 16) | 0 |
+| Facade / quay / water / her (L*) | 76 / 55 / 54 / 30 | 42 / 30 / 48 / 33 | 41 / 31 / 47 / 25 | 42 / 31 / 47 / 25 | her <= 28 |
+| The band: L* / spread / the words' contrast | 81.9 / 1.29 / 68.9 | 76.8 / 1.34 / 63.7 | 76.8 / 1.34 / 63.7 | 76.8 / 1.34 / 63.7 | spread <= 1.5 |
+| The engine against the bake's target (movers out): mean dL* (mean abs, p99 abs) | | +0.12 (0.16, 0.42) | | +0.04 (0.10, 0.41) | ~0.1 |
+Read the edge shares with care: the paper adds ~18k fine texture edges to the count (73.5k -> 91.4k edge px), which
+dilutes the shares; in pixels, crisp edges fall 14.3k -> 6.7k and straight-run edges 15.7k -> 10.7k from v7a. What is
+left of the straight runs is mostly structural: the door's frame and the fascia (crisp by rule), the facade's left
+silhouette, the far towpath's edge, the boat's hull, the bridge's deck. R2's 16 pieces are mostly designed darks (W, her,
+Pip, the boat, the lower-left glass, the canal's dark reflections) plus islands where the quay's textured ramp crosses
+the 3-value squint's threshold (L* ~35).
+
+**Cost.** Render 655-682 ms a frame for look v7 against v7a's 492-598 in the same session (20 frames from 1.0 s,
+concurrency 1, GL angle, two runs each; v7a measured 523-528 in its own session): +~130 ms for four piece images, the
+paper's maps grown to their slots' full boxes (the sky's 1080 x 954 only for the paper) and her overhaul SVG. Bake: the
+painter ~25 s for four pieces on one core (the quay 13.7 s, the facade 5.1, the far city 5.2, the prop 0.5; MyPaint 6.4
+s of it), the parts renders ~45 s, the light ~30 s (inputs 9.9, light 7.7, solve 12.4); 0.49 MB of pieces, 3.7 MB of
+maps (21 files). Deterministic: a second paint and a second bake give the same md5 for every piece and map.
+
+**Still off against the references (honest).**
+- At 400 px the frame reads as a clean illustration with painted surfaces where refs 03 and 02 read as paintings: their
+  masses are loose brush (ref 02's reeds, ref 03's cloud and sand) with long lost edges; ours keep the vector drawing
+  underneath in the boat, the lamp posts, the far towpath's furniture and railings, and the facade's frontal grid of
+  rectangles still reads at phone size (decision 2; the creeper and the lost stretches soften it at 1:1 only).
+- Our key stays lighter (median L* 44 against 34 and 21): the caption sky stays light by rule.
+- The quay's marks run one way (along the perspective) on one ladder; ref 03's ground is calmer, a few long level
+  strokes and a stronger mirror of the sky by the water. At 1:1 the near strokes repeat a tapered "fish" shape.
+- R2 holds 16 pieces (<= 10); the door's p95 94.3 still misses 95 (the lobby's lemon lean, v7a's); her cream column
+  reads lilac-grey in the backlight.
+- Her hair: the v4 rig moves only the far curtain in profile; its back and front masses do not answer the breeze (the
+  same breeze from 1060 to 5000 units a second changed nothing there), so the still's hair is the cut as drawn.
+- Nothing is checked in motion (stills only): the far city piece holds three planes in the +3 group (they float at
+  0.05 / 0.15 / 0.35), the paper's tooth is 1-2 px (the twinkle rule asks >= 2 px on a floating plane), the maps are
+  one state.
+
+**What a v8 would do.**
+1. The dose at 400 px where the references differ most: the quay as fewer, longer level strokes with a stronger mirror
+   of the sky by the water (ref 03); the far city and the bridge as one hazed brushed mass; the facade's piers and bands
+   as broad flat-brush blocks (fewer, larger); the boat, the lamp posts and the far towpath's furniture painted at their
+   planes' doses (the last vector pieces), which also takes R2 toward 10.
+2. Motion: the far city split into its three planes, per-state maps (the doors, W's lamp at 3.90 s), the float's slip,
+   the paper's twinkle and the bitrate (`techniques_motion.py`), before a film takes any of it.
+3. People: the hair rig's wind in profile (the people lane); her backlight from her own rig rather than a flat multiply;
+   the overhaul wired as the film's figure component (the tooling lane).
+4. Cost: the sky's paper folded into the painted sky piece (one full-frame blend less), the maps cropped harder.
+
+**Flags for the orchestrator (found here, not edited).**
+- ORGANIC §6 step 3's file plan (scripts/look/organic moved into scripts/look/paint as v7 styles, `src/lib/organic`)
+  is not done: the v7 painter lives in `src/look/v7_s1/bake/` and imports `oc_lib` and proof 1's face helpers.
+- The painter's v7 canal (`public/paint/v2s1_v7/water.png`) paints a bright last row mirroring the light coping (hidden
+  here by the kerb); its spec could fix it at the source.
+- The hair v4 rig's wind response in profile (above) is the people lane's; `her_v7.tsx` places the overhaul's look-study
+  code through an SVG string with per-instance ids (PEOPLE_DESIGN: wiring it into the film engine is the tooling lane's).
+- The edge shares move with the paper's texture (above): ORGANIC §4.1's targets read best in pixels or measured before
+  the paper.
+- R2's 3-value squint threshold (~35 L*) cuts through T3's quay ramp, so any texture there makes islands: the
+  recalibration ORGANIC §6 step 4 anticipated.

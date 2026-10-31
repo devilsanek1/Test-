@@ -4,6 +4,10 @@
 "But I’m wondering why can’t you manipulate pixels like we have this painting now and I think we just need to brush it
 and perhaps draw them in layers a bit more blurry each time like look how this is done or this"
 
+**Take / leave (owner, 2026-10-31: feeling first):** TAKE the method (a limited palette, shapes designed first, broad
+strokes laid soft to crisp, softer with distance, crisp detail only on the subject). LEAVE their palettes and their
+calm dusk mood unless the beat wants them: the colour and the key come from the beat's feeling.
+
 | File | What it shows | What to learn |
 |---|---|---|
 | `01_beach_van_dusk.jpg` | a panoramic dusk beach: a blue van with a surfboard, a couple on a big smooth boulder, dark rounded stones, the sea, a sailboat and a far lighthouse, a pink-violet sky with soft painted clouds, wet sand reflecting it | simple smooth forms shaded softly; the sky soft, the near objects crisper; far headlands pale; one dusk colour family; reflections that repeat the sky |

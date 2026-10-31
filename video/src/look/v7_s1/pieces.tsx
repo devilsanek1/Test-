@@ -10,8 +10,12 @@
 //   paving    our bank, over the stone bands (organic proof 1's paving, its marks bold enough for 400 px; the shadows stay
 //             the light's maps, never baked twice)
 //   prop      the near plane, the kept table and chair at the near dose (hand-cut, a light ramp, edge strokes)
-//   leaves    the near frame, a few soft leaves of the plane tree off-frame left at the left edge (the near frame's
-//             dose: few marks, out of focus, inside the near shade mass)
+//   leaves    (kept empty in v7) the near frame's soft leaves at one edge: judged unneeded, the depth already reads
+//             (NOTES.md "v7")
+// In look 'v7' (NOTES.md "v7"; painted by src/look/v7_s1/bake/paint_v7.py): farcity (the west gap at its far doses),
+// facade (the wing, holes at the door, the fascia and W), paving (the quay: it REPLACES the stone bands, V7Steps) and
+// prop (the table and the chair: they replace the vector pair, V7NearProps' `props`); clouds and water stay the
+// painter's v7 set (the top half kept).
 // How to fill one: the painter (`src/look/v7_s1/bake/paint_v7.py`, MyPaint through the vendored peinten) bakes each piece
 // to `./paint/<name>.v7piece.png` and writes `./paint_v7.ts` (the generated registry: each piece's import and its box in
 // its layer's own px: x, y, w, h); then the light bake reruns from the parts renders (`bash src/look/v7_s1/bake/run.sh
