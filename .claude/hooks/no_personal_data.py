@@ -16,7 +16,8 @@ NETWORK = re.compile(r'\b(curl|wget|httpie|http|requests\.|urllib|httpx|aiohttp|
 EMAIL = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
 HEADER = re.compile(r'(?:-A\s|--user-agent|user-agent|\bfrom:|["\']from["\']\s*:)[^\n]{0,160}', re.I)
 HANDLE = re.compile(r'devilsanek', re.I)
-REPO = re.compile(r'(?:github\.com[/:])?devilsanek1/Test-', re.I)  # the repo's own path is not personal data
+# the owner's own repos (the archive and the studio) are not personal data (the owner's yes, 2026-10-31)
+REPO = re.compile(r'(?:github\.com[/:])?devilsanek1/(?:Test-|fuss-studio(?![\w-]))', re.I)
 
 MESSAGE = ('The owner\'s privacy: never send the owner\'s email, name or handle to a web service (a User-Agent or From '
            'header, a URL, a form, an API body). This call carries {what}. Identify the tool generically instead '
