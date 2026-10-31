@@ -37,10 +37,17 @@ MESSAGE = ('Owner rule (CLAUDE.md, "Feeling first" 4): start from the feeling, n
            'example, keep it and add this line to the brief: "Numbers here are examples or checks, not targets."')
 
 
+QUOTED = re.compile(r'"[^"\n]{0,400}"|“[^”]{0,400}”')
+
+
 def find_targets(text):
-    """Return [(kind, snippet)] for the look-number targets in a brief that does not acknowledge them."""
+    """Return [(kind, snippet)] for the look-number targets in a brief that does not acknowledge them.
+
+    Text inside quotes is someone's words (the owner's notes, a quoted line), never a target the brief sets, so it is
+    left out before matching."""
     if not text or ACK.search(text) or not LOOKISH.search(text):
         return []
+    text = QUOTED.sub(' ', text)
     hits, seen = [], set()
     for kind, rx in TARGETS:
         for m in rx.finditer(text):
