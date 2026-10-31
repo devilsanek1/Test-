@@ -262,8 +262,10 @@ Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Music and 
 - **Hair is never static or one firm shape: always a little messy, unstructured and wavy, INSIDE A PROPER, STYLISH,
   CLEAN HAIRCUT:** the cut first, the life a touch, never bed-head; slim, elegant people with a relaxed posture and an
   upright neck. **Hair is BUILT TO ANIMATE and drawn CLEAN:** a few smooth shapes on a spring rig, proven in motion
-  before the owner sees it (`docs/look/PEOPLE_DESIGN.md`). — ("more like a person woke up and that's what we see like
-  not stylish and not clean"; "looks like this person was sitting at computer the whole day", 2026-10-30.)
+  before the owner sees it (`docs/look/PEOPLE_DESIGN.md`); **simpler and flowier, like the people references: a few
+  long tapering ribbons that stream with the wind, never many strands.** — ("more like a person woke up and that's what
+  we see like not stylish and not clean"; "looks like this person was sitting at computer the whole day", 2026-10-30;
+  "similarly with hair", 2026-10-31.)
 - **Faces, above all the profile, are cute and super appealing by modern standards; women read feminine and men
   manly;** tasteful, never caricature. **Hair, face, light and values are designed together, as one character,**
   judged overall beside the references. — ("just compare it overall and evaluate what makes the left to be modern and
@@ -271,11 +273,13 @@ Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Music and 
 - **People: small and simple in the frame, contemporary and refined in design:** small full figures acting with their
   pose, never big character models; open eyes looking away, never at us (closed eyes only for a downcast, serene
   moment). **In the foreground only the film's one "you" or the mascot;** strangers stay small in the mid and far
-  ground. Refined, clean and fluid (one flowing element, a scarf, a coat hem or hair, moves while the body stays
-  calm); beautiful, styled like today's 20-30-year-olds in New York and Los Angeles. The people in use:
-  `docs/look/PEOPLE_DESIGN.md` (its status block). — ("don't use big models of people", v2 restart, 2026-10-27; "we
-  need to draw people that are beautiful and pleasant and the clothing is appealing"; "Let's do open eyes",
-  2026-10-30.)
+  ground. **Simple, flowy and a touch cartoonish, like the people references (`docs/look/refs_people_flow/`): the
+  figure reads as a few flowing shapes, the clothes fluid with little detail, the garment and the hair swept the same
+  way while the body stays calm; never a tailored, jointed mannequin.** Beautiful, styled like today's 20-30-year-olds
+  in New York and Los Angeles. The people in use: `docs/look/PEOPLE_DESIGN.md` (its status block). — ("don't use big
+  models of people", v2 restart, 2026-10-27; "we need to draw people that are beautiful and pleasant and the clothing is
+  appealing"; "Let's do open eyes", 2026-10-30; "the models are simpler, more flowy, slightly more cartoonish, the
+  clothing is more fluid, less details and more flow ... I also generally like the visual style", 2026-10-31.)
 - **The words on screen are DESIGNED, never one static block: the fonts, the size, where the words sit and how they
   move are chosen beat by beat to look premium, interesting, dynamic and engaging** (`docs/look/TYPE_GUIDE.md`).
   **Captions are burned in and pop in place (or rise without clipping),** read at a glance, in the voice's order. —

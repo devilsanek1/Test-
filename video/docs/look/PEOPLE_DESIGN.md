@@ -1,5 +1,10 @@
 # PEOPLE_DESIGN: how we draw people (the people of the overhaul in use for now: hair v4, open eyes, rebuilt bodies)
 
+**STUDY IN PROGRESS (owner, 2026-10-31): FLOW, the people reworked from his new references** (`refs_people_flow/`:
+"simpler, more flowy, slightly more cartoonish, the clothing is more fluid, less details and more flow, similarly with
+hair"; the playbook's people and hair rules). The v4 people below stay in use until the owner picks; where FLOW's
+result differs from the rules below, this page is rewritten around it, not appended to.
+
 **IN USE FOR NOW (owner, 2026-10-30: "I think it is a bit better overall I think yes let's go with that for now"):
 the people of the overhaul: hair v4 + the redrawn faces with OPEN EYES + the rebuilt bodies** (assembled in
 `src/entry-look-people-bodies4.tsx`: `people_dirs/people_v4/` (heads, faces, `skel5.ts`, `hand5.ts`, `body5.ts`) and
