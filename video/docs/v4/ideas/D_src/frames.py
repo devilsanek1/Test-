@@ -1563,7 +1563,7 @@ def B7_block():
         blobs = ''.join(ell(px + k * w / 7.0, py + math.sin(k * 0.9 + i) * 18, w / 6.0 * (0.7 + 0.08 * k), h / 2.6, '#f3f6fa', opacity='0.34') for k in range(8))
         o.append(grp(blobs, filter='url(#vap)'))
         core = [(px + k * w / 7.0, py + math.sin(k * 0.9 + i) * 18) for k in range(1, 7)]
-        o.append(grp(pline(core, HONEY, h / 2.4, opacity='0.4'), filter='url(#b16)'))
+        o.append(grp(pline(core, HONEY, h / 2.6, opacity='0.27'), filter='url(#b16)'))
         o.append(grp(pline(core[1:], HONEY_HI, h / 6.0, opacity='0.72'), filter='url(#b4)'))
     hx_, hy_ = P(2.5, 6.0)
     o.append(grp(path('M %s %s C %s %s %s %s %s %s' % (f(hx_ + 260), f(hy_ - 10), f(hx_ + 160), f(hy_ - 40), f(hx_ + 90), f(hy_ - 70), f(hx_ + 40), f(hy_ - 74)),

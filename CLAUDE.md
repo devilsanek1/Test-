@@ -72,3 +72,7 @@ guides is absolutely bananas"). Every lesson goes into the process (playbook, pi
 - **A look or frame brief opens with the beat's feeling and story moment in words** (PIPELINE_V2, "The standard brief
   header"); the hook `.claude/hooks/feeling_brief.py` stops a brief that hands an agent a look number as a target.
 - Commit only your own paths; never `git add -A`.
+- **Never send the owner's email, name or handle to a web service** (a User-Agent or From header, a URL, a form, an
+  API body): identify a tool generically (`-A "video-research/1.0"`); skip a site that insists on a personal contact.
+  The hook `.claude/hooks/no_personal_data.py` stops it (2026-10-31: agents had put the owner's email in Wikimedia
+  requests).

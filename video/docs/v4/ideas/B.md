@@ -366,3 +366,11 @@ a pang (warmth thinning into the dark) > the turn (the house leaning out, the sp
 leaning in > "oh" (frost to steam under her hand) > cozy > a wink (her mug raised to your phone). Still weakest: B6
 leans on motion for its rising snow and its glowing fan is close to a fire pit at a glance; B2 and B3 share the
 one-point aisle; the window people in B7-B8 are small at phone size; B5's hand reads as a grey glove.
+
+## Round 2 changes (THE FRAME LOOP, from `B_EVAL_r2.md`)
+
+(in progress) Kept exactly as judged (THERE): B1, B2, B5, B7, B8, B9, B10, B11, B12, B6alt, B7alt, B12alt (their
+polish notes go to the key frames).
+- B6 (ALMOST, "B6alt is the stronger frame; if it is taken, B6 needs no further round"): taken. B6alt is the pick for
+  this beat; B6 stays on the sheet as drawn, its last round not spent.
+- B5alt (ALMOST, "not needed: B5's toast does the same with a person in it"): B5 stays the pick; B5alt kept as drawn.

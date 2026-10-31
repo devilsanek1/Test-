@@ -359,9 +359,10 @@ FRAMES.B2 = () => {
   return svgPage(s);
 };
 
-// ---------- B3: too hot for snow. The hot aisle behind the machines: both walls of grilles glowing, deep amber near
-// us, white-hot where the aisle meets; the heat lifting off them in a shimmering haze up to the vents; she stands in
-// the middle, coat open, her beanie pulled off in her hand, her hair lifting in the hot draught; the flakes blown in
+// ---------- B3: too hot for snow (round 2). The hot aisle behind the machines: both walls are their backs, dark faces
+// whose grille slits glow with the heat inside like an oven's, deep honey near us to white-hot where the aisle meets; the
+// glow spills onto the floor and onto her; far down the aisle the air bends in the haze. She stands near us in the
+// middle, her coat flung open, fanning herself with her beanie, her hair lifting in the hot draught; the flakes blown in
 // behind us shrink and turn to drops before they reach the machines ----------
 FRAMES.B3 = () => {
   seed(23);
@@ -369,45 +370,56 @@ FRAMES.B3 = () => {
   const ax = 1.5, rh = 2.9, z0 = 1.25, z1 = 30;
   let s = '';
   s += `<linearGradient id="b3g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1100"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.28" stop-color="${C.paper}"/><stop offset="0.55" stop-color="${C.paper}"/><stop offset="0.66" stop-color="#e3c9a3"/><stop offset="1" stop-color="${V[6]}"/></linearGradient><rect x="0" y="0" width="${W}" height="${H}" fill="url(#b3g)"/>`;
-  // the upper walls over the racks, warm-dark; the ceiling's vents (all below the band)
+  // the upper walls over the racks, warm-dark (all below the band)
   s += `<linearGradient id="b3w" gradientUnits="userSpaceOnUse" x1="0" y1="560" x2="0" y2="1000"><stop offset="0" stop-color="${C.paper}"/><stop offset="0.3" stop-color="#d9c3a2"/><stop offset="1" stop-color="${V[5]}"/></linearGradient>`;
   for (const sx of [-1, 1]) s += P(polyD([cam.p(sx * ax, rh, z0), cam.p(sx * ax, rh, z1), cam.p(sx * ax, 7, z1), cam.p(sx * ax, 7, z0)], 1), 'url(#b3w)', 'opacity="0.9"');
-  const vents = [];
-  for (let z = 9; z < 28; z += 3.6) { const a = cam.p(-0.7, 6.9, z), b = cam.p(0.7, 6.9, z + 1.0); if (b[1] < 650) continue; vents.push([(a[0] + b[0]) / 2, b[1]]); s += hrect(a[0], b[1], b[0] - a[0], Math.max(5, a[1] - b[1]), V[2], 0.5) + rect(a[0] + 3, b[1] + 1, b[0] - a[0] - 6, 2, C.honeyL, 'opacity="0.5"'); }
+  // far away everything sits in the bending air (the haze filters bend the straight lines more with distance)
+  const hz = {hz1: '', hz2: '', hz3: '', hz4: '', hz5: ''};
+  const cuts = [[5.5, 8, 'hz1'], [8, 11, 'hz2'], [11, 15, 'hz3'], [15, 20, 'hz4'], [20, z1, 'hz5']];
+  const hzOf = (z) => { for (const [a, b, k] of cuts) if (z >= a && z < b) return k; return ''; };
+  let vents = '';
+  const ventPts = [];
+  for (let z = 9; z < 28; z += 3.6) { const a = cam.p(-0.7, 6.9, z), b = cam.p(0.7, 6.9, z + 1.0); if (b[1] < 650) continue; ventPts.push([(a[0] + b[0]) / 2, b[1]]); vents += hrect(a[0], b[1], b[0] - a[0], Math.max(5, a[1] - b[1]), V[2], 0.5) + rect(a[0] + 3, b[1] + 1, b[0] - a[0] - 6, 2, C.honeyL, 'opacity="0.5"'); }
   // the core: where the aisle meets, white-hot
   const vp = cam.p(0, 1.3, z1);
-  s += faceZ(cam, z1, -ax - 0.1, ax + 0.1, 0, 7, C.honeyL);
-  s += ell(vp[0], vp[1], 170, 220, C.honeyC, 'opacity="0.9" filter="url(#b40)"') + ell(vp[0], vp[1], 70, 110, '#fffaf0', 'opacity="0.95" filter="url(#b14)"');
-  // the floor: warm, its sheen brightest toward the core
-  s += P(polyD([cam.p(-ax, 0, z0), cam.p(-ax, 0, z1), cam.p(ax, 0, z1), cam.p(ax, 0, z0)]), V[6]);
-  s += P(polyD([cam.p(-0.9, 0, z1), cam.p(0.9, 0, z1), cam.p(1.2, 0, z0), cam.p(-1.2, 0, z0)]), C.honey, 'opacity="0.3" filter="url(#b14)"');
-  for (let z = z0; z < z1; z *= 1.16) s += S(lineD([cam.p(-ax, 0, z), cam.p(ax, 0, z)]), V[4], 1.4, 'opacity="0.6"');
-  // the two walls of glowing grilles: deep amber near, paler and whiter toward the core
+  const farWall = G(faceZ(cam, z1, -ax - 0.1, ax + 0.1, 0, 7, C.honeyC), 'filter="url(#hz5)"');
+  // the floor: dark tiles, the core's light running down the middle of it
+  s += P(polyD([cam.p(-ax, 0, z0), cam.p(-ax, 0, z1), cam.p(ax, 0, z1), cam.p(ax, 0, z0)]), V[3]);
+  s += P(polyD([cam.p(-0.5, 0, z1), cam.p(0.5, 0, z1), cam.p(0.7, 0, z0), cam.p(-0.7, 0, z0)]), C.honey, 'opacity="0.2" filter="url(#b24)"');
+  for (let z = z0; z < z1; z *= 1.16) { const ln = S(lineD([cam.p(-ax, 0, z), cam.p(ax, 0, z)]), V[1], 1.6, 'opacity="0.7"'); const k = z > 11 ? hzOf(z) : ''; if (k) hz[k] += ln; else s += ln; }
+  for (const x of [-ax / 2, 0, ax / 2]) { s += S(lineD([cam.p(x, 0, z0), cam.p(x, 0, 11)]), V[1], 1.4, 'opacity="0.6"'); for (const [a, b, k] of cuts.slice(2)) hz[k] += S(lineD([cam.p(x, 0, a), cam.p(x, 0, b)]), V[1], 1.3, 'opacity="0.6"'); }
+  // the glow the walls throw on the floor along their feet (honey near us, paler toward the core)
+  for (const side of [-1, 1]) {
+    s += P(polyD(q3(cam, [[side * ax * 0.99, 0, z0], [side * ax * 0.99, 0, z1], [side * ax * 0.62, 0, z1], [side * ax * 0.62, 0, z0]])), C.honeyD, 'opacity="0.3" filter="url(#b14)"');
+    s += P(polyD(q3(cam, [[side * ax * 0.99, 0, z0], [side * ax * 0.99, 0, z1], [side * ax * 0.84, 0, z1], [side * ax * 0.84, 0, z0]])), C.honey, 'opacity="0.42" filter="url(#b8)"');
+  }
+  // the two walls: the machines' backs, dark, their slits glowing (near, mid, far: the far ones in the bending air)
+  const slices = cuts.slice().reverse().map(([a, b, k]) => [a, b, k, a < 11 ? 'b4' : 'b2']).concat([[z0, 5.5, '', 'b8']]);
+  hz.hz3 += vents;
+  let nearWalls = '';
+  for (const [za, zb, k, bl] of slices) {
+    let g = '';
+    for (const side of [-1, 1]) { const w = slitWall(cam, side * ax, rh, za, zb, z0, z1); g += w.base + G(w.glow, `filter="url(#${bl})"`) + w.core; }
+    if (k) hz[k] += g; else nearWalls += g;
+  }
+  // the white-hot core behind the far machines, so their dark edges shiver against it; a veil of hot air over them
+  s += farWall + ell(vp[0], vp[1], 170, 220, C.honeyC, 'opacity="0.9" filter="url(#b40)"') + ell(vp[0], vp[1], 70, 110, '#fffaf0', 'opacity="0.95" filter="url(#b14)"');
+  for (const k of ['hz5', 'hz4', 'hz3', 'hz2', 'hz1']) s += G(hz[k], `filter="url(#${k})"`);
+  s += ell(vp[0], vp[1], 120, 150, '#fffaf0', 'opacity="0.42" filter="url(#b40)"');
+  s += nearWalls;
+  // the heat lifting off the backs in soft warm veils, up toward the vents
   for (const side of [-1, 1]) {
     const X = side * ax;
-    for (let z = z0; z < z1 - 0.6; z += 0.72) {
-      const zz = z + 0.66, t = clamp((z - z0) / (z1 - z0), 0, 1);
-      s += poly3(cam, [[X, 0, z], [X, 0, zz], [X, rh, zz], [X, rh, z]], V[2], '', 0.3);
-      const col = t < 0.25 ? C.honeyD : t < 0.55 ? C.honey : t < 0.8 ? C.honeyL : C.honeyC;
-      s += poly3(cam, [[X, 0.12, z + 0.05], [X, 0.12, zz - 0.05], [X, rh - 0.1, zz - 0.05], [X, rh - 0.1, z + 0.05]], col, `opacity="${f1(0.85 + 0.15 * t)}"`, 0.3);
-      for (let yy = 0.3; yy < rh - 0.2; yy += 0.22) s += S(lineD([cam.p(X, yy, z + 0.06), cam.p(X, yy, zz - 0.06)]), t < 0.4 ? V[2] : C.honeyD, cam.sz(0.05, z), `opacity="${f1(0.75 - 0.4 * t)}"`);
-      s += S(lineD([cam.p(X, 0, z), cam.p(X, rh, z)]), V[1], Math.max(0.8, cam.sz(0.03, z)), 'opacity="0.8"');
-    }
-    s += P(polyD(q3(cam, [[side * ax * 0.98, 0, z0], [side * ax * 0.98, 0, z1], [side * ax * 0.5, 0, z1], [side * ax * 0.5, 0, z0]])), C.honey, 'opacity="0.3" filter="url(#b8)"');
-    // the heat lifting off the grilles: shimmering warm veils climbing from the racks' tops up toward the vents
     for (let i = 0; i < 9; i++) {
       const z = z0 + 1 + i * 2.2, base = cam.p(X * 0.92, rh, z), up = cam.sz(3.6, z);
-      const pts = []; for (let j = 0; j <= 7; j++) pts.push([base[0] - side * j * up * 0.035 + Math.sin(j * 1.5 + i) * cam.sz(0.14, z), base[1] - j * up / 7]);
-      s += S(smoothD(pts, false), C.honeyC, Math.max(2, cam.sz(0.06, z)), `opacity="${f1(0.42)}" filter="url(#b2)"`);
       s += P(blobD(base[0] - side * up * 0.08, base[1] - up * 0.45, cam.sz(0.5, z), up * 0.5, 9, 0.25), C.honeyC, 'opacity="0.2" filter="url(#b14)"');
     }
   }
-  for (const [vx, vy] of vents) s += steam(vx, vy + 34, 90, 70, {n: 4, col: C.honeyC, op: 0.35, warm: false});
-  // her, in the middle, facing us: coat open, her beanie pulled off in one hand, the other at her collar, her hair
-  // lifting in the hot draught
-  const zf = 6.2, f = cam.p(0.05, 0, zf), hp = cam.sz(1.7, zf);
-  s += ell(f[0], f[1] + 3, hp * 0.24, hp * 0.04, C.honeyD, 'opacity="0.5"');
-  s += her(f[0], f[1], hp, {view: 'front', open: true, lift: 1.0, arms: [[16, 14], [22, 194]], hold: {0: 'beanie'}, hatCol: V[7], coat: V[2], coatL: C.honeyD, knit: V[10], hair: V[1], skin: V[8], scarf: V[8], rim: C.honeyL, rimSide: 1, smile: -1, look: 0, step: [3.4, 3.4]});
+  for (const [vx, vy] of ventPts) s += steam(vx, vy + 34, 90, 70, {n: 4, col: C.honeyC, op: 0.35, warm: false});
+  // her, near, in the middle of the aisle: coat flung open, fanning herself with her beanie, the walls' heat on her
+  const zf = 2.6, f = cam.p(-0.28, 0, zf), hp = cam.sz(1.7, zf);
+  s += ell(f[0], f[1] + 4, hp * 0.26, hp * 0.04, C.honeyD, 'opacity="0.45" filter="url(#b4)"') + ell(f[0], f[1] + 3, hp * 0.16, hp * 0.025, V[0], 'opacity="0.6"');
+  s += herHot(f[0], f[1], hp, {coat: V[2], knit: V[10], hair: V[1], skin: V[8], hatCol: V[6]});
   // the flakes blown in behind us: big and white at the edges, shrinking and wet as they go in, drops and little
   // puffs before they reach the machines
   for (let i = 0; i < 46; i++) {
@@ -420,7 +432,7 @@ FRAMES.B3 = () => {
   // the hall's top dissolves into the band's calm light (nothing in the band but the words)
   s += `<linearGradient id="b3up" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="720"><stop offset="0" stop-color="${C.paperT}" stop-opacity="1"/><stop offset="0.82" stop-color="${C.paper}" stop-opacity="1"/><stop offset="1" stop-color="${C.paper}" stop-opacity="0"/></linearGradient><rect x="0" y="0" width="${W}" height="720" fill="url(#b3up)"/>`;
   s += caption([{t: 'really', x: 340, y: 380, size: 112}, {t: 'hot.', x: 600, y: 520, lit: true, size: 170}]);
-  return svgPage(s);
+  return svgPage(s, hazeDefs());
 };
 
 // ---------- B4: forty kettles in one ----------
