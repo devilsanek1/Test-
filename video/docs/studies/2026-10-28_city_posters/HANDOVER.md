@@ -6,6 +6,17 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-31 ~00:35 UTC: the owner: feeling first, numbers never targets; the rework runs
+- Owner on v7: better overall, but "we lost the feeling ... a dark alley whete nothing happens"; "Saying 65% contrast
+  makes the agent force a design"; keep all the tooling and recipes, reframe the guides around feelings. Captured:
+  playbook toolbox bullet ("A number is never a target"), paint_test/NOTES.md (owner on v7).
+- RUNNING: workflow `feeling-first-rework` (run `wf_6517fb67-52c`, script
+  `.../workflows/scripts/feeling-first-rework-wf_6517fb67-52c.js`): finish AUDIT (`video/docs/process/`, taken over
+  from video 4's session, whose run stopped at the limit; BRIEF.md says so) -> DESIGN_LANGUAGE.md + FRAME_CARD.md +
+  REWORK.md -> five lanes reframe the guides (L1 DIRECTION/CRAFT/LAYOUT, L2 composition, L3 paint/organic/palette,
+  L4 sound/people/type/gates, L5 the checkers -> reports) -> cold review -> fix -> v8 of scene 1, feeling first.
+- Still RUNNING too: composition-library-v2's Helsinki fix (run `wf_6be51888-82f`), writing in scratchpad/v4wt.
+
 ## Status 2026-10-31 ~00:10 UTC: v7 DONE and sent; the darks rule (D3) settled
 - v7 (`paint_test/paint_still_v7.png`, `compare_v7.jpg`, NOTES v7): the painted wet quay with the door's light coming to
   us; razor 7 %, straight 12 %, flat 17 % (targets met); her in the overhaul's people. Still off: vector pieces left
