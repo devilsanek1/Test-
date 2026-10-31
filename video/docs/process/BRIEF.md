@@ -1,3 +1,10 @@
+> **2026-10-31 ~00:30 UTC: TAKEN OVER by the study session** (https://claude.ai/code/session_01YGLGMqbgdpycjemYZL3aoL) on
+> the owner's request ("we need to reevaluate snd reframe the recipes and guides to focus on achieving feelings with our
+> tools rather than filling checkboxes"; playbook: "A number is never a target the frame is built to"). The first run
+> (wf_50d7fefb-751) stopped at the 5-hour limit with AUDIT in progress and RESEARCH done; the takeover finishes the audit,
+> writes DESIGN_LANGUAGE / FRAME_CARD / REWORK, then APPLIES the rework to every look guide (workflow
+> `feeling-first-rework`). Do not re-run the synthesis from another session; read `REWORK.md` when it lands.
+
 # Reworking the process: the toolbox as feelings and tools, frames planned whole (2026-10-30)
 
 **The owner, verbatim:** "okay im tired of pointing every single piece im sure we missed some more / so how do we make
