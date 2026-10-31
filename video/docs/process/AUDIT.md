@@ -1,6 +1,9 @@
 # Toolbox audit: intents, tools, prescriptions, checks (2026-10-30)
 
-Status: IN PROGRESS (written from the first step; updated as each doc is read).
+Status: IN PROGRESS (written from the first step; updated as each doc is read). Resumed 2026-10-31 by the takeover
+(study session) after the owner's v7 note ("A number is never a target the frame is built to"); scope extended to
+ORGANIC (+ organic/), PAINT_RECIPES (+ paint_recipes/), COMPOSITION_SHOTS (+ composition/), SOUND_SYNC, PEOPLE_DESIGN,
+TYPE_GUIDE, the darks rule (D3_RECONCILE), the gating checkers, and "The v7 lesson".
 
 Brief: `video/docs/process/BRIEF.md`. Four kinds:
 - **INTENT**: a feeling or goal the viewer should get ("a feel of distance", "cozy", "one place to look").
