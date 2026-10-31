@@ -47,7 +47,8 @@ the feeling"), `ORGANIC.md`, `PAINT_RECIPES.md`, the winter night with one warm 
 frame's darkness and contrast following its own feeling, the people in use, the words on screen. Hard constraints only:
 the caption band (`LAYOUT.md` §1) is open sky or wall for the words; the app's buttons kept clear.
 
-**The job (a lean round: one sequence):** ONE FILM CONCEPT first (one imaginative idea for the whole film: its world, its
+**The job (the full round, owner 2026-10-31: "not lean, do it properly"; four independent imaginations, each one
+whole sequence, each through THE FRAME LOOP; then one judge across them):** your sequence's ONE FILM CONCEPT first (one imaginative idea for the whole film: its world, its
 central device, the thread's journey, the arc of feeling from the first frame to the payoff); then for each beat ONE
 idea inside it, a chapter of it, and for the beats you are least sure of (at most four) one alternate. Each idea: a
 title; one line (what the viewer sees, gets and feels); how it flows into the next beat (the camera comes later, from
