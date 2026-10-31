@@ -100,3 +100,8 @@ the result. After step 4 and after step 10, show the owner before going on.
   (or the library's own examples) already used.
 - **Owner picks are captured as the feeling and why it worked,** never as the layout to repeat.
 - 2026-10-31, study session: steps 11-13 added (the brief must carry a feeling; a frame-loop template; the card as a required output), to confirm against process test 01's log.
+- 2026-10-31, process test 01 (Amsterdam, one still): the owner: "the final image is actually okay"; lessons in
+  `video/docs/tests/process_test_01_amsterdam/LESSONS.md`. They confirm steps 11-13 and add, cheapest first: a budget per
+  step; fix the contradictions it found; a one-page "From a piece of news" start; an ideas card (material proven in
+  colour); a cold read inside the build; a short evaluator report; and the KIT (the biggest lever: about 2 hours and
+  $100 for one still came from building it as new engine code).
