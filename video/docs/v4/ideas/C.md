@@ -1,7 +1,8 @@
 # Video 4 ideas, imagination C: THE HEAT'S JOURNEY
 
-Status: done (2026-10-31). The concept and the 12 beats written first (planned on `FRAME_CARD.md`, feeling first), then drawn
-(`C_sheet.png`, source `C_src/`), then looked at as one film (the last section).
+Status: THE FRAME LOOP adjust round 1 done (2026-10-31), after the fresh evaluator's `C_EVAL_r1.md` (verdict ALMOST). The
+concept and the 12 beats written first (planned on `FRAME_CARD.md`, feeling first), then drawn (`C_sheet.png`, source
+`C_src/`), looked at as one film, then adjusted: "Round 1 changes" (the last section).
 
 ## THE FILM CONCEPT: "The warm current"
 
@@ -54,7 +55,7 @@ B12); the people in use (small, modern, open eyes looking away); the words on sc
 warm white on the night, the stressed word lit honey; in the picture only "2027" on the plan's tag).
 
 **People (three, small):** you (POV: a gloved hand and a phone); an engineer in a knit cap and a work jacket, who works
-among today's computers (B2-B5) and walks the plan's lot (B8-B9); a woman at home in the one window (B11-B12). Strangers
+among today's computers (B2-B5) and walks the plan (B8-B10); a woman at home in the one window (B11-B12). Strangers
 stay small in the far street. Pip, hidden: a snowy balcony of the block across the street (B1, B12), the rail of a
 moored icebreaker (B8), a roof's snowy chimney row (B6-B7); none in the hall, the closes or the plan's inside.
 
@@ -68,36 +69,40 @@ life); the hand-off. The captions shown are the beat's key group of the voice's 
 
 ### C-B1 "The snow wakes warm" (0.13-3.9 s)
 - **Sees / gets / feels:** you stand in a snowy Katajanokka street at night, phone in your gloved hand; down the middle
-  of the street a warm seam lights up under the fresh snow and races in from the harbour end like a lit fuse, turning
-  in at each door, and the windows bloom honey block after block, the wave running on across the harbour into the far
-  city: AI heating homes, seventy thousand of them. Surprise and curiosity: a cozy snowy city with an odd warm thing
+  of the street the snow is melting in a ragged, steaming warm line, and its bright head is racing at you from the
+  harbour end like a lit fuse, turning in at each door it passes; behind it the windows bloom honey (the far blocks
+  full, the near ones just starting at their lowest floor), the snow at your feet still cold: caught mid-run. AI
+  heating homes, seventy thousand of them. Surprise and curiosity: a cozy snowy city with an odd warm thing racing
   under its snow ("wait, what?").
-- **Card:** the eye: the glowing seam (the only warm, a leading line) -> the blooming windows -> your phone's cyan chat.
+- **Card:** the eye: the running head (the only warm, at the end of a leading line) -> the blooming windows -> your phone.
   Space: a one-point street, the vanishing point at the harbour (where the warm comes from); near snow, five-storey
   Jugend blocks with turrets and chimneys, the hung lamps and tram wires overhead, the frozen harbour and the far city.
-  Light: a blue night, the hung lamps small and cool; the warm only in the seam and the windows it reaches. Life:
-  snowfall, a tram waiting at its stop, two small far figures looking down at the glowing snow. Words: "Helsinki wants
-  AI / to heat 70,000 homes?" (70,000 lit). The hook event: the seam's run and the bloom, big and bold, from ~1.5 s.
+  Light: a blue night, the hung lamps small and cool; the warm only in the melt line, its head and the windows behind
+  it. Life: snowfall, a tram waiting at its stop, two small far figures looking down at the glowing snow. Words:
+  "Helsinki wants AI / to heat 70,000 homes?" (70,000 lit). The hook event: the run and the bloom, from ~1.5 s.
 - **Hand-off:** your question, a cyan spark, flies off your phone down the street to the seam's source at the
   harbour's edge; the street of homes becomes the street of computers (the same one-point street).
 
 ### C-B2 "A street of computers" (4.28-8.0 s)
-- **Sees / gets / feels:** inside a hall at the harbour's edge, an aisle so long it vanishes into the dark: giant
-  computers stand along it like apartment blocks, walls of tiny cool lights like a city's windows, cable trays overhead
-  like tram wires; an engineer walks it, tiny. At the far end a loading door stands open on the snowy night. Your
-  question arrives as a cool spark, and the one computer answering it wakes: behind its grille, the first warm glow. AI
-  is real, physical and huge, not a cloud: a little awe.
-- **Card:** the eye: the one warm grille (the only warm, tall at the right) -> the canyon of lights to the snowy door ->
-  the small figure. Space: the same one-point composition as B1's street (the rhyme), computers twice a person's height
+- **Sees / gets / feels:** inside a hall at the harbour's edge, an aisle so long it vanishes into a canyon of light:
+  giant computers stand along it in blocks like apartment blocks (each its own roofline, cross-aisles like side
+  streets), their faces grids of small cool lights like a city's windows, cable trays strung across like tram wires with
+  lamps hung under them; at the far end a loading door open on the snowy night. Your question rides the cable tray in
+  from the night as a bright cool spark and lands on the one computer answering it, which wakes: behind its grille, the
+  first warm glow; the engineer in the middle distance looks up at it towering over her. AI is real, physical and
+  huge, not a cloud: a little awe.
+- **Card:** the eye: the spark landing on the one warm grille (the only warm, tall at the right) -> her, under it -> the
+  canyon of lights to the snowy door. Space: the same one-point composition as B1's street (the rhyme), computers twice a person's height
   (a little exaggerated, as the voice's "giant" is), rows of ceiling lamps receding. Light: cool, a canyon glowing with
   thousands of small lights; one warm accent. Words: "AI actually runs on / giant computers" (giant lit).
 - **Hand-off:** the warm grille brightens and we step up to it.
 
 ### C-B3 "The heat climbs" (8.76-10.4 s)
-- **Sees / gets / feels:** close on the waking computer: its lights turn from cyan to amber one by one, its grille
-  glows like a stove's, and a column of heat pours off its top, shimmering, bending the cool lights of the hall behind;
-  the engineer stops short and tugs at her collar. They get hot: warm, with a touch of alarm.
-- **Card:** the eye: the hot grille (the focal and the hardest step) -> the rising column -> her gesture. Light: the
+- **Sees / gets / feels:** close on the waking computer: its lights turn from cyan to amber, its grille glows from
+  inside like a stove's, hottest at its middle, and a tall column of hot air pours off its top, the hall's lamps and
+  lights swimming and bending through it; the engineer recoils, leaning away with a forearm up against the heat, her
+  scarf blown back. They get hot: warm, with a touch of alarm.
+- **Card:** the eye: the hot grille (the focal and the hardest step) -> the column of hot air -> her recoil. Light: the
   warmest frame so far against a hall that stays cool. Words: "Those computers get / really hot." (hot lit).
 - **Hand-off:** on "To put it into perspective" her hand goes to the door's handle.
 
@@ -110,41 +115,42 @@ life); the hand-off. The captions shown are the beat's key group of the voice's 
 - **Hand-off:** the door swings shut on "That's".
 
 ### C-B5 "The teapot computer" (17.76-18.9 s)
-- **Sees / gets / feels:** the door shut, the big computer stands steaming like a giant teapot, a teabag's paper tag
-  dangling from its top on a long string; beside it the engineer sits on a step stool with one tiny mug, dunking her own
-  teabag. The giant and the tiny: a smile and a breath.
-- **Card:** the eye: the dangling tag (the punchline) -> the tiny mug -> the steam rising to the vents. Calmer and
-  wider than B4: more quiet hall around it. Words: "That's a lot of tea." (tea lit).
+- **Sees / gets / feels:** wider, at an angle: the big computer stands in its quiet hall steaming like a giant teapot,
+  its heat glowing through the mesh like tea steeping, a giant teabag tag swinging on a long string off its corner;
+  beside it the engineer on a step stool raises her one tiny mug, its own tiny tag over the rim. The giant and the tiny
+  side by side: a smile and a breath.
+- **Card:** the eye: the swinging tag (the punchline, the brightest thing) -> the tiny mug and its tiny tag -> the
+  steam. Calmer and wider than B4, and a new angle on the computer: more quiet hall around it. Words: "That's a lot of
+  tea." (tea lit).
 - **Hand-off:** the steam rises into the ceiling's vents, and we follow it up through the roof.
 
 ### C-B6 "Thrown into the night" (19.26-22.9 s)
 - **Sees / gets / feels:** on the hall's snowy roof a row of big fans pours the heat up into the falling snow: warm
-  plumes that glow at the root, curl and thin to nothing in the dark sky; beyond the roof's edge the frozen harbour and
-  Katajanokka's blocks lie blue and cold under the snow. Warmth thrown away right above a cold city: a small pang.
-- **Card:** the eye: the nearest plume's warm root -> up, where it thins away -> down to the cold city. Space: standing
-  on the roof by the fans (the near fan cut by the edge), the city below and beyond, a big sky (the film's scale view of
-  waste). Light: the coldest frame; the warm only at the fans, fading as it rises. Words: "Normally, big fans / blow
+  plumes that glow at the root, drift up over Katajanokka's blocks just across the lot (every window dark, cold homes)
+  and thin to nothing above their roofs. Warmth thrown away right over homes that need it: a small pang.
+- **Card:** the eye: the fans' warm cores between their blades -> up the plumes, where they thin away -> the dark
+  windows. Space: standing on the roof by the fans, the lot below the parapet, the blocks near across it, a big sky. Light: the coldest frame; the warm only at the fans, fading as it rises. Words: "Normally, big fans / blow
   that heat outside." (outside lit).
 - **Hand-off:** the view holds; on "But" the city answers.
 
 ### C-B7 "The city reaches back" (23.46-25.0 s)
-- **Sees / gets / feels:** the same roof, the same cold city, and on "wants" the city answers: under its snowy streets
-  warm lines light up, running out of the homes, joining and racing across the snow toward the harbour's edge, toward
-  the heat, like a hand opening. The turn: a spark of delight, the city reaching for it.
-- **Card:** the eye: the racing lines (leading lines that end near us) -> the city they come from -> the plumes, now
+- **Sees / gets / feels:** the same roof, the same cold city, and on "wants" the city answers: its doors glow, its kerbs
+  catch the warm, and warm lines leave the doors under the snow and open out like the fingers of a reaching hand toward
+  the fans, each fingertip stopping just short of the heat. The turn: a spark of delight, the city reaching for it.
+- **Card:** the eye: the glowing fingertips stopping short -> the doors they come from -> the fans, their plumes now
   quieter. The deliberate match with B6: one change, the warm coming back from the other side. Words: "But Helsinki /
   wants that heat." (wants lit).
-- **Hand-off:** the lines lead down to an empty snowy lot by the water.
+- **Hand-off:** the fingers lead on to an empty snowy lot by the water.
 
 ### C-B8 "A plan in chalk" (25.54-27.9 s)
-- **Sees / gets / feels:** where the city's warm line ends, on an empty snowy lot by the harbour: a big new data
-  center drawn in pale chalk on the night, its walls, roof and rows of planned computers only lines, the snow falling
-  through them and the moored icebreakers showing beyond; one chalk line still being laid at a far corner (a bright chalk
-  tip: it is being drawn now); survey stakes at its corners; a chalk pipe from it toward the warm line's tip, the gap
-  still open; on a stake, a paper tag: 2027. The engineer, a rolled drawing under her arm, looks up at it. Real, and
-  coming soon: hope and anticipation.
-- **Card:** the eye: the warm tip waiting by the tag -> the chalk building -> the chalk still being drawn. Light: the
-  chalk the palest thing, the warm tip the only warm. Words: "The city has a plan, / starting next year." (next year
+- **Sees / gets / feels:** on an empty snowy lot by the harbour: a big new data center drawn in bold, faintly glowing
+  chalk on the night, its planned computers in rows inside, the snow falling through it and the moored icebreakers
+  beyond; its pipe is being drawn right now, out through its door and across the snow toward us, its bright chalk tip a
+  hand's breadth from the glowing tip of the city's warm line: two ends about to touch, close in front of us; survey
+  stakes at its corners; by the gap, a paper tag on a stake: 2027. The engineer, a rolled drawing under her arm, watches
+  the two ends. Real, and coming soon: hope and anticipation.
+- **Card:** the eye: the gap between the two tips (close, lit, the focal) -> the chalk pipe back to the plan -> the tag.
+  Light: the chalk the palest thing, the warm line and its tip the only warm. Words: "The city has a plan, / starting next year." (next year
   lit).
 - **Hand-off:** the plan's door, the one solid, painted thing in it, begins to open.
 
@@ -157,25 +163,26 @@ life); the hand-off. The captions shown are the beat's key group of the voice's 
 - **Hand-off:** through the door, inside.
 
 ### C-B10 "Blue in, gold out" (29.56-33.9 s)
-- **Sees / gets / feels:** inside the plan (its walls still chalk lines, the snowy night showing through), the new
-  hall's computers stand in rows, each with a pipe looping through it: cool blue water runs in at its foot, climbs past
-  every hot shelf and comes out of its top gold, the shelves behind the pipe cooling from amber to blue; all the gold
-  pipes join one big main that leaves through the chalk wall toward the city. "Oh, that's how": clarity and
-  satisfaction.
-- **Card:** the eye: the one computer in front, big and centred (a settled, symmetrical answer) -> blue in, low left ->
-  gold out, high right -> the rows behind doing the same -> the main leaving. Light: the clearest, most luminous frame.
+- **Sees / gets / feels:** inside the plan (its walls, posts and beams still chalk lines, the snowy night showing
+  through, snow falling in), the new hall's computers stand in rows going back into the dark, cold blue water along
+  their feet, gold along their tops; in front, the one computer: cool blue water runs in at its foot, climbs past every
+  shelf and leaves its top gold, into the gold main; the shelves it has passed gone calm and blue, the top ones still
+  amber; the engineer's gloved hand on the pipe where blue turns gold. The mains join and leave through the chalk wall,
+  under the snow toward the city. "Oh, that's how": clarity and satisfaction, felt through her hand.
+- **Card:** the eye: the one computer in front, big and centred (a settled answer) -> blue in, low left -> her hand
+  where it turns gold -> gold out, high right, into the rows going back. Light: the clearest, most luminous frame.
   Words: "take the heat out / with water in pipes." (water lit).
 - **Hand-off:** the gold main runs out through the wall, under the snow, toward the city.
 
-### C-B11 "Warm under the snow" (34.46-37.9 s)
-- **Sees / gets / feels:** back in the island's street at a person's eye level: at our feet the snowbank is cut open
-  like a slice of cake (snow, cobbles, earth) and in it the gold pipe glows, running away under the street, the snow over
-  it melting into a dark wet line across the tram rails, into the cellar of a Jugend block, where the warm climbs: window
-  after window up the facade blooms honey, and a woman at her window looks out. Warmth travelling under the snow to
-  homes: cozy relief.
-- **Card:** the eye: the gold pipe at our feet -> the melt line under the street -> the one window on the third floor.
-  Space: near (the cut bank), middle (the street, a tram passing far), the block (the focal). Words: "pipes under the
-  streets / carry that heat home" as the voice's "...into people's homes." (homes lit).
+### C-B11 "Warm under the snow" (34.46-37.9 s; B11alt's melt line, taken in round 1)
+- **Sees / gets / feels:** back in the island's street at a person's eye level, across from a Jugend block: a dark wet
+  line melted through the snow, warm from beneath, runs from our feet across the tram rails to its cellar door, a
+  manhole puffing warm steam on the way; up the facade the warmth climbs (frost still on the top floors, the windows
+  below blooming honey), and a woman right at the glass of the one window looks down at the street. Warmth travelling
+  under the snow to homes: cozy relief.
+- **Card:** the eye: the melt line at our feet -> the steaming manhole -> the door -> the one window and her. Space:
+  near (the melt line), middle (the street, a snowy parked car), the block (the focal). Words: "carry that heat / into
+  people's homes." (homes lit).
 - **Hand-off:** the warm reaches the one window, and your phone rises in front.
 
 ### C-B12 "Your chat, her warm window" (38.48-41.9 s)
@@ -189,32 +196,38 @@ life); the hand-off. The captions shown are the beat's key group of the voice's 
 
 ## ALTERNATES (the four beats I am least sure of)
 
-### C-B1alt "The waterfront wakes"
-From the snowy quay, across the frozen harbour's cracked plate ice, to Katajanokka's waterfront (ochre and peach blocks,
-steep snowy roofs, chimneys, a dome), all cold and blue; a warm current runs in along the quay under the snow and up
-into the blocks, and the whole waterfront's windows bloom honey, their warmth reflected in the ice; your phone at the
-bottom. More homes and more Helsinki in one look; less "you are here" than the street, and its loop with B12 is looser.
+### C-B1alt "From your balcony" (round 1: reworked from the idea, a new staging)
+From your top-floor balcony (its snowy iron rail, your gloved hand and phone): the island's street far below on a snowy
+night, the hall at the harbour's edge at its end; up the middle of the street the warm current races under the snow
+toward you, turning in at every door it passes, the blocks on both sides blooming in its wake (the near ones still
+dark), the hung lamps and a tram below you, neighbours on the pavements turned to look; its bright head is just
+arriving under your balcony. The whole trip in one look, from a home: "wait, is that coming to my door?". More homes and
+the source in view; less close than B1, and its loop with B12 (back in the street) is looser. (Round 0's "The waterfront
+wakes", a postcard of lit windows with nothing happening, is retired.)
 
 ### C-B5alt "The tea cosy"
-The giant computer wearing a huge knitted tea cosy (a Nordic snowflake knit, a pompom on top with a curl of steam, the
-heat glowing at its hem); beside it the engineer holds up her one tiny mug, waiting for her pour. The bigger laugh, and a
-quiet wink at the film's whole idea (keep the heat in) just before B6 throws it out; but at phone size it can read as a
-giant beanie, so the teabag tag (B5) is the surer read. (First drawn as "a whole hall of teapots", every computer down
+The giant computer wearing a huge knitted tea cosy (a Nordic snowflake knit, a pompom on top with a curl of steam), its
+spout and handle poking out (a teapot under its cosy: the teapot computer itself), the knit lit warm by the heat
+beneath; she holds her one tiny mug up under the spout, waiting for her pour. The bigger laugh, and a quiet wink at the
+film's whole idea (keep the heat in) just before B6 throws it out; the evaluator would take it over B5 with the spout
+and handle (round 1 added both). (First drawn as "a whole hall of teapots", every computer down
 the aisle with a tag: its tags were too small to read and its steam crossed the caption band, so it was replaced.)
 
 ### C-B7alt "The street opens a way"
-At eye level in the island's street, the far plumes rising over the roofs; on "wants" the manhole covers down the middle
-of the street pop open one after another toward the harbour, each breathing a warm light: a runway of welcome reaching
-for the heat; a couple on the pavement turn to look. Closer and more human than the roof; the city reads as one street.
+At eye level in the island's street; at its end the hall's fans throw the heat into the sky, plain to see; on "wants"
+the manhole lids down the middle of the street slide aside one after another toward the harbour, each opening a warm
+light laid toward the far end (no steam: the street is not warm yet, it wants the heat): a runway of welcome reaching
+for the thrown-away heat; a couple on the pavement turn to look. Closer and more human than the roof; B7 keeps the
+stronger match with B6 (the art director's call).
 
 ### C-B11alt "The melt line"
 No cut: at eye level in the street the pipe's route shows only as a dark melted line in the snow, warm from beneath, a
 manhole puffing warm steam, and the warmth climbing the block as the frost clears from its windows floor by floor.
-Truer to what a passer-by sees; "under the street" reads less at once.
+Judged THERE and taken into the film as C-B11 in round 1 (with the woman at the glass); kept here exactly as drawn.
 
-## THE LOOK AT THE SHEET (phone size, in order, as one film)
+## THE LOOK AT THE SHEET (the builder's own look before the evaluator, phone size, in order, as one film)
 Each frame looked at in the board at phone width before re-reading its beat: the feeling it gives, then the beat's,
-then the verdict. Round 1 (the first full board) and the adjustments made; round 2 is the sheet as it stands.
+then the verdict. The builder's first full board and its adjustments, then the sheet as it went to the evaluator.
 
 | frame | the feeling it gives (looked at first) | the beat's | verdict, and what changed |
 |---|---|---|---|
@@ -245,9 +258,53 @@ emptiest sky, B9 one warm door in the dark, B10 the clearest, B12 the warmest.
 ramp plus the warm); the Helsinki specifics at full richness (the photos read: the waterfront's ochre and peach blocks,
 tin roofs and chimney rows, plate ice, trams under their wires, hung lamps); the people at their modern finish (here
 silhouettes, open eyes looking away); the phone's screen kept fully above the app's bottom bar (B1, B12 sit on its
-edge); the caption builds word by word (each thumbnail shows its beat's landing group).
+edge); the caption builds word by word (each thumbnail shows its beat's landing group); the THERE frames' polish notes in
+`C_EVAL_r1.md` (B4's kettle rims and her lean-back, B9's chalk as bold as B8's, B12's face, mug steam and radiator, B11's
+street life and slight angle).
 
 **Real places read for the world** (fetched 2026-10-31, used as reference only, nothing traced): the Katajanokka
 waterfront across plate ice (Unsplash, photo-1790506013379); trams under criss-crossing wires in falling snow on
 Mannerheimintie, with a real melt patch on the tracks (Unsplash, photo-1545163448, Tapio Haaja); Helsinki snow nights
 (Unsplash photo-1522885147691, photo-1649449247267, photo-1644131654484).
+
+## Round 1 changes (THE FRAME LOOP, adjust round 1, after `C_EVAL_r1.md`)
+Each line: the evaluator's note -> what changed. THERE kept exactly as drawn: B4, B9, B12, B11alt (their pages and
+renders are byte-identical to round 0; their polish notes go to the key frames). Code: `C_src/c_frames.py`.
+- B1 the seam a road stripe -> painted as warmth under the snow: a ragged melt channel, the snow sagging dark and wet along it, steam lifting off it.
+- B1 the end state, calm -> caught mid-run: lit from the harbour end to a bright running head mid-street (the cold snow ahead lifting), the near street cold, the windows bloomed only behind it.
+- B2 murk -> the canyon lit: every computer face a grid of small cool lights, a polished floor catching them, a cool light down the aisle.
+- B2 a stock aisle -> B1's street rhythm: computers in blocks with their own rooflines and cornices, cross-aisles like side streets, cable trays strung across like tram wires with lamps hung under them.
+- B2 two warm spots -> one: the left haze gone, only the answering computer is warm.
+- B2 a far speck -> the engineer in the middle distance, looking up at the computer towering over her, its warm on her.
+- Board read: the spark never seen -> in B2 your question rides the cable tray in from the night as a bright cool spark and lands on the one computer, which wakes warm.
+- B3 squiggles -> a tall column of hot air pours off the top (the computer stands lower to give it room), the hall's lamps and lights swimming through it.
+- B3 a raised fist at the button rail -> she recoils: leaning away, a forearm up with the hand open to the heat, head turned away, scarf blown back; pulled in from the rail.
+- B3 polish, a glowing border like a lit door -> the glow comes from inside the grille, hottest at its middle.
+- B5 the tag too small -> big, cream, lit by the glow, swinging on its long string out past the computer's corner against the dark: the first place the eye lands.
+- B5 the darkest frame -> the heat glows through the mesh like tea steeping (honey with amber swirls), a warm pool on the floor, a warm rim on her.
+- B5 repeats B3's set-up -> wider and at an angle, the giant tag and her tiny mug with its tiny tag side by side.
+- B6 the homes a thin far strip -> Katajanokka's blocks brought near across the lot, every window dark; the plumes rise over them and thin away above their roofs.
+- B6 stove rings under the app's bar -> the fan units raised above the bar; each fan a drum with four broad dark blades, the heat glowing in the gaps.
+- B7 a network chart -> five warm lines leave five doors and open out like fingers toward the fans, tapered, each fingertip stopping just short at the parapet; the plumes quieter.
+- B7 too small a change for "But" -> the city answers at the source: its doors glow, its kerbs catch the warm.
+- B8 hairlines -> bold chalk with a faint glow of its own, the planned computers in rows inside, the pipe drawn out through the plan's door.
+- B8 the warm nearly gone -> the gap is the focal, close and lit: the city's warm line (a melt channel) and its glowing tip a hand's breadth from the plan's pipe.
+- B8 the line being drawn a far dot -> the line being drawn is the plan's pipe itself: its bright chalk tip, dusting chalk, is the other end of the gap.
+- B10 a diagram -> the arrows and the ladder of risers gone; a place: chalk walls, posts and beams with the snowy night through them, four rows going back, cold water along their feet, gold along their tops.
+- B10 nobody in it -> the engineer beside it, her gloved hand on the pipe where blue turns gold.
+- B10 relief -> the shelves the cold water has passed gone calm and blue, the top ones still amber.
+- B11 the cut: nothing travels -> B11alt taken (drawn from its very seed: the same picture).
+- B11 the woman caught on the bars -> bigger, right at the glass: head and shoulders filling the window, in profile, looking down at the street.
+- B1alt NOT THERE, a postcard -> reworked from the idea, a new staging: "From your balcony" (the whole trip in one look, from a home, mid-run).
+- B5alt a beanie, dark on dark -> a spout and a handle poke out (she holds her tiny mug up under the spout), the knit lit warm from beneath.
+- B7alt steam says "already warm" -> no steam: the lids slid aside, each opening a warm light laid toward the harbour end; the hall's plumes plain at the street's end.
+
+**The look at the sheet after round 1 (phone size, 135 x 240 a frame, in order, sound off):** a warm thing racing up a
+cold snowy street at me, homes lighting behind it -> a canyon of lit computers, a spark lands on the one warm one ->
+hot air pouring off it, her recoil -> kettles inside -> a giant tea tag beside her tiny mug -> warmth thrown up over
+dark homes -> their doors light and reach back -> a bold chalk plan, its pipe drawn toward the city's warm line, the two
+ends about to touch, 2027 -> a warm door in the plan -> water turning gold under her hand -> a melt line to a woman at
+her window -> my phone and her warm window. One world, one thread (the warm always where the eye lands, handed on frame
+to frame), and the arc rises where it sagged (B5 warm, B7 a gesture, B8 the warmest plan frame yet). Left for the key
+frames: B9's chalk is now thinner than B8's (its own polish note, B9 kept as THERE); B10 stays the most graphic frame
+(the loop is the mechanism itself); B1 and B1alt's phones still touch the app's bottom bar.

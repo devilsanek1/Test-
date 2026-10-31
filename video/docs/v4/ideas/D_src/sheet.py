@@ -16,16 +16,16 @@ TITLES = {
     'D-B4': 'Forty kettles in her kitchen',
     'D-B5': 'Tea for one',
     'D-B6': 'Out her window, up into the night',
-    'D-B7': 'She reaches for it',
+    'D-B7': 'The whole block reaches',
     'D-B8': 'Across the bay, a plan',
     'D-B9': "The plan's door opens",
     'D-B10': 'Blue in, honey out',
     'D-B11': 'Up her street, under the snow',
     'D-B12': 'Socks on a warm radiator',
-    'D-B2alt': 'Her phone, lined up with it',
-    'D-B7alt': 'The whole block reaches',
-    'D-B8alt': 'She draws it on the steamed glass',
-    'D-B11alt': 'Her building ends the street',
+    'D-B2alt': 'Her armchair among the giants',
+    'D-B7alt': 'She leans out and catches it',
+    'D-B8alt': 'Her window, seen from the plan',
+    'D-B11alt': "The house opened like a doll's house",
 }
 
 

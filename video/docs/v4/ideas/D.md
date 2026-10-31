@@ -211,3 +211,7 @@ read; B10's cold pipe made as present as the hot one; B11's black void filled wi
 closer and unmistakably warm; stress set in the lit hand, never in capitals. Still the weakest, honestly: B7's delight is
 mild (the pose reads as reaching more than joy); B12's socks are lumpy; B2's warm door is small at phone size; the hook's
 events (the frost melting, the wave of windows) live in motion, and the still only hints at them.
+
+## Round 1 changes (THE FRAME LOOP, adjust round 1, from `D_EVAL_r1.md`)
+In progress: the builder is working through the notes (ALMOST: exactly what each note names; NOT THERE: reworked from
+the idea; THERE: kept; the board read's breaks mended at their source).

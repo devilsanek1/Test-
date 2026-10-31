@@ -29,7 +29,7 @@ function homeView(o = {}) {
   s += steam(150, 1292, 70, 90, {n: 4, op: 0.35, col: V[12]});
   // ---- an icebreaker moored along the quay ahead: its stern toward us, black hull, pale decks, a funnel ----
   {
-    const z = 66, zs = 72;
+    const z = 58, zs = 64;
     let g = '';
     const st = (x, y) => cam.p(x, y, z);
     g += P(smoothD([st(-9.8, -1.1), st(-9.8, 4.2), st(-13, 5.1), st(-22, 5.4), st(-30, 5.1), st(-33, 3), st(-32, -1.1)], true), V[1]);
@@ -77,7 +77,7 @@ function homeView(o = {}) {
     return g;
   };
   const litP = mode === 'vision' ? 0.86 : 0.42;
-  s += block(80, 92, 14.5, V[2], 31, litP) + block(61, 79.6, 15.5, V[3], 32, litP) + block(41.5, 60.6, 16.6, V[2], 33, litP);
+  s += block(52, 67, 15.5, V[3], 32, litP) + block(41.5, 51.6, 16.6, V[2], 33, litP);
   // a lower old house nearer (its roof stays under the band), cut by the right edge
   s += block(17, 38.5, 10.2, V[3], 34, litP);
   // the corner turret between them: its window facing us is THE one warm window
@@ -94,15 +94,26 @@ function homeView(o = {}) {
     if (main && o.windowFigure) s += person(tA[0] + ww * 0.12, bot - 2, (bot - top) * 0.95, {pose: o.windowFigure, coat: V[2], dark: V[2], hair: V[1], skin: V[3], scarf: V[2]});
   }
   // ---- the hall of giant computers at the quay's end (the vision), or the empty lot (the plan) ----
-  const hz1 = 92;
+  const hz1 = 70;
   if (mode === 'vision') {
     let g = '';
     // the snow melted round its foot: a dark wet ring
     g += P(polyD([cam.p(-9, 0, hz1 - 3), cam.p(8.5, 0, hz1 - 3), cam.p(8.5, 0, hz1), cam.p(-9, 0, hz1)], 1), V[3]);
-    g += faceZ(cam, hz1, -8.5, 8, 0, 13, V[1]);
-    g += facadeX(cam, 8, hz1, hz1 + 30, 0, 13, V[0]);
-    // its face: a band of small cool lights and vents
-    for (let i = 0; i < 26; i++) { const p = cam.p(rr(-8, 7.5), rr(9, 12.4), hz1); g += ell(p[0], p[1], 1.3, 1.3, '#e8f6fb', `opacity="${f1(rr(0.5, 0.95))}"`); }
+    g += faceZ(cam, hz1, -8.5, 8, 0, 14.5, V[1]);
+    g += facadeX(cam, 8, hz1, hz1 + 30, 0, 14.5, V[0]);
+    // its face: covered in the small cool lights of the giant computers inside, in rack-like columns (it reads as a
+    // computer the size of a building), a faint cool glow over it
+    g += faceZ(cam, hz1 - 0.02, -8.5, 8, 0, 14.5, '#dceef4', 'opacity="0.12" filter="url(#b4)"');
+    for (let x = -8.1; x < 7.7; x += 0.42) {
+      if (Math.abs(x) < 4.4 && true) { /* the door's columns are drawn below */ }
+      if (((x + 8.1) / 0.42) % 5 > 3.6) continue;               // a gap between racks
+      for (let y = 0.6; y < 14.1; y += 0.46) {
+        if (Math.abs(x) < 4.3 && y < 8.9) continue;              // the door
+        if (rnd() < 0.3) continue;
+        const pp = cam.p(x, y, hz1 - 0.03);
+        g += ell(pp[0], pp[1], 1.25, 1.25, '#eaf7fb', `opacity="${f1(rr(0.45, 0.95))}"`);
+      }
+    }
     // the big door, open on rows of giant computers (cool light, small lights)
     const d1 = cam.p(-4.2, 0, hz1), d2 = cam.p(4.2, 8.6, hz1);
     g += rect(d1[0] - 22, d2[1] - 16, d2[0] - d1[0] + 44, d1[1] - d2[1] + 22, '#eaf4f7', 'opacity="0.4" filter="url(#b14)"');
@@ -110,7 +121,7 @@ function homeView(o = {}) {
     for (let i = 0; i < 6; i++) { const xx = d1[0] + 9 + i * (d2[0] - d1[0] - 18) / 5, hh = (d1[1] - d2[1]) * (0.74 - Math.abs(i - 2.5) * 0.06), ww = 11; g += rect(xx - ww / 2, d1[1] - hh, ww, hh, V[1]); for (let k = 0; k < 8; k++) g += ell(xx + rr(-2, 2), d1[1] - hh + 5 + k * hh / 9, 1.3, 1.3, '#f6fdff'); }
     g += P(polyD([[d1[0], d1[1]], [d2[0], d1[1]], [d2[0] + 70, d1[1] + 40], [d1[0] - 70, d1[1] + 40]]), '#dfeef3', 'opacity="0.28" filter="url(#b8)"');
     // steam rolling off its roof into the snowing night, warm at its root
-    const r1 = cam.p(-4, 13, hz1 + 6), r2 = cam.p(3.6, 13, hz1 + 12);
+    const r1 = cam.p(-4, 14.5, hz1 + 6), r2 = cam.p(3.6, 14.5, hz1 + 12);
     g += steam(r1[0], r1[1], 220, 360, {warm: true, op: 0.85, lean: 0.1, n: 10, col: V[12], root: 0.25});
     g += steam(r2[0], r2[1], 170, 290, {warm: true, op: 0.75, lean: 0.2, n: 9, col: V[12], root: 0.25});
     s += g;
@@ -138,9 +149,9 @@ function homeView(o = {}) {
   // the warm pipe glimpsed through the slush: a thin warm core, broken by dark slush
   s += seam(0.2, C.honeyD, 'opacity="0.95"', 0.45);
   s += seam(0.085, C.honeyL, '', 0.55);
-  for (let i = 0; i < pts.length; i++) { if (rnd() < 0.45) continue; const [x, z] = pts[i]; const p = cam.p(x + rr(-0.12, 0.12), 0, z), w = cam.sz(rr(0.14, 0.3), z); s += P(blobD(p[0], p[1], w, w * 0.32, 7, 0.3), V[2], 'opacity="0.9"'); }
+  for (let i = 0; i < pts.length; i++) { if (rnd() < 0.78) continue; const [x, z] = pts[i]; const p = cam.p(x + rr(-0.1, 0.1), 0, z), w = cam.sz(rr(0.08, 0.18), z) * clamp(z / 6, 0.5, 1); s += P(blobD(p[0], p[1], w, w * 0.28, 7, 0.45, rr(0, 3)), V[2], 'opacity="0.85"'); }
   // thin branches of melt to the far blocks' doors (the homes it reaches)
-  for (const [zb, ok] of [[43.7, true], [63.2, true], [82.2, mode === 'vision']]) {
+  for (const [zb, ok] of [[43.7, true], [53.6, true]]) {
     if (!ok || zb > zEnd) continue;
     const a = cam.p(lineX, 0, zb - 1.2), m = cam.p(4.5, 0, zb + 0.4), b = cam.p(10.2, 0, zb + 0.9);
     s += S(smoothD([a, m, b], false), V[3], cam.sz(0.26, zb), 'opacity="0.9"') + S(smoothD([a, m, b], false), C.honey, cam.sz(0.07, zb), 'opacity="0.85"');
@@ -148,7 +159,7 @@ function homeView(o = {}) {
   // manholes on the line, puffing steam
   for (const zm of [9.5, 27, 52]) { if (zm > zEnd) continue; const m = cam.p(lineX + 0.1, 0, zm), w = cam.sz(0.75, zm); s += ell(m[0], m[1], w, w * 0.24, V[1]) + steam(m[0], m[1] - 2, w * 3, w * 8, {warm: true, op: 0.55, n: 6, col: V[12], lean: 0.12}); }
   // ---- the lamps hung on wires across the street (cool white) ----
-  for (const z of [24, 42, 62]) {
+  for (const z of [24, 42, 58]) {
     const a = cam.p(-9.3, 7.3, z), b = cam.p(10.4, 7.8, z), m = cam.p(0.6, 6.8, z);
     s += S(smoothD([a, m, b], false), V[3], 1.3, 'opacity="0.85"');
     const lw = cam.sz(0.7, z);
@@ -229,7 +240,7 @@ function hallAisle(o = {}) {
     for (let i = 0; i < 10; i++) s += ell(rr(d1[0], d2[0]), rr(d2[1], d1[1]), 1.1, 1.1, '#ffffff', 'opacity="0.8"');
   }
   // cable trays over the racks (dark, converging)
-  for (const sx of [-1, 1]) { const a = cam.p(sx * (ax - 0.4), rh + 0.6, z0 + 1), b = cam.p(sx * (ax - 0.4), rh + 0.6, z1); s += S(lineD([a, b]), V[3], 7, 'opacity="0.9"'); const c = cam.p(sx * (ax + 0.2), rh + 1.1, z0 + 1), d = cam.p(sx * (ax + 0.2), rh + 1.1, z1); s += S(lineD([c, d]), V[4], 5, 'opacity="0.8"'); }
+  for (const sx of [-1, 1]) { const zs = (yy) => Math.max(z0 + 1, cam.f * (yy - 1.7) / (cam.hz - 615)); const a = cam.p(sx * (ax - 0.4), rh + 0.6, zs(rh + 0.6)), b = cam.p(sx * (ax - 0.4), rh + 0.6, z1); s += S(lineD([a, b]), V[3], 7, 'opacity="0.9"'); const c = cam.p(sx * (ax + 0.2), rh + 1.1, zs(rh + 1.1)), d = cam.p(sx * (ax + 0.2), rh + 1.1, z1); s += S(lineD([c, d]), V[4], 5, 'opacity="0.8"'); }
   // the floor: raised tiles, light, the racks' lights reflected
   s += P(polyD([cam.p(-ax, 0, z0), cam.p(-ax, 0, z1), cam.p(ax, 0, z1), cam.p(ax, 0, z0)]), o.hot ? V[7] : V[10]);
   for (let z = z0; z < z1; z *= 1.16) s += S(lineD([cam.p(-ax, 0, z), cam.p(ax, 0, z)]), V[8], 1.4, 'opacity="0.7"');
@@ -273,8 +284,9 @@ FRAMES.B2 = () => {
   const c1 = cam.p(0.9, 0, 15.4), c2 = cam.p(1.5, 1.0, 15.4);
   s += hrect(c1[0], c2[1], c2[0] - c1[0], c1[1] - c2[1] - 3, V[4], 0.4) + rect(c1[0] - 4, c2[1], 4, (c1[1] - c2[1]) * 0.6, V[3]);
   // snow blown in over the threshold behind us: drifts on the floor, flakes in the near air
-  s += P(smoothD([[-20, 1560], [160, 1520], [360, 1548], [520, 1530], [700, 1552], [900, 1522], [1100, 1546], [1100, 1940], [-20, 1940]], true), V[12]);
-  s += P(smoothD([[-20, 1640], [240, 1610], [540, 1636], [820, 1606], [1100, 1630], [1100, 1940], [-20, 1940]], true), V[11], 'opacity="0.8"');
+  s += P(smoothD([[-20, 1700], [160, 1668], [360, 1690], [520, 1676], [700, 1694], [900, 1664], [1100, 1688], [1100, 1940], [-20, 1940]], true), V[12]);
+  s += P(smoothD([[-20, 1780], [240, 1754], [540, 1774], [820, 1748], [1100, 1770], [1100, 1940], [-20, 1940]], true), V[11], 'opacity="0.8"');
+  for (const x of [430, 470, 610, 650]) s += S(lineD([[x + (x - 540) * 0.6, 1940], [x, 1690]]), V[9], 6, 'opacity="0.7"');
   s += snowfall(70, 1100, 1920, {rmax: 6}) + snowfall(40, 600, 1100, {rmax: 3, op: 0.6});
   s += caption([{t: 'giant computers,', x: 520, y: 400, size: 112}, {t: 'data centers.', x: 560, y: 528, size: 112}]);
   return svgPage(s);
@@ -285,13 +297,8 @@ FRAMES.B3 = () => {
   const h = hallAisle({seed: 23, hot: true, z1: 30, ax: 1.5, farDoor: false, hz: 1060});
   let s = h.s;
   const cam = h.cam;
-  // the air shimmering up to the vents (warm wavy strokes rising)
-  for (let i = 0; i < 26; i++) {
-    const x = rr(-1.3, 1.3), z = rr(4, 20), y0 = rr(0.6, 2.4);
-    const a = cam.p(x, y0, z), len = cam.sz(rr(0.6, 1.4), z);
-    const pts = []; for (let k = 0; k < 6; k++) pts.push([a[0] + Math.sin(k * 1.4 + i) * len * 0.08, a[1] - k * len / 5]);
-    s += S(smoothD(pts, false), C.honeyC, Math.max(1.2, cam.sz(0.03, z)), 'opacity="0.55"');
-  }
+  // the air shimmering up to the vents: soft warm haze rising off both walls
+  for (let i = 0; i < 18; i++) { const sx = rnd() < 0.5 ? -1 : 1, z = rr(4, 22), a = cam.p(sx * 1.25, rr(0.8, 2.2), z), w = cam.sz(rr(0.25, 0.5), z), hh = cam.sz(rr(1.2, 2.4), z); s += P(blobD(a[0], a[1] - hh / 2, w, hh / 2, 8, 0.3), C.honeyC, 'opacity="0.22" filter="url(#b8)"'); }
   // the vents in the ceiling, past the band
   for (let z = 9; z < 28; z += 4.5) { const a = cam.p(-0.7, 8.4, z), b = cam.p(0.7, 8.4, z + 1.2); s += hrect(a[0], b[1], b[0] - a[0], Math.max(4, a[1] - b[1]), V[6], 0.5); }
   // the technician in the middle of the hot aisle, pulling off her beanie, her hair lifting
@@ -480,179 +487,42 @@ FRAMES.B5 = () => {
 FRAMES.B6 = () => {
   seed(61);
   let s = '';
-  s += `<linearGradient id="sky6" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1200"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.24" stop-color="${C.paper}"/><stop offset="0.5" stop-color="${C.paper}"/><stop offset="0.58" stop-color="${V[8]}"/><stop offset="0.66" stop-color="${V[4]}"/><stop offset="0.9" stop-color="${V[3]}"/><stop offset="1" stop-color="${V[6]}"/></linearGradient><rect x="0" y="0" width="${W}" height="1202" fill="url(#sky6)"/>`;
-  // far below and away: the snowy land, a dark forest belt, other halls sending up their plumes, Helsinki's lights
-  s += P(polyD([[0, 1196], [W, 1196], [W, 1238], [0, 1238]]), V[9]);
-  s += P(smoothD([[0, 1200], [150, 1186], [320, 1194], [480, 1184], [660, 1192], [840, 1186], [1080, 1192], [1080, 1214], [0, 1216]], true), V[2]);
-  for (const [x, w, hh] of [[80, 34, 260], [250, 24, 190], [400, 16, 140]]) { s += hrect(x - w / 2, 1176, w, 12, V[1], 0.4); s += steam(x, 1174, w * 3, hh, {n: 7, col: V[9], op: 0.55, lean: 0.25}); }
-  for (let i = 0; i < 50; i++) s += rect(rr(680, 1070), rr(1186, 1198), 2.2, 2, C.honey, `opacity="${f1(rr(0.45, 1))}"`);
-  // the roof: its far parapet with snow, the deck dark, melted round the fans
-  s += P(polyD([[0, 1236], [W, 1236], [W, H], [0, H]]), V[4]);
-  s += P(polyD([[0, 1236], [W, 1236], [W, 1262], [0, 1262]]), V[2]) + S(lineD([[0, 1236], [W, 1236]]), V[12], 5);
-  for (const [y1, col] of [[1330, V[3]], [1560, V[2]]]) s += P(polyD([[0, y1], [W, y1 - 12], [W, H], [0, H]], 2), col);
-  for (let i = 0; i < 12; i++) { const y = rr(1280, 1880); s += P(blobD(rr(0, W), y, rr(40, 130) * (y / 1300), rr(6, 14) * (y / 1300), 8, 0.3), V[7], 'opacity="0.5"'); }
-  // the fans: far ones first, the big one near us last
-  const fans = [[930, 1268, 92], [705, 1300, 150], [300, 1470, 330]];
-  for (const [cx, cy, rx] of fans) {
-    const ry = rx * 0.26, dh = rx * 0.42;
-    s += ell(cx, cy + dh + ry * 0.4, rx * 1.4, ry * 1.6, V[1], 'opacity="0.8"');  // the melted ring
-    s += P(polyD([[cx - rx * 1.06, cy], [cx + rx * 1.06, cy], [cx + rx * 1.06, cy + dh], [cx - rx * 1.06, cy + dh]], 0.6), V[2]);
-    s += ell(cx, cy + dh, rx * 1.06, ry * 1.06, V[2]);
-    s += S(lineD([[cx - rx * 1.06, cy + dh * 0.5], [cx + rx * 1.06, cy + dh * 0.5]]), V[3], 2, 'opacity="0.7"');
-    s += fan(cx, cy, rx, ry, {ring: V[4], inner: V[1], blade: V[8]});
-    // the plume: warm at the fan's mouth, pale vapour rising into the dark, thinning to nothing under the band
-    const top = 650, hh = cy - top;
-    s += steam(cx, cy - ry * 0.3, rx * 2.0, hh, {n: 14, warm: true, col: V[11], op: rx > 200 ? 0.8 : 0.6, root: 0.12, lean: 0.03, sharp: true});
-    s += steam(cx, cy - ry * 0.3, rx * 2.6, hh * 0.9, {n: 8, col: V[9], op: 0.35, lean: 0.05});
-    // the snow lifted in it: bright streaks curving upward, fading as they rise
-    const nS = Math.round(rx / 5);
-    for (let i = 0; i < nS; i++) { const x = cx + rr(-rx * 0.95, rx * 0.95), y = rr(top + 20, cy - ry - 10); const l = rr(8, 18) * (rx / 330 + 0.4); const fade = clamp((y - top) / hh, 0, 1); s += S(smoothD([[x, y + l], [x + rr(-4, 4), y + l * 0.45], [x + rr(-7, 7), y]], false), '#f7f8fa', rr(1.8, 3.4) * (rx / 330 + 0.5), `opacity="${f1(0.25 + 0.7 * fade)}"`); }
+  // the band stays the light calm field; under it a big, deep, quiet night sky for the warmth to vanish into
+  s += `<linearGradient id="sky6" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1292"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.22" stop-color="${C.paper}"/><stop offset="0.45" stop-color="${C.paper}"/><stop offset="0.52" stop-color="${V[9]}"/><stop offset="0.62" stop-color="${V[4]}"/><stop offset="0.9" stop-color="${V[3]}"/><stop offset="1" stop-color="${V[5]}"/></linearGradient><rect x="0" y="0" width="${W}" height="1294" fill="url(#sky6)"/>`;
+  // far below and away: the snowy land, a dark forest belt, two far halls breathing their warmth away; Helsinki's lights
+  s += P(polyD([[0, 1290], [W, 1290], [W, 1322], [0, 1322]]), V[8]);
+  s += P(smoothD([[0, 1294], [150, 1282], [320, 1290], [480, 1280], [660, 1288], [840, 1282], [1080, 1288], [1080, 1304], [0, 1306]], true), V[2]);
+  for (const [x, w] of [[96, 46], [236, 30]]) { s += hrect(x - w / 2, 1270, w, 14, V[1], 0.4) + rect(x - w / 2 + 4, 1272, w - 8, 2, C.honey, 'opacity="0.6"'); s += warmAir(x, 1270, w * 1.3, 300, {op: 0.55, lean: 0.06, n: 6}); }
+  for (let i = 0; i < 46; i++) s += rect(rr(700, 1070), rr(1282, 1296), 2.2, 2, C.honey, `opacity="${f1(rr(0.45, 1))}"`);
+  // the roof: its far parapet with snow, the deck dark and wet where the fan's warmth melts it
+  s += P(polyD([[0, 1318], [W, 1318], [W, H], [0, H]]), V[4]);
+  s += P(polyD([[0, 1318], [W, 1318], [W, 1346], [0, 1346]]), V[2]) + S(lineD([[0, 1318], [W, 1318]]), V[12], 5);
+  for (const [y1, col] of [[1420, V[3]], [1640, V[2]]]) s += P(polyD([[0, y1], [W, y1 - 12], [W, H], [0, H]], 2), col);
+  for (let i = 0; i < 9; i++) { const y = rr(1380, 1880); s += P(blobD(rr(0, W), y, rr(40, 130) * (y / 1300), rr(6, 14) * (y / 1300), 8, 0.3), V[6], 'opacity="0.4"'); }
+  // one far fan at the roof's far edge, small, breathing faintly (the row goes on)
+  { const cx = 900, cy = 1352, rx = 74, ry = rx * 0.26; s += ell(cx, cy + rx * 0.42, rx * 1.06, ry * 1.06, V[2]) + P(polyD([[cx - rx * 1.06, cy], [cx + rx * 1.06, cy], [cx + rx * 1.06, cy + rx * 0.42], [cx - rx * 1.06, cy + rx * 0.42]], 0.4), V[2]) + fan(cx, cy, rx, ry, {ring: V[4], inner: V[1], blade: V[7]}); s += warmAir(cx, cy - 4, rx * 1.2, 230, {op: 0.5, n: 6}); }
+  // THE near fan: big, its housing, its blades turning, its mouth glowing with the heat
+  const cx = 470, cy = 1572, rx = 330, ry = rx * 0.27, dh = rx * 0.4;
+  s += ell(cx, cy + dh + ry * 0.4, rx * 1.4, ry * 1.6, V[1], 'opacity="0.75"');
+  s += P(polyD([[cx - rx * 1.06, cy], [cx + rx * 1.06, cy], [cx + rx * 1.06, cy + dh], [cx - rx * 1.06, cy + dh]], 0.6), V[2]);
+  s += ell(cx, cy + dh, rx * 1.06, ry * 1.06, V[2]);
+  s += S(lineD([[cx - rx * 1.06, cy + dh * 0.5], [cx + rx * 1.06, cy + dh * 0.5]]), V[3], 2, 'opacity="0.7"');
+  s += hotFan(cx, cy, rx, ry, {ring: V[4], blade: V[1]});
+  // the warm air: honey at the mouth, a clear warm shimmer climbing, thinning to nothing in the dark
+  const top = 690, hh = cy - top;
+  s += warmAir(cx, cy - ry * 0.6, rx * 1.15, hh, {op: 1.0, lean: 0.02, n: 11, root: C.honey});
+  // the snow lifted inside it: bright, clear streaks curving up, the higher the fainter; everywhere else it falls
+  for (let i = 0; i < 80; i++) {
+    const t = Math.pow(rnd(), 0.85), y = cy - ry - 16 - t * (hh - 70);
+    const half = rx * (0.6 + 0.5 * t), x = cx + rr(-half, half) * 0.9;
+    s += flakeMove(x, y, rr(2.8, 4.6) * (1.1 - t * 0.35), rr(18, 34) * (1.1 - t * 0.4), -1, 0.97 - t * 0.6, rr(-8, 8));
   }
-  // her, small between the fans, looking up as the warmth goes, her coat lifting
-  s += person(560, 1356, 128, {pose: 'stand', coat: V[1], dark: V[0], hair: V[0], skin: V[6], scarf: V[9], rim: C.honeyL});
-  // snow falling where the heat isn't
-  s += snowfall(180, 0, 1920, {rmax: 4.5});
+  // her, small beside the fan, looking up as the warmth goes; the warm air tugging her coat
+  s += ell(866, 1514, 50, 9, V[2], 'opacity="0.6"');
+  s += fig(866, 1510, 178, {view: 'back', arms: [[10, 4], [8, 6]], coat: V[1], coatL: V[3], hair: V[0], skin: V[5], scarf: V[8], rim: C.honeyL, rimSide: -1, hairLift: 0.35});
+  // the snow falling where the heat isn't (kept out of the warm column)
+  { let g = ''; for (let i = 0; i < 210; i++) { const x = rr(0, W), y = rr(610, 1920); const t = clamp((cy - y) / hh, 0, 1), half = rx * (0.6 + 0.5 * t) + 34; if (y < cy && y > top - 40 && Math.abs(x - cx) < half) continue; const r = rr(1.4, 3.8); g += ell(x, y, r, r * rr(0.85, 1.1), '#f4f5f7', `opacity="${f1(rr(0.35, 0.8))}"`); } s += g; }
   s += caption([{t: 'big fans', x: 380, y: 400, size: 112}, {t: 'blow that heat outside.', x: 545, y: 522, size: 100}]);
-  return svgPage(s);
-};
-
-// ======================================================================================
-// B7: the city reaches. From the terrace on Uspenski's rock, looking down one long snowy street of Katajanokka to the
-// harbour: under the snow the city's own warm pipes light up and race to the water's edge, pointing across the ice at
-// the plume of thrown-away heat. She leans on the railing.
-// ======================================================================================
-FRAMES.B7 = () => {
-  seed(71);
-  const cam = Cam(900, 540, 770, 27);
-  let s = '';
-  s += `<linearGradient id="sky7" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="772"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.38" stop-color="${C.paper}"/><stop offset="0.78" stop-color="${C.paper}"/><stop offset="0.9" stop-color="${V[10]}"/><stop offset="1" stop-color="${V[8]}"/></linearGradient><rect x="0" y="0" width="${W}" height="772" fill="url(#sky7)"/>`;
-  // across the harbour: the far shore, the far data center and its plume of thrown-away heat
-  s += P(polyD([[0, 772], [0, 758], [180, 760], [400, 754], [640, 760], [860, 752], [1080, 758], [1080, 772]], 1), V[6]);
-  for (let i = 0; i < 22; i++) s += rect(rr(10, 1070), rr(758, 769), 2, 2, C.honey, `opacity="${f1(rr(0.4, 0.85))}"`);
-  const dc = cam.p(1.5, 0, 1400);
-  s += hrect(dc[0] - 30, dc[1] - 30, 60, 22, V[3], 0.4);
-  s += steam(dc[0] - 4, dc[1] - 30, 260, 150, {n: 9, col: V[12], op: 0.9, warm: true, root: 0.22, lean: 0.15, sharp: true});
-  // the frozen harbour between (light), the icebreakers' dark channel
-  s += P(polyD([[0, 772], [W, 772], [W, 930], [0, 930]]), V[11]);
-  s += P(smoothD([[0, 845], [300, 832], [640, 840], [1080, 828], [1080, 842], [640, 856], [300, 850], [0, 862]], true), V[7], 'opacity="0.8"');
-  // the street's snow (white) running down to the quay; the city's roofs on both sides seen from above, snowy
-  const zq = 230, sx = 6.5;
-  s += poly3(cam, [[-sx, 0, 18], [sx, 0, 18], [sx, 0, zq], [-sx, 0, zq]], V[12]);
-  for (const side of [-1, 1]) {
-    // the facades facing the street (in shade), their warm windows, then the roof slopes with snow, block by block
-    let z = 16;
-    while (z < zq - 6) {
-      const z2 = Math.min(zq - 4, z + rr(16, 26));
-      const X = side * sx, Xr = side * (sx + 4.5), H1 = 16.5, H2 = 20.5;
-      s += poly3(cam, [[X, 0, z], [X, 0, z2], [X, H1, z2], [X, H1, z]], V[side < 0 ? 2 : 3]);
-      for (let fl = 0; fl < 4; fl++) for (let zz = z + 1.2; zz < z2 - 1.4; zz += rr(2.3, 3.1)) {
-        const y1 = 3.6 + fl * 3.2;
-        const q = q3(cam, [[X, y1, zz], [X, y1, zz + 1.2], [X, y1 + 1.8, zz + 1.2], [X, y1 + 1.8, zz]]);
-        s += P(polyD(q, 0.3), rnd() < 0.62 ? C.honey : V[1], 'opacity="0.9"');
-      }
-      s += poly3(cam, [[X, H1, z], [X, H1, z2], [Xr, H2, z2], [Xr, H2, z]], V[6]);              // the roof slope
-      s += poly3(cam, [[X, H1, z + 0.6], [X, H1, z2 - 0.6], [lerp(X, Xr, 0.55), lerp(H1, H2, 0.55), z2 - 1], [lerp(X, Xr, 0.55), lerp(H1, H2, 0.55), z + 1]], V[12], 'opacity="0.75"');   // its snow
-      s += S(lineD([cam.p(X, H1, z), cam.p(X, H1, z2)]), V[1], 2.4);                         // the eave
-      s += poly3(cam, [[Xr, H2, z], [Xr, H2, z2], [Xr + side * 9, H2 - 3, z2], [Xr + side * 9, H2 - 3, z]], V[3]); // the back slope
-      // the end wall at the side street (a gap between blocks), and chimneys with snow
-      s += poly3(cam, [[X, 0, z2], [Xr + side * 9, 0, z2], [Xr + side * 9, H2 - 3, z2], [Xr, H2, z2], [X, H1, z2]], V[side < 0 ? 1 : 2]);
-      for (const cz of [z + 3, (z + z2) / 2]) { const a = cam.p(side * (sx + 2.6), H1 + 1.3, cz), b = cam.p(side * (sx + 2.6), H1 + 4, cz), w = cam.sz(0.9, cz); s += hrect(a[0] - w / 2, b[1], w, a[1] - b[1], V[1], 0.4) + ell(a[0], b[1], w * 0.6, w * 0.25, V[13]); }
-      // the side street's own warm branch, joining the main line
-      if (z2 < zq - 8) { const a = cam.p(side * 22, 0, z2 + 2), b = cam.p(0, 0, z2 + 2); s += S(lineD([a, b]), V[6], cam.sz(0.7, z2), 'opacity="0.6"') + S(lineD([a, b]), C.honey, cam.sz(0.25, z2)); }
-      z = z2 + 4;
-    }
-  }
-  // more of the city beyond, both sides: rows of snowy ridges receding (texture, no detail)
-  for (const side of [-1, 1]) for (const X0 of [26, 44, 64]) for (let z = 30; z < zq - 10; z += rr(18, 28)) {
-    const a = cam.p(side * X0, 18, z), b = cam.p(side * (X0 + 12), 18, z), c2 = cam.p(side * (X0 + 6), 22, z + 6);
-    s += P(polyD([a, b, c2], 1), V[side < 0 ? 3 : 4]) + S(lineD([a, c2, b]), V[12], cam.sz(0.6, z), 'opacity="0.8"');
-  }
-  // the city's own warm line racing down the street to the water's edge (and stopping there, reaching across)
-  const ln = [];
-  for (let z = 18; z <= zq - 1; z *= 1.06) ln.push(cam.p(Math.sin(z * 0.08) * 0.4, 0, z));
-  ln.push(cam.p(0, 0, zq - 1));
-  s += S(lineD(ln), V[7], 30, 'opacity="0.6"') + S(lineD(ln), C.honey, 14) + S(lineD(ln), C.honeyL, 5);
-  const tip = cam.p(0, 0, zq - 1);
-  s += ell(tip[0], tip[1], 16, 6, C.honeyL) + steam(tip[0], tip[1] - 3, 70, 80, {n: 4, warm: true, col: V[13], op: 0.8});
-  // the terrace's iron railing with snow on it, and her leaning on it, looking down the street (from behind)
-  s += P(polyD([[0, 1560], [W, 1540], [W, H], [0, H]]), V[3]);
-  s += S(lineD([[0, 1520], [W, 1500]]), V[0], 10) + S(lineD([[0, 1512], [W, 1492]]), V[13], 5);
-  for (let x = 16; x < W; x += 40) s += S(lineD([[x, 1520 - x * 0.0185], [x, 1700]]), V[0], 4.5);
-  s += S(lineD([[0, 1640], [W, 1622]]), V[0], 5);
-  s += person(225, 1780, 430, {pose: 'lean', coat: V[1], dark: V[0], hair: V[0], skin: V[5], scarf: V[9], rim: C.honeyL});
-  s += snowfall(220, 0, 1920);
-  s += caption([{t: 'But Helsinki', x: 360, y: 368, size: 112}, {t: 'wants', x: 570, y: 488, lit: true, size: 156}, {t: 'that heat.', x: 770, y: 580, size: 104}]);
-  return svgPage(s);
-};
-
-// ======================================================================================
-// B8: the missing piece, drawn. Closer on the quay's end: the city's warm line comes from under our feet and stops in
-// the untouched snow; from its end a dashed pencil pipe runs on to a big pencil hall on the empty lot; a paper tag
-// "2027" on a survey stake marks the gap.
-// ======================================================================================
-FRAMES.B8 = () => {
-  seed(81);
-  const cam = Cam(1050, 520, 1110, 1.7);
-  let s = '';
-  s += `<linearGradient id="sky8" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1112"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.27" stop-color="${C.paper}"/><stop offset="0.54" stop-color="${C.paper}"/><stop offset="0.68" stop-color="${V[10]}"/><stop offset="0.86" stop-color="${V[7]}"/><stop offset="1" stop-color="${V[8]}"/></linearGradient><rect x="0" y="0" width="${W}" height="1114" fill="url(#sky8)"/>`;
-  s += cloudBank(780, 110, V[9], 0.4, 6);
-  // the far shore across the harbour, its windows
-  s += P(polyD([[0, 1112], [0, 1084], [140, 1086], [300, 1080], [520, 1088], [760, 1082], [1080, 1090], [1080, 1112]], 1), V[5]);
-  for (let i = 0; i < 40; i++) s += rect(rr(4, 1070), rr(1088, 1108), 2.4, 2.4, C.honey, `opacity="${f1(rr(0.45, 0.9))}"`);
-  // the harbour ice to the left and beyond the lot
-  s += P(polyD([[0, 1112], [W, 1112], [W, 1150], cam.p(-9.6, -1.1, 3), [0, 1920]]), V[9]);
-  s += P(smoothD([[0, 1135], [260, 1125], [600, 1130], [1080, 1122], [1080, 1134], [600, 1142], [260, 1140], [0, 1150]], true), V[5], 'opacity="0.7"');
-  // the icebreaker moored at the left, its stern toward us (black hull, pale decks)
-  {
-    const z = 30, zs = 34, st = (x, y) => cam.p(x, y, z);
-    s += P(smoothD([st(-10, -1.1), st(-10, 4.2), st(-14, 5.1), st(-24, 5.4), st(-34, 4.8), st(-36, -1.1)], true), V[1]);
-    s += faceZ(cam, zs, -32, -12, 5.1, 8.2, V[11]) + faceZ(cam, zs + 2, -30, -14, 8.2, 11.3, V[12]) + faceZ(cam, zs + 4, -27, -16, 11.3, 13.8, V[13]);
-    for (const [yy, zz, x1, x2] of [[6.2, zs, -31, -13], [9.3, zs + 2, -29, -15], [12.2, zs + 4, -26, -17]]) for (let x = x1; x < x2 - 0.8; x += 1.7) s += faceZ(cam, zz - 0.01, x, x + 1, yy, yy + 1, rnd() < 0.15 ? '#e2eef3' : V[3]);
-    s += faceZ(cam, zs + 9, -24, -19, 13.8, 18.2, V[2]);
-    s += S(lineD([cam.p(-30, 8.25, zs), cam.p(-12, 8.25, zs)]), V[14], 2.6);
-  }
-  // the quay's snow, untouched toward the lot; the kerb along the water
-  s += P(polyD([cam.p(-9.6, 0, 2.4), cam.p(-9.6, 0, 70), cam.p(10.4, 0, 70), cam.p(10.4, 0, 2.4)]), V[9]);
-  for (const [z1, z2, col] of [[2.4, 3.8, V[5]], [3.8, 6, V[6]], [6, 10, V[7]], [10, 18, V[8]]]) s += P(polyD([cam.p(-9.6, 0, z1), cam.p(-9.6, 0, z2), cam.p(10.4, 0, z2), cam.p(10.4, 0, z1)], 1.5), col);
-  s += P(polyD([cam.p(-9.8, 0.1, 2.4), cam.p(-9.8, 0.1, 70), cam.p(-8.6, 0.8, 70), cam.p(-8.6, 0.8, 2.4)], 1), V[11]);
-  // the last old block on the right, its end wall facing the lot, warm windows, its door where the line branches in
-  s += facadeX(cam, 10.4, 2.4, 12, 0, 10.5, V[3]) + poly3(cam, [[10.4, 10.5, 2.4], [10.4, 10.5, 12], [12, 12.9, 12], [12, 12.9, 2.4]], V[1]);
-  s += faceZ(cam, 12, 10.4, 24, 0, 10.5, V[2]);
-  for (let fl = 0; fl < 2; fl++) for (let zz = 4; zz < 11; zz += 2.6) { const q = q3(cam, [[10.4, 4 + fl * 3.2, zz], [10.4, 4 + fl * 3.2, zz + 1.2], [10.4, 5.8 + fl * 3.2, zz + 1.2], [10.4, 5.8 + fl * 3.2, zz]]); s += P(polyD(q, 0.3), rnd() < 0.7 ? C.honey : V[1], 'opacity="0.85"'); }
-  // the drawn hall on the empty lot: big pale pencil lines over the night (painted = real, pencil = planned)
-  seed(77);
-  const pz1 = 30, pz2 = 56, h = 13, c = (x, y, z) => cam.p(x, y, z);
-  s += pencil([c(-8.5, 0, pz1), c(8, 0, pz1), c(8, h, pz1), c(-8.5, h, pz1), c(-8.5, 0, pz1)], 4.2);
-  s += pencil([c(8, 0, pz1), c(8, 0, pz2), c(8, h, pz2), c(8, h, pz1)], 3, {op: 0.7});
-  s += pencil([c(-8.5, h, pz1), c(-8.5, h, pz2), c(8, h, pz2)], 2.6, {op: 0.55});
-  s += pencil([c(-3.2, 0, pz1), c(-3.2, 7, pz1), c(3.2, 7, pz1), c(3.2, 0, pz1)], 3.4, {op: 0.95});
-  for (let i = 0; i < 5; i++) { const xx = -6.4 + i * 3.2; s += pencil([c(xx, 9, pz1), c(xx + 1.6, 9, pz1)], 2, {op: 0.5}); }
-  s += pencil([c(-10.5, 0, pz1 - 1.2), c(10, 0, pz1 - 1.2)], 1.8, {op: 0.4, dash: '10 12'});
-  // the city's warm line from under our feet, stopping in the untouched snow: the gap
-  const zEnd = 13.5;
-  const pts = []; for (let z = 2.4; z <= zEnd; z *= 1.06) pts.push([-0.6 + Math.sin(z * 0.3) * 0.25, z]); pts.push([-0.6, zEnd]);
-  const seam = (half, col, ex, wob) => { const tp = (z) => clamp(z / 5, 0.6, 1); const L = pts.map(([x, z]) => cam.p(x - half * tp(z) * (1 + rr(-wob, wob)), 0, z)), Rr = pts.map(([x, z]) => cam.p(x + half * tp(z) * (1 + rr(-wob, wob)), 0, z)).reverse(); return P(smoothD(L.concat(Rr), true), col, ex); };
-  s += seam(0.95, V[10], 'opacity="0.5"', 0.35) + seam(0.62, V[2], '', 0.3) + seam(0.5, C.honey, 'opacity="0.4" filter="url(#b8)"', 0.2) + seam(0.2, C.honeyD, 'opacity="0.95"', 0.45) + seam(0.085, C.honeyL, '', 0.55);
-  const end = cam.p(-0.6, 0, zEnd);
-  s += steam(end[0], end[1] - 4, 70, 120, {n: 5, warm: true, col: V[12], op: 0.7});
-  // the missing piece: a dashed pencil pipe across the untouched snow, from the line's end to the drawn door
-  seed(78);
-  const gap = [c(-0.6, 0, zEnd), c(-0.45, 0, 17), c(-0.2, 0, 22.5), c(0, 0, pz1)];
-  s += S(lineD(gap), V[3], 16, 'opacity="0.35"');
-  s += pencil(gap, 7, {dash: '22 14', op: 1});
-  // the survey stake at the line's end, its paper tag swinging: 2027
-  const stB = cam.p(-2.4, 0, 12.5), stT = cam.p(-2.4, 1.8, 12.5);
-  s += S(lineD([stB, stT]), V[1], 5) + ell(stB[0], stB[1], 10, 3.5, V[3]);
-  const tx = stT[0] - 150, ty = stT[1] + 4;
-  s += S(lineD([[stT[0], stT[1] + 3], [tx + 136, ty + 8]]), V[2], 1.8);
-  s += P(polyD([[tx, ty + 6], [tx + 136, ty], [tx + 140, ty + 78], [tx + 6, ty + 86]], 0.8), '#f4f2ea');
-  s += `<text x="${tx + 72}" y="${ty + 60}" font-family="Gaegu" font-weight="700" font-size="58" text-anchor="middle" fill="${C.ink}" transform="rotate(-3 ${tx + 72} ${ty + 48})" class="ink">2027</text>`;
-  // she stands by the line's end, looking at the drawn hall (from behind)
-  const f = cam.p(1.8, 0, 9.2);
-  s += ell(f[0] + 4, f[1] + 1, cam.sz(0.5, 9.2), cam.sz(0.12, 9.2), V[4], 'opacity="0.6"');
-  s += person(f[0], f[1], cam.sz(1.7, 9.2), {pose: 'stand', coat: V[1], dark: V[0], hair: V[0], skin: V[5], scarf: V[9], rim: C.honeyL});
-  s += snowfall(220, 0, 1920);
-  s += caption([{t: 'a plan,', x: 360, y: 400, size: 112}, {t: 'starting next year.', x: 560, y: 522, size: 108}]);
   return svgPage(s);
 };
 
@@ -751,6 +621,7 @@ FRAMES.B12 = () => {
   // the street's snow
   s += P(polyD([cam.p(-9, 0, 2.6), cam.p(-9, 0, 140), cam.p(12, 0, 140), cam.p(12, 0, 2.6)]), V[8]);
   for (const [z1, z2, col] of [[2.6, 4, V[4]], [4, 6.5, V[5]], [6.5, 11, V[6]], [11, 22, V[7]]]) s += P(polyD([cam.p(-9, 0, z1), cam.p(-9, 0, z2), cam.p(12, 0, z2), cam.p(12, 0, z1)], 1.5), col);
+  s += P(polyD([[0, 1790], [W, 1780], [W, H], [0, H]]), V[4]);
   // the row of blocks on the right receding toward the quay's end (warm windows), and HER house front-on, near
   for (const [z1, z2, hgt] of [[40, 70, 16.5], [24, 39.6, 15]]) {
     s += facadeX(cam, 12, z1, z2, 0, hgt, V[2]) + poly3(cam, [[12, hgt, z1], [12, hgt, z2], [13.6, hgt + 2.4, z2], [13.6, hgt + 2.4, z1]], V[1]);
@@ -779,5 +650,247 @@ FRAMES.B12 = () => {
   s += phoneHand(300, 1360, 270);
   s += snowfall(220, 0, 1920);
   s += caption([{t: 'heat', x: 290, y: 430, lit: true, size: 170}, {t: 'an apartment', x: 660, y: 470, size: 104}, {t: 'in Helsinki.', x: 690, y: 572, size: 104}]);
+  return svgPage(s);
+};
+
+// ======================================================================================
+// THE LOT VIEW (B7, B8: one view, one change; reworked in round 1). At the quay's end, a person's eye: on the right the
+// last old block, its windows flung open, its people leaning out toward the warmth thrown away across the ice; ahead the
+// empty lot by the water, its snow untouched behind a ploughed bank; the city's warm line comes from under our feet and
+// stops in a burst at the bank. B8: the plan pencils itself onto the lot (a hall, its big door faintly warm, a dashed
+// pipe across the gap, the year pinned on the drawing).
+// ======================================================================================
+function lotView(o = {}) {
+  seed(81);
+  const cam = Cam(1000, 540, 1250, 1.7);
+  const plan = !!o.plan;
+  let s = '';
+  // the night sky under the band (the band itself stays the light calm field)
+  s += `<linearGradient id="sky8" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1254"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.24" stop-color="${C.paper}"/><stop offset="0.47" stop-color="${C.paper}"/><stop offset="0.53" stop-color="${V[10]}"/><stop offset="0.66" stop-color="${V[6]}"/><stop offset="0.9" stop-color="${V[5]}"/><stop offset="1" stop-color="${V[7]}"/></linearGradient><rect x="0" y="0" width="${W}" height="1254" fill="url(#sky8)"/>`;
+  s += cloudBank(760, 90, V[8], 0.3, 6);
+  // the far shore across the harbour: a low belt of the city, its small warm windows
+  s += P(polyD([[0, 1254], [0, 1226], [60, 1224], [70, 1212], [130, 1213], [140, 1222], [250, 1220], [262, 1208], [330, 1209], [340, 1218], [470, 1218], [480, 1210], [560, 1211], [570, 1220], [700, 1219], [1080, 1222], [1080, 1254]], 0.8), V[3]);
+  for (let i = 0; i < 80; i++) s += rect(rr(4, 1070), rr(1214, 1246), rr(2, 3.4), rr(2, 3.2), C.honey, `opacity="${f1(rr(0.45, 0.95))}"`);
+  // across the ice, a data center throwing its heat into the night: warm air rising, thinning to nothing
+  s += hrect(96, 1210, 112, 30, V[1], 0.4) + rect(104, 1224, 96, 3, C.honey, 'opacity="0.55"');
+  s += warmAir(152, 1208, 100, 520, {lean: 0.04, op: 1.3});
+  // the harbour ice; the icebreakers' channel kept open along the far side
+  s += P(polyD([[0, 1252], [W, 1252], [W, 1310], [0, 1310]]), V[10]);
+  s += P(smoothD([[0, 1258], [300, 1256], [700, 1260], [1080, 1257], [1080, 1268], [700, 1272], [300, 1268], [0, 1270]], true), V[3], 'opacity="0.85"');
+  for (let i = 0; i < 10; i++) { const y = rr(1276, 1304), x0 = rr(-40, 1000); s += S(lineD([[x0, y], [x0 + rr(40, 140), y + rr(-2, 2)]]), V[rnd() < 0.5 ? 8 : 12], rr(1, 2), 'opacity="0.6"'); }
+  // the quay's stone edge along the water, snow-capped bollards
+  s += P(polyD([[0, 1306], [W, 1306], [W, 1316], [0, 1316]], 0.6), V[3]);
+  for (const X of [-14, -9.5, -5]) { const a = cam.p(X, 0, 29), b = cam.p(X, 0.9, 29), w = cam.sz(0.45, 29); s += hrect(a[0] - w / 2, b[1], w, a[1] - b[1], V[1], 0.4) + ell(a[0], b[1], w * 0.75, w * 0.3, V[13]); }
+  // THE LOT: its snow untouched, smooth and pale (the missing piece's ground)
+  s += P(polyD([[0, 1315], [W, 1315], [W, 1446], [0, 1446]]), V[11]);
+  for (let i = 0; i < 7; i++) s += P(blobD(rr(30, 460), rr(1330, 1420), rr(60, 150), rr(4, 8), 8, 0.3), V[12], 'opacity="0.55"');
+  s += P(smoothD([[0, 1394], [160, 1382], [330, 1390], [470, 1380], [470, 1400], [300, 1408], [0, 1412]], true), V[10], 'opacity="0.35" filter="url(#b8)"');
+  // the last old house (right), front-on, two storeys and a steep snowy roof: its windows flung open on warm rooms
+  const bz = 8.9, bx1 = -0.6, bx2 = 6.4;
+  s += facadeX(cam, bx1, bz, 13, 0, 7, V[2]);
+  s += faceZ(cam, bz, bx1, bx2, 0, 7, V[3]);
+  s += faceZ(cam, bz - 0.01, bx1, bx2, 0, 3.3, V[4]);
+  for (let yy = 0.55; yy < 3.3; yy += 0.68) s += S(lineD([cam.p(bx1, yy, bz - 0.02), cam.p(bx2, yy, bz - 0.02)]), V[3], 1.8, 'opacity="0.7"');
+  s += faceZ(cam, bz - 0.02, bx1, bx2, 6.7, 7.05, V[5]) + S(lineD([cam.p(bx1 - 0.1, 7.08, bz - 0.03), cam.p(bx2, 7.08, bz - 0.03)]), V[12], 4);
+  s += poly3(cam, [[bx1 - 0.25, 7.05, bz], [bx2, 7.05, bz], [bx2, 8.1, bz + 2.2], [bx1 + 0.6, 8.1, bz + 2.2]], V[1]);
+  s += S(lineD([cam.p(bx1 + 0.5, 8.05, bz + 2.1), cam.p(bx2, 8.05, bz + 2.1)]), V[12], 3.4, 'opacity="0.85"');
+  { const a = cam.p(3.2, 7.9, bz + 1.6), b = cam.p(3.9, 8.35, bz + 1.6); s += hrect(a[0], b[1], b[0] - a[0], a[1] - b[1], V[1], 0.4) + ell((a[0] + b[0]) / 2, b[1], (b[0] - a[0]) * 0.65, 4, V[13]); }
+  const winAt = (X1, Y1, w = 1.25, h = 1.8) => { const a = cam.p(X1, Y1 + h, bz - 0.03), b = cam.p(X1 + w, Y1, bz - 0.03); return [a[0], a[1], b[0] - a[0], b[1] - a[1]]; };
+  const life = o.life || ['oldman', 'mug'];
+  [0.0, 2.3].forEach((X1, c) => {
+    const [x, y, w, h] = winAt(X1, 4.1), kind = life[c];
+    s += openWin(x, y, w, h, {open: true, spill: 1.1, leafL: 0.24, leafR: 0.24});
+    s += sillLife(kind, x, y, w, h, -1, {k: 1.5});
+  });
+  // the ground floor: a café window lit low with a child kneeling on its bench, the house door, its cat on the step
+  { const [x, y, w, h] = winAt(0.0, 0.9, 1.25, 1.75); s += openWin(x, y, w, h, {open: true, spill: 1, leafL: 0.24, leafR: 0.24}); s += sillLife('child', x, y, w, h, -1, {k: 1.45, out: -0.2}); }
+  { const a = cam.p(2.55, 2.7, bz - 0.03), b = cam.p(3.45, 0, bz - 0.03); s += hrect(a[0], a[1], b[0] - a[0], b[1] - a[1], V[1], 0.4) + hrect(a[0] + 5, a[1] + 5, b[0] - a[0] - 10, 22, C.honey, 0.3, 'opacity="0.85"'); s += ell((a[0] + b[0]) / 2, b[1] + 6, 70, 12, C.honey, 'opacity="0.3" filter="url(#b8)"');
+    s += sillLife('cat', a[0] - 40, b[1] - 120, 80, 120, -1, {k: 1.6}); }
+  // the warm light the open windows throw on the snow at the house's foot
+  s += ell(800, 1462, 330, 40, C.honey, 'opacity="0.24" filter="url(#b24)"');
+  // the ploughed bank where the street's trodden snow ends and the lot begins (the line meets it and stops)
+  s += P(smoothD([[-20, 1452], [60, 1436], [180, 1432], [300, 1438], [400, 1434], [470, 1440], [560, 1436], [700, 1440], [860, 1434], [1100, 1440], [1100, 1466], [-20, 1466]], true), V[12]);
+  s += P(smoothD([[-20, 1458], [200, 1450], [420, 1454], [640, 1449], [1100, 1454], [1100, 1480], [-20, 1480]], true), V[9]);
+  // the near street: trodden snow, tracks, darker toward us (a quiet field)
+  s += P(polyD([[0, 1478], [W, 1478], [W, H], [0, H]]), V[6]);
+  for (const [y1, col] of [[1560, V[5]], [1710, V[4]]]) s += P(smoothD([[0, y1], [300, y1 - 8], [700, y1 + 6], [1080, y1 - 4], [1080, H], [0, H]], true), col);
+  for (let i = 0; i < 22; i++) { const x = rr(-20, 1060), y = rr(1490, 1900); s += S(lineD([[x, y], [x + rr(-30, 30), y + rr(40, 120)]]), V[rnd() < 0.5 ? 7 : 3], rr(3, 7), 'opacity="0.35"'); }
+  for (let i = 0; i < 9; i++) { const p = [300 + i * 14 + (i % 2) * 10, 1890 - i * 48]; s += ell(p[0], p[1], 9 - i * 0.5, 4 - i * 0.2, V[3], 'opacity="0.7"'); }
+  // the city's warm line from under our feet to the bank, where it stops
+  const end = [396, 1446];
+  s += meltSeam([[540, 1950], [522, 1800], [480, 1650], [430, 1530], end], [74, 15]);
+  s += lineBurst(end[0], end[1] - 4, plan ? 0.6 : 1.05);
+  if (plan) {
+    seed(77);
+    // the plan, drawn on the lot in soft pencil: a hall standing on the lot, its big door facing the line's end
+    const z = 22, L = cam.p(-11.6, 0, z)[0], R = cam.p(bx1, 0, bz)[0] - 6, B = cam.p(0, 0, z)[1], T = cam.p(0, 10, z)[1];
+    const zb = 46, bl = cam.p(-11.6, 10, zb), blB = cam.p(-11.6, 0, zb);
+    // its left end receding toward the water, hatched in shade; the roof's far edge
+    s += pencilHatch([[bl[0], bl[1]], [L, T], [L, B], [blB[0], blB[1]]], 9, {op: 0.32, w: 1.8});
+    s += softPencil([[L, T], [bl[0], bl[1]], [blB[0], blB[1]]], 2.6, {op: 0.6, over: 8});
+    s += softPencil([[bl[0], bl[1]], [R, bl[1] + 2]], 2, {op: 0.36});
+    // the front: its walls, a parapet, the plinth, panel joints (a building standing on the lot, drawn; it runs on
+    // behind the old house)
+    s += softPencil([[L, B], [L, T]], 4.4, {over: 18, op: 0.86}) + softPencil([[L, T], [R, T]], 4.6, {over: 10, op: 0.88});
+    s += softPencil([[L - 50, B + 1], [R, B - 1]], 2.4, {op: 0.5});
+    s += softPencil([[L + 4, T + 22], [R, T + 22]], 2, {op: 0.5}) + softPencil([[L + 4, B - 24], [R, B - 24]], 1.8, {op: 0.42});
+    for (let x = L + 64; x < 470; x += 64) s += softPencil([[x, T + 26], [x, B - 28]], 1.4, {op: 0.24, passes: 1});
+    // the big door, faintly warm inside (the hope)
+    const dL = cam.p(-9.0, 0, z)[0], dR = cam.p(-5.0, 0, z)[0], dT = cam.p(0, 5.6, z)[1];
+    s += rect(dL - 40, dT - 40, dR - dL + 80, B - dT + 60, C.honey, 'opacity="0.26" filter="url(#b24)"');
+    s += hrect(dL, dT, dR - dL, B - dT, C.honeyL, 0.5, 'opacity="0.24"');
+    s += softPencil([[dL, B], [dL, dT], [dR, dT], [dR, B]], 4.2, {over: 8, op: 0.9});
+    s += softPencil([[(dL + dR) / 2, dT + 6], [(dL + dR) / 2, B - 4]], 2, {op: 0.5});
+    s += softPencil([[dL - 30, dT - 16], [dR + 70, dT - 16]], 2.2, {op: 0.55});
+    // the missing piece: a dashed pencil pipe across the untouched snow from the line's end to the drawn door
+    const pipe = [[end[0] - 12, end[1] - 6], [380, 1420], [300, 1388], [240, 1362], [(dL + dR) / 2 + 16, B + 2]];
+    s += S(smoothD(pipe, false), C.honey, 18, 'opacity="0.2" filter="url(#b8)"');
+    s += softPencil(sampleSmooth(pipe, 6), 5, {dash: '24 15', op: 0.9, passes: 2});
+    // the survey stake where the line ends, its ribbon
+    const st = cam.p(-1.25, 0, 9.7), stT = cam.p(-1.25, 1.45, 9.7);
+    s += S(lineD([st, stT]), V[1], 5) + ell(st[0], st[1], 10, 3.5, V[3]) + P(polyD([[stT[0], stT[1] + 2], [stT[0] + 30, stT[1] + 8], [stT[0] + 26, stT[1] + 17], [stT[0], stT[1] + 12]], 0.4), V[12]);
+    // the year, on a paper pinned to the drawing above its door (the type guide's world word, in its ink)
+    const tx = Math.max(126, (dL + dR) / 2 - 140), ty = T + 36;
+    s += G(P(polyD([[tx, ty], [tx + 280, ty - 4], [tx + 283, ty + 166], [tx + 3, ty + 170]], 0.8), '#d9dae6') + ell(tx + 140, ty + 12, 7, 7, V[2]) +
+      `<text x="${tx + 141}" y="${ty + 126}" font-family="Gaegu" font-weight="700" font-size="138" text-anchor="middle" fill="#1f2b4b" class="ink">2027</text>`, `transform="rotate(-3 ${tx + 140} ${ty + 85})"`);
+  }
+  // her, in the street by the line's end, from behind: reaching toward the warmth (B7), or standing to look at the plan (B8)
+  const f = cam.p(-0.2, 0, 7.3), hh = cam.sz(1.7, 7.3);
+  s += ell(f[0] + 4, f[1] + 2, hh * 0.2, hh * 0.04, V[4], 'opacity="0.6"');
+  s += fig(f[0], f[1], hh, plan ? {view: 'back', arms: [[8, 4], [10, 30]], coat: V[1], coatL: V[3], hair: V[0], skin: V[5], scarf: V[8], rim: C.honeyL, rimSide: 1} :
+    {view: 'back', arms: [[112, -6], [34, 18]], lean: -7, dir: 1, coat: V[1], coatL: V[3], hair: V[0], skin: V[5], scarf: V[8], rim: C.honeyL, rimSide: 1});
+  s += snowfall(200, 0, 1920);
+  return s;
+}
+FRAMES.B7 = () => {
+  let s = lotView({plan: false});
+  s += caption([{t: 'But Helsinki', x: 360, y: 368, size: 112}, {t: 'wants', x: 570, y: 488, lit: true, size: 156}, {t: 'that heat.', x: 770, y: 580, size: 104}]);
+  return svgPage(s);
+};
+FRAMES.B8 = () => {
+  let s = lotView({plan: true});
+  s += caption([{t: 'a plan,', x: 360, y: 400, size: 112}, {t: 'starting next year.', x: 560, y: 522, size: 108}]);
+  return svgPage(s);
+};
+
+// ======================================================================================
+// THE ALTERNATES (the beats I am least sure of)
+// ======================================================================================
+// ---------- B5alt: one cup, close (no one): one mug steaming in front of the soft wall of forty kettles ----------
+FRAMES.B5alt = () => {
+  seed(55);
+  let s = '';
+  s += `<linearGradient id="c5a" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1000"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.3" stop-color="${C.paper}"/><stop offset="0.6" stop-color="${C.paper}"/><stop offset="1" stop-color="${V[12]}"/></linearGradient><rect x="0" y="0" width="${W}" height="${H}" fill="url(#c5a)"/>`;
+  s += G(kettleCabinet(40, 640, 1000, 1240, {open: false}), 'opacity="0.42"');
+  s += rect(0, 600, W, 1320, V[12], 'opacity="0.3"');
+  s += steam(540, 700, 1000, 220, {n: 8, col: '#f2f3f5', op: 0.8});
+  // the open door's ledge, near, and on it ONE mug: dark on the light steam, warm tea, its tag, one curl of steam
+  s += P(polyD([[0, 1330], [W, 1300], [W, 1420], [0, 1450]], 1), V[3]) + P(polyD([[0, 1330], [W, 1300], [W, 1318], [0, 1348]], 0.6), V[6]);
+  const mx = 560, my = 1150;
+  s += ell(mx, my + 152, 150, 22, V[2], 'opacity="0.6"');
+  s += P(polyD([[mx - 120, my - 150], [mx + 112, my - 150], [mx + 100, my + 148], [mx - 108, my + 148]], 1), V[1]);
+  s += S(smoothD([[mx + 108, my - 100], [mx + 200, my - 80], [mx + 196, my + 40], [mx + 102, my + 52]], false), V[1], 30);
+  s += ell(mx - 4, my - 148, 112, 20, C.honey) + ell(mx - 4, my - 150, 70, 10, C.honeyL, 'opacity="0.7"');
+  s += S(smoothD([[mx + 30, my - 150], [mx + 60, my - 60], [mx + 66, my + 10]], false), V[11], 3) + hrect(mx + 46, my + 10, 46, 54, '#f1efe6', 0.6);
+  s += steam(mx - 10, my - 170, 220, 330, {n: 7, warm: true, col: '#f4f5f7', op: 0.9, lean: 0.12, root: 0.25});
+  s += caption([{t: "That's a lot", x: 520, y: 400, size: 112}, {t: 'of tea.', x: 600, y: 522, size: 112}]);
+  return svgPage(s);
+};
+
+// ---------- B6alt: everywhere (the wide): data centers across a snowy land at night, every roof sending its heat up
+// into the dark, the plumes thinning away; far on the coast, Helsinki's small warm lights ----------
+FRAMES.B6alt = () => {
+  seed(66);
+  let s = '';
+  s += `<linearGradient id="s6a" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1300"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.22" stop-color="${C.paper}"/><stop offset="0.46" stop-color="${C.paper}"/><stop offset="0.56" stop-color="${V[8]}"/><stop offset="0.7" stop-color="${V[4]}"/><stop offset="1" stop-color="${V[6]}"/></linearGradient><rect x="0" y="0" width="${W}" height="1302" fill="url(#s6a)"/>`;
+  // the snowy land in bands toward a far coast, dark forest belts
+  s += P(polyD([[0, 1300], [W, 1300], [W, H], [0, H]]), V[10]);
+  for (const [y, col, amp] of [[1300, V[3], 8], [1380, V[9], 0], [1470, V[2], 12], [1560, V[9], 0], [1700, V[3], 16]]) s += P(smoothD([[0, y], [180, y - amp], [360, y + amp * 0.5], [560, y - amp], [760, y + amp], [1080, y - amp * 0.5], [1080, y + 26 + amp], [0, y + 26 + amp]], true), col);
+  // Helsinki on the far coast (right): a small warm cluster by the water
+  for (let i = 0; i < 70; i++) s += rect(rr(820, 1060), rr(1286, 1300), 2.2, 2, C.honey, `opacity="${f1(rr(0.5, 1))}"`);
+  // the data centers: long low halls scattered over the land, each with its row of plumes (bigger near)
+  for (const [x, y, w] of [[140, 1295, 40], [300, 1292, 34], [520, 1296, 30], [690, 1293, 26], [210, 1375, 70], [600, 1372, 64], [380, 1465, 120], [820, 1462, 104], [250, 1690, 230]]) {
+    const hh = w * 0.22;
+    s += hrect(x - w / 2, y - hh, w, hh, V[1], 0.6);
+    for (let k = 0; k < Math.max(1, Math.round(w / 40)); k++) { const px = x - w / 2 + (k + 0.5) * w / Math.max(1, Math.round(w / 40)); s += ell(px, y - hh, w * 0.06, w * 0.02, C.honey, 'opacity="0.9"'); s += steam(px, y - hh, w * 0.9, Math.min(y - 650, w * 3.2 + 120), {n: 12, warm: true, col: V[11], op: 0.7, root: 0.1, lean: 0.06, sharp: true}); }
+  }
+  s += snowfall(200, 0, 1920, {rmax: 3.5});
+  s += caption([{t: 'Normally,', x: 380, y: 400, size: 112}, {t: 'blow that heat outside.', x: 545, y: 522, size: 100}]);
+  return svgPage(s);
+};
+
+// ---------- B7alt: the city leans out: along the quay, windows swing open and people lean out toward the warm plume
+// drifting over the harbour: a hand held out, a mug held up, mittens hung out to warm ----------
+FRAMES.B7alt = () => {
+  seed(77);
+  let s = '';
+  s += `<linearGradient id="s7a" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1000"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.3" stop-color="${C.paper}"/><stop offset="0.6" stop-color="${C.paper}"/><stop offset="0.75" stop-color="${V[9]}"/><stop offset="1" stop-color="${V[6]}"/></linearGradient><rect x="0" y="0" width="${W}" height="1000" fill="url(#s7a)"/>`;
+  // the Jugendstil facade, front-on, its steep roof under the band, a low corner turret at the right
+  s += hrect(-20, 700, 940, 1240, V[3], 1) + P(polyD([[-20, 704], [60, 640], [880, 640], [930, 704]], 1), V[1]) + S(lineD([[-10, 700], [62, 644], [880, 644]]), V[12], 5);
+  s += hrect(900, 690, 200, 1240, V[2], 1) + P(smoothD([[890, 692], [930, 650], [1000, 618], [1070, 650], [1110, 692]], true), V[1]);
+  // the warm plume drifting in over the harbour from the right, across the facade (the heat they want)
+  s += steam(1120, 900, 560, 60, {n: 9, warm: true, col: V[12], op: 0.85, lean: -9, root: 0.35, sharp: true});
+  // windows in rows; the open ones: casements swung out, people leaning toward the warmth (lit from their rooms)
+  const cols = [70, 280, 490, 700], rows = [790, 990, 1190, 1390];
+  const open = {'0,1': 'mug', '1,0': 'hand', '2,1': 'hand', '3,0': 'mitten', '1,2': 'mug', '3,2': 'hand', '0,3': 'cat', '2,3': 'mug'};
+  rows.forEach((wy, r) => cols.forEach((wx, c) => {
+    const key = c + ',' + r, kind = open[key];
+    s += win(wx, wy, 130, 150, {lit: true, glow: kind ? 1 : 0.5, core: false});
+    if (!kind) return;
+    s += P(polyD([[wx + 130, wy], [wx + 186, wy - 20], [wx + 186, wy + 170], [wx + 130, wy + 150]], 0.6), V[6]);   // the casement swung out
+    s += P(polyD([[wx + 136, wy + 6], [wx + 180, wy - 8], [wx + 180, wy + 160], [wx + 136, wy + 144]], 0.6), '#e6eef2', 'opacity="0.35"');
+    // a person at the sill, leaning out in profile toward the right (dark against the warm room, a warm rim)
+    const px = wx + 70, py = wy + 150;
+    s += personProfile(px, py + 110, 260, {pose: kind === 'mug' ? 'stand-toast' : 'stand-valve', mug: kind === 'mug', coat: V[2], coatL: V[3], hair: V[1], skin: V[7], rim: C.honeyL});
+    if (kind === 'mitten') { s += S(lineD([[wx + 130, wy + 30], [wx + 220, wy + 22]]), V[1], 2); s += P(blobD(wx + 160, wy + 54, 13, 19, 7, 0.2), V[10]) + P(blobD(wx + 200, wy + 48, 13, 19, 7, 0.2), V[10]); }
+    if (kind === 'cat') { s += P(smoothD([[wx + 110, wy + 150], [wx + 130, wy + 112], [wx + 176, wy + 104], [wx + 200, wy + 122], [wx + 196, wy + 150]], true), V[1]) + P(polyD([[wx + 184, wy + 108], [wx + 190, wy + 90], [wx + 198, wy + 110]]), V[1]); }
+  }));
+  // the street below: snow, the warm line under it
+  s += P(polyD([[0, 1600], [W, 1600], [W, H], [0, H]]), V[6]) + P(polyD([[0, 1720], [W, 1710], [W, H], [0, H]]), V[5]);
+  s += meltSeam([[-20, 1668], [300, 1660], [600, 1670], [1100, 1654]], [24, 18]);
+  s += snowfall(200, 0, 1920);
+  s += caption([{t: 'But Helsinki', x: 360, y: 368, size: 112}, {t: 'wants', x: 570, y: 488, lit: true, size: 156}, {t: 'that heat.', x: 770, y: 580, size: 104}]);
+  return svgPage(s);
+};
+
+// ---------- B12alt: inside her warm flat: a cat asleep on the warm radiator under the window, her phone on the sill
+// with your chat bubble popping, and out in the snow the quay, the warm line and the hall's lights far away ----------
+FRAMES.B12alt = () => {
+  seed(122);
+  let s = '';
+  // the room's wall: warm-lit by the lamp (the band is the wall above the window: calm and light)
+  s += rect(0, 0, W, H, C.paper);
+  s += rect(0, 620, W, 1300, V[11]);
+  // the window: deep, its frame, the night outside (the quay, the line, the hall's lights)
+  const wx = 190, wy = 650, ww = 700, wh = 700;
+  s += hrect(wx - 30, wy - 30, ww + 60, wh + 60, V[13], 1);
+  s += `<linearGradient id="n12" gradientUnits="userSpaceOnUse" x1="0" y1="${wy}" x2="0" y2="${wy + wh}"><stop offset="0" stop-color="${V[5]}"/><stop offset="1" stop-color="${V[7]}"/></linearGradient>`;
+  s += rect(wx, wy, ww, wh, 'url(#n12)');
+  s += P(polyD([[wx, wy + 430], [wx + ww, wy + 410], [wx + ww, wy + wh], [wx, wy + wh]]), V[9]);
+  s += P(polyD([[wx, wy + 330], [wx + 300, wy + 330], [wx + 300, wy + 430], [wx, wy + 440]]), V[2]);
+  for (let i = 0; i < 18; i++) s += rect(wx + 10 + rr(0, 280), wy + 340 + rr(0, 70), 6, 8, C.honey, 'opacity="0.85"');
+  s += hrect(wx + 470, wy + 360, 130, 60, V[1], 0.5) + rect(wx + 515, wy + 395, 26, 25, '#dcebf0') + steam(wx + 535, wy + 360, 90, 170, {n: 6, warm: true, col: V[11], op: 0.7});
+  s += S(lineD([[wx + ww / 2, wy], [wx + ww / 2, wy + wh]]), V[13], 16) + S(lineD([[wx, wy + 300], [wx + ww, wy + 300]]), V[13], 12);
+  for (let i = 0; i < 30; i++) s += ell(wx + rr(0, ww), wy + rr(0, wh), 2.4, 2.4, '#f6f7f9', 'opacity="0.85"');
+  // frost at the pane's lower corners, melting back
+  s += P(blobD(wx + 40, wy + wh - 30, 90, 50, 9, 0.3), '#eef1f5', 'opacity="0.6" filter="url(#b8)"') + P(blobD(wx + ww - 40, wy + wh - 30, 90, 50, 9, 0.3), '#eef1f5', 'opacity="0.6" filter="url(#b8)"');
+  // the sill (deep), the phone on it with your chat bubble popping
+  s += hrect(wx - 70, wy + wh + 10, ww + 140, 44, V[13], 1) + hrect(wx - 70, wy + wh + 54, ww + 140, 22, V[9], 1);
+  s += P(polyD([[wx + 520, wy + wh + 4], [wx + 640, wy + wh - 6], [wx + 650, wy + wh + 12], [wx + 526, wy + wh + 20]], 0.5), V[0]);
+  s += P(smoothD([[wx + 560, wy + wh - 90], [wx + 660, wy + wh - 92], [wx + 666, wy + wh - 40], [wx + 640, wy + wh - 30], [wx + 562, wy + wh - 34]], true), C.honeyL);
+  s += ell(wx + 595, wy + wh - 62, 7, 7, C.honeyD) + ell(wx + 615, wy + wh - 62, 7, 7, C.honeyD) + ell(wx + 635, wy + wh - 62, 7, 7, C.honeyD);
+  // the radiator under the sill, warm: its fins honey; a cat asleep on the shelf above it, curled
+  const ry0 = wy + wh + 100, rh = 300;
+  s += rect(wx - 20, ry0 - 30, ww + 40, rh + 80, C.honey, 'opacity="0.3" filter="url(#b40)"');
+  for (let i = 0; i < 16; i++) s += hrect(wx + 10 + i * 42, ry0, 30, rh, i % 2 ? C.honeyD : C.honey, 0.6);
+  s += S(lineD([[wx, ry0 + 20], [wx + ww, ry0 + 20]]), C.honeyW, 6);
+  s += P(smoothD([[wx + 130, wy + wh + 10], [wx + 150, wy + wh - 50], [wx + 230, wy + wh - 72], [wx + 330, wy + wh - 58], [wx + 360, wy + wh - 20], [wx + 352, wy + wh + 10]], true), V[2]);
+  s += P(smoothD([[wx + 120, wy + wh - 6], [wx + 116, wy + wh - 58], [wx + 146, wy + wh - 70], [wx + 168, wy + wh - 48], [wx + 160, wy + wh - 4]], true), V[2]);
+  s += P(polyD([[wx + 122, wy + wh - 54], [wx + 126, wy + wh - 86], [wx + 140, wy + wh - 64]]), V[2]) + P(polyD([[wx + 152, wy + wh - 66], [wx + 166, wy + wh - 90], [wx + 168, wy + wh - 58]]), V[2]);
+  s += S(smoothD([[wx + 352, wy + wh - 6], [wx + 400, wy + wh + 4], [wx + 410, wy + wh - 30]], false), V[2], 14);
+  s += S(smoothD([[wx + 150, wy + wh - 40], [wx + 300, wy + wh - 62]], false), C.honeyL, 3, 'opacity="0.7"');
+  // the floor and the room's dark edges (a quiet frame)
+  s += rect(0, 1720, W, 200, V[8]);
+  s += caption([{t: 'heat', x: 300, y: 430, lit: true, size: 170}, {t: 'an apartment', x: 660, y: 470, size: 104}, {t: 'in Helsinki.', x: 690, y: 572, size: 104}]);
   return svgPage(s);
 };
