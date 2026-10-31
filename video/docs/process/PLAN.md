@@ -69,3 +69,6 @@ the result. After step 4 and after step 10, show the owner before going on.
   The brief check's first live false positive (the owner's own quoted "65% contrast" in a brief) fixed: quoted text
   is never a target. Step 10 (scene 1 v8, feeling first) running.
 - Step 10, 2026-10-31, study session: scene 1 v8, built from the frame card, feeling first; sent to the owner beside v7.
+- 2026-10-31, study session: FRAME_CARD §4: the composition library is consulted AFTER the frame is imagined, as a
+  vocabulary (owner: "Would you put agents more in the box if we as this?"). Step 7 should reframe COMPOSITION_SHOTS
+  first: its tiers, "five numbers every shot keeps" and recipe placements still read as rules.

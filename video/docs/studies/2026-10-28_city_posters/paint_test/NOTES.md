@@ -738,3 +738,8 @@ kerb and the glass lines running to the low sun: leading lines B1 to a vanishing
 near layer at the left edge, C2; her on the right third, walking into the light), but the brief only pointed at
 DESIGN_LANGUAGE, and the card never asked for the library. Fixed: FRAME_CARD §4 now asks which library devices carry
 the feeling, the owner's reel ideas first, by code and why.
+- Then the owner: "Would you put agents more in the box if we as this?" -> yes, as first worded (pick devices from the
+  library, by code, before inventing the frame: the device comes first and the frame becomes its template, the same
+  trap as the numbers, and the library still holds placements and numbers until PLAN step 7 reframes it). Reworded:
+  imagine the frame first, then check it against the library as a vocabulary (what it already uses, what would make
+  the feeling stronger, what was missed).
