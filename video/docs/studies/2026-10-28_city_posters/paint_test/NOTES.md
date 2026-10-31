@@ -429,6 +429,18 @@ and `bash src/look/v7_s1/bake/run.sh <scratch>`; read this section, ORGANIC.md ย
    ramp, the cut, the light's doses (`v7light.py` DOSE), the 400 px judgement first; rerun `check_v7.py` (its numbers
    against v7a's above) and `sheet_v7.py` (it writes v7b's sheet once its names move on).
 
+## The owner on v7 (2026-10-31): better overall, but the feeling is lost
+"I do like the approach overall like it does look better overall but we lost the feeling and I feel like the scene now
+is about a dark alley whete nothing happens but the life and action is rather on the background"; and on why: "we are
+putting agents into too restrictive of a box by giving very specific instruction like the exact percentage of contrast
+... Saying 65% contrast makes the agent force a design actually sacrificing the feeling".
+-> What went wrong, honestly: v7a and v7 were built to numbers (T3's 45 % under L* 40, a prop count, quiet masses,
+edge shares) and every number was met, while the scene's feeling ("She quit Google.": a person stepping out of the
+building into her own evening) went unasked: the near 40 % became a dark empty quay, her moment shrank to the
+background, the life left the frame. Kept: the tools (the painter, the light solve, the colour key, the paper, the
+people). Next: the guides reframed as feelings and the tools that create them (playbook, "A number is never a target";
+`video/docs/process/`), then scene 1 again, feeling first.
+
 ## v7: painter v7's second half: the painted quay and facade, the paper, her in the people overhaul (iteration, 2026-10-30; ORGANIC.md ยง6 steps 3 and 5)
 **The ask.** The owner (2026-10-30): "Do what you think is right and make the videos better". The orchestrator's read of
 v7a (judged at 400 px beside refs 03 and 02): keep the top half (the lit door the one place to look, one key, a dusk

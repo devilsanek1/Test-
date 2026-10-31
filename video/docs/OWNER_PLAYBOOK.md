@@ -76,7 +76,20 @@ in terms of building up the visual recipes would be included?", 2026-10-30). **T
 the visual TOOLS that create them, never as placements:** "a feel of distance" is the intent, layers (near, mid, far),
 overlap and atmosphere are the tools, and the artist invents the frame; concrete positions and numbers are labelled
 examples, never the way; every frame is planned on one card that asks about every aspect, so no piece is ever left for
-the owner to point at. — ("okay im tired of pointing every single piece im sure we missed some more / so how do we make
+the owner to point at. **A number is never a target the frame is built to:** "contrastful, to give feeling X" is the
+brief; how much contrast, how much dark, how many props, how big the quiet areas are follows each scene's own content,
+mood and setup, so every scene lands somewhere different. Measurements stay as diagnostics (to explain what we see,
+to compare with a reference) and as checks against real mistakes (captions readable, safe zones, timing), never as the
+goal: an agent filling a percentage forces the design and loses the feeling. Keep all the tools and recipes; judge the
+frame by its feeling first. — ("i have a feeling we are putting agents into too restrictive of a box by giving very
+specific instruction like the exact percentage of contrast. I think there is a find difference between saying the
+scene should be constrasrful to achieve feeling X / But each scene would have a different contrast level depending on
+what is shown and what the mood and setup is / Saying 65% contrast makes the agent force a design actually sacrificing
+the feeling", on painter v7, 2026-10-31: "I do like the approach overall like it does look better overall but we lost
+the feeling and I feel like the scene now is about a dark alley whete nothing happens but the life and action is rather
+on the background"; "we should keep all the stylistic tooling and recipes we made progress on each aspect, but we need
+to reevaluate snd reframe the recipes and guides to focus on achieving feelings with our tools rather than filling
+checkboxes".) — ("okay im tired of pointing every single piece im sure we missed some more / so how do we make
 sure that our toolbox carry but imagination and full scene planning is done completely - like one example here is
 composition. Like there are million ways to build a scene with vanishing point composition. Like BILLION ways to compose
 a scene like this. But in all these i think the key recommendations applied right like not the concrete steps "PUT A
