@@ -74,6 +74,14 @@ mistakes, never stand in for the picture. — ("i want to make it more loose, mo
   card that asks about every aspect (FRAME_CARD), so no piece is left for the owner to point at. — ("like not the
   concrete steps "PUT A BUILDING HERE", but more abstarct like "layers and feel of distance" and the feel of distance
   is achieved with a "visual" tool of layers", 2026-10-30.)
+- **A library is INSPIRATION, never a template:** a composition device is an abstract RELATIONSHIP (how things sit
+  next to each other and lead the eye), so it is shown as a plain diagram plus several examples from very different
+  worlds, never one street drawn every time; agents imagine the frame first and browse the libraries for "oh yeah, we
+  could do it like this", never pick a device and fill it. — ("composition library to me would normally be an
+  inspiration like oh yeah we could do it like this"; "previously composition shot was taken too literally by agents
+  like they used the same building and a street while the intention for the composition library is to be abstract and
+  there are million way to create visuals but how they are positioned next to each is what composition provides as a
+  tool", 2026-10-31.)
 - **A number is never a target the frame is built to:** "contrastful, to give feeling X" is the brief; how much
   contrast, how much dark, how many props, how big the quiet areas are follows each scene's own content, mood and
   setup, so every scene lands somewhere different. Measurements explain what we see and catch real mistakes (captions

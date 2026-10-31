@@ -72,3 +72,21 @@ the result. After step 4 and after step 10, show the owner before going on.
 - 2026-10-31, study session: FRAME_CARD §4: the composition library is consulted AFTER the frame is imagined, as a
   vocabulary (owner: "Would you put agents more in the box if we as this?"). Step 7 should reframe COMPOSITION_SHOTS
   first: its tiers, "five numbers every shot keeps" and recipe placements still read as rules.
+- 2026-10-31, owner: the composition library is inspiration, an abstract relationship ("how they are positioned next
+  to each other"), taken too literally before ("they used the same building and a street"). Design for step 7's
+  libraries (composition first): see "How every library should work" below.
+
+## How every library should work (owner, 2026-10-31: tools that guide and inspire, never restrict)
+- **Each entry leads with its EFFECT** (what it does to the viewer: draws you in, isolates, makes small, makes cozy),
+  then the RELATIONSHIP in one line (e.g. "lines converge on the subject"), then when it tends to hurt. No
+  coordinates, no pixel sizes, no tiers as rules.
+- **Shown abstractly first, then varied:** a plain diagram (shapes, value blocks, arrows; no buildings, no street),
+  then three or more examples from very different worlds (a forest, a kitchen, a stadium, a face, a planet) so the
+  relationship is learned, never the content. Our current sheets draw every device in the same canal street with the
+  same buildings: that taught agents the street, not the composition. Redraw them.
+- **Used after the idea, as inspiration:** the frame card's feeling first, a first idea, then a browse of the library and
+  the references for "we could do it like this"; at the ideas step, several thumbnails built on different devices,
+  picked by the feeling they give.
+- **Freshness is part of the review:** the evaluator also asks whether the frame repeats a layout or a set the film
+  (or the library's own examples) already used.
+- **Owner picks are captured as the feeling and why it worked,** never as the layout to repeat.
