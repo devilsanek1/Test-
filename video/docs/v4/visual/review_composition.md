@@ -405,3 +405,101 @@ owner-approved, and library rule 7 now settles it (one tier-B stranger in the mi
    the tag, the payoff hold.
 6. **The counts and the notes (S14-S16b, S12c, S19-S21, S23-S25):** leads, doses, sound spacing, the notan, the
    computer's read, the engine risks, the clashes.
+
+## Fix pass (2026-10-31)
+
+Applied to `COMPOSITION_PASS.md` (rewritten), `composition_pass_sheet.py` (one map for every frame, plus `--numbers`,
+`--speeds`, `--camspeed`) and `composition_pass_sheet.png`; then checked by the script: every home-view piece in every
+frame, the band through every frame of every move (clear, >= 620, in all ten inside x 95-945), and every move's speeds
+(analytic, and `video/scripts/camspeed.py --limit 15` on each move rendered at half size from the planning world: its
+camera peaks within ~1 px/f of the analytic ones). The library's own fix pass is folded in (codes and tiers as they stand
+now: RJ4 a seam only (<= 1.15x) and the moves between stops C, I4 a story pull, T never a lead, RM8b the build, RM8's
+un-draw in its dose, E11's lower hand, rule 7's person, I12's hand-off, N9's "never a building").
+
+**MUST-FIX: all 6 done.**
+- **M1 done.** The home view is drawn through every frame's map: the block in S2, S4, S7-S10 (and S11, S12) as one quiet
+  dark mass cut by the right edge, its panes at the city's level, 125-207 px on the feed; S2 names its floors the scale
+  for "giant". S4: the computer at y 875-1463 (the review asked >= 850; 875 also keeps the block's corner >= 620 through the
+  S3 -> S4 and S4 -> S5 moves), its roof at y 645, 5 shallow rows of kettles at y 1471-1515, the apex at (540, 1089) (drop
+  533), the pull about (540, 719), the push about (540, 666). One plan footprint, x -50 to 360 (30 px wider on the left
+  than the review's -20, so S8's inner frame keeps C1's 15 %: 16 %; still 18 px short of the block): S2's posts at x
+  192/829, S8's at 250/781, S9's at 204/819. S8's ferry sits on the harbour left of the plan (x ~112-236, y ~1335-1380),
+  Pip at its rail (~420 px from the tag). The sheet's S2, S4, S7, S8, S9, S10 are redrawn from the map.
+- **M2 done.** S7 on the axis at 1.15x as written (the computer x 416-664, y 900-1335; its warm top ~(540, 925), ~85 px
+  from the pivot; the block at x 775, its window off the feed; the box at (823, 1399)); the reach ~204 px in 54 f (to the
+  run's start at (639, 1339)); lead E9 with B1, N15 out of the film; S8 lifted 59 px; S7 -> S8 one 1.13x push about
+  (540, 900) (RJ4's seam), S8 -> S9 1.16x about (540, 1250) (S9 now 5 px lower: S18). The lean stays in one line as the
+  owner's alternative.
+- **M3 done** as written (the front f140-205, each window flaring to L* ~85 over 6-8 f and settling to ~55-60 within
+  ~18 f, the one window >= 95 and the only honey accent once it has passed). One change: the chime sits where the front
+  reaches the far city (f175, "thousand"), not on its start: at f140 it would be 18 f after #4 (hard syncs >= 30 f apart).
+- **M4 done.** f0-122 written as a schedule in the painter's order: the band laid at f0 (never un-painted); the run's first
+  ~100 px laid with the tip moving; the stroke >= 24 px at a 42 L* step; f0-40 on an out-sine (peak 23 px/f at frame 0,
+  decelerating into the landing: an in-out sine would start still, against "never a still frame"); the harbour and far
+  city f4-38, the snow f10-40, the block's wash f24-54 crossing the window's row at f36-41; the next block, the cloud and
+  the person f54-74; the computer f84; the window f122; the wave f140.
+- **M5 done, the cloud redesigned.** The 7x push-through is withdrawn, and the card's A named as never buildable from a
+  24 px spot. The alternative is the snow cloud, but as J8's wipe ACROSS the stage (f1384-1432, Film's `foreground-wipe`,
+  its edge ~50 px/f, >= 70 % of the stage on the cut frame, never above y 620), not a 3-4x push into a drifting cloud: a
+  cloud reaching the pivot between f1340 and f1384 would drift ~14 px a frame (clouds drift 0-15 px a second), and a 3-4x
+  push about the pivot sends the Earth's limb and the cloud's top through the band.
+- **M6 done.** S11-S12 designed to the owner's version (one person on the near pavement: S1 ~180 px at (780, 1340), S11
+  ~207 px at (809, 1408), S12 ~180 px, looking up as the heat arrives), the first draft's bust in the window the
+  alternative (the owner's question 2); DIRECTION 3 and the card's §1.5 are in the clashes.
+
+**SHOULD-FIX: 28 done, 2 partly.**
+- **S1 done:** painted on f54-74 at x ~858 (~371 px from the window, rule 14), walking left in profile at ~1.6 px/f to x
+  ~780 by f104, the head turning up f98-104, a mid-value coat with the window's warm rim and dark legs (>= 25 L* both
+  ways). "Entering from behind the next block's corner" is dropped: the block stands behind the pavement, so the person is
+  painted on in place.
+- **S2 done, and it forced S3b's form:** the brush's trip back to the source (f60-84, ~373 px, peak 22 px/f, "a declared
+  jump, led by the cursor") runs right to left, so water setting off at f40 (S3b's fix) would run left to right at the
+  same time: the heat now leaves the computer's foot on "AI" (f88-122), led by the brush (the colour flooding over the
+  line: T), one mover at a time and the cause before the effect.
+- **S3 done. S3b done** (above). **S4 done** (the brush takes back the window's step and its frost on its way down the
+  riser). **S5 done** (the curve lands on "blow", f1130-1312, 83 % done on "big": the near box ~75 px, its fans ~25 px;
+  the early stills: with the pivot at the mug's centre, 24 home px above the computer's top, the block enters at y >= 682,
+  clear; the hero cloud is kept out of the chain: it would cross the band at 0.54-1.36x). **S6 done** (the VP on the eye
+  line, (540, 1343) in the lowered frame). **S7 done** (the follow's progress derived from the front: x 540-556, never left
+  of 510). **S8 done** (the hand f2296-2328 as the pull's second leg; the bubble on f2332). **S9 done** (the table of
+  landings and onsets, each a declared exception on a camera already at rest; S12's bubble fixed). **S10 done.**
+- **S11 done another way:** the tag cannot slide down out of the frame (above the eye line a forward move lifts it toward
+  the band: "found" below); it hangs on the computer's front panel and leaves with it on "how", so it reads 1.0 s
+  (f1662-1722) and never shares the read window with the opened side.
+- **S12, S12b, S12c done** (61 f of hold after the step at f2418; the "soon" fallback for G3; FORTY soft and the steam's
+  stop a texture: 7 hard syncs, the middle 20.5 s and 15.0 s apart). **S13 done** (S1 -> S2, S2 -> S3, S3 -> S4 and S4 ->
+  S5 on the trapezoid cruise; every detailed layer <= 15 px/f, the kettles 14.7 (was ~55); the table from `--speeds`
+  and `camspeed.py`).
+- **S14 done** (9 leads, 9 of 11 stops CORE-led, no RARE). **S15 done** (no light step in S11: 3 light events; S8
+  re-traces, RM8 = 3 declared). **S16 done.** **S16b done** (the hall's lines at +20-40 L* and >= 5 px, the rows' tops
+  converging inside the stage; the down-the-street S11 is the owner's question 3). **S17 done.** **S18 done** (S9-S10
+  lowered 5 px: the roof at 623; S8's box at (859, 1463); S2 lifted 40 px: its foot 51 px over the name block).
+- **S19 done** (named as a departure, for the G4 look clip). **S20 partly:** the monolith (no roofline, no window grid,
+  soft top corners, cool light columns a step under the window, the darkest body) reads "machine" from its first frame,
+  but its top does not steam before S3: the steam is "really hot"'s own beat (the state rule), and snow sits on its top
+  until the melt at f486. **S21 done.**
+- **S22 done** (reason 1 dropped; "a whip in disguise" replaced by the number: ~49x needs ~140 f, the voice gives 69 f).
+  **S23 done** ("For G3", item 1; plus the derived follow). **S24 done** (I12's hand-off on "use", f1242: the home view's
+  lit cluster ~100 px and the planet's Helsinki spot within 1.5x, the mug no longer the hand-off object; rule 7, E11, RJ4
+  at rest; the gap list down to the 4 still open). **S25 done** (the clashes, with the library's stale video-4 examples).
+  **S26 partly:** carried as open, with the formula and both answers' numbers (the written answer: the block's foot
+  ~1227, the computer's ~1263); the feet are not reset before the owner answers the visual script's question 2.
+
+**Found in this fix pass (beyond the review):**
+- **The planet's limb crossed the band:** landed at y ~780, it sweeps down through the band as the picture shrinks
+  (f1248-1265). It now lands above the band (y 220), the band over the night sea in the sky's own value, and the angle
+  change on "use" happens between masses of one value each (the night sky and the sea; the snow and the snowy land).
+- **The plan's full top line crossed the band** in S3, S5 and the S2 -> S3 push ("a storey taller than the computer"):
+  the plan is now corner posts with short returns, their tops ~0.4 storey over the computer.
+- **The block's roof corner and its bumps grazed the band's floor** in the S3 -> S4, S4 -> S5 and S10 -> S11 moves: S3's
+  top moved to y 1025, S4's to 875, the bumps to x >= 716: clear in every frame.
+- **The follow drifted:** a trapezoid camera let the front wander 502-610 px; derived from the front it holds 540-556.
+- **The S2/S3b conflict and the tag's exit** (above); **four gaps for the library** (the pass's "The library's gaps").
+
+**Not done here:** no other doc is edited (the clashes are the orchestrator's); the visual script's two open questions
+stay the owner's, as asked there.
+
+**The owner's three questions** (they end `COMPOSITION_PASS.md`, each a visible choice): (1) the turn on "But": a plain
+cut, or a snow cloud sweeping across; (2) the person at the end: on the pavement looking up (as approved), or a
+silhouette in the lit window; (3) the travel shot: the street side-on, or a turn to look down it (his leading lines and
+vanishing point in one frame, at the cost of two camera turns).
