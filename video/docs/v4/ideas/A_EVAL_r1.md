@@ -1,0 +1,23 @@
+# A · The Frosted City: THE FRAME LOOP, evaluation round 1 (fresh evaluator)
+
+## 1. The feeling each picture gives (written from the sheet alone, before reading any doc)
+
+Looked at in order: `A_sheet.png` whole, each thumbnail enlarged 2x, then each at phone size (the sheet's own size)
+and at feed-glance size (160 px wide).
+
+- **A-B1** The feeling it gives: a hushed, cold winter evening across a frozen river; one warm block of flats is a small comfort in a big grey dark and a lone figure stands on the bank; calm and a little lonely, but nothing is happening yet, so at phone size it is a pretty postcard, not a question that grabs.
+- **A-B2** The feeling it gives: cold, dim, impersonal hush; a long machine hall with one small person in it, faintly ominous; "big" comes from the tiny figure, but it is the familiar server-aisle picture and so dark it nearly goes flat at phone size.
+- **A-B3** The feeling it gives: the hall has turned to glowing embers: sweltering, stuffy, with a wry touch from the man wiping his brow; the first frame that pops at phone size, and the cold-to-hot turn from the frame before is felt at once.
+- **A-B4** The feeling it gives: playful surprise: one dark machine beside a whole building of glowing windows, a steaming kettle in each; funny and cosy once you see the kettles, but at phone size they shrink to dots, it reads first as "a warm block of flats", and the neat 8 x 5 grid feels like a counting chart.
+- **A-B5** The feeling it gives: private, wry and quiet: a woman at home with her own cup of tea looking out at the boiling block; an inward smile, but the room is so dark and she is such a heavy dark shape that it feels cold and heavy rather than cosy, and with no face there is no one to share the joke with.
+- **A-B6** The feeling it gives: a sigh of waste and loneliness: warm steam pouring into a cold sky over an empty frozen lake where one ice fisher sits alone; melancholy and clear, but mostly empty grey, and the "big fans" are nowhere to be seen.
+- **A-B7** The feeling it gives: lively, eager, shared joy: windows full of people throwing their arms up, the first crowd in the film; the turn from loss to "yes, we want it" lands, though what they reach for (a warm haze in the cloud) is faint, and open windows in falling snow puzzle a little.
+- **A-B8** The feeling it gives: quiet, homely hope: a finger drawing the plan in the frost of a window, "2027" big and clear, a candle on the sill; tender and calm, but the drawing is a little icon diagram (box, line, box) and the grey striped arm reads slightly mechanical.
+- **A-B9** The feeling it gives: a puzzle on a frosty whiteboard: curious but cold and clinical, the night city gone; a loop, two blobs and a door into a server cupboard; at phone size an abstract icon I cannot read in a second.
+- **A-B10** The feeling it gives: an X-ray reveal: cool, technical, a little ghostly; the white line and the amber line say "cold in, warm out" clearly even at phone size, but it is a blueprint, not a place, and the stick figure is out of step with every other person on the sheet.
+- **A-B11** The feeling it gives: warm, contented belonging: a whole street of lit homes, the glowing pipe running up between them, people walking home in the snow; satisfying and cosy, if static and symmetrical, and the lamp hanging in the middle reads as a gondola.
+- **A-B12** The feeling it gives: a tender, personal close: the opening view again, now every window warm, a woman in the big window and my own hand holding a phone with a chat; it closes the circle gently, but the dark hand is heavy and the white wire box by the river is a puzzle.
+- **A-B4alt** The feeling it gives: playful and fair: a seesaw in a snowy courtyard, one machine on one end and a heap of kettles on the other, a child with a sled looking on; "one weighs as much as forty" reads at once and is funnier than a chart, though the kettle heap is a dark lump at phone size.
+- **A-B7alt** The feeling it gives: a quiet promise travelling toward us: a glowing line along the kerb, steam puffing from every hatch, two people on the pavement; inviting and a little magical, but calmer and less joyful than "wants", with fewer people and less warmth.
+- **A-B9alt** The feeling it gives: opening up, a breath of curiosity: a hand swings the frosted pane open on the starry night and the lit city; intimate and quiet, but the marks on the pane (2027, a doorway) are too small to read, and opening a window in winter feels cold rather than inviting.
+- **A-B10alt** The feeling it gives: a clean "aha": a cut-away cabinet, a white pipe going in and a warm pipe coming out; very clear at phone size, but sterile and schematic, a textbook drawing more than a moment.
