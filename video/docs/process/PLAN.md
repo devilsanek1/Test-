@@ -117,3 +117,7 @@ the result. After step 4 and after step 10, show the owner before going on.
   redirect; per film a creative director who owns the final delivery; a story lead with scouts who distil and rank;
   named outside testers / critics who give honest feedback at each step; a creative room for arc, script, narration and
   key frames ("how would it normally work in the studio like a bunch of writers sit together in a room").
+- 2026-10-31, the owner: "can you create the new repo and make this bare structure". Creating it was refused (the
+  Claude GitHub App can't create repositories in his account: he creates `fuss-studio` (private) and installs the app);
+  the bare structure waits, ready to push, in `context/new_repo_seed/fuss-studio/` (README, CLAUDE.md, studio/VISION,
+  studio/ORG, ten role cards, production/, rnd/).
