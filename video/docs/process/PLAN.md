@@ -109,3 +109,11 @@ the result. After step 4 and after step 10, show the owner before going on.
   if we should start from scratch and pick and choose and build a leaner process overall / ... We should organize like
   an efficient studio with roles, processes, responsibilities". Brainstorm first: the studio's roles (in chat); no
   rebuild until he picks the shape.
+- 2026-10-31, the owner on the studio (brainstorm, nothing decided): maybe a NEW GitHub repo organized from scratch
+  ("in the current state it is complete mess"); two departments, video production and R&D (vision, style, engine,
+  references, composition library); he is the director "as Steve Jobs in Apple, people don't obey me, but rather work
+  with me and have their own thoughts"; every agent internalizes the company vision ("the most beautiful, engaging short
+  video content ... with unique style and creative storytelling"), focus now: tech in cities / countries, agile to
+  redirect; per film a creative director who owns the final delivery; a story lead with scouts who distil and rank;
+  named outside testers / critics who give honest feedback at each step; a creative room for arc, script, narration and
+  key frames ("how would it normally work in the studio like a bunch of writers sit together in a room").
