@@ -1,12 +1,12 @@
 # Project: short-form explainer videos (TikTok / Reels / Shorts)
 
-**New agent picking this up? Read `HANDOFF.md` first**: the full state, the queue, and where all past context lives (`context/`).
+**New agent picking this up? Read `HANDOFF.md` first** (its top line points to the newest resume note): the full state, the queue, and where all past context lives (`context/`).
 
 **Before any visual work, read `video/docs/look/DIRECTION.md`**: the one page of the current look and storytelling direction; it wins over every other doc except the owner's own words (the playbook, vN/OWNER_NOTES).
 
 The video project lives in `video/` (Remotion). Before starting or continuing any video:
-1. Read `video/docs/OWNER_PLAYBOOK.md`: every piece of the owner's feedback, as rules. It is the memory across videos.
-2. Follow `video/docs/PIPELINE_V2.md`: gates G0-G8; text and audio only before G3 (no MP4s), then one playable video with voice at every gate.
+1. Read `video/docs/OWNER_PLAYBOOK.md`, its top section "THE THREE RULES ABOVE ALL" first: every piece of the owner's feedback, as rules. It is the memory across videos.
+2. Follow `video/docs/PIPELINE_V2.md`, "THE LOOP NOW" (it wins where older gate text differs): words and the voice first; then stills (the ideas board, the hero frame, the key-frame board); from the animatic on, one playable video with voice at every step. Lock the story before animation; polish last.
 3. **Which doc wins:** owner's words (playbook; vN/OWNER_NOTES) > DIRECTION > CRAFT > PIPELINE_V2 > G3_ANIMATIC, G5_BLOCKING > look/*.md > the film's STYLE.md (values only) > v1-era docs (API and measurements, never style). The owner's words are what the owner said (quoted), never the "-> what we did" half of an OWNER_NOTES line. The full order, with the topic docs and the tie-breaks: DIRECTION's intro. A clash is a bug: fix the lower doc in the same turn.
 
 **Whenever the owner gives feedback, capture it in the same turn and commit it, split by scope:** approach-level lessons go to
@@ -14,18 +14,36 @@ The video project lives in `video/` (Remotion). Before starting or continuing an
 `video/docs/vN/OWNER_NOTES.md`; a concrete note that teaches something general goes to both. Post-publish numbers go in its "Performance log". Keep the playbook
 COHERENT and CLEAR, with no size budget (owner, 2026-10-27): integrate every note (rewrite or retire what it contradicts), and review it per its Maintenance section.
 
-Top rules (details in the playbook):
-- **THE THREE RULES ABOVE ALL (owner, 2026-10-30):** every frame is worth pausing on; readable imaginative ideas;
-  frames planned and created WHOLE from the get-go (never a frame built thin and filled later for density). The process
-  is loose and imaginative around them: ideas -> key frames made whole -> the animatic plays the key frames ->
-  animation (`video/docs/PIPELINE_V2.md`, "THE LOOP NOW"); every other rule is guidance that serves them.
-- From the sketch animatic (G3) on, show one playable video per gate, never only stills; before that, text/audio only (no MP4s). Lock the story (sketch animatic) before building; polish last. Between the voice lock and G3, the film's visual story is written as a VISUAL SCRIPT (G2.5: shot by shot on the take's word times, the camera and every join, style-neutral; 3 concepts judged internally, the owner reads one; `video/docs/v4/visual/METHOD.md`), and G3 plays it.
-- The G3 animatic is an ANIMATED SKETCHBOOK (stage spec `video/docs/G3_ANIMATIC.md`, drawing spec
-  `video/docs/look/STORYBOARD_STYLE.md`): the film's rough pass at 60 fps — story, joins, framing, every camera move,
-  transition and key action PLAYED with real shape and timing, density and life as grey placeholders (loose never means
-  empty) — monochrome, readable with the sound off. G3 decides flow (carriers, the thread), focus (tiers) and light (rig
-  shapes); G4 is a 6-8 s look clip in the final style, made after the G3 lock and approved before G5; G5 fills G3's
-  plan, never with a new mover, place or tier promotion.
+**HOW EVERY FILM IS MADE (owner, 2026-10-30; settled: apply it to every video, never re-ask it; details in the playbook's top section and PIPELINE_V2):**
+- **THE THREE RULES ABOVE ALL:** every frame is worth pausing on; readable imaginative ideas; frames planned and created
+  WHOLE from the get-go (never a frame built thin and filled later for density). Every other rule is guidance that
+  serves them; checks catch mistakes, they never design the frame.
+- **THE LOOP:** script and voice -> the story beats (what the viewer must get and feel; no pictures) -> IDEAS: whole
+  sequences of whole-frame thumbnails, each from ONE film concept; the owner picks the base -> THE WORLD FIRST (real
+  photos of the real place; its pieces built once at finished quality) -> THE HERO FRAME at full finish, approved by the
+  owner (the film's own bar) -> the other KEY FRAMES made whole, in sequence lanes; the owner approves the board -> THE
+  SHOT PLAN written from the key frames (camera, joins, sound sync) -> THE ANIMATIC plays the key frames -> ANIMATION
+  from each key frame (never re-filled) -> sound and final -> optional finishing tests on the final cut (the ink line),
+  with and without.
+- **ONE FILM, NEVER A HODGE-PODGE:** one film concept above the beats; one art director owns the vision note and approves
+  every frame against the whole; one shared world kit; every frame judged in the board, a board read after every round;
+  parallel lanes by sequence, never by isolated beat.
+- **THE FRAME LOOP for everything built:** a FRESH evaluator (never the builder) judges the FEELING first, at phone size,
+  beside the hero frame: THERE (move on) / ALMOST (fix exactly the notes, given as a paint-over on the frame; at most 2
+  rounds) / NOT THERE (rework from the idea, at most once, then the owner gets the options). Every workflow encodes it;
+  an iteration keeps one evaluator round.
+- **A RICH, BEAUTIFUL WORLD:** designed before the frames and held by the hero frame, never added later. Rich means
+  specific, layered and alive (detail at three scales, each detail about this place or this story); pleasing is judged
+  as a painter judges (values, a few colours in harmony around one accent, shape rhythm, edges, the finish).
+- **The toolbox is feelings and the visual tools that create them, never placements:** our recipes (composition,
+  layout, the look, people, words, moves, joins, sound) are the toolbox at every step, never a cage; every agent brief
+  starts from `video/docs/process/BRIEF_HEADER.md`; the toolbox as a design language: `video/docs/look/DESIGN_LANGUAGE.md`;
+  every frame planned on one card that asks about every aspect: `video/docs/look/FRAME_CARD.md`.
+- **Never a past film as the bar or an example** (no video 1, or any film of ours, in a brief, card or review: it boxes
+  the imagination in). **No ink in the build** (the clean pen; the ink line is tested on the final cut). People in use:
+  `video/docs/look/PEOPLE_DESIGN.md` (top); words on screen: `video/docs/look/TYPE_GUIDE.md` (picked).
+
+Other top rules (details in the playbook):
 - The look: one flowing story (every join carries something), one subject at a time, a clean premium line, gentle light
   and shadow, alive but calm, warm never sickly (`video/docs/look/DIRECTION.md`; numbers in `video/docs/look/CRAFT.md`).
 - Every video gets ONE core line, picked before the script is written: by default on the topic screen (each topic comes
