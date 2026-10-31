@@ -11,8 +11,8 @@ The video project lives in `video/` (Remotion). Before starting or continuing an
 
 **Whenever the owner gives feedback, capture it in the same turn and commit it, split by scope:** approach-level lessons go to
 `video/docs/OWNER_PLAYBOOK.md` as general rules; notes on one concrete video (picks, lines, takes, shots) go to
-`video/docs/vN/OWNER_NOTES.md`; a concrete note that teaches something general goes to both. Post-publish numbers go in its "Performance log". Keep the playbook
-COHERENT and CLEAR, with no size budget (owner, 2026-10-27): integrate every note (rewrite or retire what it contradicts), and review it per its Maintenance section.
+`video/docs/vN/OWNER_NOTES.md`; a concrete note that teaches something general goes to both. Post-publish numbers go in its "Performance log". **Capture the FEELING he asks for and the TOOLS that create it, in his words; never turn a note into a number or a placement** (a measurement may follow only as a labelled example: "v7 measured 43 %"; owner, 2026-10-31: "A number is never a target"). Keep the playbook
+COHERENT, CLEAR and SMALL (owner, 2026-10-31: "170k words of guides is absolutely bananas"; it replaces 2026-10-27's "no size budget"): integrate every note (rewrite or retire what it contradicts, never only add), and review it per its Maintenance section. The step-by-step plan that shrinks the guides and puts feeling first: `video/docs/process/PLAN.md`.
 
 Top rules (details in the playbook):
 - **THE THREE RULES ABOVE ALL (owner, 2026-10-30):** every frame is worth pausing on; readable imaginative ideas;

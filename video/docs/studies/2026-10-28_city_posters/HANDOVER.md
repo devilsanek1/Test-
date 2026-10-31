@@ -6,6 +6,13 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-31 ~01:00 UTC: the study session stops here; next: `video/docs/process/PLAN.md`
+- Owner: "let's go about it step by step 170k words of guides is absolutely bananas / ... make sure we have this plan
+  captured so that I can delegate it". PLAN.md (10 steps, step 1 done: CLAUDE.md's capture rule and "small").
+- Done and pushed (all three branches in sync): painter v7 (+ the owner's verdict), the composition library (fixed),
+  the Helsinki composition pass (reviewed, on video 4's branch), sound sync, the evaluation. Nothing running, nothing
+  scheduled.
+
 ## Status 2026-10-31 ~00:45 UTC: weekly tokens nearly out: small steps only; the rework handed back
 - Owner: "let's just do a few incremental improvents not big redesign leave it to the other session started it".
   feeling-first-rework STOPPED (only AUDIT.md was extended); `video/docs/process/BRIEF.md` hands it back to video 4's

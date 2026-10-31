@@ -18,8 +18,9 @@ Format: **rule** — why / evidence (video, date).
 
 **Last reviewed for coherence: 2026-10-29 (seventh pass, scoped to the script-clarity note: integrated into Script and
 voice and the Taste signals' "Lines", checked against Audience and goal and Hook and pacing; the other sections as of
-the sixth pass, 2026-10-27: a cold read as if starting video 4, every conflict it found fixed at its source) · no size
-budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance at the end).
+the sixth pass, 2026-10-27: a cold read as if starting video 4, every conflict it found fixed at its source) · coherent,
+clear and SMALL** (owner, 2026-10-31: "170k words of guides is absolutely bananas", replacing 2026-10-27's "no size
+budget"; see Maintenance at the end; the plan: `docs/process/PLAN.md`).
 
 ## THE THREE RULES ABOVE ALL (owner, 2026-10-30)
 1. **Every frame is worth pausing on.** Judged at a glance, as a picture, before any numeric check: would a viewer stop
@@ -1103,8 +1104,11 @@ and plan the whole frame from the get go", 2026-10-30.)
   owner's hand-over, built in painter v7, 2026-10-30).
 
 ## Maintenance (keep this file coherent and clear)
-No size budget (owner, 2026-10-27: "let's not focus on the playbook being a certain size; keep it as coherent and clear as
-we can"). Review it **whenever a note changes the direction** (in the same turn) and at the start of a session if it has
+Coherent, clear and SMALL: an agent must be able to read what it is told to read (owner, 2026-10-31: "170k words of
+guides is absolutely bananas"; the step-by-step plan: `docs/process/PLAN.md`). Every note is captured as the owner's
+words, the feeling and the tools that create it, never as a number or a placement ("A number is never a target");
+integrating a note means rewriting or retiring what it changes, never only adding. (Retired: "No size budget", owner,
+2026-10-27: "let's not focus on the playbook being a certain size; keep it as coherent and clear as we can".) Review it **whenever a note changes the direction** (in the same turn) and at the start of a session if it has
 been 7+ days since "Last reviewed" and entries were added since. The orchestrator:
 1. Integrates: rewrites or retires every rule the new note contradicts, here, in `docs/look/DIRECTION.md` and in the
    docs the rules link to, so no two instructions conflict; the newest owner direction wins, and the old rule moves to

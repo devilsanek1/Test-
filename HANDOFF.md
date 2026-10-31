@@ -1,5 +1,10 @@
 # HANDOFF: start here if you are a new agent picking up this project
 
+> **NEWEST, 2026-10-31 ~01:00 UTC: the guides go feeling first and get SMALL, step by step: `video/docs/process/PLAN.md`**
+> (owner: "170k words of guides is absolutely bananas / ... make sure we have this plan captured so that I can delegate it to
+> the next agent"). Step 1 is done; start at step 2. Why: `video/docs/process/EVALUATION.md`. The look study's last
+> state (painter v7, the composition library, sound sync): `video/docs/studies/2026-10-28_city_posters/HANDOVER.md`.
+
 > **NEWEST, 2026-10-30 ~22:45 UTC (video 4, Helsinki heat, under the new loop): read `context/RESUME_2026-10-30.md`
 > first**: what the owner decided today, the two rounds that were running and how to resume them, and what is next.
 
