@@ -10,3 +10,5 @@ with their feelings, the film concept) -> ideas for the hero beat (three whole-f
 the vision note) -> the hero frame built whole (the frame card first) -> THE FRAME LOOP (a fresh evaluator, feeling
 first; one adjust round for this test). No voice take (a still needs none; noted). Every agent appends to
 `PROCESS_LOG.md`: what it read, what helped, what got in the way. The evaluation of the PROCESS is the point.
+
+**Running:** workflow `process-test-01-amsterdam` (run `wf_65c63c9d-100`, script under the session's workflows/scripts); resume with `Workflow({scriptPath, resumeFromRunId: "wf_65c63c9d-100"})`. Code: `video/src/look/test01_s1/`.
