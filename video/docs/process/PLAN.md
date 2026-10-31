@@ -105,3 +105,7 @@ the result. After step 4 and after step 10, show the owner before going on.
   step; fix the contradictions it found; a one-page "From a piece of news" start; an ideas card (material proven in
   colour); a cold read inside the build; a short evaluator report; and the KIT (the biggest lever: about 2 hours and
   $100 for one still came from building it as new engine code).
+- 2026-10-31, the owner: "we've done a lot of work, but its still not coherently build into a clear process ... im thinking
+  if we should start from scratch and pick and choose and build a leaner process overall / ... We should organize like
+  an efficient studio with roles, processes, responsibilities". Brainstorm first: the studio's roles (in chat); no
+  rebuild until he picks the shape.
