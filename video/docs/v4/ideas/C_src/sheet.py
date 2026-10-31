@@ -7,11 +7,10 @@ OUT = os.path.join(HERE, '..', 'C_sheet.png')
 TW, TH = 300, 533
 GAP, PADX, HEAD, LAB = 18, 30, 118, 64
 BEATS = [('B1', 'The snow wakes warm'), ('B2', 'A street of computers'), ('B3', 'The heat climbs'),
-         ('B4', 'Forty kettles inside'), ('B5', 'The teapot computer'), ('B6', 'Thrown into the night'),
-         ('B7', 'The city reaches back'), ('B8', 'A plan in chalk'), ('B9', 'A door in the plan'),
+         ('B4', 'Forty kettles inside'), ('B5', 'The tea cosy'), ('B6', 'Thrown into the night'),
+         ('B7', 'The street opens a way'), ('B8', 'A plan in chalk'), ('B9', 'A door in the plan'),
          ('B10', 'Blue in, gold out'), ('B11', 'Warm under the snow'), ('B12', 'Your chat, her warm window')]
-ALTS = [('B1alt', 'From your balcony'), ('B5alt', 'The tea cosy'), ('B7alt', 'The street opens a way'),
-        ('B11alt', 'The melt line')]
+ALTS = [('B1alt', 'From your balcony'), ('B5alt', 'The teapot computer'), ('B7alt', 'The city reaches back')]
 
 
 def font(sz, bold=False):
@@ -46,8 +45,10 @@ for k, (fid, title) in enumerate(BEATS):
     place(k, fid, title, k // 6, k % 6)
 for k, (fid, title) in enumerate(ALTS):
     place(k, fid, title, 2, k)
-d.text((PADX + 4 * (TW + GAP) + 10, HEAD + 2 * (TH + LAB + GAP) + 40),
-       'Alternates for the four beats\nI am least sure of:\nB1 (the hook), B5 (the joke),\nB7 (the turn), B11 (under the street).\n\n'
-       'Each is drawn whole (world,\nlight, people, words) and is\na chapter of the same concept.', fill=(190, 194, 214), font=font(20))
+d.text((PADX + 3 * (TW + GAP) + 10, HEAD + 2 * (TH + LAB + GAP) + 40),
+       'Alternates for the three beats I am least sure of:\nB1 (the hook), B5 (the joke), B7 (the turn).\n\n'
+       'Round 2 took the tea cosy and the street into the film;\nthe teapot computer and the roof reach are now\n'
+       'their beats\' alternates, kept as drawn.\n\n'
+       'Each is drawn whole (world, light, people, words)\nand is a chapter of the same concept.', fill=(190, 194, 214), font=font(20))
 sheet.save(OUT, optimize=True)
 print('wrote', os.path.normpath(OUT), sheet.size)

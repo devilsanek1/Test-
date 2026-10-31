@@ -24,7 +24,7 @@ BEATS = [
 ]
 ALTS = {
     "B5alt": ("One cup, close", "That's a lot of tea.", "a smile and a breath"),
-    "B6alt": ("Everywhere, up it goes", "Normally, data centers just use big fans to blow that heat outside.", "a small pang"),
+    "B6alt": ("Only the fox gets it", "Normally, data centers just use big fans to blow that heat outside.", "a small pang"),
     "B7alt": ("The city leans out", "But Helsinki WANTS that heat.", "the turn, a spark of delight"),
     "B12alt": ("The cat on the warm sill", "So your chatbot could soon heat an apartment in Helsinki.", "personal warmth, a wink"),
 }

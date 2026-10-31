@@ -24,9 +24,9 @@ frost on it is the cold; when warmth arrives the frost clears and the pane goes 
 building with NO windows: heat with no home. Every beat is a window of the city (looked at, looked through, drawn on,
 opened), and the frost moves the story: it **clears** in the promise (B1), **stays** while the heat is wasted (B6),
 is **drawn on** as the plan (B8: a finger in a window's frost, "2027"), **is** the plan until it is real (B9-B10: the
-frost-drawn data center, its door, its hall; only the water painted), and **clears for real**, window by window, as
-the warm water arrives (B11-B12). **Painted = real, frost lines = planned** (the plant is a plan): the warm water is
-the one thing that crosses from the frost drawing into the painted city.
+frost-drawn data center, its door, its hall built of frost; only the water painted), and **clears for real**, window by
+window, as the warm water arrives (B11-B12). **Painted = real, frost = planned** (the plant is a plan): the warm water
+is the one thing that crosses from the frost drawing into the painted city.
 
 **The thread (the heat, always honey):** a warm wave through 70,000 windows (B1) -> the cold street of giant machines
 inside the blank building (B2) -> their heat, glowing and steaming (B3) -> forty kitchens' kettles (B4) -> one cup
@@ -39,31 +39,35 @@ touch of alarm -> playful astonishment (a whole block boiling) -> a smile (one c
 over frosted panes) -> delight (the city throws its windows open) -> hope (the plan drawn in the frost, with a date)
 -> leaning in (a frost door opens) -> "oh, that's how" -> cozy relief (frost clearing up the street) -> a warm wink.
 **Its light:** night all film, one colour key; the frost chapter (B8-B9) is the film's one light, airy moment (hope),
-then back into the dark for the mechanism, warming to the end.
+then the frost hall lit from within by the machines' heat for the mechanism (B10), warming to the end.
 
 **One person, one "you":** the city's people are its homes, so the film keeps ONE resident, a young woman in her
 twenties whose window is the one window: walking home in the wide (B1), at her sill with one cup (B5), drawing the plan
-in her frost (B8), opening its door with a fingertip (B9), at her warmed window (B12). The "you" is POV only, once:
-your gloved hand and phone (B12). Everyone else small: a technician, an ice fisher, neighbours, walkers.
+in her frost (B8), opening its door with a fingertip (B9), her frost-drawn figure with a palm on the machine (B10), at
+her warmed window lifting her cup to you (B12). The "you" is POV only, once: your gloved hand and phone (B12). Everyone
+else small: a technician, an ice fisher, neighbours, walkers.
 
 **The home view and the loop:** one view holds the first and last frame: from the snowy near shore, across a narrow
 arm of frozen harbour, her block with the one window in the golden box, the city's blocks stepping up the hill behind,
-the blank building at the harbour's edge on the left. B1 opens on it frosted and warming; B12 closes on it warm with
-your phone in front (the deliberate match), then un-builds into frame 0.
+the blank building at the harbour's edge on the left. B1 opens on it frosted and warming; B12 closes on it warm,
+stepped in on her block, your phone in front (the deliberate match: the same place, nearer), then un-builds into frame 0.
 
 ## THE BEATS (each planned on FRAME_CARD, feeling first; library devices named after the frame was imagined)
 
 **A-B1 · The city wakes warm** (0.13-4.2 s) · *Sees:* a snowy Helsinki harbour at night, the city's windows frosted
-pale, and a wave of warm honey rolling out from a blank building at the water's edge, along the shore, through her
-block and up the hill, frost clearing window after window. *Gets:* AI, that building, is to warm the city's homes.
-*Feels:* cozy, curious, "wait, what?" · **The frame:** the hook made physical as one bold event (the wave), the payoff
-in the band by ~2 s ("to heat 70,000 homes?"); the eye: her window (the hardest step, the golden box) -> the wave's
-bright crest -> its source, the blank building -> the resident walking home on the near snow (rear three-quarter, her
-breath showing). Layers: near snow (the quiet dark field), the frozen arm with its steaming channel, the shore road
-and its warm run, the blocks, the hill city, the dome, the sky. Sound: a rising run of soft chimes as the panes clear.
-*Devices:* D7 pattern with its break (a texture of frosted panes, the warm sweep), E8 the accent travelling with the
-thread, N6 depth stacked, T for frame 0's build. *Hand-off:* the warm run leads the eye back along the shore to the
-blank building's door.
+pale; at the water's edge the building with no windows (a smooth cool face, rows of cold lights like a server's, big
+fans breathing warm air) has its wide door open and blazing; a warm run leaves it along the shore road (the snow melted
+in a line over the pipe, honey glowing up through it), and wherever it has passed the warmth climbs the facades: ONE
+bold front sweeps down across all five facades from her block's roof to the run's tip, the panes behind it cleared
+honey, the panes ahead plainly frosted and glinting. *Gets:* AI, that building, is to warm the city's homes. *Feels:*
+cozy, curious, "wait, what?" · **The frame:** the hook made physical as one bold event (the sweep), the payoff in the
+band by ~2 s ("to heat 70,000 homes?"); the eye: the sweep across the facades -> back along the run to its source, the
+blazing door (the "wait, what?": a machine heating homes) -> her window, warm just behind the front (the golden box) ->
+the resident walking home on the near snow (rear three-quarter, her breath showing). Layers: near snow (the quiet dark
+field), the frozen arm with its steaming channel, the shore road and its run, the blocks, the hill city, the dome, the
+sky. Sound: a rising run of soft chimes as the panes clear. *Devices:* D7 pattern with its break (a texture of frosted
+panes, the warm sweep), E8 the accent travelling with the thread, N6 depth stacked, T for frame 0's build.
+*Hand-off:* the run leads the eye back along the shore to the blazing door.
 
 **A-B2 · A street of giant machines** (4.28-8.6 s) · *Sees:* inside the building with no windows: a long aisle of
 cabinets three times a person's height, their rows of tiny cold lights like a city's windows, a lone technician
@@ -82,15 +86,16 @@ deliberate match (B2 with one change: cold to hot), a push in. *Hand-off:* the s
 street, and "to put it into perspective" pulls us out after it.
 
 **A-B4 · One computer, a whole block boiling** (10.96-17.5 s) · *Sees:* out in a snowy street, ONE giant computer
-stands on the pavement (a cabinet four times a neighbour's height, melting its own pool in the snow); behind it, close,
-the block of kitchens across the street, its facade running past both edges, every kitchen a little different (a
-curtain, a plant, a hand at the kettle, a neighbour waiting) and a bold kettle boiling in each, its curl wafting up the
-facade; all of it gathers into ONE cloud the same size and height as the computer's own, side by side. *Gets:* one
+stands in its own space at the corner of a side street that opens onto the frozen harbour (a cabinet four times a
+neighbour's height, dark against the pale ice, melting its own pool in the snow); beside it, close, the block of
+kitchens, its facade running past the right edge, every kitchen a little different (a curtain, a plant, a hand at the
+kettle, a neighbour waiting) and a bold kettle boiling in each, its curl wafting out of the open top pane; above them,
+side by side with sky between, the computer's one cloud and the block's one gathered cloud, the same size. *Gets:* one
 computer = forty kettles boiling non-stop. *Feels:* playful astonishment · **The frame:** the comparison told by the
-city's own building and two equal clouds; the machine the one big break in the facade's pattern of warm kitchens; the
-neighbour and her dog stop beside it and look up. Sound: forty tiny whistles in a chorus on "FORTY", the lit "forty"
-in the band. *Devices:* D7 pattern with one break, E1 a human anchor for scale. *Hand-off:* a push across the street
-into one lit window opposite.
+city's own building and two equal clouds (one machine, one cloud; forty kitchens, one cloud); the neighbour and her
+pale dog stop beside the machine and look up. Sound: forty tiny whistles in a chorus on "FORTY", the lit "forty" in
+the band. *Devices:* D7 pattern with one break, E1 a human anchor for scale. *Hand-off:* a push across the street into
+one lit window opposite.
 
 **A-B5 · One cup** (17.76-19.2 s) · *Sees:* inside, behind her: she stands at her kitchen window in a big knit, hair
 up in a claw clip, one small mug of tea steaming in her hand, raised in a little toast to the block across the street
@@ -133,84 +138,91 @@ warm-lit frame pulls the eye in to the far glow; the candle warms the frost from
 *Devices:* B4 the threshold, E2 the lit opening turned inside out (a dark opening in a light frame), B2 the vanishing
 point. *Hand-off:* through the door (a push-through).
 
-**A-B10 · Cold in, warm out** (29.56-34.4 s) · *Sees:* inside the frost drawing: a big hall drawn in frost lines on
-the dark, a row of giant machines glowing warm inside, a tiny frost-line person at the far end; one pipe, the only
-painted thing: the water comes in cool and pale along the left, runs to the far end, turns and comes back along the
-machines' feet, each machine handing its heat down into it, and leaves honey toward us. *Gets:* water in pipes takes
-the heat out of the computers. *Feels:* clarity, "oh, that's how" · **The frame:** two big legs at the near edge, pale
-on the left and honey on the right, so in and out read at a glance; the water never touches the machines' insides.
-Sound: a cool flow note warming to a hum. *Devices:* E9 the subject travels the line, B2. *Hand-off:* the honey leg
-runs out of the drawing's edge and becomes the real warm water under a real street.
+**A-B10 · Cold in, warm out** (29.56-34.4 s; reworked from the idea in round 2, on B10alt's staging) · *Sees:* through
+the frost door, inside the plan's hall, built of frost and lit from within by the machines' heat: ONE giant machine
+close (a slab of frost glowing honey through its trays), a row of them receding behind it; the water's pipe, the only
+painted thing, comes in cool and pale along the floor, climbs the machine's face drinking its heat tray by tray,
+warming as it climbs, and leaves honey at the top, running away over the hall toward the warm city glowing through the
+frost walls; her frost-drawn figure stands with a palm on the machine. *Gets:* water in pipes takes the heat out of the
+computers. *Feels:* clarity, "oh, that's how" · **The frame:** one glowing object and one line that changes colour as
+it climbs (cool in low, honey out high, read in a glance); the hall a place (frost walls with body, the warm city
+through them, an ice floor holding the glow), never lines on the dark; the water never touches the machine's insides.
+Sound: a cool flow note warming to a hum. *Devices:* E9 the subject travels the line, E1 her palm (scale and touch).
+*Hand-off:* the honey pipe runs out of the frame's right edge and becomes the real warm water under a real street.
 
 **A-B11 · Home by home, up the street** (34.46-38.4 s) · *Sees:* her street at a person's eye height, blocks shoulder
-to shoulder on both sides, her block closing the far end; along the near kerb a soft painted cut in the snowbank shows
-the twin pipes under the street, the warm one honey; past it the warm water shows as a melt line running to every door;
-the near windows already warm, the middle ones clearing, the far ones still frosted: the warmth climbing toward her
-door; a tram coming down its rails on the right, walkers, a dog. *Gets:* pipes under the streets carry the heat into
-homes. *Feels:* cozy relief · **The frame:** enclosure on both sides, the street's one long sight line ended by her
-block; snow falling. Sound: the tram's bell, a warm hum. *Devices:* B2 + E7 the closed vista, B1 the melt line leading
-to her door, D7 the windows warming in order. *Hand-off:* the line reaches her door; we pull back to the shore.
+to shoulder on both sides, her block closing the far end; along each kerb the snow has melted in a ragged line over the
+pipe, wet dark ground in it, the honey glowing up through it from below and a breath of steam off it, turning in at
+every door it has reached; the near windows already warm, the middle ones clearing, the far ones still frosted: the
+warmth climbing toward her door; a tram further up on the right-hand rails, its lights low; walkers, a dog. *Gets:*
+pipes under the streets carry the heat into homes. *Feels:* cozy relief · **The frame:** enclosure on both sides, the
+street's one long sight line ended by her block, the melt lines carrying the eye to the doors and on to her block; snow
+falling. Sound: the tram's bell, a warm hum. *Devices:* B2 + E7 the closed vista, B1 the melt lines leading to her
+door, D7 the windows warming in order. *Hand-off:* the line reaches her door; we pull back to the shore.
 
-**A-B12 · Your chat, her window** (38.48-42.24 s) · *Sees:* the home view again, the whole city warm; your gloved
-hand holds your phone up low on the left, a chat bubble pops, a pulse runs along the shore from the plan's building
-(beside the blank one, still drawn in glittering frost as she drew it: a box, its door, two fans: "could soon") and
-her window goes a step warmer, her silhouette in it; the bubble, the pulse and her window on one diagonal.
+**A-B12 · Your chat, her window** (38.48-42.24 s) · *Sees:* the home view again, the whole city warm, stepped in on her
+block; your gloved hand raises your phone low on the left and your message pops on it (honey, right-aligned, as a chat
+shows yours); a pulse leaves from behind your phone along the warm run on the shore; her window goes a step warmer, and
+in it she lifts her cup toward you (B5's toast returned); your bubble, the pulse and her window on one rising diagonal.
 *Gets:* your own chatbot could soon heat an apartment in Helsinki. *Feels:* personal warmth and a wink, back to the
-start · **The frame:** the film's hardest step on her window ("apartment" lit in the band); the pop on the bubble, the
-warm step on her pane. *Devices:* N14 the deliberate match with B1, E11 the POV hook, E2. *Hand-off:* the loop: the
-city un-builds into frame 0's frosted night.
+start · **The frame:** the film's hardest step on her window ("apartment" lit in the band); your bubble and her window
+the two biggest honeys; the pop on the bubble, the warm step and her toast on her pane. *Devices:* N14 the deliberate
+match with B1 (the same place, nearer), E11 the POV hook, E2. *Hand-off:* the loop: the city un-builds into frame 0's
+frosted night.
 
 ## ALTERNATES (the four beats I am least sure of)
 
-- **A-B4alt · The seesaw in the snowy courtyard:** in a little playground held by frosted blocks, a seesaw rests level:
-  the one giant computer on one end, forty big light kettles in a tall teetering heap on the other (a curl off each),
-  the same steam rising off both; a child with a sled stops. Cleaner to read at phone size than forty windows (one
-  picture of "as much as"), but a balance can read as weight; the steam carries "heat". Flows into B5 by a push into a
-  lit window over the yard.
-- **A-B7alt · The city draws the sun** (new in round 1): a waterfront facade of frosted windows, and in almost every
-  one a little sun drawn by a fingertip in the frost, glowing honey where the lamp-lit room shows through the cleared
-  lines; one hand is still drawing a ray; the warm drift passes over the roofs and two neighbours on the pavement look
-  up at it. The turn as the city's own wish, in the film's device (the frost as the city's sketchbook), and it sets up
-  her drawing in B8. Less bodily delight than B7's open windows.
-- **A-B9alt · The roof lifts** (new in round 1): pushed in on her frost drawing, her fingertip lifts the frost roof of
-  the little building she drew like a lid, and we lean in from above onto the hall inside: rows of machines in
-  glittering frost with their lights, a cool glow, the pipe of cool water waiting in the aisle. A lid instead of a
-  door: we look down into the mechanism rather than walk into it; leads into B10 or B10alt.
-- **A-B10alt · One machine, one pipe:** inside the frost drawing, one giant machine big and close, standing in its hall
-  (a row of machines running back behind it, a frost-line person beside it with a hand on its panel); the water comes
-  in pale at its foot, climbs through it warming, and leaves honey at its top, running off toward the city. The
-  plainest "oh, that's how"; the hall behind keeps "a big new data center".
+- **A-B4alt · The machine of forty kitchens** (new in round 2; the seesaw retired: a balance said "weighs as much as",
+  which bends the fact): the one giant computer stands alone in a snowy little square, and where its rows of lights
+  should be, its whole front is forty tiny lit kitchen windows, a kettle boiling in each, the heat of all forty pouring
+  out of its top as ONE cloud; the blocks round the square frosted and quiet; a neighbour and her dog stop and stare up.
+  The film's rhyme (the machine's lights in rows like a facade's windows, B2) turned into the joke: the comparison in one
+  object. Its risk: it can read as a lit building, not a machine (its cues: the cabinet's rounded shoulders, the glass
+  door's frame, the server lights, the cable in the snow). If chosen, B5's view across the street becomes this machine;
+  it flows into B5 by a push into one of its little windows.
+- **A-B7alt · The city draws the sun** (round 1's rework, NOT THERE again in round 2, so left as it is): a waterfront
+  facade of frosted windows, a little sun drawn by a fingertip in almost every one, glowing honey through the cleared
+  lines; the warm drift passes over the roofs and two neighbours look up. **What each option for this slot lacks, for
+  the owner to choose:** round 0's "The city's own pipe reaches out" (a warm line racing along the shore road, manhole
+  lids puffing) gives a calm promise, not the turn's spark, shows B11's pipe before the "how" chapter, runs its honey
+  toward the blank building (the thread reversed), and its steam puffs bend the fact (the pipes carry hot water);
+  round 1's "The city draws the sun" is a tender wish, lovely as a pattern, but nobody reaches (no spark of the turn),
+  and it spends B8's device (a fingertip in the frost) one beat early. B7 (the city throws its windows open) is THERE.
+- **A-B9alt · The roof lifts** (new in round 1, adjusted in round 2): pushed in on her frost drawing, her fingertip lifts
+  the frost roof of the little building she drew like a lid, and we look DOWN into a deep hall: two rows of machines
+  standing along an aisle that runs away from us, their cold lights, the cool pipe waiting on its floor, a cool glow at
+  the far end; the building has walls of frost with body, her glowing lines at their edges, standing on the shore line
+  she drew with the warm line running off toward her home. A lid instead of a door; a fallback to B9 (THERE).
+- **A-B10alt · One machine, one pipe:** merged into B10 in round 2 (the note: "it becomes the base of B10's rework"):
+  its staging (one machine close, in cool at its foot, out honey at its top) with its three notes answered (a frost
+  figure with body for the stick figure, the hall with body and light for lines on black, the pipe warming as it
+  climbs for a switch at one point) is now B10. Its slot keeps the round-1 sketch only as the base B10 grew from; it is
+  no longer an option.
 
-## THE LOOK AT THE SHEET (at phone size, in order, as one film)
+## THE LOOK AT THE SHEET (round 2: at phone size, in order, as one film)
 
-**What I saw on the first pass, and redrew:** B1's wave swept one block and the hill city hid behind the near belt
-(raised the hill: the wave now crosses a whole hillside, with a bright crest and panes half-cleared ahead of it); B3's
-steam crossed the caption band (kept under it); B4's computer read as another dark building (a cabinet now: rounded,
-a glass door with trays, a plinth, its own melt pool, a neighbour beside it for scale); B5's figure was a lumpy
-silhouette and her cup did not read (her hair up in a claw clip, a light mug with its warm curl against the glass);
-B6's plume had no source (three warm columns off the fans now, bending away); B7's people were specks (staged close:
-neighbours leaning out, arms up into the drift, the casements as slim frosted panes); B8's frost read as grey noise
-and the hand as a beak (a glittering pane, a real hand and sleeve); B9 looked like a diagram (her fingertip on the
-frost door, the night's lights through the drawn walls, the candle's warmth); B10's "cold in" was invisible (a loop
-with two big legs, pale and honey); B11's sides were modern slabs (blocks of varied heights shoulder to shoulder);
-B12's source looked built (the plan's building in frost lines).
-
-**Read as one film after round 1:** one world (one Helsinki night, the stucco blocks in every wide), one thread (the
-honey heat, from the wave to her window, now glowing through the plan's lines and the drawn door), one device (the
-frost, shown as frost from frame 0 and cleared as the warmth arrives), one arc (the warm event at the hook, the dark
-middle, the frost chapter for hope and the lean-in, warmth to the end).
-**What still holds back, honestly:** B1's city is a band in the middle of a lot of sky and snow, so the wave reads as a
-warm glow spreading more than a sharp front; B10 is still the darkest, thinnest frame (line art on the dark glass, by
-the concept: the plan is frost); B4 asks the eye to scan twenty kitchens; B5's smile is implied, never seen (her face
-is turned to the glass); the people are silhouettes until the people in use are drawn at the key frames.
+**Read as one film:** one world (one Helsinki winter night, the stucco blocks in every wide, the frost chapter tied in
+by her window, her hand and now her frost figure in the hall); one thread (the honey heat in every frame, travelling:
+the sweep fed by the run from the blazing door -> the grilles -> the kettles and their cloud -> one cup -> the plume ->
+open windows -> her drawn plan -> the door's rim -> the pipe warming up the machine -> the melt lines to the doors ->
+your bubble and her window); one device (the frost: cleared by the sweep, wasted on, drawn on, built into the hall,
+melted off the street); one arc (an event at the hook, awe, heat, astonishment and a smile, the pang, the turn, hope,
+the lean-in, the click of "oh, that's how" on a glowing machine, relief, the wink). B10's frontal machine breaks the
+run of centred corridors, and B12 stepped in no longer repeats B1's wide.
+**What still holds back, honestly:** B1's lower half is still a wide quiet field of ice and snow, so the city is a band
+at phone size (the sweep reads, but small); B4 shows sixteen of the forty kitchens (the facade running past the edge
+carries the rest); B11's melt lines read as warmth at the kerbs at a glance, "under the snow" mostly at full size (the
+wet ragged edges and the steam); B10's figure and B12's toast are silhouettes until the people in use come at the key
+frames; B5's smile is still implied (her face turned to the glass).
 
 ## TRUTH, PIP, THE PLACE
 
-- **Truth:** the plant is a plan (frost lines in B8-B10 and B12's source; "2027" = next year); no names or logos; the
-  homes are flats (apartment blocks); the water stays inside its pipe and heats homes (radiators under the sills,
-  windows clearing), never a tap; "normally" is shown on generic data centers (B6), and nothing claims Helsinki is the
-  first; one AI cabinet = forty 3 kW kettles. The heat pump (the small box) is not voiced, so not drawn; a key frame may
-  add it, unlabelled, in B11's cut.
+- **Truth:** the plant is a plan (the frost: her drawing in B8, the frost door and the frost-built hall in B9-B10;
+  "2027" = next year; B12 says "could soon" in its words); no names or logos; the homes are flats (apartment blocks);
+  the water stays inside its pipe and heats homes (radiators under the sills, windows clearing), never a tap; the melt
+  line over the pipes (B1, B11) is what a heating main really does to the snow above it; "normally" is shown on generic
+  data centers (B6), and nothing claims Helsinki is the first; one AI cabinet = forty 3 kW kettles. The heat pump (the
+  small box) is not voiced, so not drawn; a key frame may add it, unlabelled, by a door in B11.
 - **Pip** (not drawn at thumbnail size): on a snowy balcony of the next block (B1, B12), on a sill among the frosted
   windows (B7, off the eye path), on a balcony on the right side of the street (B11); none in B2-B6 closes or the frost
   chapter.
@@ -258,3 +270,23 @@ is turned to the glass); the people are silhouettes until the people in use are 
 - B10alt no place, scale or life -> the one machine in its hall (a row running back behind it), a frost-line person beside it, all in the frost hand; its warming pipe kept.
 - Board read, the frost invisible before B8 -> mended at its source, the one shared frosted pane (see B1).
 - Board read, the frost chapter an infographic insert and the thread thinning in B8-B9 -> her hand, the honey-glowing lines and door frame, one frost hand for the hall and its people (B8-B10).
+
+## Round 2 changes (THE FRAME LOOP, adjust round 2, from `A_EVAL_r2.md`; each line: the note -> what I did)
+
+- B1 the wave a soft glow on one block -> ONE bold front sweeping down across all five facades from her block's roof to the run's tip: the panes ahead plainly frosted and glinting, a honey crest with its windows flaring, the cleared panes warm behind.
+- B1 the source a low dark strip, "AI" not in the picture -> the building with no windows made the second read: a smooth cool face with server-like rows of cold lights, big fans breathing warm air, its wide door open and blazing (the machines dark inside), the warm run leaving it as a melt line along the shore and feeding the front's foot (kept left of the app's right rail).
+- B1 mistake, the walker's feet under the bottom bar -> lifted (feet at y 1494), her footprints moved with her.
+- B4 the computer a dark post half against the facade, the clouds read as the building's steam -> the computer in its own space at the corner of a side street open to the frozen harbour; its cloud and the block's gathered cloud side by side, the same size, sky between them.
+- B4 the lower third empty, every kettle small -> the block closer (its base lower, the street shorter), kitchens and kettles about twice the size, bolder curls; the near street a quiet patterned field (tyre tracks, the windows' warmth on the snow, a snowbank).
+- B10 NOT THERE (lines on black, heat into water not shown) -> reworked from the idea on B10alt's staging, made a place: the frost-built hall lit from within, the warm city through its frost walls, one machine close, the pipe in cool and pale at its foot warming tray by tray to honey at its top and away toward the city, her frost figure (with body) with a palm on the machine.
+- B11 the tram's headlights the brightest whites, dead centre -> the tram moved back and aside onto the right-hand rails, smaller, its lights low (no white glare, no beam on the snow).
+- B11 "under the snow" not read (a lit stripe on the kerbs, a cut in the snowbank) -> the stripes and the cut gone: the snow melted in a ragged line over the pipe up each kerb, wet dark ground in it, the honey glowing up through it, a breath of steam, turning in at each warm door; ahead of the front only a faint warmth under whole snow.
+- B12 the payoff's two reads small, her figure a sliver -> the view stepped in on her block (the tower kept below the band) and the phone raised and larger, your message right-aligned on it; your bubble, the pulse leaving from behind the phone along the warm run (now drawn so it shows) and her window on one rising diagonal, the two biggest honeys.
+- B12 the wink missing -> she lifts her cup toward you in her window (B5's toast returned).
+- B12 polish, the plan's frost-line building read as a neon gate -> let go: the warm run leaves the site behind your phone.
+- B4alt NOT THERE (a balance says weight, the heap a grey pile; "retire it") -> the seesaw retired, the slot reworked from the idea: "The machine of forty kitchens" (see Alternates).
+- B7alt NOT THERE, already reworked in round 1 -> left as it is; what each of its options lacks is under Alternates, for the owner.
+- B9alt ALMOST (a glowing outline icon on frost, the inside a flat plan from above) -> the walls given body (frost slabs, her glowing lines at their edges) and a place (on the shore line she drew, the warm line running off toward her home); the inside a deep hall looked down into (machines standing along an aisle, their cold lights, the cool pipe, the far glow).
+- B10alt ALMOST ("it becomes the base of B10's rework") -> merged into B10, its three notes answered there; its slot keeps the round-1 sketch, no longer an option.
+- B2, B3, B5, B6, B7, B8, B9 THERE -> kept as they are (renders pixel-identical); their polish notes go to the key frames, among them two app-bar mistakes to fix there: B6's ice fisher and B7's man in the street lifted above the bottom bar.
+- Board read (B1's source invisible, B10 another film's graphic, the quiet opening, the sag at B10, the missing wink, the run of corridors) -> mended at their sources: B1, B10 and B12 above; B10's frontal machine breaks the corridors.

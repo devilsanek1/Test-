@@ -222,15 +222,18 @@ def open_hand(cx, cy, ang, sz, col):
     return ''.join(o)
 
 
-def melt_channel(cam, rng, z_near, z_far, xc=lambda z: 0.0, hw0=0.42, steam_at=(), steam_scale=1.0, n=70, glow_hw=1.6):
+def melt_channel(cam, rng, z_near, z_far, xc=lambda z: 0.0, hw0=0.42, steam_at=(), steam_scale=1.0, n=70, glow_hw=1.6,
+                 widen=None):
     """The heat under the snow, painted as a soft, ragged melt channel along Z: the snow lit from beneath, sagging dark
-    and wet along it, wet stones glowing in it, light through its cracks, steam lifting off it."""
+    and wet along it, wet stones glowing in it, light through its cracks, steam lifting off it.
+    widen = (z0, amount, scale): the channel grows wider toward z0 (round 2, B1: widening toward you behind the head)."""
     P, f = cam.P, cam.f
     out = []
     zs = [z_near * (z_far / z_near) ** (i / n) for i in range(n + 1)]
 
     def hw(z):
-        return hw0 * (1 + 0.22 * math.sin(z * 1.9 + 0.7) + 0.14 * math.sin(z * 5.3 + 2.1) + 0.1 * math.sin(z * 0.37))
+        k = 1.0 if widen is None else 1 + widen[1] * math.exp(-max(0.0, z - widen[0]) / widen[2])
+        return k * hw0 * (1 + 0.22 * math.sin(z * 1.9 + 0.7) + 0.14 * math.sin(z * 5.3 + 2.1) + 0.1 * math.sin(z * 0.37))
 
     def band(extra_hw):
         return [P(xc(z) - hw(z) - extra_hw, 0, z) for z in zs] + [P(xc(z) + hw(z) + extra_hw, 0, z) for z in zs][::-1]
@@ -337,13 +340,106 @@ def running_head(cam, rng, xc, head_z, size=1.0):
     return ''.join(out)
 
 
-# ============================================================== THE STREET OF HOMES (B1, B7alt)
-def street_of_homes(rng, cam, bloom=1.0, head_z=None, phone=True, phone_sent=False, people=True, far_lit=0.9, tram=True):
+def running_head_near(cam, rng, xc, head_z, hw_=1.0, cap=0.38, tail=3.4):
+    """Round 2 (B1, the hook): THE RUNNING HEAD brought near and big, racing AT you from frame 0: a bright warm front
+    under the snow, the melt widening behind it; just ahead of it the fresh snow still white, heaving and cracking; a
+    burst of steam thrown up at its head (honey from below, cooling as it climbs and trails back), warm flecks and snow
+    flung up. Returns (ground, air): the air part is painted after the far street (it stands in front of it)."""
+    P = cam.P
+    hz_ = head_z
+    sc = cam.f / hz_
+    ground, air = [], []
+
+    def prof(t, p):
+        return max(0.0, 1 - min(1.0, max(0.0, t)) ** p) ** 0.5
+
+    def teardrop(L, hw, p, cp):
+        zz = [hz_ - cp * math.cos(math.pi / 2 * t / 8) for t in range(8)] + [hz_ + L * t / 16 for t in range(17)]
+
+        def wd(z):
+            if z < hz_:
+                return hw * math.sqrt(max(0.0, 1 - ((hz_ - z) / cp) ** 2))
+            return hw * prof((z - hz_) / L, p)
+        return [P(xc(z) - wd(z), 0, z) for z in zz] + [P(xc(z) + wd(z), 0, z) for z in zz][::-1]
+    hc = P(xc(hz_), 0, hz_)
+    nose = P(xc(hz_), 0, hz_ - cap)
+    # the fresh snow ahead, still white: a soft pale field in front of the head, untouched (it has not come yet)
+    ahead = [P(xc(hz_) - 2.6, 0, hz_ - cap * 0.6), P(xc(hz_) + 2.6, 0, hz_ - cap * 0.6), P(xc(hz_) + 3.4, 0, 2.9),
+             P(xc(hz_) - 3.4, 0, 2.9)]
+    ground.append(poly(ahead, v(74), 0.55, extra='filter="url(#gL)"'))
+    ground.append(ell(nose[0], nose[1] + 0.05 * sc, 1.5 * sc, 0.16 * sc, v(80), 0.35, extra='filter="url(#gM)"'))
+    # its warm on the snow round it (held close: the street stays cold)
+    ground.append(ell(hc[0], hc[1] - 0.06 * sc, 1.9 * sc, 0.42 * sc, w(70), 0.42, extra='filter="url(#gL)"'))
+    # the wet, sagging rim of the melt, then the head itself: warm body, honey, the white-hot front
+    ground.append(poly(teardrop(tail, hw_ * 1.12, 1.2, cap * 1.15), v(24), 0.7, extra='filter="url(#soft3)"'))
+    ground.append(poly(teardrop(tail, hw_, 1.25, cap), w(78), 0.95, extra='filter="url(#gS)"'))
+    ground.append(poly(teardrop(tail * 0.8, hw_ * 0.86, 1.4, cap * 0.92), w(90), 0.92, extra='filter="url(#soft3)"'))
+    ground.append(poly(teardrop(tail * 0.32, hw_ * 0.6, 1.6, cap * 0.8), w(100), 0.95, extra='filter="url(#soft3)"'))
+    # light coming up through the cracks of its body
+    for k in range(16):
+        z0 = hz_ + rng.uniform(0.05, tail * 0.7)
+        x0 = xc(z0) + rng.uniform(-0.55, 0.55) * hw_
+        a, b = P(x0, 0, z0), P(x0 + rng.uniform(-0.25, 0.25), 0, z0 + rng.uniform(0.2, 0.6))
+        ground.append(line(a[0], a[1], b[0], b[1], w(100), rng.uniform(1.5, 3.2), 0.8))
+    # the cold snow just ahead, heaving: a soft pale ridge along the front, a few cracks running out toward you
+    lip = [P(xc(hz_) + hw_ * 1.12 * math.cos(a_), 0.05, hz_ - cap * 1.3 * math.sin(a_)) for a_ in
+           [math.pi * i / 14 for i in range(15)]]
+    ground.append(path(smooth(lip), 'none', v(86), max(6.0, 0.1 * sc), 0.5, extra='filter="url(#gS)"'))
+    for k in range(7):
+        a_ = math.pi * (0.18 + 0.64 * k / 6)
+        x0, z0 = xc(hz_) + hw_ * 1.12 * math.cos(a_), hz_ - cap * 1.3 * math.sin(a_)
+        ln = rng.uniform(0.3, 0.7)
+        a, b = P(x0, 0, z0), P(x0 + math.cos(a_) * ln * 0.6, 0, z0 - math.sin(a_) * ln)
+        ground.append(line(a[0], a[1], b[0], b[1], v(34), max(1.4, 0.011 * sc), 0.35))
+    # THE BOW WAVE: steam and spray thrown up and back off both sides of its front (it is racing at you)
+    for s in (-1, 1):
+        for i in range(4):
+            t = 0.25 + 0.75 * i / 3
+            X = xc(hz_) + s * (hw_ * 0.75 + 0.7 * t)
+            Y = 0.15 + 0.85 * t - 0.2 * t * t
+            Z = hz_ - cap * 0.3 + 1.3 * t
+            c = P(X, Y, Z)
+            s_ = cam.f / Z
+            col = mix(w(94), v(94), min(1.0, 0.2 + 0.8 * t))
+            air.append(steam_puff(c[0], c[1], (0.26 + 0.24 * t) * s_, (0.18 + 0.16 * t) * s_, col, 0.4 - 0.26 * t))
+        for k in range(10):
+            t = k / 9
+            c = P(xc(hz_) + s * (hw_ * 0.72 + 0.95 * t), 0.08 + 0.8 * math.sin(t * math.pi * 0.8), hz_ - cap * 0.8 + 1.4 * t)
+            air.append(circ(c[0], c[1], 3.4 - 1.6 * t, w(98), 0.85 - 0.5 * t))
+    # THE BURST thrown up at its head: steam lit honey from below, cooling as it climbs, trailing back (away from you)
+    air.append(ell(hc[0], hc[1] - 0.45 * sc, 0.9 * sc, 0.45 * sc, w(84), 0.32, extra='filter="url(#gL)"'))
+    for (dy, dz, dx, rx_, col, op) in ((0.7, 0.5, 0.0, 0.45, mix(w(92), v(96), 0.1), 0.55), (1.15, 0.8, -0.08, 0.55, mix(w(90), v(95), 0.28), 0.5),
+                                       (1.6, 1.2, -0.18, 0.65, mix(w(88), v(94), 0.48), 0.4), (2.1, 1.7, -0.3, 0.75, mix(w(84), v(92), 0.7), 0.28),
+                                       (2.6, 2.3, -0.45, 0.85, v(90), 0.15)):
+        c = P(xc(hz_) + dx, dy, hz_ + dz)
+        s_ = cam.f / (hz_ + dz)
+        air.append(steam_puff(c[0], c[1], rx_ * s_, rx_ * s_ * 0.66, col, op))
+    air.append(wisps(hc[0], hc[1] - 0.3 * sc, 1.8 * sc, 6, w(98), 0.055 * sc, rng, spread=0.35 * sc, op=0.5, blur='gS', lean=-0.12))
+    # the head's white-hot front, the brightest thing, seen through its own steam
+    air.append(ell(nose[0], nose[1] - 0.12 * sc, 0.85 * sc, 0.2 * sc, w(96), 0.45, extra='filter="url(#gM)"'))
+    air.append(poly(teardrop(tail * 0.3, hw_ * 0.62, 1.6, cap * 0.85), w(100), 0.6, extra='filter="url(#soft3)"'))
+    # flung up at the front: warm flecks and bits of snow
+    for k in range(30):
+        s = 1 if k % 2 else -1
+        t = rng.uniform(0.0, 1.0)
+        c = P(xc(hz_) + s * (hw_ * rng.uniform(0.3, 0.8) + 0.9 * t), 0.1 + 1.0 * t * rng.uniform(0.4, 1.0), hz_ - cap * 0.6 + 1.2 * t)
+        if k % 3:
+            air.append(circ(c[0], c[1], rng.uniform(2.0, 4.6), w(98), rng.uniform(0.6, 0.95)))
+        else:
+            air.append(ell(c[0], c[1], rng.uniform(3, 7), rng.uniform(2, 4), v(92), 0.85))
+    return ''.join(ground), ''.join(air)
+
+
+# ============================================================== THE STREET OF HOMES (B1, B7)
+def street_of_homes(rng, cam, bloom=1.0, head_z=None, phone=True, phone_sent=False, people=True, far_lit=0.9, tram=True,
+                    near_head=False):
     """The island's street at a person's eye height. head_z: the warm current's running head (None: no current).
     bloom: 0 = every window cold; 'wave' = the windows bloom only behind the head, the far blocks full, the near ones
-    just starting from their lowest floor (the heat arrives at the cellar and climbs)."""
+    just starting from their lowest floor (the heat arrives at the cellar and climbs).
+    near_head (round 2, B1): the head near and big, racing at you; the near blocks kept dark, the bloom only far."""
     P = cam.P
     out = []
+    air = ''
     # sky
     out.append(sky(v(12), v(19), v(36), v(64), cam.cy, glow=(330, 330, 120, v(72), 0.55)))
     out.append('<defs><linearGradient id="snowg" x1="0" y1="%.0f" x2="0" y2="%d" gradientUnits="userSpaceOnUse">'
@@ -401,7 +497,7 @@ def street_of_homes(rng, cam, bloom=1.0, head_z=None, phone=True, phone_sent=Fal
              (92, 112, 17.0, False), (112, 140, 20.0, False), (140, 175, 18.0, False), (175, 230, 19.0, False), (230, 300, 17.0, False)]
     faces = [v(24), v(21), v(26), v(22), v(25), v(23), v(27), v(25), v(28), v(30)]
     # the wave: how high the warm has climbed in each block (floors from the lowest; 99 = every floor)
-    climbed = {0: 0, 1: 1, 2: 2, 3: 3}
+    climbed = {0: 0, 1: 1, 2: 2, 3: 3} if not near_head else {0: -1, 1: -1, 2: -1, 3: 0}
     order = list(range(len(specs)))[::-1]
     for i in order:
         z0, z1, h, tur = specs[i]
@@ -449,8 +545,12 @@ def street_of_homes(rng, cam, bloom=1.0, head_z=None, phone=True, phone_sent=Fal
     if head_z is not None:
         def xc(z):
             return 0.08 * math.sin(z * 0.21) + 0.05 * math.sin(z * 0.9 + 1.3)
-        out.append(melt_channel(cam, rng, head_z + 1.2, 298, xc=xc, hw0=0.46, glow_hw=1.0,
-                                steam_at=(head_z + 4.5, 17, 26, 40, 62), steam_scale=0.6))
+        if near_head:
+            out.append(melt_channel(cam, rng, head_z + 1.0, 298, xc=xc, hw0=0.46, glow_hw=0.7,
+                                    steam_at=(head_z + 5.0, 17, 26, 40, 62), steam_scale=0.6, widen=(head_z, 0.75, 4.5)))
+        else:
+            out.append(melt_channel(cam, rng, head_z + 1.2, 298, xc=xc, hw0=0.46, glow_hw=1.0,
+                                    steam_at=(head_z + 4.5, 17, 26, 40, 62), steam_scale=0.6))
         # it turns in at each door it has passed, and the door glows where the heat goes in
         for i, (z0, z1, h, tur) in enumerate(specs[:7]):
             dz = z0 + (z1 - z0) * 0.45 + 0.8
@@ -462,7 +562,11 @@ def street_of_homes(rng, cam, bloom=1.0, head_z=None, phone=True, phone_sent=Fal
         # the source: a warm breath at the hall where it starts
         src = P(-2.5, 0.5, 298)
         out.append(ell(src[0], src[1], 34, 12, w(82), 0.85, extra='filter="url(#gM)"'))
-        out.append(running_head(cam, rng, xc, head_z))
+        if near_head:
+            ground, air = running_head_near(cam, rng, xc, head_z)
+            out.append(ground)
+        else:
+            out.append(running_head(cam, rng, xc, head_z))
     # the tram at its stop (cool lit windows, tone-on-tone)
     if tram:
         tz0, tz1 = 58, 84
@@ -498,6 +602,7 @@ def street_of_homes(rng, cam, bloom=1.0, head_z=None, phone=True, phone_sent=Fal
         fx, fy = P(X, 0, Z)
         top = P(X, 1.7, Z)
         out.append(person(fx, fy, fy - top[1], v(12), pose='walk', cap=True))
+    out.append(air)
     out.append(snowfall(rng, n=170))
     if phone:
         out.append(pov_phone(250, 1300, scale=0.92, sent=phone_sent))
@@ -506,8 +611,10 @@ def street_of_homes(rng, cam, bloom=1.0, head_z=None, phone=True, phone_sent=Fal
 
 # ============================================================== frames
 def f_B1(rng):
+    """Round 2: the hook as an event at a glance: the running head near and big, racing at you from frame 0, steam
+    thrown up at its head, the snow ahead still white; the near blocks dark, the bloom only far behind it."""
     cam = Cam(f=1000, cx=540, cy=1150, eye=1.6)
-    body = street_of_homes(rng, cam, bloom='wave', head_z=7.6, phone=True)
+    body = street_of_homes(rng, cam, bloom='wave', head_z=5.4, phone=True, near_head=True)
     body += caption([[('wants AI to heat', False)], [('70,000', True), (' homes?', False)]])
     return body + texture()
 
@@ -961,8 +1068,8 @@ def seated_figure(x, seat_y, col, rim):
     return figure(J, col, wl=19, wa=14, rim=rim)
 
 
-def f_B5(rng):
-    """The teapot computer, wider: the giant computer seen at an angle in its quiet hall, its heat glowing through its
+def f_teapot(rng):
+    """B5alt since round 2 (round 1's B5, kept as drawn). The teapot computer, wider: the giant computer seen at an angle in its quiet hall, its heat glowing through its
     mesh like tea steeping, a giant teabag tag swinging off its top; beside it, her tiny mug with its tiny tag."""
     cam = Cam(f=900, cx=540, cy=1150, eye=1.5)
     P = cam.P
@@ -1107,6 +1214,66 @@ def fan_top(cx, cy, rx, ratio, warm_amt, gid, spin=0.0):
     return ''.join(out)
 
 
+def fan_guarded(cx, cy, rx, ratio, warm_amt, gid, spin=0.0):
+    """Round 2 (B6): a big rooftop fan that reads as a fan at phone size: a dark housing ring with its snowy lip, broad
+    dark blades, the heat glowing up from below in the gaps between them, a wire grille (rings and spokes) over it."""
+    ry = rx * ratio
+    out = []
+    drum = ry * 0.8
+    # the housing: a short dark cylinder on the unit, its lip catching the snow light
+    out.append(ell(cx, cy + drum, rx * 1.22, ry * 1.22, v(8)))
+    out.append(rect(cx - rx * 1.22, cy, rx * 2.44, drum, v(8)))
+    out.append(ell(cx, cy, rx * 1.22, ry * 1.22, v(56)))
+    out.append(ell(cx, cy, rx * 1.13, ry * 1.13, v(5)))
+    # the heat glowing up from deep inside (seen between the blades, never a lit plate)
+    out.append('<defs><radialGradient id="%s" cx="0.5" cy="0.55" r="0.5"><stop offset="0" stop-color="%s"/>'
+               '<stop offset="0.45" stop-color="%s"/><stop offset="0.85" stop-color="%s"/><stop offset="1" stop-color="%s"/>'
+               '</radialGradient></defs>' % (gid, w(98), w(80), w(46), v(5)))
+    out.append(ell(cx, cy + ry * 0.06, rx * 0.92, ry * 0.92, 'url(#%s)' % gid, warm_amt))
+    # broad dark blades
+    for k in range(5):
+        a0 = spin + k * 2 * math.pi / 5
+        lead, trail = [], []
+        for t in (0.2, 0.42, 0.66, 0.86, 0.95):
+            lead.append((cx + math.cos(a0 + t * 0.5) * rx * t, cy + math.sin(a0 + t * 0.5) * ry * t))
+            a1 = a0 + t * 0.5 + 0.62 + 0.3 * t
+            trail.append((cx + math.cos(a1) * rx * t * 0.97, cy + math.sin(a1) * ry * t * 0.97))
+        out.append(path(smooth(lead + trail[::-1], closed=True), v(6)))
+    # the wire grille over it: rings and spokes
+    for rr in (0.34, 0.58, 0.82, 1.06):
+        out.append(ell(cx, cy, rx * rr, ry * rr, 'none', extra='stroke="%s" stroke-width="2.4" opacity="0.9"' % v(36)))
+    for k in range(16):
+        a = k * math.pi / 8
+        out.append(line(cx + math.cos(a) * rx * 0.2, cy + math.sin(a) * ry * 0.2, cx + math.cos(a) * rx * 1.08,
+                        cy + math.sin(a) * ry * 1.08, v(36), 2.0, 0.85))
+    # the hub cap
+    out.append(ell(cx, cy, rx * 0.2, ry * 0.2, v(10)))
+    out.append(ell(cx - rx * 0.05, cy - ry * 0.06, rx * 0.09, ry * 0.09, v(40)))
+    return ''.join(out)
+
+
+def plume_tall(cx, cy, rx, top_y, lean, rng, strength=1.0):
+    """Round 2 (B6): the heat thrown out, rising high: warm at the fan, billowing up past the roofs of the cold homes,
+    cooling toward the night's grey and thinning to nothing in the sky above them, just under the caption band."""
+    out = [ell(cx, cy - rx * 0.12, rx * 1.0, rx * 0.4, w(84), 0.55 * strength, extra='filter="url(#gM)"')]
+    n = 22
+    rise = cy - 20 - top_y
+    ph = rng.uniform(0, 6)
+    for i in range(n):
+        t = i / (n - 1)
+        y = cy - 20 - t * rise + rng.uniform(-8, 8)
+        x = cx + lean * (t ** 1.25) * rise + math.sin(t * 4.2 + ph) * 20 * t + rng.uniform(-10, 10) * t
+        r = rx * (0.42 + 1.2 * t) * rng.uniform(0.88, 1.12)
+        warm_t = 0.62 * max(0.0, min(1.0, (t - 0.3) / 0.6))
+        col = mix(w(86), v(76), warm_t)
+        fade = max(0.0, min(1.0, (y - r * 0.58 - top_y) / 60.0))
+        op = strength * (0.09 + 0.24 * (1 - t) ** 1.4) * fade
+        if op > 0.004:
+            out.append(ell(x, y, r, r * 0.58, col, op, extra='filter="url(#steam)"'))
+    out.append(wisps(cx, cy - 16, rise * 0.55, 4, w(90), rx * 0.08, rng, spread=rx * 0.3, op=0.35 * strength, blur='gS', lean=lean))
+    return ''.join(out)
+
+
 def plume(cx, cy, rx, top_y, lean, rng, strength=1.0):
     """The heat thrown out: warm at the fan, rising, cooling to grey and thinning to nothing as it drifts away."""
     out = [ell(cx, cy - rx * 0.12, rx * 0.95, rx * 0.36, w(82), 0.5 * strength, extra='filter="url(#gM)"')]
@@ -1125,9 +1292,11 @@ def plume(cx, cy, rx, top_y, lean, rng, strength=1.0):
     return ''.join(out)
 
 
-def block_mid(x0, x1, base, top, roof_h, face, rng, floors=5, door_x=None, door_warm=0.0, turret=False, chimneys=2):
+def block_mid(x0, x1, base, top, roof_h, face, rng, floors=5, door_x=None, door_warm=0.0, turret=False, chimneys=2,
+              dark=False, dim=()):
     """A Katajanokka block across the lot, near enough to read: steep snowy roof, chimneys, rows of DARK windows
-    (cold homes), snow on every sill, its street door."""
+    (cold homes), snow on every sill, its street door. dark (round 2, B6): the windows read dark and cold at phone size
+    (deep panes, only a thin dim sill, no pale grid); dim: the very few (floor, column) windows with a faint cool light."""
     out = []
     snow = v(76)
     out.append(rect(x0, top, x1 - x0, base - top, face))
@@ -1151,6 +1320,11 @@ def block_mid(x0, x1, base, top, roof_h, face, rng, floors=5, door_x=None, door_
         wy = top + 12 + k * fl_h
         for j in range(ncol):
             wx = x0 + (x1 - x0) * (j + 0.5) / ncol - 9
+            if dark:
+                pane = mix(v(26), '#8fa6d8', 0.18) if (k, j) in dim else v(6)
+                out.append(rect(wx - 1, wy, 20, fl_h * 0.66, pane))
+                out.append(rect(wx - 2, wy + fl_h * 0.66, 22, 2.2, v(36), 0.7))
+                continue
             out.append(rect(wx, wy, 18, fl_h * 0.62, v(9)))
             out.append(rect(wx + 8, wy, 2, fl_h * 0.62, v(18), 0.8))
             out.append(rect(wx - 3, wy + fl_h * 0.62, 24, 4, snow, 0.9))
@@ -1164,9 +1338,11 @@ def block_mid(x0, x1, base, top, roof_h, face, rng, floors=5, door_x=None, door_
     return ''.join(out)
 
 
-def roof_view(rng, reach=False):
+def roof_view(rng, reach=False, r2=False):
     """From the hall's roof: the fans close in front, the lot below the parapet, Katajanokka's blocks across it, near
-    and cold. reach=True: B7, the city answering (its doors and kerbs warm, its warm fingers reaching for the heat)."""
+    and cold. reach=True: the city answering (its doors and kerbs warm, its warm fingers reaching for the heat; round
+    1's B7, now the B7 alternate). r2 (round 2, B6): the plumes pour up past the roofs and thin away just under the
+    band, the homes' windows dark, the fans with housings and grilles."""
     base = 1050
     out = []
     out.append(sky(v(10), v(17), v(30), v(50), base, glow=(540, 820, 160, v(48), 0.4)))
@@ -1182,9 +1358,10 @@ def roof_view(rng, reach=False):
     specs = [(-20, 160, 812, 70, v(25), False, None), (160, 330, 786, 80, v(28), True, 300), (330, 520, 806, 66, v(23), False, 420),
              (520, 690, 772, 84, v(27), False, 540), (690, 870, 798, 72, v(24), True, 660), (870, 1100, 784, 78, v(26), False, 780)]
     doors = []
-    for (x0, x1, top, rh, face, tur, door_x) in specs:
+    dims = {1: ((2, 1),), 4: ((1, 3),), 5: ((3, 0),)} if r2 else {}
+    for b, (x0, x1, top, rh, face, tur, door_x) in enumerate(specs):
         out.append(block_mid(x0, x1, base, top, rh, face, rng, door_x=door_x, door_warm=1.0 if reach else 0.0, turret=tur,
-                             chimneys=2 if x1 - x0 < 190 else 3))
+                             chimneys=2 if x1 - x0 < 190 else 3, dark=r2, dim=dims.get(b, ())))
         if door_x is not None:
             doors.append(door_x)
     # the street at their feet and the snowy lot down to the hall's wall
@@ -1249,16 +1426,19 @@ def roof_view(rng, reach=False):
     fansA = [(162, 1392), (346, 1380), (530, 1368)]
     fansB = [(732, 1306), (862, 1298)]
     warm = 1.0 if not reach else 0.8
+    fan = fan_guarded if r2 else fan_top
     out.append(unit((684, 1342), (928, 1333), (912, 1262), (676, 1270), 46))
     for k, (cx, cy) in enumerate(fansB):
-        out.append(fan_top(cx, cy, 60, 0.42, warm, 'fanB%d' % k, spin=0.4 + k * 0.7))
+        out.append(fan(cx, cy, 60, 0.42, warm, 'fanB%d' % k, spin=0.4 + k * 0.7))
     out.append(unit((26, 1452), (646, 1426), (622, 1300), (52, 1322), 64))
     for k, (cx, cy) in enumerate(fansA):
-        out.append(fan_top(cx, cy, 84, 0.42, warm, 'fanA%d' % k, spin=0.2 + k * 0.9))
+        out.append(fan(cx, cy, 84, 0.42, warm, 'fanA%d' % k, spin=0.2 + k * 0.9))
     # the heat thrown out: B6 high over the cold homes, thinning to nothing; B7 quieter, a warm breath at each fan
     for (cx, cy), rx in [(p, 60) for p in fansB] + [(p, 84) for p in fansA]:
         if reach:
             out.append(plume(cx, cy, rx, cy - 64, -0.05, rng, strength=0.55))
+        elif r2:
+            out.append(plume_tall(cx, cy, rx, 606, -0.08 - 0.05 * ((cx // 7) % 3), rng, strength=1.0))
         else:
             out.append(plume(cx, cy, rx, 690, -0.2, rng, strength=1.0))
     out.append(snowfall(rng, n=150))
@@ -1266,12 +1446,13 @@ def roof_view(rng, reach=False):
 
 
 def f_B6(rng):
-    body = roof_view(rng, reach=False)
+    body = roof_view(rng, reach=False, r2=True)
     body += caption([[('big fans to blow', False)], [('that heat ', False), ('outside.', True)]], size=100)
     return body + texture()
 
 
-def f_B7(rng):
+def f_roof_reach(rng):
+    """B7alt since round 2 (round 1's B7, kept as drawn): the city reaches back from the roof."""
     body = roof_view(rng, reach=True)
     body += caption([[('But Helsinki', False)], [('wants', True), (' that heat.', False)]])
     return body + texture()
@@ -1354,118 +1535,171 @@ def plan_lot(rng, cam, warm_tip=True, engineer_pose='look_up', tag=True, door_op
 
 
 def f_B8(rng):
-    """A plan in chalk: the new data center drawn bold on the night, its planned computers and its pipe inside; the
-    pipe is still being drawn out across the snow, its bright chalk tip coming toward the city's warm line, whose tip
-    waits: two ends about to touch, close in front of us, a 2027 tag on a stake beside them."""
-    cam = Cam(f=1000, cx=540, cy=1080, eye=1.6)
-    P = cam.P
-    out = [plan_lot(rng, cam)]
-    # the plan: walls, roof line, door, bold chalk with a faint glow of its own (lines only: the snow falls through)
-    X0, X1, Z0, Z1, Hh = -11.0, 9.0, 22.0, 46.0, 9.0
+    """A plan in chalk, round 2: the gap made the focal, near and big in the read zone. Crouched low on the empty
+    snowy lot by the harbour: from the left the plan's chalk pipe (bold, being drawn right now, sweeping out of the
+    chalk data center's door on the lot behind), from the right the city's warm channel under the snow; between their
+    tips a small bright gap, the warm tip's light on the chalk tip and on the snow round it; the 2027 tag on its stake
+    by the gap; the engineer, a rolled drawing under her arm, watching the two ends; the icebreakers beyond."""
+    cam = Cam(f=900, cx=540, cy=820, eye=1.0)
+    P, f = cam.P, cam.f
+    out = []
+    # the night: the band's calm sky, a snow cloud, the far shore across the plate ice, two moored icebreakers
+    out.append(sky(v(11), v(18), v(34), v(58), cam.cy, glow=(420, 520, 90, v(64), 0.5)))
+    out.append(cloud(760, 180, 600, 170, v(21), v(36), rng, n=11))
+    out.append(streak(-60, 700, 520, 24, v(28), 0.45))
+    out.append(streak(560, 768, 1140, 18, v(36), 0.4))
+    out.append(far_city(rng, cam.cy + 2, cam.cy - 38, -10, 1090, v(44), lit_frac=0.0))
+    out.append(rect(0, cam.cy + 2, W, 26, v(54)))
+    out.append(icebreakers(rng, cam.cy + 24, [(6, 0.4, True), (720, 0.32, False)]))
+    # the empty lot: snow from the quay to our feet, drifts, her footprints from the plan's door
+    out.append('<defs><linearGradient id="lot8" x1="0" y1="%d" x2="0" y2="%d" gradientUnits="userSpaceOnUse">'
+               '<stop offset="0" stop-color="%s"/><stop offset="0.3" stop-color="%s"/><stop offset="1" stop-color="%s"/>'
+               '</linearGradient></defs>' % (cam.cy + 26, H, v(62), v(50), v(34)))
+    out.append(rect(0, cam.cy + 26, W, H - cam.cy - 26, 'url(#lot8)'))
+    for k in range(70):
+        Z = math.exp(rng.uniform(math.log(2.4), math.log(60)))
+        a = P(rng.uniform(-0.8, 0.8) * Z - 1.0, 0, Z)
+        out.append(ell(a[0], a[1], max(4, 0.45 * f / Z), max(1.2, 0.04 * f / Z), v(56) if k % 3 else v(44), 0.3))
+    # the near snow: soft wind ripples, one quiet field
+    for k in range(9):
+        y0 = 1290 + k * 70 + rng.uniform(-14, 14)
+        x0 = rng.uniform(-200, 500)
+        out.append(path(smooth([(x0, y0), (x0 + 260, y0 - 16), (x0 + 560, y0 - 6), (x0 + 820, y0 + 12)]), 'none',
+                        v(44) if k % 2 else v(30), 10 + k * 1.6, 0.35, extra='filter="url(#soft3)"'))
+    for k in range(9):
+        t = k / 8
+        X, Z = -1.8 + 3.9 * t + (0.18 if k % 2 else -0.18), 28 - 20.6 * t
+        a = P(X, 0, Z)
+        out.append(ell(a[0], a[1], max(2.0, 0.13 * f / Z), max(0.8, 0.03 * f / Z), v(40), 0.6))
+    # THE PLAN: the big new data center drawn on the night in bold chalk with a faint glow of its own, its planned
+    # computers in rows inside, the snow falling through it (lines only)
+    X0, X1, Z0, Z1, Hh = -15.0, 11.0, 30.0, 52.0, 7.6
     c = {nm: P(X, Y, Z) for nm, (X, Y, Z) in {'a': (X0, 0, Z0), 'b': (X1, 0, Z0), 'c': (X1, 0, Z1), 'd': (X0, 0, Z1),
                                                'A': (X0, Hh, Z0), 'B': (X1, Hh, Z0), 'C': (X1, Hh, Z1), 'D': (X0, Hh, Z1)}.items()}
     for e in ('cd', 'CD', 'cC', 'dD', 'bc', 'BC', 'da', 'DA'):
-        out.append(chalk_bold(c[e[0]], c[e[1]], rng, 4.2, 0.85, 0.22))
-    # the planned computers inside: rows of tall chalk boxes going back, and the pipe running out of them
-    for X in (-7.0, -2.6, 1.8, 6.0):
+        out.append(chalk_bold(c[e[0]], c[e[1]], rng, 3.6, 0.85, 0.22))
+    for X in (-11.0, -6.5, -2.0, 2.5, 7.0):
         zz = Z0 + 3.0
         while zz < Z1 - 2.5:
             f0, f1 = P(X - 0.5, 0, zz), P(X + 0.5, 0, zz)
             t0, t1 = P(X - 0.5, 2.6, zz), P(X + 0.5, 2.6, zz)
-            out.append(chalk_poly([f0, t0, t1, f1], rng, 3.0, 0.7, 0.15))
-            b0 = P(X + 0.5, 2.6, zz + 1.0)
-            out.append(chalk_bold(t1, b0, rng, 2.4, 0.55, 0.0))
+            out.append(chalk_poly([f0, t0, t1, f1], rng, 2.4, 0.7, 0.12))
             zz += 3.6
-    # the front wall last (nearest): bold, the door drawn in it
     for e in ('ab', 'AB', 'aA', 'bB'):
-        out.append(chalk_bold(c[e[0]], c[e[1]], rng, 6.4, 0.97, 0.3, breaks=False))
-    da, db = P(-2.4, 0, Z0), P(-0.4, 0, Z0)
-    dt = P(-0.4, 3.2, Z0)
-    out.append(chalk_poly([da, (da[0], dt[1]), dt, db], rng, 5.0, 0.95, 0.25))
-    # survey stakes with ribbons at its near corners
+        out.append(chalk_bold(c[e[0]], c[e[1]], rng, 5.6, 0.97, 0.3, breaks=False))
+    da, db = P(-2.6, 0, Z0), P(-0.8, 0, Z0)
+    dt = P(-0.8, 3.0, Z0)
+    out.append(chalk_poly([da, (da[0], dt[1]), dt, db], rng, 4.4, 0.95, 0.25))
     for (X, Z) in ((X0, Z0), (X1, Z0)):
         a, b = P(X, 0, Z), P(X, 1.4, Z)
-        out.append(line(a[0], a[1], b[0], b[1], v(72), 4))
-        out.append(path('M%.1f,%.1f q9,5 18,-2' % (b[0], b[1] + 6), 'none', v(90), 3))
-    # THE CHALK PIPE: out through the plan's front wall and across the snow toward us, still being drawn
-    hw = 0.17
-    ctrl = [(-1.4, 26.0), (-1.4, Z0), (-2.0, 14.0), (-1.9, 8.5), (-1.15, 5.7), (-0.2, 4.65)]
-    pts3 = []
-    for (a_, b_) in zip(ctrl, ctrl[1:]):
-        for t in range(8):
-            u = t / 8
-            pts3.append((a_[0] + (b_[0] - a_[0]) * u, a_[1] + (b_[1] - a_[1]) * u))
-    pts3.append(ctrl[-1])
-    smooth_pts = [pts3[0]] + [((pts3[i - 1][0] + pts3[i][0] + pts3[i + 1][0]) / 3, (pts3[i - 1][1] + pts3[i][1] + pts3[i + 1][1]) / 3)
-                              for i in range(1, len(pts3) - 1)] + [pts3[-1]]
-    left_e, right_e = [], []
-    for i, (X, Z) in enumerate(smooth_pts):
-        j = min(i + 1, len(smooth_pts) - 1)
-        k = max(i - 1, 0)
-        dX, dZ = smooth_pts[j][0] - smooth_pts[k][0], smooth_pts[j][1] - smooth_pts[k][1]
-        L = math.hypot(dX, dZ) or 1
-        nX, nZ = -dZ / L, dX / L
-        left_e.append(P(X + nX * hw, 0, Z + nZ * hw))
-        right_e.append(P(X - nX * hw, 0, Z - nZ * hw))
-    out.append(poly(left_e + right_e[::-1], v(88), 0.16))
-    for edge in (left_e, right_e):
-        for a, b in zip(edge, edge[1:]):
-            zz = max(1.0, (b[1] - cam.cy) / 30)
-            out.append(chalk_bold(a, b, rng, min(8.5, 2.4 + zz * 0.55), 0.95, 0.24, breaks=False))
-    # the chalk tip, being drawn right now: a bright nub, chalk dust
-    tip = P(-0.2, 0.02, 4.65)
-    out.append(circ(tip[0], tip[1], 46, v(98), 0.5, extra='filter="url(#gM)"'))
-    out.append(ell(tip[0], tip[1], 19, 13, CHALK_HI))
-    out.append(ell(tip[0] - 3, tip[1] - 3, 9, 6, v(100)))
-    for k in range(22):
-        out.append(circ(tip[0] + rng.uniform(-40, 30), tip[1] + rng.uniform(-36, 12), rng.uniform(1.2, 3.2), v(98), rng.uniform(0.4, 0.9)))
-    # THE CITY'S WARM LINE: in from the right under the snow, its warm tip waiting just across the gap
-    wl = [(6.0, 5.6), (3.4, 5.0), (1.8, 4.76), (0.9, 4.68), (0.2, 4.64)]
-
-    def xcw(z):
-        return 0.0
+        out.append(line(a[0], a[1], b[0], b[1], v(72), 3))
+        out.append(path('M%.1f,%.1f q7,4 14,-2' % (b[0], b[1] + 5), 'none', v(90), 2.5))
+    # the engineer, a rolled drawing under her arm, standing at the end of her footprints, watching the two ends
+    fx, fy = P(1.9, 0, 6.4)
+    u = (fy - P(1.9, 1.7, 6.4)[1]) / 7.8
+    J = dict(ftL=(fx - u * 0.5, fy), ftR=(fx + u * 0.6, fy + 1), knL=(fx - u * 0.4, fy - u * 2.0), knR=(fx + u * 0.5, fy - u * 2.0),
+             hipL=(fx - u * 0.35, fy - u * 3.9), hipR=(fx + u * 0.45, fy - u * 3.9), shL=(fx - u * 0.55, fy - u * 6.1),
+             shR=(fx + u * 0.75, fy - u * 6.1), elL=(fx - u * 0.9, fy - u * 5.1), haL=(fx - u * 0.75, fy - u * 4.2),
+             elR=(fx + u * 0.95, fy - u * 5.1), haR=(fx + u * 0.4, fy - u * 4.6), neck=(fx - u * 0.05, fy - u * 6.45),
+             head=(fx - u * 0.35, fy - u * 7.0), hr=u * 0.55, tilt=-22, hem=u * 0.45)
+    out.append(figure(J, v(9), wl=u * 0.42, wa=u * 0.34, rim=(w(78), -2)))
+    out.append(line(fx - u * 2.2, fy - u * 4.75, fx + u * 1.6, fy - u * 5.25, v(86), u * 0.36))
+    # THE CITY'S WARM CHANNEL: in from the right under the snow, wide and near, its glowing tip waiting at the gap
+    R = 0.19
+    gx, gz = 0.0, 2.7
+    wl = [(5.0, 6.0), (3.4, 4.0), (2.0, 3.1), (0.9, 2.8), (gx + 0.12, gz)]
     wpts = []
     for (a_, b_) in zip(wl, wl[1:]):
         for t in range(10):
-            u = t / 10
-            wpts.append((a_[0] + (b_[0] - a_[0]) * u, a_[1] + (b_[1] - a_[1]) * u))
+            uu = t / 10
+            wpts.append((a_[0] + (b_[0] - a_[0]) * uu, a_[1] + (b_[1] - a_[1]) * uu))
     wpts.append(wl[-1])
-    up, dn, sag_u, sag_d = [], [], [], []
+    up, dn, sag_u, sag_d, glo_u, glo_d = [], [], [], [], [], []
     for i, (X, Z) in enumerate(wpts):
-        hw_ = 0.24 * (1 + 0.18 * math.sin(i * 1.3))
+        d_ = len(wpts) - 1 - i
+        hw_ = 0.3 * (1 + 0.16 * math.sin(i * 1.3)) * (1.0 if d_ >= 5 else 0.25 + 0.75 * math.sqrt(d_ / 5.0))
         up.append(P(X, 0, Z - hw_))
         dn.append(P(X, 0, Z + hw_))
-        sag_u.append(P(X, 0, Z - hw_ - 0.16))
-        sag_d.append(P(X, 0, Z + hw_ + 0.16))
-    out.append(poly(sag_u + sag_d[::-1], v(26), 0.6, extra='filter="url(#soft3)"'))
-    out.append(poly(up + dn[::-1], w(64), 0.95))
-    out.append(poly(up + dn[::-1], w(80), 0.6, extra='filter="url(#gS)"'))
+        sag_u.append(P(X, 0, Z - hw_ - 0.14))
+        sag_d.append(P(X, 0, Z + hw_ + 0.14))
+        glo_u.append(P(X, 0, Z - hw_ - 0.6))
+        glo_d.append(P(X, 0, Z + hw_ + 0.6))
+    out.append(poly(glo_u + glo_d[::-1], w(66), 0.32, extra='filter="url(#gL)"'))
+    out.append(poly(sag_u + sag_d[::-1], v(24), 0.7, extra='filter="url(#soft3)"'))
+    out.append(poly(up + dn[::-1], w(66), 0.95))
+    out.append(poly(up + dn[::-1], w(84), 0.6, extra='filter="url(#gS)"'))
     for i in range(len(wpts) - 1):
         if rng.random() < 0.3:
             continue
-        a, b = P(wpts[i][0], 0, wpts[i][1]), P(wpts[i + 1][0], 0, wpts[i + 1][1])
-        out.append(line(a[0], a[1], b[0], b[1], w(98), 2.4, 0.9))
-    wtip = P(0.2, 0, 4.64)
-    out.append(ell(wtip[0] + 26, wtip[1] + 2, 80, 20, v(24), 0.6, extra='filter="url(#soft3)"'))
-    out.append(circ(wtip[0], wtip[1], 96, w(72), 0.5, extra='filter="url(#gL)"'))
-    out.append(circ(wtip[0], wtip[1], 40, w(90), 0.8, extra='filter="url(#gM)"'))
-    out.append(ell(wtip[0], wtip[1], 19, 13, w(100)))
-    out.append(wisps(wtip[0] + 8, wtip[1] - 6, 150, 3, mix(w(92), v(94), 0.5), 7, rng, spread=12, op=0.5, blur='gS', lean=0.1))
-    # the 2027 tag on its stake, right by the gap
-    sa, sb = P(-2.6, 0, 7.0), P(-2.6, 1.2, 7.0)
-    out.append(line(sa[0], sa[1], sb[0], sb[1], v(70), 6))
-    out.append(path('M%.1f,%.1f L%.1f,%.1f' % (sb[0], sb[1] + 4, sb[0] + 4, sb[1] + 28), 'none', v(84), 2.5))
-    tx0, ty0 = sb[0] - 20, sb[1] + 24
-    out.append(poly([(tx0, ty0 + 4), (tx0 + 184, ty0), (tx0 + 188, ty0 + 86), (tx0 + 4, ty0 + 90)], v(94)))
-    out.append(circ(tx0 + 14, ty0 + 45, 5, v(40)))
-    out.append('<text x="%.1f" y="%.1f" text-anchor="middle" font-family="Gaegu" font-weight="700" font-size="74" fill="%s">2027</text>'
-               % (tx0 + 102, ty0 + 69, v(12)))
-    # the engineer, a rolled drawing under her arm, looking down at the two ends about to meet
-    J = dict(ftL=(782, 1250), ftR=(806, 1252), knL=(784, 1204), knR=(806, 1204), hipL=(786, 1160), hipR=(806, 1160),
-             shL=(780, 1098), shR=(812, 1098), elL=(772, 1128), haL=(776, 1156), elR=(822, 1130), haR=(808, 1150),
-             neck=(792, 1088), head=(788, 1072), hr=12, tilt=-14, hem=10)
-    out.append(figure(J, v(9), wl=10, wa=8, rim=(v(70), -2)))
-    out.append(line(752, 1132, 838, 1116, v(86), 9))
+        a = P(wpts[i][0] + rng.uniform(-0.05, 0.05), 0, wpts[i][1] + rng.uniform(-0.08, 0.08))
+        b = P(wpts[i + 1][0], 0, wpts[i + 1][1] + rng.uniform(-0.08, 0.08))
+        out.append(line(a[0], a[1], b[0], b[1], w(98), 3.0, 0.9))
+    for z_ in (5.2, 3.7):
+        X_ = 4.2 if z_ > 5 else 2.9
+        cc = P(X_, 0, z_)
+        out.append(wisps(cc[0], cc[1], 0.9 * f / z_, 3, mix(w(90), v(92), 0.5), 0.05 * f / z_, rng, spread=0.15 * f / z_, op=0.4, blur='gS', lean=0.08))
+    # the warm's light on the snow round the gap (and under the chalk tip)
+    g0 = P(gx, 0, gz)
+    out.append(ell(g0[0], g0[1] + 6, 360, 80, w(76), 0.5, extra='filter="url(#gL)"'))
+    out.append(ell(g0[0] - 30, g0[1] + 4, 190, 34, w(88), 0.45, extra='filter="url(#gM)"'))
+    # THE PLAN'S CHALK PIPE: out of the plan's door, sweeping across the snow toward us, its end facing the warm one
+    ctrl = [(-1.7, 30.0), (-2.0, 20.0), (-2.6, 12.0), (-2.7, 7.5), (-2.2, 4.8), (-1.3, 3.3), (-0.6, 2.8), (gx - 0.12, gz)]
+    pts3 = []
+    for (a_, b_) in zip(ctrl, ctrl[1:]):
+        nseg = 14 if a_[1] > 10 else 8
+        for t in range(nseg):
+            uu = t / nseg
+            pts3.append((a_[0] + (b_[0] - a_[0]) * uu, a_[1] + (b_[1] - a_[1]) * uu))
+    pts3.append(ctrl[-1])
+    for _ in range(2):
+        pts3 = [pts3[0]] + [((pts3[i - 1][0] + pts3[i][0] + pts3[i + 1][0]) / 3, (pts3[i - 1][1] + pts3[i][1] + pts3[i + 1][1]) / 3)
+                            for i in range(1, len(pts3) - 1)] + [pts3[-1]]
+    top_e = [P(X, 2 * R, Z) for X, Z in pts3]
+    bot_e = [P(X, 0.0, Z) for X, Z in pts3]
+    out.append(poly(top_e + bot_e[::-1], v(88), 0.10))
+    for edge, sw0 in ((top_e, 1.0), (bot_e, 0.85)):
+        for a, b in zip(edge, edge[1:]):
+            zz = max(1.0, (b[1] - cam.cy) / 26)
+            out.append(chalk_bold(a, b, rng, min(9.0, 2.0 + zz * 0.6) * sw0, 0.95, 0.24, breaks=False))
+    # chalk hatching across its body (the drawn shading), denser near
+    for i in range(2, len(pts3) - 2, 2):
+        X, Z = pts3[i]
+        if Z > 16:
+            continue
+        a, b = P(X - 0.05, 2 * R * 0.95, Z + 0.05), P(X + 0.06, 0.03, Z - 0.05)
+        out.append(chalk_line(a, b, rng, max(1.4, 9.0 / Z), col=CHALK_HI, op=0.55, breaks=False))
+    # its end, at the gap: the open end drawn as an ellipse, chalk dust falling where it is being drawn right now,
+    # its rim warmed honey by the light across the gap
+    Xe, Ze = ctrl[-1]
+    ec = P(Xe, R, Ze)
+    ery = R * f / Ze
+    out.append(ell(ec[0], ec[1], ery * 0.42, ery, 'none', extra='stroke="%s" stroke-width="7" opacity="0.95"' % CHALK_HI))
+    out.append(ell(ec[0] + 3, ec[1], ery * 0.42, ery, 'none', extra='stroke="%s" stroke-width="5" opacity="0.75" filter="url(#soft1)"' % w(90)))
+    out.append(ell(ec[0], ec[1], ery * 1.2, ery * 1.35, v(98), 0.22, extra='filter="url(#gM)"'))
+    for k in range(26):
+        out.append(circ(ec[0] + rng.uniform(-60, 10), ec[1] + rng.uniform(-ery * 1.1, ery * 1.3), rng.uniform(1.2, 3.2), v(98),
+                        rng.uniform(0.4, 0.9)))
+    # the warm tip, a hand's breadth away: the heat breaking up through the snow, steam rising, the brightest thing
+    wt = P(gx + 0.12, 0, gz)
+    k_ = f / gz / 333.0
+    out.append(ell(wt[0] + 14 * k_, wt[1] - 14 * k_, 160 * k_, 92 * k_, w(80), 0.55, extra='filter="url(#gL)"'))
+    out.append(ell(wt[0] + 10 * k_, wt[1] - 8 * k_, 62 * k_, 34 * k_, w(92), 0.85, extra='filter="url(#gM)"'))
+    out.append(path(smooth([(wt[0] - 5 * k_, wt[1] + 10 * k_), (wt[0] - 3 * k_, wt[1] - 18 * k_), (wt[0] + 24 * k_, wt[1] - 34 * k_),
+                            (wt[0] + 60 * k_, wt[1] - 24 * k_), (wt[0] + 76 * k_, wt[1] + 5 * k_), (wt[0] + 40 * k_, wt[1] + 18 * k_)],
+                           closed=True), w(94), extra='filter="url(#soft3)"'))
+    out.append(ell(wt[0] + 12 * k_, wt[1] - 9 * k_, 26 * k_, 15 * k_, w(100), 0.95, extra='filter="url(#soft3)"'))
+    out.append(wisps(wt[0] + 18 * k_, wt[1] - 30 * k_, 230, 4, mix(w(92), v(94), 0.4), 8, rng, spread=18, op=0.55, blur='gS', lean=0.06))
+    # the gap itself: a small bright slit of warm light between the two ends
+    out.append(ell((wt[0] + ec[0]) / 2 - 4, ec[1] + ery * 0.2, 18 * k_, ery * 0.85, w(98), 0.55, extra='filter="url(#gS)"'))
+    # the 2027 tag on its stake, by the gap
+    sa, sb = P(-1.1, 0, 3.8), P(-1.1, 0.95, 3.8)
+    out.append(line(sa[0], sa[1], sb[0], sb[1], v(70), 7))
+    out.append(path('M%.1f,%.1f L%.1f,%.1f' % (sb[0], sb[1] + 6, sb[0] + 6, sb[1] + 34), 'none', v(84), 2.5))
+    tx0, ty0 = sb[0] - 104, sb[1] + 30
+    out.append(poly([(tx0, ty0 + 6), (tx0 + 212, ty0), (tx0 + 216, ty0 + 100), (tx0 + 4, ty0 + 106)], v(94)))
+    out.append(circ(tx0 + 196, ty0 + 14, 5, v(40)))
+    out.append('<text x="%.1f" y="%.1f" text-anchor="middle" font-family="Gaegu" font-weight="700" font-size="88" fill="%s">2027</text>'
+               % (tx0 + 108, ty0 + 82, v(12)))
     out.append(snowfall(rng, n=150))
     out.append(caption([[('The city has a plan,', False)], [('starting ', False), ('next year.', True)]], size=98))
     return ''.join(out) + texture()
@@ -1683,8 +1917,10 @@ def f_B10(rng):
 
 
 # ============================================================== HOME: UNDER THE SNOW (B11), THE WINDOW (B12)
-def block_front(rng, x0, x1, base_y, top_y, floors, win_w, win_h, lit_fn, face=None, snow=None, focal=None, turret=True, roof_h=120):
-    """A Jugend block seen across the street (nearly frontal): stone, a steep snowy roof, chimneys, windows."""
+def block_front(rng, x0, x1, base_y, top_y, floors, win_w, win_h, lit_fn, face=None, snow=None, focal=None, turret=True, roof_h=120,
+                low_roof=False):
+    """A Jugend block seen across the street (nearly frontal): stone, a steep snowy roof, chimneys, windows.
+    low_roof (round 2, B11): the roof, its chimneys and the turret's cap kept below the caption band (lower and squatter)."""
     face = face or v(22)
     snow = snow or v(74)
     out = []
@@ -1698,9 +1934,24 @@ def block_front(rng, x0, x1, base_y, top_y, floors, win_w, win_h, lit_fn, face=N
     out.append(poly([(x0 + 40, top_y - roof_h), (x1 - 40, top_y - roof_h), (x1 - 30, top_y - roof_h * 0.83), (x0 + 30, top_y - roof_h * 0.83)], snow))
     out.append(poly([(x0 - 14, top_y - 4), (x1 + 14, top_y - 4), (x1 + 4, top_y - 22), (x0 - 4, top_y - 22)], snow))
     for cxx in range(int(x0 + 80), int(x1 - 40), 150):
-        out.append(rect(cxx, top_y - roof_h - 40, 28, 52, v(15)))
-        out.append(rect(cxx - 4, top_y - roof_h - 46, 36, 10, snow))
-    if turret:
+        if low_roof:
+            out.append(rect(cxx, top_y - roof_h - 22, 28, 34, v(15)))
+            out.append(rect(cxx - 4, top_y - roof_h - 28, 36, 9, snow))
+        else:
+            out.append(rect(cxx, top_y - roof_h - 40, 28, 52, v(15)))
+            out.append(rect(cxx - 4, top_y - roof_h - 46, 36, 10, snow))
+    if turret and low_roof:
+        # the corner turret under a low round cap (its top stays under the caption band)
+        tx = x1 - 70
+        cap_y = top_y - roof_h - 28
+        out.append(rect(tx - 50, top_y - 34, 100, 194, mix(face, v(30), 0.4)))
+        out.append(path('M%.1f,%.1f C%.1f,%.1f %.1f,%.1f %.1f,%.1f C%.1f,%.1f %.1f,%.1f %.1f,%.1f Z' % (
+            tx - 58, top_y - 34, tx - 56, cap_y + 30, tx - 24, cap_y + 2, tx, cap_y,
+            tx + 24, cap_y + 2, tx + 56, cap_y + 30, tx + 58, top_y - 34), v(12)))
+        out.append(path('M%.1f,%.1f C%.1f,%.1f %.1f,%.1f %.1f,%.1f L%.1f,%.1f C%.1f,%.1f %.1f,%.1f %.1f,%.1f Z' % (
+            tx - 58, top_y - 34, tx - 56, cap_y + 30, tx - 24, cap_y + 2, tx, cap_y, tx - 4, cap_y + 12,
+            tx - 22, cap_y + 16, tx - 40, cap_y + 34, tx - 44, top_y - 34), snow, 0.55))
+    elif turret:
         tx = x1 - 70
         out.append(rect(tx - 50, top_y - 60, 100, 220, mix(face, v(30), 0.4)))
         out.append(poly([(tx - 58, top_y - 60), (tx + 58, top_y - 60), (tx, top_y - 230)], v(12)))
@@ -1729,7 +1980,7 @@ def street_across(rng, lit_fn, focal=None, horizon=1150, cut=False, melt=True):
     out.append(cloud(240, 170, 560, 160, v(21), v(35), rng, n=10))
     # the block across the street (the subject) and its neighbours cut by the edges
     out.append(block_front(rng, -120, 150, 1330, 820, 5, 44, 70, lambda k, j: False, face=v(18), turret=False))
-    out.append(block_front(rng, 170, 930, 1330, 700, 5, 70, 108, lit_fn, face=v(23), focal=focal))
+    out.append(block_front(rng, 170, 930, 1330, 700, 5, 70, 108, lit_fn, face=v(23), focal=focal, roof_h=62, low_roof=True))
     out.append(block_front(rng, 950, 1300, 1330, 760, 5, 50, 80, lambda k, j: False, face=v(19), turret=False))
     # the door of the block (the heat goes in at its cellar)
     out.append(rect(510, 1180, 90, 150, v(8)))
@@ -2005,8 +2256,8 @@ def f_B1alt(rng):
     return ''.join(out) + texture()
 
 
-def f_B5alt(rng):
-    """The tea cosy: the giant computer under a huge knitted tea cosy, its spout and handle poking out (a teapot under its
+def f_cosy(rng):
+    """B5 since round 2 (taken from the alternates). The tea cosy: the giant computer under a huge knitted tea cosy, its spout and handle poking out (a teapot under its
     cosy: the teapot computer itself), the knit lit warm by the heat beneath; she holds her tiny mug up under the spout."""
     out = [hall_front_bg(rng)]
     out.append(side_racks(rng, y0=760, y1=1600, xs=((-300, 150), (930, 1380))))
@@ -2072,13 +2323,17 @@ def f_B5alt(rng):
     out.append(figure(J, v(7), wl=20, wa=15, rim=(w(78), -3)))
     out.append(rect(796, 1112, 40, 44, v(92), rx=6))
     out.append(path('M%.1f,%.1f q14,6 0,22' % (836, 1120), 'none', v(92), 5))
+    # round 2 (B5's best detail brought in): her tiny mug's own tiny tea tag, its string over the rim
+    mx, my = 816, 1112
+    out.append(path('M%.1f,%.1f Q%.1f,%.1f %.1f,%.1f' % (mx - 9, my + 2, mx - 25, my + 10, mx - 29, my + 36), 'none', v(84), 2.2))
+    out.append(tea_tag(mx - 29, my + 36, 24, 30, 7, lit=0.7))
     out.append(ell(560, 1650, 330, 50, w(70), 0.3, extra='filter="url(#gL)"'))
     out.append(caption([[("That's a lot of ", False), ('tea.', True)]]))
     return ''.join(out) + texture()
 
 
-def f_B7alt(rng):
-    """The street opens a way: down the middle of the island's street the manhole lids lift one after another, each a
+def f_street_way(rng):
+    """B7 since round 2 (taken from the alternates, kept as drawn). The street opens a way: down the middle of the island's street the manhole lids lift one after another, each a
     warm light laid toward the harbour end, a runway reaching for the heat that the hall's fans are throwing into the
     sky at the street's end."""
     cam = Cam(f=1000, cx=540, cy=1150, eye=1.6)
@@ -2109,7 +2364,7 @@ def f_B7alt(rng):
 
 def melt_line_street(rng, woman='tiny'):
     """The melt line: no cut; the heat shows as a melted line in the snow, a steaming manhole, frost clearing up the
-    block. woman: 'tiny' (B11alt as judged THERE) or 'glass' (B11: bigger, at the glass, looking out at the street)."""
+    block. woman: 'glass' (B11: bigger, at the glass, looking out at the street) or 'tiny' (round 0's B11alt)."""
     def litf(k, j):
         return {0: True, 1: True, 2: j in (1, 2, 4), 3: j in (2,), 4: False}.get(k, False)
     out = [street_across(rng, litf, focal=(2, 2))]
@@ -2164,22 +2419,21 @@ def woman_at_glass(fx, fy, fw, fh):
     return ''.join(out)
 
 
-def f_B11alt(rng):
-    """The melt line (judged THERE: kept as it is)."""
-    return melt_line_street(rng, woman='tiny')
-
-
 FRAMES = {
-    'B1': f_B1, 'B2': f_B2, 'B3': f_B3, 'B4': f_B4, 'B5': f_B5, 'B6': f_B6, 'B7': f_B7, 'B8': f_B8,
+    'B1': f_B1, 'B2': f_B2, 'B3': f_B3, 'B4': f_B4, 'B5': f_cosy, 'B6': f_B6, 'B7': f_street_way, 'B8': f_B8,
     'B9': f_B9, 'B10': f_B10, 'B11': f_B11, 'B12': f_B12,
-    'B1alt': f_B1alt, 'B5alt': f_B5alt, 'B7alt': f_B7alt, 'B11alt': f_B11alt,
+    'B1alt': f_B1alt, 'B5alt': f_teapot, 'B7alt': f_roof_reach,
 }
+# round 2 swapped B5 and B7 with their alternates (and dropped B11alt, the same picture as B11): each swapped frame
+# keeps the random seed it was drawn with, so it stays exactly as judged
+SEED_ID = {'B5': 'B5alt', 'B5alt': 'B5', 'B7': 'B7alt', 'B7alt': 'B7'}
 
 
 def main(ids):
     os.makedirs(PAGES, exist_ok=True)
     for fid in ids or list(FRAMES):
-        rng = random.Random(sum(ord(c) * (i + 1) for i, c in enumerate(fid)) + 17)
+        sid = SEED_ID.get(fid, fid)
+        rng = random.Random(sum(ord(c) * (i + 1) for i, c in enumerate(sid)) + 17)
         body = FRAMES[fid](rng)
         with open(os.path.join(PAGES, fid + '.html'), 'w') as fh:
             fh.write(page(body))

@@ -861,15 +861,21 @@ def facade(f, quad, floors, cols, L=26, states=None, frost_L=60, win_w=0.46, win
     return m
 
 
-def hand_phone(f, x, y, s=1.0, bubble=True, L_glove=17):
-    """POV: your gloved hand from the bottom left holding a phone; (x, y) the screen's top-left"""
+def hand_phone(f, x, y, s=1.0, bubble=True, L_glove=17, mine_right=False):
+    """POV: your gloved hand from the bottom left holding a phone; (x, y) the screen's top-left.
+    mine_right: your own message (honey) right-aligned and lower, the reply above it on the left, as a chat shows them"""
     sw, sh = 190 * s, 330 * s
     # the phone's dark case and its cool screen
     f.add(f'<rect x="{x - 10 * s}" y="{y - 12 * s}" width="{sw + 20 * s}" height="{sh + 24 * s}" rx="{26 * s}" fill="{g(9)}"/>')
     scr = f.lingrad([(0, g(78), 1), (1, g(70), 1)])
     f.add(f'<rect x="{x}" y="{y}" width="{sw}" height="{sh}" rx="{18 * s}" fill="{scr}"/>')
     f.add(f'<rect x="{x - 30 * s}" y="{y - 30 * s}" width="{sw + 60 * s}" height="{sh + 60 * s}" rx="40" fill="{g(80)}" opacity="0.18" filter="url(#glow)"/>')
-    if bubble:
+    if bubble and mine_right:
+        f.add(f'<rect x="{x + sw * 0.08}" y="{y + sh * 0.3}" width="{sw * 0.6}" height="{46 * s}" rx="{22 * s}" fill="{g(88)}"/>')
+        f.add(f'<rect x="{x + sw * 0.3}" y="{y + sh * 0.52}" width="{sw * 0.62}" height="{58 * s}" rx="{26 * s}" fill="{HONEY}"/>')
+        f.add(f'<path d="M{x + sw * 0.86},{y + sh * 0.52 + 50 * s} l{12 * s},{12 * s} l{-2 * s},{-16 * s}Z" fill="{HONEY}"/>')
+        f.add(f'<rect x="{x + sw * 0.3}" y="{y + sh * 0.52}" width="{sw * 0.62}" height="{58 * s}" rx="{26 * s}" fill="{HONEY}" opacity="0.5" filter="url(#glow)"/>')
+    elif bubble:
         f.add(f'<rect x="{x + 22 * s}" y="{y + 150 * s}" width="{sw - 50 * s}" height="{58 * s}" rx="{26 * s}" fill="{HONEY}"/>')
         f.add(f'<rect x="{x + 50 * s}" y="{y + 80 * s}" width="{sw - 75 * s}" height="{46 * s}" rx="{22 * s}" fill="{g(88)}"/>')
         f.add(f'<rect x="{x + 22 * s}" y="{y + 150 * s}" width="{sw - 50 * s}" height="{58 * s}" rx="{26 * s}" fill="{HONEY}" opacity="0.5" filter="url(#glow)"/>')

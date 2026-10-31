@@ -26,41 +26,93 @@ def cap(*lines, size=108):
 
 
 # ------------------------------------------------------------------ the far city: seventy thousand homes across the bay
-def sea_of_windows(seed, x0, x1, base, top, warm_p=0.85, wave_left=0.3, front=0.16):
-    """Blocks of flats shoulder to shoulder along the far shore in two rows (the far row higher up the slope, paler,
-    its windows smaller), every block a grid of windows: a sea of windows. The wave of warmth runs right to left: warm
-    past its front, just turning at it, still cold before it."""
+def sea_of_windows(seed, x0, x1, base, top, warm_p=0.85, wave_left=0.3, front=0.16, s=1.0, domes_u=None):
+    """Round 2 (B1's note 2, the board read's one world): Helsinki across the bay as it is, long and low, never a wall
+    of towers. Jugend blocks of five to seven storeys stand shoulder to shoulder along the far shore in three rows
+    stepping gently up the city's slope (the far rows paler, their windows smaller); each is a grid of windows under a
+    steep tin roof carrying snow (chimneys, lit dormers; here a corner turret's pointed cap, there a curved Jugend
+    gable). Still a sea of windows: the wave of warmth runs right to left, warm past its front, just turning at it,
+    still cold before it. Uspenski's onion domes (at domes_u of the width) rise over the middle row's roofs into the
+    glow. s scales every size (the old B2's door draws the same city small)."""
     rnd = random.Random(seed)
-    o, wins = [], []
-    for b, hs, col, wcol, ww, wh, gx, gy in ((base - 30, 0.98, g(18), g(29), 4.6, 6.0, 9, 12),
-                                              (base, 0.6, g(13), g(26), 6.2, 8.2, 11.5, 15)):
-        x = x0 - 40
-        while x < x1 + 40:
-            w = rnd.uniform(50, 120)
-            hgt = (base - top) * hs * rnd.uniform(0.5, 1.0) * (1.22 if rnd.random() < 0.07 else 1.0)
-            o.append(rect(x, b - hgt, w, hgt + 70, col))
-            if rnd.random() < 0.35:
-                o.append(poly([(x, b - hgt + 1), (x + w / 2, b - hgt - rnd.uniform(10, 24)), (x + w, b - hgt + 1)], col))
-            cols, rows = max(1, int((w - 8) // gx)), max(1, int((hgt - 10) // gy))
-            for r in range(rows):
-                for c in range(cols):
-                    wx, wy = x + 5 + c * gx, b - hgt + 8 + r * gy
-                    t = (wx - x0) / float(x1 - x0)
-                    pw = warm_p * min(1.0, max(0.0, (t - wave_left) / front + 0.06))
-                    u = rnd.random()
-                    if u < pw:
-                        wins.append(rect(wx, wy, ww, wh, HONEY if rnd.random() < 0.62 else HONEY_MID, opacity=f(rnd.uniform(0.8, 1.0))))
-                    elif u < pw + 0.06 and 0 < (t - wave_left) < front:
-                        wins.append(rect(wx, wy, ww, wh, HONEY_DEEP))           # just turning, at the wave's front
-                    elif u < pw + (0.34 if pw < 0.4 else 0.1):
-                        wins.append(rect(wx, wy, ww, wh, wcol))
-            x += w * rnd.uniform(0.82, 1.0)
-    return grp(''.join(o), filter='url(#b1)') + ''.join(wins)
+    Ht, span = float(base - top), float(x1 - x0)
+    out = []
+
+    def win(wins, wx, wy, ww, wh, wcol):
+        t = (wx - x0) / span
+        pw = warm_p * min(1.0, max(0.0, (t - wave_left) / front + 0.06))
+        u = rnd.random()
+        if u < pw:
+            wins.append(rect(wx, wy, ww, wh, HONEY if rnd.random() < 0.62 else HONEY_MID, opacity=f(rnd.uniform(0.8, 1.0))))
+        elif u < pw + 0.06 and 0 < (t - wave_left) < front:
+            wins.append(rect(wx, wy, ww, wh, HONEY_DEEP))           # just turning, at the wave's front
+        elif u < pw + (0.34 if pw < 0.4 else 0.1):
+            wins.append(rect(wx, wy, ww, wh, wcol))
+
+    # back to front: (the row's foot, facade height as a share of Ht, facade, snow on the roof, tin, a cold window,
+    # window w / h, window step x / y, block width)
+    rows = ((base - 0.52 * Ht, (0.17, 0.25), g(20), g(24), g(42), g(29), 3.4, 4.4, 6.6, 8.8, (70, 130)),
+            (base - 0.26 * Ht, (0.21, 0.30), g(16), g(20), g(46), g(27), 4.4, 5.6, 8.4, 11.2, (90, 165)),
+            (base, (0.27, 0.36), g(12), g(16), g(50), g(25), 5.6, 7.2, 10.6, 13.8, (110, 200)))
+    for b, (h0, h1), fac, tin, snowc, wcol, ww, wh, gx, gy, (w0, w1) in rows:
+        ww, wh, gx, gy = ww * s, wh * s, gx * s, gy * s
+        o, wins = [], []
+        x = x0 - 40 * s
+        while x < x1 + 40 * s:
+            w = rnd.uniform(w0, w1) * s
+            fh = rnd.uniform(h0, h1) * Ht
+            rh = fh * rnd.uniform(0.28, 0.4)                    # the steep tin roof
+            et = b - fh                                          # the eave
+            ins = rh * 0.8
+            kind = rnd.random()
+            o.append(rect(x, et, w, fh + 70 * s, fac))
+            o.append(poly([(x - 1.5 * s, et + 1), (x + ins, et - rh), (x + w - ins, et - rh), (x + w + 1.5 * s, et + 1)], tin))
+            o.append(line(x + ins, et - rh, x + w - ins, et - rh, snowc, 2.6 * s) + line(x - 1.5 * s, et, x + w + 1.5 * s, et, snowc, 2.2 * s, opacity='0.8') +
+                     line(x - 1.5 * s, et + 1, x + ins, et - rh, snowc, 1.6 * s, opacity='0.7') + line(x + w + 1.5 * s, et + 1, x + w - ins, et - rh, snowc, 1.6 * s, opacity='0.7'))
+            for _ in range(rnd.randint(1, 2)):                   # chimneys on the ridge, capped with snow
+                cx_ = rnd.uniform(x + ins + 4 * s, max(x + ins + 5 * s, x + w - ins - 10 * s))
+                ch = rnd.uniform(8, 14) * s
+                o.append(rect(cx_, et - rh - ch * 0.6, 5 * s, ch, tin) + rect(cx_ - 1 * s, et - rh - ch * 0.6 - 2 * s, 7 * s, 3 * s, snowc))
+            nd = int((w - 2 * ins - 8 * s) // (24 * s))          # dormers in the roof, some lit
+            for k in range(nd):
+                dx_, dy_ = x + ins + 8 * s + k * 24 * s, et - rh * 0.5
+                o.append(rect(dx_, dy_, 11 * s, rh * 0.42, fac) + poly([(dx_ - 2 * s, dy_ + 1), (dx_ + 5.5 * s, dy_ - 6 * s), (dx_ + 13 * s, dy_ + 1)], snowc))
+                win(wins, dx_ + 3 * s, dy_ + 2 * s, ww * 0.85, wh * 0.85, wcol)
+            if kind < 0.24:
+                # a corner turret: a pointed cap over the corner bay
+                tw_ = 18 * s
+                tx = x + (w - tw_ if rnd.random() < 0.5 else 0)
+                o.append(rect(tx, et - rh * 0.75, tw_, rh * 0.75 + 2, fac))
+                o.append(poly([(tx - 2.5 * s, et - rh * 0.75 + 1), (tx + tw_ / 2, et - rh * 0.75 - rh * 1.25), (tx + tw_ + 2.5 * s, et - rh * 0.75 + 1)], tin))
+                o.append(poly([(tx + tw_ * 0.2, et - rh * 0.75 - rh * 0.25), (tx + tw_ / 2, et - rh * 0.75 - rh * 1.25), (tx + tw_ * 0.5, et - rh * 0.75 - rh * 0.2)], snowc))
+                win(wins, tx + (tw_ - ww) / 2, et - rh * 0.6, ww, wh, wcol)
+            elif kind < 0.44:
+                # a curved Jugend gable over the middle bays
+                gw, gh = w * 0.34, rh * 1.15
+                gx0 = x + (w - gw) / 2
+                o.append(path('M %s %s L %s %s C %s %s %s %s %s %s C %s %s %s %s %s %s L %s %s Z' % (
+                    f(gx0), f(et + 1), f(gx0), f(et - gh * 0.5), f(gx0), f(et - gh * 0.95), f(gx0 + gw * 0.3), f(et - gh), f(gx0 + gw / 2), f(et - gh),
+                    f(gx0 + gw * 0.7), f(et - gh), f(gx0 + gw), f(et - gh * 0.95), f(gx0 + gw), f(et - gh * 0.5), f(gx0 + gw), f(et + 1)), fac))
+                o.append(path('M %s %s C %s %s %s %s %s %s C %s %s %s %s %s %s' % (
+                    f(gx0), f(et - gh * 0.5), f(gx0), f(et - gh * 0.95), f(gx0 + gw * 0.3), f(et - gh), f(gx0 + gw / 2), f(et - gh),
+                    f(gx0 + gw * 0.7), f(et - gh), f(gx0 + gw), f(et - gh * 0.95), f(gx0 + gw), f(et - gh * 0.5)), 'none', stroke=snowc, stroke_width=f(2.4 * s)))
+                win(wins, gx0 + gw / 2 - ww * 0.6, et - gh * 0.62, ww * 1.2, wh * 1.1, wcol)
+            # its windows: a grid, five to seven storeys under the eave
+            ncols = max(1, int((w - 8 * s) // gx))
+            off = (w - ncols * gx) / 2 + (gx - ww) / 2
+            for r in range(max(1, int((fh - 5 * s) // gy))):
+                for c in range(ncols):
+                    win(wins, x + off + c * gx, et + 5 * s + r * gy, ww, wh, wcol)
+            x += w * rnd.uniform(0.92, 1.0)                      # shoulder to shoulder
+        out.append(grp(''.join(o), filter='url(#b1)') + ''.join(wins))
+        if domes_u is not None and len(out) == 1:
+            out.append(grp(domes(x0 + domes_u * span, base - 0.26 * Ht + 4 * s, 0.6 * s, g(11), snowcol=g(46)), filter='url(#rough2)'))
+    return ''.join(out)
 
 
 # ------------------------------------------------------------------ shared: her flat's big window and the view
 def night_view(seed, x0, y0, x1, y1, horizon=1000, warm_p=0.75, wave_left=0.25, domes_at=(250, 1012), ships=True,
-               near_roofs=True, plan=None, frost_clear=False, roof_y=1085, sky_top=10, glow=34, city='belt', city_top=None):
+               near_roofs=True, plan=None, frost_clear=False, roof_y=1085, sky_top=10, glow=34, city='belt', city_top=None, domes_u=None):
     """The view from her window over Katajanokka's roofs to the bay and the far city. Returns (defs, body).
     city='sea': the far city up and wide, a sea of windows (her living-room window, B1 and B12: the same view)."""
     rnd = random.Random(seed)
@@ -103,12 +155,14 @@ def night_view(seed, x0, y0, x1, y1, horizon=1000, warm_p=0.75, wave_left=0.25, 
             elif rnd.random() < 0.35:
                 wins.append(rect(wx, wy, 3, 4, g(40)))
     if city == 'sea':
-        # the far city up and wide in the glass: seventy thousand homes, a sea of windows; a far crane, a tower
+        # the far city wide and low in the glass (round 2: Helsinki's harbour blocks, never a wall of towers): seventy
+        # thousand homes, a sea of windows; a harbour crane over the far quay
         top = city_top or horizon - 260
-        o.append(grp(pline([(900, top + 70), (900, top - 40), (820, top - 26)], g(19), 5) + line(900, top - 40, 990, top - 22, g(19), 3) +
-                     rect(300, top - 20, 18, 120, g(18)) + poly([(296, top - 20), (309, top - 60), (322, top - 20)], g(18)),
+        o.append(grp(ell(x0 + 0.55 * (x1 - x0), top + 70, (x1 - x0) * 0.62, 95, g(40), opacity='0.75'), filter='url(#b30)'))  # the city's glow on the snow cloud
+        o.append(grp(ell(x0 + (0.5 + 0.5 * wave_left) * (x1 - x0), top + 80, (x1 - x0) * (0.5 - 0.4 * wave_left), 80, HONEY_DEEP, opacity='0.22'), filter='url(#b30)'))
+        o.append(grp(pline([(900, top + 150), (900, top + 34), (826, top + 46)], g(19), 5) + line(900, top + 34, 984, top + 50, g(19), 3),
                      filter='url(#b1)'))
-        o.append(sea_of_windows(seed * 7 + 3, x0, x1, horizon + 6, top, warm_p, wave_left))
+        o.append(sea_of_windows(seed * 7 + 3, x0, x1, horizon + 6, top, warm_p, wave_left, domes_u=domes_u))
     else:
         o.append(grp(''.join(fc), filter='url(#b1)'))
         o.append(''.join(wins))
@@ -165,6 +219,10 @@ def night_view(seed, x0, y0, x1, y1, horizon=1000, warm_p=0.75, wave_left=0.25, 
 
 
 # ------------------------------------------------------------------ D-B1 (and its warm match, D-B12)
+# round 2 (one real Helsinki): Uspenski's onion domes over the roofs, rising into the city's glow (B1 and B12, the same)
+DOMES_U = 0.8
+
+
 def living_room(state='landing'):
     """Her living room at night: the deep old window over Katajanokka's roofs, the bay and the far city.
     state 'landing' = B1 (frost melting, the radiator warming, the city's windows warming in a wave);
@@ -176,45 +234,91 @@ def living_room(state='landing'):
     gx0, gy0, gx1, gy1 = 96, 166, 984, 1300
     defs += '<clipPath id="glass"><rect x="%d" y="%d" width="%d" height="%d"/></clipPath>' % (gx0, gy0, gx1 - gx0, gy1 - gy0)
     d2, view = night_view(41, gx0, gy0, gx1, gy1, horizon=1040, warm_p=0.95 if warm else 0.92,
-                          wave_left=0.0 if warm else 0.36, domes_at=(226, 1052), city='sea', city_top=772, roof_y=1140)
+                          wave_left=0.0 if warm else 0.36, domes_at=None, domes_u=DOMES_U, city='sea', city_top=772, roof_y=1140)
     defs += d2
     o.append('<g clip-path="url(#glass)">' + view)
     if not warm:
-        # the hook's event (round 1): the pane frosted over at frame 0, caught mid-clear: the frost melting back from
-        # the middle (a lacy crystal edge, a wet band, a few clear trails where drops ran down) onto the city warming
+        # the hook's event: the pane frosted over at frame 0, caught mid-clear, the frost melting back from the middle
+        # onto the city warming. Round 2 (note 1: the clearing read as a dark cloud, as smoke): the frost is one even veil
+        # cut cleanly at the melting edge (no soft dark halo round it), the edge a bright lacy rim of crystals, wet just
+        # inside, drops running down from it through the frost; the cleared glass clean (no frost line across the city)
         cx, cy, rx, ry = 612, 916, 350, 196
         edge = blob(57, cx, cy, rx, ry, n=22, jit=0.14)
-        inner = [(cx + (x_ - cx) * 0.84, cy + (y_ - cy) * 0.84) for x_, y_ in edge]
-        outer = [(cx + (x_ - cx) * 1.2, cy + (y_ - cy) * 1.2) for x_, y_ in edge]
+        hole = smooth_closed(edge)
+        bigger = smooth_closed([(cx + (x_ - cx) * 1.03, cy + (y_ - cy) * 1.03) for x_, y_ in edge])
         rr = random.Random(56)
-        drips = ''
-        for k in range(6):
-            dx = cx - rx * 0.7 + k * rx * 1.4 / 5 + rr.uniform(-20, 20)
-            ye = cy + ry * math.sqrt(max(0.0, 1 - ((dx - cx) / rx) ** 2)) - 16
-            L = rr.uniform(70, 200)
-            pts_ = [(dx + math.sin(v * 0.9 + k) * 2.5, ye + v * L / 6.0) for v in range(7)]
-            drips += pline(pts_, '#5a5a5a', rr.uniform(5, 7)) + circ(pts_[-1][0], pts_[-1][1] + 3, 6, '#4a4a4a')
-        lower = '<clipPath id="lowpanes"><rect x="%d" y="652" width="%d" height="%d"/></clipPath>' % (gx0, gx1 - gx0, gy1 - 652)
-        defs += lower
+        # the drops: water running down from the lower edge, each clearing its own channel through the frost
+        trails, drops = [], ''
+        for k in (2, 3, 4, 5, 6, 7, 8, 9):
+            if k in (4, 8):
+                continue
+            ex, ey = edge[k]
+            ex, ey = cx + (ex - cx) * 0.97 + rr.uniform(-14, 14), cy + (ey - cy) * 0.97
+            L = rr.uniform(90, 230)
+            trails.append(([(ex + math.sin(v * 0.9 + k) * 3.0, ey + v * L / 6.0) for v in range(7)], rr.uniform(8, 11)))
+        tr_mask = ''.join(pline(p_, 'black', w_) for p_, w_ in trails)
+        defs += '<clipPath id="lowpanes"><rect x="%d" y="652" width="%d" height="%d"/></clipPath>' % (gx0, gx1 - gx0, gy1 - 652)
         defs += ('<mask id="frostm" maskUnits="userSpaceOnUse" x="0" y="0" width="1080" height="1920">'
                  '<rect x="0" y="0" width="1080" height="1920" fill="white"/>'
-                 '<g filter="url(#b4)"><path d="%s" fill="black"/></g><g filter="url(#b1)">%s</g></mask>') % (smooth_closed(edge), drips)
+                 '<g filter="url(#b1)"><path d="%s" fill="black"/>%s</g></mask>') % (hole, tr_mask)
         defs += ('<mask id="fernm" maskUnits="userSpaceOnUse" x="0" y="0" width="1080" height="1920">'
                  '<rect x="0" y="0" width="1080" height="1920" fill="white"/>'
-                 '<g filter="url(#b2)"><path d="%s" fill="black"/></g><g filter="url(#b1)">%s</g></mask>') % (smooth_closed(inner), drips)
-        defs += ('<mask id="frostm2" maskUnits="userSpaceOnUse" x="0" y="0" width="1080" height="1920">'
-                 '<rect x="0" y="0" width="1080" height="1920" fill="white"/>'
-                 '<g filter="url(#b16)"><path d="%s" fill="black"/></g></mask>') % smooth_closed(outer)
-        haze = rect(gx0, 652, gx1 - gx0, gy1 - 652, '#dbe3ec', opacity='0.36') + rect(gx0, 1150, gx1 - gx0, gy1 - 1150, '#e8eef4', opacity='0.25')
-        haze2 = rect(gx0, 652, gx1 - gx0, gy1 - 652, '#dbe3ec', opacity='0.3')
-        o.append('<g clip-path="url(#lowpanes)"><g mask="url(#frostm)">' + haze + '</g><g mask="url(#frostm2)">' + haze2 + '</g>'
-                 '<g mask="url(#fernm)">' + frost(5, gx0, 652, gx1, gy1, n=190, op=0.85, interior=0.62) + '</g></g>')
-        # the wet band just inside the melting edge, and beads of water along it
-        o.append(grp(path(smooth_closed(edge), 'none', stroke='#cfd8e3', stroke_width='10', opacity='0.18'), filter='url(#b4)'))
-        for k in range(46):
-            px_, py_ = edge[k % len(edge)]
-            px_ += rr.uniform(-10, 10); py_ += rr.uniform(-4, 12)
-            o.append(circ(px_, py_, rr.uniform(2.2, 4.6), '#eef3f8', opacity=f(rr.uniform(0.35, 0.7))))
+                 '<path d="%s" fill="black"/>%s</mask>') % (bigger, ''.join(pline(p_, 'black', w_ + 6) for p_, w_ in trails))
+        defs += ('<mask id="outh" maskUnits="userSpaceOnUse" x="0" y="0" width="1080" height="1920">'
+                 '<rect x="0" y="0" width="1080" height="1920" fill="white"/><path d="%s" fill="black"/></mask>'
+                 '<mask id="inh" maskUnits="userSpaceOnUse" x="0" y="0" width="1080" height="1920"><path d="%s" fill="white"/></mask>') % (hole, hole)
+        defs += ('<filter id="lace" x="-10%" y="-10%" width="120%" height="120%">'
+                 '<feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="2" seed="41" result="n"/>'
+                 '<feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G" result="d"/>'
+                 '<feTurbulence type="fractalNoise" baseFrequency="0.42" numOctaves="2" seed="43" result="gr"/>'
+                 '<feColorMatrix in="gr" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 3.6 -1.25" result="m"/>'
+                 '<feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="2" seed="47" result="lo"/>'
+                 '<feColorMatrix in="lo" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 3.0 -0.75" result="m2"/>'
+                 '<feComposite in="d" in2="m" operator="in" result="c"/><feComposite in="c" in2="m2" operator="in" result="c2"/>'
+                 '<feGaussianBlur in="c2" stdDeviation="0.5"/></filter>')
+        veil = (rect(gx0, 652, gx1 - gx0, gy1 - 652, '#dbe3ec', opacity='0.52') +
+                rect(gx0, 1150, gx1 - gx0, gy1 - 1150, '#e8eef4', opacity='0.22'))
+        o.append('<g clip-path="url(#lowpanes)"><g mask="url(#frostm)">' + veil + '</g>'
+                 '<g mask="url(#fernm)">' + frost(5, gx0, 652, gx1, gy1, n=190, op=0.85, interior=0.62) + '</g>')
+        # the rim: the crystals heaped bright and lacy along the melting edge, feathering out into the frost
+        rim = (grp(grp(path(hole, 'none', stroke='#f6f9fc', stroke_width='120', opacity='0.5'), filter='url(#lace)'), mask='url(#outh)') +
+               grp(grp(path(hole, 'none', stroke='#f6f9fc', stroke_width='50'), filter='url(#lace)'), mask='url(#outh)') +
+               grp(grp(path(hole, 'none', stroke='#ffffff', stroke_width='12', opacity='0.95'), filter='url(#frostf)'), mask='url(#outh)'))
+        feathers = []
+        ne = len(edge)
+        for k in range(ne * 4):
+            a_, b_ = edge[(k // 4) % ne], edge[(k // 4 + 1) % ne]
+            t_ = (k % 4) / 4.0
+            px_, py_ = a_[0] + (b_[0] - a_[0]) * t_, a_[1] + (b_[1] - a_[1]) * t_
+            ang = math.atan2((py_ - cy) / ry, (px_ - cx) / rx) + rr.uniform(-0.7, 0.7)
+            L_ = rr.uniform(26, 70)
+            qx, qy = px_ + math.cos(ang) * L_, py_ + math.sin(ang) * L_
+            feathers.append(line(px_, py_, qx, qy, '#f4f8fc', rr.uniform(2.0, 3.2), opacity=f(rr.uniform(0.6, 0.95))))
+            for side in (-1, 1):
+                mx, my = px_ + (qx - px_) * 0.5, py_ + (qy - py_) * 0.5
+                feathers.append(line(mx, my, mx + math.cos(ang + side * 0.9) * L_ * 0.35, my + math.sin(ang + side * 0.9) * L_ * 0.35,
+                                     '#f4f8fc', 1.2, opacity='0.7'))
+        rim += grp(grp(''.join(feathers), filter='url(#frostf)'), mask='url(#outh)')
+        o.append(rim)
+        # wet just inside the edge: a film of water on the glass, catching the light, beads of water along it (the
+        # lowest ones catching the city's warm light)
+        o.append(grp(grp(path(hole, 'none', stroke='#e9eff6', stroke_width='30', opacity='0.24'), filter='url(#b2)'), mask='url(#inh)'))
+        for k in range(ne * 3):
+            a_, b_ = edge[(k // 3) % ne], edge[(k // 3 + 1) % ne]
+            t_ = (k % 3) / 3.0 + rr.uniform(0, 0.3)
+            px_, py_ = a_[0] + (b_[0] - a_[0]) * t_, a_[1] + (b_[1] - a_[1]) * t_
+            px_, py_ = cx + (px_ - cx) * rr.uniform(0.94, 0.985), cy + (py_ - cy) * rr.uniform(0.94, 0.985)
+            r_ = rr.uniform(2.4, 5.2)
+            warm_bead = py_ > cy + ry * 0.45 and rr.random() < 0.5
+            o.append(circ(px_, py_, r_, HONEY_HI if warm_bead else '#eef3f8', opacity=f(rr.uniform(0.6, 0.95))) +
+                     circ(px_ - r_ * 0.3, py_ - r_ * 0.35, r_ * 0.35, '#ffffff', opacity='0.9'))
+        # the drops' trails: a wet glint down one side of each channel, the drop itself at its foot
+        for p_, w_ in trails:
+            o.append(pline([(x_ - w_ * 0.45, y_) for x_, y_ in p_], '#f2f6fa', 2.6, opacity='0.75') + pline([(x_ + w_ * 0.45, y_) for x_, y_ in p_], '#f2f6fa', 1.4, opacity='0.4'))
+            lx, ly = p_[-1]
+            o.append(ell(lx, ly + 4, w_ * 0.72, w_ * 0.9, '#eef3f8', opacity='0.95') + ell(lx, ly + 7, w_ * 0.55, w_ * 0.5, g(46), opacity='0.55') +
+                     circ(lx - w_ * 0.25, ly, w_ * 0.22, '#ffffff'))
+        o.append('</g>')
     o.append('</g>')
     fr, lit = g(19), g(36)
     o.append(rect(70, 146, 940, 22, fr) + rect(70, 1298, 940, 26, fr))
@@ -236,11 +340,12 @@ def living_room(state='landing'):
     o.append(grp(poly([(300, 1600), (1000, 1600), (1080, 1920), (520, 1920)], g(17), opacity='0.55'), filter='url(#b16)'))
     o.append(grp(ell(330, 1830, 430, 110, g(14)), filter='url(#rough)'))
     # the radiator: cold in B1, only its first fin waking on the "ding" (its full warmth is B12's)
-    o.append(radiator(420, 1386, 520, 214, n=16, warm=1.0 if warm else 1.0 / 16))
+    # (round 2 polish: the radiator two fins further left, so its waking fin and pipe sit clear of the app's right rail)
+    o.append(radiator(355, 1386, 520, 214, n=16, warm=1.0 if warm else 1.0 / 16))
     if warm:
         o.append(grp(rect(430, 1600, 520, 36, HONEY_DEEP, opacity='0.22'), filter='url(#b16)'))
     else:
-        o.append(grp(rect(900, 1600, 60, 22, HONEY_DEEP, opacity='0.16'), filter='url(#b8)'))
+        o.append(grp(rect(835, 1600, 60, 22, HONEY_DEEP, opacity='0.16'), filter='url(#b8)'))
     # the curtain (left gutter) and the right wall with a shelf of books
     cur = ''.join(rect(cx - 16, 100, 34, 1640, g(L), rx='14') for cx, L in [(14, 12), (40, 16), (66, 13), (92, 18)])
     o.append(grp(cur, filter='url(#rough)'))
@@ -279,7 +384,7 @@ def B12():
     gx0, gy0, gx1, gy1 = 60, 120, 1020, 1290
     defs += '<clipPath id="glass12"><rect x="%d" y="%d" width="%d" height="%d"/></clipPath>' % (gx0, gy0, gx1 - gx0, gy1 - gy0)
     # the same view as B1 (round 1: B1's far city is now a sea of windows; B12 shows the same city, all of it warm)
-    d2, view = night_view(41, gx0, gy0, gx1, gy1, horizon=1010, warm_p=0.98, wave_left=0.0, domes_at=(250, 1012), roof_y=1110,
+    d2, view = night_view(41, gx0, gy0, gx1, gy1, horizon=1010, warm_p=0.98, wave_left=0.0, domes_at=None, domes_u=DOMES_U, roof_y=1110,
                           city='sea', city_top=742)
     defs += d2
     o.append('<g clip-path="url(#glass12)">' + view + '</g>')
@@ -332,7 +437,10 @@ def B2():
     """Round 1: a CITY of machines seen from a catwalk high in the hall, as her street is seen from her window (B11):
     rows of giant computers like blocks of flats, their tops like flat roofs, the aisles like streets with walkers and a
     cart coming up the main one like the tram, their lights in rows like a city's windows at night; at the end of the
-    main aisle the wide door open to the snow is the frame's one light, and in it, across the bay, her city's warm windows."""
+    main aisle the wide door open to the snow is the frame's one light, and in it, across the bay, her city's warm windows.
+    Round 2 (note 1: it read as a city under the night sky as easily as a hall): the hall's roof shown (its trusses with
+    rows of lights running to the door) and a machine detail no building has (fan grilles on the computers' tops, cable
+    trays bridging the aisles); the layout keeps the rhyme with B11. Now D-B2alt: D-B2 is her armchair among the giants."""
     defs = lin_grad('ceil2', [(0, g(4)), (1, g(9))], x1=0, y1=0, x2=0, y2=600, units=True)
     o = [rect(0, 0, W, H, 'url(#ceil2)')]
     rnd = random.Random(72)
@@ -346,16 +454,7 @@ def B2():
     defs += lin_grad('dsky2', [(0, g(12)), (1, g(30))], x1=0, y1=dy0, x2=0, y2=dy1, units=True)
     door = rect(dx0 - 20, dy0 - 10, dx1 - dx0 + 40, dy1 - dy0 + 20, 'url(#dsky2)')
     hz = dy0 + (dy1 - dy0) * 0.56
-    for row, (base, hmin, hmax, wsz) in enumerate(((hz - 8, 16, 40, (4.4, 5.4)), (hz, 10, 30, (5.6, 6.8)))):
-        x = dx0 - 14
-        while x < dx1 + 10:                                                          # her city across the bay
-            bw, bh = rnd.uniform(16, 30), rnd.uniform(hmin, hmax)
-            door += rect(x, base - bh, bw, bh + 8, g(15 if row == 0 else 11))
-            for q in range(int((bh - 4) // 8)):
-                for c in range(int((bw - 4) // 7)):
-                    if rnd.random() < 0.7:
-                        door += rect(x + 3 + c * 7, base - bh + 4 + q * 8, wsz[0], wsz[1], HONEY if rnd.random() < 0.68 else HONEY_MID)
-            x += bw * rnd.uniform(0.85, 1.0)
+    door += sea_of_windows(2027, dx0 - 14, dx1 + 10, hz, hz - 46, warm_p=0.9, wave_left=0.0, s=0.34)   # her city across the bay (round 2: one Helsinki)
     door += rect(dx0 - 20, hz + 2, dx1 - dx0 + 40, 12, g(24))                        # the frozen bay
     door += rect(dx0 - 20, hz + 14, dx1 - dx0 + 40, dy1 - hz, g(86))                 # the lit snow outside the door
     door += poly([(dx0 + 50, dy1), ((dx0 + dx1) / 2 - 12, hz + 16), ((dx0 + dx1) / 2 + 12, hz + 16), (dx1 - 50, dy1)], g(74), opacity='0.6')
@@ -366,6 +465,23 @@ def B2():
     o.append(poly([P(-7.9, 10.4, ZF), P(7.9, 10.4, ZF), P(7.9, 10, ZF), P(-7.9, 10, ZF)], g(20)))
     for sx in (-7.9, 7.5):
         o.append(poly([P(sx, 10, ZF), P(sx + 0.4, 10, ZF), P(sx + 0.4, 0, ZF), P(sx, 0, ZF)], g(18)))
+    # round 2: the hall's roof: its trusses' lower chords spanning the hall and the rows of lights hung under them,
+    # running away to the door (only below the caption band)
+    defs += '<clipPath id="roof2"><rect x="0" y="604" width="1080" height="400"/></clipPath>'
+    rf, glow = [], []
+    for Z in (5.0, 6.4, 8.2, 10.6, 14.0, 19.0, 26.0):
+        a_, b_ = P(-40, 10.6, Z), P(40, 10.6, Z)
+        rf.append(line(a_[0], a_[1], b_[0], b_[1], g(32), max(2.0, 36.0 / Z)))
+        for X in range(-36, 37, 4):
+            q = P(X, 10.25, Z)
+            if -20 < q[0] < 1100:
+                rf.append(rect(q[0] - 95.0 / Z, q[1] - 8.0 / Z, 190.0 / Z, 26.0 / Z, '#f0f6fc'))
+                glow.append(ell(q[0], q[1] + 40.0 / Z, 260.0 / Z, 110.0 / Z, '#dfe9f4', opacity='0.35'))
+    for X in (-12.0, -4.0, 4.0, 12.0):
+        a_, b_ = P(X, 10.4, 4.5), P(X, 10.4, 36)
+        rf.append(line(a_[0], a_[1], b_[0], b_[1], '#cfdbe8', 3, opacity='0.55'))
+    o.append('<g clip-path="url(#roof2)">' + grp(''.join(glow), filter='url(#b8)') + grp(''.join(rf), filter='url(#b1)') + '</g>')
+    o.append(grp(ell(610, 650, 520, 70, '#cfdbe8', opacity='0.1'), filter='url(#b30)'))
     # the floor of the hall, its main aisle lit by the door (the light running toward us like a lit street)
     o.append(poly([P(-40, 0, 1.0), P(40, 0, 1.0), P(40, 0, ZF), P(-40, 0, ZF)], g(11)))
     o.append(grp(poly([P(-1.8, 0, 2), P(1.8, 0, 2), P(6, 0, ZF), P(-6, 0, ZF)], g(46), opacity='0.6'), filter='url(#b16)'))
@@ -402,17 +518,25 @@ def B2():
         return out
 
     def top(xa, xb, z0, z1):
-        """The flat roof of a block: cable trays along it, small units like rooftop vents."""
+        """The top of a row of computers: cable trays along it and, round 2, its fan grilles (the machine detail no
+        building has): round fans side by side down its length."""
         out = poly([P(xa, HR, z0), P(xb, HR, z0), P(xb, HR, z1), P(xa, HR, z1)], g(30))
         out += line(*P((xa + xb) / 2, HR, z0), *P((xa + xb) / 2, HR, z1), g(22), 2)
-        for k in (0.22, 0.78):
+        for k in (0.06, 0.94):
             out += line(*P(xa + (xb - xa) * k, HR, z0), *P(xa + (xb - xa) * k, HR, z1), g(38), 1.4)
-        zz = z0 + rnd.uniform(0.5, 2)
-        while zz < z1 - 1:
-            xx = rnd.uniform(xa + 0.3, xb - 1.0)
-            out += poly([P(xx, HR + 0.25, zz), P(xx + 0.7, HR + 0.25, zz), P(xx + 0.7, HR + 0.25, zz + 0.7), P(xx, HR + 0.25, zz + 0.7)], g(40))
-            out += poly([P(xx, HR + 0.25, zz), P(xx + 0.7, HR + 0.25, zz), P(xx + 0.7, HR, zz), P(xx, HR, zz)], g(16))
-            zz += rnd.uniform(2.2, 4.5)
+        zz = z0 + 0.55
+        while zz < z1 - 0.4:
+            for xc in (xa + (xb - xa) * 0.27, xa + (xb - xa) * 0.73):
+                c_ = P(xc, HR, zz)
+                rx_ = abs(P(xc + 0.42, HR, zz)[0] - c_[0])
+                ry_ = abs(P(xc, HR, zz + 0.42)[1] - P(xc, HR, zz - 0.42)[1]) / 2
+                if rx_ < 2.2:
+                    continue
+                out += (ell(c_[0], c_[1], rx_, ry_, g(46)) + ell(c_[0], c_[1], rx_ * 0.8, ry_ * 0.8, g(13)) +
+                        line(c_[0] - rx_ * 0.8, c_[1], c_[0] + rx_ * 0.8, c_[1], g(40), max(0.8, rx_ * 0.12)) +
+                        line(c_[0], c_[1] - ry_ * 0.8, c_[0], c_[1] + ry_ * 0.8, g(40), max(0.8, rx_ * 0.12)) +
+                        circ(c_[0], c_[1], max(0.8, rx_ * 0.18), g(52)))
+            zz += 1.0
         return out
 
     blocks = []
@@ -427,6 +551,21 @@ def B2():
         o.append(face_side(inner, z0, z1, sgn))
         o.append(face_end(xa_, xb_, z0))
         o.append(top(xa_, xb_, z0, z1))
+    # round 2: cable trays bridging the side aisles from row to row, a little above the computers' tops
+    trays = []
+    for xa, xb in rows[:-1]:
+        nxt = [r_ for r_ in rows if r_[0] > xb][0]
+        for sgn in (-1, 1):
+            for Z in (3.2, 7.0, 11.0, 15.4, 19.6, 24.0, 28.6, 33.0):
+                a0, a1 = sgn * xb, sgn * nxt[0]
+                for dz in (0.0, 0.32):
+                    p0, p1 = P(a0, HR + 0.5, Z + dz), P(a1, HR + 0.5, Z + dz)
+                    trays.append(line(p0[0], p0[1], p1[0], p1[1], g(40), max(1.0, 9.0 / Z)))
+                for t_ in (0.25, 0.5, 0.75):
+                    xx = a0 + (a1 - a0) * t_
+                    p0, p1 = P(xx, HR + 0.5, Z), P(xx, HR + 0.5, Z + 0.32)
+                    trays.append(line(p0[0], p0[1], p1[0], p1[1], g(40), max(0.8, 6.0 / Z)))
+    o.append(''.join(trays))
     # the life of the streets: walkers in the aisles, a cart coming up the main one (the tram's rhyme)
     def walker(X, Z, lit=False):
         fx, fy = P(X, 0, Z)
@@ -451,8 +590,11 @@ def B2():
 
 # ------------------------------------------------------------------ D-B3: the building the snow can't touch
 def B3():
-    defs = lin_grad('sky3', [(0, g(9)), (0.6, g(16)), (1, g(28))], x1=0, y1=0, x2=0, y2=1150, units=True)
+    # round 2 (note 2: black on a black sky): the sky lifted behind it, the vapour lit by the city's glow, so the
+    # building stands as a black, steaming mass in white
+    defs = lin_grad('sky3', [(0, g(10)), (0.26, g(12)), (0.52, g(15)), (0.7, g(34)), (0.86, g(52)), (1, g(60))], x1=0, y1=0, x2=0, y2=1150, units=True)
     o = [rect(0, 0, W, 1160, 'url(#sky3)')]
+    o.append(grp(ell(520, 950, 660, 170, '#e2e7ee', opacity='0.6'), filter='url(#b30)'))
     rnd = random.Random(33)
     # far: the bay and the city's warm windows on the horizon (home, far away)
     o.append(rect(0, 1100, W, 60, g(18)))
@@ -467,9 +609,9 @@ def B3():
     o.append(rect(0, 1150, W, 770, g(80)))
     o.append(grp(poly([(0, 1150), (W, 1150), (W, 1190), (0, 1180)], g(70)), filter='url(#rough)'))
     o.append(pline([(620, 1250), (520, 1600), (360, 1920)], g(66), 26) + pline([(700, 1250), (660, 1600), (600, 1920)], g(66), 26))
-    # the melted, wet dark ring round the building, its puddles mirroring the door's light
-    o.append(grp(path('M -20 1236 C 120 1180 360 1196 520 1188 C 700 1180 940 1170 1100 1222 L 1100 1300 C 900 1352 640 1376 420 1366 C 220 1356 60 1330 -20 1296 Z', g(34)), filter='url(#rough)'))
-    o.append(grp(ell(610, 1270, 120, 20, g(56), opacity='0.6') + ell(380, 1262, 90, 12, g(44)), filter='url(#rough2)'))
+    # the melted ring round the building: bare wet ground (round 2, note 3: it read as a shadow; its puddles and steam
+    # are drawn in front of the building, below)
+    o.append(grp(path('M -20 1236 C 120 1180 360 1196 520 1188 C 700 1180 940 1170 1100 1222 L 1100 1300 C 900 1352 640 1376 420 1366 C 220 1356 60 1330 -20 1296 Z', g(20)), filter='url(#rough)'))
     # the building: long, low, windowless; its roof bare and wet (no snow can stay on it)
     o.append(poly([(70, 960), (980, 930), (980, 1250), (70, 1258)], g(15)))
     o.append(poly([(60, 952), (990, 922), (990, 940), (60, 970)], g(10)))
@@ -488,26 +630,46 @@ def B3():
         x = 120 + k * 100 + rnd.uniform(-20, 20)
         y = 956 - (x - 70) * 0.033
         o.append(line(x, y + 4, x + rnd.uniform(-3, 3), y + rnd.uniform(120, 260), g(24), rnd.uniform(4, 8), opacity='0.8'))
-    # icicles along the eave, each one dripping (drops falling, rings in the meltwater below)
-    ic = []
-    for k in range(40):
-        x = 80 + k * 22.5 + rnd.uniform(-5, 5)
-        y = 958 - (x - 70) * 0.033
-        L = rnd.uniform(12, 42)
-        ic.append(poly([(x - 4, y), (x + 4, y), (x, y + L)], g(70)))
-        if rnd.random() < 0.55:
-            dy = y + L + rnd.uniform(16, 150)
-            ic.append(ell(x, dy, 2.2, 4.6, g(82)))
-            ic.append(line(x, dy - 18, x, dy - 6, g(70), 1.4, opacity='0.6'))
-    o.append(''.join(ic))
-    # the meltwater at the wall's foot, its rings where the drops land, the slumped wet banks along it
-    o.append(grp(path('M 40 1262 C 260 1250 700 1246 1010 1236 L 1030 1262 C 760 1280 300 1290 40 1290 Z', g(28)), filter='url(#rough)'))
-    for k in range(12):
-        x = 110 + k * 76 + rnd.uniform(-10, 10)
-        o.append(ell(x, 1268 + rnd.uniform(-4, 6), rnd.uniform(8, 14), 2.4, 'none', stroke=g(52), stroke_width='1.2', opacity='0.45'))
-    o.append(grp(path('M -20 1300 C 120 1290 200 1328 330 1322 C 470 1316 560 1350 700 1344 C 840 1338 960 1320 1100 1330 '
-                      'L 1100 1372 C 900 1386 640 1398 420 1392 C 220 1386 60 1372 -20 1360 Z', g(48)), filter='url(#rough)'))
-    o.append(grp(path('M -20 1360 C 200 1384 640 1398 1100 1372 L 1100 1390 C 640 1418 200 1404 -20 1380 Z', g(62)), filter='url(#rough)'))
+    # round 2 (note 1: the icicles said "frozen"): no ice can hold on it; meltwater pours off the roof edge in streams,
+    # steaming as it falls, and splashes into the water at the wall's foot
+    streams, steams = [], []
+    for k, x in enumerate((150, 300, 470, 790, 930)):
+        y = 956 - (x - 70) * 0.033
+        L = 1254 - y
+        sw = (16, 12, 14, 15, 12)[k]
+        pts_ = [(x + 8 + 10 * (1 - (1 - v / 10.0) ** 3) + math.sin(v * 1.3 + k) * 1.5, y + v * L / 10.0) for v in range(11)]
+        lip = path('M %s %s C %s %s %s %s %s %s' % (f(x - sw * 0.8), f(y - 2), f(x - sw * 0.2), f(y - 7), f(x + sw * 0.6), f(y - 6), f(pts_[1][0]), f(pts_[1][1])),
+                   'none', stroke='#eef3f8', stroke_width=f(sw * 0.9), opacity='0.8')
+        body = (pline(pts_[:4], '#e4ebf2', sw * 1.15, opacity='0.62') + pline(pts_[3:6], '#e4ebf2', sw * 0.85, opacity='0.5') +
+                pline(pts_[5:8], '#e4ebf2', sw * 0.6, opacity='0.42') +
+                ''.join(ell(pts_[v][0] + rnd.uniform(-4, 4), pts_[v][1] + rnd.uniform(-10, 10), sw * 0.22, sw * 0.4, '#eef3f8', opacity='0.75') for v in (8, 8, 9, 9, 10)))
+        core = pline([(x_ - sw * 0.25, y_) for x_, y_ in pts_[1:4]], '#ffffff', 2.2, opacity='0.7') + pline([(x_ + sw * 0.15, y_) for x_, y_ in pts_[4:6]], '#ffffff', 1.6, opacity='0.55')
+        splash = (ell(pts_[-1][0], 1258, sw * 1.8, 5, '#f2f6fa', opacity='0.8') +
+                  ''.join(circ(pts_[-1][0] + dx, 1258 - abs(dx) * 0.5 - 6, 2.4, '#f2f6fa', opacity='0.8') for dx in (-18, -9, 10, 20)))
+        streams.append(grp(lip + body, filter='url(#b1)') + core + splash)
+        steams.append(vapour(3300 + k * 3, pts_[4][0] + 8, pts_[4][1] + 30, 70, 120, op=0.55, lean=0.3, n=6, flt='vap', root=None, wisps=1))
+        steams.append(vapour(3301 + k * 3, pts_[-1][0] + 6, 1262, 90, 150, op=0.62, lean=0.25, n=7, flt='vap', root=None, wisps=1))
+    o.append(''.join(streams) + ''.join(steams))
+    # the meltwater at the wall's foot: the wet bare ground in front of it, its puddles mirroring the lifted sky and
+    # catching the vents' and the door's warm glow, steam lifting off it, the snowbanks slumped wet at its edge
+    o.append(grp(path('M 40 1262 C 260 1250 700 1246 1010 1236 L 1030 1262 C 760 1280 300 1290 40 1290 Z', g(24)), filter='url(#rough)'))
+    pud = []
+    for k, (px_, py_, pw_, ph_) in enumerate(((150, 1298, 120, 16), (330, 1320, 150, 20), (560, 1304, 110, 14), (720, 1332, 170, 22), (900, 1302, 130, 16), (470, 1348, 90, 10))):
+        pud.append(path(smooth_closed(blob(3500 + k, px_, py_, pw_, ph_, n=14, jit=0.22)), g(58), opacity='0.9'))
+        pud.append(ell(px_, py_ - ph_ * 0.3, pw_ * 0.85, ph_ * 0.4, g(26), opacity='0.6'))      # the building mirrored dark in it
+    o.append(grp(''.join(pud), filter='url(#rough)'))
+    glints = []
+    for vx in (210, 420, 650, 850):
+        glints.append(ell(vx, 1300 + (vx % 3) * 8, 16, 8, HONEY, opacity='0.75'))
+    o.append(grp(''.join(glints), filter='url(#b4)'))
+    o.append(grp(rect(604, 1264, 82, 92, HONEY_MID, opacity='0.42'), filter='url(#b8)'))   # the door's light, mirrored
+    for k, (sx_, sy_, sw_, sh_) in enumerate(((110, 1336, 150, 170), (290, 1356, 170, 190), (520, 1366, 150, 170), (700, 1362, 170, 190), (960, 1336, 150, 170))):
+        o.append(vapour(3400 + k, sx_, sy_, sw_, sh_, op=0.62, lean=0.18, n=7, flt='vap', root=None, wisps=1))
+    # the banks slumped at its edge: wet grey slush, then the snow's soft sagging lip
+    o.append(grp(path('M -20 1336 C 120 1326 200 1364 330 1358 C 470 1352 560 1386 700 1380 C 840 1374 960 1356 1100 1366 '
+                      'L 1100 1392 C 900 1402 640 1412 420 1408 C 220 1404 60 1392 -20 1382 Z', g(50)), filter='url(#rough)'))
+    o.append(grp(path('M -20 1366 C 160 1372 300 1400 460 1398 C 640 1396 860 1384 1100 1386 L 1100 1430 C 800 1440 400 1446 -20 1426 Z', g(78)), filter='url(#rough)'))
+    o.append(grp(path('M -20 1368 C 160 1374 300 1402 460 1400 C 640 1398 860 1386 1100 1388', 'none', stroke=g(90), stroke_width='6', opacity='0.9'), filter='url(#rough)'))
     # the heat: white vapour pouring off the roof vents, warm only at their mouths, a shimmer over the roof, gone
     # before the caption band
     o.append(grp(''.join(pline([(110 + u * 42 + k * 30, 912 - k * 16 + math.sin(u * 1.5 + k * 2) * 4) for u in range(20)], '#ffffff', 1.8,
@@ -606,7 +768,7 @@ def kitchen_kettles(seed=4):
     def put(x, y, h, face=1, sd=None):
         ket.append((y, kettle(x, y, h, body=g(rnd.uniform(28, 40)), lit=g(62), dark=g(18), face=face,
                                steam_seed=sd if sd is not None else rnd.randint(0, 999), steam_h=h * 1.6, steam_op=0.55,
-                               steam_col='#f4eee5', bloom=2.2, boil=rnd.random() < 0.75)))
+                               steam_col='#f6e9d3', bloom=2.2, boil=rnd.random() < 0.75)))
     for i in range(7):
         put(bx0 + 30 + i * 40, cy - 12, 44, face=1 if i % 2 else -1)
     for i in range(6):
@@ -657,8 +819,9 @@ def B4():
     o.append(her_profile_tucked(700, 1330, 1.0, sweater=g(22), hair=g(8), skin=g(50), legs=g(16), flip=True))
     o.append(front)
     o.append(steam_ceiling())
-    # the lamp's warm light on everything it reaches (the steam, the table, her), the corners left cool
-    o.append(grp(ell(540, 900, 640, 900, '#f2d6a2', opacity='0.13'), filter='url(#b30)'))
+    # the lamp's warm light on everything it reaches (the steam, the table, her), the corners left cool (round 1, the
+    # builder's look: at 0.13 the middle of the room still read as a cool grey fog; the steam glows lamp-warm now)
+    o.append(grp(ell(540, 940, 620, 860, '#f2d29a', opacity='0.22'), filter='url(#b30)'))
     # the near doorway (the near hint at both edges)
     o.append(rect(0, 0, 46, H, g(20)) + rect(W - 46, 0, 46, H, g(20)))
     caption = cap('as much heat as', '*forty| kettles,')
@@ -672,9 +835,14 @@ def B5():
     # the fogged window behind her (round 1, the board read's one night: the same window as B4, the night and the
     # city's lights blurred behind its fog; the fog lit by the lamp, heaviest behind her head, so her profile still
     # reads dark on light), the back counter's kettles soft
-    wd, wb = fogged_window('k5', 60, 640, 720, 560, seed=42, fog=0.6, top_fog=0.9, drips=7, lights=44,
+    # (round 1, the builder's look: at fog 0.6-0.9 it still read as a pale day window: the fog is thinner now, so the
+    # night shows dark round the edges, and the lamp's light caught in the fog sits behind her head)
+    wd, wb = fogged_window('k5', 60, 640, 720, 560, seed=42, fog=0.24, top_fog=0.1, drips=7, lights=44,
                            avoid=lambda x: 360 < x < 620, frame=g(70))
     o.append(wb)
+    wd += rad_grad('k5halo', [(0, '#f1e7d8', 0.95), (0.45, '#ece3d6', 0.8), (1, '#e6e1da', 0)], cx=470, cy=965, r=245, units=True)
+    o.append(grp(rect(60, 640, 720, 560, 'url(#k5halo)'), clip_path='url(#fwk5)'))
+    o.append(line(420, 640, 420, 1200, g(70), 18))
     o.append(rect(0, 1200, W, 40, g(84)) + rect(0, 1240, W, 680, g(58)))
     soft = ''
     for i in range(8):
@@ -694,7 +862,7 @@ def B5():
 
 
 FRAMES.update({
-    'D-B2': B2,
+    'D-B2alt': B2,
     'D-B3': B3,
     'D-B4': B4,
     'D-B5': B5,
@@ -1028,7 +1196,6 @@ def B10():
     pl += pline([(fw[0], fw[1]), (-40, 600)], ch, 4) + pline([(fw[2], fw[1]), (1120, 610)], ch, 4)
     pl += pline([(fw[0], fw[3]), (-40, 1600)], ch, 4) + pline([(fw[2], fw[3]), (1120, 1700)], ch, 4)
     o.append(grp(pl, filter='url(#chalk)'))
-    o.append(grp(ell(812, 1424, 34, 14, g(30), opacity='0.5'), filter='url(#b4)'))    # the gap the pipe goes out through
     # the giant computer: real, painted; its rows of blades and lights
     gx0, gx1, gy0, gy1 = 380, 660, 740, 1520
     o.append(grp(ell((gx0 + gx1) / 2, gy1 + 6, 220, 26, g(30), opacity='0.6'), filter='url(#b8)'))
@@ -1049,24 +1216,40 @@ def B10():
         o.append(poly([(x_ - 4, 1217), (x_ + 4, 1217), (x_, 1217 + rnd.uniform(12, 30))], g(90)))
     o.append(grp(''.join(circ(rnd.uniform(0, 300), rnd.uniform(1186, 1216), 2.2, '#ffffff', opacity='0.85') for _ in range(40)), filter='url(#b1)'))
     # the hot pipe: honey, out at its top and away on its posts, high over the snow, out through the chalk wall and
-    # across the shore, tapering into the distance to her city's windows, the last one hers; warm air rising off it
-    A, B = (720.0, 782.0), (968.0, HZ - 28.0)
-    o.append(pline([(gx1, 782), A], HONEY_DEEP, 42) + pline([(gx1, 782), A], HONEY_MID, 20))
-    for t in (0.1, 0.3, 0.5, 0.68, 0.82):
-        px_, py_ = A[0] + (B[0] - A[0]) * t, A[1] + (B[1] - A[1]) * t
+    # across the shore, tapering into the distance to her city's windows, the last one hers; warm air rising off it.
+    # Round 1 (the builder's look: it read as a ribbed warm beam at phone size): drawn as ONE tube, as present as the
+    # cold pipe where it leaves the giant, a collar at every post, a saddle on every post, a continuous lit top, and
+    # still a pipe (never a point) where it reaches her window
+    A, B = (738.0, 782.0), (966.0, HZ - 30.0)
+    dx_, dy_ = B[0] - A[0], B[1] - A[1]
+    L_ = math.hypot(dx_, dy_)
+    ux_, uy_ = dx_ / L_, dy_ / L_
+    nx_, ny_ = uy_, -ux_                        # the pipe's top side (toward the sky)
+    at = lambda t: (A[0] + dx_ * t, A[1] + dy_ * t)
+    wd = lambda t: 40.0 * (1 - 0.76 * t)        # 40 px at the giant, ~10 px at her window
+    def band(o0, o1, col, op=None):             # a strip of the tube between offsets o0..o1 (fractions of its width)
+        p = [(at(t)[0] + nx_ * wd(t) * o, at(t)[1] + ny_ * wd(t) * o) for t, o in ((0, o0), (1, o0), (1, o1), (0, o1))]
+        return poly(p, col, opacity=op)
+    for t in (0.1, 0.3, 0.5, 0.68, 0.82):       # the posts and their saddles
+        px_, py_ = at(t)
         gy_ = 1520 + (HZ + 6 - 1520) * t
         wpost = 10 * (1 - t) + 2
-        o.append(line(px_, py_, px_, gy_, g(22), wpost) + line(px_ - 3 * (1 - t), gy_, px_ + 3 * (1 - t), gy_, g(30), wpost))
+        o.append(line(px_, py_ + wd(t) * 0.4, px_, gy_, g(22), wpost) + line(px_ - 3 * (1 - t), gy_, px_ + 3 * (1 - t), gy_, g(30), wpost))
+        o.append(rect(px_ - wd(t) * 0.35, py_ + wd(t) * 0.55, wd(t) * 0.7, wd(t) * 0.42, g(18)))
         o.append(grp(ell(px_ + 4, gy_ + 2, 26 * (1 - t) + 4, 6 * (1 - t) + 2, g(36), opacity='0.6'), filter='url(#b2)'))
-    n = 40
-    for i in range(n):
-        t0, t1 = i / float(n), (i + 1) / float(n)
-        p0 = (A[0] + (B[0] - A[0]) * t0, A[1] + (B[1] - A[1]) * t0)
-        p1 = (A[0] + (B[0] - A[0]) * t1, A[1] + (B[1] - A[1]) * t1)
-        w0 = 42 * (1 - 0.88 * t0)
-        o.append(line(p0[0], p0[1], p1[0], p1[1], HONEY_DEEP, w0) + line(p0[0], p0[1], p1[0], p1[1], HONEY_MID, w0 * 0.48))
-        o.append(line(p0[0], p0[1] - w0 * 0.22, p1[0], p1[1] - w0 * 0.22, HONEY_HI, max(1.2, w0 * 0.12), opacity='0.65'))
-    o.append(grp(ell(B[0], B[1] + 6, 26, 18, HONEY_HI, opacity='0.7'), filter='url(#b4)'))
+    # out of the giant's top: the straight stub and its elbow, as thick as the cold pipe
+    o.append(pline([(gx1, 782), A], HONEY_DEEP, 40) + pline([(gx1, 776), (A[0], 776)], HONEY_MID, 16) +
+             pline([(gx1, 768), (A[0], 768)], HONEY_HI, 4, opacity='0.7'))
+    o.append(circ(A[0], A[1], 20, HONEY_DEEP) + circ(A[0] + 2, A[1] - 6, 9, HONEY_MID))
+    o.append(rect(gx1 - 4, 758, 10, 48, HONEY_DARK))                       # its collar at the giant
+    # the tube: shadow side, body, lit top, the highlight
+    o.append(band(-0.5, 0.5, HONEY_DEEP) + band(-0.5, -0.3, HONEY_DARK, '0.8') + band(-0.05, 0.38, HONEY_MID) +
+             band(0.2, 0.32, HONEY_HI, '0.75'))
+    for t in (0.1, 0.3, 0.5, 0.68, 0.82, 0.93):  # a collar at each post: the read of a pipe
+        cx_, cy_ = at(t)
+        o.append(line(cx_ - nx_ * wd(t) * 0.62, cy_ - ny_ * wd(t) * 0.62, cx_ + nx_ * wd(t) * 0.62, cy_ + ny_ * wd(t) * 0.62,
+                      HONEY_DARK, max(2.0, wd(t) * 0.26)))
+    o.append(grp(ell(B[0], B[1] + 4, 30, 20, HONEY_HI, opacity='0.75'), filter='url(#b4)'))
     for i, (t, hh) in enumerate([(0.0, 110), (0.22, 90), (0.45, 70)]):
         px_, py_ = A[0] + (B[0] - A[0]) * t, A[1] + (B[1] - A[1]) * t
         o.append(vapour(1100 + i, px_, py_ - 14 * (1 - t), 56 * (1 - 0.5 * t), hh, op=0.6, n=5, flt='vapS', root_w=18, wisps=0))
@@ -1140,9 +1323,9 @@ def B11():
                 continue
             col_ = (HONEY if u_ < 0.7 else g(13)) if t < 0.6 else (HONEY_DEEP if u_ < 0.45 else (HONEY_MID if u_ < 0.6 else g(13)))
             o.append(rect(xa - ww * 0.5, yy, ww * 0.5, ww * 0.8, col_))
-    # the opposite facades (right), Jugend blocks receding; windows warming as the heat passes under them
-    blocks = [(720, 1180, 320, 820), (780, 1130, 1500, 2100)]
-    fac = poly([(700, 560), (700, 720), (1080, 1520), (1080, 0)], g(24))
+    # the opposite facades (right), Jugend blocks receding; windows warming as the heat passes under them (round 2
+    # polish: cut at the band's foot, so no pale wedge crosses the caption band)
+    fac = poly([(700, 600), (700, 720), (1080, 1520), (1080, 600)], g(24))
     o.append(fac)
     rows = 6
     for r in range(rows):
@@ -1170,10 +1353,17 @@ def B11():
     o.append(poly([(600, 900), (650, 900), (668, 1010), (590, 1010)], g(30)) + rect(600, 920, 56, 24, g(70)))
     o.append(rect(880, 1270, 64, 32, g(80), rx='14') + rect(930, 1400, 76, 38, g(82), rx='16') + rect(430, 1218, 56, 28, g(80), rx='12'))
     o.append(circ(520, 1140, 6, g(14)) + rect(515, 1146, 10, 26, g(14)) + circ(536, 1150, 6, g(14)) + rect(531, 1156, 10, 26, g(14)))
+    # round 2 (note 1: the arrival was hidden behind her head): the strip's front turning in at her door is in view,
+    # its warm spill on the snow, the door lit; she moves to the right third, looking down at it
+    fa, fb = (330, 1440), (318, 1478)
+    o.append(grp(ell(332, 1462, 92, 46, HONEY, opacity='0.5'), filter='url(#b16)'))
+    o.append(poly([fa, fb, (fb[0] - 30, fb[1] - 14), (fa[0] - 30, fa[1] - 14)], HONEY_MID) +
+             poly([fa, fb, (fb[0] - 8, fb[1] - 4), (fa[0] - 8, fa[1] - 4)], HONEY_HI, opacity='0.8'))
+    o.append(grp(ell(338, 1462, 40, 20, HONEY_HI, opacity='0.6'), filter='url(#b8)'))
     # the near frame: her window's sill and frame; her head and shoulder from behind, looking down; her mug
     o.append(rect(0, 1600, W, 320, g(16)) + rect(0, 1590, W, 16, g(34)))
     o.append(rect(0, 0, 70, 1600, g(14)) + rect(1010, 0, 70, 1600, g(14)))
-    o.append(her_on_sill(230, 1606, 1.2, sweater=g(18), hair=g(7), skin=g(36), rim=g(50)))
+    o.append('<g transform="translate(1600 0) scale(-1 1)">%s</g>' % her_on_sill(800, 1606, 1.2, sweater=g(18), hair=g(7), skin=g(36), rim=g(50)))
     o.append(snow(1112, 260, 0, 0, W, 1600, 1.4, 4.0, op=(0.4, 0.9)))
     caption = cap('carry that heat', "into people's |*homes.")
     return defs, ''.join(o), caption
@@ -1242,26 +1432,47 @@ def B2alt():
     return defs, ''.join(o), caption
 
 
-def neighbour(kind, x, y, sc, warm_hand=False, face=1):
+def neighbour(kind, x, y, sc, warm_hand=False, face=1, lit=0.0, only_light=False):
     """A neighbour leaning out of a window, in profile facing `face` (+1 right), reaching out with an open hand toward
-    the drifting warmth. (x, y) = where the body meets the sill; sc = px per unit (1 unit = a ~110 px head at sc 1)."""
+    the drifting warmth. (x, y) = where the body meets the sill; sc = px per unit (1 unit = a ~110 px head at sc 1).
+    Round 2 (B7, note 2): lit > 0 catches the passing warmth on the up-turned face (a lit cheek) and the open hand (a lit
+    palm); her own (warm_hand) the brightest; only_light draws just that light (drawn again over the drifting vapour)."""
     k = face
     o = []
     dark, skin = g(9), g(40)
     X = lambda u: x + k * u * sc
     Y = lambda v: y + v * sc
+    lc = HONEY_HI if warm_hand else HONEY_MID
+    if only_light:
+        dark = 'none'
     def body(lean=40, w=74, top=-120):
         return path('M %s %s C %s %s %s %s %s %s C %s %s %s %s %s %s Z' % (
             f(X(-w)), f(Y(0)), f(X(-w + lean * 0.3)), f(Y(top * 0.7)), f(X(-w * 0.4 + lean)), f(Y(top)), f(X(lean * 0.6)), f(Y(top - 4)),
             f(X(w * 0.6 + lean)), f(Y(top * 0.9)), f(X(w)), f(Y(top * 0.4)), f(X(w)), f(Y(0))), dark)
     def head(hx, hy, r=30):
-        return (ell(X(hx), Y(hy), r * sc * 0.86, r * sc, dark) + path('M %s %s L %s %s L %s %s Z' % (f(X(hx + r * 0.8)), f(Y(hy - 4)), f(X(hx + r * 1.12)), f(Y(hy + 8)), f(X(hx + r * 0.78)), f(Y(hy + 12))), dark))
+        out = '' if only_light else (ell(X(hx), Y(hy), r * sc * 0.86, r * sc, dark) + path('M %s %s L %s %s L %s %s Z' % (
+            f(X(hx + r * 0.8)), f(Y(hy - 4)), f(X(hx + r * 1.12)), f(Y(hy + 8)), f(X(hx + r * 0.78)), f(Y(hy + 12))), dark))
+        if lit and (only_light or not warm_hand):
+            # the up-turned face catching the warmth: a lit cheek and brow along its front
+            arc = [(X(hx + math.cos(math.radians(a)) * r * 0.79), Y(hy + math.sin(math.radians(a)) * r * 0.92)) for a in range(-95, 30, 15)]
+            out += grp(pline(arc, lc, r * sc * 0.26, opacity=f(min(1.0, 0.8 * lit))), filter='url(#b1)')
+        return out
     def arm(sx, sy, ex, ey, hx2, hy2, wdt=20):
-        out = pline([(X(sx), Y(sy)), (X(ex), Y(ey)), (X(hx2), Y(hy2))], dark, wdt * sc)
+        # round 1, the builder's look: knit sleeves (never sticks) and big open hands, readable at phone size
+        out = '' if only_light else pline([(X(sx), Y(sy)), (X(ex), Y(ey)), (X(hx2), Y(hy2))], dark, wdt * 1.35 * sc)
         ang = math.atan2(Y(hy2) - Y(ey), X(hx2) - X(ex))
-        out += open_hand(X(hx2) + math.cos(ang) * 8 * sc, Y(hy2) + math.sin(ang) * 8 * sc, ang, 26 * sc, dark)
-        if warm_hand:
-            out += ell(X(hx2) + math.cos(ang) * 18 * sc, Y(hy2) + math.sin(ang) * 18 * sc, 34 * sc, 28 * sc, HONEY, opacity='0.5', filter='url(#b8)')
+        hx3, hy3 = X(hx2) + math.cos(ang) * 10 * sc, Y(hy2) + math.sin(ang) * 10 * sc
+        if not only_light:
+            out += open_hand(hx3, hy3, ang, 33 * sc, dark)
+        if lit and (only_light or not warm_hand):
+            # the open hand in the warmth: a lit palm (her own the brightest warm in the frame: the eye lands there first)
+            gx_, gy_ = hx3 + math.cos(ang) * 12 * sc, hy3 + math.sin(ang) * 12 * sc
+            if warm_hand:
+                out += (ell(gx_, gy_, 80 * sc, 66 * sc, HONEY, opacity='0.55', filter='url(#b16)') +
+                        ell(gx_, gy_, 40 * sc, 34 * sc, HONEY_HI, opacity='0.95', filter='url(#b8)'))
+            else:
+                out += ell(gx_, gy_, 34 * sc, 28 * sc, HONEY, opacity=f(0.32 * lit), filter='url(#b8)')
+            out += grp(open_hand(hx3, hy3, ang, 33 * sc * 0.86, lc), opacity=f(min(1.0, 0.85 * lit)))
         return out
     if kind == 'her':          # the one difference: her bun, the furthest lean, the warmth at her hand first
         o.append(body(lean=70, w=60, top=-118) + head(78, -150, 30) +
@@ -1337,18 +1548,32 @@ def B7_block():
                 sx_, sy_ = P((u0 + u1) / 2, top - 2.2)
                 zz = Z0 + (u0 + u1) / 2 * math.sin(a_)
                 figs.append((cast[(r, c)], sx_, sy_, F / zz / 120.0 * 1.15, (r, c) == (0, 0)))
+    def leaning(kind, sx_, sy_, sc_, first, only_light=False):
+        lean = 0 if kind == 'cat' else (17 if first else 13)
+        return '<g transform="translate(%s %s) skewX(%s) translate(%s %s)">%s</g>' % (
+            f(sx_), f(sy_ - 2), f(-lean), f(-sx_), f(-(sy_ - 2)),
+            neighbour(kind, sx_, sy_ - 2, sc_, warm_hand=first, lit=(0.0 if kind == 'cat' else 1.0), only_light=only_light))
     for kind, sx_, sy_, sc_, first in figs:
-        o.append(neighbour(kind, sx_, sy_ - 2, sc_, warm_hand=first))
-    # the warm vapour drifting past from the plumes beyond the block: white, its warmth carried in it; it reaches her first
+        # each one leans out over the sill toward the warmth (the cats sit)
+        o.append(leaning(kind, sx_, sy_, sc_, first))
+    # the warm vapour drifting past from the plumes beyond the block: white, its warmth carried in it; it reaches her first.
+    # Round 2 (note 1: it read as cool fog): a warm core that reads at a glance, warmest where it meets the hands
     for i, (u, yy, w, h) in enumerate([(3.0, 6.6, 520, 120), (8.0, 3.4, 600, 130), (12.5, 6.9, 480, 110), (5.5, -0.2, 520, 120), (14.0, 2.2, 460, 110)]):
         px, py = P(u, yy)
         blobs = ''.join(ell(px + k * w / 7.0, py + math.sin(k * 0.9 + i) * 18, w / 6.0 * (0.7 + 0.08 * k), h / 2.6, '#f3f6fa', opacity='0.34') for k in range(8))
         o.append(grp(blobs, filter='url(#vap)'))
         core = [(px + k * w / 7.0, py + math.sin(k * 0.9 + i) * 18) for k in range(1, 7)]
-        o.append(grp(pline(core, HONEY_HI, h / 7.0, opacity='0.32'), filter='url(#b8)'))
+        o.append(grp(pline(core, HONEY, h / 2.4, opacity='0.4'), filter='url(#b16)'))
+        o.append(grp(pline(core[1:], HONEY_HI, h / 6.0, opacity='0.72'), filter='url(#b4)'))
     hx_, hy_ = P(2.5, 6.0)
     o.append(grp(path('M %s %s C %s %s %s %s %s %s' % (f(hx_ + 260), f(hy_ - 10), f(hx_ + 160), f(hy_ - 40), f(hx_ + 90), f(hy_ - 70), f(hx_ + 40), f(hy_ - 74)),
-                      'none', stroke=HONEY_HI, stroke_width='16', stroke_linecap='round', opacity='0.7'), filter='url(#b4)'))
+                      'none', stroke=HONEY, stroke_width='44', stroke_linecap='round', opacity='0.45'), filter='url(#b16)'))
+    o.append(grp(path('M %s %s C %s %s %s %s %s %s' % (f(hx_ + 260), f(hy_ - 10), f(hx_ + 160), f(hy_ - 40), f(hx_ + 90), f(hy_ - 70), f(hx_ + 40), f(hy_ - 74)),
+                      'none', stroke=HONEY_HI, stroke_width='18', stroke_linecap='round', opacity='0.9'), filter='url(#b4)'))
+    # the warmth caught on the faces and the open hands, over the vapour (kept below the payoff's warmth; hers the brightest)
+    for kind, sx_, sy_, sc_, first in figs:
+        if kind != 'cat':
+            o.append(leaning(kind, sx_, sy_, sc_, first, only_light=True))
     o.append(snow(771, 300, 0, 0, W, H, 1.6, 4.2, op=(0.4, 0.9)))
     caption = cap('But Helsinki', '*wants| that heat.')
     return defs, ''.join(o), caption
@@ -1532,7 +1757,7 @@ def B11alt():
 
 
 FRAMES.update({
-    'D-B2alt': B2alt,
+    'D-B2': B2alt,
     'D-B7': B7_block,
     'D-B7alt': B7_catch,
     'D-B8alt': B8alt,
