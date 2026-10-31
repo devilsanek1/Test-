@@ -420,10 +420,22 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   colour harmony, shape rhythm, edges, the finish), an ALMOST answered with a paint-over; the owner's eye on the hero
   frame and on the board. -> rules: playbook THE THREE RULES (a rich, beautiful world); PIPELINE_V2 "A RICH, BEAUTIFUL
   WORLD".
-- 2026-10-30 ~22:40 UTC, after the ink-line test page (https://claude.ai/artifact/NVsh6GUY5NoyGwLY4yJ7QF; the pick B, the
+- 2026-10-30 ~22:33 UTC, after the ink-line test page (https://claude.ai/artifact/NVsh6GUY5NoyGwLY4yJ7QF; the pick B, the
   brush pen): "lets build without ink first and then we will test the final product with ink if its makes it any better"
   -> video 4 is built with NO ink (the clean pen, no outlines); after the final cut, B is laid over it and the two cuts
   are shown side by side; the owner decides. -> rules: playbook, Visual style (INK LINES: tested on the finished film);
   PIPELINE_V2 THE LOOP NOW step 8.
-- 2026-10-30 ~22:45 UTC: "we are about to hit 5hour limit - don't lose anything" -> everything committed and pushed; the
+- 2026-10-30 ~22:36 UTC: "we are about to hit 5hour limit - don't lose anything" -> everything committed and pushed; the
   running rounds' state and how to resume them written to `context/RESUME_2026-10-30.md` (and HANDOFF's top points to it).
+- 2026-10-30 ~22:38 UTC: "we need to make sure this playbook follows into the next videos. make sure to refine the
+  overall process the docs the guidelines to emphasise what we discussed here so that we don't talk about it again for
+  future videos" -> CLAUDE.md rewritten that minute with the day's decisions (the draft:
+  `context/agent_reports/2026-10-30_CLAUDE_md_draft_v4_session.md`); then the usage limit stopped this session, and the
+  study session's `docs/process/PLAN.md` (steps 1-9, 2026-10-31) carried the same decisions into the always-read docs:
+  CLAUDE.md (the one page), the playbook's top section (made small), PIPELINE_V2, FRAME_CARD, DESIGN_LANGUAGE, the
+  standard brief header and its hook. -> rule: playbook THE THREE RULES ("settled for every video").
+- 2026-10-31 ~02:10 UTC: "I hit my usage limit while you were working, but it has reset now. Please continue from where
+  you left off." -> the ideas round and the process rework had died at the limit with no output (only the audit and the
+  research files, archived in `context/agent_reports/`); the study session's commits merged (theirs kept where both
+  sessions changed a file); the ideas brief now opens each beat with its feeling (the standard brief header); the ideas
+  round waits for the owner's word on the week's tokens.
