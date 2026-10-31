@@ -94,9 +94,12 @@ ideas; frames planned and created whole from the get-go, never filled for densit
 **THE FRAME LOOP (owner, 2026-10-30; every built idea, key frame, scene and shot, before the owner sees it):**
 1. **Build:** the builder makes the frame whole from its card (the beat's feeling and idea; `docs/look/FRAME_CARD.md`).
 2. **Evaluate:** a FRESH evaluator (never the builder; one, not a panel) looks at the frame at full and phone size
-   beside the hero frame (once it exists) and the owner's references, never a past film of ours, and answers one
-   question first: does it give the viewer the
-   beat's FEELING and idea in a second, and is it worth pausing on? Then the card's questions. The verdict is one of:
+   beside the hero frame (once it exists) and the owner's references, never a past film of ours. Its report OPENS with
+   one line, "The feeling it gives: ...", written from looking at the picture before reading the brief, then the
+   beat's intended feeling beside it, and answers: does it give the viewer the beat's FEELING and idea in a second, and
+   is it worth pausing on? Then the card's questions and the craft. Measurements only explain a gap the eye found
+   ("it feels gloomy: 43 % of it is under L* 40"); they never make a verdict on their own, and a reference lends its
+   craft, not its mood (owner, 2026-10-31: "we lost the feeling"). The verdict is one of:
    - **THERE:** it achieves the feeling; small polish notes only -> move on.
    - **ALMOST:** the feeling is there but specific things hold it back -> ADJUST: the builder fixes exactly those
      (each note names what and why), re-render, re-evaluate. At most 2 adjust rounds.
