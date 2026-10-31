@@ -96,6 +96,12 @@ Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section THE THREE 
 
 ## Audience and goal
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24.)
+- **Our niche: TECH IN CITIES**: how cities find creative, cool ways to adopt technology (a city heating homes with
+  computers' heat, a city bringing its history to life with AI), told through the place itself, its streets, homes
+  and people. It fits our painted city look and the city-poster study's answer on content ("videos where we have more
+  of cities / architectures / buildings"). Topics are scouted for it first. — ("I am thinking about a niche content
+  start something "tech in cities" like how cities find creative and cool ways to adopt tech / So our Helsinki story
+  is great actually", 2026-10-31.)
 - **Growth matters: maximise engagement with subtle, defensible hooks.** **Exaggerating, generalizing and making it
   bigger are fine; no law-firm precision** (the core event is real). **Comments are a massive plus:** a line people
   will argue with or correct counts FOR a script, so G1 writes one or two on purpose. — ("if comments are increasing

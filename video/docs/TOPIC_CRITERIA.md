@@ -1,5 +1,8 @@
 # Topic criteria (G0): what a story is picked by
 
+**The niche first (owner, 2026-10-31): TECH IN CITIES**, how cities find creative and cool ways to adopt tech ("So our
+Helsinki story is great actually"). Scouts look there first; a story outside it needs a reason. Then the criteria below.
+
 The one list the G0 editor scores every candidate on (1-10 each) and the owner sees with the shortlist, **in the owner's
 order of importance** (2026-10-28: "lets make it relevant first but include buzz here too and surprise, then true and
 solid, then fresh, then visually appealing, then mood. Then shareabliity potential"; then "lets move the freshness lower
