@@ -65,3 +65,6 @@ the result. After step 4 and after step 10, show the owner before going on.
   scene's key retired: each scene's mood decides; "starting from v2's look" dropped; the G3 rules follow the
   2026-10-30 order; "8/10" is "worth pausing on"). What moved, by section: `process/playbook_dropped_quotes.md` (from
   `process/check_playbook_quotes.py`).
+- 2026-10-31 ~02:00 UTC, study session: the always-read set measures ~152,000 words (from ~170,000), mostly step 6.
+  The brief check's first live false positive (the owner's own quoted "65% contrast" in a brief) fixed: quoted text
+  is never a target. Step 10 (scene 1 v8, feeling first) running.
