@@ -173,9 +173,10 @@ key, the caption band kept light, built in painter v7 (rule 6; `ORGANIC.md` §8 
   value range (owner, 2026-10-28) in the references' low key (decided 2026-10-30 under the owner's hand-over, "Do what
   you think is right and make the videos better", and built in painter v7: `ORGANIC.md` §8 D3): a calm light sky, a
   mid-tone world and real darks where the eye should go: small darks at the focal (the subject's silhouette, a doorway,
-  a window, a hull) plus one or two big quiet dark masses below the caption band (a shade with a named caster, painted
-  and alive inside, in the key's shade colour, never black, grey or a dead slab), up to ~45 % of the frame under L* 40
-  (v7 43 %), the band kept light for the ink captions (a night sky's band: rule 10); never darks scattered as
+  a window, a hull) plus, where the mood wants it, big quiet dark masses below the caption band (a shade with a named
+  caster, painted and alive inside, never black, grey or a dead slab, and never where the story's life and action
+  are); HOW dark and how contrasty follows each scene's mood and content, never a percentage (owner, 2026-10-31: "A
+  number is never a target"; v7's 43 % under L* 40 is one example, and it cost the feeling), the band kept light for the ink captions (a night sky's band: rule 10); never darks scattered as
   confetti or a narrow band of light pastels (numbers: `CRAFT.md` §f.8). Money and everyday life: #9 Autumn
   Ember (#7 Autumn Ochre read sick). **One continuous sky** (owner, v2 G4), never an empty field (owner, 2026-10-29: soft
   clouds, a gentle paint-like variation in its tone, pale far towers rising into it, birds; calm, no abstract

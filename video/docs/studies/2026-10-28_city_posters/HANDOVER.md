@@ -6,6 +6,13 @@ Written 2026-10-28 ~22:55 UTC by the orchestrating session https://claude.ai/cod
 points and conclusions into the main repo"). The brief is `README.md` here; the owner's words verbatim are in
 `video/docs/look/poster_refs/README.md`.
 
+## Status 2026-10-31 ~00:45 UTC: weekly tokens nearly out: small steps only; the rework handed back
+- Owner: "let's just do a few incremental improvents not big redesign leave it to the other session started it".
+  feeling-first-rework STOPPED (only AUDIT.md was extended); `video/docs/process/BRIEF.md` hands it back to video 4's
+  session. One small fix kept: DIRECTION rule 6's darks no longer a percentage (the mood decides; v7's 43 % one example).
+- Last task still finishing: the Helsinki fix (composition-library-v2, run `wf_6be51888-82f`) -> push its files to
+  video 4's branch when it lands. Scheduled checkpoint messages cancelled to save tokens.
+
 ## Status 2026-10-31 ~00:35 UTC: the owner: feeling first, numbers never targets; the rework runs
 - Owner on v7: better overall, but "we lost the feeling ... a dark alley whete nothing happens"; "Saying 65% contrast
   makes the agent force a design"; keep all the tooling and recipes, reframe the guides around feelings. Captured:
